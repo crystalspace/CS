@@ -27,7 +27,9 @@ MacOS/X
 @end itemize
 
 @noindent
-Here are some of just some of Crystal Space's features in no particular order:
+Here are some of just some of Crystal Space's features in no particular order.
+Whenever there is some documentation on the subject this is marked after
+the feature. The most useful documentation comes first.
 
 @c this used to be listed by library and plug-in, but I found that organization
 @c redundant after looking at some other sections of the documentation,
@@ -38,175 +40,138 @@ Here are some of just some of Crystal Space's features in no particular order:
 2D and 3D vectors
 
 @item
-quaternions
+Quaternions. @xref{csGeom}.
 
 @item
 2D and 3D polygons
 
 @item
-2D and 3D matrices (and transforms)
+2D and 3D matrices (and transforms). @xref{csGeom}.
 
 @item
-Shared Class Facility @sc{scf}.  @xref{SCF}.
+Shared Class Facility @sc{scf}.  @xref{SCF}, @xref{Tutorial Introduction}.
 
 @item
-plug-in system
+Flexible plug-in system. @xref{SCF}, @xref{HOWTO Create Your Own Plugin}.
 
 @item
-archival (@sc{zip} files)
+Virtual file system and transparent support for @sc{zip} files. @xref{VFS}.
 
 @item
-configuration files
+Configuration files. @xref{Configuration File}.
 
 @item
-command-line parsing
+Command-line parsing. @xref{Tutorial Introduction}.
 
 @item
-events (queues, cords, outlets)
+Event system.
 
 @item
-user input
+Full screen effects (fading, whiteout, etc).
 
 @item
-@sc{md5} signatures
+Procedural textures. @xref{ProcTextures}, @xref{Texture Mapping}.
 
 @item
-random number generator
+2D animations.
 
 @item
-virtual clock and scheduler
-
-@item
-strings
-
-@item
-storage vectors (not geometry vectors)
-
-@item
-data streams
-
-@item
-hash maps
-
-@item
-progress meters and pulses (in text)
-
-@item
-screen @sc{fx} (fading, whiteout, etc)
-
-@item
-procedural textures
-
-@item
-2D animations
-
-@item
-sprite building
-
-@item
-two different windowing systems
+Crystal Space native windowing system. @xref{AWS}, @xref{CSWS}.
 
 @item
 2D canvases (OpenGL, DirectDraw, X11, CoreGraphics, Cocoa, null, memory, line)
 
 @item
-3D renderers (OpenGL, software, null, line)
+3D renderers (OpenGL, software, null, line). @xref{Graphics Drivers}.
 
 @item
-@sc{avi} streams (@sc{rle}, DivX 4, OpenDivX)
+Playing @sc{avi} streams (@sc{rle}, DivX 4, OpenDivX) on a texture.
 
 @item
-image loaders (@sc{bmp}, @sc{gif}, @sc{jpg}, @sc{png}, @sc{sgi}, @sc{tga},
-@sc{wal})
+Various image loaders (@sc{bmp}, @sc{gif}, @sc{jpg}, @sc{png}, @sc{sgi},
+@sc{tga}, @sc{wal}).
 
 @item
-portals and sectors
+Portals and sectors. @xref{Portal Engine}.
 
 @item
-lighting (static, pseudo-dynamic, dynamic, halos, shadows, radiosity)
+Lighting (static, pseudo-dynamic, dynamic, halos, shadows, radiosity).
+@xref{Lighting}, @xref{HOWTO Pseudo DynLight}.
 
 @item
-bezier curves
+Bezier curves.
 
 @item
-visibility culling based on kd-tree with coverage buffers
+Visibility culling based on kd-tree with coverage buffers (Dynavis).
+@xref{Visibility Culling}.
 
 @item
-multiple cameras
+Multiple cameras.
 
 @item
-textures, materials, and shaders
+Textures, materials, and shaders. @xref{Texture Mapping}.
 
 @item
-optional isometric engine
+Optional isometric engine.
 
 @item
-a virtual file system (allows reading into zip files)
+Sound drivers (CoreAudio, @sc{oss}, and WaveOut). @xref{Sound Drivers}.
 
 @item
-sound drivers (CoreAudio, @sc{oss}, and WaveOut)
+Sound renderers (software, DirectSound 3D, @sc{eax}, aRts).
+@xref{Sound Drivers}.
 
 @item
-sound renderers (software, DirectSound 3D, @sc{eax}, aRts)
+Sound loaders (@sc{wav}, @sc{au}, @sc{iff}, @sc{aiff}, @sc{mod}, @sc{mp3},
+@sc{ogg}). @xref{Sound Drivers}.
 
 @item
-sound loaders (@sc{wav}, @sc{au}, @sc{iff}, @sc{aiff}, @sc{mod}, @sc{mp3},
-@sc{ogg})
+Thing and other mesh objects. @xref{MeshObject}, @xref{MeshObject Thing},
+@xref{HOWTO Create Thing}.
 
 @item
-thing and mesh objects
+2D and 3D sprites. @xref{MeshObject Spr3D}, @xref{MeshObject Spr2D}.
 
 @item
-2D and 3D sprites
+Terrain engines. @xref{MeshObject TerrFunc}.
 
 @item
-terrains
+Metaballs. @xref{MeshObject Metaball}.
 
 @item
-metaballs
+Particle systems (fire, explosions, rain, snow, spirals, fountain).
+@xref{MeshObject PartSys}.
 
 @item
-particle systems (fire, explosions, rain, snow, spirals, fountain)
+Haze mesh (a bit like volumetric light). @xref{MeshObject Haze}.
 
 @item
-haze meshes
+Pull-down console that you can integrate in your own games.
+@xref{Config Console}.
 
 @item
-mesh builders and sprite factories
+Network sockets. @xref{Network Drivers}.
 
 @item
-volumetric light
+Collision detection (using @sc{rapid} or @sc{opcode})
 
 @item
-pull-down console
+Bitmapped and vector fonts.
 
 @item
-network sockets
+Map file loader and converters. @xref{XML File Format},
+@xref{Old Map File Format}.
 
 @item
-collision detection (using @sc{rapid} or @sc{opcode})
+Scripting engine (python, perl, ...). @xref{Scripting Languages}.
 
 @item
-bitmapped and vector fonts
+Skeletal animation. @xref{MeshObject Spr3D}.
 
 @item
-map file loader and converters
+Object movement. @xref{HOWTO Mesh Movement}.
 
 @item
-scripting engine (python, perl, ...)
-
-@item
-performance statistics
-
-@item
-skeletal animation
-
-@item
-object movement
-
-@item
-Dynavis visibility culling system
-
-@item
-debugging system
+Debugging system
 @end itemize
+

@@ -12,6 +12,10 @@ chronological order.
 	  Using iSharedVariable->AddListener() you can add listeners.
 	- Jorrit added the ability to set LOD in iLODControl using variables
 	  instead of constants.
+	- Jorrit added references to other parts of the documentation for
+	  most features mentioned in the feature list. That way the
+	  feature list is a good starting point to find out how to do
+	  something.
 13-Aug-2003
 	- res renamed the rlloader, rlsstd and rlsstencil plugins to less
 	  cryptic rendloop_loader, rendstep_std and rendstep_stencil.
