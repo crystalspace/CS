@@ -20,7 +20,7 @@
 #include "csutil/datastrm.h"
 
 csDataStream::csDataStream (void *buf, int n, bool del) :
-  Data ((uint8*)buf), Size (n), DeleteBuffer (del), Position (0)
+  Data ((uint8*)buf), Position (0), Size (n), DeleteBuffer (del)
 {
 }
 
@@ -74,7 +74,7 @@ IMPLEMENT_READ_INT (ReadUInt32, uint32);
 
 int csDataStream::GetChar () {
   char val;
-  if (Read (&val, sizeof(char)) < sizeof(char))
+  if (Read (&val, sizeof(char)) < (int)sizeof(char))
     return EOF;
   return val;
 }
