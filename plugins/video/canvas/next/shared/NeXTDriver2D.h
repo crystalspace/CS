@@ -50,6 +50,8 @@ public:
     virtual void Close();
     virtual void Print( csRect* = 0 );
     virtual bool SetMouseCursor( csMouseCursorID shape );
+    virtual iGraphics2D* CreateOffScreenCanvas( int width, int height,
+	csPixelFormat*, void* buffer, RGBPixel* palette, int pal_size );
     DECLARE_IBASE;
     };
 

@@ -19,11 +19,8 @@
 
 #include <stdarg.h>
 #include "sysdef.h"
+#include "dyntex2d.h"
 #include "csutil/scf.h"
-#include "cssys/unix/iunix.h"
-#include "cssys/csevent.h"
-#include "video/canvas/common/dyntex2d.h"
-#include "csutil/csrect.h"
 #include "isystem.h"
 
 IMPLEMENT_IBASE (csDynamicTexture2D)
@@ -112,7 +109,7 @@ iGraphics2D *csDynamicTexture2D::CreateOffScreenCanvas (int width, int height,
 
 bool csDynamicTexture2D::Open(const char *Title)
 {
-  CsPrintf (MSG_INITIALIZATION, "Crystal Space X windows texture buffer");
+  CsPrintf (MSG_INITIALIZATION, "Crystal Space dynamic texture buffer");
 
   // Open your graphic interface
   if (!csGraphics2D::Open (Title))
@@ -124,15 +121,13 @@ bool csDynamicTexture2D::Open(const char *Title)
 
 void csDynamicTexture2D::Close ()
 {
-  // the Memory array is a shared resource with the texture, let the texture
+  // The Memory array is a shared resource with the texture, let the texture
   // manager destroy it.
   Memory = NULL;
-
   csGraphics2D::Close ();
 }
 
-void csDynamicTexture2D::Print (csRect */*area*/)
+void csDynamicTexture2D::Print (csRect*)
 {
   // do nothing as its not buffered
-
 }

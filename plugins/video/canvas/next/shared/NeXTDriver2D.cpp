@@ -23,6 +23,7 @@
 #include "NeXTFrameBuffer15.h"
 #include "NeXTFrameBuffer32.h"
 #include "NeXTSystemInterface.h"
+#include "video/canvas/common/dyntex2d.h"
 #include "isystem.h"
 
 IMPLEMENT_FACTORY(NeXTDriver2D)
@@ -181,4 +182,16 @@ void NeXTDriver2D::Print( csRect* )
     {
     frame_buffer->cook();
     flush();
+    }
+
+
+//-----------------------------------------------------------------------------
+// CreateOffScreenCanvas
+//-----------------------------------------------------------------------------
+iGraphics2D* NeXTDriver2D::CreateOffScreenCanvas( int width, int height,
+   csPixelFormat* pfmt, void* buffer, RGBPixel* palette, int pal_size )
+    {
+    csDynamicTexture2D* tex = new csDynamicTexture2D( System );
+    return tex->CreateOffScreenCanvas( width, height, pfmt, buffer,
+	palette, pal_size );
     }

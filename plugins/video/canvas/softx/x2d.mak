@@ -45,8 +45,7 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_X2D
 endif
 DESCRIPTION.$(XLIB2D) = $(DESCRIPTION.x2d)
-SRC.XLIB2D = $(wildcard plugins/video/canvas/softx/*.cpp $(SRC.COMMON.DRV2D)) \
-	plugins/video/canvas/common/dyntex2d.cpp
+SRC.XLIB2D = $(wildcard plugins/video/canvas/softx/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.XLIB2D = $(addprefix $(OUT),$(notdir $(SRC.XLIB2D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
