@@ -1383,7 +1383,7 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
     size_t attrEnd = nodesFile->GetPos ();
     nodesFile->SetPos (attrStart + sizeof(uint32));
     nodesFile->Write ((char*)attrStarts, sizeof(uint32) * attrCount);
-    diskNode.offsets[0] little_endian_long (= attrStart - nodeStart);
+    diskNode.offsets[0] = little_endian_long (attrStart - nodeStart);
     nodesFile->SetPos (attrEnd);
     delete[] attrStarts;
   }

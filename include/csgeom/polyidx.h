@@ -54,6 +54,9 @@ public:
   /// Destructor.
   virtual ~csPolyIndexed ();
 
+  /// Assignment operator.
+  csPolyIndexed& operator = (const csPolyIndexed& other);
+
   /**
    * Initialize the polygon to empty.
    */

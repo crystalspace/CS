@@ -33,6 +33,17 @@ csPolyIndexed::csPolyIndexed (csPolyIndexed &copy)
   memcpy (vertices_idx, copy.vertices_idx, sizeof (int) * num_vertices);
 }
 
+csPolyIndexed& csPolyIndexed::operator = (const csPolyIndexed& other)
+{
+  if (&other == this) return *this;
+  delete[] vertices_idx;
+  max_vertices = other.max_vertices;
+  num_vertices = other.num_vertices;
+  vertices_idx = new int[max_vertices];
+  memcpy (vertices_idx, other.vertices_idx, sizeof (int) * num_vertices);
+  return *this;
+}
+
 csPolyIndexed::~csPolyIndexed ()
 {
   delete[] vertices_idx;

@@ -95,13 +95,17 @@ public:
       Push (other[i]);
   }
 
-  void operator = (const csArray& other)
+  csArray<T>& operator = (const csArray& other)
   {
+    if (&other == this)
+      return *this;
+
     // simple but not optimal solution here
     DeleteAll ();
 
     for (int i=0;i<other.Length();i++)
       Push(other[i]);
+    return *this;
   }
 
   /// Clear entire vector, releasing all memory.

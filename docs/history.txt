@@ -3,6 +3,9 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+10-Apr-2003
+	- Fixed a compile error in binary XML reader. I wonder if people
+	  compile after changing something...
 9-Apr-2003
         - Rhad fixed OpenAL compile with compilers other than MSVC.
           - Changed FillMemory() to memset()
@@ -15,6 +18,9 @@ The history order is reversed so that new features are at the top.
 	  - put back csSchedul, seems this class was used.
 	- Fixed BugPlug so that it compiles again without the new renderer
 	  enabled.
+	- Fixed csArray assignment operator so that it returns a ref to the
+	  caller and also is safe when doing 'a=a'.
+	- Added csPolyIndexed assignment operator.
 	- res changed csendian.h to utilize CONST_INT64() again. The missing 
 	  identifiers are fixed with a #define __STDC_LIMIT_MACROS in cstypes.h
 	  prior to the inclusion of <stdint.h>.
@@ -44,14 +50,6 @@ The history order is reversed so that new features are at the top.
 	      brings the dynamic ambient color range in the same range as
 	      the rest of CS with 1 meaning full bright and 2 meaning
 	      double brightness.
-	- Thing changes:
-	    - Removed obsolete csThingBBox bounding box in csThing.
-	    - Split bezier curves in seperate mesh object plugin (bezier
-	      plugin).
-	    - Greatly cleaned up the csThingStatic stuff and moved all static
-	      stuff to that.
-	    - Updated API modification document.
-	    - Fixed map2cs to export curves using the new bezier plugin.
 	- Matze started to merge his jam build system:
 	    - Added configure-jam.ac file and changed autogen.sh to generate
 	      a configure-jam as well.
