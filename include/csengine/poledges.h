@@ -72,6 +72,40 @@ public:
 };
 
 /**
+ * An iterator to iterate over all edges.
+ */
+class csEdgeIterator
+{
+  friend class csPolygonEdges;
+
+private:
+  /// Hash iterator.
+  csHashIterator* iterator;
+  /// Current poledge structure.
+  csPolEdge* current;
+
+private:
+  /**
+   * Constructor is private. This object is only made
+   * by the friend csPolygonEdges.
+   */
+  csEdgeIterator (csHashMap& edges);
+
+public:
+  /// Destructor.
+  virtual ~csEdgeIterator ();
+
+  /// Is there a next edge in this iterator?
+  bool HasNext ()
+  {
+    return current != NULL;
+  }
+
+  /// Get the next polygon/edge.
+  csPolygon3D* Next (int& e1, int& e2);
+};
+
+/**
  * A class representing all edges in a set of polygons.
  */
 class csPolygonEdges
@@ -107,6 +141,15 @@ public:
   csPolEdgeIterator* GetPolygons (int i1, int i2)
   {
     return new csPolEdgeIterator (edges, i1, i2);
+  }
+
+  /**
+   * Get an iterator to iterate over all edges and polygons
+   * in this structure. 'delete' this iterator when ready.
+   */
+  csEdgeIterator* GetEdges ()
+  {
+    return new csEdgeIterator (edges);
   }
 };
 

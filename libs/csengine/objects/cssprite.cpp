@@ -610,7 +610,7 @@ bool csSprite3D::SetPositionSector (const csVector3 &move_to)
   }
 }
 
-void csSprite3D::Transform (csMatrix3& matrix)
+void csSprite3D::Transform (const csMatrix3& matrix)
 {
   csMatrix3 m = matrix;
   m *= m_obj2world;
@@ -763,6 +763,8 @@ void csSprite3D::UpdateWorkTables (int max_size)
 
 void csSprite3D::UpdateInPolygonTrees ()
 {
+  bbox.RemoveFromTree ();
+
   // If we are not in a sector which has a polygon tree
   // then we don't really update. We should consider if this is
   // a good idea. Do we only want this object updated when we

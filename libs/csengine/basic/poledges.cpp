@@ -63,6 +63,34 @@ csPolygon3D* csPolEdgeIterator::Next ()
 
 //---------------------------------------------------------------------------
 
+csEdgeIterator::csEdgeIterator (csHashMap& edges)
+{
+  iterator = edges.GetIterator ();
+  if (iterator->HasNext ())
+    current = (csPolEdge*)(iterator->Next ());
+  else
+    current = NULL;
+}
+
+csEdgeIterator::~csEdgeIterator ()
+{
+  delete iterator;
+}
+
+csPolygon3D* csEdgeIterator::Next (int& e1, int& e2)
+{
+  if (!current) return NULL;
+  e1 = current->i1;
+  e2 = current->i2;
+
+  // Prepare to go to next polygon.
+  csPolygon3D* rc_p = current->p;
+  current = (csPolEdge*)(iterator->Next ());
+  return rc_p;
+}
+
+//---------------------------------------------------------------------------
+
 csPolygonEdges::csPolygonEdges (csPolygonInt** polygons, int num_polygons)
 	: edges (25247)	// Some prime number
 {

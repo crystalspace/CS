@@ -1,5 +1,35 @@
 The history order has been reversed so that new features are at the top.
 
+12-Aug-2000
+	- Wouter Wijngaards did the following:
+	  Make install now works on Linux, set CRYSTAL to the installdir,
+	  including a trailing /. For this I made some changes. engine: now
+	  installs vfs.cfg and scf.cfg into TO_INSTALL.ROOT in vfs.cfg  @ is
+	  the install dir, with /. Thus $@data/standard.zip.  isystem has
+	  an added InferInstallLocationOf(file), used during startup. This
+	  has an implementation in csSysDriver, that looks at $CRYSTAL or
+	  returns "" (current dir). It can be overridden for other platforms,
+	  i.e. for win32 it could look in the registry first, or default to
+	  something smarter (like /usr/local/crystal, or
+	  C:\Program Files\Crystal). csLoadLibrary has an added const char*
+	  installpath, containing installation directory (probably).
+	  The 'make install' target now reports the environment setting to
+	  set. I also changed the loadlib.cpp files, for unix it is used
+	  now, looking in <installpath>lib/ for .so files. The other
+	  platforms have it as an unused variable for now. Perhaps they
+	  wish to use it? if possible.
+	- Norman added "" as installpath, so for scfreg you have to give either
+	  the full path to the shared libs or the current is taken as
+	  default.
+	- Fixed a big memory leak and slow-down with sprites in a STATBSP
+	  level. Everytime the sprite moves the old position was not removed
+	  from the octree/BSP tree. There is still a memory leak remaining
+	  though.
+	- Thomas Hieber adjusted some Win32 files for the new install
+	  system. Thomas also fixed a few compilation errors.
+	- Thomas also removed a few warnings in cscon, perfstat, and
+	  opengl canvas.
+	- Martin Geisse fixed a bug in the MSVC workspace file.
 11-Aug-2000
 	- Andrew Zabolotny removed console_open and console_close from all
 	  ports. Every system driver has lots of opportunities for
@@ -15,7 +45,13 @@ The history order has been reversed so that new features are at the top.
 	- Andrew also added dxguid library to dx6 driver linkage command.
 	- Andrew fixed a small work-around so that Matrix Millenium II
 	  AGP will work with the Direct3D driver (45 fps but no lighting).
+	- Added 'const' to matrix paramter for csSprite3D::Transform().
 10-Aug-2000
+	- Added new GetEdges() function to csPolygonEdges which returns
+	  an iterator to iterate over all edges in the structure.
+	- Fixed a bug in the PVS routine to combine adjacent polygons.
+	- Completely rewrote csPoly2D::ExtendConvex() to make it more
+	  mathematically robust and faster.
 	- Michael Dale Long did more fixes on cctest. Can quit and fire
 	  rockets again. Still no console.
 	- Martin Geisse fixed a few compile time errors.

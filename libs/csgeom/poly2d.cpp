@@ -256,39 +256,60 @@ void csPoly2D::ClipPlane (const csPlane2& plane, csPoly2D& right) const
   for (i = 0 ; i < num_vertices ; i++)
   {
     c = plane.Classify (vertices[i]);
+printf ("    i=%d c=%f\n", i, c);
     if (c > -EPSILON && c < EPSILON)
     {
+printf ("    b1\n");
       // This vertex is on the edge. Add it to both polygons
       // unless the polygon has no vertices yet. In that
       // case we remember it for later (skip_xxx var) so
       // that we can later add them if the polygon ever
       // gets vertices.
       if (right.GetNumVertices ())
+{
+printf ("    AddVertex (%f,%f)\n", vertices[i].x, vertices[i].y);
         right.AddVertex (vertices[i]);
+}
       else
+{
         skip_right++;
+printf ("    skip_right++ = %d\n", skip_right);
+}
     }
     else if (c <= -EPSILON && c1 < EPSILON)
     {
+printf ("    b2\n");
       // This vertex is on the left and the previous
       // vertex is not right (i.e. on the left or on the edge).
       if (!skip_right && !right.GetNumVertices ())
+{
         ignore_right++;
+printf ("    ignore_right++ =%d\n", ignore_right);
+}
     }
     else if (c >= EPSILON && c1 > -EPSILON)
     {
+printf ("    b3\n");
       // This vertex is on the right and the previous
       // vertex is not left.
+printf ("    AddVertex (%f,%f)\n", vertices[i].x, vertices[i].y);
       right.AddVertex (vertices[i]);
     }
     else
     {
+printf ("    b4\n");
       // We need to split.
+printf ("    isect:(%f,%f) and (%f,%f) plane (%f,%f,%f)\n", vertices[i1].x, vertices[i1].y,
+vertices[i].x, vertices[i].y, plane.A (), plane.B (), plane.C ());
       csIntersect2::Plane (vertices[i1], vertices[i],
       	plane, isect, dist);
+printf ("    AddVertex isect:(%f,%f)\n", isect.x, isect.y);
       right.AddVertex (isect);
       if (c > 0)
+{
+printf ("    AddVertex (%f,%f)\n", vertices[i].x, vertices[i].y);
 	right.AddVertex (vertices[i]);
+}
     }
 
     i1 = i;
@@ -303,76 +324,170 @@ void csPoly2D::ClipPlane (const csPlane2& plane, csPoly2D& right) const
   if (right.GetNumVertices ())
     while (skip_right > 0)
     {
+printf ("    AddVertex while:(%f,%f)\n", vertices[i].x, vertices[i].y);
       right.AddVertex (vertices[i]);
       i++;
       skip_right--;
     }
 }
 
-void csPoly2D::ExtendConvex (const csPoly2D& other, int this_edge)
+void csPoly2D::ExtendConvex (const csPoly2D& other, int i1)
 {
-  int this_edge2 = (this_edge+1)%num_vertices;
-  int i, i1, j;
+  // Some conventions:
+  //   i1, i2: edge of this polygon common with 'other'.
+  //   j1, j2: edge of other polygon common with 'this'.
+  //   i1 corresponds with j2
+  //   i2 corresponds with j1
+  int i2 = (i1+1)%num_vertices;
+  int j1, j2;
+  int i, j, jp;
 
-  // First clip the other polygon to the two edges from this polygon
-  // that connect to the shared edge. This way we can reduce the algorithm
-  // to just having to connect the two remaining polygons. The resulting
-  // connection will be convex.
-  csPoly2D other1;
-  csPlane2 pl;
-  pl.Set (vertices[(this_edge-1+num_vertices)%num_vertices],
-  	vertices[this_edge]);
-  other.ClipPlane (pl, other1);
-  if (other1.GetNumVertices () <= 0) return;	// Nothing to be done.
-  csPoly2D other2;
-  pl.Set (vertices[this_edge2], vertices[(this_edge2+1)%num_vertices]);
-  other1.ClipPlane (pl, other2);
-  if (other2.GetNumVertices () <= 0) return;	// Nothing to be done.
-
-  // Find the common edge in this new polygon.
-  int other_edge = -1, other_edge2 = -1;
-  for (i = 0 ; i < other2.GetNumVertices () ; i++)
+  // First find j1 and j2.
+  j2 = -1;
+  for (j = 0 ; j < other.GetNumVertices () ; j++)
   {
-    if ((vertices[this_edge]-other2[i]) < EPSILON)
-      other_edge2 = i;
-    if ((vertices[this_edge2]-other2[i]) < EPSILON)
-      other_edge = i;
+    if ((vertices[i1]-other[j]) < EPSILON)
+    {
+      j2 = j;
+      break;
+    }
   }
-  if (other_edge == -1 || other_edge2 == -1)
-    printf ("INTERNAL ERROR: csPoly2D::ExtendConvex\n");
+  if (j2 == -1)
+  {
+    printf ("INTERNAL ERROR: matching vertex not found!\n");
+    exit (0);
+  }
+  j1 = (j2-1+other.GetNumVertices ()) % other.GetNumVertices ();
 
+  // Double check if i2 and j1 really match.
+  if (!((vertices[i2]-other[j1]) < EPSILON))
+  {
+    printf ("INTERNAL ERROR: i2 doesn't match j1!\n");
+    for (i = 0 ; i < GetNumVertices () ; i++)
+      printf ("  orig %d: %f,%f\n", i, (*this)[i].x, (*this)[i].y);
+    for (i = 0 ; i < other.GetNumVertices () ; i++)
+      printf ("  other %d: %f,%f\n", i, other[i].x, other[i].y);
+    printf ("  i1=%d i2=%d j1=%d j2=%d\n", i1, i2, j1, j2);
+    exit (0);
+  }
+
+  // Copy this polygon to 'orig' and clear this one.
   csPoly2D orig (*this);
+  int orig_num = orig.GetNumVertices ();
+  int other_num = other.GetNumVertices ();
   MakeEmpty ();
 
-  // Now join the two polygons. Note that this function
-  // assumes that the two polygons are oriented the same way.
-  // i.e. the polygons go along the adjacent edge in seperate directions.
-  i1 = orig.num_vertices-1;
-  for (i = 0 ; i < orig.num_vertices ; i++)
+  // Add the vertex just before i1. We will start our new
+  // polygon with this one.
+  AddVertex (orig[(i1-1+orig_num) % orig_num]);
+
+  // Construct two 2D planes for i1-1 to i1 and i2 to i2+1. These
+  // planes will be used to check what vertices of the other polygon
+  // we will retain and which we will discard. These two planes in
+  // effect define the subset of the other polygon that we are
+  // interested in. This subset we add (union) to this polygon.
+  csPlane2 pl1, pl2;
+  pl1.Set (orig[(i1-1+orig_num) % orig_num], orig[i1]);
+  pl1.Normalize ();	//@@@ Needed?
+  pl2.Set (orig[i2], orig[(i2+1) % orig_num]);
+  pl2.Normalize ();	//@@@ Needed?
+
+  // Start scanning the other polygon starting with j2+1.
+  // While the vertices of the other polygon are on the left side
+  // of pl1 we ignore them.
+  jp = j2;
+  j = (j2+1) % other_num;
+  int cnt = other_num;
+  while (pl1.Classify (other[j]) > EPSILON)
   {
-    // Join other polygon.
-    if (i == this_edge)
+    jp = j;
+    j = (j+1) % other_num;
+    cnt--;
+    if (cnt < 0)
     {
-      j = (other_edge2+1)%other2.GetNumVertices ();
-      while (j != other_edge)
-      {
-	AddVertex (other2[j]);
-        j = (j+1)%other2.GetNumVertices ();
-      }
+      printf ("INTERNAL ERROR! Looping forever!\n");
+      for (i = 0 ; i < orig.GetNumVertices () ; i++)
+	printf ("  orig %d: %f,%f\n", i, orig[i].x, orig[i].y);
+      for (i = 0 ; i < other.GetNumVertices () ; i++)
+	printf ("  other %d: %f,%f\n", i, other[i].x, other[i].y);
+      printf ("  i1=%d i2=%d j1=%d j2=%d\n", i1, i2, j1, j2);
+      exit (0);
     }
-    else if (i == this_edge2)
-    {
-      // Ignore this edge.
-    }
-    else if (i1 == this_edge2)
+  }
+
+  csVector2 isect;
+  float dist;
+
+  // If jp == j2 then we know that the first vertex after i1 is already
+  // right of pl1 so we consider j2 or i1 the intersection point to
+  // continue with the rest of the processing below.
+  if (jp == j2)
+  {
+    isect = other[j2];
+  }
+  else
+  {
+    // jp to j is an edge which is intersected by pl1. The intersection
+    // point is what we need.
+    csIntersect2::Plane (other[jp], other[j], pl1, isect, dist);
+  }
+
+  // If the intersection point is on the left of pl2 then we know
+  // that the intersection point of the two planes itself will define
+  // the new extended polygon. In that case we can simply add that
+  // intersection point to the this polygon and add the rest of the
+  // vertices as well.
+  if (pl2.Classify (isect) > EPSILON)
+  {
+    csIntersect2::Planes (pl1, pl2, isect);
+    AddVertex (isect);
+    i = (i2+1)%orig_num;
+    while (i != (i1-1+orig_num) % orig_num)
     {
       AddVertex (orig[i]);
+      i = (i+1) % orig_num;
     }
-    else
+    return;
+  }
+
+  // Otherwise the intersection point is going to be part of the
+  // polygon.
+  AddVertex (isect);
+
+  // Now we continue scanning the other polygon starting with the
+  // vertex j where we ended. We add all vertices that are on the
+  // right of the second plane.
+  while (j != j1)
+  {
+    if (pl2.Classify (other[j]) < -EPSILON)
+      AddVertex (other[j]);
+    else break;
+    jp = j;
+    j = (j+1) % other_num;
+  }
+
+  // If j == j1 then all other vertices are right so we must add
+  // j1 (or i2) itself then continue with the rest of this polygon.
+  if (j == j1)
+  {
+    i = i2;
+    while (i != (i1-1+orig_num) % orig_num)
     {
       AddVertex (orig[i]);
+      i = (i+1) % orig_num;
     }
-    i1 = i;
+    return;
+  }
+
+  // Otherwise the edge jp to j crosses the second plane. In this
+  // case we intersect again and ignore the rest of 'other'.
+  csIntersect2::Plane (other[jp], other[j], pl2, isect, dist);
+  AddVertex (isect);
+  i = (i2+1)%orig_num;
+  while (i != (i1-1+orig_num) % orig_num)
+  {
+    AddVertex (orig[i]);
+    i = (i+1) % orig_num;
   }
 }
 

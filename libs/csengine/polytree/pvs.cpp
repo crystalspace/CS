@@ -41,7 +41,7 @@
 #define DO_PVS_SOLID_SPACE_OPT 0
 #define DO_PVS_ADJACENT_NODES 0
 #define DO_PVS_POLYGONS 1
-#define DO_PVS_MERGE_ADJACENT_POLYGONS 1
+#define DO_PVS_MERGE_ADJACENT_POLYGONS 0
 #define DO_PVS_QAD 0
 
 #define PLANE_X 0
@@ -669,6 +669,7 @@ void csPVSAlgo::BoxOccludeeShadowPolygons (
 {
   // This version will try to merge
   // adjacent polygons into one bigger convex polygon.
+//printf("num_polygons=%d\n", num_polygons);
   csPolygonEdges edges (polygons, num_polygons);
 
   int i, j, j1, k;
@@ -695,12 +696,14 @@ void csPVSAlgo::BoxOccludeeShadowPolygons (
       // we don't have to cast the shadow of this polygon anymore.
       bool casted_shadow = false;
       j1 = p->GetNumVertices ()-1;
+      int* vidx = p->GetVertexIndices ();
       for (j = 0 ; j < p->GetNumVertices () ; j++)
       {
-        csPolEdgeIterator* pol_it = edges.GetPolygons (j1, j);
+        csPolEdgeIterator* pol_it = edges.GetPolygons (vidx[j1], vidx[j]);
 	while (pol_it->HasNext ())
 	{
 	  csPolygon3D* other = pol_it->Next ();
+	  if (other == p) continue;
           other_poly.SetNumVertices (0);
           for (k = 0 ; k < other->GetNumVertices () ; k++)
             other_poly.AddVertex (other->Vwor (k));
