@@ -1,11 +1,6 @@
 SubDir TOP plugins mesh protomesh persist standard ;
 
 Description protomeshldr : "Proto mesh object loader" ;
-
-Plugin protomeshldr
-	: [ Wildcard *.cpp *.h ]
-;
+Plugin protomeshldr : [ Wildcard *.cpp *.h ] : noinstall ;
 LinkWith protomeshldr : csgeom csutil ;
-
-CompileGroups protomeshldr :  meshes ;
-
+CompileGroups protomeshldr : meshes ;
