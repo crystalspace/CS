@@ -352,7 +352,7 @@ bool Simple::Initialize ()
   
   spstate->SetMaterialWrapper( mat );
   printf("bla3 \n");
-  spstate->GenerateFabric(40,40);
+  spstate->GenerateFabric(25,25);
   printf("blu \n");
 
   // Create the sprite and add it to the engine.
