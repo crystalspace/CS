@@ -30,9 +30,20 @@ csString::~csString ()
   Free ();
 }
 
+void csString::Free ()
+  {
+  if (Data)
+  {
+    delete[] Data;
+    Data = 0;
+    Size = 0;
+    MaxSize = 0;
+  }
+}
+
 void csString::SetCapacity (size_t NewSize)
 {
-  NewSize++;
+  NewSize++; // Plus one for implicit null byte.
   if (NewSize <= MaxSize)
     return;
   MaxSize = NewSize;
@@ -48,12 +59,28 @@ void csString::SetCapacity (size_t NewSize)
   Data = buff;
 }
 
+csString &csString::Reclaim()
+{
+  if (Size == 0)
+    Free();
+  else
+  {
+    CS_ASSERT(Data != 0);
+    MaxSize = Size + 1; // Plus one for implicit null byte.
+    char* s = new char[MaxSize];
+    memcpy(s, Data, MaxSize);
+    delete[] Data;
+    Data = s;
+  }
+  return *this;
+}
+
 csString &csString::Truncate (size_t iPos)
 {
   if (iPos < Size)
   {
     Size = iPos;
-    Data [Size] = 0;
+    Data [Size] = '\0';
   }
   return *this;
 }
@@ -61,12 +88,13 @@ csString &csString::Truncate (size_t iPos)
 csString &csString::DeleteAt (size_t iPos, size_t iCount)
 {
 #ifdef CS_DEBUG
-  if (iPos > Size || iPos + iCount > Size)
+  if (iPos >= Size || iPos + iCount > Size)
     STR_FATAL (("Tried to delete characters beyond the end of the string!\n"))
 #endif
-  memmove(Data + iPos, Data + iPos + iCount, Size - (iPos + iCount));
-  Size = Size - iCount;
-  Data[Size] = 0;
+  if (iPos + iCount < Size)
+    memmove(Data + iPos, Data + iPos + iCount, Size - (iPos + iCount));
+  Size -= iCount;
+  Data[Size] = '\0';
   return *this;
 }
 
@@ -74,109 +102,66 @@ csString &csString::Insert (size_t iPos, const csString &iStr)
 {
 #ifdef CS_DEBUG
   if (iPos > Size)
-    STR_FATAL (("Inserting `%s' into `%s' at position %lu\n",
-      iStr.GetData (), Data, (unsigned long)iPos))
+    STR_FATAL (("Inserting `%s' beyond end of string `%s' at position %lu\n",
+      iStr.GetData (), Data ? Data : "<null>", (unsigned long)iPos))
 #endif
 
-  if (Data == NULL)
-  {
-    Append (iStr);
-    return *this;
-  }
+  if (Data == 0 || iPos == Size)
+    return Append (iStr);
 
-  size_t sl = iStr.Length ();
-  size_t NewSize = sl + Length ();
-  if (NewSize >= MaxSize)
-    SetCapacity (NewSize);
-  memmove (Data + iPos + sl, Data + iPos, Size - iPos);
+  size_t const sl = iStr.Length ();
+  size_t const NewSize = sl + Size;
+  SetCapacity (NewSize);
+  memmove (Data + iPos + sl, Data + iPos, Size - iPos + 1); // Also move null.
   memcpy (Data + iPos, iStr.GetData (), sl);
-  Data [Size = NewSize] = 0;
-
+  Size = NewSize;
   return *this;
 }
 
 csString &csString::Insert (size_t iPos, const char iChar)
 {
-#ifdef CS_DEBUG
-  if (iPos > Size)
-    STR_FATAL (("Inserting `%c' into `%s' at position %lu\n",
-      iChar, Data, (unsigned long)iPos))
-#endif
-
-  if (Data == NULL)
-  {
-    Append (iChar);
-    return *this;
-  }
-
-  size_t NewSize = 1 + Length ();
-  if (NewSize >= MaxSize)
-    SetCapacity (NewSize);
-  memmove (Data + iPos + 1, Data + iPos, Size - iPos);
-  Data[iPos] = iChar;
-  Data [Size = NewSize] = 0;
-
-  return *this;
+  csString s(iChar);
+  return Insert(iPos, s);
 }
 
 csString &csString::Overwrite (size_t iPos, const csString &iStr)
 {
 #ifdef CS_DEBUG
   if (iPos > Size)
-    STR_FATAL (("Overwriting `%s' into `%s' at position %lu\n",
-      iStr.GetData (), Data, (unsigned long)iPos))
+    STR_FATAL (("Overwriting `%s' beyond end of string `%s' at position %lu\n",
+      iStr.GetData (), Data ? Data : "<null>", (unsigned long)iPos))
 #endif
 
-  if (Data == NULL)
-  {
-    Append (iStr);
-    return *this;
-  }
+  if (Data == 0 || iPos == Size)
+    return Append (iStr);
 
-  size_t sl = iStr.Length ();
-  size_t NewSize = iPos + sl;
-  if (NewSize >= MaxSize)
-    SetCapacity (NewSize);
-  memcpy (Data + iPos, iStr.GetData (), sl);
-  Data [Size = NewSize] = 0;
-
+  size_t const sl = iStr.Length ();
+  size_t const NewSize = iPos + sl;
+  SetCapacity (NewSize);
+  memcpy (Data + iPos, iStr.GetData (), sl + 1); // Also copy null terminator.
+  Size = NewSize;
   return *this;
 }
 
 csString &csString::Append (const csString &iStr, size_t iCount)
 {
-  if (iCount == (size_t)-1)
-    iCount = iStr.Length ();
-
-  if (!iCount)
-    return *this;
-
-  size_t NewSize = Size + iCount;
-  if (NewSize >= MaxSize)
-    SetCapacity (NewSize);
-
-  memcpy (Data + Size, iStr.GetData (), iCount);
-  Data [Size = NewSize] = 0;
-
-  return *this;
+  return Append(iStr.GetData(), iCount);
 }
 
 csString &csString::Append (const char *iStr, size_t iCount)
 {
-  if (!iStr) return *this;
+  if (iStr == 0)
+    return *this;
   if (iCount == (size_t)-1)
     iCount = strlen (iStr);
-
-  if (!iCount)
+  if (iCount == 0)
     return *this;
 
-  size_t NewSize = Size + iCount;
-  if (NewSize >= MaxSize)
-    SetCapacity (NewSize);
-
+  size_t const NewSize = Size + iCount;
+  SetCapacity (NewSize);
   memcpy (Data + Size, iStr, iCount);
-  Data [Size = NewSize] = 0;
-
+  Size = NewSize;
+  Data [Size] = '\0';
   return *this;
 }
 
@@ -184,25 +169,23 @@ csString &csString::LTrim()
 {
   size_t i;
   for (i = 0; i < Size; i++)
-  {
     if (!isspace (Data[i]))
-      return DeleteAt (0, i);
-  }
+      break;
+  if (i > 0)
+    DeleteAt (0, i);
   return *this;
 }
 
 csString &csString::RTrim()
 {
-  if (Size == 0) return *this;
-
-  int i;
-  for(i = Size - 1; i >= 0; i--)
+  if (Size > 0)
   {
-    if (!isspace (Data[i]))
-    {
-      i++;
-      return DeleteAt (i, Size - i);
-    }
+    int i;
+    for (i = Size - 1; i >= 0; i--)
+      if (!isspace (Data[i]))
+        break;
+    if (i < Size - 1)
+      Truncate(i + 1);
   }
   return *this;
 }
@@ -214,31 +197,27 @@ csString &csString::Trim()
 
 csString &csString::Collapse()
 {
-  if (Size == 0) return *this;
-
-  size_t start = (size_t) -1;
-  Trim();
-  size_t i;
-  for (i = 1; i < Size - 1; i++)
+  if (Size > 0)
   {
-    if (isspace (Data[i]))
+    char const* src = Data;
+    char const* slim = Data + Size;
+    char* dst = Data;
+    bool saw_white = false;
+    for ( ; src < slim; src++)
     {
-      if (start==(size_t) -1)
+      char const c = *src;
+      if (isspace(c))
+        saw_white = true;
+      else
       {
-		start = i + 1;
-		Data[i] = ' '; // Force 'space' as opposed to anything isspace()able.
+        if (saw_white && dst > Data)
+          *dst++ = ' ';
+        *dst++ = c;
+        saw_white = false;
       }
     }
-    else
-    {
-      // Delete any extra whitespace
-      if (start != (size_t)-1 && start != i)
-      {
-		DeleteAt (start, i - start);
-		i -= i - start;
-      }
-      start = (size_t) -1;
-    }
+    Size = dst - Data;
+    Data[Size] = '\0';
   }
   return *this;
 }
@@ -246,27 +225,26 @@ csString &csString::Collapse()
 csString &csString::Format(const char *format, ...)
 {
   va_list args;
-  int NewSize = -1;
-
   va_start(args, format);
 
-  // Keep trying until the buffer is big enough to hold the entire string
-  while(NewSize < 0)
+  if (Data == 0) // Ensure that backing-store exists prior to vsnprintf().
+    SetCapacity(255);
+
+  int rc;
+  while (1)
   {
-    NewSize = vsprintf(Data, format, args);
-    // Increasing by the size of the format streams seems logical enough
-    if(NewSize < 0)
-      SetCapacity(MaxSize + strlen(format));
-    // In this case we know what size it wants
-    if((size_t) NewSize>=MaxSize)
-    {
-      SetCapacity(NewSize + 1);
-      NewSize = -1; // Don't break the while loop just yet!
-    } 
+    rc = cs_vsnprintf(Data, MaxSize, format, args);
+    // Buffer was big enough for entire string?
+    if (rc >= 0 && rc < MaxSize)
+      break;
+    // Some vsnprintf()s return -1 on failure, others return desired capacity.
+    if (rc >= 0)
+      SetCapacity(rc); // SetCapacity() ensures room for null byte.
+    else
+      SetCapacity(MaxSize * 2 - 1);
   }
 
-  // Add in the terminating NULL
-  Size = NewSize + 1;
+  Size = rc;
   va_end(args);
   return *this;
 
@@ -274,7 +252,7 @@ csString &csString::Format(const char *format, ...)
 
 #define STR_FORMAT(TYPE,FMT,SZ) \
 csString csString::Format (TYPE v) \
-{ char s[SZ]; sprintf (s, #FMT, v); return csString ().Append (s); }
+{ char s[SZ]; cs_snprintf (s, SZ, #FMT, v); return csString ().Append (s); }
   STR_FORMAT(short, %hd, 32)
   STR_FORMAT(unsigned short, %hu, 32)
   STR_FORMAT(int, %d, 32)
@@ -287,8 +265,9 @@ csString csString::Format (TYPE v) \
 
 #define STR_FORMAT_INT(TYPE,FMT) \
 csString csString::Format (TYPE v, int width, int prec/*=0*/) \
-{ char s[32], s1[32]; \
-  sprintf (s1, "%%%d.%d"#FMT, width, prec); sprintf (s, s1, v); \
+{ char s[64], s1[64]; \
+  cs_snprintf (s1, sizeof(s1), "%%%d.%d"#FMT, width, prec); \
+  cs_snprintf (s, sizeof(s), s1, v); \
   return csString ().Append (s); }
   STR_FORMAT_INT(short, hd)
   STR_FORMAT_INT(unsigned short, hu)
@@ -300,8 +279,9 @@ csString csString::Format (TYPE v, int width, int prec/*=0*/) \
 
 #define STR_FORMAT_FLOAT(TYPE) \
 csString csString::Format (TYPE v, int width, int prec/*=6*/) \
-{ char s[64], s1[32]; \
-  sprintf (s1, "%%%d.%dg", width, prec); sprintf (s, s1, v); \
+{ char s[64], s1[64]; \
+  cs_snprintf (s1, sizeof(s1), "%%%d.%dg", width, prec); \
+  cs_snprintf (s, sizeof(s), s1, v); \
   return csString ().Append (s); }
   STR_FORMAT_FLOAT(float)
   STR_FORMAT_FLOAT(double)
@@ -309,19 +289,13 @@ csString csString::Format (TYPE v, int width, int prec/*=6*/) \
 
 csString &csString::PadLeft (size_t iNewSize, char iChar)
 {
-  if (Size < iNewSize)
+  if (iNewSize > Size)
   {
     SetCapacity (iNewSize);
-    if (Size == 0) return *this;
     const size_t toInsert = iNewSize - Size;
-
-    memmove (Data + toInsert, Data, Size);
-    size_t x;
-    for (x = 0; x < toInsert; x++)
-    {
+    memmove (Data + toInsert, Data, Size + 1); // Also move null terminator.
+    for (size_t x = 0; x < toInsert; x++)
       Data [x] = iChar;
-    }
-    Data [iNewSize] = '\0';
     Size = iNewSize;
   }
   return *this;
@@ -356,14 +330,13 @@ csString csString::PadLeft (TYPE v, size_t iNewSize, char iChar) \
 
 csString& csString::PadRight (size_t iNewSize, char iChar)
 {
-  if (Size < iNewSize)
+  if (iNewSize > Size)
   {
     SetCapacity (iNewSize);
-    size_t x;
-    for (x = Size; x < iNewSize; x++)
+    for (size_t x = Size; x < iNewSize; x++)
       Data [x] = iChar;
-    Data [iNewSize] = '\0';
     Size = iNewSize;
+    Data [Size] = '\0';
   }
   return *this;
 }
@@ -397,25 +370,20 @@ csString csString::PadRight (TYPE v, size_t iNewSize, char iChar) \
 
 csString& csString::PadCenter (size_t iNewSize, char iChar)
 {
-  if (Size < iNewSize)
+  if (iNewSize > Size)
   {
     SetCapacity (iNewSize);
-    if (Size == 0) return *this;
     const size_t toInsert = iNewSize - Size;
-
-    memmove (Data + toInsert / 2 + toInsert % 2, Data, Size);
-
+    const size_t halfInsert = toInsert / 2;
+    if (Size > 0)
+      memmove (Data + halfInsert, Data, Size);
     size_t x;
-    for (x = 0; x < toInsert / 2 + toInsert % 2; x++)
-    {
+    for (x = 0; x < halfInsert; x++)
       Data [x] = iChar;
-    }
-    for (x = iNewSize - toInsert / 2; x < iNewSize; x++)
-    {
+    for (x = halfInsert + Size; x < iNewSize; x++)
       Data [x] = iChar;
-    }
-    Data [iNewSize] = '\0';
     Size = iNewSize;
+    Data [Size] = '\0';
   }
   return *this;
 }

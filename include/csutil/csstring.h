@@ -21,6 +21,7 @@
 #define __CS_CSSTRING_H__
 
 #include <stdarg.h>
+#include "csutil/snprintf.h"
 
 #define STR_FATAL(s) \
 { \
@@ -29,37 +30,37 @@
 }
 
 /**
- * This is a "string" class with a range of useful operators and
+ * This is a string class with a range of useful operators and
  * typesafe overloads.
  */
 class csString
 {
+protected:
+  /// String buffer.
   char *Data;
-  size_t Size, MaxSize;
+  /// Length of string; not including null terminator.
+  size_t Size;
+  /// Size in bytes of allocated string buffer.
+  size_t MaxSize;
 
 public:
-  /// Set string capacity to NewSize characters (plus one for ending NULL)
+  /**
+   * Set string capacity to at least NewSize characters (plus one for null
+   * terminator).  Never shrinks capacity.  If you need to actually reclaim
+   * memory, then use Free() or Reclaim().
+   */
   void SetCapacity (size_t NewSize);
 
   /// Free the memory allocated for the string
-  void Free ()
-  {
-    if (Data)
-    {
-      delete[] Data;
-      Data = NULL;
-      Size = MaxSize = 0;
-    }
-  }
+  void Free ();
 
-  /// Truncate the string
-  csString &Truncate (size_t iPos);
+  /// Truncate the string to length iLen.
+  csString &Truncate (size_t iLen);
 
-  /// Set string maximal capacity to current string length
-  csString &Reclaim ()
-  { SetCapacity (Size); return *this; }
+  /// Set string buffer capacity to exactly hold the current content.
+  csString &Reclaim ();
 
-  /// Clear the string (so that it contains only ending NULL character)
+  /// Clear the string (so that it contains only a null terminator)
   csString& Clear ()
   { return Truncate (0); }
 
@@ -67,72 +68,84 @@ public:
   char *GetData () const
   { return Data; }
 
-  /// Query string length
+  /// Query string length.  Length does not include null terminator.
   size_t Length () const
   { return Size; }
 
   /// Check if string is empty
   bool IsEmpty () const
-  { return !Size; }
+  { return (Size == 0); }
 
-  /// Get a reference to iPos'th character
-  inline char &operator [] (size_t iPos)
+  /// Get a reference to n'th character
+  char &operator [] (size_t n)
   {
 #ifdef CS_DEBUG
-    if (iPos > Size)
+    if (n >= Size)
       STR_FATAL(("Trying to access string `%s' at position %lu\n",
-        Data, (unsigned long)iPos))
+        Data ? Data : "<null>", (unsigned long)n))
 #endif
-    return Data [iPos];
+    return Data [n];
   }
 
-  /// Set characetr number iPos to iChar
-  void SetAt (size_t iPos, const char iChar)
+  /**
+   * Set character at position `n'.  Does not expand string if `n' is greater
+   * than length of string.
+   */
+  void SetAt (size_t n, const char c)
   {
 #ifdef CS_DEBUG
-    if (iPos > Size)
-      STR_FATAL (("Trying to do `%s'.SetAt (%lu)\n",
-        Data, (unsigned long)iPos))
+    if (n >= Size)
+      STR_FATAL (("Trying to set string`%s' at position %lu\n",
+        Data ? Data : "<null>", (unsigned long)n))
 #endif
-    Data [iPos] = iChar;
+    Data [n] = c;
   }
 
-  /// Get character at position iPos
-  char GetAt (size_t iPos) const
+  /// Get character at n'th position.
+  char GetAt (size_t n) const
   {
 #ifdef CS_DEBUG
-    if (iPos > Size)
-      STR_FATAL (("Trying to do `%s'.GetAt (%lu)\n",
-        Data, (unsigned long)iPos));
+    if (n >= Size)
+      STR_FATAL (("Trying to access string `%s' at position %lu\n",
+        Data ? Data : "<null>", (unsigned long)n));
 #endif
-    return Data [iPos];
+    return Data [n];
   }
 
-  /// Delete iCount characters at iPos
+  /// Delete iCount characters at starting iPos
   csString &DeleteAt (size_t iPos, size_t iCount = 1);
 
   /// Insert another string into this one at position iPos
-  csString &Insert (size_t iPos, const csString &iStr);
+  csString &Insert (size_t iPos, const csString&);
 
   /// Insert a char into this string at position iPos
-  csString &Insert (size_t iPos, const char iChar);
+  csString &Insert (size_t iPos, const char);
 
   /// Overlay another string onto a part of this string
-  csString &Overwrite (size_t iPos, const csString &iStr);
+  csString &Overwrite (size_t iPos, const csString&);
 
-  /// Append an ASCIIZ string to this one
-  /// (possibly iCount characters from the string)
-  csString &Append (const char *iStr, size_t iCount = (size_t)-1);
+  /**
+   * Append an ASCIIZ string to this one.  If iCount is -1, then the entire
+   * string is appended.  Otherwise, only iCount characters from the string are
+   * appended.
+   */
+  csString &Append (const char*, size_t iCount = (size_t)-1);
 
-  /// Append a string to this one (possibly iCount characters from the string)
+  /**
+   * Append a string to this one.  If iCount is -1, then the entire string is
+   * appended.  Otherwise, only iCount characters from the string are appended.
+   */
   csString &Append (const csString &iStr, size_t iCount = (size_t)-1);
 
-  /// Append a character to this string
-  csString &Append (char c){ char s[2]; s[0] = c; s[1] = 0; return Append(s); }
-  csString &Append (unsigned char c){ return Append(char(c)); }
+  /// Append a character to this string.
+  csString &Append (char c)
+  { char s[2]; s[0] = c; s[1] = '\0'; return Append(s); }
+  /// Append an unsigned character to this string.
+  csString &Append (unsigned char c)
+  { return Append(char(c)); }
 
 #define STR_APPEND(TYPE,FMT,SZ) csString &Append(TYPE n) \
-  { char s[SZ]; sprintf(s, #FMT, n); return Append(s); }
+  { char s[SZ]; cs_snprintf(s, SZ, #FMT, n); return Append(s); }
   STR_APPEND(short, %hd, 32)
   STR_APPEND(unsigned short, %hu, 32)
   STR_APPEND(int, %d, 32)
@@ -148,7 +161,11 @@ public:
   csString &Append (bool b) { return Append (b ? "1" : "0"); }
 #endif
 
-  /// Replace contents of this string with the contents of another
+  /**
+   * Replace contents of this string with the contents of another.  If iCount
+   * is -1, then use the entire replacement string.  Otherwise, use iCount
+   * characters from the replacement string.
+   */
   csString &Replace (const csString &iStr, size_t iCount = (size_t)-1)
   {
     Size = 0;
@@ -158,27 +175,36 @@ public:
   /// Check if two strings are equal
   bool Compare (const csString &iStr) const
   {
-    if (Size != iStr.Length ())
+    if (&iStr == this)
+      return true;
+    size_t const n = iStr.Length();
+    if (Size != n)
       return false;
-
+    if (Size == 0 && n == 0)
+      return true;
     return (memcmp (Data, iStr.GetData (), Size) == 0);
   }
 
-  /// Same but compare with an ASCIIZ string
+  /// Check if an ASCIIZ string is equal to this string.
   bool Compare (const char *iStr) const
-  { return (strcmp (Data, iStr) == 0); }
+  { return (strcmp (Data ? Data : "", iStr) == 0); }
 
   /// Compare two strings ignoring case
   bool CompareNoCase (const csString &iStr) const
   {
-    if (Size != iStr.Length ())
+    if (&iStr == this)
+      return true;
+    size_t const n = iStr.Length();
+    if (Size != n)
       return false;
+    if (Size == 0 && n == 0)
+      return true;
     return (strncasecmp (Data, iStr.GetData (), Size) == 0);
   }
 
   /// Compare ignoring case with an ASCIIZ string
   bool CompareNoCase (const char *iStr) const
-  { return (strncasecmp (Data, iStr, Size) == 0); }
+  { return (strncasecmp (Data ? Data : "", iStr, Size) == 0); }
 
   /// Create an empty csString object
   csString () : Data (NULL), Size (0), MaxSize (0) {}
@@ -206,18 +232,26 @@ public:
   csString Clone () const
   { return csString (*this); }
 
-  /// Trim all of the white space off of the left side of the string
+  /// Trim leading whitespace.
   csString &LTrim();
 
-  /// Trim all of the white space off of the right side of the string
+  /// Trim trailing whitespace.
   csString &RTrim();
 
-  /// Does both LTrim() and RTrim()
+  /// Trim leading and trailing whitespace.
   csString &Trim();
 
-  /// Calls Trim() and collapses internal whitespace to a single space.
+  /**
+   * Trims leading and trailing whitespace, and collapses all internal
+   * whitespace to a single space.
+   */
   csString &Collapse();
 
+  /**
+   * Format this string using sprintf() formatting directives.  Automatically
+   * allocates sufficient memory to hold result.  Newly formatted string
+   * overwrites previous string value.
+   */
   csString &Format(const char *format, ...) CS_GNUC_PRINTF (2, 3);
 
 #define STR_FORMAT(TYPE,FMT,SZ) \
@@ -248,13 +282,13 @@ public:
   STR_FORMAT_FLOAT(double)
 #undef STR_FORMAT_FLOAT
 
-  /// Pad to specified size with leading chars
+  /// Pad to specified size with leading characters (default: space).
   csString& PadLeft (size_t iNewSize, char iChar=' ');
 
-  /// Return a new string formatted with PadLeft
+  /// Return a new string formatted with PadLeft().
   csString AsPadLeft (size_t iNewSize, char iChar=' ');
 
-  /// Return a new left-padded string representation of a basic type
+  // Return a new left-padded string representation of a basic type
 #define STR_PADLEFT(TYPE) \
   static csString PadLeft (TYPE v, size_t iNewSize, char iChar=' ');
   STR_PADLEFT(const csString&)
@@ -274,13 +308,13 @@ public:
 #endif
 #undef STR_PADLEFT
 
-  /// Pad to specified size with trailing chars
+  /// Pad to specified size with trailing characters (default: space).
   csString& PadRight (size_t iNewSize, char iChar=' ');
 
-  /// Return a new string formatted with PadRight
+  /// Return a new string formatted with PadRight().
   csString AsPadRight (size_t iNewSize, char iChar=' ');
 
-  /// Return a new right-padded string representation of a basic type
+  // Return a new right-padded string representation of a basic type
 #define STR_PADRIGHT(TYPE) \
   static csString PadRight (TYPE v, size_t iNewSize, char iChar=' ');
   STR_PADRIGHT(const csString&)
@@ -300,13 +334,13 @@ public:
 #endif
 #undef STR_PADRIGHT
 
-  /// Pad to specified size between chars (any remainder is prepended)
+  /// Pad to specified size between characters (any remainder is appended).
   csString& PadCenter (size_t iNewSize, char iChar=' ');
 
-  /// Return a copy of this string formatted with PadCenter
+  /// Return a copy of this string formatted with PadCenter().
   csString AsPadCenter (size_t iNewSize, char iChar=' ');
 
-  /// Return a new left+right padded string representation of a basic type
+  // Return a new left+right padded string representation of a basic type
 #define STR_PADCENTER(TYPE) \
   static csString PadCenter (TYPE v, size_t iNewSize, char iChar=' ');
   STR_PADCENTER(const csString&)
@@ -348,7 +382,7 @@ public:
 #endif
 #undef STR_APPEND
 
-  /// Concatenate two strings and return a third one
+  /// Add another string to this one and return the result as a new string.
   csString operator + (const csString &iStr) const
   { return Clone ().Append (iStr); }
 
@@ -364,10 +398,11 @@ public:
    * Detach the low-level null-terminated string buffer from the csString
    * object.  The caller of this function becomes the owner of the returned
    * string buffer and is responsible for destroying it via `delete[]' when
-   * no longer needed.
+   * no longer needed.  The returned value may be NULL if no buffer had been
+   * allocated for this string.
    */
   char *Detach ()
-  { char *d = Data; Data = NULL; Size = MaxSize = 0; return d; }
+  { char *d = Data; Data = 0; Size = 0; MaxSize = 0; return d; }
 };
 
 /// Concatenate a csString with an ASCIIZ and return resulting csString
@@ -376,13 +411,13 @@ inline csString operator + (const char* iStr1, const csString &iStr2)
   return csString (iStr1).Append (iStr2);
 }
 
-/// Same but in reverse order (optimization)
+/// Concatenate a csString with an ASCIIZ and return resulting csString
 inline csString operator + (const csString &iStr1, const char* iStr2)
 {
   return iStr1.Clone ().Append (iStr2);
 }
 
-/// Handy shift operators.
+// Handy shift operators.
 #define STR_SHIFT(TYPE) \
   inline csString &operator << (csString &s, TYPE v) { return s.Append (v); }
 STR_SHIFT(const csString&)
