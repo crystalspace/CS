@@ -40,7 +40,12 @@
 #ifdef __cplusplus
 
 #include <stdlib.h>
-#include <unistd.h>
+
+#if defined (COMP_GCC)
+  #include <unistd.h>
+#else
+  #include <io.h>
+#endif
 
 /* Use prototypes in function declarations. */
 #define YY_USE_PROTOS
