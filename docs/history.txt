@@ -15,6 +15,9 @@ chronological order.
 	  and texture cache size via a config setting.
 	- res started on converting spr2d to NR. Still needs work, tho.
 	- res added a GL driver DB entry for software GL implementations.
+	- Jorrit fixed spr2d so that it compiles again with OR.
+	- Jorrit fixed spr2d Jamfile so that it no longer trys to use
+	  the bcsgeom library (whatever that is :-).
 21-Mar-2004
 	- Luca Cappa committed the res fix to the problem regarding the lack
 	  of the regex.c file in the CSUtil library. The problem was 

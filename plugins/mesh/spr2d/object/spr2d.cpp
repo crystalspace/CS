@@ -43,7 +43,9 @@ SCF_IMPLEMENT_IBASE (csSprite2DMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSprite2DState)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iParticle)
+#ifdef CS_USE_NEW_RENDERER
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShaderVariableAccessor)
+#endif
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObject::ObjectModel)
@@ -58,6 +60,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObject::Particle)
   SCF_IMPLEMENTS_INTERFACE (iParticle)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+#ifdef CS_USE_NEW_RENDERER
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObject::eiShaderVariableAccessor)
   SCF_IMPLEMENTS_INTERFACE (iShaderVariableAccessor)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
@@ -66,6 +69,7 @@ csStringID csSprite2DMeshObject::vertex_name = csInvalidStringID;
 csStringID csSprite2DMeshObject::texel_name = csInvalidStringID;
 csStringID csSprite2DMeshObject::color_name = csInvalidStringID;
 csStringID csSprite2DMeshObject::index_name = csInvalidStringID;
+#endif
 
 csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory)
 {
@@ -73,7 +77,9 @@ csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSprite2DState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiParticle);
+#ifdef CS_USE_NEW_RENDERER
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShaderVariableAccessor);
+#endif
   csSprite2DMeshObject::factory = factory;
   logparent = 0;
   ifactory = SCF_QUERY_INTERFACE (factory, iMeshObjectFactory);
@@ -94,7 +100,9 @@ csSprite2DMeshObject::~csSprite2DMeshObject ()
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiSprite2DState);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiParticle);
+#ifdef CS_USE_NEW_RENDERER
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiShaderVariableAccessor);
+#endif
   SCF_DESTRUCT_IBASE ();
 }
 
@@ -433,7 +441,8 @@ bool csSprite2DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n, 
 						      iRenderView* rview, 
 						      iMovable* movable) 
-{ 
+{
+#ifdef CS_USE_NEW_RENDERER
   SetupObject ();
 
   iCamera* camera = rview->GetCamera ();
@@ -475,9 +484,11 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
   rm->object2camera = movable->GetFullTransform();
   rm->variablecontext = svcontext;
   rm->geometryInstance = this;
-
   n = 1; 
   return &rm; 
+#endif
+  n = 0; 
+  return 0;
 }
 
 #ifdef CS_USE_NEW_RENDERER
