@@ -99,10 +99,10 @@ csPtr<iCollider> csOPCODECollideSystem::CreateCollider (iPolygonMesh* mesh)
   return csPtr<iCollider> (col);
 }
 
-iCollider* csOPCODECollideSystem::CreateSphereCollider (iMeshObject* mesh) 
+csPtr<iCollider> csOPCODECollideSystem::CreateSphereCollider (iMeshObject* mesh) 
 { return NULL; };  //unimplemented yet
 
-iCollider* csOPCODECollideSystem::CreateBoxCollider (iMeshObject* mesh) 
+csPtr<iCollider> csOPCODECollideSystem::CreateBoxCollider (iMeshObject* mesh) 
 { return NULL; };  //unimplemented yet
 
 
