@@ -20,6 +20,7 @@
 #include "cssys/sysfunc.h"
 #include "csutil/scf.h"
 #include "csutil/csstring.h"
+#include "video/canvas/directxcommon/directdetection.h"
 #include "csgeom/csrect.h"
 #include "csutil/util.h"
 #include "iutil/event.h"
@@ -28,9 +29,6 @@
 #include "cssys/win32/win32.h"
 #include "iutil/cmdline.h"
 #include "g2d.h"
-
-#define INITGUID
-#include "video/canvas/directxcommon/directdetection.h"
 
 #ifndef DD_FALSE
   // This is normally being done in the ddraw.h file

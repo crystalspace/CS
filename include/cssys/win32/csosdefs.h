@@ -57,107 +57,21 @@
 
 // So many things require this. IF you have an issue with something defined
 // in it then undef that def here.
-
-#if defined(COMP_GCC)
-
-// From the w32api header files:
-
-#if defined(__i686__) && !defined(_M_IX86)
-#define _M_IX86 600
-#elif defined(__i586__) && !defined(_M_IX86)
-#define _M_IX86 500
-#elif defined(__i486__) && !defined(_M_IX86)
-#define _M_IX86 400
-#elif defined(__i386__) && !defined(_M_IX86)
-#define _M_IX86 300
-#endif
-#if defined(_M_IX86) && !defined(_X86_)
-#define _X86_
-#endif
-
-#ifdef __GNUC__
-#ifndef NONAMELESSUNION
-#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 95) 
-#define _ANONYMOUS_UNION __extension__
-#define _ANONYMOUS_STRUCT __extension__
-#else
-#if defined(__cplusplus)
-#define _ANONYMOUS_UNION __extension__
-#endif /* __cplusplus */
-#endif /* __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 95) */
-#endif /* NONAMELESSUNION */
-#endif /* __GNUC__ */
-
-#ifndef _ANONYMOUS_UNION
-#define _ANONYMOUS_UNION
-#define _UNION_NAME(x) x
-#define DUMMYUNIONNAME	u
-#define DUMMYUNIONNAME2	u2
-#define DUMMYUNIONNAME3	u3
-#define DUMMYUNIONNAME4	u4
-#define DUMMYUNIONNAME5	u5
-#define DUMMYUNIONNAME6	u6
-#define DUMMYUNIONNAME7	u7
-#define DUMMYUNIONNAME8	u8
-#else
-#define _UNION_NAME(x)
-#define DUMMYUNIONNAME
-#define DUMMYUNIONNAME2
-#define DUMMYUNIONNAME3
-#define DUMMYUNIONNAME4
-#define DUMMYUNIONNAME5
-#define DUMMYUNIONNAME6
-#define DUMMYUNIONNAME7
-#define DUMMYUNIONNAME8
-#endif
-#ifndef _ANONYMOUS_STRUCT
-#define _ANONYMOUS_STRUCT
-#define _STRUCT_NAME(x) x
-#define DUMMYSTRUCTNAME	s
-#define DUMMYSTRUCTNAME2 s2
-#define DUMMYSTRUCTNAME3 s3
-#else
-#define _STRUCT_NAME(x)
-#define DUMMYSTRUCTNAME
-#define DUMMYSTRUCTNAME2
-#define DUMMYSTRUCTNAME3
-#endif
-
-#else
-
-#if !defined(_X86_) && !defined(_IA64_) && !defined(_AMD64_) && defined(_M_IX86)
-#define _X86_
-#endif
-
-#if !defined(_X86_) && !defined(_IA64_) && !defined(_AMD64_) && defined(_M_AMD64)
-#define _AMD64_
-#endif
-
-#if !defined(_X86_) && !defined(_M_IX86) && !defined(_AMD64_) && defined(_M_IA64)
-#if !defined(_IA64_)
-#define _IA64_
-#endif 
-#endif
-
-#endif
-
-#include <excpt.h>
-#include <stdarg.h>
-#include <windef.h>
-#include <winbase.h>
+#include <windows.h>
 #include <malloc.h>
-
-#define WINGDIAPI
-
-#undef min
-#undef max
-#undef DeleteFile
 
 #if defined(COMP_VC)
   typedef __int64 int64_t;
 #else
   typedef long long int64_t;
 #endif
+
+#define WIN32_LEAN_AND_MEAN
+
+#undef min
+#undef max
+#undef GetCurrentTime
+#undef DeleteFile
 
 #if defined(_DEBUG) || defined(CS_DEBUG)
   #include <assert.h>
@@ -480,7 +394,7 @@ static inline void* fast_mem_copy (void *dest, const void *src, int count)
 #define CS_IMPLEMENT_PLATFORM_APPLICATION \
 int main (int argc, char* argv[]); \
 HINSTANCE ModuleHandle = NULL; \
-int ApplicationShow = 1/*SW_SHOWNORMAL*/; \
+int ApplicationShow = SW_SHOWNORMAL; \
 int WINAPI WinMain (HINSTANCE hApp, HINSTANCE prev, LPSTR cmd, int show) \
 { \
   ModuleHandle = hApp; \
