@@ -190,7 +190,7 @@ void csView::RestrictClipperToScreen ()
   // so we only have to update polygon-based views
   if (PolyView)
   {
-    int InCount = PolyView->GetVertexCount (), OutCount;
+    size_t InCount = PolyView->GetVertexCount (), OutCount;
     csBoxClipper bc (0., 0., (float)G3D->GetWidth (), (float)G3D->GetHeight());
     csVector2 *TempPoly = new csVector2[InCount + 5];
     uint8 rc = bc.Clip (PolyView->GetVertices (), InCount , TempPoly, OutCount);

@@ -46,7 +46,7 @@ public:
    * \param points is the set of points
    * \param n is the number of points
    */
-  static void SortXY (csVector2* points, int n);
+  static void SortXY (csVector2* points, size_t n);
 
   /**
    * This routine will calculate the convex hull of the presorted
@@ -57,7 +57,8 @@ public:
    * as big as the 'points' array (i.e. n points)
    * \return the number of points in the convex hull
    */
-  static int CalculatePresorted (csVector2* points, int n, csVector2* hull);
+  static size_t CalculatePresorted (csVector2* points, size_t n,
+				    csVector2* hull);
 };
 
 #endif // __CS_CHAINHULL2D_H__

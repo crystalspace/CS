@@ -127,7 +127,7 @@ void csStaticPVSNode::AddObject (const csBox3& bbox,
     child1->AddObject (bbox, object);
 }
 
-void csStaticPVSNode::MarkInvisible (const csVector3& pos, uint32 cur_timestamp)
+void csStaticPVSNode::MarkInvisible(const csVector3& pos, uint32 cur_timestamp)
 {
   size_t i;
   for (i = 0 ; i < invisible_nodes.Length () ; i++)
@@ -172,7 +172,7 @@ void csStaticPVSTree::Clear ()
 csStaticPVSNode* csStaticPVSTree::CreateNode ()
 {
   csStaticPVSNode* node = new csStaticPVSNode;
-  node->id = nodes_by_id.Length ();
+  node->id = (uint32)nodes_by_id.Length ();
   nodes_by_id.Push (node);
   return node;
 }
@@ -240,7 +240,7 @@ void csStaticPVSTree::WriteOut (char*& data, csStaticPVSNode* node)
   csSetLittleEndianLong (data, node->id); data += 4;
   *data++ = node->axis;
   csSetLittleEndianFloat32 (data, node->where); data += 4;
-  csSetLittleEndianLong (data, node->invisible_nodes.Length ()); data += 4;
+  csSetLittleEndianLong (data, (uint32)node->invisible_nodes.Length ()); data += 4;
   size_t i;
   for (i = 0 ; i < node->invisible_nodes.Length () ; i++)
   {
@@ -442,7 +442,7 @@ void csStaticPVSTree::TraverseRandom (csPVSTreeVisitFunc* func,
   root->TraverseRandom (func, userdata, global_timestamp, frustum_mask);
 }
 
-void csStaticPVSTree::MarkInvisible (const csVector3& pos, uint32 cur_timestamp)
+void csStaticPVSTree::MarkInvisible(const csVector3& pos, uint32 cur_timestamp)
 {
   root->MarkInvisible (pos, cur_timestamp);
 }
@@ -465,4 +465,3 @@ void csStaticPVSTree::SetPVSCacheName (const char* pvscache)
 {
   csStaticPVSTree::pvscache = pvscache;
 }
-

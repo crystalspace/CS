@@ -121,7 +121,7 @@ void csRenderView::SetEngine (csEngine *engine)
 
 void csRenderView::UpdateFrustum ()
 {
-  int i;
+  size_t i;
   csBox2 bbox;
   csVector2 shift (ctxt->icamera->GetShiftX (), ctxt->icamera->GetShiftY ());
   float inv_fov = ctxt->icamera->GetInvFOV ();

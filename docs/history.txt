@@ -8,6 +8,7 @@ chronological order.
 
 30-Mar-2005
 	- Marten fixed a bug in haze-mesh.
+	- Eric Sunshine performed another round of size_t-related cleanups.
 29-Mar-2005
 	- Jorrit disabled the new `clearWithBox' rule in gldrivers.xml
 	  because it breaks screen clearing on his nVidia card. If this is

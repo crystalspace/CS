@@ -442,8 +442,8 @@ static void CallVisibilityCallbacksForSubtree (csStaticPVSNode* treenode,
 	PVSTest_Front2BackData* data, uint32 cur_timestamp)
 {
   const csArray<csPVSVisObjectWrapper*>& objects = treenode->objects;
-  int num_objects = objects.Length ();
-  int i;
+  size_t num_objects = objects.Length ();
+  size_t i;
   for (i = 0 ; i < num_objects ; i++)
   {
     if (objects[i]->timestamp != cur_timestamp)
@@ -490,9 +490,9 @@ void csPVSVis::PVSTest_Traverse (csStaticPVSNode* treenode,
   }
 
   const csArray<csPVSVisObjectWrapper*>& objects = treenode->objects;
-  int num_objects = objects.Length ();
+  size_t num_objects = objects.Length ();
 
-  int i;
+  size_t i;
   for (i = 0 ; i < num_objects ; i++)
   {
     if (objects[i]->timestamp != cur_timestamp)
@@ -580,8 +580,8 @@ static bool PVSTestPlanes_Front2Back (csStaticPVSNode* treenode,
   frustum_mask = new_mask;
 
   const csArray<csPVSVisObjectWrapper*>& objects = treenode->objects;
-  int num_objects = objects.Length ();
-  int i;
+  size_t num_objects = objects.Length ();
+  size_t i;
   for (i = 0 ; i < num_objects ; i++)
   {
     if (objects[i]->timestamp != cur_timestamp)
@@ -682,9 +682,9 @@ static bool PVSTestBox_Front2Back (csStaticPVSNode* treenode, void* userdata,
   }
 
   const csArray<csPVSVisObjectWrapper*>& objects = treenode->objects;
-  int num_objects = objects.Length ();
+  size_t num_objects = objects.Length ();
 
-  int i;
+  size_t i;
   for (i = 0 ; i < num_objects ; i++)
   {
     if (objects[i]->timestamp != cur_timestamp)
@@ -761,9 +761,9 @@ static bool PVSTestSphere_Front2Back (csStaticPVSNode* treenode,
   }
 
   const csArray<csPVSVisObjectWrapper*>& objects = treenode->objects;
-  int num_objects = objects.Length ();
+  size_t num_objects = objects.Length ();
 
-  int i;
+  size_t i;
   for (i = 0 ; i < num_objects ; i++)
   {
     if (objects[i]->timestamp != cur_timestamp)
@@ -869,9 +869,9 @@ static bool IntersectSegmentSloppy_Front2Back (csStaticPVSNode* treenode,
   }
 
   const csArray<csPVSVisObjectWrapper*>& objects = treenode->objects;
-  int num_objects = objects.Length ();
+  size_t num_objects = objects.Length ();
 
-  int i;
+  size_t i;
   for (i = 0 ; i < num_objects ; i++)
   {
     if (objects[i]->timestamp != cur_timestamp)
@@ -922,9 +922,9 @@ static bool IntersectSegment_Front2Back (csStaticPVSNode* treenode,
   }
 
   const csArray<csPVSVisObjectWrapper*>& objects = treenode->objects;
-  int num_objects = objects.Length ();
+  size_t num_objects = objects.Length ();
 
-  int i;
+  size_t i;
   for (i = 0 ; i < num_objects ; i++)
   {
     if (objects[i]->timestamp != cur_timestamp)
@@ -1113,9 +1113,9 @@ static bool CastShadows_Front2Back (csStaticPVSNode* treenode, void* userdata,
   }
 
   const csArray<csPVSVisObjectWrapper*>& objects = treenode->objects;
-  int num_objects = objects.Length ();
+  size_t num_objects = objects.Length ();
 
-  int i;
+  size_t i;
   for (i = 0 ; i < num_objects ; i++)
   {
     if (objects[i]->timestamp != cur_timestamp)

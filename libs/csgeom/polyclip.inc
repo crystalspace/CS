@@ -37,13 +37,13 @@
   // The currently clipped polygon
   csVector2 *InP = InPolygon;
   // Number of input vertices
-  int InV = InCount;
+  size_t InV = InCount;
   // The current output polygon
   csVector2 *OutP = (ClipPolyVertices & 1) ? OutPolygon : TempPoly;
   // Number of output vertices
-  int OutV = 0;
+  size_t OutV = 0;
   // Current clipper edge & input vertex & vertex % num_vertices
-  int edge, vert, realvert;
+  size_t edge, vert, realvert;
   // Flag: was input polygon clipped?
   bool Clipped = false;
 
@@ -57,7 +57,7 @@
   else
     InS = OutStatus, OutS = TempStatus;
   // Fill the input vertex status array
-  for (int vs = 0; vs < InCount; vs++)
+  for (size_t vs = 0; vs < InCount; vs++)
   {
     InS [vs].Type = CS_VERTEX_ORIGINAL;
     InS [vs].Vertex = vs;

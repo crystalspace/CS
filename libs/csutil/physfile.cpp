@@ -100,7 +100,7 @@ size_t csPhysicalFile::GetSize()
     {
       len = ftell(fp);
       if (errno == 0)
-        fseek(fp, pos, SEEK_SET);
+        fseek(fp, (long)pos, SEEK_SET);
     }
     last_error = (errno == 0 ? VFS_STATUS_OK : VFS_STATUS_IOERROR);
   }
@@ -156,7 +156,7 @@ bool csPhysicalFile::SetPos(size_t p)
   if (fp != 0)
   {
     errno = 0;
-    fseek(fp, p, SEEK_SET);
+    fseek(fp, (long)p, SEEK_SET);
     last_error = (errno == 0 ? VFS_STATUS_OK : VFS_STATUS_IOERROR);
   }
   else

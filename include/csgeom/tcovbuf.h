@@ -20,8 +20,9 @@
 #define __CS_CSGEOM_TCOVBUF_H__
 
 #include "csextern.h"
-#include "csgeom/vector2.h"
 #include "csgeom/math2d.h"
+#include "csgeom/transfrm.h"
+#include "csgeom/vector2.h"
 #include "iutil/dbghelp.h"
 
 //#define SHIFT_TILECOL 5

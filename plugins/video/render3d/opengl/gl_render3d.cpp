@@ -597,7 +597,7 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
   // z-plane clipping and/or near-plane clipping. These additional planes
   // will not be usable for portal clipping (if we're using OpenGL plane
   // clipping).
-  int reserved_planes = int (do_plane_clipping) + int (do_z_plane_clipping);
+  size_t reserved_planes = int (do_plane_clipping) + int (do_z_plane_clipping);
 
   if (clip_portal != CS_CLIP_NOT)//@@@??? && cliptype != CS_CLIPPER_OPTIONAL)
   {
@@ -2384,7 +2384,7 @@ void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
   csGLGraphics3D::cliptype = cliptype;
   stencil_initialized = false;
   frustum_valid = false;
-  int i;
+  size_t i;
   for (i = 0; i<6; i++)
     glDisable ((GLenum)(GL_CLIP_PLANE0+i));
   DisableStencilClipping ();

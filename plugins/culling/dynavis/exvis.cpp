@@ -304,7 +304,7 @@ void csExactCuller::AddObject (void* obj,
         spoly = &clippoly;
       }
       csVector2 clipped[100];
-      int num_clipped = (int)spoly->GetVertexCount ();
+      size_t num_clipped = spoly->GetVertexCount ();
       csBox2 out_box;
       out_box.StartBoundingBox ();
       for (size_t k = 0 ; k < spoly->GetVertexCount () ; k++)

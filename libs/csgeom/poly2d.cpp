@@ -23,7 +23,7 @@
 CS_IMPLEMENT_STATIC_CLASSVAR (csPoly2DFactory, sharedFactory, \
 			      SharedFactory, csPoly2DFactory,())
 
-csPoly2D::csPoly2D (int start_size)
+csPoly2D::csPoly2D (size_t start_size)
 {
   max_vertices = start_size;
   vertices = new csVector2[max_vertices];
@@ -71,32 +71,35 @@ void csPoly2D::MakeEmpty ()
 
 bool csPoly2D::In (const csVector2 &v)
 {
-  int i, i1;
-  i1 = num_vertices - 1;
-  for (i = 0; i < num_vertices; i++)
+  if (num_vertices > 0)
   {
-    if (csMath2::WhichSide2D (v, vertices[i1], vertices[i]) < 0)
-      return false;
-    i1 = i;
+    size_t i1 = num_vertices - 1;
+    for (size_t i = 0; i < num_vertices; i++)
+    {
+      if (csMath2::WhichSide2D (v, vertices[i1], vertices[i]) < 0)
+	return false;
+      i1 = i;
+    }
   }
-
   return true;
 }
 
-bool csPoly2D::In (csVector2 *poly, int num_poly, const csVector2 &v)
+bool csPoly2D::In (csVector2 *poly, size_t num_poly, const csVector2 &v)
 {
-  int i, i1;
-  i1 = num_poly - 1;
-  for (i = 0; i < num_poly; i++)
+  if (num_poly > 0)
   {
-    if (csMath2::WhichSide2D (v, poly[i1], poly[i]) < 0) return false;
-    i1 = i;
+    size_t i1 = num_poly - 1;
+    for (size_t i = 0; i < num_poly; i++)
+    {
+      if (csMath2::WhichSide2D (v, poly[i1], poly[i]) < 0)
+	return false;
+      i1 = i;
+    }
   }
-
   return true;
 }
 
-void csPoly2D::MakeRoom (int new_max)
+void csPoly2D::MakeRoom (size_t new_max)
 {
   if (new_max <= max_vertices) return ;
 
@@ -107,7 +110,7 @@ void csPoly2D::MakeRoom (int new_max)
   max_vertices = new_max;
 }
 
-int csPoly2D::AddVertex (float x, float y)
+size_t csPoly2D::AddVertex (float x, float y)
 {
   if (num_vertices >= max_vertices) MakeRoom (max_vertices + 5);
   vertices[num_vertices].x = x;
@@ -120,8 +123,7 @@ bool csPoly2D::ClipAgainst (iClipper2D *view)
 {
   MakeRoom (num_vertices + view->GetVertexCount () + 1);
   csBox2 bbox (vertices[0]);
-  int i;
-  for (i = 1 ; i < num_vertices ; i++)
+  for (size_t i = 1 ; i < num_vertices ; i++)
     bbox.AddBoundingVertexSmart (vertices[i]);
   return view->ClipInPlace (vertices, num_vertices, bbox) ? true : false;
 }
@@ -131,7 +133,12 @@ void csPoly2D::Intersect (
   csPoly2D &left,
   csPoly2D &right) const
 {
-  int i, i1;
+  left.MakeEmpty ();
+  right.MakeEmpty ();
+  if (num_vertices == 0)
+    return;
+
+  size_t i, i1;
   float c, c1;
   csVector2 isect;
   float dist;
@@ -141,14 +148,11 @@ void csPoly2D::Intersect (
   // get added to both polygons. However, we try not to generate degenerate
   // polygons (one edge only) so we only add those plane-vertices if
   // we know that the polygon has other vertices too.
-  int skip_left = 0, skip_right = 0;
+  size_t skip_left = 0, skip_right = 0;
 
   // Ignore the specified number of vertices in the beginning (just
   // before skip_??? vertices).
-  int ignore_left = 0, ignore_right = 0;
-
-  left.MakeEmpty ();
-  right.MakeEmpty ();
+  size_t ignore_left = 0, ignore_right = 0;
 
   i1 = num_vertices - 1;
   c1 = plane.Classify (vertices[i1]);
@@ -229,7 +233,11 @@ void csPoly2D::Intersect (
 void csPoly2D::ClipPlane (const csPlane2 &plane,
 	csPoly2D &right) const
 {
-  int i, i1;
+  right.MakeEmpty ();
+  if (num_vertices == 0)
+    return;
+
+  size_t i, i1;
   float c, c1;
   csVector2 isect;
   float dist;
@@ -239,13 +247,11 @@ void csPoly2D::ClipPlane (const csPlane2 &plane,
   // get added to both polygons. However, we try not to generate degenerate
   // polygons (one edge only) so we only add those plane-vertices if
   // we know that the polygon has other vertices too.
-  int skip_right = 0;
+  size_t skip_right = 0;
 
   // Ignore the specified number of vertices in the beginning (just
   // before skip_right vertices).
-  int ignore_right = 0;
-
-  right.MakeEmpty ();
+  size_t ignore_right = 0;
 
   i1 = num_vertices - 1;
   c1 = plane.Classify (vertices[i1]);
@@ -316,19 +322,19 @@ void csPoly2D::ClipPlane (const csPlane2 &plane,
   }
 }
 
-void csPoly2D::ExtendConvex (const csPoly2D &other, int i1)
+void csPoly2D::ExtendConvex (const csPoly2D &other, size_t i1)
 {
   // Some conventions:
   //   i1, i2: edge of this polygon common with 'other'.
   //   j1, j2: edge of other polygon common with 'this'.
   //   i1 corresponds with j2
   //   i2 corresponds with j1
-  int i2 = (i1 + 1) % num_vertices;
-  int j1, j2;
-  int i, j, jp;
+  size_t i2 = (i1 + 1) % num_vertices;
+  size_t j1, j2;
+  size_t i, j, jp;
 
   // First find j1 and j2.
-  j2 = -1;
+  j2 = csArrayItemNotFound;
   for (j = 0; j < other.GetVertexCount (); j++)
   {
     if ((vertices[i1] - other[j]) < EPSILON)
@@ -338,7 +344,7 @@ void csPoly2D::ExtendConvex (const csPoly2D &other, int i1)
     }
   }
 
-  CS_ASSERT (j2 != -1);
+  CS_ASSERT (j2 != csArrayItemNotFound);
 
   j1 = (j2 - 1 + other.GetVertexCount ()) % other.GetVertexCount ();
 
@@ -346,17 +352,20 @@ void csPoly2D::ExtendConvex (const csPoly2D &other, int i1)
   if (!((vertices[i2] - other[j1]) < EPSILON))
   {
     for (i = 0; i < GetVertexCount (); i++)
-      csPrintf ("  orig %d: %f,%f\n", i, (*this)[i].x, (*this)[i].y);
+      csPrintf ("  orig %lu: %f,%f\n",
+		(unsigned long)i, (*this)[i].x, (*this)[i].y);
     for (i = 0; i < other.GetVertexCount (); i++)
-      csPrintf ("  other %d: %f,%f\n", i, other[i].x, other[i].y);
-    csPrintf ("  i1=%d i2=%d j1=%d j2=%d\n", i1, i2, j1, j2);
+      csPrintf ("  other %lu: %f,%f\n",
+		(unsigned long)i, other[i].x, other[i].y);
+    csPrintf ("  i1=%lu i2=%lu j1=%lu j2=%lu\n", (unsigned long)i1,
+	      (unsigned long)i2, (unsigned long)j1, (unsigned long)j2);
     CS_ASSERT (false);
   }
 
   // Copy this polygon to 'orig' and clear this one.
   csPoly2D orig (*this);
-  int orig_num = orig.GetVertexCount ();
-  int other_num = other.GetVertexCount ();
+  size_t orig_num = orig.GetVertexCount ();
+  size_t other_num = other.GetVertexCount ();
   MakeEmpty ();
 
   // Add the vertex just before i1. We will start our new
@@ -390,10 +399,13 @@ void csPoly2D::ExtendConvex (const csPoly2D &other, int i1)
     {
       csPrintf ("INTERNAL ERROR! Looping forever!\n");
       for (i = 0; i < orig.GetVertexCount (); i++)
-        csPrintf ("  orig %d: %f,%f\n", i, orig[i].x, orig[i].y);
+        csPrintf ("  orig %lu: %f,%f\n",
+		  (unsigned long)i, orig[i].x, orig[i].y);
       for (i = 0; i < other.GetVertexCount (); i++)
-        csPrintf ("  other %d: %f,%f\n", i, other[i].x, other[i].y);
-      csPrintf ("  i1=%d i2=%d j1=%d j2=%d\n", i1, i2, j1, j2);
+        csPrintf ("  other %lu: %f,%f\n",
+		  (unsigned long)i, other[i].x, other[i].y);
+      csPrintf ("  i1=%lu i2=%lu j1=%lu j2=%lu\n", (unsigned long)i1,
+		(unsigned long)i2, (unsigned long)j1, (unsigned long)j2);
       CS_ASSERT (false);
     }
   }
@@ -430,8 +442,7 @@ void csPoly2D::ExtendConvex (const csPoly2D &other, int i1)
       AddVertex (orig[i]);
       i = (i + 1) % orig_num;
     }
-
-    return ;
+    return;
   }
 
   // Otherwise the intersection point is going to be part of the
@@ -462,8 +473,7 @@ void csPoly2D::ExtendConvex (const csPoly2D &other, int i1)
       AddVertex (orig[i]);
       i = (i + 1) % orig_num;
     }
-
-    return ;
+    return;
   }
 
   // Otherwise the edge jp to j crosses the second plane. In this
@@ -481,10 +491,8 @@ void csPoly2D::ExtendConvex (const csPoly2D &other, int i1)
 float csPoly2D::GetSignedArea ()
 {
   float area = 0.0;
-
   // triangulize the polygon, triangles are (0,1,2), (0,2,3), (0,3,4), etc..
-  int i;
-  for (i = 0; i < GetVertexCount () - 2; i++)
+  for (size_t i = 0; i < GetVertexCount () - 2; i++)
     area += csMath2::Area2 (vertices[0], vertices[i + 1], vertices[i + 2]);
   return area / 2.0f;
 }
@@ -494,17 +502,16 @@ static float randflt ()
   return ((float)rand ()) / RAND_MAX;
 }
 
-void csPoly2D::Random (int num, const csBox2 &max_bbox)
+void csPoly2D::Random (size_t num, const csBox2 &max_bbox)
 {
   MakeEmpty ();
 
-  int i;
   csVector2 v;
   float w = max_bbox.MaxX () - max_bbox.MinX ();
   float h = max_bbox.MaxY () - max_bbox.MinY ();
   float dx = max_bbox.MinX ();
   float dy = max_bbox.MinY ();
-  for (i = 0; i < 3; i++)
+  for (size_t i = 0; i < 3; i++)
   {
     v.Set (randflt () * w + dx, randflt () * h + dy);
     AddVertex (v);
@@ -513,4 +520,3 @@ void csPoly2D::Random (int num, const csBox2 &max_bbox)
   // @@@ Only triangles are supported right now.
   (void)num;
 }
-

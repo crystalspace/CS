@@ -730,7 +730,7 @@ bool DiskFile::SetPos (size_t newpos)
 {
   if (file)
   {
-    return (fseek (file, newpos, SEEK_SET) == 0);
+    return (fseek (file, (long)newpos, SEEK_SET) == 0);
   }
   else
   {

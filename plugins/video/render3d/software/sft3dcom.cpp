@@ -3958,7 +3958,7 @@ static void DrawTriangle (csSoftwareGraphics3DCommon* g3d,
   // Clip triangle. Note that the clipper doesn't care about the
   // orientation of the triangle vertices. It works just as well in
   // mirrored mode.
-  int rescount = 0;
+  size_t rescount = 0;
   if (clipper)
   {
     clip_result = clipper->Clip (triangle, 3, clipped_triangle, rescount,

@@ -204,7 +204,7 @@ void csArchive::ReadZipDirectory (FILE *infile)
     else
       cur_offs = 0;
 
-    fseek (infile, cur_offs, SEEK_SET);
+    fseek (infile, (long)cur_offs, SEEK_SET);
     search_pos = fread (buff, 1, sizeof (buff), infile);
     if (search_pos >= step)
     {
@@ -217,8 +217,8 @@ void csArchive::ReadZipDirectory (FILE *infile)
           /* Central directory structure found */
           central_directory_offset = cur_offs + (size_t)(search_ptr - buff);
           LoadECDR (ecdr, &search_ptr[sizeof (hdr_endcentral)]);
-          if (fseek (infile, central_directory_offset + sizeof (hdr_endcentral) + 
-	    ZIP_END_CENTRAL_DIR_RECORD_SIZE, SEEK_SET)
+          if (fseek (infile, (long)(central_directory_offset + sizeof (hdr_endcentral) + 
+				    ZIP_END_CENTRAL_DIR_RECORD_SIZE), SEEK_SET)
            || !ReadArchiveComment (infile, ecdr.zipfile_comment_length)
            || fseek (infile, ecdr.offset_start_central_directory, SEEK_SET))
             goto rebuild_cdr;   /* Broken central directory */
@@ -297,7 +297,8 @@ void csArchive::ReadZipEntries (FILE *infile)
       if (!curentry->ReadExtraField (infile, lfh.extra_field_length))
         return;                 /* Broken zipfile */
     } /* endif */
-    if (fseek (infile, cur_offs = new_offs, SEEK_SET))
+    cur_offs = new_offs;
+    if (fseek (infile, (long)new_offs, SEEK_SET))
       return;                   /* Broken zipfile */
   } /* endwhile */
 }
@@ -619,7 +620,7 @@ skip_entry:
     } /* endif */
 
     if (bytes_to_skip)
-      fseek (file, bytes_to_skip, SEEK_CUR);
+	fseek (file, (long)bytes_to_skip, SEEK_CUR);
     while (bytes_to_copy)
     {
       size_t size;
@@ -1029,8 +1030,8 @@ bool csArchive::ArchiveEntry::WriteFile (FILE *outfile)
 
   while (!finished)
   {
-    if (fseek (outfile, lfhoffs + sizeof (hdr_local) + ZIP_LOCAL_FILE_HEADER_SIZE +
-               strlen (filename) + (extrafield ? info.extra_field_length : 0), SEEK_SET))
+    if (fseek (outfile, (long)(lfhoffs + sizeof (hdr_local) + ZIP_LOCAL_FILE_HEADER_SIZE +
+	strlen (filename) + (extrafield ? info.extra_field_length : 0)), SEEK_SET))
       return false;
 
     switch (info.compression_method)
@@ -1090,7 +1091,7 @@ bool csArchive::ArchiveEntry::WriteFile (FILE *outfile)
     } /* endswitch */
   } /* endwhile */
 
-  fseek (outfile, lfhoffs, SEEK_SET);
+  fseek (outfile, (long)lfhoffs, SEEK_SET);
   if (!WriteLFH (outfile))
     return false;
   fseek (outfile, info.csize, SEEK_CUR);

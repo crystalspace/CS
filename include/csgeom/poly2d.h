@@ -41,14 +41,14 @@ protected:
   /// The 2D vertices.
   csVector2* vertices;
   ///
-  int num_vertices;
+  size_t num_vertices;
   ///
-  int max_vertices;
+  size_t max_vertices;
 public:
   /**
    * Make a new empty polygon.
    */
-  csPoly2D (int start_size = 10);
+  csPoly2D (size_t start_size = 10);
 
   /// Copy constructor.
   csPoly2D (const csPoly2D& copy);
@@ -67,7 +67,7 @@ public:
   /**
    * Get the number of vertices.
    */
-  int GetVertexCount () const { return num_vertices; }
+  size_t GetVertexCount () const { return num_vertices; }
 
   /**
    * Get the array with all vertices.
@@ -82,7 +82,7 @@ public:
   /**
    * Get the specified vertex.
    */
-  csVector2* GetVertex (int i)
+  csVector2* GetVertex (size_t i)
   {
     if (i<0 || i>=num_vertices) return 0;
     return &vertices[i];
@@ -91,7 +91,7 @@ public:
   /**
    * Get the specified vertex.
    */
-  csVector2& operator[] (int i)
+  csVector2& operator[] (size_t i)
   {
     CS_ASSERT (i >= 0 && i < num_vertices);
     return vertices[i];
@@ -100,7 +100,7 @@ public:
   /**
    * Get the specified vertex.
    */
-  const csVector2& operator[] (int i) const
+  const csVector2& operator[] (size_t i) const
   {
     CS_ASSERT (i >= 0 && i < num_vertices);
     return vertices[i];
@@ -126,17 +126,17 @@ public:
   /**
    * Test if a vector is inside the given polygon.
    */
-  static bool In (csVector2* poly, int num_poly, const csVector2& v);
+  static bool In (csVector2* poly, size_t num_poly, const csVector2& v);
 
   /**
    * Make room for at least the specified number of vertices.
    */
-  void MakeRoom (int new_max);
+  void MakeRoom (size_t new_max);
 
   /**
    * Set the number of vertices.
    */
-  void SetVertexCount (int n)
+  void SetVertexCount (size_t n)
   {
     MakeRoom (n);
     num_vertices = n;
@@ -146,19 +146,19 @@ public:
    * Add a vertex (2D) to the polygon.
    * Return index of added vertex.
    */
-  int AddVertex (const csVector2& v) { return AddVertex (v.x, v.y); }
+  size_t AddVertex (const csVector2& v) { return AddVertex (v.x, v.y); }
 
   /**
    * Add a vertex (2D) to the polygon.
    * Return index of added vertex.
    */
-  int AddVertex (float x, float y);
+  size_t AddVertex (float x, float y);
 
   /**
    * Set all polygon vertices at once.  Copies the array.
    * Note! This doesn't update the bounding box!
    */
-  void SetVertices (csVector2 const* v, int num)
+  void SetVertices (csVector2 const* v, size_t num)
   {
     MakeRoom (num);
     memcpy (vertices, v, (num_vertices = num) * sizeof (csVector2));
@@ -199,7 +199,7 @@ public:
    * Edges are indexed with 0 being the edge from 0 to 1 and n-1 being
    * the edge from n-1 to 0.
    */
-  void ExtendConvex (const csPoly2D& other, int this_edge);
+  void ExtendConvex (const csPoly2D& other, size_t this_edge);
 
   /**
    * Calculate the signed area of this polygon.
@@ -211,7 +211,7 @@ public:
    * of vertices. The polygon will be inside the given bounding box.
    * @@@ Currently only triangles are supported.
    */
-  void Random (int num, const csBox2& max_bbox);
+  void Random (size_t num, const csBox2& max_bbox);
 };
 
 /**

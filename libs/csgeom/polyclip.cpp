@@ -51,7 +51,7 @@ csPoly2DPool *csClipper::GetSharedPool ()
 
 uint8 csClipper::ClipInPlace (
   csVector2 *InPolygon,
-  int &InOutCount,
+  size_t &InOutCount,
   csBox2 &BoundingBox)
 {
   csVector2 TempPoly[MAX_OUTPUT_VERTICES];
@@ -76,9 +76,9 @@ int csBoxClipper::ClassifyBox (const csBox2 &box)
 
 uint8 csBoxClipper::Clip (
   csVector2 *InPolygon,
-  int InCount,
+  size_t InCount,
   csVector2 *OutPolygon,
-  int &OutCount)
+  size_t &OutCount)
 {
 #include "boxclip.inc"
   OutCount = OutV;
@@ -87,9 +87,9 @@ uint8 csBoxClipper::Clip (
 
 uint8 csBoxClipper::Clip (
   csVector2 *InPolygon,
-  int InCount,
+  size_t InCount,
   csVector2 *OutPolygon,
-  int &OutCount,
+  size_t &OutCount,
   csVertexStatus *OutStatus)
 {
 #define OUTPUT_VERTEX_STATUS
@@ -100,9 +100,9 @@ uint8 csBoxClipper::Clip (
 
 uint8 csBoxClipper::Clip (
   csVector2 *InPolygon,
-  int InCount,
+  size_t InCount,
   csVector2 *OutPolygon,
-  int &OutCount,
+  size_t &OutCount,
   csBox2 &BoundingBox)
 {
   if (!region.Overlap (BoundingBox)) return false;
@@ -112,7 +112,7 @@ uint8 csBoxClipper::Clip (
   OutCount = OutV;
   BoundingBox.StartBoundingBox (OutPolygon[0]);
 
-  int i;
+  size_t i;
   for (i = 1; i < OutCount; i++)
     BoundingBox.AddBoundingVertexSmart (OutPolygon[i]);
   return Clipped ? CS_CLIP_CLIPPED : CS_CLIP_INSIDE;
@@ -125,7 +125,7 @@ csPolygonClipper::csPolygonClipper (
   bool copy) :
     csClipper()
 {
-  int Count = Clipper->GetVertexCount ();
+  size_t Count = Clipper->GetVertexCount ();
   ClipPolyVertices = Count;
 
   if (mirror || copy)
@@ -135,7 +135,7 @@ csPolygonClipper::csPolygonClipper (
     ClipPoly = ClipPoly2D->GetVertices ();
     ClipData = ClipPoly + Count;
 
-    int vert;
+    size_t vert;
     if (mirror)
       for (vert = 0; vert < Count; vert++)
         ClipPoly[Count - 1 - vert] = (*Clipper)[vert];
@@ -155,7 +155,7 @@ csPolygonClipper::csPolygonClipper (
 
 csPolygonClipper::csPolygonClipper (
   csVector2 *Clipper,
-  int Count,
+  size_t Count,
   bool mirror,
   bool copy) :
     csClipper()
@@ -169,7 +169,7 @@ csPolygonClipper::csPolygonClipper (
     ClipPoly = ClipPoly2D->GetVertices ();
     ClipData = ClipPoly + Count;
 
-    int vert;
+    size_t vert;
     if (mirror)
       for (vert = 0; vert < Count; vert++)
         ClipPoly[Count - 1 - vert] = Clipper[vert];
@@ -197,7 +197,7 @@ csPolygonClipper::~csPolygonClipper ()
 void csPolygonClipper::Prepare ()
 {
   // Precompute some data for each clipping edge
-  int vert;
+  size_t vert;
   ClipBox.StartBoundingBox (ClipPoly[0]);
   for (vert = 0; vert < ClipPolyVertices; vert++)
   {
@@ -224,7 +224,7 @@ bool csPolygonClipper::IsInside (const csVector2 &v)
   if (!ClipBox.In (v.x, v.y)) return false;
 
   // Detailed test
-  int vert;
+  size_t vert;
   for (vert = 0; vert < ClipPolyVertices; vert++)
     if ((v.x - ClipPoly[vert].x) *
           ClipData[vert].y -
@@ -236,9 +236,9 @@ bool csPolygonClipper::IsInside (const csVector2 &v)
 
 uint8 csPolygonClipper::Clip (
   csVector2 *InPolygon,
-  int InCount,
+  size_t InCount,
   csVector2 *OutPolygon,
-  int &OutCount)
+  size_t &OutCount)
 {
 #include "polyclip.inc"
   OutCount = OutV;
@@ -247,9 +247,9 @@ uint8 csPolygonClipper::Clip (
 
 uint8 csPolygonClipper::Clip (
   csVector2 *InPolygon,
-  int InCount,
+  size_t InCount,
   csVector2 *OutPolygon,
-  int &OutCount,
+  size_t &OutCount,
   csBox2 &BoundingBox)
 {
   if (!ClipBox.Overlap (BoundingBox)) return false;
@@ -259,7 +259,7 @@ uint8 csPolygonClipper::Clip (
   {
     BoundingBox.StartBoundingBox (OutPolygon[0]);
 
-    int i;
+    size_t i;
     for (i = 1; i < OutCount; i++)
       BoundingBox.AddBoundingVertexSmart (OutPolygon[i]);
   }
@@ -269,9 +269,9 @@ uint8 csPolygonClipper::Clip (
 
 uint8 csPolygonClipper::Clip (
   csVector2 *InPolygon,
-  int InCount,
+  size_t InCount,
   csVector2 *OutPolygon,
-  int &OutCount,
+  size_t &OutCount,
   csVertexStatus *OutStatus)
 {
 #define OUTPUT_VERTEX_STATUS

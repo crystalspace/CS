@@ -260,7 +260,7 @@ bool csLightHalo::Process (csTicks ElapsedTime, iCamera* camera,
   csVector2 HaloClip[32];
 
   // Number of vertices in HaloClip array
-  int HaloVCount = 32;
+  size_t HaloVCount = 32;
 
   halo_vis = IsVisible (camera, Engine, v);
 
