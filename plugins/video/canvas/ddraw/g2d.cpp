@@ -22,8 +22,6 @@
 #include "cssys/win32/directdetection.h"
 #include "isystem.h"
 
-#define ASSERT assert
-
 DirectDetection DDetection;
 DirectDetectionDevice * DirectDevice;
 
@@ -65,7 +63,7 @@ void sys_fatalerror(char *str, HRESULT hRes = S_OK)
 
 IMPLEMENT_FACTORY (csGraphics2DDDraw3)
 
-EXPORT_CLASS_TABLE (ddraw3)
+EXPORT_CLASS_TABLE (ddraw5)
   EXPORT_CLASS (csGraphics2DDDraw3, SOFTWARE_2D_DRIVER,
     "DirectDraw DX3 2D graphics driver for Crystal Space")
   EXPORT_CLASS (csGraphics2DDDraw3, "crystalspace.graphics2d.direct3d.dx5",
@@ -385,7 +383,7 @@ bool csGraphics2DDDraw3::Open(const char *Title)
     wwidth=Width+2*GetSystemMetrics(SM_CXSIZEFRAME);
     wheight=Height+2*GetSystemMetrics(SM_CYSIZEFRAME)+GetSystemMetrics(SM_CYCAPTION);
   
-    m_hWnd = CreateWindowEx(exStyle, "CrystalWindow", Title, style,
+    m_hWnd = CreateWindowEx(exStyle, WINDOWCLASSNAME/*"CrystalWindow"*/, Title, style,
                           (GetSystemMetrics(SM_CXSCREEN)-wwidth)/2,
                             (GetSystemMetrics(SM_CYSCREEN)-wheight)/2,
                             wwidth, wheight, NULL, NULL, m_hInstance, NULL );
