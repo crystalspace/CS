@@ -50,7 +50,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 user32.lib advapi32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 user32.lib advapi32.lib %libs% /nologo /subsystem:console /machine:I386 /nodefaultlib:"LIBC" /out:"csrelease\temp\%project%\%target%" /libpath:"..\..\libs\cssys\win32\lib" %lflags% /OPT:NOREF
+# ADD LINK32 user32.lib advapi32.lib ddraw.lib zlib.lib %libs% /nologo /subsystem:console /machine:I386 /nodefaultlib:"LIBC" /out:"csrelease\temp\%project%\%target%" /libpath:"..\..\libs\cssys\win32\lib" %lflags% /OPT:NOREF
 # Begin Special Build Tool
 TargetPath=.\csrelease\temp\%project%\%target%
 SOURCE="$(InputPath)"
@@ -79,7 +79,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 user32.lib advapi32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 user32.lib advapi32.lib %libs% /nologo /subsystem:console /debug /machine:I386 /nodefaultlib:"LIBC" /out:"csdebug\temp\%project%\%target%" /pdbtype:sept /libpath:"..\..\libs\cssys\win32\lib" %lflags%
+# ADD LINK32 user32.lib advapi32.lib ddraw.lib zlib.lib %libs% /nologo /subsystem:console /debug /machine:I386 /nodefaultlib:"LIBC" /out:"csdebug\temp\%project%\%target%" /pdbtype:sept /libpath:"..\..\libs\cssys\win32\lib" %lflags%
 # Begin Special Build Tool
 TargetPath=.\csdebug\temp\%project%\%target%
 SOURCE="$(InputPath)"
