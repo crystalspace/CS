@@ -47,7 +47,7 @@ def SetupFrame ():
     if kbd.GetKeyState(CSKEY_DOWN):
         view.GetCamera().Move(CS_VEC_BACKWARD * 4 * speed)
     # Tell 3D driver we're going to display 3D things.
-    if not myG3D.BeginDraw(CSDRAW_3DGRAPHICS):
+    if not myG3D.BeginDraw(engine.GetBeginDrawFlags() | CSDRAW_3DGRAPHICS):
         sys.exit(1)
     if view:
         view.Draw()

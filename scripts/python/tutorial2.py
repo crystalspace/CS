@@ -170,7 +170,7 @@ class MyCsApp:
         if self.keybd.GetKeyState(CSKEY_DOWN):
             self.view.GetCamera().Move(CS_VEC_BACKWARD * 4 * speed)
         # Tell 3D driver we're going to display 3D things.
-        if not self.g3d.BeginDraw(CSDRAW_3DGRAPHICS):
+        if not self.g3d.BeginDraw(self.engine.GetBeginDrawFlags() | CSDRAW_3DGRAPHICS):
             FatalError()
         self.view.Draw()
         #print 'SetupFrame done'
