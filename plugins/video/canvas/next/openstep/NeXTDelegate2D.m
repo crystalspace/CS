@@ -25,6 +25,7 @@
 #import <AppKit/NSCursor.h>
 #import <AppKit/NSImage.h>
 #import <AppKit/NSWindow.h>
+#import <Foundation/NSString.h>
 
 typedef void* NeXTDelegateHandle2D;
 #define N2D_PROTO(RET,FUNC) RET NeXTDelegate2D_##FUNC
