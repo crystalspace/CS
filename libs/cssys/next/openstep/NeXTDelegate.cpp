@@ -375,6 +375,8 @@ enum
 
 //-----------------------------------------------------------------------------
 // classifyOtherKey::
+//	*NOTE* The so-called "backspace" key on the keyboard actually sends
+//	DEL, however Crystal Space would like to see it as CSKEY_BACKSPACE.
 //-----------------------------------------------------------------------------
 - (void)classifyOtherKey:(int*)raw :(int*)cooked
     {
@@ -384,7 +386,7 @@ enum
 	case K_RETURN:    *raw = CSKEY_ENTER;     break;
 	case K_TAB:       *raw = CSKEY_TAB;       break;
 	case K_BACKSPACE: *raw = CSKEY_BACKSPACE; break;
-	case K_DELETE:    *raw = CSKEY_DEL;       break;
+	case K_DELETE:    *raw = CSKEY_BACKSPACE; break; // *NOTE*
 	default:
 	    if (*raw <= 0x7f) // Is it 7-bit ASCII?
 		*raw = CS_DOWN_CASE[ *raw ];
