@@ -60,7 +60,7 @@ void csDefaultDialogSkin::Draw (csComponent &This)
 
 void csDefaultDialogSkin::SetBorderSize (csDialog &This)
 {
-  int bw, bh;
+  int bw = 0, bh = 0;
   switch (This.GetFrameStyle ())
   {
     case csdfsNone:
