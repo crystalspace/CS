@@ -24,6 +24,9 @@ The history order is reversed so that new features are at the top.
 	  protected members from within subclasses).
 	- Philip Wyett added virtual desctructor to 'TextureLoaderContext'
           and aslo a newline to the end of the file.
+	- Jorrit removed the obsolete coverage buffer from Dynavis. The
+	  tiled coverage buffer works much better and was default anyway.
+	  Additionally removed the toggle_tiled debug command.
 14-May-2003
 	- Jorrit fixed a bug in the syntax services. When a polygon is a
 	  portal it is now marked as excluded from the visculling mesh.

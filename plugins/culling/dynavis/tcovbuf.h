@@ -23,7 +23,16 @@
 #include "csgeom/math2d.h"
 #include "iutil/dbghelp.h"
 #include "bits64.h"
-#include "covbuf.h"
+
+/**
+ * A 2D bounding box with integer coordinates.
+ */
+class csBox2Int
+{
+public:
+  int minx, miny;
+  int maxx, maxy;
+};
 
 struct iGraphics2D;
 struct iGraphics3D;
