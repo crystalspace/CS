@@ -272,6 +272,8 @@ protected:
   char *text;
   /// Current font index
   int Font;
+  /// Current font size
+  int FontSize;
   /// true if window is maximized, false if not (OrgBound invalid in this case)
   bool Maximized;
   /// Original bound when window is maximized
@@ -587,6 +589,12 @@ public:
   /// Set text font for this component and possibly its children
   void SetFont (int iFont, bool IncludeChildren = false);
 
+  /// Query current fontsize for this component
+  int GetFontSize ();
+  
+  /// Set text font size for this component and possibly its children
+  void SetFontSize (int iSize, bool IncludeChildren = false);
+  
   /// Draw a box
   void Box (int xmin, int ymin, int xmax, int ymax, int colindx);
 

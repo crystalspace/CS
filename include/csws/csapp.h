@@ -236,8 +236,8 @@ public:
   { GfxPpl->Pixel (x, y, pplColor (color)); }
 
   /// Draw a text string: if bg < 0 background is not drawn
-  void pplText (int x, int y, int fg, int bg, int Font, const char *s)
-  { GfxPpl->Text (x, y, pplColor (fg), bg >= 0 ? pplColor (bg) : bg, Font, s); }
+  void pplText (int x, int y, int fg, int bg, int Font, int FontSize, const char *s)
+  { GfxPpl->Text (x, y, pplColor (fg), bg >= 0 ? pplColor (bg) : bg, Font, FontSize, s); }
 
   /// Draw a (scaled) 2D sprite
   void pplSprite2D (csPixmap *s2d, int x, int y, int w, int h)
@@ -274,11 +274,11 @@ public:
   { GfxPpl->Polygon3D (poly, mode); }
 
   /// Return the width of given text using currently selected font
-  int TextWidth (const char *text, int Font)
-  { return GfxPpl->TextWidth (text, Font); }
+  int TextWidth (const char *text, int Font, int FontSize)
+  { return GfxPpl->TextWidth (text, Font, FontSize); }
   /// Return the height of currently selected font
-  int TextHeight (int Font)
-  { return GfxPpl->TextHeight (Font); }
+  int TextHeight (int Font, int FontSize)
+  { return GfxPpl->TextHeight (Font, FontSize); }
 
   /// Clip a line against a rectangle and return true if its clipped out
   bool ClipLine (float &x1, float &y1, float &x2, float &y2,

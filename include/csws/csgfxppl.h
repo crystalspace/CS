@@ -71,7 +71,7 @@ private:
   typedef struct
   {
     unsigned char Op;
-    unsigned char font;	// this is a part of Text struct (below)
+    unsigned char font, fontsize;	// this is a part of Text struct (below)
     union
     {
       struct
@@ -164,7 +164,7 @@ private:
   void Pixel (int x, int y, int color);
 
   /// Draw a text string: if bg < 0 background is not drawn
-  void Text (int x, int y, int fg, int bg, int font, const char *s);
+  void Text (int x, int y, int fg, int bg, int font, int fontsize, const char *s);
 
   /// Draw a 2D sprite
   void Sprite2D (csPixmap *s2d, int x, int y, int w, int h);
@@ -212,11 +212,11 @@ private:
   /// Change system mouse cursor and return success status
   bool SwitchMouseCursor (csMouseCursorID Shape);
 
-  /// Return the width of given text using selected font
-  int TextWidth (const char *text, int Font);
+  /// Return the width of given text using selected font and size
+  int TextWidth (const char *text, int Font, int FontSize);
 
-  /// Return the height of selected font
-  int TextHeight (int Font);
+  /// Return the height of selected font and size
+  int TextHeight (int Font, int FontSize);
 
   /// Begin painting
   bool BeginDraw ();
