@@ -37,10 +37,10 @@ OUTSUFX.yes=
 # Command for creating a directory.
 # Note that directories will have forward slashes. Please
 # make sure that this command accepts that (or use 'subst' first).
-MKDIR=$(CMD.MKDIR) $(subst /,\,$(patsubst %/,%,$@))
+MKDIR=$(CMD.MKDIR) $(patsubst %/,%,$(subst \,/,$@))
 
 # Command for creating a directory including missing parents.
-MKDIRS=$(CMD.MKDIRS) $(subst /,\,$(patsubst %/,%,$@))
+MKDIRS=$(CMD.MKDIRS) $(patsubst %/,%,$(subst \,/,$@))
 
 # The command to remove all specified files.
 RM=rm -f
