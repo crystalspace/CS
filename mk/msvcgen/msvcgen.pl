@@ -1189,7 +1189,7 @@ Project Options:
                  cumulative, or not at all if no extra compiler options are
                  required.  As an example, a pre-processor macro named
                  __FOOBAR__ can be defined with: --cflags='/D "__FOOBAR__"'
-    --cflags=<flags>
+    --debugcflags=<flags>
                  Specifies extra compiler options which should be used in
                  addition to those already mentioned in the template file.
                  This is the replacement value for the \%debugcflags\%
