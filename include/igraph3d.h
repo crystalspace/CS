@@ -91,8 +91,8 @@ public:
 };
 
 
-///Structure containing all info needed by DrawPolygonQuick (DPQ)
-struct G3DPolygonDPQ
+///Structure containing all info needed by DrawPolygonFX (DPFX)
+struct G3DPolygonDPFX
 {
   /// Current number of vertices.
   int num;
@@ -185,20 +185,6 @@ typedef enum
   FX_Alpha
 } DPFXMixMode;
 
-///Structure containing all info needed by DrawPolygonFX (DPFX)
-struct G3DPolygonDPFX
-{
-  /// Current number of vertices.
-  int num;
-  /// Vertices that form the polygon.
-  G3DTexturedVertex vertices[200];
-
-  /// Invert aspect ratio that was used to perspective project the vertices (1/fov)
-  float inv_aspect;
-
-  /// The texture handle as returned by ITextureManager.
-  ITextureHandle* txt_handle;
-};
 
 
 ///
@@ -383,32 +369,6 @@ public:
   STDMETHOD (DrawLine) (csVector3& v1, csVector3& v2, float fov, int color) PURE;
 
   /**
-   * Prepare for drawing a series of projected polygons which all use
-   * the same texture. You must call this function before calling a
-   * series of DrawPolygonQuick(). After calling the series you should
-   * call FinishPolygonQuick().<p>
-   *
-   * Warning! After calling this function you are not allowed to do
-   * any calls to the 3D rasterizer other than DrawPolygonQuick() and
-   * FinishPolygonQuick().
-   */
-  STDMETHOD (StartPolygonQuick) (ITextureHandle* handle, bool gouraud) PURE;
-
-  /**
-   * Finish drawing a series of projected polygons.
-   */
-  STDMETHOD (FinishPolygonQuick) () PURE;
-
-  /**
-   * Draw a projected polygon.
-   * This routine will draw the polygon using and filling
-   * the z buffer if needed. The texture mapping need not
-   * be perspective correct since this function is generally going
-   * to be used for 3D sprites which are made up of small triangles.
-   */
-  STDMETHOD (DrawPolygonQuick) (G3DPolygonDPQ& poly) PURE;
-
-  /**
    * Prepare for drawing a series of Polygon FX which all use
    * the same settings. You must call this function before calling a
    * series of DrawPolygonFX(). After calling the series you should
@@ -422,13 +382,13 @@ public:
    * handle:  The texture handle as returned by ITextureManager.
    * mode:    How shall the new polygon be combined with the current 
    *          screen content.
+   * alpha:   AlphaValue of the polygon. Ranges from 0.0 to 1.0. 0 means 
+   *          opaque, 1.0 is comletely transparent. Will only cause some 
+   *          effect, if mode is FX_Alpha
    * gouraud: set to true, if you want to shade the resulting texture by 
    *          the colorvalues in vertices[i].r, .b, .g, if you set gouraud 
    *          to true and set all color components to 1.0, you will see no 
    *          gouraud shading.
-   * alpha:   AlphaValue of the polygon. Ranges from 0.0 to 1.0. 0 means 
-   *          opaque, 1.0 is comletely transparent. Will only cause some 
-   *          effect, if mode is FX_Alpha
    */
   STDMETHOD (StartPolygonFX)  (ITextureHandle* handle, DPFXMixMode mode, float alpha, bool gouraud) PURE;
 
