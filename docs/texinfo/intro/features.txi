@@ -32,10 +32,10 @@ write your own engine. The libraries include:
 
 @itemize @bullet
 @item
-Direct3D for Windows port.
+Direct3D for Windows (32 bit) port.
 
 @item
-OpenGL support for GNU/Linux, BeOS, MacOS/9, OS/2, and Windows.
+OpenGL support for GNU/Linux, BeOS, MacOS/9, OS/2, and Windows (32 bit).
 
 @item
 Drawing arbitrary sloped convex polygons.

@@ -24,7 +24,7 @@ for the platform which you are using.  Some of the supported compilers are
 @sc{gcc}, @sc{msvc} and Code Warrior.
 
 @item
-What do you I to run Crystal Space?
+What do you need to run Crystal Space?
 
 @strong{A}: You need the following items:
 
@@ -41,7 +41,7 @@ following drivers.  Otherwise you will need the remaining items.
 @item
 A 3D rasterizer plug-in.  You can choose either the software renderer or else
 one of the hardware accelerated renderers.  You also have to choose the
-correct library for your system.  On OS/2 and Windows this will be a
+correct library for your system.  On OS/2 and Windows (32 bit) this will be a
 @file{.DLL} file.  On most Unix systems this will be an @file{.so} file.
 
 @item
