@@ -77,6 +77,8 @@ csOPCODECollideSystem::csOPCODECollideSystem (iBase *pParent)
  // TreeCollider.SetFullPrimPrimTest(true);
   TreeCollider.SetTemporalCoherence(false);
   N_pairs=0;
+  pairs=NULL;
+ 
 }
 
 csOPCODECollideSystem::~csOPCODECollideSystem ()
@@ -101,8 +103,9 @@ bool csOPCODECollideSystem::Collide (
   iCollider* collider1, const csReversibleTransform* trans1,
   iCollider* collider2, const csReversibleTransform* trans2)
 {
-  csOPCODECollider* col1 = (csOPCODECollider*)collider1;
-  csOPCODECollider* col2 = (csOPCODECollider*)collider2;
+	  printf( " we are in Collide \n");
+   col1 = (csOPCODECollider*)collider1;
+   col2 = (csOPCODECollider*)collider2;
    
   //TreeCollider.SetDestination ( &CollideFaces );
   //
@@ -118,7 +121,8 @@ bool csOPCODECollideSystem::Collide (
   csMatrix3 m1 = trans1->GetO2T();
   csMatrix3 m2 = trans2->GetO2T();
    csVector3 u;
-      
+ //  csVector3 v;
+     /* 
    u=m1.Row1();
    col1->transform.m[0][0] = u.x;
    col1->transform.m[0][1] = u.y;
@@ -154,16 +158,54 @@ bool csOPCODECollideSystem::Collide (
 						   col2->transform.m[3][1] = u.y;
 					             col2->transform.m[3][2] = u.z;
  
-   
-					 
-   bool isOk = TreeCollider.Collide ( ColCache   , &col1->transform , &col2->transform  );
+ */  
+  u=m1.Row1();
+   col1->transform.m[0][0] = u.x;
+   col1->transform.m[1][0] = u.y;
+   col1->transform.m[2][0] = u.z;
+                                           u=m2.Row1();
+  					 col2->transform.m[0][0] = u.x;
+					 col2->transform.m[1][0] = u.y;
+					 col2->transform.m[2][0] = u.z;
+   u=m1.Row2();
+ col1->transform.m[0][1] = u.x;
+ col1->transform.m[1][1] = u.y;
+ col1->transform.m[2][1] = u.z;
+ 					      u=m2.Row2();
+					 col2->transform.m[0][1] = u.x;
+					 col2->transform.m[1][1] = u.y;
+					 col2->transform.m[2][1] = u.z;	
+   u=m1.Row3();
+ col1->transform.m[0][2] = u.x;
+ col1->transform.m[1][2] = u.y;
+ col1->transform.m[2][2] = u.z;
+ 						  u=m2.Row3();
+ 					 col1->transform.m[0][2] = u.x;
+					 col1->transform.m[1][2] = u.y;
+   					 col1->transform.m[2][2] = u.z;
+     
+   u=trans1->GetO2TTranslation();
+     col1->transform.m[3][0] = u.x;
+      col1->transform.m[3][1] = u.y;
+       col1->transform.m[3][2] = u.z;
+ 
+ 						 u=trans2->GetO2TTranslation();
+    						 col2->transform.m[3][0] = u.x;
+						   col2->transform.m[3][1] = u.y;
+					             col2->transform.m[3][2] = u.z;
+ 
 
+	    			  printf( " Collide \n");
+   bool isOk = TreeCollider.Collide ( ColCache   , &col1->transform , &col2->transform  );
+                               	  printf( " isOK? \n");
   if (isOk) {
+	   printf( "  yes! \n");
    bool Status = TreeCollider.GetContactStatus();
+                                   	  printf( " some contact done! \n");
     
    if (Status) {
         
-	     // it really sucks having to copy all this each Collide query, but
+	     // it really sucks having to copy all this each succesful Collide query, but
 	   //   since opcode library uses his own vector types, 
 	   //  but there are some things to consider:
 	   //  first, since opcode doesnt store the mesh, it relies on a callback
@@ -178,50 +220,22 @@ bool csOPCODECollideSystem::Collide (
 	   //    but doing it at the Callback would be plain wrong, since that Callback
 	   //    should be as fast as possible 
 	   //    so, the question is, what we should prefer? memory or speed?
-	   //    
-	const Pair* colPairs=TreeCollider.GetPairs();
-	Point* vertholder0 = col1->vertholder;
-	Point* vertholder1 = col2->vertholder;
-	udword* indexholder0 = col1->indexholder;
-	udword* indexholder1 = col2->indexholder;
-	
-	Point* current;
-        unsigned int i;
-	int j;     
-	int size=(int)(udword(TreeCollider.GetNbPairs() ));
-	unsigned int oldN=0;
-	 if ( pairs ) {
-	csCollisionPair* temporal;
-          temporal=new csCollisionPair[N_pairs + size ]	;
-           memcpy (temporal , pairs , sizeof(csCollisionPair)*N_pairs );	   
-	    delete[](pairs); 
-         pairs = temporal;               //new csCollisionPair[ size ];
-	 oldN=N_pairs;
-	      };
-        N_pairs+=size;
-	 for (i= oldN ;i< N_pairs ;i++) {
-		 j =  3*colPairs[i].id0;
-		 current = &vertholder0[ indexholder0 [ j ] ];		 
-          pairs[i].a1=csVector3 ( current->x , current->y , current->z ); 
-	          current =  &vertholder0[ indexholder0 [ j + 1 ] ];		 
-          pairs[i].b1=csVector3 ( current->x , current->y , current->z ); 
-	          current =  &vertholder0[ indexholder0 [ j + 2 ] ];		 
-          pairs[i].c1=csVector3 ( current->x , current->y , current->z ); 
-	          j = 3*colPairs[i].id1; 
-	          current =  &vertholder1[ indexholder1 [ j ] ];		 
-          pairs[i].a2=csVector3 ( current->x , current->y , current->z ); 
-	          current =  &vertholder1[ indexholder1 [ j + 1 ] ];		 
-          pairs[i].b2=csVector3 ( current->x , current->y , current->z ); 
-	           current =  &vertholder1[ indexholder1 [ j + 2 ] ];		 
-          pairs[i].c2=csVector3 ( current->x , current->y , current->z ); 
-	
-	 };	
-       
+	    	  printf( " 1) \n");
+
+//  UGLY::         I know, it sucks to have to copy them by value, but then how can i be
+		  //sure that it would not be modified by the app until the GetCollisionPairs
+		  //calls use them?!
+        this->T1=*trans1;
+        this->T2=*trans2;    	
+       //	int size=(int)(udword(TreeCollider.GetNbPairs() ));
+	//	N_pairs=size;
        return true;
-      } else { //pairs=NULL;  very bad, this must be done on ResetCollisionPairs
-	       return false; };  
-  }
-  return false;
+      } else {  return false; };  
+   
+  } else { printf( " uh oh \n");
+	   return false; 
+  };
+
 }
 
 
@@ -238,13 +252,52 @@ int csOPCODECollideSystem::CollidePath (
 }
 
 csCollisionPair* csOPCODECollideSystem::GetCollisionPairs ()
-{		
-	return pairs;
+{       printf( " someone asked for pairs \n");
+        int size=(int)(udword(TreeCollider.GetNbPairs() ));
+	    	N_pairs=size;
+		if (!(N_pairs)) { return NULL; };
+	const Pair* colPairs=TreeCollider.GetPairs();
+	csCollisionPair* temporal;
+	Point* vertholder0 = col1->vertholder;
+	Point* vertholder1 = col2->vertholder;
+	udword* indexholder0 = col1->indexholder;
+	udword* indexholder1 = col2->indexholder;
+	
+	Point* current;
+        	int i;
+	int j;     
+	    		 if ( pairs ) {
+		     delete[](pairs); 
+        };		   
+      	 pairs=new csCollisionPair[N_pairs];
+	               printf( " lets write the col stack on GCP \n");
+	 for(i= 0 ;i< N_pairs ;i++) {
+		 j =  3*colPairs[i].id0;
+		 current = &vertholder0[ indexholder0 [ j ] ];		 
+          pairs[i].a1= T1.This2Other (csVector3 ( current->x , current->y , current->z ) ); 
+	          current =  &vertholder0[ indexholder0 [ j + 1 ] ];		 
+          pairs[i].b1=T1.This2Other( csVector3 ( current->x , current->y , current->z ) ); 
+	          current =  &vertholder0[ indexholder0 [ j + 2 ] ];		 
+          pairs[i].c1=T1.This2Other( csVector3 ( current->x , current->y , current->z ) ); 
+	          j = 3*colPairs[i].id1; 
+	          current =  &vertholder1[ indexholder1 [ j ] ];		 
+          pairs[i].a2=T2.This2Other( csVector3 ( current->x , current->y , current->z ) ); 
+	          current =  &vertholder1[ indexholder1 [ j + 1 ] ];		 
+          pairs[i].b2=T2.This2Other( csVector3 ( current->x , current->y , current->z ) ); 
+	           current =  &vertholder1[ indexholder1 [ j + 2 ] ];		 
+          pairs[i].c2=T2.This2Other( csVector3 ( current->x , current->y , current->z ) ); 
+	
+	 };		 printf( " ok we just did %u pairs \n",i);
+      
+        	return pairs;
 //  return csRapidCollider::GetCollisions ();
 }
 
 int csOPCODECollideSystem::GetCollisionPairCount ()
-{
+{        int size=(int)(udword(TreeCollider.GetNbPairs() ));
+	    	N_pairs=size;
+		
+       	printf( " %u pairs \n",N_pairs);
 	return N_pairs;
 
 //  return csRapidCollider::numHits;
@@ -254,9 +307,10 @@ void csOPCODECollideSystem::ResetCollisionPairs ()
 {
 //  csRapidCollider::CollideReset ();
 //  csRapidCollider::numHits = 0;
-	delete[](pairs);
-	N_pairs=0;
-}
+	 printf( " reset \n");
+	if (pairs) { delete[](pairs); pairs=NULL; N_pairs=0;  };
+  
+	}
 
 
  void csOPCODECollideSystem::SetOneHitOnly (bool o) {  };
