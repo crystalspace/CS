@@ -57,6 +57,15 @@ The history order is reversed so that new features are at the top.
 	- Norman Kraemer modified configure.ac to fix the case when 
 	  distutils.sysconfig.get_config_var() return None so concatenation 
 	  with a string would fail fails
+	- Oktal made the following changes to the Perl cspace module:
+	    - Numerous updates to the SWIG interface files.
+	    - Commented out some erroneous sections of perlpost.i, for future
+	      fixing, meaning that those features of CS are unwrapped.
+	    - Reorganised the SWIG-generated C++ code, so the code is written
+	      to cswigpl5.inc, and cswigpl5.cpp is a two-line file that first
+	      #include's css.h, then cswigpl5.inc. This is the best way to
+	      make sure that the very first file to be included is cssysdef.h,
+	      which in turn fixes some problems like the lack of int64 macros.
 29-Apr-2003
 	- Matze fixed bad filepermission for jam install
 	- Matze moved crystal.m4 around to mk/autoconf and merged to make and

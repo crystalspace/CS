@@ -251,8 +251,9 @@ sub CS_REQUEST_REPORTERLISTENER
 sub CS_REQUEST_CONSOLEOUT
   { CS_REQUEST_PLUGIN ('crystalspace.console.output.simple', iConsoleOutput) }
 %}
-#endif
+#endif // 0
 
+#if 0
 %extend iCollideSystem
 {
   %native(GetCollisionPairs) _GetCollisionPairs;
@@ -281,7 +282,7 @@ sub CS_REQUEST_CONSOLEOUT
     int num = sys->GetCollisionPairCount ();
     AV *av = newAV ();
     for (int i = 0; i < num; i++)
-    av_push (av, sys->GetCollisionPairs () + i);
+      av_push (av, sys->GetCollisionPairs () + i);
 
     SV *rv = newRV ((SV *) av);
     HvREFCNT_dec (av);
@@ -291,6 +292,7 @@ sub CS_REQUEST_CONSOLEOUT
   }
   %}
 }
+#endif // 0
 
 %apply float * OUTPUT { float & __v1__ };
 %apply float * OUTPUT { float & __v2__ };
@@ -327,6 +329,7 @@ sub CS_REQUEST_CONSOLEOUT
   }
 }
 
+#if 0
 %{
   #undef CS_VEC_FORWARD
   #undef CS_VEC_BACKWARD
@@ -339,7 +342,7 @@ sub CS_REQUEST_CONSOLEOUT
   #undef CS_VEC_TILT_RIGHT
   #undef CS_VEC_TILT_LEFT
   #undef CS_VEC_TILT_UP
-  #undef CS_VEC_TILE_DOWN
+  #undef CS_VEC_TILT_DOWN
 %}
 csVector3 CS_VEC_FORWARD()	{ return csVector3 ( 0,  0,  1); }
 csVector3 CS_VEC_BACKWARD()	{ return csVector3 ( 0,  0, -1); }
@@ -353,6 +356,7 @@ csVector3 CS_VEC_TILT_RIGHT()	{ return csVector3 ( 0,  0, -1); }
 csVector3 CS_VEC_TILT_LEFT()	{ return csVector3 ( 0,  0,  1); }
 csVector3 CS_VEC_TILT_UP()	{ return csVector3 (-1,  0,  0); }
 csVector3 CS_VEC_TILT_DOWN()	{ return csVector3 ( 1,  0,  0); }
+#endif // 0
 
 TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), NULL, *)
 
@@ -428,7 +432,7 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), NULL, *)
   {
     return self->GetData ();
   }
-  void __av__ (char &*__chars__, int &__len__)
+  void __av__ (char *&__chars__, int &__len__)
   {
     __chars__ = self->GetData ();
     __len__ = self->Length ();
@@ -478,6 +482,7 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), NULL, *)
   }
 }
 
+#if 0
 %extend csHashMapReversible
 {
   %native(__hv__) ___hv__;
@@ -521,5 +526,6 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), NULL, *)
   }
   %}
 }
+#endif // 0
 
 #endif // SWIGPERL5

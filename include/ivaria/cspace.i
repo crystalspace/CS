@@ -82,9 +82,16 @@
 	%include "ivaria/perl1st.i"
 #endif
 
-%{
+/* @@@ The following is a kludge. In the future, all cspace modules for all
+ *     scripting languages should include css.h in the same way Perl does.
+ */
+#ifndef SWIGPERL5
+  %{
+    #include "css.h"
+  %}
+#endif
 
-#include "css.h"
+%{
 
 #include "imap/saver.h"
 #include "ivaria/reporter.h"

@@ -1,5 +1,5 @@
 DESCRIPTION.csperl5 = Crystal Space Perl5 scripting plugin
-DESCRIPTION.csperl5distclean = $(DESCRIPTION.csperl5)
+DESCRIPTION.csperl5dist = $(DESCRIPTION.csperl5) interim files
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION), rootdefines)
@@ -52,7 +52,8 @@ PERLXSI.O = $(OUT)/$(notdir $(PERLXSI.C:.c=$O))
 SWIG.I = include/ivaria/cspace.i
 SWIG.MOD = cspace
 SWIG.PERL5.PM = scripts/perl5/$(SWIG.MOD).pm
-SWIG.PERL5.C = plugins/cscript/csperl5/cswigpl5.cpp
+SWIG.PERL5.C = plugins/cscript/csperl5/cswigpl5.inc
+SWIG.PERL5.CPP = plugins/cscript/csperl5/cswigpl5.cpp
 SWIG.PERL5.O = $(OUT)/$(notdir $(SWIG.PERL5.C:.cpp=$O))
 SWIG.PERL5.DLL = scripts/perl5/$(SWIG.MOD)$(DLL)
 SWIG.PERL5.DOC = scripts/perl5/cs_wrap.doc
@@ -167,7 +168,9 @@ $(SWIG.PERL5.PM) $(SWIG.PERL5.C): $(SWIG.I)
 	-module $(SWIG.MOD) -o $(SWIG.PERL5.C) $(SWIG.I)
 	$(MV) plugins/cscript/csperl5/$(SWIG.MOD).pm $(SWIG.PERL5.PM)
 
-$(SWIG.PERL5.O): $(SWIG.PERL5.C)
+$(SWIG.PERL5.CPP): $(SWIG.PERL5.C)
+
+$(SWIG.PERL5.O): $(SWIG.PERL5.CPP)
 	$(filter-out -W -Wunused -Wall -Wmost,$(DO.COMPILE.CPP) \
 	$(PERL5.CFLAGS) -DPERL_POLLUTE)
 
