@@ -357,7 +357,7 @@ bool csGraphics2DOpenGL::Open ()
   // create the window.
   if (FullScreen)
   {
-    SwitchDisplayMode (true);
+    SwitchDisplayMode (false);
   }
 
   m_bActivated = true;
