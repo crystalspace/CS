@@ -312,14 +312,14 @@ void csAVIStreamVideo::yuv_channel_2_rgba_interleave (char *data[3])
     {
       if (uvidx != (sc>>1)) // this YUV is a 1:4:4 scheme
       {
-	uvidx = (sr>>1) * sw + (sc>>1);
-	u=((float)(unsigned char)udata[uvidx]) - 128.f;
-	v=((float)(unsigned char)vdata[uvidx]) - 128.f;
-	uf1 = 2.018f * u;
-	uf2 = 0.813f * u;
-	vf1 = 0.391f * v;
-	vf2 = 1.596f * v;
-	uvidx = sc  >>1;
+		uvidx = (sr>>1) * sw + (sc>>1);
+		u=((float)(unsigned char)udata[uvidx]) - 128.f;
+		v=((float)(unsigned char)vdata[uvidx]) - 128.f;
+		uf1 = 2.018f * u;
+		uf2 = 0.813f * u;
+		vf1 = 0.391f * v;
+		vf2 = 1.596f * v;
+		uvidx = sc  >>1;
       }
       y=1.164f*(((float)(unsigned char)ydata[idx]) - 16.f);
       pixel[tidx].blue = FIX_RANGE(y + uf1);
@@ -328,9 +328,9 @@ void csAVIStreamVideo::yuv_channel_2_rgba_interleave (char *data[3])
 
       while (xtic < sw)
       {
-	idx++;
-	sc++;
-	xtic += tw;
+		idx++;
+		sc++;
+		xtic += tw;
       }
       xtic -=sw;
       tidx++;
@@ -371,9 +371,9 @@ void csAVIStreamVideo::rgba_interleave (char *data)
       memcpy (&pixel[tidx], &src[idx], sizeof (csRGBpixel));
       while (xtic < sw)
       {
-	idx++;
-	sc++;
-	xtic += tw;
+		idx++;
+		sc++;
+		xtic += tw;
       }
       xtic -=sw;
       tidx++;
@@ -453,14 +453,14 @@ bool csAVIStreamVideo::LoadCodec (UByte *pInitData, ULong nInitDataLen,
       // codec exists, now try to initialize it
       if (pCodec->Initialize (&strdesc, pInitData, nInitDataLen, pFormatEx, nFormatEx))
       {
-	pCodec->GetCodecDescription (cdesc);
+		pCodec->GetCodecDescription (cdesc);
        	return true;
       }
       else
       {
-	pSystem->Printf (MSG_WARNING, "CODEC class \"%s\" could not be initialized !", cn);
-	pCodec->DecRef ();
-	pCodec = NULL;
+		pSystem->Printf (MSG_WARNING, "CODEC class \"%s\" could not be initialized !", cn);
+		pCodec->DecRef ();
+		pCodec = NULL;
       }
     }
     else
@@ -468,5 +468,6 @@ bool csAVIStreamVideo::LoadCodec (UByte *pInitData, ULong nInitDataLen,
   }
   else
     pSystem->Printf (MSG_DEBUG_0, "Could not get an SCF interface from the systemdriver !");
+
   return false;
 }

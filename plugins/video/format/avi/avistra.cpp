@@ -140,12 +140,12 @@ bool csAVIStreamAudio::LoadCodec (UByte *pInitData, ULong nInitDataLen,
     {
       // codec exists, now try to initialize it
       if (pCodec->Initialize (&strdesc, pInitData, nInitDataLen, pFormatEx, nFormatEx))
-	return true;
+		return true;
       else
       {
-	pSystem->Printf (MSG_WARNING, "CODEC class \"%s\" could not be initialized !", cn);
-	pCodec->DecRef ();
-	pCodec = NULL;
+		pSystem->Printf (MSG_WARNING, "CODEC class \"%s\" could not be initialized !", cn);
+		pCodec->DecRef ();
+		pCodec = NULL;
       }
     }
     else
@@ -153,5 +153,6 @@ bool csAVIStreamAudio::LoadCodec (UByte *pInitData, ULong nInitDataLen,
   }
   else
     pSystem->Printf (MSG_DEBUG_0, "Could not get an SCF interface from the systemdriver !");
+
   return false;
 }
