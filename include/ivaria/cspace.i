@@ -717,6 +717,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "iengine/material.h"
 %include "iengine/mesh.h"
 %include "iengine/movable.h"
+%include "iengine/region.h"
 %include "iengine/viscull.h"
 
 %include "imesh/mdlconv.h"
@@ -832,7 +833,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "ivaria/collider.h"
 %include "ivaria/dynamics.h"
 %include "ivaria/conout.h"
-//%include "ivaria/script.h"
+%include "ivaria/script.h"
 %include "ivaria/engseq.h"
 
 %include "inetwork/netman.h"
@@ -893,6 +894,15 @@ APPLY_FOR_EACH_INTERFACE
 }
 
 // iutil/event.h
+%extend csEventNetworkData
+{
+	const iNetworkConnection * const From;
+	const iNetworkSocket2 * const From2;
+	const iNetworkPacket * const Data;
+	const iNetworkPacket2 * const Data2;
+}
+
+// iutil/event.h
 %{
 	csEventKeyData * iEvent_Key_get (iEvent * event)
 		{ return &event->Key; }
@@ -904,6 +914,15 @@ APPLY_FOR_EACH_INTERFACE
 		{ return &event->Command; }
 	csEventNetworkData * iEvent_Network_get (iEvent * event)
 		{ return &event->Network; }
+
+	iNetworkConnection * csEventNetworkData_From_get (csEventNetworkData * data)
+		{ return data->From; }
+	iNetworkSocket2 * csEventNetworkData_From2_get (csEventNetworkData * data)
+		{ return data->From2; }
+	iNetworkPacket * csEventNetworkData_Data_get (csEventNetworkData * data)
+		{ return data->Data; }
+	iNetworkPacket2 * csEventNetworkData_Data2_get (csEventNetworkData * data)
+		{ return data->Data2; }
 %}
 
 // iutil/evdefs.h
