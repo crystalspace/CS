@@ -23,10 +23,9 @@ MacOS/X, MacOS/X Server, @sc{openstep}, NeXTSTEP, @sc{os/2}, BeOS,
 @item
 Development Environment: If you plan to use Crystal Space it is recommended
 that you compile it yourself from source. To do so you will need a supported
-C++ compiler such as the @sc{gnu} Compiler Collection (@sc{gcc}), Microsoft
-Visual C++, or Metrowerks CodeWarrior. If you plan to use the scripting
-capabilities of Crystal Space you will also need an interpreter for each
-scripting language you use.
+C++ compiler such as the @sc{gnu} Compiler Collection (@sc{gcc}) or Microsoft
+Visual C++. If you plan to use the scripting capabilities of Crystal Space
+you will also need an interpreter for each scripting language you use.
 
 @item
 Crystal Space Package: The latest release of Crystal Space can be downloaded
