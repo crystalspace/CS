@@ -62,6 +62,7 @@ private:
   char* str;
 
 public:
+  csStrKey () { str = 0; }
   csStrKey (const char* s) { str = csStrNew (s); }
   csStrKey (const csStrKey& c) { str = csStrNew (c.str); }
   ~csStrKey () { delete[] str; }

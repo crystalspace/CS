@@ -47,6 +47,7 @@ class csIntegralHashKeyHandler
 public:
   static unsigned int ComputeHash (const T& key)
   {
+#ifndef CS_PLATFORM_IS_64BITS
 #if (_MSC_VER >= 1300)
     /*
       VC7 with 64bit warnings complains about a pointer truncation when T is
@@ -57,6 +58,10 @@ public:
     return (unsigned int __w64)key;  
 #else
     return (unsigned int)key;  
+#endif
+#else
+    // Cast to uint64 first to avoid compiler warnings about truncation.
+    return (unsigned int)((uint64)key);
 #endif
   }
 
@@ -356,7 +361,7 @@ public:
   private:
     const csHash<T, K, KeyHandler>* hash;
     const K key;
-    int bucket, size, element;
+    size_t bucket, size, element;
 
     void Seek ()
     {

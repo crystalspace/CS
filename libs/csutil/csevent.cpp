@@ -1,7 +1,7 @@
 /*
   Crystal Space Event Queue
   Copyright (C) 1998-2004 by Jorrit Tyberghein
-  Written by Andrew Zabolotny <bit@eltech.ru>, Eric Sushine, Jonathan Tarbox
+  Written by Andrew Zabolotny <bit@eltech.ru>, Eric Sunshine, Jonathan Tarbox
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -24,6 +24,7 @@
 #include "csutil/cseventq.h"
 #include "csutil/memfile.h"
 #include "csutil/util.h"
+#include "csutil/sysfunc.h"
 
 //---------------------------------------------------------------------------
 
@@ -31,46 +32,7 @@ SCF_IMPLEMENT_IBASE (csEvent)
   SCF_IMPLEMENTS_INTERFACE (iEvent)
 SCF_IMPLEMENT_IBASE_END
 
-typedef struct attribute_tag
-{
-  union
-  {
-    int64 Integer;
-    uint64 Unsigned;
-    double Double;
-    char *String;
-    bool Bool;
-    iEvent *Event;
-  };
-  enum Type
-  {
-    tag_int8,
-    tag_uint8,
-    tag_int16,
-    tag_uint16,
-    tag_int32,
-    tag_uint32,
-    tag_int64,
-    tag_uint64,
-    tag_float,
-    tag_double,
-    tag_string,
-    tag_databuffer,
-    tag_bool,
-    tag_event
-  } type;
-  uint32 length;
-  attribute_tag(Type t) { type = t; }
-  ~attribute_tag() 
-  { 
-    if ((type == tag_string) || (type == tag_databuffer)) 
-      delete[] String; 
-    else if (type == tag_event)
-      Event->DecRef();
-  }
-} attribute;
-
-static char const* GetTypeName(attribute::Type t)
+char const* csEvent::GetTypeName (attribute::Type t)
 {
   switch (t)
   {
@@ -185,73 +147,9 @@ csEvent::~csEvent ()
   SCF_DESTRUCT_IBASE ();
 }
 
-bool csEvent::Add(const char *name, int8 v)
-{
-  attribute *object = new attribute(attribute::tag_int8);
-  object->Integer = v;
-  csArray<attribute *> *v1 =
-    (csArray<attribute *> *) attributes.Get(csHashCompute(name));
-  if (!v1) 
-  {
-    v1 = new csArray<attribute *>;
-    attributes.Put(name, (csHashObject) v1);
-  }
-  v1->Push(object);
-  count++;
-  return true;
-}
-
-bool csEvent::Add(const char *name, uint8 v)
-{
-  attribute *object = new attribute(attribute::tag_uint8);
-  object->Unsigned = v;
-  csArray<attribute *> *v1 =
-    (csArray<attribute *> *) attributes.Get(csHashCompute(name));
-  if (!v1) 
-  {
-    v1 = new csArray<attribute *>;
-    attributes.Put(name, (csHashObject) v1);
-  }
-  v1->Push(object);
-  count++;
-  return true;
-}
-
-bool csEvent::Add(const char *name, int16 v)
-{
-  attribute *object = new attribute(attribute::tag_int16);
-  object->Integer = v;
-  csArray<attribute *> *v1 =
-    (csArray<attribute *> *) attributes.Get(csHashCompute(name));
-  if (!v1) 
-  {
-    v1 = new csArray<attribute *>;
-    attributes.Put(name, (csHashObject) v1);
-  }
-  v1->Push(object);
-  count++;
-  return true;
-}
-
-bool csEvent::Add(const char *name, uint16 v)
-{
-  attribute *object = new attribute(attribute::tag_uint16);
-  object->Unsigned = v;
-  csArray<attribute *> *v1 =
-    (csArray<attribute *> *) attributes.Get(csHashCompute(name));
-  if (!v1) 
-  {
-    v1 = new csArray<attribute *>;
-    attributes.Put(name, (csHashObject) v1);
-  }
-  v1->Push(object);
-  count++;
-  return true;
-}
-
 bool csEvent::Add(const char *name, int32 v, bool force_boolean)
 {
-  attribute *object = new attribute(attribute::tag_int32);
+  attribute* object = new attribute (attribute::tag_int32);
   if (force_boolean)
   {
     object->type = attribute::tag_bool;
@@ -261,94 +159,26 @@ bool csEvent::Add(const char *name, int32 v, bool force_boolean)
   {
     object->Integer = v;
   }
-  csArray<attribute *> *v1 =
-    (csArray<attribute *> *) attributes.Get(csHashCompute(name));
-  if (!v1) 
-  {
-    v1 = new csArray<attribute *>;
-    attributes.Put(name, (csHashObject) v1);
-  }
-  v1->Push(object);
+  attributes.Put (name, object);
   count++;
-  return true;
-}
 
-bool csEvent::Add(const char *name, uint32 v)
-{
-  attribute *object = new attribute(attribute::tag_uint32);
-  object->Unsigned = v;
-  csArray<attribute *> *v1 =
-    (csArray<attribute *> *) attributes.Get(csHashCompute(name));
-  if (!v1) 
-  {
-    v1 = new csArray<attribute *>;
-    attributes.Put(name, (csHashObject) v1);
-  }
-  v1->Push(object);
-  count++;
-  return true;
-}
-
-bool csEvent::Add(const char *name, int64 v)
-{
-  attribute *object = new attribute(attribute::tag_int64);
-  object->Integer = v;
-  csArray<attribute *> *v1 =
-    (csArray<attribute *> *) attributes.Get(csHashCompute(name));
-  if (!v1) 
-  {
-    v1 = new csArray<attribute *>;
-    attributes.Put(name, (csHashObject) v1);
-  }
-  v1->Push(object);
-  count++;
-  return true;
-}
-
-bool csEvent::Add(const char *name, uint64 v)
-{
-  attribute *object = new attribute(attribute::tag_uint64);
-  object->Unsigned = v;
-  csArray<attribute *> *v1 =
-    (csArray<attribute *> *) attributes.Get(csHashCompute(name));
-  if (!v1) 
-  {
-    v1 = new csArray<attribute *>;
-    attributes.Put(name, (csHashObject) v1);
-  }
-  v1->Push(object);
-  count++;
   return true;
 }
 
 bool csEvent::Add(const char *name, float v)
 {
-  attribute *object = new attribute(attribute::tag_float);
+  attribute* object = new attribute (attribute::tag_float);
   object->Double = v;
-  csArray<attribute *> *v1 =
-    (csArray<attribute *> *) attributes.Get(csHashCompute(name));
-  if (!v1) 
-  {
-    v1 = new csArray<attribute *>;
-    attributes.Put(name, (csHashObject) v1);
-  }
-  v1->Push(object);
+  attributes.Put (name, object);
   count++;
   return true;
 }
 
 bool csEvent::Add(const char *name, double v)
 {
-  attribute *object = new attribute(attribute::tag_double);
+  attribute* object = new attribute (attribute::tag_double);
   object->Double = v;
-  csArray<attribute *> *v1 =
-    (csArray<attribute *> *) attributes.Get(csHashCompute(name));
-  if (!v1) 
-  {
-    v1 = new csArray<attribute *>;
-    attributes.Put(name, (csHashObject) v1);
-  }
-  v1->Push(object);
+  attributes.Put (name, object);
   count++;
   return true;
 }
@@ -357,7 +187,7 @@ bool csEvent::Add(const char *name, double v)
 
 bool csEvent::Add(const char *name, bool v, bool force_boolean)
 {
-  attribute *object = new attribute(attribute::tag_bool);
+  attribute* object = new attribute (attribute::tag_bool);
   if (!force_boolean)
   {
     object->type = attribute::tag_int32;
@@ -367,15 +197,9 @@ bool csEvent::Add(const char *name, bool v, bool force_boolean)
   {
     object->Bool = v;
   }
-  csArray<attribute *> *v1 =
-    (csArray<attribute *> *) attributes.Get(csHashCompute(name));
-  if (!v1) 
-  {
-    v1 = new csArray<attribute *>;
-    attributes.Put(name, (csHashObject) v1);
-  }
-  v1->Push(object);
+  attributes.Put (name, object);
   count++;
+
   return true;
 }
 
@@ -383,47 +207,40 @@ bool csEvent::Add(const char *name, bool v, bool force_boolean)
 
 bool csEvent::Add(const char *name, const char *v)
 {
-  attribute *object = new attribute(attribute::tag_string);
+  attribute* object = new attribute (attribute::tag_string);
   object->length = (uint32)strlen(v);
   object->String = csStrNew(v);
-  csArray<attribute *> *v1 =
-    (csArray<attribute *> *) attributes.Get(csHashCompute(name));
-  if (!v1) 
-  {
-    v1 = new csArray<attribute *>;
-    attributes.Put(name, (csHashObject) v1);
-  }
-  v1->Push(object);
+  attributes.Put (name, object);
   count++;
   return true;
 }
 
 bool csEvent::Add(const char *name, const void *v, uint32 size)
 {
-  attribute *object = new attribute(attribute::tag_databuffer);
+  attribute* object = new attribute (attribute::tag_databuffer);
   object->String = new char[size];
   memcpy (object->String, v, size);
   object->length = size;
-  csArray<attribute *> *v1 =
-    (csArray<attribute *> *) attributes.Get(csHashCompute(name));
-  if (!v1) 
-  {
-    v1 = new csArray<attribute *>;
-    attributes.Put(name, (csHashObject) v1);
-  }
-  v1->Push(object);
+  attributes.Put (name, object);
   count++;
   return true;
 }
 
 bool csEvent::CheckForLoops(iEvent *current, iEvent *e)
 {
-  csRef<iEvent> temp;
-  if (current->Find("_parent", temp))
+  csHash<attribute*, csStrKey, csConstCharHashKeyHandler>::GlobalIterator iter (
+    ((csEvent*)current)->attributes.GetIterator ());
+
+  while (iter.HasNext())
   {
-    if (temp == e)
-      return false;
-    return CheckForLoops(temp, e);
+    attribute* object = iter.Next ();
+
+    if (object->type == attribute::tag_event)
+    {
+      if (object->Event == e)
+	return false;
+      return CheckForLoops(object->Event, e);
+    }
   }
   return true;
 }
@@ -432,155 +249,16 @@ bool csEvent::Add(const char *name, iEvent *v)
 {
   if (this == v)
     return false;
-  if (CheckForLoops(this, v))
+  //if (CheckForLoops(this, v))
+  if (CheckForLoops(v, this))
   {
-    attribute *object = new attribute(attribute::tag_event);
+    attribute* object = new attribute (attribute::tag_event);
     object->Event = v;
     if (object->Event)
     { 
       object->Event->IncRef();
-      if (strcmp(name, "_parent") != 0)
-      {
-        object->Event->Add("_parent", this);
-      }
-      csArray<attribute *> *v1 =
-        (csArray<attribute *> *) attributes.Get(csHashCompute(name));
-      if (!v1) 
-      {
-        v1 = new csArray<attribute *>;
-        attributes.Put(name, (csHashObject) v1);
-      }
-      v1->Push(object);
+      attributes.Put (name, object);
       count++;
-      return true;
-    }
-  }
-  return false;
-}
-
-bool csEvent::Find(const char *name, int8 &v, int index) const
-{
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
-    csHashCompute (name));
-  if (v1)
-  {
-    attribute *object = (attribute *) v1->Get(index);
-    if (object->type == attribute::tag_int8)
-    {
-      v = (int8)object->Integer;
-      return true;
-    }
-  }
-  return false;
-}
-  
-bool csEvent::Find(const char *name, uint8 &v, int index) const
-{
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
-    csHashCompute (name));
-  if (v1)
-  {
-    attribute *object = (attribute *) v1->Get(index);
-    if (object->type == attribute::tag_uint8)
-    {
-      v = object->Unsigned;
-      return true;
-    }
-  }
-  return false;
-}
-  
-bool csEvent::Find(const char *name, int16 &v, int index) const
-{
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
-    csHashCompute (name));
-  if (v1)
-  {
-    attribute *object = (attribute *) v1->Get(index);
-    if (object->type == attribute::tag_int16)
-    {
-      v = (int16)object->Integer;
-      return true;
-    }
-  }
-  return false;
-}
-  
-bool csEvent::Find(const char *name, uint16 &v, int index) const
-{
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
-    csHashCompute (name));
-  if (v1)
-  {
-    attribute *object = (attribute *) v1->Get(index);
-    if (object->type == attribute::tag_uint16)
-    {
-      v = object->Unsigned;
-      return true;
-    }
-  }
-  return false;
-}
-
-bool csEvent::Find(const char *name, int32 &v, int index) const
-{
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
-    csHashCompute (name));
-  if (v1)
-  {
-    attribute *object = (attribute *) v1->Get(index);
-    if ((object->type == attribute::tag_int32) ||
-        (object->type == attribute::tag_bool))
-    {
-      v = (int32)object->Integer;
-      return true;
-    }
-  }
-  return false;
-}
-  
-bool csEvent::Find(const char *name, uint32 &v, int index) const
-{
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
-    csHashCompute (name));
-  if (v1)
-  {
-    attribute *object = (attribute *) v1->Get(index);
-    if (object->type == attribute::tag_uint32)
-    {
-      v = object->Unsigned;
-      return true;
-    }
-  }
-  return false;
-}
-
-bool csEvent::Find(const char *name, int64 &v, int index) const
-{
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
-    csHashCompute (name));
-  if (v1)
-  {
-    attribute *object = (attribute *) v1->Get(index);
-    if (object->type == attribute::tag_int64)
-    {
-      v = object->Integer;
-      return true;
-    }
-  }
-  return false;
-}
-  
-bool csEvent::Find(const char *name, uint64 &v, int index) const
-{
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
-    csHashCompute (name));
-  if (v1)
-  {
-    attribute *object = (attribute *) v1->Get(index);
-    if (object->type == attribute::tag_uint64)
-    {
-      v = object->Unsigned;
       return true;
     }
   }
@@ -589,48 +267,45 @@ bool csEvent::Find(const char *name, uint64 &v, int index) const
   
 bool csEvent::Find(const char *name, float &v, int index) const
 {
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
-    csHashCompute (name));
-  if (v1)
+  csHash<attribute*, csStrKey, csConstCharHashKeyHandler>::Iterator iter (
+    attributes.GetIterator (name));
+
+  if (!SkipToIndex (iter, index)) return false;
+  attribute* object = iter.Next();
+  if (object->type == attribute::tag_float)
   {
-    attribute *object = (attribute *) v1->Get(index);
-    if (object->type == attribute::tag_float)
-    {
-      v = (float)object->Double;
-      return true;
-    }
+    v = (float)object->Double;
+    return true;
   }
   return false;
 }
 
 bool csEvent::Find(const char *name, double &v, int index) const
 {
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
-    csHashCompute (name));
-  if (v1)
+  csHash<attribute*, csStrKey, csConstCharHashKeyHandler>::Iterator iter (
+    attributes.GetIterator (name));
+
+  if (!SkipToIndex (iter, index)) return false;
+  attribute* object = iter.Next();
+  if (object->type == attribute::tag_double)
   {
-    attribute *object = (attribute *) v1->Get(index);
-    if (object->type == attribute::tag_double)
-    {
-      v = object->Double;
-      return true;
-    }
+    v = (double)object->Double;
+    return true;
   }
   return false;
 }
 
 bool csEvent::Find(const char *name, const char *&v, int index) const
 {
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(
-    csHashCompute (name));
-  if (v1)
+  csHash<attribute*, csStrKey, csConstCharHashKeyHandler>::Iterator iter (
+    attributes.GetIterator (name));
+
+  if (!SkipToIndex (iter, index)) return false;
+  attribute* object = iter.Next();
+  if (object->type == attribute::tag_string)
   {
-    attribute *object = (attribute *) v1->Get(index);
-    if (object->type == attribute::tag_string)
-    {
-      v = object->String;
-      return true;
-    }
+    v = object->String;
+    return true;
   }
   return false;
 }
@@ -638,17 +313,16 @@ bool csEvent::Find(const char *name, const char *&v, int index) const
 bool csEvent::Find(const char *name, void const *&v, uint32 &size,
   int index) const
 {
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
-    csHashCompute (name));
-  if (v1)
+  csHash<attribute*, csStrKey, csConstCharHashKeyHandler>::Iterator iter (
+    attributes.GetIterator (name));
+
+  if (!SkipToIndex (iter, index)) return false;
+  attribute* object = iter.Next();
+  if (object->type == attribute::tag_databuffer)
   {
-    attribute *object = (attribute *) v1->Get(index);
-    if (object->type == attribute::tag_databuffer)
-    {
-      v = object->String;
-      size = object->length;
-      return true;
-    }
+    v = object->String;
+    size = object->length;
+    return true;
   }
   return false;
 }
@@ -657,16 +331,15 @@ bool csEvent::Find(const char *name, void const *&v, uint32 &size,
 
 bool csEvent::Find(const char *name, bool &v, int index) const
 {
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
-    csHashCompute (name));
-  if (v1)
+  csHash<attribute*, csStrKey, csConstCharHashKeyHandler>::Iterator iter (
+    attributes.GetIterator (name));
+
+  if (!SkipToIndex (iter, index)) return false;
+  attribute* object = iter.Next();
+  if (object->type == attribute::tag_bool)
   {
-    attribute *object = (attribute *) v1->Get(index);
-    if (object->type == attribute::tag_bool)
-    {
-      v = object->Bool;
-      return true;
-    }
+    v = object->Bool;
+    return true;
   }
   return false;
 }
@@ -675,16 +348,15 @@ bool csEvent::Find(const char *name, bool &v, int index) const
 
 bool csEvent::Find(const char *name, csRef<iEvent> &v, int index) const
 {
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
-    csHashCompute (name));
-  if (v1)
+  csHash<attribute*, csStrKey, csConstCharHashKeyHandler>::Iterator iter (
+    attributes.GetIterator (name));
+
+  if (!SkipToIndex (iter, index)) return false;
+  attribute* object = iter.Next();
+  if (object->type == attribute::tag_event)
   {
-    attribute *object = (attribute *) v1->Get(index);
-    if (object->type == attribute::tag_event)
-    {
-      v = object->Event;
-      return true;
-    }
+    v = object->Event;
+    return true;
   }
   return false;
 }
@@ -694,90 +366,46 @@ bool csEvent::Remove(const char *name, int index)
   if (index == -1)
   {
     // remove all in the vector, and remove the vector from the hashmap
-    csArray<attribute *> *v =
-      (csArray<attribute *> *) attributes.Get(csHashCompute(name));
-    if (v)
+    csHash<attribute*, csStrKey, csConstCharHashKeyHandler>::Iterator iter (
+      attributes.GetIterator (name));
+
+    while (iter.HasNext())
     {
-      attribute *object = 0;
-      while((object = (attribute *) v->Pop()) != 0)
-      {
-        if (object)
-        {
-          if (object->type == attribute::tag_event) 
-          {
-            if (strcmp("_parent", name) != 0)
-              object->Event->Remove("_parent");
-            object->Event->DecRef();
-          }
-          else
-	  {
-            delete object;
-	  }
-        }
-        count--;
-      }
-      delete v;
-      return true;
+      attribute* object = iter.Next();
+      delete object;
+      count--;
     }
-    return false;
+    return attributes.DeleteAll (name);
   }
   else
   {
     // remove only the listed index from the vector, if it's the only one 
     // in the vector, remove the vector from the hashmap
-    csArray<attribute *> *v =
-      (csArray<attribute *> *) attributes.Get(csHashCompute(name));
-    if (v)
-    {
-      attribute *object = (attribute *) v->Get(index);
-      if (object)
-      {
-        if (object->type == attribute::tag_event) 
-        {
-          if (strcmp("_parent", name) != 0)
-            object->Event->Remove("_parent");
-          object->Event->DecRef();
-        }
-        else
-	{
-          delete object;
-	}
-        count--;
-	delete v;
-        return true;
-      }
-      else
-	delete v;
-    }
-    return false;
+
+    csHash<attribute*, csStrKey, csConstCharHashKeyHandler>::Iterator iter (
+      attributes.GetIterator (name));
+    if (!SkipToIndex (iter, index)) return false;
+
+    attribute* object = iter.Next();
+    bool ret = attributes.Delete (name, object);
+    delete object;
+    count--;
+    return ret;
   }
 }
 
 bool csEvent::RemoveAll()
 {
-  csGlobalHashIteratorReversible iter(&attributes);
+  csHash<attribute*, csStrKey, csConstCharHashKeyHandler>::GlobalIterator iter (
+    attributes.GetIterator ());
+
   while (iter.HasNext())
   {
-    csArray<attribute *> *v = (csArray<attribute *> *) iter.Next();
-    if (strcmp("_parent", iter.GetKey()) != 0)
-    {
-      if (v)
-      {
-        attribute *object = 0;
-        while(v->Length() > 0)
-        {
-          if ((object = (attribute *) v->Pop()) != 0)
-          {
-            if (object->type == attribute::tag_event)
-              object->Event->DecRef();
-            else
-              delete object;
-          }
-        }
-      }
-    }
-    delete v;
+    csStrKey name;
+    attribute* object = iter.Next (name);
+    delete object;
   }
+
   attributes.DeleteAll();
   count = 0;
   return true;
@@ -792,70 +420,60 @@ void IndentLevel(int level)
 
 bool csEvent::Print(int level)
 {
-  csGlobalHashIteratorReversible iter(&attributes);
+  csHash<attribute*, csStrKey, csConstCharHashKeyHandler>::GlobalIterator iter (
+    attributes.GetIterator ());
+
   while (iter.HasNext())
   {
-    csArray<attribute *> *v = (csArray<attribute *> *) iter.Next();
-    if (v)
+    csStrKey name;
+    attribute* object = iter.Next (name);
+
+    IndentLevel(level); csPrintf ("------\n");
+    IndentLevel(level); csPrintf ("Name: %s\n", (const char*)name);
+    IndentLevel(level); csPrintf (" Datatype: %s\n",
+	  GetTypeName(object->type));
+    if (object->type == attribute::tag_event)
     {
-      attribute *object = 0;
-      size_t index = 0;
-      while(index < v->Length())
-      {
-        if ((object = (attribute *) v->Get(index)) != 0)
-        {
-          IndentLevel(level); printf ("------\n");
-          IndentLevel(level); printf ("Name: %s\n", iter.GetKey());
-          IndentLevel(level); printf (" Datatype: %s\n",
-	  	GetTypeName(object->type));
-          if (object->type == attribute::tag_event)
-          {
-            if (strcmp("_parent", iter.GetKey()) != 0)
-            {
-              IndentLevel(level); printf(" Sub-Event Contents:\n"); 
-              object->Event->Print(level+1);
-            }
-          }
-          if ((object->type == attribute::tag_int8)
-            || (object->type == attribute::tag_int16)
-            || (object->type == attribute::tag_int32)
-            || (object->type == attribute::tag_int64))
-          {
-            IndentLevel(level); printf (" Value: %lld\n", object->Integer);
-          }
-          if ((object->type == attribute::tag_uint8)
-            || (object->type == attribute::tag_uint16)
-            || (object->type == attribute::tag_uint32)
-            || (object->type == attribute::tag_uint64))
-          {
-            IndentLevel(level); printf (" Value: %llu\n", object->Unsigned);
-          }
-          
-          if ((object->type == attribute::tag_float)
-	  	|| (object->type == attribute::tag_double))
-          {
-            IndentLevel(level);
-	    printf (" Value: %f\n", object->Double);
-          }
-          if (object->type == attribute::tag_bool)
-          {
-            IndentLevel(level);
-	    printf (" Value: %s\n", object->Bool ? "true" : "false");
-          }
-          if (object->type == attribute::tag_databuffer)
-          {
-            IndentLevel(level); printf(" Value: 0x%p\n",(void*)object->String);
-            IndentLevel(level); printf(" Length: %d\n", object->length);
-          }
-          if (object->type == attribute::tag_string)
-          {
-            IndentLevel(level); printf (" Value: %s\n", object->String);
-          }
-          index++;
-        }
-      }
+      IndentLevel(level); csPrintf(" Sub-Event Contents:\n"); 
+      object->Event->Print(level+1);
+    }
+    if ((object->type == attribute::tag_int8)
+      || (object->type == attribute::tag_int16)
+      || (object->type == attribute::tag_int32)
+      || (object->type == attribute::tag_int64))
+    {
+      IndentLevel(level); csPrintf (" Value: %lld\n", object->Integer);
+    }
+    if ((object->type == attribute::tag_uint8)
+      || (object->type == attribute::tag_uint16)
+      || (object->type == attribute::tag_uint32)
+      || (object->type == attribute::tag_uint64))
+    {
+      IndentLevel(level); csPrintf (" Value: %llu\n", object->Unsigned);
+    }
+    
+    if ((object->type == attribute::tag_float)
+	  || (object->type == attribute::tag_double))
+    {
+      IndentLevel(level);
+      csPrintf (" Value: %f\n", object->Double);
+    }
+    if (object->type == attribute::tag_bool)
+    {
+      IndentLevel(level);
+      csPrintf (" Value: %s\n", object->Bool ? "true" : "false");
+    }
+    if (object->type == attribute::tag_databuffer)
+    {
+      IndentLevel(level); csPrintf(" Value: 0x%p\n",(void*)object->String);
+      IndentLevel(level); csPrintf(" Length: %d\n", object->length);
+    }
+    if (object->type == attribute::tag_string)
+    {
+      IndentLevel(level); csPrintf (" Value: %s\n", object->String);
     }
   }
+
   return true;
 }
 
@@ -876,103 +494,95 @@ uint32 csEvent::FlattenSize(int format)
 
 uint32 csEvent::FlattenSizeCrystal()
 {
-  csGlobalHashIteratorReversible iter(&attributes);
   // Start count with the initial header
   // Version(4) + packet length(4) + Type(1) + Cat(1) + SubCat(1) 
   //    + Flags(1) + Time(4) + Joystick(5*4)
   uint32 size = 36;
 
+  csHash<attribute*, csStrKey, csConstCharHashKeyHandler>::GlobalIterator iter (
+    attributes.GetIterator ());
+
   while (iter.HasNext())
   {
-    csArray<attribute *> *v = (csArray<attribute *> *) iter.Next();
-    if (v)
+    csStrKey name;
+    attribute* object = iter.Next (name);
+
+    if (object->type == attribute::tag_event)
     {
-      attribute *object = 0;
-      size_t index = 0;
-      while(index < v->Length())
+      //if (strcmp("_parent", name) != 0)
       {
-        if ((object = (attribute *) v->Get(index)) != 0)
-        {
-          if (object->type == attribute::tag_event)
-          {
-            if (strcmp("_parent", iter.GetKey()) != 0)
-            {
-              // 2 for name length
-              // X for name string
-              // 1 for type id
-              // 4 for data length
-              // X for data
-              size += 7 + (uint32)strlen(iter.GetKey())
-	      	+ object->Event->FlattenSize(CS_CRYSTAL_PROTOCOL);
-            }
-          }
-          if ((object->type == attribute::tag_int8)
-	  	|| (object->type == attribute::tag_uint8))
-          {
-            // 2 for name length
-            // X for name string
-            // 1 for type id
-            // 1 for data
-            size += 4 + (uint32)strlen(iter.GetKey());
-          }
-          if ((object->type == attribute::tag_int16)
-	  	|| (object->type == attribute::tag_uint16))
-          {
-            // 2 for name length
-            // X for name string
-            // 1 for type id
-            // 2 for data
-            size += 5 + (uint32)strlen(iter.GetKey());
-          }
-          if ((object->type == attribute::tag_int32)
-	  	|| (object->type == attribute::tag_uint32)
-		|| (object->type == attribute::tag_float))
-          {
-            // 2 for name length
-            // X for name string
-            // 1 for type id
-            // 4 for data
-            size += 7 + (uint32)strlen(iter.GetKey());
-          }
-          if ((object->type == attribute::tag_double)
-            || (object->type == attribute::tag_int64)
-            || (object->type == attribute::tag_uint64))
-          {
-            // 2 for name length
-            // X for name string
-            // 1 for type id
-            // 8 for data
-            size += 11 + (uint32)strlen(iter.GetKey());
-          }
-          if (object->type == attribute::tag_bool)
-          {
-            // 2 for name length
-            // X for name string
-            // 1 for type id
-            // 1 for data
-            size += 4 + (uint32)strlen(iter.GetKey());
-          }
-          if (object->type == attribute::tag_databuffer)
-          {
-            // 2 for name length
-            // X for name string
-            // 1 for type id
-            // 4 for length
-            // X for data
-            size += 7 + (uint32)strlen(iter.GetKey()) + object->length;
-          }
-          if (object->type == attribute::tag_string)
-          {
-            // 2 for name length
-            // X for name string
-            // 1 for type id
-            // 4 for length
-            // X for data
-            size += 7 + (uint32)strlen(iter.GetKey()) + object->length;
-          }
-          index++;
-        }
+        // 2 for name length
+        // X for name string
+        // 1 for type id
+        // 4 for data length
+        // X for data
+        size += 7 + (uint32)strlen(name)
+	  + object->Event->FlattenSize(CS_CRYSTAL_PROTOCOL);
       }
+    }
+    if ((object->type == attribute::tag_int8)
+	  || (object->type == attribute::tag_uint8))
+    {
+      // 2 for name length
+      // X for name string
+      // 1 for type id
+      // 1 for data
+      size += 4 + (uint32)strlen(name);
+    }
+    if ((object->type == attribute::tag_int16)
+	  || (object->type == attribute::tag_uint16))
+    {
+      // 2 for name length
+      // X for name string
+      // 1 for type id
+      // 2 for data
+      size += 5 + (uint32)strlen(name);
+    }
+    if ((object->type == attribute::tag_int32)
+	  || (object->type == attribute::tag_uint32)
+	  || (object->type == attribute::tag_float))
+    {
+      // 2 for name length
+      // X for name string
+      // 1 for type id
+      // 4 for data
+      size += 7 + (uint32)strlen(name);
+    }
+    if ((object->type == attribute::tag_double)
+      || (object->type == attribute::tag_int64)
+      || (object->type == attribute::tag_uint64))
+    {
+      // 2 for name length
+      // X for name string
+      // 1 for type id
+      // 8 for data
+      size += 11 + (uint32)strlen(name);
+    }
+    if (object->type == attribute::tag_bool)
+    {
+      // 2 for name length
+      // X for name string
+      // 1 for type id
+      // 1 for data
+      size += 4 + (uint32)strlen(name);
+    }
+    if (object->type == attribute::tag_databuffer)
+    {
+      // 2 for name length
+      // X for name string
+      // 1 for type id
+      // 4 for length
+      // X for data
+      size += 7 + (uint32)strlen(name) + object->length;
+    }
+    if (object->type == attribute::tag_string)
+    {
+      // 2 for name length
+      // X for name string
+      // 1 for type id
+      // 4 for length
+      // X for data
+      size += 7 + (uint32)strlen(name) + object->length;
     }
   } 
   return size;
@@ -1034,7 +644,6 @@ bool csEvent::FlattenXML(char * buffer)
 
 bool csEvent::FlattenCrystal(char * buffer)
 {
-  csGlobalHashIteratorReversible iter(&attributes);
   uint8 ui8;
   int8 i8;
   uint16 ui16;
@@ -1071,243 +680,236 @@ bool csEvent::FlattenCrystal(char * buffer)
   i32 = convert_endian((int32)Joystick.Modifiers);
   b.Write((char *)&i32, sizeof(int32));
    
+  csHash<attribute*, csStrKey, csConstCharHashKeyHandler>::GlobalIterator iter (
+    attributes.GetIterator ());
+
   while (iter.HasNext())
   {
-    csArray<attribute *> *v = (csArray<attribute *> *) iter.Next();
-    if (v)
+    csStrKey name;
+    attribute* object = iter.Next (name);
+
+    switch (object->type)
     {
-      attribute *object = 0;
-      size_t index = 0;
-      while(index < v->Length())
-      {
-        if ((object = (attribute *) v->Get(index)) != 0)
+      case attribute::tag_event:
+        //if (strcmp("_parent", name) != 0)
         {
-          switch (object->type)
-          {
-            case attribute::tag_event:
-              if (strcmp("_parent", iter.GetKey()) != 0)
-              {
-                // 2 byte name length (little endian)
-                ui16 = (uint16)strlen(iter.GetKey());
-                ui16 = convert_endian(ui16);
-                b.Write((char *)&ui16, sizeof(int16));
-                // XX byte name
-                b.Write(iter.GetKey(), ui16);
-                // 1 byte datatype id
-                ui8 = CS_DATATYPE_EVENT;
-                b.Write((char *)&ui8, sizeof(uint8));
-                // 4 byte data length
-                ui32 = object->Event->FlattenSize(CS_CRYSTAL_PROTOCOL);
-                ui32 = convert_endian(ui32);
-                b.Write((char *)&ui32, sizeof(uint32));
-                // XX byte data
-                if (!object->Event->Flatten(b.GetPos() + buffer))
-                  return false;
-                else
-                  b.SetPos(b.GetPos() + object->Event->FlattenSize());
-              }
-              break;
-            case attribute::tag_databuffer:
-              // 2 byte name length (little endian)
-              ui16 = (uint16)strlen(iter.GetKey());
-              ui16 = convert_endian(ui16);
-              b.Write((char *)&ui16, sizeof(int16));
-              // XX byte name
-              b.Write(iter.GetKey(), ui16);
-              // 1 byte datatype id
-              ui8 = CS_DATATYPE_DATABUFFER;
-              b.Write((char *)&ui8, sizeof(uint8));
-              // 4 byte data length
-              ui32 = object->length;
-              ui32 = convert_endian(ui32);
-              b.Write((char *)&ui32, sizeof(uint32));
-              // XX byte data
-              b.Write(object->String, object->length);
-              break;
-            case attribute::tag_string:
-              // 2 byte name length (little endian)
-              ui16 = (uint16)strlen(iter.GetKey());
-              ui16 = convert_endian(ui16);
-              b.Write((char *)&ui16, sizeof(int16));
-              // XX byte name
-              b.Write(iter.GetKey(), ui16);
-              // 1 byte datatype id
-              ui8 = CS_DATATYPE_STRING;
-              b.Write((char *)&ui8, sizeof(uint8));
-              // 4 byte data length
-              ui32 = object->length;
-              ui32 = convert_endian(ui32);
-              b.Write((char *)&ui32, sizeof(uint32));
-              // XX byte data
-              b.Write(object->String, object->length);
-              break;
-            case attribute::tag_bool:
-              // 2 byte name length (little endian)
-              ui16 = (uint16)strlen(iter.GetKey());
-              ui16 = convert_endian(ui16);
-              b.Write((char *)&ui16, sizeof(int16));
-              // XX byte name
-              b.Write(iter.GetKey(), ui16);
-              // 1 byte datatype id
-              ui8 = CS_DATATYPE_BOOL;
-              b.Write((char *)&ui8, sizeof(uint8));
-              // 1 byte data
-              if (object->Bool) ui8 = 1; else ui8 = 0;
-              b.Write((char *)&ui8, sizeof(uint8));
-              break;
-            case attribute::tag_int8:
-              // 2 byte name length (little endian)
-              ui16 = (uint16)strlen(iter.GetKey());
-              ui16 = convert_endian(ui16);
-              b.Write((char *)&ui16, sizeof(int16));
-              // XX byte name
-              b.Write(iter.GetKey(), ui16);
-              // 1 byte datatype id
-              ui8 = CS_DATATYPE_INT8;
-              b.Write((char *)&ui8, sizeof(uint8));
-              // 1 byte data
-              i8 = (int8)object->Integer;
-              b.Write((char *)&i8, sizeof(int8));
-              break;
-            case attribute::tag_uint8:
-              // 2 byte name length (little endian)
-              ui16 = (uint16)strlen(iter.GetKey());
-              ui16 = convert_endian(ui16);
-              b.Write((char *)&ui16, sizeof(int16));
-              // XX byte name
-              b.Write(iter.GetKey(), ui16);
-              // 1 byte datatype id
-              ui8 = CS_DATATYPE_UINT8;
-              b.Write((char *)&ui8, sizeof(uint8));
-              // 1 byte data
-              ui8 = (uint8)object->Unsigned;
-              b.Write((char *)&ui8, sizeof(uint8));
-              break;
-            case attribute::tag_int16:
-              // 2 byte name length (little endian)
-              ui16 = (uint16)strlen(iter.GetKey());
-              ui16 = convert_endian(ui16);
-              b.Write((char *)&ui16, sizeof(int16));
-              // XX byte name
-              b.Write(iter.GetKey(), ui16);
-              // 1 byte datatype id
-              ui8 = CS_DATATYPE_INT16;
-              b.Write((char *)&ui8, sizeof(uint8));
-              // 2 byte data
-              i16 = (int16)object->Integer;
-              i16 = convert_endian(i16);
-              b.Write((char *)&i16, sizeof(int16));
-              break;
-            case attribute::tag_uint16:
-              // 2 byte name length (little endian)
-              ui16 = (uint16)strlen(iter.GetKey());
-              ui16 = convert_endian(ui16);
-              b.Write((char *)&ui16, sizeof(int16));
-              // XX byte name
-              b.Write(iter.GetKey(), ui16);
-              // 1 byte datatype id
-              ui8 = CS_DATATYPE_UINT16;
-              b.Write((char *)&ui8, sizeof(uint8));
-              // 2 byte data (little endian)
-              ui16 = (uint16)object->Unsigned;
-              ui16 = convert_endian(ui16);
-              b.Write((char *)&ui16, sizeof(uint16));
-              break;
-            case attribute::tag_int32:
-              // 2 byte name length (little endian)
-              ui16 = (uint16)strlen(iter.GetKey());
-              ui16 = convert_endian(ui16);
-              b.Write((char *)&ui16, sizeof(int16));
-              // XX byte name
-              b.Write(iter.GetKey(), ui16);
-              // 1 byte datatype id
-              ui8 = CS_DATATYPE_INT32;
-              b.Write((char *)&ui8, sizeof(uint8));
-              // 4 byte data
-              i32 = (int32)object->Integer;
-              i32 = convert_endian(i32);
-              b.Write((char *)&i32, sizeof(int32));
-              break;
-            case attribute::tag_uint32:
-              // 2 byte name length (little endian)
-              ui16 = (uint16)strlen(iter.GetKey());
-              ui16 = convert_endian(ui16);
-              b.Write((char *)&ui16, sizeof(int16));
-              // XX byte name
-              b.Write(iter.GetKey(), ui16);
-              // 1 byte datatype id
-              ui8 = CS_DATATYPE_UINT32;
-              b.Write((char *)&ui8, sizeof(uint8));
-              // 4 byte data (little endian)
-              ui32 = (uint32)object->Unsigned;
-              ui32 = convert_endian(ui32);
-              b.Write((char *)&ui32, sizeof(uint32));
-              break;
-            case attribute::tag_int64:
-              // 2 byte name length (little endian)
-              ui16 = (uint16)strlen(iter.GetKey());
-              ui16 = convert_endian(ui16);
-              b.Write((char *)&ui16, sizeof(int16));
-              // XX byte name
-              b.Write(iter.GetKey(), ui16);
-              // 1 byte datatype id
-              ui8 = CS_DATATYPE_INT64;
-              b.Write((char *)&ui8, sizeof(uint8));
-              // 4 byte data
-              i64 = (int64)object->Integer;
-              i64 = convert_endian(i64);
-              b.Write((char *)&i64, sizeof(int64));
-              break;
-            case attribute::tag_uint64:
-              // 2 byte name length (little endian)
-              ui16 = (uint16)strlen(iter.GetKey());
-              ui16 = convert_endian(ui16);
-              b.Write((char *)&ui16, sizeof(int16));
-              // XX byte name
-              b.Write(iter.GetKey(), ui16);
-              // 1 byte datatype id
-              ui8 = CS_DATATYPE_UINT64;
-              b.Write((char *)&ui8, sizeof(uint8));
-              // 4 byte data (little endian)
-              ui64 = (uint64)object->Unsigned;
-              ui64 = convert_endian(ui64);
-              b.Write((char *)&ui64, sizeof(uint64));
-              break;
-            case attribute::tag_float:
-              // 2 byte name length (little endian)
-              ui16 = (uint16)strlen(iter.GetKey());
-              ui16 = convert_endian(ui16);
-              b.Write((char *)&ui16, sizeof(int16));
-              // XX byte name
-              b.Write(iter.GetKey(), ui16);
-              // 1 byte datatype id
-              ui8 = CS_DATATYPE_FLOAT;
-              b.Write((char *)&ui8, sizeof(uint8));
-              // 4 byte data (little endian)
-              f = (float)object->Double;
-              i32 = float2long(f);
-              b.Write((char *)&i32, sizeof(i32));
-              break;
-            case attribute::tag_double:
-              // 2 byte name length (little endian)
-              ui16 = (uint16)strlen(iter.GetKey());
-              ui16 = convert_endian(ui16);
-              b.Write((char *)&ui16, sizeof(int16));
-              // XX byte name
-              b.Write(iter.GetKey(), ui16);
-              // 1 byte datatype id
-              ui8 = CS_DATATYPE_DOUBLE;
-              b.Write((char *)&ui8, sizeof(uint8));
-              // 8 byte data (longlong fixed format)
-              i64 = double2longlong(object->Double);
-              b.Write((char *)&i64, sizeof(int64));
-              break;
-            default: 
-              break;
-          }
-          index++;
+          // 2 byte name length (little endian)
+          ui16 = (uint16)strlen(name);
+          ui16 = convert_endian(ui16);
+          b.Write((char *)&ui16, sizeof(int16));
+          // XX byte name
+          b.Write(name, ui16);
+          // 1 byte datatype id
+          ui8 = CS_DATATYPE_EVENT;
+          b.Write((char *)&ui8, sizeof(uint8));
+          // 4 byte data length
+          ui32 = object->Event->FlattenSize(CS_CRYSTAL_PROTOCOL);
+          ui32 = convert_endian(ui32);
+          b.Write((char *)&ui32, sizeof(uint32));
+          // XX byte data
+          if (!object->Event->Flatten(b.GetPos() + buffer))
+            return false;
+          else
+            b.SetPos(b.GetPos() + object->Event->FlattenSize());
         }
-      }
+        break;
+      case attribute::tag_databuffer:
+        // 2 byte name length (little endian)
+        ui16 = (uint16)strlen(name);
+        ui16 = convert_endian(ui16);
+        b.Write((char *)&ui16, sizeof(int16));
+        // XX byte name
+        b.Write(name, ui16);
+        // 1 byte datatype id
+        ui8 = CS_DATATYPE_DATABUFFER;
+        b.Write((char *)&ui8, sizeof(uint8));
+        // 4 byte data length
+        ui32 = object->length;
+        ui32 = convert_endian(ui32);
+        b.Write((char *)&ui32, sizeof(uint32));
+        // XX byte data
+        b.Write(object->String, object->length);
+        break;
+      case attribute::tag_string:
+        // 2 byte name length (little endian)
+        ui16 = (uint16)strlen(name);
+        ui16 = convert_endian(ui16);
+        b.Write((char *)&ui16, sizeof(int16));
+        // XX byte name
+        b.Write(name, ui16);
+        // 1 byte datatype id
+        ui8 = CS_DATATYPE_STRING;
+        b.Write((char *)&ui8, sizeof(uint8));
+        // 4 byte data length
+        ui32 = object->length;
+        ui32 = convert_endian(ui32);
+        b.Write((char *)&ui32, sizeof(uint32));
+        // XX byte data
+        b.Write(object->String, object->length);
+        break;
+      case attribute::tag_bool:
+        // 2 byte name length (little endian)
+        ui16 = (uint16)strlen(name);
+        ui16 = convert_endian(ui16);
+        b.Write((char *)&ui16, sizeof(int16));
+        // XX byte name
+        b.Write(name, ui16);
+        // 1 byte datatype id
+        ui8 = CS_DATATYPE_BOOL;
+        b.Write((char *)&ui8, sizeof(uint8));
+        // 1 byte data
+        if (object->Bool) ui8 = 1; else ui8 = 0;
+        b.Write((char *)&ui8, sizeof(uint8));
+        break;
+      case attribute::tag_int8:
+        // 2 byte name length (little endian)
+        ui16 = (uint16)strlen(name);
+        ui16 = convert_endian(ui16);
+        b.Write((char *)&ui16, sizeof(int16));
+        // XX byte name
+        b.Write(name, ui16);
+        // 1 byte datatype id
+        ui8 = CS_DATATYPE_INT8;
+        b.Write((char *)&ui8, sizeof(uint8));
+        // 1 byte data
+        i8 = (int8)object->Integer;
+        b.Write((char *)&i8, sizeof(int8));
+        break;
+      case attribute::tag_uint8:
+        // 2 byte name length (little endian)
+        ui16 = (uint16)strlen(name);
+        ui16 = convert_endian(ui16);
+        b.Write((char *)&ui16, sizeof(int16));
+        // XX byte name
+        b.Write(name, ui16);
+        // 1 byte datatype id
+        ui8 = CS_DATATYPE_UINT8;
+        b.Write((char *)&ui8, sizeof(uint8));
+        // 1 byte data
+        ui8 = (uint8)object->Unsigned;
+        b.Write((char *)&ui8, sizeof(uint8));
+        break;
+      case attribute::tag_int16:
+        // 2 byte name length (little endian)
+        ui16 = (uint16)strlen(name);
+        ui16 = convert_endian(ui16);
+        b.Write((char *)&ui16, sizeof(int16));
+        // XX byte name
+        b.Write(name, ui16);
+        // 1 byte datatype id
+        ui8 = CS_DATATYPE_INT16;
+        b.Write((char *)&ui8, sizeof(uint8));
+        // 2 byte data
+        i16 = (int16)object->Integer;
+        i16 = convert_endian(i16);
+        b.Write((char *)&i16, sizeof(int16));
+        break;
+      case attribute::tag_uint16:
+        // 2 byte name length (little endian)
+        ui16 = (uint16)strlen(name);
+        ui16 = convert_endian(ui16);
+        b.Write((char *)&ui16, sizeof(int16));
+        // XX byte name
+        b.Write(name, ui16);
+        // 1 byte datatype id
+        ui8 = CS_DATATYPE_UINT16;
+        b.Write((char *)&ui8, sizeof(uint8));
+        // 2 byte data (little endian)
+        ui16 = (uint16)object->Unsigned;
+        ui16 = convert_endian(ui16);
+        b.Write((char *)&ui16, sizeof(uint16));
+        break;
+      case attribute::tag_int32:
+        // 2 byte name length (little endian)
+        ui16 = (uint16)strlen(name);
+        ui16 = convert_endian(ui16);
+        b.Write((char *)&ui16, sizeof(int16));
+        // XX byte name
+        b.Write(name, ui16);
+        // 1 byte datatype id
+        ui8 = CS_DATATYPE_INT32;
+        b.Write((char *)&ui8, sizeof(uint8));
+        // 4 byte data
+        i32 = (int32)object->Integer;
+        i32 = convert_endian(i32);
+        b.Write((char *)&i32, sizeof(int32));
+        break;
+      case attribute::tag_uint32:
+        // 2 byte name length (little endian)
+        ui16 = (uint16)strlen(name);
+        ui16 = convert_endian(ui16);
+        b.Write((char *)&ui16, sizeof(int16));
+        // XX byte name
+        b.Write(name, ui16);
+        // 1 byte datatype id
+        ui8 = CS_DATATYPE_UINT32;
+        b.Write((char *)&ui8, sizeof(uint8));
+        // 4 byte data (little endian)
+        ui32 = (uint32)object->Unsigned;
+        ui32 = convert_endian(ui32);
+        b.Write((char *)&ui32, sizeof(uint32));
+        break;
+      case attribute::tag_int64:
+        // 2 byte name length (little endian)
+        ui16 = (uint16)strlen(name);
+        ui16 = convert_endian(ui16);
+        b.Write((char *)&ui16, sizeof(int16));
+        // XX byte name
+        b.Write(name, ui16);
+        // 1 byte datatype id
+        ui8 = CS_DATATYPE_INT64;
+        b.Write((char *)&ui8, sizeof(uint8));
+        // 4 byte data
+        i64 = (int64)object->Integer;
+        i64 = convert_endian(i64);
+        b.Write((char *)&i64, sizeof(int64));
+        break;
+      case attribute::tag_uint64:
+        // 2 byte name length (little endian)
+        ui16 = (uint16)strlen(name);
+        ui16 = convert_endian(ui16);
+        b.Write((char *)&ui16, sizeof(int16));
+        // XX byte name
+        b.Write(name, ui16);
+        // 1 byte datatype id
+        ui8 = CS_DATATYPE_UINT64;
+        b.Write((char *)&ui8, sizeof(uint8));
+        // 4 byte data (little endian)
+        ui64 = (uint64)object->Unsigned;
+        ui64 = convert_endian(ui64);
+        b.Write((char *)&ui64, sizeof(uint64));
+        break;
+      case attribute::tag_float:
+        // 2 byte name length (little endian)
+        ui16 = (uint16)strlen(name);
+        ui16 = convert_endian(ui16);
+        b.Write((char *)&ui16, sizeof(int16));
+        // XX byte name
+        b.Write(name, ui16);
+        // 1 byte datatype id
+        ui8 = CS_DATATYPE_FLOAT;
+        b.Write((char *)&ui8, sizeof(uint8));
+        // 4 byte data (little endian)
+        f = (float)object->Double;
+        i32 = float2long(f);
+        b.Write((char *)&i32, sizeof(i32));
+        break;
+      case attribute::tag_double:
+        // 2 byte name length (little endian)
+        ui16 = (uint16)strlen(name);
+        ui16 = convert_endian(ui16);
+        b.Write((char *)&ui16, sizeof(int16));
+        // XX byte name
+        b.Write(name, ui16);
+        // 1 byte datatype id
+        ui8 = CS_DATATYPE_DOUBLE;
+        b.Write((char *)&ui8, sizeof(uint8));
+        // 8 byte data (longlong fixed format)
+        i64 = double2longlong(object->Double);
+        b.Write((char *)&i64, sizeof(int64));
+        break;
+      default: 
+        break;
     }
   }
   return true;
@@ -1448,15 +1050,17 @@ bool csEvent::UnflattenCrystal(const char *buffer, uint32 length)
           b.Read(str, ui32);
           str[ui32]=0; // null terminate
           Add(name, str);
+	  delete[] str;
         }
         break;
       case CS_DATATYPE_DATABUFFER:
         {
           b.Read((char *)&ui32, sizeof(uint32));
           ui32 = convert_endian(ui32);
-          void *data = new char[ui32];
-          b.Read((char*)data, ui32);
+          char* data = new char[ui32];
+          b.Read(data, ui32);
           Add(name, data, ui32);
+	  delete[] data;
         }
         break;
       case CS_DATATYPE_EVENT:
@@ -1472,6 +1076,7 @@ bool csEvent::UnflattenCrystal(const char *buffer, uint32 length)
       default:
         break;
     }  
+    delete[] name;
   } 
   return true;
 }

@@ -22,7 +22,8 @@
 
 #include "csextern.h"
 #include "iutil/event.h"
-#include "hashmapr.h"
+#include "hashr.h"
+#include "hashhandlers.h"
 #include "csendian.h"
 #include "weakref.h"
 #include "cseventq.h"
@@ -52,11 +53,49 @@ enum
  * as well as by software. There are so much constructors of
  * this class as much different types of events exists.
  */
-
 class CS_CSUTIL_EXPORT csEvent : public iEvent
 {
 private:
-  csHashMapReversible attributes;
+  typedef struct attribute_tag
+  {
+    union
+    {
+      int64 Integer;
+      uint64 Unsigned;
+      double Double;
+      char *String;
+      bool Bool;
+      iEvent *Event;
+    };
+    enum Type
+    {
+      tag_int8,
+      tag_uint8,
+      tag_int16,
+      tag_uint16,
+      tag_int32,
+      tag_uint32,
+      tag_int64,
+      tag_uint64,
+      tag_float,
+      tag_double,
+      tag_string,
+      tag_databuffer,
+      tag_bool,
+      tag_event
+    } type;
+    uint32 length;
+    attribute_tag (Type t) { type = t; }
+    ~attribute_tag() 
+    { 
+      if ((type == tag_string) || (type == tag_databuffer)) 
+	delete[] String; 
+      else if (type == tag_event)
+	Event->DecRef();
+    }
+  } attribute;
+
+  csHash<attribute*, csStrKey, csConstCharHashKeyHandler> attributes;
 
   uint32 count;
 
@@ -74,6 +113,29 @@ private:
   bool UnflattenMuscle(const char *buffer, uint32 length);
   bool UnflattenXML(const char *buffer, uint32 length);
 
+  template<class T, attribute_tag::Type typeID>
+  bool AddInternalInt (const char* name, T value)
+  {
+    attribute* object = new attribute (typeID);
+    object->Integer = value;
+    attributes.Put (name, object);
+    count++;
+    return true;
+  }
+
+  bool SkipToIndex (
+    csHash<attribute*, csStrKey, csConstCharHashKeyHandler>::Iterator& iter,
+    int index) const
+  {
+    while (index-- > 0)
+    {
+      if (!iter.HasNext()) return false;
+      iter.Next();
+    }
+    return iter.HasNext();
+  }
+
+  static char const* GetTypeName (attribute::Type t);
 protected:
   virtual csRef<iEvent> CreateEvent();
 
@@ -100,14 +162,26 @@ public:
   virtual ~csEvent ();
 
   /// Add a named event with a given parameter.
-  virtual bool Add (const char *name, int8 v);
-  virtual bool Add (const char *name, uint8 v);
-  virtual bool Add (const char *name, int16 v);
-  virtual bool Add (const char *name, uint16 v);
+
+#define CS_CSEVENT_ADDINT(type)					\
+  virtual bool Add (const char* name, type value)		\
+  {								\
+    attribute* object = new attribute (attribute::tag_##type);	\
+    object->Integer = value;					\
+    attributes.Put (name, object);				\
+    count++;							\
+    return true;						\
+  }
+
+  CS_CSEVENT_ADDINT(int8)
+  CS_CSEVENT_ADDINT(uint8)
+  CS_CSEVENT_ADDINT(int16)
+  CS_CSEVENT_ADDINT(uint16)
+  CS_CSEVENT_ADDINT(uint32)
+  CS_CSEVENT_ADDINT(int64)
+  CS_CSEVENT_ADDINT(uint64)
+#undef CS_CSEVENT_ADDINT
   virtual bool Add (const char *name, int32 v, bool force_boolean = false);
-  virtual bool Add (const char *name, uint32 v);
-  virtual bool Add (const char *name, int64 v);
-  virtual bool Add (const char *name, uint64 v);
   virtual bool Add (const char *name, float v);
   virtual bool Add (const char *name, double v);
   virtual bool Add (const char *name, const char *v);
@@ -118,14 +192,29 @@ public:
   virtual bool Add (const char *name, iEvent *v);
 
   /// Find a named event for a given type.
-  virtual bool Find (const char *name, int8 &v, int index = 0) const;
-  virtual bool Find (const char *name, uint8 &v, int index = 0) const;
-  virtual bool Find (const char *name, int16 &v, int index = 0) const;
-  virtual bool Find (const char *name, uint16 &v, int index = 0) const;
-  virtual bool Find (const char *name, int32 &v, int index = 0) const;
-  virtual bool Find (const char *name, uint32 &v, int index = 0) const;
-  virtual bool Find (const char *name, int64 &v, int index = 0) const;
-  virtual bool Find (const char *name, uint64 &v, int index = 0) const;
+#define CS_CSEVENT_FINDINT(T)						\
+  virtual bool Find (const char* name, T& value, int index) const	\
+  {									\
+    csHash<attribute*, csStrKey, csConstCharHashKeyHandler>::Iterator	\
+      iter (attributes.GetIterator (name));				\
+    if (!SkipToIndex (iter, index)) return false;			\
+    attribute* object = iter.Next();					\
+    if (object->type == attribute::tag_##T)				\
+    {									\
+      value = (T)object->Integer;					\
+      return true;							\
+    }									\
+    return false;							\
+  }
+  CS_CSEVENT_FINDINT(int8)
+  CS_CSEVENT_FINDINT(uint8)
+  CS_CSEVENT_FINDINT(int16)
+  CS_CSEVENT_FINDINT(uint16)
+  CS_CSEVENT_FINDINT(int32)
+  CS_CSEVENT_FINDINT(uint32)
+  CS_CSEVENT_FINDINT(int64)
+  CS_CSEVENT_FINDINT(uint64)
+#undef CS_CSEVENT_FINDINT
   virtual bool Find (const char *name, float &v, int index = 0) const;
   virtual bool Find (const char *name, double &v, int index = 0) const;
   virtual bool Find (const char *name, const char *&v, int index = 0) const;

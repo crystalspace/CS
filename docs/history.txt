@@ -13,6 +13,8 @@ chronological order.
 	  local variable.
 	- Jorrit fixed a bug in the bruteblock plugin. Sometimes when walking
 	  around the border the material map would get accessed out of bounds.
+	- res changed csEvent to use a csHash<> to store the event attributes.
+	- res made a small 64bit warning fix to csHash<>.
 6-Jul-2004
 	- Reed changed VOSA3DL to load required plugins on demand rather than 
 	  assume they were already loaded.
