@@ -542,13 +542,6 @@ bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   SetupObject ();
   CheckLitColors ();
 
-  if (factory->light_mgr)
-  {
-    const csArray<iLight*>& relevant_lights = factory->light_mgr
-    	->GetRelevantLights (logparent);
-    UpdateLighting (relevant_lights, movable);
-  }
-
   iCamera* camera = rview->GetCamera ();
 
   // First create the transformation from object to camera space directly:
@@ -592,6 +585,14 @@ bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 
   lighting_movable = movable;
 #endif
+
+  if (factory->light_mgr)
+  {
+    const csArray<iLight*>& relevant_lights = factory->light_mgr
+    	->GetRelevantLights (logparent);
+    UpdateLighting (relevant_lights, movable);
+  }
+
   return true;
 }
 

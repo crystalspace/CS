@@ -103,6 +103,14 @@ class csFlags;
  */
 #define CS_LIGHTINGUPDATE_SORTRELEVANCE 1
 
+/**
+ * If this flag for iMeshWrapper->SetLightingUpdate() is set then
+ * the set of relevant lights will be recalculated every time.
+ * Otherwise the lights are only recalculated when the object moves or
+ * when one of the affected lights changes (default).
+ */
+#define CS_LIGHTINGUPDATE_ALWAYSUPDATE 2
+
 /** @} */
 
 SCF_VERSION (iMeshDrawCallback, 0, 0, 1);
@@ -188,8 +196,12 @@ struct iMeshWrapper : public iBase
   /**
    * Control how lighting updates should take place.
    * 'num_lights' is the number of lights that will be given to the
-   * mesh object at maximum (default is 8). 'flags' can be equal
-   * to #CS_LIGHTINGUPDATE_SORTRELEVANCE (default on) or 0.
+   * mesh object at maximum (default is 8). 'flags' can be a combination
+   * of one of the following:
+   * <ul>
+   * <li>#CS_LIGHTINGUPDATE_SORTRELEVANCE (default on).
+   * <li>#CS_LIGHTINGUPDATE_ALWAYSUPDATE (default off).
+   * </ul>
    * Note that this function has no effect on thing
    * mesh objects as they use another lighting system (lightmaps).
    * Also some genmesh objects can optionally also use the other lighting

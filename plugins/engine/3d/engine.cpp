@@ -3258,7 +3258,7 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
     meshwrap->GetCsMovable ().UpdateMove ();
   }
 
-  mesh->SetLogicalParent ((csObject*)meshwrap);
+  mesh->SetLogicalParent (&(meshwrap->scfiMeshWrapper));
   return csPtr<iMeshWrapper> (&meshwrap->scfiMeshWrapper);
 }
 

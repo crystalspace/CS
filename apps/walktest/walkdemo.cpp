@@ -952,7 +952,7 @@ void WalkTest::add_bot (float size, iSector* where, csVector3 const& pos,
   csRef<iMeshObject> botmesh (tmpl->GetMeshObjectFactory ()->NewInstance ());
   csRef<iMeshWrapper> botWrapper = Engine->CreateMeshWrapper (botmesh, "bot",
     where);
-  
+
   csMatrix3 m; m.Identity (); m = m * size;
   botWrapper->GetMovable ()->SetTransform (m);
   
@@ -960,9 +960,9 @@ void WalkTest::add_bot (float size, iSector* where, csVector3 const& pos,
   csRef<iSprite3DState> state (SCF_QUERY_INTERFACE (botmesh, iSprite3DState));
   state->SetAction ("default");
   
-  Bot bot (Sys->view->GetEngine(), botWrapper);
-  bot.set_bot_move (pos);
-  bot.set_bot_sector (where);
+  Bot* bot = new Bot (Sys->view->GetEngine(), botWrapper);
+  bot->set_bot_move (pos);
+  bot->set_bot_sector (where);
   bots.Push (bot);
 }
 
@@ -977,7 +977,7 @@ void WalkTest::move_bots (csTicks elapsed_time)
   int i;
   for (i = 0; i < bots.Length(); i++)
   {
-    bots[i].move (elapsed_time);
+    bots[i]->move (elapsed_time);
   }
 }
 

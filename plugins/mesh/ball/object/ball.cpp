@@ -733,14 +733,6 @@ bool csBallMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
   SetupObject ();
 
-  if (((csBallMeshObjectFactory*)factory)->light_mgr)
-  {
-    const csArray<iLight*>& relevant_lights
-    	= ((csBallMeshObjectFactory*)factory)->light_mgr
-    	->GetRelevantLights (logparent);
-    UpdateLighting (relevant_lights, movable);
-  }
-
   iCamera* camera = rview->GetCamera ();
 
   // First create the transformation from object to camera space directly:
@@ -780,6 +772,14 @@ bool csBallMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   top_mesh.clip_z_plane = clip_z_plane;
   top_mesh.do_mirror = camera->IsMirrored ();
 #endif
+
+  if (((csBallMeshObjectFactory*)factory)->light_mgr)
+  {
+    const csArray<iLight*>& relevant_lights
+    	= ((csBallMeshObjectFactory*)factory)->light_mgr
+    	->GetRelevantLights (logparent);
+    UpdateLighting (relevant_lights, movable);
+  }
 
   return true;
 }

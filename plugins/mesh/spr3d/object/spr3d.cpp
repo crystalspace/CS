@@ -1419,13 +1419,6 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
   SetupObject ();
 
-  if (factory->light_mgr)
-  {
-    const csArray<iLight*>& relevant_lights = factory->light_mgr
-    	->GetRelevantLights (logparent);
-    UpdateLighting (relevant_lights, movable);
-  }
-
   if (!factory->cstxt)
   {
     factory->Report (CS_REPORTER_SEVERITY_ERROR,
@@ -1830,6 +1823,14 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   rendermesh.do_mirror = camera->IsMirrored ();
 
 #endif // CS_USE_NEW_RENDERER
+
+  if (factory->light_mgr)
+  {
+    const csArray<iLight*>& relevant_lights = factory->light_mgr
+    	->GetRelevantLights (logparent);
+    UpdateLighting (relevant_lights, movable);
+  }
+
   return true;
 }
 

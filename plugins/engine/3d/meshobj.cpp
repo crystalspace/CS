@@ -92,7 +92,7 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent, iMeshObject *meshobj) :
 
   relevant_lights_valid = false;
   relevant_lights_max = 8;
-  relevant_lights_flags.Set (CS_LIGHTINGUPDATE_SORTRELEVANCE);
+  relevant_lights_flags.SetAll (CS_LIGHTINGUPDATE_SORTRELEVANCE);
 }
 
 void csMeshWrapper::SetParentContainer (iMeshWrapper* newParent)
@@ -157,6 +157,7 @@ csMeshWrapper::~csMeshWrapper ()
 
 void csMeshWrapper::UpdateMove ()
 {
+  relevant_lights_valid = false;
   int i;
   for (i = 0; i < children.GetCount (); i++)
   {
@@ -211,15 +212,46 @@ void csMeshWrapper::SetLightingUpdate (int flags, int num_lights)
 {
   relevant_lights_flags.SetAll (flags);
   relevant_lights_max = num_lights;
+  relevant_lights_valid = false;
 }
 
 const csArray<iLight*>& csMeshWrapper::GetRelevantLights ()
 {
-  // @@@ Temporary implementation. In future we should use
-  // flags and counters to check if updating is really needed.
+  bool always_update = relevant_lights_flags.Check (
+  	CS_LIGHTINGUPDATE_ALWAYSUPDATE);
+  if (!always_update)
+  {
+    // Check if updating is needed.
+    if (relevant_lights_valid)
+    {
+      // Object didn't move. Now check lights (moved or destroyed).
+      bool relevant = true;
+      int i;
+      for (i = 0 ; i < relevant_lights.Length () ; i++)
+      {
+        iLight* l = relevant_lights[i];
+	if (!relevant_lights_ref[i].light)
+	{
+	  relevant = false;	// Light was removed!
+	  break;
+	}
+	if (l->GetLightNumber () != relevant_lights_ref[i].light_nr)
+	{
+	  relevant = false;	// Light was removed!
+	  break;
+	}
+      }
+
+      if (relevant)
+        return relevant_lights;
+    }
+  }
+
   relevant_lights.Empty ();
+  relevant_lights_ref.Empty ();
+
   const iSectorList *movable_sectors = movable.GetSectors ();
-  if (movable_sectors->GetCount () > 0)
+  if (movable_sectors->GetCount () > 0 && relevant_lights_max > 0)
   {
     csBox3 box;
     GetFullBBox (box);
@@ -234,7 +266,19 @@ const csArray<iLight*>& csMeshWrapper::GetRelevantLights ()
         relevant_lights.GetArray (),
         relevant_lights_max);
     relevant_lights.SetLength (num_lights);
+    relevant_lights_ref.SetLength (num_lights);
+    if (!always_update)
+    {
+      // Update our ref list.
+      int i;
+      for (i = 0 ; i < num_lights ; i++)
+      {
+        relevant_lights_ref[i].light = relevant_lights[i];
+        relevant_lights_ref[i].light_nr = relevant_lights[i]->GetLightNumber ();
+      }
+    }
   }
+  relevant_lights_valid = true;
   return relevant_lights;
 }
 

@@ -117,6 +117,11 @@ bool csSprite2DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
   SetupObject ();
 
+  // Camera transformation for the single 'position' vector.
+  cam = rview->GetCamera ()->GetTransform ().Other2This (
+  	movable->GetFullPosition ());
+  if (cam.z < SMALL_Z) return false;
+
   if (factory->light_mgr)
   {
     const csArray<iLight*>& relevant_lights = factory->light_mgr
@@ -124,10 +129,6 @@ bool csSprite2DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
     UpdateLighting (relevant_lights, movable);
   }
 
-  // Camera transformation for the single 'position' vector.
-  cam = rview->GetCamera ()->GetTransform ().Other2This (
-  	movable->GetFullPosition ());
-  if (cam.z < SMALL_Z) return false;
   return true;
 }
 

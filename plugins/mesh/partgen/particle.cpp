@@ -229,13 +229,6 @@ bool csNewParticleSystem::DrawTest (iRenderView* rview, iMovable* movable)
 {
   SetupObject ();
 
-  if (light_mgr)
-  {
-    const csArray<iLight*>& relevant_lights = light_mgr
-    	->GetRelevantLights (LogParent);
-    UpdateLighting (relevant_lights, movable);
-  }
-
   // get the object-to-camera transformation
   iCamera *camera = rview->GetCamera ();
   csReversibleTransform trans = camera->GetTransform ();
@@ -369,6 +362,13 @@ bool csNewParticleSystem::DrawTest (iRenderView* rview, iMovable* movable)
   }
 
 #endif
+
+  if (light_mgr)
+  {
+    const csArray<iLight*>& relevant_lights = light_mgr
+    	->GetRelevantLights (LogParent);
+    UpdateLighting (relevant_lights, movable);
+  }
 
   return true;
 }

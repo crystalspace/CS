@@ -755,13 +755,6 @@ void csBigTerrainObject::InitMesh (nTerrainInfo *info)
 
 bool csBigTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
-  if (light_mgr)
-  {
-    const csArray<iLight*>& relevant_lights = light_mgr
-    	->GetRelevantLights (logparent);
-    UpdateLighting (relevant_lights, movable);
-  }
-
   if (terrain)
   {
     iCamera* cam = rview->GetCamera ();
@@ -798,6 +791,13 @@ bool csBigTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
 	info->GetMesh()->clip_portal = clip_portal;
 	info->GetMesh()->clip_plane = clip_plane;
 	info->GetMesh()->clip_z_plane = clip_z_plane;
+    if (light_mgr)
+    {
+      const csArray<iLight*>& relevant_lights = light_mgr
+    	  ->GetRelevantLights (logparent);
+      UpdateLighting (relevant_lights, movable);
+    }
+
     return true;
   }
 

@@ -244,13 +244,6 @@ bool csParticleSystem::DrawTest (iRenderView* rview, iMovable* movable)
 {
   SetupObject ();
 
-  if (light_mgr)
-  {
-    const csArray<iLight*>& relevant_lights = light_mgr
-    	->GetRelevantLights (logparent);
-    UpdateLighting (relevant_lights, movable);
-  }
-
   // Based and copied this code on csSprite3DMeshObject's
   //   DrawTest, GetScreenBoundingBox, GetTransformedBoundingBox
 
@@ -304,6 +297,13 @@ bool csParticleSystem::DrawTest (iRenderView* rview, iMovable* movable)
   if (!rview->ClipBBox (particle_sbox, particle_cbox,
                       clip_portal,clip_plane,clip_z_plane))
     return false;
+
+  if (light_mgr)
+  {
+    const csArray<iLight*>& relevant_lights = light_mgr
+    	->GetRelevantLights (logparent);
+    UpdateLighting (relevant_lights, movable);
+  }
 
   return true;
 }

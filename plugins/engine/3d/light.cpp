@@ -449,6 +449,9 @@ static void object_light_func (iMeshWrapper *mesh, iFrustumView *lview,
   iShadowReceiver* receiver = mesh->GetShadowReceiver ();
   if (receiver)
     receiver->CastShadows (mesh->GetMovable (), lview);
+
+  csMeshWrapper* cmw = ((csMeshWrapper::MeshWrapper*)mesh)->GetCsMeshWrapper ();
+  cmw->InvalidateRelevantLights ();
 }
 
 void csLight::CalculateLighting ()

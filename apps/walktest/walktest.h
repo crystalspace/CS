@@ -513,7 +513,7 @@ public:
   void GfxWrite (int x, int y, int fg, int bg, char *str, ...);
 
   // Bot stuff
-  csArray<Bot> bots;
+  csPDelArray<Bot> bots;
   void add_bot (float size, iSector* where, csVector3 const& pos,
     float dyn_radius);
   void del_bot ();

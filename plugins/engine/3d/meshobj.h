@@ -25,6 +25,7 @@
 #include "csutil/refarr.h"
 #include "csutil/flags.h"
 #include "csutil/garray.h"
+#include "csutil/weakref.h"
 #include "plugins/engine/3d/movable.h"
 #include "plugins/engine/3d/impmesh.h"
 #include "plugins/engine/3d/meshlod.h"
@@ -250,6 +251,16 @@ private:
    * by the csLightManager class.
    */
   csDirtyAccessArray<iLight*> relevant_lights;
+  // This is a mirror of 'relevant_lights' which we use to detect if
+  // a light has been removed or changed. It is only used in case we
+  // are not updating all the time (if CS_LIGHTINGUPDATE_ALWAYSUPDATE is
+  // not set).
+  struct LightRef
+  {
+    csWeakRef<iLight> light;
+    uint32 light_nr;
+  };
+  csSafeCopyArray<LightRef> relevant_lights_ref;
   bool relevant_lights_valid;
   int relevant_lights_max;
   csFlags relevant_lights_flags;
@@ -419,6 +430,10 @@ public:
    * Get the array of relevant lights for this object.
    */
   const csArray<iLight*>& GetRelevantLights ();
+  /**
+   * Forcibly invalidate relevant lights.
+   */
+  void InvalidateRelevantLights () { relevant_lights_valid = false; }
 
   /**
    * Draw this mesh object given a camera transformation.
