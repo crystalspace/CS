@@ -49,7 +49,7 @@ public:
 };
 
 /// a haze hull
-class csHazeHull : iHazeHull {
+class csHazeHull : public iHazeHull {
 protected:
   /// total counts
   int total_poly, total_vert, total_edge;
