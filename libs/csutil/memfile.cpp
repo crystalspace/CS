@@ -67,6 +67,7 @@ size_t csMemFile::Read(char* Data, size_t DataSize)
   const size_t nbytes = DataSize < remaining ? DataSize : remaining;
   if (nbytes != 0)
     memcpy(Data, buffer + cursor, nbytes);
+  cursor += nbytes;
   return nbytes;
 }
 

@@ -20,6 +20,8 @@ he history order is reversed so that new features are at the top.
 	  would be more efficient to let the hardware clear the Z-buffer
 	  in one go and then use the Z-buffer (i.e. for space type levels).
 	  That's why this flag is useful.
+	- Matze fixed a serious bug in csMemFile: It wasn't increasing file
+	  postion while reading. (Seems like no one ever used this...)
 14-Jan-2002
 	- Matt Reda added 3 OSX drivers (2 canvases and an audio driver)
 	  and updated various Makefiles to support these changes.
