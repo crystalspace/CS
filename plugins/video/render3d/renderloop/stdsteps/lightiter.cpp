@@ -151,6 +151,8 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector)
 
   int nlights = lights->GetCount();
 
+  r3d->SetShadowState (CS_SHADOW_VOLUME_BEGIN);
+
   while (nlights-- > 0)
   {
     iLight* light = lights->Get (nlights);
@@ -183,6 +185,9 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector)
       }
     }
   }
+
+  r3d->SetShadowState (CS_SHADOW_VOLUME_FINISH);
+
 }
 
 int csLightIterRenderStep::AddStep (iRenderStep* step)
