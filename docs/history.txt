@@ -11,6 +11,11 @@ chronological order.
 	  overrides in csColor and csColor4. Although modern C++ can deal with
 	  overrides in subclasses having return values which differ from those
 	  in the parent class, Java can not.
+	- Eric Sunshine fixed a nasty bug in _csWrapPtr_to_Python() (pythpre.i)
+	  where it mismanaged (under-incremented) the reference count of the
+	  wrapped object. This caused objects to be deleted multiple times.
+	  Objects affected by this bug were those returned by the various
+	  CS_QUERY_FOO() and SCF_QUERY_FOO() macros.
 11-Dec-2004
 	- PK added static void ReportWarning (const char* description, ...)
 	  to csApplicationFramework.

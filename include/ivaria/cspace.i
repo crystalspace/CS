@@ -24,19 +24,19 @@
 	phase) for places where to include files for new scripting languages.
 
 	Python (renej_frog@users.sourceforge.net):
-		Used for the new "cspython" plugin based on python 2.2 including
-		almost complete access to CS.
+		Used for the new "cspython" plugin based on python 2.2
+		including almost complete access to CS.
 
 		Additionally, provides CS as a python 2.2 module name "cspace".
 		To use this, make sure cspace.py and _cspace.so in directory
-		$CRYSTAL/scripts/python can be found by python; and don't forget
-		to set the CRYSTAL environment variable.
-		See $CRYSTAL/scripts/python/pysimpcd.py for an example of usage.
+		$CRYSTAL/scripts/python can be found by python; and don't
+		forget to set the CRYSTAL environment variable.  See
+		$CRYSTAL/scripts/python/pysimpcd.py for an example of usage.
 
 	Perl (oktal@gmx.co.uk):
 		Used for the "csperl5" plugin based on perl 5.8 including
-		access to most parts of CS
-		(although some ealier versions are probably supported).
+		access to most parts of CS (although some ealier versions are
+		probably supported).
 
 		Additionally, provices CS as a perl 5.8 module name "cspace".
 		Make sure the directory containing cspace.pm and cspace.so,
@@ -127,27 +127,8 @@
 	%include "ivaria/perl1st.i"
 #endif
 
-/* @@@ The following is a kludge. In the future, all cspace modules for all
- *     scripting languages should include crystalspace.h in the same way Perl
- *     does.
- */
-#ifndef SWIGPERL5
-  %{
-    #include "crystalspace.h"
-  %}
-#endif
-
 %{
-#include "iaws/aws.h"
-#include "imap/saver.h"
-#include "ivaria/reporter.h"
-#include "ivaria/dynamics.h"
-#include "ivaria/engseq.h"
-#include "iutil/cache.h"
-#include "csutil/event.h"
-#include "csutil/xmltiny.h"
-#include "igeom/objmodel.h"
-#include "iengine/portalcontainer.h"
+#include "crystalspace.h"
 %}
 
 // The following list holds all the interfaces that are handled correctly.
@@ -389,17 +370,27 @@
 %immutable csWrapPtr::Type;
 %inline %{
 
-	// This pointer wrapper can be used to prevent code-bloat by macro's acting
-	// as template functions.
-	// Examples are SCF_QUERY_INTERFACE and CS_QUERY_REGISTRY.
-	// Thanks to Mat Sutcliffe <oktal@gmx.co.uk>.
-	// Note that this works only if you're not using virtual inheritance.
-	// Also note that CS should never need to use virtual inheritance as
-	// long as it has SCF.
+	// This pointer wrapper can be used to prevent code-bloat by macros
+	// acting as template functions.  Examples are SCF_QUERY_INTERFACE()
+	// and CS_QUERY_REGISTRY(). Note that this works only if you're not
+	// using virtual inheritance.  Also note that CS should never need to
+	// use virtual inheritance as long as it has SCF.
 	//
-	// renej: The VoidPtr is added to handle case where the void pointer is
-	// the actual pointer. Ref<iBase> is used for pointers that need casting
-	// when transferred to the scripting language.
+	// Ref - A managed reference to the iBase pointer of the wrapped
+	//    interface.
+	// VoidPtr - A raw pointer to the address of the the specified SCF
+	//    interface after performing a dynamic cast from iBase. This
+	//    address may differ from the iBase address (as a result of normal
+	//    C++ casting behavior where objects and inheritence are
+	//    involved). This is the actual value which the higher-level
+	//    scripting objects wrap; they do not wrap the iBase pointer.  This
+	//    member is assigned only by very specialized functions which
+	//    already know, or which can compute, the raw interface address,
+	//    such as iBase::_DynamicCast(), and the various FOO_QUERY_BAR()
+	//    macros.
+	// Type
+	//    The SCF interface name which this pointer represents (for
+	//    instance, "iEngine").
 
 	struct csWrapPtr
 	{

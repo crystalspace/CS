@@ -132,24 +132,42 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
 	CS_ALLOC_STACK_ARRAY(char, type_name, strlen(wp.Type) + 3);
 	strcat(strcpy(type_name, wp.Type), " *");
 	iBase * ibase;
+	void * ptr;
 	if (wp.VoidPtr)
 	{
-		void * ptr = wp.VoidPtr;
-		result = SWIG_NewPointerObj(ptr, SWIG_TypeQuery(type_name), 1);
-		ibase = (iBase *) SWIG_TypeCast(SWIG_TypeQuery("iBase *"), ptr);
+		ptr = wp.VoidPtr;
+		ibase = (iBase *)SWIG_TypeCast(SWIG_TypeQuery("iBase *"), ptr);
 	}
 	else
 	{
-		ibase = (iBase *) wp.Ref;
-		void * ptr = iBase__DynamicCast(ibase, wp.Type).VoidPtr;
-		result = SWIG_NewPointerObj(ptr, SWIG_TypeQuery(type_name), 1);
+		ibase = (iBase *)wp.Ref;
+		ptr = iBase__DynamicCast(ibase, wp.Type).VoidPtr;
 	}
+
+	// This is a bit tricky: We want the generated Python 'result' object
+	// to own one reference to the wrapped object, so we want to call
+	// Python's iBase.IncRef() to gain that reference. In order to do this,
+	// we create a second Python object (an iBase) and invoke its IncRef()
+	// method. This IncRef() is done on the Python side so that Python code
+	// can override IncRef() if needed. Note carefully that this means we
+	// are actually creating _two_ Python objects, and each Python object
+	// will invoke DecRef() on the wrapped pointer at destruction time. (We
+	// destroy the iBase object manually below; and the 'result' object
+	// gets destroyed when it goes out of scope in the Python program.)
+	// Because DecRef() is being invoked twice (once for each Python
+	// object), we must ensure that IncRef() is invoked twice, hence the
+	// extra C++ `ibase->IncRef()'. (We don't bother doing this on the
+	// Python side because this reference count manipulation is for our own
+	// internal correctness.)
+
+	result = SWIG_NewPointerObj(ptr, SWIG_TypeQuery(type_name), 1);
+	ibase->IncRef();
 	PyObject * ibase_obj = SWIG_NewPointerObj(
 		(void *) ibase, SWIG_TypeQuery(type_name), 1);
 	PyObject * res_obj = PyObject_CallMethod(ibase_obj, "IncRef", "()");
 	if (!res_obj)
 	{
-		// Calling IncRef() failed; something wrong here.
+		// Calling Python IncRef() failed; something wrong here.
 		Py_XDECREF(result);
 		result = 0;
 	}
