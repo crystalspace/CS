@@ -106,7 +106,7 @@ copyright = "Copyright (C) 2000-2004 by " + author_info
 #------------------------------------------------------------------------------
 
 cvsroot = ":pserver:anonymous@cvs1:/cvsroot/crystal"
-fixcvsroot = ":pserver:anonymous@cvs.crystal.sourceforge.net:/cvsroot/crystal"
+fixcvsroot = ":pserver:anonymous@cvs.sourceforge.net:/cvsroot/crystal"
 cvsmodule = "CS"
 moduledir = "CS"
 ownergroup = "crystal"
