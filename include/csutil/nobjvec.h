@@ -50,7 +50,7 @@ public:
     for (i = 0 ; i < Length () ; i++)
     {
       T* o = (*this)[i];
-      if (!strcmp (o->QueryObject ()->GetName (), name))
+      if (o->QueryObject ()->GetName () && !strcmp (o->QueryObject ()->GetName (), name))
         return i;
     }
     return -1;
