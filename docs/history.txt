@@ -3,6 +3,8 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+21-Jul-2003
+	- Oktal added missing doxygen comment at the top of csSymbolTable.
 20-Jul-2003
 	- Jorrit forgot to link the new howto into the howto chapter.
 	- Jorrit fixed a small note about curves in the thing mesh object
