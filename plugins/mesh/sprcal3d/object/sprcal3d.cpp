@@ -837,8 +837,8 @@ void csSpriteCal3DMeshObject::RecalcBoundingBox (csBox3& bbox)
   CalVector p[8];
   calBoundingBox.computePoints(p);
 
-  bbox.StartBoundingBox();
-  for (int i=0; i<8; i++)
+  bbox.Set(p[0].x, p[0].y, p[0].z, p[0].x, p[0].y, p[0].z);
+  for (int i=1; i<8; i++)
   {
     bbox.AddBoundingVertexSmart(p[i].x,p[i].y,p[i].z);
   }
@@ -870,10 +870,10 @@ void csSpriteCal3DMeshObjectFactory::GetObjectBoundingBox (csBox3& bbox,
   CalVector p[8];
   calBoundingBox.computePoints(p);
 
-  bbox.Set(0,0,0,0,0,0);
-  for (int i=0; i<8; i++)
+  bbox.Set (p[0].x, p[0].y, p[0].z, p[0].x, p[0].y, p[0].z);
+  for (int i=1; i<8; i++)
   {
-    bbox.AddBoundingVertexSmart(p[i].x,p[i].y,p[i].z);
+    bbox.AddBoundingVertexSmart(p[i].x, p[i].y, p[i].z);
   }
 }
 
@@ -1151,8 +1151,6 @@ void csSpriteCal3DMeshObject::SetupObject()
 	meshes[index][j].vertex_fog = 0;
 #endif
 
-	RecalcBoundingBox(object_bbox);
-
 //	factory->GetObjectBoundingBox(object_bbox);  // initialize object_bbox here
 
 #ifndef CS_USE_NEW_RENDERER
@@ -1165,6 +1163,7 @@ void csSpriteCal3DMeshObject::SetupObject()
       }
     }
   }
+  RecalcBoundingBox(object_bbox);
 }
 
 bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
