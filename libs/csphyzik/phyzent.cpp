@@ -27,13 +27,13 @@
 #include "csphyzik/debug.h"
 
 ctPhysicalEntity::ctPhysicalEntity() : 
-  RF( ctReferenceFrame::universe() ), v(0), w(0), F(0), T(0)
+  v(0), w(0), RF( ctReferenceFrame::universe() ), F(0), T(0)
 {
   RF.add_ref( RF );
 }
 
 ctPhysicalEntity::ctPhysicalEntity( ctReferenceFrame &ref ) :
-  RF( ref ), v(0), w(0), F(0), T(0)
+  v(0), w(0), RF( ref ), F(0), T(0)
 {
   RF.add_ref( RF );
 }

@@ -24,14 +24,14 @@
 #include "csphyzik/phyzent.h"
 
 ctForce::ctForce() :
-  RF( ctReferenceFrame::universe() ), direction(0), origin(0)
+  direction(0), origin(0), RF( ctReferenceFrame::universe() )
 {
 	RF.add_ref( RF );
 	magnitude = 1.0;
 }
 
 ctForce::ctForce( ctReferenceFrame &ref ) :
-  RF( ref ), direction(0), origin(0)
+  direction(0), origin(0), RF( ref )
 {
 	RF.add_ref( RF );
 }

@@ -28,8 +28,7 @@
 double ctJoint::joint_friction = 0.0;
 
 ctJoint::ctJoint( ctArticulatedBody *in, ctVector3 &in_offset, ctArticulatedBody *out, ctVector3 &out_offset ) :
-  inboard_offset(in_offset), outboard_offset(out_offset), joint_axis(0),
-  inboard(in), outboard( out )
+  inboard(in), inboard_offset(in_offset), outboard( out ), outboard_offset(out_offset), joint_axis(0)
 {
 	q = qv = qa = 0;
 
