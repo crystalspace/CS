@@ -198,8 +198,8 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #--------------------------------------------------------------- confighelp ---#
 ifeq ($(MAKESECTION),confighelp)
 
-# Since this makefile can be included more than once, disallow addition of
-# help messages more than once.
+# This makefile can be included more than once, but help messages should be
+# appended only once.
 ifndef ALREADY_INCLUDED
 ALREADY_INCLUDED = 1
 
@@ -248,7 +248,6 @@ ifeq ($(ROOTCONFIG),volatile)
 
 MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define OS_NEXT_$(NEXT.FLAVOR)$">>volatile.tmp
 MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define OS_NEXT_DESCRIPTION "$(NEXT.DESCRIPTION)"$">>volatile.tmp
-MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define CS_NO_MODULE_LOCKING$">>volatile.tmp
 
 endif # ifeq ($(ROOTCONFIG),volatile)
 endif # ifeq ($(MAKESECTION),rootdefines)
