@@ -83,7 +83,8 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   if (!synldr)
   {
-    csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+    csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
+    	object_reg, iPluginManager);
     synldr = CS_LOAD_PLUGIN (plugin_mgr,
       "crystalspace.syntax.loader.service.text", iSyntaxService);
     if (!synldr)
@@ -278,7 +279,7 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
       if (do_verbose)
         SetFailReason ("vertex program failed to load");
       else
-        Report (CS_REPORTER_SEVERITY_WARNING, 
+        Report (CS_REPORTER_SEVERITY_NOTIFY, 
 	  "Vertex Program for shader '%s' failed to load",
 	  pass->owner->GetName ());
       return false;
@@ -297,7 +298,7 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
       if (do_verbose)
         SetFailReason ("fragment program failed to load");
       else
-        Report (CS_REPORTER_SEVERITY_WARNING, 
+        Report (CS_REPORTER_SEVERITY_NOTIFY, 
 	  "Fragment Program for shader '%s' failed to load",
 	  pass->owner->GetName ());
       return false;
@@ -479,7 +480,6 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
 	"Shader '%s', pass %d: invalid buffer destination '%s'",
 	pass->owner->GetName (), pass->owner->GetPassNumber (pass),
 	dest);
-      
     }
   }
 
@@ -488,7 +488,6 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
     Report (CS_REPORTER_SEVERITY_WARNING,
       "Shader '%s', pass %d has no buffer mappings",
       pass->owner->GetName (), pass->owner->GetPassNumber (pass));
-    
   }
 
   //get texturemappings
@@ -571,7 +570,7 @@ csPtr<iShaderProgram> csXMLShaderCompiler::LoadProgram (
 {
   if (node->GetAttributeValue("plugin") == 0)
   {
-    Report (CS_REPORTER_SEVERITY_WARNING,
+    Report (CS_REPORTER_SEVERITY_ERROR,
       "No shader program plugin specified for <%s> in shader '%s'",
       node->GetValue (), pass->owner->GetName ());
     return 0;
@@ -597,7 +596,7 @@ csPtr<iShaderProgram> csXMLShaderCompiler::LoadProgram (
     plg = CS_LOAD_PLUGIN(plugin_mgr, plugin, iShaderProgramPlugin);
     if (!plg)
     {
-      Report (CS_REPORTER_SEVERITY_WARNING,
+      Report (CS_REPORTER_SEVERITY_ERROR,
 	"Couldn't retrieve shader plugin '%s' for <%s> in shader '%s'",
 	plugin, node->GetValue (), pass->owner->GetName ());
       delete[] plugin;
@@ -618,9 +617,9 @@ csPtr<iShaderProgram> csXMLShaderCompiler::LoadProgram (
     csRef<iVFS> VFS = CS_QUERY_REGISTRY(objectreg, iVFS);
     csRef<iFile> programFile = VFS->Open (node->GetAttributeValue ("file"),
       VFS_FILE_READ);
-    if(!programFile)
+    if (!programFile)
     {
-      Report (CS_REPORTER_SEVERITY_WARNING,
+      Report (CS_REPORTER_SEVERITY_ERROR,
         "Unable to load shader program '%s'",
         node->GetAttributeValue ("file"));
       return 0;
@@ -681,7 +680,7 @@ bool csXMLShaderCompiler::IsTemplateToCompiler(iDocumentNode *templ)
   if ((shaderType == 0) || (xmltokens.Request (shaderType) != 
     XMLTOKEN_XMLSHADER))
   {
-    Report (CS_REPORTER_SEVERITY_WARNING, 
+    Report (CS_REPORTER_SEVERITY_ERROR, 
       "Type of shader '%s' is not 'xmlshader', but '%s'",
       shaderName, shaderType);
     return false;
