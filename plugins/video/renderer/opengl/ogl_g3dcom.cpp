@@ -3665,22 +3665,22 @@ void csGraphics3DOGLCommon::ClipTriangleLightmapMesh (
 	  clipinfo[j].original.idx =
 	  	(*clipped_lightmap_translate)[clipinfo[j].original.idx];
 	}
-  else
+        else
 	{
 	  ResolveVertexLightmap (&clipinfo[j], clipped_lightmap_translate->GetArray (),
-	  	texels, vertex_fog,
-		clipped_lightmap_texels->GetArray ()[num_clipped_vertices],		
-		clipped_lightmap_fog->GetArray ()[num_clipped_vertices],
-    (*clipped_lightmap_fog_texels)[num_clipped_vertices], 
-    fog_indices);
+                                 texels, vertex_fog,
+                                 clipped_lightmap_texels->GetArray ()[num_clipped_vertices],		
+                                 clipped_lightmap_fog->GetArray ()[num_clipped_vertices],
+                                 clipped_lightmap_fog_texels->GetArray ()[num_clipped_vertices], 
+                                 fog_indices);
 
 	  (*clipped_lightmap_vertices)[num_clipped_vertices].x = 
-      poly[j].x+frust_origin.x;
-    (*clipped_lightmap_vertices)[num_clipped_vertices].y = 
-      poly[j].y+frust_origin.y;
-    (*clipped_lightmap_vertices)[num_clipped_vertices].z = 
-      poly[j].z+frust_origin.z;
-    (*clipped_lightmap_vertices)[num_clipped_vertices].w = 1.0;
+            poly[j].x+frust_origin.x;
+          (*clipped_lightmap_vertices)[num_clipped_vertices].y = 
+            poly[j].y+frust_origin.y;
+          (*clipped_lightmap_vertices)[num_clipped_vertices].z = 
+            poly[j].z+frust_origin.z;
+          (*clipped_lightmap_vertices)[num_clipped_vertices].w = 1.0;
 	  clipinfo[j].original.idx = num_clipped_vertices;
 	  num_clipped_vertices++;
 	}
