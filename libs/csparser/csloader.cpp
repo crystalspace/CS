@@ -633,10 +633,16 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info, int cmd,
       }
       break;
     case TOKEN_POLYGON:
-      ps.AddPolygon ( load_poly3d(name, info.w, params,
-                      info.textures, info.default_texture, info.default_texlen,
-                      info.default_lightx, ps.GetSector (), &ps) );
-      LoadStat::polygons_loaded++;
+      {
+	csPolygon3D* poly3d = load_poly3d(name, info.w, params,
+			info.textures, info.default_texture, info.default_texlen,
+			info.default_lightx, ps.GetSector (), &ps);
+	if (poly3d)
+	{
+	  ps.AddPolygon (poly3d);
+	  LoadStat::polygons_loaded++;
+	}
+      }
       break;
 
     case TOKEN_BEZIER:
@@ -1446,6 +1452,12 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a polygon!\n", csGetLastOffender ());
     fatal_exit (0, false);
+  }
+
+  if (poly3d->GetNumVertices() == 0)
+  {
+    CsPrintf (MSG_WARNING, "Polygon in line %d contains no vertices!\n", parser_line);
+    return NULL;
   }
 
   if (tx1_given)
@@ -3559,6 +3571,7 @@ bool csLoader::LoadWorld (csWorld* world, LanguageLayer* layer, char* buf)
     TOKEN_TABLE (SOUNDS)
   TOKEN_TABLE_END
 
+  parser_line = 1;
   char *name, *data;
 
   if (csGetObject (&buf, tokens, &name, &data))
