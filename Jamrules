@@ -104,8 +104,6 @@ if $(USE_NEW_RENDERER) = "yes"
     glshader_arb
     glrender3d
     shadermgr
-    r3dtest
-    effects
     ;
 }
 else
