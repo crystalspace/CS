@@ -403,6 +403,7 @@ class csString(_object):
     def GetDataSafe(*args): return _cspace.csString_GetDataSafe(*args)
     def Length(*args): return _cspace.csString_Length(*args)
     def IsEmpty(*args): return _cspace.csString_IsEmpty(*args)
+    def StartsWith(*args): return _cspace.csString_StartsWith(*args)
     def __init__(self, *args):
         _swig_setattr(self, csString, 'this', _cspace.new_csString(*args))
         _swig_setattr(self, csString, 'thisown', 1)
@@ -6555,6 +6556,7 @@ class iVFS(iBase):
     def MountRoot(*args): return _cspace.iVFS_MountRoot(*args)
     def SaveMounts(*args): return _cspace.iVFS_SaveMounts(*args)
     def LoadMountsFromFile(*args): return _cspace.iVFS_LoadMountsFromFile(*args)
+    def ChDirAuto(*args): return _cspace.iVFS_ChDirAuto(*args)
     def GetFileTime(*args): return _cspace.iVFS_GetFileTime(*args)
     def SetFileTime(*args): return _cspace.iVFS_SetFileTime(*args)
     def GetFileSize(*args): return _cspace.iVFS_GetFileSize(*args)
@@ -7086,6 +7088,8 @@ class csKeyEventHelper(_object):
     if _newclass:GetModifiersBits = staticmethod(_cspace.csKeyEventHelper_GetModifiersBits)
     __swig_getmethods__["GetModifiersBits"] = lambda x: _cspace.csKeyEventHelper_GetModifiersBits
     if _newclass:GetModifiersBits = staticmethod(_cspace.csKeyEventHelper_GetModifiersBits)
+    __swig_getmethods__["GetModifiers"] = lambda x: _cspace.csKeyEventHelper_GetModifiers
+    if _newclass:GetModifiers = staticmethod(_cspace.csKeyEventHelper_GetModifiers)
     def __init__(self, *args):
         _swig_setattr(self, csKeyEventHelper, 'this', _cspace.new_csKeyEventHelper(*args))
         _swig_setattr(self, csKeyEventHelper, 'thisown', 1)
@@ -7105,8 +7109,6 @@ csKeyEventHelper_GetRawCode = _cspace.csKeyEventHelper_GetRawCode
 
 csKeyEventHelper_GetCookedCode = _cspace.csKeyEventHelper_GetCookedCode
 
-csKeyEventHelper_GetModifiers = _cspace.csKeyEventHelper_GetModifiers
-
 csKeyEventHelper_GetEventType = _cspace.csKeyEventHelper_GetEventType
 
 csKeyEventHelper_GetAutoRepeat = _cspace.csKeyEventHelper_GetAutoRepeat
@@ -7116,6 +7118,8 @@ csKeyEventHelper_GetCharacterType = _cspace.csKeyEventHelper_GetCharacterType
 csKeyEventHelper_GetEventData = _cspace.csKeyEventHelper_GetEventData
 
 csKeyEventHelper_GetModifiersBits = _cspace.csKeyEventHelper_GetModifiersBits
+
+csKeyEventHelper_GetModifiers = _cspace.csKeyEventHelper_GetModifiers
 
 csevNothing = _cspace.csevNothing
 csevKeyboard = _cspace.csevKeyboard
@@ -7397,6 +7401,7 @@ class iKeyboardDriver(iBase):
     def DoKey(*args): return _cspace.iKeyboardDriver_DoKey(*args)
     def GetModifierState(*args): return _cspace.iKeyboardDriver_GetModifierState(*args)
     def CreateKeyComposer(*args): return _cspace.iKeyboardDriver_CreateKeyComposer(*args)
+    def SynthesizeCooked(*args): return _cspace.iKeyboardDriver_SynthesizeCooked(*args)
     def __del__(self, destroy=_cspace.delete_iKeyboardDriver):
         try:
             if self.thisown: destroy(self)
