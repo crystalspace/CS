@@ -163,6 +163,7 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon ():
   dbg_max_polygons_to_draw = 2000000000;	// After 2 billion
   // polygons we give up :-)
 
+  /// caps will be read from config or reset to defaults during Initialize.
   Caps.CanClip = false;
   Caps.minTexHeight = 2;
   Caps.minTexWidth = 2;
@@ -223,6 +224,15 @@ bool csGraphics3DOGLCommon::NewInitialize (iSystem * iSys)
   m_renderstate.dither = config->GetBool ("Video.OpenGL.EnableDither", false);
   z_buf_mode = CS_ZBUF_NONE;
   width = height = -1;
+  Caps.CanClip = config->GetBool("Video.OpenGL.Caps.CanClip", false);
+  Caps.minTexHeight = config->GetInt("Video.OpenGL.Caps.minTexHeight", 2);
+  Caps.minTexWidth = config->GetInt("Video.OpenGL.Caps.minTexWidth", 2);
+  Caps.maxTexHeight = config->GetInt("Video.OpenGL.Caps.maxTexHeight", 1024);
+  Caps.maxTexWidth = config->GetInt("Video.OpenGL.Caps.maxTexWidth", 1024);
+  Caps.fog = G3DFOGMETHOD_VERTEX;
+  Caps.NeedsPO2Maps = config->GetBool("Video.OpenGL.Caps.NeedsPO2Maps", true);
+  Caps.MaxAspectRatio = config->GetInt("Video.OpenGL.Caps.MaxAspectRatio", 
+    32768);
 
   m_renderstate.alphablend = true;
   m_renderstate.mipmap = 0;
