@@ -613,7 +613,7 @@ void csSystemDriver::Help (iConfig* Config)
 	break;
       case CSVAR_FLOAT:
         sprintf (opt, "  -%s=<val>", option.name);
-	sprintf (desc, "%s (%f)", option.description, def.v.f);
+	sprintf (desc, "%s (%g)", option.description, def.v.f);
 	break;
       case CSVAR_LONG:
         sprintf (opt, "  -%s=<val>", option.name);
