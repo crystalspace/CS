@@ -26,13 +26,12 @@ class csVector;
 
 SCF_VERSION (iImageIO, 1, 0, 0);
 
-/**
- * The iImageIO interface is used to save and load graphic files.
- */
-
 #define CS_IMAGEIO_LOAD 1
 #define CS_IMAGEIO_SAVE 2
 
+/**
+ * The iImageIO interface is used to save and load graphic files.
+ */
 struct iImageIO : public iBase
 {
   struct FileFormatDescription
