@@ -19,10 +19,9 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <config.h>
-
+#include "cssysdef.h"
 #include "mayanode.h"
-#include "util/binarytree.h"
+#include "binarytree.h"
 
 
 void DAGNode::PrintStats(FILE *s,int level) 

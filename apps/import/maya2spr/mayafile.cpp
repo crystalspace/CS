@@ -23,9 +23,7 @@
 // Implementation of InputFile Class
 // Implementation of OutputFile Class
 
-#include <config.h>
-
-
+#include "cssysdef.h"
 #include "mayafile.h"
 #include <ctype.h>
 #include <errno.h>

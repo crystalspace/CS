@@ -21,8 +21,7 @@
 
 #ifndef __BINARYTREE_H__
 
-#include <config.h>
-#include "util/binarytree.h"
+#include "binarytree.h"
 #endif
 
 

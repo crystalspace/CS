@@ -3,6 +3,7 @@ The history order is reversed so that new features are at the top.
 21-Jan-2003
 	- Keith Fulton moved the maya2spr converter from the Planeshift
 	  cvs to Crystal Space.
+	- Made a makefile for maya2spr and fixed it so it compiles cleanly.
 20-Jan-2003
 	- Removed the obsolete and non-working iRenderView callback system
 	  and the associated iEngine->DrawFunc().
@@ -3183,7 +3184,7 @@ The history order is reversed so that new features are at the top.
 	- Charlls Al-Quarra did a few fixes to the OPCODE plugin.
 	- Charlls renormalized the pair of csReversibleTransform with the
 	  *trans1 / *trans2 trick.
-	- Daniel Duphrey fixed some reference counting issues in ODE
+	- Daniel Duhprey fixed some reference counting issues in ODE
 	  dynamics plugin.
 	- Daniel also modified mmapio.h: fixed the parameters into mmap
 	  (should have *something* in the flags. MAP_PRIVATE seems most
@@ -3209,7 +3210,7 @@ The history order is reversed so that new features are at the top.
 	- Fixed a few warnings in opcode plugin. Also replace fabsf() with
 	  fabs() for more portability.
 2-Sep-2002
-	- Daniel Duphrey did the following:
+	- Daniel Duhprey did the following:
 	    - Modified scf.cfg to recognize terrbig plugin.
 	    - Terrbig specific mesh information.
 	    - Added workable/compilable copy of terrbig.
@@ -3334,7 +3335,7 @@ The history order is reversed so that new features are at the top.
 	      w/ fonts with higher descends aren't too far apart).
 	    - Slight change of failure report when iWin32Assistant couldn't be
 	      registered.
-	- Daniel Duphrey fixed terrfldr.cpp to change csPtr<iFile> to the
+	- Daniel Duhprey fixed terrfldr.cpp to change csPtr<iFile> to the
 	  more correct csPtr<iImage>.
 	- Matthias Braun did the following:
 	    - Converted soundloader to use the new csPtr.
@@ -3892,7 +3893,7 @@ The history order is reversed so that new features are at the top.
 	      content changed).
 	- Philip Wyett did the following:
 	    - Fixed include in ms2spr.cpp for the 3rd and LAST time!!!
-	- Daniel Duphrey added MeshCylinder collisions to the ODE dynamics
+	- Daniel Duhprey added MeshCylinder collisions to the ODE dynamics
 	  plugin.
 	- Removed support/doom2cs again. This doom2cs utility can now be
 	  found at ftp://sunsite.dk/projects/crystal/contrib/doom2cs.zip

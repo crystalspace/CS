@@ -61,6 +61,7 @@ protected:
     };
 
 public:
+    virtual ~DAGNode () { }
 
     virtual const char *Parent() { return parentname; };
 
