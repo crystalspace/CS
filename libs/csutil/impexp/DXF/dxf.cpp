@@ -92,8 +92,8 @@ int converter::dxf_read ( FILE *filein ) {
   int   count;
   float cvec[3];
   int   icor3;
-  char  input1[MAX_INPUT];
-  char  input2[MAX_INPUT];
+  char  input1[MAX_INCHARS];
+  char  input2[MAX_INCHARS];
   float rval;
   int   width;
 /* 
@@ -106,7 +106,7 @@ int converter::dxf_read ( FILE *filein ) {
   INPUT1 should contain a single integer, which tells what INPUT2
   will contain.
 */
-    if ( fgets ( input1, MAX_INPUT, filein ) == NULL ) {
+    if ( fgets ( input1, MAX_INCHARS, filein ) == NULL ) {
       break;
     }
 
@@ -119,7 +119,7 @@ int converter::dxf_read ( FILE *filein ) {
 /*
   Read the second line, and interpret it according to the code.
 */
-    if ( fgets ( input2, MAX_INPUT, filein ) == NULL ) {
+    if ( fgets ( input2, MAX_INCHARS, filein ) == NULL ) {
       break;
     }
 

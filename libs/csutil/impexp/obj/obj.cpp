@@ -81,8 +81,8 @@ int converter::obj_read ( FILE *filein ) {
   float r1;
   float r2;
   float r3;
-  char  token[MAX_INPUT];
-  char  token2[MAX_INPUT];
+  char  token[MAX_INCHARS];
+  char  token2[MAX_INCHARS];
   int   width;
 /* 
   Initialize. 
@@ -91,7 +91,7 @@ int converter::obj_read ( FILE *filein ) {
 /* 
   Read the next line of the file into INPUT. 
 */
-  while ( fgets ( input, MAX_INPUT, filein ) != NULL ) {
+  while ( fgets ( input, MAX_INCHARS, filein ) != NULL ) {
 
     num_text = num_text + 1;
 /* 
@@ -248,7 +248,7 @@ int converter::obj_read ( FILE *filein ) {
 */
         if ( *next2 == '/' ) {
 
-          for ( next3 = next2 + 1; next3 < token2 + MAX_INPUT; next3++ ) {
+          for ( next3 = next2 + 1; next3 < token2 + MAX_INCHARS; next3++ ) {
 
             if ( *next3 == '/' ) {
               next3 = next3 + 1;

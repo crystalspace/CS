@@ -59,7 +59,7 @@ int converter::vla_read ( FILE *filein ) {
   float r2;
   float r3;
   float temp[3];
-  char  token[MAX_INPUT];
+  char  token[MAX_INCHARS];
   int   width;
 /*
   Initialize. 
@@ -72,7 +72,7 @@ int converter::vla_read ( FILE *filein ) {
 /* 
   Read the next line of the file into INPUT. 
 */
-  while ( fgets ( input, MAX_INPUT, filein ) != NULL ) {
+  while ( fgets ( input, MAX_INCHARS, filein ) != NULL ) {
 
     num_text = num_text + 1;
 /* 

@@ -1334,7 +1334,7 @@ int converter::interact ( ) {
   fprintf ( logfile,  "\n" );
   fprintf ( logfile,  "Enter command (H for help)\n" );
 
-  while ( fgets ( input, MAX_INPUT, stdin ) != NULL ) {
+  while ( fgets ( input, MAX_INCHARS, stdin ) != NULL ) {
 /*  
   Advance to the first nonspace character in INPUT. 
 */

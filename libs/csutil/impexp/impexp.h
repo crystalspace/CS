@@ -59,7 +59,7 @@
 #define MAX_COLOR 1000
 #define MAX_COR3 5000
 #define MAX_FACE 10000
-#define MAX_INPUT 256
+#define MAX_INCHARS 256
 #define MAX_LEVEL 10
 #define MAX_LINE 1500
 #define MAX_ORDER 10
@@ -159,8 +159,8 @@ float  face_normal[3][MAX_FACE];
 int    face_object[MAX_FACE];
 int    face_order[MAX_FACE];
 int    face_smooth[MAX_FACE];
-char   input[MAX_INPUT];
-char   levnam[MAX_LEVEL][MAX_INPUT];
+char   input[MAX_INCHARS];
+char   levnam[MAX_LEVEL][MAX_INCHARS];
 int    line_dex[MAX_LINE];
 int    line_mat[MAX_LINE];
 int    list[MAX_COR3];

@@ -59,12 +59,12 @@ int converter::stla_read ( FILE *filein ) {
   float r3;
   float r4;
   float temp[3];
-  char  token[MAX_INPUT];
+  char  token[MAX_INCHARS];
   int   width;
 /*
   Read the next line of the file into INPUT. 
 */
-  while ( fgets ( input, MAX_INPUT, filein ) != NULL ) {
+  while ( fgets ( input, MAX_INCHARS, filein ) != NULL ) {
 
     num_text = num_text + 1;
 /*
@@ -101,14 +101,14 @@ int converter::stla_read ( FILE *filein ) {
         face_normal[2][num_face] = r3;
       }
 
-      fgets ( input, MAX_INPUT, filein );
+      fgets ( input, MAX_INCHARS, filein );
       num_text = num_text + 1;
 
       ivert = 0;
 
       for ( ;; ) {
 
-        fgets ( input, MAX_INPUT, filein );
+        fgets ( input, MAX_INCHARS, filein );
         num_text = num_text + 1;
 
         count = sscanf ( input, "%*s %e %e %e", &r1, &r2, &r3 );
@@ -154,7 +154,7 @@ int converter::stla_read ( FILE *filein ) {
         ivert = ivert + 1;
       } 
 
-      fgets ( input, MAX_INPUT, filein );
+      fgets ( input, MAX_INCHARS, filein );
       num_text = num_text + 1;
 
       if ( num_face < MAX_FACE ) {

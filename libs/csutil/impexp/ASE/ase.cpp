@@ -68,10 +68,10 @@ int converter::ase_read ( FILE *filein ) {
   float rval;
   float temp;
   int   width;
-  char  word[MAX_INPUT];
-  char  word1[MAX_INPUT];
-  char  word2[MAX_INPUT];
-  char  wordm1[MAX_INPUT];
+  char  word[MAX_INCHARS];
+  char  word1[MAX_INCHARS];
+  char  word2[MAX_INCHARS];
+  char  wordm1[MAX_INCHARS];
   float x;
   float y;
   float z;
@@ -90,7 +90,7 @@ int converter::ase_read ( FILE *filein ) {
 */
   while ( TRUE ) {
 
-    if ( fgets ( input, MAX_INPUT, filein ) == NULL ) {
+    if ( fgets ( input, MAX_INCHARS, filein ) == NULL ) {
       break;
     }
 

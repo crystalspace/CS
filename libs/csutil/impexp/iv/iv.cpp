@@ -80,9 +80,9 @@ int converter::iv_read ( FILE *filein ) {
   int   result;
   float rval;
   int   width;
-  char  word[MAX_INPUT];
-  char  word1[MAX_INPUT];
-  char  wordm1[MAX_INPUT];
+  char  word[MAX_INCHARS];
+  char  word1[MAX_INCHARS];
+  char  wordm1[MAX_INCHARS];
 
   icface = 0;
   inormface = 0;
@@ -108,7 +108,7 @@ int converter::iv_read ( FILE *filein ) {
 */
   while ( TRUE ) {
 
-    if ( fgets ( input, MAX_INPUT, filein ) == NULL ) {
+    if ( fgets ( input, MAX_INCHARS, filein ) == NULL ) {
       break;
     }
 
@@ -136,12 +136,12 @@ int converter::iv_read ( FILE *filein ) {
     null_index = i;
 
     i = 0;
-    while ( input[i] != '\0' && i < MAX_INPUT ) {
+    while ( input[i] != '\0' && i < MAX_INCHARS ) {
 
       if ( input[i] == '[' || input[i] == ']' || 
            input[i] == '{' || input[i] == '}' ) {
 
-        result = char_pad ( &i, &null_index, input, MAX_INPUT );
+        result = char_pad ( &i, &null_index, input, MAX_INCHARS );
         if ( result == ERROR ) {
           break;
         }

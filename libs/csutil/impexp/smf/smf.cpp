@@ -71,8 +71,8 @@ int converter::smf_read ( FILE *filein ) {
   float r1;
   float r2;
   float r3;
-  char  token[MAX_INPUT];
-  char  token2[MAX_INPUT];
+  char  token[MAX_INCHARS];
+  char  token2[MAX_INCHARS];
   int   vert_base;
   int   width;
 
@@ -80,7 +80,7 @@ int converter::smf_read ( FILE *filein ) {
 /* 
   Read the next line of the file into INPUT. 
 */
-  while ( fgets ( input, MAX_INPUT, filein ) != NULL ) {
+  while ( fgets ( input, MAX_INCHARS, filein ) != NULL ) {
 
     num_text = num_text + 1;
 /* 
