@@ -975,7 +975,7 @@ void CalcBBoxFromBoxes (const csBox3& box1, const csBox3& box2,
       csVector3 v = v2-v1;
       float dist = -(v1[plane_nr] - plane_pos) / v[plane_nr];
       csVector3 isect = v1 + dist*v;
-      csVector2 v2d(0);
+      csVector2 v2d(0,0);
       switch (plane_nr)
       {
         case PLANE_X: v2d.Set (isect.y, isect.z); break;
