@@ -367,8 +367,7 @@ void *scfCreateInstance (const char *iClassID, const char *iInterfaceID,
     if (object)
     {
       instance = object->QueryInterface (iInterfaceID, iVersion);
-      if (!instance)
-        object->DecRef ();
+      object->DecRef ();
     }
   } /* endif */
 

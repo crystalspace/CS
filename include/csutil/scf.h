@@ -95,7 +95,7 @@ public:									\
  * to the parent object.
  */
 #define CONSTRUCT_IBASE(Parent)						\
-  scfRefCount = 0; scfParent = Parent;
+  scfRefCount = 0; scfParent = Parent; IncRef ();
 
 /**
  * The CONSTRUCT_EMBEDDED_IBASE macro should be invoked inside the

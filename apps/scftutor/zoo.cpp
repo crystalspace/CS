@@ -53,10 +53,6 @@ void Clone (iBase *iObject)
     return;
   }
 
-  // Since the refcount of a object returned by iFactory::CreateInstance
-  // is zero, we should increment it
-  newobj->IncRef ();
-
   // Check if the object supports the iName interface
   iName *name = QUERY_INTERFACE (newobj, iName);
   if (name)
