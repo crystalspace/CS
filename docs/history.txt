@@ -81,6 +81,8 @@ chronological order.
 	- Eric Sunshine fixed MacOS/X defaultsconfig.{mm|h} so that it can be
 	  built on pre-10.2 machines where -[NSUserDefaults
 	  objectIsForcedForKey:inDomain:] is not present.
+	- Eric Sunshine eliminated signed versus unsigned compilation warning
+	  in cskeyacc.cpp.
 20-Oct-2003
         - Philip Wyett added 'joytest' to CS/ root .cvsignore file.
 	- Jorrit added thing.cfg.

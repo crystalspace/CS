@@ -27,7 +27,7 @@
 struct csAccElement
 {
   utf32_char Key;
-  int Shifts;
+  unsigned int Shifts;
   csEvent Event;
 };
 
