@@ -7,8 +7,12 @@
 <p>Disclaimer: Don't build a new game! Join the crew at <a href="http://www.planeshift.it">www.planeshift.it</a> 
   to build THE game :)</p>
 <h2>Content</h2>
-<p><b>Level Exporter </b>(Version 39)<br>
+<p><b>Level Exporter </b>(Version 41)<br>
   Used to export complete maps including buildings, skybox, lights.</p>
+<p><b>Sanity Check </b>(Version 5)<br>
+  Once a separate script, now called by level exporter. It checks the level for 
+  invalid polygons, such as lines. It has the option to fix the meshes by deleting 
+  those invalid polygons.</p>
 <p><b>Lights Exporter</b> (Version 05)<br>
   This script is for PS engine only, can't work in CS walktest. It exports the 
   lights values. One set of values is exported for each hour of the day. PlaneShift 
@@ -33,11 +37,10 @@
 <h2>Features</h2>
 <p><br>
   The exporter supports ambient <a href="light.htm">lights</a> (defined in the 
-  file properties ) and omni lights , no spot or any directional lights.<br>
+  file properties ) and omni lights, no spot or any directional lights.<br>
   For faster rendering you can use <a href="thinggenmesh.htm#genmeshs" target="text">genmeshes</a> 
   and <a href="thinggenmesh.htm#thingmeshs" target="text">thingmeshes </a> , who 
   act like instances in 3ds max.<br>
-  The Exporter can also export <a href="character.htm">sprites</a>.<br>
   For higher realism you can use the 24 or 48 hours <a href="light.htm">light</a> 
   system ( 1 frame/hour or 1frame/hour for sun and rain) <br>
   You can use helpers for creating particle <a href="emitter.htm">emitters</a> 
@@ -45,6 +48,7 @@
   Both Standard Materials and Multi/Sub Materials are supported <br>
   And obviously you can export meshes<br>
   The exporter supports both right-handed and left-handed objects<br>
+  The Exporter can also export <a href="exportsprite.htm">sprites</a>. <br>
 </p>
 <h2>Quick Guide</H2>
 <br>
