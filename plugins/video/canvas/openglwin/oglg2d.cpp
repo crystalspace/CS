@@ -28,35 +28,35 @@
 
 void sys_fatalerror(char *str, HRESULT hRes = S_OK)
 {
-	LPVOID lpMsgBuf;
-	char* szMsg;
-	char szStdMessage[] = "Last Error: ";
-	if (FAILED(hRes))
-	{
-		DWORD dwResult;
-		dwResult = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL,
-								 hRes,  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
-							     (LPTSTR) &lpMsgBuf, 0, NULL );
-	
-		if (dwResult != 0)
-		{
-			szMsg = new char[strlen((const char*)lpMsgBuf) + strlen(str) + strlen(szStdMessage) + 1];
-			strcpy( szMsg, str );
-			strcat( szMsg, szStdMessage );
-			strcat( szMsg, (const char*)lpMsgBuf );
-			
-			LocalFree( lpMsgBuf );
-			
-			MessageBox (NULL, szMsg, "Fatal Error in OpenGL2D.dll", MB_OK);
-			delete szMsg;
+  LPVOID lpMsgBuf;
+  char* szMsg;
+  char szStdMessage[] = "Last Error: ";
+  if (FAILED(hRes))
+  {
+    DWORD dwResult;
+    dwResult = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL,
+                 hRes,  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
+                   (LPTSTR) &lpMsgBuf, 0, NULL );
+  
+    if (dwResult != 0)
+    {
+      szMsg = new char[strlen((const char*)lpMsgBuf) + strlen(str) + strlen(szStdMessage) + 1];
+      strcpy( szMsg, str );
+      strcat( szMsg, szStdMessage );
+      strcat( szMsg, (const char*)lpMsgBuf );
+      
+      LocalFree( lpMsgBuf );
+      
+      MessageBox (NULL, szMsg, "Fatal Error in OpenGL2D.dll", MB_OK);
+      delete szMsg;
 
-			exit(1);
-		}
-	}
+      exit(1);
+    }
+  }
 
-	MessageBox(NULL, str, "Fatal Error in OpenGL2D.dll", MB_OK);
-	
-	exit(1);
+  MessageBox(NULL, str, "Fatal Error in OpenGL2D.dll", MB_OK);
+  
+  exit(1);
 }
 
 /////The 2D Graphics Driver//////////////
@@ -68,8 +68,6 @@ BEGIN_INTERFACE_TABLE(csGraphics2DOpenGL)
 END_INTERFACE_TABLE()
 
 IMPLEMENT_UNKNOWN_NODELETE(csGraphics2DOpenGL)
-csGraphics2DOpenGLFontServer *csGraphics2DOpenGL::LocalFontServer = NULL;
-OpenGLTextureCache *csGraphics2DOpenGL::texture_cache = NULL;
 
 ///// Windowed-mode palette stuff //////
 
@@ -158,7 +156,7 @@ void CreateIdentityPalette(RGBpaletteEntry *p)
 }
 
 csGraphics2DOpenGL::csGraphics2DOpenGL(ISystem* piSystem, bool bUses3D) : 
-                   csGraphics2D (piSystem),
+                   csGraphics2DGLCommon (piSystem),
                    m_hWnd(NULL),
                    m_bDisableDoubleBuffer(false),
                    m_bPaletteChanged(false),
@@ -172,19 +170,18 @@ csGraphics2DOpenGL::csGraphics2DOpenGL(ISystem* piSystem, bool bUses3D) :
   // QI for IWin32SystemDriver //
   ddrval = piSystem->QueryInterface(IID_IWin32SystemDriver, (void**)&m_piWin32System);
   if (FAILED(ddrval))
-  	  sys_fatalerror("csGraphics2DDDraw3::Open(QI) -- ISystem passed does not support IWin32SystemDriver.", ddrval);
+      sys_fatalerror("csGraphics2DDDraw3::Open(QI) -- ISystem passed does not support IWin32SystemDriver.", ddrval);
 }
 
 csGraphics2DOpenGL::~csGraphics2DOpenGL(void)
 {
   FINAL_RELEASE(m_piWin32System);
-  Close();
   m_nGraphicsReady=0;
 }
 
 void csGraphics2DOpenGL::Initialize(void)
 {
-  csGraphics2D::Initialize();
+  csGraphics2DGLCommon::Initialize();
   
   // Get the creation parameters //
   m_piWin32System->GetInstance(&m_hInstance);
@@ -229,9 +226,6 @@ void csGraphics2DOpenGL::Initialize(void)
     sys_fatalerror("Only support 8, 16 or 32 bits color depth");
   
   SysPrintf (MSG_INITIALIZATION, "Using %d bits per pixel (%d color mode).\n", Depth, 1 << Depth);
-
-  DrawPixel = DrawPixelGL;   WriteChar = WriteCharGL;
-  GetPixelAt = GetPixelAtGL; DrawSprite = DrawSpriteGL;
 }
 
 void csGraphics2DOpenGL::CalcPixelFormat ()
@@ -274,14 +268,14 @@ bool csGraphics2DOpenGL::Open(char *Title)
   DEVMODE dmode;
   LONG ti;
 
-  if (!csGraphics2D::Open (Title))
+  if (!csGraphics2DGLCommon::Open(Title))
     return false;
   
   // create the window.
   DWORD exStyle = 0;
   DWORD style = WS_POPUP;// | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
   if (!FullScreen)
-	  style |= WS_CAPTION;
+    style |= WS_CAPTION;
   if (FullScreen) 
   {
     ChangeDisplaySettings(NULL,0);
@@ -349,29 +343,6 @@ bool csGraphics2DOpenGL::Open(char *Title)
 
   m_bPaletteChanged = false;
 
-  if (LocalFontServer == NULL)
-  {
-       LocalFontServer = new csGraphics2DOpenGLFontServer(&FontList[0]);
-       for (int fontindex=1; 
-       		fontindex < 8;
-		fontindex++)
-	   LocalFontServer->AddFont(FontList[fontindex]);
-  }
-
-  if (texture_cache == NULL)
-  {
-    CHK (texture_cache = new OpenGLTextureCache(1<<24,24));
-  }
-
-  if (glGetString(GL_RENDERER))
-    SysPrintf (MSG_INITIALIZATION, "OpenGL Renderer is %s\n", glGetString(GL_RENDERER) );
-  else
-    SysPrintf (MSG_INITIALIZATION, "No OpenGL renderer found!\n");
-  if (glGetString(GL_VERSION))
-    SysPrintf (MSG_INITIALIZATION, "OpenGL Version is %s\n", glGetString(GL_VERSION) );
-  else
-    SysPrintf (MSG_INITIALIZATION, "No OpenGL version found!\n");
-  
   return true;
 }
 
@@ -478,122 +449,6 @@ bool csGraphics2DOpenGL::SetMouseCursor (int iShape, csTextureHandle* iBitmap)
 {
   (void)iShape; (void)iBitmap;
   return false;
-}
-
-void csGraphics2DOpenGL::setGLColorfromint(int color)
-{
-  switch (pfmt.PixelBytes)
-  {
-  case 1: // paletted colors
-    glColor3i(Palette[color].red,
-    		Palette[color].green,
-		Palette[color].blue);
-    break;
-  case 2: // 16bit color
-  case 4: // truecolor
-    glColor3f( ( (color & pfmt.RedMask) >> pfmt.RedShift )     / (float)pfmt.RedBits,
-               ( (color & pfmt.GreenMask) >> pfmt.GreenShift ) / (float)pfmt.GreenBits,
-               ( (color & pfmt.BlueMask) >> pfmt.BlueShift )   / (float)pfmt.BlueBits);
-    break;
-  }
-}
-void csGraphics2DOpenGL::DrawLine (int x1, int y1, int x2, int y2, int color)
-{
-  glDisable (GL_TEXTURE_2D);
-  glDisable (GL_BLEND);
-  glBegin (GL_LINES);
-  setGLColorfromint(color);
-  glVertex2i (x1, Height-y1-1);
-  glVertex2i (x2, Height-y2-1);
-  glEnd ();
-}
-
-void csGraphics2DOpenGL::DrawHorizLine (int x1, int x2, int y, int color)
-{
-  glDisable (GL_TEXTURE_2D);
-  glDisable (GL_BLEND);
-  glBegin (GL_LINES);
-  setGLColorfromint(color);
-  glVertex2i (x1, Height-y-1);
-  glVertex2i (x2, Height-y-1);
-  glEnd ();
-}
-
-void csGraphics2DOpenGL::DrawPixelGL (int x, int y, int color)
-{
-  // prepare for 2D drawing--so we need no fancy GL effects!
-  glDisable (GL_TEXTURE_2D);
-  glDisable (GL_BLEND);
-  glDisable (GL_DEPTH_TEST);
-  setGLColorfromint(color);
-  glBegin (GL_POINTS);
-  glVertex2i (x, Height-y-1);
-  glEnd ();
-}
-
-void csGraphics2DOpenGL::WriteCharGL (int x, int y, int fg, int bg, char c)
-{
-  // prepare for 2D drawing--so we need no fancy GL effects!
-  glDisable (GL_TEXTURE_2D);
-  glDisable (GL_BLEND);
-  glDisable (GL_DEPTH_TEST);
-  
-  setGLColorfromint(fg);
-
-  // FIXME: without the 0.5 shift rounding errors in the
-  // openGL renderer can misalign text!
-  // maybe we should modify the glOrtho() in glrender to avoid
-  // having to does this fractional shift?
-  //glRasterPos2i (x, Height-y-1-FontList[Font].Height);
-  glRasterPos2f (x+0.5, Height-y-0.5-FontList[Font].Height);
-
-  LocalFontServer->WriteCharacter(c,Font);
-}
-
-void csGraphics2DOpenGL::DrawSpriteGL (ITextureHandle *hTex, int sx, int sy,
-  int sw, int sh, int tx, int ty, int tw, int th)
-{
-  texture_cache->Add (hTex);
-
-  // cache the texture if we haven't already.
-  csTextureMMOpenGL* txt_mm = (csTextureMMOpenGL*)GetcsTextureMMFromITextureHandle (hTex);
-
-  HighColorCache_Data *cachedata;
-  cachedata = txt_mm->get_hicolorcache ();
-  GLuint texturehandle = *( (GLuint *) (cachedata->pData) );
-
-  glShadeModel(GL_FLAT);
-  glEnable(GL_TEXTURE_2D);
-  glDisable (GL_BLEND);
-  glDisable (GL_DEPTH_TEST);
-  glBindTexture(GL_TEXTURE_2D,texturehandle);
-  
-  int bitmapwidth=0, bitmapheight=0;
-  hTex->GetBitmapDimensions(bitmapwidth,bitmapheight);
-
-  // convert texture coords given above to normalized (0-1.0) texture coordinates
-  float ntx1,nty1,ntx2,nty2;
-  ntx1 = tx/bitmapwidth;
-  ntx2 = (tx+tw)/bitmapwidth;
-  nty1 = ty/bitmapheight;
-  nty2 = (ty+th)/bitmapheight;
-
-  // draw the bitmap
-  glBegin(GL_TRIANGLE_FAN);
-  glTexCoord2f(ntx1,nty1);
-  glVertex2i(sx,Height-sy-1);
-  glTexCoord2f(ntx2,nty1);
-  glVertex2i(sx+sw,Height-sy-1);
-  glTexCoord2f(ntx2,nty2);
-  glVertex2i(sx+sw,Height-sy-sh-1);
-  glTexCoord2f(ntx1,nty2);
-  glVertex2i(sx,Height-sy-sh-1);
-  glEnd();
-}
-
-unsigned char* csGraphics2DOpenGL::GetPixelAtGL (int /*x*/, int /*y*/)
-{
-  return NULL;
 }
 
 bool csGraphics2DOpenGL::SetMousePosition (int x, int y)

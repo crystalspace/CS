@@ -24,7 +24,9 @@
 #include "cs2d/common/graph2d.h"
 #include "cssys/win32/win32itf.h"
 #include "cs2d/openglwin/xsysg2d.h"
-#include "cs2d/openglwin/gl2d_font.h"
+#include "cs2d/openglcommon/gl2d_font.h"
+#include "cs2d/openglcommon/glcommon2d.h"
+
 
 class csTextureHandle;
 class csGraphics2DOpenGLFontServer;
@@ -51,7 +53,7 @@ public:
 };
 
 /// Windows version.
-class csGraphics2DOpenGL : public csGraphics2D
+class csGraphics2DOpenGL : public csGraphics2DGLCommon
 {
   friend class csGraphics3DOpenGL;
 
@@ -59,11 +61,6 @@ private:
   // Calculate the OpenGL pixel format.
   void CalcPixelFormat ();
 
-  static csGraphics2DOpenGLFontServer *LocalFontServer;
-
-  // my own private texture cache--for sprites!
-  static OpenGLTextureCache *texture_cache; 
- 
 public:
   csGraphics2DOpenGL(ISystem* piSystem, bool bUses3D);
   virtual ~csGraphics2DOpenGL(void);
@@ -88,20 +85,6 @@ public:
   virtual bool DoubleBuffer ();
 
   int m_nGraphicsReady;
-
-  /// Draw a line
-  virtual void DrawLine (int x1, int y1, int x2, int y2, int color);
-  /// Draw a horizontal line
-  virtual void DrawHorizLine (int x1, int x2, int y, int color);
-  /// Draw a pixel
-  static void DrawPixelGL (int x, int y, int color);
-  /// Write a single character
-  static void WriteCharGL (int x, int y, int fg, int bg, char c);
-  /// Draw a 2D sprite
-  static void DrawSpriteGL (ITextureHandle *hTex, int sx, int sy, int sw, int sh,
-    int tx, int ty, int tw, int th);
-
-  static void setGLColorfromint(int color);
 
   /**
    * Get address of video RAM at given x,y coordinates.
