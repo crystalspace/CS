@@ -436,10 +436,13 @@ static inline void* fast_mem_copy (void *dest, const void *src, int count)
   #define main csMain
 #endif
 
+// just to avoid windows.h inclusion
+#define csSW_SHOWNORMAL 1
+
 #ifdef __CYGWIN32__
 #define CS_IMPLEMENT_PLATFORM_APPLICATION \
 HINSTANCE ModuleHandle = NULL; \
-int ApplicationShow = SW_SHOWNORMAL;
+int ApplicationShow = csSW_SHOWNORMAL;
 #else
 
 #if defined(COMP_BC)
@@ -453,7 +456,7 @@ int ApplicationShow = SW_SHOWNORMAL;
 #define CS_IMPLEMENT_PLATFORM_APPLICATION \
 int main (int argc, char* argv[]); \
 HINSTANCE ModuleHandle = NULL; \
-int ApplicationShow = 1/*SW_SHOWNORMAL*/; \
+int ApplicationShow = csSW_SHOWNORMAL; \
 int WINAPI WinMain (HINSTANCE hApp, HINSTANCE prev, LPSTR cmd, int show) \
 { \
   ModuleHandle = hApp; \
