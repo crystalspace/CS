@@ -100,20 +100,17 @@ public:
     virtual void Invalidate(csRect area);
 
     /// Get this component's frame
-    virtual csRect& Frame()
-    { return frame; }
+    virtual csRect& Frame();
 
     /// Returns the named TYPE of the component, like "Radio Button", etc.
-    virtual char *Type()
-    { return "Component"; }
+    virtual char *Type();
 
     /// Returns true if this window overlaps the given rect.
     virtual bool Overlaps(csRect &r);
 
     /// Returns the state of the hidden flag
-    virtual bool isHidden()
-    { return hidden; }
-
+    virtual bool isHidden();
+    
     /// Hides a component
     virtual void Hide();
 
@@ -121,9 +118,8 @@ public:
     virtual void Show();
 
     /// Get's the unique id of this component.
-    virtual unsigned long GetID()
-    { return id; }
-
+    virtual unsigned long GetID();
+    
     /// Set's the unique id of this component. Note: only to be used by window manager.
     virtual void SetID(unsigned long _id);
 
@@ -151,15 +147,13 @@ public:
     virtual iAwsComponent *GetChildAt(int i);
     
     /// Returns true if this component has children
-    virtual bool HasChildren()
-    { return children!=NULL; }
+    virtual bool HasChildren();
 
     /** Get's this components idea of the window manager.  
       * Should be used internally by the component ONLY,
       * or by embedding classes. */
-    iAws *WindowManager()
-    { return wmgr; }
-
+    iAws *WindowManager();
+    
 public:
     /// Triggered when the component needs to draw
     virtual void OnDraw(csRect clip);

@@ -25,6 +25,10 @@ awsCmdButton::~awsCmdButton()
 {
 }
 
+char *
+awsCmdButton::Type() 
+{ return "Command Button"; }
+
 bool
 awsCmdButton::Setup(iAws *_wmgr, awsComponentNode *settings)
 {

@@ -223,13 +223,11 @@ public:
     virtual void SetDefaultContext(iEngine* engine, iTextureManager* txtmgr);
 
     /// Get the iGraphics2D interface so that components can use it.
-    virtual iGraphics2D *G2D() 
-    { return ptG2D; }
-
+    virtual iGraphics2D *G2D(); 
+ 
     /// Get the iGraphics3D interface so that components can use it.
-    virtual iGraphics3D *G3D() 
-    { return ptG3D; }
-
+    virtual iGraphics3D *G3D(); 
+ 
     /// Dispatches events to the proper components
     virtual bool HandleEvent(iEvent&);
     

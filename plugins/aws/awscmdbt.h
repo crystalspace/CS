@@ -63,7 +63,7 @@ public:
     virtual bool Setup(iAws *wmgr, awsComponentNode *settings);
 
     /// Returns the named TYPE of the component, like "Radio Button", etc.
-    virtual char *Type() { return "Command Button"; }
+    virtual char *Type();
 
 public:
     SCF_DECLARE_IBASE;

@@ -712,6 +712,14 @@ awsManager::RegisterCommonComponents()
   //  takes care of all the implementation details.  There's nothing else you need to do.
   (void)new awsCmdButtonFactory(this);
 }
+
+iGraphics2D *
+awsManager::G2D() 
+{ return ptG2D; }
+
+iGraphics3D *
+awsManager::G3D() 
+{ return ptG3D; }
     
 
 //// Canvas stuff  //////////////////////////////////////////////////////////////////////////////////

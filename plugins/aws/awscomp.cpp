@@ -35,12 +35,33 @@ awsComponent::~awsComponent()
    }
 }
 
+csRect& 
+awsComponent::Frame()
+{ return frame; }
+
+char *
+awsComponent::Type()
+{ return "Component"; }
+
+bool 
+awsComponent::isHidden()
+{ return hidden; }
+
+unsigned long 
+awsComponent::GetID()
+{ return id; }
+
 void 
 awsComponent::SetID(unsigned long _id)
-{
-  id = _id;
-}
-    
+{ id = _id; }
+
+bool 
+awsComponent::HasChildren()
+{ return children!=NULL; }
+   
+iAws *
+awsComponent::WindowManager()
+{ return wmgr; }
     
 /**
  *  This function is normally called automatically by the window manager.  You may call it manually if you wish, but
