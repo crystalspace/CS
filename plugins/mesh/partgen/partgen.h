@@ -106,7 +106,6 @@ protected:
   int VertexCount;
   int TriangleCount;
   csVector3* vertices;
-  csTriangle* triangles;
   csVector2* texels;
   csColor* colors;
 

@@ -22,6 +22,7 @@
 #include "csgeom/matrix3.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/box.h"
+#include "cstool/rbuflock.h"
 #include "partgen.h"
 #include "imesh/object.h"
 #include "iengine/mesh.h"
@@ -97,7 +98,6 @@ csParticleSystem::csParticleSystem (iObjectRegistry* object_reg,
 
   vertices = 0;
   texels = 0;
-  triangles = 0;
   colors = 0;
   part_sides = 0;
 
@@ -110,7 +110,6 @@ csParticleSystem::~csParticleSystem()
 #ifdef CS_USE_NEW_RENDERER 
   delete[] vertices;
   delete[] texels;
-  delete[] triangles;
   delete[] colors;
 #endif
 
@@ -142,24 +141,10 @@ void csParticleSystem::SetupBuffers (int part_sides)
 
   delete[] texels;
   texels = new csVector2 [VertexCount];
-  delete[] triangles;
-  triangles = new csTriangle [TriangleCount];
   delete[] colors;
   colors = new csColor [VertexCount];
   delete[] vertices;
   vertices = new csVector3 [VertexCount];
-
-  int i;
-  csTriangle* tri = triangles;
-  for (i = 0 ; i < number ; i++)
-  {
-    // fill the triangle table
-    int j;
-    for (j = 2 ; j < part_sides ; j++)
-    {
-      *tri++ = csTriangle (i*part_sides+0, i*part_sides+j-1, i*part_sides+j);
-    }
-  }
 
   csStringID vertex_name, texel_name, normal_name, color_name, index_name;
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
@@ -171,22 +156,39 @@ void csParticleSystem::SetupBuffers (int part_sides)
   index_name = strings->Request ("indices");
 
   vertex_buffer = g3d->CreateRenderBuffer (
-        sizeof (csVector3)*VertexCount, CS_BUF_STATIC, 
+        sizeof (csVector3)*VertexCount, CS_BUF_DYNAMIC, 
         CS_BUFCOMP_FLOAT, 3, false);
   texel_buffer = g3d->CreateRenderBuffer (
-        sizeof (csVector2)*VertexCount, CS_BUF_STATIC, 
+        sizeof (csVector2)*VertexCount, CS_BUF_DYNAMIC, 
         CS_BUFCOMP_FLOAT, 2, false);
 #if 0
   normal_buffer = g3d->CreateRenderBuffer (
-        sizeof (csVector3)*VertexCount, CS_BUF_STATIC,
+        sizeof (csVector3)*VertexCount, CS_BUF_DYNAMIC,
         CS_BUFCOMP_FLOAT, 3, false);
 #endif
   color_buffer = g3d->CreateRenderBuffer (
-        sizeof (csColor)*VertexCount, CS_BUF_STATIC,
+        sizeof (csColor)*VertexCount, CS_BUF_DYNAMIC,
         CS_BUFCOMP_FLOAT, 3, false);
   index_buffer = g3d->CreateRenderBuffer (
         sizeof (unsigned int)*TriangleCount*3, CS_BUF_STATIC,
         CS_BUFCOMP_UNSIGNED_INT, 1, true);
+
+  {
+    csRenderBufferLock<csTriangle> trianglesLock (index_buffer);
+
+    int i;
+    csTriangle* tri = trianglesLock.Lock(); 
+    for (i = 0 ; i < number ; i++)
+    {
+      // fill the triangle table
+      int j;
+      for (j = 2 ; j < part_sides ; j++)
+      {
+	*tri++ = csTriangle (i*part_sides+0, i*part_sides+j-1, i*part_sides+j);
+      }
+    }
+  }
+
   csShaderVariable *sv;
   sv = svcontext->GetVariableAdd (vertex_name);
   sv->SetValue (vertex_buffer);
@@ -364,7 +366,7 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
 						  uint32 frustum_mask)
 {
 #ifdef CS_USE_NEW_RENDERER
-  if (!DrawTest (rview, movable, frustum_mask))
+  if ((sprite2ds.Length() == 0) || !DrawTest (rview, movable, frustum_mask))
   {
     n = 0;
     return 0;
@@ -406,8 +408,8 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
   vertex_buffer->CopyToBuffer (vertices, sizeof (csVector3) * VertexCount);
   texel_buffer->CopyToBuffer (texels, sizeof (csVector2) * VertexCount);
   color_buffer->CopyToBuffer (colors, sizeof (csColor) * VertexCount);
-  index_buffer->CopyToBuffer (triangles,
-      	sizeof (unsigned int) * TriangleCount *3);
+  //index_buffer->CopyToBuffer (triangles,
+  //    	sizeof (unsigned int) * TriangleCount *3);
 
   bool meshCreated;
   csRenderMesh*& rm = rmHolder.GetUnusedMesh (meshCreated, 
@@ -433,7 +435,8 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
   rm->indexend = TriangleCount * 3;
   rm->material = m;
   rm->object2camera = csReversibleTransform ();
- 
+  rm->camera_origin = vertices[0];
+
   n = 1;
   return &rm;
 #else

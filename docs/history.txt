@@ -27,6 +27,12 @@ chronological order.
 	  texture format from the texture manager instead of just
 	  loading CS_IMGFMT_TRUECOLOR. By doing that it is now possible
 	  to load textures with alpha channel using CreateTexture().
+	- res fixed sorting for partgen-type meshes. The camera_origin member
+	  of the render mesh wasn't set correctly.
+	- res made some optimizations to partgen: the render buffers are now
+	  DYNAMIC instead of STATIC (results in an FPS boost for me) and the
+	  indices aren't copied over every time, only when the index buffer
+	  is created, as they don't change.
 17-May-2004
 	- Eric Sunshine made the following msvcgen-related changes:
 	    - Added --source-root and --build-root options to msvcgen.pl, as
