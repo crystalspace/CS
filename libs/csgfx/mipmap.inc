@@ -103,23 +103,23 @@ static void MIPMAP_NAME (unsigned w, unsigned h, csRGBpixel *src, csRGBpixel *ds
      a += p * m;
 #else
 #  if defined (MIPMAP_TRANSPARENT)
-#    define ACCUMULATE_PIXEL(p, m)						\
-     {													\
-       if (MIPMAP_ISKEY(p))								\
-       {												\
-		 transcnt += m;									\
-       }												\
-       else												\
-       {												\
+#    define ACCUMULATE_PIXEL(p, m)					\
+     {									\
+       if (MIPMAP_ISKEY(p))						\
+       {								\
+	 transcnt += m;							\
+       }								\
+       else								\
+       {								\
          uint32 rgb = MIPMAP_RGB(p);					\
          rb += (rgb & 0x00ff00ff) * m;					\
-         ga += ((rgb >> 8) & 0x00ff00ff) * m;			\
-       }												\
+         ga += ((rgb >> 8) & 0x00ff00ff) * m;				\
+       }								\
      }
 #  else
-#    define ACCUMULATE_PIXEL(p, m)						\
-     {													\
-       uint32 rgb = MIPMAP_RGB(p);						\
+#    define ACCUMULATE_PIXEL(p, m)					\
+     {									\
+       uint32 rgb = MIPMAP_RGB(p);					\
        rb += (rgb & 0x00ff00ff) * m;					\
        ga += ((rgb >> 8) & 0x00ff00ff) * m;				\
      }
@@ -132,27 +132,27 @@ static void MIPMAP_NAME (unsigned w, unsigned h, csRGBpixel *src, csRGBpixel *ds
     *dst++ = a / MIPMAP_DIVIDER;
 #else
 # ifdef MIPMAP_TRANSPARENT											
-# define MIPMAP_OUTPUT												\
-	if (transcnt)													\
-	{																\
-	  if (transcnt <= (MIPMAP_DIVIDER / 2))							\
-	  {																\
-		int div = (MIPMAP_DIVIDER - transcnt);						\
-		/* need to treat every component separately...  */			\
-	    *(uint32 *)dst++ =  (((rb & 0x0000ffff) / div) |						\
-						     ((rb / div) & 0x00ff0000)) |						\
-						  (((((ga & 0x0000ffff) / div) |						\
-						     ((ga / div)& 0x00ff0000)) << 8) & 0xff00ff00);		\
-	  }																\
-	  else															\
-	  {																\
-	    *(uint32 *)dst++ = MIPMAP_RGB(transp);						\
-	  }																\
-	}																\
-	else															\
-	{																\
-	  *(uint32 *)dst++ = ((rb / (MIPMAP_DIVIDER)) & 0x00ff00ff) |		\
-	  				     (((ga / (MIPMAP_DIVIDER)) << 8) & 0xff00ff00); \
+# define MIPMAP_OUTPUT							\
+	if (transcnt)							\
+	{								\
+	  if (transcnt <= (MIPMAP_DIVIDER / 2))				\
+	  {								\
+	    int div = (MIPMAP_DIVIDER - transcnt);			\
+	    /* need to treat every component separately...  */		\
+	    *(uint32 *)dst++ =  (((rb & 0x0000ffff) / div) |		\
+				 ((rb / div) & 0x00ff0000)) |		\
+				 (((((ga & 0x0000ffff) / div) |		\
+				 ((ga / div)& 0x00ff0000)) << 8) & 0xff00ff00);		\
+	  }								\
+	  else								\
+	  {								\
+	    *(uint32 *)dst++ = MIPMAP_RGB(transp);			\
+	  }								\
+	}								\
+	else								\
+	{								\
+	  *(uint32 *)dst++ = ((rb / (MIPMAP_DIVIDER)) & 0x00ff00ff) |	\
+	  		     (((ga / (MIPMAP_DIVIDER)) << 8) & 0xff00ff00); \
 	}
 # else
 # define MIPMAP_OUTPUT							\
@@ -208,15 +208,15 @@ static void MIPMAP_NAME (unsigned w, unsigned h, csRGBpixel *src, csRGBpixel *ds
 
 # define MIPMAP_PROCESS(d1,d2,d3)					\
       {									\
-        ACCUMULATE_PIXEL (src1 [d1], 1);					\
-        ACCUMULATE_PIXEL (src1 [d2], 2);					\
-        ACCUMULATE_PIXEL (src1 [d3], 1);					\
-        ACCUMULATE_PIXEL (src2 [d1], 2);					\
-        ACCUMULATE_PIXEL (src2 [d2], 4);					\
-        ACCUMULATE_PIXEL (src2 [d3], 2);					\
-        ACCUMULATE_PIXEL (src3 [d1], 1);					\
-        ACCUMULATE_PIXEL (src3 [d2], 2);					\
-        ACCUMULATE_PIXEL (src3 [d3], 1);					\
+        ACCUMULATE_PIXEL (src1 [d1], 1);				\
+        ACCUMULATE_PIXEL (src1 [d2], 2);				\
+        ACCUMULATE_PIXEL (src1 [d3], 1);				\
+        ACCUMULATE_PIXEL (src2 [d1], 2);				\
+        ACCUMULATE_PIXEL (src2 [d2], 4);				\
+        ACCUMULATE_PIXEL (src2 [d3], 2);				\
+        ACCUMULATE_PIXEL (src3 [d1], 1);				\
+        ACCUMULATE_PIXEL (src3 [d2], 2);				\
+        ACCUMULATE_PIXEL (src3 [d3], 1);				\
       }
 
   if (w1 == 0) // special case: width == 1
@@ -238,15 +238,15 @@ static void MIPMAP_NAME (unsigned w, unsigned h, csRGBpixel *src, csRGBpixel *ds
 		
 # ifdef MIPMAP_TRANSPARENT
       // transparent and non-transparent areas should be the same 
-	  // on src and dst
-	  if (MIPMAP_ISKEY(src2[0]))
-	  {
-	    *(uint32 *)dst++ = MIPMAP_RGB(src2[0]);
-	    src += MIPMAP_STEP;
-	    continue;
-	  }
+      // on src and dst
+      if (MIPMAP_ISKEY(src2[0]))
+      {
+        *(uint32 *)dst++ = MIPMAP_RGB(src2[0]);
+        src += MIPMAP_STEP;
+        continue;
+      }
 # endif
-	  MIPMAP_PROCESS (0, 0, 0);
+      MIPMAP_PROCESS (0, 0, 0);
       MIPMAP_OUTPUT;
       src += MIPMAP_STEP;
     }
@@ -278,29 +278,29 @@ static void MIPMAP_NAME (unsigned w, unsigned h, csRGBpixel *src, csRGBpixel *ds
 #if MIPMAP_LEVEL == 0
 
 # ifdef MIPMAP_TRANSPARENT
-		// transparent and non-transparent areas should be the same 
-		// on src and dst
-	    if (MIPMAP_ISKEY(src2[0]))
-	    {
-	      *(uint32 *)dst++ = MIPMAP_RGB(src2[0]);
-		  src1++; src2++; src3++;
-		  continue;
-	    }
+  	// transparent and non-transparent areas should be the same 
+	// on src and dst
+	if (MIPMAP_ISKEY(src2[0]))
+	{
+	  *(uint32 *)dst++ = MIPMAP_RGB(src2[0]);
+	  src1++; src2++; src3++;
+	  continue;
+	}
 # endif
-	    // Process first and last column separately since they wrap around
-	    if (x == 0)
-	    {
-		  MIPMAP_PROCESS (w1, 0, 1);
-	    } 
-	    else if (x == w1)
-	    {
-		  MIPMAP_PROCESS (-1, 0, -w1);
-	    }
-	    else
-	    {
+	// Process first and last column separately since they wrap around
+	if (x == 0)
+	{
+	  MIPMAP_PROCESS (w1, 0, 1);
+	} 
+	else if (x == w1)
+	{
+	  MIPMAP_PROCESS (-1, 0, -w1);
+	}
+	else
+	{
           MIPMAP_PROCESS (-1, 0, 1);
         }
-	    src1++; src2++; src3++;
+	src1++; src2++; src3++;
 #elif MIPMAP_LEVEL == 1
         ACCUMULATE_2X2 (x);
 #endif
