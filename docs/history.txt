@@ -19,6 +19,7 @@ The history order has been reversed so that new features are at the top.
 	  for COMP_GCC. Added libdinput.a link reference.
 	- Fixed a fix by Eric to radiosity (suggested by Wouter Wijngaards).
 	- Fixed memory leak in new lighting code from Andrew.
+	- Further debug work on PVS. Still not working properly though.
 4-May-2000
 	- Chris Bruner did some various cleanups in some files.
 	- Borland Ehle did an attempt to unify makefile for all Win32

@@ -873,6 +873,7 @@ void csOctree::BoxOccludeeShadowPolygons (const csBox3& box,
 	csBox2 bbox;
 	if (clipper->Clip (result_poly.GetVertices (), num_verts, bbox))
 	{
+	printf ("cbuffer INSERT\n");
 	  result_poly.SetNumVertices (num_verts);
 	  cbuffer->InsertPolygon (result_poly.GetVertices (),
 	  	result_poly.GetNumVertices ());
@@ -920,7 +921,7 @@ void csOctree::BoxOccludeeAddShadows (csOctreeNode* occluder,
 // are in or on the smallest convex polygons formed by the intersection
 // of those planes. From those vertices it will calculate a bounding box
 // in 2D.
-void CalcBBoxFromLines (csPlane2* planes2d, int num_planes2d, csBox2& bbox)
+bool CalcBBoxFromLines (csPlane2* planes2d, int num_planes2d, csBox2& bbox)
 {
   int i, j, k;
   csVector2 isect;
@@ -928,26 +929,63 @@ void CalcBBoxFromLines (csPlane2* planes2d, int num_planes2d, csBox2& bbox)
   k = 0;
   // Find all intersection points between the planes.
   for (i = 0 ; i < num_planes2d ; i++)
-    for (j = 0 ; j < num_planes2d ; j++)
-      if (i != j)
-        if (csIntersect2::Planes (planes2d[i], planes2d[j], isect))
-	  points[k++] = isect;
+    for (j = i+1 ; j < num_planes2d ; j++)
+      if (csIntersect2::Planes (planes2d[i], planes2d[j], isect))
+	points[k++] = isect;
   // Calculate the bounding box for all intersection points that
   // are in or on the smallest polygon.
+  if (k == 0) return false;
   bbox.StartBoundingBox ();
+  bool rc = false;
   for (i = 0 ; i < k ; i++)
   {
     bool in = true;
     for (j = 0 ; j < num_planes2d ; j++)
-      if (planes2d[j].Classify (points[i]) < SMALL_EPSILON)
+    {
+      //printf ("i(%d)=%f,%f j(%d)=%f\n", i, points[i].x, points[i].y, j, planes2d[j].Classify (points[i]));
+      if (planes2d[j].Classify (points[i]) < -SMALL_EPSILON)
       {
         in = false;
 	break;
       }
-    if (in) bbox.AddBoundingVertex (points[i]);
+    }
+    if (in)
+    {
+      bbox.AddBoundingVertex (points[i]);
+      rc = true;
+    }
   }
+  return rc;
 }
 
+// This routine traces all lines between the vertices of the two boxes
+// and intersects those lines with an axis aligned plane. Then a bounding
+// box on that plane is calculated for those intersections.
+void CalcBBoxFromBoxes (const csBox3& box1, const csBox3& box2,
+	int plane_nr, float plane_pos, csBox2& plane_area)
+{
+  int i, j;
+  plane_area.StartBoundingBox ();
+  for (i = 0 ; i < 8 ; i++)
+  {
+    csVector3 v1 = box1.GetCorner (i);
+    for (j = 0 ; j < 8 ; j++)
+    {
+      csVector3 v2 = box2.GetCorner (j);
+      csVector3 v = v2-v1;
+      float dist = -(v1[plane_nr] - plane_pos) / v[plane_nr];
+      csVector3 isect = v1 + dist*v;
+      csVector2 v2d;
+      switch (plane_nr)
+      {
+        case PLANE_X: v2d.Set (isect.y, isect.z); break;
+        case PLANE_Y: v2d.Set (isect.x, isect.z); break;
+        case PLANE_Z: v2d.Set (isect.x, isect.y); break;
+      }
+      plane_area.AddBoundingVertex (v2d);
+    }
+  }
+}
 
 bool csOctree::BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee)
 {
@@ -990,6 +1028,21 @@ bool csOctree::BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee)
   // On this plane we now find the largest possible area that will
   // be used. This corresponds with the projection on the plane of
   // the outer set of planes between the occludee and the box.
+#if 1
+  csBox2 plane_area;
+printf ("\n--------\n");
+printf ("box=(%f,%f,%f)-(%f,%f,%f)\n",
+box.MinX (), box.MinY (), box.MinZ (),
+box.MaxX (), box.MaxY (), box.MaxZ ());
+printf ("occludee=(%f,%f,%f)-(%f,%f,%f)\n",
+occludee.MinX (), occludee.MinY (), occludee.MinZ (),
+occludee.MaxX (), occludee.MaxY (), occludee.MaxZ ());
+printf ("box_center=(%f,%f,%f) occludee_center=(%f,%f,%f)\n",
+box_center.x, box_center.y, box_center.z,
+occludee_center.x, occludee_center.y, occludee_center.z);
+printf ("plane_nr=%d plane_pos=%f\n", plane_nr, plane_pos);
+  CalcBBoxFromBoxes (box, occludee, plane_nr, plane_pos, plane_area);
+#else
   csPlane3 planes[8];
   int num_planes;
   num_planes = csMath3::OuterPlanes (occludee, box, planes);
@@ -1002,7 +1055,10 @@ bool csOctree::BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee)
   // now we just calculate a bounding box in 2D which may in some cases
   // slightly overestimate the lit area (but not much).
   csBox2 plane_area;
-  CalcBBoxFromLines (planes2d, num_planes, plane_area);
+  if (!CalcBBoxFromLines (planes2d, num_planes, plane_area)) return false;
+#endif
+printf ("plane_area=%f,%f %f,%f\n", plane_area.MinX (), plane_area.MinY (),
+	plane_area.MaxX (), plane_area.MaxY ());
 
   // From the calculated plane area we can now calculate a scale to get
   // to a c-buffer size of 1024x1024. We also allocate this c-buffer here.
@@ -1036,8 +1092,12 @@ void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
     // nodes in the PVS by testing if the shared plane between
     // the two nodes is completely solid.
     visible = true;
-  else if (BoxCanSeeOccludee (leaf->GetBox (), occludee->GetBox ()))
-    visible = true;
+  else
+  {
+    bool rc = BoxCanSeeOccludee (leaf->GetBox (), occludee->GetBox ());
+    printf ("[%d]", rc); fflush (stdout);
+    if (rc) visible = true;
+  }
 
   // If visible then we add to the PVS and build the PVS for
   // the polygons in the node as well.

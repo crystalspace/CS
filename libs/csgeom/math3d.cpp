@@ -201,46 +201,36 @@ int csMath3::OuterPlanes (const csBox3& box1, const csBox3& box2,
   for (i = 0 ; i < 8 ; i++)
   {
     csVector3 v1 = box1.GetCorner (i);
-    for (j = 0 ; j < 12 ; j++)
+    // Try 24 edges instead of 12. The 12 other edges
+    // are just edges with inverted direction.
+    for (j = 0 ; j < 24 ; j++)
     {
-      csSegment3 seg = box2.GetEdge (j);
-      const csVector3 v2a = seg.Start ();
-      const csVector3 v2b = seg.End ();
+      csSegment3 seg = box2.GetEdge (j % 12);
+      csVector3 v2a, v2b;
+      if (j < 12) { v2a = seg.Start (); v2b = seg.End (); }
+      else { v2a = seg.End (); v2b = seg.Start (); }
       csPlane3 pl (v1, v2a, v2b);
       pl.Normalize ();
       // Check if we already have this plane.
       bool equal = false;
       for (k = 0 ; k < num_planes ; k++)
-      {
         if (csMath3::PlanesEqual (planes[k], pl))
 	{
 	  equal = true;
 	  break;
 	}
-	pl.Invert (); // We don't restore Invert(). It is not needed.
-        if (csMath3::PlanesEqual (planes[k], pl))
-	{
-	  equal = true;
-	  break;
-	}
-      }
       if (equal) continue;
       // Count how many vertices of the two boxes are inside or outside
       // the plane. We need planes with all vertices either
       // on the plane or inside.
-      int cnt_in = 0, cnt_out = 0;
+      int cnt_out = 0;
       for (k = 0 ; k < 8 ; k++)
       {
         float cl = pl.Classify (box1.GetCorner (k));
-        if (cl < -EPSILON) cnt_out++;
-	else if (cl > EPSILON) cnt_in++;
+        if (cl < -EPSILON) { cnt_out++; break; }
         cl = pl.Classify (box2.GetCorner (k));
-        if (cl < -EPSILON) cnt_out++;
-	else if (cl > EPSILON) cnt_in++;
+        if (cl < -EPSILON) { cnt_out++; break; }
       }
-      // If all vertices are outside then we invert the plane
-      // to make them all inside instead.
-      if (cnt_in == 0) { pl.Invert (); cnt_in = cnt_out; cnt_out = 0; }
       // If no vertices are outside then we have a good plane.
       if (cnt_out == 0)
       {

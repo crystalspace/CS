@@ -188,6 +188,46 @@ bool csIntersect2::Planes (const csPlane2& p1, const csPlane2& p2,
 {
   // p1: A1x+B1y+C1 = 0
   // p2: A2x+B2y+C2 = 0
+  csVector2 start1, end1;
+  csVector2 start2, end2;
+  if (ABS (p1.A ()) < SMALL_EPSILON)
+  {
+    // Horizontal line.
+    start1.Set (0, -p1.C () / p1.B ());
+    end1.Set (1, -p1.C () / p1.B ());
+  }
+  else if (ABS (p1.B ()) < SMALL_EPSILON)
+  {
+    // Vertical line.
+    start1.Set (-p1.C () / p1.A (), 0);
+    end1.Set (-p1.C () / p1.A (), 1);
+  }
+  else
+  {
+    start1.Set (0, -p1.C () / p1.B ());
+    end1.Set (1, (-p1.C () - p1.A ()) / p1.B ());
+  }
+  if (ABS (p2.A ()) < SMALL_EPSILON)
+  {
+    // Horizontal line.
+    start2.Set (0, -p2.C () / p2.B ());
+    end2.Set (1, -p2.C () / p2.B ());
+  }
+  else if (ABS (p2.B ()) < SMALL_EPSILON)
+  {
+    // Vertical line.
+    start2.Set (-p2.C () / p2.A (), 0);
+    end2.Set (-p2.C () / p2.A (), 1);
+  }
+  else
+  {
+    start2.Set (0, -p2.C () / p2.B ());
+    end2.Set (1, (-p2.C () - p2.A ()) / p2.B ());
+  }
+  return Lines (csSegment2 (start1, end1), csSegment2 (start2, end2),
+    isect);
+
+#if 0
 //@@@NOT SURE THAT THIS ROUTINE IS RIGHT AND OPTIMAL
   if (ABS (p1.B ()) < SMALL_EPSILON && ABS (p2.B ()) < SMALL_EPSILON)
     return false;
@@ -204,7 +244,8 @@ bool csIntersect2::Planes (const csPlane2& p1, const csPlane2& p2,
   else
     return false; // parallel
 
-  return false;
+  return true;
+#endif
 }
 
 //---------------------------------------------------------------------------

@@ -364,7 +364,7 @@ bool CommandHandler (char *cmd, char *arg)
   }
   else if (!strcasecmp (cmd, "debug2"))
   {
-#   if 0
+#   if 1
     if (Sys->world->IsPVS ())
     {
       Sys->world->DisablePVS ();
