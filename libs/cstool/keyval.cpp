@@ -80,14 +80,3 @@ void csKeyValuePair::SetValue (const char* vname, const char* value)
   }
 }
 
-csArray<const char*> csKeyValuePair::GetValueNames () const
-{
-  csArray<const char*> ret (names.GetSize ());
-  csSet<csStrKey, csConstCharHashKeyHandler>::GlobalIterator it = names.GetIterator ();
-  size_t i = 0;
-  while (it.HasNext ())
-  {
-    ret.Put (i++, csStrNew (it.Next ()));
-  }
-  return ret;
-}

@@ -60,8 +60,6 @@ public:
   virtual void SetValue (const char* value);
   virtual void SetValue (const char* vname, const char* value);
 
-  virtual csArray<const char*> GetValueNames () const;
-
   //----------------------- iSaverPlugin ---------------------------
 };
 

@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+03-Dec-2004
+	- Jorrit removed the GetValueNames() from iKeyValuePair again as it
+	  is illegal to return a csArray directly in an SCF interface (due
+	  to inter-plugin memory management issues).
 02-Dec-2004
 	- Eric Sunshine fixed the various extension checks in glextmanager.h so
 	  that they won't crash if glGetString(GL_EXTENSIONS) and/or
