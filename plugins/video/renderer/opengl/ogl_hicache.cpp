@@ -106,6 +106,7 @@ void HighColorCache::Add (ITextureHandle* txt_handle)
             num--;
             total_size -= l->lSize;
 
+	    delete l;
             piMMC->Release ();
         }
         
@@ -167,6 +168,9 @@ void HighColorCache::Add(IPolygonTexture *polytex)
         
         num--;
         total_size -= l->lSize;
+
+	delete l;
+	piLM->Release();
     }
     
     piLM->GetInVideoMemory( bInVideoMemory );
@@ -216,6 +220,7 @@ void HighColorCache::Add(IPolygonTexture *polytex)
             num--;
             total_size -= l->lSize;
             
+	    delete l;
             ilm->Release();
         }
         
