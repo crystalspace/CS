@@ -25,6 +25,7 @@
 #include "csgeom/frustrum.h"
 #include "csengine/dumper.h"
 #include "csengine/bsp.h"
+#include "csengine/bsp2d.h"
 #include "csengine/octree.h"
 #include "csengine/quadtree.h"
 #include "csengine/quadcube.h"
@@ -274,9 +275,35 @@ void Dumper::dump (csBspTree* tree, csBspNode* node, int indent)
   dump (tree, node->back, indent+2);
 }
 
+void Dumper::dump (csBspTree2D* tree, csBspNode2D* node, int indent)
+{
+  if (!node) return;
+  int i;
+  char spaces[256];
+  for (i = 0 ; i < indent ; i++) spaces[i] = ' ';
+  spaces[indent] = 0;
+  CsPrintf (MSG_DEBUG_0, "%sThere are %d segments in this node.\n", spaces,
+    node->segments.Length ());
+  for (i = 0 ; i < node->segments.Length () ; i++)
+  {
+    csSegment2* s = node->segments.Get (i);
+    CsPrintf (MSG_DEBUG_0, "%s%d: (%f,%f)-(%f,%f)\n", spaces,
+      i, s->Start ().x, s->Start ().y, s->End ().x, s->End ().y);
+  }
+  CsPrintf (MSG_DEBUG_0, "%s Front:\n", spaces);
+  dump (tree, node->front, indent+2);
+  CsPrintf (MSG_DEBUG_0, "%s Back:\n", spaces);
+  dump (tree, node->back, indent+2);
+}
+
 void Dumper::dump (csBspTree* tree)
 {
   dump (tree, (csBspNode*)(tree->root), 0);
+}
+
+void Dumper::dump (csBspTree2D* tree)
+{
+  dump (tree, tree->root, 0);
 }
 
 void Dumper::dump (csPolygonClipper* clipper, char* name)

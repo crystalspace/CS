@@ -1,6 +1,14 @@
 The history order has been reversed so that new features are at the top.
 
 9-Apr-2000
+	- Drasticly improved octree building but NOT with the solid
+	  space splitter. I still need to investigate that one.
+	  The new octree center selection just tries to minimize on
+	  polygons splits like before but instead of choosing random
+	  points only vertices of the polygons in the octree are
+	  considered. This tends to minimize splits greatly.
+	  Lighting improved about 20% with this. Rendering could have
+	  improved approximately the same amount.
 	- Eric Sunshine corrected several errors in the BeOS 'build' document
 	  (texinfo/build/platform/beos.txi) and rewrote several sections for
 	  increased clarity.
@@ -45,6 +53,13 @@ The history order has been reversed so that new features are at the top.
 	      .init file is always textually incorporated into texi2html,
 	      itself, thus one can still see a list of all options if
 	      desired.)
+8-Apr-2000
+	- Added Dumper::dump for csBspTree2D.
+	- Implemented missing csSegmentArray::Get().
+	- Fixed a small bug in 2D bsp.
+	- Fixed back2front and front2back traversal in 2D bsp.
+	- Started further debugger on system to select octree splitter
+	  based on solid space intersection.
 7-Apr-2000
 	- W.C.A. Wijngaards <wouterw@cs.vu.nl> contributed a particle
 	  system (check out include/csengine/particle.h).

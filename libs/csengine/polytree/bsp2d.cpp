@@ -84,7 +84,7 @@ void csBspTree2D::Add (csBspNode2D* node, csSegment2* segment)
         Add (node->front, segment);
     }
   }
-  else if (c1 > 0 && c2 > 0)
+  else if (c1 >= 0 && c2 >= 0)
   {
     // Front.
     if (!node->front)
@@ -96,7 +96,7 @@ void csBspTree2D::Add (csBspNode2D* node, csSegment2* segment)
     else
       Add (node->front, segment);
   }
-  else if (c1 < 0 && c2 < 0)
+  else if (c1 <= 0 && c2 <= 0)
   {
     // Back.
     if (!node->back)
@@ -179,9 +179,12 @@ void* csBspTree2D::Back2Front (csBspNode2D* node, const csVector2& pos,
   if (!node) return NULL;
   void* rc;
 
+//@@@@@@ THIS VISIBILITY TEST IS REVERSED (also in Front2Back).
+//Check what the reason is for this.
+
   // Check if some polygon (just take the first) of the polygons array
   // is visible from the given point. If so, we are in front of this node.
-  if (csMath2::Visible (pos, node->splitter))
+  if (!csMath2::Visible (pos, node->splitter))
   {
     // Front.
     rc = Back2Front (node->back, pos, func, data);
@@ -212,7 +215,7 @@ void* csBspTree2D::Front2Back (csBspNode2D* node, const csVector2& pos,
 
   // Check if some polygon (just take the first) of the polygons array
   // is visible from the given point. If so, we are in front of this node.
-  if (csMath2::Visible (pos, node->splitter))
+  if (!csMath2::Visible (pos, node->splitter))
   {
     // Front.
     rc = Front2Back (node->front, pos, func, data);

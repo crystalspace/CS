@@ -26,6 +26,7 @@
 #include "csutil/csvector.h"
 
 class csBspTree2D;
+class Dumper;
 
 /**
  * An dynamic array of csSegment2 objects.
@@ -48,7 +49,10 @@ public:
   }
 
   /// Get a segment given its index in the array.
-  csSegment2* Get (int iIndex) const;
+  csSegment2* Get (int iIndex) const
+  {
+    return (csSegment2*)csVector::Get (iIndex);
+  }
 
   /// Get the entire array of segments as an array of pointers.
   csSegment2** GetArray () { return (csSegment2**)root; }
@@ -61,6 +65,7 @@ public:
 class csBspNode2D
 {
   friend class csBspTree2D;
+  friend class Dumper;
 
 private:
   /**
@@ -102,6 +107,8 @@ typedef void* (csTree2DVisitFunc)(csSegment2**, int num, void*);
  */
 class csBspTree2D
 {
+  friend class Dumper;
+
 private:
   /// The root.
   csBspNode2D* root;

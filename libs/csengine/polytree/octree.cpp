@@ -129,9 +129,6 @@ void csOctree::Build ()
 
   CHK (root = new csOctreeNode);
 
-  // Initialize the random generator to a fixed value to make
-  // sure we get the same octree everytime (easier for debugging).
-  srand (12345);
   Build ((csOctreeNode*)root, bbox.Min (), bbox.Max (), polygons, num);
 
   CHK (delete [] polygons);
@@ -144,9 +141,6 @@ void csOctree::Build (csPolygonInt** polygons, int num)
   CHK (csPolygonInt** new_polygons = new csPolygonInt* [num]);
   int i;
   for (i = 0 ; i < num ; i++) new_polygons[i] = polygons[i];
-  // Initialize the random generator to a fixed value to make
-  // sure we get the same octree everytime (easier for debugging).
-  srand (12345);
   Build ((csOctreeNode*)root, bbox.Min (), bbox.Max (), new_polygons, num);
   CHK (delete [] new_polygons);
 }
@@ -318,7 +312,7 @@ void* TestSolid (csSegment2** segments, int num, void* data)
   if (num == 0) return NULL; // Continue.
   TestSolidData* d = (TestSolidData*)data;
   csPlane2 plane (*segments[0]);
-  if (plane.Classify (d->pos) < 0) d->is_solid = true;
+  if (plane.Classify (d->pos) > 0) d->is_solid = true;
   else d->is_solid = false;
   return (void*)1;	// Stop recursion.
 }
@@ -329,22 +323,34 @@ void* TestSolid (csSegment2** segments, int num, void* data)
 // @@@@ UGLY CODE!!! EXPERIMENTAL ONLY!
 // If this works good it should be cleaned up a lot.
 void GetVertexComponents (csPolygonInt** polygons, int num, const csBox3& box,
-	float* xarray, float* yarray, float* zarray, int& num_ar)
+	float* xarray, int& num_xar,
+	float* yarray, int& num_yar,
+	float* zarray, int& num_zar)
 {
   int i, j;
-  num_ar = 0;
+  num_xar = 0;
+  num_yar = 0;
+  num_zar = 0;
   for (i = 0 ; i < num ; i++)
   {
     csPolygon3D* p = (csPolygon3D*)polygons[i];
     for (j = 0 ; j < p->GetNumVertices () ; j++)
     {
       const csVector3& v = p->Vwor (j);
-      if (box.In (v))
+      if (v.x >= box.MinX () && v.x <= box.MaxX ())
       {
         *xarray++ = v.x;
-	*yarray++ = v.y;
-	*zarray++ = v.z;
-	num_ar++;
+	num_xar++;
+      }
+      if (v.y >= box.MinY () && v.y <= box.MaxY ())
+      {
+        *yarray++ = v.y;
+	num_yar++;
+      }
+      if (v.z >= box.MinZ () && v.z <= box.MaxZ ())
+      {
+        *zarray++ = v.z;
+	num_zar++;
       }
     }
   }
@@ -384,37 +390,38 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
 
   // The test box for finding the center.
   csBox3 tbox (orig-(bmax-bmin)/5, orig+(bmax-bmin)/5);
-  float dx = tbox.MaxX () - tbox.MinX ();
-  float dy = tbox.MaxY () - tbox.MinY ();
-  float dz = tbox.MaxZ () - tbox.MinZ ();
+
+  // First find all x, y, z components in the box we want to test.
+  // These are the ones we're going to try.
+  float* xarray_all, * yarray_all, * zarray_all;
+  float* xarray, * yarray, * zarray;
+  int num_xar, num_yar, num_zar;
+  CHK (xarray_all = new float [num*10]);
+  CHK (yarray_all = new float [num*10]);
+  CHK (zarray_all = new float [num*10]);
+  GetVertexComponents (polygons, num, tbox,
+	xarray_all, num_xar, yarray_all, num_yar, zarray_all, num_zar);
+  // Make sure the center is always included.
+  xarray_all[num_xar++] = orig.x;
+  yarray_all[num_yar++] = orig.y;
+  zarray_all[num_zar++] = orig.z;
+  qsort (xarray_all, num_xar, sizeof (float), compare_float);
+  qsort (yarray_all, num_yar, sizeof (float), compare_float);
+  qsort (zarray_all, num_zar, sizeof (float), compare_float);
+  CHK (xarray = new float [num_xar]);
+  CHK (yarray = new float [num_yar]);
+  CHK (zarray = new float [num_zar]);
+  int num_x, num_y, num_z;
+  num_x = RemoveDoubles (xarray_all, num_xar, xarray);
+  num_y = RemoveDoubles (yarray_all, num_yar, yarray);
+  num_z = RemoveDoubles (zarray_all, num_zar, zarray);
+  CHK (delete [] xarray_all);
+  CHK (delete [] yarray_all);
+  CHK (delete [] zarray_all);
 
   int i, j;
   csVector3 best_center = orig;
-  int best_splits = 2000000000;
-  csVector3 tryit;
 #if 0
-  for (tryit.x = tbox.MinX () ; tryit.x < tbox.MaxX () ; tryit.x += dx/10)
-    for (tryit.y = tbox.MinY () ; tryit.y < tbox.MaxY () ; tryit.y += dy/10)
-      for (tryit.z = tbox.MinZ () ; tryit.z < tbox.MaxZ () ; tryit.z += dz/10)
-      {
-        int splits = 0;
-        for (j = 0 ; j < num ; j++)
-        {
-          if (polygons[j]->ClassifyX (tryit.x) == POL_SPLIT_NEEDED) splits++;
-          if (polygons[j]->ClassifyY (tryit.y) == POL_SPLIT_NEEDED) splits++;
-          if (polygons[j]->ClassifyZ (tryit.z) == POL_SPLIT_NEEDED) splits++;
-        }
-        if (splits < best_splits)
-        {
-          best_center = tryit;
-          best_splits = splits;
-        }
-      }
-#elif 0
-  // @@@ Choose based on vertices in polygons!
-#elif 0
-  // @@@ Choose one axis at a time instead of all three together!
-#elif 0
   // @@@ Choose while trying to maximize the area of solid space
   // This will improve occlusion!
   // One way to do this:
@@ -434,35 +441,9 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
   //    - Take the plane with most solid space.
 
 # define DTRIES 10
-
-  // First find all x, y, z components in the box we want to test.
-  // These are the ones we're going to try.
-  float* xarray_all, * yarray_all, * zarray_all;
-  float* xarray, * yarray, * zarray;
-  int num_ar;
-  CHK (xarray_all = new float [num*10]);
-  CHK (yarray_all = new float [num*10]);
-  CHK (zarray_all = new float [num*10]);
-  GetVertexComponents (polygons, num, tbox,
-	xarray_all, yarray_all, zarray_all, num_ar);
-  // Make sure the center is always included.
-  xarray_all[num_ar] = orig.x;
-  yarray_all[num_ar] = orig.y;
-  zarray_all[num_ar] = orig.z;
-  num_ar++;
-  qsort (xarray_all, num_ar, sizeof (float), compare_float);
-  qsort (yarray_all, num_ar, sizeof (float), compare_float);
-  qsort (zarray_all, num_ar, sizeof (float), compare_float);
-  CHK (xarray = new float [num_ar]);
-  CHK (yarray = new float [num_ar]);
-  CHK (zarray = new float [num_ar]);
-  int num_x, num_y, num_z;
-  num_x = RemoveDoubles (xarray_all, num_ar, xarray);
-  num_y = RemoveDoubles (yarray_all, num_ar, yarray);
-  num_z = RemoveDoubles (zarray_all, num_ar, zarray);
-  CHK (delete [] xarray_all);
-  CHK (delete [] yarray_all);
-  CHK (delete [] zarray_all);
+  float dx = tbox.MaxX () - tbox.MinX ();
+  float dy = tbox.MaxY () - tbox.MinY ();
+  float dz = tbox.MaxZ () - tbox.MinZ ();
 
   // Try a few x-planes first.
   float x, y, z;
@@ -472,7 +453,7 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
   int max_solid = -1000;
   for (i = 0 ; i < num_x ; i++)
   {
-    x = xarray[i];
+    x = xarray[i]+.1;
     csPlane3 plane (1, 0, 0, -x);
     // First create a 2D bsp tree for all intersections of the
     // polygons in the node with the chosen plane.
@@ -508,7 +489,7 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
   max_solid = -1000;
   for (i = 0 ; i < num_y ; i++)
   {
-    y = yarray[i];
+    y = yarray[i]+.1;
     csPlane3 plane (0, 1, 0, -y);
     CHK (csBspTree2D* bsp2d = new csBspTree2D ());
     for (j = 0 ; j < num ; j++)
@@ -534,7 +515,7 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
   max_solid = -1000;
   for (i = 0 ; i < num_z ; i++)
   {
-    z = zarray[i];
+    z = zarray[i]+.1;
     csPlane3 plane (0, 0, 1, -z);
     CHK (csBspTree2D* bsp2d = new csBspTree2D ());
     for (j = 0 ; j < num ; j++)
@@ -555,31 +536,53 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
     }
     CHK (delete bsp2d);
   }
-
-  CHK (delete [] xarray);
-  CHK (delete [] yarray);
-  CHK (delete [] zarray);
 #else
-  for (i = 0 ; i < 500 ; i++)
+  // Try a few x-planes first.
+  float x, y, z;
+  int splits, best_splits = 2000000000;
+  for (i = 0 ; i < num_x ; i++)
   {
-    tryit.x = orig.x + (dx/2) * (randflt ()-.5);
-    tryit.y = orig.y + (dy/2) * (randflt ()-.5);
-    tryit.z = orig.z + (dz/2) * (randflt ()-.5);
-    int splits = 0;
+    x = xarray[i]+.1;
+    splits = 0;
     for (j = 0 ; j < num ; j++)
-    {
-      if (polygons[j]->ClassifyX (tryit.x) == POL_SPLIT_NEEDED) splits++;
-      if (polygons[j]->ClassifyY (tryit.y) == POL_SPLIT_NEEDED) splits++;
-      if (polygons[j]->ClassifyZ (tryit.z) == POL_SPLIT_NEEDED) splits++;
-    }
+      if (polygons[j]->ClassifyX (x) == POL_SPLIT_NEEDED) splits++;
     if (splits < best_splits)
     {
-      best_center = tryit;
+      best_center.x = x;
+      best_splits = splits;
+    }
+  }
+  best_splits = 2000000000;
+  for (i = 0 ; i < num_y ; i++)
+  {
+    y = yarray[i]+.1;
+    splits = 0;
+    for (j = 0 ; j < num ; j++)
+      if (polygons[j]->ClassifyY (y) == POL_SPLIT_NEEDED) splits++;
+    if (splits < best_splits)
+    {
+      best_center.y = y;
+      best_splits = splits;
+    }
+  }
+  best_splits = 2000000000;
+  for (i = 0 ; i < num_z ; i++)
+  {
+    z = zarray[i]+.1;
+    splits = 0;
+    for (j = 0 ; j < num ; j++)
+      if (polygons[j]->ClassifyZ (z) == POL_SPLIT_NEEDED) splits++;
+    if (splits < best_splits)
+    {
+      best_center.z = z;
       best_splits = splits;
     }
   }
 #endif
   node->center = best_center;
+  CHK (delete [] xarray);
+  CHK (delete [] yarray);
+  CHK (delete [] zarray);
 }
 
 void csOctree::Build (csOctreeNode* node, const csVector3& bmin,
