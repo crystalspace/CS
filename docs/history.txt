@@ -24,6 +24,7 @@ chronological order.
 	  member.  cal3d never uses these values, so it is ok.  This enables
 	  the model to specify and use multiple materials (assigned
 	  independently to each mesh).
+	- Jorrit added csGrowingArray::GetArrayCopy().
 	- Jorrit removed csIntArray and replaced the usage of it with
 	  csGrowingArray<int> (in mdltool.cpp). Also fixed a big bug in
 	  that code. It was taking the address of the array and after that
