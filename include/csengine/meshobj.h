@@ -62,6 +62,8 @@ public:
 
   /// Set the mesh object.
   void SetMeshObject (iMeshObject* mesh);
+  /// Get the mesh object.
+  iMeshObject* GetMeshObject () const {return mesh;}
 
   /**
    * Light object according to the given array of lights (i.e.
