@@ -228,6 +228,10 @@ public:
 
   /// Destroy the spline.
   virtual ~csCatmullRomSpline () {}
+
+  /// Clones the spline
+  csCatmullRomSpline * Clone();
+
 };
 
 /** @} */

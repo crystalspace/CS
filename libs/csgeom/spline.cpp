@@ -321,3 +321,14 @@ float csCatmullRomSpline::BaseFunction (int i, float t) const
 
   return 0;         // We only get here if an invalid i is specified.
 }
+
+csCatmullRomSpline * csCatmullRomSpline::Clone()
+{
+  csCatmullRomSpline * new_spline = new csCatmullRomSpline(dimensions, num_points);
+  memcpy(new_spline->time_points, time_points, sizeof(float)*num_points);
+  memcpy(new_spline->points, points, sizeof(float)*num_points*dimensions);
+  new_spline->precalculation_valid = precalculation_valid;
+  new_spline->idx = idx;
+  
+  return new_spline;
+}
