@@ -21,12 +21,6 @@ The Crystal Space home page is located at:
 @uref{http://crystal.sourceforge.net/}
 
 @noindent
-The Crystal Space @emph{Jump Start} page, from which you can jump to many
-destinations, is located at:
-
-@uref{http://crystal.sourceforge.net/}
-
-@noindent
 The Crystal Space Developer's Project page is located at:
 
 @uref{http://sourceforge.net/projects/crystal/}
@@ -36,6 +30,17 @@ The released Crystal Space packages can be downloaded via @sc{http}
 from the following location:
 
 @uref{http://sourceforge.net/project/showfiles.php?group_id=649}
+
+@noindent
+Levels and data for Crystal Space can be downloaded via @sc{ftp} from
+sunsite.dk:
+
+@uref{ftp://sunsite.dk/pub/projects/crystal/cs094/}
+
+Older release data and separate packages may also be found one directory up
+at:
+
+@uref{ftp://sunsite.dk/pub/projects/crystal/}
 
 @subheading Bleeding-Edge Developmental Releases (@sc{cvs})
 @cindex CVS
@@ -75,11 +80,11 @@ all of the historical information and administrative information.
 
 @anchor{Documentation Resources}
 Documentation is included with the Crystal Space distribution.  A gateway to
-all documentation can be found in the file @file{CS/docs/README.htm}.  You can
+all documentation can be found in the file @file{CS/docs/README.html}.  You can
 also read the @cite{Crystal Space User's Manual} with your web browser by
-loading the file @file{CS/docs/html/index.htm}, as well as the @cite{Crystal
+loading the file @file{CS/docs/html/index.html}, as well as the @cite{Crystal
 Space Public API Reference Manual} by viewing the file
-@file{CS/docs/pubapi/index.htm}.
+@file{CS/docs/pubapi/index.html}.
 
 Documentation is also available for online viewing.  The @cite{Crystal Space
 User's Manual} is available for online viewing at this location:
@@ -119,7 +124,7 @@ These makefile targets place the generated output in subdirectories of
 @section Mailing Lists
 @cindex Mailing Lists
 
-There are three mailing lists for the Crystal Space project which may be of
+There are four mailing lists for the Crystal Space project which may be of
 interest to users and developers.
 
 The discussion list used for general and in-depth discussion of Crystal Space
@@ -161,6 +166,19 @@ unsubscribing.
 
 @uref{http://lists.sourceforge.net/mailman/listinfo/crystal-cvs/}
 
+There is also a mailing list which keeps track of documentation annotations.
+This mailing list receives automated messages every time someone adds a comment
+to one of the pages of the online documentation.
+
+@noindent
+Mailing List: @email{crystal-docs@@lists.sourceforge.net}.
+
+To subscribe to this list visit the mailing list administration page and
+follow the instructions there. This page also contains instructions for
+unsubscribing.
+
+@uref{http://lists.sourceforge.net/mailman/listinfo/crystal-docs/}
+
 @node Internet Relay Chat (IRC), Feedback, Mailing Lists, CS Introduction
 @section Internet Relay Chat (@sc{irc})
 @cindex Internet Relay Chat (@sc{irc})
@@ -168,15 +186,16 @@ unsubscribing.
 
 The Crystal Space developers are often available online for live chat via the
 Internet Relay Chat (@sc{irc}) system.  If you are unfamiliar with @sc{irc}, a
-good place to learn about it is @uref{http://www.mirc.com/}.  The Crystal
-Space developers inhabit a channel named @code{#CrystalSpace} on any of the
-following servers (all of which are linked together):
+good place to learn about it is @uref{http://irchelp.org/}.  The Crystal
+Space developers inhabit a channel named @code{#CrystalSpace} on the Open
+Projects Network (OPN). You can find more information about OPN at
+@uref{http://openprojects.net/}, including a list of servers. There are a few
+redirection servers that you should be able to connect to right away. Try
+connecting to one located close (geographically) to you for the least lag.
 
 @example
-irc.linux.com:6667
-irc.openprojects.net:6667
+irc.au.openprojects.net
+irc.cn.openprojects.net
+irc.eu.openprojects.net
+irc.us.openprojects.net
 @end example
-
-@noindent
-In fact, any of the @sc{irc} servers with the Open Projects network may be
-used.
