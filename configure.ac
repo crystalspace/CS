@@ -118,6 +118,14 @@ AS_IF([test -n "$SWIG"],
     [CS_CHECK_PROG_VERSION([swig], [$SWIG -version 2>&1], [1.3.14],
 	[9.9|.9], [CS_EMIT_BUILD_PROPERTY([CMD.SWIG], [$SWIG])])])
 
+CS_CHECK_LIBTOOL
+CS_EMIT_BUILD_PROPERTY([LIBTOOL], [$LIBTOOL])
+CS_EMIT_BUILD_PROPERTY([APPLE_LIBTOOL], [$APPLE_LIBTOOL])
+
+CS_CHECK_MKDIR
+CS_EMIT_BUILD_PROPERTY([CMD.MKDIR], [$MKDIR])
+CS_EMIT_BUILD_PROPERTY([CMD.MKDIRS], [$MKDIRS])
+
 
 
 #------------------------------------------------------------------------------
@@ -153,58 +161,6 @@ CS_EMIT_BUILD_PROPERTY([JAM], [$JAM])
 
 AC_CHECK_PROGS([MAKE], [gnumake gmake make])
 
-
-
-#------------------------------------------------------------------------------
-# Determine how to make a directory tree.
-#------------------------------------------------------------------------------
-CS_CHECK_MKDIR
-CS_EMIT_BUILD_PROPERTY([CMD.MKDIR], [$MKDIR])
-CS_EMIT_BUILD_PROPERTY([CMD.MKDIRS], [$MKDIRS])
-
-
-
-#------------------------------------------------------------------------------
-# Find and identify the various implementations of libtool.  In particular, we
-# are aware of GNU libtool and Apple's libtool (which serves a completely
-# different purpose).  On MacOS/X, GNU libtool is typically named glibtool,
-# however a user might also use Fink to install the unadorned libtool; and the
-# Fink-installed version might shadow Apple's own libtool if it appears in the
-# PATH before the Apple tool.
-#------------------------------------------------------------------------------
-AC_DEFUN([CS_LIBTOOL_GNU_IFELSE],
-    [AS_IF([AC_RUN_LOG([$1 --version 1>&2])], [$2], [$3])])
-
-AC_DEFUN([CS_LIBTOOL_CLASSIFY],
-    [AS_IF([test -n "$1"],
-	[AC_MSG_CHECKING([classification of $1])
-	CS_LIBTOOL_GNU_IFELSE([$1],
-	    [AC_MSG_RESULT([gnu])
-	    $2],
-	    [AC_MSG_RESULT([apple])
-	    $3])])])
-
-# GNU: Search for libtool before glibtool since Fink version is likely newer.
-m4_define([cs_lt_path_gnu],
-    [/sw/bin$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR$PATH])
-AS_IF([test -z "$LIBTOOL"],
-    [AC_CHECK_TOOLS([LIBTOOL_TEST], [libtool glibtool gnulibtool], [],
-	[cs_lt_path_gnu])
-    AS_IF([test -n "$LIBTOOL_TEST"],
-	[AC_PATH_PROG([LIBTOOL_PATH], [$LIBTOOL_TEST], [], [cs_lt_path_gnu])
-	CS_LIBTOOL_CLASSIFY([$LIBTOOL_PATH],
-	    [LIBTOOL="$LIBTOOL_PATH"],
-	    [AS_IF([test -z "$APPLE_LIBTOOL"], [APPLE_LIBTOOL="$LIBTOOL_PATH"])
-	    AC_CHECK_TOOLS([LIBTOOL], [glibtool gnulibtool])])])])
-CS_EMIT_BUILD_PROPERTY([LIBTOOL], [$LIBTOOL])
-
-# Apple: Ensure that Apple libtool will be found before GNU libtool from Fink.
-m4_define([cs_lt_path_apple],[/bin$PATH_SEPARATOR/usr/bin$PATH_SEPARATOR$PATH])
-AS_IF([test -z "$APPLE_LIBTOOL"],
-    [AC_PATH_PROG([CS_LT_APPLE], [libtool], [], [cs_lt_path_apple])
-    CS_LIBTOOL_CLASSIFY([$CS_LT_APPLE], [],
-	[APPLE_LIBTOOL="$CS_LT_APPLE"])])
-CS_EMIT_BUILD_PROPERTY([APPLE_LIBTOOL], [$APPLE_LIBTOOL])
 
 
 #------------------------------------------------------------------------------

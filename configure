@@ -313,7 +313,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX RANLIB ac_ct_RANLIB DLLTOOL ac_ct_DLLTOOL DLLWRAP ac_ct_DLLWRAP WINDRES ac_ct_WINDRES OBJCOPY ac_ct_OBJCOPY FLEX BISON DOXYGEN TEXI2DVI DVIPS DVIPDF MAKEINFO INSTALL SWIG JAM MAKE MKDIR MKDIRS LIBTOOL_TEST ac_ct_LIBTOOL_TEST LIBTOOL_PATH LIBTOOL ac_ct_LIBTOOL CS_LT_APPLE CSLIBS_CONFIG ac_ct_CSLIBS_CONFIG NASM ac_ct_NASM PERL PYTHON JAVA JAVAC ANT CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP FT2CONFIG ac_ct_FT2CONFIG SDLCONFIG ac_ct_SDLCONFIG PKGCONFIG ac_ct_PKGCONFIG CGC CXXCPP LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX RANLIB ac_ct_RANLIB DLLTOOL ac_ct_DLLTOOL DLLWRAP ac_ct_DLLWRAP WINDRES ac_ct_WINDRES OBJCOPY ac_ct_OBJCOPY FLEX BISON DOXYGEN TEXI2DVI DVIPS DVIPDF MAKEINFO INSTALL SWIG LIBTOOL_TEST ac_ct_LIBTOOL_TEST LIBTOOL_PATH LIBTOOL ac_ct_LIBTOOL CS_LT_APPLE APPLE_LIBTOOL MKDIR MKDIRS JAM MAKE CSLIBS_CONFIG ac_ct_CSLIBS_CONFIG NASM ac_ct_NASM PERL PYTHON JAVA JAVAC ANT CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP FT2CONFIG ac_ct_FT2CONFIG SDLCONFIG ac_ct_SDLCONFIG PKGCONFIG ac_ct_PKGCONFIG CGC CXXCPP LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -3877,323 +3877,6 @@ fi
 fi
 
 
-
-
-#------------------------------------------------------------------------------
-# In order to avoid alienating users by forcing them to install and use Jam,
-# config.status is instructed (see far below) to build Jam on the user's behalf
-# from local sources, and to place the executable in the root of the build
-# directory.  When checking for Jam, in addition to PATH, we also look in root
-# of the build directory since we might already have built Jam on a previous
-# configure run.
-#
-# IMPLEMENTATION NOTES
-#
-# The Crystal Space build system supports Jam versions starting with 2.4.
-# Earlier versions are rejected. Examples of rejected versions include Apple's
-# highly modified Jam (based upon 2.2.1), and ftjam (based upon
-# 2.3.2). BoostJam reports its version number as 3.1.9 (or greater), though it
-# is actually based upon Jam 2.4. Since we accept 2.4, and since 3.1.9 passes
-# the "jam -v >= 2.4" assertion, this version anomaly is not a problem.
-#
-# We also check for 'make', since it is used to build Jam locally, when needed.
-#------------------------------------------------------------------------------
-
-
-for ac_prog in jam
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_path_JAM+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  case $JAM in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_JAM="$JAM" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH$PATH_SEPARATOR.
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_JAM="$as_dir/$ac_word$ac_exec_ext"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-  ;;
-esac
-fi
-JAM=$ac_cv_path_JAM
-
-if test -n "$JAM"; then
-  echo "$as_me:$LINENO: result: $JAM" >&5
-echo "${ECHO_T}$JAM" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-  test -n "$JAM" && break
-done
-
-if test -n "$JAM"; then
-  echo "$as_me:$LINENO: checking if jam version >= 2.4" >&5
-echo $ECHO_N "checking if jam version >= 2.4... $ECHO_C" >&6
-if test "${cs_cv_prog_jam_version_ok_annotated+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cs_prog_jam_is_version=
-cs_prog_jam_min_version=
-cs_prog_jam_is_suffix=
-cs_prog_jam_min_suffix=
-cs_prog_jam_is_suffix_done=
-cs_prog_jam_min_suffix_done=
-
-
-
-
-test -z $cs_prog_jam_is_version && cs_prog_jam_is_version=`$JAM -v 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
-test -n "$cs_prog_jam_is_version" && test -z $cs_prog_jam_is_suffix_done  && { cs_prog_jam_is_suffix_done=yes ; cs_prog_jam_is_suffix= ; }
-
-test -z $cs_prog_jam_is_version && cs_prog_jam_is_version=`$JAM -v 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
-test -n "$cs_prog_jam_is_version" && test -z $cs_prog_jam_is_suffix_done  && { cs_prog_jam_is_suffix_done=yes ; cs_prog_jam_is_suffix=.0 ; }
-
-
-
-
-
-
-test -z $cs_prog_jam_min_version && cs_prog_jam_min_version=`echo 2.4 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
-test -n "$cs_prog_jam_min_version" && test -z $cs_prog_jam_min_suffix_done  && { cs_prog_jam_min_suffix_done=yes ; cs_prog_jam_min_suffix= ; }
-
-test -z $cs_prog_jam_min_version && cs_prog_jam_min_version=`echo 2.4 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
-test -n "$cs_prog_jam_min_version" && test -z $cs_prog_jam_min_suffix_done  && { cs_prog_jam_min_suffix_done=yes ; cs_prog_jam_min_suffix=.0 ; }
-
-
-cs_prog_jam_is_ver_1=`echo ${cs_prog_jam_is_version}${cs_prog_jam_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_jam_is_ver_2=`echo ${cs_prog_jam_is_version}${cs_prog_jam_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
-cs_prog_jam_is_ver_3=`echo ${cs_prog_jam_is_version}${cs_prog_jam_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
-
-cs_prog_jam_min_ver_1=`echo $cs_prog_jam_min_version${cs_prog_jam_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_jam_min_ver_2=`echo $cs_prog_jam_min_version${cs_prog_jam_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
-cs_prog_jam_min_ver_3=`echo $cs_prog_jam_min_version${cs_prog_jam_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
-
-cs_cv_prog_jam_version_ok=''
-test -z "$cs_cv_prog_jam_version_ok" && { expr "$cs_prog_jam_is_ver_1" ">=" "$cs_prog_jam_min_ver_1" >/dev/null || cs_cv_prog_jam_version_ok=no ; }
-test -z "$cs_cv_prog_jam_version_ok" && { expr "$cs_prog_jam_min_ver_1" ">=" "$cs_prog_jam_is_ver_1" >/dev/null || cs_cv_prog_jam_version_ok=yes ; }
-test -z "$cs_cv_prog_jam_version_ok" && { expr "$cs_prog_jam_is_ver_2" ">=" "$cs_prog_jam_min_ver_2" >/dev/null || cs_cv_prog_jam_version_ok=no ; }
-test -z "$cs_cv_prog_jam_version_ok" && { expr "$cs_prog_jam_min_ver_2" ">=" "$cs_prog_jam_is_ver_2" >/dev/null || cs_cv_prog_jam_version_ok=yes ; }
-test -z "$cs_cv_prog_jam_version_ok" && { expr "$cs_prog_jam_is_ver_3" ">=" "$cs_prog_jam_min_ver_3" >/dev/null || cs_cv_prog_jam_version_ok=no ; }
-test -z "$cs_cv_prog_jam_version_ok" && { expr "$cs_prog_jam_min_ver_3" ">=" "$cs_prog_jam_is_ver_3" >/dev/null || cs_cv_prog_jam_version_ok=yes ; }
-
-if test -z "$cs_cv_prog_jam_version_ok"; then
-  cs_cv_prog_jam_version_ok=yes
-fi
-
-cs_cv_prog_jam_version_ok_annotated="$cs_cv_prog_jam_version_ok"
-if test -n "$cs_prog_jam_is_version"; then
-  cs_cv_prog_jam_version_ok_annotated="$cs_cv_prog_jam_version_ok_annotated (version $cs_prog_jam_is_version)"
-fi
-
-
-fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_jam_version_ok_annotated" >&5
-echo "${ECHO_T}$cs_cv_prog_jam_version_ok_annotated" >&6
-if test "$cs_cv_prog_jam_version_ok" = yes; then
-  cs_prog_jam_okay=yes
-else
-  cs_prog_jam_okay=no
-fi
-
-else
-  cs_prog_jam_okay=no
-fi
-
-
-if test $cs_prog_jam_okay != yes; then
-  JAM=./jam$EXEEXT CS_NEED_LOCAL_JAM=yes
-fi
-
-cs_build_prop_val="$JAM"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}JAM ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-
-for ac_prog in gnumake gmake make
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_MAKE+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$MAKE"; then
-  ac_cv_prog_MAKE="$MAKE" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_MAKE="$ac_prog"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-fi
-fi
-MAKE=$ac_cv_prog_MAKE
-if test -n "$MAKE"; then
-  echo "$as_me:$LINENO: result: $MAKE" >&5
-echo "${ECHO_T}$MAKE" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-  test -n "$MAKE" && break
-done
-
-
-
-
-#------------------------------------------------------------------------------
-# Determine how to make a directory tree.
-#------------------------------------------------------------------------------
-echo "$as_me:$LINENO: checking how to create a directory" >&5
-echo $ECHO_N "checking how to create a directory... $ECHO_C" >&6
-if test "${cs_cv_shell_mkdir+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cs_cv_shell_mkdir='mkdir'
-fi
-echo "$as_me:$LINENO: result: $cs_cv_shell_mkdir" >&5
-echo "${ECHO_T}$cs_cv_shell_mkdir" >&6
-    MKDIR=$cs_cv_shell_mkdir
-
-
-    echo "$as_me:$LINENO: checking how to create a directory tree" >&5
-echo $ECHO_N "checking how to create a directory tree... $ECHO_C" >&6
-if test "${cs_cv_shell_mkdir_p+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if $cs_cv_shell_mkdir -p . 2>/dev/null; then
-	    cs_cv_shell_mkdir_p='mkdir -p'
-	elif mkdirs . 2>/dev/null; then
-	    cs_cv_shell_mkdir_p='mkdirs'
-	fi
-	test -d ./-p && rmdir ./-p
-fi
-echo "$as_me:$LINENO: result: $cs_cv_shell_mkdir_p" >&5
-echo "${ECHO_T}$cs_cv_shell_mkdir_p" >&6
-    if test "${cs_cv_shell_mkdir_p+set}" = set; then
-  MKDIRS=$cs_cv_shell_mkdir_p
-
-else
-  cat >confcache <<\_ACEOF
-# This file is a shell script that caches the results of configure
-# tests run on this system so they can be shared between configure
-# scripts and configure runs, see configure's option --config-cache.
-# It is not useful on other systems.  If it contains results you don't
-# want to keep, you may remove or edit it.
-#
-# config.status only pays attention to the cache file if you give it
-# the --recheck option to rerun configure.
-#
-# `ac_cv_env_foo' variables (set or unset) will be overridden when
-# loading this file, other *unset* `ac_cv_foo' will be assigned the
-# following values.
-
-_ACEOF
-
-# The following way of writing the cache mishandles newlines in values,
-# but we know of no workaround that is simple, portable, and efficient.
-# So, don't put newlines in cache variables' values.
-# Ultrix sh set writes to stderr and can't be redirected directly,
-# and sets the high bit in the cache file unless we assign to the vars.
-{
-  (set) 2>&1 |
-    case `(ac_space=' '; set | grep ac_space) 2>&1` in
-    *ac_space=\ *)
-      # `set' does not quote correctly, so add quotes (double-quote
-      # substitution turns \\\\ into \\, and sed turns \\ into \).
-      sed -n \
-	"s/'/'\\\\''/g;
-	  s/^\\([_$as_cr_alnum]*_cv_[_$as_cr_alnum]*\\)=\\(.*\\)/\\1='\\2'/p"
-      ;;
-    *)
-      # `set' quotes correctly as required by POSIX, so do not add quotes.
-      sed -n \
-	"s/^\\([_$as_cr_alnum]*_cv_[_$as_cr_alnum]*\\)=\\(.*\\)/\\1=\\2/p"
-      ;;
-    esac;
-} |
-  sed '
-     t clear
-     : clear
-     s/^\([^=]*\)=\(.*[{}].*\)$/test "${\1+set}" = set || &/
-     t end
-     /^ac_cv_env/!s/^\([^=]*\)=\(.*\)$/\1=${\1=\2}/
-     : end' >>confcache
-if diff $cache_file confcache >/dev/null 2>&1; then :; else
-  if test -w $cache_file; then
-    test "x$cache_file" != "x/dev/null" && echo "updating cache $cache_file"
-    cat confcache >$cache_file
-  else
-    echo "not updating unwritable cache $cache_file"
-  fi
-fi
-rm -f confcache
-    { { echo "$as_me:$LINENO: error: do not know how to create a directory tree" >&5
-echo "$as_me: error: do not know how to create a directory tree" >&2;}
-   { (exit 1); exit 1; }; }
-fi
-
-cs_build_prop_val="$MKDIR"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.MKDIR ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-cs_build_prop_val="$MKDIRS"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.MKDIRS ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-
-
-
-#------------------------------------------------------------------------------
-# Find and identify the various implementations of libtool.  In particular, we
-# are aware of GNU libtool and Apple's libtool (which serves a completely
-# different purpose).  On MacOS/X, GNU libtool is typically named glibtool,
-# however a user might also use Fink to install the unadorned libtool; and the
-# Fink-installed version might shadow Apple's own libtool if it appears in the
-# PATH before the Apple tool.
-#------------------------------------------------------------------------------
-
-
-
-
 # GNU: Search for libtool before glibtool since Fink version is likely newer.
 
 if test -z "$LIBTOOL"; then
@@ -4435,12 +4118,7 @@ fi
 
 fi
 
-cs_build_prop_val="$LIBTOOL"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}LIBTOOL ?= \"$cs_build_prop_val\" ;
-"
-fi
+LIBTOOL=$LIBTOOL
 
 
 # Apple: Ensure that Apple libtool will be found before GNU libtool from Fink.
@@ -4506,12 +4184,320 @@ fi
 
 fi
 
+APPLE_LIBTOOL=$APPLE_LIBTOOL
+
+cs_build_prop_val="$LIBTOOL"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}LIBTOOL ?= \"$cs_build_prop_val\" ;
+"
+fi
+
 cs_build_prop_val="$APPLE_LIBTOOL"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}APPLE_LIBTOOL ?= \"$cs_build_prop_val\" ;
 "
 fi
+
+
+echo "$as_me:$LINENO: checking how to create a directory" >&5
+echo $ECHO_N "checking how to create a directory... $ECHO_C" >&6
+if test "${cs_cv_shell_mkdir+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cs_cv_shell_mkdir='mkdir'
+fi
+echo "$as_me:$LINENO: result: $cs_cv_shell_mkdir" >&5
+echo "${ECHO_T}$cs_cv_shell_mkdir" >&6
+    MKDIR=$cs_cv_shell_mkdir
+
+
+    echo "$as_me:$LINENO: checking how to create a directory tree" >&5
+echo $ECHO_N "checking how to create a directory tree... $ECHO_C" >&6
+if test "${cs_cv_shell_mkdir_p+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if $cs_cv_shell_mkdir -p . 2>/dev/null; then
+	    cs_cv_shell_mkdir_p='mkdir -p'
+	elif mkdirs . 2>/dev/null; then
+	    cs_cv_shell_mkdir_p='mkdirs'
+	fi
+	test -d ./-p && rmdir ./-p
+fi
+echo "$as_me:$LINENO: result: $cs_cv_shell_mkdir_p" >&5
+echo "${ECHO_T}$cs_cv_shell_mkdir_p" >&6
+    if test "${cs_cv_shell_mkdir_p+set}" = set; then
+  MKDIRS=$cs_cv_shell_mkdir_p
+
+else
+  cat >confcache <<\_ACEOF
+# This file is a shell script that caches the results of configure
+# tests run on this system so they can be shared between configure
+# scripts and configure runs, see configure's option --config-cache.
+# It is not useful on other systems.  If it contains results you don't
+# want to keep, you may remove or edit it.
+#
+# config.status only pays attention to the cache file if you give it
+# the --recheck option to rerun configure.
+#
+# `ac_cv_env_foo' variables (set or unset) will be overridden when
+# loading this file, other *unset* `ac_cv_foo' will be assigned the
+# following values.
+
+_ACEOF
+
+# The following way of writing the cache mishandles newlines in values,
+# but we know of no workaround that is simple, portable, and efficient.
+# So, don't put newlines in cache variables' values.
+# Ultrix sh set writes to stderr and can't be redirected directly,
+# and sets the high bit in the cache file unless we assign to the vars.
+{
+  (set) 2>&1 |
+    case `(ac_space=' '; set | grep ac_space) 2>&1` in
+    *ac_space=\ *)
+      # `set' does not quote correctly, so add quotes (double-quote
+      # substitution turns \\\\ into \\, and sed turns \\ into \).
+      sed -n \
+	"s/'/'\\\\''/g;
+	  s/^\\([_$as_cr_alnum]*_cv_[_$as_cr_alnum]*\\)=\\(.*\\)/\\1='\\2'/p"
+      ;;
+    *)
+      # `set' quotes correctly as required by POSIX, so do not add quotes.
+      sed -n \
+	"s/^\\([_$as_cr_alnum]*_cv_[_$as_cr_alnum]*\\)=\\(.*\\)/\\1=\\2/p"
+      ;;
+    esac;
+} |
+  sed '
+     t clear
+     : clear
+     s/^\([^=]*\)=\(.*[{}].*\)$/test "${\1+set}" = set || &/
+     t end
+     /^ac_cv_env/!s/^\([^=]*\)=\(.*\)$/\1=${\1=\2}/
+     : end' >>confcache
+if diff $cache_file confcache >/dev/null 2>&1; then :; else
+  if test -w $cache_file; then
+    test "x$cache_file" != "x/dev/null" && echo "updating cache $cache_file"
+    cat confcache >$cache_file
+  else
+    echo "not updating unwritable cache $cache_file"
+  fi
+fi
+rm -f confcache
+    { { echo "$as_me:$LINENO: error: do not know how to create a directory tree" >&5
+echo "$as_me: error: do not know how to create a directory tree" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+cs_build_prop_val="$MKDIR"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.MKDIR ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+cs_build_prop_val="$MKDIRS"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.MKDIRS ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+
+
+
+#------------------------------------------------------------------------------
+# In order to avoid alienating users by forcing them to install and use Jam,
+# config.status is instructed (see far below) to build Jam on the user's behalf
+# from local sources, and to place the executable in the root of the build
+# directory.  When checking for Jam, in addition to PATH, we also look in root
+# of the build directory since we might already have built Jam on a previous
+# configure run.
+#
+# IMPLEMENTATION NOTES
+#
+# The Crystal Space build system supports Jam versions starting with 2.4.
+# Earlier versions are rejected. Examples of rejected versions include Apple's
+# highly modified Jam (based upon 2.2.1), and ftjam (based upon
+# 2.3.2). BoostJam reports its version number as 3.1.9 (or greater), though it
+# is actually based upon Jam 2.4. Since we accept 2.4, and since 3.1.9 passes
+# the "jam -v >= 2.4" assertion, this version anomaly is not a problem.
+#
+# We also check for 'make', since it is used to build Jam locally, when needed.
+#------------------------------------------------------------------------------
+
+
+for ac_prog in jam
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_JAM+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $JAM in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_JAM="$JAM" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH$PATH_SEPARATOR.
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_JAM="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  ;;
+esac
+fi
+JAM=$ac_cv_path_JAM
+
+if test -n "$JAM"; then
+  echo "$as_me:$LINENO: result: $JAM" >&5
+echo "${ECHO_T}$JAM" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  test -n "$JAM" && break
+done
+
+if test -n "$JAM"; then
+  echo "$as_me:$LINENO: checking if jam version >= 2.4" >&5
+echo $ECHO_N "checking if jam version >= 2.4... $ECHO_C" >&6
+if test "${cs_cv_prog_jam_version_ok_annotated+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cs_prog_jam_is_version=
+cs_prog_jam_min_version=
+cs_prog_jam_is_suffix=
+cs_prog_jam_min_suffix=
+cs_prog_jam_is_suffix_done=
+cs_prog_jam_min_suffix_done=
+
+
+
+
+test -z $cs_prog_jam_is_version && cs_prog_jam_is_version=`$JAM -v 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+test -n "$cs_prog_jam_is_version" && test -z $cs_prog_jam_is_suffix_done  && { cs_prog_jam_is_suffix_done=yes ; cs_prog_jam_is_suffix= ; }
+
+test -z $cs_prog_jam_is_version && cs_prog_jam_is_version=`$JAM -v 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+test -n "$cs_prog_jam_is_version" && test -z $cs_prog_jam_is_suffix_done  && { cs_prog_jam_is_suffix_done=yes ; cs_prog_jam_is_suffix=.0 ; }
+
+
+
+
+
+
+test -z $cs_prog_jam_min_version && cs_prog_jam_min_version=`echo 2.4 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+test -n "$cs_prog_jam_min_version" && test -z $cs_prog_jam_min_suffix_done  && { cs_prog_jam_min_suffix_done=yes ; cs_prog_jam_min_suffix= ; }
+
+test -z $cs_prog_jam_min_version && cs_prog_jam_min_version=`echo 2.4 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+test -n "$cs_prog_jam_min_version" && test -z $cs_prog_jam_min_suffix_done  && { cs_prog_jam_min_suffix_done=yes ; cs_prog_jam_min_suffix=.0 ; }
+
+
+cs_prog_jam_is_ver_1=`echo ${cs_prog_jam_is_version}${cs_prog_jam_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_jam_is_ver_2=`echo ${cs_prog_jam_is_version}${cs_prog_jam_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_jam_is_ver_3=`echo ${cs_prog_jam_is_version}${cs_prog_jam_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
+
+cs_prog_jam_min_ver_1=`echo $cs_prog_jam_min_version${cs_prog_jam_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_jam_min_ver_2=`echo $cs_prog_jam_min_version${cs_prog_jam_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_jam_min_ver_3=`echo $cs_prog_jam_min_version${cs_prog_jam_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
+
+cs_cv_prog_jam_version_ok=''
+test -z "$cs_cv_prog_jam_version_ok" && { expr "$cs_prog_jam_is_ver_1" ">=" "$cs_prog_jam_min_ver_1" >/dev/null || cs_cv_prog_jam_version_ok=no ; }
+test -z "$cs_cv_prog_jam_version_ok" && { expr "$cs_prog_jam_min_ver_1" ">=" "$cs_prog_jam_is_ver_1" >/dev/null || cs_cv_prog_jam_version_ok=yes ; }
+test -z "$cs_cv_prog_jam_version_ok" && { expr "$cs_prog_jam_is_ver_2" ">=" "$cs_prog_jam_min_ver_2" >/dev/null || cs_cv_prog_jam_version_ok=no ; }
+test -z "$cs_cv_prog_jam_version_ok" && { expr "$cs_prog_jam_min_ver_2" ">=" "$cs_prog_jam_is_ver_2" >/dev/null || cs_cv_prog_jam_version_ok=yes ; }
+test -z "$cs_cv_prog_jam_version_ok" && { expr "$cs_prog_jam_is_ver_3" ">=" "$cs_prog_jam_min_ver_3" >/dev/null || cs_cv_prog_jam_version_ok=no ; }
+test -z "$cs_cv_prog_jam_version_ok" && { expr "$cs_prog_jam_min_ver_3" ">=" "$cs_prog_jam_is_ver_3" >/dev/null || cs_cv_prog_jam_version_ok=yes ; }
+
+if test -z "$cs_cv_prog_jam_version_ok"; then
+  cs_cv_prog_jam_version_ok=yes
+fi
+
+cs_cv_prog_jam_version_ok_annotated="$cs_cv_prog_jam_version_ok"
+if test -n "$cs_prog_jam_is_version"; then
+  cs_cv_prog_jam_version_ok_annotated="$cs_cv_prog_jam_version_ok_annotated (version $cs_prog_jam_is_version)"
+fi
+
+
+fi
+echo "$as_me:$LINENO: result: $cs_cv_prog_jam_version_ok_annotated" >&5
+echo "${ECHO_T}$cs_cv_prog_jam_version_ok_annotated" >&6
+if test "$cs_cv_prog_jam_version_ok" = yes; then
+  cs_prog_jam_okay=yes
+else
+  cs_prog_jam_okay=no
+fi
+
+else
+  cs_prog_jam_okay=no
+fi
+
+
+if test $cs_prog_jam_okay != yes; then
+  JAM=./jam$EXEEXT CS_NEED_LOCAL_JAM=yes
+fi
+
+cs_build_prop_val="$JAM"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}JAM ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+
+for ac_prog in gnumake gmake make
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_MAKE+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$MAKE"; then
+  ac_cv_prog_MAKE="$MAKE" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_MAKE="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+MAKE=$ac_cv_prog_MAKE
+if test -n "$MAKE"; then
+  echo "$as_me:$LINENO: result: $MAKE" >&5
+echo "${ECHO_T}$MAKE" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  test -n "$MAKE" && break
+done
+
 
 
 
@@ -36509,16 +36495,17 @@ s,@DVIPDF@,$DVIPDF,;t t
 s,@MAKEINFO@,$MAKEINFO,;t t
 s,@INSTALL@,$INSTALL,;t t
 s,@SWIG@,$SWIG,;t t
-s,@JAM@,$JAM,;t t
-s,@MAKE@,$MAKE,;t t
-s,@MKDIR@,$MKDIR,;t t
-s,@MKDIRS@,$MKDIRS,;t t
 s,@LIBTOOL_TEST@,$LIBTOOL_TEST,;t t
 s,@ac_ct_LIBTOOL_TEST@,$ac_ct_LIBTOOL_TEST,;t t
 s,@LIBTOOL_PATH@,$LIBTOOL_PATH,;t t
 s,@LIBTOOL@,$LIBTOOL,;t t
 s,@ac_ct_LIBTOOL@,$ac_ct_LIBTOOL,;t t
 s,@CS_LT_APPLE@,$CS_LT_APPLE,;t t
+s,@APPLE_LIBTOOL@,$APPLE_LIBTOOL,;t t
+s,@MKDIR@,$MKDIR,;t t
+s,@MKDIRS@,$MKDIRS,;t t
+s,@JAM@,$JAM,;t t
+s,@MAKE@,$MAKE,;t t
 s,@CSLIBS_CONFIG@,$CSLIBS_CONFIG,;t t
 s,@ac_ct_CSLIBS_CONFIG@,$ac_ct_CSLIBS_CONFIG,;t t
 s,@NASM@,$NASM,;t t
