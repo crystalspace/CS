@@ -25,6 +25,9 @@ The history order is reversed so that new features are at the top.
 	  a 64x64 and 16x16 texture on which smaller lightmaps will fit.
 	  On linux this doesn't seem to have any effect at all on performance
 	  but perhaps it will help on MacOS/X.
+	- Fixed a compile error with TinyXML on MSVC.
+	- Made SetValue() on elements in TinyXML a bit more relaxed in case
+	  the given value == NULL. Previously it would crash there.
 12-Mar-2003
 	- Added csArray::ShrinkBestFit() routine. This routine will set
 	  the capacity of the array exactly to the current length. This

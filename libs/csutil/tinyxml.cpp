@@ -459,10 +459,17 @@ TiXmlElement::~TiXmlElement()
 
 void TiXmlElement::SetValue (const char * name)
 {
-  TiDocument* document = GetDocument ();
-  csStringID name_id = document->strings.Request (name);
-  const char* reg_name = document->strings.Request (name_id);
-  value = reg_name;
+  if (name == NULL)
+  {
+    value = NULL;
+  }
+  else
+  {
+    TiDocument* document = GetDocument ();
+    csStringID name_id = document->strings.Request (name);
+    const char* reg_name = document->strings.Request (name_id);
+    value = reg_name;
+  }
 }
 
 const char * TiXmlElement::Attribute( const char * name ) const

@@ -469,10 +469,11 @@ public:
 	TiDocumentAttribute() { name = NULL; value = NULL; }
 	~TiDocumentAttribute () { delete[] value; }
 
-	const char* Name()  const		{ return name; }		///< Return the name of this attribute.
-	const char* Value() const		{ return value; }		///< Return the value of this attribute.
-	const int       IntValue() const;									///< Return the value of this attribute, converted to an integer.
-	const double	DoubleValue() const;								///< Return the value of this attribute, converted to a double.
+	const char* Name()  const { return name; }
+	const char* Value() const { return value; }
+	char* Value() { return value; }
+	const int IntValue() const;
+	const double DoubleValue() const;
 
 	void SetName( const char* _name )	{ name = _name; }
 	void SetValue( const char* _value )
@@ -481,7 +482,7 @@ public:
 	  value = csStrNew (_value);
 	}
 	/// Take over value so that this attribute has ownership.
-	void TakeOverValue( const char* _value )
+	void TakeOverValue( char* _value )
 	{
 	  value = _value;
 	}
@@ -515,7 +516,7 @@ public:
 
 private:
 	const char* name;
-	const char* value;
+	char* value;
 };
 
 
