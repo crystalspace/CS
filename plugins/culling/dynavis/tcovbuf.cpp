@@ -345,6 +345,50 @@ void csCoverageTile::FlushNoDepthConstFValue (csTileCol& fvalue, float maxdepth,
     if (!mods.IsEmpty ())
       modified = true;
   }
+
+  // Check for full coverage.
+  csTileCol test;
+  test = fvalue;
+  test.Invert ();
+  bool recheck_depth = false;
+  if (!test.CheckByte0 ())
+  {
+    if (maxdepth < depth[0]) { depth[0] = maxdepth; recheck_depth = true; }
+    if (maxdepth < depth[1]) { depth[1] = maxdepth; recheck_depth = true; }
+    if (maxdepth < depth[2]) { depth[2] = maxdepth; recheck_depth = true; }
+    if (maxdepth < depth[3]) { depth[3] = maxdepth; recheck_depth = true; }
+  }
+  if (!test.CheckByte1 ())
+  {
+    if (maxdepth < depth[4]) { depth[4] = maxdepth; recheck_depth = true; }
+    if (maxdepth < depth[5]) { depth[5] = maxdepth; recheck_depth = true; }
+    if (maxdepth < depth[6]) { depth[6] = maxdepth; recheck_depth = true; }
+    if (maxdepth < depth[7]) { depth[7] = maxdepth; recheck_depth = true; }
+  }
+  if (!test.CheckByte2 ())
+  {
+    if (maxdepth < depth[8]) { depth[8] = maxdepth; recheck_depth = true; }
+    if (maxdepth < depth[9]) { depth[9] = maxdepth; recheck_depth = true; }
+    if (maxdepth < depth[10]) { depth[10] = maxdepth; recheck_depth = true; }
+    if (maxdepth < depth[11]) { depth[11] = maxdepth; recheck_depth = true; }
+  }
+  if (!test.CheckByte3 ())
+  {
+    if (maxdepth < depth[12]) { depth[12] = maxdepth; recheck_depth = true; }
+    if (maxdepth < depth[13]) { depth[13] = maxdepth; recheck_depth = true; }
+    if (maxdepth < depth[14]) { depth[14] = maxdepth; recheck_depth = true; }
+    if (maxdepth < depth[15]) { depth[15] = maxdepth; recheck_depth = true; }
+  }
+  if (recheck_depth)
+  {
+    modified = true;
+    tile_min_depth = depth[0];
+    tile_max_depth = depth[0];
+    for (i = 1 ; i < NUM_DEPTH ; i++)
+      if (depth[i] < tile_min_depth) tile_min_depth = depth[i];
+      else if (depth[i] > tile_max_depth) tile_max_depth = depth[i];
+  }
+  
   tile_full = fulltest.IsFull ();
 }
 

@@ -27,6 +27,8 @@ chronological order.
 	- Jorrit started work on an optimization in Dynavis which detects
 	  if an object actually modifies the coverage buffer. This is
 	  not finished yet though.
+	- Jorrit optimized Dynavis routine FlushNoDepthConstFValue() to also
+	  test for full coverage of blocks.
 13-Nov-2003
 	- Keith Fulton committed updated versions of the scripts for 3ds Max
  	  exporting.  I've had these for two months and forgot to commit them
