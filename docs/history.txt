@@ -1,6 +1,15 @@
 The history order has been reversed so that new features are at the top.
 
 28-Mar-2001
+	- Wouter Wijngaards added GetNumberParticles and GetSource methods
+	  to the spiral particle system SCF interface.
+	- Wouter also added the following methods to the rain particle
+	  system scf interface: GetNumberParticles, GetDropSize, GetBox,
+	  GetLighting, GetFallSpeed.
+	- Wouter added the following methods to the snow particle system
+	  scf interface: GetNumberParticles, GetDropSize, GetBox,
+	  GetLighting, GetFallSpeed, GetSwirl.
+	- Philip Wyett added necessary fontserver plugin to test app.
 	- Finished the split of csFrustumView and csFrustumContext.
 	- Fixed a bug in the sprite loader with regards to skeletal sprites.
 	- Added a normal sprite, a skeletal sprite, and the hierarchical
