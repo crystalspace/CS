@@ -80,8 +80,14 @@ struct iSpriteCal3DFactoryState : public iBase
 
   /**
    * This loads a submesh which will attach to this skeleton.
+   * filename is the native system filename of the mesh file.
+   * name is the logical name which will be used by the mesh object to
+   * attach and detach this mesh.
+   * attach should be true if this mesh should be part of the mesh object
+   * after it is first created, or false if it will be optionally added
+   * later.
    */
-  virtual bool LoadCoreMesh(const char *filename) = 0;
+  virtual bool LoadCoreMesh(const char *filename,const char *name,bool attach) = 0;
 
   /**
    * This jams a CS material into a cal3d material struct.
@@ -95,6 +101,26 @@ struct iSpriteCal3DFactoryState : public iBase
    */
   virtual void BindMaterials() = 0;
 
+  /**
+   * Returns the count of all the meshes available for attachment
+   * to the core model.
+   */
+  virtual int  GetMeshCount() = 0;
+
+  /**
+   * Returns the xml name of the mesh at a certain index in the array.
+   */
+  virtual const char *GetMeshName(int idx) = 0;
+
+  /**
+   * Returns the index of the specified mesh name, or -1 if not found.
+   */
+  virtual int  FindMeshName(const char *meshName) = 0;
+
+  /**
+   * Returns whether the mesh is a default mesh or not.
+   */
+  virtual bool IsMeshDefault(int idx) = 0;
 };
 
 SCF_VERSION (iSpriteCal3DState, 0, 0, 1);
@@ -167,6 +193,34 @@ struct iSpriteCal3DState : public iBase
    * reduce the polygon count and simplify the scene for the renderer.
    */
   virtual void SetLOD(float lod) = 0;
+
+  /**
+   * This attaches a mesh with the specified name (from xml) to the instance of
+   * the model.
+   */
+  virtual bool AttachCoreMesh(const char *meshname) = 0;
+
+  /**
+   * This attaches a mesh with the specified calCoreModel id to the instance of
+   * the model.  It is expected this function is only called by the mesh object
+   * itself under normal circumstances.  Callers should normally refer to meshes
+   * by name to prevent behavior changes when xml order is updated.
+   */
+  virtual bool AttachCoreMesh(int mesh_id) = 0;
+
+  /**
+   * This detaches a mesh with the specified name (from xml) to the instance of
+   * the model.
+   */
+  virtual bool DetachCoreMesh(const char *meshname) = 0;
+
+  /**
+   * This detaches a mesh with the specified calCoreModel id to the instance of
+   * the model.  It is expected this function is only called by the mesh object
+   * itself under normal circumstances.  Callers should normally refer to meshes
+   * by name to prevent behavior changes when xml order is updated.
+   */
+  virtual bool DetachCoreMesh(int mesh_id) = 0;
 };
 
 #endif // __CS_IMESH_SPRITE3D_H__

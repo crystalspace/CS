@@ -23,23 +23,23 @@
 	<animation file="cally_shoot_arrow.caf"  name="shoot arrow" type="4" />
 	<animation file="cally_wave.caf"         name="greet" type="4" />
 
-	<mesh file="cally_calf_left.cmf" />
-	<mesh file="cally_calf_right.cmf" />
-	<mesh file="cally_chest.cmf" />
-	<mesh file="cally_foot_left.cmf" />
-	<mesh file="cally_foot_right.cmf" />
-	<mesh file="cally_hand_left.cmf" />
-	<mesh file="cally_hand_right.cmf" />
-	<mesh file="cally_head.cmf" />
-	<mesh file="cally_lowerarm_left.cmf" />
-	<mesh file="cally_lowerarm_right.cmf" />
-	<mesh file="cally_neck.cmf" />
-	<mesh file="cally_pelvis.cmf" />
-	<mesh file="cally_ponytail.cmf" />
-	<mesh file="cally_thigh_left.cmf" />
-	<mesh file="cally_thigh_right.cmf" />
-	<mesh file="cally_upperarm_left.cmf" />
-	<mesh file="cally_upperarm_right.cmf" />
+	<mesh file="cally_calf_left.cmf"  name="Left Calf" />
+	<mesh file="cally_calf_right.cmf" name="Right Calf" />
+	<mesh file="cally_chest.cmf"      name="Chest" />
+	<mesh file="cally_foot_left.cmf"  name="Left Foot" />
+	<mesh file="cally_foot_right.cmf" name="Right Foot" />
+	<mesh file="cally_hand_left.cmf"  name="Left Hand" />
+	<mesh file="cally_hand_right.cmf" name="Right Hand" />
+	<mesh file="cally_head.cmf"       name="Head" />
+	<mesh file="cally_lowerarm_left.cmf"  name="Left Forearm" />
+	<mesh file="cally_lowerarm_right.cmf" name="Right Forearm" />
+	<mesh file="cally_neck.cmf"           name="Neck" />
+	<mesh file="cally_pelvis.cmf"         name="Pelvis" />
+	<mesh file="cally_ponytail.cmf"       name="Ponytail" />
+	<mesh file="cally_thigh_left.cmf"     name="Left Thigh" />
+	<mesh file="cally_thigh_right.cmf"    name="Right Thigh" />
+	<mesh file="cally_upperarm_left.cmf"  name="Left Upper Arm" />
+	<mesh file="cally_upperarm_right.cmf" name="Right Upper Arm" />
 
 	<material file="cally_skin.crf" />
 	<material file="cally_ponytail.crf" />

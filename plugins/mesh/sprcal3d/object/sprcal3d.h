@@ -71,6 +71,13 @@ struct csCal3DAnimation
     float    max_velocity;
 };
 
+struct csCal3DMesh
+{
+    int      index;
+    csString name;
+    bool     attach_by_default;
+};
+
 class csSpriteCal3DMeshObject;
 
 /**
@@ -93,6 +100,8 @@ private:
   /// This is the factory equivalent class in cal3d.
   CalCoreModel calCoreModel;
   csArray<csCal3DAnimation*> anims;
+  csArray<csCal3DMesh*>      submeshes;
+
   csString     basePath;
   float	       renderScale;
 
@@ -124,9 +133,14 @@ public:
   float GetRenderScale() { return renderScale; }
   bool LoadCoreSkeleton(const char *filename);
   int  LoadCoreAnimation(const char *filename,const char *name,int type,float base_vel,float min_vel,float max_vel);
-  bool LoadCoreMesh(const char *filename);
+  bool LoadCoreMesh(const char *filename,const char *name,bool attach);
   bool AddCoreMaterial(iMaterialWrapper *mat);
   void BindMaterials();
+
+  int  GetMeshCount() { return submeshes.Length(); }
+  const char *GetMeshName(int idx);
+  int  FindMeshName(const char *meshName);
+  bool IsMeshDefault(int idx);
 
   //------------------------ iMeshObjectFactory implementation --------------
   SCF_DECLARE_IBASE;
@@ -239,14 +253,26 @@ public:
     virtual int LoadCoreAnimation(const char *filename,const char *name,int type,float base_vel,float min_vel,float max_vel)
     { return scfParent->LoadCoreAnimation(filename,name,type,base_vel,min_vel,max_vel); }
 
-    virtual bool LoadCoreMesh(const char *filename)
-    { return scfParent->LoadCoreMesh(filename); }
+    virtual bool LoadCoreMesh(const char *filename,const char *name,bool attach)
+    { return scfParent->LoadCoreMesh(filename,name,attach); }
 
     virtual bool AddCoreMaterial(iMaterialWrapper *mat)
     { return scfParent->AddCoreMaterial(mat); }
 
     virtual void BindMaterials()
     { scfParent->BindMaterials(); }
+
+    virtual int  GetMeshCount()
+    { return scfParent->GetMeshCount(); }
+
+    virtual const char *GetMeshName(int idx)
+    { return scfParent->GetMeshName(idx); }
+
+    virtual int  FindMeshName(const char *meshName)
+    { return scfParent->FindMeshName(meshName); }
+
+    virtual bool IsMeshDefault(int idx)
+    { return scfParent->IsMeshDefault(idx); }
 
   } scfiSpriteCal3DFactoryState;
   struct LODControl : public iLODControl
@@ -331,6 +357,7 @@ private:
 //  csArray<bool>             initialized;
 //  csArray<csColor*>         mesh_colors;
   bool arrays_initialized;
+  csArray<int>		     attached_ids;
   csArray<G3DTriangleMesh>  *meshes;
   csArray<bool>             *is_initialized;
   csArray<csColor*>         *meshes_colors;
@@ -339,6 +366,7 @@ private:
 #endif
 
   void SetupObject ();
+  void SetupObjectSubmesh(int index);
   void SetupVertexBuffer (int mesh,int submesh,int num_vertices,int num_triangles,csTriangle *triangles);
   bool DrawSubmesh (iGraphics3D* g3d,iRenderView* rview,CalRenderer *pCalRenderer,int mesh,int submesh);
   void UpdateLightingSubmesh (iLight** lights, int num_lights,iMovable* movable,CalRenderer *pCalRenderer,int mesh, int submesh);
@@ -480,6 +508,11 @@ public:
   bool SetVelocity(float vel);
   void SetLOD(float lod);
   
+  bool AttachCoreMesh(const char *meshname);
+  bool AttachCoreMesh(int mesh_id);
+  bool DetachCoreMesh(const char *meshname);
+  bool DetachCoreMesh(int mesh_id);
+
   struct SpriteCal3DState : public iSpriteCal3DState
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSpriteCal3DMeshObject);
@@ -529,6 +562,17 @@ public:
     {
 	scfParent->SetLOD(lod);
     }
+    virtual bool AttachCoreMesh(const char *meshname)
+    {  return scfParent->AttachCoreMesh(meshname); }
+
+    virtual bool AttachCoreMesh(int mesh_id)
+    {  return scfParent->AttachCoreMesh(mesh_id); }
+
+    virtual bool DetachCoreMesh(const char *meshname)
+    {  return scfParent->DetachCoreMesh(meshname); }
+
+    virtual bool DetachCoreMesh(int mesh_id)
+    {  return scfParent->DetachCoreMesh(mesh_id); }
 
   } scfiSpriteCal3DState;
   friend struct SpriteCal3DState;

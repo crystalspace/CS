@@ -75,6 +75,7 @@ CS_IMPLEMENT_APPLICATION
 #define VIEWMESH_OVERRIDE_SELECT_START  77900
 #define VIEWMESH_STATES_ADD_START       78000
 #define VIEWMESH_STATES_CLEAR_START     78100
+#define VIEWMESH_MESH_SELECT_START      78200
 #define VIEWMESH_COMMAND_CAMMODE1       77711
 #define VIEWMESH_COMMAND_CAMMODE2       77712
 #define VIEWMESH_COMMAND_CAMMODE3       77713
@@ -361,6 +362,28 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 	menu->Hide();
 	return true;
       }
+      if (ev.Command.Code >= VIEWMESH_MESH_SELECT_START &&
+	  ev.Command.Code < VIEWMESH_MESH_SELECT_START + 100)
+      {
+        csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
+                iSpriteCal3DState));
+        if (cal3dstate)
+        {
+	  if (menu->GetCheck(ev.Command.Code))
+	  {
+	    cal3dstate->DetachCoreMesh(ev.Command.Code - VIEWMESH_MESH_SELECT_START);
+            menu->SetCheck(ev.Command.Code, false);
+	  }
+	  else
+	  {
+	    cal3dstate->AttachCoreMesh(ev.Command.Code - VIEWMESH_MESH_SELECT_START);
+	    sprite->DeferUpdateLighting(CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+            menu->SetCheck(ev.Command.Code, true);
+	  }
+	}
+	menu->Hide();
+	return true;
+      }
       break;
   }
 
@@ -441,6 +464,21 @@ bool ViewMesh::LoadSprite(const char *filename, float scale)
           actionlist.Push (csStrNew (cal3dstate->GetAnimName (i)));
 	else
           stateslist.Push (csStrNew (cal3dstate->GetAnimName (i)));
+      }
+      csRef<iSpriteCal3DFactoryState> factstate(SCF_QUERY_INTERFACE(imeshfact,
+								    iSpriteCal3DFactoryState));
+      if (factstate)
+      {
+	  for (int i=0; i<factstate->GetMeshCount(); i++)
+	  {
+	      csString push;
+	      if (factstate->IsMeshDefault(i))
+		  push.Append("x"); // This is used as a flag to determine whether the item should be initially checked or not.
+	      else
+		  push.Append(" ");
+	      push.Append(factstate->GetMeshName(i));
+	      meshlist.Push(push);
+	  }
       }
     }
   }
@@ -536,6 +574,17 @@ void ViewMesh::ConstructMenu()
  	  		   VIEWMESH_OVERRIDE_SELECT_START+i);
     }
     (void)new csMenuItem(menu, "Overrides", overridemenu);
+
+    csMenu *meshmenu = new csMenu(0);
+    for (i=0;i<meshlist.Length();i++)
+    {
+      (void)new csMenuItem(meshmenu, meshlist.Get(i)+1,
+ 	  		   VIEWMESH_MESH_SELECT_START+i);
+      if (*meshlist.Get(i) == 'x')
+	  meshmenu->SetCheck(VIEWMESH_MESH_SELECT_START+i, true);
+    }
+    (void)new csMenuItem(menu, "Attach Meshes", meshmenu);
+   
   }
   else
   {

@@ -184,11 +184,49 @@ int  csSpriteCal3DMeshObjectFactory::LoadCoreAnimation(const char *filename,
     return id;
 }
 
-bool csSpriteCal3DMeshObjectFactory::LoadCoreMesh(const char *filename)
+bool csSpriteCal3DMeshObjectFactory::LoadCoreMesh(const char *filename,const char *name,bool attach)
 {
     csString path(basePath);
     path.Append(filename);
-    return (calCoreModel.loadCoreMesh((const char *)path)!=-1);
+
+    csCal3DMesh *mesh = new csCal3DMesh;
+    mesh->index = calCoreModel.loadCoreMesh((const char *)path);
+    if (mesh->index == -1)
+    {
+	delete mesh;
+	return false;
+    }
+    mesh->name              = name;
+    mesh->attach_by_default = attach;
+    submeshes.Push(mesh);
+
+    return true;
+}
+
+const char *csSpriteCal3DMeshObjectFactory::GetMeshName(int idx)
+{
+    if (idx >= submeshes.Length())
+	return NULL;
+
+    return submeshes[idx]->name;
+}
+
+bool csSpriteCal3DMeshObjectFactory::IsMeshDefault(int idx)
+{
+    if (idx >= submeshes.Length())
+	return NULL;
+
+    return submeshes[idx]->attach_by_default;
+}
+
+int  csSpriteCal3DMeshObjectFactory::FindMeshName(const char *meshName)
+{
+    for (int i=0; i<submeshes.Length(); i++)
+    {
+	if (submeshes[i]->name == meshName)
+	    return i;
+    }
+    return -1;
 }
 
 bool csSpriteCal3DMeshObjectFactory::AddCoreMaterial(iMaterialWrapper *mat)
@@ -335,23 +373,9 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,CalCoreModel& c
     return;
   }
 
-  // attach all meshes to the model
-  int meshId;
-  for(meshId = 0; meshId < calCoreModel.getCoreMeshCount(); meshId++)
-  {
-    calModel.attachMesh(meshId);
-  }
-
   // set the material set of the whole model
-  calModel.setMaterialSet(0);
-
-  // set initial animation state
-  calModel.getMixer()->blendCycle(0, 1, 0.0f);
-
   vis_cb = 0;
   arrays_initialized = false;
-
-  calModel.update(0);
 }
 
 csSpriteCal3DMeshObject::~csSpriteCal3DMeshObject ()
@@ -362,17 +386,20 @@ csSpriteCal3DMeshObject::~csSpriteCal3DMeshObject ()
   delete [] meshes_colors;
 }
 
-/*******
-int csSpriteCal3DMeshObject::GetLODPolygonCount (float lod) const
-{
-    return 0;
-}
-*******/
-
 
 void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
 {
   factory = tmpl;
+
+  // attach all default meshes to the model
+  int meshId;
+  for(meshId = 0; meshId < factory->GetMeshCount(); meshId++)
+  {
+    if (factory->submeshes[meshId]->attach_by_default)
+	AttachCoreMesh(factory->submeshes[meshId]->index);
+  }
+  calModel.setMaterialSet(0);
+  calModel.update(0);
 }
 
 void csSpriteCal3DMeshObject::SetupVertexBuffer (int mesh,int submesh,int num_vertices,int num_triangles,csTriangle *triangles)
@@ -566,6 +593,27 @@ void csSpriteCal3DMeshObject::UpdateLightingSubmesh (iLight** lights, int num_li
     colors[i].Clamp (2.0f, 2.0f, 2.0f);
 }
 
+void csSpriteCal3DMeshObject::SetupObjectSubmesh(int index)
+{
+    if (!arrays_initialized)
+	return;  // First draw call to SetupObject will take care of most of this.
+
+    if (!calModel.getMesh(index))
+	return;
+
+    int submeshes = calModel.getMesh(index)->getSubmeshCount();
+    for (int j=0; j<submeshes; j++)
+    {
+	bool flag = false;
+	is_initialized[index].Push(flag);
+	G3DTriangleMesh sample;
+	sample.num_vertices_pool = 1;  // no blending
+	sample.buffers[0]  = 0; // NULL
+	meshes[index].Push(sample);
+	meshes_colors[index].Push(NULL);
+    }
+}
+
 void csSpriteCal3DMeshObject::SetupObject()
 {
   int meshCount;
@@ -580,22 +628,15 @@ void csSpriteCal3DMeshObject::SetupObject()
 
     for (int index=0; index<meshCount; index++)
     {
-      int submeshes = calModel.getMesh(index)->getSubmeshCount();
-      for (int j=0; j<submeshes; j++)
-      {
-        bool flag = false;
-        is_initialized[index].Push(flag);
-        G3DTriangleMesh sample;
-        sample.num_vertices_pool = 1;  // no blending
-        sample.buffers[0]  = 0; // NULL
-        meshes[index].Push(sample);
-        meshes_colors[index].Push(0);
-      }
+      SetupObjectSubmesh(index);
     }
   }
   for (int index=0; index<meshCount; index++)
   {
-    int submeshes = calModel.getMesh(index)->getSubmeshCount();
+    CalMesh *mesh = calModel.getMesh(index);
+    if (!mesh)
+	continue;
+    int submeshes = mesh->getSubmeshCount();
     for (int j=0; j<submeshes; j++)
     {
       if (!is_initialized[index][j])
@@ -658,6 +699,8 @@ bool csSpriteCal3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   meshCount = calModel.getRenderer()->getMeshCount();
   for (int i=0; i<meshCount; i++)
   {
+    if (!calModel.getMesh(i))
+	continue;
     for (int j=0; j<calModel.getMesh(i)->getSubmeshCount(); j++)
     {
       meshes[i][j].clip_portal = clip_portal;
@@ -930,6 +973,74 @@ void csSpriteCal3DMeshObject::SetLOD(float lod)
     calModel.setLodLevel(lod);
 }
 
+bool csSpriteCal3DMeshObject::AttachCoreMesh(const char *meshname)
+{
+    int idx = factory->FindMeshName(meshname);
+    if (idx == -1)
+	return false;
+
+    return AttachCoreMesh(factory->submeshes[idx]->index);
+}
+
+bool csSpriteCal3DMeshObject::AttachCoreMesh(int mesh_id)
+{
+    if (!calModel.attachMesh(mesh_id))
+	return false;
+
+    // Since all our vertex buffers and G3DTriangles are in arrays
+    // which line up with the attached submesh list on the calModel,
+    // we need to track these id's in the identical way so that
+    // we can remove the right G3DTriangles when the submesh is
+    // removed.
+
+    attached_ids.Push(mesh_id);
+    SetupObjectSubmesh(attached_ids.Length()-1);
+    CalMesh *mesh = calModel.getMesh(mesh_id);
+    mesh->setMaterialSet(0);
+    return true;
+}
+
+bool csSpriteCal3DMeshObject::DetachCoreMesh(const char *meshname)
+{
+    int idx = factory->FindMeshName(meshname);
+    if (idx == -1)
+	return false;
+
+    return DetachCoreMesh(factory->submeshes[idx]->index);
+}
+
+bool csSpriteCal3DMeshObject::DetachCoreMesh(int mesh_id)
+{
+    if (!calModel.detachMesh(mesh_id))
+	return false;
+
+    // Now that the submesh is removed from the model, we must
+    // remove all the CS rendering structures as well.
+    int i;
+    for (i=0; i<attached_ids.Length(); i++)
+    {
+	if (attached_ids[i] == mesh_id)
+	{
+	    meshes[i].DeleteAll();
+	    is_initialized[i].DeleteAll();
+	    meshes_colors[i].DeleteAll();
+
+	    for (int j=i+1; j<attached_ids.Length(); j++)
+	    {
+              meshes[j-1] = meshes[j];
+	      is_initialized[j-1] = is_initialized[j];
+	      meshes_colors[j-1]  = meshes_colors[j];
+	    }
+	    meshes[j-1].DeleteAll();
+	    is_initialized[j-1].DeleteAll();
+	    meshes_colors[j-1].DeleteAll();
+
+	    attached_ids.DeleteIndex(i);
+	    break;
+	}
+    }
+    return true;
+}
 
 
 

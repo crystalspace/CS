@@ -256,9 +256,17 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_MESH:
       {
 	const char *file = child->GetAttributeValue("file");
+	const char *name = child->GetAttributeValue("name");
+	bool      attach;
+	const char *a = child->GetAttributeValue("attach");
+	if (a && *a == 'n')
+	    attach = false;
+	else
+	    attach = true;
+
 	if (file)
 	{
-	  if (!newspr->LoadCoreMesh(file))
+	  if (!newspr->LoadCoreMesh(file,name,attach))
 	  {
 	    newspr->ReportLastError();
 	    return 0;
