@@ -24,7 +24,7 @@ m4_define([cs_lib_paths_default], [])
 #------------------------------------------------------------------------------
 # CS_CHECK_LIB_WITH(LIBRARY, PROGRAM, [SEARCH-LIST], [LANGUAGE],
 #                   [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND], [OTHER-CFLAGS],
-#                   [OTHER-LFLAGS], [OTHER-LIBS])
+#                   [OTHER-LFLAGS], [OTHER-LIBS], [ALIASES])
 #	Similar to AC_CHECK_LIB(), but allows caller to to provide list of
 #	directories in which to search for LIBRARY, and allows user to override
 #	library location via --with-libLIBRARY=dir.  LIBRARY is the name of the
@@ -51,16 +51,22 @@ m4_define([cs_lib_paths_default], [])
 #	compiler to use for the test.  If LANGUAGE is omitted, C is used.
 #	OTHER-CFLAGS, OTHER-LFLAGS, and OTHER-LIBS can specify additional
 #	compiler flags, linker flags, and libraries needed to successfully link
-#	with LIBRARY.  If the library is found and can be successfully linked
-#	into a program, then the shell cache variable cs_cv_libLIBRARY is set
-#	to "yes"; cs_cv_libLIBRARY_cflags, cs_cv_libLIBRARY_lflags, and
+#	with LIBRARY.  The optional ALIASES is a whitespace-delimited list of
+#	library names to search for in case LIBRARY is not located (for example
+#	"sdl1.2 sdl12" for libsdl1.2.a and libsdl12.a).  If the library or one
+#	of its aliases is found and can be successfully linked into a program,
+#	then the shell cache variable cs_cv_libLIBRARY is set to "yes";
+#	cs_cv_libLIBRARY_cflags, cs_cv_libLIBRARY_lflags, and
 #	cs_cv_libLIBRARY_libs are set, respectively, to the compiler flags
 #	(including OTHER-CFLAGS), linker flags (including OTHER-LFLAGS), and
 #	library references (including OTHER-LIBS) which resulted in a
 #	successful build; and ACTION-IF-FOUND is invoked.  If the library was
 #	not found or was unlinkable, or if the user disabled the library with
 #	--without-libLIBRARY, then cs_cv_libLIBRARY is set to "no" and
-#	ACTION-IF-NOT-FOUND is invoked.
+#	ACTION-IF-NOT-FOUND is invoked.  Note that the exported shell variable
+#	names are always composed from LIBRARY regardless of whether the test
+#	succeeded because the primary library was discovered or one of the
+#	aliases.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_LIB_WITH],
     [AC_ARG_WITH([lib$1], [AC_HELP_STRING([--with-lib$1=dir],
@@ -78,12 +84,17 @@ AC_DEFUN([CS_CHECK_LIB_WITH],
 	    [cs_check_lib_paths=$with_lib$1],
 	    [cs_check_lib_paths="| cs_lib_paths_default $3"])
 
-	_CS_CHECK_LIB_CREATE_FLAGS(
-	    [cs_check_lib_flags], [$1], [$cs_check_lib_paths])
+	cs_check_lib_flags=''
+	for cs_check_lib_alias in $1 $10
+	do
+	    _CS_CHECK_LIB_CREATE_FLAGS([cs_check_lib_flags],
+		[$cs_check_lib_alias], [$cs_check_lib_paths])
+	done
 
 	CS_CHECK_BUILD([for lib$1], [cs_cv_lib$1], [$2], [$cs_check_lib_flags],
 	    [$4], [], [], [$cs_ignore_cache], [$7], [$8], [$9])],
 	[cs_cv_lib$1=no])
+
     cs_cv_with_lib$1="$with_lib$1"
 
     AS_IF([test "$cs_cv_lib$1" = yes],
@@ -99,8 +110,7 @@ AC_DEFUN([CS_CHECK_LIB_WITH],
 #	the like-named arguments of CS_CHECK_LIB_WITH().
 #------------------------------------------------------------------------------
 AC_DEFUN([_CS_CHECK_LIB_CREATE_FLAGS],
-    [$1=''
-    for cs_lib_item in $3
+    [for cs_lib_item in $3
     do
 	case $cs_lib_item in
 	    *\|*) CS_SPLIT(

@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Nov-2003
+	- Eric Sunshine augmented CS_CHECK_LIBS_WITH() in checklib.m4 so that
+	  it now accepts an optional list of alias names of the library for
+	  which it is checking.  For example, the zlib check which normally
+	  checks for "z" can be given aliases "zlib" and "libz" which are names
+	  common on Windows.
 20-Nov-2003
 	- Eric Sunshine once again disabled /nodefaultlib:"MSVCRT" in the
 	  freefnt2 MSVC project files since a user reports that it results in
