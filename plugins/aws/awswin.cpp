@@ -786,7 +786,7 @@ awsWindow::OnDraw(csRect clip)
 
       if (frame_options & foGrip)
       {
-        int   x,y;
+        //int   x,y;
  
         g2d->DrawBox(Frame().xmax-grip_size+2,  Frame().ymax-grip_size+2, grip_size-4, grip_size-4, fill);
         g2d->DrawLine(Frame().xmax-grip_size,   Frame().ymax-grip_size+1, Frame().xmax-7,           Frame().ymax-grip_size+1, hi2);
