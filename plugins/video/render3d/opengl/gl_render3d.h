@@ -32,6 +32,7 @@
 #include "csutil/csstring.h"
 #include "csutil/scf.h"
 #include "csutil/scfstrset.h"
+#include "csgfx/shadervarcontext.h"
 #include "iutil/strset.h"
 
 #include "iutil/comp.h"
@@ -121,6 +122,7 @@ private:
   csStringID string_indices;
   csStringID string_point_radius;
   csStringID string_point_scale;
+  csStringID string_texture_diffuse;
 
   csConfigAccess config;
 
@@ -155,6 +157,15 @@ private:
 
   /// Should we use special buffertype (VBO) or just systemmeory
   bool use_hw_render_buffers;
+
+  // for simple mesh drawing
+  uint scrapIndicesSize;
+  csRef<iRenderBuffer> scrapIndices;
+  uint scrapVerticesSize;
+  csRef<iRenderBuffer> scrapVertices;
+  csRef<iRenderBuffer> scrapTexcoords;
+  csRef<iRenderBuffer> scrapColors;
+  csShaderVariableContext scrapDomain;
 
   ////////////////////////////////////////////////////////////////////
   //                         Private helpers
@@ -405,6 +416,7 @@ public:
   virtual long GetRenderState (G3D_RENDERSTATEOPTION op) const;
 
   virtual csPtr<iPolygonRenderer> CreatePolygonRenderer ();
+  virtual void DrawSimpleMesh (const csSimpleRenderMesh& mesh);
 
   //=========================================================================
   // Below this line are all functions that are not yet implemented by

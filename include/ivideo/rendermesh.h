@@ -43,20 +43,6 @@ struct iMaterialWrapper;
 struct iRenderBufferSource;
 struct iPortalContainer;
 
-/// Type of mesh
-enum csRenderMeshType
-{
-  CS_MESHTYPE_TRIANGLES,
-  CS_MESHTYPE_QUADS,
-  CS_MESHTYPE_TRIANGLESTRIP,
-  CS_MESHTYPE_TRIANGLEFAN,
-  CS_MESHTYPE_POINTS,
-  CS_MESHTYPE_POINT_SPRITES,
-  CS_MESHTYPE_LINES,
-  CS_MESHTYPE_LINESTRIP,
-  CS_MESHTYPE_POLYGON,
-};
-
 /// Document me! @@@
 struct csRenderMesh
 {

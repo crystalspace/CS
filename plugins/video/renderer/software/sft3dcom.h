@@ -497,6 +497,7 @@ public:
   virtual void SetShadowState (int) { }
   virtual csPtr<iPolygonRenderer> CreatePolygonRenderer () { return 0; }
   virtual void SetWorldToCamera (csReversibleTransform* wvmatrix) {}
+  virtual void DrawSimpleMesh (const csSimpleRenderMesh& mesh) {}
   //========================================================================
 
   struct eiComponent : public iComponent

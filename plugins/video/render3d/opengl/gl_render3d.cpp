@@ -138,6 +138,9 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent)
     texunitenabled[i] = false;
   }
 //  lastUsedShaderpass = 0;
+
+  scrapIndicesSize = 0;
+  scrapVerticesSize = 0;
 }
 
 csGLGraphics3D::~csGLGraphics3D()
@@ -797,6 +800,7 @@ bool csGLGraphics3D::Open ()
   string_indices = strings->Request ("indices");
   string_point_radius = strings->Request ("point radius");
   string_point_scale = strings->Request ("point scale");
+  string_texture_diffuse = strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
 
 
   // @@@ These shouldn't be here, I guess.
@@ -1863,6 +1867,186 @@ long csGLGraphics3D::GetRenderState (G3D_RENDERSTATEOPTION op) const
 csPtr<iPolygonRenderer> csGLGraphics3D::CreatePolygonRenderer ()
 {
   return csPtr<iPolygonRenderer> (new csGLPolygonRenderer (this));
+}
+
+void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh)
+{
+  if (scrapIndicesSize < mesh.indexCount)
+  {
+    scrapIndices = CreateRenderBuffer (mesh.indexCount * sizeof (uint),
+      CS_BUF_DYNAMIC, CS_BUFCOMP_UNSIGNED_INT, 1, true);
+    scrapIndicesSize = mesh.indexCount;
+  }
+  if (scrapVerticesSize < mesh.vertexCount)
+  {
+    scrapVertices = CreateRenderBuffer (
+      mesh.vertexCount * sizeof (float) * 3,
+      CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 3, false);
+    scrapTexcoords = CreateRenderBuffer (
+      mesh.vertexCount * sizeof (float) * 2,
+      CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 2, false);
+    scrapColors = CreateRenderBuffer (
+      mesh.vertexCount * sizeof (float) * 4,
+      CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 4, false);
+
+    scrapVerticesSize = mesh.vertexCount;
+  }
+
+  bool useShader = (mesh.shader != 0);
+
+  csShaderVariable* sv;
+  sv = scrapDomain.GetVariableAdd (string_indices);
+  if (mesh.indices)
+  {
+    scrapIndices->CopyToBuffer (mesh.indices, 
+      mesh.indexCount * sizeof (uint));
+    sv->SetValue (scrapIndices);
+  }
+  else
+  {
+    sv->SetValue (0);
+  }
+  sv = scrapDomain.GetVariableAdd (string_vertices);
+  if (mesh.vertices)
+  {
+    scrapVertices->CopyToBuffer (mesh.vertices, 
+      mesh.vertexCount * sizeof (csVector3));
+    if (useShader)
+      sv->SetValue (scrapVertices);
+    else
+      ActivateBuffer (CS_VATTRIB_POSITION, scrapVertices);
+  }
+  else
+  {
+    if (useShader)
+      sv->SetValue (0);
+    else
+      DeactivateBuffer (CS_VATTRIB_POSITION);
+  }
+  sv = scrapDomain.GetVariableAdd (string_texture_coordinates);
+  if (mesh.texcoords)
+  {
+    scrapTexcoords->CopyToBuffer (mesh.texcoords, 
+      mesh.vertexCount * sizeof (csVector2));
+    if (useShader)
+      sv->SetValue (scrapTexcoords);
+    else
+      ActivateBuffer (CS_VATTRIB_TEXCOORD, scrapTexcoords);
+  }
+  else
+  {
+    if (useShader)
+      sv->SetValue (0);
+    else
+      DeactivateBuffer (CS_VATTRIB_TEXCOORD);
+  }
+  sv = scrapDomain.GetVariableAdd (string_colors);
+  if (mesh.colors)
+  {
+    scrapColors->CopyToBuffer (mesh.colors, 
+      mesh.vertexCount * sizeof (csVector4));
+    if (useShader)
+      sv->SetValue (scrapColors);
+    else
+      ActivateBuffer (CS_VATTRIB_COLOR, scrapColors);
+  }
+  else
+  {
+    if (useShader)
+      sv->SetValue (0);
+    else
+      DeactivateBuffer (CS_VATTRIB_COLOR);
+  }
+  if (useShader)
+  {
+    sv = scrapDomain.GetVariableAdd (string_texture_diffuse);
+    sv->SetValue (mesh.texture);
+  }
+  else
+  {
+    if (ext->CS_GL_ARB_multitexture)
+      statecache->SetActiveTU (0);
+    if (mesh.texture)
+      ActivateTexture (mesh.texture);
+    else
+      DeactivateTexture ();
+  }
+
+  int passCount = 1;
+  if (mesh.shader != 0)
+  {
+    passCount = mesh.shader->GetNumberOfPasses ();
+  }
+  
+  csRenderMesh rmesh;
+  //rmesh.z_buf_mode = mesh.z_buf_mode;
+  rmesh.mixmode = mesh.mixmode;
+  rmesh.clip_portal = 0;
+  rmesh.clip_plane = 0;
+  rmesh.clip_z_plane = 0;
+  rmesh.do_mirror = false;
+  rmesh.meshtype = mesh.meshtype;
+  rmesh.indexstart = 0;
+  rmesh.indexend = mesh.indexCount;
+  rmesh.dynDomain = &scrapDomain;
+
+  if (mesh.alphaType.autoAlphaMode)
+  {
+    csAlphaMode::AlphaType autoMode = csAlphaMode::alphaNone;
+
+    iTextureHandle* tex;
+    if ((mesh.alphaType.autoModeTexture != csInvalidStringID) &&
+      (mesh.dynDomain != 0))
+    {
+      csShaderVariable* texVar = mesh.dynDomain->GetVariableRecursive (
+	mesh.alphaType.autoModeTexture);
+      if (texVar)
+	texVar->GetValue (tex);
+    }
+    if (tex == 0)
+      tex = mesh.texture;
+    if (tex != 0)
+      autoMode = tex->GetAlphaType ();
+
+    rmesh.alphaType = autoMode;
+  }
+  else
+  {
+    rmesh.alphaType = mesh.alphaType.alphaType;
+  }
+
+  csArray<iShaderVariableContext*> dynDomain;
+  if (useShader)
+  {
+    dynDomain.Push (shadermgr);
+    dynDomain.Push (&scrapDomain);
+    if (mesh.dynDomain != 0) dynDomain.Push (mesh.dynDomain);
+  }
+
+  SetZMode (mesh.z_buf_mode);
+  for (int p = 0; p < passCount; p++)
+  {
+    if (mesh.shader != 0)
+    {
+      mesh.shader->ActivatePass (p);
+      mesh.shader->SetupPass (&rmesh, dynDomain);
+    }
+    DrawMesh (&rmesh);
+    if (mesh.shader != 0)
+    {
+      mesh.shader->TeardownPass ();
+      mesh.shader->DeactivatePass ();
+    }
+  }
+
+  if (!useShader)
+  {
+    DeactivateBuffer (CS_VATTRIB_POSITION);
+    DeactivateBuffer (CS_VATTRIB_TEXCOORD);
+    DeactivateBuffer (CS_VATTRIB_COLOR);
+    if (mesh.texture)
+      DeactivateTexture ();
+  }
 }
 
 ////////////////////////////////////////////////////////////////////

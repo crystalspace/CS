@@ -37,6 +37,7 @@
 
 struct csRenderMesh;
 class csMatrix3;
+class csVector4;
 class csVector3;
 class csVector2;
 class csPlane3;
@@ -61,6 +62,8 @@ struct iRenderBuffer;
 struct iRenderBufferManager;
 struct iLightingManager;
 struct iPolygonRenderer;
+struct iShader;
+struct iShaderVariableContext;
 
 
 /**\name iGraphics3D::BeginDraw() flags
@@ -599,7 +602,75 @@ struct G3DPolygonMesh
   G3DFogInfo* vertex_fog;
 };
 
-SCF_VERSION (iGraphics3D, 5, 2, 0);
+/// Type of mesh
+enum csRenderMeshType
+{
+  CS_MESHTYPE_TRIANGLES,
+  CS_MESHTYPE_QUADS,
+  CS_MESHTYPE_TRIANGLESTRIP,
+  CS_MESHTYPE_TRIANGLEFAN,
+  CS_MESHTYPE_POINTS,
+  CS_MESHTYPE_POINT_SPRITES,
+  CS_MESHTYPE_LINES,
+  CS_MESHTYPE_LINESTRIP,
+  CS_MESHTYPE_POLYGON,
+};
+
+/**
+ * A simple render mesh.
+ */
+struct csSimpleRenderMesh
+{
+  /// Type of the geometry to draw.
+  csRenderMeshType meshtype;
+
+  /// Number of vertex indices
+  uint indexCount;
+  /// Vertex indices
+  uint* indices;
+
+  /// Number of vertices
+  uint vertexCount;
+  /**
+   * Vertices. Note: you can omit vertices or texcoords, however this 
+   * will likely only give useable results if you provide a shader and 
+   * shader var context (and transfer vertices and/or texcoords with SVs.)
+   */
+  csVector3* vertices;
+  /// Texture coordinates.
+  csVector2* texcoords;
+  /**
+   * (Optional) Colors. 
+   * Leaving this 0 has the same effect as having all vertex colors set to
+   * white.
+   */
+  csVector4* colors;
+  /**
+   * (Optional) Handle to the texture to select. 
+   * Leaving this 0 has the same effect as using a white texture.
+   */
+  iTextureHandle* texture;
+
+  /// (Optional) Shader to use.
+  iShader* shader;
+  /// (Optional) Shader variable context.
+  iShaderVariableContext* dynDomain;
+  /// (Optional) Alpha mode. Defaults to "autodetect".
+  csAlphaMode alphaType;
+  /// (Optional) Z buffer mode. Defaults to CS_ZBUF_NONE.
+  csZBufMode z_buf_mode;
+  /// (Optional) Mix mode. Defaults to CS_FX_COPY.
+  uint mixmode;
+
+  csSimpleRenderMesh () : texture (0), shader (0), dynDomain (0), 
+    z_buf_mode (CS_ZBUF_NONE), mixmode (CS_FX_COPY)
+  {  
+    alphaType.autoAlphaMode = true;
+    alphaType.autoModeTexture = csInvalidStringID;
+  };
+};
+
+SCF_VERSION (iGraphics3D, 5, 2, 1);
 
 /**
  * This is the standard 3D graphics interface.
@@ -957,6 +1028,19 @@ struct iGraphics3D : public iBase
     @@@ Needed for SW poly drawing ATM.
    */
   virtual void SetWorldToCamera (csReversibleTransform* w2c) = 0;
+
+  /**
+   * Draw a csSimpleRenderMesh on the screen.
+   * Simple render meshes are intended for cases where setting up
+   * a render mesh and juggling with render buffers would be too much
+   * effort - e.g. when you want to draw a single polygon on the screen.
+   * <p>
+   * DrawSimpleMesh () hides the complexity of csRenderMesh, it cares
+   * about setting up render buffers, activating the texture etc.
+   * Note that you can still provide shaders and shader variables, but those
+   * are optional.
+   */
+  virtual void DrawSimpleMesh (const csSimpleRenderMesh& mesh) = 0;
 };
 
 /** @} */
