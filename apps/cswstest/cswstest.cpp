@@ -795,6 +795,20 @@ void csWsTest::NotebookDialog ()
     true, "Page four");
 }
 
+/*
+ * This is data that we keep for modal processing.
+ */
+struct ModalData : public iBase
+{
+  uint code;
+  csWindow* d;
+  SCF_DECLARE_IBASE;
+  ModalData () { SCF_CONSTRUCT_IBASE (NULL); }
+};
+
+SCF_IMPLEMENT_IBASE (ModalData)
+SCF_IMPLEMENT_IBASE_END
+
 bool csWsTest::HandleEvent (iEvent &Event)
 {
   static csMouseCursorID mousecursors [] =
@@ -815,40 +829,57 @@ bool csWsTest::HandleEvent (iEvent &Event)
     case csevCommand:
       switch (Event.Command.Code)
       {
+        case cscmdStopModal:
+	{
+	  csComponent* d = GetTopModalComponent ();
+	  int rc = (int)Event.Command.Info;
+	  if (rc == 0 || rc == cscmdCancel) { delete d; return true; }
+	  iMessageBoxData* mbd = SCF_QUERY_INTERFACE (GetTopModalUserdata (),
+	  	iMessageBoxData);
+	  if (mbd) { mbd->DecRef (); delete d; return true; }
+
+	  ModalData* data = (ModalData*)GetTopModalUserdata ();
+	  CS_ASSERT (data != NULL);
+	    switch (data->code)
+	    {
+	      case 66600:
+	      {
+                char filename [MAXPATHLEN + 1];
+                csQueryFileDialog ((csWindow*)d, filename, sizeof (filename));
+                csMessageBox (app, "Result", filename, NULL);
+	      }
+	      break;
+              case 66601:
+	      {
+                int color;
+                csQueryColorDialog ((csWindow*)d, color);
+                char buff [100];
+                sprintf (buff, "color value: %08X\n", color);
+                csMessageBox (app, "Result", buff, NULL);
+	      }
+	      break;
+	    }
+	  delete d;
+          return true;
+	}
         case 66600:
         {
-          csWindow *d = csFileDialog (this, "test file dialog");
-          if (d)
-          {
-            if (Execute (d) == cscmdCancel)
-            {
-              delete d;
-              return true;
-            }
-            char filename [MAXPATHLEN + 1];
-            csQueryFileDialog (d, filename, sizeof (filename));
-            delete d;
-            csMessageBox (app, "Result", filename);
-          }
+          csWindow* d = csFileDialog (this, "test file dialog");
+	  ModalData* data = new ModalData ();
+	  data->d = d;
+	  data->code = Event.Command.Code;
+	  StartModal (d, data);
+	  data->DecRef ();
           return true;
         }
         case 66601:
         {
           csWindow *d = csColorDialog (this, "test color dialog");
-          if (d)
-          {
-            if (Execute (d) == cscmdCancel)
-            {
-              delete d;
-              return true;
-            }
-            int color;
-            csQueryColorDialog (d, color);
-            delete d;
-            char buff [100];
-            sprintf (buff, "color value: %08X\n", color);
-            csMessageBox (app, "Result", buff);
-          }
+	  ModalData* data = new ModalData ();
+	  data->d = d;
+	  data->code = Event.Command.Code;
+	  StartModal (d, data);
+	  data->DecRef ();
           return true;
         }
         case 66610:

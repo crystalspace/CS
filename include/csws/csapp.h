@@ -1,5 +1,6 @@
 /*
     Crystal Space Windowing System: Windowing System Application class interface
+    Copyright (C) 2001 by Jorrit Tyberghein
     Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -75,8 +76,6 @@ protected:
   int WindowListWidth, WindowListHeight;
   /// Current & old mouse pointer ID
   csMouseCursorID MouseCursorID, OldMouseCursorID;
-  /// The recursion level within System->Loop ()
-  int LoopLevel;
   /// The code that dialog passed to Dismiss ()
   int DismissCode;
   /// This is equal to 8 if any of physical r,g,b masks is 0xff000000
@@ -107,6 +106,18 @@ protected:
     virtual bool HandleEvent (iEvent &Event);
   } *scfiPlugIn;
   friend class csAppPlugIn;
+
+  /// A structure for keeping modal information on a stack.
+  struct csModalInfo
+  {
+    csComponent* component;	// Component that is modal
+    csComponent* old_focus;	// Old focus before this component was modal
+    iBase* userdata;		// Userdata
+  };
+  /**
+   * This is a stack of csModalInfo instances to keep track of modality.
+   */
+  csVector ModalInfo;
 
 public:
   /// The system driver
@@ -246,8 +257,29 @@ public:
   /// Delete a child component
   virtual void Delete (csComponent *comp);
 
-  /// Execute a dialog box (or entire app if NULL) and return its dismiss code
-  int Execute (csComponent *comp);
+  /**
+   * Set modality state on a component. When the component is dismissed
+   * StopModal() will be called automatically. This function returns
+   * immediatelly. StartModal() can fail if the component is already modal.
+   */
+  bool StartModal (csComponent* comp, iBase* userdata);
+
+  /**
+   * Stop top-level modality state.
+   */
+  void StopModal (int iCode = cscmdCancel);
+
+  /**
+   * Get the top component which is currently modal.
+   * Or NULL if not in modality.
+   */
+  csComponent* GetTopModalComponent ();
+
+  /**
+   * Get the userdata for the top modal component.
+   * Or NULL if not in modality.
+   */
+  iBase* GetTopModalUserdata ();
 
   /// Dismiss a dialog box with given return code
   void Dismiss (int iCode = cscmdCancel);

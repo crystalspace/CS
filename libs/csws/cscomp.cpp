@@ -1893,7 +1893,9 @@ void csComponent::FixSize (int &newW, int &newH)
 void csComponent::Close ()
 {
   if (GetState (CSS_MODAL))
+  {
     app->Dismiss (cscmdCancel);
+  }
   else
     delete this;
 }

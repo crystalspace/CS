@@ -40,7 +40,23 @@
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//- Message boxes --//--
 
-int csMessageBox (csComponent *iParent, const char *iTitle, const char *iMessage, int iFlags, ...)
+struct MessageBoxData : public iMessageBoxData
+{
+  int id;
+  iBase* userdata;
+  SCF_DECLARE_IBASE;
+  MessageBoxData () { SCF_CONSTRUCT_IBASE (NULL); }
+  virtual ~MessageBoxData () { if (userdata) userdata->DecRef (); }
+  virtual int GetPressedButton () { return id; }
+  virtual iBase* GetUserData () { return userdata; }
+};
+
+SCF_IMPLEMENT_IBASE (MessageBoxData)
+  SCF_IMPLEMENTS_INTERFACE (iMessageBoxData)
+SCF_IMPLEMENT_IBASE_END
+
+void csMessageBox (csComponent *iParent, const char *iTitle,
+	const char *iMessage, iBase* userdata, int iFlags, ...)
 {
   #define DIST_BITMAPX		8
   #define DIST_BITMAPY		8
@@ -217,10 +233,15 @@ int csMessageBox (csComponent *iParent, const char *iTitle, const char *iMessage
   MsgBox->SetRect (x, y, x + xmax, y + ymax);
   MsgBox->SetDragStyle (CS_DRAG_MOVEABLE);
 
-  int ret = iParent->app->Execute (MsgBox);
+  MessageBoxData* mbdata = new MessageBoxData ();
+  mbdata->userdata = userdata;
+  if (userdata) userdata->IncRef ();
+  iParent->app->StartModal (MsgBox, mbdata);
+  mbdata->DecRef ();
 
-  delete MsgBox;
-  return ret;
+  //int ret = iParent->app->Execute (MsgBox);
+  //delete MsgBox;
+  //return ret;
 }
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//-- File open dialog --//--
@@ -453,7 +474,7 @@ void cspFileDialog::Reread ()
 
   if (!(dh = opendir (path)))
   {
-    csMessageBox (app, "Error", "Invalid directory");
+    csMessageBox (app, "Error", "Invalid directory", NULL);
     app->System->Printf (CS_MSG_INITIALIZATION, "Invalid directory path\n");
   }
   else

@@ -226,7 +226,11 @@ enum
    * IN:  (int *)deltaxy [2]
    * </pre>
    */
-  cscmdMoveClipChildren
+  cscmdMoveClipChildren,
+  /**
+   * This command is sent when this components get out of modality.
+   */
+  cscmdStopModal
 };
 
 /**

@@ -1,5 +1,6 @@
 /*
     Crystal Space Windowing System: Windowing System Application class
+    Copyright (C) 2001 by Jorrit Tyberghein
     Copyright (C) 1998,1999,2000 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -97,7 +98,6 @@ csApp::csApp (iSystem *sys, csSkin &Skin)
   KeyboardOwner = NULL;		// no keyboard owner
   FocusOwner = NULL;		// no focus owner
   WindowListChanged = false;
-  LoopLevel = 0;
   BackgroundStyle = csabsSolid;
   InsertMode = true;
   VFS = NULL;
@@ -118,6 +118,14 @@ csApp::csApp (iSystem *sys, csSkin &Skin)
 
 csApp::~csApp ()
 {
+  // Clean up the modality stack.
+  while (ModalInfo.Length () > 0)
+  {
+    csModalInfo* mi = (csModalInfo*)ModalInfo.Pop ();
+    if (mi->userdata) mi->userdata->DecRef ();
+    delete mi;
+  }
+
   System->UnloadPlugIn (scfiPlugIn);
 
   // Delete all children prior to shutting down the system
@@ -725,26 +733,57 @@ void csApp::NotifyDelete (csComponent *comp)
   hints->Remove (comp);
 }
 
-int csApp::Execute (csComponent *comp)
+bool csApp::StartModal (csComponent* comp, iBase* userdata)
 {
-  csComponent *oldFocusOwner = CaptureFocus (comp);
+  // If already modal then fail.
+  if (comp->GetState (CSS_MODAL))
+    return false;
 
+  csComponent *oldFocusOwner = CaptureFocus (comp);
   comp->Select ();
   comp->SetState (CSS_MODAL, true);
-  LoopLevel++;
-  System->Loop ();
-  LoopLevel--;
-  comp->SetState (CSS_MODAL, false);
 
-  CaptureFocus (oldFocusOwner);
-  return DismissCode;
+  csModalInfo* mi = new csModalInfo ();
+  mi->component = comp;
+  mi->old_focus = oldFocusOwner;
+  mi->userdata = userdata;
+  if (userdata) userdata->IncRef ();
+  ModalInfo.Push (mi);
+
+  return true;
+}
+
+void csApp::StopModal (int iCode)
+{
+  if (ModalInfo.Length () == 0) return;
+  int idx = ModalInfo.Length ()-1;
+  csModalInfo* mi = (csModalInfo*)ModalInfo[idx];
+  mi->component->SetState (CSS_MODAL, false);
+  CaptureFocus (mi->old_focus);
+  app->SendCommand (cscmdStopModal, (void*)iCode);
+  if (mi->userdata) mi->userdata->DecRef ();
+  // Don't use Pop because the event handler might already add new
+  // modal components.
+  ModalInfo.Delete (idx);
+  delete mi;
+}
+
+csComponent* csApp::GetTopModalComponent ()
+{
+  if (ModalInfo.Length () == 0) return NULL;
+  csModalInfo* mi = (csModalInfo*)ModalInfo[ModalInfo.Length ()-1];
+  return mi->component;
+}
+
+iBase* csApp::GetTopModalUserdata ()
+{
+  if (ModalInfo.Length () == 0) return NULL;
+  csModalInfo* mi = (csModalInfo*)ModalInfo[ModalInfo.Length ()-1];
+  return mi->userdata;
 }
 
 void csApp::Dismiss (int iCode)
 {
-  if (LoopLevel)
-  {
-    DismissCode = iCode;
-    EventOutlet->Broadcast (cscmdQuitLoop);
-  } /* endif */
+  app->StopModal (iCode);
 }
+

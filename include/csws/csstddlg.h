@@ -20,6 +20,7 @@
 #ifndef __CSSTDDLG_H__
 #define __CSSTDDLG_H__
 
+#include "csutil/scf.h"
 #define CSWS_INTERNAL
 #include "csws.h"
 
@@ -72,9 +73,29 @@
 /// Center all text lines
 #define CSMBS_CENTER		0x20000000
 
-/// Display a message box and return ID of pressed button (0 for Esc)
-extern int csMessageBox (csComponent *iParent, const char *iTitle, const char *iMessage,
-  int iFlags = CSMBS_INFO | CSMBS_OK, ...);
+SCF_VERSION (iMessageBoxData, 0, 0, 1);
+
+/**
+ * The application will receive a cscmdStopModal event
+ * when csMessageBox is done. The data of this event will be of this
+ * type. You can check this with QUERY_INTERFACE.
+ */
+struct iMessageBoxData : public iBase
+{
+  /// Return userdata given by caller.
+  virtual iBase* GetUserData () = 0;
+};
+
+/**
+ * Display a message box and return immediatelly.
+ * When message box finishes it will send a cscmdStopModal message
+ * to the csApp::HandleEvent() with iMessageBoxData as userdata.
+ * The pressed button will be given as the 'Info' field in
+ * Event.Command.Info (cscmdCancel, cscmdOk, ...).
+ */
+extern void csMessageBox (csComponent *iParent, const char *iTitle,
+	const char *iMessage, iBase* userdata,
+	int iFlags = CSMBS_INFO | CSMBS_OK, ...);
 
 /// File name entry field in file dialogs
 #define CSWID_FILENAME		0xC509

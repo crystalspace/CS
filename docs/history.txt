@@ -8,6 +8,26 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed several minor issues in the Texinfo files.
 	  Also upgraded apimod19.txi to mention CS_QUERY_PLUGIN_ID() rather
 	  than CS_QUERY_PLUGIN().
+	- Did a fundamental change in CSWS. csApp::Execute() is
+	  removed as it did some very bad recursive system loop calling.
+	  This prevented us from doing a proper redesign of the system
+	  driver. Instead there is now a csApp::StartModal() and
+	  csApp::StopModal(). For the GUI user the effect is that of modality
+	  (i.e. there is no difference with calling Execute() from the view-
+	  point of the user: the top-modal dialog has focus and all other
+	  components are disabled). However it will not be modal for the
+	  application. StartModal() returns immediatelly. Instead you have
+	  to wait for the cscmdStopModal command which will be called
+	  to the csApp::HandleEvent() when the modality has finished. LevTool,
+	  CSWSTest, and csfedit have been fixed for this. MazeD hasn't been
+	  fixed and will soon be removed.
+	- A change which is related to this is that csMessageBox() now
+	  returns immediatelly. If you are interested in the result you need
+	  to catch the cscmdStopModal command and see if the userdata
+	  implements iMessageBoxData. If so then you have the result from
+	  csMessageBox().
+	- Removed MazeD (it doesn't work anymore). I put the source of
+	  MazeD in a zip file at ftp://sunsite.dk/projects/crystal.
 25-Jun-2001
 	- Added iBase::GetRefCount(). This way you can now get the reference
 	  counter from any SCF interface. Note that this is ONLY for debugging
