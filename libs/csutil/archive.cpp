@@ -351,7 +351,8 @@ void csArchive::Dir () const
 
 void *csArchive::FindName (const char *name) const
 {
-  int idx = dir.FindSortedKey (name, ArchiveEntryVector::CompareKey);
+  int idx = dir.FindSortedKey(csArrayCmp<ArchiveEntry*,char const*>(name,
+    ArchiveEntryVector::CompareKey));
   if (idx < 0)
     return 0;
   return dir.Get (idx);
@@ -462,7 +463,8 @@ char *csArchive::ReadEntry (FILE *infile, ArchiveEntry * f)
 void *csArchive::NewFile (const char *name, size_t size, bool pack)
 {
   DeleteFile (name);
-  int idx = lazy.FindKey (name, ArchiveEntryVector::CompareKey);
+  int idx = lazy.FindKey (csArrayCmp<ArchiveEntry*,char const*>(name,
+    ArchiveEntryVector::CompareKey));
   ArchiveEntry *f;
   if (idx >= 0)
   {

@@ -107,7 +107,12 @@ class scfSharedLibrary;
 class scfLibraryVector : public csPDelArray<scfSharedLibrary>
 {
 public:
-  static int CompareKey (scfSharedLibrary* const&, char const* const&);
+  static int CompareName (scfSharedLibrary* const& x, char const* const& n);
+  int FindLibrary(char const* name) const
+  {
+    return FindKey(
+      csArrayCmp<scfSharedLibrary*,char const*>(name, CompareName));
+  }
 };
 
 // This is the registry for all shared libraries
@@ -215,10 +220,10 @@ scfSharedLibrary::~scfSharedLibrary ()
   delete [] LibraryName;
 }
 
-int scfLibraryVector::CompareKey (scfSharedLibrary* const& Item,
-				  char const* const& key)
+int scfLibraryVector::CompareName (scfSharedLibrary* const& Item,
+  char const* const& Key)
 {
-  return (strcmp (Item->LibraryName, key));
+  return strcmp (Item->LibraryName, Key);
 }
 
 #endif // CS_STATIC_LINKED
@@ -272,12 +277,22 @@ public:
 /// This class holds a number of scfFactory structures
 class scfClassRegistry : public csPDelArray<scfFactory>
 {
+  typedef csPDelArray<scfFactory> superclass;
 public:
-  scfClassRegistry () : csPDelArray<scfFactory> (16, 16) {}
-  static int CompareKey (scfFactory* const& Item, char const* const& key)
+  scfClassRegistry () : superclass(16, 16) {}
+  static int CompareClass (scfFactory* const& Item, char const* const& key)
   { return strcmp (Item->ClassID, key); }
+  int FindClass(char const* name, bool assume_sorted = false) const
+  {
+    if (assume_sorted)
+      return FindSortedKey(csArrayCmp<scfFactory*,char const*>(name,
+        CompareClass));
+    return FindKey(csArrayCmp<scfFactory*,char const*>(name, CompareClass));
+  }
   static int Compare (scfFactory* const& f1, scfFactory* const& f2)
   { return strcmp (f1->ClassID, f2->ClassID); }
+  void Sort()
+  { superclass::Sort(Compare); }
 };
 
 //----------------------------------------- Class factory implementation ----//
@@ -334,8 +349,7 @@ void scfFactory::IncRef ()
 #ifndef CS_STATIC_LINKED
   if (!Library && LibraryName)
   {
-    int libidx = LibraryRegistry->FindKey (
-      (char const*)LibraryName, scfLibraryVector::CompareKey);
+    int libidx = LibraryRegistry->FindLibrary(LibraryName);
     if (libidx >= 0)
       Library = (scfSharedLibrary *)LibraryRegistry->Get (libidx);
     else
@@ -685,12 +699,11 @@ void *csSCF::CreateInstance (const char *iClassID, const char *iInterface,
   // Pre-sort class registry for doing binary searches
   if (SortClassRegistry)
   {
-    ClassRegistry->Sort (ClassRegistry->Compare);
+    ClassRegistry->Sort();
     SortClassRegistry = false;
   }
 
-  int idx = ClassRegistry->FindSortedKey (
-    iClassID, scfClassRegistry::CompareKey);
+  int idx = ClassRegistry->FindClass(iClassID, true);
   void *instance = 0;
 
   if (idx >= 0)
@@ -743,8 +756,7 @@ bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
   int idx;
   csStringID contextID = 
     context ? contexts.Request (context) : csInvalidStringID;
-  if ((idx = ClassRegistry->FindKey (iClassID,
-  	ClassRegistry->CompareKey)) >= 0)
+  if ((idx = ClassRegistry->FindClass(iClassID)) >= 0)
   {
     scfFactory *cf = (scfFactory *)ClassRegistry->Get (idx);
     if (ContextClash (cf->classContext, contextID))
@@ -789,8 +801,7 @@ bool csSCF::RegisterClass (scfFactoryFunc Func, const char *iClassID,
   int idx;
   csStringID contextID = 
     context ? contexts.Request (context) : csInvalidStringID;
-  if ((idx = ClassRegistry->FindKey (iClassID,
-  	ClassRegistry->CompareKey)) >= 0)
+  if ((idx = ClassRegistry->FindClass(iClassID)) >= 0)
   {
     scfFactory *cf = (scfFactory *)ClassRegistry->Get (idx);
     if (ContextClash (cf->classContext, contextID))
@@ -861,7 +872,7 @@ bool csSCF::UnregisterClass (const char *iClassID)
   if (!ClassRegistry)
     return false;
 
-  int idx = ClassRegistry->FindKey(iClassID, ClassRegistry->CompareKey);
+  int idx = ClassRegistry->FindClass(iClassID);
 
   if (idx < 0)
     return false;
@@ -901,7 +912,7 @@ const char *csSCF::GetClassDescription (const char *iClassID)
 {
   csScopedMutexLock lock (mutex);
 
-  int idx = ClassRegistry->FindKey(iClassID, ClassRegistry->CompareKey);
+  int idx = ClassRegistry->FindClass(iClassID);
   if (idx >= 0)
   {
     iFactory *cf = (iFactory *)ClassRegistry->Get (idx);
@@ -915,7 +926,7 @@ const char *csSCF::GetClassDependencies (const char *iClassID)
 {
   csScopedMutexLock lock (mutex);
 
-  int idx = ClassRegistry->FindKey(iClassID, ClassRegistry->CompareKey);
+  int idx = ClassRegistry->FindClass(iClassID);
   if (idx >= 0)
   {
     iFactory *cf = (iFactory *)ClassRegistry->Get (idx);
@@ -930,7 +941,7 @@ csRef<iDocument> csSCF::GetPluginMetadata (char const *iClassID)
   csRef<iDocument> metadata;
 #ifndef CS_STATIC_LINKED
   csScopedMutexLock lock (mutex);
-  int idx = ClassRegistry->FindKey(iClassID, ClassRegistry->CompareKey);
+  int idx = ClassRegistry->FindClass(iClassID);
   if (idx >= 0)
   {
     scfFactory *cf = ClassRegistry->Get (idx);
@@ -945,7 +956,7 @@ csRef<iDocument> csSCF::GetPluginMetadata (char const *iClassID)
 bool csSCF::ClassRegistered (const char *iClassID)
 {
   csScopedMutexLock lock (mutex);
-  return (ClassRegistry->FindKey (iClassID, ClassRegistry->CompareKey) >= 0);
+  return (ClassRegistry->FindClass(iClassID) >= 0);
 }
 
 

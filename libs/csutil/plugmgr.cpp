@@ -330,7 +330,8 @@ iBase *csPluginManager::QueryPlugin (const char* classID,
 bool csPluginManager::UnloadPlugin (iComponent* obj)
 {
   csScopedMutexLock lock (mutex);
-  int idx = Plugins.FindKey (obj, Plugins.CompareAddress);
+  int idx = Plugins.FindKey (
+    csArrayCmp<csPlugin*,iComponent*>(obj, csPluginsVector::CompareAddress));
   if (idx < 0)
     return false;
 
