@@ -18,6 +18,8 @@
 #include "cssysdef.h"
 #include "csgeom/csrectrg.h"
 
+#include <stdio.h>
+
 csRectRegion::csRectRegion() : region(0), region_count(0), region_max(0) {}
 csRectRegion::~csRectRegion()
 {
@@ -25,7 +27,7 @@ csRectRegion::~csRectRegion()
     free(region);
 }
 
-void csRectRegion::pushRect(csRect const& r)
+void csRectRegion::pushRect(csRect const &r)
 {
   if (region_count >= region_max)
   {
@@ -36,6 +38,7 @@ void csRectRegion::pushRect(csRect const& r)
     else
       region = (csRect*)realloc(region, nbytes);
   }
+
   region[region_count++] = r;
 }
 
@@ -50,17 +53,24 @@ void csRectRegion::deleteRect(int i)
 // and turns it into as many rects as it takes to exclude r2 from the
 // area controlled by r1.
 void
-csRectRegion::fragmentContainedRect(csRect &r1, csRect &r2)
+csRectRegion::fragmentContainedRect(csRect &r1t, csRect &r2t)
 {
   // Edge flags
   const unsigned int LX=1, TY=2, RX=4, BY=8;
   unsigned int edges=0;
+
+  csRect r1(r1t), r2(r2t);
 
   // First check for edging.
   edges |= (r1.xmin == r2.xmin ? LX : 0); 
   edges |= (r1.ymin == r2.ymin ? TY : 0); 
   edges |= (r1.xmax == r2.xmax ? RX : 0); 
   edges |= (r1.ymax == r2.ymax ? BY : 0); 
+
+  
+  printf("csrectrgn: fragmenting with rule %d\n", edges);
+  printf("\t%d,%d,%d,%d\n", r1.xmin, r1.ymin, r1.xmax, r1.ymax);
+  printf("\t%d,%d,%d,%d\n", r2.xmin, r2.ymin, r2.xmax, r2.ymax);
 
   switch(edges)
   {
