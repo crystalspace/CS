@@ -91,6 +91,7 @@ The Print() method displays the bitmap by locking the window, blitting the BBitm
 ========================================
 This is the list of BeOS-specific bugs compiled by Eric Sunshine <sunshine@sunshineco.com>.  These bugs are being actively eradicated.
 
+- The BeOS system driver should determine the directory in which the application resides, and set that as the current working directory.  This would (presumably) allow the programs to be launched from the Tracker application by merely double-clicking on them.
 - Add full-screen support.  Be careful about the resolution, since CS can use any arbitrary window dimension.
 - Application should be able to redraw rendering window when BeOS asks for a redraw even if CS is busy (that is, not pushing out a continuous stream of frames).  There are already cases where this is needed, and will be very important when a pause feature is added.
 - Pause when not foreground application.  Make sure that screen redraws correctly even when paused.
