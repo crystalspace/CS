@@ -32,6 +32,7 @@
 #include "imesh/particle.h"
 #include "imesh/sprite2d.h"
 #include "iengine/lightmgr.h"
+#include "iengine/material.h"
 #include "csgfx/shadervarcontext.h"
 
 struct iMeshObjectFactory;
