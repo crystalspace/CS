@@ -10,6 +10,34 @@ The history order is reversed so that new features are at the top.
 	  specification. This avoids a crash. It will print a warning
 	  if invalid. In addition it will select some default valid
 	  texture mapping.
+	- Martin Geisse enabled both the sprite and the thing conversion of
+	  the generated model in mdltest with different position.
+	- Martin also fixed a memory leak in csSectorList.
+	- Michael Voasse did the following:
+	    - terrfunc.cpp: improved current hit beam ready for HitBeam()
+	      rewrite. I have rewritten the while loop to be a for loop. 
+	      This has improved performance reasonably. The movement of
+	      the loop through the terrain is now governed by the result
+	      of the csintersect3::BoxSegment() interface. The beam moves
+	      through the terrain by initially sampling the main bounding
+	      box of the terrain, then setting up a recursive loop through
+	      the terrian if the bbox test is successful. The loop uses
+	      the result of the reverse bbox test on a bounding box that
+	      is the full height of the terrain to acquire the exit
+	      point of the beam, then indexes the block array accordingly.
+	      If the beam terminates inside the box, or the beam exits
+	      through the top or the bottom of the box, then the loop exits.
+	      This manner of beam testing scales well and can be adapted 
+	      to a 3 dimensional grid. One small point is the structure
+	      of the loop catches intersections through a given block even
+	      if the beam terminates inside the block. I take this as a
+	      good omen as I didnt expect it. 
+	      Added into the bundle, terrafunc should be free of all accuracy
+	      bugs. The old increment method has been disposed of safely (and
+	      permanently ;). It was causing blocks to be missed through
+	      its scan.
+	      Lastly, the debugging messages have been dropped completely.
+	    - terrfunc.h: Preening.
 18-Jul-2001
 	- Reworked the cstool texture generation tool to also use a
 	  SCF structure for the slope and height function instead of a
