@@ -67,8 +67,32 @@ csString &csString::Insert (size_t iPos, const csString &iStr)
   size_t NewSize = sl + Length ();
   if (NewSize >= MaxSize)
     SetSize (NewSize);
-  memcpy (Data + iPos + sl, Data + iPos, Size - iPos);
+  memmove (Data + iPos + sl, Data + iPos, Size - iPos);
   memcpy (Data + iPos, iStr.GetData (), sl);
+  Data [Size = NewSize] = 0;
+
+  return *this;
+}
+
+csString &csString::Insert (size_t iPos, const char iChar)
+{
+#ifdef DEBUG
+  if (iPos > Size)
+    STR_FATAL (("Inserting `%c' into `%s' at position %lu\n",
+      iChar, Data, (unsigned long)iPos))
+#endif
+
+  if (Data == NULL)
+  {
+    Append (iChar);
+    return *this;
+  }
+
+  size_t NewSize = 1 + Length ();
+  if (NewSize >= MaxSize)
+    SetSize (NewSize);
+  memmove (Data + iPos + 1, Data + iPos, Size - iPos);
+  Data[iPos] = iChar;
   Data [Size = NewSize] = 0;
 
   return *this;

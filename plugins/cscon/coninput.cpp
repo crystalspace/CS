@@ -31,6 +31,7 @@ csConsoleInput::csConsoleInput(iBase *base)
   CONSTRUCT_IBASE(base);
   buffer = new csConsoleBuffer(4096, 4096);
   piConsole = NULL;
+  cursor = 0;
 }
 
 csConsoleInput::~csConsoleInput()
@@ -54,56 +55,84 @@ bool csConsoleInput::HandleEvent(csEvent &event)
 
   if(event.Type==csevKeyDown) {
     csString *line;
+    int cx, cy;
+    bool dummy;
 
-    // Printable keys only, please
-    if((event.Key.Code < CSKEY_FIRST)&&(event.Key.Code != CSKEY_ESC)) {
-
-      bool echo = true;
-
-      // Handle special cases
-      switch(event.Key.Code) {
-      case CSKEY_ENTER:
-	// New line
-	NewLine();
+    switch(event.Key.Code) {
+    case CSKEY_ESC:
+      // The ignored keys
+      break;
+    case CSKEY_LEFT:
+	if(cursor>0) {
+	  cursor--;
+	  piConsole->GetCursorPos(cx, cy);
+	  piConsole->SetCursorPos(cx-1, cy);
+	}
 	break;
-      case CSKEY_BACKSPACE:
-	{
-	  int cx, cy, diff = 0;
+    case CSKEY_RIGHT:
+      if(cursor<buffer->GetLine(buffer->GetCurLine(), dummy)->Length()) {
+	cursor++;
+	piConsole->GetCursorPos(cx, cy);
+	piConsole->SetCursorPos(cx+1, cy);
+      }
+    case CSKEY_UP:
+      //@@@ How do I handle this
+      break;
+    case CSKEY_DOWN:
+      //@@@ How do I handle this
+      break;
+    default:
+      if(event.Key.Code < CSKEY_FIRST) {
+
+	bool echo = true;
+
+	// Handle special cases
+	switch(event.Key.Code) {
+	case CSKEY_ENTER:
+	  // New line
+	  NewLine();
+	  break;
+	case CSKEY_BACKSPACE:
 	  line = buffer->WriteLine();
-	  /* Backspace will only handle deleting last character if it can't
-	   * retrieve the cursor position from the console!!! */
-	  if(piConsole) {
-	    piConsole->GetCursorPos(cx, cy);
-	    const csString *otherline = piConsole->GetText(cy);
-	    // Account for prompts, etc.
-	    if(otherline!=NULL)
-	      cx -= (diff = otherline->Length() - line->Length());
-	  } else {
-	    cx = line->Length();
-	    cy = buffer->GetCurLine();
-	    diff = 0;
-	  }
 	  // Delete the last character in the current line
-	  if(cx>1)
-	    line->DeleteAt(cx-1);
-	  else if (cx==1)
+	  if(cursor>1)
+	    line->DeleteAt(cursor-1);
+	  else if (cursor==1)
 	    buffer->DeleteLine(buffer->GetCurLine());
-	  else if (diff>0) // Don't backspace over prompts
+	  else if (cursor==0) {
+#if 0
+	    if(buffer->GetCurLine()>0) {
+	      buffer->SetCurLine(buffer->GetCurLine()-1);
+	    }
+#else
 	    echo = false;
+#endif
+	    // This gets decremented to zero below
+	    cursor = 1;
+	  }
+	  // Move the cursor back by one
+	  cursor--;
+	  break;
+	default:
+	  // Append the character to the current line
+	  line = buffer->WriteLine();
+	  if(cursor==line->Length())
+	    line->Append((char) event.Key.Code);
+#ifdef DEBUG
+	  else if(cursor>line->Length())
+	    piSystem->Print(MSG_FATAL_ERROR, "csConsoleInput:  Cursor past end of line!\n");
+#endif
+	  else
+	    line->Insert(cursor, (char) event.Key.Code);
+	  // Increment cursor position
+	  cursor++;
 	  break;
 	}
-      default:
-	// Append the character to the current line
-	line = buffer->WriteLine();
-	line->Append((char) event.Key.Code);
-	break;
+	if(piConsole&&echo) {
+	  csString put((char) event.Key.Code);
+	  piConsole->PutText(put.GetData());
+	}
       }
-
-      if(piConsole&&echo) {
-	csString put((char) event.Key.Code);
-	piConsole->PutText(put.GetData());
-      }
-
     }
   }
 #ifdef DEBUG
@@ -135,6 +164,7 @@ int csConsoleInput::GetCurLine() const
 void csConsoleInput::NewLine()
 {
   buffer->NewLine();
+  cursor = 0;
 }
 
 int csConsoleInput::GetBufferSize() const
@@ -155,6 +185,7 @@ void csConsoleInput::SetBufferSize(int size)
 void csConsoleInput::Clear()
 {
   buffer->Clear();
+  cursor = 0;
 }
 
 bool csConsoleInput::GetEcho() const

@@ -25,6 +25,7 @@
 #include "igraph2d.h"
 #include "isystem.h"
 #include "itxtmgr.h"
+#include "csinput/csevent.h"
 #include "csutil/csrect.h"
 #include "csutil/scf.h"
 #include "csutil/csstring.h"
@@ -151,16 +152,21 @@ void csConsole::PutText(const char *text)
       // Print 4-space tabs
       curline = buffer->WriteLine();
       curline->Append("    ");
+      cx += 4;
       break;      
     default:
       curline = buffer->WriteLine();
-      curline->Append(text[i]);
+      if(cx==(int)curline->Length())
+	curline->Append(text[i]);
+      else
+	curline->Insert(cx, text[i]);
+      cx++;
       break;
     }
   }
   // Update cursor X position
-  if(curline!=NULL)
-    cx = curline->Length();
+  //if(curline!=NULL)
+  //cx = curline->Length();
 }
 
 const csString *csConsole::GetText(int line) const
@@ -239,7 +245,7 @@ void csConsole::Draw(csRect *area)
 
 #ifdef DEBUG
       if(cx!=0)
-	piSystem->Print(MSG_WARNING, "csConsole:  Empty line but cursor not at start!\n");
+	piSystem->Print(MSG_WARNING, "csConsole:  Current line is empty but cursor x != 0!\n");
 #endif // DEBUG
 
       cx_pix = 1;
@@ -249,6 +255,7 @@ void csConsole::Draw(csRect *area)
       // Make a copy of the text
       csString curText(*text);
       curText.SetSize(cx);
+      curText.SetAt(cx, '\0');
       cx_pix = piG2D->GetTextWidth(font, curText.GetData());
     }
 
@@ -428,16 +435,26 @@ void csConsole::GetCursorPos(int &x, int &y) const
 
 void csConsole::SetCursorPos(int x, int y)
 {
-  int max_y = buffer->GetPageSize();
+  bool dummy;
+  int max_x, max_y = buffer->GetPageSize();
+  const csString *curline = buffer->GetLine(cy, dummy);
 
-  /* Because of dynamic width fonts, we can't know how far over
-   * the cursor will be unless we have the string for that line.
-   */
-  cx = x;
+  if(curline)
+    max_x = curline->Length();
+  else
+    max_x = 0;
+
+  // Keep the cursor from going past the end of the line
+  if(x>max_x)
+    cx = max_x - 1;
+  else
+    cx = x;
   
-  // But keep it from going off the bottom of the display
+  // Keep it from going off the bottom of the display
   if(y>max_y)
     cy = max_y - 1;
+  else
+    cy = y;
   
 }
 

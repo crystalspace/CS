@@ -114,6 +114,9 @@ public:
   /// Insert another string into this one at position iPos
   csString &Insert (size_t iPos, const csString &iStr);
 
+  /// Insert a char into this string at position iPos
+  csString &Insert (size_t iPos, const char iChar);
+
   /// Overlay another string onto a part of this string
   csString &Overwrite (size_t iPos, const csString &iStr);
 

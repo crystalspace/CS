@@ -48,6 +48,7 @@ protected:
   iSystem *piSystem;
   iConsole *piConsole;
   csConsoleBuffer *buffer;
+  size_t cursor;
 };
 
 #endif // ! __CS_CONINPUT_H__
