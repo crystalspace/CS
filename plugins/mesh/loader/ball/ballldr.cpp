@@ -427,7 +427,7 @@ void csBallSaver::WriteDown (iBase* obj, iStrVector *str,
   if (state->IsTopOnly ())
     str->Push (strnew ("TOPONLY (yes)\n"));
   csColor col = state->GetColor ();
-  sprintf(buf, "COLOR (%g,&g,&g)\n", col.red, col.green, col.blue);
+  sprintf(buf, "COLOR (%g,%g,%g)\n", col.red, col.green, col.blue);
   str->Push(strnew(buf));
 
   fact->DecRef();
