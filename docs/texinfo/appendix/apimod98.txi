@@ -339,6 +339,77 @@ use @code{iAWS::SetupCanvas} instead.
 This means that functions like @code{iVFS::MountRoot()} and
 @code{iVFS::FindFiles()} now return an @code{iStringArray}.
 
+@subheading csVector and csBasicVector removed
+@cindex @code{csVector}
+@cindex @code{csBasicVector}
+@cindex @code{csArray}
+@cindex @code{csRefArray}
+@cindex @code{csPDelArray}
+
+@code{csVector} and @code{csBasicVector} have been removed. Instead you
+should use one of the templated arrays: @code{csArray}, @code{csPDelArray},
+or @code{csRefArray}.
+
+If you were using a regular @code{csVector} then this can usually be
+replaced directly by @code{csArray<type*>} with @samp{type} the type you
+were storing in the vector.
+
+If you subclassed from @code{csVector} in order to override @code{FreeItem()}
+then you have to decide what to do depending on the code in @code{FreeItem()}.
+If that code performed a @code{delete} then you can use @code{csPDelArray}.
+If that code performed a @code{DecRef()} then you can use @code{csRefArray}
+but you still have to be careful because @code{csRefArray} will automatically
+incref objects that are pushed on the array. In other cases you probably
+need to handle deletion manually.
+
+@code{csVector} also allowed to override @code{Compare()} and
+@code{CompareKey} in order to drive @code{QuickSort}, @code{FindSortedKey},
+@code{InsertSorted}, and @code{FindKey}. This is no longer possible. Instead
+you can do the following transformation. First the old code:
+
+@example
+class MyVector : public csVector
+@{
+public:
+  virtual ~MyVector ()
+  @{
+    DeleteAll ();
+  @}
+  virtual void FreeItem (void* item)
+  @{
+    delete (MyType*)item;
+  @}
+  virtual int Compare (void* i1, void* i2, int mode) const
+  @{
+    @dots{}
+  @}
+  virtual int CompareKey (void* i, const void* key, int mode) const
+  @{
+    @dots{}
+  @}
+@};
+@end example
+
+This could be transformed roughly to the following class:
+
+@example
+class MyVector : public csPDelArray<MyType>
+@{
+public:
+  static int Compare (MyType const* i1, MyType const* i2)
+  @{
+    @dots{}
+  @}
+  static int CompareKey (MyType const* i, void* key)
+  @{
+    @dots{}
+  @}
+@};
+@end example
+
+In the calls to @code{InsertSorted}, @code{FindKey}, @dots{} you would then
+pass in one of the static functions to use.
+
 @subheading iEventQueue clients now responsible for their own references
 @cindex @code{csEventQueue}
 @cindex @code{iEventQueue}
@@ -368,3 +439,4 @@ You must now call it like this:
 
 Events created with @code{iEventQueue::CreateEvent()} or
 @code{iEventOutlet::CreateEvent()} are unaffected by this change.
+
