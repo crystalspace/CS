@@ -10,7 +10,7 @@
 
 # Should we build drivers/plugins as loadable modules?
 ifndef USE_SHARED_PLUGINS
-  USE_SHARED_PLUGINS=yes
+  USE_SHARED_PLUGINS=no
 endif
 
 # Should we build libraries as shared/dynamic libraries?
@@ -28,14 +28,14 @@ endif
 # Note that you'll link all plugins into executable in the case of static build
 ifndef PLUGINS
   PLUGINS  = video/canvas video/renderer 
-  PLUGINS += cscon 
-  PLUGINS += csclear 
-  PLUGINS += dungeon 
-  PLUGINS += net/driver/socket net/netman 
+#  PLUGINS += cscon 
+#  PLUGINS += csclear 
+#  PLUGINS += dungeon 
+#  PLUGINS += net/driver/socket net/netman 
   PLUGINS += font/renderer/csfont 
-# PLUGINS += font/renderer/freefont
-  PLUGINS += netspace/nstp netspace/nsmgr 
-  PLUGINS += csauth/simple 
+#  PLUGINS += font/renderer/freefont
+#  PLUGINS += netspace/nstp netspace/nsmgr 
+#  PLUGINS += csauth/simple 
   PLUGINS += $(DETECTED_PLUGINS)
 endif
 
@@ -65,25 +65,25 @@ DO_TGA=yes
 DO_JPG=yes
 
 # If 'yes' include support for WAL graphic files (not required currently).
-DO_WAL=yes
+DO_WAL=no
 
 # If 'yes' include support for SGI graphic files (not required currently).
-DO_SGI=yes
+DO_SGI=no
 
 # If 'yes' include sound support.
-DO_SOUND=yes
+DO_SOUND=no
 
 # If "yes" include AIFF support
-DO_AIFF=yes
+DO_AIFF=no
 
 # If "yes" include IFF support
-DO_IFF=yes
+DO_IFF=no
 
 # If "yes" include AU support
-DO_AU=yes
+DO_AU=no
 
 # If "yes" include WAV support
-DO_WAV=yes
+DO_WAV=no
 
 # If "yes" include MMX support in software renderer
 DO_MMX=yes
