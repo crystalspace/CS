@@ -65,10 +65,10 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csSoundDriverOSS::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-int lasterr=0;
-int gaudio;
-bool inUse=false;
-char *err[]=
+static int lasterr=0;
+static int gaudio;
+static bool inUse=false;
+static const char *err[]=
 {
   "no error", "get semaphore", "dec semaphore", "inc semaphore",
   "malloc shmptr", "shmget soundmem", "mark shared mem as removable",
