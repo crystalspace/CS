@@ -17,9 +17,14 @@ chronological order.
 	  on MacOS/X. It now #undefines `main' after #including <SDL/SDL.h>,
 	  since SDL's `main' #define breaks the test.
 	- res replaced the parallaxtest normal map with a better looking one.
-	- Anders fixed a nasty bug in genmesh. If the data size of the mesh
-	  was increased with a SetVertexCount call, tangent and binormal buffers
+	- Anders fixed a nasty bug in genmesh. If the data size of the mesh was
+	  increased with a SetVertexCount call, tangent and binormal buffers
 	  would be overrun upon next access resulting in memory corruption.
+	- Eric Sunshine upgraded javapre.i so that it does not manually provide
+	  an overload for iEventOutlet::Broadcast() since this is no longer
+	  needed with Swig 1.3.23, and resulted in a Java compilation
+	  error. (The manual overload is still provided for earlier Swig
+	  versions.)
 15-Nov-2004
 	- Eric Sunshine fixed _CS_CHECK_LIB_PKG_CONFIG_FLAGS() in checklib.m4
 	  so that it no longer checks for `pkg-config' only the very first time

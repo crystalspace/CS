@@ -238,12 +238,21 @@ _csRef_to_Java (const csRef<iBase> & ref, void * ptr, const char * name,
 APPLY_FOR_EACH_INTERFACE
 
 // ivaria/event.h
+// Swig 1.3.23 introduces support for default arguments, so it generates this
+// automatically. Prior versions do not.
+#if (SWIG_VERSION < 0x010323)
+#define IEVENTOUTLET_BROADCAST \
+public void Broadcast (int iCode) { Broadcast(iCode, null); }
+#else
+#define IEVENTOUTLET_BROADCAST
+#endif
+
 #undef IEVENTOUTLET_JAVACODE
 %define IEVENTOUTLET_JAVACODE
 %typemap(javacode) iEventOutlet
 %{
     INTERFACE_EQUALS
-    public void Broadcast (int iCode) { Broadcast(iCode, null); }
+    IEVENTOUTLET_BROADCAST
 %}
 %enddef
 IEVENTOUTLET_JAVACODE
