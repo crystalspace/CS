@@ -1,10 +1,12 @@
 The history order is reversed so that new features are at the top.
 
 20-Feb-2003
-	- Anders Stenberg fixed a bug in shader loader causing fragment programs not to load
+	- Anders Stenberg fixed a bug in shader loader causing fragment
+	  programs not to load.
 19-Feb-2003
-	- Mårten Svanfeldt fixed a bug introduced when adding the new light-parameters
-	  for the new renderer due to a missing #ifdef CS_USE_NEW_RENDERER
+	- Mårten Svanfeldt fixed a bug introduced when adding the new
+	  light-parameters for the new renderer due to a missing
+	  #ifdef CS_USE_NEW_RENDERER.
 	- Mårten Svanfeldt changed the way lights are handled in new renderer
 	    - Lights now have a influence radius which is different from the
 	      normal radius. Influence radius is the distance at which the light
@@ -12,11 +14,11 @@ The history order is reversed so that new features are at the top.
 	      in the center. Influence radius is used to determin wheter i light
 	      needs to be used or not to draw on a specific spot.
 	    - The way culling of lights and objects work is changed. An more 
-	      in depth description of how it's done is in a comment in Sector::Draw.
+	      in depth description of how it's done is in a comment in
+	      Sector::Draw.
 	    - Shadows now use depthfail shadows if we are in the shadow-volume.
 	- Fixed a memory leak in the OpenGL renderer.
 	- Philip Wyett updated configure script from 0.96 to 0.97dev.
-
 18-Feb-2003
 	- Philipp Aumayr updated bugplug for render3d api changes and "repaired"
 	  history.txt for Philipp Wyett (wrong indent :o)
