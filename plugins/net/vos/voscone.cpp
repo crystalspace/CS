@@ -61,7 +61,7 @@ ConstructConeTask::~ConstructConeTask()
 
 void ConstructConeTask::doTask()
 {
-  LOG("voscone", 2, "Constructing cone");
+  LOG("voscone", 3, "Constructing cone");
 
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
@@ -159,13 +159,13 @@ void csMetaCone::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
 
   vRef<A3DL::Material> m = getMaterial();
   vRef<csMetaMaterial> mat = meta_cast<csMetaMaterial>(getMaterial());
-  LOG("csMetaCone", 2, "getting material " << mat.isValid());
+  LOG("csMetaCone", 3, "getting material " << mat.isValid());
   mat->Setup(vosa3dl);
-  LOG("csMetaCone", 2, "setting up cone");
+  LOG("csMetaCone", 3, "setting up cone");
   vosa3dl->mainThreadTasks.push(new ConstructConeTask(
                                       vosa3dl->GetObjectRegistry(), mat, this,
                                       getURLstr(), sect->GetSector()));
 
-  LOG("csMetaCone", 2, "calling csMetaObject3D::setup");
+  LOG("csMetaCone", 3, "calling csMetaObject3D::setup");
   csMetaObject3D::Setup(vosa3dl, sect);
 }

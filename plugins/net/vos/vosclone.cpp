@@ -59,7 +59,7 @@ ConstructCloneTask::~ConstructCloneTask()
 
 void ConstructCloneTask::doTask()
 {
-  LOG("vosclone", 2, "Constructing clone");
+  LOG("vosclone", 3, "Constructing clone");
 
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
@@ -100,19 +100,19 @@ void csMetaClone::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
   //mat->Setup(vosa3dl);
 
   vRef<csMetaObject3D> obj = meta_cast<csMetaObject3D> (getTemplate());
-  LOG("csMetaClone", 2, "getting template object");
+  LOG("csMetaClone", 3, "getting template object");
   if (obj->GetCSinterface()->GetMeshWrapper())
   {
-    LOG("csMetaClone", 2, "object is already set up");
+    LOG("csMetaClone", 3, "object is already set up");
   }
   else obj->Setup(vosa3dl, sect);
 
-  LOG("csMetaClone", 2, "setting up clone");
+  LOG("csMetaClone", 3, "setting up clone");
   vosa3dl->mainThreadTasks.push(new ConstructCloneTask(
                               vosa3dl->GetObjectRegistry(), obj, this,
                               getURLstr(), sect->GetSector()));
 
-  LOG("csMetaClone", 2, "calling csMetaObject3D::setup");
+  LOG("csMetaClone", 3, "calling csMetaObject3D::setup");
   csMetaObject3D::Setup(vosa3dl, sect);
 #endif
 }

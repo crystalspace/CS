@@ -64,6 +64,7 @@ csRef<iMeshWrapper> csVosObject3D::GetMeshWrapper()
 void csVosObject3D::SetMeshWrapper(iMeshWrapper* mw)
 {
   meshwrapper = mw;
+  meshwrapper->QueryObject()->ObjAdd(this);
 }
 
 csRef<iRigidBody> csVosObject3D::GetCollider ()
@@ -83,13 +84,13 @@ VOS::vRef<VOS::Vobject> csVosObject3D::GetVobject()
 
 void csVosObject3D::Execute(iMeshWrapper *, csOrthoTransform &t)
 {
-  LOG ("csVosObject3D", 2, "Received Execute callback 2 args");
+  LOG ("csVosObject3D", 3, "Received Execute callback 2 args");
   this->Execute(t);
 }
 
 void csVosObject3D::Execute(csOrthoTransform &)
 {
-  LOG ("csVosObject3D", 2, "Received Execute callback 1 arg");
+  LOG ("csVosObject3D", 3, "Received Execute callback 1 arg");
   csVector3 pos = collider->GetPosition();
   //csVector3 vel = collider->GetLinearVelocity();
   //csVector3 acc = collider->GetForce();
@@ -136,10 +137,10 @@ ConstructObject3DTask::~ConstructObject3DTask()
 void ConstructObject3DTask::doTask()
 {
   csRef<iMeshWrapper> mw = obj->GetCSinterface()->GetMeshWrapper();
-  LOG("vosobject3d", 2, "ConstructObject3DTask: creating " << obj->getURLstr()
+  LOG("vosobject3d", 3, "ConstructObject3DTask: creating " << obj->getURLstr()
       << " at " << pos.x << " " << pos.y << " " << pos.z);
   if(hardpos.x != 0 || hardpos.y != 0 || hardpos.z != 0) {
-    LOG("vosobject3d", 2, "setting hard position of " << obj->getURLstr()
+    LOG("vosobject3d", 3, "setting hard position of " << obj->getURLstr()
         << " to " << hardpos.x << " " << hardpos.y << " " << hardpos.z);
   }
 
@@ -373,7 +374,7 @@ void csMetaObject3D::notifyPropertyChange(const PropertyEvent &event)
       {
         double x = 0.0, y = 0.0, z = 0.0;
         getPosition (x,y,z);
-        LOG("vosobject3d", 2, getURLstr() << " event value is \"" << event.getValue()
+        LOG("vosobject3d", 3, getURLstr() << " event value is \"" << event.getValue()
             << "\", prop read is \""
             << event.getProperty()->read() << "\" and getPos() gave us "
             << x << " " << y << " " << z);
@@ -396,7 +397,7 @@ void csMetaObject3D::notifyPropertyChange(const PropertyEvent &event)
 void csMetaObject3D::changePosition (const csVector3 &pos)
 {
   csRef<iMeshWrapper> mw = GetCSinterface()->GetMeshWrapper();
-  LOG("vosobject3d", 2, "changePosition: " << getURLstr() <<
+  LOG("vosobject3d", 3, "changePosition: " << getURLstr() <<
       " to " << pos.x << " " << pos.y << " " << pos.z);
   if (mw.IsValid())
   {

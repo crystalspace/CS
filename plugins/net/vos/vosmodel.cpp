@@ -134,7 +134,7 @@ static void NormalizeModel(csRef<iMeshWrapper> wrapper, bool recenter,
 
 void ConstructModelTask::doTask()
 {
-  LOG("vosmodel", 2, "Constructing model");
+  LOG("vosmodel", 3, "Constructing model");
 
 
 
@@ -154,7 +154,7 @@ void ConstructModelTask::doTask()
     return;
   }
 
-  LOG ("ConstructModelTask", 2, "Loading into model converter");
+  LOG ("ConstructModelTask", 3, "Loading into model converter");
   csRef<iModelData> data = modconv->Load (databuf->GetUint8(),
     databuf->GetSize());
   if (!data)
@@ -163,11 +163,11 @@ void ConstructModelTask::doTask()
     return;
   }
 
-  LOG ("ConstructModelTask", 2, "Splitting objects");
+  LOG ("ConstructModelTask", 3, "Splitting objects");
   csModelDataTools::SplitObjectsByMaterial (data);
   csModelDataTools::MergeObjects (data, false);
 
-  LOG ("ConstructModelTask", 2, "Creating factory");
+  LOG ("ConstructModelTask", 3, "Creating factory");
   csRef<iMeshFactoryWrapper> factory;
   if(metamat.isValid()) {
     factory = xbuild->BuildSpriteFactoryHierarchy (
@@ -192,20 +192,6 @@ void ConstructModelTask::doTask()
   NormalizeModel (meshwrapper, true, true, datatype);
 
   model->GetCSinterface()->SetMeshWrapper(meshwrapper);
-
-  LOG ("ConstructModelTask", 2, "Done (you should see something now)");
-  csBox3 bb;
-  meshwrapper->GetWorldBoundingBox(bb);
-  LOG ("ConstructModelTask", 2, "bounding box is "
-       << bb.MinX() << " "<< bb.MinY() << " "<< bb.MinZ()
-       << bb.MaxX() << " " << bb.MaxY() << " " << bb.MaxZ());
-
-  {
-    csRef<iMeshList> ml = sector->GetMeshes();
-    for(int i = 0; i < ml->GetCount(); i++) {
-      LOG ("ConstructModelTask", 2, "Sector contains: " << ml->Get(i)->QueryObject()->GetName());
-    }
-  }
 }
 
 /// csMetaModel ///
@@ -229,16 +215,16 @@ void csMetaModel::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
   if(alreadyLoaded) return;
   else alreadyLoaded = true;
 
-  LOG("csMetaModel", 2, "entered setup for " << getURLstr());
+  LOG("csMetaModel", 3, "entered setup for " << getURLstr());
 
   // Get material
   vRef<csMetaMaterial> mat;
   try {
     vRef<A3DL::Material> m = getMaterial();
     mat = meta_cast<csMetaMaterial>(getMaterial());
-    LOG("csMetaModel", 2, "getting material " << mat.isValid());
+    LOG("csMetaModel", 3, "getting material " << mat.isValid());
     mat->Setup(vosa3dl);
-    LOG("csMetaModel", 2, "setting up model");
+    LOG("csMetaModel", 3, "setting up model");
   } catch(std::runtime_error& e) {
     LOG("csMetaModel", 2, "Got error " << e.what());
   }
@@ -263,7 +249,7 @@ void csMetaModel::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
   vRef<A3DL::Actor> actor = meta_cast<A3DL::Actor>(this);
   if(actor.isValid()) actor->addActionListener(this);
 
-  LOG("csMetaModel", 2, "calling csMetaObject3D::setup");
+  LOG("csMetaModel", 3, "calling csMetaObject3D::setup");
   csMetaObject3D::Setup(vosa3dl, sect);
 }
 

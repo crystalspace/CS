@@ -60,7 +60,7 @@ ConstructLightTask::~ConstructLightTask()
 
 void ConstructLightTask::doTask()
 {
-  LOG("ConstructLightTask", 2, "creating light");
+  LOG("ConstructLightTask", 3, "creating light");
 
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 

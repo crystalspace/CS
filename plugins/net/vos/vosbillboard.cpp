@@ -70,7 +70,7 @@ ConstructBillboardTask::~ConstructBillboardTask()
 
 void ConstructBillboardTask::doTask()
 {
-  LOG("vosbillboard", 2, "Constructing billboard");
+  LOG("vosbillboard", 3, "Constructing billboard");
 
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
@@ -144,14 +144,14 @@ void csMetaBillboard::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
 
   vRef<A3DL::Material> m = getMaterial();
   vRef<csMetaMaterial> mat = meta_cast<csMetaMaterial>(getMaterial());
-  LOG("csMetaBillboard", 2, "getting material " << mat.isValid());
+  LOG("csMetaBillboard", 3, "getting material " << mat.isValid());
   mat->Setup(vosa3dl);
-  LOG("csMetaBillboard", 2, "setting up billboard");
+  LOG("csMetaBillboard", 3, "setting up billboard");
   vosa3dl->mainThreadTasks.push(new ConstructBillboardTask(
     vosa3dl->GetObjectRegistry(), mat, this, getURLstr(),
   sect->GetSector()));
 
-  LOG("csMetaBillboard", 2, "calling csMetaObject3D::setup");
+  LOG("csMetaBillboard", 3, "calling csMetaObject3D::setup");
   csMetaObject3D::Setup(vosa3dl, sect);
 }
 

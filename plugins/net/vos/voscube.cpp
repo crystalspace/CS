@@ -63,7 +63,7 @@ ConstructCubeTask::~ConstructCubeTask()
 
 void ConstructCubeTask::doTask()
 {
-  LOG("voscube", 2, "Constructing cube");
+  LOG("voscube", 3, "Constructing cube");
 
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 

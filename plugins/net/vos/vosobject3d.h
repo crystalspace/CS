@@ -29,13 +29,16 @@
 
 #include "inetwork/vosa3dl.h"
 #include "iengine/mesh.h"
+#include "csutil/csobject.h"
 #include "ivaria/dynamics.h"
 
 #include "csvosa3dl.h"
 #include "vossector.h"
 
-class csVosObject3D : public iVosObject3D, public iVosApi,
-                    public iDynamicsMoveCallback
+class csVosObject3D : public csObject,
+                      public iVosObject3D,
+                      public iVosApi,
+                      public iDynamicsMoveCallback
 {
 private:
   csRef<iMeshWrapper> meshwrapper;

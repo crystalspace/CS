@@ -112,7 +112,7 @@ void ConstructPolygonMeshTask::doTask()
         if(n > 2)
         {
           float a = csMath3::Direction3(
-	  	thingfac->GetPolygonVertex(polymap[i], n-2),
+      thingfac->GetPolygonVertex(polymap[i], n-2),
                 thingfac->GetPolygonVertex(polymap[i], n-1),
                 thingfac->GetPolygonVertex(polymap[i], n));
           if(ABS(a) < EPSILON) flat = true;
@@ -545,30 +545,30 @@ void csMetaPolygonMesh::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
   ConstructPolygonMeshTask* cpmt = new ConstructPolygonMeshTask(
     vosa3dl->GetObjectRegistry(), this, getURLstr(), sect->GetSector());
 
-  LOG("csMetaPolygonMesh", 2, "getting vertices");
+  LOG("csMetaPolygonMesh", 3, "getting vertices");
 
   getVertices(cpmt->verts);
   getPolygons(cpmt->polys);
 
   try
   {
-    LOG("csMetaPolygonMesh", 2, "getting texels");
+    LOG("csMetaPolygonMesh", 3, "getting texels");
     getTexels(cpmt->texels);
-    LOG("csMetaPolygonMesh", 2, "got texels");
+    LOG("csMetaPolygonMesh", 3, "got texels");
   }
   catch(NoSuchObjectError&)
   {
-    LOG("csMetaPolygonMesh", 2, "getting texturespaces");
+    LOG("csMetaPolygonMesh", 3, "getting texturespaces");
     try
     {
       getTextureSpaces(cpmt->texsp);
     } catch(NoSuchObjectError&)
     {
     }
-    LOG("csMetaPolygonMesh", 2, "got texturespaces");
+    LOG("csMetaPolygonMesh", 3, "got texturespaces");
   }
 
-  LOG("csMetaPolygonMesh", 2, "getting materials");
+  LOG("csMetaPolygonMesh", 3, "getting materials");
 
   cpmt->materials = getMaterials();
   cpmt->portals = getPortals();
@@ -587,14 +587,14 @@ void csMetaPolygonMesh::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
   cpmt->portals.reset();
 #endif
 
-  LOG("csMetaPolygonMesh", 2, "looking at types");
+  LOG("csMetaPolygonMesh", 3, "looking at types");
 
   for(TypeSetIterator ti = getTypes(); ti.hasMore(); ti++)
   {
-    LOG("csMetaPolygonMesh", 2, "has type " << *ti);
+    LOG("csMetaPolygonMesh", 3, "has type " << *ti);
     if(*ti == "a3dl:static") cpmt->isStatic = true;
   }
-  LOG("csMetaPolygonMesh", 2, "is static " << cpmt->isStatic);
+  LOG("csMetaPolygonMesh", 3, "is static " << cpmt->isStatic);
 
   cpmt->dynsys = vosa3dl->GetDynSys();
 

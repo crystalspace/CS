@@ -189,7 +189,7 @@ bool csVosA3DL::HandleEvent (iEvent &ev)
 {
   if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
   {
-    while(! mainThreadTasks.empty())
+    for(unsigned int n = mainThreadTasks.size(); n > 0; n--)
     {
       LOG("csVosA3DL", 3, "starting main thread task");
       Task* t = mainThreadTasks.pop();
@@ -211,7 +211,7 @@ void csVosA3DL::incrementRelightCounter()
 {
   boost::mutex::scoped_lock lk (relightCounterMutex);
   relightCounter++;
-  LOG ("csVosA3DL", 2, "relight counter incremented to " << relightCounter);
+  LOG ("csVosA3DL", 3, "relight counter incremented to " << relightCounter);
 }
 
 void csVosA3DL::decrementRelightCounter()
@@ -221,5 +221,5 @@ void csVosA3DL::decrementRelightCounter()
   {
   mainThreadTasks.push(new RelightTask (this));
   }
-  LOG ("csVosA3DL", 2, "relight counter decremented to " << relightCounter);
+  LOG ("csVosA3DL", 3, "relight counter decremented to " << relightCounter);
 }
