@@ -68,6 +68,7 @@ chronological order.
 	  to csunicode.h which was addressing the symptom rather than the
 	  cause.  We need to determine the actual problem (if there is one),
 	  and instead address that.
+	- Paul Garceau updated csunicode.h back to pre-hack version of csunicode.h.
 3-Aug-2003
 	- Paul G. implemented a very nasty (and hopefully very temporary) hack
 	  for csunicode.h to define CS_WCHAR_T_SIZE appropriately for
