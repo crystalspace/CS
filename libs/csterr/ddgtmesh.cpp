@@ -22,6 +22,9 @@
 #include "csterr/ddgtmesh.h"
 #include "csterr/ddgsplay.h"
 #include "csterr/ddgbtree.h"
+
+extern void transformer(csVector3 vin, csVector3 *vout);
+
 // ----------------------------------------------------------------------
 // NOTE This value is the maximum number of vertices that can be converted
 // per frame, this is approximatesly 3x the number of triangles in the frame.
@@ -34,7 +37,7 @@ ddgVCache::ddgVCache( void )
 
 void ddgVCache::init (unsigned int size )
 {
-	_cache = new ddgVector3[size];
+	_cache = new csVector3[size];
 	_size = size;
 	_used = 0;
 }
@@ -44,9 +47,9 @@ ddgVCache::~ddgVCache( void )
 	delete _cache;
 }
 /// Get entry.
-ddgVector3		*ddgVCache::get(unsigned short index)
+csVector3		*ddgVCache::get(unsigned short index)
 {
-	return _cache[index];
+	return &_cache[index];
 }
 /// New entry.
 unsigned short	ddgVCache::alloc(void)
@@ -81,7 +84,6 @@ ddgHeightMap *heightMap = 0;
 ddgTBinMesh::ddgTBinMesh( ddgHeightMap * h )
 {
 	heightMap = h;
-	_transform = NULL;
 	_bintreeMax = 2*(heightMap->cols()-1)/(ddgTBinMesh_size) * (heightMap->rows()-1)/(ddgTBinMesh_size);
 	typedef ddgTBinTree *ddgTBinTreeP;
 	_bintree = new ddgTBinTreeP[_bintreeMax];
@@ -334,13 +336,14 @@ void ddgTBinMesh::calculate( void )
 	_dirty = true; // Assume always dirty for CS
 	if (_dirty)
 	{
-		ddgVector3 ev0,ev1;
+		csVector3 ev0,ev1, tmp;
 		unsigned int i = 0;
 
 		// Calc transform of unit vector once per frame and scale the rest.
-		transform( ddgVector3(0,0,0), ev0 );
-		transform( ddgVector3(0,1,0), ev1 );
-		ddgTBinTree::unit( ev1 - ev0);
+		transformer( csVector3(0,0,0), &ev0 );
+		transformer( csVector3(0,1,0), &ev1 );
+		tmp = ev1 - ev0;
+		ddgTBinTree::unit( &tmp);
 		// Reset the visibility counter.
 		_visTri = 0;
 		_vcache.reset();
@@ -620,10 +623,5 @@ float ddgTBinMesh::height(float x, float z)
     pos(&x,&z,&bt, &r, &c);
     // Find mesh height at this location.
 	return bt ? bt->treeHeight(r,c,x,z) : 0.0;
-}
-
-void ddgTBinMesh::transform( ddgVector3 vin, ddgVector3 *vout )
-{
-	_transform(vin,vout);
 }
 

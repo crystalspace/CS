@@ -27,7 +27,7 @@ class csTextureHandle;
 class ddgTBinMesh;
 class ddgHeightMap;
 class ddgBBox;
-class ddgVector3;
+class csVector3;
 
 class ddgColor3
 {
@@ -91,7 +91,7 @@ public:
   /// Set the texture for this surface.
   void SetTexture (csTextureHandle *texture) { _textureMap = texture; }
   /// Choose a color for a vertex.
-  void classify( ddgVector3 *p, ddgColor3 *c);
+  void classify( csVector3 *p, ddgColor3 *c);
 
   CSOBJTYPE;
 };

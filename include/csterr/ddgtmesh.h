@@ -22,6 +22,7 @@
 #include "csterr/ddghemap.h"
 #include "csterr/ddgbbox.h"
 #include "csterr/ddgsplay.h"
+#include "csterr/ddgvec.h"
 
 class ddgTBinTree;
 class ddgTBinMesh;
@@ -83,7 +84,7 @@ class WEXP ddgVCache {
 	/// Current size.
 	unsigned short _used;
 	/// Pointer to array of Vector3s.
-	ddgVector3		*_cache;
+	csVector3		*_cache;
 public:
 	/// Create cache.
 	ddgVCache();
@@ -92,7 +93,7 @@ public:
 	/// Initialize the cache.
 	void init (unsigned int size );
 	/// Get entry.
-	ddgVector3		*get(unsigned short index);
+	csVector3		*get(unsigned short index);
 	/// New entry.
 	unsigned short	alloc(void);
 	/// Reset cache to empty.
@@ -437,17 +438,6 @@ public:
     ddgBBox *camBBox(void) { return _camBBox; }
     /// Return the half field of view.
     float tanHalfFOV(void) { return _tanHalfFOV; }
-    /// Transform coordinate from world to camera space.
-    void transform( ddgVector3 vin, ddgVector3 *vout );
-#ifndef DDG
-private:
-	/// A transform method.
-	void (*_transform)(ddgVector3 vin, ddgVector3 *vout);
-public:
-	/// Specify a transform method.
-	void settransform( void (*t)(ddgVector3 vin, ddgVector3 *vout)) { _transform = t; }
-#endif
-
 };
 
 #endif

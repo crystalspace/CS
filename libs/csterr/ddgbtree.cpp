@@ -23,20 +23,21 @@
 #include "csterr/ddgtmesh.h"
 #include "csterr/ddgbtree.h"
 
+extern void transformer(csVector3 vin, csVector3 *vout);
 
 // Constant used for identifying brothers.
 const	unsigned int BINIT = 0xFFFFFFFF;
 
 // ----------------------------------------------------------------------
 
-ddgVector3 ddgTBinTree::_unit;
+csVector3 ddgTBinTree::_unit;
 /// Set the unit vector.
-void ddgTBinTree::unit(ddgVector3 *v)
+void ddgTBinTree::unit(csVector3 *v)
 {
-	_unit.set(v);
+	_unit = *v;
 }
 /// Return the unit vector.
-ddgVector3 * ddgTBinTree::unit(void)
+csVector3 * ddgTBinTree::unit(void)
 {
 	return &_unit;
 }
@@ -401,89 +402,60 @@ void ddgTBinTree::visibility(ddgTriIndex tvc, unsigned int level)
 		// We dont know so analyze ourselves.
 		else
 		{
-			ddgVector3 wpqr;
+			csVector3 wpqr;
 			// Calculate bounding box of wedgie.
-			ddgVector3 pmin;
-			ddgVector3 pmax;
-			ddgVector3 *ptri;
-			ddgVector3 vu, vl;
-			ddgVector3 th;
+			csVector3 pmin;
+			csVector3 pmax;
+			csVector3 *ptri;
+			csVector3 vu, vl;
+			csVector3 th;
+			csVector3 *un = unit();
 			// Calculate the parent.
 			ptri = pos(tva);
 			if (!tri(tva)->_state.flags.coord)
 			{
-				vertex(tva,wpqr);
-				_mesh->transform( wpqr, ptri );
+				vertex(tva,&wpqr);
+				transformer( wpqr, ptri );
 				tri(tva)->_state.flags.coord = true;
 			}
-			th.set(unit());
-			th.multiply(tri(tvc)->thick());
-			vu = ptri+th;
-			vl = ptri;
-			vl.subtract(th);
-			pmin.set(vu);
-			pmax.set(vu);
-			pmin.minimum(vl);
-			pmax.maximum(vl);
+			th = (*un)*(tri(tvc)->thick());
+			vu = *ptri+th;
+			vl = *ptri-th;
+			pmin = vu;
+			pmax = vu;
+			csMath3::SetMinMax(vl,pmin,pmax);
 
 			// Calculate the left and right vertex.
 			ptri = pos(tv0);
 			if (!tri(tv0)->_state.flags.coord)
 			{
-				vertex(tv0,wpqr);
-				_mesh->transform( wpqr, ptri );
+				vertex(tv0,&wpqr);
+				transformer( wpqr, ptri );
 				tri(tv0)->_state.flags.coord = true;
 			}
-			th.set(unit());
-			th.multiply(tri(tv0)->thick());
-			vu = ptri+th;
-			vl = ptri;
-			vl.subtract(th);
-			pmin.minimum(vu);
-			pmax.maximum(vu);
-			pmin.minimum(vl);
-			pmax.maximum(vl);
+			th= (*un) *(tri(tv0)->thick());
+			vu = *ptri+th;
+			vl = *ptri-th;
+			csMath3::SetMinMax(vu,pmin,pmax);
+			csMath3::SetMinMax(vl,pmin,pmax);
 
 			ptri = pos(tv1);
 			if (!tri(tv1)->_state.flags.coord)
 			{
-				vertex(tv1,wpqr);
-				_mesh->transform( wpqr, ptri );
+				vertex(tv1,&wpqr);
+				transformer( wpqr, ptri );
 				tri(tv1)->_state.flags.coord = true;
 			}
-			th.set(unit());
-			th.multiply(tri(tv1)->thick());
-			vu = ptri+th;
-			vl = ptri;
-			vl.subtract(th);
-			pmin.minimum(vu);
-			pmax.maximum(vu);
-			pmin.minimum(vl);
-			pmax.maximum(vl);
+			th = (*un)*(tri(tv1)->thick());
+			vu = *ptri+th;
+			vl = *ptri-th;
+			csMath3::SetMinMax(vu,pmin,pmax);
+			csMath3::SetMinMax(vl,pmin,pmax);
 
-			if (!tri(tv1)->_state.flags.coord)
-			{
-				vertex(tv1,wpqr);
-				_mesh->transform( wpqr, pos(tv1) );
-				tri(tv1)->_state.flags.coord = true;
-			}
-			th.set(unit());
-			th.multiply(tri(tv1)->thick());
-			vu = pos(tv1)+th;
-			vl = pos(tv1);
-			vl.subtract(th);
-			pmin.minimum(vu);
-			pmax.maximum(vu);
-			pmin.minimum(vl);
-			pmax.maximum(vl);
 
 			// Pmin and Pmax now define a bounding box that contains the wedgie.
 			// Determine if this bounding box is visible in screen space.
-#ifdef DDG
-		   	if (pmin[2]< _mesh->farclip() || pmax[2] > _mesh->nearclip())
-#else
-		   	if (pmin[2]> _mesh->farclip() || pmax[2] < _mesh->nearclip())
-#endif
+		   	if (pmin.z> _mesh->farclip() || pmax.z < _mesh->nearclip())
 				tri(tvc)->_vis.visibility = ddgALLOUT;
 			else
 			{
@@ -570,7 +542,7 @@ unsigned short ddgTBinTree::priority(ddgTriIndex tvc)
 		tv0 = v0(tvc),
 		tv1 = v1(tvc);
 
-	ddgVector3 wpqr;
+	csVector3 wpqr;
 
     // Get screen space error metric of wedgie thickness.
 	// Note were are switching y & z since ROAM paper is z
@@ -578,38 +550,37 @@ unsigned short ddgTBinTree::priority(ddgTriIndex tvc)
 
 	if (!tri(tva)->_state.flags.coord)
 	{
-        vertex(tva,wpqr);
-		_mesh->transform( wpqr, pos(tva) );
+        vertex(tva,&wpqr);
+		transformer( wpqr, pos(tva) );
 		tri(tva)->_state.flags.coord = true;
 	}
 
 	// Left and right vertex should be calculated.
 	if (!tri(tv0)->_state.flags.coord)
 	{
-        vertex(tv0,wpqr);
-		_mesh->transform( wpqr, pos(tv0) );
+        vertex(tv0,&wpqr);
+		transformer( wpqr, pos(tv0) );
 		tri(tv0)->_state.flags.coord = true;
 	}
 	if (!tri(tv1)->_state.flags.coord)
 	{
-        vertex(tv1,wpqr);
-		_mesh->transform( wpqr, pos(tv1) );
+        vertex(tv1,&wpqr);
+		transformer( wpqr, pos(tv1) );
 		tri(tv1)->_state.flags.coord = true;
 	}
 
 	// Calculate the maximum screen space thickness.
-	ddgVector3 th(unit());
-	th.multiply(tri(tvc)->thick());
+	csVector3 th = (*unit())*(tri(tvc)->thick());
 
 	float result = ddgMAXPRI;
 #define ddgEPSILON 0.00001
-	ddgVector3 vp = pos(tva);
+	csVector3 *vp = pos(tva);
 	float a = th[0],
 		  b = th[2],
 		  c = th[1],
-		  p = vp[0],
-		  q = vp[1],
-		  r = vp[2],
+		  p = vp->x,
+		  q = vp->y,
+		  r = vp->z,
 		  d, da, d0, d1,
 		  m, ma, m0, m1;
 	if (r*r <= c*c + ddgEPSILON)
@@ -617,17 +588,17 @@ unsigned short ddgTBinTree::priority(ddgTriIndex tvc)
 	da = (sq(a*r-c*p)+sq(b*r-c*q));
 	ma = 2.0 / (r*r - c*c);
 	vp = pos(tv0);
-    p = vp[0];
-    q = vp[1];
-    r = vp[2];
+    p = vp->x;
+    q = vp->y;
+    r = vp->z;
 	if (r*r <= c*c + ddgEPSILON)
 		goto skip;
 	d0 = (sq(a*r-c*p)+sq(b*r-c*q));
 	m0 = 2.0 / (r*r - c*c);
 	vp = pos(tv1);
-    p = vp[0];
-    q = vp[1];
-    r = vp[2];
+    p = vp->x;
+    q = vp->y;
+    r = vp->z;
 	if (r*r <= c*c + ddgEPSILON)
 		goto skip;
 	d1 = (sq(a*r-c*p)+sq(b*r-c*q));

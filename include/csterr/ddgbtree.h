@@ -173,7 +173,7 @@ class WEXP ddgTBinTree {
 	/// For mirrored mesh this is the right side.
 	ddgTBinTree   *_pNeighbourLeft;
 	/// Unit vector updated once per frame.
-	static ddgVector3	_unit;
+	static csVector3	_unit;
 
 public:
 	/**
@@ -199,9 +199,9 @@ public:
 	inline void pNeighbourLeft(ddgTBinTree* t) { _pNeighbourLeft = t; }
 
 	/// Set the unit vector.
-	static void unit(ddgVector3 *v);
+	static void unit(csVector3 *v);
 	/// Return the unit vector.
-	static ddgVector3 * unit(void);
+	static csVector3 * unit(void);
 	/// Returns the column offset in the height map.
 	int dc(void) { return _dc; }
 	/// Returns the row offset in the height map.
@@ -247,12 +247,12 @@ public:
      */
     float treeHeight(unsigned int r, unsigned int c, float dx, float dz);
     /// Get vertex location.
-    unsigned int vertex(ddgTriIndex tindex, ddgVector3 *vout)
+    unsigned int vertex(ddgTriIndex tindex, csVector3 *vout)
     {
         if (_mirror)
-            vout->set(_dr-row(tindex),height(tindex),_dc-col(tindex));
+            vout->Set(_dr-row(tindex),height(tindex),_dc-col(tindex));
         else
-            vout->set(_dr+row(tindex),height(tindex),_dc+col(tindex));
+            vout->Set(_dr+row(tindex),height(tindex),_dc+col(tindex));
         if (tri(tindex)->state().flags.vbuffer)
             return tri(tindex)->vbufindex();
         return 0;
@@ -411,7 +411,7 @@ public:
 	/// Return the index in the mesh.
 	unsigned int index(void) { return _index; }
 	/// Return the camera space vector.
-	inline ddgVector3* pos(ddgTriIndex ti)
+	inline csVector3* pos(ddgTriIndex ti)
 	{
 		if (tri(ti)->_cbufindex == 0)
 		{
@@ -421,7 +421,10 @@ public:
 		return _mesh->vcache()->get( tri(ti)->_cbufindex );
 	}
 	/// Return the camera space vector.
-	inline float pos(ddgTriIndex ti, unsigned int i) { return pos( ti )->v[i]; }
+	inline float pos(ddgTriIndex ti, unsigned int i)
+	{
+		return (*pos( ti ))[i];
+	}
 
 };
 
