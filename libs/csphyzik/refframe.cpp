@@ -23,7 +23,9 @@
 #endif
 #include "csphyzik/refframe.h"
 
-ctReferenceFrame::ctReferenceFrame( coord px, coord py, coord pz, ctangle ppitch, ctangle proll, ctangle pyaw, ctReferenceFrame *ref ): offset( px, py, pz )
+
+ctReferenceFrame::ctReferenceFrame( coord px, coord py, coord pz, ctangle ppitch, ctangle proll, ctangle pyaw, ctReferenceFrame *ref ) : 
+	offset( px, py, pz )
 {
   //!me what the hell is this.  Who writes this stuff?
   (void) ref;
@@ -49,6 +51,11 @@ ctReferenceFrame& ctReferenceFrame::universe()
 	return basis;
 } 
 
+ctDeltaReferenceFrame::ctDeltaReferenceFrame() : 
+	v(0), w(0) 
+{
+	reference_count = 0; is_universe_frame = false; 
+}
 
 ctDeltaReferenceFrame& ctDeltaReferenceFrame::universe()
 { 

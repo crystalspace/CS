@@ -1,8 +1,17 @@
 The history order has been reversed so that new features are at the top.
 
+17-Aug-2000
+	- Some fixes to csphyzik from Michael Ewert.
+	- Increased far clipping plane in csTerrain::SetDetail() and
+	  decreased near clipping plane.
+	- Wyatt Miler updated the Mac project files.
 16-Aug-2000
+	- Norman Kamer fixed scfreg.mak.
+	- Alex Pfaffe fixed a bug in the terrain engine where it would
+	  underestimate the size of the vertex buffer.
 	- Martin Geisse patched the ds3d sound renderer so that it works
 	  again and cleaned up the software sound renderer.
+	- Martin fixed a bug in his last update to the MSVC project files.
 	- Andrew Zabolotny did the following:
 	    - Changed InferInstallPathOf() into GetInstallPath(). Unlike
 	      before, the memory is not allocated inside the routine;

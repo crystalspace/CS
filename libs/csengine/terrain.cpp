@@ -55,8 +55,8 @@ void csTerrain::SetDetail( unsigned int detail)
   mesh->minDetail(detail);
   mesh->maxDetail((unsigned int)(detail*1.1));
   mesh->absMaxDetail((unsigned int)(detail * 1.25));
-  mesh->nearClip(1.0);
-  mesh->farClip(200.0);
+  mesh->nearClip(.1);
+  mesh->farClip(1000.0);
 }
 
 int csTerrain::GetNumMaterials ()

@@ -123,7 +123,7 @@ public:
 		}
 	}
 
-  ctDeltaReferenceFrame(){reference_count = 0; is_universe_frame = false; }
+	ctDeltaReferenceFrame();
 
   ctVector3 v;
   ctVector3 w;
