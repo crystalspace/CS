@@ -1147,8 +1147,9 @@ csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
     if (info.thing_fact_state->GetPolygonCount () == 0)
     {
       synldr->ReportError ("crystalspace.thingloader.loadpart",
-	node, "No more polygons left after converting to portals! This is not supported!");
-      return false;
+	node, "No more polygons left after converting to portals! "
+	"This is not supported!");
+      return 0;
     }
     int i;
     for (i = 0 ; i < info.replace_materials.Length () ; i++)

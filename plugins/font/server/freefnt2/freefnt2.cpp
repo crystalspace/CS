@@ -456,7 +456,7 @@ int csFreeType2Font::GetLength (const char *text, int maxwidth)
     }
     if (maxwidth < glyphW)
       break;
-    count++;
+    count += skip;
     maxwidth -= glyphW;
   }
   return count;

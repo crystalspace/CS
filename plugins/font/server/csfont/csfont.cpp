@@ -817,7 +817,7 @@ int csDefaultFont::GetLength (const char *text, int maxwidth)
       return n;
 
     maxwidth -= charW;
-    n++;
+    n += skip;
   }
   return n;
 }

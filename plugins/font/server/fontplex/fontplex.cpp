@@ -565,7 +565,7 @@ int csFontPlexer::GetLength (const char *text, int maxwidth)
 
     if (maxwidth < gMetrics.advance)
       break;
-    n++;
+    n += skip;
     maxwidth -= gMetrics.advance;
   }
   return n;
