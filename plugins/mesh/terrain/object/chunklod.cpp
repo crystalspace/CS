@@ -140,49 +140,14 @@ csPtr<iMeshObject> csChunkLodTerrainFactory::NewInstance ()
 
 void csChunkLodTerrainFactory::GetObjectBoundingBox (csBox3& bbox, int type)
 {
-  bbox.StartBoundingBox ();
-  switch (type)
-  {
-    case CS_BBOX_MAX:
-    case CS_BBOX_NORMAL:
-      bbox.AddBoundingVertex (
-	  - (hm_x * scale.x / 2),
-	  -100000.0 * scale.y,
-	  - (hm_y * scale.z / 2));
-      bbox.AddBoundingVertex (
-	  hm_x * scale.x / 2,
-	  100000.0 * scale.y,
-	  hm_y * scale.z / 2);
-      break;
-    case CS_BBOX_ACCURATE:
-    {
-      float max = -100000.0;
-      float min = 100000.0;
-      for (int i = 0; i < hm_x; i ++)
-        for (int j = 0; j < hm_y; j ++)
-	{
-          if (max < datamap[i + j * hm_x].pos.y) 
-	    max = datamap[i + j * hm_x].pos.y;
-	  if (min > datamap[i + j * hm_x].pos.y)
-	    min = datamap[i + j * hm_x].pos.y;
-        }
-      bbox.AddBoundingVertex (
-	  - (hm_x * scale.x / 2),
-	  0,
-	  - (hm_y * scale.z / 2));
-      bbox.AddBoundingVertex (
-	  hm_x * scale.x / 2,
-	  max * scale.y,
-	  hm_y * scale.z / 2);
-      break;
-    }
-  }
+  bbox = root->BBox ();
 }
 
 void csChunkLodTerrainFactory::GetRadius (csVector3& rad, csVector3& c)
 {
-  c = csVector3 (0,0,0);
-  rad = scale * csVector3 (hm_x, 100000.0, hm_y);
+  const csBox3& bbox = root->BBox ();
+  c = bbox.GetCenter ();
+  rad = (bbox.Max () - bbox.Min ()) * 0.5f;
 }
 
 void csChunkLodTerrainFactory::SetScale (const csVector3& s)

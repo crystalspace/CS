@@ -40,6 +40,7 @@ SCF_IMPLEMENT_IBASE (csNullmeshMeshObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMeshObjectFactory)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iNullMeshState)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iNullFactoryState)
 SCF_IMPLEMENT_IBASE_END
 
@@ -52,8 +53,11 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csNullmeshMeshObject::ObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csNullmeshMeshObject::NullFactoryState)
-  SCF_IMPLEMENTS_INTERFACE (iNullMeshState)
   SCF_IMPLEMENTS_INTERFACE (iNullFactoryState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csNullmeshMeshObject::NullMeshState)
+  SCF_IMPLEMENTS_INTERFACE (iNullMeshState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 
@@ -63,6 +67,7 @@ csNullmeshMeshObject::csNullmeshMeshObject (csNullmeshMeshObject* factory)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshObjectFactory);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiNullFactoryState);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiNullMeshState);
   if (factory)
   {
     csNullmeshMeshObject::factory = &(factory->scfiMeshObjectFactory);

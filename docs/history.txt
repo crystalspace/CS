@@ -76,6 +76,26 @@ chronological order.
 	  overrides Jambase's default value of $(CP) "cp -f" to avoid using the
 	  -f flag, since older platforms do not support it.  Also removed the
 	  obsolete SearchSubdir rule.
+	- Jorrit extended csKDTree class with GetChild1() and GetChild2().
+	  This allows manual traversal of the tree.
+	- Jorrit optimized Frustvis so that it detects when a node is fully
+	  in the frustum. In that case it will stop traversing the tree
+	  in front to back mode but instead just mark all objects inside
+	  that node (and inside children of that node) as visible. This
+	  greatly reduces visibility processing and also avoids the need
+	  to distribute that part of the tree. This optimization will help
+	  in all cases but especially in large open areas (i.e. landscape
+	  with many objects on it). Note that the effectivity of this
+	  optimization is currently reduced because the bbox of the kdtree
+	  is too big. Have to find a solution for that first.
+	- Jorrit removed un unused field in frustvis. This field was being
+	  tested but never filled. So totally useless.
+	- Jorrit changed the chunklod mesh object (NR terrain engine) so that
+	  it now returns an accurate bbox instead of the previous bbox
+	  that was WAAY too big. It now uses the bbox of the root quad.
+	  Also fixed GetRadius() to use this bbox.
+	- Jorrit fixed nullmesh so it properly implements iNullMeshState
+	  now.
 14-Apr-2004
 	- Eric Sunshine fixed bugs in csString where GetData() and the (char
 	  const*) operator would incorrectly return a null pointer at times.

@@ -131,6 +131,28 @@ public:
   virtual void PositionChild (iMeshObject* child,csTicks current_time) { }
 
   //------------------------- iGeneralMeshState implementation ----------------
+  class NullMeshState : public iNullMeshState
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csNullmeshMeshObject);
+    virtual void SetRadius (float radius)
+    {
+      scfParent->SetRadius (radius);
+    }
+    virtual float GetRadius () const
+    {
+      return scfParent->GetRadius ();
+    }
+    virtual void SetBoundingBox (const csBox3& box)
+    {
+      scfParent->SetBoundingBox (box);
+    }
+    virtual void GetBoundingBox (csBox3& box)
+    {
+      scfParent->GetBoundingBox (box);
+    }
+  } scfiNullMeshState;
+  friend class NullMeshState;
+
   //---------------------- iGeneralMeshFactoryState implementation ------------
   class NullFactoryState : public iNullFactoryState
   {

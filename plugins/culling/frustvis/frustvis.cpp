@@ -342,57 +342,78 @@ struct FrustTest_Front2BackData
   iVisibilityCullerListener* viscallback;
 };
 
-bool csFrustumVis::TestNodeVisibility (csKDTree* treenode,
+int csFrustumVis::TestNodeVisibility (csKDTree* treenode,
 	FrustTest_Front2BackData* data, uint32& frustum_mask)
 {
   const csBox3& node_bbox = treenode->GetNodeBBox ();
 
   if (node_bbox.Contains (data->pos))
   {
-    return true;
+    return NODE_INSIDE;
   }
 
   uint32 new_mask;
   if (!csIntersect3::BoxFrustum (node_bbox, data->frustum, frustum_mask,
   	new_mask))
   {
-    return false;
+    return NODE_INVISIBLE;
   }
   frustum_mask = new_mask;
-  return true;
+  return NODE_VISIBLE;
 }
 
 bool csFrustumVis::TestObjectVisibility (csFrustVisObjectWrapper* obj,
   	FrustTest_Front2BackData* data, uint32 frustum_mask)
 {
-  if (obj->last_visible_vistest_nr != current_vistest_nr)
+  if (obj->mesh && obj->mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH))
+    return false;
+
+  const csBox3& obj_bbox = obj->child->GetBBox ();
+  if (obj_bbox.Contains (data->pos))
   {
-    if (obj->mesh && obj->mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH))
-      return false;
-
-    const csBox3& obj_bbox = obj->child->GetBBox ();
-    if (obj_bbox.Contains (data->pos))
-    {
-      //obj->visobj->SetVisibilityNumber (current_visnr);
-      data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
-      return true;
-    }
-  
-    uint32 new_mask;
-    if (!csIntersect3::BoxFrustum (obj_bbox, data->frustum,
-		frustum_mask, new_mask))
-    {
-      return false;
-    }
-
-    //obj->visobj->SetVisibilityNumber (current_visnr);
     data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
+    return true;
   }
+  
+  uint32 new_mask;
+  if (!csIntersect3::BoxFrustum (obj_bbox, data->frustum,
+		frustum_mask, new_mask))
+  {
+    return false;
+  }
+
+  data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
 
   return true;
 }
 
 //======== VisTest =========================================================
+
+static void CallVisibilityCallbacksForSubtree (csKDTree* treenode,
+	FrustTest_Front2BackData* data, uint32 cur_timestamp)
+{
+  int num_objects = treenode->GetObjectCount ();
+  csKDTreeChild** objects = treenode->GetObjects ();
+  int i;
+  for (i = 0 ; i < num_objects ; i++)
+  {
+    if (objects[i]->timestamp != cur_timestamp)
+    {
+      objects[i]->timestamp = cur_timestamp;
+      csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
+      	objects[i]->GetObject ();
+      iMeshWrapper* mesh = visobj_wrap->mesh;
+      if (!(mesh && mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH)))
+        data->viscallback->ObjectVisible (visobj_wrap->visobj, mesh);
+    }
+  }
+
+  csKDTree* child1 = treenode->GetChild1 ();
+  if (child1) CallVisibilityCallbacksForSubtree (child1, data, cur_timestamp);
+  csKDTree* child2 = treenode->GetChild2 ();
+  if (child2) CallVisibilityCallbacksForSubtree (child2, data, cur_timestamp);
+
+}
 
 static bool FrustTest_Front2Back (csKDTree* treenode, void* userdata,
 	uint32 cur_timestamp, uint32& frustum_mask)
@@ -402,8 +423,21 @@ static bool FrustTest_Front2Back (csKDTree* treenode, void* userdata,
 
   // In the first part of this test we are going to test if the node
   // itself is visible. If it is not then we don't need to continue.
-  if (!frustvis->TestNodeVisibility (treenode, data, frustum_mask))
+  int nodevis = frustvis->TestNodeVisibility (treenode, data, frustum_mask);
+  if (nodevis == NODE_INVISIBLE)
     return false;
+
+  if (nodevis == NODE_VISIBLE && frustum_mask == 0)
+  {
+    // Special case. The node is visible and the frustum mask is 0.
+    // This means that the node is completely visible and it doesn't
+    // make sense to continue testing visibility. However we need
+    // to call the callback on all visible objects. So we traverse the
+    // tree manually from this point on. To stop the Front2Back traversal
+    // we return false here.
+    CallVisibilityCallbacksForSubtree (treenode, data, cur_timestamp);
+    return false;
+  }
 
   treenode->Distribute ();
 
@@ -430,7 +464,7 @@ bool csFrustumVis::VisTest (iRenderView* rview,
                             iVisibilityCullerListener* viscallback)
 {
   // just make sure we have a callback
-  if (0 == viscallback)
+  if (viscallback == 0)
     return false;
 
   UpdateObjects ();
@@ -516,23 +550,19 @@ static bool FrustTestPlanes_Front2Back (csKDTree* treenode,
       objects[i]->timestamp = cur_timestamp;
       csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
       	objects[i]->GetObject ();
-      if (visobj_wrap->last_visible_vistest_nr != data->current_vistest_nr)
-      {
-	const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
-	uint32 new_mask2;
-	if (csIntersect3::BoxFrustum (obj_bbox, data->frustum,
+      const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
+      uint32 new_mask2;
+      if (csIntersect3::BoxFrustum (obj_bbox, data->frustum,
 		frustum_mask, new_mask2))
+      {
+	if (data->viscallback)
 	{
-	  if (data->viscallback)
-	  {
-	    data->viscallback->ObjectVisible (visobj_wrap->visobj, 
+	  data->viscallback->ObjectVisible (visobj_wrap->visobj, 
 	      visobj_wrap->mesh);
-	  }
-	  else
-	  {
-	    visobj_wrap->last_visible_vistest_nr  = data->current_vistest_nr ;
-	    data->vistest_objects->Push (visobj_wrap->visobj);
-	  }
+	}
+	else
+	{
+	  data->vistest_objects->Push (visobj_wrap->visobj);
 	}
       }
     }
@@ -634,7 +664,6 @@ static bool FrustTestBox_Front2Back (csKDTree* treenode, void* userdata,
       const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
       if (obj_bbox.TestIntersect (data->box))
       {
-	visobj_wrap->last_visible_vistest_nr = data->current_vistest_nr;
 	data->vistest_objects->Push (visobj_wrap->visobj);
       }
     }
@@ -727,7 +756,6 @@ static bool FrustTestSphere_Front2Back (csKDTree* treenode,
 	}
 	else
 	{
- 	  visobj_wrap->last_visible_vistest_nr = data->current_vistest_nr;
 	  data->vistest_objects->Push (visobj_wrap->visobj);
 	}
       }

@@ -57,8 +57,6 @@ public:
   long update_number;	// Last used update_number from movable.
   long shape_number;	// Last used shape_number from model.
 
-  uint32 last_visible_vistest_nr;
-
   // Optional data for shadows. Both fields can be 0.
   csRef<iMeshWrapper> mesh;
   csRef<iShadowCaster> caster;
@@ -67,7 +65,6 @@ public:
   {
     SCF_CONSTRUCT_IBASE (0);
     csFrustVisObjectWrapper::frustvis = frustvis;
-    last_visible_vistest_nr = 0;
   }
   virtual ~csFrustVisObjectWrapper ()
   {
@@ -122,10 +119,14 @@ public:
   virtual ~csFrustumVis ();
   virtual bool Initialize (iObjectRegistry *object_reg);
 
-  // Test visibility for the given node. Returns true if visible.
+#define NODE_INSIDE 2
+#define NODE_VISIBLE 1
+#define NODE_INVISIBLE 0
+  // Test visibility for the given node. Returns 2 if camera is inside node,
+  // 1 if visible normally, or 0 if not visible.
   // This function will also modify the frustum_mask in 'data'. So
   // take care to restore this later if you recurse down.
-  bool TestNodeVisibility (csKDTree* treenode,
+  int TestNodeVisibility (csKDTree* treenode,
   	FrustTest_Front2BackData* data, uint32& frustum_mask);
 
   // Test visibility for the given object. Returns true if visible.

@@ -298,6 +298,16 @@ public:
   	void* userdata, uint32 frustum_mask);
 
   /**
+   * Get child one.
+   */
+  csKDTree* GetChild1 () const { return child1; }
+
+  /**
+   * Get child two.
+   */
+  csKDTree* GetChild2 () const { return child2; }
+
+  /**
    * Return the number of objects in this node.
    */
   int GetObjectCount () const { return num_objects; }
