@@ -126,9 +126,6 @@ LFLAGS.DLL=FORM os2 lx dll initi termi \
 # ... a console executable
 LFLAGS.CONSOLE.EXE=FORM os2 lx pmcomp
  
-# Flags for the linker which are used when building a shared library.
-LFLAGS.DLL=
-
 # Flags for linker to direct output to rule target file
 LFLAGS.@=NAME $(subst /,\,$@)
 
@@ -203,7 +200,7 @@ DO.LINK.EXE+=$(CR)$(DO.BIND.RES)
 endif
 
 DO.DEP = gcc -MM $(filter-out $(CFLAGS.GENERAL) $(CFLAGS.optimize) $(CFLAGS.debug),\
-  $(subst -d,-D,$(CFLAGS))) $(subst -i=,-I ,$(CFLAGS.INCLUDE)) $^ | sed $(SED_DEPEND) >
+  $(subst -d,-D,$(CFLAGS))) $(subst -i=,-I ,$(CFLAGS.INCLUDE)) $^ | sed $(SED_DEPEND) >$@
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
