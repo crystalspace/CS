@@ -86,7 +86,6 @@ public:
   // Optional data for shadows. Both fields can be 0.
   csRef<iMeshWrapper> mesh;
   csRef<iShadowCaster> caster;
-  csRef<iThingState> thing_state;	// Optional.
 
   csVisibilityObjectWrapper (csDynaVis* dynavis)
   {
@@ -248,7 +247,7 @@ public:
   virtual bool IntersectSegment (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr = 0,
     iMeshWrapper** p_mesh = 0, int* poly_idx = 0,
-    bool accurate = false);
+    bool accurate = true);
   virtual void CastShadows (iFrustumView* fview);
   //virtual uint32 GetCurrentVisibilityNumber () const { return current_visnr; }
 

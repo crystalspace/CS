@@ -9,6 +9,11 @@ chronological order.
 1-Oct-2003
 	- Jorrit fixed a bug reported by valgrind in the portal container.
 	  It was using an uninitialized variable.
+	- Jorrit made frustvis and dynavis totally independent of things.
+	- Jorrit changed the default value of accurate for the second
+	  iVisibilityCuller->IntersectSegment() function (the one that
+	  returns polygon indices) from false to true. This means that by
+	  default the most accurate version is used.
 30-Sep-2003
 	- Jorrit fixed a bug in thing polygon mesh helper where it would not
 	  clean up old data if the thing changes and at the same time the

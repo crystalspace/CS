@@ -159,12 +159,13 @@ struct iVisibilityCuller : public iBase
    * then this means that the object belonging to the culler itself was
    * hit. Some meshes don't support returning polygon indices in which case
    * that field will always be -1.
-   * If accurate is true then a more accurate (and slower) method is used.
+   * If accurate is false then a less accurate (and faster) method is used.
+   * In that case the polygon index will never be filled.
    */
   virtual bool IntersectSegment (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr = 0,
     iMeshWrapper** p_mesh = 0, int* poly_idx = 0,
-    bool accurate = false) = 0;
+    bool accurate = true) = 0;
 
   /**
    * Start casting shadows from a given point in space. What this will

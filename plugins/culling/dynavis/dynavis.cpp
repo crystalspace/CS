@@ -49,7 +49,6 @@
 #include "iengine/shadows.h"
 #include "iengine/fview.h"
 #include "imesh/object.h"
-#include "imesh/thing/thing.h"
 #include "iutil/object.h"
 #include "ivaria/reporter.h"
 #include "ivaria/bugplug.h"
@@ -305,8 +304,6 @@ void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
   {
     visobj_wrap->caster = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
     	iShadowCaster);
-    visobj_wrap->thing_state = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-	iThingState);
   }
   model_mgr->CheckObjectModel (visobj_wrap->model, mesh);
 
@@ -1671,13 +1668,21 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode, void* userdata,
 	    csVector3 obj_isect;
 	    float r;
 
-	    if (!data->vector && visobj_wrap->thing_state)
+	    bool rc;
+	    int pidx = -1;
+	    if (data->accurate)
+	      rc = visobj_wrap->mesh->GetMeshObject ()->HitBeamObject (
+	      	  obj_start, obj_end, obj_isect, &r, &pidx);
+	    else
+	      rc = visobj_wrap->mesh->GetMeshObject ()->HitBeamOutline (
+	      	  obj_start, obj_end, obj_isect, &r);
+	    if (rc)
 	    {
-	      iThingState* st = visobj_wrap->thing_state;
-	      int pidx = st->IntersectSegment (
-			obj_start, obj_end,
-			obj_isect, &r, false);
-	      if (pidx != -1 && r < data->r)
+	      if (data->vector)
+	      {
+		data->vector->Push (visobj_wrap->visobj);
+	      }
+	      else if (r < data->r)
 	      {
 		data->r = r;
 		data->polygon_idx = pidx;
@@ -1688,35 +1693,6 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode, void* userdata,
 		data->sqdist = csSquaredDist::PointPoint (
 			data->seg.Start (), data->isect);
 		data->mesh = visobj_wrap->mesh;
-	      }
-	    }
-	    else
-	    {
-	      bool rc;
-	      if (data->accurate)
-	        rc = visobj_wrap->mesh->GetMeshObject ()->HitBeamObject (
-	      	  obj_start, obj_end, obj_isect, &r);
-	      else
-	        rc = visobj_wrap->mesh->GetMeshObject ()->HitBeamOutline (
-	      	  obj_start, obj_end, obj_isect, &r);
-	      if (rc)
-	      {
-	        if (data->vector)
-		{
-		  data->vector->Push (visobj_wrap->visobj);
-		}
-	        else if (r < data->r)
-		{
-		  data->r = r;
-		  data->polygon_idx = -1;
-		  if (identity)
-		    data->isect = obj_isect;
-		  else
-		    data->isect = movtrans.This2Other (obj_isect);
-		  data->sqdist = csSquaredDist::PointPoint (
-			data->seg.Start (), data->isect);
-		  data->mesh = visobj_wrap->mesh;
-		}
 	      }
 	    }
 	  }
