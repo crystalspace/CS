@@ -30,6 +30,9 @@ chronological order.
 	- Jorrit fixed a bad bug in the OpenGL renderer. DrawPolygonMesh()
 	  didn't call FlushDrawPolygon() which could cause particle systems
 	  not to be rendered.
+	- res made the following changes:
+	    - Made some updates to the map2cs tutorial.
+	    - cssys/win32/wintools.h doesn't include <windows.h> any more.
 14-Oct-2003
 	- Eric Sunshine fixed typographical error in constant expression in
 	  cssys/general/platformconfig.cpp: S_IWGRPS_IXGRP --> S_IWGRP|S_IXGRP.
