@@ -49,7 +49,8 @@ bool run_pool_tests(iObjectRegistry* object_reg)
   fprintf (stdout, "Event Pool count: %ld\n", eq->CountPool());
   fprintf (stdout, "Allocating 10 events...  ");
   begin = csGetTicks();
-  for (int i = 0; i < 10; i++)
+  int i;
+  for (i = 0; i < 10; i++)
   {
     ten[i] = q->CreateEvent(1);
   }
@@ -59,7 +60,7 @@ bool run_pool_tests(iObjectRegistry* object_reg)
   fprintf (stdout, "Event Pool count: %ld\n", eq->CountPool());
   fprintf (stdout, "Allocating 100 events...  ");
   begin = csGetTicks();
-  for (int i = 0; i < 100; i++)
+  for (i = 0; i < 100; i++)
   {
     hundred[i] = q->CreateEvent(1);
   }
@@ -69,7 +70,7 @@ bool run_pool_tests(iObjectRegistry* object_reg)
   fprintf (stdout, "Event Pool count: %ld\n", eq->CountPool());
   fprintf (stdout, "Allocating 1000 events...  ");
   begin = csGetTicks();
-  for (int i = 0; i < 1000; i += 10)
+  for (i = 0; i < 1000; i += 10)
   {
     thousand[i] = q->CreateEvent(1);
     thousand[i+1] = q->CreateEvent(1);
@@ -89,7 +90,7 @@ bool run_pool_tests(iObjectRegistry* object_reg)
   fprintf (stdout, "Allocating 10000 events...  ");
   begin = csGetTicks();
   // On my machine, this unrolled loop is 10x faster then doing one at a time
-  for (int i = 0; i < 10000; i += 10)
+  for (i = 0; i < 10000; i += 10)
   {
     lots[i] = q->CreateEvent(1);
     lots[i+1] = q->CreateEvent(1);
