@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Jan-2005
+	- Eric Sunshine applied a patch from Brian DeVries
+	  <mavericktux@cashette.com> for sprcal3d.txi which provides some help
+	  for problems which new sprcal3d users might encounter. Eric also did
+	  a small amount of additional re-writing.
 5-Jan-2005
 	- res tweaked the pattern(s) for the NV GF FX rules.
 	- res changed the cs_floatrand_seed definition to properly compile on
@@ -26,17 +31,18 @@ chronological order.
 	  making it far more flexible and useful.
 4-Jan-2005
 	- Jorrit added a new iSectorMeshCallback and associated setter
-	  functions in iSector. With this callback you can get notified whenever
-	  a mesh is added or removed from a sector.
+	  functions in iSector. With this callback you can get notified
+	  whenever a mesh is added or removed from a sector.
 	- Jorrit removed iSector->GetPrivateObject(). It is now a non-virtual
 	  private function of csSector::eiSector. That means the engine
 	  can still access it but it is no longer published in the public
 	  API. Also calling it will be slightly more efficient for the engine
 	  as the virtual call is avoided.
 	- Jorrit also removed iLight->GetPrivateObject() in a similar way.
-	- Jorrit submitted a patch from Constantine Dymnikov which implements
+	- Jorrit applied a patch from Constantine Dymnikov which implements
 	  Clone() for the thing factory.
-	- PK removed the csws dependency from the Viewmesh and Picview Jamfiles.
+	- PK removed the csws dependency from the Viewmesh and Picview
+	  Jamfiles.
 2-Jan-2005
 	- res made some more fixes to GL text drawing, among it the use of
 	  a variable at a time it had no sensible value yet.

@@ -8,8 +8,8 @@
 @cindex @code{iMeshObjectFactory}
 @cindex @code{iMeshObjectType}
 
-@file{sprcal3d} is a 3D mesh that can perform skeletal animation using the
-Cal3D library.
+@file{sprcal3d} is a 3D mesh plugin which can perform skeletal animation using
+the Cal3D library.
 
 @noindent
 @uref{http://cal3d.sourceforge.net/}
@@ -19,12 +19,12 @@ Cal3D library.
 This is an example of how to load and view a Cal3d file with the
 @file{viewmesh} program.
 
-We are going to load the @file{cally} model. The data files of this 
-model are part of the standard Cal3d @sc{cvs} repository, and can be found at
-@file{cal3d/data/cally}. You must copy the files from this directory
-to @file{CS/cally}.
+We are going to load the @file{cally} model. The data files of this model are
+part of the standard Cal3d @sc{cvs} repository, and can be found within the
+Cal3D project at @file{cal3d/data/cally}. For this example, you should copy the
+files from this directory to @file{CS/cally}.
 
-Make a new file called @file{test.cal3d} in the @file{CS} directory with
+Now, make a new file called @file{test.cal3d} in the @file{CS} directory with
 the following contents:
 
 @example
@@ -182,16 +182,116 @@ the following contents:
 </meshfact>
 @end example
 
-Next, you must run @samp{viewmesh} from the @file{CS} directory. 
-Right click on the screen and then select @emph{Load Mesh}.
-Select @file{test.cal3d} from the list of files.
+Next, run @file{viewmesh} from the @file{CS} directory.
+Click ``Load'', select the @file{/this} directory, and
+select @file{test.cal3d}.  Alternately, to load @file{test.cal3d} from
+the command line when you launch @samp{viewmesh}:
 
+@example
+./viewmesh /this/test.cal3d
+@end example
+
+@noindent
 You should be able to see the @file{cally} model, completely green.
+
+@subsubheading Creating Your Own Cal3D Mesh
+
+Although explaining how to create your own Cal3D meshes is beyond the
+scope of this document, there are several web sites and tutorials which
+describe how to do so. These include:
+
+@table @uref
+@item http://cal3d.sourceforge.net/modeling/tutorial.html
+Describes how to create Cal3D meshes in 3D Studio @sc{max}.
+
+@item http://www.cs.indiana.edu/~joellis/
+Escribes how to create maps and Cal3D meshes in Blender.
+@end table
+
+@emph{Note}: The Crystal Space Cal3D plugin requires a skeleton system to
+function properly even if the mesh is not going to be animated.  If your mesh
+does not require animation, you must still place at least one bone in the mesh,
+bind it to a part of the mesh (e.g., the body of a space ship), name it
+correctly (see @uref{http://www.cs.indiana.edu/~joellis/} for more
+information), and export the skeleton along with the mesh.  If you do not
+create the skeleton and export it.
+
+@subsubheading Common @file{viewmesh} Errors
+
+A good way to test your Cal3d mesh is by loading it into @file{viewmesh}.
+Since most diagnostic output is directed to the console, it is important
+to run @file{viewmesh} from the command line.  See above for how to
+do so, and substitute your @file{.cal3d} file for @file{test.cal3d}.
+
+Here are several errors which may occur when testing your mesh:
+
+@itemize @bullet
+@item
+If @file{viewmesh} crashes or aborts with a message about missing skeleton
+immediately after loading your @file{.cal3d} file, make sure that you have
+included the @code{<skeleton>} tag in your @file{.cal3d} file.
+
+@item
+If @file{viewmesh} pops up an error dialogue with a message such as:
+
+@example
+crystalspace.mesh.sprite.cal3d: Cal3d: Invalid file format...
+@end example
+
+@noindent
+and outputs to the console:
+
+@example
+Error ID: crystalspace.spritecal3dfactoryloader.parse.badfile
+Description: Could not load cal3d skeleton file <test.csf>.
+[node: meshfact(name=test),params,skeleton]
+crystalspace.mesh.sprite.cal3d: Cal3d: Invalid file format...
+@end example
+
+You likely forgot to put a bone in your mesh before exporting it.
+Open your 3D editor, add a bone somewhere in the mesh, bind it to the mesh,
+name it correctly (see @uref{http://www.cs.indiana.edu/~joellis/}), then 
+re-export your mesh and try again.
+
+@item
+If @file{viewmesh} pops up the error message:
+
+@example
+crystalspace.mesh.sprite.cal3d: Cal3d: No error found in...
+@end example
+
+@noindent
+and outputs to the console:
+
+@example
+Error ID: crystalspace.spritecal3dfactoryloader.parse.badfile
+Description: Could not load cal3d skeleton file <test.csf>.
+[node: meshfact(name=test),params,skeleton]
+@end example
+
+This probably means that you entered the skeleton file name incorrectly in your
+@code{<skeleton>} tag.  Check the value of @code{<name>} in your
+@code{<skeleton>} tag and try again.
+
+@item
+If @file{viewmesh} does nothing when you try to load your @file{.cal3d} file,
+but outputs the following message to the console:
+
+@example
+Error ID: crystalspace.maploader.parse.plugin
+Description: Document system error for file 'test.cal3d':
+  Error reading Element value.
+@end example
+
+@noindent
+You probably forgot to close one of your tags properly (e.g., a missing
+``>'' at the end of a tag).  Check your @file{.cal3d} file, and try again.
+@end itemize
 
 @subsubheading Displaying the Model
 
 We now show you how to edit the @file{simple1} tutorial
-(@pxref{Tutorial Simple}) in order to load the Cal3d model.
+(@pxref{Tutorial Simple}) in order to load the Cal3d model programmatically.
 
 Add the following to @file{simple1.cpp}
 just after the call to @code{CreateRoom()} in @code{Simple::Application()}:
@@ -215,9 +315,9 @@ csRef<iMeshWrapper> sprite = engine->CreateMeshWrapper(
 Now, build @file{simple1}, and run it from the @file{CS} directory.
 You should be looking right at the model.
 
-@subsubheading Controling the Model
+@subsubheading Controlling the Model
 
-We can now display the model but we cannot set animations, etc.
+We can now display the model but we can not set animations, etc.
 To resolve this, insert the following code into @file{simple1.cpp} immediately
 after the code which you inserted to display the model:
 
@@ -266,10 +366,10 @@ cause problems.
 </morphanimation>
 @end example
 
-You can test a morphanimation if you load the Cal3D file in the @file{viewmesh}
-example program.
+You can test a morph animation if you load the Cal3D file in the
+@file{viewmesh} example program.
 
-You can use morph animations programmatically as follows.
+Furthermore, you can use morph animations programmatically as follows:
 
 @noindent
 In this example, @samp{cal3dfactorystate} is the Cal3D factory state object of
@@ -313,7 +413,7 @@ is maintained, so you can deduce which mesh you are using.
 You can test a socket if you load the Cal3D file in the @file{viewmesh} example
 program.
 
-You can use sockets in code as follows.
+Furthermore, you can use sockets in code as follows:
 
 @noindent
 In this example, @samp{cal3dstate} is the Cal3D state object of type
