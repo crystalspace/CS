@@ -31,6 +31,7 @@ public:
   csPython(iBase *iParent);
   virtual ~csPython();
 
+  static csPython* shared_instance;
   iSystem* Sys;
   int Mode;
   void* Storage;
@@ -53,7 +54,6 @@ public:
   } scfiPlugIn;
 };
 
-extern csPython *thisclass;
 void InitPytocs();
 #endif
 

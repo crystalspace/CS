@@ -1,5 +1,13 @@
 The history order is reversed so that new features are at the top.
 
+2-Jul-2001
+	- Removed the bad and global 'thisclass' pointer from the Python
+	  plugin. Removed the 'GetSystem()' call from 'cs.i'. The Python
+	  plugin now sets the pointer to iSystem in 'cspace.system' Python
+	  variable. So if a Python script does 'import cspace.*' then
+	  you can just use 'system' in your script.
+	  This change breaks the LUA plugin though. A similar change has
+	  to happen there but I don't know how.
 1-Jul-2001
 	- Eric Sunshine repaired the new cmdline.cpp and cmdline.h so that they
 	  compile error-free with the NextStep compiler.

@@ -9,8 +9,6 @@ except:
 
 def CreateRoom(matname):
 	print 'Start creating polygons...'
-	global system
-	system = GetSystem()
 	engine = system.Query_iEngine()
 	room = engine.FindSector("room")
 	walls = engine.CreateSectorWallsMesh(room,"walls")

@@ -39,6 +39,8 @@ ifneq (,$(strip $(PYTHON_INC)))
   CFLAGS.PYTHON += $(CFLAGS.I)$(PYTHON_INC)
 endif
 
+CFLAGS.PYTHON += -DSWIG_GLOBAL
+
 ifeq (,$(strip $(LIBS.CSPYTHON.SYSTEM)))
 ifneq (,$(strip $(PYTHON_LIB)))
   # PYTHON_LIB points at the Python library directory (which is often

@@ -37,10 +37,6 @@
 #include "imesh/thing/thing.h"
 #include "imap/parser.h"
 #include "plugins/cscript/cspython/cspython.h"
-iSystem* GetSystem()
-{
-  return thisclass->Sys;
-}
 
 void* GetMyPtr() { return NULL; }
 %}
@@ -294,9 +290,8 @@ public:
     }
     void Print(int mode, const char* format) {
       self->Printf(mode, format); 
-    }	
+    }
   }
 };
 
-iSystem* GetSystem();
 void* GetMyPtr();

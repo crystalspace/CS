@@ -30,7 +30,7 @@ extern "C" PyObject* pytocs_printout(PyObject *self, PyObject* args) {
 
   (void)self;
   if (PyArg_ParseTuple(args, "s", &command))
-    thisclass->Print(0, command);
+    csPython::shared_instance->Print(0, command);
   
   Py_INCREF(Py_None);
   return Py_None;
@@ -41,7 +41,7 @@ extern "C" PyObject* pytocs_printerr(PyObject *self, PyObject* args) {
 
   (void)self;
   if (PyArg_ParseTuple(args, "s", &command))
-    thisclass->Print(1, command);
+    csPython::shared_instance->Print(1, command);
   
   Py_INCREF(Py_None);
   return Py_None;

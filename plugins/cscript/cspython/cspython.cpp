@@ -41,12 +41,13 @@ SCF_EXPORT_CLASS_TABLE(cspython)
     "Crystal Space Script Python")
 SCF_EXPORT_CLASS_TABLE_END
 
-csPython *thisclass=NULL;
+csPython* csPython::shared_instance = NULL;
 
 csPython::csPython(iBase *iParent) :Sys(NULL), Mode(CS_MSG_INITIALIZATION)
 {
   SCF_CONSTRUCT_IBASE(iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  shared_instance = this;
 }
 
 csPython::~csPython()
@@ -54,13 +55,15 @@ csPython::~csPython()
   Mode=CS_MSG_INTERNAL_ERROR;
   Py_Finalize();
   Sys=NULL;
-  thisclass=NULL;
+}
+
+extern "C" {
+  extern void SWIG_MakePtr(char *_c, const void *_ptr, char *type);
 }
 
 bool csPython::Initialize(iSystem* iSys)
 {
-  Sys=iSys;
-  thisclass=this;
+  Sys = iSys;
 
   Py_SetProgramName("Crystal Space -- Python");
   Py_Initialize();
@@ -70,24 +73,26 @@ bool csPython::Initialize(iSystem* iSys)
   iSys->GetInstallPath (path, 255);
   if (path[0] == 0) strcpy (path, "./");
 
-  if(!LoadModule("sys"))
-    return false;
+  if (!LoadModule ("sys")) return false;
   csString cmd;
   cmd << "sys.path.append('" << path << "scripts/python/')";
-  if(!RunText(cmd))
-    return false;
+  if (!RunText (cmd)) return false;
 #if 0 // Enable this to send python script prints to the crystal space console.
-  if(!LoadModule("cshelper"))
-    return false;
+  if (!LoadModule ("cshelper")) return false;
 #endif   
-  if(!LoadModule("pdb"))
-    return false;
-  if(!LoadModule("cspacec"))
-    return false;
-  if(!LoadModule("cspace"))
-    return false;
+  if (!LoadModule ("pdb")) return false;
+  if (!LoadModule ("cspacec")) return false;
+  if (!LoadModule ("cspace")) return false;
 
-  Mode=CS_MSG_STDOUT;
+  Mode = CS_MSG_STDOUT;
+
+  // Store the system pointer in 'cspace.system'.
+  char command[256];
+  char sysPtr[100];
+  SWIG_MakePtr (sysPtr, Sys, "_iSystem_p");
+  sprintf (command, "cspace.system=cspace.iSystemPtr(\"%s\")", sysPtr);
+  RunText (command);
+
   return true;
 }
 

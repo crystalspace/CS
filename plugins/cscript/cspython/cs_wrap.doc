@@ -484,7 +484,5 @@ Print(mode,format)
 
 ----------
 
-GetSystem()
-
 GetMyPtr()
 
