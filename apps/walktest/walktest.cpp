@@ -1085,6 +1085,45 @@ bool WalkTest::SetMapDir (const char* map_dir)
   return true;
 }
 
+#if 0
+
+#include "cssys/thread.h"
+#include "cssys/sysfunc.h"
+#include "iutil/document.h"
+
+class MyThread : public csRunnable
+{
+private:
+  int ref;
+
+public:
+  csRef<iDocument> doc;
+  csRef<iDataBuffer> buf;
+
+public:
+  MyThread () : ref (1) { }
+  virtual ~MyThread () { }
+  virtual void Run ()
+  {
+    csSleep (2000);
+    printf ("================ START PARSING!\n"); fflush (stdout);
+    const char* error = doc->Parse (buf);
+    if (error != NULL)
+    {
+      printf ("Document system error for file '%s'!", error);
+    }
+    printf ("================ END PARSING!\n"); fflush (stdout);
+  }
+  virtual void IncRef () { ref++; }
+  virtual void DecRef () { ref--; if (ref <= 0) delete this; }
+};
+
+static csRef<csThread> thread1;
+static csRef<csThread> thread2;
+static csRef<csThread> thread3;
+
+#endif
+
 bool WalkTest::Initialize (int argc, const char* const argv[],
 	const char *iConfigName)
 {
@@ -1573,6 +1612,26 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   myG2D->ClearAll (myG2D->FindRGB(0,0,0));
   myG2D->FinishDraw ();
 
+#if 0
+{
+  csRef<iDocumentSystem> xml (
+      CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
+
+  MyThread* t1 = new MyThread ();
+  MyThread* t2 = new MyThread ();
+  t1->doc = xml->CreateDocument ();
+  t2->doc = xml->CreateDocument ();
+  myVFS->Mount ("/lev/hydlaa", "hydlaa.zip");
+  myVFS->ChDir ("/lev/hydlaa");
+  t1->buf = myVFS->ReadFile ("/lev/hydlaa/world");
+  t2->buf = t1->buf;
+
+  thread1 = csThread::Create (t1);
+  thread1->Start ();
+  //thread2 = csThread::Create (t2);
+  //thread2->Start ();
+}
+#endif
   return true;
 }
 
@@ -1583,7 +1642,6 @@ static void CreateSystem(void)
   // Create the system driver object
   Sys = new WalkTest ();
 }
-
 
 /*---------------------------------------------------------------------*
  * Main function

@@ -52,6 +52,19 @@ struct iComponent;
   csPtr<Interface> ((Interface *)((Object)->LoadPlugin			\
   (ClassID, #Interface, Interface##_VERSION)))
 
+SCF_VERSION (iPluginIterator, 0, 0, 1);
+
+/**
+ * An iterator to iterate over all plugins in the plugin manager.
+ */
+struct iPluginIterator : public iBase
+{
+  /// Are there more elements?
+  virtual bool HasNext () = 0;
+  /// Get next element.
+  virtual iBase* Next () = 0;
+};
+
 /**
  * Same as CS_LOAD_PLUGIN but don't bother asking for a interface.
  * This is useful for unconditionally loading plugins.
@@ -59,7 +72,7 @@ struct iComponent;
 #define CS_LOAD_PLUGIN_ALWAYS(Object,ClassID)			\
   csPtr<iBase> ((Object)->LoadPlugin (ClassID, NULL, 0))
 
-SCF_VERSION (iPluginManager, 0, 1, 0);
+SCF_VERSION (iPluginManager, 0, 2, 0);
 
 /**
  * This is the plugin manager.
@@ -86,10 +99,13 @@ struct iPluginManager : public iBase
   virtual bool UnloadPlugin (iComponent *obj) = 0;
   /// Register a object that implements the iComponent interface as a plugin.
   virtual bool RegisterPlugin (const char *classID, iComponent *obj) = 0;
-  /// Get the number of loaded plugins in the plugin manager.
-  virtual int GetPluginCount () = 0;
-  /// Get the specified plugin from the plugin manager.
-  virtual iBase* GetPlugin (int idx) = 0;
+
+  /**
+   * Get an iterator to iterate over all loaded plugins in the plugin manager.
+   * This iterator will contain a copy of the plugins so it will not lock
+   * the plugin manager while looping over the plugins.
+   */
+  virtual csPtr<iPluginIterator> GetPlugins () = 0;
   /// Unload all plugins from this plugin manager.
   virtual void Clear () = 0;
 };

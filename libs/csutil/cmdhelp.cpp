@@ -91,11 +91,11 @@ void csCommandLineHelper::Help (iObjectRegistry* object_reg,
     evout->ImmediateBroadcast (cscmdCommandLineHelp, NULL);
   }
 
-  csRef<iPluginManager> plgmgr (CS_QUERY_REGISTRY (object_reg, iPluginManager));
-  int i;
-  for (i = 0; i < plgmgr->GetPluginCount (); i++)
+  csRef<iPluginManager> plgmgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csRef<iPluginIterator> it = plgmgr->GetPlugins ();
+  while (it->HasNext ())
   {
-    iBase* plug = plgmgr->GetPlugin (i);
+    iBase* plug = it->Next ();
     csRef<iConfig> config (SCF_QUERY_INTERFACE (plug, iConfig));
     if (config)
     {

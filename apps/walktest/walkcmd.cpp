@@ -1090,14 +1090,15 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "plugins"))
   {
-    int num = Sys->plugin_mgr->GetPluginCount ();
     int i;
-    for (i = 0 ; i < num ; i++)
+    csRef<iPluginIterator> it = Sys->plugin_mgr->GetPlugins ();
+    while (it->HasNext ())
     {
-      iBase* plugin = Sys->plugin_mgr->GetPlugin (i);
+      iBase* plugin = it->Next ();
       csRef<iFactory> fact (SCF_QUERY_INTERFACE (plugin, iFactory));
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
       	"%d: %s", i, fact->QueryDescription ());
+      i++;
     }
   }
   else if (!strcasecmp (cmd, "conflist"))
@@ -1106,12 +1107,22 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       int idx;
       sscanf (arg, "%d", &idx);
-      if (idx < 0 || idx >= Sys->plugin_mgr->GetPluginCount ())
+      int i;
+      iBase* plugin = NULL;
+      csRef<iPluginIterator> it = Sys->plugin_mgr->GetPlugins ();
+      while (it->HasNext ())
+      {
+        plugin = it->Next ();
+	if (idx == i) break;
+	plugin = NULL;
+        i++;
+      }
+
+      if (!plugin)
 	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
 		"Bad value for plugin (see 'plugins' command)!");
       else
       {
-        iBase* plugin = Sys->plugin_mgr->GetPlugin (idx);
         csRef<iConfig> config (SCF_QUERY_INTERFACE (plugin, iConfig));
 	if (!config)
 	  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -1164,12 +1175,24 @@ bool CommandHandler (const char *cmd, const char *arg)
       char val[256];
       int idx;
       csScanStr (arg, "%d,%s,%s", &idx, name, val);
-      if (idx < 0 || idx >= Sys->plugin_mgr->GetPluginCount ())
+      int i;
+      iBase* plugin = NULL;
+      csRef<iPluginIterator> it = Sys->plugin_mgr->GetPlugins ();
+      while (it->HasNext ())
+      {
+        plugin = it->Next ();
+	if (idx == i) break;
+	plugin = NULL;
+        i++;
+      }
+
+      if (!plugin)
+      {
 	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
 		"Bad value for plugin (see 'plugins' command)!");
+      }
       else
       {
-        iBase* plugin = Sys->plugin_mgr->GetPlugin (idx);
 	SetConfigOption (plugin, name, val);
       }
     }

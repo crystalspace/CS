@@ -23,6 +23,7 @@
 #include "cssysdef.h"
 #include "csutil/plugmgr.h"
 #include "csutil/util.h"
+#include "csutil/parray.h"
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
 #include "iutil/cmdline.h"
@@ -43,6 +44,44 @@ csPluginManager::csPlugin::~csPlugin ()
   delete [] ClassID;
   Plugin->DecRef ();
 }
+
+//------------------------------------------------------------------------
+/**
+ * Implementation of iPluginIterator.
+ */
+class csPluginIterator : public iPluginIterator
+{
+public:
+  csPArray<iBase> pointers;
+  int idx;
+
+public:
+  csPluginIterator ()
+  {
+    SCF_CONSTRUCT_IBASE (NULL);
+    idx = 0;
+  }
+  virtual ~csPluginIterator ()
+  {
+  }
+
+  SCF_DECLARE_IBASE;
+
+  virtual bool HasNext ()
+  {
+    return idx < pointers.Length ();
+  }
+  virtual iBase* Next ()
+  {
+    iBase* p = pointers[idx];
+    idx++;
+    return p;
+  }
+};
+
+SCF_IMPLEMENT_IBASE (csPluginIterator)
+  SCF_IMPLEMENTS_INTERFACE (iPluginIterator)
+SCF_IMPLEMENT_IBASE_END
 
 //------------------------------------------------------------------------
 
@@ -233,17 +272,16 @@ bool csPluginManager::RegisterPlugin (const char *classID,
   }
 }
 
-int csPluginManager::GetPluginCount ()
+csPtr<iPluginIterator> csPluginManager::GetPlugins ()
 {
   csScopedMutexLock lock (mutex);
-  return Plugins.Length ();
-}
-
-iBase* csPluginManager::GetPlugin (int idx)
-{
-  csScopedMutexLock lock (mutex);
-  csPlugin* pl = Plugins.Get (idx);
-  return pl->Plugin;
+  csPluginIterator* it = new csPluginIterator ();
+  int i;
+  for (i = 0 ; i < Plugins.Length () ; i++)
+  {
+    it->pointers.Push (Plugins.Get (i)->Plugin);
+  }
+  return csPtr<iPluginIterator> (it);
 }
 
 iBase *csPluginManager::QueryPlugin (const char *iInterface, int iVersion)

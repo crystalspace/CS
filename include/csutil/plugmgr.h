@@ -144,10 +144,8 @@ public:
   /// Register a object that implements the iComponent interface as a plugin.
   virtual bool RegisterPlugin (const char *iClassID,
           iComponent *iObject);
-  /// Get the number of loaded plugins in the plugin manager.
-  virtual int GetPluginCount ();
-  /// Get the specified plugin from the plugin manager.
-  virtual iBase* GetPlugin (int idx);
+  /// Get an iterator to iterate over all plugins.
+  virtual csPtr<iPluginIterator> GetPlugins ();
   /// Unload all plugins from this plugin manager.
   virtual void Clear ();
 };
