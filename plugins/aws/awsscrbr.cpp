@@ -181,21 +181,40 @@ awsScrollBar::SetProperty(char *name, void *parm)
     return true;
   }
   else if (strcmp("Min", name)==0)
-  {
-
+  { 
     min = *(int *)parm;
+
+    // Fix value in case it's out of range
+    value = ( value < min ? min : 
+               ( value > max ? max : value));
+    
+    Invalidate();
     return true;
   }
   else if (strcmp("Max", name)==0)
-  {
-
+  { 
     max = *(int *)parm;
+
+    // Fix the page size
+    if (amntvis>max)
+      amntvis=max;
+
+    // Fix value in case it's out of range
+    value = ( value < min ? min : 
+               ( value > max ? max : value));
+
+    Invalidate();
     return true;
   }
   else if (strcmp("PageSize", name)==0)
-  {
-
+  { 
     amntvis = *(int *)parm;
+
+    // Fix the page size
+    if (amntvis>max)
+      amntvis=max;
+    
+    Invalidate();
     return true;
   }
 
@@ -215,8 +234,7 @@ awsScrollBar::IncClicked(void *sk, iAwsSource *source)
 
   sb->Broadcast(signalChanged); 
   sb->Invalidate();
-
-  printf("sb: inc value %f\n", sb->value);
+  
 }
 
 void 
@@ -233,7 +251,6 @@ awsScrollBar::DecClicked(void *sk, iAwsSource *source)
   sb->Broadcast(signalChanged); 
   sb->Invalidate();
 
-  printf("sb: dec value %f\n", sb->value);
 }
 
 void 
@@ -254,15 +271,22 @@ awsScrollBar::OnDraw(csRect clip)
     // Get the knob height
     if (amntvis==0)
       WindowManager()->GetPrefMgr()->LookupIntKey("ScrollBarHeight", height);
+    else
+      height = (int)((amntvis*f.Height())/max);
+    
 
     // Get the actual height that we can traverse with the knob
     int bh = f.Height()-height;
 
     // Get the knob's position
-    int kx = (value*bh)/max;
+    int ky = (int)((value*bh)/max);
 
-    f.ymin+=kx;
+    f.ymin+=ky;
     f.ymax=f.ymin+height;
+
+    if (f.ymax>incVal->Frame().ymin-1)
+      f.ymax=incVal->Frame().ymin-1;
+    
   }
   else
   {
@@ -271,7 +295,20 @@ awsScrollBar::OnDraw(csRect clip)
 
     if (amntvis==0)
       WindowManager()->GetPrefMgr()->LookupIntKey("ScrollBarWidth", width);
+    else
+      width=(int)((amntvis*f.Width())/max);
 
+    // Get the actual height that we can traverse with the knob
+    int bw = f.Width()-width;
+
+    // Get the knob's position
+    int kx = (int)((value*bw)/max);
+
+    f.xmin+=kx;
+    f.xmax=f.xmin+width;
+
+    if (f.xmax>incVal->Frame().xmin-1)
+      f.xmax=incVal->Frame().xmin-1;
   }
   
   frame3d.Draw(WindowManager(), Window(), f, aws3DFrame::fsRaised, tex, alpha_level);

@@ -202,6 +202,9 @@ class awsListBox : public awsComponent
 
    /// Position of where we start drawing
    int scroll_start;
+
+   /// Number of items that can be drawn
+   int drawable_count;
  
 private:
    ///////////////////////////// Embedded items

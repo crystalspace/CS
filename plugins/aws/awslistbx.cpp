@@ -99,7 +99,7 @@ tree_collapsed(NULL), tree_expanded(NULL),
 tree_hline(NULL), tree_vline(NULL),
 frame_style(0), alpha_level(92), hi_alpha_level(128),
 control_type(0), ncolumns(1), sel(NULL), map(NULL),
-map_size(0), map_dirty(true), scroll_start(0)
+map_size(0), map_dirty(true), scroll_start(0), drawable_count(0)
 {
   actions.Register("InsertItem", &InsertItem);
   actions.Register("DeleteItem", &DeleteItem);
@@ -252,11 +252,17 @@ awsListBox::ScrollChanged(void *sk, iAwsSource *source)
 {
   awsListBox *lb = (awsListBox *)sk;
   float *curval=0;
+  int adjusted_max;
 
   source->GetComponent()->GetProperty("Value", (void **)&curval);
   
   lb->UpdateMap();
   lb->scroll_start=(int)*curval;
+  if (lb->scroll_start>lb->map_size-lb->drawable_count)
+    lb->scroll_start=lb->map_size-lb->drawable_count;
+
+  if (lb->scroll_start<0)
+    lb->scroll_start=0;
   
   lb->Invalidate();
 }
@@ -282,7 +288,7 @@ awsListBox::UpdateMap()
     // Set the scroll bar's max position
     map_size_m1 = map_size-1;
     scrollbar->SetProperty("Max", &map_size_m1);
-
+    
     // Map out items
     MapVisibleItems(&rows, start, map);
   }
@@ -782,6 +788,9 @@ awsListBox::OnDraw(csRect clip)
   // Setup y in proper place.
   y+=hch+2;
 
+  // Fix drawable count
+  drawable_count=0;
+
   // Now begin to draw actual list
   if (rows.Length())
   {
@@ -829,7 +838,7 @@ awsListBox::OnDraw(csRect clip)
 
         // If we're done, leave
         if (i>=rows.Length())
-          return;
+          break;
         else
           row=(awsListRow *)rows[i];
 
@@ -859,19 +868,13 @@ awsListBox::OnDraw(csRect clip)
        
     } // end while draw items recursively
 
+    scrollbar->SetProperty("PageSize", &drawable_count);
 
-    ///////////////////////////////////
-    /*for (j=0; j<rows.Length(); ++j)
-    {
-      x=startx;
-      awsListRow *row = (awsListRow *)rows[j];
+    int adjusted_max=map_size-1-drawable_count;
+    if (adjusted_max<1)
+      adjusted_max=1;
   
-      if (DrawItemsRecursively(row, x, y, border, false, false))
-        break;
-  
-    }*/ // end for j (number of rows)
-    //////////////////////////////////
-
+    scrollbar->SetProperty("Max", (void *)&adjusted_max);
 
   }  // end if there are any rows to draw
 }
@@ -889,6 +892,9 @@ awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int border, in
 
   // Find out if we need to leave now.
   if (y+ith > Frame().ymax) return true;
+
+  // Count how many we've drawn
+  ++drawable_count;
 
   // Figure out how to draw boxes and stuff
   if (row->children && depth)
