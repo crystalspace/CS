@@ -19,8 +19,10 @@
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
 #include "csgeom/box.h"
+#include "csgeom/frustum.h"
 #include "genmesh.h"
 #include "gmtri.h"
+#include "iengine/shadows.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
 #include "ivideo/graph3d.h"
@@ -40,12 +42,17 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_IBASE (csGenmeshMeshObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShadowCaster)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iGeneralMeshState)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObject::ObjectModel)
   SCF_IMPLEMENTS_INTERFACE (iObjectModel)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObject::ShadowCaster)
+  SCF_IMPLEMENTS_INTERFACE (iShadowCaster)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObject::PolyMesh)
@@ -63,6 +70,7 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiGeneralMeshState);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowCaster);
   csGenmeshMeshObject::factory = factory;
   logparent = NULL;
   initialized = false;
@@ -86,6 +94,41 @@ csGenmeshMeshObject::~csGenmeshMeshObject ()
 {
   if (vis_cb) vis_cb->DecRef ();
   delete[] lit_mesh_colors;
+}
+
+void csGenmeshMeshObject::AppendShadows (iMovable* movable,
+	iShadowBlockList* shadows, const csVector3& origin)
+{
+  int tri_num = factory->GetTriangleCount ();
+  csVector3* vt = factory->GetVertices ();
+  int vt_num = factory->GetVertexCount ();
+  csVector3* vt_world = new csVector3 [vt_num];
+  int i;
+  csReversibleTransform movtrans = movable->GetFullTransform ();
+  for (i = 0 ; i < vt_num ; i++)
+    vt_world[i] = movtrans.This2Other (vt[i]);
+
+  iShadowBlock *list = shadows->NewShadowBlock (tri_num);
+  csFrustum *frust;
+  bool cw = true;                   //@@@ Use mirroring parameter here!
+  csTriangle* tri = factory->GetTriangles ();
+  for (i = 0 ; i < tri_num ; i++, tri++)
+  {
+    csPlane3 pl (vt_world[tri->c], vt_world[tri->b], vt_world[tri->a]);
+    //if (pl.VisibleFromPoint (origin) != cw) continue;
+    float clas = pl.Classify (origin);
+    if (ABS (clas) < EPSILON) continue;
+    if ((clas <= 0) != cw) continue;
+
+    pl.DD += origin * pl.norm;
+    pl.Invert ();
+    frust = list->AddShadow (origin, NULL, 3, pl);
+    frust->GetVertex (0).Set (vt_world[tri->a] - origin);
+    frust->GetVertex (1).Set (vt_world[tri->b] - origin);
+    frust->GetVertex (2).Set (vt_world[tri->c] - origin);
+  }
+
+  delete[] vt_world;
 }
 
 void csGenmeshMeshObject::GetTransformedBoundingBox (long cameranr,

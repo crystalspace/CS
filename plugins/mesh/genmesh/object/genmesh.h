@@ -31,9 +31,12 @@
 #include "ivideo/vbufmgr.h"
 #include "igeom/objmodel.h"
 #include "igeom/polymesh.h"
+#include "iengine/shadcast.h"
 
 struct iMaterialWrapper;
 struct iObjectRegistry;
+struct iMovable;
+struct iShadowBlockList;
 class csGenmeshMeshObjectFactory;
 class csColor;
 class G3DFogInfo;
@@ -112,6 +115,9 @@ public:
   void AddListener (iObjectModelListener* listener);
   void RemoveListener (iObjectModelListener* listener);
 
+  void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
+    	const csVector3& origin);
+
   //----------------------- iMeshObject implementation ------------------------
   SCF_DECLARE_IBASE;
 
@@ -181,6 +187,18 @@ public:
     return true;
   }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return material; }
+
+  //-------------------- iShadowCaster interface implementation ----------
+  struct ShadowCaster : public iShadowCaster
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObject);
+    virtual void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
+    	const csVector3& origin)
+    {
+      scfParent->AppendShadows (movable, shadows, origin);
+    }
+  } scfiShadowCaster;
+  friend struct ShadowCaster;
 
   //------------------------- iGeneralMeshState implementation ----------------
   class GeneralMeshState : public iGeneralMeshState

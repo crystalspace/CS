@@ -443,12 +443,23 @@ void csPolyTexture::FillLightMap (
       //currently transformed and we cannot do that to the original polygon.
       // @@@ Optimization: Check for shadow_it->IsRelevant() here.
       csPolygon3D *shad_poly = (csPolygon3D *) (shadow_it->GetUserData ());
-      if (shad_poly->GetBasePolygon () == base_poly) continue;
+      // It is possible that shad_poly is NULL. This can happen if we
+      // are casting shadows from something that is not a thing.
+      if (shad_poly && shad_poly->GetBasePolygon () == base_poly) continue;
 
       // Check if planes of two polygons are equal
       // (@@@ should be precalculated).
       csPlane3 base_pl = *(base_poly->GetPolyPlane ());
-      csPlane3 shad_pl = *(shad_poly->GetPolyPlane ());
+      csPlane3 shad_pl;
+      if (shad_poly)
+      {
+        shad_pl = *(shad_poly->GetPolyPlane ());
+      }
+      else
+      {
+	shad_pl = csPoly3D::ComputePlane (shadow_frust->GetVertices (),
+		shadow_frust->GetVertexCount ());
+      }
       if (csMath3::PlanesClose (base_pl, shad_pl)) continue;
 
       // @@@ TODO: Optimize. Custom version of Intersect that is more
@@ -462,7 +473,8 @@ void csPolyTexture::FillLightMap (
         // Test if two polygons can cast shadows on each other.
 	// Note: we use the base polygons here because that is a stronger
 	// test which is more likely to give a better result.
-        if (!CanCastShadow (shad_poly->GetBasePolygon (), base_poly, lightpos))
+        if (shad_poly && !CanCastShadow (shad_poly->GetBasePolygon (),
+			base_poly, lightpos))
         {
           new_shadow->DecRef ();
           continue;

@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+19-Nov-2002
+	- 'genmesh' objects now also cast shadows (they don't receive
+	  shadows yet). Generalized the shadow casting system in the engine
+	  so that this is actually possible.
 18-Nov-2002
 	- Fixed software renderer procedural textures in 16-bit display
 	  mode. They worked fine in 32-bit display mode and that's why

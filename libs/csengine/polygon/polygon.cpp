@@ -2168,6 +2168,12 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
     else
     {
       csPolygon3D *sfp = (csPolygon3D *) (shadow_it->GetUserData ());
+      if (sfp == NULL)
+      {
+        shadow_it->MarkRelevant (true);
+	continue;
+      }
+
       switch (csFrustum::BatchClassify (
             lf_verts,
             lf_normals,
