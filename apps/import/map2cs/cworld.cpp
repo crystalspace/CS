@@ -148,6 +148,8 @@ bool CCSWorld::Write(const char* filename, CMapFile* pMap, const char * /*source
   Indent();
   WriteIndent();
 
+  CMapEntity* pEntity = GetWorldspawn();
+
   fprintf(m_fd, "<settings><clearzbuf>yes</clearzbuf></settings>\n\n", m_ScaleFactor);
     
   WriteIndent();
@@ -158,10 +160,11 @@ bool CCSWorld::Write(const char* filename, CMapFile* pMap, const char * /*source
 
   fprintf(m_fd, 
     "\t<renderpriorities>\n"
-    "\t\t<priority name=\"sky\"><level>1</level><sort>NONE</sort></priority>\n"
-    "\t\t<priority name=\"wall\"><level>2</level><sort>NONE</sort></priority>\n"
-    "\t\t<priority name=\"object\"><level>3</level><sort>NONE</sort></priority>\n"
-    "\t\t<priority name=\"alpha\"><level>4</level><sort>BACK2FRONT</sort></priority>\n"
+    "\t\t<priority name=\"sky\"><level>1</level><sort>NONE</sort><camera /></priority>\n"
+    "\t\t<priority name=\"mirror\"><level>2</level><sort>FRONT2BACK</sort></priority>\n"
+    "\t\t<priority name=\"wall\"><level>3</level><sort>NONE</sort></priority>\n"
+    "\t\t<priority name=\"object\"><level>4</level><sort>NONE</sort></priority>\n"
+    "\t\t<priority name=\"alpha\"><level>5</level><sort>BACK2FRONT</sort></priority>\n"
     "\t</renderpriorities>\n"
     "\n");  
 
@@ -279,7 +282,7 @@ void CCSWorld::WriteSkysector()
     WriteIndent();
     fprintf(m_fd, "<plugin>thing</plugin>\n");
     WriteIndent();
-    fprintf(m_fd, "<zuse />\n");
+    fprintf(m_fd, "<znone />\n");
     WriteIndent();
     fprintf(m_fd, "<priority>sky</priority>\n");
 

@@ -65,31 +65,9 @@ bool CCSThing::Write(CIWorld* pIWorld, CISector* pISector)
   if (IsSky())
     fprintf(fd, "<priority>sky</priority>\n");
   else
-    fprintf(fd, "<priority>%s</priority>\n", m_pOriginalEntity->GetValueOfKey("priority", "object"));
-
-  //Activate a script
-/*  char scriptname[99] = "none";
-  const char* activateval = m_pOriginalEntity->GetValueOfKey("activate");
-  if (activateval)
-  {
-    char dummy;
-    if (sscanf(activateval, "%s%c",scriptname, &dummy) == 1)
-    {
-      pWorld->WriteIndent();
-      fprintf(fd, "ACTIVATE ('%s')\n", scriptname);
-    }
-  }*/
-  //Trigger a script TRIGGER ('activate', 'scriptname')
-/*  const char* triggerval = m_pOriginalEntity->GetValueOfKey("trigger");
-  if (triggerval)
-  {
-    char dummy;
-    if (sscanf(triggerval, "%s%c",scriptname, &dummy) == 1)
-    {
-      pWorld->WriteIndent();
-      fprintf(fd, "TRIGGER ('activate', '%s')\n", scriptname);
-    }
-  }*/
+    fprintf(fd, "<priority>%s</priority>\n", 
+      m_pOriginalEntity->GetValueOfKey("priority", 
+      m_pOriginalEntity->GetValueOfKey("mirror")?"mirror":"object"));
 
   CCSWorld::WriteKeys(pWorld, m_pOriginalEntity);
 
