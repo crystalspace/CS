@@ -372,7 +372,14 @@ void csBugPlug::AddSelectedMesh (iMeshWrapper* m)
 {
   int i;
   for (i = 0 ; i < selected_meshes.Length () ; i++)
-    if (selected_meshes[i] == m) return;
+  {
+#if defined(COMP_VC) && (_MSC_VER < 1300)
+    if (((iMeshWrapper*)selected_meshes[i]) == m) 
+#else
+    if (selected_meshes[i] == m) 
+#endif
+      return;
+  }
   selected_meshes.Push (m);
 }
 
