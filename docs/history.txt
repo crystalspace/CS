@@ -51,6 +51,7 @@ chronological order.
 	- Jorrit replaced awsListRowVector with csPDelArray<awsListRow>.
 	- Jorrit removed all includes from csvector.h from all CS sources.
 	- Jorrit added csArray::Sort().
+	- Jorrit finally removed csVector and csBasicVector.
 2-Aug-2003
 	- Jorrit renamed csPDelArray::Delete(int) to DeleteIndex() to conform
 	  more to the API used by csArray.
