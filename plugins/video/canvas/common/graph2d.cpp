@@ -473,7 +473,8 @@ void csGraphics2D::Blit (int x, int y, int w, int h,
   if (hor_clip_needed)
     data += 4*(x-orig_x);
 
-  int r, g, b, a;
+  int r, g, b, a, realColor;
+  uint8 alpha;
   unsigned char const* d;
   switch (pfmt.PixelBytes)
   {
@@ -501,8 +502,18 @@ void csGraphics2D::Blit (int x, int y, int w, int h,
 	d = data;
 	while (w2 > 0)
 	{
-	  r = *d++; g = *d++; b = *d++; d++;
+	  r = *d++; g = *d++; b = *d++; a = *d++;
 	  *vram++ = FindRGB (r, g, b);
+    SplitAlpha (FindRGB (r, g, b, a), realColor, alpha);
+    if (alpha == 0)
+      *vram++;
+    else if (alpha == 255)
+      *vram++ = realColor;
+    else
+    {
+      csPixMixerRGBA<uint16> mixer (this, realColor, alpha);
+      mixer.Mix (*vram++);
+    }
 	  w2--;
 	}
         data += 4*orig_w;
@@ -518,7 +529,16 @@ void csGraphics2D::Blit (int x, int y, int w, int h,
 	while (w2 > 0)
 	{
 	  r = *d++; g = *d++; b = *d++; a = *d++;
-	  *vram++ = FindRGB (r, g, b, a);
+    SplitAlpha (FindRGB (r, g, b, a), realColor, alpha);
+    if (alpha == 0)
+      *vram++;
+    else if (alpha == 255)
+      *vram++ = realColor;
+    else
+    {
+      csPixMixerRGBA<uint32> mixer (this, realColor, alpha);
+      mixer.Mix (*vram++);
+    }
 	  w2--;
 	}
         data += 4*orig_w;

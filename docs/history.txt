@@ -29,6 +29,8 @@ chronological order.
 	  reference to the now gone csengine library and updating the 
 	  cssysdef.h paragraph to reflect the new possibility to include it
 	  from headers.
+	- Squee added alpha support to iGraphics2D::Blit() in the software
+	  canvases and added the transparent Crystalspace logo to g2dtest.
 26-Oct-2004
 	- Eric Sunshine added an optional argument to iDocument::Parse() which
 	  controls whether or not whitespace in CS_NODE_TEXT nodes is

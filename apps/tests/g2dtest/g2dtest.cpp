@@ -112,6 +112,7 @@ class G2DTestSystemDriver
   csRef<iFont> fontCourier;
   csRef<iFont> fontSmall;
   csRef<iImage> blitTestImage;
+  csRef<iImage> alphaBlitImage;
   // Event Outlet
   iEventOutlet* EventOutlet;
 
@@ -219,6 +220,7 @@ G2DTestSystemDriver::~G2DTestSystemDriver ()
   fontLarge = 0;
   fontSmall = 0;
   blitTestImage = 0;
+  alphaBlitImage = 0;
   cursorPlugin = 0;
   csInitializer::DestroyApplication (object_reg);
 }
@@ -343,6 +345,15 @@ void G2DTestSystemDriver::SetupFrame ()
 		blitTestImage->SetFormat (CS_IMGFMT_TRUECOLOR 
 		  | CS_IMGFMT_ALPHA);
 	      }
+        testFile = vfs->Open ("/lib/std/cslogo2.png", VFS_FILE_READ);
+        if (testFile.IsValid ())
+        {
+          csRef<iDataBuffer> fileData = testFile->GetAllData ();
+          alphaBlitImage = iio->Load (fileData->GetUint8 (),
+            fileData->GetSize (), CS_IMGFMT_ANY);
+          alphaBlitImage->SetFormat (CS_IMGFMT_TRUECOLOR |
+            CS_IMGFMT_ALPHA);
+        }
 	    }
 	  }
 	  EnterState (stStartup);
@@ -917,6 +928,12 @@ void G2DTestSystemDriver::DrawAlphaTestScreen ()
   myG2D->DrawLine (30, 110, 120, 60, myG2D->FindRGB (255, 128, 128, 128));
   myG2D->DrawLine (120, 60, 70, 120, myG2D->FindRGB (128, 255, 128, 128));
   myG2D->DrawLine (70, 120, 30, 110, myG2D->FindRGB (128, 128, 255, 128));
+
+  if (alphaBlitImage.IsValid ())
+  {
+    myG2D->Blit (20, 160, alphaBlitImage->GetWidth (), alphaBlitImage->GetHeight (), 
+      (unsigned char*)alphaBlitImage->GetImageData ());
+  }
 
   myG2D->Write (font, 50, 140, myG2D->FindRGB (255, 255, 255, 100), -1,
     "Here is some partially transparent text");
