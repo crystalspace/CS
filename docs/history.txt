@@ -40,6 +40,7 @@ The history order is reversed so that new features are at the top.
 	      to the debug graph is shown and the number of parents and
 	      children. The object is then expanded to show all its
 	      parents and children.
+	- Fixed a memory leak in the parsing of KEY statements in the loader.
 15-Nov-2001
 	- Added DG_ADDI and csDebuggingGraph::AddInterface() with which you
 	  can add an SCF interface (instance of iBase) to the debug graph.

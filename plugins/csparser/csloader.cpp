@@ -408,8 +408,13 @@ bool csLoader::LoadMap (char* buf)
           break;
         }
         case CS_TOKEN_KEY:
-          if (!ParseKey (params, Engine->QueryObject()))
-	    return false;
+	  {
+            iKeyValuePair* kvp = ParseKey (params, Engine->QueryObject());
+	    if (kvp)
+	      kvp->DecRef ();
+	    else
+	      return false;
+	  }
           break;
       }
     }
@@ -1281,8 +1286,13 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (char* buf)
 	  	"First specify the parent factory with FACTORY!");
 	  return NULL;
 	}
-        if (!ParseKey (params, mesh->QueryObject()))
-	  return NULL;
+	{
+          iKeyValuePair* kvp = ParseKey (params, mesh->QueryObject());
+	  if (kvp)
+	    kvp->DecRef ();
+	  else
+	    return NULL;
+	}
         break;
       case CS_TOKEN_HARDMOVE:
         if (!mesh)
@@ -1546,8 +1556,13 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
         mesh->GetFlags().Set (CS_ENTITY_CONVEX);
         break;
       case CS_TOKEN_KEY:
-        if (!ParseKey (params, mesh->QueryObject()))
-	  return false;
+        {
+          iKeyValuePair* kvp = ParseKey (params, mesh->QueryObject());
+          if (kvp)
+	    kvp->DecRef ();
+	  else
+	    return false;
+	}
         break;
       case CS_TOKEN_MESHREF:
         {
@@ -2194,8 +2209,13 @@ iStatLight* csLoader::ParseStatlight (char* name, char* buf)
           dyn = true;
           break;
         case CS_TOKEN_KEY:
-          if (!ParseKey (params, &Keys))
-	    return NULL;
+	  {
+            iKeyValuePair* kvp = ParseKey (params, &Keys);
+            if (kvp)
+	      kvp->DecRef ();
+	    else
+	      return NULL;
+	  }
           break;
         case CS_TOKEN_HALO:
 	  str[0] = 0;
@@ -2388,8 +2408,13 @@ iMapNode* csLoader::ParseNode (char* name, char* buf, iSector* sec)
         	"ADDON not yet supported in node!");
 	return NULL;
       case CS_TOKEN_KEY:
-        if (!ParseKey (params, pNode->QueryObject ()))
-	  return NULL;
+        {
+          iKeyValuePair* kvp = ParseKey (params, pNode->QueryObject ());
+          if (kvp)
+	    kvp->DecRef ();
+	  else
+	    return NULL;
+	}
         break;
       case CS_TOKEN_POSITION:
         csScanStr (params, "%f,%f,%f", &x, &y, &z);
@@ -2531,10 +2556,11 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
         break;
       case CS_TOKEN_KEY:
       {
-        if (!ParseKey (params, sector->QueryObject()))
-	{
+        iKeyValuePair* kvp = ParseKey (params, sector->QueryObject());
+	if (kvp)
+	  kvp->DecRef ();
+	else
 	  return NULL;
-	}
         break;
       }
     }
