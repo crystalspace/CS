@@ -20,6 +20,12 @@
 #ifndef __OSDEFS_H__
 #define __OSDEFS_H__
 
+// For GUI applications, use "csMain" instead of "main".
+// For console applications, use regular "main".
+#ifndef CONSOLE
+#  define main csMain
+#endif
+
 #if defined(COMP_VC)
 #pragma warning(disable:4244)   // conversion from 'double' to 'float'
 #pragma warning(disable:4305)   // conversion from 'const double' to 'float'
