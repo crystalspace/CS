@@ -489,6 +489,114 @@ void csQuadTree :: Print(void)
 }
 
 
+int csQuadTree :: propagate_down_func (csQuadTree* pObj, 
+  const csBox2& node_bbox, int node_state, node_pos_info *node_pos, void* data)
+{
+  int newstate = (int)data;
+  if(newstate != CS_QUAD_UNKNOWN)
+    pObj->SetNodeState(node_pos, newstate);
+  else if(node_state == CS_QUAD_FULL || node_state == CS_QUAD_EMPTY)
+    newstate = node_state;
+  if(node_pos->depth < pObj->max_depth)
+    CallChildren(&csQuadTree::propagate_down_func, pObj, node_bbox, node_pos,
+    (void*)newstate);
+  return 0;
+}
+
+
+void csQuadTree :: PropagateDown(void)
+{
+  node_pos_info start_pos;
+  start_pos.set_root();
+  propagate_down_func(this, bbox, root_state, &start_pos, 
+    (void*)CS_QUAD_UNKNOWN);
+}
+
+
+int csQuadTree :: sift_up_func (csQuadTree* pObj, const csBox2& node_bbox, 
+  int node_state, node_pos_info *node_pos, void* data)
+{
+  if(node_pos->depth >= pObj->max_depth) // this is a leaf
+    return node_state;
+  // ask my children what value should me
+  int retval[4];
+  CallChildren(&csQuadTree::propagate_down_func, pObj, node_bbox, node_pos,
+    data, retval);
+  int newstate = pObj->GetTestPointResult(retval);
+  if(node_state != newstate)
+    pObj->SetNodeState(node_pos, newstate);
+  return newstate;
+}
+
+
+void csQuadTree :: SiftUp(void)
+{
+  node_pos_info start_pos;
+  start_pos.set_root();
+  sift_up_func(this, bbox, root_state, &start_pos, 0);
+}
+
+
+static bool CheckRow(int plane_start, int start_nr, int w, 
+  unsigned char *states)
+// checks a sequence of nodes if all are FULL
+// plane start is start of plane,
+// start_nr is the node nr of the start node
+// w is width to check.
+{
+  /// it is sure this is not the root node.
+  int offset = plane_start + (start_nr >> 2);
+  int bytepos = start_nr & 0x3;
+  /// checking 4 nodes at a time (1 byte) is very fast.
+  if(bytepos != 0)
+  {
+    /// so first check the leading nodes. since bytepos!=0,
+    /// startnr was not a multiple of 4.
+    /// if bytepos == 0, we were not called,
+    /// if bytepos>0, check using lead_check[bytepos]
+    //// These values depend of CS_QUAD_FULL==3
+    const int lead_check[4] = {0xFF, 0x3F, 0x0F, 0x03};
+    if( states[offset]&lead_check[bytepos] != lead_check[bytepos] )
+      return false;
+    w -= 4-bytepos; // checked this many nodes.
+    // update values to get correct start position.
+    offset ++;
+    bytepos = 0;
+  }
+  // got a correct start position now, can check bytes for w/4 times.
+  int runlen = w/4;
+  for(int i=0; i<runlen; i++, offset++)
+    if(states[offset] != CS_QUAD_ALL_FULL) // 0xFF
+      return false;
+  // now to check the trailing nodes to be sure.
+  // got w%4 trailing nodes.
+  // offset already points to the right byte.
+  // in trail_check is the value to check for, the last value is never used.
+  //// These values depend of CS_QUAD_FULL==3
+  const int trail_check[5] = {0x00, 0xC0, 0xF0, 0xFC, 0xFF};
+  int trail_amt = w%4;
+  if(trail_amt != 0) // have to check, prevents array overflow
+    if( states[offset] & trail_check[trail_amt] != trail_check[trail_amt] )
+      return false;
+  // passed all tests
+  return true;
+}
+
+bool csQuadTree :: TestRectangle(int depth, int x, int y, int w, int h)
+{
+  if(depth==1) // if this is root node
+    return (root_state == CS_QUAD_FULL);
+  int dep_prevnodes = ( Pow2( 2*(depth-1) ) - 1 ) / 3;
+  // dep_prevnodes is the number of nodes in dep-1 tree.
+  int plane_start = dep_prevnodes / 4; // offset of start of plane in array
+  int plane_size = Pow2( (depth-1) ); // is sqrt(nr_leaves)
+  int nodenr = plane_size * y + x; // nr of nodes after plane_start
+  for(int ty=0;ty<h;ty++,nodenr+=plane_size)
+    if(!CheckRow(plane_start, nodenr, w, states))
+      return false;
+  return true;
+}
+
 
 /*
  * 2 bytes form a 4x4 rectangle.

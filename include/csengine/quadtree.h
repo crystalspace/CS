@@ -202,6 +202,16 @@ private:
    */
   static quad_traverse_func mark_node_func;
 
+  /** for a node, give it the (int) cast of data as value and
+   *  give children a good value. CS_QUAD_UNKNOWN means the
+   *  child's value is unchanged.
+   */
+  static quad_traverse_func propagate_down_func;
+
+  /** Set the state of the node based on states of child nodes.
+   * returns new node state, leaves only return their state.
+   */
+  static quad_traverse_func sift_up_func;
 
 public:
   /** create a quadtree of depth, using about (4**depth-1)/3-1/3 bytes. 
@@ -263,10 +273,18 @@ public:
    *  Returns true if and only if all nodes at that spot are CS_QUAD_FULL.
    *  Note: You must have called PropagateDown() before using this method.
    */
-  //bool TestRectangle(int depth, int x, int y, int w, int h);
+  bool TestRectangle(int depth, int x, int y, int w, int h);
 
-  //propagate down() function.
-  //sift_up() function.
+  /** Propagate down, makes sure that all nodes in the tree get a value
+   * repesenting their state. For speed reasons this is not always the case
+   * after an InsertPolygon() call.
+   */
+  void PropagateDown(void);
+
+  /** The leaves must have valid values. The higher level nodes are
+   * given the correct values.
+   */
+  void SiftUp(void);
   
 
   
