@@ -1,78 +1,79 @@
 @c -*-texinfo-*-
-@node Name = "List Box", , Name = "Group Frame", AWS Standard Component Signal and Action reference
+@node AWS List Box, , AWS Group Frame, AWS Signals and Actions reference
 @subsubsection Name = "List Box"
 
-@subheading Signals
+@subsubheading Signals
 
 @table @samp
 @item signalListBoxSelectionChanged
 Occurs when the currently selected item changes.
 @end table
 
-@subheading Actions
+@subsubheading Actions
 
 @table @samp
 @item InsertItem
-Inserts a new item. See below for parameters.  Note that an item does not need to have
-  text or image or state, but it should have one of the above.
- @end table
+Inserts a new item. See below for parameters. Note that an item 
+does not need to have text or image or state, but it should have 
+one of the above.
+@end table
   
-@subheading Input Parameters
+@subsubheading Input Parameters
 
 @multitable @columnfractions .15 .2 .55
 @item @emph{Input Parameter Name} @tab @emph{Parameter Type} @tab @emph{Description}
 @item @samp{textX}
-@tab @code{iString *}
-@tab The text for the item in column X. 
+@tab @samp{iString *}
+@tab The text for the item in column X.
 
 @item @samp{imageX}
-@tab @code{iString *}
+@tab @samp{iString *}
 @tab The path to the image in column X.
 
 @item @samp{statefulX}
-@tab @code{bool}
+@tab @samp{bool}
 @tab True if the item in column X needs a state box (like a
   check box or radio button)
 
 @item @samp{stateX}
-@tab @code{bool}
+@tab @samp{bool}
 @tab The state of the item in column X.
 
 @item @samp{groupstateX}
-@tab @code{bool}
+@tab @samp{bool}
 @tab If true, the item in column X will have a radio button
   type state box instead of the default check-box style state.
 
 @item @samp{selectableX}
-@tab @code{bool}
+@tab @samp{bool}
 @tab If false, then the item is not selectable and will never
-  be highlighted.  This is useful for
-  items that have state of some sort and aren’t intended to be "picked" out of
+  be highlighted. This is useful for
+  items that have state of some sort and aren't intended to be "picked" out of
   a list.
 
 @item @samp{aligntxtX}
-@tab @code{int}
-@tab The alignment of the text in column X.  By default, all text is left-aligned.  This can be 0 or 1.  Zero is left-align, 1 is right-align.  If there is state, it will be aligned with the text.
+@tab @samp{int}
+@tab The alignment of the text in column X. By default, all text is left-aligned. This can be 0 or 1. Zero is left-align, 1 is right-align. If there is state, it will be aligned with the text.
 
 @item @samp{alignimgX}
-@tab @code{int}
-@tab The same as aligntxtX, only it operates on the image.
+@tab @samp{int}
+@tab The same as @samp{aligntxtX}, only it operates on the image.
 
 @item @samp{parent}
-@tab @code{int}
+@tab @samp{int}
 @tab The key that identifies the parent that this item should
-  be added under.  This will turn the
-  new item into a child item. 
+  be added under. This will turn the
+  new item into a child item.
 
 @end multitable
 
-@subheading Output Parameters
+@subsubheading Output Parameters
 
 @multitable @columnfractions .15 .2 .55
 @item @emph{Output Parameter Name} @tab @emph{Parameter Type} @tab @emph{Description}
 @item @samp{key}
-@tab @code{int}
-@tab The unique key of this item.  This can be saved and used for the value of parent when adding
+@tab @samp{int}
+@tab The unique key of this item. This can be saved and used for the value of parent when adding
   children under an item, or it may be saved and used with the GetState action.
 
 @end multitable

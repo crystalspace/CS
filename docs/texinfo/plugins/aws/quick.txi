@@ -1,15 +1,17 @@
 @c -*-texinfo-*-
-@node AWS Quick Start, Actually finding out what your user is doing, AWS, AWS
+@node AWS Quick Start, AWS Signals, AWS, AWS
 @subsection Quick Start
 
-In order to startup and use AWS, currently, the following needs to be done: 
+In order to startup and use @sc{aws}, currently, the following needs to be done: 
 
-Load the AWS plugin: 
+Load the @sc{aws} plugin: 
 
-@code{aws = CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.window.alternatemanager", 
-"awsManager", iAws); }
+@example 
+aws = CS_LOAD_PLUGIN(plugin_mgr, 
+"crystalspace.window.alternatemanager", "awsManager", iAws); 
+@end example
 
-Setup the AWS plugin: 
+Setup the @sc{aws} plugin: 
 
 @example
 aws->SetDefaultContext(engine, myG3D->GetTextureManager());
@@ -32,14 +34,15 @@ Create and show your windows:
 @example
 awsWindow *test = aws->CreateWindowFrom("Splash");
 awsWindow *test2 = aws->CreateWindowFrom("Another"); 
-if (test)  test->Show();
+if (test) test->Show();
 if (test2) test2->Show();
 @end example
 
-That’s it.  AWS is designed to be easy to use.  Of course, this brief look 
-doesn’t suppose that you want to get any data from components in the windows, 
-nor does it suppose that you want to do anything other than show your windows.  
-The windows created here will be fully-fledged windows with all the controls 
-listed in the definition that you’ve created.  For more advanced topics, read 
-"@ref{Actually finding out what your user is doing}" and "@ref{How you can write your 
-own component}".
+That's it. @sc{aws} is designed to be easy to use. Of course, this 
+brief look doesn't suppose that you want to get any data from 
+components in the windows, nor does it suppose that you want to 
+do anything other than show your windows. The windows created 
+here will be fully-fledged windows with all the controls listed 
+in the definition that you've created. For more advanced topics, 
+read "@ref{AWS Signals}" and "@ref{AWS Custom Components}".
+

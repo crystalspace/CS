@@ -1,16 +1,17 @@
 @c -*-texinfo-*-
-@node All components, Name = "Command Button", AWS Standard Component Signal and Action reference, AWS Standard Component Signal and Action reference
-@subsubsection All components
+@node AWS All, AWS Command Button, AWS Signals and Actions reference, AWS Signals and Actions reference
+@subsubsection All Components
 
-@subheading Signals
+@subsubheading Signals
 
 @table @samp
 @item signalCreated
-Occurs when a component is first created.  This can be used to get a handle to the
-  component to perform actions on it (like filling up a list box with items.)
+Occurs when a component is first created. This can be used to 
+get a handle to the component to perform actions on it (like 
+filling up a list box with items.)
 @end table  
 
-@subheading Attributes
+@subsubheading Attributes
 
 @table @samp
 @item Frame
@@ -18,7 +19,7 @@ Defines the extents of the frame.
 @end table
 
 
-@subheading Actions
+@subsubheading Actions
 
 @table @samp
 @item Hide
@@ -32,9 +33,9 @@ Makes the component redraw
 
 @item HideWindow
 Hides the window the component belongs to.
-@end table      
-                 
-@subheading Properties
+@end table
+
+@subsubheading Properties
 @table @samp
 @item Frame
 Gets the frame extents of the component (Read only)
@@ -43,3 +44,5 @@ Gets the frame extents of the component (Read only)
 Gets a string that describes the type of the component ("Window", 
 "Command Button", etc.)
 @end table
+
+

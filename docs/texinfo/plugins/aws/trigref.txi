@@ -1,8 +1,8 @@
 @c -*-texinfo-*-
-@node AWS Standard Sink Trigger Reference, AWS Standard Component Signal and Action reference, How you can write your own component, AWS
-@subsection AWS Standard Sink Trigger Reference
+@node AWS Standard Sink Trigger Reference, AWS Signals and Actions reference, AWS Custom Components, AWS
+@subsection @sc{aws} Standard Sink Trigger Reference
 
-The following table lists triggers that the awsStandardSink hosts. 
+The following table lists triggers that the @samp{awsStandardSink} hosts. 
 
 @table @samp
 @item Hide

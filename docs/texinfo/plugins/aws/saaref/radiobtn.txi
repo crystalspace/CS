@@ -1,28 +1,28 @@
 @c -*-texinfo-*-
-@node Name = "Radio Button", Name = "Group Frame", Name = "Check Box", AWS Standard Component Signal and Action reference
+@node AWS Radio Button, AWS Group Frame, AWS Check Box, AWS Signals and Actions reference
 @subsubsection Name = "Radio Button"
 
-@subheading Signals
+@subsubheading Signals
 
 @table @samp
 @item signalRadButtonClicked
-Generated when the radio box’s state changes (on to off)
+Generated when the radio box's state changes (on to off)
 @end table
 
-@subheading Attributes
+@subsubheading Attributes
 
 @table @samp
 @item Alpha
 The alpha of the radio button images.
 
 @item Align
-Either rbAlignLeft or rbAlignRight, aligns the control and text.
+Either @samp{rbAlignLeft} or @samp{rbAlignRight}, aligns the control and text.
 
 @item Caption
 The text caption for the component.
 @end table
 
-@subheading Skin Attributes
+@subsubheading Skin Attributes
 
 @table @samp
 @item RadioButtonUp
@@ -32,13 +32,13 @@ The image drawn when the radio button is unpressed.
 The image drawn when the radio button is pressed.
 
 @item RadioButtonOn
-The image drawn over the radio button when it’s state is "on"
+The image drawn over the radio button when it's state is "on"
 
 @item RadioButtonOff
-The image drawn over the radio button when it’s state is "off"
+The image drawn over the radio button when it's state is "off"
 @end table
 
-@subheading Properties
+@subsubheading Properties
 
 @table @samp
 @item Caption

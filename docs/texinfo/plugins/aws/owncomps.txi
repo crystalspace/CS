@@ -1,63 +1,69 @@
 @c -*-texinfo-*-
-@node How you can write your own component, AWS Standard Sink Trigger Reference, Actually finding out what your user is doing, AWS
-@subsection How you can write your own component
+@node AWS Custom Components, AWS Standard Sink Trigger Reference, AWS Signals, AWS
+@section Write Your Own @sc{aws} Component
+@subsection How You Can Write Your Own Component
 
-Obviously the components included with AWS will not cover every single user’s 
-needs.  Or, you may not like the way a certain control actually works. Maybe you 
-want it to glow faintly when the mouse is over it. Or perhaps you don’t like the 
-way command buttons look.  For whatever reason, AWS is designed to be simple for 
-component designers to use. Without a rich set of components, no windowing 
-system is very interesting.       
+Obviously the components included with @sc{aws} will not cover 
+every single user's needs. Or, you may not like the way a 
+certain control actually works. Maybe you want it to glow faintly 
+when the mouse is over it. Or perhaps you don't like the way 
+command buttons look. For whatever reason, @sc{aws} is designed 
+to be simple for component designers to use. Without a rich set 
+of components, no windowing system is very interesting.  
 
-The first thing you need to know is that all components are derived from the 
-common base class: @code{awsComponent}.  This component has built in handling 
-for events and drawing.  You don’t need to know anything about how internal 
-event handling happens, you just have to override the correct events.  This 
-component also has built in support for handling automatic parameter delivery, 
-and sinks and sources.  The next few subsections will detail the things that you 
-should do to make a good, robust AWS component.
+The first thing you need to know is that all components are 
+derived from the common base class: @code{awsComponent}. This 
+component has built in handling for events and drawing. You 
+don't need to know anything about how internal event handling 
+happens, you just have to override the correct events. This 
+component also has built in support for handling automatic 
+parameter delivery, and sinks and sources. The next few 
+subsections will detail the things that you should do to make a 
+good, robust @sc{aws} component.
 
 @menu
-* Automatic parameter delivery or How to get component parameters from the window:: Automatic parameter delivery or How to get component parameters from the window definition
-* Finding out what the user is doing::
-* Getting or giving signals so that everyone else knows what’s up::
+* AWS Component parameter delivery:: Automatic Parameter Delivery Or How To Get Component Parameters From The Window Definition
+* AWS Component Events:: Finding Out What The User Is Doing
+* AWS Component signals:: Getting Or Giving Signals So That Everyone Else Knows What's Up
 @end menu
 
-@node Automatic parameter delivery or How to get component parameters from the window, Finding out what the user is doing, How you can write your own component, How you can write your own component
-@subsubsection Automatic parameter delivery or How to get component parameters from the window definition
 
-In AWS, all windows are defined by a window definition.  There can be multiple 
-definitions in a file, or you may have multiple files.  That’s all up to the end 
-user.  For a component writer, however, you need to be able to get at this 
-information.  As well, you need to be able to get the information for the window 
-that’s being created, and for the current instance of the component.  How does 
-that happen? 
+@node AWS Component parameter delivery, AWS Component Events, AWS Custom Components, AWS Custom Components
+@subsubsection Automatic Parameter Delivery Or How To Get Component Parameters From The Window Definition
 
-It’s very easy, actually.  The window manager knows everything about everything, 
-and it particularly knows where the component is in the window’s setup process.  
+In @sc{aws}, all windows are defined by a window definition. 
+There can be multiple definitions in a file, or you may have 
+multiple files. That's all up to the end user. For a component 
+writer, however, you need to be able to get at this information. 
+As well, you need to be able to get the information for the 
+window that's being created, and for the current instance of the 
+component. How does that happen? 
+
+It's very easy, actually. The window manager knows everything about everything, 
+and it particularly knows where the component is in the window's setup process. 
 You should only need to get your parameters once per creation of a window, and 
-that happens at setup time.  
+that happens at setup time. 
 
 Each component @strong{must} override a function called @code{Setup()} in 
-@code{awsComponent}.  You should always called the base 
+@code{awsComponent}. You should always called the base 
 @code{awsComponent::Setup()} first, because there is some important work for it 
-to do.  You must never release or delete the parameters passed in to you, 
-because they are not yours.  You should never store the settings parameter, 
-because it is only on loan and strange things may happen to it.  Next, you are 
-free to do whatever setup your component needs.  This is primarily accomplished 
-by using the GetXXXX functions of the preference manager.  The @code{Setup()} 
- function is passed two important parameters: a pointer to the window manager, 
+to do. You must never release or delete the parameters passed in to you, 
+because they are not yours. You should never store the settings parameter, 
+because it is only on loan and strange things may happen to it. Next, you are 
+free to do whatever setup your component needs. This is primarily accomplished 
+by using the @code{GetXXXX} functions of the preference manager. The @code{Setup()} 
+function is passed two important parameters: a pointer to the window manager, 
 and a pointer to the current settings container that contains all the settings 
-for this instance of this component.  The prototype for the setup function is as 
+for this instance of this component. The prototype for the setup function is as 
 follows: 
 
 @example
 bool awsComponent::Setup(iAws *_wmgr, awsComponentNode *settings) 
 @end example
 
-The default @code{Setup()} in @code{awsComponent} sets an internal variable that 
+The default @code{Setup()}in @code{awsComponent} sets an internal variable that 
 stores the pointer to the window manager, which may then be retrieved afterwards 
-from the accessor function @code{WindowManager()}.  The first line in a setup 
+from the accessor function @code{WindowManager()}. The first line in a setup 
 function should always be: 
 
 @example
@@ -65,15 +71,15 @@ if (!awsComponent::Setup(_wmgr, settings)) return false;
 @end example
 
 This lets the lower level setup code do some important initialization, and also 
-keeps us from proceeding if something cataclysmic happens during initial setup.  
-Returning false from the @code{Setup()} function at any time gracefully fails 
-construction of the component.  It does not, however, fail construction of the 
-entire container or window.  It @emph{does} fail construction of any children 
+keeps us from proceeding if something cataclysmic happens during initial setup. 
+Returning false from the @code{Setup()}function at any time gracefully fails 
+construction of the component. It does not, however, fail construction of the 
+entire container or window. It @emph{does} fail construction of any children 
 this component may have. 
 
 After the initial call to the base version of @code{Setup()}, you may do 
-whatever you like.  It is common to get any important settings for your 
-component here.  For example, the base awsComponent retrieves the component’s 
+whatever you like. It is common to get any important settings for your 
+component here. For example, the base awsComponent retrieves the component's 
 frame rect by doing the following: 
 
 @example
@@ -81,56 +87,67 @@ iAwsPrefs *pm=WindowManager()->GetPrefMgr();
 pm->GetRect(settings, "Frame", frame); 
 @end example
 
-The preference manager supports two other versions of this command, altogether 
-providing @code{GetInt()}, @code{GetRect()}, and @code{GetString()}.  The first 
-parameter is always provided for you: it is the settings container passed as a 
-parameter.  The second parameter is the text name of the attribute you wish to 
-query, like "Frame" or "Style", etc.  The final parameter is a variable of the 
-type corresponding to the function, in which the results will be stored.  For 
-@code{GetInt()} this is always a signed integer, for code{GetRect()} this is a 
-code{csRect} structure, and for @code{GetString()} this is an @code{iString} pointer.  
+The preference manager supports two other versions of this 
+command, altogether providing @code{GetInt()}, @code{GetRect()}, 
+and @code{GetString()}. The first parameter is always provided 
+for you: it is the settings container passed as a parameter. The 
+second parameter is the text name of the attribute you wish to 
+query, like @samp{Frame} or @samp{Style}, etc. The final 
+parameter is a variable of the type corresponding to the 
+function, in which the results will be stored. For 
+@code{GetInt()} this is always a signed integer, for 
+@code{GetRect()} this is a @code{csRect} structure, and for 
+@code{GetString()} this is an @code{iString} pointer. 
 
-If your component needs to get information about the default skin, it can do so 
-using some other, very similar functions for the skin definition.  
-@code{LookupIntKey()}, @code{LookupRectKey()}, @code{LookupStringKey()}, and 
-@code{LookupRGBKey()}.  These functions operate identically to the GetXXXX 
-functions, except that they know where their information is coming from, so they 
-don’t need a settings parameter.  Also, @code{LookupRGBKey()} requires a 
-reference to three value parameters: red, green, and blue in that order.  Each 
-is an unsigned char.  Note that the preference manager also supports a Get for 
-colors, textures, and fonts.  It is preferred to use these functions for 
-actually getting those resources for use.  Please consult the API reference for 
-@code{awsPreferenceManager} for further information on those functions. 
+If your component needs to get information about the default 
+skin, it can do so using some other, very similar functions for 
+the skin definition. @code{LookupIntKey()}, 
+@code{LookupRectKey()}, @code{LookupStringKey()}, and 
+@code{LookupRGBKey()}. These functions operate identically to the 
+@code{GetXXXX} functions, except that they know where their 
+information is coming from, so they don't need a settings 
+parameter. Also, @code{LookupRGBKey()} requires a reference to 
+three value parameters: red, green, and blue in that order. Each 
+is an unsigned char. Note that the preference manager also 
+supports a @code{Get} for colors, textures, and fonts. It is 
+preferred to use these functions for actually getting those 
+resources for use. Please consult the @sc{api} reference for 
+@code{awsPreferenceManager} for further information on those 
+functions. 
 
-Once you have finished your setup process, you should always leave by returning 
-true. This means that everything went well and you are ready to work.
+Once you have finished your setup process, you should always 
+leave by returning true. This means that everything went well and 
+you are ready to work.
 
-@node Finding out what the user is doing, Getting or giving signals so that everyone else knows what’s up, Automatic parameter delivery or How to get component parameters from the window, How you can write your own component
-@subsubsection Finding out what the user is doing
 
-Events are broken out into OnXXXXX functions. The parameters for those events 
-are also broken out and passed to the functions.  At the end of any of the 
-OnXXXXX event functions (except @code{OnDraw()}) you should return true if the 
-event was used by you, otherwise return false. You @emph{must} override 
-@emph{all} event functions, even if you don’t use them all.  If you will not use 
-a particular event, just return false.             
+@node AWS Component Events, AWS Component signals, AWS Component parameter delivery, AWS Custom Components
+@subsubsection Finding Out What The User Is Doing
 
-It’s important to note that you will only receive events that apply to your 
-component.  For example, if the mouse is inside of your component, you will 
-receive all mouse events.  However, once the mouse leaves the confines of your 
-borders you will no longer receive @emph{any} mouse events.  The only exception 
-to this is the MouseExit event which is sent to the component that just lost the 
-mouse.             
+Events are broken out into @code{OnXXXXX} functions.The 
+parameters for those events are also broken out and passed to the 
+functions. At the end of any of the @code{OnXXXXX} event 
+functions (except @code{OnDraw()}) you should return true if the 
+event was used by you, otherwise return false. You @emph{must} 
+override @emph{all} event functions, even if you don't use them 
+all. If you will not use a particular event, just return false.  
+
+It's important to note that you will only receive events that 
+apply to your component. For example, if the mouse is inside of 
+your component, you will receive all mouse events. However, once 
+the mouse leaves the confines of your borders you will no longer 
+receive @emph{any} mouse events. The only exception to this is 
+the @code{MouseExit} event which is sent to the component that 
+just lost the mouse.  
 
 The following is the list of all events understood by components:
 
 @example
 /// Triggered when the user presses a mouse button down
 virtual bool OnMouseDown(int button, int x, int y)=0;
-   
+
 /// Triggered when the user unpresses a mouse button
 virtual bool OnMouseUp(int button, int x, int y)=0;
-   
+
 /// Triggered when the user moves the mouse
 virtual bool OnMouseMove(int button, int x, int y)=0;
 
@@ -148,7 +165,7 @@ virtual bool OnMouseEnter()=0;
 
 /// Triggered when the user presses a key
 virtual bool OnKeypress(int key, int modifiers)=0;
-   
+
 /// Triggered when the keyboard focus is lost
 virtual bool OnLostFocus()=0;
 
@@ -156,58 +173,70 @@ virtual bool OnLostFocus()=0;
 virtual bool OnGainFocus()=0;
 @end example
 
-@node Getting or giving signals so that everyone else knows what’s up, , Finding out what the user is doing, How you can write your own component
-@subsubsection Getting or giving signals so that everyone else knows what’s up
 
-AWS supports signal sources and sinks.  A signal is simply a bit of information 
-that lets someone know that something happened.  A signal source is an object 
-that gives out signals.  A signal sink is an object that receives them.  A 
-signal slot is a conduit that manages a connection between sources and sinks.  
-All AWS components are signal sources.  They are derived from @code{awsSource}, 
-and thus support all the functionality of that class. 
+@node AWS Component signals, , AWS Component Events, AWS Custom Components
+@subsubsection Getting Or Giving Signals So That Everyone Else Knows What's Up
 
-Signals are very distinct from Events.  Signals are usually not given for Events 
-like MouseDown, etc.  A signal usually indicates that something important 
-happened to the source.  Good examples of signals are TextChanged for a text-box 
-or ButtonClicked for a command button.  These indicate that the user has gone 
-through a series of complex motions, and has triggered the component to do 
-something that it was programmed for. Signals do not include extra parameter 
-information, simply a 32-bit value that indicates what happened. 
+@sc{aws} supports signal sources and sinks. A signal is simply a 
+bit of information that lets someone know that something 
+happened. A signal source is an object that gives out signals. 
+A signal sink is an object that receives them. A signal slot is 
+a conduit that manages a connection between sources and sinks. 
+All @sc{aws} components are signal sources. They are derived 
+from @code{awsSource}, and thus support all the functionality of 
+that class.
 
-Signals are unique to each component. Therefore, you never have to worry about 
-namespace conflicts.  If you wanted to find out when a command button was 
-clicked, for instance, you could do the following in your App:
+Signals are very distinct from Events. Signals are usually not 
+given for Events like @code{MouseDown}, etc. A signal usually 
+indicates that something important happened to the source. Good 
+examples of signals are @code{TextChanged} for a text-box or 
+@code{ButtonClicked} for a command button. These indicate that 
+the user has gone through a series of complex motions, and has 
+triggered the component to do something that it was programmed 
+for. Signals do not include extra parameter information, simply a 
+32-bit value that indicates what happened.
+
+Signals are unique to each component.Therefore, you never have 
+to worry about namespace conflicts. If you wanted to find out 
+when a command button was clicked, for instance, you could do the 
+following in your App:
 
 @example
 awsSlot slot(mySink); 
 slot.Connect(cmdbutton, awsButton::sButtonClicked, doSomethingUsefulTrigger); 
 @end example
 
-The parameter to the slot is the class that contains your sink.  This can be any 
-class derived from iAwsSink.  For the connect call, the first parameter is the 
-signal source that you are connecting to, the second is the signal you want 
-notified of, and the final parameter is the id of the trigger you want activated 
-on the sink when signaled.  A single slot can map between a number of  sources, 
-signals, and triggers.  To get the trigger id (which may change every time your 
-application is run) you just need to call @code{GetTriggerID} on the sink with 
-the name of the trigger that you want.  
+The parameter to the slot is the class that contains your sink. 
+This can be any class derived from @samp{iAwsSink}. For the connect 
+call, the first parameter is the signal source that you are 
+connecting to, the second is the signal you want notified of, and 
+the final parameter is the id of the trigger you want activated 
+on the sink when signaled. A single slot can map between a 
+number of sources, signals, and triggers. To get the trigger id 
+(which may change every time your application is run) you just 
+need to call @code{GetTriggerID} on the sink with the name of the 
+trigger that you want. 
 
 @example
 unsigned long trigger = mySink->GetTriggerID("LoginUser"); 
 @end example
 
-What this means is that you don’t have to override the awsButton class to find 
-out what’s going on.  In fact, you don’t even have to know about the button.  
-All you need to know is that it supports the signal.  If it doesn’t support the 
-signal, by the way, you will simply never get any info about it.  Your slot will 
+What this means is that you don't have to override the awsButton 
+class to find out what's going on. In fact, you don't even have 
+to know about the button. All you need to know is that it 
+supports the signal. If it doesn't support the signal, by the 
+way, you will simply never get any info about it. Your slot will 
 never become active. 
 
-A slot maps back to a sink’s trigger.  A single slot is ALWAYS bound to a single 
-sink, but there may be other slots bound to the same sink.  When a trigger gets 
-activated, it’s passed in a reference to the source of the signal.  That way it 
-can get any information that it needs out of that source.  A trigger could use 
-this information to find out what type of component the source is and cast it to 
-the right type.  The primary means for doing that resides in the Get- and 
-SetProperty methods.  These allow you to request a property by name from a 
-random component.  If the component does not support the property, the call will 
-fail in a graceful manner.  This is much nicer than segfaulting.
+A slot maps back to a sink's trigger. A single slot is ALWAYS 
+bound to a single sink, but there may be other slots bound to the 
+same sink. When a trigger gets activated, it's passed in a 
+reference to the source of the signal. That way it can get any 
+information that it needs out of that source. A trigger could use 
+this information to find out what type of component the source is 
+and cast it to the right type. The primary means for doing that 
+resides in the @code{Get}- and @code{SetProperty} methods. These 
+allow you to request a property by name from a random component. 
+If the component does not support the property, the call will 
+fail in a graceful manner. This is much nicer than segfaulting.
+

@@ -36,6 +36,7 @@ information you need in the introduction to the simple tutorial
 * csPython::
 * Animation::
 * Model Conversion:: Importing Model Files
+@c * AWS:: The Alternate Windowing System (@sc{aws})
 @end menu
 
 @imports{plugins,overview.txi}

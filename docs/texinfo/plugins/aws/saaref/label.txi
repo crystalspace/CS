@@ -1,22 +1,22 @@
 @c -*-texinfo-*-
-@node Name = "Label", Name = "Check Box", Name = "Command Button", AWS Standard Component Signal and Action reference
+@node AWS Label, AWS Check Box, AWS Command Button, AWS Signals and Actions reference
 @subsubsection Name = "Label"
 
-@subheading Signals
+@subsubheading Signals
 
 @table @samp
 @item signalLabelClicked
 Occurs when the user clicks a mouse button on the component.
 @end table
 
-@subheading Attributes
+@subsubheading Attributes
 
 @table @samp
 @item Caption
 The text of the label.
 @end table
-                       
-@subheading Properties
+
+@subsubheading Properties
 
 @table @samp
 @item Caption
