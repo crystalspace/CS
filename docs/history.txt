@@ -3,6 +3,21 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+28-Apr-2003
+	- Eric Sunshine made the following changes to the cspython build
+	  mechanism:
+	    - Fixed problem: Latest changes assumed that everyone had Swig
+	      installed, and always attempted to re-create the Swig-generated
+	      files when the cspython or pythmod modules were built.
+	    - Fixed cspythonclean and pythmodclean targets.  They were not
+	      removing all of the transient, generated files.  (In fact,
+	      "make pythmod ; make pythmodclean; make pythmod" would not rebuild
+	      the pythmod module at all for the second invocation.)
+	    - Fixed problem with non-standard use of $(MKDIR) which caused mkdir
+	      to attempt to create the pythmod transient directory twice.
+	      The second attempt would fail.
+	    - It is once again possible to build pythmod when building the
+	      project in an external directory (outside of the source tree).
 27-Apr-2003
 	- Philip Wyett fixed the DDS plugin compilation under MSVC, by
 	  replacing struct with static (don't ask) and giving the the array an

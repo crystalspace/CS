@@ -3,7 +3,8 @@
 # Copyright (C) 2003 Rene Jager <renej@frog.nl>
 # License: LGPL
 
-# Arguments: install <gen-files-dir> <include-dir> <libraries-dir> <setup-args>
+# Arguments: install <derived-files-dir> <source-dir> <include-dir> \
+#                    <alt-include-dir> <libraries-dir> <setup-args>
 # See cspython.mak for example usage.
 
 import sys, os, string, traceback, re
@@ -11,15 +12,19 @@ from distutils import ccompiler, sysconfig
 from distutils.core import setup, Extension
 
 # get non-distutils args and remove them
-src_dir = sys.argv[1]
-inc_dir = sys.argv[2]
-lib_dir = sys.argv[3]
-sys.argv[1:4] = []
+derived_dir = sys.argv[1]
+src_dir = sys.argv[2]
+inc_dir = sys.argv[3]
+inc_dir_alt = sys.argv[4]
+lib_dir = sys.argv[5]
+sys.argv[1:6] = []
 
 ext_module = Extension(
     '_cspace',
-    [src_dir+'/cs_pyth.cpp', 'plugins/cscript/cspython/pythmod.cpp'],
-    include_dirs=[inc_dir],
+    [derived_dir+'/cs_pyth.cpp',
+     src_dir+'/plugins/cscript/cspython/pythmod.cpp'
+     ],
+    include_dirs=[inc_dir, inc_dir_alt],
     library_dirs=[lib_dir],
     libraries=['cstool', 'csgfx', 'csgeom', 'cssys', 'csutil',
                'cssys', 'csutil'
@@ -31,7 +36,7 @@ setup_kwargs = {
     'description'  : 'Python Crystal Space Module',
     'url'          : 'http://www.crystalspace.org',
     'license'      : 'LGPL',
-    'package_dir'  : {'' : src_dir},
+    'package_dir'  : {'' : derived_dir},
     'py_modules'   : ['cspace'],
     'ext_modules'  : [ext_module],
 }
