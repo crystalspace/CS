@@ -1,3 +1,0 @@
-@c -*-texinfo-*-
-@node Commiting Modifed Files, Adding New Files and Directories, Advanced Topics for Developers Only, Advanced Topics for Developers Only
-@subsection Commiting Modifed Files

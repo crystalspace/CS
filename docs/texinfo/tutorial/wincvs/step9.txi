@@ -1,3 +1,0 @@
-@c -*-texinfo-*-
-@node Adding New Files and Directories, Tips and Tricks with WinCVS, Commiting Modifed Files, Advanced Topics for Developers Only
-@subsection Adding New Files and Directories
