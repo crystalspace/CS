@@ -35,9 +35,9 @@ protected:
   friend class csGLGraphics3D;
 
   size_t size;
-  int compcount, compSize, stride, offset;
   csRenderBufferType type;
   csRenderBufferComponentType comptype;
+  int compcount, compSize, stride, offset;
   GLenum compGLType;
   bool nodelete;
   size_t rangeStart;
