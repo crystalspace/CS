@@ -2,6 +2,16 @@
 # Rules for cleaning up after an autoconf run
 #============================================================================
 
+# Override the Jambase Clean rule in order to delete directories (the Jambase
+# rule deletes only files).  This is a hack.  It is needed for rules which
+# create entire directory trees, such LinkApplication for MacOS/X, rather than
+# a single file.  We can remove this hack once LinkApplication for MacOS/X is
+# updated so that Jam has full knowledge of the generated .app wrapper.
+actions piecemeal together existing Clean
+{
+  $(RM) -rf $(>)
+}
+
 rule DistClean
 {
   NotFile $(<) ;

@@ -6,6 +6,36 @@ The history order is reversed so that new features are at the top.
 14-Apr-2003
 	- Philip Wyett removed makedep entry under apps/tools for Jam. This
 	  is no longer needed after recent changes.
+	- Eric Sunshine made the following Jam-related changes for MacOS/X:
+	    - Fixed bug: Was ignoring the "console" attribute when building
+	      console applications, thus it was attempting to place console
+	      applications in an .app wrapper.  Introduced a new
+	      LinkApplicationConsole rule to complement the existing
+	      LinkApplication rule.
+	    - Fixed several problems which prevented creation of GUI
+	      applications and which prevented the .app wrapper mechanism from
+	      being applied properly.  I still consider this a hack, as Jam
+	      only knows about the top-level .app wrapper and checks only that
+	      timestamp, but at least it now works.  In the future, I think it
+	      would be better for Jam to have first-hand knowledge of the .app
+	      wrapper and to explicitly create the associated resources, and
+	      fully track dependencies of in-wrapper files.
+	    - Added APPLICATION.SUFFIX.GUI and APPLICATION.SUFFIX.CONSOLE
+	      variables which are employed by the Application rule if defined.
+	      These allow the gui/console application suffix to be overriden.
+	      The MacOS/X port uses this feature to give GUI application an
+	      appropriate ".app" suffix for wrappers, and no suffix for console
+	      executables.
+	    - Now exports MACOSX_DEPLOYMENT_TARGET=10.2 to the environment in
+	      order to avoid the linker complaint about weak versus non-weak
+	      frameworks.
+	- Eric Sunshine added a Clean rule to the Jam build which overrides the
+	  Jambase Clean rule in order to delete directories (the Jambase rule
+	  deletes only files).  This is a hack.  It is needed for rules which
+	  create entire directory trees, such LinkApplication for MacOS/X,
+	  rather than a single file.  We can remove this hack once
+	  LinkApplication for MacOS/X is updated so that Jam has full knowledge
+	  of the generated .app wrapper.
 13-Apr-2003
 	- Wouter fixed mikmod sound loader, delete[]/realloc mismatch.
 	- Matze cleaned some jamrules.
@@ -51,29 +81,6 @@ The history order is reversed so that new features are at the top.
 	  useful nor necessary.
 	- Eric Sunshine fixed bug in options.jam: Failed to declare "option" as
 	  a local variable.
-	- Eric Sunshine made the following Jam-related changes for MacOS/X:
-	    - Fixed bug: Was ignoring the "console" attribute when building
-	      console applications, thus it was attempting to place console
-	      applications in an .app wrapper.  Introduced a new
-	      LinkApplicationConsole rule to complement the existing
-	      LinkApplication rule.
-	    - Fixed several problems which prevented creation of GUI
-	      applications and which prevented the .app wrapper mechanism from
-	      being applied properly.  I still consider this a hack, as Jam
-	      only knows about the top-level .app wrapper and checks only that
-	      timestamp, but at least it now works.  In the future, I think it
-	      would be better for Jam to have first-hand knowledge of the .app
-	      wrapper and to explicitly create the associated resources, and
-	      fully track dependencies of in-wrapper files.
-	    - Added APPLICATION.SUFFIX.GUI and APPLICATION.SUFFIX.CONSOLE
-	      variables which are employed by the Application rule if defined.
-	      These allow the gui/console application suffix to be overriden.
-	      The MacOS/X port uses this feature to give GUI application an
-	      appropriate ".app" suffix for wrappers, and no suffix for console
-	      executables.
-	    - Now exports MACOSX_DEPLOYMENT_TARGET=10.2 to the environment in
-	      order to avoid the linker complaint about weak versus non-weak
-	      frameworks.
 12-Apr-2003
 	- Rhad fixed a couple potential deadlock and mutex issues in
 	  the ds3d sound renderer plugin. Also fixed similar issues in
