@@ -205,6 +205,10 @@ chronological order.
 	  served only to confuse new users.
 	- Eric Sunshine fixed Texinfo formatting and mark-up problems in the
 	  tutorials and HOWTO's.
+	- Eric Sunshine removed the now obsolete CS/include/css.h, which
+	  included many, but not all, of the public Crystal Space headers. To
+	  obtain the same type of functionality, #include the new
+	  <crystalspace.h> instead.
 	- Jorrit worked further on the genmesh animation system. The basic
 	  principles are now working. Removed the jittering test case.
 	  Currently no animation is occuring but you can see test messages
@@ -562,10 +566,6 @@ chronological order.
 	  time when Eric performed the major Jam-based msvcgen clean-up and
 	  fix-up several months ago, but broke at a late stage during that
 	  work, and went unnoticed until now.
-	- Eric Sunshine removed the now obsolete CS/include/css.h, which
-	  included many, but not all, of the public Crystal Space headers. To
-	  obtain the same type of functionality, #include the new
-	  <crystalspace.h> instead.
 26-Aug-2004
 	- res changed the TinyXML unknown element writer to write the value
 	  not verbatim but inside pointy brackets (a tag like "<?foo ?>" in a 
