@@ -1,6 +1,15 @@
 The history order is reversed so that new features are at the top.
 
 20-Aug-2001
+	- Philip Wyett removed duplicate commented out entry for cslua plugin.
+	  Manually updated MSVC project files with CSLUA. This I do
+	  not out of choice because of SWIG library (or lack of) for VC.
+	  Philip also fixed the LUA plugin so it compiles again for Visual
+	  C++.
+	- Philip fixed a compile error in phyztest.
+	- Philip did a commit of cspace.py which Jorrit forgot to commit
+	  yesterday.
+	- Martin Geisse moved the MD2 importer to its plugin.
 	- Added virtual destructor to csSpriteBuilderFile to remove warning.
 	- Made destructor of csModelConverterSPR private.
 	- Added iThingState::GetPortalPolygon() which returns the polygon
