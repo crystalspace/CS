@@ -37,7 +37,12 @@ chronological order.
 	  mesh and cleanup (in thing plugin). That way the load of cleaning
 	  up all polygon meshes will be spread in time.
 	- Eric Sunshine fixed a bug in cs-config where the value of
-	  $(LIB.EXE.PLATFORMS) was not emitted by cs-config's --libs option.
+	  $(LIB.EXE.PLATFORM) was not emitted by cs-config's --libs option.
+	  This caused linking problems on Windows since gdi32.lib was not
+	  getting mentioned in the link statement.  This broke recently when
+	  LIBS.EXE was changed so that it is distinct from LIBS.EXE.PLATFORM,
+	  rather than incorporating LIBS.EXE.PLATFORM.  Problem was reported by
+	  Dariusz Dawidowski <chfsoft@interia.pl>.
 30-Sep-2003
 	- Jorrit fixed a bug in thing polygon mesh helper where it would not
 	  clean up old data if the thing changes and at the same time the
