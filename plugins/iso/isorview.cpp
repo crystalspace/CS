@@ -57,7 +57,6 @@ void csIsoRenderView::DrawBuckets()
     p = buckets[i];
     if(!p) continue;
     //int num = 0;
-    g3d->StartPolygonFX (p->g3dpolyfx->mat_handle, p->g3dpolyfx->mixmode);
     while(p)
     {
       g3d->DrawPolygonFX (*p->g3dpolyfx);
@@ -68,7 +67,6 @@ void csIsoRenderView::DrawBuckets()
       p = np;
       //num++;
     }
-    g3d->FinishPolygonFX ();
     //printf("Drawn index %d for %d times\n", i, num);
     buckets[i] = NULL;
   }
@@ -80,9 +78,7 @@ void csIsoRenderView::AddPolyFX(int materialindex, G3DPolygonDPFX *g3dpolyfx,
   if(materialindex>=maxbuckets) 
   {
     g3dpolyfx->mixmode = mixmode;
-    g3d->StartPolygonFX (g3dpolyfx->mat_handle, g3dpolyfx->mixmode);
     g3d->DrawPolygonFX (*g3dpolyfx);
-    g3d->FinishPolygonFX ();
     return;
   }
   csIsoRenderBucket *bucket = 0;

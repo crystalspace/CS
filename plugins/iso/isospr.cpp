@@ -263,9 +263,7 @@ void csIsoSprite::Draw(iIsoRenderView *rview)
   // for non-iso-engine created materials, we have to draw them now.
   //rview->CalculateFogPolygon (g3dpolyfx);
   g3dpolyfx.mixmode = g3dpolyfx.mixmode | CS_FX_GOURAUD;
-  g3d->StartPolygonFX (g3dpolyfx.mat_handle, g3dpolyfx.mixmode);
   g3d->DrawPolygonFX (g3dpolyfx);
-  g3d->FinishPolygonFX ();
 
   return;// true;
 }
