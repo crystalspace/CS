@@ -251,7 +251,8 @@ public:
     vertex_indices[5*4+3] = 2;
     SetBox (box);
 
-    flags.SetAll (CS_POLYMESH_CLOSED | CS_POLYMESH_CONVEX);
+    flags.SetAll (CS_POLYMESH_CLOSED | CS_POLYMESH_CONVEX
+    	| CS_POLYMESH_TRIANGLEMESH);
     triangles = 0;
   }
 

@@ -950,6 +950,7 @@ UnitCubeMesh::UnitCubeMesh ()
   vertices[5*4+3] = 2;
   int tc;
   csPolygonMeshTools::Triangulate (this, triangles, tc);
+  flags.Set (CS_POLYMESH_TRIANGLEMESH);
 }
 
 static bool ContainsEdge (csPolygonMeshEdge* edges, int num_edges,

@@ -1440,6 +1440,7 @@ public:
       polygons[i].num_vertices = 3;
       polygons[i].vertices = (int*)&vertex_indices[i];
     }
+    flags.Set (CS_POLYMESH_TRIANGLEMESH);
   }
   virtual ~PolygonMeshMesh ()
   {

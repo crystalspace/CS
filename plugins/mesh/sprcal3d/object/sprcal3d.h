@@ -204,6 +204,7 @@ public:
     PolyMesh () : polygons (0)
     {
       SCF_CONSTRUCT_IBASE (0);
+      flags.Set (CS_POLYMESH_TRIANGLEMESH);
     }
     virtual ~PolyMesh () { Cleanup (); }
     void Cleanup () { } //  delete[] polygons; polygons = 0; }
@@ -479,7 +480,10 @@ public:
     virtual csFlags& GetFlags () { return flags;  }
     virtual uint32 GetChangeNumber() const { return 0; }
 
-    PolyMesh () : polygons (0) { }
+    PolyMesh () : polygons (0)
+    {
+      flags.Set (CS_POLYMESH_TRIANGLEMESH);
+    }
     virtual ~PolyMesh () { Cleanup (); }
     void Cleanup () { delete[] polygons; polygons = 0; }
 

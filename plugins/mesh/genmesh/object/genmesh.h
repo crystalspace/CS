@@ -377,7 +377,10 @@ public:
     virtual csFlags& GetFlags () { return flags;  }
     virtual uint32 GetChangeNumber() const { return 0; }
 
-    PolyMesh () { }
+    PolyMesh ()
+    {
+      flags.Set (CS_POLYMESH_TRIANGLEMESH);
+    }
     virtual ~PolyMesh () { }
   } scfiPolygonMesh;
   friend struct PolyMesh;
@@ -683,7 +686,11 @@ public:
     virtual csFlags& GetFlags () { return flags;  }
     virtual uint32 GetChangeNumber() const { return 0; }
 
-    PolyMesh () { SCF_CONSTRUCT_IBASE (0); }
+    PolyMesh ()
+    {
+      SCF_CONSTRUCT_IBASE (0);
+      flags.Set (CS_POLYMESH_TRIANGLEMESH);
+    }
     virtual ~PolyMesh () { }
   } scfiPolygonMesh;
   friend struct PolyMesh;

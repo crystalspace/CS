@@ -131,6 +131,7 @@ struct TriPolygonMesh : public iPolygonMesh
     triangle.a = 0;
     triangle.b = 1;
     triangle.c = 2;
+    flags.Set (CS_POLYMESH_TRIANGLEMESH);
   }
 
   virtual int GetVertexCount () { return 3; }

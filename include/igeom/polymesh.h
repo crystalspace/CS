@@ -69,6 +69,14 @@
  */
 #define CS_POLYMESH_DEFORMABLE 16
 
+/**
+ * Set this flag if the native or desired format of the polygon mesh
+ * is a triangle mesh. If this flag is set it means that GetTriangles()
+ * is very cheap. The presence of this flag does not mean that GetPolygons()
+ * will not work.
+ */
+#define CS_POLYMESH_TRIANGLEMESH 32
+
 /** @} */
 
 /**
@@ -135,6 +143,7 @@ struct iPolygonMesh : public iBase
    * <li>#CS_POLYMESH_CONVEX: mesh is convex.
    * <li>#CS_POLYMESH_NOTCONVEX: mesh is not convex.
    * <li>#CS_POLYMESH_DEFORMABLE: mesh is deformable.
+   * <li>#CS_POLYMESH_TRIANGLEMESH: mesh prefers triangle mesh.
    * </ul>
    * Note that if neither #CS_POLYMESH_CLOSED nor #CS_POLYMESH_NOTCLOSED
    * are set then the closed state is not known. Setting both is illegal.

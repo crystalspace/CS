@@ -404,7 +404,8 @@ public:
     void SetBall (csBallMeshObject* Ball)
     {
       ball = Ball;
-      flags.SetAll (CS_POLYMESH_CLOSED | CS_POLYMESH_CONVEX);
+      flags.SetAll (CS_POLYMESH_CLOSED | CS_POLYMESH_CONVEX |
+      	CS_POLYMESH_TRIANGLEMESH);
     }
     void Cleanup ();
 
