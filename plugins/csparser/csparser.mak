@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# Alternate Window Manager plugin submakefile
+# Map File Parser plugin makefile
 #------------------------------------------------------------------------------
 DESCRIPTION.csparser = Crystal Space map file parser
 
