@@ -355,15 +355,20 @@ awsManager::Redraw()
    curwin=oldwin;
    while(curwin)
    {
+     if (DEBUG_MANAGER)
+     {
       printf("aws-debug: consider window: %p\n", curwin); 
       printf("aws-debug: redraw tag: %d/%d\n", curwin->RedrawTag(), redraw_tag);
+     }
 
       if (redraw_tag == curwin->RedrawTag()) 
-      {          
-        printf("aws-debug: window is dirty, redraw.\n");
+      { 
+        if (DEBUG_MANAGER) printf("aws-debug: window is dirty, redraw.\n");
+
         for(i=0; i<dirty.Count(); ++i)
         {
-          printf("aws-debug: consider rect:%d of %d\n", i, dirty.Count()); 
+          
+          if(DEBUG_MANAGER) printf("aws-debug: consider rect:%d of %d\n", i, dirty.Count()); 
 
           csRect dr(dirty.RectAt(i));
 
@@ -418,7 +423,7 @@ awsManager::Redraw()
 void
 awsManager::RedrawWindow(awsWindow *win, csRect &dirtyarea)
 {
-     printf("aws-debug: start drawing window.\n");
+     if (DEBUG_MANAGER) printf("aws-debug: start drawing window.\n");
 
      /// See if this window intersects with this dirty area
      if (!dirtyarea.Intersects(win->Frame()))
@@ -437,7 +442,7 @@ awsManager::RedrawWindow(awsWindow *win, csRect &dirtyarea)
      /// Now draw all of it's children
      RecursiveDrawChildren(win, dirtyarea);
 
-     printf("aws-debug: finished drawing window.\n");
+     if (DEBUG_MANAGER) printf("aws-debug: finished drawing window.\n");
 }
 
 void
@@ -447,11 +452,11 @@ awsManager::RecursiveDrawChildren(awsComponent *cmp, csRect &dirtyarea)
 
    if (!child) return;
 
-   printf("aws-debug: start drawing children.\n");
+   if (DEBUG_MANAGER) printf("aws-debug: start drawing children.\n");
 
    do 
    {
-     printf("aws-debug: entered draw children loop for %p.\n", child);
+     if (DEBUG_MANAGER) printf("aws-debug: entered draw children loop for %p.\n", child);
 
      // Check to see if this component even needs redrawing.
      if (!dirtyarea.Intersects(child->Frame()))
@@ -471,7 +476,7 @@ awsManager::RecursiveDrawChildren(awsComponent *cmp, csRect &dirtyarea)
      child = cmp->GetNextChild();
    } while (!cmp->FinishedChildren()); 
 
-   printf("aws-debug: finished drawing children.\n");
+   if (DEBUG_MANAGER) printf("aws-debug: finished drawing children.\n");
 
 }
 

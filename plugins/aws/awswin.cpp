@@ -190,7 +190,8 @@ awsWindow::OnMouseDown(int button, int x, int y)
   
   if (!(frame_style & fsBitmap))
   {
-    printf("mousedown: x=%d, y=%d, fx=%d, fy=%d\n", x,y,Frame().xmax, Frame().ymax);
+    if (DEBUG_WINDOW_EVENTS) 
+      printf("mousedown: x=%d, y=%d, fx=%d, fy=%d\n", x,y,Frame().xmax, Frame().ymax);
 
     if (x<Frame().xmax && x>Frame().xmax-grip_size &&
         y<Frame().ymax && y>Frame().ymax-grip_size)

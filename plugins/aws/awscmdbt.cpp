@@ -44,22 +44,40 @@ awsCmdButton::OnDraw(csRect clip)
   int lo2   = WindowManager()->GetPrefMgr()->GetColor(AC_SHADOW2);
   int fill  = WindowManager()->GetPrefMgr()->GetColor(AC_FILL);
   int black = WindowManager()->GetPrefMgr()->GetColor(AC_BLACK);
-
+  
   switch(frame_style)
   {
   case fsNormal:
   case fsToolbar:
-    
-    g2d->DrawLine(Frame().xmin+1, Frame().ymin+1, Frame().xmax-1, Frame().ymin+1, hi);
-    g2d->DrawLine(Frame().xmin+1, Frame().ymin+1, Frame().xmin+1, Frame().ymax-1, hi);
-    g2d->DrawLine(Frame().xmin+1, Frame().ymax-1, Frame().xmax-1, Frame().ymax-1, lo);
-    g2d->DrawLine(Frame().xmax-1, Frame().ymin+1, Frame().xmax-1, Frame().ymax-1, lo);
 
-    g2d->DrawLine(Frame().xmin+2, Frame().ymin+2, Frame().xmax-2, Frame().ymin+2, hi2);
-    g2d->DrawLine(Frame().xmin+2, Frame().ymin+2, Frame().xmin+2, Frame().ymax-2, hi2);
-    g2d->DrawLine(Frame().xmin+2, Frame().ymax-2, Frame().xmax-2, Frame().ymax-2, lo2);
-    g2d->DrawLine(Frame().xmax-2, Frame().ymin+2, Frame().xmax-2, Frame().ymax-2, lo2);
+    if (is_down)
+    {
+      g2d->DrawLine(Frame().xmin+0, Frame().ymin+0, Frame().xmax-1, Frame().ymin+0, lo2);
+      g2d->DrawLine(Frame().xmin+0, Frame().ymin+0, Frame().xmin+0, Frame().ymax-1, lo2);
+      g2d->DrawLine(Frame().xmin+1, Frame().ymin+1, Frame().xmax-0, Frame().ymin+1, lo);
+      g2d->DrawLine(Frame().xmin+1, Frame().ymin+1, Frame().xmin+1, Frame().ymax-0, lo);
+      g2d->DrawLine(Frame().xmin+1, Frame().ymax-0, Frame().xmax-0, Frame().ymax-0, hi);
+      g2d->DrawLine(Frame().xmax-0, Frame().ymin+1, Frame().xmax-0, Frame().ymax-0, hi);
 
+      g2d->DrawLine(Frame().xmin+2, Frame().ymin+2, Frame().xmax-1, Frame().ymin+2, black);
+      g2d->DrawLine(Frame().xmin+2, Frame().ymin+2, Frame().xmin+2, Frame().ymax-1, black);
+      g2d->DrawLine(Frame().xmin+2, Frame().ymax-1, Frame().xmax-1, Frame().ymax-1, hi2);
+      g2d->DrawLine(Frame().xmax-1, Frame().ymin+2, Frame().xmax-1, Frame().ymax-1, hi2);
+    }
+    else
+    {
+      g2d->DrawLine(Frame().xmin+0, Frame().ymin+0, Frame().xmax-1, Frame().ymin+0, hi);
+      g2d->DrawLine(Frame().xmin+0, Frame().ymin+0, Frame().xmin+0, Frame().ymax-1, hi);
+      g2d->DrawLine(Frame().xmin+0, Frame().ymax-1, Frame().xmax-1, Frame().ymax-1, lo);
+      g2d->DrawLine(Frame().xmax-1, Frame().ymin+0, Frame().xmax-1, Frame().ymax-1, lo);
+      g2d->DrawLine(Frame().xmin+1, Frame().ymax-0, Frame().xmax-0, Frame().ymax-0, black);
+      g2d->DrawLine(Frame().xmax-0, Frame().ymin+1, Frame().xmax-0, Frame().ymax-0, black);
+
+      g2d->DrawLine(Frame().xmin+1, Frame().ymin+1, Frame().xmax-2, Frame().ymin+1, hi2);
+      g2d->DrawLine(Frame().xmin+1, Frame().ymin+1, Frame().xmin+1, Frame().ymax-2, hi2);
+      g2d->DrawLine(Frame().xmin+1, Frame().ymax-2, Frame().xmax-2, Frame().ymax-2, lo2);
+      g2d->DrawLine(Frame().xmax-2, Frame().ymin+1, Frame().xmax-2, Frame().ymax-2, lo2);
+    }
     break;
 
   case fsBitmap:
@@ -83,12 +101,16 @@ awsCmdButton::OnDraw(csRect clip)
 bool 
 awsCmdButton::OnMouseDown(int button, int x, int y)
 {
+  is_down=true;
+  Invalidate();
   return false;
 }
     
 bool 
 awsCmdButton::OnMouseUp(int button, int x, int y)
 {
+  is_down=false;
+  Invalidate();
   return false;
 }
     
@@ -114,6 +136,13 @@ bool
 awsCmdButton::OnMouseExit()
 {
   mouse_is_over=false;
+
+  if (is_down)
+  {
+    is_down=false;
+    Invalidate();
+  }
+
   return true;
 }
 
