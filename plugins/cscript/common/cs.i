@@ -168,7 +168,7 @@ struct iMeshObject : public iBase
   {
     iThingState* Query_iThingState()
     {
-      return QUERY_INTERFACE(self, iThingState);
+      return SCF_QUERY_INTERFACE(self, iThingState);
     }
   }
 };
@@ -287,11 +287,11 @@ public:
   {
     iEngine* Query_iEngine()
     {
-      return QUERY_PLUGIN(self, iEngine);
+      return CS_QUERY_PLUGIN(self, iEngine);
     }
     iGraphics3D* Query_iGraphics3D()
     {
-      return QUERY_PLUGIN(self, iGraphics3D);
+      return CS_QUERY_PLUGIN(self, iGraphics3D);
     }
     void Print(int mode, const char* format) {
       self->Printf(mode, format); 
