@@ -22,6 +22,7 @@
 #include "csutil/scf.h"
 #include "csutil/garray.h"
 #include "csutil/cscolor.h"
+#include "csgeom/vector2.h"
 
 struct iMaterialWrapper;
 
@@ -34,6 +35,122 @@ struct csSprite2DVertex
 };
 
 TYPEDEF_GROWING_ARRAY (csColoredVertices, csSprite2DVertex);
+
+/**
+ * This is a single frame in a UV animation. So its not much more than a set of
+ * (u.v) coordinates and a duration time.
+ */
+SCF_VERSION (iSprite2DUVAnimationFrame, 0, 0, 1);
+
+struct iSprite2DUVAnimationFrame : public iBase
+{
+  /**
+   * Give this frame a name.
+   */
+  virtual void SetName (const char *name) = 0;
+
+  /**
+   * Return the name of this frame.
+   */
+  virtual const char *GetName () = 0;
+
+  /**
+   * Get the u,v coordinates of the <idx>-th vertex
+   */
+  virtual csVector2 &GetUVCoo (int idx) = 0;
+
+  /**
+   * Get all u,v coordinates
+   */
+  virtual const csVector2 *GetUVCoo () = 0;
+
+  /**
+   * Get the number of (u,v) coordinates
+   */
+  virtual int GetUVCount () = 0;
+
+  /**
+   * Set the (u,v) coordinate of <idx>-th coo. Set idx to -1 to append it
+   */
+  virtual void SetUV (int idx, float u, float v) = 0;
+
+  /**
+   * Set all (u,v) coordinates and the name and duration
+   */
+  virtual void SetFrameData (const char *name, int duration, int num, float *uv) = 0;
+
+  /**
+   * Remove the <idx>-th coordinate.
+   */
+  virtual void RemoveUV (int idx) = 0;
+
+  /**
+   * Return the duration of this frame.
+   */
+  virtual int GetDuration () = 0;
+
+  /**
+   * Set the duration of this frame.
+   */
+  virtual void SetDuration (int duration) = 0;
+};
+
+
+/**
+ * The animation works by having all frames of an animation sequence
+ * in a texture at different (u,v) locations, hence the name.
+ * So it is basically a set of (u,v) coordinates plus a duration number.
+ * for every frame.
+ */
+
+SCF_VERSION (iSprite2DUVAnimation, 0, 0, 1);
+
+struct iSprite2DUVAnimation : public iBase
+{
+  /**
+   * Give this sequence a name.
+   */
+  virtual void SetName (const char *name) = 0;
+
+  /**
+   * return the name of this sequence.
+   */
+  virtual const char *GetName () = 0;
+
+  /**
+   * Retrieve the number of frames in this animation.
+   */
+  virtual int GetFrameCount () = 0;
+
+  /**
+   * Get the <idx>-th frame in the animation.
+   * Set idx to -1 to get the current to be played.
+   */
+  virtual iSprite2DUVAnimationFrame *GetFrame (int idx) = 0;
+
+  /**
+   * Get the frame <name> in the animation.
+   */
+  virtual iSprite2DUVAnimationFrame *GetFrame (const char *name) = 0;
+
+  /**
+   * Create a new frame that will be inserted before the <idx> frame.
+   * Set <idx> to -1 to append the frame to the sequence.
+   */
+  virtual iSprite2DUVAnimationFrame *CreateFrame (int idx) = 0;
+
+  /**
+   * Move the <frame>-th frame before the <idx>-th frame. Set idx to -1
+   * to move the frame to the end of the sequence.
+   */
+  virtual void MoveFrame (int frame, int idx) = 0;
+
+  /**
+   * Remove the <idx>-th from the animation
+   */
+  virtual void RemoveFrame (int idx) = 0;
+
+};
 
 SCF_VERSION (iSprite2DFactoryState, 0, 0, 1);
 
@@ -61,6 +178,31 @@ struct iSprite2DFactoryState : public iBase
 
   /// Return the value of the lighting flag.
   virtual bool HasLighting () = 0;
+
+  /**
+   * Get the number of UVAnimations.
+   */
+  virtual int GetUVAnimationCount () = 0;
+
+  /**
+   * Create a new UV animation
+   */
+  virtual iSprite2DUVAnimation *CreateUVAnimation () = 0;
+
+  /**
+   * Remove an UV animation
+   */
+  virtual void RemoveUVAnimation (iSprite2DUVAnimation *anim) = 0;
+
+  /**
+   * Get a specific UV animation by name. Returns NULL if not found.
+   */
+  virtual iSprite2DUVAnimation *GetUVAnimation (const char *name) = 0;
+
+  /**
+   * Get a specific UV animation by index. Returns NULL if not found.
+   */
+  virtual iSprite2DUVAnimation *GetUVAnimation (int idx) = 0;
 };
 
 SCF_VERSION (iSprite2DState, 0, 0, 1);
@@ -79,6 +221,38 @@ struct iSprite2DState : public iSprite2DFactoryState
    * Large n approximates a circle with radius 1. n must be > 2. 
    */
   virtual void CreateRegularVertices (int n, bool setuv) = 0;
+
+  /**
+   * Select an UV animation to play. Set name to NULL to select
+   * no animation to show.
+   * Style:
+   * 0   .. use the time values supplied in the frames
+   * > 0 .. every <style> millisecond skip to next frame
+   * < 0 .. every -1*<style>-th frame skip to next frame
+   * Loop:
+   * true  .. after last frame animations starts over from the beginning
+   * false .. after last frame the normal texture is shown
+   */
+  virtual void SetUVAnimation (const char *name, int style, bool loop) = 0;
+
+  /**
+   * Stop the animation and show the <idx>-th frame.
+   * Set idx to -1 to stop it at its current position.
+   */
+  virtual void StopUVAnimation (int idx) = 0;
+
+  /**
+   * Play the animation starting from the <idx>-th frame.
+   * Set idx to -1 to start it fro its current position.
+   * Style:
+   * 0   .. use the time values supplied in the frames
+   * > 0 .. every <style> millisecond skip to next frame
+   * < 0 .. every -1*<style>-th frame skip to next frame
+   * Loop:
+   * true  .. after last frame animations starts over from the beginning
+   * false .. after last frame the normal texture is shown
+   */
+  virtual void PlayUVAnimation (int idx, int style, bool loop) = 0;
 };
 
 #endif
