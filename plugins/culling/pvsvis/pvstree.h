@@ -124,6 +124,9 @@ private:
   // Bounding box of the root.
   csBox3 root_box;
 
+  // Minimal box for a node in the tree.
+  csBox3 node_minbox;
+
   // Create a node and assign an id to it.
   csStaticPVSNode* CreateNode ();
   // Create a node with a given id. This function will return
@@ -226,6 +229,15 @@ public:
    * Set the bounding box for this PVS.
    */
   virtual void SetBoundingBox (const csBox3& bbox);
+
+  virtual void SetMinimalNodeBox (const csBox3& bbox)
+  {
+    node_minbox = bbox;
+  }
+  virtual const csBox3& GetMinimalNodeBox () const
+  {
+    return node_minbox;
+  }
 
   /**
    * Clear PVS and read it from the data buffer.

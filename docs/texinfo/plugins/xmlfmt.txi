@@ -146,14 +146,10 @@ in the previous section:
   </material>
   <material name="plasma_wood">
     <texture>wood</texture>
-    <layer>
-      <texture>plasma</texture>
-      <scale u="10" v="10" />
-      <mixmode>
-        <add />
-        <tiling />
-      </mixmode>
-    </layer>
+    <shader type="standard">std_lighting_detail_alpha</shader>
+    <shadervar name="tex detail" type="texture">plasma</shadervar>
+    <shadervar name="detail texture scale" type="vector2">10,10</shadervar>
+    <shadervar name="detail texture color" type="vector4">1,1,1,0.25</shadervar>
   </material>
 </materials>
 @end example
@@ -170,10 +166,7 @@ The last material is interesting. The base of the material is the
 @samp{wood} texture. On top of that there is an additional texture layer
 that uses the @samp{plasma} texture. The layer is scaled 10 times in both
 @emph{u} and @emph{v} direction and it is added to the original texture
-(i.e. the colors are added). The @samp{<tiling />} flag indicates that the
-@samp{plasma} texture will be repeated when needed (i.e. if the surface
-on which this material is used is large). Note that not all renderers
-support layered materials. In that case the second layer will be ignored.
+(i.e. the colors are added).
 
 @subsubheading Shader Section
 @cindex shaders (Map File)

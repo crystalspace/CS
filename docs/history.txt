@@ -12,6 +12,13 @@ chronological order.
 	  modifiers.
 	- Jorrit removed the OR specific layer statements from csparser
 	  and from data/flarge/world.
+	- Jorrit updated the documentation about the XML format to reflect
+	  the change in how texture layers work now.
+	- Jorrit changed pvsvis to give an error if the 'box' is missing
+	  in the XML of the culler descriptor.
+	- Jorrit changed pvsvis to also accept a 'minnode' keyword. This
+	  can be used to set the minimal node of the kdtree used by the
+	  PVS culler.
 23-Jan-2005
 	- Eric Sunshine applied a boundary-condition fix from Andrew Mann for
 	  the timspec::tv_nsec overflow check in csPosixCondition::Wait().

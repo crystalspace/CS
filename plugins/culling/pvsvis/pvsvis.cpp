@@ -210,6 +210,11 @@ void csPVSVis::Setup (const char* name)
 
 const char* csPVSVis::ParseCullerParameters (iDocumentNode* node)
 {
+  bool box_was_given = false;
+
+  csRef<iSyntaxService> syn = CS_QUERY_REGISTRY (object_reg,
+        iSyntaxService);
+
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
@@ -218,18 +223,27 @@ const char* csPVSVis::ParseCullerParameters (iDocumentNode* node)
     const char* value = child->GetValue ();
     if (!strcmp ("box", value))
     {
-      csRef<iSyntaxService> syn = CS_QUERY_REGISTRY (object_reg,
-        iSyntaxService);
       csBox3 b;
       if (!syn->ParseBox (child, b))
-        return "Error parsing box for the PVS visibility culler!";
+        return "Error parsing <box> for the PVS visibility culler!";
       pvstree.SetBoundingBox (b);
+      box_was_given = true;
+    }
+    else if (!strcmp ("minnode", value))
+    {
+      csBox3 b;
+      if (!syn->ParseBox (child, b))
+        return "Error parsing <minnode> for the PVS visibility culler!";
+      pvstree.SetMinimalNodeBox (b);
     }
     else
     {
       return "Unrecognized parameter for the PVS visibility culler!";
     }
   }
+  if (!box_was_given)
+    return "The PVS visibility culler requires an outer <box>!";
+
   return 0;
 }
 
