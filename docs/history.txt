@@ -10,6 +10,15 @@ The history order is reversed so that new features are at the top.
 	    - Fixed the MacOS/X implementation of csGetTicks() so it is
 	      MT safe.
 	    - Fixed a wrapping bug in the virtual clock.
+	- Light ID's are now MD5 keys instead of simple numbers. This is
+	  done to solve a bug with multiple regions and light id's not
+	  matching with the cached light id's in the lightmap cache.
+	  This fixes a bug with pseudo-dynamic lights not working if they
+	  are loaded differently from when they were loading at relighting
+	  time.
+	- Changed iEngine->FindLight(id) to iEngine->FindLightID().
+	- Changed the engine so it now reports the first 4 objects for which
+	  it couldn't load lighting.
 17-Feb-2003
 	- Steven Geens reports: milk2spr now mentions apps/tests/mottest as its
 	  code example.

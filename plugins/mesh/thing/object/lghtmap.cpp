@@ -28,7 +28,7 @@
 #include "iutil/cache.h"
 #include "iengine/statlght.h"
 
-#define LMMAGIC	    "LM03" // must be 4 chars!
+#define LMMAGIC	    "LM04" // must be 4 chars!
 
 
 #ifdef DEBUG_OVERFLOWOPT
@@ -219,7 +219,7 @@ struct PolySave
 
 struct LightSave
 {
-  unsigned long light_id;
+  char light_id[16];
 };
 
 struct LightHeader
@@ -358,7 +358,7 @@ bool csLightMap::ReadFromCache (
   size = convert_endian (size);
 
   unsigned int expected_size;
-  expected_size = lh.dyn_cnt * (sizeof (ls.light_id) + lm_size);
+  expected_size = lh.dyn_cnt * (sizeof (LightSave) + lm_size);
   if (expected_size != size)
     return false;
 
@@ -367,12 +367,11 @@ bool csLightMap::ReadFromCache (
 
   for (i = 0 ; i < lh.dyn_cnt ; i++)
   {
-    if (file->Read ((char*)&ls.light_id, sizeof (ls.light_id))
-    	!= sizeof (ls.light_id))
+    if (file->Read ((char*)&ls.light_id, sizeof (LightSave))
+    	!= sizeof (LightSave))
       return false;
-    ls.light_id = convert_endian (ls.light_id);
 
-    iStatLight *il = engine->FindLight (ls.light_id);
+    iStatLight *il = engine->FindLightID (ls.light_id);
     if (il)
     {
       light = il->QueryLight ();
@@ -386,8 +385,7 @@ bool csLightMap::ReadFromCache (
     }
     else
     {
-      parent->thing_type->Warn (
-          "Warning! Light (%ld) not found!\n", ls.light_id);
+      return false;
     }
   }
 
@@ -472,7 +470,7 @@ void csLightMap::Cache (
     file->Write ((char *) &l, 4);
 
     // unsigned long == ls.light_id.
-    uint32 size = lh.dyn_cnt * (sizeof (unsigned long) + lm_size);
+    uint32 size = lh.dyn_cnt * (sizeof (LightSave) + lm_size);
     file->Write ((char*)&size, sizeof (size));
 
     while (smap)
@@ -481,8 +479,8 @@ void csLightMap::Cache (
       if (smap->GetArray ())
       {
         LightSave ls;
-        ls.light_id = convert_endian (light->GetLightID ());
-        file->Write ((char *) &ls.light_id, sizeof (ls.light_id));
+	memcpy (ls.light_id, light->GetLightID (), sizeof (LightSave));
+        file->Write ((char *) &ls.light_id, sizeof (LightSave));
         file->Write ((char *)(smap->GetArray ()), lm_size);
       }
 

@@ -122,7 +122,7 @@ struct iLightCallback : public iBase
 };
 
 
-SCF_VERSION (iLight, 0, 0, 8);
+SCF_VERSION (iLight, 0, 0, 9);
 
 /**
  * The iLight interface is the SCF interface for the csLight class.
@@ -153,8 +153,8 @@ struct iLight : public iBase
   /// Get private pointer to light object. UGLY
   virtual csLight* GetPrivateObject () = 0;
 
-  /// Get the id of this light.
-  virtual unsigned long GetLightID () = 0;
+  /// Get the id of this light. This is a 16-byte MD5.
+  virtual const char* GetLightID () = 0;
 
   /// Get the iObject for this light.
   virtual iObject *QueryObject() = 0;
@@ -259,7 +259,7 @@ struct iLight : public iBase
   virtual uint32 GetLightNumber () const = 0;
 };
 
-SCF_VERSION (iLightList, 0, 0, 1);
+SCF_VERSION (iLightList, 0, 0, 2);
 
 /**
  * This structure represents a list of lights.
@@ -290,8 +290,8 @@ struct iLightList : public iBase
   /// Find a light by name.
   virtual iLight *FindByName (const char *Name) const = 0;
 
-  /// Find a light by its ID value.
-  virtual iLight *FindByID (unsigned long id) const = 0;
+  /// Find a light by its ID value (16-byte MD5).
+  virtual iLight *FindByID (const char* id) const = 0;
 };
 
 SCF_VERSION (iLightingProcessData, 0, 0, 1);

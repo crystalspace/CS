@@ -1914,17 +1914,20 @@ bool csPolygon3D::ReadFromCache (iFile* file)
   if (lmi)
   {
     if (lmi->tex->lm == NULL) return true;
-    if (
-      !lmi->tex->lm->ReadFromCache (
+    bool rc = true;
+    if (!lmi->tex->lm->ReadFromCache (
           file,
           lmi->tex->w_orig,
           lmi->tex->h,
           this,
           true,
 	  thing->thing_type->engine))
+    {
       lmi->tex->InitLightMaps ();
+      rc = false;
+    }
     lmi->lightmap_up_to_date = true;
-    return true;
+    return rc;
   }
 
   csPolyTexGouraud *goi = GetGouraudInfo ();

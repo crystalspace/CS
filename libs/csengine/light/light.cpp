@@ -23,11 +23,13 @@
 #include "csengine/halo.h"
 #include "csengine/meshobj.h"
 #include "csutil/debug.h"
+#include "csutil/csmd5.h"
+#include "csutil/memfile.h"
+#include "cssys/csendian.h"
 
 int csLight:: ambient_red = CS_DEFAULT_LIGHT_LEVEL;
 int csLight:: ambient_green = CS_DEFAULT_LIGHT_LEVEL;
 int csLight:: ambient_blue = CS_DEFAULT_LIGHT_LEVEL;
-unsigned long csLight:: last_light_id = 0;
 
 SCF_IMPLEMENT_IBASE_EXT(csLight)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iLight)
@@ -49,7 +51,7 @@ csLight::csLight (
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLight);
   DG_TYPE (this, "csLight");
-  light_id = last_light_id++;
+  light_id = NULL;
   center.x = x;
   center.y = y;
   center.z = z;
@@ -85,6 +87,37 @@ csLight::~csLight ()
   if (flags.Check (CS_LIGHT_ACTIVEHALO))
     csEngine::current_engine->RemoveHalo (this);
   delete halo;
+  delete[] light_id;
+}
+
+const char* csLight::GenerateUniqueID ()
+{
+  if (light_id) return light_id;
+  csMemFile mf;
+
+  mf.Write ("light", 5);
+  if (sector)
+  {
+    if (sector->GetName ())
+      mf.Write (sector->GetName (), strlen (sector->GetName ()));
+  }
+
+  long l;
+  l = convert_endian ((long)QInt ((center.x * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+  l = convert_endian ((long)QInt ((center.y * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+  l = convert_endian ((long)QInt ((center.z * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+  l = convert_endian ((long)QInt ((dist * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+
+  csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());
+
+  delete[] light_id;
+  light_id = new char[16];
+  memcpy (light_id, digest.data, 16);
+  return light_id;
 }
 
 void csLight::SetHalo (csHalo *Halo)
@@ -429,13 +462,13 @@ csLightList::csLightList ()
   SCF_CONSTRUCT_IBASE (NULL);
 }
 
-iLight *csLightList::FindByID (unsigned long id) const
+iLight *csLightList::FindByID (const char* id) const
 {
   int i;
   for (i = 0; i < list.Length (); i++)
   {
     iLight *l = list.Get (i);
-    if (l->GetLightID () == id) return l;
+    if (memcmp (l->GetLightID (), id, 16) == 0) return l;
   }
 
   return NULL;

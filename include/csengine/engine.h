@@ -933,7 +933,7 @@ public:
   	const csVector3& pos, float radius,
   	const csColor& color, bool pseudoDyn);
   /// Find a static/pseudo-dynamic light by ID.
-  virtual iStatLight* FindLight (unsigned long light_id) const;
+  virtual iStatLight* FindLightID (const char* light_id) const;
   /// Find a static/pseudo-dynamic light by name.
   virtual iStatLight* FindLight (const char *Name, bool RegionOnly = false)
     const;

@@ -139,7 +139,7 @@ struct iSharedVariableList;
 #define CS_RENDPRI_FRONT2BACK 2
 /** @} */
 
-SCF_VERSION (iEngine, 0, 16, 1);
+SCF_VERSION (iEngine, 0, 16, 2);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -513,8 +513,11 @@ struct iEngine : public iBase
   /// Find a static/pseudo-dynamic light by name.
   virtual iStatLight* FindLight (const char *Name, bool RegionOnly = false)
     const = 0;
-  /// Find a static/pseudo-dynamic light by id.
-  virtual iStatLight* FindLight (unsigned long light_id) const = 0;
+  /**
+   * Find a static/pseudo-dynamic light by id. An ID is a 16-byte MD5
+   * checksum for the light.
+   */
+  virtual iStatLight* FindLightID (const char* light_id) const = 0;
   /**
    * Create an iterator to iterate over all static lights of the engine.
    * Assign to a csRef or use DecRef().

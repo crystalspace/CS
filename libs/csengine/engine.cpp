@@ -1262,6 +1262,8 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
   }
 
   int failed = 0;
+  int tot_failed_meshes = 0;
+  iMeshWrapper* failed_meshes[4];
   for (sn = 0; sn < num_meshes; sn++)
   {
     iMeshWrapper *s = meshes.Get (sn);
@@ -1274,7 +1276,14 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
           linfo->InitializeDefault ();
         else
           if (!linfo->ReadFromCache (cm))
+	  {
+	    if (tot_failed_meshes < 4)
+	    {
+	      failed_meshes[tot_failed_meshes] = s;
+	      tot_failed_meshes++;
+	    }
 	    failed++;
+          }
       }
     }
 
@@ -1282,7 +1291,13 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
   }
   if (failed > 0)
   {
-    Warn ("Couldn't load cached lighting for %d objects!", failed);
+    Warn ("Couldn't load cached lighting for %d object(s):", failed);
+    for (sn = 0 ; sn < tot_failed_meshes ; sn++)
+    {
+      Warn ("    %s", failed_meshes[sn]->QueryObject ()->GetName ());
+    }
+    if (tot_failed_meshes < failed)
+      Warn ("    ...");
     Warn ("Use -relight cmd option to refresh lighting.");
   }
 
@@ -1573,7 +1588,7 @@ void csEngine::RemoveHalo (csLight *Light)
   }
 }
 
-iStatLight *csEngine::FindLight (unsigned long light_id) const
+iStatLight *csEngine::FindLightID (const char* light_id) const
 {
   for (int i = 0; i < sectors.GetCount (); i++)
   {

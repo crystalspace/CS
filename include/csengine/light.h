@@ -49,10 +49,8 @@ struct iLightingInfo;
 class csLight : public csObject
 {
 private:
-  /// ID for this light.
-  unsigned long light_id;
-  /// Last used ID.
-  static unsigned long last_light_id;
+  /// ID for this light (16-byte MD5).
+  char* light_id;
 
 protected:
   /// Home sector of the light.
@@ -84,6 +82,9 @@ protected:
    * List of light callbacks.
    */
   csRefArray<iLightCallback> light_cb_vector;
+
+  /// Get a unique ID for this light. Generate it if needed.
+  const char* GenerateUniqueID ();
 
 public:
   /// Set of flags
@@ -121,7 +122,7 @@ public:
   virtual ~csLight ();
 
   /// Get the ID of this light.
-  unsigned long GetLightID () { return light_id; }
+  const char* GetLightID () { return GenerateUniqueID (); }
 
   /// Return true if the light is pseudo-dynamic.
   virtual bool IsDynamic () const { return false; }
@@ -255,7 +256,7 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csLight);
     virtual csLight* GetPrivateObject () { return scfParent; }
-    virtual unsigned long GetLightID () { return scfParent->GetLightID (); }
+    virtual const char* GetLightID () { return scfParent->GetLightID (); }
     virtual iObject *QueryObject() { return scfParent; }
     virtual const csVector3& GetCenter () { return scfParent->GetCenter (); }
     virtual void SetCenter (const csVector3& pos)
@@ -533,7 +534,7 @@ public:
   virtual void RemoveAll ();
   virtual int Find (iLight *obj) const;
   virtual iLight *FindByName (const char *Name) const;
-  virtual iLight *FindByID (unsigned long id) const;
+  virtual iLight *FindByID (const char* id) const;
 };
 
 /**

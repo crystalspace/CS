@@ -249,6 +249,8 @@ char* csGenmeshMeshObject::GenerateCacheName ()
   return cachename;
 }
 
+#define LMMAGIC	    "LM04" // must be 4 chars!
+
 bool csGenmeshMeshObject::ReadFromCache (iCacheManager* cache_mgr)
 {
   if (!do_shadow_rec) return true;
@@ -263,20 +265,23 @@ bool csGenmeshMeshObject::ReadFromCache (iCacheManager* cache_mgr)
   if (db)
   {
     csMemFile mf ((const char*)(db->GetData ()), db->GetSize ());
-    uint32 lid;
-    if (mf.Read ((char*)&lid, sizeof (lid)) != sizeof (lid))
-      goto stop;
-    lid = convert_endian (lid);
-    while (lid != (uint32)~0)
+    char magic[5];
+    if (mf.Read (magic, 4) != 4) goto stop;
+    magic[4] = 0;
+    if (strcmp (magic, LMMAGIC)) goto stop;
+
+    char cont;
+    if (mf.Read ((char*)&cont, 1) != 1) goto stop;
+    while (cont)
     {
-      iStatLight *il = factory->engine->FindLight (lid);
+      char lid[16];
+      if (mf.Read (lid, 16) != 16) goto stop;
+      iStatLight *il = factory->engine->FindLightID (lid);
+      if (!il) goto stop;
       iLight* l = il->QueryLight ();
       affecting_lights.Add (l);
       il->AddAffectedLightingInfo (&scfiLightingInfo);
-
-      if (mf.Read ((char*)&lid, sizeof (lid)) != sizeof (lid))
-        goto stop;
-      lid = convert_endian (lid);
+      if (mf.Read ((char*)&cont, 1) != 1) goto stop;
     }
     rc = true;
   }
@@ -295,6 +300,7 @@ bool csGenmeshMeshObject::WriteToCache (iCacheManager* cache_mgr)
 
   bool rc = false;
   csMemFile mf;
+  mf.Write (LMMAGIC, 4);
   csHashIterator it (affecting_lights.GetHashMap ());
   while (it.HasNext ())
   {
@@ -302,12 +308,14 @@ bool csGenmeshMeshObject::WriteToCache (iCacheManager* cache_mgr)
     csRef<iStatLight> sl = SCF_QUERY_INTERFACE (l, iStatLight);
     if (sl)
     {
-      uint32 lid = convert_endian (l->GetLightID ());
-      mf.Write ((char*)&lid, sizeof (lid));
+      char cont = 1;
+      mf.Write ((char*)&cont, 1);
+      const char* lid = l->GetLightID ();
+      mf.Write ((char*)lid, 16);
     }
   }
-  uint32 f = convert_endian ((uint32)~0);
-  mf.Write ((char*)&f, sizeof (f));
+  char cont = 0;
+  mf.Write ((char*)&cont, 1);
   if (!cache_mgr->CacheData ((void*)(mf.GetData ()), mf.GetSize (),
     	"genmesh_lm", NULL, ~0))
     goto stop;
