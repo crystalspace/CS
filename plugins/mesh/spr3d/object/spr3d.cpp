@@ -2417,15 +2417,16 @@ bool csSprite3DMeshObject::HitBeamObject (const csVector3& start,
 	csIntersect3::IntersectTriangle (verts[tr.c], verts[tr.b],
     	verts[tr.a], seg, tsect))
     {
-      if (dist > (temp = csSquaredDist::PointPoint (start, tsect)))
+      temp = csSquaredDist::PointPoint (start, tsect);
+      if (temp < dist)
       {
-          dist = temp;
-	  isect = tsect;
-          if (pr) *pr = qsqrt (dist / max);
+        dist = temp;
+	isect = tsect;
       }
     }
   }
-  if ( dist == max ) return false;
+  if (pr) *pr = qsqrt (dist / max);
+  if (dist >= max) return false;
   return true;
 }
 

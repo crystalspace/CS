@@ -724,15 +724,16 @@ bool csBallMeshObject::HitBeamObject(const csVector3& start,
     if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
     	vrt[tr[i].c], seg, tmp))
     {
-      if ( dist > (temp = csSquaredDist::PointPoint (start, tmp)))
+      temp = csSquaredDist::PointPoint (start, tmp);
+      if (temp < dist)
       {
-          isect = tmp;
-	  dist = temp;
-          if (pr) *pr = qsqrt(dist * itot_dist);
+        isect = tmp;
+	dist = temp;
       }
     }
   }
-  if (dist == tot_dist)
+  if (pr) *pr = qsqrt(dist * itot_dist);
+  if (dist >= tot_dist)
       return false;
   return true;
 }

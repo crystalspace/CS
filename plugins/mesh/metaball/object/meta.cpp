@@ -636,15 +636,16 @@ bool csMetaBall::HitBeamObject( const csVector3& start, const csVector3& end,
     if (csIntersect3::IntersectTriangle (mesh_vertices[i+2], mesh_vertices[i+1],
     	mesh_vertices[i], seg, tmp))
     {
-      if ( dist > (temp = csSquaredDist::PointPoint (start, tmp)))
+      temp = csSquaredDist::PointPoint (start, tmp);
+      if (temp < dist)
       {
         dist = temp;
 	isect = tmp;
-        if (pr) *pr = qsqrt(dist * itot_dist);
       }
     }
   }
-  if (dist == tot_dist)
+  if (pr) *pr = qsqrt (dist * itot_dist);
+  if (dist >= tot_dist)
     return false;
   return true;
 }

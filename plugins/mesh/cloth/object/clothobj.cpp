@@ -317,10 +317,12 @@ bool csStuffObject::HitBeamObject (const csVector3& start,
   csVector3 *vrt = vertices;
   for (i = 0 ; i < max ; i++)
   {
-    if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],vrt[tr[i].c], seg, isect))
+    if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
+	vrt[tr[i].c], seg, isect))
     {
       if (pr)
-		*pr = qsqrt (csSquaredDist::PointPoint (start, isect) / csSquaredDist::PointPoint (start, end));
+	*pr = qsqrt (csSquaredDist::PointPoint (start, isect)
+		/ csSquaredDist::PointPoint (start, end));
       return true;
     }
   }

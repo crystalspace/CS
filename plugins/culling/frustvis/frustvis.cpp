@@ -756,7 +756,7 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode,
   {
     csBox3 b (node_bbox.Min ()-data->seg.Start (),
     	      node_bbox.Max ()-data->seg.Start ());
-    if (b.SquaredOriginMaxDist () > data->sqdist) return false;
+    if (b.SquaredOriginDist () > data->sqdist) return false;
   }
 
   // In the first part of this test we are going to test if the
@@ -774,9 +774,6 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode,
   csKDTreeChild** objects;
   num_objects = treenode->GetObjectCount ();
   objects = treenode->GetObjects ();
-
-  data->r = 10000000000.;
-  data->polygon = NULL;
 
   int i;
   for (i = 0 ; i < num_objects ; i++)
@@ -882,7 +879,7 @@ bool csFrustumVis::IntersectSegment (const csVector3& start,
   IntersectSegment_Front2BackData data;
   data.seg.Set (start, end);
   data.sqdist = 10000000000.0;
-  data.r = 0;
+  data.r = 10000000000.;
   data.mesh = NULL;
   data.polygon = NULL;
   data.vector = NULL;
@@ -905,7 +902,7 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::IntersectSegment (
   IntersectSegment_Front2BackData data;
   data.seg.Set (start, end);
   data.sqdist = 10000000000.0;
-  data.r = 0;
+  data.r = 10000000000.;
   data.mesh = NULL;
   data.polygon = NULL;
   data.vector = new csVector ();
