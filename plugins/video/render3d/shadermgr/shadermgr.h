@@ -390,6 +390,14 @@ private:
   csPDelArray<csSymbolTable> symtabs;
   csSymbolTable *symtab;
 
+  // Optimization fields for SetupState.
+  static csVertexAttrib attribs[STREAMMAX*2];
+  static iRenderBuffer* buffers[STREAMMAX*2];
+  static iRenderBuffer* clear_buffers[STREAMMAX*2];	// For quick clearing...
+  static int units[TEXMAX];
+  static iTextureHandle* textures[TEXMAX];
+  static iTextureHandle* clear_textures[TEXMAX];	// For quick clearing...
+
   uint mixmode;
 
   csStringID streammapping[STREAMMAX];
@@ -433,10 +441,18 @@ public:
     mixmode = 0;
     int i;
     for (i=0; i<STREAMMAX; i++)
+    {
       streammapping[i] = csInvalidStringID;
+      attribs[i*2+0] = (csVertexAttrib)i;
+      attribs[i*2+1] = (csVertexAttrib)(i+100);
+      clear_buffers[i*2+0] = 0;
+      clear_buffers[i*2+1] = 0;
+    }
     for (i=0; i<TEXMAX; i++)
     {
       texmapping[i] = csInvalidStringID;
+      units[i] = i;
+      clear_textures[i] = 0;
     }
 
     writemaskRed = true;

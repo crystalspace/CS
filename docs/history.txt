@@ -32,6 +32,8 @@ chronological order.
 	- Jorrit optimized the OpenGL version of SetBufferState() and
 	  SetTextureState() by avoiding the deactivation of the buffers
 	  if this is not needed.
+	- Jorrit performed some further optimizations on
+	  csShaderManager::SetupState().
 1-Sep-2003
 	- Jorrit unreverted the changes from Old_Belge on the sprcal3d
 	  mesh object. Unfortunatelly this means that this plugin now
