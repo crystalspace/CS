@@ -20,18 +20,18 @@
 #include "cssysdef.h"
 #include "csutil/csrect.h"
 
-csRect::csRect ()
+csRect::csRect () : csBase()
 {
   xmin = xmax = ymin = ymax = 0;
 }
 
-csRect::csRect (int ixmin, int iymin, int ixmax, int iymax)
+csRect::csRect (int ixmin, int iymin, int ixmax, int iymax) : csBase()
 {
   xmin = ixmin; xmax = ixmax;
   ymin = iymin; ymax = iymax;
 }
 
-csRect::csRect (csRect &copy)
+csRect::csRect (const csRect &copy) : csBase()
 {
   xmin = copy.xmin; xmax = copy.xmax;
   ymin = copy.ymin; ymax = copy.ymax;
@@ -39,7 +39,6 @@ csRect::csRect (csRect &copy)
 
 csRect::~csRect ()
 {
-  // empty
 }
 
 void csRect::Intersect (int ixmin, int iymin, int ixmax, int iymax)
@@ -55,7 +54,7 @@ void csRect::Intersect (int ixmin, int iymin, int ixmax, int iymax)
   if (ymax > iymax) ymax = iymax;
 }
 
-void csRect::Intersect (csRect &target)
+void csRect::Intersect (const csRect &target)
 {
   if (IsEmpty () || target.IsEmpty ())
   {
@@ -69,7 +68,7 @@ void csRect::Intersect (csRect &target)
   if (ymax > target.ymax) ymax = target.ymax;
 }
 
-bool csRect::Intersects (csRect &target)
+bool csRect::Intersects (const csRect &target) const
 {
   if (IsEmpty () || target.IsEmpty ()
    || (xmin >= target.xmax)
@@ -97,7 +96,7 @@ void csRect::Union (int ixmin, int iymin, int ixmax, int iymax)
   }
 }
 
-void csRect::Union (csRect &target)
+void csRect::Union (const csRect &target)
 {
   if (target.IsEmpty ())
     return;
@@ -161,7 +160,7 @@ void csRect::Exclude (int ixmin, int iymin, int ixmax, int iymax)
   return;
 }
 
-void csRect::Subtract (csRect &rect)
+void csRect::Subtract (const csRect &rect)
 {
   if (rect.IsEmpty () || IsEmpty ())
     return;
@@ -199,7 +198,7 @@ void csRect::Subtract (csRect &rect)
         Set (xmin, rect.ymax, xmax, ymax);//area4
 }
 
-void csRect::AddAdjanced (csRect &rect)
+void csRect::AddAdjanced (const csRect &rect)
 {
   csRect tmp;
   if (xmin == rect.xmax)

@@ -57,24 +57,19 @@ public:
   csRect (int ixmin, int iymin, int ixmax, int iymax);
 
   /// Copy constructor.
-  csRect (csRect &copy);
+  csRect (const csRect &copy);
 
+  /// Destructor.
   virtual ~csRect ();
 
-  /**
-   * Intersect with another rectangle; return false if
-   * resulting rectangle is empty.
-   */
+  /// Intersect with another rectangle.
   void Intersect (int ixmin, int iymin, int ixmax, int iymax);
 
-  /**
-   * Intersect with another rectangle; return false if
-   * resulting rectangle is empty.
-   */
-  void Intersect (csRect &target);
+  /// Intersect with another rectangle.
+  void Intersect (const csRect &target);
 
   /// Return true if rectangle intersects with target.
-  bool Intersects (csRect &target);
+  bool Intersects (const csRect &target) const;
 
   /**
    * Add a rectangle: find minimal rectangle
@@ -86,7 +81,7 @@ public:
    * Add a rectangle: find minimal rectangle
    * that embeds both given rectangles.
    */
-  void Union (csRect &target);
+  void Union (const csRect &target);
 
   /**
    * Subtract rectangle: find the minimal rectangle which embeds all
@@ -99,69 +94,70 @@ public:
    * Alternative subtraction: find maximal area of this rectangle that
    * is not covered by argument.
    */
-  void Subtract (csRect &rect);
+  void Subtract (const csRect &rect);
 
   /// Return true if rectangle is empty.
-  inline bool IsEmpty ()
+  bool IsEmpty () const
   { return (xmin >= xmax) || (ymin >= ymax); }
 
   /// Make rectangle empty.
-  inline void MakeEmpty ()
+  void MakeEmpty ()
   { xmin = xmax = 0; }
 
   /// Set rectangle to given ixmin,iymin,ixmax,iymax position.
-  inline void Set (int ixmin, int iymin, int ixmax, int iymax)
+  void Set (int ixmin, int iymin, int ixmax, int iymax)
   {
     xmin = ixmin; xmax = ixmax;
     ymin = iymin; ymax = iymax;
   }
 
   /// Copy rectangle.
-  inline void Set (csRect &target)
+  void Set (const csRect &target)
   {
     xmin = target.xmin; xmax = target.xmax;
     ymin = target.ymin; ymax = target.ymax;
   }
 
   /// Set rectangle xmin,ymin position.
-  inline void SetPos (int x, int y)
+  void SetPos (int x, int y)
   { xmin = x; ymin = y; }
 
   /// Set rectangle size.
-  inline void SetSize (int w, int h)
+  void SetSize (int w, int h)
   { xmax = xmin + w; ymax = ymin + h; }
 
   /// Move rectangle by deltaX, deltaY.
-  inline void Move (int dX, int dY)
+  void Move (int dX, int dY)
   { xmin += dX; xmax += dX; ymin += dY; ymax += dY; }
 
   /// Return the width of rectangle.
-  inline int Width () const { return xmax - xmin; }
+  int Width () const { return xmax - xmin; }
 
   /// Return the height of rectangle.
-  inline int Height () const { return ymax - ymin; }
+  int Height () const { return ymax - ymin; }
 
   /// Return true if a point lies within rectangle bounds.
-  inline bool Contains (int x, int y)
+  bool Contains (int x, int y) const
   { return (x >= xmin) && (x < xmax) && (y >= ymin) && (y < ymax); }
 
   /// Return true if a relative point lies within rectangle bounds.
-  inline bool ContainsRel (int x, int y)
+  bool ContainsRel (int x, int y) const
   { return (x >= 0) && (x < Width ()) && (y >= 0) && (y < Height ()); }
 
   /// Return true if rectangle is the same.
-  inline bool Equal (int ixmin, int iymin, int ixmax, int iymax)
-  { return (xmin == ixmin) && (ymin == iymin) && (xmax == ixmax) && (ymax == iymax); }
+  bool Equal (int ixmin, int iymin, int ixmax, int iymax) const
+  { return (xmin == ixmin) && (ymin == iymin) &&
+           (xmax == ixmax) && (ymax == iymax); }
 
   /// Normalize a rectangle such that xmin <= xmax and ymin <= ymax.
-  inline void Normalize ()
+  void Normalize ()
   {
     if (xmin > xmax) { int tmp = xmin; xmin = xmax; xmax = tmp; }
     if (ymin > ymax) { int tmp = ymin; ymin = ymax; ymax = tmp; }
   }
 
   /// Return area of this rectangle.
-  inline int Area ()
+  int Area () const
   {
     if (IsEmpty ())
       return 0;
@@ -170,17 +166,17 @@ public:
   }
 
   /// Add an adjanced rectangle if resulting rectangle will have larger area.
-  void AddAdjanced (csRect &rect);
+  void AddAdjanced (const csRect &rect);
 
   /// Test inequality of two rectangles.
-  inline bool operator != (csRect &rect)
+  bool operator != (const csRect &rect) const
   {
     return (xmin != rect.xmin) || (ymin != rect.ymin)
         || (xmax != rect.xmax) || (ymax != rect.ymax);
   }
 
   /// Extend rectangle so that it will include given point
-  inline void Extend (int x, int y)
+  void Extend (int x, int y)
   {
     if (xmin > x) xmin = x; if (xmax < x) xmax = x;
     if (ymin > y) ymin = y; if (ymax < y) ymax = y;
