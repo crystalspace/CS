@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Sep-2003
+	- res reverted the change made to libs/cssys/win32/shellstuff.h that
+	  caused SHGetFolderPathW() to be used when present. The way this
+	  function was employed was borked: as the W in the name indicates,
+	  it returns it's data as a wide(i.e. wchar_t*) string. However, it 
+	  was stored in a standard char* string - thus the data returned 
+	  would've been useless.
 17-Sep-2003
 	- Eric Sunshine documented cssys+csutil merge in apimod98.txi.
 	- Eric Sunshine documented csHash<> and csSet<> in apimod98.txi.
@@ -46,15 +53,12 @@ chronological order.
 	  respect $(SRCDIR) in all cases.
 	- Eric Sunshine eliminated hundreds of "macro redifinition" warnings
 	  from renderer/opengl/csglext.h.
-
-17-Sep-2003
         - Mingw/Msys Build/Maintenance Update for Windows OS versions < 5.0
           - Added exception processing to allow SHGetFolderPathW to be properly
 	    loaded for Unicode Processing as needed or requested by Windows OS
 	    for those Windows OS versions < 5.0 (NT4/Win98/Win98SE/Win95).
           - Impact:  Reduce time and overhead required to open Canvas and
                      start Renderer for Windows OS versions < 5.0.
-
 16-Sep-2003
 	- Jorrit fixed the thing plugin so that it now actually registers
 	  leaving portals to the sector.
