@@ -47,6 +47,8 @@ class awsManager : public iAws
     */
    csRect     dirty[awsNumRectBuckets];
 
+
+
    /// This contains the index of the highest dirty rect containing valid info.
    int dirty_lid;
 
@@ -130,10 +132,21 @@ public:
     /// Set the top window
     virtual void       SetTopWindow(awsWindow *_top);
 
+    /// Returns true if part of this window is inside the dirty zones
+    virtual bool       WindowIsDirty(awsWindow *win);
+
     /// Redraw whatever portions of the screen need it.
+    virtual void       Redraw();
 
     /// Mark a section of the screen dirty
-    virtual void Mark(csRect &rect);
+    virtual void       Mark(csRect &rect);
+
+protected:
+     /// Redraws a window only if it has areas in the dirtyarea
+    void          RedrawWindow(awsWindow *win, csRect &dirtyarea);
+                
+    ///  Redraws all children recursively, but only if they have an part in dirty area
+    void          RecursiveDrawChildren(awsComponent *cmp, csRect &dirtyarea);
 
 public:
     /// Set the contexts however you want

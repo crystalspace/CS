@@ -52,8 +52,15 @@ class awsComponent : public awsSigSrc
    /// The rectangle marking the frame of this component
    csRect frame;
 
+   /// This points to a linked list if this component has children
+   csDLinkList *children;
+
    /// Every component will have a name, which is translated to an id
    unsigned long id;
+
+   /// True if the component is hidden, else false.
+   bool hidden;
+
 
 public:
     awsComponent();
@@ -72,8 +79,47 @@ public:
     /// Invalidation routine: allow the component to be redrawn when you call this
     virtual void Invalidate();
 
+    /// Invalidation routine: allow component to be redrawn, but only part of it
+    virtual void Invalidate(csRect area);
+
+    /// Get this component's frame
+    virtual csRect& Frame()
+    { return frame; }
+
     /// Returns the named TYPE of the component, like "Radio Button", etc.
     virtual char *Type()=0;
+
+    /// Returns true if this window overlaps the given rect.
+    virtual bool Overlaps(csRect &r);
+
+    /// Returns the state of the hidden flag
+    virtual bool isHidden()
+    { return hidden; }
+
+public:
+    /** Adds a child into this component.  It's frame should be respective this component, not absolute.
+     * This component can grab a reference to the child and dispose of it when it destructs, unless you
+     * call RemoveChild() beforehand.  If you set owner to false, this component will call IncRef, otherwise
+     * it will assume control of the child and not IncRef.  The difference is that, if owner is false the
+     * child component will NOT be destroyed on destruction of this component, or on call of RemoveChild().
+     */
+    virtual void AddChild(awsComponent *child, bool owner=true);
+
+    /** Removes a child from this component.  Important!! The child will be destroyed automatically if owner
+     *  was true when you called AddChild().
+     */
+    virtual void RemoveChild(awsComponent *child);
+
+    /// Mirrors the GetFirstItem from the DLinkList class
+    virtual awsComponent *GetFirstChild();
+
+    /// Mirrors the GetNextItem from the DLinkList class
+    virtual awsComponent *GetNextChild();
+    
+    /// Returns true if this component has children
+    virtual bool HasChildren()
+    { return children!=NULL; }
+
 
 protected:
     /// Get's this components idea of the window manager.  Should be used internally by the component ONLY.
@@ -82,7 +128,7 @@ protected:
 
 public:
     /// Triggered when the component needs to draw
-    virtual void OnDraw()=0;
+    virtual void OnDraw(csRect clip)=0;
 
     /// Triggered when the user presses a mouse button down
     virtual bool OnMouseDown(int button, int x, int y)=0;

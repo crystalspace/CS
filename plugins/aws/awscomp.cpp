@@ -3,12 +3,28 @@
 #include "awscomp.h"
 #include "awsslot.h"
 
-awsComponent::awsComponent()
+awsComponent::awsComponent():children(NULL)
 {
 }
 
 awsComponent::~awsComponent()
 {
+   /// Let go our references to any children if we have them.
+   if (children)
+   {
+      void *item = children->GetFirstItem();
+
+      while(item)
+      {
+         awsComponent *cmp = (awsComponent *)item;
+
+         cmp->DecRef();
+
+         item = children->GetNextItem();
+      }
+
+      delete children;
+   }
 }
     
     
@@ -48,11 +64,65 @@ awsComponent::Invalidate()
   WindowManager()->Mark(frame);
 }
 
+void 
+awsComponent::Invalidate(csRect area)
+{
+  WindowManager()->Mark(area);
+}
+
 bool 
 awsComponent::HandleEvent()
 {
   return false;
 }
+
+bool 
+awsComponent::Overlaps(csRect &r)
+{
+  return frame.Intersects(r);
+}
+
+void 
+awsComponent::AddChild(awsComponent *child, bool owner=true)
+{
+   // Only grab a reference if we are not the owner.
+   if (owner==false)
+     child->IncRef();
+
+   // Create a new child list if the current one does not exist.
+   if (children==NULL)
+     children = new csDLinkList();
+   
+   children->AddItem(child);
+}
+
+void 
+awsComponent::RemoveChild(awsComponent *child)
+{
+   if (children)
+     children->RemoveItem(child);
+}
+
+awsComponent *
+awsComponent::GetFirstChild()
+{
+   if (children)
+     return (awsComponent *)children->GetFirstItem();
+
+   return NULL;
+}
+
+    
+awsComponent *
+awsComponent::GetNextChild()
+{
+   if (children)
+    return (awsComponent *)children->GetNextItem();
+
+  return NULL;
+}
+    
+
 
 /////////////////////////////////////  awsComponentFactory ////////////////////////////////////////////////////////
 

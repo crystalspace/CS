@@ -48,6 +48,13 @@ private:
     /// Links this window in below the passed in window.  This window must be unlinked!
     void LinkBelow(awsWindow *win);
 
+private:
+    /** Contains the redraw tag.  This tag changes everytime we redraw the window system, but only once per frame.
+      we use it to keep track of which windows have been redrawn and which haven't.
+     */
+    unsigned int redraw_tag;
+
+
 public:
    static const unsigned long sWindowRaised;
    static const unsigned long sWindowLowered;
@@ -55,7 +62,19 @@ public:
    static const unsigned long sWindowShown;
    static const unsigned long sWindowClosed;
    
-   
+   /// This is a component of type window
+   virtual char *Type()
+   {
+      return "Window";
+   }
+
+   /// Sets the value of the redraw tag
+   void SetRedrawTag(unsigned int tag);
+
+   /// Gets the value of the redraw tag
+   unsigned int RedrawTag()
+   { return redraw_tag; }
+
 public:
     /// Raises a window to the top.
     void Raise();
@@ -79,7 +98,7 @@ public:
     virtual void OnLower();
 
     /// Triggered when the component needs to draw
-    virtual void OnDraw();
+    virtual void OnDraw(csRect clip);
 
     /// Triggered when the user presses a mouse button down
     virtual bool OnMouseDown(int button, int x, int y);
@@ -105,7 +124,5 @@ public:
     /// Triggered when the keyboard focus is gained
     virtual bool OnGainFocus();
 };
-
-
 
 #endif

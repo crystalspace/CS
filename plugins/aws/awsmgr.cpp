@@ -115,6 +115,120 @@ awsManager::Mark(csRect &rect)
      dirty[dirty_lid++].Set(rect);
 }
 
+bool
+awsManager::WindowIsDirty(awsWindow *win)
+{
+  if (all_buckets_full) 
+  {
+    // return the result the overlap test with the dirty rect
+    return win->Overlaps(dirty[0]);
+  }
+  else
+  {
+    for(int i=0; i<dirty_lid; ++i)
+      if (win->Overlaps(dirty[i])) return true;
+  }
+
+  return false;
+}
+
+void       
+awsManager::Redraw()
+{
+   static unsigned redraw_tag = 0;
+
+   redraw_tag++;
+    
+   // check to see if there is anything to redraw.
+   if (dirty[0].IsEmpty()) {
+      return;
+   }
+
+   awsWindow *curwin=top, *oldwin;
+   
+   // check to see if any part of this window needs redrawn
+   while(curwin)
+   {
+      if (WindowIsDirty(curwin)) {
+        curwin->SetRedrawTag(redraw_tag);
+      }
+
+      oldwin=curwin;
+      curwin = curwin->WindowBelow();
+   }
+
+   /*  At this point in time, oldwin points to the bottom most window.  That means that we take curwin, set it
+    * equal to oldwin, and then follow the chain up to the top, redrawing on the way.  This makes sure that we 
+    * only redraw each window once.
+    */
+
+   curwin=oldwin;
+   while(curwin)
+   {
+      if (curwin->RedrawTag() == redraw_tag) 
+      {
+         if (all_buckets_full) 
+           RedrawWindow(curwin, dirty[0]);
+         else
+         {
+            for(int i=0; i<dirty_lid; ++i)
+              RedrawWindow(curwin, dirty[i]);
+         }
+      }
+      curwin=curwin->WindowAbove();
+   }
+
+   // done with the redraw!
+}
+
+void
+awsManager::RedrawWindow(awsWindow *win, csRect &dirtyarea)
+{
+     /// See if this window intersects with this dirty area
+     if (!dirtyarea.Intersects(win->Frame()))
+       return;
+
+     /// Draw the window first.
+     csRect clip(win->Frame());
+
+     /// Clip the window to it's intersection with the dirty rectangle
+     clip.Intersect(dirtyarea);
+     ptG2D->SetClipRect(clip.xmin, clip.ymin, clip.xmax, clip.ymax);
+
+     /// Tell the window to draw
+     win->OnDraw(clip);
+
+     /// Now draw all of it's children
+     RecursiveDrawChildren(win, dirtyarea);
+}
+
+void
+awsManager::RecursiveDrawChildren(awsComponent *cmp, csRect &dirtyarea)
+{
+   awsComponent *child = cmp->GetFirstChild();
+
+   while (child) 
+   {
+     // Check to see if this component even needs redrawing.
+     if (!dirtyarea.Intersects(child->Frame()))
+       continue;                                            
+
+     csRect clip(child->Frame());
+     clip.Intersect(dirtyarea);
+     ptG2D->SetClipRect(clip.xmin, clip.ymin, clip.xmax, clip.ymax);
+
+     // Draw the child
+     child->OnDraw(clip);
+
+     // If it has children, draw them
+     if (child->HasChildren())
+       RecursiveDrawChildren(child, dirtyarea);
+
+    child = cmp->GetNextChild();
+   }
+
+}
+
  //// Canvas stuff  //////////////////////////////////////////////////////////////////////////////////
 
 

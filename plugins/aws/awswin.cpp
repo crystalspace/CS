@@ -9,6 +9,12 @@ const unsigned long awsWindow::sWindowClosed  = 0x5;
 
 
 void 
+awsWindow::SetRedrawTag(unsigned int tag)
+{
+ redraw_tag=tag;
+}
+
+void 
 awsWindow::Unlink()
 {
     // If there's someone below us, set their above to our above.
@@ -133,7 +139,7 @@ awsWindow::OnGainFocus()
 }
 
 void 
-awsWindow::OnDraw()
+awsWindow::OnDraw(csRect clip)
 {
 
 }
