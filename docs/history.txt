@@ -21,6 +21,7 @@ chronological order.
 	- res generally updated some of the information in the Win32 build 
 	  docs.
 	- res extended the "External Libraries" list somewhat.
+	- res fixed a small formatting error in the VC build docs.
 19-Mar-2004
 	- res fixed compilation of the aseie plugin.
 	- duhprey overrided the correct Write in null2d (from Jorrit)

@@ -261,7 +261,7 @@ Hebrew).  If your @file{CS} directory is under such a directory, try to move it
 to a directory which name has only Latin characters in it.
 @end itemize
 
-@subheading Blasting the Past
+@subsubheading Blasting the Past
 
 If you have previously used the @file{msvc_libs} package, it's recommended you
 remove it before installing the @file{cs-win32libs} package as outlined above.

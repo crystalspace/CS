@@ -467,7 +467,7 @@ If after doing this, you are still getting the same error, make sure that you
 have the @file{zlib.dll} installed, the @sc{vfs} plugin is dependent upon it.
 @end itemize
 
-@subheading Blasting the Past
+@subsubheading Blasting the Past
 
 If you have previously used the @file{msvc_libs} package, it's recommended you
 remove it before installing the @file{cs-win32libs} package as outlined above.
