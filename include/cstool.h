@@ -35,6 +35,7 @@
 #include "cstool/mdltool.h"
 #include "cstool/meshobjtmpl.h"
 #include "cstool/proctex.h"
+#include "cstool/proctxtanim.h"
 #include "cstool/rbuflock.h"
 #include "cstool/rendermeshholder.h"
 #include "cstool/rendermeshlist.h"
