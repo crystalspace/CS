@@ -32,12 +32,9 @@ W - Wishlist (the build also works without this feature)
     could be done either via a monolithic list or on a module-by-module basis
     in each module's Jamfile.  (What are the relative merits of each approach?)
     Obvious examples for which MSVC project files should not be created are
-    those modules which are specific to Unix and MacOS/X.
-[H] An MSVC project file is created for the walktest_static variation. (Worse,
-    it generates the file out/apps/walktest/static/_crystal_static_init.cpp and
-    references it in the project file; _and_ it even compiles that file.  This
-    is especially bad for automated project file creation on the SourceForge
-    shell machine where the compiler is unavailable.)
+    those modules which are specific to Unix and MacOS/X. "static" variations
+    of targets are also very good candidates for exclusion.  (Be sure to
+    exclude walktest_static.)
 [H] msvcgen.jam: When modules reference sources or headers outside of the local
     source directory via some number of ".."'s, these resources appear as
     "../../foo/bar/../../this/module" in the generated project file.  (If MSVC6
