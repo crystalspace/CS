@@ -98,6 +98,7 @@ window "Another"
 {
   Frame: (100,100)-(500,440)
   Style: wfsNormal
+  Title: "A window with lots of stuff"
 
   component "HideWindow" is "Command Button"
   {
