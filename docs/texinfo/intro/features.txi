@@ -4,34 +4,46 @@
 @cindex Features
 
 @emph{Last updated by Chris Forno, @email{jcore@@arbornet.org} on 2002-06-19.
-Please feel free to add comments or email me if any of the information is
+Please feel free to add comments or email me if any of the information here is
 incorrect or out-of-date.}
 
-The first feature to mention here is that Crystal Space is an Open Source
-project (or a Free Software project, depending on your religion). It is
-released under the GNU Lesser General Public License (GNU LGPL). @xref{License}.
+The first feature to mention here are that Crystal Space is an Open Source
+project (or a Free Software project, depending on your religion) that is
+freely available under the @sc{gnu} Lesser General Public License
+(@sc{gnu lgpl}). @xref{License}. The developers come from a wide range of
+backgrounds and as a result Crystal Space runs on a wide variety of platforms.
 
-Crystal Space is divided into several libraries and plug-ins. The items in the
-feature list are sorted by the library or plug-in that are responsible for
-them. Note that this is not a description of how these components work
-together. Since Crystal Space is in active development, not all features (or
-even libraries and plug-ins for that matter) are mentioned here. You are
-advised to browse the source code or the mailing list to get the most up-to-date
-idea of Crystal Space's current feature set.
+Crystal Space has been known to run on the following systems. Note that if a
+system is listed here it does not necessarily mean that it is 100% supported:
 
-Here are some of Crystal Space's current features in no particular order:
+@itemize @bullet
+@item
+BeOS
 
-@table @emph
-@item System Library
-The system library performs system-dependent operations (such as dynamically
-loading shared libraries). This helps to make your program easily portable to
-any supported platform. It originally provided a good deal of functionality
-but much of the code has migrated to the Tool and Utility libraries.
+@item
+@sc{dos}, win32 (Windows 9x/NT/ME/2000/XP)
 
-@item Geometry Library
-The geometry library provides 3D maths for the rest of Crystal Space.  It is
-also useful on its own and can be used independently from the rest of Crystal
-Space.
+@item
+FreeBSD, NetBSD
+
+@item
+Linux, @sc{gnu/hurd}
+
+@item
+MacOS/X, MacOS/X Server 1.0 (Rhapsody)
+
+@item
+OpenStep, NextStep
+
+@item
+@sc{os/2}
+@end itemize
+
+Here are some of just some of Crystal Space's features in no particular order:
+
+@c this used to be listed by library and plug-in, but I found that organization
+@c redundant after looking at some other sections of the documentation,
+@c namely the directory hierarchy section
 
 @itemize @bullet
 @item
@@ -48,21 +60,15 @@ splines
 
 @item
 2D and 3D matrices (and transforms)
-@end itemize
-
-@item Utility Library
-The Utility Library provides low-level functionality for the rest of Crystal
-Space.
-
-@itemize @bullet
-@item
-SCF (the backbone of object-orientation in Crystal Space. @xref{SCF})
 
 @item
-plugin manager
+@sc{SCF} (the backbone of object-orientation in Crystal Space. @xref{SCF})
 
 @item
-archival (ZIP files)
+plug-in system
+
+@item
+archival (@sc{zip} files)
 
 @item
 configuration files
@@ -80,13 +86,10 @@ user input
 md5 signatures
 
 @item
-debugging functions
-
-@item
 random number generator
 
 @item
-a virtual clock and scheduler
+virtual clock and scheduler
 
 @item
 strings
@@ -102,21 +105,9 @@ hash maps
 
 @item
 progress meters and pulses (in text)
-@end itemize
-
-@item Tool Library
-The Tool Library is a higher-level library that provides a number of tools such
-as:
-
-@itemize @bullet
-@item
-application initialization
 
 @item
-video preferences
-
-@item
-screen FX (fading, whiteout, etc)
+screen @sc{fx} (fading, whiteout, etc)
 
 @item
 procedural textures
@@ -126,60 +117,29 @@ procedural textures
 
 @item
 sprite building
-@end itemize
-
-@item Windowing System Library
-CSWS provides a collection of objects that can be used to create a portable
-GUI that runs inside of Crystal Space.  The interface look can also be
-customized at runtime and textured to fit with your project. It includes the
-following widgets:
-
-@itemize @bullet
-@item
-buttons (command buttons, checkboxes, radio buttons)
 
 @item
-menus
+two different windowing systems
 
 @item
-scrollbars
+2D canvases (null, memory, OpenGL, DirectDraw, X11, Allegro, @sc{dos},
+@sc{dive})
 
 @item
-dialogs (including ready-made dialogs such as file selection and color
-selection)
+3D renderers (null, software, OpenGL, Line 3D)
 
 @item
-trees and listboxes
+@sc{avi} streams (@sc{rle}, DivX 4, OpenDivX)
 
 @item
-layout widgets (notebook, grid)
+image loaders (@sc{bmp}, @sc{gif}, @sc{jpg}, @sc{png}, @sc{sgi}, @sc{tga},
+@sc{wal})
 
-@item
-GUI hints
-@end itemize
-
-@item Video Plug-in
-@itemize @bullet
-@item
-2D canvas (null, memory, OpenGL, DirectDraw, X11, Allegro, DOS, DIVE)
-
-@item
-3D renderer (null, software, OpenGL, Line 3D)
-
-@item
-AVI streams (RLE, DivX 4, OpenDivX)
-
-@item
-image loaders (BMP, GIF, JPG, PNG, SGI, TGA, WAL)
-@end itemize
-
-@item 3D Engine Plug-in
-@itemize @bullet
 @item
 portals and sectors
 
 @item
-polygon trees (BSP, octree)
+polygon trees (@sc{bsp}, octree)
 
 @item
 lighting (static, pseudo-dynamic, dynamic, halos, shadows, radiosity)
@@ -198,43 +158,22 @@ textures and materials
 
 @item
 isometric engine
-@end itemize
-
-@item Virtual File System (VFS) Plug-in
-@itemize @bullet
-@item
-cross-platform file access (I/O and file attributes)
 
 @item
-filesystem abstraction (archives may be treated the same as a native
-filesystem)
+a virtual file system
 
 @item
-a virtual path
+sound drivers (CoreAudio, @sc{oss}, and WaveOut)
 
 @item
-find files
-@end itemize
-
-@item Sound Plug-in
-@itemize @bullet
-@item
-drivers for CoreAudio (MacOS X), OSS (UNIX), and WaveOut (Windows)
+sound renderers (software, DirectSound 3D, @sc{eax}, aRts)
 
 @item
-renderers (software, DirectSound 3D, EAX, aRts)
+sound loaders (@sc{wav}, @sc{au}, @sc{iff}, @sc{aiff}, @sc{mod}, @sc{mp3},
+@sc{ogg})
 
 @item
-loaders (WAV, AU, IFF, AIFF, MOD, MP3, OGG)
-
-@item
-multiplexer
-@end itemize
-
-@item Mesh Plug-in
-@itemize @bullet
-@item
-Thing meshes
+thing and mesh objects
 
 @item
 2D and 3D sprites
@@ -253,55 +192,40 @@ haze meshes
 
 @item
 mesh builders and sprite factories
+
+@item
+volumetric light
+
+@item
+pull-down console
+
+@item
+network sockets
+
+@item
+collision detection (using @sc{rapig})
+
+@item
+bitmapped and vector fonts
+
+@item
+map file loader and converters
+
+@item
+scripting engine
+
+@item
+performance statistics
+
+@item
+skeletal animation
+
+@item
+object movement
+
+@item
+Dynavis visibility culling system
+
+@item
+debugging system
 @end itemize
-
-@item Console Plug-in
-The console plug-in can be used to create a pull-down console similar to one
-you would find in nearly any FPS today.
-@emph{FIXME:} add console features.
-
-@item Network Plug-in
-The network plug-in provides BSD-style socket access for UNIX, win32, BeOS, and
-OS/2.
-@emph{FIXME:} add network features.
-
-@item Collide Plug-in
-The collide plug-in provides collision detection using the RAPID library.
-@emph{FIXME:} add collision detection features.
-
-@item Font Plug-in
-The font plug-in provides access to bitmapped and scalable fonts.
-@emph{FIXME:} add font features.
-
-@item Parser Plug-in
-The parser plug-in handles loading and parsing map files.
-@emph{FIXME:} add map file parser features.
-
-@item Script Plug-in
-The script plug-in uses python to provide scripting capabilities to Crystal
-Space projects.
-@emph{FIXME:} add script features.
-
-@item Alternate Windowing System (AWS) Plug-in
-The AWS plug-in provides an alternative to the CSWS (Crystal Space Windowing
-System).
-@emph{FIXME:} add AWS features.
-
-@item Performance Statistics Plug-in
-@emph{FIXME:} add performance statistic features.
-
-@item Motion Plug-in
-The motion plug-in is capable of skeletal animation.
-@emph{FIXME:} add motion plug-in features.
-
-@item Dynavis Culling Plug-in
-Dynavis is a dynamic visibility system that is currently under development by
-Jorrit.  It will change a bit about how maps are loaded and rendered.
-@emph{FIXME:} add dynavis features.
-
-@item Bugplug Plug-in
-Bugplug is a new debugging plug-in that is under development along with
-Dynavis.
-@emph{FIXME:} add bugplug features.
-
-@end table

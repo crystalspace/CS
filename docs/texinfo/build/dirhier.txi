@@ -27,7 +27,7 @@ executables. The two files @file{vfs.cfg} and @file{scf.cfg} also reside in this
 
 @item CS/out
 This directory is used by the build process. It will contain all object,
-dependency files and other files needed for building the Crystal Space
+dependency, and other files needed for building the Crystal Space
 applications, libraries, and plugins.
 
 @item CS/apps
@@ -68,8 +68,8 @@ directory.
 
 @item CS/docs/html
 This directory contains the @sc{html} conversion of the Texinfo Crystal Space
-documentation.  Most users will want to look at the @file{CS/docs/html/index.htm}
-that resides here.
+documentation.  Most users will want to look at the file
+@file{CS/docs/html/index.html} that resides here.
 
 @item CS/docs/incoming
 This is a temporary staging area for documentation which has not yet been
@@ -77,14 +77,18 @@ converted to Texinfo format.  Much of this documentation is useful and worth
 perusing.
 
 @item CS/docs/pubapi
-This directory contains the Crystal Space SDK's public API reference manual
-rendered in @sc{html} format.
+This directory contains the Crystal Space @sc{sdk}'s public @sc{api} reference
+manual rendered in @sc{html} format.
+
+@item CS/docs/support
+This directory contains support scripts and templates for automatically
+generating documentation.
 @end table
 
 @item CS/include
 Here are the headers that can be used from other modules. The path for the
-headers reflect the structure of the modules in the @file{CS/lib} directory. So for
-further explanation of a specific directory see the @file{CS/lib} section.
+headers reflect the structure of the modules in the @file{CS/lib} directory. So
+for further explanation of a specific directory see the @file{CS/lib} section.
 Include files which live in this directory itself (i.e. not deeper in the
 hierarchy) contain definitions for @sc{scf} interfaces.
 @xref{SCF}.
@@ -103,27 +107,36 @@ libraries (csutil, csgeom, csgfxldr).  The 3D engine exports a number of
 @sc{scf} interfaces to allow access through the @sc{scf} mechanism.
 
 @table @code
+@item CS/libs/csengine/basic
+collections, movable sector list, polygon edges
+@item CS/libs/csengine/culler
+visibility culling
 @item CS/libs/csengine/light
-Lighting system
+lighting system
 @item CS/libs/csengine/objects
-Things and Mesh objects
+things and mesh objects
 @item CS/libs/csengine/polygon
-Polygon related functionality
+polygons and portals
+@item CS/libs/csengine/polytree
+BSP trees and octrees
 @end table
 
 @item CS/libs/csgeom
-The geometry library.  Various geometry related functions and classes can be
+The geometry library. Various geometry related functions and classes can be
 found here: matrices, vectors, transforms, clipper, planes, etc.
 
 @item CS/libs/csgfx
-The graphics library.  Routines to support loading various graphic file
-formats (through plugins) and put them internally in the same format.
-Through this library you can get at @sc{jpg}, @sc{gif}, @sc{tga}, @sc{png},
-and @sc{bmp} files.
+The graphics library. Here you will find bumpmapping, mipmapping, quantizers,
+and routines to support loading an image file (through the various image
+loading plug-ins).
+
+@item CS/libs/csphyzik
+The phyzik library. A collection of algorithms for simulating the real-world
+physics of motion. A solver for friction, joints, kinematics, and more.
 
 @item CS/libs/cssys
-All system dependent stuff (non-graphics and non-sound related) is in this
-library.
+All system-dependent source and make files (non-graphics and non-sound related)
+are located here.
 
 @table @code
 @item CS/libs/cssys/general
@@ -137,20 +150,25 @@ MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, NextStep
 @item CS/libs/cssys/os2
 @sc{os/2}
 @item CS/libs/cssys/unix
-Unix, including Linux, Solaris, Irix, etc.
+Linux, FreeBSD, NetBSD, Solaris, Irix, @sc{gnu/hurd}
 @item CS/libs/cssys/win32
-Win32
+Windows 32-bit (9x, NT, ME, 2000, XP)
 @end table
 
+@item CS/libs/cstool
+This library contains low-level code that the rest of Crystal Space depends on.
+It includes procedural textures, a video perference manager, 2D animations,
+key-value pairs, screen effects, map nodes, and more.
+
 @item CS/libs/csutil
-This library contains various utilities.  There is an Archive class which can
-read and/or write @sc{zip} archives.  There is a vector class, a sparse matrix class
-and some other useful goodies.  This library requires the use of the external
-@file{zlib} library which is used to read/write @sc{zip} archives.
+This library contains various utilities. The utilities include an archiver,
+configuration manager, virtual clock, scheduler, strings, hash maps, all
+@sc{scf} (@xref{SCF}) functionality, md5 algorithm, map file parser,
+command-line parser, event structures, and many others.
 
 @item CS/libs/csws
-The Crystal Space Window System which is nicely integrated with Crystal Space.
-It is also platform independent.
+The Crystal Space Windowing System which is nicely integrated with Crystal
+Space and is also platform independent.
 @end table
 
 @item CS/mk
@@ -161,12 +179,19 @@ This directory contains the common parts of the makefiles for many systems
 Component for automatic generation of Visual C++ project files based upon
 information gleaned from @sc{gnu} makefiles project-wide.
 @item CS/mk/visualc
-Project files for Win32 using @sc{msvc} 5.0/ 6.0
+Project files for Win32 using @sc{msvc} 5.0/6.0/7.0
 @end table
 
 @item CS/plugins
-Plug-in, dynamically loaded modules.  Communication with these modules is
-performed strictly via @sc{scf} interfaces.  @xref{SCF}.
+Dynamically loaded plug-ins. Communication with these modules is performed
+strictly via @sc{scf} interfaces. @xref{SCF}.
+
+@table @code
+@item CS/plugin/aws
+Alternate Windowing System
+
+@item CS/plugins/bugplug
+Crystal Space Debugger
 
 @item CS/plugins/csparser
 A plugin which parses @sc{ascii} map files and imports the map into the
@@ -242,6 +267,7 @@ The @emph{null} rasterizer (required to work with 2D graphics only)
 
 @item CS/plugins/video/format
 Support for playing video files on a texture.
+@end table
 
 @item CS/plugins/net/driver
 Network drivers.  The only existing driver is a @sc{bsd} socket-based
