@@ -3,19 +3,21 @@ he history order is reversed so that new features are at the top.
 10-Jan-2002
 	- Matze added an autoconf macro for CS to scripts/cs-config, no
 	  documentation on usage yet, but I think it should be clear how to use
-	  it if you know autoconf
+	  it if you know autoconf.
 9-Jan-2002
 	- Eric Sunshine applied a much saner patch to the makefiles to combat
 	  the breakage caused by AndyZ's makefile change.  Reverted a patch
 	  which Philip Wyett made to cygwin.mak since the new saner patch
 	  should make the cygwin.mak patch unnecessary.
 	- Matze added DEBUG_BREAK_MSG macro to cssysdef.h in order to avoid the
-	  STR_FATAL macro in csstring.h (perhaps this will also usefull for other apps).
-          Problem here is win32 as I had to use printf (or is there a way to access the
-	  reporter wihtout having a pointer to iObjectRegistry?)
-	- Matze added operator == const char* to csString
-	- Matze added operator = for various types to csString
-	- smaller cleanups for csString - there's still MUCH room for optimisations
+	  STR_FATAL macro in csstring.h (perhaps this will also useful for
+	  other apps). Problem here is win32 as I had to use printf (or is
+	  there a way to access the reporter wihtout having a pointer to
+	  iObjectRegistry?).
+	- Matze added operator == const char* to csString.
+	- Matze added operator = for various types to csString.
+	- Smaller cleanups for csString - there's still MUCH room for
+	  optimisation.
 8-Jan-2002
 	- Reverted a change to the png loader plugin (in the saving part)
 	  that 'res' made some time ago. It caused quality degradation when
@@ -245,10 +247,10 @@ he history order is reversed so that new features are at the top.
 	  canvases, renderers, ...).
 	- Removed the reference to the plugin manager from the OpenGL and
 	  perfstats plugins. This is also a circular reference.
-	- fixed SCF_DEBUG to work correctly with embeded interfaces
-	- fixed some compiler warnings
-	- fixed definition of int32 and uint32 should be long not int
-	- removed the type UByte,SByte, UShort,SShort, ULong,SLong, UInt, 
+	- Matze fixed SCF_DEBUG to work correctly with embeded interfaces.
+	- Matze fixed some compiler warnings.
+	- Matze fixed definition of int32 and uint32 should be long not int
+	- Matze removed the type UByte,SByte, UShort,SShort, ULong,SLong, UInt, 
 	  SInt, uchar, ushort and ulong and substituted code with the
 	  corresponding intxx types.
 	- Philip Wyett reports: standardized and optimized methods
