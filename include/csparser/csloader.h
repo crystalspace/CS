@@ -22,7 +22,6 @@
 
 #include "imap/parser.h"
 
-#include "csparser/loadinfo.h"
 #include "csutil/csvector.h"
 #include "csutil/util.h"
 #include "csgeom/quaterni.h"
@@ -65,7 +64,7 @@ class csLoader : public iLoader
     // Find a loader plugin record
     struct csLoaderPluginRec* FindPlugInRec (const char* name);
     // Return the loader plugin from a record, possibly loading the plugin now
-    iLoaderPlugIn* GetPluginFromRec (csLoaderPluginRec *rec, const char *FuncID);
+    iLoaderPlugIn* GetPluginFromRec (csLoaderPluginRec*, const char *FuncID);
   public:
     iSystem *System;
 

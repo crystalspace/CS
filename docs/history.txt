@@ -19,6 +19,19 @@ The history order is reversed so that new features are at the top.
 	  (DO.SHARED.PLUGIN.POSTAMBLE in nextstep.mak) to take into account
 	  the name change: module_GetClassTable() -> module_scfInitialize().
 	  Also repaired the NextStep documentation in this regard.
+	- Eric Sunshine fixed a problem which prevented `simple' from
+	  successfully linking on NextStep.  The problem was that the csparser
+	  library still had dependencies upon csengine on NextStep.  The
+	  problem was that the NextStep compiler has the peculiar behavior of
+	  generating references to all symbols which are seen by it even if no
+	  actual code refers to those symbols.  Thus, even unnecessarily
+	  including a header file will result in dependencies upon the symbols
+	  in the header.  In this case, impexp.cpp, which is part of csparser,
+	  was unnecessarily including csengine/thing.h and csengine/meshobj.h.
+	  Furthermore, csloader.h was unnecessarily including the obsolete
+	  loadinfo.h header which contains forward references to a couple
+	  csengine classes.  I also moved loadinfo.h to the CVS Attic since it
+	  is no longer used.
 31-May-2001
 	- In an effort to understand how the keyframer section in 3DS
 	  works I extended 3ds2lev verbose option to also list the contents

@@ -35,8 +35,6 @@
 #include <limits.h>
 #include <stdarg.h>
 
-#include "csengine/thing.h"
-#include "csengine/meshobj.h"
 #include "csutil/csstring.h"
 #include "cssys/csendian.h"
 #include "isys/vfs.h"
