@@ -28,6 +28,7 @@
 #include "cs2d/mac/xsysg2d.h"
 
 class csTextureHandle;
+class csGraphics2DOpenGLFontServer;
 
 // the CLSID to create csGraphics2DWin32 instances.
 extern const CLSID CLSID_OpenGLGraphics2D;
@@ -106,6 +107,8 @@ public:
 	 */
 	static unsigned char* GetPixelAtGL (int x, int y);
 
+	void			Clear( int color );
+
 protected:
 	CWindowPtr			mMainWindow;
 	GDHandle			mMainGDevice;
@@ -117,8 +120,11 @@ protected:
     short				mOldDepth;
 	CGrafPtr			mSavedPort;
 	GDHandle			mSavedGDHandle;
-      short				mActivePage;
+    short				mActivePage;
 
+	static csGraphics2DOpenGLFontServer *sLocalFontServer;
+
+	static void			SetGLColorfromInt( int color );
 	void				DisplayErrorDialog( short errorIndex );
 
 	DECLARE_IUNKNOWN()

@@ -16,9 +16,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <windows.h>
 #include <gl/gl.h>
 
+#include <Windows.h>
 #include <Dialogs.h>
 #include <TextUtils.h>
 
@@ -26,6 +26,7 @@
 #include "sysdef.h"
 #include "cscom/com.h"
 #include "cs2d/openglmac/oglg2d.h"
+#include "cs2d/openglmac/oglFont.h"
 #include "isystem.h"
 
 /////The 2D Graphics Driver//////////////
@@ -39,6 +40,8 @@ BEGIN_INTERFACE_TABLE(csGraphics2DOpenGL)
 END_INTERFACE_TABLE()
 
 IMPLEMENT_UNKNOWN(csGraphics2DOpenGL)
+
+csGraphics2DOpenGLFontServer *csGraphics2DOpenGL::sLocalFontServer = NULL;
 
 csGraphics2DOpenGL::csGraphics2DOpenGL(ISystem* piSystem, bool bUses3D) : 
                    csGraphics2D (piSystem)
@@ -181,11 +184,6 @@ void csGraphics2DOpenGL::Initialize(void)
   		pfmt.GreenMask = 0x1F << 5;
   		pfmt.BlueMask = 0x1F;
   		complete_pixel_format();
-
-		DrawPixel = DrawPixel16;
-		WriteChar = WriteChar16;
-		GetPixelAt = GetPixelAt16;
-		DrawSprite = DrawSprite16;
 	} else {
 		/*
 		 *	The 8 bit pixel data was filled in by csGraphics2D
@@ -302,9 +300,17 @@ bool csGraphics2DOpenGL::Open(char *Title)
 	aglSetDrawable( mGLContext, mMainWindow );
 	aglSetCurrentContext( mGLContext );
 
+	/* Setup the fonts for OpenGL */
+	if (sLocalFontServer == NULL) {
+		sLocalFontServer = new csGraphics2DOpenGLFontServer(&FontList[0]);
+		for (int fontindex=1; fontindex < 8; fontindex++)
+			sLocalFontServer->AddFont(FontList[fontindex]);
+	}
+
 	/* Clear color buffer to black */
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
+	aglSwapBuffers( mGLContext );
 
 	if ( glGetString( GL_RENDERER ))
 		SysPrintf( MSG_INITIALIZATION, "OpenGL Renderer is %s\n", glGetString(GL_RENDERER) );
@@ -360,10 +366,17 @@ bool csGraphics2DOpenGL::DoubleBuffer()
 void csGraphics2DOpenGL::Print( csRect *area )
 {
 	aglSwapBuffers( mGLContext );
+	glFlush ();
 }
 
 bool csGraphics2DOpenGL::BeginDraw()
 {
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0.,(GLdouble)Width,0.,(GLdouble)Height,-1.0,100.0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
 	return true;
 }
 
@@ -437,12 +450,28 @@ bool csGraphics2DOpenGL::SetMouseCursor( int iShape, ITextureHandle* iBitmap )
   return cursorSet;
 }
 
+void csGraphics2DOpenGL::SetGLColorfromInt( int color )
+{
+	switch (pfmt.PixelBytes) {
+		case 1: // paletted colors
+			glColor3i(Palette[color].red, Palette[color].green, Palette[color].blue);
+			break;
+
+		case 2: // 16bit color
+		case 4: // truecolor
+			glColor3f(  (float)((color & pfmt.RedMask) >> pfmt.RedShift )     / (float)pfmt.RedBits,
+						(float)((color & pfmt.GreenMask) >> pfmt.GreenShift ) / (float)pfmt.GreenBits,
+						(float)((color & pfmt.BlueMask) >> pfmt.BlueShift )   / (float)pfmt.BlueBits );
+			break;
+	}
+}
+
 void csGraphics2DOpenGL::DrawLine( float x1, float y1, float x2, float y2, int color )
 {
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_BLEND);
 	glBegin(GL_LINES);
-	glColor3f(1.0f, 1.0f, 1.0f);
+	SetGLColorfromInt( color );
 	glVertex2f(x1, (float)Height-y1-1.0f);
 	glVertex2f(x2, (float)Height-y2-1.0f);
 	glEnd();
@@ -453,7 +482,7 @@ void csGraphics2DOpenGL::DrawHorizLine (int x1, int x2, int y, int color)
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_BLEND);
 	glBegin(GL_LINES);
-	glColor3f(1., 1., 1.);
+	SetGLColorfromInt( color );
 	glVertex2i(x1, Height-y-1);
 	glVertex2i(x2, Height-y-1);
 	glEnd ();
@@ -464,13 +493,21 @@ void csGraphics2DOpenGL::DrawPixelGL (int x, int y, int color)
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_BLEND);
 	glBegin(GL_POINTS);
-	glColor3f(1., 1., 1.);
+	SetGLColorfromInt( color );
 	glVertex2i(x, Height-y-1);
 	glEnd();
 }
 
 void csGraphics2DOpenGL::WriteCharGL(int x, int y, int fg, int bg, char c)
 {
+	glDisable( GL_TEXTURE_2D );
+	glDisable( GL_BLEND );
+	glDisable( GL_DEPTH_TEST );
+  
+	SetGLColorfromInt( fg );
+	glRasterPos2i( x, Height-y-1 );
+
+	sLocalFontServer->WriteCharacter( c, Font );
 }
 
 void csGraphics2DOpenGL::DrawSpriteGL(ITextureHandle *hTex, int sx, int sy,
@@ -481,6 +518,23 @@ void csGraphics2DOpenGL::DrawSpriteGL(ITextureHandle *hTex, int sx, int sy,
 unsigned char* csGraphics2DOpenGL::GetPixelAtGL(int /*x*/, int /*y*/)
 {
 	return NULL;
+}
+
+void csGraphics2DOpenGL::Clear( int color )
+{
+	switch (pfmt.PixelBytes) {
+		case 1: // paletted colors
+			glClearColor(Palette[color].red, Palette[color].green, Palette[color].blue, 0.0f);
+			break;
+
+		case 2: // 16bit color
+		case 4: // truecolor
+			glClearColor(  (float)((color & pfmt.RedMask) >> pfmt.RedShift )     / (float)pfmt.RedBits,
+						(float)((color & pfmt.GreenMask) >> pfmt.GreenShift ) / (float)pfmt.GreenBits,
+						(float)((color & pfmt.BlueMask) >> pfmt.BlueShift )   / (float)pfmt.BlueBits, 0.0f );
+			break;
+	}
+	glClear(GL_COLOR_BUFFER_BIT);
 }
 
 
