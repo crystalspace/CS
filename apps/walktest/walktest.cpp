@@ -1402,7 +1402,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     }
 
     Printf (CS_MSG_INITIALIZATION, "Creating initial room!...\n");
-    Engine->EnableLightingCache (false);
+    Engine->SetLightingCacheMode (0);
 
     // Unfortunately the current movement system does not allow the user to
     // move around the maze unless collision detection is enabled, even

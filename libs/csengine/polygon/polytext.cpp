@@ -267,7 +267,8 @@ csPolyTexture::csPolyTexture ()
 
 csPolyTexture::~csPolyTexture ()
 {
-  csEngine::current_engine->G3D->RemoveFromCache (this);
+  if (csEngine::current_engine->G3D)
+    csEngine::current_engine->G3D->RemoveFromCache (this);
   CS_ASSERT (cache_data[0] == NULL);
   CS_ASSERT (cache_data[1] == NULL);
   CS_ASSERT (cache_data[2] == NULL);
@@ -312,7 +313,10 @@ void csPolyTexture::CreateBoundingTextureBox ()
   Fmax_v = max_v;
 
   int ww, hh;
-  mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
+  if (mat_handle && mat_handle->GetTexture ())
+    mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
+  else
+    ww = hh = 64;
   Imin_u = QRound (min_u * ww);
   Imin_v = QRound (min_v * hh);
   Imax_u = QRound (max_u * ww);
@@ -405,7 +409,10 @@ bool csPolyTexture::GetLightmapBounds (const csVector3& lightpos, bool mirror,
   int lmh = lm->rheight;
 
   int ww, hh;
-  mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
+  if (mat_handle && mat_handle->GetTexture ())
+    mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
+  else
+    ww = hh = 64;
   float inv_ww = 1.0 / ww;
   float inv_hh = 1.0 / hh;
 
@@ -577,7 +584,10 @@ void csPolyTexture::GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &c
   if (!lm) return;
 
   int ww, hh;
-  mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
+  if (mat_handle && mat_handle->GetTexture ())
+    mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
+  else
+    ww = hh = 64;
 
   csPolyTxtPlane *txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
 
@@ -747,7 +757,10 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
   csShadowMap *smap = NULL;
 
   int ww, hh;
-  mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
+  if (mat_handle && mat_handle->GetTexture ())
+    mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
+  else
+    ww = hh = 64;
   float inv_ww = 1.0 / ww;
   float inv_hh = 1.0 / hh;
 

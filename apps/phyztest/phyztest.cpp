@@ -213,7 +213,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
 
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
-  engine->EnableLightingCache (false);
+  engine->SetLightingCacheMode (0);
 
   // Create our world.
   Printf (CS_MSG_INITIALIZATION, "Creating world!...\n");

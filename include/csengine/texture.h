@@ -213,12 +213,13 @@ inline int csTextureWrapper::GetFlags ()
 { return flags; }
 inline void csTextureWrapper::UpdateKeyColorFromHandle ()
 {
-  if (handle->GetKeyColor ())
+  if (handle && handle->GetKeyColor ())
   {
     UByte r, g, b;
     handle->GetKeyColor (r, g, b);
     SetKeyColor ((int)r, (int)g, (int)b);
-  } else
+  }
+  else
     key_col_r = -1;
 }
 inline void csTextureWrapper::UpdateKeyColorFromImage ()

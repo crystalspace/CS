@@ -41,8 +41,6 @@
 #include "iengine/texture.h"
 #include "ivideo/txtmgr.h"
 
-bool csPolygon3D::do_cache_lightmaps = true;
-
 // This is a static vector array which is adapted to the
 // right size everytime it is used. In the beginning it means
 // that this array will grow a lot but finally it will
@@ -1627,8 +1625,8 @@ bool csPolygon3D::WriteToCache (int id)
   if (!lmi->lightmap_up_to_date)
   {
     lmi->lightmap_up_to_date = true;
-    if (csEngine::current_engine->IsLightingCacheEnabled ()
-    	&& do_cache_lightmaps)
+    if (csEngine::current_engine->GetLightingCacheMode ()
+    	& CS_ENGINE_CACHE_WRITE)
       lmi->tex->lm->Cache (id, this, NULL, csEngine::current_engine);
   }
   return true;

@@ -37,24 +37,28 @@ static const csOptionDescription config_options [] =
   {  5, "relight",  "Force/inhibit recalculation of lightmaps", CSVAR_BOOL },
   {  6, "revis",    "Force/inhibit recalculation of visibility data",
                      CSVAR_BOOL },
-  {  7, "cache",    "Enable caching of generated lightmaps", CSVAR_BOOL },
-  {  8, "radstep",  "Enable radiosity step-by-step", CSVAR_BOOL }
+  {  7, "radstep",  "Enable radiosity step-by-step", CSVAR_BOOL }
 };
 const int NUM_OPTIONS =
   (sizeof (config_options) / sizeof (config_options [0]));
 
-static bool config_relight () { return csEngine::do_force_relight; }
+static bool config_relight ()
+{
+  return csEngine::lightcache_mode == CS_ENGINE_CACHE_WRITE;
+}
+
 static void config_relight (bool flag)
 {
-  csEngine::do_force_relight = flag;
-  csEngine::do_not_force_relight = !flag;
+  if (flag)
+    csEngine::lightcache_mode = CS_ENGINE_CACHE_WRITE;
+  else
+    csEngine::lightcache_mode = CS_ENGINE_CACHE_READ;
 }
 
 static bool config_revis () { return csEngine::do_force_revis; }
 static void config_revis (bool flag)
 {
   csEngine::do_force_revis = flag;
-  csEngine::do_not_force_revis = !flag;
 }
 
 static bool config_recalc () { return config_relight() || config_revis(); }
@@ -76,8 +80,7 @@ bool csEngineConfig::SetOption (int id, csVariant* value)
     case 4:  config_recalc  (value->v.b); break;
     case 5:  config_relight (value->v.b); break;
     case 6:  config_revis   (value->v.b); break;
-    case 7:  csPolygon3D::do_cache_lightmaps = value->v.b; break;
-    case 8:  csEngine::do_rad_debug = value->v.b; break;
+    case 7:  csEngine::do_rad_debug = value->v.b; break;
     default: return false;
   }
   return true;
@@ -95,8 +98,7 @@ bool csEngineConfig::GetOption (int id, csVariant* value)
     case 4:  value->v.b = config_recalc (); break;
     case 5:  value->v.b = config_relight(); break;
     case 6:  value->v.b = config_revis  (); break;
-    case 7:  value->v.b = csPolygon3D::do_cache_lightmaps; break;
-    case 8:  value->v.b = csEngine::do_rad_debug; break;
+    case 7:  value->v.b = csEngine::do_rad_debug; break;
     default: return false;
   }
   return true;

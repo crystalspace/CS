@@ -261,7 +261,7 @@ void ceCswsEngineApp::SetupDefaultWorld ()
 {
   // First disable the lighting cache.
   engine->DeleteAll ();
-  engine->EnableLightingCache (false);
+  engine->SetLightingCacheMode (0);
 
   iMaterialWrapper* tm = engine->FindMaterial ("stone");
   if (!tm)
@@ -474,7 +474,7 @@ bool ceCswsEngineApp::HandleEvent (iEvent &Event)
 void ceCswsEngineApp::LoadNewMap (const char* filename)
 {
   // Enable the lighting cache again.
-  engine->EnableLightingCache (true);
+  engine->SetLightingCacheMode (CS_ENGINE_CACHE_READ);
 
   // If the selected file is already a 'world' file then
   // we use that.

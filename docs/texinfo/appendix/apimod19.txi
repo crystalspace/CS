@@ -954,3 +954,8 @@ Removed @code{csMeshWrapper::GetChildren()}.  Instead use
 Renamed @code{csFilenameMatches()} to @code{csGlobMatches()} (from
 @file{csutil} library).
 
+Removed @code{iEngine::EnableLightingCache()} and
+@code{iEngine::IsLightingCacheEnabled()}. Replaced with
+@code{iEngine::SetLightingCacheMode()} and
+@code{iEngine::GetLightingCacheMode()}.
+

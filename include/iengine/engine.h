@@ -109,6 +109,18 @@ struct iProgressMeter;
 #define CS_ENGINE_ZBUFFER 3
 
 /**
+ * Setting for SetLightingCacheMode().
+ * Read the cache.
+ */
+#define CS_ENGINE_CACHE_READ 1
+
+/**
+ * Setting for SetLightingCacheMode().
+ * Write the cache.
+ */
+#define CS_ENGINE_CACHE_WRITE 2
+
+/**
  * Flags for the callbacks called via iEngine::DrawFunc() or
  * iLight::LightingFunc().
  * (type iDrawFuncCallback or iLightingFuncCallback).
@@ -130,7 +142,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 2, 3);
+SCF_VERSION (iEngine, 0, 2, 5);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -157,6 +169,15 @@ struct iEngine : public iBase
    * report progress.
    */
   virtual bool Prepare (iProgressMeter* meter = NULL) = 0;
+
+  /**
+   * Calculate all lighting information. Normally you shouldn't call
+   * this function directly, because it will be called by Prepare().
+   * If the optional 'region' parameter is given then only lights will
+   * be recalculated for the given region.
+   */
+  virtual void ShineLights (iRegion* region = NULL,
+  	iProgressMeter* meter = NULL) = 0;
 
   /**
    * Query the format to load textures (usually this depends on texture
@@ -333,10 +354,13 @@ struct iEngine : public iBase
   /// Create a new collection.
   virtual iCollection* CreateCollection (const char* iName) = 0;
 
-  /// Enable/disable the lighting cache.
-  virtual void EnableLightingCache (bool do_cache) = 0;
-  /// Return true if lighting cache is enabled.
-  virtual bool IsLightingCacheEnabled () const = 0;
+  /**
+   * Set the mode for the lighting cache (combination of CS_ENGINE_CACHE_???).
+   * Default is CS_ENGINE_CACHE_READ.
+   */
+  virtual void SetLightingCacheMode (int mode) = 0;
+  /// Get the mode for the lighting cache.
+  virtual int GetLightingCacheMode () = 0;
 
   /// Return the current lightmap cell size
   virtual int GetLightmapCellSize () const = 0;

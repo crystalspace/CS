@@ -509,7 +509,9 @@ bool csCurve::WriteToCache (int id)
   if (!LightmapUpToDate)
   {
     LightmapUpToDate = true;
-    LightMap->Cache (id, NULL, this, csEngine::current_engine);
+    if (csEngine::current_engine->GetLightingCacheMode ()
+    	& CS_ENGINE_CACHE_WRITE)
+      LightMap->Cache (id, NULL, this, csEngine::current_engine);
   }
   return true;
 }

@@ -537,9 +537,6 @@ public:
   csFlags flags;
 
 public:
-  /// Option variable: cache lightmaps.
-  static bool do_cache_lightmaps;
-
 #ifdef DO_HW_UVZ
   csVector3 *uvz;
   bool isClipped;

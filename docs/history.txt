@@ -10,6 +10,43 @@ The history order is reversed so that new features are at the top.
 	- Fixed a few descriptions in makefiles so that they align properly.
 	- Removed link with CSPARSER from all makefiles. csParser is now
 	  a plugin.
+	- Added iEngine::ShineLights() for manually calculating lighting.
+	- The engine plugin can now be initialized without requiring a
+	  G3D plugin. This is useful for using the engine in a server
+	  setup or for calculating stuff (like lighting).
+	- Tried to modify the engine and parser so they work nicely without
+	  a 3D renderer. For the parser this is ok but it appears to be
+	  more complicated for the engine so I aborted this attempt.
+	- Removed EnableLightingCache() and IsLightingCacheEnabled()
+	  from the engine (iEngine and csEngine). Instead added
+	  SetLightingCacheMode() and GetLightingCacheMode(). There
+	  are two flags that you can combine and give to that function:
+	    CS_ENGINE_CACHE_READ
+	    CS_ENGINE_CACHE_WRITE
+	  If CS_ENGINE_CACHE_READ is set then the engine will try to
+	  read lightmaps from the cache. If this fails then no lighting
+	  will be present. If CS_ENGINE_CACHE_READ is not set then the
+	  engine will recalculate lighting.
+	  If CS_ENGINE_CACHE_WRITE is set then the engine will cache
+	  the resulting lighting.
+	- Added Lighter application which will do the lighting on a level.
+	  It even shows a graphical progress bar (this is now possible
+	  with the new iProgressMeter interface I made yesterday)
+	  Don't expect too much fancy graphics though! That's for later :-)
+	- Philip Wyett added lua support to VC port of CS. VC6 users
+	  can through the cslua plugin take advantage of the lua as a
+	  scripting choice for your development.
+	  Commented out a compile error lua maintainer should
+	  look at - search for REDEYE tag in "cs_lua.cpp"
+	  Jorrit fixed a compile error where a bad l-value was
+	  being attempted to be set.
+	  Added cslua to MSVCGEN process.
+	  Added a SCF entry for cslua plugin.
+	  Note: You need to download the new 0.19a winlibs
+	  archive with the lua dlls to test or use the new
+	  cs lua plugin/test app.
+	  The new winlibs can be obtained from:
+	      ftp.sunsite.dk/projects/crystal/support/win32
 5-Jul-2001
 	- Removed Glide renderer and canvases due to lack of
 	  maintenance. It was not functional either.

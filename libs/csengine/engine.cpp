@@ -396,10 +396,7 @@ iEngine* csEngine::current_iengine = NULL;
 bool csEngine::use_new_radiosity = false;
 int csEngine::max_process_polygons = 2000000000;
 int csEngine::cur_process_polygons = 0;
-bool csEngine::do_lighting_cache = true;
-bool csEngine::do_not_force_relight = false;
-bool csEngine::do_force_relight = false;
-bool csEngine::do_not_force_revis = false;
+int csEngine::lightcache_mode = CS_ENGINE_CACHE_READ;
 bool csEngine::do_force_revis = false;
 bool csEngine::do_rad_debug = false;
 
@@ -514,25 +511,34 @@ bool csEngine::Initialize (iSystem* sys)
   System = sys;
 
   if (!(G3D = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_VIDEO, iGraphics3D)))
-    return false;
+  {
+    // If there is no G3D then we still allow initialization of the
+    // engine because it might be useful to use the engine stand-alone
+    // (i.e. for calculating lighting and so on).
+    Warn ("No 3D driver!");
+  }
 
   if (!(VFS = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_VFS, iVFS)))
     return false;
 
-  G2D = G3D->GetDriver2D ();
+  if (G3D)
+    G2D = G3D->GetDriver2D ();
+  else
+    G2D = NULL;
 
   // don't check for failure; the engine can work without the image loader
   ImageLoader = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_IMGLOADER, iImageIO);
   if (!ImageLoader)
     Warn ("No image loader. Loading images will fail.");
 
+  // Reporter is optional.
   Reporter = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_REPORTER, iReporter);
 
   // Tell system driver that we want to handle broadcast events
   if (!System->CallOnEvents (&scfiPlugin, CSMASK_Broadcast))
     return false;
   
-  csConfigAccess cfg(System, "/config/engine.cfg");
+  csConfigAccess cfg (System, "/config/engine.cfg");
   ReadConfig (cfg);
 
   thing_type->Initialize (sys);
@@ -548,13 +554,25 @@ bool csEngine::HandleEvent (iEvent &Event)
     {
       case cscmdSystemOpen:
       {
-        csGraphics3DCaps *caps = G3D->GetCaps ();
-        fogmethod = caps->fog;
-        NeedPO2Maps = caps->NeedsPO2Maps;
-        MaxAspectRatio = caps->MaxAspectRatio;
+        if (G3D)
+	{
+          csGraphics3DCaps *caps = G3D->GetCaps ();
+          fogmethod = caps->fog;
+          NeedPO2Maps = caps->NeedsPO2Maps;
+          MaxAspectRatio = caps->MaxAspectRatio;
 
-        frame_width = G3D->GetWidth ();
-        frame_height = G3D->GetHeight ();
+          frame_width = G3D->GetWidth ();
+          frame_height = G3D->GetHeight ();
+	}
+	else
+	{
+          fogmethod = G3DFOGMETHOD_NONE;
+          NeedPO2Maps = false;
+          MaxAspectRatio = 4096;
+          frame_width = 640;
+          frame_height = 480;
+	}
+
         if (csCamera::GetDefaultFOV () == 0)
           csCamera::SetDefaultFOV (frame_height, frame_width);
 
@@ -567,7 +585,8 @@ bool csEngine::HandleEvent (iEvent &Event)
         }
 
         // Allow context resizing since we handle cscmdContextResize
-        G2D->AllowCanvasResize (true);
+        if (G2D)
+	  G2D->AllowCanvasResize (true);
 
         StartEngine ();
 
@@ -771,13 +790,6 @@ void csEngine::ResolveEngineMode ()
   }
 }
 
-void csEngine::EnableLightingCache (bool en)
-{
-  do_lighting_cache = en;
-  if (!do_lighting_cache) do_force_relight = true;
-  else do_force_relight = false;
-}
-
 int csEngine::GetLightmapCellSize () const
 {
   return csLightMap::lightcell_size;
@@ -855,14 +867,14 @@ bool csEngine::Prepare (iProgressMeter* meter)
   return true;
 }
 
-void csEngine::ShineLights (csRegion* region, iProgressMeter* meter)
+void csEngine::ShineLights (iRegion* iregion, iProgressMeter* meter)
 {
-  if (!do_not_force_relight)
+  if (lightcache_mode & CS_ENGINE_CACHE_READ)
   {
-    // If recalculation is not forced then we check if the 'precalc_info'
-    // file exists on the VFS. If not then we will recalculate in any case.
+    // If we have to read from the cache then we check if the 'precalc_info'
+    // file exists on the VFS. If not then we cannot use the cache.
     // If the file exists but is not valid (some flags are different) then
-    // we recalculate again.
+    // we cannot use the cache either.
     // If we recalculate then we also update this 'precalc_info' file with
     // the new settings.
     struct PrecalcInfo
@@ -942,11 +954,11 @@ void csEngine::ShineLights (csRegion* region, iProgressMeter* meter)
         current.lightmap_size);
       VFS->WriteFile ("precalc_info", data, strlen (data));
       Report ("Lightmap data is not up to date (reason: %s).", reason);
-      do_force_relight = true;
+      lightcache_mode &= ~CS_ENGINE_CACHE_READ;
     }
   }
 
-  if (do_force_relight)
+  if (!(lightcache_mode & CS_ENGINE_CACHE_READ))
   {
     Report ("Recalculation of lightmaps forced.");
     Report ("  Pseudo-radiosity system %s.",
@@ -962,6 +974,8 @@ void csEngine::ShineLights (csRegion* region, iProgressMeter* meter)
     csSector::cfg_reflections = 1;
   }
 
+  csRegion* region = NULL;
+  if (iregion) region = (csRegion*)(iregion->GetPrivateObject ());
   csLightIt* lit = NewLightIterator (region);
 
   // Count number of lights to process.
@@ -971,7 +985,7 @@ void csEngine::ShineLights (csRegion* region, iProgressMeter* meter)
   while (lit->Fetch ()) light_count++;
 
   bool do_relight = false;
-  if (do_force_relight && IsLightingCacheEnabled ())
+  if (!(lightcache_mode & CS_ENGINE_CACHE_READ))
     do_relight = true;
 
   int sn = 0;
@@ -997,7 +1011,7 @@ void csEngine::ShineLights (csRegion* region, iProgressMeter* meter)
       	iLightingInfo);
       if (linfo)
       {
-        if (do_force_relight || !IsLightingCacheEnabled ())
+        if (do_relight)
           linfo->InitializeDefault ();
 	else
 	  linfo->ReadFromCache (0);	// ID?
@@ -1031,7 +1045,7 @@ void csEngine::ShineLights (csRegion* region, iProgressMeter* meter)
     Report ("Time taken: %.4f seconds.", (float)(stop-start)/1000.);
 
   // Render radiosity
-  if (use_new_radiosity && !do_not_force_relight && do_force_relight)
+  if (use_new_radiosity && do_relight)
   {
     start = System->GetTime ();
     csRadiosity *rad = new csRadiosity (this, meter);

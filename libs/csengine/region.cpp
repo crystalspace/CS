@@ -310,7 +310,7 @@ bool csRegion::Region::PrepareTextures ()
 
 bool csRegion::Region::ShineLights ()
 {
-  scfParent->engine->ShineLights (scfParent);
+  scfParent->engine->ShineLights (this);
   return true;
 }
 

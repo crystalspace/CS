@@ -364,7 +364,7 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
 
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
-  engine->EnableLightingCache (false);
+  engine->SetLightingCacheMode (0);
 
   // Create our world.
   Printf (CS_MSG_INITIALIZATION, "Creating world!...\n");

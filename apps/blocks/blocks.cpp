@@ -3131,7 +3131,7 @@ int main (int argc, char* argv[])
 
   // Create our world.
   Sys->Printf (CS_MSG_INITIALIZATION, "Creating world!...\n");
-  Sys->engine->EnableLightingCache (false);
+  Sys->engine->SetLightingCacheMode (0);
 
   // Change to virtual directory where Blocks data is stored
   //if (!)

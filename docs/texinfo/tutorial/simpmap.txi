@@ -262,7 +262,7 @@ int main (int argc, char* argv[])
 One important note in the code above: we removed the following line:
 
 @example
-  engine->EnableLightingCache (false);
+  engine->SetLightingCacheMode (0);
 @end example
 
 That's because when we are loading from map file we actually want

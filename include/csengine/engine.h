@@ -377,12 +377,8 @@ public:
   long render_priority_object;
   long render_priority_alpha;
 
-  /// Option variable: inhibit lightmap recalculation?
-  static bool do_not_force_relight;
   /// Option variable: force lightmap recalculation?
-  static bool do_force_relight;
-  /// Option variable: inhibit visibility recalculation?
-  static bool do_not_force_revis;
+  static int lightcache_mode;
   /// Option variable: force visibility recalculation?
   static bool do_force_revis;
   /// Option variable: radiosity debugging (step by step)?
@@ -397,8 +393,6 @@ private:
   csDynLight* first_dyn_lights;
   /// List of halos (csHaloInformation).
   csHaloArray halos;  
-  /// If true then the lighting cache is enabled.
-  static bool do_lighting_cache;
   /// Debugging: maximum number of polygons to process in one frame.
   static int max_process_polygons;
   /// Current number of processed polygons.
@@ -548,7 +542,8 @@ public:
    * If the optional 'region' parameter is given then only lights will
    * be recalculated for the given region.
    */
-  void ShineLights (csRegion* region = NULL, iProgressMeter* meter = NULL);
+  virtual void ShineLights (iRegion* region = NULL,
+  	iProgressMeter* meter = NULL);
 
   /// Query the iObject for the engine.
   virtual iObject *QueryObject();
@@ -712,17 +707,12 @@ public:
   const csVector3& GetFrozenPosition () const { return freeze_pvs_pos; }
 
   /**
-   * Cache lighting. If true (default) then lighting will be cached in
-   * either the map file or else 'precalc.zip'. If false then this
-   * will not happen and lighting will be calculated at startup.
-   * If set to 'false' recalculating of lightmaps will be forced.
-   * If set to 'true' recalculating of lightmaps will depend on
-   * wether or not the lightmap was cached.
+   * Set the mode for the lighting cache (combination of CS_ENGINE_CACHE_???).
+   * Default is CS_ENGINE_CACHE_READ.
    */
-  void EnableLightingCache (bool en);
-
-  /// Return true if lighting cache is enabled.
-  bool IsLightingCacheEnabled () const { return do_lighting_cache; }
+  virtual void SetLightingCacheMode (int mode) { lightcache_mode = mode; }
+  /// Get the mode for the lighting cache.
+  virtual int GetLightingCacheMode () { return lightcache_mode; }
 
   /// Return current lightmap cell size
   virtual int GetLightmapCellSize () const;
