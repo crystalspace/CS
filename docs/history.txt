@@ -680,7 +680,7 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug in spr3d plugin. It was querying the iMeshWrapper
 	  from the movable instead of the logparent.
 	- Micah added an alternative logo image to standard.zip.
-	- Micah modivied walktest to use the alternative logo.
+	- Micah modified walktest to use the alternative logo.
 	- Added csMeshObject implementation to cstool. This is a basic
 	  base class from which other mesh objects can be easily created.
 	  Martin Geisse added this.
