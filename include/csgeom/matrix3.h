@@ -190,6 +190,9 @@ public:
   /**
    * Return a rotation matrix around the X axis.
    * 'angle' is given in radians.
+   * Looking along the X axis with Y pointing to the right and Z pointing up
+   * a rotation of PI/2 will rotate 90 degrees in anti-clockwise direction
+   * (i.e. 0,1,0 -> 0,0,1).
    */
   csXRotMatrix3 (float angle);
 };
@@ -201,6 +204,9 @@ public:
   /**
    * Return a rotation matrix around the Y axis.
    * 'angle' is given in radians.
+   * Looking along the Y axis with X pointing to the right and Z pointing up
+   * a rotation of PI/2 will rotate 90 degrees in anti-clockwise direction
+   * (i.e. 1,0,0 -> 0,0,1).
    */
   csYRotMatrix3 (float angle);
 };
@@ -212,6 +218,9 @@ public:
   /**
    * Return a rotation matrix around the Z axis.
    * 'angle' is given in radians.
+   * Looking along the Z axis with X pointing to the right and Y pointing up
+   * a rotation of PI/2 will rotate 90 degrees in anti-clockwise direction
+   * (i.e. 1,0,0 -> 0,1,0).
    */
   csZRotMatrix3 (float angle);
 };
