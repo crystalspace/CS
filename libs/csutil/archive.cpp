@@ -1015,6 +1015,8 @@ void Archive::update_directory ()
       if (is_deleted (cur->filename))
       {
         *prev = cur->next;
+	if (cur == last)
+	  last = cur->next;
         CHK (delete cur);
         cur = *prev;
       } else
