@@ -13,6 +13,18 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+27-Dec-1999
+	- Further changes to MazeD and handling of flat colors from
+	  Norman Kramer.
+	- Jorrit partially reverted a change from Norman because it
+	  was broken.
+25-Dec-1999
+	- Norman Kramer did some fixes on MazeD.
+	- Seth Galbraith updated documentation for compiling CS
+	  with DJGPP.
+24-Dec-1999
+	- Some changes to Python scripts from Michael Dale Long.
+	- Brandon Ehle did some updates to the BCB4 project files.
 23-Dec-1999
 	- A fix on static linking for OpenGL.
 	- Glide drivers are disabled by default on Linux (reenable them
@@ -30,6 +42,10 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine worked around NextStep compiler code-generation bug
 	  which resulted in corrupt computation of coverage mask by
 	  covtree.cpp when full optimization was enabled.
+	- Gary Haussman made the following OpenGL fixes:
+     	    - Added flags to link in GLU when user is not using Mesa.
+     	    - Added implementation to read Z-buffer values from the
+	      framebuffer.
 22-Dec-1999
 	- Eric Sunshine fixed the project so that it once again compiles on
 	  NextStep following recent changes.
