@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-Nov-2004
+	- Erotoman added new stencil2 plugin for dynamic shadows. It is working
+	  only for perfectly closed meshes
 31-Oct-2004
 	- Eric Sunshine renamed the following `null' SCF classes in order to
 	  make them consistent with the names of all other `null' plugins:
@@ -872,7 +875,7 @@ chronological order.
 	  %ignores from javapre.i to cspace.i. They are sufficiently general
 	  that they can be applied to all supported scripting interfaces.
 	- Eric Sunshine fixed crasher in csjava's CS.requestPlugin() where it
-	  was incorrectly invoking the do-nothing constructor of
+	  was incorrectly invoking the doStencil2thing constructor of
 	  csPluginRequestArray which did not even create the underlying C++
 	  object. Therefore, later method invocations on that object crashed.
 	- Eric Sunshine fixed nasty bug in csjava's <iface/iface_ver> typemap
