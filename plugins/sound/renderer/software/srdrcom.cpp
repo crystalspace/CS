@@ -200,11 +200,11 @@ void csSoundRenderSoftware::Close()
   }
 
   while (Sources.Length()>0)
-    ((iSoundSource*)Sources.Get(0))->Stop();
+    Sources.Get(0)->Stop();
 
   while (SoundHandles.Length()>0)
   {
-    csSoundHandleSoftware *hdl = (csSoundHandleSoftware *)SoundHandles.Pop();
+    csSoundHandleSoftware *hdl = SoundHandles.Pop();
     hdl->Unregister();
     hdl->DecRef();
   }
@@ -227,12 +227,13 @@ csPtr<iSoundHandle> csSoundRenderSoftware::RegisterSound(iSoundData *snd)
 
 void csSoundRenderSoftware::UnregisterSound(iSoundHandle *snd)
 {
-  int n = SoundHandles.Find(snd);
-  if (n != -1) {
+  int n = SoundHandles.Find((csSoundHandleSoftware*)snd);
+  if (n != -1)
+  {
     if (owning || mixing->LockWait ()) // dont remove while we mix
     {
       csSoundHandleSoftware *hdl = (csSoundHandleSoftware *)snd;
-      SoundHandles.Delete(n);
+      SoundHandles.DeleteIndex (n);
       hdl->Unregister();
       hdl->DecRef();
       
@@ -286,7 +287,7 @@ void csSoundRenderSoftware::RemoveSource(csSoundSourceSoftware *src)
     int n=Sources.Find(src);
     if (n!=-1)
     {
-      Sources.Delete(n);
+      Sources.DeleteIndex (n);
       src->DecRef();
     }
     if (!downing) 
@@ -319,12 +320,14 @@ void csSoundRenderSoftware::MixingFunction()
   else memset(memory,128,memorysize);
 
   // prepare and play all sources
-  for (i=0;i<Sources.Length();i++) {
-    csSoundSourceSoftware *src=(csSoundSourceSoftware*)(Sources.Get(i));
+  for (i=0;i<Sources.Length();i++)
+  {
+    csSoundSourceSoftware *src=Sources.Get(i);
     src->Prepare(Volume);
     src->AddToBufferStatic(memory, memorysize);
-    if (!src->IsActive()) {
-      Sources.Delete (i);
+    if (!src->IsActive())
+    {
+      Sources.DeleteIndex (i);
       src->DecRef ();
       i--;
     }
@@ -339,7 +342,7 @@ void csSoundRenderSoftware::MixingFunction()
   // update sound handles
    long NumSamples = memorysize / (is16Bits()?2:1) / (isStereo()?2:1);
    for (i=0;i<SoundHandles.Length();i++) {
-    csSoundHandleSoftware *hdl = (csSoundHandleSoftware*)SoundHandles.Get(i);
+    csSoundHandleSoftware *hdl = SoundHandles.Get(i);
     hdl->UpdateCount(NumSamples);
   }
 */

@@ -20,7 +20,7 @@
 #define __CS_SPR2D_UV_ANIMATION_H__
 
 #include "imesh/sprite2d.h"
-#include "csutil/csvector.h"
+#include "csutil/array.h"
 #include "csgeom/vector2.h"
 
 class csSprite2DUVAnimationFrame : public iSprite2DUVAnimationFrame
@@ -46,7 +46,7 @@ class csSprite2DUVAnimationFrame : public iSprite2DUVAnimationFrame
   /**
    * Return the name of this frame.
    */
-  virtual const char *GetName ();
+  virtual const char *GetName () const;
 
   /**
    * Get the u,v coordinates of the <idx>-th vertex
@@ -91,25 +91,24 @@ class csSprite2DUVAnimationFrame : public iSprite2DUVAnimationFrame
 
 class csSprite2DUVAnimation : public iSprite2DUVAnimation
 {
- protected:
+protected:
   char *name;
 
-  class frameVector : public csVector
+  class frameVector : public csArray<csSprite2DUVAnimationFrame*>
   {
   public:
-    frameVector () : csVector (8, 16){}
-    virtual int CompareKey (void* Item1, const void* Item2, int Mode) const
+    frameVector () : csArray<csSprite2DUVAnimationFrame*> (8, 16){}
+    static int CompareKey (csSprite2DUVAnimationFrame* const& f1,
+    	void* key)
     {
-      (void)Mode;
-      csSprite2DUVAnimationFrame *f1 = (csSprite2DUVAnimationFrame *)Item1;
-      const char *f2 = (const char *)Item2;
+      const char *f2 = (const char *)key;
       return strcmp (f1->GetName (), f2);
     }
   };
 
   frameVector vFrames;
 
- public:
+public:
   SCF_DECLARE_IBASE;
 
   csSprite2DUVAnimation (iBase*);
@@ -120,7 +119,7 @@ class csSprite2DUVAnimation : public iSprite2DUVAnimation
   /**
    * return the name of this sequence.
    */
-  virtual const char *GetName ();
+  virtual const char *GetName () const;
 
   /**
    * Retrieve the number of frames in this animation.

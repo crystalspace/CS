@@ -33,19 +33,19 @@ csSprite2DUVAnimationFrame::csSprite2DUVAnimationFrame (iBase* pParent)
 
 csSprite2DUVAnimationFrame::~csSprite2DUVAnimationFrame ()
 {
-  if (name) delete [] name;
+  delete [] name;
 }
 
 void csSprite2DUVAnimationFrame::SetName (const char *name)
 {
   if (name)
   {
-    if (this->name) delete [] this->name;
+    delete [] this->name;
     this->name = csStrNew (name);
   }
 }
 
-const char *csSprite2DUVAnimationFrame::GetName ()
+const char *csSprite2DUVAnimationFrame::GetName () const
 {
   return name;
 }
@@ -75,7 +75,8 @@ void csSprite2DUVAnimationFrame::SetUV (int idx, float u, float v)
     vCoo[MAX (0, idx)] = uv;
 }
 
-void csSprite2DUVAnimationFrame::SetFrameData (const char *name, int duration, int num, float *uv)
+void csSprite2DUVAnimationFrame::SetFrameData (const char *name,
+	int duration, int num, float *uv)
 {
   SetName (name);
   SetDuration (duration);
@@ -123,7 +124,7 @@ void csSprite2DUVAnimation::SetName (const char *name)
   }
 }
 
-const char *csSprite2DUVAnimation::GetName ()
+const char *csSprite2DUVAnimation::GetName () const
 {
   return name;
 }
@@ -140,7 +141,7 @@ iSprite2DUVAnimationFrame *csSprite2DUVAnimation::GetFrame (int idx)
 
 iSprite2DUVAnimationFrame *csSprite2DUVAnimation::GetFrame (const char *name)
 {
-  int idx = vFrames.FindKey ((void*) name);
+  int idx = vFrames.FindKey ((void*) name, vFrames.CompareKey);
   return (iSprite2DUVAnimationFrame *)(idx != -1 ? vFrames.Get (idx) : 0);
 }
 
@@ -156,19 +157,19 @@ iSprite2DUVAnimationFrame *csSprite2DUVAnimation::CreateFrame (int idx)
 
 void csSprite2DUVAnimation::MoveFrame (int frame, int idx)
 {
-  void* p = vFrames.Get (frame);
+  csSprite2DUVAnimationFrame* p = vFrames.Get (frame);
   if (idx == -1 || idx >= vFrames.Length ())
     vFrames.Push (p);
   else
     vFrames.Insert (MAX (0, idx), p);
 
-  vFrames.Delete (frame + (idx <= frame ? 1 : 0));
+  vFrames.DeleteIndex (frame + (idx <= frame ? 1 : 0));
 }
 
 void csSprite2DUVAnimation::RemoveFrame (int idx)
 {
   delete (iSprite2DUVAnimationFrame *)vFrames.Get (idx);
-  vFrames.Delete (idx);
+  vFrames.DeleteIndex (idx);
 }
 
 

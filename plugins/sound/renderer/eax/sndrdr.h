@@ -25,12 +25,13 @@
 #include "isound/renderer.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "csutil/csvector.h"
+#include "csutil/array.h"
 #include "csutil/cfgacc.h"
 #include <dsound.h>
 
 class csSoundListenerEAX;
 class csSoundSourceEAX;
+class csSoundHandleEAX;
 
 
 class csSoundRenderEAX : public iSoundRender
@@ -78,8 +79,8 @@ public:
   iObjectRegistry *object_reg;
   csSoundListenerEAX *Listener;
   csSoundFormat LoadFormat;
-  csVector ActiveSources;
-  csVector SoundHandles;
+  csArray<csSoundSourceEAX*> ActiveSources;
+  csArray<csSoundHandleEAX*> SoundHandles;
   csConfigAccess Config;
   csTicks LastTime;
 

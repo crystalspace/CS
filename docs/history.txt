@@ -18,6 +18,32 @@ chronological order.
 	- Jorrit modified the api documentation to reflect the pending removal
 	  of csVector and csBasicVector. Also explained how to do most common
 	  transitions.
+	- Jorrit replaced various occurances of csVector:
+	    - Replaced 'csLoadedPluginVector' in the isometric loader with
+	      a csPDelArray<csLoaderPluginRec>.
+	    - Replaced 'animVector' in spr2d with a
+	      csArray<csSprite2DUVAnimation*>.
+	    - Replaced 'frameVector' in spr2d with a
+	      csArray<csSprite2DUVAnimationFrame*>.
+	    - Commented out 'pal_colors' in terrbig because it is not used.
+	    - Replaced 'polygons' in thing with a csArray<csPolygon3D*>.
+	    - Replaced 'static_polygons' in thing with a
+	      csArray<csPolygon3DStatic*>.
+	    - Replaced 'soVector' in arts renderer with a
+	      csPDelArray<csArtsHandle>.
+	    - Replaced 'ActiveSources' in eax renderer with a
+	      csArray<csSoundSourceEAX*>.
+	    - Replaced 'SoundHandles' in eax renderer with a
+	      csArray<csSoundHandleEAX*>.
+	    - Replaced 'Sources' in sound software renderer with a
+	      csArray<csSoundSourceSoftware*>.
+	    - Replaced 'SoundHandles' in sound software renderer with a
+	      csArray<csSoundHandleSoftware*>.
+	    - Replaced 'GLGlyphVector' in OpenGL canvases with a
+	      csPDelArray<GLGlyphSet>.
+	    - Replaced 'vStream' in csavi plugin with csRefArray<iStream>.
+	    - Replaced 'StreamIdx' in csavi plugin with csArray<indexentry*>.
+	    - Replaced 'StreamList' in csavi plugin with csPDelArray<StreamIdx>.
 1-Aug-2003
 	- Jorrit changed csPDelArray::Sort() to use a new
 	  csArraySortCompareFunction typedef instead of csArrayCompareFunction.

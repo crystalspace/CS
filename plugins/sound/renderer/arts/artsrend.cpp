@@ -60,8 +60,7 @@ csArtsRenderer::csArtsRenderer (iBase *pParent)
 
 csArtsRenderer::~csArtsRenderer ()
 {
-  vObject.DeleteAll ();
-  if (dispatcher) delete dispatcher;
+  delete dispatcher;
 }
 
 bool csArtsRenderer::Initialize (iObjectRegistry *object_reg)
@@ -120,7 +119,7 @@ csPtr<iSoundHandle> csArtsRenderer::RegisterSound(iSoundData *sd)
   csArtsHandle *sh = new csArtsHandle (this);
   if (sh->UseData (sd))
   {
-    vObject.InsertSorted (sh);
+    vObject.InsertSorted (sh, vObject.Compare);
     sh->SetVolume (volume);
     return csPtr<iSoundHandle> (sh);
   }
@@ -131,9 +130,9 @@ csPtr<iSoundHandle> csArtsRenderer::RegisterSound(iSoundData *sd)
 
 void csArtsRenderer::UnregisterSound(iSoundHandle *sh)
 {
-  int idx = vObject.FindSortedKey ((const void*)sh);
+  int idx = vObject.FindSortedKey ((void*)sh, vObject.CompareKey);
   if (idx != -1)
-    vObject.Delete (idx);
+    vObject.DeleteIndex (idx);
 
 }
 
@@ -142,7 +141,7 @@ csPtr<iSoundSource> csArtsRenderer::CreateSource (csArtsHandle *pHandle, int Mod
   csArtsHandle *sh = new csArtsHandle (this);
   if (sh->UseData (pHandle->sd))
   {
-    vObject.InsertSorted (sh);
+    vObject.InsertSorted (sh, vObject.Compare);
     sh->SetVolume (volume);
     sh->SetMode3D (Mode3D);
     return csPtr<iSoundSource> (sh);

@@ -1,6 +1,7 @@
 /*
     Dynamic arrays of engine objects
     Copyright (C) 1999 by Andrew Zabolotny
+    Copyright (C) 2003 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -24,53 +25,54 @@
 //------------------------------------------------------+ csPolygonArray +----//
 csPolygonArray::~csPolygonArray ()
 {
+  FreeAll ();
+}
+
+void csPolygonArray::FreeAll ()
+{
+  int i;
+  for (i = 0 ; i < Length () ; i++)
+  {
+    FreeItem (Get (i));
+  }
   DeleteAll ();
 }
 
-bool csPolygonArray::FreeItem (void* Item)
+void csPolygonArray::FreeItem (csPolygon3D* Item)
 {
-  thing_type->blk_polygon3d.Free ((csPolygon3D*)Item);
-  //delete (csPolygon3D *)Item;
-  return true;
+  thing_type->blk_polygon3d.Free (Item);
 }
 
-int csPolygonArray::CompareKey (void* Item, const void* Key, int Mode) const
+int csPolygonArray::CompareKey (csPolygon3D* const& Item, void* Key)
 {
-  (void)Mode;
-
-  const char *name = ((csPolygon3D *) Item)->GetStaticData ()->GetName ();
+  const char *name = Item->GetStaticData ()->GetName ();
   return name ? strcmp (name, (char *)Key) : -1;
-}
-
-csPolygon3D *csPolygonArray::Get (int iIndex) const
-{
-  return (csPolygon3D *)csVector::Get (iIndex);
 }
 
 //-----------------------------------------------+ csPolygonStaticArray +----//
 csPolygonStaticArray::~csPolygonStaticArray ()
 {
+  FreeAll ();
+}
+
+void csPolygonStaticArray::FreeAll ()
+{
+  int i;
+  for (i = 0 ; i < Length () ; i++)
+  {
+    FreeItem (Get (i));
+  }
   DeleteAll ();
 }
 
-bool csPolygonStaticArray::FreeItem (void* Item)
+void csPolygonStaticArray::FreeItem (csPolygon3DStatic* Item)
 {
-  thing_type->blk_polygon3dstatic.Free ((csPolygon3DStatic*)Item);
-  //delete (csPolygon3DStatic *)Item;
-  return true;
+  thing_type->blk_polygon3dstatic.Free (Item);
 }
 
-int csPolygonStaticArray::CompareKey (void* Item, const void* Key,
-		int Mode) const
+int csPolygonStaticArray::CompareKey (csPolygon3DStatic* const& Item, void* Key)
 {
-  (void)Mode;
-
-  const char *name = ((csPolygon3DStatic *) Item)->GetName ();
+  const char *name = Item->GetName ();
   return name ? strcmp (name, (char *)Key) : -1;
-}
-
-csPolygon3DStatic *csPolygonStaticArray::Get (int iIndex) const
-{
-  return (csPolygon3DStatic *)csVector::Get (iIndex);
 }
 

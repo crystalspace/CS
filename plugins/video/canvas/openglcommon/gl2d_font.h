@@ -26,10 +26,10 @@
 #include <GL/gl.h>
 #endif
 
-#include "csutil/csvector.h"
 #include "ivideo/fontserv.h"
 #include "csgeom/vector2.h"
 #include "csutil/garray.h"
+#include "csutil/parray.h"
 #include "video/canvas/common/graph2d.h"
 #include "video/canvas/openglcommon/glstates.h"
 
@@ -69,47 +69,11 @@ class GLFontCache
 {
 protected:
   // The font cache array, sorted by iFont + size
-  class GLGlyphVector : public csVector
+  class GLGlyphVector : public csPDelArray<GLGlyphSet>
   {
   public:
-    GLGlyphVector (int limit, int threshold) : csVector (limit, threshold) {}
-    virtual ~GLGlyphVector ();
-    virtual bool FreeItem (void* Item);
-    virtual int Compare (void* Item1, void* Item2, int Mode) const
-    {
-      (void)Mode;
-      GLProtoGlyphSet *gs1 = (GLProtoGlyphSet *)Item1;
-      GLProtoGlyphSet *gs2 = (GLProtoGlyphSet *)Item2;
-      if (gs1->font < gs2->font)
-        return -1;
-      else if (gs1->font > gs2->font)
-        return +1;
-      else if (gs1->size < gs2->size)
-        return -1;
-      else if (gs1->size > gs2->size)
-        return +1;
-      else
-        return 0;
-    }
-    virtual int CompareKey (void* Item, const void* Key, int Mode) const
-    {
-      (void)Mode;
-      GLProtoGlyphSet *gs = (GLProtoGlyphSet *)Item;
-      iFont *font = (iFont *)Key;
-      if (gs->font < font)
-        return -1;
-      else if (gs->font > font)
-        return +1;
-      int size = font->GetSize ();
-      if (gs->size < size)
-        return -1;
-      else if (gs->size > size)
-        return +1;
-      else
-        return 0;
-    }
-    GLGlyphSet *Get (int iIndex)
-    { return (GLGlyphSet *)csVector::Get (iIndex); }
+    GLGlyphVector (int limit, int threshold);
+    static int CompareKey (GLGlyphSet const* gs, void* Key);
   } FontCache;
 
   /// the current clipping rect

@@ -1,6 +1,7 @@
 /*
     Dynamic arrays of engine objects
     Copyright (C) 1999 by Andrew Zabolotny
+    Copyright (C) 2003 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,8 +21,7 @@
 #ifndef __CS_PARRAYS_H__
 #define __CS_PARRAYS_H__
 
-#include "csutil/csvector.h"
-#include "csutil/parray.h"
+#include "csutil/array.h"
 
 class csPolygon3D;
 class csPolygon3DStatic;
@@ -32,20 +32,21 @@ class csThingObjectType;
  * This class is used in polygon set class and thing template class
  * for storing the polygons that the model consists of.
  */
-class csPolygonStaticArray : public csVector
+class csPolygonStaticArray : public csArray<csPolygon3DStatic*>
 {
 private:
   csThingObjectType* thing_type;
 
 public:
   /// Create the polygon array object
-  csPolygonStaticArray (int iLimit, int iDelta) : csVector (iLimit, iDelta)
+  csPolygonStaticArray (int iLimit, int iDelta)
+  	: csArray<csPolygon3DStatic*> (iLimit, iDelta)
   {
     thing_type = 0;
   }
 
   /// Destroy the polygon array and all inserted polygons
-  virtual ~csPolygonStaticArray ();
+  ~csPolygonStaticArray ();
 
   /// Set the thing type used to destroy polygons.
   void SetThingType (csThingObjectType* thing_type)
@@ -53,18 +54,14 @@ public:
     csPolygonStaticArray::thing_type = thing_type;
   }
 
+  /// Free all polygons.
+  void FreeAll ();
+
   /// Delete a particular array element
-  virtual bool FreeItem (void* Item);
+  void FreeItem (csPolygon3DStatic* Item);
 
   /// Find a polygon by name
-  virtual int CompareKey (void* Item, const void* Key, int Mode) const;
-
-  /// Get a polygon given its index in the array
-  csPolygon3DStatic *Get (int iIndex) const;
-
-  /// Get the entire array of polygons as an array of pointers
-  csPolygon3DStatic **GetArray ()
-  { return (csPolygon3DStatic **)root; }
+  static int CompareKey (csPolygon3DStatic* const& Item, void* Key);
 };
 
 /**
@@ -72,20 +69,21 @@ public:
  * This class is used in polygon set class and thing template class
  * for storing the polygons that the model consists of.
  */
-class csPolygonArray : public csVector
+class csPolygonArray : public csArray<csPolygon3D*>
 {
 private:
   csThingObjectType* thing_type;
 
 public:
   /// Create the polygon array object
-  csPolygonArray (int iLimit, int iDelta) : csVector (iLimit, iDelta)
+  csPolygonArray (int iLimit, int iDelta)
+  	: csArray<csPolygon3D*> (iLimit, iDelta)
   {
     thing_type = 0;
   }
 
   /// Destroy the polygon array and all inserted polygons
-  virtual ~csPolygonArray ();
+  ~csPolygonArray ();
 
   /// Set the thing type used to destroy polygons.
   void SetThingType (csThingObjectType* thing_type)
@@ -93,18 +91,14 @@ public:
     csPolygonArray::thing_type = thing_type;
   }
 
+  /// Free all polygons.
+  void FreeAll ();
+
   /// Delete a particular array element
-  virtual bool FreeItem (void* Item);
+  void FreeItem (csPolygon3D* Item);
 
   /// Find a polygon by name
-  virtual int CompareKey (void* Item, const void* Key, int Mode) const;
-
-  /// Get a polygon given its index in the array
-  csPolygon3D *Get (int iIndex) const;
-
-  /// Get the entire array of polygons as an array of pointers
-  csPolygon3D **GetArray ()
-  { return (csPolygon3D **)root; }
+  static int CompareKey (csPolygon3D* const& Item, void* Key);
 };
 
 #endif // __CS_PARRAYS_H__

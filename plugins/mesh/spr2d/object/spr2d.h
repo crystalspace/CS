@@ -23,7 +23,7 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/objmodel.h"
 #include "csutil/cscolor.h"
-#include "csutil/csvector.h"
+#include "csutil/array.h"
 #include "csutil/refarr.h"
 #include "imesh/object.h"
 #include "imesh/sprite2d.h"
@@ -246,15 +246,13 @@ class csSprite2DMeshObjectFactory : public iMeshObjectFactory
 {
 protected:
 
-  class animVector : public csVector
+  class animVector : public csArray<csSprite2DUVAnimation*>
   {
   public:
-    animVector () : csVector (8, 16){}
-    virtual int CompareKey (void* Item1, const void* Item2, int Mode) const
+    animVector () : csArray<csSprite2DUVAnimation*> (8, 16){}
+    static int CompareKey (csSprite2DUVAnimation* const& f1, void* key)
     {
-      (void)Mode;
-      csSprite2DUVAnimation *f1 = (csSprite2DUVAnimation *)Item1;
-      const char *f2 = (const char *)Item2;
+      const char *f2 = (const char *)key;
       return strcmp (f1->GetName (), f2);
     }
   };
@@ -298,16 +296,16 @@ public:
   }
   void RemoveUVAnimation (iSprite2DUVAnimation *anim)
   {
-    int idx = vAnims.Find ((void*)anim);
+    int idx = vAnims.Find ((csSprite2DUVAnimation*)anim);
     if (idx != -1)
     {
       anim->DecRef ();
-      vAnims.Delete (idx);
+      vAnims.DeleteIndex (idx);
     }
   }
   iSprite2DUVAnimation *GetUVAnimation (const char *name)
   {
-    int idx = vAnims.FindKey ((void*) name);
+    int idx = vAnims.FindKey ((void*) name, vAnims.CompareKey);
     return (iSprite2DUVAnimation *)(idx != -1 ? vAnims.Get (idx) : 0);
   }
   iSprite2DUVAnimation *GetUVAnimation (int idx)

@@ -489,13 +489,13 @@ void nTerrain::CreateMaterialMap(iFile *matmap, iImage* /*terrtex*/)
     {
 	index+=read;
 	
-	pal_colors.Push((void *)r);
+	// Disabled: not used: pal_colors.Push(r);
     }
   }
 
   // Now sort the list
   if (map_mode==MAP_MODE_RGB) rgb_colors.QuickSort();
-  else pal_colors.QuickSort();
+  // Disabled: not used: else pal_colors.Sort();
 }
 
 SCF_IMPLEMENT_IBASE (csBigTerrainObject)

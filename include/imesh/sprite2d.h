@@ -53,7 +53,7 @@ struct iSprite2DUVAnimationFrame : public iBase
   /**
    * Return the name of this frame.
    */
-  virtual const char *GetName () = 0;
+  virtual const char *GetName () const = 0;
 
   /**
    * Get the u,v coordinates of the <idx>-th vertex
@@ -114,7 +114,7 @@ struct iSprite2DUVAnimation : public iBase
   /**
    * return the name of this sequence.
    */
-  virtual const char *GetName () = 0;
+  virtual const char *GetName () const = 0;
 
   /**
    * Retrieve the number of frames in this animation.

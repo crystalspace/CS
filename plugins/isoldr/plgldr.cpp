@@ -49,19 +49,27 @@ struct csLoaderPluginRec
 };
 
 csIsoLoader::csLoadedPluginVector::csLoadedPluginVector (
-	int iLimit, int iThresh) : csVector (iLimit, iThresh)
+	int iLimit, int iThresh)
+	: csPDelArray<csLoaderPluginRec> (iLimit, iThresh)
 {
   plugin_mgr = 0;
 }
 
 csIsoLoader::csLoadedPluginVector::~csLoadedPluginVector ()
 {
+  FreeAll ();
+}
+
+void csIsoLoader::csLoadedPluginVector::FreeAll ()
+{
+  int i;
+  for (i = 0 ; i < Length () ; i++)
+    FreeItem (Get (i));
   DeleteAll ();
 }
 
-bool csIsoLoader::csLoadedPluginVector::FreeItem (void* Item)
+void csIsoLoader::csLoadedPluginVector::FreeItem (csLoaderPluginRec* rec)
 {
-  csLoaderPluginRec *rec = (csLoaderPluginRec*)Item;
   if (rec->Plugin)
   {
     if (plugin_mgr)
@@ -71,8 +79,6 @@ bool csIsoLoader::csLoadedPluginVector::FreeItem (void* Item)
         plugin_mgr->UnloadPlugin(p);
     }
   }
-  delete rec;
-  return true;
 }
 
 csLoaderPluginRec* csIsoLoader::csLoadedPluginVector::FindPluginRec (
@@ -81,7 +87,7 @@ csLoaderPluginRec* csIsoLoader::csLoadedPluginVector::FindPluginRec (
   int i;
   for (i=0 ; i<Length () ; i++)
   {
-    csLoaderPluginRec* pl = (csLoaderPluginRec*)Get (i);
+    csLoaderPluginRec* pl = Get (i);
     if (pl->ShortName && !strcmp (name, pl->ShortName))
       return pl;
     if (!strcmp (name, pl->ClassID))
@@ -95,7 +101,7 @@ iLoaderPlugin* csIsoLoader::csLoadedPluginVector::GetPluginFromRec (
 {
 
   if (!rec->Plugin)
-    rec->Plugin = CS_LOAD_PLUGIN (plugin_mgr,	rec->ClassID, iLoaderPlugin);
+    rec->Plugin = CS_LOAD_PLUGIN (plugin_mgr, rec->ClassID, iLoaderPlugin);
 
   return rec->Plugin;
 }
@@ -110,7 +116,7 @@ iLoaderPlugin* csIsoLoader::csLoadedPluginVector::FindPlugin (
 
   // create a new loading record
   NewPlugin (0, Name);
-  return GetPluginFromRec((csLoaderPluginRec*)Get(Length()-1));
+  return GetPluginFromRec(Get(Length()-1));
 }
 
 void csIsoLoader::csLoadedPluginVector::NewPlugin

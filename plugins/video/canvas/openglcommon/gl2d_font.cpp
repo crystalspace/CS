@@ -77,17 +77,25 @@ GLGlyphSet::~GLGlyphSet ()
   font->DecRef ();
 }
 
-//-----------------------------------------------------// GLGlyphVector //----//
+//-------------------------------------------------------// GLFontCache //----//
 
-GLFontCache::GLGlyphVector::~GLGlyphVector ()
-{
-  DeleteAll ();
-}
+GLFontCache::GLGlyphVector::GLGlyphVector (int limit, int threshold)
+    	: csPDelArray<GLGlyphSet> (limit, threshold) {}
 
-bool GLFontCache::GLGlyphVector::FreeItem (void* Item)
+int GLFontCache::GLGlyphVector::CompareKey (GLGlyphSet const* gs, void* Key)
 {
-  delete (GLGlyphSet *)Item;
-  return true;
+  iFont *font = (iFont *)Key;
+  if (gs->font < font)
+    return -1;
+  else if (gs->font > font)
+    return +1;
+  int size = font->GetSize ();
+  if (gs->size < size)
+    return -1;
+  else if (gs->size > size)
+    return +1;
+  else
+    return 0;
 }
 
 //-------------------------------------------------------// GLFontCache //----//
@@ -297,7 +305,7 @@ void GLFontCache::CacheFree (iFont *font)
   {
     GLGlyphSet *gs = FontCache.Get (i);
     if (gs->font == font)
-      FontCache.Delete (i);
+      FontCache.DeleteIndex (i);
   }
 }
 
@@ -334,7 +342,7 @@ void GLFontCache::Write (iFont *font, int x, int y, const char *text)
 {
   if (!text || !*text) return;
 
-  int idx = FontCache.FindKey (font);
+  int idx = FontCache.FindKey (font, FontCache.CompareKey);
   GLGlyphSet *gs = idx >= 0 ? FontCache.Get (idx) : CacheFont (font);
   if (!gs) return;
 

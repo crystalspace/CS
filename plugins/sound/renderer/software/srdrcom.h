@@ -23,7 +23,7 @@
 #define __CS_SRDRCOMSOFTWARE_H__
 
 #include "csutil/scf.h"
-#include "csutil/csvector.h"
+#include "csutil/array.h"
 #include "csutil/cfgacc.h"
 #include "cssys/thread.h"
 #include "isound/data.h"
@@ -35,6 +35,7 @@ struct iSoundDriver;
 struct iConfigFile;
 class csSoundListener;
 class csSoundSourceSoftware;
+class csSoundHandleSoftware;
 
 class csSoundRenderSoftware : public iSoundRender
 {
@@ -102,10 +103,10 @@ public:
   csConfigAccess Config;
 
   // all active sound sources
-  csVector Sources;
+  csArray<csSoundSourceSoftware*> Sources;
 
   // all registered sound handles
-  csVector SoundHandles;
+  csArray<csSoundHandleSoftware*> SoundHandles;
 
   // the low-level sound driver
   csRef<iSoundDriver> SoundDriver;

@@ -581,7 +581,7 @@ iPolygon3DStatic *csThingStatic::GetPolygon (int idx)
 
 iPolygon3DStatic *csThingStatic::GetPolygon (const char* name)
 {
-  int idx = static_polygons.FindKey (name);
+  int idx = static_polygons.FindKey ((void*)name, static_polygons.CompareKey);
   return idx >= 0 ? &(static_polygons.Get (idx)->scfiPolygon3DStatic) : 0;
 }
 
@@ -603,13 +603,14 @@ iPolygon3DStatic *csThingStatic::CreatePolygon (const char *name)
 
 void csThingStatic::RemovePolygon (int idx)
 {
-  static_polygons.Delete (idx);
+  static_polygons.FreeItem (static_polygons.Get (idx));
+  static_polygons.DeleteIndex (idx);
   scfiObjectModel.ShapeChanged ();
 }
 
 void csThingStatic::RemovePolygons ()
 {
-  static_polygons.DeleteAll ();
+  static_polygons.FreeAll ();
   portal_polygons.DeleteAll ();
   scfiObjectModel.ShapeChanged ();
 }
@@ -1067,7 +1068,7 @@ csThing::~csThing ()
 
   delete[] cam_verts;
 
-  polygons.DeleteAll ();          // delete prior to portal_poly array !
+  polygons.FreeAll ();          // delete prior to portal_poly array !
 
 #ifdef CS_USE_NEW_RENDERER
   ClearRenderMeshes ();
@@ -1330,7 +1331,7 @@ void csThing::Prepare ()
 #ifdef COMBINE_LIGHTMAPS
       ClearLMs ();
 #endif
-      polygons.DeleteAll ();
+      polygons.FreeAll ();
       for (i = 0 ; i < static_data->static_polygons.Length () ; i++)
       {
 	p = static_data->thing_type->blk_polygon3d.Alloc ();
@@ -1373,7 +1374,8 @@ void csThing::Prepare ()
 	}
 	else
 	{
-	  polygons.Delete (i);
+	  polygons.FreeItem (Get (i));
+	  polygons.DeleteIndex (i);
 	}
       }
       csGlobalHashIterator spIt (staticPolys.GetHashMap ());
@@ -1430,7 +1432,7 @@ void csThing::Prepare ()
   int i;
   csPolygon3DStatic *ps;
   csPolygon3D *p;
-  polygons.DeleteAll ();
+  polygons.FreeAll ();
   for (i = 0; i < static_data->static_polygons.Length (); i++)
   {
     p = static_data->thing_type->blk_polygon3d.Alloc ();
@@ -1472,7 +1474,7 @@ void csThing::ClearReplacedMaterials ()
 
 csPolygon3D *csThing::GetPolygon3D (const char *name)
 {
-  int idx = polygons.FindKey (name);
+  int idx = polygons.FindKey ((void*)name, polygons.CompareKey);
   return idx >= 0 ? polygons.Get (idx) : 0;
 }
 
@@ -1639,8 +1641,6 @@ void csThing::DrawOnePolygon (
 }
 
 void csThing::DrawPolygonArray (
-  csPolygon3D **polygon,
-  int num,
   const csReversibleTransform& t,
   iRenderView *d,
   csZBufMode zMode)
@@ -1669,9 +1669,9 @@ void csThing::DrawPolygonArray (
   float shift_x = icam->GetShiftX ();
   float shift_y = icam->GetShiftY ();
 
-  for (i = 0; i < num; i++)
+  for (i = 0; i < polygons.Length (); i++)
   {
-    p = polygon[i];
+    p = polygons[i];
     p->UpdateTransformation (camtrans, icam->GetCameraNumber ());
     if (p->ClipToPlane (pclip_plane, camtrans.GetOrigin (), verts, num_verts))  //@@@Pool for verts?
     {
@@ -1903,8 +1903,6 @@ void csThing::PreparePolygonBuffer ()
 
 #ifndef CS_USE_NEW_RENDERER
 void csThing::DrawPolygonArrayDPM (
-  csPolygon3D ** /*polygon*/,
-  int /*num*/,
   iRenderView *rview,
   iMovable *movable,
   csZBufMode zMode)
@@ -2192,8 +2190,6 @@ bool csThing::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
 
   if (static_data->flags.Check (CS_THING_FASTMESH))
     DrawPolygonArrayDPM (
-      polygons.GetArray (),
-      polygons.Length (),
       rview,
       movable,
       zMode);
@@ -2201,8 +2197,6 @@ bool csThing::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
   {
     UpdateTransformation (camtrans, icam->GetCameraNumber ());
     DrawPolygonArray (
-      polygons.GetArray (),
-      polygons.Length (),
       movable->GetTransform (),
       rview,
       zMode);

@@ -77,7 +77,7 @@ struct MetaField
   PointCharge *points;
 };
 //------------------------ Data Arrays: Done this way to make
-// exporting the data easier. Can get very cumbersome with csVector.
+// exporting the data easier. Can get very cumbersome with csArray.
 // The vertices and triangles are optimized after tesselation,
 // so the actual size will be greater than their current content.
 

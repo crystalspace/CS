@@ -156,11 +156,11 @@ bool csSoundRenderEAX::Open()
 void csSoundRenderEAX::Close()
 {
   while (ActiveSources.Length()>0)
-    ((iSoundSource*)ActiveSources.Get(0))->Stop();
+    ActiveSources.Get(0)->Stop();
 
   while (SoundHandles.Length()>0)
   {
-    csSoundHandleEAX *hdl = (csSoundHandleEAX *)SoundHandles.Pop();
+    csSoundHandleEAX *hdl = SoundHandles.Pop();
     hdl->Unregister();
     hdl->DecRef();
   }
@@ -199,11 +199,11 @@ csPtr<iSoundHandle> csSoundRenderEAX::RegisterSound(iSoundData *snd)
 
 void csSoundRenderEAX::UnregisterSound(iSoundHandle *snd)
 {
-  int n = SoundHandles.Find(snd);
+  int n = SoundHandles.Find((csSoundHandleEAX*)snd);
   if (n != -1)
   {
     csSoundHandleEAX *hdl = (csSoundHandleEAX *)snd;
-    SoundHandles.Delete(n);
+    SoundHandles.DeleteIndex (n);
     hdl->Unregister();
     hdl->DecRef();
   }
@@ -229,16 +229,16 @@ void csSoundRenderEAX::Update()
 
   for (i=0;i<SoundHandles.Length();i++)
   {
-    csSoundHandleEAX *hdl = (csSoundHandleEAX*)SoundHandles.Get(i);
+    csSoundHandleEAX *hdl = SoundHandles.Get(i);
     hdl->Update_Time(ETime);
   }
 
   for (i=0;i<ActiveSources.Length();i++)
   {
-    csSoundSourceEAX *src = (csSoundSourceEAX*)ActiveSources.Get(i);
+    csSoundSourceEAX *src = ActiveSources.Get(i);
     if (!src->IsPlaying())
     {
-      ActiveSources.Delete(i);
+      ActiveSources.DeleteIndex (i);
       i--;
     }
   }
@@ -268,7 +268,7 @@ void csSoundRenderEAX::RemoveSource(csSoundSourceEAX *src)
   int n=ActiveSources.Find(src);
   if (n!=-1)
   {
-    ActiveSources.Delete(n);
+    ActiveSources.DeleteIndex(n);
     src->DecRef();
   }
 }

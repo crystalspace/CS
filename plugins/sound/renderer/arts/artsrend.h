@@ -24,7 +24,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "artshndl.h"
-#include "csutil/csvector.h"
+#include "csutil/parray.h"
 
 class csSoundModule;
 
@@ -32,25 +32,18 @@ class csArtsRenderer : public iSoundListener
 {
  protected:
   friend class csArtsHandle;
-  class soVector : public csVector
+  class soVector : public csPDelArray<csArtsHandle>
   {
   public:
-    int Compare (void* Item1, void* Item2, int Mode=0) const
+    static int Compare (csArtsHandle const* h1, csArtsHandle const* h2)
     {
-      (void)Mode;
-      csArtsHandle *h1 = (csArtsHandle *)Item1;
-      csArtsHandle *h2 = (csArtsHandle *)Item2;
       return (h1 < h2 ? -1 : h1 > h2 ? 1 : 0);
     }
-    int CompareKey (void* Item1, const void* Key, int Mode=0) const
+    static int CompareKey (csArtsHandle* h1, void* Key)
     {
-      (void)Mode;
-      csArtsHandle *h1 = (csArtsHandle *)Item1;
       csArtsHandle *h2 = (csArtsHandle *)Key;
       return (h1 < h2 ? -1 : h1 > h2 ? 1 : 0);
     }
-    csArtsHandle *Get (int i) const { return (csArtsHandle*)csVector::Get(i); }
-    bool FreeItem (void* Item){delete (csArtsHandle *)Item; return true;}
   };
 
   Arts::SimpleSoundServer server;

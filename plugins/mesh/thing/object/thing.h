@@ -587,14 +587,13 @@ private:
    * lightmapped polygons right now and is far from complete.
    * 't' is the movable transform.
    */
-  void DrawPolygonArrayDPM (csPolygon3D** polygon, int num,
-	iRenderView* rview, iMovable* movable, csZBufMode zMode);
+  void DrawPolygonArrayDPM (iRenderView* rview, iMovable* movable,
+  	csZBufMode zMode);
 
   /**
    * Draw the given array of polygons.
    */
-  void DrawPolygonArray (csPolygon3D** polygon, int num,
-	const csReversibleTransform& t,
+  void DrawPolygonArray (const csReversibleTransform& t,
 	iRenderView* rview, csZBufMode zMode);
 
   /**

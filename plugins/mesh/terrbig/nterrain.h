@@ -9,7 +9,6 @@
 #include "csutil/garray.h"
 #include "csutil/cscolor.h"
 #include "csutil/scanstr.h"
-#include "csutil/csvector.h"
 #include "csutil/csrgbvct.h"
 #include "iutil/vfs.h"
 #include "iutil/comp.h"
@@ -164,7 +163,7 @@ class nTerrain
   csRGBVector rgb_colors;
 
   /// Color mappings for terrain tile texturing. (8-Bit palettized)
-  csVector  pal_colors;
+  //Disabled for now: not used: csArray<int> pal_colors;
 
   // Must be a power of two, otherwise things get stupid.
   int map_scale;

@@ -20,7 +20,7 @@
 #define __CS_ISOLOAD_H__
 
 #include "csutil/scf.h"
-#include "csutil/csvector.h"
+#include "csutil/parray.h"
 #include "csutil/util.h"
 #include "csutil/plugldr.h"
 #include "csutil/strhash.h"
@@ -52,6 +52,7 @@ struct iPluginManager;
 struct iMeshWrapper;
 struct iSyntaxService;
 struct iLoaderContext;
+struct csLoaderPluginRec;
 
 /**
  * The loader for Crystal Space iso maps.
@@ -68,7 +69,7 @@ private:
 
   // csLoadedPluginVector Cut & Paste from - csloader.h
   // Perhaps theres a better way to do this ??
-  class csLoadedPluginVector : public csVector
+  class csLoadedPluginVector : public csPDelArray<csLoaderPluginRec>
   {
   private:
     // Find a loader plugin record
@@ -82,8 +83,10 @@ private:
     csLoadedPluginVector (int iLimit = 8, int iThresh = 16);
     // destructor
     ~csLoadedPluginVector ();
+    // Free all items.
+    void FreeAll ();
     // delete a plugin record
-    virtual bool FreeItem (void* Item);
+    void FreeItem (csLoaderPluginRec* Item);
     // find a plugin by its name or load it if it doesn't exist
     iLoaderPlugin* FindPlugin (const char* Name);
     // add a new plugin record

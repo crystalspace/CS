@@ -278,9 +278,6 @@ bool csAVIFormat::InitVideoData ()
 
 void csAVIFormat::Unload ()
 {
-  int i;
-  for (i=0; i < vStream.Length (); i++)
-    ((iStream*)vStream.Get (i))->DecRef ();
   vStream.DeleteAll ();
 
   pAudio = 0;
@@ -357,10 +354,10 @@ uint32 csAVIFormat::CreateStream (StreamHeader *streamheader)
 	n += AVI_EVEN(strh.size) + len_hcl;
       }
       if (pAudioStream->Initialize (&aviheader, streamheader, &audsf, nAudio,
-				    pCID, nCIDLen, pName, pFormatEx, nFormatEx, object_reg))
+				    pCID, nCIDLen, pName, pFormatEx,
+				    nFormatEx, object_reg))
 	vStream.Push (pAudioStream);
-      else
-	pAudioStream->DecRef ();
+      pAudioStream->DecRef ();	// vStream keeps reference.
     }
     nAudio++;
   }
@@ -405,10 +402,10 @@ uint32 csAVIFormat::CreateStream (StreamHeader *streamheader)
 	n += AVI_EVEN(strh.size) + len_hcl;
       }
       if (pVideoStream->Initialize (&aviheader, streamheader, &vidsf, nVideo,
-				    pCID, nCIDLen, pName, pFormatEx, nFormatEx, object_reg))
-      vStream.Push (pVideoStream);
-      else
-	pVideoStream->DecRef ();
+				    pCID, nCIDLen, pName, pFormatEx,
+				    nFormatEx, object_reg))
+        vStream.Push (pVideoStream);
+      pVideoStream->DecRef ();	// vStream keeps reference.
     }
     nVideo++;
   }
@@ -605,7 +602,7 @@ bool csAVIFormat::streamiterator::HasNext ()
 iStream* csAVIFormat::streamiterator::Next ()
 {
   if (HasNext ())
-    return (iStream*)pAVI->vStream.Get (pos++);
+    return pAVI->vStream.Get (pos++);
    return 0;
 }
 
@@ -619,7 +616,7 @@ void csAVIFormat::ChunkList::LoadList (uint8 *data, uint32 length)
   for (i = 0; i < nEntries; i++)
   {
     ie->Endian ();
-    idx = streamlist.FindKey ((void*) ie->id);
+    idx = streamlist.FindKey ((void*) ie->id, streamlist.CompareKey);
     if (idx == -1)
       idx = streamlist.Push (new StreamIdx (ie->id));
     streamlist.Get (idx)->Push (ie);
@@ -629,13 +626,13 @@ void csAVIFormat::ChunkList::LoadList (uint8 *data, uint32 length)
 
 bool csAVIFormat::ChunkList::HasChunk (uint32 id, uint32 idx)
 {
-  int i = streamlist.FindKey ((void*) id);
+  int i = streamlist.FindKey ((void*) id, streamlist.CompareKey);
   return (i == -1 ? false : idx < (uint32)streamlist.Get (i)->Length ());
 }
 
 bool csAVIFormat::ChunkList::GetPos (uint32 id, uint32 idx, char *&pos, uint32 &size)
 {
-  int i = streamlist.FindKey ((void*) id);
+  int i = streamlist.FindKey ((void*) id, streamlist.CompareKey);
   if (i != -1)
   {
     indexentry *ie = streamlist.Get (i)->Get (idx);

@@ -23,7 +23,9 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/vfs.h"
-#include "csutil/csvector.h"
+#include "csutil/array.h"
+#include "csutil/parray.h"
+#include "csutil/refarr.h"
 #include "cssys/csendian.h"
 
 struct iObjectRegistry;
@@ -66,41 +68,34 @@ class csAVIFormat : public iStreamFormat
       uint32 length;
       void Endian ()
       {
-		id = little_endian_long (id);
-		flags = little_endian_long (flags);
-		offset = little_endian_long (offset);
-		length = little_endian_long (length);
+	id = little_endian_long (id);
+	flags = little_endian_long (flags);
+	offset = little_endian_long (offset);
+	length = little_endian_long (length);
       }
     };
 
-    class StreamIdx : public csVector
+    class StreamIdx : public csArray<indexentry*>
     {
     public:
       uint32 id;
     public:
-      StreamIdx (uint32 id) : csVector (8,8) {this->id = id;}
-      virtual ~StreamIdx (){}
-      virtual indexentry *Get (int idx)const {return (indexentry*)csVector::Get(idx); }
+      StreamIdx (uint32 id) : csArray<indexentry*> (8,8) {this->id = id;}
     };
 
-    class StreamList : public csVector
+    class StreamList : public csPDelArray<StreamIdx>
     {
     public:
-      StreamList () : csVector (8, 8){}
-      virtual ~StreamList () {}
-      virtual int Compare (void* Item1, void* Item2, int) const
+      StreamList () : csPDelArray<StreamIdx> (8, 8){}
+      static int Compare (StreamIdx const* i1, StreamIdx const* i2)
       {
-	StreamIdx *i1 = (StreamIdx*)Item1, *i2 = (StreamIdx*)Item2;
         return (i1->id < i2->id ? -1 : i1->id > i2->id ? 1 : 0);
       }
-      virtual int CompareKey (void* Item1, const void* Item2, int) const
+      static int CompareKey (StreamIdx const* i1, void* key)
       {
-	StreamIdx *i1 = (StreamIdx*)Item1;
-	uint32 id = (uint32)Item2;
+	uint32 id = (uint32)key;
         return (i1->id < id ? -1 : i1->id > id ? 1 : 0);
       }
-      virtual StreamIdx *Get (int idx)const {return (StreamIdx*)csVector::Get(idx); }
-      virtual bool FreeItem (void* Item) { delete (StreamIdx*)Item; return true; }
     };
 
     StreamList streamlist;
@@ -303,7 +298,7 @@ class csAVIFormat : public iStreamFormat
   AudioStreamFormat audsf;
   VideoStreamFormat vidsf;
 
-  csVector vStream;
+  csRefArray<iStream> vStream;
   iAudioStream *pAudio;
   iVideoStream *pVideo;
 
