@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+16-Oct-2001
+	- Michael Voase did the following:
+	  - Update bin/unixconf.sh to seperate gcc from g++
 15-Oct-2001
 	- All func-id's are now changed so that they are equal to their
 	  interface name. Basically this means:
