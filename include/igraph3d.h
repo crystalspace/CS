@@ -304,6 +304,23 @@ public:
   STDMETHOD (DrawLine) (csVector3& v1, csVector3& v2, float fov, int color) PURE;
 
   /**
+   * Prepare for drawing a series of projected polygons which all use
+   * the same texture. You must call this function before calling a
+   * series of DrawPolygonQuick(). After calling the series you should
+   * call FinishPolygonQuick().<p>
+   *
+   * Warning! After calling this function you are not allowed to do
+   * any calls to the 3D rasterizer other than DrawPolygonQuick() and
+   * FinishPolygonQuick().
+   */
+  STDMETHOD (StartPolygonQuick) (ITextureHandle* handle, bool gouroud) PURE;
+
+  /**
+   * Finish drawing a series of projected polygons.
+   */
+  STDMETHOD (FinishPolygonQuick) () PURE;
+
+  /**
    * Draw a projected polygon.
    * This routine will draw the polygon using and filling
    * the z buffer if needed. The texture mapping need not
