@@ -240,15 +240,15 @@ the width. This is the number of arms for the ghost.
 Add a particle system simulating rain. The three parameter for this
 command are the texture to use for the particles (raindrop.png is good),
 the number of particles and the speed (in meter per second). The default
-number of particles is 500 and the default speed is 2. Both speed and
-number are optional parameters.
+number of particles is 500 and the default speed is 2. All parameters
+are optional.
 
 @item snow
 Add a particle system simulating rain. The three parameter for this
 command are the texture to use for the particles (snow.jpg is good),
 the number of particles and the speed (in meter per second). The
-default number of particles is 500 and the default speed is .3. Both
-speed and number are optional parameters.
+default number of particles is 500 and the default speed is 0.3. All
+parameters are optional.
 
 @item explosion
 Add a particle system simulating an explosion. The parameter for this

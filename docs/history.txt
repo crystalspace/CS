@@ -4,6 +4,10 @@ The history order has been reversed so that new features are at the top.
 	- Wouter Wijngaards added a new snow particle system.
 	- Added 'snow' console command that works almost the same as
 	  the 'rain' console command.
+	- Fixed a bug in 'rain' and 'snow' commands with speeds other
+	  than the default. Also made raindrop.png and snow.jpg default
+	  so you can type just 'rain' or 'snow'. Default number of particles
+	  is now 500.
 18-Jun-2000
 	- Norman Kramer fixed Squawk and csgame following the recent modifications
 	  in sprite creation.

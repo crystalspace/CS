@@ -591,41 +591,31 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     char txtname[100];
     int cnt = 0;
-    int num, speed;
+    int num;
+    float speed;
     if (arg) cnt = ScanStr (arg, "%s,%d,%f", txtname, &num, &speed);
     extern void add_particles_rain (csSector* sector, char* txtname,
     	int num, float speed);
-    if (cnt < 1)
-    {
-      Sys->Printf (MSG_CONSOLE, "Expected parameter 'texture[,num[,speed]]'!\n");
-    }
-    else
-    {
-      if (cnt <= 2) speed = 2;
-      if (cnt <= 1) num = 100;
-      add_particles_rain (Sys->view->GetCamera ()->GetSector (),
+    if (cnt <= 2) speed = 2;
+    if (cnt <= 1) num = 500;
+    if (cnt <= 0) strcpy (txtname, "raindrop.png");
+    add_particles_rain (Sys->view->GetCamera ()->GetSector (),
     	txtname, num, speed);
-    }
   }
   else if (!strcasecmp (cmd, "snow"))
   {
     char txtname[100];
     int cnt = 0;
-    int num, speed;
+    int num;
+    float speed;
     if (arg) cnt = ScanStr (arg, "%s,%d,%f", txtname, &num, &speed);
     extern void add_particles_snow (csSector* sector, char* txtname,
     	int num, float speed);
-    if (cnt < 1)
-    {
-      Sys->Printf (MSG_CONSOLE, "Expected parameter 'texture[,num[,speed]]'!\n");
-    }
-    else
-    {
-      if (cnt <= 2) speed = .3;
-      if (cnt <= 1) num = 100;
-      add_particles_snow (Sys->view->GetCamera ()->GetSector (),
+    if (cnt <= 2) speed = .3;
+    if (cnt <= 1) num = 500;
+    if (cnt <= 0) strcpy (txtname, "snow.jpg");
+    add_particles_snow (Sys->view->GetCamera ()->GetSector (),
     	txtname, num, speed);
-    }
   }
   else if (!strcasecmp (cmd, "explosion"))
   {
