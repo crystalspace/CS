@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+11-Apr-2002
+	- Replaced /bin/sh to sh in the csconf.mak makefile. Many mingw
+	  installations don't have /bin/sh. So using 'sh' is preferable.
 8-Apr-2002
 	- Release of CS 0.94.
 7-Apr-2002

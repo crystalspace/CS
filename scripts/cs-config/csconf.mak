@@ -60,7 +60,7 @@ else
 endif
 	@echo $"PLUGIN.POSTFLAGS=$(PLUGIN.POSTFLAGS)$" >> out/csconfig.tmp
 
-	/bin/sh scripts/cs-config/genscript.sh "$(INSTALL_DIR)" "$(CXXFLAGS)" \
+	sh scripts/cs-config/genscript.sh "$(INSTALL_DIR)" "$(CXXFLAGS)" \
 	"$(CFLAGS)" "$(LIBS.EXE)" scripts/cs-config
 	$(RM) out/csconfig.tmp
 
