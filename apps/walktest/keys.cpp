@@ -593,10 +593,11 @@ static bool CommandHandler (char *cmd, char *arg)
     csDynLight* dyn;
 
     bool rnd;
-    float r, g, b, radius;
-    if (arg && ScanStr (arg, "%f,%f,%f,%f", &r, &g, &b, &radius) == 4)
+    float r, g, b, radius, thing_shadows;
+    if (arg && ScanStr (arg, "%f,%f,%f,%f,%d", &r, &g, &b, &radius, &thing_shadows) == 5)
     {
       CHK (dyn = new csDynLight (pos.x, pos.y, pos.z, radius, r, g, b));
+      if (thing_shadows) dyn->SetFlags (CS_LIGHT_THINGSHADOWS, CS_LIGHT_THINGSHADOWS);
       rnd = false;
     }
     else
