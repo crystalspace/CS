@@ -232,7 +232,7 @@ bool csCubeMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   if (rview->ClipBBox (sbox, cbox, clip_portal, clip_plane) == false)
     return false;
 
-  iClipper2D* clipper = rview->GetClipper ();
+  iClipper2D* clipper; clipper = rview->GetClipper ();
   g3d->SetObjectToCamera (&tr_o2c);
   // @@@ This should only be done when aspect changes...
   g3d->SetPerspectiveAspect (fov);
