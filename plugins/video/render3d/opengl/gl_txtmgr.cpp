@@ -122,7 +122,7 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target,
   Handle = 0;
 
   images = new csImageVector();
-  image->IncRef();
+  //image->IncRef();
   images->AddImage(image);
 
   this->flags = flags;
@@ -164,8 +164,8 @@ csGLTextureHandle::csGLTextureHandle (csRef<iImageVector> image,
 
   images = image;
   int i=0;
-  for (i=0; i < images->Length(); i++)
-    images->GetImage (i)->IncRef();
+  //for (i=0; i < images->Length(); i++)
+    //images->GetImage (i)->IncRef();
 
   this->flags = flags;
   transp = false;
