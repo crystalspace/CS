@@ -26,6 +26,10 @@ chronological order.
 	  with yesterday's changes.
 	- Eric Sunshine updated some outdated documentation in csstring.h and
 	  script/perl.txi.
+	- Jorrit temporarily disabled the optimization in csStringFast because
+	  it makes it impossible to use csString in csArray which is a bad
+	  problem. We have to find a better solution for this. This fix is
+	  only temporary.
 13-Mar-2005
 	- res made the following changes to csStringBase:
 	    - Removed static Pad*() methods. Provided nothing that can't 

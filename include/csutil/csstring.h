@@ -896,7 +896,8 @@ protected:
   {
     char* oldBuf = (MaxSize > LEN) ? Data : 0;
     char* newBuf;
-    if (NewSize < LEN)
+    // @@@ TEMPORARILY DISABLED!
+    if (false) //(NewSize < LEN)
     {
       newBuf = internalBuffer;
       /* No need to honor extraSpace; later "reallocations" are free when
