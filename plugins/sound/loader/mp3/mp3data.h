@@ -24,8 +24,8 @@
  */
 
 #include "isound/data.h"
-#include "mpglib/mpg123.h"
-#include "mpglib/mpglib.h"
+#include "mpg123/mpg123.h"
+#include "mpg123/frame.h"
 
 class csMp3SoundData : public iSoundData
 {
@@ -51,15 +51,27 @@ class csMp3SoundData : public iSoundData
     ~datastore(){ if (bOwn) free(data);}
   };
 
-
+  struct myCallback
+  {
+    size_t (*read)  (void *ptr, size_t size, void *datastore);
+    int    (*seek)  (int offset, int whence, void *datastore);
+    int    (*close) (void *datastore);
+    long   (*tell)  (void *datastore);
+    myCallback ();
+    static size_t myread  (void *ptr, size_t size, void *datasource);
+    static int    myseek  (int offset, int whence, void *datasource);
+    static int    myclose (void *datasource);
+    static long   mytell  (void *datasource);
+  };
+  
  protected:
   datastore *ds;
   csSoundFormat fmt;
   bool mp3_ok;
-  mpstr mp;
+  csMPGFrame *mp;
+  myCallback cb;
+  unsigned char *pos;
   int bytes_left;
-  uint8 *buf, *pos;
-  long len;
 
  public:
   SCF_DECLARE_IBASE;

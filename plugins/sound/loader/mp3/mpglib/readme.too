@@ -1,6 +1,0 @@
-The sources you see here are from the mpg123 package which is (c) by Michael Hipp.
-In order to please the compiler i added a few explicit casts, changed the filename 
-suffices to .cpp (mingw dislikes it otherwise). Also to be conform with CS filenames
-i shorten them to fit the 8.3 schema.
-
-Norman Krämer

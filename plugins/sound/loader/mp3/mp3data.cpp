@@ -27,25 +27,75 @@ SCF_IMPLEMENT_IBASE (csMp3SoundData)
   SCF_IMPLEMENTS_INTERFACE (iSoundData)
 SCF_IMPLEMENT_IBASE_END
 
+
+csMp3SoundData::myCallback::myCallback ()
+{
+  read  = myread;
+  seek  = myseek;
+  close = myclose;
+  tell  = mytell;
+}
+
+size_t csMp3SoundData::myCallback::myread  (void *ptr, size_t size, void *datasource)
+{
+  csMp3SoundData::datastore *ds = (csMp3SoundData::datastore *)datasource;
+
+  size_t br = MIN (size, ds->length-ds->pos);
+  //  printf ("read from %p %ld bytes into %p\n", ds->data + ds->pos, br, ptr);
+  memcpy (ptr, ds->data+ds->pos, br);
+
+  ds->pos +=br;
+  return br;
+}
+
+int csMp3SoundData::myCallback::myseek  (int offset, int whence, void *datasource)
+{
+  size_t np;
+  csMp3SoundData::datastore *ds = (csMp3SoundData::datastore*)datasource;
+
+  if (whence == SEEK_SET)
+    np = offset;
+  else if (whence == SEEK_CUR)
+    np = ds->pos + offset;
+  else if (whence == SEEK_END)
+    np = ds->length + offset;
+  else
+    return -1;
+
+  if (np > ds->length)
+    return -1;
+
+  ds->pos = np;
+  return 0;
+}
+
+int csMp3SoundData::myCallback::myclose (void *)
+{
+  return 0;
+}
+
+long csMp3SoundData::myCallback::mytell  (void *datasource)
+{
+  csMp3SoundData::datastore *ds = (csMp3SoundData::datastore*)datasource;
+  return ds->pos;
+}
+
 csMp3SoundData::csMp3SoundData (iBase *parent, uint8 *data, size_t len)
 {
   SCF_CONSTRUCT_IBASE (parent);
 
   ds = new datastore (data, len, true);
   mp3_ok = false;
-  this->len = 8192;
   bytes_left = 0;
-  buf = (uint8*)malloc (this->len*2);
-  pos = buf;
   fmt.Bits = 16;
   fmt.Channels = 2;
-  InitMP3 (&mp);
+  pos = NULL;
+  mp = new csMPGFrame (ds, (ioCallback*)&cb, AUDIO_FORMAT_SIGNED_8, fmt.Bits, 0);
 }
 
 csMp3SoundData::~csMp3SoundData ()
 {
-  ExitMP3 (&mp);
-  delete [] buf;
+  delete mp;
   delete ds;
 }
 
@@ -53,20 +103,20 @@ bool csMp3SoundData::Initialize(const csSoundFormat* )
 {
   if (!mp3_ok)
   {
-    // try to convert the first few frames
-    mp3_ok = decodeMP3(&mp, (char*)ds->data, ds->length, (char*)buf, len, &bytes_left) == MP3_OK;
+    mp3_ok = mp->Read (); // read frame
+    if (mp3_ok)
+      mp->Decode ();
   }
   return mp3_ok;
 }
 
 bool csMp3SoundData::IsMp3 (void *Buffer, size_t len)
 {
-  char buf[8192];
-  int pos;
-  mpstr m;
-  InitMP3 (&m);
-  bool ok = decodeMP3(&m, (char*)Buffer, len, (char*)buf, 8192, &pos) == MP3_OK;
-  ExitMP3 (&m);
+  myCallback cb;
+  datastore ds ((uint8*)Buffer, len, false);
+  csMPGFrame *mpframe = new csMPGFrame (&ds, (ioCallback*)&cb, AUDIO_FORMAT_SIGNED_8, 16, 0);
+  bool ok = mpframe->Read ();
+  delete mpframe;
   return ok;
 }
 
@@ -92,42 +142,55 @@ void *csMp3SoundData::GetStaticData()
 
 void csMp3SoundData::ResetStreamed()
 {
-  ExitMP3 (&mp);
-  InitMP3 (&mp);
+  mp->Rewind ();
   bytes_left = 0;
-  pos = buf;
-  mp3_ok = decodeMP3(&mp, (char*)ds->data, ds->length, (char*)buf, len, &bytes_left) == MP3_OK;
+  mp3_ok = true;
 }
 
 void *csMp3SoundData::ReadStreamed(long &NumSamples)
 {
   if (mp3_ok)
   {
-    uint8 *p;
+    csPCMBuffer *pcm = mp->GetPCMBuffer ();
+    unsigned char *p;
+
+    //    printf ("requesting %d samples, ", NumSamples);
+
     if (!bytes_left)
     {
-      mp3_ok = decodeMP3(&mp, NULL, 0, (char*)buf, len, &bytes_left) == MP3_OK;
-      p = pos = buf;
-    }
-    else
-      p = pos;
-
-    if (mp3_ok)
-    {
-      long samples = bytes_left / ((fmt.Bits >> 3) * fmt.Channels);
-      if (samples > NumSamples)
+      mp3_ok = mp->Read ();
+      if (mp3_ok)
       {
-	pos += NumSamples * ((fmt.Bits >> 3) * fmt.Channels);
-	bytes_left -= NumSamples * ((fmt.Bits >> 3) * fmt.Channels);
+	mp->Decode ();
+	bytes_left = pcm->pos;
+	pos = pcm->buffer;
       }
       else
       {
-	NumSamples = samples;
-	bytes_left = 0;
+	NumSamples = 0;
+	return NULL;
       }
-
-      return p;
     }
+
+    p = pos;
+
+    long samples = bytes_left / ((fmt.Bits >> 3) * fmt.Channels);
+
+    //    printf ("returning %d samples\n", samples);
+
+    if (samples > NumSamples)
+    {
+      pos += NumSamples * ((fmt.Bits >> 3) * fmt.Channels);
+      bytes_left -= NumSamples * ((fmt.Bits >> 3) * fmt.Channels);
+    }
+    else
+    {
+      NumSamples = samples;
+      bytes_left = 0;
+      pcm->pos = 0;
+    }
+
+    return p;
   }
 
   NumSamples = 0;

@@ -26,7 +26,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/sound/loader/mp3 plugins/sound/loader/mp3/mpglib
+vpath %.cpp plugins/sound/loader/mp3 plugins/sound/loader/mp3/mpg123
 
 ifeq ($(USE_PLUGINS),yes)
   MP3 = $(OUTDLL)sndmp3$(DLL)
@@ -39,8 +39,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(MP3)
 endif
 
-INC.MP3 = $(wildcard plugins/sound/loader/mp3/*.h) $(wildcard plugins/sound/loader/mp3/mpglib/*.h)
-SRC.MP3 = $(wildcard plugins/sound/loader/mp3/*.cpp) $(wildcard plugins/sound/loader/mp3/mpglib/*.cpp)
+INC.MP3 = $(wildcard plugins/sound/loader/mp3/*.h) $(wildcard plugins/sound/loader/mp3/mpg123/*.h)
+SRC.MP3 = $(wildcard plugins/sound/loader/mp3/*.cpp) $(wildcard plugins/sound/loader/mp3/mpg123/*.cpp)
 OBJ.MP3 = $(addprefix $(OUT),$(notdir $(SRC.MP3:.cpp=$O)))
 DEP.MP3 = CSUTIL CSSYS CSUTIL
 
@@ -56,12 +56,6 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: mp3 mp3clean
 
 mp3: $(OUTDIRS) $(MP3)
-
-#$(OUT)%$O: plugins/sound/loader/mp3/mpglib/%.c
-#	$(DO.COMPILE.C)
-
-#$(OUT)%$O: plugins/sound/loader/mp3/%.cpp
-#	$(DO.COMPILE.CPP)
 
 $(MP3): $(OBJ.MP3) $(LIB.MP3)
 	$(DO.PLUGIN)

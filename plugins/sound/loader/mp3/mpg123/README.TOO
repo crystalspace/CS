@@ -1,0 +1,5 @@
+i took these sources from the mpg123 0.59r package which is (c) by Michael Hipp.
+i stripped off the player specific parts and all (?) globals which were subject to write access.
+i wrapped most of the code into a frame class.
+
+norman

@@ -1,49 +1,32 @@
-#include        <stdio.h>
-#include        <string.h>
-#include        <signal.h>
+/*
+ * mpg123 defines 
+ * used source: musicout.h from mpegaudio package
+ */
 
-#ifndef WIN32
-#include        <sys/signal.h>
-#include        <unistd.h>
-#endif
+#ifndef _MPG123_H_
+#define _MPG123_H_
 
-#include        <math.h>
+#define SKIP_JUNK 1
+#define NOXFERMEM 1
+#define real float
 
-#ifdef _WIN32
+#ifdef _WIN32	/* Win32 Additions By Tony Million */
 # undef WIN32
 # define WIN32
 
-# define M_PI       3.14159265358979323846
-# define M_SQRT2	1.41421356237309504880
-# define REAL_IS_FLOAT
 # define NEW_DCT9
 
-# define random rand
-# define srandom srand
-
+# undef MPG123_REMOTE           /* Get rid of this stuff for Win32 */
 #endif
 
-#ifdef REAL_IS_FLOAT
-#  define real float
-#elif defined(REAL_IS_LONG_DOUBLE)
-#  define real long double
-#else
-#  define real double
-#endif
+# define M_PI       3.14159265358979323846
+# define M_SQRT2	1.41421356237309504880
 
-#ifdef __GNUC__
-#define INLINE inline
-#else
-#define INLINE
-#endif
-
-/* AUDIOBUFSIZE = n*64 with n=1,2,3 ...  */
-#define		AUDIOBUFSIZE		16384
-
-#define         FALSE                   0
-#define         TRUE                    1
+#define byte unsigned char
+#include "xfermem.h"
 
 #define         SBLIMIT                 32
+#define         SCALE_BLOCK             12
 #define         SSLIMIT                 18
 
 #define         MPG_MD_STEREO           0
@@ -51,53 +34,32 @@
 #define         MPG_MD_DUAL_CHANNEL     2
 #define         MPG_MD_MONO             3
 
-#define MAXFRAMESIZE 1792
-
+#define MAXOUTBURST 32768
 
 /* Pre Shift fo 16 to 8 bit converter table */
 #define AUSHIFT (3)
 
-struct frame {
-    int stereo;
-    int jsbound;
-    int single;
-    int lsf;
-    int mpeg25;
-    int header_change;
-    int lay;
-    int error_protection;
-    int bitrate_index;
-    int sampling_frequency;
-    int padding;
-    int extension;
-    int mode;
-    int mode_ext;
-    int copyright;
-    int original;
-    int emphasis;
-    int framesize; /* computed framesize */
+
+struct al_table 
+{
+  short bits;
+  short d;
 };
 
-struct parameter {
-	int quiet;	/* shut up! */
-	int tryresync;  /* resync stream after error */
-	int verbose;    /* verbose level */
-	int checkrange;
-};
+extern txfermem *buffermem;
 
-extern unsigned int   get1bit(void);
-extern unsigned int   getbits(int);
-extern unsigned int   getbits_fast(int);
-extern int set_pointer(long);
+#ifndef NOXFERMEM
+extern void buffer_loop(struct audio_info_struct *ai,sigset_t *oldsigset);
+#endif
 
-extern unsigned char *wordpointer;
-extern int bitindex;
+/* ------ Declarations from "common.c" ------ */
 
-extern void make_decode_tables(long scaleval);
-extern int do_layer3(struct frame *fr,unsigned char *,int *);
-extern int decode_header(struct frame *fr,unsigned long newhead);
+extern void (*catchsignal(int signum, void(*handler)()))();
 
-
+#ifdef VARMODESUPPORT
+extern int varmode;
+extern int playlimit;
+#endif
 
 struct gr_info_s {
       int scfsi;
@@ -129,6 +91,12 @@ struct III_sideinfo
   } ch[2];
 };
 
+#ifdef PENTIUM_OPT
+extern int synth_1to1_pent (real *,int,unsigned char *);
+#endif
+#ifdef USE_3DNOW
+extern int synth_1to1_3dnow (real *,int,unsigned char *);
+#endif
 extern int synth_1to1 (real *,int,unsigned char *,int *);
 extern int synth_1to1_8bit (real *,int,unsigned char *,int *);
 extern int synth_1to1_mono (real *,unsigned char *,int *);
@@ -159,22 +127,26 @@ extern int synth_ntom_8bit_mono2stereo (real *,unsigned char *,int *);
 
 extern void rewindNbits(int bits);
 extern int  hsstell(void);
-extern int get_songlen(struct frame *fr,int no);
 
-extern void init_layer3(int);
-extern void init_layer2(void);
-extern void make_decode_tables(long scale);
-extern void make_conv16to8_table(int);
+extern void huffman_decoder(int ,int *);
+extern void huffman_count1(int,int *);
+
 extern void dct64(real *,real *,real *);
 
 extern void synth_ntom_set_step(long,long);
 
 extern unsigned char *conv16to8;
-extern long freqs[9];
 extern real muls[27][64];
+#ifdef USE_3DNOW
+extern real decwin[2*(512+32)];
+#else
 extern real decwin[512+32];
+#endif
 extern real *pnts[5];
 
-extern struct parameter param;
+/* 486 optimizations */
+#define FIR_BUFFER_SIZE  128
+extern void dct64_486(int *a,int *b,real *c);
+extern int synth_1to1_486(real *bandPtr,int channel,unsigned char *out,int nb_blocks);
 
-
+#endif
