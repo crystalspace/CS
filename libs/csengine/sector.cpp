@@ -744,28 +744,35 @@ void csSector::Draw (iRenderView* rview)
 
   G3D_FOGMETHOD fogmethod = G3DFOGMETHOD_NONE;
 
-  if (HasFog ())
+  if (rview->GetCallback ())
   {
-    if ((fogmethod = csEngine::current_engine->fogmethod)
-    	== G3DFOGMETHOD_VERTEX)
+    rview->CallCallback (CALLBACK_SECTOR, (void*)&scfiSector);
+  }
+  else
+  {
+    if (HasFog ())
     {
-      csFogInfo* fog_info = new csFogInfo ();
-      fog_info->next = rview->GetFirstFogInfo ();
-      iPolygon3D* ipoly3d = rview->GetPortalPolygon ();
-      if (ipoly3d)
+      if ((fogmethod = csEngine::current_engine->fogmethod)
+    	  == G3DFOGMETHOD_VERTEX)
       {
-        fog_info->incoming_plane = ipoly3d->GetCameraPlane ();
-        fog_info->incoming_plane.Invert ();
-	fog_info->has_incoming_plane = true;
+        csFogInfo* fog_info = new csFogInfo ();
+        fog_info->next = rview->GetFirstFogInfo ();
+        iPolygon3D* ipoly3d = rview->GetPortalPolygon ();
+        if (ipoly3d)
+        {
+          fog_info->incoming_plane = ipoly3d->GetCameraPlane ();
+          fog_info->incoming_plane.Invert ();
+	  fog_info->has_incoming_plane = true;
+        }
+        else fog_info->has_incoming_plane = false;
+        fog_info->fog = &GetFog ();
+        fog_info->has_outgoing_plane = true;
+        rview->SetFirstFogInfo (fog_info);
       }
-      else fog_info->has_incoming_plane = false;
-      fog_info->fog = &GetFog ();
-      fog_info->has_outgoing_plane = true;
-      rview->SetFirstFogInfo (fog_info);
-    }
-    else if (fogmethod != G3DFOGMETHOD_NONE)
-    {
-      rview->GetGraphics3D ()->OpenFogObject (GetID (), &GetFog ());
+      else if (fogmethod != G3DFOGMETHOD_NONE)
+      {
+        rview->GetGraphics3D ()->OpenFogObject (GetID (), &GetFog ());
+      }
     }
   }
 
@@ -898,34 +905,43 @@ void csSector::Draw (iRenderView* rview)
     // Tell the engine to try to add this light into the halo queue
     csEngine::current_engine->AddHalo ((csLight *)lights.Get (i));
 
-  // Handle the fog, if any
-  if (fogmethod != G3DFOGMETHOD_NONE)
+  if (rview->GetCallback ())
   {
-    G3DPolygonDFP g3dpoly;
-    if (fogmethod == G3DFOGMETHOD_ZBUFFER)
+    rview->CallCallback (CALLBACK_SECTOREXIT, (void*)&scfiSector);
+  }
+  else
+  {
+    // Handle the fog, if any
+    if (fogmethod != G3DFOGMETHOD_NONE)
     {
-      g3dpoly.num = rview->GetClipper ()->GetNumVertices ();
-      csVector2 *clipview = rview->GetClipper ()->GetClipPoly ();
-      memcpy (g3dpoly.vertices, clipview, g3dpoly.num * sizeof (csVector2));
-      if (icam->GetSector () == &scfiSector && draw_busy == 0)
+      G3DPolygonDFP g3dpoly;
+      if (fogmethod == G3DFOGMETHOD_ZBUFFER)
       {
-        // Since there is fog in the current camera sector we simulate
-        // this by adding the view plane polygon.
-        rview->GetGraphics3D ()->DrawFogPolygon (GetID (), g3dpoly, CS_FOG_VIEW);
+        g3dpoly.num = rview->GetClipper ()->GetNumVertices ();
+        csVector2 *clipview = rview->GetClipper ()->GetClipPoly ();
+        memcpy (g3dpoly.vertices, clipview, g3dpoly.num * sizeof (csVector2));
+        if (icam->GetSector () == &scfiSector && draw_busy == 0)
+        {
+          // Since there is fog in the current camera sector we simulate
+          // this by adding the view plane polygon.
+          rview->GetGraphics3D ()->DrawFogPolygon (GetID (),
+		g3dpoly, CS_FOG_VIEW);
+        }
+        else
+        {
+          // We must add a FRONT fog polygon for the clipper to this sector.
+          rview->GetClipPlane (g3dpoly.normal);
+	  g3dpoly.normal.Invert ();
+          rview->GetGraphics3D ()->DrawFogPolygon (GetID (), g3dpoly,
+	  	CS_FOG_FRONT);
+        }
       }
-      else
+      else if (fogmethod == G3DFOGMETHOD_VERTEX && rview->AddedFogInfo ())
       {
-        // We must add a FRONT fog polygon for the clipper to this sector.
-        rview->GetClipPlane (g3dpoly.normal);
-	g3dpoly.normal.Invert ();
-        rview->GetGraphics3D ()->DrawFogPolygon (GetID (), g3dpoly, CS_FOG_FRONT);
+        csFogInfo *fog_info = rview->GetFirstFogInfo ();
+        rview->SetFirstFogInfo (rview->GetFirstFogInfo ()->next);
+        delete fog_info;
       }
-    }
-    else if (fogmethod == G3DFOGMETHOD_VERTEX && rview->AddedFogInfo ())
-    {
-      csFogInfo *fog_info = rview->GetFirstFogInfo ();
-      rview->SetFirstFogInfo (rview->GetFirstFogInfo ()->next);
-      delete fog_info;
     }
   }
 

@@ -325,12 +325,6 @@ the name of a loaded material (use 'spark' for a good example).
 Toggle a fullscreen shading effect which is added to the 3D view using
 add-blending-mode.
 
-@item dumpvis
-This command takes the current view and dumps information for the rendering
-process.  You will see what sectors and polygons are rendered and how they are
-clipped.  This is useful for debugging purposes.  The output comes into a file
-named @file{debug.txt}.
-
 @item clrlights
 Clear all pseudo-dynamic lights in the world to black.
 

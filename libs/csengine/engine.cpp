@@ -1204,7 +1204,6 @@ void csEngine::DrawFunc (iCamera* c, iClipper2D* view,
 {
   csRenderView rview (c, view, G3D, G2D);
   StartDraw (c->GetPrivateObject (), view, rview);
-
   rview.SetCallback (callback, callback_data);
 
   // First initialize G3D with the right clipper.
@@ -1215,7 +1214,7 @@ void csEngine::DrawFunc (iCamera* c, iClipper2D* view,
   csSector* s = c->GetSector ()->GetPrivateObject ();
   s->Draw (&rview);
 
-  G3D->SetClipper (NULL, false);
+  G3D->SetClipper (NULL, CS_CLIPPER_NONE);
 }
 
 void csEngine::AddHalo (csLight* Light)

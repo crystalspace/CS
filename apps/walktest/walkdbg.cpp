@@ -95,36 +95,6 @@ int collcount = 0;
 // which are called by csEngine::DrawFunc() or csLight::LightingFunc().
 //------------------------------------------------------------------------
 
-// Callback for LightingFunc() to show the lighting frustum for the
-// selected light.
-void show_frustum (csFrustumView* lview, int type, void* /*entity*/)
-{
-  iTextureManager* txtmgr = Gfx3D->GetTextureManager ();
-  int white = txtmgr->FindRGB (255, 255, 255);
-  int red = txtmgr->FindRGB (255, 0, 0);
-
-  if (type == CALLBACK_POLYGON)
-  {
-    csCamera* cam = Sys->view->GetCamera ()->GetPrivateObject ();
-    csFrustumContext* ctxt = lview->GetFrustumContext ();
-    csFrustum* fr = ctxt->GetLightFrustum ();
-    csVector3 v0, v1, v2;
-    csVector3 light_cam = cam->Other2This (fr->GetOrigin ());
-    int j;
-
-    for (j = 0 ; j < fr->GetNumVertices () ; j++)
-    {
-      v0 = fr->GetVertices ()[j] + fr->GetOrigin ();
-      v1 = cam->Other2This (v0);
-      v0 = fr->GetVertices ()[(j+1)%fr->GetNumVertices ()] + fr->GetOrigin ();
-      v2 = cam->Other2This (v0);
-      Gfx3D->DrawLine (light_cam, v1, cam->GetFOV (), red);
-      Gfx3D->DrawLine (light_cam, v2, cam->GetFOV (), red);
-      Gfx3D->DrawLine (v1, v2, cam->GetFOV (), white);
-    }
-  }
-}
-
 // Callback for DrawFunc() to select an object with the mouse. The coordinate
 // to check for is in 'coord_check_vector'.
 bool check_poly;
@@ -196,6 +166,7 @@ void select_object (iRenderView* rview, int type, void* entity)
 void draw_map (csRenderView* /*rview*/, int type, void* entity)
 {
   csWireFrame* wf = Sys->wf->GetWireframe ();
+#if 0
   if (type == CALLBACK_POLYGON)
   {
     csPolygon3D* poly = (csPolygon3D*)entity;
@@ -207,7 +178,9 @@ void draw_map (csRenderView* /*rview*/, int type, void* entity)
       po->SetVertex (j, poly->Vwor (j));
     po->Prepare ();
   }
-  else if (type == CALLBACK_SECTOR)
+  else
+#endif
+  if (type == CALLBACK_SECTOR)
   {
     csSector* sector = (csSector*)entity;
     int i;
@@ -217,101 +190,6 @@ void draw_map (csRenderView* /*rview*/, int type, void* entity)
       vt->SetColor (wf->GetRed ());
     }
   }
-}
-
-// Callback for DrawFunc() to dump debug information about everything
-// that is currently visible. This is useful to debug clipping errors
-// and other visual errors.
-int dump_visible_indent = 0;
-void dump_visible (iRenderView* /*rview*/, int type, void* entity)
-{
-  int i;
-  char indent_spaces[255];
-  int ind = dump_visible_indent;
-  if (ind > 254) ind = 254;
-  for (i = 0 ; i < ind ; i++) indent_spaces[i] = ' ';
-  indent_spaces[ind] = 0;
-
-  if (type == CALLBACK_POLYGON)
-  {
-    csPolygon3D* poly = (csPolygon3D*)entity;
-    const char* name = poly->GetName ();
-    if (!name) name = "(NULL)";
-    const char* pname = poly->GetParent ()->GetName ();
-    if (!pname) pname = "(NULL)";
-    Sys->Printf (MSG_DEBUG_0, "%03d%sPolygon '%s/%s' ------\n",
-    	dump_visible_indent, indent_spaces, pname, name);
-    if (poly->GetPortal ())
-      Sys->Printf (MSG_DEBUG_0, "%03d%s   | Polygon has a portal.\n",
-        dump_visible_indent, indent_spaces);
-    for (i = 0 ; i < poly->GetVertices ().GetNumVertices () ; i++)
-    {
-      csVector3& vw = poly->Vwor (i);
-      csVector3& vc = poly->Vcam (i);
-      Sys->Printf (MSG_DEBUG_0, "%03d%s   | %d: wor=(%f,%f,%f) cam=(%f,%f,%f)\n",
-      	dump_visible_indent, indent_spaces, i, vw.x, vw.y, vw.z, vc.x, vc.y, vc.z);
-    }
-  }
-  else if (type == CALLBACK_POLYGON2D)
-  {
-    csPolygon2D* poly = (csPolygon2D*)entity;
-    Sys->Printf (MSG_DEBUG_0, "%03d%s2D Polygon ------\n", dump_visible_indent, indent_spaces);
-    for (i = 0 ; i < poly->GetNumVertices () ; i++)
-    {
-      csVector2 v = *poly->GetVertex (i);
-      Sys->Printf (MSG_DEBUG_0, "%03d%s   | %d: persp=(%f,%f)\n",
-      	dump_visible_indent, indent_spaces, i, v.x, v.y);
-    }
-  }
-  else if (type == CALLBACK_POLYGONQ)
-  {
-    // G3DPolygonDPQ* dpq = (G3DPolygonDPQ*)entity;
-  }
-  else if (type == CALLBACK_SECTOR)
-  {
-    csSector* sector = (csSector*)entity;
-    const char* name = sector->GetName ();
-    if (!name) name = "(NULL)";
-    Sys->Printf (MSG_DEBUG_0, "%03d%s BEGIN Sector '%s' ------------\n",
-    	dump_visible_indent+1, indent_spaces, name);
-    dump_visible_indent++;
-  }
-  else if (type == CALLBACK_SECTOREXIT)
-  {
-    csSector* sector = (csSector*)entity;
-    const char* name = sector->GetName ();
-    if (!name) name = "(NULL)";
-    Sys->Printf (MSG_DEBUG_0, "%03d%sEXIT Sector '%s' ------------\n",
-    	dump_visible_indent, indent_spaces, name);
-    dump_visible_indent--;
-  }
-#if 0
-  else if (type == CALLBACK_THING)
-  {
-    csThing* thing = (csThing*)entity;
-    const char* name = thing->GetName ();
-    if (!name) name = "(NULL)";
-    Sys->Printf (MSG_DEBUG_0, "%03d%s BEGIN Thing '%s' ------------\n",
-    	dump_visible_indent+1, indent_spaces, name);
-    for (i = 0 ; i < thing->GetNumVertices () ; i++)
-    {
-      csVector3& vw = thing->Vwor (i);
-      csVector3& vc = thing->Vcam (i);
-      Sys->Printf (MSG_DEBUG_0, "%03d%s   | %d: wor=(%f,%f,%f) cam=(%f,%f,%f)\n",
-      	dump_visible_indent+1, indent_spaces, i, vw.x, vw.y, vw.z, vc.x, vc.y, vc.z);
-    }
-    dump_visible_indent++;
-  }
-  else if (type == CALLBACK_THINGEXIT)
-  {
-    csThing* thing = (csThing*)entity;
-    const char* name = thing->GetName ();
-    if (!name) name = "(NULL)";
-    Sys->Printf (MSG_DEBUG_0, "%03d%sEXIT Thing '%s' ------------\n",
-    	dump_visible_indent, indent_spaces, name);
-    dump_visible_indent--;
-  }
-#endif
 }
 
 //------------------------------------------------------------------------
@@ -681,72 +559,5 @@ void CreateSolidThings (csEngine* engine, csSector* room,
   for (i = 0 ; i < 8 ; i++)
     CreateSolidThings (engine, room, node->GetChild (i), depth+1);
 #endif
-}
-
-struct db_frust
-{
-  int max_vis;
-  int num_vis;
-  csVector queue;
-};
-
-static db_frust dbf;
-
-// Callback for DrawFunc() to show an outline for all polygons that
-// are in the dbf queue.
-void draw_frust_edges (iRenderView* rview, int type, void* entity)
-{
-  iTextureManager* txtmgr = Gfx3D->GetTextureManager ();
-  int col = txtmgr->FindRGB (0, 0, 255);
-  static csPolygon3D* last_poly;
-
-  if (type == CALLBACK_POLYGON)
-  {
-    // Here we depend on CALLBACK_POLYGON being called right before CALLBACK_POLYGON2D.
-    last_poly = (csPolygon3D*)entity;
-  }
-  else if (type == CALLBACK_POLYGON2D)
-  {
-    csPolygon2D* polygon = (csPolygon2D*)entity;
-    int idx = dbf.queue.Find (last_poly);
-    if (idx != -1)
-      polygon->Draw (rview->GetGraphics2D (), col);
-  }
-}
-
-void poly_db_func (csObject* obj, csFrustumView* /*lview*/)
-{
-  csPolygon3D* poly = (csPolygon3D*)obj;
-  if (dbf.num_vis < dbf.max_vis)
-  {
-    dbf.num_vis++;
-    dbf.queue.Push ((void*)poly);
-  }
-}
-
-void curve_db_func (csObject*, csFrustumView*)
-{
-  //csCurve* curve = (csCurve*)obj;
-}
-
-void ShowCheckFrustum (csView* view,
-	csSector* room, const csVector3& pos, int num_vis)
-{
-  csFrustumView lview;
-  csFrustumContext* ctxt = lview.GetFrustumContext ();
-  lview.SetPolygonFunction (poly_db_func);
-  lview.SetCurveFunction (curve_db_func);
-  dbf.max_vis = num_vis;
-  dbf.num_vis = 0;
-  dbf.queue.SetLength (0);
-  lview.SetUserData ((void*)&dbf);
-  lview.SetRadius (1000000000.);
-  lview.EnableThingShadows (false);
-  lview.SetDynamic (false);
-  ctxt->SetLightFrustum (new csFrustum (pos));
-  ctxt->GetLightFrustum ()->MakeInfinite ();
-  room->CheckFrustum ((iFrustumView*)&lview);
-  view->GetEngine ()->DrawFunc (view->GetCamera (),
-    view->GetClipper (), draw_frust_edges);
 }
 

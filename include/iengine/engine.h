@@ -114,6 +114,15 @@ struct iKeyValuePair;
  */
 #define CS_ENGINE_ZBUFFER 3
 
+/**
+ * Flags for the callbacks called via iEngine::DrawFunc() or
+ * iLight::LightingFunc().
+ * (type csDrawFunc or csLightingFunc).
+ */
+#define CALLBACK_SECTOR 1
+#define CALLBACK_SECTOREXIT 2
+#define CALLBACK_MESH 3
+#define CALLBACK_VISMESH 4
 
 /// A callback function for csEngine::DrawFunc().
 typedef void (csDrawFunc) (iRenderView* rview, int type, void* entity);

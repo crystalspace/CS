@@ -24,6 +24,7 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/box.h"
 #include "ivideo/graph3d.h"
+#include "iengine/engine.h"
 
 struct iEngine;
 struct iClipper2D;
@@ -146,7 +147,7 @@ public:
   int draw_rec_level;
 };
 
-SCF_VERSION (iRenderView, 0, 1, 3);
+SCF_VERSION (iRenderView, 0, 1, 4);
 
 /**
  * This interface represents all information needed to render
@@ -321,6 +322,22 @@ struct iRenderView : public iBase
    * context.
    */
   virtual void DeleteRenderContextData (void* key) = 0;
+
+  /**
+   * Set a callback that will be called instead of drawing something.
+   * This will be used by iEngine::DrawFunc().
+   */
+  virtual void SetCallback (csDrawFunc* cb, void* cbdata) = 0;
+  /**
+   * Get the callback.
+   */
+  virtual csDrawFunc* GetCallback () = 0;
+  /// Get the data for the callback.
+  virtual void* GetCallbackData () = 0;
+  /**
+   * Call callback.
+   */
+  virtual void CallCallback (int type, void* data) = 0;
 };
 
 #endif

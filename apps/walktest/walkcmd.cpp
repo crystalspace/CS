@@ -664,7 +664,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 #   define CONPRI(m) Sys->Printf (MSG_CONSOLE, m);
     CONPRI("-*- Additional commands -*-\n");
     CONPRI("Visibility:\n");
-    CONPRI("  dumpvis emode pvs freezepvs pvsonly\n");
+    CONPRI("  emode pvs freezepvs pvsonly\n");
     CONPRI("  db_octree, db_osolid, db_dumpstubs, db_cbuffer, db_frustum\n");
     CONPRI("  db_curleaf\n");
     CONPRI("Lights:\n");
@@ -683,7 +683,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  snow fountain flame portal fs_inter fs_fadeout fs_fadecol\n");
     CONPRI("  fs_fadetxt fs_red fs_green fs_blue fs_whiteout fs_shadevert\n");
     CONPRI("Debugging:\n");
-    CONPRI("  fclear hi frustum zbuf debug0 debug1 debug2 edges palette\n");
+    CONPRI("  fclear hi zbuf debug0 debug1 debug2 edges palette\n");
     CONPRI("  db_boxshow db_boxcam1 db_boxcam2 db_boxsize1 db_boxsize2\n");
     CONPRI("  db_boxnode1 db_boxnode2 db_boxvis db_radstep db_radhi db_radtodo\n");
     CONPRI("Meshes:\n");
@@ -925,16 +925,6 @@ bool CommandHandler (const char *cmd, const char *arg)
     else
       Sys->Printf (MSG_CONSOLE, "Error: Option valid only when recording.\n");
   }
-  else if (!strcasecmp (cmd, "dumpvis"))
-  {
-    extern int dump_visible_indent;
-    dump_visible_indent = 0;
-    Sys->Printf (MSG_DEBUG_0, "====================================================================\n");
-    extern void dump_visible (iRenderView* rview, int type, void* entity);
-    Sys->view->GetEngine ()->DrawFunc (Sys->view->GetCamera (),
-      Sys->view->GetClipper (), dump_visible);
-    Sys->Printf (MSG_DEBUG_0, "====================================================================\n");
-  }
   else if (!strcasecmp (cmd, "bind"))
   {
     extern void bind_key (const char* arg);
@@ -955,8 +945,6 @@ bool CommandHandler (const char *cmd, const char *arg)
     csCommandProcessor::change_boolean (arg, &Sys->inverse_mouse, "inverse_mouse");
   else if (!strcasecmp (cmd, "colldet"))
     csCommandProcessor::change_boolean (arg, &Sys->do_cd, "colldet");
-  else if (!strcasecmp (cmd, "frustum"))
-    csCommandProcessor::change_boolean (arg, &Sys->do_light_frust, "frustum");
   else if (!strcasecmp (cmd, "zbuf"))
     csCommandProcessor::change_boolean (arg, &Sys->do_show_z, "zbuf");
   else if (!strcasecmp (cmd, "db_boxshow"))

@@ -37,20 +37,6 @@ struct iSector;
 struct iClipper2D;
 
 /**
- * Flags for the callbacks called via csEngine::DrawFunc() or
- * csLight::LightingFunc().
- * (type csDrawFunc or csLightingFunc).
- */
-#define CALLBACK_POLYGON 1
-#define CALLBACK_POLYGON2D 2
-#define CALLBACK_POLYGONQ 3
-#define CALLBACK_SECTOR 4
-#define CALLBACK_SECTOREXIT 5
-#define CALLBACK_THING 6
-#define CALLBACK_THINGEXIT 7
-#define CALLBACK_MESH 8
-
-/**
  * This structure represents all information needed for drawing
  * a scene. It is modified while rendering according to
  * portals/warping portals and such.
@@ -122,24 +108,24 @@ public:
 
 
   ///
-  void SetCallback (csDrawFunc* cb, void* cbdata)
+  virtual void SetCallback (csDrawFunc* cb, void* cbdata)
   {
     callback = cb;
     callback_data = cbdata;
   }
   ///
-  csDrawFunc* GetCallback ()
+  virtual csDrawFunc* GetCallback ()
   {
     return callback;
   }
   ///
-  void* GetCallbackData ()
+  virtual void* GetCallbackData ()
   {
     return callback_data;
   }
 
   /// Call callback.
-  void CallCallback (int type, void* data)
+  virtual void CallCallback (int type, void* data)
   {
     callback (this, type, data);
   }

@@ -132,7 +132,6 @@ WalkTest::WalkTest () :
   do_stats = false;
   do_clear = false;
   do_edges = false;
-  do_light_frust = false;
   do_show_coord = false;
   do_show_cbuffer = false;
   busy_perf_test = false;
@@ -515,11 +514,6 @@ void WalkTest::DrawFrameDebug ()
   //if (selected_polygon || selected_light)
     //view->GetEngine ()->DrawFunc (view->GetCamera (),
       //view->GetClipper (), draw_edges, (void*)1);
-  if (do_light_frust && selected_light)
-  {
-    extern void show_frustum (csFrustumView*, int, void*);
-    ((csStatLight*)selected_light)->LightingFunc (show_frustum);
-  }
   if (cfg_draw_octree)
   {
     extern void DrawOctreeBoxes (int);
@@ -527,10 +521,7 @@ void WalkTest::DrawFrameDebug ()
   }
   if (cfg_debug_check_frustum)
   {
-    extern void ShowCheckFrustum (csView* view, csSector* room,
-    	const csVector3& pos, int num_vis);
-    ShowCheckFrustum (view, view->GetCamera ()->GetSector ()->GetPrivateObject (),
-    	view->GetCamera ()->GetTransform ().GetOrigin (), cfg_debug_check_frustum);
+    // @@@
   }
   if (do_show_cbuffer)
   {

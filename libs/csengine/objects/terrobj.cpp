@@ -118,13 +118,16 @@ void csTerrainWrapper::ClearSectors()
   sectors.SetLength (0);
 }
 
-void csTerrainWrapper::Draw( iRenderView *iRView, bool bUseZBuf )
+void csTerrainWrapper::Draw (iRenderView* rview, bool bUseZBuf)
 {
-// if (mesh->DrawTest (irv, imov))
-// {
-    pTerrObj->Draw( iRView, bUseZBuf );
-// }
-
+  if (rview->GetCallback ())
+  {
+    rview->CallCallback (CALLBACK_VISMESH, (void*)&scfiTerrainWrapper);
+  }
+  else
+  {
+    pTerrObj->Draw (rview, bUseZBuf);
+  }
 }
 
 int csTerrainWrapper::CollisionDetect( csTransform *pTrans )

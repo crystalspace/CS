@@ -249,20 +249,31 @@ void csMeshWrapper::Draw (iRenderView* rview)
 void csMeshWrapper::DrawInt (iRenderView* rview)
 {
   iMeshWrapper* meshwrap = &scfiMeshWrapper;
+  if (rview->GetCallback ())
+  {
+    rview->CallCallback (CALLBACK_MESH, (void*)&scfiMeshWrapper);
+  }
   if (draw_cb) draw_cb (meshwrap, rview, draw_cbData);
   if (mesh->DrawTest (rview, &movable.scfiMovable))
   {
-    cs_time lt = csEngine::current_engine->GetLastAnimationTime ();
-    if (lt != 0)
+    if (rview->GetCallback ())
     {
-      if (lt != last_anim_time)
-      {
-        mesh->NextFrame (lt);
-        last_anim_time = lt;
-      }
+      rview->CallCallback (CALLBACK_VISMESH, (void*)&scfiMeshWrapper);
     }
-    UpdateDeferedLighting (movable.GetFullPosition ());
-    mesh->Draw (rview, &movable.scfiMovable, zbufMode);
+    else
+    {
+      cs_time lt = csEngine::current_engine->GetLastAnimationTime ();
+      if (lt != 0)
+      {
+        if (lt != last_anim_time)
+        {
+          mesh->NextFrame (lt);
+          last_anim_time = lt;
+        }
+      }
+      UpdateDeferedLighting (movable.GetFullPosition ());
+      mesh->Draw (rview, &movable.scfiMovable, zbufMode);
+    }
   }
   int i;
   for (i = 0 ; i < children.Length () ; i++)

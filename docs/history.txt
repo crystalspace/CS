@@ -52,6 +52,15 @@ The history order is reversed so that new features are at the top.
 	  but it may be that everything is ok now.
 	- Fixed an EXTREMELY stupid bug in OpenGL renderer which caused
 	  all polygons to be rendered twice :-)
+	- Added callback functionality to iRenderView (copy from csRenderView).
+	  Reduce the number of callbacks to 4: CALLBACK_SECTOR,
+	  CALLBACK_SECTOREXIT, CALLBACK_MESH, and CALLBACK_VISMESH.
+	  iEngine::DrawFunc() is now working again but will no longer fire
+	  callbacks for every individual polygon. It will stop at the
+	  mesh level.
+	- Removed 'frustum' command from WalkTest. It was never very useful
+	  and was broken anyway.
+	- Removed 'dumpvis' command from WalkTest. It was also broken.
 	- Eric Sunshine changed the prototype of iSCF::QueryClassList() so that
 	  it now returns matches via an iStrVector object rather than a (char
 	  const**) which was free()'d by the caller.  It was necessary to
