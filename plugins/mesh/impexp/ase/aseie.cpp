@@ -26,44 +26,17 @@
 #include "csutil/csstring.h"
 #include "csutil/objiter.h"
 #include "csutil/databuf.h"
+#include "csutil/datastrm.h"
+#include "csutil/nobjvec.h"
 #include "csgeom/math3d.h"
+#include "csgeom/transfrm.h"
 
-// A simple triangle, consisting of three vertex indices
-struct csTriangle
-{
-  int a, b, c;
+typedef bool (csASEInterpreter) (class csModelConverterASE *conv, csDataStream &in,
+  const char *Token);
 
-  csTriangle (int v1, int v2, int v3)
-  { a=v1; b=v2; c=v3; }
-};
+SCF_DECLARE_FAST_INTERFACE (iModelDataPolygon);
 
-/*
- * Extended triangle structure, consisting of three vertex, normal, color
- * and texel indices.
- */
-struct csExtTriangle
-{
-  int va, vb, vc;
-  int na, nb, nc;
-  int ca, cb, cc;
-  int ta, tb, tc;
-
-  csExtTriangle (iModelDataPolygon *p, int a, int b, int c)
-  {
-    va = p->GetVertex (a);
-    vb = p->GetVertex (b);
-    vc = p->GetVertex (c);
-    na = p->GetNormal (a);
-    nb = p->GetNormal (b);
-    nc = p->GetNormal (c);
-    ca = p->GetColor (a);
-    cb = p->GetColor (b);
-    cc = p->GetColor (c);
-    ta = p->GetTexel (a);
-    tb = p->GetTexel (b);
-    tc = p->GetTexel (c);
-  }
-};
+CS_DECLARE_OBJECT_VECTOR (csModelDataPolygonVector, iModelDataPolygon);
 
 class csModelConverterASE : iModelConverter
 {
@@ -72,6 +45,26 @@ private:
 
 public:
   SCF_DECLARE_IBASE;
+
+  // current interpreter
+  csASEInterpreter *interp;
+  // current scene
+  iModelData *Scene;
+  // current object
+  iModelDataObject *Object;
+  // vertices of current object
+  iModelDataVertices *Vertices;
+  // list of polygons for current object
+  csModelDataPolygonVector Polygons;
+  // current polygon (for "normals" section; not referenced)
+  iModelDataPolygon *CurrentPolygon;
+  // current vertex (for "normals" section)
+  int CurrentVertex;
+  // object transformation
+  csVector3 TransformRow1;
+  csVector3 TransformRow2;
+  csVector3 TransformRow3;
+  csVector3 TransformOrigin;
 
   /// constructor
   csModelConverterASE (iBase *pBase);
@@ -114,19 +107,13 @@ SCF_EXPORT_CLASS_TABLE_END
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_DECLARE_FAST_INTERFACE (iModelDataPolygon);
-
-CS_DECLARE_TYPED_VECTOR (csTriangleVector, csTriangle);
-CS_DECLARE_TYPED_VECTOR (csExtTriangleVector, csExtTriangle);
-CS_DECLARE_OBJECT_ITERATOR (csModelDataPolygonIterator, iModelDataPolygon);
-
 csModelConverterASE::csModelConverterASE (iBase *pBase)
 {
   SCF_CONSTRUCT_IBASE (pBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
 
   FormatInfo.Name = "ase";
-  FormatInfo.CanLoad = false;
+  FormatInfo.CanLoad = true;
   FormatInfo.CanSave = true;
 }
 
@@ -149,10 +136,444 @@ const csModelConverterFormat *csModelConverterASE::GetFormat (int idx) const
   return (idx == 0) ? &FormatInfo : NULL;
 }
 
-iModelData *csModelConverterASE::Load (UByte * /*Buffer*/, ULong /*Size*/)
+// Load a single word from the stream
+static bool csASEReadWord (csDataStream &str, char *buf, int max)
 {
-  return NULL;
+  int count = 0;
+  bool quoted = false;
+  str.SkipWhitespace ();
+
+  if (str.Finished ()) return false;
+
+  // look if this word is enclosed in double quotes
+  if (str.LookChar () == '"') {
+    str.GetChar ();
+    quoted = true;
+  }
+
+  while (count < max-1) {
+    int c = str.GetChar ();
+    bool Finished = quoted ? (c == '"') : (isspace (c));
+    if (c == EOF || Finished) break;
+    buf [count] = c;
+    count++;
+  }
+
+  buf [count] = 0;
+  return true;
 }
+
+#define CS_ASE_CHECK_TOKEN(x)						\
+  (strcmp (Token, x) == 0)
+
+#define CS_ASE_READ_IGNORE(x)						\
+  if (CS_ASE_CHECK_TOKEN (x)) return true;
+
+#define CS_ASE_ENTER_SUBSECTION(intp)					\
+  {									\
+    char buf [256];							\
+    if (!csASEReadWord (in, buf, 256)) return false;			\
+    if (strcmp (buf, "{")) return false;				\
+    conv->interp = &intp;						\
+  }
+
+#define CS_ASE_LEAVE_SUBSECTION(intp)					\
+  conv->interp = &intp;
+
+#define CS_ASE_SUBSECTION(token,intp)					\
+  if (CS_ASE_CHECK_TOKEN (token)) {					\
+    CS_ASE_ENTER_SUBSECTION (intp);					\
+    return true;							\
+  }
+
+#define CS_ASE_OUTER_SECTION(intp)					\
+  if (CS_ASE_CHECK_TOKEN ("}")) {					\
+    CS_ASE_LEAVE_SUBSECTION (intp);					\
+    return true;							\
+  }
+    
+csASEInterpreter csASEInterpreter_MAIN;
+csASEInterpreter csASEInterpreter_SCENE;
+csASEInterpreter csASEInterpreter_GEOMOBJECT;
+csASEInterpreter csASEInterpreter_MESH;
+csASEInterpreter csASEInterpreter_NODE_TM;
+csASEInterpreter csASEInterpreter_MESH_VERTEX_LIST;
+csASEInterpreter csASEInterpreter_MESH_FACE_LIST;
+csASEInterpreter csASEInterpreter_MESH_NORMALS;
+csASEInterpreter csASEInterpreter_MESH_CFACELIST;
+csASEInterpreter csASEInterpreter_MESH_CVERTLIST;
+csASEInterpreter csASEInterpreter_MESH_TFACELIST;
+csASEInterpreter csASEInterpreter_MESH_TVERTLIST;
+
+bool csASEInterpreter_MAIN (csModelConverterASE *conv, csDataStream &in,
+  const char *Token)
+{
+  CS_ASE_READ_IGNORE ("*3DSMAX_ASCIIEXPORT");
+  CS_ASE_READ_IGNORE ("*COMMENT");
+  CS_ASE_SUBSECTION ("*SCENE", csASEInterpreter_SCENE);
+
+  if (CS_ASE_CHECK_TOKEN ("*GEOMOBJECT")) {
+    conv->Object = new csModelDataObject ();
+    conv->Scene->QueryObject ()->ObjAdd (conv->Object->QueryObject ());
+    conv->Vertices = new csModelDataVertices ();
+    conv->Object->SetDefaultVertices (conv->Vertices);
+    conv->TransformRow1 = csVector3 (0);
+    conv->TransformRow2 = csVector3 (0);
+    conv->TransformRow3 = csVector3 (0);
+    conv->TransformOrigin = csVector3 (0);
+
+    CS_ASE_ENTER_SUBSECTION (csASEInterpreter_GEOMOBJECT);
+    return true;
+  }
+
+  return false;
+}
+
+bool csASEInterpreter_SCENE (csModelConverterASE *conv, csDataStream &in,
+  const char *Token)
+{
+  CS_ASE_READ_IGNORE ("*SCENE_AMBIENT_STATIC");
+  CS_ASE_READ_IGNORE ("*SCENE_BACKGROUND_STATIC");
+  CS_ASE_READ_IGNORE ("*SCENE_FILENAME");
+  CS_ASE_READ_IGNORE ("*SCENE_FIRSTFRAME");
+  CS_ASE_READ_IGNORE ("*SCENE_FRAMESPEED");
+  CS_ASE_READ_IGNORE ("*SCENE_LASTFRAME");
+  CS_ASE_READ_IGNORE ("*SCENE_TICKSPERFRAME");
+
+  CS_ASE_OUTER_SECTION (csASEInterpreter_MAIN);
+  return false;
+}
+
+bool csASEInterpreter_GEOMOBJECT (csModelConverterASE *conv, csDataStream &in,
+  const char *Token)
+{
+  CS_ASE_READ_IGNORE ("*NODE_NAME");
+  CS_ASE_READ_IGNORE ("*PROP_CASTSHADOW");
+  CS_ASE_READ_IGNORE ("*PROP_MOTIONBLUR");
+  CS_ASE_READ_IGNORE ("*PROP_RECVSHADOW");
+  CS_ASE_SUBSECTION ("*NODE_TM", csASEInterpreter_NODE_TM);
+  CS_ASE_SUBSECTION ("*MESH", csASEInterpreter_MESH);
+
+  if (CS_ASE_CHECK_TOKEN ("}")) {
+    // @@@ transform object
+
+    // fill missing colors or texels
+    int vc = conv->Vertices->GetVertexCount ();
+    while (conv->Vertices->GetColorCount () < vc)
+      conv->Vertices->AddColor (csColor (1, 1, 1));
+    while (conv->Vertices->GetTexelCount () < vc)
+      conv->Vertices->AddTexel (csVector2 (0, 0));
+
+    conv->Object->DecRef ();
+    conv->Object = NULL;
+    conv->Vertices->DecRef ();
+    conv->Vertices = NULL;
+    conv->Polygons.DeleteAll ();
+
+    CS_ASE_LEAVE_SUBSECTION (csASEInterpreter_MAIN);
+    return true;
+  }
+
+  return false;
+}
+
+bool csASEInterpreter_MESH (csModelConverterASE *conv, csDataStream &in,
+  const char *Token)
+{
+  CS_ASE_SUBSECTION ("*MESH_CFACELIST", csASEInterpreter_MESH_CFACELIST);
+  CS_ASE_SUBSECTION ("*MESH_CVERTLIST", csASEInterpreter_MESH_CVERTLIST);
+  CS_ASE_SUBSECTION ("*MESH_FACE_LIST", csASEInterpreter_MESH_FACE_LIST);
+  CS_ASE_SUBSECTION ("*MESH_NORMALS", csASEInterpreter_MESH_NORMALS);
+  CS_ASE_SUBSECTION ("*MESH_TFACELIST", csASEInterpreter_MESH_TFACELIST);
+  CS_ASE_SUBSECTION ("*MESH_TVERTLIST", csASEInterpreter_MESH_TVERTLIST);
+  CS_ASE_SUBSECTION ("*MESH_VERTEX_LIST", csASEInterpreter_MESH_VERTEX_LIST);
+
+  CS_ASE_READ_IGNORE ("*TIMEVALUE");
+  CS_ASE_READ_IGNORE ("*MESH_NUMCVERTEX");
+  CS_ASE_READ_IGNORE ("*MESH_NUMCVFACES");
+  CS_ASE_READ_IGNORE ("*MESH_NUMFACES");
+  CS_ASE_READ_IGNORE ("*MESH_NUMTVERTEX");
+  CS_ASE_READ_IGNORE ("*MESH_NUMTVFACES");
+  CS_ASE_READ_IGNORE ("*MESH_NUMVERTEX");
+
+  CS_ASE_OUTER_SECTION (csASEInterpreter_GEOMOBJECT);
+  return false;
+}
+
+bool csASEInterpreter_NODE_TM (csModelConverterASE *conv, csDataStream &in,
+  const char *Token)
+{
+  CS_ASE_READ_IGNORE ("*INHERIT_POS");
+  CS_ASE_READ_IGNORE ("*INHERIT_ROT");
+  CS_ASE_READ_IGNORE ("*INHERIT_SCL");
+  CS_ASE_READ_IGNORE ("*NODE_NAME");
+  CS_ASE_READ_IGNORE ("*TM_POS");
+  CS_ASE_READ_IGNORE ("*TM_ROTANGLE");
+  CS_ASE_READ_IGNORE ("*TM_ROTAXIS");
+  CS_ASE_READ_IGNORE ("*TM_SCALE");
+  CS_ASE_READ_IGNORE ("*TM_SCALEAXIS");
+  CS_ASE_READ_IGNORE ("*TM_SCALEAXISANG");
+
+  if (CS_ASE_CHECK_TOKEN ("*TM_ROW0")) {
+    conv->TransformRow1.x = in.ReadTextFloat ();
+    conv->TransformRow1.y = in.ReadTextFloat ();
+    conv->TransformRow1.z = in.ReadTextFloat ();
+    return true;
+  }
+  if (CS_ASE_CHECK_TOKEN ("*TM_ROW1")) {
+    conv->TransformRow2.x = in.ReadTextFloat ();
+    conv->TransformRow2.y = in.ReadTextFloat ();
+    conv->TransformRow2.z = in.ReadTextFloat ();
+    return true;
+  }
+  if (CS_ASE_CHECK_TOKEN ("*TM_ROW2")) {
+    conv->TransformRow3.x = in.ReadTextFloat ();
+    conv->TransformRow3.y = in.ReadTextFloat ();
+    conv->TransformRow3.z = in.ReadTextFloat ();
+    return true;
+  }
+  if (CS_ASE_CHECK_TOKEN ("*TM_ROW3")) {
+    conv->TransformOrigin.x = in.ReadTextFloat ();
+    conv->TransformOrigin.y = in.ReadTextFloat ();
+    conv->TransformOrigin.z = in.ReadTextFloat ();
+    return true;
+  }
+
+  CS_ASE_OUTER_SECTION (csASEInterpreter_GEOMOBJECT);
+  return false;
+}
+
+bool csASEInterpreter_MESH_VERTEX_LIST (csModelConverterASE *conv, csDataStream &in,
+  const char *Token)
+{
+  if (CS_ASE_CHECK_TOKEN ("*MESH_VERTEX"))
+  {
+    // @@@ nbase?
+    int n = in.ReadTextInt ();
+    float x = in.ReadTextFloat ();
+    float y = in.ReadTextFloat ();
+    float z = in.ReadTextFloat ();
+    conv->Vertices->AddVertex (csVector3 (x, y, z));
+    return true;
+  }
+
+  CS_ASE_OUTER_SECTION (csASEInterpreter_MESH);
+  return false;
+}
+
+bool csASEInterpreter_MESH_FACE_LIST (csModelConverterASE *conv, csDataStream &in,
+  const char *Token)
+{
+  if (CS_ASE_CHECK_TOKEN ("*MESH_FACE"))
+  {
+    char Token2 [256];
+    int a = -1, b = -1, c = -1, d = -1;
+
+    // first word is the face number, which is unimportant to us
+    csASEReadWord (in, Token2, 256);
+
+    // loop through the remaining words
+    while (!in.Finished ()) {
+      csASEReadWord (in, Token2, 256);
+      int Param = in.ReadTextInt ();
+      
+      if (!strcmp (Token2, "A:")) a = Param;
+      if (!strcmp (Token2, "B:")) b = Param;
+      if (!strcmp (Token2, "C:")) c = Param;
+      if (!strcmp (Token2, "D:")) d = Param;
+      if (!strcmp (Token2, "*MESH_MTLID")) {
+        // is this the material for the face?
+      }
+    }
+
+    iModelDataPolygon *poly = new csModelDataPolygon ();
+    if (a == -1 || b == -1 || c == -1) return false;
+    poly->AddVertex (a, 0, a, a);
+    poly->AddVertex (b, 0, b, b);
+    poly->AddVertex (c, 0, c, c);
+    if (d != -1) poly->AddVertex (d, 0, d, d);
+
+    conv->Object->QueryObject ()->ObjAdd (poly->QueryObject ());
+    conv->Polygons.Push (poly);
+    poly->DecRef ();
+    return true;
+  }
+
+  CS_ASE_OUTER_SECTION (csASEInterpreter_MESH);
+  return false;
+}
+
+bool csASEInterpreter_MESH_NORMALS (csModelConverterASE *conv, csDataStream &in,
+  const char *Token)
+{
+  if (CS_ASE_CHECK_TOKEN ("*MESH_FACENORMAL"))
+  {
+    int n = in.ReadTextInt ();
+    if (n<0 || n>=conv->Polygons.Length ()) return false;
+    conv->CurrentPolygon = conv->Polygons.Get (n);
+    conv->CurrentVertex = 0;
+    return true;
+  }
+
+  if (CS_ASE_CHECK_TOKEN ("*MESH_VERTEXNORMAL"))
+  {
+    int n = in.ReadTextInt ();
+    float x = in.ReadTextFloat ();
+    float y = in.ReadTextFloat ();
+    float z = in.ReadTextFloat ();
+    csVector3 v (x, y, z);
+
+    n = conv->Vertices->FindNormal (v);
+    if (n == -1) n = conv->Vertices->AddNormal (v);
+    conv->CurrentPolygon->SetNormal (conv->CurrentVertex, n);
+    conv->CurrentVertex++;
+
+    return true;
+  }
+
+  CS_ASE_OUTER_SECTION (csASEInterpreter_MESH);
+  return false;
+}
+
+bool csASEInterpreter_MESH_CFACELIST (csModelConverterASE *conv, csDataStream &in,
+  const char *Token)
+{
+  CS_ASE_READ_IGNORE ("*MESH_CFACE");
+
+  CS_ASE_OUTER_SECTION (csASEInterpreter_MESH);
+  return false;
+}
+
+bool csASEInterpreter_MESH_CVERTLIST (csModelConverterASE *conv, csDataStream &in,
+  const char *Token)
+{
+  if (CS_ASE_CHECK_TOKEN ("*MESH_VERTCOL"))
+  {
+    // @@@ nbase?
+    int n = in.ReadTextInt ();
+    float r = in.ReadTextFloat ();
+    float g = in.ReadTextFloat ();
+    float b = in.ReadTextFloat ();
+    conv->Vertices->AddColor (csColor (r, g, b));
+    return true;
+  }
+
+  CS_ASE_OUTER_SECTION (csASEInterpreter_MESH);
+  return false;
+}
+
+bool csASEInterpreter_MESH_TFACELIST (csModelConverterASE *conv, csDataStream &in,
+  const char *Token)
+{
+  CS_ASE_READ_IGNORE ("*MESH_TFACE");
+
+  CS_ASE_OUTER_SECTION (csASEInterpreter_MESH);
+  return false;
+}
+
+bool csASEInterpreter_MESH_TVERTLIST (csModelConverterASE *conv, csDataStream &in,
+  const char *Token)
+{
+  if (CS_ASE_CHECK_TOKEN ("*MESH_TVERT"))
+  {
+    // @@@ nbase?
+    int n = in.ReadTextInt ();
+    float u = in.ReadTextFloat ();
+    float v = in.ReadTextFloat ();
+    conv->Vertices->AddTexel (csVector2 (u, v));
+    return true;
+  }
+
+  CS_ASE_OUTER_SECTION (csASEInterpreter_MESH);
+  return false;
+}
+
+iModelData *csModelConverterASE::Load (UByte *Buffer, ULong Size)
+{
+  csDataStream in (Buffer, Size, false);
+  interp = &csASEInterpreter_MAIN;
+  Scene = new csModelData ();
+  Object = NULL;
+  Vertices = NULL;
+  CurrentPolygon = NULL;
+
+  while (!in.Finished ()) {
+    // read a line of text
+    char line [2048];
+    int linelen = 0;
+    while (linelen < 2047) {
+      int c = in.GetChar ();
+      if (c == EOF || c == '\n' || c == '\r') break;
+      line [linelen] = c;
+      linelen++;
+    }
+    line [linelen] = 0;
+
+    // create a separate stream for the line
+    csDataStream Line (line, linelen, false);
+
+    // read the first word
+    char Token [256];
+    if (!csASEReadWord (Line, Token, 256)) continue;
+
+    // give the line to the current interpreter
+    if (!(*interp) (this, Line, Token))
+    {
+      CRASH;
+      if (Scene) Scene->DecRef ();
+      Scene = NULL;
+      if (Object) Object->DecRef ();
+      Object = NULL;
+      if (Vertices) Vertices->DecRef ();
+      Vertices = NULL;
+      Polygons.DeleteAll ();
+      return NULL;
+    }
+  }
+
+  return Scene;
+}
+
+// A simple triangle, consisting of three vertex indices
+struct csTriangle
+{
+  int a, b, c;
+
+  csTriangle (int v1, int v2, int v3)
+  { a=v1; b=v2; c=v3; }
+};
+
+/*
+ * Extended triangle structure, consisting of three vertex, normal, color
+ * and texel indices.
+ */
+struct csExtTriangle
+{
+  int va, vb, vc;
+  int na, nb, nc;
+  int ca, cb, cc;
+  int ta, tb, tc;
+
+  csExtTriangle (iModelDataPolygon *p, int a, int b, int c)
+  {
+    va = p->GetVertex (a);
+    vb = p->GetVertex (b);
+    vc = p->GetVertex (c);
+    na = p->GetNormal (a);
+    nb = p->GetNormal (b);
+    nc = p->GetNormal (c);
+    ca = p->GetColor (a);
+    cb = p->GetColor (b);
+    cc = p->GetColor (c);
+    ta = p->GetTexel (a);
+    tb = p->GetTexel (b);
+    tc = p->GetTexel (c);
+  }
+};
+
+CS_DECLARE_TYPED_VECTOR (csTriangleVector, csTriangle);
+CS_DECLARE_TYPED_VECTOR (csExtTriangleVector, csExtTriangle);
+CS_DECLARE_OBJECT_ITERATOR (csModelDataPolygonIterator, iModelDataPolygon);
 
 iDataBuffer *csModelConverterASE::Save (iModelData *Data, const char *Format)
 {
@@ -303,7 +724,8 @@ iDataBuffer *csModelConverterASE::Save (iModelData *Data, const char *Format)
       int element = (j==0) ? (t->na) : ((j==1) ? (t->nb) : (t->nc));
       n = ver->GetNormal (element);
 
-      out << "      *MESH_VERTEXNORMAL " << j << ' ' << n.x << ' ' << n.y
+      element = (j==0) ? (t->va) : ((j==1) ? (t->vb) : (t->vc));
+      out << "      *MESH_VERTEXNORMAL " << element << ' ' << n.x << ' ' << n.y
         << ' ' << n.z << '\n';
     }
   }

@@ -157,6 +157,10 @@ public:
   CS_DECLARE_ARRAY_INTERFACE (const csVector3 &, Normal);
   CS_DECLARE_ARRAY_INTERFACE (const csColor &, Color);
   CS_DECLARE_ARRAY_INTERFACE (const csVector2 &, Texel);
+  virtual int FindVertex (const csVector3 &v) const;
+  virtual int FindNormal (const csVector3 &v) const;
+  virtual int FindColor (const csColor &v) const;
+  virtual int FindTexel (const csVector2 &v) const;
 
   iModelDataVertices *Clone () const;
 };

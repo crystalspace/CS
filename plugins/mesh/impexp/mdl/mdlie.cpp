@@ -292,7 +292,7 @@ iModelData *csModelConverterMDL::Load (UByte *Buffer, ULong Size)
     in.Read (Readbuffer, SIZEOF_MDLLONG * 4);
     int FrontPolygon = get_le_long (Readbuffer);
 
-    for (j=0; j<3; j++) {
+    for (j=2; j>=0; j--) {
       int VertexIndex = get_le_long (Readbuffer + (j+1) * SIZEOF_MDLLONG);
       if ((SeamTexels [VertexIndex] != -1) && !FrontPolygon) {
         Polygon->AddVertex (VertexIndex, 0, 0, SeamTexels [VertexIndex]);

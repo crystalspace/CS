@@ -156,6 +156,8 @@ struct iModelDataVertices : public iBase
   virtual int AddVertex (const csVector3 &v) = 0;
   /// Delete a vertex
   virtual void DeleteVertex (int n) = 0;
+  /// Find a vertex
+  virtual int FindVertex (const csVector3 &v) const = 0;
 
   /// Return the number of contained normals
   virtual int GetNormalCount () const = 0;
@@ -167,6 +169,8 @@ struct iModelDataVertices : public iBase
   virtual int AddNormal (const csVector3 &v) = 0;
   /// Delete a normal
   virtual void DeleteNormal (int n) = 0;
+  /// Find a normal
+  virtual int FindNormal (const csVector3 &v) const = 0;
 
   /// Return the number of contained colors
   virtual int GetColorCount () const = 0;
@@ -178,6 +182,8 @@ struct iModelDataVertices : public iBase
   virtual int AddColor (const csColor &v) = 0;
   /// Delete a color
   virtual void DeleteColor (int n) = 0;
+  /// Find a color
+  virtual int FindColor (const csColor &v) const = 0;
 
   /// Return the number of contained texels
   virtual int GetTexelCount () const = 0;
@@ -189,6 +195,8 @@ struct iModelDataVertices : public iBase
   virtual int AddTexel (const csVector2 &v) = 0;
   /// Delete a texel
   virtual void DeleteTexel (int n) = 0;
+  /// Find a texel
+  virtual int FindTexel (const csVector2 &v) const = 0;
 
   /// Add all data from another vertex frame to this one
   virtual void CopyFrom (const iModelDataVertices *Other) = 0;

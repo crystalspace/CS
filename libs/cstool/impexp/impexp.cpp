@@ -778,11 +778,8 @@ int converter::data_read ( void ) {
   if ( leqi ( filein_type, "3DS" ) == TRUE ) {
     ierror = tds_read ( filein );
   }
-  else */ if ( leqi ( filein_type, "ASE" ) == TRUE ) {
-    ierror = ase_read ( filein );
-    cor3_2_vertex_rgb ( );
-  }
-  else if ( leqi ( filein_type, "DXF" ) == TRUE ) {
+  else */
+  if ( leqi ( filein_type, "DXF" ) == TRUE ) {
     ierror = dxf_read ( filein );
   }
   else if ( leqi ( filein_type, "HRC" ) == TRUE ) {
@@ -946,9 +943,6 @@ int converter::data_write ( void ) {
   if ( leqi ( fileout_type, "3DS" ) == TRUE ) {
     tds_pre_process();
     result = tds_write ( fileout );
-  }
-  else if ( leqi ( fileout_type, "ASE" ) == TRUE ) {
-    result = ase_write ( fileout );
   }
   else if ( leqi ( fileout_type, "DXF" ) == TRUE ) {
     result = dxf_write ( fileout );

@@ -130,18 +130,26 @@ bool csDataStream::GetString (char* buf, int len, bool OmitNewline)
 int csDataStream::ReadTextInt ()
 {
   int Value, Length;
-  sscanf ((char*)(Data+Position), "%d%n", &Value, &Length);
-  Position += Length;
-  return Value;
+  if (sscanf ((char*)(Data+Position), "%d%n", &Value, &Length) != 1) {
+    Position = Size;
+    return 0;
+  } else {
+    Position += Length;
+    return Value;
+  }
 }
 
 float csDataStream::ReadTextFloat ()
 {
   float Value;
   int Length;
-  sscanf ((char*)(Data+Position), "%f%n", &Value, &Length);
-  Position += Length;
-  return Value;
+  if (sscanf ((char*)(Data+Position), "%f%n", &Value, &Length) != 1) {
+    Position = Size;
+    return 0;
+  } else {
+    Position += Length;
+    return Value;
+  }
 }
 
 void csDataStream::SkipWhitespace ()

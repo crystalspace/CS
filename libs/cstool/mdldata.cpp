@@ -237,6 +237,44 @@ iModelDataVertices *csModelDataVertices::Clone () const
   return v;
 }
 
+int csModelDataVertices::FindVertex (const csVector3 &v) const
+{
+  int i;
+  for (i=0; i<Vertices.Length (); i++)
+    if (Vertices [i] - v < EPSILON)
+      return i;
+  return -1;
+}
+
+int csModelDataVertices::FindNormal (const csVector3 &v) const
+{
+  int i;
+  for (i=0; i<Normals.Length (); i++)
+    if (Normals [i] - v < EPSILON)
+      return i;
+  return -1;
+}
+
+int csModelDataVertices::FindColor (const csColor &v) const
+{
+  int i;
+  for (i=0; i<Colors.Length (); i++)
+    if ((Colors[i].red - v.red < EPSILON) &&
+        (Colors[i].green - v.green < EPSILON) &&
+        (Colors[i].blue - v.blue < EPSILON))
+      return i;
+  return -1;
+}
+
+int csModelDataVertices::FindTexel (const csVector2 &v) const
+{
+  int i;
+  for (i=0; i<Texels.Length (); i++)
+    if (Texels [i] - v < EPSILON)
+      return i;
+  return -1;
+}
+
 /*** csModelDataAction ***/
 
 SCF_IMPLEMENT_IBASE (csModelDataAction)
