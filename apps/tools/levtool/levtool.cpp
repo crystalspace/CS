@@ -20,6 +20,7 @@
 
 #include "cssysdef.h"
 #include "levtool.h"
+#include "csgeom/plane3.h"
 #include "csutil/util.h"
 #include "csutil/xmltiny.h"
 #include "csutil/csstring.h"
@@ -54,7 +55,7 @@ ltVertex::ltVertex ()
   max_polygons = 0;
 }
 
-ltVertex::ltVertex (const ltVertex& vt)
+ltVertex::ltVertex (const ltVertex& vt) : csVector3 (vt.x, vt.y, vt.z)
 {
   if (vt.max_polygons > 0)
   {
@@ -788,6 +789,43 @@ void LevTool::ListContents (iDocumentNode* world)
 
 //-----------------------------------------------------------------------------
 
+void LevTool::ValidateContents (ltThing* thing)
+{
+  int i, j;
+  for (i = 0 ; i < thing->GetPolygonCount () ; i++)
+  {
+    ltPolygon* pol = thing->GetPolygon (i);
+    if (pol->GetVertexCount () > 3)
+    {
+      csPlane3 plane (
+	thing->GetVertex (pol->GetVertex (0)),
+	thing->GetVertex (pol->GetVertex (1)),
+	thing->GetVertex (pol->GetVertex (2)));
+      for (j = 3 ; j < pol->GetVertexCount () ; j++)
+      {
+	float d = plane.Distance (thing->GetVertex (pol->GetVertex (j)));
+	if (d > 0.01)
+	{
+	  printf ("WARNING! polygon '%s' in thing/part '%s' seems to be non-coplanar with distance %g\n",
+			  pol->GetName (), thing->GetName (), d);
+	}
+      }
+    }
+  }
+}
+
+void LevTool::ValidateContents ()
+{
+  int i;
+  for (i = 0 ; i < things.Length () ; i++)
+  {
+    ltThing* th = (ltThing*)things.Get (i);
+    ValidateContents (th);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
 LevTool::LevTool ()
 {
   object_reg = NULL;
@@ -810,6 +848,7 @@ LevTool::~LevTool ()
 
 #define OP_LIST 1
 #define OP_DYNAVIS 2
+#define OP_VALIDATE 3
 
 //----------------------------------------------------------------------------
 
@@ -824,11 +863,13 @@ void LevTool::Main ()
   {
     printf ("levtool <options> <zipfile>\n");
     printf ("  -list: list world contents\n");
+    printf ("  -validate: validate world contents\n");
     printf ("  -dynavis: convert to Dynavis\n");
     exit (0);
   }
   if (cmdline->GetOption ("dynavis")) op = OP_DYNAVIS;
   if (cmdline->GetOption ("list")) op = OP_LIST;
+  if (cmdline->GetOption ("validate")) op = OP_VALIDATE;
 
   const char* val = cmdline->GetName ();
   if (!val)
@@ -878,6 +919,13 @@ void LevTool::Main ()
 
   switch (op)
   {
+    case OP_VALIDATE:
+      {
+	AnalyzePluginSection (doc);
+	FindAllThings (doc);
+	ValidateContents ();
+      }
+      break;
     case OP_LIST:
       {
 	AnalyzePluginSection (doc);

@@ -11,6 +11,12 @@ The history order is reversed so that new features are at the top.
 	- Implemented relative move with duration.
 	- Flarge now has a nice animating model using these new
 	  sequence features.
+	- Relaxed the bad uv mapping test a bit (SMALL_EPSILON instead
+	  of EPSILON).
+	- Extended levtool with a -validate commandline option. This will
+	  validate the level. At this moment it will only test if all
+	  polygons with more than three vertices are well-formed in the
+	  sense that all vertices of the polygon must be on the same plane.
 23-Sep-2002
 	- Added new iEngineSequenceManager API. This is going to be used
 	  for an engine sequence manager. More info on this new feature

@@ -252,6 +252,18 @@ public:
 
   //-----------------------------------------------------------------------
 
+  /**
+   * Validate the contents of one thing.
+   */
+  void ValidateContents (ltThing* thing);
+
+  /**
+   * Validate the contents of all things.
+   */
+  void ValidateContents ();
+
+  //-----------------------------------------------------------------------
+
 public:
   LevTool ();
   ~LevTool ();
