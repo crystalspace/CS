@@ -52,10 +52,10 @@ case $MACHINE in
 esac
 
 # Find the C++ compiler
-CXX=`which gcc | grep -v "[Nn]o"`
-[ -z "${CXX}" ] && CXX=`which egcs | grep -v "[Nn]o"`
-[ -z "${CXX}" ] && CXX=`which g++ | grep -v "[Nn]o"`
-[ -z "${CXX}" ] && CXX=`which c++ | grep -v "[Nn]o"`
+CXX=`which gcc 2>&1 | grep -v "[Nn]o"`
+[ -z "${CXX}" ] && CXX=`which 2>&1 egcs | grep -v "[Nn]o"`
+[ -z "${CXX}" ] && CXX=`which 2>&1 g++ | grep -v "[Nn]o"`
+[ -z "${CXX}" ] && CXX=`which 2>&1 c++ | grep -v "[Nn]o"`
 
 if [ -z "${CXX}" ]; then
   echo "$0: Cannot find an installed C++ compiler!" >&2
@@ -85,7 +85,7 @@ rm -f conftest.cpp conftest.o
 echo "%xdefine TEST" >conftest.asm
 
 # Check if NASM is installed and if it has the right version
-[ -z "${NASM}" ] && NASM=`which nasm | grep -v "no nasm"`
+[ -z "${NASM}" ] && NASM=`which nasm 2>&1 | grep -v "no nasm"`
 
 if [ -n "${NASM}" ]; then
   echo "NASM = "`basename ${NASM}`
@@ -98,7 +98,7 @@ fi
 rm -f conftest.asm conftest.o
 
 # Check if makedep is installed and is the right version
-[ -z "${MAKEDEP}" ] && MAKEDEP=`which makedep | grep -v "no makedep"`
+[ -z "${MAKEDEP}" ] && MAKEDEP=`which 2>&1 makedep | grep -v "no makedep"`
 if [ -n "${MAKEDEP}" ]; then
   echo "DEPEND_TOOL = mkdep"
   MAKEDEP_VERSION=`makedep -V | sed -e "s/.*Version *//"`
