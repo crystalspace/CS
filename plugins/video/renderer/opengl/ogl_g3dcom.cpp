@@ -409,7 +409,6 @@ allFound = allFound && fName != NULL;
 		glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &maxtextures);
 		if (maxtextures > 1)
 		{
-                  printf ("dang\n");
 		  m_config_options.do_multitexture_level = maxtextures;
 		  Report (CS_REPORTER_SEVERITY_NOTIFY,
 			  "Using multitexture extension with %d texture units", maxtextures);
@@ -2270,6 +2269,11 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
     if (clm)
     {
       csLightMapQueue* lm_queue = lightmap_cache->GetQueue (clm);
+      if (!lm_queue->ownsData)
+      {
+        lm_queue->LoadArrays ();
+        lm_queue->ownsData = true;
+      }
       int lm_idx = lm_queue->AddVertices (poly.num);
 
       // Copy vertex info.
