@@ -96,7 +96,7 @@ void csStateHandler::SetStateOpaque( csStringID state, void *value )
 
 void csStateHandler::SetStateVector4( csStringID state, csEffectVector4 value)
 {
-	csHashIterator cIterator( states, state );
+  csHashIterator cIterator( states, state );
   while( cIterator.HasNext() )
   {
     statedata* data = (statedata*)cIterator.Next();
@@ -157,7 +157,7 @@ void *csStateHandler::GetStateOpaque( csStringID state )
 
 csEffectVector4 csStateHandler::GetStateVector4(csStringID state)
 {
-	csHashIterator cIterator( states, state );
+  csHashIterator cIterator( states, state );
   while( cIterator.HasNext() )
   {
     statedata* data = (statedata*)cIterator.Next();

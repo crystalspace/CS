@@ -41,11 +41,11 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  csEffectLayer() {
+  csEffectLayer()
+  {
     SCF_CONSTRUCT_IBASE( NULL );
     SCF_CONSTRUCT_EMBEDDED_IBASE( scfiEffectLayer );
   }
-
   
 
   struct EffectLayer : public iEffectLayer

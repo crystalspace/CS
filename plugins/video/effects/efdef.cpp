@@ -33,7 +33,8 @@
 iEffectTechnique* csEffectDefinition::CreateTechnique()
 {
   csEffectTechnique* techniqueobj = new csEffectTechnique();
-  iEffectTechnique* technique = SCF_QUERY_INTERFACE( techniqueobj, iEffectTechnique );
+  iEffectTechnique* technique = SCF_QUERY_INTERFACE(
+  	techniqueobj, iEffectTechnique );
   techniques.Push( technique );
   return technique;
 }

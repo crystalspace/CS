@@ -42,7 +42,8 @@ bool csEffectServer::Initialize( iObjectRegistry* reg )
 iEffectDefinition* csEffectServer::CreateEffect()
 {
   csEffectDefinition* effectobj = new csEffectDefinition();
-  iEffectDefinition* effect = SCF_QUERY_INTERFACE( effectobj, iEffectDefinition );
+  iEffectDefinition* effect = SCF_QUERY_INTERFACE(
+  	effectobj, iEffectDefinition );
   return effect;
 }
 
@@ -69,7 +70,8 @@ bool csEffectServer::Validate( iEffectDefinition* effect )
   return false;
 }
 
-iEffectTechnique* csEffectServer::SelectAppropriateTechnique( iEffectDefinition* effect )
+iEffectTechnique* csEffectServer::SelectAppropriateTechnique(
+	iEffectDefinition* effect )
 {
   if( !effect )
     return NULL;
