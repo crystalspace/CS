@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,14 +16,14 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef OCTREE_H
-#define OCTREE_H
+#ifndef _CS_OCTREE_H
+#define _CS_OCTREE_H
 
 #include "csgeom/math3d.h"
 #include "csgeom/box.h"
 #include "csengine/polytree.h"
 #include "csengine/bsp.h"
-#include "csengine/arrays.h"
+#include "csengine/pvs.h"
 
 class csPolygonInt;
 class csOctree;
@@ -31,7 +31,6 @@ class csOctreeNode;
 class csBspTree;
 class csCBuffer;
 class csThing;
-class csPVS;
 class Dumper;
 struct iVFS;
 struct iFile;
@@ -44,83 +43,6 @@ struct iFile;
 #define OCTREE_BFB 5
 #define OCTREE_BBF 6
 #define OCTREE_BBB 7
-
-/**
- * A visibility info node for one octree node.
- * This node represents a visible octree node and possibly
- * all visible polygons (if the node is a leaf).
- */
-class csOctreeVisible
-{
-  friend class csPVS;
-
-private:
-  // Next visibility entry.
-  csOctreeVisible* next;
-  // Previous visibility entry.
-  csOctreeVisible* prev;
-  // The visible polygons.
-  csPolygonArrayNoFree polygons;
-  // The visible node.
-  csOctreeNode* node;
-  // If true then this node is TRUELY visible. i.e. we
-  // know that there is at least one point in the leaf from where this
-  // node can be seen.
-  bool really_visible;
-  
-public:
-  csOctreeVisible() : next (NULL), prev (NULL), polygons (8, 16),
-  	node (NULL), really_visible (false) {}
-  /// Set octree node.
-  void SetOctreeNode (csOctreeNode* onode) { node = onode; }
-  /// Get octree node.
-  csOctreeNode* GetOctreeNode () { return node; }
-  /// Get the polygon array.
-  csPolygonArrayNoFree& GetPolygons () { return polygons; }
-  /// Return true if this node is really visible.
-  bool IsReallyVisible () { return really_visible; }
-  /// Mark this node as really visible.
-  void MarkReallyVisible () { really_visible = true; }
-};
-
-/**
- * The PVS itself.
- */
-class csPVS
-{
-private:
-  // Linked list of visible nodes (with polygons attached).
-  csOctreeVisible* visible;
-
-public:
-  /// Constructor.
-  csPVS () : visible (NULL) { }
-  /// Destructor.
-  ~csPVS ();
-  /// Clear the PVS.
-  void Clear ();
-
-  /// Add a new visibility struct.
-  csOctreeVisible* Add ();
-
-  /// Find the visibility struct for a node.
-  csOctreeVisible* FindNode (csOctreeNode* onode);
-
-  /// Delete a visibility struct.
-  void Delete (csOctreeVisible* ovis);
-
-  /// Delete a visibility struct.
-  void Delete (csOctreeNode* onode)
-  {
-    csOctreeVisible* ovis = FindNode (onode);
-    if (ovis) Delete (ovis);
-  }
-
-  /// Get the first visibility struct.
-  csOctreeVisible* GetFirst () { return visible; }
-  /// Get the next one.
-  csOctreeVisible* GetNext (csOctreeVisible* ovis) { return ovis->next; }
-};
 
 /**
  * An octree node.
@@ -656,5 +578,5 @@ public:
   bool ReadFromCachePVS (iVFS* vfs, const char* name);
 };
 
-#endif /*OCTREE_H*/
+#endif /*_CS_OCTREE_H*/
 

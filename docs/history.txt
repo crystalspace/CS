@@ -45,6 +45,7 @@ The history order has been reversed so that new features are at the top.
 	- Fixed a bug in the iterator code of the new csHashMap class.
 	- Norman Kramer changed config for Glide to access Glide section
 	  instead of Glide2x.
+	- Split octree.h into octree.h and pvs.h. Was getting a bit big.
 1-Jun-2000
 	- Experiment with new octree generation method. Instead of only
 	  favoring a center with few splits I also try to favor centers which
