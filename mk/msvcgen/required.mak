@@ -41,7 +41,6 @@
 
 MSVC.PLUGINS.REQUIRED =         \
   aws                           \
-  cscript/cslua                 \
   cscript/cspython              \
   font/server/freefont          \
   mesh/impexp/3ds               \
