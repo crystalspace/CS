@@ -22,6 +22,9 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine eliminated a compiler warning from rview.cpp.
 	- Eric Sunshine eliminated compiler warnings from walkcmd.cpp.
 	- Eric Sunshine fixed gtreeldr.cpp so that it now compiles on NextStep.
+	- Eric Sunshine fixed a problem where both the engine and the Thing
+	  mesh plugin were publishing the crystalspace.mesh.object.thing class,
+	  which caused linking errors when attempting to load the plugin.
 24-Jan-2002
 	- Jorge Acereda relaxed a limit in 3ds2lev that made it crash
 	  with scenes with more than 100 textures.

@@ -3400,11 +3400,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csThingObjectType)
 
-SCF_EXPORT_CLASS_TABLE (thing)
-  SCF_EXPORT_CLASS (csThingObjectType, "crystalspace.mesh.object.thing",
-    "Crystal Space Thing Mesh Type")
-SCF_EXPORT_CLASS_TABLE_END
-
 csThingObjectType::csThingObjectType (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
@@ -3420,7 +3415,6 @@ csThingObjectType::~csThingObjectType ()
 
 bool csThingObjectType::Initialize (iObjectRegistry* object_reg)
 {
-  iSCF::SCF->RegisterStaticClass (thing_scfInitialize (iSCF::SCF));
   csThingObjectType::object_reg = object_reg;
   return true;
 }
