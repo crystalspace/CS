@@ -125,7 +125,7 @@ awsComponent::Overlaps(csRect &r)
 }
 
 void 
-awsComponent::AddChild(awsComponent *child, bool owner)
+awsComponent::AddChild(iAwsComponent *child, bool owner)
 {
   (void)owner;
   /* @@@: we cannot incref for non-owned only if we generally decrefing upon destruction
@@ -141,11 +141,11 @@ awsComponent::AddChild(awsComponent *child, bool owner)
    children->Push(child);
    
    // Modify the child's rectangle to be inside and relative to the parent's rectangle.
-   child->frame.Move(frame.xmin, frame.ymin);
+   child->Frame().Move(Frame().xmin, Frame().ymin);
 }
 
 void 
-awsComponent::RemoveChild(awsComponent *child)
+awsComponent::RemoveChild(iAwsComponent *child)
 {
    int i;
 
@@ -214,6 +214,24 @@ awsComponent::MoveChildren(int delta_x, int delta_y)
     child->Frame().Move(delta_x, delta_y);
   }
 
+}
+
+bool 
+awsComponent::RegisterSlot(iAwsSlot *slot, unsigned long signal)
+{
+  return signalsrc.RegisterSlot(slot, signal);
+}
+
+bool 
+awsComponent::UnregisterSlot(iAwsSlot *slot, unsigned long signal)
+{
+  return signalsrc.UnregisterSlot(slot, signal);
+} 
+
+void 
+awsComponent::Broadcast(unsigned long signal)
+{
+  signalsrc.Broadcast(signal);
 }
 
 /////////////////////////////////////  awsComponentFactory ////////////////////////////////////////////////////////

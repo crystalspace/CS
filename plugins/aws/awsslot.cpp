@@ -71,7 +71,10 @@ awsSinkManager::FindSink(char *_name)
 
 ///////////////////////////////////// Signal Sinks //////////////////////////////////////////////////////////
 
-awsSink::awsSink() {}
+awsSink::awsSink() 
+{
+  
+}
 
 awsSink::~awsSink() {}
 
@@ -112,7 +115,7 @@ awsSink::RegisterTrigger(char *name, void (iBase::*Trigger)(iAwsSource &source))
 
 ///////////////////////////////////// Signal Sources ////////////////////////////////////////////////////////
 awsSource::awsSource() 
-{
+{  
 }
 
 awsSource::~awsSource() 
@@ -189,7 +192,9 @@ awsSource::Broadcast(unsigned long signal)
 
 ///////////////////////////////////// Slots ////////////////////////////////////////////////////////
 
-awsSlot::awsSlot():sink(NULL) {}
+awsSlot::awsSlot():sink(NULL) 
+{
+}
 
 awsSlot::~awsSlot() 
 {

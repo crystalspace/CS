@@ -47,7 +47,7 @@ SCF_VERSION (awsComponent, 0, 0, 1);
 *                                                                              
 *                                                                                                                         *
 **************************************************************************************************************************/
-class awsComponent : public awsSource
+class awsComponent : public iAwsComponent
 {
    /// The stored handle to the window manager, in case a component needs it.
    iAws  *wmgr;
@@ -63,12 +63,24 @@ class awsComponent : public awsSource
 
    /// True if the component is hidden, else false.
    bool hidden;
+
+   /// Embedded awsSource
+   awsSource signalsrc;
   
 public:
     awsComponent();
     virtual ~awsComponent();
-        
-    
+
+public:
+    /// Registers a slot for a signal
+    virtual bool RegisterSlot(iAwsSlot *slot, unsigned long signal);
+
+    /// Unregisters a slot for a signal.
+    virtual bool UnregisterSlot(iAwsSlot *slot, unsigned long signal);
+
+    /// Broadcasts a signal to all slots that are interested.
+    virtual void Broadcast(unsigned long signal);
+         
 public:
     /**
      *  This is the function that components use to set themselves up.  All components MUST implement this function.  
@@ -110,10 +122,10 @@ public:
     { return id; }
 
     /// Set's the unique id of this component. Note: only to be used by window manager.
-    void SetID(unsigned long _id);
+    virtual void SetID(unsigned long _id);
 
     /// Recursively moves children (and all nested children) by relative amount given.
-    void MoveChildren(int delta_x, int delta_y);
+    virtual void MoveChildren(int delta_x, int delta_y);
 
 public:
     /** Adds a child into this component.  It's frame should be respective this component, not absolute.
@@ -122,12 +134,12 @@ public:
      * it will assume control of the child and not IncRef.  The difference is that, if owner is false the
      * child component will NOT be destroyed on destruction of this component, or on call of RemoveChild().
      */
-    virtual void AddChild(awsComponent* child, bool owner=true);
+    virtual void AddChild(iAwsComponent* child, bool owner=true);
 
     /** Removes a child from this component.  Important!! The child will be destroyed automatically if owner
      *  was true when you called AddChild().
      */
-    virtual void RemoveChild(awsComponent *child);
+    virtual void RemoveChild(iAwsComponent *child);
 
     /// Get's the number of children
     virtual int GetChildCount();

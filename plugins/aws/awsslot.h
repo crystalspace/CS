@@ -83,6 +83,8 @@ class awsSink : public iAwsSink
   csBasicVector triggers;
 
 public:
+  SCF_DECLARE_IBASE;
+
   awsSink();
   virtual ~awsSink();
 
@@ -94,6 +96,7 @@ public:
 
   /// A sink should call this to register trigger events
   virtual void RegisterTrigger(char *name, void (iBase::*Trigger)(iAwsSource &source));
+  
 };
 
 class awsSource : public iAwsSource
@@ -111,8 +114,12 @@ class awsSource : public iAwsSource
    };
 
 public:  
+    SCF_DECLARE_IBASE;
+
+    /// Initializes a couple things.
     awsSource();
 
+    /// Does nothing
     virtual ~awsSource();
 
     /// Registers a slot for any one of the signals defined by a source.  Each sources's signals exist in it's own namespace
@@ -152,6 +159,8 @@ class awsSlot : public iAwsSlot
    csBasicVector stmap;
   
 public:
+  SCF_DECLARE_IBASE;
+
   /// Does nothing
   awsSlot();
 
