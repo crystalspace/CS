@@ -94,6 +94,33 @@ public:
   void DrawAlign (iGraphics3D* g3d, int sx, int sy, int alnx, int alny)
   { DrawScaledAlign (g3d, sx, sy, tw, th, alnx, alny); }
 
+  /** Draw the pixmap tiled over an area. multiple draw commands with the
+    same texture and same shift values will align properly.
+    The shiftx and shifty point to a pixel (perhaps offscreen) where the
+    (0,0) pixel of this pixmap would be drawn.
+    */
+  void DrawTiledShifted(iGraphics3D* g3d, int sx, int sy, int w, int h,
+    int shiftx, int shifty)
+  {
+    if(!hTex) return;
+    while(shiftx<0) shiftx+=tw;
+    while(shifty<0) shifty+=th;
+    for(int my=-shifty; my < h; my += th)
+      for(int mx=-shiftx; mx < w; mx += tw)
+      {
+        int px = sx + ((mx < 0)?0:mx);
+        int py = sy + ((my < 0)?0:my);
+	int mw = tw + ((mx+tw>w)?w-mx-tw:0) + ((mx<0)?mx:0);
+	int mh = th + ((my+th>h)?h-my-th:0) + ((my<0)?my:0);
+        g3d->DrawPixmap (hTex, px, py, mw, mh, 
+	  tx + (mx<0?-mx:0), ty + (my<0?-my:0), mw, mh);
+      }
+  }
+
+  /// Fill a rectangle with the pixmap, tiled.
+  void DrawTiled(iGraphics3D* g3d, int sx, int sy, int w, int h)
+  { DrawTiledShifted(g3d, sx, sy, w, h, sx, sy); }
+
   /// Return pixmap width
   int Width ()
   { return tw; }
