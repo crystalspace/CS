@@ -89,7 +89,7 @@ public:
     scale_alpha = 1.0f;
   }
 
-  virtual csOpenGlEffectLayerData()
+  virtual ~csOpenGlEffectLayerData()
   {
     SCF_DESTRUCT_IBASE();
   }
