@@ -274,7 +274,7 @@ void csTriangleArrayPolygonBuffer::AddTriangles (csTrianglesPerMaterial* pol,
 
 
 
-//poly_texture, num_vertices, old_cur_vt_idx
+//poly_texture, num_vertices, old_cur_vt_idx, uv0, transform
 
   // Lightmap handling.
   csRect rect;
@@ -335,13 +335,13 @@ void csTriangleArrayPolygonBuffer::AddTriangles (csTrianglesPerMaterial* pol,
    * same coordinates but different uv's a new vertex is
    * created)
    */
-  csVector2 uvLightmap;
+  csVector2 uvLightmap, uvLightmap0;
+  uvLightmap0.x = (uv0.x - lm_offset_u) * lm_scale_u;
+  uvLightmap0.y = (uv0.y - lm_offset_v) * lm_scale_v;
   cur_vt_idx = old_cur_vt_idx;
   for (i = 1; i < num_vertices - 1; i++)
   {
-    uvLightmap.x = (uv0.x - lm_offset_u) * lm_scale_u;
-    uvLightmap.y = (uv0.y - lm_offset_v) * lm_scale_v;
-    triangle.a = AddSingleVertexLM (uvLightmap, cur_vt_idx);
+    triangle.a = AddSingleVertexLM (uvLightmap0, cur_vt_idx);
 
     aux = transform.Other2This (vertices[verts[i]]);
     uvLightmap.x = (aux.x - lm_offset_u) * lm_scale_u;
