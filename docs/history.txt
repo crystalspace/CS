@@ -1,8 +1,16 @@
 The history order has been reversed so that new features are at the top.
 
+31-Oct-2000
+	- Philip Wyett fixed the CSWS VC project file after Andrew's
+	  changes.
 30-Oct-2000
 	- Two fixes to csws. Andrew: you forgot SYSDEF_ALLOCA and
 	  also default parameters cannot be repeated in the cpp file.
+	- Norman Kramer fixed dtsimple after Andrew's changes.
+	- Norman also fixed ttf2fnt, glide, and svgalib.
+	- Eric Sunshine fixed a compilation problem in csfont.
+	- Eric also fixed null and line renderers so that they compile
+	  with VC5.
 	- Andrew Zabolotny did the following changes:
 	    - Fixed a bug in default window theme that caused
 	      background texture to not be drawn if the window is not
