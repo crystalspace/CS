@@ -13,10 +13,67 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+21-Oct-1999
+	- Significantly rewrote the quadtree handling. It is now much more
+	  efficient (both memory and speed) and it does seem to work a
+	  little better as well. Still not perfect though!
+	- Received patch from Fragdance with interfaces for alphamap
+	  loading.  Also a new loader for SGI file graphics.
+	- Probably fixed DOS port compile.
 20-Oct-1999
 	- Fixes to landscape engine from Alex Pfaffe. Uses camera space
 	  coordinates instead of world space.
 	- Various changes to quadtree stuff.
+	- Huge patch from Andrew Zabolotny:
+	    - Moved csrect* to libcsutil. This is correct since, first, csRect
+	      does have nothing common with csgeom (that is, it's not
+	      geometry), second, csRect is used as argument to
+	      Graphics2D::Print(), and any program that use the 2D driver is
+	      forced to use libcsgeom, which is not too good.  On other hand,
+	      even if program does not 3D math, it almost for sure uses such
+	      basical things as csVector/csIniFile/csVfs/etc so it has to be
+	      linked in any case against libcsutil.
+     	    - Removed csspr2d.cpp and all code (which is very small) has been
+	      integrated directly into csspr2d.h. No more need to link against
+	      csengine (even if the 3D engine is not used at all), however,
+	      the csengine/csspr2d.h file is still used. Need to think where
+	      csspr2d.h can be moved since it is a general class, and doesn't
+	      have nothing common with the engine (engine even doesn't use it).
+     	    - Moved csObjVector back into csUtil. Now csObjVector is meant
+	      ONLY for descendents from csBase; for descendents of csObject
+	      there is a new vector class called csNamedObjVector; it has
+	      additional facilities (supposing that its members descend from
+	      csObject) such as sorting by names, finding by name, fast
+	      finding by names in a pre-sorted array (using BSP). The header
+	      file for csNamedObjVector is called "nobjvec.h"
+     	    - Made CSWS completely independent of engine. This reduces A
+	      WHOLE LOT both executable size and memory footprint for programs
+	      that do not use the engine themselves (i.e. MazeD). For example,
+	      cswstest.exe debug executable size reduced (in my case) from
+	      3.4Mb to about 1Mb (!) and memory footprint from 15Mb to as low
+	      as 7Mb. The MazeD has decreased in size from 5.6Mb to 4.1Mb and
+	      memory footprint has decreased from 20Mb to 11Mb. Besides, it
+	      works now very well (without heavy swapping) on machines with
+	      "just" 32M RAM (i.e. my home computer :-) For optimized
+	      executables the numbers are way lower, of course.
+              This also removes the dependency of cswstest.exe from:
+     		$(CSSCRIPT.LIB) $(CSENGINE.LIB) $(CSTERR.LIB) $(CSGEOM.LIB)
+     	    - Removed CsPrintf() references from CSWS (since CsPrintf is an
+	      engine function). Added a printf() routine to csApp class.
+     	    - TODO: make csloader completely independent on engine. This
+	      could be made by providing an SCF interface instead of world
+	      object. The parser should not care what's behind that
+	      interface...
+     	    - Moved all stuff from cssys/common into cssys/, both under
+	      libs/ and include/
+     	    - Renamed all osdefs.h into csosdefs.h
+     	    - Added "intensity" spin box to mazed's light setup dialog.
+     	    - Added SetName() and GetName() methods to csObject. They just
+	      call csNameObject::###, but are easier to use. Possibly we can
+	      add name functionality right to csObject (but by using a char*
+	      instead of char [30]) - this will conserve both memory and
+	      improve access speed.
+	    - Added support for Allegro driver back.
 19-Oct-1999
 	- Michael Dale Long added major CrystalClear updates (InputHandler
 	  and PlayerEntity).
