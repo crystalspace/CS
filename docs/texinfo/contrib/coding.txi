@@ -131,16 +131,32 @@ constructor at the time the library is loaded. Therefore it is unsafe to rely
 on such objects.
 
 @item
-@emph{Endian and Alignment}
+@emph{Endian-ness}
 
 Beware of code that is endian specific.  Key off of the @code{CS_BIG_ENDIAN}
 or @code{CS_LITTLE_ENDIAN} macros if necessary.  Avoid unions of bit-sets
-since they can result in endian-related problems.
+since they can result in endian-related problems. Avoid casting an
+@code{int*} to a @code{short*} or a @code{char*}, or casting a @code{short*}
+to a @code{char*}.
 
-Beware of code which tries to access values of primitive types at memory
-locations which are not multiples of the type's size, since some platforms
-require @dfn{natural alignment} and will generate faults if data is accessed
-at incorrect locations.
+Also reading/writing binary files and sending binary messages over the
+network is endian-prone. The best thing to do here is to use the @code{htons}
+and @code{htonl} macros. They convert the host byte format to the network
+byte format. You can also convert back from the network format to the host
+format with @code{ntohs} and @code{ntohl}.
+
+@item
+@emph{Data Alignment}
+
+Some platforms require data to be aligned in memory. The processor cannot
+access a @code{long} on an odd memory address for instance. The program will
+crash on this instruction. Thus you should make sure to always access
+properly aligned data. The compiler already ensures the proper alignment, but
+you can have problems after pointer arithmatic. This is a problem on the
+Macintosh and NeXT platforms. Together with this problem you are probably
+also having endian problems. Beware of code which tries to access values of
+primitive types at memory locations which are not multiples of the type's
+size.
 
 @item
 @emph{@sc{dos} Filename Restrictions}
@@ -162,4 +178,46 @@ entirely lower-case filenames for files which are shared between ports.
 
 @strong{Warning}: @file{WinCVS} has been reported to botch capitalization of
 files.  Please be aware of this potential problem.
+
+@item
+@emph{Floating Points}
+
+For some reason comparing floats to 0.0 does not give the same results
+on different platform. Use a @samp{if(floatvalue < EPSILON)} instead where
+@code{EPSILON} is some very small value. It is certain linux and solaris
+platforms differ on this point.
+
+Also @samp{float1 < float2} may give different results on different platforms.
+@samp{float1 < float2+ERSILON} gives more dependable results. Note that these 
+floating point problems are on floats that result from length computation,
+such that seemingly-same floats can be slightly different due to numerical
+accuracy.
+
+@item
+@emph{int i redefined?}
+
+Some compilers do not scope the variable in a for, in a line like
+@samp{for(int i=0; ...)}. They treat the @code{i} as if defined in the outer
+function. Thus when you later on have a second @samp{for(int i...)} line
+those compilers will give an error. Avoid this by only defining variables
+once in a for statement, or else defining the variable at the top of the
+function, changing the for loops to @samp{for(i=0;...)}. The Microsoft Visual
+C++ compiler has this problem.
+
+@item
+@emph{Pathnames}
+
+Pathnames are different on many platforms. Use the VFS which gives a unified
+approach. To seperate folders and files, use @samp{/} in the VFS.
+(Not @samp{\} or @samp{:} ). Also, always use @samp{/} in @code{#include}
+statements, never @samp{\} or @samp{:}. Windows compilers often allow
+@samp{\}, but other platforms never do.
+
+@item
+@emph{Black screen bugs}
+
+Some platforms depend on the correct @code{BeginDraw()} - @code{FinishDraw()}
+calls. Thus every @code{BeginDraw()} must be followed by a @code{FinishDraw()}
+or nothing will be rendered. DirectX needs this, linux does not (currently)
+enforce this.
 @end enumerate

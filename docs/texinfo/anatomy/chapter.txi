@@ -16,8 +16,6 @@ Format of @emph{World} File
 @item
 Importing Foreign Models
 @item
-Memory Debugger
-@item
 Scripting
 @end itemize
 
@@ -28,6 +26,7 @@ Scripting
 * Makefile How-To::
 * SCF:: Shared Class Facility (@sc{scf})
 * VFS:: Virtual File System (@sc{vfs})
+* Memory Debugger::
 * Platform Details:: Platform-Specific Details
 @end menu
 
@@ -37,4 +36,5 @@ Scripting
 @imports{anatomy,makefile.txi}
 @imports{anatomy,scf.txi}
 @imports{anatomy,vfs.txi}
+@imports{anatomy,memdbg.txi}
 @importss{anatomy,platform,details.txi}
