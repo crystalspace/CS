@@ -147,6 +147,6 @@ fi
 # Check for Luaswig.
 #------------------------------------------------------------------------------
 LUASWIGBIN=`checktool luaswig`
-if [ -n "${SWIGBIN}" ]; then
+if [ -n "${LUASWIGBIN}" ]; then
     echo "LUASWIGBIN = "`shellprotect "${LUASWIGBIN}"`
 fi
