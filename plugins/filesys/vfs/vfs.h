@@ -273,6 +273,14 @@ private:
    * physical mount points, so true will be returned.
    */
   bool CheckIfMounted(char const* virtual_path) const;
+
+  /**
+   * Helper for ChDirAuto(). Checks if dir is mounted and invokes ChDir() if it
+   * is and returns true. If filename is specified, then ensures that it exists
+   * in dir. If filename is not present, returns false and does not invoke
+   * ChDir().
+   */
+  bool TryChDirAuto(char const* dir, char const* filename);
 };
 
 #endif // __CS_VFS_H__

@@ -11,6 +11,9 @@ chronological order.
 	  generator routine that returns a number between 0 and 1.
 	- Jorrit optimized emit particle system by using that function
 	  instead of rand(). This speeds it up a little.
+	- Eric Sunshine fixed problem with 19-Dec-2004 change to
+	  csVFS::ChDirAuto() where the new code did not precisely mirror the
+	  semantics of the original code, thus some auto-mount attempts failed.
 19-Dec-2004
 	- Eric Sunshine fixed problem on MacOS/X where output of `cs-config
 	  --libs' did not include "-framework AppKit -framework Foundation".

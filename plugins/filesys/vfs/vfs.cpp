@@ -2137,31 +2137,47 @@ static char* TransformPath (const char* path, bool add_end)
   return npath;
 }
 
+static csString compose_vfs_path(char const* dir, char const* file)
+{
+  csString path(dir);
+  size_t const n = path.Length();
+  if (n > 0 && path[n - 1] != VFS_PATH_SEPARATOR)
+    path << VFS_PATH_SEPARATOR;
+  path << file;
+  return path;
+}
+
+bool csVFS::TryChDirAuto(char const* dir, char const* filename)
+{
+  bool ok = false;
+  if (CheckIfMounted(dir))
+  {
+    if (filename == 0)
+      ok = true;
+    else
+    {
+      csString testpath = compose_vfs_path(dir, filename);
+      ok = Exists(testpath);
+    }
+  }
+  return ok && ChDir(dir);
+}
+
 bool csVFS::ChDirAuto (const char* path, const csStringArray* paths,
 	const char* vfspath, const char* filename)
 {
   // If the VFS path is valid we can use that.
-  if (CheckIfMounted(path) && (filename == 0 || Exists (filename)))
-  {
-    ChDir(path);
+  if (TryChDirAuto(path, filename))
     return true;
-  }
 
   // Now try to see if we can get it from one of the paths.
   if (paths)
   {
-    size_t i;
-    for (i = 0 ; i < paths->Length () ; i++)
+    for (size_t i = 0; i < paths->Length(); i++)
     {
-      csString testpath = paths->Get (i);
-      if (testpath[testpath.Length ()-1] != '/')
-        testpath += "/";
-      testpath += path;
-      if (CheckIfMounted(testpath) && (filename == 0 || Exists (filename)))
-      {
-	ChDir(testpath);
+      csString testpath = compose_vfs_path(paths->Get(i), path);
+      if (TryChDirAuto(testpath, filename))
 	return true;
-      }
     }
   }
 
