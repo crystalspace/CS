@@ -172,6 +172,8 @@ struct iCamera : public iBase
   /**
    * Check if there is a polygon in front of us in the direction
    * defined by 'v' (world space coordinates). Return the nearest polygon.
+   * Note that this function will not check beyond 'v'. So only the
+   * vector between the current position of the camera and 'v' is checked.
    */
   virtual iPolygon3D* GetHit (csVector3& v) = 0;
 

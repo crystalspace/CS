@@ -2,6 +2,7 @@ The history order is reversed so that new features are at the top.
 
 30-Jan-2002
 	- Added iEngine::FindLight().
+	- Improved comment with iCamera::GetHit().
 29-Jan-2002
 	- Jorge Acereda changed the MD2 importer so that it recognizes 
 	  sprite actions. Also, scaling and axis conventions are now
