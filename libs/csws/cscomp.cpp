@@ -1588,7 +1588,7 @@ void csComponent::Text (int x, int y, int fgindx, int bgindx, const char *s)
     app->pplRestoreClipRect ();
 }
 
-void csComponent::Pixmap (csPixmap *s2d, int x, int y, int w, int h, uint8 Alpha = 0)
+void csComponent::Pixmap (csPixmap *s2d, int x, int y, int w, int h, uint8 Alpha)
 {
   if (!s2d)
     return;
@@ -1617,7 +1617,7 @@ void csComponent::Pixmap (csPixmap *s2d, int x, int y, int w, int h, uint8 Alpha
 }
 
 void csComponent::Pixmap (csPixmap *s2d, int x, int y, int w, int h,
-  int orgx, int orgy, uint8 Alpha = 0)
+  int orgx, int orgy, uint8 Alpha)
 {
   if (!s2d)
     return;
