@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Aug-2003
+	- res renamed the rlloader, rlsstd and rlsstencil plugins to less
+	  cryptic rendloop_loader, rendstep_std and rendstep_stencil.
+	  Don't forget to delete the old rl* plugin binaries.
 12-Aug-2003
 	- Jorrit fixed a compile error in the OpenGL Windows canvas after the
 	  changes from res yesterday.
