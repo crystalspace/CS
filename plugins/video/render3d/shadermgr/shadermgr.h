@@ -139,9 +139,6 @@ public:
   virtual csSymbolTable* GetSymbolTable(int i) { return & symtab; }
   virtual void SelectSymbolTable(int i) {}
 
-  /// Private variable to get the variable without virtual call
-  inline csShaderVariable* privateGetVariable (int namehash);
-
   /// Report a message.
   void Report (int severity, const char* msg, ...);
 
@@ -284,9 +281,6 @@ public:
     for (int j = 0; j < children.Length (); j++)
       children[j]->SelectSymbolTable (i);
   }
-
-  /// Private variable to get the variable without virtual call
-  inline csShaderVariable* privateGetVariable (int namehash);
 
   /// Loads a shader from buffer
   virtual bool Load(iDataBuffer* program);
@@ -579,9 +573,6 @@ public:
     for (int j = 0; j < children.Length (); j++)
       children[j]->SelectSymbolTable (i);
   }
-
-  /// Private variable to get the variable without virtual call
-  inline csShaderVariable* privateGetVariable (int namehash);
 
   /// Loads a shader from buffer
   virtual bool Load(iDataBuffer* program);

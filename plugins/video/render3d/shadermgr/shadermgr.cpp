@@ -311,25 +311,6 @@ bool csShader::IsValid() const
   return false;
 }
 
-csShaderVariable* csShader::privateGetVariable (int namehash)
-{
-  csShaderVariable* var;
-  csHashIterator cIter(variables, namehash);
-
-  if (cIter.HasNext())
-  {
-    var = (csShaderVariable*)cIter.Next();
-    return var;
-  }
-
-  if (parent)
-  {
-    return parent->privateGetVariable (namehash);
-  }
-
-  return 0;
-}
-
 //technique-related
 csPtr<iShaderTechnique> csShader::CreateTechnique()
 {

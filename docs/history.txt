@@ -36,6 +36,7 @@ chronological order.
 	  additional libraries between the two "--".
 	- Norman Kraemer augmented PYTHMOD.LIBS.PLATFORM flags to include
 	  LIBBFD.LFLAGS. He thinks this should probably go into configure.ac.
+	- res removed the 'privateGetVariable()' stuff from shader manager.
 24-Sep-2003
 	- Jorrit finished implemented basic drawing of portals in
 	  csPortalContainer. Still some optimizations and testing to do.
