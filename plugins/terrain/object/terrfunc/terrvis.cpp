@@ -95,7 +95,7 @@ int csTerrainQuad::GetHorIndex(const csVector3& campos, float x, float z,
   float invcos = acos(cosinus);
   if(invcos < k*0.5) return 0;
   if(invcos > PI - k*0.5) return horsize/2;
-  int idx = QInt( invcos + k*0.5 );
+  int idx = QInt( (invcos + k*0.5)/k );
   if(z < 0) idx = horsize - idx;
 #endif
 #if 0
