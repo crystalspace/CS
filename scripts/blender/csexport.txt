@@ -1,0 +1,34 @@
+This script is written by Sebastian Düll <wastel7@gmx.de>
+
+Some info on using csexport.py plugin.
+
+This Script is written for Blender 2.14, if you are using an older version
+please download the new version.
+
+At first put the script (csexport.py) into the subdirectory "python" of the
+Blender-dir. This is the dir where all plugins are. Then create the .ani
+files for every Blender-Object. The name of the object can be edited in the
+field "OB:xxxx" near the middle of the screen. For a simple Crystal
+Space-export you can delete the lights, the camera and all Planes
+(Planes.001 or so).
+
+The .ani files have the name of the Blender-Object with the extension ".ani".
+Just put the ACTION statements for the object into the file. For example an
+.ani file could contain the follwing:
+    ACTION 'default' (F(f0,1000))
+
+This means the exported object has only one frame, e.g. no animation.
+
+An .ani file for an animation could look so:
+	ACTION 'default' (F(f0,1000))
+	ACTION 'walk' (F(f0,100) F(f1,100) F(f2,100) F(f3,100) F(f4,100)
+		F(f5,100) F(f6,100) F(f7,100) F(f8,100) F(f9,100) F(f10,100))
+
+It is necessary  that there are no spaces except between the F statements.
+Put all this file in the Blender-Dir. Next open your Scene in Blender.
+Press Shift-F11 in the main window and the script screen will appear.
+Now press Alt-Shift-F. Select Open. Now Select the csexport.py in the
+File-Requester and open it. To execute the script press Shift-Alt-P.
+Errors in execution are shown in the Blender-Textconsole.
+
+

@@ -4,6 +4,9 @@ The history order is reversed so that new features are at the top.
 	- Martin Geisse moved high-level model data manipulation functions
 	  out of the model data classes themselves and into their own
 	  namespace wrapper, csModelDataTools.
+	- Added csexport.py (in scripts/blender). This script is written by
+	  Sebastian Düll <wastel7@gmx.de>. Note that it needs Blender 2.14!
+	  There are instructions on usage in scripts/blender/csexport.txt.
 30-Jul-2001
 	- Renamed csTime to csTicks and removed iSystem::GetTime().
 	  Now use the global csGetTicks() instead.
