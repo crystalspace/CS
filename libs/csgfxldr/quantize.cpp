@@ -154,13 +154,6 @@ struct csColorBox
           } /* endif */
       } /* endfor */
   }
-  // Shrink box: move min/max bounds until we hit an existing color
-  void Shrink ()
-  {
-    ShrinkRm (); ShrinkRx ();
-    ShrinkGm (); ShrinkGx ();
-    ShrinkBm (); ShrinkBx ();
-  }
   // Move Rm up until we find pixels that contain this value
   bool csColorBox::ShrinkRm ()
   {
@@ -238,6 +231,13 @@ struct csColorBox
           if (*hp) return (Bx != iBx);
       }
     return (Bx != iBx);
+  }
+  // Shrink box: move min/max bounds until we hit an existing color
+  void Shrink ()
+  {
+    ShrinkRm (); ShrinkRx ();
+    ShrinkGm (); ShrinkGx ();
+    ShrinkBm (); ShrinkBx ();
   }
   /**
    * Compute the mean color for this box.
