@@ -328,8 +328,8 @@ WORLD (
       PARAMS (
         FACTORY ('test')
         ACTION ('default')
+        APPLY_MOTION ('test_0')
       )
-      APPLY_MOTION ('test_0')
       MOVE (V (0,0,0))
     )
   )
