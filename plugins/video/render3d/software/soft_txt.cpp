@@ -432,12 +432,13 @@ SCF_IMPLEMENT_IBASE(csSoftSuperLightmap)
 SCF_IMPLEMENTS_INTERFACE(iSuperLightmap)
 SCF_IMPLEMENT_IBASE_END
 
-csSoftSuperLightmap::csSoftSuperLightmap (int width, int height) : RLMs(32)
+csSoftSuperLightmap::csSoftSuperLightmap (csSoftwareTextureManager* texman, 
+					  int width, int height) : RLMs(32)
 {
   SCF_CONSTRUCT_IBASE (0);
   w = width;
   h = height;
-  tex.AttachNew (new csSoftwareTextureHandle (0, 0, 0));
+  tex.AttachNew (new csSoftwareTextureHandle (texman, 0, 0));
   tex->SetCacheData (this);
 }
 
@@ -609,7 +610,7 @@ void csSoftwareTextureManager::UnregisterTexture (
 csPtr<iSuperLightmap> csSoftwareTextureManager::CreateSuperLightmap (
   int width, int height)
 {
-  return csPtr<iSuperLightmap> (new csSoftSuperLightmap (width, height));
+  return csPtr<iSuperLightmap> (new csSoftSuperLightmap (this, width, height));
 }
 
 void csSoftwareTextureManager::GetMaxTextureSize (int& w, int& h, int& aspect)

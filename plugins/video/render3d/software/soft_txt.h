@@ -259,7 +259,7 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  csSoftSuperLightmap (int width, int height);
+  csSoftSuperLightmap (csSoftwareTextureManager* texman, int width, int height);
   virtual ~csSoftSuperLightmap ();
 
   virtual csPtr<iRendererLightmap> RegisterLightmap (int left, int top, 

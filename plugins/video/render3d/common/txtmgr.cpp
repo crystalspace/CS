@@ -225,7 +225,7 @@ void csTextureHandle::CalculateNextBestPo2Size (const int width,
 
 void csTextureHandle::SetTextureClass (const char* className)
 {
-  texClass = texman->texClassIDs.Request (className);
+  texClass = texman->texClassIDs.Request (className ? className : "default");
 }
 
 const char* csTextureHandle::GetTextureClass ()

@@ -24,6 +24,7 @@ chronological order.
 	  'virtual' from destructor. So csPoly2D is now back as it was before
 	  except that it no longer supports the bounding box.
 	- Jorrit finished implementation of CastAreaShadow() in pvscalc.
+	- res fixed a crash in csTextureHandle related to texture classes.
 10-Feb-2005
 	- Jorrit added csIntersect3::XPlane() and YPlane() to complement
 	  the already existing ZPlane(). Also added AxisPlane() which will
