@@ -1240,10 +1240,9 @@ void csLoader::load_thing_part (csThing* thing, csSector* sec, PSLoadInfo& info,
         {
 	  float f;
           ScanStr (params, "%f", &f);
-	  thing->SetCurvesScale (f);
+	  thing->SetCurveScale (f);
           break;
-	}
-
+        }
       case CS_TOKEN_CURVECONTROL:
         {
           csVector3 v;
@@ -2867,6 +2866,7 @@ bool csLoader::AppendMapFile (csEngine* engine, const char* file,
   } /* endif */
 
   buf->DecRef ();
+  loaded_plugins.DeleteAll ();
 
   return true;
 }
@@ -3036,7 +3036,8 @@ bool csLoader::LoadLibraryFile (csEngine* engine, const char* fname)
   bool retcode = LoadLibrary (**buf);
 
   buf->DecRef ();
-
+  
+  loaded_plugins.DeleteAll ();
   return retcode;
 }
 
@@ -3123,28 +3124,18 @@ bool csLoader::LoadSounds (char* buf)
 //---------------------------------------------------------------------------
 
 // @@@ MEMORY LEAK!!! We should unload all the plugins we load here.
-csVector csLoader::loaded_plugins;
+csLoader::csLoadedPluginVector csLoader::loaded_plugins;
 
-iPlugIn* csLoader::FindPlugIn (const char* name)
-{
-  int i;
-  for (i = 0 ; i < loaded_plugins.Length () ; i++)
-  {
-    LoadedPlugin* lp = (LoadedPlugin*)loaded_plugins[i];
-    if (!strcmp (lp->name, name)) return lp->plugin;
-  }
-  return NULL;
+csLoader::LoadedPlugin::LoadedPlugin (const char *theName, iPlugIn *thePlugin)
+{ 
+  name = strnew (theName); plugin = thePlugin; 
 }
 
-void csLoader::NewPlugIn (char* name, iPlugIn* plugin)
-{
-  LoadedPlugin* lp = new LoadedPlugin ();
-  lp->name = new char [strlen (name)+1];
-  strcpy (lp->name, name);
-  lp->plugin = plugin;
-  loaded_plugins.Push (lp);
-}
-
+csLoader::LoadedPlugin::~LoadedPlugin ()
+{ 
+  delete [] name; 
+  plugin->DecRef (); 
+}                                                                                  
 //---------------------------------------------------------------------------
 
 csMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (csEngine* engine,
@@ -3182,6 +3173,7 @@ csMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (csEngine* engine,
     {
       Engine->mesh_factories.Push (tmpl);
       databuff->DecRef ();
+      loaded_plugins.DeleteAll ();
       return tmpl;
     }
     else
@@ -3239,6 +3231,7 @@ bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
 	  {
 	    iMeshObjectFactory* mof2 = QUERY_INTERFACE (mof, iMeshObjectFactory);
 	    stemp->SetMeshObjectFactory (mof2);
+	    mof->DecRef ();
 	    mof2->DecRef ();
 	  }
 	}
@@ -3296,12 +3289,12 @@ bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
       case CS_TOKEN_PLUGIN:
 	{
 	  ScanStr (params, "%s", str);
-	  plug = (iLoaderPlugIn*)FindPlugIn (str);
+	  plug = (iLoaderPlugIn*)loaded_plugins.FindPlugIn (str);
 	  if (!plug)
 	  {
 	    printf ("Plugin '%s' loaded!\n", str);
 	    plug = LOAD_PLUGIN (System, str, "MeshLdr", iLoaderPlugIn);
-	    if (plug) NewPlugIn (str, plug);
+	    if (plug) loaded_plugins.NewPlugIn (str, plug);
 	  }
 	}
         break;
@@ -3409,6 +3402,7 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
 	  iMeshObject* mo2 = QUERY_INTERFACE (mo, iMeshObject);
 	  mesh->SetMeshObject (mo2);
 	  mo2->DecRef ();
+	  mo->DecRef ();
 	  // This is a bit ugly but I don't know another way to do it.
 	  // Here we find the csMeshFactoryWrapper which is holding the
 	  // reference to the factory that created this object.
@@ -3429,12 +3423,12 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
       case CS_TOKEN_PLUGIN:
 	{
 	  ScanStr (params, "%s", str);
-	  plug = (iLoaderPlugIn*)FindPlugIn (str);
+	  plug = (iLoaderPlugIn*)loaded_plugins.FindPlugIn (str);
 	  if (!plug)
 	  {
 	    printf ("Plugin '%s' loaded!\n", str);
 	    plug = LOAD_PLUGIN (System, str, "MeshLdr", iLoaderPlugIn);
-	    if (plug) NewPlugIn (str, plug);
+	    if (plug) loaded_plugins.NewPlugIn (str, plug);
 	  }
 	}
         break;
