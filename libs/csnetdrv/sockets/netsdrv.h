@@ -89,15 +89,19 @@ public:
   virtual csNetworkDriverCapabilities GetCapabilities() const;
   virtual csNetworkDriverError GetLastError () const;
 
-  /// The target should be a <host,port#> tuple.  It should be a string
-  /// containing: "host:port#" (ie. "localhost:888").  Host can be an IP
-  /// address (ie. "192.168.0.1"), a hostname (ie. "localhost"), or the empty
-  /// string, in which case "localhost" is assumed.
+  /**
+   * The target should be a <host,port#> tuple.  It should be a string
+   * containing: "host:port#" (ie. "localhost:888").  Host can be an IP
+   * address (ie. "192.168.0.1"), a hostname (ie. "localhost"), or the empty
+   * string, in which case "localhost" is assumed.
+   */
   virtual iNetworkConnection* NewConnection(const char* target,
     bool reliable, bool blocking);
 
-  /// The source should be a port# on which to listen.  It should be a string
-  /// containing: "port#" (ie. "888").
+  /**
+   * The source should be a port# on which to listen.  It should be a string
+   * containing: "port#" (ie. "888").
+   */
   virtual iNetworkListener* NewListener(const char* source,
     bool reliable, bool blockingListener, bool blockingConnection);
 
