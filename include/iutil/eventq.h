@@ -41,8 +41,7 @@ SCF_VERSION(iEventQueue, 0, 0, 1);
  * Events may be posted to the queue by various sources.  Listeners
  * (implementing iEventHandler) can register to receive notification when
  * various events are processed.  Typically, one instance of this object is
- * available from the shared-object registry (iObjectRegistry) under the
- * name "crystalspace.event.queue".
+ * available from the shared-object registry (iObjectRegistry).
  */
 struct iEventQueue : public iBase
 {
