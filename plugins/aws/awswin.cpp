@@ -4,8 +4,10 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"
 #include "iutil/event.h"
+#include "csutil/scfstr.h"
 
 #include <stdio.h>
+#include <string.h>
 
 const unsigned long awsWindow::sWindowRaised  = 0x1;
 const unsigned long awsWindow::sWindowLowered = 0x2;
@@ -35,6 +37,7 @@ awsWindow::awsWindow():above(NULL), below(NULL),
   min_button(NULL), max_button(NULL), close_button(NULL), btxt(NULL),
   frame_style(fsNormal), 
   frame_options(foControl | foZoom | foClose | foTitle | foGrip | foRoundBorder),
+  title(NULL),
   resizing_mode(false), moving_mode(false), 
   minp(50,5, 50+13, 5+11), maxp(34,5, 34+13, 5+11), closep(18,5, 18+13,5+11),
   min_down(false), max_down(false), close_down(false),
@@ -113,6 +116,43 @@ awsWindow::Setup(iAws *_wmgr, awsComponentNode *settings)
   closep.ymax=Frame().ymin+closep.ymax;
    
   return true;
+}
+
+bool 
+awsWindow::GetProperty(char *name, void **parm)
+{
+  if (strcmp("Title", name)==0)
+  {
+    char *st=NULL;
+
+    if (title) st=title->GetData();
+
+    iString *s = new scfString(st);
+    *parm = (void *)s;
+    return true;
+  }
+
+  return false;
+}
+
+bool 
+awsWindow::SetProperty(char *name, void **parm)
+{  
+  if (strcmp("Title", name)==0)
+  {
+    iString *t = (iString *)(*parm);
+    if (t)
+    {
+      title->DecRef();
+      title = new scfString(t->GetData());
+      title->IncRef();
+
+      Invalidate();
+    }
+    return true;
+  }
+  
+  return false;
 }
 
 
@@ -648,13 +688,16 @@ awsWindow::OnDraw(csRect clip)
           g2d->DrawLine(Frame().xmax-i, Frame().ymin+i+th-1, Frame().xmax-i, Frame().ymax-i,       botright[i]);
         } 
 
+        if (title)
+        {
         // now draw the title
         g2d->Write(WindowManager()->GetPrefMgr()->GetDefaultFont(),
                    Frame().xmin+10,
                    Frame().ymin+(step>>1)+toff,
                    WindowManager()->GetPrefMgr()->GetColor(AC_TEXTFORE),
                    -1,
-                   "AWS Test Window");
+                   title->GetData());
+        }
 
       } // end if title bar
       else

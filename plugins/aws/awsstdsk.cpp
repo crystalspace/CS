@@ -1,0 +1,56 @@
+#include "cssysdef.h"
+#include "aws/awsstdsk.h"
+#include "aws/awscomp.h"
+
+
+void 
+awsStandardSink::Hide(void *sink, iAwsSource *source)
+{
+  awsComponent *c = (awsComponent *)source;
+
+  c->Hide();
+}
+ 
+void 
+awsStandardSink::Show(void *sink, iAwsSource *source)
+{
+  awsComponent *c = (awsComponent *)source;
+
+  c->Show();
+}
+
+void 
+awsStandardSink::HideWindow(void *sink, iAwsSource *source)
+{
+  awsComponent *c = (awsComponent *)source;
+
+  if (strcmp(c->Type(), "Window")==0)
+  {
+    c->Hide();
+  }
+  else
+  { 
+    // not yet implemented, since it requires extra functionality in the window manager.
+  }
+}
+
+void 
+awsStandardSink::Invalidate(void *sink, iAwsSource *source)
+{
+  awsComponent *c = (awsComponent *)source;
+
+  c->Invalidate();
+}
+
+awsStandardSink::awsStandardSink()
+{
+  RegisterTrigger("Show", Show);
+  RegisterTrigger("Hide", Hide);
+  RegisterTrigger("HideWindow", HideWindow);
+  RegisterTrigger("Invalidate", Invalidate);
+}
+
+awsStandardSink::~awsStandardSink()
+{
+
+}

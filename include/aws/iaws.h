@@ -275,6 +275,12 @@ struct iAwsComponent : public iAwsSource
     /// Event dispatcher, demultiplexes events and sends them off to the proper event handler
     virtual bool HandleEvent(iEvent& Event)=0;
 
+    /// Gets a copy of the property, put it in parm.  Returns false if the property does not exist.
+    virtual bool GetProperty(char *name, void **parm)=0;
+
+    /// Sets the property specified to whatever is in parm. Returns false if there's no such property.
+    virtual bool SetProperty(char *name, void **parm)=0;
+
     /// Invalidation routine: allow the component to be redrawn when you call this
     virtual void Invalidate()=0;
 

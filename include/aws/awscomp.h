@@ -93,6 +93,12 @@ public:
     /// Event dispatcher, demultiplexes events and sends them off to the proper event handler
     virtual bool HandleEvent(iEvent& Event);
 
+    /// Gets the property specified, setting the parameter to a COPY of the property's value. Returns false if there's no such property.
+    virtual bool GetProperty(char *name, void **parm);
+
+    /// Sets the property specified, setting the proprty to whatever is in parm. Returns false if there's no such property.
+    virtual bool SetProperty(char *name, void **parm);
+
     /// Invalidation routine: allow the component to be redrawn when you call this
     virtual void Invalidate();
 

@@ -67,6 +67,9 @@ private:
     /// The size of the title bar as of last draw
     int  title_bar_height;
 
+    /// The title
+    iString *title;
+
     /// The last values for x and y so that we can create deltas for moving
     int  last_x, last_y;
 
@@ -247,6 +250,12 @@ public:
     
     /// Does some additional setup for windows, including linking into the window hierarchy.
     virtual bool Setup(iAws *_wmgr, awsComponentNode *settings);
+
+    /// Gets properties for this window
+    bool GetProperty(char *name, void **parm);
+
+    /// Sets properties for this window
+    bool SetProperty(char *name, void **parm);
 
 public:
     /// Event triggered when a window is about to be raised

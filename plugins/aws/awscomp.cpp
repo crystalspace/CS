@@ -3,8 +3,10 @@
 #include "aws/awscomp.h"
 #include "aws/awsslot.h"
 #include "iutil/event.h"
+#include "csutil/scfstr.h"
 
 #include <stdio.h>
+#include <string.h>
 
 const bool AWS_COMP_DEBUG=true;
 
@@ -93,6 +95,39 @@ awsComponent::Setup(iAws *_wmgr, awsComponentNode *settings)
 
   return true;
 
+}
+
+bool 
+awsComponent::GetProperty(char *name, void **parm)
+{
+  if (strcmp("Frame", name)==0)
+  {
+    csRect *r = new csRect(Frame());
+    *parm = (void *)r;
+    return true;
+  }
+  else if (strcmp("Type", name)==0)
+  {
+    iString *s = new scfString(Type());
+    *parm = (void *)s;
+    return true;
+  }
+
+  return false;
+}
+
+bool 
+awsComponent::SetProperty(char *name, void **parm)
+{  
+  if (strcmp("Frame", name)==0)
+  {
+    csRect *r = (csRect *)(*parm);
+
+    Frame().Set(*r);
+    return true;
+  }
+  
+  return false;
 }
 
 void
