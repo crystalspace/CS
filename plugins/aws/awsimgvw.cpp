@@ -23,6 +23,8 @@ const int awsImageView::fsBump =0x0;
 const int awsImageView::fsSimple =0x1;
 const int awsImageView::fsRaised =0x2;
 const int awsImageView::fsSunken =0x3;
+const int awsImageView::fsFlat =0x4;
+const int awsImageView::fsNone =0x5;
 
 
 awsImageView::awsImageView():is_down(false), mouse_is_over(false),
@@ -177,6 +179,8 @@ awsImageViewFactory::awsImageViewFactory(iAws *wmgr):awsComponentFactory(wmgr)
   RegisterConstant("ivfsSimple", awsImageView::fsSimple);
   RegisterConstant("ivfsRaised",  awsImageView::fsRaised);
   RegisterConstant("ivfsSunken",  awsImageView::fsSunken);
+  RegisterConstant("ivfsFlat",  awsImageView::fsFlat);
+  RegisterConstant("ivfsNone",  awsImageView::fsNone);
 
   RegisterConstant("signalImageViewClicked",  awsImageView::signalClicked);
   RegisterConstant("signalImageViewMouseUp",  awsImageView::signalMouseUp);

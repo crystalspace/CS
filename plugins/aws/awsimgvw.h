@@ -52,6 +52,8 @@ protected:
   static const int fsSimple;
   static const int fsRaised;
   static const int fsSunken;
+  static const int fsFlat;
+  static const int fsNone;
 
 
   /******* Signals **********************/

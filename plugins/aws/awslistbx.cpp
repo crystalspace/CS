@@ -21,7 +21,8 @@ const int awsListBox::fsBump   = 0x0;
 const int awsListBox::fsSimple = 0x1;
 const int awsListBox::fsRaised = 0x2;
 const int awsListBox::fsSunken = 0x3;
-const int awsListBox::fsNone   = 0x4;
+const int awsListBox::fsFlat   = 0x4;
+const int awsListBox::fsNone   = 0x5;
 
 const int awsListBox::ctList = 0x0;
 const int awsListBox::ctTree = 0x1;
@@ -1304,6 +1305,7 @@ awsListBoxFactory::awsListBoxFactory(iAws *wmgr):awsComponentFactory(wmgr)
   RegisterConstant("lbfsSunken", awsListBox::fsSunken);
   RegisterConstant("lbfsRaised",  awsListBox::fsRaised);
   RegisterConstant("lbfsSimple", awsListBox::fsSimple);
+  RegisterConstant("lbfsFlat", awsListBox::fsFlat);
   RegisterConstant("lbfsNone",  awsListBox::fsNone);
 
   RegisterConstant("lbtTree", awsListBox::ctTree);

@@ -8,6 +8,7 @@ const int aws3DFrame::fsSimple =0x1;
 const int aws3DFrame::fsRaised =0x2;
 const int aws3DFrame::fsSunken =0x3;
 const int aws3DFrame::fsFlat =0x4;
+const int aws3DFrame::fsNone =0x5;
 
 aws3DFrame::aws3DFrame()
 {
@@ -151,6 +152,8 @@ aws3DFrame::Draw(iAws *wmgr, iAwsWindow *window, csRect &frame, int frame_style,
 
   case fsSimple:
     g2d->DrawBox(frame.xmin, frame.ymin, frame.Width(), frame.Height(), black);
+    break;
+  case fsNone:
     break;
   }
 }

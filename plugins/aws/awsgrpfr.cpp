@@ -18,6 +18,8 @@ const int awsGroupFrame::fsBump =0x0;
 const int awsGroupFrame::fsSimple =0x1;
 const int awsGroupFrame::fsRaised =0x2;
 const int awsGroupFrame::fsSunken =0x3;
+const int awsGroupFrame::fsFlat =0x4;
+const int awsGroupFrame::fsNone =0x5;
 
 const int awsGroupFrame::signalClicked=0x1;
 
@@ -194,6 +196,8 @@ awsGroupFrameFactory::awsGroupFrameFactory(iAws *wmgr):awsComponentFactory(wmgr)
   RegisterConstant("gfsSimple", awsGroupFrame::fsSimple);
   RegisterConstant("gfsSunken",  awsGroupFrame::fsSunken);
   RegisterConstant("gfsRaised", awsGroupFrame::fsRaised);
+  RegisterConstant("gfsFlat", awsGroupFrame::fsFlat);
+  RegisterConstant("gfsNone", awsGroupFrame::fsNone);
 
   RegisterConstant("signalGroupFrameClicked",  awsGroupFrame::signalClicked);
 }

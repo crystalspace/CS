@@ -290,6 +290,9 @@ public:
    /// A simple frame
    static const int fsSimple;
 
+   /// A flat frame
+   static const int fsFlat;
+   
    /// No frame is drawn
    static const int fsNone;
 

@@ -52,6 +52,12 @@ public:
    /// A frame that looks like a raised button
    static const int fsRaised;
 
+   /// A frame that looks flat
+   static const int fsFlat;
+
+   /// no frame at all
+   static const int fsNone;
+
    /******* Signals **********************/
 
    /// An up and down motion for the button
