@@ -62,16 +62,16 @@ csLua::~csLua()
   Mode=CS_REPORTER_SEVERITY_BUG;
   lua_close(LUA_STATE());
   lua_state=NULL;
-  Sys=NULL;
+  object_reg=NULL;
 }
 
 extern "C" {
   int cspace_initialize(lua_State *L);
 }
-extern int iSystem_tag;
-bool csLua::Initialize(iSystem* iSys)
+extern int iObjectRegistry_tag;
+bool csLua::Initialize(iObjectRegistry* object_reg)
 {
-  Sys=iSys;
+  csLua::object_reg=object_reg;
 
   lua_state = lua_open(0); //Stacksize is 0, is there a better value?
 
@@ -88,8 +88,8 @@ bool csLua::Initialize(iSystem* iSys)
   Mode=CS_REPORTER_SEVERITY_NOTIFY;
 
   // Store the system pointer in 'cspace.system'.
-  lua_pushusertag(LUA_STATE(), (void*)Sys, iSystem_tag);
-  lua_setglobal(LUA_STATE(), "system");
+  lua_pushusertag(LUA_STATE(), (void*)object_reg, iObjectRegistry_tag);
+  lua_setglobal(LUA_STATE(), "object_reg");
 
   return true;
 }

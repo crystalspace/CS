@@ -612,9 +612,9 @@ bool csEmitMeshObject::Draw (iRenderView* rview, iMovable* movable,
   return true;
 }
 
-csEmitMeshObject::csEmitMeshObject (iSystem* system,
+csEmitMeshObject::csEmitMeshObject (iObjectRegistry* object_reg,
   iMeshObjectFactory* factory)
-	: csParticleSystem (system, factory)
+	: csParticleSystem (object_reg, factory)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEmitState);
   lighted_particles = false;
@@ -888,11 +888,11 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csEmitMeshObjectFactory::EmitFactoryState)
   SCF_IMPLEMENTS_INTERFACE (iEmitFactoryState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csEmitMeshObjectFactory::csEmitMeshObjectFactory (iBase *p, iSystem* s)
+csEmitMeshObjectFactory::csEmitMeshObjectFactory (iBase *p, iObjectRegistry* s)
 {
   SCF_CONSTRUCT_IBASE (p);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEmitFactoryState);
-  system = s;
+  object_reg = s;
 }
 
 csEmitMeshObjectFactory::~csEmitMeshObjectFactory ()
@@ -902,7 +902,7 @@ csEmitMeshObjectFactory::~csEmitMeshObjectFactory ()
 iMeshObject* csEmitMeshObjectFactory::NewInstance ()
 {
   csEmitMeshObject* cm =
-    new csEmitMeshObject (system, (iMeshObjectFactory*)this);
+    new csEmitMeshObject (object_reg, (iMeshObjectFactory*)this);
   iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
   return im;
@@ -938,7 +938,7 @@ csEmitMeshObjectType::~csEmitMeshObjectType ()
 
 iMeshObjectFactory* csEmitMeshObjectType::NewFactory ()
 {
-  csEmitMeshObjectFactory* cm = new csEmitMeshObjectFactory (this, system);
+  csEmitMeshObjectFactory* cm = new csEmitMeshObjectFactory (this, object_reg);
   iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;

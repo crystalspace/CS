@@ -78,7 +78,7 @@ void csAVIFormat::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (pSystem->GetObjectRegistry (), iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
     rep->ReportV (severity, "crystalspace.video.avi", msg, arg);
   else
@@ -89,11 +89,11 @@ void csAVIFormat::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-bool csAVIFormat::Initialize (iSystem *iSys)
+bool csAVIFormat::Initialize (iObjectRegistry *object_reg)
 {
   datalen = 0;
 
-  pSystem = iSys;
+  csAVIFormat::object_reg = object_reg;
   pFile = NULL;
   pData = NULL;
   pChunkList = NULL;
@@ -356,7 +356,7 @@ ULong csAVIFormat::CreateStream (StreamHeader *streamheader)
 	n += AVI_EVEN(strh.size) + len_hcl;
       }
       if (pAudioStream->Initialize (&aviheader, streamheader, &audsf, nAudio, 
-				    pCID, nCIDLen, pName, pFormatEx, nFormatEx, pSystem))
+				    pCID, nCIDLen, pName, pFormatEx, nFormatEx, object_reg))
 	vStream.Push (pAudioStream);
       else
 	pAudioStream->DecRef ();
@@ -404,7 +404,7 @@ ULong csAVIFormat::CreateStream (StreamHeader *streamheader)
 	n += AVI_EVEN(strh.size) + len_hcl;
       }
       if (pVideoStream->Initialize (&aviheader, streamheader, &vidsf, nVideo, 
-				    pCID, nCIDLen, pName, pFormatEx, nFormatEx, pSystem))
+				    pCID, nCIDLen, pName, pFormatEx, nFormatEx, object_reg))
       vStream.Push (pVideoStream);
       else
 	pVideoStream->DecRef ();

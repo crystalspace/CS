@@ -33,8 +33,15 @@ struct iStrVector;
 struct iConfigFile;
 struct iConfigManager;
 
+//@@@ This is a temporary define that MUST be used to get the iSystem
+// pointer from the object registry. Normally you can also use
+// CS_QUERY_REGISTRY() but since we want to eventually remove iSystem
+// we need to be able to find queries to iSystem fast so we can remove them
+// too. That's why we put this in a seperate define that we will later remove.
+#define CS_GET_SYSTEM(object_reg) CS_QUERY_REGISTRY(object_reg, iSystem)
 
-SCF_VERSION (iSystem, 9, 0, 0);
+
+SCF_VERSION (iSystem, 10, 0, 0);
 
 /**
  * This interface serves as a way for plug-ins to query Crystal Space about
@@ -52,26 +59,6 @@ SCF_VERSION (iSystem, 9, 0, 0);
 struct iSystem : public iBase
 {
   //---------------------------- Initialization ------------------------------//
-
-  /**
-   * Initialize the system. Sort all plugins with respect to their
-   * dependencies. Then load all plugins and initialize them.
-   */
-  virtual bool Initialize (int argc, const char* const argv[],
-  	const char *iConfigName) = 0;
-
-  /**
-   * Send cscmdSystemOpen message to all loaded plugins.
-   */
-  virtual bool Open () = 0;
-  /// Send cscmdSystemClose message to all loaded plugins. 
-  virtual void Close () = 0;
-
-  /**
-   * System loop.
-   * This function returns only when an cscmdQuit broadcast is encountered.
-   */
-  virtual void Loop () = 0;
 
   /**
    * The ::Loop method calls this method once per frame.

@@ -257,11 +257,12 @@ SCF_IMPLEMENT_IBASE (csTextureManager)
   SCF_IMPLEMENTS_INTERFACE (iTextureManager)
 SCF_IMPLEMENT_IBASE_END
 
-csTextureManager::csTextureManager (iSystem* iSys, iGraphics2D *iG2D)
-  : textures (16, 16), materials (16, 16)
+csTextureManager::csTextureManager (iObjectRegistry* object_reg,
+	iGraphics2D *iG2D)
+	: textures (16, 16), materials (16, 16)
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  System = iSys;
+  csTextureManager::object_reg = object_reg;
   verbose = false;
 
   pfmt = *iG2D->GetPixelFormat ();

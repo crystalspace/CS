@@ -165,7 +165,7 @@ class CsfEdit : public csApp
 
 public:
   /// Initialize maze editor
-  CsfEdit (iSystem *SysDriver, csSkin &Skin);
+  CsfEdit (iObjectRegistry *SysDriver, csSkin &Skin);
 
   /// Initialize maze editor
   virtual ~CsfEdit ();

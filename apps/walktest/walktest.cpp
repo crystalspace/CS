@@ -1219,7 +1219,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     return false;
   }
 
-  csInitializeApplication (Sys);
+  csInitializeApplication (object_reg);
 
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iConfigManager* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);

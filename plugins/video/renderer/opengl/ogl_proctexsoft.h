@@ -48,7 +48,7 @@ struct iNativeWindow;
 class csOpenGLProcSoftware : public iGraphics3D
 {
  protected:
-  iSystem *system;
+  iObjectRegistry *object_reg;
   char *buffer;
   int width, height;
   csPixelFormat pfmt;

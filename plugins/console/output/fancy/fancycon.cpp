@@ -59,7 +59,7 @@ void csFancyConsole::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
     rep->ReportV (severity, "crystalspace.console.output.fancy", msg, arg);
   else
@@ -71,7 +71,7 @@ void csFancyConsole::Report (int severity, const char* msg, ...)
 }
 
 csFancyConsole::csFancyConsole (iBase *p) :
-  System(0), VFS(0), base(0), G2D(0), G3D(0), ImageLoader(NULL), border_computed(false),
+  object_reg(0), VFS(0), base(0), G2D(0), G3D(0), ImageLoader(NULL), border_computed(false),
   pix_loaded(false), system_ready(false), auto_update(true), visible(true)
 {
   SCF_CONSTRUCT_IBASE (p);
@@ -92,17 +92,16 @@ csFancyConsole::~csFancyConsole ()
     VFS->DecRef ();
 }
 
-bool csFancyConsole::Initialize (iSystem *system) 
+bool csFancyConsole::Initialize (iObjectRegistry *object_reg) 
 {
-  System = system;
-  iObjectRegistry* object_reg = system->GetObjectRegistry ();
+  csFancyConsole::object_reg = object_reg;
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   VFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
   if (!VFS)
     return false;
 
-  csConfigAccess ini(System, "/config/fancycon.cfg");
+  csConfigAccess ini(object_reg, "/config/fancycon.cfg");
   char const* baseclass = ini->GetStr("FancyConsole.General.Superclass",
     "crystalspace.console.output.standard");
   base = CS_LOAD_PLUGIN(plugin_mgr, baseclass, 0, iConsoleOutput);
@@ -118,7 +117,8 @@ bool csFancyConsole::Initialize (iSystem *system)
   ImageLoader = NULL;
 
   // Tell system driver that we want to handle broadcast events
-  if (!System->CallOnEvents (&scfiPlugin, CSMASK_Broadcast))
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  if (!sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast))
     return false;
 
   int x, y, w, h;
@@ -139,7 +139,6 @@ bool csFancyConsole::HandleEvent (iEvent &Event)
           system_ready = true;
 	  if (!pix_loaded)
 	  {
-	    iObjectRegistry* object_reg = System->GetObjectRegistry ();
 	    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg,
 	    	iPluginManager);
             ImageLoader = CS_QUERY_PLUGIN_ID (plugin_mgr,
@@ -421,7 +420,7 @@ void csFancyConsole::GetPosition(int &x, int &y, int &width, int &height) const
 
 void csFancyConsole::LoadPix ()
 {
-  csConfigAccess ini(System, "/config/fancycon.cfg");
+  csConfigAccess ini(object_reg, "/config/fancycon.cfg");
 
   const char* dir = ini->GetStr ("FancyConsole.General.Archive");
   const char* mountdir = ini->GetStr ("FancyConsole.General.Mount");

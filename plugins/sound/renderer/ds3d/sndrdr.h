@@ -37,7 +37,7 @@ public:
   SCF_DECLARE_IBASE;
   csSoundRenderDS3D(iBase *piBase);
   virtual ~csSoundRenderDS3D();
-  virtual bool Initialize (iSystem *iSys);
+  virtual bool Initialize (iObjectRegistry *object_reg);
 
   virtual void SetVolume (float vol);
   virtual float GetVolume ();
@@ -60,7 +60,7 @@ public:
   const char *GetError(HRESULT result);
 
   LPDIRECTSOUND AudioRenderer;
-  iSystem *System;
+  iObjectRegistry *object_reg;
   csSoundListenerDS3D *Listener;
   csSoundFormat LoadFormat;
   csVector ActiveSources;
@@ -71,7 +71,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundRenderDS3D);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
   } scfiPlugin;
 };

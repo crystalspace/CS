@@ -142,8 +142,8 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   if (!superclass::Initialize (argc, argv, iConfigName))
     return false;
 
-  csInitializeApplication (this);
   iObjectRegistry* object_reg = GetObjectRegistry ();
+  csInitializeApplication (object_reg);
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // Find the pointer to engine plugin
@@ -219,17 +219,17 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   sky = new csProcSky();
   sky->SetAnimated(false);
   sky_f = new csProcSkyTexture(sky);
-  iMaterialWrapper* imatf = sky_f->Initialize(this, engine, txtmgr, "sky_f");
+  iMaterialWrapper* imatf = sky_f->Initialize(object_reg, engine, txtmgr, "sky_f");
   sky_b = new csProcSkyTexture(sky);
-  iMaterialWrapper* imatb = sky_b->Initialize(this, engine, txtmgr, "sky_b");
+  iMaterialWrapper* imatb = sky_b->Initialize(object_reg, engine, txtmgr, "sky_b");
   sky_l = new csProcSkyTexture(sky);
-  iMaterialWrapper* imatl = sky_l->Initialize(this, engine, txtmgr, "sky_l");
+  iMaterialWrapper* imatl = sky_l->Initialize(object_reg, engine, txtmgr, "sky_l");
   sky_r = new csProcSkyTexture(sky);
-  iMaterialWrapper* imatr = sky_r->Initialize(this, engine, txtmgr, "sky_r");
+  iMaterialWrapper* imatr = sky_r->Initialize(object_reg, engine, txtmgr, "sky_r");
   sky_u = new csProcSkyTexture(sky);
-  iMaterialWrapper* imatu = sky_u->Initialize(this, engine, txtmgr, "sky_u");
+  iMaterialWrapper* imatu = sky_u->Initialize(object_reg, engine, txtmgr, "sky_u");
   sky_d = new csProcSkyTexture(sky);
-  iMaterialWrapper* imatd = sky_d->Initialize(this, engine, txtmgr, "sky_d");
+  iMaterialWrapper* imatd = sky_d->Initialize(object_reg, engine, txtmgr, "sky_d");
 
   room = engine->CreateSector ("room");
   iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");

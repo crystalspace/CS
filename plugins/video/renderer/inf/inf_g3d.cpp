@@ -36,8 +36,6 @@
 #include "imesh/thing/polygon.h"	//@@@
 #include "imesh/thing/lightmap.h"	//@@@
 
-#define SysPrintf System->Printf
-
 ///---------------------------------------------------------------------------
 
 CS_IMPLEMENT_PLUGIN
@@ -115,23 +113,23 @@ csGraphics3DInfinite::~csGraphics3DInfinite ()
   if (G2D) G2D->DecRef ();
 }
 
-bool csGraphics3DInfinite::Initialize (iSystem *iSys)
+bool csGraphics3DInfinite::Initialize (iObjectRegistry *object_reg)
 {
-  System = iSys;
+  csGraphics3DInfinite::object_reg = object_reg;
 
-  config.AddConfig(System, "/config/inf3d.cfg");
+  config.AddConfig(object_reg, "/config/inf3d.cfg");
 
   width = height = -1;
 
-  iObjectRegistry* object_reg = System->GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   G2D = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.graphics2d.infinite",
     NULL, iGraphics2D);
   if (!G2D)
     return false;
 
-  texman = new csTextureManagerInfinite (System, G2D, config);
-  System->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
+  texman = new csTextureManagerInfinite (object_reg, G2D, config);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
 
   return true;
 }
@@ -161,7 +159,7 @@ bool csGraphics3DInfinite::Open ()
 
   if (!G2D->Open ())
   {
-    csReport (System->GetObjectRegistry (), CS_REPORTER_SEVERITY_ERROR,
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.graphics3d.infinite",
 	"Error opening Graphics2D context.");
     // set "not opened" flag
@@ -177,7 +175,7 @@ bool csGraphics3DInfinite::Open ()
   texman->SetPixelFormat (pfmt);
 
   SetDimensions (nWidth, nHeight);
-  csReport (System->GetObjectRegistry (), CS_REPORTER_SEVERITY_NOTIFY,
+  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
   	"crystalspace.graphics3d.infinite",
 	"Using virtual mode %dx%d.",width,height);
   z_buf_mode = CS_ZBUF_NONE;
@@ -457,9 +455,9 @@ bool csGraphics3DInfinite::eiInfiniteConfig::GetOptionDescription
 //====================================================================
 
 // csGraphics2DInfinite functions
-bool csGraphics2DInfinite::Initialize (iSystem *pSystem)
+bool csGraphics2DInfinite::Initialize (iObjectRegistry *object_reg)
 {
-  if (!csGraphics2D::Initialize (pSystem))
+  if (!csGraphics2D::Initialize (object_reg))
     return false;
 
   pfmt.RedMask = 0xf800;

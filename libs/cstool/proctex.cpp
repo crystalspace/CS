@@ -45,7 +45,7 @@ csProcTexture::csProcTexture ()
   ptTxtMgr = NULL;
   texFlags = 0;
   key_color = false;
-  sys = NULL;
+  object_reg = NULL;
   use_cb = true;
   last_cur_time = 0;
   anim_prepared = false;
@@ -72,20 +72,21 @@ void ProcCallback::UseTexture (iTextureWrapper*)
 {
   pt->PrepareAnim ();
   csTicks elapsed_time, current_time;
-  pt->sys->GetElapsedTime (elapsed_time, current_time);
+  iSystem* sys = CS_GET_SYSTEM (pt->object_reg);	//@@@
+  sys->GetElapsedTime (elapsed_time, current_time);
   if (pt->last_cur_time == current_time) return;
   pt->Animate (current_time);
   pt->last_cur_time = current_time;
 }
 
-bool csProcTexture::Initialize (iSystem* system)
+bool csProcTexture::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
+  csProcTexture::object_reg = object_reg;
   iImage *proc_image;
   proc_image = (iImage*) new csImageMemory (mat_w, mat_h);
 
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (
-  	system->GetObjectRegistry (), iPluginManager);
+  	object_reg, iPluginManager);
   iEngine* engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
   tex = engine->GetTextureList ()->NewTexture (proc_image);
   engine->DecRef ();
@@ -122,11 +123,11 @@ bool csProcTexture::PrepareAnim ()
   return true;
 }
 
-iMaterialWrapper* csProcTexture::Initialize (iSystem * system,
+iMaterialWrapper* csProcTexture::Initialize (iObjectRegistry * object_reg,
     	iEngine* engine, iTextureManager* txtmgr, const char* name)
 {
   SetName (name);
-  Initialize (system);
+  Initialize (object_reg);
   if (txtmgr)
   {
     tex->Register (txtmgr);

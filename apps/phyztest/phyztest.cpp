@@ -176,8 +176,8 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   if (!superclass::Initialize (argc, argv, iConfigName))
     return false;
 
-  csInitializeApplication (this);
   iObjectRegistry* object_reg = GetObjectRegistry ();
+  csInitializeApplication (object_reg);
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // Find the pointer to engine plugin

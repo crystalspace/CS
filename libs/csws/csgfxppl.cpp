@@ -57,11 +57,10 @@ csGraphicsPipeline::~csGraphicsPipeline ()
   if (G3D) G3D->DecRef ();
 }
 
-void csGraphicsPipeline::Initialize (iSystem *System)
+void csGraphicsPipeline::Initialize (iObjectRegistry *object_reg)
 {
   MaxPage = 0;
   DrawMode = 0;
-  iObjectRegistry* object_reg = System->GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   memset (SyncArea, 0, sizeof (SyncArea));
   G3D = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);

@@ -26,7 +26,7 @@
 class csModelConverter3ds : iModelConverter
 {
 private:
-  iSystem *pSystem;
+  iObjectRegistry *object_reg;
   iModelData *pModelData;
 
   char *supportedFormats;
@@ -47,7 +47,7 @@ public:
   /// destructor
   ~csModelConverter3ds();
 
-  bool Initialize( iSystem *pSys );
+  bool Initialize( iObjectRegistry *object_reg );
   virtual int GetFormatCount();
   virtual const char *GetFormat( int idx );
   virtual bool SupportsFormat( const char *Format );
@@ -57,9 +57,9 @@ public:
   struct Plugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE( csModelConverter3ds );
-    virtual bool Initialize (iSystem *sys)
+    virtual bool Initialize (iObjectRegistry *object_reg)
     { 
-      return scfParent->Initialize (sys);
+      return scfParent->Initialize (object_reg);
     }
   } scfiPlugin;
 };

@@ -37,7 +37,7 @@ csAVIStreamVideo::csAVIStreamVideo (iBase *pBase): memimage (1,1)
   SCF_CONSTRUCT_IBASE (pBase);
   pChunk = NULL;
   pAVI = (csAVIFormat*)pBase;
-  pSystem = NULL;
+  object_reg = NULL;
   pG3D = NULL;
   pG2D = NULL;
   pCodec = NULL;
@@ -53,7 +53,7 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
 				   UByte *pInitData, ULong nInitDataLen,
 				   char *pName,
 				   UByte *pFormatEx, ULong nFormatEx, 
-				   iSystem *pTheSystem)
+				   iObjectRegistry *object_reg)
 {
   strdesc.type = CS_STREAMTYPE_VIDEO;
   memcpy (strdesc.codec, psh->handler, 4);
@@ -79,8 +79,7 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
   pChunk->id[4] = '\0';
 
   nStream = nStreamNumber;
-  pSystem = pTheSystem;
-  iObjectRegistry* object_reg = pSystem->GetObjectRegistry ();
+  csAVIStreamVideo::object_reg = object_reg;
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   if (pG3D) pG3D->DecRef ();
   pG3D = CS_QUERY_PLUGIN (plugin_mgr, iGraphics3D);
@@ -461,7 +460,7 @@ bool csAVIStreamVideo::LoadCodec (UByte *pInitData, ULong nInitDataLen,
     }
     else
     {
-      csReport (pSystem->GetObjectRegistry (), CS_REPORTER_SEVERITY_WARNING,
+      csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
 		"crystalspace.video.avi",
       		"CODEC class \"%s\" could not be initialized !", cn);
       pCodec->DecRef ();
@@ -470,7 +469,7 @@ bool csAVIStreamVideo::LoadCodec (UByte *pInitData, ULong nInitDataLen,
   }
   else
   {
-    csReport (pSystem->GetObjectRegistry (), CS_REPORTER_SEVERITY_WARNING,
+    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
 		"crystalspace.video.avi",
       		"CODEC class \"%s\" could not be loaded !", cn);
   }

@@ -1,6 +1,32 @@
 The history order is reversed so that new features are at the top.
 
 6-Aug-2001
+	- Removed almost all usage of iSystem in the entire CS system. Instead
+	  a pointer to the object registry (iObjectRegistry) is used. This
+	  includes the following:
+	    - iPlugin::Initialize().
+	    - csConfigAccess class.
+	    - csInitializeApplication().
+	    - Constructor of csApp.
+	    - Various others...
+	- Because iSystem is still needed in some cases (still busy with the
+	  removal of that) there are some cases where you need to have a
+	  pointer to the system. To get that pointer you can now use the
+	  new CS_GET_SYSTEM define like this:
+	  	iSystem* sys = CS_GET_SYSTEM (object_reg);
+	  Note that this define will go away as soon as iSystem is removed.
+	  So it is only a temporary measure. CS_GET_SYSTEM is implemented
+	  by asking the object registry where iSystem is now registered.
+	  The use of iSystem is still required for using everything related
+	  to events (this includes the iEventOutlet pointers and also the
+	  elapsed time (GetElapsedTime()), GetMouseButton(), GetKeyState(),
+	  Sleep(), NextFrame(), ...).
+	- For Python scripts this also means that the 'system' variable is
+	  gone and has been replaced with 'object_reg'.
+	- Since they were not used I removed iSystem::Initialize(),
+	  Loop(), Open(), and Close(). The csSystemDriver versions of these
+	  functions are not removed though. They are still needed at this
+	  moment.
 	- Michael Voase added the following,
           Feature update:
 	    - CS/include/csutil/typedvec.h: Added
@@ -41,6 +67,8 @@ The history order is reversed so that new features are at the top.
               zero reference count on incoming handles. This breaks
               an endless loop issue between csMat/TexVector,
               the destructor and unregister (it is a circular reference).
+	- Philip Wyett did some more cleaning and loop optimization etc in
+	  csgeom, csutil, and other libraries.
 5-Aug-2001
 	- Fixed a small bug in haze. Now it shows in OpenGL but not
 	  correctly right yet.

@@ -62,7 +62,7 @@ public:
    *   slant the particles in that case...
    * swirl: is the amount of swirl for a flake, 0.0 is like rain.
    */
-  csSnowMeshObject (iSystem* system, iMeshObjectFactory* factory);
+  csSnowMeshObject (iObjectRegistry* object_reg, iMeshObjectFactory* factory);
   /// Destructor.
   virtual ~csSnowMeshObject ();
 
@@ -177,11 +177,11 @@ public:
 class csSnowMeshObjectFactory : public iMeshObjectFactory
 {
 private:
-  iSystem* system;
+  iObjectRegistry* object_reg;
 
 public:
   /// Constructor.
-  csSnowMeshObjectFactory (iBase *pParent, iSystem* system);
+  csSnowMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csSnowMeshObjectFactory ();
@@ -201,7 +201,7 @@ public:
 class csSnowMeshObjectType : public iMeshObjectType
 {
 private:
-  iSystem* system;
+  iObjectRegistry* object_reg;
 
 public:
   SCF_DECLARE_IBASE;
@@ -222,8 +222,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSnowMeshObjectType);
-    virtual bool Initialize (iSystem* p)
-    { scfParent->system = p; return true; }
+    virtual bool Initialize (iObjectRegistry* p)
+    { scfParent->object_reg = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;

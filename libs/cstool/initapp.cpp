@@ -30,10 +30,9 @@
 #include "isys/vfs.h"
 #include "imap/parser.h"
 
-void csInitializeApplication (iSystem* system, bool use_reporter,
+void csInitializeApplication (iObjectRegistry* object_reg, bool use_reporter,
 	bool use_reporter_listener)
 {
-  iObjectRegistry* object_reg = system->GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   iGraphics3D* g3d = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO,

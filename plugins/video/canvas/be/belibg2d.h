@@ -42,7 +42,7 @@ public:
   csGraphics2DBeLib(iBase*);
   virtual ~csGraphics2DBeLib();
 
-  virtual bool Initialize(iSystem*);
+  virtual bool Initialize(iObjectRegistry*);
   virtual bool Open();
   virtual void Close();
   virtual void Print(csRect* area = NULL);

@@ -157,8 +157,8 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   if (!superclass::Initialize (argc, argv, iConfigName))
     return false;
 
-  csInitializeApplication (this);
   iObjectRegistry* object_reg = GetObjectRegistry ();
+  csInitializeApplication (object_reg);
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);

@@ -235,7 +235,6 @@ public:
   SCF_DECLARE_IBASE;
   
   // system driver
-  iSystem *System;
   iObjectRegistry* object_reg;
   iPluginManager* plugin_mgr;
   // virtual file system
@@ -260,7 +259,7 @@ public:
   // destructor
   virtual ~csLoader();
   // initialize the plug-in
-  virtual bool Initialize(iSystem *System);
+  virtual bool Initialize(iObjectRegistry *object_reg);
 
   virtual void SetMode (int iFlags);
 
@@ -284,7 +283,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csLoader);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 };

@@ -46,7 +46,8 @@ SCF_EXPORT_CLASS_TABLE_END
 
 csPython* csPython::shared_instance = NULL;
 
-csPython::csPython(iBase *iParent) :Sys(NULL), Mode(CS_REPORTER_SEVERITY_NOTIFY)
+csPython::csPython(iBase *iParent) :object_reg(NULL),
+	Mode(CS_REPORTER_SEVERITY_NOTIFY)
 {
   SCF_CONSTRUCT_IBASE(iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
@@ -57,16 +58,16 @@ csPython::~csPython()
 {
   Mode=CS_REPORTER_SEVERITY_BUG;
   Py_Finalize();
-  Sys=NULL;
+  object_reg=NULL;
 }
 
 extern "C" {
   extern void SWIG_MakePtr(char *_c, const void *_ptr, char *type);
 }
 
-bool csPython::Initialize(iSystem* iSys)
+bool csPython::Initialize(iObjectRegistry* object_reg)
 {
-  Sys = iSys;
+  csPython::object_reg = object_reg;
 
   Py_SetProgramName("Crystal Space -- Python");
   Py_Initialize();
@@ -89,11 +90,11 @@ bool csPython::Initialize(iSystem* iSys)
 
   Mode = CS_REPORTER_SEVERITY_NOTIFY;
 
-  // Store the system pointer in 'cspace.system'.
+  // Store the object registry pointer in 'cspace.object_reg'.
   char command[256];
   char sysPtr[100];
-  SWIG_MakePtr (sysPtr, Sys, "_iSystem_p");
-  sprintf (command, "cspace.system=cspace.iSystemPtr(\"%s\")", sysPtr);
+  SWIG_MakePtr (sysPtr, object_reg, "_iObjectRegistry_p");
+  sprintf (command, "cspace.object_reg=cspace.iObjectRegistryPtr(\"%s\")", sysPtr);
   RunText (command);
 
   return true;
@@ -137,7 +138,6 @@ bool csPython::LoadModule(const char* name)
 
 void csPython::Print(bool Error, const char *msg)
 {
-  iObjectRegistry* object_reg = Sys->GetObjectRegistry ();
   iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (!rep)
     csPrintf ("%s\n", msg);

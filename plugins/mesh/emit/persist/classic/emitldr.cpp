@@ -139,10 +139,9 @@ csEmitFactoryLoader::~csEmitFactoryLoader ()
 {
 }
 
-bool csEmitFactoryLoader::Initialize (iSystem* system)
+bool csEmitFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csEmitFactoryLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -175,10 +174,9 @@ csEmitFactorySaver::~csEmitFactorySaver ()
 {
 }
 
-bool csEmitFactorySaver::Initialize (iSystem* system)
+bool csEmitFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csEmitFactorySaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -222,10 +220,9 @@ csEmitLoader::~csEmitLoader ()
 {
 }
 
-bool csEmitLoader::Initialize (iSystem* system)
+bool csEmitLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csEmitLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -592,10 +589,9 @@ csEmitSaver::~csEmitSaver ()
 {
 }
 
-bool csEmitSaver::Initialize (iSystem* system)
+bool csEmitSaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csEmitSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }

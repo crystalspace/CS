@@ -73,15 +73,16 @@ csGraphics2D::csGraphics2D (iBase* parent)
   FullScreen = false;
   is_open = false;
   win_title = csStrNew ("Crystal Space Application");
+  object_reg = NULL;
 }
 
-bool csGraphics2D::Initialize (iSystem* pSystem)
+bool csGraphics2D::Initialize (iObjectRegistry* object_reg)
 {
-  System = pSystem;
-  object_reg = System->GetObjectRegistry ();
+  CS_ASSERT (object_reg != NULL);
+  csGraphics2D::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   // Get the system parameters
-  config.AddConfig (System, "/config/video.cfg");
+  config.AddConfig (object_reg, "/config/video.cfg");
   Width = config->GetInt ("Video.ScreenWidth", Width);
   Height = config->GetInt ("Video.ScreenHeight", Height);
   Depth = config->GetInt ("Video.ScreenDepth", Depth);
@@ -115,7 +116,8 @@ bool csGraphics2D::Initialize (iSystem* pSystem)
     Palette [i].blue = 0;
   }
 
-  System->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
 
   return true;
 }
@@ -683,7 +685,8 @@ iGraphics2D *csGraphics2D::CreateOffScreenCanvas
    csPixelFormat *pfmt, csRGBpixel *palette, int pal_size)
 {
   // default return a software canvas
-  csProcTextureSoft2D *tex = new csProcTextureSoft2D (System);
+  CS_ASSERT (object_reg != NULL);
+  csProcTextureSoft2D *tex = new csProcTextureSoft2D (object_reg);
   return tex->CreateOffScreenCanvas (width, height, buffer, alone_hint,
 				     pfmt, palette, pal_size);
 }

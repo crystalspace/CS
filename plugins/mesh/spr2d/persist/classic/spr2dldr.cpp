@@ -147,10 +147,9 @@ csSprite2DFactoryLoader::~csSprite2DFactoryLoader ()
   if (reporter) reporter->DecRef ();
 }
 
-bool csSprite2DFactoryLoader::Initialize (iSystem* system)
+bool csSprite2DFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csSprite2DFactoryLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
   return true;
@@ -367,10 +366,9 @@ csSprite2DFactorySaver::~csSprite2DFactorySaver ()
   if (reporter) reporter->DecRef ();
 }
 
-bool csSprite2DFactorySaver::Initialize (iSystem* system)
+bool csSprite2DFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csSprite2DFactorySaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
   return true;
@@ -430,10 +428,9 @@ csSprite2DLoader::~csSprite2DLoader ()
   if (reporter) reporter->DecRef ();
 }
 
-bool csSprite2DLoader::Initialize (iSystem* system)
+bool csSprite2DLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csSprite2DLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
   return true;
@@ -617,10 +614,9 @@ csSprite2DSaver::~csSprite2DSaver ()
   if (reporter) reporter->DecRef ();
 }
 
-bool csSprite2DSaver::Initialize (iSystem* system)
+bool csSprite2DSaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csSprite2DSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
   return true;

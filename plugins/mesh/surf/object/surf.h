@@ -302,7 +302,7 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSurfMeshObjectType);
-    virtual bool Initialize (iSystem*) { return true; }
+    virtual bool Initialize (iObjectRegistry*) { return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 };

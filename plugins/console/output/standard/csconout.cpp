@@ -75,7 +75,7 @@ csConsoleOutput::csConsoleOutput (iBase *base)
   G2D = NULL;
   // clear font for closedown
   font = NULL;
-  System = NULL;
+  object_reg = NULL;
 }
 
 csConsoleOutput::~csConsoleOutput ()
@@ -89,10 +89,9 @@ csConsoleOutput::~csConsoleOutput ()
   delete buffer;
 }
 
-bool csConsoleOutput::Initialize (iSystem *system)
+bool csConsoleOutput::Initialize (iObjectRegistry *object_reg)
 {
-  System = system;
-  iObjectRegistry* object_reg = system->GetObjectRegistry ();
+  csConsoleOutput::object_reg = object_reg;
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   G3D = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
   if (!G3D) return false;
@@ -111,7 +110,8 @@ bool csConsoleOutput::Initialize (iSystem *system)
   flash_time = csGetTicks ();
 
   // We want to see broadcast events
-  System->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
   return true;
 }
 

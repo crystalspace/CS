@@ -54,7 +54,7 @@ csSoundDriverWaveOut::csSoundDriverWaveOut(iBase *piBase)
   SCF_CONSTRUCT_IBASE(piBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
 
-  System = NULL;
+  object_reg = NULL;
   SoundRender = NULL;
   MemorySize = 0;
   Memory = NULL;
@@ -65,11 +65,12 @@ csSoundDriverWaveOut::~csSoundDriverWaveOut()
 {
 }
 
-bool csSoundDriverWaveOut::Initialize (iSystem *iSys)
+bool csSoundDriverWaveOut::Initialize (iObjectRegistry *object_reg)
 {
-  System = iSys;
-  System->CallOnEvents(&scfiPlugin, csevCommand | csevBroadcast);
-  Config.AddConfig(System, "/config/sound.cfg");
+  csSoundDriverWaveOut::object_reg = object_reg;
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->CallOnEvents(&scfiPlugin, csevCommand | csevBroadcast);
+  Config.AddConfig(object_reg, "/config/sound.cfg");
   return true;
 }
 
@@ -77,7 +78,7 @@ void csSoundDriverWaveOut::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
     rep->ReportV (severity, "crystalspace.sound.driver.waveout", msg, arg);
   else

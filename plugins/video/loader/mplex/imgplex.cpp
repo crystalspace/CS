@@ -57,16 +57,15 @@ csMultiplexImageIO::~csMultiplexImageIO ()
     ((iImageIO*)list.Get (i))->DecRef ();
 }
 
-bool csMultiplexImageIO::Initialize (iSystem *pSystem)
+bool csMultiplexImageIO::Initialize (iObjectRegistry *object_reg)
 {
-  if (pSystem)
+  if (object_reg)
   {
-    csReport (pSystem->GetObjectRegistry (), CS_REPORTER_SEVERITY_NOTIFY,
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
       "crystalspace.video.mplex",
       "Initializing image loading multiplexer...\n"
       "  Looking for image loader modules:");
 
-    iObjectRegistry* object_reg = pSystem->GetObjectRegistry ();
     iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
     iStrVector* classlist =
@@ -79,7 +78,7 @@ bool csMultiplexImageIO::Initialize (iSystem *pSystem)
 	char const* classname = classlist->Get(i);
         if (strcasecmp (classname, MY_CLASSNAME))
         {
-	  csReport (pSystem->GetObjectRegistry (),
+	  csReport (object_reg,
 	  	CS_REPORTER_SEVERITY_NOTIFY,
 		"crystalspace.video.mplex",
 		"  %s",classname);

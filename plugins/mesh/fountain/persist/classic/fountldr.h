@@ -25,7 +25,6 @@
 #include "isys/plugin.h"
 
 struct iEngine;
-struct iSystem;
 struct iPluginManager;
 struct iObjectRegistry;
 
@@ -35,7 +34,6 @@ struct iObjectRegistry;
 class csFountainFactoryLoader : public iLoaderPlugin
 {
 private:
-  iSystem* sys;
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
 
@@ -48,7 +46,7 @@ public:
   /// Destructor.
   virtual ~csFountainFactoryLoader ();
 
-  bool Initialize (iSystem* p);
+  bool Initialize (iObjectRegistry* p);
 
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
@@ -56,7 +54,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csFountainFactoryLoader);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize (p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize (p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;
@@ -68,7 +67,6 @@ public:
 class csFountainFactorySaver : public iSaverPlugin
 {
 private:
-  iSystem* sys;
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
 
@@ -81,7 +79,7 @@ public:
   /// Destructor.
   virtual ~csFountainFactorySaver ();
 
-  bool Initialize (iSystem* p);
+  bool Initialize (iObjectRegistry* p);
 
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
@@ -89,7 +87,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csFountainFactorySaver);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize (p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize (p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;
@@ -102,7 +101,6 @@ public:
 class csFountainLoader : public iLoaderPlugin
 {
 private:
-  iSystem* sys;
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
 
@@ -115,7 +113,7 @@ public:
   /// Destructor.
   virtual ~csFountainLoader ();
 
-  bool Initialize (iSystem* p);
+  bool Initialize (iObjectRegistry* p);
 
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
@@ -123,7 +121,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csFountainLoader);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize (p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize (p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;
@@ -135,7 +134,6 @@ public:
 class csFountainSaver : public iSaverPlugin
 {
 private:
-  iSystem* sys;
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
 
@@ -148,7 +146,7 @@ public:
   /// Destructor.
   virtual ~csFountainSaver ();
 
-  bool Initialize (iSystem* p);
+  bool Initialize (iObjectRegistry* p);
 
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
@@ -156,7 +154,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csFountainSaver);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize (p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize (p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;

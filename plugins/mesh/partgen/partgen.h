@@ -35,7 +35,7 @@ struct iMeshObjectFactory;
 struct iMaterialWrapper;
 struct iMovable;
 struct iRenderView;
-struct iSystem;
+struct iObjectRegistry;
 
 /**
  * This class represents a particle system. It is a set of iParticles.
@@ -102,7 +102,7 @@ public:
    * Make a new system. 
    * Also adds the particle system to the list of the current engine.
    */
-  csParticleSystem (iSystem* system, iMeshObjectFactory* factory);
+  csParticleSystem (iObjectRegistry* object_reg, iMeshObjectFactory* factory);
 
   /**
    * Destroy particle system, and all particles.
@@ -373,7 +373,8 @@ protected:
 
 public:
   /// Specify max number of particles.
-  csNewtonianParticleSystem (iSystem* system, iMeshObjectFactory* factory);
+  csNewtonianParticleSystem (iObjectRegistry* object_reg,
+  	iMeshObjectFactory* factory);
   virtual ~csNewtonianParticleSystem ();
 
   void SetCount (int max);

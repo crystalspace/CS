@@ -48,7 +48,7 @@ csMotionManager::csMotionManager(iBase *iParent)
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
   oldtime=0;
-  iSys=NULL;
+  object_reg=NULL;
 }
 
 csMotionManager::~csMotionManager()
@@ -63,9 +63,9 @@ csMotionManager::~csMotionManager()
   cache.DeleteAll();
 }
 
-bool csMotionManager::Initialize (iSystem* TiSys)
+bool csMotionManager::Initialize (iObjectRegistry* object_reg)
 {
-  iSys=TiSys;
+  csMotionManager::object_reg = object_reg;
   slerp = true;
   return true;
 }

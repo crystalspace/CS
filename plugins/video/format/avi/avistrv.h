@@ -46,7 +46,7 @@ class csAVIStreamVideo : public iVideoStream
   iMaterialHandle *pMaterial;
   iGraphics3D *pG3D;
   iGraphics2D *pG2D;
-  iSystem *pSystem;
+  iObjectRegistry *object_reg;
   iAVICodec *pCodec;
   csCodecDescription cdesc;
 
@@ -71,7 +71,7 @@ class csAVIStreamVideo : public iVideoStream
 		   UByte *pInitData, ULong nInitDataLen,
 		   char *pName, 
 		   UByte *pFormatEx, ULong nFormatEx, 
-		   iSystem *pTheSystem);
+		   iObjectRegistry *object_reg);
   virtual ~csAVIStreamVideo ();
 
   // iStream

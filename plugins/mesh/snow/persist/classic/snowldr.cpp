@@ -125,10 +125,9 @@ csSnowFactoryLoader::~csSnowFactoryLoader ()
 {
 }
 
-bool csSnowFactoryLoader::Initialize (iSystem* system)
+bool csSnowFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csSnowFactoryLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -161,10 +160,9 @@ csSnowFactorySaver::~csSnowFactorySaver ()
 {
 }
 
-bool csSnowFactorySaver::Initialize (iSystem* system)
+bool csSnowFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csSnowFactorySaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -207,10 +205,9 @@ csSnowLoader::~csSnowLoader ()
 {
 }
 
-bool csSnowLoader::Initialize (iSystem* system)
+bool csSnowLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csSnowLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -413,10 +410,9 @@ csSnowSaver::~csSnowSaver ()
 {
 }
 
-bool csSnowSaver::Initialize (iSystem* system)
+bool csSnowSaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csSnowSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }

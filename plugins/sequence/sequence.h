@@ -24,7 +24,7 @@
 #include "ivaria/sequence.h"
 #include "isys/plugin.h"
 
-struct iSystem;
+struct iObjectRegistry;
 
 struct csSequenceOp
 {
@@ -154,7 +154,7 @@ public:
 class csSequenceManager : public iSequenceManager
 {
 private:
-  iSystem *System;
+  iObjectRegistry *object_reg;
 
   // The sequence manager uses one big sequence to keep all queued
   // sequence operations. New sequences will be merged with this one.
@@ -176,7 +176,7 @@ public:
 
   csSequenceManager (iBase *iParent);
   virtual ~csSequenceManager ();
-  virtual bool Initialize (iSystem *system);
+  virtual bool Initialize (iObjectRegistry *object_reg);
 
   /// This is set to receive the once per frame nothing event.
   virtual bool HandleEvent (iEvent &event);
@@ -194,7 +194,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSequenceManager);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
   } scfiPlugin;
 };

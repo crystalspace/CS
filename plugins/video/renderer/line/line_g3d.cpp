@@ -105,15 +105,14 @@ csGraphics3DLine::~csGraphics3DLine ()
     G2D->DecRef ();
 }
 
-bool csGraphics3DLine::Initialize (iSystem *iSys)
+bool csGraphics3DLine::Initialize (iObjectRegistry *object_reg)
 {
-  System = iSys;
-  iObjectRegistry* object_reg = System->GetObjectRegistry ();
+  csGraphics3DLine::object_reg = object_reg;
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
 
-  config.AddConfig(System, "/config/line3d.cfg");
+  config.AddConfig(object_reg, "/config/line3d.cfg");
 
   width = height = -1;
 
@@ -125,8 +124,9 @@ bool csGraphics3DLine::Initialize (iSystem *iSys)
   if (!G2D)
     return false;
 
-  texman = new csTextureManagerLine (System, G2D, config);
-  System->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
+  texman = new csTextureManagerLine (object_reg, G2D, config);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
 
   return true;
 }
@@ -156,7 +156,7 @@ bool csGraphics3DLine::Open ()
 
   if (!G2D->Open ())
   {
-    csReport (System->GetObjectRegistry (), CS_REPORTER_SEVERITY_ERROR,
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.graphics3d.line",
 	"Error opening Graphics2D context.");
     // set "not opened" flag
@@ -189,7 +189,7 @@ bool csGraphics3DLine::Open ()
 
   SetDimensions (nWidth, nHeight);
 
-  csReport (System->GetObjectRegistry (), CS_REPORTER_SEVERITY_NOTIFY,
+  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
 	"crystalspace.graphics3d.line",
   	"Using %s mode %dx%d.",
             bFullScreen ? "full screen" : "windowed", width, height);

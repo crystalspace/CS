@@ -168,10 +168,9 @@ csSprite3DFactoryLoader::~csSprite3DFactoryLoader ()
   if (reporter) reporter->DecRef ();
 }
 
-bool csSprite3DFactoryLoader::Initialize (iSystem* system)
+bool csSprite3DFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csSprite3DFactoryLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
   return true;
@@ -725,10 +724,9 @@ csSprite3DFactorySaver::~csSprite3DFactorySaver ()
   if (reporter) reporter->DecRef ();
 }
 
-bool csSprite3DFactorySaver::Initialize (iSystem* system)
+bool csSprite3DFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csSprite3DFactorySaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
   return true;
@@ -890,10 +888,9 @@ csSprite3DLoader::~csSprite3DLoader ()
   if (reporter) reporter->DecRef ();
 }
 
-bool csSprite3DLoader::Initialize (iSystem* system)
+bool csSprite3DLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csSprite3DLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
   return true;
@@ -1075,10 +1072,9 @@ csSprite3DSaver::~csSprite3DSaver ()
   if (reporter) reporter->DecRef ();
 }
 
-bool csSprite3DSaver::Initialize (iSystem* system)
+bool csSprite3DSaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csSprite3DSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
   return true;

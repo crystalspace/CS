@@ -46,7 +46,7 @@ public:
   virtual ~csSoundLoaderMultiplexer();
 
   // Initialize the Sound Loader.
-  virtual bool Initialize (iSystem *sys);
+  virtual bool Initialize (iObjectRegistry *object_reg);
 
   // Load a sound file from the raw data.
   virtual iSoundData *LoadSound(void *Data, unsigned long Size) const;
@@ -54,7 +54,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundLoaderMultiplexer);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 };
@@ -90,9 +91,8 @@ csSoundLoaderMultiplexer::~csSoundLoaderMultiplexer()
   }
 }
 
-bool csSoundLoaderMultiplexer::Initialize(iSystem *sys) 
+bool csSoundLoaderMultiplexer::Initialize(iObjectRegistry *object_reg) 
 {
-  iObjectRegistry* object_reg = sys->GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iReporter* reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (reporter)

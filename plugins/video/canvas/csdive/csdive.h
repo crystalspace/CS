@@ -75,7 +75,7 @@ public:
   csGraphics2DOS2DIVE (iBase *iParent);
   virtual ~csGraphics2DOS2DIVE ();
 
-  virtual bool Initialize (iSystem* pSystem);
+  virtual bool Initialize (iObjectRegistry* object_reg);
   virtual bool Open ();
   virtual void Close ();
 

@@ -29,7 +29,7 @@
 
 struct iEngine;
 struct iMaterialWrapper;
-struct iSystem;
+struct iObjectRegistry;
 class csTerrainQuad;
 
 #define LOD_LEVELS 4
@@ -81,7 +81,7 @@ public:
   float inv_grid_stepy;
 
 private:
-  iSystem* pSystem;
+  iObjectRegistry* object_reg;
   iMeshObjectFactory* pFactory;
   iMeshObjectDrawCallback* vis_cb;
   float current_lod;
@@ -211,7 +211,7 @@ private:
 
 public:
   /// Constructor.
-  csTerrFuncObject (iSystem* pSys, iMeshObjectFactory* factory);
+  csTerrFuncObject (iObjectRegistry* object_reg, iMeshObjectFactory* factory);
   virtual ~csTerrFuncObject ();
 
   void LoadMaterialGroup (iEngine* engine, const char *pName,
@@ -617,11 +617,11 @@ public:
 class csTerrFuncObjectFactory : public iMeshObjectFactory
 {
 private:
-  iSystem *pSystem;
+  iObjectRegistry *object_reg;
 
 public:
   /// Constructor.
-  csTerrFuncObjectFactory (iSystem* pSys);
+  csTerrFuncObjectFactory (iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csTerrFuncObjectFactory ();
@@ -641,7 +641,7 @@ public:
 class csTerrFuncObjectType : public iMeshObjectType
 {
 private:
-  iSystem *pSystem;
+  iObjectRegistry *object_reg;
 
 public:
   SCF_DECLARE_IBASE;
@@ -660,8 +660,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csTerrFuncObjectType);
-    virtual bool Initialize (iSystem* p)
-    { scfParent->pSystem = p; return true; }
+    virtual bool Initialize (iObjectRegistry* p)
+    { scfParent->object_reg = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;

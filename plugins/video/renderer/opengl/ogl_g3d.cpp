@@ -47,8 +47,6 @@
 #include "csutil/garray.h"
 #include "csutil/cscolor.h"
 
-#define SysPrintf System->Printf
-
 /*=========================================================================
  SCF macro section
 =========================================================================*/
@@ -75,7 +73,7 @@ csGraphics3DOpenGL::~csGraphics3DOpenGL ()
 {
 }
 
-bool csGraphics3DOpenGL::Initialize (iSystem* p)
+bool csGraphics3DOpenGL::Initialize (iObjectRegistry* p)
 {
   csGraphics3DOGLCommon::Initialize(p);
   return NewInitialize ();

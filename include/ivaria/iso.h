@@ -28,7 +28,7 @@
 #include "ivideo/graph3d.h"
 
 class csMatrix3;
-struct iSystem;
+struct iObjectRegistry;
 struct iEvent;
 struct iGraphics2D;
 struct iGraphics3D;
@@ -70,7 +70,7 @@ SCF_VERSION (iIsoEngine, 0, 0, 2);
 struct iIsoEngine : public iBase
 {
   /// Get the system
-  virtual iSystem* GetSystem() const = 0;
+  virtual iObjectRegistry* GetObjectRegistry() const = 0;
   /// Get the 2d canvas
   virtual iGraphics2D* GetG2D() const = 0;
   /// Get the 3d renderer

@@ -52,7 +52,6 @@ class csPoly2DPool;
 class csLightPatchPool;
 class csLightHalo;
 class csRenderView;
-struct iSystem;
 struct iVFS;
 struct iMaterialWrapper;
 struct iRegion;
@@ -340,8 +339,6 @@ public:
 
   /// Remember dimensions of display.
   static int frame_width, frame_height;
-  /// Remember iSystem interface.
-  static iSystem* System;
   /// Remember iObjectRegistry.
   static iObjectRegistry* object_reg;
   /// Remember iPluginManager.
@@ -944,7 +941,7 @@ public:
    * at startup so that plugin can do basic initialization stuff, register
    * with the system driver and so on.
    */
-  virtual bool Initialize (iSystem* sys);
+  virtual bool Initialize (iObjectRegistry* object_reg);
 
   /// We need to handle some events
   virtual bool HandleEvent (iEvent &Event);
@@ -952,7 +949,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csEngine);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
   } scfiPlugin;
 

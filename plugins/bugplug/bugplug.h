@@ -25,7 +25,7 @@
 #include "csutil/csvector.h"
 #include "ivideo/graph3d.h"
 
-struct iSystem;
+struct iObjectRegistry;
 struct iEngine;
 struct iGraphics3D;
 struct iGraphics2D;
@@ -112,8 +112,7 @@ struct csKeyMap
 class csBugPlug : public iPlugin
 {
 private:
-  iSystem *System;
-  iObjectRegistry* object_reg;
+  iObjectRegistry *object_reg;
   iPluginManager* plugin_mgr;
   iEngine *Engine;
   iGraphics3D* G3D;
@@ -241,7 +240,7 @@ public:
   csBugPlug (iBase *iParent);
   virtual ~csBugPlug ();
   ///
-  virtual bool Initialize (iSystem *system);
+  virtual bool Initialize (iObjectRegistry *object_reg);
   /// This is set to receive the once per frame nothing  event
   virtual bool HandleEvent (iEvent &event);
 };

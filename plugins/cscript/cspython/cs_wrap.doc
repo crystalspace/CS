@@ -254,7 +254,7 @@ csImageArea(sx,sy,sw,sh)
 1.8.  class iPlugin
 -------------------
 
-Initialize(iSys)
+Initialize(object_reg)
 
 HandleEvent(iEvent *)
 
@@ -680,8 +680,8 @@ CreateSectorWallsMesh(sector,name)
 
 GetSectors()
 
-1.31.  class iSystem
---------------------
+1.31.  class iObjectRegistry
+----------------------------
 
 Query_iEngine()
 

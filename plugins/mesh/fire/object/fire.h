@@ -95,7 +95,7 @@ public:
    * swirl is the amount of swirling of particles.
    * color_scale scales the colour the particles are set to.
    */
-  csFireMeshObject (iSystem* system, iMeshObjectFactory* factory);
+  csFireMeshObject (iObjectRegistry* object_reg, iMeshObjectFactory* factory);
   /// Destructor.
   virtual ~csFireMeshObject ();
 
@@ -264,11 +264,11 @@ public:
 class csFireMeshObjectFactory : public iMeshObjectFactory
 {
 private:
-  iSystem* system;
+  iObjectRegistry* object_reg;
 
 public:
   /// Constructor.
-  csFireMeshObjectFactory (iBase *pParent, iSystem* system);
+  csFireMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csFireMeshObjectFactory ();
@@ -288,7 +288,7 @@ public:
 class csFireMeshObjectType : public iMeshObjectType
 {
 private:
-  iSystem* system;
+  iObjectRegistry* object_reg;
 
 public:
   SCF_DECLARE_IBASE;
@@ -308,8 +308,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csFireMeshObjectType);
-    virtual bool Initialize (iSystem* p)
-    { scfParent->system = p; return true; }
+    virtual bool Initialize (iObjectRegistry* p)
+    { scfParent->object_reg = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;

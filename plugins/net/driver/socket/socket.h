@@ -86,7 +86,7 @@ public:
 class csSocketDriver : public iNetworkDriver
 {
 protected:
-  iSystem* Sys;
+  iObjectRegistry* object_reg;
   csNetworkDriverError LastError;
   void ClearError();
   bool PlatformDriverStart();
@@ -122,7 +122,7 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSocketDriver);
-    virtual bool Initialize (iSystem*);
+    virtual bool Initialize (iObjectRegistry*);
     virtual bool HandleEvent (iEvent&);
   } scfiPlugin;
   friend struct eiPlugin;

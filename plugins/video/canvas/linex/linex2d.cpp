@@ -72,7 +72,7 @@ void csGraphics2DLineXLib::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
     rep->ReportV (severity, "crystalspace.canvas.linex", msg, arg);
   else
@@ -83,9 +83,9 @@ void csGraphics2DLineXLib::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
+bool csGraphics2DLineXLib::Initialize (iObjectRegistry *object_reg)
 {
-  if (!csGraphics2D::Initialize (pSystem))
+  if (!csGraphics2D::Initialize (object_reg))
     return false;
 
   // Open display
@@ -101,8 +101,7 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
   if (XSupportsLocale ())
     XSetLocaleModifiers ("");
 
-  csConfigAccess Config(pSystem, "/config/video.cfg");
-  iObjectRegistry* object_reg = pSystem->GetObjectRegistry ();
+  csConfigAccess Config(object_reg, "/config/video.cfg");
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
   do_hwmouse = Config->GetBool ("Video.SystemMouseCursor", true);
@@ -188,9 +187,10 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
   memset (MouseCursor, 0, sizeof (MouseCursor));
 
   // Tell system driver to call us on every frame
-  System->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
   // Create the event outlet
-  EventOutlet = System->CreateEventOutlet (this);
+  EventOutlet = sys->CreateEventOutlet (this);
 
   // Do a trick: unload the system font server since its useless for us
   iPlugin *fs = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_FONTSERVER, iPlugin);
@@ -656,7 +656,7 @@ bool csGraphics2DLineXLib::HandleEvent (iEvent &Event)
 
   if ((Event.Type == csevBroadcast)
    && (Event.Command.Code == cscmdCommandLineHelp)
-   && System)
+   && object_reg)
   {
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Options for X-Windows line 2D graphics driver:");
     Report (CS_REPORTER_SEVERITY_NOTIFY, "  -[no]sysmouse      use/don't use system mouse cursor (default=%s)",

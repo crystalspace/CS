@@ -79,12 +79,12 @@ csPerfStats::~csPerfStats ()
   delete frame;
 }
 
-bool csPerfStats::Initialize (iSystem *system)
+bool csPerfStats::Initialize (iObjectRegistry *object_reg)
 {
-  System = system;
-  object_reg = system->GetObjectRegistry ();
+  csPerfStats::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  if (!System->CallOnEvents (&scfiPlugin, CSMASK_Nothing))
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  if (!sys->CallOnEvents (&scfiPlugin, CSMASK_Nothing))
     return false;
   sub_section = super_section = NULL;
   // default resolution
@@ -245,7 +245,7 @@ iPerfStats *csPerfStats::StartNewSubsection (const char *name)
 
   sub_section = new csPerfStats (this);
   sub_section->SetName (name);
-  sub_section->System = System;
+  sub_section->object_reg = object_reg;
   sub_section->resolution = resolution;
   sub_section->Engine = Engine;
   sub_section->statlog_section = statlog_section;

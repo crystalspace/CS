@@ -40,7 +40,7 @@
 
 #define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING|CS_OBJECT_FEATURE_ANIMATION)
 
-struct iSystem;
+struct iObjectRegistry;
 
 /**
  * A frame for 3D sprite animation.
@@ -263,7 +263,7 @@ private:
   bool initialized;
 
 public:
-  iSystem* System;
+  iObjectRegistry* object_reg;
 
 public:
   /// Create the sprite template
@@ -1352,7 +1352,7 @@ public:
 class csSprite3DMeshObjectType : public iMeshObjectType
 {
 private:
-  iSystem* System;
+  iObjectRegistry* object_reg;
 
 public:
   /// Constructor.
@@ -1385,8 +1385,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSprite3DMeshObjectType);
-    virtual bool Initialize (iSystem* p)
-    { scfParent->System = p; return true; }
+    virtual bool Initialize (iObjectRegistry* p)
+    { scfParent->object_reg = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;

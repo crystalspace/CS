@@ -62,7 +62,6 @@ void OpenGLTextureCache::Unload (csTxtCacheData *d)
   delete d;
 }
 
-#define Printf system->Printf
 //----------------------------------------------------------------------------//
 
 OpenGLTextureCache::OpenGLTextureCache (int max_size, int bpp)

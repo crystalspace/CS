@@ -77,7 +77,7 @@ public:
    * part_radius is the radius of every particle,
    * spreading multipliers: a random number (1.0..+1.0) * spread is added.
    */
-  csExploMeshObject (iSystem* system, iMeshObjectFactory* factory);
+  csExploMeshObject (iObjectRegistry* object_reg, iMeshObjectFactory* factory);
   /// Destructor.
   virtual ~csExploMeshObject ();
 
@@ -284,11 +284,11 @@ public:
 class csExploMeshObjectFactory : public iMeshObjectFactory
 {
 private:
-  iSystem* system;
+  iObjectRegistry* object_reg;
 
 public:
   /// Constructor.
-  csExploMeshObjectFactory (iBase *pParent, iSystem* system);
+  csExploMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csExploMeshObjectFactory ();
@@ -308,7 +308,7 @@ public:
 class csExploMeshObjectType : public iMeshObjectType
 {
 private:
-  iSystem* system;
+  iObjectRegistry* object_reg;
 
 public:
   SCF_DECLARE_IBASE;
@@ -328,8 +328,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csExploMeshObjectType);
-    virtual bool Initialize (iSystem* p)
-    { scfParent->system = p; return true; }
+    virtual bool Initialize (iObjectRegistry* p)
+    { scfParent->object_reg = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;

@@ -42,7 +42,7 @@ protected:
 
 public:
   /// Constructor.
-  csSpiralMeshObject (iSystem* system, iMeshObjectFactory* factory);
+  csSpiralMeshObject (iObjectRegistry* object_reg, iMeshObjectFactory* factory);
   /// Destructor.
   virtual ~csSpiralMeshObject ();
 
@@ -99,11 +99,11 @@ public:
 class csSpiralMeshObjectFactory : public iMeshObjectFactory
 {
 private:
-  iSystem* system;
+  iObjectRegistry* object_reg;
 
 public:
   /// Constructor.
-  csSpiralMeshObjectFactory (iBase *pParent, iSystem* system);
+  csSpiralMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csSpiralMeshObjectFactory ();
@@ -123,7 +123,7 @@ public:
 class csSpiralMeshObjectType : public iMeshObjectType
 {
 private:
-  iSystem* system;
+  iObjectRegistry* object_reg;
 
 public:
   SCF_DECLARE_IBASE;
@@ -143,7 +143,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSpiralMeshObjectType);
-    virtual bool Initialize(iSystem* p) { scfParent->system = p; return true; }
+    virtual bool Initialize(iObjectRegistry* p)
+    { scfParent->object_reg = p; return true; }
     virtual bool HandleEvent(iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;

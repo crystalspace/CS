@@ -33,7 +33,7 @@
 struct iLightMap;
 struct iTextureHandle;
 struct iPolygonTexture;
-struct iSystem;
+struct iObjectRegistry;
 class csSubRectangles;
 class csGraphics3DOGLCommon;
 

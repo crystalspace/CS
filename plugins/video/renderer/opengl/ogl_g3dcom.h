@@ -487,7 +487,6 @@ public:
   csConfigAccess config;
 
   /// The System interface. 
-  iSystem* System;
   iObjectRegistry* object_reg;
   iPluginManager* plugin_mgr;
 
@@ -499,7 +498,7 @@ public:
   void Report (int severity, const char* msg, ...);
 
   /// Initialization for iPlugin.  Sets System pointer.
-  virtual bool Initialize (iSystem*);
+  virtual bool Initialize (iObjectRegistry*);
   /**
    * Open or close our interface.
    */
@@ -755,7 +754,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DOGLCommon);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent& ev) { return scfParent->HandleEvent (ev); }
   } scfiPlugin;
 };

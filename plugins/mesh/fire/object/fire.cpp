@@ -114,8 +114,8 @@ void csFireMeshObject::SetupObject ()
   }
 }
 
-csFireMeshObject::csFireMeshObject (iSystem* system,
-  iMeshObjectFactory* factory) : csParticleSystem (system, factory)
+csFireMeshObject::csFireMeshObject (iObjectRegistry* object_reg,
+  iMeshObjectFactory* factory) : csParticleSystem (object_reg, factory)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiFireState);
   part_pos = NULL;
@@ -267,10 +267,10 @@ SCF_IMPLEMENT_IBASE (csFireMeshObjectFactory)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_END
 
-csFireMeshObjectFactory::csFireMeshObjectFactory(iBase* b, iSystem* s)
+csFireMeshObjectFactory::csFireMeshObjectFactory(iBase* b, iObjectRegistry* s)
 {
   SCF_CONSTRUCT_IBASE (b);
-  system = s;
+  object_reg = s;
 }
 
 csFireMeshObjectFactory::~csFireMeshObjectFactory ()
@@ -280,7 +280,7 @@ csFireMeshObjectFactory::~csFireMeshObjectFactory ()
 iMeshObject* csFireMeshObjectFactory::NewInstance ()
 {
   csFireMeshObject* cm =
-    new csFireMeshObject (system, (iMeshObjectFactory*)this );
+    new csFireMeshObject (object_reg, (iMeshObjectFactory*)this );
   iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
   return im;
@@ -316,7 +316,7 @@ csFireMeshObjectType::~csFireMeshObjectType ()
 
 iMeshObjectFactory* csFireMeshObjectType::NewFactory ()
 {
-  csFireMeshObjectFactory* cm = new csFireMeshObjectFactory (this, system);
+  csFireMeshObjectFactory* cm = new csFireMeshObjectFactory (this, object_reg);
   iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;

@@ -51,7 +51,7 @@ struct ConsoleDecoration
 class csFancyConsole : public iConsoleOutput
 {
 private:
-  iSystem *System;
+  iObjectRegistry *object_reg;
   iVFS *VFS;
   iConsoleOutput* base;
   iGraphics2D *G2D;
@@ -80,7 +80,7 @@ public:
 
   void Report (int severity, const char* msg, ...);
 
-  virtual bool Initialize (iSystem *);
+  virtual bool Initialize (iObjectRegistry *);
   virtual bool HandleEvent (iEvent &Event);
   virtual void PutText (const char *iText, ...)
   {
@@ -119,7 +119,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csFancyConsole);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
   } scfiPlugin;
 };

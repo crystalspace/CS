@@ -22,7 +22,7 @@
 #include "csutil/scf.h"
 #include "graph2d.h"
 
-struct iSystem;
+struct iObjectRegistry;
 
 class csProcTextureSoft2D : public csGraphics2D
 {
@@ -35,7 +35,7 @@ public:
   // responsibility.
   bool destroy_memory;
 
-  csProcTextureSoft2D (iSystem *isys);
+  csProcTextureSoft2D (iObjectRegistry *object_reg);
   virtual ~csProcTextureSoft2D ();
 
   virtual void Close ();

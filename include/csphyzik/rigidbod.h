@@ -25,7 +25,7 @@
 #include "csphyzik/phyztype.h"
 
 #define RBSTATESIZE (6 + PHYSICALENTITY_STATESIZE) 
-struct iSystem;
+struct iObjectRegistry;
 
 /// a rigid body.  has inertia tensor.
 class ctRigidBody : public ctDynamicEntity
@@ -48,7 +48,7 @@ public:
   { return RBSTATESIZE; }
 
 
-  iSystem *System;
+  iObjectRegistry *object_reg;
 
 /*
 **  Member functions

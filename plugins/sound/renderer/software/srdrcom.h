@@ -40,13 +40,13 @@ class csSoundRenderSoftware : public iSoundRender
 public:
   SCF_DECLARE_IBASE;
   // The system driver.
-  iSystem *System;
+  iObjectRegistry *object_reg;
 
   csSoundRenderSoftware(iBase *piBase);
   virtual ~csSoundRenderSoftware();
 	
   // implementation of iPlugin
-  virtual bool Initialize (iSystem *iSys);
+  virtual bool Initialize (iObjectRegistry *object_reg);
 
   // implementation of iSoundRender
   virtual void SetVolume (float vol);
@@ -109,7 +109,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundRenderSoftware);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
   } scfiPlugin;
 };

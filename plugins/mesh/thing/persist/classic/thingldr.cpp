@@ -217,10 +217,9 @@ csThingLoader::~csThingLoader ()
 {
 }
 
-bool csThingLoader::Initialize (iSystem* system)
+bool csThingLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csThingLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -1198,10 +1197,9 @@ csThingSaver::~csThingSaver ()
 {
 }
 
-bool csThingSaver::Initialize (iSystem* system)
+bool csThingSaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csThingSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -1230,10 +1228,9 @@ csPlaneLoader::~csPlaneLoader ()
 {
 }
 
-bool csPlaneLoader::Initialize (iSystem* system)
+bool csPlaneLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csPlaneLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -1369,10 +1366,9 @@ csPlaneSaver::~csPlaneSaver ()
 {
 }
 
-bool csPlaneSaver::Initialize (iSystem* system)
+bool csPlaneSaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csPlaneSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -1394,10 +1390,9 @@ csBezierLoader::~csBezierLoader ()
 {
 }
 
-bool csBezierLoader::Initialize (iSystem* system)
+bool csBezierLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csBezierLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -1482,10 +1477,9 @@ csBezierSaver::~csBezierSaver ()
 {
 }
 
-bool csBezierSaver::Initialize (iSystem* system)
+bool csBezierSaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csBezierSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }

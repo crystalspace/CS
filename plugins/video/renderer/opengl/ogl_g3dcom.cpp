@@ -120,7 +120,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csGraphics3DOGLCommon* csGraphics3DOGLCommon::ogl_g3d = NULL;
 
 csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
-  G2D (NULL), System (NULL)
+  G2D (NULL), object_reg (NULL)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
@@ -214,12 +214,13 @@ void csGraphics3DOGLCommon::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-bool csGraphics3DOGLCommon::Initialize (iSystem* p)
+bool csGraphics3DOGLCommon::Initialize (iObjectRegistry* p)
 {
-  System = p;
-  object_reg = System->GetObjectRegistry ();
+  object_reg = p;
+  CS_ASSERT (object_reg != NULL);
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  System->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
   return true;
 }
 
@@ -244,7 +245,8 @@ bool csGraphics3DOGLCommon::HandleEvent (iEvent& Event)
 
 bool csGraphics3DOGLCommon::NewInitialize ()
 {
-  config.AddConfig(System, "/config/opengl.cfg");
+  CS_ASSERT (object_reg != NULL);
+  config.AddConfig(object_reg, "/config/opengl.cfg");
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
 
@@ -256,7 +258,7 @@ bool csGraphics3DOGLCommon::NewInitialize ()
   if (!G2D)
     return false;
 
-  txtmgr = new csTextureManagerOpenGL (System, G2D, config, this);
+  txtmgr = new csTextureManagerOpenGL (object_reg, G2D, config, this);
 
   m_renderstate.dither = config->GetBool ("Video.OpenGL.EnableDither", false);
   z_buf_mode = CS_ZBUF_NONE;
@@ -1049,7 +1051,8 @@ void csGraphics3DOGLCommon::Print (csRect * area)
   if (fps_limit)
   {
     csTicks elapsed_time, current_time;
-    System->GetElapsedTime (elapsed_time, current_time);
+    iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+    sys->GetElapsedTime (elapsed_time, current_time);
     /// Smooth last n frames, to avoid jitter when objects appear/disappear.
     static int num = 10;
     static int times[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -1059,7 +1062,7 @@ void csGraphics3DOGLCommon::Print (csRect * area)
     times[cur] = elapsed_time;
     totaltime += times[cur];
     cur = (cur+1)%num;
-    if (totaltime/10 < fps_limit) System->Sleep (fps_limit - totaltime/10);
+    if (totaltime/10 < fps_limit) sys->Sleep (fps_limit - totaltime/10);
   }
   G2D->Print (area);
 }

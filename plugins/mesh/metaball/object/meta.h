@@ -33,7 +33,7 @@
 
 class csMaterialHandle;
 struct G3DTriangleMesh;
-struct iSystem;
+struct iObjectRegistry;
 struct iGraphics3D;
 struct iGraphics2D;
 struct iMaterialWrapper;
@@ -55,7 +55,7 @@ class csMetaBall : public iMeshObject
   float env_map_mult;
   float alpha;
   MetaParameters mp;
-  iSystem *Sys;
+  iObjectRegistry *object_reg;
   iMaterialWrapper *th;
   G3DTriangleMesh mesh;
   MetaBall *meta_balls;
@@ -233,7 +233,7 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMetaBallType);
-    virtual bool Initialize (iSystem*) { return true; }
+    virtual bool Initialize (iObjectRegistry*) { return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 };

@@ -245,8 +245,8 @@ bool ceControlWindow::HandleEvent (iEvent& Event)
  * ceCswsEngineApp
  *---------------------------------------------------------------------*/
 
-ceCswsEngineApp::ceCswsEngineApp (iSystem *iSys, csSkin &skin)
-	: csApp (iSys, skin)
+ceCswsEngineApp::ceCswsEngineApp (iObjectRegistry *object_reg, csSkin &skin)
+	: csApp (object_reg, skin)
 {
   engine = NULL;
   pG3D = NULL;
@@ -348,7 +348,6 @@ bool ceCswsEngineApp::Initialize ()
   if (!csApp::Initialize ())
     return false;
 
-  iObjectRegistry* object_reg = System->GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // Find the pointer to engine plugin
@@ -562,7 +561,7 @@ int main (int argc, char* argv[])
     printf ("System not initialized !\n");
     return -1;
   }    
-  csInitializeApplication (&Sys);
+  csInitializeApplication (object_reg);
 
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
@@ -576,7 +575,7 @@ int main (int argc, char* argv[])
     return -1;
   }
   // Create our main class.
-  ceCswsEngineApp theApp (&Sys, DefaultSkin);
+  ceCswsEngineApp theApp (object_reg, DefaultSkin);
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.

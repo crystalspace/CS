@@ -25,7 +25,7 @@
 #include "csutil/csvector.h"
 #include "cssys/csendian.h"
 
-struct iSystem;
+struct iObjectRegistry;
 class csAVIStreamVideo;
 class csAVIStreamAudio;
 
@@ -280,7 +280,7 @@ class csAVIFormat : public iStreamFormat
  protected:
   size_t datalen;
 
-  iSystem *pSystem;
+  iObjectRegistry *object_reg;
   iFile *pFile;
 
   char *pData, *p;
@@ -319,7 +319,7 @@ class csAVIFormat : public iStreamFormat
   csAVIFormat (iBase *pParent);
   virtual ~csAVIFormat ();
 
-  virtual bool Initialize (iSystem *iSys);
+  virtual bool Initialize (iObjectRegistry *object_reg);
 
   void Report (int severity, const char* msg, ...);
 
@@ -333,7 +333,8 @@ class csAVIFormat : public iStreamFormat
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csAVIFormat);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 };

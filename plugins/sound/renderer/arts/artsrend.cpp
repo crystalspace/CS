@@ -64,14 +64,14 @@ csArtsRenderer::~csArtsRenderer ()
   if (dispatcher) delete dispatcher;
 }
 
-bool csArtsRenderer::Initialize (iSystem *iSys)
+bool csArtsRenderer::Initialize (iObjectRegistry *object_reg)
 {
   // ok, we try to get a remote soundserver object
   dispatcher = new Arts::Dispatcher;
   server = Arts::Reference (ARTS_SIMPLESOUNDSERVER);
   if (server.isNull ())
   {
-    csReport (iSys->GetObjectRegistry (), CS_REPORTER_SEVERITY_WARNING,
+    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
     	"crystalspace.sound.arts",
         "Couldn't get a reference to the soundserver !\n"
         "Check whether you have the Arts server running "

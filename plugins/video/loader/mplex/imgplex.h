@@ -44,7 +44,7 @@ class csMultiplexImageIO : public iImageIO
   csMultiplexImageIO (iBase *pParent);
   virtual ~csMultiplexImageIO ();
 
-  virtual bool Initialize (iSystem*);
+  virtual bool Initialize (iObjectRegistry*);
   virtual const csVector& GetDescription ();
   virtual iImage *Load (UByte* iBuffer, ULong iSize, int iFormat);
   virtual void SetDithering (bool iEnable);
@@ -54,7 +54,8 @@ class csMultiplexImageIO : public iImageIO
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMultiplexImageIO);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 };

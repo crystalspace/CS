@@ -74,8 +74,8 @@ void csSnowMeshObject::SetupObject ()
   }
 }
 
-csSnowMeshObject::csSnowMeshObject (iSystem* system,
-  iMeshObjectFactory* factory) : csParticleSystem (system, factory)
+csSnowMeshObject::csSnowMeshObject (iObjectRegistry* object_reg,
+  iMeshObjectFactory* factory) : csParticleSystem (object_reg, factory)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSnowState);
   part_pos = NULL;
@@ -153,10 +153,10 @@ SCF_IMPLEMENT_IBASE (csSnowMeshObjectFactory)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_END
 
-csSnowMeshObjectFactory::csSnowMeshObjectFactory (iBase* p, iSystem* s)
+csSnowMeshObjectFactory::csSnowMeshObjectFactory (iBase* p, iObjectRegistry* s)
 {
   SCF_CONSTRUCT_IBASE (p);
-  system = s;
+  object_reg = s;
 }
 
 csSnowMeshObjectFactory::~csSnowMeshObjectFactory ()
@@ -166,7 +166,7 @@ csSnowMeshObjectFactory::~csSnowMeshObjectFactory ()
 iMeshObject* csSnowMeshObjectFactory::NewInstance ()
 {
   csSnowMeshObject* cm =
-    new csSnowMeshObject (system, (iMeshObjectFactory*)this);
+    new csSnowMeshObject (object_reg, (iMeshObjectFactory*)this);
   iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
   return im;
@@ -202,7 +202,7 @@ csSnowMeshObjectType::~csSnowMeshObjectType ()
 
 iMeshObjectFactory* csSnowMeshObjectType::NewFactory ()
 {
-  csSnowMeshObjectFactory* cm = new csSnowMeshObjectFactory (this, system);
+  csSnowMeshObjectFactory* cm = new csSnowMeshObjectFactory (this, object_reg);
   iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;

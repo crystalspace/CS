@@ -32,7 +32,7 @@ class csAVIStreamAudio : public iAudioStream
   UShort nStream;
   csAudioStreamDescription strdesc;
 
-  iSystem *pSystem;
+  iObjectRegistry *object_reg;
   iAVICodec *pCodec;
 
   bool LoadCodec (UByte *pInitData, ULong nInitDataLen, UByte *pFormatEx, ULong nFormatEx);
@@ -48,7 +48,7 @@ class csAVIStreamAudio : public iAudioStream
 		   UByte *pInitData, ULong nInitDataLen,
 		   char *pName,
 		   UByte *pFormatEx, ULong nFormatEx, 
-		   iSystem *pTheSystem);
+		   iObjectRegistry *object_reg);
   virtual ~csAVIStreamAudio ();
 
   // iStream

@@ -62,7 +62,7 @@ public:
   void LoadNewMap (const char* name);
 
 public:
-  ceCswsEngineApp (iSystem *iSys, csSkin &skin);
+  ceCswsEngineApp (iObjectRegistry *object_reg, csSkin &skin);
   ~ceCswsEngineApp ();
   
   virtual bool HandleEvent (iEvent &Event);

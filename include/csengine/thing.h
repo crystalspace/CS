@@ -1074,7 +1074,7 @@ public:
 class csThingObjectType : public iMeshObjectType
 {
 private:
-  iSystem* System;
+  iObjectRegistry* object_reg;
 
 public:
   SCF_DECLARE_IBASE;
@@ -1086,7 +1086,7 @@ public:
   virtual ~csThingObjectType ();
 
   /// Register plugin with the system driver
-  virtual bool Initialize (iSystem *pSystem);
+  virtual bool Initialize (iObjectRegistry *object_reg);
 
   /// New Factory.
   virtual iMeshObjectFactory* NewFactory ();
@@ -1100,7 +1100,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csThingObjectType);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 };

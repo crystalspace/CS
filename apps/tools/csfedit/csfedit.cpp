@@ -1332,7 +1332,8 @@ static int palette_CsfEdit[] =
   cs_Color_White			// Start points
 };
 
-CsfEdit::CsfEdit (iSystem *System, csSkin &Skin) : csApp (System, Skin)
+CsfEdit::CsfEdit (iObjectRegistry *object_reg, csSkin &Skin)
+	: csApp (object_reg, Skin)
 {
   int pal = csRegisterPalette (palette_CsfEdit, sizeof (palette_CsfEdit) / sizeof (int));
   SetPalette (pal);
@@ -1364,7 +1365,7 @@ bool CsfEdit::Initialize ()
   // CSWS apps are a lot more performant with a single-buffered canvas
   GetG2D ()->DoubleBuffer (false);
 
-  csReport (System->GetObjectRegistry (), CS_REPORTER_SEVERITY_NOTIFY,
+  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
 	"crystalspace.application.csfedit",
     "Crystal Space version %s (%s).\n"
     "CSF Editor.\n",
@@ -1541,8 +1542,8 @@ int main (int argc, char* argv[])
   if (!System.Initialize (argc, argv, "/config/cswstest.cfg"))
     return -1;
 
-  csInitializeApplication (&System);
   iObjectRegistry* object_reg = System.GetObjectRegistry ();
+  csInitializeApplication (object_reg);
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   iNativeWindow* nw = g3d->GetDriver2D ()->GetNativeWindow ();
@@ -1560,7 +1561,7 @@ int main (int argc, char* argv[])
     DefaultSkin.Prefix = cfg->GetStr ("CSWS.Skin.Variant", NULL);
 
   // Create our application object
-  CsfEdit app (&System, DefaultSkin);
+  CsfEdit app (object_reg, DefaultSkin);
 
   if (app.Initialize ())
     System.Loop ();

@@ -27,7 +27,7 @@ struct iTextureWrapper;
 struct iMaterialWrapper;
 struct iEngine;
 
-struct iSystem;
+struct iObjectRegistry;
 struct iGraphics2D;
 struct iGraphics3D;
 struct iTextureManager;
@@ -52,7 +52,7 @@ protected:
   iGraphics3D* ptG3D;
   iGraphics2D* ptG2D;
   iTextureManager* ptTxtMgr;
-  iSystem* sys;
+  iObjectRegistry* object_reg;
   bool anim_prepared;
 
   bool key_color;
@@ -97,7 +97,7 @@ public:
    * Alternatively you can use Initialize(engine,name) which does all this
    * work for you.
    */
-  virtual bool Initialize (iSystem* system);
+  virtual bool Initialize (iObjectRegistry* object_reg);
 
   /**
    * Initialize this procedural texture, create a material associated
@@ -108,7 +108,7 @@ public:
    * less flexibility but is sufficient for most cases. The texture and
    * material will get the name that is given by this routine.
    */
-  iMaterialWrapper* Initialize (iSystem* system, iEngine* engine,
+  iMaterialWrapper* Initialize (iObjectRegistry* object_reg, iEngine* engine,
       	iTextureManager* txtmgr, const char* name);
 
   /**

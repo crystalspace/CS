@@ -25,9 +25,9 @@
 #include "isys/system.h"
 #include "CrystGLWindow.h"
 
-CrystGLView::CrystGLView(BRect frame, iSystem* isys) :
+CrystGLView::CrystGLView(BRect frame, iObjectRegistry* objreg) :
   BGLView(frame, "", B_FOLLOW_NONE, 0, BGL_RGB | BGL_DEPTH | BGL_DOUBLE),
-  system(isys)
+  object_reg(objreg)
 {
 }
 
@@ -37,7 +37,8 @@ CrystGLView::~CrystGLView()
 
 void CrystGLView::UserAction() const
 {
-  system->PerformExtension("UserAction", Looper()->CurrentMessage());
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->PerformExtension("UserAction", Looper()->CurrentMessage());
 }
 
 void CrystGLView::KeyDown(char const* bytes, int32 numBytes)
@@ -75,11 +76,10 @@ void CrystGLView::AttachedToWindow()
 }
 
 CrystGLWindow::CrystGLWindow(BRect frame, char const* name, CrystGLView *v,
-	iSystem* isys, iGraphics2D* ig2d) :
+	iObjectRegistry* objreg, iGraphics2D* ig2d) :
 	BDirectWindow(frame, name, B_TITLED_WINDOW, B_NOT_RESIZABLE, 0),
-	view(v), system(isys), g2d(ig2d)
+	view(v), object_reg(objreg), g2d(ig2d)
 {
-  system->IncRef();
   g2d->IncRef();
   view->SetViewColor(0, 0, 0);
 
@@ -93,7 +93,6 @@ CrystGLWindow::~CrystGLWindow()
   Hide();
   Flush();
   g2d->DecRef();
-  system->DecRef();
 }
 
 void CrystGLWindow::DirectConnected(direct_buffer_info* info)
@@ -107,8 +106,9 @@ void CrystGLWindow::DirectConnected(direct_buffer_info* info)
 
 bool CrystGLWindow::QuitRequested()
 {
-  system->PerformExtension("ContextClose", g2d);
-  system->PerformExtension("Quit");
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->PerformExtension("ContextClose", g2d);
+  sys->PerformExtension("Quit");
   return false; // Allow Crystal Space to close window itself.
 }
 

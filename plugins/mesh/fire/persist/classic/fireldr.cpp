@@ -128,10 +128,9 @@ csFireFactoryLoader::~csFireFactoryLoader ()
 {
 }
 
-bool csFireFactoryLoader::Initialize (iSystem* system)
+bool csFireFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csFireFactoryLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -164,10 +163,9 @@ csFireFactorySaver::~csFireFactorySaver ()
 {
 }
 
-bool csFireFactorySaver::Initialize (iSystem* system)
+bool csFireFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csFireFactorySaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -211,10 +209,9 @@ csFireLoader::~csFireLoader ()
 {
 }
 
-bool csFireLoader::Initialize (iSystem* system)
+bool csFireLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csFireLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -443,10 +440,9 @@ csFireSaver::~csFireSaver ()
 {
 }
 
-bool csFireSaver::Initialize (iSystem* system)
+bool csFireSaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csFireSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }

@@ -25,11 +25,10 @@
 #include "csgfx/quantize.h"
 #include "csutil/scanstr.h"
 #include "iutil/cfgfile.h"
+#include "iutil/objreg.h"
 #include "isys/event.h"
 #include "isys/system.h"
 #include "igraphic/image.h"
-
-#define SysPrintf System->Printf
 
 #define RESERVED_COLOR(c) ((c == 0) || (c == 255))
 
@@ -247,8 +246,8 @@ static UByte *GenLightmapTable (int bits)
   return table;
 }
 
-csTextureManagerLine::csTextureManagerLine (iSystem *iSys,
-  iGraphics2D *iG2D, iConfigFile *config) : csTextureManager (iSys, iG2D)
+csTextureManagerLine::csTextureManagerLine (iObjectRegistry *object_reg,
+  iGraphics2D *iG2D, iConfigFile *config) : csTextureManager (object_reg, iG2D)
 {
   alpha_tables = NULL;
   ResetPalette ();
@@ -503,5 +502,6 @@ void csTextureManagerLine::SetPalette ()
   for (int i = 0; i < 256; i++)
     G2D->SetRGB (i, cmap [i].red, cmap [i].green, cmap [i].blue);
 
-  System->GetSystemEventOutlet ()->ImmediateBroadcast (cscmdPaletteChanged, this);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->GetSystemEventOutlet ()->ImmediateBroadcast (cscmdPaletteChanged, this);
 }

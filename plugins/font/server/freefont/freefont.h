@@ -191,7 +191,7 @@ public:
   TT_Engine engine;
   TT_UShort platformID, encodingID;
   int defaultSize;
-  iSystem *System;
+  iObjectRegistry *object_reg;
   csConfigAccess ftconfig;
   iVFS *VFS;
   const char *fontset;
@@ -201,7 +201,7 @@ public:
   csFreeTypeServer (iBase *iParent);
   virtual ~csFreeTypeServer ();
 
-  virtual bool Initialize (iSystem *Sys);
+  virtual bool Initialize (iObjectRegistry *Sys);
   void Report (int severity, const char* msg, ...);
 
   /**
@@ -226,7 +226,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csFreeTypeServer);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 };

@@ -57,7 +57,7 @@ void csGraphics2DGLX::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
     rep->ReportV (severity, "crystalspace.canvas.glx2d", msg, arg);
   else
@@ -68,19 +68,18 @@ void csGraphics2DGLX::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-bool csGraphics2DGLX::Initialize (iSystem *pSystem)
+bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
 {
-  if (!csGraphics2DGLCommon::Initialize (pSystem))
+  if (!csGraphics2DGLCommon::Initialize (object_reg))
     return false;
 
-  csConfigAccess config(pSystem, "/config/opengl.cfg");
+  csConfigAccess config(object_reg, "/config/opengl.cfg");
 
   dispdriver = NULL;
   const char *strDriver;
 
   if ((strDriver = config->GetStr ("Video.OpenGL.Display.Driver", NULL)))
   {
-    iObjectRegistry* object_reg = pSystem->GetObjectRegistry ();
     iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
     dispdriver = CS_LOAD_PLUGIN (plugin_mgr, strDriver, NULL, iOpenGLDisp);
     if (!dispdriver)
@@ -100,7 +99,7 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
   // Query system settings
   int sim_depth;
   bool do_shm;
-  GetX11Settings (System, sim_depth, do_shm, do_hwmouse);
+  GetX11Settings (object_reg, sim_depth, do_shm, do_hwmouse);
 
   dpy = XOpenDisplay (NULL);
   if (!dpy)
@@ -137,9 +136,10 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
   pfmt.PalEntries = 0;
 
   // Tell system driver to call us on every frame
-  System->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
   // Create the event outlet
-  EventOutlet = System->CreateEventOutlet (this);
+  EventOutlet = sys->CreateEventOutlet (this);
 
   return true;
 }

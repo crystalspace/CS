@@ -62,17 +62,16 @@ csGraphics2DAA::~csGraphics2DAA (void)
     EventOutlet->DecRef ();
 }
 
-bool csGraphics2DAA::Initialize (iSystem *pSystem)
+bool csGraphics2DAA::Initialize (iObjectRegistry *object_reg)
 {
-  if (!csGraphics2D::Initialize (pSystem))
+  if (!csGraphics2D::Initialize (object_reg))
     return false;
 
   csConfigAccess config;
-  config.AddConfig(pSystem, "/config/asciiart.cfg");
-  config.AddConfig(pSystem, "/config/video.cfg");
+  config.AddConfig(object_reg, "/config/asciiart.cfg");
+  config.AddConfig(object_reg, "/config/video.cfg");
 
   // Load settings from config file and setup the aa_defparams structure
-  iObjectRegistry* object_reg = System->GetObjectRegistry ();
   iConfigManager* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
   HardwareCursor = config->GetBool ("Video.SystemMouseCursor", true);
 
@@ -129,7 +128,8 @@ bool csGraphics2DAA::Initialize (iSystem *pSystem)
   pfmt.BlueMask   = 0xff;
   pfmt.complete ();
 
-  EventOutlet = System->CreateEventOutlet (this);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys = System->CreateEventOutlet (this);
   return true;
 }
 

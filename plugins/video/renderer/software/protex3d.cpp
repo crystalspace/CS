@@ -76,7 +76,7 @@ bool csSoftProcTexture3D::Prepare (csTextureManagerSoftware *main_texman,
 {
   csGraphics3DSoftwareCommon* parent_g3d = main_texman->G3D;
   iGraphics2D *g2d = parent_g3d->GetDriver2D ();
-  System = parent_g3d->System;
+  object_reg = parent_g3d->object_reg;
 
   main_tcache = parent_g3d->tcache;
   parent_tex_mm = tex_mm;
@@ -215,7 +215,6 @@ iTextureHandle *csSoftProcTexture3D::CreateOffScreenRenderer
 
   if (!G2D)
   {
-    iObjectRegistry* object_reg = System->GetObjectRegistry ();
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
       	"crystalspace.video.software.protex3d",
 	"Error opening Graphics2D texture context.");

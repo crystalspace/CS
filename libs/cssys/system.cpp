@@ -323,6 +323,11 @@ csSystemDriver::csSystemDriver () : Plugins (8, 8), EventQueue (),
   //@@@ cmdline->DecRef (); Uncomment when object registry moves out
   // of system driver.
 
+  //@@@ We temporarily register iSystem with the object registry too.
+  // That allows us to remove the usage of iSystem everywhere except in
+  // a few places where this is still needed. This is only transitionary.
+  scfiObjectRegistry.Register (this, "System");
+
   // Initialize Shared Class Facility|
   char scfconfigpath [MAXPATHLEN + 1];
 
@@ -402,7 +407,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
 
   // look if the user-specific config domain should be used
   {
-    csConfigAccess cfgacc(this, "/config/system.cfg");
+    csConfigAccess cfgacc(&scfiObjectRegistry, "/config/system.cfg");
     if (cfgacc->GetBool("System.UserConfig", true))
     {
       // open the user-specific, application-neutral config domain
@@ -617,7 +622,7 @@ void csSystemDriver::SetSystemDefaults (iConfigManager *Config)
 {
   // First look in .cfg file
   csConfigAccess cfg;
-  cfg.AddConfig(this, "/config/system.cfg");
+  cfg.AddConfig(&scfiObjectRegistry, "/config/system.cfg");
 
   // Now analyze command line
   const char *val;
@@ -810,7 +815,7 @@ iBase *csSystemDriver::LoadPlugin (const char *iClassID, const char *iFuncID,
   else
   {
     int index = Plugins.Push (new csPlugin (p, iClassID, iFuncID));
-    if (p->Initialize (this))
+    if (p->Initialize (&scfiObjectRegistry))
     {
       iBase *ret;
       if (iInterface)
@@ -835,7 +840,7 @@ bool csSystemDriver::RegisterPlugin (const char *iClassID,
   const char *iFuncID, iPlugin *iObject)
 {
   int index = Plugins.Push (new csPlugin (iObject, iClassID, iFuncID));
-  if (iObject->Initialize (this))
+  if (iObject->Initialize (&scfiObjectRegistry))
   {
     QueryOptions (iObject);
     iObject->IncRef ();

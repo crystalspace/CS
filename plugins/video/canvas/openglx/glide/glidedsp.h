@@ -31,7 +31,7 @@ class csOpenGLGlideDisp : public iOpenGLDisp
       
       virtual bool open();
       virtual bool close();
-      virtual bool Initialize( iSystem *pSystem );
+      virtual bool Initialize( iObjectRegistry *object_reg );
 };
 
 #endif // __OPENGLGLIDEDISP_H__

@@ -27,9 +27,8 @@
 #include "iutil/cfgfile.h"
 #include "isys/event.h"
 #include "isys/system.h"
+#include "iutil/objreg.h"
 #include "igraphic/image.h"
-
-#define SysPrintf System->Printf
 
 #define RESERVED_COLOR(c) ((c == 0) || (c == 255))
 
@@ -261,8 +260,8 @@ void csTextureHandleNull::Prepare ()
 
 //----------------------------------------------- csTextureManagerNull ---//
 
-csTextureManagerNull::csTextureManagerNull (iSystem *iSys,
-  iGraphics2D *iG2D, iConfigFile *config) : csTextureManager (iSys, iG2D)
+csTextureManagerNull::csTextureManagerNull (iObjectRegistry *object_reg,
+  iGraphics2D *iG2D, iConfigFile *config) : csTextureManager (object_reg, iG2D)
 {
   ResetPalette ();
   read_config (config);
@@ -475,5 +474,6 @@ void csTextureManagerNull::SetPalette ()
   for (int i = 0; i < 256; i++)
     G2D->SetRGB (i, cmap [i].red, cmap [i].green, cmap [i].blue);
 
-  System->GetSystemEventOutlet ()->ImmediateBroadcast (cscmdPaletteChanged, this);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->GetSystemEventOutlet ()->ImmediateBroadcast (cscmdPaletteChanged, this);
 }

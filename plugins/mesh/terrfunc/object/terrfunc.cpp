@@ -159,12 +159,12 @@ void csTerrFuncObject::SetHeightMap (iImage* im, float hscale, float hshift)
   data->DecRef ();
 }
 
-csTerrFuncObject::csTerrFuncObject (iSystem* pSys,
+csTerrFuncObject::csTerrFuncObject (iObjectRegistry* object_reg,
 	iMeshObjectFactory *pFactory)
 {
   SCF_CONSTRUCT_IBASE (NULL)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTerrFuncState);
-  pSystem = pSys;
+  csTerrFuncObject::object_reg = object_reg;
   csTerrFuncObject::pFactory = pFactory;
   initialized = false;
   blockxy = 4;
@@ -1474,10 +1474,10 @@ SCF_IMPLEMENT_IBASE (csTerrFuncObjectFactory)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_END
 
-csTerrFuncObjectFactory::csTerrFuncObjectFactory (iSystem* pSys)
+csTerrFuncObjectFactory::csTerrFuncObjectFactory (iObjectRegistry* object_reg)
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  pSystem = pSys;
+  csTerrFuncObjectFactory::object_reg = object_reg;
 }
 
 csTerrFuncObjectFactory::~csTerrFuncObjectFactory ()
@@ -1486,7 +1486,7 @@ csTerrFuncObjectFactory::~csTerrFuncObjectFactory ()
 
 iMeshObject* csTerrFuncObjectFactory::NewInstance ()
 {
-  csTerrFuncObject* pTerrObj = new csTerrFuncObject (pSystem, this);
+  csTerrFuncObject* pTerrObj = new csTerrFuncObject (object_reg, this);
   return (iMeshObject*)pTerrObj;
 }
 
@@ -1520,7 +1520,7 @@ csTerrFuncObjectType::~csTerrFuncObjectType ()
 
 iMeshObjectFactory* csTerrFuncObjectType::NewFactory()
 {
-  csTerrFuncObjectFactory *pFactory = new csTerrFuncObjectFactory (pSystem);
+  csTerrFuncObjectFactory *pFactory = new csTerrFuncObjectFactory (object_reg);
   return (iMeshObjectFactory*)pFactory;
 }
 

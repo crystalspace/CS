@@ -46,8 +46,6 @@ SCF_IMPLEMENT_IBASE (csOpenGLProcSoftware2D)
   SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
 SCF_IMPLEMENT_IBASE_END;
 
-#define SysPrintf system->Printf
-
 //----------------------------------------------------------------------------
 // Keep a private vector of soft textures generated from ogl textures
 //----------------------------------------------------------------------------
@@ -92,16 +90,17 @@ dummyMaterial::dummyMaterial ()
 
 class TxtHandleVector : public csVector
 {
-  iSystem *system;
+  iObjectRegistry *object_reg;
   iPluginManager* plugin_mgr;
   iTextureManager* soft_man;
   iTextureManager* ogl_man;
 public:
   // Constructor
-  TxtHandleVector (iSystem *sys, iTextureManager *stm, iTextureManager *otm) 
-    : csVector (8, 8), system (sys), soft_man (stm), ogl_man (otm)
+  TxtHandleVector (iObjectRegistry *objreg, iTextureManager *stm,
+  	iTextureManager *otm) 
+    : csVector (8, 8), object_reg (objreg), soft_man (stm), ogl_man (otm)
   {
-    plugin_mgr = CS_QUERY_REGISTRY (sys->GetObjectRegistry (), iPluginManager);
+    plugin_mgr = CS_QUERY_REGISTRY (objreg, iPluginManager);
   }; 
   // Destructor
   virtual ~TxtHandleVector () { DeleteAll (); }
@@ -200,7 +199,8 @@ csOpenGLProcSoftware::~csOpenGLProcSoftware ()
       last = last->next_soft_tex;
     last->next_soft_tex = next_soft_tex;
   }
-  system->GetSystemEventOutlet ()->Broadcast (cscmdContextClose, (void*)dummy_g2d);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->GetSystemEventOutlet ()->Broadcast (cscmdContextClose, (void*)dummy_g2d);
   dummy_g2d->DecRef ();
 }
 
@@ -251,7 +251,8 @@ bool csOpenGLProcSoftware::Prepare(
   pfmt.PalEntries = 0;
   pfmt.complete ();
 
-  system = parent_g3d->System;
+  object_reg = parent_g3d->object_reg;
+  CS_ASSERT (object_reg != NULL);
   iPluginManager* plugin_mgr = parent_g3d->plugin_mgr;
   this->buffer = (char*) buffer;
   this->tex = tex;
@@ -278,7 +279,7 @@ bool csOpenGLProcSoftware::Prepare(
     "crystalspace.graphics3d.software.offscreen", NULL, iGraphics3D);
   if (!soft_proc_g3d)
   {
-    csReport (system->GetObjectRegistry (), CS_REPORTER_SEVERITY_ERROR,
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.graphics3d.opengl",
 	"Error creating offscreen software renderer");
     return false;
@@ -290,7 +291,7 @@ bool csOpenGLProcSoftware::Prepare(
 
   if (!isoft_proc)
   {
-    csReport (system->GetObjectRegistry (), CS_REPORTER_SEVERITY_ERROR,
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
 	"crystalspace.graphics3d.opengl",
     	"Error creating offscreen software renderer");
     return false;
@@ -317,8 +318,9 @@ bool csOpenGLProcSoftware::Prepare(
   csPixelFormat *main_pfmt = parent_g3d->GetDriver2D()->GetPixelFormat ();
   dummy_g2d = (iGraphics2D*) new csOpenGLProcSoftware2D (g3d, main_pfmt);
 
+  CS_ASSERT (object_reg != NULL);
   if (!head_soft_tex)
-    txts_vector = new TxtHandleVector (system, g3d->GetTextureManager (), 
+    txts_vector = new TxtHandleVector (object_reg, g3d->GetTextureManager (), 
       parent_g3d->GetTextureManager ());
   else
     txts_vector = head_soft_tex->txts_vector;

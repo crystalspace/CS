@@ -31,7 +31,7 @@
 class csSoundDriverMac : public iSoundDriver
 {
 protected:
-  iSystem* m_piSystem;
+  iObjectRegistry* object_reg;
   iSoundRender *m_piSoundRender;
   void * Memory;
   int MemorySize;
@@ -43,7 +43,7 @@ public:
   SCF_DECLARE_IBASE;
   csSoundDriverMac(iBase *piBase);
   virtual ~csSoundDriverMac();
-  virtual bool Initialize(iSystem *iSys);
+  virtual bool Initialize(iObjectRegistry *object_reg);
   
   void Report (int severity, const char* msg, ...);
 
@@ -63,8 +63,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundDriverMac);
-    virtual bool Initialize (iSystem* p)
-    { scfParent->m_piSystem = p; return true; }
+    virtual bool Initialize (iObjectRegistry* p)
+    { scfParent->object_reg = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 

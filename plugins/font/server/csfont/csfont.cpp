@@ -72,7 +72,7 @@ SCF_EXPORT_CLASS_TABLE (csfont)
     "Crystal Space default font server")
 SCF_EXPORT_CLASS_TABLE_END
 
-csDefaultFontServer::csDefaultFontServer (iBase *pParent) : System(0)
+csDefaultFontServer::csDefaultFontServer (iBase *pParent) : object_reg(0)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
@@ -416,10 +416,9 @@ bool csDefaultFont::RemoveDeleteCallback (iFontDeleteNotify* func)
   return false;
 }
 
-bool csDefaultFontServer::eiPlugin::Initialize (iSystem* p)
+bool csDefaultFontServer::eiPlugin::Initialize (iObjectRegistry* p)
 {
-  scfParent->System = p;
-  scfParent->object_reg = p->GetObjectRegistry ();
+  scfParent->object_reg = p;
   scfParent->plugin_mgr = CS_QUERY_REGISTRY (scfParent->object_reg,
   	iPluginManager);
   return true;

@@ -25,7 +25,6 @@
 #include "isys/plugin.h"
 
 struct iEngine;
-struct iSystem;
 struct iPluginManager;
 struct iObjectRegistry;
 
@@ -35,7 +34,6 @@ struct iObjectRegistry;
 class csSnowFactoryLoader : public iLoaderPlugin
 {
 private:
-  iSystem* sys;
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
 
@@ -46,7 +44,7 @@ public:
   /// Destructor.
   virtual ~csSnowFactoryLoader ();
 
-  bool Initialize (iSystem* p);
+  bool Initialize (iObjectRegistry* p);
 
 public:
   //------------------------ iLoaderPlugin implementation --------------
@@ -58,7 +56,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSnowFactoryLoader);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize (p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize (p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;
@@ -70,7 +69,6 @@ public:
 class csSnowFactorySaver : public iSaverPlugin
 {
 private:
-  iSystem* sys;
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
 
@@ -83,7 +81,7 @@ public:
   /// Destructor.
   virtual ~csSnowFactorySaver ();
 
-  bool Initialize (iSystem* p);
+  bool Initialize (iObjectRegistry* p);
 
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
@@ -91,7 +89,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSnowFactorySaver);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize (p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize (p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;
@@ -103,7 +102,6 @@ public:
 class csSnowLoader : public iLoaderPlugin
 {
 private:
-  iSystem* sys;
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
 
@@ -116,7 +114,7 @@ public:
   /// Destructor.
   virtual ~csSnowLoader ();
 
-  bool Initialize (iSystem* p);
+  bool Initialize (iObjectRegistry* p);
 
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
@@ -124,7 +122,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSnowLoader);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize (p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize (p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;
@@ -136,7 +135,6 @@ public:
 class csSnowSaver : public iSaverPlugin
 {
 private:
-  iSystem* sys;
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
 
@@ -149,7 +147,7 @@ public:
   /// Destructor.
   virtual ~csSnowSaver ();
 
-  bool Initialize (iSystem* p);
+  bool Initialize (iObjectRegistry* p);
 
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
@@ -157,7 +155,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSnowSaver);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize (p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize (p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;

@@ -44,7 +44,7 @@ struct csReporterMessage
 class csReporter : public iReporter
 {
 private:
-  iSystem *System;
+  iObjectRegistry *object_reg;
   csVector messages;
   csVector listeners;
 
@@ -53,7 +53,7 @@ public:
 
   csReporter (iBase *iParent);
   virtual ~csReporter ();
-  virtual bool Initialize (iSystem *system);
+  virtual bool Initialize (iObjectRegistry *object_reg);
 
   virtual void Report (int severity, const char* msgId,
   	const char* description, ...);
@@ -72,7 +72,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE (csReporter);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize (p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize (p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 };

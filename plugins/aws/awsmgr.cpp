@@ -8,7 +8,7 @@
 #include "ivaria/reporter.h"
 #include <stdio.h>
 
-awsManager::awsManager(iBase *p):prefmgr(NULL),System(NULL), 
+awsManager::awsManager(iBase *p):prefmgr(NULL),object_reg(NULL), 
                UsingDefaultContext(false), DefaultContextInitialized(false)
 {
   SCF_CONSTRUCT_IBASE (p);
@@ -22,10 +22,9 @@ awsManager::~awsManager()
 }
 
 bool 
-awsManager::Initialize(iSystem *system)
+awsManager::Initialize(iObjectRegistry *object_reg)
 {   
-  System=system;
-  iObjectRegistry* object_reg = system->GetObjectRegistry ();
+  awsManager::object_reg = object_reg;
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   
   printf("aws-debug: getting image loader.\n");
@@ -145,7 +144,7 @@ awsManager::SetDefaultContext(iEngine* engine, iTextureManager* txtmgr)
   {
     canvas.SetSize(512, 512);
     canvas.SetKeyColor(255,0,255);
-    if (!canvas.Initialize(System, engine, txtmgr, "awsCanvas"))
+    if (!canvas.Initialize(object_reg, engine, txtmgr, "awsCanvas"))
       printf("aws-debug: SetDefaultContext failed to initialize the memory canvas.\n");
     else
       printf("aws-debug: Memory canvas initialized!\n");

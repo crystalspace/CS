@@ -65,13 +65,13 @@ csGraphics2DOpenGL::~csGraphics2DOpenGL(void)
 {
 }
 
-bool csGraphics2DOpenGL::Initialize (iSystem *pSystem)
+bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
 {
 	long					pixel_format;
 	OSErr					err;
 	Boolean					showDialogFlag;
 
-	if (!csGraphics2DGLCommon::Initialize (pSystem))
+	if (!csGraphics2DGLCommon::Initialize (object_reg))
 		return false;
 
 	/*

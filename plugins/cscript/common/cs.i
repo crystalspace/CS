@@ -109,7 +109,7 @@ struct csImageArea
 //***** Interfaces
 struct iPlugin:public iBase
 {
-  bool Initialize(iSystem *iSys);
+  bool Initialize(iObjectRegistry *object_reg);
   bool HandleEvent(iEvent&);
 };
 
@@ -408,22 +408,20 @@ struct iEngine : public iBase
 };
 
 //****** System Interface
-struct iSystem:public iBase
+struct iObjectRegistry:public iBase
 {
 public:
   %addmethods
   {
     iEngine* Query_iEngine()
     {
-      iObjectRegistry* object_reg = self->GetObjectRegistry ();
-      iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg,
+      iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (self,
       	iPluginManager);
       return CS_QUERY_PLUGIN(plugin_mgr, iEngine);
     }
     iGraphics3D* Query_iGraphics3D()
     {
-      iObjectRegistry* object_reg = self->GetObjectRegistry ();
-      iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg,
+      iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (self,
       	iPluginManager);
       return CS_QUERY_PLUGIN(plugin_mgr, iGraphics3D);
     }

@@ -104,12 +104,13 @@ csGraphics2DOS2DIVE::~csGraphics2DOS2DIVE ()
     EventOutlet->DecRef ();
 }
 
-bool csGraphics2DOS2DIVE::Initialize (iSystem* pSystem)
+bool csGraphics2DOS2DIVE::Initialize (iObjectRegistry* object_reg)
 {
-  if (!csGraphics2D::Initialize (pSystem))
+  if (!csGraphics2D::Initialize (object_reg))
     return false;
 
-  System->PerformExtension ("StartGUI");
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->PerformExtension ("StartGUI");
 
   // Initialize DIVE
   if (!gdDiveInitialize ())
@@ -118,13 +119,12 @@ bool csGraphics2DOS2DIVE::Initialize (iSystem* pSystem)
     return false;
   }
 
-  csConfigAccess Config(iSys, "/config/video.cfg");
+  csConfigAccess Config(object_reg, "/config/video.cfg");
   WindowX = Config->GetInt ("Video.WindowX", INT_MIN);
   WindowY = Config->GetInt ("Video.WindowY", INT_MIN);
   WindowWidth = Config->GetInt ("Video.WindowWidth", -1);
   WindowHeight = Config->GetInt ("Video.WindowHeight", -1);
   HardwareCursor = Config->GetBool ("Video.SystemMouseCursor", true);
-  iObjectRegistry* object_reg = System->GetObjectRegistry ();
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
 
@@ -156,7 +156,7 @@ bool csGraphics2DOS2DIVE::Initialize (iSystem* pSystem)
   if (cmdline->GetOption ("sysmouse")) HardwareCursor = true;
   if (cmdline->GetOption ("nosysmouse")) HardwareCursor = false;
 
-  EventOutlet = System->CreateEventOutlet (this);
+  EventOutlet = sys->CreateEventOutlet (this);
 
   return true;
 }
@@ -165,7 +165,7 @@ bool csGraphics2DOS2DIVE::HandleEvent (iEvent &Event)
 {
   if ((Event.Type == csevBroadcast)
    && (Event.Command.Code == cscmdCommandLineHelp)
-   && System)
+   && object_reg)
   {
     printf ("Options for OS/2 DIVE driver:\n");
     printf ("  -winpos=<x>,<y>    set window position in percent of screen (default=center)\n");
@@ -647,7 +647,8 @@ void csGraphics2DOS2DIVE::KeyboardHandlerStub (void *Self, unsigned char ScanCod
   if (KeyCode == CSKEY_ENTER) CharCode = CSKEY_ENTER;
 
   // WM_CHAR does not support Ctrl+# ...
-  if (This->System->GetKeyState (CSKEY_CTRL) && !CharCode
+  iSystem* sys = CS_GET_SYSTEM (This->object_reg);	//@@@
+  if (sys->GetKeyState (CSKEY_CTRL) && !CharCode
    && (KeyCode > 96) && (KeyCode < 127))
     CharCode = KeyCode - 96;
 

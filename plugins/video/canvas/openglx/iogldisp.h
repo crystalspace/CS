@@ -21,7 +21,6 @@
 
 #include "csutil/scf.h"
 #include "isys/plugin.h"
-//#include "isys/system.h"
 
 SCF_VERSION (iOpenGLDisp, 0, 0, 1);
 

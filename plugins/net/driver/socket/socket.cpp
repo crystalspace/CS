@@ -21,6 +21,7 @@
 #include "cssysdef.h"
 #include "socket.h"
 #include "isys/system.h"
+#include "iutil/objreg.h"
 #include "isys/event.h"
 #include "csutil/util.h"
 
@@ -229,10 +230,11 @@ void csSocketDriver::Close()
   PlatformDriverStop();
 }
 
-bool csSocketDriver::eiPlugin::Initialize(iSystem* p)
+bool csSocketDriver::eiPlugin::Initialize(iObjectRegistry* object_reg)
 {
-  scfParent->Sys = p;
-  p->CallOnEvents(this, CSMASK_Command | CSMASK_Broadcast);
+  scfParent->object_reg = object_reg;
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->CallOnEvents(this, CSMASK_Command | CSMASK_Broadcast);
   return true;
 }
 

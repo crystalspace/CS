@@ -37,7 +37,7 @@
 
 #define I_PI_4 1 / (M_PI * 4.0)
 
-struct iSystem;
+struct iObjectRegistry;
 struct iGraphics3D;
 struct iGraphics2D;
 
@@ -352,7 +352,7 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMetaGenType);
-    virtual bool Initialize (iSystem*) { return true; }
+    virtual bool Initialize (iObjectRegistry*) { return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 };

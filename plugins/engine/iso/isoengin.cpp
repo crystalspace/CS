@@ -62,7 +62,7 @@ void csIsoEngine::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (system->GetObjectRegistry (), iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
     rep->ReportV (severity, "crystalspace.engine.iso", msg, arg);
   else
@@ -77,7 +77,7 @@ csIsoEngine::csIsoEngine (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
-  system = NULL;
+  object_reg = NULL;
   g2d = NULL;
   g3d = NULL;
   txtmgr = NULL;
@@ -91,11 +91,12 @@ csIsoEngine::~csIsoEngine ()
   if(g3d) g3d->DecRef();
 }
 
-bool csIsoEngine::Initialize (iSystem* p)
+bool csIsoEngine::Initialize (iObjectRegistry* p)
 {
-  system = p;
+  object_reg = p;
   // Tell system driver that we want to handle broadcast events
-  if (!system->CallOnEvents (&scfiPlugin, CSMASK_Broadcast))
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  if (!sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast))
     return false;
   return true;
 }
@@ -108,7 +109,6 @@ bool csIsoEngine::HandleEvent (iEvent& Event)
     {
       case cscmdSystemOpen:
       {
-        iObjectRegistry* object_reg = system->GetObjectRegistry ();
 	iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg,
 		iPluginManager);
         // system is open we can get ptrs now
@@ -260,7 +260,6 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(iMaterialHandle *handle,
 iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
 	          const char *materialname)
 {
-  iObjectRegistry* object_reg = system->GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg,
 		iPluginManager);
   iImageIO *imgloader = CS_QUERY_PLUGIN(plugin_mgr, iImageIO);
@@ -357,7 +356,6 @@ iMeshObjectFactory *csIsoEngine::CreateMeshFactory(const char* classId,
 {
   if(name && FindMeshFactory(name))
     return FindMeshFactory(name);
-  iObjectRegistry* object_reg = system->GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg,
 		iPluginManager);
   iMeshObjectType *mesh_type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,

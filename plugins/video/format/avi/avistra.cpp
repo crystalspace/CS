@@ -33,7 +33,7 @@ csAVIStreamAudio::csAVIStreamAudio (iBase *pBase)
   SCF_CONSTRUCT_IBASE (pBase);
   pChunk = NULL;
   pAVI = (csAVIFormat*)pBase;
-  pSystem = NULL;
+  object_reg = NULL;
   pCodec = NULL;
 }
 
@@ -44,7 +44,7 @@ bool csAVIStreamAudio::Initialize (const csAVIFormat::AVIHeader *ph,
 				   UByte *pInitData, ULong nInitDataLen,
 				   char *pName, 
 				   UByte *pFormatEx, ULong nFormatEx, 
-				   iSystem *pTheSystem)
+				   iObjectRegistry *object_reg)
 {
 
   (void)ph;
@@ -71,7 +71,7 @@ bool csAVIStreamAudio::Initialize (const csAVIFormat::AVIHeader *ph,
   pChunk->id[4] = '\0';
 
   nStream = nStreamNumber;
-  pSystem = pTheSystem;
+  csAVIStreamAudio::object_reg = object_reg;
 
   bTimeSynced = false;
   // load the CODEC
@@ -143,7 +143,7 @@ bool csAVIStreamAudio::LoadCodec (UByte *pInitData, ULong nInitDataLen,
       return true;
     else
     {
-      csReport (pSystem->GetObjectRegistry (), CS_REPORTER_SEVERITY_WARNING,
+      csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
 		"crystalspace.video.avi",
 		"CODEC class \"%s\" could not be initialized !", cn);
       pCodec->DecRef ();
@@ -152,7 +152,7 @@ bool csAVIStreamAudio::LoadCodec (UByte *pInitData, ULong nInitDataLen,
   }
   else
   {
-      csReport (pSystem->GetObjectRegistry (), CS_REPORTER_SEVERITY_WARNING,
+      csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
 		"crystalspace.video.avi",
 		"CODEC class \"%s\" could not be loaded !", cn);
   }

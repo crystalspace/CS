@@ -59,7 +59,7 @@ private:
 class csSoundDriverOSS : public iSoundDriver
 {
 protected:
-  iSystem* m_piSystem;
+  iObjectRegistry* object_reg;
   void * memory;
   int memorysize;
   int m_nFrequency;
@@ -75,7 +75,7 @@ public:
   csSoundDriverOSS(iBase *iParent);
   virtual ~csSoundDriverOSS();
 
-  bool Initialize(iSystem *iSys);
+  bool Initialize(iObjectRegistry *object_reg);
   
   bool Open(iSoundRender *render, int frequency, bool bit16, bool stereo);
   void Close();
@@ -91,8 +91,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundDriverOSS);
-    virtual bool Initialize (iSystem* p)
-    { scfParent->m_piSystem = p; return true; }
+    virtual bool Initialize (iObjectRegistry* p)
+    { scfParent->object_reg = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;

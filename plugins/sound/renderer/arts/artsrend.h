@@ -69,7 +69,7 @@ public:
   csArtsRenderer (iBase *pParent);
   virtual ~csArtsRenderer ();
 
-  bool Initialize (iSystem *iSys);
+  bool Initialize (iObjectRegistry *object_reg);
 
   // *********** Renderer Interface ****************
   /// Set Volume [0, 1]
@@ -134,7 +134,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csArtsRenderer);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 };

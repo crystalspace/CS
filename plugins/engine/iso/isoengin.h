@@ -96,7 +96,7 @@ class csIsoEngine : public iIsoEngine
 {
 private:
   /// the system
-  iSystem* system;
+  iObjectRegistry* object_reg;
   /// 2d canvas
   iGraphics2D* g2d;
   /// 3d renderer
@@ -123,19 +123,20 @@ public:
 
   //----- iPlugin ------------------------------------------------------
   /// For the system to initialize the plugin, and return success status
-  virtual bool Initialize (iSystem* p);
+  virtual bool Initialize (iObjectRegistry* p);
   /// Intercept events
   virtual bool HandleEvent (iEvent& e);
 
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csIsoEngine);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
   } scfiPlugin;
 
   //----- iIsoEngine ---------------------------------------------------
-  virtual iSystem* GetSystem() const {return system;}
+  virtual iObjectRegistry* GetObjectRegistry() const {return object_reg;}
   virtual iGraphics2D* GetG2D() const {return g2d;}
   virtual iGraphics3D* GetG3D() const {return g3d;}
   virtual iTextureManager* GetTextureManager() const {return txtmgr;}

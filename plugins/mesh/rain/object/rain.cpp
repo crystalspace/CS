@@ -71,8 +71,8 @@ void csRainMeshObject::SetupObject ()
   }
 }
 
-csRainMeshObject::csRainMeshObject (iSystem* system,
-  iMeshObjectFactory* factory) : csParticleSystem (system, factory)
+csRainMeshObject::csRainMeshObject (iObjectRegistry* object_reg,
+  iMeshObjectFactory* factory) : csParticleSystem (object_reg, factory)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRainState);
   part_pos = NULL;
@@ -141,10 +141,10 @@ SCF_IMPLEMENT_IBASE (csRainMeshObjectFactory)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_END
 
-csRainMeshObjectFactory::csRainMeshObjectFactory (iBase* p, iSystem* s)
+csRainMeshObjectFactory::csRainMeshObjectFactory (iBase* p, iObjectRegistry* s)
 {
   SCF_CONSTRUCT_IBASE (p);
-  system = s;
+  object_reg = s;
 }
 
 csRainMeshObjectFactory::~csRainMeshObjectFactory ()
@@ -154,7 +154,7 @@ csRainMeshObjectFactory::~csRainMeshObjectFactory ()
 iMeshObject* csRainMeshObjectFactory::NewInstance ()
 {
   csRainMeshObject* cm =
-    new csRainMeshObject (system, (iMeshObjectFactory*)this);
+    new csRainMeshObject (object_reg, (iMeshObjectFactory*)this);
   iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
   return im;
@@ -190,7 +190,7 @@ csRainMeshObjectType::~csRainMeshObjectType ()
 
 iMeshObjectFactory* csRainMeshObjectType::NewFactory ()
 {
-  csRainMeshObjectFactory* cm = new csRainMeshObjectFactory (this, system);
+  csRainMeshObjectFactory* cm = new csRainMeshObjectFactory (this, object_reg);
   iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;

@@ -58,7 +58,7 @@ private:
   /// The width and height of graphics canvas
   int FrameWidth, FrameHeight;
   /// The system driver
-  iSystem *System;
+  iObjectRegistry *object_reg;
   /// The 3D driver
   iGraphics3D *G3D;
   /// The 2D driver
@@ -95,7 +95,7 @@ public:
   virtual ~csSimpleConsole ();
 
   /// Initialize the plugin, and return success status
-  virtual bool Initialize (iSystem *iSys);
+  virtual bool Initialize (iObjectRegistry *object_reg);
 
   /// Intercept events
   virtual bool HandleEvent (iEvent &Event);
@@ -220,7 +220,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSimpleConsole);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
   } scfiPlugin;
 

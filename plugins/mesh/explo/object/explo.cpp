@@ -85,8 +85,8 @@ void csExploMeshObject::SetupObject ()
   }
 }
 
-csExploMeshObject::csExploMeshObject (iSystem* system,
-  iMeshObjectFactory* factory) : csNewtonianParticleSystem (system, factory)
+csExploMeshObject::csExploMeshObject (iObjectRegistry* object_reg,
+  iMeshObjectFactory* factory) : csNewtonianParticleSystem (object_reg, factory)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiExplosionState);
   /// defaults
@@ -170,10 +170,11 @@ SCF_IMPLEMENT_IBASE (csExploMeshObjectFactory)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_END
 
-csExploMeshObjectFactory::csExploMeshObjectFactory (iBase *p, iSystem* s)
+csExploMeshObjectFactory::csExploMeshObjectFactory (iBase *p,
+	iObjectRegistry* s)
 {
   SCF_CONSTRUCT_IBASE (p);
-  system = s;
+  object_reg = s;
 }
 
 csExploMeshObjectFactory::~csExploMeshObjectFactory ()
@@ -183,7 +184,7 @@ csExploMeshObjectFactory::~csExploMeshObjectFactory ()
 iMeshObject* csExploMeshObjectFactory::NewInstance ()
 {
   csExploMeshObject* cm =
-    new csExploMeshObject (system, (iMeshObjectFactory*)this);
+    new csExploMeshObject (object_reg, (iMeshObjectFactory*)this);
   iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
   return im;
@@ -220,7 +221,8 @@ csExploMeshObjectType::~csExploMeshObjectType ()
 
 iMeshObjectFactory* csExploMeshObjectType::NewFactory ()
 {
-  csExploMeshObjectFactory* cm = new csExploMeshObjectFactory (this, system);
+  csExploMeshObjectFactory* cm = new csExploMeshObjectFactory (this,
+  	object_reg);
   iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;

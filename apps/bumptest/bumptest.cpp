@@ -136,7 +136,7 @@ bool BumpTest::InitProcDemo ()
   iImage *map = bptex->GetImageFile();
   prBump = new csProcBump (map);
   //prBump->SetBumpMap(map);
-  matBump = prBump->Initialize (this, engine, txtmgr, "bumps");
+  matBump = prBump->Initialize (GetObjectRegistry (), engine, txtmgr, "bumps");
   prBump->PrepareAnim ();
   iMeshObjectType* thing_type = engine->GetThingType ();
   iMeshObjectFactory* thing_fact = thing_type->NewFactory ();
@@ -333,8 +333,8 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   if (!superclass::Initialize (argc, argv, iConfigName))
     return false;
 
-  csInitializeApplication (this);
   iObjectRegistry* object_reg = GetObjectRegistry ();
+  csInitializeApplication (object_reg);
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // Find the pointer to engine plugin

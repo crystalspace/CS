@@ -42,7 +42,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csParticleSystem::ParticleState)
   SCF_IMPLEMENTS_INTERFACE (iParticleState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csParticleSystem::csParticleSystem (iSystem* system, iMeshObjectFactory* factory)
+csParticleSystem::csParticleSystem (iObjectRegistry* object_reg,
+	iMeshObjectFactory* factory)
 {
   SCF_CONSTRUCT_IBASE (factory);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiParticleState);
@@ -64,7 +65,6 @@ csParticleSystem::csParticleSystem (iSystem* system, iMeshObjectFactory* factory
   vis_cb = NULL;
   mat = NULL;
 
-  iObjectRegistry* object_reg = system->GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.mesh.object.sprite.2d", "MeshObj", iMeshObjectType);
@@ -282,9 +282,10 @@ csVector3& csParticleSystem::GetRandomPosition (const csBox3& box)
 }
 //-- csNewtonianParticleSystem ------------------------------------------
 
-csNewtonianParticleSystem::csNewtonianParticleSystem (iSystem* system,
+csNewtonianParticleSystem::csNewtonianParticleSystem (
+	iObjectRegistry* object_reg,
 	iMeshObjectFactory* factory)
-  : csParticleSystem (system, factory)
+  : csParticleSystem (object_reg, factory)
 {
   // create csVector3's
   part_speed = NULL;

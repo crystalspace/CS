@@ -435,9 +435,9 @@ static UByte *GenLightmapTable (int bits)
   return table;
 }
 
-csTextureManagerSoftware::csTextureManagerSoftware (iSystem *iSys,
+csTextureManagerSoftware::csTextureManagerSoftware (iObjectRegistry *object_reg,
   csGraphics3DSoftwareCommon *iG3D, iConfigFile *config) 
-  : csTextureManager (iSys, iG3D->GetDriver2D())
+  : csTextureManager (object_reg, iG3D->GetDriver2D())
 {
   alpha_tables = NULL;
   ResetPalette ();
@@ -779,7 +779,8 @@ void csTextureManagerSoftware::SetPalette ()
     G2D->SetRGB (i, r, g, b);
   }
 
-  System->GetSystemEventOutlet ()->ImmediateBroadcast (cscmdPaletteChanged, this);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->GetSystemEventOutlet ()->ImmediateBroadcast (cscmdPaletteChanged, this);
 }
 
 void csTextureManagerSoftware::Reprepare8BitProcs ()

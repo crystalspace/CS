@@ -193,7 +193,7 @@ void csGraphics2DSDL::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
     rep->ReportV (severity, "crystalspace.canvas.sdl", msg, arg);
   else
@@ -234,9 +234,9 @@ void csGraphics2DSDL::fixlibrary()
 #endif
 }
 
-bool csGraphics2DSDL::Initialize (iSystem *pSystem)
+bool csGraphics2DSDL::Initialize (iObjectRegistry *object_reg)
 {
-    if (!csGraphics2D::Initialize (pSystem))
+    if (!csGraphics2D::Initialize (object_reg))
       return false;
 
     Memory = NULL;
@@ -379,10 +379,11 @@ bool csGraphics2DSDL::Open()
 
   pfmt.complete ();
   Clear(0);
-  System->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
 
   if (!EventOutlet)
-    EventOutlet = System->CreateEventOutlet (this);
+    EventOutlet = sys->CreateEventOutlet (this);
 
   return true;
 }

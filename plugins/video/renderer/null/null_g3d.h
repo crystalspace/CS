@@ -84,7 +84,7 @@ public:
   csTextureManagerNull* texman;
 
   /// The System interface.
-  iSystem* System;
+  iObjectRegistry* object_reg;
 
   ///
   csGraphics3DNull (iBase *iParent);
@@ -92,7 +92,7 @@ public:
   virtual ~csGraphics3DNull ();
 
   ///
-  virtual bool Initialize (iSystem *iSys);
+  virtual bool Initialize (iObjectRegistry *object_reg);
   bool HandleEvent (iEvent&);
   ///
   virtual bool Open ();
@@ -253,7 +253,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DNull);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent& ev) { return scfParent->HandleEvent (ev); }
   } scfiPlugin;
 };

@@ -24,13 +24,13 @@
 #include <View.h>
 #include <Bitmap.h>
 #include <DirectWindow.h>
-struct iSystem;
+struct iObjectRegistry;
 struct iGraphics2D;
 
 class CrystView : public BView
 {
 public:
-  CrystView(BRect, iSystem*, BBitmap*); 
+  CrystView(BRect, iObjectRegistry*, BBitmap*); 
   virtual ~CrystView();
 
   virtual void KeyDown(char const* bytes, int32 numBytes);
@@ -41,7 +41,7 @@ public:
   virtual void Draw(BRect);
 
 protected:
-  iSystem* system;
+  iObjectRegistry* object_reg;
   BBitmap* bitmap;
   void UserAction() const;
 };
@@ -49,13 +49,13 @@ protected:
 class CrystWindow : public BDirectWindow
 {
 public:
-  CrystWindow (BRect, char const*, CrystView*, iSystem*, iGraphics2D*);
+  CrystWindow (BRect, char const*, CrystView*, iObjectRegistry*, iGraphics2D*);
   virtual ~CrystWindow();
   virtual bool QuitRequested();
 
 protected:
   CrystView* view;
-  iSystem* system;
+  iObjectRegistry* object_reg;
   iGraphics2D* g2d;
 };
 

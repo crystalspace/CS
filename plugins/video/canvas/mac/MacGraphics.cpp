@@ -109,13 +109,13 @@ csGraphics2DMac::~csGraphics2DMac()
 	Construct the screen objects.  This object provides a place on
 	screen to draw, and a place offscreen to render into.
 ----------------------------------------------------------------*/
-bool csGraphics2DMac::Initialize( iSystem* piSystem )
+bool csGraphics2DMac::Initialize( iObjectRegistry* object_reg )
 {
 	long					pixel_format;
 	OSErr					err;
 	Boolean					showDialogFlag;
 
-	if ( ! csGraphics2D::Initialize( piSystem ))
+	if ( ! csGraphics2D::Initialize( object_reg ))
 		return false;
 
 	/*

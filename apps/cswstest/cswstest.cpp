@@ -42,7 +42,7 @@ class csWsTest : public csApp
 
 public:
   /// Initialize maze editor
-  csWsTest (iSystem *SysDriver, csSkin &Skin);
+  csWsTest (iObjectRegistry *object_reg, csSkin &Skin);
 
   /// Initialize maze editor
   virtual ~csWsTest ();
@@ -158,7 +158,8 @@ static int palette_csWsTest[] =
   cs_Color_White			// Start points
 };
 
-csWsTest::csWsTest (iSystem *System, csSkin &Skin) : csApp (System, Skin)
+csWsTest::csWsTest (iObjectRegistry *object_reg, csSkin &Skin)
+	: csApp (object_reg, Skin)
 {
   int pal = csRegisterPalette (palette_csWsTest, sizeof (palette_csWsTest) / sizeof (int));
   SetPalette (pal);
@@ -181,7 +182,7 @@ bool csWsTest::Initialize ()
   // CSWS apps are a lot more performant with a single-buffered canvas
   GetG2D ()->DoubleBuffer (false);
 
-  csReport (System->GetObjectRegistry (), CS_REPORTER_SEVERITY_NOTIFY,
+  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
     "crystalspace.application.cswstest",
     "Crystal Space Windowing System test version %s (%s).\n"
     "Created by Andrew Zabolotny and others...\n\n",
@@ -1008,12 +1009,12 @@ int main (int argc, char* argv[])
 
   if (!System.Initialize (argc, argv, "/config/cswstest.cfg"))
     return -1;
-  csInitializeApplication (&System);
+  iObjectRegistry* object_reg = System.GetObjectRegistry ();
+  csInitializeApplication (object_reg);
 
   if (!System.Open ())
     return -1;
 
-  iObjectRegistry* object_reg = System.GetObjectRegistry ();
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
   iConfigManager* config = CS_QUERY_REGISTRY (object_reg, iConfigManager);
@@ -1024,7 +1025,7 @@ int main (int argc, char* argv[])
     DefaultSkin.Prefix = config->GetStr ("CSWS.Skin.Variant", NULL);
 
   // Create our application object
-  csWsTest app (&System, DefaultSkin);
+  csWsTest app (object_reg, DefaultSkin);
 
   if (app.Initialize ())
     System.Loop ();

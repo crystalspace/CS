@@ -308,7 +308,8 @@ public:
   float Gamma;
 
   ///
-  csTextureManagerSoftware (iSystem *iSys, csGraphics3DSoftwareCommon *iG3D, 
+  csTextureManagerSoftware (iObjectRegistry *object_reg,
+  			    csGraphics3DSoftwareCommon *iG3D, 
 			    iConfigFile *config);
   ///
   virtual ~csTextureManagerSoftware ();

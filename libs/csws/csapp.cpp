@@ -55,18 +55,18 @@ csApp::csAppPlugin::csAppPlugin (csApp *iParent)
   app = iParent;
 }
 
-bool csApp::csAppPlugin::Initialize (iSystem *System)
+bool csApp::csAppPlugin::Initialize (iObjectRegistry *object_reg)
 {
-  iObjectRegistry* object_reg = System->GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   app->VFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
   if (!app->VFS) return false;
 
   // Get system event outlet for faster access
-  app->EventOutlet = System->GetSystemEventOutlet ();
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  app->EventOutlet = sys->GetSystemEventOutlet ();
 
   // We want ALL the events! :)
-  return System->CallOnEvents (this, unsigned (-1));
+  return sys->CallOnEvents (this, unsigned (-1));
 }
 
 bool csApp::csAppPlugin::HandleEvent (iEvent &Event)
@@ -91,7 +91,7 @@ bool csApp::csAppPlugin::HandleEvent (iEvent &Event)
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//-- csApp -//--
 
-csApp::csApp (iSystem *sys, csSkin &Skin)
+csApp::csApp (iObjectRegistry *object_reg, csSkin &Skin)
   : csComponent (NULL)
 {
   Mouse = new csMouse(this);
@@ -109,8 +109,7 @@ csApp::csApp (iSystem *sys, csSkin &Skin)
   DefaultFont = NULL;
   InFrame = false;
   ImageLoader = NULL;
-  System = sys;
-  object_reg = sys->GetObjectRegistry ();
+  csApp::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   LastMouseContainer = NULL;
 
@@ -168,7 +167,7 @@ bool csApp::Initialize ()
     return false;
 
   // Create the graphics pipeline
-  GfxPpl.Initialize (System);
+  GfxPpl.Initialize (object_reg);
 
   ScreenWidth = GfxPpl.FrameWidth;
   ScreenHeight = GfxPpl.FrameHeight;
@@ -177,7 +176,7 @@ bool csApp::Initialize ()
   WindowListWidth = ScreenWidth / 3;
   WindowListHeight = ScreenWidth / 6;
 
-  config.AddConfig(System, "/config/csws.cfg");
+  config.AddConfig(object_reg, "/config/csws.cfg");
 
   FontServer = CS_QUERY_PLUGIN_ID (plugin_mgr,
   	CS_FUNCID_FONTSERVER, iFontServer);
@@ -321,7 +320,7 @@ void csApp::GetFont (iFont *&oFont, int &oFontSize)
 
 void csApp::PrintfV (int mode, char const* format, va_list args)
 {
-  csReport (System->GetObjectRegistry (), mode,
+  csReport (object_reg, mode,
   	"crystalspace.csws", format, args);
 }
 
@@ -499,7 +498,8 @@ int csApp::FindColor (int r, int g, int b)
 
 void csApp::Idle ()
 {
-  System->Sleep (1);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->Sleep (1);
 }
 
 void csApp::StartFrame ()
@@ -509,7 +509,8 @@ void csApp::StartFrame ()
   InFrame = true;
 
   csTicks elapsed_time;
-  System->GetElapsedTime (elapsed_time, CurrentTime);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->GetElapsedTime (elapsed_time, CurrentTime);
 
   GfxPpl.StartFrame (Mouse);
 }
@@ -665,8 +666,9 @@ bool csApp::HandleEvent (iEvent &Event)
     return true;
 
   // Handle 'window list' event
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
   if ((Event.Type == csevMouseDown)
-   && (((System->GetMouseButton (1) && System->GetMouseButton (2)))
+   && (((sys->GetMouseButton (1) && sys->GetMouseButton (2)))
     || (Event.Mouse.Button == 3)))
   {
     WindowList ();
@@ -678,7 +680,8 @@ bool csApp::HandleEvent (iEvent &Event)
 
 void csApp::FlushEvents ()
 {
-  System->NextFrame ();
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->NextFrame ();
 }
 
 void csApp::WindowList ()
@@ -716,7 +719,8 @@ void csApp::Draw ()
 
 bool csApp::GetKeyState (int iKey)
 {
-  return System->GetKeyState (iKey);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  return sys->GetKeyState (iKey);
 }
 
 void csApp::Insert (csComponent *comp)

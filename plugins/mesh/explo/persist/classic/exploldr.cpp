@@ -130,10 +130,9 @@ csExplosionFactoryLoader::~csExplosionFactoryLoader ()
 {
 }
 
-bool csExplosionFactoryLoader::Initialize (iSystem* system)
+bool csExplosionFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csExplosionFactoryLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -166,10 +165,9 @@ csExplosionFactorySaver::~csExplosionFactorySaver ()
 {
 }
 
-bool csExplosionFactorySaver::Initialize (iSystem* system)
+bool csExplosionFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csExplosionFactorySaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -214,10 +212,9 @@ csExplosionLoader::~csExplosionLoader ()
 {
 }
 
-bool csExplosionLoader::Initialize (iSystem* system)
+bool csExplosionLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csExplosionLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -451,10 +448,9 @@ csExplosionSaver::~csExplosionSaver ()
 {
 }
 
-bool csExplosionSaver::Initialize (iSystem* system)
+bool csExplosionSaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csExplosionSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }

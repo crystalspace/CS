@@ -23,14 +23,14 @@
 #include "isys/system.h"
 
 /**
- * Query user preferences through iSystem interface:
+ * Query user preferences through iObjectRegistry interface:
  * (o) oHardwareCursor will be set if user desires hardware (system)
  *     mouse cursor (vs software - drawn by CS engine)
  * (o) oUseSHM will be set if user wants to use X11 shared memory
  *     extension (it is not always available).
  * (o) oSimDepth is the screen depth to simulate.
  */
-extern void GetX11Settings (iSystem *iSys, int &oSimDepth, bool &oUseSHM,
-  bool &oHardwareCursor);
+extern void GetX11Settings (iObjectRegistry *object_reg,
+	int &oSimDepth, bool &oUseSHM, bool &oHardwareCursor);
 
 #endif // __X11COMM_H__

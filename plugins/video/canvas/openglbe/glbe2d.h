@@ -41,7 +41,7 @@ public:
   csGraphics2DGLBe(iBase*);
   virtual ~csGraphics2DGLBe();
   
-  virtual bool Initialize(iSystem*);
+  virtual bool Initialize(iObjectRegistry*);
   virtual bool Open();
   virtual void Close();
   virtual bool BeginDraw();

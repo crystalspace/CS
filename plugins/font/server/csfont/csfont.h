@@ -25,7 +25,6 @@
 #include "isys/plugin.h"
 #include "csutil/typedvec.h"
 
-struct iSystem;
 struct iObjectRegistry;
 struct iPluginManager;
 class csDefaultFontServer;
@@ -118,7 +117,6 @@ public:
 class csDefaultFontServer : public iFontServer
 {
 private:
-  iSystem *System;
   iObjectRegistry* object_reg;
   iPluginManager* plugin_mgr;
 
@@ -164,7 +162,7 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csDefaultFontServer);
-    virtual bool Initialize(iSystem* p);
+    virtual bool Initialize(iObjectRegistry* p);
     virtual bool HandleEvent(iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;

@@ -80,8 +80,8 @@ void csFountainMeshObject::SetupObject ()
   }
 }
 
-csFountainMeshObject::csFountainMeshObject (iSystem* system,
-  iMeshObjectFactory* factory) : csParticleSystem (system, factory)
+csFountainMeshObject::csFountainMeshObject (iObjectRegistry* object_reg,
+  iMeshObjectFactory* factory) : csParticleSystem (object_reg, factory)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiFountainState);
   part_pos = NULL;
@@ -185,10 +185,11 @@ SCF_IMPLEMENT_IBASE (csFountainMeshObjectFactory)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_END
 
-csFountainMeshObjectFactory::csFountainMeshObjectFactory (iBase *p, iSystem* s)
+csFountainMeshObjectFactory::csFountainMeshObjectFactory (iBase *p,
+	iObjectRegistry* s)
 {
   SCF_CONSTRUCT_IBASE (p);
-  system = s;
+  object_reg = s;
 }
 
 csFountainMeshObjectFactory::~csFountainMeshObjectFactory ()
@@ -198,7 +199,7 @@ csFountainMeshObjectFactory::~csFountainMeshObjectFactory ()
 iMeshObject* csFountainMeshObjectFactory::NewInstance ()
 {
   csFountainMeshObject* cm =
-    new csFountainMeshObject (system, (iMeshObjectFactory*)this);
+    new csFountainMeshObject (object_reg, (iMeshObjectFactory*)this);
   iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
   return im;
@@ -236,7 +237,7 @@ csFountainMeshObjectType::~csFountainMeshObjectType ()
 iMeshObjectFactory* csFountainMeshObjectType::NewFactory ()
 {
   csFountainMeshObjectFactory* cm =
-    new csFountainMeshObjectFactory (this, system);
+    new csFountainMeshObjectFactory (this, object_reg);
   iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;

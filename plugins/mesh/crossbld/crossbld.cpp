@@ -48,7 +48,7 @@ public:
   {
   public:
     SCF_DECLARE_EMBEDDED_IBASE (csCrossBuilder);
-    virtual bool Initialize (iSystem *sys)
+    virtual bool Initialize (iObjectRegistry *)
     { return true; }
   } scfiPlugin;
 };

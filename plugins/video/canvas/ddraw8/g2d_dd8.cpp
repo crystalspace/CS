@@ -73,10 +73,10 @@ csGraphics2DDDraw8::~csGraphics2DDDraw8 ()
   Close ();
 }
 
-bool csGraphics2DDDraw8::Initialize(iSystem *pSystem)
+bool csGraphics2DDDraw8::Initialize(iObjectRegistry *object_reg)
 {
   // Call original Initialize() function
-  if (!csGraphics2D::Initialize(pSystem))
+  if (!csGraphics2D::Initialize(object_reg))
     return false;
 
   return true;
@@ -86,7 +86,7 @@ void csGraphics2DDDraw8::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
     rep->ReportV (severity, "crystalspace.canvas.ddraw8", msg, arg);
   else
@@ -450,7 +450,8 @@ void csGraphics2DDDraw8::SetRGB (int i, int r, int g, int b)
 bool csGraphics2DDDraw8::SetMouseCursor (csMouseCursorID iShape)
 {
   bool success;
-  if (!System->PerformExtension ("SetCursor", iShape, &success))
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  if (!sys->PerformExtension ("SetCursor", iShape, &success))
     return false;
 
   return success;

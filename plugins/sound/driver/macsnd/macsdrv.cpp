@@ -57,7 +57,7 @@ csSoundDriverMac::csSoundDriverMac(iBase *piBase)
 {
   SCF_CONSTRUCT_IBASE(piBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
-  m_piSystem = NULL;
+  object_reg = NULL;
   mStopPlayback = false;
   mSoundDBHeader.dbhDoubleBack = NULL;
   mSoundDBHeader.dbhBufferPtr[0] = NULL;
@@ -75,8 +75,7 @@ void csSoundDriverMac::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (m_piSystem->GetObjectRegistry (),
-  	iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
     rep->ReportV (severity, "crystalspace.sound.macsnd", msg, arg);
   else

@@ -200,7 +200,7 @@ public:
  
 public:
  /// Initializes the bytecode machine (plugin derived)
- virtual bool Initialize (iSystem *sys);
+ virtual bool Initialize (iObjectRegistry *object_reg);
 
  /// Allows an object to register a regular expression with a key used in a production.
  virtual bool RegisterRegExp(unsigned int key, iRegExp &re);
@@ -246,7 +246,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csLexicalAnalyzer);
-    virtual bool Initialize(iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize(iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent(iEvent&) { return false; }
   } scfiPlugin;
 };

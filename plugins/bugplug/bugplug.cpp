@@ -84,7 +84,7 @@ csBugPlug::csBugPlug (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   Engine = NULL;
-  System = NULL;
+  object_reg = NULL;
   G3D = NULL;
   G2D = NULL;
   Conout = NULL;
@@ -127,12 +127,12 @@ csBugPlug::~csBugPlug ()
   }
 }
 
-bool csBugPlug::Initialize (iSystem *system)
+bool csBugPlug::Initialize (iObjectRegistry *object_reg)
 {
-  System = system;
-  object_reg = system->GetObjectRegistry ();
+  csBugPlug::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  if (!System->CallOnEvents (this, CSMASK_Nothing|CSMASK_KeyUp|CSMASK_KeyDown|
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  if (!sys->CallOnEvents (this, CSMASK_Nothing|CSMASK_KeyUp|CSMASK_KeyDown|
   	CSMASK_MouseUp|CSMASK_MouseDown))
     return false;
 

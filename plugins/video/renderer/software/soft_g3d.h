@@ -33,7 +33,7 @@ public:
   /// Destructor
   virtual ~csGraphics3DSoftware ();
   /// Initialize iPlugin.
-  virtual bool Initialize (iSystem*);
+  virtual bool Initialize (iObjectRegistry*);
   /// Open a canvas.
   virtual bool Open ();
 

@@ -224,7 +224,7 @@ public:
   csTextureCacheSoftware *tcache;
 
   /// The System interface.
-  iSystem* System;
+  iObjectRegistry* object_reg;
 
   /// Option variable: do texture lighting?
   bool do_lighting;
@@ -259,7 +259,7 @@ public:
   /**
    * Initialization method required by iPlugin interface.  Sets System pointer.
    */
-  virtual bool Initialize (iSystem*);
+  virtual bool Initialize (iObjectRegistry*);
 
   /**
    * Open or close our interface.
@@ -474,7 +474,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DSoftwareCommon);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent& ev) { return scfParent->HandleEvent (ev); }
   } scfiPlugin;
 };

@@ -35,7 +35,7 @@ struct iNativeWindowManager;
 class csReporterListener : public iStandardReporterListener
 {
 private:
-  iSystem *System;
+  iObjectRegistry *object_reg;
   iConsoleOutput* console;
   iNativeWindowManager* nativewm;
   iReporter* reporter;
@@ -53,7 +53,7 @@ public:
 
   csReporterListener (iBase *iParent);
   virtual ~csReporterListener ();
-  virtual bool Initialize (iSystem *system);
+  virtual bool Initialize (iObjectRegistry *object_reg);
 
   virtual void SetOutputConsole (iConsoleOutput* console);
   virtual void SetNativeWindowManager (iNativeWindowManager* wm);
@@ -72,7 +72,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE (csReporterListener);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize (p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize (p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 

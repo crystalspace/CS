@@ -76,7 +76,7 @@ void csGraphics2DAlleg::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
     rep->ReportV (severity, "crystalspace.canvas.allegro", msg, arg);
   else
@@ -87,9 +87,9 @@ void csGraphics2DAlleg::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-bool csGraphics2DAlleg::Initialize (iSystem *pSystem)
+bool csGraphics2DAlleg::Initialize (iObjectRegistry *object_reg)
 {
-  if (!csGraphics2D::Initialize (pSystem))
+  if (!csGraphics2D::Initialize (object_reg))
     return false;
 
   switch (Depth)
@@ -124,8 +124,9 @@ bool csGraphics2DAlleg::Initialize (iSystem *pSystem)
 
   Font = 0;
   Memory = NULL;
-  System->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
-  EventOutlet = System->CreateEventOutlet (this);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
+  EventOutlet = sys->CreateEventOutlet (this);
   return true;
 }
 
@@ -162,7 +163,8 @@ bool csGraphics2DAlleg::Open ()
   Memory = (unsigned char *) bitmap->dat;
 
   // Tell printf() to shut up
-  System->PerformExtension ("EnablePrintf", false);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->PerformExtension ("EnablePrintf", false);
 
   // Update drawing routine addresses
   switch (pfmt.PixelBytes)
@@ -225,7 +227,8 @@ void csGraphics2DAlleg::Close (void)
   bitmap = NULL;
   Memory = NULL;
   csGraphics2D::Close ();
-  System->PerformExtension ("EnablePrintf", true);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->PerformExtension ("EnablePrintf", true);
   set_gfx_mode (GFX_TEXT, 0, 0, 0, 0);
 }
 

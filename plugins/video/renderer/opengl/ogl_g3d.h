@@ -38,7 +38,7 @@ class csGraphics3DOpenGL : public csGraphics3DOGLCommon
 public:
   csGraphics3DOpenGL (iBase*);
   virtual ~csGraphics3DOpenGL ();
-  virtual bool Initialize (iSystem*);
+  virtual bool Initialize (iObjectRegistry*);
   virtual bool Open();
 };
 

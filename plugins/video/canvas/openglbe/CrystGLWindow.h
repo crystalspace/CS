@@ -25,13 +25,13 @@
 #include <Bitmap.h>
 #include <DirectWindow.h>
 #include <GLView.h>
-struct iSystem;
+struct iObjectRegistry;
 struct iGraphics2D;
 
 class CrystGLView : public BGLView
 {
 public:
-  CrystGLView(BRect frame, iSystem*); 
+  CrystGLView(BRect frame, iObjectRegistry*); 
   virtual ~CrystGLView();
   virtual void AttachedToWindow();
 
@@ -42,14 +42,15 @@ public:
   virtual void MouseMoved(BPoint, uint32 transit, BMessage const*);
 
 protected:
-  iSystem* system;
+  iObjectRegistry* object_reg;
   void UserAction() const;
 };
 
 class CrystGLWindow : public BDirectWindow
 {
 public:
-  CrystGLWindow(BRect, char const*, CrystGLView*, iSystem*, iGraphics2D*);
+  CrystGLWindow(BRect, char const*, CrystGLView*, iObjectRegistry*,
+  	iGraphics2D*);
   virtual ~CrystGLWindow();
   virtual bool QuitRequested();
   virtual void MessageReceived(BMessage*);
@@ -57,7 +58,7 @@ public:
 
 protected:
   CrystGLView* view;
-  iSystem* system;
+  iObjectRegistry* object_reg;
   iGraphics2D* g2d;
 };
 

@@ -148,10 +148,9 @@ csBallFactoryLoader::~csBallFactoryLoader ()
   if (reporter) reporter->DecRef ();
 }
 
-bool csBallFactoryLoader::Initialize (iSystem* system)
+bool csBallFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csBallFactoryLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
   return true;
@@ -193,10 +192,9 @@ csBallFactorySaver::~csBallFactorySaver ()
   if (reporter) reporter->DecRef ();
 }
 
-bool csBallFactorySaver::Initialize (iSystem* system)
+bool csBallFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csBallFactorySaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
   return true;
@@ -224,10 +222,9 @@ csBallLoader::~csBallLoader ()
   if (reporter) reporter->DecRef ();
 }
 
-bool csBallLoader::Initialize (iSystem* system)
+bool csBallLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csBallLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
   return true;
@@ -448,10 +445,9 @@ csBallSaver::~csBallSaver ()
   if (reporter) reporter->DecRef ();
 }
 
-bool csBallSaver::Initialize (iSystem* system)
+bool csBallSaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csBallSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
   return true;

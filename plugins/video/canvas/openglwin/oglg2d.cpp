@@ -224,7 +224,7 @@ void csGraphics2DOpenGL::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
     rep->ReportV (severity, "crystalspace.canvas.openglwin", msg, arg);
   else
@@ -235,13 +235,14 @@ void csGraphics2DOpenGL::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-bool csGraphics2DOpenGL::Initialize (iSystem *pSystem)
+bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
 {
-  if (!csGraphics2DGLCommon::Initialize (pSystem))
+  if (!csGraphics2DGLCommon::Initialize (object_reg))
     return false;
 
   // QI for iWin32SystemDriver //
-  m_piWin32System = SCF_QUERY_INTERFACE (System, iWin32SystemDriver);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  m_piWin32System = SCF_QUERY_INTERFACE (sys, iWin32SystemDriver);
   if (!m_piWin32System)
       SystemFatalError ("csGraphics2DDDraw3::Open(QI) -- iSystem passed does not support iWin32SystemDriver.");
   

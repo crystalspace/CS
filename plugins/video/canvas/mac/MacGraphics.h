@@ -34,7 +34,7 @@ public:
 	virtual 			~csGraphics2DMac();
 
 					// this is handled in the constuctor
-  	virtual bool 		Initialize(iSystem *theSystem);
+  	virtual bool 		Initialize(iObjectRegistry *object_reg);
   	virtual bool 		Open();
   	virtual void 		Close();
 

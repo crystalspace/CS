@@ -74,7 +74,7 @@ public:
   csGraphics2DDDraw8 (iBase *iParent);
   virtual ~csGraphics2DDDraw8 (void);
 
-  virtual bool Initialize (iSystem *pSystem);
+  virtual bool Initialize (iObjectRegistry *object_reg);
 
   virtual bool Open ();
   virtual void Close ();

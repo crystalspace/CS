@@ -79,7 +79,7 @@ public:
   csGraphics2DGLX (iBase *iParent);
   virtual ~csGraphics2DGLX ();
 
-  virtual bool Initialize (iSystem *pSystem);
+  virtual bool Initialize (iObjectRegistry *object_reg);
   virtual bool Open ();
   virtual void Close ();
 

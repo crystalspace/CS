@@ -24,7 +24,6 @@
 #include "ivaria/perfstat.h"
 #include "isys/plugin.h"
 
-struct iSystem;
 struct iObjectRegistry;
 struct iPluginManager;
 struct iEngine;
@@ -76,7 +75,6 @@ protected:
   };
   //------------------------------------------------------------------------
 
-  iSystem *System;
   iObjectRegistry* object_reg;
   iPluginManager* plugin_mgr;
   iEngine *Engine;
@@ -151,7 +149,7 @@ protected:
   csPerfStats (iBase *iParent);
   virtual ~csPerfStats ();
   ///
-  virtual bool Initialize (iSystem *system);
+  virtual bool Initialize (iObjectRegistry *object_reg);
   /// This is set to receive the once per frame nothing  event
   virtual bool HandleEvent (iEvent &event);
 
@@ -200,7 +198,8 @@ protected:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csPerfStats);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
   } scfiPlugin;
 };

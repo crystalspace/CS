@@ -37,9 +37,9 @@ csGraphics2DGLCommon::csGraphics2DGLCommon (iBase *iParent) :
   EventOutlet = NULL;
 }
 
-bool csGraphics2DGLCommon::Initialize (iSystem *pSystem)
+bool csGraphics2DGLCommon::Initialize (iObjectRegistry *object_reg)
 {
-  if (!csGraphics2D::Initialize (pSystem))
+  if (!csGraphics2D::Initialize (object_reg))
     return false;
 
   // We don't really care about pixel format, except for ScreenShot ()
@@ -78,8 +78,7 @@ bool csGraphics2DGLCommon::Open ()
 
   const char *renderer = (const char *)glGetString (GL_RENDERER);
   const char *version = (const char *)glGetString (GL_VERSION);
-  iReporter* reporter = CS_QUERY_REGISTRY (System->GetObjectRegistry (),
-  	iReporter);
+  iReporter* reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (renderer || version)
     if (reporter)
       reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,

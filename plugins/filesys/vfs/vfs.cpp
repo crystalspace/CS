@@ -128,7 +128,7 @@ public:
   // number of open for writing files in this archive
   int Writing;
   // The system driver
-  iSystem *System;
+  iObjectRegistry *object_reg;
 
   void UpdateTime ()
   {
@@ -150,11 +150,12 @@ public:
     return (RefCount == 0) &&
       (csGetTicks () - LastUseTime > VFS_KEEP_UNUSED_ARCHIVE_TIME);
   }
-  VfsArchive (const char *filename, iSystem *iSys) : csArchive (filename)
+  VfsArchive (const char *filename, iObjectRegistry *object_reg)
+  	: csArchive (filename)
   {
     RefCount = 0;
     Writing = 0;
-    System = iSys;
+    VfsArchive::object_reg = object_reg;
     UpdateTime (); // OpenStep compiler requires having seen this already.
 #ifdef VFS_DEBUG
     printf ("VFS: opening archive \"%s\"\n", filename);
@@ -225,10 +226,10 @@ public:
   // The array of unexpanded real paths
   csStrVector UPathV;
   // The system interface
-  iSystem *System;
+  iObjectRegistry *object_reg;
 
   // Initialize the object
-  VfsNode (char *iPath, const char *iConfigKey, iSystem *iSys);
+  VfsNode (char *iPath, const char *iConfigKey, iObjectRegistry *object_reg);
   // Destroy the object
   virtual ~VfsNode ();
 
@@ -621,11 +622,12 @@ iDataBuffer *ArchiveFile::GetAllData ()
 
 // ------------------------------------------------------------- VfsNode --- //
 
-VfsNode::VfsNode (char *iPath, const char *iConfigKey, iSystem *iSys)
+VfsNode::VfsNode (char *iPath, const char *iConfigKey,
+	iObjectRegistry *object_reg)
 {
   VPath = iPath;
   ConfigKey = csStrNew (iConfigKey);
-  System = iSys;
+  VfsNode::object_reg = object_reg;
 }
 
 VfsNode::~VfsNode ()
@@ -859,7 +861,7 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask,
           continue;
 
         idx = ArchiveCache->Length ();
-        ArchiveCache->Push (new VfsArchive (rpath, System));
+        ArchiveCache->Push (new VfsArchive (rpath, object_reg));
       }
 
       VfsArchive *a = ArchiveCache->Get (idx);
@@ -936,7 +938,7 @@ iFile *VfsNode::Open (int Mode, const char *FileName)
 	}
 
         idx = ArchiveCache->Length ();
-        ArchiveCache->Push (new VfsArchive (rpath, System));
+        ArchiveCache->Push (new VfsArchive (rpath, object_reg));
       }
 
       f = new ArchiveFile (Mode, this, i, FileName, ArchiveCache->Get (idx));
@@ -981,7 +983,7 @@ bool VfsNode::FindFile (const char *Suffix, char *RealPath,
           continue;
 
         idx = ArchiveCache->Length ();
-        ArchiveCache->Push (new VfsArchive (rpath, System));
+        ArchiveCache->Push (new VfsArchive (rpath, object_reg));
       }
 
       VfsArchive *a = ArchiveCache->Get (idx);
@@ -1138,7 +1140,7 @@ SCF_EXPORT_CLASS_TABLE_END
 
 csVFS::csVFS (iBase *iParent) : dirstack (8, 8)
 {
-  System = NULL;
+  object_reg = NULL;
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
   cwd = new char [2];
@@ -1160,9 +1162,9 @@ csVFS::~csVFS ()
   ArchiveCache = NULL;
 }
 
-bool csVFS::Initialize (iSystem *iSys)
+bool csVFS::Initialize (iObjectRegistry *object_reg)
 {
-  System = iSys;
+  csVFS::object_reg = object_reg;
   char vfsconfigpath [MAXPATHLEN + 1];
   csGetInstallPath (vfsconfigpath, sizeof (vfsconfigpath));
   basedir = csStrNew (vfsconfigpath);
@@ -1184,7 +1186,7 @@ bool csVFS::ReadConfig ()
 bool csVFS::AddLink (const char *VirtualPath, const char *RealPath)
 {
   char *xp = _ExpandPath (VirtualPath, true);
-  VfsNode *e = new VfsNode (xp, VirtualPath, System);
+  VfsNode *e = new VfsNode (xp, VirtualPath, object_reg);
   if (!e->AddRPath (RealPath, this))
   {
     delete e;
@@ -1528,7 +1530,7 @@ bool csVFS::Mount (const char *VirtualPath, const char *RealPath)
    || suffix [0])
   {
     char *xp = _ExpandPath (VirtualPath, true);
-    node = new VfsNode (xp, VirtualPath, System);
+    node = new VfsNode (xp, VirtualPath, object_reg);
     NodeList.Push (node);
   }
 

@@ -32,8 +32,6 @@
 struct iObjectRegistry;
 struct iPluginManager;
 
-#define CsPrintf System->Printf
-
 /**
  * This is the base class for 2D renderer. System-dependent ports
  * should derive their own SysGraphics2D class from this one and
@@ -62,8 +60,6 @@ public:
   /// Keep a array of Y*width to avoid multiplications
   int *LineAddress;
 
-  /// The system driver.
-  iSystem* System;
   /// The object registry.
   iObjectRegistry* object_reg;
   /// The plugin manager.
@@ -111,7 +107,7 @@ public:
   virtual ~csGraphics2D ();
 
   /// Initialize the plugin
-  virtual bool Initialize (iSystem*);
+  virtual bool Initialize (iObjectRegistry*);
   /// Event handler for plugin.
   virtual bool HandleEvent (iEvent&);
 
@@ -281,7 +277,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csGraphics2D);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
   } scfiPlugin;
 

@@ -124,10 +124,9 @@ csSurfFactoryLoader::~csSurfFactoryLoader ()
 {
 }
 
-bool csSurfFactoryLoader::Initialize (iSystem* system)
+bool csSurfFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csSurfFactoryLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -160,10 +159,9 @@ csSurfFactorySaver::~csSurfFactorySaver ()
 {
 }
 
-bool csSurfFactorySaver::Initialize (iSystem* system)
+bool csSurfFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csSurfFactorySaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -188,10 +186,9 @@ csSurfLoader::~csSurfLoader ()
 {
 }
 
-bool csSurfLoader::Initialize (iSystem* system)
+bool csSurfLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csSurfLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -368,10 +365,9 @@ csSurfSaver::~csSurfSaver ()
 {
 }
 
-bool csSurfSaver::Initialize (iSystem* system)
+bool csSurfSaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csSurfSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }

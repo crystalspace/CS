@@ -124,10 +124,9 @@ csHazeFactoryLoader::~csHazeFactoryLoader ()
 {
 }
 
-bool csHazeFactoryLoader::Initialize (iSystem* system)
+bool csHazeFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csHazeFactoryLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -344,10 +343,9 @@ csHazeFactorySaver::~csHazeFactorySaver ()
 {
 }
 
-bool csHazeFactorySaver::Initialize (iSystem* system)
+bool csHazeFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csHazeFactorySaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -445,10 +443,9 @@ csHazeLoader::~csHazeLoader ()
 {
 }
 
-bool csHazeLoader::Initialize (iSystem* system)
+bool csHazeLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csHazeLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -564,10 +561,9 @@ csHazeSaver::~csHazeSaver ()
 {
 }
 
-bool csHazeSaver::Initialize (iSystem* system)
+bool csHazeSaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csHazeSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }

@@ -24,7 +24,7 @@
 #include "isys/plugin.h"
 
 struct iEngine;
-struct iSystem;
+struct iObjectRegistry;
 struct iVFS;
 struct iMotionManager;
 struct iMotion;
@@ -38,7 +38,7 @@ struct iMotion;
 class csMotionLoader : public iLoaderPlugin
 {
 private:
-  iSystem *sys;
+  iObjectRegistry *object_reg;
   iVFS *vfs;
   iMotionManager *motman;
   
@@ -51,7 +51,7 @@ public:
   /// Constructor
   csMotionLoader (iBase *);
   virtual ~csMotionLoader();
-  virtual bool Initialize( iSystem *Sys);
+  virtual bool Initialize( iObjectRegistry *object_reg);
   virtual iBase* Parse( const char* string, iEngine *engine, iBase *context );
 
   void Report (int severity, const char* msg, ...);
@@ -59,7 +59,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMotionLoader);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 };
@@ -67,7 +68,7 @@ public:
 class csMotionSaver : public iSaverPlugin
 {
 private:
-  iSystem *sys;
+  iObjectRegistry *object_reg;
 
 public:
   SCF_DECLARE_IBASE;
@@ -79,7 +80,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMotionSaver);
-    virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
+    virtual bool Initialize (iObjectRegistry* p)
+    { scfParent->object_reg = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;

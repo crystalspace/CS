@@ -38,7 +38,7 @@ public:
   void Report (int severity, const char* msg, ...);
 
   // Implementation of interface for iPlugin
-  virtual bool Initialize (iSystem *iSys);
+  virtual bool Initialize (iObjectRegistry *object_reg);
   virtual bool HandleEvent (iEvent &e);
   virtual bool Open(iSoundRender*, int frequency, bool bit16, bool stereo);
   virtual void Close();
@@ -55,13 +55,14 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundDriverWaveOut);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
   } scfiPlugin;
 
 protected:
   // system driver
-  iSystem *System;
+  iObjectRegistry *object_reg;
 
   // config file
   csConfigAccess Config;

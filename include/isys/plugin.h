@@ -22,10 +22,10 @@
 
 #include "csutil/scf.h"
 
-struct iSystem;
+struct iObjectRegistry;
 struct iEvent;
 
-SCF_VERSION (iPlugin, 0, 0, 1);
+SCF_VERSION (iPlugin, 0, 0, 2);
 
 /**
  * This is the general plug-in interface for CS.
@@ -36,7 +36,7 @@ SCF_VERSION (iPlugin, 0, 0, 1);
 struct iPlugin : public iBase
 {
   /// Initialize the plugin, and return success status
-  virtual bool Initialize (iSystem *iSys) = 0;
+  virtual bool Initialize (iObjectRegistry *object_reg) = 0;
   /**
    * This is plugin's event handler. Plugin should register first
    * with the system driver (using iSystem::CallOnEvents method)

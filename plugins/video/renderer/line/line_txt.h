@@ -212,7 +212,8 @@ public:
   UByte *inv_cmap;
 
   ///
-  csTextureManagerLine (iSystem *iSys, iGraphics2D *iG2D, iConfigFile *config);
+  csTextureManagerLine (iObjectRegistry *object_reg,
+  	iGraphics2D *iG2D, iConfigFile *config);
   ///
   virtual ~csTextureManagerLine ();
 

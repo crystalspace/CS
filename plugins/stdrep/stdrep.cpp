@@ -59,7 +59,7 @@ csReporterListener::csReporterListener (iBase *iParent)
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugin);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiReporterListener);
-  System = NULL;
+  object_reg = NULL;
   console = NULL;
   nativewm = NULL;
   reporter = NULL;
@@ -92,9 +92,9 @@ csReporterListener::~csReporterListener ()
   if (reporter) reporter->RemoveReporterListener (&scfiReporterListener);
 }
 
-bool csReporterListener::Initialize (iSystem *system)
+bool csReporterListener::Initialize (iObjectRegistry *object_reg)
 {
-  System = system;
+  csReporterListener::object_reg = object_reg;
   return true;
 }
 
@@ -158,7 +158,6 @@ void csReporterListener::SetDebugFile (const char* filename)
 
 void csReporterListener::SetDefaults ()
 {
-  iObjectRegistry* object_reg = System->GetObjectRegistry ();
   console = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
   nativewm = NULL;
   iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);

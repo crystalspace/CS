@@ -65,7 +65,7 @@ public:
   csGraphics2DOS2GL (iBase *iParent);
   virtual ~csGraphics2DOS2GL ();
 
-  virtual bool Initialize (iSystem *pSystem);
+  virtual bool Initialize (iObjectRegistry *object_reg);
   virtual bool Open ();
   virtual void Close ();
 

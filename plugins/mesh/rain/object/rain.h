@@ -59,7 +59,7 @@ public:
    *   You can make slanted rain this way. Although you would also want to
    *   slant the particles in that case...
    */
-  csRainMeshObject (iSystem* system, iMeshObjectFactory* factory);
+  csRainMeshObject (iObjectRegistry* object_reg, iMeshObjectFactory* factory);
   /// Destructor.
   virtual ~csRainMeshObject ();
 
@@ -158,11 +158,11 @@ public:
 class csRainMeshObjectFactory : public iMeshObjectFactory
 {
 private:
-  iSystem* system;
+  iObjectRegistry* object_reg;
 
 public:
   /// Constructor.
-  csRainMeshObjectFactory (iBase *pParent, iSystem* system);
+  csRainMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csRainMeshObjectFactory ();
@@ -182,7 +182,7 @@ public:
 class csRainMeshObjectType : public iMeshObjectType
 {
 private:
-  iSystem* system;
+  iObjectRegistry* object_reg;
 
 public:
   SCF_DECLARE_IBASE;
@@ -203,8 +203,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csRainMeshObjectType);
-    virtual bool Initialize (iSystem* p)
-    { scfParent->system = p; return true; }
+    virtual bool Initialize (iObjectRegistry* p)
+    { scfParent->object_reg = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;

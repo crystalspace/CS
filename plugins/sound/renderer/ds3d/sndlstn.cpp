@@ -60,7 +60,7 @@ bool csSoundListenerDS3D::Initialize(csSoundRenderDS3D *srdr) {
   dsbd.dwBufferBytes = 0;
   dsbd.lpwfxFormat = NULL;
 
-  iReporter* reporter = CS_QUERY_REGISTRY (Renderer->System->GetObjectRegistry (),
+  iReporter* reporter = CS_QUERY_REGISTRY (Renderer->object_reg,
   	iReporter);
 
   HRESULT r;

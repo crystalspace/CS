@@ -2745,10 +2745,10 @@ csThingObjectType::~csThingObjectType ()
 {
 }
 
-bool csThingObjectType::Initialize (iSystem* pSystem)
+bool csThingObjectType::Initialize (iObjectRegistry* object_reg)
 {
   iSCF::SCF->RegisterStaticClass (thing_scfInitialize (iSCF::SCF));
-  System = pSystem;
+  csThingObjectType::object_reg = object_reg;
   return true;
 }
 

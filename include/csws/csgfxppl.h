@@ -26,7 +26,7 @@
 
 class csMouse;
 struct iGraphics2D;
-struct iSystem;
+struct iObjectRegistry;
 
 // Maximal number of primitives which can be drawn IN ONE FRAME
 #define MAX_CSWS_PIPELINE_LENGTH 16384
@@ -97,7 +97,7 @@ private:
   bool DontCacheFrame;
   
   /// Initialize pipeline
-  void Initialize (iSystem *System);
+  void Initialize (iObjectRegistry *object_reg);
   /// Finish graphics pipeline
   virtual ~csGraphicsPipeline ();
 

@@ -32,11 +32,11 @@ public:
   virtual ~csPython();
 
   static csPython* shared_instance;
-  iSystem* Sys;
+  iObjectRegistry* object_reg;
   int Mode;
   void* Storage;
 
-  bool Initialize(iSystem* iSys);
+  bool Initialize(iObjectRegistry* object_reg);
   bool RunText(const char *Text);
   bool LoadModule(const char *Text);
 	bool Store(const char* type, const char* name, void* data);
@@ -49,7 +49,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csPython);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 };

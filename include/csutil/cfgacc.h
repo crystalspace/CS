@@ -28,7 +28,7 @@ struct iConfigFile;
  * sytem config manager. It adds config files to the manager on demand and
  * automatically removes them when destroyed. In addition, you can use
  * the '->' operator to access the system configuration. Note that you must
- * use the same iSystem for all config files you add.
+ * use the same iObjectRegistry for all config files you add.
  */
 class csConfigAccess
 {
@@ -36,13 +36,13 @@ public:
   /// constructor
   csConfigAccess();
   /// constructor (also adds a config file)
-  csConfigAccess(iSystem *sys, const char *Filename,
+  csConfigAccess(iObjectRegistry *object_reg, const char *Filename,
     bool vfs = true, int Priority = iConfigManager::ConfigPriorityPlugin);
   /// destructor
   ~csConfigAccess();
 
   /// add a config file
-  void AddConfig(iSystem *sys, const char *Filename,
+  void AddConfig(iObjectRegistry *object_reg, const char *Filename,
     bool vfs = true, int Priority = iConfigManager::ConfigPriorityPlugin);
   /// access to system configuration
   iConfigFile *operator->();
@@ -50,7 +50,7 @@ public:
   operator iConfigFile* ();
 
 private:
-  iSystem *System;
+  iObjectRegistry *object_reg;
   csVector ConfigFiles;
 };
 

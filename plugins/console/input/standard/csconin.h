@@ -63,7 +63,7 @@ public:
   virtual ~csConsoleInput ();
 
   /// Initialize the plugin, and return success status
-  virtual bool Initialize (iSystem *iSys);
+  virtual bool Initialize (iObjectRegistry *object_reg);
 
   /// Handle an input event
   virtual bool HandleEvent (iEvent &Event);
@@ -105,7 +105,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csConsoleInput);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
   } scfiPlugin;
 

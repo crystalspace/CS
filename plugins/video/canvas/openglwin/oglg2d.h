@@ -42,7 +42,7 @@ public:
 
   void Report (int severity, const char* msg, ...);
   
-  virtual bool Initialize(iSystem *pSystem);
+  virtual bool Initialize(iObjectRegistry *object_reg);
 
   virtual void Print (csRect *area = NULL);
   

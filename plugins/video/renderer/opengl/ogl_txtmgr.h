@@ -134,7 +134,8 @@ public:
   csOpenGLProcSoftware *head_soft_proc_tex;
 
   ///
-  csTextureManagerOpenGL (iSystem* iSys, iGraphics2D* iG2D, iConfigFile *config,
+  csTextureManagerOpenGL (iObjectRegistry* object_reg,
+  	iGraphics2D* iG2D, iConfigFile *config,
     csGraphics3DOGLCommon *iG3D);
   ///
   virtual ~csTextureManagerOpenGL ();

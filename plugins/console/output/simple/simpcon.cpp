@@ -69,7 +69,7 @@ csSimpleConsole::csSimpleConsole (iBase *iParent)
   CursorStyle = csConNoCursor;
   Update = true;
   SystemReady = false;
-  System = NULL;
+  object_reg = NULL;
   G3D = NULL;
   CursorPos = -1;
   ClearInput = false;
@@ -91,11 +91,10 @@ csSimpleConsole::~csSimpleConsole ()
     G3D->DecRef ();
 }
 
-bool csSimpleConsole::Initialize (iSystem *iSys)
+bool csSimpleConsole::Initialize (iObjectRegistry *object_reg)
 {
-  System = iSys;
+  csSimpleConsole::object_reg = object_reg;
 
-  iObjectRegistry* object_reg = iSys->GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   G3D = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
   if (!G3D) return false;
@@ -104,7 +103,7 @@ bool csSimpleConsole::Initialize (iSystem *iSys)
   FrameWidth = G2D->GetWidth ();
   FrameHeight = G2D->GetHeight ();
 
-  csConfigAccess Config(System, "/config/simpcon.cfg");
+  csConfigAccess Config(object_reg, "/config/simpcon.cfg");
   console_transparent_bg = Config->GetBool ("SimpleConsole.TranspBG", false);
   console_transparent_bg = Config->GetBool ("SimpleConsole.TranspBG", 1);
   const char *buf = Config->GetStr ("SimpleConsole.ConFG", "255,255,255");
@@ -153,7 +152,8 @@ bool csSimpleConsole::Initialize (iSystem *iSys)
   CursorTime = csGetTicks ();
 
   // We want to see broadcast events
-  System->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
 
   return true;
 }

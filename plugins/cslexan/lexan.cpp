@@ -62,7 +62,7 @@ csLexicalAnalyzer::~csLexicalAnalyzer()
 }
 
 bool 
-csLexicalAnalyzer::Initialize(iSystem *sys)
+csLexicalAnalyzer::Initialize(iObjectRegistry *)
 {
   return true;
 }

@@ -56,7 +56,7 @@ void csGraphics2DDOSRAW::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
     rep->ReportV (severity, "crystalspace.canvas.dosraw", msg, arg);
   else
@@ -67,9 +67,9 @@ void csGraphics2DDOSRAW::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-bool csGraphics2DDOSRAW::Initialize (iSystem *pSystem)
+bool csGraphics2DDOSRAW::Initialize (iObjectRegistry *object_reg)
 {
-  if (!csGraphics2D::Initialize (pSystem))
+  if (!csGraphics2D::Initialize (object_reg))
     return false;
 
   // Tell videosystem not to wait vertical retrace during page flip
@@ -163,7 +163,8 @@ bool csGraphics2DDOSRAW::Open ()
 #endif // USE_ALLEGRO
 
   // Tell printf() to shut up
-  System->PerformExtension ("EnablePrintf", false);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->PerformExtension ("EnablePrintf", false);
 
   // Update drawing routine addresses
   switch (pfmt.PixelBytes)
@@ -201,7 +202,8 @@ void csGraphics2DDOSRAW::Close ()
 #endif // USE_ALLEGRO
   csGraphics2D::Close ();
   // Tell printf() it can work now
-  System->PerformExtension ("EnablePrintf", true);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->PerformExtension ("EnablePrintf", true);
 }
 
 void csGraphics2DDOSRAW::Print (csRect *area)
@@ -242,7 +244,8 @@ void csGraphics2DDOSRAW::Print (csRect *area)
 
 bool csGraphics2DDOSRAW::SetMousePosition (int x, int y)
 {
-  return System->PerformExtension ("SetMousePosition", x, y);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  return sys->PerformExtension ("SetMousePosition", x, y);
 }
 
 bool csGraphics2DDOSRAW::SetMouseCursor (csMouseCursorID iShape)

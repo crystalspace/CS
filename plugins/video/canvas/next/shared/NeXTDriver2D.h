@@ -45,7 +45,7 @@ protected:
 public:
   NeXTDriver2D(iBase* p) : superclass(p), controller(0), frame_buffer(0) {}
   virtual ~NeXTDriver2D();
-  virtual bool Initialize(iSystem*);
+  virtual bool Initialize(iObjectRegistry*);
   virtual bool Open();
   virtual void Close();
   virtual void SetTitle(char const*);

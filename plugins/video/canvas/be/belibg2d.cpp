@@ -44,12 +44,12 @@ csGraphics2DBeLib::~csGraphics2DBeLib()
 {
 }
 
-bool csGraphics2DBeLib::Initialize(iSystem* isys)
+bool csGraphics2DBeLib::Initialize(iObjectRegistry* object_reg)
 {
-  bool ok = superclass::Initialize(isys);
+  bool ok = superclass::Initialize(object_reg);
   if (ok)
   {
-    csReport (isys->GetObjectRegistry (), CS_REPORTER_SEVERITY_NOTIFY,
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
     	"crystalspace.canvas.be",
       	"Crystal Space BeOS 2D Driver.");
 
@@ -87,8 +87,8 @@ bool csGraphics2DBeLib::Open()
       win_rect.Set(x, y, x + vw, y + vh);
     }
 
-    view = new CrystView(BRect(0, 0, vw, vh), System, bitmap);
-    window = new CrystWindow(win_rect, win_title, view, System, this);
+    view = new CrystView(BRect(0, 0, vw, vh), object_reg, bitmap);
+    window = new CrystWindow(win_rect, win_title, view, object_reg, this);
 	
     window->Show();
     if (window->Lock())
@@ -99,7 +99,8 @@ bool csGraphics2DBeLib::Open()
     window->Flush();
 	
     Memory = (unsigned char*)bitmap->Bits();
-    System->PerformExtension("BeginUI");
+    iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+    sys->PerformExtension("BeginUI");
   }
   return ok;
 }
@@ -132,7 +133,8 @@ void csGraphics2DBeLib::Print(csRect* cr)
 
 bool csGraphics2DBeLib::SetMouseCursor(csMouseCursorID shape)
 {
-  return System->PerformExtension("SetCursor", shape);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  return sys->PerformExtension("SetCursor", shape);
 }
 
 void csGraphics2DBeLib::ApplyDepthInfo(color_space cs)

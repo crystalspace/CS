@@ -85,12 +85,13 @@ csGraphics2DOS2GL::~csGraphics2DOS2GL (void)
   gdGLDeinitialize ();
 }
 
-bool csGraphics2DOS2GL::Initialize (iSystem *pSystem)
+bool csGraphics2DOS2GL::Initialize (iObjectRegistry *object_reg)
 {
-  if (!csGraphics2DGLCommon::Initialize (pSystem))
+  if (!csGraphics2DGLCommon::Initialize (object_reg))
     return false;
 
-  System->PerformExtension ("StartGUI");
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->PerformExtension ("StartGUI");
 
   // Initialize OpenGL
   if (!gdGLInitialize ())
@@ -108,11 +109,10 @@ bool csGraphics2DOS2GL::Initialize (iSystem *pSystem)
     pfmt.PalEntries = 256;
   }
 
-  csConfigAccess Config(System, "/config/video.cfg");
+  csConfigAccess Config(object_reg, "/config/video.cfg");
   WindowX = Config->GetInt ("Video.WindowX", INT_MIN);
   WindowY = Config->GetInt ("Video.WindowY", INT_MIN);
   HardwareCursor = Config->GetBool ("Video.SystemMouseCursor", true);
-  iObjectRegistry* object_reg = System->GetObjectRegistry ();
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
 
@@ -134,7 +134,7 @@ bool csGraphics2DOS2GL::Initialize (iSystem *pSystem)
   if (cmdline->GetOption ("nosysmouse"))
     HardwareCursor = false;
 
-  EventOutlet = System->CreateEventOutlet (this);
+  EventOutlet = sys->CreateEventOutlet (this);
 
   return true;
 }
@@ -143,7 +143,7 @@ bool csGraphics2DOS2GL::HandleEvent (iEvent &Event)
 {
   if ((Event.Type == csevBroadcast)
    && (Event.Command.Code == cscmdCommandLineHelp)
-   && System)
+   && object_reg)
   {
     printf ("Options for OS/2 OpenGL canvas driver:\n");
     printf ("  -winpos=<x>,<y>    set window position in percent of screen (default=center)\n");
@@ -393,7 +393,8 @@ void csGraphics2DOS2GL::KeyboardHandlerStub (void *Self, unsigned char ScanCode,
   if (KeyCode == CSKEY_ENTER) CharCode = CSKEY_ENTER;
 
   // WM_CHAR does not support Ctrl+# ...
-  if (This->System->GetKeyState (CSKEY_CTRL) && !CharCode
+  iSystem* sys = CS_GET_SYSTEM (This->object_reg);	//@@@
+  if (sys->GetKeyState (CSKEY_CTRL) && !CharCode
    && (KeyCode > 96) && (KeyCode < 127))
     CharCode = KeyCode - 96;
 

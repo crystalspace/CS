@@ -32,7 +32,7 @@ public:
   csGraphics2Dps2 (iBase*);
   virtual ~csGraphics2Dps2 ();
 
-  virtual bool Initialize (iSystem*;
+  virtual bool Initialize (iObjectRegistry*);
   virtual bool Open ();
   virtual void Close ();
 

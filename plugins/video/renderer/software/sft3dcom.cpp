@@ -275,7 +275,7 @@ csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon (iBase* parent) :
 
   dpfx_valid = false;
 
-  System = NULL;
+  object_reg = NULL;
 }
 
 csGraphics3DSoftwareCommon::~csGraphics3DSoftwareCommon ()
@@ -286,10 +286,11 @@ csGraphics3DSoftwareCommon::~csGraphics3DSoftwareCommon ()
   if (clipper) { clipper->DecRef (); clipper = NULL; cliptype = CS_CLIPPER_NONE; }
 }
 
-bool csGraphics3DSoftwareCommon::Initialize (iSystem* p)
+bool csGraphics3DSoftwareCommon::Initialize (iObjectRegistry* p)
 {
-  System = p;
-  System->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
+  object_reg = p;
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
   return true;
 }
 
@@ -314,8 +315,7 @@ bool csGraphics3DSoftwareCommon::HandleEvent (iEvent& Event)
 
 void csGraphics3DSoftwareCommon::NewInitialize ()
 {
-  config.AddConfig(System, "/config/soft3d.cfg");
-  iObjectRegistry* object_reg = System->GetObjectRegistry ();
+  config.AddConfig(object_reg, "/config/soft3d.cfg");
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
   do_smaller_rendering = config->GetBool ("Video.Software.Smaller", false);
@@ -351,7 +351,7 @@ void csGraphics3DSoftwareCommon::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
   {
     rep->ReportV (severity, "crystalspace.video.software", msg, arg);
@@ -432,7 +432,7 @@ bool csGraphics3DSoftwareCommon::NewOpen ()
   fog_buffers = NULL;
 
   // Create the texture manager
-  texman = new csTextureManagerSoftware (System, this, config);
+  texman = new csTextureManagerSoftware (object_reg, this, config);
   texman->SetPixelFormat (pfmt);
 
   tcache = new csTextureCacheSoftware (texman);

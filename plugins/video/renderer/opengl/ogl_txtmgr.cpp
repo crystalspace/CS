@@ -31,8 +31,6 @@
 #include "isys/system.h"
 #include "igraphic/image.h"
 
-#define SysPrintf System->Printf
-
 //---------------------------------------------------------------------------
 
 csTextureOpenGL::csTextureOpenGL (csTextureHandle *Parent, iImage *Image)
@@ -191,9 +189,9 @@ void csTextureHandleOpenGL::Prepare ()
 
 //---------------------------------------------------------------------------
 
-csTextureManagerOpenGL::csTextureManagerOpenGL (iSystem* iSys,
+csTextureManagerOpenGL::csTextureManagerOpenGL (iObjectRegistry* object_reg,
   iGraphics2D* iG2D, iConfigFile *config, csGraphics3DOGLCommon *iG3D)
-  : csTextureManager (iSys, iG2D)
+  : csTextureManager (object_reg, iG2D)
 {
   G3D = iG3D;
   head_soft_proc_tex = NULL;

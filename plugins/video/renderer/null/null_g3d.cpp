@@ -78,15 +78,14 @@ csGraphics3DNull::~csGraphics3DNull ()
     G2D->DecRef ();
 }
 
-bool csGraphics3DNull::Initialize (iSystem *iSys)
+bool csGraphics3DNull::Initialize (iObjectRegistry *object_reg)
 {
-  System = iSys;
-  iObjectRegistry* object_reg = System->GetObjectRegistry ();
+  csGraphics3DNull::object_reg = object_reg;
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
 
-  config.AddConfig(System, "/config/null3d.cfg");
+  config.AddConfig(object_reg, "/config/null3d.cfg");
 
   width = height = -1;
 
@@ -98,8 +97,9 @@ bool csGraphics3DNull::Initialize (iSystem *iSys)
   if (!G2D)
     return false;
 
-  texman = new csTextureManagerNull (System, G2D, config);
-  System->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
+  texman = new csTextureManagerNull (object_reg, G2D, config);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
 
   return true;
 }
@@ -129,7 +129,7 @@ bool csGraphics3DNull::Open ()
 
   if (!G2D->Open ())
   {
-    csReport (System->GetObjectRegistry (), CS_REPORTER_SEVERITY_ERROR,
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.graphics3d.null",
     	"Error opening Graphics2D context.");
     // set "not opened" flag
@@ -162,7 +162,7 @@ bool csGraphics3DNull::Open ()
 
   SetDimensions (nWidth, nHeight);
 
-  csReport (System->GetObjectRegistry (), CS_REPORTER_SEVERITY_NOTIFY,
+  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
   	"crystalspace.graphics3d.null", "Using %s mode %dx%d.",
             bFullScreen ? "full screen" : "windowed", width, height);
 

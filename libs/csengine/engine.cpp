@@ -393,7 +393,6 @@ iObject* csObjectIt::Fetch ()
 
 int csEngine::frame_width;
 int csEngine::frame_height;
-iSystem* csEngine::System = NULL;
 iObjectRegistry* csEngine::object_reg = NULL;
 iPluginManager* csEngine::plugin_mgr = NULL;
 csEngine* csEngine::current_engine = NULL;
@@ -440,7 +439,7 @@ csEngine::csEngine (iBase *iParent) : sectors (true), camera_positions (16, 16)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
   engine_mode = CS_ENGINE_AUTODETECT;
   first_dyn_lights = NULL;
-  System = NULL;
+  object_reg = NULL;
   VFS = NULL;
   G3D = NULL;
   G2D = NULL;
@@ -501,9 +500,9 @@ csEngine::~csEngine ()
   camera_hack = NULL;
 }
 
-bool csEngine::Initialize (iSystem* sys)
+bool csEngine::Initialize (iObjectRegistry* object_reg)
 {
-  object_reg = sys->GetObjectRegistry ();
+  csEngine::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 #if defined(JORRIT_DEBUG)
   printf ("csPolygon3D %ld\n", (long)sizeof (csPolygon3D));
@@ -515,8 +514,6 @@ bool csEngine::Initialize (iSystem* sys)
   printf ("csGouraudShaded %ld\n", (long)sizeof (csGouraudShaded));
   printf ("csLightMap %ld\n", (long)sizeof (csLightMap));
 #endif
-
-  System = sys;
 
   if (!(G3D = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D)))
   {
@@ -543,13 +540,14 @@ bool csEngine::Initialize (iSystem* sys)
   Reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
 
   // Tell system driver that we want to handle broadcast events
-  if (!System->CallOnEvents (&scfiPlugin, CSMASK_Broadcast))
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  if (!sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast))
     return false;
   
-  csConfigAccess cfg (System, "/config/engine.cfg");
+  csConfigAccess cfg (object_reg, "/config/engine.cfg");
   ReadConfig (cfg);
 
-  thing_type->Initialize (sys);
+  thing_type->Initialize (object_reg);
 
   return true;
 }
@@ -1198,7 +1196,8 @@ void csEngine::Draw (iCamera* c, iClipper2D* view)
 
   // draw all halos on the screen
   csTicks Elapsed, Current;
-  System->GetElapsedTime (Elapsed, Current);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->GetElapsedTime (Elapsed, Current);
   for (int halo = halos.Length () - 1; halo >= 0; halo--)
     if (!halos.Get (halo)->Process (Elapsed, *this))
       halos.Delete (halo);
@@ -1355,7 +1354,8 @@ void csEngine::RemoveDynLight (csDynLight* dyn)
 void csEngine::ControlMeshes ()
 {
   csTicks elapsed_time, current_time;
-  System->GetElapsedTime (elapsed_time, current_time);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->GetElapsedTime (elapsed_time, current_time);
 
   nextframe_pending = current_time;
 

@@ -66,10 +66,9 @@ csGraphics3DSoftware::~csGraphics3DSoftware ()
   csScan_Finalize ();
 }
 
-bool csGraphics3DSoftware::Initialize (iSystem *iSys)
+bool csGraphics3DSoftware::Initialize (iObjectRegistry *object_reg)
 {
-  csGraphics3DSoftwareCommon::Initialize(iSys);
-  iObjectRegistry* object_reg = iSys->GetObjectRegistry ();
+  csGraphics3DSoftwareCommon::Initialize(object_reg);
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);

@@ -122,10 +122,9 @@ csSpiralFactoryLoader::~csSpiralFactoryLoader ()
 {
 }
 
-bool csSpiralFactoryLoader::Initialize (iSystem* system)
+bool csSpiralFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csSpiralFactoryLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -157,10 +156,9 @@ csSpiralFactorySaver::~csSpiralFactorySaver ()
 {
 }
 
-bool csSpiralFactorySaver::Initialize (iSystem* system)
+bool csSpiralFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csSpiralFactorySaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -202,10 +200,9 @@ csSpiralLoader::~csSpiralLoader ()
 {
 }
 
-bool csSpiralLoader::Initialize (iSystem* system)
+bool csSpiralLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csSpiralLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -374,10 +371,9 @@ csSpiralSaver::~csSpiralSaver ()
 {
 }
 
-bool csSpiralSaver::Initialize (iSystem* system)
+bool csSpiralSaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csSpiralSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }

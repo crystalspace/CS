@@ -23,15 +23,14 @@
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"
 
-void GetX11Settings (iSystem *iSys, int &oSimDepth, bool &oUseSHM,
+void GetX11Settings (iObjectRegistry *object_reg, int &oSimDepth, bool &oUseSHM,
   bool &oHardwareCursor)
 {
-  csConfigAccess Config(iSys, "/config/video.cfg");
+  csConfigAccess Config(object_reg, "/config/video.cfg");
   oSimDepth = Config->GetInt ("Video.SimulateDepth", 0);
   oUseSHM = Config->GetBool ("Video.XSHM", true);
   oHardwareCursor = Config->GetBool ("Video.SystemMouseCursor", true);
 
-  iObjectRegistry* object_reg = iSys->GetObjectRegistry ();
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
 

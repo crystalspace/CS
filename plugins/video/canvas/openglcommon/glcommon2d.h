@@ -24,7 +24,6 @@
 #include "gl2d_font.h"
 #include "isys/event.h"
 
-#define CsPrintf System->Printf
 class OpenGLTextureCache;
 class GLFontCache;
 
@@ -75,7 +74,7 @@ public:
    */
 
   /// Initialize the plugin
-  virtual bool Initialize (iSystem *pSystem);
+  virtual bool Initialize (iObjectRegistry *object_reg);
 
   /**
    * Initialize font cache, texture cache, prints renderer name and version.

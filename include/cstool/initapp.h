@@ -22,14 +22,14 @@
 
 #include "cstypes.h"
 
-struct iSystem;
+struct iObjectRegistry;
 
 /**
  * This is a very general function that does a lot of the application
  * setup for you. It has to be called after system->Initialize() and will
  * setup various objects in the object registry.
  */
-extern void csInitializeApplication (iSystem* system,
+extern void csInitializeApplication (iObjectRegistry* object_reg,
 	bool use_reporter = true,
 	bool use_reporter_listener = true);
 

@@ -59,7 +59,7 @@ csSoundRenderSoftware::csSoundRenderSoftware(iBase* piBase) : Listener(NULL)
 {
   SCF_CONSTRUCT_IBASE(piBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
-  System = NULL;
+  object_reg = NULL;
   SoundDriver = NULL;
   Listener = NULL;
   memory = NULL;
@@ -71,7 +71,7 @@ void csSoundRenderSoftware::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
     rep->ReportV (severity, "crystalspace.sound.software", msg, arg);
   else
@@ -82,17 +82,18 @@ void csSoundRenderSoftware::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-bool csSoundRenderSoftware::Initialize (iSystem *iSys)
+bool csSoundRenderSoftware::Initialize (iObjectRegistry *object_reg)
 {
   // copy the system pointer
-  System = iSys;
+  csSoundRenderSoftware::object_reg = object_reg;
 
   // set event callback
-  System->CallOnEvents(&scfiPlugin,
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->CallOnEvents(&scfiPlugin,
     CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
 
   // read the config file
-  Config.AddConfig(System, "/config/sound.cfg");
+  Config.AddConfig(object_reg, "/config/sound.cfg");
 
   // load the sound driver plug-in
 #ifdef CS_SOUND_DRIVER
@@ -101,7 +102,6 @@ bool csSoundRenderSoftware::Initialize (iSystem *iSys)
   char *drv = "crystalspace.sound.driver.null";
 #endif
 
-  iObjectRegistry* object_reg = System->GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   SoundDriver = CS_LOAD_PLUGIN (plugin_mgr, drv, NULL, iSoundDriver);
   if (!SoundDriver) {	
@@ -143,7 +143,8 @@ bool csSoundRenderSoftware::Open()
   Report (CS_REPORTER_SEVERITY_NOTIFY, "  Volume: %g", Volume);
 
   csTicks et, ct;
-  System->GetElapsedTime(et, ct);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->GetElapsedTime(et, ct);
   LastTime = ct;
 
   return true;

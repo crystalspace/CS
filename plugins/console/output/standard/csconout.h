@@ -37,7 +37,7 @@ public:
   virtual ~csConsoleOutput ();
 
   /// Initialize the console
-  virtual bool Initialize (iSystem *);
+  virtual bool Initialize (iObjectRegistry *);
   /// Handle broadcast events
   virtual bool HandleEvent (iEvent &Event);
 
@@ -158,7 +158,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csConsoleOutput);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
   } scfiPlugin;
 
@@ -175,7 +176,7 @@ private:
   bool transparent, do_snap;
   iGraphics2D *G2D;
   iGraphics3D *G3D;
-  iSystem *System;
+  iObjectRegistry *object_reg;
   csRect size, invalid;
   int cursor, cx, cy;
   iFont *font;

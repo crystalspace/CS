@@ -173,7 +173,7 @@ csSequenceManager::csSequenceManager (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
-  System = NULL;
+  object_reg = NULL;
   main_sequence = new csSequence (this);
   previous_time_valid = false;
   main_time = 0;
@@ -185,10 +185,11 @@ csSequenceManager::~csSequenceManager ()
   main_sequence->DecRef ();
 }
 
-bool csSequenceManager::Initialize (iSystem *system)
+bool csSequenceManager::Initialize (iObjectRegistry *object_reg)
 {
-  System = system;
-  if (!System->CallOnEvents (&scfiPlugin, CSMASK_Nothing))
+  csSequenceManager::object_reg = object_reg;
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@ Temporary
+  if (!sys->CallOnEvents (&scfiPlugin, CSMASK_Nothing))
     return false;
   return true;
 }

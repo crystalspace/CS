@@ -91,7 +91,7 @@ csMotionLoader::csMotionLoader(iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
-  sys=NULL;
+  object_reg=NULL;
 }
 
 csMotionLoader::~csMotionLoader()
@@ -100,10 +100,9 @@ csMotionLoader::~csMotionLoader()
   motman->DecRef();
 }
 
-bool csMotionLoader::Initialize (iSystem* Sys)
+bool csMotionLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys=Sys;
-  iObjectRegistry* object_reg = Sys->GetObjectRegistry ();
+  csMotionLoader::object_reg=object_reg;
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   vfs = CS_QUERY_PLUGIN_ID(plugin_mgr, CS_FUNCID_VFS, iVFS );
   if (!vfs)
@@ -231,7 +230,7 @@ void csMotionLoader::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (sys->GetObjectRegistry (), iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
     rep->ReportV (severity, "crystalspace.motion.loader", msg, arg);
   else
@@ -495,7 +494,6 @@ csMotionSaver::~csMotionSaver()
 
 void csMotionSaver::WriteDown ( iBase* /* obj */, iStrVector* /* string */, iEngine* /* engine */)
 {
-  iObjectRegistry* object_reg = sys->GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iMotionManager *motman = CS_QUERY_PLUGIN_CLASS(plugin_mgr, "crystalspace.motion.manager.default", "MotionManager" , iMotionManager );
   if (motman)

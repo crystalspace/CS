@@ -104,7 +104,7 @@ protected:
     csAppPlugin (csApp *iParent);
 
     /// Initialize the application plugin (called by system driver)
-    virtual bool Initialize (iSystem *System);
+    virtual bool Initialize (iObjectRegistry *object_reg);
 
     /// Handle a event and return true if processed; called by system driver
     virtual bool HandleEvent (iEvent &Event);
@@ -124,8 +124,6 @@ protected:
   csVector ModalInfo;
 
 public:
-  /// The system driver
-  iSystem *System;
   /// The object registry.
   iObjectRegistry* object_reg;
   /// The plugin manager.
@@ -162,7 +160,7 @@ public:
   int DefaultFontSize;
 
   /// Initialize windowing system by giving a system driver and a skin
-  csApp (iSystem *System, csSkin &Skin);
+  csApp (iObjectRegistry *object_reg, csSkin &Skin);
   /// Deinitialize windowing system
   virtual ~csApp ();
 

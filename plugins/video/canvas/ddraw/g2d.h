@@ -31,7 +31,7 @@ public:
   csGraphics2DDDraw3 (iBase *iParent);
   virtual ~csGraphics2DDDraw3 ();
   
-  virtual bool Initialize (iSystem *pSystem);
+  virtual bool Initialize (iObjectRegistry *object_reg);
 
   virtual bool Open ();
   virtual void Close ();

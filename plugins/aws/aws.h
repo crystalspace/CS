@@ -77,8 +77,8 @@ class awsManager : public iAws
    /// The 3d graphics context
    iGraphics3D *ptG3D;
    
-   /// The system pointer, needed at odd times.
-   iSystem *System;
+   /// The object registry pointer, needed at odd times.
+   iObjectRegistry *object_reg;
   
    /// Handle to our procedural texture, which the user can have us draw on.
    class awsCanvas : public csProcTexture
@@ -143,7 +143,7 @@ public:
     awsManager(iBase *p);
     virtual ~awsManager();
     
-    bool Initialize(iSystem *sys);
+    bool Initialize(iObjectRegistry *sys);
    
     /// Get a pointer to the preference manager
     virtual iAwsPrefs *GetPrefMgr();
@@ -211,7 +211,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(awsManager);
-    virtual bool Initialize(iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize(iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent(iEvent&)   { return false; }
   } scfiPlugin;
 };

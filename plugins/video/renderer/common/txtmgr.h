@@ -35,7 +35,7 @@ class csTextureManager;
 struct iImage;
 struct iConfigFile;
 struct iGraphics2D;
-struct iSystem;
+struct iObjectRegistry;
 
 /**
  * This class is the top-level representation of a texture.
@@ -315,7 +315,7 @@ protected:
   csMatVector materials;
 
   ///
-  iSystem *System;
+  iObjectRegistry *object_reg;
 
   /// Verbose mode.
   bool verbose;
@@ -330,7 +330,7 @@ public:
   SCF_DECLARE_IBASE;
 
   /// Initialize the texture manager
-  csTextureManager (iSystem* iSys, iGraphics2D *iG2D);
+  csTextureManager (iObjectRegistry* object_reg, iGraphics2D *iG2D);
   /// Destroy the texture manager
   virtual ~csTextureManager ();
 

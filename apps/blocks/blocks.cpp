@@ -3105,8 +3105,8 @@ int main (int argc, char* argv[])
     exit (-1);
   }
 
-  csInitializeApplication (Sys);
   iObjectRegistry* object_reg = Sys->GetObjectRegistry ();
+  csInitializeApplication (object_reg);
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iConfigManager* config = CS_QUERY_REGISTRY (object_reg, iConfigManager);
 

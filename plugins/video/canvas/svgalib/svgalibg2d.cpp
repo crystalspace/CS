@@ -71,7 +71,7 @@ void csGraphics2DSVGALib::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
     rep->ReportV (severity, "crystalspace.canvas.svgalib", msg, arg);
   else
@@ -82,9 +82,9 @@ void csGraphics2DSVGALib::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-bool csGraphics2DSVGALib::Initialize (iSystem *pSystem)
+bool csGraphics2DSVGALib::Initialize (iObjectRegistry *object_reg)
 {
-  if (!csGraphics2D::Initialize (pSystem))
+  if (!csGraphics2D::Initialize (object_reg))
     return false;
 
   Memory = NULL;
@@ -149,9 +149,10 @@ bool csGraphics2DSVGALib::Initialize (iSystem *pSystem)
   memset (keydown, 0, sizeof (keydown));
 
   // Tell system driver to call us on every frame
-  System->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);
+  sys->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
   // Create the event outlet
-  EventOutlet = System->CreateEventOutlet (this);
+  EventOutlet = sys->CreateEventOutlet (this);
 
   return true;
 }

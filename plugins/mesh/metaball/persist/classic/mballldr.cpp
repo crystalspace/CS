@@ -124,10 +124,9 @@ csMetaBallFactoryLoader::~csMetaBallFactoryLoader ()
 {
 }
 
-bool csMetaBallFactoryLoader::Initialize (iSystem* system)
+bool csMetaBallFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csMetaBallFactoryLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -160,10 +159,9 @@ csMetaBallFactorySaver::~csMetaBallFactorySaver ()
 {
 }
 
-bool csMetaBallFactorySaver::Initialize (iSystem* system)
+bool csMetaBallFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csMetaBallFactorySaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -188,10 +186,9 @@ csMetaBallLoader::~csMetaBallLoader ()
 {
 }
 
-bool csMetaBallLoader::Initialize (iSystem* system)
+bool csMetaBallLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csMetaBallLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -392,10 +389,9 @@ csMetaBallSaver::~csMetaBallSaver ()
 {
 }
 
-bool csMetaBallSaver::Initialize (iSystem* system)
+bool csMetaBallSaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csMetaBallSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }

@@ -77,11 +77,11 @@ csConsoleInput::~csConsoleInput ()
   if (Callback) Callback->DecRef ();
 }
 
-bool csConsoleInput::Initialize (iSystem *iSys)
+bool csConsoleInput::Initialize (iObjectRegistry *object_reg)
 {
   // It is not necessary to call System->CallOnEvents since application
   // will usually pass events to us directly.
-  (void)iSys;
+  (void)object_reg;
   return true;
 }
 

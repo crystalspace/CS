@@ -133,7 +133,7 @@ csModelConverter3ds::~csModelConverter3ds ()
   delete supportedFormats;
 }
 
-bool csModelConverter3ds::Initialize( iSystem *pSys )
+bool csModelConverter3ds::Initialize( iObjectRegistry * )
 {
   supportedFormats = new char( strlen( SUPPORTED_FORMATS ) );
   strcpy( supportedFormats, SUPPORTED_FORMATS );

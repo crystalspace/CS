@@ -118,10 +118,9 @@ csCubeFactoryLoader::~csCubeFactoryLoader ()
 {
 }
 
-bool csCubeFactoryLoader::Initialize (iSystem* system)
+bool csCubeFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csCubeFactoryLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -268,10 +267,9 @@ csCubeFactorySaver::~csCubeFactorySaver ()
 {
 }
 
-bool csCubeFactorySaver::Initialize (iSystem* system)
+bool csCubeFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csCubeFactorySaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -342,10 +340,9 @@ csCubeLoader::~csCubeLoader ()
 {
 }
 
-bool csCubeLoader::Initialize (iSystem* system)
+bool csCubeLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csCubeLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -406,10 +403,9 @@ csCubeSaver::~csCubeSaver ()
 {
 }
 
-bool csCubeSaver::Initialize (iSystem* system)
+bool csCubeSaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csCubeSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }

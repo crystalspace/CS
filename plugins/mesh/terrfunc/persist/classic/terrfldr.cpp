@@ -93,9 +93,8 @@ csTerrFuncFactoryLoader::~csTerrFuncFactoryLoader ()
 {
 }
 
-bool csTerrFuncFactoryLoader::Initialize (iSystem* system)
+bool csTerrFuncFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
-  object_reg = system->GetObjectRegistry ();
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -128,9 +127,8 @@ csTerrFuncLoader::~csTerrFuncLoader ()
 {
 }
 
-bool csTerrFuncLoader::Initialize (iSystem* system)
+bool csTerrFuncLoader::Initialize (iObjectRegistry* object_reg)
 {
-  object_reg = system->GetObjectRegistry ();
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }

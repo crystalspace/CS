@@ -56,7 +56,7 @@ void csGraphics2DXLib::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
     rep->ReportV (severity, "crystalspace.canvas.softx", msg, arg);
   else
@@ -67,9 +67,9 @@ void csGraphics2DXLib::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-bool csGraphics2DXLib::Initialize (iSystem *pSystem)
+bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
 {
-  if (!csGraphics2D::Initialize (pSystem))
+  if (!csGraphics2D::Initialize (object_reg))
     return false;
 
   // Open display
@@ -86,7 +86,7 @@ bool csGraphics2DXLib::Initialize (iSystem *pSystem)
     XSetLocaleModifiers ("");
 
   // Query system settings
-  GetX11Settings (System, sim_depth, do_shm, do_hwmouse);
+  GetX11Settings (object_reg, sim_depth, do_shm, do_hwmouse);
 
   screen_num = DefaultScreen (dpy);
   root_window = RootWindow (dpy, screen_num);
@@ -265,9 +265,10 @@ bool csGraphics2DXLib::Initialize (iSystem *pSystem)
   memset (MouseCursor, 0, sizeof (MouseCursor));
 
   // Tell system driver to call us on every frame
-  System->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);
+  sys->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
   // Create the event outlet
-  EventOutlet = System->CreateEventOutlet (this);
+  EventOutlet = sys->CreateEventOutlet (this);
 
   return true;
 }
@@ -1160,7 +1161,7 @@ bool csGraphics2DXLib::HandleEvent (iEvent &Event)
 
   if ((Event.Type == csevBroadcast)
    && (Event.Command.Code == cscmdCommandLineHelp)
-   && System)
+   && object_reg)
   {
     printf ("Options for X-Windows 2D graphics driver:\n");
     printf ("  -sdepth=<depth>    set simulated depth (8, 15, 16, or 32) (default=none)\n");

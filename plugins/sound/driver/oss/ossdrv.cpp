@@ -261,7 +261,7 @@ csSoundDriverOSS::csSoundDriverOSS(iBase *piBase)
 {
   SCF_CONSTRUCT_IBASE(piBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
-  m_piSystem = NULL;
+  object_reg = NULL;
   m_piSoundRender = NULL;
   memorysize = 0;
   memory = NULL;
@@ -281,7 +281,7 @@ csSoundDriverOSS::~csSoundDriverOSS()
 bool csSoundDriverOSS::Open(iSoundRender *render, int frequency, bool bit16,
   bool stereo)
 {
-  csReport (m_piSystem->GetObjectRegistry (), CS_REPORTER_SEVERITY_NOTIFY,
+  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
   	"crystalspace.sound.oss",
     	"SoundDriver OSS selected");
   m_piSoundRender = render;

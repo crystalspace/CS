@@ -51,7 +51,7 @@ public:
 
   virtual bool Open ();
   virtual void Close ();
-  virtual bool Initialize (iSystem*);
+  virtual bool Initialize (iObjectRegistry*);
 
   void Report (int severity, const char* msg, ...);
 

@@ -155,7 +155,7 @@ void csSprite3DMeshObjectFactory::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
     rep->ReportV (severity, "crystalspace.mesh.sprite.3d", msg, arg);
   else
@@ -1670,7 +1670,7 @@ csSprite3DMeshObjectType::~csSprite3DMeshObjectType ()
 iMeshObjectFactory* csSprite3DMeshObjectType::NewFactory ()
 {
   csSprite3DMeshObjectFactory* cm = new csSprite3DMeshObjectFactory (this);
-  cm->System = System;
+  cm->object_reg = object_reg;
   iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;

@@ -142,7 +142,7 @@ class csMotionManager : public iMotionManager
   csAppliedMotionVector cache;
   csTicks oldtime;
   bool slerp;
-  iSystem* iSys;
+  iObjectRegistry* object_reg;
   
 public:
   SCF_DECLARE_IBASE;
@@ -150,7 +150,7 @@ public:
   csMotionManager(iBase *iParent);
   virtual ~csMotionManager();
 
-  virtual bool Initialize (iSystem *iSys);
+  virtual bool Initialize (iObjectRegistry *object_reg);
   virtual iMotion* FindByName (const char* name)
   {
     return FindClassByName(name);  
@@ -230,7 +230,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMotionManager);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 };

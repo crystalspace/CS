@@ -113,8 +113,8 @@ bool Simple::Initialize (int argc, const char* const argv[],
   if (!superclass::Initialize (argc, argv, iConfigName))
     return false;
 
-  csInitializeApplication (this);
   iObjectRegistry* object_reg = GetObjectRegistry ();
+  csInitializeApplication (object_reg);
 
   // Find the pointer to VFS.
   iVFS* VFS = CS_QUERY_REGISTRY (object_reg, iVFS);

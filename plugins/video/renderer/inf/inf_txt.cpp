@@ -26,8 +26,6 @@
 #include "isys/system.h"
 #include "igraphic/image.h"
 
-#define SysPrintf System->Printf
-
 //-------------------------------------------------------- csTextureHandleInfinite ---//
 
 csTextureHandleInfinite::csTextureHandleInfinite (csTextureManagerInfinite *txtmgr,
@@ -97,8 +95,8 @@ void csTextureHandleInfinite::Prepare ()
 
 //----------------------------------------------- csTextureManagerInfinite ---//
 
-csTextureManagerInfinite::csTextureManagerInfinite (iSystem *iSys,
-  iGraphics2D *iG2D, iConfigFile *config) : csTextureManager (iSys, iG2D)
+csTextureManagerInfinite::csTextureManagerInfinite (iObjectRegistry *object_reg,
+  iGraphics2D *iG2D, iConfigFile *config) : csTextureManager (object_reg, iG2D)
 {
   read_config (config);
   G2D = iG2D;

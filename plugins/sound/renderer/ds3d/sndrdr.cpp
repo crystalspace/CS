@@ -58,18 +58,19 @@ csSoundRenderDS3D::csSoundRenderDS3D(iBase *piBase)
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
   Listener = NULL;
   AudioRenderer = NULL;
-  System = NULL;
+  object_reg = NULL;
 }
 
-bool csSoundRenderDS3D::Initialize(iSystem *iSys)
+bool csSoundRenderDS3D::Initialize(iObjectRegistry *object_reg)
 {
-  System = iSys;
-  System->CallOnEvents(&scfiPlugin,
+  csSoundRenderDS3D::object_reg = object_reg;
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->CallOnEvents(&scfiPlugin,
     CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
   LoadFormat.Bits = -1;
   LoadFormat.Freq = -1;
   LoadFormat.Channels = -1;
-  Config.AddConfig(System, "/config/sound.cfg");
+  Config.AddConfig(object_reg, "/config/sound.cfg");
   return true;
 }
 
@@ -80,8 +81,7 @@ csSoundRenderDS3D::~csSoundRenderDS3D()
 
 bool csSoundRenderDS3D::Open()
 {
-  iReporter* reporter = CS_QUERY_REGISTRY (System->GetObjectRegistry (),
-  	iReporter);
+  iReporter* reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (reporter)
     reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
   	"crystalspace.sound.ds3d",
@@ -134,7 +134,8 @@ bool csSoundRenderDS3D::Open()
     	"  Volume: %g\n", GetVolume());
 
   csTicks et, ct;
-  System->GetElapsedTime(et, ct);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->GetElapsedTime(et, ct);
   LastTime = ct;
   
   return true;
@@ -204,7 +205,8 @@ void csSoundRenderDS3D::Update()
 {
   int i;
   csTicks et, ct;
-  System->GetElapsedTime(et, ct);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->GetElapsedTime(et, ct);
   csTicks ETime = ct - LastTime;
   LastTime = ct;
 

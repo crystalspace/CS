@@ -124,10 +124,9 @@ csRainFactoryLoader::~csRainFactoryLoader ()
 {
 }
 
-bool csRainFactoryLoader::Initialize (iSystem* system)
+bool csRainFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csRainFactoryLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -159,10 +158,9 @@ csRainFactorySaver::~csRainFactorySaver ()
 {
 }
 
-bool csRainFactorySaver::Initialize (iSystem* system)
+bool csRainFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csRainFactorySaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -205,10 +203,9 @@ csRainLoader::~csRainLoader ()
 {
 }
 
-bool csRainLoader::Initialize (iSystem* system)
+bool csRainLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csRainLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -403,10 +400,9 @@ csRainSaver::~csRainSaver ()
 {
 }
 
-bool csRainSaver::Initialize (iSystem* system)
+bool csRainSaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csRainSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }

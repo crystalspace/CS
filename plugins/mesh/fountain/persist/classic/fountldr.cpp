@@ -130,10 +130,9 @@ csFountainFactoryLoader::~csFountainFactoryLoader ()
 {
 }
 
-bool csFountainFactoryLoader::Initialize (iSystem* system)
+bool csFountainFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csFountainFactoryLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -166,10 +165,9 @@ csFountainFactorySaver::~csFountainFactorySaver ()
 {
 }
 
-bool csFountainFactorySaver::Initialize (iSystem* system)
+bool csFountainFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csFountainFactorySaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -214,10 +212,9 @@ csFountainLoader::~csFountainLoader ()
 {
 }
 
-bool csFountainLoader::Initialize (iSystem* system)
+bool csFountainLoader::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csFountainLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -451,10 +448,9 @@ csFountainSaver::~csFountainSaver ()
 {
 }
 
-bool csFountainSaver::Initialize (iSystem* system)
+bool csFountainSaver::Initialize (iObjectRegistry* object_reg)
 {
-  sys = system;
-  object_reg = system->GetObjectRegistry ();
+  csFountainSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }

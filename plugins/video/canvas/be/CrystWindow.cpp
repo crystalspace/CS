@@ -25,8 +25,8 @@
 #include "isys/system.h"
 #include "CrystWindow.h"
 
-CrystView::CrystView(BRect frame, iSystem* isys, BBitmap* ibmap) :
-  BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW), system(isys), bitmap(ibmap)
+CrystView::CrystView(BRect frame, iObjectRegistry* objreg, BBitmap* ibmap) :
+  BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW), object_reg(objreg), bitmap(ibmap)
 {
 }
 
@@ -36,7 +36,8 @@ CrystView::~CrystView()
 
 void CrystView::UserAction() const
 {
-  system->PerformExtension("UserAction", Looper()->CurrentMessage());
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->PerformExtension("UserAction", Looper()->CurrentMessage());
 }
 
 void CrystView::KeyDown(char const *bytes, int32 numBytes)
@@ -72,11 +73,10 @@ void CrystView::Draw(BRect r)
 }
 
 CrystWindow::CrystWindow(BRect frame, char const* name, CrystView* v,
-  iSystem* isys, iGraphics2D* ig2d) :
+  iObjectRegistry* objreg, iGraphics2D* ig2d) :
   BDirectWindow(frame, name, B_TITLED_WINDOW, B_NOT_RESIZABLE|B_NOT_ZOOMABLE),
-  view(v), system(isys), g2d(ig2d)
+  view(v), object_reg(objreg), g2d(ig2d)
 {
-  system->IncRef();
   g2d->IncRef();
   view->SetViewColor(0, 0, 0);
   AddChild(view);
@@ -88,12 +88,12 @@ CrystWindow::~CrystWindow()
   Hide();
   Flush();
   g2d->DecRef();
-  system->DecRef();
 }
 
 bool CrystWindow::QuitRequested()
 {
-  system->PerformExtension("ContextClose", g2d);
-  system->PerformExtension("Quit");
+  iSystem* sys = CS_GET_SYSTEM (objreg);	//@@@
+  sys->PerformExtension("ContextClose", g2d);
+  sys->PerformExtension("Quit");
   return false; // Allow Crystal Space to close window itself.
 }

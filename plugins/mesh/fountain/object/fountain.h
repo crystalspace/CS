@@ -73,7 +73,8 @@ public:
    * elevation is the angle of the direction (up/down) of the stream.
    *   angles in radians (2*PI is 360 degrees)
    */
-  csFountainMeshObject (iSystem* system, iMeshObjectFactory* factory);
+  csFountainMeshObject (iObjectRegistry* object_reg,
+  	iMeshObjectFactory* factory);
   /// Destructor.
   virtual ~csFountainMeshObject ();
 
@@ -262,11 +263,11 @@ public:
 class csFountainMeshObjectFactory : public iMeshObjectFactory
 {
 private:
-  iSystem* system;
+  iObjectRegistry* object_reg;
 
 public:
   /// Constructor.
-  csFountainMeshObjectFactory (iBase *pParent, iSystem* system);
+  csFountainMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csFountainMeshObjectFactory ();
@@ -286,7 +287,7 @@ public:
 class csFountainMeshObjectType : public iMeshObjectType
 {
 private:
-  iSystem* system;
+  iObjectRegistry* object_reg;
 
 public:
   SCF_DECLARE_IBASE;
@@ -306,8 +307,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csFountainMeshObjectType);
-    virtual bool Initialize (iSystem* p)
-    { scfParent->system = p; return true; }
+    virtual bool Initialize (iObjectRegistry* p)
+    { scfParent->object_reg = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;

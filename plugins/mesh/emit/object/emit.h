@@ -239,7 +239,7 @@ protected:
 public:
   /**
    */
-  csEmitMeshObject (iSystem* system, iMeshObjectFactory* factory);
+  csEmitMeshObject (iObjectRegistry* object_reg, iMeshObjectFactory* factory);
   /// Destructor.
   virtual ~csEmitMeshObject ();
 
@@ -382,11 +382,11 @@ public:
 class csEmitMeshObjectFactory : public iMeshObjectFactory
 {
 private:
-  iSystem* system;
+  iObjectRegistry* object_reg;
 
 public:
   /// Constructor.
-  csEmitMeshObjectFactory (iBase *pParent, iSystem* system);
+  csEmitMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csEmitMeshObjectFactory ();
@@ -425,7 +425,7 @@ public:
 class csEmitMeshObjectType : public iMeshObjectType
 {
 private:
-  iSystem* system;
+  iObjectRegistry* object_reg;
 
 public:
   SCF_DECLARE_IBASE;
@@ -445,8 +445,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csEmitMeshObjectType);
-    virtual bool Initialize (iSystem* p)
-    { scfParent->system = p; return true; }
+    virtual bool Initialize (iObjectRegistry* p)
+    { scfParent->object_reg = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
   friend struct eiPlugin;

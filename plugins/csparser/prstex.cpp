@@ -202,7 +202,8 @@ iTextureWrapper* csLoader::ParseProcTex (char *name, char* buf)
     return NULL;
   }
 
-  pt->Initialize (System, Engine, G3D ? G3D->GetTextureManager () : NULL, name);
+  pt->Initialize (object_reg, Engine,
+  	G3D ? G3D->GetTextureManager () : NULL, name);
   return pt->GetTextureWrapper ();
 }
 

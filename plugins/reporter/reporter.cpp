@@ -47,7 +47,7 @@ csReporter::csReporter (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugin);
-  System = NULL;
+  object_reg = NULL;
 }
 
 csReporter::~csReporter ()
@@ -61,9 +61,9 @@ csReporter::~csReporter ()
   }
 }
 
-bool csReporter::Initialize (iSystem *system)
+bool csReporter::Initialize (iObjectRegistry *object_reg)
 {
-  System = system;
+  csReporter::object_reg = object_reg;
   return true;
 }
 

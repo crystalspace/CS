@@ -63,12 +63,13 @@ NeXTDriver2D::~NeXTDriver2D()
 //-----------------------------------------------------------------------------
 // Initialize
 //-----------------------------------------------------------------------------
-bool NeXTDriver2D::Initialize(iSystem* s)
+bool NeXTDriver2D::Initialize(iObjectRegistry* s)
 {
   bool ok = superclass::Initialize(s);
   if (ok)
   {
-    s->CallOnEvents(&scfiPlugin, CSMASK_Broadcast);
+    iSystem* sys = CS_GET_SYSTEM (s);	//@@@
+    sys->CallOnEvents(&scfiPlugin, CSMASK_Broadcast);
     controller = NeXTDelegate2D_new(this);
     ok = init_driver(get_desired_depth());
   }
@@ -106,7 +107,7 @@ bool NeXTDriver2D::init_driver(int desired_depth)
     }
   }
   else
-    csReport(System->GetObjectRegistry(), CS_REPORTER_SEVERITY_ERROR,
+    csReport(object_reg, CS_REPORTER_SEVERITY_ERROR,
       NeXT_REPORTER_ID, "Bizarre internal error; support for 15- and 32-bit "
       "RGB only");
   return ok;
@@ -125,7 +126,6 @@ bool NeXTDriver2D::init_driver(int desired_depth)
 int NeXTDriver2D::get_desired_depth() const
 {
   int depth = 0;
-  iObjectRegistry* object_reg = System->GetObjectRegistry ();
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
   char const* s = cmdline->GetOption("simdepth");
@@ -133,12 +133,12 @@ int NeXTDriver2D::get_desired_depth() const
     depth = atoi(s);
   else
   {
-    csConfigAccess cfg(System, "/config/video.cfg");
+    csConfigAccess cfg(object_reg, "/config/video.cfg");
     depth = cfg->GetInt("Video.SimulateDepth", 0);
   }
   if (depth != 0 && depth != 15 && depth != 16 && depth != 32)
   {
-    csReport(System->GetObjectRegistry(),
+    csReport(object_reg,
       CS_REPORTER_SEVERITY_WARNING, NeXT_REPORTER_ID, 
       "WARNING: Ignoring request to simulate %d-bit RGB depth.\n"
       "WARNING: Can only simulate 15-, 16-, or 32-bit RGB depth.", depth);
@@ -195,7 +195,8 @@ void NeXTDriver2D::setup_rgb_32()
 //-----------------------------------------------------------------------------
 bool NeXTDriver2D::system_extension(char const* msg, va_list args) const
 {
-  return System->PerformExtensionV(msg, args);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  return sys->PerformExtensionV(msg, args);
 }
 
 N2D_PROTO(int,system_extension_v)
@@ -218,9 +219,10 @@ N2D_PROTO(int,system_extension)
 //-----------------------------------------------------------------------------
 void NeXTDriver2D::user_close() const
 {
-  System->GetSystemEventOutlet()->Broadcast(
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->GetSystemEventOutlet()->Broadcast(
     cscmdContextClose, (iGraphics2D*)this);
-  System->PerformExtension("requestshutdown");
+  sys->PerformExtension("requestshutdown");
 }
 
 N2D_PROTO(void,user_close)(NeXTDriverHandle2D handle)
@@ -232,7 +234,7 @@ N2D_PROTO(void,user_close)(NeXTDriverHandle2D handle)
 //-----------------------------------------------------------------------------
 bool NeXTDriver2D::Open()
 {
-  csReport(System->GetObjectRegistry(), CS_REPORTER_SEVERITY_NOTIFY,
+  csReport(object_reg, CS_REPORTER_SEVERITY_NOTIFY,
     NeXT_REPORTER_ID, CS_PLATFORM_NAME " 2D graphics driver for Crystal Space "
     CS_VERSION_NUMBER "\nWritten by Eric Sunshine <sunshine@sunshineco.com>");
   
@@ -314,7 +316,7 @@ bool NeXTDriver2D::HandleEvent(iEvent& e)
 //-----------------------------------------------------------------------------
 void NeXTDriver2D::usage_summary() const
 {
-  if (System != 0)
+  if (object_reg != 0)
     printf (
       "Options for " CS_PLATFORM_NAME " 2D graphics driver:\n"
       "  -simdepth=<depth>  Simulate depth (15, 16, or 32) (default=none)\n");

@@ -44,13 +44,12 @@ csGraphics2DGLBe::~csGraphics2DGLBe()
 {
 }
 
-bool csGraphics2DGLBe::Initialize(iSystem* p)
+bool csGraphics2DGLBe::Initialize(iObjectRegistry* p)
 {
   bool ok = csGraphics2DGLCommon::Initialize(p);
   if (ok)
   {
-    iReporter* reporter = CS_QUERY_REGISTRY (p->GetObjectRegistry (),
-    	iReporter);
+    iReporter* reporter = CS_QUERY_REGISTRY (p, iReporter);
     if (reporter)
       reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
         "crystalspace.canvas.glbe2d",
@@ -81,8 +80,8 @@ bool csGraphics2DGLBe::Open()
     win_rect.Set(x, y, x + vw, y + vh);
   }
 
-  view = new CrystGLView(BRect(0, 0, vw, vh), System);
-  window = new CrystGLWindow(win_rect, win_title, view, System, this);
+  view = new CrystGLView(BRect(0, 0, vw, vh), object_reg);
+  window = new CrystGLWindow(win_rect, win_title, view, object_reg, this);
 
   window->Show();
   if (window->Lock())
@@ -91,7 +90,8 @@ bool csGraphics2DGLBe::Open()
     window->Unlock();
   }
   window->Flush();
-  System->PerformExtension("BeginUI");
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->PerformExtension("BeginUI");
 
   return superclass::Open();
 }
@@ -133,7 +133,8 @@ void csGraphics2DGLBe::Print(csRect*)
 
 bool csGraphics2DGLBe::SetMouseCursor(csMouseCursorID shape)
 {
-  return System->PerformExtension("SetCursor", shape);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  return sys->PerformExtension("SetCursor", shape);
 }
 
 void csGraphics2DGLBe::ApplyDepthInfo(color_space cs)

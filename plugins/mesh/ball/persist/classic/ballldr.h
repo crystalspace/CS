@@ -25,7 +25,6 @@
 #include "isys/plugin.h"
 
 struct iEngine;
-struct iSystem;
 struct iReporter;
 struct iPluginManager;
 struct iObjectRegistry;
@@ -36,7 +35,6 @@ struct iObjectRegistry;
 class csBallFactoryLoader : public iLoaderPlugin
 {
 private:
-  iSystem* sys;
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
   iReporter* reporter;
@@ -51,7 +49,7 @@ public:
   virtual ~csBallFactoryLoader ();
 
   /// Register plugin with the system driver
-  virtual bool Initialize (iSystem *pSystem);
+  virtual bool Initialize (iObjectRegistry *object_reg);
 
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
@@ -59,7 +57,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csBallFactoryLoader);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 };
@@ -70,7 +69,6 @@ public:
 class csBallFactorySaver : public iSaverPlugin
 {
 private:
-  iSystem* sys;
   iReporter* reporter;
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
@@ -85,7 +83,7 @@ public:
   virtual ~csBallFactorySaver ();
 
   /// Register plugin with the system driver
-  virtual bool Initialize (iSystem *pSystem);
+  virtual bool Initialize (iObjectRegistry *object_reg);
 
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
@@ -93,7 +91,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csBallFactorySaver);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 };
@@ -104,7 +103,6 @@ public:
 class csBallLoader : public iLoaderPlugin
 {
 private:
-  iSystem* sys;
   iReporter* reporter;
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
@@ -119,7 +117,7 @@ public:
   virtual ~csBallLoader ();
 
   /// Register plugin with the system driver
-  virtual bool Initialize (iSystem *pSystem);
+  virtual bool Initialize (iObjectRegistry *object_reg);
 
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
@@ -127,7 +125,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csBallLoader);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 };
@@ -138,7 +137,6 @@ public:
 class csBallSaver : public iSaverPlugin
 {
 private:
-  iSystem* sys;
   iReporter* reporter;
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
@@ -153,7 +151,7 @@ public:
   virtual ~csBallSaver ();
 
   /// Register plugin with the system driver
-  virtual bool Initialize (iSystem *pSystem);
+  virtual bool Initialize (iObjectRegistry *object_reg);
 
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
@@ -161,7 +159,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csBallSaver);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 };

@@ -25,29 +25,27 @@
 
 csConfigAccess::csConfigAccess()
 {
-  System = NULL;
+  object_reg = NULL;
 }
 
-csConfigAccess::csConfigAccess(iSystem *sys, const char *fname,
+csConfigAccess::csConfigAccess(iObjectRegistry *object_reg, const char *fname,
   bool vfs, int priority)
 {
-  AddConfig(sys, fname, vfs, priority);
+  AddConfig(object_reg, fname, vfs, priority);
 }
 
 csConfigAccess::~csConfigAccess()
 {
-  iConfigManager* cfgmgr = CS_QUERY_REGISTRY (System->GetObjectRegistry (),
-      iConfigManager);
+  iConfigManager* cfgmgr = CS_QUERY_REGISTRY (object_reg, iConfigManager);
   for (long i=0; i<ConfigFiles.Length(); i++)
     cfgmgr->RemoveDomain ((iConfigFile*)ConfigFiles.Get(i));
 }
 
-void csConfigAccess::AddConfig(iSystem *sys, const char *fname,
+void csConfigAccess::AddConfig(iObjectRegistry *object_reg, const char *fname,
   bool vfs, int priority)
 {
-  System = sys;
-  iConfigManager* cfgmgr = CS_QUERY_REGISTRY (System->GetObjectRegistry (),
-      iConfigManager);
+  csConfigAccess::object_reg = object_reg;
+  iConfigManager* cfgmgr = CS_QUERY_REGISTRY (object_reg, iConfigManager);
   iVFS* VFS = NULL;
   if (vfs)
   {
@@ -56,7 +54,7 @@ void csConfigAccess::AddConfig(iSystem *sys, const char *fname,
     // VFS is added to the object registry. In the future we have
     // to see if we cannot avoid this.
     iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (
-	System->GetObjectRegistry (), iPluginManager);
+	object_reg, iPluginManager);
     VFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
     //CS_ASSERT (VFS != NULL);
   }
@@ -65,14 +63,12 @@ void csConfigAccess::AddConfig(iSystem *sys, const char *fname,
 
 iConfigFile *csConfigAccess::operator->()
 {
-  iObjectRegistry* object_reg = System->GetObjectRegistry ();
   iConfigFile* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
   return cfg;
 }
 
 csConfigAccess::operator iConfigFile* ()
 {
-  iObjectRegistry* object_reg = System->GetObjectRegistry ();
   iConfigFile* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
   return cfg;
 }

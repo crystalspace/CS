@@ -56,14 +56,15 @@ unsigned char *csGraphics2Dps2::GetPixelAt (int x, int y) {
   return &framebuffer[x+(y*VIRTUAL_WIDTH)];
 }
 
-bool csGraphics2Dps2::Initialize (iSystem *pSystem)
+bool csGraphics2Dps2::Initialize (iObjectRegistry *object_reg)
 {
-  if (!csGraphics2D::Initialize (pSystem))
+  if (!csGraphics2D::Initialize (object_reg))
     return false;
   // Tell system driver to call us on every frame
-  System->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
   // Create the event outlet
-  EventOutlet = System->CreateEventOutlet (this);
+  EventOutlet = sys->CreateEventOutlet (this);
   return true;
 }
 

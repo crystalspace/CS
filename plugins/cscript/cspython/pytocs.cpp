@@ -66,6 +66,5 @@ void InitPytocs() {
   Py_InitModule("pytocs", PytocsMethods);
   initcspacec();
 //TODO temporary
-  //System=NULL;
 }
 

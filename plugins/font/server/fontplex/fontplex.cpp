@@ -56,9 +56,8 @@ csFontServerMultiplexor::~csFontServerMultiplexor ()
 {
 }
 
-bool csFontServerMultiplexor::Initialize (iSystem *System)
+bool csFontServerMultiplexor::Initialize (iObjectRegistry *object_reg)
 {
-  iObjectRegistry* object_reg = System->GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   // Query the auxiliary font servers in turn
   char funcid [20];

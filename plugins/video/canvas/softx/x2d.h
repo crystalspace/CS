@@ -103,7 +103,7 @@ public:
   csGraphics2DXLib (iBase*);
   virtual ~csGraphics2DXLib ();
 
-  virtual bool Initialize (iSystem*);
+  virtual bool Initialize (iObjectRegistry*);
   virtual bool Open ();
   virtual void Close ();
 

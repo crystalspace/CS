@@ -102,8 +102,8 @@ bool Video::Initialize (int argc, const char* const argv[],
   if (!superclass::Initialize (argc, argv, iConfigName))
     return false;
 
-  csInitializeApplication (this);
   object_reg = GetObjectRegistry ();
+  csInitializeApplication (object_reg);
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // Find the pointer to engine plugin

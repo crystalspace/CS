@@ -793,7 +793,7 @@ int main (int argc, char *argv[])
     return -1;
   }
 
-  csInitializeApplication (&System);
+  csInitializeApplication (object_reg);
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);

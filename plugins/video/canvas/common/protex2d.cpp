@@ -25,9 +25,10 @@
 #include "isys/plugin.h"
 #include "iutil/objreg.h"
 
-csProcTextureSoft2D::csProcTextureSoft2D (iSystem *isys) : csGraphics2D (NULL)
+csProcTextureSoft2D::csProcTextureSoft2D (iObjectRegistry *object_reg)
+	: csGraphics2D (NULL)
 {
-  System = isys;
+  csProcTextureSoft2D::object_reg = object_reg;
   image_buffer = NULL;
   destroy_memory = false;
 }
@@ -134,7 +135,7 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
   }
 
   // Get the font server, as we've bypassed csGraphics2D::Initialize
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (System->GetObjectRegistry (),
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg,
   	iPluginManager);
   FontServer = CS_QUERY_PLUGIN_ID (plugin_mgr,
   	CS_FUNCID_FONTSERVER, iFontServer);
@@ -148,7 +149,8 @@ void csProcTextureSoft2D::Close ()
   // These arrays are shared with the texture, the texture will destroy them.
   Palette = NULL;
   csGraphics2D::Close ();
-  System->GetSystemEventOutlet ()->Broadcast (cscmdContextClose, this);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->GetSystemEventOutlet ()->Broadcast (cscmdContextClose, this);
 }
 
 void csProcTextureSoft2D::Print (csRect *area)

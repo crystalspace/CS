@@ -1677,7 +1677,7 @@ csLoader::csLoader(iBase *p)
   SCF_CONSTRUCT_IBASE(p);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
 
-  System = NULL;
+  object_reg = NULL;
   VFS = NULL;
   ImageLoader = NULL;
   SoundLoader = NULL;
@@ -1707,10 +1707,9 @@ csLoader::~csLoader()
 #define GET_PLUGIN(var, func, intf, msgname)	\
   var = CS_QUERY_PLUGIN_ID(plugin_mgr, func, intf);
 
-bool csLoader::Initialize(iSystem *iSys)
+bool csLoader::Initialize(iObjectRegistry *object_Reg)
 {
-  System = iSys;
-  object_reg = System->GetObjectRegistry ();
+  csLoader::object_reg = object_Reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   GET_PLUGIN (Reporter, CS_FUNCID_REPORTER, iReporter, "reporter");

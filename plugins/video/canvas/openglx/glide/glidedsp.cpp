@@ -40,7 +40,7 @@ csOpenGLGlideDisp::csOpenGLGlideDisp (iBase *iParent)
   SCF_CONSTRUCT_IBASE (iParent);
 }
 
-bool csOpenGLGlideDisp::Initialize(iSystem */*pSystem*/)
+bool csOpenGLGlideDisp::Initialize(iObjectRegistry *)
 {
    // This environment setting prevents fxmesa from setting atexit handlers
    // which when used in conjunction with scf (dlopen) causes at least with

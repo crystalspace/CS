@@ -218,7 +218,8 @@ public:
   uint16 *GlobalCMap;
 
   ///
-  csTextureManagerNull (iSystem *iSys, iGraphics2D *iG2D, iConfigFile *config);
+  csTextureManagerNull (iObjectRegistry *object_reg,
+  	iGraphics2D *iG2D, iConfigFile *config);
   ///
   virtual ~csTextureManagerNull ();
 

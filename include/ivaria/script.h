@@ -21,7 +21,7 @@
 
 #include "csutil/scf.h"
 
-struct iSystem;
+struct iObjectRegistry;
 
 SCF_VERSION (iScript, 0, 0, 1);
 
@@ -31,7 +31,7 @@ SCF_VERSION (iScript, 0, 0, 1);
 struct iScript : public iBase
 {
   /// Initialize
-  virtual bool Initialize (iSystem *iSys) = 0;
+  virtual bool Initialize (iObjectRegistry *object_reg) = 0;
   /// RunText
   virtual bool RunText (const char *iStr) = 0;
   /// LoadModule

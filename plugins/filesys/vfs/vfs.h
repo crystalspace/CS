@@ -125,7 +125,7 @@ class csVFS : public iVFS
   // Directory stack (used in PushDir () and PopDir ())
   csStrVector dirstack;
   // The pointer to system driver interface
-  iSystem *System;
+  iObjectRegistry *object_reg;
 
 public:
   SCF_DECLARE_IBASE;
@@ -186,7 +186,7 @@ public:
   virtual bool SaveMounts (const char *FileName);
 
   /// Initialize the Virtual File System
-  virtual bool Initialize (iSystem *iSys);
+  virtual bool Initialize (iObjectRegistry *object_reg);
 
   /// Query file local date/time
   virtual bool GetFileTime (const char *FileName, csFileTime &oTime) const;
@@ -207,7 +207,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csVFS);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 

@@ -23,14 +23,13 @@
 #include "ogl_g3dcom.h"
 #include "csgeom/polyclip.h"
 #include "isys/event.h"
+#include "iutil/objreg.h"
 
 #if defined(CS_OPENGL_PATH)
 #include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
 #else
 #include <GL/gl.h>
 #endif
-
-#define SysPrintf System->Printf
 
 csOpenGLProcBackBuffer::csOpenGLProcBackBuffer (iBase *parent) :
   csGraphics3DOGLCommon (parent)
@@ -50,7 +49,8 @@ csOpenGLProcBackBuffer::~csOpenGLProcBackBuffer ()
   lightmap_cache = NULL;
   m_fogtexturehandle = 0;
   delete [] buffer;
-  System->GetSystemEventOutlet ()->Broadcast (cscmdContextClose, (void*)G2D);
+  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
+  sys->GetSystemEventOutlet ()->Broadcast (cscmdContextClose, (void*)G2D);
 }
 
 void csOpenGLProcBackBuffer::Close ()
@@ -65,7 +65,8 @@ void csOpenGLProcBackBuffer::Prepare (csGraphics3DOGLCommon *g3d,
   persistent = bpersistent;
   this->g3d = g3d;
   this->tex_mm = tex_mm;
-  System = g3d->System;
+  object_reg = g3d->object_reg;
+  CS_ASSERT (object_reg != NULL);
   g2d = g3d->GetDriver2D ();
 
   tex_mm->GetMipMapDimensions(0, width, height);

@@ -86,7 +86,7 @@ public:
   csGraphics2DLineXLib (iBase *iParent);
   virtual ~csGraphics2DLineXLib ();
 
-  virtual bool Initialize (iSystem *pSystem);
+  virtual bool Initialize (iObjectRegistry *object_reg);
   virtual bool Open ();
   virtual void Close ();
 
@@ -164,7 +164,7 @@ public:
 
   csLineX2DFontServer (iBase *iParent);
   virtual ~csLineX2DFontServer () {}
-  virtual bool Initialize (iSystem *)
+  virtual bool Initialize (iObjectRegistry *)
   { return true; }
   virtual iFont *LoadFont (const char *filename);
   virtual int GetFontCount ()
@@ -175,7 +175,8 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csLineX2DFontServer);
-    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool Initialize (iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 };

@@ -60,7 +60,7 @@ csMetaBall::csMetaBall (iMeshObjectFactory *fact)
   alpha = frame = 0;
   meta_balls = NULL;
   factory = fact;
-  Sys = NULL;
+  object_reg = NULL;
   vis_cb = NULL;
   do_lighting = false;
   initialize = false;
