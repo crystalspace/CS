@@ -741,16 +741,16 @@ void csSystemDriver::Help ()
 void csSystemDriver::Alert (const char* msg)
 {
   ConsoleOut (msg);
-  debug_out (true, msg);
+  DebugTextOut (true, msg);
 }
 
 void csSystemDriver::Warn (const char* msg)
 {
   ConsoleOut (msg);
-  debug_out (true, msg);
+  DebugTextOut (true, msg);
 }
 
-void csSystemDriver::debug_out (bool flush, const char *str)
+void csSystemDriver::DebugTextOut (bool flush, const char *str)
 {
   static FILE *f = NULL;
   if (!f)
@@ -875,7 +875,7 @@ void csSystemDriver::PrintfV (int mode, char const* format, va_list args)
 
     case CS_MSG_INITIALIZATION:
       ConsoleOut (buf);
-      debug_out (true, buf);
+      DebugTextOut (true, buf);
       if (Console)
         Console->PutText (CS_MSG_INITIALIZATION, buf);
       break;
@@ -892,31 +892,31 @@ void csSystemDriver::PrintfV (int mode, char const* format, va_list args)
       break;
 
     case CS_MSG_DEBUG_0:
-      debug_out (false, buf);
+      DebugTextOut (false, buf);
       break;
 
     case CS_MSG_DEBUG_1:
       if (debug_level >= 1)
-        debug_out (false, buf);
+        DebugTextOut (false, buf);
       break;
 
     case CS_MSG_DEBUG_2:
       if (debug_level >= 2)
-        debug_out (false, buf);
+        DebugTextOut (false, buf);
       break;
 
     case CS_MSG_DEBUG_0F:
-      debug_out (true, buf);
+      DebugTextOut (true, buf);
       break;
 
     case CS_MSG_DEBUG_1F:
       if (debug_level >= 1)
-        debug_out (true, buf);
+        DebugTextOut (true, buf);
       break;
 
     case CS_MSG_DEBUG_2F:
       if (debug_level >= 2)
-        debug_out (true, buf);
+        DebugTextOut (true, buf);
       break;
   } /* endswitch */
 }

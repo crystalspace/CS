@@ -526,7 +526,7 @@ void SysSystemDriver::Alert (const char* s)
   }
 
   MessageBox (NULL, s, "Fatal Error", MB_OK | MB_ICONSTOP);
-  debug_out (true, s);
+  DebugTextOut (true, s);
 }
 
 //----------------------------------------------// SCF Implementation //------//

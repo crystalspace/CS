@@ -306,7 +306,7 @@ public:
   static bool InstallPath (char *oInstallPath, size_t iBufferSize);
 
   /// Print a string into debug.txt
-  static void debug_out (bool flush, const char* str);
+  static void DebugTextOut (bool flush, const char* str);
 
   /**
    * Printf version that works on all systems.
