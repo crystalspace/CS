@@ -225,6 +225,15 @@ The history order has been reversed so that new features are at the top.
 	    - Fixed MazeD so that it works with the new CSWS architecture.
 	      No other enhancements though :-(
 	- Fixed a bug in walktest related to the patch above.
+	- Samuel Humphreys fixed dtsimple after the big Andrew/Jorrit
+	  changes.
+	- Norman Kramer fixed commandline processing after Andrew broke
+	  it again...
+	- Norman fixed glide renderer after Jorrit's changes. Code is
+	  untested though.
+     	- Norman fixed OpenGL:
+	    - added missing PerformExtension () dummies
+            - replaced QueueContextCloseEvent with the new EventOutlet method
 3-Aug-2000
 	- Norman Kramer added clipping code to openglcommon canvas code,
 	  especially to font drawing.
