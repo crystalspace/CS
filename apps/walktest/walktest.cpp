@@ -1273,19 +1273,19 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
   // Find the model converter plugin
   ModelConverter = CS_QUERY_REGISTRY (object_reg, iModelConverter);
-  if (!ModelConverter)
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "No model converter plugin!");
-    return false;
-  }
+  //if (!ModelConverter)
+  //{
+    //Report (CS_REPORTER_SEVERITY_ERROR, "No model converter plugin!");
+    //return false;
+  //}
 
   // Find the model crossbuilder plugin
   CrossBuilder = CS_QUERY_REGISTRY (object_reg, iCrossBuilder);
-  if (!CrossBuilder)
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "No model crossbuilder plugin!");
-    return false;
-  }
+  //if (!CrossBuilder)
+  //{
+    //Report (CS_REPORTER_SEVERITY_ERROR, "No model crossbuilder plugin!");
+    //return false;
+  //}
 
   // performance statistics module.
   perf_stats = CS_QUERY_REGISTRY (object_reg, iPerfStats);

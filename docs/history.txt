@@ -27,6 +27,12 @@ chronological order.
 	- res added the Joystick plugin for Windows (utilizing DirectInput)
 	  and the joytest app contributed by Turbo J <turboj@web.de>.
 	- res augmented the DirectX configure check to include DirectInput.
+	- Jorrit removed 'motion', 'csbmpimg', and 'fontplex' targets from
+	  'jam walkall'. These are not required by walktest. Added 'spiral'
+	  and 'spirldr' to the meshes target.
+	- Jorrit made 'ieplex' optional in walktest and then removed the
+	  target from 'jam walkall'.
+	- Jorrit removed 'crossbld' from the 'meshes' target.
 15-Oct-2003
 	- Eric Sunshine fixed a bug in RemoveDups from helper.jam.  It was
 	  trying to dereference a variable using an 8-bit character instead of

@@ -6,4 +6,5 @@ Plugin spiral
 LinkWith spiral : partgen cstool csgeom csutil ;
 
 Help spiral : "Spiral mesh object plug-in" ;
+CompileGroups spiral :  meshes ;
 

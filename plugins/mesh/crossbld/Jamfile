@@ -6,5 +6,4 @@ Plugin crossbld
 LinkWith crossbld : csgeom cstool csutil ;
 
 Help crossbld : "Mesh object cross-builder plug-in" ;
-CompileGroups crossbld :  meshes ;
 

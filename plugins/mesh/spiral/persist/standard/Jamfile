@@ -6,4 +6,5 @@ Plugin spirldr
 LinkWith spirldr : csgeom csutil ;
 
 Help spirldr : "Spiral mesh object loader" ;
+CompileGroups spirldr : meshes ;
 
