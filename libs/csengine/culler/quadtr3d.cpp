@@ -128,7 +128,7 @@ csQuadTree3D::csQuadTree3D (const csVector3& start_center,
 
   if(max_depth < 1)
   {
-    CsPrintf(MSG_FATAL_ERROR, "QuadTree3D: Depth too small\n");
+    CsPrintf(MSG_FATAL_ERROR, "QuadTree3D: Depth too small.\n");
     exit(1);
   }
 
@@ -157,7 +157,7 @@ csQuadTree3D::csQuadTree3D (const csVector3& start_center,
   /// 4 nodes per byte, the root node is stored seperately
   state_size = (nr_nodes - 1) / 4;
   printf("QuadTree3D: depth %d, nodes %d, leaves %d, statesize %d"
-    " bytes\n", max_depth, nr_nodes, nr_leaves, state_size);
+    " bytes.\n", max_depth, nr_nodes, nr_leaves, state_size);
 
   if(state_size > 0)
   {
@@ -274,7 +274,7 @@ void csQuadTree3D::CallChildren(quad_traverse_func func, csQuadTree3D* pObj,
 	  child_verts[0] = parent_verts[0] + child_v; break;
         case 3 /*bottomright*/ :
 	  child_verts[0] = parent_verts[0] + child_u + child_v; break;
-        default: CsPrintf(MSG_FATAL_ERROR, "QuadTree3D: Unknown child\n");
+        default: CsPrintf(MSG_FATAL_ERROR, "QuadTree3D: Unknown child.\n");
       }
       child_verts[1] = child_verts[0] + child_u;
       child_verts[2] = child_verts[1] + child_v;
@@ -302,7 +302,7 @@ int csQuadTree3D::GetNodeState(int offset, int bytepos) const
 {
   if(offset > state_size)
   {
-    CsPrintf(MSG_INTERNAL_ERROR, "QuadTree3D: state out of range\n");
+    CsPrintf(MSG_INTERNAL_ERROR, "QuadTree3D: state out of range.\n");
     return 0;
   }
   if(offset == -1)
@@ -324,7 +324,7 @@ void csQuadTree3D::SetNodeState(int offset, int bytepos, int newstate)
 {
   if(offset > state_size)
   {
-    CsPrintf(MSG_INTERNAL_ERROR, "QuadTree3D: setstate out of range\n");
+    CsPrintf(MSG_INTERNAL_ERROR, "QuadTree3D: setstate out of range.\n");
     return;
   }
   if(offset == -1)
@@ -391,10 +391,25 @@ int csQuadTree3D::insert_polygon_func (csQuadTree3D* pObj,
   /// So, the polygon bbox overlaps this node. How much?
   ///----------------------------------------------------
 
-  if(0)
+  if(1)
   printf("quadtree3d at %d Checking node %d+%d %d,%d (%d)\n", node_pos->depth,
     node_pos->offset, node_pos->bytepos, node_pos->node_x, node_pos->node_y,
     node_state);
+  if(0)
+  printf("quadtree3d rect (%f,%f,%f), (%f,%f,%f), (%f,%f,%f), (%f,%f,%f).\n",
+    node_pos->frust->GetVertices()[0].x,
+    node_pos->frust->GetVertices()[0].y,
+    node_pos->frust->GetVertices()[0].z,
+    node_pos->frust->GetVertices()[1].x,
+    node_pos->frust->GetVertices()[1].y,
+    node_pos->frust->GetVertices()[1].z,
+    node_pos->frust->GetVertices()[2].x,
+    node_pos->frust->GetVertices()[2].y,
+    node_pos->frust->GetVertices()[2].z,
+    node_pos->frust->GetVertices()[3].x,
+    node_pos->frust->GetVertices()[3].y,
+    node_pos->frust->GetVertices()[3].z );
+    
 
   /// is the whole node covered?
   /// // first check bounding boxes then precisely.
@@ -411,35 +426,35 @@ int csQuadTree3D::insert_polygon_func (csQuadTree3D* pObj,
   }
 
   /// So we are sure that a part of the node is covered.
-    int old_node_state = node_state;
-    // so it overlaps a bit.
-    if(node_state == CS_QUAD3D_EMPTY && node_pos->depth < pObj->max_depth)
-    {
-      // mark children as empty now, since they should be empty, and
-      // can be reached now...
-      pObj->CallChildren(&csQuadTree3D::mark_node_func, pObj,
-        node_pos, (void*)CS_QUAD3D_EMPTY);
-    }
-    // this node is partially covered.
-    if(!info.test_only)
-      pObj->SetNodeState(node_pos, CS_QUAD3D_PARTIAL);
-    // if any children they can process the polygon too. And they determine
-    // the return value.
-    if(node_pos->depth < pObj->max_depth)
-    {
-      int retval[4];
-      pObj->CallChildren(&csQuadTree3D::insert_polygon_func, pObj,
-        node_pos, data, retval);
-      /// @@@ the polygon could have caused a child to become FULL and thus
-      /// all children could be FULL now, in which case we should be FULL too.
-      return pObj->GetPolygonResult(retval);
-    }
-    /// no children, return value for change, either
-    /// EMPTY->PARTIAL (certain change) or
-    /// PARTIAL->PARTIAL (possible change)
-    if(old_node_state == CS_QUAD3D_EMPTY)
-      return CS_QUAD3D_CERTAINCHANGE;
-    return CS_QUAD3D_POSSIBLECHANGE;
+  int old_node_state = node_state;
+  // so it overlaps a bit.
+  if(node_state == CS_QUAD3D_EMPTY && node_pos->depth < pObj->max_depth)
+  {
+    // mark children as empty now, since they should be empty, and
+    // can be reached now...
+    pObj->CallChildren(&csQuadTree3D::mark_node_func, pObj,
+      node_pos, (void*)CS_QUAD3D_EMPTY);
+  }
+  // this node is partially covered.
+  if(!info.test_only)
+    pObj->SetNodeState(node_pos, CS_QUAD3D_PARTIAL);
+  // if any children they can process the polygon too. And they determine
+  // the return value.
+  if(node_pos->depth < pObj->max_depth)
+  {
+    int retval[4];
+    pObj->CallChildren(&csQuadTree3D::insert_polygon_func, pObj,
+      node_pos, data, retval);
+    /// @@@ the polygon could have caused a child to become FULL and thus
+    /// all children could be FULL now, in which case we should be FULL too.
+    return pObj->GetPolygonResult(retval);
+  }
+  /// no children, return value for change, either
+  /// EMPTY->PARTIAL (certain change) or
+  /// PARTIAL->PARTIAL (possible change)
+  if(old_node_state == CS_QUAD3D_EMPTY)
+    return CS_QUAD3D_CERTAINCHANGE;
+  return CS_QUAD3D_POSSIBLECHANGE;
 }
 
 
