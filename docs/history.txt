@@ -25,6 +25,9 @@ The history order is reversed so that new features are at the top.
 	  joystick.cfg.
 	- Eric Sunshine updated vfs.cfg and joystick.cfg to agree with the new
 	  normalized CS_PLATFORM_NAME.
+	- Eric Sunshine udpated NASM URL in user manual.
+	- Eric Sunshine updated aged entries in Contributors section of user
+	  manual.
 6-Jan-2002
 	- Fixed a stupid bug in Dynavis. Dynavis wasn't correctly updating
 	  the kdtree when objects moved. The reason was that UpdateObjects()

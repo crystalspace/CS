@@ -82,7 +82,7 @@ files.
 routines, for performance enhancement.  This is optional.
 
 @noindent
-@url{http://nasm.2y.net/}
+@url{http://nasm.sourceforge.net/}
 
 @item @sc{ascii} Art Library
 aalib is used for 2D rendering in text mode.  This is optional and only needed

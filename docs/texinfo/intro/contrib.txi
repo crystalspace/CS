@@ -281,8 +281,7 @@ graphics drivers in general. He introduced the first @sc{mmx} support.
 He also rewrote the @sc{djgpp} port (non-Allegro)
 to use 16-bit and also support more video modes.
 @item
-He recently ported almost all assembly to @sc{nasm} and wrote a few new
-routines.
+He ported almost all assembly to @sc{nasm} and wrote a few new routines.
 @item
 He also improved speed of fog and alpha transparency a lot.
 @item
@@ -594,22 +593,22 @@ Robert maintained the now-defunct pre-Carbon Macintosh port.
 @item
 Norman Kramer (@email{normank@@lycosmail.com})
 
-Norman contributed several fixes and new features and helped with code
-cleanup. In particular he worked on the sound code, the engine, @sc{csws} and
-the graphics drivers. He also worked on the image loaders. For example he
-split the former monolithic image loader into several modules, added saving to
-many of the image loaders, fixed the @sc{bmp} loader so that it is endian
-correct and added @sc{rle8} encoding to the @sc{bmp} loader. Norman also added
-the @code{csQuaternion} class and has been bringing the Glide drivers up to
-date. Norman contributed a FreeType font server plug-in.  Most recently, he
-added a grid-view to @sc{csws}. He also added a sound renderer using the artsd
-soundserver that comes with the aRts system (see www.arts-project.org). Norman
-added an export script for Blender. He added texture coordinate animation to
-2D sprites. He worked on the video file streamer. Norman also added the
-(unused) @code{csCrystalBall} culler and the fancy console plugin.
-In addition he has also worked a lot on the OpenGL renderer (mostly support
-for extensions). Lately Norman worked on @sc{aws} and a convertor from @sc{qt}
-to @sc{aws}.  Norman also added several sound related modules like ogg.
+Norman contributed several fixes and new features and helped with code cleanup.
+In particular he worked on the sound code, the engine, @sc{csws} and the
+graphics drivers.  He also worked on the image loaders.  For example he split
+the former monolithic image loader into several modules, added saving to many
+of the image loaders, fixed the @sc{bmp} loader so that it is endian correct
+and added @sc{rle8} encoding to the @sc{bmp} loader.  Norman also added the
+@code{csQuaternion} class and has been bringing the Glide drivers up to date.
+Norman contributed a FreeType font server plug-in.  He added a grid-view to
+@sc{csws}.  He also added a sound renderer using the artsd soundserver that
+comes with the aRts system (see www.arts-project.org).  Norman added an export
+script for Blender.  He added texture coordinate animation to 2D sprites.  He
+worked on the video file streamer.  Norman also added the (unused)
+@code{csCrystalBall} culler and the fancy console plugin.  In addition he has
+also worked a lot on the OpenGL renderer (mostly support for extensions).
+Lately Norman worked on @sc{aws} and a convertor from @sc{qt} to @sc{aws}.
+Norman also added several sound related modules like ogg.
 
 @item
 Nicholas Francis (@email{nicholasfrancis@@iname.com})
@@ -769,9 +768,9 @@ the console (during lighting) and added a new way to do bilinear filtering for
 the software renderer.  He also dramatically improved the quality of the
 precalculated lightmaps.  Denis also improved the movement system in WalkTest
 by implementing gravity and better collision detection (using the collision
-detection system from Alex Pfaffe). He added the @file{metademo} application
-which has recently been reworked to the @file{metaballs} mesh object. He also
-fixed a lot of bugs.
+detection system from Alex Pfaffe).  He added the @file{metademo} application
+which was later reworked to the @file{metaballs} mesh object.  He also fixed a
+number of bugs.
 
 @item
 Thomas Hieber (@email{thieber@@gmx.net})
@@ -1203,7 +1202,7 @@ engine to a plug-in.
 @item
 Dan Bogdanov
 
-Dan recently became port maintainer for @sc{djgpp}.
+Dan was the @sc{djgpp} port maintainer for a while.
 
 @item
 Matt Reda (@email{mreda@@mac.com})
