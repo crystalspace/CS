@@ -104,7 +104,7 @@ void csRadPoly :: GetLumelWorldCoords(csVector3& res, int x, int y)
   csMatrix3 m_t2w = m_world2tex->GetInverse ();
   csVector3 vv = *v_world2tex;
 
-  csVector3 v1, v2;
+  csVector3 v1(0), v2;
   int lightcell_shift = csLightMap::lightcell_shift;
   int ru = x << lightcell_shift;
   int rv = y << lightcell_shift;
