@@ -273,7 +273,7 @@ bool BumpTest::InitProcDemo ()
   spstate->SetBaseColor(csColor(1.,1.,1.));
   spstate->SetMaterialWrapper(imatBump);
   //spstate->SetMixMode(CS_FX_COPY);
-  spstate->SetMixMode(CS_FX_MULTIPLY2);
+  spstate->SetMixMode(CS_FX_MULTIPLY2 | CS_FX_TILING);
   spstate->DecRef ();
 
 
