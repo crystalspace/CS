@@ -47,7 +47,7 @@ public:
   /// Next bot.
   Bot* next;
   /// Optional dynamic light.
-  iDynLight* light;
+  csRef<iDynLight> light;
 
 public:
   /// Constructor.

@@ -1562,7 +1562,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "db_radstep"))
   {
     csRadiosity* rad;
-    csEngine* engine = (csEngine*)(Sys->Engine);
+    csEngine* engine = (csEngine*)(iEngine*)(Sys->Engine);
     if ((rad = engine->GetRadiosity ()) != NULL)
     {
       int steps;
@@ -1578,7 +1578,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "db_radtodo"))
   {
     csRadiosity* rad;
-    csEngine* engine = (csEngine*)(Sys->Engine);
+    csEngine* engine = (csEngine*)(iEngine*)(Sys->Engine);
     if ((rad = engine->GetRadiosity ()) != NULL)
     {
       rad->ToggleShowDeltaMaps ();
@@ -1588,12 +1588,12 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "db_radhi"))
   {
     csRadiosity* rad;
-    csEngine* engine = (csEngine*)(Sys->Engine);
+    csEngine* engine = (csEngine*)(iEngine*)(Sys->Engine);
     if ((rad = engine->GetRadiosity ()) != NULL)
     {
-      Sys->selected_polygon = SCF_QUERY_INTERFACE (rad->GetNextPolygon (),
-      	iPolygon3D);
-      Sys->selected_polygon->DecRef ();
+      csRef<iPolygon3D> p (SCF_QUERY_INTERFACE (rad->GetNextPolygon (),
+      	iPolygon3D));
+      Sys->selected_polygon = p;
     }
   }
   else if (!strcasecmp (cmd, "palette"))
@@ -1602,7 +1602,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     csCommandProcessor::change_boolean (arg, &Sys->move_3d, "move3d");
   else if (!strcasecmp (cmd, "pvs"))
   {
-    csEngine* engine = (csEngine*)(Sys->Engine);
+    csEngine* engine = (csEngine*)(iEngine*)(Sys->Engine);
     bool en = engine->IsPVS ();
     csCommandProcessor::change_boolean (arg, &en, "pvs");
     if (en)
@@ -1612,7 +1612,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "pvsonly"))
   {
-    csEngine* engine = (csEngine*)(Sys->Engine);
+    csEngine* engine = (csEngine*)(iEngine*)(Sys->Engine);
     bool en = engine->IsPVSOnly ();
     csCommandProcessor::change_boolean (arg, &en, "pvs only");
     if (en)
@@ -1622,7 +1622,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "freezepvs"))
   {
-    csEngine* engine = (csEngine*)(Sys->Engine);
+    csEngine* engine = (csEngine*)(iEngine*)(Sys->Engine);
     bool en = engine->IsPVSFrozen ();
     csCommandProcessor::change_boolean (arg, &en, "freeze pvs");
     if (en)
@@ -1636,7 +1636,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     	"zbuffer", NULL };
     int emode = Sys->Engine->GetEngineMode ();
     csCommandProcessor::change_choice (arg, &emode, "engine mode", choices, 4);
-    csEngine* engine = (csEngine*)(Sys->Engine);
+    csEngine* engine = (csEngine*)(iEngine*)(Sys->Engine);
     engine->SetEngineMode (emode);
   }
   else if (!strcasecmp (cmd, "freelook"))
@@ -2361,7 +2361,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     RECORD_ARGS (cmd, arg);
     csVector3 dir (0,0,0);
     csVector3 pos = Sys->view->GetCamera ()->GetTransform ().This2Other (dir);
-    iDynLight* dyn;
+    csRef<iDynLight> dyn;
 
     bool rnd;
     float r, g, b, radius, thing_shadows;
@@ -2393,7 +2393,6 @@ bool CommandHandler (const char *cmd, const char *arg)
     if ((dyn = Sys->view->GetEngine ()->GetFirstDynLight ()) != NULL)
     {
       Sys->view->GetEngine ()->RemoveDynLight (dyn);
-      dyn->DecRef ();
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Dynamic light deleted.");
     }
   }
@@ -2404,7 +2403,6 @@ bool CommandHandler (const char *cmd, const char *arg)
     while ((dyn = Sys->view->GetEngine ()->GetFirstDynLight ()) != NULL)
     {
       Sys->view->GetEngine ()->RemoveDynLight (dyn);
-      dyn->DecRef ();
     }
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "All dynamic lights deleted.");
   }

@@ -903,17 +903,18 @@ bool do_bots = false;
 void add_bot (float size, iSector* where, csVector3 const& pos,
 	float dyn_radius)
 {
-  iDynLight* dyn = NULL;
+  csRef<iDynLight> dyn;
   if (dyn_radius)
   {
     float r, g, b;
     RandomColor (r, g, b);
-    //@@@ MEMORY LEAK?
-    dyn = Sys->view->GetEngine ()->CreateDynLight (pos, dyn_radius, csColor(r, g, b));
+    dyn = Sys->view->GetEngine ()->CreateDynLight (
+    	pos, dyn_radius, csColor(r, g, b));
     dyn->QueryLight ()->SetSector (where);
     dyn->Setup ();
   }
-  iMeshFactoryWrapper* tmpl = Sys->view->GetEngine ()->GetMeshFactories ()->FindByName ("bot");
+  iMeshFactoryWrapper* tmpl = Sys->view->GetEngine ()->GetMeshFactories ()
+  	->FindByName ("bot");
   if (!tmpl) return;
   csRef<iMeshObject> botmesh (tmpl->GetMeshObjectFactory ()->NewInstance ());
   Bot* bot;
@@ -974,7 +975,7 @@ struct MissileStruct
 {
   int type;		// type == DYN_TYPE_MISSILE
   csOrthoTransform dir;
-  iMeshWrapper* sprite;
+  csRef<iMeshWrapper> sprite;
   csRef<iSoundSource> snd;
 };
 
@@ -1080,7 +1081,6 @@ void HandleDynLight (iDynLight* dyn)
 	  dyn->QueryObject ()->ObjRemove (ido->QueryObject ());
 	  delete es;
           Sys->view->GetEngine ()->RemoveDynLight (dyn);
-          dyn->DecRef ();
 	  return;
 	}
       }
@@ -1115,7 +1115,8 @@ void fire_missile ()
   csVector3 pos = Sys->view->GetCamera ()->GetTransform ().This2Other (dir);
   float r, g, b;
   RandomColor (r, g, b);
-  iDynLight* dyn = Sys->view->GetEngine ()->CreateDynLight (pos, 4, csColor (r, g, b));
+  csRef<iDynLight> dyn (
+  	Sys->view->GetEngine ()->CreateDynLight (pos, 4, csColor (r, g, b)));
   dyn->QueryLight ()->SetSector (Sys->view->GetCamera ()->GetSector ());
   dyn->Setup ();
 
@@ -1147,8 +1148,9 @@ void fire_missile ()
     	"Could not find '%s' sprite factory!", misname);
   else
   {
-    iMeshWrapper* sp = Sys->view->GetEngine ()->
-      CreateMeshWrapper (tmpl, "missile",Sys->view->GetCamera ()->GetSector (), pos);
+    csRef<iMeshWrapper> sp (
+    	Sys->view->GetEngine ()->CreateMeshWrapper (tmpl,
+	"missile",Sys->view->GetCamera ()->GetSector (), pos));
 
     ms->sprite = sp;
     csMatrix3 m = ms->dir.GetT2O ();
@@ -1198,7 +1200,7 @@ void light_statics ()
 
 //===========================================================================
 
-static iMeshWrapper* CreateMeshWrapper (const char* name)
+static csPtr<iMeshWrapper> CreateMeshWrapper (const char* name)
 {
   csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (Sys->object_reg,
   	iPluginManager));
@@ -1211,14 +1213,16 @@ static iMeshWrapper* CreateMeshWrapper (const char* name)
   csRef<iMeshObjectFactory> thing_fact (ThingType->NewFactory ());
   csRef<iMeshObject> mesh_obj (SCF_QUERY_INTERFACE (thing_fact, iMeshObject));
 
-  iMeshWrapper* mesh_wrap = Sys->Engine->CreateMeshWrapper (mesh_obj, name);
-  return mesh_wrap;
+  csRef<iMeshWrapper> mesh_wrap (
+  	Sys->Engine->CreateMeshWrapper (mesh_obj, name));
+  if (mesh_wrap) mesh_wrap->IncRef ();	// Prevent smart pointer release.
+  return csPtr<iMeshWrapper> (mesh_wrap);
 }
 
-iMeshWrapper* CreatePortalThing (const char* name, iSector* room,
+static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
     	iMaterialWrapper* tm, iPolygon3D*& portalPoly)
 {
-  iMeshWrapper* thing = CreateMeshWrapper (name);
+  csRef<iMeshWrapper> thing (CreateMeshWrapper (name));
   csRef<iThingState> thing_state (SCF_QUERY_INTERFACE (thing->GetMeshObject (),
   	iThingState));
   thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
@@ -1415,7 +1419,8 @@ iMeshWrapper* CreatePortalThing (const char* name, iSector* room,
   room->ShineLights (thing);
   linfo->PrepareLighting ();
 
-  return thing;
+  thing->IncRef ();	// Prevent smart pointer release.
+  return csPtr<iMeshWrapper> (thing);
 }
 
 void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
@@ -1426,7 +1431,8 @@ void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
   	FindByName ("portal");
 
   iPolygon3D* portalPoly;
-  iMeshWrapper* thing = CreatePortalThing ("portalTo", room, tm, portalPoly);
+  csRef<iMeshWrapper> thing (
+  	CreatePortalThing ("portalTo", room, tm, portalPoly));
 
   bool regionExists = (Sys->Engine->GetRegions ()->FindByName (lev) != NULL);
   Sys->Engine->SelectRegion (lev);
@@ -1467,8 +1473,8 @@ void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
       // back. So even if multiple portals go to the region we only have
       // one portal back.
       iPolygon3D* portalPolyBack;
-      iMeshWrapper* thingBack = CreatePortalThing ("portalFrom",
-	  	start_sector, tm, portalPolyBack);
+      csRef<iMeshWrapper> thingBack (CreatePortalThing ("portalFrom",
+	  	start_sector, tm, portalPolyBack));
       thingBack->GetMovable ()->SetPosition (topos + csVector3 (0, Sys->cfg_legs_offset, -.1));
       thingBack->GetMovable ()->Transform (csYRotMatrix3 (PI));//view->GetCamera ()->GetW2C ());
       thingBack->GetMovable ()->UpdateMove ();
@@ -1476,11 +1482,9 @@ void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
       portalBack->GetFlags ().Set (CS_PORTAL_ZFILL);
       portalBack->GetFlags ().Set (CS_PORTAL_CLIPDEST);
       portalBack->SetWarp (view->GetCamera ()->GetTransform ().GetO2T (), -pos, -topos);
-      thingBack->DecRef ();
     }
   }
 
-  thing->DecRef ();
   if (!regionExists)
     Sys->InitCollDet (Sys->Engine, Sys->Engine->GetCurrentRegion ());
   Sys->Engine->SelectRegion ((iRegion*)NULL);

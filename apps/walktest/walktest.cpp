@@ -119,11 +119,6 @@ WalkTest::WalkTest () :
   wMissile_boom = NULL;
   wMissile_whoosh = NULL;
   cslogo = NULL;
-  Engine = NULL;
-  LevelLoader = NULL;
-  ModelConverter = NULL;
-  CrossBuilder = NULL;
-  kbd = NULL;
   anim_sky = NULL;
   anim_dirlight = NULL;
   anim_dynlight = NULL;
@@ -175,16 +170,8 @@ WalkTest::WalkTest () :
   bgcolor_txtmap = 255;
   bgcolor_map = 0;
 
-  ConsoleInput = NULL;
   SmallConsole = false;
 
-  myG2D = NULL;
-  myG3D = NULL;
-  myConsole = NULL;
-  myVFS = NULL;
-  mySound = NULL;
-  myMotionMan = NULL;
-  collide_system = NULL;
   vc = NULL;
   plugin_mgr = NULL;
 
@@ -203,17 +190,6 @@ WalkTest::WalkTest () :
 
 WalkTest::~WalkTest ()
 {
-  SCF_DEC_REF (vc);
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (myVFS);
-  SCF_DEC_REF (myConsole);
-  SCF_DEC_REF (myG2D);
-  SCF_DEC_REF (myG3D);
-  SCF_DEC_REF (mySound);
-  SCF_DEC_REF (myMotionMan);
-  SCF_DEC_REF (ConsoleInput)
-  SCF_DEC_REF (collide_system);
-  SCF_DEC_REF (Font);
   delete wf;
   delete [] auto_script;
   SCF_DEC_REF (views[0]);
@@ -228,12 +204,6 @@ WalkTest::~WalkTest ()
   }
   */
   delete [] recorded_perf_stats_name;
-  SCF_DEC_REF (perf_stats);
-  SCF_DEC_REF (Engine);
-  SCF_DEC_REF (LevelLoader);
-  SCF_DEC_REF (kbd);
-  SCF_DEC_REF (CrossBuilder);
-  SCF_DEC_REF (ModelConverter);
 
   while (first_map)
   {
@@ -768,7 +738,9 @@ void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
   {
     extern void HandleDynLight (iDynLight*);
     iDynLight* dn = dyn->GetNext ();
-    if (CS_GET_CHILD_OBJECT (dyn->QueryObject (), iDataObject))
+    csRef<iDataObject> dao (
+    	CS_GET_CHILD_OBJECT (dyn->QueryObject (), iDataObject));
+    if (dao)
       HandleDynLight (dyn);
     dyn = dn;
   }
@@ -1658,14 +1630,12 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   // Load a few sounds.
   if (mySound)
   {
-    iSoundWrapper *w = CS_GET_NAMED_CHILD_OBJECT (
-    	Engine->QueryObject (), iSoundWrapper, "boom.wav");
+    csRef<iSoundWrapper> w (CS_GET_NAMED_CHILD_OBJECT (
+    	Engine->QueryObject (), iSoundWrapper, "boom.wav"));
     wMissile_boom = w ? w->GetSound () : NULL;
-    SCF_DEC_REF (w);
     w = CS_GET_NAMED_CHILD_OBJECT (Engine->QueryObject (),
 					iSoundWrapper, "whoosh.wav");
     wMissile_whoosh = w ? w->GetSound () : NULL;
-    SCF_DEC_REF (w);
    }
 
   Report (CS_REPORTER_SEVERITY_NOTIFY,

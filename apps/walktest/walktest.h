@@ -132,9 +132,9 @@ class WalkTest
 {
 public:
   iObjectRegistry* object_reg;
-  iPluginManager* plugin_mgr;
-  iKeyboardDriver* kbd;
-  iVirtualClock* vc;
+  csRef<iPluginManager> plugin_mgr;
+  csRef<iKeyboardDriver> kbd;
+  csRef<iVirtualClock> vc;
 
   int FrameWidth, FrameHeight;
 
@@ -168,7 +168,7 @@ public:
   /// A vector that is used to temporarily store references to busy entities.
   csVector busy_vector;
   /// Plugin which calculates fps and records statistics
-  iPerfStats *perf_stats;
+  csRef<iPerfStats> perf_stats;
   /// Vector with recorded camera transformations and commands.
   csRecordVector recording;
   /// While playing/recording demos a secondary perfstats instance is used to
@@ -278,19 +278,19 @@ public:
    * The main engine interface
    * (when interface will be complete, csEngine will not be needed anymore)
    */
-  iEngine *Engine;
+  csRef<iEngine> Engine;
   /// The level loader
-  iLoader *LevelLoader;
+  csRef<iLoader> LevelLoader;
   /// The model importer and crossbuilder
-  iModelConverter *ModelConverter;
-  iCrossBuilder *CrossBuilder;
+  csRef<iModelConverter> ModelConverter;
+  csRef<iCrossBuilder> CrossBuilder;
   ///
-  iGraphics2D *myG2D;
-  iGraphics3D *myG3D;
-  iConsoleOutput *myConsole;
-  iVFS *myVFS;
-  iSoundRender *mySound;
-  iMotionManager *myMotionMan;
+  csRef<iGraphics2D> myG2D;
+  csRef<iGraphics3D> myG3D;
+  csRef<iConsoleOutput> myConsole;
+  csRef<iVFS> myVFS;
+  csRef<iSoundRender> mySound;
+  csRef<iMotionManager> myMotionMan;
 
   /// The view on the world.
   iView* view;
@@ -362,18 +362,18 @@ public:
   bool move_forward;
 
   /// Collision detection plugin.
-  iCollideSystem* collide_system;
+  csRef<iCollideSystem> collide_system;
 
   /// Player's body (as a 3D model) and legs
   csRef<iMeshWrapper> plbody, pllegs;
 
   /// The console input plugin
-  iConsoleInput *ConsoleInput;
+  csRef<iConsoleInput> ConsoleInput;
   /// Is the console smaller than the screen?
   bool SmallConsole;
 
   /// The font we'll use for writing
-  iFont *Font;
+  csRef<iFont> Font;
 
   /// Value to indicate split state
   /// -1 = not split, other value is index of current view
