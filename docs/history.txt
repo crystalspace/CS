@@ -17,6 +17,9 @@ The history order is reversed so that new features are at the top.
 	  in the generated volatile.h).
 	- Eric Sunshine fixed csLoader so that it no longer emits misleading
 	  warning messages when one of the `optional' plugin is not loaded.
+	- Eric Sunshine fixed a memory leak in the DiskFile constructor in
+	  vfs.cpp.  It was unnecessarily duplicating the `NameSuffix' argument
+	  and then leaking the duplicate.
 18-Jun-2001
 	- Fixed a bug in the region checking code from the loader.
 	- Renamed csCollider to csColliderWrapper and moved it from csengine

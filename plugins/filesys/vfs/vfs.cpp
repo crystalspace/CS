@@ -313,14 +313,13 @@ IMPLEMENT_IBASE_END
 DiskFile::DiskFile (int Mode, VfsNode *ParentNode, int RIndex,
   const char *NameSuffix) : csFile (Mode, ParentNode, RIndex, NameSuffix)
 {
-  char* ns=strdup(NameSuffix);
   CONSTRUCT_IBASE (NULL);
   char *rp = (char *)Node->RPathV [Index];
   size_t rpl = strlen (rp);
-  size_t nsl = strlen (ns);
+  size_t nsl = strlen (NameSuffix);
   char *fName = new char [rpl + nsl + 1];
   memcpy (fName, rp, rpl);
-  memcpy (fName + rpl, ns, nsl + 1);
+  memcpy (fName + rpl, NameSuffix, nsl + 1);
 
   // Convert all VFS_PATH_SEPARATOR's in filename into PATH_SEPARATOR's
   for (size_t n = 0; n < nsl; n++)
@@ -335,12 +334,12 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, int RIndex,
     file = fopen (fName, (Mode & VFS_FILE_MODE) == VFS_FILE_WRITE ? "wb":"rb");
     if (file || (t != 1))
       break;
-    char *lastps = strrchr (ns, VFS_PATH_SEPARATOR);
+    char *lastps = strrchr (NameSuffix, VFS_PATH_SEPARATOR);
     if (!lastps)
       break;
 
     *lastps = 0;
-    MakeDir (rp, ns);
+    MakeDir (rp, NameSuffix);
     *lastps = VFS_PATH_SEPARATOR;
   }
 
@@ -417,7 +416,7 @@ void DiskFile::MakeDir (const char *PathBase, const char *PathSuffix)
 }
 
 int DiskFile::GetStatus ()
-{ 
+{
   if (file != 0)
     clearerr (file);
   return csFile::GetStatus ();
@@ -556,7 +555,7 @@ ArchiveFile::ArchiveFile (int Mode, VfsNode *ParentNode, int RIndex,
   }
   else if ((Mode & VFS_FILE_MODE) == VFS_FILE_WRITE)
   {
-    if ((fh = Archive->NewFile (NameSuffix, 0, !(Mode & VFS_FILE_UNCOMPRESSED))))
+    if ((fh = Archive->NewFile(NameSuffix,0,!(Mode & VFS_FILE_UNCOMPRESSED))))
     {
       Error = VFS_STATUS_OK;
       Archive->Writing++;
