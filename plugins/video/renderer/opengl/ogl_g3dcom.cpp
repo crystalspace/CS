@@ -1085,6 +1085,17 @@ bool csGraphics3DOGLCommon::NewOpen ()
       CS_QUERY_REGISTRY (object_reg, iPluginManager));
     effectserver = CS_LOAD_PLUGIN (plugin_mgr,
       "crystalspace.video.effects.stdserver", iEffectServer);
+    if (!effectserver)
+    {
+      Report (CS_REPORTER_SEVERITY_ERROR, "FATAL: Wasn't able to load effect"
+	  " server plugin. Did you compile it (effects)?");
+      // This is the only way to stop here. As the return value from Open() is
+      // ignored :-/
+      csRef<iEventQueue> queue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+      if (queue)
+	queue->GetEventOutlet()->Broadcast (cscmdQuit);
+    }
+
     object_reg->Register (effectserver, "iEffectServer");
   }
   //csEffectStrings::InitStrings( effectserver );
