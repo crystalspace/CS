@@ -14,6 +14,7 @@ chronological order.
 	  becomes:
 	     camera->GetSector ()->HitBeamPortals (
 	     	camera->GetTransform ().GetOrigin (), v, isect, pidx)
+	- Duhprey added a new terrain plugin and demo for the NR
 24-Sep-2003
 	- Jorrit finished implemented basic drawing of portals in
 	  csPortalContainer. Still some optimizations and testing to do.
