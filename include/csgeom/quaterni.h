@@ -29,17 +29,17 @@ class csQuaternion{
   csQuaternion( const csQuaternion& q){ init( q.r, q.x, q.y, q.z ); }
   csQuaternion( const csVector3& q){ init( 0, q.x, q.y, q.z ); }
   
-  inline friend csQuaternion operator +( csQuaternion& q1, csQuaternion& q2 )
+  inline friend csQuaternion operator +( const csQuaternion& q1, const csQuaternion& q2 )
     { return csQuaternion( q1.r + q2.r, q1.x + q2.x, q1.y + q2.y, q1.z + q2.z ); }
-  inline friend csQuaternion operator -( csQuaternion& q1, csQuaternion& q2 )
+  inline friend csQuaternion operator -( const csQuaternion& q1, const csQuaternion& q2 )
     { return csQuaternion( q1.r - q2.r, q1.x - q2.x, q1.y - q2.y, q1.z - q2.z ); }
-  inline friend csQuaternion operator *( csQuaternion& q1, csQuaternion& q2 )
+  inline friend csQuaternion operator *( const csQuaternion& q1, const csQuaternion& q2 )
     { return csQuaternion( q1.r*q2.r -  q1.x*q2.x - q1.y*q2.y - q1.z*q2.z,
 			   q1.y*q2.z -  q1.z*q2.y + q1.r*q2.x + q1.x*q2.r,
 			   q1.z*q2.x -  q1.x*q2.z + q1.r*q2.y + q1.y*q2.r,
 			   q1.x*q2.y -  q1.y*q2.x + q1.r*q2.z + q1.z*q2.r ); }
 
-  csQuaternion& operator *=( csQuaternion& q2 )
+  csQuaternion& operator *=( const csQuaternion& q2 )
     { init( r*q2.r -  x*q2.x - y*q2.y - z*q2.z,
 	    y*q2.z -  z*q2.y + r*q2.x + x*q2.r,
 	    z*q2.x -  x*q2.z + r*q2.y + y*q2.r,
