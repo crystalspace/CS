@@ -1285,81 +1285,11 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   iGraphics3D* g3d = rview->GetGraphics3D ();
   iCamera* camera = rview->GetCamera ();
 
-  // First create the transformation from object to camera space directly:
-  //   W = Mow * O - Vow;
-  //   C = Mwc * (W - Vwc)
-  // ->
-  //   C = Mwc * (Mow * O - Vow - Vwc)
-  //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
-  csReversibleTransform tr_o2c = camera->GetTransform ();
-  if (!movable->IsFullTransformIdentity ())
-    tr_o2c /= movable->GetFullTransform ();
 
-#if 1
-  csVector3 radius;
-  csSphere sphere;
-  GetRadius (radius, sphere.GetCenter ());
-  float max_radius = radius.x;
-  if (max_radius < radius.y) max_radius = radius.y;
-  if (max_radius < radius.z) max_radius = radius.z;
-  sphere.SetRadius (max_radius);
-  int clip_portal, clip_plane, clip_z_plane;
-  if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
-  	clip_z_plane) == false)
-    return false;
-#else
-  float fov = camera->GetFOV ();
-  float shiftx = camera->GetShiftX ();
-  float shifty = camera->GetShiftY ();
-
-  // Test visibility of entire sprite by clipping bounding box against clipper.
-  // There are three possibilities:
-  //	1. box is not visible -> sprite is not visible.
-  //	2. box is entirely visible -> sprite is visible and need not be clipped.
-  //	3. box is partially visible -> sprite is visible and needs to be clipped
-  //	   if rview has do_clip_plane set to true.
-  csBox2 bbox;
-  csBox3 bbox3;
-  if (GetScreenBoundingBox (camera->GetCameraNumber (),
-  	movable->GetUpdateNumber (), fov, shiftx, shifty,
-  	tr_o2c, bbox, bbox3) < 0) return false;	// Not visible.
-  int clip_portal, clip_plane, clip_z_plane;
-  if (rview->ClipBBox (bbox, bbox3, clip_portal, clip_plane,
-  	clip_z_plane) == false)
-    return false;
-#endif
-
-  UpdateWorkTables (factory->GetVertexCount());
-
-  CS_ASSERT (cur_action != NULL);
-  csSpriteFrame * cframe = cur_action->GetCsFrame (cur_frame);
-
-  // Get next frame for animation tweening.
-  csSpriteFrame * next_frame = cur_action->GetCsNextFrame (cur_frame);
-
-  // First create the transformation from object to camera space directly:
-  //   W = Mow * O - Vow;
-  //   C = Mwc * (W - Vwc)
-  // ->
-  //   C = Mwc * (Mow * O - Vow - Vwc)
-  //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
-  g3d->SetObjectToCamera (&tr_o2c);
-
-  bool do_tween = false;
-  if (!skeleton_state && tween_ratio) do_tween = true;
-
-  int cf_idx = cframe->GetAnmIndex();
-
-  csVector3* real_obj_verts;
-  csVector3* real_tween_verts = NULL;
-
-  real_obj_verts = factory->GetVertices (cf_idx);
-  if (do_tween)
-  {
-    int nf_idx = next_frame->GetAnmIndex();
-    real_tween_verts = factory->GetVertices (nf_idx);
-  }
-
+  /*
+   *  If we're going to figure out the position of a socket-attached mesh here in the drawing function
+   *   we should be setting this position for THIS frame not for the next frame!
+   */
 
     // Drill down into the parent and compute the center of
   // the socket where this mesh should be located along with the rotation angles
@@ -1469,6 +1399,86 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
       }
     }
   }
+
+
+
+
+  // First create the transformation from object to camera space directly:
+  //   W = Mow * O - Vow;
+  //   C = Mwc * (W - Vwc)
+  // ->
+  //   C = Mwc * (Mow * O - Vow - Vwc)
+  //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
+  csReversibleTransform tr_o2c = camera->GetTransform ();
+  if (!movable->IsFullTransformIdentity ())
+    tr_o2c /= movable->GetFullTransform ();
+
+#if 1
+  csVector3 radius;
+  csSphere sphere;
+  GetRadius (radius, sphere.GetCenter ());
+  float max_radius = radius.x;
+  if (max_radius < radius.y) max_radius = radius.y;
+  if (max_radius < radius.z) max_radius = radius.z;
+  sphere.SetRadius (max_radius);
+  int clip_portal, clip_plane, clip_z_plane;
+  if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
+  	clip_z_plane) == false)
+    return false;
+#else
+  float fov = camera->GetFOV ();
+  float shiftx = camera->GetShiftX ();
+  float shifty = camera->GetShiftY ();
+
+  // Test visibility of entire sprite by clipping bounding box against clipper.
+  // There are three possibilities:
+  //	1. box is not visible -> sprite is not visible.
+  //	2. box is entirely visible -> sprite is visible and need not be clipped.
+  //	3. box is partially visible -> sprite is visible and needs to be clipped
+  //	   if rview has do_clip_plane set to true.
+  csBox2 bbox;
+  csBox3 bbox3;
+  if (GetScreenBoundingBox (camera->GetCameraNumber (),
+  	movable->GetUpdateNumber (), fov, shiftx, shifty,
+  	tr_o2c, bbox, bbox3) < 0) return false;	// Not visible.
+  int clip_portal, clip_plane, clip_z_plane;
+  if (rview->ClipBBox (bbox, bbox3, clip_portal, clip_plane,
+  	clip_z_plane) == false)
+    return false;
+#endif
+
+  UpdateWorkTables (factory->GetVertexCount());
+
+  CS_ASSERT (cur_action != NULL);
+  csSpriteFrame * cframe = cur_action->GetCsFrame (cur_frame);
+
+  // Get next frame for animation tweening.
+  csSpriteFrame * next_frame = cur_action->GetCsNextFrame (cur_frame);
+
+  // First create the transformation from object to camera space directly:
+  //   W = Mow * O - Vow;
+  //   C = Mwc * (W - Vwc)
+  // ->
+  //   C = Mwc * (Mow * O - Vow - Vwc)
+  //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
+  g3d->SetObjectToCamera (&tr_o2c);
+
+  bool do_tween = false;
+  if (!skeleton_state && tween_ratio) do_tween = true;
+
+  int cf_idx = cframe->GetAnmIndex();
+
+  csVector3* real_obj_verts;
+  csVector3* real_tween_verts = NULL;
+
+  real_obj_verts = factory->GetVertices (cf_idx);
+  if (do_tween)
+  {
+    int nf_idx = next_frame->GetAnmIndex();
+    real_tween_verts = factory->GetVertices (nf_idx);
+  }
+
+
 
   // If we have a skeleton then we transform all vertices through
   // the skeleton. In that case we also include the camera transformation
@@ -2478,4 +2488,5 @@ bool csSprite3DMeshObjectType::csSprite3DConfig::GetOptionDescription
   *option = config_options[idx];
   return true;
 }
+
 
