@@ -99,7 +99,7 @@ bool Video::Initialize (int argc, const char* const argv[],
   }
 
   // Find the pointer to level loader plugin
-  LevelLoader = CS_QUERY_REGISTRY (object_reg, CS_FUNCID_LVLLOADER, iLoader);
+  LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!LevelLoader)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
