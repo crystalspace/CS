@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp libs/cssnddrv/oss
+vpath %.cpp plugins/sound/driver/oss
 
 # The OSS sound driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
