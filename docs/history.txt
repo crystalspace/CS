@@ -7,7 +7,10 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 25-Dec-2003
-  - Philip Wyett begins a general cleanup of CS code.
+	- Philip Wyett performed some cleanup of CS code formatting.
+	- Eric Sunshine applied patch from Bruce Williams
+	  <midnightcoder@midnightcoder.com> to cs_world.xsd (XML schema) which
+	  fixes a couple typographical errors (rotx,roty,rotx), etc.
 24-Dec-2003
 	- Eric Sunshined fixed linking problem with csjoywin.  It was using
 	  #define INITGUID before #including windows.h, and was also linking
