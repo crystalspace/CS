@@ -31,13 +31,16 @@ extern unsigned long inet_addr(const char*);
 
 #if defined(OS_BE)
 #define CS_CLOSESOCKET closesocket
+#define CS_GETSOCKETERROR errno
 #elif defined(OS_WIN32)
 #define CS_IOCTLSOCKET ioctlsocket
 #define CS_CLOSESOCKET closesocket
 #define EWOULDBLOCK WSAEWOULDBLOCK
+#define CS_GETSOCKETERROR ::WSAGetLastError()
 #else
 #define CS_IOCTLSOCKET ioctl
 #define CS_CLOSESOCKET close
+#define CS_GETSOCKETERROR errno
 #endif
 
 IMPLEMENT_FACTORY(csSocketDriver)
@@ -148,7 +151,7 @@ size_t csSocketConnection::Receive(void* buff, size_t maxbytes)
     if (received == (size_t)-1)
     {
       received = 0;
-      if (errno != EWOULDBLOCK)
+      if (CS_GETSOCKETERROR != EWOULDBLOCK)
         LastError = CS_NET_ERR_CANNOT_RECEIVE;
     }
   }
@@ -191,7 +194,7 @@ iNetworkConnection* csSocketListener::Accept()
     csNetworkSocket s = accept(Socket, &addr, &addrlen);
     if (s != CS_NET_SOCKET_INVALID)
       connection = new csSocketConnection(scfParent, s, BlockingConnection);
-    else if (errno != EWOULDBLOCK)
+    else if (CS_GETSOCKETERROR != EWOULDBLOCK)
       LastError = CS_NET_ERR_CANNOT_ACCEPT;
   }
   return connection;
