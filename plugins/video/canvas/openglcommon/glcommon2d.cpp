@@ -53,11 +53,6 @@ csGraphics2DGLCommon::~csGraphics2DGLCommon ()
 {
   // Destroy your graphic interface
   Close ();
-  CHKB (delete [] Memory);
-  CHKB (delete [] LocalFontServer);
-  LocalFontServer = NULL;
-  CHKB (delete [] texture_cache);
-  texture_cache = NULL;
 }
 
 bool csGraphics2DGLCommon::Open(char *Title)
@@ -101,6 +96,11 @@ void csGraphics2DGLCommon::Close(void)
 {
   // Close your graphic interface
   csGraphics2D::Close ();
+//  CHKB (delete [] Memory);
+  CHKB (delete LocalFontServer);
+  LocalFontServer = NULL;
+  CHKB (delete texture_cache);
+  texture_cache = NULL;
 }
 
 void csGraphics2DGLCommon::Clear(int color)
