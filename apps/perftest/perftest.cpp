@@ -240,6 +240,7 @@ int main (int argc, char* argv[])
   // We want at least the minimal set of plugins
   System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
   System->RequestPlugin ("crystalspace.font.server.default:FontServer");
+  System->RequestPlugin ("crystalspace.image.loader:ImageLoader");
   System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
   System->RequestPlugin ("crystalspace.console.output.standard:Console.Output");
 
