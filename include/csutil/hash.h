@@ -36,7 +36,7 @@ CS_CSUTIL_EXPORT unsigned int csHashCompute (char const*);
  * Note that these keys are non-unique; some dissimilar strings may generate
  * the same key. For unique keys, see csStringSet.
  */
-CS_CSUTIL_EXPORT unsigned int csHashCompute (char const*, int length);
+CS_CSUTIL_EXPORT unsigned int csHashCompute (char const*, size_t length);
 
 /**
  * A hash key handler for integral types and types that can be casted to such.
@@ -47,12 +47,17 @@ class csIntegralHashKeyHandler
 public:
   static unsigned int ComputeHash (const T& key)
   {
+#if (_MSC_VER >= 1300)
     /*
-      @@@ FIXME 64bit: possible pointer truncation
-      - not serious (the correct item will still be retrieved from a csHash<>, 
-        as the keys are also compared), but causes a warning.
+      VC7 with 64bit warnings complains about a pointer truncation when T is
+      a pointer. This isn't serious (as csHash<> does not rely on the hash of
+      a key alone to retrieve a value). The __w64 causes VC7 to not emit that
+      warning (on 32bit compilers at least).
      */
+    return (unsigned int __w64)key;  
+#else
     return (unsigned int)key;  
+#endif
   }
 
   static bool CompareKeys (const T& key1, const T& key2)

@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+27-Jun-2004
+	- res worked around a possible VC7 64bit warning in 
+	  csIntegralHashKeyHandler<>.
 26-Jun-2004
 	- Jorrit added a new bugplug command to switch visibility culler of
 	  the current sector. ctrl-shift-1 is assigned to switch to frustvis

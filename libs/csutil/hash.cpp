@@ -18,7 +18,7 @@
 #include "cssysdef.h"
 #include "csutil/hash.h"
 
-unsigned int csHashCompute (char const* s, int n)
+unsigned int csHashCompute (char const* s, size_t n)
 {
   unsigned int h = 0;
   const char* end = s + n;
