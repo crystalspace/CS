@@ -8,6 +8,7 @@ The history order is reversed so that new features are at the top.
 	  but there was still one case where a manual DecRef() was done.
 	  This caused crashes when firing missiles.
 	- Fixed another csFrustum::DecRef() in the thing plugin.
+	- Fixed yet another csFrustum::DecRef() in the thing plugin.
 	- Changed csArray::SetCapacity() so that it will now correctly
 	  construct new elements using the default constructor. Previously it
 	  was not doing that which made the routine not better than

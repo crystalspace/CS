@@ -498,7 +498,6 @@ void csPolyTexture::FillLightMap (
           s2d[j].y = trans_v * s3d[j] + shift_v;
         }
 
-        new_shadow->DecRef ();
         shadow_bitmap->RenderPolygon (s2d, nv, 1);
         if (shadow_bitmap->IsFullyShadowed ()) break;
       }
