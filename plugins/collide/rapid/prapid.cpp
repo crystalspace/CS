@@ -373,6 +373,7 @@ csCollisionPair *csRapidCollider::GetCollisions ()
   return CD_contact->GetArray ();
 }
 
+/*
 static int project6 (csVector3 ax, csVector3 p1, csVector3 p2, csVector3 p3,
   csVector3 q1, csVector3 q2, csVector3 q3)
 {
@@ -392,6 +393,7 @@ static int project6 (csVector3 ax, csVector3 p1, csVector3 p2, csVector3 p3,
   if (mn2 > mx1) return 0;
   return 1;
 }
+*/
 
 /* Triangle/triangle intersection test routine,
  * by Tomas Moller, 1997.
