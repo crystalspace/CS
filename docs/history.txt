@@ -5,6 +5,9 @@ The history order is reversed so that new features are at the top.
 
 5-Apr-2003
 	- Philip Wyett fixed compile error in ogg plugin.
+	- Oktal fixed a problem with the cssocket plugin where it would only
+	  send the first packet of a transmission that is split up into
+	  multiple packets.
 4-Apr-2003
         - JTarbox altered event define's to an enum
 	- Boyan added lightning loader plugin.

@@ -127,15 +127,27 @@ csSocketConnection::csSocketConnection(
 
 bool csSocketConnection::Send(const void* data, size_t nbytes)
 {
-  bool ok = false;
+  size_t totalsent = 0;
   if (ValidateSocket())
   {
-    if (send(Socket, (char*)data, nbytes, 0) != -1)
-      ok = true;
-    else
-      LastError = CS_NET_ERR_CANNOT_SEND;
+    do
+    {
+      size_t sent = send(Socket, (char*)data + totalsent, nbytes, 0);
+      if (sent == (size_t)-1)
+      {
+        LastError = CS_NET_ERR_CANNOT_SEND;
+        return false;
+      }
+      totalsent += sent;
+    }
+    while (totalsent < nbytes);
+    return true;
   }
-  return ok;
+  else
+  {
+    LastError = CS_NET_ERR_INVALID_SOCKET;
+    return false;
+  }
 }
 
 size_t csSocketConnection::Receive(void* buff, size_t maxbytes)
