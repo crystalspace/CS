@@ -13,6 +13,51 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+9-Dec-1999
+	- Nearly completed coverage mask tree algorithm. A lot still
+	  needs to be done (like fixing the bugs preventing it from
+	  REALLY working :-) but it is near working properly now. Added
+	  'covtree' console command to toggle the new rendering mode
+	  on and off (similar to 'cbuffer', works only on levels
+	  prepared with STATBSP()). Lighting does not use the technique
+	  yet.
+8-Dec-1999
+	- Wyatt Miler added plugin info on csclear and csphysics to the
+	  documentation.
+	- Alex Pfaffe updated the landscape engine with the following
+	  modifications:
+	    - Replaced ddgVector3 with csVector3.
+	    - Optimizations, Reduced memory consumption to 9 bytes
+	      per height map location.
+	    - Fixed priority function, this stabilizes the terrain a lot.
+	    - Increased default triangles to 2000.
+	    - Fixed z sorting and y offset bug.
+	- Further work on coverage mask trees.
+7-Dec-1999
+	- Continued implementation of coverage mask trees. The lookup
+	  table works and seems correct. The edge test function
+	  also works.
+	- Brandon Ehle almost got the BCB4 project files working again.
+	- Brandon also updated some of the docs.
+	- Norman Kramer updated the Glide ports considerably.
+6-Dec-1999
+	- Brandon Ehle added links to coverage masks in the docs.
+	- Improvements to MazeD from Andrew Zabolotny:
+	    - Polygon properties dialog (select a/some polys then press
+	      'P').
+	    - Some progress in texture manager dialog.
+	    - Completely rewritten "snap to grid" mode.
+	    - Also fixed the 'Save model' dialog to not complain about
+	      directory being invalid (thanks to mayday
+	      <may-day@lycosmail.com>).
+	    - Added draft view rotation lock (CTRL locks phi, ALT
+	      locks theta) (thanks to Norman Kramer).
+	    - Lots of other small changes I don't remember now.
+	- Andrew also removed the iTextureHandle parameter from
+	  iGraphics2D::SetMouseCursor. There is no driver that uses
+	  it anyway :)
+	- Andrew also simplified the automount feature in WalkTest.
+	- Robert Bate updated the Macintosh project files.
 5-Dec-1999
 	- Continued work on the coverage mask tree. The masks start to work
 	  now but there is still a bug somewhere in the calculation of the

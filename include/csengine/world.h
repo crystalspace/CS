@@ -47,6 +47,8 @@ class Dumper;
 class csLight;
 class csCBuffer;
 class csQuadtree;
+class csCoverageMaskTree;
+class csCovMaskLUT;
 class csPoly2DPool;
 class csLightPatchPool;
 struct iGraphics3D;
@@ -263,6 +265,12 @@ private:
   /// Optional quad-tree used for rendering.
   csQuadtree* quadtree;
 
+  /// Optional coverage mask tree used for rendering.
+  csCoverageMaskTree* covtree;
+
+  /// Lookup table for coverage mask trees.
+  csCovMaskLUT* covtree_lut;
+
   /// Quad-cube used for lighting.
   csQuadcube* quadcube;
 
@@ -349,6 +357,16 @@ public:
    * Return c-buffer (or NULL if not used).
    */
   csCBuffer* GetCBuffer () { return c_buffer; }
+
+  /**
+   * Enable/disable coverage mask tree.
+   */
+  void EnableCovtree (bool en);
+
+  /**
+   * Return coverage mask tree (or NULL if not used).
+   */
+  csCoverageMaskTree* GetCovtree () { return covtree; }
 
   /**
    * Enable/disable quadtree.

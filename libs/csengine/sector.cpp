@@ -33,6 +33,7 @@
 #include "csengine/stats.h"
 #include "csengine/csppulse.h"
 #include "csengine/cbuffer.h"
+#include "csengine/covtree.h"
 #include "csengine/bspbbox.h"
 #include "csengine/terrain.h"
 #include "csengine/quadcube.h"
@@ -408,6 +409,7 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   csOctreeNode* onode = (csOctreeNode*)node;
   csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
   csQuadtree* quadtree = csWorld::current_world->GetQuadtree ();
+  csCoverageMaskTree* covtree = csWorld::current_world->GetCovtree ();
   csRenderView* rview = (csRenderView*)data;
   csVector3 array[6];
   static csPolygon2D persp;
@@ -476,9 +478,15 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
 
     // c-buffer test.
     bool vis;
-    if (quadtree) vis = quadtree->TestPolygon (persp.GetVertices (), persp.GetNumVertices (),
-    	persp.GetBoundingBox ());
-    else vis = c_buffer->TestPolygon (persp.GetVertices (), persp.GetNumVertices ());
+    if (quadtree)
+      vis = quadtree->TestPolygon (persp.GetVertices (),
+	persp.GetNumVertices (), persp.GetBoundingBox ());
+    else if (covtree)
+      vis = covtree->TestPolygon (persp.GetVertices (),
+	persp.GetNumVertices (), persp.GetBoundingBox ());
+    else
+      vis = c_buffer->TestPolygon (persp.GetVertices (),
+      	persp.GetNumVertices ());
     if (!vis)
     {
       count_cull_node_notvis_cbuffer++;
@@ -548,8 +556,9 @@ void csSector::Draw (csRenderView& rview)
   int num_sprite_queue = 0;
 
   csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
+  csCoverageMaskTree* covtree = csWorld::current_world->GetCovtree ();
   csQuadtree* quadtree = csWorld::current_world->GetQuadtree ();
-  if (c_buffer || quadtree)
+  if (c_buffer || quadtree || covtree)
   {
     // @@@ We should make a pool for queues. The number of queues allocated
     // at the same time is bounded by the recursion through portals. So a

@@ -30,6 +30,7 @@
 #include "csengine/stats.h"
 #include "csengine/dumper.h"
 #include "csengine/cbuffer.h"
+#include "csengine/covtree.h"
 #include "csengine/bspbbox.h"
 #include "csengine/cssprite.h"
 #include "csengine/quadcube.h"
@@ -476,6 +477,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
   int num_verts;
   int i;
   csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
+  csCoverageMaskTree* covtree = csWorld::current_world->GetCovtree ();
   csQuadtree* quadtree = csWorld::current_world->GetQuadtree ();
   bool visible;
   csPoly2DPool* render_pool = csWorld::current_world->render_pol2d_pool;
@@ -504,11 +506,18 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
         {
 	  if (quadtree)
 	  {
-	    if (quadtree->TestPolygon (clip->GetVertices (), clip->GetNumVertices (),
-	    	clip->GetBoundingBox ()))
+	    if (quadtree->TestPolygon (clip->GetVertices (),
+	    	clip->GetNumVertices (), clip->GetBoundingBox ()))
               sp3d->MarkVisible ();
 	  }
-	  else if (c_buffer->TestPolygon (clip->GetVertices (), clip->GetNumVertices ()))
+	  else if (covtree)
+	  {
+	    if (covtree->TestPolygon (clip->GetVertices (),
+	    	clip->GetNumVertices (), clip->GetBoundingBox ()))
+              sp3d->MarkVisible ();
+	  }
+	  else if (c_buffer->TestPolygon (clip->GetVertices (),
+	  	clip->GetNumVertices ()))
             sp3d->MarkVisible ();
         }
         render_pool->Free (clip);
@@ -533,6 +542,9 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	  if (quadtree)
             visible = quadtree->TestPolygon (clip->GetVertices (),
 		  clip->GetNumVertices (), clip->GetBoundingBox ());
+	  else if (covtree)
+            visible = covtree->TestPolygon (clip->GetVertices (),
+		  clip->GetNumVertices (), clip->GetBoundingBox ());
 	  else
             visible = c_buffer->TestPolygon (clip->GetVertices (),
 		  clip->GetNumVertices ());
@@ -541,6 +553,9 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
         {
 	  if (quadtree)
             visible = quadtree->InsertPolygon (clip->GetVertices (),
+		  clip->GetNumVertices (), clip->GetBoundingBox ());
+	  else if (covtree)
+            visible = covtree->InsertPolygon (clip->GetVertices (),
 		  clip->GetNumVertices (), clip->GetBoundingBox ());
 	  else
             visible = c_buffer->InsertPolygon (clip->GetVertices (),

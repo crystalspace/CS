@@ -604,7 +604,7 @@ Action:  Toggle c-buffer rendering on/off. In some levels (especially levels
 	 improve performance considerably. By default it is off (currently).
 	 Note that the level needs to be prepared for this (octree needs
 	 to be added using STATBSP command). Enabling the c-buffer
-	 disables the quadtree automatically.
+	 disables the quadtree and coverage mask tree automatically.
 
 Command: quadtree
 Type:    boolean command
@@ -613,7 +613,17 @@ Action:  Toggle quadtree rendering on/off. In some levels (especially levels
 	 improve performance considerably. By default it is off (currently).
 	 Note that the level needs to be prepared for this (octree needs
 	 to be added using STATBSP command). Enabling the quadtree
-	 disables the c-buffer automatically.
+	 disables the c-buffer and coverage mask tree automatically.
+
+Command: covtree
+Type:    boolean command
+Action:  Toggle coverage mask tree rendering on/off. In some levels
+         (especially levels with many non-moving things) enabling the
+	 coverage mask tree for the engine can
+	 improve performance considerably. By default it is off (currently).
+	 Note that the level needs to be prepared for this (octree needs
+	 to be added using STATBSP command). Enabling the coverage mask
+	 tree disables the c-buffer and quadtree automatically.
 
 Command: lod
 Type:    value command

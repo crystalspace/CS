@@ -22,6 +22,8 @@
 // !!! NOTE !!! DON'T MOVE THIS INCLUDE FILE TO 'include'!!!
 // IT IS MENT TO BE PRIVATE.
 
+struct iGraphics2D;
+
 #include "csengine/covmask.h"
 
 /**
@@ -33,7 +35,7 @@
  * can only be included by libs/csengine/covtree.cpp.
  */
 template <class Child>
-class csCovTreeNode
+class csCovTreeNode : public csCovMaskTriage
 {
 private:
   /**
@@ -42,25 +44,62 @@ private:
    */
   Child children[CS_CM_BITS];
 
-  /// The visibility mask for this node.
-  csCovMaskTriage mask;
-
 public:
   /**
    * Test a polygon against this node (and children).
    * Returns true if polygon is visible.
+   * dxdy and dydx are an array of edge gradients for the polygon.
+   * hor_offs, and ver_offs are the offset for the (0,0) corner
+   * of the node.
    */
-  bool TestPolygon (csVector2* poly, int num_verts) const;
+  bool TestPolygon (csVector2* poly, int num_verts,
+  	float* dxdy, float* dydx,
+  	int hor_offs, int ver_offs) const;
 
   /**
    * Insert a polygon in this node (and children).
    * Returns true if polygon was visible (i.e. tree is modified).
+   * dxdy and dydx are an array of edge gradients for the polygon.
+   * hor_offs, and ver_offs are the offset for the (0,0) corner
+   * of the node.
    */
-  bool InsertPolygon (csVector2* poly, int num_verts);
+  bool InsertPolygon (csVector2* poly, int num_verts,
+  	float* dxdy, float* dydx,
+  	int hor_offs, int ver_offs);
+
+  /// Return the horizontal number of pixels for this node.
+  static int GetHorizontalSize ()
+  {
+    return Child::GetHorizontalSize ()*csCovMaskTriage::GetHorizontalSize ();
+  }
+
+  /**
+   * Update this node and all children to a polygon.
+   * This function is similar to InsertPolygon() but it does
+   * not look at the old contents of the node and children.
+   * Instead it assumes the old contents was empty.
+   * This function returns false if the polygon mask for
+   * the top-level node was empty and true otherwise.
+   */
+  bool UpdatePolygon (csVector2* poly, int num_verts,
+  	float* dxdy, float* dydx,
+  	int hor_offs, int ver_offs);
+
+  /// Return the vertical number of pixels for this node.
+  static int GetVerticalSize ()
+  {
+    return Child::GetVerticalSize ()*csCovMaskTriage::GetVerticalSize ();
+  }
+
+  /**
+   * Do a graphical dump of the coverage mask tree
+   * upto the specified level.
+   */
+  void GfxDump (iGraphics2D* ig2d, int level, int hor_offs, int ver_offs);
 };
 
 /**
- * A subclass of csCovMaskSingle also implementing
+ * A subclass of csCovMask also implementing
  * TestPolygon/InsertPolygon.
  */
 class csCovTreeNode0 : public csCovMask
@@ -69,14 +108,42 @@ public:
   /**
    * Test a polygon against this node.
    * Returns true if polygon is visible.
+   * dxdy and dydx are an array of edge gradients for the polygon.
+   * hor_offs, and ver_offs are the offset for the (0,0) corner
+   * of the node.
    */
-  bool TestPolygon (csVector2* poly, int num_verts) const;
+  bool TestPolygon (csVector2* poly, int num_verts,
+  	float* dxdy, float* dydx,
+  	int hor_offs, int ver_offs) const;
 
   /**
    * Insert a polygon in this node.
    * Returns true if polygon was visible (i.e. mask is modified).
+   * dxdy and dydx are an array of edge gradients for the polygon.
+   * hor_offs, and ver_offs are the offset for the (0,0) corner
+   * of the node.
    */
-  bool InsertPolygon (csVector2* poly, int num_verts);
+  bool InsertPolygon (csVector2* poly, int num_verts,
+  	float* dxdy, float* dydx,
+  	int hor_offs, int ver_offs);
+
+  /**
+   * Update this node to a mask.
+   * This function is similar to InsertPolygon() but it does
+   * not look at the old contents of the node.
+   * Instead it assumes the old contents was empty.
+   * This function returns false if the polygon mask for
+   * the top-level node was empty and true otherwise.
+   */
+  bool UpdatePolygon (csVector2* poly, int num_verts,
+  	float* dxdy, float* dydx,
+  	int hor_offs, int ver_offs);
+
+  /**
+   * Do a graphical dump of the coverage mask tree
+   * upto the specified level.
+   */
+  void GfxDump (iGraphics2D* ig2d, int level, int hor_offs, int ver_offs);
 };
 
 typedef csCovTreeNode<csCovTreeNode0> csCovTreeNode1;

@@ -39,6 +39,7 @@
 #include "csengine/wirefrm.h"
 #include "csengine/polytext.h"
 #include "csengine/pol2d.h"
+#include "csengine/covtree.h"
 #include "csscript/csscript.h"
 #include "csscript/intscri.h"
 #include "csengine/cdobj.h"
@@ -520,6 +521,40 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
       int x = FRAME_WIDTH - 2 - w*152/256;
       cslogo->Draw(Gfx2D, x,2,w,h);
     }
+
+    // White-board for debugging purposes.
+    if (true)
+    {
+      csCoverageMaskTree* covtree = Sys->world->GetCovtree ();
+      if (covtree)
+      {
+        Gfx2D->Clear (0);
+	covtree->MakeEmpty ();
+	csPolygon2D poly;
+	poly.AddPerspective (csVector3 (-1, -1, 5));
+	poly.AddPerspective (csVector3 (1, -1, 5));
+	poly.AddPerspective (csVector3 (1, 1, 5));
+	poly.AddPerspective (csVector3 (-1, 1, 5));
+	covtree->InsertPolygon (poly.GetVertices (),
+		poly.GetNumVertices (), poly.GetBoundingBox ());
+	static int level = 0;
+	static time_t prev;
+	if (level == 0)
+	{
+	  prev = current_time;
+	  level = 1;
+	}
+	else if (current_time - prev > 5000)
+	{
+	  prev = current_time;
+	  level++;
+	  if (level > 4) level = 1;
+	}
+	covtree->GfxDump (Gfx2D, level);
+	printf ("Dumping level %d\n", level);
+      }
+    }
+
   } /* endif */
 
   // Drawing code ends here

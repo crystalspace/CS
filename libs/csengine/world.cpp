@@ -42,6 +42,7 @@
 #include "csengine/cspmeter.h"
 #include "csengine/cbuffer.h"
 #include "csengine/lppool.h"
+#include "csengine/covtree.h"
 #include "csgeom/fastsqrt.h"
 #include "csgeom/polypool.h"
 #include "csinput/csevent.h"
@@ -208,6 +209,7 @@ csWorld::csWorld (iBase *iParent) : csObject (), start_vec (0, 0, 0)
   c_buffer = NULL;
   quadtree = NULL;
   quadcube = NULL;
+  covtree = NULL;
   current_camera = NULL;
   current_world = this;
 
@@ -241,6 +243,56 @@ csWorld::~csWorld ()
 bool csWorld::Initialize (iSystem* sys)
 {
   System = sys;
+
+#if 0
+  extern void calc_size ();
+  calc_size ();
+  csCovMaskLUT* cml = new csCovMaskLUT (8);
+
+{
+  csVector2 from, to;
+  float dxdy, dydx;
+
+  from.x = 1; from.y = 1;
+  to.x = 15; to.y = 8;
+  dxdy = (to.x-from.x) / (to.y-from.y);
+  dydx = (to.y-from.y) / (to.x-from.x);
+  cml->GetMask (from, to, dxdy, dydx, 0, 0, 16, 16).Dump ();
+  printf ("\n");
+  cml->GetTriageMask (from, to, dxdy, dydx, 0, 0, 16, 16).Dump ();
+  printf ("\n");
+}
+
+{
+  csVector2 verts[100];
+  float dxdy[100], dydx[100];
+  verts[0].x = 3; verts[0].y = 7;
+  verts[1].x = 7; verts[1].y = 3;
+  verts[2].x = 20; verts[2].y = 7;
+  verts[3].x = 7; verts[3].y = 20;
+  int i, i1;
+  i1 = 4-1;
+  // @@@ Can we somehow combine the next divides with the
+  // perspective correction divides that are done earlier?
+  for (i = 0 ; i < 4 ; i++)
+  {
+    float dx = verts[i].x - verts[i1].x;
+    float dy = verts[i].y - verts[i1].y;
+    if (dy >= 0 && dy < SMALL_EPSILON) dy = SMALL_EPSILON;
+    else if (dy <= 0 && dy > -SMALL_EPSILON) dy = -SMALL_EPSILON;
+    dxdy[i1] = dx / dy;
+    dy = verts[i].y - verts[i1].y;
+    if (dx >= 0 && dx < SMALL_EPSILON) dx = SMALL_EPSILON;
+    else if (dx <= 0 && dx > -SMALL_EPSILON) dx = -SMALL_EPSILON;
+    dydx[i1] = dy / dx;
+    i1 = i;
+  }
+  cml->GetMask (verts, 4, dxdy, dydx, 0, 0, 16, 16).Dump ();
+  cml->GetTriageMask (verts, 4, dxdy, dydx, 0, 0, 16, 16).Dump ();
+
+  exit (0);
+}
+#endif
 
   if (!(G3D = QUERY_PLUGIN (sys, iGraphics3D)))
     return false;
@@ -363,6 +415,8 @@ void csWorld::Clear ()
   CHK (textures = new csTextureList ());
   CHK (delete c_buffer); c_buffer = NULL;
   CHK (delete quadtree); quadtree = NULL;
+  CHK (delete covtree); covtree = NULL;
+  CHK (delete covtree_lut); covtree_lut = NULL;
   CHK (delete render_pol2d_pool);
   CHK (render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory()));
   CHK (delete lightpatch_pool);
@@ -379,8 +433,8 @@ void csWorld::EnableCBuffer (bool en)
 {
   if (en)
   {
-    CHK (delete quadtree);
-    quadtree = NULL;
+    CHK (delete quadtree); quadtree = NULL;
+    CHK (delete covtree); covtree = NULL;
     if (c_buffer) return;
     CHK (c_buffer = new csCBuffer (0, frame_width-1, frame_height));
   }
@@ -395,8 +449,8 @@ void csWorld::EnableQuadtree (bool en)
 {
   if (en)
   {
-    CHK (delete c_buffer);
-    c_buffer = NULL;
+    CHK (delete c_buffer); c_buffer = NULL;
+    CHK (delete covtree); covtree = NULL;
     if (quadtree) return;
     csBox box (0, 0, frame_width, frame_height);
     CHK (quadtree = new csQuadtree (box, 8));
@@ -405,6 +459,27 @@ void csWorld::EnableQuadtree (bool en)
   {
     CHK (delete quadtree);
     quadtree = NULL;
+  }
+}
+
+void csWorld::EnableCovtree (bool en)
+{
+  if (en)
+  {
+    CHK (delete quadtree); quadtree = NULL;
+    CHK (delete covtree); covtree = NULL;
+    if (covtree) return;
+    csBox box (0, 0, frame_width, frame_height);
+    if (!covtree_lut)
+    {
+      CHK (covtree_lut = new csCovMaskLUT (8));
+    }
+    CHK (covtree = new csCoverageMaskTree (covtree_lut, box));
+  }
+  else
+  {
+    CHK (delete covtree);
+    covtree = NULL;
   }
 }
 
@@ -807,6 +882,8 @@ void csWorld::Draw (csCamera* c, csClipper* view)
   }
   if (quadtree)
     quadtree->MakeEmpty ();
+  if (covtree)
+    covtree->MakeEmpty ();
 
   csSector* s = c->GetSector ();
   s->Draw (rview);
