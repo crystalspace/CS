@@ -1,6 +1,13 @@
 The history order has been reversed so that new features are at the top.
 
 17-Jan-2001
+	- Wouter Windows added more error messages to openglwin32 canvas.
+	- Martin Geisse removed current support for threading from the
+	  wave-out driver because it produced strange gaps in sound output.
+	  It was a bug in the concept. This does not mean that threading
+	  won't be supported at all, but not the way it was done till
+	  now. Wave-Out is now based on function callback mode, which is
+	  also modified to remove the sound gaps.
 	- Renamed iskeleton.h to iskel.h to make it work on DOS.
 	- Extended iskel.h with several new interface to represent the
 	  skeleton structure of a 3D sprite: iSkeletonLimb,
