@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Aug-2004
+	- Eric Sunshine reverted the 29 July 2004 change to the cosf() check in
+	  configure.ac so that it once again performs the check with the C
+	  compiler rather than the C++ compiler. The benefit of using the C++
+	  compiler turned out to be illusory since, though the test would
+	  succeed because the functions were built-in, the headers failed to
+	  declare them, thus we nevertheless need to do extra work to make them
+	  usable. (The <cmath> change which was made at the same time is
+	  retained since it prevents problems resulting from clients including
+	  <cmath> after cosf() and cousins are faked-up.)
 7-Aug-2004
 	- Jorrit added a test (debug mode only) in the generic render step
 	  to print when a material or material handle is missing.
