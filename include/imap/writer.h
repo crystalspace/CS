@@ -22,10 +22,9 @@
 
 #include "csutil/scf.h"
 
-struct iEngine;
 struct iStrVector;
 
-SCF_VERSION (iSaverPlugin, 0, 0, 1);
+SCF_VERSION (iSaverPlugin, 0, 1, 0);
 
 /**
  * This is a plugin to save with.
@@ -37,7 +36,7 @@ struct iSaverPlugin : public iBase
    *  Concatenating the strings in the vector will create the saved text.
    *  Or write them to a file consequtively.
    */
-  virtual void WriteDown (iBase* obj, iStrVector* str, iEngine*) = 0;
+  virtual void WriteDown (iBase* obj, iStrVector* str) = 0;
 };
 
 #endif

@@ -53,7 +53,8 @@ public:
   csMotionLoader (iBase *);
   virtual ~csMotionLoader();
   virtual bool Initialize( iObjectRegistry *object_reg);
-  virtual iBase* Parse( const char* string, iEngine *engine, iBase *context );
+  virtual iBase* Parse( const char* string, iMaterialList* matlist,
+  	iMeshFactoryList* factlist, iBase *context );
 
   void Report (int severity, const char* msg, ...);
 
@@ -75,7 +76,7 @@ public:
   
   csMotionSaver (iBase *);
   virtual ~csMotionSaver ();
-  virtual void WriteDown ( iBase *obj, iStrVector *string, iEngine *engine );
+  virtual void WriteDown ( iBase *obj, iStrVector *string);
   
   struct eiComponent : public iComponent
   {

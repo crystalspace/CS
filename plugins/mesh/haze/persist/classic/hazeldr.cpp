@@ -248,7 +248,8 @@ static iHazeHull* ParseHull (char* buf, iHazeFactoryState *fstate, float &s)
 }
 
 iBase* csHazeFactoryLoader::Parse (const char* string,
-	iEngine* engine, iBase* /* context */)
+	iMaterialList* matlist, iMeshFactoryList* factlist,
+	iBase* /* context */)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (DIRECTIONAL)
@@ -293,8 +294,7 @@ iBase* csHazeFactoryLoader::Parse (const char* string,
       case CS_TOKEN_MATERIAL:
 	{
           csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = engine->GetMaterialList ()->
-	  	FindByName (str);
+          iMaterialWrapper* mat = matlist->FindByName (str);
 	  if (!mat)
 	  {
 	    printf ("Could not find material '%s'!\n", str);
@@ -406,8 +406,7 @@ static void WriteHull(iStrVector *str, iHazeHull *hull)
   printf ("Unknown hazehull type, cannot writedown!\n");
 }
 
-void csHazeFactorySaver::WriteDown (iBase* obj, iStrVector *str,
-  iEngine* /*engine*/)
+void csHazeFactorySaver::WriteDown (iBase* obj, iStrVector *str)
 {
   iHazeFactoryState *hazestate = SCF_QUERY_INTERFACE (obj, iHazeFactoryState);
   char buf[MAXLINE];
@@ -459,8 +458,8 @@ bool csHazeLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csHazeLoader::Parse (const char* string, iEngine* engine,
-	iBase* context)
+iBase* csHazeLoader::Parse (const char* string, iMaterialList* matlist,
+	iMeshFactoryList* factlist, iBase* context)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (DIRECTIONAL)
@@ -498,8 +497,7 @@ iBase* csHazeLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_FACTORY:
 	{
           csScanStr (params, "%s", str);
-	  iMeshFactoryWrapper* fact = engine->GetMeshFactories ()
-	  	->FindByName (str);
+	  iMeshFactoryWrapper* fact = factlist->FindByName (str);
 	  if (!fact)
 	  {
 	    // @@@ Error handling!
@@ -516,7 +514,7 @@ iBase* csHazeLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_MATERIAL:
 	{
           csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName (str);
+          iMaterialWrapper* mat = matlist->FindByName (str);
 	  if (!mat)
 	  {
 	    printf ("Could not find material '%s'!\n", str);
@@ -580,8 +578,7 @@ bool csHazeSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csHazeSaver::WriteDown (iBase* obj, iStrVector *str,
-  iEngine* /*engine*/)
+void csHazeSaver::WriteDown (iBase* obj, iStrVector *str)
 {
   iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
   iHazeState *state = SCF_QUERY_INTERFACE (obj, iHazeState);

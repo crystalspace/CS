@@ -537,4 +537,83 @@ void csIsoMeshSprite::AddToVertexStaticColor(int /*i*/,
   /// nothing
 }
 
+// ---------------------------------------------------------------------------
+// csIsoMeshFactoryWrapper
+// ---------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE_EXT (csIsoMeshFactoryWrapper)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMeshFactoryWrapper)
+  SCF_IMPLEMENTS_INTERFACE (csIsoMeshFactoryWrapper)
+SCF_IMPLEMENT_IBASE_EXT_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csIsoMeshFactoryWrapper::MeshFactoryWrapper)
+  SCF_IMPLEMENTS_INTERFACE (iMeshFactoryWrapper)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+csIsoMeshFactoryWrapper::csIsoMeshFactoryWrapper (iMeshObjectFactory* meshFact)
+{
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshFactoryWrapper);
+  csIsoMeshFactoryWrapper::meshFact = meshFact;
+  meshFact->IncRef ();
+}
+
+csIsoMeshFactoryWrapper::csIsoMeshFactoryWrapper ()
+{
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshFactoryWrapper);
+  csIsoMeshFactoryWrapper::meshFact = NULL;
+}
+
+csIsoMeshFactoryWrapper::~csIsoMeshFactoryWrapper ()
+{
+  if (meshFact) meshFact->DecRef ();
+}
+
+void csIsoMeshFactoryWrapper::SetMeshObjectFactory (
+	iMeshObjectFactory* meshFact)
+{
+  if (meshFact) meshFact->IncRef ();
+  if (csIsoMeshFactoryWrapper::meshFact)
+    csIsoMeshFactoryWrapper::meshFact->DecRef ();
+  csIsoMeshFactoryWrapper::meshFact = meshFact;
+}
+
+void csIsoMeshFactoryWrapper::HardTransform (const csReversibleTransform& t)
+{
+  meshFact->HardTransform (t);
+}
+
+//--------------------------------------------------------------------------
+// csIsoMeshFactoryList
+//--------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE (csIsoMeshFactoryList)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMeshFactoryList)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csIsoMeshFactoryList::MeshFactoryList)
+  SCF_IMPLEMENTS_INTERFACE (iMeshFactoryList)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+csIsoMeshFactoryList::csIsoMeshFactoryList ()
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshFactoryList);
+}
+
+int csIsoMeshFactoryList::MeshFactoryList::GetCount () const
+  { return scfParent->Length (); }
+iMeshFactoryWrapper *csIsoMeshFactoryList::MeshFactoryList::Get (int n) const
+  { return scfParent->Get (n); }
+int csIsoMeshFactoryList::MeshFactoryList::Add (iMeshFactoryWrapper *obj)
+  { scfParent->Push (obj); return true; }
+bool csIsoMeshFactoryList::MeshFactoryList::Remove (iMeshFactoryWrapper *obj)
+  { scfParent->Delete (obj); return true; }
+bool csIsoMeshFactoryList::MeshFactoryList::Remove (int n)
+  { scfParent->Delete (scfParent->Get (n)); return true; }
+void csIsoMeshFactoryList::MeshFactoryList::RemoveAll ()
+  { scfParent->DeleteAll (); }
+int csIsoMeshFactoryList::MeshFactoryList::Find (iMeshFactoryWrapper *obj) const
+  { return scfParent->Find (obj); }
+iMeshFactoryWrapper *csIsoMeshFactoryList::MeshFactoryList::FindByName (const char *Name) const
+  { return scfParent->FindByName (Name); }
 

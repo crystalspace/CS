@@ -248,7 +248,7 @@ public:
   csIsoMaterialWrapper *FindByName (const char* iName)
   { return (csIsoMaterialWrapper *)csNamedObjVector::FindByName (iName); }
 
-  /// remove 'index' from the list. Does not decref/delete.
+  /// remove 'index' from the list. Does DecRef().
   void RemoveIndex(int i);
 
   SCF_DECLARE_IBASE;
@@ -271,7 +271,8 @@ public:
     }
     virtual int Add (iMaterialWrapper *imw)
     {
-      csIsoMaterialWrapper* mw = scfParent->NewMaterial (imw->GetMaterialHandle ());
+      csIsoMaterialWrapper* mw = scfParent->NewMaterial (
+      	imw->GetMaterialHandle ());
       if (mw) return Find (&(mw->scfiMaterialWrapper));
       return -1;
     }

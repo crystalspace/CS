@@ -242,7 +242,7 @@ public:
   csTerrFuncObject (iObjectRegistry* object_reg, iMeshObjectFactory* factory);
   virtual ~csTerrFuncObject ();
 
-  void LoadMaterialGroup (iEngine* engine, const char *pName,
+  void LoadMaterialGroup (iMaterialList* matlist, const char *pName,
     int iStart, int iEnd);
   /// Set the base color.
   void SetColor (const csColor& col) { base_color = col; dirlight_number++; }
@@ -482,10 +482,10 @@ public:
   class TerrFuncState : public iTerrFuncState
   {
     SCF_DECLARE_EMBEDDED_IBASE (csTerrFuncObject);
-    virtual void LoadMaterialGroup (iEngine* engine, const char *pName,
+    virtual void LoadMaterialGroup (iMaterialList* matlist, const char *pName,
       int iStart, int iEnd)
     {
-      scfParent->LoadMaterialGroup (engine, pName, iStart, iEnd);
+      scfParent->LoadMaterialGroup (matlist, pName, iStart, iEnd);
     }
     virtual void SetTopLeftCorner (const csVector3& topleft)
     {

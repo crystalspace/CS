@@ -378,7 +378,7 @@ struct iMeshFactoryWrapper : public iBase
    * Set the parent of this factory. This will only change the 'parent'
    * pointer but not add the factory as a child! Internal use only.
    */
-  virtual void SetParentContainer (iMeshFactoryWrapper *p) const = 0;
+  virtual void SetParentContainer (iMeshFactoryWrapper *p) = 0;
 
   /**
    * Get all the children of this mesh factory.

@@ -20,10 +20,16 @@
 #define __ISOMESH_H__
 
 #include "ivaria/iso.h"
+#include "csutil/csobject.h"
+#include "csutil/nobjvec.h"
 #include "ivideo/graph3d.h"
 #include "csgeom/matrix3.h"
+#include "csgeom/transfrm.h"
+#include "iengine/mesh.h"
 
 struct iMaterialWrapper;
+struct iMeshFactoryWrapper;
+struct iMeshFactoryList;
 
 class csIsoMeshSprite : public iIsoMeshSprite {
 private:
@@ -88,7 +94,106 @@ public:
   virtual const csMatrix3& GetTransform() const {return transform;}
   virtual void SetZBufMode(csZBufMode mode) {zbufmode = mode;}
   virtual csZBufMode GetZBufMode() const {return zbufmode;}
+};
 
+CS_DECLARE_OBJECT_VECTOR (csIsoMeshFactoryListHelper, iMeshFactoryWrapper);
+
+/**
+ * A list of mesh factories.
+ */
+class csIsoMeshFactoryList : public csIsoMeshFactoryListHelper
+{
+public:
+  SCF_DECLARE_IBASE;
+
+  /// constructor
+  csIsoMeshFactoryList ();
+
+  class MeshFactoryList : public iMeshFactoryList
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csIsoMeshFactoryList);
+    virtual int GetCount () const;
+    virtual iMeshFactoryWrapper *Get (int n) const;
+    virtual int Add (iMeshFactoryWrapper *obj);
+    virtual bool Remove (iMeshFactoryWrapper *obj);
+    virtual bool Remove (int n);
+    virtual void RemoveAll ();
+    virtual int Find (iMeshFactoryWrapper *obj) const;
+    virtual iMeshFactoryWrapper *FindByName (const char *Name) const;
+  } scfiMeshFactoryList;
+};
+
+SCF_VERSION (csIsoMeshFactoryWrapper, 0, 0, 1);
+
+/**
+ * The holder class for all implementations of iMeshObjectFactory.
+ */
+class csIsoMeshFactoryWrapper : public csObject
+{
+private:
+  /// Mesh object factory corresponding with this csMeshFactoryWrapper.
+  iMeshObjectFactory* meshFact;
+  csReversibleTransform tr;	// Dummy
+
+private:
+  /// Destructor.
+  virtual ~csIsoMeshFactoryWrapper ();
+
+public:
+  /// Constructor.
+  csIsoMeshFactoryWrapper (iMeshObjectFactory* meshFact);
+  /// Constructor.
+  csIsoMeshFactoryWrapper ();
+
+  /// Set the mesh object factory.
+  void SetMeshObjectFactory (iMeshObjectFactory* meshFact);
+
+  /// Get the mesh object factory.
+  iMeshObjectFactory* GetMeshObjectFactory () const
+  {
+    return meshFact;
+  }
+
+  /**
+   * Do a hard transform of this factory.
+   * This transformation and the original coordinates are not
+   * remembered but the object space coordinates are directly
+   * computed (world space coordinates are set to the object space
+   * coordinates by this routine). Note that some implementations
+   * of mesh objects will not change the orientation of the object but
+   * only the position.
+   */
+  void HardTransform (const csReversibleTransform& t);
+
+  SCF_DECLARE_IBASE_EXT (csObject);
+
+  //----------------- iMeshFactoryWrapper implementation --------------------//
+  struct MeshFactoryWrapper : public iMeshFactoryWrapper
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csIsoMeshFactoryWrapper);
+    virtual iMeshObjectFactory* GetMeshObjectFactory () const
+      { return scfParent->GetMeshObjectFactory (); }
+    virtual void SetMeshObjectFactory (iMeshObjectFactory* fact)
+      { scfParent->SetMeshObjectFactory (fact); }
+    virtual iObject *QueryObject ()
+      { return scfParent; }
+    virtual void HardTransform (const csReversibleTransform& t)
+      { scfParent->HardTransform (t); }
+    virtual iMeshWrapper* CreateMeshWrapper ()
+      { return NULL; }
+    virtual iMeshFactoryWrapper* GetParentContainer () const
+      { return NULL; }
+    virtual void SetParentContainer (iMeshFactoryWrapper *p)
+      { (void)p; }
+    virtual iMeshFactoryList* GetChildren ()
+      { return NULL; }
+    virtual csReversibleTransform& GetTransform ()
+      { return scfParent->tr; }
+    virtual void SetTransform (const csReversibleTransform& tr)
+      { (void)tr; }
+  } scfiMeshFactoryWrapper;
+  friend struct MeshFactoryWrapper;
 };
 
 #endif
+

@@ -460,7 +460,8 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iReporter* reporter,
   return true;
 }
 
-iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
+iBase* csSprite3DFactoryLoader::Parse (const char* string,
+	iMaterialList* matlist, iMeshFactoryList* factlist,
 	iBase* context)
 {
   // @@@ Implement MIXMODE
@@ -537,8 +538,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_MATERIAL:
 	{
           csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = engine->GetMaterialList ()->
-	  	FindByName (str);
+          iMaterialWrapper* mat = matlist->FindByName (str);
 	  if (!mat)
 	  {
 	    ReportError (reporter,
@@ -805,8 +805,7 @@ void csSprite3DFactorySaver::SaveSkeleton (iSkeletonLimb* limb,
   con->DecRef();
 }
 
-void csSprite3DFactorySaver::WriteDown (iBase* obj, iStrVector * str,
-  iEngine* /*engine*/)
+void csSprite3DFactorySaver::WriteDown (iBase* obj, iStrVector * str)
 {
   iSprite3DFactoryState *state =
     SCF_QUERY_INTERFACE (obj, iSprite3DFactoryState);
@@ -905,8 +904,8 @@ bool csSprite3DLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
-	iBase* context)
+iBase* csSprite3DLoader::Parse (const char* string, iMaterialList* matlist,
+	iMeshFactoryList* factlist, iBase* context)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (ACTION)
@@ -947,8 +946,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_FACTORY:
 	{
           csScanStr (params, "%s", str);
-	  iMeshFactoryWrapper* fact = engine->GetMeshFactories ()
-	  	->FindByName (str);
+	  iMeshFactoryWrapper* fact = factlist->FindByName (str);
 	  if (!fact)
 	  {
       	    ReportError (reporter,
@@ -983,8 +981,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_MATERIAL:
 	{
           csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = engine->GetMaterialList ()->
-	  	FindByName (str);
+          iMaterialWrapper* mat = matlist->FindByName (str);
 	  if (!mat)
 	  {
       	    ReportError (reporter,
@@ -1093,8 +1090,7 @@ bool csSprite3DSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csSprite3DSaver::WriteDown (iBase* obj, iStrVector *str,
-  iEngine* /*engine*/)
+void csSprite3DSaver::WriteDown (iBase* obj, iStrVector *str)
 {
   iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
   iSprite3DState *state = SCF_QUERY_INTERFACE (obj, iSprite3DState);

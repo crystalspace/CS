@@ -611,9 +611,12 @@ Nag to Jorrit about this feature if you want it.");
   return true;
 }
 
-iBase* csThingLoader::Parse (const char* string, iEngine* engine,
-	iBase* context)
+iBase* csThingLoader::Parse (const char* string, iMaterialList*,
+	iMeshFactoryList*, iBase* context)
 {
+  // Things only work with the real 3D engine and not with the iso engine.
+  iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  CS_ASSERT (engine != NULL);
   iMeshObjectFactory* fact = NULL;
   iThingState* thing_state = NULL;
 
@@ -638,6 +641,7 @@ iBase* csThingLoader::Parse (const char* string, iEngine* engine,
     fact = NULL;
   }
   thing_state->DecRef ();
+  engine->DecRef ();
   return fact;
 }
 
@@ -665,8 +669,7 @@ bool csThingSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csThingSaver::WriteDown (iBase* /*obj*/, iStrVector *str,
-  iEngine* /*engine*/)
+void csThingSaver::WriteDown (iBase* /*obj*/, iStrVector *str)
 {
   iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
   char buf[MAXLINE];
@@ -723,8 +726,8 @@ bool csPlaneLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csPlaneLoader::Parse (const char* string, iEngine* engine,
-	iBase* /*context*/)
+iBase* csPlaneLoader::Parse (const char* string, iMaterialList*,
+	iMeshFactoryList*, iBase* /*context*/)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (ORIG)
@@ -742,8 +745,14 @@ iBase* csPlaneLoader::Parse (const char* string, iEngine* engine,
   char* xname;
   long cmd;
   char* params;
+
+  // Things only work with the real 3D engine and not with the iso engine.
+  iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  CS_ASSERT (engine != NULL);
+
   iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
   	iThingEnvironment);
+  engine->DecRef ();
   iPolyTxtPlane* ppl = te->CreatePolyTxtPlane ();
   te->DecRef ();
 
@@ -879,8 +888,7 @@ bool csPlaneSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csPlaneSaver::WriteDown (iBase* /*obj*/, iStrVector* /*str*/,
-  iEngine* /*engine*/)
+void csPlaneSaver::WriteDown (iBase* /*obj*/, iStrVector* /*str*/)
 {
 }
 
@@ -908,7 +916,8 @@ bool csBezierLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csBezierLoader::Parse (const char* string, iEngine* engine,
+iBase* csBezierLoader::Parse (const char* string, iMaterialList*,
+	iMeshFactoryList*,
 	iBase* /*context*/)
 {
   CS_TOKEN_TABLE_START (commands)
@@ -923,6 +932,10 @@ iBase* csBezierLoader::Parse (const char* string, iEngine* engine,
   int i;
   char *params;
   char name[100];
+
+  // Things only work with the real 3D engine and not with the iso engine.
+  iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  CS_ASSERT (engine != NULL);
 
   iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
 	    iThingEnvironment);
@@ -940,6 +953,7 @@ iBase* csBezierLoader::Parse (const char* string, iEngine* engine,
       ReportError (reporter,
 	  "crystalspace.bezierloader.parse.badformat",
           "Expected parameters instead of '%s'!", buf);
+      engine->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -967,6 +981,7 @@ iBase* csBezierLoader::Parse (const char* string, iEngine* engine,
 	  ReportError (reporter,
 	    "crystalspace.bezierloader.parse.material",
             "Couldn't find material named '%s'!", str);
+          engine->DecRef ();
           return NULL;
         }
         tmpl->SetMaterial (mat);
@@ -981,6 +996,7 @@ iBase* csBezierLoader::Parse (const char* string, iEngine* engine,
 	    ReportError (reporter,
 	      "crystalspace.bezierloader.parse.vertices",
               "Wrong number of vertices to bezier! %d should be 9!", num);
+            engine->DecRef ();
             return NULL;
           }
           for (i = 0 ; i < num ; i++) tmpl->SetVertex (i, list[i]);
@@ -988,6 +1004,7 @@ iBase* csBezierLoader::Parse (const char* string, iEngine* engine,
         break;
     }
   }
+  engine->DecRef ();
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     ReportError (reporter,
@@ -1023,7 +1040,6 @@ bool csBezierSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csBezierSaver::WriteDown (iBase* /*obj*/, iStrVector* /*str*/,
-  iEngine* /*engine*/)
+void csBezierSaver::WriteDown (iBase* /*obj*/, iStrVector* /*str*/)
 {
 }

@@ -99,10 +99,8 @@ csIsoEngine::csIsoEngine (iBase *iParent)
 
 csIsoEngine::~csIsoEngine ()
 {
-  int i;
-  for(i=0; i<materials.Length(); i++)
-    RemoveMaterial(i);
-  if(g3d) g3d->DecRef();
+  materials.scfiMaterialList.RemoveAll ();
+  if (g3d) g3d->DecRef();
 }
 
 bool csIsoEngine::Initialize (iObjectRegistry* p)
@@ -153,9 +151,7 @@ bool csIsoEngine::HandleEvent (iEvent& Event)
         // We must free all material and texture handles since after
         // G3D->Close() they all become invalid, no matter whenever
         // we did or didn't an IncRef on them.
-	  int i;
-	  for(i=0; i<materials.Length(); i++)
-	  RemoveMaterial(i);
+	materials.scfiMaterialList.RemoveAll ();
         return true;
       }
       case cscmdContextResize:
@@ -250,29 +246,6 @@ iIsoLight* csIsoEngine::CreateLight()
   return new csIsoLight(this);
 }
 
-iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(iMaterial *material,
-      const char *name)
-{
-  iMaterialWrapper* wrap = SCF_QUERY_INTERFACE(materials.NewMaterial(material),
-    iMaterialWrapper);
-  iObject *object = SCF_QUERY_INTERFACE(wrap, iObject);
-  object->SetName(name);
-  object->DecRef();
-  return wrap;
-}
-
-iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(iMaterialHandle *handle,
-	    const char *name)
-{
-  iMaterialWrapper* wrap = SCF_QUERY_INTERFACE(materials.NewMaterial(handle),
-    iMaterialWrapper);
-  iObject *object = SCF_QUERY_INTERFACE(wrap, iObject);
-  object->SetName(name);
-  object->DecRef();
-  //printf("name %s = %d \n", name, materials.FindByName(name)->GetIndex());
-  return wrap;
-}
-
 iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
 	          const char *materialname)
 {
@@ -329,7 +302,11 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
   material = new csIsoMaterial(handle);
   math = txtmgr->RegisterMaterial(material);
   if(math) 
-    mat_wrap = CreateMaterialWrapper(math, materialname);
+  {
+    mat_wrap = materials.scfiMaterialList.NewMaterial (math);
+    mat_wrap->IncRef ();	// Jorrit: @@@ Not sure why this is needed?
+    mat_wrap->QueryObject ()->SetName (materialname);
+  }
   else
   {
     Report (CS_REPORTER_SEVERITY_ERROR, 
@@ -347,43 +324,6 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
   return mat_wrap;
 }
 
-iMaterialWrapper *csIsoEngine::FindMaterial(const char *name)
-{
-  return SCF_QUERY_INTERFACE(materials.FindByName(name), iMaterialWrapper);
-}
-
-iMaterialWrapper *csIsoEngine::FindMaterial(int index)
-{
-  return SCF_QUERY_INTERFACE(materials.Get(index), iMaterialWrapper);
-}
-
-void csIsoEngine::RemoveMaterial(const char *name)
-{
-  csIsoMaterialWrapper *wrap = materials.FindByName(name);
-  if(!wrap) return;
-  int i;
-  for(i=0; i< materials.Length(); i++)
-  {
-    if(materials.Get(i) == wrap) break;
-  }
-  materials.RemoveIndex(i);
-  delete wrap;
-}
-
-void csIsoEngine::RemoveMaterial(int index)
-{
-  csIsoMaterialWrapper *wrap = materials.Get(index);
-  if(!wrap) return;
-  materials.RemoveIndex(index);
-  delete wrap;
-}
-
-int csIsoEngine::GetMaterialCount() const
-{
-  return materials.Length();
-}
-
-
 iMeshObjectFactory *csIsoEngine::CreateMeshFactory(const char* classId,
     const char *name) 
 {
@@ -392,7 +332,10 @@ iMeshObjectFactory *csIsoEngine::CreateMeshFactory(const char* classId,
 
   if(name)
   {
-    mesh_fact = FindMeshFactory(name);
+    iMeshFactoryWrapper* wrap = meshfactories.
+    	scfiMeshFactoryList.FindByName (name);
+    if (wrap) mesh_fact = wrap->GetMeshObjectFactory ();
+    else mesh_fact = NULL;
     if (mesh_fact)
     {
       mesh_fact->IncRef ();
@@ -412,34 +355,17 @@ iMeshObjectFactory *csIsoEngine::CreateMeshFactory(const char* classId,
   mesh_fact = mesh_type->NewFactory ();
   if(mesh_fact)
   {
-    AddMeshFactory (mesh_fact, name);
-    mesh_fact->DecRef ();
+    //AddMeshFactory (mesh_fact, name);
+    //mesh_fact->DecRef ();
+    csIsoMeshFactoryWrapper* wrap = new csIsoMeshFactoryWrapper (mesh_fact);
+    iObject* obj = SCF_QUERY_INTERFACE (wrap, iObject);
+    obj->SetName (name);
+    obj->DecRef ();
+    meshfactories.scfiMeshFactoryList.Add (&(wrap->scfiMeshFactoryWrapper));
+    wrap->DecRef ();
   }
   mesh_type->DecRef ();
   return mesh_fact;
 }
 
-void csIsoEngine::AddMeshFactory(iMeshObjectFactory *fact, const char *name)
-{
-  if(name && FindMeshFactory(name))
-    return;
-  fact->IncRef();
-  meshfactories.Push(new csIsoObjWrapper(fact, name));
-}
-
-iMeshObjectFactory *csIsoEngine::FindMeshFactory(const char *name)
-{
-  return (iMeshObjectFactory *)meshfactories.FindContentByName(name);
-}
-
-void csIsoEngine::RemoveMeshFactory(const char *name)
-{
-  int idx = meshfactories.FindIndexByName(name);
-  if(idx==-1) return;
-  csIsoObjWrapper *wrap = (csIsoObjWrapper*) meshfactories.Get(idx);
-  meshfactories.Delete(idx);
-  if(wrap->GetContent())
-    wrap->GetContent()->DecRef();
-  delete wrap;
-}
 

@@ -208,6 +208,11 @@ void csIsoMaterialList::RemoveIndex(int i)
 {
   CS_ASSERT (i >= 0);
   if(i>=Length()) return;
+
+  iMaterialWrapper* mw = (iMaterialWrapper*)(*this)[i];
+  mw->DecRef ();
+  (*this)[i] = NULL;
+
   if(i==Length()-1)
   {
     (void)Pop(); // pop last element from the list
@@ -215,7 +220,6 @@ void csIsoMaterialList::RemoveIndex(int i)
     return;
   }
   /// remove from middle of list
-  (*this)[i] = NULL;
   if(i<lastindex) lastindex = i;
 }
 

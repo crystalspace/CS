@@ -896,7 +896,8 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	}
 	else
 	{
-	  iBase* mof = plug->Parse (params, Engine, stemp);
+	  iBase* mof = plug->Parse (params, Engine->GetMaterialList (),
+	  	Engine->GetMeshFactories (), stemp);
 	  if (!mof)
 	  {
             ReportError (
@@ -1683,7 +1684,8 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	}
 	else
 	{
-	  iBase* mo = plug->Parse (params, Engine, mesh);
+	  iBase* mo = plug->Parse (params, Engine->GetMaterialList (),
+	  	Engine->GetMeshFactories (), mesh);
           if (mo)
           {
 	    iMeshObject* mo2 = SCF_QUERY_INTERFACE (mo, iMeshObject);
@@ -1780,7 +1782,8 @@ bool csLoader::LoadAddOn (char* buf, iBase* context)
 	}
 	else
 	{
-	  plug->Parse (params, Engine, context);
+	  plug->Parse (params, Engine->GetMaterialList (),
+	  	Engine->GetMeshFactories (), context);
 	}
         break;
 

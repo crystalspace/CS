@@ -36,6 +36,8 @@ struct iTextureManager;
 struct iMaterial;
 struct iMaterialHandle;
 struct iMaterialWrapper;
+struct iMaterialList;
+struct iMeshFactoryList;
 struct iClipper2D;
 struct iIsoWorld;
 struct iIsoView;
@@ -62,7 +64,7 @@ struct iGridChangeCallback : public iBase
   virtual void GridChange (iIsoSprite* spr) = 0;
 };
 
-SCF_VERSION (iIsoEngine, 0, 0, 2);
+SCF_VERSION (iIsoEngine, 0, 1, 0);
 
 /**
  * SCF Interface to the isometric engine.
@@ -104,41 +106,20 @@ struct iIsoEngine : public iBase
   virtual iIsoSprite* CreateXWallSprite(const csVector3& pos, float w, 
     float h) = 0;
 
-  /// Create a new materialwrapper for the iso engine from material
-  virtual iMaterialWrapper *CreateMaterialWrapper(iMaterial *material,
-    const char *name) = 0;
-  /** 
-   * Create a new materialwrapper for the iso engine from 
-   * pre-prepared iMaterialHandle given. It is Increfed.
-   */
-  virtual iMaterialWrapper *CreateMaterialWrapper(iMaterialHandle *handle,
-    const char *name) = 0;
+  /// Get the list of materials.
+  virtual iMaterialList* GetMaterialList () = 0;
   /** 
    * Create a new materialwrapper for the iso engine from 
    * the given file (on the VFS), resulting in a material with that texture.
    */
   virtual iMaterialWrapper *CreateMaterialWrapper(const char *vfsfilename,
     const char *materialname) = 0;
-  /// Find a material by name
-  virtual iMaterialWrapper *FindMaterial(const char *name) = 0;
-  /// Find a material by index
-  virtual iMaterialWrapper *FindMaterial(int index) = 0;
-  /// delete a material by name
-  virtual void RemoveMaterial(const char *name) = 0;
-  /// delete a material by index
-  virtual void RemoveMaterial(int index) = 0;
-  /// get the possible number of materials (indices 0..n-1), some are NULL.
-  virtual int GetMaterialCount() const = 0;
 
+  /// Get the list of mesh factories
+  virtual iMeshFactoryList* GetMeshFactories () = 0;
   /// load and add a mesh factory, given classID under given name.
   virtual iMeshObjectFactory *CreateMeshFactory(const char* classId,
     const char *name) = 0;
-  /// add a mesh factory, to the list of mesh factories under given name.
-  virtual void AddMeshFactory(iMeshObjectFactory *fact, const char *name) = 0;
-  /// find a mesh factory by name
-  virtual iMeshObjectFactory *FindMeshFactory(const char *name) = 0;
-  /// remove a mesh factory
-  virtual void RemoveMeshFactory(const char *name) = 0;
 };
 
 SCF_VERSION (iIsoWorld, 0, 0, 1);

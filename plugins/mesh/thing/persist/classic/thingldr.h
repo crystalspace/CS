@@ -52,7 +52,8 @@ public:
   bool Initialize (iObjectRegistry* p);
 
   /// Parse a given string and return a new object for it.
-  virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
+  virtual iBase* Parse (const char* string, iMaterialList* matlist,
+  	iMeshFactoryList* factlist, iBase* context);
 
   struct eiComponent : public iComponent
   {
@@ -84,7 +85,7 @@ public:
   bool Initialize (iObjectRegistry* p);
 
   /// Write down given object and add to string vector.
-  virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
+  virtual void WriteDown (iBase *obj, iStrVector *str);
 
   struct eiComponent : public iComponent
   {
@@ -117,7 +118,8 @@ public:
   bool Initialize (iObjectRegistry* p);
 
   /// Parse a given string and return a new object for it.
-  virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
+  virtual iBase* Parse (const char* string, iMaterialList* matlist,
+  	iMeshFactoryList* factlist, iBase* context);
 
   struct eiComponent : public iComponent
   {
@@ -149,7 +151,7 @@ public:
   bool Initialize (iObjectRegistry* p);
 
   /// Write down given object and add to string vector.
-  virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
+  virtual void WriteDown (iBase *obj, iStrVector *str);
 
   struct eiComponent : public iComponent
   {
@@ -181,7 +183,8 @@ public:
   bool Initialize (iObjectRegistry* p);
 
   /// Parse a given string and return a new object for it.
-  virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
+  virtual iBase* Parse (const char* string, iMaterialList* matlist,
+  	iMeshFactoryList* factlist, iBase* context);
 
   struct eiComponent : public iComponent
   {
@@ -213,7 +216,7 @@ public:
   bool Initialize (iObjectRegistry* p);
 
   /// Write down given object and add to string vector.
-  virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
+  virtual void WriteDown (iBase *obj, iStrVector *str);
 
   struct eiComponent : public iComponent
   {

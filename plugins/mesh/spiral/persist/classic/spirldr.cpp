@@ -133,7 +133,7 @@ bool csSpiralFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 iBase* csSpiralFactoryLoader::Parse (const char* /*string*/,
-	iEngine* /*engine*/, iBase* /* context */)
+	iMaterialList*, iMeshFactoryList*, iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.mesh.object.spiral", iMeshObjectType);
@@ -189,8 +189,7 @@ static void WriteMixmode(iStrVector *str, UInt mixmode)
   str->Push(csStrNew(")"));
 }
 
-void csSpiralFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
-  iEngine* /*engine*/)
+void csSpiralFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/)
 {
   // nothing to do
 }
@@ -266,8 +265,8 @@ static UInt ParseMixmode (char* buf)
   return Mixmode;
 }
 
-iBase* csSpiralLoader::Parse (const char* string, iEngine* engine,
-	iBase* context)
+iBase* csSpiralLoader::Parse (const char* string, iMaterialList* matlist,
+	iMeshFactoryList* factlist, iBase* context)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (MATERIAL)
@@ -319,8 +318,7 @@ iBase* csSpiralLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_FACTORY:
 	{
           csScanStr (params, "%s", str);
-	  iMeshFactoryWrapper* fact = engine->GetMeshFactories ()
-	  	->FindByName (str);
+	  iMeshFactoryWrapper* fact = factlist->FindByName (str);
 	  if (!fact)
 	  {
 	    // @@@ Error handling!
@@ -337,8 +335,7 @@ iBase* csSpiralLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_MATERIAL:
 	{
           csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = engine->GetMaterialList ()->
-	  	FindByName (str);
+          iMaterialWrapper* mat = matlist->FindByName (str);
 	  if (!mat)
 	  {
             // @@@ Error handling!
@@ -389,8 +386,7 @@ bool csSpiralSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csSpiralSaver::WriteDown (iBase* obj, iStrVector *str,
-  iEngine* /*engine*/)
+void csSpiralSaver::WriteDown (iBase* obj, iStrVector *str)
 {
   iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
   iParticleState *partstate = SCF_QUERY_INTERFACE (obj, iParticleState);

@@ -24,6 +24,7 @@
 struct iEngine;
 struct iImage;
 struct iMaterialWrapper;
+struct iMaterialList;
 class csVector3;
 class csColor;
 class csTransform;
@@ -52,7 +53,7 @@ struct iTerrainNormalFunction : public iBase
   virtual csVector3 GetNormal (float dx, float dy) = 0;
 };
 
-SCF_VERSION (iTerrFuncState, 0, 0, 8);
+SCF_VERSION (iTerrFuncState, 0, 0, 9);
 
 /**
  * This interface describes the API for the terrain object.
@@ -60,7 +61,7 @@ SCF_VERSION (iTerrFuncState, 0, 0, 8);
 struct iTerrFuncState : public iBase
 {
   /// Load a group of materials.
-  virtual void LoadMaterialGroup (iEngine* engine, const char *pName,
+  virtual void LoadMaterialGroup (iMaterialList* engine, const char *pName,
   	int iStart, int iEnd) = 0;
   /// Set the top-left corner of the terrain.
   virtual void SetTopLeftCorner (const csVector3& topleft) = 0;

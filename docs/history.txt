@@ -1,6 +1,40 @@
 The history order is reversed so that new features are at the top.
 
 10-Dec-2001
+	- Added thanks to Ted Nguyen for donating two copies of MSVC
+	  to Jorrit Tyberghein and Eric Sunshine (one each :-)
+	- Added iIsoEngine::GetMaterialList() and removed all other material
+	  related functions (except the one to create a material from
+	  a VFS filename) from iIsoEngine. This makes iso engine more
+	  consistant with the 3D engine.
+	- Added iIsoEngine::GetMeshFactories(). Also created
+	  iMeshFactoryWrapper and iMeshFactoryList implementations for iso
+	  engine. Removed iIsoEngine::AddMeshFactory(), FindMeshFactory(),
+	  and RemoveMeshFactory().
+	- Removed csIsoNamedVector and csIsoObjWrapper classes since these
+	  are now no longer used.
+	- During this small redesign of the iso engine several bugs where
+	  fixed. Mostly in functions that were never used so never tested
+	  (i.e. mostly functions for finding and removing mesh factories and
+	  materials).
+	- Changed iTerrFuncState::LoadMaterialGroup() so that the first
+	  parameter is now a material list (iMaterialList) instead of iEngine.
+	- Removed weird 'const' from iMeshFactoryWrapper::SetParentContainer().
+	  How can a function that modifies an object be const?
+	- Changed iLoaderPlugin to accept a material list and mesh factory
+	  list (iMaterialList and iMeshFactoryList) instead of an iEngine
+	  instance. This allows the loader plugins to work fine with the
+	  isometric engine too. In the past this was hard to do because
+	  the isometric engine doesn't implement iEngine so there was no
+	  useful pointer to give to the loader plugins.
+	  Note that this will not work for the thing loader. At this moment
+	  things are tied to the real 3D engine and cannot work in the
+	  isometric engine. So the thing loader refuses to work if the
+	  3D engine is not present.
+	- For similar reasons I removed the iEngine pointer from
+	  iSaverPlugin::WriteDown().
+	- Modified all loader and saver plugins in CS to conform to the new
+	  API.
 	- Matze enabled python in cygwin port. (I didn't touch anything, but as
 	  I tried it again today, it suddenly worked :)
 9-Dec-2001

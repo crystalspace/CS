@@ -108,3 +108,32 @@ Added several functions to @code{iThingState}:
 @code{RemoveCurves()}
 @end itemize
 
+@subheading Isometric Engine
+@cindex @code{iIsoEngine}
+
+Added @code{iIsoEngine::GetMaterialList()} and removed all other
+material functions from @code{iIsoEngine} except the one to create a material
+from a @sc{vfs} path.
+
+Added @code{iIsoEngine::GetMeshFactories()} and removed
+@code{AddMeshFactory()}, @code{FindMeshFactory()}, and
+@code{RemoveMeshFactory()}.
+
+@subheading Terrain Mesh Object
+@cindex @code{iTerrFuncState}
+
+Changed @code{iTerrFuncState::LoadMaterialGroup()} so that the first
+parameter is now a material list (@code{iMaterialList}) instead of
+@code{iEngine}.
+
+@subheading Loader and Saver Plugins
+@cindex @code{iLoaderPlugin}
+@cindex @code{iSaverPlugin}
+
+Changed @code{iLoaderPlugin::Parse()} to accept a material list and mesh
+factory list (@code{iMaterialList} and @code{iMeshFactoryList}) instead of an
+@code{iEngine} instance.
+
+Changed @code{iSaverPlugin::WriteDown()} so that it no longer has
+the @code{iEngine} parameter.
+

@@ -431,7 +431,8 @@ bool csMotionLoader::LoadMotion (iMotion* mot, char* buf)
 }
 
 
-iBase* csMotionLoader::Parse ( const char *string, iEngine* /* engine */, iBase* /* context */ )
+iBase* csMotionLoader::Parse ( const char *string, iMaterialList*,
+	iMeshFactoryList*, iBase* /* context */ )
 {
 CS_TOKEN_TABLE_START(commands)
   CS_TOKEN_TABLE(FILE)
@@ -498,7 +499,7 @@ csMotionSaver::~csMotionSaver()
 {
 }
 
-void csMotionSaver::WriteDown ( iBase* /* obj */, iStrVector* /* string */, iEngine* /* engine */)
+void csMotionSaver::WriteDown ( iBase* /* obj */, iStrVector* /* string */)
 {
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iMotionManager *motman = CS_QUERY_PLUGIN_CLASS (plugin_mgr,

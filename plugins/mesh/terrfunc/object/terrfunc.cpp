@@ -248,8 +248,8 @@ void csTerrFuncObject::CorrectSeams (int tw, int th)
   }
 }
 
-void csTerrFuncObject::LoadMaterialGroup (iEngine* engine, const char *pName,
-	int iStart, int iEnd)
+void csTerrFuncObject::LoadMaterialGroup (iMaterialList* matlist,
+	const char *pName, int iStart, int iEnd)
 {
   if (!blocks || block_dim_invalid)
   {
@@ -262,8 +262,8 @@ void csTerrFuncObject::LoadMaterialGroup (iEngine* engine, const char *pName,
   for (i = iStart ; i <= iEnd ; i++)
   {
     sprintf (pMatName, pName, i);
-    iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName (pMatName);
-	Index2Block(i, bx, by);
+    iMaterialWrapper* mat = matlist->FindByName (pMatName);
+    Index2Block(i, bx, by);
     Block2Index(by, bx, newi);
     blocks[newi].material = mat;
   }

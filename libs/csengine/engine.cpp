@@ -2168,7 +2168,7 @@ iMeshFactoryWrapper* csEngine::LoadMeshFactory (
   if (!fact) return NULL;
 
   char* buf = **input;
-  iBase* mof = plug->Parse (buf, this, fact);
+  iBase* mof = plug->Parse (buf, GetMaterialList (), GetMeshFactories (), fact);
   plug->DecRef ();
   if (!mof)
   {
@@ -2205,7 +2205,7 @@ iMeshWrapper* csEngine::LoadMeshWrapper (
   }
 
   char* buf = **input;
-  iBase* mof = plug->Parse (buf, this, imw);
+  iBase* mof = plug->Parse (buf, GetMaterialList (), GetMeshFactories (), imw);
   plug->DecRef ();
   if (!mof) {GetMeshes ()->Remove (imw); meshwrap->DecRef(); return NULL; }
   meshwrap->SetMeshObject ((iMeshObject*)mof);

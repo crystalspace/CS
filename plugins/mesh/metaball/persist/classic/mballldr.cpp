@@ -135,7 +135,7 @@ bool csMetaBallFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 iBase* csMetaBallFactoryLoader::Parse (const char* /*string*/,
-	iEngine* /*engine*/, iBase* /* context */)
+	iMaterialList*, iMeshFactoryList*, iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.mesh.object.metaball", iMeshObjectType);
@@ -173,8 +173,7 @@ bool csMetaBallFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 #define MAXLINE 100 /* max number of chars per line... */
 
-void csMetaBallFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
-  iEngine* /*engine*/)
+void csMetaBallFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/)
 {
   // no params
 }
@@ -251,8 +250,8 @@ static UInt ParseMixmode (char* buf)
   return Mixmode;
 }
 
-iBase* csMetaBallLoader::Parse (const char* string, iEngine* engine,
-	iBase* context)
+iBase* csMetaBallLoader::Parse (const char* string, iMaterialList* matlist,
+	iMeshFactoryList* factlist, iBase* context)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (MATERIAL)
@@ -340,8 +339,7 @@ iBase* csMetaBallLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_FACTORY:
 	{
       csScanStr (params, "%s", str);
-	  iMeshFactoryWrapper* fact = engine->GetMeshFactories ()
-	  	->FindByName (str);
+	  iMeshFactoryWrapper* fact = factlist->FindByName (str);
 	  if (!fact)
 	  {
 	    // @@@ Error handling!
@@ -357,8 +355,7 @@ iBase* csMetaBallLoader::Parse (const char* string, iEngine* engine,
 	{
 	  if (!ballstate) { printf("Please set FACTORY before MATERIAL\n"); return NULL; }
           csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = engine->GetMaterialList ()->
-	  	FindByName (str);
+          iMaterialWrapper* mat = matlist->FindByName (str);
 	  if (!mat)
 	  {
             // @@@ Error handling!
@@ -425,8 +422,7 @@ static void WriteMixmode(iStrVector *str, UInt mixmode)
   str->Push(csStrNew(")"));
 }
 
-void csMetaBallSaver::WriteDown (iBase* obj, iStrVector *str,
-  iEngine* /*engine*/)
+void csMetaBallSaver::WriteDown (iBase* obj, iStrVector *str)
 {
   iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
   iMeshObject *mesh = SCF_QUERY_INTERFACE(obj, iMeshObject);

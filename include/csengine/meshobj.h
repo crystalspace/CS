@@ -665,7 +665,7 @@ public:
       { return scfParent->NewMeshObject (); }
     virtual iMeshFactoryWrapper* GetParentContainer () const
       { return scfParent->parent; }
-    virtual void SetParentContainer (iMeshFactoryWrapper *p) const
+    virtual void SetParentContainer (iMeshFactoryWrapper *p)
       { scfParent->parent = p; }
     virtual iMeshFactoryList* GetChildren ()
       { return &(scfParent->children.scfiMeshFactoryList); }

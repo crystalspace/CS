@@ -262,7 +262,8 @@ static void ParseAnim (iReporter* reporter, iSprite2DFactoryState* spr2dLook,
   }
 }
 
-iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine,
+iBase* csSprite2DFactoryLoader::Parse (const char* string,
+	iMaterialList* matlist, iMeshFactoryList* factlist,
 	iBase* /* context */)
 {
   CS_TOKEN_TABLE_START (commands)
@@ -313,8 +314,7 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_MATERIAL:
 	{
           csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = engine->GetMaterialList ()->
-	  	FindByName (str);
+          iMaterialWrapper* mat = matlist->FindByName (str);
 	  if (!mat)
 	  {
 	    ReportError (reporter,
@@ -402,8 +402,7 @@ static void WriteMixmode(iStrVector *str, UInt mixmode)
   str->Push(csStrNew(")"));
 }
 
-void csSprite2DFactorySaver::WriteDown (iBase* obj, iStrVector * str,
-  iEngine* /*engine*/)
+void csSprite2DFactorySaver::WriteDown (iBase* obj, iStrVector * str)
 {
   iSprite2DFactoryState *state =
     SCF_QUERY_INTERFACE (obj, iSprite2DFactoryState);
@@ -445,8 +444,8 @@ bool csSprite2DLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
-	iBase* context)
+iBase* csSprite2DLoader::Parse (const char* string, iMaterialList* matlist,
+	iMeshFactoryList* factlist, iBase* context)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (FACTORY)
@@ -488,8 +487,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_FACTORY:
 	{
           csScanStr (params, "%s", str);
-	  iMeshFactoryWrapper* fact = engine->GetMeshFactories ()
-	  	->FindByName (str);
+	  iMeshFactoryWrapper* fact = factlist->FindByName (str);
 	  if (!fact)
 	  {
       	    ReportError (reporter,
@@ -507,8 +505,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_MATERIAL:
 	{
           csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = engine->GetMaterialList ()->
-	  	FindByName (str);
+          iMaterialWrapper* mat = matlist->FindByName (str);
 	  if (!mat)
 	  {
       	    ReportError (reporter,
@@ -638,8 +635,7 @@ bool csSprite2DSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csSprite2DSaver::WriteDown (iBase* obj, iStrVector *str,
-  iEngine* /*engine*/)
+void csSprite2DSaver::WriteDown (iBase* obj, iStrVector *str)
 {
   iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
   iSprite2DState *state = SCF_QUERY_INTERFACE (obj, iSprite2DState);

@@ -105,7 +105,7 @@ bool csTerrFuncFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 iBase* csTerrFuncFactoryLoader::Parse (const char* /*string*/,
-	iEngine* /*engine*/, iBase* /* context */)
+	iMaterialList*, iMeshFactoryList*, iBase* /* context */)
 {
   iMeshObjectType* pType = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.mesh.object.terrfunc", iMeshObjectType);
@@ -143,8 +143,8 @@ bool csTerrFuncLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
-	iBase* /* context */)
+iBase* csTerrFuncLoader::Parse (const char* pString, iMaterialList* matlist,
+	iMeshFactoryList* factlist, iBase* /* context */)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (FACTORY)
@@ -186,8 +186,7 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
       case CS_TOKEN_FACTORY:
 	{
           csScanStr (pParams, "%s", pStr);
-	  iMeshFactoryWrapper* iFactory = iEngine->GetMeshFactories ()
-	  	->FindByName (pStr);
+	  iMeshFactoryWrapper* iFactory = factlist->FindByName (pStr);
 	  if (!iFactory)
 	  {
 	    // @@@ Error handling!
@@ -201,8 +200,7 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
 	{
 	  int i;
           csScanStr (pParams, "%d,%s", &i, pStr);
-          iMaterialWrapper* mat = iEngine->GetMaterialList ()->
-	  	FindByName (pStr);
+          iMaterialWrapper* mat = matlist->FindByName (pStr);
 	  if (!mat)
 	  {
             // @@@ Error handling!
@@ -217,8 +215,7 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
 		int i, j = iTerrainState->GetXResolution();
 		j = j * j;
 		csScanStr( pParams, "%s", pStr);
-		iMaterialWrapper *mat = iEngine->GetMaterialList ()->
-			FindByName (pStr);
+		iMaterialWrapper *mat = matlist->FindByName (pStr);
 		if (!mat) 
 		{
 		  printf("Terrain func loader: Cant find requested material '%s'\n",pStr);
@@ -231,7 +228,7 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
 	{
 	  int rangeStart, rangeEnd;
 	  csScanStr (pParams, "%s,%d,%d", pStr, &rangeStart, &rangeEnd);
-	  iTerrainState->LoadMaterialGroup (iEngine, pStr,
+	  iTerrainState->LoadMaterialGroup (matlist, pStr,
 	  	rangeStart, rangeEnd);
 	}
     	break;

@@ -20,6 +20,7 @@
 #include "isoview.h"
 #include "isorview.h"
 #include "ivideo/graph3d.h"
+#include "iengine/material.h"
 #include "csgeom/polyclip.h"
 #include "qint.h"
 
@@ -97,8 +98,9 @@ void csIsoView::Draw()
   rview->SetClipper(clipper);
   rview->GetG3D()->SetClipper( rview->GetClipper(), CS_CLIPPER_TOPLEVEL);
   rview->GetG3D()->ResetNearPlane ();
-  if(rview->GetNumBuckets() < engine->GetMaterialCount())
-    rview->CreateBuckets(engine->GetMaterialCount());
+  iMaterialList* ml = engine->GetMaterialList ();
+  if(rview->GetNumBuckets() < ml->GetCount ())
+    rview->CreateBuckets(ml->GetCount ());
   PreCalc();
   
   int pass;

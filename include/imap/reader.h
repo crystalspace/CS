@@ -21,9 +21,10 @@
 
 #include "csutil/scf.h"
 
-struct iEngine;
+struct iMaterialList;
+struct iMeshFactoryList;
 
-SCF_VERSION (iLoaderPlugin, 0, 0, 2);
+SCF_VERSION (iLoaderPlugin, 0, 1, 0);
 
 /**
  * This is a plugin for the loader.
@@ -31,7 +32,8 @@ SCF_VERSION (iLoaderPlugin, 0, 0, 2);
 struct iLoaderPlugin : public iBase
 {
   /// Parse a given string and return a new object for it.
-  virtual iBase* Parse (const char* string, iEngine*, iBase* context) = 0;
+  virtual iBase* Parse (const char* string, iMaterialList* matlist,
+  	iMeshFactoryList* factlist, iBase* context) = 0;
 };
 
 #endif
