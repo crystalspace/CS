@@ -102,11 +102,6 @@ class csWrappedDocumentNode : public iDocumentNode
   };
   csPDelArray<WrappedChild> wrappedChildren;
 
-
-  //VisualC++ 6 requires these two statement below to compile properly. Luca
-  class WrapperWalker;
-  friend class WrapperWalker;
-
   /**
    * Helper class to go over the wrapped children in a linear fashion,
    * without having to care that a hierarchy of WrappedChild structures 
@@ -136,6 +131,8 @@ class csWrappedDocumentNode : public iDocumentNode
     iDocumentNode* Peek ();
     iDocumentNode* Next ();
   };
+  friend class WrapperWalker;
+
   struct NodeProcessingState;
   void ProcessWrappedNode (NodeProcessingState* state, iDocumentNode* wrappedNode);
   void ProcessWrappedNode ();
