@@ -1,6 +1,16 @@
 The history order has been reversed so that new features are at the top.
 
 7-Mar-2001
+	- Martin Geisse changed CSWS to use the new config system.
+	- Thomas Hieber completely changed the way data from XML maps to
+	  iDataLoader. The way it is done now will introduce far less
+	  typing overhead, and looks nicer too.
+	- Thomas Hieber did the following:
+	  csString stores a NULL pointer if you set an empty string.
+	  (This seems to be some optimisation) Now, it will return an empty
+	  string in these cases, instead of a NULL pointer, when you ask
+	  for the string.
+	- Thomas fixed some potentially uninitialized variable.
 	- csThing::MergeTemplate() now works through object space coordinates
 	  all the time.
 	- Fixed a bug in the new camera system. When the camera didn't update
