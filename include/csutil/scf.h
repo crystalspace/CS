@@ -579,6 +579,12 @@ void CS_EXPORTED_NAME(Class,_scfInitialize)(iSCF* SCF)			\
 { Class ## _scfUnitInitialize(SCF); }
 #endif
 
+#ifdef CS_BUILD_SHARED_LIBS
+# define SCF_STATIC_VAR_CLEANUP
+#else
+# define SCF_STATIC_VAR_CLEANUP		CS_STATIC_VARIABLE_CLEANUP
+#endif
+
 /**
  * The SCF_IMPLEMENT_FACTORY_FINIS macro defines finalization code for a plugin
  * module.  As with SCF_IMPLEMENT_FACTORY_INIT, only one instance of this
@@ -589,7 +595,7 @@ CS_DECLARE_STATIC_VARIABLE_CLEANUP					\
 CS_EXPORTED_FUNCTION							\
 void CS_EXPORTED_NAME(Class,_scfFinalize)()				\
 {									\
-CS_STATIC_VARIABLE_CLEANUP						\
+SCF_STATIC_VAR_CLEANUP							\
 iSCF::SCF = 0;								\
 }
 

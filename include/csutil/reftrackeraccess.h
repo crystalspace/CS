@@ -25,6 +25,9 @@
 #ifndef CS_REF_TRACKER
   // @@@ HACK: to allow enabled and disabled versions to coexist
   #define csRefTrackerAccess	csRefTrackerAccess_nada
+  #define CS_CSUTIL_REFTRACK_EXPORT
+#else
+  #define CS_CSUTIL_REFTRACK_EXPORT	CS_CSUTIL_EXPORT
 #endif
 
 /**
@@ -32,7 +35,7 @@
  * iRefTracker documentation for an explanation of the available 
  * methods.
  */
-class CS_CSUTIL_EXPORT csRefTrackerAccess
+class CS_CSUTIL_REFTRACK_EXPORT csRefTrackerAccess
 {
 public:
 #ifndef CS_REF_TRACKER

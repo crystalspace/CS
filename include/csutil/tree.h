@@ -25,7 +25,7 @@
 /**
  * A generic tree class.
  */
-class CS_CSUTIL_EXPORT csTreeNode
+class csTreeNode
 {
 public:
   /// Returns true if this node has no children.
