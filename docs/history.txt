@@ -12,6 +12,9 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+7-Mar-2000
+	- Added LIGHTING(yes/no) option to skydomes to be able to disable
+	  lighting for the generated triangles.
 6-Mar-2000
 	- Started work on new csSprite superclass for csSprite3D (already
 	  done) and csSprite2D. csSprite3D now inherits from csSprite.

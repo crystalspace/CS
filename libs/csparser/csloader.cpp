@@ -3566,6 +3566,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
   TOKEN_TABLE_START (commands)
     TOKEN_TABLE (RADIUS)
     TOKEN_TABLE (VERTICES)
+    TOKEN_TABLE (LIGHTING)
   TOKEN_TABLE_END
 
   long cmd;
@@ -3583,6 +3584,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
   char poly_name[30], * end_poly_name;
   strcpy (poly_name, name);
   end_poly_name = strchr (poly_name, 0);
+  int lighting_flags = CS_POLY_LIGHTING;
 
   while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
   {
@@ -3593,6 +3595,14 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
         break;
       case TOKEN_VERTICES:
         ScanStr (params, "%D", prev_vertices, &num);
+        break;
+      case TOKEN_LIGHTING:
+        {
+	  int do_lighting;
+          ScanStr (params, "%b", &do_lighting);
+	  if (do_lighting) lighting_flags = CS_POLY_LIGHTING;
+	  else lighting_flags = 0;
+        }
         break;
     }
   }
@@ -3662,7 +3672,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
       p->SetName (poly_name);
       p->SetSector (&sector);
       p->SetParent (&sector);
-      p->SetFlags (CS_POLY_LIGHTING, CS_POLY_LIGHTING);
+      p->SetFlags (CS_POLY_LIGHTING, lighting_flags);
       p->SetCosinusFactor (1);
       p->AddVertex (prev_vertices[j]);
       p->AddVertex (new_vertices[(j+1)%num]);
@@ -3683,7 +3693,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
       p->SetName (poly_name);
       p->SetSector (&sector);
       p->SetParent (&sector);
-      p->SetFlags (CS_POLY_LIGHTING, CS_POLY_LIGHTING);
+      p->SetFlags (CS_POLY_LIGHTING, lighting_flags);
       p->SetCosinusFactor (1);
       p->AddVertex (prev_vertices[j]);
       p->AddVertex (prev_vertices[(j+1)%num]);
@@ -3726,7 +3736,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
     p->SetName (poly_name);
     p->SetSector (&sector);
     p->SetParent (&sector);
-    p->SetFlags (CS_POLY_LIGHTING, CS_POLY_LIGHTING);
+    p->SetFlags (CS_POLY_LIGHTING, lighting_flags);
     p->SetCosinusFactor (1);
     p->AddVertex (top_vertex);
     p->AddVertex (prev_vertices[j]);
