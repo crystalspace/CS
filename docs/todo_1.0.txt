@@ -63,7 +63,7 @@ Bugs to fix:
 	[S]  cswseng crashes dereferencing a null pointer.  To reproduce: 1)
 	     Launch cswseng.  2) Press "New View".  3) Press "Quit".  4) Crash.
 	     (optimize and debug mode)
-	[S]  cswstest crashes with dereference of null pointer.  To reproduce:
+	[**] cswstest crashes with dereference of null pointer.  To reproduce:
 	     1) Launch cswstest.  2) Open Grid test window.  3) Close Grid test
 	     window (or quit app).  4) Crash. (optimize and debug mode)
 	[**] mottest crashes dereferencing a null pointer.  To reproduce: 1)
