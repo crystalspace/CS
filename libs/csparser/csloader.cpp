@@ -36,6 +36,7 @@
 #include "csengine/light.h"
 #include "csengine/texture.h"
 #include "csengine/curve.h"
+#include "csengine/terrain.h"
 #include "csengine/dumper.h"
 #include "csterr/ddgtmesh.h"
 #include "csutil/parser.h"
@@ -3459,7 +3460,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
 
 //---------------------------------------------------------------------------
 
-void csLoader::terrain_process (csSector& /*sector*/, char* /*name*/, char* buf,
+void csLoader::terrain_process (csSector& sector, char* name, char* buf,
         csTextureHandle* /*texture*/)
 {
   TOKEN_TABLE_START (commands)
@@ -3490,53 +3491,17 @@ void csLoader::terrain_process (csSector& /*sector*/, char* /*name*/, char* buf,
     fatal_exit (0, false);
   }
 
-  // ---------------------------------------------------------------------
-  //
-  // Global Objects used in this app.
-  //
-  ddgTBinMesh	*mesh = 0;
-  ddgHeightMap	*height = 0;
-  ddgBBox	*clipbox = 0;
-  // ---------------------------------------------------------------------
-  //
-  // Create and Initialize Global Objects.
-  //
-  // Load the data set.
-  height = new ddgHeightMap();
+  CHK (csTerrain* terr = new csTerrain ());
+  csNameObject::AddName (*terr, name);
 
   // Otherwise read file, if that fails generate a random map.
-  if (height->readTGN(heightmap))
+  if (!terr->Initialize (heightmap))
   {
     CsPrintf (MSG_FATAL_ERROR, "Error creating height field\n");
     fatal_exit (0, false);
   }
-  else
-    mesh = new ddgTBinMesh(height);
 
-  // Initialize.
-  double wtoc[16];		// World to camera space transformation matrix.
-  float fov = 90.0;
-  clipbox = new ddgBBox(0,100,0,100,1,15000);
-  mesh->init(wtoc,clipbox,fov);
-
-  // For each frame.
-  // Update the wtoc.
-  mesh->calculate();
-  // Render
-  mesh->qsi()->reset();
-  while (!mesh->qsi()->end() )
-  {
-    ddgTriIndex tvc = mesh->qs()->index(mesh->qsi());
-    ddgTBinTree *bt = mesh->qs()->tree(mesh->qsi());
-
-#if 0
-    drawTriangle(bt, tvc);
-#else
-    (void)tvc; (void)bt;
-#endif
-    mesh->qsi()->next();
-  }
-
+  sector.terrains.Push (terr);
 }
 
 //---------------------------------------------------------------------------

@@ -61,6 +61,12 @@ public:
    */
   csObjVector lights;
 
+  /**
+   * List of terrain objects in this sector. This vector
+   * contains objects of type csTerrain*.
+   */
+  csObjVector terrains;
+
 private:
   /// First thing in this sector.
   csThing* first_thing;

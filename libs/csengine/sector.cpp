@@ -35,6 +35,7 @@
 #include "csengine/csppulse.h"
 #include "csengine/cbuffer.h"
 #include "csengine/bspbbox.h"
+#include "csengine/terrain.h"
 #include "csgeom/bsp.h"
 #include "csgeom/octree.h"
 #include "csgeom/quadcube.h"
@@ -85,6 +86,8 @@ csSector::~csSector ()
   sprites.DeleteAll ();
 
   lights.DeleteAll ();
+
+  terrains.DeleteAll ();
 }
 
 void csSector::Prepare ()
@@ -737,6 +740,16 @@ void csSector::Draw (csRenderView& rview)
       }
     }
     CHK (delete [] sprite_queue);
+  }
+
+  // Draw all terrain surfaces.
+  if (terrains.Length () > 0)
+  {
+    for (i = 0 ; i < terrains.Length () ; i++)
+    {
+      csTerrain* terrain = (csTerrain*)terrains[i];
+      terrain->Draw (rview, true);
+    }
   }
 
   // queue all halos in this sector to be drawn.
