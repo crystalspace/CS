@@ -6373,6 +6373,7 @@ package cspace::iSpriteCal3DState;
 *SetActiveAnims = *cspacec::iSpriteCal3DState_SetActiveAnims;
 *SetAnimAction = *cspacec::iSpriteCal3DState_SetAnimAction;
 *SetVelocity = *cspacec::iSpriteCal3DState_SetVelocity;
+*SetDefaultIdleAnim = *cspacec::iSpriteCal3DState_SetDefaultIdleAnim;
 *SetLOD = *cspacec::iSpriteCal3DState_SetLOD;
 *AttachCoreMesh = *cspacec::iSpriteCal3DState_AttachCoreMesh;
 *DetachCoreMesh = *cspacec::iSpriteCal3DState_DetachCoreMesh;
@@ -10231,6 +10232,38 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iShaderPriorityList ##############
+
+package cspace::iShaderPriorityList;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*GetCount = *cspacec::iShaderPriorityList_GetCount;
+*GetPriority = *cspacec::iShaderPriorityList_GetPriority;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iShaderPriorityList($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iShaderCompiler ##############
 
 package cspace::iShaderCompiler;
@@ -10241,6 +10274,7 @@ package cspace::iShaderCompiler;
 *CompileShader = *cspacec::iShaderCompiler_CompileShader;
 *ValidateTemplate = *cspacec::iShaderCompiler_ValidateTemplate;
 *IsTemplateToCompiler = *cspacec::iShaderCompiler_IsTemplateToCompiler;
+*GetPriorities = *cspacec::iShaderCompiler_GetPriorities;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
