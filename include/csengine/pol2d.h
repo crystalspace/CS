@@ -62,7 +62,7 @@ private:
    * The u,v coordinates. This array is used only when the original
    * 3D polygon also has an u,v coordinate array.
    */
-  csVector2* uv_coords;
+  //csVector2* uv_coords;
 
   /// A 2D bounding box that is maintained automatically.
   csBox bbox;
@@ -149,15 +149,10 @@ public:
   /**
    * Set the uv coordinate for a specified vertex.
    */
-  void SetUV (int i, float u, float v) { uv_coords[i].x = u; uv_coords[i].y = v; }
+  //void SetUV (int i, float u, float v) { uv_coords[i].x = u; uv_coords[i].y = v; }
 
   /// Get the bounding box (in 2D space) for this polygon.
   csBox& GetBoundingBox () { return bbox; }
-
-  ///
-  //int overlap_bounding_box (const csBox& box) { return bbox.Overlap (box); }
-  ///
-  //int overlap_bounding_box (Polygon2D* poly) { return bbox.Overlap (poly->bbox); }
 
   /**
    * Clipping routines. They return false if the resulting polygon is not
@@ -198,5 +193,109 @@ struct G3DPolygonDPFX;
  */
 extern void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_poly,
   int num_vertices, csVector2 *orig_triangle, bool gouraud);
+
+/**
+ * This class is a large array of 2D vertices which is used by
+ * csPolygon2DQueue to store all 2D vertices accross several
+ * queue implementations. This array works as a queue as well and
+ * assumes that blocks of vertices will be added deleted together
+ * (each block corresponds to all vertices belonging to one queue).
+ */
+class csVector2Array
+{
+private:
+  // The array of vectors.
+  csVector2* array;
+
+  // Maximum number of vectors.
+  int max_vectors;
+
+  // Current used number of vectors.
+  int num_vectors;
+
+public:
+  /// Construct an empty array.
+  csVector2Array ();
+
+  /// Destruct array (asumes all queue stopped using it).
+  ~csVector2Array ();
+
+  /// Add a new vector array of n elements. Return index to start.
+  int AddArray (int n);
+
+  /// Get index of next array (if you would allocated one).
+  int GetNextIndex () { return num_vectors; }
+
+  /// Remove the last n vectors from the array.
+  void RemoveLastN (int n) { num_vectors -= n; }
+
+  /**
+   * Remove the given array starting at index (this
+   * will also remove all arrays beyond that).
+   */
+  void RemoveArray (int index) { num_vectors = index; }
+
+  /**
+   * Get the array of vectors starting at the given index.
+   * Note that this pointer is only valid until the next call
+   * to AddArray(). After that you need to call GetVectors() again.
+   */
+  csVector2* GetVectors (int index) { return array+index; }
+};
+
+/*
+ * An element for the queue.
+ */
+struct csQueueElement
+{
+  csPolygon3D* poly3d;
+  int vector_idx;
+  int vector_len;
+};
+
+/**
+ * A queue for polygon 2D objects to render at a later time.
+ * This queue is useful to remember a set of 2D polygons efficiently
+ * and play them back in front to back or back to front. The 2D polygons
+ * (csPolygon2D) are generated transparently by this queue.
+ * A queue is always allocated for a given maximum size. This size
+ * is known in advance because we know for which polygons the queue
+ * is going to be used.<br>
+ * NOTE! Allocation and deallocation of queues should happen in
+ * a strict FIFO order. The last allocated queue should be deallocated
+ * first.
+ */
+class csPolygon2DQueue
+{
+private:
+  // The queue.
+  csQueueElement* queue;
+
+  // Maximum number of elements in the queue.
+  int max_queue;
+
+  // Current number of elements in the queue.
+  int num_queue;
+
+  // Index we take in the global vector array.
+  int vector_idx;
+
+  // An array with vectors for all queues. @@@ CLEANUP!
+  static csVector2Array vector_array;
+
+public:
+  /// Construct a queue for a given maximum size.
+  csPolygon2DQueue (int max_size);
+
+  /// Destruct queue.
+  ~csPolygon2DQueue ();
+
+  /// Push a 2D polygon to the queue.
+  void Push (csPolygon3D* poly3d, csPolygon2D* poly2d);
+
+  /// Pop last added 2D polygon from the queue.
+  void Pop (csPolygon3D** poly3d, csPolygon2D* poly2d);
+};
+
 
 #endif /*POL2D_H*/

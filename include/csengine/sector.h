@@ -34,6 +34,7 @@ class csDynLight;
 class csSprite3D;
 class Dumper;
 class csBspTree;
+class csPolygon2DQueue;
 interface IGraphics3D;
 
 /**
@@ -93,10 +94,22 @@ private:
 
   /**
    * This function is called by the BSP tree traversal routine
+   * to test polygons against the C buffer and add them to a queue if needed.
+   */
+  static void* TestQueuePolygons (csPolygonParentInt*, csPolygonInt** polygon,
+  	int num, void* data);
+
+  /**
+   * This function is called by the BSP tree traversal routine
    * to update the lighting for a number of polygons.
    */
   static void* CalculateLightingPolygons (csPolygonParentInt*, csPolygonInt** polygon,
   	int num, void* data);
+
+  /**
+   * Draw a number of polygons from a queue (used with C buffer processing).
+   */
+  static void DrawPolygonsFromQueue (csPolygon2DQueue* queue, csRenderView* rview);
 
 public:
   /**

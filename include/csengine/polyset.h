@@ -34,6 +34,8 @@ class csCamera;
 class csTextureHandle;
 class CLights;
 class csPolygon3D;
+class csPolygon2D;
+class csPolygon2DQueue;
 class csCollider;
 class csBspTree;
 class Dumper;
@@ -173,11 +175,27 @@ protected:
   void RestoreTransformation (csVector3* old_tr3);
 
   /**
+   * Draw one 3D/2D polygon combination. The 2D polygon is the transformed
+   * and clipped version of the 3D polygon. If 'can_be_reused' is true then
+   * you cannot depend on the 2D polygon having the same value after recusing
+   * through a portal. Otherwise you can depend on this.
+   */
+  void DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly, csRenderView* d,
+	bool can_be_reused, bool use_z_buf);
+  /**
    * Draw the given array of polygons from this csPolygonSet. This
    * function is called by subclasses of csPolygonSet (csSector and
    * Thing currently).
    */
-  void DrawPolygonArray (csPolygonInt** polygon, int num, csRenderView* rview, bool use_z_buf);
+  void DrawPolygonArray (csPolygonInt** polygon, int num, csRenderView* rview,
+  	bool use_z_buf);
+
+  /**
+   * Test a number of polygons against the c-buffer and insert them to the
+   * c-buffer if visible and also add them to a queue.
+   */
+  void TestQueuePolygonArray (csPolygonInt** polygon, int num, csRenderView* d,
+  	csPolygon2DQueue* poly_queue);
 
 private:
   /**
