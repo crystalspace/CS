@@ -363,6 +363,11 @@ Blocks::~Blocks ()
   TerminateConnection();
 #endif
   if (LevelLoader) LevelLoader->DecRef();
+
+  Sys->console_out ("Cleaning up...\n");
+  delete view;
+  delete Sys;
+  Sys = NULL;
 }
 
 void Blocks::InitGame ()
@@ -2992,14 +2997,6 @@ void Blocks::TerminateConnection()
 
 #endif // BLOCKS_NETWORKING
 
-void cleanup ()
-{
-  Sys->console_out ("Cleaning up...\n");
-  delete view;
-  delete Sys;
-  Sys = NULL;
-}
-
 //----------------------------------------------------------------------------
 int main (int argc, char* argv[])
 {
@@ -3014,7 +3011,6 @@ int main (int argc, char* argv[])
   if (!Sys->Initialize (argc, argv, "/config/blocks.cfg"))
   {
     Sys->Printf (MSG_FATAL_ERROR, "Error initializing system!\n");
-    cleanup ();
     fatal_exit (0, false);
   }
 
@@ -3022,7 +3018,6 @@ int main (int argc, char* argv[])
   if (!Sys->Open ("3D Blocks"))
   {
     Sys->Printf (MSG_FATAL_ERROR, "Error opening system!\n");
-    cleanup ();
     fatal_exit (0, false);
   }
 
@@ -3095,6 +3090,5 @@ int main (int argc, char* argv[])
   do_network = Sys->InitNet();
 #endif
   Sys->Loop ();
-  cleanup ();
   return 0;
 }
