@@ -773,18 +773,30 @@ static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview)
   new_lview.light_frustum = NULL;
   csVector3 poly[40];
   int num_vert = 4;
+  int num_vertices = destpoly3d->GetVertices ().GetNumVertices ();
+  int j;
   if(dest)
   {
     if( !destpoly3d->GetLightMapInfo()->GetPolyTex()->
       GetLightmapBounds(lview, poly) )
       /// empty intersection or lightmap has already been seen by frustum.
       return;
-    new_lview.light_frustum = lview->light_frustum->Intersect(poly, num_vert);
-    // empty intersection, none covered (will be skipped)
-    if(!new_lview.light_frustum) return;
   }
   else
-    new_lview.light_frustum = new csFrustum (*lview->light_frustum);
+  {
+    /// clip to polygon instead of lightmap if no lightmap.
+    /// @@@ hope that poly array is big enough
+    if (lview->mirror)
+      for (j = 0 ; j < num_vertices ; j++)
+        poly[j] = destpoly3d->Vwor (num_vertices - j - 1) - center;
+    else
+      for (j = 0 ; j < num_vertices ; j++)
+        poly[j] = destpoly3d->Vwor (j) - center;
+    num_vert = num_vertices;
+  }
+  new_lview.light_frustum = lview->light_frustum->Intersect(poly, num_vert);
+  // empty intersection, none covered (will be skipped)
+  if(!new_lview.light_frustum) return;
 
   // uses polygon3d of *base* polygon...
   csPortal *po = destpoly3d->GetPortal();
@@ -806,9 +818,7 @@ static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview)
   
   /// portal?
   if(!po) return;
-  int num_vertices = destpoly3d->GetVertices ().GetNumVertices ();
   /// @@@ hope that poly array is big enough
-  int j;
   if (lview->mirror)
     for (j = 0 ; j < num_vertices ; j++)
       poly[j] = destpoly3d->Vwor (num_vertices - j - 1) - center;
