@@ -394,6 +394,12 @@ csConfigFile::~csConfigFile()
   SCF_DESTRUCT_IBASE ();
 }
 
+bool csConfigFile::IsEmpty() const
+{
+  csConfigNode* const n = FirstNode->GetNext();
+  return n == 0 || n->GetName() == 0;
+}
+
 const char* csConfigFile::GetFileName() const
 {
   return Filename;

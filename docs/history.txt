@@ -46,6 +46,7 @@ chronological order.
 	  optional. This makes it more convenient to use csConfigManager as an
 	  instance variable when the containing object is not able to populate
 	  the manager immediately upon construction.
+	- Eric Sunshine added a csConfigFile::IsEmpty() method.
 5-Dec-2004
 	- res made the following changes:
 	    - Fixed the Win32 shared library linking.

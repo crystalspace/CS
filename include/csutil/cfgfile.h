@@ -42,6 +42,9 @@ public:
   /// Delete this configuration.
   virtual ~csConfigFile();
 
+  /// Is the configuration object empty?
+  virtual bool IsEmpty() const;
+
   /// Get configuration file name.
   virtual const char *GetFileName () const;
 
