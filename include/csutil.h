@@ -59,6 +59,7 @@
 #include "csutil/fifo.h"
 #include "csutil/flags.h"
 #include "csutil/floatrand.h"
+#include "csutil/formatter.h"
 #include "csutil/fpu80x86.h"
 #include "csutil/hash.h"
 #include "csutil/hashhandlers.h"
