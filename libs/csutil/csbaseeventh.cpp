@@ -61,7 +61,7 @@ bool csBaseEventHandler::RegisterQueue (
 bool (csBaseEventHandler::*csBaseEventHandler::pmfnTriggers[])(iEvent &event) =
   {
     &csBaseEventHandler::OnUnhandledEvent   /*csevNothing*/,
-    &csBaseEventHandler::OnKeyboard         /*csevKeyDown*/,
+    &csBaseEventHandler::OnKeyboard         /*csevKeyboard*/,
     &csBaseEventHandler::OnMouseMove        /*csevMouseMove*/,
     &csBaseEventHandler::OnMouseDown        /*csevMouseDown*/,
     &csBaseEventHandler::OnMouseUp          /*csevMouseUp*/,

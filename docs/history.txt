@@ -14,6 +14,12 @@ chronological order.
 	    - prplasma.cpp / prplasma.h
 	    - prsky.cpp    / prsky.h
 	    - prwater.cpp  / prwater.h
+	- res added functions to print formatted strings to stderr.
+	- res eliminated a static var from win32kbd.cpp.
+	- res silenced some MSVC warnings in regcomp.c and snprintf.cpp.
+	- res replaced some ints with size_ts in csPoly3D.
+	- res removed the csextern.h #inclusion from csutil/hashr.h. Not needed
+	  there.
 21-Sep-2004
 	- Eric Sunshine fixed a bug in the "subsystem"-related change to
 	  msvcgen/project6x.tlib on 19-Sep-2004 which caused the linker's /out:

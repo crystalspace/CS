@@ -25,7 +25,7 @@
 #include "csutil/sysfunc.h"
 
 // Replacement for printf(); exact same prototype/functionality as printf()
-int csPrintf(char const* str, ...)
+int csPrintf (char const* str, ...)
 {
   va_list args;
   va_start (args, str);
@@ -78,6 +78,24 @@ int csPrintfV(char const* str, va_list args)
 
 int csFPutErr (const char* str)
 {
-  return csFPutStr (stderr, str);
+  int ret = csFPutStr (stderr, str);
+  fflush (stderr);
+  return ret;
 }
 
+int csPrintfErr (const char* str, ...)
+{
+  va_list args;
+  va_start (args, str);
+  int const rc = csPrintfErrV (str, args);
+  va_end (args);
+  return rc;
+}
+
+int csPrintfErrV (const char* str, va_list args)
+{
+  csString temp;
+  temp.FormatV (str, args);
+  
+  return csFPutErr (temp);
+}

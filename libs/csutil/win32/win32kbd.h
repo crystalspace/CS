@@ -23,6 +23,7 @@
 #include "csextern.h"
 #include "iutil/csinput.h"
 #include "csutil/csinput.h"
+#include "csutil/garray.h"
 
 // Some #defines from newer PSDKs
 #ifndef WM_UNICHAR
@@ -55,7 +56,8 @@ public:
 
 class csWin32KeyboardDriver : public csKeyboardDriver
 {
-private:
+protected:
+  csDirtyAccessArray<WCHAR> IMEComposeBuf;
   bool Win32KeyToCSKey (LONG vKey, LONG keyFlags,
     utf32_char& rawCode, utf32_char& cookedCode, csKeyCharType& charType);
 public:

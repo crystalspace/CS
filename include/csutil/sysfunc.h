@@ -96,8 +96,21 @@ CS_CSUTIL_EXPORT int csPrintfV (const char* str, va_list arg) CS_GNUC_PRINTF (1,
 /**
  * CS version of fputs (&lt;str&gt;, stderr). 
  * \copydoc csPrintf()
+ * \remarks Will flush stderr.
  */
 CS_CSUTIL_EXPORT int csFPutErr (const char* str);
+/**
+ * CS version of fprintf (stderr, str, ...). 
+ * \copydoc csPrintf()
+ * \remarks Will flush stderr.
+ */
+CS_CSUTIL_EXPORT int csPrintfErr (const char* str, ...) CS_GNUC_PRINTF (1, 2);
+/**
+ * CS version of vfprintf (stderr, str, ...). 
+ * \copydoc csPrintf()
+ * \remarks Will flush stderr.
+ */
+CS_CSUTIL_EXPORT int csPrintfErrV (const char* str, va_list arg) CS_GNUC_PRINTF (1, 0);
 
 /**
  * Get the current tick count. Warning! Do NOT use this function for

@@ -451,7 +451,7 @@ bool csIntersect3::IntersectPolygon (
 {
   csVector3 &v1 = seg.Start ();
   csVector3 &v2 = seg.End ();
-  int i, i1;
+  size_t i, i1;
   float c, c1;
   csVector3 isect;
   float dist;

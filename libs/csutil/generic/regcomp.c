@@ -21,8 +21,10 @@
 #ifdef _MSC_VER
 // Silence some warnings on MSVC
 #pragma warning (disable:4018)	// signed/unsigned mismatch
-#pragma warning (disable:4047)	// 'type' differs in levels of indirection 
-								// from 'type'
+#pragma warning (disable:4047)	/* 'type' differs in levels of indirection 
+				 * from 'type' */
+#pragma warning (disable:4267)  /* conversion from 'type' to 'type', possible 
+				 * loss of data */
 #endif
 
 static reg_errcode_t re_compile_internal (regex_t *preg, const char * pattern,

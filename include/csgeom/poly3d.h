@@ -51,7 +51,7 @@ public:
   /**
    * Make a new empty polygon.
    */
-  csPoly3D (int start_size = 10);
+  csPoly3D (size_t start_size = 10);
 
   /// Copy constructor.
   csPoly3D (const csPoly3D& copy);
@@ -67,7 +67,7 @@ public:
   /**
    * Get the number of vertices.
    */
-  int GetVertexCount () const { return vertices.Length (); }
+  size_t GetVertexCount () const { return vertices.Length (); }
 
   /**
    * Get the array with all vertices.
@@ -82,16 +82,16 @@ public:
   /**
    * Get the specified vertex.
    */
-  const csVector3* GetVertex (int i) const
+  const csVector3* GetVertex (size_t i) const
   {
-    if (i<0 || i>=(int)vertices.Length ()) return 0;
+    if (i >= vertices.Length ()) return 0;
     return &(vertices.GetArray ()[i]);
   }
 
   /**
    * Get the specified vertex.
    */
-  csVector3& operator[] (int i)
+  csVector3& operator[] (size_t i)
   {
     return vertices[i];
   }
@@ -99,7 +99,7 @@ public:
   /**
    * Get the specified vertex.
    */
-  const csVector3& operator[] (int i) const
+  const csVector3& operator[] (size_t i) const
   {
     return vertices[i];
   }
@@ -125,34 +125,34 @@ public:
   /**
    * Test if a vector is inside the given polygon.
    */
-  static bool In (csVector3* poly, int num_poly, const csVector3& v);
+  static bool In (csVector3* poly, size_t num_poly, const csVector3& v);
 
   /**
    * Make room for at least the specified number of vertices.
    */
-  void MakeRoom (int new_max);
+  void MakeRoom (size_t new_max);
 
   /**
    * Set the number of vertices.
    */
-  void SetVertexCount (int n) { vertices.SetLength (n); }
+  void SetVertexCount (size_t n) { vertices.SetLength (n); }
 
   /**
    * Add a vertex (3D) to the polygon.
    * Return index of added vertex.
    */
-  int AddVertex (const csVector3& v) { return AddVertex (v.x, v.y, v.z); }
+  size_t AddVertex (const csVector3& v) { return AddVertex (v.x, v.y, v.z); }
 
   /**
    * Add a vertex (3D) to the polygon.
    * Return index of added vertex.
    */
-  int AddVertex (float x, float y, float z);
+  size_t AddVertex (float x, float y, float z);
 
   /**
    * Set all polygon vertices at once.  Copies the array.
    */
-  void SetVertices (csVector3 const* v, int num)
+  void SetVertices (csVector3 const* v, size_t num)
   {
     MakeRoom (num);
     memcpy (vertices.GetArray (), v, num * sizeof (csVector3));
@@ -214,7 +214,7 @@ public:
    * returnes CS_POL_BACK. Otherwise it returns CS_POL_SPLIT_NEEDED.
    */
   static int Classify (const csPlane3& pl,
-  	const csVector3* vertices, int num_vertices);
+  	const csVector3* vertices, size_t num_vertices);
 
   /**
    * Classify this polygon with regards to a plane.
@@ -254,7 +254,7 @@ public:
   void SplitWithPlaneZ (csPoly3D& front, csPoly3D& back, float z) const;
 
   /// Compute the normal of a polygon.
-  static csVector3 ComputeNormal (const csVector3* vertices, int num);
+  static csVector3 ComputeNormal (const csVector3* vertices, size_t num);
 
   /// Compute the normal of a polygon.
   static csVector3 ComputeNormal (const csArray<csVector3>& poly);
@@ -266,7 +266,7 @@ public:
   }
 
   /// Compute the plane of a polygon.
-  static csPlane3 ComputePlane (const csVector3* vertices, int num);
+  static csPlane3 ComputePlane (const csVector3* vertices, size_t num);
 
   /// Compute the plane of a polygon.
   static csPlane3 ComputePlane (const csArray<csVector3>& poly);
@@ -306,20 +306,20 @@ struct csCompressVertex
 class CS_CSGEOM_EXPORT csVector3Array : public csPoly3D
 {
 public:
-  csVector3Array (int start_size = 10) : csPoly3D (start_size) { }
+  csVector3Array (size_t start_size = 10) : csPoly3D (start_size) { }
 
   /**
    * Add a vertex but first check if it isn't already present
    * in the array. Return the index that the vertex was added too.
    */
-  int AddVertexSmart (const csVector3& v)
+  size_t AddVertexSmart (const csVector3& v)
   { return AddVertexSmart (v.x, v.y, v.z); }
 
   /**
    * Add a vertex but first check if it isn't already present
    * in the array. Return the index that the vertex was added too.
    */
-  int AddVertexSmart (float x, float y, float z);
+  size_t AddVertexSmart (float x, float y, float z);
 
   /**
    * Compress an array of vertices (i.e. remove all duplicated

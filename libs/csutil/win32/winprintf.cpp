@@ -77,7 +77,7 @@ static int _cs_vfprintf (FILE* stream, const char* format, va_list args)
 }
 
 // Replacement for printf(); exact same prototype/functionality as printf()
-int csPrintf(char const* str, ...)
+int csPrintf (char const* str, ...)
 {
   va_list args;
   va_start(args, str);
@@ -94,6 +94,23 @@ int csPrintfV(char const* str, va_list args)
 
 int csFPutErr (const char* str)
 {
-  return _cs_fputs (str, stderr);
+  int ret = _cs_fputs (str, stderr);
+  fflush (stderr);
+  return ret;
 }
 
+int csPrintfErr (const char* str, ...)
+{
+  va_list args;
+  va_start (args, str);
+  int const rc = csPrintfErrV (str, args);
+  va_end (args);
+  return rc;
+}
+
+int csPrintfErrV (const char* str, va_list args)
+{
+  int ret = _cs_vfprintf (stderr, str, args);
+  fflush (stderr);
+  return ret;
+}

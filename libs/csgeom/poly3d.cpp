@@ -20,9 +20,10 @@
 #include "csgeom/poly3d.h"
 #include "csgeom/poly2d.h"
 
-csPoly3D::csPoly3D (int start_size)
+csPoly3D::csPoly3D (size_t start_size)
 {
   CS_ASSERT (start_size > 0);
+
   vertices.SetLength (start_size);
   MakeEmpty ();
 }
@@ -55,9 +56,11 @@ bool csPoly3D::In (const csVector3 &v) const
   return true;
 }
 
-bool csPoly3D::In (csVector3 *poly, int num_poly, const csVector3 &v)
+bool csPoly3D::In (csVector3 *poly, size_t num_poly, const csVector3 &v)
 {
-  int i, i1;
+  CS_ASSERT (num_poly > 0);
+
+  size_t i, i1;
   i1 = num_poly - 1;
   for (i = 0; i < num_poly; i++)
   {
@@ -68,12 +71,12 @@ bool csPoly3D::In (csVector3 *poly, int num_poly, const csVector3 &v)
   return true;
 }
 
-void csPoly3D::MakeRoom (int new_max)
+void csPoly3D::MakeRoom (size_t new_max)
 {
   vertices.SetCapacity (new_max);
 }
 
-int csPoly3D::AddVertex (float x, float y, float z)
+size_t csPoly3D::AddVertex (float x, float y, float z)
 {
   return vertices.Push (csVector3 (x, y, z));
 }
@@ -150,10 +153,10 @@ bool csPoly3D::ProjectZPlane (
 int csPoly3D::Classify (
   const csPlane3 &pl,
   const csVector3 *vertices,
-  int num_vertices)
+  size_t num_vertices)
 {
-  int i;
-  int front = 0, back = 0;
+  size_t i;
+  size_t front = 0, back = 0;
 
   for (i = 0; i < num_vertices; i++)
   {
@@ -570,7 +573,7 @@ void csPoly3D::SplitWithPlaneZ (
 }
 
 //---------------------------------------------------------------------------
-int csVector3Array::AddVertexSmart (float x, float y, float z)
+size_t csVector3Array::AddVertexSmart (float x, float y, float z)
 {
   size_t i;
   for (i = 0; i < vertices.Length (); i++)
@@ -585,12 +588,14 @@ int csVector3Array::AddVertexSmart (float x, float y, float z)
   return AddVertex (x, y, z);
 }
 
-csVector3 csPoly3D::ComputeNormal (const csVector3 *vertices, int num)
+csVector3 csPoly3D::ComputeNormal (const csVector3 *vertices, size_t num)
 {
+  CS_ASSERT (num > 0);
+
   float ayz = 0;
   float azx = 0;
   float axy = 0;
-  int i, i1;
+  size_t i, i1;
   float x1, y1, z1, x, y, z;
 
   i1 = num - 1;
@@ -624,7 +629,7 @@ csVector3 csPoly3D::ComputeNormal (const csArray<csVector3>& poly)
   return ComputeNormal (&poly[0], poly.Length ());
 }
 
-csPlane3 csPoly3D::ComputePlane (const csVector3 *vertices, int num_vertices)
+csPlane3 csPoly3D::ComputePlane (const csVector3 *vertices, size_t num_vertices)
 {
   float D;
   csVector3 pl = ComputeNormal (vertices, num_vertices);

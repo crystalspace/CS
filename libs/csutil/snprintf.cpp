@@ -62,6 +62,14 @@
  * <panos@alumni.cs.colorado.edu> for xinetd.
  */
 
+#ifdef _MSC_VER
+// Silence some warnings on MSVC
+#pragma warning (disable:4267)  /* conversion from 'type' to 'type', possible 
+				 * loss of data */
+#pragma warning (disable:4311)  /* pointer truncation from 'type*' to 
+				 * 'type' */
+#endif
+
 #include "cssysdef.h"
 #include "csutil/snprintf.h"
 // This MUST go before the ctype includes!
