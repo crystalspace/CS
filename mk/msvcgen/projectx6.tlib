@@ -32,12 +32,12 @@
 # "appgui", "group", "library", or "plugin") named by the projtypes[] array
 # (control.tlib).
 #
-# For example, to add customization entries to the compiler portion of the
+# For example, to add customization entries to the post-build portion of the
 # project file in release mode for all project types, provide a macro named
-# "compiler_release".  To customize linker for plugins only but for all build
-# modes, provide the macro "linker_plugin".  To add customizations for the
-# compiler in debug mode for GUI application projects only, provide a macro
-# named "compiler_appgui_debug".
+# "postbuild_release".  To customize the post-build for plugins only but for
+# all build modes, provide the macro "postbuild_plugin".  To add customizations
+# for the post-build in debug mode for GUI application projects only, provide a
+# macro named "postbuild_appgui_debug".
 #------------------------------------------------------------------------------
 
 [%
@@ -81,8 +81,9 @@ GET glue(my.doc.librarydelay,' ','/DELAYLOAD:','.dll') %]
 [% MACRO addlib32_outfile(suffix) BLOCK -%]
 /out:"[% worklibout %]\[% my.doc.project.0 %][% suffix %].lib"
 [%- END %]
-[% MACRO addlib32_library_release GET addlib32_outfile('') %]
+[% MACRO addlib32_library_release GET addlib32_outfile('')   %]
 [% MACRO addlib32_library_debug   GET addlib32_outfile('_d') %]
+[% MACRO addlib32_group           GET addlib32_outfile('')   %]
 
 [% MACRO addlink32_subsystem(subsys) BLOCK -%]
 /subsystem:[% subsys %]

@@ -39,13 +39,7 @@
 # named "compiler_appgui_debug".
 #------------------------------------------------------------------------------
 
-[% MACRO global_common BLOCK -%]
-			OutputDirectory="[% workbuild([]) %]"
-			IntermediateDirectory="[% workbuild([]) %]"
-[% END %]
-
 [% MACRO global_app BLOCK -%]
-[% global_common -%]
 			ConfigurationType="1"
 			CharacterSet="2"
 [% END %]
@@ -53,17 +47,14 @@
 [% MACRO global_appgui GET global_app %]
 
 [% MACRO global_group BLOCK -%]
-[% global_common -%]
 			ConfigurationType="4"
 [% END %]
 
 [% MACRO global_library BLOCK -%]
-[% global_common -%]
 			ConfigurationType="4"
 [% END %]
 
 [% MACRO global_plugin BLOCK -%]
-[% global_common -%]
 			ConfigurationType="2"
 [% END %]
 

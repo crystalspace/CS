@@ -19,11 +19,7 @@
 #
 #==============================================================================
 
-# Everything.
-# MsvcGenWorkspace all : : "grp.+_(?!all$)" ;
-
-# What the typical user will need. Presently, everything but the new renderer.
-MsvcGenWorkspace typical : :
+MSVC_WORKSPACE_TYPICAL_REJECTS =
   chunklod
   glrender3d
   glshader_arb
@@ -31,7 +27,6 @@ MsvcGenWorkspace typical : :
   glshader_fixed
   glshader_ps1
   grpnrall
-  "grp.+_(?!typical$)"
   isotest
   nullrender3d
   render3dcommon
@@ -41,51 +36,44 @@ MsvcGenWorkspace typical : :
   terrainldr
   waterdemo
   xmlshader
-  wx.*
+  ;
+
+MSVC_WORKSPACE_NEWRENDERER_REJECTS =
+  csjava
+  csperl5
+  cspython
+  gl3d
+  null3d
+  renderercommon
+  soft3d
+  ;
+
+# Everything.
+# MsvcGenWorkspace all : : "grp.+_(?!all$)" ;
+
+# What the typical user will need. Presently, everything but the new renderer
+# and wxWidgets.
+MsvcGenWorkspace typical : :
+  $(MSVC_WORKSPACE_TYPICAL_REJECTS)
+  "grp.+_(?!typical$)"
+  wx
   ;
 
 # Similar to "typical" but using the new renderer instead of the old.
 MsvcGenWorkspace newrenderer : :
-  csjava
-  csperl5
-  cspython
-  gl3d
+  $(MSVC_WORKSPACE_NEWRENDERER_REJECTS)
   "grp.+_(?!newrenderer$)"
-  null3d
-  renderercommon
-  soft3d
-  wx.*
+  wx
   ;
 
-# Like "typical", but with WX, too.
-MsvcGenWorkspace wx-typical : :
-  chunklod
-  glrender3d
-  glshader_arb
-  glshader_cg
-  glshader_fixed
-  glshader_ps1
-  grpnrall
+# Similar to "typical", but with wxWidgets.
+MsvcGenWorkspace wxtypical : :
+  $(MSVC_WORKSPACE_TYPICAL_REJECTS)
   "grp.+_(?!wx-typical$)"
-  isotest
-  nullrender3d
-  render3dcommon
-  shadermgr
-  softrender3d
-  softshader
-  terrainldr
-  waterdemo
-  xmlshader
   ;
 
-# Like "newrenderer", but with WX, too.
-MsvcGenWorkspace wx-newrenderer : :
-  csjava
-  csperl5
-  cspython
-  gl3d
+# Similar to "newrenderer", but with wxWidgets.
+MsvcGenWorkspace wxnewrenderer : :
+  $(MSVC_WORKSPACE_NEWRENDERER_REJECTS)
   "grp.+_(?!wx-newrenderer$)"
-  null3d
-  renderercommon
-  soft3d
   ;

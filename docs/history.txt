@@ -57,6 +57,21 @@ chronological order.
 	  spend the effort to build wxWidgets or need the wxgl canvas).
 	- res updated the "External Libraries" docs to point to the latest
 	  cs-win32libs package.
+	- Eric Sunshine folded out redundant copy/paste code which was added to
+	  msvcgen/workspaces.jam. This will reduce maintenance costs and avoid
+	  possible errors attendant with such duplication.
+	- Eric Sunshine renamed the recently added `wx-typical' and
+	  `wx-newrenderer' MSVC workspaces to `wxtypical' and `wxnewrenderer',
+	  respectively, since MSVC6 can not grok hyphens in project or
+	  workspace names.
+	- Eric Sunshine added missing CS_HAS_WXWIDGETS define to WX.CFLAGS in
+	  msvcgen/config.jam.
+	- Eric Sunshine applied to the MSVC6 group project templates Frank's
+	  fix which allows the "clean" operation to work without warning. Also
+	  simplified Frank's change to the MSVC7 templates. Since the content
+	  of the `global_common' macro is now shared by all project types, it
+	  has been folded directly into the project template proper (in
+	  project7.tlib).
 18-Sep-2004
 	- Eric Sunshine changed the executable subsystem type in the MSVC
 	  project files for GUI applications from "windows" to "console". This

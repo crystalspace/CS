@@ -46,6 +46,8 @@ END -%]
 [% FOREACH build IN builds -%]
 		<Configuration
 			Name="[% build.name %]|Win32"
+			OutputDirectory="[% workbuild([]) %]"
+			IntermediateDirectory="[% workbuild([]) %]"
 [% interpolate('global') -%]
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE">
