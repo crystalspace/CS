@@ -432,9 +432,10 @@ bool csEvent::Add(const char *name, iEvent *v)
   return false;
 }
 
-bool csEvent::Find(const char *name, int8 &v, int index)
+bool csEvent::Find(const char *name, int8 &v, int index) const
 {
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
+    csHashCompute (name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
@@ -447,9 +448,10 @@ bool csEvent::Find(const char *name, int8 &v, int index)
   return false;
 }
   
-bool csEvent::Find(const char *name, uint8 &v, int index)
+bool csEvent::Find(const char *name, uint8 &v, int index) const
 {
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
+    csHashCompute (name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
@@ -462,9 +464,10 @@ bool csEvent::Find(const char *name, uint8 &v, int index)
   return false;
 }
   
-bool csEvent::Find(const char *name, int16 &v, int index)
+bool csEvent::Find(const char *name, int16 &v, int index) const
 {
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
+    csHashCompute (name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
@@ -477,9 +480,10 @@ bool csEvent::Find(const char *name, int16 &v, int index)
   return false;
 }
   
-bool csEvent::Find(const char *name, uint16 &v, int index)
+bool csEvent::Find(const char *name, uint16 &v, int index) const
 {
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
+    csHashCompute (name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
@@ -492,9 +496,10 @@ bool csEvent::Find(const char *name, uint16 &v, int index)
   return false;
 }
 
-bool csEvent::Find(const char *name, int32 &v, int index)
+bool csEvent::Find(const char *name, int32 &v, int index) const
 {
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
+    csHashCompute (name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
@@ -507,9 +512,10 @@ bool csEvent::Find(const char *name, int32 &v, int index)
   return false;
 }
   
-bool csEvent::Find(const char *name, uint32 &v, int index)
+bool csEvent::Find(const char *name, uint32 &v, int index) const
 {
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
+    csHashCompute (name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
@@ -522,9 +528,10 @@ bool csEvent::Find(const char *name, uint32 &v, int index)
   return false;
 }
 
-bool csEvent::Find(const char *name, int64 &v, int index)
+bool csEvent::Find(const char *name, int64 &v, int index) const
 {
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
+    csHashCompute (name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
@@ -537,9 +544,10 @@ bool csEvent::Find(const char *name, int64 &v, int index)
   return false;
 }
   
-bool csEvent::Find(const char *name, uint64 &v, int index)
+bool csEvent::Find(const char *name, uint64 &v, int index) const
 {
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
+    csHashCompute (name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
@@ -552,9 +560,10 @@ bool csEvent::Find(const char *name, uint64 &v, int index)
   return false;
 }
   
-bool csEvent::Find(const char *name, float &v, int index)
+bool csEvent::Find(const char *name, float &v, int index) const
 {
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
+    csHashCompute (name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
@@ -567,9 +576,10 @@ bool csEvent::Find(const char *name, float &v, int index)
   return false;
 }
 
-bool csEvent::Find(const char *name, double &v, int index)
+bool csEvent::Find(const char *name, double &v, int index) const
 {
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
+    csHashCompute (name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
@@ -582,9 +592,10 @@ bool csEvent::Find(const char *name, double &v, int index)
   return false;
 }
 
-bool csEvent::Find(const char *name, char **v, int index)
+bool csEvent::Find(const char *name, char **v, int index) const
 {
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(
+    csHashCompute (name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
@@ -597,9 +608,10 @@ bool csEvent::Find(const char *name, char **v, int index)
   return false;
 }
 
-bool csEvent::Find(const char *name, void **v, uint32 &size, int index)
+bool csEvent::Find(const char *name, void **v, uint32 &size, int index) const
 {
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
+    csHashCompute (name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
@@ -615,9 +627,10 @@ bool csEvent::Find(const char *name, void **v, uint32 &size, int index)
 
 #ifndef CS_USE_FAKE_BOOL_TYPE
 
-bool csEvent::Find(const char *name, bool &v, int index)
+bool csEvent::Find(const char *name, bool &v, int index) const
 {
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
+    csHashCompute (name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
@@ -632,9 +645,10 @@ bool csEvent::Find(const char *name, bool &v, int index)
 
 #endif
 
-bool csEvent::Find(const char *name, iEvent **v, int index)
+bool csEvent::Find(const char *name, iEvent **v, int index) const
 {
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
+    csHashCompute (name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
