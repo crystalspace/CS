@@ -42,6 +42,8 @@ The history order is reversed so that new features are at the top.
 	  "CS_24BIT_PIXEL_ARGB" to volatile.h, rather than the token
 	  CS_24BIT_PIXEL_ARGB.  This caused compilation of OpenGL-related code
 	  to fail on MacOS/X.
+	- Eric Sunshine eliminated printf() formatting warning from
+	  map2cs/texfile.cpp.
 12-Apr-2003
 	- Rhad fixed a couple potential deadlock and mutex issues in
 	  the ds3d sound renderer plugin. Also fixed similar issues in
