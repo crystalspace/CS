@@ -103,7 +103,7 @@ ViewMesh::ViewMesh (iObjectRegistry *object_reg, csSkin &Skin)
   SetBackgroundStyle(csabsNothing);
   menu = 0;
   dialog = 0;
-  cammode = movenormal;
+  cammode = moveorigin;
   spritepos = csVector3(0,10,0);
   move_sprite_speed = 0;
   scale = 1;
@@ -121,7 +121,7 @@ void ViewMesh::Help ()
   printf ("Options for ViewMesh:\n");
   printf ("  -L=<file>          Load a library file (for textures/materials)\n");
   printf ("  -Scale=<ratio>     Scale the Object\n");
-  printf ("  -RoomSize=<units>  Make the room the specified radius, and 4*size high.  (default 5).\n");
+  printf ("  -RoomSize=<units>  Radius and height (4*) of the room (default 5)\n");
   printf ("  <meshfile>         Load the specified mesh object\n");
 }
 
@@ -258,52 +258,52 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 	  return true;
 	case cscmdStopModal:
 	{        
-      char filename[1024];
-      csQueryFileDialog (dialog, filename, sizeof(filename));
-      ModalData *data = (ModalData *) GetTopModalUserdata();
+          char filename[1024];
+          csQueryFileDialog (dialog, filename, sizeof(filename));
+          ModalData *data = (ModalData *) GetTopModalUserdata();
 
-      /* If the dialog was the rotation one then pick out the 
-         rotation information and attach the mesh.
-      */
-      if ( data->code == VIEWMESH_COMMAND_ATTACH_SOCKET )
-      {
-        csComponent *rotX = 0;
-        csComponent *rotY = 0;
-        csComponent *rotZ = 0;
+          /* If the dialog was the rotation one then pick out the 
+             rotation information and attach the mesh.
+          */
+          if ( data->code == VIEWMESH_COMMAND_ATTACH_SOCKET )
+          {
+            csComponent *rotX = 0;
+            csComponent *rotY = 0;
+            csComponent *rotZ = 0;
         
-        csComponent * client = dialog->GetChild (1000);
-        if ( client )
-        {
-            rotX = client->GetChild(1001);
-            rotY = client->GetChild(1002);            
-            rotZ = client->GetChild(1003);            
-        }             
+            csComponent * client = dialog->GetChild (1000);
+            if (client)
+            {
+              rotX = client->GetChild(1001);
+              rotY = client->GetChild(1002);            
+              rotZ = client->GetChild(1003);            
+            }             
             
-        if ( rotX && rotY && rotZ )
-        {
-        
-          AttachMeshToSocket( data->socket, data->meshName.GetData(), 
-                              atof( rotX->GetText() ),
-                              atof( rotY->GetText() ),
-                              atof( rotZ->GetText() ) );                                                                
-        }
-      }        
+            if (rotX && rotY && rotZ)
+            {
+              AttachMeshToSocket (data->socket, data->meshName.GetData(), 
+                              atof (rotX->GetText()),
+                              atof (rotY->GetText()),
+                              atof (rotZ->GetText()));
+            }
+          }        
       
-      delete dialog;
-      dialog = 0;
+          delete dialog;
+          dialog = 0;
       
-      /* Check to see if this was from the dialog box to load a mesh for a
-         socket.
-       */            
-      if (data->code >= VIEWMESH_COMMAND_LOADSOCKET &&
-          data->code < VIEWMESH_COMMAND_LOADSOCKET + 100)
-      {
-        CreateRotationWindow(data->code - VIEWMESH_COMMAND_LOADSOCKET, filename);
-      }
+          /* Check to see if this was from the dialog box to load a mesh for a
+             socket.
+           */            
+          if (data->code >= VIEWMESH_COMMAND_LOADSOCKET &&
+              data->code < VIEWMESH_COMMAND_LOADSOCKET + 100)
+          {
+            CreateRotationWindow (data->code - VIEWMESH_COMMAND_LOADSOCKET,
+	    	filename);
+          }
                   
 	  switch (data->code)
 	  {     
-        case VIEWMESH_COMMAND_LOADMESH:
+            case VIEWMESH_COMMAND_LOADMESH:
 	      if (!LoadSprite(filename, scale))
 	      {
 		Printf (CS_REPORTER_SEVERITY_ERROR, "couldn't load mesh %s",
@@ -366,8 +366,8 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 		SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
 		iSprite3DState));
 	if (spstate)
-	  spstate->SetOverrideAction(
-	      stateslist.Get(ev.Command.Code - VIEWMESH_OVERRIDE_SELECT_START) );
+	  spstate->SetOverrideAction (stateslist.Get (
+	  	ev.Command.Code - VIEWMESH_OVERRIDE_SELECT_START) );
 	else
 	{
           csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(
@@ -385,13 +385,14 @@ bool ViewMesh::HandleEvent (iEvent& ev)
       if (ev.Command.Code >= VIEWMESH_STATES_ADD_START &&
 	  ev.Command.Code < VIEWMESH_STATES_ADD_START + 100)
       {
-        csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
-                iSpriteCal3DState));
+        csRef<iSpriteCal3DState> cal3dstate (SCF_QUERY_INTERFACE (
+		sprite->GetMeshObject(), iSpriteCal3DState));
         if (cal3dstate)
         {
 	  cal3dstate->AddAnimCycle(stateslist.Get(ev.Command.Code
 		- VIEWMESH_STATES_ADD_START),1,3);
-	  activelist.Push(stateslist.Get(ev.Command.Code - VIEWMESH_STATES_ADD_START));
+	  activelist.Push(stateslist.Get(ev.Command.Code
+	  	- VIEWMESH_STATES_ADD_START));
 	  menu->Hide();
 	  (void) new csMenuItem(activemenu,stateslist.Get(ev.Command.Code
 		- VIEWMESH_STATES_ADD_START),VIEWMESH_STATES_CLEAR_START
@@ -404,8 +405,8 @@ bool ViewMesh::HandleEvent (iEvent& ev)
       if (ev.Command.Code >= VIEWMESH_STATES_CLEAR_START &&
 	  ev.Command.Code < VIEWMESH_STATES_CLEAR_START + 100)
       {
-        csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
-                iSpriteCal3DState));
+        csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(
+		sprite->GetMeshObject(), iSpriteCal3DState));
         if (cal3dstate)
         {
 	  if (ev.Command.Code > VIEWMESH_STATES_CLEAR_START)
@@ -424,8 +425,8 @@ bool ViewMesh::HandleEvent (iEvent& ev)
       if (ev.Command.Code >= VIEWMESH_MESH_SELECT_START &&
 	  ev.Command.Code < VIEWMESH_MESH_SELECT_START + 100)
       {
-        csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
-                iSpriteCal3DState));
+        csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(
+		sprite->GetMeshObject(), iSpriteCal3DState));
         if (cal3dstate)
         {
 	  if (menu->GetCheck(ev.Command.Code))
@@ -447,8 +448,8 @@ bool ViewMesh::HandleEvent (iEvent& ev)
       if (ev.Command.Code >= VIEWMESH_COMMAND_BLEND &&
           ev.Command.Code < VIEWMESH_COMMAND_BLEND + 100)
       {
-        csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
-                iSpriteCal3DState));
+        csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(
+		sprite->GetMeshObject(), iSpriteCal3DState));
         if (cal3dstate)
         {
            int i = ev.Command.Code - VIEWMESH_COMMAND_BLEND;
@@ -458,8 +459,8 @@ bool ViewMesh::HandleEvent (iEvent& ev)
       if (ev.Command.Code >= VIEWMESH_COMMAND_CLEAR &&
           ev.Command.Code < VIEWMESH_COMMAND_CLEAR + 100)
       {
-        csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
-                iSpriteCal3DState));
+        csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(
+		sprite->GetMeshObject(), iSpriteCal3DState));
         if (cal3dstate)
         {
            int i = ev.Command.Code - VIEWMESH_COMMAND_CLEAR;
@@ -494,23 +495,62 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 }
 
 
-bool ViewMesh::LoadSprite(const char *filename, float scale)
+bool ViewMesh::LoadSprite (const char *filename, float scale)
 {
-  // grab the directory.
-  char *path = new char[strlen(filename)+1];
-  strcpy (path, filename);
-  char* fn = path;
-  char* slash = strrchr (path, '/');
-  char* dir;
-  if (slash)
+  // If there is a ':' in the name then we use vfs->ChDirAuto() which
+  // gives us more flexibility. For example you can then say things like:
+  //   viewmesh data/models.zip:bla/bla.cal3d
+  //   viewmesh /this/data:test.cal3d
+
+  char* colon = strchr (filename, ':');
+  char* path;
+  char* fn;
+  if (colon)
   {
-    fn = slash + 1;
-    *slash = 0;
-    dir = path;
+    int pathlen = colon-filename;
+    path = new char[pathlen+1];
+    fn = colon+1;
+    strncpy (path, filename, pathlen);
+    path[pathlen] = 0;
+    if (!VFS->ChDirAuto (path, 0, 0, colon+1))
+    {
+      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	"crystalspace.application.viewmesh", "Couldn't find '%s' in '%s'!",
+		colon+1, path);
+      delete[] path;
+      return false;
+    }
+    // If there is a path after the colon we skip every entry in that
+    // path until we end up with only the filename.
+    char* slash = strpbrk (fn, "/\\");
+    while (slash)
+    {
+      char rs = *slash;
+      *slash = 0;
+      VFS->ChDir (fn);
+      *slash = rs;
+      fn = slash+1;
+      slash = strpbrk (fn, "/\\");
+    }
   }
   else
-    dir = "/";
-  VFS->ChDir (dir);
+  {
+    // grab the directory.
+    path = new char[strlen(filename)+1];
+    strcpy (path, filename);
+    fn = path;
+    char* slash = strrchr (path, '/');
+    char* dir;
+    if (slash)
+    {
+      fn = slash + 1;
+      *slash = 0;
+      dir = path;
+    }
+    else
+      dir = "/";
+    VFS->ChDir (dir);
+  }
 
   csRef<iMeshFactoryWrapper> imeshfactwrap (
   	loader->LoadMeshObjectFactory (fn));
@@ -557,20 +597,21 @@ bool ViewMesh::LoadSprite(const char *filename, float scale)
   }
   else
   {
-    csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
-          iSpriteCal3DState));
+    csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(
+    	sprite->GetMeshObject(), iSpriteCal3DState));
     if (cal3dstate)
     {
       is_cal3d = true;
       for (int i=0;i<cal3dstate->GetAnimCount();i++)
       {
-	if (cal3dstate->GetAnimType (i) == iSpriteCal3DState::C3D_ANIM_TYPE_ACTION)
+	if (cal3dstate->GetAnimType (i) == iSpriteCal3DState
+		::C3D_ANIM_TYPE_ACTION)
           actionlist.Push (csStrNew (cal3dstate->GetAnimName (i)));
 	else
           stateslist.Push (csStrNew (cal3dstate->GetAnimName (i)));
       }
-      csRef<iSpriteCal3DFactoryState> factstate(SCF_QUERY_INTERFACE(imeshfact,
-								    iSpriteCal3DFactoryState));
+      csRef<iSpriteCal3DFactoryState> factstate(
+      	SCF_QUERY_INTERFACE(imeshfact, iSpriteCal3DFactoryState));
       if (factstate)
       {
         factstate->RescaleFactory(scale);
@@ -578,16 +619,18 @@ bool ViewMesh::LoadSprite(const char *filename, float scale)
 	  {
 	      csString push;
 	      if (factstate->IsMeshDefault(i))
-		  push.Append("x"); // This is used as a flag to determine whether the item should be initially checked or not.
+		push.Append("x"); // This is used as a flag to determine
+		// whether the item should be initially checked or not.
 	      else
-		  push.Append(" ");
+		push.Append(" ");
 	      push.Append(factstate->GetMeshName(i));
 	      meshlist.Push(push);
 	  }
 	  int j;
           for (j=0;j<factstate->GetMorphAnimationCount();j++)
           {
-            morphanimationlist.Push(csStrNew (factstate->GetMorphAnimationName(j)));
+            morphanimationlist.Push(csStrNew (
+	    	factstate->GetMorphAnimationName(j)));
 	  }
 	  for(j=0;j< factstate->GetSocketCount();j++)
 	  {
@@ -640,11 +683,16 @@ void ViewMesh::ConstructMenu()
 
   // AnimMenu
   csMenu *animmenu = new csMenu(0);
-  (void)new csMenuItem(animmenu,"Move Sprite Faster", VIEWMESH_COMMAND_MOVEANIMFASTER);
-  (void)new csMenuItem(animmenu,"Move Sprite Slower", VIEWMESH_COMMAND_MOVEANIMSLOWER);
-  (void)new csMenuItem(animmenu,"Reverse Action",     VIEWMESH_COMMAND_REVERSEACTION);
-  (void)new csMenuItem(animmenu,"Forward Action",     VIEWMESH_COMMAND_FORWARDACTION);
-  (void)new csMenuItem(menu, "Action Effects",animmenu);
+  (void)new csMenuItem(animmenu,"Move Sprite Faster",
+  	VIEWMESH_COMMAND_MOVEANIMFASTER);
+  (void)new csMenuItem(animmenu,"Move Sprite Slower",
+  	VIEWMESH_COMMAND_MOVEANIMSLOWER);
+  (void)new csMenuItem(animmenu,"Reverse Action",
+  	VIEWMESH_COMMAND_REVERSEACTION);
+  (void)new csMenuItem(animmenu,"Forward Action",
+  	VIEWMESH_COMMAND_FORWARDACTION);
+  (void)new csMenuItem(menu, "Action Effects",
+  	animmenu);
 
   // StateMenu
   csMenu *statesmenu = new csMenu(0);
@@ -1019,7 +1067,8 @@ bool ViewMesh::AttachMeshToSocket( int socketNumber, char* meshFile,
         
   if (cal3dstate)
   {
-    iSpriteCal3DSocket* socket = cal3dstate->FindSocket(socketlist.Get(socketNumber));
+    iSpriteCal3DSocket* socket = cal3dstate->FindSocket(
+    	socketlist.Get(socketNumber));
     if ( !socket )
     {
       Printf (CS_REPORTER_SEVERITY_ERROR,
@@ -1030,12 +1079,13 @@ bool ViewMesh::AttachMeshToSocket( int socketNumber, char* meshFile,
     csRef<iMeshWrapper> meshWrapOld = socket->GetMeshWrapper();
     if ( meshWrapOld )
     {
-        sprite->GetChildren()->Remove( meshWrapOld );
-        socket->SetMeshWrapper( NULL );    
+      sprite->GetChildren()->Remove( meshWrapOld );
+      socket->SetMeshWrapper( NULL );    
     }
     
-    csRef<iMeshFactoryWrapper> factory = loader->LoadMeshObjectFactory( meshFile );
-    if ( !factory )
+    csRef<iMeshFactoryWrapper> factory = loader->LoadMeshObjectFactory (
+    	meshFile );
+    if (!factory)
     {
       Printf (CS_REPORTER_SEVERITY_ERROR,
               "Error loading mesh object factory '%s'!", meshFile);    
@@ -1043,7 +1093,8 @@ bool ViewMesh::AttachMeshToSocket( int socketNumber, char* meshFile,
     }
     else
     {
-      csRef<iMeshWrapper> meshWrap = engine->CreateMeshWrapper( factory, meshFile );
+      csRef<iMeshWrapper> meshWrap = engine->CreateMeshWrapper (
+      	factory, meshFile );
       
       if ( xRot != 0 )          
       {
@@ -1114,7 +1165,8 @@ void ViewMesh::CreateRotationWindow(int socket, char* filename)
   sprintf(buffer, "%f", DEFAULT_SOCKET_Z_ROTATION),
   il->SetText (buffer);        
         
-  csButton* b = new csButton (client, cscmdStopModal, CSBS_DEFAULTVALUE | CSBS_DISMISS);
+  csButton* b = new csButton (client, cscmdStopModal,
+  	CSBS_DEFAULTVALUE | CSBS_DISMISS);
   b->SetText ("~Ok");
   b->SetRect (10, 180, 150, 200);
       

@@ -12,6 +12,23 @@ chronological order.
 	  only deleted in case -verbose commandline option was given.
 	- Eric Sunshine silenced Swig warnings resulting from Jorrit's new
 	  CS_LEAKGUARD_DECLARE.
+	- Jorrit made 'look to origin' default in viewmesh. Also cleaned up
+	  the code.
+	- Jorrit enhanced viewmesh so that you can now (on the commandline)
+	  specify a model in the following ways:
+	    - <full vfs path including model name>
+	    - <vfs path> ':' [ <directory> '/' ] <model name>
+	    - <real path to zip> ':' [ <directory> '/' ] <model name>
+	    - <real path> ':' [ <directory> '/' ] <model name>
+	  Some examples:
+	    - /this/data/model.cal3d
+	    - data/standard.zip:sprite1
+	    - /lib/std:sprite1
+	    - data/models.zip:uglyone/uglyone.cal3d
+	  This works best (for cal3d models) if you make sure that the
+	  cal3d model specifies NO path and the textures also have
+	  no path so everything is loaded relative to the current VFS
+	  directory.
 22-Aug-2004
 	- Jorrit fixed a leak in spr3d. Everytime an spr3d was created
 	  it couldn't be removed again.
