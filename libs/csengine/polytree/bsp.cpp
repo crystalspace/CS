@@ -526,20 +526,6 @@ int* csBspTree::GetVertices (int& count)
   return indices;
 }
 
-void csBspTree::AddToPVS (csBspNode* node, csPolygonArrayNoFree* polygons)
-{
-  if (!node) return;
-  int i;
-  for (i = 0 ; i < node->polygons.GetNumPolygons () ; i++)
-  {
-    if (node->polygons.GetPolygon (i)->GetType () != 1) continue;
-    csPolygon3D* p = (csPolygon3D*)(node->polygons.GetPolygon (i));
-    if (p->IsVisible ()) polygons->Push ((csPolygonInt*)p);
-  }
-  AddToPVS (node->front, polygons);
-  AddToPVS (node->back, polygons);
-}
-
 void csBspTree::Cache (csBspNode* node, iFile* cf)
 {
   if (!node) return;
@@ -648,52 +634,3 @@ bool csBspTree::ReadFromCache (iFile* cf,
   return rc;
 }
 
-int csBspTree::ClassifyPolygon (csBspNode* node, const csPoly3D& poly)
-{
-  if (!node)
-  {
-    if (ClassifyPoint (poly.GetCenter ()))
-      return 1;
-    else
-      return 0;
-  }
-
-  if (!node->front && !node->back)
-  {
-    // Leaf.
-    // If we come here then we know that the entire polygon is in
-    // this node. In that case we test one of the vertices to see if
-    // it is solid or not.
-    if (ClassifyPoint (poly.GetCenter ()))
-      return 1;
-    else
-      return 0;
-  }
-  int c = poly.Classify (node->splitter);
-  switch (c)
-  {
-    case POL_SAME_PLANE:
-      if (ClassifyPoint (poly.GetCenter ()))
-        return 1;
-      else
-        return 0;
-      break;
-    case POL_FRONT:
-      return ClassifyPolygon (node->front, poly);
-    case POL_BACK:
-      return ClassifyPolygon (node->back, poly);
-    case POL_SPLIT_NEEDED:
-      {
-        csPoly3D front, back;
-	poly.SplitWithPlane (front, back, node->splitter);
-        int rc1 = ClassifyPolygon (node->front, front);
-	if (rc1 == -1) return -1;
-        int rc2 = ClassifyPolygon (node->back, back);
-	if (rc2 == -1) return -1;
-	if (rc1 != rc2) return -1;
-	return rc1;
-      }
-      return -1;
-  }
-  return -1;
-}

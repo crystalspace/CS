@@ -477,31 +477,6 @@ void csThing::BuildStaticTree (int mode, bool /*octree*/)
   CsPrintf (MSG_INITIALIZATION, "Build vertex tables...\n");
   ((csOctree*)static_tree)->BuildVertexTables ();
 
-  // Everything for PVS.
-  str = "vis/pvs_";
-  str += GetName ();
-  bool recalc_pvs = true;
-  if ((!csEngine::do_force_revis || csEngine::do_not_force_revis) &&
-  	w->VFS->Exists ((const char*)str))
-  {
-    recalc_pvs = false;
-    CsPrintf (MSG_INITIALIZATION, "Loading PVS...\n");
-    recalc_pvs = !((csOctree*)static_tree)->ReadFromCachePVS (
-    	w->VFS, (const char*)str);;
-  }
-  if (csEngine::do_not_force_revis) recalc_pvs = false;
-  if (recalc_pvs)
-  {
-#   if 0
-    CsPrintf (MSG_INITIALIZATION, "Build PVS...\n");
-    ((csOctree*)static_tree)->BuildPVS (static_thing);
-#   else
-    //CsPrintf (MSG_INITIALIZATION, "Build Dummy PVS...\n");
-    //((csOctree*)static_tree)->SetupDummyPVS ();
-#   endif
-    CsPrintf (MSG_INITIALIZATION, "Caching PVS...\n");
-    ((csOctree*)static_tree)->CachePVS (w->VFS, (const char*)str);
-  }
   static_tree->Statistics ();
 
   CsPrintf (MSG_INITIALIZATION, "DONE!\n");
@@ -905,11 +880,11 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
       p = (csPolygon3D*)polygon[i];
       if (pvs)
       {
-        if (!p->IsVisible ())
-        {
+        //if (!p->IsVisible ())
+        //{
           // Polygon is not visible because of PVS.
           //@@@ CURRENTLY DISABLED continue;
-        }
+        //}
       }
 
       visible = false;
@@ -1671,12 +1646,12 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   iCamera* icam = rview->GetCamera ();
   const csReversibleTransform& camtrans = icam->GetTransform ();
 
-  if (w->IsPVS ())
-  {
+  //if (w->IsPVS ())
+  //{
     // Test for PVS.
-    if (!onode->IsVisible ()) return false;
-    else if (w->IsPVSOnly ()) goto is_vis;
-  }
+    //if (!onode->IsVisible ()) return false;
+    //else if (w->IsPVSOnly ()) goto is_vis;
+  //}
 
   c_buffer = w->GetCBuffer ();
   covtree = w->GetCovtree ();
@@ -2129,14 +2104,14 @@ bool csThing::VisTest (iRenderView* irview)
 
     // Using the PVS, mark all sectors and polygons that are visible
     // from the current node.
-    if (engine->IsPVS ())
-    {
-      csOctree* otree = (csOctree*)static_tree;
+    //if (engine->IsPVS ())
+    //{
+      //csOctree* otree = (csOctree*)static_tree;
       //@@@if (engine->IsPVSFrozen ())
 	//@@@otree->MarkVisibleFromPVS (engine->GetFrozenPosition ());
       //@@@else
-      otree->MarkVisibleFromPVS (origin);
-    }
+      //otree->MarkVisibleFromPVS (origin);
+    //}
 
     // Initialize a queue on which all visible polygons will be pushed.
     // The octree is traversed front to back but we want to render

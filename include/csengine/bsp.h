@@ -166,23 +166,12 @@ private:
    */
   void ProcessTodo (csBspNode* node);
 
-  /**
-   * Add all visible polygons in this tree to
-   * the given polygon array (for PVS).
-   */
-  void AddToPVS (csBspNode* node, csPolygonArrayNoFree* polygons);
-
   /// Cache this node and children.
   void Cache (csBspNode* node, iFile* cf);
 
   /// Read this tree from cache.
   bool ReadFromCache (iFile* cf, csBspNode* node,
   	csPolygonInt** polygons, int num);
-
-  /**
-   * Classify a polygon with respect to this tree.
-   */
-  int ClassifyPolygon (csBspNode* node, const csPoly3D& poly);
 
 public:
   /**
@@ -235,35 +224,11 @@ public:
    */
   bool IsEmpty () { return root ? root->IsEmpty () : false; }
 
-  /**
-   * Add all visible polygons in this tree to
-   * the given polygon array (for PVS).
-   */
-  void AddToPVS (csPolygonArrayNoFree* polygons)
-  {
-    AddToPVS ((csBspNode*)root, polygons);
-  }
-
   /// Cache this tree.
   void Cache (iFile* cf);
 
   /// Read this tree from cache.
   bool ReadFromCache (iFile* cf, csPolygonInt** polygons, int num);
-
-  /**
-   * Take a 3D polygon and classify it with respect to this tree.
-   * The value returned is 1 if the polygon is entirely in solid space,
-   * 0 if the polygon is entirely in open space and -1 otherwise (i.e.
-   * if the polygon would have to be split). The polygon is not actually
-   * inserted. Note that this algorithm cannot be 100% perfect. If a world
-   * is not properly formed (i.e. there are floating single polygons)
-   * then it is possible (but unlikely) that a polygon is misclassified
-   * as being in solid space while it actually isn't.
-   */
-  int ClassifyPolygon (const csPoly3D& poly)
-  {
-    return ClassifyPolygon ((csBspNode*)root, poly);
-  }
 
   /**
    * Count all the polygons in this tree.

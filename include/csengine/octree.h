@@ -23,7 +23,6 @@
 #include "csgeom/box.h"
 #include "csengine/polytree.h"
 #include "csengine/bsp.h"
-#include "csengine/pvs.h"
 
 class csPolygonInt;
 class csOctree;
@@ -97,27 +96,6 @@ private:
   /// Number of vertices in minibsp_verts.
   int minibsp_numverts;
 
-  /**
-   * The PVS for this node.
-   * This list contains all octree nodes and polygons that
-   * are visible from this node.
-   */
-  csPVS pvs;
-
-  /**
-   * Visibility number. If equal to csOctreeNode::pvs_cur_vis_nr then
-   * this object is visible.
-   */
-  ULong pvs_vis_nr;
-
-public:
-  /**
-   * Current visibility number. All objects (i.e. octree
-   * nodes and polygons) which have the same number as this one
-   * are visible. All others are not.
-   */
-  static ULong pvs_cur_vis_nr;
-
 private:
   /// Make an empty octree node.
   csOctreeNode ();
@@ -143,12 +121,6 @@ private:
 public:
   /// Return true if node is empty.
   bool IsEmpty ();
-
-  /// Return true if node is visible according to PVS.
-  bool IsVisible () { return pvs_vis_nr == pvs_cur_vis_nr; }
-
-  /// Mark visible (used by PVS).
-  void MarkVisible () { pvs_vis_nr = pvs_cur_vis_nr; }
 
   /// Return true if node is leaf.
   bool IsLeaf () { return leaf; }
@@ -204,16 +176,6 @@ public:
    * actually be returned by Front2Back/Back2Front).
    */
   int CountPolygons ();
-
-  /// Get the PVS.
-  csPVS& GetPVS () { return pvs; }
-
-  /**
-   * Test if this node can see the leaf containing the given position
-   * with the PVS. This function will return true (i.e. visible) if the PVS 
-   * for this node has not been computed yet.
-   */
-  bool PVSCanSee (const csVector3& v);
 
   /**
    * Create an iterator to iterate over all solid polygons that
@@ -288,68 +250,9 @@ private:
 	int* tot_pvs_vis_poly, int* min_pvs_vis_poly, int* max_pvs_vis_poly);
 
   /**
-   * Test if 'box' can see 'occludee' through all the polygons
-   * in this octree.
-   */
-  bool BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee);
-
-  /**
-   * Test if 'box' can see 'occludee' through all the polygons
-   * in this octree. This function is VERY VERY slow and when the
-   * two nodes cannot see each other it will actually never return.
-   * This function is only useful for debugging.
-   */
-  bool BoxCanSeeOccludeeSuperSlow (const csBox3& box, const csBox3& occludee);
-
-  /**
-   * Build PVS for this leaf.
-   * Returns true if the occludee was visible, false otherwise.
-   */
-  bool BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
-  	csOctreeNode* leaf);
-
-  /**
-   * Build PVS for this node.
-   * Call SetupDummyPVS() and optionally BuildQADPVS()
-   * before calling BuildPVS().
-   */
-  void BuildPVS (csThing* thing, csOctreeNode* node);
-
-  /**
-   * Build quick PVS for this node.
-   * The quick PVS will not correctly find all visible nodes but all
-   * nodes that it marks as visible are SURE to be correct. Note that
-   * SetupDummyPVS() must be called before this. The real BuildPVS()
-   * will use this PVS to optimize PVS building (i.e. don't test PVS
-   * for nodes that are sure to be mutually visible).
-   */
-  void BuildQADPVS (csOctreeNode* node);
-
-  /**
-   * Delete the given occludee and all children of that occludee
-   * from the given pvs.
-   */
-  void DeleteNodeAndChildrenFromPVS (csPVS& pvs, csOctreeNode* occludee);
-
-  /**
    * Calculate masks for the sides of all nodes.
    */
   void CalculateSolidMasks (csOctreeNode* node);
-
-  /**
-   * Add all nodes of a tree to the PVS of 'leaf'.
-   */
-  void AddDummyPVSNodes (csOctreeNode* leaf, csOctreeNode* node);
-
-  /**
-   * Set up a dummy PVS for this node.
-   */
-  void SetupDummyPVS (csOctreeNode* node);
-
-  /**
-   * Classify a polygon with respect to this tree.
-   */
-  int ClassifyPolygon (csOctreeNode* node, const csPoly3D& poly);
 
   /// Cache this node and children.
   void Cache (csOctreeNode* node, iFile* cf);
@@ -358,11 +261,6 @@ private:
   bool ReadFromCache (iFile* cf, csOctreeNode* node,
   	const csVector3& bmin, const csVector3& bmax,
   	csPolygonInt** polygons, int num);
-
-  /// Read the PVS for this node and children from VFS.
-  bool ReadFromCachePVS (iFile* cf, csOctreeNode* node);
-  /// Cache the PVS for this node and children to VFS.
-  void CachePVS (csOctreeNode* node, iFile* cf);
 
   /**
    * Get the node for this path.
@@ -430,34 +328,6 @@ public:
   }
 
   /**
-   * Update with PVS. This routine will take the given position
-   * and locate the octree leaf node for that position. Then it
-   * will get the PVS for that node and mark all visible octree
-   * nodes and polygons.
-   */
-  void MarkVisibleFromPVS (const csVector3& pos);
-
-  /**
-   * Build the PVS for this octree and the csThing
-   * to which this octree belongs.
-   */
-  void BuildPVS (csThing* thing);
-
-  /**
-   * Set up a dummy PVS (i.e. mark everything as visible).
-   */
-  void SetupDummyPVS ()
-  {
-    SetupDummyPVS ((csOctreeNode*)root);
-  }
-
-  /**
-   * Test if 'box1' can see 'box2' through all the polygons
-   * in this octree.
-   */
-  bool BoxCanSeeBox (const csBox3& box1, const csBox3& box2);
-
-  /**
    * Given a position return the leaf that this position is in.
    */
   csOctreeNode* GetLeaf (const csVector3& pos);
@@ -471,30 +341,6 @@ public:
 
   /// Print statistics about this octree.
   void Statistics ();
-
-  /**
-   * Take a 3D polygon and classify it with respect to this tree.
-   * The value returned is 1 if the polygon is entirely in solid space,
-   * 0 if the polygon is entirely in open space and -1 otherwise (i.e.
-   * if the polygon would have to be split). The polygon is not actually
-   * inserted. Note that this algorithm cannot be 100% perfect. If a world
-   * is not properly formed (i.e. there are floating single polygons)
-   * then it is possible (but unlikely) that a polygon is misclassified
-   * as being in solid space while it actually isn't.
-   */
-  int ClassifyPolygon (const csPoly3D& poly)
-  {
-    return ClassifyPolygon ((csOctreeNode*)root, poly);
-  }
-
-  /**
-   * Take an axis-aligned rectangle in 3D space represented by the plane
-   * and a 2D box on that plane.
-   * Return a 4x4 bitmap with information about the solid/open state
-   * of every 1/16'th of that rectangle.
-   */
-  UShort ClassifyRectangle (int plane_nr, float plane_pos,
-  	const csBox2& box);
 
   /**
    * Cache this entire octree to disk (VFS).

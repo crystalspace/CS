@@ -971,9 +971,9 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       csPolygonTree* tree = stat->GetStaticTree ();
       csOctree* otree = (csOctree*)tree;
-      bool vis1 = otree->BoxCanSeeBox (Sys->debug_box1, Sys->debug_box2);
-      bool vis2 = otree->BoxCanSeeBox (Sys->debug_box2, Sys->debug_box1);
-      CsPrintf (MSG_CONSOLE, "Box1->box2:%d box2->box1:%d\n", vis1, vis2);
+      //bool vis1 = otree->BoxCanSeeBox (Sys->debug_box1, Sys->debug_box2);
+      //bool vis2 = otree->BoxCanSeeBox (Sys->debug_box2, Sys->debug_box1);
+      //CsPrintf (MSG_CONSOLE, "Box1->box2:%d box2->box1:%d\n", vis1, vis2);
     }
     else
       CsPrintf (MSG_CONSOLE, "No octree in this sector!\n");

@@ -356,13 +356,13 @@ void csPolygon3D::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
 
   csVector3 ptB;
   float sideA, sideB;
-  csVector3 ptA = Vwor (GetVertices ().GetNumVertices () - 1);
+  csVector3 ptA = Vobj (GetVertices ().GetNumVertices () - 1);
   sideA = plane.Classify (ptA);
   if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
 
   for (int i = -1 ; ++i < GetVertices ().GetNumVertices () ; )
   {
-    ptB = Vwor (i);
+    ptB = Vobj (i);
     sideB = plane.Classify (ptB);
     if (ABS (sideB) < SMALL_EPSILON) sideB = 0;
     if (sideB > 0)
@@ -428,12 +428,12 @@ bool csPolygon3D::Overlaps (csPolygonInt* overlapped)
   int i;
   for (i = 0 ; i < totest->vertices.GetNumVertices () ; i++)
   {
-    if (this_plane.Classify (totest->Vwor (i)) >= SMALL_EPSILON)
+    if (this_plane.Classify (totest->Vobj (i)) >= SMALL_EPSILON)
     {
       int j;
       for (j = 0 ; j < vertices.GetNumVertices () ; j++)
       {
-        if (test_plane.Classify (Vwor (j)) <= SMALL_EPSILON)
+        if (test_plane.Classify (Vobj (j)) <= SMALL_EPSILON)
 	{
 	  return true;
 	}
@@ -496,7 +496,7 @@ int csPolygon3D::Classify (const csPlane3& pl)
 
   for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
   {
-    float dot = pl.Classify (Vwor (i));
+    float dot = pl.Classify (Vobj (i));
     if (ABS (dot) < EPSILON) dot = 0;
     if (dot > 0) back++;
     else if (dot < 0) front++;
@@ -513,7 +513,7 @@ int csPolygon3D::ClassifyX (float x)
 
   for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
   {
-    float xx = Vwor (i).x-x;
+    float xx = Vobj (i).x-x;
     if (xx < -EPSILON) front++;
     else if (xx > EPSILON) back++;
   }
@@ -530,7 +530,7 @@ int csPolygon3D::ClassifyY (float y)
 
   for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
   {
-    float yy = Vwor (i).y-y;
+    float yy = Vobj (i).y-y;
     if (yy < -EPSILON) front++;
     else if (yy > EPSILON) back++;
   }
@@ -547,7 +547,7 @@ int csPolygon3D::ClassifyZ (float z)
 
   for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
   {
-    float zz = Vwor (i).z-z;
+    float zz = Vobj (i).z-z;
     if (zz < -EPSILON) front++;
     else if (zz > EPSILON) back++;
   }
@@ -689,8 +689,8 @@ float csPolygon3D::GetArea()
 {
   float area = 0.0;
   // triangulize the polygon, triangles are (0,1,2), (0,2,3), (0,3,4), etc..
-  for(int i=0; i<vertices.GetNumVertices()-2; i++)
-    area += ABS(csMath3::Area3 ( Vwor(0), Vwor(i+1), Vwor(i+2) ));
+  for (int i = 0 ; i<vertices.GetNumVertices()-2 ; i++)
+    area += ABS(csMath3::Area3 (Vobj(0), Vobj(i+1), Vobj(i+2)));
   return area / 2.0;
 }
 
@@ -1438,7 +1438,7 @@ bool csPolygon3D::PointOnPolygon (const csVector3& v)
   i1 = GetVertices ().GetNumVertices ()-1;
   for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
   {
-    float ar = csMath3::Area3 (v, Vwor (i1), Vwor (i));
+    float ar = csMath3::Area3 (v, Vobj (i1), Vobj (i));
     if (ar < 0) neg = true;
     else if (ar > 0) pos = true;
     if (neg && pos) return false;

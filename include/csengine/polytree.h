@@ -212,15 +212,6 @@ public:
 
   /// Print statistics about this tree.
   virtual void Statistics () = 0;
-
-  /**
-   * Classify a point with respect to this tree.
-   * Return true if the point is in solid space or false otherwise.
-   * This routine is not exact. In badly formed worlds it is possible
-   * that it will generate a bad result (i.e. say solid if it isn't
-   * solid space).
-   */
-  bool ClassifyPoint (const csVector3& p);
 };
 
 #endif // __CS_POLYTREE_H__

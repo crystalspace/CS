@@ -52,7 +52,6 @@ csOctreeNode::csOctreeNode ()
   minibsp_verts = NULL;
   minibsp_numverts = 0;
   leaf = false;
-  pvs_vis_nr = 0;
 }
 
 csOctreeNode::~csOctreeNode ()
@@ -136,8 +135,6 @@ void csOctree::Build (csPolygonInt** polygons, int num)
   delete [] new_polygons;
 
   Dumper::dump (this);
-
-  CalculateSolidMasks ((csOctreeNode*)root);
 }
 
 void csOctree::ProcessTodo (csOctreeNode* node)
@@ -356,68 +353,6 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
 
   int i, j;
   csVector3 best_center = orig;
-#if 0
-  // Choose while trying to maximize the area of solid space
-  // This will improve occlusion!
-
-  // @@@ Idea: we would like to use ClassifyRectangle here but that
-  // function depends on the octree being generated already. Maybe
-  // octree generation needs to happen in two passes?
-
-# define DTRIES 10
-  float dx = tbox.MaxX () - tbox.MinX ();
-  float dy = tbox.MaxY () - tbox.MinY ();
-  float dz = tbox.MaxZ () - tbox.MinZ ();
-
-  // Try a few x-planes first.
-  float x, y, z;
-  float tx, ty;
-  TestSolidData tdata;
-  int count_solid;
-  int max_solid = -1000;
-  for (i = 0 ; i < num_x ; i++)
-  {
-    x = xarray[i]+.1;
-    csPlane3 plane (1, 0, 0, -x);
-    UShort mask = ClassifyRectangle (int plane_nr, float plane_pos,
-  	const csBox2& box);//@@@
-    if (count_solid > max_solid)
-    {
-      max_solid = count_solid;
-      best_center.x = x;
-    }
-  }
-
-  // Try y planes.
-  max_solid = -1000;
-  for (i = 0 ; i < num_y ; i++)
-  {
-    y = yarray[i]+.1;
-    csPlane3 plane (0, 1, 0, -y);
-    UShort mask = ClassifyRectangle (int plane_nr, float plane_pos,
-  	const csBox2& box);//@@@
-    if (count_solid > max_solid)
-    {
-      max_solid = count_solid;
-      best_center.y = y;
-    }
-  }
-
-  // Try z planes.
-  max_solid = -1000;
-  for (i = 0 ; i < num_z ; i++)
-  {
-    z = zarray[i]+.1;
-    csPlane3 plane (0, 0, 1, -z);
-    UShort mask = ClassifyRectangle (int plane_nr, float plane_pos,
-  	const csBox2& box);//@@@
-    if (count_solid > max_solid)
-    {
-      max_solid = count_solid;
-      best_center.z = z;
-    }
-  }
-#else
   // Try a few x-planes first.
   float x, y, z;
   int splits, best_splits = 2000000000;
@@ -472,7 +407,6 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
       best_splits = splits;
     }
   }
-#endif
   node->center = best_center;
   delete [] xarray;
   delete [] yarray;
@@ -752,15 +686,6 @@ void csOctree::Statistics (csOctreeNode* node, int depth,
     (*num_pvs_leaves)++;
     int num_vis_nodes = 0;
     int num_vis_poly = 0;
-    csPVS& pvs = node->GetPVS ();
-    csOctreeVisible* ovis = pvs.GetFirst ();
-    while (ovis)
-    {
-      num_vis_nodes++;
-      csOctreeNode* vis_node = ovis->GetOctreeNode ();
-      if (vis_node->IsLeaf ()) num_vis_poly += vis_node->CountPolygons ();
-      ovis = pvs.GetNext (ovis);
-    }
     (*tot_pvs_vis_nodes) += num_vis_nodes;
     if (num_vis_nodes > *max_pvs_vis_nodes) *max_pvs_vis_nodes = num_vis_nodes;
     if (num_vis_nodes < *min_pvs_vis_nodes) *min_pvs_vis_nodes = num_vis_nodes;

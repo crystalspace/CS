@@ -812,13 +812,7 @@ public:
    */
   bool IsTransparent ();
 
-  /// Return true if node is visible according to PVS.
-  bool IsVisible () { return pvs_vis_nr == csOctreeNode::pvs_cur_vis_nr; }
-
-  /// Mark visible (used by PVS).
-  void MarkVisible () { pvs_vis_nr = csOctreeNode::pvs_cur_vis_nr; }
-
-  /// Calculates the area of the polygon.
+  /// Calculates the area of the polygon in object space.
   float GetArea ();
 
   /**
@@ -1130,7 +1124,7 @@ public:
 	bool mirror);
 
   /**
-   * Classify this polygon with regards to a plane (in world space).  If this
+   * Classify this polygon with regards to a plane (in object space).  If this
    * poly is on same plane it returns POL_SAME_PLANE.  If this poly is
    * completely in front of the given plane it returnes POL_FRONT.  If this
    * poly is completely back of the given plane it returnes POL_BACK.
@@ -1151,14 +1145,15 @@ public:
    * Split this polygon with the given plane (A,B,C,D) and return the
    * two resulting new polygons in 'front' and 'back'. The new polygons will
    * mimic the behaviour of the parent polygon as good as possible.
-   * This function is mainly used by the BSP splitter.
+   * This function is mainly used by the BSP splitter. Note that splitting
+   * happens in object space.
    */
   void SplitWithPlane (csPolygonInt** front, csPolygonInt** back,
   	const csPlane3& plane);
 
   /**
    * Check if this polygon (partially) overlaps the other polygon
-   * from some viewpoint in space.
+   * from some viewpoint in space. This function works in object space.
    */
   bool Overlaps (csPolygonInt* overlapped);
 
@@ -1205,6 +1200,7 @@ public:
 
   /**
    * This is a given point is on (or very nearly on) this polygon.
+   * Test happens in object space.
    */
   bool PointOnPolygon (const csVector3& v);
 

@@ -1,5 +1,14 @@
 The history order has been reversed so that new features are at the top.
 
+5-Mar-2001
+	- Removed the old and obsolete pvs code. It wasn't working anyway
+	  and when I revive it I'm going to totally rewrite it.
+	- Also removed a lot of functions that were only used by PVS.
+	  I still kept a copy and they are also in CVS attic if it turns
+	  out they were useful after all.
+	- Changed several of the routines in csPolygon3D to operate on
+	  object space coordinates instead of world space. This it make
+	  it easier to make the world space coordinate array optional.
 4-Mar-2001
 	- Finalized the first rewrite of the data structures that are used
 	  in CheckFrustum. A further rewrite and conversion to SCF will
