@@ -4218,6 +4218,56 @@ void csLoader::NewPlugIn (char* name, iPlugIn* plugin)
   loaded_plugins.Push (lp);
 }
 
+//---------------------------------------------------------------------------
+
+csMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (csEngine* engine,
+	const char* fname)
+{
+  Engine = engine;
+
+  iDataBuffer *databuff = System->VFS->ReadFile (fname);
+
+  if (!databuff || !databuff->GetSize ())
+  {
+    if (databuff) databuff->DecRef ();
+    CsPrintf (MSG_FATAL_ERROR, "Could not open mesh object file \"%s\" on VFS!\n", fname);
+    return NULL;
+  }
+
+  CS_TOKEN_TABLE_START (tokens)
+    CS_TOKEN_TABLE (MESHOBJ)
+  CS_TOKEN_TABLE_END
+
+  char *name, *data;
+  char *buf = **databuff;
+
+  if (csGetObject (&buf, tokens, &name, &data))
+  {
+    if (!data)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
+
+    csMeshFactoryWrapper* tmpl = new csMeshFactoryWrapper ();
+    tmpl->SetName (name);
+    if (LoadMeshObjectFactory (tmpl, data))
+    {
+      Engine->meshobj_factories.Push (tmpl);
+      databuff->DecRef ();
+      return tmpl;
+    }
+    else
+    {
+      delete tmpl;
+      databuff->DecRef ();
+      return NULL;
+    }
+  }
+  databuff->DecRef ();
+  return NULL;
+}
+
 bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
 {
   CS_TOKEN_TABLE_START (commands)

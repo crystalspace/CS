@@ -235,6 +235,9 @@ public:
    */
   static csSpriteTemplate* LoadSpriteTemplate (csEngine*, const char* fname);
 
+  /// Load a Mesh Object Factory from the map file.
+  static csMeshFactoryWrapper* LoadMeshObjectFactory (csEngine*, const char* fname);
+
   /**
    * Load a thing from a file.
    */

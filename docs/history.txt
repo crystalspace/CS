@@ -15,6 +15,9 @@ The history order has been reversed so that new features are at the top.
 	  it correctly in the world.
 	- Updated simple to use the new conveniance functions.
 	- Norman Kramer started optimizing AVI plugin using u/v pipe.
+	- Added csLoader::LoadMeshObjectFactory() to load mesh object
+	  factories.
+	- Simple now uses mesh object system for the sprite too.
 6-Feb-2001
 	- Continue implementation of spr3d loader plugin. The factory
 	  loader should work now.
