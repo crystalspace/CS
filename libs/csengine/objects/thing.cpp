@@ -1242,6 +1242,7 @@ static DECLARE_GROWING_ARRAY (fog_verts, G3DFogInfo);
 bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
 	csZBufMode zMode)
 {
+  if (GetNumCurves () <= 0) return false;
   iCamera* icam = rview->GetCamera ();
   const csReversibleTransform& camtrans = icam->GetTransform ();
 

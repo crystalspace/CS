@@ -3,6 +3,10 @@ The history order is reversed so that new features are at the top.
 17-Jun-2001
 	- Fixed a bug in 'facedown'/'faceup' commands (walktest). Reported
 	  by Thiago Ramon.
+	- Did a very trivial optimizaton. It appeared that a lot of code
+	  on curve drawing setup was done every frame for every thing
+	  that is drawn. This code is totally unneeded in most cases
+	  (except if there really is a curve).
 15-Jun-2001
 	- Added the ability to the parser to load proc textures (fire,
 	  water, dots, and plasma). Instead of saying 'TEXTURE' in the
