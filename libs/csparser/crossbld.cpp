@@ -32,6 +32,8 @@
 #include "csutil/scfstrv.h"
 #include "itexture.h"
 #include "itxtmgr.h"
+#include "imspr3d.h"
+#include "imeshobj.h"
 
 //
 // definitions of method for the base csCrossBuild_Factory
@@ -64,70 +66,75 @@ csCrossBuild_SpriteTemplateFactory::~csCrossBuild_SpriteTemplateFactory()
 }
 
 /// full sprite template builder
-csBase *csCrossBuild_SpriteTemplateFactory::CrossBuild (converter &buildsource)
+void* csCrossBuild_SpriteTemplateFactory::CrossBuild (converter &buildsource)
 {
-  csSpriteTemplate *newtemplate = new csSpriteTemplate();
-  CrossBuild ((csBase*)newtemplate, buildsource);
-  newtemplate->GenerateLOD ();
-  newtemplate->ComputeBoundingBox ();
-  return newtemplate;
+  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.sprite.3d", "MeshObj", iMeshObjectType);
+  if (!type)
+  {
+    type = LOAD_PLUGIN (System, "crystalspace.mesh.object.sprite.3d", "MeshObj", iMeshObjectType);
+    printf ("Load TYPE plugin crystalspace.mesh.object.sprite.3d\n");
+  }
+  iMeshObjectFactory* fact = type->NewFactory ();
+  CrossBuild ((void*)fact, buildsource);
+  return fact;
 }
 
 /// full sprite template builder (second variant)
-void csCrossBuild_SpriteTemplateFactory::CrossBuild (csBase* object,
+void csCrossBuild_SpriteTemplateFactory::CrossBuild (void* object,
   converter &buildsource)
 {
-  csSpriteTemplate *newtemplate = (csSpriteTemplate*)object;
+  iMeshObjectFactory* fact = (iMeshObjectFactory*)object;
+  iSprite3DFactoryState* fstate = QUERY_INTERFACE (fact, iSprite3DFactoryState);
   buildsource.set_animation_frame(0);
 
   // build the triangle mesh
-  Build_TriangleMesh(*newtemplate, buildsource);
+  Build_TriangleMesh(fstate, buildsource);
 
   // build all the frames
   for (int frameindex=0; 
     frameindex<=buildsource.set_animation_frame(frameindex); 
     frameindex++)
   {
-    Build_Frame(*newtemplate, buildsource);
+    Build_Frame(fstate, buildsource);
   }
 
   // make a 'default' action showing the first frame, if any
-  if (newtemplate->GetFrame (0) != NULL)
+  if (fstate->GetFrame (0) != NULL)
   {
-    csSpriteAction *defaultaction = newtemplate->AddAction();
+    iSpriteAction *defaultaction = fstate->AddAction();
     defaultaction->SetName("default");
-    defaultaction->AddFrame( newtemplate->GetFrame(0), 1000 );
+    defaultaction->AddFrame( fstate->GetFrame(0), 1000 );
   }
 
 }
 
 /// frame build method
 void csCrossBuild_SpriteTemplateFactory::Build_Frame
-  (csSpriteTemplate &framesource, converter& buildsource)
+  (iSprite3DFactoryState* framesource, converter& buildsource)
 {
-  csFrame *newframe = framesource.AddFrame();
+  iSpriteFrame *newframe = framesource->AddFrame();
   newframe->SetName(buildsource.object_name);
   int anm_idx = newframe->GetAnmIndex();
   int tex_idx = newframe->GetTexIndex();
 
-  if (framesource.GetNumFrames() == 1)
-    framesource.AddVertices(buildsource.num_cor3);
+  if (framesource->GetNumFrames() == 1)
+    framesource->AddVertices(buildsource.num_cor3);
 
   for (int coordindex=0; coordindex<buildsource.num_cor3; coordindex++)
   {
     // standard 3D coords seem to swap y and z axis compared to CS
-    framesource.GetVertex(anm_idx, coordindex) = csVector3 (
+    framesource->GetVertex(anm_idx, coordindex) = csVector3 (
       buildsource.cor3[0][coordindex]/20.0,
       buildsource.cor3[2][coordindex]/20.0,
       buildsource.cor3[1][coordindex]/20.0);
-    framesource.GetTexel(tex_idx, coordindex) = csVector2 (
+    framesource->GetTexel(tex_idx, coordindex) = csVector2 (
       buildsource.cor3_uv[0][coordindex],
       buildsource.cor3_uv[1][coordindex]);
   }
 }
 
 /// triangle mesh builder
-void csCrossBuild_SpriteTemplateFactory::Build_TriangleMesh(csSpriteTemplate& meshsource,converter& buildsource)
+void csCrossBuild_SpriteTemplateFactory::Build_TriangleMesh(iSprite3DFactoryState* meshsource,converter& buildsource)
 {
   for (int triangleindex=0; triangleindex<buildsource.num_face; triangleindex++)
   {
@@ -137,7 +144,7 @@ void csCrossBuild_SpriteTemplateFactory::Build_TriangleMesh(csSpriteTemplate& me
       int a = buildsource.face[0][triangleindex];
       int b = buildsource.face[ivert-1][triangleindex];
       int c = buildsource.face[ivert][triangleindex];
-      meshsource.AddTriangle(a,b,c);
+      meshsource->AddTriangle(a,b,c);
     }
   }
 }
@@ -254,15 +261,15 @@ csCrossBuild_ThingTemplateFactory::~csCrossBuild_ThingTemplateFactory()
 }
 
 /// full thing template builder
-csBase *csCrossBuild_ThingTemplateFactory::CrossBuild(converter &buildsource)
+void *csCrossBuild_ThingTemplateFactory::CrossBuild(converter &buildsource)
 {
   csThing *newtemplate = new csThing(NULL); //@@@### BAD! NEED A PARENT
-  CrossBuild ((csBase*)newtemplate, buildsource);
+  CrossBuild ((void*)newtemplate, buildsource);
   return newtemplate;
 }
 
 /// full thing template builder (second variant)
-void csCrossBuild_ThingTemplateFactory::CrossBuild(csBase* object, converter &buildsource)
+void csCrossBuild_ThingTemplateFactory::CrossBuild(void* object, converter &buildsource)
 {
   csThing *newtemplate = (csThing*)object;
   buildsource.set_animation_frame(0);
@@ -325,7 +332,7 @@ csCrossBuild_Quake2Importer::~csCrossBuild_Quake2Importer()
 {
 }
 
-csSpriteTemplate *csCrossBuild_Quake2Importer::Import_Quake2File (
+iMeshObjectFactory *csCrossBuild_Quake2Importer::Import_Quake2File (
   char const*md2filebase, char const*skinpath, char const*modelname,
   csEngine *importdestination) const
 {
@@ -378,7 +385,7 @@ csSpriteTemplate *csCrossBuild_Quake2Importer::Import_Quake2File (
 }
 
 
-csSpriteTemplate *csCrossBuild_Quake2Importer::Import_Quake2SpriteTemplate(
+iMeshObjectFactory *csCrossBuild_Quake2Importer::Import_Quake2MeshObjectFactory(
 			iFile *modelfile) const
 {
 #if 0
@@ -464,19 +471,19 @@ csTextureWrapper *csCrossBuild_Quake2Importer::Import_Quake2Textures (
 
 /// given a prefix representing an action name, make a csSpriteAction
 /// by concatinating all the frames that start with that prefix
-csSpriteAction *  csCrossBuild_Quake2Importer::Make_NamedAction(
-			csSpriteTemplate &frameholder,
+iSpriteAction *  csCrossBuild_Quake2Importer::Make_NamedAction(
+			iSprite3DFactoryState* frameholder,
 			char const*prefixstring,
 			int delay) const
 {
-  csSpriteAction *newaction = frameholder.AddAction();
+  iSpriteAction *newaction = frameholder->AddAction();
 
   newaction->SetName(prefixstring);
 
   // check all the frame names, do any match?
-  for (int frameindex=0; frameindex < frameholder.GetNumFrames(); frameindex++)
+  for (int frameindex=0; frameindex < frameholder->GetNumFrames(); frameindex++)
   {
-    csFrame *curframe = frameholder.GetFrame(frameindex);
+    iSpriteFrame *curframe = frameholder->GetFrame(frameindex);
     const char *framename = curframe->GetName();
     if ( strncmp( prefixstring,framename,strlen(prefixstring) ) == 0 )
     {
@@ -490,7 +497,7 @@ csSpriteAction *  csCrossBuild_Quake2Importer::Make_NamedAction(
 /// build all the standard quake 2 actions, assuming the sprite
 /// has frames with names that start with the proper action names
 void              csCrossBuild_Quake2Importer::Build_Quake2Actions(
-			csSpriteTemplate &frameholder) const
+			iSprite3DFactoryState* frameholder) const
 {
   static char const*actionnames[] = {
   	"stand", "run", "attack", "pain1", "pain2",

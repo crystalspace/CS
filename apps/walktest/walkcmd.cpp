@@ -291,9 +291,9 @@ void move_sprite (csSprite* sprite, csSector* where, csVector3 const& pos)
   sprite->GetMovable ().UpdateMove ();
 }
 
-// Load a sprite from a general format (3DS, MD2, ...)
-// This creates a sprite template which you can then add using add_sprite ().
-void load_sprite (char *filename, char *templatename, char* txtname)
+// Load a mesh object factory from a general format (3DS, MD2, ...)
+// This creates a mesh object factory which you can then add using add_meshobj ().
+void load_meshobj (char *filename, char *templatename, char* txtname)
 {
   // First check if the texture exists.
   if (!Sys->view->GetEngine ()->GetMaterials ()->FindByName (txtname))
@@ -313,40 +313,16 @@ void load_sprite (char *filename, char *templatename, char* txtname)
 
   // convert data from the 'filedata' structure into a CS sprite template
   csCrossBuild_SpriteTemplateFactory builder;
-  csSpriteTemplate *result = (csSpriteTemplate *)builder.CrossBuild (*filedata);
+  iMeshObjectFactory *result = (iMeshObjectFactory *)builder.CrossBuild (*filedata);
   delete filedata;
 
-  // add this sprite to the engine
-  result->SetName (templatename);
-  result->SetMaterial (Sys->view->GetEngine ()->GetMaterials ()->FindByName (txtname));
+  // Add this sprite template to the engine.
+  iSprite3DFactoryState* fstate = QUERY_INTERFACE (result, iSprite3DFactoryState);
+  fstate->SetMaterialWrapper (Sys->engine->FindMaterial (txtname));
 
-  Sys->view->GetEngine ()->sprite_templates.Push (result);
-}
-
-
-
-
-csSprite3D* add_sprite (char* tname, char* sname, csSector* where,
-	csVector3 const& pos, float size)
-{
-  csSpriteTemplate* tmpl = (csSpriteTemplate*)
-  	Sys->view->GetEngine ()->sprite_templates.FindByName (tname);
-  if (!tmpl)
-  {
-    Sys->Printf (MSG_CONSOLE, "Unknown sprite template '%s'!\n", tname);
-    return NULL;
-  }
-  csSprite3D* spr = tmpl->NewSprite (Sys->view->GetEngine ());
-  spr->SetName (sname);
-  Sys->view->GetEngine ()->sprites.Push (spr);
-  spr->GetMovable ().SetSector (where);
-  spr->GetMovable ().SetPosition (pos);
-  csMatrix3 m; m.Identity (); m = m * size;
-  spr->GetMovable ().SetTransform (m);
-  spr->GetMovable ().UpdateMove ();
-
-  spr->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
-  return spr;
+  csMeshFactoryWrapper* meshwrap = new csMeshFactoryWrapper (result);
+  meshwrap->SetName (templatename);
+  Sys->engine->meshobj_factories.Push (meshwrap);
 }
 
 iMeshWrapper* add_meshobj (char* tname, char* sname, csSector* where,
@@ -369,25 +345,25 @@ iMeshWrapper* add_meshobj (char* tname, char* sname, csSector* where,
 }
 
 
-void list_sprites(void)
+void list_meshes (void)
 {
-  int num_sprites;
-  const char* sprite_name;
-  csSprite* sprite;
+  int num_meshes;
+  const char* mesh_name;
+  csSprite* mesh;
 
-  num_sprites = Sys->engine->sprites.Length();
+  num_meshes = Sys->engine->sprites.Length();
 
-  for(int i = 0; i < num_sprites; i++)
+  for(int i = 0; i < num_meshes; i++)
   {
-    sprite = (csSprite*) Sys->engine->sprites[i];
-    sprite_name = sprite->GetName();
+    mesh = (csSprite*) Sys->engine->sprites[i];
+    mesh_name = mesh->GetName();
 
-    if(sprite_name)
-      Sys->Printf (MSG_CONSOLE, "%s\n", sprite_name);
+    if (mesh_name)
+      Sys->Printf (MSG_CONSOLE, "%s\n", mesh_name);
     else
-      Sys->Printf (MSG_CONSOLE, "A sprite with no name.\n");
+      Sys->Printf (MSG_CONSOLE, "A mesh with no name.\n");
   }
-  Sys->Printf (MSG_CONSOLE, "There are:%d sprites\n",
+  Sys->Printf (MSG_CONSOLE, "There are:%d meshes\n",
 	       Sys->engine->sprites.Length());
 }
 
@@ -588,7 +564,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  db_boxshow db_boxcam1 db_boxcam2 db_boxsize1 db_boxsize2\n");
     CONPRI("  db_boxnode1 db_boxnode2 db_boxvis db_radstep db_radhi db_radtodo\n");
     CONPRI("Sprites:\n");
-    CONPRI("  loadsprite addsprite delsprite listsprites\n");
+    CONPRI("  loadmesh addmesh delmesh listmeshes\n");
     CONPRI("  listactions setaction setmotion\n");
     CONPRI("Various:\n");
     CONPRI("  coordsave coordload bind capture map mapproj p_alpha s_fog\n");
@@ -1413,7 +1389,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       add_particles_spiral (Sys->view->GetCamera ()->GetSector (),
     	Sys->view->GetCamera ()->GetOrigin (), txtname);
   }
-  else if (!strcasecmp (cmd, "loadsprite"))
+  else if (!strcasecmp (cmd, "loadmesh"))
   {
     char filename[100], tempname[100], txtname[100];
     int cnt = 0;
@@ -1422,9 +1398,9 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       Sys->Printf (MSG_CONSOLE, "Expected parameters 'file','template','texture'!\n");
     }
-    else load_sprite (filename, tempname, txtname);
+    else load_meshobj (filename, tempname, txtname);
   }
-  else if (!strcasecmp (cmd, "addsprite"))
+  else if (!strcasecmp (cmd, "addmesh"))
   {
     char tname[100];
     char sname[100];
@@ -1434,15 +1410,15 @@ bool CommandHandler (const char *cmd, const char *arg)
     if(cnt != 3)
     {
       Sys->Printf (MSG_CONSOLE, "Expected parameters 'templatename',");
-      Sys->Printf (MSG_CONSOLE, "'spritename','size'!\n");
+      Sys->Printf (MSG_CONSOLE, "'meshname','size'!\n");
     }
     else
     {
-      add_sprite (tname, sname, Sys->view->GetCamera ()->GetSector (),
+      add_meshobj (tname, sname, Sys->view->GetCamera ()->GetSector (),
     	          Sys->view->GetCamera ()->GetOrigin (), size);
     }
   }
-  else if (!strcasecmp (cmd, "delsprite"))
+  else if (!strcasecmp (cmd, "delmesh"))
   {
     char name[100];
     if (arg)
@@ -1452,14 +1428,14 @@ bool CommandHandler (const char *cmd, const char *arg)
       if (obj)
         Sys->view->GetEngine ()->RemoveSprite ((csSprite*)obj);
       else
-        CsPrintf (MSG_CONSOLE, "Can't find sprite with that name!\n");
+        CsPrintf (MSG_CONSOLE, "Can't find mesh with that name!\n");
     }
     else
-      CsPrintf (MSG_CONSOLE, "Missing sprite name!\n");
+      CsPrintf (MSG_CONSOLE, "Missing mesh name!\n");
   }
-  else if (!strcasecmp (cmd, "listsprites"))
+  else if (!strcasecmp (cmd, "listmeshes"))
   {
-    list_sprites();
+    list_meshes ();
   }
   else if(!strcasecmp(cmd, "listactions"))
   {

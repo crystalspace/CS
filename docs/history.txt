@@ -28,6 +28,24 @@ The history order has been reversed so that new features are at the top.
 	  csSprite.
 	- Fixed a bug in the spr3d plugin where it would reset the value
 	  of MixMode to CS_FX_COPY the first time it was used.
+	- Converted the crossbuilder importer (i.e. the routines that can
+	  read MD2 and 3DS files to sprite templates) so that they use
+	  the new spr3d plugins.
+	- Added support for 'FILE' in MESHOBJ for factories. This is only
+	  temporary. The real solution is to move the 3DS and MDL/MD2 loaders
+	  which are now in impexp to plugins similar to the spr3dldr plugin.
+	  For now you can use this to import such a sprite template. If
+	  you use 'FILE' then you don't have to specify a 'PLUGIN' or use
+	  the 'PARAMS' statement. In addition also supported the MATERIAL
+	  keyword to set the material here. Note that you should only use
+	  MATERIAL in combination with the FILE keyword. In normal use
+	  MATERIAL is part of the PARAMS statement and parsed by the plugin.
+	- Converted Squawk to use the new spr3d plugin.
+	- Added 'loadmesh' and 'addmesh' console commands which complement
+	  the old 'loadsprite' and 'addsprite' commands. These work for
+	  meshes now. 'loadsprite' and 'addsprite' are now deleted.
+	- Renamed 'delsprite' to 'delmesh'.
+	- Renamed 'listsprites' to 'listmeshes'.
 7-Feb-2001
 	- Martin Geisse removed sound volume division by number of sources
 	  from software sound because it did not sound very good.

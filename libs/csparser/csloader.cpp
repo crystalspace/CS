@@ -4271,6 +4271,8 @@ csMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (csEngine* engine,
 bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
 {
   CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (FILE)
+    CS_TOKEN_TABLE (MATERIAL)
     CS_TOKEN_TABLE (PARAMS)
     CS_TOKEN_TABLE (PLUGIN)
   CS_TOKEN_TABLE_END
@@ -4314,6 +4316,51 @@ bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
 	    mof2->DecRef ();
 	  }
 	}
+        break;
+
+      case CS_TOKEN_MATERIAL:
+        {
+          ScanStr (params, "%s", str);
+          csMaterialWrapper *mat = FindMaterial (str, onlyRegion);
+          if (mat)
+	  {
+	    iSprite3DFactoryState* state = QUERY_INTERFACE (
+	    	stemp->GetMeshObjectFactory (),
+		iSprite3DFactoryState);
+            state->SetMaterialWrapper (QUERY_INTERFACE (mat, iMaterialWrapper));
+	  }
+          else
+          {
+            CsPrintf (MSG_FATAL_ERROR, "Material `%s' not found!\n", str);
+            fatal_exit (0, true);
+          }
+        }
+        break;
+
+      case CS_TOKEN_FILE:
+        {
+          ScanStr (params, "%s", str);
+	  converter* filedata = new converter;
+	  if (filedata->ivcon (str, true, false, NULL, System->VFS) == ERROR)
+	  {
+	    CsPrintf (MSG_FATAL_ERROR, "Error loading file model '%s'!\n", str);
+	    delete filedata;
+	    fatal_exit (0, false);
+	  }
+  	  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.sprite.3d", "MeshObj", iMeshObjectType);
+  	  if (!type)
+  	  {
+    	    type = LOAD_PLUGIN (System, "crystalspace.mesh.object.sprite.3d", "MeshObj", iMeshObjectType);
+    	    printf ("Load TYPE plugin crystalspace.mesh.object.sprite.3d\n");
+  	  }
+	  iMeshObjectFactory* fact = type->NewFactory ();
+	  stemp->SetMeshObjectFactory (fact);
+	  fact->DecRef ();
+	  iSprite3DFactoryState* state = QUERY_INTERFACE (fact, iSprite3DFactoryState);
+	  csCrossBuild_SpriteTemplateFactory builder;
+	  builder.CrossBuild (state, *filedata);
+	  delete filedata;
+        }
         break;
 
       case CS_TOKEN_PLUGIN:
@@ -4675,7 +4722,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
 	    fatal_exit (0, false);
 	  }
 	  csCrossBuild_SpriteTemplateFactory builder;
-	  builder.CrossBuild (stemp, *filedata);
+	  builder.CrossBuild (state, *filedata);
 	  delete filedata;
         }
         break;

@@ -221,23 +221,23 @@ Add a sprite that moves randomly through the dungeon.
 @item delbot
 Remove the last added bot.
 
-@item loadsprite @var{file},@var{template},@var{texture}
-Load a sprite from a model file (currently @sc{3ds} version 3 and @sc{md2} are
-supported) and add it as a sprite template.  Later you can use
-@samp{addsprite} to really add the sprite visually.  Parameters are
+@item loadmesh @var{file},@var{template},@var{texture}
+Load a mesh from a model file (currently @sc{3ds} version 3 and @sc{md2} are
+supported) and add it as a mesh factory.  Later you can use
+@samp{addmesh} to really add the mesh visually.  Parameters are
 @var{file}, @var{template}, @var{texture}.  The texture should be one which is
 already loaded in memory.  This is a current limitation.  The filename
 represents a file within the @sc{vfs} directory hierarchy.
 
-@item addsprite @var{sname},@var{tname},@var{size}
-Add a sprite from a template already in memory.  @var{sname} is the name of
-the sprite.  @var{tname} is the name of a sprite template which has to be
+@item addmesh @var{sname},@var{tname},@var{size}
+Add a mesh from a factory already in memory.  @var{sname} is the name of
+the mesh.  @var{tname} is the name of a mesh factory which has to be
 loaded in memory (either from @file{standard.zip} or from the level).  The
-@var{size} is a scale factor for the sprite.  The sprite is put at the current
+@var{size} is a scale factor for the mesh.  The mesh is put at the current
 location.
 
-@item delsprite @var{name}
-Delete a sprite from the world with the given name.
+@item delmesh @var{name}
+Delete a mesh from the world with the given name.
 
 @item listactions @var{name}
 Lists the actions of a sprite.  @var{name} is the name of the sprite for which
@@ -248,8 +248,8 @@ Sets the action of the specified sprite.  @var{spritename} is the name of the
 sprite which you want to list the actions of.  @var{action} is the name of the
 action which you want the sprite to use.
 
-@item listsprites
-Lists all of the sprites in the world.
+@item listmeshes
+Lists all of the mesh objects in the world.
 
 @item addskel
 Add a skeletal tree (demonstration). The first argument is the depth. A

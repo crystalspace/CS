@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -25,8 +25,16 @@
 #define __CS_CROSSBLD_H__
 
 #include "csparser/impexp.h"
-#include "csengine/cssprite.h"
 #include "csengine/triangle.h"
+
+struct iSprite3DFactoryState;
+struct iMeshObjectFactory;
+struct iSpriteAction;
+struct iSpriteFrame;
+class csThing;
+class csThingTemplate;
+class csTextureWrapper;
+class csEngine;
 
 /**
  * The general cross builder interface.  All cross builders inherit from
@@ -50,19 +58,19 @@ class csCrossBuild_Factory
      * is that you want.  This object could be a frame, sprite template,
      * thing, sector, etc...
      */
-    virtual csBase *CrossBuild(converter& buildsource) = 0;
+    virtual void *CrossBuild(converter& buildsource) = 0;
 
     /**
      * This is another variant to override. It takes the object to construct
      * as a parameter.
      */
-    virtual void CrossBuild(csBase* object, converter& buildsource) = 0;
+    virtual void CrossBuild(void* object, converter& buildsource) = 0;
 };
 
 /**
  * The sprite template factory makes a whole sprite template by
  * extracting all the frames from a converter and stuffing them
- * into a csSpriteTemplate object.
+ * into a iMeshObjectFactory object.
  * Typical usage is done by combining this with the 'converter'
  * class.  Example, assuming the texture exists and is already
  * loaded:
@@ -79,7 +87,7 @@ class csCrossBuild_Factory
 
   // convert data from the 'filedata' structure into a CS sprite template
   csCrossBuild_SpriteTemplateFactory builder;
-  csSpriteTemplate *t = (csSpriteTemplate *)builder.CrossBuild (*filedata);
+  iMeshObjectFactory *t = (iMeshObjectFactory *)builder.CrossBuild (*filedata);
   delete filedata;
 
   // add this sprite to the engine
@@ -107,26 +115,26 @@ class csCrossBuild_SpriteTemplateFactory : public csCrossBuild_Factory
      * Makes a sprite template out of frames stored in the
      * converter object
      */
-    csBase* CrossBuild(converter&);
+    void* CrossBuild(converter&);
 
     /**
      * Makes a sprite template out of frames stored in the
      * converter object
      */
-    void CrossBuild(csBase*, converter&);
+    void CrossBuild(void*, converter&);
 
   private:
     /**
      * make a single new frame by extracting data from
      * the converter object
      */
-    void Build_Frame(csSpriteTemplate&, converter&);
+    void Build_Frame(iSprite3DFactoryState*, converter&);
 
     /**
      * make a triangle mesh by extracting data from the
      * converter data
      */
-    void Build_TriangleMesh(csSpriteTemplate&, converter&);
+    void Build_TriangleMesh(iSprite3DFactoryState*, converter&);
 };
 
 
@@ -153,13 +161,13 @@ class csCrossBuild_ThingTemplateFactory : public csCrossBuild_Factory
      * Makes a thing template out of the first frame stored in the
      * converter object
      */
-    csBase* CrossBuild(converter&);
+    void* CrossBuild(converter&);
 
     /**
      * Makes a thing template out of the first frame stored in the
      * converter object
      */
-    void CrossBuild(csBase*, converter&);
+    void CrossBuild(void*, converter&);
 
   private:
     /**
@@ -189,10 +197,11 @@ class csCrossBuild_ThingTemplateFactory : public csCrossBuild_Factory
 =================================================
  filename = 'bob.zip'
  csCrossBuild_Quake2Importer importer;
- csSpriteTemplate *newtemplate =
+ iMeshObjectFactory *newtemplate =
    importer.ImportQuake2Pack(filename,'bob',engine);
- newtemplate->SetTexture('bob-gnarlyskin'); // assume 'gnarlyskin' is a skin!
- csSprite *newsprite = newtemplate->NewSprite();
+ iSprite3DFactoryState* fstat = QUERY_INTERFACE (newtemplate, iSprite3DFactoryState);
+ fstate->SetMaterial(bobMaterial);
+ iMeshObject* obj = newtemplate->NewInstance ();
 =================================================
  *
  */
@@ -205,7 +214,7 @@ class csCrossBuild_Quake2Importer
 
     // find a MD2 geometry file, load and return it, with all standard
     // actions already created
-    csSpriteTemplate* Import_Quake2SpriteTemplate(iFile*) const;
+    iMeshObjectFactory* Import_Quake2MeshObjectFactory(iFile*) const;
 
     // find textures in a directory and add to the engine.  the texture names
     // are made by concatinating the modelname passed in and the
@@ -215,12 +224,12 @@ class csCrossBuild_Quake2Importer
 
     // given a prefix representing an action name, make a csSpriteAction
     // by concatinating all the frames that start with that prefix
-    csSpriteAction* Make_NamedAction(csSpriteTemplate&,
+    iSpriteAction* Make_NamedAction(iSprite3DFactoryState*,
       char const *prefixstring, int delay) const;
 
     // build all the standard quake 2 actions, assuming the sprite
     // has frames with names that start with the proper action names
-    void Build_Quake2Actions(csSpriteTemplate&) const;
+    void Build_Quake2Actions(iSprite3DFactoryState*) const;
 
     /// Dummy asignment operator to get rid of a MSVC warning.
     void operator= (csCrossBuild_Quake2Importer const&) {};
@@ -239,7 +248,7 @@ class csCrossBuild_Quake2Importer
      * loaded by looking for image files in the directory 'skinpath'.  If
      * 'skinpath' is NULL, looks in the same directory as the geometry file.
      */
-    csSpriteTemplate *Import_Quake2File(char const* md2filebase,
+    iMeshObjectFactory *Import_Quake2File(char const* md2filebase,
       char const* skinpath, char const* modelname, csEngine*) const;
 };
 
