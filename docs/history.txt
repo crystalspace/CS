@@ -32,6 +32,8 @@ The history order is reversed so that new features are at the top.
 	  an effect currently.
 	- Added support for TILING() keyword in the map loader and all loader
 	  plugins.
+	- Removed the obsolete support for libraries (regions should be
+	  used instead).
 	- Eric Sunshine fixed a nasty plugin-leak in SCF which was introduced
 	  when iBase was substituted for csBase as the base class of
 	  scfSharedLibrary.  The specific problem was that, although SCF

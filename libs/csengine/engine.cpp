@@ -396,7 +396,6 @@ csEngine::csEngine (iBase *iParent) : sectors (true), camera_positions (16, 16)
   use_pvs = false;
   use_pvs_only = false;
   freeze_pvs = false;
-  library = NULL;
   engine_states = NULL;
   rad_debug = NULL;
   nextframe_pending = 0;
@@ -422,7 +421,7 @@ iCamera* camera_hack = NULL;
 
 csEngine::~csEngine ()
 {
-  Clear ();
+  DeleteAll ();
   if (G3D) G3D->DecRef ();
   if (ImageLoader) ImageLoader->DecRef();
   if (VFS) VFS->DecRef ();
@@ -518,7 +517,7 @@ bool csEngine::HandleEvent (iEvent &Event)
         // We must free all material and texture handles since after
         // G3D->Close() they all become invalid, no matter whenever
         // we did or didn't an IncRef on them.
-        Clear ();
+        DeleteAll ();
         return true;
       }
       case cscmdContextResize:
@@ -548,7 +547,7 @@ bool csEngine::HandleEvent (iEvent &Event)
   return false;
 }
 
-void csEngine::Clear ()
+void csEngine::DeleteAll ()
 {
   nextframe_pending = 0;
   if (G3D) G3D->ClearCache ();
@@ -606,10 +605,6 @@ void csEngine::Clear ()
   delete lightpatch_pool;
   lightpatch_pool = new csLightPatchPool ();
   use_pvs = false;
-
-  // Clear all object libraries
-  library = NULL;
-  libraries.DeleteAll ();
 
   // Clear all regions.
   region = NULL;
@@ -1105,7 +1100,7 @@ bool csEngine::CheckConsistency ()
 
 void csEngine::StartEngine ()
 {
-  Clear ();
+  DeleteAll ();
 }
 
 void csEngine::StartDraw (iCamera* c, iClipper2D* view, csRenderView& rview)
@@ -1604,74 +1599,6 @@ void csEngine::AddToCurrentRegion (csObject* obj)
   {
     region->AddToRegion (obj);
   }
-}
-
-void csEngine::SelectLibrary (const char *iName)
-{
-  library = libraries.FindByName (iName);
-  if (!library)
-  {
-    library = new csObject ();
-    library->SetName (iName);
-    libraries.Push (library);
-  }
-}
-
-bool csEngine::DeleteLibrary (const char *iName)
-{
-  csObject *lib = libraries.FindByName (iName);
-  if (!lib) return false;
-
-#define DELETE_ALL_OBJECTS(vector,type)				\
-  {								\
-    for (iObjectIterator *iter = lib->GetIterator ();		\
-         !iter->IsFinished (); iter->Next ())			\
-    {								\
-      type *x = SCF_QUERY_INTERFACE_FAST (iter->GetObject (), type);\
-      int idx = vector.Find (x);				\
-      x->DecRef ();						\
-      if (idx >= 0) vector.Delete (idx);			\
-    }								\
-  }
-
-  DELETE_ALL_OBJECTS (collections, csCollection)
-  DELETE_ALL_OBJECTS (meshes, csMeshWrapper)
-  DELETE_ALL_OBJECTS (mesh_factories, csMeshFactoryWrapper)
-  DELETE_ALL_OBJECTS (curve_templates, csCurveTemplate)
-
-  DELETE_ALL_OBJECTS (sectors, iSector)
-  DELETE_ALL_OBJECTS ((*materials), iMaterialWrapper)
-  DELETE_ALL_OBJECTS ((*textures), iTextureWrapper)
-
-#undef DELETE_ALL_OBJECTS
-#define DELETE_ALL_OBJECTS(vector,type)				\
-  for (iObjectIterator *iter = lib->GetIterator ();		\
-       !iter->IsFinished (); iter->Next ())			\
-  {								\
-    type *x = SCF_QUERY_INTERFACE_FAST (iter->GetObject (), type);	\
-    int idx = vector.Find (x);					\
-    if (idx >= 0) { x->DecRef (); vector [idx] = 0; }		\
-    x->DecRef ();						\
-  }
-
-  DELETE_ALL_OBJECTS (planes, csPolyTxtPlane)
-
-/*
-@@todo: move all dynamic lights to a vector
-  while (first_dyn_lights)
-  {
-    csDynLight *dyn = first_dyn_lights->GetNext ();
-    delete first_dyn_lights;
-    first_dyn_lights = dyn;
-  }
-*/
-
-  return true;
-}
-
-void csEngine::DeleteAll ()
-{
-  Clear ();
 }
 
 iTextureWrapper* csEngine::CreateTexture (const char *iName, const char *iFileName,

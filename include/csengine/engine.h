@@ -347,13 +347,6 @@ public:
   bool NeedPO2Maps;
   /// Maximum texture aspect ratio
   int MaxAspectRatio;
-  /// A pointer to current object library
-  csObject* library;
-  /**
-   * The list of all object libraries currently loaded.
-   * @@@ When regions are complete support for libraries will be removed.
-   */
-  csNamedObjVector libraries;
   /// A pointer to the current region.
   csRegion* region;
   /// The list of all regions currently loaded.
@@ -727,11 +720,6 @@ public:
   void StartEngine ();
 
   /**
-   * Clear everything in the engine.
-   */
-  void Clear ();
-
-  /**
    * Return the object managing all loaded textures.
    */
   csTextureList* GetTextures () const { return textures; }
@@ -982,17 +970,7 @@ public:
   /// find a region by name
   virtual iRegion* FindRegion (const char *name) const;
 
-  /**
-   * Create or select a new object library (name can be NULL for engine).
-   * All new objects will be marked as belonging to this library.
-   * You can then delete a whole library at once, for example.
-   * @@@ Libraries are obsolete!!! When regions are finished use them
-   * instead.
-   */
-  virtual void SelectLibrary (const char *iName);
-  /// Delete a whole library (all objects that are part of library)
-  virtual bool DeleteLibrary (const char *iName);
-  /// Clear the entire engine (delete all libraries)
+  /// Clear the entire engine.
   virtual void DeleteAll ();
 
   /// Register a texture to be loaded during Prepare()

@@ -129,7 +129,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 2, 1);
+SCF_VERSION (iEngine, 0, 2, 2);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -185,16 +185,7 @@ struct iEngine : public iBase
   /// Find a region by name
   virtual iRegion* FindRegion (const char *name) const = 0;
 
-  /**
-   * Create or select a new object library (name can be NULL for engine).
-   * All new objects will be marked as belonging to this library.
-   * You can then delete a whole library at once, for example.
-   * @@@ NOTE THE LIBRARY SYSTEM IS OBSOLETE. Use csRegion/iRegion instead.
-   */
-  virtual void SelectLibrary (const char *iName) = 0;
-  /// Delete a whole library (all objects that are part of library)
-  virtual bool DeleteLibrary (const char *iName) = 0;
-  /// Delete all libraries (clear the engine)
+  /// Delete everything in the engine.
   virtual void DeleteAll () = 0;
 
   /// Register a new render priority.

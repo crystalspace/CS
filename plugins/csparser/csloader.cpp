@@ -250,8 +250,6 @@ bool csLoader::LoadMap (char* buf)
     long cmd;
     char* params;
 
-    Engine->SelectLibrary (name); //@@@? Don't do this for regions!
-
     while ((cmd = csGetObject (&data, commands, &name, &params)) > 0)
     {
       if (!params)
@@ -498,8 +496,6 @@ bool csLoader::LoadLibrary (char* buf)
 
     long cmd;
     char* params;
-
-    Engine->SelectLibrary (name);
 
     while ((cmd = csGetObject (&data, commands, &name, &params)) > 0)
     {
