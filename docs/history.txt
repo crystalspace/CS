@@ -3,6 +3,17 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+8-Jul-2003
+	- Jorrit reverted the change to glrender.mak that was made yesterday.
+	  This change breaks compilation of the OpenGL plugin. With revision
+	  1.52 of glrender.mak the following errors occur:
+		gcc: out/WIN32/X86/debug/plugins/video/renderer/opengl/txtmgr.o:
+			No such file or directory
+		gcc: out/WIN32/X86/debug/plugins/video/renderer/opengl/dtmesh.o:
+			No such file or directory
+		...
+	  Jorrit didn't test new renderer makefile where a similar change
+	  was made.
 7-Jul-2003
 	- Peter Amstutz changed iDataBuffer so that it can be instructed 
 	  not to delete the underlying buffer when iDataBuffer is freed.
