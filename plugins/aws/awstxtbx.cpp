@@ -168,42 +168,49 @@ awsTextBox::OnDraw(csRect clip)
     
     if (bkg)
        g3d->DrawPixmap(bkg, Frame().xmin, Frame().ymin, Frame().Width()+1, Frame().Height()+1, 0, 0, Frame().Width()+1, Frame().Height()+1, alpha_level);
-        
-    // Draw the caption, if there is one and the style permits it.
-    if (text && text->Length())
-    {     
-      int tw, th, tx, ty, mcc;
-                  
-      // Get the maximum number of characters we can use
-      mcc = WindowManager()->GetPrefMgr()->GetDefaultFont()->GetLength(text->GetData()+start, Frame().Width()-10);
-     
-      // Check to see if we're getting wierd.
-      start = cursor-mcc;
-      if (start<0) start=0;
-           
-      // Make the text the right length
-      scfString tmp(text->GetData()+start);      
-      tmp.Truncate(mcc);
-
-       // Get the size of the text
-      WindowManager()->GetPrefMgr()->GetDefaultFont()->GetDimensions(tmp.GetData(), tw, th);
-      
-      // Calculate the center
-      tx = 4;
-      ty = (Frame().Height()>>1) - (th>>1);
-
-      // Draw the text
-      g2d->Write(WindowManager()->GetPrefMgr()->GetDefaultFont(),
-                 Frame().xmin+tx,
-                 Frame().ymin+ty,
-                 WindowManager()->GetPrefMgr()->GetColor(AC_TEXTFORE),
-                 -1,
-                 tmp.GetData());
-
-      
-    }
+   
     break;
   }
+        
+  // Draw the caption, if there is one and the style permits it.
+  if (text && text->Length())
+  {     
+    int tw, th, tx, ty, mcc;
+                  
+    // Get the maximum number of characters we can use
+    mcc = WindowManager()->GetPrefMgr()->GetDefaultFont()->GetLength(text->GetData()+start, Frame().Width()-10);
+     
+    // Check to see if we're getting wierd.
+    start = cursor-mcc;
+    if (start<0) start=0;
+           
+    // Make the text the right length
+    scfString tmp(text->GetData()+start);      
+    tmp.Truncate(mcc);
+
+     // Get the size of the text
+    WindowManager()->GetPrefMgr()->GetDefaultFont()->GetDimensions(tmp.GetData(), tw, th);
+      
+    // Calculate the center
+    tx = 4;
+    ty = (Frame().Height()>>1) - (th>>1);
+
+    // Draw the text
+    g2d->Write(WindowManager()->GetPrefMgr()->GetDefaultFont(),
+               Frame().xmin+tx,
+               Frame().ymin+ty,
+               WindowManager()->GetPrefMgr()->GetColor(AC_TEXTFORE),
+               -1,
+               tmp.GetData());
+
+    if (has_focus)
+      g2d->DrawLine(Frame().xmin+tx+tw+1,Frame().ymin+ty,Frame().xmin+tx+tw+1,Frame().ymin+ty+th, WindowManager()->GetPrefMgr()->GetColor(AC_TEXTFORE));
+  }
+  else if (has_focus)
+  {
+    g2d->DrawLine(Frame().xmin+5,Frame().ymin+5,Frame().xmin+5,Frame().ymax-5, WindowManager()->GetPrefMgr()->GetColor(AC_TEXTFORE));
+  }
+  
  
 }
 
@@ -293,6 +300,7 @@ awsTextBox::OnLostFocus()
 {
   has_focus=false;
   Broadcast(signalLostFocus);
+  Invalidate();
   return false;
 }
 
@@ -300,6 +308,7 @@ bool
 awsTextBox::OnGainFocus()
 {
   has_focus=true;
+  Invalidate();
   return false;
 }
 

@@ -226,6 +226,12 @@ awsComponent::HandleEvent(iEvent& Event)
 
   case csevKeyDown:
     return OnKeypress(Event.Key.Char, Event.Key.Modifiers);
+
+  case csevGainFocus:
+    return OnGainFocus();
+
+  case csevLostFocus:
+    return OnLostFocus();
     
   }
 

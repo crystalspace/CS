@@ -45,7 +45,9 @@ enum
   csevBroadcast,		// Somebody(-thing) sent a broadcast command
   csevNetwork	,		// Something has arrived on network.
   csevMouseEnter,		// The mouse has entered a component
-  csevMouseExit		// The mouse has exited a component
+  csevMouseExit,		// The mouse has exited a component
+  csevLostFocus,                // The component has lost keyboard focus
+  csevGainFocus                 // The component has gained keyboard focus
 };
 
 /*

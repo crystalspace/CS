@@ -72,6 +72,9 @@ class awsManager : public iAws
    /// The current component that the mouse was in.
    iAwsComponent *mouse_in;
 
+   /// The current component that has keyboard focus.
+   iAwsComponent *keyb_focus;
+
    /// True if mouse events are locked into the top window
    bool          mouse_captured;
 
@@ -201,6 +204,9 @@ protected:
 
     /// Recursively broadcasts events to children, but only if they deserve it.
     bool RecursiveBroadcastToChildren(iAwsComponent *cmp, iEvent &event);
+
+    /// Handles MouseEnter/Exit message when broadcasting component events.
+    bool CheckFocus(iAwsComponent *cmp, iEvent &Event);
     
     /// Recursively creates child components and adds them into a parent.  Used internally.
     void CreateChildrenFromDef(iAws *wmgr, iAwsWindow *win, iAwsComponent *parent, awsComponentNode *settings);

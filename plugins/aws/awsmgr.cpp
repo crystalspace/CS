@@ -31,7 +31,8 @@ awsManager::awsComponentFactoryMap::~awsComponentFactoryMap ()
 
 awsManager::awsManager(iBase *p):prefmgr(NULL), sinkmgr(NULL),
                updatestore_dirty(true), 
-               top(NULL), mouse_in(NULL), mouse_captured(false),
+               top(NULL), mouse_in(NULL), keyb_focus(NULL),
+               mouse_captured(false),
                ptG2D(NULL), ptG3D(NULL), object_reg(NULL), 
                UsingDefaultContext(false), DefaultContextInitialized(false)
 {
@@ -632,7 +633,10 @@ awsManager::HandleEvent(iEvent& Event)
       if (GetTopWindow()->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
       {
         if (RecursiveBroadcastToChildren(GetTopWindow(), Event)) return true;
-        else return GetTopWindow()->HandleEvent(Event);
+        else 
+        {                   
+          return GetTopWindow()->HandleEvent(Event);
+        }
         
         break;
       }
@@ -653,7 +657,10 @@ awsManager::HandleEvent(iEvent& Event)
           {
             win->Raise();
             if (RecursiveBroadcastToChildren(win, Event)) return true;
-            else return win->HandleEvent(Event);
+            else 
+            {              
+              return win->HandleEvent(Event);
+            }
             break;
           }
           else
@@ -665,11 +672,14 @@ awsManager::HandleEvent(iEvent& Event)
   break;
 
   case csevKeyDown:
-    if (GetTopWindow()) 
-    {
-      if (RecursiveBroadcastToChildren(GetTopWindow(), Event)) return true;
-      else return GetTopWindow()->HandleEvent(Event);
-    }
+   // if (GetTopWindow()) 
+   // {
+   //   if (RecursiveBroadcastToChildren(GetTopWindow(), Event)) return true;
+   //   else return GetTopWindow()->HandleEvent(Event);
+   // }
+
+   if (keyb_focus)
+     keyb_focus->HandleEvent(Event);
 
   break;
   }
@@ -693,7 +703,18 @@ awsManager::RecursiveBroadcastToChildren(iAwsComponent *cmp, iEvent &Event)
       if (RecursiveBroadcastToChildren(child, Event))
         return true;
 
+    if (CheckFocus(child, Event))
+      return true;
    
+   } // End for
+
+  return false;
+
+}
+
+bool
+awsManager::CheckFocus(iAwsComponent *cmp, iEvent &Event)
+{   
     switch(Event.Type)
     {
       case csevMouseMove:
@@ -702,10 +723,10 @@ awsManager::RecursiveBroadcastToChildren(iAwsComponent *cmp, iEvent &Event)
       case csevMouseClick:
 
         // Only give to child if it contains the mouse.
-        if (child->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
+        if (cmp->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
         {
 
-          if (mouse_in != child)
+          if (mouse_in != cmp)
           {
             // Create a new event for MouseExit and MouseEnter
             uchar et = Event.Type;
@@ -716,29 +737,47 @@ awsManager::RecursiveBroadcastToChildren(iAwsComponent *cmp, iEvent &Event)
               mouse_in->HandleEvent(Event);
             }
 
-            mouse_in=child;
+            mouse_in=cmp;
             Event.Type = csevMouseEnter;
             mouse_in->HandleEvent(Event);
 
             Event.Type = et;
           }
 
-          return child->HandleEvent(Event);
+          if (Event.Type == csevMouseDown)
+          {
+            if (keyb_focus != cmp)
+            {
+              // Create a new event for MouseExit and MouseEnter
+              uchar et = Event.Type;
+
+              if (keyb_focus)
+              {
+                Event.Type = csevLostFocus;
+                keyb_focus->HandleEvent(Event);
+              }
+
+              keyb_focus=cmp;
+              Event.Type = csevGainFocus;
+              keyb_focus->HandleEvent(Event);
+
+              Event.Type = et;
+            }
+          }
+
+          return cmp->HandleEvent(Event);
         } 
       break;
 
 
       case csevKeyDown:
         
-        if (child->HandleEvent(Event)) return true;
-      
+        if (cmp->HandleEvent(Event)) return true;
+              
       break;
     }  // End switch
-   
-   } // End for
 
-  return false;
-
+    return false;
 }
 
 void 
