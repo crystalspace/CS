@@ -261,11 +261,7 @@ bool IsPowerOf2 (int n)
   int i;
   int po2 = 1;
 
-  if (!n) return false; 
-    
-  for (i=0; i<32; i++, po2<<=1)
-    if (n==po2) return true;
-
-  return false;
+  if (n<=0) return false; 
+  return (n-1)^n >= n;
 }
 
