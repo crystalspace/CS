@@ -48,7 +48,7 @@ update the position of the object that represents your body in the renderer.
 * csPhyziks Articulated Bodies:: Articulated Bodies
 * csPhyziks Impulses:: Impulses
 * csPhyziks Solvers:: Solvers
-* csPhyziks Evolve-Collide-Update Loop:: Evolve-Collide-Update Loop
+* csPhyziks Evolve-Collide-Update Loop:: Catastrophes
 * csPhyziks ODE Solvers:: @sc{ode} Solvers
 * csPhyziks Usage Guide:: Usage Guide
 @end menu
@@ -292,7 +292,7 @@ simulation and trying with smaller time steps until csphyziks has reached a mini
 The collision response code does not accurately handle multiple points of
 simultaneous collision on one object.
 
-@node csPhyziks ODE Solvers, , csPhyziks Evolve-Collide-Update Loop, csPhyziks
+@node csPhyziks ODE Solvers, csPhyziks Usage Guide, csPhyziks Evolve-Collide-Update Loop, csPhyziks
 @subsection @sc{ode} Solvers
 
 An @sc{ode} is an @dfn{Ordinary Differential Equation} solver.  @code{ctWorld}
@@ -316,7 +316,7 @@ implemented), but the resulting performance hit could cause more instability.
 So it can be a no-win situation when choosing and @sc{ode} solver if you have
 a very low frame-rate.  Then it's time to up the system requirements of your application.
 
-@node csPhyziks Usage Guide, csPhyziks
+@node csPhyziks Usage Guide, , csPhyziks ODE Solvers, csPhyziks
 @subsection Usage Guide
 
 The way you use this physics module in your application is very application specific.  Since games are the most common type of application this section will mostly cover recommended usage for games.
