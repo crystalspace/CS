@@ -1,6 +1,7 @@
 crystalspace (0.93-5) unstable; urgency=low
 
   * French translation of control file
+  * Repeating First upload (CLoses: bug#120691)
 
  -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
 
