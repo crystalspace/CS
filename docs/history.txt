@@ -32,6 +32,15 @@ The history order is reversed so that new features are at the top.
 	  the XOR buffer turns out to be slower I still will need it for
 	  the real dynamic PVS algorithms because the c-buffer cannot
 	  cope with non-convex outlines.
+	- Added support for printing out culling efficiency (polygons,
+	  nodes, and objects). Only enabled in debug mode.
+	- Added 'toggle_cullstat' command (for iEngine::DebugCommand())
+	  to toggle the printing of this culling statistics.
+	- Added new 'togglecull' command to bugplug which will execute
+	  the toggle_cullstat command. Assigned to ctrl-c key.
+	- Added csXORBuffer::IsFull() which checks if the entire screen
+	  buffer is full and nothing can be visible now. Always returns
+	  false at the moment.
 17-Apr-2002
 	- Started working on new XOR buffer which *might* (if all goes
 	  well) replace the c-buffer. Nothing functional yet though.

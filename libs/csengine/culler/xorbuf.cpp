@@ -66,8 +66,14 @@ void csXORBuffer::Initialize ()
   memset (scr_buffer, 0, bufsize << 2);
 }
 
+bool csXORBuffer::IsFull ()
+{
+}
+
 void csXORBuffer::DrawLeftLine (int x1, int y1, int x2, int y2)
 {
+x1--; // @@@ temporary, but could be an option for contribution culling.
+x2--;
   if (y2 < 0 || y1 >= height)
   {
     //------
@@ -201,6 +207,8 @@ void csXORBuffer::DrawLeftLine (int x1, int y1, int x2, int y2)
 
 void csXORBuffer::DrawRightLine (int x1, int y1, int x2, int y2)
 {
+x1++; // @@@ temporary, but could be an option for contribution culling.
+x2++;
   if (y2 < 0 || y1 >= height)
   {
     //------

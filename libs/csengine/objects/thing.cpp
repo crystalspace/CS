@@ -1759,6 +1759,16 @@ void csThing::DrawPolygonArrayDPM (
   rview->GetGraphics3D ()->DrawPolygonMesh (mesh);
 }
 
+#ifdef CS_DEBUG
+bool viscnt_enabled;
+int viscnt_vis_poly;
+int viscnt_invis_poly;
+int viscnt_vis_node;
+int viscnt_invis_node;
+int viscnt_vis_obj;
+int viscnt_invis_obj;
+#endif
+
 void *csThing::TestQueuePolygonArray (
   csPolygonInt **polygon,
   int num,
@@ -1863,7 +1873,13 @@ void *csThing::TestQueuePolygonArray (
                       clip->GetVertexCount ()))
                 {
                   mark_vis = true;
+#		  ifdef CS_DEBUG
+		  viscnt_vis_obj++;
+#		  endif
                 }
+#		ifdef CS_DEBUG
+		else viscnt_invis_obj++;
+#		endif
 	      }
 	      else
 	      {
@@ -1872,7 +1888,13 @@ void *csThing::TestQueuePolygonArray (
                       clip->GetVertexCount ()))
                 {
                   mark_vis = true;
+#		  ifdef CS_DEBUG
+		  viscnt_vis_obj++;
+#		  endif
                 }
+#		ifdef CS_DEBUG
+		else viscnt_invis_obj++;
+#		endif
 	      }
             }
           }
@@ -1951,6 +1973,10 @@ void *csThing::TestQueuePolygonArray (
               visible = c_buffer->InsertPolygon (
                   clip->GetVertices (),
                   clip->GetVertexCount ());
+#	    ifdef CS_DEBUG
+	    if (visible) viscnt_vis_poly++;
+	    else viscnt_invis_poly++;
+#	    endif
           }
         }
       }
@@ -2000,7 +2026,7 @@ void *csThing::TestQueuePolygonArray (
         poly_queue->Push (p, clip);
         Stats::polygons_accepted++;
         if (c_buffer && c_buffer->IsFull ()) return (void *)1;  // Stop
-	//@@@@@@@@@@@@@@@if (xor_buffer && xor_buffer->IsFull ()) return (void *)1;  // Stop
+	if (xor_buffer && xor_buffer->IsFull ()) return (void *)1;  // Stop
       }
       else
       {
@@ -2705,12 +2731,6 @@ bool csThing::DrawTest (iRenderView *rview, iMovable *movable)
 #endif
 }
 
-static int count_cull_node_notvis_behind;
-
-// static int count_cull_node_vis_cutzplane;
-static int count_cull_node_notvis_cbuffer;
-static int count_cull_node_vis;
-
 CS_IMPLEMENT_STATIC_VAR (GetCullOctreeNodePerspPoly,csPolygon2D,())
 
 // @@@ This routine need to be cleaned up!!! It probably needs to
@@ -2782,7 +2802,6 @@ bool CullOctreeNode (
     if (num_z_0 == nVert)
     {
       // Node behind camera.
-      count_cull_node_notvis_behind++;
       return false;
     }
 
@@ -2850,14 +2869,12 @@ bool CullOctreeNode (
       vis = c_buffer->TestPolygon (
           persp.GetVertices (),
           persp.GetVertexCount ());
-    if (!vis)
-    {
-      count_cull_node_notvis_cbuffer++;
-      return false;
-    }
+#   ifdef CS_DEBUG
+    if (vis) viscnt_vis_node++;
+    else viscnt_invis_node++;
+#   endif
+    if (!vis) return false;
   }
-
-  count_cull_node_vis++;
 
   // If a node is visible we check wether or not it has a minibsp.
   // If it has a minibsp then we need to transform all vertices used

@@ -860,6 +860,11 @@ csEngine::csEngine (iBase *iParent) :
 
   thing_type = new csThingObjectType (NULL);
   ClearRenderPriorities ();
+
+# ifdef CS_DEBUG
+  extern bool viscnt_enabled;
+  viscnt_enabled = false;
+# endif
 }
 
 // @@@ Hack
@@ -3124,6 +3129,19 @@ void csEngine::DebugCommand (const char* cmd)
     else
       Report ("Engine is using c-buffer.");
     InitCuller ();
+  }
+  else if (!strcasecmp (cmd, "toggle_cullstat"))
+  {
+#   ifdef CS_DEBUG
+    extern bool viscnt_enabled;
+    viscnt_enabled = !viscnt_enabled;
+    if (viscnt_enabled)
+      Report ("Visibility culling statistics.");
+    else
+      Report ("Visibility culling statistics.");
+#   else
+    Report ("toggle_cullstat is only available in debug mode!");
+#   endif
   }
 }
 

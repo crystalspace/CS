@@ -623,6 +623,15 @@ int compare_z_thing (const void *p1, const void *p2)
  */
 void csSector::Draw (iRenderView *rview)
 {
+# ifdef CS_DEBUG
+  extern int viscnt_vis_poly; viscnt_vis_poly = 0;
+  extern int viscnt_invis_poly; viscnt_invis_poly = 0;
+  extern int viscnt_vis_node; viscnt_vis_node = 0;
+  extern int viscnt_invis_node; viscnt_invis_node = 0;
+  extern int viscnt_vis_obj; viscnt_vis_obj = 0;
+  extern int viscnt_invis_obj; viscnt_invis_obj = 0;
+# endif
+
   draw_busy++;
 
   int i, j;
@@ -785,6 +794,17 @@ void csSector::Draw (iRenderView *rview)
   }
 
   draw_busy--;
+
+# ifdef CS_DEBUG
+  extern bool viscnt_enabled;
+  if (viscnt_enabled)
+  {
+    printf ("poly +%d -%d   node +%d -%d   obj +%d -%d\n",
+	viscnt_vis_poly, viscnt_invis_poly, viscnt_vis_node,
+	viscnt_invis_node, viscnt_vis_obj, viscnt_invis_obj);
+    fflush (stdout);
+  }
+# endif
 }
 
 csObject **csSector::GetVisibleObjects (iFrustumView *lview, int &num_objects)

@@ -95,6 +95,7 @@ class csShadow;
 #define DEBUGCMD_MESHRAD	1023	// How RADIUS of selected mesh
 #define DEBUGCMD_DEBUGGRAPH	1024	// Do a dump of the debug graph
 #define DEBUGCMD_TOGGLEXOR	1025	// Toggle c-buffer vs xor-buf
+#define DEBUGCMD_TOGGLECULL	1026	// Toggle vis culling statistics
 
 /**
  * For key mappings.

@@ -504,6 +504,11 @@ bool csBugPlug::EatKey (iEvent& event)
         Report (CS_REPORTER_SEVERITY_NOTIFY, "Toggle c-buffer/XOR buffer!");
 	Engine->DebugCommand ("toggle_xorbuf");
         break;
+      case DEBUGCMD_TOGGLECULL:
+        Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"Toggle Visibility Culling Statistics!");
+	Engine->DebugCommand ("toggle_cullstat");
+        break;
       case DEBUGCMD_HELP:
         Report (CS_REPORTER_SEVERITY_NOTIFY, "Sorry, cannot help you yet.");
         break;
@@ -909,6 +914,7 @@ int csBugPlug::GetCommandCode (const char* cmd)
   if (!strcmp (cmd, "meshrad"))		return DEBUGCMD_MESHRAD;
   if (!strcmp (cmd, "debuggraph"))	return DEBUGCMD_DEBUGGRAPH;
   if (!strcmp (cmd, "togglexor"))	return DEBUGCMD_TOGGLEXOR;
+  if (!strcmp (cmd, "togglecull"))	return DEBUGCMD_TOGGLECULL;
 
   return DEBUGCMD_UNKNOWN;
 }

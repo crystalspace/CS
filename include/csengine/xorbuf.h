@@ -118,6 +118,11 @@ public:
   void XORSweep ();
 
   /**
+   * Return true if entire screen buffer is full.
+   */
+  bool IsFull ();
+
+  /**
    * Do a graphical dump of the XOR buffer contents on screen.
    */
   void Debug_Dump (iGraphics2D* g2d, iGraphics3D* g3d, int zoom = 1);
