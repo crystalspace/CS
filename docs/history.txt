@@ -3,6 +3,8 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+13-Jul-2003
+	- Keith Fulton changed csPath to inherit from SCF interface iPath.
 12-Jul-2003
         - Boyan added SetBroadcast and SetBroadcastOptions in iNetworkSocket2
 	- Jorrit applied a fix to the fountain bounding box creation

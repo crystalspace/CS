@@ -19,13 +19,17 @@
 #ifndef __CS_PATH_H__
 #define __CS_PATH_H__
 
+
 /**\file 
  */
 /**
  * \addtogroup geom_utils
  * @{ */
 
+#include "csutil/scf.h"
 #include "csgeom/spline.h"
+#include "csgeom/vector3.h"
+#include "igeom/path.h"
 
 /**
  * A path in 3D.
@@ -33,7 +37,7 @@
  * This is particularly useful in combination with
  * csReversibleTransform::LookAt().
  */
-class csPath : public csCatmullRomSpline
+class csPath : public csCatmullRomSpline, public iPath
 {
 private:
   void SetVectorAsDimensionValues (int dim, csVector3* v)
@@ -58,6 +62,8 @@ private:
   }
 
 public:
+  SCF_DECLARE_IBASE;
+
   /// Create a path with p points.
   csPath (int p) : csCatmullRomSpline (9, p) { }
 
