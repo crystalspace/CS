@@ -19,7 +19,7 @@ have to deal with the sound driver in any way.
 
 @item Sound Renderer
 System dependent sound renderers.  This driver can be used to play sound.
-There are currently renderers for DirectSound3D, @sc{eax} and software.
+There are currently renderers for DirectSound3D and software.
 
 @item Sound Loader
 This module is used to load sound files.  There is only one implementation for
