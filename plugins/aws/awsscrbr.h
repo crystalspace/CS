@@ -55,9 +55,12 @@ class awsScrollBar : public awsComponent
 
   /// The sink for button messages
   iAwsSink *sink;
-
-  /// The slot for button messages
-  iAwsSlot *slot;
+  
+  /// The slot for decrement button messages
+  iAwsSlot *dec_slot;
+  
+  /// The slot for increment button messages
+  iAwsSlot *inc_slot;
 
   /// Value of scroll bar
   float value;

@@ -125,6 +125,7 @@ awsListBox::Setup(iAws *_wmgr, awsComponentNode *settings)
   int i;
   int sb_h, sb_w;
   int border=3;
+  int min=0, max=0, change=1, bigchange=1;
 
   if (!awsComponent::Setup(_wmgr, settings)) return false;
 
@@ -213,6 +214,11 @@ awsListBox::Setup(iAws *_wmgr, awsComponentNode *settings)
   scrollbar->SetParent(this);
   scrollbar->Setup(_wmgr, sbinfo.GetThisNode());
 
+  scrollbar->SetProperty("Change", &change);
+  scrollbar->SetProperty("BigChange", &bigchange);
+  scrollbar->SetProperty("Max", &max);
+  scrollbar->SetProperty("Min", &min);
+ 
   // Setup trigger
   sink = new awsSink(this);
 
@@ -244,12 +250,11 @@ awsListBox::SetProperty(char *name, void *parm)
 void 
 awsListBox::ScrollChanged(void *sk, iAwsSource *source)     
 {
-  awsListBox *lb = (awsListBox *)lb;
-  static float last_value=0;
+  awsListBox *lb = (awsListBox *)sk;
   float *curval=0;
 
   source->GetComponent()->GetProperty("Value", (void **)&curval);
-
+  
   lb->UpdateMap();
   lb->scroll_start=(int)*curval;
   
@@ -259,6 +264,8 @@ awsListBox::ScrollChanged(void *sk, iAwsSource *source)
 void 
 awsListBox::UpdateMap()
 {
+  int map_size_m1;
+
   if (map_dirty)
   { 
     int start=0;
@@ -271,6 +278,10 @@ awsListBox::UpdateMap()
     // Traverse once for the count of visible items
     map_size = CountVisibleItems(&rows);
     map = new awsListRow *[map_size];
+
+    // Set the scroll bar's max position
+    map_size_m1 = map_size-1;
+    scrollbar->SetProperty("Max", &map_size_m1);
 
     // Map out items
     MapVisibleItems(&rows, start, map);
@@ -430,6 +441,8 @@ awsListBox::InsertItem(void *owner, iAwsParmList &parmlist)
 
   // Pass back the id of this row, in case they want it.
   parmlist.AddInt("id", (int)row);
+
+  lb->map_dirty=true;
 } 
 
 void 
@@ -450,6 +463,8 @@ awsListBox::DeleteItem(void *owner, iAwsParmList &parmlist)
 
   // Pass back the result, in case they want it
   parmlist.AddInt("result", (int)i);
+
+  lb->map_dirty=true;
 }
 
 
@@ -517,6 +532,8 @@ awsListBox::ClearList(void *owner, iAwsParmList &parmlist)
   awsListBox *lb = (awsListBox *)owner;
 
   DoRecursiveClearList(&lb->rows);
+
+  lb->map_dirty=true;
 }
 
 bool 
@@ -749,8 +766,16 @@ awsListBox::OnDraw(csRect clip)
     row=start;
     x=startx;
 
-    while (DrawItemsRecursively(row,x,y,border,false,false)==false)
+    bool stop_drawing=false;
+    bool draw_this_time=true;
+
+    while (stop_drawing==false)
     {
+      if (draw_this_time)
+        stop_drawing=DrawItemsRecursively(row,x,y,border,false,false);
+      
+      draw_this_time=true;
+
       // Reset row start point
       x=startx;
 
@@ -771,15 +796,35 @@ awsListBox::OnDraw(csRect clip)
           ++i;
 
         // If we're done, leave
-        if (i==rows.Length())
+        if (i>=rows.Length())
           return;
         else
           row=(awsListRow *)rows[i];
 
       } // end if no parent.
       else
-        row=parent;
+      {
+        int i=parent->children->Find(row);
 
+        // This should never occur
+        if (i==-1)
+        {
+          printf("awslistbox: bug: couldn't find current row!\n");
+          return;
+        }
+        else
+          ++i;
+
+        if (i>=parent->children->Length())
+        {
+          row=parent;
+          draw_this_time=false;
+        }
+        else
+          row=(awsListRow *)parent->children->Get(i);
+        
+      }
+       
     } // end while draw items recursively
 
 
@@ -1094,6 +1139,7 @@ awsListBox::OnMouseDown(int /*button*/,int x,int y)
           if (row->expanded) row->expanded=false;
           else row->expanded=true;
 
+          map_dirty=true;
           Invalidate();
           return true;
         }

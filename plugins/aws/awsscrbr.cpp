@@ -25,7 +25,7 @@ awsScrollBar::awsScrollBar():is_down(false), mouse_is_over(false),
 was_down(false), tex(NULL),
 frame_style(0), alpha_level(92),
 decVal(NULL), incVal(NULL), 
-sink(NULL), slot(NULL),
+sink(NULL), dec_slot(NULL), inc_slot(NULL),
 value(0), max(1), min(0), amntvis(0),
 value_delta(0.1), value_page_delta(0.25)
 {
@@ -33,13 +33,14 @@ value_delta(0.1), value_page_delta(0.25)
 
 awsScrollBar::~awsScrollBar()
 {
-  slot->Disconnect(decVal, awsCmdButton::signalClicked, sink, sink->GetTriggerID("DecValue"));
-  slot->Disconnect(incVal, awsCmdButton::signalClicked, sink, sink->GetTriggerID("IncValue"));
+  dec_slot->Disconnect(decVal, awsCmdButton::signalClicked, sink, sink->GetTriggerID("DecValue"));
+  inc_slot->Disconnect(incVal, awsCmdButton::signalClicked, sink, sink->GetTriggerID("IncValue"));
 
   SCF_DEC_REF(incVal);
   SCF_DEC_REF(decVal);
   SCF_DEC_REF(sink);
-  SCF_DEC_REF(slot);
+  SCF_DEC_REF(inc_slot);
+  SCF_DEC_REF(dec_slot);
 }
 
 char *
@@ -58,9 +59,9 @@ awsScrollBar::Setup(iAws *_wmgr, awsComponentNode *settings)
   pm->LookupIntKey("OverlayTextureAlpha", alpha_level); // global get
   pm->GetInt(settings, "Style", frame_style);
   pm->GetInt(settings, "Alpha", alpha_level);          // local overrides, if present.
-  
+
   tex=pm->GetTexture("Texture");
-  
+
   // Setup embedded buttons
   incVal = new awsCmdButton;
   decVal = new awsCmdButton;
@@ -84,7 +85,7 @@ awsScrollBar::Setup(iAws *_wmgr, awsComponentNode *settings)
       // Abort if the images are not found
       if (!incimg || !decimg)
         return false;
-     
+
       int img_w, img_h;
 
       incimg->GetOriginalDimensions(img_w, img_h);
@@ -134,16 +135,17 @@ awsScrollBar::Setup(iAws *_wmgr, awsComponentNode *settings)
 
   decVal->SetProperty("Image", decimg);
   incVal->SetProperty("Image", incimg);
- 
+
   sink = new awsSink(this);
 
   sink->RegisterTrigger("DecValue", &DecClicked);
   sink->RegisterTrigger("IncValue", &IncClicked);
 
-  slot = new awsSlot();
+  dec_slot = new awsSlot();
+  inc_slot = new awsSlot();
 
-  slot->Connect(decVal, awsCmdButton::signalClicked, sink, sink->GetTriggerID("DecValue"));
-  slot->Connect(incVal, awsCmdButton::signalClicked, sink, sink->GetTriggerID("IncValue"));
+  dec_slot->Connect(decVal, awsCmdButton::signalClicked, sink, sink->GetTriggerID("DecValue"));
+  inc_slot->Connect(incVal, awsCmdButton::signalClicked, sink, sink->GetTriggerID("IncValue"));
 
   return true;
 }
@@ -154,8 +156,12 @@ awsScrollBar::GetProperty(char *name, void **parm)
   if (awsComponent::GetProperty(name, parm)) return true;
 
   if (strcmp("Value", name)==0)
+  {
     *parm = (void *)&value;
-  
+    return true;
+  }
+
+
   return false;
 }
 
@@ -163,6 +169,35 @@ bool
 awsScrollBar::SetProperty(char *name, void *parm)
 {
   if (awsComponent::SetProperty(name, parm)) return true;
+
+  if (strcmp("Change", name)==0)
+  {
+    value_delta = *(int *)parm;
+    return true;
+  }
+  else if (strcmp("BigChange", name)==0)
+  {
+    value_page_delta = *(int *)parm;
+    return true;
+  }
+  else if (strcmp("Min", name)==0)
+  {
+
+    min = *(int *)parm;
+    return true;
+  }
+  else if (strcmp("Max", name)==0)
+  {
+
+    max = *(int *)parm;
+    return true;
+  }
+  else if (strcmp("PageSize", name)==0)
+  {
+
+    amntvis = *(int *)parm;
+    return true;
+  }
 
   return false;
 }
@@ -176,10 +211,12 @@ awsScrollBar::IncClicked(void *sk, iAwsSource *source)
 
   /// Check floor and ceiling
   sb->value = ( sb->value < sb->min ? sb->min : 
-               ( sb->value > sb->max ? sb->max : sb->value));
+                ( sb->value > sb->max ? sb->max : sb->value));
 
   sb->Broadcast(signalChanged); 
   sb->Invalidate();
+
+  printf("sb: inc value %f\n", sb->value);
 }
 
 void 
@@ -195,6 +232,8 @@ awsScrollBar::DecClicked(void *sk, iAwsSource *source)
 
   sb->Broadcast(signalChanged); 
   sb->Invalidate();
+
+  printf("sb: dec value %f\n", sb->value);
 }
 
 void 
@@ -207,7 +246,7 @@ awsScrollBar::OnDraw(csRect clip)
 
 bool 
 awsScrollBar::OnMouseDown(int button , int x , int y)
-{ 
+{
   return false;
 }
 
@@ -219,7 +258,7 @@ awsScrollBar::OnMouseUp(int button, int x, int y)
 
 bool
 awsScrollBar::OnMouseMove(int button, int x, int y)
-{ 
+{
   return false;
 }
 

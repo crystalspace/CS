@@ -152,7 +152,9 @@ public:
 *                                                                                                                     *
 *   This implements the slot architecture.  Slots are conduits for signals.  Signals always have a source.  Slots may *
 *  be a conduit for multiple signals from multiple sources.  It is up to the user to determine how to use his slots.  *
-*  Slots do not care, other than they always activate a particular trigger of a particular sink.                      *
+*  Slots do not care, other than they route based on signal, NOT source.  Therefore, if a slot is hooked up to two    *
+*  different sources that emit the same signal, then any trigger registered for that signal will recieve the signal   *
+*  from EVERY source that emits it.                                                                                   *
 *                                                                                                                     *
 **********************************************************************************************************************/
 class awsSlot : public iAwsSlot
@@ -162,7 +164,8 @@ class awsSlot : public iAwsSlot
    
    /** A mapping between signals and triggers.  One signal may map to multiple triggers, or
     * vice versa.  The mapping list is traversed everytime there is a signal emitted.  All
-    * mappings are evaluated and if they qualify, are activated. */
+    * mappings are evaluated and if they qualify, are activated. Note that a slot may be
+    * connected to multiple sources, but that it routes based on signal, NOT source. */
    struct SignalTriggerMap
    {
      unsigned long signal;
