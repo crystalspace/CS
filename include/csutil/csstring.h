@@ -121,7 +121,7 @@ public:
    * non-const pointer, so use this function with care!
    */
   char* GetData ()
-  { return Data != 0 ? Data : ""; }
+  { static char* highly_nasty = ""; return Data != 0 ? Data : highly_nasty; }
 
   /// Query string length.  Length does not include null terminator.
   size_t Length () const
