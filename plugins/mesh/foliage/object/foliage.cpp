@@ -181,19 +181,46 @@ int csFoliageObject::GetLODPolygonCount (float lod) const
 
 //----------------------------------------------------------------------
 
-csFoliageMeshBlock::csFoliageMeshBlock (const csBox2& box,
-    iTerraFormer* terraformer, int res)
+csFoliageMeshBlock::csFoliageMeshBlock ()
 {
-  csFoliageMeshBlock::box = box;
-  terrasampler = terraformer->GetSampler (box, res);
-
   bbox.Empty ();
+}
+
+void csFoliageMeshBlock::AddGeometryInstance (csFoliageGeometry* geom,
+  	const csReversibleTransform& trans)
+{
+  iMaterialWrapper* material = geom->GetMaterialWrapper ();
+  size_t i;
+  size_t found_i = (size_t)~0;
+  for (i = 0 ; i < geom_instances.Length () ; i++)
+  {
+    if (geom_instances[i].material == material)
+    {
+      found_i = i;
+      break;
+    }
+  }
+  if (found_i == (size_t)~0)
+  {
+    found_i = geom_instances.Push (csGeomInstances ());
+    geom_instances[found_i].material = material;
+  }
+
+  csGeomInstances& gi = geom_instances[found_i];
+  size_t geom_idx = gi.instances.Push (csFoliageGeometryInstance ());
+  gi.instances[geom_idx].transform = trans;
+  gi.instances[geom_idx].geometry = geom;
 }
 
 void csFoliageMeshBlock::Draw (iGraphics3D* g3d, iRenderView* rview,
       uint32 frustum_mask, const csReversibleTransform& transform,
       csRenderMeshHolderSingle& rmHolder)
 {
+  if (!interleaved_buffer)
+  {
+    //g3d->CreateInterleavedRenderBuffers (sizeof (csFoliageVertex)
+    	//* 0);
+  }
 }
 
 //----------------------------------------------------------------------
@@ -492,9 +519,12 @@ csStringID csFoliageMeshObjectFactory::texel_name = csInvalidStringID;
 csStringID csFoliageMeshObjectFactory::normal_name = csInvalidStringID;
 csStringID csFoliageMeshObjectFactory::color_name = csInvalidStringID;
 csStringID csFoliageMeshObjectFactory::index_name = csInvalidStringID;
+csStringID csFoliageMeshObjectFactory::heights_name = csInvalidStringID;
+csStringID csFoliageMeshObjectFactory::foliage_density_name = csInvalidStringID;
+csStringID csFoliageMeshObjectFactory::foliage_types_name = csInvalidStringID;
 
-csFoliageMeshObjectFactory::csFoliageMeshObjectFactory (iMeshObjectType *pParent,
-      iObjectRegistry* object_reg)
+csFoliageMeshObjectFactory::csFoliageMeshObjectFactory (
+	iMeshObjectType *pParent, iObjectRegistry* object_reg)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiFoliageFactoryState);
@@ -520,17 +550,16 @@ csFoliageMeshObjectFactory::csFoliageMeshObjectFactory (iMeshObjectType *pParent
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
     "crystalspace.shared.stringset", iStringSet);
 
-  if ((vertex_name == csInvalidStringID) ||
-    (texel_name == csInvalidStringID) ||
-    (normal_name == csInvalidStringID) ||
-    (color_name == csInvalidStringID) ||
-    (index_name == csInvalidStringID))
+  if (vertex_name == csInvalidStringID)
   {
     vertex_name = strings->Request ("vertices");
     texel_name = strings->Request ("texture coordinates");
     normal_name = strings->Request ("normals");
     color_name = strings->Request ("colors");
     index_name = strings->Request ("indices");
+    heights_name = strings->Request ("heights");
+    foliage_density_name = strings->Request ("foliage_density");
+    foliage_types_name = strings->Request ("foliage_types");
   }
 
   mesh_vertices_dirty_flag = true;
@@ -554,23 +583,40 @@ csFoliageMeshObjectFactory::~csFoliageMeshObjectFactory ()
 
 void csFoliageMeshObjectFactory::ClearGeneratedFoliage ()
 {
-  if (genfoliage)
-  {
-    int i;
-    for (i = 0 ; i < genfoliage_res * genfoliage_res ; i++)
-    {
-      if (genfoliage[i])
-	delete genfoliage[i];
-    }
-    delete[] genfoliage;
-    genfoliage = 0;
-  }
+  delete[] genfoliage;
+  genfoliage = 0;
 }
 
 void csFoliageMeshObjectFactory::GenerateFoliage ()
 {
   ClearGeneratedFoliage ();
-  genfoliage = new csArray<csGeneratedFoliage>* [genfoliage_res*genfoliage_res];
+  genfoliage = new csArray<csGeneratedFoliage> [genfoliage_res*genfoliage_res];
+  /*
+  float dx = (samplerRegion.MaxX ()-samplerRegion.MinX ())
+    / float (genfoliage_res);
+  float dy = (samplerRegion.MaxY ()-samplerRegion.MinY ())
+    / float (genfoliage_res);
+  */
+  int x, y;
+  int idx;
+
+  // Sample a region...
+  /*
+  csRef<iTerraSampler> terrasampler = terraformer->GetSampler (
+      samplerRegion, genfoliage_res);
+  const float* heights = terrasampler->SampleFloat (heights_name);
+  */
+
+  for (y = 0 ; y < genfoliage_res ; y++)
+  {
+    for (x = 0 ; x < genfoliage_res ; x++)
+    {
+      //genfoliage[idx].Push ();
+      //@@@@@@@@@@@
+      genfoliage[idx].ShrinkBestFit ();
+      idx++;
+    }
+  }
 }
 
 void csFoliageMeshObjectFactory::CalculateBBoxRadius ()

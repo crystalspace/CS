@@ -142,15 +142,30 @@ public:
 
 
 /**
+ * A piece of geometry with an associated transform.
+ */
+struct csFoliageGeometryInstance
+{
+  csFoliageGeometry* geometry;
+  csReversibleTransform transform;
+};
+
+/**
+ * An array of geometry instances all using the same material.
+ */
+struct csGeomInstances
+{
+  csArray<csFoliageGeometryInstance> instances;
+  iMaterialWrapper* material;
+};
+
+/**
  * Foliage mesh block. This represents a subset of the foliage
  * geometry depending on where the camera is.
  */
 class csFoliageMeshBlock
 {
 private:
-  // Bounding box for this block (in 2D).
-  csBox2 box;
-
   // 3D bounding box for all geometry in this block.
   csBox3 bbox;
 
@@ -161,19 +176,20 @@ private:
   // Render buffer for the triangle data.
   csRef<iRenderBuffer> index_buffer;
 
-  // Sampler for getting the data for this block.
-  csRef<iTerraSampler> terrasampler;
-
-  // Resolution at which we sample this block.
-  int res;
+  // One set of geometry instances for every material.
+  csArray<csGeomInstances> geom_instances;
 
 public:
   /**
-   * Construct a new mesh block for the given area
-   * and with the supplied terraformer.
+   * Construct a new mesh block.
    */
-  csFoliageMeshBlock (const csBox2& box, iTerraFormer* terraformer,
-      int res);
+  csFoliageMeshBlock ();
+
+  /**
+   * Add a geometry instance.
+   */
+  void AddGeometryInstance (csFoliageGeometry* geom,
+  	const csReversibleTransform& trans);
 
   /**
    * Draw this block (add to the render mesh holder).
@@ -435,7 +451,7 @@ private:
 
   // Generated foliage.
   int genfoliage_res;	// Resolution at which we generate foliage.
-  csArray<csGeneratedFoliage>** genfoliage;
+  csArray<csGeneratedFoliage>* genfoliage;
   void ClearGeneratedFoliage ();
   void GenerateFoliage ();
 
@@ -446,7 +462,7 @@ private:
 
 public:
   static csStringID vertex_name, texel_name, normal_name, color_name, 
-    index_name;
+    index_name, heights_name, foliage_density_name, foliage_types_name;
 
   iObjectRegistry* object_reg;
   iBase* logparent;
