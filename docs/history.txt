@@ -20,6 +20,8 @@ chronological order.
 	- Marten Svanfeldt changed the ways shader variables work in new renderer.
 	  The current way works, but is somewhat messy code and unclean design.
 	  It should be fixed in the following week(s).
+	- Rhad added a call to broadcast signalTextBoxFocused when a textbox 
+	  gains focus by any means - not just when it's set programatically.
 25-Oct-2003
 	- Rhad moved emitter list initialization into the
 	  RecreateParticleSystem() member function of partedit.  This fixes the

@@ -697,6 +697,7 @@ bool awsTextBox::OnLostFocus ()
 bool awsTextBox::OnGainFocus ()
 {
   has_focus = true;
+  Broadcast (signalFocused);
   Invalidate ();
   return true;
 }
