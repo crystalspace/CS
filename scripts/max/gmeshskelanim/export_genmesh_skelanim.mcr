@@ -432,7 +432,7 @@ rollout Test1 "Export GenMesh Skelanim to CS" width:238 height:345
 					if write_x_rot or write_y_rot or write_z_rot then
 					(
 						biped_animation_found = true
-						format "        <move bone=\"%\" duration=\"%\" x=\"%\" y=\"%\" z=\"%\"/>\n" t.name duration biped_position.x biped_position.z biped_position.y to:outFile
+						format "        <move bone=\"%\" duration=\"%\" x=\"%\" y=\"%\" z=\"%\"/>\n" t.name duration (biped_position.x*xscale) (biped_position.z*zscale) (biped_position.y*yscale) to:outFile
 					)
 
 					biped_transforms[bp_index].pos = biped_position
