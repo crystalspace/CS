@@ -718,7 +718,7 @@ bool RegisterServer (char *SharedLibraryFilename, csIniFile *ini, bool Register)
       ini->SetComment ("SCF.Registry", ClassTable->ClassID, comment);
     }
     else
-      ini->Delete ("SCF.Registry", ClassTable->ClassID);
+      ini->DeleteKey ("SCF.Registry", ClassTable->ClassID);
     ClassTable++;
   }
 
