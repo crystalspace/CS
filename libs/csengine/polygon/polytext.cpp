@@ -844,7 +844,7 @@ bool csPolyTexture::DynamicLightsDirty ()
 
 void csPolyTexture::MakeDirtyDynamicLights ()
 {
-  if (lm) lm->dyn_dirty = true;
+  if (lm) lm->MakeDirtyDynamicLights ();
 }
 
 iLightMap *csPolyTexture::GetLightMap ()

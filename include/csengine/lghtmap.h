@@ -95,9 +95,11 @@ private:
 
   /**
    * Mean lighting value of this lightmap.
-   * (only for static lighting currently).
    */
   csRGBpixel mean_color;
+
+  /// need recalculation of mean color?
+  bool mean_recalc;
 
   /// The hicolor cache ptr.
   void *cachedata;
@@ -149,7 +151,7 @@ public:
   virtual ~csLightMap ();
 
   /// set the dirty flag for this lightmap
-  void MakeDirtyDynamicLights () { dyn_dirty = true; }
+  void MakeDirtyDynamicLights () { dyn_dirty = true; mean_recalc = true; }
 
   bool UpdateRealLightMap ();
 
@@ -208,9 +210,7 @@ public:
   /**
    * Convert the lightmaps to the correct mixing mode.
    * This function does nothing unless the mixing mode is
-   * nocolor.<p>
-   *
-   * This function also calculates the mean color of the lightmap.
+   * nocolor.
    */
   void ConvertToMixingMode ();
 
@@ -225,6 +225,12 @@ public:
    * lightmap_shift also has to be updated.
    */
   static void SetLightCellSize (int size);
+
+  /**
+   * Calculate the mean color of csRGBpixel array.
+   * Used by GetMeanLighting().
+   */
+  void CalcMeanLighting ();
 
   //------------------------ iLightMap implementation ------------------------
   SCF_DECLARE_IBASE;
@@ -248,9 +254,8 @@ public:
   ///
   virtual void SetCacheData (void *d)
   { cachedata = d; }
-  ///
-  virtual void GetMeanLighting (int &r, int &g, int &b)
-  { r = mean_color.red; g = mean_color.green; b = mean_color.blue; }
+  /// calculate (if needed) and return mean color
+  virtual void GetMeanLighting (int &r, int &g, int &b);
   /// Get size of one lightmap
   virtual long GetSize ()
   { return lm_size; }

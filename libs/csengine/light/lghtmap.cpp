@@ -77,6 +77,7 @@ csLightMap::csLightMap ()
   cachedata = NULL;
   delayed_light_info = NULL;
   dyn_dirty = true;
+  mean_recalc = true;
 }
 
 csLightMap::~csLightMap ()
@@ -527,6 +528,7 @@ bool csLightMap::UpdateRealLightMap ()
   if (!dyn_dirty) return false;
 
   dyn_dirty = false;
+  mean_recalc = true;
 
   //---
   // First copy the static lightmap to the real lightmap.
@@ -581,13 +583,17 @@ bool csLightMap::UpdateRealLightMap ()
 
 void csLightMap::ConvertToMixingMode ()
 {
+}
+
+void csLightMap::CalcMeanLighting ()
+{
   int i;
   int mer, meg, meb;
   mer = 0;
   meg = 0;
   meb = 0;
 
-  csRGBpixel *map = static_lm.GetArray ();
+  csRGBpixel *map = real_lm.GetArray ();
   for (i = 0; i < lm_size; i++)
   {
     mer += map->red;
@@ -686,4 +692,18 @@ void csLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
 csRGBpixel *csLightMap::GetMapData ()
 {
   return GetRealMap ().GetArray ();
+}
+
+void csLightMap::GetMeanLighting (int &r, int &g, int &b)
+{ 
+  if (mean_recalc)
+  {
+    UpdateRealLightMap ();
+    CalcMeanLighting ();
+    mean_recalc = false;
+  }
+
+  r = mean_color.red; 
+  g = mean_color.green; 
+  b = mean_color.blue; 
 }
