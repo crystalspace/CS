@@ -101,9 +101,9 @@ csSphere csTransform::Other2This (const csSphere& s) const
   // relative to the transform.
   csVector3 v_radius (s.GetRadius ());
   v_radius = Other2ThisRelative (v_radius);
-  float radius = v_radius.x;
-  if (radius < v_radius.y) radius = v_radius.y;
-  if (radius < v_radius.z) radius = v_radius.z;
+  float radius = fabs (v_radius.x);
+  if (radius < fabs (v_radius.y)) radius = fabs (v_radius.y);
+  if (radius < fabs (v_radius.z)) radius = fabs (v_radius.z);
   news.SetRadius (radius);
   return news;
 }
@@ -146,9 +146,9 @@ csSphere& operator*= (csSphere& p, const csTransform& t)
   // relative to the transform.
   csVector3 v_radius (p.GetRadius ());
   v_radius = t.Other2ThisRelative (v_radius);
-  float radius = v_radius.x;
-  if (radius < v_radius.y) radius = v_radius.y;
-  if (radius < v_radius.z) radius = v_radius.z;
+  float radius = fabs (v_radius.x);
+  if (radius < fabs (v_radius.y)) radius = fabs (v_radius.y);
+  if (radius < fabs (v_radius.z)) radius = fabs (v_radius.z);
   p.SetRadius (radius);
   return p;
 }
@@ -194,9 +194,9 @@ csSphere csReversibleTransform::This2Other (const csSphere& s) const
   // relative to the transform.
   csVector3 v_radius (s.GetRadius ());
   v_radius = This2OtherRelative (v_radius);
-  float radius = v_radius.x;
-  if (radius < v_radius.y) radius = v_radius.y;
-  if (radius < v_radius.z) radius = v_radius.z;
+  float radius = fabs (v_radius.x);
+  if (radius < fabs (v_radius.y)) radius = fabs (v_radius.y);
+  if (radius < fabs (v_radius.z)) radius = fabs (v_radius.z);
   news.SetRadius (radius);
   return news;
 }

@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+25-Sep-2001
+	- Fixed a bug in csTransform::Other2This and This2Other for
+	  csSphere. The radius was not always calculated correctly.
+	  This bug could cause errors in visibility culling. Sometimes
+	  an object was considered invisible even if it was visible.
 21-Sep-2001
 	- Fixed csSector::IntersectSegment() so that it no longer ignores
 	  all the other meshes if there is a culler. The culler is now
