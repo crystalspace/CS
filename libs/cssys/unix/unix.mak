@@ -16,7 +16,7 @@ ifeq ($(X11.AVAILABLE),yes)
   PLUGINS += video/canvas/xextshm
   # Video Modes Plugin
   ifeq ($(USE_XFREE86VM),yes)
-  PLUGINS += video/canvas/xextf86vm
+    PLUGINS += video/canvas/xextf86vm
   endif
 
   ifeq ($(GL.AVAILABLE),yes)
