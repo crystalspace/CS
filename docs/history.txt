@@ -22,6 +22,10 @@ chronological order.
 	      renderer. Not sure that the fix is right. I had to add a
 	      missing parameter to CreateRenderBuffer() and I guessed that
 	      the correct value should be 'false' for index.
+	    - Added 'nrall' target for jam to compile all that is specific
+	      for the new renderer.
+	- Jorrit added stdpt, ieplex, motion, and gtreeldr to walkall target
+	  for jam.
 26-Aug-2003
         - Philip Wyett eliminated warning suggesting adding parentheses
           around truth value in csGLShaderFFP::LoadLayer (...);.

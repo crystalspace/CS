@@ -33,6 +33,10 @@ CompileGroups engseq : walkall ;
 CompileGroups xmlread : walkall ;
 CompileGroups xmlread : walkall ;
 CompileGroups ptanimimg : walkall ;
+CompileGroups stdpt : walkall ;
+CompileGroups ieplex : walkall ;
+CompileGroups motion : walkall ;
+CompileGroups gtreeldr : walkall ;
 
 SubVariant static ;
 Application walktest_static
