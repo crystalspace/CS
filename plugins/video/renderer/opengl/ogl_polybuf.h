@@ -232,10 +232,10 @@ private:
 	int* verts, int i, const csVector2& uvLightmap);
 
 public:
-  //SuperLightMap list
+  // SuperLightMap list.
   TrianglesSuperLightmapList superLM;
 protected:
-  //Mesh triangles grouped by material list
+  // Mesh triangles grouped by material list.
   TrianglesList polygons;
 
   typedef iMaterialHandle* iMaterialHandleP;
@@ -248,7 +248,7 @@ protected:
   int matCount;
   int verticesCount;
 
-  csTrianglesPerSuperLightmap* SearchFittingSuperLightmap(
+  csTrianglesPerSuperLightmap* SearchFittingSuperLightmap (
     iPolygonTexture* poly_texture, csRect& rect, int num_vertices);
 
   csTrianglesPerSuperLightmap* unlitPolysSL;

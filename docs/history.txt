@@ -45,6 +45,7 @@ The history order is reversed so that new features are at the top.
 	  fixed a memory leak.
 	- Again reduced memory usage in the OpenGL renderer by
 	  removing several unneeded growing arrays. More cleanups.
+	- Fixed a bug in OpenGL renderer which I introduced a few moments ago.
 7-Oct-2002
 	- Removed some obsolete texmem.{cpp|h} files in the 3D renderer
 	  directories.

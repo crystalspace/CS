@@ -437,7 +437,7 @@ void csTriangleArrayPolygonBuffer::AddTriangles (csTrianglesPerMaterial* pol,
     const csPlane3& /*poly_normal*/)
 {
   csVector3 aux;
-  csVector2 uv[3];
+  csVector2 uv0, uv;
   int i;
   csTriangle triangle;
 
@@ -445,21 +445,21 @@ void csTriangleArrayPolygonBuffer::AddTriangles (csTrianglesPerMaterial* pol,
   // index.
   csTransform transform (m_obj2tex, v_obj2tex);
   aux = transform.Other2This (vertices[verts[0]]);
-  uv[0].x = aux.x;
-  uv[0].y = aux.y;
-  triangle.a = AddSingleVertex (pol, verts, 0, uv[0]);
+  uv0.x = aux.x;
+  uv0.y = aux.y;
+  triangle.a = AddSingleVertex (pol, verts, 0, uv0);
 
   for (i = 1; i < num_vertices-1; i++)
   {
     aux = transform.Other2This (vertices[verts[i]]);
-    uv[1].x = aux.x;
-    uv[1].y = aux.y;
-    triangle.b = AddSingleVertex (pol, verts, i, uv[1]);
+    uv.x = aux.x;
+    uv.y = aux.y;
+    triangle.b = AddSingleVertex (pol, verts, i, uv);
 
     aux = transform.Other2This (vertices[verts[i+1]]);
-    uv[2].x = aux.x;
-    uv[2].y = aux.y;
-    triangle.c = AddSingleVertex (pol, verts, i+1, uv[2]);
+    uv.x = aux.x;
+    uv.y = aux.y;
+    triangle.c = AddSingleVertex (pol, verts, i+1, uv);
 
     pol->triangles.Push (triangle);
 
@@ -551,18 +551,20 @@ void csTriangleArrayPolygonBuffer::AddTriangles (csTrianglesPerMaterial* pol,
    * created)
    */
   csVector2 uvLightmap;
-  uvLightmap.x = (uv[0].x - lm_offset_u) * lm_scale_u;
-  uvLightmap.y = (uv[0].y - lm_offset_v) * lm_scale_v;
+  uvLightmap.x = (uv0.x - lm_offset_u) * lm_scale_u;
+  uvLightmap.y = (uv0.y - lm_offset_v) * lm_scale_v;
   triangle.a = AddSingleVertexLM (triSuperLM, verts, 0, uvLightmap);
 
   for (i = 1; i < num_vertices - 1; i++)
   {
-    uvLightmap.x = (uv[1].x - lm_offset_u) * lm_scale_u;
-    uvLightmap.y = (uv[1].y - lm_offset_v) * lm_scale_v;
+    aux = transform.Other2This (vertices[verts[i]]);
+    uvLightmap.x = (aux.x - lm_offset_u) * lm_scale_u;
+    uvLightmap.y = (aux.y - lm_offset_v) * lm_scale_v;
     triangle.b = AddSingleVertexLM (triSuperLM, verts, i, uvLightmap);
 
-    uvLightmap.x = (uv[2].x - lm_offset_u) * lm_scale_u;
-    uvLightmap.y = (uv[2].y - lm_offset_v) * lm_scale_v;
+    aux = transform.Other2This (vertices[verts[i+1]]);
+    uvLightmap.x = (aux.x - lm_offset_u) * lm_scale_u;
+    uvLightmap.y = (aux.y - lm_offset_v) * lm_scale_v;
     triangle.c = AddSingleVertexLM (triSuperLM, verts, i+1, uvLightmap);
 
     triSuperLM->triangles.Push (triangle);
