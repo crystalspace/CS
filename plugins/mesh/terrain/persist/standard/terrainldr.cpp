@@ -371,7 +371,7 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
         int height = child->GetAttributeValueAsInt ("height");
         if (imagefile != 0)
         {
-          csRef<iImage> map = loader->LoadImage (imagefile, CS_IMGFMT_PALETTED8);
+          csRef<iImage> map = loader->LoadImage(imagefile,CS_IMGFMT_PALETTED8);
           if (map == 0) 
           {
             synldr->ReportError ("crystalspace.terrain.factory.loader",
@@ -429,7 +429,7 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
 	{
 	  bool staticLighting;
 	  if (!synldr->ParseBool (child, staticLighting, false))
-	    return false;
+	    return 0;
 	  state->SetStaticLighting (staticLighting);
 	}
 	break;
@@ -437,7 +437,7 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
 	{
 	  bool castShadows;
 	  if (!synldr->ParseBool (child, castShadows, false))
-	    return false;
+	    return 0;
 	  state->SetCastShadows (castShadows);
 	}
 	break;

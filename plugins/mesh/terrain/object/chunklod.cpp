@@ -122,7 +122,7 @@ csChunkLodTerrainFactory::csChunkLodTerrainFactory (csChunkLodTerrainType* p,
   vertex_name = strings->Request ("vertices");
   compressed_vertex_name = strings->Request ("compressed vertices");
   texcors_name = strings->Request ("texture coordinates");
-  compressed_texcors_name = strings->Request ("compressed texture coordinates");
+  compressed_texcors_name = strings->Request("compressed texture coordinates");
   texcoords_norm_name = strings->Request ("texture coordinates normalized");
   normal_name = strings->Request ("normals");
   compressed_normal_name = strings->Request ("compressed normals");
@@ -879,8 +879,6 @@ bool csChunkLodTerrainObject::DrawTest (iRenderView* rview, iMovable* movable,
     return false;
   if (returnMeshes->Length () == 0)
     return false;
-// printf ("avg triangle per mesh %f\n", (float)tricount/(float)meshes.Length());
-// printf ("tricount %d, meshcount %d\n", tricount, meshes.Length());
   return true;
 }
 
@@ -1275,7 +1273,7 @@ void csChunkLodTerrainObject::InitializeDefault (bool clear)
 }
 
 const char CachedLightingMagic[] = "chunky";
-const int CachedLightingMagicSize = sizeof (CachedLightingMagic) - 1;
+const size_t CachedLightingMagicSize = sizeof (CachedLightingMagic) - 1;
 
 #define STATIC_LIGHT_SCALE	255.0f
 
@@ -1490,7 +1488,8 @@ void csChunkLodTerrainObject::CastShadows (iMovable* movable,
   }
 
   float lightScale = CS_NORMAL_LIGHT_LEVEL / 256.0f;
-  csColor light_color = li->GetColor () * lightScale /* * (256. / CS_NORMAL_LIGHT_LEVEL)*/;
+  csColor light_color =
+    li->GetColor () * lightScale /* * (256. / CS_NORMAL_LIGHT_LEVEL)*/;
 
   csColor col;
   int i;
@@ -1642,7 +1641,7 @@ csChunkLodTerrainObject::MeshTreeNodeWrapper::MeshTreeNodeWrapper (
   csRef<iShaderVariableAccessor> sva;
   sva.AttachNew (new MeshTreeNodeSVA (this));
 
-  csShaderVariable *sv;
+  csShaderVariable *sv = 0; // =0 pacifies gcc 2.95.4.
   sv = svcontext->GetVariableAdd (obj->pFactory->vertex_name);
   sv->SetAccessor (sva);
   sv = svcontext->GetVariableAdd (obj->pFactory->normal_name);
