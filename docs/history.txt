@@ -6,6 +6,8 @@ The history order is reversed so that new features are at the top.
 	- Added csRef class which is a smart pointer class that works
 	  with both iBase and csRefCount pointers. Still in testing
 	  phase!
+	- Converted simple1 tutorial to use smart pointers. Note that I
+	  only converted the code and not the documentation.
 29-Jul-2002
 	- Fixed a memory leak in csThing::PreparePolygonBuffer().
 27-Jul-2002

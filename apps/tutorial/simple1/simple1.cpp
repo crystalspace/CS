@@ -59,25 +59,13 @@ CS_IMPLEMENT_APPLICATION
 // The global pointer to simple
 Simple *simple;
 
-Simple::Simple ()
+Simple::Simple (iObjectRegistry* object_reg)
 {
-  engine = NULL;
-  loader = NULL;
-  g3d = NULL;
-  kbd = NULL;
-  vc = NULL;
-  view = NULL;
+  Simple::object_reg = object_reg;
 }
 
 Simple::~Simple ()
 {
-  if (vc) vc->DecRef ();
-  if (engine) engine->DecRef ();
-  if (loader) loader->DecRef();
-  if (g3d) g3d->DecRef ();
-  if (kbd) kbd->DecRef ();
-  if (view) view->DecRef ();
-  csInitializer::DestroyApplication (object_reg);
 }
 
 void Simple::SetupFrame ()
@@ -147,11 +135,8 @@ bool Simple::SimpleEventHandler (iEvent& ev)
   return simple->HandleEvent (ev);
 }
 
-bool Simple::Initialize (int argc, const char* const argv[])
+bool Simple::Initialize ()
 {
-  object_reg = csInitializer::CreateEnvironment (argc, argv);
-  if (!object_reg) return false;
-
   if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,
 	CS_REQUEST_SOFTWARE3D,
@@ -185,7 +170,7 @@ bool Simple::Initialize (int argc, const char* const argv[])
   }
 
   // The virtual clock.
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  vc.Assign (CS_QUERY_REGISTRY (object_reg, iVirtualClock));
   if (!vc)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -195,7 +180,7 @@ bool Simple::Initialize (int argc, const char* const argv[])
   }
 
   // Find the pointer to engine plugin
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine.Assign (CS_QUERY_REGISTRY (object_reg, iEngine));
   if (!engine)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -204,7 +189,7 @@ bool Simple::Initialize (int argc, const char* const argv[])
     return false;
   }
 
-  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  loader.Assign (CS_QUERY_REGISTRY (object_reg, iLoader));
   if (!loader)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -213,7 +198,7 @@ bool Simple::Initialize (int argc, const char* const argv[])
     return false;
   }
 
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  g3d.Assign (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
   if (!g3d)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -222,7 +207,7 @@ bool Simple::Initialize (int argc, const char* const argv[])
     return false;
   }
 
-  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  kbd.Assign (CS_QUERY_REGISTRY (object_reg, iKeyboardDriver));
   if (!kbd)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -254,9 +239,10 @@ bool Simple::Initialize (int argc, const char* const argv[])
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   room = engine->CreateSector ("room");
-  iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
-  iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
-  	iThingState);
+  csRef<iMeshWrapper> walls (
+  	engine->CreateSectorWallsMesh (room, "walls"));
+  csRef<iThingState> walls_state (
+  	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState));
   iPolygon3D* p;
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
@@ -306,30 +292,24 @@ bool Simple::Initialize (int argc, const char* const argv[])
   p->CreateVertex (csVector3 (5, 0, -5));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
-  walls_state->DecRef ();
-  walls->DecRef ();
-
-  iStatLight* light;
+  csRef<iStatLight> light;
   iLightList* ll = room->GetLights ();
 
-  light = engine->CreateLight (NULL, csVector3 (-3, 5, 0), 10,
-  	csColor (1, 0, 0), false);
+  light.Assign (engine->CreateLight (NULL, csVector3 (-3, 5, 0), 10,
+  	csColor (1, 0, 0), false));
   ll->Add (light->QueryLight ());
-  light->DecRef ();
 
-  light = engine->CreateLight (NULL, csVector3 (3, 5,  0), 10,
-  	csColor (0, 0, 1), false);
+  light.Assign (engine->CreateLight (NULL, csVector3 (3, 5,  0), 10,
+  	csColor (0, 0, 1), false));
   ll->Add (light->QueryLight ());
-  light->DecRef ();
 
-  light = engine->CreateLight (NULL, csVector3 (0, 5, -3), 10,
-  	csColor (0, 1, 0), false);
+  light.Assign (engine->CreateLight (NULL, csVector3 (0, 5, -3), 10,
+  	csColor (0, 1, 0), false));
   ll->Add (light->QueryLight ());
-  light->DecRef ();
 
   engine->Prepare ();
 
-  view = new csView (engine, g3d);
+  view.Assign (new csView (engine, g3d));
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
   iGraphics2D* g2d = g3d->GetDriver2D ();
@@ -350,11 +330,14 @@ void Simple::Start ()
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  simple = new Simple ();
+  iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
 
-  if (simple->Initialize (argc, argv))
+  simple = new Simple (object_reg);
+  if (simple->Initialize ())
     simple->Start ();
-
   delete simple;
+
+  csInitializer::DestroyApplication (object_reg);
   return 0;
 }
+
