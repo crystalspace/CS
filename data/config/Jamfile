@@ -1,5 +1,4 @@
 SubDir TOP data config ;
 
 InstallConfig [ Wildcard *.cfg *.key ] ;
-InstallConfig [ Wildcard render3d : *.cfg ] : render3d ;
 

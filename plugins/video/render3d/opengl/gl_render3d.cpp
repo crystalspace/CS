@@ -710,9 +710,6 @@ bool csGLGraphics3D::Open ()
   csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
   	object_reg, iCommandLineParser);
 
-  config.AddConfig (object_reg, "/config/r3dopengl.cfg",
-    true, iConfigManager::ConfigPriorityPlugin);
-
   textureLodBias = config->GetFloat ("Video.OpenGL.TextureLODBias",
     -0.3f);
 

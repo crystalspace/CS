@@ -61,6 +61,9 @@ chronological order.
 	      the GL canvases now load certain config settings. See 
 	      data/config/gldrivers.xml.
 	- res fixed a cut'n'paste error in the regexp configure check.	
+	- Eric Sunshine removed empty & unused data/config/render3d/opengl.cfg
+	  and data/config/render3d/render3d.cfg.  Also fixed a couple other
+	  configuration file-related problems.
 25-Feb-2004
 	- Fritz Elfert fixed the following lighting related crash in sprcal3d:
 	  Previously, csSpriteCal3DMeshObject managed a set of relevant lights
