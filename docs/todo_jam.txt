@@ -95,3 +95,8 @@ W - Wishlist (the build also works without this feature)
     responsibility of the CS configure script, and indeed it has performed this
     check for quite a long time now.  I see now evidence that the Jam build
     utilizes this flag when unwarranted, thus I marked this item as `done'.)
+[*] Auto-generated Bison & Flex files should be generated into the build
+    directory rather than the source tree, since the source tree might be
+    read-only or shared.  We should provide rules to copy the generated files
+    back to the source tree upon explicit request so that they can be committed
+    to the CVS respository if desired.
