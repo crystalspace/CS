@@ -43,6 +43,30 @@
 	</OpenGL>
       </Video>
     </config>
+    <config name="3dfxhacks">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_ARB_multitexture>no</GL_ARB_multitexture>
+	  </UseExtension>
+	  <Win32>
+	    <DisableConsoleWindow>yes</DisableConsoleWindow>
+	  </Win32>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="texturecompression">
+      <Video>
+	<OpenGL>
+	  <TargetFormat>
+	    <GL_RGB>compressed</GL_RGB>
+	    <GL_RGBA>compressed</GL_RGBA>
+	    <GL_RGB5_A1>compressed</GL_RGB5_A1>
+	    <GL_RGBA8>compressed</GL_RGBA8>
+	  </TargetFormat>
+	</OpenGL>
+      </Video>
+    </config>
   </configs>
   <rules>
     <!-- rule description="Some more examples">
@@ -64,14 +88,29 @@
 	<usecfg>noaps</usecfg>
       </applicable>
     </rule>
-    <rule>
+    <rule description="Work around 3dfx Voodoo shortcomings">
       <conditions>
-	<comparever version="gl" relation="gt 1.3.666" />
+	<regexp string="vendor" pattern="^3dfx" />
       </conditions>
       <applicable>
+	<usecfg>3dfxhacks</usecfg>
       </applicable>
-      <notapplicable>
-      </notapplicable>
+    </rule>
+    <rule description="GeForce settings">
+      <conditions>
+	<regexp string="renderer" pattern="^GeForce" />
+      </conditions>
+      <applicable>
+	<usecfg>texturecompression</usecfg>
+      </applicable>
+    </rule>
+    <rule description="ATI r300+ settings">
+      <conditions>
+	<regexp string="renderer" pattern="^R\(ADEON\|adeon\) 9\(5\|6\|7\|8\)00" />
+      </conditions>
+      <applicable>
+	<usecfg>texturecompression</usecfg>
+      </applicable>
     </rule>
   </rules>
 </gldriverdb>

@@ -65,7 +65,11 @@ chronological order.
 	  and data/config/render3d/render3d.cfg.  Also fixed a couple other
 	  configuration file-related problems.
 	- res fixed regexp_impl.c to actually honor the result of the regexp 
-	  check.	
+	  check.
+	- res merged the old config/gl*.cfg configs into the the new driver 
+	  database and removed the old mechanism for driver-specific settings.
+	- res changed the driver DB implementation to report what rules have
+	  been applied.
 25-Feb-2004
 	- Fritz Elfert fixed the following lighting related crash in sprcal3d:
 	  Previously, csSpriteCal3DMeshObject managed a set of relevant lights

@@ -24,7 +24,6 @@ class csGraphics2DGLCommon;
 
 class csGLDriverDatabase
 {
-  void Report (int severity, const char* msg, ...);
 public:
   csGraphics2DGLCommon* ogl2d;
 
@@ -34,6 +33,8 @@ public:
 
   csGLDriverDatabase ();
   ~csGLDriverDatabase ();
+
+  void Report (int severity, const char* msg, ...);
 
   void Open (csGraphics2DGLCommon* ogl2d);
   void Close ();

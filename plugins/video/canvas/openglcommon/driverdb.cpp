@@ -406,6 +406,7 @@ bool csDriverDBReader::ParseRules (iDocumentNode* node)
 	  csRef<iDocumentNode> notapplicable = child->GetNode ("notapplicable");
 
 	  bool condTrue = true;
+	  bool applied = false;
 	  if (conditions.IsValid())
 	  {
 	    if (!ParseConditions (conditions, condTrue))
@@ -416,6 +417,7 @@ bool csDriverDBReader::ParseRules (iDocumentNode* node)
 	    if (applicable.IsValid ())
 	    {
 	      if (!Apply (applicable)) return false;
+	      applied = true;
 	    }
 	  }
 	  else
@@ -423,6 +425,16 @@ bool csDriverDBReader::ParseRules (iDocumentNode* node)
 	    if (notapplicable.IsValid ())
 	    {
 	      if (!Apply (notapplicable)) return false;
+	      applied = true;
+	    }
+	  }
+	  if (applied)
+	  {
+	    const char* descr = child->GetAttributeValue ("description");
+	    if (descr != 0)
+	    {
+	      db->Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"Applied: %s", descr);
 	    }
 	  }
 	}
