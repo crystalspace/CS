@@ -3,22 +3,29 @@ reversed so that new features are at the top.
 
 Short-term cleanups that need to be done:
 	- Resolve config/console/commandline mess.
-	  Several things are broken currently:
-	  	gamma
-		dmipmap1
-		...
+	  Several things are broken currently: gamma, dmipmap1, ...
 	- Add to API: absolute versions of Rotate and RotateWorld for csCamera.
 	- Resolve confusion with SetTexture() and SetTextureHandle(). We
 	  need to be consequent.
-	- Consider flattening many of the routines that are now structured as
-		csWorld
-			csSector
-				csPolygon
-				csThing
-					csPolygon
+	- Consider flattening many of the routines that are now structured to go
+	  through all the recursive object layers (csWorld, csSector, csThing, ...)
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+18-Jun-99:
+	- Fixed bug in shadow calculation for things. I think it is now
+	  correct. This basicly means that the new lighting algorithm is
+	  fully ready except for reflected light which has not been fully
+	  tested yet with regards to things (and will most probably not
+	  work fully) and also light frustrums which extend from a floating
+	  portal.
+	- Added 'L' key to autoexec.cfg. This creates a very large white
+	  dynamic light which casts shadows for things. It is very useful
+	  for testing dynamic lights.
+	- Added creation of bounding boxes to things (csPolygonSet but only
+	  used by things for now). Those bounding boxes are now also used by
+	  the lighting routines to optimize lighting even more (things which
+	  are not in the light frustrum are quickly rejected that way).
 17-Jun-99:
 	- Further optimizations on the new lighting system. Reordered a few
 	  relevant calculations to discover more rapidly when lighting should
@@ -43,6 +50,14 @@ Short-term cleanups that need to be done:
 	  to be cast from things.
 	- With this it is possible to see that the shadow calculation for
 	  things is still not completely correct.
+	- Thomas Hieber significantly cleaned up the 3D rasterizers so that
+	  handling of texture remapping is done in a common base class
+	  (csTextureMM).
+	- Thomas also changed the D3D renderer to use new gamma values that
+	  look much better.
+	- Thomas also implemented proper color keying for sprites and portals
+	  (for D3D).
+	- Some changes to VC project files from Thomas as well.
 16-Jun-99:
 	- Added CHK macro to many 'new' and 'delete' commands.
 	- Fixed memory debugger so that it works again.
