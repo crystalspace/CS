@@ -39,12 +39,12 @@ csDivX4::csDivX4 (iBase *pParent)
   bOK = false;
   decParam.buffers.mp4_edged_ref_buffers = 0;
   decParam.buffers.mp4_edged_for_buffers = 0;
-// PSW  decParam.buffers.mp4_edged_back_buffers = 0;
+  decParam.buffers.mp4_edged_back_buffers = 0;
   decParam.buffers.mp4_display_buffers = 0;
   decParam.buffers.mp4_state = 0;
   decParam.buffers.mp4_tables = 0;
   decParam.buffers.mp4_stream = 0;
-// PSW  decParam.buffers.mp4_reference = 0;
+  decParam.buffers.mp4_reference = 0;
   result = NULL;
 }
 
@@ -58,9 +58,9 @@ csDivX4::~csDivX4 ()
    
   free(decParam.buffers.mp4_display_buffers);
   free(decParam.buffers.mp4_edged_for_buffers);
-// PSW  free(decParam.buffers.mp4_edged_back_buffers);
+  free(decParam.buffers.mp4_edged_back_buffers);
   free(decParam.buffers.mp4_edged_ref_buffers);
-// PSW  free(decParam.buffers.mp4_reference);
+  free(decParam.buffers.mp4_reference);
   free(decParam.buffers.mp4_state);
   free(decParam.buffers.mp4_stream);
   free(decParam.buffers.mp4_tables);
@@ -88,17 +88,17 @@ bool csDivX4::Initialize (csStreamDescription *desc, uint8 *, uint32, uint8 *, u
     // the application allocates the data structures and the buffers
     decParam.buffers.mp4_edged_ref_buffers = malloc(decMemReqs.mp4_edged_ref_buffers_size);
     decParam.buffers.mp4_edged_for_buffers = malloc(decMemReqs.mp4_edged_for_buffers_size);
-// PSW    decParam.buffers.mp4_edged_back_buffers = malloc(decMemReqs.mp4_edged_back_buffers_size);
+    decParam.buffers.mp4_edged_back_buffers = malloc(decMemReqs.mp4_edged_back_buffers_size);
     decParam.buffers.mp4_display_buffers = malloc(decMemReqs.mp4_display_buffers_size);
     decParam.buffers.mp4_state = malloc(decMemReqs.mp4_state_size);
     decParam.buffers.mp4_tables = malloc(decMemReqs.mp4_tables_size);
     decParam.buffers.mp4_stream = malloc(decMemReqs.mp4_stream_size);
-// PSW    decParam.buffers.mp4_reference = malloc(decMemReqs.mp4_reference_size);
+    decParam.buffers.mp4_reference = malloc(decMemReqs.mp4_reference_size);
 
     memset(decParam.buffers.mp4_state, 0, decMemReqs.mp4_state_size);
     memset(decParam.buffers.mp4_tables, 0, decMemReqs.mp4_tables_size);
     memset(decParam.buffers.mp4_stream, 0, decMemReqs.mp4_stream_size);
-// PSW    memset(decParam.buffers.mp4_reference, 0, decMemReqs.mp4_reference_size);
+    memset(decParam.buffers.mp4_reference, 0, decMemReqs.mp4_reference_size);
     
     bOK = (decore ((unsigned long) this, DEC_OPT_INIT, &decParam, NULL) == DEC_OK);
     if (bOK)
