@@ -276,6 +276,14 @@ public:
    */
   csString& Format(const char *format, ...) CS_GNUC_PRINTF (2, 3);
 
+  /**
+   * Format this string using sprintf() formatting directives in a va_list.  Automatically
+   * allocates sufficient memory to hold result.  Newly formatted string
+   * overwrites previous string value.
+   */
+  csString& FormatV(const char *format, va_list args);
+
+
 #define STR_FORMAT(TYPE,FMT,SZ) \
   static csString Format (TYPE v);
   STR_FORMAT(short, %hd, 32)

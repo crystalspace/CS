@@ -216,32 +216,37 @@ csString &csString::Collapse()
   return *this;
 }
 
-csString &csString::Format(const char *format, ...)
+csString &csString::FormatV(const char *format, va_list args)
 {
-  va_list args;
-  va_start(args, format);
-
   if (Data == 0) // Ensure that backing-store exists prior to vsnprintf().
     SetCapacity(255);
 
   int rc = 0;
   while (1)
-  {
-    rc = cs_vsnprintf(Data, MaxSize, format, args);
-    // Buffer was big enough for entire string?
-    if (rc >= 0 && rc < (int)MaxSize)
-      break;
-    // Some vsnprintf()s return -1 on failure, others return desired capacity.
-    if (rc >= 0)
-      SetCapacity(rc); // SetCapacity() ensures room for null byte.
+    {
+      rc = cs_vsnprintf(Data, MaxSize, format, args);
+      // Buffer was big enough for entire string?
+      if (rc >= 0 && rc < (int)MaxSize)
+	break;
+      // Some vsnprintf()s return -1 on failure, others return desired capacity.
+      if (rc >= 0)
+	SetCapacity(rc); // SetCapacity() ensures room for null byte.
     else
       SetCapacity(MaxSize * 2 - 1);
-  }
-
+    }
   Size = rc;
+  return *this;
+}
+
+csString &csString::Format(const char *format, ...)
+{
+  va_list args;
+  va_start(args, format);
+
+  FormatV(format, args);
+
   va_end(args);
   return *this;
-
 }
 
 #define STR_FORMAT(TYPE,FMT,SZ) \
