@@ -162,7 +162,7 @@ bool csOpenGLProcSoftware::Prepare
   tex->GetMipMapDimensions (0, width, height);
 
   this->head_soft_tex = head_soft_tex;
-  if (!alone_hint && head_soft_tex->alone_mode)
+  if (!alone_hint && head_soft_tex && head_soft_tex->alone_mode)
   {
     // here we need to convert all procedural textures in the system to not
     // alone mode.
