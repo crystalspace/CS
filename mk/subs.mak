@@ -19,7 +19,7 @@ include mk/cache.mak
 
 ifeq ($(strip $(SUBMAKEFILES)),)
   SUBMAKEFILES = $(sort \
-    docs/docs.mak mk/install.mak mk/msvcgen/msvcgen.mak mk/static.mak \
+    docs/docs.mak mk/install.mak mk/msvcgen/msvcgen.mak mk/msvcgen/msvc7gen.mak mk/static.mak \
     $(wildcard $(addsuffix /*.mak,$(addprefix plugins/,$(sort $(PLUGINS)))) \
     scripts/cs-config/csconf.mak \
     apps/*/*.mak \
