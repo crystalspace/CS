@@ -50,6 +50,7 @@
 #include "iutil/virtclk.h"
 #include "ivaria/reporter.h"
 #include "isys/plugin.h"
+#include "isys/vfs.h"
 
 //------------------------------------------------- We need the 3D engine -----
 
