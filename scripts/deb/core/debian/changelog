@@ -1,8 +1,29 @@
-crystalspace (0.96-20030709-4) unstable; urgency=low
+crystalspace (0.96-20030714-2) unstable; urgency=low
+
+  * Stupid error in configure options 
+
+ -- Christian Bayle <bayle@debian.org>  Mon, 14 Jul 2003 21:02:15 +0200
+
+crystalspace (0.96-20030714-1) unstable; urgency=low
 
   * New build from fresh cvs
 
  -- Christian Bayle <bayle@debian.org>  Wed,  9 Jul 2003 21:48:09 +0200
+
+crystalspace (0.96-20030609-5) unstable; urgency=low
+
+  * Removed support for lib3ds and libode on hppa and alpha
+  This always to try to (Closes: bug#198921)
+
+ -- Christian Bayle <bayle@debian.org>  Mon, 14 Jul 2003 03:53:01 +0200
+
+crystalspace (0.96-20030609-4) unstable; urgency=low
+
+  * Readd 3ds support, since I NMUed lib3ds to compile with -fPIC on hppa
+  and alpha, hope this will (Closes: bug#198921)
+  * Don't try to rmdir a symlink (Closes: bug#198776) 
+
+ -- Christian Bayle <bayle@debian.org>  Wed,  9 Jul 2003 18:13:05 +0200
 
 crystalspace (0.96-20030609-3) unstable; urgency=low
 
