@@ -115,6 +115,7 @@ public:
       candidate);
   }
 
+
   /**
    * Insert an element at a sorted position.
    * Assumes array is already sorted.
@@ -125,8 +126,9 @@ public:
     int(*cf)(char const* const&, char const* const&) =
       case_sensitive ? CaseSensitiveCompare : CaseInsensitiveCompare;
     return superclass::InsertSorted (item,
-    	csArrayCmp<char const*, char const*>(item, cf), equal_index);
+    	cf, equal_index);
   }
+
 
   /**
    * Pop an element from tail end of array.  Caller is responsible for
