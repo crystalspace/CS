@@ -206,7 +206,6 @@ their targets directly.  For instance:
 
 @example
 make walktest  # @r{Builds @code{walktest}, the map exploration program}
-make blocks    # @r{Builds @code{blocks}, the 3D-Tetris style game}
 make glosx2d   # @r{Builds @code{glosx2d}, the MacOS/X OpenGL 2D driver}
 make gl3d      # @r{Builds @code{gl3d}, the OpenGL renderer}
 @end example
@@ -343,7 +342,7 @@ named @samp{castle}, add the following line to @file{user.cfg}:
 Walktest.Settings.WorldFile = castle
 @end example
 
-Other interesting applications, such as Blocks and csDemo, also come with
+Other interesting applications, such as csDemo, also come with
 Crystal Space.
 
 By default, Crystal Space renders the 3D scenes with the OpenGL renderer.  It
@@ -385,9 +384,9 @@ Global.Video.FullScreen = yes
 @end example
 
 It is also possible to enable full-screen mode selectively only for certain
-applications.  For example, to enable full-screen mode only for the Blocks
-game by default, you could add this line to @file{user.cfg}:
+applications.  For example, to enable full-screen mode only for CsDemo
+by default, you could add this line to @file{user.cfg}:
 
 @example
-Blocks.Video.FullScreen = yes
+CsDemo.Video.FullScreen = yes
 @end example

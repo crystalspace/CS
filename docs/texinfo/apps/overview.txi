@@ -16,11 +16,6 @@ particular application may be found in subsequent sections.
 @item 3ds2lev
 A @sc{3ds} to Crystal Space map converter (work in progress!).
 
-@cindex @file{blocks}
-@cindex Applications, @file{blocks}
-@item blocks
-A falling blocks game.  (Think 3D Tetris.).
-
 @cindex @file{csdemo}
 @cindex Applications, @file{csdemo}
 @item csdemo

@@ -113,6 +113,7 @@ The history order is reversed so that new features are at the top.
 	  cleaned the code up there.
 	- Jorrit removed Blocks from CS. Blocks is now a seperate project
 	  (http://sf.net/projects/blocks3d).
+	- Jorrit removed several entries to Blocks from the documentation.
 	- acraig fixed the csList<T>::Delete() to use pre-increment.
 	- res started to fix the incomplete shader variable stuff. The shader
 	  manager compiles+links now, at least.

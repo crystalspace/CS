@@ -39,7 +39,7 @@ for the platform which you are using.  Some of the supported compilers are
 
 @itemize @minus
 @item
-A compiled executable program such as @file{walktest} or @file{blocks}, for
+A compiled executable program such as @file{walktest} or @file{csdemo}, for
 example.  These are demo programs included in the main source archive.
 
 Note that there exist two types of executables: statically linked and

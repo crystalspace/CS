@@ -200,7 +200,6 @@ Submakefiles for applications located last, using the search mask
 
 @example
 (~/CS)% ls apps/*/*.mak
-apps/blocks/blocks.mak          apps/mazed/mazed.mak
 apps/map2cs/map2cs.mak          apps/simple/simple.mak
 apps/levtool/levtool.mak        apps/walktest/walktest.mak
 @end example
