@@ -106,14 +106,55 @@ internet via proxy server, please select that option and enter the necessary inf
 @picturessss{build,platform,win32,cygwin,cygshot6}
 @end ifnotinfo
 
+After choosing your internet connection type, click on the @emph{Next} button to continue.
+
+The next dialog you will see is the @emph{Choose A Download Site} dialog - See screenshot
+below. Ok, you all I hope know to choose a download location in or as close to your own
+country as possible. As I am in th United Kingdom, I choose one in my own country to
+download from.
+
 @ifnotinfo
 @picturessss{build,platform,win32,cygwin,cygshot7}
 @end ifnotinfo
+
+After choosing your closest dowload location, click on the @emph{Next} button
+to continue.
+
+The next dialog you will see is the @emph{Select Packages To Install} dialog - See
+screenshot below. As you see the installer is a tree with selectable packages in the
+branches. While we would suggest installing the vast majority of the tools if you have
+enough hard disk space. However key packages you need are all those in the @emph{Devel}
+branch and at a minimum @emph{libjpeg}, @emph{libpng}, @emph{opengl}, @emph{python},
+@emph{win32api} and @emph{zlib} from the @emph{Libs} branch.
 
 @ifnotinfo
 @picturessss{build,platform,win32,cygwin,cygshot8}
 @end ifnotinfo
 
+Note: You do not need to install the @emph{apache server}, @emph{Xfree} or @emph{Games}.
+Also if you miss anything first time round you can merely repeat the install process and
+pick-up and install the package(s) you miss.
+
+Important: The above @emph{Select Packages To Install} section is subject to change. It
+is a preliminary version only.
+
+After choosing the packages for installing, click on the @emph{Next} button to continue.
+
+At this point the installer will download and install the selected packages and perform
+post build steps i.e. generating documentation etc. If you see command windows appear.
+Do not worry.
+
+The next dialog you will see is the @emph{Create Icons} dialog - See screenshot below.
+If you are doing a fresh install and want these icons please check the boxes. If you are
+updating you need not check the boxes if you already have the icons.
+
 @ifnotinfo
 @picturessss{build,platform,win32,cygwin,cygshot9}
 @end ifnotinfo
+
+After making your selection, click on the @emph{Finish} button to continue.
+
+After all this you will be prompted with a dialog to tell you that the installation is
+complete. Click on the @emph{Ok} button to finish the install process.
+
+@subsubheading Installing DirectX 8 SDK for Cygwin
