@@ -764,6 +764,8 @@ void csEmitMeshObject::MoveAgeParticle (int i, int elapsed, float delta_t)
     col = between*belowage->color + invbet*aboveage->color;
   }
   // adjust the particle
+  // Jorrit: @@@ This fix is needed or we sometimes get a division by zero!
+  if (ABS (oldscale) < .0001) oldscale = 1;
   GetParticle(i)->ScaleBy(newscale / oldscale);
   GetParticle(i)->Rotate(rotspeed * delta_t);
   if(MixMode & CS_FX_ADD)
