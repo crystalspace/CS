@@ -29,29 +29,25 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/physics/odedynam
-
-LIB.EXTERNAL.odedynam = $(ODE.LFLAGS)
-
 ifeq ($(USE_PLUGINS),yes)
-  odedynam = $(OUTDLL)/odedynam$(DLL)
-  LIB.odedynam = $(foreach d,$(DEP.odedynam),$($d.LIB))
-  TO_INSTALL.DYNAMIC_LIBS += $(odedynam)
+  ODEDYNAM = $(OUTDLL)/odedynam$(DLL)
+  LIB.ODEDYNAM = $(foreach d,$(DEP.ODEDYNAM),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(ODEDYNAM)
 else
-  odedynam = $(OUT)/$(LIB_PREFIX)odedynam$(LIB)
-  DEP.EXE += $(odedynam)
+  ODEDYNAM = $(OUT)/$(LIB_PREFIX)odedynam$(LIB)
+  DEP.EXE += $(ODEDYNAM)
   SCF.STATIC += odedynam
-  TO_INSTALL.STATIC_LIBS += $(odedynam)
+  TO_INSTALL.STATIC_LIBS += $(ODEDYNAM)
 endif
 
-INC.odedynam = $(wildcard plugins/physics/odedynam/*.h)
-SRC.odedynam = $(wildcard plugins/physics/odedynam/*.cpp)
-OBJ.odedynam = $(addprefix $(OUT)/,$(notdir $(SRC.odedynam:.cpp=$O)))
-DEP.odedynam = CSGEOM CSUTIL CSSYS
+INC.ODEDYNAM = $(wildcard plugins/physics/odedynam/*.h)
+SRC.ODEDYNAM = $(wildcard plugins/physics/odedynam/*.cpp)
+OBJ.ODEDYNAM = $(addprefix $(OUT)/,$(notdir $(SRC.ODEDYNAM:.cpp=$O)))
+DEP.ODEDYNAM = CSGEOM CSUTIL CSSYS
 
 MSVC.DSP += odedynam
-DSP.odedynam.NAME = odedynam
-DSP.odedynam.TYPE = plugin
+DSP.ODEDYNAM.NAME = odedynam
+DSP.ODEDYNAM.TYPE = plugin
 DSP.odedynam.LIBS = ode
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -60,19 +56,21 @@ endif # ifeq ($(MAKESECTION),postdefines)
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: odedynam odedynamclean
+odedynam: $(OUTDIRS) $(ODEDYNAM)
 
-odedynam: $(OUTDIRS) $(odedynam)
+$(OUT)/%$O: plugins/physics/odedynam/%.cpp
+	$(DO.COMPILE.CPP) $(ODE.CFLAGS)
 
-$(odedynam): $(OBJ.odedynam) $(LIB.odedynam)
-	$(DO.PLUGIN) $(LIB.EXTERNAL.odedynam)
+$(ODEDYNAM): $(OBJ.ODEDYNAM) $(LIB.ODEDYNAM)
+	$(DO.PLUGIN) $(ODE.LFLAGS)
 
 clean: odedynamclean
 odedynamclean:
-	$(RM) $(odedynam) $(OBJ.odedynam)
+	$(RM) $(ODEDYNAM) $(OBJ.ODEDYNAM)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/odedynam.dep
-$(OUTOS)/odedynam.dep: $(SRC.odedynam)
+$(OUTOS)/odedynam.dep: $(SRC.ODEDYNAM)
 	$(DO.DEP)
 else
 -include $(OUTOS)/odedynam.dep

@@ -26,8 +26,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/sound/loader/mod
-
 ifeq ($(USE_PLUGINS),yes)
   SNDMOD = $(OUTDLL)/sndmod$(DLL)
   LIB.SNDMOD = $(foreach d,$(DEP.SNDMOD),$($d.LIB))
@@ -55,8 +53,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: sndmod sndmodclean
-
 sndmod: $(OUTDIRS) $(SNDMOD)
+
+$(OUT)/%$O: plugins/sound/loader/mod/%.cpp
+	$(DO.COMPILE.CPP) $(MIKMOD.CFLAGS)
 
 $(SNDMOD): $(OBJ.SNDMOD) $(LIB.SNDMOD)
 	$(DO.PLUGIN) $(MIKMOD.LFLAGS)

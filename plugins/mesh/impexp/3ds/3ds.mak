@@ -22,8 +22,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/impexp/3ds
-
 ifeq ($(USE_PLUGINS),yes)
   IE3DS = $(OUTDLL)/ie3ds$(DLL)
   LIB.IE3DS = $(foreach d,$(DEP.IE3DS),$($d.LIB))
@@ -54,6 +52,9 @@ ie3ds: $(OUTDIRS) $(IE3DS)
 
 $(IE3DS): $(OBJ.IE3DS) $(LIB.IE3DS)
 	$(DO.PLUGIN) $(3DS.LFLAGS)
+
+$(OUT)/%$O: plugins/mesh/impexp/3ds/%.cpp
+	$(DO.COMPILE.CPP) $(3DS.CFLAGS)
 
 clean: ie3dsclean
 ie3dsclean:
