@@ -65,10 +65,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: glx2d glxclean
+.PHONY: glx2d glx2dclean
 
 # Chain rules
-clean: glxclean
+clean: glx2dclean
 
 glx2d: $(OUTDIRS) $(GLX2D)
 
