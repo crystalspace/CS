@@ -198,20 +198,20 @@ using namespace Opcode;
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 RayCollider::RayCollider()
- :	mNbRayBVTests		(0),
-	mNbRayPrimTests		(0),
-	mNbIntersections	(0),
-	mClosestHit			(false),
-	mCulling			(true),
+ :  mStabbedFaces		(null),
 #ifdef OPC_USE_CALLBACKS
-	mUserData			(0),
-	mObjCallback		(null),
+	mUserData			    (0),
+	mObjCallback		  (null),
 #else
-	mFaces				(null),
-	mVerts				(null),
+	mFaces				    (null),
+	mVerts				    (null),
 #endif
-	mStabbedFaces		(null),
-	mMaxDist			(MAX_FLOAT)
+  mNbRayBVTests		  (0),
+	mNbRayPrimTests		(0),
+  mNbIntersections	(0),
+  mMaxDist			    (MAX_FLOAT),
+	mClosestHit			  (false),
+	mCulling			    (true)
 {
 }
 
