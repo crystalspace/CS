@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "cssys/sysdriv.h"
 #include "csws/csws.h"
+#include "version.h"
 #include "ifontsrv.h"
 #include "icfgfile.h"
 
