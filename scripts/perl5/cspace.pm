@@ -2777,6 +2777,7 @@ package cspace::csInitializer;
 *CreateEventQueue = *cspacec::csInitializer_CreateEventQueue;
 *CreateVirtualClock = *cspacec::csInitializer_CreateVirtualClock;
 *CreateCommandLineParser = *cspacec::csInitializer_CreateCommandLineParser;
+*CreateVerbosityManager = *cspacec::csInitializer_CreateVerbosityManager;
 *CreateConfigManager = *cspacec::csInitializer_CreateConfigManager;
 *CreateInputDrivers = *cspacec::csInitializer_CreateInputDrivers;
 *CreateStringSet = *cspacec::csInitializer_CreateStringSet;
