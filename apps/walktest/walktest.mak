@@ -1,7 +1,7 @@
 # Application description
 DESCRIPTION.walk = Crystal Space WalkTest demo executable
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
@@ -9,10 +9,10 @@ APPHELP += $(NEWLINE)echo $"  make walk         Make the $(DESCRIPTION.walk)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: walk
+.PHONY: walk walkclean
 
 all apps: walk
 walk:
@@ -22,7 +22,7 @@ walkclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/walktest apps/support
@@ -35,7 +35,7 @@ DESCRIPTION.$(WALKTEST.EXE) = $(DESCRIPTION.walk)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: walk walkclean
@@ -45,13 +45,13 @@ walk: $(OUTDIRS) $(WALKTEST.EXE)
 clean: walkclean
 
 $(WALKTEST.EXE): $(DEP.EXE) $(OBJ.WALKTEST) \
-  $(CSTOOLS.LIB) $(CSPARSER.LIB) $(CSENGINE.LIB) $(CSTERR.LIB) $(CSSCRIPT.LIB) \
-  $(CSGEOM.LIB) $(CSSFXLDR.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB) \
-  $(CSOBJECT.LIB)
+  $(CSTOOLS.LIB) $(CSPARSER.LIB) $(CSENGINE.LIB) $(CSTERR.LIB) \
+  $(CSSCRIPT.LIB) $(CSGEOM.LIB) $(CSSFXLDR.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) \
+  $(CSSYS.LIB) $(CSOBJECT.LIB)
 	$(DO.LINK.EXE)
 
 walkclean:
-	-$(RM) $(WALKTEST.EXE) $(OBJ.WALKTEST)
+	-$(RM) $(WALKTEST.EXE) $(OBJ.WALKTEST) $(OUTOS)walktest.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)walktest.dep
