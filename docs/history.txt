@@ -35,6 +35,9 @@ chronological order.
 	  by avoiding the two iterator loops over the render priorities.
 	- Jorrit considerably optimized the generic render loop by avoiding
 	  an unneeded csArray for keeping the sorted meshes.
+	- Jorrit did another small optimization to avoid the construction
+	  of the dynDomain array if the material didn't change (in
+	  csGenericRenderStep::RenderMeshes).
 8-Jan-2004
 	- Jorrit moved include/ivideo/rendersteps directory to
 	  include/iengine/rendersteps. Apparently this was forgotten during

@@ -1667,10 +1667,11 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
     indexbuf->Release();
   }
 
-  if(mymesh->meshtype == CS_MESHTYPE_POINT_SPRITES) {
-      //statecache->Enable_GL_TEXTURE_2D ();
-      glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE);
-      glDisable(GL_POINT_SPRITE_ARB);
+  if (mymesh->meshtype == CS_MESHTYPE_POINT_SPRITES)
+  {
+    //statecache->Enable_GL_TEXTURE_2D ();
+    glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE);
+    glDisable(GL_POINT_SPRITE_ARB);
   }
 
   //if (clip_planes_enabled)

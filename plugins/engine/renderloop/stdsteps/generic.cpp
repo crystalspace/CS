@@ -182,12 +182,18 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
     shader->ActivatePass (p);
 
     int j;
+    iMaterialWrapper* material = 0;
     for (j = 0; j < num; j++)
     {
-      dynDomain.Empty ();
       csRenderMesh* mesh = meshes[j];
-      dynDomain.Push (shaderManager);
-      dynDomain.Push (mesh->material->GetMaterial ());
+      iMaterialWrapper* mesh_material = mesh->material;
+      if (mesh_material != material)
+      {
+	material = mesh_material;
+        dynDomain.Empty ();
+        dynDomain.Push (shaderManager);
+        dynDomain.Push (mesh_material->GetMaterial ());
+      }
 
       shader->SetupPass (mesh, dynDomain);
       g3d->DrawMesh (mesh);
