@@ -31,6 +31,7 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine applied a more correct fix to SCF following Jorrit's
 	  patch today.  DECLARE_FAST_INTERFACE() now correctly employs the
 	  opaque scfInterfaceID rather than uint32.
+	- Eric Sunshine removed the now obsolete DO_COREDUMP makefile variable.
 11-Jun-2001
 	- Created a new 'bugplug' plugin. This plugin will give debugging
 	  functionality to any CS app. To use it just add the following

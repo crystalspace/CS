@@ -92,9 +92,6 @@ endif
 ifeq ($(CS_NO_QSQRT),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_NO_QSQRT$">>volatile.tmp
 endif
-ifeq ($(DO_COREDUMP),yes)
-  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_COREDUMP$">>volatile.tmp
-endif
 ifdef CS_LITTLE_ENDIAN
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_LITTLE_ENDIAN$">>volatile.tmp
 endif

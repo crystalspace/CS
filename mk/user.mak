@@ -108,10 +108,6 @@ DO_ASM=yes
 # If "yes" include MMX support in software renderer
 DO_MMX=yes
 
-# If "yes", then in UNIX create core dumps on crash.
-# Be warned, they are large (> 20MB)!
-DO_COREDUMP=no
-
 # Set to 1 to use Mesa instead of "real" OpenGL.  You can define MESA_PATH
 # variable in environment to point to MesaGL base path. If Mesa is not
 # used then you can use OPENGL_PATH to point to the base of the OpenGL
