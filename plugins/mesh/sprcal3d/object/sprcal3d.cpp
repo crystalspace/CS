@@ -41,7 +41,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/csmd5.h"
 #include "iengine/mesh.h"
 #include "csutil/csendian.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 
 // STL include required by cal3d
 #include <string>

@@ -29,7 +29,7 @@
 #include "csgeom/vector3.h"
 #include "csgeom/frustum.h"
 #include "csutil/csppulse.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #include "igraphic/image.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"

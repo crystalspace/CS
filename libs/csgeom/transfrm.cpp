@@ -20,7 +20,7 @@
 #include "cssysdef.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/transfrm.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 
 //---------------------------------------------------------------------------
 csTransform csTransform::GetReflect (const csPlane3 &pl)

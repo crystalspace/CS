@@ -47,7 +47,7 @@
 #include "iutil/strset.h"
 #include "genmesh.h"
 
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 
 #include "ivideo/rendermesh.h"
 

@@ -40,7 +40,7 @@
 #include "terrvis.h"
 #include "terrdiv.h"
 #include "csqint.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 
 CS_IMPLEMENT_PLUGIN
 

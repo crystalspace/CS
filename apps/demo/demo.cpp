@@ -66,7 +66,7 @@
 #include "csutil/stringarray.h"
 #include "igraphic/imageio.h"
 #include "ivaria/reporter.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #include "csutil/event.h"
 
 CS_IMPLEMENT_APPLICATION

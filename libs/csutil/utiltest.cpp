@@ -18,7 +18,7 @@
 
 #include "cssysdef.h"
 #include "csqint.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #include "csutil/utiltest.h"
 #include "csutil/xmltiny.h"
 #include "iutil/document.h"

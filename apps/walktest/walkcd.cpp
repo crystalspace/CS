@@ -20,7 +20,7 @@
 #include "walktest.h"
 #include "infmaze.h"
 #include "csqint.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #include "csgeom/frustum.h"
 #include "igeom/objmodel.h"
 #include "igeom/polymesh.h"

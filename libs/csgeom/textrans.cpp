@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
 #include "csgeom/textrans.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 
 //---------------------------------------------------------------------------
 void csTextureTrans::compute_texture_space (

@@ -19,7 +19,7 @@
 
 #include "cssysdef.h"
 #include "csqint.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #include "csutil/csstring.h"
 #include "csutil/hashmap.h"
 #include "csutil/csppulse.h"

@@ -29,7 +29,7 @@
 #include "cstool/initapp.h"
 #include "ivaria/reporter.h"
 #include "csqint.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #include "csgeom/polyaa.h"
 #include "csgeom/vector2.h"
 

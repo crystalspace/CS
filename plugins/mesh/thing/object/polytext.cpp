@@ -18,7 +18,7 @@
 #include <math.h>
 #include "cssysdef.h"
 #include "csqint.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/polyaa.h"
 #include "csgeom/poly3d.h"

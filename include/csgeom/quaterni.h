@@ -29,7 +29,7 @@
 
 #include "csgeom/math3d.h"
 #include "csgeom/matrix3.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 
 /**
  * Class for a quaternion.

@@ -21,7 +21,7 @@
 #include "csgeom/vector3.h"
 #include "rapcol.h"
 #include "prapid.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 
 /**
  * Located in eigen.cpp, this function returns the eigenvectors of M,

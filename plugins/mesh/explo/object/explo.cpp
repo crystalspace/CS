@@ -25,7 +25,7 @@
 #include "ivideo/material.h"
 #include "iengine/material.h"
 #include "iengine/engine.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #include <math.h>
 #include <stdlib.h>
 

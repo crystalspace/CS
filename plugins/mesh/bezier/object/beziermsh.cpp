@@ -54,7 +54,7 @@
 #include "iutil/cmdline.h"
 #include "iengine/rview.h"
 #include "iengine/fview.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #include "ivideo/graph3d.h"
 #include "ivaria/reporter.h"
 

@@ -31,7 +31,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "ivideo/vbufmgr.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 
 struct iEngine;
 struct iMaterialWrapper;

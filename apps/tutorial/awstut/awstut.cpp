@@ -25,7 +25,7 @@
 #include "csgeom/csrectrg.h"
 #include "cstool/csfxscr.h"
 #include "cstool/initapp.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #include "csutil/event.h"
 
 #include "ivideo/graph3d.h"

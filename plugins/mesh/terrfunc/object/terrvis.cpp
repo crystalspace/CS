@@ -25,7 +25,7 @@
 #include "csutil/garray.h"
 #include "terrvis.h"
 #include "csqint.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 
 //------------------------------------------------------------------------
 

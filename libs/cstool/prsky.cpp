@@ -21,7 +21,7 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #include "csqint.h"
 #include "csgeom/matrix3.h"
 #include "iutil/objreg.h"

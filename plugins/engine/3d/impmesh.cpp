@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #include "plugins/engine/3d/impmesh.h"
 #include "plugins/engine/3d/sector.h"
 #include "plugins/engine/3d/meshobj.h"

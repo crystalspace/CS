@@ -33,7 +33,7 @@
 #include "iengine/engine.h"
 #include "imesh/object.h"
 #include "csgeom/obb.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 
 #include "odedynam.h"
 

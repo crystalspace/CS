@@ -21,7 +21,7 @@
 #include <float.h>
 #include "cssysdef.h"
 #include "csqint.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math3d_d.h"
 #include "csgeom/matrix3.h"

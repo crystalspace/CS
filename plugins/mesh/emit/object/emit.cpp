@@ -25,7 +25,7 @@
 #include "iengine/rview.h"
 #include "iengine/camera.h"
 #include "iengine/movable.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #include "csqint.h"
 #include "csgeom/math3d.h"
 #include "csutil/garray.h"

@@ -20,7 +20,7 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "terrdiv.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 
 //-------------- csTerrainQuadDiv ------------------------------
 csTerrainQuadDiv::csTerrainQuadDiv(int depth)

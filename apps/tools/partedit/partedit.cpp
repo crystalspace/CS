@@ -49,7 +49,7 @@
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 #include "csutil/cmdhelp.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #include "csutil/event.h"
 
 #include "imesh/emit.h"

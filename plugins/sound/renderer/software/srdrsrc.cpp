@@ -24,7 +24,7 @@
 #include "srdrsrc.h"
 #include "srdrcom.h"
 #include "sndhdl.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 
 SCF_IMPLEMENT_IBASE(csSoundSourceSoftware)
   SCF_IMPLEMENTS_INTERFACE(iSoundSource)

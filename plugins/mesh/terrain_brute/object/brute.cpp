@@ -36,7 +36,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iutil/objreg.h"
 #include "iutil/vfs.h"
 #include "brute.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 
 CS_IMPLEMENT_PLUGIN
 

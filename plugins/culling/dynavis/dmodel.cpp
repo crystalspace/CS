@@ -20,7 +20,7 @@
 #include "csutil/scfstr.h"
 #include "iutil/string.h"
 #include "csqint.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #include "csgeom/math3d.h"
 #include "csgeom/pmtools.h"
 #include "igeom/objmodel.h"

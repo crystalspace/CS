@@ -33,7 +33,7 @@
 #include "csgeom/csrect.h"
 #include "csutil/cmdhelp.h"
 #include "csutil/util.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 
 CS_IMPLEMENT_APPLICATION
 

@@ -53,7 +53,7 @@
 // quick int and sqrt
 #ifndef NO_CSQINTQSQRT
 #include "csqint.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #endif
 
 // SCF

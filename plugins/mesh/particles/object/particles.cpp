@@ -37,7 +37,7 @@
 #include "csutil/randomgen.h"
 #include "csutil/util.h"
 
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #include "csqint.h"
 
 #include "particles.h"

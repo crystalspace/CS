@@ -34,7 +34,7 @@
 #include "iengine/light.h"
 #include "iutil/objreg.h"
 #include "spr2d.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 
 CS_IMPLEMENT_PLUGIN
 

@@ -16,7 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #include "csgeom/frustum.h"
 #include "plugins/engine/3d/light.h"
 #include "plugins/engine/3d/sector.h"

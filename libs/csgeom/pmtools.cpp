@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #include "csutil/hash.h"
 #include "csgeom/vector3.h"
 #include "csgeom/plane3.h"

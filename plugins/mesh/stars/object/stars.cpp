@@ -30,7 +30,7 @@
 #include "igeom/clip2d.h"
 #include "iengine/engine.h"
 #include "iengine/light.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #include "csqint.h"
 
 CS_IMPLEMENT_PLUGIN

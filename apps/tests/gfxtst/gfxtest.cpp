@@ -35,7 +35,7 @@
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
 #include "csutil/cmdhelp.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 
 #include <string.h>
 

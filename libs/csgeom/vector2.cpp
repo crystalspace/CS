@@ -18,7 +18,7 @@
 */
 #include <math.h>
 #include "cssysdef.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #include "csgeom/vector2.h"
 
 //---------------------------------------------------------------------------

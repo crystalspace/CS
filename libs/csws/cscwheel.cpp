@@ -21,7 +21,7 @@
 #include "csws/cscwheel.h"
 #include "csws/csapp.h"
 #include "csws/cswsaux.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 
 #define COLORWHEEL_TEXTURE_NAME	"csws::ColorWheel"
 

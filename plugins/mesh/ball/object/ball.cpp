@@ -33,7 +33,7 @@
 #include "iutil/objreg.h"
 #include "ball.h"
 
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #include "iutil/strset.h"
 
 //#define BALL_DEBUG

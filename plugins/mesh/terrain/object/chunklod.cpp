@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 
 #include "iutil/cache.h"
 #include "iutil/object.h"

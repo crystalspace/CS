@@ -20,7 +20,7 @@
 #include <float.h>
 #include "cssysdef.h"
 #include "csqint.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #include "csgeom/vector3.h"
 
 //---------------------------------------------------------------------------

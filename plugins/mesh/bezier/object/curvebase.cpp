@@ -18,7 +18,7 @@
 */
 #include "cssysdef.h"
 #include "csqint.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #include "bezier2.h"
 #include "curvebase.h"
 #include "beziermsh.h"

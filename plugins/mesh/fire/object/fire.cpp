@@ -26,7 +26,7 @@
 #include "iengine/light.h"
 #include "iengine/sector.h"
 #include "iengine/engine.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #include <math.h>
 #include <stdlib.h>
 

@@ -29,7 +29,7 @@
 #include "iutil/databuff.h"
 #include "iutil/vfs.h"
 #include "csutil/xmltiny.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 
 // Define all tokens used through this file
 enum

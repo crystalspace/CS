@@ -60,7 +60,7 @@
 #include "csutil/util.h"
 #include "csgfx/rgbpixel.h"
 #include "csgfx/memimage.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 
 #include "ieffects/efserver.h"
 #include "ieffects/efdef.h"

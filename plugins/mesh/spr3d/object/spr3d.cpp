@@ -41,7 +41,7 @@
 #include "iengine/mesh.h"
 #include "csutil/csendian.h"
 #include "cstool/rbuflock.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 
 CS_IMPLEMENT_STATIC_CLASSVAR (csSprite3DMeshObject, mesh, GetLODMesh, csTriangleMesh, ())
 

@@ -22,7 +22,7 @@
 #include "iutil/string.h"
 #include "ivaria/bugplug.h"
 #include "csqint.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #include "csgeom/box.h"
 #include "csgeom/math3d.h"
 #include "csgeom/csrect.h"

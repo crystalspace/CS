@@ -32,7 +32,7 @@
 #include "csgeom/matrix2.h"
 #include "csgeom/poly3d.h"
 #include "csqint.h"
-#include "cscsQsqrt.h"
+#include "csqsqrt.h"
 #include "iengine/texture.h"
 #include "iengine/material.h"
 #include "iengine/light.h"
