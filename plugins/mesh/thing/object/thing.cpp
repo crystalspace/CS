@@ -1499,6 +1499,10 @@ bool csThingStatic::IsPolygonTransparent (int polygon_idx)
   return static_polygons[GetRealIndex (polygon_idx)]->IsTransparent ();
 }
 
+bool csThingStatic::PointOnPolygon (int polygon_idx, const csVector3& v)
+{
+  return static_polygons[GetRealIndex (polygon_idx)]->PointOnPolygon (v);
+}
 
 //----------------------------------------------------------------------------
 

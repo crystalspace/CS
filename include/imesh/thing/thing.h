@@ -517,6 +517,14 @@ struct iThingFactoryState : public iBase
    */
   virtual bool IsPolygonTransparent (int polygon_idx) = 0;
 
+  /**
+   * Return true if an object space point is on (or very nearly on)
+   * the given polygon.
+   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last
+   * created polygon.
+   */
+  virtual bool PointOnPolygon (int polygon_idx, const csVector3& v) = 0;
+
   /// Query number of vertices in set
   virtual int GetVertexCount () const = 0;
   /// Get the given vertex coordinates in object space

@@ -484,8 +484,10 @@ public:
   virtual void SetPolygonTextureMappingEnabled (const csPolygonRange& range,
   	bool enabled);
   virtual bool IsPolygonTextureMappingEnabled (int polygon_idx) const;
+  virtual bool PointOnPolygon (int polygon_idx, const csVector3& v);
   virtual void SetPolygonFlags (const csPolygonRange& range, uint32 flags);
-  virtual void SetPolygonFlags (const csPolygonRange& range, uint32 mask, uint32 flags);
+  virtual void SetPolygonFlags (const csPolygonRange& range, uint32 mask,
+  	uint32 flags);
   virtual void ResetPolygonFlags (const csPolygonRange& range, uint32 flags);
   virtual csFlags& GetPolygonFlags (int polygon_idx);
   virtual const csPlane3& GetPolygonObjectPlane (int polygon_idx);
