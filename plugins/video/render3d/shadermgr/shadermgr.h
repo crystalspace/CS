@@ -73,9 +73,13 @@ public:
   /// Add a variable to this context
   virtual bool AddVariable(iShaderVariable* variable) ;
   /// Get variable
-  virtual iShaderVariable* GetVariable(int namehash);
-  /// Get all variable stringnames added to this context (used when creatingthem)
-  virtual csBasicVector GetAllVariableNames() ; 
+  virtual iShaderVariable* GetVariable(int namehash)
+  { return privateGetVariable (namehash); }
+  /// Get all variable stringnames in this context (used when creatingthem)
+  virtual csBasicVector GetAllVariableNames(); 
+
+  /// Private variable to get the variable without virtual call
+  inline iShaderVariable* privateGetVariable (int namehash);
 
 /// Create a shaderprogram
   virtual csPtr<iShaderProgram> CreateShaderProgram(const char* type);
@@ -172,9 +176,14 @@ public:
   /// Add a variable to this context
   virtual bool AddVariable(iShaderVariable* variable);
   /// Get variable
-  virtual iShaderVariable* GetVariable(int namehash);
+  virtual iShaderVariable* GetVariable(int namehash)
+  { return privateGetVariable (namehash); }
   /// Get all variable stringnames in this context (used when creatingthem)
   virtual csBasicVector GetAllVariableNames(); 
+
+  /// Private variable to get the variable without virtual call
+  inline iShaderVariable* privateGetVariable (int namehash);
+
 
   /// Loads a shader from buffer
   virtual bool Load(iDataBuffer* program);
@@ -309,9 +318,9 @@ public:
   virtual ~csShaderPass () {}
 
   /// Add a stream mapping
-  virtual void AddStreamMapping (csStringID name, int attribute);
+  virtual void AddStreamMapping (csStringID name, csVertexAttrib attribute);
   /// Get stream mapping for a certain attribute
-  virtual csStringID GetStreamMapping (int attribute);
+  virtual csStringID GetStreamMapping (csVertexAttrib attribute);
 
   /// Add a texture mapping by name
   virtual void AddTextureMapping (const char* name, int unit);
@@ -356,11 +365,15 @@ public:
   /// Add a variable to this context
   virtual bool AddVariable(iShaderVariable* variable){return false;}
   /// Get variable
-  virtual iShaderVariable* GetVariable(int namehash);
+  virtual iShaderVariable* GetVariable(int namehash) 
+  { return privateGetVariable (namehash); }
   /// Get all variable stringnames in this context (used when creatingthem)
   virtual csBasicVector GetAllVariableNames() {return csBasicVector();}
 
-    /// Loads a shader from buffer
+  /// Private variable to get the variable without virtual call
+  inline iShaderVariable* privateGetVariable (int namehash);
+
+  /// Loads a shader from buffer
   virtual bool Load(iDataBuffer* program);
 
   /// Loads from a document-node

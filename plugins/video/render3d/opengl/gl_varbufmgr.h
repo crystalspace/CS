@@ -97,8 +97,9 @@ private:
   bool isRealVAR;
   csVARMemoryBlock* memblock;
   char currentBlock;
-  int size;
-  CS_RENDERBUFFER_TYPE type;
+  int size, compcount;
+  csRenderBufferType type;
+  csRenderBufferComponentType comptype;
   bool locked;
   bool discarded;
   bool discardable;
@@ -107,8 +108,10 @@ private:
 
   csVARRenderBufferManager* bm;
 
-  CS_BUFFER_LOCK_TYPE lastlock;
-  csVARRenderBuffer(void *buffer, int size, CS_RENDERBUFFER_TYPE type, csVARRenderBufferManager* bm);
+  csRenderBufferLockType lastlock;
+  csVARRenderBuffer(void *buffer, int size, csRenderBufferType type, 
+    csRenderBufferComponentType comptype, int compcount,
+    csVARRenderBufferManager* bm);
 
   bool Discard(); //returns true if it was discarded and all memory freed
   void* AllocData(int size);
@@ -122,7 +125,7 @@ public:
    * Lock the buffer to allow writing and give us a pointer to the data
    * The pointer will be NULL if there was some error
    */
-  virtual void* Lock(CS_BUFFER_LOCK_TYPE lockType);
+  virtual void* Lock(csRenderBufferLockType lockType);
 
   /// Releases the buffer. After this all writing to the buffer is illegal
   virtual void Release();
@@ -134,10 +137,16 @@ public:
   virtual void CanDiscard(bool value) { discardable = value; }
 
   /// Get type of buffer (where it's located)
-  virtual CS_RENDERBUFFER_TYPE GetBufferType() { return type; }
+  virtual csRenderBufferType GetBufferType() { return type; }
 
   /// Get the size of the buffer (in bytes)
   virtual int GetSize() {return size; }
+
+  /// Gets the number of components per element
+  virtual int GetComponentCount () { return compcount; }
+
+  /// Gets the component type
+  virtual csRenderBufferComponentType GetComponentType () { return comptype; }
 };
 
 
@@ -171,7 +180,10 @@ public:
   virtual ~csVARRenderBufferManager();
 
   /// Allocate a buffer of the specified type and return it
-  csPtr<iRenderBuffer> CreateBuffer(int buffersize, CS_RENDERBUFFER_TYPE location);
+  virtual csPtr<iRenderBuffer> CreateBuffer(int buffersize, 
+    csRenderBufferType type,
+    csRenderBufferComponentType comptype,
+    int compcount);
 };
 
 #endif // __CS_GL_VARBUFMGR_H__

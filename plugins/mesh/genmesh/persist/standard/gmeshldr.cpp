@@ -29,6 +29,9 @@
 #include "iutil/document.h"
 #include "imesh/genmesh.h"
 #include "ivideo/graph3d.h"
+#ifdef CS_USE_NEW_RENDERER
+#include "ivideo/rndbuf.h"
+#endif // CS_USE_NEW_RENDERER
 #include "qint.h"
 #include "iutil/object.h"
 #include "iengine/material.h"
@@ -192,7 +195,7 @@ bool csGeneralFactoryLoader::ParseStream(iDocumentNode *node, iGeneralFactorySta
       }
     };
 
-    state->AddStream(name, compcount);
+    state->AddStream(name, CS_BUFCOMP_FLOAT, compcount);
     state->SetStream(name, floatarray);
     delete[] floatarray;
   }
@@ -220,7 +223,7 @@ bool csGeneralFactoryLoader::ParseStream(iDocumentNode *node, iGeneralFactorySta
       }
     };
 
-    state->AddStream(name, compcount);
+    state->AddStream(name, CS_BUFCOMP_INT, compcount);
     state->SetStream(name, intarray);
     delete[] intarray;
   }
@@ -250,7 +253,7 @@ bool csGeneralFactoryLoader::ParseStream(iDocumentNode *node, iGeneralFactorySta
       }
     };
 
-    state->AddStream(name, compcount >> 1);
+    state->AddStream(name, CS_BUFCOMP_SHORT, compcount);
     state->SetStream(name, (int*)shortarray);
     delete[] shortarray;
   }
@@ -280,7 +283,7 @@ bool csGeneralFactoryLoader::ParseStream(iDocumentNode *node, iGeneralFactorySta
       }
     };
 
-    state->AddStream(name, compcount >> 2);
+    state->AddStream(name, CS_BUFCOMP_BYTE, compcount);
     state->SetStream(name, (int*)bytearray);
   
     delete[] bytearray;

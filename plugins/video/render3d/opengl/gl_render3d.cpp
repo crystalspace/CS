@@ -137,6 +137,13 @@ csGLRender3D::csGLRender3D (iBase *parent)
   string_normals = strings->Request ("normals");
   string_colors = strings->Request ("colors");
   string_indices = strings->Request ("indices");
+
+  int i;
+  for (i=0; i<16; i++)
+  {
+    vertattrib[i] = NULL;
+    texunit[i] = NULL;
+  }
 }
 
 csGLRender3D::~csGLRender3D()
@@ -811,13 +818,14 @@ bool csGLRender3D::BeginDraw (int drawflags)
 
     if (!rt_onscreen)
     {
-      txtcache->Cache (render_target);
+      /*txtcache->Cache (render_target);
       GLuint handle = ((csTxtCacheData *)render_target->GetCacheData ())
-        ->Handle;
+        ->Handle;*/
       statecache->SetShadeModel (GL_FLAT);
-      statecache->Enable_GL_TEXTURE_2D ();
       glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
-      statecache->SetTexture (GL_TEXTURE_2D, handle);
+      //statecache->Enable_GL_TEXTURE_2D ();
+      //statecache->SetTexture (GL_TEXTURE_2D, handle);
+      ActivateTexture (render_target);
       statecache->Disable_GL_BLEND ();
       SetZMode (CS_ZBUF_NONE);
 
@@ -893,7 +901,7 @@ void csGLRender3D::FinishDraw ()
     if (rt_onscreen)
     {
       rt_onscreen = false;
-      statecache->Enable_GL_TEXTURE_2D ();
+      //statecache->Enable_GL_TEXTURE_2D ();
       SetZMode (CS_ZBUF_NONE);
       statecache->Disable_GL_BLEND ();
       statecache->Disable_GL_ALPHA_TEST ();
@@ -906,7 +914,8 @@ void csGLRender3D::FinishDraw ()
       if (tex_data)
       {
         // Texture is in tha cache, update texture directly.
-        statecache->SetTexture (GL_TEXTURE_2D, tex_data->Handle);
+        //statecache->SetTexture (GL_TEXTURE_2D, tex_data->Handle);
+        ActivateTexture (render_target);
         // Texture was not used as a render target before.
         // Make some necessary adjustments.
         if (!tex_mm->was_render_target)
@@ -973,7 +982,7 @@ void csGLRender3D::Print (csRect* area)
 
 csReversibleTransform* csGLRender3D::GetWVMatrix()
 {
-  return NULL;
+  return &object2camera;
 }
 
 void csGLRender3D::SetObjectToCamera(csReversibleTransform* wvmatrix)
@@ -1018,6 +1027,136 @@ void csGLRender3D::DrawLine(const csVector3 & v1, const csVector3 & v2, float fo
   int py2 = viewheight - 1 - QInt (y2 * iz2 + (viewheight / 2));
 
   G2D->DrawLine (px1, py1, px2, py2, color);
+}
+
+void csGLRender3D::ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer)
+{
+  if (vertattrib[attrib] == buffer)
+    return;
+  if (vertattrib[attrib])
+  {
+    vertattrib[attrib]->Release ();
+    vertattrib[attrib] = NULL;
+  }
+  GLenum type;
+  switch (buffer->GetComponentType ())
+  {
+  case CS_BUFCOMP_BYTE:
+    type = GL_BYTE;
+    break;
+  case CS_BUFCOMP_UNSIGNED_BYTE:
+    type = GL_UNSIGNED_BYTE;
+    break;
+  case CS_BUFCOMP_SHORT:
+    type = GL_SHORT;
+    break;
+  case CS_BUFCOMP_UNSIGNED_SHORT:
+    type = GL_UNSIGNED_SHORT;
+    break;
+  case CS_BUFCOMP_INT:
+    type = GL_INT;
+    break;
+  case CS_BUFCOMP_UNSIGNED_INT:
+    type = GL_UNSIGNED_INT;
+    break;
+  case CS_BUFCOMP_FLOAT:
+    type = GL_FLOAT;
+    break;
+  case CS_BUFCOMP_DOUBLE:
+    type = GL_DOUBLE;
+    break;
+  }
+  void* data = buffer->Lock (CS_BUF_LOCK_RENDER);
+  if (data)
+  {
+    ext.glEnableVertexAttribArrayARB (attrib);
+    varr.VertexAttribPointer (
+      attrib, buffer->GetComponentCount (), type, true, 0, data);
+    vertattrib[attrib] = buffer;
+  }
+}
+
+void csGLRender3D::DeactivateBuffer (csVertexAttrib attrib)
+{
+  if (vertattrib[attrib])
+  {
+    ext.glDisableVertexAttribArrayARB (attrib);
+    vertattrib[attrib]->Release ();
+    vertattrib[attrib] = NULL;
+  }
+}
+
+void csGLRender3D::ActivateTexture (iTextureHandle *txthandle, int unit)
+{
+  if (texunit[unit] == txthandle)
+    return;
+
+  if (ext.CS_GL_ARB_multitexture)
+  {
+    ext.glActiveTextureARB(GL_TEXTURE0_ARB + unit);
+    ext.glClientActiveTextureARB(GL_TEXTURE0_ARB + unit);
+  } else if (unit != 0) return;
+
+  txtcache->Cache (txthandle);
+  csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
+    txthandle->GetPrivateObject ();
+  csTxtCacheData *cachedata =
+    (csTxtCacheData *)gltxthandle->GetCacheData ();
+
+  switch (gltxthandle->target)
+  {
+  case iTextureHandle::CS_TEX_IMG_1D:
+    statecache->SetTexture (GL_TEXTURE_1D, cachedata->Handle, unit);
+    statecache->Enable_GL_TEXTURE_1D (unit);
+    statecache->Disable_GL_TEXTURE_2D (unit);
+    statecache->Disable_GL_TEXTURE_3D (unit);
+    statecache->Disable_GL_TEXTURE_CUBE_MAP (unit);
+    texunit[unit] = txthandle;
+    break;
+  case iTextureHandle::CS_TEX_IMG_2D:
+    statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle, unit);
+    statecache->Enable_GL_TEXTURE_2D (unit);
+    statecache->Disable_GL_TEXTURE_3D (unit);
+    statecache->Disable_GL_TEXTURE_CUBE_MAP (unit);
+    texunit[unit] = txthandle;
+    break;
+  case iTextureHandle::CS_TEX_IMG_3D:
+    statecache->SetTexture (GL_TEXTURE_3D, cachedata->Handle, unit);
+    statecache->Enable_GL_TEXTURE_3D (unit);
+    statecache->Disable_GL_TEXTURE_CUBE_MAP (unit);
+    texunit[unit] = txthandle;
+    break;
+  case iTextureHandle::CS_TEX_IMG_CUBEMAP:
+    statecache->SetTexture (GL_TEXTURE_3D, cachedata->Handle, unit);
+    statecache->Enable_GL_TEXTURE_CUBE_MAP (unit);
+    texunit[unit] = txthandle;
+    break;
+  }
+}
+
+void csGLRender3D::DeactivateTexture (int unit)
+{
+  if (!texunit[unit])
+    return;
+
+  csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
+    texunit[unit]->GetPrivateObject ();
+  switch (gltxthandle->target)
+  {
+  case iTextureHandle::CS_TEX_IMG_1D:
+    statecache->Disable_GL_TEXTURE_1D (unit);
+    break;
+  case iTextureHandle::CS_TEX_IMG_2D:
+    statecache->Disable_GL_TEXTURE_2D (unit);
+    break;
+  case iTextureHandle::CS_TEX_IMG_3D:
+    statecache->Disable_GL_TEXTURE_3D (unit);
+    break;
+  case iTextureHandle::CS_TEX_IMG_CUBEMAP:
+    statecache->Disable_GL_TEXTURE_CUBE_MAP (unit);
+    break;
+  }
+  texunit[unit] = NULL;
 }
 
 void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
@@ -1101,26 +1240,6 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
   float red = 1, green = 1, blue = 1, alpha = 1;
   if (txthandle)
   {
-    txtcache->Cache (txthandle);
-    csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
-      txthandle->GetPrivateObject ();
-    csTxtCacheData *cachedata =
-      (csTxtCacheData *)gltxthandle->GetCacheData ();
-
-    if (gltxthandle->target == iTextureHandle::CS_TEX_IMG_CUBEMAP)
-    {
-      // @@@ SHOULD BE CACHED
-      glEnable (GL_TEXTURE_CUBE_MAP);
-      glBindTexture (GL_TEXTURE_CUBE_MAP, cachedata->Handle);
-    } else if (gltxthandle->target == iTextureHandle::CS_TEX_IMG_3D)
-    {
-      // @@@ SHOULD BE CACHED
-      glEnable (GL_TEXTURE_3D);
-      glBindTexture (GL_TEXTURE_3D, cachedata->Handle);
-    } else{
-      statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle);
-      statecache->Enable_GL_TEXTURE_2D ();
-    }
 
     alpha = 1.0f - BYTE_TO_FLOAT (mymesh->mixmode & CS_FX_MASK_ALPHA);
     alpha = SetMixMode (mymesh->mixmode, alpha, 
@@ -1168,7 +1287,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
         primitivetype,
         mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
         GL_UNSIGNED_INT,
-        ((unsigned int*)indexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER))
+        ((unsigned int*)indexbuf->Lock(CS_BUF_LOCK_RENDER))
         +mymesh->GetIndexStart ());
       tech->GetPass(currp)->Deactivate(mymesh);
       indexbuf->Release ();
@@ -1192,25 +1311,25 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
       return;
 
     varr.VertexPointer (3, GL_FLOAT, 0,
-      (float*)vertexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
+      (float*)vertexbuf->Lock(CS_BUF_LOCK_RENDER));
     glEnableClientState (GL_VERTEX_ARRAY);
 
     if (texcoordbuf && !texcoordbuf->IsDiscarded())
     {
       varr.TexCoordPointer (2, GL_FLOAT, 0, (float*)
-        texcoordbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
+        texcoordbuf->Lock(CS_BUF_LOCK_RENDER));
       glEnableClientState (GL_TEXTURE_COORD_ARRAY);
     }
     if (normalbuf && !normalbuf->IsDiscarded())
     {
       varr.NormalPointer (GL_FLOAT, 0, (float*)
-        normalbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
+        normalbuf->Lock(CS_BUF_LOCK_RENDER));
       glEnableClientState (GL_NORMAL_ARRAY);
     }
     if (colorbuf && !colorbuf->IsDiscarded())
     {
       varr.ColorPointer (4, GL_FLOAT, 0, (float*)
-        colorbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
+        colorbuf->Lock(CS_BUF_LOCK_RENDER));
       glEnableClientState (GL_COLOR_ARRAY);
     }
 
@@ -1218,7 +1337,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
       primitivetype,
       mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
       GL_UNSIGNED_INT,
-      ((unsigned int*)indexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER))
+      ((unsigned int*)indexbuf->Lock(CS_BUF_LOCK_RENDER))
       +mymesh->GetIndexStart ());
 
     if (mathandle)
@@ -1232,15 +1351,15 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
         txthandle = layer->txt_handle;
         if (txthandle)
         {
-
-          txtcache->Cache (txthandle);
+          ActivateTexture (txthandle);
+          /*txtcache->Cache (txthandle);
           csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
             txthandle->GetPrivateObject ();
           csTxtCacheData *cachedata =
             (csTxtCacheData *)gltxthandle->GetCacheData ();
 
           statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle);
-          statecache->Enable_GL_TEXTURE_2D ();
+          statecache->Enable_GL_TEXTURE_2D ();*/
         } else continue;
 
         alpha = 1.0f - BYTE_TO_FLOAT (layer->mode & CS_FX_MASK_ALPHA);
@@ -1266,7 +1385,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
           primitivetype,
           mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
           GL_UNSIGNED_INT,
-          ((unsigned int*)indexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER))
+          ((unsigned int*)indexbuf->Lock(CS_BUF_LOCK_RENDER))
           +mymesh->GetIndexStart ());
 
         glPopMatrix ();
@@ -1319,6 +1438,7 @@ void csGLRender3D::SetShadowState (int state)
     glClearStencil (0);
     stencil_initialized = false;
     glClear (GL_STENCIL_BUFFER_BIT);
+    glClearStencil (0);
     statecache->Enable_GL_STENCIL_TEST ();
     glStencilFunc (GL_ALWAYS, 0, 127);
     glPolygonOffset (-0.1, -4); 

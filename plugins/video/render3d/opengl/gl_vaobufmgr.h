@@ -36,7 +36,10 @@ public:
   SCF_DECLARE_IBASE;
 
   /// Allocate a buffer of the specified type and return it
-  csPtr<iRenderBuffer> CreateBuffer(int buffersize, CS_RENDERBUFFER_TYPE location);
+  virtual csPtr<iRenderBuffer> CreateBuffer(int buffersize, 
+    csRenderBufferType type,
+    csRenderBufferComponentType comptype,
+    int compcount);
 
     /**
    * Nonstandard constructor, as we need access to the internal of opengl-renderer
@@ -56,11 +59,12 @@ class csVaoRenderBuffer : public iRenderBuffer
 private:
   void *tempbuffer; //used when getting data from caller, returned by lock etc
   void *indexbuffer;  //only used if this is a index-buffer
-  int size;
-  CS_RENDERBUFFER_TYPE type;
+  int size, compcount;
+  csRenderBufferType type;
+  csRenderBufferComponentType comptype;
   bool locked;
   unsigned int VAObufferID;
-  CS_BUFFER_LOCK_TYPE lastlock;
+  csRenderBufferLockType lastlock;
   bool discarded;
   csVaoRenderBufferManager* vaomgr;
   
@@ -68,7 +72,9 @@ public:
   SCF_DECLARE_IBASE;
 
   
-  csVaoRenderBuffer (int size, CS_RENDERBUFFER_TYPE type, csVaoRenderBufferManager* vaomgr);
+  csVaoRenderBuffer (int size, csRenderBufferType type, 
+    csRenderBufferComponentType comptype, int compcount,
+    csVaoRenderBufferManager* vaomgr);
 
   virtual ~csVaoRenderBuffer ();
   
@@ -77,7 +83,7 @@ public:
    * Lock the buffer to allow writing and give us a pointer to the data
    * The pointer will be NULL if there was some error
    */
-  virtual void* Lock(CS_BUFFER_LOCK_TYPE lockType)
+  virtual void* Lock(csRenderBufferLockType lockType)
   {
     if(locked) return 0;
 
@@ -88,10 +94,11 @@ public:
       if(indexbuffer == NULL)
         indexbuffer = new char[size];
 
+      locked = true;
       return indexbuffer;
     }
 
-    if(lockType == iRenderBuffer::CS_BUF_LOCK_RENDER)
+    if(lockType == CS_BUF_LOCK_RENDER)
     {
       locked = true;
       return (void*)VAObufferID;
@@ -115,10 +122,16 @@ public:
   virtual void CanDiscard(bool value) {}
 
   /// Get type of buffer (where it's located)
-  virtual CS_RENDERBUFFER_TYPE GetBufferType() { return type; }
+  virtual csRenderBufferType GetBufferType() { return type; }
 
   /// Get the size of the buffer (in bytes)
   virtual int GetSize() { return size; }
+
+  /// Gets the number of components per element
+  virtual int GetComponentCount () { return compcount; }
+
+  /// Gets the component type
+  virtual csRenderBufferComponentType GetComponentType () { return comptype; }
 };
 
 

@@ -36,9 +36,12 @@ SCF_IMPLEMENT_IBASE_END
 
 
 
-csPtr<iRenderBuffer> csSysRenderBufferManager::CreateBuffer(int buffersize, CS_RENDERBUFFER_TYPE location)
+csPtr<iRenderBuffer> csSysRenderBufferManager::CreateBuffer(int buffersize, 
+    csRenderBufferType type,
+    csRenderBufferComponentType comptype,
+    int compcount)
 {
   csSysRenderBuffer *buffer = new csSysRenderBuffer (
-    new char[buffersize], buffersize, location);
+    new char[buffersize], buffersize, type, comptype, compcount);
   return csPtr<iRenderBuffer> (buffer);
 }

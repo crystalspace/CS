@@ -19,6 +19,10 @@ The history order is reversed so that new features are at the top.
 	  now be a little faster.
 	- Marten Svanfeldt fixed the light/shadow culling using the new version
 	  of VisTest.
+	- Marten Svanfeldt / Anders Stenberg made these changes
+	    - The way buffers are activated. Now you use iRender3D::ActivateBuffer
+	    - The way textures are activated. Added iRender3D::ActivateTexture
+	    - Streammapping in the shaders
 26-Feb-2003
 	- Christian Bayle added some missing dependancy to enable to compile
   	  libs as shared

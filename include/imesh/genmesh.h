@@ -21,6 +21,10 @@
 
 #include "csutil/scf.h"
 
+#ifdef CS_USE_NEW_RENDERER
+#include "ivideo/rndbuf.h"
+#endif // CS_USE_NEW_RENDERER
+
 class csVector3;
 class csVector2;
 class csColor;
@@ -159,7 +163,8 @@ struct iGeneralFactoryState : public iBase
 #ifdef CS_USE_NEW_RENDERER
 
   /// Adds an independantly named stream, sets to VertexCount
-  virtual bool AddStream (const char *name, int component_size) = 0;
+  virtual bool AddStream (const char *name, 
+    csRenderBufferComponentType component_type, int component_size) = 0;
 
   /// Adds a component to stream with name
   virtual bool SetStreamComponent (const char *name, int index, int component, float value) = 0; 

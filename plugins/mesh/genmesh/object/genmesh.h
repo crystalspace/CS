@@ -245,15 +245,12 @@ public:
   virtual iBase* GetLogicalParent () const { return logparent; }
 #ifdef CS_USE_NEW_RENDERER
   iRenderBuffer *GetBuffer (csStringID name);
-  int GetComponentCount (csStringID name);
   //------------------------- iStreamSource implementation ----------------
   class StreamSource : public iStreamSource 
   {
     SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObject);
     iRenderBuffer *GetBuffer (csStringID name)
 	{ return scfParent->GetBuffer (name); }
-    int GetComponentCount (csStringID name)
-	{ return scfParent->GetComponentCount (name); }
   } scfiStreamSource;
   friend class StreamSource;
 #endif
@@ -577,7 +574,7 @@ public:
   void CalculateNormals ();
   void GenerateBox (const csBox3& box);
 #ifdef CS_USE_NEW_RENDERER
-  bool AddStream (const char *name, int component_size);
+  bool AddStream (const char *name, csRenderBufferComponentType component_type, int component_size);
   bool SetStreamComponent (const char *name, int index, int component, float value);
   bool SetStreamComponent (const char *name, int index, int component, int value);
   bool SetStream (const char *name, float *value);
@@ -608,15 +605,12 @@ public:
   }
 #else
   iRenderBuffer *GetBuffer (csStringID name);
-  int GetComponentCount (csStringID name);
   //------------------------- iStreamSource implementation ----------------
   class StreamSource : public iStreamSource 
   {
     SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
     iRenderBuffer *GetBuffer (csStringID name)
 	{ return scfParent->GetBuffer (name); }
-    int GetComponentCount (csStringID name)
-	{ return scfParent->GetComponentCount (name); }
   } scfiStreamSource;
   friend class StreamSource;
 #endif
@@ -691,9 +685,10 @@ public:
       scfParent->GenerateBox (box);
     }
 #ifdef CS_USE_NEW_RENDERER
-    virtual bool AddStream (const char *name, int component_size)
+    virtual bool AddStream (const char *name, 
+      csRenderBufferComponentType component_type, int component_size)
     {
-      return scfParent->AddStream (name, component_size);
+      return scfParent->AddStream (name, component_type, component_size);
     }
     virtual bool SetStreamComponent (const char *name, int index, int component, float value)
     {

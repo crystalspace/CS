@@ -42,6 +42,7 @@ struct iClipper2D;
 struct iGraphics2D;
 struct iTextureManager;
 struct iTextureHandle;
+struct iRenderBuffer;
 struct iRenderBufferManager;
 struct iLightingManager;
 
@@ -119,6 +120,39 @@ enum csZBufMode
   CS_ZBUF_INVERT   = 0x00000006,
 };
 
+/// Vertex attributes
+enum csVertexAttrib
+{
+  CS_VATTRIB_0 = 0,
+  CS_VATTRIB_1 = 1,
+  CS_VATTRIB_2 = 2,
+  CS_VATTRIB_3 = 3,
+  CS_VATTRIB_4 = 4,
+  CS_VATTRIB_5 = 5,
+  CS_VATTRIB_6 = 6,
+  CS_VATTRIB_7 = 7,
+  CS_VATTRIB_8 = 8,
+  CS_VATTRIB_9 = 9,
+  CS_VATTRIB_10 = 10,
+  CS_VATTRIB_11 = 11,
+  CS_VATTRIB_12 = 12,
+  CS_VATTRIB_13 = 13,
+  CS_VATTRIB_14 = 14,
+  CS_VATTRIB_15 = 15,
+  CS_VATTRIB_POSITION = 0,
+  CS_VATTRIB_WEIGHT = 1,
+  CS_VATTRIB_NORMAL = 2,
+  CS_VATTRIB_COLOR = 3,
+  CS_VATTRIB_PRIMARY_COLOR = 3,
+  CS_VATTRIB_SECONDARY_COLOR = 4,
+  CS_VATTRIB_FOGCOORD = 5,
+  CS_VATTRIB_TEXCOORD = 8,
+  CS_VATTRIB_TEXCOORD0 = 8,
+  CS_VATTRIB_TEXCOORD1 = 9,
+  CS_VATTRIB_TEXCOORD2 = 10,
+  CS_VATTRIB_TEXCOORD3 = 11
+};
+
 /**\name Mix modes for DrawPolygonFX ()
  * The constants can be ORed together if they belong to different masks.
  * @{ */
@@ -182,6 +216,7 @@ enum csZBufMode
 
 /**\name Shadow states
  * @{ */
+
 
 /**
  * Clear stencil
@@ -275,6 +310,18 @@ struct iRender3D : public iBase
 
   /// Get a pointer to lighting manager
   virtual iLightingManager* GetLightingManager () = 0;
+
+  /// Activate a vertex buffer
+  virtual void ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer) = 0;
+
+  /// Deactivate a vertex buffer
+  virtual void DeactivateBuffer (csVertexAttrib attrib) = 0;
+
+  /// Activate a texture
+  virtual void ActivateTexture (iTextureHandle *txthandle, int unit = 0) = 0;
+
+  /// Deactivate a texture
+  virtual void DeactivateTexture (int unit = 0) = 0;
 
   /// Set dimensions of window
   virtual void SetDimensions (int width, int height) = 0;

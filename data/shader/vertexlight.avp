@@ -3,10 +3,6 @@
 <variablemap variable="STANDARD_LIGHT_0_DIFFUSE" register="1"/>
 <variablemap variable="STANDARD_LIGHT_0_SPECULAR" register="2"/>
 <variablemap variable="STANDARD_LIGHT_0_ATTENUATION" register="3"/>
-<streammap stream="vertices" attribute="0" />
-<streammap stream="colors" attribute="1" />
-<streammap stream="normals" attribute="2" />
-<streammap stream="texture coordinates" attribute="3" />
 <program>
 <![CDATA[
 !!ARBvp1.0

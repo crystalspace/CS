@@ -193,6 +193,10 @@ private:
 
   void CacheTexture(iTextureHandle* itex);
 
+
+  iRenderBuffer* vertattrib[16]; // @@@ Hardcoded max number of attributes
+  iTextureHandle* texunit[16]; // @@@ Hardcoded max number of units
+
 public:
   SCF_DECLARE_IBASE;
 
@@ -228,6 +232,18 @@ public:
   /// Get a pointer to lighting manager
   iLightingManager* GetLightingManager () 
     { return lightmgr; }
+
+  /// Activate a vertex buffer
+  virtual void ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer);
+
+  /// Deactivate a vertex buffer
+  virtual void DeactivateBuffer (csVertexAttrib attrib);
+
+  /// Activate a texture
+  virtual void ActivateTexture (iTextureHandle *txthandle, int unit = 0);
+
+  /// Deactivate a texture
+  virtual void DeactivateTexture (int unit = 0);
 
   /// Set dimensions of window
   void SetDimensions (int width, int height)

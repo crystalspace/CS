@@ -26,6 +26,10 @@
 #include <GL/gl.h>
 #endif
 
+#ifdef CS_USE_NEW_RENDERER
+#include "video/render3d/opengl/glextmanager.h"
+#endif // CS_USE_NEW_RENDERER
+
 #define IMPLEMENT_CACHED_BOOL( name ) \
   bool enabled_##name; \
   void Enable_##name () { \
@@ -150,11 +154,27 @@ public:
     enabled_GL_LIGHTING = glIsEnabled (GL_LIGHTING);
     enabled_GL_ALPHA_TEST = glIsEnabled (GL_ALPHA_TEST);
     enabled_GL_TEXTURE_2D[0] = glIsEnabled (GL_TEXTURE_2D);
+#ifdef CS_USE_NEW_RENDERER
+    enabled_GL_TEXTURE_1D[0] = glIsEnabled (GL_TEXTURE_1D);
+    enabled_GL_TEXTURE_3D[0] = glIsEnabled (GL_TEXTURE_3D);
+    enabled_GL_TEXTURE_CUBE_MAP[0] = glIsEnabled (GL_TEXTURE_CUBE_MAP);
+#endif // CS_USE_NEW_RENDERER
     for (i = 1 ; i < MAX_LAYER ; i++)
+    {
       enabled_GL_TEXTURE_2D[i] = enabled_GL_TEXTURE_2D[0];
+#ifdef CS_USE_NEW_RENDERER
+      enabled_GL_TEXTURE_1D[i] = enabled_GL_TEXTURE_1D[0];
+      enabled_GL_TEXTURE_3D[i] = enabled_GL_TEXTURE_3D[0];
+      enabled_GL_TEXTURE_CUBE_MAP[i] = enabled_GL_TEXTURE_CUBE_MAP[0];
+#endif // CS_USE_NEW_RENDERER
+    }
 
-    memset( texture1d, 0, 32*sizeof(GLuint) );
     memset( texture2d, 0, 32*sizeof(GLuint) );
+#ifdef CS_USE_NEW_RENDERER
+    memset( texture1d, 0, 32*sizeof(GLuint) );
+    memset( texture3d, 0, 32*sizeof(GLuint) );
+    memset( texturecube, 0, 32*sizeof(GLuint) );
+#endif // CS_USE_NEW_RENDERER
   }
 
   // Standardized caches
@@ -166,44 +186,77 @@ public:
   IMPLEMENT_CACHED_BOOL (GL_POLYGON_OFFSET_FILL)
   IMPLEMENT_CACHED_BOOL (GL_LIGHTING)
   IMPLEMENT_CACHED_BOOL (GL_ALPHA_TEST)
+  IMPLEMENT_CACHED_BOOL_LAYER (GL_TEXTURE_1D)
   IMPLEMENT_CACHED_BOOL_LAYER (GL_TEXTURE_2D)
-  IMPLEMENT_CACHED_PARAMETER_2( glAlphaFunc, AlphaFunc, GLenum, alpha_func, GLclampf, alpha_ref )
-  IMPLEMENT_CACHED_PARAMETER_2( glBlendFunc, BlendFunc, GLenum, blend_source, GLenum, blend_destination )
-  IMPLEMENT_CACHED_PARAMETER_1( glCullFace, CullFace, GLenum, cull_mode )
-  IMPLEMENT_CACHED_PARAMETER_1( glDepthFunc, DepthFunc, GLenum, depth_func )
-  IMPLEMENT_CACHED_PARAMETER_1( glDepthMask, DepthMask, GLboolean, depth_mask )
-  IMPLEMENT_CACHED_PARAMETER_1( glShadeModel, ShadeModel, GLenum, shade_model )
-  IMPLEMENT_CACHED_PARAMETER_3( glStencilFunc, StencilFunc, GLenum, stencil_func, GLint, stencil_ref, GLuint, stencil_mask )
-  IMPLEMENT_CACHED_PARAMETER_3( glStencilOp, StencilOp, GLenum, stencil_fail, GLenum, stencil_zfail, GLenum, stencil_zpass )
+  IMPLEMENT_CACHED_BOOL_LAYER (GL_TEXTURE_3D)
+  IMPLEMENT_CACHED_BOOL_LAYER (GL_TEXTURE_CUBE_MAP)
+  IMPLEMENT_CACHED_PARAMETER_2 (glAlphaFunc, AlphaFunc, GLenum, alpha_func, GLclampf, alpha_ref)
+  IMPLEMENT_CACHED_PARAMETER_2 (glBlendFunc, BlendFunc, GLenum, blend_source, GLenum, blend_destination)
+  IMPLEMENT_CACHED_PARAMETER_1 (glCullFace, CullFace, GLenum, cull_mode)
+  IMPLEMENT_CACHED_PARAMETER_1 (glDepthFunc, DepthFunc, GLenum, depth_func)
+  IMPLEMENT_CACHED_PARAMETER_1 (glDepthMask, DepthMask, GLboolean, depth_mask)
+  IMPLEMENT_CACHED_PARAMETER_1 (glShadeModel, ShadeModel, GLenum, shade_model)
+  IMPLEMENT_CACHED_PARAMETER_3 (glStencilFunc, StencilFunc, GLenum, stencil_func, GLint, stencil_ref, GLuint, stencil_mask)
+  IMPLEMENT_CACHED_PARAMETER_3 (glStencilOp, StencilOp, GLenum, stencil_fail, GLenum, stencil_zfail, GLenum, stencil_zpass)
 
   // Special caches
-  GLuint texture1d[32]; // 32 max texture layers
   GLuint texture2d[32]; // 32 max texture layers
+#ifdef CS_USE_NEW_RENDERER
+  GLuint texture1d[32]; // 32 max texture layers
+  GLuint texture3d[32]; // 32 max texture layers
+  GLuint texturecube[32]; // 32 max texture layers
+#endif // CS_USE_NEW_RENDERER
   void SetTexture( GLenum target, GLuint texture, int layer = 0 )
   {
-    if( target == GL_TEXTURE_1D )
+    switch (target)
     {
-      if( texture != texture1d[layer] )
-      {
-        texture1d[layer] = texture;
-        glBindTexture( target, texture );
-      }
-    }
-    if( target == GL_TEXTURE_2D )
-    {
-      if( texture != texture2d[layer] )
+    case GL_TEXTURE_2D:
+      if (texture != texture2d[layer])
       {
         texture2d[layer] = texture;
-        glBindTexture( target, texture );
+        glBindTexture (target, texture);
       }
+      break;
+#ifdef CS_USE_NEW_RENDERER
+    case GL_TEXTURE_1D:
+      if (texture != texture1d[layer])
+      {
+        texture1d[layer] = texture;
+        glBindTexture (target, texture);
+      }
+      break;
+    case GL_TEXTURE_3D:
+      if (texture != texture3d[layer])
+      {
+        texture3d[layer] = texture;
+        glBindTexture (target, texture);
+      }
+      break;
+    case GL_TEXTURE_CUBE_MAP:
+      if (texture != texturecube[layer])
+      {
+        texturecube[layer] = texture;
+        glBindTexture (target, texture);
+      }
+      break;
     }
+#endif // CS_USE_NEW_RENDERER
   }
   GLuint GetTexture( GLenum target, GLuint texture, int layer = 0 )
   {
-    if( target == GL_TEXTURE_1D )
-      return texture1d[layer];
-    if( target == GL_TEXTURE_2D )
+    switch (target)
+    {
+    case GL_TEXTURE_2D:
       return texture2d[layer];
+#ifdef CS_USE_NEW_RENDERER
+    case GL_TEXTURE_1D:
+      return texture1d[layer];
+    case GL_TEXTURE_3D:
+      return texture3d[layer];
+    case GL_TEXTURE_CUBE_MAP:
+      return texturecube[layer];
+#endif // CS_USE_NEW_RENDERER
+    }
     return 0;
   }
 };

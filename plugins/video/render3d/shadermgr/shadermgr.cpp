@@ -43,6 +43,7 @@
 #include "ivideo/shader/shader.h"
 //#include "ivideo/shader/shadervar.h"
 #include "ivideo/render3d.h"
+#include "ivideo/rndbuf.h"
 #include "shadermgr.h"
 
 
@@ -185,7 +186,7 @@ csPtr<iShaderVariable> csShaderManager::CreateVariable(const char* name)
   return (iShaderVariable*)myVar;
 }
 
-iShaderVariable* csShaderManager::GetVariable(int namehash)
+iShaderVariable* csShaderManager::privateGetVariable(int namehash)
 {
   csHashIterator cIter(variables, namehash);
 
@@ -343,7 +344,7 @@ bool csShader::AddVariable(iShaderVariable* variable)
   return true;
 }
 
-iShaderVariable* csShader::GetVariable(int namehash)
+iShaderVariable* csShader::privateGetVariable(int namehash)
 {
   iShaderVariable* var;
   csHashIterator cIter(variables, namehash);
@@ -357,7 +358,7 @@ iShaderVariable* csShader::GetVariable(int namehash)
 
   if(parent)
   {
-    return parent->GetVariable(namehash);
+    return parent->privateGetVariable (namehash);
   }
 
   return NULL;
@@ -530,7 +531,8 @@ bool csShader::Prepare()
     primap[i].priority = ((iShaderTechnique*)techniques->Get(i))->GetPriority();
   }
 
-  qsort(primap, techniques->Length()-1, sizeof(priority_mapping), pricompare);
+  if (techniques->Length()>1)
+    qsort(primap, techniques->Length()-1, sizeof(priority_mapping), pricompare);
 
   bool isPrep = false;
   int prepNr;
@@ -560,15 +562,17 @@ bool csShader::Prepare()
 //==================== csShaderPass ==============//
 void csShaderPass::Activate(csRenderMesh* mesh)
 {
-  /*int i;
+  int i;
   for (i=0; i<STREAMMAX; i++)
   {
     if (streammapping[i] != csInvalidStringID)
     {
       csRef<iRenderBuffer> buf (
         mesh->GetStreamSource ()->GetBuffer (streammapping[i]));
+      if (buf)
+        r3d->ActivateBuffer ((csVertexAttrib)i, buf);
     }
-  }*/
+  }
 
   r3d->GetWriteMask (OrigWMRed, OrigWMGreen, OrigWMBlue, OrigWMAlpha);
   r3d->SetWriteMask (writemaskRed, writemaskGreen, writemaskBlue, writemaskAlpha);
@@ -582,14 +586,23 @@ void csShaderPass::Deactivate(csRenderMesh* mesh)
   if(vp) vp->Deactivate(this, mesh);
   if(fp) fp->Deactivate(this, mesh);
   r3d->SetWriteMask (OrigWMRed, OrigWMGreen, OrigWMBlue, OrigWMAlpha);
+
+  int i;
+  for (i=0; i<STREAMMAX; i++)
+  {
+    if (streammapping[i] != csInvalidStringID)
+    {
+      r3d->DeactivateBuffer ((csVertexAttrib)i);
+    }
+  }
 }
 
-void csShaderPass::AddStreamMapping (csStringID name, int attribute)
+void csShaderPass::AddStreamMapping (csStringID name, csVertexAttrib attribute)
 {
   streammapping[attribute] = name;
 }
 
-csStringID csShaderPass::GetStreamMapping (int attribute)
+csStringID csShaderPass::GetStreamMapping (csVertexAttrib attribute)
 {
   return streammapping[attribute];
 }
@@ -616,7 +629,7 @@ const char* csShaderPass::GetTextureMappingAsName (int unit)
   return texmappingname[unit];
 }
 
-iShaderVariable* csShaderPass::GetVariable(int namehash)
+iShaderVariable* csShaderPass::privateGetVariable(int namehash)
 {
   iShaderVariable* var;
   csHashIterator c(&variables, namehash);
@@ -630,7 +643,7 @@ iShaderVariable* csShaderPass::GetVariable(int namehash)
 
   if (parent && parent->GetParent())
   {
-    return parent->GetParent()->GetVariable(namehash);
+    return parent->GetParent()->privateGetVariable (namehash);
   }
 
   return NULL;
@@ -676,9 +689,80 @@ bool csShaderPass::Load(iDocumentNode* node)
         break;
       case XMLTOKEN_STREAMMAPPING:
         {
-          AddStreamMapping (
-            r3d->GetStringContainer ()->Request (child->GetAttributeValue ("stream")),
-            child->GetAttributeValueAsInt ("attribute"));
+          const char* dest = child->GetAttributeValue ("destination");
+          csVertexAttrib attribute;
+          bool found = false;
+          int i;
+          for (i = 0; i<16; i++)
+          {
+            char str[13];
+            sprintf (str, "attribute %d", i);
+            if (strcmp (str, dest) == 0)
+            {
+              attribute = (csVertexAttrib)(CS_VATTRIB_0 + i);
+              found = true;
+              break;
+            }
+          }
+          if (!found)
+          {
+            if (strcmp (dest, "position") == 0)
+            {
+              attribute = CS_VATTRIB_POSITION;
+              found = true;
+            }
+            else if (strcmp (dest, "normal") == 0)
+            {
+              attribute = CS_VATTRIB_NORMAL;
+              found = true;
+            }
+            else if (strcmp (dest, "color") == 0)
+            {
+              attribute = CS_VATTRIB_COLOR;
+              found = true;
+            }
+            else if (strcmp (dest, "primary color") == 0)
+            {
+              attribute = CS_VATTRIB_PRIMARY_COLOR;
+              found = true;
+            }
+            else if (strcmp (dest, "secondary color") == 0)
+            {
+              attribute = CS_VATTRIB_SECONDARY_COLOR;
+              found = true;
+            }
+            else if (strcmp (dest, "texture coordinate") == 0)
+            {
+              attribute = CS_VATTRIB_TEXCOORD;
+              found = true;
+            }
+            else if (strcmp (dest, "texture coordinate 0") == 0)
+            {
+              attribute = CS_VATTRIB_TEXCOORD0;
+              found = true;
+            }
+            else if (strcmp (dest, "texture coordinate 1") == 0)
+            {
+              attribute = CS_VATTRIB_TEXCOORD1;
+              found = true;
+            }
+            else if (strcmp (dest, "texture coordinate 2") == 0)
+            {
+              attribute = CS_VATTRIB_TEXCOORD2;
+              found = true;
+            }
+            else if (strcmp (dest, "texture coordinate 3") == 0)
+            {
+              attribute = CS_VATTRIB_TEXCOORD3;
+              found = true;
+            }
+          }
+          if (found)
+          {
+            AddStreamMapping (
+              r3d->GetStringContainer ()->Request (child->GetAttributeValue ("stream")),
+              attribute);
+          }
         }
         break;
       case XMLTOKEN_TEXTUREMAPPING:

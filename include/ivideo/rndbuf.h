@@ -45,13 +45,37 @@ struct iTextureHandle;
  * Where the buffer is placed
  * CS_BUF_INDEX is special and only to be used by indexbuffers
  */
-typedef enum _CS_RENDERBUFFER_TYPE
+enum csRenderBufferType
 {
   CS_BUF_DYNAMIC,
   CS_BUF_STATIC,
   CS_BUF_INDEX
-} CS_RENDERBUFFER_TYPE;
+};
 
+/// Type of components
+enum csRenderBufferComponentType
+{
+  CS_BUFCOMP_BYTE,
+  CS_BUFCOMP_UNSIGNED_BYTE,
+  CS_BUFCOMP_SHORT,
+  CS_BUFCOMP_UNSIGNED_SHORT,
+  CS_BUFCOMP_INT,
+  CS_BUFCOMP_UNSIGNED_INT,
+  CS_BUFCOMP_FLOAT,
+  CS_BUFCOMP_DOUBLE
+};
+
+/**
+  * Type of lock
+  * CS_BUF_LOCK_NORMAL: Just get a point to the buffer, nothing special
+  * CS_BUF_LOCK_RENDER: Special lock only to be used by renderer
+  */
+enum csRenderBufferLockType
+{
+  CS_BUF_LOCK_NOLOCK,
+  CS_BUF_LOCK_NORMAL,
+  CS_BUF_LOCK_RENDER
+};
 
 SCF_VERSION (iRenderBuffer, 0, 0, 2);
 
@@ -62,25 +86,19 @@ SCF_VERSION (iRenderBuffer, 0, 0, 2);
 struct iRenderBuffer : public iBase
 {
   /**
-   * Type of lock
-   * CS_BUF_LOCK_NORMAL: Just get a point to the buffer, nothing special
-   * CS_BUF_LOCK_RENDER: Special lock only to be used by renderer
-   */
-  typedef enum _CS_BUFFER_LOCK_TYPE
-  {
-    CS_BUF_LOCK_NOLOCK,
-    CS_BUF_LOCK_NORMAL,
-    CS_BUF_LOCK_RENDER
-  } CS_BUFFER_LOCK_TYPE;
-
-  /**
    * Lock the buffer to allow writing and give us a pointer to the data
    * The pointer will be NULL if there was some error
    */
-  virtual void* Lock(CS_BUFFER_LOCK_TYPE lockType) = 0;
+  virtual void* Lock(csRenderBufferLockType lockType) = 0;
 
   /// Releases the buffer. After this all writing to the buffer is illegal
   virtual void Release() = 0;
+
+  /// Gets the number of components per element
+  virtual int GetComponentCount () = 0;
+
+  /// Gets the component type
+  virtual csRenderBufferComponentType GetComponentType () = 0;
 
   /// Returns wheter the buffer is discarded or not
   virtual bool IsDiscarded() = 0;
@@ -89,7 +107,7 @@ struct iRenderBuffer : public iBase
   virtual void CanDiscard(bool value) = 0;
 
   /// Get type of buffer (where it's located)
-  virtual CS_RENDERBUFFER_TYPE GetBufferType() = 0;
+  virtual csRenderBufferType GetBufferType() = 0;
 
   /// Get the size of the buffer (in bytes)
   virtual int GetSize() = 0;
@@ -101,10 +119,12 @@ SCF_VERSION (iRenderBufferManager, 0, 0, 2);
 struct iRenderBufferManager : public iBase
 {
   /// Allocate a buffer of the specified type and return it
-  virtual csPtr<iRenderBuffer> CreateBuffer(int buffersize, CS_RENDERBUFFER_TYPE type) = 0;
+  virtual csPtr<iRenderBuffer> CreateBuffer(int buffersize, 
+    csRenderBufferType type,
+    csRenderBufferComponentType comptype,
+    int compcount) = 0;
 
 };
-
 
 SCF_VERSION (iStreamSource, 0, 0, 1);
 
@@ -112,9 +132,6 @@ struct iStreamSource : public iBase
 {
   /// Get a named buffer
   virtual iRenderBuffer* GetBuffer (csStringID name) = 0;
-
-  /// Get the number of components in a buffer
-  virtual int GetComponentCount (csStringID name) = 0;
 };
 
 class csRenderMesh

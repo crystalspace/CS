@@ -273,9 +273,13 @@ csVARRenderBufferManager::~csVARRenderBufferManager()
   delete myalloc;
 }
 
-csPtr<iRenderBuffer> csVARRenderBufferManager::CreateBuffer(int size, CS_RENDERBUFFER_TYPE location)
+csPtr<iRenderBuffer> csVARRenderBufferManager::CreateBuffer(int buffersize, 
+    csRenderBufferType type,
+    csRenderBufferComponentType comptype,
+    int compcount)
 {
-  csVARRenderBuffer* buffer = new csVARRenderBuffer( NULL, size, location, this);
+  csVARRenderBuffer* buffer = new csVARRenderBuffer 
+    (NULL, buffersize, type, comptype, compcount, this);
 
   printf("Created buffer at: %X\n", (long)buffer);
   //buffer->IncRef();
@@ -364,13 +368,17 @@ void* csVARRenderBuffer::AllocData(int size)
   return bm->var_buffer + offset;
 }
 
-csVARRenderBuffer::csVARRenderBuffer(void *buffer, int size, CS_RENDERBUFFER_TYPE type, csVARRenderBufferManager* bm)
+csVARRenderBuffer::csVARRenderBuffer(void *buffer, int size, csRenderBufferType type, 
+    csRenderBufferComponentType comptype, int compcount,
+    csVARRenderBufferManager* bm)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   currentBlock = 0;
 
   csVARRenderBuffer::size = size;
   csVARRenderBuffer::type = type;
+  csVARRenderBuffer::comptype = comptype;
+  csVARRenderBuffer::compcount = compcount;
 
   csVARRenderBuffer::bm = bm;
   locked = false;
@@ -411,7 +419,7 @@ csVARRenderBuffer::~csVARRenderBuffer()
   delete[] memblock;
 }
 
-void* csVARRenderBuffer::Lock(CS_BUFFER_LOCK_TYPE lockType)
+void* csVARRenderBuffer::Lock(csRenderBufferLockType lockType)
 {
   //if its already locked, we cannot return it
   if(locked) 

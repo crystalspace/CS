@@ -35,7 +35,9 @@ SCF_IMPLEMENT_IBASE (csVaoRenderBufferManager)
   SCF_IMPLEMENTS_INTERFACE (iRenderBufferManager)
 SCF_IMPLEMENT_IBASE_END
 
-csVaoRenderBuffer::csVaoRenderBuffer(int size, CS_RENDERBUFFER_TYPE type, csVaoRenderBufferManager* vaomgr)
+csVaoRenderBuffer::csVaoRenderBuffer (int size, csRenderBufferType type, 
+  csRenderBufferComponentType comptype, int compcount,
+  csVaoRenderBufferManager* vaomgr)
 {
     SCF_CONSTRUCT_IBASE (NULL)
 
@@ -43,6 +45,8 @@ csVaoRenderBuffer::csVaoRenderBuffer(int size, CS_RENDERBUFFER_TYPE type, csVaoR
     indexbuffer = NULL;
     csVaoRenderBuffer::size = size;
     csVaoRenderBuffer::type = type;
+    csVaoRenderBuffer::comptype = comptype;
+    csVaoRenderBuffer::compcount = compcount;
     csVaoRenderBuffer::vaomgr = vaomgr;
     locked = false;
 
@@ -63,7 +67,7 @@ csVaoRenderBuffer::~csVaoRenderBuffer()
 void csVaoRenderBuffer::Release()
 { 
   locked = false; 
-  if(lastlock != iRenderBuffer::CS_BUF_LOCK_RENDER && type != CS_BUF_INDEX)
+  if(lastlock != CS_BUF_LOCK_RENDER && type != CS_BUF_INDEX)
   {
     //copy to our VAO buffer
     vaomgr->render3d->ext.glUpdateObjectBufferATI(VAObufferID, 0, size, tempbuffer, GL_DISCARD_ATI);
@@ -71,9 +75,13 @@ void csVaoRenderBuffer::Release()
   discarded = false;
 }
 
-csPtr<iRenderBuffer> csVaoRenderBufferManager::CreateBuffer(int buffersize, CS_RENDERBUFFER_TYPE location)
+csPtr<iRenderBuffer> csVaoRenderBufferManager::CreateBuffer(int buffersize, 
+    csRenderBufferType type,
+    csRenderBufferComponentType comptype,
+    int compcount)
 {
-  csVaoRenderBuffer *buffer = new csVaoRenderBuffer (buffersize, location, this);
+  csVaoRenderBuffer *buffer = new csVaoRenderBuffer 
+    (buffersize, type, comptype, compcount, this);
   return csPtr<iRenderBuffer> (buffer);
 }
 

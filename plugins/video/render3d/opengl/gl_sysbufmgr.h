@@ -36,21 +36,24 @@ class csSysRenderBuffer : public iRenderBuffer
 {
 private:
   void *buffer;
-  int size;
-  CS_RENDERBUFFER_TYPE type;
+  int size, compcount;
+  csRenderBufferType type;
+  csRenderBufferComponentType comptype;
   bool locked;
   bool discarded;
 public:
   SCF_DECLARE_IBASE;
 
-  
-  csSysRenderBuffer (void *buffer, int size, CS_RENDERBUFFER_TYPE type)
+  csSysRenderBuffer (void *buffer, int size, csRenderBufferType type,
+    csRenderBufferComponentType comptype, int compcount)
   {
     SCF_CONSTRUCT_IBASE (NULL)
 
     csSysRenderBuffer::buffer = buffer;
     csSysRenderBuffer::size = size;
     csSysRenderBuffer::type = type;
+    csSysRenderBuffer::comptype = comptype;
+    csSysRenderBuffer::compcount = compcount;
     locked = false;
     discarded = true;
   }
@@ -65,7 +68,7 @@ public:
    * Lock the buffer to allow writing and give us a pointer to the data
    * The pointer will be NULL if there was some error
    */
-  virtual void* Lock(CS_BUFFER_LOCK_TYPE lockType)
+  virtual void* Lock(csRenderBufferLockType lockType)
   {
     locked = true;
     return buffer;
@@ -79,10 +82,16 @@ public:
   virtual void CanDiscard(bool value) {}
 
   /// Get type of buffer (where it's located)
-  virtual CS_RENDERBUFFER_TYPE GetBufferType() { return type; }
+  virtual csRenderBufferType GetBufferType() { return type; }
 
   /// Get the size of the buffer (in bytes)
   virtual int GetSize() { return size; }
+
+  /// Gets the number of components per element
+  virtual int GetComponentCount () { return compcount; }
+
+  /// Gets the component type
+  virtual csRenderBufferComponentType GetComponentType () { return comptype; }
 };
 
 
@@ -97,8 +106,10 @@ public:
   }
 
   /// Allocate a buffer of the specified type and return it
-  csPtr<iRenderBuffer> CreateBuffer(int buffersize, CS_RENDERBUFFER_TYPE location);
-
+  csPtr<iRenderBuffer> CreateBuffer(int buffersize, 
+    csRenderBufferType type,
+    csRenderBufferComponentType comptype,
+    int compcount);
 };
 
 #endif //  __CS_GL_SYSRBUFMGR_H__

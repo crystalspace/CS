@@ -101,38 +101,10 @@ void csShaderGLAVP::Activate(iShaderPass* current, csRenderMesh* mesh)
       }
     }
   }
-
-  csRef<iStreamSource> source = mesh->GetStreamSource ();
-
-  // set streams
-  for(i = 0; i < streammap.Length(); ++i)
-  {
-    streammapentry* e = (streammapentry*)streammap.Get(i);
-    csRef<iRenderBuffer> buf = source->GetBuffer (e->name);
-    if (!buf)
-      continue;
-    void* ptr = buf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER);
-    if (ptr)
-    {
-      varr->VertexAttribPointer (e->attribnum, 
-        source->GetComponentCount (e->name), GL_FLOAT, false, 0, ptr);
-      ext->glEnableVertexAttribArrayARB (e->attribnum);
-    }
-  }
 }
 
 void csShaderGLAVP::Deactivate(iShaderPass* current, csRenderMesh* mesh)
 {
-  csRef<iStreamSource> source = mesh->GetStreamSource ();
-  for(int i = 0; i < streammap.Length(); ++i)
-  {
-    streammapentry* e = (streammapentry*)streammap.Get(i);
-    csRef<iRenderBuffer> buf = source->GetBuffer (e->name);
-    if (!buf)
-      continue;
-    buf->Release ();
-    ext->glDisableVertexAttribArrayARB (e->attribnum);
-  }
   glDisable (GL_VERTEX_PROGRAM_ARB);
 }
 
@@ -193,7 +165,6 @@ void csShaderGLAVP::BuildTokenHash()
   xmltokens.Register("ARBVP",XMLTOKEN_ARBVP);
   xmltokens.Register("declare",XMLTOKEN_DECLARE);
   xmltokens.Register("variablemap",XMLTOKEN_VARIABLEMAP);
-  xmltokens.Register("streammap",XMLTOKEN_STREAMMAP);
   xmltokens.Register("program", XMLTOKEN_PROGRAM);
 
   xmltokens.Register("integer", 100+iShaderVariable::INT);
@@ -292,17 +263,6 @@ bool csShaderGLAVP::Load(iDocumentNode* program)
 
           //save it for later
           variablemap.Push( map );
-        }
-        break;
-      case XMLTOKEN_STREAMMAP:
-        {
-          //create a stream<->attribute mapping
-          streammapentry * map = new streammapentry();
-          map->name = r3d->GetStringContainer ()->Request (
-            child->GetAttributeValue("stream"));
-          map->attribnum = child->GetAttributeValueAsInt("attribute");
-          //save it for later
-          streammap.Push( map );
         }
         break;
       default:

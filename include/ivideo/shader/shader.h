@@ -183,9 +183,9 @@ SCF_VERSION (iShaderPass, 0,0,1);
 struct iShaderPass : iBase
 {
   /// Add a stream mapping
-  virtual void AddStreamMapping (csStringID name, int attribute) = 0;
+  virtual void AddStreamMapping (csStringID name, csVertexAttrib attribute) = 0;
   /// Get stream mapping for a certain attribute
-  virtual csStringID GetStreamMapping (int attribute) = 0;
+  virtual csStringID GetStreamMapping (csVertexAttrib attribute) = 0;
 
   /// Add a texture mapping by name
   virtual void AddTextureMapping (const char* name, int unit) = 0;

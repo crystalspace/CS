@@ -788,11 +788,6 @@ iRenderBuffer *csGenmeshMeshObject::GetBuffer (csStringID name)
   return factory->GetBuffer (name);
 }
 
-int csGenmeshMeshObject::GetComponentCount (csStringID name)
-{
-  return factory->GetComponentCount (name);
-}
-
 bool csGenmeshMeshObject::DrawZ (iRenderView* rview, iMovable* /*movable*/,
 	csZBufMode mode)
 {
@@ -850,9 +845,13 @@ bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* movable,
   mesh.SetType (csRenderMesh::MESHTYPE_TRIANGLES);
 
   int *ibuf = factory->GetEdgeIndices();
-  shadow_index_buffer = r3d->GetBufferManager ()->CreateBuffer (
-    sizeof (unsigned int)*factory->GetTriangleCount()*12, CS_BUF_INDEX);
-  unsigned int *buf = (unsigned int *)shadow_index_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+  if (!shadow_index_buffer)
+    shadow_index_buffer = r3d->GetBufferManager ()->CreateBuffer (
+      sizeof (unsigned int)*factory->GetTriangleCount()*12, CS_BUF_INDEX,
+      CS_BUFCOMP_UNSIGNED_INT, 1);
+
+
+  unsigned int *buf = (unsigned int *)shadow_index_buffer->Lock(CS_BUF_LOCK_NORMAL);
   csVector3 lightpos = light->GetCenter() * movable->GetFullTransform();
   int i;
   int edge_start = factory->GetTriangleCount()*3;
@@ -1260,14 +1259,15 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
     if (mesh_vertices_dirty_flag)
     {
       vertex_buffer = r3d->GetBufferManager ()->CreateBuffer (
-        sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC);
+        sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC, 
+        CS_BUFCOMP_FLOAT, 3);
 	    mesh_vertices_dirty_flag = false;
     }
     if (vertex_buffer)
     {
       if (vertex_buffer->IsDiscarded())
       {
-        csVector3* vbuf = (csVector3*)vertex_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+        csVector3* vbuf = (csVector3*)vertex_buffer->Lock(CS_BUF_LOCK_NORMAL);
         memcpy (vbuf, mesh_vertices, sizeof(csVector3)*num_mesh_vertices);
         vertex_buffer->Release ();
       }
@@ -1281,14 +1281,15 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
     if (mesh_shadow_vertices_dirty_flag)
     {
       shadow_vertex_buffer = r3d->GetBufferManager ()->CreateBuffer (
-        sizeof (csVector3)*num_mesh_triangles*3, CS_BUF_STATIC);
+        sizeof (csVector3)*num_mesh_triangles*3, CS_BUF_STATIC, 
+        CS_BUFCOMP_FLOAT, 3);
       mesh_shadow_vertices_dirty_flag = false;
     }
     if (shadow_vertex_buffer)
     {
       if (shadow_vertex_buffer->IsDiscarded())
       {
-        csVector3* sbuf = (csVector3*)shadow_vertex_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+        csVector3* sbuf = (csVector3*)shadow_vertex_buffer->Lock(CS_BUF_LOCK_NORMAL);
         int sbuf_index = 0;
         for (int i = 0; i < num_mesh_triangles; i ++)
         {
@@ -1308,14 +1309,15 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
     if (mesh_texels_dirty_flag)
     {
       texel_buffer = r3d->GetBufferManager ()->CreateBuffer (
-        sizeof (csVector2)*num_mesh_vertices, CS_BUF_STATIC);
+        sizeof (csVector2)*num_mesh_vertices, CS_BUF_STATIC, 
+        CS_BUFCOMP_FLOAT, 2);
       mesh_texels_dirty_flag = false;
     }
     if (texel_buffer)
     {
       if (texel_buffer->IsDiscarded())
       {
-        csVector2* tbuf = (csVector2*)texel_buffer->Lock (iRenderBuffer::CS_BUF_LOCK_NORMAL);
+        csVector2* tbuf = (csVector2*)texel_buffer->Lock (CS_BUF_LOCK_NORMAL);
         memcpy (tbuf, mesh_texels, sizeof (csVector2) * num_mesh_vertices);
         texel_buffer->Release ();
       }
@@ -1329,14 +1331,15 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
     if (mesh_normals_dirty_flag )
     {
       normal_buffer = r3d->GetBufferManager ()->CreateBuffer (
-        sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC);
+        sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC,
+        CS_BUFCOMP_FLOAT, 3);
       mesh_normals_dirty_flag = false;
     }
     if(normal_buffer)
     {
       if(normal_buffer->IsDiscarded())
       {
-        csVector3 *nbuf = (csVector3*)normal_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+        csVector3 *nbuf = (csVector3*)normal_buffer->Lock(CS_BUF_LOCK_NORMAL);
         memcpy (nbuf, mesh_normals, sizeof (csVector3)*num_mesh_vertices);
         normal_buffer->Release();
       }
@@ -1350,7 +1353,8 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
     if (mesh_tri_normals_dirty_flag)
     {
       trinormal_buffer = r3d->GetBufferManager ()->CreateBuffer (
-          sizeof (csVector3)*num_mesh_triangles*3, CS_BUF_STATIC);
+          sizeof (csVector3)*num_mesh_triangles*3, CS_BUF_STATIC,
+          CS_BUFCOMP_FLOAT, 3);
       if(!autonormals)
       {
         if (mesh_tri_normals)
@@ -1369,7 +1373,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
     {
       if(trinormal_buffer->IsDiscarded())
       {
-          csVector3 *tbuf = (csVector3*)trinormal_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+          csVector3 *tbuf = (csVector3*)trinormal_buffer->Lock(CS_BUF_LOCK_NORMAL);
           int tbuf_index = 0;
           for (int i = 0; i < num_mesh_triangles; i ++) {
             tbuf[tbuf_index++] = mesh_tri_normals[i];
@@ -1388,14 +1392,15 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
     if (mesh_colors_dirty_flag)
     {
       color_buffer = r3d->GetBufferManager ()->CreateBuffer (
-        sizeof (csColor)*num_mesh_vertices, CS_BUF_STATIC);
+        sizeof (csColor)*num_mesh_vertices, CS_BUF_STATIC,
+        CS_BUFCOMP_FLOAT, 3);
       mesh_colors_dirty_flag = false;
     }
     if (color_buffer)
     {
       if (color_buffer->IsDiscarded())
       {
-        csColor *cbuf = (csColor*)color_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+        csColor *cbuf = (csColor*)color_buffer->Lock(CS_BUF_LOCK_NORMAL);
         memcpy (cbuf, mesh_colors, sizeof (csColor) * num_mesh_vertices);
         color_buffer->Release();
       }
@@ -1410,7 +1415,8 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
     {
       mesh_shadow_vertices_dirty_flag = true;
       index_buffer = r3d->GetBufferManager ()->CreateBuffer (
-        sizeof (unsigned int)*num_mesh_triangles*3, CS_BUF_INDEX);
+        sizeof (unsigned int)*num_mesh_triangles*3, CS_BUF_INDEX,
+        CS_BUFCOMP_UNSIGNED_INT, 1);
       mesh_triangle_dirty_flag = false;
     }
     if (index_buffer)
@@ -1436,7 +1442,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
         if (edge_midpts) delete [] edge_midpts;
           edge_midpts = new csVector3[num_mesh_triangles*3];
 
-        unsigned int *ibuf = (unsigned int *)index_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+        unsigned int *ibuf = (unsigned int *)index_buffer->Lock(CS_BUF_LOCK_NORMAL);
 
         struct Edge {
           csVector3 a, b;
@@ -1612,25 +1618,6 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
   return NULL;
 }
 
-
-
-
-
-int csGenmeshMeshObjectFactory::GetComponentCount (csStringID name)
-{
-  if (name == vertex_name) return 3;
-  if (name == shadow_vertex_name) return 3;
-  if (name == texel_name) return 2;
-  if (name == normal_name) return 3;
-  if (name == trinormal_name) return 3;
-  if (name == color_name) return 4;
-  if (name == index_name) return 1;
-  for (int i = 0; i < anon_names.Length(); i ++)
-  {
-    if (anon_names[i] == name) return anon_size[i];
-  }
-  return 0;
-}
 #endif
 
 void csGenmeshMeshObjectFactory::SetVertexCount (int n)
@@ -1927,12 +1914,42 @@ void csGenmeshMeshObjectFactory::GenerateBox (const csBox3& box)
 }
 
 #ifdef CS_USE_NEW_RENDERER
-bool csGenmeshMeshObjectFactory::AddStream (const char *name, int component_size)
+bool csGenmeshMeshObjectFactory::AddStream (const char *name, 
+  csRenderBufferComponentType component_type, int component_size)
 {
   csRef<iRender3D> r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
   anon_names.Push(r3d->GetStringContainer ()->Request (name));
+  int size = 0;
+  switch (component_type)
+  {
+  case CS_BUFCOMP_BYTE:
+    size = sizeof(char);
+    break;
+  case CS_BUFCOMP_UNSIGNED_BYTE:
+    size = sizeof(unsigned char);
+    break;
+  case CS_BUFCOMP_SHORT:
+    size = sizeof(short);
+    break;
+  case CS_BUFCOMP_UNSIGNED_SHORT:
+    size = sizeof(unsigned short);
+    break;
+  case CS_BUFCOMP_INT:
+    size = sizeof(int);
+    break;
+  case CS_BUFCOMP_UNSIGNED_INT:
+    size = sizeof(unsigned int);
+    break;
+  case CS_BUFCOMP_FLOAT:
+    size = sizeof(float);
+    break;
+  case CS_BUFCOMP_DOUBLE:
+    size = sizeof(double);
+    break;
+  }
   csRef<iRenderBuffer> b = r3d->GetBufferManager ()->CreateBuffer (
-        sizeof (float)*component_size*(num_mesh_vertices), CS_BUF_STATIC);
+        size*component_size*(num_mesh_vertices), CS_BUF_STATIC,
+        component_type, component_size);
   anon_buffers.Push(b);
   anon_size.Push(component_size);
   return true;
@@ -1948,7 +1965,7 @@ bool csGenmeshMeshObjectFactory::SetStreamComponent (const char *name, int index
   }
   if (i == anon_names.Length()) return false;
 
-  float *buf = (float *)anon_buffers[i]->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+  float *buf = (float *)anon_buffers[i]->Lock(CS_BUF_LOCK_NORMAL);
   buf[index * anon_size[i] + component] = value;
   anon_buffers[i]->Release ();
   return true;
@@ -1964,7 +1981,7 @@ bool csGenmeshMeshObjectFactory::SetStreamComponent (const char *name, int index
   }
   if (i == anon_names.Length()) return false;
 
-  int *buf = (int *)anon_buffers[i]->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+  int *buf = (int *)anon_buffers[i]->Lock(CS_BUF_LOCK_NORMAL);
   buf[index * anon_size[i] + component] = value;
   anon_buffers[i]->Release ();
   return true;
@@ -1980,7 +1997,7 @@ bool csGenmeshMeshObjectFactory::SetStream (const char *name, float *value)
   }
   if (i == anon_names.Length()) return false;
 
-  float *buf = (float *)anon_buffers[i]->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+  float *buf = (float *)anon_buffers[i]->Lock(CS_BUF_LOCK_NORMAL);
   memcpy (buf, value, sizeof (float) * anon_size[i] * num_mesh_vertices);
   anon_buffers[i]->Release ();
   return true;
@@ -1996,7 +2013,7 @@ bool csGenmeshMeshObjectFactory::SetStream (const char *name, int *value)
   }
   if (i == anon_names.Length()) return false;
 
-  int *buf = (int *)anon_buffers[i]->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+  int *buf = (int *)anon_buffers[i]->Lock(CS_BUF_LOCK_NORMAL);
   memcpy (buf, value, sizeof (int) * anon_size[i] * num_mesh_vertices);
   anon_buffers[i]->Release ();
   return true;
