@@ -23,7 +23,7 @@
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
 #include "ivaria/collider.h"
-#include "ivaria/polymesh.h"
+#include "igeom/polymesh.h"
 
 #include "odedynam.h"
 
