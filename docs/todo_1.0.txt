@@ -82,7 +82,7 @@ FIXED?	[S]  In walktest, if you fire a rocket and manually delete its dynamic
 	     but the fix is not yet in CVS.
 	[S]  Starting walktest with infinite or null renderer leads to direct
 	     crash
-	[S]  simpvs crashes immediately at startup dereferencing a null pointer.
+	[**] simpvs crashes immediately at startup dereferencing a null pointer.
 	     (optimize mode)
 	[S]  tbtut crashes after moving a bit in software mode.  Also, the
 	     program seems very incomplete.  Matze Braun <matze@braunis.de>
