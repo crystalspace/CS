@@ -29,6 +29,9 @@ The history order is reversed so that new features are at the top.
 	  correct. This fixes both collision detection (i.e. walking on the
 	  terrain which used to be very bumpy) as well as texture mapping
 	  using the texture generation process.
+	- Fixed a bug in csThing (creation of bounding box) which was
+	  harmless but nevertheless it did cause an assert to fail
+	  (and rightly so).
 15-May-2001
 	- Philip Wyett added the new cslexan to global build process.
 	  Philip also changed MSVC project file generation process to create

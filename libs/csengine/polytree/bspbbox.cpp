@@ -812,7 +812,7 @@ void csPolyTreeBBox::LinkStub (csPolygonStub* ps)
 void csPolyTreeBBox::World2Camera (const csTransform& trans)
 {
   int i;
-  cam_vertices.MakeRoom (vertices.GetNumVertices ());
+  cam_vertices.SetNumVertices (vertices.GetNumVertices ());
   for (i = 0 ; i < vertices.GetNumVertices () ; i++)
     cam_vertices[i] = trans.Other2This (vertices[i]);
   is_cam_transf = true;
