@@ -84,11 +84,11 @@ csStringBase& csStringBase::AppendFmt (const char* format, ...)
   return *this;
 }
 
-class FmtStringWriter
+class csStringFmtWriter
 {
   csStringBase& str;
 public:
-  FmtStringWriter (csStringBase& str) : str (str) {}
+  csStringFmtWriter (csStringBase& str) : str (str) {}
   void Put (utf32_char ch) 
   { 
     utf8_char dest[CS_UC_MAX_UTF8_ENCODED];
@@ -101,24 +101,23 @@ public:
 
 csStringBase& csStringBase::AppendFmtV (const char* format, va_list args)
 {
-  FmtStringWriter writer (*this);
+  csStringFmtWriter writer (*this);
   csFmtDefaultReader<utf8_char> reader ((utf8_char*)format, strlen (format));
-  csPrintfFormatter<FmtStringWriter, csFmtDefaultReader<utf8_char> >
+  csPrintfFormatter<csStringFmtWriter, csFmtDefaultReader<utf8_char> >
     formatter (&reader, args);
   formatter.Format (writer);
-  return *this;
-}
 
-// These 'long long' methods are not inline since "%ll" and "%llu" are not
-// compatible with gcc's -ansi and -pedantic options which external projects
-// may employ; thus we can not use them in public headers.
-csStringBase& csStringBase::Append (longlong v)
-{
-  return AppendFmt ("%lld", v);
-}
-csStringBase& csStringBase::Append (ulonglong v)
-{
-  return AppendFmt ("%llu", v);
+  // csStringBase is capable of storing any binary data, including null bytes.
+  // csPrintfFormatter() always appends a null terminator for the convenience
+  // of raw string buffers (char[]), but csStringBase already maintains its own
+  // null terminator one position beyond the string length. We discard the
+  // final null added by csPrintfFormatter() because we do not want it to be
+  // considered by Length() as actual string data. csStringBase's own final
+  // null suffices as a suitable string terminator.
+  if (!IsEmpty())
+    Truncate(Length() - 1);
+
+  return *this;
 }
 
 void csStringBase::ExpandIfNeeded(size_t NewSize)
@@ -272,7 +271,7 @@ csStringBase& csStringBase::Replace (const char* Str, size_t Count)
 
 csStringBase &csStringBase::Append (const csStringBase &iStr, size_t iCount)
 {
-  return Append(iStr.GetData(), iCount);
+  return Append(iStr.GetData(), iCount == (size_t)-1 ? iStr.Length() : iCount);
 }
 
 csStringBase &csStringBase::Append (const char *iStr, size_t iCount)
@@ -494,7 +493,7 @@ csStringBase &csStringBase::Collapse()
 
 csStringBase &csStringBase::FormatV (const char *format, va_list args)
 {
-  Size = 0;
+  Truncate(0);
   return AppendFmtV (format, args);
 }
 

@@ -23,6 +23,17 @@ chronological order.
 	  Fischer <turboj@web.de>.
 	- Eric Sunshine removed the unused PTHREAD_MUTEX_TIMED test from
 	  CS_CHECK_PTHREAD() in checkpthread.m4.
+	- Eric Sunshine fixed bug in csStringBase::Append(csStringBase x,
+	  size_t n) where, if string 'x' contained embedded nulls and 'n' was
+	  -1, all characters following the first embedded null would be
+	  discarded (i.e. not be appended to the target string).
+	- Eric Sunshine fixed bug in csStringBase::AppendFmt() where the
+	  convenience null terminator added by csPrintfFormatter() was
+	  incorrectly considered as actual data (an embedded null) by
+	  csStringBase. This had the unfortunate side-effect of making the
+	  formatted string seem longer than expected. For instance,
+	  csString(1234) would create a string of five characters (the four
+	  digits plus an embedded null).
 15-Mar-2005
 	- Eric Sunshine renamed csQint8(), csQint16(), and csQint24() to
 	  csQfixed8(), csQfixed16(), and csQfixed24(), respectively, in order

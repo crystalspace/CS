@@ -149,9 +149,6 @@ public:
   csStringBase& AppendFmtV (const char* format, va_list args);
   /** @} */
 
-  // Implementation note: The 'long long' methods are not inline since "%ll"
-  // and "%llu" are not compatible with gcc's -ansi and -pedantic options which
-  // external projects may employ; thus we can not use them in public headers.
   /** @{ */
   /// Append the value, in formatted form, to this string.
   csStringBase& Append (short v) { return AppendFmt ("%hd", v); }
@@ -163,8 +160,8 @@ public:
   csStringBase& Append (float v) { return AppendFmt ("%g", v); }
   csStringBase& Append (double v) { return AppendFmt ("%g", v); }
 #ifndef __STRICT_ANSI__
-  csStringBase& Append (longlong);
-  csStringBase& Append (ulonglong);
+  csStringBase& Append (longlong v) { return AppendFmt ("%lld", v); }
+  csStringBase& Append (ulonglong v) { return AppendFmt ("%llu", v); }
 #endif
   /** @} */
 
