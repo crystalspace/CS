@@ -214,7 +214,7 @@ bool Loader::ReadHeader ()
   }
   if ((positions[GetMipmapCount()] - positions[0]) + add > sourcelen)
   {
-    printf ("DDS Image too small Needs:%lu Has: %d.\n",
+    printf ("DDS Image too small Needs:%u Has: %d.\n",
 	(positions[GetMipmapCount()] - positions[0])+add, sourcelen);
     return false;
   }
