@@ -3547,8 +3547,6 @@ if test "$cs_cv_prog_bison_version_ok" = yes; then
 "
 fi
 
-else
-  :
 fi
 
 fi
@@ -4002,8 +4000,6 @@ if test "$cs_cv_prog_swig_version_ok" = yes; then
 "
 fi
 
-else
-  :
 fi
 
 fi

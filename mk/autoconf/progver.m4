@@ -201,7 +201,7 @@ AS_IF([test -n "$cs_prog_$4_is_version"],
 ##############################################################################
 AC_DEFUN([CS_CHECK_PROG_VERSION],
 [AC_CACHE_CHECK([if $1 version m4_default([$7],[>=]) $3],
-    [cs_cv_prog_$1_version_ok_annotated],
-    [CS_VCHK_EXTRACTVERSION([$2], [$3], [$4], [$1], m4_default([$7],[>=]))])
-AS_IF([test "$cs_cv_prog_$1_version_ok" = yes],
-    [m4_default([$5],[:])], [m4_default([$6],[:])])])
+    [AS_TR_SH([cs_cv_prog_$1_version_ok_annotated])],
+    [CS_VCHK_EXTRACTVERSION([$2], [$3], [$4], AS_TR_SH([$1]),
+	m4_default([$7],[>=]))])
+AS_IF([test "$AS_TR_SH([cs_cv_prog_$1_version_ok])" = yes], [$5], [$6])])

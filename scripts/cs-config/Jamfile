@@ -15,7 +15,7 @@ rule csConfigGen
   for l in $(INSTALLEDLIBS)
   {
     libaddstrings += "    $(l)) \
-	addlib \"$(l)\" 	\
+	addlib \"-l$(l)\" 	\
 	;;			\
 " ;
     libdep = ;
@@ -75,7 +75,7 @@ if test "\${PATH_SEPARATOR+set}" != set; then
   rm -f conf\$\$.sh
 fi
 
-CRYSTAL="\${CRYSTAL-$(prefix)}"
+CRYSTAL="\${CRYSTAL-$(prefix)\$PATH_SEPARATOR.}"
 my_IFS=\$IFS; IFS=\$PATH_SEPARATOR
 for p in \$CRYSTAL
 do

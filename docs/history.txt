@@ -6,6 +6,44 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Mar-2005
+	- Eric Sunshine re-wrote crystal.m4 essentially from scratch since it
+	  was fragile, obfuscated, and unnecessarily complex.
+	- Eric Sunshine renamed CS_PATH_CRYSTAL_JAM() to CS_PATH_CRYSTAL_EMIT()
+	  in crystal.m4 and generalized it to work with any EMITTER, rather
+	  than being hard-coded to use only CS_JAMCONFIG_PROPERTY(). (The old
+	  CS_PATH_CRYSTAL_JAM(), though deprecated, is still recognized for
+	  backward compatibility.)
+	- Eric Sunshine added an OPTIONAL-LIBS argument to the
+	  CS_PATH_CRYSTAL() and CS_PATH_CRYSTAL_EMIT() macros in crystal.m4.
+	  This is useful for clients which may want to build portions of their
+	  own projects conditionally based upon the modules with which Crystal
+	  Space itself was built. For instance, CEL's Python support is
+	  dependent upon Python support in Crystal Space, such that the CEL
+	  Python module should be built only if Crystal Space was built with
+	  Python support.
+	- Eric Sunshine changed CS_PATH_CRYSTAL() and CS_PATH_CRYSTAL_EMIT() in
+	  crystal.m4 so that they publish the additional shell variables
+	  CRYSTAL_AVAILABLE (yes or no) and CRYSTAL_AVAILABLE_LIBS (a list of
+	  all CS libraries available in this CS installation).
+	  CS_PATH_CRYSTAL() exports these variables with AC_SUBST(), and
+	  CS_PATH_CRYSTAL_EMIT() emits them to a property file.
+	- Eric Sunshine renamed CS_PATH_CRYSTAL_HELPER() to
+	  CS_PATH_CRYSTAL_CHECK() in crystal.m4. (The old name, though
+	  deprecated, is still recognized for backward compatibility.)
+	- Eric Sunshine fixed the --available-libs option in `cs-config' so
+	  that it does not raise an error when given a library name which it
+	  does not recognize. The purpose of this option (when given arguments)
+	  is to filter its arguments down to a usable subset. For example, if
+	  given 'csplugincommon_osx' on Linux, it should simply filter out this
+	  name rather than complaining that it is unknown. (The other options,
+	  such as --libs, --cflags, etc., still correctly complain about
+	  unknown names.)
+	- Eric Sunshine changed `cs-config' so that it also consults the
+	  current working directory when attempting to locate the CS resources,
+	  if all other options fail.
+	- Eric Sunshine fixed problem in CS_CHECK_PROG_VERSION() macro in
+	  progver.m4 where it could construct illegal shell variable names.
 20-Mar-2005
 	- Jorrit changed pvsvis so that the required bounding box is now
 	  optional. PVSCalc will calculate the missing bounding box if needed

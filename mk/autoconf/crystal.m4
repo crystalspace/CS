@@ -1,5 +1,6 @@
-#    Matze Braun <MatzeBraun@gmx.de>
-#    Patrick McFarland (Diablo-D3) <unknown@panax.com>
+# crystal.m4                                                   -*- Autoconf -*-
+#==============================================================================
+# Copyright (C)2005 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or modify it
 #    under the terms of the GNU Library General Public License as published by
@@ -15,200 +16,175 @@
 #    along with this library; if not, write to the Free Software Foundation,
 #    Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
+#==============================================================================
+AC_PREREQ([2.56])
 
-# CS_PATH_CRYSTAL_HELPER
-# Checks for Crystal Space paths and libs, This scripts tries first if it can
-# find a cs-config in the actual path.  If yes it just uses that.  If not it
-# checks if CRYSTAL environment variable is set, and after that if it tries to
-# find Crystal Space.  If all else fails, it just looks in /usr/local/crystal.
-# Emits an error if it can not locate Crystal Space or it was fed it a bad
-# (optional) path.  Exports the variables CRYSTAL_VERSION, CRYSTAL_CFLAGS,
-# CRYSTAL_LIBS, and CRYSTAL_INCLUDE_DIR.  Remember to do CFLAGS="$CFLAGS
-# $CRYSTAL_CFLAGS" and LDFLAGS=$"LDFLAGS $CRYSTAL_LIBS" so you can use the
-# information provided by this script.
+m4_define([cs_min_version_default], [0.99])
 
-dnl helper function
-AC_DEFUN([CS_PATH_CRYSTAL_HELPER],
-[# Get the cflags, libraries, and include-dir from the cs-config script.
-AC_ARG_WITH([cs-prefix],
-    [AC_HELP_STRING([--with-cs-prefix=PFX],
-	[Prefix where Crystal Space is installed (optional)])],
-    [CRYSTAL="$withval"], [])
-AC_ARG_ENABLE([cstest],
-    [AC_HELP_STRING([--disable-cstest],
-	[Do not try to compile and run a test Crystal Space program])],
-    [], [enable_cstest=yes])
+#------------------------------------------------------------------------------
+# CS_PATH_CRYSTAL_CHECK([MINIMUM-VERSION], [ACTION-IF-FOUND],
+#                       [ACTION-IF-NOT-FOUND], [REQUIRED-LIBS],
+#                       [OPTIONAL-LIBS])
+#	Checks for Crystal Space paths and libraries by consulting
+#	cs-config. It first looks for cs-config in the paths mentioned by
+#	$CRYSTAL, then in the paths mentioned by $PATH, and then in
+#	/usr/local/crystalspace/bin.  Emits an error if it can not locate
+#	cs-config, if the Crystal Space test program fails, or if the available
+#	version number is unsuitable.  Exports the variables
+#	CRYSTAL_CONFIG_TOOL, CRYSTAL_AVAILABLE, CRYSTAL_VERSION,
+#	CRYSTAL_CFLAGS, CRYSTAL_LIBS, CRYSTAL_INCLUDE_DIR, and
+#	CRYSTAL_AVAILABLE_LIBS.  If the check succeeds, then CRYSTAL_AVAILABLE
+#	will be 'yes', and the other variables set to appropriate values. If it
+#	fails, then CRYSTAL_AVAILABLE will be 'no', and the other variables
+#	empty.  If REQUIRED-LIBS is specified, then it is a list of Crystal
+#	Space libraries which must be present, and for which appropriate
+#	compiler and linker flags will be reflected in CRYSTAL_CFLAGS and
+#	CRYSTAL_LFLAGS. If OPTIONAL-LIBS is specified, then it is a list of
+#	Crystal Space libraries for which appropriate compiler and linker flags
+#	should be returned if the libraries are available.  It is not an error
+#	for an optional library to be absent. The client can check
+#	CRYSTAL_AVAILABLE_LIBS for a list of all libraries available for this
+#	particular installation of Crystal Space.  The returned list is
+#	independent of REQUIRED-LIBS and OPTIONAL-LIBS.  Use the results of the
+#	check like this: CFLAGS="$CFLAGS $CRYSTAL_CFLAGS" and LDFLAGS="$LDFLAGS
+#	$CRYSTAL_LIBS"
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_PATH_CRYSTAL_CHECK],
+[AC_ARG_WITH([cs-prefix],
+    [AC_HELP_STRING([--with-cs-prefix=CRYSTAL_PREFIX],
+	[specify location of Crystal Space installation; this is the \$prefix
+	value used when installing the SDK])],
+	[CRYSTAL="$withval"
+	export CRYSTAL])
 AC_ARG_VAR([CRYSTAL], [Prefix Where Crystal Space is installed])
-dnl If you really want to use autoconf 2.13 (not recommended) comment out the
-dnl line above.
+AC_ARG_ENABLE([cstest],
+    [AC_HELP_STRING([--enable-cstest],
+	[verify that the Crystal Spsace SDK is actually usable
+	(default YES)])], [], [enable_cstest=yes])
 
 # Try to find an installed cs-config.
+cs_path=''
+AS_IF([test -n "$CRYSTAL"],
+    [my_IFS=$IFS; IFS=$PATH_SEPARATOR
+    for cs_dir in $CRYSTAL; do
+	AS_IF([test -n "$cs_path"], [cs_path="$cs_path$PATH_SEPARATOR"])
+	cs_path="$cs_path$cs_dir$PATH_SEPARATOR$cs_dir/bin"
+    done
+    IFS=$my_IFS])
 
-if test "x$CRYSTAL" != "x"
-then
-   my_IFS=$IFS; IFS=$PATH_SEPARATOR
-   for cs_dir in $CRYSTAL 
-   do
-     if test -f ${cs_dir}/cs-config
-     then
-	CSCONF="${cs_dir}/cs-config"
-	break
-     else
-	if test -f ${cs_dir}/bin/cs-config
-	then
-	   CSCONF="${cs_dir}/bin/cs-config"
-	   break
-	fi
-     fi	
-   done
-   IFS=$my_IFS
+AS_IF([test -n "$cs_path"], [cs_path="$cs_path$PATH_SEPARATOR"])
+cs_path="$cs_path$PATH$PATH_SEPARATOR/usr/local/crystalspace/bin"
 
-   if test "x$CSCONF" = "x"
-   then
-     AC_MSG_WARN([Can not find cs-config in path you provided])
-     no_cs=yes
-   fi
-fi
+AC_PATH_TOOL([CRYSTAL_CONFIG_TOOL], [cs-config], [], [$cs_path])
 
-if test "x$CRYSTAL" = "x"
-then
-   CS_CHECK_TOOLS([CSCONF], [cs-config])
-   if test "x$CSCONF" = "x"
-   then
-      CRYSTAL=/usr/local/crystal
-      if test -f $CRYSTAL/bin/cs-config
-      then
-         CSCONF="$CRYSTAL/bin/cs-config"
-      else
-	 no_result=yes
-	 no_cs=yes
-      fi
-   fi
-fi
+AS_IF([test -n "$CRYSTAL_CONFIG_TOOL"],
+    [cfg="$CRYSTAL_CONFIG_TOOL"
 
-# Either we found cs by now, or we caused an error.  Now we define stuff, then
-# check if we are running a new enough version
+    CS_CHECK_PROG_VERSION([Crystal Space], [$cfg --version],
+	[m4_default([$1],[cs_min_version_default])], [9.9|.9],
+	[cs_sdk=yes], [cs_sdk=no])
 
-if test "x$no_cs" = "x"
-then
-    min_cs_version=ifelse([$1],[],[0.99],[$1])
-    AC_MSG_CHECKING([for Crystal Space - version >= $min_cs_version])
+    AS_IF([test $cs_sdk = yes],
+	[cs_liblist="$4"
+	cs_optlibs=CS_TRIM([$5])
+	AS_IF([test -n "$cs_optlibs"],
+	    [cs_optlibs=`$cfg --available-libs $cs_optlibs`
+	    cs_liblist="$cs_liblist $cs_optlibs"])
+	CRYSTAL_VERSION=`$cfg --version $cs_liblist`
+	CRYSTAL_CFLAGS=CS_RUN_PATH_NORMALIZE([$cfg --cxxflags $cs_liblist])
+	CRYSTAL_LIBS=CS_RUN_PATH_NORMALIZE([$cfg --libs $cs_liblist])
+	CRYSTAL_INCLUDE_DIR=CS_RUN_PATH_NORMALIZE(
+	    [$cfg --includedir $cs_liblist])
+	CRYSTAL_AVAILABLE_LIBS=`$cfg --available-libs`
+	AS_IF([test -z "$CRYSTAL_LIBS"], [cs_sdk=no])])],
+    [cs_sdk=no])
 
-    CRYSTAL_CFLAGS=CS_RUN_PATH_NORMALIZE([$CSCONF $csconf_args --cxxflags $4])
-    CRYSTAL_LIBS=CS_RUN_PATH_NORMALIZE([$CSCONF $csconf_args --libs $4])
-    CRYSTAL_INCLUDE_DIR=CS_RUN_PATH_NORMALIZE([$CSCONF --includedir $4])
-    CRYSTAL_VERSION=`$CSCONF --version $4`
+AS_IF([test "$cs_sdk" = yes && test "$enable_cstest" = yes],
+    [CS_CHECK_BUILD([if Crystal Space SDK is usable], [cs_cv_crystal_sdk],
+	[AC_LANG_PROGRAM(
+	    [#include <cssysdef.h>
+	    #include <csutil/scf.h>
+	    #include <stdio.h>
+	    #include <stdlib.h>
+	    CS_IMPLEMENT_APPLICATION],
+	    [scfInitialize(0,0);
+	    CS_STATIC_VARIABLE_CLEANUP
+	    iSCF::SCF->Finish();])],
+	[CS_CREATE_TUPLE([$CRYSTAL_CFLAGS],[],[$CRYSTAL_LIBS])], [C++],
+	[], [cs_sdk=no])])
 
-    cs_major_version=`$CSCONF $cs_args --version | \
-       awk 'BEGIN { FS="." } { print $[1] }'`
-    cs_minor_version=`$CSCONF $cs_args --version | \
-       awk 'BEGIN { FS="." } { print $[2] }'`
-
-    if test "x$CRYSTAL_LIBS" = "x"
-    then
-	no_cs=yes
-    fi
-fi
-
-if test "x$no_cs" != "x"
-then
-    enable_cstest=no
-fi
-
-if test x$enable_cstest = xyes
-then
-   ac_save_CXXFLAGS="$CXXFLAGS"
-   ac_save_LIBS="$LIBS"
-   CXXFLAGS="$CXXFLAGS $CRYSTAL_CFLAGS"
-   LIBS="$LIBS $CRYSTAL_LIBS"
-
-   AC_LANG_SAVE()
-   AC_LANG(C++)
-   AC_TRY_RUN([
-#include <cssysdef.h>
-#include <stdio.h>
-#include <csutil/util.h>
-
-CS_IMPLEMENT_APPLICATION
-
-int main (int argc, char *argv[])
-{
-  int major, minor, micro;
-  char *tmp_version;
-
-  /* HP/UX 9 writes to sscanf strings */
-  tmp_version = csStrNew ("$min_cs_version");
-  if (sscanf (tmp_version, "%d.%d", &major, &minor) != 2)
-  {
-     printf("%s, bad version string\n", "$min_cs_version");
-     return 1;
-  }
-
-  if (($cs_major_version > major) ||
-     (($cs_major_version == major) && ($cs_minor_version > minor)) ||
-     (($cs_major_version == major) && ($cs_minor_version == minor)))
-  {
-    return 0;
-  }
-  else
-  {
-    printf("\n*** 'cs-config --version' returned %d.%d, but the minimum version\n", $cs_major_version, $cs_minor_version);
-    printf("*** of Crystal Space required is %d.%d. If cs-config is correct, then it is\n", major, minor);
-    printf("*** best to upgrade to the required version.\n");
-    printf("*** If cs-config was wrong, set the environment variable CRYSTAL\n");
-    printf("*** to point to the correct copy of cs-config, and remove the file\n");
-    printf("*** config.cache before re-running configure\n");
-    return 1;
-  }
-}
-], [], [no_cs=yes], [echo $ac_n "cross compiling; assumed OK... $ac_c"])
-  CXXFLAGS="$ac_save_CXXFLAGS"
-  LIBS="$ac_save_LIBS"
-  AC_LANG_RESTORE()
-fi
-
-if test "x$no_cs" = "x"
-then
-   AC_MSG_RESULT([$CRYSTAL_VERSION])
-   ifelse([$2], [], [:], [$2])     
-else
-   if test x$no_result = x
-   then
-     AC_MSG_RESULT([no])
-   fi
-   CRYSTAL_CFLAGS=""
-   CRYSTAL_VERSION=""
-   CRYSTAL_LIBS=""
-   CRYSTAL_INCLUDE_DIR=""
-   ifelse([$3], [], [:], [$3])
-fi
+AS_IF([test "$cs_sdk" = yes],
+   [CRYSTAL_AVAILABLE=yes
+   $2],
+   [CRYSTAL_AVAILABLE=no
+   CRYSTAL_CFLAGS=''
+   CRYSTAL_VERSION=''
+   CRYSTAL_LIBS=''
+   CRYSTAL_INCLUDE_DIR=''
+   $3])
 ])
 
-dnl CS_PATH_CRYSTAL([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND
-dnl    [, LIBS]]]])
-dnl Test for Crystal Space, and set CRYSTAL_VERSION, CRYSTAL_CFLAGS,
-dnl CRYSTAL_LIBS, and CRYSTAL_INCLUDE_DIR.  Also exports these variables via
-dnl AC_SUBST().
-dnl
-AC_DEFUN([CS_PATH_CRYSTAL],[
-CS_PATH_CRYSTAL_HELPER([$1],[$2],[$3],[$4])
+
+#------------------------------------------------------------------------------
+# CS_PATH_CRYSTAL_HELPER([MINIMUM-VERSION], [ACTION-IF-FOUND],
+#                        [ACTION-IF-NOT-FOUND], [REQUIRED-LIBS],
+#                        [OPTIONAL-LIBS])
+#	Deprecated: Backward compatibility wrapper for CS_PATH_CRYSTAL_CHECK().
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_PATH_CRYSTAL_HELPER],
+[CS_PATH_CRYSTAL_CHECK([$1],[$2],[$3],[$4],[$5])])
+
+
+#------------------------------------------------------------------------------
+# CS_PATH_CRYSTAL([MINIMUM-VERSION], [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND],
+#                 [REQUIRED-LIBS], [OPTIONAL-LIBS])
+#	Convenience wrapper for CS_PATH_CRYSTAL_CHECK() which also invokes
+#	AC_SUBST() for CRYSTAL_AVAILABLE, CRYSTAL_VERSION, CRYSTAL_CFLAGS,
+#	CRYSTAL_LIBS, CRYSTAL_INCLUDE_DIR, and CRYSTAL_AVAILABLE_LIBS.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_PATH_CRYSTAL],
+[CS_PATH_CRYSTAL_CHECK([$1],[$2],[$3],[$4],[$5])
+AC_SUBST([CRYSTAL_AVAILABLE])
+AC_SUBST([CRYSTAL_VERSION])
 AC_SUBST([CRYSTAL_CFLAGS])
 AC_SUBST([CRYSTAL_LIBS])
-AC_SUBST([CRYSTAL_VERSION])
 AC_SUBST([CRYSTAL_INCLUDE_DIR])
+AC_SUBST([CRYSTAL_AVAILABLE_LIBS])])
+
+
+#------------------------------------------------------------------------------
+# CS_PATH_CRYSTAL_EMIT([MINIMUM-VERSION], [ACTION-IF-FOUND],
+#                      [ACTION-IF-NOT-FOUND], [REQUIRED-LIBS], [OPTIONAL-LIBS],
+#                      [EMITTER])
+#	Convenience wrapper for CS_PATH_CRYSTAL_CHECK() which also emits
+#	CRYSTAL_AVAILABLE, CRYSTAL_VERSION, CRYSTAL_CFLAGS, CRYSTAL_LIBS,
+#	CRYSTAL_INCLUDE_DIR, and CRYSTAL_AVAILABLE_LIBS as the build properties
+#	CRYSTAL.AVAILABLE, CRYSTAL.VERSION, CRYSTAL.CFLAGS, CRYSTAL.LIBS,
+#	CRYSTAL.INCLUDE_DIR, and CRYSTAL.AVAILABLE_LIBS, respectively, using
+#	EMITTER.  EMITTER is a macro name, such as CS_JAMCONFIG_PROPERTY or
+#	CS_MAKEFILE_PROPERTY, which performs the actual task of emitting the
+#	property and value. If EMITTER is omitted, then
+#	CS_EMIT_BUILD_PROPERTY()'s default emitter is used.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_PATH_CRYSTAL_EMIT],
+[CS_PATH_CRYSTAL_CHECK([$1],[$2],[$3],[$4],[$5])
+_CS_PATH_CRYSTAL_EMIT([CRYSTAL.AVAILABLE],[$CRYSTAL_AVAILABLE],[$6])
+_CS_PATH_CRYSTAL_EMIT([CRYSTAL.VERSION],[$CRYSTAL_VERSION],[$6])
+_CS_PATH_CRYSTAL_EMIT([CRYSTAL.CFLAGS],[$CRYSTAL_CFLAGS],[$6])
+_CS_PATH_CRYSTAL_EMIT([CRYSTAL.LFLAGS],[$CRYSTAL_LIBS],[$6])
+_CS_PATH_CRYSTAL_EMIT([CRYSTAL.INCLUDE_DIR],[$CRYSTAL_INCLUDE_DIR],[$6])
+_CS_PATH_CRYSTAL_EMIT([CRYSTAL.AVAILABLE_LIBS],[$CRYSTAL_AVAILABLE_LIBS],[$6])
 ])
 
-dnl CS_PATH_CRYSTAL_JAM([MINIMUM-VERSION, [ACTION-IF-FOUND
-dnl    [, ACTION-IF-NOT-FOUND [, LIBS]]]])
-dnl Test for Crystal Space, and set CRYSTAL_VERSION, CRYSTAL_CFLAGS,
-dnl CRYSTAL_LIBS, and CRYSTAL_INCLUDE_DIR.  Also exports these variabls via
-dnl CS_JAMCONFIG_PROPERTY() as the Jam variables CRYSTAL.VERSION,
-dnl CRYSTAL.CFLAGS, CRYSTAL.LFLAGS, and CRYSTAL.INCLUDE_DIR.
-dnl
-AC_DEFUN([CS_PATH_CRYSTAL_JAM],[
-CS_PATH_CRYSTAL_HELPER([$1],[$2],[$3],[$4])
-CS_JAMCONFIG_PROPERTY([CRYSTAL.CFLAGS], [$CRYSTAL_CFLAGS])
-CS_JAMCONFIG_PROPERTY([CRYSTAL.LFLAGS], [$CRYSTAL_LIBS])
-CS_JAMCONFIG_PROPERTY([CRYSTAL.VERSION], [$CRYSTAL_VERSION])
-CS_JAMCONFIG_PROPERTY([CRYSTAL.INCLUDE_DIR], [$CRYSTAL_INCLUDE_DIR])
-])
+AC_DEFUN([_CS_PATH_CRYSTAL_EMIT],
+[CS_EMIT_BUILD_PROPERTY([$1],[$2],[],[],[$3])])
+
+
+#------------------------------------------------------------------------------
+# CS_PATH_CRYSTAL_JAM([MINIMUM-VERSION], [ACTION-IF-FOUND],
+#                     [ACTION-IF-NOT-FOUND], [REQUIRED-LIBS], [OPTIONAL-LIBS])
+#	Deprecated: Jam-specific backward compatibility wrapper for
+#	CS_PATH_CRYSTAL_EMIT().
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_PATH_CRYSTAL_JAM],
+[CS_PATH_CRYSTAL_EMIT([$1],[$2],[$3],[$4],[$5],[CS_JAMCONFIG_PROPERTY])])

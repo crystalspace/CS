@@ -94,7 +94,7 @@ includedeps()
     fi
 }
 
-addlib_decorated()
+addlib()
 {
     # Lib already in list?
     case " $the_libs " in
@@ -114,12 +114,6 @@ addlib_decorated()
 	    ALREADY_TESTED=""
 	fi
     done
-}
-
-addlib()
-{
-    all_libnames="$1 $all_libnames"
-    addlib_decorated "-l$1"
 }
 
 findcexfile()
@@ -159,11 +153,12 @@ addexlib()
     done
 
     if test -n "$EXLIB"; then
-        addlib_decorated "$EXLIB"
+        addlib "$EXLIB"
     fi
 }
 
-all_libnames=""
+common_libs="csgfx csgeom cstool csutil csws csplugincommon"
+raw_names=""
 the_libs=""
 show_libs=""
 show_cflags=""
@@ -225,7 +220,7 @@ while test $# -gt 0; do
 	show_availlibs=true
 	;;
     *)
-	checklibname $1
+	raw_names="$raw_names $1"
         ;;
   esac
   shift
@@ -264,24 +259,39 @@ fi
     
 if test -n "$show_libs"; then
     # If user specified no libraries, then emit commonly needed ones.
-    if test -z "$the_libs"; then
-	commonlibs="csgfx csgeom cstool csutil csws csplugincommon"
-	for deflib in $commonlibs; do
-	    addlib $deflib
-        done
+    if test -z "$raw_names"; then
+	raw_names="$common_libs"
     fi
-    the_libs="${lflags} $the_libs ${syslibs}"
-    echo "$the_libs"
+    for do_lib in $raw_names; do
+	checklibname $do_lib
+    done
+    echo "$lflags $the_libs $syslibs"
 fi
 
 if test -n "$show_availlibs"; then
     # If user specified no libraries, then emit all.
-    if test -z "$the_libs"; then
-	for deflib in $liblist; do
-	    addlib $deflib
+    if test -z "$raw_names"; then
+	lib_names="$liblist"
+    else
+	# Filter the user-supplied list down to valid entries. It is not an
+	# error for the user-supplied list to contain unknown library names;
+	# we are filtering the list down to names which are valid under this
+	# installation's configuration. For instance, the client might request
+	# `csplugincommon_osx', and we do not want to emit an error when the
+	# request is made on Linux; we just want to return a usable subset of
+	# those requested. Other options, such as --cflags, --libs, etc., will
+	# emit an appropriate error for unknown library requests.
+	lib_names=''
+	for x in $raw_names; do
+	    for z in $liblist; do
+		if test "_$x" = "_$z"; then
+		    lib_names="$x $lib_names"
+		    break
+		fi
+	    done
         done
     fi
-    echo "$all_libnames"
+    echo "$lib_names"
 fi
 
 exit 0
