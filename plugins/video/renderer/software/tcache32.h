@@ -43,8 +43,7 @@ private:
   /// Create a texture in the texture cache (true_rgb and private colormaps).
   void create_lighted_true_rgb_priv (TCacheData& tcd, TCacheLightedTexture* tclt, csTextureManagerSoftware* txtmgr);
 #endif
-
-  int red_shift, green_shift, blue_shift;
+  enum { PIX_RGB, PIX_BGR } pixmode;
 
 protected:
   /**

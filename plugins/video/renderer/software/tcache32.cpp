@@ -29,9 +29,10 @@
 TextureCache32::TextureCache32 (csPixelFormat* pfmt) : TextureCache (pfmt)
 {
   gi_pixelbytes = 4;
-  red_shift = pfmt->RedShift;
-  green_shift = pfmt->GreenShift;
-  blue_shift = pfmt->BlueShift;
+  // simplified check as for now we know only about RGB and BGR modes.
+  // If support for more pixel formats is needed, modify here and the
+  // start of create_lighted_24bit () routine.
+  pixmode = pfmt->RedShift ? PIX_RGB : PIX_BGR;
 }
 
 TextureCache32::~TextureCache32 ()
@@ -46,6 +47,16 @@ void TextureCache32::create_lighted_texture (TCacheData& tcd, TCacheLightedTextu
   if (tcd.lm_grid) show_lightmap_grid (tcd, tclt, txtmgr);
 }
 
+/*
+    Implementation note. We don't pay attention to whenever we have RGB or BGR
+    or whatever pixel format except for the moment when we get the light map
+    for R, G and B. Because texture is kept in "native" form, bits 16-23 of
+    texture will end in bits 16-23 of lighted texture, bits 8-15 of source
+    texture will influence bits 8-15 of the result and so on, no matter if
+    it is R, G or B component. The only thing that really matters is where
+    the lightmap pointer (mapR, mapG or mapB) points. We can decide this
+    once at the beginning of the function.
+*/
 void TextureCache32::create_lighted_24bit (TCacheData& tcd, TCacheLightedTexture* tclt,
   csTextureManagerSoftware* txtmgr)
 {
@@ -55,13 +66,12 @@ void TextureCache32::create_lighted_24bit (TCacheData& tcd, TCacheLightedTexture
   int Imin_u = tcd.Imin_u;
   int Imin_v = tcd.Imin_v;
 
-  int rs24 = txtmgr->pixel_format ().RedShift;
-  int gs24 = txtmgr->pixel_format ().GreenShift;
-  int bs24 = txtmgr->pixel_format ().BlueShift;
+  unsigned char *mapR, *mapG, *mapB;
 
-  unsigned char* mapR = tcd.mapR;
-  unsigned char* mapG = tcd.mapG;
-  unsigned char* mapB = tcd.mapB;
+  if (pixmode)
+    mapR = tcd.mapR, mapG = tcd.mapG, mapB = tcd.mapB;
+  else
+    mapR = tcd.mapB, mapG = tcd.mapG, mapB = tcd.mapR;
 
   ULong* otmap = (ULong*)tcd.tdata;
   int shf_w = tcd.shf_w;
@@ -117,14 +127,9 @@ void TextureCache32::create_lighted_24bit (TCacheData& tcd, TCacheLightedTexture
 	whi_0 = gre_00 << 16; whi_0d = ((gre_01-gre_00)<<16) >> tcd.mipmap_shift;
 	whi_1 = gre_10 << 16; whi_1d = ((gre_11-gre_10)<<16) >> tcd.mipmap_shift;
 
-        if (red_shift == 16)
-	  #define PI_R8G8B8
-	  #define TL_WHITE
-	  #include "texl24.inc"
-	else
-	  #define PI_B8G8R8
-	  #define TL_WHITE
-	  #include "texl24.inc"
+        #define PI_R8G8B8
+	#define TL_WHITE
+	#include "texl24.inc"
 
 	luv++;
       }
@@ -140,14 +145,9 @@ void TextureCache32::create_lighted_24bit (TCacheData& tcd, TCacheLightedTexture
         blu_0 = blu_00 << 16; blu_0d = ((blu_01-blu_00)<<16) >> tcd.mipmap_shift;
         blu_1 = blu_10 << 16; blu_1d = ((blu_11-blu_10)<<16) >> tcd.mipmap_shift;
 
-        if (red_shift == 16)
-	  #define PI_R8G8B8
-	  #define TL_RGB
-	  #include "texl24.inc"
-        else
-	  #define PI_B8G8R8
-	  #define TL_RGB
-	  #include "texl24.inc"
+	#define PI_R8G8B8
+	#define TL_RGB
+	#include "texl24.inc"
 
         luv++;
       }

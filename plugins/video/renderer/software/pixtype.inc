@@ -45,17 +45,6 @@
 #  define PI_BM		0x000000FF
 #  define PI_BS		0
 #  define PI_BB		8
-#elif defined (PI_B8G8R8)
-#  define PI_PIXTYPE	ULong
-#  define PI_RM		0x000000FF
-#  define PI_RS		0
-#  define PI_RB		8
-#  define PI_GM		0x0000FF00
-#  define PI_GS		8
-#  define PI_GB		8
-#  define PI_BM		0x00FF0000
-#  define PI_BS		16
-#  define PI_BB		8
 #else
 #  error "ERROR: Pixel format not defined before including pixtype.inc!"
 #endif

@@ -25,16 +25,6 @@
 #  define __blu	blu
 #endif
 
-#ifdef PI_R8G8B8
-#  define __rs	rs24
-#  define __gs	gs24
-#  define __bs	bs24
-#else
-#  define __rs	16
-#  define __gs	8
-#  define __bs	0
-#endif
-
 {
   for (dv = 0 ; dv < tcd.mipmap_size ; dv++, tm += w-tcd.mipmap_size)
   {
@@ -59,17 +49,17 @@
     for (uu = u + Imin_u ; uu < end_u ; uu++)
     {
       UInt pixel = ot [uu & and_w];
-      UInt r = ((pixel >> __rs) & 0xff) * __red >> (31 - PI_RS - PI_RB);
+      UInt r = (pixel >> 16) * __red >> (31 - PI_RS - PI_RB);
       if (r > PI_RM) r = PI_RM;
 #if PI_RS > 0
       else r &= PI_RM;
 #endif
-      UInt g = ((pixel >> __gs) & 0xff) * __gre >> (31 - PI_GS - PI_GB);
+      UInt g = ((pixel >> 8) & 0xff) * __gre >> (31 - PI_GS - PI_GB);
       if (g > PI_GM) g = PI_GM;
 #if PI_GS > 0
       else g &= PI_GM;
 #endif
-      UInt b = ((pixel >> __bs) & 0xff) * __blu >> (31 - PI_BS - PI_BB);
+      UInt b = (pixel & 0xff) * __blu >> (31 - PI_BS - PI_BB);
       if (b > PI_BM) b = PI_BM;
 #if PI_BS > 0
       else b &= PI_BM;
@@ -101,12 +91,8 @@
 #undef __red
 #undef __gre
 #undef __blu
-#undef __rs
-#undef __gs
-#undef __bs
 #undef TL_WHITE
 #undef TL_RGB
 #undef PI_R5G5B5
 #undef PI_R5G6B5
 #undef PI_R8G8B8
-#undef PI_B8G8R8
