@@ -144,7 +144,7 @@ bool csGraphics3DOpenGL::Initialize (iSystem *iSys)
   m_config_options.do_multitexture_level = 0;
   m_config_options.do_extra_bright = false;
 
-  CHK (txtmgr = new csTextureManagerOpenGL (System, G2D));
+//  CHK (txtmgr = new csTextureManagerOpenGL (System, G2D));
 
   return true;
 }
