@@ -2046,10 +2046,10 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
   if (has_lightmap)
   {
     // If there is a lightmap we check if the size of the lighted
-    // texture would not exceed 1000000 bytes. In that case we
+    // texture would not exceed MAX_LIGHTMAP_SIZE pixels. In that case we
     // revert to unlighted texture mapping.
     long size = tex->GetWidth () * tex->GetHeight ();
-    if (size > 1000000) has_lightmap = false;
+    if (size > MAX_LIGHTMAP_SIZE) has_lightmap = false;
   }
 
   // Continue with texture mapping
