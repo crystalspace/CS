@@ -9,6 +9,11 @@ The history order has been reversed so that new features are at the top.
 	    - Replaced / with \ in #include directive.
 	    - Fixed virtual destructor.
 	    - Fixed vpath in makefile.
+	- Martin Geisse split up the sound loader into several plugins.
+	  There is now one loader plugin for every sound format, plus one
+	  plugin that lets all others look like a single loader for
+	  convenience (called multiplexer). Currently all these plugins
+	  remain in the sndload library.
 21-Mar-2001:
 	- Martin Geisse did a big redesign and cleanup of the sound system:
 	    - Merged static and streamed sound data classes.
