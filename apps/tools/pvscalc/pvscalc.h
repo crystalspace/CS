@@ -36,17 +36,6 @@
 #include "iutil/virtclk.h"
 #include "ivideo/graph3d.h"
 
-#include "csgeom/chainhull2d.h"
-#include "csgeom/pmtools.h"
-#include "iengine/mesh.h"
-#include "iengine/movable.h"
-#include "iengine/sector.h"
-#include "iengine/viscull.h"
-#include "igeom/objmodel.h"
-#include "imesh/object.h"
-#include "iutil/cmdline.h"
-#include "ivaria/pvstree.h"
-
 class PVSCalc;
 struct iDocumentNode;
 struct iLoaderContext;
