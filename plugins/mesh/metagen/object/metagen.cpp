@@ -180,6 +180,7 @@ void csMetaGen::SetEnvironmentMappingFactor (float env_mult)
 	FillArcSineTable ();
 }
 
+#if 0
 static void LitVertex( const csVector3 &n, csColor &c )
 {
   if (n.z > 0)
@@ -190,6 +191,7 @@ static void LitVertex( const csVector3 &n, csColor &c )
     c.red = c.green = c.blue = l;
   }
 }
+#endif
 
 void csMetaGen::CreateLighting( iLight **, int, iMovable * )
 {

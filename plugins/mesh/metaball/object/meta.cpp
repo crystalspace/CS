@@ -163,6 +163,7 @@ void csMetaBall::SetEnvironmentMappingFactor (float env_mult)
   InitTables ();
 }
 
+#if 0
 static void LitVertex( const csVector3 &n, csColor &c )
 {
   if (n.z > 0)
@@ -173,6 +174,7 @@ static void LitVertex( const csVector3 &n, csColor &c )
     c.red = c.green = c.blue = l;
   }
 }
+#endif
 
 bool csMetaBall::DrawTest( iRenderView* rview, iMovable* movable)
 {
