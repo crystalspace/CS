@@ -11,6 +11,9 @@ chronological order.
 	- Jorrit added a new iEngineSectorCallback system to the engine. This
 	  can be used to discover when sectors are added or removed to the
 	  engine.
+	- Jorrit fixed the sector and engine callbacks so that they traverse
+	  the callback list from end to start. That way a callback can
+	  remove itself safely.
 6-Jan-2005
 	- Jorrit removed GetPrivateObject() from iThingState and iBezierState.
 	- Eric Sunshine applied a patch from Brian DeVries

@@ -2918,16 +2918,22 @@ void csEngine::RemoveEngineSectorCallback (iEngineSectorCallback* cb)
 
 void csEngine::FireNewSector (iSector* sector)
 {
-  size_t i;
-  for (i = 0 ; i < sector_callbacks.Length () ; i++)
+  size_t i = sector_callbacks.Length ();
+  while (i > 0)
+  {
+    i--;
     sector_callbacks[i]->NewSector (this, sector);
+  }
 }
 
 void csEngine::FireRemoveSector (iSector* sector)
 {
-  size_t i;
-  for (i = 0 ; i < sector_callbacks.Length () ; i++)
+  size_t i = sector_callbacks.Length ();
+  while (i > 0)
+  {
+    i--;
     sector_callbacks[i]->RemoveSector (this, sector);
+  }
 }
 
 csPtr<iMaterial> csEngine::CreateBaseMaterial (iTextureWrapper *txt)

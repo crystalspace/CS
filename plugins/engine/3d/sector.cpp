@@ -629,8 +629,9 @@ void csSector::PrepareDraw (iRenderView *rview)
   csrview->SetThisSector (&scfiSector);
 
   size_t i = sector_cb_vector.Length ();
-  while (i-- > 0)
+  while (i > 0)
   {
+    i--;
     iSectorCallback* cb = sector_cb_vector.Get (i);
     cb->Traverse (&scfiSector, rview);
   }
@@ -793,16 +794,22 @@ void csSector::RemoveSectorMeshCallback (iSectorMeshCallback* cb)
 
 void csSector::FireNewMesh (iMeshWrapper* mesh)
 {
-  size_t i;
-  for (i = 0 ; i < sector_mesh_cb_vector.Length () ; i++)
+  size_t i = sector_mesh_cb_vector.Length ();
+  while (i > 0)
+  {
+    i--;
     sector_mesh_cb_vector[i]->NewMesh (&scfiSector, mesh);
+  }
 }
 
 void csSector::FireRemoveMesh (iMeshWrapper* mesh)
 {
-  size_t i;
-  for (i = 0 ; i < sector_mesh_cb_vector.Length () ; i++)
+  size_t i = sector_mesh_cb_vector.Length ();
+  while (i > 0)
+  {
+    i--;
     sector_mesh_cb_vector[i]->RemoveMesh (&scfiSector, mesh);
+  }
 }
 
 void csSector::CheckFrustum (iFrustumView *lview)
