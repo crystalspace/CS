@@ -7,7 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 9-Jul-2004
-        - Vincent Knecht simplified and re-enabled levels relighting in cs.spec
+	- Vincent Knecht simplified and re-enabled levels relighting in cs.spec
 8-Jul-2004
 	- Jorrit fixed a compile error in the NR GL renderer.
 	- Jorrit fixed a compile error in partgen.
