@@ -538,7 +538,7 @@ struct iMeshWrapper : public iBase
   virtual bool GetDrawAfterShadow () = 0;
   
   /**
-   * Get shader variable context of mesh object.
+   * Get the shader variable context of the mesh object.
    */
   virtual iShaderVariableContext* GetSVContext() = 0;
 };
@@ -720,6 +720,11 @@ struct iMeshFactoryWrapper : public iBase
    * render priority for the children too.
    */
   virtual void SetRenderPriorityRecursive (long rp) = 0;
+
+  /**
+   * Get the shader variable context of the mesh factory.
+   */
+  virtual iShaderVariableContext* GetSVContext() = 0;
 };
 
 SCF_VERSION (iMeshList, 0, 0, 1);

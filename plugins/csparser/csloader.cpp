@@ -2273,7 +2273,32 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
         stemp->SetRenderPriority (
 		Engine->GetRenderPriority (child->GetContentsValue ()));
         break;
-
+      case XMLTOKEN_SHADERVAR:
+	{
+	  if (!stemp->GetMeshObjectFactory ())
+	  {
+            SyntaxService->ReportError (
+	      "crystalspace.maploader.parse.meshfactory",
+              child, "Please use 'params' before specifying 'shadervar'!");
+	    return false;
+	  }
+	  csRef<iShaderVariableContext> svc = stemp->GetSVContext();
+	  CS_ASSERT (svc.IsValid());
+	  //create a new variable
+	  const char* varname = child->GetAttributeValue ("name");
+	  csRef<csShaderVariable> var;
+	  var.AttachNew (new csShaderVariable (stringSet->Request (varname)));
+	  if (!SyntaxService->ParseShaderVar (child, *var))
+	  {
+	    SyntaxService->ReportError (
+	      "crystalspace.maploader.load.meshobject", child,
+	      "Error loading shader variable '%s' in mesh factory '%s'.", 
+	      varname, stemp->QueryObject()->GetName());
+	    break;
+	  }
+	  svc->AddVariable (var);
+	}
+	break;
       default:
 	SyntaxService->ReportBadToken (child);
         return false;

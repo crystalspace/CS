@@ -212,6 +212,7 @@ protected:
   csRef<csStaticLODMesh> static_lod;
 
   csShaderVariableContext svcontext;
+  csRef<iShaderVariableContext> factorySVC;
 private:
   /// Mesh object corresponding with this csMeshWrapper.
   csRef<iMeshObject> meshobj;
@@ -338,6 +339,7 @@ public:
   void SetFactory (iMeshFactoryWrapper* factory)
   {
     csMeshWrapper::factory = factory;
+    factorySVC = factory ? factory->GetSVContext() : 0;
   }
   /// Get the mesh factory.
   iMeshFactoryWrapper* GetFactory () const
@@ -654,25 +656,39 @@ public:
 
   /// Get a named variable from this context
   csShaderVariable* GetVariable (csStringID name) const
-  { return svcontext.GetVariable (name); }
+  { 
+    csShaderVariable* sv = svcontext.GetVariable (name); 
+    if ((sv == 0) && (factorySVC.IsValid()))
+      sv = factorySVC->GetVariable (name);
+    return sv;
+  }
 
   /// Get Array of all ShaderVariables
   const csRefArray<csShaderVariable>& GetShaderVariables () const
-  { return svcontext.GetShaderVariables (); }
+  { 
+    // @@@ Will not return factory SVs
+    return svcontext.GetShaderVariables (); 
+  }
 
   /**
    * Push the variables of this context onto the variable stacks
    * supplied in the "stacks" argument
    */
   void PushVariables (csShaderVarStack &stacks) const
-  { svcontext.PushVariables (stacks); }
+  { 
+    if (factorySVC.IsValid()) factorySVC->PushVariables (stacks);
+    svcontext.PushVariables (stacks); 
+  }
 
   /**
    * Pop the variables of this context off the variable stacks
    * supplied in the "stacks" argument
    */
   void PopVariables (csShaderVarStack &stacks) const
-  { svcontext.PopVariables (stacks); }
+  { 
+    svcontext.PopVariables (stacks); 
+    if (factorySVC.IsValid()) factorySVC->PopVariables (stacks);
+  }
 
   //--------------------- iMeshWrapper implementation --------------------//
   struct MeshWrapper : public iMeshWrapper
@@ -902,7 +918,7 @@ SCF_VERSION (csMeshFactoryWrapper, 0, 0, 3);
 /**
  * The holder class for all implementations of iMeshObjectFactory.
  */
-class csMeshFactoryWrapper : public csObject
+class csMeshFactoryWrapper : public csObject, public iShaderVariableContext
 {
 private:
   /// Mesh object factory corresponding with this csMeshFactoryWrapper.
@@ -927,6 +943,8 @@ private:
   long render_priority;
   /// Suggestion for new children created from factory.
   csZBufMode zbufMode;
+
+  csShaderVariableContext svcontext;
 private:
   /// Destructor.
   virtual ~csMeshFactoryWrapper ();
@@ -1000,6 +1018,34 @@ public:
   void SetRenderPriorityRecursive (long rp);
 
   SCF_DECLARE_IBASE_EXT (csObject);
+
+  //=================== iShaderVariableContext ================//
+
+  /// Add a variable to this context
+  void AddVariable (csShaderVariable *variable)
+  { svcontext.AddVariable (variable); }
+
+  /// Get a named variable from this context
+  csShaderVariable* GetVariable (csStringID name) const
+  { return svcontext.GetVariable (name); }
+
+  /// Get Array of all ShaderVariables
+  const csRefArray<csShaderVariable>& GetShaderVariables () const
+  { return svcontext.GetShaderVariables (); }
+
+  /**
+   * Push the variables of this context onto the variable stacks
+   * supplied in the "stacks" argument
+   */
+  void PushVariables (csShaderVarStack &stacks) const
+  { svcontext.PushVariables (stacks); }
+
+  /**
+   * Pop the variables of this context off the variable stacks
+   * supplied in the "stacks" argument
+   */
+  void PopVariables (csShaderVarStack &stacks) const
+  { svcontext.PopVariables (stacks); }
 
   //----------------- iMeshFactoryWrapper implementation --------------------//
   struct MeshFactoryWrapper : public iMeshFactoryWrapper
@@ -1077,6 +1123,8 @@ public:
     {
       scfParent->SetRenderPriorityRecursive (rp);
     }
+    virtual iShaderVariableContext* GetSVContext()
+    { return CS_STATIC_CAST(iShaderVariableContext*, scfParent); }
   } scfiMeshFactoryWrapper;
   friend struct MeshFactoryWrapper;
 };

@@ -1065,6 +1065,7 @@ float csMeshWrapper::GetScreenBoundingBox (
 // ---------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE_EXT(csMeshFactoryWrapper)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshFactoryWrapper)
+  SCF_IMPLEMENTS_INTERFACE(iShaderVariableContext)
   SCF_IMPLEMENTS_INTERFACE(csMeshFactoryWrapper)
 SCF_IMPLEMENT_IBASE_EXT_END
 

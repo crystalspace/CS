@@ -3060,7 +3060,7 @@ csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (
   csMeshFactoryWrapper *mfactwrap = new csMeshFactoryWrapper (fact);
   if (name) mfactwrap->SetName (name);
   GetMeshFactories ()->Add (&(mfactwrap->scfiMeshFactoryWrapper));
-  fact->SetLogicalParent (mfactwrap);
+  fact->SetLogicalParent ((iObject*)mfactwrap);
   return csPtr<iMeshFactoryWrapper> (&mfactwrap->scfiMeshFactoryWrapper);
 }
 
