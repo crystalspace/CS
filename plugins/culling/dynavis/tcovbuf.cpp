@@ -303,9 +303,6 @@ void csCoverageTile::FlushNoDepthConstFValue (csTileCol& fvalue, float maxdepth,
   // we don't have to check the depth buffer.
   // This version has a constant fvalue (no operations).
 
-  // @@@ TODO: Check if we can improve depth for fully covered blocks!
-  // Should be easy in this version.
-
   csTileCol* c = coverage;
   // 'fulltest' will be used to test if the resulting tile is full.
   // We will initialize it to full and then and it with every column. If
