@@ -3,35 +3,162 @@
 @section Feature List
 @cindex Features
 
-The first feature to mention is that Crystal Space is an open source project.
-It falls under the GNU copyleft license (LGPL). @xref{License}.
+The first feature to mention here is that Crystal Space is an Open Source
+project (or a Free Software project, depending on your religion). It is
+released under the GNU Lesser General Public License (GNU LGPL). @xref{License}.
 
-Crystal Space is divided into several libraries. The items in the feature
-list are sorted by the library they belong to. Note that this is not a
-description of how these libraries work together. Some libraries are not
-even mentioned here.
+Crystal Space is divided into several libraries and plug-ins. The items in the
+feature list are sorted by the library or plug-in that are responsible for
+them. Note that this is not a description of how these components work
+together. Since Crystal Space is in active development, not all features (or
+even libraries and plug-ins for that matter) are mentioned here. You are
+advised to browse the source code or the mailing list to get the most up-to-date
+idea of Crystal Space's current feature set.
 
-Currently Crystal Space has the following features:
+Here are some of Crystal Space's current features:
 
 @table @emph
-@item System Driver
-A system library that will perform system-dependent operations for your
-program. This way your program is easily portable to any supported system.
-It includes a good plug-in system that offers you an interface to
-dynamically loaded drivers (@file{.so} or @file{.dll}), like the 3D rasterizer.
-NOTE: This library as such will not be available in the 1.0 release, OS-specific 
-functions will remain in this library however. The most important classes will 
-be moving into the Tool and Utility libraries.
- 
+@item System Library
+The system library performs system-dependent operations (such as dynamically
+loading shared libraries). This helps to make your program easily portable to
+any supported platform. It originally provided a good deal of functionality
+but much of the code has migrated to the Tool and Utility libraries.
+
 @item Geometry Library
-A 3D math library, including 2D and 3D vectors, matrices and polygons.
-This library can be used without the rest of Crystal Space.
+The geometry library provides 3D maths for the rest of Crystal Space.  It is
+also useful on its own and can be used independently from the rest of Crystal
+Space.
+
+@itemize @bullet
+@item
+2D and 3D vectors
+
+@item
+quaternions
+
+@item
+2D and 3D polygons
+
+@item
+splines
+
+@item
+2D and 3D matrices (and transforms)
+@end itemize
+
+@item Utility Library
+The Utility Library provides low-level functionality for the rest of Crystal
+Space.
+
+@itemize @bullet
+@item
+SCF (the backbone of object-orientation in Crystal Space. @xref{SCF})
+
+@item
+plugin manager
+
+@item
+archival (ZIP files)
+
+@item
+configuration files
+
+@item
+command-line parsing
+
+@item
+events (queues, cords, outlets)
+
+@item
+user input
+
+@item
+md5 signatures
+
+@item
+debugging functions
+
+@item
+random number generator
+
+@item
+a virtual clock and scheduler
+
+@item
+strings
+
+@item
+storage vectors (not geometry vectors)
+
+@item
+data streams
+
+@item
+hash maps
+
+@item
+progress meters and pulses (in text)
+@end itemize
+
+@item Tool Library
+The Tool Library is a higher-level library that provides a number of tools such
+as:
+
+@itemize @bullet
+@item
+application initialization
+
+@item
+video preferences
+
+@item
+screen FX (fading, whiteout, etc)
+
+@item
+procedural textures
+
+@item
+2D animations
+
+@item
+sprite building
+@end itemize
+
+@item Windowing System Library
+CSWS provides a collection of objects that can be used to create a portable
+GUI that runs inside of Crystal Space.  The interface look can also be
+customized at runtime and textured to fit with your project. It includes the
+following widgets:
+
+@itemize @bullet
+@item
+buttons (command buttons, checkboxes, radio buttons)
+
+@item
+menus
+
+@item
+scrollbars
+
+@item
+dialogs (including ready-made dialogs such as file selection and color
+selection)
+
+@item
+trees and listboxes
+
+@item
+layout widgets (notebook, grid)
+
+@item
+GUI hints
+@end itemize
 
 @item 2D Canvas / 3D Renderer
-These libraries allow you to draw directly on the screen, and to use
+These libraries allow you to draw directly on the screen and to use
 hardware accelerated 3D drawing. They are independent from the engine and
 perform only basic operations. You can actually use them if you want to
-write your own engine. The libraries include:
+write your own engine. Features include:
 
 @itemize @bullet
 @item

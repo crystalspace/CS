@@ -4,24 +4,24 @@
 @cindex Introduction
 
 CrystalSpace is a 6@sc{dof} 3D engine (six degrees of freedom, this means that
-you can look in all directions for a real 3D experience), it is not in
-itself a game and is still very much in development.  Anyone who feels
-inclined can contribute to the source.  There are several things that still
-need to be done.  For more information about what is missing and a list of
-currently known bugs, visit the Developer's Project page at SourceForge:
+you can look in all directions for a real 3D experience), it is not in itself a
+game and is still very much in development.  Anyone who feels inclined can
+contribute to the source.  There are several things that still need to be done.
+For more information about what is missing and a list of currently known bugs,
+visit the Developer's Project page at SourceForge:
 
 @noindent
 @uref{http://sourceforge.net/projects/crystal/}
 
 CrystalSpace is free and should remain free.  CrystalSpace falls under the
-GNU copyleft license for libraries.  To see what this means please read the license
-that should be included with this archive. @xref{License}. In short it means
-that you are allowed to use Crystal Space in your products.  You are even
+GNU copyleft license for libraries.  To see what this means please read the
+license that should be included with this archive. @xref{License}. In short it
+means that you are allowed to use Crystal Space in your products.  You are even
 allowed to sell your product using Crystal Space provided Crystal Space
 itself remains free.
 
-Please read the @sc{faq} if you have any questions.  If you don't find the answer
-there you can always email the mailing lists. @xref{FAQ}, or
+Please read the @sc{faq} if you have any questions.  If you don't find the
+answer there you can always email the mailing lists. @xref{FAQ}, or
 @ref{Mailing Lists}.
 
 @menu
