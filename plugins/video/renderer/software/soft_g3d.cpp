@@ -100,7 +100,7 @@
 #define SCANPROCPI_TEX_GOURAUD_ZFIL     0x02
 #define SCANPROCPI_TEX_GOURAUD_ZUSE     0x03
 
-//Pointers to scanline drawing with effects.
+// Pointers to scanline drawing with effects.
 #define SCANPROCPIFX_ZUSE               0x00
 #define SCANPROCPIFX_ZFIL               0x01
 #define SCANPROCPIFX_TRANSP_ZUSE        0x02
@@ -266,9 +266,7 @@ void csGraphics3DSoftware::ScanSetup ()
 #endif
 
   // In the following unimplemented routines are just commented out
-  // Since the arrays are zeroed above this is effectively a NULL assignment
-  // The routines that are substitued by other close routines are marked
-  // with a /**/ sign at the start of line. Usually this means loss of quality.
+  // Since the arrays are zeroed above this is effectively a NULL assignment.
   ScanProc [SCANPROC_ZFIL] = csScan_draw_scanline_zfil;
   switch (pfmt.PixelBytes)
   {
@@ -477,31 +475,31 @@ void csGraphics3DSoftware::ScanSetup ()
       break;
   } /* endswitch */
 
-  int MaxColorcomponent = 64; //(pfmt.PixelBytes == 4) ? 256 : 32;
+  int MaxColorcomponent = 64; // (pfmt.PixelBytes == 4) ? 256 : 32;
   
-  //For DrawPolygonFX we will need to do some blending of textures with current
-  //screen content. 
-  for (int i = 0; i<8; i++)
+  // For DrawPolygonFX we will need to do some blending of textures with current
+  // screen content. 
+  for (int i = 0; i < 8; i++)
   {
-    m_BlendingTable[i] = new UByte[MaxColorcomponent*MaxColorcomponent];
+    m_BlendingTable [i] = new UByte [MaxColorcomponent * MaxColorcomponent];
   }
 
   for (int src = 0; src<MaxColorcomponent; src++)
   {
     for (int dest = 0; dest<MaxColorcomponent; dest++)
     {
-      //The index in the table is a combintation of src pixel and dest pixel
+      // The index in the table is a combintation of src pixel and dest pixel
       int index = dest * MaxColorcomponent + src;
 
-      //Calculate all the available blendingmodes supported.
-      m_BlendingTable[BLENDTABLE_COPY     ][index] =  src;
-      m_BlendingTable[BLENDTABLE_ADD      ][index] =  dest + src;
-      m_BlendingTable[BLENDTABLE_MULTIPLY ][index] = (dest * src)/MaxColorcomponent;
-      m_BlendingTable[BLENDTABLE_MULTIPLY2][index] = (dest * src * 2)/MaxColorcomponent;
-      m_BlendingTable[BLENDTABLE_ALPHA25  ][index] =  dest/4 + (src*3)/4;
-      m_BlendingTable[BLENDTABLE_ALPHA50  ][index] =  dest/2 + src/2;
-      m_BlendingTable[BLENDTABLE_ALPHA75  ][index] = (dest*3)/4 + src/4;
-      m_BlendingTable[BLENDTABLE_ALPHA100 ][index] =  dest;
+      // Calculate all the available blendingmodes supported.
+      m_BlendingTable [BLENDTABLE_COPY     ][index] =  src;
+      m_BlendingTable [BLENDTABLE_ADD      ][index] =  dest + src;
+      m_BlendingTable [BLENDTABLE_MULTIPLY ][index] = (dest * src)/MaxColorcomponent;
+      m_BlendingTable [BLENDTABLE_MULTIPLY2][index] = (dest * src * 2)/MaxColorcomponent;
+      m_BlendingTable [BLENDTABLE_ALPHA25  ][index] =  dest/4 + (src*3)/4;
+      m_BlendingTable [BLENDTABLE_ALPHA50  ][index] =  dest/2 + src/2;
+      m_BlendingTable [BLENDTABLE_ALPHA75  ][index] = (dest*3)/4 + src/4;
+      m_BlendingTable [BLENDTABLE_ALPHA100 ][index] =  dest;
 
       for (i = 0; i<8; i++)
       {
@@ -510,7 +508,6 @@ void csGraphics3DSoftware::ScanSetup ()
       }
     }
   }
-
 }
 
 csDrawScanline* csGraphics3DSoftware::ScanProc_8_Alpha
@@ -973,9 +970,11 @@ HRESULT csGraphics3DSoftware::DrawPolygonFlat (G3DPolygonDPF& poly)
       if (sy <= fyR)
       {
         // Check first if polygon has been finished
-        if (scanR2 == min_i) goto finish;
+        if (scanR2 == min_i)
+	  goto finish;
         scanR1 = scanR2;
-        scanR2 = (scanR2 + 1) % poly.num;
+	if (++scanR2 >= poly.num)
+	  scanR2 = 0;
 
         fyR = QRound (poly.vertices [scanR2].sy);
         float dyR = (poly.vertices [scanR1].sy - poly.vertices [scanR2].sy);
@@ -991,7 +990,8 @@ HRESULT csGraphics3DSoftware::DrawPolygonFlat (G3DPolygonDPF& poly)
       if (sy <= fyL)
       {
         scanL1 = scanL2;
-        scanL2 = (scanL2 - 1 + poly.num) % poly.num;
+	if (--scanL2 < 0)
+	  scanL2 = poly.num - 1;
 
         fyL = QRound (poly.vertices [scanL2].sy);
         float dyL = (poly.vertices [scanL1].sy - poly.vertices [scanL2].sy);
@@ -1373,7 +1373,8 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
         if (scanR2 == min_i)
           goto finish;
         scanR1 = scanR2;
-        scanR2 = (scanR2 + 1) % poly.num;
+	if (++scanR2 >= poly.num)
+	  scanR2 = 0;
 
         fyR = QRound (poly.vertices [scanR2].sy);
         float dyR = (poly.vertices [scanR1].sy - poly.vertices [scanR2].sy);
@@ -1389,7 +1390,8 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
       if (sy <= fyL)
       {
         scanL1 = scanL2;
-        scanL2 = (scanL2 - 1 + poly.num) % poly.num;
+	if (--scanL2 < 0)
+	  scanL2 = poly.num - 1;
 
         fyL = QRound (poly.vertices [scanL2].sy);
         float dyL = (poly.vertices [scanL1].sy - poly.vertices [scanL2].sy);
@@ -1718,7 +1720,8 @@ STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly,
         if (scanR2 == min_i)
 `         goto finish;
         scanR1 = scanR2;
-        scanR2 = (scanR2 + 1) % poly.num;
+	if (++scanR2 >= poly.num)
+	  scanR2 = 0;
 
         fyR = QRound (poly.vertices [scanR2].sy);
         float dyR = (poly.vertices [scanR1].sy - poly.vertices [scanR2].sy);
@@ -1734,7 +1737,8 @@ STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly,
       if (sy <= fyL)
       {
         scanL1 = scanL2;
-        scanL2 = (scanL2 - 1 + poly.num) % poly.num;
+	if (--scanL2 < 0)
+	  scanL2 = poly.num - 1;
 
         fyL = QRound (poly.vertices [scanL2].sy);
         float dyL = (poly.vertices [scanL1].sy - poly.vertices [scanL2].sy);
@@ -2037,7 +2041,8 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygonDPQ& poly)
         if (scanR2 == bot)
           goto finish;
         scanR1 = scanR2;
-        scanR2 = (scanR2 + 1) % poly.num;
+	if (++scanR2 >= poly.num)
+	  scanR2 = 0;
 
         // Do we have a flat bottom?
         //@@@ this looks like it needs to be rethought -- A.Z.
@@ -2064,7 +2069,8 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygonDPQ& poly)
         if (scanL2 == bot)
           goto finish;
         scanL1 = scanL2;
-        scanL2 = (scanL2 - 1 + poly.num) % poly.num;
+	if (--scanL2 < 0)
+	  scanL2 = poly.num - 1;
 
         // Do we have a flat bottom?
         //@@@ this looks like it needs to be rethought -- A.Z.
@@ -2834,24 +2840,30 @@ STDMETHODIMP csGraphics3DSoftware::SetRenderState (G3D_RENDERSTATEOPTION op,
       break;
     case G3DRENDERSTATE_DITHERENABLE:
       rstate_dither = value;
+      ScanSetup ();
       break;
     case G3DRENDERSTATE_SPECULARENABLE:
       rstate_specular = value;
+      ScanSetup ();
       break;
     case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
-      do_texel_filt = value;
+      do_bilin_filt = value;
+      ScanSetup ();
       break;
     case G3DRENDERSTATE_TRILINEARMAPPINGENABLE:
       do_bilin_filt = value;
+      ScanSetup ();
       break;
     case G3DRENDERSTATE_TRANSPARENCYENABLE:
       do_transp = value;
+      ScanSetup ();
       break;
     case G3DRENDERSTATE_MIPMAPENABLE:
       rstate_mipmap = value;
       break;
     case G3DRENDERSTATE_TEXTUREMAPPINGENABLE:
       do_textured = value;
+      ScanSetup ();
       break;
     case G3DRENDERSTATE_EDGESENABLE:
       rstate_edges = value;
@@ -2859,6 +2871,7 @@ STDMETHODIMP csGraphics3DSoftware::SetRenderState (G3D_RENDERSTATEOPTION op,
     case G3DRENDERSTATE_MMXENABLE:
 #ifdef DO_MMX
       do_mmx = value;
+      ScanSetup ();
       break;
 #else
       return E_FAIL;
@@ -2879,6 +2892,7 @@ STDMETHODIMP csGraphics3DSoftware::SetRenderState (G3D_RENDERSTATEOPTION op,
       break;
     case G3DRENDERSTATE_FILTERINGENABLE:
       do_texel_filt = value;
+      ScanSetup ();
       break;
     case G3DRENDERSTATE_LIGHTINGENABLE:
       do_lighting = value;
@@ -3632,6 +3646,7 @@ STDMETHODIMP IXConfig3DSoft::SetOption (int id, csVariant* value)
     case 11: pThis->zdist_mipmap3 = value->v.fVal; break;
     default: return E_FAIL;
   }
+  pThis->ScanSetup ();
   return S_OK;
 }
 
