@@ -26,6 +26,10 @@ chronological order.
 	  down when fixing non-po2 textures.
 	- res removed the printf() & siblings aliasing from Win32 csosdefs.h.
 	  Instead, csPrintf() now care about proper UTF-8 output. 
+	- Troy in odedynam, altered NearCallBack to set slip1 and slip2 to 
+	  SMALL_EPSILON.  slip1 & 2 are for simulating lateral car tire skid.
+	  This inhibits this behaviour.  Better (todo) will be to expose it
+	  similar to softness.
 13-Aug-2003
 	- res renamed the rlloader, rlsstd and rlsstencil plugins to less
 	  cryptic rendloop_loader, rendstep_std and rendstep_stencil.
