@@ -402,12 +402,16 @@ iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node,
 		}
 		break;
 	      case XMLTOKEN_SCALE:
-		layers[num_txt_layer].uscale = child->GetAttributeValueAsFloat ("u");
-		layers[num_txt_layer].vscale = child->GetAttributeValueAsFloat ("v");
+		layers[num_txt_layer].uscale = layer_child
+				->GetAttributeValueAsFloat ("u");
+		layers[num_txt_layer].vscale = layer_child
+				->GetAttributeValueAsFloat ("v");
 	        break;
 	      case XMLTOKEN_SHIFT:
-		layers[num_txt_layer].ushift = child->GetAttributeValueAsFloat ("u");
-		layers[num_txt_layer].vshift = child->GetAttributeValueAsFloat ("v");
+		layers[num_txt_layer].ushift = layer_child
+				->GetAttributeValueAsFloat ("u");
+		layers[num_txt_layer].vshift = layer_child
+				->GetAttributeValueAsFloat ("v");
 	        break;
 	      case XMLTOKEN_MIXMODE:
 		if (!SyntaxService->ParseMixmode (layer_child,

@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+20-Sep-2002
+	- Fixed XML parsing for <scale> and <shift> for material layers.
+	  Thanks to Brandon for spotting this.
 19-Sep-2002
 	- Fixed some memory leaks in csInitializer.
 	- Completely removed support for the old format from CS.  All is XML
