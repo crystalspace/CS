@@ -250,8 +250,17 @@ $(INSTALL_INCLUDE.DESTFILES): $(INSTALL_DIR)/% : $(SRCDIR)/%
 	$(CP) $< $@
 	@echo $@ >> $(INSTALL_LOG)
 
+# If the build directory differs from the source directory, we must take
+# special care to install the generated $(builddir)/include/volatile.h.
+ifneq ($(SRCDIR),.)
+INSTALL_INCLUDE.EXTRA_RULES += install_volatile
+install_volatile:
+	$(CP) include/volatile.h $(INSTALL_DIR)/include/volatile.h
+	@echo $(INSTALL_DIR)/include/volatile.h >> $(INSTALL_LOG)
+endif
+
 install_include: $(INSTALL_DIR)/include $(INSTALL_INCLUDE.DIR) \
-  $(INSTALL_INCLUDE.DESTFILES)
+  $(INSTALL_INCLUDE.DESTFILES) $(INSTALL_INCLUDE.EXTRA_RULES)
 
 # Install documentation.
 $(INSTALL_DOCS.DIR): 
