@@ -30,7 +30,7 @@ viewed online.  @xref{Where to Get}.
 @menu
 * Simple Basic Concepts:: Basic Crystal Space Concepts
 * Simple Minimum Requirements:: Minimum Application Requirements
-* Simple System Driver:: Creating the Simple System Driver
+* Simple Main Structure:: Simple Main Structure
 * Simple Event Handling:: Event Handling
 * Simple World:: Creating a ``World''
 * Simple Camera:: The Camera
