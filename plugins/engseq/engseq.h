@@ -61,6 +61,8 @@ public:
 		  const csReversibleTransform& trans);
   void AddOperationRelativeMove (csTicks time, iMeshWrapper* mesh,
 		  const csVector3& pos);
+  void AddOperationRotateDuration (csTicks time, iMeshWrapper* mesh,
+  		  int axis, float tot_angle, csTicks duration);
   void AddOperationTriggerState (csTicks time, iSequenceTrigger* trigger,
 		  bool en);
 
@@ -118,6 +120,12 @@ public:
 		  const csVector3& pos)
     {
       scfParent->AddOperationRelativeMove (time, mesh, pos);
+    }
+    virtual void AddOperationRotateDuration (csTicks time, iMeshWrapper* mesh,
+  		int axis, float tot_angle, csTicks duration)
+    {
+      scfParent->AddOperationRotateDuration (time, mesh, axis, tot_angle,
+      	duration);
     }
     virtual void AddOperationTriggerState (csTicks time,
     		  iSequenceTrigger* trigger, bool en)

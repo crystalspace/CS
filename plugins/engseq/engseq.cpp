@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
+#include "csgeom/matrix3.h"
 #include "engseq.h"
 #include "csutil/scf.h"
 #include "iutil/objreg.h"
@@ -261,6 +262,92 @@ public:
 //---------------------------------------------------------------------------
 
 /**
+ * Timed rotation operator.
+ */
+class TimedOpRotate : public iSequenceTimedOperation
+{
+private:
+  csRef<iMeshWrapper> mesh;
+  int axis;
+  float tot_angle;
+  csReversibleTransform start_transform;
+
+public:
+  TimedOpRotate (iMeshWrapper* mesh,
+  	const csReversibleTransform& start_transform, int axis, float tot_angle)
+  {
+    SCF_CONSTRUCT_IBASE (NULL);
+    TimedOpRotate::mesh = mesh;
+    TimedOpRotate::axis = axis;
+    TimedOpRotate::tot_angle = tot_angle;
+    TimedOpRotate::start_transform = start_transform;
+  }
+  virtual ~TimedOpRotate () { }
+
+  SCF_DECLARE_IBASE;
+
+  virtual void Do (float time)
+  {
+    float angle = tot_angle * time;
+    csReversibleTransform trans;
+    switch (axis)
+    {
+      case 0: trans = start_transform * csTransform (csXRotMatrix3 (angle),
+      	  csVector3 (0));
+      	break;
+      case 1: trans = start_transform * csTransform (csYRotMatrix3 (angle),
+      	  csVector3 (0));
+      	break;
+      case 2: trans = start_transform * csTransform (csZRotMatrix3 (angle),
+      	  csVector3 (0));
+      	break;
+    }
+    mesh->GetMovable ()->SetTransform (trans);
+    mesh->GetMovable ()->UpdateMove ();
+    // DeferUpdateLighting@@@
+  }
+};
+
+SCF_IMPLEMENT_IBASE (TimedOpRotate)
+  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
+SCF_IMPLEMENT_IBASE_END
+
+/**
+ * Operate operation.
+ */
+class OpRotate : public OpStandard
+{
+private:
+  csRef<iMeshWrapper> mesh;
+  int axis;
+  float tot_angle;
+  csTicks duration;
+  iEngineSequenceManager* eseqmgr;
+
+public:
+  OpRotate (iMeshWrapper* mesh, int axis, float tot_angle,
+  	csTicks duration, iEngineSequenceManager* eseqmgr)
+  {
+    OpRotate::mesh = mesh;
+    OpRotate::axis = axis;
+    OpRotate::tot_angle = tot_angle;
+    OpRotate::duration = duration;
+    OpRotate::eseqmgr = eseqmgr;
+  }
+
+  virtual void Do (csTicks dt)
+  {
+    iMovable* movable = mesh->GetMovable ();
+    TimedOpRotate* timedop = new TimedOpRotate (
+    	mesh, movable->GetTransform (), axis, tot_angle);
+    eseqmgr->FireTimedOperation (dt, duration, timedop);
+    timedop->DecRef ();
+  }
+};
+
+//---------------------------------------------------------------------------
+
+/**
  * Set trigger state.
  */
 class OpTriggerState : public OpStandard
@@ -356,6 +443,14 @@ void csSequenceWrapper::AddOperationRelativeMove (csTicks time,
 void csSequenceWrapper::AddOperationRelativeMove (csTicks time,
 	iMeshWrapper* mesh, const csVector3& pos)
 {
+}
+
+void csSequenceWrapper::AddOperationRotateDuration (csTicks time,
+	iMeshWrapper* mesh, int axis, float tot_angle, csTicks duration)
+{
+  OpRotate* op = new OpRotate (mesh, axis, tot_angle, duration, eseqmgr);
+  sequence->AddOperation (time, op);
+  op->DecRef ();
 }
 
 void csSequenceWrapper::AddOperationTriggerState (csTicks time,
@@ -613,6 +708,7 @@ bool csEngineSequenceManager::HandleEvent (iEvent &event)
       csTimedOperation* op = timed_operations[i];
       if (curtime >= op->end)
       {
+        op->op->Do (1.0);
         timed_operations.Delete (i);
       }
       else
@@ -715,7 +811,11 @@ void csEngineSequenceManager::FireTimedOperation (csTicks delta,
 	csTicks duration, iSequenceTimedOperation* op)
 {
   csTicks curtime = seqmgr->GetMainTime ();
-  if (delta >= duration) return;	// Already done.
+  if (delta >= duration)
+  {
+    op->Do (1.0);
+    return;	// Already done.
+  }
 
   csTimedOperation* top = new csTimedOperation (op);
   top->start = curtime-delta;

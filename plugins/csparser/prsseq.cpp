@@ -159,6 +159,25 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
 	  cur_time += delay;
 	}
 	break;
+      case XMLTOKEN_ROTATE:
+        {
+	  const char* meshname = child->GetAttributeValue ("mesh");
+	  iMeshWrapper* mesh = Engine->FindMeshObject (meshname);
+	  if (!mesh)
+	  {
+	    SyntaxService->ReportError (
+		"crystalspace.maploader.parse.sequence",
+		child, "Couldn't find mesh '%s' in sequence '%s'!", meshname,
+		seqname);
+	    return NULL;
+	  }
+	  int axis = child->GetAttributeValueAsInt ("axis");
+	  float tot_angle = child->GetAttributeValueAsFloat ("angle");
+	  int duration = child->GetAttributeValueAsInt ("duration");
+	  sequence->AddOperationRotateDuration (cur_time, mesh,
+	  	axis, tot_angle, duration);
+	}
+	break;
       case XMLTOKEN_FADELIGHT:
         {
 	  const char* lightname = child->GetAttributeValue ("light");

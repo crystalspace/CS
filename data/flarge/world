@@ -4800,7 +4800,6 @@
             </move>
         </meshobj>
         <meshobj name="transpBall">
-            <key name="entity_Rotate" value="0,30,10,true" />
             <plugin>crystalspace.mesh.loader.ball</plugin>
             <params>
                 <factory>ballFact</factory>
@@ -22653,6 +22652,12 @@
 	    <delay>1000</delay>
 	    <runsequence>animlight</runsequence>
 	</sequence>
+
+	<sequence name="rotball">
+	    <rotate mesh="transpBall" axis="1" angle="3" duration="1000" />
+	    <delay>1000</delay>
+	    <runsequence>rotball</runsequence>
+	</sequence>
     </sequences>
     <triggers>
         <trigger name="setfog">
@@ -22663,6 +22668,10 @@
         <trigger name="animlight">
 	    <sectorvis>large</sectorvis>
 	    <fire delay=0>animlight</fire>
+	</trigger>
+	
+	<trigger name="rotball">
+	    <fire delay=0>rotball</fire>
 	</trigger>
     </triggers>
 

@@ -103,6 +103,14 @@ struct iSequenceWrapper : public iBase
 		  const csVector3& pos) = 0;
 
   /**
+   * Operation: rotate object during some time. After the time has elapsed
+   * the rotation will be equal to the given angle here.
+   * Axis is 0, 1, or 2 for x, y, or z.
+   */
+  virtual void AddOperationRotateDuration (csTicks time, iMeshWrapper* mesh,
+  		int axis, float tot_angle, csTicks duration) = 0;
+
+  /**
    * Operation: enable/disable a given trigger.
    */
   virtual void AddOperationTriggerState (csTicks time,

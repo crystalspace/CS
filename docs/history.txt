@@ -26,6 +26,11 @@ The history order is reversed so that new features are at the top.
 	  commands.
 	- Modified the pseudo-dynamic light in flarge to work using
 	  the new sequence system instead of the Walktest specific stuff.
+	- Fixed a bug in the engine sequence manager. When timed operations
+	  are done they will ALWAYS be called with time==1. That ensures
+	  that the end result of a timed operation is well defined.
+	- Added rotation command to the engine sequence manager and modified
+	  flarge to use it.
 22-Sep-2002
 	- Modified iMeshWrapper->SetDrawCallback() so that multiple
 	  callbacks are now supported. Added RemoveDrawCallback() and
