@@ -128,11 +128,11 @@ void add_particles_rain (csSector* sector, char* txtname, int num, float speed)
     bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i8));
 
     csRainParticleSystem* exp = new csRainParticleSystem (num,
-  	  txt, CS_FX_MULTIPLY2, false, .3/50., .3,
+  	  txt, CS_FX_ADD, false, .3/50., .3,
 	  bbox.Min (), bbox.Max (),
 	  csVector3 (0, -speed, 0));
     exp->MoveToSector (sector);
-    exp->SetColor (csColor (1,1,1));
+    exp->SetColor (csColor (.25,.25,.25));
   }
 }
 
