@@ -297,7 +297,7 @@ public:
    * doesn't want to restrict its movement by portals and
    * sector boundaries.
    */
-  virtual void MoveWorldUnrestricted (const csVector3& v) { v_o2t += v; }
+  virtual void MoveWorldUnrestricted (const csVector3& v) { Translate (v); }
 
   /**
    * Moves the camera a relative amount in camera coordinates,
@@ -306,7 +306,7 @@ public:
    * doesn't want to restrict its movement by portals and
    * sector boundaries.
    */
-  virtual void MoveUnrestricted (const csVector3& v) { v_o2t += m_t2o * v; }
+  virtual void MoveUnrestricted (const csVector3& v) { Translate (m_t2o * v); }
 
   /**
    * Eliminate roundoff error by snapping the camera orientation to a
