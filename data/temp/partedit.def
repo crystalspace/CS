@@ -1,0 +1,283 @@
+skin "Normal Windows"
+{
+  Texture: 		"/aws/texture.png"
+  HighlightColor: 		230,230,230
+  ShadowColor:    		60,60,60
+  FillColor:      		200,200,200
+  TextDisabledColor:		128,128,0
+  TextForeColor:		0,0,0
+  TextBackColor:        	255,255,255
+  ButtonTextColor:		0,0,192
+  ChartBarColor:		255,0,0
+  ActiveTitleBarColor1:        	0,0,128
+  ActiveTitleBarColor2:        	200,200,255
+  OverlayTextureAlpha:	128
+  ScrollBarHeight:	16
+  ScrollBarWidth:	16
+  WindowMin:		"/aws/minimize.png"
+  WindowZoom:		"/aws/zoom.png"
+  WindowClose:		"/aws/close.png"
+  WindowMinAt:		(50, 5) - (50-14, 5+14)
+  WindowZoomAt:		(36, 5) - (36-14, 5+14)
+  WindowCloseAt:	(19, 5) - (19-14, 5+14)
+  CheckBoxUp:		"/aws/chkup.png"
+  CheckBoxDn:		"/aws/chkdn.png"
+  CheckBoxOn:		"/aws/chkon.png"
+  CheckBoxOff:		"/aws/chkoff.png"
+  RadioButtonUp:	"/aws/radup.png"
+  RadioButtonDn:	"/aws/raddn.png"
+  RadioButtonOn:	"/aws/radon.png"
+  RadioButtonOff:	"/aws/radoff.png"
+  TreeCollapsed:	"/aws/treecol.png"
+  TreeExpanded:		"/aws/treeexp.png"
+  TreeCollapsed:	"/aws/treecol.png"
+  TreeVertLine:		"/aws/treevl.png"
+  TreeHorzLine:		"/aws/treehl.png"
+  TreeChkUnmarked:	"/aws/treechke.png"
+  TreeChkMarked:	"/aws/treechkf.png"
+  TreeGrpUnmarked:	"/aws/treegrpe.png"
+  TreeGrpMarked:	"/aws/treegrpf.png"
+  ScrollBarUp:		"/aws/sbup.png"
+  ScrollBarDn:		"/aws/sbdn.png"
+  ScrollBarRt:		"/aws/sbrt.png"
+  ScrollBarLt:		"/aws/sblt.png"
+}
+
+window "Another"
+{
+  Frame: (100,100)-(600,250)
+  Style: wfsNormal
+  Title: "Particle Editor"
+
+  connect
+  {
+    signalComponentCreated -> parteditSink::RegisterFrame
+  }
+
+  component "LabelX" is "Label"
+  {
+    Frame: (0, 10) - (40, 30)
+    Align: lblAlignCenter
+    Caption: "X:"
+    connect 
+    {
+      signalComponentCreated -> parteditSink::RegisterLabel1
+    }
+  }
+  component "LabelY" is "Label"
+  {
+    Frame: (0, 35) - (40, 55)
+    Align: lblAlignCenter
+    Caption: "Y:"
+    connect 
+    {
+      signalComponentCreated -> parteditSink::RegisterLabel2
+    }
+  }
+  component "LabelZ" is "Label"
+  {
+    Frame: (0, 60) - (40, 80)
+    Align: lblAlignCenter
+    Caption: "Z:"
+    connect 
+    {
+      signalComponentCreated -> parteditSink::RegisterLabel3
+    }
+  }
+  component "LabelX" is "Label"
+  {
+    Frame: (0, 85) - (40, 105)
+    Align: lblAlignCenter
+    Caption: "Other:"
+    connect 
+    {
+      signalComponentCreated -> parteditSink::RegisterLabel4
+    }
+  }
+
+  connect
+  {
+    signalComponentCreated -> awsStandardSink::Show
+  }
+
+  component "X" is "Scroll Bar"
+  {
+   Frame: (40, 10) - (140, 30)
+   Orientation: sboHorizontal
+   Min: 0
+   Max: 1000
+   Change: 1
+   BigChange: 5
+
+	connect
+	{
+	  signalScrollBarChanged -> parteditSink::SetScrollBarX
+	}
+  }
+  component "Y" is "Scroll Bar"
+  {
+   Frame: (40, 35) - (140, 55)
+   Orientation: sboHorizontal
+   Min: 0
+   Max: 1000
+   Change: 1
+   BigChange: 5
+
+	connect
+	{
+	  signalScrollBarChanged -> parteditSink::SetScrollBarY
+	}
+  }
+  component "Z" is "Scroll Bar"
+  {
+   Frame: (40, 60) - (140, 80)
+   Orientation: sboHorizontal
+   Min: 0
+   Max: 1000
+   Change: 2
+   BigChange: 5
+
+	connect
+	{
+	  signalScrollBarChanged -> parteditSink::SetScrollBarZ
+	}
+  }
+  component "Other" is "Scroll Bar"
+  {
+   Frame: (40, 85) - (140, 105)
+   Orientation: sboHorizontal
+   Min: 0
+   Max: 1000
+   Change: 1
+   BigChange: 5
+
+	connect
+	{
+	  signalScrollBarChanged -> parteditSink::SetScrollBarOther
+	}
+  }
+  component "Input1" is "Text Box"
+  {
+    Frame: (145, 10) - (190, 30)
+    Style: tbfsNormal
+
+    Disallow: "abcdefghijklmnopqrstuvwxz"
+ 
+    connect 
+    {
+      signalComponentCreated -> parteditSink::RegisterInput1
+      signalTextBoxLostFocus-> parteditSink::SetInput1
+    }
+  }
+  component "Input2" is "Text Box"
+  {
+    Frame: (145, 35) - (190, 55)
+    Style: tbfsNormal
+    Disallow: "abcdefghijklmnopqrstuvwxz"
+
+    connect 
+    {
+      signalComponentCreated -> parteditSink::RegisterInput2
+      signalTextBoxLostFocus-> parteditSink::SetInput2
+    }
+
+  }
+  component "Input3" is "Text Box"
+  {
+    Frame: (145, 60) - (190, 80)
+    Style: tbfsNormal
+    Disallow: "abcdefghijklmnopqrstuvwxz"
+
+    connect 
+    {
+      signalComponentCreated -> parteditSink::RegisterInput3
+      signalTextBoxLostFocus-> parteditSink::SetInput3
+    }
+
+  }
+  component "Input4" is "Text Box"
+  {
+    Frame: (145, 85) - (190, 105)
+    Style: tbfsNormal
+    Disallow: "abcdefghijklmnopqrstuvwxz"
+
+    connect 
+    {
+      signalComponentCreated -> parteditSink::RegisterInput4
+      signalTextBoxLostFocus-> parteditSink::SetInput4
+    }
+
+  }
+  component "Speed" is "Radio Button"
+  {
+    Frame: (195, 5) - (275, 20)
+    Caption: "Speed"
+
+    connect
+    {
+	signalRadButtonTurnedOn-> parteditSink::SetSpeed
+    }
+  }
+  component "Acceleration" is "Radio Button"
+  {
+    Frame: (195, 20) - (300, 35)
+    Caption: "Acceleration"
+
+    connect
+    {
+	signalRadButtonTurnedOn -> parteditSink::SetAccel
+    }
+  }
+  component "Position" is "Radio Button"
+  {
+    Frame: (195, 35) - (275, 50)
+    Caption: "Position"
+
+    connect
+    {
+	signalRadButtonTurnedOn -> parteditSink::SetPosition
+    }
+  }
+
+  component "Rect" is "Radio Button"
+  {
+    Frame: (195, 50) - (275, 65)
+    Caption: "Rectangle"
+
+    connect
+    {
+	signalRadButtonTurnedOn -> parteditSink::SetRectangle
+    }
+  }
+  component "NumParticle" is "Radio Button"
+  {
+    Frame: (195, 65) - (275, 80)
+    Caption: "# Particles"
+
+    connect
+    {
+	signalRadButtonTurnedOn -> parteditSink::SetNumParticle
+    }
+  }
+  component "ParticleTime" is "Radio Button"
+  {
+    Frame: (195, 80) - (300, 95)
+    Caption: "Particle Time"
+
+    connect
+    {
+	signalRadButtonTurnedOn -> parteditSink::SetParticleTime
+    }
+  }
+  component "AddAge" is "Radio Button"
+  {
+    Frame: (195, 95) - (275, 110)
+    Caption: "Add Age"
+
+    connect
+    {
+	signalRadButtonTurnedOn -> parteditSink::SetAddAge
+    }
+  }
+}
+
