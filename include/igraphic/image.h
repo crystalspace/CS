@@ -42,6 +42,12 @@
 #define CS_IMGFMT_ANY		CS_IMGFMT_MASK
 /// Do we need alpha channel or not
 #define CS_IMGFMT_ALPHA		0x00010000
+/**
+ * This flag indicates an invalid image format. No image may have this set,
+ * and you may not load images with this flag set.
+ */
+#define CS_IMGFMT_INVALID	0x80000000
+
 
 struct csRGBpixel;
 

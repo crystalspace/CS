@@ -22,8 +22,8 @@
 
 #include "isys/plugin.h"
 #include "ivideo/txtmgr.h"
+#include "igraphic/image.h"
 
-struct iImage;
 struct iTextureHandle;
 struct iTextureWrapper;
 struct iSoundData;
@@ -81,22 +81,29 @@ struct iLoaderNew : public iPlugIn
   /// Set loader mode (see CS_LOADER_XXX flags above)
   virtual void SetMode (int iFlags) = 0;
 
-  /// Load an image file
-  virtual iImage *LoadImage (const char* Filename) = 0;
   /**
-   * Load an image and create a texture handle from it. The 'Flags' parameter
-   * accepts the flags described in ivideo/txtmgr.h.
+   * Load an image file. The image will be loaded in the format requested by
+   * the engine. If no engine exists, the format is taken from the video
+   * renderer. If no video renderer exists, this function fails. You may also
+   * request an alternate format to override the above sequence.
+   */
+  virtual iImage *LoadImage (const char* Filename, int Format = CS_IMGFMT_INVALID) = 0;
+  /**
+   * Load an image as with LoadImage() and create a texture handle from it.
+   * The 'Flags' parameter accepts the flags described in ivideo/txtmgr.h.
+   * The texture manager determines the format, so choosing an alternate format
+   * doesn't make sense here. Instead you may choose an alternate texture
+   * manager.
    */
   virtual iTextureHandle *LoadTexture (const char* Filename,
-    int Flags = CS_TEXTURE_3D) = 0;
+	int Flags = CS_TEXTURE_3D, iTextureManager *tm = NULL) = 0;
   /**
-   * Load a texture and register it with the engine. 'Name' is the name that
-   * the engine will use for the wrapper. The 'Flags' parameter accepts the
-   * flags described in ivideo/txtmgr.h. This function also creates a
-   * material for the texture.
+   * Load a texture as with LoadTexture() above and register it with the
+   * engine. 'Name' is the name that the engine will use for the wrapper.
+   * This function also creates a material for the texture.
    */
-  virtual iTextureWrapper *LoadTexture (const char *Name,
-    const char *FileName, int Flags = CS_TEXTURE_3D) = 0;
+  virtual iTextureWrapper *LoadTexture (const char *Name, const char *FileName,
+	int Flags = CS_TEXTURE_3D, iTextureManager *tm = NULL) = 0;
 
   /// Load a sound file and return an iSoundData object
   virtual iSoundData *LoadSoundData (const char *fname) = 0;

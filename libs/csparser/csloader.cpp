@@ -2427,17 +2427,19 @@ bool csLoader::Initialize(iSystem *System)
 
 //--- Image and Texture loading ----------------------------------------------
 
-iImage* csLoader::LoadImage (const char* name)
+iImage* csLoader::LoadImage (const char* name, int Format)
 {
   if (!ImageLoader)
      return NULL;
 
-  int Format;
-  if (Engine) {
-    Format = Engine->GetTextureFormat ();
-  } else if (G3D) {
-    Format = G3D->GetTextureManager()->GetTextureFormat();
-  } else return NULL;
+  if (Format & CS_IMGFMT_INVALID)
+  {
+    if (Engine) {
+      Format = Engine->GetTextureFormat ();
+    } else if (G3D) {
+      Format = G3D->GetTextureManager()->GetTextureFormat();
+    } else return NULL;
+  }
 
   iImage *ifile = NULL;
   iDataBuffer *buf = VFS->ReadFile (name);
@@ -2465,29 +2467,33 @@ iImage* csLoader::LoadImage (const char* name)
   return ifile;
 }
 
-iTextureHandle *csLoader::LoadTexture (const char *fname, int Flags)
+iTextureHandle *csLoader::LoadTexture (const char *fname, int Flags, iTextureManager *tm)
 {
-  if (!G3D)
-    return NULL;
+  if (!tm)
+  {
+    if (!G3D)
+      return NULL;
+    tm = G3D->GetTextureManager();
+  }
 
-  iImage *Image = LoadImage(fname);
+  iImage *Image = LoadImage(fname, tm->GetTextureFormat());
   if (!Image)
     return NULL;
 
-  iTextureHandle *TexHandle = G3D->GetTextureManager()->
-    RegisterTexture (Image, Flags);
+  iTextureHandle *TexHandle = tm->RegisterTexture (Image, Flags);
   if (!TexHandle)
     System->Printf(MSG_WARNING, "cannot create texture from '%s'.", fname);
 
   return TexHandle;
 }
 
-iTextureWrapper *csLoader::LoadTexture (const char *name, const char *fname, int flags)
+iTextureWrapper *csLoader::LoadTexture (const char *name, const char *fname,
+	int Flags, iTextureManager *tm)
 {
   if (!Engine)
     return NULL;
   
-  iTextureHandle *TexHandle = LoadTexture(fname, flags);
+  iTextureHandle *TexHandle = LoadTexture(fname, Flags, tm);
   if (!TexHandle)
     return NULL;
 

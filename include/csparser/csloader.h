@@ -239,9 +239,11 @@ public:
 
   virtual void SetMode (int iFlags);
 
-  virtual iImage *LoadImage (const char *fname);
-  virtual iTextureHandle *LoadTexture (const char *fname, int flags);
-  virtual iTextureWrapper *LoadTexture (const char *name, const char *fname, int flags);
+  virtual iImage *LoadImage (const char *fname, int Format);
+  virtual iTextureHandle *LoadTexture (const char* fname,
+	int Flags = CS_TEXTURE_3D, iTextureManager *tm = NULL);
+  virtual iTextureWrapper *LoadTexture (const char *name, const char *fname,
+	int Flags = CS_TEXTURE_3D, iTextureManager *tm = NULL);
 
   virtual iSoundData *LoadSoundData (const char *fname);
   virtual iSoundHandle *LoadSound (const char *fname);
