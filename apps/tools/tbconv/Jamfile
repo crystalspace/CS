@@ -1,9 +1,0 @@
-SubDir TOP apps tools tbconv ;
-
-Description tbconvert : "Big Terrain Conversion Tool" ;
-
-Application tbconvert
-	: [ Wildcard *.cpp *.h ]
-	: console
-;
-LinkWith tbconvert : csgeom csgfx cstool csutil ;

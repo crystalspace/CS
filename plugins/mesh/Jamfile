@@ -25,7 +25,6 @@ SubInclude TOP plugins mesh thing ;
 
 if ! [ Property build : newrenderer ] || [ Property build : projgen ]
 {
-  SubInclude TOP plugins mesh terrbig ;
   SubInclude TOP plugins mesh terrfunc ;
 }
 

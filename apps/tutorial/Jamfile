@@ -9,4 +9,3 @@ SubInclude TOP apps tutorial simple2 ;
 SubInclude TOP apps tutorial simplept ;
 SubInclude TOP apps tutorial simpmap ;
 SubInclude TOP apps tutorial simpvs ;
-SubInclude TOP apps tutorial tbtut ;

@@ -7,6 +7,5 @@ SubInclude TOP apps tools docconv ;
 SubInclude TOP apps tools levtool ;
 SubInclude TOP apps tools partedit ;
 SubInclude TOP apps tools picview ;
-SubInclude TOP apps tools tbconv ;
 SubInclude TOP apps tools viewmesh ;
 SubInclude TOP apps tools vsh ;

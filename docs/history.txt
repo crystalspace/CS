@@ -25,6 +25,10 @@ chronological order.
 	- Jorrit did some additional updates to the documentation:
 	    - Updated link to the sunsite data directory from cs096 to cs098.
 	    - Updated feedback chapter a bit.
+	- Jorrit removed the terrbig terrain engine. It is old, obsolete
+	  and unmaintained. It is better to use the NR terrain engines in any
+	  case. Before removing I tagged with TERRBIG_OBSOLETE.
+	  Note that tbconv and tbtut are also removed.
 6-Jun-2004
 	- Jorrit modified the Jamfile so that the isotest application
 	  is only build with new renderer.
