@@ -59,6 +59,7 @@ enum
   XMLTOKEN_MORPHTARGET,
   XMLTOKEN_MORPHANIMATION,
   XMLTOKEN_OPTIONS,
+  XMLTOKEN_HARDTRANSFORM,
   XMLTOKEN_SOCKET
 };
 
@@ -132,7 +133,8 @@ bool csSpriteCal3DFactoryLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("morphtarget",    XMLTOKEN_MORPHTARGET);
   xmltokens.Register ("morphanimation", XMLTOKEN_MORPHANIMATION);
   xmltokens.Register ("options",        XMLTOKEN_OPTIONS);
-  xmltokens.Register ("socket",        XMLTOKEN_SOCKET);
+  xmltokens.Register ("hardtransform",  XMLTOKEN_HARDTRANSFORM);
+  xmltokens.Register ("socket",         XMLTOKEN_SOCKET);
   return true;
 }
 
@@ -222,6 +224,23 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	}
 	break;
       }
+    case XMLTOKEN_HARDTRANSFORM:
+      {
+	float ax,ay,az,angle;
+	csVector3 translation;
+	ax = child->GetAttributeValueAsFloat("rot_axis_x");
+	ay = child->GetAttributeValueAsFloat("rot_axis_y");
+	az = child->GetAttributeValueAsFloat("rot_axis_z");
+	angle = child->GetAttributeValueAsFloat("rot_angle");
+	translation.x = child->GetAttributeValueAsFloat("delta_x");
+	translation.y = child->GetAttributeValueAsFloat("delta_y");
+	translation.z = child->GetAttributeValueAsFloat("delta_z");
+
+	csMatrix3 rotation(ax,ay,az,angle*TWO_PI/360);
+	csReversibleTransform rt(rotation,translation);
+	fact->HardTransform(rt);
+	break;
+      }
     case XMLTOKEN_SKELETON:
       {
 	const char *file = child->GetAttributeValue("file");
@@ -253,10 +272,27 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	    child,"name is a required attribute of <animation> token in cal3d files.");
 	  return 0;
 	}
-	int type = child->GetAttributeValueAsInt("type");
+	int type;
+    csString ctype = child->GetAttributeValue("type");
+    if (ctype=="idle")
+      type = iSpriteCal3DState::C3D_ANIM_TYPE_IDLE;
+    else if (ctype == "travel")
+      type = iSpriteCal3DState::C3D_ANIM_TYPE_TRAVEL;
+    else if (ctype == "cycle")
+      type = iSpriteCal3DState::C3D_ANIM_TYPE_CYCLE;
+    else if (ctype == "style_cycle")
+      type = iSpriteCal3DState::C3D_ANIM_TYPE_STYLE_CYCLE;
+    else if (ctype == "action")
+      type = iSpriteCal3DState::C3D_ANIM_TYPE_ACTION;
+    else
+      type = iSpriteCal3DState::C3D_ANIM_TYPE_NONE;
+
 	float base_vel = child->GetAttributeValueAsInt("base_vel");
 	float min_vel = child->GetAttributeValueAsFloat("min_vel");
 	float max_vel = child->GetAttributeValueAsFloat("max_vel");
+	int  max_interval = child->GetAttributeValueAsInt("max_random");
+	int  min_interval = child->GetAttributeValueAsInt("min_random");
+	int  idle_pct     = child->GetAttributeValueAsInt("idle_pct");
 	if (file)
 	{
 	  int animID = newspr->LoadCoreAnimation(vfs,file,
@@ -264,7 +300,11 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	    type,
 	    base_vel,
 	    min_vel,
-	    max_vel);
+	    max_vel,
+        min_interval,
+        max_interval,
+        idle_pct);
+
 	  if (animID == -1)
 	  {
 	    newspr->ReportLastError();

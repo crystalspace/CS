@@ -69,6 +69,9 @@ struct csCal3DAnimation
     float    base_velocity;
     float    min_velocity;
     float    max_velocity;
+    int      min_interval;
+    int      max_interval;
+    int      idle_pct;
 };
 
 struct csCal3DMesh
@@ -190,7 +193,8 @@ public:
   void SetRenderScale(float scale) { renderScale=scale; }
   float GetRenderScale() { return renderScale; }
   bool LoadCoreSkeleton(iVFS *vfs,const char *filename);
-  int  LoadCoreAnimation(iVFS *vfs,const char *filename,const char *name,int type,float base_vel,float min_vel,float max_vel);
+  int  LoadCoreAnimation(iVFS *vfs,const char *filename,const char *name,int type,float base_vel,
+                         float min_vel,float max_vel,int min_interval,int max_interval,int idle_pct);
   int LoadCoreMesh(iVFS *vfs,const char *filename,const char *name,bool attach,iMaterialWrapper *defmat);
   int LoadCoreMorphTarget(iVFS *vfs,int mesh_index,const char *filename,const char *name);
   int AddMorphAnimation(const char *name);
@@ -228,7 +232,7 @@ public:
   SCF_DECLARE_IBASE;
 
   virtual csPtr<iMeshObject> NewInstance ();
-  virtual void HardTransform (const csReversibleTransform& t) { };
+  virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
@@ -351,8 +355,8 @@ public:
     virtual bool LoadCoreSkeleton(iVFS *vfs,const char *filename)
     { return scfParent->LoadCoreSkeleton(vfs,filename); }
 
-    virtual int LoadCoreAnimation(iVFS *vfs,const char *filename,const char *name,int type,float base_vel,float min_vel,float max_vel)
-    { return scfParent->LoadCoreAnimation(vfs,filename,name,type,base_vel,min_vel,max_vel); }
+    virtual int LoadCoreAnimation(iVFS *vfs,const char *filename,const char *name,int type,float base_vel,float min_vel,float max_vel,int min_interval,int max_interval,int idle_pct)
+    { return scfParent->LoadCoreAnimation(vfs,filename,name,type,base_vel,min_vel,max_vel,min_interval,max_interval,idle_pct); }
 
     virtual int LoadCoreMesh(iVFS *vfs,const char *filename,const char *name,bool attach,iMaterialWrapper *defmat)
     { return scfParent->LoadCoreMesh(vfs,filename,name,attach,defmat); }
@@ -476,6 +480,9 @@ private:
   float last_update_time;
   csArray<csCal3DAnimation*> active_anims;
   csArray<float>             active_weights;
+  bool is_idling;
+  float idle_override_interval;
+  int   idle_action;
 
   /**
    * Each mesh must have its own individual socket assignments,
@@ -547,6 +554,9 @@ private:
 
   void SetupObject ();
   void SetupObjectSubmesh(int index);
+  void SetIdleOverrides(csRandomGen *rng,int which);
+  void RecalcBoundingBox(csBox3& bbox);
+
 #ifndef CS_USE_NEW_RENDERER
   void SetupVertexBuffer (int mesh, int submesh, int num_vertices,
     int num_triangles, csTriangle *triangles);
@@ -770,7 +780,7 @@ public:
   int  GetActiveAnims(char *buffer,int max_length);
   void SetActiveAnims(const char *buffer,int anim_count);
   bool SetAnimAction(const char *name, float delayIn, float delayOut);
-  bool SetVelocity(float vel);
+  bool SetVelocity(float vel,csRandomGen *rng=NULL);
   void SetLOD(float lod);
   
   bool AttachCoreMesh(const char *meshname);
@@ -853,9 +863,9 @@ public:
 	return scfParent->SetAnimAction(name,delayIn,delayOut);
     }
 
-    virtual bool SetVelocity(float vel)
+    virtual bool SetVelocity(float vel,csRandomGen *rng=NULL)
     {
-	return scfParent->SetVelocity(vel);
+	return scfParent->SetVelocity(vel,rng);
     }
 
     virtual void SetLOD(float lod)

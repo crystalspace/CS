@@ -20,6 +20,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "cssys/sysfunc.h"
 #include "sprcal3d.h"
 #include "csgeom/polyclip.h"
+#include "csgeom/quaterni.h"
 #include "csgeom/sphere.h"
 #include "csutil/garray.h"
 #include "csutil/randomgen.h"
@@ -259,14 +260,17 @@ int  csSpriteCal3DMeshObjectFactory::LoadCoreAnimation(iVFS *vfs,const char *fil
 						       int type,
 						       float base_vel, 
 						       float min_vel, 
-						       float max_vel)
+						       float max_vel,
+                               int min_interval,
+                               int max_interval,
+                               int idle_pct)
 {
   csString path(basePath);
   path.Append(filename);
   csRef<iDataBuffer> file = vfs->ReadFile (path);
   if (file)
   {
-    CalCoreAnimation *anim = CalLoader::loadCoreAnimation((void*)file->GetData() );
+      CalCoreAnimation *anim = CalLoader::loadCoreAnimation((void*)file->GetData(), calCoreModel.getCoreSkeleton() );
     if (anim)
     {
       int id = calCoreModel.addCoreAnimation(anim);
@@ -278,6 +282,10 @@ int  csSpriteCal3DMeshObjectFactory::LoadCoreAnimation(iVFS *vfs,const char *fil
         an->base_velocity = base_vel;
         an->min_velocity  = min_vel;
         an->max_velocity  = max_vel;
+        an->min_interval  = min_interval;
+        an->max_interval  = max_interval;
+        an->idle_pct      = idle_pct;
+
         an->index = anims.Push(an);
 
         std::string str(name);
@@ -509,6 +517,61 @@ csPtr<iMeshObject> csSpriteCal3DMeshObjectFactory::NewInstance ()
   return csPtr<iMeshObject> (im);
 }
 
+void csSpriteCal3DMeshObjectFactory::HardTransform (const csReversibleTransform& t)
+{
+  csQuaternion quat (t.GetO2T ());
+  CalQuaternion quatrot(quat.x,quat.y,quat.z,quat.r);
+  csVector3 trans (t.GetOrigin () );
+  CalVector translation (trans.x,trans.y,trans.z);
+
+  // First we transform the skeleton, then we do the same to each animation.
+
+  // get core skeleton
+  CalCoreSkeleton *pCoreSkeleton;
+  pCoreSkeleton = calCoreModel.getCoreSkeleton();
+	
+  // get core bone vector
+  std::vector<CalCoreBone *>& vectorCoreBone = pCoreSkeleton->getVectorCoreBone();
+
+  // loop through all root core bones
+  std::list<int>::iterator iteratorRootCoreBoneId;
+  for(iteratorRootCoreBoneId = pCoreSkeleton->getListRootCoreBoneId().begin(); iteratorRootCoreBoneId != pCoreSkeleton->getListRootCoreBoneId().end(); ++iteratorRootCoreBoneId)
+  {
+    CalCoreBone *bone = vectorCoreBone[*iteratorRootCoreBoneId];
+    CalQuaternion bonerot = bone->getRotation();
+    CalVector bonevec = bone->getTranslation();
+    bonerot *= quatrot;
+    bonevec *= quatrot;
+    bonevec += translation;
+    bone->setRotation(bonerot);
+    bone->setTranslation(bonevec);
+  }
+
+  int i,count = calCoreModel.getCoreAnimationCount();
+  for (i = 0; i < count; i++)
+  {
+    CalCoreAnimation *anim = calCoreModel.getCoreAnimation(i);
+    if (!anim) continue;
+    // loop through all root core bones
+    std::list<int>::iterator iteratorRootCoreBoneId;
+    for(iteratorRootCoreBoneId = pCoreSkeleton->getListRootCoreBoneId().begin(); iteratorRootCoreBoneId != pCoreSkeleton->getListRootCoreBoneId().end(); ++iteratorRootCoreBoneId)
+    {
+      CalCoreTrack *track = anim->getCoreTrack(*iteratorRootCoreBoneId);
+      if (!track) continue;
+      for (int j=0; j<track->getCoreKeyframeCount(); j++)
+      {
+	CalCoreKeyframe *frame = track->getCoreKeyframe(j);
+	CalQuaternion bonerot = frame->getRotation();
+	CalVector bonevec = frame->getTranslation();
+	bonerot *= quatrot;
+	bonevec *= quatrot;
+	bonevec += translation;
+	frame->setRotation(bonerot);
+	frame->setTranslation(bonevec);
+      }
+    }
+  }
+}
 
 //=============================================================================
 
@@ -598,6 +661,7 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
   // set the material set of the whole model
   vis_cb = 0;
   arrays_initialized = false;
+  is_idling = false;
   meshes_colors = 0;
   is_initialized = 0;
 #ifdef CS_USE_NEW_RENDERER
@@ -609,11 +673,15 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
 csSpriteCal3DMeshObject::~csSpriteCal3DMeshObject ()
 {
   calModel.destroy();
+
+  if (arrays_initialized)
+  {
 #ifndef CS_USE_NEW_RENDERER
   delete [] meshes;
 #endif
-  delete [] is_initialized;
-  delete [] meshes_colors;
+    delete [] is_initialized;
+    delete [] meshes_colors;
+  }
 
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
@@ -637,9 +705,10 @@ void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
   CalBone *bone;
   skeleton = calModel.getSkeleton();
   std::vector < CalBone *> &bones = skeleton->getVectorBone();
-  for (unsigned int b = 0; b < bones.size(); b++)
+  int i;
+  for (i=0; i < (int)bones.size(); i++)
   {
-    bone = bones[b];
+    bone = bones[i];
     //bone->setScale (factory->GetRenderScale() );
     bone->calculateState ();
   }
@@ -657,9 +726,10 @@ void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
   //  calModel.setMaterialSet(0);
   calModel.update(0);
 
+  RecalcBoundingBox(object_bbox);
+
   // Copy the sockets list down to the mesh
   iSpriteCal3DSocket *factory_socket,*new_socket;
-  int i;
   for (i=0; i<tmpl->GetSocketCount(); i++)
   {
     factory_socket = tmpl->GetSocket(i);
@@ -710,8 +780,25 @@ void csSpriteCal3DMeshObject::GetRadius (csVector3& rad, csVector3& cent)
   rad.Set(r1,r2,r3);
 }
 
+void csSpriteCal3DMeshObject::RecalcBoundingBox(csBox3& bbox)
+{
+//  bbox.Set(-1,0,-1,1,2,1);
+
+  CalBoundingBox &calBoundingBox  = calModel.getBoundingBox();
+  CalVector p[8];
+  calBoundingBox.computePoints(p);
+
+  for (int i=0; i<8; i++)
+  {
+    bbox.AddBoundingVertexSmart(p[i].x,p[i].y,p[i].z);
+  }
+}
+
+
 void csSpriteCal3DMeshObject::GetObjectBoundingBox (csBox3& bbox, int type)
 {
+  if (object_bbox.Empty())
+    RecalcBoundingBox(object_bbox);
   bbox = object_bbox;
 }
 
@@ -723,19 +810,25 @@ void csSpriteCal3DMeshObjectFactory::GetRadius (csVector3& rad, csVector3& cent)
 
 void csSpriteCal3DMeshObjectFactory::GetObjectBoundingBox (csBox3& bbox, int type)
 {
-  bbox.AddBoundingVertexSmart(-1,-1,-1);
-  bbox.AddBoundingVertexSmart(1,1,1);
+  CalCoreSkeleton *skel = calCoreModel.getCoreSkeleton ();
+  skel->calculateBoundingBox(&calCoreModel);
+  std::vector<CalCoreBone*> &vectorCoreBone = skel->getVectorCoreBone();
+  CalBoundingBox &calBoundingBox  = vectorCoreBone[0]->getBoundingBox();
+  CalVector p[8];
+  calBoundingBox.computePoints(p);
+
+  bbox.Set(0,0,0,0,0,0);
+  for (int i=0; i<8; i++)
+  {
+    bbox.AddBoundingVertexSmart(p[i].x,p[i].y,p[i].z);
+  }
 }
 
 void csSpriteCal3DMeshObject::GetObjectBoundingBox (csBox3& bbox, int type, csVector3 *verts,int vertCount)
 {
-  int vertex;
-
-  //  bbox.StartBoundingBox (verts[0]);
-  for ( vertex = 1 ; vertex < vertCount; vertex++ )
-  {
-    bbox.AddBoundingVertexSmart (verts[vertex]);
-  }
+  if (object_bbox.Empty())
+    RecalcBoundingBox(object_bbox);
+  bbox = object_bbox;
 }
 
 void csSpriteCal3DMeshObject::DynamicLightChanged (iDynLight* dynlight)
@@ -1345,6 +1438,16 @@ bool csSpriteCal3DMeshObject::Advance (csTicks current_time)
   float delta = ((float)current_time - last_update_time)/1000.0F;
   calModel.update(delta);
   last_update_time = current_time;
+
+  if (is_idling) // check for override and play if time
+  {
+    idle_override_interval -= delta;
+    if (idle_override_interval <= 0)
+    {
+      SetAnimAction(factory->anims[idle_action]->name,.25,.25);
+      idle_override_interval = 20;
+    }
+  }
 #ifdef CS_USE_NEW_RENDERER
   meshVersion++;
 #endif
@@ -1492,34 +1595,75 @@ bool csSpriteCal3DMeshObject::SetAnimAction(const char *name, float delayIn, flo
   return true;
 }
 
-bool csSpriteCal3DMeshObject::SetVelocity(float vel)
+void csSpriteCal3DMeshObject::SetIdleOverrides(csRandomGen *rng,int which)
+{
+  csCal3DAnimation *anim = factory->anims[which];
+
+  is_idling = true;
+
+  // Determine interval till next override.
+  idle_override_interval = rng->Get(anim->max_interval - anim->min_interval) + anim->min_interval;
+
+  // Determine which idle override will be played.
+  int odds = rng->Get(100);
+  for (int i=0; i<GetAnimCount(); i++)
+  {
+    if (factory->anims[i]->idle_pct > odds)
+    {
+      idle_action = i;
+      return;
+    }
+    else
+    {
+      odds -= factory->anims[i]->idle_pct;
+    }
+  }
+}
+
+bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
 {
   int count = GetAnimCount();
+  int i;
+  ClearAllAnims();
+  if (!vel)
+  {
+    for (i=0; i<count; i++)
+    {
+      if (factory->anims[i]->type == iSpriteCal3DState::C3D_ANIM_TYPE_IDLE)
+      {
+        AddAnimCycle(i,1,0);
+	if (rng)
+	  SetIdleOverrides(rng,i);
+        return true;
+      }
+    }
+  }
 
-  for (int i=0; i<count; i++)
+  is_idling = false;
+  for (i=0; i<count; i++)
   {
     if (factory->anims[i]->type == iSpriteCal3DState::C3D_ANIM_TYPE_TRAVEL)
     {
       if (vel < factory->anims[i]->min_velocity ||
-	vel > factory->anims[i]->max_velocity)
-	continue;
+          vel > factory->anims[i]->max_velocity)
+    	continue;
 
       float pct,vel_diff;
       if (vel == factory->anims[i]->base_velocity)
-	pct = 1;
+	      pct = 1;
       else if (vel < factory->anims[i]->base_velocity)
       {
-	vel_diff = factory->anims[i]->base_velocity - factory->anims[i]->min_velocity;
-	pct      = (vel - factory->anims[i]->min_velocity) / vel_diff;
+    	vel_diff = factory->anims[i]->base_velocity - factory->anims[i]->min_velocity;
+	    pct      = (vel - factory->anims[i]->min_velocity) / vel_diff;
       }
       else
       {
-	vel_diff = factory->anims[i]->max_velocity - factory->anims[i]->base_velocity;
-	pct      = 1 - (factory->anims[i]->min_velocity - vel) / vel_diff;
+    	vel_diff = factory->anims[i]->max_velocity - factory->anims[i]->base_velocity;
+	    pct      = 1 - (factory->anims[i]->min_velocity - vel) / vel_diff;
       }
-      calModel.getMixer()->blendCycle(i,pct,0);
+      AddAnimCycle(i,pct,0);
       if (pct == 1)
-	break;
+    	break;
     }
   }
 
