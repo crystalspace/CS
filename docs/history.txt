@@ -26,6 +26,8 @@ chronological order.
 	  "maintainerclean" target to the "distclean" target.
 	- Eric Sunshine removed the last remnant (DO_DINPUT_KEYBOARD) of
 	  DirecInput support; the bulk of which was removed some time ago.
+        - Philip Wyett corrected #include's for Cg and eliminated make
+          depend warnings.        
 11-Sep-2003
 	- Jorrit cleaned up some sources in the stencil renderloop.
 	- Jorrit did the following optimizations with regards to

@@ -23,8 +23,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/shader/shader.h"
 #include "csutil/strhash.h"
 
-#include "Cg/cg.h"
-#include "Cg/cgGL.h"
+#include <Cg/cg.h>
+#include <Cg/cgGL.h>
 
 class csGLStateCache;
 struct iGLTextureCache;
@@ -149,4 +149,3 @@ public:
 
 
 #endif //__GLSHADER_CGFP_H__
-
