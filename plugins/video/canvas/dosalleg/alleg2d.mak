@@ -36,7 +36,7 @@ DEP.EXE+=$(ALLEG2D)
 DESCRIPTION.$(ALLEG2D) = $(DESCRIPTION.alleg2d)
 SRC.ALLEG2D=$(wildcard plugins/video/canvas/dosalleg/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.ALLEG2D = $(addprefix $(OUT),$(notdir $(SRC.ALLEG2D:.cpp=$O)))
-CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_ALLEG2D
+CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_DOSALLEGRO
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
