@@ -7,7 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 24-Oct-2003
-	- res 'un-disabled' a couple of MSVC warnings and fixed some occurances
+	- res re-enabled a couple of MSVC warnings and fixed some occurences
 	  of VC warnings in the source.
 	- Jorrit changed walktest perftest so that it prints to standard
 	  output and it will also call FinishFrame() now for a more
@@ -24,7 +24,7 @@ chronological order.
 	  of the outline.
 	- Jorrit changed the kdtree so that it sets the bounding boxes of
 	  the nodes maximum to -100000/100000. This avoids bugs in Dynavis
-	  which cannot easily handle these big bounding boxes. Unfortunatelly
+	  which cannot easily handle these big bounding boxes. Unfortunately
 	  that restricts worlds that use Dynavis to be within that range.
 	  We'll have to see about better solutions in the future.
 	- Jorrit changed the write queue operation in Dynavis to test every
@@ -47,6 +47,28 @@ chronological order.
 	  culling errors is very small though.
 	- res fixed csGetKeyDesc() to properly deal with keys that are 
 	  modifiers.
+	- Eric Sunshine applied a patch from Fritz Elfert <felfert@to.com>
+	  which makes the following changes:
+	    - Fixed bug: csStringArray failed to override InsertSorted(), which
+	      caused inserted strings to be compared by pointer rather than
+	      content, thus the array was not sorted in a meaningful way at
+	      all.  As a side effect, this fixes a bug in VFS where its
+	      `deleted files' array had essentially random order, causing
+	      csArchive:IsDeleted() to fail, which in turn caused zip
+	      corruption. (Bug# 827467)
+	    - Fixed bug in his recent VFS patch: "Fake" directory entries in
+	      `dir' array were being written to "central directory" in zip file
+	      even though the fake entries were not themselves represented in
+	      the data portion of the archive.  This caused the central
+	      directory to get out of sync with the stored entries, thus
+	      resulting in corruption. (Bug# 827467)
+	    - csArchive::NewFile() now checks if the desired file is already in
+	      the `lazy' array. If so, it reuses this entry instead of creating
+	      a new one.  This change removes the limitation that adding the
+	      same file more than once without a Flush() could lead to
+	      unpredicted results. It now resembles behavior of a real
+	      filesystem more closely: Creating/Writing a file more than once
+	      simply overwrites the previous version in cache.
 23-Oct-2003
 	- Jorrit reduced the 'yellow-message-time' in the standard reporter
 	  from 10 to 5 seconds.

@@ -96,6 +96,20 @@ csArchive::~csArchive ()
   }
 }
 
+void csArchive::ResetArchiveEntry (ArchiveEntry *f, size_t size, bool pack)
+{
+  f->info.compression_method = (pack) ?
+    DEFAULT_COMPRESSION_METHOD : ZIP_STORE;
+  f->info.ucsize = size;
+  f->buffer_pos = 0;
+
+  time_t curtime = time (0);
+  struct tm *curtm = localtime (&curtime);
+  csFileTime ft;
+  ASSIGN_FILETIME (ft, *curtm);
+  SetFileTime ((void *)f, ft);
+}
+
 csArchive::ArchiveEntry *csArchive::CreateArchiveEntry (const char *name, size_t size, bool pack)
 {
   ZIP_central_directory_file_header cdfh;
@@ -105,19 +119,9 @@ csArchive::ArchiveEntry *csArchive::CreateArchiveEntry (const char *name, size_t
   cdfh.version_made_by[1] = 0x06;
   cdfh.version_needed_to_extract[0] = 20;       /* Unzip version 2.0 rev 0 */
   cdfh.version_needed_to_extract[1] = 00;
-  if (pack)
-    cdfh.compression_method = DEFAULT_COMPRESSION_METHOD;
-  else
-    cdfh.compression_method = ZIP_STORE;
-  cdfh.ucsize = size;
 
   ArchiveEntry *f = new ArchiveEntry (name, cdfh);
-
-  time_t curtime = time (0);
-  struct tm *curtm = localtime (&curtime);
-  csFileTime ft;
-  ASSIGN_FILETIME (ft, *curtm);
-  SetFileTime ((void *)f, ft);
+  ResetArchiveEntry (f, size, pack);
 
   return f;
 }
@@ -166,6 +170,7 @@ void csArchive::ReadDirectory ()
     if (!FileExists (dname))
     {
       ArchiveEntry* f = CreateArchiveEntry(dname, 0, 0);
+      f->faked = true;
       dir.InsertSorted (f, dir.Compare);
     }
     free(dname); // Free string we allocated above and stored in `dset'.
@@ -456,8 +461,20 @@ char *csArchive::ReadEntry (FILE *infile, ArchiveEntry * f)
 void *csArchive::NewFile (const char *name, size_t size, bool pack)
 {
   DeleteFile (name);
-  ArchiveEntry *f = CreateArchiveEntry(name, size, pack);
+  int idx = lazy.FindKey ((void*)name, dir.CompareKey);
+  ArchiveEntry *f;
+  if (idx >= 0)
+  {
+    // If already added without flushing, reuse the previously added
+    // entry and just reset the write pointer and compression method.
+    f = lazy.Get(idx);
+    ResetArchiveEntry (f, size, pack);
+  }
+  else
+  {
+    f = CreateArchiveEntry(name, size, pack);
   lazy.Push (f);
+  }
   return (void *)f;
 }
 
@@ -687,7 +704,8 @@ bool csArchive::WriteCentralDirectory (FILE *temp)
   for (n = 0; n < dir.Length (); n++)
   {
     ArchiveEntry *f = dir.Get (n);
-    if (IsDeleted (f->filename))
+    // Don't write deleted or faked entries
+    if (IsDeleted (f->filename) || f->faked)
       continue;
     if (!f->WriteCDFH (temp))
       return false;
@@ -860,6 +878,7 @@ csArchive::ArchiveEntry::ArchiveEntry (const char *name,
   comment = 0;
   buffer_pos = 0;
   buffer_size = 0;
+  faked = false;
 }
 
 csArchive::ArchiveEntry::~ArchiveEntry ()

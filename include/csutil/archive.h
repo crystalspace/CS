@@ -66,6 +66,7 @@ private:
     size_t buffer_pos;
     size_t buffer_size;
     char *extrafield, *comment;
+    bool faked;
 
     ArchiveEntry (const char *name, ZIP_central_directory_file_header &cdfh);
     ~ArchiveEntry ();
@@ -119,6 +120,7 @@ private:
   char *ReadEntry (FILE *infile, ArchiveEntry *f);
   ArchiveEntry *CreateArchiveEntry (const char *name,
     size_t size = 0, bool pack = true);
+  void ResetArchiveEntry (ArchiveEntry *f, size_t size, bool pack);
 
 public:
   /// Open the archive.
@@ -131,8 +133,7 @@ public:
 
   /**
    * Create a new file in the archive. If the file already exists
-   * it will be overwritten. Calling NewFile twice with same filename
-   * without calling Flush() inbetween will cause unpredictable results.
+   * it will be overwritten.
    * <p>
    * Returns 0 if not succesful. Otherwise it returns a pointer
    * that can be passed to 'Write' routine. You won't see any changes
@@ -153,7 +154,7 @@ public:
   bool DeleteFile (const char *name);
 
   /**
-   * Return true if a file exists. Also return the
+   * Return true if a path exists. Also return the
    * size of the file if needed.
    */
   bool FileExists (const char *name, size_t *size = 0) const;

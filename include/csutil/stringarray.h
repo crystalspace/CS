@@ -72,6 +72,11 @@ public:
     return strcasecmp (item1, item2);
   }
 
+  static int CaseSensitiveCompare (const char* const &item1, const char* const &item2)
+  {
+    return strcmp (item1, item2);
+  }
+
   static int CaseSensitiveCompare (char const* item1, char const* item2)
   {
     return strcmp (item1, item2);
@@ -154,6 +159,16 @@ public:
       if (!strcasecmp (Get (i), what))
         return i;
     return -1;
+  }
+
+  /**
+   * Insert a string element at a sorted position, using a specialized
+   * csArrayCompareFunction. Assumes array is already sorted.
+   */
+  int InsertSorted (const char* const &newstr, ArrayCompareFunction* compare
+    = CaseSensitiveCompare, int* equal_index = 0)
+  {
+    return superclass::InsertSorted(newstr, compare, equal_index);
   }
 };
 
