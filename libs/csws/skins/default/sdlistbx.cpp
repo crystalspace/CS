@@ -74,7 +74,7 @@ void csDefaultListBoxItemSkin::Draw (csComponent &This) {
   
   if ((ItemBitmap=This.GetItemBitmap()))
   {
-    This.Pixmap (ItemBitmap, x, (This.bound.Height () - ItemBitmap->Height ()) / 2);
+    This.Pixmap(ItemBitmap, x, (This.bound.Height()-ItemBitmap->Height()) / 2);
     x += ItemBitmap->Width () + LISTBOXITEM_XSPACE;
   } /* endif */
   
@@ -116,9 +116,12 @@ void csDefaultListBoxSkin::Draw (csComponent &This)
       This.Rect3D (1, 1, This.bound.Width () - 1, This.bound.Height () - 1,
           CSPAL_LISTBOX_2LIGHT3D, CSPAL_LISTBOX_2DARK3D);
       break;
+    default:
+      break;
   } /* endswitch */
   This.Box (BorderWidth, BorderHeight, This.bound.Width () - BorderWidth,
-    This.bound.Height () - BorderHeight, This.GetFrameStyle() == cslfsThickRect ?
+    This.bound.Height () - BorderHeight,
+    This.GetFrameStyle() == cslfsThickRect ?
     CSPAL_LISTBOX_BACKGROUND2 : CSPAL_LISTBOX_BACKGROUND);
 
   #undef This
