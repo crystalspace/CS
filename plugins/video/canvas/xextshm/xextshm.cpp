@@ -150,7 +150,7 @@ void csXExtSHM::DestroyMemory ()
   shm_image = 0;
 }
 
-void csXExtSHM::Print (Window window, GC gc, csRect *area)
+void csXExtSHM::Print (Window window, GC gc, csRect const* area)
 {
   if (area)
     XShmPutImage (dpy, window, gc, shm_image,

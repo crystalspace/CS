@@ -486,7 +486,7 @@ public:
   void read_config (iConfigFile *config);
   void Clear ();
   void DetermineStorageSizes();
-  void SetPixelFormat (csPixelFormat &PixelFormat);
+  void SetPixelFormat (csPixelFormat const& PixelFormat);
 
 
   /**

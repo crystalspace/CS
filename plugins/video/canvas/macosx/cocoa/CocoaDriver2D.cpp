@@ -240,7 +240,7 @@ void CocoaDriver2D::SetTitle(char const* s)
 //-----------------------------------------------------------------------------
 // Print -- A misnomer; actually flushes frame buffer to display.
 //-----------------------------------------------------------------------------
-void CocoaDriver2D::Print(csRect*)
+void CocoaDriver2D::Print(csRect const*)
 {
   frame_buffer->cook();
   CocoaDelegate2D_flush(controller);

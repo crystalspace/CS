@@ -235,7 +235,7 @@ void csGraphics3DNull::FinishDraw ()
   DrawMode = 0;
 }
 
-void csGraphics3DNull::Print (csRect *area)
+void csGraphics3DNull::Print (csRect const* area)
 {
   G2D->Print (area);
 }

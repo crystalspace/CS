@@ -460,7 +460,7 @@ void csApp::PrepareTextures ()
 
 void csApp::SetupPalette ()
 {
-  csPixelFormat *pfmt = GfxPpl.G2D->GetPixelFormat ();
+  csPixelFormat const* pfmt = GfxPpl.G2D->GetPixelFormat ();
   PhysColorShift = ((pfmt->RedShift >= 24) || (pfmt->GreenShift >= 24)
     || (pfmt->BlueShift >= 24)) ? 8 : 0;
 

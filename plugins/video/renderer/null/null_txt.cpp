@@ -211,7 +211,7 @@ csTextureManagerNull::~csTextureManagerNull ()
   Clear ();
 }
 
-void csTextureManagerNull::SetPixelFormat (csPixelFormat &PixelFormat)
+void csTextureManagerNull::SetPixelFormat (csPixelFormat const& PixelFormat)
 {
   pfmt = PixelFormat;
 }

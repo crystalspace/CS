@@ -1557,7 +1557,7 @@ void csGraphics3DOGLCommon::FinishDraw ()
   DrawMode = 0;
 }
 
-void csGraphics3DOGLCommon::Print (csRect * area)
+void csGraphics3DOGLCommon::Print (csRect const* area)
 {
   if (fps_limit)
   {

@@ -128,7 +128,7 @@ void CGDriver2D::SetTitle(char *title)
 
 // Print
 // Flip video page (or dump to framebuffer)
-void CGDriver2D::Print(csRect *area)
+void CGDriver2D::Print(csRect const* area)
 {
     OSXDelegate2D_blitToWindow(delegate, Memory, Width, Height, Depth);
 }

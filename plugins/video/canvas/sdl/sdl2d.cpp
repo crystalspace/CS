@@ -519,7 +519,7 @@ bool csGraphics2DSDL::HandleEvent (iEvent&)
   return false;
 }
 
-void csGraphics2DSDL::Print (csRect *area)
+void csGraphics2DSDL::Print (csRect const* area)
 {
   (void) area;
 

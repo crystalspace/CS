@@ -18,6 +18,8 @@ chronological order.
 	- Eric Sunshine fixed copy/paste error in MSVC6 template files which
 	  caused Release_NR and Debug_NR configurations of all projects
 	  (applications, plugins, etc.) to appear to be static link libraries.
+	- Eric Sunshine added a number of missing `const' qualifiers to
+	  arguments of video- and graphics-related interfaces.
 14-Feb-2004
 	- Norman Kraemer added an ALSA sound driver.  It can be used if you
 	  disabled OSS emulation in your ALSA configuration.

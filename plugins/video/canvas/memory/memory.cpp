@@ -139,7 +139,7 @@ bool csGraphicsMemory::Initialize(iObjectRegistry* obj_reg)
   return ok;
 }
 
-void csGraphicsMemory::Print (csRect *)
+void csGraphicsMemory::Print (csRect const*)
 {
 }
 

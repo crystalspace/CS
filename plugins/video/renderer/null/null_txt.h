@@ -163,7 +163,7 @@ public:
   virtual ~csTextureManagerNull ();
 
   /// Called from G3D::Open ()
-  void SetPixelFormat (csPixelFormat &PixelFormat);
+  void SetPixelFormat (csPixelFormat const& PixelFormat);
 
   /// Encode RGB values to a 16-bit word (for 16-bit mode).
   uint32 encode_rgb (int r, int g, int b);

@@ -143,7 +143,7 @@ void GLOSXDriver2D::SetTitle(char *title)
 
 // Print
 // Swap OpenGL buffers
-void GLOSXDriver2D::Print(csRect *area)
+void GLOSXDriver2D::Print(csRect const* area)
 {
   CGLSetCurrentContext(context);
   CGLFlushDrawable(context);

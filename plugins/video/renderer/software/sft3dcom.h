@@ -293,7 +293,7 @@ public:
   /// Start a new frame (see CSDRAW_XXX bit flags)
   virtual bool BeginDraw (int DrawFlags);
 
-  virtual void Print (csRect *area);
+  virtual void Print (csRect const* area);
   /// End the frame and do a page swap.
   virtual void FinishDraw ();
   /// Draw the projected polygon with light and texture.

@@ -282,7 +282,7 @@ bool csGraphics2DDDraw3::GetDoubleBufferState ()
   return (FullScreen && m_bDoubleBuffer);
 }
 
-void csGraphics2DDDraw3::Print (csRect *area)
+void csGraphics2DDDraw3::Print (csRect const* area)
 {
   bool loop = true;
 

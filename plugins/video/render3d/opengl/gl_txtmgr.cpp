@@ -1337,7 +1337,7 @@ int csGLTextureManager::GetTextureFormat ()
   return CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA;
 }
 
-void csGLTextureManager::SetPixelFormat (csPixelFormat &PixelFormat)
+void csGLTextureManager::SetPixelFormat (csPixelFormat const& PixelFormat)
 {
   pfmt = PixelFormat;
   max_tex_size = G3D->GetMaxTextureSize ();

@@ -51,7 +51,7 @@ public:
 
   virtual bool Initialize(iObjectRegistry *object_reg);
 
-  virtual void Print (csRect *area = 0);
+  virtual void Print (csRect const* area = 0);
 
   virtual void SetRGB(int i, int r, int g, int b);
 

@@ -434,8 +434,8 @@ void csGraphics2DGLCommon::DrawPixel (int x, int y, int color)
   }
 }
 
-void csGraphics2DGLCommon::DrawPixels (csPixelCoord* pixels,
-	int num_pixels, int color)
+void csGraphics2DGLCommon::DrawPixels (
+  csPixelCoord const* pixels, int num_pixels, int color)
 {
   // prepare for 2D drawing--so we need no fancy GL effects!
   bool gl_texture2d = statecache->IsEnabled_GL_TEXTURE_2D ();
@@ -459,7 +459,7 @@ void csGraphics2DGLCommon::DrawPixels (csPixelCoord* pixels,
 }
 
 void csGraphics2DGLCommon::Blit (int x, int y, int w, int h,
-	unsigned char* data)
+	unsigned char const* data)
 {
   int orig_x = x;
   int orig_y = y;

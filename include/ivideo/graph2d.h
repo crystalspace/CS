@@ -180,12 +180,12 @@ struct iGraphics2D : public iBase
   virtual bool GetDoubleBufferState () = 0;
 
   /// Return information about the pixel format.
-  virtual csPixelFormat *GetPixelFormat () = 0;
+  virtual csPixelFormat const* GetPixelFormat () = 0;
 
   /**
    * Return the number of bytes for every pixel.
    * This function is equivalent to the PixelBytes field that
-   * you get from GetPixelFormat.
+   * you get from GetPixelFormat().
    */
   virtual int GetPixelBytes () = 0;
 
@@ -193,7 +193,7 @@ struct iGraphics2D : public iBase
    * Return the number of palette entries that can be modified.
    * This should return 0 if there is no palette (true color displays).
    * This function is equivalent to the PalEntries field that you
-   * get from GetPixelFormat. It is just a little bit easier to obtain
+   * get from GetPixelFormat(). It is just a little bit easier to obtain
    * this way.
    */
   virtual int GetPalEntryCount () = 0;
@@ -230,7 +230,7 @@ struct iGraphics2D : public iBase
    * parameter is only a hint to the canvas driver. Changes outside the
    * rectangle may or may not be printed as well.
    */
-  virtual void Print (csRect *pArea) = 0;
+  virtual void Print (csRect const* pArea) = 0;
 
   /// Clear backbuffer.
   virtual void Clear (int color) = 0;
@@ -239,7 +239,7 @@ struct iGraphics2D : public iBase
   virtual void ClearAll (int color) = 0;
 
   /// Draw a line.
-  virtual void DrawLine (float x1, float y1, float x2, float y2, int color) = 0;
+  virtual void DrawLine(float x1, float y1, float x2, float y2, int color) = 0;
 
   /// Draw a box
   virtual void DrawBox (int x, int y, int w, int h, int color) = 0;
@@ -255,11 +255,12 @@ struct iGraphics2D : public iBase
   virtual void DrawPixel (int x, int y, int color) = 0;
 
   /// Draw an array of pixel coordinates with the given color.
-  virtual void DrawPixels (csPixelCoord* pixels, int num_pixels, int color) = 0;
+  virtual void DrawPixels(csPixelCoord const* pixels, int num_pixels,
+     int color) = 0;
 
-  /// Blit a memory block. The format of the image is RGBA in bytes. Row by row.
+  /// Blit a memory block.  Format of the image is RGBA in bytes. Row by row.
   virtual void Blit (int x, int y, int width, int height,
-  	unsigned char* data) = 0;
+    unsigned char const* data) = 0;
 
   /// Returns the address of the pixel at the specified (x, y) coordinates.
   virtual unsigned char *GetPixelAt (int x, int y) = 0;

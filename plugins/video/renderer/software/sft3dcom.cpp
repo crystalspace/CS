@@ -1284,7 +1284,7 @@ bool csGraphics3DSoftwareCommon::BeginDraw (int DrawFlags)
   return true;
 }
 
-void csGraphics3DSoftwareCommon::Print (csRect *area)
+void csGraphics3DSoftwareCommon::Print (csRect const* area)
 {
   G2D->Print (area);
   if (do_interlaced != -1)

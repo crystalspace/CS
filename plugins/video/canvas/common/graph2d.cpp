@@ -388,7 +388,8 @@ void csGraphics2D::DrawPixel32 (csGraphics2D *This, int x, int y, int color)
     *(long *)(This->GetPixelAt (x, y)) = color;
 }
 
-void csGraphics2D::DrawPixels (csPixelCoord* pixels, int num_pixels, int color)
+void csGraphics2D::DrawPixels (
+  csPixelCoord const* pixels, int num_pixels, int color)
 {
   while (num_pixels > 0)
   {
@@ -399,7 +400,7 @@ void csGraphics2D::DrawPixels (csPixelCoord* pixels, int num_pixels, int color)
 }
 
 void csGraphics2D::Blit (int x, int y, int w, int h,
-    unsigned char* data)
+    unsigned char const* data)
 {
   bool hor_clip_needed = false;
   bool ver_clip_needed = false;
@@ -427,7 +428,7 @@ void csGraphics2D::Blit (int x, int y, int w, int h,
     data += 4*(x-orig_x);
 
   int r, g, b, a;
-  unsigned char* d;
+  unsigned char const* d;
   switch (pfmt.PixelBytes)
   {
     case 1:

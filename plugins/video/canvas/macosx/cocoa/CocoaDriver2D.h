@@ -52,7 +52,7 @@ public:
   virtual bool Open();
   virtual void Close();
   virtual void SetTitle(char const*);
-  virtual void Print(csRect* = 0);
+  virtual void Print(csRect const* = 0);
   virtual bool SetMouseCursor(csMouseCursorID);
   virtual bool HandleEvent(iEvent&);
 

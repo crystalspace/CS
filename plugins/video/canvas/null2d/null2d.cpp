@@ -78,7 +78,7 @@ void csGraphics2DNull::FinishDraw()
     csGraphics2D::FinishDraw();
 }
 
-void csGraphics2DNull::Print(csRect*)
+void csGraphics2DNull::Print(csRect const*)
 {
 }
 

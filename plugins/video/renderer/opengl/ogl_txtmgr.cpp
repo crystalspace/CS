@@ -400,7 +400,7 @@ void csTextureHandleOpenGL::ShowFormat ()
 }
 
 void csTextureHandleOpenGL::InitTexture (csTextureManagerOpenGL *texman,
-           csPixelFormat *pfmt)
+           csPixelFormat const* pfmt)
 {
   if (!image)
     return;
@@ -835,7 +835,7 @@ void csTextureManagerOpenGL::DetermineStorageSizes ()
   }
 }
 
-void csTextureManagerOpenGL::SetPixelFormat (csPixelFormat &PixelFormat)
+void csTextureManagerOpenGL::SetPixelFormat (csPixelFormat const& PixelFormat)
 {
   pfmt = PixelFormat;
   max_tex_size = G3D->Caps.maxTexWidth;

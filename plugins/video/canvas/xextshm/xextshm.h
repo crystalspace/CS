@@ -64,7 +64,7 @@ public:
     { this->dpy = dpy; this->screen_num = screen_num; }
   virtual unsigned char *CreateMemory (int Width, int Height);
   virtual void DestroyMemory ();
-  virtual void Print (Window window, GC gc, csRect *area);
+  virtual void Print (Window window, GC gc, csRect const* area);
 
   struct eiComponent : public iComponent
   {

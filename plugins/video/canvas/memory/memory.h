@@ -64,7 +64,7 @@ public:
   virtual bool BeginDraw();
   virtual void FinishDraw();
 
-  virtual void Print(csRect* area = 0);
+  virtual void Print(csRect const* area = 0);
 
   unsigned char *GetImage();
   struct eiGraphicsMemory : public iGraphicsMemory

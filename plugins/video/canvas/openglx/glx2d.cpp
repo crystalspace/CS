@@ -364,7 +364,7 @@ bool csGraphics2DGLX::PerformExtensionV (char const* command, va_list args)
   return csGraphics2DGLCommon::PerformExtensionV (command, args);
 }
 
-void csGraphics2DGLX::Print (csRect * /*area*/)
+void csGraphics2DGLX::Print (csRect const* /*area*/)
 {
   glXSwapBuffers (dpy,window);
 }

@@ -617,7 +617,7 @@ public:
   virtual void FinishDraw ();
 
   /// Print the image in backbuffer
-  virtual void Print (csRect *area);
+  virtual void Print (csRect const* area);
 
   /// Draw the projected polygon with light and texture.
   virtual void DrawPolygon (G3DPolygonDP& poly);

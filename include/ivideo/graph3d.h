@@ -776,7 +776,7 @@ struct iGraphics3D : public iBase
    * renderer. Changes outside the rectangle may or may not be printed as
    * well.
    */
-  virtual void Print (csRect *area) = 0;
+  virtual void Print (csRect const* area) = 0;
 
   /**
    * Draw a pixmap using a rectangle from given texture.

@@ -364,7 +364,7 @@ void csPerfStats::WriteMainHeader ()
   if (!g3d) abort ();
   iGraphics2D *g2d = g3d->GetDriver2D ();
   const csGraphics3DCaps *caps = g3d->GetCaps ();
-  csPixelFormat *pfmt = g2d->GetPixelFormat ();
+  csPixelFormat const* pfmt = g2d->GetPixelFormat ();
 
 #if defined CS_DEBUG
   char exe_mode [] = "Debug";

@@ -40,7 +40,7 @@ struct iXExtSHM : public iBase
   /// Destroy Shared Memory
   virtual void DestroyMemory () = 0;
   /// Print Image
-  virtual void Print (Window window, GC gc, csRect *area) = 0;
+  virtual void Print (Window window, GC gc, csRect const* area) = 0;
 
 };
 

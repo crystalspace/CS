@@ -514,7 +514,7 @@ csTextureManagerSoftware::csTextureManagerSoftware (
   G3D = iG3D;
 }
 
-void csTextureManagerSoftware::SetPixelFormat (csPixelFormat &PixelFormat)
+void csTextureManagerSoftware::SetPixelFormat(csPixelFormat const& PixelFormat)
 {
   pfmt = PixelFormat;
 

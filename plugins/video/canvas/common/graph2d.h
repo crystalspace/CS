@@ -156,7 +156,7 @@ public:
   virtual void FinishDraw ();
 
   /// (*) Flip video pages (or dump backbuffer into framebuffer).
-  virtual void Print (csRect *area = 0) { }
+  virtual void Print (csRect const* area = 0) { }
 
   /// Get active videopage number (starting from zero)
   virtual int GetPage ();
@@ -180,10 +180,11 @@ public:
   /// Same but exposed through iGraphics2D interface
   virtual void DrawPixel (int x, int y, int color)
   { _DrawPixel (this, x, y, color); }
-  virtual void DrawPixels (csPixelCoord* pixels, int num_pixels, int color);
-  /// Blit a memory block. The format of the image is RGBA in bytes. Row by row.
+  virtual void DrawPixels (csPixelCoord const* pixels, int num_pixels,
+    int color);
+  /// Blit a memory block. Format of the image is RGBA in bytes. Row by row.
   virtual void Blit (int x, int y, int width, int height,
-  	unsigned char* data);
+  	unsigned char const* data);
 
   /// Draw a line
   virtual void DrawLine (float x1, float y1, float x2, float y2, int color);
@@ -218,7 +219,7 @@ public:
    * Return the number of palette entries that can be modified.
    * This should return 0 if there is no palette (true color displays).
    * This function is equivalent to the PalEntries field that you
-   * get from GetPixelFormat. It is just a little bit easier to obtain
+   * get from GetPixelFormat(). It is just a little bit easier to obtain
    * this way.
    */
   virtual int GetPalEntryCount ()
@@ -227,7 +228,7 @@ public:
   /**
    * Return the number of bytes for every pixel.
    * This function is equivalent to the PixelBytes field that
-   * you get from GetPixelFormat.
+   * you get from GetPixelFormat().
    */
   virtual int GetPixelBytes ()
   { return pfmt.PixelBytes; }
@@ -235,7 +236,7 @@ public:
   /**
    * Return information about about the pixel format.
    */
-  virtual csPixelFormat* GetPixelFormat ()
+  virtual csPixelFormat const* GetPixelFormat ()
   { return &pfmt; }
 
   /**

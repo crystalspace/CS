@@ -29,7 +29,7 @@ csScreenShot::csScreenShot (iGraphics2D *G2D)
 
   Width = G2D->GetWidth ();
   Height = G2D->GetHeight ();
-  csPixelFormat *pfmt = G2D->GetPixelFormat ();
+  csPixelFormat const* pfmt = G2D->GetPixelFormat ();
   int x;
 
   if (pfmt->PalEntries)

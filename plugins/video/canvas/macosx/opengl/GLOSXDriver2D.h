@@ -51,7 +51,7 @@ public:
     virtual void SetTitle(char *title);
 
     // Flip video page (or dump to framebuffer)
-    virtual void Print(csRect *area = 0);
+    virtual void Print(csRect const* area = 0);
 
     // Set mouse position
     virtual bool SetMousePosition(int x, int y);

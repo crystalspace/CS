@@ -56,7 +56,7 @@ public:
   virtual void Close();
 
   // Flip video page (or dump to framebuffer) - pure virtual
-  virtual void Print(csRect *area = 0) = 0;
+  virtual void Print(csRect const* area = 0) = 0;
 
   // Pure virtual function - the driver must invlude code to handle resizing
   virtual bool Resize(int w, int h) = 0;

@@ -38,7 +38,7 @@ public:
   virtual bool BeginDraw();
   virtual void FinishDraw();
 
-  virtual void Print (csRect *area = 0);
+  virtual void Print (csRect const* area = 0);
   virtual void SetRGB (int i, int r, int g, int b);
 
   virtual bool SetMousePosition (int , int );
@@ -54,10 +54,10 @@ public:
   /// Same but exposed through iGraphics2D interface
   virtual void DrawPixel (int , int , int )
   { }
-  virtual void DrawPixels (csPixelCoord* , int , int )
+  virtual void DrawPixels (csPixelCoord const* , int , int )
   { }
   /// Blit a memory block. The format of the image is RGBA in bytes. Row by row.
-  virtual void Blit (int , int , int , int ,unsigned char* )
+  virtual void Blit (int , int , int , int ,unsigned char const* )
   { }
   /// Draw a line
   virtual void DrawLine (float , float , float , float , int )

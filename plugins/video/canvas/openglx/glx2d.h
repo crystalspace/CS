@@ -69,7 +69,7 @@ public:
 
   void Report (int severity, const char* msg, ...);
 
-  virtual void Print (csRect *area = 0);
+  virtual void Print (csRect const* area = 0);
 
   virtual bool PerformExtensionV (char const* command, va_list);
 

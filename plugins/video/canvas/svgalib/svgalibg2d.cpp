@@ -416,7 +416,7 @@ bool csGraphics2DSVGALib::HandleEvent (iEvent &/*Event*/)
   return false;
 }
 
-void csGraphics2DSVGALib::Print (csRect * /*area*/)
+void csGraphics2DSVGALib::Print (csRect const* /*area*/)
 {
   gl_copyscreen (&physicalscreen);
 }

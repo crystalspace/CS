@@ -1203,7 +1203,7 @@ void csGLGraphics3D::FinishDraw ()
   render_target = 0;
 }
 
-void csGLGraphics3D::Print (csRect* area)
+void csGLGraphics3D::Print (csRect const* area)
 {
   //glFinish ();
   if (bugplug)

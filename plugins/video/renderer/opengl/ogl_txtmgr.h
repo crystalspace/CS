@@ -99,7 +99,7 @@ public:
   /// Delete the texture object
   virtual ~csTextureHandleOpenGL ();
   /// Adjust size, mipmap, create procedural texture etc
-  void InitTexture (csTextureManagerOpenGL *texman, csPixelFormat *pfmt);
+  void InitTexture (csTextureManagerOpenGL *texman, csPixelFormat const* pfmt);
 
   virtual bool csTextureHandleOpenGL::GetMipMapDimensions (int mipmap,
     int &w, int &h);
@@ -277,7 +277,7 @@ public:
   virtual ~csTextureManagerOpenGL ();
 
   /// Called from G3D::Open ()
-  void SetPixelFormat (csPixelFormat &PixelFormat);
+  void SetPixelFormat (csPixelFormat const& PixelFormat);
   /// Called by texture's destructor
   void UnregisterTexture (csTextureHandleOpenGL *handle);
 

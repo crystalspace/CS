@@ -52,7 +52,7 @@ public:
   virtual bool Open ();
   virtual void Close ();
 
-  virtual void Print (csRect *area = 0);
+  virtual void Print (csRect const* area = 0);
 
   virtual void SetRGB (int i, int r, int g, int b);
 

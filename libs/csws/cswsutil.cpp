@@ -397,7 +397,7 @@ void csRGB2HLS (float r, float g, float b, float &h, float &l, float &s)
 void csGetRGB (int iColor, csApp *iApp, float &r, float &g, float &b)
 {
   iColor = iApp->pplColor (iColor);
-  csPixelFormat *pfmt = iApp->GetG2D ()->GetPixelFormat ();
+  csPixelFormat const* pfmt = iApp->GetG2D ()->GetPixelFormat ();
   csRGBpixel *palette = iApp->GetG2D ()->GetPalette ();
   if (pfmt->PalEntries)
   {

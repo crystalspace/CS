@@ -163,7 +163,7 @@ static int oldmousebut = 0;
 static int oldmousex = -1, oldmousey = -1;
 static bool shift_state = false, ctrl_state = false, alt_state = false;
 
-void csGraphics2DAA::Print (csRect *area)
+void csGraphics2DAA::Print (csRect const* area)
 {
   int sx1, sx2, sy1, sy2;
   if (area)

@@ -668,7 +668,7 @@ void csGraphics2DXLib::SetRGB(int i, int r, int g, int b)
   csGraphics2D::SetRGB (i, r, g, b);
 }
 
-void csGraphics2DXLib::Print (csRect *area)
+void csGraphics2DXLib::Print (csRect const* area)
 {
   // If we won't tell X-Windows to flush, the applications starts to response
   // slowly in some circumstances (on some machines, OSes, configurations etc)
