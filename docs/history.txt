@@ -14,6 +14,19 @@ The history order is reversed so that new features are at the top.
 	  comment, so that csList will be added to PubAPI.
 	- Jorrit changed a comment for ThreadedLoadMapFile() to indicate that
 	  it doesn't work yet.
+	- Marten added the class csProcessorCapabilities to allow CS to query
+	  processorspecific extensions and information. Some functions in this
+	  class is processorspecific and some parts compilerdependant so we must
+	  protect certain areas with #defines
+	- Marten made these changes to dynavis
+	    - Added a fix to csVisibilityObjectHistory to make it set reason on
+	      initializationtime. This fix a bug where bugplug/dynavis segfault 
+	      when trying to use the linedrawing debugging in dynavis.
+	    - Made the inner XOR-filling loop in csCoverageTile::Flush use MMX
+	      on machines which support MMX. The loop is written twice, once in
+	      MSVC and once in GCC inline assembly. The reason for this is speed.
+	      It could have been written in NASM as a separate function, but the 
+	      overhead for the functioncall is too big.
 14-Jun-2003
 	- Jorrit got a fix from Arthur K. (nemerle@lsk.pl) for two memory
 	  leaks in AWS.
