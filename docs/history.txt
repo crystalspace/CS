@@ -1,6 +1,9 @@
 The history order has been reversed so that new features are at the top.
 
+20-Oct-2000
+	- Set minimum canvas size for X to 32x32 instead of 320x200.
 18-Oct-2000
+	- Thomas Hieber did some fixes to cctest for MSVC.
 	- Andrew Zabolotny did the following changes:
 	    - Fixed a small bug in csRect::Exclude() that was there for a
 	      very long time. Effectively it caused CSWS to do some extra

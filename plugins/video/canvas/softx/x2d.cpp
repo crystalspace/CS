@@ -1100,8 +1100,8 @@ void csGraphics2DXLib::AllowCanvasResize (bool iAllow)
   normal_hints.height_inc = 2;
   if (iAllow)
   {
-    normal_hints.min_width = 320;
-    normal_hints.min_height = 200;
+    normal_hints.min_width = 32;
+    normal_hints.min_height = 32;
     normal_hints.max_width = display_width;
     normal_hints.max_height = display_height;
   }
