@@ -4,42 +4,18 @@
 @cindex BeOS
 
 CrystalSpace is a full-featured 3D graphics engine and the BeOS port was
-originally created by Xavier Pianet.  David Huen performed a small amount
-of maintenance after Xavier abandoned the project.
-Most recently, @email{sunshine@@sunshineco.com, Eric Sunshine} significantly
-cleaned up and re-engineered the BeOS port, ensuring that all programs
-compile cleanly and run properly right out of the box. He also heavily
-updated the accompanying documentation.
+originally created by Xavier Pianet.  David Huen performed a small amount of
+maintenance after Xavier abandoned the project.  Most recently,
+@email{sunshine@@sunshineco.com, Eric Sunshine} significantly cleaned up and
+almost totally re-engineered the BeOS port, ensuring that all programs compile
+cleanly and run properly right out of the box.  He also heavily updated the
+accompanying documentation.
 
-Here is the list of BeOS-specific bugs compiled by Eric Sunshine.
-These bugs are being actively eradicated.
-
-@itemize @bullet
-@item
-The BeOS system driver should determine the directory in which the
-application resides, and set that as the current working directory. This
-would (presumably) allow the programs to be launched from the Tracker
-application by merely double-clicking on them.
-
-@item
-Add full-screen support. Be careful about the resolution, since CS can
-use any arbitrary window dimension.
-
-@item
-Application should be able to redraw rendering window when BeOS asks
-for a redraw even if CS is busy (that is, not pushing out a continuous
-stream of frames). There are already cases where this is needed, and will
-be very important when a pause feature is added.
-
-@item
-Pause when not foreground application. Make sure that screen redraws
-correctly even when paused.
-@end itemize
-
-It is assumed that you will have obtained a full set of sources at this
-stage. Full sources includes the Crystal Space sources as well as those for
-the supporting library, libjpeg. After installing the JPEG library, you can
-build it by follow these simple instructions:
+It is assumed that you will have obtained a full set of sources at this stage.
+Full sources includes the Crystal Space sources as well as those for the
+supporting library, @samp{libjpeg}.  After downloading and unpacking the
+@sc{jpeg} library into @file{CS/libs/libjpeg}, you can build it by following
+these simple instructions:
 
 @example
 cd CS/libs/libjpeg
@@ -47,20 +23,22 @@ sh ./configure
 make libjpeg.a
 @end example
 
-Other required libraries, zlib and libpng are already present on BeOS 4.5,
-so there is no need to manually install them.
+Other required libraries, @samp{zlib} and @samp{libpng} are already present on
+BeOS 4.5, so there is no need to install them manually.
 
 @menu
 * BeOS settings::
 * BeOS Program settings:: Program settings
 * BeOS testing:: Testing
+* BeOS To-Do and Bug List:: To-Do and Bug List
 @end menu
 
 @node BeOS settings, BeOS Program settings, BeOS, BeOS
 @subsubsection BeOS settings
 
-You set up the compilation environment by going into the @file{CS/} directory
+You set up the compilation environment by changing to the @file{CS/} directory
 in terminal and typing:
+
 @example
 make beos
 make depend    # Optional.
@@ -74,40 +52,56 @@ make all
 @end example
 
 If you prefer more control over the build process, then you can compile the
-various modules separately or in batches.  To compile all the basic drivers:
+various modules separately or in batches.  To compile all the basic drivers
+and plug-in modules, type:
 
 @example
-make netdrivers
-make snddrivers
+make plugins
 @end example
 
-Note that sound has not yet been implemented in the BeOS port, so this just
-builds null sound driver.
+Or for even more fine-grained control:
 
-The graphics libraries consist of a OS-specific 2D driver and a
-OS-independent 3D renderer.  To get:
+@example
+make drivers2d
+make drivers3d
+make netdrivers
+make cscon
+@end example
 
-1) software renderer
+The graphics libraries consist of several BeOS-specific 2D drivers and
+OS-independent 3D renderer.  You may compile these manually if you like,
+though they are normally built as part of the targets already mentioned,
+such as @samp{all}, @samp{plugins}, @samp{drivers2d}, @samp{drivers3d}.
+
+@enumerate
+@item
+Software Renderer.
+
 @example
 make be2d
 make soft
 @end example
 
-2) OpenGL
+@item
+OpenGL.
+
 @example
 make glbe2d
-make glrender
+make gl3d
 @end example
 
->>> GLIDE IS CURRENTLY BROKEN >>>@*
-3) Glide
+@item
+Glide.  @strong{Warning}: @emph{The Glide driver is currently broken.  Do not
+use these commands.}
+
 @example
 make glidebe2d
 make glide3d
 @end example
-<<< GLIDE IS CURRENTLY BROKEN <<<@*
+@end enumerate
 
-Finally, to build the example applications:
+Finally, if you did not invoke the makefile target @samp{all}, you can build
+the example applications manually:
 
 @example
 make apps
@@ -116,10 +110,16 @@ make apps
 @node BeOS Program settings, BeOS testing, BeOS settings, BeOS
 @subsubsection Program settings
 
-You will need to have a world file to do anything.  I suggest downloading
-@file{flarge.zip}. Place this file in the @file{CS/data} directory.
+You will need to have a world file to do anything.  It is suggested that you
+download @file{flarge.zip} or any of the other world files offered on the
+Crystal Space web site.  Place the downloaded file in the @file{CS/data}
+directory.
 
-Edit @file{cryst.cfg} to set the world file accordingly (used by walktest):
+To use a particular world file, mention it on the command line when invoking
+the WalkTest application.  If you wish this file to be used by default, you
+may want to edit @file{cryst.cfg} to set the @samp{WORLDFILE} variable to the
+chosen file.
+
 @example
 WORLDFILE=flarge
 @end example
@@ -127,13 +127,14 @@ WORLDFILE=flarge
 The rest of the settings are mostly self evident and can often be overridden
 at the command line.
 
-@node BeOS testing, , BeOS Program settings, BeOS
+@node BeOS testing, BeOS To-Do and Bug List, BeOS Program settings, BeOS
 @subsubsection Testing
 
 You may want to switch to a different workspace and set the screen resolution
 to something like 800*600, 16 bit, though this is not strictly necessary.
 
-Form Terminal within this workspace, go to the @file{CS/} folder and type:
+From Terminal within this workspace, change to the @file{CS/} folder and type:
+
 @example
 walktest
 @end example
@@ -144,12 +145,12 @@ choose the driver by specifying the @code{-driver} keyword:
 
 @example
 walktest -video=software  # Runs in software mode.
-walktest -video=opengl  # Runs in OpenGL mode.
-walktest -video=glide  # Runs in Glide mode.
+walktest -video=opengl    # Runs in OpenGL mode.
+walktest -video=glide     # Runs in Glide mode (currently broken).
 @end example
 
 Alt-f will switch you in and out of full screen.  (Note, the software driver
-does not currently implement full screen mode.)
+does not currently implement full screen mode, though OpenGL does.)
 
 Note that walktest requires a good world file to show off effectively (like
 @file{flarge.zip}).  Make sure that cryst.cfg is correctly set to identify
@@ -161,24 +162,57 @@ walktest flarge
 
 You may have to adjust the @samp{AMBIENT_WHITE} level in @file{cryst.cfg} if
 the levels appear too dark.  After adjusting the ambient level, specify
-@code{-recalc} on the command line, as in:
+@code{-recalc} on the command line to instruct Crystal Space to recalculte
+the lighting information.
 
 @example
 walktest -recalc flarge
 @end example
 
-Other interesting example applications which you can run are blocks,
-metademo, shooter, and mazed.
+Other interesting example applications which you can run are blocks, metademo,
+shooter, and mazed.
 
 You should be able to start experimenting with the BeOS port at this stage.
 
 There may well be mistakes in this document.  Please feel free to correct
-them and send the text to one of the port maintainers, such as
-Eric Sunshine     (@email{sunshine@@sunshineco.com}),
-David Huen        (@email{david@@huen.freeserve.co.uk}), or
-Jorrit Tyberghein (@email{Jorrit.Tyberghein@@uz.kuleuven.ac.be}).
+them and send the text to one of the port maintainers:
 
->>> IGNORE: THIS SECTION WILL SOON BE OBSOLETE >>>
+Eric Sunshine (@email{sunshine@@sunshineco.com}),@*
+Jorrit Tyberghein (@email{Jorrit.Tyberghein@@uz.kuleuven.ac.be}), or possibly@*
+David Huen (@email{david@@huen.freeserve.co.uk}).
+
+@node BeOS To-Do and Bug List, , BeOS testing, BeOS
+@subsubsection To-Do and Bug List
+
+Here is the list of BeOS-specific bugs and To-Do items compiled by
+Eric Sunshine.  These items are addressed as time permits.
+
+@itemize @bullet
+@item
+The BeOS system driver should determine the directory in which the
+application resides, and set that as the current working directory. This
+would (presumably) allow the programs to be launched from the Tracker
+application by merely double-clicking on them.
+
+@item
+Add full-screen support for the software renderer.  Be careful about the
+resolution, since CS can use any arbitrary window dimension.
+
+@item
+Application should be able to redraw rendering window when BeOS asks
+for a redraw even if CS is busy (that is, not pushing out a continuous
+stream of frames). There are already cases where this is needed, and will
+be very important when a pause feature is added.
+
+@item
+Pause when not foreground application. Make sure that screen redraws
+correctly even when paused.
+@end itemize
+
+@strong{IGNORE}: @emph{This text is from an earlier edition of this
+documentation and is now mostly inaccurate and obsolete, and will be removed
+in the future.}
+
 As it currently stands, the Glide renderer can be activated by the following
 steps.
 
@@ -192,7 +226,7 @@ and add instead
 @example
 LIBS._GLIDE3D+=/boot/develop/lib/x86/glide2x.so
 @end example
-  
+
 You will also need to comment out the following line in @file{glrender.mak}:
 @example
 LIBS._GL3D+=-L$(X11_PATH)/lib -lXext -lX11

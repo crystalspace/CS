@@ -1,5 +1,9 @@
 The history order has been reversed so that new features are at the top.
 
+9-Apr-2000
+	- Eric Sunshine corrected several errors in the BeOS 'build' document
+	  (texinfo/build/platform/beos.txi) and rewrote several sections for
+	  increased lucidity.
 7-Apr-2000
 	- W.C.A. Wijngaards <wouterw@cs.vu.nl> contributed a particle
 	  system (check out include/csengine/particle.h).
