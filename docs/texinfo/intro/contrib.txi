@@ -1060,6 +1060,12 @@ Ralf Eisele (@email{eiselera@@pcpool1.informatik.uni-ulm.de})
 Ralf updated the (now defunct) Amiga port to Crystal Space version 0.09.
 
 @item
+Randall Foreman (@email{eidpers@@comcast.net})
+
+Randall supplied a number of patches and build-time problem reports aimed at
+making the 0.97 version of the project buildable with the Borland compiler.
+
+@item
 Reed Hedges (@email{reed@@zerohour.net})
 
 Reed worked on the @sc{vos} networking plugin together with Peter Amstutz, and
