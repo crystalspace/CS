@@ -1190,19 +1190,41 @@ bool csLoader::LoadSounds (iDocumentNode* node)
         {
           const char* name = child->GetAttributeValue ("name");
           const char* filename = name;
-	  csRef<iDocumentNode> filenode = child->GetNode ("file");
-	  if (filenode)
-	  {
-	    filename = filenode->GetContentsValue ();
-	  }
+          csRef<iDocumentNode> filenode = child->GetNode ("file");
+          if (filenode)
+          {
+            filename = filenode->GetContentsValue ();
+          }
           csRef<iSoundWrapper> snd = CS_GET_NAMED_CHILD_OBJECT (
-	  	Engine->QueryObject (), iSoundWrapper, name);
+                Engine->QueryObject (), iSoundWrapper, name);
           if (!snd)
             snd = LoadSound (name, filename);
+          if (snd)
+          {
+            csRef<iDocumentNodeIterator> it2 (child->GetNodes ());
+            while (it2->HasNext ())
+            {
+              csRef<iDocumentNode> child2 = it2->Next ();
+              if (child2->GetType () != CS_NODE_ELEMENT) continue;
+              switch (xmltokens.Request (child2->GetValue ()))
+              {
+                case XMLTOKEN_KEY:
+                  {
+                    iKeyValuePair *kvp =
+                        ParseKey (child2, snd->QueryObject ());
+                    if (kvp)
+                      kvp->DecRef ();
+                    else
+                      return false;
+                  }
+                  break;
+              }
+            }
+          }
         }
         break;
       default:
-	SyntaxService->ReportBadToken (child);
+        SyntaxService->ReportBadToken (child);
         return false;
     }
   }
