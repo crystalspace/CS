@@ -65,7 +65,7 @@
     virtual csRENode *Right()=0;
     
     /// Returns an acceptance match for this leaf (if node is a leaf)
-    virtual bool Accept(int ch)
+    virtual bool Accept(int )
     { return false; }    
 };
  
@@ -155,8 +155,8 @@
    csRENode *left, *right;
    
  public:
-   csREAltNode(csRENode *l, csReNode *r):left(l), right(r) {};
-   virtual ~csREAltNode() {};
+   csREAltNode(csRENode *l, csRENode *r):left(l), right(r) {}
+   virtual ~csREAltNode() {}
    
  public:
    virtual unsigned char Type()
@@ -185,7 +185,7 @@
    
  public:
    virtual unsigned char Type()
-   { return CSRE_CHARLEAF; }
+   { return CSRE_CHLEAF; }
  
    virtual csRENode *Left()
    { return NULL; }
@@ -213,7 +213,7 @@
    
  public:
    virtual unsigned char Type()
-   { return CSRE_TABLELEAF; }
+   { return CSRE_TBLEAF; }
  
    virtual csRENode *Left()
    { return NULL; }

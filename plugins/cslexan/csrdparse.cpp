@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "csrenode.h"
 
 /// Does a foreward lookup to support wildcards
