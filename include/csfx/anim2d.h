@@ -7,7 +7,7 @@
 #ifndef CSANIM2D_H
 #define CSANIM2D_H
 
-#include "csengine/cspixmap.h"
+#include "csfx/cspixmap.h"
 struct iTextureHandle;
 struct iSystem;
 struct iGraphics3D;
@@ -21,7 +21,7 @@ struct iGraphics3D;
  * and they draw the animation frame at that moment.
  * Thus, if you simply redraw each frame, it will animate correctly.
 */
-class csAnim2D: public csPixmap
+class csAnim2D: public csSimplePixmap
 {
   /// have an image rectangle yet
   bool texture_rect_ok;

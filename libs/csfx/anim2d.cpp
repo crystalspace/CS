@@ -12,7 +12,7 @@
 #include "isystem.h"
 
 csAnim2D::csAnim2D(iSystem* sys, int num)
-  : csPixmap(0)
+  : csSimplePixmap(0)
 {
   texture_rect_ok = false;
   tx=0; ty=0; 
