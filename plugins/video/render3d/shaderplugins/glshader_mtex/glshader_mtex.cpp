@@ -353,8 +353,8 @@ bool csShaderGLMTEX::Prepare()
   g2d->PerformExtension("getstatecache", &statecache);
 
   //get extension-object
-  csRef<iRender3D> r = CS_QUERY_REGISTRY(object_reg,iRender3D);
-  csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r, iShaderRenderInterface);
+  r3d = CS_QUERY_REGISTRY(object_reg,iRender3D);
+  csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r3d, iShaderRenderInterface);
 
   ext = (csGLExtensionManager*) sri->GetPrivateObject("ext");
   txtcache = (iGLTextureCache*) sri->GetPrivateObject("txtcache");
@@ -364,91 +364,12 @@ bool csShaderGLMTEX::Prepare()
 
 void csShaderGLMTEX::Activate(iShaderPass* current, csRenderMesh* mesh)
 {
-  if(!validProgram) return;
-
-  csRef<iRender3D> r = CS_QUERY_REGISTRY(object_reg,iRender3D);
-  csStringSet* strset = r->GetStringContainer();
-
-  iStreamSource * ss = mesh->GetStreamSource();
-
   for(int i = 0; i < MIN(maxlayers, texlayers.Length()); ++i)
   {
     mtexlayer* layer = (mtexlayer*) texlayers.Get(i);
     ext->glActiveTextureARB(GL_TEXTURE0_ARB + i);
     ext->glClientActiveTextureARB(GL_TEXTURE0_ARB + i);
 
-/*
-    if(layer->ccsource == CS_COLORSOURCE_MESH)
-    {
-      csRef<iRenderBuffer> cbuf = ss->GetBuffer(strset->Request("COLOR"));
-      if(cbuf)
-      {
-        glColorPointer(4,GL_FLOAT,0,cbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER) );
-        glEnableClientState( GL_COLOR_ARRAY);
-        layer->doCArr = true;
-      }
-    } else if (layer->ccsource == CS_COLORSOURCE_STREAM && layer->colorstream )
-    {
-      csRef<iRenderBuffer> cbuf = ss->GetBuffer(strset->Request(layer->colorstream));
-      if(cbuf)
-      {
-        glColorPointer(4,GL_FLOAT,0,cbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER) );
-        glEnableClientState( GL_COLOR_ARRAY);
-        layer->doCArr = true;
-      }
-    }
-*/
-    GLuint texturehandle = 0;
-    iTextureHandle* txt_handle = layer->texturehandle;
-
-    if (!txt_handle)
-    {
-      csRef<csMaterialHandle> mathand ((csMaterialHandle*)(mesh->GetMaterialHandle ()));
-      if(layer->texnum == 0)
-      {
-        txt_handle = mathand->GetTexture();
-      }
-      else if(layer->texnum > 0 && layer->texnum <= mathand->GetTextureLayerCount() )
-      {
-        csTextureLayer* matlayer = mathand->GetTextureLayer(layer->texnum-1);
-        txt_handle = matlayer->txt_handle;
-      }
-    }
-    
-    if(txt_handle)
-    {
-      txtcache->Cache(txt_handle);
-      csGLTextureHandle* txt_gl = (csGLTextureHandle *) txt_handle->GetPrivateObject ();
-      csTxtCacheData *cachedata = (csTxtCacheData *)txt_gl->GetCacheData();
-
-      texturehandle = cachedata->Handle;
-
-      if (txt_gl->target == iTextureHandle::CS_TEX_IMG_CUBEMAP)
-      {
-        // @@@ SHOULD BE CACHED
-        glEnable (GL_TEXTURE_CUBE_MAP);
-        glBindTexture (GL_TEXTURE_CUBE_MAP, texturehandle);
-      } else if (txt_gl->target == iTextureHandle::CS_TEX_IMG_3D)
-      {
-        // @@@ SHOULD BE CACHED
-        glEnable (GL_TEXTURE_3D);
-        glBindTexture (GL_TEXTURE_3D, texturehandle);
-      } else if (txt_gl->target == iTextureHandle::CS_TEX_IMG_1D)
-      {
-        // @@@ SHOULD BE CACHED
-        glEnable (GL_TEXTURE_1D);
-        statecache->Disable_GL_TEXTURE_2D (i);
-        glBindTexture (GL_TEXTURE_1D, texturehandle);
-      } else {
-        statecache->Enable_GL_TEXTURE_2D (i);
-        statecache->SetTexture (GL_TEXTURE_2D, texturehandle, i);
-      }
-
-      layer->doTexture = true;
-    } else {
-      statecache->SetTexture (GL_TEXTURE_2D, 0, i);
-      statecache->Enable_GL_TEXTURE_2D (i);
-    }
 
     if(ext->CS_GL_ARB_texture_env_combine || ext->CS_GL_EXT_texture_env_combine)
     {
@@ -489,27 +410,58 @@ void csShaderGLMTEX::Activate(iShaderPass* current, csRenderMesh* mesh)
         
 	glTexEnvf(GL_TEXTURE_ENV, GL_ALPHA_SCALE, layer->scale_alpha);
     }
-
   }
 }
 
-void csShaderGLMTEX::Deactivate(iShaderPass* current, csRenderMesh* mesh)
+void csShaderGLMTEX::Deactivate(iShaderPass* current)
+{
+  glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+}
+
+void csShaderGLMTEX::SetupState (iShaderPass *curret, csRenderMesh *mesh)
+{
+  for(int i = 0; i < MIN(maxlayers, texlayers.Length()); ++i)
+  {
+    mtexlayer* layer = (mtexlayer*) texlayers.Get(i);
+    ext->glActiveTextureARB(GL_TEXTURE0_ARB + i);
+    ext->glClientActiveTextureARB(GL_TEXTURE0_ARB + i);
+
+    GLuint texturehandle = 0;
+    iTextureHandle* txt_handle = layer->texturehandle;
+
+    if (!txt_handle)
+    {
+      csRef<csMaterialHandle> mathand ((csMaterialHandle*)(mesh->GetMaterialHandle ()));
+      if(layer->texnum == 0)
+      {
+        txt_handle = mathand->GetTexture();
+      }
+      else if(layer->texnum > 0 && layer->texnum <= mathand->GetTextureLayerCount() )
+      {
+        csTextureLayer* matlayer = mathand->GetTextureLayer(layer->texnum-1);
+        txt_handle = matlayer->txt_handle;
+      }
+    }
+    r3d->ActivateTexture (txt_handle, i);
+  }
+  ext->glActiveTextureARB(GL_TEXTURE0_ARB);
+  ext->glClientActiveTextureARB(GL_TEXTURE0_ARB);
+}
+
+void csShaderGLMTEX::ResetState ()
 {
   if(!validProgram) return;
 
   for(int i = MIN(maxlayers, texlayers.Length()); i >= 0 ; --i)
   {
-    ext->glActiveTextureARB (GL_TEXTURE0_ARB+i);
-    ext->glClientActiveTextureARB (GL_TEXTURE0_ARB+i);
-    statecache->Disable_GL_TEXTURE_2D (i);
-    // @@@ HACK
-    glDisable (GL_TEXTURE_1D);
-    glDisable (GL_TEXTURE_3D);
-    glDisable (GL_TEXTURE_CUBE_MAP);
-    statecache->SetTexture (GL_TEXTURE_2D, 0, i); //should not be necessary
-    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    r3d->DeactivateTexture (i);
+//    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
   }
+
+  ext->glActiveTextureARB(GL_TEXTURE0_ARB);
+  ext->glClientActiveTextureARB(GL_TEXTURE0_ARB);
 }
+
 
 csBasicVector csShaderGLMTEX::GetAllVariableNames()
 {

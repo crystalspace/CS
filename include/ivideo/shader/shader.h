@@ -218,7 +218,13 @@ struct iShaderPass : iBase
   virtual void Activate(csRenderMesh* mesh) = 0;
 
   /// Deactivate the whole pass
-  virtual void Deactivate(csRenderMesh* mesh) = 0;
+  virtual void Deactivate() = 0;
+
+  /// Setup states needed for proper operation of the shader
+  virtual void SetupState (csRenderMesh* mesh) = 0;
+
+  /// Reset states to original
+  virtual void ResetState () = 0;
 
   /// Add a variable to this context
   virtual bool AddVariable(iShaderVariable* variable) = 0;
@@ -251,7 +257,13 @@ struct iShaderProgram : iBase
   virtual void Activate(iShaderPass* current, csRenderMesh* mesh) = 0;
 
   /// Deactivate program so that it's not used in next rendering
-  virtual void Deactivate(iShaderPass* current, csRenderMesh* mesh) = 0;
+  virtual void Deactivate(iShaderPass* current) = 0;
+
+  /// Setup states needed for proper operation of the shader
+  virtual void SetupState (iShaderPass* current, csRenderMesh* mesh) = 0;
+
+  /// Reset states to original
+  virtual void ResetState () = 0;
 
   /* Propertybag - get property, return false if no such property found
    * Which properties there is is implementation specific

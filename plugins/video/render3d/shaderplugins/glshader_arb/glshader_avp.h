@@ -98,7 +98,13 @@ public:
   virtual void Activate(iShaderPass* current, csRenderMesh* mesh);
 
   /// Deactivate program so that it's not used in next rendering
-  virtual void Deactivate(iShaderPass* current, csRenderMesh* mesh);
+  virtual void Deactivate(iShaderPass* current);
+
+  /// Setup states needed for proper operation of the shader
+  virtual void SetupState (iShaderPass* current, csRenderMesh* mesh);
+
+  /// Reset states to original
+  virtual void ResetState ();
 
   /* Propertybag - get property, return false if no such property found
    * Which properties there is is implementation specific

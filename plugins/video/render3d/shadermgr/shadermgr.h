@@ -360,7 +360,13 @@ public:
   virtual void Activate(csRenderMesh* mesh);
 
   /// Deactivate
-  virtual void Deactivate(csRenderMesh* mesh);
+  virtual void Deactivate();
+
+  /// Setup states needed for proper operation of the shader
+  virtual void SetupState (csRenderMesh* mesh);
+
+  /// Reset states to original
+  virtual void ResetState ();
 
   /// Add a variable to this context
   virtual bool AddVariable(iShaderVariable* variable){return false;}

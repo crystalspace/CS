@@ -562,6 +562,18 @@ bool csShader::Prepare()
 //==================== csShaderPass ==============//
 void csShaderPass::Activate(csRenderMesh* mesh)
 {
+  if(vp) vp->Activate(this, mesh);
+  if(fp) fp->Activate(this, mesh);
+}
+
+void csShaderPass::Deactivate()
+{
+  if(vp) vp->Deactivate(this);
+  if(fp) fp->Deactivate(this);
+}
+
+void csShaderPass::SetupState (csRenderMesh *mesh)
+{
   int i;
   for (i=0; i<STREAMMAX; i++)
   {
@@ -576,17 +588,13 @@ void csShaderPass::Activate(csRenderMesh* mesh)
 
   r3d->GetWriteMask (OrigWMRed, OrigWMGreen, OrigWMBlue, OrigWMAlpha);
   r3d->SetWriteMask (writemaskRed, writemaskGreen, writemaskBlue, writemaskAlpha);
-
-  if(vp) vp->Activate(this, mesh);
-  if(fp) fp->Activate(this, mesh);
+  
+  if (vp) vp->SetupState (this, mesh);
+  if (fp) fp->SetupState (this, mesh);
 }
 
-void csShaderPass::Deactivate(csRenderMesh* mesh)
+void csShaderPass::ResetState ()
 {
-  if(vp) vp->Deactivate(this, mesh);
-  if(fp) fp->Deactivate(this, mesh);
-  r3d->SetWriteMask (OrigWMRed, OrigWMGreen, OrigWMBlue, OrigWMAlpha);
-
   int i;
   for (i=0; i<STREAMMAX; i++)
   {
@@ -595,6 +603,10 @@ void csShaderPass::Deactivate(csRenderMesh* mesh)
       r3d->DeactivateBuffer ((csVertexAttrib)i);
     }
   }
+  if (vp) vp->ResetState ();
+  if (fp) fp->ResetState ();
+
+  r3d->SetWriteMask (OrigWMRed, OrigWMGreen, OrigWMBlue, OrigWMAlpha);
 }
 
 void csShaderPass::AddStreamMapping (csStringID name, csVertexAttrib attribute)

@@ -197,6 +197,8 @@ private:
   iRenderBuffer* vertattrib[16]; // @@@ Hardcoded max number of attributes
   iTextureHandle* texunit[16]; // @@@ Hardcoded max number of units
 
+  iShaderPass* lastUsedShaderpass;
+
 public:
   SCF_DECLARE_IBASE;
 

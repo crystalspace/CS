@@ -144,6 +144,7 @@ csGLRender3D::csGLRender3D (iBase *parent)
     vertattrib[i] = NULL;
     texunit[i] = NULL;
   }
+  lastUsedShaderpass = NULL;
 }
 
 csGLRender3D::~csGLRender3D()
@@ -798,6 +799,14 @@ void csGLRender3D::Close ()
 bool csGLRender3D::BeginDraw (int drawflags)
 {
   current_drawflags = drawflags;
+  
+  if (lastUsedShaderpass)
+  {
+    lastUsedShaderpass->ResetState ();
+    lastUsedShaderpass->Deactivate ();
+  }
+
+  SetWriteMask (true,true,true,true);
 
   tricnt = 0;
   if (render_target)
@@ -1091,6 +1100,9 @@ void csGLRender3D::ActivateTexture (iTextureHandle *txthandle, int unit)
   if (texunit[unit] == txthandle)
     return;
 
+  if (texunit[unit])
+    DeactivateTexture (unit);
+
   if (ext.CS_GL_ARB_multitexture)
   {
     ext.glActiveTextureARB(GL_TEXTURE0_ARB + unit);
@@ -1106,29 +1118,23 @@ void csGLRender3D::ActivateTexture (iTextureHandle *txthandle, int unit)
   switch (gltxthandle->target)
   {
   case iTextureHandle::CS_TEX_IMG_1D:
-    statecache->SetTexture (GL_TEXTURE_1D, cachedata->Handle, unit);
-    statecache->Enable_GL_TEXTURE_1D (unit);
-    statecache->Disable_GL_TEXTURE_2D (unit);
-    statecache->Disable_GL_TEXTURE_3D (unit);
-    statecache->Disable_GL_TEXTURE_CUBE_MAP (unit);
+    statecache->Enable_GL_TEXTURE_1D (unit);;
+    glBindTexture (GL_TEXTURE_1D, cachedata->Handle );
     texunit[unit] = txthandle;
     break;
   case iTextureHandle::CS_TEX_IMG_2D:
-    statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle, unit);
     statecache->Enable_GL_TEXTURE_2D (unit);
-    statecache->Disable_GL_TEXTURE_3D (unit);
-    statecache->Disable_GL_TEXTURE_CUBE_MAP (unit);
+    glBindTexture (GL_TEXTURE_2D, cachedata->Handle );
     texunit[unit] = txthandle;
     break;
   case iTextureHandle::CS_TEX_IMG_3D:
-    statecache->SetTexture (GL_TEXTURE_3D, cachedata->Handle, unit);
     statecache->Enable_GL_TEXTURE_3D (unit);
-    statecache->Disable_GL_TEXTURE_CUBE_MAP (unit);
+    glBindTexture (GL_TEXTURE_3D, cachedata->Handle );
     texunit[unit] = txthandle;
     break;
   case iTextureHandle::CS_TEX_IMG_CUBEMAP:
-    statecache->SetTexture (GL_TEXTURE_3D, cachedata->Handle, unit);
     statecache->Enable_GL_TEXTURE_CUBE_MAP (unit);
+    glBindTexture (GL_TEXTURE_CUBE_MAP, cachedata->Handle);
     texunit[unit] = txthandle;
     break;
   }
@@ -1139,21 +1145,31 @@ void csGLRender3D::DeactivateTexture (int unit)
   if (!texunit[unit])
     return;
 
+  if (ext.CS_GL_ARB_multitexture)
+  {
+    ext.glActiveTextureARB(GL_TEXTURE0_ARB + unit);
+    ext.glClientActiveTextureARB(GL_TEXTURE0_ARB + unit);
+  } else if (unit != 0) return;
+
   csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
     texunit[unit]->GetPrivateObject ();
   switch (gltxthandle->target)
   {
   case iTextureHandle::CS_TEX_IMG_1D:
     statecache->Disable_GL_TEXTURE_1D (unit);
+    //glBindTexture (GL_TEXTURE_1D, NULL);
     break;
   case iTextureHandle::CS_TEX_IMG_2D:
     statecache->Disable_GL_TEXTURE_2D (unit);
+    //glBindTexture (GL_TEXTURE_2D, NULL);
     break;
   case iTextureHandle::CS_TEX_IMG_3D:
     statecache->Disable_GL_TEXTURE_3D (unit);
+    //glBindTexture (GL_TEXTURE_3D, NULL);
     break;
   case iTextureHandle::CS_TEX_IMG_CUBEMAP:
     statecache->Disable_GL_TEXTURE_CUBE_MAP (unit);
+    //glBindTexture (GL_TEXTURE_CUBE_MAP, NULL);
     break;
   }
   texunit[unit] = NULL;
@@ -1279,20 +1295,42 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
     int currp;
     for(currp = 0; currp< tech->GetPassCount(); ++currp)
     {
-      uint mixmode = tech->GetPass (currp)->GetMixmodeOverride ();
+      iShaderPass *pass = tech->GetPass (currp);
+      uint mixmode = pass->GetMixmodeOverride ();
       if (mixmode != 0)
         SetMixMode (mixmode, 0, true);
-      tech->GetPass(currp)->Activate(mymesh);
+
+      if (pass != lastUsedShaderpass)
+      {
+        if (lastUsedShaderpass)
+        {
+          lastUsedShaderpass->Deactivate ();
+        }
+
+        pass->Activate (mymesh);
+      }
+      pass->SetupState (mymesh);
+
       glDrawElements (
         primitivetype,
         mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
         GL_UNSIGNED_INT,
         ((unsigned int*)indexbuf->Lock(CS_BUF_LOCK_RENDER))
         +mymesh->GetIndexStart ());
-      tech->GetPass(currp)->Deactivate(mymesh);
+
+      //pass->Deactivate(mymesh);
+      pass->ResetState ();
+      lastUsedShaderpass = pass;
       indexbuf->Release ();
     }
   } else {
+    if (lastUsedShaderpass)
+    {
+      lastUsedShaderpass->ResetState ();
+      lastUsedShaderpass->Deactivate ();
+      lastUsedShaderpass = NULL;
+    }
+
     csRef<iStreamSource> source = mymesh->GetStreamSource ();
     csRef<iRenderBuffer> vertexbuf =
       source->GetBuffer (string_vertices);
