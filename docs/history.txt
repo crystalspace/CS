@@ -8,6 +8,10 @@ chronological order.
 
 16-Oct-2004
 	- Jorrit resumed work on the foliage mesh. Still unfinished.
+	- res added some code to initialize some structs used by the shader
+	  conditional code, hopefully fixing some valgrind complaints.
+	- res fixed leaks in csRenderMeshHolderMultiple, the cube map texture
+	  loader and csBSPTree.
 15-Oct-2004
 	- Jorrit temporarily fixed spr3d with <alpha> mixmode for NR.
 	  The fix works by using csColor4 for the color buffer and extracting

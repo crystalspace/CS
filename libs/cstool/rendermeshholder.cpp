@@ -70,6 +70,19 @@ csRenderMeshHolderMultiple::~csRenderMeshHolderMultiple ()
     }
     delete holder;
   }
+  while (clearQueue.Length () > 0)
+  {
+    csDirtyAccessArray<csRenderMesh*>* holder = clearQueue.Pop();
+    if (deleteMeshes)
+    {
+      for (size_t j = 0; j < holder->Length(); j++)
+      {
+	csRenderMesh* rm = (*holder)[j];
+	delete rm;
+      }
+    }
+    delete holder;
+  }
 }
 
 csDirtyAccessArray<csRenderMesh*>& 

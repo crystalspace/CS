@@ -81,6 +81,8 @@ class csConditionEvaluator
       csStringID svName;
       csConditionID operation;
     };
+    CondOperand ()
+    { memset (this, 0, sizeof (*this)); }
   };
   /// An operation.
   struct CondOperation
@@ -88,6 +90,9 @@ class csConditionEvaluator
     ConditionOp operation;
     CondOperand left;
     CondOperand right;
+
+    CondOperation ()
+    { operation = opInvalid; }
   };
 
   class OperationHashKeyHandler

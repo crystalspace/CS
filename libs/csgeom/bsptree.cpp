@@ -194,6 +194,7 @@ void csBSPTree::Build (csTriangle* triangles, int num_triangles,
   }
 
   Build (triangles, planes, num_triangles, vertices, triidx);
+  delete[] planes;
 }
 
 void csBSPTree::Back2Front (const csVector3& pos, csDirtyAccessArray<int>& arr,
