@@ -223,7 +223,7 @@ the standard developer tools, as summarized below.
 @quotation
 @multitable @columnfractions .25 .30 .30
 @item @emph{Platform} @tab @emph{Architectures} @tab @emph{Tested}
-@item MacOS/X @tab @code{ppc} @tab @code{}
+@item MacOS/X @tab @code{ppc} @tab @code{ppc}
 @item MacOS/X Server 1.0 @tab @code{i386 ppc} @tab @code{i386 ppc}
 @item OpenStep @tab @code{i386 m68k sparc} @tab @code{i386 m68k}
 @item NextStep @tab @code{i386 m68k sparc hppa} @tab @code{i386 m68k sparc}
