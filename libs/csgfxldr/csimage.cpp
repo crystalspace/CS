@@ -136,7 +136,10 @@ void ImageFile::set_dimensions (int w, int h)
   width = w;
   height = h;
   if (image) CHKB (delete [] image);
-  CHK (image = new RGBPixel [w*h]);
+  //We allocate a little more memory than is actually needed, because 
+  //the jpeg lib will write a little further than it is supposed to.
+  //(At least on Win32) In theory w*h would be enough!
+  CHK (image = new RGBPixel [(w+1)*(h+1)]); 
 }
 
 const char* ImageFile::get_status_mesg() const
