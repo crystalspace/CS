@@ -176,7 +176,7 @@ static bool NextLine (csString& line, const char*& source, const char* limit)
 bool csIniFile::Load (const char* path)
 {
   bool rc = false;
-  FILE* f = fopen (path, "r");
+  FILE* f = fopen (path, "rb");
   if (f)
   {
     size_t size;
