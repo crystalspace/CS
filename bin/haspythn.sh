@@ -1,20 +1,44 @@
 #!/bin/sh
 #
-# This script file is used to automatically detect if the Python
-# language / interpreter is installed.
+# This script file is used to automatically detect if the Python language is
+# installed.  If the user has not already specified the location of Python's
+# headers and library via PYTHON_INC and PYTHON_LIB, then a search is
+# performed to locate these directories.
 #
-# The configuration (a makefile fragment) is piped to stdout
-# and errors are piped to stderr.
+# The configuration (a makefile fragment) is piped to stdout and errors are
+# piped to stderr.
 #
 
-# Find the Python header/library directory
-[ -z "${PYTHON_INC}" ] && PYTHON_INC=`ls -d /usr/include/python* 2>/dev/null`
-[ -z "${PYTHON_INC}" ] && PYTHON_INC=`ls -d /usr/local/include/python* 2>/dev/null`
-[ -z "${PYTHON_LIB}" ] && PYTHON_LIB=`ls -d /usr/lib/python* 2>/dev/null`
-[ -z "${PYTHON_LIB}" ] && PYTHON_LIB=`ls -d /usr/local/lib/python* 2>/dev/null`
+SOURCES="/usr /usr/local"
+
+# Find the Python header and library directories.  In the event that multiple
+# header and library directories are located, choose the the final
+# lexicographically sorted entry from each list.  (Or stated in C terminology,
+# do not 'break' out of the 'for' loops.)
+
+if [ -z "${PYTHON_INC}" ]; then
+  for i in ${SOURCES}; do
+    FILES=`ls -d ${i}/include/python* 2>/dev/null`
+    if [ -n "${FILES}" ]; then
+      for j in ${FILES}; do
+        PYTHON_INC=${j}
+      done
+    fi
+  done
+fi
+
+if [ -z "${PYTHON_LIB}" ]; then
+  for i in ${SOURCES}; do
+    FILES=`ls -d ${i}/lib/python* 2>/dev/null`
+    if [ -n "${FILES}" ]; then
+      for j in ${FILES}; do
+        PYTHON_LIB=${j}
+        done
+    fi
+  done
+fi
 
 if [ -n "${PYTHON_INC}" -a -n "${PYTHON_LIB}" ]; then
-# echo "Found Python headers in ${PYTHON_INC}, libs in ${PYTHON_LIB}" >&2
   echo "PYTHON_INC = ${PYTHON_INC}"
   echo "PYTHON_LIB = ${PYTHON_LIB}"
 fi
