@@ -293,11 +293,11 @@ bool csSpriteCal3DMeshObjectFactory::LoadCoreSkeleton (iVFS *vfs,
   csRef<iDataBuffer> file = vfs->ReadFile (path);
   if (file)
   {
-    CalCoreSkeleton *skel = CalLoader::loadCoreSkeleton (
+    CalCoreSkeletonPtr skel = CalLoader::loadCoreSkeleton (
     	(void *)file->GetData() );
     if (skel)
     {
-      calCoreModel.setCoreSkeleton (skel);
+      calCoreModel.setCoreSkeleton (skel.get());
       return true;
     }
     else
@@ -320,11 +320,11 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreAnimation (
   csRef<iDataBuffer> file = vfs->ReadFile (path);
   if (file)
   {
-    CalCoreAnimation *anim = CalLoader::loadCoreAnimation (
+    CalCoreAnimationPtr anim = CalLoader::loadCoreAnimation (
     	(void*)file->GetData(), calCoreModel.getCoreSkeleton() );
     if (anim)
     {
-      int id = calCoreModel.addCoreAnimation(anim);
+      int id = calCoreModel.addCoreAnimation(anim.get());
       if (id != -1)
       {
         csCal3DAnimation *an = new csCal3DAnimation;
@@ -362,10 +362,10 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMesh (
   if (file)
   {
     csCal3DMesh *mesh = new csCal3DMesh;
-    CalCoreMesh *coremesh = CalLoader::loadCoreMesh((void*)file->GetData() );
+    CalCoreMeshPtr coremesh = CalLoader::loadCoreMesh((void*)file->GetData() );
     if (coremesh)
     {
-      mesh->index = calCoreModel.addCoreMesh(coremesh);
+      mesh->index = calCoreModel.addCoreMesh(coremesh.get());
       if (mesh->index == -1)
       {
         delete mesh;
@@ -401,12 +401,12 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMorphTarget (
   csRef<iDataBuffer> file = vfs->ReadFile (path);
   if (file)
   {
-    CalCoreMesh *core_mesh = CalLoader::loadCoreMesh((void *)file->GetData() );
-    if(core_mesh == 0)
+    CalCoreMeshPtr core_mesh = CalLoader::loadCoreMesh((void *)file->GetData() );
+    if(core_mesh.get() == 0)
       return -1;
     
     int morph_index = calCoreModel.getCoreMesh(mesh_index)->
-    	addAsMorphTarget(core_mesh);
+    	addAsMorphTarget(core_mesh.get());
     if(morph_index == -1)
     {
       return -1;
