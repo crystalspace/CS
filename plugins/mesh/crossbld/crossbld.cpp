@@ -305,8 +305,14 @@ bool csCrossBuilder::BuildSpriteFactory (iModelDataObject *Object,
       float LastTime = 0;
       for (i=0; i<ac->GetFrameCount (); i++)
       {
+        /* It might seem strange to store the nth frame time value with the
+	 * (n-1)th frame state. This difference is due to the different
+	 * meaning of the time values in the model data structures and
+	 * in 3d sprites.
+	 */
+        int FrameIndex = (i == 0) ? (ac->GetFrameCount ()-1) : (i-1);
         iModelDataVertices *ver = SCF_QUERY_INTERFACE_FAST (
-		ac->GetState (i), iModelDataVertices);
+		ac->GetState (FrameIndex), iModelDataVertices);
 	if (ver)
 	{
 	  float ThisTime = ac->GetTime (i);

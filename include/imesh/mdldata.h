@@ -186,15 +186,21 @@ SCF_VERSION (iModelDataAction, 0, 0, 1);
  * An action. This is mainly a list of key frames. Note that the key frames
  * are not added as sub-objects, but instead they are added directly through
  * the iModelDataAction interface. The reason is that together with every
- * frame a time value has to be stored. The idea of time values is the
- * following: Every frame comes with the point in time when the frame *ends*,
- * measured in seconds. For example, if your frames last 100msec, 200msec,
- * 50msec and 250msec, the time values are: 0.1, 0.3, 0.35, 0.6. As this is
- * the ending time for each frame, the last time value has three meanings:
+ * frame a time value has to be stored. <p>
+ *
+ * The idea of time values is the following: Every frame comes with the point
+ * in time when the frame *ends*, measured in seconds. For example, if your
+ * frames last 100msec, 200msec, 50msec and 250msec, the time values are: 0.1,
+ * 0.3, 0.35, 0.6. As this is the ending time for each frame, the last time
+ * value has three meanings:
  * <ul><li> It is the end of the whole action
  * <li> It is the length of the action
  * <li> It wraps around to the time value 0.0
  * </ul>
+ * Another effect of this is that when you start playing an animation cycle,
+ * the animation begins at the *last* frame and moves on to the first frame
+ * within the time that is stored with the first frame. <p>
+ *
  * Note that the frames are automatically sorted by time. <p>
  *
  * There are different types of frames. One could imagine vertex states,
@@ -220,6 +226,8 @@ struct iModelDataAction : public iBase
   virtual void AddFrame (float Time, iObject *State) = 0;
   /// Delete a frame
   virtual void DeleteFrame (int Frame) = 0;
+  /// Return the length (in time) of a complete animation cycle
+  virtual float GetTotalTime () const = 0;
 };
 
 

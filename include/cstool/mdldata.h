@@ -178,6 +178,8 @@ public:
   virtual void AddFrame (float Time, iObject *State);
   /// Delete a frame
   virtual void DeleteFrame (int Frame);
+  /// Return the total time of one animation cycle
+  virtual float GetTotalTime () const;
 };
 
 class csModelDataPolygon : public iModelDataPolygon

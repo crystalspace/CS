@@ -74,6 +74,27 @@ static void ExtractObjects (iModelData *Parent, csModelDataObjectVector &vec)
 }
 
 /*
+ * CloneVertices (): Create a copy of a vertex frame.
+ *
+static iModelDataVertices *CloneVertices (iModelDataVertices *v)
+{
+  iModelDataVertices *v2 = new csModelDataVertices ();
+  int i;
+
+  for (i=0; i<v->GetVertexCount (); i++)
+    v2->AddVertex (v->GetVertex (i));
+  for (i=0; i<v->GetNormalCount (); i++)
+    v2->AddNormal (v->GetNormal (i));
+  for (i=0; i<v->GetColorCount (); i++)
+    v2->AddColor (v->GetColor (i));
+  for (i=0; i<v->GetTexelCount (); i++)
+    v2->AddTexel (v->GetTexel (i));
+  
+  return v2;
+}
+*/
+
+/*
  * MergeVertices (): Concatenate the vertex, normal, color and texel lists of
  * the given vertex frames and build a new frame from them.
  */
@@ -107,6 +128,34 @@ static iModelDataVertices *MergeVertices (const iModelDataVertices *v1,
 }
 
 /*
+ * InterpolateVertices (): Return a new vertex frame whose elements are the
+ * linear interpolation of the given two frames at the given position [0..1].
+ * The input vertex frames must contain the same amount elements of each
+ * type (vertices, normals, colors, texels).
+ */
+static iModelDataVertices *InterpolateVertices (iModelDataVertices *v1,
+  iModelDataVertices *v2, float Position)
+{
+  iModelDataVertices *ver = new csModelDataVertices ();
+  int i;
+
+  for (i=0; i<v1->GetVertexCount (); i++)
+    ver->AddVertex (v1->GetVertex (i) +
+      (v2->GetVertex (i) - v1->GetVertex (i)) * Position);
+  for (i=0; i<v1->GetNormalCount (); i++)
+    ver->AddNormal (v1->GetNormal (i) +
+      (v2->GetNormal (i) - v1->GetNormal (i)) * Position);
+  for (i=0; i<v1->GetColorCount (); i++)
+    ver->AddColor (v1->GetColor (i) +
+      (v2->GetColor (i) - v1->GetColor (i)) * Position);
+  for (i=0; i<v1->GetTexelCount (); i++)
+    ver->AddTexel (v1->GetTexel (i) +
+      (v2->GetTexel (i) - v1->GetTexel (i)) * Position);
+  
+  return ver;
+}
+
+/*
  * MergeAction(): Merge all frames of the input action with the given frame and
  * store the result in the output action (which is returned). If 'Swap' is true
  * then the merging order of the frames is reversed.
@@ -128,6 +177,124 @@ static iModelDataAction *MergeAction (iModelDataAction *In1,
       ver->DecRef ();
     }
   }
+  return Out;
+}
+
+/*
+ * MergeAction(): Create an action of the given time in which the given
+ * actions are looped and the frames are merged. This function currently
+ * assumes that only vertex frames are used in the action! Note: To change
+ * that, it is not enough to make the SCF_QUERY_INTERFACE calls safe. There
+ * has to be additional test, for example for the case that the action
+ * doesn't contain vertex frames at all (only other frame types).
+ */
+static iModelDataAction *MergeAction (iModelDataAction *In1,
+  iModelDataAction *In2, float TotalTime)
+{
+  // copy the first action
+  iModelDataAction *Out = new csModelDataAction ();
+
+  // next frame to process
+  int n1 = 0, n2 = 0;
+  // base time value for the current animation cycle
+  float tbase1 = 0, tbase2 = 0;
+
+  while (1)
+  {
+    // index of the previous frame
+    int prev1 = (n1 == 0) ? (In1->GetFrameCount () - 1) : (n1 - 1);
+    int prev2 = (n2 == 0) ? (In2->GetFrameCount () - 1) : (n2 - 1);
+
+    // time value of the next frame, relative to current base time
+    float ft1 = In1->GetTime (n1);
+    float ft2 = In2->GetTime (n2);
+
+    // absolute time value of the next frame
+    float nf1 = tbase1 + ft1;
+    float nf2 = tbase2 + ft2;
+
+    // check if finished
+    if (nf1 > TotalTime && nf2 > TotalTime) break;
+
+    // absolute time value of the previous frame (can be negative for the
+    // very first frame)
+    float pf1 = tbase1 + In1->GetTime (prev1);
+    if (n1 == 0) pf1 -= In1->GetTotalTime ();
+    float pf2 = tbase2 + In2->GetTime (prev2);
+    if (n2 == 0) pf2 -= In2->GetTotalTime ();
+
+    // current frame states
+    iModelDataVertices *Frame1, *Frame2;
+    bool Hit1, Hit2;
+    float CurrentTime;
+
+    if (ABS (nf2 - nf1) < EPSILON) {
+      Frame1 = SCF_QUERY_INTERFACE_FAST (In1->GetState (n1), iModelDataVertices);
+      Frame2 = SCF_QUERY_INTERFACE_FAST (In2->GetState (n2), iModelDataVertices);
+      CurrentTime = nf1;
+      Hit1 = Hit2 = true;
+    } else {
+      iModelDataVertices *DirectFrame, *InterpFrameStart, *InterpFrameEnd;
+      float InterpAmount;
+      bool Swap;
+
+      if (nf1 < nf2) {
+        DirectFrame = SCF_QUERY_INTERFACE_FAST (In1->GetState (n1), iModelDataVertices);
+        InterpFrameStart = SCF_QUERY_INTERFACE_FAST (In2->GetState (prev2), iModelDataVertices);
+        InterpFrameEnd = SCF_QUERY_INTERFACE_FAST (In2->GetState (n2), iModelDataVertices);
+        InterpAmount = (nf1-pf2) / (nf2-pf2);
+        Swap = false;
+
+        CurrentTime = nf1;
+	Hit1 = true;
+	Hit2 = false;
+      } else {
+        DirectFrame = SCF_QUERY_INTERFACE_FAST (In2->GetState (n2), iModelDataVertices);
+        InterpFrameStart = SCF_QUERY_INTERFACE_FAST (In1->GetState (prev1), iModelDataVertices);
+        InterpFrameEnd = SCF_QUERY_INTERFACE_FAST (In1->GetState (n1), iModelDataVertices);
+        InterpAmount = (nf2-pf1) / (nf1-pf1);
+        Swap = true;
+
+        CurrentTime = nf2;
+	Hit1 = false;
+	Hit2 = true;
+      }
+
+      iModelDataVertices *InterpFrame =
+        InterpolateVertices (InterpFrameStart, InterpFrameEnd, InterpAmount);
+      InterpFrameStart->DecRef ();
+      InterpFrameEnd->DecRef ();
+
+      if (Swap == false) {
+        Frame1 = DirectFrame;
+	Frame2 = InterpFrame;
+      } else {
+	Frame1 = InterpFrame;
+        Frame2 = DirectFrame;
+      }
+    }
+
+    iModelDataVertices *MergedVertices = 
+        MergeVertices (Frame1, Frame2);
+    Frame1->DecRef ();
+    Frame2->DecRef ();
+
+    Out->AddFrame (CurrentTime, MergedVertices->QueryObject ());
+    MergedVertices->DecRef ();
+
+    if (Hit1) {
+      n1++;
+      if (n1 == In1->GetFrameCount ())
+      { n1 = 0; tbase1 += In1->GetTotalTime (); }
+    }
+
+    if (Hit2) {
+      n2++;
+      if (n2 == In2->GetFrameCount ())
+      { n2 = 0; tbase2 += In2->GetTotalTime (); }
+    }
+  }
+
   return Out;
 }
 
@@ -184,6 +351,46 @@ static bool CheckMaterialConflict (iModelDataObject *obj1)
   return false;
 }
 
+/*
+ * Helper function for MergeTimes () which assumes that in1<in2
+ */
+static float MergeTimesHelper (float in1, float in2)
+{
+  if (in1 < EPSILON)
+    return in2;
+
+  if (in2 < EPSILON)
+    return in1;
+
+  float a = in2 / in1;
+  if (ABS (a-1) < EPSILON) {
+    return in2;
+  } else if (ABS (a-2) < EPSILON) {
+    return in2;
+  } else if (ABS (a-3) < EPSILON) {
+    return in2;
+  } else if (ABS (a-1.5) < EPSILON) {
+    return in2 * 2;
+  }
+  return -1;
+}
+
+/*
+ * Take two time values ('in1' and 'in2') and find a total time value which is
+ * a multiple of both values, which is returned. A negative value is returned
+ * if this is impossible or if one of the multipliers is >3 (@@@ find a better
+ * way to detect actions that would end up in too many frames when merging!).
+ * If one of the time values is zero then the other time value is returned.
+ */
+inline float MergeTimes (float in1, float in2)
+{
+  if (in1 < in2) {
+    return MergeTimesHelper (in1, in2);
+  } else {
+    return MergeTimesHelper (in2, in1);
+  }
+}
+
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
@@ -229,23 +436,20 @@ void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject
   // build the action mapping
   csModelDataActionVector ActionMap1, ActionMap2;
 
-  csModelDataActionIterator *actit = new csModelDataActionIterator (dest->QueryObject ());
-  while (!actit->IsFinished ())
+  while (1)
   {
-    iModelDataAction *Action = actit->Get ();
+    iModelDataAction *Action = CS_GET_CHILD_OBJECT_FAST (dest->QueryObject (), iModelDataAction);
+    if (!Action) break;
 
     ActionMap1.Push (Action);
     ActionMap2.Push (NULL);
     dest->QueryObject ()->ObjRemove (Action->QueryObject ());
-
-    actit->Next ();
   }
-  delete actit;
 
-  actit = new csModelDataActionIterator (src->QueryObject ());
-  while (!actit->IsFinished ())
+  while (1)
   {
-    iModelDataAction *Action = actit->Get ();
+    iModelDataAction *Action = CS_GET_CHILD_OBJECT_FAST (src->QueryObject (), iModelDataAction);
+    if (!Action) break;
 
     int n = ActionMap1.GetIndexByName (Action->QueryObject ()->GetName ());
     if (n == -1) {
@@ -254,10 +458,8 @@ void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject
     } else {
       ActionMap2.Replace (n, Action);
     }
-
-    actit->Next ();
+    src->QueryObject ()->ObjRemove (Action->QueryObject ());
   }
-  delete actit;
 
   // merge the actions
   for (int i=0; i<ActionMap1.Length (); i++)
@@ -265,11 +467,18 @@ void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject
     iModelDataAction *Action1 = ActionMap1.Get (i),
                      *Action2 = ActionMap2.Get (i),
 		     *NewAction;
-    if (Action1) {
-      if (Action2) {
-        // this should not happen
-	CS_ASSERT (("Action conflict detection missed a conflict!!!", false));
-	NewAction = NULL;
+    if (Action1 && Action1->GetTotalTime () > EPSILON) {
+      if (Action2 && Action2->GetTotalTime () > EPSILON) {
+        float total = MergeTimes (Action1->GetTotalTime (), Action2->GetTotalTime ());
+        
+	if (total<0)
+	{
+          // this should not happen
+	  CS_ASSERT (("Action conflict detection missed a conflict!!!", false));
+	  NewAction = NULL;
+	}
+
+	NewAction = MergeAction (Action1, Action2, total);
       } else {
         // merge action 1 and the default frame of object 2
 	NewAction = MergeAction (Action1, src->GetDefaultVertices (), false);
@@ -340,8 +549,11 @@ static bool CheckActionConflict (iModelDataObject *obj1, iModelDataObject *obj2)
 
     if (Action2)
     {
+      float time2 = Action2->GetTotalTime ();
       Action2->DecRef ();
-      return true;
+
+      if (MergeTimes (Action->GetTotalTime (), Action2->GetTotalTime ()) < 0)
+        return true;
     }
     it.Next ();
   }

@@ -108,7 +108,7 @@ iModelData *Simple::CreateDefaultModel (iMaterialWrapper *OtherMaterial)
   Action->QueryObject ()->SetName ("action");
   Object->QueryObject ()->ObjAdd (Action->QueryObject ());
 
-  Action->AddFrame (1, Vertices->QueryObject ());
+  Action->AddFrame (3, Vertices->QueryObject ());
   Vertices->AddVertex (csVector3 (-3, -3, -3));
   Vertices->AddVertex (csVector3 (-3, -3, +3));
   Vertices->AddVertex (csVector3 (+3, -3, +3));
@@ -119,7 +119,7 @@ iModelData *Simple::CreateDefaultModel (iMaterialWrapper *OtherMaterial)
   Vertices->AddVertex (csVector3 (+3, +3, -3));
 
   Vertices = CreateDefaultModelVertexFrame ();
-  Action->AddFrame (2, Vertices->QueryObject ());
+  Action->AddFrame (1, Vertices->QueryObject ());
   Vertices->AddVertex (csVector3 (-3, -7, -3));
   Vertices->AddVertex (csVector3 (-3, -7, +3));
   Vertices->AddVertex (csVector3 (+3, -7, +3));
@@ -130,7 +130,7 @@ iModelData *Simple::CreateDefaultModel (iMaterialWrapper *OtherMaterial)
   Vertices->AddVertex (csVector3 (+3, +7, -3));
 
   Vertices = CreateDefaultModelVertexFrame ();
-  Action->AddFrame (3, Vertices->QueryObject ());
+  Action->AddFrame (2, Vertices->QueryObject ());
   Vertices->AddVertex (csVector3 (-7, -3, -3));
   Vertices->AddVertex (csVector3 (-7, -3, +3));
   Vertices->AddVertex (csVector3 (+7, -3, +3));

@@ -35,7 +35,13 @@ struct csModelDataTools
 {
   /**
    * Copy the contents of one object into antoher one. Both objects may
-   * contain something.
+   * contain something. Note that overlapping vertices are NOT merged by
+   * this function. There are two reasons: Firstly, vertex merging is
+   * also useful without object merging and should therefore be done
+   * separately. Secondly, vertex merging is a very complex task (as the
+   * vertices to merge have to share position in every frame of every action)
+   * and is thus done separately anyway. @@@ vertex merging is not yet
+   * implemented.
    */
   static void MergeCopyObject (iModelDataObject *dest, iModelDataObject *src);
 

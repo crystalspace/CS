@@ -248,6 +248,11 @@ void csModelDataAction::DeleteFrame (int n)
   States.Delete (n);
 }
 
+float csModelDataAction::GetTotalTime () const
+{
+  return (Times.Length () > 0) ? (Times [Times.Length () - 1]) : 0;
+}
+
 /*** csModelDataPolygon ***/
 
 SCF_IMPLEMENT_IBASE (csModelDataPolygon)
