@@ -16,7 +16,7 @@ NASM = nasm
 NASMFLAGS = -DOS=$(OS) -DCOMP=$(COMP) -DPROC=$(PROC) $(NASMFLAGS.SYSTEM)
 
 # If shared libraries use position-independent code, tell NASM about that
-ifneq ($(CFLAGS.DLL),)
+ifneq ($(substr pic,$(CFLAGS.DLL))$(substr PIC,$(CFLAGS.DLL)),)
 NASMFLAGS += -DPIC
 endif
 

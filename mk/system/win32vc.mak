@@ -28,8 +28,8 @@ OS=WIN32
 # Compiler
 COMP=VC
 
-# Does this OS have native COM support?
-NATIVE_COM=yes
+# Command to update a target
+UPD=bin/dosupd.bat $@ DEST
 
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
@@ -110,7 +110,7 @@ LFLAGS.profile=-debug
 # Flags for building a Crystal Space executable
 LFLAGS.EXE=-subsystem:windows
 # ... a DLL
-LFLAGS.DLL=-dll -entry:_DllMainCRTStartup@12
+LFLAGS.DLL=-dll -entry:_DllMainCRTStartup@12 $(OUT)dllentry.obj
 # ... a console executable
 LFLAGS.CONSOLE.EXE=-subsystem:console
  
@@ -130,7 +130,6 @@ NASMFLAGS.SYSTEM=-f win32 -DEXTERNC_UNDERSCORE
 SRC.SYS_CSSYS = libs/cssys/win32/printf.cpp libs/cssys/win32/timing.cpp \
   libs/cssys/win32/fopen.cpp libs/cssys/win32/dir.cpp \
   libs/cssys/win32/win32.cpp libs/cssys/win32/loadlib.cpp \
-  libs/cssys/win32/loadlib.cpp \
   support/gnu/getopt.c support/gnu/getopt1.c
 SRC.SYS_CSSYS_EXE=libs/cssys/win32/exeentry.cpp
 SRC.SYS_CSSYS_DLL=libs/cssys/win32/dllentry.cpp
@@ -200,6 +199,11 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #--------------------------------------------------------------- confighelp ---#
 ifeq ($(MAKESECTION),confighelp)
 
+ifneq ($(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL)),)
+"=
+|=³
+endif
+
 SYSHELP += \
   $(NEWLINE)echo $"  make win32vc      Prepare for building under and for $(DESCRIPTION.win32vc)$"
 
@@ -211,3 +215,10 @@ ifeq ($(ROOTCONFIG),config)
 SYSCONFIG=bin\win32conf.bat
 
 endif # ifeq ($(ROOTCONFIG),config)
+
+ifeq ($(ROOTCONFIG),volatile)
+
+# Does this OS have native COM support?
+NATIVE_COM=yes
+
+endif # ifeq ($(ROOTCONFIG),volatile)

@@ -36,6 +36,13 @@ define SYSMODIFIERSHELP
   echo $"  MODE=optimize$|debug$|profile$"
   echo $"      Select one of three available compilation modes$"
 endef
+# This macro is used to rebuild "volatile.h"
+# You're free to add any commands you want to it in submakefiles
+define MAKE_VOLATILE_H
+  echo $"#define OS_$(OS)$">>volatile.tmp
+  echo $"#define PROC_$(PROC)$">>volatile.tmp
+  echo $"#define COMP_$(COMP)$">>volatile.tmp
+endef
 
 # If there is no target defined (makefile system were not configured),
 # look which targets are available in mk/system directory.
@@ -144,6 +151,8 @@ config.tmp:
 
 endif
 ifeq ($(ROOTCONFIG),volatile)
+
+include mk/volatile.mak
 
 configure: volatile.tmp
 
