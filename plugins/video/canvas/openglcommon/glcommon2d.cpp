@@ -34,7 +34,6 @@ csGraphics2DGLCommon::csGraphics2DGLCommon (iBase *iParent) :
   LocalFontServer (NULL)
 {
   CONSTRUCT_IBASE (iParent);
-  is_double_buffered = true;
   EventOutlet = NULL;
 }
 
@@ -163,9 +162,8 @@ void csGraphics2DGLCommon::setGLColorfromint (int color)
 void csGraphics2DGLCommon::DrawLine (
   float x1, float y1, float x2, float y2, int color)
 {
-  if (!ClipLine (x1, y1, x2, y2, ClipX1, ClipY1, ClipX2, ClipY2)){
-    y1 = QInt(Height - (y1+1));
-    y2 = QInt(Height - (y2+1));
+  if (!ClipLine (x1, y1, x2, y2, ClipX1, ClipY1, ClipX2, ClipY2))
+  {
     // prepare for 2D drawing--so we need no fancy GL effects!
     glDisable (GL_TEXTURE_2D);
     glDisable (GL_BLEND);
@@ -174,12 +172,8 @@ void csGraphics2DGLCommon::DrawLine (
     setGLColorfromint (color);
 
     glBegin (GL_LINES);
-//    glVertex2i (GLint (x1), GLint (Height - y1 - 1));
-//    glVertex2i (GLint (x2), GLint (Height - y2 - 1));
-
-// This works with cswstest:
-    glVertex2i (GLint (QInt(x1)), GLint (y1));
-    glVertex2i (GLint (QInt(x2)), GLint (y2));
+    glVertex2f (x1, Height - 1 - y1);
+    glVertex2f (x2, Height - 1 - y2);
 
     glEnd ();
   }

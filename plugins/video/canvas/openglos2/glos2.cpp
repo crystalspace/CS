@@ -259,8 +259,7 @@ int csGraphics2DOS2GL::GetPage ()
 
 bool csGraphics2DOS2GL::DoubleBuffer (bool Enable)
 {
-  (void)Enable;
-  return false;
+  return Enable;
 }
 
 bool csGraphics2DOS2GL::GetDoubleBufferState ()
