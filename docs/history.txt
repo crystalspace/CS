@@ -22,6 +22,7 @@ chronological order.
 	    - Re-enabled levels relighting when building NR.
 	- res fixed csLightIterRenderStep::GetAttenuationTexture() to only
 	  allocate the amount of memory actually required.
+	- res fixed a crasher on 64 bit platforms.
 3-Jul-2004
 	- Remi Bonnet fixed a few signed/unsigned comparisons warnings and a
 	  bug in aws where unsigned can't be used.

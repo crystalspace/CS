@@ -70,7 +70,7 @@ struct iConfigManager;
 
 /// Marker for the end of the requested plugins list.
 #define CS_REQUEST_END \
-  0
+  (const char*)0
 /// Request VFS plugin.
 #define CS_REQUEST_VFS \
   CS_REQUEST_PLUGIN("crystalspace.kernel.vfs", iVFS)

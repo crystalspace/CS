@@ -298,7 +298,7 @@ bool csInitializer::RequestPlugins (iObjectRegistry* r, ...)
   while (plugName != 0)
   {
     char* intName = va_arg (arg, char*);
-    int scfId = va_arg (arg, scfInterfaceID);
+    scfInterfaceID scfId = va_arg (arg, scfInterfaceID);
     int version = va_arg (arg, int);
     csPluginRequest req(plugName, intName, scfId, version);
     reqs.Push(req);
