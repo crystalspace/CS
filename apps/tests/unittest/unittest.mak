@@ -41,8 +41,8 @@ TO_INSTALL.DATA   += data/stdtex.zip
 
 MSVC.DSP += UNITTEST
 DSP.UNITTEST.NAME = unittest
-DSP.UNITTEST.TYPE = appgui
-DSP.UNITTEST.RESOURCES = libs/cssys/win32/rsrc/cs1.rc
+DSP.UNITTEST.TYPE = appcon
+#DSP.UNITTEST.RESOURCES = libs/cssys/win32/rsrc/cs1.rc
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
