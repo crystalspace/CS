@@ -425,6 +425,10 @@ bool csSoftwareRender3DCommon::NewOpen ()
   int family, features;
   char vendor [13];
   csDetectCPU (&family, vendor, &features);
+  /* Higher 686 processors like P4 report higher cpu family, although they're
+     still 686 architecture, so limit that until higher architecture follows
+     Can someone test on IA64 or Xeon ? */
+  if (family > 686) family = 686;
   cpu_mmx = (features & CPUx86_FEATURE_MMX) != 0;
   Report (CS_REPORTER_SEVERITY_NOTIFY,
   	"%d %s CPU detected; FPU (%s) MMX (%s) CMOV (%s)",
