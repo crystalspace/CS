@@ -74,7 +74,7 @@ public:
   iGraphics2D *G2D() { return canvas->G2D(); }
   iGraphics3D *G3D() { return canvas->G3D(); }
 
-  virtual void Show (csRect *area = NULL);
+  virtual void Show (csRect *area = NULL, iGraphics3D *g3d=NULL);
 };
 
 #endif // __AWSCSPT_H__

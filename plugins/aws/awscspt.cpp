@@ -91,16 +91,16 @@ awsSingleProctexCanvas::Animate (csTicks current_time)
   (void)current_time;
 }
 
-void awsSingleProctexCanvas::Show (csRect *area)
+void awsSingleProctexCanvas::Show (csRect *area, iGraphics3D *g3d)
 {
   canvas->G3D()->Print(area);
 
-/*  if (rG3D)
+  if (g3d)
   {
-    rG3D->DrawPixmap(canvas->GetTextureWrapper()->GetTextureHandle(),
+     g3d->DrawPixmap(canvas->GetTextureWrapper()->GetTextureHandle(),
                      area->xmin,area->ymin,area->Width(),area->Height(),
                      area->xmin,area->ymin,area->Width(),area->Height(),
                      0);
-  }*/
+  }
 }
 

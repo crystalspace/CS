@@ -321,7 +321,7 @@ awsManager::Print(iGraphics3D *g3d)
     for(i=0; i<erase.Count(); ++i)
     {
       csRect r(erase.RectAt(i));
-      canvas->Show(&r);
+      canvas->Show(&r, g3d);
     }
 
     erase.makeEmpty();
@@ -332,7 +332,7 @@ awsManager::Print(iGraphics3D *g3d)
     for(i=0; i<updatestore.Count(); ++i)
     {
       csRect r(updatestore.RectAt(i));
-      canvas->Show(&r);   
+      canvas->Show(&r, g3d);   
     }
   }
 

@@ -594,7 +594,7 @@ awsMultiProctexCanvas::Animate (csTicks current_time)
   (void)current_time;
 }
 
-void awsMultiProctexCanvas::Show (csRect *area)
+void awsMultiProctexCanvas::Show (csRect *area, iGraphics3D *g3d)
 {
   vG3D->Print (area);
 }

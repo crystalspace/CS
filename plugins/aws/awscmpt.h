@@ -255,7 +255,7 @@ public:
   iGraphics2D *G2D() { return vG2D; }
   iGraphics3D *G3D() { return vG3D; }
 
-  virtual void Show (csRect *area = NULL);
+  virtual void Show (csRect *area = NULL, iGraphics3D *g3d=NULL);
 
   /// Returns the index to which the vertical and horizontal indices specify.
   int GetIndex(int &v, int &h)
