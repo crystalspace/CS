@@ -10,12 +10,12 @@ rule csConfigGen
   Depends $(<) : Jamconfig cs-config.temppre cs-config.temppost 
   		 [ ConcatDirs $(TOP) scripts cs-config Jamfile ] ;
 
-  local l d e s libdep libdepstr ;
+  local l d e s liblist libdep libdepstr libstrings libaddstrings ;
   
   for l in $(INSTALLEDLIBS)
   {
-    libaddstrings += "    $(l)) 	\
-	addlib \"-l$(l)\" 	\
+    libaddstrings += "    $(l)) \
+	addlib \"$(l)\" 	\
 	;;			\
 " ;
     libdep = ;
@@ -36,9 +36,6 @@ rule csConfigGen
 " ;
   }
 
-  liblist = "       $(INSTALLEDLIBS) \
-" ;
-
   # Hack to produce a makevars output similar to the 'make' build system.
   switch $(TARGET.OS)
   {
@@ -51,9 +48,15 @@ rule csConfigGen
   }
   MAKEVARS = $(MAKEVARS:R=$(SUBDIR)) ;
   Depends $(<) : $(MAKEVARS) ;
+
+  liblist on $(<) = [ Sort $(INSTALLEDLIBS) ] ;
+  libstrings on $(<) = $(libstrings) ;
+  libaddstrings on $(<) = $(libaddstrings) ;
+
+  csConfigGen1 $(<) : $(>) ;
 }
 
-actions csConfigGen
+actions csConfigGen1
 {
   cat $(SUBDIR)/cs-config.temppre > $(<)
 
@@ -157,8 +160,7 @@ checklibname()
     *)
 	findcexfile "\$1"
 	if test -z "\$CEXFILE"; then
-	    echo "Unknown lib: \$1" 1>&2
-            usage 1>&2
+	    echo "Unknown library: \$1; consult --help for library list" 1>&2
 	    exit 1
 	fi
 	

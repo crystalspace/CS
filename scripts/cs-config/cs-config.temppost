@@ -42,12 +42,17 @@ Options:
 	[--libs]
 	[--cflags]
 	[--cxxflags]
+	[--available-libs]
 	[--makevars]
 	[--help]
 Libraries:
-${liblist}
-Note that the Crystal Space directory is detect by looking at the CRYSTAL
-environment variable. Make sure this variable is set correctly.
+EOF
+    for lib in $liblist; do
+	echo "        $lib"
+    done
+    cat <<EOF
+Note that the Crystal Space directory is detect by examining the CRYSTAL
+environment variable. Ensure that this variable is set correctly.
 EOF
 }
 
@@ -89,7 +94,7 @@ includedeps()
     fi
 }
 
-addlib()
+addlib_decorated()
 {
     # Lib already in list?
     case " $the_libs " in
@@ -109,6 +114,12 @@ addlib()
 	    ALREADY_TESTED=""
 	fi
     done
+}
+
+addlib()
+{
+    all_libnames="$1 $all_libnames"
+    addlib_decorated "-l$1"
 }
 
 findcexfile()
@@ -148,14 +159,16 @@ addexlib()
     done
 
     if test -n "$EXLIB"; then
-        addlib "$EXLIB"
+        addlib_decorated "$EXLIB"
     fi
 }
 
+all_libnames=""
 the_libs=""
 show_libs=""
 show_cflags=""
 show_cxxflags=""
+show_availlibs=""
 
 if test $# -eq 0; then
 	usage 1>&2
@@ -208,6 +221,9 @@ while test $# -gt 0; do
     --libs)
 	show_libs=true
 	;;
+    --available-libs)
+	show_availlibs=true
+	;;
     *)
 	checklibname $1
         ;;
@@ -215,10 +231,12 @@ while test $# -gt 0; do
   shift
 done
 
+# This is tested late in order to allow --help to work even if the Crystal
+# Space directory is not found.
 if test -z "$lflags"; then
   cat 1>&2 <<EOF
-Couldn't detect dir with lib files, aborting!
-Did you already compile CS? Did you set CRYSTAL environment variable
+Failed to detect directory containing Crystal Space link libraries; aborting!
+Did you build Crystal Space? Did you set the CRYSTAL environment variable
 correctly?
 EOF
   exit 1
@@ -231,7 +249,6 @@ do
   inc_dir_shown="$inc_dir_shown -I$p"
 done
 IFS=$my_IFS
-
 
 if test -n "$show_cflags"; then
 	echo "$inc_dir_shown $common_cflags $add_cflags"
@@ -246,15 +263,25 @@ else
 fi    
     
 if test -n "$show_libs"; then
-    # if users specified no lib, output commonly needed ones
+    # If user specified no libraries, then emit commonly needed ones.
     if test -z "$the_libs"; then
-        addlib "-lcsgfx"
-        addlib "-lcsgeom"
-        addlib "-lcstool"
-        addlib "-lcsutil"
+	commonlibs="csgfx csgeom cstool csutil csws csplugincommon"
+	for deflib in $commonlibs; do
+	    addlib $deflib
+        done
     fi
     the_libs="${lflags} $the_libs ${syslibs}"
     echo "$the_libs"
+fi
+
+if test -n "$show_availlibs"; then
+    # If user specified no libraries, then emit all.
+    if test -z "$the_libs"; then
+	for deflib in $liblist; do
+	    addlib $deflib
+        done
+    fi
+    echo "$all_libnames"
 fi
 
 exit 0

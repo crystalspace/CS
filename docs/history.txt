@@ -28,6 +28,13 @@ chronological order.
 	  with older versions of gcc, such as 2.95.x.
 	- Eric Sunshine fixed some build errors which manifested with older
 	  versions of gcc, such as 2.95.x.
+	- Eric Sunshine added an --available-libs option to `cs-config', which
+	  allows clients to query whether certain Crystal Space libraries are
+	  available. This is necessary since some libraries (such as
+	  cspycommon, csplugincommon_ogl, csplugincommon_osx,
+	  csplugincommon_w32, csplugincommon_dx) may not be built on all
+	  platforms or all configurations, and clients need to be able to
+	  figure out which resources are available.
 19-Mar-2005
 	- Erroroman fixed a bug in genmesh skelanimation exporter
 	- Erroroman added texture "ugly_woman.jpg" to flarge skeleton model.
