@@ -31,6 +31,7 @@
 #include "csutil/scf.h"
 #include "cstypes.h"
 #include "csutil/ref.h"
+#include "csutil/strset.h"
 #include "efvector4.h"
 
 SCF_VERSION (iEffectLayer, 0, 0, 1);

@@ -20,116 +20,75 @@
 #ifndef __EFFECTPASS_H__
 #define __EFFECTPASS_H__
 
+#include "csutil/refarr.h"
 #include "csutil/hashmap.h"
 #include "statehdr.h"
 #include "ivideo/effects/efpass.h"
 
 struct iEffectLayer;
-class csBasicVector;
 
-class csEffectPass : public csStateHandler
+class csEffectPass : public csStateHandler, public iEffectPass
 {
 private:
-  csBasicVector layers;
+  csRefArray<iEffectLayer> layers;
 		
   csRef<iBase> rendererData;
 
-  iBase* GetRendererData()
-  {
-    return rendererData;
-  }
-
-  void SetRendererData(iBase* data)
-  {
-    rendererData = data;
-  }
-
 public:
-
   SCF_DECLARE_IBASE;
 
-  csEffectPass()
-  {
-    SCF_CONSTRUCT_IBASE( NULL );
-    SCF_CONSTRUCT_EMBEDDED_IBASE( scfiEffectPass );
-  }
-  virtual ~csEffectPass () { }
+  csEffectPass ();
+  virtual ~csEffectPass ();
 
   iEffectLayer* CreateLayer();
   int GetLayerCount();
   iEffectLayer* GetLayer( int layer );
 
-  struct EffectPass : public iEffectPass
+  iBase* GetRendererData ();
+  void SetRendererData (iBase* data);
+
+  void SetStateFloat( csStringID state, float value )
   {
-    SCF_DECLARE_EMBEDDED_IBASE( csEffectPass );
+    csStateHandler::SetStateFloat( state, value );
+  }
+  void SetStateString( csStringID state, csStringID value )
+  {
+    csStateHandler::SetStateString( state, value );
+  }
+  void SetStateOpaque( csStringID state, void *value )
+  {
+    csStateHandler::SetStateOpaque( state, value );
+  }
+  void SetStateVector4( csStringID state, csEffectVector4 value)
+  {
+    csStateHandler::SetStateVector4( state, value);
+  }
+  
+  float GetStateFloat( csStringID state )
+  {
+    return csStateHandler::GetStateFloat( state );
+  }
+  csStringID GetStateString( csStringID state )
+  {
+    return csStateHandler::GetStateString( state );
+  }
+  void *GetStateOpaque( csStringID state )
+  {
+    return csStateHandler::GetStateOpaque( state );
+  }
+  csEffectVector4 GetStateVector4( csStringID state)
+  {
+    return csStateHandler::GetStateVector4( state );
+  }
 
-    void SetStateFloat( csStringID state, float value )
-    {
-      scfParent->SetStateFloat( state, value );
-    }
-    void SetStateString( csStringID state, csStringID value )
-    {
-      scfParent->SetStateString( state, value );
-    }
-    void SetStateOpaque( csStringID state, void *value )
-    {
-      scfParent->SetStateOpaque( state, value );
-    }
-    void SetStateVector4( csStringID state, csEffectVector4 value)
-    {
-      scfParent->SetStateVector4( state, value);
-    }
-
-    float GetStateFloat( csStringID state )
-    {
-      return scfParent->GetStateFloat( state );
-    }
-    csStringID GetStateString( csStringID state )
-    {
-      return scfParent->GetStateString( state );
-    }
-    void *GetStateOpaque( csStringID state )
-    {
-      return scfParent->GetStateOpaque( state );
-    }
-    csEffectVector4 GetStateVector4( csStringID state)
-    {
-      return scfParent->GetStateVector4( state );
-    }
-
-    iEffectLayer* CreateLayer()
-    {
-      return scfParent->CreateLayer();
-    }
-    int GetLayerCount()
-    {
-      return scfParent->GetLayerCount();
-    }
-    iEffectLayer* GetLayer( int layer )
-    {
-      return scfParent->GetLayer( layer );
-    }
-
-    csStringID GetFirstState()
-    {
-      return scfParent->GetFirstState();
-    }
-    csStringID GetNextState()
-    {
-      return scfParent->GetNextState();
-    }
-
-    iBase* GetRendererData()
-    {
-      return scfParent->GetRendererData();
-    }
-
-    void SetRendererData(iBase* data)
-    {
-      scfParent->SetRendererData(data);
-    }
-  } scfiEffectPass;
-  friend struct EffectPass;
+  csStringID GetFirstState()
+  {
+    return csStateHandler::GetFirstState();
+  }
+  csStringID GetNextState()
+  {
+    return csStateHandler::GetNextState();
+  }
 };
 
 #endif // __EFFECTPASS_H__

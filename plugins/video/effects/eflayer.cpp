@@ -16,59 +16,30 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include "cssysdef.h"
-#include "cstypes.h"
-#include "csutil/ref.h"
-#include "csutil/csvector.h"
-#include "csutil/scf.h"
-#include "csutil/hashmap.h"
-#include "csutil/strset.h"
 
-#include "ivideo/effects/efpass.h"
-#include "efpass.h"
-#include "ivideo/effects/eflayer.h"
 #include "eflayer.h"
 
-csEffectPass::csEffectPass()
+csEffectLayer::csEffectLayer ()
 {
-  SCF_CONSTRUCT_IBASE( NULL );
+  SCF_CONSTRUCT_IBASE (NULL);
 }
 
-csEffectPass::~csEffectPass ()
+csEffectLayer::~csEffectLayer ()
 {
 }
 
-iEffectLayer* csEffectPass::CreateLayer()
-{
-  csRef<iEffectLayer> layer = 
-    csPtr<iEffectLayer> (new csEffectLayer());
-  
-  layers.Push( layer );
-  
-  return layer;
-}
-
-int csEffectPass::GetLayerCount()
-{
-  return layers.Length();
-}
-
-iEffectLayer* csEffectPass::GetLayer( int layer )
-{
-  return layers.Get (layer);
-}
-
-iBase* csEffectPass::GetRendererData ()
+iBase* csEffectLayer::GetRendererData ()
 {
   return rendererData;
 }
 
-void csEffectPass::SetRendererData (iBase* data)
+void csEffectLayer::SetRendererData (iBase* data)
 {
   rendererData = data;
 }
 
-SCF_IMPLEMENT_IBASE( csEffectPass )
-  SCF_IMPLEMENTS_INTERFACE (iEffectPass)
+SCF_IMPLEMENT_IBASE( csEffectLayer )
+  SCF_IMPLEMENTS_INTERFACE( iEffectLayer )
 SCF_IMPLEMENT_IBASE_END
+

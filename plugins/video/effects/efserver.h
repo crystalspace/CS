@@ -22,6 +22,8 @@
 
 #include "cstypes.h"
 #include "csutil/scf.h"
+#include "csutil/ref.h"
+#include "csutil/refarr.h"
 #include "csutil/objreg.h"
 #include "iutil/comp.h"
 #include "csutil/csvector.h"
@@ -31,38 +33,18 @@
 /**
  * Effect server
  */
-class csEffectServer : public iEffectServer
+class csEffectServer : public iEffectServer, public iComponent
 {
 private:
   iObjectRegistry* objectreg;
   csStringSet strset;
   int seqnr;
 
-  csBasicVector* effects;
+  csRefArray <iEffectDefinition> effects;
   csEffectStrings* efstrings;
 public:
-
-  SCF_DECLARE_IBASE;
-
-  csEffectServer( iBase* parent)
-  {
-    SCF_CONSTRUCT_IBASE( parent );
-    SCF_CONSTRUCT_EMBEDDED_IBASE( scfiComponent );
-    seqnr = 0;
-
-    effects = new csVector();
-    efstrings = new csEffectStrings();
-    efstrings->InitStrings(this);
-  }
-  
-  virtual ~csEffectServer () 
-  {
-    while(effects->Length() > 0)
-    {
-      delete (iEffectDefinition*)(effects->Pop());
-    }
-    delete effects;
-  }
+  csEffectServer (iBase* parent);
+  virtual ~csEffectServer ();
 
   bool Initialize( iObjectRegistry* reg );
 
@@ -82,14 +64,7 @@ public:
     return efstrings;
   }
 
-  struct Component : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE( csEffectServer );
-    virtual bool Initialize( iObjectRegistry* objectreg )
-    {
-      return scfParent->Initialize( objectreg );
-    }
-  } scfiComponent;
+  SCF_DECLARE_IBASE;
 };
 
 #endif // __EFFECTSERVER_H__

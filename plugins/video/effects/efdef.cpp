@@ -30,6 +30,10 @@
 #include "ivideo/effects/eftech.h"
 #include "eftech.h"
 
+SCF_IMPLEMENT_IBASE( csEffectDefinition )
+  SCF_IMPLEMENTS_INTERFACE( iEffectDefinition )
+SCF_IMPLEMENT_IBASE_END
+
 iEffectTechnique* csEffectDefinition::CreateTechnique()
 {
   csEffectTechnique* techniqueobj = new csEffectTechnique();

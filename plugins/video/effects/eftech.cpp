@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "cstypes.h"
+#include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "csutil/csvector.h"
 #include "csutil/hashmap.h"
@@ -37,12 +38,16 @@ csEffectTechnique::csEffectTechnique()
   clientflags = 0;
 }
 
+csEffectTechnique::~csEffectTechnique ()
+{
+}
+
 iEffectPass* csEffectTechnique::CreatePass()
 {
-  csEffectPass* passobj = new csEffectPass();
-  csRef<iEffectPass> pass (SCF_QUERY_INTERFACE( passobj, iEffectPass ));
+  csRef <iEffectPass> pass = csPtr<iEffectPass> (new csEffectPass());
+  
   passes.Push( pass );
-  pass->IncRef ();	// To prevent smart pointer release.
+  
   return pass;
 }
 
@@ -51,12 +56,12 @@ int csEffectTechnique::GetPassCount()
   return passes.Length();
 }
 
-iEffectPass* csEffectTechnique::GetPass( int pass )
+iEffectPass* csEffectTechnique::GetPass (int passnumber)
 {
-  return (iEffectPass*)(passes.Get( pass ));
+  return passes.Get (passnumber);
 }
 
-void csEffectTechnique::SetValidation( int validation )
+void csEffectTechnique::SetValidation (int validation)
 {
   valid = validation;
 }
@@ -85,3 +90,7 @@ uint32 csEffectTechnique::GetClientFlags()
 {
   return clientflags;
 }
+
+SCF_IMPLEMENT_IBASE( csEffectTechnique )
+  SCF_IMPLEMENTS_INTERFACE( iEffectTechnique )
+SCF_IMPLEMENT_IBASE_END

@@ -29,6 +29,7 @@
  * @{ */
 
 #include "csutil/scf.h"
+#include "csutil/ref.h"
 #include "csutil/strset.h"
 #include "cstypes.h"
 

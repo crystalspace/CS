@@ -21,21 +21,24 @@
 #define __EFFECTTECHNIQUE_H__
 
 #include "csutil/scf.h"
+#include "csutil/refarr.h"
 #include "cstypes.h"
+
+struct iEffectPass;
 
 class csEffectTechnique : public iEffectTechnique
 {
 private:
-  csBasicVector passes;
+  csRefArray<iEffectPass> passes;
   float quality;
   int valid;
   uint32 clientflags;
-public:
 
+public:
   SCF_DECLARE_IBASE;
 
   csEffectTechnique ();
-  virtual ~csEffectTechnique () { }
+  virtual ~csEffectTechnique ();
 
   iEffectPass* CreatePass();
   int GetPassCount();

@@ -32,6 +32,19 @@
 #include "ivideo/effects/eftech.h"
 #include "eftech.h"
 
+csEffectServer::csEffectServer( iBase* parent)
+{
+  SCF_CONSTRUCT_IBASE( parent );
+  seqnr = 0;
+  
+  efstrings = new csEffectStrings();
+  efstrings->InitStrings(this);
+}
+
+csEffectServer::~csEffectServer () 
+{
+  delete efstrings;
+}
 
 bool csEffectServer::Initialize( iObjectRegistry* reg )
 {
@@ -43,18 +56,16 @@ iEffectDefinition* csEffectServer::CreateEffect()
 {
   csEffectDefinition* effectobj = new csEffectDefinition();
 
-  csRef<iEffectDefinition> effect (SCF_QUERY_INTERFACE(
-  effectobj, iEffectDefinition));
-  effect->IncRef ();	// To avoid smart pointer release.
+  csRef<iEffectDefinition> effect = 
+    SCF_QUERY_INTERFACE(effectobj, iEffectDefinition);
 
   char* name = new char[10];
   sprintf(name, "effect%2d", seqnr);
   seqnr++;
   effect->SetName(name);
 
-  effects->Push(effect);
+  effects.Push(effect);
 
-  // THIS ROUTINE MUST RETURN csPtr.
   return effect;
 }
 
@@ -101,13 +112,13 @@ iEffectTechnique* csEffectServer::SelectAppropriateTechnique(
   return tech;
 }
 
-iEffectDefinition* csEffectServer::GetEffect(const char *s)
+iEffectDefinition* csEffectServer::GetEffect(const char* name)
 {
-  for(int ni = 0; ni < effects->Length(); ni++)
+  for(int i = 0; i < effects.Length(); i++)
   {
-    if(strcasecmp(s,((iEffectDefinition*)(effects->Get(ni)))->GetName()) == 0)
+    if(strcasecmp(name, effects.Get(i)->GetName()) == 0)
       //is this, return it
-      return (iEffectDefinition*)(effects->Get(ni));
+      return effects.Get (i);
   }
   return NULL;
 }
@@ -121,3 +132,19 @@ const char* csEffectServer::RequestString( csStringID id )
 {
   return strset.Request( id );
 }
+
+// Plugin part
+
+CS_IMPLEMENT_PLUGIN
+
+SCF_IMPLEMENT_IBASE( csEffectServer )
+  SCF_IMPLEMENTS_INTERFACE( iEffectServer )
+  SCF_IMPLEMENTS_INTERFACE( iComponent )
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_FACTORY( csEffectServer )
+
+SCF_EXPORT_CLASS_TABLE( effects )
+  SCF_EXPORT_CLASS( csEffectServer, "crystalspace.video.effects.stdserver", "Effects system" )
+SCF_EXPORT_CLASS_TABLE_END
+

@@ -50,16 +50,13 @@ struct statedata
   {name = state; vector_value=value; type = CS_STATETYPE_VECTOR4;}
 };
 
-class csStateHandler : public iBase
+class csStateHandler
 {
 private:
   csHashMap *states;
   csHashIterator* iterator;
 
 public:
-
-  SCF_DECLARE_IBASE;
-  
   csStateHandler();
   virtual ~csStateHandler();
   void SetStateFloat( csStringID state, float value );
