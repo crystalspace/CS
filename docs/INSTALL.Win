@@ -10,8 +10,8 @@ If you have any questions, contact me at thieber@gmx.net
 
 Contents:
 1.  Quickstart
-2.	Working with the Workspace.
-3.	Frequently Asked Questions.
+2.  Working with the Workspace.
+3.  Frequently Asked Questions.
 
 ---------[1] Quickstart - for the impatient -------------
 
@@ -211,9 +211,14 @@ If you are using MSVC 6.0 (as I highly recommend), you have all needed
 headers and libraries for DirectX 5 and OpenGL installed. If you want
 to use Glide, EAX, A3D or DirectX 6, you will have to download the SDK's
 from their according sites.
-
-I don't know about EAX or A3D, but you can get the Glide from 
-http://www.3dfx.com    
+If you want just to build Crystal Space using those API', but don't need
+any docs or samples, you can get a mimum version of these API's from
+NooTe's homepage. Take a look at:
+http://www.multimania.com/noote/CrystalSpace 
+in the Sources section. 
+You will need a3d 2.0, eax 1.0 and Glide2x.
+Of course, you can also get the full SDK at 
+Aureal (A3D), CreativeLabs (EAX) and 3D/FX (Glide).
 
 and the most current DirectX SDK from
 http://www.microsoft.com 
