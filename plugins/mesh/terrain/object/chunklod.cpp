@@ -124,7 +124,7 @@ csChunkLodTerrainFactory::csChunkLodTerrainFactory (csChunkLodTerrainType* p,
 
 csChunkLodTerrainFactory::~csChunkLodTerrainFactory ()
 {
-  if (root) delete root;
+  delete root;
 
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel)
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiTerrainFactoryState)
@@ -188,11 +188,6 @@ void csChunkLodTerrainFactory::SetScale (const csVector3& s)
   scale = s;
 }
 
-csVector3 csChunkLodTerrainFactory::GetScale ()
-{
-  return scale;
-}
-
 void csChunkLodTerrainFactory::ComputeError (int i, int j, int di, int dj,
 	int n, int w)
 {
@@ -227,8 +222,10 @@ bool csChunkLodTerrainFactory::SetHeightMap (const csArray<float>& data,
   datamap.SetLength (w * h);
   hm_x = w; hm_y = h;
   int i, j;
-  for (j = 0; j < h; j ++) {
-    for (i = 0; i < w; i ++) {
+  for (j = 0; j < h; j ++)
+  {
+    for (i = 0; i < w; i ++)
+    {
       int pos = i + j * w;
 
       datamap[pos].pos.x = (i - (w>>1)) * scale.x;
@@ -305,12 +302,6 @@ bool csChunkLodTerrainFactory::SetHeightMap (iImage* map)
   return SetHeightMap (image_data, map->GetWidth(), map->GetHeight());
 }
 
-csArray<float> csChunkLodTerrainFactory::GetHeightMap ()
-{
-  csArray<float> hm;
-  return hm;
-}
-
 bool csChunkLodTerrainFactory::SaveState (const char *filename)
 {
   return false;
@@ -339,14 +330,9 @@ csVector3 csChunkLodTerrainFactory::CollisionDetect (const csVector3 &p)
 }
 
 
-SCF_IMPLEMENT_IBASE (csChunkLodTerrainFactory::MeshTreeNode)
-SCF_IMPLEMENT_IBASE_END
-
 csChunkLodTerrainFactory::MeshTreeNode::MeshTreeNode (
 	csChunkLodTerrainFactory* p, int x, int y, int w, int h, float e)
 {
-  SCF_CONSTRUCT_IBASE (p)
-
   pFactory = p;
   vertex_buffer = 0;
   compressed_vertex_buffer = 0;
@@ -372,8 +358,10 @@ csChunkLodTerrainFactory::MeshTreeNode::MeshTreeNode (
   int nw = x + y * p->hm_x;
 
   box.StartBoundingBox ();
-  for (int i = x; i < (x+w); i ++) {
-    for (int j = y; j < (y+h); j ++) {
+  for (int i = x; i < (x+w); i ++)
+  {
+    for (int j = y; j < (y+h); j ++)
+    {
       box.AddBoundingVertex (p->datamap[i+j*p->hm_x].pos);
     }
   }
@@ -492,14 +480,10 @@ csChunkLodTerrainFactory::MeshTreeNode::MeshTreeNode (
 
 csChunkLodTerrainFactory::MeshTreeNode::~MeshTreeNode ()
 {
-  if (error > 0)
-  {
-    delete children[0];
-    delete children[1];
-    delete children[2];
-    delete children[3];
-  }
-  SCF_DESTRUCT_IBASE ()
+  delete children[0];
+  delete children[1];
+  delete children[2];
+  delete children[3];
 }
 
 iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
@@ -846,8 +830,7 @@ csChunkLodTerrainObject::csChunkLodTerrainObject (csChunkLodTerrainFactory* p)
 
 csChunkLodTerrainObject::~csChunkLodTerrainObject ()
 {
-  if (meshpp)
-    delete [] meshpp;
+  delete [] meshpp;
 
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiTerrainObjectState)
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel)
@@ -986,7 +969,7 @@ csRenderMesh** csChunkLodTerrainObject::GetRenderMeshes (
 	int &n, iRenderView* rview, 
 	iMovable* movable)
 {
-  if (!DrawTest(rview, movable))
+  if (!DrawTest (rview, movable))
   {
     n = 0;
     return 0;
@@ -1057,11 +1040,6 @@ bool csChunkLodTerrainObject::SetMaterialPalette (
   }
   palette_meshes.SetLength (pal.Length());
   return true;
-}
-
-csArray<iMaterialWrapper*> csChunkLodTerrainObject::GetMaterialPalette ()
-{
-  return palette;
 }
 
 bool csChunkLodTerrainObject::SetMaterialMap (csArray<char> data, int w, int h)
@@ -1146,11 +1124,6 @@ bool csChunkLodTerrainObject::SetMaterialMap (iImage* map)
     }
   }
   return SetMaterialMap (image_data, map->GetWidth(), map->GetHeight());
-}
-
-csArray<char> csChunkLodTerrainObject::GetMaterialMap ()
-{
-  return 0;
 }
 
 bool csChunkLodTerrainObject::SaveState (const char *filename)

@@ -151,11 +151,10 @@ private:
     
   public:
     csShaderVariableContext svcontext;
-    SCF_DECLARE_IBASE;
   
     MeshTreeNode (csChunkLodTerrainFactory* p, int x, int y, int w, int h,
     	float error);
-    virtual ~MeshTreeNode ();
+    ~MeshTreeNode ();
 
     MeshTreeNode *GetChild (int i) 
     { CS_ASSERT (i >= 0 && i < 4); return (error > 0) ? children[i] : 0; }
@@ -195,37 +194,34 @@ public:
   struct eiObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csChunkLodTerrainFactory);
-    void GetObjectBoundingBox (csBox3& b, int t = CS_BBOX_NORMAL)
+    virtual void GetObjectBoundingBox (csBox3& b, int t = CS_BBOX_NORMAL)
     { scfParent->GetObjectBoundingBox (b, t); }
-    void GetRadius (csVector3& r, csVector3& c)
+    virtual void GetRadius (csVector3& r, csVector3& c)
     { scfParent->GetRadius (r, c); }
   } scfiObjectModel;
   friend struct eiObjectModel;
 
   void SetScale (const csVector3& scale);
-  csVector3 GetScale ();
+  const csVector3& GetScale () const { return scale; }
   bool SetHeightMap (const csArray<float>& data, int x, int y);
   bool SetHeightMap (iImage* map);
-  csArray<float> GetHeightMap ();
   bool SaveState (const char *filename);
   bool RestoreState (const char *filename);
 
   struct eiTerrainFactoryState : public iTerrainFactoryState
   {
     SCF_DECLARE_EMBEDDED_IBASE (csChunkLodTerrainFactory);
-    void SetScale (const csVector3& scale)
+    virtual void SetScale (const csVector3& scale)
     { scfParent->SetScale (scale); }
-    csVector3 GetScale ()
+    virtual const csVector3& GetScale () const
     { return scfParent->GetScale (); }
-    bool SetHeightMap (const csArray<float>& data, int x, int y)
+    virtual bool SetHeightMap (const csArray<float>& data, int x, int y)
     { return scfParent->SetHeightMap (data, x, y); }
-    bool SetHeightMap (iImage* map)
+    virtual bool SetHeightMap (iImage* map)
     { return scfParent->SetHeightMap (map); }
-    csArray<float> GetHeightMap ()
-    { return scfParent->GetHeightMap (); }
-    bool SaveState (const char *filename)
+    virtual bool SaveState (const char *filename)
     { return scfParent->SaveState (filename); }
-    bool RestoreState (const char *filename) 
+    virtual bool RestoreState (const char *filename) 
     { return scfParent->RestoreState (filename); }
   } scfiTerrainFactoryState;
   friend struct eiTerrainFactoryState;
@@ -291,47 +287,49 @@ public:
   { /* deprecated */ return false; }
 
   /// Returns the mesh, ready for rendering
-  csRenderMesh** GetRenderMeshes (int &n, iRenderView* rview, iMovable* movable);
+  virtual csRenderMesh** GetRenderMeshes (int &n, iRenderView* rview,
+  	iMovable* movable);
 
-  void SetVisibleCallback (iMeshObjectDrawCallback* cb) { vis_cb = cb; }
-  iMeshObjectDrawCallback* GetVisibleCallback () const { return vis_cb; }
+  virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb) { vis_cb = cb; }
+  virtual iMeshObjectDrawCallback* GetVisibleCallback () const
+  { return vis_cb; }
 
   /// For animation ... ha ha
-  void NextFrame (csTicks, const csVector3&) { }
+  virtual void NextFrame (csTicks, const csVector3&) { }
 
   /// Unsupported
-  void HardTransform (const csReversibleTransform&) { }
+  virtual void HardTransform (const csReversibleTransform&) { }
 
   /// Shows that HardTransform is not supported by this mesh
-  bool SupportsHardTransform () const { return false; }
+  virtual bool SupportsHardTransform () const { return false; }
 
   /// Check if the terrain is hit by the beam
-  bool HitBeamOutline (const csVector3& start, const csVector3& end, 
+  virtual bool HitBeamOutline (const csVector3& start, const csVector3& end, 
 	csVector3& isect, float* pr);
   /// Find exact position of a beam hit
-  bool HitBeamObject (const csVector3& start, const csVector3& end, 
+  virtual bool HitBeamObject (const csVector3& start, const csVector3& end, 
 	csVector3& isect, float* pr, int* polygon_idx = 0);
 
   /// Set/Get logical parent
-  void SetLogicalParent (iBase* lp) { logparent = lp; }
-  iBase* GetLogicalParent () const { return logparent; }
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual iBase* GetLogicalParent () const { return logparent; }
 
   /// Gets the objects model, not sure what this means yet
-  iObjectModel *GetObjectModel () { return &scfiObjectModel; }
+  virtual iObjectModel *GetObjectModel () { return &scfiObjectModel; }
 
   /// Set (Get) the terrain to a constant base color 
-  bool SetColor (const csColor& c) { basecolor = c; return true; }
-  bool GetColor (csColor &c) const { c = basecolor; return true; }
+  virtual bool SetColor (const csColor& c) { basecolor = c; return true; }
+  virtual bool GetColor (csColor &c) const { c = basecolor; return true; }
 
   /** 
    * Set (Get) the terrain to a single material, useful only with 
    * large textures or small terrains (or terrains in the distance)
    * See TerrainState for better texture settings
    */
-  bool SetMaterialWrapper (iMaterialWrapper* m)
+  virtual bool SetMaterialWrapper (iMaterialWrapper* m)
   { matwrap = m; return true; }
-  iMaterialWrapper* GetMaterialWrapper () const { return matwrap; }
-  void InvalidateMaterialHandles () { }
+  virtual iMaterialWrapper* GetMaterialWrapper () const { return matwrap; }
+  virtual void InvalidateMaterialHandles () { }
   /**
    * see imesh/object.h for specification. The default implementation
    * does nothing.
@@ -339,14 +337,16 @@ public:
   virtual void PositionChild (iMeshObject* child,csTicks current_time) { }
 
   bool SetMaterialPalette (const csArray<iMaterialWrapper*>& pal);
-  csArray<iMaterialWrapper*> GetMaterialPalette ();
+  const csArray<iMaterialWrapper*>& GetMaterialPalette () const
+  {
+    return palette;
+  }
   bool SetMaterialMap (csArray<char> data, int x, int y);
   bool SetMaterialMap (iImage* map);
-  csArray<char> GetMaterialMap ();
   void SetLODDistance (float distance) { lod_distance = distance; }
-  float GetLODDistance () { return lod_distance; }
+  float GetLODDistance () const { return lod_distance; }
   void SetErrorTolerance (float error) { error_tolerance = error; }
-  float GetErrorTolerance () { return error_tolerance; }
+  float GetErrorTolerance () const { return error_tolerance; }
   /// Saves the texture quad-tree into the file specified
   bool SaveState (const char *filename);
   bool RestoreState (const char *filename);
@@ -355,29 +355,27 @@ public:
   struct eiTerrainObjectState : public iTerrainObjectState
   {
     SCF_DECLARE_EMBEDDED_IBASE (csChunkLodTerrainObject);
-    bool SetMaterialPalette (const csArray<iMaterialWrapper*>& pal) 
+    virtual bool SetMaterialPalette (const csArray<iMaterialWrapper*>& pal) 
     { return scfParent->SetMaterialPalette (pal); }
-    csArray<iMaterialWrapper*> GetMaterialPalette ()
+    virtual const csArray<iMaterialWrapper*>& GetMaterialPalette () const
     { return scfParent->GetMaterialPalette (); }
-    bool SetMaterialMap (csArray<char> data, int x, int y)
+    virtual bool SetMaterialMap (csArray<char> data, int x, int y)
     { return scfParent->SetMaterialMap (data, x, y); }
-    bool SetMaterialMap (iImage* map)
+    virtual bool SetMaterialMap (iImage* map)
     { return scfParent->SetMaterialMap (map); }
-    csArray<char> GetMaterialMap ()
-    { return scfParent->GetMaterialMap (); }
-    void SetLODDistance (float distance)
+    virtual void SetLODDistance (float distance)
     { scfParent->SetLODDistance (distance); }
-    float GetLODDistance () 
+    virtual float GetLODDistance () const
     { return scfParent->GetLODDistance (); }
-    void SetErrorTolerance (float error)
+    virtual void SetErrorTolerance (float error)
     { scfParent->SetErrorTolerance (error); }
-    float GetErrorTolerance ()
+    virtual float GetErrorTolerance () const
     { return scfParent->GetErrorTolerance (); }
-    bool SaveState (const char *filename)
+    virtual bool SaveState (const char *filename)
     { return scfParent->SaveState (filename); }
-    bool RestoreState (const char *filename) 
+    virtual bool RestoreState (const char *filename) 
     { return scfParent->RestoreState (filename); }
-    int CollisionDetect (iMovable *m, csTransform *p)
+    virtual int CollisionDetect (iMovable *m, csTransform *p)
     { return scfParent->CollisionDetect (m, p); }
   } scfiTerrainObjectState;
   friend struct eiTerrainObjectState;
@@ -385,9 +383,9 @@ public:
   struct eiObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csChunkLodTerrainObject);
-    void GetObjectBoundingBox (csBox3& b, int t = CS_BBOX_NORMAL)
+    virtual void GetObjectBoundingBox (csBox3& b, int t = CS_BBOX_NORMAL)
     { scfParent->pFactory->GetObjectBoundingBox (b, t); }
-    void GetRadius (csVector3& r, csVector3& c)
+    virtual void GetRadius (csVector3& r, csVector3& c)
     { scfParent->pFactory->GetRadius (r, c); }
   } scfiObjectModel;
   friend struct eiObjectModel;

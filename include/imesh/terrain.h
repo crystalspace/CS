@@ -43,7 +43,7 @@ struct iTerrainObjectState : public iBase
    * bytemap representing the material makeup of the terrain
    */
   virtual bool SetMaterialPalette (const csArray<iMaterialWrapper*>& pal) = 0;
-  virtual csArray<iMaterialWrapper*> GetMaterialPalette () = 0;
+  virtual const csArray<iMaterialWrapper*>& GetMaterialPalette () const = 0;
 
   /**
    * In short, the materialmap paints the palette onto the terrain like
@@ -56,14 +56,13 @@ struct iTerrainObjectState : public iBase
    */
   virtual bool SetMaterialMap (csArray<char> data, int x, int y) = 0;
   virtual bool SetMaterialMap (iImage* map) = 0;
-  virtual csArray<char> GetMaterialMap () = 0;
 
   /**
    * The distance at which splatting is no longer in effect and the
    * base texture is the only layer.
    */
   virtual void SetLODDistance (float distance) = 0;
-  virtual float GetLODDistance () = 0;
+  virtual float GetLODDistance () const = 0;
 
   /**
    * Sets the screenspace error tolerance in numbers of pixels. 
@@ -71,7 +70,7 @@ struct iTerrainObjectState : public iBase
    * to values less than 1 is worthless.
    */
   virtual void SetErrorTolerance (float error) = 0;
-  virtual float GetErrorTolerance () = 0;
+  virtual float GetErrorTolerance () const = 0;
 
   /**
    * Save/Restore preprocessing information, the algorithm will 
@@ -98,7 +97,7 @@ struct iTerrainFactoryState : public iBase
 {
   /// Set/Get the 3 axis scale of the terrain
   virtual void SetScale (const csVector3& scale) = 0;
-  virtual csVector3 GetScale () = 0;
+  virtual const csVector3& GetScale () const = 0;
 
   /**
    * Sets the heightmap for heightvalues
@@ -106,7 +105,6 @@ struct iTerrainFactoryState : public iBase
    */
   virtual bool SetHeightMap (const csArray<float>& data, int x, int y) = 0;
   virtual bool SetHeightMap (iImage* map) = 0;
-  virtual csArray<float> GetHeightMap () = 0;
 
   /**
    * Save/Restore preprocessing information, the algorithm will 

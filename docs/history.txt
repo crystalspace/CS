@@ -17,6 +17,13 @@ chronological order.
 	  your variables!!!!!
 	- Jorrit fixed missing SCF_CONSTRUCT_IBASE in the
 	  eiShaderVariableAccessor instances of genmesh.
+	- Jorrit removed the non-functional GetHeightMap() function
+	  from iTerrainFactoryState and made some other small changes
+	  to the API (mostly adding 'const' where needed). Also removed the
+	  non-functional GetMaterialMap() function from iTerrainObjectState.
+	- Jorrit discovered that MeshTreeNode in the NR terrain engine
+	  was doing some SCF stuff for no reason at all (it didn't even
+	  inherit from iBase).
 13-Apr-2004
 	- Jorrit changed the PreferClipPlane default to enabled for the new
 	  renderer. Now clipping planes are enabled by default and only
