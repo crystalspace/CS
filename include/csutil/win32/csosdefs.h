@@ -198,6 +198,7 @@
 #include <malloc.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/param.h>
 #ifndef __CYGWIN32__
 #include <direct.h>
 #endif
