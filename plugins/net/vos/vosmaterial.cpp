@@ -68,6 +68,12 @@ void MaterialUpdateTask::doTask()
 }
 
 
+struct TextureLayer
+{
+  float uscale, vscale;
+  int mode;
+};
+
 /// ConstructMaterialTask ///
 
 class ConstructMaterialTask : public Task
@@ -75,7 +81,7 @@ class ConstructMaterialTask : public Task
 public:
   vRef<csMetaTexture> base;
   std::vector<csMetaTexture*> layers;
-  csTextureLayer* coords;
+  TextureLayer* coords;
   vRef<csMetaMaterial> metamaterial;
   iObjectRegistry *object_reg;
   bool iscolor;
@@ -121,8 +127,10 @@ void ConstructMaterialTask::doTask()
         layers[i]->release();
       }
 
-      imat = engine->CreateBaseMaterial(basetw, layers.size(),
-        layertws, coords);
+      imat = engine->CreateBaseMaterial(basetw);
+
+      // XXX add texture layers using shaders
+
       free(layertws);
       free(coords);
     }
@@ -257,8 +265,8 @@ void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
     txt++;
     if(txt.hasMore())
     {
-      cmt->coords = (csTextureLayer*)malloc(txt.remaining()
-        * sizeof(csTextureLayer));
+      cmt->coords = (TextureLayer*)malloc(txt.remaining()
+                                          * sizeof(TextureLayer));
       float uscale = 1, vscale = 1, ushift = 0, vshift = 0;
       for(int i = 0; txt.hasMore(); txt++, i++)
       {
@@ -278,8 +286,9 @@ void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
           }
           cmt->coords[i].uscale = uscale;
           cmt->coords[i].vscale = vscale;
-          cmt->coords[i].ushift = ushift;
-          cmt->coords[i].vshift = vshift;
+          //cmt->coords[i].ushift = ushift;
+          //cmt->coords[i].vshift = vshift;
+
           switch(mt->getBlendMode())
           {
             case A3DL::Material::BLEND_NORMAL:
