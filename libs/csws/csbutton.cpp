@@ -385,7 +385,7 @@ void csButton::Press ()
 {
   if (ButtonStyle & CSBS_DISMISS)
     app->Dismiss (CommandCode);
-  if (parent && CommandCode)
+  else if (parent && CommandCode)
     parent->SendCommand (CommandCode, (void *)this);
 }
 
