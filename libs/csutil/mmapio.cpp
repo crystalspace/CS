@@ -107,6 +107,24 @@ csMemoryMappedIO::~csMemoryMappedIO()
   if (page_map)
     delete page_map;
 
+  unsigned int i;
+
+  // Free all allocated memory.
+  for(i=0; i<csmmioDefaultHashSize; ++i)
+  {
+    CacheBlock *cp, *np;
+
+    cp=cache.blocks[i];
+    while(cp)
+    {
+     np=cp->next;
+     delete [] cp->data;
+     delete cp;
+
+     cp=np;
+    }
+  }
+
 #endif
 
 
@@ -158,6 +176,9 @@ csMemoryMappedIO::CachePage(unsigned int page)
     // Insert it into the bucket.
     cp->next=cache.blocks[bucket];
     cache.blocks[bucket]=cp;
+
+    // Initialize it
+    cp->data = new unsigned char[block_size * cache_block_size];
   }
   else
   {
@@ -174,24 +195,42 @@ csMemoryMappedIO::CachePage(unsigned int page)
 
       block=block->next;
     }
-  }
 
+    // Unmark this page as allocated
+    page_map->ClearBit(cp->page); 
+  }
     
   // Get the data for it.
-  cp->offset=page;
+  cp->offset=page*cache_block_size;
+  cp->page=page;
   cp->age=0;
+
+  // Mark this page as allocated
+  page_map->SetBit(page);
     
-  fseek(mapped_file, page*block_size, SEEK_SET);
+  // Read the page from the file
+  fseek(mapped_file, page*cache_block_size*block_size, SEEK_SET);
   fread(cp->data, block_size, cache_block_size, mapped_file);
-  
 }
 
 void *
 csMemoryMappedIO::LookupIndex(unsigned int page, unsigned int index)
 {
-  unsigned int bucket = page % csmmioDefaultHashSize;
+  CacheBlock *cp = cache.blocks[page % csmmioDefaultHashSize];
 
-  
+  while(cp)
+  { 
+    if (cp->page==page)
+    {
+      // Decrease age     
+      ++cp->age;
+	      
+      return cp->data + ((index-cp->offset)*block_size);
+    }
 
+    cp=cp->next;
+  }
+
+  //Serious error! The page is marked as here, but we could not find it!
   return NULL;
 }
