@@ -77,6 +77,8 @@ chronological order.
 	  sources" in plugins/video/canvas/canvas.mak, fixing runtime errors
 	  of GL plugins.
 	- Jorrit fixed the glrender3d jamfile to also link with cstool.
+	- res worked around compile problems in the fullscreen quad render
+	  step.
 11-Aug-2003
         - Philip Wyett changed #include "cal3d/cal3d" to
           #include <cal3d/cal3d.h> and dropped below other includes fixing

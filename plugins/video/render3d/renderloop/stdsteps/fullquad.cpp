@@ -30,6 +30,7 @@
 #include "iengine/mesh.h"
 #include "iengine/material.h"
 #include "ivideo/material.h"
+#include "csgeom/transfrm.h"
 
 #include "fullquad.h"
 
@@ -85,6 +86,7 @@ public:
     indices_name = strings->Request ("indices");
     texcoords_name = strings->Request ("texture coordinates");
   }
+  virtual ~csFullscreenQuad () {}
 
   iRenderBuffer* GetRenderBuffer(csStringID name)
   {
@@ -99,7 +101,7 @@ public:
 };
 
 SCF_IMPLEMENT_IBASE (csFullscreenQuad)
-SCF_IMPLEMENTS_INTERFACE (iRenderBufferSource)
+  SCF_IMPLEMENTS_INTERFACE (iRenderBufferSource)
 SCF_IMPLEMENT_IBASE_END
 
 //---------------------------------------------------------------------------
@@ -246,8 +248,9 @@ void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector)
         mesh.indexstart = 0;
         mesh.indexend = 4;
         mesh.buffersource = fullquad;
-        csReversibleTransform trans (csMatrix3(), csVector3 (0, 0, -2));
-        mesh.transform = &trans;
+        csReversibleTransform* trans =
+	 new csReversibleTransform (csMatrix3(), csVector3 (0, 0, -2.0f));
+        mesh.transform = trans;
         mesh.meshtype = CS_MESHTYPE_QUADS;
         mesh.z_buf_mode = CS_ZBUF_NONE;
         mesh.material = mat;
@@ -263,6 +266,7 @@ void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector)
         r3d->DrawMesh (&mesh);
         pass->ResetState ();
         pass->Deactivate ();
+	delete trans;
       }
     }
   }
