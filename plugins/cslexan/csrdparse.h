@@ -22,12 +22,29 @@
  /****** Change log
   1. Sat Jun 02 10:06:15 AM MDT 2001 paradox <paradox@bbhc.org> Creation of file
  ******/
+ 
+ const unsigned int RE_COMP_ERR_NONE				  = 0; 
+ const unsigned int RE_COMP_ERR_MISSING_RIGHT_PAREN   = 1;
+ const unsigned int RE_COMP_ERR_MISSING_LEFT_PAREN    = 2;
+ const unsigned int RE_COMP_ERR_MISSING_RIGHT_BRACKET = 3;
+ const unsigned int RE_COMP_ERR_MISSING_LEFT_BRACKET  = 4;
+ const unsigned int RE_COMP_ERR_UNKNOWN_CHAR_CLASS    = 5;
+
 
  class csRESyntaxTree
  {
+    unsigned int last_error;
+     	
  public:
 	csRENode *Build(char **regexp);
 	bool      Compile(char *regexp);
+	
+ public:
+    void SetErrorCondition(unsigned int errc)
+    { last_error = errc; }
+    
+    unsigned int GetError()
+    { return last_error; }
  };
 
 #endif

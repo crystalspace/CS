@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include "csrenode.h"
 #include "csrdparse.h"
@@ -6,7 +7,8 @@
 /*****
  Changelog:
  
- Fri Jun 01 03:00:01 PM MDT 2001 paradox <paradox@bbhc.org>  Created new file, implemented basic parsing
+ 1. Fri Jun 01 03:00:01 PM MDT 2001 paradox <paradox@bbhc.org>  Created new file, implemented basic parsing.
+ 2. Sat Jun 02 10:16:35 AM MDT 2001 paradox <paradox@bbhc.org>  Fixed some compile errors, add "csrdparse.h" interface file.
 
  ****/
 
@@ -24,6 +26,9 @@ SupportWildCards(char **pRE, csRESyntaxTree &tree, csRENode **node)
       ++p; // skip the or bar, since we've already processed it.
       wild_found=true;
       *node = new csREAltNode(*node, tree.Build(&p));
+      
+        // If we hit an error, abort.
+        if (tree.GetError()) return false;
     break;
     
     case '*':
@@ -78,8 +83,18 @@ BuildParenBranch(char **pRE, csRESyntaxTree &tree)
   // Continue to process until we have finished this set of parentheses.
   while(*p && *p!=')')
   { 
+    //Abort on error.
+    if (tree.GetError()) return NULL;
+ 
     node = new csRECatNode(top_node, tree.Build(&p));
     top_node = node;     	
+  }
+  
+  // Check for missing ')'
+  if (*p == 0)
+  {
+    tree.SetErrorCondition(RE_COMP_ERR_MISSING_RIGHT_PAREN);
+    return NULL;
   }
   
   // Support scoping wild cards 
@@ -88,6 +103,71 @@ BuildParenBranch(char **pRE, csRESyntaxTree &tree)
   *pRE = p;
   return node;
 };
+
+/// Builds a table leaf with support for wildcards and alternate branches.
+csRENode *
+BuildTableLeaf(char **pRE, csRESyntaxTree &tree)
+{
+  char     *p = *pRE;
+  bool      table[256];  // The table size should never exceed 256 different characters.
+  bool      invert_match = false;
+  csRENode *node;
+  
+  memset(table, sizeof(table), 0);
+  
+  // Check to see if this is a named table
+  if (*p==':')
+  {  // Named table resolution
+      	
+    tree.SetErrorCondition(RE_COMP_ERR_UNKNOWN_CHAR_CLASS);
+    return NULL;
+  } 
+     
+  // Preprocess special characters.
+  if (*p=='^') 
+  {
+    invert_match=true;
+    ++p;
+  }
+  
+  if (*p==']')
+  {
+    table[*p]=true;   
+    ++p;
+  }
+      
+  // Process entire bracket set.
+  while(*p && *p!=']')
+  {
+    // check for ranges!
+    if (*(p+1) == '-')
+    {
+      char start = *p;
+      char end   = *(p+2);
+     
+      // insert this range
+      for(int i=start; i<=end; ++i)
+        table[i]=true; 
+      
+    } 
+ 
+
+  }
+  
+  // Check for missing ')'
+  if (*p == 0)
+  {
+    tree.SetErrorCondition(RE_COMP_ERR_MISSING_RIGHT_BRACKET);
+    return NULL;
+  }
+  
+  // Support scoping wild cards 
+  while(SupportWildCards(&p, tree, &node));        
+   
+  *pRE = p;
+  return node;
+};
+
 
 /// Recursive descent parsing of regular expressions
 csRENode *
@@ -100,32 +180,72 @@ csRESyntaxTree::Build(char **regexp)
   {
      case '[':
      { // Begin table creation.  
-       
+     
+        // Special case: is there only one char inside the table?
+        if (*(p+2) == ']')
+        {  // yes, treat it like it wasn't a table.
+         node = BuildCharLeaf(&p, *this);
          
-     	
-     	
+         // Abort on error
+         if (GetError()) return NULL;
+         
+         p+=3; // Set pointer to next character to be consumed.
+        }
+        else
+        { // no, begin recursion
+         ++p; //eat '['
+         node = BuildTableLeaf(&p, *this);
+        
+         // If we hit an error, abort.
+         if (GetError()) return NULL;
+        }
+           	
      } // End table creation
      break;	
-  	
+     
+     case ')':
+       SetErrorCondition(RE_COMP_ERR_MISSING_LEFT_PAREN);
+       return NULL;
+     break;
+     
+     case ']':
+       SetErrorCondition(RE_COMP_ERR_MISSING_LEFT_BRACKET);
+       return NULL;
+     break;
+     
+     	
      case '(':
-      { // Begin parenthetical recursion
+     { // Begin parenthetical recursion
         
         // Special case: is there only one char inside the parentheses?
         if (*(p+2) == ')')
         {  // yes, treat it like it wasn't in parentheses.
          node = BuildCharLeaf(&p, *this);
+         
+         // Abort on error
+         if (GetError()) return NULL;
+         
          p+=3; // Set pointer to next character to be consumed.
         }
         else
         { // no, begin recursion
-         node = BuildParenBranch(&p, *this); 
+         ++p; // eat '('
+         node = BuildParenBranch(&p, *this);
+        
+         // If we hit an error, abort.
+         if (GetError()) return NULL;
+  
         }
         
       } // End parenthetical recursion 
       break;     	
     	
       default:
-        node = BuildCharLeaf(&p, *this); 
+        node = BuildCharLeaf(&p, *this);
+     
+        // If we hit an error, abort.
+ 	   if (GetError()) return NULL;
+  
       break;  	
     }  // end switch (*p)	
    
@@ -142,14 +262,19 @@ csRESyntaxTree::Compile(char *regexp)
 {
  char *pRE = regexp;
  
+ SetErrorCondition(RE_COMP_ERR_NONE);
+ 
  // Create the initial top node.
  csRENode *top_node= new csRECatNode(Build(&pRE), Build(&pRE));
- 
+  
  // Recursively create nodes, with the new node always being on top.  This allows us to create proper LALR syntax tree.
  while(*pRE)
  {
+   // If we hit an error, abort.
+   if (GetError()) return false;
+ 
    csRENode *node = new csRECatNode(top_node, Build(&pRE));	
-   top_node = node;	
+   top_node = node;
  }
  
  return true;	
