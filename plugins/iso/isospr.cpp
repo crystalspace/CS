@@ -55,11 +55,12 @@ void csIsoSprite::AddVertex(const csVector3& coord, float u, float v)
   colors.AddVertex(1.,1.,1.);
 }
 
-void csIsoSprite::SetPosition(const csVector3& pos) 
+void csIsoSprite::SetPosition(const csVector3& newpos) 
 {
   /// manage movement of the sprite, oldpos, newpos
-  if(grid) grid->MoveSprite(this, position, pos);
-  position = pos;
+  csVector3 oldpos = position;
+  position = newpos; // already set, so it can be overridden
+  if(grid) grid->MoveSprite(this, oldpos, newpos);
 }
 
 void csIsoSprite::MovePosition(const csVector3& delta) 
@@ -252,8 +253,4 @@ void csIsoSprite::Draw(iIsoRenderView *rview)
 void csIsoSprite::SetGrid(iIsoGrid *grid)
 {
   csIsoSprite::grid = grid;
-  if(grid==NULL)
-  {
-    printf("Warning sprite moved out of bounds of the world.\n");
-  }
 }

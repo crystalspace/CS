@@ -76,22 +76,26 @@ void csIsoGrid::RemoveSprite(iIsoSprite *sprite)
 void csIsoGrid::MoveSprite(iIsoSprite *sprite, const csVector3& oldpos,
     const csVector3& newpos)
 {
-  GetCell(oldpos)->RemoveSprite(sprite, oldpos);
   if(box.In(newpos))
   {
     //printf("Sprite moved to new pos\n");
+    GetCell(oldpos)->RemoveSprite(sprite, oldpos);
     AddSprite(sprite, newpos);
     return;
   }
   // sprite not any longer in this grid
-  printf("Grid: Sprite moved to new grid\n");
   iIsoGrid *newgrid = world->FindGrid(newpos);
   if(!newgrid) 
   {
     // uh oh sprite not any longer in *any* grid
-    sprite->SetGrid(NULL);
+    sprite->SetGrid(NULL); // so the sprite will not call me back
+    sprite->SetPosition(oldpos);
+    sprite->SetGrid(this);
+    // disallow the movement
     return;
   }
+  printf("Grid: Sprite moved to new grid\n");
+  GetCell(oldpos)->RemoveSprite(sprite, oldpos);
   sprite->SetGrid(newgrid);
   newgrid->AddSprite(sprite, newpos);
 }
