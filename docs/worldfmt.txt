@@ -126,15 +126,32 @@ Various basic objects:
 
   <vector> ::= 'V' '(' <vector-3d> ')'
 
-  <identity-matrix> ::= 'IDENTITY'
-  <rotation-x-matrix> ::= 'ROT_X' '(' <angle> ')'
-  <rotation-y-matrix> ::= 'ROT_Y' '(' <angle> ')'
-  <rotation-z-matrix> ::= 'ROT_Z' '(' <angle> ')'
-  <rotation-matrix-comp> ::= <rotation-x-matrix> | <rotation-y-matrix> | <rotation-z-matrix>
-  <rotation-matrix> ::= 'ROT' '(' { <rotation-matrix-comp> } ')'
-  <mult-matrix> ::= <number>
+  <matrix-scaler> ::= <number>
+  <matrix-x-scaler> ::= <matrix-scaler>
+  <matrix-y-scaler> ::= <matrix-scaler>
+  <matrix-z-scaler> ::= <matrix-scaler>
+  <stated-matrix-x-scaler> ::= 'SCALE_X' '(' <matrix-x-scaler> ')'
+  <stated-matrix-y-scaler> ::= 'SCALE_Y' '(' <matrix-y-scaler> ')'
+  <stated-matrix-z-scaler> ::= 'SCALE_Z' '(' <matrix-z-scaler> ')'
+  <complex-matrix-scaler> ::= <stated-matrix-x-scaler> | <stated-matrix-y-scaler> | <stated-matrix-z-scaler>
+  <full-matrix-scaler> ::= <matrix-x-scaler>, <matrix-y-scaler>, <matrix-z-scaler>
+  <uniform-matrix-scaler> ::= <matrix-scaler>
+  <simple-matrix-scaler> ::= 'SCALE' '(' <uniform-matrix-scaler> | <full-matrix-scaler> ')'
+  <compound-matrix-scaler> ::= <simple-matrix-scaler> | <complex-matrix-scaler>
+  <rotation-x-angle> ::= <angle>
+  <rotation-y-angle> ::= <angle>
+  <rotation-z-angle> ::= <angle>
+  <rotation-x-matrix> ::= 'ROT_X' '(' <rotation-x-angle> ')'
+  <rotation-y-matrix> ::= 'ROT_Y' '(' <rotation-y-angle> ')'
+  <rotation-z-matrix> ::= 'ROT_Z' '(' <rotation-z-angle> ')'
+  <complex-rotation-matrix> ::= <rotation-x-matrix> | <rotation-y-matrix> | <rotation-z-matrix>
+  <simple-rotation-matrix> ::= 'ROT' '(' <rotation-x-angle>, <rotation-y-angle>, <rotation-z-angle> ')'
+  <rotation-matrix> ::= <simple-rotation-matrix> | <complex-rotation-matrix>
+  <complex-matrix> ::= <rotation-matrix> | <compound-matrix-scaler>
+  <simple-scaled-matrix> ::= <uniform-matrix-scaler>
   <normal-matrix> ::= <vector-3d> ',' <vector-3d> ',' <vector-3d>
-  <matrix> ::= 'MATRIX '(' <identity-matrix> | <rotation-matrix> | <mult-matrix> | <normal-matrix> ')'
+  <identity-matrix> ::= 'IDENTITY'
+  <matrix> ::= 'MATRIX '(' <identity-matrix> | <normal-matrix> | <simple-scaled-matrix> | <complex-matrix>... ')'
 
 -----------------------------------------------------------------------------
 Various components:
