@@ -21,14 +21,14 @@ The first thing you need to do is to go to the Crystal Space directory and
 type:
 
 @example
-make csconfig
+make cs-config
 @end example
 
 This will create a script called @file{cs-config}.  Copy that script unmodified
 to the directory where your project is located.  Note that this script is
 platform dependent so you should not put it in your project's @sc{cvs}
 repository.  Everyone who uses your project will have to generate their own
-@file{cs-config} script by invoking @samp{make csconfig} from within the
+@file{cs-config} script by invoking @samp{make cs-config} from within the
 Crystal Space project directory.
 
 @subsubheading Makefile
