@@ -302,6 +302,8 @@ error2:
 
     if (Image->HasKeycolor())
     {
+      // Get the keycolor palette index and write the appropriate
+      // tRNS chunk.
       int key_r, key_g, key_b;
       Image->GetKeycolor (key_r, key_g, key_b);
       csRGBpixel key (key_r, key_g, key_b);
@@ -315,6 +317,7 @@ error2:
   }
   else
   {
+    //Write tRNS chunk with keycolor.
     if (Image->HasKeycolor())
     {
       int key_r, key_g, key_b;
@@ -509,8 +512,7 @@ nomem2:
       if (!(color_type & PNG_COLOR_MASK_ALPHA))
       {
         Format &= ~CS_IMGFMT_ALPHA;
-        // Expand paletted or RGB images with transparency to full alpha
-	// channels so the data will be available as RGBA quartets.
+        // Check if we have keycolor transparency.
         if (png_get_valid (png, info, PNG_INFO_tRNS))
 	{
 	  png_color_16p trans_values;
