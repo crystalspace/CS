@@ -3,6 +3,9 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+9-May-2003
+	- Philip Wyett added 'Makefile' to 'jam distclean', so at distclean
+	  the 'CS/' directory is again cleaned up fully. 
 8-May-2003
 	- Eric Sunshine fixed problem in MacOS/X OpenGL canvas where it was not
 	  specifying its SCF dependency properly.

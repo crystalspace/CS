@@ -16,7 +16,7 @@ Help meshes	  : "mesh plugin and loader compilegroup" ;
 
 # Create some clean targets
 Clean distclean : Jamconfig Jamfile
-		  cache.mak config.mak
+		  cache.mak config.mak Makefile
 		  config.log config.status config.cache
 		  include/volatile.h
 		  [ Wildcard *.scf ]
