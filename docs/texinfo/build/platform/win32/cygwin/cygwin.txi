@@ -168,3 +168,50 @@ To install. Extract the archive to a location of your choice. Open a Cygwin bash
 navigate to where you extracted the files. To be more exact the directory which contains the
 @file{Makefile}. Now at the prompt do: @file{make install} and hit @sc{return}. Wait for the
 prompt to re-appear and it's installed - That's it. :)
+
+@subsubheading Building
+
+Open a Cygwin bash prompt by wither using the desktop shortcut or the icon in the programs
+menu. Navigate to the @file{CS\} directory and issue the following commands.
+
+@example
+make cygwin MODE=debug
+make depend
+make -k all
+@end example
+
+Some Windows ME users have reported a system crash when running the 
+@samp{make cygwin} command. If you have that problem, try adding
+@samp{FORCEBUCK=SS} to the command line, like this:
+
+@example
+make cygwin MODE=debug FORCEBUCK=SS
+make depend
+make -k all
+@end example
+
+Note that making the @samp{depend} target is not absolutely required. If
+doing so presents problems, then you can safely omit it:
+
+@example
+make cygwin MODE=debug
+make -k all
+@end example
+
+@subsubheading Additional Command Line Compile Options
+
+You can also insert the @samp{clean} makefile target into the @samp{make}
+command, as follows:
+
+@example
+make -k clean all
+@end example
+
+@noindent
+This will first remove all object files, libraries, etc.  from the
+@file{CS\out\WIN32\X86\debug} directory and will then build the entire project.
+
+The @samp{-k} option used in the @samp{make -k all} command instructs the
+compiler to ignore errors and continue compiling regardless.
+
+@subsubheading Troubleshooting
