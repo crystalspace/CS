@@ -27,7 +27,7 @@
 #include "csutil/flags.h"
 #include "csutil/cscolor.h"
 #include "csutil/csvector.h"
-#include "csutil/garray.h"
+#include "csutil/array.h"
 #include "csutil/refarr.h"
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
@@ -266,14 +266,16 @@ private:
    */
   int cfg_moving;
 
-  /// The array of polygons forming the outside of the set
+  /// The array of static polygon data (csPolygon3DStatic).
+  csPolygonStaticArray static_polygons;
+  /// The array of dynamic polygon data (csPolygon3D).
   csPolygonArray polygons;
   /**
-   * A vector with polygons that contain portals (optimization).
-   * csPolygon3D will make sure to call AddPortalPolygon() and
+   * Polygon indices to polygons that contain portals (optimization).
+   * csPolygon3DStatic will make sure to call AddPortalPolygon() and
    * RemovePortalPolygon() when appropriate.
    */
-  csVector portal_polygons;
+  csArray<int> portal_polygons;
 
 #ifndef CS_USE_NEW_RENDERER
   /**
@@ -323,6 +325,8 @@ private:
 
   /// If true then this thing has been prepared (Prepare() function).
   bool prepared;
+  /// If true then dynamic polygon data has to be refreshed.
+  bool static_data_changed;
 
   float current_lod;
   uint32 current_features;
@@ -362,6 +366,7 @@ private:
    * This version uses iGraphics3D->DrawPolygonMesh()
    * for more efficient rendering. WARNING! This version only works for
    * lightmapped polygons right now and is far from complete.
+   * 't' is the movable transform.
    */
   void DrawPolygonArrayDPM (csPolygon3D** polygon, int num,
 	iRenderView* rview, iMovable* movable, csZBufMode zMode);
@@ -370,13 +375,16 @@ private:
    * Draw the given array of polygons.
    */
   void DrawPolygonArray (csPolygon3D** polygon, int num,
+	const csReversibleTransform& t,
 	iRenderView* rview, csZBufMode zMode);
 
   /**
    * Draw one 3D/2D polygon combination. The 2D polygon is the transformed
    * and clipped version of the 3D polygon.
+   * 't' is the movable transform.
    */
   static void DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
+	const csReversibleTransform& t,
 	iRenderView* d, csZBufMode zMode, const csPlane3& camera_plane);
 
   /**
@@ -490,7 +498,7 @@ public:
   //----------------------------------------------------------------------
 
   /// Add a polygon to this thing.
-  void AddPolygon (csPolygon3D* spoly);
+  void AddPolygon (csPolygon3DStatic* spoly, csPolygon3D* spoly);
 
   /// Create a new polygon in this thing and add it.
   csPolygon3D* NewPolygon (iMaterialWrapper* material);
@@ -498,6 +506,10 @@ public:
   /// Get the number of polygons in this thing.
   int GetPolygonCount ()
   { return polygons.Length (); }
+
+  /// Get the specified polygon from this set.
+  csPolygon3DStatic *GetPolygon3DStatic (int idx)
+  { return static_polygons.Get (idx); }
 
   /// Get the specified polygon from this set.
   csPolygon3D *GetPolygon3D (int idx)
@@ -612,6 +624,11 @@ public:
   void Prepare ();
 
   /**
+   * Called if static data in some polygon has changed.
+   */
+  void StaticDataChanged () { static_data_changed = true; }
+
+  /**
    * Merge the given Thing into this one. The other polygons and
    * curves are removed from the other thing so that it is ready to
    * be removed. Warning! All Things are merged in world space
@@ -699,16 +716,11 @@ public:
   void GetRadius (csVector3& rad, csVector3& cent);
 
   /**
-   * Add a polygon to the list of polygons having a portal.
-   * This function is called by a csPolygon3D in this thing
-   * whenever it gets a portal.
+   * When a portal is added/removed the portal list must be updated.
+   * Prepare() does this automatically But this function is useful in
+   * cases where you don't want the overhead of a full prepare.
    */
-  void AddPortalPolygon (csPolygon3D* poly);
-
-  /**
-   * Remove a polygon from the list of polygons having a portal.
-   */
-  void RemovePortalPolygon (csPolygon3D* poly);
+  void UpdatePortalList ();
 
   /**
    * Get a write object for a vis culling system.
@@ -779,7 +791,7 @@ public:
    * If 'pr' != NULL it will also return the distance where the
    * intersection happened.
    */
-  csPolygon3D* IntersectSphere (csVector3& center, float radius,
+  csPolygon3DStatic* IntersectSphere (csVector3& center, float radius,
   	float* pr = NULL);
 
   /**
@@ -811,7 +823,7 @@ public:
    * of this thing (if there is any). It also returns the mesh wrapper
    * that was hit. If this is NULL then this mesh was hit.
    */
-  csPolygon3D* IntersectSegmentFull (const csVector3& start,
+  csPolygon3DStatic* IntersectSegmentFull (const csVector3& start,
 	const csVector3& end, csVector3& isect,
 	float* pr = NULL, csMeshWrapper** p_mesh = NULL);
 

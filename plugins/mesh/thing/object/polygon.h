@@ -125,7 +125,7 @@ public:
 #define CS_POLY_LM_REFUSED	0x10000000
 
 /**
- * This is our main 3D polygon class. Polygons are used to construct the
+ * This is our main static 3D polygon class. Polygons are used to construct the
  * faces of things.
  *<p>
  * Polygons have a texture and lie on a plane. The plane does not
@@ -133,9 +133,10 @@ public:
  * does define how the texture is scaled and translated accross the surface
  * of the polygon (in case we are talking about lightmapped polygons).
  */
-class csPolygon3D : public iBase
+class csPolygon3DStatic : public iBase
 {
   friend class csPolyTexture;
+  friend class csPolygon3D;
 
 private:
   /// Name of this polygon.
@@ -169,25 +170,12 @@ private:
 
   /// The object space plane equation (this is fixed).
   csPlane3 plane_obj;
-  /// The world space plane equation.
-  csPlane3 plane_wor;
 
   /**
    * The material, this contains the texture handle,
    * the flat color (if no texture) and other parameters.
    */
   iMaterialWrapper* material;
-
-  /**
-   * List of light patches for this polygon.
-   */
-  csLightPatch *lightpatches;
-
-  /**
-   * Texture type specific information for this polygon. Can be
-   * csPolyTexLightMap.
-   */
-  csPolyTexLightMap *txt_info;
 
   /// How to map the lightmap on the polygon.
   csLightMapMapping* mapping;
@@ -222,20 +210,14 @@ public:
   /**
    * Construct a new polygon with the given material.
    */
-  csPolygon3D (iMaterialWrapper *mat);
+  csPolygon3DStatic (iMaterialWrapper *mat);
 
   /**
    * Delete everything related to this polygon. Less is
    * deleted if this polygon is a copy of another one (because
    * some stuff is shared).
    */
-  virtual ~csPolygon3D ();
-
-  /**
-   * Calculate the bounding box in (u,v) space for the lighted texture.
-   * This is used in case of lightmapping.
-   */
-  void CreateBoundingTextureBox ();
+  virtual ~csPolygon3DStatic ();
 
   ///
   void MappingSetTextureSpace (const csVector3& v_orig,
@@ -274,7 +256,7 @@ public:
    * Enable or disable texture mapping.
    */
   void EnableTextureMapping (bool enabled);
-  bool IsTextureMappingEnabled () const { return txt_info != NULL; }
+  bool IsTextureMappingEnabled () const { return mapping != NULL; }
 
   /**
    * Copy texture type settings from another polygon.
@@ -282,11 +264,6 @@ public:
    * information on how to apply that material to the polygon).
    */
   void CopyTextureType (iPolygon3DStatic* other_polygon);
-
-  /**
-   * Get the lightmap information.
-   */
-  csPolyTexLightMap *GetLightMapInfo () const { return txt_info; }
 
   /**
    * Get the lightmap mapping information.
@@ -327,6 +304,12 @@ public:
    * something has changed.
    */
   void ComputeNormal ();
+
+  /**
+   * Calculate the bounding box in (u,v) space for the lighted texture.
+   * This is used in case of lightmapping.
+   */
+  void CreateBoundingTextureBox ();
 
   /**
    * After the plane normal and the texture matrices have been set
@@ -381,43 +364,9 @@ public:
   }
 
   /**
-   * Return the plane of this polygon.  This function returns a 3D engine type
-   * csPolyPlane which encapsulates object, world, and camera space planes as
-   * well as the texture transformation.
-   */
-  //csPolyPlane* GetPlane () { return plane; }
-
-  /**
-   * Return the world-space plane of this polygon.
-   */
-  const csPlane3& GetPolyPlane () const { return plane_wor; }
-
-  /**
-   * Return the world-space plane of this polygon.
-   */
-  csPlane3& GetWorldPlane () { return plane_wor; }
-
-  /**
    * Return the object-space plane of this polygon.
    */
   csPlane3& GetObjectPlane () { return plane_obj; }
-
-  /**
-   * Transform the plane of this polygon from world space to camera space using
-   * the given matrices. One vertex on the plane is also given so
-   * that we can more easily recompute the 'D' component of the plane.
-   * The given vertex should be in camera space.
-   */
-  void WorldToCameraPlane (
-  	const csReversibleTransform& t,
-	const csVector3& vertex1,
-	csPlane3& camera_plane);
-
-  /**
-   * Other version which computes the camera space vertex itself.
-   */
-  void ComputeCameraPlane (const csReversibleTransform& t,
-  	csPlane3& pl);
 
   /**
    * Get the vertices.
@@ -453,43 +402,10 @@ public:
   /**
    * 'idx' is a local index into the vertices table of the polygon.
    * This index is translated to the index in the parent container and
-   * a reference to the vertex in world-space is returned.
-   */
-  const csVector3& Vwor (int idx) const
-  { return thing->Vwor (vertices.GetVertexIndices ()[idx]); }
-
-  /**
-   * 'idx' is a local index into the vertices table of the polygon.
-   * This index is translated to the index in the parent container and
    * a reference to the vertex in object-space is returned.
    */
   const csVector3& Vobj (int idx) const
   { return thing->Vobj (vertices.GetVertexIndices ()[idx]); }
-
-  /**
-   * 'idx' is a local index into the vertices table of the polygon.
-   * This index is translated to the index in the parent container and
-   * a reference to the vertex in camera-space is returned.
-   */
-  const csVector3& Vcam (int idx) const
-  { return thing->Vcam (vertices.GetVertexIndices ()[idx]); }
-
-  /**
-   * Before calling a series of Vcam() you should call
-   * UpdateTransformation() first to make sure that the camera vertex set
-   * is up-to-date.
-   */
-  void UpdateTransformation (const csTransform& c, long cam_cameranr)
-  {
-    thing->UpdateTransformation (c, cam_cameranr);
-  }
-
-  /**
-   * Before calling a series of Vwor() you should call
-   * WorUpdate() first to make sure that the world vertex set
-   * is up-to-date.
-   */
-  void WorUpdate () { thing->WorUpdate (); }
 
   /**
    * Set the material for this polygon.
@@ -600,178 +516,12 @@ public:
   void GetTextureSpace (csMatrix3&, csVector3&);
 
   /**
-   * Disconnect a dynamic light from this polygon.
-   */
-  void DynamicLightDisconnect (iDynLight* dynlight);
-
-  /**
-   * Unlink a light patch from the light patch list.
-   * Warning! This function does not test if the light patch
-   * is really on the list!
-   */
-  void UnlinkLightpatch (csLightPatch* lp);
-
-  /**
-   * Add a light patch to the light patch list.
-   */
-  void AddLightpatch (csLightPatch *lp);
-
-  /**
-   * Get the list of light patches for this polygon.
-   */
-  csLightPatch* GetLightpatches () { return lightpatches; }
-
-  /**
-   * Clip a polygon against a plane (in camera space).
-   * The plane is defined as going through v1, v2, and (0,0,0).
-   * The 'verts' array is modified and 'num' is also modified if needed.
-   */
-  void ClipPolyPlane (csVector3* verts, int* num, bool mirror,
-  	csVector3& v1, csVector3& v2);
-
-  /**
-   * Initialize the lightmaps for this polygon.
-   * Should be called before calling CalculateLighting() and before
-   * calling WriteToCache().
-   */
-  void InitializeDefault ();
-
-  /**
-   * This function will try to read the lightmap from the given file.
-   * Return NULL on success or else an error message.
-   */
-  const char* ReadFromCache (iFile* file);
-
-  /**
-   * Call after calling InitializeDefault() and CalculateLighting to cache
-   * the calculated lightmap to the file.
-   */
-  bool WriteToCache (iFile* file);
-
-  /**
-   * Prepare the lightmaps for use.
-   * This function also converts the lightmaps to the correct
-   * format required by the 3D driver. This function does NOT
-   * create the first lightmap. This is done by the precalculated
-   * lighting process (using CalculateLighting()).
-   */
-  void PrepareLighting ();
-
-  /**
-   * Fill the lightmap of this polygon according to the given light and
-   * the frustum. The light is given in world space coordinates. The
-   * view frustum is given in camera space (with (0,0,0) the origin
-   * of the frustum). The camera space used is just world space translated
-   * so that the center of the light is at (0,0,0).
-   * If the lightmaps were cached in the level archive this function will
-   * do nothing.
-   * The "frustum" parameter defines the original light frustum (not the
-   * one bounded by this polygon as given by "lview").
-   */
-  void FillLightMapDynamic (iFrustumView* lview);
-
-  /**
-   * Fill the lightmap of this polygon according to the given light and
-   * the frustum. The light is given in world space coordinates. The
-   * view frustum is given in camera space (with (0,0,0) the origin
-   * of the frustum). The camera space used is just world space translated
-   * so that the center of the light is at (0,0,0).
-   * If the lightmaps were cached in the level archive this function will
-   * do nothing.<p>
-   *
-   * The "frustum" parameter defines the original light frustum (not the
-   * one bounded by this polygon as given by "lview").<p>
-   *
-   * If 'vis' == false this means that the lighting system already discovered
-   * that the polygon is totally shadowed.
-   */
-  void FillLightMapStatic (iFrustumView* lview, csLightingPolyTexQueue* lptq,
-  	bool vis);
-
-  /**
-   * Check all shadow frustums and mark all relevant ones. A shadow
-   * frustum is relevant if it is (partially) inside the light frustum
-   * and if it is not obscured by other shadow frustums.
-   * In addition to the checking above this routine will return false
-   * if it can find a shadow frustum which totally obscures the light
-   * frustum. In this case it makes no sense to continue lighting the
-   * polygon.<br>
-   * This function will also discard all shadow frustums which start at
-   * the same plane as the given plane.
-   */
-  bool MarkRelevantShadowFrustums (iFrustumView* lview, csPlane3& plane);
-
-  /**
-   * Same as above but takes polygon plane as 'plane' argument.
-   */
-  bool MarkRelevantShadowFrustums (iFrustumView* lview);
-
-  /**
-   * Check visibility of this polygon with the given csFrustumView
-   * and update the light patches if needed.
-   * This function will also traverse through a portal if so needed.
-   * This version is for dynamic lighting.
-   */
-  void CalculateLightingDynamic (iFrustumView* lview);
-
-  /**
-   * Check visibility of this polygon with the given csFrustumView
-   * and fill the lightmap if needed (this function calls FillLightMap ()).
-   * This function will also traverse through a portal if so needed.
-   * If 'vis' == false this means that the lighting system already discovered
-   * that the polygon is totally shadowed.
-   * This version is for static lighting.
-   */
-  void CalculateLightingStatic (iFrustumView* lview,
-  	csLightingPolyTexQueue* lptq, bool vis);
-
-  /**
-   * Transform the plane of this polygon from object space to world space.
-   * 'vt' is a vertex of this polygon in world space.
-   */
-  void ObjectToWorld (const csReversibleTransform& t, const csVector3& vwor);
-
-  /**
    * Hard transform the plane of this polygon and also the
    * portal and lightmap info. This is similar to ObjectToWorld
    * but it does a hard transform of the object space planes
    * instead of keeping a transformation.
    */
   void HardTransform (const csReversibleTransform& t);
-
-  /**
-   * Clip this camera space polygon to the given plane. 'plane' can be NULL
-   * in which case no clipping happens.<p>
-   *
-   * If this function returns false then the polygon is not visible (backface
-   * culling, no visible vertices, ...) and 'verts' will be NULL. Otherwise
-   * this function will return true and 'verts' will point to the new
-   * clipped polygon (this is a pointer to a static table of vertices.
-   * WARNING! Because of this you cannot do new ClipToPlane calls until
-   * you have processed the 'verts' array!).<p>
-   *
-   * If 'cw' is true the polygon has to be oriented clockwise in order to be
-   * visible. Otherwise it is the other way around.
-   */
-  bool ClipToPlane (csPlane3* portal_plane, const csVector3& v_w2c,
-  	csVector3*& pverts, int& num_verts, bool cw = true);
-
-  /**
-   * This is the link between csPolygon3D and csPolygon2D (see below for
-   * more info about csPolygon2D). It should be used after the parent
-   * container has been transformed from world to camera space.
-   * It will fill the given csPolygon2D with a perspective corrected
-   * polygon that is also clipped to the view plane (Z=SMALL_Z).
-   * If all vertices are behind the view plane the polygon will not
-   * be visible and it will return false.
-   * 'do_perspective' will also do back-face culling and returns false
-   * if the polygon is not visible because of this.
-   * If the polygon is deemed to be visible it will return true.
-   */
-  bool DoPerspective (csVector3* source,
-  	int num_verts, csPolygon2D* dest, bool mirror,
-	int fov, float shift_x, float shift_y,
-	const csPlane3& plane_cam);
 
   /**
    * Classify this polygon with regards to a plane (in object space).  If this
@@ -795,7 +545,7 @@ public:
    * Check if this polygon (partially) overlaps the other polygon
    * from some viewpoint in space. This function works in object space.
    */
-  bool Overlaps (csPolygon3D* overlapped);
+  bool Overlaps (csPolygon3DStatic* overlapped);
 
   /**
    * Intersect object-space segment with the plane of this polygon. Return
@@ -865,11 +615,6 @@ public:
 
   /// Get the material handle for the texture manager.
   iMaterialHandle *GetMaterialHandle ();
-  /// Get the handle to the polygon texture object
-  iPolygonTexture *GetTexture ()
-  {
-    return txt_info ? txt_info->GetPolyTex () : (iPolygonTexture*)NULL;
-  }
 
   /// Sets the mode that is used for DrawPolygonFX.
   void SetMixMode (uint m)
@@ -889,9 +634,9 @@ public:
 
   struct eiPolygon3DStatic : public iPolygon3DStatic
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csPolygon3D);
+    SCF_DECLARE_EMBEDDED_IBASE (csPolygon3DStatic);
 
-    virtual csPolygon3D *GetPrivateObject () { return scfParent; }
+    virtual csPolygon3DStatic *GetPrivateObject () { return scfParent; }
     virtual const char* GetName () const { return scfParent->GetName (); }
     virtual void SetName (const char* name) { scfParent->SetName (name); }
     virtual iThingState *GetParent ();
@@ -1028,6 +773,332 @@ public:
     }
   } scfiPolygon3DStatic;
   friend struct eiPolygon3DStatic;
+};
+
+/**
+ * This is our main 3D polygon class. Polygons are used to construct the
+ * faces of things.
+ */
+class csPolygon3D : public iBase
+{
+  friend class csPolyTexture;
+
+private:
+  /// Pointer to static data.
+  csPolygon3DStatic* static_data;
+
+  /**
+   * @@@@@@@@@@@@@ DO WE NEED THIS HERE?
+   * The physical parent of this polygon.
+   * Important note for CS developers. If the parent of a polygon
+   * is changed in any way and this polygon has a portal then the
+   * portal needs to be removed from the old thing and added to the
+   * new thing (things keep a list of all polygons having a portal
+   * on them).
+   */
+  csThing* thing;
+
+  /// The world space plane equation.
+  csPlane3 plane_wor;
+
+  /**
+   * List of light patches for this polygon.
+   */
+  csLightPatch *lightpatches;
+
+  /**
+   * Texture type specific information for this polygon. Can be
+   * csPolyTexLightMap.
+   */
+  csPolyTexLightMap *txt_info;
+
+public:
+  /**
+   * Construct a new polygon with the given material.
+   */
+  csPolygon3D (csPolygon3DStatic* static_data);
+
+  /**
+   * Delete everything related to this polygon. Less is
+   * deleted if this polygon is a copy of another one (because
+   * some stuff is shared).
+   */
+  virtual ~csPolygon3D ();
+
+  /**
+   * Get the lightmap information.
+   */
+  csPolyTexLightMap *GetLightMapInfo () const { return txt_info; }
+
+  /**
+   * @@@@@@@@ NEEDED?
+   * After the plane normal and the texture matrices have been set
+   * up this routine makes some needed pre-calculations for this polygon.
+   * It will create a texture space bounding box that
+   * is going to be used for lighting and the texture cache.
+   * Then it will allocate the light map tables for this polygons.
+   * You also need to call this function if you make a copy of a
+   * polygon (using the copy constructor) or if you change the vertices
+   * in a polygon.
+   */
+  void Finish ();
+
+  /**
+   * Refresh texture mapping and other info from static polygon.
+   */
+  void RefreshFromStaticData ();
+
+  /**
+   * @@@@@ NEEDED?
+   * Set the thing that this polygon belongs to.
+   */
+  void SetParent (csThing* thing);
+
+  /**
+   * @@@@@ NEEDED?
+   * Get the polygonset (container) that this polygons belongs to.
+   */
+  csThing* GetParent () { return thing; }
+
+  /**
+   * Get static data.
+   */
+  csPolygon3DStatic* GetStaticData () const { return static_data; }
+
+  /**
+   * Return the world-space plane of this polygon.
+   */
+  const csPlane3& GetPolyPlane () const { return plane_wor; }
+
+  /**
+   * Return the world-space plane of this polygon.
+   */
+  csPlane3& GetWorldPlane () { return plane_wor; }
+
+  /**
+   * Transform the plane of this polygon from world space to camera space using
+   * the given matrices. One vertex on the plane is also given so
+   * that we can more easily recompute the 'D' component of the plane.
+   * The given vertex should be in camera space.
+   */
+  void WorldToCameraPlane (
+  	const csReversibleTransform& t,
+	const csVector3& vertex1,
+	csPlane3& camera_plane);
+
+  /**
+   * Other version which computes the camera space vertex itself.
+   */
+  void ComputeCameraPlane (const csReversibleTransform& t,
+  	csPlane3& pl);
+
+  /**
+   * 'idx' is a local index into the vertices table of the polygon.
+   * This index is translated to the index in the parent container and
+   * a reference to the vertex in world-space is returned.
+   */
+  const csVector3& Vwor (int idx) const
+  { return thing->Vwor (static_data->vertices.GetVertexIndices ()[idx]); }
+
+  /**
+   * 'idx' is a local index into the vertices table of the polygon.
+   * This index is translated to the index in the parent container and
+   * a reference to the vertex in camera-space is returned.
+   */
+  const csVector3& Vcam (int idx) const
+  { return thing->Vcam (static_data->vertices.GetVertexIndices ()[idx]); }
+
+  /**
+   * Before calling a series of Vcam() you should call
+   * UpdateTransformation() first to make sure that the camera vertex set
+   * is up-to-date.
+   */
+  void UpdateTransformation (const csTransform& c, long cam_cameranr)
+  {
+    thing->UpdateTransformation (c, cam_cameranr);
+  }
+
+  /**
+   * Before calling a series of Vwor() you should call
+   * WorUpdate() first to make sure that the world vertex set
+   * is up-to-date.
+   */
+  void WorUpdate () { thing->WorUpdate (); }
+
+  /**
+   * Disconnect a dynamic light from this polygon.
+   */
+  void DynamicLightDisconnect (iDynLight* dynlight);
+
+  /**
+   * Unlink a light patch from the light patch list.
+   * Warning! This function does not test if the light patch
+   * is really on the list!
+   */
+  void UnlinkLightpatch (csLightPatch* lp);
+
+  /**
+   * Add a light patch to the light patch list.
+   */
+  void AddLightpatch (csLightPatch *lp);
+
+  /**
+   * Get the list of light patches for this polygon.
+   */
+  csLightPatch* GetLightpatches () { return lightpatches; }
+
+  /**
+   * Clip a polygon against a plane (in camera space).
+   * The plane is defined as going through v1, v2, and (0,0,0).
+   * The 'verts' array is modified and 'num' is also modified if needed.
+   */
+  void ClipPolyPlane (csVector3* verts, int* num, bool mirror,
+  	csVector3& v1, csVector3& v2);
+
+  /**
+   * Initialize the lightmaps for this polygon.
+   * Should be called before calling CalculateLighting() and before
+   * calling WriteToCache().
+   */
+  void InitializeDefault ();
+
+  /**
+   * This function will try to read the lightmap from the given file.
+   * Return NULL on success or else an error message.
+   */
+  const char* ReadFromCache (iFile* file);
+
+  /**
+   * Call after calling InitializeDefault() and CalculateLighting to cache
+   * the calculated lightmap to the file.
+   */
+  bool WriteToCache (iFile* file);
+
+  /**
+   * Prepare the lightmaps for use.
+   * This function also converts the lightmaps to the correct
+   * format required by the 3D driver. This function does NOT
+   * create the first lightmap. This is done by the precalculated
+   * lighting process (using CalculateLighting()).
+   */
+  void PrepareLighting ();
+
+  /**
+   * Fill the lightmap of this polygon according to the given light and
+   * the frustum. The light is given in world space coordinates. The
+   * view frustum is given in camera space (with (0,0,0) the origin
+   * of the frustum). The camera space used is just world space translated
+   * so that the center of the light is at (0,0,0).
+   * If the lightmaps were cached in the level archive this function will
+   * do nothing.
+   * The "frustum" parameter defines the original light frustum (not the
+   * one bounded by this polygon as given by "lview").
+   */
+  void FillLightMapDynamic (iFrustumView* lview);
+
+  /**
+   * Fill the lightmap of this polygon according to the given light and
+   * the frustum. The light is given in world space coordinates. The
+   * view frustum is given in camera space (with (0,0,0) the origin
+   * of the frustum). The camera space used is just world space translated
+   * so that the center of the light is at (0,0,0).
+   * If the lightmaps were cached in the level archive this function will
+   * do nothing.<p>
+   *
+   * The "frustum" parameter defines the original light frustum (not the
+   * one bounded by this polygon as given by "lview").<p>
+   *
+   * If 'vis' == false this means that the lighting system already discovered
+   * that the polygon is totally shadowed.
+   */
+  void FillLightMapStatic (iFrustumView* lview, csLightingPolyTexQueue* lptq,
+  	bool vis);
+
+  /**
+   * Check all shadow frustums and mark all relevant ones. A shadow
+   * frustum is relevant if it is (partially) inside the light frustum
+   * and if it is not obscured by other shadow frustums.
+   * In addition to the checking above this routine will return false
+   * if it can find a shadow frustum which totally obscures the light
+   * frustum. In this case it makes no sense to continue lighting the
+   * polygon.<br>
+   * This function will also discard all shadow frustums which start at
+   * the same plane as the given plane.
+   */
+  bool MarkRelevantShadowFrustums (iFrustumView* lview, csPlane3& plane);
+
+  /**
+   * Same as above but takes polygon plane as 'plane' argument.
+   */
+  bool MarkRelevantShadowFrustums (iFrustumView* lview);
+
+  /**
+   * Check visibility of this polygon with the given csFrustumView
+   * and update the light patches if needed.
+   * This function will also traverse through a portal if so needed.
+   * This version is for dynamic lighting.
+   */
+  void CalculateLightingDynamic (iFrustumView* lview, iMovable* movable);
+
+  /**
+   * Check visibility of this polygon with the given csFrustumView
+   * and fill the lightmap if needed (this function calls FillLightMap ()).
+   * This function will also traverse through a portal if so needed.
+   * If 'vis' == false this means that the lighting system already discovered
+   * that the polygon is totally shadowed.
+   * This version is for static lighting.
+   */
+  void CalculateLightingStatic (iFrustumView* lview, iMovable* movable,
+  	csLightingPolyTexQueue* lptq, bool vis);
+
+  /**
+   * Transform the plane of this polygon from object space to world space.
+   * 'vt' is a vertex of this polygon in world space.
+   */
+  void ObjectToWorld (const csReversibleTransform& t, const csVector3& vwor);
+
+  /**
+   * Clip this camera space polygon to the given plane. 'plane' can be NULL
+   * in which case no clipping happens.<p>
+   *
+   * If this function returns false then the polygon is not visible (backface
+   * culling, no visible vertices, ...) and 'verts' will be NULL. Otherwise
+   * this function will return true and 'verts' will point to the new
+   * clipped polygon (this is a pointer to a static table of vertices.
+   * WARNING! Because of this you cannot do new ClipToPlane calls until
+   * you have processed the 'verts' array!).<p>
+   *
+   * If 'cw' is true the polygon has to be oriented clockwise in order to be
+   * visible. Otherwise it is the other way around.
+   */
+  bool ClipToPlane (csPlane3* portal_plane, const csVector3& v_w2c,
+  	csVector3*& pverts, int& num_verts, bool cw = true);
+
+  /**
+   * This is the link between csPolygon3D and csPolygon2D (see below for
+   * more info about csPolygon2D). It should be used after the parent
+   * container has been transformed from world to camera space.
+   * It will fill the given csPolygon2D with a perspective corrected
+   * polygon that is also clipped to the view plane (Z=SMALL_Z).
+   * If all vertices are behind the view plane the polygon will not
+   * be visible and it will return false.
+   * 'do_perspective' will also do back-face culling and returns false
+   * if the polygon is not visible because of this.
+   * If the polygon is deemed to be visible it will return true.
+   */
+  bool DoPerspective (csVector3* source,
+  	int num_verts, csPolygon2D* dest, bool mirror,
+	int fov, float shift_x, float shift_y,
+	const csPlane3& plane_cam);
+
+  /// Get the handle to the polygon texture object
+  iPolygonTexture *GetTexture ()
+  {
+    return txt_info ? txt_info->GetPolyTex () : (iPolygonTexture*)NULL;
+  }
+
+  SCF_DECLARE_IBASE;
+
   //------------------- iPolygon3D interface implementation -------------------
 
   struct eiPolygon3D : public iPolygon3D
@@ -1038,7 +1109,7 @@ public:
     virtual iThingState *GetParent ();
     virtual iPolygon3DStatic* GetStaticData () const
     {
-      return &(scfParent->scfiPolygon3DStatic);
+      return &(scfParent->GetStaticData ()->scfiPolygon3DStatic);
     }
 
     virtual iLightMap *GetLightMap ()

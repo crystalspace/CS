@@ -253,12 +253,13 @@ const char* csLightMap::ReadFromCache (
   strcpy (pswanted.header, LMMAGIC);
   if (poly)
   {
-    pswanted.x1 = float2short (poly->Vobj (0).x);
-    pswanted.y1 = float2short (poly->Vobj (0).y);
-    pswanted.z1 = float2short (poly->Vobj (0).z);
-    pswanted.x2 = float2short (poly->Vobj (1).x);
-    pswanted.y2 = float2short (poly->Vobj (1).y);
-    pswanted.z2 = float2short (poly->Vobj (1).z);
+    csPolygon3DStatic* spoly = poly->GetStaticData ();
+    pswanted.x1 = float2short (spoly->Vobj (0).x);
+    pswanted.y1 = float2short (spoly->Vobj (0).y);
+    pswanted.z1 = float2short (spoly->Vobj (0).z);
+    pswanted.x2 = float2short (spoly->Vobj (1).x);
+    pswanted.y2 = float2short (spoly->Vobj (1).y);
+    pswanted.z2 = float2short (spoly->Vobj (1).z);
   }
   pswanted.lm_size = lm_size;
   pswanted.lm_cnt = 111;
@@ -451,12 +452,13 @@ void csLightMap::Cache (
   strcpy (ps.header, LMMAGIC);
   if (poly)
   {
-    ps.x1 = convert_endian (float2short (poly->Vobj (0).x));
-    ps.y1 = convert_endian (float2short (poly->Vobj (0).y));
-    ps.z1 = convert_endian (float2short (poly->Vobj (0).z));
-    ps.x2 = convert_endian (float2short (poly->Vobj (1).x));
-    ps.y2 = convert_endian (float2short (poly->Vobj (1).y));
-    ps.z2 = convert_endian (float2short (poly->Vobj (1).z));
+    csPolygon3DStatic* spoly = poly->GetStaticData ();
+    ps.x1 = convert_endian (float2short (spoly->Vobj (0).x));
+    ps.y1 = convert_endian (float2short (spoly->Vobj (0).y));
+    ps.z1 = convert_endian (float2short (spoly->Vobj (0).z));
+    ps.x2 = convert_endian (float2short (spoly->Vobj (1).x));
+    ps.y2 = convert_endian (float2short (spoly->Vobj (1).y));
+    ps.z2 = convert_endian (float2short (spoly->Vobj (1).z));
   }
 
   if (file->Write ("lmpn", 4) != 4)

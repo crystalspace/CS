@@ -40,6 +40,7 @@ struct iPolyTexType;
 class csReversibleTransform;
 class csPlane3;
 class csPolygon3D;
+class csPolygon3DStatic;
 class csVector3;
 class csVector2;
 class csMatrix3;
@@ -70,7 +71,7 @@ SCF_VERSION (iPolygon3DStatic, 0, 2, 0);
 struct iPolygon3DStatic : public iBase
 {
   /// @@@ UGLY! Used by engine to retrieve internal object structure
-  virtual csPolygon3D *GetPrivateObject () = 0;
+  virtual csPolygon3DStatic *GetPrivateObject () = 0;
 
   /// Get the name of this polygon.
   virtual const char* GetName () const = 0;

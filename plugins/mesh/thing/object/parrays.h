@@ -25,9 +25,39 @@
 #include "curve.h"
 
 class csPolygon3D;
+class csPolygon3DStatic;
 
 /// A dynamic array of csCurve objects
 typedef csPDelArray<csCurve> csCurvesArray;
+
+/**
+ * An dynamic array of csPolygon3DStatic objects.
+ * This class is used in polygon set class and thing template class
+ * for storing the polygons that the model consists of.
+ */
+class csPolygonStaticArray : public csVector
+{
+public:
+  /// Create the polygon array object
+  csPolygonStaticArray (int iLimit, int iDelta) : csVector (iLimit, iDelta)
+  { }
+
+  /// Destroy the polygon array and all inserted polygons
+  virtual ~csPolygonStaticArray ();
+
+  /// Delete a particular array element
+  virtual bool FreeItem (csSome Item);
+
+  /// Find a polygon by name
+  virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
+
+  /// Get a polygon given its index in the array
+  csPolygon3DStatic *Get (int iIndex) const;
+
+  /// Get the entire array of polygons as an array of pointers
+  csPolygon3DStatic **GetArray ()
+  { return (csPolygon3DStatic **)root; }
+};
 
 /**
  * An dynamic array of csPolygon3D objects.

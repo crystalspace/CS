@@ -19,6 +19,14 @@ The history order is reversed so that new features are at the top.
 	  csendian.h, for converting doubles to a portable format, like
 	  float2long and long2float. Commented out for now because it doesn't
 	  work on all compilers.
+	- Removed world space warping transformation in portals. Instead this
+	  is now calculated as needed. This part is less optimal but in addition
+	  I optimized the fact that the warp matrix is no longer transformed
+	  if a thing moves and there is no warping.
+	- Physically split csPolygon3D into csPolygon3DStatic and csPolygon3D.
+	  This is the next step into seperating static thing and mesh objects.
+	- Several internal orginizations are caused by this in the thing
+	  mesh plugin.
 	- Keith Fulton committed a fix made by Andrew Mann which caused
 	  socket-attached sprites to be off by 1 frame in their position
 	  as they follow the parent socket.

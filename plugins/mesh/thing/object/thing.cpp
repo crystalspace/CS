@@ -45,6 +45,7 @@
 #include "csutil/debug.h"
 #include "csutil/csmd5.h"
 #include "csutil/array.h"
+#include "csutil/garray.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/vbufmgr.h"
 #include "ivideo/texture.h"
@@ -116,8 +117,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 int csThing:: last_thing_id = 0;
 
 csThing::csThing (iBase *parent, csThingObjectType* thing_type) :
-  polygons(64, 64),
-  curves(16, 16)
+  static_polygons(32, 64), polygons(32, 64),
+  curves(4, 16)
 {
   csThing::thing_type = thing_type;
 
@@ -170,6 +171,7 @@ csThing::csThing (iBase *parent, csThingObjectType* thing_type) :
   cfg_moving = CS_THING_MOVE_NEVER;
 
   prepared = false;
+  static_data_changed = false;
 
   current_lod = 1;
   current_features = 0;
@@ -208,8 +210,6 @@ csThing::~csThing ()
   delete bbox;
 
   polygons.DeleteAll ();          // delete prior to portal_poly array !
-  if (portal_polygons.Length ()) portal_polygons.DeleteAll ();
-
   delete [] obj_normals;
 }
 
@@ -354,6 +354,7 @@ void csThing::WorUpdate ()
 	  csReversibleTransform movtrans;	// Identity.
 	  // @@@ It is possible to optimize the below too. Don't know
 	  // if it is worth it though.
+	  //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
           for (i = 0; i < polygons.Length (); i++)
           {
             csPolygon3D *p = GetPolygon3D (i);
@@ -432,7 +433,7 @@ void csThing::CalculateNormals ()
   PolygonsForVertex* pvv = new PolygonsForVertex[num_vertices];
   for (i = 0 ; i < polyCount ; i++)
   {
-    csPolygon3D* p = polygons.Get (i);
+    csPolygon3DStatic* p = static_polygons.Get (i);
     int* vtidx = p->GetVertexIndices ();
     for (j = 0 ; j < p->GetVertexCount () ; j++)
     {
@@ -459,10 +460,38 @@ void csThing::CalculateNormals ()
   delete[] pvv;
 }
 
+void csThing::UpdatePortalList ()
+{
+  int i;
+  csPolygon3DStatic* sp;
+  portal_polygons.DeleteAll ();
+  for (i = 0; i < static_polygons.Length (); i++)
+  {
+    sp = static_polygons.Get (i);
+    if (sp->GetPortal ())
+      portal_polygons.Push (i);
+  }
+}
+
 void csThing::Prepare ()
 {
-  if (prepared) return ;
+  if (prepared)
+  {
+    if (static_data_changed)
+    {
+      static_data_changed = false;
+      int i;
+      for (i = 0 ; i < polygons.Length () ; i++)
+      {
+        csPolygon3D* p = polygons.Get (i);
+	p->RefreshFromStaticData ();
+      }
+    }
+    return;
+  }
+
   prepared = true;
+  static_data_changed = false;
   shapenr++;
   if (thing_type->engine)
   {
@@ -487,10 +516,17 @@ void csThing::Prepare ()
 
   int i;
   csPolygon3D *p;
+  csPolygon3DStatic* sp;
+  portal_polygons.DeleteAll ();
   for (i = 0; i < polygons.Length (); i++)
   {
+    sp = static_polygons.Get (i);
+    sp->Finish ();
     p = polygons.Get (i);
+    p->RefreshFromStaticData ();
     p->Finish ();
+    if (sp->GetPortal ())
+      portal_polygons.Push (i);
   }
 
   FireListeners ();
@@ -811,9 +847,9 @@ void csThing::CompressVertices ()
   num_vertices = max_vertices = count_unique;
 
   // Now we can remap the vertices in all polygons.
-  for (i = 0; i < polygons.Length (); i++)
+  for (i = 0; i < static_polygons.Length (); i++)
   {
-    csPolygon3D *p = polygons.Get (i);
+    csPolygon3DStatic *p = static_polygons.Get (i);
     csPolyIndexed &pi = p->GetVertices ();
     int *idx = pi.GetVertexIndices ();
     for (j = 0; j < pi.GetVertexCount (); j++) idx[j] = vt[idx[j]].new_idx;
@@ -835,9 +871,9 @@ void csThing::RemoveUnusedVertices ()
   for (i = 0; i < num_vertices; i++) used[i] = false;
 
   // Mark all vertices that are used as used.
-  for (i = 0; i < polygons.Length (); i++)
+  for (i = 0; i < static_polygons.Length (); i++)
   {
-    csPolygon3D *p = polygons.Get (i);
+    csPolygon3DStatic *p = static_polygons.Get (i);
     csPolyIndexed &pi = p->GetVertices ();
     int *idx = pi.GetVertexIndices ();
     for (j = 0; j < pi.GetVertexCount (); j++) used[idx[j]] = true;
@@ -891,9 +927,9 @@ void csThing::RemoveUnusedVertices ()
   num_vertices = max_vertices = count_relevant;
 
   // Now we can remap the vertices in all polygons.
-  for (i = 0; i < polygons.Length (); i++)
+  for (i = 0; i < static_polygons.Length (); i++)
   {
-    csPolygon3D *p = polygons.Get (i);
+    csPolygon3DStatic *p = static_polygons.Get (i);
     csPolyIndexed &pi = p->GetVertices ();
     int *idx = pi.GetVertexIndices ();
     for (j = 0; j < pi.GetVertexCount (); j++) idx[j] = relocate[idx[j]];
@@ -914,8 +950,8 @@ csPolygon3D *csThing::GetPolygon3D (const char *name)
 
 int csThing::FindPolygonIndex (iPolygon3DStatic *polygon) const
 {
-  csPolygon3D *p = polygon->GetPrivateObject ();
-  return polygons.Find (p);
+  csPolygon3DStatic *p = polygon->GetPrivateObject ();
+  return static_polygons.Find (p);
 }
 
 int csThing::FindPolygonIndex (iPolygon3D *polygon) const
@@ -926,8 +962,9 @@ int csThing::FindPolygonIndex (iPolygon3D *polygon) const
 
 csPolygon3D *csThing::NewPolygon (iMaterialWrapper *material)
 {
-  csPolygon3D *p = new csPolygon3D (material);
-  AddPolygon (p);
+  csPolygon3DStatic *sp = new csPolygon3DStatic (material);
+  csPolygon3D *p = new csPolygon3D (sp);
+  AddPolygon (sp, p);
   return p;
 }
 
@@ -958,13 +995,7 @@ void csThing::InvalidateThing ()
 void csThing::RemovePolygon (int idx)
 {
   InvalidateThing ();
-
-  csPolygon3D *poly3d = GetPolygon3D (idx);
-  if (poly3d->GetPortal ())
-  {
-    RemovePortalPolygon (poly3d);
-  }
-
+  static_polygons.Delete (idx);
   polygons.Delete (idx);
 }
 
@@ -980,13 +1011,14 @@ void csThing::RemovePolygons ()
   if (portal_polygons.Length ()) portal_polygons.DeleteAll ();
 }
 
-void csThing::AddPolygon (csPolygon3D *poly)
+void csThing::AddPolygon (csPolygon3DStatic* spoly, csPolygon3D *poly)
 {
   InvalidateThing ();
 
+  spoly->SetParent (this);
   poly->SetParent (this);
+  static_polygons.Push (spoly);
   polygons.Push (poly);
-  if (poly->GetPortal ()) AddPortalPolygon (poly);
 }
 
 csCurve *csThing::GetCurve (char *name) const
@@ -1060,9 +1092,9 @@ void csThing::HardTransform (const csReversibleTransform &t)
   //-------
   // Now transform the polygons.
   //-------
-  for (i = 0; i < polygons.Length (); i++)
+  for (i = 0; i < static_polygons.Length (); i++)
   {
-    csPolygon3D *p = GetPolygon3D (i);
+    csPolygon3DStatic *p = GetPolygon3DStatic (i);
     p->HardTransform (t);
   }
 
@@ -1074,7 +1106,7 @@ void csThing::HardTransform (const csReversibleTransform &t)
   }
 }
 
-csPolygon3D *csThing::IntersectSegmentFull (
+csPolygon3DStatic *csThing::IntersectSegmentFull (
   const csVector3 &start,
   const csVector3 &end,
   csVector3 &isect,
@@ -1086,13 +1118,13 @@ csPolygon3D *csThing::IntersectSegmentFull (
   int i;
   float r, best_r = 2000000000.;
   csVector3 cur_isect;
-  csPolygon3D *best_p = NULL;
+  csPolygon3DStatic *best_p = NULL;
 
   // @@@ This routine is not very optimal. Especially for things
   // with large number of polygons.
-  for (i = 0; i < polygons.Length (); i++)
+  for (i = 0; i < static_polygons.Length (); i++)
   {
-    csPolygon3D *p = polygons.Get (i);
+    csPolygon3DStatic *p = static_polygons.Get (i);
     if (p->IntersectSegment (start, end, cur_isect, &r))
     {
       if (r < best_r)
@@ -1124,13 +1156,13 @@ csPolygon3D *csThing::IntersectSegment (
     csPolygon3D *best_p = NULL;
     for (i = 0; i < portal_polygons.Length (); i++)
     {
-      csPolygon3D *p = (csPolygon3D *)portal_polygons[i];
+      csPolygon3DStatic *p = static_polygons.Get (portal_polygons[i]);
       if (p->IntersectSegment (start, end, cur_isect, &r))
       {
         if (r < best_r)
         {
           best_r = r;
-          best_p = p;
+          best_p = polygons.Get (portal_polygons[i]);
           isect = cur_isect;
         }
       }
@@ -1147,15 +1179,15 @@ csPolygon3D *csThing::IntersectSegment (
 
   // @@@ This routine is not very optimal. Especially for things
   // with large number of polygons.
-  for (i = 0; i < polygons.Length (); i++)
+  for (i = 0; i < static_polygons.Length (); i++)
   {
-    csPolygon3D *p = polygons.Get (i);
+    csPolygon3DStatic *p = static_polygons.Get (i);
     if (p->IntersectSegment (start, end, cur_isect, &r))
     {
       if (r < best_r)
       {
         best_r = r;
-        best_p = p;
+        best_p = polygons.Get (i);
         isect = cur_isect;
       }
     }
@@ -1173,9 +1205,9 @@ bool csThing::HitBeamOutline (const csVector3& start,
 
   // @@@ This routine is not very optimal. Especially for things
   // with large number of polygons.
-  for (i = 0; i < polygons.Length (); i++)
+  for (i = 0; i < static_polygons.Length (); i++)
   {
-    csPolygon3D *p = polygons.Get (i);
+    csPolygon3DStatic *p = static_polygons.Get (i);
     if (p->IntersectSegment (start, end, isect, &r))
     {
       if (pr) *pr = r;
@@ -1198,6 +1230,7 @@ bool csThing::HitBeamObject (const csVector3& start,
 void csThing::DrawOnePolygon (
   csPolygon3D *p,
   csPolygon2D *poly,
+  const csReversibleTransform& t,
   iRenderView *d,
   csZBufMode zMode,
   const csPlane3& camera_plane)
@@ -1212,7 +1245,8 @@ void csThing::DrawOnePolygon (
     d->GetFirstFogInfo ()->outgoing_plane = camera_plane;
   }
 
-  csPortal *po = p->GetPortal ();
+  csPolygon3DStatic* sp = p->GetStaticData ();
+  csPortal *po = sp->GetPortal ();
   //@@@if (csSector::do_portals && po)
   if (po)
   {
@@ -1228,7 +1262,7 @@ void csThing::DrawOnePolygon (
     csPlane3 keep_plane;
     if (d->GetGraphics3D ()->GetRenderState (
           G3DRENDERSTATE_TRANSPARENCYENABLE))
-      filtered = p->IsTransparent ();
+      filtered = sp->IsTransparent ();
     if (filtered || is_this_fog || (po && po->flags.Check (CS_PORTAL_ZFILL)))
     {
       keep_plane = camera_plane;
@@ -1249,7 +1283,7 @@ void csThing::DrawOnePolygon (
     // Draw through the portal. If this fails we draw the original polygon
     // instead. Drawing through a portal can fail because we have reached
     // the maximum number that a sector is drawn (for mirrors).
-    if (po->Draw (poly, &(p->scfiPolygon3D), d, keep_plane))
+    if (po->Draw (poly, &(p->scfiPolygon3D), t, d, keep_plane))
     {
       if (filtered)
       {
@@ -1298,6 +1332,7 @@ void csThing::DrawOnePolygon (
 void csThing::DrawPolygonArray (
   csPolygon3D **polygon,
   int num,
+  const csReversibleTransform& t,
   iRenderView *d,
   csZBufMode zMode)
 {
@@ -1347,7 +1382,7 @@ void csThing::DrawPolygonArray (
 	      plane_cam) &&
           clip->ClipAgainst (d->GetClipper ()))
         {
-          DrawOnePolygon (p, clip, d, zMode, plane_cam);
+          DrawOnePolygon (p, clip, t, d, zMode, plane_cam);
         }
 
         render_pool->Free (clip);
@@ -1360,6 +1395,7 @@ struct MatPol
 {
   iMaterialWrapper *mat;
   int mat_index;
+  csPolygon3DStatic *spoly;
   csPolygon3D *poly;
 };
 
@@ -1390,11 +1426,12 @@ void csThing::PreparePolygonBuffer ()
   //-----
   // First collect all material wrappers and polygons.
   //-----
-  MatPol *matpol = new MatPol[polygons.Length ()];
-  for (i = 0; i < polygons.Length (); i++)
+  MatPol *matpol = new MatPol[static_polygons.Length ()];
+  for (i = 0; i < static_polygons.Length (); i++)
   {
+    matpol[i].spoly = GetPolygon3DStatic (i);
     matpol[i].poly = GetPolygon3D (i);
-    matpol[i].mat = matpol[i].poly->GetMaterialWrapper ();
+    matpol[i].mat = matpol[i].spoly->GetMaterialWrapper ();
   }
 
   //-----
@@ -1442,10 +1479,11 @@ void csThing::PreparePolygonBuffer ()
   //-----
   // Now add the polygons to the polygon buffer sorted by material.
   //-----
-  for (i = 0; i < polygons.Length (); i++)
+  for (i = 0; i < static_polygons.Length (); i++)
   {
+    csPolygon3DStatic *spoly = matpol[i].spoly;
+    csLightMapMapping *mapping = spoly->GetLightMapMapping ();
     csPolygon3D *poly = matpol[i].poly;
-    csLightMapMapping *mapping = poly->GetLightMapMapping ();
     csPolyTexLightMap* lmi = poly->GetLightMapInfo ();
 
     // @@@ what if lmi == NULL?
@@ -1453,9 +1491,9 @@ void csThing::PreparePolygonBuffer ()
     if (mapping)
     {
       polybuf->AddPolygon (
-          poly->GetVertexIndices (),
-          poly->GetVertexCount (),
-          poly->GetObjectPlane (),
+          spoly->GetVertexIndices (),
+          spoly->GetVertexCount (),
+          spoly->GetObjectPlane (),
           matpol[i].mat_index,
           mapping->m_obj2tex,
           mapping->v_obj2tex,
@@ -1466,9 +1504,9 @@ void csThing::PreparePolygonBuffer ()
       csMatrix3 m_obj2tex;	// @@@
       csVector3 v_obj2tex;
       polybuf->AddPolygon (
-          poly->GetVertexIndices (),
-          poly->GetVertexCount (),
-          poly->GetObjectPlane (),
+          spoly->GetVertexIndices (),
+          spoly->GetVertexCount (),
+          spoly->GetObjectPlane (),
           matpol[i].mat_index,
           m_obj2tex,
           v_obj2tex,
@@ -1641,12 +1679,14 @@ void csThing::AppendShadows (
       polygons.Length ());
   csFrustum *frust;
   int i, j;
+  csPolygon3DStatic *sp;
   csPolygon3D *p;
   bool cw = true;                   //@@@ Use mirroring parameter here!
-  for (i = 0; i < polygons.Length (); i++)
+  for (i = 0; i < static_polygons.Length (); i++)
   {
+    sp = static_polygons.Get (i);
+    if (sp->GetPortal ()) continue;  // No portals
     p = polygons.Get (i);
-    if (p->GetPortal ()) continue;  // No portals
 
     //if (p->GetPlane ()->VisibleFromPoint (origin) != cw) continue;
     float clas = p->GetWorldPlane ().Classify (origin);
@@ -1659,9 +1699,9 @@ void csThing::AppendShadows (
     frust = list->AddShadow (
         origin,
         (void *)p,
-        p->GetVertices ().GetVertexCount (),
+        sp->GetVertices ().GetVertexCount (),
         pl);
-    for (j = 0; j < p->GetVertices ().GetVertexCount (); j++)
+    for (j = 0; j < sp->GetVertices ().GetVertexCount (); j++)
       frust->GetVertex (j).Set (p->Vwor (j) - origin);
   }
 }
@@ -1927,10 +1967,10 @@ void PolyMeshHelper::Setup ()
   num_poly = 0;
 
   int i, j;
-  const csPolygonArray &pol = thing->polygons;
+  const csPolygonStaticArray &pol = thing->static_polygons;
   for (i = 0; i < thing->GetPolygonCount (); i++)
   {
-    csPolygon3D *p = pol.Get (i);
+    csPolygon3DStatic *p = pol.Get (i);
     if (p->flags.Check (poly_flag)) num_poly++;
   }
 
@@ -1976,7 +2016,7 @@ void PolyMeshHelper::Setup ()
     num_poly = 0;
     for (i = 0; i < thing->GetPolygonCount (); i++)
     {
-      csPolygon3D *p = pol.Get (i);
+      csPolygon3DStatic *p = pol.Get (i);
       if (p->flags.Check (poly_flag))
       {
         polygons[num_poly].num_vertices = p->GetVertexCount ();
@@ -2073,19 +2113,19 @@ void csThing::UpdateCurveTransform ()
   }
 }
 
-csPolygon3D *csThing::IntersectSphere (
+csPolygon3DStatic *csThing::IntersectSphere (
   csVector3 &center,
   float radius,
   float *pr)
 {
   float d, min_d = radius;
   int i;
-  csPolygon3D *p, *min_p = NULL;
+  csPolygon3DStatic *p, *min_p = NULL;
   csVector3 hit;
 
-  for (i = 0; i < polygons.Length (); i++)
+  for (i = 0; i < static_polygons.Length (); i++)
   {
-    p = GetPolygon3D (i);
+    p = GetPolygon3DStatic (i);
 
     const csPlane3 &wpl = p->GetObjectPlane ();
     d = wpl.Distance (center);
@@ -2363,6 +2403,7 @@ bool csThing::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
     DrawPolygonArray (
       polygons.GetArray (),
       polygons.Length (),
+      movable->GetTransform (),
       rview,
       zMode);
   }
@@ -2416,9 +2457,9 @@ void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
   {
     csPolygon3D* poly = GetPolygon3D (i);
     if (dyn)
-      poly->CalculateLightingDynamic (lview);
+      poly->CalculateLightingDynamic (lview, movable);
     else
-      poly->CalculateLightingStatic (lview, lptq, true);
+      poly->CalculateLightingStatic (lview, movable, lptq, true);
   }
 
   for (i = 0; i < GetCurveCount (); i++)
@@ -2474,7 +2515,7 @@ bool csThing::ReadFromCache (iCacheManager* cache_mgr)
         if (thing_type->do_verbose)
 	{
 	  printf ("  Thing '%s' Poly '%s': %s\n",
-	  	thing_name, polygons.Get (i)->GetName (),
+	  	thing_name, static_polygons.Get (i)->GetName (),
 		error);
 	  fflush (stdout);
         }
@@ -2553,10 +2594,11 @@ void csThing::Merge (csThing *other)
   for (i = 0; i < other->polygons.Length (); i++)
   {
     csPolygon3D *p = other->GetPolygon3D (i);
-    int *idx = p->GetVertices ().GetVertexIndices ();
-    for (j = 0; j < p->GetVertices ().GetVertexCount (); j++)
+    csPolygon3DStatic *sp = other->GetPolygon3DStatic (i);
+    int *idx = sp->GetVertices ().GetVertexIndices ();
+    for (j = 0; j < sp->GetVertices ().GetVertexCount (); j++)
       idx[j] = merge_vertices[idx[j]];
-    AddPolygon (p);
+    AddPolygon (sp, p);
     other->polygons[i] = NULL;
   }
 
@@ -2607,18 +2649,19 @@ void csThing::MergeTemplate (
     csPolygon3D *p;
     iMaterialWrapper *mat = pt->GetMaterial ();
     p = NewPolygon (mat);
-    p->SetName (pt->GetName ());
+    csPolygon3DStatic* ps = p->GetStaticData ();
+    ps->SetName (pt->GetName ());
 
     iMaterialWrapper *wrap = pt->GetMaterial ();
     if (!wrap && default_material)
-      p->SetMaterial (default_material);
+      ps->SetMaterial (default_material);
 
     int *idx = pt->GetVertexIndices ();
     for (j = 0; j < pt->GetVertexCount (); j++)
-      p->AddVertex (merge_vertices[idx[j]]);
+      ps->AddVertex (merge_vertices[idx[j]]);
 
-    p->flags.SetAll (pt->GetFlags ().Get ());
-    p->CopyTextureType (pt);
+    ps->flags.SetAll (pt->GetFlags ().Get ());
+    ps->CopyTextureType (pt);
   }
 
   for (i = 0; i < tpl->GetCurveVertexCount (); i++)
@@ -2651,7 +2694,7 @@ void csThing::ReplaceMaterials (iMaterialList *matList, const char *prefix)
   int i;
   for (i = 0; i < GetPolygonCount (); i++)
   {
-    csPolygon3D *p = GetPolygon3D (i);
+    csPolygon3DStatic *p = GetPolygon3DStatic (i);
     const char *txtname = p->GetMaterialWrapper ()->QueryObject ()->GetName ();
     char *newname = new char[strlen (prefix) + strlen (txtname) + 2];
     sprintf (newname, "%s_%s", prefix, txtname);
@@ -2660,29 +2703,6 @@ void csThing::ReplaceMaterials (iMaterialList *matList, const char *prefix)
     if (mw != NULL) p->SetMaterial (mw);
     delete[] newname;
   }
-}
-
-void csThing::AddPortalPolygon (csPolygon3D *poly)
-{
-  int idx = portal_polygons.Find (poly);
-
-  //@@@???CS_ASSERT (idx == -1);
-  if (idx != -1) return ;
-
-  CS_ASSERT (poly->GetPortal () != NULL);
-  CS_ASSERT (poly->GetParent () == this);
-  portal_polygons.Push (poly);
-}
-
-void csThing::RemovePortalPolygon (csPolygon3D *poly)
-{
-  int idx = portal_polygons.Find (poly);
-
-  //@@@???CS_ASSERT (idx != -1);
-  if (idx == -1) return ;
-
-  CS_ASSERT (poly->GetPortal () == NULL || poly->GetParent () != this);
-  portal_polygons.Delete (idx);
 }
 
 //---------------------------------------------------------------------------
@@ -2701,7 +2721,7 @@ iPolygon3D *csThing::ThingState::GetPolygon (int idx)
 
 iPolygon3DStatic *csThing::ThingFactoryState::GetPolygon (int idx)
 {
-  csPolygon3D *p = scfParent->GetPolygon3D (idx);
+  csPolygon3DStatic *p = scfParent->GetPolygon3DStatic (idx);
   if (!p) return NULL;
   return &(p->scfiPolygon3DStatic);
 }
@@ -2718,15 +2738,16 @@ iPolygon3DStatic *csThing::ThingFactoryState::GetPolygon (
 {
   csPolygon3D *p = scfParent->GetPolygon3D (name);
   if (!p) return NULL;
-  return &(p->scfiPolygon3DStatic);
+  return &(p->GetStaticData ()->scfiPolygon3DStatic);
 }
 
-iPolygon3DStatic *csThing::ThingFactoryState::CreatePolygon (const char *iName)
+iPolygon3DStatic *csThing::ThingFactoryState::CreatePolygon (const char *name)
 {
-  csPolygon3D *p = new csPolygon3D ((iMaterialWrapper *)NULL);
-  if (iName) p->SetName (iName);
-  scfParent->AddPolygon (p);
-  return &(p->scfiPolygon3DStatic);
+  csPolygon3DStatic *sp = new csPolygon3DStatic ((iMaterialWrapper *)NULL);
+  if (name) sp->SetName (name);
+  csPolygon3D* p = new csPolygon3D (sp);
+  scfParent->AddPolygon (sp, p);
+  return &(sp->scfiPolygon3DStatic);
 }
 
 int csThing::ThingFactoryState::GetPortalCount () const
@@ -2736,29 +2757,23 @@ int csThing::ThingFactoryState::GetPortalCount () const
 
 iPortal *csThing::ThingFactoryState::GetPortal (int idx) const
 {
-  csPolygon3D *p = (csPolygon3D *) (scfParent->portal_polygons)[idx];
+  csPolygon3DStatic *p = scfParent->static_polygons.Get (
+		  scfParent->portal_polygons[idx]);
   return &(p->GetPortal ()->scfiPortal);
 }
 
 iPolygon3DStatic *csThing::ThingFactoryState::GetPortalPolygon (int idx) const
 {
-  csPolygon3D *p = (csPolygon3D *) (scfParent->portal_polygons)[idx];
+  csPolygon3DStatic *p = (scfParent->static_polygons.Get (
+		  scfParent->portal_polygons[idx]));
   return &(p->scfiPolygon3DStatic);
 }
 
 iPolygon3D *csThing::ThingState::GetPortalPolygon (int idx) const
 {
-  csPolygon3D *p = (csPolygon3D *) (scfParent->portal_polygons)[idx];
+  csPolygon3D *p = (scfParent->polygons.Get (
+		  scfParent->portal_polygons[idx]));
   return &(p->scfiPolygon3D);
-}
-
-iPolygon3D* csThing::ThingState::IntersectSegment (const csVector3& start,
-	const csVector3& end, csVector3& isect,
-	float* pr, bool only_portals)
-{
-  csPolygon3D* p = scfParent->IntersectSegment (start, end, isect, pr,
-  	only_portals);
-  return p ? &(p->scfiPolygon3D) : NULL;
 }
 
 iPolygon3DStatic* csThing::ThingFactoryState::IntersectSegment (
@@ -2768,7 +2783,17 @@ iPolygon3DStatic* csThing::ThingFactoryState::IntersectSegment (
 {
   csPolygon3D* p = scfParent->IntersectSegment (start, end, isect, pr,
   	only_portals);
-  return p ? &(p->scfiPolygon3DStatic) : NULL;
+  return p ? &(p->GetStaticData ()->scfiPolygon3DStatic) : NULL;
+}
+
+iPolygon3D* csThing::ThingState::IntersectSegment (
+	const csVector3& start,
+	const csVector3& end, csVector3& isect,
+	float* pr, bool only_portals)
+{
+  csPolygon3D* p = scfParent->IntersectSegment (start, end, isect, pr,
+  	only_portals);
+  return p ? &(p->scfiPolygon3D) : NULL;
 }
 
 //---------------------------------------------------------------------------

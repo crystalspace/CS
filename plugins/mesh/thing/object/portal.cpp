@@ -164,7 +164,8 @@ bool csPortal::CompleteSector (iBase *context)
   return false;
 }
 
-void csPortal::ObjectToWorld (const csReversibleTransform &t)
+void csPortal::ObjectToWorld (const csReversibleTransform &t,
+	csReversibleTransform& warp_wor) const
 {
   if (flags.Check (CS_PORTAL_STATICDEST))
     warp_wor = warp_obj * t;
@@ -174,8 +175,8 @@ void csPortal::ObjectToWorld (const csReversibleTransform &t)
 
 void csPortal::HardTransform (const csReversibleTransform &t)
 {
-  ObjectToWorld (t);
-  warp_obj = warp_wor;
+  if (flags.Check (CS_PORTAL_WARP))
+    ObjectToWorld (t, warp_obj);
 }
 
 void csPortal::SetWarp (const csTransform &t)
@@ -187,8 +188,6 @@ void csPortal::SetWarp (const csTransform &t)
   flags.SetBool (
       CS_PORTAL_MIRROR,
       (((m.Col1 () % m.Col2 ()) * m.Col3 ()) < 0));
-
-  warp_wor = warp_obj;
 }
 
 void csPortal::SetWarp (
@@ -210,8 +209,6 @@ void csPortal::SetWarp (
   flags.SetBool (
       CS_PORTAL_MIRROR,
       (((m.Col1 () % m.Col2 ()) * m.Col3 ()) < 0));
-
-  warp_wor = warp_obj;
 }
 
 const csReversibleTransform &csPortal::GetWarp () const
@@ -250,12 +247,25 @@ void csPortal::GetColorFilter (float &r, float &g, float &b) const
   b = filter_b;
 }
 
-csVector3 csPortal::Warp (const csVector3 &pos) const
+csVector3 csPortal::Warp (const csReversibleTransform& t,
+		const csVector3 &pos) const
 {
-  return warp_wor.Other2This (pos);
+  if (flags.Check (CS_PORTAL_WARP))
+  {
+    csReversibleTransform warp_wor;
+    // @@@ Perhaps can be calculated more efficiently without having
+    // to calculate a new transform?
+    ObjectToWorld (t, warp_wor);
+    return warp_wor.Other2This (pos);
+  }
+  else
+  {
+    return pos;
+  }
 }
 
-void csPortal::WarpSpace (csReversibleTransform &t, bool &mirror) const
+void csPortal::WarpSpace (const csReversibleTransform& warp_wor,
+		csReversibleTransform &t, bool &mirror) const
 {
   // warp_wor is a world -> warp space transformation.
   // t is a world -> camera space transformation.
@@ -268,6 +278,7 @@ void csPortal::WarpSpace (csReversibleTransform &t, bool &mirror) const
 bool csPortal::Draw (
   csPolygon2D *new_clipper,
   iPolygon3D *portal_polygon,
+  const csReversibleTransform& t,
   iRenderView *rview,
   const csPlane3& camera_plane)
 {
@@ -322,7 +333,9 @@ bool csPortal::Draw (
     iCamera *inewcam = rview->CreateNewCamera ();
 
     bool mirror = inewcam->IsMirrored ();
-    WarpSpace (inewcam->GetTransform (), mirror);
+    csReversibleTransform warp_wor;
+    ObjectToWorld (t, warp_wor);
+    WarpSpace (warp_wor, inewcam->GetTransform (), mirror);
     inewcam->SetMirrored (mirror);
 
     sector->Draw (rview);
@@ -346,6 +359,7 @@ bool csPortal::Draw (
 }
 
 iPolygon3D *csPortal::HitBeam (
+  const csReversibleTransform& t,
   const csVector3 &start,
   const csVector3 &end,
   csVector3 &isect)
@@ -355,6 +369,11 @@ iPolygon3D *csPortal::HitBeam (
     return NULL;
   if (flags.Check (CS_PORTAL_WARP))
   {
+    csReversibleTransform warp_wor;
+    // @@@ Perhaps can be calculated more efficiently without having
+    // to calculate a new transform?
+    ObjectToWorld (t, warp_wor);
+
     csVector3 new_start = warp_wor.Other2This (start);
     csVector3 new_end = warp_wor.Other2This (end);
     csVector3 new_isect;
@@ -369,6 +388,7 @@ iPolygon3D *csPortal::HitBeam (
   }
 }
 
+#if 0
 iMeshWrapper *csPortal::HitBeam (
   const csVector3 &start,
   const csVector3 &end,
@@ -394,8 +414,10 @@ iMeshWrapper *csPortal::HitBeam (
         polygonPtr);
   }
 }
+#endif
 
-void csPortal::CheckFrustum (iFrustumView *lview, int alpha)
+void csPortal::CheckFrustum (iFrustumView *lview,
+		const csReversibleTransform& t, int alpha)
 {
   if (!CompleteSector (lview)) return ;
   if (sector->GetRecLevel () > 1)
@@ -422,6 +444,11 @@ void csPortal::CheckFrustum (iFrustumView *lview, int alpha)
 
   if (flags.Check (CS_PORTAL_WARP))
   {
+    csReversibleTransform warp_wor;
+    // @@@ Perhaps can be calculated more efficiently without having
+    // to calculate a new transform?
+    ObjectToWorld (t, warp_wor);
+
     new_ctxt->GetLightFrustum ()->Transform (&warp_wor);
 
     if (flags.Check (CS_PORTAL_MIRROR))

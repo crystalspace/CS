@@ -50,8 +50,6 @@ public:
 protected:
   /// Warp transform in object space.
   csReversibleTransform warp_obj;
-  /// Warp transform in world space.
-  csReversibleTransform warp_wor;
   /// List of callbacks called when a sector is missing (iPortalCallback).
   csVector sector_cb_vector;
   /// List of callbacks called for traversing to a portal (iPortalCallback).
@@ -175,25 +173,28 @@ public:
   void SetMirror (iPolygon3D *iPoly);
 
   /// Transform the warp matrix from object space to world space.
-  void ObjectToWorld (const csReversibleTransform& t);
+  void ObjectToWorld (const csReversibleTransform& t,
+	csReversibleTransform& warp_wor) const;
 
   /// Hard transform the warp matrix.
   void HardTransform (const csReversibleTransform& t);
 
   /// Warp a position in world space.
-  csVector3 Warp (const csVector3& pos) const;
+  csVector3 Warp (const csReversibleTransform& t, const csVector3& pos) const;
 
   /**
    * Warp space using the given world->camera transformation.
    * This function modifies the given camera transformation to reflect
    * the warping change.<p>
    *
+   * 'warp_wor' is the warp transformation in world space.
    * 't' is the transformation from world to camera space.<br>
    * 'mirror' is true if the camera transformation transforms all polygons so
    * that the vertices are ordered anti-clockwise.  'mirror' will be modified
    * by warp_space if needed.
    */
-  void WarpSpace (csReversibleTransform& t, bool& mirror) const;
+  void WarpSpace (const csReversibleTransform& warp_wor,
+		  csReversibleTransform& t, bool& mirror) const;
 
   //-------------------------------------------------------------------------
 
@@ -207,6 +208,7 @@ public:
    * should be clipped.<br>
    * 'portal_polygon' is the polygon containing this portal. This routine
    * will use the camera space plane of the portal polygon.<br>
+   * 't' is the transform from object to world (this2other).
    * 'rview' is the current iRenderView.<p>
    *
    * Return true if succesful, false otherwise.
@@ -216,6 +218,7 @@ public:
    * can be drawn through a mirror).
    */
   bool Draw (csPolygon2D* new_clipper, iPolygon3D* portal_polygon,
+	const csReversibleTransform& t,
   	iRenderView* rview, const csPlane3& camera_plane);
 
   /**
@@ -224,8 +227,11 @@ public:
    * warping portals and also checks for infinite recursion (does
    * not allow traversing the same sector more than five times).
    * Returns the intersection point with the polygon in 'isect'.
+   * The given transform 't' is used to transform the warping matrix
+   * in the portal from object to world space (this==object, other==world).
    */
-  iPolygon3D* HitBeam (const csVector3& start, const csVector3& end,
+  iPolygon3D* HitBeam (const csReversibleTransform& t,
+	const csVector3& start, const csVector3& end,
   	csVector3& isect);
 
   /**
@@ -234,9 +240,11 @@ public:
    * warping portals and also checks for infinite recursion (does
    * not allow traversing the same sector more than five times).
    * Optionally returns the polygon in 'polygonPtr'.
+   * The given transform 't' is used to transform the warping matrix
+   * in the portal from object to world space (this==object, other==world).
    */
-  iMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,
-  	csVector3& isect, iPolygon3D** polygonPtr);
+  //iMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,
+  	//csVector3& isect, iPolygon3D** polygonPtr);
 
   /**
    * Check if the destination sector is NULL and if so call
@@ -249,8 +257,10 @@ public:
    * Check frustum visibility of all polygons reachable through this portal.
    * Alpha is the alpha value you'd like to use to pass through this
    * portal (0 is no completely transparent, 100 is complete opaque).
+   * 't' is the transform from object to world (this2other).
    */
-  void CheckFrustum (iFrustumView* lview, int alpha);
+  void CheckFrustum (iFrustumView* lview, const csReversibleTransform& t,
+		  int alpha);
 
   SCF_DECLARE_IBASE_EXT (csObject);
 
@@ -339,34 +349,39 @@ public:
     {
       return scfParent->GetWarp ();
     }
-    virtual void ObjectToWorld (const csReversibleTransform& t)
-    {
-      scfParent->ObjectToWorld (t);
-    }
     virtual void HardTransform (const csReversibleTransform& t)
     {
       scfParent->HardTransform (t);
     }
-    virtual csVector3 Warp (const csVector3& pos) const
+    virtual void ObjectToWorld (const csReversibleTransform& t,
+	csReversibleTransform& warp_wor) const
     {
-      return scfParent->Warp (pos);
+      scfParent->ObjectToWorld (t, warp_wor);
     }
-    virtual void WarpSpace (csReversibleTransform& t, bool& mirror) const
+    virtual csVector3 Warp (const csReversibleTransform& t,
+		    const csVector3& pos) const
     {
-      scfParent->WarpSpace (t, mirror);
+      return scfParent->Warp (t, pos);
+    }
+    virtual void WarpSpace (const csReversibleTransform& warp_wor,
+		  csReversibleTransform& t, bool& mirror) const
+    {
+      scfParent->WarpSpace (warp_wor, t, mirror);
     }
     virtual bool CompleteSector (iBase* context)
     {
       return scfParent->CompleteSector (context);
     }
-    virtual void CheckFrustum (iFrustumView* lview, int alpha)
+    virtual void CheckFrustum (iFrustumView* lview,
+	const csReversibleTransform& t, int alpha)
     {
-      scfParent->CheckFrustum (lview, alpha);
+      scfParent->CheckFrustum (lview, t, alpha);
     }
-    virtual iPolygon3D* HitBeam (const csVector3& start, const csVector3& end,
+    virtual iPolygon3D* HitBeam (const csReversibleTransform& t,
+	const csVector3& start, const csVector3& end,
   	csVector3& isect)
     {
-      return scfParent->HitBeam (start, end, isect);
+      return scfParent->HitBeam (t, start, end, isect);
     }
   } scfiPortal;
 };

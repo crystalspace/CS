@@ -103,7 +103,8 @@ void csPolygon2D::DrawFilled (
   const csPlane3& camera_plane,
   csZBufMode zbufMode)
 {
-  if (!poly->IsTextureMappingEnabled ()) return;
+  csPolygon3DStatic* spoly = poly->GetStaticData ();
+  if (!spoly->IsTextureMappingEnabled ()) return;
   int i;
   bool debug = false;
   iCamera *icam = rview->GetCamera ();
@@ -116,12 +117,12 @@ void csPolygon2D::DrawFilled (
   static G3DPolygonDP g3dpoly;
 
   g3dpoly.num = num_vertices;
-  if (poly->GetMaterialWrapper ()) poly->GetMaterialWrapper ()->Visit ();
-  g3dpoly.mat_handle = poly->GetMaterialHandle ();
-  g3dpoly.mixmode = poly->GetMixMode ();
+  if (spoly->GetMaterialWrapper ()) spoly->GetMaterialWrapper ()->Visit ();
+  g3dpoly.mat_handle = spoly->GetMaterialHandle ();
+  g3dpoly.mixmode = spoly->GetMixMode ();
   g3dpoly.mixmode &= ~(CS_FX_ALPHA | CS_FX_MASK_ALPHA);
-  if (poly->GetAlpha ())
-    g3dpoly.mixmode |= CS_FX_SETALPHA_INT (poly->GetAlpha ());
+  if (spoly->GetAlpha ())
+    g3dpoly.mixmode |= CS_FX_SETALPHA_INT (spoly->GetAlpha ());
 
   // We are going to use DrawPolygon.
   if (mirror)
@@ -138,10 +139,10 @@ void csPolygon2D::DrawFilled (
   }
 
   g3dpoly.z_value = poly->Vcam (0).z;
-  g3dpoly.poly_texture = poly->GetLightMapInfo ()->GetPolyTex ();
-  g3dpoly.do_fullbright = poly->flags.Check (CS_POLY_LM_REFUSED);
-
   csPolyTexLightMap* lmi = poly->GetLightMapInfo ();
+  g3dpoly.poly_texture = lmi->GetPolyTex ();
+  g3dpoly.do_fullbright = spoly->flags.Check (CS_POLY_LM_REFUSED);
+
   csMatrix3 m_cam2tex;
   csVector3 v_cam2tex;
   lmi->WorldToCamera (icam->GetTransform (), m_cam2tex, v_cam2tex);

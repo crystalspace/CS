@@ -273,7 +273,7 @@ bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
       iFrustumView* fv = lviews->lv;
       csFrustumContext* orig_ctxt = fv->GetFrustumContext ();
       fv->SetFrustumContext (lviews->ctxt);
-      portal->CheckFrustum (fv, 0);
+      portal->CheckFrustum (fv, ird->walls->GetMovable ()->GetTransform (), 0);
       fv->RestoreFrustumContext (orig_ctxt);
       s->draw_busy = old_draw_busy;
 

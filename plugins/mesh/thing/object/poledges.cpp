@@ -100,7 +100,7 @@ csPolygonEdges::csPolygonEdges (csPolygon3D **polygons, int num_polygons) :
   for (i = 0; i < num_polygons; i++)
   {
     csPolygon3D *p = polygons[i];
-    const csPolyIndexed &pi = p->GetVertices ();
+    const csPolyIndexed &pi = p->GetStaticData ()->GetVertices ();
     j1 = pi.GetVertexCount () - 1;
     for (j = 0; j < pi.GetVertexCount (); j++)
     {

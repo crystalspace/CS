@@ -88,7 +88,7 @@ csPolyTexture::~csPolyTexture ()
 
 iMaterialHandle *csPolyTexture::GetMaterialHandle ()
 {
-  return polygon->GetMaterialHandle ();
+  return polygon->GetStaticData ()->GetMaterialHandle ();
 }
 
 void* csPolyTexture::GetCacheData (int idx)
@@ -252,8 +252,8 @@ static bool CanCastShadow (
    * the two polygons. These are the criteria we now use in this test.
    */
   if (FindSeparatingPlane (
-  	shadow_poly, shadow_poly->GetVertexCount (), 
-	poly, poly->GetVertexCount (),
+  	shadow_poly, shadow_poly->GetStaticData ()->GetVertexCount (), 
+	poly, poly->GetStaticData ()->GetVertexCount (),
 	lightpos))
     return false;
 
@@ -261,8 +261,8 @@ static bool CanCastShadow (
   // we also try the reverse because that way we might give a good
   // result.
   if (FindSeparatingPlane (
-	poly, poly->GetVertexCount (),
-	shadow_poly, shadow_poly->GetVertexCount (),
+	poly, poly->GetStaticData ()->GetVertexCount (),
+	shadow_poly, shadow_poly->GetStaticData ()->GetVertexCount (),
 	lightpos))
     return false;
 
@@ -284,7 +284,7 @@ void csPolyTexture::FillLightMap (
   csVector3 &lightpos = light_frustum->GetOrigin ();
   float inv_lightcell_size = 1.0f / csLightMap::lightcell_size;
   int ww, hh;
-  iMaterialHandle* mat_handle = polygon->GetMaterialHandle ();
+  iMaterialHandle* mat_handle = polygon->static_data->GetMaterialHandle ();
   if (mat_handle && mat_handle->GetTexture ())
     mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
   else
@@ -502,7 +502,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp)
   float d;
 
   int ww, hh;
-  iMaterialHandle* mat_handle = polygon->GetMaterialHandle ();
+  iMaterialHandle* mat_handle = polygon->GetStaticData ()->GetMaterialHandle ();
   mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
 
   csPolyTexLightMap* lmi = polygon->GetLightMapInfo ();
@@ -797,7 +797,7 @@ void csPolyTexture::UpdateFromShadowBitmap (
   CS_ASSERT (shadow_bitmap != NULL);
 
   int ww, hh;
-  iMaterialHandle* mat_handle = polygon->GetMaterialHandle ();
+  iMaterialHandle* mat_handle = polygon->GetStaticData ()->GetMaterialHandle ();
   if (mat_handle && mat_handle->GetTexture ())
     mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
   else
@@ -1284,9 +1284,9 @@ void csShadowBitmap::UpdateLightMap (
       csVector3 normal = poly->GetPolyPlane().Normal ();
       if (poly->GetParent ()->GetSmoothingFlag())
       {
-	int* vertexs = poly->GetVertexIndices ();
+	int* vertexs = poly->GetStaticData ()->GetVertexIndices ();
 	csVector3* normals = poly->GetParent ()->GetNormals ();
-	int vCount = poly->GetVertexCount ();
+	int vCount = poly->GetStaticData ()->GetVertexCount ();
 
 	csVector3* nearestNormals = new csVector3[vCount];
 	float *distances = new float[vCount];
@@ -1343,7 +1343,7 @@ void csShadowBitmap::UpdateLightMap (
 	  }
 	}
 
-	if (!poly->PointOnPolygon (v))
+	if (!poly->GetStaticData ()->PointOnPolygon (v))
 	{
 	  normal = nearestNormals[nearestNormal];
 	}
@@ -1455,9 +1455,9 @@ bool csShadowBitmap::UpdateShadowMap (
       csVector3 normal = poly->GetPolyPlane().Normal ();
       if ( poly->GetParent ()->GetSmoothingFlag() ) 
       {
-	int* vertexs = poly->GetVertexIndices ();
+	int* vertexs = poly->GetStaticData ()->GetVertexIndices ();
 	csVector3* normals = poly->GetParent ()->GetNormals ();
-	int vCount = poly->GetVertexCount ();
+	int vCount = poly->GetStaticData ()->GetVertexCount ();
 	csSegment3* segments = new csSegment3[vCount];
 
 	// int nearest; 
@@ -1534,7 +1534,7 @@ bool csShadowBitmap::UpdateShadowMap (
 	    weights[act] = shortestDistance / distances[act];
 	}
 	
-	if (!poly->PointOnPolygon (v))
+	if (!poly->GetStaticData ()->PointOnPolygon (v))
 	{
 	  normal = nearestNormals[nearestNormal];
 	}

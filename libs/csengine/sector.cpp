@@ -239,7 +239,9 @@ iPolygon3D *csSector::HitBeam (
   const csVector3 &end,
   csVector3 &isect)
 {
-  iPolygon3D *p = IntersectSegment (start, end, isect);
+  csMeshWrapper* mesh;
+  iPolygon3D *p = IntersectSegment (start, end, isect, NULL, false,
+		  &mesh);
   if (p)
   {
     iPolygon3DStatic* ps = p->GetStaticData ();
@@ -249,7 +251,8 @@ iPolygon3D *csSector::HitBeam (
       draw_busy++;
 
       csVector3 new_start = isect;
-      p = po->HitBeam (new_start, end, isect);
+      p = po->HitBeam (mesh->GetMovable ().GetTransform (),
+		      new_start, end, isect);
       draw_busy--;
       return p;
     }
@@ -377,12 +380,14 @@ csSector *csSector::FollowSegment (
   bool only_portals)
 {
   csVector3 isect;
+  csMeshWrapper* mesh;
   iPolygon3D *p = IntersectSegment (
       t.GetOrigin (),
       new_position,
       isect,
       NULL,
-      only_portals);
+      only_portals,
+      &mesh);
   iPortal *po;
 
   if (p)
@@ -400,8 +405,10 @@ csSector *csSector::FollowSegment (
 
       if (po->GetFlags ().Check (CS_PORTAL_WARP))
       {
-        po->WarpSpace (t, mirror);
-        new_position = po->Warp (new_position);
+	csReversibleTransform warp_wor;
+	po->ObjectToWorld (mesh->GetMovable ().GetTransform (), warp_wor);
+        po->WarpSpace (warp_wor, t, mirror);
+        new_position = po->Warp (warp_wor, new_position);
       }
 
       csSector *dest_sect = po->GetSector ()->GetPrivateObject ();

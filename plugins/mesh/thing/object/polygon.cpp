@@ -39,6 +39,7 @@
 #include "iengine/material.h"
 #include "iengine/dynlight.h"
 #include "iengine/shadows.h"
+#include "iengine/movable.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
 #include "ivideo/txtmgr.h"
@@ -118,38 +119,28 @@ void csPolyTexLightMap::ObjectToWorld (const csMatrix3& m_obj2tex,
 }
 
 //---------------------------------------------------------------------------
-SCF_IMPLEMENT_IBASE(csPolygon3D)
+SCF_IMPLEMENT_IBASE(csPolygon3DStatic)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPolygon3DStatic)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPolygon3D)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csPolygon3D::eiPolygon3D)
-  SCF_IMPLEMENTS_INTERFACE(iPolygon3D)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csPolygon3D::eiPolygon3DStatic)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csPolygon3DStatic::eiPolygon3DStatic)
   SCF_IMPLEMENTS_INTERFACE(iPolygon3DStatic)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csPolygon3D::csPolygon3D (iMaterialWrapper *material) : vertices(4)
+csPolygon3DStatic::csPolygon3DStatic (iMaterialWrapper *material) : vertices(4)
 {
   VectorArray = GetStaticVectorArray();
   SCF_CONSTRUCT_IBASE (NULL);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3DStatic);
   thing = NULL;
 
-  csPolygon3D::material = material;
+  csPolygon3DStatic::material = material;
   name = NULL;
 
-  txt_info = NULL;
   mapping = NULL;
-
   portal = NULL;
 
   flags.SetAll (CS_POLY_LIGHTING | CS_POLY_COLLDET | CS_POLY_VISCULL);
-
-  lightpatches = NULL;
 
   EnableTextureMapping (true);
 
@@ -161,11 +152,10 @@ csPolygon3D::csPolygon3D (iMaterialWrapper *material) : vertices(4)
 #endif // CS_USE_NEW_RENDERER
 }
 
-csPolygon3D::~csPolygon3D ()
+csPolygon3DStatic::~csPolygon3DStatic ()
 {
   delete[] name;
 
-  delete txt_info;
   delete mapping;
 
   if (portal && flags.Check (CS_POLY_DELETE_PORTAL))
@@ -173,23 +163,379 @@ csPolygon3D::~csPolygon3D ()
     portal->SetSector (NULL);
     delete portal;
     portal = NULL;
-    if (thing) thing->RemovePortalPolygon (this);
   }
 
-  if (thing)
-  {
-    while (lightpatches)
-    {
-      iDynLight* dl = lightpatches->GetLight ();
-      if (dl)
-        dl->RemoveAffectedLightingInfo (&(thing->scfiLightingInfo));
-      thing->thing_type->lightpatch_pool->Free (lightpatches);
-    }
-  }
   VectorArray->DecRef ();
 }
 
-void csPolygon3D::CreateBoundingTextureBox ()
+void csPolygon3DStatic::MappingSetTextureSpace (
+  const csPlane3 &plane_wor,
+  const csVector3 &v_orig,
+  const csVector3 &v1,
+  float len)
+{
+  MappingSetTextureSpace (
+    plane_wor,
+    v_orig.x, v_orig.y, v_orig.z,
+    v1.x, v1.y, v1.z,
+    len);
+}
+
+void csPolygon3DStatic::MappingSetTextureSpace (
+  const csPlane3 &plane_wor,
+  float xo,
+  float yo,
+  float zo,
+  float x1,
+  float y1,
+  float z1,
+  float len1)
+{
+  float A = plane_wor.A ();
+  float B = plane_wor.B ();
+  float C = plane_wor.C ();
+  csTextureTrans::compute_texture_space (
+      mapping->m_obj2tex, mapping->v_obj2tex,
+      xo, yo, zo,
+      x1, y1, z1,
+      len1,
+      A, B, C);
+  thing->StaticDataChanged ();
+}
+
+void csPolygon3DStatic::MappingSetTextureSpace (
+  const csVector3 &v_orig,
+  const csVector3 &v1,
+  float len1,
+  const csVector3 &v2,
+  float len2)
+{
+  csTextureTrans::compute_texture_space (
+      mapping->m_obj2tex, mapping->v_obj2tex,
+      v_orig, v1,
+      len1, v2,
+      len2);
+  thing->StaticDataChanged ();
+}
+
+void csPolygon3DStatic::MappingSetTextureSpace (
+  const csVector3 &v_orig,
+  const csVector3 &v_u,
+  const csVector3 &v_v)
+{
+  csTextureTrans::compute_texture_space (
+      mapping->m_obj2tex,
+      mapping->v_obj2tex,
+      v_orig,
+      v_u,
+      v_v);
+  thing->StaticDataChanged ();
+}
+
+void csPolygon3DStatic::MappingSetTextureSpace (
+  float xo, float yo, float zo,
+  float xu, float yu, float zu,
+  float xv, float yv, float zv)
+{
+  const csVector3 o (xo, yo, zo);
+  const csVector3 u (xu, yu, zu);
+  const csVector3 v (xv, yv, zv);
+  csTextureTrans::compute_texture_space (mapping->m_obj2tex,
+  	mapping->v_obj2tex, o, u, v);
+  thing->StaticDataChanged ();
+}
+
+void csPolygon3DStatic::MappingSetTextureSpace (
+  float xo, float yo, float zo,
+  float xu, float yu, float zu,
+  float xv, float yv, float zv,
+  float xw, float yw, float zw)
+{
+  csTextureTrans::compute_texture_space (
+      mapping->m_obj2tex, mapping->v_obj2tex,
+      xo, yo, zo,
+      xu, yu, zu,
+      xv, yv, zv,
+      xw, yw, zw);
+  thing->StaticDataChanged ();
+}
+
+void csPolygon3DStatic::MappingSetTextureSpace (
+  const csMatrix3 &tx_matrix,
+  const csVector3 &tx_vector)
+{
+  mapping->m_obj2tex = tx_matrix;
+  mapping->v_obj2tex = tx_vector;
+  thing->StaticDataChanged ();
+}
+
+void csPolygon3DStatic::MappingGetTextureSpace (
+  csMatrix3 &tx_matrix,
+  csVector3 &tx_vector)
+{
+  tx_matrix = mapping->m_obj2tex;
+  tx_vector = mapping->v_obj2tex;
+}
+
+void csPolygon3DStatic::SetParent (csThing *thing)
+{
+  csPolygon3DStatic::thing = thing;
+}
+
+void csPolygon3DStatic::EnableTextureMapping (bool enable)
+{
+  if (enable && mapping != NULL) return;
+  if (!enable && mapping == NULL) return;
+
+  if (thing) thing->StaticDataChanged ();
+  if (enable)
+  {
+    mapping = new csLightMapMapping ();
+  }
+  else
+  {
+    delete mapping;
+    mapping = NULL;
+  }
+}
+
+void csPolygon3DStatic::CopyTextureType (iPolygon3DStatic *ipt)
+{
+  csPolygon3DStatic *pt = ipt->GetPrivateObject ();
+  EnableTextureMapping (pt->IsTextureMappingEnabled ());
+
+  csMatrix3 m;
+  csVector3 v (0);
+  if (pt->IsTextureMappingEnabled ())
+  {
+    pt->MappingGetTextureSpace (m, v);
+  }
+
+  SetTextureSpace (m, v);
+}
+
+void csPolygon3DStatic::Reset ()
+{
+  vertices.MakeEmpty ();
+}
+
+void csPolygon3DStatic::SetCSPortal (iSector *sector, bool null)
+{
+  if (portal && portal->GetSector () == sector)
+    return ;
+  if (portal && flags.Check (CS_POLY_DELETE_PORTAL))
+  {
+    delete portal;
+    portal = NULL;
+    if (thing) thing->UpdatePortalList ();
+  }
+
+  if (!null && !sector) return ;
+  portal = new csPortal ();
+  flags.Set (CS_POLY_DELETE_PORTAL);
+  portal->flags.Reset (CS_PORTAL_WARP);
+  if (sector)
+    portal->SetSector (sector);
+  else
+    portal->SetSector (NULL);
+  flags.Reset (CS_POLY_COLLDET);         // Disable CD by default for portals.
+  if (thing) thing->UpdatePortalList ();
+}
+
+void csPolygon3DStatic::SetPortal (csPortal *prt)
+{
+  if (portal && flags.Check (CS_POLY_DELETE_PORTAL))
+  {
+    portal->SetSector (NULL);
+    delete portal;
+    portal = NULL;
+    if (thing) thing->UpdatePortalList ();
+  }
+
+  portal = prt;
+  flags.Set (CS_POLY_DELETE_PORTAL);
+  flags.Reset (CS_POLY_COLLDET);         // Disable CD by default for portals.
+  if (thing) thing->UpdatePortalList ();
+}
+
+bool csPolygon3DStatic::Overlaps (csPolygon3DStatic *overlapped)
+{
+  csPolygon3DStatic *totest = overlapped;
+
+  // Algorithm: if any of the vertices of the 'totest' polygon
+  // is facing away from the front of this polygon (i.e. the vertex
+  // cannot see this polygon) then there is a chance that this polygon
+  // overlaps the other. If this is not the case then we can return false
+  // already. Otherwise we have to see that the 'totest' polygon is
+  // itself not facing away from this polygon. To test that we see if
+  // there is a vertex of this polygon that is in front of the 'totest'
+  // polygon. If that is the case then we return true.
+  csPlane3 &this_plane = plane_obj;
+  csPlane3 &test_plane = totest->plane_obj;
+  int i;
+  for (i = 0; i < totest->vertices.GetVertexCount (); i++)
+  {
+    if (this_plane.Classify (totest->Vobj (i)) >= SMALL_EPSILON)
+    {
+      int j;
+      for (j = 0; j < vertices.GetVertexCount (); j++)
+      {
+        if (test_plane.Classify (Vobj (j)) <= SMALL_EPSILON)
+        {
+          return true;
+        }
+      }
+
+      return false;
+    }
+  }
+
+  return false;
+}
+
+void csPolygon3DStatic::SetMaterial (iMaterialWrapper *material)
+{
+  csPolygon3DStatic::material = material;
+}
+
+iMaterialHandle *csPolygon3DStatic::GetMaterialHandle ()
+{
+  return material ? material->GetMaterialHandle () : NULL;
+}
+
+iThingState *csPolygon3DStatic::eiPolygon3DStatic::GetParent ()
+{
+  return &(scfParent->GetParent ()->scfiThingState);
+}
+
+void csPolygon3DStatic::eiPolygon3DStatic::CreatePlane (
+  const csVector3 &iOrigin,
+  const csMatrix3 &iMatrix)
+{
+  scfParent->SetTextureSpace (iMatrix, iOrigin);
+}
+
+bool csPolygon3DStatic::IsTransparent ()
+{
+  if (Alpha) return true;
+#ifndef CS_USE_NEW_RENDERER
+  if (MixMode != CS_FX_COPY) return true;
+#endif // CS_USE_NEW_RENDERER
+
+  iTextureHandle *txt_handle = GetMaterialHandle ()->GetTexture ();
+  return txt_handle && ((txt_handle->GetAlphaMap ()
+  	|| txt_handle->GetKeyColor ()));
+}
+
+int csPolygon3DStatic::Classify (const csPlane3 &pl)
+{
+  if (&GetObjectPlane () == &pl) return CS_POL_SAME_PLANE;
+  if (csMath3::PlanesEqual (pl, GetObjectPlane ())) return CS_POL_SAME_PLANE;
+
+  int i;
+  int front = 0, back = 0;
+
+  for (i = 0; i < GetVertices ().GetVertexCount (); i++)
+  {
+    float dot = pl.Classify (Vobj (i));
+    if (ABS (dot) < EPSILON) dot = 0;
+    if (dot > 0)
+      back++;
+    else if (dot < 0)
+      front++;
+  }
+
+  if (back == 0) return CS_POL_FRONT;
+  if (front == 0) return CS_POL_BACK;
+  return CS_POL_SPLIT_NEEDED;
+}
+
+int csPolygon3DStatic::ClassifyX (float x)
+{
+  int i;
+  int front = 0, back = 0;
+
+  for (i = 0; i < GetVertices ().GetVertexCount (); i++)
+  {
+    float xx = Vobj (i).x - x;
+    if (xx < -EPSILON)
+      front++;
+    else if (xx > EPSILON)
+      back++;
+  }
+
+  if (back == 0 && front == 0) return CS_POL_SAME_PLANE;
+  if (back == 0) return CS_POL_FRONT;
+  if (front == 0) return CS_POL_BACK;
+  return CS_POL_SPLIT_NEEDED;
+}
+
+int csPolygon3DStatic::ClassifyY (float y)
+{
+  int i;
+  int front = 0, back = 0;
+
+  for (i = 0; i < GetVertices ().GetVertexCount (); i++)
+  {
+    float yy = Vobj (i).y - y;
+    if (yy < -EPSILON)
+      front++;
+    else if (yy > EPSILON)
+      back++;
+  }
+
+  if (back == 0 && front == 0) return CS_POL_SAME_PLANE;
+  if (back == 0) return CS_POL_FRONT;
+  if (front == 0) return CS_POL_BACK;
+  return CS_POL_SPLIT_NEEDED;
+}
+
+int csPolygon3DStatic::ClassifyZ (float z)
+{
+  int i;
+  int front = 0, back = 0;
+
+  for (i = 0; i < GetVertices ().GetVertexCount (); i++)
+  {
+    float zz = Vobj (i).z - z;
+    if (zz < -EPSILON)
+      front++;
+    else if (zz > EPSILON)
+      back++;
+  }
+
+  if (back == 0 && front == 0) return CS_POL_SAME_PLANE;
+  if (back == 0) return CS_POL_FRONT;
+  if (front == 0) return CS_POL_BACK;
+  return CS_POL_SPLIT_NEEDED;
+}
+
+void csPolygon3DStatic::ComputeNormal ()
+{
+  float A, B, C, D;
+  PlaneNormal (&A, &B, &C);
+  D = -A * Vobj (0).x - B * Vobj (0).y - C * Vobj (0).z;
+
+  // By default the world space normal is equal to the object space normal.
+  plane_obj.Set (A, B, C, D);
+  thing->StaticDataChanged ();
+}
+
+void csPolygon3DStatic::HardTransform (const csReversibleTransform &t)
+{
+  if (portal) portal->HardTransform (t);
+  csPlane3 new_plane;
+  t.This2Other (GetObjectPlane (), Vobj (0), new_plane);
+  GetObjectPlane () = new_plane;
+  thing->StaticDataChanged ();
+  if (mapping)
+  {
+    mapping->m_obj2tex *= t.GetO2T ();
+    mapping->v_obj2tex = t.This2Other (mapping->v_obj2tex);
+  }
+}
+
+void csPolygon3DStatic::CreateBoundingTextureBox ()
 {
   if (!mapping) mapping = new csLightMapMapping ();
 
@@ -244,427 +590,10 @@ void csPolygon3D::CreateBoundingTextureBox ()
   mapping->fdv = min_v * hh;
 }
 
-void csPolygon3D::MappingSetTextureSpace (
-  const csPlane3 &plane_wor,
-  const csVector3 &v_orig,
-  const csVector3 &v1,
-  float len)
-{
-  MappingSetTextureSpace (
-    plane_wor,
-    v_orig.x, v_orig.y, v_orig.z,
-    v1.x, v1.y, v1.z,
-    len);
-}
-
-void csPolygon3D::MappingSetTextureSpace (
-  const csPlane3 &plane_wor,
-  float xo,
-  float yo,
-  float zo,
-  float x1,
-  float y1,
-  float z1,
-  float len1)
-{
-  float A = plane_wor.A ();
-  float B = plane_wor.B ();
-  float C = plane_wor.C ();
-  csTextureTrans::compute_texture_space (
-      mapping->m_obj2tex, mapping->v_obj2tex,
-      xo, yo, zo,
-      x1, y1, z1,
-      len1,
-      A, B, C);
-  txt_info->m_world2tex = mapping->m_obj2tex;
-  txt_info->v_world2tex = mapping->v_obj2tex;
-}
-
-void csPolygon3D::MappingSetTextureSpace (
-  const csVector3 &v_orig,
-  const csVector3 &v1,
-  float len1,
-  const csVector3 &v2,
-  float len2)
-{
-  csTextureTrans::compute_texture_space (
-      mapping->m_obj2tex, mapping->v_obj2tex,
-      v_orig, v1,
-      len1, v2,
-      len2);
-  txt_info->m_world2tex = mapping->m_obj2tex;
-  txt_info->v_world2tex = mapping->v_obj2tex;
-}
-
-void csPolygon3D::MappingSetTextureSpace (
-  const csVector3 &v_orig,
-  const csVector3 &v_u,
-  const csVector3 &v_v)
-{
-  csTextureTrans::compute_texture_space (
-      mapping->m_obj2tex,
-      mapping->v_obj2tex,
-      v_orig,
-      v_u,
-      v_v);
-  txt_info->m_world2tex = mapping->m_obj2tex;
-  txt_info->v_world2tex = mapping->v_obj2tex;
-}
-
-void csPolygon3D::MappingSetTextureSpace (
-  float xo, float yo, float zo,
-  float xu, float yu, float zu,
-  float xv, float yv, float zv)
-{
-  const csVector3 o (xo, yo, zo);
-  const csVector3 u (xu, yu, zu);
-  const csVector3 v (xv, yv, zv);
-  csTextureTrans::compute_texture_space (mapping->m_obj2tex,
-  	mapping->v_obj2tex, o, u, v);
-  txt_info->m_world2tex = mapping->m_obj2tex;
-  txt_info->v_world2tex = mapping->v_obj2tex;
-}
-
-void csPolygon3D::MappingSetTextureSpace (
-  float xo, float yo, float zo,
-  float xu, float yu, float zu,
-  float xv, float yv, float zv,
-  float xw, float yw, float zw)
-{
-  csTextureTrans::compute_texture_space (
-      mapping->m_obj2tex, mapping->v_obj2tex,
-      xo, yo, zo,
-      xu, yu, zu,
-      xv, yv, zv,
-      xw, yw, zw);
-  txt_info->m_world2tex = mapping->m_obj2tex;
-  txt_info->v_world2tex = mapping->v_obj2tex;
-}
-
-void csPolygon3D::MappingSetTextureSpace (
-  const csMatrix3 &tx_matrix,
-  const csVector3 &tx_vector)
-{
-  mapping->m_obj2tex = tx_matrix;
-  txt_info->m_world2tex = tx_matrix;
-  mapping->v_obj2tex = tx_vector;
-  txt_info->v_world2tex = tx_vector;
-}
-
-void csPolygon3D::MappingGetTextureSpace (
-  csMatrix3 &tx_matrix,
-  csVector3 &tx_vector)
-{
-  tx_matrix = mapping->m_obj2tex;
-  tx_vector = mapping->v_obj2tex;
-}
-
-void csPolygon3D::SetParent (csThing *thing)
-{
-  if (thing == csPolygon3D::thing) return ;           // Nothing to do.
-  if (csPolygon3D::thing && portal)
-    csPolygon3D::thing->RemovePortalPolygon (this);
-  csPolygon3D::thing = thing;
-  if (portal) thing->AddPortalPolygon (this);
-}
-
-void csPolygon3D::EnableTextureMapping (bool enable)
-{
-  if (enable && txt_info != NULL) return;
-  if (!enable && txt_info == NULL) return;
-
-  if (enable)
-  {
-    mapping = new csLightMapMapping ();
-    txt_info = new csPolyTexLightMap (mapping);
-  }
-  else
-  {
-    delete txt_info;
-    txt_info = NULL;
-    delete mapping;
-    mapping = NULL;
-  }
-}
-
-void csPolygon3D::CopyTextureType (iPolygon3DStatic *ipt)
-{
-  csPolygon3D *pt = ipt->GetPrivateObject ();
-  EnableTextureMapping (pt->IsTextureMappingEnabled ());
-
-  csMatrix3 m;
-  csVector3 v (0);
-  if (pt->IsTextureMappingEnabled ())
-  {
-    pt->MappingGetTextureSpace (m, v);
-  }
-
-  SetTextureSpace (m, v);
-}
-
-void csPolygon3D::Reset ()
-{
-  vertices.MakeEmpty ();
-}
-
-void csPolygon3D::SetCSPortal (iSector *sector, bool null)
-{
-  if (portal && portal->GetSector () == sector)
-    return ;
-  if (portal && flags.Check (CS_POLY_DELETE_PORTAL))
-  {
-    delete portal;
-    portal = NULL;
-    if (thing) thing->RemovePortalPolygon (this);
-  }
-
-  if (!null && !sector) return ;
-  portal = new csPortal ();
-  flags.Set (CS_POLY_DELETE_PORTAL);
-  portal->flags.Reset (CS_PORTAL_WARP);
-  if (sector)
-    portal->SetSector (sector);
-  else
-    portal->SetSector (NULL);
-  flags.Reset (CS_POLY_COLLDET);         // Disable CD by default for portals.
-  if (thing) thing->AddPortalPolygon (this);
-
-  //portal->SetTexture (texh->get_texture_handle ());
-}
-
-void csPolygon3D::SetPortal (csPortal *prt)
-{
-  if (portal && flags.Check (CS_POLY_DELETE_PORTAL))
-  {
-    portal->SetSector (NULL);
-    delete portal;
-    portal = NULL;
-    if (thing) thing->RemovePortalPolygon (this);
-  }
-
-  portal = prt;
-  flags.Set (CS_POLY_DELETE_PORTAL);
-  flags.Reset (CS_POLY_COLLDET);         // Disable CD by default for portals.
-  if (thing) thing->AddPortalPolygon (this);
-}
-
-bool csPolygon3D::Overlaps (csPolygon3D *overlapped)
-{
-  csPolygon3D *totest = overlapped;
-
-  // Algorithm: if any of the vertices of the 'totest' polygon
-  // is facing away from the front of this polygon (i.e. the vertex
-  // cannot see this polygon) then there is a chance that this polygon
-  // overlaps the other. If this is not the case then we can return false
-  // already. Otherwise we have to see that the 'totest' polygon is
-  // itself not facing away from this polygon. To test that we see if
-  // there is a vertex of this polygon that is in front of the 'totest'
-  // polygon. If that is the case then we return true.
-  csPlane3 &this_plane = plane_obj;
-  csPlane3 &test_plane = totest->plane_obj;
-  int i;
-  for (i = 0; i < totest->vertices.GetVertexCount (); i++)
-  {
-    if (this_plane.Classify (totest->Vobj (i)) >= SMALL_EPSILON)
-    {
-      int j;
-      for (j = 0; j < vertices.GetVertexCount (); j++)
-      {
-        if (test_plane.Classify (Vobj (j)) <= SMALL_EPSILON)
-        {
-          return true;
-        }
-      }
-
-      return false;
-    }
-  }
-
-  return false;
-}
-
-void csPolygon3D::SetMaterial (iMaterialWrapper *material)
-{
-  csPolygon3D::material = material;
-}
-
-iMaterialHandle *csPolygon3D::GetMaterialHandle ()
-{
-  return material ? material->GetMaterialHandle () : NULL;
-}
-
-iThingState *csPolygon3D::eiPolygon3D::GetParent ()
-{
-  return &(scfParent->GetParent ()->scfiThingState);
-}
-
-iThingState *csPolygon3D::eiPolygon3DStatic::GetParent ()
-{
-  return &(scfParent->GetParent ()->scfiThingState);
-}
-
-void csPolygon3D::eiPolygon3DStatic::CreatePlane (
-  const csVector3 &iOrigin,
-  const csMatrix3 &iMatrix)
-{
-  scfParent->SetTextureSpace (iMatrix, iOrigin);
-}
-
-bool csPolygon3D::IsTransparent ()
-{
-  if (Alpha) return true;
-#ifndef CS_USE_NEW_RENDERER
-  if (MixMode != CS_FX_COPY) return true;
-#endif // CS_USE_NEW_RENDERER
-
-  iTextureHandle *txt_handle = GetMaterialHandle ()->GetTexture ();
-  return txt_handle && ((txt_handle->GetAlphaMap ()
-  	|| txt_handle->GetKeyColor ()));
-}
-
-int csPolygon3D::Classify (const csPlane3 &pl)
-{
-  if (&GetPolyPlane () == &pl) return CS_POL_SAME_PLANE;
-  if (csMath3::PlanesEqual (pl, GetPolyPlane ())) return CS_POL_SAME_PLANE;
-
-  int i;
-  int front = 0, back = 0;
-
-  for (i = 0; i < GetVertices ().GetVertexCount (); i++)
-  {
-    float dot = pl.Classify (Vobj (i));
-    if (ABS (dot) < EPSILON) dot = 0;
-    if (dot > 0)
-      back++;
-    else if (dot < 0)
-      front++;
-  }
-
-  if (back == 0) return CS_POL_FRONT;
-  if (front == 0) return CS_POL_BACK;
-  return CS_POL_SPLIT_NEEDED;
-}
-
-int csPolygon3D::ClassifyX (float x)
-{
-  int i;
-  int front = 0, back = 0;
-
-  for (i = 0; i < GetVertices ().GetVertexCount (); i++)
-  {
-    float xx = Vobj (i).x - x;
-    if (xx < -EPSILON)
-      front++;
-    else if (xx > EPSILON)
-      back++;
-  }
-
-  if (back == 0 && front == 0) return CS_POL_SAME_PLANE;
-  if (back == 0) return CS_POL_FRONT;
-  if (front == 0) return CS_POL_BACK;
-  return CS_POL_SPLIT_NEEDED;
-}
-
-int csPolygon3D::ClassifyY (float y)
-{
-  int i;
-  int front = 0, back = 0;
-
-  for (i = 0; i < GetVertices ().GetVertexCount (); i++)
-  {
-    float yy = Vobj (i).y - y;
-    if (yy < -EPSILON)
-      front++;
-    else if (yy > EPSILON)
-      back++;
-  }
-
-  if (back == 0 && front == 0) return CS_POL_SAME_PLANE;
-  if (back == 0) return CS_POL_FRONT;
-  if (front == 0) return CS_POL_BACK;
-  return CS_POL_SPLIT_NEEDED;
-}
-
-int csPolygon3D::ClassifyZ (float z)
-{
-  int i;
-  int front = 0, back = 0;
-
-  for (i = 0; i < GetVertices ().GetVertexCount (); i++)
-  {
-    float zz = Vobj (i).z - z;
-    if (zz < -EPSILON)
-      front++;
-    else if (zz > EPSILON)
-      back++;
-  }
-
-  if (back == 0 && front == 0) return CS_POL_SAME_PLANE;
-  if (back == 0) return CS_POL_FRONT;
-  if (front == 0) return CS_POL_BACK;
-  return CS_POL_SPLIT_NEEDED;
-}
-
-void csPolygon3D::ComputeNormal ()
-{
-  float A, B, C, D;
-  PlaneNormal (&A, &B, &C);
-  D = -A * Vobj (0).x - B * Vobj (0).y - C * Vobj (0).z;
-
-  // By default the world space normal is equal to the object space normal.
-  plane_obj.Set (A, B, C, D);
-  plane_wor.Set (A, B, C, D);
-}
-
-void csPolygon3D::WorldToCameraPlane (
-  const csReversibleTransform &t,
-  const csVector3 &vertex1,
-  csPlane3& plane_cam)
-{
-  t.Other2This (plane_wor, vertex1, plane_cam);
-}
-
-void csPolygon3D::ComputeCameraPlane (const csReversibleTransform& t,
-  	csPlane3& pl)
-{
-  csVector3 cam_vert = t.Other2This (Vwor (0));
-  WorldToCameraPlane (t, cam_vert, pl);
-}
-
-void csPolygon3D::ObjectToWorld (
-  const csReversibleTransform &t,
-  const csVector3 &vwor)
-{
-  t.This2Other (plane_obj, vwor, plane_wor);
-  // This is not efficient and only needed in those cases where the
-  // thing is really scaled. We have to see if this is a problem. Normally
-  // it is a good thing to avoid calling csThing::Transform() to often.
-  // So normally it should not be a problem.
-  plane_wor.Normalize ();
-
-  if (txt_info) txt_info->ObjectToWorld (mapping->m_obj2tex,
-  	mapping->v_obj2tex, t);
-  if (portal) portal->ObjectToWorld (t);
-}
-
-void csPolygon3D::HardTransform (const csReversibleTransform &t)
-{
-  if (portal) portal->HardTransform (t);
-  csPlane3 new_plane;
-  t.This2Other (GetObjectPlane (), Vobj (0), new_plane);
-  GetObjectPlane () = new_plane;
-  GetWorldPlane () = new_plane;
-  if (mapping)
-  {
-    mapping->m_obj2tex *= t.GetO2T ();
-    mapping->v_obj2tex = t.This2Other (mapping->v_obj2tex);
-  }
-}
-
 #define TEXW(t) ((t)->w_orig)
 #define TEXH(t) ((t)->h)
 
-void csPolygon3D::Finish ()
+void csPolygon3DStatic::Finish ()
 {
 #ifndef CS_USE_NEW_RENDERER
 
@@ -678,15 +607,13 @@ void csPolygon3D::Finish ()
       EnableTextureMapping (false);
       return ;
     }
+    CreateBoundingTextureBox ();
   }
   else
   {
     return;
   }
 
-  txt_info->tex->SetPolygon (this);
-  CreateBoundingTextureBox ();
-  txt_info->tex->SetLightMap (NULL);
   if (portal)
     portal->SetFilter (material->GetMaterialHandle ()->GetTexture ());
 
@@ -702,33 +629,12 @@ void csPolygon3D::Finish ()
         "for polygon '%s'", lmw, lmh, 
 	max_lmw, max_lmh, GetName());
     }
-    else
-    {
-      csLightMap *lm = new csLightMap ();
-      txt_info->tex->SetLightMap (lm);
-
-      csColor ambient;
-      thing->thing_type->engine->GetAmbientLight (ambient);
-      lm->Alloc (mapping->w_orig, mapping->h,
-      	int(ambient.red * 255.0f),
-      	int(ambient.green * 255.0f),
-      	int(ambient.blue * 255.0f));
-
-      if (!thing->thing_type->G3D->IsLightmapOK (txt_info->GetPolyTex()))
-      {
-	thing->thing_type->Notify ("Renderer can't handle lightmap "
-	  "for polygon '%s'", GetName());
-	flags.Set (CS_POLY_LM_REFUSED, CS_POLY_LM_REFUSED);
-      }
-
-      lm->DecRef ();
-    }
   }
 
 #endif // CS_USE_NEW_RENDERER
 }
 
-float csPolygon3D::GetArea ()
+float csPolygon3DStatic::GetArea ()
 {
   float area = 0.0f;
 
@@ -739,7 +645,7 @@ float csPolygon3D::GetArea ()
   return area / 2.0f;
 }
 
-void csPolygon3D::SetTextureSpace (
+void csPolygon3DStatic::SetTextureSpace (
   const csMatrix3 &tx_matrix,
   const csVector3 &tx_vector)
 {
@@ -750,7 +656,7 @@ void csPolygon3D::SetTextureSpace (
   }
 }
 
-void csPolygon3D::GetTextureSpace (
+void csPolygon3DStatic::GetTextureSpace (
   csMatrix3 &tx_matrix,
   csVector3 &tx_vector)
 {
@@ -760,7 +666,7 @@ void csPolygon3D::GetTextureSpace (
   }
 }
 
-void csPolygon3D::SetTextureSpace (
+void csPolygon3DStatic::SetTextureSpace (
   const csVector3 &p1,
   const csVector2 &uv1,
   const csVector3 &p2,
@@ -822,7 +728,7 @@ void csPolygon3D::SetTextureSpace (
   SetTextureSpace (po, pu, (pu - po).Norm (), pv, (pv - po).Norm ());
 }
 
-void csPolygon3D::SetTextureSpace (
+void csPolygon3DStatic::SetTextureSpace (
   const csVector3 &v_orig,
   const csVector3 &v1,
   float len1)
@@ -836,7 +742,7 @@ void csPolygon3D::SetTextureSpace (
   SetTextureSpace (xo, yo, zo, x1, y1, z1, len1);
 }
 
-void csPolygon3D::SetTextureSpace (
+void csPolygon3DStatic::SetTextureSpace (
   float xo,
   float yo,
   float zo,
@@ -856,7 +762,7 @@ void csPolygon3D::SetTextureSpace (
   }
 }
 
-void csPolygon3D::SetTextureSpace (
+void csPolygon3DStatic::SetTextureSpace (
   const csVector3 &v_orig,
   const csVector3 &v1,
   float len1,
@@ -870,7 +776,7 @@ void csPolygon3D::SetTextureSpace (
   }
 }
 
-void csPolygon3D::SetTextureSpace (
+void csPolygon3DStatic::SetTextureSpace (
   float xo,
   float yo,
   float zo,
@@ -891,30 +797,7 @@ void csPolygon3D::SetTextureSpace (
     len2);
 }
 
-void csPolygon3D::DynamicLightDisconnect (iDynLight* dynlight)
-{
-  csLightPatch* lp = lightpatches;
-  while (lp)
-  {
-    csLightPatch* lpnext = lp->GetNext ();
-    if (lp->GetLight () == dynlight)
-      thing->thing_type->lightpatch_pool->Free (lp);
-    lp = lpnext;
-  }
-}
-
-void csPolygon3D::UnlinkLightpatch (csLightPatch *lp)
-{
-  lp->RemoveList (lightpatches);
-}
-
-void csPolygon3D::AddLightpatch (csLightPatch *lp)
-{
-  lp->AddList (lightpatches);
-  lp->SetPolyCurve (this);
-}
-
-int csPolygon3D::AddVertex (int v)
+int csPolygon3DStatic::AddVertex (int v)
 {
   if (v >= thing->GetVertexCount ())
   {
@@ -936,21 +819,21 @@ int csPolygon3D::AddVertex (int v)
   return vertices.GetVertexCount () - 1;
 }
 
-int csPolygon3D::AddVertex (const csVector3 &v)
+int csPolygon3DStatic::AddVertex (const csVector3 &v)
 {
   int i = thing->AddVertex (v);
   AddVertex (i);
   return i;
 }
 
-int csPolygon3D::AddVertex (float x, float y, float z)
+int csPolygon3DStatic::AddVertex (float x, float y, float z)
 {
   int i = thing->AddVertex (x, y, z);
   AddVertex (i);
   return i;
 }
 
-void csPolygon3D::PlaneNormal (float *yz, float *zx, float *xy)
+void csPolygon3DStatic::PlaneNormal (float *yz, float *zx, float *xy)
 {
   float ayz = 0;
   float azx = 0;
@@ -983,6 +866,345 @@ void csPolygon3D::PlaneNormal (float *yz, float *zx, float *xy)
   *yz = ayz * invd;
   *zx = azx * invd;
   *xy = axy * invd;
+}
+
+bool csPolygon3DStatic::PointOnPolygon (const csVector3 &v)
+{
+  // First check if point is on the plane.
+  csPlane3 &pl = plane_obj;
+  float dot = pl.D () + pl.A () * v.x + pl.B () * v.y + pl.C () * v.z;
+  if (ABS (dot) >= EPSILON) return false;
+
+  // Check if 'v' is on the same side of all edges.
+  int i, i1;
+  bool neg = false, pos = false;
+  i1 = GetVertices ().GetVertexCount () - 1;
+  for (i = 0; i < GetVertices ().GetVertexCount (); i++)
+  {
+    float ar = csMath3::Area3 (v, Vobj (i1), Vobj (i));
+    if (ar < 0)
+      neg = true;
+    else if (ar > 0)
+      pos = true;
+    if (neg && pos) return false;
+    i1 = i;
+  }
+
+  return true;
+}
+
+bool csPolygon3DStatic::IntersectRay (const csVector3 &start,
+		const csVector3 &end)
+{
+  // First we do backface culling on the polygon with respect to
+  // the starting point of the beam.
+  csPlane3 &pl = plane_obj;
+  float dot1 = pl.D () +
+    pl.A () *
+    start.x +
+    pl.B () *
+    start.y +
+    pl.C () *
+    start.z;
+  if (dot1 > 0) return false;
+
+  // If this vector is perpendicular to the plane of the polygon we
+
+  // need to catch this case here.
+  float dot2 = pl.D () + pl.A () * end.x + pl.B () * end.y + pl.C () * end.z;
+  if (ABS (dot1 - dot2) < SMALL_EPSILON) return false;
+
+  // Now we generate a plane between the starting point of the ray and
+  // every edge of the polygon. With the plane normal of that plane we
+  // can then check if the end of the ray is on the same side for all
+  // these planes.
+  csVector3 normal;
+  csVector3 relend = end;
+  relend -= start;
+
+  int i, i1;
+  i1 = GetVertices ().GetVertexCount () - 1;
+  for (i = 0; i < GetVertices ().GetVertexCount (); i++)
+  {
+    csMath3::CalcNormal (normal, start, Vobj (i1), Vobj (i));
+    if ((relend * normal) > 0) return false;
+    i1 = i;
+  }
+
+  return true;
+}
+
+bool csPolygon3DStatic::IntersectRayNoBackFace (
+  const csVector3 &start,
+  const csVector3 &end)
+{
+  // If this vector is perpendicular to the plane of the polygon we
+  // need to catch this case here.
+  csPlane3 &pl = plane_obj;
+  float dot1 = pl.D () +
+    pl.A () *
+    start.x +
+    pl.B () *
+    start.y +
+    pl.C () *
+    start.z;
+  float dot2 = pl.D () + pl.A () * end.x + pl.B () * end.y + pl.C () * end.z;
+  if (ABS (dot1 - dot2) < SMALL_EPSILON) return false;
+
+  // If dot1 > 0 the polygon would have been backface culled.
+  // In this case we just use the result of this test to reverse
+  // the test below.
+  // Now we generate a plane between the starting point of the ray and
+  // every edge of the polygon. With the plane normal of that plane we
+  // can then check if the end of the ray is on the same side for all
+  // these planes.
+  csVector3 normal;
+  csVector3 relend = end;
+  relend -= start;
+
+  int i, i1;
+  i1 = GetVertices ().GetVertexCount () - 1;
+  for (i = 0; i < GetVertices ().GetVertexCount (); i++)
+  {
+    csMath3::CalcNormal (normal, start, Vobj (i1), Vobj (i));
+    if (dot1 > 0)
+    {
+      if ((relend * normal) < 0) return false;
+    }
+    else
+    {
+      if ((relend * normal) > 0) return false;
+    }
+
+    i1 = i;
+  }
+
+  return true;
+}
+
+bool csPolygon3DStatic::IntersectSegment (
+  const csVector3 &start,
+  const csVector3 &end,
+  csVector3 &isect,
+  float *pr)
+{
+  if (!IntersectRay (start, end)) return false;
+  return IntersectSegmentPlane (start, end, isect, pr);
+}
+
+bool csPolygon3DStatic::IntersectSegmentPlane (
+  const csVector3 &start,
+  const csVector3 &end,
+  csVector3 &isect,
+  float *pr) const
+{
+  float x1 = start.x;
+  float y1 = start.y;
+  float z1 = start.z;
+  float x2 = end.x;
+  float y2 = end.y;
+  float z2 = end.z;
+  float r, num, denom;
+
+  // So now we have the plane equation of the polygon:
+  // A*x + B*y + C*z + D = 0
+  //
+  // We also have the parameter line equations of the ray
+  // going through 'start' and 'end':
+  // x = r*(x2-x1)+x1
+  // y = r*(y2-y1)+y1
+  // z = r*(z2-z1)+z1
+  //
+  // =>   A*(r*(x2-x1)+x1) + B*(r*(y2-y1)+y1) + C*(r*(z2-z1)+z1) + D = 0
+  // Set *pr to -1 to indicate error if we return false now.
+  if (pr) *pr = -1;
+
+  denom = plane_obj.A () * (x2 - x1) +
+    plane_obj.B () * (y2 - y1) +
+    plane_obj.C () * (z2 - z1);
+  if (ABS (denom) < SMALL_EPSILON) return false;  // Lines are parallel
+  num = -(plane_obj.A () * x1 +
+	  plane_obj.B () * y1 +
+	  plane_obj.C () * z1 +
+	  plane_obj.D ());
+  r = num / denom;
+
+  // Calculate 'r' and 'isect' even if the intersection point is
+  // not on the segment. That way we can use this function for testing
+  // with rays as well.
+  if (pr) *pr = r;
+
+  isect.x = r * (x2 - x1) + x1;
+  isect.y = r * (y2 - y1) + y1;
+  isect.z = r * (z2 - z1) + z1;
+
+  // If r is not in [0,1] the intersection point is not on the segment.
+  if (r < 0 /*-SMALL_EPSILON*/ || r > 1) return false;
+
+  return true;
+}
+
+bool csPolygon3DStatic::IntersectRayPlane (
+  const csVector3 &start,
+  const csVector3 &end,
+  csVector3 &isect)
+{
+  float r;
+  IntersectSegmentPlane (start, end, isect, &r);
+  return r >= 0;
+}
+
+//---------------------------------------------------------------------------
+SCF_IMPLEMENT_IBASE(csPolygon3D)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPolygon3D)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csPolygon3D::eiPolygon3D)
+  SCF_IMPLEMENTS_INTERFACE(iPolygon3D)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+csPolygon3D::csPolygon3D (csPolygon3DStatic* static_data)
+{
+  VectorArray = GetStaticVectorArray();
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
+  thing = NULL;
+
+  csPolygon3D::static_data = static_data;
+
+  txt_info = NULL;
+  lightpatches = NULL;
+}
+
+csPolygon3D::~csPolygon3D ()
+{
+  delete txt_info;
+
+  if (thing)
+  {
+    while (lightpatches)
+    {
+      iDynLight* dl = lightpatches->GetLight ();
+      if (dl)
+        dl->RemoveAffectedLightingInfo (&(thing->scfiLightingInfo));
+      thing->thing_type->lightpatch_pool->Free (lightpatches);
+    }
+  }
+}
+
+void csPolygon3D::SetParent (csThing *thing)
+{
+  if (thing == csPolygon3D::thing) return ;           // Nothing to do.
+  csPolygon3D::thing = thing;
+}
+
+iThingState *csPolygon3D::eiPolygon3D::GetParent ()
+{
+  return &(scfParent->GetParent ()->scfiThingState);
+}
+
+void csPolygon3D::RefreshFromStaticData ()
+{
+  delete txt_info;
+  txt_info = NULL;
+  if (static_data->IsTextureMappingEnabled ())
+  {
+    txt_info = new csPolyTexLightMap (static_data->GetLightMapMapping ());
+    txt_info->m_world2tex = static_data->GetLightMapMapping ()->m_obj2tex;
+    txt_info->v_world2tex = static_data->GetLightMapMapping ()->v_obj2tex;
+  }
+  plane_wor = static_data->GetObjectPlane ();
+}
+
+void csPolygon3D::WorldToCameraPlane (
+  const csReversibleTransform &t,
+  const csVector3 &vertex1,
+  csPlane3& plane_cam)
+{
+  t.Other2This (plane_wor, vertex1, plane_cam);
+}
+
+void csPolygon3D::ComputeCameraPlane (const csReversibleTransform& t,
+  	csPlane3& pl)
+{
+  csVector3 cam_vert = t.Other2This (Vwor (0));
+  WorldToCameraPlane (t, cam_vert, pl);
+}
+
+void csPolygon3D::ObjectToWorld (
+  const csReversibleTransform &t,
+  const csVector3 &vwor)
+{
+  t.This2Other (static_data->plane_obj, vwor, plane_wor);
+  // This is not efficient and only needed in those cases where the
+  // thing is really scaled. We have to see if this is a problem. Normally
+  // it is a good thing to avoid calling csThing::Transform() to often.
+  // So normally it should not be a problem.
+  plane_wor.Normalize ();
+
+  if (txt_info) txt_info->ObjectToWorld (static_data->mapping->m_obj2tex,
+  	static_data->mapping->v_obj2tex, t);
+}
+
+#define TEXW(t) ((t)->w_orig)
+#define TEXH(t) ((t)->h)
+
+void csPolygon3D::Finish ()
+{
+#ifndef CS_USE_NEW_RENDERER
+  RefreshFromStaticData ();
+
+  if (static_data->IsTextureMappingEnabled ())
+  {
+    txt_info->tex->SetPolygon (this);
+    txt_info->tex->SetLightMap (NULL);
+    if (static_data->flags.Check (CS_POLY_LIGHTING))
+    {
+      csLightMap *lm = new csLightMap ();
+      txt_info->tex->SetLightMap (lm);
+
+      csColor ambient;
+      thing->thing_type->engine->GetAmbientLight (ambient);
+      lm->Alloc (static_data->mapping->w_orig, static_data->mapping->h,
+      	  int(ambient.red * 255.0f),
+      	  int(ambient.green * 255.0f),
+      	  int(ambient.blue * 255.0f));
+  
+      if (!thing->thing_type->G3D->IsLightmapOK (txt_info->GetPolyTex()))
+      {
+        thing->thing_type->Notify ("Renderer can't handle lightmap "
+	    "for polygon '%s'", static_data->GetName());
+        static_data->flags.Set (CS_POLY_LM_REFUSED, CS_POLY_LM_REFUSED);
+      }
+
+      lm->DecRef ();
+    }
+  }
+
+#endif // CS_USE_NEW_RENDERER
+}
+
+void csPolygon3D::DynamicLightDisconnect (iDynLight* dynlight)
+{
+  csLightPatch* lp = lightpatches;
+  while (lp)
+  {
+    csLightPatch* lpnext = lp->GetNext ();
+    if (lp->GetLight () == dynlight)
+      thing->thing_type->lightpatch_pool->Free (lp);
+    lp = lpnext;
+  }
+}
+
+void csPolygon3D::UnlinkLightpatch (csLightPatch *lp)
+{
+  lp->RemoveList (lightpatches);
+}
+
+void csPolygon3D::AddLightpatch (csLightPatch *lp)
+{
+  lp->AddList (lightpatches);
+  lp->SetPolyCurve (this);
 }
 
 // Clip a polygon against a plane.
@@ -1104,7 +1326,7 @@ bool csPolygon3D::ClipToPlane (
   // vertices has been done earlier).
   // If there are no visible vertices this polygon need not be drawn.
   cnt_vis = 0;
-  num_vertices = GetVertices ().GetVertexCount ();
+  num_vertices = static_data->GetVertices ().GetVertexCount ();
   for (i = 0; i < num_vertices; i++)
     if (Vcam (i).z >= 0)
     {
@@ -1512,192 +1734,6 @@ bool csPolygon3D::DoPerspective (
   return true;
 }
 
-bool csPolygon3D::PointOnPolygon (const csVector3 &v)
-{
-  // First check if point is on the plane.
-  csPlane3 &pl = plane_obj;
-  float dot = pl.D () + pl.A () * v.x + pl.B () * v.y + pl.C () * v.z;
-  if (ABS (dot) >= EPSILON) return false;
-
-  // Check if 'v' is on the same side of all edges.
-  int i, i1;
-  bool neg = false, pos = false;
-  i1 = GetVertices ().GetVertexCount () - 1;
-  for (i = 0; i < GetVertices ().GetVertexCount (); i++)
-  {
-    float ar = csMath3::Area3 (v, Vobj (i1), Vobj (i));
-    if (ar < 0)
-      neg = true;
-    else if (ar > 0)
-      pos = true;
-    if (neg && pos) return false;
-    i1 = i;
-  }
-
-  return true;
-}
-
-bool csPolygon3D::IntersectRay (const csVector3 &start, const csVector3 &end)
-{
-  // First we do backface culling on the polygon with respect to
-
-  // the starting point of the beam.
-  csPlane3 &pl = plane_obj;
-  float dot1 = pl.D () +
-    pl.A () *
-    start.x +
-    pl.B () *
-    start.y +
-    pl.C () *
-    start.z;
-  if (dot1 > 0) return false;
-
-  // If this vector is perpendicular to the plane of the polygon we
-
-  // need to catch this case here.
-  float dot2 = pl.D () + pl.A () * end.x + pl.B () * end.y + pl.C () * end.z;
-  if (ABS (dot1 - dot2) < SMALL_EPSILON) return false;
-
-  // Now we generate a plane between the starting point of the ray and
-  // every edge of the polygon. With the plane normal of that plane we
-  // can then check if the end of the ray is on the same side for all
-  // these planes.
-  csVector3 normal;
-  csVector3 relend = end;
-  relend -= start;
-
-  int i, i1;
-  i1 = GetVertices ().GetVertexCount () - 1;
-  for (i = 0; i < GetVertices ().GetVertexCount (); i++)
-  {
-    csMath3::CalcNormal (normal, start, Vobj (i1), Vobj (i));
-    if ((relend * normal) > 0) return false;
-    i1 = i;
-  }
-
-  return true;
-}
-
-bool csPolygon3D::IntersectRayNoBackFace (
-  const csVector3 &start,
-  const csVector3 &end)
-{
-  // If this vector is perpendicular to the plane of the polygon we
-  // need to catch this case here.
-  csPlane3 &pl = plane_obj;
-  float dot1 = pl.D () +
-    pl.A () *
-    start.x +
-    pl.B () *
-    start.y +
-    pl.C () *
-    start.z;
-  float dot2 = pl.D () + pl.A () * end.x + pl.B () * end.y + pl.C () * end.z;
-  if (ABS (dot1 - dot2) < SMALL_EPSILON) return false;
-
-  // If dot1 > 0 the polygon would have been backface culled.
-  // In this case we just use the result of this test to reverse
-  // the test below.
-  // Now we generate a plane between the starting point of the ray and
-  // every edge of the polygon. With the plane normal of that plane we
-  // can then check if the end of the ray is on the same side for all
-  // these planes.
-  csVector3 normal;
-  csVector3 relend = end;
-  relend -= start;
-
-  int i, i1;
-  i1 = GetVertices ().GetVertexCount () - 1;
-  for (i = 0; i < GetVertices ().GetVertexCount (); i++)
-  {
-    csMath3::CalcNormal (normal, start, Vobj (i1), Vobj (i));
-    if (dot1 > 0)
-    {
-      if ((relend * normal) < 0) return false;
-    }
-    else
-    {
-      if ((relend * normal) > 0) return false;
-    }
-
-    i1 = i;
-  }
-
-  return true;
-}
-
-bool csPolygon3D::IntersectSegment (
-  const csVector3 &start,
-  const csVector3 &end,
-  csVector3 &isect,
-  float *pr)
-{
-  if (!IntersectRay (start, end)) return false;
-  return IntersectSegmentPlane (start, end, isect, pr);
-}
-
-bool csPolygon3D::IntersectSegmentPlane (
-  const csVector3 &start,
-  const csVector3 &end,
-  csVector3 &isect,
-  float *pr) const
-{
-  float x1 = start.x;
-  float y1 = start.y;
-  float z1 = start.z;
-  float x2 = end.x;
-  float y2 = end.y;
-  float z2 = end.z;
-  float r, num, denom;
-
-  // So now we have the plane equation of the polygon:
-  // A*x + B*y + C*z + D = 0
-  //
-  // We also have the parameter line equations of the ray
-  // going through 'start' and 'end':
-  // x = r*(x2-x1)+x1
-  // y = r*(y2-y1)+y1
-  // z = r*(z2-z1)+z1
-  //
-  // =>   A*(r*(x2-x1)+x1) + B*(r*(y2-y1)+y1) + C*(r*(z2-z1)+z1) + D = 0
-  // Set *pr to -1 to indicate error if we return false now.
-  if (pr) *pr = -1;
-
-  denom = plane_obj.A () * (x2 - x1) +
-    plane_obj.B () * (y2 - y1) +
-    plane_obj.C () * (z2 - z1);
-  if (ABS (denom) < SMALL_EPSILON) return false;  // Lines are parallel
-  num = -(plane_obj.A () * x1 +
-	  plane_obj.B () * y1 +
-	  plane_obj.C () * z1 +
-	  plane_obj.D ());
-  r = num / denom;
-
-  // Calculate 'r' and 'isect' even if the intersection point is
-  // not on the segment. That way we can use this function for testing
-  // with rays as well.
-  if (pr) *pr = r;
-
-  isect.x = r * (x2 - x1) + x1;
-  isect.y = r * (y2 - y1) + y1;
-  isect.z = r * (z2 - z1) + z1;
-
-  // If r is not in [0,1] the intersection point is not on the segment.
-  if (r < 0 /*-SMALL_EPSILON*/ || r > 1) return false;
-
-  return true;
-}
-
-bool csPolygon3D::IntersectRayPlane (
-  const csVector3 &start,
-  const csVector3 &end,
-  csVector3 &isect)
-{
-  float r;
-  IntersectSegmentPlane (start, end, isect, &r);
-  return r >= 0;
-}
-
 void csPolygon3D::InitializeDefault ()
 {
   if (txt_info)
@@ -1713,12 +1749,12 @@ const char* csPolygon3D::ReadFromCache (iFile* file)
 {
   if (txt_info)
   {
-    CS_ASSERT (mapping != NULL);
+    CS_ASSERT (txt_info != NULL);
     if (txt_info->tex->lm == NULL) return NULL;
     const char* error = txt_info->tex->lm->ReadFromCache (
           file,
-          mapping->w_orig,
-          mapping->h,
+          static_data->mapping->w_orig,
+          static_data->mapping->h,
           this,
 	  NULL,
 	  thing->thing_type->engine);
@@ -1846,13 +1882,13 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
           // If partial then we first test if the light and shadow
           // frustums are adjacent. If so then we ignore the shadow
           // frustum as well (not relevant).
-          i1 = GetVertexCount () - 1;
-          for (i = 0; i < GetVertexCount (); i++)
+          i1 = static_data->GetVertexCount () - 1;
+          for (i = 0; i < static_data->GetVertexCount (); i++)
           {
-            j1 = sfp->GetVertexCount () - 1;
+            j1 = sfp->static_data->GetVertexCount () - 1;
 
             float a1 = csMath3::Area3 (Vwor (i1), Vwor (i), sfp->Vwor (j1));
-            for (j = 0; j < sfp->GetVertexCount (); j++)
+            for (j = 0; j < sfp->static_data->GetVertexCount (); j++)
             {
               float a = csMath3::Area3 (Vwor (i1), Vwor (i), sfp->Vwor (j));
               if (ABS (a) < EPSILON && ABS (a1) < EPSILON)
@@ -1926,7 +1962,8 @@ bool csPolygon3D::MarkRelevantShadowFrustums (iFrustumView* lview)
   return MarkRelevantShadowFrustums (lview, poly_plane);
 }
 
-void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview)
+void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
+		iMovable* movable)
 {
   csFrustum *light_frustum = lview->GetFrustumContext ()->GetLightFrustum ();
   const csVector3 &center = light_frustum->GetOrigin ();
@@ -1951,7 +1988,7 @@ void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview)
 
   bool fill_lightmap = true;
 
-  num_vertices = GetVertices ().GetVertexCount ();
+  num_vertices = static_data->GetVertices ().GetVertexCount ();
   if (num_vertices > VectorArray->Limit ())
     VectorArray->SetLimit (num_vertices);
   poly = VectorArray->GetArray ();
@@ -2007,7 +2044,7 @@ void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview)
   // well.
   // FillLightMap() will use this information and
   // csPortal::CalculateLighting() will also use it!!
-  po = GetPortal ();
+  po = static_data->GetPortal ();
   if (!MarkRelevantShadowFrustums (lview)) goto stop;
 
   // Update the lightmap given light and shadow frustums in new_lview.
@@ -2016,7 +2053,8 @@ void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview)
   if (po)
   {
     if (!po->flags.Check (CS_PORTAL_MIRROR))
-      po->CheckFrustum (lview, GetAlpha ());
+      po->CheckFrustum (lview, movable->GetTransform (),
+		      static_data->GetAlpha ());
   }
 
 stop:
@@ -2024,6 +2062,7 @@ stop:
 }
 
 void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
+	iMovable* movable,
 	csLightingPolyTexQueue* lptq, bool vis)
 {
   bool do_smooth = GetParent ()->GetSmoothingFlag ();
@@ -2079,7 +2118,7 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
   if (maybeItsVisible) 
     return;
 
-  csPortal *po = GetPortal ();
+  csPortal *po = static_data->GetPortal ();
 
   // @@@@@@@@ We temporarily don't do lighting through space-warping portals.
   // Needs to be fixed soon!!!
@@ -2090,7 +2129,7 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
 
     csFrustumContext *new_ctxt = lview->GetFrustumContext ();
 
-    int num_vertices = GetVertices ().GetVertexCount ();
+    int num_vertices = static_data->GetVertices ().GetVertexCount ();
     if (num_vertices > VectorArray->Limit ())
       VectorArray->SetLimit (num_vertices);
 
@@ -2111,7 +2150,8 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
     new_ctxt->SetLightFrustum (new_light_frustum);
     if (new_light_frustum)
     {
-      po->CheckFrustum ((iFrustumView *)lview, GetAlpha ());
+      po->CheckFrustum ((iFrustumView *)lview,
+		      movable->GetTransform (), static_data->GetAlpha ());
     }
 
     lview->RestoreFrustumContext (old_ctxt);

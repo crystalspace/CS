@@ -253,7 +253,6 @@ struct iThingState : public iBase
   virtual iPolygon3D *GetPolygon (const char* name) = 0;
   /// Find the index for a polygon. Returns -1 if polygon cannot be found.
   virtual int FindPolygonIndex (iPolygon3D* polygon) const = 0;
-
   /// Get the polygon for the given portal (with index).
   virtual iPolygon3D* GetPortalPolygon (int idx) const = 0;
 

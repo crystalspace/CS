@@ -37,12 +37,38 @@ int csPolygonArray::CompareKey (csSome Item, csConstSome Key, int Mode) const
 {
   (void)Mode;
 
-  const char *name = ((csPolygon3D *) Item)->GetName ();
+  const char *name = ((csPolygon3D *) Item)->GetStaticData ()->GetName ();
   return name ? strcmp (name, (char *)Key) : -1;
 }
 
 csPolygon3D *csPolygonArray::Get (int iIndex) const
 {
   return (csPolygon3D *)csVector::Get (iIndex);
+}
+
+//-----------------------------------------------+ csPolygonStaticArray +----//
+csPolygonStaticArray::~csPolygonStaticArray ()
+{
+  DeleteAll ();
+}
+
+bool csPolygonStaticArray::FreeItem (csSome Item)
+{
+  delete (csPolygon3DStatic *)Item;
+  return true;
+}
+
+int csPolygonStaticArray::CompareKey (csSome Item, csConstSome Key,
+		int Mode) const
+{
+  (void)Mode;
+
+  const char *name = ((csPolygon3DStatic *) Item)->GetName ();
+  return name ? strcmp (name, (char *)Key) : -1;
+}
+
+csPolygon3DStatic *csPolygonStaticArray::Get (int iIndex) const
+{
+  return (csPolygon3DStatic *)csVector::Get (iIndex);
 }
 
