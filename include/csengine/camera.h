@@ -393,7 +393,7 @@ public:
 
     virtual iPolygon3D* GetHit (csVector3& v)
     {
-      iPolygon3D* poly = scfParent->GetHit (v);
+      csPolygon3D* poly = scfParent->GetHit (v);
       return poly ? &(poly->scfiPolygon3D) : NULL;
     }
     virtual void Correct (int n)
