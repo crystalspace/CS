@@ -117,7 +117,7 @@ struct iSyntaxService : public iBase
 	iDocumentNode* child, iLoaderContext* ldr_context,
 	uint32 &flags, bool &mirror, bool &warp, int& msv,
 	csMatrix3 &m, csVector3 &before, csVector3 &after,
-	iString* destSector, bool& handled) = 0;
+	iString* destSector, bool& handled, bool& autoresolve) = 0;
 
   /**
    * Parse a color gradient.

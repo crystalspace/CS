@@ -284,9 +284,10 @@ bool csTextSyntaxService::HandlePortalParameter (
 	iDocumentNode* child, iLoaderContext* ldr_context,
 	uint32 &flags, bool &mirror, bool &warp, int& msv,
 	csMatrix3 &m, csVector3 &before, csVector3 &after,
-	iString* destSector, bool& handled)
+	iString* destSector, bool& handled, bool& autoresolve)
 {
   handled = true;
+  autoresolve = false;
   const char* value = child->GetValue ();
   csStringID id = xmltokens.Request (value);
   switch (id)
@@ -309,6 +310,10 @@ bool csTextSyntaxService::HandlePortalParameter (
       ParseVector (child, after);
       mirror = false;
       warp = true;
+      break;
+    case XMLTOKEN_AUTORESOLVE:
+      if (!ParseBool (child, autoresolve, true))
+        return false;
       break;
     case XMLTOKEN_MIRROR:
       if (!ParseBool (child, mirror, true))

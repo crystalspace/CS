@@ -4188,13 +4188,16 @@ class csMissingSectorCallback : public iPortalCallback
 public:
   csRef<iLoaderContext> ldr_context;
   char* sectorname;
+  bool autoresolve;
 
   SCF_DECLARE_IBASE;
-  csMissingSectorCallback (iLoaderContext* ldr_context, const char* sector)
+  csMissingSectorCallback (iLoaderContext* ldr_context, const char* sector,
+  	bool autoresolve)
   {
     SCF_CONSTRUCT_IBASE (0);
     csMissingSectorCallback::ldr_context = ldr_context;
     sectorname = csStrNew (sector);
+    csMissingSectorCallback::autoresolve = autoresolve;
   }
   virtual ~csMissingSectorCallback ()
   {
@@ -4208,9 +4211,12 @@ public:
     if (!sector) return false;
     portal->SetSector (sector);
     // For efficiency reasons we deallocate the name here.
-    delete[] sectorname;
-    sectorname = 0;
-    portal->RemoveMissingSectorCallback (this);
+    if (!autoresolve)
+    {
+      delete[] sectorname;
+      sectorname = 0;
+      portal->RemoveMissingSectorCallback (this);
+    }
     return true;
   }
 };
@@ -4235,6 +4241,7 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
   bool do_mirror = false;
   int msv = -1;
   scfString destSectorName;
+  bool autoresolve = false;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -4244,7 +4251,7 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
     bool handled;
     if (!SyntaxService->HandlePortalParameter (child, ldr_context,
         flags, do_mirror, do_warp, msv, m_w, v_w_before, v_w_after,
-	&destSectorName, handled))
+	&destSectorName, handled, autoresolve))
     {
       return false;
     }
@@ -4305,7 +4312,7 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
     // Create a callback to find the sector at runtime when the
     // portal is first used.
     csMissingSectorCallback* missing_cb = new csMissingSectorCallback (
-	    	ldr_context, destSectorName.GetData ());
+	    	ldr_context, destSectorName.GetData (), autoresolve);
     portal->SetMissingSectorCallback (missing_cb);
     missing_cb->DecRef ();
   }

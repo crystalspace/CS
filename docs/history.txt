@@ -42,6 +42,25 @@ chronological order.
 	  destination attribute missing. I'm not sure this is the correct
 	  fix though. Perhaps in some cases it IS an error if this is
 	  missing.
+	- Jorrit added a new 'autoresolve' tag for portals. If this tag is
+	  given the portal will automatically reconnect to the sector if
+	  the sector is removed and later added again. Without this flag
+	  it works as follows:
+	    - Portal is created, if sector doesn't exist a callback is
+	      created which will attempt to find the sector as soon as the
+	      portal is needed (for rendering for example).
+	    - As soon as the callback manages to find the sector it will
+	      connect the portal to that sector and remove itself.
+	    - When later the sector is removed the portal will be cleared
+	      again because it keeps a weak reference to the sector.
+	    - However when the sector then comes back again the callback
+	      is removed so the portal will not be able to relink again
+	      to the sector.
+	  With the 'autoresolve' flag the callback will not remove itself
+	  so it will always be able to relink to the sector. This is not
+	  default because this callback takes some memory which is not
+	  needed in most cases. Using this flag helps with games that do
+	  dynamic loading and unloading of levels.
 1-Apr-2004
 	- Eric Sunshine fixed include/Jamfile so that it installs Swig (*.i)
 	  files.  These are needed by CEL, for instance.

@@ -342,13 +342,16 @@ class MissingSectorCallback : public iPortalCallback
 public:
   csRef<iLoaderContext> ldr_context;
   char* sectorname;
+  bool autoresolve;
 
   SCF_DECLARE_IBASE;
-  MissingSectorCallback (iLoaderContext* ldr_context, const char* sector)
+  MissingSectorCallback (iLoaderContext* ldr_context, const char* sector,
+  	bool autoresolve)
   {
     SCF_CONSTRUCT_IBASE (0);
     MissingSectorCallback::ldr_context = ldr_context;
     sectorname = csStrNew (sector);
+    MissingSectorCallback::autoresolve = autoresolve;
   }
   virtual ~MissingSectorCallback ()
   {
@@ -362,9 +365,12 @@ public:
     if (!sector) return false;
     portal->SetSector (sector);
     // For efficiency reasons we deallocate the name here.
-    delete[] sectorname;
-    sectorname = 0;
-    portal->RemoveMissingSectorCallback (this);
+    if (!autoresolve)
+    {
+      delete[] sectorname;
+      sectorname = 0;
+      portal->RemoveMissingSectorCallback (this);
+    }
     return true;
   }
 };
@@ -377,7 +383,7 @@ bool csThingLoader::ParsePortal (
 	iDocumentNode* node, iLoaderContext* ldr_context,
 	uint32 &flags, bool &mirror, bool &warp, int& msv,
 	csMatrix3 &m, csVector3 &before, csVector3 &after,
-	iString* destSector)
+	iString* destSector, bool& autoresolve)
 {
   destSector->Clear ();
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -388,8 +394,10 @@ bool csThingLoader::ParsePortal (
     //const char* value = child->GetValue ();
     //csStringID id = xmltokens.Request (value);
     bool handled;
+    bool autoresolve;
     if (!synldr->HandlePortalParameter (child, ldr_context,
-        flags, mirror, warp, msv, m, before, after, destSector, handled))
+        flags, mirror, warp, msv, m, before, after, destSector, handled,
+	autoresolve))
     {
       return false;
     }
@@ -739,9 +747,10 @@ bool csThingLoader::ParsePoly3d (
     int msv = -1;
     scfString destSectorName;
 
+    bool autoresolve;
     if (ParsePortal (portal_node, ldr_context,
 	      flags, do_mirror, do_warp, msv,
-	      m_w, v_w_before, v_w_after, &destSectorName))
+	      m_w, v_w_before, v_w_after, &destSectorName, autoresolve))
     {
       iSector* destSector = ldr_context->FindSector (destSectorName.GetData ());
       int cnt = thing_fact_state->GetPolygonVertexCount (CS_POLYINDEX_LAST);
@@ -755,7 +764,8 @@ bool csThingLoader::ParsePoly3d (
       if (portal_pri == 0)
         portal_pri = mesh->GetRenderPriority ();
       char pc_name[100];
-      sprintf (pc_name, "__portals_%d_%s__", portal_pri, destSectorName.GetData ());
+      sprintf (pc_name, "__portals_%d_%s__", portal_pri,
+      	destSectorName.GetData ());
 
       iPortal* portal;
       csRef<iMeshWrapper> portal_mesh = engine->CreatePortal (
@@ -770,7 +780,7 @@ bool csThingLoader::ParsePoly3d (
       if (!destSector)
       {
 	MissingSectorCallback* mscb = new MissingSectorCallback (
-	    	ldr_context, destSectorName.GetData ());
+	    	ldr_context, destSectorName.GetData (), autoresolve);
 	portal->SetMissingSectorCallback (mscb);
 	mscb->DecRef ();
       }
