@@ -30,17 +30,17 @@ csImageMemory::csImageMemory (int width, int height, int format)
   Height = height;
   switch (format & CS_IMGFMT_MASK)
   {
-  case CS_IMGFMT_PALETTED8:
-    Image = (void*) new uint8[Width*Height];
-    if (format & CS_IMGFMT_ALPHA)
-    {
-      Alpha =  new uint8[Width*Height];
-    }
-    Palette = new csRGBpixel[256];
-    break;
-  case CS_IMGFMT_TRUECOLOR:
-    Image = (void*) new csRGBpixel[Width*Height];
-    break;
+    case CS_IMGFMT_PALETTED8:
+      Image = (void*) new uint8[Width*Height];
+      if (format & CS_IMGFMT_ALPHA)
+      {
+        Alpha =  new uint8[Width*Height];
+      }
+      Palette = new csRGBpixel[256];
+      break;
+    case CS_IMGFMT_TRUECOLOR:
+      Image = (void*) new csRGBpixel[Width*Height];
+      break;
   }
   short_cut = true;
   destroy_image = true;
@@ -64,7 +64,15 @@ csImageMemory::~csImageMemory ()
 {
   if (destroy_image)
   {
-    delete [] Image;
+    switch (Format & CS_IMGFMT_MASK)
+    {
+      case CS_IMGFMT_PALETTED8:
+        delete [] (uint8*)Image;
+	break;
+      case CS_IMGFMT_TRUECOLOR:
+        delete[] (csRGBpixel*)Image;
+	break;
+    }
     delete [] Palette;
   }
   SCF_DESTRUCT_IBASE ();
