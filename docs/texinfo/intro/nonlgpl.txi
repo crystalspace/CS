@@ -11,8 +11,13 @@ product.
 @code{map2cs}, the Quake MAP to Crystal Space converter in 
 @file{apps/import/map2cs}
 
-Currently licensed under the GNU General Public License (can be downloaded 
+Licensed under the GNU General Public License (can be downloaded 
 at @uref{http://www.fsf.org/licenses/gpl.txt}).
+
+@item 
+@code{movierecorder} plugin
+
+Licensed under the GNU General Public License.
 
 @end itemize
 

@@ -31,12 +31,13 @@
 #include "nuppelvideo.h"
 //#include <string.h>
 
+#include "cssys/sysfunc.h"
+
 /* Colorspace conversion routines from rgb2yuv420.cpp */
 void InitLookupTable();
 int RGB2YUV420 (int x_dim, int y_dim, 
 		unsigned char *bmp, 
-		unsigned char *yuv,
-		unsigned char *tmp1, unsigned char *tmp2);
+		unsigned char *yuv);
 
 
 NuppelWriter::NuppelWriter(int width, int height, 
@@ -76,8 +77,7 @@ NuppelWriter::NuppelWriter(int width, int height,
   /* Allocate several temporary buffers */
   compressBuffer = new unsigned char [width*height+(width*height)/2];
   yuvBuffer = new unsigned char [width*height+(width*height)/2];
-  yuvTmp1 = new unsigned char [width*height];
-  yuvTmp2 = new unsigned char [width*height];
+  memset (yuvBuffer, 0, width*height+(width*height)/2);
   lzoTmp = new unsigned char [LZO1X_MEM_COMPRESS];
   InitLookupTable();
 
@@ -103,11 +103,9 @@ NuppelWriter::NuppelWriter(int width, int height,
 }
 
 NuppelWriter::~NuppelWriter() {
-  delete lzoTmp;
-  delete yuvTmp1;
-  delete yuvTmp2;
-  delete compressBuffer;
-  delete yuvBuffer;
+  delete[] lzoTmp;
+  delete[] compressBuffer;
+  delete[] yuvBuffer;
 }
 
 void NuppelWriter::writeFrame(unsigned char *frameBuffer) {
@@ -146,7 +144,7 @@ void NuppelWriter::writeFrame(unsigned char *frameBuffer) {
     /* Convert from RGB to YUV420. This routine has also
      * been modified to flip the video vertically.
      */
-    RGB2YUV420(width, height, frameBuffer, yuvBuffer, yuvTmp1, yuvTmp2);
+    RGB2YUV420(width, height, frameBuffer, yuvBuffer);
     currentBuffer = yuvBuffer;
     currentBufferSize = width*height+(width*height/2);
     frameh.comptype = '0';

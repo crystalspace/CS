@@ -63,7 +63,7 @@ class NuppelWriter {
   outputCallback_t outputCallback;
   void *callbackExtra;
   unsigned char *compressBuffer, *yuvBuffer;
-  unsigned char *yuvTmp1, *yuvTmp2, *lzoTmp;
+  unsigned char *lzoTmp;
   int keyframeFreq;
   int frameofgop;
   int frameNumber;
