@@ -1056,6 +1056,11 @@ void csThing::HardTransform (const csReversibleTransform& t)
   scfiPolygonMeshLOD.SetThing (static_data);
 }
 
+void csThing::Unprepare ()
+{
+    prepared = false;
+}
+
 void csThing::Prepare ()
 {
   static_data->Prepare ();

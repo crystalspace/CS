@@ -618,6 +618,12 @@ public:
    */
   void Prepare ();
 
+  /** Reset the prepare flag so that this Thing can be re-prepared.
+   * Among other things this will allow cached lightmaps to be
+   * recalculated.
+   */
+  void Unprepare ();
+
   /**
    * Merge the given Thing into this one. The other polygons and
    * curves are removed from the other thing so that it is ready to
@@ -829,6 +835,12 @@ public:
       scfParent->Prepare ();
       if (scfParent->static_data->flags.Check (CS_THING_FASTMESH))
         scfParent->PreparePolygonBuffer ();
+    }
+
+    /// Unprepare.
+    virtual void Unprepare ()
+    {
+      scfParent->Unprepare ();
     }
 
     virtual void ReplaceMaterial (iMaterialWrapper* oldmat,

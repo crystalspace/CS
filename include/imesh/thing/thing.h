@@ -247,6 +247,12 @@ struct iThingState : public iBase
    */
   virtual void Prepare () = 0;
 
+  /** Reset the prepare flag so that this Thing can be re-prepared.
+   * Among other things this will allow cached lightmaps to be
+   * recalculated.
+   */
+  virtual void Unprepare () = 0;
+
   /**
    * Scan all polygons and replace the given material with a new material.
    * Note that the new material MUST have the same size as the old material!
