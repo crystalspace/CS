@@ -21,6 +21,9 @@
 #include "csgeom/csrect.h"
 #include "csutil/csdllist.h"
 #include "csutil/csvector.h"
+
+#include "awstex.h"
+
 struct iString;
 
 /****
@@ -261,11 +264,15 @@ class awsPrefManager : public iAwsPrefs
   /// Color index
   int sys_colors[AC_COLOR_COUNT];
 
+  /// aws texture manager
+  awsTextureManager *awstxtmgr;
+
 public:
     SCF_DECLARE_IBASE;
 
     awsPrefManager(iBase *iParent);
     virtual ~awsPrefManager();
+ 
 
     /// Invokes the parser to load a definitions file.
     virtual void Load(const char *def_file);
@@ -334,6 +341,11 @@ public:
        should be read from the window and skin definition files (as
        happens automatically normally. */
     virtual void SetupPalette(iGraphics3D *g3d);
+
+    /** Performs whatever initialization is necessary.  For now, it simply initializes the
+     * texture loader.
+     */
+    virtual void Setup(iObjectRegistry *obj_reg);
     
 };
  

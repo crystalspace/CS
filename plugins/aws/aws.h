@@ -102,8 +102,8 @@ class awsManager : public iAws
         iGraphics3D *G3D() 
         { return ptG3D; }
 	
-	/// Set dimensions of texture
-	void SetSize(int w, int h);
+		/// Set dimensions of texture
+		void SetSize(int w, int h);
 
    };
 

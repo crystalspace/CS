@@ -154,5 +154,7 @@ void
 awsWindow::OnDraw(csRect clip)
 {
 
+
+
 }
 

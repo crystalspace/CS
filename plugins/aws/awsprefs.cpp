@@ -2,6 +2,8 @@
 #include "csutil/scfstr.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
+#include "ivaria/reporter.h"
+#include "iutil/objreg.h"
 #include "awsprefs.h"
 #include <stdio.h>
 #include <string.h>
@@ -10,6 +12,9 @@ extern int awsparse(void *prefscont);
 extern FILE *awsin;
 unsigned long aws_adler32(unsigned long adler,  const unsigned char *buf,  unsigned int len);
 
+
+const bool DEBUG_KEYS = false;
+const bool DEBUG_INIT = true;
 
 /***************************************************************************************************************
 *   This constructor converts the text-based name into a fairly unique numeric ID.  The ID's are then used for *
@@ -20,7 +25,9 @@ awsKey::awsKey(iString *n)
 {
   if (n) {
     name = aws_adler32(aws_adler32(0, NULL, 0), (unsigned char *)n->GetData(), n->Length());
-    printf("aws-debug: new key %s mapped to %lu\n", n->GetData(), name);
+
+    if (DEBUG_KEYS) printf("aws-debug: new key %s mapped to %lu\n", n->GetData(), name);
+
     n->DecRef();
   }
 }
@@ -28,13 +35,22 @@ awsKey::awsKey(iString *n)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-awsPrefManager::awsPrefManager(iBase *iParent):n_win_defs(0), n_skin_defs(0), def_skin(0)
+awsPrefManager::awsPrefManager(iBase *iParent):n_win_defs(0), n_skin_defs(0), def_skin(NULL), awstxtmgr(NULL)
 {
   SCF_CONSTRUCT_IBASE (iParent);
 }
 
 awsPrefManager::~awsPrefManager()
 {
+}
+
+void 
+awsPrefManager::Setup(iObjectRegistry *obj_reg)
+{  
+  if (DEBUG_INIT) printf("aws-debug: Initializing AWS Texture Manager\n");
+
+  awstxtmgr = new awsTextureManager();
+  awstxtmgr->Initialize(obj_reg);   
 }
 
 unsigned long 

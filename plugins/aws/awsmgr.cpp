@@ -27,6 +27,7 @@ awsManager::Initialize(iSystem *system)
   System=system;
   iObjectRegistry* object_reg = system->GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  
   printf("aws-debug: getting image loader.\n");
   ImageLoader = CS_QUERY_PLUGIN_ID(plugin_mgr, CS_FUNCID_IMGLOADER, iImageIO);
   
@@ -36,6 +37,7 @@ awsManager::Initialize(iSystem *system)
       	"AWS could not find an image loader plugin. This is a fatal error.");
     return false;
   }
+
   
   printf("aws-debug: getting preference manager.\n");  
   iAwsPrefs *prefs =  SCF_CREATE_INSTANCE ("crystalspace.window.preferencemanager", iAwsPrefs);
@@ -48,7 +50,10 @@ awsManager::Initialize(iSystem *system)
   }
   else
   {
-    printf("aws-debug: setting the internal preference manager.\n");
+    printf("aws-debug: initing and setting the internal preference manager.\n");
+    
+    prefs->Setup(object_reg);
+
     SetPrefMgr(prefs);
     prefs->DecRef();
   }
