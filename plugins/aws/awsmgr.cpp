@@ -282,9 +282,11 @@ awsManager::UpdateStore()
    // Get all frames into the store.
    while(curwin)
    {
-      csRect r(curwin->Frame());
-      //printf("\t%d,%d,%d,%d\n", r.xmin, r.ymin, r.xmax, r.ymax);
-      updatestore.Include(r);
+      if (!curwin->isHidden())
+      {
+        csRect r(curwin->Frame());
+        updatestore.Include(r);
+      } 
       curwin = curwin->WindowBelow();
    }
 
@@ -358,7 +360,7 @@ awsManager::Redraw()
    // check to see if any part of this window needs redrawn
    while(curwin)
    {
-      if (WindowIsDirty(curwin)) {
+      if ((!curwin->isHidden()) && WindowIsDirty(curwin)) {
         curwin->SetRedrawTag(redraw_tag);
       }
 

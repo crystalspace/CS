@@ -828,11 +828,17 @@ awsWindow::isHidden()
 
 void 
 awsWindow::Hide()
-{ comp.Hide(); }
+{ 
+  comp.Hide(); 
+  WindowManager()->InvalidateUpdateStore();
+}
 
 void 
 awsWindow::Show()
-{ comp.Show(); }
+{ 
+  comp.Show(); 
+  WindowManager()->InvalidateUpdateStore();
+}
 
 unsigned 
 long 
