@@ -298,6 +298,10 @@ public:
     virtual iAwsComponent *GetTabComponent (int index)
 		{ return comp->GetTabComponent (index); }
 
+    /// Returns first focusable component on this component
+    virtual iAwsComponent *GetFirstFocusableChild (iAwsComponent *comp)
+		{ return comp->GetFirstFocusableChild (comp); }
+
 public:
     /// Adds a child
     virtual void AddChild(iAwsComponent* child)

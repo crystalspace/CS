@@ -833,6 +833,9 @@ struct iAwsComponent : public iAwsSource
   /// Returns component from TabOrder, 0 if there is none or index is invalid
   virtual iAwsComponent *GetTabComponent(int index)=0;
 
+  /// Returns first focusable component on this window
+  virtual iAwsComponent *GetFirstFocusableChild(iAwsComponent *comp)=0;
+
   /// Moves this component above all its siblings
   virtual void Raise()=0;
 
