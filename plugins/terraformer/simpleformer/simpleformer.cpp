@@ -39,8 +39,8 @@ CS_IMPLEMENT_PLUGIN
 float BiLinearData (float* data, int width, int height, float x, float z)
 {
   // Calculate surrounding integer indices
-  int lowX = floor (x), lowZ = floor (z);
-  int highX = ceil (x), highZ = ceil (z);
+  int lowX = (int) floor (x), lowZ = (int) floor (z);
+  int highX = (int) ceil (x), highZ = (int) ceil (z);
 
   // Clamp coordinates to heightmap size
   lowX = MAX (MIN (lowX, width-1), 0);
@@ -85,8 +85,8 @@ float BiCubicData (float* data, int width, int height, float x, float z)
   if (fabs (deltaX) <= SMALL_EPSILON && 
       fabs (deltaZ) <= SMALL_EPSILON)
   {
-    int intX = floor(x+0.5);
-    int intZ = floor(z+0.5);
+    int intX = (int) floor (x + 0.5);
+    int intZ = (int) floor (z + 0.5);
     intX = MAX (MIN (intX, width-1), 0);
     intZ = MAX (MIN (intZ, height-1), 0);
     return data[(int)intX+(int)intZ*width];
@@ -98,8 +98,8 @@ float BiCubicData (float* data, int width, int height, float x, float z)
     for (int j=0; j<4; ++j)
     {
       // Calculate integer position
-      int intX = floor(x)-1+i;
-      int intZ = floor(z)-1+j;
+      int intX = (int) floor (x) - 1 + i;
+      int intZ = (int) floor (z) - 1 + j;
 
       // Clamp coordinates to heightmap size
       intX = MAX (MIN (intX, width-1), 0);
@@ -205,7 +205,7 @@ void csSimpleFormer::SetHeightmap (iImage *heightmap)
     // Keep an index to avoid uneccesary x+y*w calculations
     // Start at last line, since we're gonna want it reversed in Y later
     // (negative Y in heightmap image goes to positive Z in terrain)
-    int idx = (height-1)*width;
+    //int idx = (height-1)*width;
 
     unsigned int x, y;
     // Loop through the data

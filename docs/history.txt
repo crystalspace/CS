@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+16-May-2004
+        - Philip Wyett elimenated gcc compiler warnings in simpleformer.cpp.
 15-May-2004
 	- Eric Sunshine added implementation of FReverse rule to 2.4 section of
 	  jamcompatibility.jam since it is missing in Jam 2.4 but is needed by
