@@ -94,11 +94,12 @@ csPluginPaths* csGetPluginPaths (const char* argv0)
   paths->AddOnce(csGetResourceDir(argv0), false, "app");
   paths->AddOnce(csGetAppDir(argv0), false, "app");
 
-  const char* crystal = getenv ("CRYSTAL");
+  const char* crystal = getenv("CRYSTAL");
   if(crystal) {
     csString path = crystal;
     path += "/lib/crystal";
     paths->AddOnce(path, false, "plugins");
+    paths->AddOnce(crystal, false, "plugins");
   }
   const char* crystal_plugin = getenv("CRYSTAL_PLUGIN");
   if(crystal_plugin) {
