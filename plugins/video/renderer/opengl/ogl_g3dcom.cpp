@@ -3265,6 +3265,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       else
       {
         csColor* old = work_colors;
+	if (num_vertices > color_verts.Limit())
+	  color_verts.SetLimit(num_vertices);
 	work_colors = color_verts.GetArray ();
 	for (i = 0 ; i < num_vertices ; i++)
 	{

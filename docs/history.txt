@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+1-Feb-2002
+	- Tobias Brueckner (Toxe) fixed a bug in the OpenGL 3D renderer that
+	  caused it to crash when rendering materials that only had an
+	  assigned flat color and no texture.
 31-Jan-2002
 	- Fixed a long-standing annoyance in WalkTest. WalkTest was able
 	  to load levels in the following cases:
