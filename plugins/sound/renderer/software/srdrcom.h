@@ -75,7 +75,7 @@ private:
     csIniFile *Config;
 
     // all active sound sources
-    csVector *Sources;
+    csVector Sources;
 
     // the system driver
 	iSystem *System;

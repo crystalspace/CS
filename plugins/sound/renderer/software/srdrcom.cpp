@@ -87,24 +87,17 @@ bool csSoundRenderSoftware::Initialize (iSystem *iSys)
     exit(0);
   }
 
-  // some other initialization stuff
-  Listener = new csSoundListenerSoftware (NULL);
-  Sources = new csVector();
-
   return true;
 }
 
 csSoundRenderSoftware::~csSoundRenderSoftware()
 {
+  Close();
   if (SoundDriver) SoundDriver->DecRef();
-  if (Listener) Listener->DecRef();
 
-  if (Sources) {
-    while (Sources->Length()>0) {
-      iSoundSource *src=(iSoundSource*)(Sources->Get(0));
-      src->DecRef();
-    }
-    delete Sources;
+  while (Sources.Length()>0) {
+    iSoundSource *src=(iSoundSource*)(Sources.Get(0));
+    src->DecRef();
   }
 
   delete Config;
@@ -155,11 +148,17 @@ bool csSoundRenderSoftware::Open()
   LoadFormat.Bits = is16Bits()?16:8;
   LoadFormat.Channels = -1;
 
+  Listener = new csSoundListenerSoftware (NULL);
+
   return true;
 }
 
 void csSoundRenderSoftware::Close()
 {
+  if (Listener) {
+    Listener->DecRef();
+    Listener = NULL;
+  }
   SoundDriver->Close();
 }
 
@@ -182,14 +181,14 @@ void csSoundRenderSoftware::PlayEphemeral(iSoundData *snd, bool Loop)
 }
 
 void csSoundRenderSoftware::AddSource(csSoundSourceSoftware *src) {
-  Sources->Push(src);
+  Sources.Push(src);
   src->IncRef();
 }
 
 void csSoundRenderSoftware::RemoveSource(csSoundSourceSoftware *src) {
-  int n=Sources->Find(src);
+  int n=Sources.Find(src);
   if (n!=-1) {
-    Sources->Delete(n);
+    Sources.Delete(n);
     src->DecRef();
   }
 }
@@ -200,7 +199,7 @@ void csSoundRenderSoftware::MixingFunction()
   if(!SoundDriver) return;
 	
   // if no sources exist, there may be an optimized way to handle this
-  if (Sources->Length()==0 && SoundDriver->IsHandleVoidSound()) return;
+  if (Sources.Length()==0 && SoundDriver->IsHandleVoidSound()) return;
 
   // lock sound memory
   SoundDriver->LockMemory(&memory, &memorysize);
@@ -212,12 +211,12 @@ void csSoundRenderSoftware::MixingFunction()
 
   // prepare and play all sources
   long i;
-  for (i=0;i<Sources->Length();i++) {
-    csSoundSourceSoftware *src=(csSoundSourceSoftware*)(Sources->Get(i));
+  for (i=0;i<Sources.Length();i++) {
+    csSoundSourceSoftware *src=(csSoundSourceSoftware*)(Sources.Get(i));
     // @@@ this divides volume by number of sources. If we don't do this,
     // sound can be distorted because of too high volume. Is there a better
     // solution?
-    src->Prepare(Sources->Length());
+    src->Prepare(Sources.Length());
     src->AddToBuffer(memory, memorysize);
     if (!src->IsActive()) {
       RemoveSource(src);
