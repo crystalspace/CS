@@ -32,7 +32,6 @@
 #include <ToolUtils.h>
 #include <Windows.h>
 #include <DrawSprocket.h>
-#include <SIOUX.h>
 #include "sysdef.h"
 #include "types.h"
 #include "csutil/inifile.h"
@@ -84,15 +83,6 @@ SysSystemDriver::SysSystemDriver()
 	::FlushEvents ( everyEvent, 0 );
 
 	::GetDateTime((unsigned long*) &qd.randSeed);
-
-	/*
-	 *	Initialize sioux (console).
-	 */
-	SIOUXSettings.standalone = FALSE;
-	SIOUXSettings.setupmenus = FALSE;
-	SIOUXSettings.initializeTB = FALSE;
-	SIOUXSettings.asktosaveonclose = FALSE;
-	SIOUXSettings.autocloseonquit = FALSE;
 
 	/*
 	 *	Initialise keyboard state.
