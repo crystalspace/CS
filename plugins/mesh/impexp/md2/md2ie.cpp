@@ -22,7 +22,7 @@
 #include "imesh/mdlconv.h"
 #include "cstool/mdldata.h"
 
-class csModelConverterPOV : iModelConverter
+class csModelConverterMD2 : iModelConverter
 {
 private:
   csModelConverterFormat FormatInfo;
@@ -31,10 +31,10 @@ public:
   SCF_DECLARE_IBASE;
 
   /// constructor
-  csModelConverterPOV (iBase *pBase);
+  csModelConverterMD2 (iBase *pBase);
 
   /// destructor
-  ~csModelConverterPOV ();
+  ~csModelConverterMD2 ();
 
   bool Initialize (iObjectRegistry *object_reg);
   virtual int GetFormatCount() const;
@@ -44,7 +44,7 @@ public:
 
   struct Plugin : public iPlugin
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csModelConverterPOV);
+    SCF_DECLARE_EMBEDDED_IBASE (csModelConverterMD2);
     virtual bool Initialize (iObjectRegistry *object_reg)
     { 
       return scfParent->Initialize (object_reg);
@@ -52,62 +52,62 @@ public:
   } scfiPlugin;
 };
 
-SCF_IMPLEMENT_IBASE (csModelConverterPOV)
+SCF_IMPLEMENT_IBASE (csModelConverterMD2)
   SCF_IMPLEMENTS_INTERFACE (iModelConverter)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csModelConverterPOV::Plugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csModelConverterMD2::Plugin)
   SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_FACTORY (csModelConverterPOV)
+SCF_IMPLEMENT_FACTORY (csModelConverterMD2)
 
-SCF_EXPORT_CLASS_TABLE (povie)
-  SCF_EXPORT_CLASS (csModelConverterPOV, 
-    "crystalspace.modelconverter.pov",
-    "POV Model Converter")
+SCF_EXPORT_CLASS_TABLE (md2ie)
+  SCF_EXPORT_CLASS (csModelConverterMD2, 
+    "crystalspace.modelconverter.md2",
+    "MD2 Model Converter")
 SCF_EXPORT_CLASS_TABLE_END
 
 CS_IMPLEMENT_PLUGIN
 
-csModelConverterPOV::csModelConverterPOV (iBase *pBase)
+csModelConverterMD2::csModelConverterMD2 (iBase *pBase)
 {
   SCF_CONSTRUCT_IBASE (pBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugin);
 
-  FormatInfo.Name = "pov";
+  FormatInfo.Name = "md2";
   FormatInfo.CanLoad = false;
-  FormatInfo.CanSave = true;
+  FormatInfo.CanSave = false;
 }
 
-csModelConverterPOV::~csModelConverterPOV ()
+csModelConverterMD2::~csModelConverterMD2 ()
 {
 }
 
-bool csModelConverterPOV::Initialize (iObjectRegistry *objreg)
+bool csModelConverterMD2::Initialize (iObjectRegistry *objreg)
 {
   return true;
 }
 
-int csModelConverterPOV::GetFormatCount () const
+int csModelConverterMD2::GetFormatCount () const
 {
   return 1;
 }
 
-const csModelConverterFormat *csModelConverterPOV::GetFormat (int idx) const
+const csModelConverterFormat *csModelConverterMD2::GetFormat (int idx) const
 {
   return (idx == 0) ? &FormatInfo : NULL;
 }
 
-iModelData *csModelConverterPOV::Load (UByte * /*Buffer*/, ULong /*Size*/)
+iModelData *csModelConverterMD2::Load (UByte * /*Buffer*/, ULong /*Size*/)
 {
   return NULL;
 }
 
-iDataBuffer *csModelConverterPOV::Save (iModelData *Data, const char *Format)
+iDataBuffer *csModelConverterMD2::Save (iModelData *Data, const char *Format)
 {
-  if (strcasecmp (Format, "pov"))
+  if (strcasecmp (Format, "md2"))
     return NULL;
 
   return NULL;
