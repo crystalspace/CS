@@ -123,7 +123,7 @@ static inline float qisqrt (float x)
   return ret;
 }
 
-#elif !defined (CS_NO_QSQRT) && defined (COMP_MSVC)
+#elif !defined (CS_NO_QSQRT) && defined (COMP_VC)
 
 #pragma warning(disable:4035)               // re-enable below
 
