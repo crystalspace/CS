@@ -77,26 +77,16 @@ public:
     return strcmp (item1, item2);
   }
 
-  static int CaseSensitiveCompare (char const* item1, char const* item2)
-  {
-    return strcmp (item1, item2);
-  }
-
-  static int CaseInsensitiveCompare (char const* item1, char const* item2)
-  {
-    return strcasecmp (item1, item2);
-  }
- 
-  static int CaseSensitiveCompare (void const* item1, void const* item2)
+  static int CaseSensitiveCompareSort (void const* item1, void const* item2)
   {
     return strcmp (*(char const**)item1, *(char const**)item2);
   }
 
-  static int CaseInsensitiveCompare (void const* item1, void const* item2)
+  static int CaseInsensitiveCompareSort (void const* item1, void const* item2)
   {
     return strcasecmp (*(char const**)item1, *(char const**)item2);
   }
- 
+  
   /**
    * Sort array based on case sensitive string compare function.
    */
@@ -110,7 +100,7 @@ public:
    */
   void Sort ()
   {
-    superclass::Sort (CaseSensitiveCompare);
+    superclass::Sort (CaseSensitiveCompareSort);
   }
 
   /**
