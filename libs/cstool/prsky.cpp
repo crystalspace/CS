@@ -203,7 +203,7 @@ void csProcSky::SmoothOctave(uint8 *octs, int nr, int smoothpower)
       tot /= (2*sm+1)*(2*sm+1);
       SetOctave(octs, nr, x, y, tot);
     }
-  delete myoct;
+  delete[] myoct;
 }
 
 
