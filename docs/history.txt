@@ -6,6 +6,8 @@ The history order is reversed so that new features are at the top.
 	  to the sequence parser. These new commands are able to
 	  change the color of genmesh, ball, sprite3d, cloth,
 	  terrfunc, stars, and particle systems.
+	- Eric Sunshine added appropriate PNG/MNG makefile definitions to
+	  next.mak.
 26-Sep-2002
 	- Keith Fulton added optimization at Jorrit's request which
 	  uses integer add for non-overflow addition of pixels

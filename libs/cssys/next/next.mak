@@ -115,6 +115,9 @@ PNG_LIBS = $(LFLAGS.l)png
 # The name of the JPEG library.
 JPG_LIBS = $(LFLAGS.l)jpeg
 
+# The name of the JNG/MNG library.
+MNG_LIBS = $(LFLAGS.L)libs/libmng $(LFLAGS.l)mng
+
 # Additional audio libraries.
 SOUND_LIBS =
 
@@ -281,6 +284,7 @@ SYSCONFIG += $(NEXT.SYSCONFIG) \
 NEXT.DIR.ZLIB    = $(wildcard libs/zlib*)
 NEXT.DIR.LIBPNG  = $(wildcard libs/libpng*)
 NEXT.DIR.LIBJPEG = $(wildcard libs/libjpeg* libs/jpeg*)
+NEXT.DIR.LIBMNG  = $(wildcard libs/libmng*)
 
 # Unfortunately, these are not yet defined, so we do so manually.
 ifeq (,$(CFLAGS.I))
@@ -304,6 +308,11 @@ ifneq (,$(NEXT.DIR.LIBJPEG))
   SYSCONFIG += \
     $(NEWLINE)echo NEXT.CFLAGS.CONFIG += $(CFLAGS.I)$(NEXT.DIR.LIBJPEG)>>config.tmp \
     $(NEWLINE)echo NEXT.LFLAGS.CONFIG += $(LFLAGS.L)$(NEXT.DIR.LIBJPEG)>>config.tmp
+endif
+ifneq (,$(NEXT.DIR.LIBMNG))
+  SYSCONFIG += \
+    $(NEWLINE)echo NEXT.CFLAGS.CONFIG += $(CFLAGS.I)$(NEXT.DIR.LIBMNG)>>config.tmp \
+    $(NEWLINE)echo NEXT.LFLAGS.CONFIG += $(LFLAGS.L)$(NEXT.DIR.LIBMNG)>>config.tmp
 endif
 
 endif # ifeq ($(ROOTCONFIG),config)
