@@ -79,7 +79,7 @@ void csFrame::AddVertex (int num)
 
   CHK (csVector2 * new_texels = new csVector2 [max_vertex + num]);
   CHK (csVector3 * new_vertices = new csVector3 [max_vertex + num]);
-    
+
   memcpy (new_texels, texels, max_vertex*sizeof(csVector2));
   memcpy (new_vertices, vertices, max_vertex*sizeof(csVector3));
   CHK (delete [] texels);
@@ -346,6 +346,7 @@ csSprite3D::csSprite3D () : csObject ()
   defered_num_lights = 0;
   defered_lighting_flags = 0;
   draw_callback = NULL;
+  draw_callback2 = NULL;
   is_visible = false;
   camera_cookie = 0;
   tween_ratio = 0;
@@ -997,6 +998,9 @@ void csSprite3D::Draw (csRenderView& rview)
     }
   }
 
+  if (draw_callback2)
+     draw_callback2(this, &rview, myOwner);
+
   if (!rview.callback)
     rview.g3d->FinishPolygonFX ();
 }
@@ -1054,7 +1058,7 @@ bool csSprite3D::NextFrame (time_t current_time, bool onestep, bool stoptoend)
           }
           cur_frame = 0;
           ret = true;
-        }        
+        }
       }
       else break;
     }

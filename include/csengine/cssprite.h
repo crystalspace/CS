@@ -295,6 +295,8 @@ public:
 
 /// A callback function for csSprite3D::Draw().
 typedef void (csSpriteCallback) (csSprite3D* spr, csRenderView* rview);
+/// A callback function for csSprite3D::Draw().
+typedef void (csSpriteCallback2) (csSprite3D* spr, csRenderView* rview, csObject *callbackData);
 
 /**
  * A 3D sprite based on a triangle mesh with a single texture.
@@ -307,6 +309,9 @@ class csSprite3D : public csObject
   friend class csCollider;
 
 private:
+  /// Points to Actor class which "owns" this sprite.
+  csObject* myOwner;
+
   /// Set the size of internally used tables
   static void UpdateWorkTables (int max_size);
 
@@ -324,6 +329,11 @@ private:
   csTranCookie camera_cookie;
 
 public:
+  /// Set owner (actor) for this sprite.
+  void SetMyOwner (csObject *newOwner) { myOwner = newOwner; }
+  /// Get owner (actor) for this sprite.
+  csObject* GetMyOwner () { return myOwner; }
+
   /// List of sectors where this sprite is.
   csNamedObjVector sectors;
 
@@ -402,6 +412,9 @@ private:
 
   /// The callback which is called just before drawing.
   csSpriteCallback* draw_callback;
+
+  /// This callback is only called if the sprite is actually drawn.
+  csSpriteCallback2* draw_callback2;
 
   /**
    * Flag which is set to true when the sprite is visible.
@@ -595,10 +608,21 @@ public:
   void SetDrawCallback (csSpriteCallback* callback) { draw_callback = callback; }
 
   /**
+   * Set a callback which is called only if the sprite is actually drawn.
+   */
+  void SetDrawCallback2 (csSpriteCallback2* callback) { draw_callback2 = callback; }
+
+  /**
    * Get the draw callback. If there are multiple draw callbacks you can
    * use this function to chain.
    */
   csSpriteCallback* GetDrawCallback () { return draw_callback; }
+
+  /**
+   * Get the draw callback. If there are multiple draw callbacks you can
+   * use this function to chain.
+   */
+  csSpriteCallback2* GetDrawCallback2 () { return draw_callback2; }
 
   /**
    * Go to the next frame depending on the current time in milliseconds.
