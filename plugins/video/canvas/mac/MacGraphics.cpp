@@ -133,7 +133,6 @@ bool csGraphics2DMac::Initialize( iSystem* piSystem )
 	 *	DrawSprockets is available, then use it.
 	 */
 
-#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
 	if (( FullScreen ) && ( DSpStartup != NULL ) && ( DSpStartup() == noErr )) {
 		// Create the display
 		mDisplayAttributes.frequency 				= 0;
@@ -179,6 +178,7 @@ bool csGraphics2DMac::Initialize( iSystem* piSystem )
 			}
 		}
 
+#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
 		err = DSpCanUserSelectContext( &mDisplayAttributes, &showDialogFlag );
 		if ( err ) {
 			DisplayErrorDialog( kNoDSContext );
@@ -194,13 +194,18 @@ bool csGraphics2DMac::Initialize( iSystem* piSystem )
 				ExitToShell();
 			}
 		}
+#else
+		err = DSpFindBestContext(&mDisplayAttributes, &mDisplayContext);
+		if ( err ) {
+			DisplayErrorDialog( kUnableToOpenDSContext );
+		}
+#endif
 
 		DSpContext_GetAttributes( mDisplayContext, &mDisplayAttributes );
 		Depth = mDisplayAttributes.backBufferBestDepth;
 
 		mDrawSprocketsEnabled = true;
 	} else {
-#endif
 		mDrawSprocketsEnabled = false;
 
 		/*
@@ -285,9 +290,7 @@ bool csGraphics2DMac::Initialize( iSystem* piSystem )
 		} else {
 			Depth = pixel_format;
 		}
-#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
 	}
-#endif
 
 	/*
 	 *	Setup the pixel format, color table and drawing
@@ -325,7 +328,6 @@ bool csGraphics2DMac::Initialize( iSystem* piSystem )
 		mColorTable = GetCTable( 72 );
 	}
 
-#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
 	if ( mDrawSprocketsEnabled ) {
 		mDisplayAttributes.colorTable = mColorTable;
 		err = DSpContext_Reserve(mDisplayContext, &mDisplayAttributes);
@@ -333,7 +335,6 @@ bool csGraphics2DMac::Initialize( iSystem* piSystem )
 			DisplayErrorDialog( kUnableToReserveDSContext );
 		}
 	}
-#endif
 
 	return true;
 }
@@ -355,7 +356,6 @@ bool csGraphics2DMac::Open(const char* Title)
 	int				displayHeight;
 
 	if ( mDrawSprocketsEnabled ) {
-#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
 		DSpContext_FadeGammaOut(NULL, NULL);
 		DSpContext_SetState(mDisplayContext, kDSpContextState_Active);
 		DSpContext_FadeGammaIn(NULL, NULL);
@@ -366,7 +366,6 @@ bool csGraphics2DMac::Open(const char* Title)
 
 		mGetBufferAddress = false;
 		mDoubleBuffering = true;
-#endif
 	} else {
 		/*
 		 *	Make the offscreen port.
@@ -453,7 +452,6 @@ bool csGraphics2DMac::Open(const char* Title)
 void csGraphics2DMac::Close(void)
 {
 	if ( mDrawSprocketsEnabled ) {
-#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
 		if ( mDisplayContext != NULL )
 		{
 			DSpContext_FadeGammaOut(NULL, NULL);
@@ -464,7 +462,6 @@ void csGraphics2DMac::Close(void)
 			mDisplayContext = NULL;
 		}
 		DSpShutdown();
-#endif
 	} else {
 		if ( Depth == 8 )
 			::RestoreDeviceClut( NULL );
@@ -517,9 +514,7 @@ void csGraphics2DMac::SetRGB(int i, int r, int g, int b)
 	theColor.rgb.blue = b | (b << 8);
 
 	if ( mDrawSprocketsEnabled ) {
-#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
 		DSpContext_SetCLUTEntries( mDisplayContext,  &theColor, i, i );
-#endif
 	} else {
 		(*mColorTable)->ctTable[i].value = i;
 		(*mColorTable)->ctTable[i].rgb = theColor.rgb;
@@ -566,7 +561,6 @@ bool csGraphics2DMac::BeginDraw()
 {
 	csGraphics2D::BeginDraw ();
 
-#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
 	if (( FrameBufferLocked == 1 ) && mDrawSprocketsEnabled ) {
 		CGrafPtr port;
 		int		 i;
@@ -576,11 +570,10 @@ bool csGraphics2DMac::BeginDraw()
 		if ( mGetBufferAddress ) {
 			DSpContext_GetBackBuffer(mDisplayContext, kDSpBufferKind_Normal, &mOffscreen);
 
-			Memory = (unsigned char*)::GetPixBaseAddr(mOffscreen->portPixMap);
+			Memory = (unsigned char*)::GetPixBaseAddr(GetPortPixMap(mOffscreen));
 			mGetBufferAddress = false;
 		}
 	}
-#endif
 
   return true;
 }
@@ -603,13 +596,13 @@ void csGraphics2DMac::Print( csRect * area )
 	Rect	theRect;
 
 	if ( mDrawSprocketsEnabled ) {
-#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
 		/*
 		 *	If area is not null, then use it to select the
 		 *	region that is to be drawn.  Otherwise the whole
 		 *	window is drawn.
 		 */
 
+#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
 		if ( area ) {
 			if (( area->xmin == 0 ) && ( area->ymin == 0 ) &&
 					( area->xmax == 0 ) && ( area->ymax == 0 )) {
@@ -622,10 +615,10 @@ void csGraphics2DMac::Print( csRect * area )
 			}
 			DSpContext_InvalBackBufferRect( mDisplayContext, &theRect );
 		}
+#endif
 
 		DSpContext_SwapBuffers( mDisplayContext, NULL, 0 );
 		mGetBufferAddress = true;
-#endif
 	} else {
 		CGrafPtr	thePort;
 		GDHandle	theGDHandle;
@@ -848,7 +841,6 @@ bool csGraphics2DMac::PointInWindow( Point *thePoint )
 	bool inWindow = false;
 
 	if ( mDrawSprocketsEnabled ) {
-#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
 		DSpContextReference outContext;
 		OSStatus			err;
 
@@ -858,7 +850,6 @@ bool csGraphics2DMac::PointInWindow( Point *thePoint )
 				inWindow = true;
 			}
 		}
-#endif
 	} else {
 		CGrafPtr	thePort;
 		GDHandle	theGDHandle;
@@ -933,14 +924,12 @@ bool csGraphics2DMac::HandleEvent( EventRecord *inEvent )
 	bool outEventWasProcessed = false;
 	Boolean	processed = FALSE;
 
-#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
 	if ( mDrawSprocketsEnabled ) {
 		DSpProcessEvent( inEvent, &processed );
 
 		if ( processed )
 			outEventWasProcessed = true;
 	}
-#endif
 
 	return outEventWasProcessed;
 }
@@ -981,23 +970,19 @@ void csGraphics2DMac::SetColorPalette( void )
 
 void csGraphics2DMac::PauseDisplayContext( void )
 {
-#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
 	if ( mDrawSprocketsEnabled ) {
 		if ( mDisplayContext )
 			DSpContext_SetState(mDisplayContext, kDSpContextState_Paused);
 	}
-#endif
 }
 
 
 void csGraphics2DMac::ActivateDisplayContext( void )
 {
-#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
 	if ( mDrawSprocketsEnabled ) {
 		if ( mDisplayContext )
 			DSpContext_SetState(mDisplayContext, kDSpContextState_Active);
 	}
-#endif
 }
 
 
@@ -1005,13 +990,11 @@ void csGraphics2DMac::DisplayErrorDialog( short errorIndex )
 {
 	Str255	theString;
 
-#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
 	if ( mDrawSprocketsEnabled ) {
 		if ( mDisplayContext )
 			DSpContext_SetState(mDisplayContext, kDSpContextState_Inactive);
 		DSpShutdown();
 	}
-#endif
 
 	GetIndString( theString, kErrorStrings, errorIndex );
 	ParamText( theString, "\p",  "\p", "\p" );
