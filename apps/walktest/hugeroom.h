@@ -56,6 +56,8 @@ private:
   /// Minimum/maximum number of polygons for every thing.
   int thing_min_poly;
   int thing_max_poly;
+  /// Dimension of one cityblock.
+  float thing_cityblock_dim;
   /// Minimum/maximum number of things in sector.
   int sector_min_thing;
   int sector_max_thing;

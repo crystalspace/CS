@@ -44,11 +44,12 @@ HugeRoom::HugeRoom ()
   wall_max_red = .82;
   wall_max_green = .82;
   wall_max_blue = .82;
-  thing_max_x = 70;
-  thing_max_y = 70;
-  thing_max_z = 70;
+  thing_max_x = 50;
+  thing_max_y = 50;
+  thing_max_z = 50;
   thing_min_poly = 10;
   thing_max_poly = 20;
+  thing_cityblock_dim = 4;
   sector_min_thing = 5;
   sector_max_thing = 12;
   sector_min_thing_x = 30;
@@ -57,8 +58,8 @@ HugeRoom::HugeRoom ()
   sector_max_thing_x = 90;
   sector_max_thing_y = 90;
   sector_max_thing_z = 90;
-  sector_min_lights = 50;
-  sector_max_lights = 80;
+  sector_min_lights = 2;
+  sector_max_lights = 4;
   sector_light_max_pos = 90;
   sector_light_min_radius = 30;
   sector_light_max_radius = 40;
@@ -68,7 +69,7 @@ HugeRoom::HugeRoom ()
   sector_light_max_red = 1;
   sector_light_max_green = 1;
   sector_light_max_blue = 1;
-  seed = 0;
+  seed = 1654594509;
 }
 
 void HugeRoom::create_wall (csSector* sector, csPolygonSet* thing,
@@ -138,25 +139,67 @@ csPolygon3D* HugeRoom::create_polygon (csSector* sector, csPolygonSet* thing,
   return p;
 }
 
+//#define ROOM_PURE_RANDOM
+//#define ROOM_RANDOM_WALLS
+#define ROOM_CITYBLOCKS
+
 csThing* HugeRoom::create_thing (csSector* sector, const csVector3& pos)
 {
   CHK (csThing* thing = new csThing ());
   csNameObject::AddName (*thing, "t"); 
+
+#ifdef ROOM_CITYBLOCKS
+  float y_low = -wall_dim;
+  float y_high = y_low + rand1 (wall_dim) + 5;
+  int txt = (rand () & 0x8) ? 1 : 2;
+  csVector3 p1 (-thing_cityblock_dim/2,y_low,thing_cityblock_dim/2);
+  csVector3 p2 (thing_cityblock_dim/2,y_low,thing_cityblock_dim/2);
+  csVector3 p3 (thing_cityblock_dim/2,y_low,-thing_cityblock_dim/2);
+  csVector3 p4 (-thing_cityblock_dim/2,y_low,-thing_cityblock_dim/2);
+  csVector3 p5 (-thing_cityblock_dim/2,y_high,thing_cityblock_dim/2);
+  csVector3 p6 (thing_cityblock_dim/2,y_high,thing_cityblock_dim/2);
+  csVector3 p7 (thing_cityblock_dim/2,y_high,-thing_cityblock_dim/2);
+  csVector3 p8 (-thing_cityblock_dim/2,y_high,-thing_cityblock_dim/2);
+  create_wall (sector, thing, p5, p6, p7, p8, 3, 3, txt);	// Top
+  create_wall (sector, thing, p8, p7, p3, p4, 3, 3, txt);	// Front
+  create_wall (sector, thing, p7, p6, p2, p3, 3, 3, txt);	// Right
+  create_wall (sector, thing, p5, p8, p4, p1, 3, 3, txt);	// Left
+  create_wall (sector, thing, p6, p5, p1, p2, 3, 3, txt);	// Back
+#endif
+#ifdef ROOM_RANDOM_WALLS
+  thing_min_poly = 3;
+  thing_min_poly = 8;
   int num = ((rand () >> 3) % (thing_max_poly-thing_min_poly+1)) + thing_min_poly;
   int i;
   for (i = 0 ; i < num ; i++)
   {
+    int txt = (rand () & 0x8) ? 1 : 2;
     csVector3 p1 (rand2 (thing_max_x), rand2 (thing_max_y), rand2 (thing_max_z));
     csVector3 p2 (rand2 (thing_max_x), rand2 (thing_max_y), rand2 (thing_max_z));
     csVector3 p3 (rand2 (thing_max_x), rand2 (thing_max_y), rand2 (thing_max_z));
+    csVector3 p4 = p2 + (p1-p2) + (p3-p2);
+    create_wall (sector, thing, p1, p2, p3, p4, 4, 4, txt);
+  }
+#endif
+#ifdef ROOM_PURE_RANDOM
+  int num = ((rand () >> 3) % (thing_max_poly-thing_min_poly+1)) + thing_min_poly;
+  int i;
+  csVector3 p1 (rand2 (thing_max_x), rand2 (thing_max_y), rand2 (thing_max_z));
+  csVector3 p2 (rand2 (thing_max_x), rand2 (thing_max_y), rand2 (thing_max_z));
+  csVector3 p3 (rand2 (thing_max_x), rand2 (thing_max_y), rand2 (thing_max_z));
+  for (i = 0 ; i < num ; i++)
+  {
     int txt = (rand () & 0x8) ? 1 : 2;
     create_polygon (sector, thing, p1, p2, p3, txt);
     create_polygon (sector, thing, p3, p2, p1, txt);
+    p1 = p2;
+    p2 = p3;
+    p3 = csVector3 (rand2 (thing_max_x), rand2 (thing_max_y), rand2 (thing_max_z));
   }
+#endif
 
   thing->SetSector (sector);
   sector->AddThing (thing);
-
   csReversibleTransform obj;
   obj.SetT2O (csMatrix3 ());
   obj.SetOrigin (pos);
@@ -178,14 +221,28 @@ csSector* HugeRoom::create_huge_world (csWorld* world)
 
   int i, num;
 
+#ifdef ROOM_CITYBLOCKS
+  float x, y;
+  float cnt = wall_dim/thing_cityblock_dim;
+  for (x = -cnt/2 ; x < cnt/2 ; x++)
+    for (y = -cnt/2 ; y < cnt/2 ; y++)
+    {
+      if ((rand () & 0xc) == 0)
+        create_thing (room, csVector3 (x*thing_cityblock_dim, 0, y*thing_cityblock_dim));
+    }
+#else
   num = ((rand () >> 3) % (sector_max_thing-sector_min_thing+1)) + sector_min_thing;
   for (i = 0 ; i < num ; i++)
   {
-    float x = rand1 (sector_max_thing_x-sector_min_thing_x+1)+sector_min_thing_x; if (rand () & 0x8) x = -x;
-    float y = rand1 (sector_max_thing_y-sector_min_thing_y+1)+sector_min_thing_y; if (rand () & 0x8) y = -y;
-    float z = rand1 (sector_max_thing_z-sector_min_thing_z+1)+sector_min_thing_z; if (rand () & 0x8) z = -z;
+    float x = rand1 (sector_max_thing_x-sector_min_thing_x+1)+sector_min_thing_x;
+    if (rand () & 0x8) x = -x;
+    float y = rand1 (sector_max_thing_y-sector_min_thing_y+1)+sector_min_thing_y;
+    if (rand () & 0x8) y = -y;
+    float z = rand1 (sector_max_thing_z-sector_min_thing_z+1)+sector_min_thing_z;
+    if (rand () & 0x8) z = -z;
     create_thing (room, csVector3 (x, y, z));
   }
+#endif
 
   num = ((rand () >> 3) % (sector_max_lights-sector_min_lights+1)) + sector_min_lights;
   for (i = 0 ; i < num ; i++)
@@ -234,8 +291,11 @@ csSector* HugeRoom::create_huge_world (csWorld* world)
 	csVector3 (wall_dim,wall_dim,wall_dim), csVector3 (-wall_dim,wall_dim,wall_dim),
 	wall_num_tris, wall_num_tris, 0);
 
-  //room->UseStaticBSP (BSP_ALMOST_MINIMIZE_SPLITS);
-  room->UseStaticBSP (BSP_ALMOST_BALANCED);
+  Sys->Printf (MSG_INITIALIZATION, "Number of polygons: %d\n", pol_nr);
+  room->UseStaticBSP (BSP_ALMOST_MINIMIZE_SPLITS);
+  Sys->Printf (MSG_INITIALIZATION, "Number of polygons (after BSP): %d+%d=%d\n",
+  	room->GetStaticThing ()->GetNumPolygons (), room->GetNumPolygons (),
+	room->GetStaticThing ()->GetNumPolygons ()+room->GetNumPolygons ());
 
   return room;
 }
