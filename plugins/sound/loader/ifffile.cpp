@@ -22,19 +22,42 @@
 #include <string.h>
 
 #include "cssysdef.h"
-#include "csutil/csvector.h"
-#include "sndload.h"
+#include "isound/loader.h"
 #include "soundraw.h"
+#include "sndload.h"
 
 // Amiga 8svx/iff file format loader
 //  support 8 bits PCM
+
+class csSoundLoader_IFF : public iSoundLoader
+{
+public:
+  DECLARE_IBASE;
+
+  csSoundLoader_IFF(iBase *p) {
+    CONSTRUCT_IBASE(p);
+  }
+  virtual bool Initialize(iSystem *) {
+    return true;
+  }
+  virtual iSoundData *LoadSound(void *Buffer, unsigned long Size) const;
+};
+
+IMPLEMENT_IBASE(csSoundLoader_IFF)
+  IMPLEMENTS_INTERFACE(iSoundLoader)
+  IMPLEMENTS_INTERFACE(iPlugIn)
+IMPLEMENT_IBASE_END;
+
+IMPLEMENT_FACTORY(csSoundLoader_IFF);
+
 
 #define setStream(x) {if(x>size) {goto exit_read;} else {index=x;}}
 #define canAddStream(x) {if((index+x)>size) goto exit_read;}
 #define addStream(x) {if((index+x)>size) {goto exit_read;} else {index+=x;}}
 #define Stream buf[index]
 
-iSoundData *csSoundLoader_IFF::Load(UByte* buf, ULong size) const {
+iSoundData *csSoundLoader_IFF::LoadSound(void *databuf, ULong size) const {
+  UByte *buf = (UByte*) databuf;
   unsigned long index=0;
   csSoundDataRaw *sb= NULL;
   char *data=NULL;

@@ -22,13 +22,35 @@
 #include <string.h>
 
 #include "cssysdef.h"
-#include "csutil/csvector.h"
-#include "sndload.h"
+#include "isound/loader.h"
 #include "soundraw.h"
+#include "sndload.h"
 
 // Sun AU file loader
 //  support 8 and 16 bits PCM
 //  and 8 bit ULAW (no compressed)
+
+class csSoundLoader_AU : public iSoundLoader
+{
+public:
+  DECLARE_IBASE;
+
+  csSoundLoader_AU(iBase *p) {
+    CONSTRUCT_IBASE(p);
+  }
+  virtual bool Initialize(iSystem *) {
+    return true;
+  }
+  virtual iSoundData *LoadSound(void *Buffer, unsigned long Size) const;
+};
+
+IMPLEMENT_IBASE(csSoundLoader_AU)
+  IMPLEMENTS_INTERFACE(iSoundLoader)
+  IMPLEMENTS_INTERFACE(iPlugIn)
+IMPLEMENT_IBASE_END;
+
+IMPLEMENT_FACTORY(csSoundLoader_AU);
+
 
 #define BIT16 0x03
 #define BIT8 0x02
@@ -39,7 +61,8 @@
 #define addStream(x) {if((index+x)>size) {goto exit_read;} else {index+=x;}}
 #define Stream buf[index]
 
-iSoundData *csSoundLoader_AU::Load(UByte* buf, ULong size) const {
+iSoundData *csSoundLoader_AU::LoadSound(void *databuf, ULong size) const {
+  UByte *buf = (UByte*) databuf;
   unsigned long index=0;
   csSoundDataRaw *sb= NULL;
   char *data=NULL;

@@ -36,7 +36,7 @@ struct iSoundLoader : public iPlugIn
   virtual bool Initialize (iSystem *sys) = 0;
 
   /// Load a sound file from the VFS.
-  virtual iSoundData *LoadSound(void *Data, unsigned long Size) = 0;
+  virtual iSoundData *LoadSound(void *Data, unsigned long Size) const = 0;
 };
 
 #endif // __ISOUND_LOADER_H__

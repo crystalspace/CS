@@ -22,15 +22,37 @@
 #include <string.h>
 
 #include "cssysdef.h"
-#include "csutil/csvector.h"
-#include "sndload.h"
+#include "isound/loader.h"
 #include "soundraw.h"
+#include "sndload.h"
 
 // MacIntosh AIFF file format loader
 
 // big warning, I hack this format with a hex editor,
 // if you have some informations about this format
 // email me at noote@bigfoot.com
+
+class csSoundLoader_AIFF : public iSoundLoader
+{
+public:
+  DECLARE_IBASE;
+
+  csSoundLoader_AIFF(iBase *p) {
+    CONSTRUCT_IBASE(p);
+  }
+  virtual bool Initialize(iSystem *) {
+    return true;
+  }
+  virtual iSoundData *LoadSound(void *Buffer, unsigned long Size) const;
+};
+
+IMPLEMENT_IBASE(csSoundLoader_AIFF)
+  IMPLEMENTS_INTERFACE(iSoundLoader)
+  IMPLEMENTS_INTERFACE(iPlugIn)
+IMPLEMENT_IBASE_END;
+
+IMPLEMENT_FACTORY(csSoundLoader_AIFF);
+
 
 #define BIT8 0x0008
 #define BIT16 0x0010
@@ -43,7 +65,8 @@
 #define addStream(x) {if((index+x)>size) {goto exit_read;} else {index+=x;}}
 #define Stream buf[index]
 
-iSoundData *csSoundLoader_AIFF::Load(UByte* buf, ULong size) const {
+iSoundData *csSoundLoader_AIFF::LoadSound(void* databuf, unsigned long size) const {
+  UByte *buf = (UByte*) databuf;
   unsigned long index=0;
   csSoundDataRaw *sb= NULL;
   char *data=NULL;

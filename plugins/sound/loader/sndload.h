@@ -19,26 +19,6 @@
 #ifndef __SNDLOAD_H__
 #define __SNDLOAD_H__
 
-struct iSoundData;
-
-// format-specific sound data loader
-class csSoundDataLoader {
-public:
-  virtual iSoundData *Load (UByte *buf, ULong size) const = 0;
-};
-
-#define DECLARE_SOUNDDATA_LOADER(name)                                          \
-  class name : public csSoundDataLoader {                                       \
-  public:                                                                       \
-    virtual iSoundData *Load(UByte*, ULong) const;                              \
-  }
-
-// all sound data loaders
-DECLARE_SOUNDDATA_LOADER(csSoundLoader_AIFF);
-DECLARE_SOUNDDATA_LOADER(csSoundLoader_AU);
-DECLARE_SOUNDDATA_LOADER(csSoundLoader_IFF);
-DECLARE_SOUNDDATA_LOADER(csSoundLoader_WAV);
-
 // Some helper functions for the sound loaders
 class csSndFunc {
 public:
@@ -51,4 +31,4 @@ public:
   static short int ulaw2linear(unsigned char ulawbyte);
 };
 
-#endif // __SOUNDLOADER_H
+#endif // __SNDLOAD_H__

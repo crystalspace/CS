@@ -2476,7 +2476,8 @@ iSoundHandle* csLoader::LoadSoundHandle(const char* filename) {
    */
 
   /* get format descriptor */
-  /* ### */iSoundRender *SoundRender = QUERY_PLUGIN(System, iSoundRender);
+  /* ### */iSoundRender *SoundRender =
+    QUERY_PLUGIN_ID(System, CS_FUNCID_SOUND, iSoundRender);
   /* ### */if (!SoundRender) return NULL;
 
   /* read the file data */
@@ -2491,7 +2492,8 @@ iSoundHandle* csLoader::LoadSoundHandle(const char* filename) {
 
   /* ### get sound loader plugin */
   static bool TriedToLoadSound = false;
-  iSoundLoader *SoundLoader = QUERY_PLUGIN(System, iSoundLoader);
+  iSoundLoader *SoundLoader =
+    QUERY_PLUGIN_ID(System, CS_FUNCID_SNDLOADER, iSoundLoader);
   if (!SoundLoader) {
     if (!TriedToLoadSound) {
       TriedToLoadSound = true;

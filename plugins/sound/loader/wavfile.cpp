@@ -22,13 +22,34 @@
 #include <string.h>
 
 #include "cssysdef.h"
-#include "csutil/csvector.h"
-#include "csutil/util.h"
-#include "sndload.h"
+#include "isound/loader.h"
 #include "soundraw.h"
+#include "sndload.h"
 
 // Microsoft Wav file loader
 //  support 8 and 16 bits PCM (RIFF)
+
+class csSoundLoader_WAV : public iSoundLoader
+{
+public:
+  DECLARE_IBASE;
+
+  csSoundLoader_WAV(iBase *p) {
+    CONSTRUCT_IBASE(p);
+  }
+  virtual bool Initialize(iSystem *) {
+    return true;
+  }
+  virtual iSoundData *LoadSound(void *Buffer, unsigned long Size) const;
+};
+
+IMPLEMENT_IBASE(csSoundLoader_WAV)
+  IMPLEMENTS_INTERFACE(iSoundLoader)
+  IMPLEMENTS_INTERFACE(iPlugIn)
+IMPLEMENT_IBASE_END;
+
+IMPLEMENT_FACTORY(csSoundLoader_WAV);
+
 
 struct _WAVchk
 {
@@ -55,7 +76,8 @@ struct _WAVhdr
 #define addStream(x) {if((index+x)>size) {goto exit_read;} else {index+=x;}}
 #define Stream buf[index]
 
-iSoundData *csSoundLoader_WAV::Load(UByte* buf, ULong size) const {
+iSoundData *csSoundLoader_WAV::LoadSound(void *databuf, ULong size) const {
+  UByte *buf = (UByte*) databuf;
   int index=0;
 
   csSoundDataRaw *sb= NULL;

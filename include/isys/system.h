@@ -88,6 +88,8 @@
 #define CS_FUNCID_CANVAS	"VideoCanvas"
 /// Sound renderer
 #define CS_FUNCID_SOUND		"SoundRender"
+/// Sound loader
+#define CS_FUNCID_SNDLOADER	"SoundLoader"
 /// Font server
 #define CS_FUNCID_FONTSERVER	"FontServer"
 /// Network driver
