@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-Feb-2005
+	- Jorrit added a new howto that explains how to compile external
+	  applications for Crystal Space and CEL using Dev-CPP.
 24-Feb-2005
 	- Jorrit fixed edge drawing by the OpenGL renderer by using
 	  glPolygonMode(GL_BACK,GL_LINE) instead of the way it was currently

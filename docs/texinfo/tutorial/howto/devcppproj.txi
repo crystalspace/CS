@@ -1,0 +1,151 @@
+@c -*-texinfo-*-
+@node HOWTO CS Project DevCPP, HOWTO Creating External MSVC 6 Application, HOWTO User Objects in Maps, HOWTO
+@subsection Creating an External Crystal Space Application Using Dev-CPP
+@cindex External Crystal Space Application
+@cindex Dev-CPP
+
+This section describes how you can use @samp{Dev-CPP} to compile external applications
+using Crystal Space and @sc{cel}. Unfortunatelly Crystal Space doesn't have project
+files for @samp{Dev-CPP} so at this moment you will have to use straight
+@samp{MinGW} and @sc{msys} to compile Crystal Space. However, for your own external
+applications you can use @samp{Dev-CPP}.
+
+@subsubheading External Application Requirements
+
+We assume that you have successfully configured and compiled Crystal Space
+(and optionally @sc{cel}) using @samp{MinGW} and @sc{msys}.
+
+If you installed Crystal Space in a non-standard location you probably
+will need to set the @samp{CRYSTAL} environment variable to point at the
+the location where the @sc{sdk} was installed.  For instance, if you specified
+@samp{--prefix=/site/sdk} when configuring Crystal Space, then you will need to
+set @samp{CRYSTAL} to @file{/site/sdk}.
+
+If you plan to use @sc{cel} then you also must set the @samp{CEL} environment
+variable.
+
+@subsubheading Defining a new Compiler
+
+Chances are the compiler which is provided by @samp{Dev-CPP} is not compatible
+for using with Crystal Space (since Crystal Space is compiled using the compiler
+in @samp{MinGW}). The easiest way to avoid problems with compiler versions here is
+to define a new compiler in @samp{Dev-CPP}. To do that go to @samp{Tools/Compiler Options}
+and click on the green '+' icon to add a compiler called @samp{MinGW}. Make sure
+that compiler is active in the popup and then switch to the @samp{Directories} tab.
+In that tab we have to change the path of everything to point to the @samp{MinGW}
+versions instead of the @samp{Dev-CPP} versions. In the @samp{Binaries} sub-tab you
+have to add both the bin directory of @samp{MinGW} as the bin directory of @sc{msys}
+(and remove the path to @samp{Dev-CPP}). In the @samp{Libraries} sub-tab you add
+the path to the @samp{MinGW} library directory and same for the @samp{C Includes}
+sub-tab. In the @samp{C++ Includes} tab you have to add the right @samp{C++}
+include directory within the @samp{MinGW} include directory.
+
+If this is done correctly you should now be able to use the compiler from
+@samp{MinGW}.
+
+@subsubheading Creating a New Project
+
+Select the @samp{File/New/Project} menu and choose @samp{Console Application}
+as the project type. Select an appropriate name and make sure @samp{C++} is
+selected as the language. Save the project file in an appropriate directory.
+It is best to make a new directory for the project file and all other files
+related to the project.
+
+If this is done succesfully @samp{Dev-CPP} will open with an unsaved
+@file{main.cpp}. Don't save it yet.
+
+@subsubheading Project Settings
+
+Before we can start you need various settings in the project. Select
+the @samp{Project/Project Options} menu.
+
+First go to the @samp{Compiler} tab and switch to our own
+@samp{MinGW} compiler that we defined earlier.
+
+Then go to the @samp{Parameters} tab where you need to add the Crystal
+Space (and optionally @sc{cel}) libraries that you want to link with. For
+Crystal Space the libraries will be in a path that looks somewhat similar
+to this: @file{CS/out/msysx86/debug/libs/cstool/...}. Add the following
+libraries:
+
+@example
+../CS/out/msysx86/debug/libs/csgeom/libcsgeom.a
+../CS/out/msysx86/debug/libs/csgeom/libcsgfx.a
+../CS/out/msysx86/debug/libs/csgeom/libcstool.a
+../CS/out/msysx86/debug/libs/csgeom/libcsutil.a
+../CS/out/msysx86/debug/libs/csgeom/libcsgeom.a
+../CS/out/msysx86/debug/libs/csgeom/libcsgfx.a
+../CS/out/msysx86/debug/libs/csgeom/libcstool.a
+../CS/out/msysx86/debug/libs/csgeom/libcsutil.a
+@end example
+
+It is important to add the libraries two times! The reason for that
+is to make sure everything is loaded when there are dependencies
+between the libraries themselves.
+
+Finally you have to add the @sc{gdi} library. This can be found
+in the @samp{MinGW} directory. For example:
+
+@example
+../MinGW-3.1.0-1/lib/libgdi32.a
+@end example
+
+Now we proceed to the @samp{Directories} tab. In that tab we immediatelly
+switch to the @samp{Include Directories} sub-tab where we add the following:
+
+@example
+c:\projects\CS\include
+src
+@end example
+
+(replace the path with the correct path). We add @file{src} too because we
+want to put all sources of our project in the @file{src} directory (this is
+optional).
+
+This concludes the project settings.
+
+@subsubheading Additional dll's
+
+Crystal Space requires a few dll's so that the program can run. The
+dll's that are required depend on what your application needs but they
+can be any of the dll's that you find in your path where you installed the
+Crystal Space Library package for Windows (the @file{cs-win32libs} package).
+Most commonly the following are at least required:
+
+@itemize
+@item
+@file{libz-cs.dll}
+@item
+@file{libjpeg-cs.dll}
+@item
+@file{libpng-cs.dll}
+@end itemize
+
+You can either copy those dll's manually to the project folder (the place
+where the exe will be) or you can make sure the dll's are in a standard
+location where dll's can be loaded (inside the windows folder).
+
+@subsubheading Getting Started
+
+Now that the project is ok we have to actually start programming. We
+replace the @file{main.cpp} with the one provided here:
+
+@example
+#include <crystalspace.h>
+#include "myapp.h"
+
+CS_IMPLEMENT_APPLICATION
+
+int main(int argc, char *argv[])
+@{
+  MyApp app;
+  return app.Main (argc, argv);
+@}
+@end example
+
+After this we just create @file{myapp.h} and @file{myapp.cpp} which
+will define the main @code{MyApp} class for the application. Refer to the
+other tutorials in this manual for more information on how to proceed from
+this point.
+
+

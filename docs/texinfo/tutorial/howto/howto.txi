@@ -27,6 +27,7 @@ code.
 * HOWTO Creating External MSVC 6 Application:: Creating an External @sc{msvc} 6 Application
 * HOWTO Creating External MSVC 7 Application:: Creating an External @sc{msvc} 7 Application
 * HOWTO Creating External Application Using KDevelop:: Creating an External Application using KDevelop
+* HOWTO CS Project DevCPP:: Creating an External Crystal Space Application Using Dev-CPP
 * HOWTO Create RPM:: Creating Crystal Space @sc{rpm}'s
 * HOWTO Setting the CRYSTAL environment variable:: Setting the CRYSTAL environment variable
 * HOWTO Create Your Own Plugin:: Create Your Own Plugin
@@ -54,6 +55,7 @@ code.
 @importsss{tutorial,howto,msvc6proj,msvc6proj.txi}
 @importsss{tutorial,howto,msvc7proj,msvc7proj.txi}
 @importsss{tutorial,howto,kdevproj,kdevproj.txi}
+@importss{tutorial,howto,devcppproj.txi}
 @importss{tutorial,howto,rpm.txi}
 @importss{tutorial,howto,envvar.txi}
 @importss{tutorial,howto,plugin.txi}
