@@ -3156,7 +3156,7 @@ int main (int argc, char* argv[])
   // Create our main class which is the driver for Blocks.
   Sys = new Blocks ();
 
-  iObjectRegistry* object_reg = csInitializer::CreateEnvironment ();
+  iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
   if (!object_reg) return -1;
   Sys->object_reg = object_reg;
 
@@ -3166,7 +3166,6 @@ int main (int argc, char* argv[])
     return -1;
   }
 
-  csInitializer::SetupCommandLineParser (object_reg, argc, argv);
   if (!csInitializer::RequestPlugins (object_reg, CS_REQUEST_END))
   {
     Sys->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");

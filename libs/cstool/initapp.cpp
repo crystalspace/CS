@@ -71,7 +71,7 @@ static bool config_done = false;
 static bool sys_init_done = false;
 static iEventHandler* installed_event_handler = NULL;
 
-iObjectRegistry* csInitializer::CreateEnvironment ()
+iObjectRegistry* csInitializer::CreateEnvironment (int argc, const char* const argv[])
 {
   iObjectRegistry* reg = 0;
   if (InitializeSCF())
@@ -84,9 +84,15 @@ iObjectRegistry* csInitializer::CreateEnvironment ()
           CreateVirtualClock(r) &&
           CreateCommandLineParser(r) &&
           CreateConfigManager(r) &&
-          CreateInputDrivers(r) &&
-	  csPlatformStartup(r))
-        reg = r;
+          CreateInputDrivers(r))
+      {
+	iCommandLineParser* c = CS_QUERY_REGISTRY (r, iCommandLineParser);
+	CS_ASSERT (c != NULL);
+	c->Initialize (argc, argv);
+	c->DecRef ();
+	if (csPlatformStartup(r))
+	  reg = r;
+      }
       else
         r->DecRef();
     }
@@ -224,16 +230,6 @@ iConfigManager* csInitializer::CreateConfigManager (iObjectRegistry* r)
   Config->DecRef ();
   cfg->DecRef ();
   return Config;
-}
-
-bool csInitializer::SetupCommandLineParser (
-  iObjectRegistry* r, int argc, const char* const argv[])
-{
-  iCommandLineParser* c = CS_QUERY_REGISTRY (r, iCommandLineParser);
-  CS_ASSERT (c != NULL);
-  c->Initialize (argc, argv);
-  c->DecRef ();
-  return true;
 }
 
 bool csInitializer::SetupConfigManager (

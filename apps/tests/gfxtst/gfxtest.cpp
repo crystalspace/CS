@@ -432,7 +432,7 @@ int main (int argc, char *argv[])
   _wildcard (&argc, &argv);
 #endif
 
-  iObjectRegistry* object_reg = csInitializer::CreateEnvironment ();
+  iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
   if (!object_reg) return -1;
 
   if (!csInitializer::SetupConfigManager (object_reg, NULL))
@@ -443,7 +443,6 @@ int main (int argc, char *argv[])
     return -1;
   }
 
-  csInitializer::SetupCommandLineParser (object_reg, argc, argv);
   if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,
 	CS_REQUEST_SOFTWARE3D,

@@ -156,7 +156,7 @@ static bool AwsEventHandler (iEvent& ev)
 bool 
 awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
 {
-  object_reg = csInitializer::CreateEnvironment ();
+  object_reg = csInitializer::CreateEnvironment (argc, argv);
   if (!object_reg) return false;
 
   if (!csInitializer::SetupConfigManager (object_reg, iConfigName))
@@ -165,7 +165,6 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
     return false;
   }
 
-  csInitializer::SetupCommandLineParser (object_reg, argc, argv);
   if (!csInitializer::RequestPlugins (object_reg, CS_REQUEST_END))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Could not init app!");

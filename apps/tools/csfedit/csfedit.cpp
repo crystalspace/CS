@@ -1547,7 +1547,7 @@ CSWS_SKIN_DECLARE_DEFAULT (DefaultSkin);
  */
 int main (int argc, char* argv[])
 {
-  iObjectRegistry* object_reg = csInitializer::CreateEnvironment ();
+  iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
   if (!object_reg) return -1;
 
   if (!csInitializer::SetupConfigManager (object_reg, "/config/cswstest.cfg"))
@@ -1558,7 +1558,6 @@ int main (int argc, char* argv[])
     return -1;
   }
 
-  csInitializer::SetupCommandLineParser (object_reg, argc, argv);
   if (!csInitializer::RequestPlugins (object_reg, CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
