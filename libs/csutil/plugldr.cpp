@@ -275,7 +275,7 @@ bool csPluginLoader::LoadPlugins ()
     memcpy (temp, val, sl); temp [sl] = 0;
     char *tag = strchr (temp, ':');
     if (tag) *tag++ = 0;
-    if (g3d_override && !strcmp ("iGraphics3D", tag)) continue;
+    if (g3d_override && tag && !strcmp ("iGraphics3D", tag)) continue;
     PluginList.Push (new csPluginLoadRec (tag, temp));
   }
 
