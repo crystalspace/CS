@@ -24,6 +24,10 @@ Short-term cleanups that need to be done:
 	  NextStep) this had the side-effect of transmogrifying the ctWorld
 	  into a ctPhysicalEntity, such that all virtual method dispatches
 	  went to ctPhysicalEntity rather than ctWorld as expected.
+	- Eric Sunshine fixed vfs.cpp so that it once again compiles on
+	  MacOS/X server.  Problem was that type of stat.st_mtime on this
+	  platform is not time_t, yet it was being passed to localtime() as
+	  though it was.
 24-Nov-1999
 	- Eric Sunshine fixed a transpostion error in snddata.cpp which was
 	  leaking memory.
