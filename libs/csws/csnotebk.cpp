@@ -250,7 +250,7 @@ void csNotebook::Draw ()
   }
 
   // Compute the position of all buttons
-  int bx, by, fx, fy, ww, hh;
+  int bx = 0, by = 0, fx = 0, fy =0, ww, hh;
 
   ww = sprites [0]->Width () + 6;
   if ((style & CSNBS_TABPOS_MASK) < CSNBS_TABPOS_LEFT)
