@@ -23,7 +23,6 @@
 #include "iutil/object.h"
 #include "iutil/objreg.h"
 #include "iutil/string.h"
-#include "iutil/plugin.h"
 #include "imesh/object.h"
 #include "iengine/engine.h"
 #include "iengine/texture.h"
@@ -47,6 +46,7 @@
 #include "csutil/util.h"
 #include "csgfx/rgbpixel.h"
 #include "imesh/thing.h"
+#include "imesh/sprite3d.h"
 #include "iengine/renderloop.h"
 #include "iengine/sharevar.h"
 #include "plugins/engine/3d/halo.h"
@@ -58,6 +58,8 @@
 #include "cstool/proctex.h"
 #include "ivaria/engseq.h"
 #include "ivaria/sequence.h"
+#include "ivaria/keyval.h"
+#include "igeom/objmodel.h"
 
 #define ONE_OVER_256 (1.0/255.0)
 
@@ -92,6 +94,7 @@ bool csSaver::Initialize(iObjectRegistry* p)
   object_reg = p;
   engine = CS_QUERY_REGISTRY(object_reg, iEngine);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
 
@@ -192,8 +195,6 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
     csFindReplace(savername, fact->QueryClassID(), ".type.", ".saver.", 128);
 
     //Invoke the iSaverPlugin::WriteDown
-    csRef<iPluginManager> plugin_mgr = 
-      CS_QUERY_REGISTRY (object_reg, iPluginManager);
     csRef<iSaverPlugin> saver = 
       CS_QUERY_PLUGIN_CLASS(plugin_mgr, savername, iSaverPlugin);
     if (!saver) 
@@ -536,26 +537,20 @@ bool csSaver::SaveCameraPositions(iDocumentNode *parent)
     // write the sector
     csRef<iDocumentNode> sectornode = CreateNode(n, "sector");
     const char *sectorname = cam->GetSector();
-    if(sectorname)
-      sectornode->SetValue(cam->GetSector());
+    if(sectorname && *sectorname)
+      sectornode->CreateNodeBefore (CS_NODE_TEXT)->SetValue(sectorname);
       
     // write position
-    csRef<iDocumentNode> positionnode = CreateNode(n, "position");
-    positionnode->SetAttributeAsFloat("x", cam->GetPosition().x);
-    positionnode->SetAttributeAsFloat("y", cam->GetPosition().y);
-    positionnode->SetAttributeAsFloat("z", cam->GetPosition().z);
+    csVector3 pos = cam->GetPosition ();
+    synldr->WriteVector (CreateNode (n, "position"), &pos);
 
     // write up vector
-    csRef<iDocumentNode> upnode = CreateNode(n, "up");
-    upnode->SetAttributeAsFloat("x", cam->GetUpwardVector().x);
-    upnode->SetAttributeAsFloat("y", cam->GetUpwardVector().y);
-    upnode->SetAttributeAsFloat("z", cam->GetUpwardVector().z);
+    csVector3 up = cam->GetUpwardVector ();
+    synldr->WriteVector (CreateNode (n, "up"), &up);
 
     // write forward vector
-    csRef<iDocumentNode> forwardnode = CreateNode(n, "forward");
-    forwardnode->SetAttributeAsFloat("x", cam->GetForwardVector().x);
-    forwardnode->SetAttributeAsFloat("y", cam->GetForwardVector().y);
-    forwardnode->SetAttributeAsFloat("z", cam->GetForwardVector().z);
+    csVector3 forward = cam->GetForwardVector ();
+    synldr->WriteVector (CreateNode (n, "forward"), &forward);
 
     // write farplane if available
     csPlane3 *fp = cam->GetFarPlane();
@@ -572,12 +567,14 @@ bool csSaver::SaveCameraPositions(iDocumentNode *parent)
 }
 
 bool csSaver::SaveMeshFactories(iMeshFactoryList* factList, 
-                                iDocumentNode *parent)
+                                iDocumentNode *parent, iMeshFactoryWrapper* parentfact)
 {
   for (int i=0; i<factList->GetCount(); i++)
   {
-    iMeshFactoryWrapper* meshfactwrap = factList->Get(i);
-    iMeshObjectFactory*  meshfact = meshfactwrap->GetMeshObjectFactory();
+    csRef<iMeshFactoryWrapper> meshfactwrap = factList->Get(i);
+    if (!parentfact && meshfactwrap->GetParentContainer ())
+      continue;
+    csRef<iMeshObjectFactory>  meshfact = meshfactwrap->GetMeshObjectFactory();
 
     //Create the Tag for the MeshObj
     csRef<iDocumentNode> factNode = CreateNode(parent, "meshfact");
@@ -585,7 +582,7 @@ bool csSaver::SaveMeshFactories(iMeshFactoryList* factList,
     //Add the mesh's name to the MeshObj tag
     const char* name = meshfactwrap->QueryObject()->GetName();
     if (name && *name) 
-    factNode->SetAttribute("name", name);
+      factNode->SetAttribute("name", name);
 
     csRef<iFactory> factory = 
       SCF_QUERY_INTERFACE(meshfact->GetMeshObjectType(), iFactory);
@@ -594,6 +591,8 @@ bool csSaver::SaveMeshFactories(iMeshFactoryList* factList,
 
     if (!(pluginname && *pluginname)) continue;
 
+    // TBD: Nullmesh
+
     csRef<iDocumentNode> pluginNode = CreateNode(factNode, "plugin");
 
     //Add the plugin tag
@@ -601,8 +600,6 @@ bool csSaver::SaveMeshFactories(iMeshFactoryList* factList,
     csFindReplace(loadername, pluginname, ".object.", ".loader.factory.",128);
 
     pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(loadername);
-    csRef<iPluginManager> plugin_mgr = 
-      CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
     char savername[128] = "";
     csFindReplace(savername, pluginname, ".object.", ".saver.factory.", 128);
@@ -613,7 +610,66 @@ bool csSaver::SaveMeshFactories(iMeshFactoryList* factList,
     if (!saver) 
       saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iSaverPlugin);
     if (saver) 
-      saver->WriteDown(meshfactwrap->GetMeshObjectFactory(), factNode);
+      saver->WriteDown(meshfact, factNode);
+
+    //Save some factory params...
+    if (!SaveKeys (factNode, meshfactwrap->QueryObject ())) return false;
+
+    synldr->WriteBool (factNode, "staticshape",
+      meshfact->GetFlags ().Check (CS_FACTORY_STATICSHAPE), false);
+
+    csRef<iObjectModel> objmdl = meshfact->GetObjectModel ();
+    if (objmdl.IsValid ())
+    {
+      csRef<iPolygonMesh> poly = objmdl->GetPolygonMeshShadows ();
+      if (poly.IsValid ())
+      {
+        synldr->WriteBool (factNode, "closed",
+          poly->GetFlags ().Check (CS_POLYMESH_CLOSED),
+          false);
+        synldr->WriteBool (factNode, "convex",
+          poly->GetFlags ().Check (CS_POLYMESH_CONVEX),
+          false);
+      }
+
+      //TBD: Polymesh
+    }
+
+    const char* pname = engine->GetRenderPriorityName (meshfactwrap->GetRenderPriority ());
+    if (pname && *pname)
+      CreateNode (factNode, "priority")->CreateNodeBefore (CS_NODE_TEXT)->SetValue (pname);
+
+    csZBufMode zmode = meshfactwrap->GetZBufMode ();
+    synldr->WriteZMode (factNode, &zmode, false);
+
+    // Save sprite3d specific material...Because it's not handled in sprite3d loader?
+    csRef<iSprite3DFactoryState> sprstate =
+      SCF_QUERY_INTERFACE (meshfact, iSprite3DFactoryState);
+    if (sprstate)
+    {
+      if (sprstate->GetMaterialWrapper ())
+        CreateNode (factNode, "material")->CreateNodeBefore (CS_NODE_TEXT)
+          ->SetValue (sprstate->GetMaterialWrapper ()->QueryObject ()->GetName ());
+    }
+
+    // TBD: Static LOD, LOD
+    
+    if (parentfact)
+    {
+      csReversibleTransform rt = meshfactwrap->GetTransform ();
+      csRef<iDocumentNode> move = CreateNode (factNode, "move");
+      csMatrix3 t2o = rt.GetT2O ();
+      csVector3 t2ot = rt.GetT2OTranslation ();
+      synldr->WriteMatrix (CreateNode (move, "matrix"), &t2o);
+      synldr->WriteVector (CreateNode (move, "v"), &t2ot);
+
+      // LBD: LOD level
+    }
+
+    //Save children
+    if (meshfactwrap->GetChildren ()->GetCount ())
+      if (!SaveMeshFactories (meshfactwrap->GetChildren (), factNode, meshfactwrap))
+        return false;
   }
   return true;
 }
@@ -627,8 +683,33 @@ bool csSaver::SaveSectors(iDocumentNode *parent)
     csRef<iDocumentNode> sectorNode = CreateNode(parent, "sector");
     const char* name = sector->QueryObject()->GetName();
     if (name && *name) sectorNode->SetAttribute("name", name);
-    if(!SaveSectorMeshes(sector->GetMeshes(), sectorNode)) return false;
-    if(!SaveSectorLights(sector, sectorNode)) return false;
+    
+#ifndef CS_USE_OLD_RENDERER
+    iRenderLoop* renderloop = sector->GetRenderLoop ();
+    if (renderloop)
+    {
+      const char* loopName = engine->GetRenderLoopManager()->GetName(renderloop);
+      if (strcmp (loopName, CS_DEFAULT_RENDERLOOP_NAME))
+        CreateNode(sectorNode, "renderloop")
+          ->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(loopName);
+    }
+#endif
+
+    // TBD: cullerp, polymesh, node
+
+    if (sector->HasFog ())
+    {
+      csFog* fog = sector->GetFog ();
+      csRef<iDocumentNode> fogNode = CreateNode (sectorNode, "fog");
+      fogNode->SetAttributeAsFloat ("red", fog->red);
+      fogNode->SetAttributeAsFloat ("green", fog->green);
+      fogNode->SetAttributeAsFloat ("blue", fog->blue);
+      fogNode->SetAttributeAsFloat ("density", fog->density);
+    }
+    
+    if (!SaveKeys (sectorNode, sector->QueryObject ())) return false;
+    if (!SaveSectorMeshes(sector->GetMeshes(), sectorNode)) return false;
+    if (!SaveSectorLights(sector, sectorNode)) return false;
     }
   return true;
 }
@@ -655,7 +736,7 @@ bool csSaver::SaveSectorMeshes(iMeshList *meshList, iDocumentNode *parent)
     //Add the mesh's name to the MeshObj tag
     const char* name = meshwrapper->QueryObject()->GetName();
     if (name && *name) 
-    meshNode->SetAttribute("name", name);
+      meshNode->SetAttribute("name", name);
 
     //Let the iSaverPlugin write the parameters of the mesh
     //It has to create the params node itself, maybe it might like to write
@@ -686,8 +767,6 @@ bool csSaver::SaveSectorMeshes(iMeshList *meshList, iDocumentNode *parent)
         csFindReplace(loadername, pluginname, ".object.", ".loader.", 128);
 
         pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(loadername);
-        csRef<iPluginManager> plugin_mgr = 
-          CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
         char savername[128] = "";
         csFindReplace(savername, pluginname, ".object.", ".saver.", 128);
@@ -704,8 +783,9 @@ bool csSaver::SaveSectorMeshes(iMeshList *meshList, iDocumentNode *parent)
       }
 
     }
-    if (CS_ZBUF_FILL == meshwrapper->GetZBufMode())
-      CreateNode(meshNode, "zfill");
+
+    csZBufMode zmode = meshwrapper->GetZBufMode ();
+    synldr->WriteZMode (meshNode, &zmode, false);
 
     //TBD: write <priority>
     //TBD: write other tags
@@ -917,8 +997,6 @@ bool csSaver::SaveSettings (iDocumentNode* node)
   synldr->WriteBool(settingsNode,"clearscreen",engine->GetClearScreen (),
     engine->GetDefaultClearScreen ());
 
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-    iPluginManager));
   csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
     "crystalspace.mesh.object.thing", iMeshObjectType));
   if (!type)
@@ -1038,6 +1116,21 @@ bool csSaver::SaveTriggers(iDocumentNode *parent)
   return true;
 }
 
+bool csSaver::SaveKeys (iDocumentNode* node, iObject* object)
+{
+  csRef<iObjectIterator> it = object->GetIterator ();
+  while (it->HasNext ())
+  {
+    csRef<iObject> obj = it->Next ();
+    csRef<iKeyValuePair> key = SCF_QUERY_INTERFACE (obj, iKeyValuePair);
+    if (key.IsValid ())
+    {
+      synldr->WriteKey (CreateNode (node, "key"), key);
+    }
+  }
+  return true;
+}
+
 csRef<iString> csSaver::SaveMapFile()
 {
   csRef<iDocumentSystem> xml = 
@@ -1077,10 +1170,12 @@ bool csSaver::SaveMapFile(csRef<iDocumentNode> &root)
 
   if (!SaveTextures(parent)) return false;
   if (!SaveVariables(parent)) return false;
+  if (!SaveKeys (parent, engine->QueryObject ())) return false;
   if (!SaveShaders(parent)) return false;
   if (!SaveMaterials(parent)) return false;
   if (!SaveSettings(parent)) return false;
   if (!SaveRenderPriorities(parent)) return false;
+  if (!SaveCameraPositions (parent)) return false;
   if (!SaveMeshFactories(engine->GetMeshFactories(), parent)) return false;
   if (!SaveSectors(parent)) return false;
   if (!SaveSequence(parent)) return false;

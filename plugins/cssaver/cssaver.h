@@ -24,6 +24,7 @@
 #include "iengine/engine.h"
 #include "iutil/comp.h"
 #include "iutil/document.h"
+#include "iutil/plugin.h"
 #include "csutil/cscolor.h"
 
 struct iSyntaxService;
@@ -33,6 +34,7 @@ class csSaver : public iSaver
   iObjectRegistry* object_reg;
   csRef<iEngine> engine;
   csRef<iSyntaxService> synldr;
+  csRef<iPluginManager> plugin_mgr;
 
 public:
   SCF_DECLARE_IBASE;
@@ -62,10 +64,13 @@ public:
   bool SaveTriggers(iDocumentNode *parent);
   bool SaveVariables (iDocumentNode* node);
 
-  bool SaveMeshFactories(iMeshFactoryList* factList, iDocumentNode *parent);
+  bool SaveMeshFactories(iMeshFactoryList* factList, iDocumentNode *parent,
+    iMeshFactoryWrapper* parentfact = 0);
   bool SavePortals(iPortal *portal, iDocumentNode *parent);
   bool SaveSectorLights(iSector *s, iDocumentNode *parent);
   bool SaveSectorMeshes(iMeshList *meshList, iDocumentNode *parent);
+
+  bool SaveKeys (iDocumentNode* node, iObject* object);
 
   virtual csRef<iString> SaveMapFile();
   virtual bool SaveMapFile(const char *filename);
