@@ -20,6 +20,7 @@
 #define __CS_CSSTRING_H__
 
 #include <stdarg.h>
+#include <ctype.h>
 #include "csutil/snprintf.h"
 
 /**
