@@ -23,8 +23,9 @@
 #include "csengine/meshobj.h"
 
 struct iMeshObject;
-class csSector;
-class csDynLight;
+struct iSector;
+struct iDynLight;
+struct iEngine;
 class csEngine;
 
 /**
@@ -34,7 +35,7 @@ class Bot : public csMeshWrapper
 {
 private:
   /// Engine handle.
-  csEngine *engine;
+  iEngine *engine;
   /// Current movement vector (unit vector).
   csVector3 d;
   /// Position that is followed.
@@ -46,7 +47,7 @@ public:
   /// Next bot.
   Bot* next;
   /// Optional dynamic light.
-  csDynLight* light;
+  iDynLight* light;
 
 public:
   /// Constructor.

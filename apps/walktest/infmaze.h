@@ -20,8 +20,7 @@
 #define INFMAZE_H
 
 #include "csgeom/math3d.h"
-#include "csengine/portal.h"
-#include "csengine/lview.h"
+#include "imesh/thing/portal.h"
 
 class csSparse3D;
 class csWideSparse3D;

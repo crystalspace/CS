@@ -18,9 +18,10 @@
 
 #include "cssysdef.h"
 #include "bot.h"
-#include "csengine/sector.h"
-#include "csengine/light.h"
 #include "csengine/engine.h"
+#include "iengine/dynlight.h"
+#include "iengine/light.h"
+#include "iengine/sector.h"
 
 Bot::Bot (csEngine* Engine, iMeshObject* botmesh) :
   csMeshWrapper (Engine->QueryCsObject (), botmesh)
@@ -92,13 +93,14 @@ void Bot::move (cs_time elapsed_time)
   {
     GetMovable ().SetSector (s->GetPrivateObject ());
     iLight* lights[2];
-    int num_lights = engine->GetNearbyLights (s->GetPrivateObject (),
-    	new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
+    int num_lights = engine->GetCsEngine ()->GetNearbyLights
+      (s->GetPrivateObject (), new_p,
+        CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
     UpdateLighting (lights, num_lights);
     if (light)
     {
-      light->SetSector (s->GetPrivateObject ());
-      light->SetCenter (new_p);
+      light->QueryLight ()->SetSector (s);
+      light->QueryLight ()->SetCenter (new_p);
       light->Setup ();
     }
   }

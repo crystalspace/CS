@@ -21,23 +21,15 @@
 #include "qint.h"
 #include "cssys/system.h"
 #include "csgeom/frustum.h"
-#include "csengine/stats.h"
-#include "csengine/light.h"
-#include "csengine/texture.h"
-#include "csengine/thing.h"
-#include "csengine/wirefrm.h"
-#include "csengine/polytext.h"
-#include "csengine/polygon.h"
-#include "csengine/pol2d.h"
-#include "csengine/sector.h"
-#include "csengine/engine.h"
-#include "csengine/meshobj.h"
-#include "csengine/csview.h"
-#include "csengine/octree.h"
+#include "iengine/view.h"
 #include "csgeom/csrect.h"
 #include "csutil/dataobj.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
+
+#include "csengine/wirefrm.h"
+#include "csengine/light.h"
+#include "csengine/octree.h"
 
 #define Gfx3D Sys->myG3D
 #define Gfx2D Sys->myG2D

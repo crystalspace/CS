@@ -22,23 +22,15 @@
 #include "infmaze.h"
 #include "hugeroom.h"
 #include "command.h"
-#include "csengine/camera.h"
-#include "csengine/campos.h"
-#include "csengine/octree.h"
-#include "csengine/engine.h"
-#include "csengine/csview.h"
-#include "csengine/wirefrm.h"
-#include "csengine/meshobj.h"
-#include "csengine/polygon.h"
-#include "csengine/light.h"
-#include "csengine/sector.h"
-#include "csengine/thing.h"
-#include "csengine/meshobj.h"
-#include "csengine/region.h"
+#include "iengine/view.h"
+#include "iengine/dynlight.h"
+#include "iengine/light.h"
+#include "iengine/campos.h"
+#include "iengine/region.h"
+#include "imesh/thing/polygon.h"
 #include "csutil/scanstr.h"
 #include "csparser/impexp.h"
 #include "csutil/dataobj.h"
-#include "csparser/snddatao.h"
 #include "csparser/crossbld.h"
 #include "csgeom/math3d.h"
 #include "cssys/system.h"
@@ -50,6 +42,7 @@
 #include "isound/listener.h"
 #include "isound/source.h"
 #include "isound/renderer.h"
+#include "isound/wrapper.h"
 #include "ivideo/graph3d.h"
 #include "ivaria/collider.h"
 #include "imesh/lighting.h"
@@ -63,6 +56,8 @@
 #include "imesh/sprite3d.h"
 #include "imesh/skeleton.h"
 #include "imap/parser.h"
+
+#include "csengine/light.h"
 
 extern WalkTest* Sys;
 
@@ -959,7 +954,7 @@ void add_bot (float size, iSector* where, csVector3 const& pos,
   state->SetAction ("default");
   state->DecRef ();
   bot->next = first_bot;
-  bot->light = dyn ? dyn->GetPrivateObject () : NULL;
+  bot->light = dyn;
   first_bot = bot;
 }
 
@@ -1079,7 +1074,7 @@ void HandleDynLight (iDynLight* dyn)
         es->radius = 2;
         es->dir = 1;
         csDataObject* esdata = new csDataObject (es);
-        dyn->GetPrivateObject ()->ObjAdd (esdata);
+        dyn->QueryObject ()->ObjAdd (esdata);
 	esdata->DecRef ();
         add_particles_explosion (l->GetSector (), l->GetCenter (), "explo");
         return;
@@ -1437,7 +1432,7 @@ iMeshWrapper* CreatePortalThing (const char* name, iSector* room,
   return thing;
 }
 
-void OpenPortal (iLoader *LevelLoader, csView* view, char* lev)
+void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
 {
   iSector* room = view->GetCamera ()->GetSector ();
   csVector3 pos = view->GetCamera ()->GetTransform ().This2Other (csVector3 (0, 0, 1));

@@ -23,24 +23,12 @@
 #include "hugeroom.h"
 #include "wentity.h"
 #include "command.h"
-#include "csengine/thing.h"
-#include "csengine/camera.h"
-#include "csengine/octree.h"
-#include "csengine/engine.h"
-#include "csengine/csview.h"
-#include "csengine/wirefrm.h"
-#include "csengine/meshobj.h"
-#include "csengine/terrobj.h"
-#include "csengine/polygon.h"
-#include "csengine/light.h"
-#include "csengine/sector.h"
-#include "csengine/radiosty.h"
+#include "iengine/view.h"
 #include "csutil/scanstr.h"
 #include "csutil/csstring.h"
 #include "csutil/util.h"
 #include "csparser/impexp.h"
 #include "csutil/dataobj.h"
-#include "csparser/snddatao.h"
 #include "csparser/crossbld.h"
 #include "csgeom/math3d.h"
 #include "cssys/system.h"
@@ -54,14 +42,20 @@
 #include "isound/listener.h"
 #include "isound/source.h"
 #include "isound/renderer.h"
+#include "isound/wrapper.h"
 #include "imesh/skeleton.h"
 #include "iengine/skelbone.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "isys/vfs.h"
 #include "iengine/motion.h"
+#include "iengine/light.h"
 #include "ivaria/perfstat.h"
 #include "imesh/sprite3d.h"
+
+#include "csengine/polygon.h"
+#include "csengine/radiosty.h"
+#include "csengine/light.h"
 
 extern WalkTest* Sys;
 
@@ -1243,7 +1237,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       char level[100];
       csScanStr (arg, "%s", level);
-      void OpenPortal (iLoader*, csView* view, char* lev);
+      void OpenPortal (iLoader*, iView* view, char* lev);
       OpenPortal (Sys->LevelLoader, Sys->view, level);
     }
     else

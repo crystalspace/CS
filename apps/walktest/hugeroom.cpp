@@ -19,12 +19,8 @@
 #include "cssysdef.h"
 #include "walktest/hugeroom.h"
 #include "walktest/walktest.h"
-#include "csengine/sector.h"
-#include "csengine/polygon.h"
-#include "csengine/engine.h"
-#include "csengine/texture.h"
-#include "csengine/light.h"
-#include "csengine/meshobj.h"
+#include "imesh/thing/polygon.h"
+#include "imesh/thing/ptextype.h"
 
 extern WalkTest* Sys;
 

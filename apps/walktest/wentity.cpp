@@ -21,6 +21,7 @@
 #include "walktest/walktest.h"
 #include "csengine/meshobj.h"
 #include "csgeom/matrix3.h"
+#include "iengine/light.h"
 
 extern WalkTest* Sys;
 

@@ -26,29 +26,15 @@
 #include "hugeroom.h"
 #include "command.h"
 #include "csgeom/frustum.h"
-#include "csengine/campos.h"
-#include "csengine/region.h"
-#include "csengine/csview.h"
-#include "csengine/stats.h"
-#include "csengine/light.h"
-#include "csengine/texture.h"
-#include "csengine/thing.h"
-#include "csengine/wirefrm.h"
-#include "csengine/polytext.h"
-#include "csengine/polytmap.h"
-#include "csengine/polygon.h"
-#include "csengine/pol2d.h"
-#include "csengine/cbuffer.h"
-#include "csengine/sector.h"
-#include "csengine/engine.h"
-#include "csengine/meshobj.h"
-#include "csengine/terrobj.h"
+#include "iengine/region.h"
+#include "iengine/view.h"
+#include "iengine/light.h"
+#include "iengine/motion.h"
 #include "csparser/impexp.h"
 #include "csgeom/csrect.h"
 #include "csutil/scanstr.h"
 #include "csutil/dataobj.h"
 #include "csutil/csobject.h"
-#include "csparser/snddatao.h"
 #include "cssys/system.h"
 #include "cstool/cspixmap.h"
 #include "cstool/csfxscr.h"
@@ -65,10 +51,17 @@
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "ivaria/collider.h"
-#include "iengine/motion.h"
 #include "ivaria/perfstat.h"
 #include "ivaria/reporter.h"
 #include "imap/parser.h"
+#include "isound/wrapper.h"
+#include "iterrain/object.h"
+
+#include "csengine/wirefrm.h"
+#include "csengine/cbuffer.h"
+#include "csengine/stats.h"
+#include "csengine/light.h"
+#include "csengine/campos.h"
 
 #if defined(OS_DOS) || defined(OS_WIN32) || defined (OS_OS2)
 #  include <io.h>
@@ -1183,13 +1176,9 @@ void WalkTest::LoadLibraryData (void)
 
 void WalkTest::Inititalize2DTextures ()
 {
-  csTextureWrapper *texh;
-  csEngine* engine = (csEngine*)Engine;
-  csTextureList *texlist = engine->GetTextures ();
-
   // Find the Crystal Space logo and set the renderer Flag to for_2d, to allow
   // the use in the 2D part.
-  texh = texlist->FindByName ("cslogo");
+  iTextureWrapper *texh = Engine->GetTextureList ()->FindByName ("cslogo");
   if (texh)
     texh->SetFlags (CS_TEXTURE_2D);
 }
@@ -1198,13 +1187,11 @@ void WalkTest::Inititalize2DTextures ()
 void WalkTest::Create2DSprites(void)
 {
   int w, h;
-  csTextureWrapper *texh;
+  iTextureWrapper *texh;
   iTextureHandle* phTex;
-  csEngine* engine = (csEngine*)Engine;
-  csTextureList *texlist = engine->GetTextures ();
 
   // Create a 2D sprite for the Logo.
-  texh = texlist->FindByName ("cslogo");
+  texh = Engine->GetTextureList ()->FindByName ("cslogo");
   if (texh)
   {
     phTex = texh->GetTextureHandle();
@@ -1336,7 +1323,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
-  view = new csView ((csEngine*)Engine, Gfx3D);
+  view = Engine->CreateView (Gfx3D);
 
   // Get the collide system plugin.
   const char* p = GetConfig()->GetStr ("Walktest.Settings.CollDetPlugIn",
@@ -1349,9 +1336,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   }
 
   // Initialize the command processor with the engine and camera.
-  csCommandProcessor::Initialize ((csEngine*)Engine,
-    view->GetCamera ()->GetPrivateObject (), Gfx3D,
-    Sys->myConsole, System);
+  csCommandProcessor::Initialize (Engine, view->GetCamera (),
+    Gfx3D, Sys->myConsole, System);
 
   // Now we have two choices. Either we create an infinite
   // maze (random). This happens when the '-infinite' commandline

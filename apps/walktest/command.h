@@ -22,9 +22,8 @@
 #include "ivideo/graph3d.h"
 #include "isys/vfs.h"
 
-class csSystemDriver;
-class csEngine;
-class csCamera;
+struct iEngine;
+struct iCamera;
 struct iConsoleOutput;
 struct iSystem;
 
@@ -37,9 +36,9 @@ class csCommandProcessor
 {
 private:
   /// The engine that this command interpreter is using.
-  static csEngine* engine;
+  static iEngine* engine;
   /// The corresponding camera object for this command interpreter.
-  static csCamera* camera;
+  static iCamera* camera;
   /// The iGraphics3D interface to use.
   static iGraphics3D* g3d;
   /// The iSystem interface to use.
@@ -55,7 +54,8 @@ private:
 
 public:
   /// Call this first.
-  static void Initialize (csEngine* engine, csCamera* camera, iGraphics3D* g3d, iConsoleOutput* console, iSystem* system);
+  static void Initialize (iEngine* engine, iCamera* camera, iGraphics3D* g3d,
+    iConsoleOutput* console, iSystem* system);
 
   /// This method can be set as a console input callback
   static void perform_callback (void *, const char *command);

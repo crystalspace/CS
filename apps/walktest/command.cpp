@@ -27,12 +27,7 @@
 #include <string.h>
 #include "cssysdef.h"
 #include "csver.h"
-#include "csengine/engine.h"
-#include "csengine/lghtmap.h"
-#include "csengine/sector.h"
-#include "csengine/polygon.h"
 #include "csengine/polytext.h"
-#include "csengine/meshobj.h"
 #include "command.h"
 #include "csutil/scanstr.h"
 #include "walktest.h"
@@ -47,8 +42,8 @@
 extern WalkTest* Sys;
 
 // Static csCommandProcessor variables
-csEngine* csCommandProcessor::engine = NULL;
-csCamera* csCommandProcessor::camera = NULL;
+iEngine* csCommandProcessor::engine = NULL;
+iCamera* csCommandProcessor::camera = NULL;
 iGraphics3D* csCommandProcessor::g3d = NULL;
 iConsoleOutput* csCommandProcessor::console = NULL;
 iSystem* csCommandProcessor::system = NULL;
@@ -56,7 +51,8 @@ iFile* csCommandProcessor::script = NULL;
 // Additional command handler
 csCommandProcessor::CmdHandler csCommandProcessor::ExtraHandler = NULL;
 
-void csCommandProcessor::Initialize (csEngine* engine, csCamera* camera, iGraphics3D* g3d, iConsoleOutput* console, iSystem* system)
+void csCommandProcessor::Initialize (iEngine* engine, iCamera* camera,
+  iGraphics3D* g3d, iConsoleOutput* console, iSystem* system)
 {
   csCommandProcessor::engine = engine;
   csCommandProcessor::camera = camera;
@@ -385,7 +381,7 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     }
   }
   else if (!strcasecmp (cmd, "turn"))
-    camera->RotateThis (VEC_ROT_RIGHT, M_PI);
+    camera->GetTransform ().RotateThis (VEC_ROT_RIGHT, M_PI);
   else if (!strcasecmp (cmd, "activate"))
   {
     CsPrintf (CS_MSG_CONSOLE, "OBSOLETE\n");
@@ -404,35 +400,35 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
       CsPrintf (CS_MSG_CONSOLE, "Expected sector,x,y,z. Got something else!\n");
       return false;
     }
-    csSector* s = (csSector*)engine->sectors.FindByName (sect);
+    iSector* s = engine->FindSector (sect);
     if (!s)
     {
       CsPrintf (CS_MSG_CONSOLE, "Can't find this sector!\n");
       return false;
     }
     camera->SetSector (s);
-    camera->SetPosition (csVector3(x,y,z));
+    camera->GetTransform ().SetOrigin (csVector3(x,y,z));
   }
   else if (!strcasecmp (cmd, "facenorth"))
-   camera->SetO2T (csMatrix3() /* identity */ );
+   camera->GetTransform ().SetO2T (csMatrix3() /* identity */ );
   else if (!strcasecmp (cmd, "facesouth"))
-   camera->SetO2T ( csMatrix3 ( -1,  0,  0,
+   camera->GetTransform ().SetO2T ( csMatrix3 ( -1,  0,  0,
                                0,  1,  0,
                                0,  0, -1 ) );
   else if (!strcasecmp (cmd, "facewest"))
-   camera->SetO2T ( csMatrix3 (  0,  0,  1,
+   camera->GetTransform ().SetO2T ( csMatrix3 (  0,  0,  1,
                                0,  1,  0,
                               -1,  0,  0 ) );
   else if (!strcasecmp (cmd, "faceeast"))
-   camera->SetO2T ( csMatrix3 (  0,  0, -1,
+   camera->GetTransform ().SetO2T ( csMatrix3 (  0,  0, -1,
                                0,  1,  0,
                               1,  0,  0 ) );
   else if (!strcasecmp (cmd, "facedown"))
-   camera->SetO2T ( csMatrix3 (  1,  0,  0,
+   camera->GetTransform ().SetO2T ( csMatrix3 (  1,  0,  0,
                                0,  0,  1,
                                0, -1,  0 ) );
   else if (!strcasecmp (cmd, "faceup"))
-   camera->SetO2T ( csMatrix3 (  1,  0,  0,
+   camera->GetTransform ().SetO2T ( csMatrix3 (  1,  0,  0,
                                0,  0, -1,
                                0,  1,  0 ) );
   else

@@ -73,6 +73,7 @@ struct iSector;
 struct iPolygon3D;
 struct iPortal;
 struct iFrustumView;
+struct iObject;
 
 SCF_VERSION (iPortalCallback, 0, 0, 1);
 

@@ -22,20 +22,8 @@
 #include "qint.h"
 #include "cssys/system.h"
 #include "csgeom/frustum.h"
-#include "csengine/campos.h"
-#include "csengine/csview.h"
-#include "csengine/stats.h"
-#include "csengine/light.h"
-#include "csengine/texture.h"
-#include "csengine/thing.h"
-#include "csengine/wirefrm.h"
-#include "csengine/polytext.h"
-#include "csengine/polygon.h"
-#include "csengine/pol2d.h"
-#include "csengine/sector.h"
-#include "csengine/engine.h"
-#include "csengine/meshobj.h"
-#include "csengine/terrobj.h"
+#include "iengine/view.h"
+#include "imesh/thing/polygon.h"
 #include "csparser/impexp.h"
 #include "csgeom/csrect.h"
 #include "csutil/dataobj.h"
@@ -43,6 +31,8 @@
 #include "cstool/collider.h"
 #include "cstool/cspixmap.h"
 #include "ivaria/collider.h"
+
+#include "csengine/terrobj.h"
 
 extern WalkTest *Sys;
 

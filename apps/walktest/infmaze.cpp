@@ -20,20 +20,12 @@
 #include "cssys/system.h"
 #include "walktest/infmaze.h"
 #include "walktest/walktest.h"
-#include "csengine/sector.h"
-#include "csengine/portal.h"
-#include "csengine/polygon.h"
-#include "csengine/thing.h"
-#include "csengine/engine.h"
-#include "csengine/texture.h"
-#include "csengine/material.h"
-#include "csengine/light.h"
-#include "csengine/lghtmap.h"
 #include "cstool/collider.h"
 #include "csutil/dataobj.h"
 #include "csutil/sparse3d.h"
 #include "imesh/object.h"
 #include "imesh/lighting.h"
+#include "imesh/thing/polygon.h"
 
 InfiniteMaze::InfiniteMaze ()
 {

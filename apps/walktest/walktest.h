@@ -24,19 +24,19 @@
 #include "csgeom/math3d.h"
 #include "csgeom/box.h"
 #include "cssys/sysdriv.h"
-#include "csengine/engine.h"
-#include "csengine/light.h"
 #include "cstool/collider.h"
 #include "csutil/cscolor.h"
 #include "walktest/wentity.h"
 #include "iengine/engine.h"
+#include "iengine/fview.h"
 #include "ivaria/conout.h"
 #include "ivaria/conin.h"
 #include "isys/vfs.h"
 #include "ivideo/fontserv.h"
 
+#include "csengine/engine.h"
+
 class WalkTest;
-class csView;
 class csPixmap;
 class csWireFrameCam;
 class InfiniteMaze;
@@ -53,6 +53,7 @@ struct iMeshWrapper;
 struct iTerrainWrapper;
 struct iLight;
 struct iPolygon3D;
+struct iView;
 
 // type information
 
@@ -284,7 +285,7 @@ public:
   iMotionManager *myMotionMan;
 
   /// The view on the world.
-  csView* view;
+  iView* view;
 
   /// A pointer to a skybox to animate (if any).
   iMeshWrapper* anim_sky;
