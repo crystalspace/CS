@@ -823,7 +823,6 @@ awsListBox::OnMouseUp(int button, int x, int y)
     awsListHotspot *hs = (awsListHotspot *)hotspots[i];
     if (hs->r.Contains(x, y))
     {
-      printf("listbox: matched hotspot\n");
       switch(hs->type)
       {
       case hsTreeBox:
