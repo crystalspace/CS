@@ -93,7 +93,7 @@ public:
 
   /**
    * Set the tick scale.  Valid values are 1-100, inclusive.  Default is 2.  A
-   * value of 1 means that each printed tick represents one unit, thus a totla
+   * value of 1 means that each printed tick represents one unit, thus a total
    * of 100 ticks will be printed.  A value of 2 means that each tick
    * represents two units, thus a total of 50 ticks will be printed, etc.
    */
