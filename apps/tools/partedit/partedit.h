@@ -56,7 +56,6 @@ private:
   csRef<iAwsCanvas> awsCanvas;
   iSector* room;
   csRef<iEmitState> emitState;
-  iEmitFixed* emitvector;
   bool keydown;
   float value;
   csString current_graphic;
@@ -75,6 +74,7 @@ private:
 
   EmitterState state_emitter;
   Emitter3DState state_initial_position;
+  AttractorState state_attractor;
 
   /** Set to true on start.  Set to false when a quit event is received.
    *  When false, normal events are not processed (such as aws events) since the underlying objects

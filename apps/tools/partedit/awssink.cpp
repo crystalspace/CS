@@ -10,6 +10,118 @@
 #include <stdio.h>
 
 
+/*
+ *  Component reference  (iawscomponent_NAME)
+ *  Data storage (somestruct.state.somevalue)
+ *  Updated flag (somestruct.state_changed)
+ *
+ *  Register Creation Trigger in constructor  (sink->RegisterTrigger("text",&function) )
+ *  Register Input Trigger in constructor (sink->RegisterTrigger("text",&function) )
+ *
+ *  Registration function (static)
+ *  Input function (static)
+ *  Update function
+ *
+ *
+ */
+
+
+////
+// Some helper macros that make adding components and windows a bit less tedious
+////
+
+// This macro implements a static callback function which records the pointer to the iAwsComponent that calls the trigger
+// The function named here should be attached to the creation trigger of the aws component
+#define IMPLEMENT_REGISTER_FUNCTION(function,componentvar)  \
+void awsSink::function(void *sk, iAwsSource *source) \
+{ \
+  asink->componentvar=source->GetComponent(); \
+} 
+
+
+// This macro implements a static callback function which pulls the value out of a textbox control
+// converts it to a float, stores the float in a given variable beneath the global pointer 'asink'
+// and sets a boolean variable beneath 'asink' to true to signal that a data update has occurred
+#define IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(function,floatvar,invalidate_flag,update) \
+void awsSink::function(void *sk, iAwsSource *source) \
+{ \
+  iString *textvalue; \
+  if (source->GetComponent()->GetProperty("Text",(void **)&textvalue) && textvalue->Length()) \
+  { \
+    asink->floatvar=atof(textvalue->GetData()); \
+    asink->invalidate_flag=true; \
+  } \
+  else \
+    asink->update(); \
+}
+
+
+// This macro implements a static callback function which pulls the value out of a textbox control
+// converts it to a integer, stores the integer in a given variable beneath the global pointer 'asink'
+// and sets a boolean variable beneath 'asink' to true to signal that a data update has occurred
+#define IMPLEMENT_COMPONENT_TEXTBOX_TO_INT(function,intvar,invalidate_flag,update) \
+void awsSink::function(void *sk, iAwsSource *source) \
+{ \
+  iString *textvalue; \
+  if (source->GetComponent()->GetProperty("Text",(void **)&textvalue) && textvalue->Length()) \
+  { \
+    asink->intvar=strtol(textvalue->GetData(),NULL,10); \
+    asink->invalidate_flag=true; \
+  } \
+  else \
+    asink->update(); \
+}
+
+
+// This macro implements a static callback function which checks the state of a checkbox or radio button
+// and stores the result (on/off) in a given boolean variable beneath the global pointer 'asink'
+// It also sets a different boolean variable beneath 'asink' to true to signal that a data update has occurred.
+#define IMPLEMENT_COMPONENT_CHECKBOX_TO_BOOL(function,boolvar,invalidate_flag,update) \
+void awsSink::function(void *sk, iAwsSource *source) \
+{ \
+  bool *p_bvalue; \
+  if (source->GetComponent()->GetProperty("State",(void **)&p_bvalue)) \
+  { \
+    if (*p_bvalue) \
+      asink->boolvar=true; \
+    else \
+      asink->boolvar=false; \
+    asink->invalidate_flag=true; \
+  } \
+  else \
+    asink->update(); \
+}
+
+
+// This macro can be used to set the contents of a textbox given the iAwsComponent * of the text box
+// and an integer.  value must be defined as a csRef<iString> prior to this macro being used in a
+// function.
+#define SET_TEXTBOX_INT(component,intval) \
+    value = csPtr<iString> (new scfString()); \
+    value->Format("%d",intval); \
+    component->SetProperty("Text",value);
+
+// This macro can be used to set the contents of a textbox given the iAwsComponent * of the text box
+// and a float.  value must be defined as a csRef<iString> prior to this macro being used in a
+// function.
+#define SET_TEXTBOX_FLOAT(component,floatval) \
+    value = csPtr<iString> (new scfString()); \
+    value->Format("%f",floatval); \
+    component->SetProperty("Text",value);
+
+// This macro can be used to set the contents of a checkbox or radio button given the iAwsComponent * 
+// of the checkbox or radio button and a statement that can evaluate to true/false.  
+// boolval must be defined as a bool prior to this macro being used in a function.
+#define SET_CHECKBOX_BOOL(component,boolval) \
+  if (boolval) \
+    bvalue=true; \
+  else \
+    bvalue=false; \
+  component->SetProperty("State",&bvalue);
+
+
+
+
 awsSink * awsSink::asink = NULL;
 
 awsSink::awsSink() : wmgr(0) 
@@ -117,6 +229,41 @@ void awsSink::SetSink(iAwsSink *s)
     sink->RegisterTrigger("RegisterIPSMin",&RegisterIPSMin);
     sink->RegisterTrigger("RegisterIPSMax",&RegisterIPSMax);
     sink->RegisterTrigger("RegisterIPSWeight",&RegisterIPSWeight);
+    sink->RegisterTrigger("RegisterIPCNOX",&RegisterIPCNOX);
+    sink->RegisterTrigger("RegisterIPCNOY",&RegisterIPCNOY);
+    sink->RegisterTrigger("RegisterIPCNOZ",&RegisterIPCNOZ);
+    sink->RegisterTrigger("RegisterIPCNElev",&RegisterIPCNElev);
+    sink->RegisterTrigger("RegisterIPCNAzim",&RegisterIPCNAzim);
+    sink->RegisterTrigger("RegisterIPCNAper",&RegisterIPCNAper);
+    sink->RegisterTrigger("RegisterIPCNMin",&RegisterIPCNMin);
+    sink->RegisterTrigger("RegisterIPCNMax",&RegisterIPCNMax);
+    sink->RegisterTrigger("RegisterIPCNWeight",&RegisterIPCNWeight);
+    sink->RegisterTrigger("RegisterIPCYSX",&RegisterIPCYSX);
+    sink->RegisterTrigger("RegisterIPCYSY",&RegisterIPCYSY);
+    sink->RegisterTrigger("RegisterIPCYSZ",&RegisterIPCYSZ);
+    sink->RegisterTrigger("RegisterIPCYEX",&RegisterIPCYEX);
+    sink->RegisterTrigger("RegisterIPCYEY",&RegisterIPCYEY);
+    sink->RegisterTrigger("RegisterIPCYEZ",&RegisterIPCYEZ);
+    sink->RegisterTrigger("RegisterIPCYMin",&RegisterIPCYMin);
+    sink->RegisterTrigger("RegisterIPCYMax",&RegisterIPCYMax);
+    sink->RegisterTrigger("RegisterIPCYWeight",&RegisterIPCYWeight);
+    sink->RegisterTrigger("RegisterIPSTCX",&RegisterIPSTCX);
+    sink->RegisterTrigger("RegisterIPSTCY",&RegisterIPSTCY);
+    sink->RegisterTrigger("RegisterIPSTCZ",&RegisterIPSTCZ);
+    sink->RegisterTrigger("RegisterIPSTMin",&RegisterIPSTMin);
+    sink->RegisterTrigger("RegisterIPSTMax",&RegisterIPSTMax);
+    sink->RegisterTrigger("RegisterIPSTWeight",&RegisterIPSTWeight);
+    sink->RegisterTrigger("RegisterIPCYTSX",&RegisterIPCYTSX);
+    sink->RegisterTrigger("RegisterIPCYTSY",&RegisterIPCYTSY);
+    sink->RegisterTrigger("RegisterIPCYTSZ",&RegisterIPCYTSZ);
+    sink->RegisterTrigger("RegisterIPCYTEX",&RegisterIPCYTEX);
+    sink->RegisterTrigger("RegisterIPCYTEY",&RegisterIPCYTEY);
+    sink->RegisterTrigger("RegisterIPCYTEZ",&RegisterIPCYTEZ);
+    sink->RegisterTrigger("RegisterIPCYTMin",&RegisterIPCYTMin);
+    sink->RegisterTrigger("RegisterIPCYTMax",&RegisterIPCYTMax);
+    sink->RegisterTrigger("RegisterIPCYTWeight",&RegisterIPCYTWeight);
+
+
 
     sink->RegisterTrigger("SetIPFPositionX",&AwsSetIPFPositionX);
     sink->RegisterTrigger("SetIPFPositionY",&AwsSetIPFPositionY);
@@ -142,6 +289,162 @@ void awsSink::SetSink(iAwsSink *s)
     sink->RegisterTrigger("SetIPSMin",&AwsSetIPSMin);
     sink->RegisterTrigger("SetIPSMax",&AwsSetIPSMax);
     sink->RegisterTrigger("SetIPSWeight",&AwsSetIPSWeight);
+    sink->RegisterTrigger("SetIPCNOriginX",&AwsSetIPCNOriginX);
+    sink->RegisterTrigger("SetIPCNOriginY",&AwsSetIPCNOriginY);
+    sink->RegisterTrigger("SetIPCNOriginZ",&AwsSetIPCNOriginZ);
+    sink->RegisterTrigger("SetIPCNElev",&AwsSetIPCNElev);
+    sink->RegisterTrigger("SetIPCNAzim",&AwsSetIPCNAzim);
+    sink->RegisterTrigger("SetIPCNAper",&AwsSetIPCNAper);
+    sink->RegisterTrigger("SetIPCNMin",&AwsSetIPCNMin);
+    sink->RegisterTrigger("SetIPCNMax",&AwsSetIPCNMax);
+    sink->RegisterTrigger("SetIPCNWeight",&AwsSetIPCNWeight);
+    sink->RegisterTrigger("SetIPCYStartX",&AwsSetIPCYStartX);
+    sink->RegisterTrigger("SetIPCYStartY",&AwsSetIPCYStartY);
+    sink->RegisterTrigger("SetIPCYStartZ",&AwsSetIPCYStartZ);
+    sink->RegisterTrigger("SetIPCYEndX",&AwsSetIPCYEndX);
+    sink->RegisterTrigger("SetIPCYEndY",&AwsSetIPCYEndY);
+    sink->RegisterTrigger("SetIPCYEndZ",&AwsSetIPCYEndZ);
+    sink->RegisterTrigger("SetIPCYMin",&AwsSetIPCYMin);
+    sink->RegisterTrigger("SetIPCYMax",&AwsSetIPCYMax);
+    sink->RegisterTrigger("SetIPCYWeight",&AwsSetIPCYWeight);
+    sink->RegisterTrigger("SetIPSTCenterX",&AwsSetIPSTCenterX);
+    sink->RegisterTrigger("SetIPSTCenterY",&AwsSetIPSTCenterY);
+    sink->RegisterTrigger("SetIPSTCenterZ",&AwsSetIPSTCenterZ);
+    sink->RegisterTrigger("SetIPSTMin",&AwsSetIPSTMin);
+    sink->RegisterTrigger("SetIPSTMax",&AwsSetIPSTMax);
+    sink->RegisterTrigger("SetIPSTWeight",&AwsSetIPSTWeight);
+    sink->RegisterTrigger("SetIPCYTStartX",&AwsSetIPCYTStartX);
+    sink->RegisterTrigger("SetIPCYTStartY",&AwsSetIPCYTStartY);
+    sink->RegisterTrigger("SetIPCYTStartZ",&AwsSetIPCYTStartZ);
+    sink->RegisterTrigger("SetIPCYTEndX",&AwsSetIPCYTEndX);
+    sink->RegisterTrigger("SetIPCYTEndY",&AwsSetIPCYTEndY);
+    sink->RegisterTrigger("SetIPCYTEndZ",&AwsSetIPCYTEndZ);
+    sink->RegisterTrigger("SetIPCYTMin",&AwsSetIPCYTMin);
+    sink->RegisterTrigger("SetIPCYTMax",&AwsSetIPCYTMax);
+    sink->RegisterTrigger("SetIPCYTWeight",&AwsSetIPCYTWeight);
+
+
+    // Attractor Options Callbacks
+    sink->RegisterTrigger("RegisterAttractor",&RegisterAttractor);
+    sink->RegisterTrigger("RegisterATForce",&RegisterATForce);
+    sink->RegisterTrigger("RegisterATFPX",&RegisterATFPX);
+    sink->RegisterTrigger("RegisterATFPY",&RegisterATFPY);
+    sink->RegisterTrigger("RegisterATFPZ",&RegisterATFPZ);
+    sink->RegisterTrigger("RegisterATFWeight",&RegisterATFWeight);
+    sink->RegisterTrigger("RegisterATLSX",&RegisterATLSX);
+    sink->RegisterTrigger("RegisterATLSY",&RegisterATLSY);
+    sink->RegisterTrigger("RegisterATLSZ",&RegisterATLSZ);
+    sink->RegisterTrigger("RegisterATLEX",&RegisterATLEX);
+    sink->RegisterTrigger("RegisterATLEY",&RegisterATLEY);
+    sink->RegisterTrigger("RegisterATLEZ",&RegisterATLEZ);
+    sink->RegisterTrigger("RegisterATLWeight",&RegisterATLWeight);
+    sink->RegisterTrigger("RegisterATBMX",&RegisterATBMX);
+    sink->RegisterTrigger("RegisterATBMY",&RegisterATBMY);
+    sink->RegisterTrigger("RegisterATBMZ",&RegisterATBMZ);
+    sink->RegisterTrigger("RegisterATBXX",&RegisterATBXX);
+    sink->RegisterTrigger("RegisterATBXY",&RegisterATBXY);
+    sink->RegisterTrigger("RegisterATBXZ",&RegisterATBXZ);
+    sink->RegisterTrigger("RegisterATBWeight",&RegisterATBWeight);
+    sink->RegisterTrigger("RegisterATSCX",&RegisterATSCX);
+    sink->RegisterTrigger("RegisterATSCY",&RegisterATSCY);
+    sink->RegisterTrigger("RegisterATSCZ",&RegisterATSCZ);
+    sink->RegisterTrigger("RegisterATSMin",&RegisterATSMin);
+    sink->RegisterTrigger("RegisterATSMax",&RegisterATSMax);
+    sink->RegisterTrigger("RegisterATSWeight",&RegisterATSWeight);
+    sink->RegisterTrigger("RegisterATCNOX",&RegisterATCNOX);
+    sink->RegisterTrigger("RegisterATCNOY",&RegisterATCNOY);
+    sink->RegisterTrigger("RegisterATCNOZ",&RegisterATCNOZ);
+    sink->RegisterTrigger("RegisterATCNElev",&RegisterATCNElev);
+    sink->RegisterTrigger("RegisterATCNAzim",&RegisterATCNAzim);
+    sink->RegisterTrigger("RegisterATCNAper",&RegisterATCNAper);
+    sink->RegisterTrigger("RegisterATCNMin",&RegisterATCNMin);
+    sink->RegisterTrigger("RegisterATCNMax",&RegisterATCNMax);
+    sink->RegisterTrigger("RegisterATCNWeight",&RegisterATCNWeight);
+    sink->RegisterTrigger("RegisterATCYSX",&RegisterATCYSX);
+    sink->RegisterTrigger("RegisterATCYSY",&RegisterATCYSY);
+    sink->RegisterTrigger("RegisterATCYSZ",&RegisterATCYSZ);
+    sink->RegisterTrigger("RegisterATCYEX",&RegisterATCYEX);
+    sink->RegisterTrigger("RegisterATCYEY",&RegisterATCYEY);
+    sink->RegisterTrigger("RegisterATCYEZ",&RegisterATCYEZ);
+    sink->RegisterTrigger("RegisterATCYMin",&RegisterATCYMin);
+    sink->RegisterTrigger("RegisterATCYMax",&RegisterATCYMax);
+    sink->RegisterTrigger("RegisterATCYWeight",&RegisterATCYWeight);
+    sink->RegisterTrigger("RegisterATSTCX",&RegisterATSTCX);
+    sink->RegisterTrigger("RegisterATSTCY",&RegisterATSTCY);
+    sink->RegisterTrigger("RegisterATSTCZ",&RegisterATSTCZ);
+    sink->RegisterTrigger("RegisterATSTMin",&RegisterATSTMin);
+    sink->RegisterTrigger("RegisterATSTMax",&RegisterATSTMax);
+    sink->RegisterTrigger("RegisterATSTWeight",&RegisterATSTWeight);
+    sink->RegisterTrigger("RegisterATCYTSX",&RegisterATCYTSX);
+    sink->RegisterTrigger("RegisterATCYTSY",&RegisterATCYTSY);
+    sink->RegisterTrigger("RegisterATCYTSZ",&RegisterATCYTSZ);
+    sink->RegisterTrigger("RegisterATCYTEX",&RegisterATCYTEX);
+    sink->RegisterTrigger("RegisterATCYTEY",&RegisterATCYTEY);
+    sink->RegisterTrigger("RegisterATCYTEZ",&RegisterATCYTEZ);
+    sink->RegisterTrigger("RegisterATCYTMin",&RegisterATCYTMin);
+    sink->RegisterTrigger("RegisterATCYTMax",&RegisterATCYTMax);
+    sink->RegisterTrigger("RegisterATCYTWeight",&RegisterATCYTWeight);
+
+
+
+    sink->RegisterTrigger("SetATForce",&AwsSetATForce);
+    sink->RegisterTrigger("SetATFPositionX",&AwsSetATFPositionX);
+    sink->RegisterTrigger("SetATFPositionY",&AwsSetATFPositionY);
+    sink->RegisterTrigger("SetATFPositionZ",&AwsSetATFPositionZ);
+    sink->RegisterTrigger("SetATFWeight",&AwsSetATFWeight);
+    sink->RegisterTrigger("SetATLStartX",&AwsSetATLStartX);
+    sink->RegisterTrigger("SetATLStartY",&AwsSetATLStartY);
+    sink->RegisterTrigger("SetATLStartZ",&AwsSetATLStartZ);
+    sink->RegisterTrigger("SetATLEndX",&AwsSetATLEndX);
+    sink->RegisterTrigger("SetATLEndY",&AwsSetATLEndY);
+    sink->RegisterTrigger("SetATLEndZ",&AwsSetATLEndZ);
+    sink->RegisterTrigger("SetATLWeight",&AwsSetATLWeight);
+    sink->RegisterTrigger("SetATBMinX",&AwsSetATBMinX);
+    sink->RegisterTrigger("SetATBMinY",&AwsSetATBMinY);
+    sink->RegisterTrigger("SetATBMinZ",&AwsSetATBMinZ);
+    sink->RegisterTrigger("SetATBMaxX",&AwsSetATBMaxX);
+    sink->RegisterTrigger("SetATBMaxY",&AwsSetATBMaxY);
+    sink->RegisterTrigger("SetATBMaxZ",&AwsSetATBMaxZ);
+    sink->RegisterTrigger("SetATBWeight",&AwsSetATBWeight);
+    sink->RegisterTrigger("SetATSCenterX",&AwsSetATSCenterX);
+    sink->RegisterTrigger("SetATSCenterY",&AwsSetATSCenterY);
+    sink->RegisterTrigger("SetATSCenterZ",&AwsSetATSCenterZ);
+    sink->RegisterTrigger("SetATSMin",&AwsSetATSMin);
+    sink->RegisterTrigger("SetATSMax",&AwsSetATSMax);
+    sink->RegisterTrigger("SetATSWeight",&AwsSetATSWeight);
+    sink->RegisterTrigger("SetATCNOriginX",&AwsSetATCNOriginX);
+    sink->RegisterTrigger("SetATCNOriginY",&AwsSetATCNOriginY);
+    sink->RegisterTrigger("SetATCNOriginZ",&AwsSetATCNOriginZ);
+    sink->RegisterTrigger("SetATCNElev",&AwsSetATCNElev);
+    sink->RegisterTrigger("SetATCNAzim",&AwsSetATCNAzim);
+    sink->RegisterTrigger("SetATCNAper",&AwsSetATCNAper);
+    sink->RegisterTrigger("SetATCNMin",&AwsSetATCNMin);
+    sink->RegisterTrigger("SetATCNMax",&AwsSetATCNMax);
+    sink->RegisterTrigger("SetATCNWeight",&AwsSetATCNWeight);
+    sink->RegisterTrigger("SetATCYStartX",&AwsSetATCYStartX);
+    sink->RegisterTrigger("SetATCYStartY",&AwsSetATCYStartY);
+    sink->RegisterTrigger("SetATCYStartZ",&AwsSetATCYStartZ);
+    sink->RegisterTrigger("SetATCYEndX",&AwsSetATCYEndX);
+    sink->RegisterTrigger("SetATCYEndY",&AwsSetATCYEndY);
+    sink->RegisterTrigger("SetATCYEndZ",&AwsSetATCYEndZ);
+    sink->RegisterTrigger("SetATCYMin",&AwsSetATCYMin);
+    sink->RegisterTrigger("SetATCYMax",&AwsSetATCYMax);
+    sink->RegisterTrigger("SetATCYWeight",&AwsSetATCYWeight);
+    sink->RegisterTrigger("SetATSTCenterX",&AwsSetATSTCenterX);
+    sink->RegisterTrigger("SetATSTCenterY",&AwsSetATSTCenterY);
+    sink->RegisterTrigger("SetATSTCenterZ",&AwsSetATSTCenterZ);
+    sink->RegisterTrigger("SetATSTMin",&AwsSetATSTMin);
+    sink->RegisterTrigger("SetATSTMax",&AwsSetATSTMax);
+    sink->RegisterTrigger("SetATSTWeight",&AwsSetATSTWeight);
+    sink->RegisterTrigger("SetATCYTStartX",&AwsSetATCYTStartX);
+    sink->RegisterTrigger("SetATCYTStartY",&AwsSetATCYTStartY);
+    sink->RegisterTrigger("SetATCYTStartZ",&AwsSetATCYTStartZ);
+    sink->RegisterTrigger("SetATCYTEndX",&AwsSetATCYTEndX);
+    sink->RegisterTrigger("SetATCYTEndY",&AwsSetATCYTEndY);
+    sink->RegisterTrigger("SetATCYTEndZ",&AwsSetATCYTEndZ);
+    sink->RegisterTrigger("SetATCYTMin",&AwsSetATCYTMin);
+    sink->RegisterTrigger("SetATCYTMax",&AwsSetATCYTMax);
+    sink->RegisterTrigger("SetATCYTWeight",&AwsSetATCYTWeight);
 
 
   }
@@ -296,11 +599,19 @@ void awsSink::SectionListSelectionChanged(void *sk, iAwsSource *source)
       else
         asink->InitialPositionData.iawscomponent_InitialPosition->Hide();
       break;
+    case SECTION_ATTRACTOR:
+      if (asink->SectionState[i])
+      {
+        asink->AttractorData.iawscomponent_Attractor->Show();
+        asink->AttractorData.iawscomponent_Attractor->Raise();
+      }
+      else
+        asink->AttractorData.iawscomponent_Attractor->Hide();
+      break;
     case SECTION_INIT_SPEED:
     case SECTION_INIT_ACCELERATION:
     case SECTION_FIELD_SPEED:
     case SECTION_FIELD_ACCELERATION:
-    case SECTION_ATTRACTOR:
     case SECTION_AGING_MOMENTS:
     default:
       printf("Unhandled section state change %d.\n",i);
@@ -320,20 +631,9 @@ void awsSink::SectionListSelectionChanged(void *sk, iAwsSource *source)
 ////
 
 // Registration
-void awsSink::RegisterGraphicSelection(void *sk, iAwsSource *source)
-{
-  asink->GraphicSelectionData.iawscomponent_GraphicSelection=source->GetComponent();
-}
-
-void awsSink::RegisterGraphicFilter(void *sk, iAwsSource *source)
-{
-	asink->GraphicSelectionData.iawscomponent_GraphicFilter = source->GetComponent();
-}
-
-void awsSink::RegisterGraphicFileList(void *sk, iAwsSource *source)
-{
-	asink->GraphicSelectionData.iawscomponent_GraphicFileList = source->GetComponent();
-}
+IMPLEMENT_REGISTER_FUNCTION(RegisterGraphicSelection,GraphicSelectionData.iawscomponent_GraphicSelection)
+IMPLEMENT_REGISTER_FUNCTION(RegisterGraphicFilter,GraphicSelectionData.iawscomponent_GraphicFilter)
+IMPLEMENT_REGISTER_FUNCTION(RegisterGraphicFileList,GraphicSelectionData.iawscomponent_GraphicFileList)
 
 
 
@@ -540,290 +840,81 @@ void awsSink::FillGraphicFileList()
 ////
 
 // Registration
-void awsSink::RegisterEmitterState(void *sk, iAwsSource *source)
-{
-  asink->EmitterStateData.iawscomponent_EmitterState=source->GetComponent();
-}
-void awsSink::RegisterParticleCount(void *sk, iAwsSource *source)
-{
-  asink->EmitterStateData.iawscomponent_ParticleCount=source->GetComponent();
-}
-void awsSink::RegisterParticleMaxAge(void *sk, iAwsSource *source)
-{
-  asink->EmitterStateData.iawscomponent_ParticleMaxAge=source->GetComponent();
-}
-void awsSink::RegisterLighting(void *sk, iAwsSource *source)
-{
-  asink->EmitterStateData.iawscomponent_Lighting=source->GetComponent();
-}
-void awsSink::RegisterAlphaBlend(void *sk, iAwsSource *source)
-{
-  asink->EmitterStateData.iawscomponent_AlphaBlend=source->GetComponent();
-}
-void awsSink::RegisterRectParticlesRadio(void *sk, iAwsSource *source)
-{
-  asink->EmitterStateData.iawscomponent_RectParticlesRadio=source->GetComponent();
-}
-void awsSink::RegisterRegParticlesRadio(void *sk, iAwsSource *source)
-{
-  asink->EmitterStateData.iawscomponent_RegParticlesRadio=source->GetComponent();
-}
-void awsSink::RegisterRectParticlesWidth(void *sk, iAwsSource *source)
-{
-  asink->EmitterStateData.iawscomponent_RectParticlesWidth=source->GetComponent();
-}
-void awsSink::RegisterRectParticlesHeight(void *sk, iAwsSource *source)
-{
-  asink->EmitterStateData.iawscomponent_RectParticlesHeight=source->GetComponent();
-}
-void awsSink::RegisterRegParticlesNumber(void *sk, iAwsSource *source)
-{
-  asink->EmitterStateData.iawscomponent_RegParticlesNumber=source->GetComponent();
-}
-void awsSink::RegisterRegParticlesRadius(void *sk, iAwsSource *source)
-{
-  asink->EmitterStateData.iawscomponent_RegParticlesRadius=source->GetComponent();
-}
-void awsSink::RegisterUseBoundingBox(void *sk, iAwsSource *source)
-{
-  asink->EmitterStateData.iawscomponent_UseBoundingBox=source->GetComponent();
-}
-void awsSink::RegisterBBoxMinX(void *sk, iAwsSource *source)
-{
-  asink->EmitterStateData.iawscomponent_BBoxMinX=source->GetComponent();
-}
-void awsSink::RegisterBBoxMinY(void *sk, iAwsSource *source)
-{
-  asink->EmitterStateData.iawscomponent_BBoxMinY=source->GetComponent();
-}
-void awsSink::RegisterBBoxMinZ(void *sk, iAwsSource *source)
-{
-  asink->EmitterStateData.iawscomponent_BBoxMinZ=source->GetComponent();
-}
-void awsSink::RegisterBBoxMaxX(void *sk, iAwsSource *source)
-{
-  asink->EmitterStateData.iawscomponent_BBoxMaxX=source->GetComponent();
-}
-void awsSink::RegisterBBoxMaxY(void *sk, iAwsSource *source)
-{
-  asink->EmitterStateData.iawscomponent_BBoxMaxY=source->GetComponent();
-}
-void awsSink::RegisterBBoxMaxZ(void *sk, iAwsSource *source)
-{
-  asink->EmitterStateData.iawscomponent_BBoxMaxZ=source->GetComponent();
-}
+IMPLEMENT_REGISTER_FUNCTION(RegisterEmitterState,EmitterStateData.iawscomponent_EmitterState)
+IMPLEMENT_REGISTER_FUNCTION(RegisterParticleCount,EmitterStateData.iawscomponent_ParticleCount)
+IMPLEMENT_REGISTER_FUNCTION(RegisterParticleMaxAge,EmitterStateData.iawscomponent_ParticleMaxAge)
+IMPLEMENT_REGISTER_FUNCTION(RegisterLighting,EmitterStateData.iawscomponent_Lighting)
+IMPLEMENT_REGISTER_FUNCTION(RegisterAlphaBlend,EmitterStateData.iawscomponent_AlphaBlend)
+IMPLEMENT_REGISTER_FUNCTION(RegisterRectParticlesRadio,EmitterStateData.iawscomponent_RectParticlesRadio)
+IMPLEMENT_REGISTER_FUNCTION(RegisterRegParticlesRadio,EmitterStateData.iawscomponent_RegParticlesRadio)
+IMPLEMENT_REGISTER_FUNCTION(RegisterRectParticlesWidth,EmitterStateData.iawscomponent_RectParticlesWidth)
+IMPLEMENT_REGISTER_FUNCTION(RegisterRectParticlesHeight,EmitterStateData.iawscomponent_RectParticlesHeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterRegParticlesNumber,EmitterStateData.iawscomponent_RegParticlesNumber)
+IMPLEMENT_REGISTER_FUNCTION(RegisterRegParticlesRadius,EmitterStateData.iawscomponent_RegParticlesRadius)
+IMPLEMENT_REGISTER_FUNCTION(RegisterUseBoundingBox,EmitterStateData.iawscomponent_UseBoundingBox)
+IMPLEMENT_REGISTER_FUNCTION(RegisterBBoxMinX,EmitterStateData.iawscomponent_BBoxMinX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterBBoxMinY,EmitterStateData.iawscomponent_BBoxMinY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterBBoxMinZ,EmitterStateData.iawscomponent_BBoxMinZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterBBoxMaxX,EmitterStateData.iawscomponent_BBoxMaxX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterBBoxMaxY,EmitterStateData.iawscomponent_BBoxMaxY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterBBoxMaxZ,EmitterStateData.iawscomponent_BBoxMaxZ)
 
-void awsSink::AwsSetParticleCount(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->EmitterStateData.iawscomponent_ParticleCount->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->EmitterStateData.state.particle_count=strtol(textvalue->GetData(),NULL,10);
-    asink->EmitterStateData.settings_changed=true;
-  }
-  else
-    asink->UpdateEmitterStateDisplay();
 
-}
 
-void awsSink::AwsSetParticleMaxAge(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->EmitterStateData.iawscomponent_ParticleMaxAge->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->EmitterStateData.state.particle_max_age=strtol(textvalue->GetData(),NULL,10);
-    asink->EmitterStateData.settings_changed=true;
-  }
-  else
-    asink->UpdateEmitterStateDisplay();
-}
 
-void awsSink::AwsSetLighting(void *sk, iAwsSource *source)
-{
-  bool *p_bvalue;
-  if (asink->EmitterStateData.iawscomponent_Lighting->GetProperty("State",(void **)&p_bvalue))
-  {
-    if (*p_bvalue)
-      asink->EmitterStateData.state.lighting=true;
-    else
-      asink->EmitterStateData.state.lighting=false;
-    asink->EmitterStateData.settings_changed=true;
-  }
-  else
-    asink->UpdateEmitterStateDisplay();
-}
+IMPLEMENT_COMPONENT_TEXTBOX_TO_INT(AwsSetParticleCount,
+								   EmitterStateData.state.particle_count,EmitterStateData.settings_changed,
+								   UpdateEmitterStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_INT(AwsSetParticleMaxAge,
+								   EmitterStateData.state.particle_max_age,EmitterStateData.settings_changed,
+								   UpdateEmitterStateDisplay)
+IMPLEMENT_COMPONENT_CHECKBOX_TO_BOOL(AwsSetLighting,
+									 EmitterStateData.state.lighting,EmitterStateData.settings_changed,
+									 UpdateEmitterStateDisplay)
+IMPLEMENT_COMPONENT_CHECKBOX_TO_BOOL(AwsSetAlphaBlend,
+									 EmitterStateData.state.alpha_blend,EmitterStateData.settings_changed,
+									 UpdateEmitterStateDisplay)
+// Although this is a radio button, it only has 2 options, so we can treat it like a checkbox
+IMPLEMENT_COMPONENT_CHECKBOX_TO_BOOL(AwsSetParticleType,
+									 EmitterStateData.state.rectangular_particles,
+									 EmitterStateData.settings_changed,
+									 UpdateEmitterStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetRectangularWidth,
+									 EmitterStateData.state.rect_w,EmitterStateData.settings_changed,
+									 UpdateEmitterStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetRectangularHeight,
+									 EmitterStateData.state.rect_h,EmitterStateData.settings_changed,
+									 UpdateEmitterStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetRegularNumber,
+									 EmitterStateData.state.reg_number,EmitterStateData.settings_changed,
+									 UpdateEmitterStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetRegularRadius,
+									 EmitterStateData.state.reg_radius,EmitterStateData.settings_changed,
+									 UpdateEmitterStateDisplay)
+IMPLEMENT_COMPONENT_CHECKBOX_TO_BOOL(AwsSetUseBoundingBox,
+									 EmitterStateData.state.using_bounding_box,EmitterStateData.settings_changed,
+									 UpdateEmitterStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetBBoxMinX,
+									 EmitterStateData.state.bbox_minx,EmitterStateData.settings_changed,
+									 UpdateEmitterStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetBBoxMinY,
+									 EmitterStateData.state.bbox_miny,EmitterStateData.settings_changed,
+									 UpdateEmitterStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetBBoxMinZ,
+									 EmitterStateData.state.bbox_minz,EmitterStateData.settings_changed,
+									 UpdateEmitterStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetBBoxMaxX,
+									 EmitterStateData.state.bbox_maxx,EmitterStateData.settings_changed,
+									 UpdateEmitterStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetBBoxMaxY,
+									 EmitterStateData.state.bbox_maxy,EmitterStateData.settings_changed,
+									 UpdateEmitterStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetBBoxMaxZ,
+									 EmitterStateData.state.bbox_maxz,EmitterStateData.settings_changed,
+									 UpdateEmitterStateDisplay)
 
-void awsSink::AwsSetAlphaBlend(void *sk, iAwsSource *source)
-{
-  bool *p_bvalue;
-  if (asink->EmitterStateData.iawscomponent_AlphaBlend->GetProperty("State",(void **)&p_bvalue))
-  {
-    if (*p_bvalue)
-      asink->EmitterStateData.state.alpha_blend=true;
-    else
-      asink->EmitterStateData.state.alpha_blend=false;
-    asink->EmitterStateData.settings_changed=true;
-  }
-  else
-    asink->UpdateEmitterStateDisplay();
-}
 
-void awsSink::AwsSetParticleType(void *sk, iAwsSource *source)
-{
-  bool *p_bvalue;
-  if (asink->EmitterStateData.iawscomponent_RectParticlesRadio->GetProperty("State",(void **)&p_bvalue))
-  {
-    if (*p_bvalue)
-      asink->EmitterStateData.state.rectangular_particles=true;
-    else
-      asink->EmitterStateData.state.rectangular_particles=false;
-    asink->EmitterStateData.settings_changed=true;
-  }
-  else
-    asink->UpdateEmitterStateDisplay();
-}
 
-void awsSink::AwsSetRectangularWidth(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->EmitterStateData.iawscomponent_RectParticlesWidth->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->EmitterStateData.state.rect_w=atof(textvalue->GetData());
-    asink->EmitterStateData.settings_changed=true;
-  }
-  else
-    asink->UpdateEmitterStateDisplay();
-}
-
-void awsSink::AwsSetRectangularHeight(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->EmitterStateData.iawscomponent_RectParticlesHeight->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->EmitterStateData.state.rect_h=atof(textvalue->GetData());
-    asink->EmitterStateData.settings_changed=true;
-  }
-  else
-    asink->UpdateEmitterStateDisplay();
-}
-
-void awsSink::AwsSetRegularNumber(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->EmitterStateData.iawscomponent_RegParticlesNumber->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->EmitterStateData.state.reg_number=strtol(textvalue->GetData(),NULL,10);
-    asink->EmitterStateData.settings_changed=true;
-  }
-  else
-    asink->UpdateEmitterStateDisplay();
-
-}
-
-void awsSink::AwsSetRegularRadius(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->EmitterStateData.iawscomponent_RegParticlesRadius->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->EmitterStateData.state.reg_radius=atof(textvalue->GetData());
-    asink->EmitterStateData.settings_changed=true;
-  }
-  else
-    asink->UpdateEmitterStateDisplay();
-
-}
-
-void awsSink::AwsSetUseBoundingBox(void *sk, iAwsSource *source)
-{
-  bool *p_bvalue;
-  if (asink->EmitterStateData.iawscomponent_UseBoundingBox->GetProperty("State",(void **)&p_bvalue))
-  {
-    if (*p_bvalue)
-      asink->EmitterStateData.state.using_bounding_box=true;
-    else
-      asink->EmitterStateData.state.using_bounding_box=false;
-    asink->EmitterStateData.settings_changed=true;
-  }
-  else
-    asink->UpdateEmitterStateDisplay();
-}
-
-void awsSink::AwsSetBBoxMinX(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->EmitterStateData.iawscomponent_BBoxMinX->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->EmitterStateData.state.bbox_minx=atof(textvalue->GetData());
-    asink->EmitterStateData.settings_changed=true;
-  }
-  else
-    asink->UpdateEmitterStateDisplay();
-
-}
-
-void awsSink::AwsSetBBoxMinY(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->EmitterStateData.iawscomponent_BBoxMinY->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->EmitterStateData.state.bbox_miny=atof(textvalue->GetData());
-    asink->EmitterStateData.settings_changed=true;
-  }
-  else
-    asink->UpdateEmitterStateDisplay();
-}
-
-void awsSink::AwsSetBBoxMinZ(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->EmitterStateData.iawscomponent_BBoxMinZ->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->EmitterStateData.state.bbox_minz=atof(textvalue->GetData());
-    asink->EmitterStateData.settings_changed=true;
-  }
-  else
-    asink->UpdateEmitterStateDisplay();
-
-}
-
-void awsSink::AwsSetBBoxMaxX(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->EmitterStateData.iawscomponent_BBoxMaxX->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->EmitterStateData.state.bbox_maxx=atof(textvalue->GetData());
-    asink->EmitterStateData.settings_changed=true;
-  }
-  else
-    asink->UpdateEmitterStateDisplay();
-
-}
-
-void awsSink::AwsSetBBoxMaxY(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->EmitterStateData.iawscomponent_BBoxMaxY->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->EmitterStateData.state.bbox_maxy=atof(textvalue->GetData());
-    asink->EmitterStateData.settings_changed=true;
-  }
-  else
-    asink->UpdateEmitterStateDisplay();
-
-}
-
-void awsSink::AwsSetBBoxMaxZ(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->EmitterStateData.iawscomponent_BBoxMaxZ->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->EmitterStateData.state.bbox_maxz=atof(textvalue->GetData());
-    asink->EmitterStateData.settings_changed=true;
-  }
-  else
-    asink->UpdateEmitterStateDisplay();
-
-}
 
 
 
@@ -851,103 +942,31 @@ void awsSink::SetEmitterState(EmitterState *source)
 }
 
 
+
+
+
 void awsSink::UpdateEmitterStateDisplay()
 {
   bool bvalue;
   csRef<iString> value;
-  value=new scfString();
-  value->Format("%d",EmitterStateData.state.particle_count);
-  EmitterStateData.iawscomponent_ParticleCount->SetProperty("Text",value);
 
-  value=new scfString();
-  value->Format("%d",EmitterStateData.state.particle_max_age);
-  EmitterStateData.iawscomponent_ParticleMaxAge->SetProperty("Text",value);
-
-  if (EmitterStateData.state.lighting)
-  {
-    bvalue=true;
-    EmitterStateData.iawscomponent_Lighting->SetProperty("State",&bvalue);
-  }
-  else
-  {
-    bvalue=false;
-    EmitterStateData.iawscomponent_Lighting->SetProperty("State",&bvalue);
-  }
-  if (EmitterStateData.state.alpha_blend)
-  {
-    bvalue=true;
-    EmitterStateData.iawscomponent_AlphaBlend->SetProperty("State",&bvalue);
-  }
-  else
-  {
-    bvalue=false;
-    EmitterStateData.iawscomponent_AlphaBlend->SetProperty("State",&bvalue);
-  }
-  if (EmitterStateData.state.rectangular_particles)
-  {
-    bvalue=true;
-    EmitterStateData.iawscomponent_RectParticlesRadio->SetProperty("State",&bvalue);
-    bvalue=false;
-    EmitterStateData.iawscomponent_RegParticlesRadio->SetProperty("State",&bvalue);
-  }
-  else
-  {
-    bvalue=true;
-    EmitterStateData.iawscomponent_RegParticlesRadio->SetProperty("State",&bvalue);
-    bvalue=false;
-    EmitterStateData.iawscomponent_RectParticlesRadio->SetProperty("State",&bvalue);
-  }
-  if (EmitterStateData.state.using_bounding_box)
-  {
-    bvalue=true;
-    EmitterStateData.iawscomponent_UseBoundingBox->SetProperty("State",&bvalue);
-  }
-  else
-  {
-    bvalue=false;
-    EmitterStateData.iawscomponent_UseBoundingBox->SetProperty("State",&bvalue);
-  }
-
-  value=new scfString();
-  value->Format("%f",EmitterStateData.state.rect_w);
-  EmitterStateData.iawscomponent_RectParticlesWidth->SetProperty("Text",value);
-
-  value=new scfString();
-  value->Format("%f",EmitterStateData.state.rect_h);
-  EmitterStateData.iawscomponent_RectParticlesHeight->SetProperty("Text",value);
-
-  value=new scfString();
-  value->Format("%d",EmitterStateData.state.reg_number);
-  EmitterStateData.iawscomponent_RegParticlesNumber->SetProperty("Text",value);
-
-  value=new scfString();
-  value->Format("%f",EmitterStateData.state.reg_radius);
-  EmitterStateData.iawscomponent_RegParticlesRadius->SetProperty("Text",value);
-
-  value=new scfString();
-  value->Format("%f",EmitterStateData.state.bbox_minx);
-  EmitterStateData.iawscomponent_BBoxMinX->SetProperty("Text",value);
-
-  value=new scfString();
-  value->Format("%f",EmitterStateData.state.bbox_miny);
-  EmitterStateData.iawscomponent_BBoxMinY->SetProperty("Text",value);
-
-  value=new scfString();
-  value->Format("%f",EmitterStateData.state.bbox_minz);
-  EmitterStateData.iawscomponent_BBoxMinZ->SetProperty("Text",value);
-
-  value=new scfString();
-  value->Format("%f",EmitterStateData.state.bbox_maxx);
-  EmitterStateData.iawscomponent_BBoxMaxX->SetProperty("Text",value);
-
-  value=new scfString();
-  value->Format("%f",EmitterStateData.state.bbox_maxy);
-  EmitterStateData.iawscomponent_BBoxMaxY->SetProperty("Text",value);
-
-  value=new scfString();
-  value->Format("%f",EmitterStateData.state.bbox_maxz);
-  EmitterStateData.iawscomponent_BBoxMaxZ->SetProperty("Text",value);
-
+  SET_TEXTBOX_INT(EmitterStateData.iawscomponent_ParticleCount,EmitterStateData.state.particle_count);
+  SET_TEXTBOX_INT(EmitterStateData.iawscomponent_ParticleMaxAge,EmitterStateData.state.particle_max_age);
+  SET_CHECKBOX_BOOL(EmitterStateData.iawscomponent_Lighting,EmitterStateData.state.lighting);
+  SET_CHECKBOX_BOOL(EmitterStateData.iawscomponent_AlphaBlend,EmitterStateData.state.alpha_blend);
+  SET_CHECKBOX_BOOL(EmitterStateData.iawscomponent_RectParticlesRadio,EmitterStateData.state.rectangular_particles);
+  SET_CHECKBOX_BOOL(EmitterStateData.iawscomponent_RegParticlesRadio,!EmitterStateData.state.rectangular_particles);
+  SET_CHECKBOX_BOOL(EmitterStateData.iawscomponent_UseBoundingBox,EmitterStateData.state.using_bounding_box);
+  SET_TEXTBOX_FLOAT(EmitterStateData.iawscomponent_RectParticlesWidth,EmitterStateData.state.rect_w);
+  SET_TEXTBOX_FLOAT(EmitterStateData.iawscomponent_RectParticlesHeight,EmitterStateData.state.rect_h);
+  SET_TEXTBOX_INT(EmitterStateData.iawscomponent_RegParticlesNumber,EmitterStateData.state.reg_number);
+  SET_TEXTBOX_FLOAT(EmitterStateData.iawscomponent_RegParticlesRadius,EmitterStateData.state.reg_radius);
+  SET_TEXTBOX_FLOAT(EmitterStateData.iawscomponent_BBoxMinX,EmitterStateData.state.bbox_minx);
+  SET_TEXTBOX_FLOAT(EmitterStateData.iawscomponent_BBoxMinY,EmitterStateData.state.bbox_miny);
+  SET_TEXTBOX_FLOAT(EmitterStateData.iawscomponent_BBoxMinZ,EmitterStateData.state.bbox_minz);
+  SET_TEXTBOX_FLOAT(EmitterStateData.iawscomponent_BBoxMaxX,EmitterStateData.state.bbox_maxx);
+  SET_TEXTBOX_FLOAT(EmitterStateData.iawscomponent_BBoxMaxY,EmitterStateData.state.bbox_maxy);
+  SET_TEXTBOX_FLOAT(EmitterStateData.iawscomponent_BBoxMaxZ,EmitterStateData.state.bbox_maxz);
 }
 
 
@@ -956,388 +975,252 @@ void awsSink::UpdateEmitterStateDisplay()
 ////
 //  Initial Position Display
 ////
-void awsSink::RegisterInitialPosition(void *sk, iAwsSource *source)
-{
-  asink->InitialPositionData.iawscomponent_InitialPosition = source->GetComponent();
-}
-void awsSink::RegisterIPFPX(void *sk, iAwsSource *source)
-{
-  asink->InitialPositionData.iawscomponent_IPFPX = source->GetComponent();
-}
-void awsSink::RegisterIPFPY(void *sk, iAwsSource *source)
-{
-  asink->InitialPositionData.iawscomponent_IPFPY = source->GetComponent();
-}
-void awsSink::RegisterIPFPZ(void *sk, iAwsSource *source)
-{
-  asink->InitialPositionData.iawscomponent_IPFPZ = source->GetComponent();
-}
-void awsSink::RegisterIPFWeight(void *sk, iAwsSource *source)
-{
-  asink->InitialPositionData.iawscomponent_IPFWeight = source->GetComponent();
-}
-void awsSink::RegisterIPLSX(void *sk, iAwsSource *source)
-{
-  asink->InitialPositionData.iawscomponent_IPLSX = source->GetComponent();
-}
-void awsSink::RegisterIPLSY(void *sk, iAwsSource *source)
-{
-  asink->InitialPositionData.iawscomponent_IPLSY = source->GetComponent();
-}
-void awsSink::RegisterIPLSZ(void *sk, iAwsSource *source)
-{
-  asink->InitialPositionData.iawscomponent_IPLSZ = source->GetComponent();
-}
-void awsSink::RegisterIPLEX(void *sk, iAwsSource *source)
-{
-  asink->InitialPositionData.iawscomponent_IPLEX = source->GetComponent();
-}
-void awsSink::RegisterIPLEY(void *sk, iAwsSource *source)
-{
-  asink->InitialPositionData.iawscomponent_IPLEY = source->GetComponent();
-}
-void awsSink::RegisterIPLEZ(void *sk, iAwsSource *source)
-{
-  asink->InitialPositionData.iawscomponent_IPLEZ = source->GetComponent();
-}
-void awsSink::RegisterIPLWeight(void *sk, iAwsSource *source)
-{
-  asink->InitialPositionData.iawscomponent_IPLWeight = source->GetComponent();
-}
-void awsSink::RegisterIPBMX(void *sk, iAwsSource *source)
-{
-  asink->InitialPositionData.iawscomponent_IPBMX = source->GetComponent();
-}
-void awsSink::RegisterIPBMY(void *sk, iAwsSource *source)
-{
-  asink->InitialPositionData.iawscomponent_IPBMY = source->GetComponent();
-}
-void awsSink::RegisterIPBMZ(void *sk, iAwsSource *source)
-{
-  asink->InitialPositionData.iawscomponent_IPBMZ = source->GetComponent();
-}
-void awsSink::RegisterIPBXX(void *sk, iAwsSource *source)
-{
-  asink->InitialPositionData.iawscomponent_IPBXX = source->GetComponent();
-}
-void awsSink::RegisterIPBXY(void *sk, iAwsSource *source)
-{
-  asink->InitialPositionData.iawscomponent_IPBXY = source->GetComponent();
-}
-void awsSink::RegisterIPBXZ(void *sk, iAwsSource *source)
-{
-  asink->InitialPositionData.iawscomponent_IPBXZ = source->GetComponent();
-}
-void awsSink::RegisterIPBWeight(void *sk, iAwsSource *source)
-{
-  asink->InitialPositionData.iawscomponent_IPBWeight = source->GetComponent();
-}
-void awsSink::RegisterIPSCX(void *sk, iAwsSource *source)
-{
-  asink->InitialPositionData.iawscomponent_IPSCX = source->GetComponent();
-}
-void awsSink::RegisterIPSCY(void *sk, iAwsSource *source)
-{
-  asink->InitialPositionData.iawscomponent_IPSCY = source->GetComponent();
-}
-void awsSink::RegisterIPSCZ(void *sk, iAwsSource *source)
-{
-  asink->InitialPositionData.iawscomponent_IPSCZ = source->GetComponent();
-}
-void awsSink::RegisterIPSMin(void *sk, iAwsSource *source)
-{
-  asink->InitialPositionData.iawscomponent_IPSMin = source->GetComponent();
-}
-void awsSink::RegisterIPSMax(void *sk, iAwsSource *source)
-{
-  asink->InitialPositionData.iawscomponent_IPSMax = source->GetComponent();
-}
-void awsSink::RegisterIPSWeight(void *sk, iAwsSource *source)
-{
-  asink->InitialPositionData.iawscomponent_IPSWeight = source->GetComponent();
-}
+IMPLEMENT_REGISTER_FUNCTION(RegisterInitialPosition,InitialPositionData.iawscomponent_InitialPosition)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPFPX,InitialPositionData.iawscomponent_IPFPX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPFPY,InitialPositionData.iawscomponent_IPFPY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPFPZ,InitialPositionData.iawscomponent_IPFPZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPFWeight,InitialPositionData.iawscomponent_IPFWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPLSX,InitialPositionData.iawscomponent_IPLSX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPLSY,InitialPositionData.iawscomponent_IPLSY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPLSZ,InitialPositionData.iawscomponent_IPLSZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPLEX,InitialPositionData.iawscomponent_IPLEX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPLEY,InitialPositionData.iawscomponent_IPLEY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPLEZ,InitialPositionData.iawscomponent_IPLEZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPLWeight,InitialPositionData.iawscomponent_IPLWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPBMX,InitialPositionData.iawscomponent_IPBMX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPBMY,InitialPositionData.iawscomponent_IPBMY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPBMZ,InitialPositionData.iawscomponent_IPBMZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPBXX,InitialPositionData.iawscomponent_IPBXX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPBXY,InitialPositionData.iawscomponent_IPBXY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPBXZ,InitialPositionData.iawscomponent_IPBXZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPBWeight,InitialPositionData.iawscomponent_IPBWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPSCX,InitialPositionData.iawscomponent_IPSCX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPSCY,InitialPositionData.iawscomponent_IPSCY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPSCZ,InitialPositionData.iawscomponent_IPSCZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPSMin,InitialPositionData.iawscomponent_IPSMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPSMax,InitialPositionData.iawscomponent_IPSMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPSWeight,InitialPositionData.iawscomponent_IPSWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPCNOX,InitialPositionData.iawscomponent_IPCNOX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPCNOY,InitialPositionData.iawscomponent_IPCNOY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPCNOZ,InitialPositionData.iawscomponent_IPCNOZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPCNElev,InitialPositionData.iawscomponent_IPCNElevation)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPCNAzim,InitialPositionData.iawscomponent_IPCNAzimuth)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPCNAper,InitialPositionData.iawscomponent_IPCNAperture)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPCNMin,InitialPositionData.iawscomponent_IPCNMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPCNMax,InitialPositionData.iawscomponent_IPCNMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPCNWeight,InitialPositionData.iawscomponent_IPCNWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPCYSX,InitialPositionData.iawscomponent_IPCYSX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPCYSY,InitialPositionData.iawscomponent_IPCYSY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPCYSZ,InitialPositionData.iawscomponent_IPCYSZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPCYEX,InitialPositionData.iawscomponent_IPCYEX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPCYEY,InitialPositionData.iawscomponent_IPCYEY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPCYEZ,InitialPositionData.iawscomponent_IPCYEZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPCYMin,InitialPositionData.iawscomponent_IPCYMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPCYMax,InitialPositionData.iawscomponent_IPCYMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPCYWeight,InitialPositionData.iawscomponent_IPCYWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPSTCX,InitialPositionData.iawscomponent_IPSTCX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPSTCY,InitialPositionData.iawscomponent_IPSTCY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPSTCZ,InitialPositionData.iawscomponent_IPSTCZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPSTMin,InitialPositionData.iawscomponent_IPSTMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPSTMax,InitialPositionData.iawscomponent_IPSTMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPSTWeight,InitialPositionData.iawscomponent_IPSTWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPCYTSX,InitialPositionData.iawscomponent_IPCYTSX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPCYTSY,InitialPositionData.iawscomponent_IPCYTSY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPCYTSZ,InitialPositionData.iawscomponent_IPCYTSZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPCYTEX,InitialPositionData.iawscomponent_IPCYTEX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPCYTEY,InitialPositionData.iawscomponent_IPCYTEY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPCYTEZ,InitialPositionData.iawscomponent_IPCYTEZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPCYTMin,InitialPositionData.iawscomponent_IPCYTMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPCYTMax,InitialPositionData.iawscomponent_IPCYTMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIPCYTWeight,InitialPositionData.iawscomponent_IPCYTWeight)
 
 
 
+// Fixed Position
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPFPositionX,
+									 InitialPositionData.state.fixed_position.x,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPFPositionY,
+									 InitialPositionData.state.fixed_position.y,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPFPositionZ,
+									 InitialPositionData.state.fixed_position.z,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPFWeight,
+									 InitialPositionData.state.fixed_weight,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+// Line
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPLStartX,
+									 InitialPositionData.state.line_start.x,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPLStartY,
+									 InitialPositionData.state.line_start.y,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPLStartZ,
+									 InitialPositionData.state.line_start.z,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPLEndX,
+									 InitialPositionData.state.line_end.x,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPLEndY,
+									 InitialPositionData.state.line_end.y,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPLEndZ,
+									 InitialPositionData.state.line_end.z,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPLWeight,
+									 InitialPositionData.state.line_weight,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
 
+// Box
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPBMinX,
+									 InitialPositionData.state.box_min.x,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPBMinY,
+									 InitialPositionData.state.box_min.y,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPBMinZ,
+									 InitialPositionData.state.box_min.z,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPBMaxX,
+									 InitialPositionData.state.box_max.x,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPBMaxY,
+									 InitialPositionData.state.box_max.y,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPBMaxZ,
+									 InitialPositionData.state.box_max.z,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPBWeight,
+									 InitialPositionData.state.box_weight,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
 
-void awsSink::AwsSetIPFPositionX(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->InitialPositionData.iawscomponent_IPFPX->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->InitialPositionData.state.fixed_position.x=atof(textvalue->GetData());
-    asink->InitialPositionData.settings_changed=true;
-  }
-  else
-    asink->UpdateInitialPositionStateDisplay();
-}
-void awsSink::AwsSetIPFPositionY(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->InitialPositionData.iawscomponent_IPFPY->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->InitialPositionData.state.fixed_position.y=atof(textvalue->GetData());
-    asink->InitialPositionData.settings_changed=true;
-  }
-  else
-    asink->UpdateInitialPositionStateDisplay();
-}
-void awsSink::AwsSetIPFPositionZ(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->InitialPositionData.iawscomponent_IPFPZ->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->InitialPositionData.state.fixed_position.z=atof(textvalue->GetData());
-    asink->InitialPositionData.settings_changed=true;
-  }
-  else
-    asink->UpdateInitialPositionStateDisplay();
-}
-void awsSink::AwsSetIPFWeight(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->InitialPositionData.iawscomponent_IPFWeight->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->InitialPositionData.state.fixed_weight=atof(textvalue->GetData());
-    asink->InitialPositionData.settings_changed=true;
-  }
-  else
-    asink->UpdateInitialPositionStateDisplay();
-}
-void awsSink::AwsSetIPLStartX(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->InitialPositionData.iawscomponent_IPLSX->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->InitialPositionData.state.line_start.x=atof(textvalue->GetData());
-    asink->InitialPositionData.settings_changed=true;
-  }
-  else
-    asink->UpdateInitialPositionStateDisplay();
+// Sphere
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPSCenterX,
+									 InitialPositionData.state.sphere_center.x,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPSCenterY,
+									 InitialPositionData.state.sphere_center.y,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPSCenterZ,
+									 InitialPositionData.state.sphere_center.z,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPSMin,
+									 InitialPositionData.state.sphere_min,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPSMax,
+									 InitialPositionData.state.sphere_max,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPSWeight,
+									 InitialPositionData.state.sphere_weight,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
 
-}
-void awsSink::AwsSetIPLStartY(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->InitialPositionData.iawscomponent_IPLSY->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->InitialPositionData.state.line_start.y=atof(textvalue->GetData());
-    asink->InitialPositionData.settings_changed=true;
-  }
-  else
-    asink->UpdateInitialPositionStateDisplay();
-}
-void awsSink::AwsSetIPLStartZ(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->InitialPositionData.iawscomponent_IPLSZ->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->InitialPositionData.state.line_start.z=atof(textvalue->GetData());
-    asink->InitialPositionData.settings_changed=true;
-  }
-  else
-    asink->UpdateInitialPositionStateDisplay();
-}
-void awsSink::AwsSetIPLEndX(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->InitialPositionData.iawscomponent_IPLEX->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->InitialPositionData.state.line_end.x=atof(textvalue->GetData());
-    asink->InitialPositionData.settings_changed=true;
-  }
-  else
-    asink->UpdateInitialPositionStateDisplay();
-}
-void awsSink::AwsSetIPLEndY(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->InitialPositionData.iawscomponent_IPLEY->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->InitialPositionData.state.line_end.y=atof(textvalue->GetData());
-    asink->InitialPositionData.settings_changed=true;
-  }
-  else
-    asink->UpdateInitialPositionStateDisplay();
-}
-void awsSink::AwsSetIPLEndZ(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->InitialPositionData.iawscomponent_IPLEZ->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->InitialPositionData.state.line_end.z=atof(textvalue->GetData());
-    asink->InitialPositionData.settings_changed=true;
-  }
-  else
-    asink->UpdateInitialPositionStateDisplay();
-}
-void awsSink::AwsSetIPLWeight(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->InitialPositionData.iawscomponent_IPLWeight->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->InitialPositionData.state.line_weight=atof(textvalue->GetData());
-    asink->InitialPositionData.settings_changed=true;
-  }
-  else
-    asink->UpdateInitialPositionStateDisplay();
-}
-void awsSink::AwsSetIPBMinX(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->InitialPositionData.iawscomponent_IPBMX->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->InitialPositionData.state.box_min.x=atof(textvalue->GetData());
-    asink->InitialPositionData.settings_changed=true;
-  }
-  else
-    asink->UpdateInitialPositionStateDisplay();
-}
-void awsSink::AwsSetIPBMinY(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->InitialPositionData.iawscomponent_IPBMY->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->InitialPositionData.state.box_min.y=atof(textvalue->GetData());
-    asink->InitialPositionData.settings_changed=true;
-  }
-  else
-    asink->UpdateInitialPositionStateDisplay();
-}
-void awsSink::AwsSetIPBMinZ(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->InitialPositionData.iawscomponent_IPBMZ->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->InitialPositionData.state.box_min.z=atof(textvalue->GetData());
-    asink->InitialPositionData.settings_changed=true;
-  }
-  else
-    asink->UpdateInitialPositionStateDisplay();
-}
-void awsSink::AwsSetIPBMaxX(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->InitialPositionData.iawscomponent_IPBXX->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->InitialPositionData.state.box_max.x=atof(textvalue->GetData());
-    asink->InitialPositionData.settings_changed=true;
-  }
-  else
-    asink->UpdateInitialPositionStateDisplay();
-}
-void awsSink::AwsSetIPBMaxY(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->InitialPositionData.iawscomponent_IPBXY->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->InitialPositionData.state.box_max.y=atof(textvalue->GetData());
-    asink->InitialPositionData.settings_changed=true;
-  }
-  else
-    asink->UpdateInitialPositionStateDisplay();
-}
-void awsSink::AwsSetIPBMaxZ(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->InitialPositionData.iawscomponent_IPBXZ->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->InitialPositionData.state.box_max.z=atof(textvalue->GetData());
-    asink->InitialPositionData.settings_changed=true;
-  }
-  else
-    asink->UpdateInitialPositionStateDisplay();
-}
-void awsSink::AwsSetIPBWeight(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->InitialPositionData.iawscomponent_IPBWeight->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->InitialPositionData.state.box_weight=atof(textvalue->GetData());
-    asink->InitialPositionData.settings_changed=true;
-  }
-  else
-    asink->UpdateInitialPositionStateDisplay();
-}
-void awsSink::AwsSetIPSCenterX(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->InitialPositionData.iawscomponent_IPSCX->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->InitialPositionData.state.sphere_center.x=atof(textvalue->GetData());
-    asink->InitialPositionData.settings_changed=true;
-  }
-  else
-    asink->UpdateInitialPositionStateDisplay();
-}
-void awsSink::AwsSetIPSCenterY(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->InitialPositionData.iawscomponent_IPSCY->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->InitialPositionData.state.sphere_center.y=atof(textvalue->GetData());
-    asink->InitialPositionData.settings_changed=true;
-  }
-  else
-    asink->UpdateInitialPositionStateDisplay();
-}
-void awsSink::AwsSetIPSCenterZ(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->InitialPositionData.iawscomponent_IPSCZ->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->InitialPositionData.state.sphere_center.z=atof(textvalue->GetData());
-    asink->InitialPositionData.settings_changed=true;
-  }
-  else
-    asink->UpdateInitialPositionStateDisplay();
-}
-void awsSink::AwsSetIPSMin(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->InitialPositionData.iawscomponent_IPSMin->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->InitialPositionData.state.sphere_min=atof(textvalue->GetData());
-    asink->InitialPositionData.settings_changed=true;
-  }
-  else
-    asink->UpdateInitialPositionStateDisplay();
-}
-void awsSink::AwsSetIPSMax(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->InitialPositionData.iawscomponent_IPSMax->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->InitialPositionData.state.sphere_max=atof(textvalue->GetData());
-    asink->InitialPositionData.settings_changed=true;
-  }
-  else
-    asink->UpdateInitialPositionStateDisplay();
-}
-void awsSink::AwsSetIPSWeight(void *sk, iAwsSource *source)
-{
-  iString *textvalue;
-  if (asink->InitialPositionData.iawscomponent_IPSWeight->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
-  {
-    asink->InitialPositionData.state.sphere_weight=atof(textvalue->GetData());
-    asink->InitialPositionData.settings_changed=true;
-  }
-  else
-    asink->UpdateInitialPositionStateDisplay();
-}
+// Cone
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCNOriginX,
+									 InitialPositionData.state.cone_origin.x,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCNOriginY,
+									 InitialPositionData.state.cone_origin.y,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCNOriginZ,
+									 InitialPositionData.state.cone_origin.z,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCNElev,
+									 InitialPositionData.state.cone_elevation,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCNAzim,
+									 InitialPositionData.state.cone_azimuth,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCNAper,
+									 InitialPositionData.state.cone_aperture,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCNMin,
+									 InitialPositionData.state.cone_min,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCNMax,
+									 InitialPositionData.state.cone_max,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCNWeight,
+									 InitialPositionData.state.cone_weight,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
 
+// Cylinder
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCYStartX,
+									 InitialPositionData.state.cylinder_start.x,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCYStartY,
+									 InitialPositionData.state.cylinder_start.y,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCYStartZ,
+									 InitialPositionData.state.cylinder_start.z,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCYEndX,
+									 InitialPositionData.state.cylinder_end.x,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCYEndY,
+									 InitialPositionData.state.cylinder_end.y,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCYEndZ,
+									 InitialPositionData.state.cylinder_end.z,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCYMin,
+									 InitialPositionData.state.cylinder_min,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCYMax,
+									 InitialPositionData.state.cylinder_max,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCYWeight,
+									 InitialPositionData.state.cylinder_weight,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
 
+// Sphere Tangent
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPSTCenterX,
+									 InitialPositionData.state.spheretangent_center.x,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPSTCenterY,
+									 InitialPositionData.state.spheretangent_center.y,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPSTCenterZ,
+									 InitialPositionData.state.spheretangent_center.z,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPSTMin,
+									 InitialPositionData.state.spheretangent_min,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPSTMax,
+									 InitialPositionData.state.spheretangent_max,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPSTWeight,
+									 InitialPositionData.state.spheretangent_weight,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
 
-
-
-
-
-
-
-
-
-
+// Cylinder Tangent
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCYTStartX,
+									 InitialPositionData.state.cylindertangent_start.x,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCYTStartY,
+									 InitialPositionData.state.cylindertangent_start.y,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCYTStartZ,
+									 InitialPositionData.state.cylindertangent_start.z,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCYTEndX,
+									 InitialPositionData.state.cylindertangent_end.x,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCYTEndY,
+									 InitialPositionData.state.cylindertangent_end.y,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCYTEndZ,
+									 InitialPositionData.state.cylindertangent_end.z,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCYTMin,
+									 InitialPositionData.state.cylindertangent_min,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCYTMax,
+									 InitialPositionData.state.cylindertangent_max,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCYTWeight,
+									 InitialPositionData.state.cylindertangent_weight,InitialPositionData.settings_changed,
+									 UpdateInitialPositionStateDisplay)
 
 
 
@@ -1370,101 +1253,70 @@ void awsSink::UpdateInitialPositionStateDisplay()
 {
   csRef<iString> value;
 
-  value=new scfString();
-  value->Format("%f",InitialPositionData.state.fixed_position.x);
-  InitialPositionData.iawscomponent_IPFPX->SetProperty("Text",value);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPFPX,InitialPositionData.state.fixed_position.x);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPFPY,InitialPositionData.state.fixed_position.y);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPFPZ,InitialPositionData.state.fixed_position.z);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPFWeight,InitialPositionData.state.fixed_weight);
 
-  value=new scfString();
-  value->Format("%f",InitialPositionData.state.fixed_position.y);
-  InitialPositionData.iawscomponent_IPFPY->SetProperty("Text",value);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPLSX,InitialPositionData.state.line_start.x);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPLSY,InitialPositionData.state.line_start.y);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPLSZ,InitialPositionData.state.line_start.z);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPLEX,InitialPositionData.state.line_end.x);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPLEY,InitialPositionData.state.line_end.y);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPLEZ,InitialPositionData.state.line_end.z);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPLWeight,InitialPositionData.state.line_weight);
 
-  value=new scfString();
-  value->Format("%f",InitialPositionData.state.fixed_position.z);
-  InitialPositionData.iawscomponent_IPFPZ->SetProperty("Text",value);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPBMX,InitialPositionData.state.box_min.x);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPBMY,InitialPositionData.state.box_min.y);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPBMZ,InitialPositionData.state.box_min.z);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPBXX,InitialPositionData.state.box_max.x);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPBXY,InitialPositionData.state.box_max.y);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPBXZ,InitialPositionData.state.box_max.z);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPBWeight,InitialPositionData.state.box_weight);
 
-  value=new scfString();
-  value->Format("%f",InitialPositionData.state.fixed_weight);
-  InitialPositionData.iawscomponent_IPFWeight->SetProperty("Text",value);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPSCX,InitialPositionData.state.sphere_center.x);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPSCY,InitialPositionData.state.sphere_center.y);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPSCZ,InitialPositionData.state.sphere_center.z);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPSMin,InitialPositionData.state.sphere_min);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPSMax,InitialPositionData.state.sphere_max);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPSWeight,InitialPositionData.state.sphere_weight);
 
-  value=new scfString();
-  value->Format("%f",InitialPositionData.state.line_start.x);
-  InitialPositionData.iawscomponent_IPLSX->SetProperty("Text",value);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCNOX,InitialPositionData.state.cone_origin.x);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCNOY,InitialPositionData.state.cone_origin.y);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCNOZ,InitialPositionData.state.cone_origin.z);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCNElevation,InitialPositionData.state.cone_elevation);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCNAzimuth,InitialPositionData.state.cone_azimuth);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCNAperture,InitialPositionData.state.cone_aperture);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCNMin,InitialPositionData.state.cone_min);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCNMax,InitialPositionData.state.cone_max);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCNWeight,InitialPositionData.state.cone_weight);
 
-  value=new scfString();
-  value->Format("%f",InitialPositionData.state.line_start.y);
-  InitialPositionData.iawscomponent_IPLSY->SetProperty("Text",value);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCYSX,InitialPositionData.state.cylinder_start.x);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCYSY,InitialPositionData.state.cylinder_start.y);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCYSZ,InitialPositionData.state.cylinder_start.z);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCYEX,InitialPositionData.state.cylinder_end.x);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCYEY,InitialPositionData.state.cylinder_end.y);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCYEZ,InitialPositionData.state.cylinder_end.z);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCYMin,InitialPositionData.state.cylinder_min);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCYMax,InitialPositionData.state.cylinder_max);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCYWeight,InitialPositionData.state.cylinder_weight);
 
-  value=new scfString();
-  value->Format("%f",InitialPositionData.state.line_start.z);
-  InitialPositionData.iawscomponent_IPLSZ->SetProperty("Text",value);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPSTCX,InitialPositionData.state.spheretangent_center.x);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPSTCY,InitialPositionData.state.spheretangent_center.y);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPSTCZ,InitialPositionData.state.spheretangent_center.z);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPSTMin,InitialPositionData.state.spheretangent_min);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPSTMax,InitialPositionData.state.spheretangent_max);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPSTWeight,InitialPositionData.state.spheretangent_weight);
 
-  value=new scfString();
-  value->Format("%f",InitialPositionData.state.line_end.x);
-  InitialPositionData.iawscomponent_IPLEX->SetProperty("Text",value);
-
-  value=new scfString();
-  value->Format("%f",InitialPositionData.state.line_end.y);
-  InitialPositionData.iawscomponent_IPLEY->SetProperty("Text",value);
-
-  value=new scfString();
-  value->Format("%f",InitialPositionData.state.line_end.z);
-  InitialPositionData.iawscomponent_IPLEZ->SetProperty("Text",value);
-
-  value=new scfString();
-  value->Format("%f",InitialPositionData.state.line_weight);
-  InitialPositionData.iawscomponent_IPLWeight->SetProperty("Text",value);
-
-  value=new scfString();
-  value->Format("%f",InitialPositionData.state.box_min.x);
-  InitialPositionData.iawscomponent_IPBMX->SetProperty("Text",value);
-
-  value=new scfString();
-  value->Format("%f",InitialPositionData.state.box_min.y);
-  InitialPositionData.iawscomponent_IPBMY->SetProperty("Text",value);
-
-  value=new scfString();
-  value->Format("%f",InitialPositionData.state.box_min.z);
-  InitialPositionData.iawscomponent_IPBMZ->SetProperty("Text",value);
-
-  value=new scfString();
-  value->Format("%f",InitialPositionData.state.box_max.x);
-  InitialPositionData.iawscomponent_IPBXX->SetProperty("Text",value);
-
-  value=new scfString();
-  value->Format("%f",InitialPositionData.state.box_max.y);
-  InitialPositionData.iawscomponent_IPBXY->SetProperty("Text",value);
-
-  value=new scfString();
-  value->Format("%f",InitialPositionData.state.box_max.z);
-  InitialPositionData.iawscomponent_IPBXZ->SetProperty("Text",value);
-
-  value=new scfString();
-  value->Format("%f",InitialPositionData.state.box_weight);
-  InitialPositionData.iawscomponent_IPBWeight->SetProperty("Text",value);
-
-  value=new scfString();
-  value->Format("%f",InitialPositionData.state.sphere_center.x);
-  InitialPositionData.iawscomponent_IPSCX->SetProperty("Text",value);
-
-  value=new scfString();
-  value->Format("%f",InitialPositionData.state.sphere_center.y);
-  InitialPositionData.iawscomponent_IPSCY->SetProperty("Text",value);
-
-  value=new scfString();
-  value->Format("%f",InitialPositionData.state.sphere_center.z);
-  InitialPositionData.iawscomponent_IPSCZ->SetProperty("Text",value);
-
-  value=new scfString();
-  value->Format("%f",InitialPositionData.state.sphere_min);
-  InitialPositionData.iawscomponent_IPSMin->SetProperty("Text",value);
-
-  value=new scfString();
-  value->Format("%f",InitialPositionData.state.sphere_max);
-  InitialPositionData.iawscomponent_IPSMax->SetProperty("Text",value);
-
-  value=new scfString();
-  value->Format("%f",InitialPositionData.state.sphere_weight);
-  InitialPositionData.iawscomponent_IPSWeight->SetProperty("Text",value);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCYTSX,InitialPositionData.state.cylindertangent_start.x);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCYTSY,InitialPositionData.state.cylindertangent_start.y);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCYTSZ,InitialPositionData.state.cylindertangent_start.z);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCYTEX,InitialPositionData.state.cylindertangent_end.x);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCYTEY,InitialPositionData.state.cylindertangent_end.y);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCYTEZ,InitialPositionData.state.cylindertangent_end.z);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCYTMin,InitialPositionData.state.cylindertangent_min);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCYTMax,InitialPositionData.state.cylindertangent_max);
+  SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCYTWeight,InitialPositionData.state.cylindertangent_weight);
 
 
 }
@@ -1474,12 +1326,362 @@ void awsSink::UpdateInitialPositionStateDisplay()
 
 
 
+////
+//  Attractor Display
+////
+IMPLEMENT_REGISTER_FUNCTION(RegisterAttractor,AttractorData.iawscomponent_Attractor)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATForce,AttractorData.iawscomponent_ATForce)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATFPX,AttractorData.iawscomponent_ATFPX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATFPY,AttractorData.iawscomponent_ATFPY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATFPZ,AttractorData.iawscomponent_ATFPZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATFWeight,AttractorData.iawscomponent_ATFWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATLSX,AttractorData.iawscomponent_ATLSX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATLSY,AttractorData.iawscomponent_ATLSY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATLSZ,AttractorData.iawscomponent_ATLSZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATLEX,AttractorData.iawscomponent_ATLEX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATLEY,AttractorData.iawscomponent_ATLEY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATLEZ,AttractorData.iawscomponent_ATLEZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATLWeight,AttractorData.iawscomponent_ATLWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATBMX,AttractorData.iawscomponent_ATBMX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATBMY,AttractorData.iawscomponent_ATBMY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATBMZ,AttractorData.iawscomponent_ATBMZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATBXX,AttractorData.iawscomponent_ATBXX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATBXY,AttractorData.iawscomponent_ATBXY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATBXZ,AttractorData.iawscomponent_ATBXZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATBWeight,AttractorData.iawscomponent_ATBWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATSCX,AttractorData.iawscomponent_ATSCX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATSCY,AttractorData.iawscomponent_ATSCY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATSCZ,AttractorData.iawscomponent_ATSCZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATSMin,AttractorData.iawscomponent_ATSMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATSMax,AttractorData.iawscomponent_ATSMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATSWeight,AttractorData.iawscomponent_ATSWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATCNOX,AttractorData.iawscomponent_ATCNOX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATCNOY,AttractorData.iawscomponent_ATCNOY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATCNOZ,AttractorData.iawscomponent_ATCNOZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATCNElev,AttractorData.iawscomponent_ATCNElevation)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATCNAzim,AttractorData.iawscomponent_ATCNAzimuth)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATCNAper,AttractorData.iawscomponent_ATCNAperture)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATCNMin,AttractorData.iawscomponent_ATCNMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATCNMax,AttractorData.iawscomponent_ATCNMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATCNWeight,AttractorData.iawscomponent_ATCNWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATCYSX,AttractorData.iawscomponent_ATCYSX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATCYSY,AttractorData.iawscomponent_ATCYSY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATCYSZ,AttractorData.iawscomponent_ATCYSZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATCYEX,AttractorData.iawscomponent_ATCYEX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATCYEY,AttractorData.iawscomponent_ATCYEY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATCYEZ,AttractorData.iawscomponent_ATCYEZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATCYMin,AttractorData.iawscomponent_ATCYMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATCYMax,AttractorData.iawscomponent_ATCYMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATCYWeight,AttractorData.iawscomponent_ATCYWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATSTCX,AttractorData.iawscomponent_ATSTCX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATSTCY,AttractorData.iawscomponent_ATSTCY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATSTCZ,AttractorData.iawscomponent_ATSTCZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATSTMin,AttractorData.iawscomponent_ATSTMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATSTMax,AttractorData.iawscomponent_ATSTMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATSTWeight,AttractorData.iawscomponent_ATSTWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATCYTSX,AttractorData.iawscomponent_ATCYTSX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATCYTSY,AttractorData.iawscomponent_ATCYTSY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATCYTSZ,AttractorData.iawscomponent_ATCYTSZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATCYTEX,AttractorData.iawscomponent_ATCYTEX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATCYTEY,AttractorData.iawscomponent_ATCYTEY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATCYTEZ,AttractorData.iawscomponent_ATCYTEZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATCYTMin,AttractorData.iawscomponent_ATCYTMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATCYTMax,AttractorData.iawscomponent_ATCYTMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterATCYTWeight,AttractorData.iawscomponent_ATCYTWeight)
+
+
+
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATForce,
+									 AttractorData.state.force,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+
+
+// Fixed Position
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATFPositionX,
+									 AttractorData.state.e3d_state.fixed_position.x,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATFPositionY,
+									 AttractorData.state.e3d_state.fixed_position.y,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATFPositionZ,
+									 AttractorData.state.e3d_state.fixed_position.z,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATFWeight,
+									 AttractorData.state.e3d_state.fixed_weight,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+// Line
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATLStartX,
+									 AttractorData.state.e3d_state.line_start.x,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATLStartY,
+									 AttractorData.state.e3d_state.line_start.y,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATLStartZ,
+									 AttractorData.state.e3d_state.line_start.z,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATLEndX,
+									 AttractorData.state.e3d_state.line_end.x,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATLEndY,
+									 AttractorData.state.e3d_state.line_end.y,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATLEndZ,
+									 AttractorData.state.e3d_state.line_end.z,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATLWeight,
+									 AttractorData.state.e3d_state.line_weight,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+
+// Box
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATBMinX,
+									 AttractorData.state.e3d_state.box_min.x,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATBMinY,
+									 AttractorData.state.e3d_state.box_min.y,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATBMinZ,
+									 AttractorData.state.e3d_state.box_min.z,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATBMaxX,
+									 AttractorData.state.e3d_state.box_max.x,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATBMaxY,
+									 AttractorData.state.e3d_state.box_max.y,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATBMaxZ,
+									 AttractorData.state.e3d_state.box_max.z,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATBWeight,
+									 AttractorData.state.e3d_state.box_weight,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+
+// Sphere
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATSCenterX,
+									 AttractorData.state.e3d_state.sphere_center.x,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATSCenterY,
+									 AttractorData.state.e3d_state.sphere_center.y,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATSCenterZ,
+									 AttractorData.state.e3d_state.sphere_center.z,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATSMin,
+									 AttractorData.state.e3d_state.sphere_min,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATSMax,
+									 AttractorData.state.e3d_state.sphere_max,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATSWeight,
+									 AttractorData.state.e3d_state.sphere_weight,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+
+// Cone
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCNOriginX,
+									 AttractorData.state.e3d_state.cone_origin.x,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCNOriginY,
+									 AttractorData.state.e3d_state.cone_origin.y,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCNOriginZ,
+									 AttractorData.state.e3d_state.cone_origin.z,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCNElev,
+									 AttractorData.state.e3d_state.cone_elevation,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCNAzim,
+									 AttractorData.state.e3d_state.cone_azimuth,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCNAper,
+									 AttractorData.state.e3d_state.cone_aperture,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCNMin,
+									 AttractorData.state.e3d_state.cone_min,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCNMax,
+									 AttractorData.state.e3d_state.cone_max,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCNWeight,
+									 AttractorData.state.e3d_state.cone_weight,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+
+// Cylinder
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCYStartX,
+									 AttractorData.state.e3d_state.cylinder_start.x,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCYStartY,
+									 AttractorData.state.e3d_state.cylinder_start.y,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCYStartZ,
+									 AttractorData.state.e3d_state.cylinder_start.z,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCYEndX,
+									 AttractorData.state.e3d_state.cylinder_end.x,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCYEndY,
+									 AttractorData.state.e3d_state.cylinder_end.y,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCYEndZ,
+									 AttractorData.state.e3d_state.cylinder_end.z,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCYMin,
+									 AttractorData.state.e3d_state.cylinder_min,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCYMax,
+									 AttractorData.state.e3d_state.cylinder_max,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCYWeight,
+									 AttractorData.state.e3d_state.cylinder_weight,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+
+// Sphere Tangent
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATSTCenterX,
+									 AttractorData.state.e3d_state.spheretangent_center.x,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATSTCenterY,
+									 AttractorData.state.e3d_state.spheretangent_center.y,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATSTCenterZ,
+									 AttractorData.state.e3d_state.spheretangent_center.z,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATSTMin,
+									 AttractorData.state.e3d_state.spheretangent_min,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATSTMax,
+									 AttractorData.state.e3d_state.spheretangent_max,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATSTWeight,
+									 AttractorData.state.e3d_state.spheretangent_weight,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+
+// Cylinder Tangent
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCYTStartX,
+									 AttractorData.state.e3d_state.cylindertangent_start.x,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCYTStartY,
+									 AttractorData.state.e3d_state.cylindertangent_start.y,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCYTStartZ,
+									 AttractorData.state.e3d_state.cylindertangent_start.z,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCYTEndX,
+									 AttractorData.state.e3d_state.cylindertangent_end.x,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCYTEndY,
+									 AttractorData.state.e3d_state.cylindertangent_end.y,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCYTEndZ,
+									 AttractorData.state.e3d_state.cylindertangent_end.z,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCYTMin,
+									 AttractorData.state.e3d_state.cylindertangent_min,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCYTMax,
+									 AttractorData.state.e3d_state.cylindertangent_max,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCYTWeight,
+									 AttractorData.state.e3d_state.cylindertangent_weight,AttractorData.settings_changed,
+									 UpdateAttractorStateDisplay)
 
 
 
 
 
 
+bool awsSink::AttractorStateChanged()
+{
+  return AttractorData.settings_changed;
+}
+
+void awsSink::ClearAttractorStateChanged()
+{
+  AttractorData.settings_changed=false;
+}
+
+AttractorState *awsSink::GetAttractorState()
+{
+  return &(AttractorData.state);
+}
+
+void awsSink::SetAttractorState(AttractorState *source)
+{
+  memcpy(&(AttractorData.state),source,sizeof(AttractorState));
+  ClearAttractorStateChanged();
+  UpdateAttractorStateDisplay();
+}
+
+void awsSink::UpdateAttractorStateDisplay()
+{
+  csRef<iString> value;
+
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATForce,AttractorData.state.force);
+
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATFPX,AttractorData.state.e3d_state.fixed_position.x);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATFPY,AttractorData.state.e3d_state.fixed_position.y);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATFPZ,AttractorData.state.e3d_state.fixed_position.z);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATFWeight,AttractorData.state.e3d_state.fixed_weight);
+
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATLSX,AttractorData.state.e3d_state.line_start.x);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATLSY,AttractorData.state.e3d_state.line_start.y);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATLSZ,AttractorData.state.e3d_state.line_start.z);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATLEX,AttractorData.state.e3d_state.line_end.x);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATLEY,AttractorData.state.e3d_state.line_end.y);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATLEZ,AttractorData.state.e3d_state.line_end.z);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATLWeight,AttractorData.state.e3d_state.line_weight);
+
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATBMX,AttractorData.state.e3d_state.box_min.x);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATBMY,AttractorData.state.e3d_state.box_min.y);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATBMZ,AttractorData.state.e3d_state.box_min.z);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATBXX,AttractorData.state.e3d_state.box_max.x);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATBXY,AttractorData.state.e3d_state.box_max.y);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATBXZ,AttractorData.state.e3d_state.box_max.z);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATBWeight,AttractorData.state.e3d_state.box_weight);
+
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATSCX,AttractorData.state.e3d_state.sphere_center.x);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATSCY,AttractorData.state.e3d_state.sphere_center.y);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATSCZ,AttractorData.state.e3d_state.sphere_center.z);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATSMin,AttractorData.state.e3d_state.sphere_min);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATSMax,AttractorData.state.e3d_state.sphere_max);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATSWeight,AttractorData.state.e3d_state.sphere_weight);
+
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCNOX,AttractorData.state.e3d_state.cone_origin.x);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCNOY,AttractorData.state.e3d_state.cone_origin.y);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCNOZ,AttractorData.state.e3d_state.cone_origin.z);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCNElevation,AttractorData.state.e3d_state.cone_elevation);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCNAzimuth,AttractorData.state.e3d_state.cone_azimuth);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCNAperture,AttractorData.state.e3d_state.cone_aperture);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCNMin,AttractorData.state.e3d_state.cone_min);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCNMax,AttractorData.state.e3d_state.cone_max);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCNWeight,AttractorData.state.e3d_state.cone_weight);
+
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCYSX,AttractorData.state.e3d_state.cylinder_start.x);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCYSY,AttractorData.state.e3d_state.cylinder_start.y);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCYSZ,AttractorData.state.e3d_state.cylinder_start.z);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCYEX,AttractorData.state.e3d_state.cylinder_end.x);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCYEY,AttractorData.state.e3d_state.cylinder_end.y);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCYEZ,AttractorData.state.e3d_state.cylinder_end.z);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCYMin,AttractorData.state.e3d_state.cylinder_min);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCYMax,AttractorData.state.e3d_state.cylinder_max);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCYWeight,AttractorData.state.e3d_state.cylinder_weight);
+
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATSTCX,AttractorData.state.e3d_state.spheretangent_center.x);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATSTCY,AttractorData.state.e3d_state.spheretangent_center.y);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATSTCZ,AttractorData.state.e3d_state.spheretangent_center.z);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATSTMin,AttractorData.state.e3d_state.spheretangent_min);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATSTMax,AttractorData.state.e3d_state.spheretangent_max);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATSTWeight,AttractorData.state.e3d_state.spheretangent_weight);
+
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCYTSX,AttractorData.state.e3d_state.cylindertangent_start.x);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCYTSY,AttractorData.state.e3d_state.cylindertangent_start.y);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCYTSZ,AttractorData.state.e3d_state.cylindertangent_start.z);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCYTEX,AttractorData.state.e3d_state.cylindertangent_end.x);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCYTEY,AttractorData.state.e3d_state.cylindertangent_end.y);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCYTEZ,AttractorData.state.e3d_state.cylindertangent_end.z);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCYTMin,AttractorData.state.e3d_state.cylindertangent_min);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCYTMax,AttractorData.state.e3d_state.cylindertangent_max);
+  SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCYTWeight,AttractorData.state.e3d_state.cylindertangent_weight);
+
+
+}
 
 
 
