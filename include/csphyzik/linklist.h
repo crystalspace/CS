@@ -22,14 +22,6 @@ public:
 // caches more recent link for ease of iteration.
 class ctLinkList{
 public:
-  ctLinkList(){ size = 0; head = new llLink(); prev = NULL; current = head; }
-
-  // clean up nodes.  Does NOT delete contents of nodes
-  ~ctLinkList(){
-    remove_all();
-    delete head;
-  }
-
   void reset(){ prev = NULL; current = head; }
 
   void * get_first(){  if( head->next != NULL ){
@@ -128,6 +120,14 @@ public:
   }
 
   long get_size(){ return size; }
+
+  ctLinkList(){ size = 0; head = new llLink(); prev = NULL; current = head; }
+
+  // clean up nodes.  Does NOT delete contents of nodes
+  ~ctLinkList(){
+    remove_all();
+    delete head;
+  }
 
 protected:
   llLink *head;
