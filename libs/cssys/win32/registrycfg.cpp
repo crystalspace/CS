@@ -374,7 +374,11 @@ void csRegistryConfig::SetInt (const char *Key, int Value)
 
 void csRegistryConfig::SetFloat (const char *Key, float Value)
 {
-  InternalSetValue (Key, REG_BINARY, &Value, sizeof (Value));
+  //InternalSetValue (Key, REG_BINARY, &Value, sizeof (Value));
+  // for better readability:
+  char buf[128];
+  sprintf (buf, "%g", Value);
+  InternalSetValue (Key, REG_SZ, buf, strlen (buf) + 1);
 }
 
 void csRegistryConfig::SetBool (const char *Key, bool Value)

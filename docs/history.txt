@@ -44,6 +44,8 @@ The history order is reversed so that new features are at the top.
 	      with above (bug 751779).
 	    - Fixed scfString::FindLast() not returning a value.
 	- Matze improved the introduction message in createproject.sh
+	- res changed the Win32 registry config to store floats as strings 
+	  instead of binaries for better human readability.
 9-Jun-2003
 	- Jorrit made a new csStringArray class.
 	- res made the following changes:
