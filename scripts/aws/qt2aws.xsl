@@ -46,7 +46,7 @@
   </xsl:template>
 
 
-  <xsl:template match="widget[class[text()='QPushButton' or text()='QRadioButton' or text()='QButtonGroup' or text()='QGroupBox' or text()='QFrame' or text()='QCheckBox' or text()='QLineEdit' or text()='QLabel']]">
+  <xsl:template match="widget[class[text()='QPushButton' or text()='QRadioButton' or text()='QSlider' or text()='QButtonGroup' or text()='QGroupBox' or text()='QFrame' or text()='QCheckBox' or text()='QLineEdit' or text()='QLabel']]">
     <xsl:call-template name="spacer"/><xsl:call-template name="component_header"/>
     <xsl:call-template name="spacer"/><xsl:text>{</xsl:text>
     <xsl:apply-templates/>
@@ -102,6 +102,34 @@
 
   <xsl:template match="property[name[text()='geometry']]">
     <xsl:call-template name="spacer"/><xsl:text>Frame: (</xsl:text><xsl:value-of select="rect/x"/><xsl:text>,</xsl:text><xsl:value-of select="rect/y"/><xsl:text>) - (</xsl:text><xsl:value-of select="number(rect/x)+number(rect/width)"/><xsl:text>,</xsl:text><xsl:value-of select="number(rect/y)+number(rect/height)"/><xsl:text>)</xsl:text>
+  </xsl:template>
+
+  <xsl:template match="property[name[text()='minValue']]">
+    <xsl:call-template name="spacer"/><xsl:text>Min: </xsl:text><xsl:value-of select="number"/>
+  </xsl:template>
+
+  <xsl:template match="property[name[text()='maxValue']]">
+    <xsl:call-template name="spacer"/><xsl:text>Max: </xsl:text><xsl:value-of select="number"/>
+  </xsl:template>
+
+  <xsl:template match="property[name[text()='pageStep']]">
+    <xsl:call-template name="spacer"/><xsl:text>PageSize: </xsl:text><xsl:value-of select="number"/>
+  </xsl:template>
+
+  <xsl:template match="property[name[text()='value']]">
+    <xsl:call-template name="spacer"/><xsl:text>Value: </xsl:text><xsl:value-of select="number"/>
+  </xsl:template>
+
+  <xsl:template match="property[name[text()='orientation']]">
+    <xsl:call-template name="spacer"/><xsl:text>Orientation: </xsl:text>
+    <xsl:choose>
+      <xsl:when test="enum='Horizontal'">
+        <xsl:call-template name="prefix"/><xsl:text>oHorizontal</xsl:text>
+      </xsl:when>
+      <xsl:when test="enum='Vertical'">
+        <xsl:call-template name="prefix"/><xsl:text>oVertical</xsl:text>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="property[name[text()='echoMode']]">
@@ -175,6 +203,7 @@
       <xsl:when test="class='QCheckBox'">"Check Box"</xsl:when>
       <xsl:when test="class='QListBox'">"List Box"</xsl:when>
       <xsl:when test="class='QListView'">"List Box"</xsl:when>
+      <xsl:when test="class='QSlider'">"Scroll Bar"</xsl:when>
       <xsl:when test="class='QLabel' and property/name='text'">"Label"</xsl:when>
       <xsl:when test="class='QLabel' and property/name='pixmap'">"Image View"</xsl:when>
       <xsl:otherwise><xsl:value-of select="class"/></xsl:otherwise>
@@ -190,6 +219,7 @@
       <xsl:when test="../class='QFrame'"><xsl:text>g</xsl:text></xsl:when>
       <xsl:when test="../class='QListBox'"><xsl:text>lb</xsl:text></xsl:when>
       <xsl:when test="../class='QListView'"><xsl:text>lb</xsl:text></xsl:when>
+      <xsl:when test="../class='QSlider'"><xsl:text>sb</xsl:text></xsl:when>
       <xsl:when test="../class='QLabel' and ../property/name='pixmap'"><xsl:text>iv</xsl:text></xsl:when>
       <xsl:when test="../class='QLabel' and ../property/name='text'"><xsl:text>lbl</xsl:text></xsl:when>
     </xsl:choose>
