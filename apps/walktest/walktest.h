@@ -56,6 +56,7 @@ struct csKeyMap
 ///
 class WalkTest : public SysSystemDriver
 {
+  typedef SysSystemDriver superclass;
 public:
   /// The startup directory on VFS with needed world file
   static char world_dir [100];
@@ -194,6 +195,8 @@ public:
   ///
   void DrawFrame (long elapsed_time, long current_time);
 
+  /// Override SetSystemDefaults to handle additional configuration defaults.
+  virtual void SetSystemDefaults (csIniFile*);
   /// Override ParseArg to handle additional arguments
   virtual bool ParseArg (int argc, char* argv[], int& i);
   /// Override Help to show additional arguments help

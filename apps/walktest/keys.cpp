@@ -1510,12 +1510,6 @@ bool WalkTest::Initialize (int argc, char *argv[], const char *iConfigName,
   if (!SysSystemDriver::Initialize (argc, argv, iConfigName, iVfsConfigName, iOptions))
     return false;
 
-  // Read values from config file
-  do_fps = Config->GetYesNo ("WalkTest", "FPS", true);
-  do_stats = Config->GetYesNo ("WalkTest", "STATS", false);
-  do_cd = Config->GetYesNo ("WalkTest", "COLLDET", true);
-  sprintf (world_dir, "/lev/%s", Config->GetStr ("World", "WORLDFILE", "world"));
-
   // Get all collision detection and movement config file parameters.
   cfg_jumpspeed = Config->GetFloat ("CD", "JUMPSPEED", 0.08);
   cfg_walk_accelerate = Config->GetFloat ("CD", "WALKACCELERATE", 0.007);
@@ -1533,6 +1527,15 @@ bool WalkTest::Initialize (int argc, char *argv[], const char *iConfigName,
   cfg_legs_depth = Config->GetFloat ("CD", "LEGSDEPTH", 0.4);
   cfg_legs_offset = Config->GetFloat ("CD", "LEGSOFFSET", -1.1);
   return true;
+}
+
+void WalkTest::SetSystemDefaults (csIniFile *Config)
+{
+  superclass::SetSystemDefaults (Config);
+  do_fps = Config->GetYesNo ("WalkTest", "FPS", true);
+  do_stats = Config->GetYesNo ("WalkTest", "STATS", false);
+  do_cd = Config->GetYesNo ("WalkTest", "COLLDET", true);
+  sprintf (world_dir, "/lev/%s", Config->GetStr ("World", "WORLDFILE", "world"));
 }
 
 bool WalkTest::ParseArg (int argc, char* argv[], int& i)
