@@ -27,6 +27,14 @@ The history order is reversed so that new features are at the top.
 	- res wrote a plugin wrapping the four built-in proctexes.
 	- res also moved the <plugins> block in flarge since they are needed
 	  before the textures now.
+	- Matze moved the definition of the distclean and maintainerclean
+	  rules to the toplevel Jamfile. Having these filenames in clean.jam
+	  is not good for external projects.
+	- Also removed the clean target for application.txt again. Some
+	  external projects might have readme files in the same name. (We
+	  could let the Application rule construct a list of application
+	  targets and generate the clean targets from this list, but I think
+	  the question is if we really need this features) 
 6-May-2003
 	- Eric Sunshine made the following changes:
 	    - Fixed Linux joystick makefile so that makefile target and

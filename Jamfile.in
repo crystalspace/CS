@@ -1,5 +1,5 @@
-TOP ?= @top_srcdir@ ;
-BUILDTOP ?= @top_builddir@ ;
+TOP ?= "@top_srcdir@" ;
+BUILDTOP ?= "@top_builddir@" ;
 
 SubDir TOP ;
 
@@ -14,6 +14,21 @@ Help drivers2d	  : "2d canvases compilegroup" ;
 Help drivers3d	  : "3d renderers compilegroup" ;
 Help meshes	  : "mesh plugin and loader compilegroup" ;
 
+# Create some clean targets
+Clean distclean : Jamconfig Jamfile
+		  cache.mak config.mak
+		  config.log config.status config.cache
+		  include/volatile.h
+		  [ Wildcard *.scf ]
+		  [ Wildcard *.cex ]
+		  out ;
+Depends distclean : clean ;
+
+Clean maintainerclean : autom4te.cache aclocal.m4
+			configure configure.scan ;
+Depends maintainerclean : distclean ;
+
+# Process subdirectories
 SubInclude TOP libs ;
 SubInclude TOP apps ;
 SubInclude TOP data ;
