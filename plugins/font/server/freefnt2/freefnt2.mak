@@ -4,7 +4,7 @@ DESCRIPTION.freefont2 = Crystal Space FreeType font server
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make freefont2     Make the $(DESCRIPTION.freefont2)$"
+  $(NEWLINE)echo $"  make freefont2    Make the $(DESCRIPTION.freefont2)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
