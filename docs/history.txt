@@ -35,6 +35,8 @@ The history order is reversed so that new features are at the top.
 	  use the standard while (HasNext()) { Next(); ...} construct too.
         - DeSigna corrected a range checking bug in csString::SubString(), 
 	  and made the second range argument a length instead of an index.
+	- Jorrit fixed csProcFile inheritance to use public inheritance
+	  for iFireTexture instead of private inheritance.
 4-June-2003
 	- Jorrit fixed a bug in the AWS engine view where it would not set the
 	  FOV of the camera based on the height of the frame. This caused the

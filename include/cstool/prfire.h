@@ -31,7 +31,7 @@ struct csRGBcolor;
 /**
  * Fire.
  */
-class csProcFire : public csProcTexture, iFireTexture
+class csProcFire : public csProcTexture, public iFireTexture
 {
 private:
   /// Palette.
