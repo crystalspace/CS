@@ -157,6 +157,8 @@ ptrmap(type1,type2)
 1.1.  class iBase
 -----------------
 
+DecRef()
+
 1.2.  class iSCF
 ----------------
 
@@ -307,36 +309,22 @@ GetInvFOV()
 1.12.  class iSector
 --------------------
 
-CreateBSP()
+1.13.  class iThingState
+------------------------
 
-1.13.  class iThing
--------------------
+CreatePolygon(name)
 
-GetName()
+1.14.  class iMeshObject
+------------------------
 
-SetName(iName)
+Query_iThingState()
 
-CompressVertices()
+1.15.  class iMeshWrapper
+-------------------------
 
-GetPolygonCount()
+GetMeshObject()
 
-GetPolygon(idx)
-
-CreatePolygon(iName)
-
-GetVertexCount()
-
-GetVertex(idx)
-
-GetVertexW(idx)
-
-GetVertexC(idx)
-
-CreateVertex(iVertex)
-
-CreateKey(iName,iValue)
-
-1.14.  class iPolygon3D
+1.16.  class iPolygon3D
 -----------------------
 
 GetName()
@@ -373,7 +361,7 @@ SetPlane(iName)
 
 SetTextureSpace(v_orig,v1,len1)
 
-1.15.  class iImage
+1.17.  class iImage
 -------------------
 
 GetImageData()
@@ -404,7 +392,7 @@ Clone()
 
 Crop(x,y,width,height)
 
-1.16.  class iTextureManager
+1.18.  class iTextureManager
 ----------------------------
 
 RegisterTexture(image,flags)
@@ -425,7 +413,7 @@ SetVerbose(vb)
 
 GetTextureFormat()
 
-1.17.  class iPolygonTexture
+1.19.  class iPolygonTexture
 ----------------------------
 
 GetMaterialHandle()
@@ -465,7 +453,7 @@ GetCacheData(idx)
 
 SetCacheData(idx,d)
 
-1.18.  class iEngine
+1.20.  class iEngine
 --------------------
 
 GetTextureFormat()
@@ -484,17 +472,17 @@ CreateKey(iName,iValue)
 
 CreatePlane(iName,iOrigin,iMatrix)
 
-CreateSector(iName)
+CreateSector(iName,link)
 
 FindSector(iName)
 
 GetSector(idx)
 
-CreateThing(iName,iParent)
-
 FindMaterial(iName,regionOnly)
 
-1.19.  class iSystem
+CreateSectorWallsMesh(sector,name)
+
+1.21.  class iSystem
 --------------------
 
 Query_iEngine()

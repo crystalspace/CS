@@ -32,6 +32,8 @@
 
 #include "isys/system.h"
 #include "iengine/camera.h"
+#include "imesh/object.h"
+#include "iengine/thing.h"
 #include "csparser/csloader.h"
 #include "plugins/cscript/cspython/cspython.h"
 iSystem* GetSystem()
@@ -45,7 +47,10 @@ void* GetMyPtr() { return NULL; }
 %include pointer.i
 
 //***** SCF
-struct iBase {};
+struct iBase
+{
+  void DecRef ();
+};
 
 struct iSCF:public iBase
 {
@@ -150,27 +155,30 @@ struct iCamera:public iBase
   float GetInvFOV ();
 };
 
-struct iSector:public iBase
+struct iSector : public iBase
 {
-public:
-  void CreateBSP(); 
-}
+};
 
-struct iThing:public iBase
+struct iThingState : public iBase
 {
-  const char *GetName () const;
-  void SetName (const char *iName);
-  void CompressVertices ();
-  int GetPolygonCount ();
-  iPolygon3D *GetPolygon (int idx);
-  iPolygon3D *CreatePolygon (const char *iName);
-  int GetVertexCount ();
-  csVector3 &GetVertex (int idx);
-  csVector3 &GetVertexW (int idx);
-  csVector3 &GetVertexC (int idx);
-  int CreateVertex (csVector3 &iVertex);
-  bool CreateKey (const char *iName, const char *iValue);
-}
+  iPolygon3D* CreatePolygon (const char* name);
+};
+
+struct iMeshObject : public iBase
+{
+  %addmethods
+  {
+    iThingState* Query_iThingState()
+    {
+      return QUERY_INTERFACE(self, iThingState);
+    }
+  }
+};
+
+struct iMeshWrapper : public iBase
+{
+  virtual iMeshObject* GetMeshObject ();
+};
 
 struct iPolygon3D : public iBase
 {
@@ -264,11 +272,12 @@ struct iEngine : public iPlugIn
   virtual bool CreateKey (const char *iName, const char *iValue) = 0;
   virtual bool CreatePlane (const char *iName, const csVector3 &iOrigin,
     const csMatrix3 &iMatrix) = 0;
-  virtual iSector *CreateSector (const char *iName) = 0;
+  virtual iSector *CreateSector (const char *iName, bool link = true) = 0;
   virtual iSector *FindSector (const char *iName) = 0;
   virtual iSector *GetSector (int idx) = 0;
-  virtual iThing *CreateThing (const char *iName, iSector *iParent) = 0;
-  virtual iMaterialWrapper *FindMaterial (const char *iName, bool regionOnly) = 0;
+  virtual iMaterialWrapper *FindMaterial (const char *iName, bool regionOnly = false) = 0;
+  virtual iMeshWrapper* CreateSectorWallsMesh (iSector* sector,
+      const char* name) = 0;
 };
 
 //****** System Interface

@@ -106,7 +106,6 @@ bool PySimple::Initialize (int argc, const char* const argv[],
 
   LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
   csSector *room = engine->CreateCsSector ("room");
-  csThing* walls = engine->CreateSectorWalls (room, "walls");
 
   // Initialize the python plugin.
   iScript* is = LOAD_PLUGIN (this, "crystalspace.script.python", "Python", iScript);
@@ -140,11 +139,6 @@ bool PySimple::Initialize (int argc, const char* const argv[],
 
     is->DecRef();
   }
-
-printf ("verts:%d\n", walls->GetNumVertices ());
-printf ("poly:%d\n", walls->GetNumPolygons ());
-
-  walls->CompressVertices ();
 
   csStatLight* light;
   light = new csStatLight (0, 5, 0, 10, 1, 0, 0, false);
