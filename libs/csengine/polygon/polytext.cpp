@@ -237,16 +237,14 @@ struct __rect
 
 static void (*__draw_func)(int, int, float);
 
-FILE *fo;
-
 static void lixel_intensity (int x, int y, float density)
 {
-  int addr=x+y*__texture_width;
+  int addr = x + y * __texture_width;
 
-  if (density>=1.0)
-    density=1.0;
+  if (density >= 1.0)
+    density = 1.0;
 
-  __texture[addr] = density;
+  __texture [addr] = density;
 }
 
 static void correct_results (int x, int y, float density)
@@ -514,7 +512,6 @@ void csPolyTexture::FillLightMap (csLightView& lview)
     mapG = lm->GetStaticMap ().GetGreen ();
     mapB = lm->GetStaticMap ().GetBlue ();
   }
-  long lm_size = lm->lm_size;
 
   float miny = 1000000, maxy = -1000000;
   int MaxIndex = -1, MinIndex = -1;
@@ -579,10 +576,6 @@ void csPolyTexture::FillLightMap (csLightView& lview)
   {
     for (u = 0; u < lw; u++, uv++)
     {
-      //@@@ (Note from Jorrit): The following test should not be needed
-      // but it appears to be anyway. 'uv' can get too large.
-      if (uv >= lm_size) continue;
-
       float usual_value = 1.0;
 
       float lightintensity = __texture[uv];
@@ -721,15 +714,6 @@ void csPolyTexture::FillLightMap (csLightView& lview)
           }
         }
       }
-      //mapR[uv] = 128;
-      //mapG[uv] = 128;
-      //mapB[uv] = 128;
-      //if (u == 0 && (v & 1)) { mapR[uv] = 255; mapG[uv] = 0; mapB[uv] = 0; }
-      //else if (v == 0 && (u & 1)) { mapR[uv] = 0; mapG[uv] = 255; mapB[uv] = 0; }
-      //else if (u == lw-1 && (v & 1)) { mapR[uv] = 0; mapG[uv] = 0; mapB[uv] = 255; }
-      //else if (v == lh-1 && (u & 1)) { mapR[uv] = 255; mapG[uv] = 0; mapB[uv] = 255; }
-      //else if (u == v) { mapR[uv] = 255; mapG[uv] = 255; mapB[uv] = 0; }
-      //else if (u == lh-1-v) { mapR[uv] = 0; mapG[uv] = 255; mapB[uv] = 255; }
     }
   }
 
@@ -939,10 +923,6 @@ b:      if (scanL2 == MinIndex) goto finish;
       for (u = xR; u < xL ; u++)
       {
         uv = sy * new_lw + u;
-
-	//@@@ (Note from Jorrit): The following test should not be needed
-	// but it appears to be anyway. 'uv' can get both negative and too large.
-	if (uv < 0 || uv >= lm_size) continue;
 
         ru = u << lightcell_shift;
         rv = sy << lightcell_shift;

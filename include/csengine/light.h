@@ -129,8 +129,6 @@ public:
   static int ambient_green;
   /// Config value: ambient blue value.
   static int ambient_blue;
-  /// Config value: ambient white value.
-  static int ambient_white;
 
 public:
   /**

@@ -564,7 +564,6 @@ void csWorld::ShineLights ()
                                 // If different then the format is different and we need
                                 // to recalculate.
       int normal_light_level;   // Normal light level (unlighted level).
-      int ambient_white;
       int ambient_red;
       int ambient_green;
       int ambient_blue;
@@ -580,7 +579,6 @@ void csWorld::ShineLights ()
     current.lm_version = 1;
     current.normal_light_level = NORMAL_LIGHT_LEVEL;
     //@@@
-    //current.ambient_white = Textures::ambient_white;
     //current.ambient_red = Textures::ambient_red;
     //current.ambient_green = Textures::ambient_green;
     //current.ambient_blue = Textures::ambient_blue;
@@ -604,7 +602,6 @@ void csWorld::ShineLights ()
       if (i != current.lm_version) { force = true; reason = "lightmap format changed"; }
       else { p1 = p2+1; p2 = strchr (p1, '='); sscanf (p2+1, "%d", &i); if (i != current.normal_light_level) { force = true; reason = "normal light level changed"; }
       //@@@
-      //else { p1 = p2+1; p2 = strchr (p1, '='); sscanf (p2+1, "%d", &i); if (i != current.ambient_white) { force = true; reason = "ambient white level changed"; }
       //else { p1 = p2+1; p2 = strchr (p1, '='); sscanf (p2+1, "%d", &i); if (i != current.ambient_red) { force = true; reason = "ambient red level changed"; }
       //else { p1 = p2+1; p2 = strchr (p1, '='); sscanf (p2+1, "%d", &i); if (i != current.ambient_green) { force = true; reason = "ambient green level changed"; }
       //else { p1 = p2+1; p2 = strchr (p1, '='); sscanf (p2+1, "%d", &i); if (i != current.ambient_blue) { force = true; reason = "ambient blue level changed"; }
@@ -633,13 +630,13 @@ void csWorld::ShineLights ()
       char data [1000];
       sprintf (data,
         "LMVERSION=%d\n"        "NORMALLIGHTLEVEL=%d\n"
-        "AMBIENT_WHITE=%d\n"    "AMBIENT_RED=%d\n"
-        "AMBIENT_GREEN=%d\n"    "AMBIENT_BLUE=%d\n"
+        "AMBIENT_RED=%d\n"      "AMBIENT_GREEN=%d\n"    "AMBIENT_BLUE=%d\n"
         "REFLECT=%d\n"          "RADIOSITY=%d\n"
         "ACCURATE_THINGS=%d\n"  "COSINUS_FACTOR=%f\n"
         "LIGHTMAP_SIZE=%d\n"    "LIGHTMAP_HIGHQUAL=%d\n",
-        current.lm_version, current.normal_light_level, current.ambient_white, current.ambient_red, current.ambient_green,
-        current.ambient_blue, current.reflect, current.radiosity, current.accurate_things, current.cosinus_factor,
+        current.lm_version, current.normal_light_level, current.ambient_red,
+        current.ambient_green, current.ambient_blue, current.reflect,
+        current.radiosity, current.accurate_things, current.cosinus_factor,
         current.lightmap_size, current.lightmap_highqual);
       VFS->WriteFile ("precalc_info", data, strlen (data));
       CsPrintf (MSG_INITIALIZATION, "Lightmap data is not up to date (reason: %s).\n", reason);
@@ -1241,10 +1238,16 @@ void csWorld::ReadConfig ()
   csLight::ambient_red = System->ConfigGetInt ("World", "AMBIENT_RED", DEFAULT_LIGHT_LEVEL);
   csLight::ambient_green = System->ConfigGetInt ("World", "AMBIENT_GREEN", DEFAULT_LIGHT_LEVEL);
   csLight::ambient_blue = System->ConfigGetInt ("World", "AMBIENT_BLUE", DEFAULT_LIGHT_LEVEL);
-  csLight::ambient_white = System->ConfigGetInt ("World", "AMBIENT_WHITE", DEFAULT_LIGHT_LEVEL);
-  csLight::ambient_red += csLight::ambient_white;
-  csLight::ambient_green += csLight::ambient_white;
-  csLight::ambient_blue += csLight::ambient_white;
+
+  int ambient_white = System->ConfigGetInt ("World", "AMBIENT_WHITE", DEFAULT_LIGHT_LEVEL);
+  csLight::ambient_red += ambient_white;
+  csLight::ambient_green += ambient_white;
+  csLight::ambient_blue += ambient_white;
+
+  // Do not allow too black environments as software renderer hates it
+  if (csLight::ambient_red + csLight::ambient_green + csLight::ambient_blue < 6)
+    csLight::ambient_red = csLight::ambient_green = csLight::ambient_blue = 2;
+
   csSector::cfg_reflections = System->ConfigGetInt ("Lighting", "REFLECT", csSector::cfg_reflections);
   csSector::do_radiosity = System->ConfigGetYesNo ("Lighting", "RADIOSITY", csSector::do_radiosity);
   csPolyTexture::do_accurate_things = System->ConfigGetYesNo ("Lighting", "ACCURATE_THINGS", csPolyTexture::do_accurate_things);

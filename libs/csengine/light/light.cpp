@@ -33,7 +33,6 @@
 int csLight::ambient_red = DEFAULT_LIGHT_LEVEL;
 int csLight::ambient_green = DEFAULT_LIGHT_LEVEL;
 int csLight::ambient_blue = DEFAULT_LIGHT_LEVEL;
-int csLight::ambient_white = DEFAULT_LIGHT_LEVEL;
 
 IMPLEMENT_CSOBJTYPE (csLight,csObject);
 
