@@ -54,12 +54,16 @@ public:
   virtual void SetVolume (float vol) = 0;
   /// Get Volume [0, 1]
   virtual float GetVolume () = 0;
-  /// Play a sound buffer without control (play until its end)
+  /// Play a sound buffer without control; data should be decoded
   virtual void PlayEphemeral (iSoundData *snd, bool Loop=false) = 0;
-  /// create a sound source
+  /// create a sound source; data should be decoded
   virtual iSoundSource *CreateSource (iSoundData *snd, bool Is3d) = 0;
   /// Get the global Listener object
   virtual iSoundListener *GetListener () = 0;
+  /// play background music; data should NOT be decoded to save memory
+  virtual void PlayMusic(iSoundData *snd) = 0;
+  /// stop background music
+  virtual void StopMusic() = 0;
   /// get format for sound loader
   virtual const csSoundFormat *GetLoadFormat() = 0;
   /// update the renderer

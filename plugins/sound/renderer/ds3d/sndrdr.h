@@ -49,6 +49,8 @@ public:
   virtual const csSoundFormat *GetLoadFormat();
   virtual void Update();
   virtual void MixingFunction ();
+  virtual void PlayMusic(iSoundData *snd);
+  virtual void StopMusic();
 
   void SetDirty();
 

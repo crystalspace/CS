@@ -148,3 +148,10 @@ void csSoundRenderDS3D::SetDirty() {
   Listener->Dirty = true;
 }
 
+void csSoundRenderDS3D::PlayMusic(iSoundData * /*snd*/) {
+  // @@@
+}
+
+void csSoundRenderDS3D::StopMusic() {
+  // @@@
+}
