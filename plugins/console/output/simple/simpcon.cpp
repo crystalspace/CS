@@ -430,7 +430,7 @@ void csSimpleConsole::Draw2D (csRect* area)
 
       char cursor [2];
       if (CursorState && (CursorStyle != csConNoCursor))
-        cursor [0] = (CursorStyle == csConNormalCursor) ? 'Û' : '_';
+        cursor [0] = (CursorStyle == csConNormalCursor) ? '\333' : '_';
       else
         cursor [0] = ' ';
       cursor [1] = 0;

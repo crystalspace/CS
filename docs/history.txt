@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+7-Nov-2001
+	- Eric Sunshine fixed simpcon.cpp so that it now uses an octal
+	  character constant for cursor assignment, rather than using an 8-bit
+	  character, since not all compilers are capable of correctly dealing
+	  with 8-bit charactes.
 6-Nov-2001
 	- Eric Sunshine fixed the derivation of Win32Assistant.  It was
 	  incorrectly inheriting iEventPlug and iEventHandler privately, rather
