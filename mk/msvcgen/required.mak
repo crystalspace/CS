@@ -46,6 +46,7 @@ MSVC.PLUGINS.REQUIRED =         \
   mesh/impexp/3ds               \
   sound/driver/waveoutsd        \
   sound/renderer/ds3d           \
+  sound/renderer/eax            \
   sound/renderer/software       \
   video/canvas/ddraw            \
   video/canvas/openglwin        \
