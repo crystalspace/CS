@@ -3,6 +3,16 @@ The history order has been reversed so that new features are at the top.
 6-Jun-2000
 	- Fixed OpenGL GLX driver (2D driver for OpenGL/X Windows).
 	  It was trying to find a visual with AUX buffers.
+	- Wouter Wijngaards fixed a bad nested if construct in
+	  libs/csengine/polygon/polytext.cpp that could cause compile
+	  errors in some cases.
+	- Wouter did some further improvements on radiosity.
+	- Added csPoly3D::CutToPlane() to cut a polygon with a plane
+	  and only keep the front side.
+	- Added csPlane3::Set() to initialize a plane given three vectors.
+	- Some work on PVS again. Tried to fix a serious bug with shadow
+	  projection. Not sure that I actually fixed it. Will have to do
+	  some more tests.
 5-Jun-2000
 	- Added a few const methods to csPoly2D as well.
 	- Added a speed improvement to PVS. Before considering an

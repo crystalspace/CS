@@ -52,7 +52,7 @@ public:
   csPoly3D (int start_size = 10);
 
   /// Copy constructor.
-  csPoly3D (csPoly3D& copy);
+  csPoly3D (const csPoly3D& copy);
 
   /// Destructor.
   virtual ~csPoly3D ();
@@ -212,6 +212,9 @@ public:
 
   /// Same as Classify() but for Z plane only.
   int ClassifyZ (float z) const;
+
+  /// Cut this polygon with a plane and only keep the front side.
+  void CutToPlane (const csPlane3& split_plane);
 
   /// Split this polygon with the given plane (A,B,C,D).
   void SplitWithPlane (csPoly3D& front, csPoly3D& back,

@@ -51,7 +51,7 @@ public:
   csPoly2D (int start_size = 10);
 
   /// Copy constructor.
-  csPoly2D (csPoly2D& copy);
+  csPoly2D (const csPoly2D& copy);
 
   /// Destructor.
   virtual ~csPoly2D ();

@@ -33,7 +33,7 @@ csPoly2D::csPoly2D (int start_size)
   MakeEmpty ();
 }
 
-csPoly2D::csPoly2D (csPoly2D& copy)
+csPoly2D::csPoly2D (const csPoly2D& copy)
 {
   max_vertices = copy.max_vertices;
   vertices = new csVector2 [max_vertices];

@@ -84,9 +84,12 @@ public:
   inline void Set (float a, float b, float c, float d)
   { norm.x = a; norm.y = b; norm.z = c; DD = d; }
 
-  /// Same but takes directly a vector
+  /// Same but takes a vector directly.
   inline void Set (const csVector3& normal, float d)
   { norm = normal; DD = d; }
+
+  /// Initialize the plane through the three given points.
+  void Set (const csVector3& v1, const csVector3& v2, const csVector3& v3);
 
   /// Classify the given vector with regards to this plane.
   inline float Classify (const csVector3& pt) const { return norm*pt+DD; }

@@ -235,6 +235,8 @@ public:
   void CleanupSolidPolygonIterator (void* vspit);
 };
 
+typedef csPlane3 csFrustum4[4];
+
 /**
  * The octree.
  */
@@ -293,19 +295,21 @@ private:
    */
   void CalculatePolygonShadowArea (
 	const csBox3& occludee_box,
-	csPoly3D& poly, const csPlane3& poly_plane,
+	const csPoly3D& poly, const csPlane3& poly_plane,
 	csPoly2D& result_poly,
-	int plane_nr, float plane_pos);
+	int plane_nr, float plane_pos,
+	csFrustum4* frustums);
 
   /**
    * Help function for BoxCanSeeOccludee.
    */
   bool CalculatePolygonsShadowArea (
 	const csBox3& occludee_box,
-	csPoly3D& poly1, const csPlane3& plane1, int edge1,
-	csPoly3D& poly2, const csPlane3& plane2,
+	const csPoly3D& poly1, const csPlane3& plane1, int edge1,
+	const csPoly3D& poly2, const csPlane3& plane2,
 	csPoly2D& result_poly,
-	int plane_nr, float plane_pos);
+	int plane_nr, float plane_pos,
+	csFrustum4* frustums);
   /**
    * Help function for BoxCanSeeOccludee.
    */
@@ -317,14 +321,15 @@ private:
    */
   bool CalculatePolygonShadow (
 	const csVector3& corner,
-	csPoly3D& cur_poly,
+	const csPoly3D& cur_poly,
 	csPoly2D& result_poly, bool first_time,
-	int plane_nr, float plane_pos);
+	int plane_nr, float plane_pos,
+	csFrustum4 frustum);
 
   /**
    * Help function for BoxCanSeeOccludee.
    */
-  void InsertShadowIntoCBuffer (const csPoly2D& result_poly,
+  bool InsertShadowIntoCBuffer (const csPoly2D& result_poly,
 	csCBuffer* cbuffer, const csVector2& scale, const csVector2& shift);
 
   /**
@@ -339,18 +344,20 @@ private:
    * the box is too close to the test plane for example).
    */
   bool BoxOccludeeShadowOutline (const csBox3& occluder_box,
-  	const csBox3& occludee,
-	int plane_nr, float plane_pos, csPoly2D& result_poly);
+  	const csBox3& occludee_box,
+	int plane_nr, float plane_pos, csPoly2D& result_poly,
+	csFrustum4* frustums);
 
   /**
    * Help function for BoxCanSeeOccludee.
    */
   void BoxOccludeeShadowPolygons (const csBox3& box,
-  	const csBox3& occludee,
+  	const csBox3& occludee_box,
 	csPolygonInt** polygons, int num_polygons,
 	csCBuffer* cbuffer,
   	const csVector2& scale, const csVector2& shift,
-	int plane_nr, float plane_pos);
+	int plane_nr, float plane_pos,
+	csFrustum4* frustums);
 
   /**
    * Help function for BoxCanSeeOccludee.
@@ -358,7 +365,8 @@ private:
   void BoxOccludeeShadowSolidBoundaries (csOctreeNode* occluder,
 	const csBox3& occludee_box,
     	csCBuffer* cbuffer, const csVector2& scale, const csVector2& shift,
-	int plane_nr, float plane_pos);
+	int plane_nr, float plane_pos,
+	csFrustum4* frustums);
   /**
    * Help function for BoxCanSeeOccludee.
    * If 'do_polygons' is true then this function will also call
@@ -370,9 +378,10 @@ private:
   void BoxOccludeeAddShadows (csOctreeNode* occluder, csCBuffer* cbuffer,
   	const csVector2& scale, const csVector2& shift,
 	int plane_nr, float plane_pos,
-  	const csBox3& box, const csBox3& occludee,
+  	const csBox3& box, const csBox3& occludee_box,
 	csVector3& box_center, csVector3& occludee_center,
-	bool do_polygons);
+	bool do_polygons,
+	csFrustum4* frustums);
 
   /**
    * Test if 'box' can see 'occludee' through all the polygons

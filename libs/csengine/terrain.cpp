@@ -102,30 +102,30 @@ bool csTerrain::Initialize (const void* heightMapFile, unsigned long size)
  */
 bool csTerrain::drawTriangle( ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf )
 {
-	if ( !bt->visible(tvc))
-		return ddgFailure;
+  if ( !bt->visible(tvc))
+    return ddgFailure;
 
-    static ddgVector3 p[3];
-    static ddgColor3 c[3];
-    static ddgVector2 t[3];
-    ddgVBIndex i[3] = {0,0,0};
+  static ddgVector3 p[3];
+  static ddgColor3 c[3];
+  static ddgVector2 t[3];
+  ddgVBIndex i[3] = {0,0,0};
 
-    ddgTriIndex tv[3];
-	tv[0] = bt->parent(tvc),
-	tv[2] = mesh->v0(tvc),
-	tv[1] = mesh->v1(tvc);
+  ddgTriIndex tv[3];
+  tv[0] = bt->parent(tvc),
+  tv[2] = mesh->v0(tvc),
+  tv[1] = mesh->v1(tvc);
 
-	int cnt;
-	for (cnt = 0; cnt < 3; cnt++)
-	{
-		bt->vertex(tv[cnt],&p[cnt]);
-		bt->textureC(tv[cnt],&t[cnt]);
-		i[cnt] = vbuf->pushVT(&p[cnt],&t[cnt]);
-	}
-    // Record that these vertices are in the buffer.
-    vbuf->pushTriangle(i[0],i[1],i[2]);
+  int cnt;
+  for (cnt = 0; cnt < 3; cnt++)
+  {
+    bt->vertex(tv[cnt],&p[cnt]);
+    bt->textureC(tv[cnt],&t[cnt]);
+    i[cnt] = vbuf->pushVT(&p[cnt],&t[cnt]);
+  }
+  // Record that these vertices are in the buffer.
+  vbuf->pushTriangle(i[0],i[1],i[2]);
 
-    return ddgSuccess;
+  return ddgSuccess;
 }
 
 void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
@@ -166,46 +166,46 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   // If our orientation has changed, reload the buffer.
   if (modified)
   {
-	vbuf->reset();
-	// Update the vertex buffers.
-	ddgCacheIndex ci = 0;
-	while (i < mesh->getBinTreeNo())
-	{
-	  if ((bt = mesh->getBinTree(i)))
-	  {
-	    s = 0;
-		if (bt->vis() != ddgOUT)
-		{
-		  // Render each triangle.
-		  ci = bt->chain();
-		  // Render each triangle.
-		  while (ci)
-		  {
-		    ddgTNode *tn = (ddgTNode*) mesh->tcache()->get(ci);
- 		    if (drawTriangle(bt, tn->tindex(), vbuf) == ddgSuccess)
-		      s++;
-		    ci = tn->next();
-		  }
-		}
-		bt->visTriangle(s);
-	  }
-	  i++;
-	}
-	// Ugly hack to help software renderer, reindex the triangles per block.
-	i = 0;
-	int j;
+    vbuf->reset();
+    // Update the vertex buffers.
+    ddgCacheIndex ci = 0;
+    while (i < mesh->getBinTreeNo())
+    {
+      if ((bt = mesh->getBinTree(i)))
+      {
 	s = 0;
-	while (i < mesh->getBinTreeNo())
+	if (bt->vis() != ddgOUT)
 	{
-	  d = mesh->getBinTree(i)->visTriangle() + mesh->getBinTree(i+1)->visTriangle();
-	  if (d > 0)
+	  // Render each triangle.
+	  ci = bt->chain();
+	  // Render each triangle.
+	  while (ci)
 	  {
-		for (j = s*3; j < 3*(s+d); j++)
-	      vbuf->ibuf[j] -= s*3;
-	    s = s+d;
+	    ddgTNode *tn = (ddgTNode*) mesh->tcache()->get(ci);
+	    if (drawTriangle(bt, tn->tindex(), vbuf) == ddgSuccess)
+	      s++;
+	    ci = tn->next();
 	  }
-	  i = i+2;
 	}
+	bt->visTriangle(s);
+      }
+      i++;
+    }
+    // Ugly hack to help software renderer, reindex the triangles per block.
+    i = 0;
+    int j;
+    s = 0;
+    while (i < mesh->getBinTreeNo())
+    {
+      d = mesh->getBinTree(i)->visTriangle() + mesh->getBinTree(i+1)->visTriangle();
+      if (d > 0)
+      {
+	for (j = s*3; j < 3*(s+d); j++)
+	  vbuf->ibuf[j] -= s*3;
+	s = s+d;
+      }
+      i = i+2;
+    }
   } // end modified.
 
   rview.g3d->SetObjectToCamera (&rview);
@@ -219,18 +219,18 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   static bool init = false;
   if (!init)
   {
-	g3dmesh.vertex_colors[0] = NULL;			 // pointer to array of csColor for color information.
-	g3dmesh.morph_factor = 0;
-	g3dmesh.num_vertices_pool = 1;
-	g3dmesh.num_textures = 1;
-	g3dmesh.use_vertex_color = false;
-	g3dmesh.do_mirror = rview.IsMirrored ();
-	g3dmesh.do_morph_texels = false;
-	g3dmesh.do_morph_colors = false;
-	g3dmesh.vertex_fog = NULL;
-	g3dmesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
-	g3dmesh.fxmode = 0;//CS_FX_GOURAUD;
-	init = true;
+    g3dmesh.vertex_colors[0] = NULL;			 // pointer to array of csColor for color information.
+    g3dmesh.morph_factor = 0;
+    g3dmesh.num_vertices_pool = 1;
+    g3dmesh.num_textures = 1;
+    g3dmesh.use_vertex_color = false;
+    g3dmesh.do_mirror = rview.IsMirrored ();
+    g3dmesh.do_morph_texels = false;
+    g3dmesh.do_morph_colors = false;
+    g3dmesh.vertex_fog = NULL;
+    g3dmesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
+    g3dmesh.fxmode = 0;//CS_FX_GOURAUD;
+    init = true;
   }
 
   // Render the vertex buffer piece by piece (per texture).
@@ -238,27 +238,27 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   s = 0;
   while (i < mesh->getBinTreeNo())
   {
-	d = mesh->getBinTree(i)->visTriangle() + mesh->getBinTree(i+1)->visTriangle();
-	if (d > 0)
-	{
+    d = mesh->getBinTree(i)->visTriangle() + mesh->getBinTree(i+1)->visTriangle();
+    if (d > 0)
+    {
       if (_textureMap && _textureMap[i/2])
-	    g3dmesh.txt_handle[0] = _textureMap[i/2]->GetTextureHandle ();
-	  // Render this block.
-	  // For software renderer we need to pass in a little bit at a time.
-	  g3dmesh.num_vertices = d*3;	  // number of shared vertices for all triangles
-	  g3dmesh.vertices[0] = (csVector3*) &(vbuf->vbuf[s*3]); // pointer to array of csVector3 for all those verts
-	  g3dmesh.texels[0][0] = (csVector2*) &(vbuf->tbuf[s*3]);	 // pointer to array of csVector2 for uv coordinates
+	g3dmesh.txt_handle[0] = _textureMap[i/2]->GetTextureHandle ();
+      // Render this block.
+      // For software renderer we need to pass in a little bit at a time.
+      g3dmesh.num_vertices = d*3;	  // number of shared vertices for all triangles
+      g3dmesh.vertices[0] = (csVector3*) &(vbuf->vbuf[s*3]); // pointer to array of csVector3 for all those verts
+      g3dmesh.texels[0][0] = (csVector2*) &(vbuf->tbuf[s*3]);	 // pointer to array of csVector2 for uv coordinates
       g3dmesh.num_triangles = d; // number of triangles
       g3dmesh.triangles = (csTriangle *) &(vbuf->ibuf[s*3]);	// pointer to array of csTriangle for all triangles
-	  // Enable clipping for blocks that are not entirely within the view frustrum.
-	  g3dmesh.do_clip = mesh->getBinTree(i)->vis() == ddgIN
-		  && mesh->getBinTree(i+1)->vis() == ddgIN ? false : true;
+      // Enable clipping for blocks that are not entirely within the view frustrum.
+      g3dmesh.do_clip = mesh->getBinTree(i)->vis() == ddgIN
+	&& mesh->getBinTree(i+1)->vis() == ddgIN ? false : true;
 
       rview.g3d->DrawTriangleMesh (g3dmesh);
-	  // Increment the starting offset by the number of triangles that were in this block.
-	  s = s+d;
-	}
-	i = i+2;
+      // Increment the starting offset by the number of triangles that were in this block.
+      s = s+d;
+    }
+    i = i+2;
   }
 }
 
