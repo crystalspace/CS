@@ -69,7 +69,7 @@ void csGLScreenShot::SetData (void* data)
 // On ABGR machines, we also need to swap B/R bytes
   uint32* s = (uint32*)data;
   int x, y;
-  for (y = Height; --y > 0;)
+  for (y = Height; y-- > 0;)
   {
     csRGBpixel* dest = Data + y * Width;
     for (x = 0 ; x < Width; x++)

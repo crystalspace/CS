@@ -46,61 +46,61 @@ int RGB2YUV420 (int x_dim, int y_dim,
 		uint8 *yuv)
 {
   int i, j;
-  uint32 *rgb_line;
-  uint8 *y, *u, *v;
+  uint32 *rgb_line1, *rgb_line2;
+  uint8 *y1, *y2, *u, *v;
   int pitch;
   pitch = x_dim;
 
-  y = yuv;
+  y1 = yuv;
+  y2 = y1 + pitch;
   u = yuv + (x_dim * y_dim);
   x_dim >>= 1;
   y_dim >>= 1;
   v = u + (x_dim * y_dim);
-  rgb_line = (uint32*)bmp;
-
-  int lpitch = (pitch * 2) - (x_dim * 2);
+  rgb_line1 = (uint32*)bmp;
+  rgb_line2 = rgb_line1 + pitch;
 
   for (i=0; i < y_dim; i++){
-    for (j=0;j < x_dim; j++){
+    for (j=0; j < x_dim; j++){
       uint32 tu = 0, tv = 0;
       uint32 c;
       int r, g, b;
       
-      c = *rgb_line;
+      c = *rgb_line1++;
       r = R(c), g = G(c), b = B(c);
-      *y =  ( RGB2YUV_YR[r]  +RGB2YUV_YG[g]+RGB2YUV_YB[b])>>16;
+      *y1++ =
+	( RGB2YUV_YR[r]  +RGB2YUV_YG[g]+RGB2YUV_YB[b])>>16;
       tu += ( RGB2YUV_UR[r]  +RGB2YUV_UG[g]+RGB2YUV_UBVR[b]);
       tv += ( RGB2YUV_UBVR[r]+RGB2YUV_VG[g]+RGB2YUV_VB[b]);
 
-      c = *(rgb_line + 1);
+      c = *rgb_line1++;
       r = R(c), g = G(c), b = B(c);
-      *(y + 1) = 
-	    ( RGB2YUV_YR[r]  +RGB2YUV_YG[g]+RGB2YUV_YB[b])>>16;
+      *y1++ = 
+	( RGB2YUV_YR[r]  +RGB2YUV_YG[g]+RGB2YUV_YB[b])>>16;
       tu += ( RGB2YUV_UR[r]  +RGB2YUV_UG[g]+RGB2YUV_UBVR[b]);
       tv += ( RGB2YUV_UBVR[r]+RGB2YUV_VG[g]+RGB2YUV_VB[b]);
 
-      c = *(rgb_line + pitch);
+      c = *rgb_line2++;
       r = R(c), g = G(c), b = B(c);
-      *(y + pitch) = 
-	    ( RGB2YUV_YR[r]  +RGB2YUV_YG[g]+RGB2YUV_YB[b])>>16;
+      *y2++ = 
+	( RGB2YUV_YR[r]  +RGB2YUV_YG[g]+RGB2YUV_YB[b])>>16;
       tu += ( RGB2YUV_UR[r]  +RGB2YUV_UG[g]+RGB2YUV_UBVR[b]);
       tv += ( RGB2YUV_UBVR[r]+RGB2YUV_VG[g]+RGB2YUV_VB[b]);
 
-      c = *(rgb_line + pitch + 1);
+      c = *rgb_line2++;
       r = R(c), g = G(c), b = B(c);
-      *(y + pitch + 1) = 
-	    ( RGB2YUV_YR[r]  +RGB2YUV_YG[g]+RGB2YUV_YB[b])>>16;
+      *y2++ = 
+	( RGB2YUV_YR[r]  +RGB2YUV_YG[g]+RGB2YUV_YB[b])>>16;
       tu += ( RGB2YUV_UR[r]  +RGB2YUV_UG[g]+RGB2YUV_UBVR[b]);
       tv += ( RGB2YUV_UBVR[r]+RGB2YUV_VG[g]+RGB2YUV_VB[b]);
 
       *u++ = tu >> 18;
       *v++ = tv >> 18;
-
-      y += 2;
-      rgb_line += 2;
     }
-    rgb_line += lpitch;
-    y += lpitch;
+    rgb_line1 += pitch;
+    rgb_line2 += pitch;
+    y1 += pitch;
+    y2 += pitch;
   }
 
   return 0;

@@ -30,6 +30,10 @@ The history order is reversed so that new features are at the top.
 	  lots of nice comments to perlpre.i and perlpost.i.
 	- Oktal fixed a couple of nasty typos (XSRETURN_SV and sv_setpvn)
 	  in the Perl Swig module.
+	- res fixed a stupid mistake in the new GL screenshot causing the 
+	  first line to contain garbage.
+	- res made some slight changes to the movierecorder, hoping that 
+	  performance might be a tad better.
 1-June-2003
 	- Philip Wyett started adding MSVC 7 external app HOWTO screenshot
 	  images.
