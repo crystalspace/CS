@@ -14,16 +14,16 @@
 	  <step plugin="crystalspace.renderloop.step.lightiter">
 	    <steps>
 	      <!-- stencil shadows -->
-	      <step plugin="crystalspace.renderloop.step.shadow.stencil">
-		<steps>
+	      <!--<step plugin="crystalspace.renderloop.step.shadow.stencil">
+		<steps>-->
 		  <!-- diffuse lighting -->
 		  <step plugin="crystalspace.renderloop.step.generic">
 		    <shadertype>diffuse</shadertype>
 		    <zoffset>no</zoffset>
 		    <ztest />
 		  </step>
-		</steps>
-	      </step>
+		<!--</steps>
+	      </step>-->
 	    </steps>
 	  </step>
 	</steps>
@@ -1724,11 +1724,11 @@
             <radius>5</radius>
             <color red="1.5625" green="1.5625" blue="0.784314" />
         </light>
-        <!--<light>
+        <light>
             <center x="1.8" y="-12" z="-8.2" />
             <radius>5</radius>
             <color red="1.5625" green="0.784314" blue="0.392157" />
-        </light>-->
+        </light>
         <meshobj name="e6">
             <plugin>thing</plugin>
             <zuse />
@@ -1864,7 +1864,7 @@
 	    <enable trigger="moveLight" />
         </sequence>
         <sequence name="rotateTorus">
-	    <rotate mesh="Torus02" duration="3000">
+	    <!--<rotate mesh="Torus02" duration="3000">
 	      <rotx>1</rotx>
 	      <v x="1" y="-13" z="-4" />
 	    </rotate>
@@ -1882,7 +1882,7 @@
 	      <v x="0" y="-12" z="-4" />
 	    </rotate>
 	    <delay time="1500" />
-	    <enable trigger="rotateTorus" />
+	    <enable trigger="rotateTorus" />-->
         </sequence>
     </sequences>
     <triggers>
