@@ -21,42 +21,47 @@
 #ifndef __CSUTIL_CSINPUTS_H__
 #define __CSUTIL_CSINPUTS_H__
 
-struct iEvent;
-class csEvent;
+#define CSAXIS_X -1
+#define CSAXIS_Y -2
 
 /**
  * Convert a free-format string into an input event as understood by
  * the csinput library ("Ctrl+a", "alt+shift+mouse1" and so on).
  * Handy for supporting user-defined hot-keys, keyboard accelerators and so on.
- * Returns true if the name could be parsed correctly.
  */
-bool csParseInputDef (const char *name, iEvent *ev,
-	bool use_modifiers = true);
+extern bool csParseInputDef (const char *name, iEvent *ev,
+  bool use_shift = true);
 
-/**
- * Convert a free-format string into an input event as understood by
- * the csinput library ("Ctrl+a", "alt+shift+mouse1" and so on).
- * Handy for supporting user-defined hot-keys, keyboard accelerators and so on.
- * Returns true if the name could be parsed correctly.
- */
-bool csParseInputDef (const char *name, csEvent &ev,
-	bool use_modifiers = true);
+extern bool csParseInputDef (const char *name, csEvent &ev,
+  bool use_shift = true);
 
-/**
- * Performs the reverse conversion; given an event object
- * the routine will copy a string describing the input combination in
- * human-understandable format. Returns true if the event could be
- * described.
- */
-bool csGetInputDesc (iEvent *ev, char *buf, bool use_modifiers = true);
+extern bool csParseKeyDef (const char *name, int &key, int &shift,
+  bool use_shift = true);
+
+extern bool csParseMouseDef (const char *name, int &button, int &shift,
+  bool use_shift = true);
+
+extern bool csParseJoystickDef (const char *name, int &button, int &shift,
+  bool use_shift = true);
 
 /**
  * Performs the reverse conversion; given an event object
  * the routine will copy a string describing the input combination in
- * human-understandable format. Returns true if the event could be
- * described.
+ * human-understandable format.
  */
-bool csGetInputDesc (csEvent &ev, char *buf, bool use_modifiers = true);
+extern bool csGetInputDesc (iEvent *ev, char *buf,
+  bool use_shift = true);
+
+extern bool csGetInputDesc (csEvent &ev, char *buf,
+  bool use_shift = true);
+
+extern bool csGetKeyDesc (int key, int shift, char *buf,
+  bool use_shift = true);
+
+extern bool csGetMouseDesc (int button, int shift, char *buf,
+  bool use_shift = true);
+
+extern bool csGetJoyDesc (int button, int shift, char *buf,
+  bool use_shift = true);
 
 #endif // __CSUTIL_CSINPUTS_H__
-
