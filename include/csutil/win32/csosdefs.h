@@ -562,11 +562,6 @@ int WINAPI WinMain (HINSTANCE hApp, HINSTANCE prev, LPSTR cmd, int show)\
 
 #endif // __CYGWIN32__
 
-/*#ifdef COMP_GCC
-#define CS_REAL_VIRTUAL		virtual
-#define	virtual			CS_REAL_VIRTUAL __attribute__ ((fastcall))
-#endif*/
-
 #if !defined(CS_STATIC_LINKED)
 
 #if !defined(CS_IMPLEMENT_PLATFORM_PLUGIN)
