@@ -42,7 +42,7 @@
 MSVC.PLUGINS.REQUIRED =         \
   cscript/cslua                 \
   cscript/cspython              \
-  font/server/freefont          \
+  font/server/freefont2          \
   mesh/impexp/3ds               \
   sound/driver/waveoutsd        \
   net/driver/ensocket           \
