@@ -29,6 +29,7 @@
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "csqint.h"
+#include "csgfx/rgbpixel.h"
 
 //---------------------------------------------------------- csGraphics2DAA ---
 
@@ -45,6 +46,7 @@ csGraphics2DAA::csGraphics2DAA (iBase *iParent) : csGraphics2D (iParent)
 {
   context = 0;
   EventOutlet = 0;
+  Memory = 0;
 }
 
 csGraphics2DAA::~csGraphics2DAA (void)
@@ -110,13 +112,13 @@ bool csGraphics2DAA::Initialize (iObjectRegistry *object_reg)
   aa_defrenderparams.contrast = config->GetInt
         ("Video.ASCII.Rendering.Contrast", 1);
 
-  Depth = 8;
-  pfmt.PalEntries = 256;
-  pfmt.PixelBytes = 1;
-  pfmt.RedMask    = 0xff;
-  pfmt.GreenMask  = 0xff;
-  pfmt.BlueMask   = 0xff;
-  pfmt.AlphaMask  = 0x00;
+  Depth = 32;
+  pfmt.RedMask   = 0xff << 24;
+  pfmt.GreenMask = 0xff << 16;
+  pfmt.BlueMask  = 0xff << 8;
+  pfmt.AlphaMask = 0x00;
+  pfmt.PalEntries = 0;
+  pfmt.PixelBytes = 4;
   pfmt.complete ();
 
   csRef<iEventQueue> q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
@@ -139,6 +141,7 @@ bool csGraphics2DAA::Open ()
   }
   Width = aa_imgwidth (context);
   Height = aa_imgheight (context);
+  Memory = new unsigned char[ pfmt.PixelBytes*Width*Height ];
 
   aa_autoinitkbd (context, AA_SENDRELEASE);
   aa_autoinitmouse (context, AA_MOUSEALLMASK);
@@ -153,6 +156,8 @@ void csGraphics2DAA::Close ()
   if (!is_open) return;
   if (!context)
     return;
+  if(Memory) delete[] Memory;
+  Memory = 0;
   aa_showcursor (context);
   aa_uninitmouse (context);
   aa_uninitkbd (context);
@@ -185,7 +190,12 @@ void csGraphics2DAA::Print (csRect const* area)
     sy2 = aa_scrheight (context);
   }
 
-  aa_renderpalette (context, palette, &aa_defrenderparams, sx1, sy1, sx2, sy2);
+  // render Memory image to aa context imagebuffer
+  for(int y=0; y<Height; ++y)
+    for(int x=0; x<Width; ++x)
+      context->imagebuffer[y*Width + x] = 
+	((csRGBpixel*)Memory)[y*Width+x].Luminance();
+  aa_render (context, &aa_defrenderparams, sx1, sy1, sx2, sy2);
   aa_flush (context);
 
   /* Get all events from keyboard and mouse and put them into system queue */
@@ -274,20 +284,12 @@ void csGraphics2DAA::SetRGB (int i, int r, int g, int b)
 bool csGraphics2DAA::BeginDraw ()
 {
   csGraphics2D::BeginDraw ();
-  if (FrameBufferLocked != 1)
-    return true;
-
-  Memory = aa_image (context);
   return true;
 }
 
 void csGraphics2DAA::FinishDraw ()
 {
   csGraphics2D::FinishDraw ();
-  if (FrameBufferLocked)
-    return;
-
-  Memory = 0;
 }
 
 bool csGraphics2DAA::SetMousePosition (int x, int y)

@@ -60,6 +60,8 @@ public:
   virtual bool BeginDraw ();
   virtual void FinishDraw ();
 
+  virtual bool DoubleBuffer(bool) {return false;}
+
   virtual bool SetMousePosition (int x, int y);
   virtual bool SetMouseCursor (csMouseCursorID iShape);
 

@@ -13,6 +13,7 @@ chronological order.
 	  - made size a size_t in map2cs AddFile.
 	  - added %ignore in csspace.i for csStringBase::operator[].
 	  - changed strnicmp in csShaderGLCGVP::Compile to csStrNCaseCmp.
+	  - made the asciiart renderer work again.
 	- Jorrit fixed a problem in syntax services where there were too
 	  few parameters to csReport.
 	- res fixed a the std_foo shaders for the recent xmlshader changes.
