@@ -19,6 +19,7 @@
 */
 
 #include "cssys/csshlib.h"
+#include <stdio.h>
 #include <string.h>
 
 // pseudo-prototypes (but compatible) for some OS/2 dynamic-library functions
@@ -28,6 +29,9 @@ extern "C" int DosFreeModule (csLibraryHandle ModuleHandle);
 extern "C" int DosQueryProcAddr (csLibraryHandle ModuleHandle,
   unsigned long Ordinal, const char *FunctionName, void *FunctionAddress);
 
+static char errbuff [100];
+static int lasterr;
+
 csLibraryHandle csFindLoadLibrary (const char *iName)
 {
   return csFindLoadLibrary (NULL, iName, ".dll");
@@ -36,7 +40,7 @@ csLibraryHandle csFindLoadLibrary (const char *iName)
 csLibraryHandle csLoadLibrary (const char* iName)
 {
   csLibraryHandle Handle;
-  if (DosLoadModule ((const char *)0, 0, iName, &Handle))
+  if ((lasterr = DosLoadModule (errbuff, sizeof (errbuff), iName, &Handle)))
     Handle = (csLibraryHandle)0;
   return Handle;
 }
@@ -56,4 +60,5 @@ bool csUnloadLibrary (csLibraryHandle Handle)
 
 void csPrintLibraryError (const char *iModule)
 {
+  fprintf (stderr, "DosLoadModule returns %d, cause module: %s\n", lasterr, errbuff);
 }
