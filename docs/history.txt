@@ -6,6 +6,18 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+30-Nov-2004
+	- Eric Sunshine changed the `friend class csHash' mentions in the hash
+	  iterators so that they once again specify the full templated name:
+	  `friend class csHash<T, K, KeyHandler>'. This reverses a change made
+	  some time back (January 2004) to pacify the buggy Borland compiler
+	  which failed to understand the fully decorated name, however, MSVC6
+	  (at least some versions / patch levels) barfs on the non-decorated
+	  name. Since, at present, we are actively supporting MSVC6, but not
+	  Borland, it makes sense to use the decorated form which pacifies
+	  MSVC6. If, in the future, we need to support both products, we will
+	  have to arrive at some other solution (such as conditional
+	  compilation).
 29-Nov-2004
 	- res changed the static variable cleanup code to employ a variable
 	  with a pointer to the cleanup function instead of using it directly.

@@ -393,7 +393,7 @@ public:
       size(hash->Elements[bucket].Length ())
       { Reset (); }
 
-    friend class csHash;
+    friend class csHash<T, K, KeyHandler>;
   public:
     /// Copy constructor.
     Iterator (const Iterator &o) :
@@ -468,7 +468,7 @@ public:
       FindItem ();
     }
 
-    friend class csHash;
+    friend class csHash<T, K, KeyHandler>;
   public:
     /// Copy constructor.
     GlobalIterator (const Iterator &o) :
@@ -594,7 +594,7 @@ public:
     { }
 
   public:
-    friend class csSet;
+    friend class csSet<T, KeyHandler>;
   };
   friend class GlobalIterator;
 
