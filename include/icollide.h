@@ -87,7 +87,7 @@ struct iCollideSystem : public iPlugIn
   /**
    * Reset the array with collision pairs.
    */
-  virtual csCollisionPair* ResetCollisionPairs () = 0;
+  virtual void ResetCollisionPairs () = 0;
 
   /**
    * Indicate if we are interested only in the first hit that is found.

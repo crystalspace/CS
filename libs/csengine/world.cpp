@@ -603,11 +603,13 @@ csThing* csWorld::GetThing (const char* name)
 
 void csWorld::PrepareTextures ()
 {
+  int i;
+
   iTextureManager* txtmgr = G3D->GetTextureManager ();
   txtmgr->ResetPalette ();
 
   // First register all textures to the texture manager.
-  for (int i = 0; i < textures->Length (); i++)
+  for (i = 0; i < textures->Length (); i++)
   {
     csTextureHandle *csth = textures->Get (i);
     if (!csth->GetTextureHandle ())
@@ -618,7 +620,7 @@ void csWorld::PrepareTextures ()
   txtmgr->PrepareTextures ();
 
   // Then register all materials to the texture manager.
-  for (int i = 0; i < materials->Length (); i++)
+  for (i = 0; i < materials->Length (); i++)
   {
     csMaterialHandle *csth = materials->Get (i);
     if (!csth->GetMaterialHandle ())

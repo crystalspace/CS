@@ -91,7 +91,7 @@ public:
   /**
    * Reset the array with collision pairs.
    */
-  virtual csCollisionPair* ResetCollisionPairs ();
+  virtual void ResetCollisionPairs ();
 
   /**
    * Indicate if we are interested only in the first hit that is found.

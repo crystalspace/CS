@@ -89,7 +89,7 @@ int csRapidCollideSystem::GetNumCollisionPairs ()
   return csRAPIDCollider::numHits;
 }
 
-csCollisionPair* csRapidCollideSystem::ResetCollisionPairs ()
+void csRapidCollideSystem::ResetCollisionPairs ()
 {
   csRAPIDCollider::CollideReset ();
   csRAPIDCollider::numHits = 0;
