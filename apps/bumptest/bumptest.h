@@ -47,6 +47,7 @@ private:
   iLight *bumplight;
   iMaterialWrapper* matBump;
   iLoader *LevelLoader;
+  iGraphics3D *myG3D;
 
   float animli;
   bool going_right;

@@ -70,6 +70,7 @@ BumpTest::BumpTest ()
   bumplight = NULL;
   animli = 0.0;
   going_right = true;
+  myG3D = NULL;
 }
 
 BumpTest::~BumpTest ()
@@ -78,6 +79,7 @@ BumpTest::~BumpTest ()
   if (engine) engine->DecRef ();
   delete prBump;
   if (LevelLoader) LevelLoader->DecRef();
+  if (myG3D) myG3D->DecRef ();
 }
 
 void cleanup ()
@@ -88,7 +90,7 @@ void cleanup ()
 
 bool BumpTest::InitProcDemo ()
 {
-  iTextureManager* txtmgr = G3D->GetTextureManager ();
+  iTextureManager* txtmgr = myG3D->GetTextureManager ();
   iMaterialWrapper* itm = engine->FindMaterial ("wood");
 
   //char *vfsfilename = "/lib/std/mystone2.gif";
@@ -243,7 +245,7 @@ bool BumpTest::InitProcDemo ()
 
   thing_state->InitLightMaps (false);
   room->ShineLights (thing_wrap);
-  thing_state->CreateLightMaps (G3D);
+  thing_state->CreateLightMaps (myG3D);
 
 #if 0
   iMeshFactoryWrapper* sprfact = engine->CreateMeshFactory (
@@ -317,6 +319,13 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
     abort ();
   }
 
+  myG3D = QUERY_PLUGIN (this, iGraphics3D);
+  if (!myG3D)
+  {
+    Printf (MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
+    abort ();
+  }
+
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ("BumpTest Crystal Space Application"))
   {
@@ -326,7 +335,7 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   }
 
   // Setup the texture manager
-  iTextureManager* txtmgr = G3D->GetTextureManager ();
+  iTextureManager* txtmgr = myG3D->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
   // Initialize the texture manager
@@ -448,7 +457,7 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
-  view = engine->CreateView (G3D);
+  view = engine->CreateView (myG3D);
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
   view->SetRectangle (0, 0, FrameWidth, FrameHeight);
@@ -513,19 +522,19 @@ void BumpTest::NextFrame ()
   prBump->RecalcFast(center, normal, xdir, ydir, 1, &l);
 
   // Tell 3D driver we're going to display 3D things.
-  if (!G3D->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
+  if (!myG3D->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
     return;
 
   view->Draw ();
 
   // Start drawing 2D graphics.
-  if (!G3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
+  if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
 
   // Drawing code ends here.
-  G3D->FinishDraw ();
+  myG3D->FinishDraw ();
 
   // Print the final output.
-  G3D->Print (NULL);
+  myG3D->Print (NULL);
 }
 
 bool BumpTest::HandleEvent (iEvent &Event)
