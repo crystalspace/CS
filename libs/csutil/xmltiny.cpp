@@ -378,7 +378,7 @@ int csTinyXmlNode::GetContentsValueAsInt ()
 {
   const char* v = GetContentsValue ();
   if (!v) return 0;
-  int val;
+  int val = 0;
   sscanf (v, "%d", &val);
   return val;
 }
@@ -387,7 +387,7 @@ float csTinyXmlNode::GetContentsValueAsFloat ()
 {
   const char* v = GetContentsValue ();
   if (!v) return 0;
-  float val;
+  float val = 0.0;
   sscanf (v, "%f", &val);
   return val;
 }
