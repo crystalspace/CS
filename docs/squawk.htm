@@ -44,15 +44,16 @@ Currently this application just tests a few ideas:
 
 <h2><a name="#control"></a>Controls</h2>
 
+Run "squawk.exe -help" to see command line options
+
 <pre>
 Esc  exit program
 
-1  show run action
-2  show stand action
-3  show pain action
-4  show death action
-5  show attack action
-6  show jump action
+1  3 view layout (default)
+2  1 view layout
+3  no margin around views
+4  default margin around views
+5  wide margin around views
 </pre>
 
 <h3>Upper view</h3>
@@ -105,15 +106,8 @@ o  look up and right
 <h2><a name="#bugs"></a>Known Bugs</h2>
 
 <ul>
-<li>Converting 24 bit images to 8 bit palettes is <em>very</em>
-slow and TXTMODE=24bit doesn't work for non-lightmapped polygons.
-The skybox uses 24 bit JPEG images again so it takes a <em>long</em>
-time to start in 16 or 8 bit.
-<li>Floating point exceptions in PreparePolygonFX, pol2d.cpp,
-lines 169 and 173.
-<li>Edges of sky box polygons visible because of sloppy texture
-alignment code that allows some wrapping of the non-tiling textures.
-<li>Some sprite polygons vanish when they cross the view plane.
+<li>Edges of sky box polygons visible because of sloppy texture alignment code.
+<li>Sprite polygons vanish when they cross the view plane.
 </ul>
 
 <hr>
@@ -250,7 +244,6 @@ centered around the middle of the screen
 <h3>Controls</h3>
 
 <ul>
-<li>Add view controls to config
 <li>Better keyboard and mouse handling
 <li>Multiple controls that can be used simultaneously
 <li>Control character rather than camera
@@ -261,10 +254,13 @@ centered around the middle of the screen
 <h3>Content</h3>
 
 <ul>
-<li>Create a Squawk or general Crystal Space skybox class
-<li>Transparent color on the treez.mdl
-<li>Configure actions for sprites
-<li>Load .mdl files through VFS
+<li>SetMixmode (CS_FX_KEYCOLOR) should make black
+    completely transparent for Sprites.
+<li>Sprite transparency effects (alpha, and keycolor)
+    should be configurable in world file
+<li>Load some character models and not just scenery.
+    (Can .mdl files be loaded through a library?)
+<li>Dynamic skies (like DDG ROAM program?)
 </ul>
 
 <hr>
