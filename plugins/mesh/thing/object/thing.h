@@ -973,6 +973,8 @@ public:
     {
       scfParent->Prepare ();
       scfParent->PreparePolygonBuffer ();
+      scfParent->PrepareLMs ();
+      scfParent->UpdateDirtyLMs ();
     }
 
     /// Unprepare.

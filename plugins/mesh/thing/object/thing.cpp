@@ -2133,7 +2133,7 @@ void csThing::DrawPolygonArrayDPM (
   mesh.vertex_fog = 0;
   mesh.mixmode = mixmode;
 
-  rview->CalculateFogMesh(tr_o2c,mesh);
+  rview->CalculateFogMesh (tr_o2c,mesh);
   rview->GetGraphics3D ()->DrawPolygonMesh (mesh);
 }
 
@@ -2805,7 +2805,7 @@ void csThing::UpdateDirtyLMs ()
   WorUpdate ();
   bool ident;
   csReversibleTransform o2c;
-  if (cached_movable->IsFullTransformIdentity ())
+  if (!cached_movable || cached_movable->IsFullTransformIdentity ())
   {
     ident = true;
   }

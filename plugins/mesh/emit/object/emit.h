@@ -173,7 +173,8 @@ public:
 
 
 /** emit ages structure */
-class csEmitAge {
+class csEmitAge
+{
 public:
   /// moment of age (in msec)
   int time;

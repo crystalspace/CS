@@ -24,6 +24,11 @@ chronological order.
 	  should be no leak on multiple prepare calls.
 	- Jorrit added a new bugplug 'unprepare' command to unprepare all
 	  thing meshes. Assigned to alt-u.
+	- Jorrit enhanced the iThingState->Prepare() function so that the
+	  lighting is now also done in that stage. This means that the
+	  -prepare option with WalkTest will now prepare things a bit
+	  more. This option causes lag to disappear when new things come
+	  into view.
 	- Eric Sunshine completely overhauled the Texinfo formatting in the new
 	  sprcal3d.txi so that it formats properly on the printed page, and
 	  rewrote much of the discussion.
