@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000-2001 by Jorrit Tyberghein
     Copyright (C) 2000 by Samuel Humphreys
 
     This library is free software; you can redistribute it and/or
@@ -23,9 +23,9 @@
 #include <stdarg.h>
 #include "csobject/csobject.h"
 
-class csTextureWrapper;
-class csMaterialWrapper;
-class csEngine;
+struct iTextureWrapper;
+struct iMaterialWrapper;
+struct iEngine;
 
 struct iSystem;
 struct iGraphics2D;
@@ -43,7 +43,7 @@ protected:
   int texFlags;
 
   // Texture wrapper.
-  csTextureWrapper* tex;
+  iTextureWrapper* tex;
   // Dimensions of texture.
   int mat_w, mat_h; 
   // Procedural G3D and G2D.
@@ -87,7 +87,7 @@ public:
    * texture handle or PrepareTextures. The correct init sequence is:
    * <ul>
    * <li>csProcTexture::Initialize()
-   * <li>csTextureWrapper::Register()
+   * <li>iTextureWrapper::Register()
    * <li>iTextureHandle::Prepare() or iTextureManager::PrepareTextures()
    * <li>csProcTexture::PrepareAnim()
    * </ul>
@@ -105,7 +105,7 @@ public:
    * less flexibility but is sufficient for most cases. The texture and
    * material will get the name that is given by this routine.
    */
-  csMaterialWrapper* Initialize (iSystem* system, csEngine* engine,
+  iMaterialWrapper* Initialize (iSystem* system, iEngine* engine,
       	iTextureManager* txtmgr, const char* name);
 
   /**
@@ -130,7 +130,7 @@ public:
   virtual void Animate (cs_time current_time) = 0;
 
   /// Get the texture corresponding with this procedural texture.
-  csTextureWrapper* GetTextureWrapper () { return tex; }
+  iTextureWrapper* GetTextureWrapper () { return tex; }
 
   static int GetRandom (int max)
   {

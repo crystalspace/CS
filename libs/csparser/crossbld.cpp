@@ -23,19 +23,20 @@
 
 #include "cssysdef.h"
 #include "csparser/crossbld.h"
-#include "csengine/engine.h"
-#include "csengine/texture.h"
-#include "csengine/thing.h"
-#include "csengine/polygon.h"
 #include "csgfx/csimage.h"
 #include "cssys/system.h"
 #include "csutil/scfstrv.h"
 #include "ivideo/texture.h"
-#include "iengine/texture.h"
 #include "ivideo/txtmgr.h"
+#include "iobject/object.h"
 #include "imesh/sprite3d.h"
 #include "imesh/object.h"
+#include "iengine/engine.h"
 #include "iengine/mesh.h"
+#include "iengine/thing.h"
+#include "iengine/polygon.h"
+#include "iengine/ptextype.h"
+#include "iengine/texture.h"
 #include "igraphic/imageio.h"
 
 // helper function for image loading
@@ -189,12 +190,13 @@ csSpriteTemplate *ivconbuild_Quake2csSpriteTemplate(Archive &pakarchive)
 // load textures from a quake-pakked file.  All textures will have
 // their names prefixed by the prefixstring if it is non-NULL
 // returns the 'default' texture for the sprite in this file
-csTextureWrapper *ivconload_Quake2Textures(csEngine *engine,Archive &pakarchive,char const*prefixstring)
+iTextureWrapper *ivconload_Quake2Textures(iEngine *engine,
+	Archive &pakarchive, char const*prefixstring)
 {
   // go through and load all .pcx and .bmp files in the archive
   void *currententry = pakarchive.first_file();
 
-  csTextureWrapper *defaulttexture = NULL;
+  iTextureWrapper *defaulttexture = NULL;
 
   while (currententry != NULL)
   {
@@ -277,59 +279,75 @@ csCrossBuild_ThingTemplateFactory::~csCrossBuild_ThingTemplateFactory()
 }
 
 /// full thing template builder
-void *csCrossBuild_ThingTemplateFactory::CrossBuild(converter &buildsource)
+void *csCrossBuild_ThingTemplateFactory::CrossBuild (converter &buildsource)
 {
-  csThing *newtemplate = new csThing ();
-  CrossBuild ((void*)newtemplate, buildsource);
-  return newtemplate;
+  iEngine* engine = QUERY_PLUGIN (System, iEngine);
+  iMeshObjectType* thing_type = engine->GetThingType ();
+  engine->DecRef ();
+  iMeshObjectFactory* thing_fact = thing_type->NewFactory ();
+  iMeshObject* thing_obj = QUERY_INTERFACE (thing_fact, iMeshObject);
+  thing_fact->DecRef ();
+
+  iThingState* thing_state = QUERY_INTERFACE (thing_obj, iThingState);
+
+  CrossBuild ((void*)thing_state, buildsource);
+  thing_state->DecRef ();
+  return thing_obj;
 }
 
 /// full thing template builder (second variant)
-void csCrossBuild_ThingTemplateFactory::CrossBuild(void* object, converter &buildsource)
+void csCrossBuild_ThingTemplateFactory::CrossBuild (void* object,
+	converter &buildsource)
 {
-  csThing *newtemplate = (csThing*)object;
-  buildsource.set_animation_frame(0);
+  iThingState* thing_state = (iThingState*)object;
+  buildsource.set_animation_frame (0);
 
   // Add the vertices
-  Add_Vertices(*newtemplate, buildsource);
+  Add_Vertices (thing_state, buildsource);
 
   // Build the triangle mesh
-  Build_TriangleMesh(*newtemplate, buildsource);
+  Build_TriangleMesh (thing_state, buildsource);
 }
 
 /// frame build method
-void csCrossBuild_ThingTemplateFactory::Add_Vertices (csThing &framesource, converter& buildsource)
+void csCrossBuild_ThingTemplateFactory::Add_Vertices (
+	iThingState* thing_state, converter& buildsource)
 {
   for (int coordindex=0; coordindex<buildsource.num_cor3; coordindex++)
   {
     // standard 3D coords seem to swap y and z axis compared to CS
-    framesource.AddVertex(
+    thing_state->CreateVertex (
+    	csVector3 (
     		buildsource.cor3[0][coordindex]/20.0,
     		buildsource.cor3[2][coordindex]/20.0,
-    		buildsource.cor3[1][coordindex]/20.0);
+    		buildsource.cor3[1][coordindex]/20.0));
   }
 }
 
 
 /// triangle mesh builder
-void csCrossBuild_ThingTemplateFactory::Build_TriangleMesh(csThing& meshsource,converter& buildsource)
+void csCrossBuild_ThingTemplateFactory::Build_TriangleMesh (
+	iThingState* thing_state, converter& buildsource)
 {
   for (int triangleindex=0; triangleindex<buildsource.num_face; triangleindex++)
   {
     char buf[10];
     sprintf (buf, "t%d", triangleindex);
-    csPolygon3D* ptemp = meshsource.NewPolygon (NULL); //@@@### MATERIAL WRAPPER
+    iPolygon3D* ptemp = thing_state->CreatePolygon ();
+    //@@@ MATERIAL!!! ptemp->SetMaterial (NULL);
     int a = buildsource.face[0][triangleindex];
     int b = buildsource.face[1][triangleindex];
     int c = buildsource.face[2][triangleindex];
-    ptemp->AddVertex (a);
-    ptemp->AddVertex (b);
-    ptemp->AddVertex (c);
+    ptemp->CreateVertex (a);
+    ptemp->CreateVertex (b);
+    ptemp->CreateVertex (c);
     ptemp->SetTextureType (POLYTXT_GOURAUD);
-    csPolyTexGouraud* gs = ptemp->GetGouraudInfo ();
+    iPolyTexType* pt = ptemp->GetPolyTexType ();
+    iPolyTexFlat* gs = QUERY_INTERFACE (pt, iPolyTexFlat);
     gs->SetUV (0, buildsource.cor3_uv[0][a], buildsource.cor3_uv[1][a]);
     gs->SetUV (1, buildsource.cor3_uv[0][b], buildsource.cor3_uv[1][b]);
     gs->SetUV (2, buildsource.cor3_uv[0][c], buildsource.cor3_uv[1][c]);
+    gs->DecRef ();
   }
 }
 
@@ -350,7 +368,7 @@ csCrossBuild_Quake2Importer::~csCrossBuild_Quake2Importer()
 
 iMeshObjectFactory *csCrossBuild_Quake2Importer::Import_Quake2File (
   char const*md2filebase, char const*skinpath, char const*modelname,
-  csEngine *importdestination) const
+  iEngine *importdestination) const
 {
 #if 0
   iFile *modelfile = localVFS.Open(md2filebase,VFS_FILE_READ);
@@ -382,7 +400,7 @@ iMeshObjectFactory *csCrossBuild_Quake2Importer::Import_Quake2File (
     lastslash = '\0';
   }
 
-  csTextureWrapper *defaultskin = Import_Quake2Textures (skinpath,
+  iTextureWrapper *defaultskin = Import_Quake2Textures (skinpath,
     modelname, importdestination);
   
   newtemplate->SetTexture (importdestination->GetTextures (),
@@ -434,14 +452,14 @@ iMeshObjectFactory *csCrossBuild_Quake2Importer::Import_Quake2MeshObjectFactory(
   return NULL;
 }
 
-csTextureWrapper *csCrossBuild_Quake2Importer::Import_Quake2Textures (
-  char const*skinpath, char const*modelname, csEngine *importdestination) const
+iTextureWrapper *csCrossBuild_Quake2Importer::Import_Quake2Textures (
+  char const*skinpath, char const*modelname, iEngine *importdestination) const
 {
   // go through and load all .pcx and .bmp files in the archive
   iStrVector *skinlist = localVFS.FindFiles(skinpath);
   int const skinfilecount = skinlist->Length();
 
-  csTextureWrapper *defaulttexture = NULL;
+  iTextureWrapper *defaulttexture = NULL;
 
   for (int skinfileindex = 0; skinfileindex < skinfilecount; skinfileindex++)
   {
@@ -461,7 +479,7 @@ csTextureWrapper *csCrossBuild_Quake2Importer::Import_Quake2Textures (
       imagedata->DecRef ();
 
       //if (!defaulttexture)
-      defaulttexture = importdestination->GetTextures()->NewTexture (newskin);
+      defaulttexture = importdestination->GetTextureList ()->NewTexture (newskin);
       defaulttexture->Register (System->G3D->GetTextureManager ());
 
       printf("added texture %s...\n",skinfilename);
@@ -472,10 +490,10 @@ csTextureWrapper *csCrossBuild_Quake2Importer::Import_Quake2Textures (
         char *prefixedname = new char[strlen(skinfilename)+strlen(prefixstring)+1];
         strcpy(prefixedname,prefixstring);
 	strcat(prefixedname,skinfilename);
-	defaulttexture->SetName (prefixedname);
+	defaulttexture->QueryObject ()->SetName (prefixedname);
 	delete[] prefixedname;
       }
-      defaulttexture->SetName (skinfilename);
+      defaulttexture->QueryObject ()->SetName (skinfilename);
 
     }
   } /* end for(int skinfileindex...) */

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000-2001 by Jorrit Tyberghein
     Copyright (C) 2000 by Samuel Humphreys
 
     This library is free software; you can redistribute it and/or
@@ -25,11 +25,12 @@
 #include "igraphic/image.h"
 #include "isys/system.h"
 #include "ivideo/txtmgr.h"
+#include "ivideo/material.h"
 
 #include "csgfx/memimage.h"
-#include "csengine/texture.h"
-#include "csengine/material.h"
-#include "csengine/engine.h"
+#include "iengine/texture.h"
+#include "iengine/material.h"
+#include "iengine/engine.h"
 
 #include "csfx/proctex.h"
 
@@ -68,8 +69,10 @@ bool csProcTexture::Initialize (iSystem* system)
   sys = system;
   iImage *proc_image;
   proc_image = (iImage*) new csImageMemory (mat_w, mat_h);
-  
-  tex = csEngine::current_engine->GetTextures ()->NewTexture (proc_image);
+
+  iEngine* engine = QUERY_PLUGIN (system, iEngine);
+  tex = engine->GetTextureList ()->NewTexture (proc_image);
+  engine->DecRef ();
   if (!tex) 
     return false;
 
@@ -77,7 +80,7 @@ bool csProcTexture::Initialize (iSystem* system)
     tex->SetKeyColor (key_red, key_green, key_blue);
 
   tex->SetFlags (tex->GetFlags() | texFlags);
-  tex->SetName (GetName ());
+  tex->QueryObject ()->SetName (GetName ());
   if (use_cb)
     tex->SetUseCallback (ProcCallback, (void*)this);
   ptReady = true;
@@ -94,38 +97,21 @@ bool csProcTexture::PrepareAnim ()
   return true;
 }
 
-csMaterialWrapper* csProcTexture::Initialize (iSystem * system,
-    	csEngine* engine, iTextureManager* txtmgr, const char* name)
+iMaterialWrapper* csProcTexture::Initialize (iSystem * system,
+    	iEngine* engine, iTextureManager* txtmgr, const char* name)
 {
   SetName (name);
   Initialize (system);
   tex->Register (txtmgr);
   tex->GetTextureHandle ()->Prepare ();
   PrepareAnim ();
-  csMaterial* material = new csMaterial ();
-  csMaterialWrapper* mat = engine->GetMaterials ()->NewMaterial (material);
-  mat->SetName (name);
-  material->SetTextureWrapper (&tex->scfiTextureWrapper);
+  iMaterial* material = engine->CreateBaseMaterial (tex);
+  iMaterialWrapper* mat = engine->GetMaterialList ()->NewMaterial (material);
+  mat->QueryObject ()->SetName (name);
   material->DecRef ();
   mat->Register (txtmgr);
   mat->GetMaterialHandle ()->Prepare ();
   return mat;
 }
-
-#if 0
-csMaterialWrapper* csProcTexture::Initialize2 (csEngine* engine, iTextureManager* txtmgr)
-{
-  //PrepareAnim ();
-
-  csMaterial* material = new csMaterial ();
-  csMaterialWrapper* mat = engine->GetMaterials ()->NewMaterial (material);
-  mat->SetName (GetName ());
-  material->SetTextureWrapper (tex);
-  material->DecRef ();
-  mat->Register (txtmgr);
-  mat->GetMaterialHandle ()->Prepare ();
-  return mat;
-}
-#endif
 
 //--------------------------------------------------------------------------------

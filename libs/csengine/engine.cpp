@@ -2066,6 +2066,31 @@ iTerrainFactoryWrapper *csEngine::FindTerrainFactory (const char *iName, bool re
   return iFactory;
 }
 
+iMaterial* csEngine::CreateBaseMaterial (iTextureWrapper* txt)
+{
+  csMaterial* mat = new csMaterial ();
+  if (txt) mat->SetTextureWrapper (txt);
+  iMaterial* imat = QUERY_INTERFACE (mat, iMaterial);
+  imat->DecRef ();
+  return imat;
+}
+
+iMaterial* csEngine::CreateBaseMaterial (iTextureWrapper* txt,
+  	int num_layers, iTextureWrapper** wrappers, csTextureLayer* layers)
+{
+  csMaterial* mat = new csMaterial ();
+  if (txt) mat->SetTextureWrapper (txt);
+  int i;
+  for (i = 0 ; i < num_layers ; i++)
+  {
+    mat->AddTextureLayer (wrappers[i], layers[i].mode,
+    	layers[i].uscale, layers[i].vscale, layers[i].ushift, layers[i].vshift);
+  }
+  iMaterial* imat = QUERY_INTERFACE (mat, iMaterial);
+  imat->DecRef ();
+  return imat;
+}
+
 iTextureList* csEngine::GetTextureList ()
 {
   return &(GetTextures ()->scfiTextureList);
@@ -2641,6 +2666,23 @@ void csEngine::SetContext (iGraphics3D* g3d)
 iClipper2D* csEngine::GetTopLevelClipper ()
 {
   return top_clipper;
+}
+
+iMapNode* csEngine::CreateMapNode (const char* name)
+{
+  csMapNode* mn = new csMapNode (name);
+  iMapNode* imn = QUERY_INTERFACE (mn, iMapNode);
+  imn->DecRef ();
+  return imn;
+}
+
+iKeyValuePair* csEngine::CreateKeyValuePair (const char* key,
+  	const char* value)
+{
+  csKeyValuePair* kv = new csKeyValuePair (key, value);
+  iKeyValuePair* ikey = QUERY_INTERFACE (kv, iKeyValuePair);
+  ikey->DecRef ();
+  return ikey;
 }
 
 //-------------------End-Multi-Context-Support--------------------------------

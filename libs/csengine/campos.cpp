@@ -22,9 +22,9 @@
 #include "csgeom/matrix3.h"
 #include "csutil/util.h"
 
-IMPLEMENT_IBASE (csCameraPosition)
+IMPLEMENT_IBASE_EXT (csCameraPosition)
   IMPLEMENTS_EMBEDDED_INTERFACE (iCameraPosition)
-IMPLEMENT_IBASE_END
+IMPLEMENT_IBASE_EXT_END
 
 IMPLEMENT_EMBEDDED_IBASE (csCameraPosition::CameraPosition)
   IMPLEMENTS_INTERFACE (iCameraPosition)

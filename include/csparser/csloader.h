@@ -52,9 +52,8 @@ struct iTerrainFactoryWrapper;
 struct iTerrainWrapper;
 struct iSector;
 struct iStatLight;
-
-class csKeyValuePair;
-class csMapNode;
+struct iKeyValuePair;
+struct iMapNode;
 
 /**
  * The loader for Crystal Space maps.
@@ -109,9 +108,9 @@ class csLoader : public iLoader
   /// Parse a static light definition and return a new object
   iStatLight* load_statlight (char* name, char* buf);
   /// Parse a key definition and return a new object
-  csKeyValuePair* load_key (char* buf, iObject* pParent);
+  iKeyValuePair* load_key (char* buf, iObject* pParent);
   /// Parse a map node definition and return a new object
-  csMapNode* load_node (char* name, char* buf, iSector* sec);
+  iMapNode* load_node (char* name, char* buf, iSector* sec);
 
   /// Parse and load a single texture
   void txt_process (char *name, char* buf);

@@ -144,12 +144,6 @@ makes proper use of various modules in the engine.  The @file{simple}
 application is the subject of a Crystal Space programming tutorial,
 @ref{Tutorials}.
 
-@cindex @file{simplep}
-@cindex Applications, @file{simplep}
-@item simplep
-A simple example illustrating how to use the Crystal Space engine as a plug-in
-module rather than a statically linked library.
-
 @cindex @file{squawk}
 @cindex Applications, @file{squawk}
 @item squawk

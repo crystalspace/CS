@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 200 by Thomas Hieber
+    Copyright (C) 2000 by Thomas Hieber
     
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -22,6 +22,7 @@
 #include "csgeom/vector3.h"
 #include "csobject/csobject.h"
 #include "csobject/nobjvec.h"
+#include "iengine/keyval.h"
 
 class csSector;
 
@@ -45,6 +46,17 @@ public:
   /// Set the value of a key in an object.
   void SetValue (const char* value);
 
+  DECLARE_IBASE_EXT (csObject);
+  //----------------------- iKeyValuePair --------------------------
+  struct KeyValuePair : public iKeyValuePair
+  {
+    DECLARE_EMBEDDED_IBASE (csKeyValuePair);
+    virtual iObject *QueryObject() { return scfParent; }
+    virtual const char *GetKey () const { return scfParent->GetKey (); }
+    virtual const char *GetValue () const { return scfParent->GetValue (); }
+    virtual void SetValue (const char* value) { scfParent->SetValue (value); }
+  } scfiKeyValuePair;
+
 private:
   char *m_Value;
   CSOBJTYPE;
@@ -65,16 +77,34 @@ public:
   ///
   void SetPosition (const csVector3& pos) { m_Position = pos; }
   ///
-  const csVector3& GetPosition () { return m_Position; }
+  const csVector3& GetPosition () const { return m_Position; }
 
   ///
   void SetSector (csSector *pSector) { m_pSector = pSector; }
   ///
-  csSector *GetSector () { return m_pSector; }
+  csSector *GetSector () const { return m_pSector; }
 
   /// Get a node with the given name and a given classname. (shortcut)
   static csMapNode *GetNode (csSector *pSector, const char *name,
     const char *classname = NULL);
+
+  DECLARE_IBASE_EXT (csObject);
+  //----------------------- iMapNode --------------------------
+  struct MapNode : public iMapNode
+  {
+    DECLARE_EMBEDDED_IBASE (csMapNode);
+    virtual iObject *QueryObject() { return scfParent; }
+    virtual void SetPosition (const csVector3& pos)
+    {
+      scfParent->SetPosition (pos);
+    }
+    virtual const csVector3& GetPosition () const
+    {
+      return scfParent->GetPosition ();
+    }
+    virtual void SetSector (iSector *pSector);
+    virtual iSector *GetSector () const;
+  } scfiMapNode;
 
 private:
   csSector *m_pSector;

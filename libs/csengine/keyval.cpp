@@ -28,8 +28,18 @@ IMPLEMENT_CSOBJTYPE (csKeyValuePair,csObject);
 IMPLEMENT_OBJECT_INTERFACE (csKeyValuePair)
 IMPLEMENT_OBJECT_INTERFACE_END
 
+IMPLEMENT_IBASE_EXT (csKeyValuePair)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iKeyValuePair)
+IMPLEMENT_IBASE_EXT_END
+
+IMPLEMENT_EMBEDDED_IBASE (csKeyValuePair::KeyValuePair)
+  IMPLEMENTS_INTERFACE (iKeyValuePair)
+IMPLEMENT_EMBEDDED_IBASE_END
+
 csKeyValuePair::csKeyValuePair (const char* Key, const char* Value)
 {
+  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiKeyValuePair);
   SetName (Key);
   m_Value = strnew (Value);
 }
@@ -52,8 +62,18 @@ IMPLEMENT_CSOBJTYPE (csMapNode,csObject);
 IMPLEMENT_OBJECT_INTERFACE (csMapNode)
 IMPLEMENT_OBJECT_INTERFACE_END
 
+IMPLEMENT_IBASE_EXT (csMapNode)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iMapNode)
+IMPLEMENT_IBASE_EXT_END
+
+IMPLEMENT_EMBEDDED_IBASE (csMapNode::MapNode)
+  IMPLEMENTS_INTERFACE (iMapNode)
+IMPLEMENT_EMBEDDED_IBASE_END
+
 csMapNode::csMapNode (const char* Name) : m_Position (0, 0, 0)
 {
+  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiMapNode);
   SetName (Name);
 }
 
@@ -72,6 +92,18 @@ csMapNode* csMapNode::GetNode (csSector *pSector, const char* name,
   }
 
   return NULL;
+}
+
+void csMapNode::MapNode::SetSector (iSector *pSector)
+{
+  scfParent->SetSector (pSector->GetPrivateObject ());
+}
+
+iSector* csMapNode::MapNode::GetSector () const
+{
+  iSector* sec = QUERY_INTERFACE (scfParent->GetSector (), iSector);
+  sec->DecRef ();
+  return sec;
 }
 
 //---------------------------------------------------------------------------

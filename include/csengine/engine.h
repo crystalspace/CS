@@ -826,6 +826,13 @@ public:
    */
   csMaterialList* GetMaterials () { return materials; }
 
+  /**
+   * Create a base material.
+   */
+  virtual iMaterial* CreateBaseMaterial (iTextureWrapper* txt);
+  virtual iMaterial* CreateBaseMaterial (iTextureWrapper* txt,
+  	int num_layers, iTextureWrapper** wrappers, csTextureLayer* layers);
+
   virtual iMaterialList* GetMaterialList ();
   virtual iTextureList* GetTextureList ();
 
@@ -1229,6 +1236,12 @@ public:
   	bool regionOnly = false);
 
   virtual iClipper2D* GetTopLevelClipper ();
+
+  /// Create a map node.
+  virtual iMapNode* CreateMapNode (const char* name);
+  /// Create a key value pair.
+  virtual iKeyValuePair* CreateKeyValuePair (const char* key,
+  	const char* value);
 
   //--------------------- iConfig interface implementation --------------------
 

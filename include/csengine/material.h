@@ -70,33 +70,31 @@ public:
   virtual ~csMaterial ();
 
   /// Get the flat shading color
-  inline csRGBcolor& GetFlatColor ();
-  /// Set the flat shading color
-  inline void SetFlatColor (const csRGBcolor& col);
+  csRGBcolor& GetFlatColor () { return flat_color; }
+
+  /// Get diffuse reflection constant for the material
+  float GetDiffuse () const { return diffuse; }
+  /// Set diffuse reflection constant for the material
+  void SetDiffuse (float val) { diffuse = val; }
+
+  /// Get ambient lighting for the material
+  float GetAmbient () const { return ambient; }
+  /// Set ambient lighting for the material
+  void SetAmbient (float val) { ambient = val; }
+
+  /// Get reflection of the material
+  float GetReflection () const { return reflection; }
+  /// Set reflection of the material
+  void SetReflection (float val) { reflection = val; }
 
   /// Get the texture (if none NULL is returned)
-  inline iTextureWrapper *GetTextureWrapper () const;
+  iTextureWrapper *GetTextureWrapper () const { return texture; }
   /// Set the texture (pass NULL to set no texture)
   void SetTextureWrapper (iTextureWrapper *tex);
 
   /// Add a texture layer (currently only one supported).
   void AddTextureLayer (iTextureWrapper* txtwrap, UInt mode,
       	int uscale, int vscale, int ushift, int vshift);
-  
-  /// Get diffuse reflection constant for the material
-  inline float GetDiffuse () const;
-  /// Set diffuse reflection constant for the material
-  inline void SetDiffuse (float val);
-
-  /// Get ambient lighting for the material
-  inline float GetAmbient () const;
-  /// Set ambient lighting for the material
-  inline void SetAmbient (float val);
-
-  /// Get reflection of the material
-  inline float GetReflection () const;
-  /// Set reflection of the material
-  inline void SetReflection (float val);
 
   //--------------------- iMaterial implementation ---------------------
 
@@ -108,9 +106,19 @@ public:
   virtual csTextureLayer* GetTextureLayer (int idx);
   /// Get flat color.
   virtual void GetFlatColor (csRGBpixel &oColor);
+  /// Set the flat shading color
+  virtual void SetFlatColor (const csRGBcolor& col) { flat_color = col; }
   /// Get reflection values (diffuse, ambient, reflection).
   virtual void GetReflection (float &oDiffuse, float &oAmbient,
     float &oReflection);
+  /// Set reflection values (diffuse, ambient, reflection).
+  virtual void SetReflection (float oDiffuse, float oAmbient,
+    float oReflection)
+  {
+    diffuse = oDiffuse;
+    ambient = oAmbient;
+    reflection = oReflection;
+  }
 
   DECLARE_IBASE;
 };
@@ -141,7 +149,7 @@ public:
    */
   void SetMaterialHandle (iMaterialHandle *mat);
   /// Get the material handle.
-  inline iMaterialHandle* GetMaterialHandle ();
+  iMaterialHandle* GetMaterialHandle () { return handle; }
 
   /**
    * Change the base material. Note: The changes will not be visible until
@@ -149,7 +157,7 @@ public:
    */
   void SetMaterial (iMaterial* material);
   /// Get the original material.
-  inline iMaterial* GetMaterial ();
+  iMaterial* GetMaterial () { return material; }
 
   /// Register the material with the texture manager
   void Register (iTextureManager *txtmng);
@@ -250,31 +258,5 @@ public:
     }
   } scfiMaterialList;
 };
-
-//--- implementation of inline methods ---------------------------------------
-
-inline csRGBcolor& csMaterial::GetFlatColor ()
-{ return flat_color; }
-inline void csMaterial::SetFlatColor (const csRGBcolor& col)
-{ flat_color = col; }
-inline iTextureWrapper *csMaterial::GetTextureWrapper () const
-{ return texture; }
-inline float csMaterial::GetDiffuse () const
-{ return diffuse; }
-inline void csMaterial::SetDiffuse (float val)
-{ diffuse = val; }
-inline float csMaterial::GetAmbient () const
-{ return ambient; }
-inline void csMaterial::SetAmbient (float val)
-{ ambient = val; }
-inline float csMaterial::GetReflection () const
-{ return reflection; }
-inline void csMaterial::SetReflection (float val)
-{ reflection = val; }
-
-inline iMaterialHandle* csMaterialWrapper::GetMaterialHandle ()
-{ return handle; }
-inline iMaterial* csMaterialWrapper::GetMaterial ()
-{ return material; }
 
 #endif // __CS_MATERIAL_H__

@@ -28,6 +28,7 @@ class csEngine;
 class csVector3;
 class csMatrix3;
 class csColor;
+class csTextureLayer;
 
 struct iSector;
 struct iStatLight;
@@ -38,6 +39,7 @@ struct iMeshObjectFactory;
 struct iMeshWrapper;
 struct iMeshFactoryWrapper;
 struct iMeshObjectType;
+struct iMaterial;
 struct iMaterialWrapper;
 struct iMaterialList;
 struct iTextureWrapper;
@@ -58,6 +60,8 @@ struct iCollection;
 struct iDataBuffer;
 struct iCamera;
 struct iRenderView;
+struct iMapNode;
+struct iKeyValuePair;
 
 /**
  * Flag for GetNearbyLights().
@@ -133,7 +137,7 @@ struct iRenderView;
 typedef void (csDrawFunc) (iRenderView* rview, int type, void* entity);
 
 
-SCF_VERSION (iEngine, 0, 1, 25);
+SCF_VERSION (iEngine, 0, 1, 26);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -210,6 +214,19 @@ struct iEngine : public iPlugIn
   virtual long GetAlphaRenderPriority () const = 0;
   /// Clear all render priorities.
   virtual void ClearRenderPriorities () = 0;
+
+  /**
+   * Create a base material that can be used to give to the texture
+   * manager.
+   */
+  virtual iMaterial* CreateBaseMaterial (iTextureWrapper* txt) = 0;
+
+  /**
+   * Create a base material that can be used to give to the texture
+   * manager. This version also supports texture layers.
+   */
+  virtual iMaterial* CreateBaseMaterial (iTextureWrapper* txt,
+  	int num_layers, iTextureWrapper** wrappers, csTextureLayer* layers) = 0;
 
   /// Register a texture to be loaded during Prepare()
   virtual iTextureWrapper* CreateTexture (const char *iName,
@@ -536,6 +553,12 @@ struct iEngine : public iPlugIn
 
   /// Set the drawing context
   virtual void SetContext (iGraphics3D*) = 0;
+
+  /// Create a map node.
+  virtual iMapNode* CreateMapNode (const char* name) = 0;
+  /// Create a key value pair.
+  virtual iKeyValuePair* CreateKeyValuePair (const char* key,
+  	const char* value) = 0;
 };
 
 #endif // __IENGINE_ENGINE_H__

@@ -4,6 +4,31 @@ The history order is reversed so that new features are at the top.
 	- Completely removed Crystal Clear from CS. It is now obsolete
 	  and no longer maintained. This removal was done with the permission
 	  of Michael Dale Long.
+	- Enhanced iMaterial with a number of methods to set various
+	  stuff.
+	- Added iEngine::CreateBaseMaterial() to create a csMaterial
+	  and return the iMaterial. This allows the engine to be used
+	  as a plugin in more places.
+	- Changed the procedural textures in csfx to use iEngine,
+	  iMaterialWrapper, and iTextureWrapper instead of csEngine,
+	  csMaterialWrapper, and csTextureWrapper. That way these classes
+	  can be used together with the engine as a plugin.
+	- Rewrote the crossbuild/impexp part of the loader to use iThingState
+	  instead of csThing directly. In additional also use iTextureWrapper
+	  and iEngine instead of csTextureWrapper and csEngine.
+	- Added iKeyValuePair and iMapNode which are SCF interfaces for
+	  csKeyValuePair and csMapNode.
+	- Added iEngine::CreateMapNode() and iEngine::CreateKeyValuePair()
+	  to create above objects.
+	- The above changes make the loader independent of the engine library.
+	- Fixed a bug in the SCF code of csCameraPosition. Please people,
+	  do NOT use DECLARE_IBASE if you inherit from something that already
+	  declares IBASE. Use DECLARE_IBASE_EXT()!!!! In addition use
+	  IMPLEMENT_IBASE_EXT!!!
+	- Rewrote simple to use the engine as a plugin.
+	- Removed simplep since that app is now no longer useful (as its
+	  only purpose was to demonstrate how to use the engine as a plugin,
+	  but simple does that now).
 29-May-2001
 	- Michael Voasse added accessor functions to iCameraPosition for
 	  sector, position upward vector and forward vector.

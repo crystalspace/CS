@@ -30,10 +30,9 @@ struct iSprite3DFactoryState;
 struct iMeshObjectFactory;
 struct iSpriteAction;
 struct iSpriteFrame;
-class csThing;
-class csThingTemplate;
-class csTextureWrapper;
-class csEngine;
+struct iThingState;
+struct iTextureWrapper;
+struct iEngine;
 
 /**
  * The general cross builder interface.  All cross builders inherit from
@@ -140,7 +139,7 @@ class csCrossBuild_SpriteTemplateFactory : public csCrossBuild_Factory
 /**
  * The thing template factory makes a whole thing template by
  * extracting the first frame from a converter and stuffing it
- * into a csThing object.
+ * into a iThingState object.
  * Note that the converted thing will be using gouraud shading.
  */
 class csCrossBuild_ThingTemplateFactory : public csCrossBuild_Factory
@@ -172,13 +171,13 @@ class csCrossBuild_ThingTemplateFactory : public csCrossBuild_Factory
     /**
      * Add all vertices to the thing template.
      */
-    void Add_Vertices (csThing&, converter&);
+    void Add_Vertices (iThingState*, converter&);
 
     /**
      * Make triangle mesh by extracting data from the
      * converter data
      */
-    void Build_TriangleMesh(csThing&, converter&);
+    void Build_TriangleMesh (iThingState*, converter&);
 };
 
 /**
@@ -218,8 +217,8 @@ class csCrossBuild_Quake2Importer
     // find textures in a directory and add to the engine.  the texture names
     // are made by concatinating the modelname passed in and the
     // texture file name
-    csTextureWrapper* Import_Quake2Textures(char const* skinpath,
-      char const* modelname, csEngine*) const;
+    iTextureWrapper* Import_Quake2Textures(char const* skinpath,
+      char const* modelname, iEngine*) const;
 
     // given a prefix representing an action name, make a csSpriteAction
     // by concatinating all the frames that start with that prefix
@@ -248,7 +247,7 @@ class csCrossBuild_Quake2Importer
      * 'skinpath' is NULL, looks in the same directory as the geometry file.
      */
     iMeshObjectFactory *Import_Quake2File(char const* md2filebase,
-      char const* skinpath, char const* modelname, csEngine*) const;
+      char const* skinpath, char const* modelname, iEngine*) const;
 };
 
 #endif // __CS_CROSSBLD_H__

@@ -64,7 +64,7 @@ public:
 
   CSOBJTYPE;
   DECLARE_OBJECT_INTERFACE;
-  DECLARE_IBASE;
+  DECLARE_IBASE_EXT (csPObject);
 
   //--------------------- iCameraPosition implementation ----------------------
   struct CameraPosition : public iCameraPosition

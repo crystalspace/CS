@@ -30,6 +30,7 @@
 
 struct iTextureHandle;
 struct csRGBpixel;
+struct csRGBcolor;
 
 /**
  * This structure represents an extra texture
@@ -43,7 +44,7 @@ struct csTextureLayer
   int ushift, vshift;	// Txt mapping shift relative to parent texture
 };
 
-SCF_VERSION (iMaterial, 0, 0, 3);
+SCF_VERSION (iMaterial, 0, 0, 4);
 
 /**
  * This class represents a material as seen from the engine
@@ -75,11 +76,21 @@ struct iMaterial : public iBase
    * will return the mean texture color.
    */
   virtual void GetFlatColor (csRGBpixel &oColor) = 0;
+  /**
+   * Set the flat shading color.
+   */
+  virtual void SetFlatColor (const csRGBcolor& col) = 0;
 
   /**
    * Get light reflection parameters for this material.
    */
-  virtual void GetReflection (float &oDiffuse, float &oAmbient, float &oReflection) = 0;
+  virtual void GetReflection (
+  	float &oDiffuse, float &oAmbient, float &oReflection) = 0;
+  /**
+   * Set the reflection parameters.
+   */
+  virtual void SetReflection (float oDiffuse, float oAmbient,
+    float oReflection) = 0;
 };
 
 SCF_VERSION (iMaterialHandle, 0, 0, 2);

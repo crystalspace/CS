@@ -38,6 +38,7 @@
 #include "iengine/skelbone.h"
 #include "iengine/region.h"
 #include "iengine/texture.h"
+#include "iengine/material.h"
 #include "iengine/terrain.h"
 #include "iengine/collectn.h"
 #include "iengine/sector.h"
@@ -49,6 +50,7 @@
 #include "iengine/statlght.h"
 #include "iengine/mesh.h"
 #include "iengine/thing.h"
+#include "iengine/keyval.h"
 #include "isound/data.h"
 #include "isound/loader.h"
 #include "isound/renderer.h"
@@ -56,14 +58,12 @@
 #include "iterrain/ddg.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
+#include "ivideo/material.h"
 #include "isys/vfs.h"
 #include "isys/system.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "ivaria/strserv.h"
-
-#include "csengine/material.h"
-#include "csengine/keyval.h"
 
 //---------------------------------------------------------------------------
 
@@ -330,8 +330,7 @@ iMaterialWrapper *csLoader::FindMaterial (const char *iName)
   if (tex)
   {
     // Add a default material with the same name as the texture
-    csMaterial *material = new csMaterial ();
-    material->SetTextureWrapper (tex);
+    iMaterial* material = Engine->CreateBaseMaterial (tex);
     iMaterialWrapper *mat = Engine->GetMaterialList ()->NewMaterial (material);
     mat->QueryObject()->SetName (iName);
     material->DecRef ();
@@ -479,7 +478,7 @@ iStatLight* csLoader::load_statlight (char* name, char* buf)
   } halo;
 
   memset (&halo, 0, sizeof (halo));
-  csKeyValuePair* kvp = NULL;
+  iKeyValuePair* kvp = NULL;
 
   if (strchr (buf, ':'))
   {
@@ -581,19 +580,19 @@ defaulthalo:
       break;
   }
   l->QueryLight ()->SetAttenuation (attenuation);
-  if (kvp) l->QueryObject ()->ObjAdd (kvp);
+  if (kvp) l->QueryObject ()->ObjAdd (kvp->QueryObject ());
   return l;
 }
 
-csKeyValuePair* csLoader::load_key (char* buf, iObject* pParent)
+iKeyValuePair* csLoader::load_key (char* buf, iObject* pParent)
 {
   char Key  [256];
   char Value[10000]; //Value can potentially grow _very_ large.
   if (ScanStr(buf, "%S,%S", Key, Value) == 2)
   {
-    csKeyValuePair* kvp = new csKeyValuePair(Key, Value);
+    iKeyValuePair* kvp = Engine->CreateKeyValuePair (Key, Value);
     if (pParent)
-      pParent->ObjAdd (kvp);
+      pParent->ObjAdd (kvp->QueryObject ());
     return kvp;
   }
   else
@@ -605,7 +604,7 @@ csKeyValuePair* csLoader::load_key (char* buf, iObject* pParent)
   }
 }
 
-csMapNode* csLoader::load_node (char* name, char* buf, iSector* sec)
+iMapNode* csLoader::load_node (char* name, char* buf, iSector* sec)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (ADDON)
@@ -613,8 +612,8 @@ csMapNode* csLoader::load_node (char* name, char* buf, iSector* sec)
     CS_TOKEN_TABLE (POSITION)
   CS_TOKEN_TABLE_END
 
-  csMapNode* pNode = new csMapNode (name);
-  pNode->SetSector (sec->GetPrivateObject());
+  iMapNode* pNode = Engine->CreateMapNode (name);
+  pNode->SetSector (sec);
 
   long  cmd;
   char* xname;
@@ -637,7 +636,7 @@ csMapNode* csLoader::load_node (char* name, char* buf, iSector* sec)
         System->Printf (MSG_WARNING, "ADDON not yet supported in node!\n");
       	break;
       case CS_TOKEN_KEY:
-        load_key(params, pNode);
+        load_key (params, pNode->QueryObject ());
         break;
       case CS_TOKEN_POSITION:
         ScanStr (params, "%f,%f,%f", &x, &y, &z);
@@ -1205,9 +1204,16 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
   long cmd;
   char *params;
   char str [255];
-  float tmp;
 
-  csMaterial* material = new csMaterial ();
+  iTextureWrapper* texh;
+  bool col_set = false;
+  csRGBcolor col;
+  float diffuse = CS_DEFMAT_DIFFUSE;
+  float ambient = CS_DEFMAT_AMBIENT;
+  float reflection = CS_DEFMAT_REFLECTION;
+  int num_txt_layer = 0;
+  csTextureLayer layers[4];
+  iTextureWrapper* txt_layers[4];
 
   while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
   {
@@ -1216,37 +1222,43 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
       case CS_TOKEN_TEXTURE:
       {
         ScanStr (params, "%s", str);
-        iTextureWrapper *texh = Engine->FindTexture (str, ResolveOnlyRegion);
-        if (texh)
-          material->SetTextureWrapper (texh);
-        else
+        texh = Engine->FindTexture (str, ResolveOnlyRegion);
+        if (!texh)
         {
-          System->Printf (MSG_FATAL_ERROR, "Cannot find texture `%s' for material `%s'\n", str, name);
+          System->Printf (MSG_FATAL_ERROR,
+	  	"Cannot find texture `%s' for material `%s'\n", str, name);
           fatal_exit (0, false);
         }
         break;
       }
       case CS_TOKEN_COLOR:
-        load_color (params, material->GetFlatColor ());
+        col_set = true;
+        load_color (params, col);
         break;
       case CS_TOKEN_DIFFUSE:
-        ScanStr (params, "%f", &tmp);
-        material->SetDiffuse (tmp);
+        ScanStr (params, "%f", &diffuse);
         break;
       case CS_TOKEN_AMBIENT:
-        ScanStr (params, "%f", &tmp);
-        material->SetAmbient (tmp);
+        ScanStr (params, "%f", &ambient);
         break;
       case CS_TOKEN_REFLECTION:
-        ScanStr (params, "%f", &tmp);
-        material->SetReflection (tmp);
+        ScanStr (params, "%f", &reflection);
         break;
       case CS_TOKEN_LAYER:
 	{
-	  iTextureWrapper* layer_texture = NULL;
-	  int layer_uscale = 1, layer_vscale = 1;
-	  int layer_ushift = 0, layer_vshift = 0;
-	  UInt layer_mode = CS_FX_ADD;
+	  if (num_txt_layer >= 4)
+	  {
+            System->Printf (MSG_FATAL_ERROR,
+	  	"Only four texture layers supported!\n");
+            fatal_exit (0, false);
+	  }
+	  txt_layers[num_txt_layer] = NULL;
+	  layers[num_txt_layer].txt_handle = NULL;
+	  layers[num_txt_layer].uscale = 1;
+	  layers[num_txt_layer].vscale = 1;
+	  layers[num_txt_layer].ushift = 0;
+	  layers[num_txt_layer].vshift = 0;
+	  layers[num_txt_layer].mode = CS_FX_ADD;
 	  char* params2;
 	  while ((cmd = csGetCommand (&params, layerCommands,
 		&params2)) > 0)
@@ -1256,29 +1268,35 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
 	      case CS_TOKEN_TEXTURE:
 		{
                   ScanStr (params2, "%s", str);
-                  iTextureWrapper *texh = Engine->FindTexture (str, ResolveOnlyRegion);
+                  iTextureWrapper *texh = Engine->FindTexture (str,
+		  	ResolveOnlyRegion);
                   if (texh)
-                    layer_texture = texh;
+                    txt_layers[num_txt_layer] = texh;
                   else
                   {
-                    System->Printf (MSG_FATAL_ERROR, "Cannot find texture `%s' for material `%s'\n", str, name);
+                    System->Printf (MSG_FATAL_ERROR,
+		    	"Cannot find texture `%s' for material `%s'\n",
+			str, name);
                     fatal_exit (0, false);
                   }
 		}
 		break;
 	      case CS_TOKEN_SCALE:
-	        ScanStr (params2, "%d,%d", &layer_uscale, &layer_vscale);
+	        ScanStr (params2, "%d,%d",
+			&layers[num_txt_layer].uscale,
+			&layers[num_txt_layer].vscale);
 	        break;
 	      case CS_TOKEN_SHIFT:
-	        ScanStr (params2, "%d,%d", &layer_ushift, &layer_vshift);
+	        ScanStr (params2, "%d,%d",
+			&layers[num_txt_layer].ushift,
+			&layers[num_txt_layer].vshift);
 	        break;
 	      case CS_TOKEN_MIXMODE:
-	        layer_mode = ParseMixmode (params2);
+	        layers[num_txt_layer].mode = ParseMixmode (params2);
 	        break;
 	    }
 	  }
-	  material->AddTextureLayer (layer_texture, layer_mode,
-	    layer_uscale, layer_vscale, layer_ushift, layer_vshift);
+	  num_txt_layer++;
 	}
         break;
     }
@@ -1290,6 +1308,11 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
     fatal_exit (0, false);
   }
 
+  iMaterial* material = Engine->CreateBaseMaterial (texh,
+  	num_txt_layer, txt_layers, layers);
+  if (col_set)
+    material->SetFlatColor (col);
+  material->SetReflection (diffuse, ambient, reflection);
   iMaterialWrapper *mat = Engine->GetMaterialList ()->NewMaterial (material);
   if (prefix)
   {
@@ -1370,7 +1393,8 @@ iSector* csLoader::load_sector (char* secname, char* buf)
         sector->AddLight ( load_statlight(name, params) );
         break;
       case CS_TOKEN_NODE:
-        sector->QueryObject ()->ObjAdd (load_node(name, params, sector));
+        sector->QueryObject ()->ObjAdd (load_node(name, params, sector)->
+		QueryObject ());
         break;
       case CS_TOKEN_FOG:
         {
@@ -2804,7 +2828,8 @@ iImage* csLoader::LoadImage (const char* name, int Format)
   return ifile;
 }
 
-iTextureHandle *csLoader::LoadTexture (const char *fname, int Flags, iTextureManager *tm)
+iTextureHandle *csLoader::LoadTexture (const char *fname, int Flags,
+	iTextureManager *tm)
 {
   if (!tm)
   {
@@ -2835,16 +2860,15 @@ iTextureWrapper *csLoader::LoadTexture (const char *name, const char *fname,
     return NULL;
 
   iTextureWrapper *TexWrapper =
-	Engine->GetTextureList()->NewTexture(TexHandle);
-  TexWrapper->QueryObject()->SetName (name);
+	Engine->GetTextureList ()->NewTexture(TexHandle);
+  TexWrapper->QueryObject ()->SetName (name);
 
-  csMaterial *Material = new csMaterial ();
-  Material->SetTextureWrapper (TexWrapper);
+  iMaterial* material = Engine->CreateBaseMaterial (TexWrapper);
 
-  iMaterialWrapper *MatWrapper = Engine->GetMaterialList()->
-    NewMaterial (Material);
-  MatWrapper->QueryObject()->SetName (name);
-  Material->DecRef ();
+  iMaterialWrapper *MatWrapper = Engine->GetMaterialList ()->
+    NewMaterial (material);
+  MatWrapper->QueryObject ()->SetName (name);
+  material->DecRef ();
 
   return TexWrapper;
 }
