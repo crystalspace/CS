@@ -1,26 +1,70 @@
+// test program -- should go away as loader gets debugged.....
+
+//
+// WARNING
+//
+// To successfully run this program, find the lines:
+//
+//  if (!(G3D = QUERY_PLUGIN (sys, iGraphics3D)))
+//    return false;
+//
+// inside world.cpp (method csWorld::Initialize) and temporarily
+// comment them out with an #if 0 ... #endif.
+//
+
 #include "sysdef.h"
+#include "cssys/system.h"
+#include "csutil/inifile.h"
+#include "csengine/sector.h"
+#include "csengine/world.h"
+#include "csengine/csview.h"
+#include "csengine/camera.h"
+#include "csengine/light.h"
+#include "csengine/polygon.h"
+#include "csparser/csloader.h"
+#include "cssys/sysdriv.h"
+#include "igraph3d.h"
+#include "itxtmgr.h"
+#include "iconsole.h"
+
 #include "stdldr.h"
-#include <malloc.h>
-#include <stdio.h>
 
-int main ()
+REGISTER_STATIC_LIBRARY (vfs)
+REGISTER_STATIC_LIBRARY (engine)
+
+class MyApp : public SysSystemDriver
 {
-  csStandardLoader ldr (NULL);
+public:
+  MyApp () : SysSystemDriver () {}
+  virtual bool CheckDrivers ()
+  { return true; }
+};
 
-  FILE *f = fopen ("plugins/csstdldr/test/world.test", "rb");
-  if (!f)
+int main (int argc, char* argv[])
+{
+  System = new MyApp ();
+  csWorld::System = System;
+
+  System->RequestPlugin ("crystalspace.kernel.vfs");
+  System->RequestPlugin ("crystalspace.engine.core");
+
+  if (!System->Initialize (argc, argv, NULL))
   {
-    fprintf (stderr, "cant open input file\n");
-    return -1;
+    System->Printf (MSG_FATAL_ERROR, "Error initializing system!\n");
+    exit (1);
   }
-  fseek (f, 0, SEEK_END);
-  size_t size = ftell (f);
-  fseek (f, 0, SEEK_SET);
-  char *data = (char *)malloc (size);
-  fread (data, size, 1, f);
-  fclose (f);
 
-  printf ("success: %d\n", ldr.Parse (data));
+  csStandardLoader *ldr = new csStandardLoader (NULL);
+  if (!ldr->Initialize (System))
+  {
+    System->Printf (MSG_FATAL_ERROR, "Failed to initialize loader\n");
+    exit (1);
+  }
+
+  printf ("Success: %d\n", ldr->Load ("/this/plugins/csstdldr/test/world.test"));
+
+  delete ldr;
+  delete System;
 
   return 0;
 }

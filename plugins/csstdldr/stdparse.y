@@ -25,6 +25,9 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 
+#include "iworld.h"
+#include "itxtmgr.h"
+
 // Unfortunately we can't make yyparse a member function because of the
 // dumb prototype definition in bison.simple :-(
 //#define yyparse csStandardLoader::yyparse
@@ -42,10 +45,17 @@
 #define CSVECTOR2(x)	(*(csVector2 *)&x)
 #define CSVECTOR3(x)	(*(csVector3 *)&x)
 
+// More shortcuts
+#define STORAGE		THIS->storage
+#define TEX		THIS->storage.tex
+
 %} /* Definition for all tokens */
 
 /* Tell Bison to build a table with all token names */
 %token_table
+
+/* We want a re-enterant parser */
+%pure_parser
 
 /* Define the top-level non-terminal symbol */
 %start input
@@ -67,7 +77,7 @@
   // A string value
   char *string;
   // A color
-  struct { float red, green, blue; } color;
+  csPColor color;
   // A 2D point
   struct { float x, y; } vect2;
   // A 3D point
@@ -75,7 +85,7 @@
   // A transformation matrix
   csMatrix3 *matrix;
   // A transformation matrix/vector
-  csTransform *transform;
+  csStandardLoader::yystorage *transform;
 }
 
 /*
@@ -126,6 +136,8 @@
 %token KW_FLOOR_HEIGHT
 %token KW_FLOOR_TEXTURE
 %token KW_FOG
+%token KW_FOR_2D
+%token KW_FOR_3D
 %token KW_FRAME
 %token KW_GOURAUD
 %token KW_HALO
@@ -242,306 +254,54 @@
 
 %% /* Grammar */
 
-/*-- General-use non-terminals -----------------------------------------------*/
-
-/*
-    GENERAL NOTE: To minimize space occupied by pre-tokenized data,
-    the ',' characters between numbers are removed. Thus the lists of
-    numbers will look like "NUMBER NUMBER NUMBER" instead of (how it
-    should be in the most obvious case) "NUMBER ',' NUMBER ',' NUMBER".
-*/
-
-/* A name - either empty or defined */
-name:
-  /* empty == no name */
-  { $$ = NULL; }
-| STRING
-;
-
-/* Yes or no - the result is a boolean */
-yesno:
-  KW_yes				{ $$ = true; }
-| KW_no					{ $$ = false; }
-;
-
-/* The definition of a color - red, green, blue from 0 to 1 */
-color:
-  NUMBER NUMBER NUMBER			{ CSCOLOR ($$).Set ($1, $2, $3); }
-;
-
-/* Simply a vector */
-vector:
-  NUMBER NUMBER NUMBER			{ CSVECTOR3 ($$).Set ($1, $2, $3); }
-;
-
-/* A vector defined either directly or using a vertex index */
-vect_idx:
-  NUMBER				{ $$.x = $$.y = $$.z = 0; }
-| vector
-;
-
-/* A 2D vector */
-vector2:
-  NUMBER NUMBER				{ CSVECTOR2 ($$).Set ($1, $2); }
-;
-
-/* A matrix: there are lots of ways to define a matrix */
-matrix:
-  NUMBER NUMBER NUMBER
-  NUMBER NUMBER NUMBER
-  NUMBER NUMBER NUMBER			/* Matrix defined by nine numbers */
-  {
-    $$ = &THIS->matrix;
-    $$->Set ($1, $2, $3, $4, $5, $6, $7, $8, $9);
-  }
-| NUMBER				/* Uniform matrix scaler */
-  {
-    $$ = &THIS->matrix;
-    $$->Set ($1, 0, 0, 0, $1, 0, 0, 0, $1);
-  }
-| /* Initialize matrix to identity before starting any complex defs */
-  {
-    $$ = &THIS->matrix;
-    $$->Identity ();
-  }
-  matrix_ops
-;
-
-matrix_ops:
-  matrix_op
-| matrix_ops matrix_op
-;
-
-matrix_op:
-  KW_IDENTITY noargs			/* Load identity matrix */
-  { THIS->matrix.Identity (); }
-| KW_ROT_X '(' NUMBER ')'		/* Rotate around OX */
-  {
-    printf ("ROT_X(%g)\n", $3);
-    THIS->matrix *= csXRotMatrix3 ($3);
-  }
-| KW_ROT_Y '(' NUMBER ')'		/* Rotate around OY */
-  { THIS->matrix *= csYRotMatrix3 ($3); }
-| KW_ROT_Z '(' NUMBER ')'		/* Rotate around OZ */
-  { THIS->matrix *= csZRotMatrix3 ($3); }
-| KW_SCALE '(' NUMBER ')'		/* Uniform matrix scaler */
-  { THIS->matrix *= $3; }
-| KW_SCALE '(' NUMBER NUMBER NUMBER ')'	/* Scalers for X/Y/Z individually */
-  { THIS->matrix *= csMatrix3 ($3, 0, 0, 0, $4, 0, 0, 0, $5); }
-| KW_SCALE_X '(' NUMBER ')'		/* Scale related to YOZ */
-  { THIS->matrix *= csXScaleMatrix3 ($3); }
-| KW_SCALE_Y '(' NUMBER ')'		/* Scale related to XOZ */
-  { THIS->matrix *= csYScaleMatrix3 ($3); }
-| KW_SCALE_Z '(' NUMBER ')'		/* Scale related to XOY */
-  { THIS->matrix *= csYScaleMatrix3 ($3); }
-;
-
-noargs:
-  /* No arguments */
-| '(' ')'
-;
-
-/* MOVE ( ... ) operator (used in things/sprites/sixfaces/etc) */
-move:
-  {
-    $$ = &THIS->transform;
-    *$$ = csTransform ();
-  }
-  move_ops
-;
-
-move_ops:
-  move_op
-| move_ops move_op
-;
-
-move_op:
-  KW_MATRIX '(' matrix ')'
-  { THIS->transform.SetO2T (*$3); }
-| KW_V '(' vector ')'
-  { THIS->transform.SetO2TTranslation (CSVECTOR3 ($3)); }
-;
-
-/* POLYGON 'name' ( ... ) (used in things and sectors) */
-polygon_ops:
-  polygon_op
-| polygon_ops polygon_op
-;
-
-polygon_op:
-  KW_TEXNR '(' STRING ')'
-  { printf ("TEXNR ('%s')\n", $3); }
-| KW_LIGHTING '(' yesno ')'
-  { printf ("LIGHTING (%d)\n", $3); }
-| KW_TEXTURE '(' polygon_texture_ops ')'
-  { printf ("TEXTURE (...)\n"); }
-| KW_VERTICES '(' vertex_indices ')'
-  { printf ("VERTICES (...)\n"); }
-| KW_GOURAUD noargs
-  { printf ("GOURAUD ()\n"); }
-| KW_FLATCOL '(' color ')'
-  { printf ("FLATCOL (%g,%g,%g)\n", $3.red, $3.green, $3.blue); }
-| KW_ALPHA '(' NUMBER ')'
-  { printf ("ALPHA (%g)\n", $3); }
-| KW_UV '(' tex_coordinates ')'
-  { printf ("UV (...)\n"); }
-| KW_UVA '(' uva_coordinates ')'
-  { printf ("UVA (...)\n"); }
-| KW_COLORS '(' colors ')'
-  { printf ("COLORS (...)\n"); }
-| KW_COSFACT '(' NUMBER ')'
-  { printf ("COSFACT (%g)\n", $3); }
-| KW_CLIP noargs
-  { printf ("CLIP ()\n"); }
-| KW_PORTAL '(' STRING ')'
-  { printf ("PORTAL (%s)\n", $3); }
-| KW_WARP '(' warp_ops ')'
-  { printf ("WARP (...)\n"); }
-| KW_LIGHTX '(' STRING ')'
-  { printf ("LIGHTX ('%s')\n", $3); }
-;
-
-colors:
-  /* none */
-| colors color
-  { }
-;
-
-vertex_indices:
-  /* none */
-| vertex_indices NUMBER
-;
-
-tex_coordinates:
-  /* none */
-| tex_coordinates NUMBER NUMBER
-  /* <u> <v> */
-;
-
-uva_coordinates:
-  /* none */
-| uva_coordinates NUMBER NUMBER NUMBER
-  /* <angle> <uva-scale> <uva-offset> */
-;
-
-/* WARP ( ... ) */
-warp_ops:
-  warp_op
-| warp_ops warp_op
-;
-
-warp_op:
-  KW_MATRIX '(' matrix ')'
-  { printf ("MATRIX (...)\n"); }
-| KW_V '(' vector ')'
-  { printf ("V (...)\n"); }
-| KW_W '(' vector ')'
-  { printf ("W (...)\n"); }
-| KW_MIRROR noargs
-  { printf ("MIRROR ()\n"); }
-| KW_STATIC noargs
-  { printf ("STATIC ()\n"); }
-;
-
-/* TEXTURE (...) */
-polygon_texture_ops:
-  polygon_texture_op
-| polygon_texture_ops polygon_texture_op
-;
-
-polygon_texture_op:
-  KW_ORIG '(' vect_idx ')'		{ printf ("ORIG (%g, %g, %g)\n", $3.x, $3.y, $3.z); }
-| KW_FIRST '(' vect_idx ')'		{ printf ("FIRST (%g, %g, %g)\n", $3.x, $3.y, $3.z); }
-| KW_SECOND '(' vect_idx ')'		{ printf ("SECOND (%g, %g, %g)\n", $3.x, $3.y, $3.z); }
-| KW_FIRST_LEN '(' NUMBER ')'		{ printf ("FIRST_LEN (%g)\n", $3); }
-| KW_SECOND_LEN '(' NUMBER ')'		{ printf ("SECOND_LEN (%g)\n", $3); }
-| KW_UVEC '(' vector ')'		{ printf ("UVEC (%g, %g, %g)\n", $3.x, $3.y, $3.z); }
-| KW_VVEC '(' vector ')'		{ printf ("VVEC (%g, %g, %g)\n", $3.x, $3.y, $3.z); }
-| KW_MATRIX '(' matrix ')'
-  {
-    printf ("MATRIX (\n  %g, %g, %g\n  %g, %g, %g\n  %g, %g, %g\n)\n",
-    $3->m11, $3->m12, $3->m13, $3->m21, $3->m22, $3->m21, $3->m31, $3->m32, $3->m33);
-  }
-| KW_V '(' vector ')'			{ printf ("V (%g, %g, %g)\n", $3.x, $3.y, $3.z); }
-| KW_TEXLEN '(' NUMBER ')'
-  { printf ("TEXLEN (%g)\n", $3); }
-| KW_PLANE '(' STRING ')'
-  { printf ("PLANE ('%s')\n", $3); }
-| KW_UV_SHIFT '(' vector2 ')'
-  { printf ("UV_SHIFT (%g, %g)\n", $3.x, $3.y); }
-;
-
-light_ops:
-  light_op
-| light_ops light_op
-;
-
-light_op:
-  vector ':' NUMBER color NUMBER
-  /* <pos> <radius> <color> <dynamic-flag> */
-  { printf ("<pos> <radius> <color> <dynamic-flag>\n"); }
-| KW_CENTER '(' vector ')'
-  { printf ("CENTER (...)\n"); }
-| KW_RADIUS '(' NUMBER ')'
-  { printf ("RADIUS (%g)\n", $3); }
-| KW_DYNAMIC noargs
-  { printf ("DYNAMIC ()\n"); }
-| KW_COLOR '(' color ')'
-  { printf ("COLOR ( ... )\n"); }
-| KW_HALO '(' NUMBER NUMBER ')'
-  { printf ("HALO (%g,%g)\n", $3, $4); }
-| KW_ATTENUATION '(' attenuation_op ')'
-;
-
-attenuation_op:
-  KW_none
-| KW_linear
-| KW_inverse
-| KW_realistic
-;
-
 /*-- Input stream ------------------------------------------------------------*/
 
 input:
-  KW_WORLD name	'('
-  {
-#if YYDEBUG
-    yydebug = 1;
-#endif
-    printf ("--> Starting world [%s]\n", $2);
-  }
-  world_contents ')'
-  {
-    printf ("WORLD: [%s]\n", $2);
-  }
-| KW_LIBRARY name '(' world_contents ')'
+  KW_WORLD name '('
+  { THIS->world->SelectLibrary (STORAGE.cur_library = $2); }
+  world_ops ')'
+| KW_LIBRARY name '('
+  { THIS->world->SelectLibrary (STORAGE.cur_library = $2); }
+  world_ops ')'
 ;
 
 /*-- Grammar -----------------------------------------------------------------*/
 
-world_contents:
+world_ops:
   /* empty world */
-| world_contents world_keyword
+| world_ops world_op
 ;
 
-world_keyword:
-  KW_LIBRARY name '(' STRING ')'	{ printf ("LIBRARY '%s' (%s)\n", $2, $4); }
-| KW_TEXTURES '(' textures ')'		{ printf ("TEXTURES\n"); }
-| KW_SOUNDS '(' sounds ')'		{ printf ("SOUNDS\n"); }
-| KW_START '(' start ')'		{ printf ("START\n"); }
-| KW_SECTOR name '(' sector_ops ')'	{ printf ("SECTOR [%s]\n", $2); }
-| KW_PLANE name '(' plane_ops ')'	{ printf ("PLANE [%s]\n", $2); }
+world_op:
+  KW_TEXTURES '(' textures ')'
+| KW_TEX_SET name '('
+  { STORAGE.tex_prefix = $2; }
+  textures ')'
+  { STORAGE.tex_prefix = NULL; }
+| KW_LIBRARY '(' STRING ')'
+  { if (!THIS->RecursiveLoad ($3)) YYABORT; }
+| KW_SOUNDS '(' sounds ')'
+  { printf ("SOUNDS\n"); }
+| KW_START '(' start ')'
+  { printf ("START\n"); }
+| KW_SECTOR name '(' sector_ops ')'
+  { printf ("SECTOR [%s]\n", $2); }
+| KW_PLANE name '(' plane_ops ')'
+  { printf ("PLANE [%s]\n", $2); }
 | KW_KEY name '(' key ')'
   { printf ("KEY [%s]\n", $2); }
 | KW_COLLECTION name '(' collection_ops ')'
   { printf ("COLLECTION [%s]\n", $2); }
 | KW_SCRIPT name '(' STRING ':' STRING ')'
   { printf ("SCRIPT '%s' (%s: %s)\n", $2, $4, $6); }
-| KW_TEX_SET name '(' tex_set ')'	{ printf ("TEX_SET [%s]\n", $2); }
-| KW_LIGHTX name '(' lightx ')'		{ printf ("LIGHTX [%s]\n", $2); }
-| KW_THING name '(' thing_tpl_ops ')'	{ printf ("THING_tpl [%s]\n", $2); }
-| KW_SPRITE name '(' sprite ')'		{ printf ("SPRITE [%s]\n", $2); }
-| KW_ROOM name '(' room_ops ')'		{ printf ("ROOM [%s]\n", $2); }
+| KW_LIGHTX name '(' lightx ')'
+  { printf ("LIGHTX [%s]\n", $2); }
+| KW_THING name '(' thing_tpl_ops ')'
+  { printf ("THING_tpl [%s]\n", $2); }
+| KW_SPRITE name '(' sprite_tpl_ops ')'
+  { printf ("SPRITE [%s]\n", $2); }
+| KW_ROOM name '(' room_ops ')'
+  { printf ("ROOM [%s]\n", $2); }
 | KW_SIXFACE name '(' sixface_tpl_ops ')'
   { printf ("SIXFACE [%s]\n", $2); }
 ;
@@ -554,8 +314,10 @@ textures:
 ;
 
 texture:
-  KW_TEXTURE name '(' texture_ops ')'
-  { printf ("TEXTURE '%s'\n", $2); }
+  KW_TEXTURE name
+  { THIS->InitTexture ($2); }
+  '(' texture_ops ')'
+  { if (!THIS->CreateTexture ()) YYABORT; }
 ;
 
 texture_ops:
@@ -565,9 +327,37 @@ texture_ops:
 
 texture_op:
   KW_MIPMAP '(' yesno ')'		{ printf ("MIPMAP (%d)\n", $3); }
-| KW_DITHER '(' yesno ')'		{ printf ("DITHER (%d)\n", $3); }
-| KW_FILE '(' STRING ')'		{ printf ("FILE (%s)\n", $3); }
-| KW_TRANSPARENT '(' color ')'		{ printf ("TRANSPARENT (%g,%g,%g)\n", $3.red, $3.green, $3.blue); }
+  {
+    if ($3)
+      TEX.flags = (TEX.flags & ~CS_TEXTURE_NOMIPMAPS);
+    else
+      TEX.flags |= CS_TEXTURE_NOMIPMAPS;
+  }
+| KW_DITHER '(' yesno ')'
+  {
+    if ($3)
+      TEX.flags |= CS_TEXTURE_DITHER;
+    else
+      TEX.flags = (TEX.flags & ~CS_TEXTURE_DITHER);
+  }
+| KW_FILE '(' STRING ')'
+  { TEX.filename = $3; }
+| KW_TRANSPARENT '(' color ')'
+  { TEX.transp = $3; TEX.do_transp = true; }
+| KW_FOR_3D '(' yesno ')'
+  {
+    if ($3)
+      TEX.flags |= CS_TEXTURE_3D;
+    else
+      TEX.flags = (TEX.flags & ~CS_TEXTURE_3D);
+  }
+| KW_FOR_2D '(' yesno ')'
+  {
+    if ($3)
+      TEX.flags |= CS_TEXTURE_2D;
+    else
+      TEX.flags = (TEX.flags & ~CS_TEXTURE_2D);
+  }
 ;
 
 /*--------*/
@@ -716,11 +506,6 @@ collection_op:
 
 /*--------*/
 
-tex_set:
-;
-
-/*--------*/
-
 lightx:
   /* empty */
 | lightx lightx_desc
@@ -829,7 +614,53 @@ bezier_texture_op:
 
 /*--------*/
 
-sprite:
+sprite_tpl_ops:
+  sprite_tpl_op
+| sprite_tpl_ops sprite_tpl_op
+;
+
+sprite_tpl_op:
+  KW_TEXNR '(' STRING ')'
+  { printf ("TEXNR ('%s')\n", $3); }
+| KW_FRAME name '(' sprite_verts ')'
+  { printf ("FRAME '%s' (...)\n", $2); }
+| KW_ACTION name '(' sprite_actions ')'
+  { printf ("ACTION '%s' ( ... )\n", $2); }
+| KW_TRIANGLE '(' NUMBER NUMBER NUMBER ')'
+  { printf ("TRIANGLE (%g,%g,%g)\n", $3, $4, $5); }
+| KW_FILE '(' STRING ')'
+  { printf ("FILE ('%s')\n", $3); }
+| KW_MERGE_TEXELS '(' yesno ')'
+  { printf ("MERGE_TEXELS (%d)\n", $3); }
+/*
+@@todo: can't really understand how it all works
+| KW_MERGE_NORMALS '(' <sprite-merge> ')'
+| KW_MERGE_VERTICES '(' <sprite-merge> ')'
+*/
+/*
+@@todo:
+| <sprite-skeleton>
+*/
+;
+
+sprite_verts:
+  /* empty */
+| sprite_verts sprite_vert
+;
+
+sprite_vert:
+  KW_V '(' vector ':' vector2 ')'
+  { printf ("V (%g,%g,%g:%g,%g)\n", $3.x, $3.y, $3.z, $5.x, $5.y); }
+;
+
+sprite_actions:
+  /* empty */
+| sprite_actions sprite_action
+;
+
+sprite_action:
+  KW_F '(' STRING ',' NUMBER ')'
+  { printf ("F ('%s', %g)\n", $3, $5); }
 ;
 
 /*--------*/
@@ -933,6 +764,11 @@ split_list:
 ;
 
 sprite_ops:
+  sprite_op
+| sprite_ops sprite_op
+;
+
+sprite_op:
   KW_MOVE '(' move ')'
   { printf ("MOVE ()\n"); }
 | KW_TEMPLATE '(' STRING ',' STRING ')'
@@ -1017,10 +853,280 @@ sixface_op:
   { printf ("MOVEABLE ()\n"); }
 ;
 
-/*--------*/
+/*-- General-use non-terminals -----------------------------------------------*/
+
+/*
+    GENERAL NOTE: To minimize space occupied by pre-tokenized data,
+    the ',' characters between numbers are removed. Thus the lists of
+    numbers will look like "NUMBER NUMBER NUMBER" instead of (how it
+    should be in the most obvious case) "NUMBER ',' NUMBER ',' NUMBER".
+*/
+
+/* A name - either empty or defined */
+name:
+  /* empty == no name */
+  { $$ = NULL; }
+| STRING
+;
+
+/* Yes or no - the result is a boolean */
+yesno:
+  KW_yes				{ $$ = true; }
+| KW_no					{ $$ = false; }
+;
+
+/* The definition of a color - red, green, blue from 0 to 1 */
+color:
+  NUMBER NUMBER NUMBER			{ CSCOLOR ($$).Set ($1, $2, $3); }
+;
+
+/* Simply a vector */
+vector:
+  NUMBER NUMBER NUMBER			{ CSVECTOR3 ($$).Set ($1, $2, $3); }
+;
+
+/* A vector defined either directly or using a vertex index */
+vect_idx:
+  NUMBER				{ $$.x = $$.y = $$.z = 0; }
+| vector
+;
+
+/* A 2D vector */
+vector2:
+  NUMBER NUMBER				{ CSVECTOR2 ($$).Set ($1, $2); }
+;
+
+/* A matrix: there are lots of ways to define a matrix */
+matrix:
+  NUMBER NUMBER NUMBER
+  NUMBER NUMBER NUMBER
+  NUMBER NUMBER NUMBER			/* Matrix defined by nine numbers */
+  {
+    $$ = &STORAGE.matrix2;
+    $$->Set ($1, $2, $3, $4, $5, $6, $7, $8, $9);
+  }
+| NUMBER				/* Uniform matrix scaler */
+  {
+    $$ = &STORAGE.matrix2;
+    $$->Set ($1, 0, 0, 0, $1, 0, 0, 0, $1);
+  }
+| /* Initialize matrix to identity before starting any complex defs */
+  {
+    $$ = &STORAGE.matrix2;
+    $$->Identity ();
+  }
+  matrix_ops
+;
+
+matrix_ops:
+  matrix_op
+| matrix_ops matrix_op
+;
+
+matrix_op:
+  KW_IDENTITY noargs			/* Load identity matrix */
+  { STORAGE.matrix2.Identity (); }
+| KW_ROT_X '(' NUMBER ')'		/* Rotate around OX */
+  { STORAGE.matrix2 *= csXRotMatrix3 ($3); }
+| KW_ROT_Y '(' NUMBER ')'		/* Rotate around OY */
+  { STORAGE.matrix2 *= csYRotMatrix3 ($3); }
+| KW_ROT_Z '(' NUMBER ')'		/* Rotate around OZ */
+  { STORAGE.matrix2 *= csZRotMatrix3 ($3); }
+| KW_SCALE '(' NUMBER ')'		/* Uniform matrix scaler */
+  { STORAGE.matrix2 *= $3; }
+| KW_SCALE '(' NUMBER NUMBER NUMBER ')'	/* Scalers for X/Y/Z individually */
+  { STORAGE.matrix2 *= csMatrix3 ($3, 0, 0, 0, $4, 0, 0, 0, $5); }
+| KW_SCALE_X '(' NUMBER ')'		/* Scale related to YOZ */
+  { STORAGE.matrix2 *= csXScaleMatrix3 ($3); }
+| KW_SCALE_Y '(' NUMBER ')'		/* Scale related to XOZ */
+  { STORAGE.matrix2 *= csYScaleMatrix3 ($3); }
+| KW_SCALE_Z '(' NUMBER ')'		/* Scale related to XOY */
+  { STORAGE.matrix2 *= csYScaleMatrix3 ($3); }
+;
+
+noargs:
+  /* No arguments */
+| '(' ')'
+;
+
+/* MOVE ( ... ) operator (used in things/sprites/sixfaces/etc) */
+move:
+  {
+    $$ = &STORAGE;
+    $$->matrix.Identity ();
+    $$->matrix_valid = false;
+    $$->vector_valid = false;
+  }
+  move_ops
+;
+
+move_ops:
+  move_op
+| move_ops move_op
+;
+
+move_op:
+  KW_MATRIX '(' matrix ')'
+  {
+    STORAGE.matrix = *$3;
+    STORAGE.matrix_valid = true;
+  }
+| KW_V '(' vector ')'
+  {
+    STORAGE.vector = CSVECTOR3 ($3);
+    STORAGE.vector_valid = true;
+  }
+;
+
+/* POLYGON 'name' ( ... ) (used in things and sectors) */
+polygon_ops:
+  polygon_op
+| polygon_ops polygon_op
+;
+
+polygon_op:
+  KW_TEXNR '(' STRING ')'
+  { printf ("TEXNR ('%s')\n", $3); }
+| KW_LIGHTING '(' yesno ')'
+  { printf ("LIGHTING (%d)\n", $3); }
+| KW_TEXTURE '(' polygon_texture_ops ')'
+  { printf ("TEXTURE (...)\n"); }
+| KW_VERTICES '(' vertex_indices ')'
+  { printf ("VERTICES (...)\n"); }
+| KW_GOURAUD noargs
+  { printf ("GOURAUD ()\n"); }
+| KW_FLATCOL '(' color ')'
+  { printf ("FLATCOL (%g,%g,%g)\n", $3.red, $3.green, $3.blue); }
+| KW_ALPHA '(' NUMBER ')'
+  { printf ("ALPHA (%g)\n", $3); }
+| KW_UV '(' tex_coordinates ')'
+  { printf ("UV (...)\n"); }
+| KW_UVA '(' uva_coordinates ')'
+  { printf ("UVA (...)\n"); }
+| KW_COLORS '(' colors ')'
+  { printf ("COLORS (...)\n"); }
+| KW_COSFACT '(' NUMBER ')'
+  { printf ("COSFACT (%g)\n", $3); }
+| KW_CLIP noargs
+  { printf ("CLIP ()\n"); }
+| KW_PORTAL '(' STRING ')'
+  { printf ("PORTAL (%s)\n", $3); }
+| KW_WARP '(' warp_ops ')'
+  { printf ("WARP (...)\n"); }
+| KW_LIGHTX '(' STRING ')'
+  { printf ("LIGHTX ('%s')\n", $3); }
+;
+
+colors:
+  /* none */
+| colors color
+  { }
+;
+
+vertex_indices:
+  /* none */
+| vertex_indices NUMBER
+;
+
+tex_coordinates:
+  /* none */
+| tex_coordinates NUMBER NUMBER
+  /* <u> <v> */
+;
+
+uva_coordinates:
+  /* none */
+| uva_coordinates NUMBER NUMBER NUMBER
+  /* <angle> <uva-scale> <uva-offset> */
+;
+
+/* WARP ( ... ) */
+warp_ops:
+  warp_op
+| warp_ops warp_op
+;
+
+warp_op:
+  KW_MATRIX '(' matrix ')'
+  { printf ("MATRIX (...)\n"); }
+| KW_V '(' vector ')'
+  { printf ("V (...)\n"); }
+| KW_W '(' vector ')'
+  { printf ("W (...)\n"); }
+| KW_MIRROR noargs
+  { printf ("MIRROR ()\n"); }
+| KW_STATIC noargs
+  { printf ("STATIC ()\n"); }
+;
+
+/* TEXTURE (...) */
+polygon_texture_ops:
+  polygon_texture_op
+| polygon_texture_ops polygon_texture_op
+;
+
+polygon_texture_op:
+  KW_ORIG '(' vect_idx ')'		{ printf ("ORIG (%g, %g, %g)\n", $3.x, $3.y, $3.z); }
+| KW_FIRST '(' vect_idx ')'		{ printf ("FIRST (%g, %g, %g)\n", $3.x, $3.y, $3.z); }
+| KW_SECOND '(' vect_idx ')'		{ printf ("SECOND (%g, %g, %g)\n", $3.x, $3.y, $3.z); }
+| KW_FIRST_LEN '(' NUMBER ')'		{ printf ("FIRST_LEN (%g)\n", $3); }
+| KW_SECOND_LEN '(' NUMBER ')'		{ printf ("SECOND_LEN (%g)\n", $3); }
+| KW_UVEC '(' vector ')'		{ printf ("UVEC (%g, %g, %g)\n", $3.x, $3.y, $3.z); }
+| KW_VVEC '(' vector ')'		{ printf ("VVEC (%g, %g, %g)\n", $3.x, $3.y, $3.z); }
+| KW_MATRIX '(' matrix ')'
+  {
+    printf ("MATRIX (\n  %g, %g, %g\n  %g, %g, %g\n  %g, %g, %g\n)\n",
+    $3->m11, $3->m12, $3->m13, $3->m21, $3->m22, $3->m21, $3->m31, $3->m32, $3->m33);
+  }
+| KW_V '(' vector ')'			{ printf ("V (%g, %g, %g)\n", $3.x, $3.y, $3.z); }
+| KW_TEXLEN '(' NUMBER ')'
+  { printf ("TEXLEN (%g)\n", $3); }
+| KW_PLANE '(' STRING ')'
+  { printf ("PLANE ('%s')\n", $3); }
+| KW_UV_SHIFT '(' vector2 ')'
+  { printf ("UV_SHIFT (%g, %g)\n", $3.x, $3.y); }
+;
+
+light_ops:
+  light_op
+| light_ops light_op
+;
+
+light_op:
+  vector ':' NUMBER color NUMBER
+  /* <pos> <radius> <color> <dynamic-flag> */
+  { printf ("<pos> <radius> <color> <dynamic-flag>\n"); }
+| KW_CENTER '(' vector ')'
+  { printf ("CENTER (...)\n"); }
+| KW_RADIUS '(' NUMBER ')'
+  { printf ("RADIUS (%g)\n", $3); }
+| KW_DYNAMIC noargs
+  { printf ("DYNAMIC ()\n"); }
+| KW_COLOR '(' color ')'
+  { printf ("COLOR ( ... )\n"); }
+| KW_HALO '(' NUMBER NUMBER ')'
+  { printf ("HALO (%g,%g)\n", $3, $4); }
+| KW_ATTENUATION '(' attenuation_op ')'
+;
+
+attenuation_op:
+  KW_none
+| KW_linear
+| KW_inverse
+| KW_realistic
+;
 
 %% /* End of grammar */
 
 /* On initialization, register keyword list with the C++ parser */
 extern int init_token_table (const char * const *yytname);
-int __parser_init = init_token_table (yytname);
+struct __parser_init
+{
+  __parser_init ()
+  {
+    init_token_table (yytname);
+#if YYDEBUG
+    yydebug = 1;
+#endif
+  }
+} __parser_init_dummy;

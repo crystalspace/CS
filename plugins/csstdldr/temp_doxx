@@ -1,21 +1,37 @@
--*- The (I hope complete) difference list between old loader
-    (libs/csparser/csloader.cpp) and the stdldr plugin:
+$$$
+$$$ This is the (I hope complete) difference list between old loader
+$$$ (libs/csparser/csloader.cpp) and the stdldr plugin.
+$$$
+$$$ The differences between old loader and the new loader plugin
+$$$ are caused by the need to balance between 100% compatibility with
+$$$ the legacy worlds and a more logical and strict format. Another
+$$$ goal was to simplify the loader by removing obsolete keywords,
+$$$ duplicate functionality and so on. Thus in the end we don't have
+$$$ 100% compatibility, but the loader should perfectly load world
+$$$ files written by map2cs and MazeD. In general, worlds that use
+$$$ deprecated keywords (e.g. ROOM, SIXFACE etc) should be loaded into
+$$$ MazeD (while its using the old loader) and saved back; this will
+$$$ automatically make them compatible with the new loader. Thus when
+$$$ MazeD will be able to save worlds without data loss (e.g. scripts,
+$$$ beziers) the legacy world files should be converted and the old
+$$$ loader should be deprecated.
+$$$
 
-    - The scripts should be enclosed in quotes. E.g. instead of
+-*- The scripts should be enclosed in quotes. E.g. instead of
 
 	SCRIPT (prim: loop 40 { wait })
 
-      you should now write:
+    you should now write:
 
 	SCRIPT (prim: 'loop 40 { wait }')
 
-      This is related to tokenizer, not to the parser itself. The problem is
-      that tokenizer was developed to deal with world scripts, not with
-      abstract scripts (to parse the script is the responsability of the
-      interpreter, not of the geometry loader). Thus the script is passed
-      as a whole string to the interpreter. A string can span across multiple
-      lines (note that if you forget to close a quote somewhere you can get
-      an actual error message at the end of the file!).
+    This is related to tokenizer, not to the parser itself. The problem is
+    that tokenizer was developed to deal with world scripts, not with
+    abstract scripts (to parse the script is the responsability of the
+    interpreter, not of the geometry loader). Thus the script is passed
+    as a whole string to the interpreter. A string can span across multiple
+    lines (note that if you forget to close a quote somewhere you can get
+    an actual error message at the end of the file!).
 
 -*- Whenever possible, enclose strings in quotes. Quotes are accepted
     everywhere, both ' and " quotes are accepted. If the string has no
@@ -49,3 +65,16 @@
     from thing instances but not from templates). Now thing instances are
     just a superset of tning templates, and contain just the additional
     options that do not make sense for thing templates.
+
+-*- Added texture parameters FOR_3D (yes|no) and FOR_2D (yes|no). Now you can
+    use lines like these:
+
+    TEXTURE 'marble' (FILE ('/lib/tex/marble7.gif') FOR_3D (no) FOR_2D (yes))
+
+    By default 3D usage is on, 2D usage is off.
+
+-*- TEXTURES won't delete all textures loaded previously into engine.
+    In general, the goal of the loader is to *merge* data into engine,
+    without automatically clearing the data that is already loaded.
+    Thus YOU decide when to clear the world by calling iWorld::DeleteAll()
+    method.

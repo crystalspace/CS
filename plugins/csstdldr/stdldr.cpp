@@ -21,14 +21,18 @@
 #include <ctype.h>
 #include <stdlib.h>
 
+#define SYSDEF_ALLOCA
 #include "sysdef.h"
 #include "stdldr.h"
 #include "stdparse.h"
-#include "isystem.h"
-#include "iworld.h"
 #include "cssys/csendian.h"
 #include "csutil/csvector.h"
 #include "csutil/util.h"
+
+#include "itxtmgr.h"
+#include "isystem.h"
+#include "iworld.h"
+#include "ivfs.h"
 
 //------------------------------------------------------- Helper functions -----
 
@@ -120,38 +124,102 @@ EXPORT_CLASS_TABLE (stdldr)
     "Standard Crystal Space geometry loader", "crystalspace.kernel.")
 EXPORT_CLASS_TABLE_END
 
-csStandardLoader::csStandardLoader (iBase *iParent) :
-  strings (16, 16), lineoffs (1, 1)
+csStandardLoader::csStandardLoader (iBase *iParent)
 {
   CONSTRUCT_IBASE (iParent);
   system = NULL; vfs = NULL; world = NULL;
   line = -1;
+  strings = NULL;
+  lineoffs = NULL;
+  recursion_depth = 0;
 }
 
 csStandardLoader::~csStandardLoader ()
 {
+  if (world) world->DecRef ();
+  if (vfs) vfs->DecRef ();
+  if (system) system->DecRef ();
 }
 
 bool csStandardLoader::Initialize (iSystem *iSys)
 {
-  system = iSys;
+  (system = iSys)->IncRef ();
+  if (!(vfs = QUERY_PLUGIN (system, iVFS)))
+    return false;
+  if (!(world = QUERY_PLUGIN (system, iWorld)))
+    return false;
   return true;
-}
-
-void csStandardLoader::ClearAll ()
-{
 }
 
 bool csStandardLoader::Load (const char *iName)
 {
-  return true;
-}
+  if (!vfs) return false;
 
-bool csStandardLoader::Load (csTokenList iInput, size_t &iSize)
-{
-  yyinit (iInput, iSize);
+  // First of all, check if the pre-tokenized file exists
+  char fnw [VFS_MAX_PATH_LEN + 1];
+  size_t sl = strlen (iName);
+  if (sl > sizeof (fnw) - 5) sl = sizeof (fnw) - 5;
+  memcpy (fnw, iName, sl); fnw [sl] = 0;
+  strcpy (fnw + sl, ".csw");
+  tm ftw;
+  bool csw_valid = false;
+  if (vfs->GetFileTime (fnw, ftw))
+  {
+    // Now check if pre-tokenized file is up-to-date
+    tm fts;
+    if (vfs->GetFileTime (iName, fts))
+    {
+      unsigned long tw = ftw.tm_sec + (ftw.tm_min + (ftw.tm_hour +
+        (ftw.tm_mday + (ftw.tm_mon + (ftw.tm_year - 70) * 12) * 32) * 24) * 60) * 60;
+      unsigned long ts = fts.tm_sec + (fts.tm_min + (fts.tm_hour +
+        (fts.tm_mday + (fts.tm_mon + (fts.tm_year - 70) * 12) * 32) * 24) * 60) * 60;
+      csw_valid = (tw >= ts);
+    }
+    else
+      // If we don't have the source file, read the pre-tokenized version
+      csw_valid = true;
+  }
+
+  char *data;
+  size_t size;
+  if (csw_valid)
+  {
+    data = vfs->ReadFile (fnw, size);
+    if (!data) csw_valid = false;
+  }
+  if (!csw_valid)
+  {
+    char *src = vfs->ReadFile (iName, size);
+    if (!src)
+    {
+      system->Printf (MSG_FATAL_ERROR, "Cannot read geometry file '%s'!\n", iName);
+      return false;
+    }
+    data = Tokenize (src, size);
+    delete [] src;
+    // Save the pre-tokenized version
+    vfs->WriteFile (fnw, data, size);
+  }
+
+  // Finally, launch the parser
+  if (!yyinit (data, size))
+  {
+    system->Printf (MSG_FATAL_ERROR, "Failed to load file '%s'!\n", iName);
+    return false;
+  }
   bool rc = (yyparse (this) == 0);
   yydone ();
+
+  // Free the token data
+  if (csw_valid)
+    delete [] data;
+  else
+  {
+    free (data);
+    // Kill the pre-tokenized data on error
+    if (!rc) vfs->DeleteFile (fnw);
+  }
+
   return rc;
 }
 
@@ -161,13 +229,13 @@ bool csStandardLoader::Parse (char *iData)
   csTokenList tl = Tokenize (iData, size);
   if (!tl) return false;
 
-  yyinit (tl, size);
+  if (!yyinit (tl, size))
+  {
+    free (tl);
+    return false;
+  }
   bool rc = (yyparse (this) == 0);
   yydone ();
-
-FILE *f = fopen ("plugins/csstdldr/test/world.bin", "wb");
-fwrite (tl, size, 1, f);
-fclose (f);
 
   free (tl);
   return rc;
@@ -178,8 +246,8 @@ csTokenList csStandardLoader::Tokenize (char *iData, size_t &oSize)
   csTokenList output = (csTokenList)malloc (oSize = 256);
   int cur = sizeof (long), prev = -1, prevprev = -1;
 
-  lineoffs.DeleteAll ();
-  strings.DeleteAll ();
+  if (!lineoffs) lineoffs = new csVector ();
+  if (!strings) strings = new csStringList ();
 
 #define ENSURE(size)					\
   if (cur + size > oSize)				\
@@ -261,8 +329,8 @@ csTokenList csStandardLoader::Tokenize (char *iData, size_t &oSize)
 
     if (line != prevline)
     {
-      lineoffs.Push ((csSome)line);
-      lineoffs.Push ((csSome)cur);
+      lineoffs->Push ((csSome)line);
+      lineoffs->Push ((csSome)cur);
       prevline = line;
     }
 
@@ -347,9 +415,9 @@ csTokenList csStandardLoader::Tokenize (char *iData, size_t &oSize)
     // Strings are represented via an index into the string table
     if (outtoken == tokSTRING8)
     {
-      tmp = strings.FindKey (data);
+      tmp = strings->FindKey (data);
       if (tmp < 0)
-        tmp = strings.Push (strnew ((char *)data));
+        tmp = strings->Push (strnew ((char *)data));
       if (tmp > 255)
       {
         outtoken = tokSTRING16;
@@ -401,14 +469,15 @@ csTokenList csStandardLoader::Tokenize (char *iData, size_t &oSize)
 
   // Put the string table at the end of token table
   set_le_long (output, cur);
-  for (int i = 0; i < strings.Length (); i++)
+  for (int i = 0; i < strings->Length (); i++)
   {
-    size_t len = strlen (strings.Get (i)) + 1;
+    size_t len = strlen (strings->Get (i)) + 1;
     ENSURE (len);
-    memcpy (output + cur, strings.Get (i), len);
+    memcpy (output + cur, strings->Get (i), len);
     cur += len;
   }
-  strings.FreeAll ();
+  delete strings;
+  strings = NULL;
 
   line = -1;
   oSize = cur;
@@ -416,9 +485,15 @@ csTokenList csStandardLoader::Tokenize (char *iData, size_t &oSize)
   return output;
 }
 
-void csStandardLoader::yyinit (csTokenList iInput, size_t iSize)
+bool csStandardLoader::yyinit (csTokenList iInput, size_t iSize)
 {
+  if (!iInput || !world || !system)
+    return false;
+
   curtoken = NULL;
+  storage.tex_prefix = NULL;
+
+  if (!strings) strings = new csStringList ();
 
   // Get the string table
   size_t stofs = get_le_long (iInput);
@@ -428,33 +503,48 @@ void csStandardLoader::yyinit (csTokenList iInput, size_t iSize)
   while (stofs < iSize)
   {
     int sl = strlen (iInput + stofs) + 1;
-    strings.Push (iInput + stofs);
+    strings->Push (iInput + stofs);
     stofs += sl;
   }
+  return true;
 }
 
 void csStandardLoader::yydone ()
 {
-  strings.DeleteAll ();
-  lineoffs.DeleteAll ();
+  delete strings; strings = NULL;
+  delete lineoffs; lineoffs = NULL;
 }
 
 void csStandardLoader::yyerror (char *s)
 {
   int l = line;
-  if (l < 0)
+  if (l < 0 && lineoffs)
   {
     // Find the line number
     int i = 0;
-    while (i < lineoffs.Length () && ofs >= (int)lineoffs.Get (i + 1))
+    while (i < lineoffs->Length () && ofs >= (int)lineoffs->Get (i + 1))
       i += 2;
-    l = (int)lineoffs.Get (i - 2);
+    l = (int)lineoffs->Get (i - 2);
   }
-  fprintf (stderr, "line %d%s: %s\n", l, l < 0 ? " (unknown)" : "", s);
+
+  char lno [10];
+  if (l < 0)
+    strcpy (lno, "(unknown)");
+  else
+    sprintf (lno, "%d", l);
+
+  char src [100];
+  if (storage.cur_library)
+    sprintf (src, "library %s", storage.cur_library);
+  else
+    strcpy (src, "input");
+
+  fprintf (stderr, "%s line %s: %s\n", src, lno, s);
 }
 
-int csStandardLoader::yylex ()
+int csStandardLoader::yylex (void *lval)
 {
+  YYSTYPE *yylval = (YYSTYPE *)lval;
   // Remember the position of last token in the case we'll need to display error
   ofs = input - (startinput - sizeof (long));
 
@@ -482,37 +572,37 @@ int csStandardLoader::yylex ()
   switch (csToken (th & TOKEN_MASK))
   {
     case tokNUMBER8:
-      yylval.fval = (unsigned char)*input;
+      yylval->fval = (unsigned char)*input;
       input += sizeof (char);
       bytesleft -= sizeof (char);
       return NUMBER;
     case tokNUMBER8N:
-      yylval.fval = -256 + (unsigned char)*input;
+      yylval->fval = -256 + (unsigned char)*input;
       input += sizeof (char);
       bytesleft -= sizeof (char);
       return NUMBER;
     case tokNUMBER16:
-      yylval.fval = (unsigned short)get_le_short (input);
+      yylval->fval = (unsigned short)get_le_short (input);
       input += sizeof (short);
       bytesleft -= sizeof (short);
       return NUMBER;
     case tokNUMBER16F:
-      yylval.fval = get_le_float16 (input);
+      yylval->fval = get_le_float16 (input);
       input += sizeof (short);
       bytesleft -= sizeof (short);
       return NUMBER;
     case tokNUMBER32:
-      yylval.fval = get_le_float32 (input);
+      yylval->fval = get_le_float32 (input);
       input += sizeof (long);
       bytesleft -= sizeof (long);
       return NUMBER;
     case tokSTRING8:
-      yylval.string = strings.Get ((unsigned char)*input);
+      yylval->string = strings->Get ((unsigned char)*input);
       input += sizeof (char);
       bytesleft -= sizeof (char);
       return STRING;
     case tokSTRING16:
-      yylval.string = strings.Get ((unsigned short)get_le_short (input));
+      yylval->string = strings->Get ((unsigned short)get_le_short (input));
       input += sizeof (short);
       bytesleft -= sizeof (short);
       return STRING;
@@ -536,4 +626,71 @@ int csStandardLoader::yylex ()
 
   // It should never come here
   return 0;
+}
+
+bool csStandardLoader::RecursiveLoad (const char *iName)
+{
+  if (recursion_depth > MAX_RECURSION_DEPTH)
+  {
+    system->Printf (MSG_FATAL_ERROR, "Max recursive depth exceeded (cyclic LIBRARY statements?)\n");
+    return false;
+  }
+
+  recursion_depth++;
+
+  char *_tex_prefix = storage.tex_prefix;
+  char *_cur_library = storage.cur_library;
+  csStringList *_strings = strings; strings = NULL;
+  csVector *_lineoffs = lineoffs; lineoffs = NULL;
+  csTokenList _input = input;
+  csTokenList _startinput = startinput;
+  csTokenList _curtoken = curtoken;
+  int _bytesleft = bytesleft;
+  int _curtokencount = curtokencount;
+
+  bool rc = Load (iName);
+
+  curtokencount = _curtokencount;
+  bytesleft = _bytesleft;
+  curtoken = _curtoken;
+  startinput = _startinput;
+  input = _input;
+  lineoffs = _lineoffs;
+  strings = _strings;
+  storage.cur_library = _cur_library;
+  storage.tex_prefix = _tex_prefix;
+
+  recursion_depth--;
+
+  return rc;
+}
+
+//--------------------------------------- Geometry loader parser helpers -----//
+
+void csStandardLoader::InitTexture (char *name)
+{
+  // Prepare all parameters to initial values
+  storage.tex.name =
+  storage.tex.filename = name;
+  storage.tex.transp.Set (0, 0, 0);
+  storage.tex.do_transp = false;
+  storage.tex.flags = CS_TEXTURE_3D;
+}
+
+bool csStandardLoader::CreateTexture ()
+{
+  // See if we have to add some prefix to texture name
+  char *new_name = storage.tex.name;
+  if (storage.tex_prefix)
+  {
+    new_name = (char *)alloca (strlen (storage.tex_prefix) +
+      strlen (storage.tex.name) + 2);
+    strcat (strcat (strcpy (new_name, storage.tex_prefix), "_"),
+      storage.tex.name);
+  }
+
+  // Now tell the engine to register the respective texture
+  return world->RegisterTexture (new_name, storage.tex.filename,
+    storage.tex.do_transp ? (csColor *)&storage.tex.transp : NULL,
+    storage.tex.flags);
 }

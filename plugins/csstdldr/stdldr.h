@@ -30,6 +30,17 @@ struct iVFS;
 
 typedef char *csTokenList;
 
+// Maximal number of recursive LIBRARY()'es
+#define MAX_RECURSION_DEPTH	10
+
+// We can't use csColor since it has a constructor :-(
+struct csPColor
+{
+  float red, green, blue;
+  void Set (float r, float g, float b)
+  { red = r; green = g; blue = b; }
+};
+
 class csStandardLoader : public iLoader
 {
   // The system driver (for error reporting and for queriyng other plugins)
@@ -50,9 +61,6 @@ public:
 
   /// Set up the system driver and extract all other required plugins (VFS,...)
   virtual bool Initialize (iSystem *iSys);
-
-  /// This is the same as calling World->Clear ()
-  virtual void ClearAll ();
 
   /**
    * Load the given file (from VFS) into engine.
@@ -77,26 +85,19 @@ public:
 
 private:
   // The string list (all strings encountered in input)
-  class csStringList : public csStrVector
+  class csStringList : public csVector
   {
   public:
     csStringList (int ilimit = 64, int ithreshold = 64) :
-      csStrVector (ilimit, ithreshold) {}
+      csVector (ilimit, ithreshold) {}
     void FreeAll ()
     { while (count--) delete [] Get (count); SetLength (0); }
-    bool FreeItem (csSome Item)
-    { return true; }
-  } strings;
+    char *Get (int idx)
+    { return (char *)csVector::Get (idx); }
+  } *strings;
 
-  // Tokenize a string and return a newly-allocated array of tokens
-  csTokenList Tokenize (char *iData, size_t &oSize);
-  // Load the model given a token list
-  bool Load (csTokenList iInput, size_t &iSize);
-
-  // The parser function
-  friend int yyparse (void *);
   // The token offsets for each tokenized line (for error reporting)
-  csVector lineoffs;
+  csVector *lineoffs;
   // Input data (incremented as parser goes along)
   csTokenList input, startinput;
   // Current line for tokenizer
@@ -105,19 +106,65 @@ private:
   csTokenList curtoken;
   // Total bytes in input stream left and number of similar tokens
   int bytesleft, curtokencount;
+  // Current recursion depth
+  int recursion_depth;
+
   // Prepare the parser
-  void yyinit (csTokenList iInput, size_t iSize);
+  bool yyinit (csTokenList iInput, size_t iSize);
   // Finalize the parser
   void yydone ();
   // The standard Bison error reporting function
   void yyerror (char *s);
   // The standard Bison tokenizer function
-  int yylex ();
+  int yylex (void *lval);
+  // The parser function
+  friend int yyparse (void *);
 
   // Temporary storage for parser
-  csMatrix3 matrix;
-  // The transform
-  csTransform transform;
+  struct yystorage
+  {
+    // A matrix
+    csMatrix3 matrix;
+    // Yet another matrix (used as scratch space by `matrix' non-terminal symbol)
+    csMatrix3 matrix2;
+    // Whenever the matrix has been defined
+    bool matrix_valid;
+    // A vector
+    csVector3 vector;
+    // Whenever the vector has been defined
+    bool vector_valid;
+    // Current texture prefix
+    char *tex_prefix;
+    // The name of currently loaded library/world
+    char *cur_library;
+    // A unnamed union containing miscelaneous parameters for different entities
+    union
+    {
+      // Texture loader storage
+      struct
+      {
+        // texture/file name
+        char *name, *filename;
+        // Transparent color
+        csPColor transp;
+        // Texture uses transparency?
+        bool do_transp;
+        // Texture flags
+        int flags;
+      } tex;
+    };
+  } storage;
+
+  // Save the state of loader and call Load() recursively
+  bool RecursiveLoad (const char *iName);
+
+  // Tokenize a string and return a newly-allocated array of tokens
+  csTokenList Tokenize (char *iData, size_t &oSize);
+
+  // Initialize texture creation process
+  void InitTexture (char *name);
+  // Finish texture creation
+  bool CreateTexture ();
 };
 
 #endif // __STDLDR_H__
