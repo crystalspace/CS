@@ -979,7 +979,9 @@ AS_IF([test "$no_x" != yes],
 #------------------------------------------------------------------------------
 # Check for OpenGL and companions.  Also check if GLX extensions are supported
 # and define the (backward) header property CSGL_EXT_STATIC_ASSERTION if they
-# are _not_ supported.
+# are _not_ supported. Finally, check if the type GLhandleARB is exported by
+# the GL headers. It is starting to show up in very modern headers, but is
+# absent from most.
 #
 # IMPLEMENTATION NOTES
 #
@@ -1101,7 +1103,15 @@ CS_CHECK_BUILD([for OpenGL], [cs_cv_libgl],
     [$cs_gl_plat_cflags], [$cs_gl_plat_lflags], [$cs_gl_plat_libs])
 
 AS_IF([test $cs_cv_libgl = yes],
-    [# Check for GLU.
+    [# Check for GLhandleARB.
+    CS_CHECK_BUILD([for GLhandleARB], [cs_cv_libgl_glhandlearb],
+	[AC_LANG_PROGRAM(
+	    [CS_GL_INCLUDE([CS_OPENGL_PATH],[GL],[gl.h])],
+	    [GLhandleARB x; (void)x;])],
+	[], [],	[CS_HEADER_PROPERTY([CS_HAS_GLHANDLEARB_T])], [], [],
+	[$cs_cv_libgl_cflags], [$cs_cv_libgl_lflags], [$cs_cv_libgl_libs])
+
+    # Check for GLU.
     CS_CHECK_BUILD([for GLU], [cs_cv_libglu],
 	[AC_LANG_PROGRAM(
 	    [CS_GL_INCLUDE([CS_GLU_PATH],[GL],[glu.h])], [gluNewQuadric()])],
