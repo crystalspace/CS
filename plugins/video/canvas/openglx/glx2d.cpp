@@ -497,7 +497,13 @@ void csGraphics2DGLX::WriteCharGL (int x, int y, int fg, int bg, char c)
   glDisable (GL_DEPTH_TEST);
   
   setGLColorfromint(fg);
-  glRasterPos2i (x, Height-y-1);
+
+  // FIXME: without the 0.5 shift rounding errors in the
+  // openGL renderer can misalign text!
+  // maybe we should modify the glOrtho() in glrender to avoid
+  // having to does this fractional shift?
+  //glRasterPos2i (x, Height-y-1-FontList[Font].Height);
+  glRasterPos2f (x+0.5, Height-y-0.5-FontList[Font].Height);
 
   LocalFontServer->WriteCharacter(c,Font);
 }
