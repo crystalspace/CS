@@ -264,7 +264,7 @@ bool csLightMap::ReadFromCache (
   pswanted.lm_size = convert_endian (lm_size);
   pswanted.lm_cnt = convert_endian ((int32) 111);
 
-  iDataBuffer *data = cache_mgr->ReadCache (type, NULL, uid);
+  csRef<iDataBuffer> data (csPtr<iDataBuffer> (cache_mgr->ReadCache (type, NULL, uid)));
   if (!data) return false;
 
   char *d = **data;
@@ -307,7 +307,6 @@ bool csLightMap::ReadFromCache (
     ))
   {
     // Invalid.
-    data->DecRef ();
     return false;
   }
 
@@ -331,8 +330,6 @@ bool csLightMap::ReadFromCache (
   memcpy (static_lm.GetArray (), lm_rgba, lm_size * 4);
   delete[] lm_rgba;
 
-  data->DecRef ();
-
   //-------------------------------
   // Now load the dynamic data.
   //-------------------------------
@@ -341,7 +338,7 @@ bool csLightMap::ReadFromCache (
   else
     type = "lmcur_d";
 
-  data = cache_mgr->ReadCache (type, NULL, uid);
+  data = csPtr<iDataBuffer> (cache_mgr->ReadCache (type, NULL, uid));
   if (!data) return true;   // No dynamic data. @@@ Recalc dynamic data?
   int size = data->GetSize ();
   d = **data;
@@ -357,7 +354,6 @@ bool csLightMap::ReadFromCache (
   int expected_size = lh.dyn_cnt * (sizeof (ls.light_id) + lm_size);
   if (expected_size != size)
   {
-    data->DecRef ();
     return true;
   }
 
@@ -383,8 +379,6 @@ bool csLightMap::ReadFromCache (
 
     d += lm_size;
   }
-
-  data->DecRef ();
 
   return true;
 }

@@ -185,9 +185,8 @@ csPtr<iImage> csLoader::LoadImage (const char* name, int Format)
     ifile = csPtr<iImage> (csCreateXORPatternImage(32, 32, 5));
   }
 
-  iDataBuffer *xname = VFS->ExpandPath (name);
+  csRef<iDataBuffer> xname (VFS->ExpandPath (name));
   ifile->SetName (**xname);
-  xname->DecRef ();
 
   ifile->IncRef ();	// IncRef() so that smart pointer will not clean it up.
   return csPtr<iImage> (ifile);

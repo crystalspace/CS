@@ -627,7 +627,7 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
     cache_mgr = engine->GetCacheManager ();
     engine->DecRef ();
     sprintf (buf, "spr3dnormals_%d_%d", base, frame);
-    iDataBuffer* db = cache_mgr->ReadCache (buf, GetCacheName (), 0);
+    csRef<iDataBuffer> db (csPtr<iDataBuffer> (cache_mgr->ReadCache (buf, GetCacheName (), 0)));
     if (db)
     {
       csMemFile* cf = new csMemFile ((char*)db->GetData (), db->GetSize (),
@@ -644,7 +644,6 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
       }
 
       cf->DecRef ();
-      db->DecRef ();
       return;
     }
   }

@@ -244,7 +244,7 @@ bool LoadCamera (iVFS* vfs, const char *fName)
   IFFAIL (vfs->Exists (fName))
     Sys->Report (CS_REPORTER_SEVERITY_ERROR,
 		 "Could not open camera file '%s'!", fName);
-  iDataBuffer *data = 0;
+  csRef<iDataBuffer> data;
   IFFAIL ((data = vfs->ReadFile(fName)) != 0)
     Sys->Report (CS_REPORTER_SEVERITY_ERROR,
 		 "Could not read camera file '%s'!", fName);
@@ -284,7 +284,6 @@ bool LoadCamera (iVFS* vfs, const char *fName)
     c->GetTransform ().SetOrigin (v);
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Camera loaded");
   }
-  SCF_DEC_REF (data);
   delete[] sector_name;
   return true;
 #undef IFFAIL

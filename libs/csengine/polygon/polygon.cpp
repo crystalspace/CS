@@ -1955,7 +1955,7 @@ bool csPolygon3D::ReadFromCache (iCacheManager* cache_mgr, int id)
     char* type = "lmpol_g";
     uint32 uid = GetPolygonID ();
 
-    iDataBuffer *data = cache_mgr->ReadCache (type, NULL, uid);
+    csRef<iDataBuffer> data (csPtr<iDataBuffer> (cache_mgr->ReadCache (type, NULL, uid)));
     if (!data) return false;
 
     char *d = **data;
@@ -1965,7 +1965,6 @@ bool csPolygon3D::ReadFromCache (iCacheManager* cache_mgr, int id)
     num_vts = convert_endian (num_vts);
     if (num_vts != GetVertexCount ())
     {
-      data->DecRef ();
       return false;
     }
 
@@ -1985,7 +1984,6 @@ bool csPolygon3D::ReadFromCache (iCacheManager* cache_mgr, int id)
       goi->SetColor (i, r, g, b);
     }
 
-    data->DecRef ();
     goi->gouraud_up_to_date = true;
     return true;
   }

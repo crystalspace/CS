@@ -1134,7 +1134,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	else
         {
           csScanStr (params, "%s", str);
-          iDataBuffer *buf = VFS->ReadFile (str);
+          csRef<iDataBuffer> buf (VFS->ReadFile (str));
 	  if (!buf)
 	  {
             ReportError (
@@ -1153,7 +1153,6 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	  else
 	    mof = binplug->Parse ((void*)(buf->GetUint8 ()),
 	  	GetLoaderContext (), stemp->GetMeshObjectFactory ());
-	  buf->DecRef ();
 	  if (!mof)
 	  {
             ReportError (
@@ -1221,7 +1220,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
           if (!ModelConverter || !CrossBuilder) return false;
 
           csScanStr (params, "%s", str);
-          iDataBuffer *buf = VFS->ReadFile (str);
+          csRef<iDataBuffer> buf (VFS->ReadFile (str));
 	  if (!buf)
 	  {
             ReportError (
@@ -1232,7 +1231,6 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 
 	  iModelData *Model = ModelConverter->Load (buf->GetUint8 (),
 	  	buf->GetSize ());
-	  buf->DecRef ();
           if (!Model)
 	  {
             ReportError (
@@ -2049,7 +2047,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	else
         {
           csScanStr (params, "%s", str);
-          iDataBuffer *buf = VFS->ReadFile (str);
+          csRef<iDataBuffer> buf (VFS->ReadFile (str));
 	  if (!buf)
 	  {
             ReportError (
@@ -3831,7 +3829,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	}
 	else
         {
-          iDataBuffer *buf = VFS->ReadFile (child->GetContentsValue ());
+          csRef<iDataBuffer> buf (VFS->ReadFile (child->GetContentsValue ()));
 	  if (!buf)
 	  {
             SyntaxService->ReportError (
@@ -3850,7 +3848,6 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	  else
 	    mof = binplug->Parse ((void*)(buf->GetUint8 ()),
 	  	GetLoaderContext (), stemp->GetMeshObjectFactory ());
-	  buf->DecRef ();
 	  if (!mof)
 	  {
 	    // Error is reported by plug->Parse().
@@ -3917,7 +3914,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
           if (!ModelConverter || !CrossBuilder) return false;
 
 	  const char* filename = child->GetContentsValue ();
-          iDataBuffer *buf = VFS->ReadFile (filename);
+          csRef<iDataBuffer> buf (VFS->ReadFile (filename));
 	  if (!buf)
 	  {
             SyntaxService->ReportError (
@@ -3928,7 +3925,6 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 
 	  iModelData *Model = ModelConverter->Load (buf->GetUint8 (),
 	  	buf->GetSize ());
-	  buf->DecRef ();
           if (!Model)
 	  {
             SyntaxService->ReportError (
@@ -4585,7 +4581,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 	      child, "Specify a VFS filename with 'paramsfile'!");
 	    return false;
 	  }
-          iDataBuffer *buf = VFS->ReadFile (fname);
+          csRef<iDataBuffer> buf (VFS->ReadFile (fname));
 	  if (!buf)
 	  {
             SyntaxService->ReportError (
@@ -4731,7 +4727,7 @@ bool csLoader::LoadAddOn (iDocumentNode* node, iBase* context)
 	      child, "Specify a VFS filename with 'paramsfile'!");
 	    return false;
 	  }
-          iDataBuffer *buf = VFS->ReadFile (fname);
+          csRef<iDataBuffer> buf (VFS->ReadFile (fname));
 	  if (!buf)
 	  {
             SyntaxService->ReportError (

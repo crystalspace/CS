@@ -437,7 +437,7 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
   }
 
   // Now load the texture
-  iDataBuffer *fbuffer = VFS->ReadFile (filename);
+  csRef<iDataBuffer> fbuffer (VFS->ReadFile (filename));
   if (!fbuffer || !fbuffer->GetSize ())
   {
     Printf (CS_REPORTER_SEVERITY_WARNING, "Cannot read image file \"%s\" from VFS\n", filename);
@@ -449,7 +449,6 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
   iTextureManager *txtmgr = GfxPpl.G3D->GetTextureManager ();
   csRef<iImage> image (ImageLoader->Load (fbuffer->GetUint8 (), fbuffer->GetSize (),
     txtmgr->GetTextureFormat ()));
-  fbuffer->DecRef ();
 
   csWSTexture *tex = new csWSTexture (iTexName, image, iFlags);
   if (tb >= 0)

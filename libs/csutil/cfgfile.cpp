@@ -672,7 +672,7 @@ void csConfigFile::DeleteKey(const char *Name)
 bool csConfigFile::LoadNow(const char *fName, iVFS *vfs, bool overwrite)
 {
   // load the file buffer
-  iDataBuffer *Filedata;
+  csRef<iDataBuffer> Filedata;
   if (vfs)
   {
     Filedata = vfs->ReadFile(fName);
@@ -685,7 +685,7 @@ bool csConfigFile::LoadNow(const char *fName, iVFS *vfs, bool overwrite)
     fseek(fp, 0, SEEK_END);
     size_t Size = ftell(fp);
     fseek(fp, 0, SEEK_SET);
-    Filedata = new csDataBuffer(Size + 1);
+    Filedata = csPtr<iDataBuffer> (new csDataBuffer(Size + 1));
     fread(Filedata->GetData(), sizeof(char), Size, fp);
     fclose(fp);
     Filedata->GetInt8()[Size] = 0;
@@ -693,7 +693,6 @@ bool csConfigFile::LoadNow(const char *fName, iVFS *vfs, bool overwrite)
 
   // parse the data
   LoadFromBuffer((char*)Filedata->GetInt8(), overwrite);
-  Filedata->DecRef();
 
   return true;
 }

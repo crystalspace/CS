@@ -153,9 +153,8 @@ void csDefaultFontServer::NotifyDelete (csDefaultFont *font)
 
 csDefaultFont *csDefaultFontServer::ReadFontFile(const char *file)
 {
-  iVFS *VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
-  iDataBuffer *fntfile = VFS->ReadFile (file);
-  VFS->DecRef ();
+  csRef<iVFS> VFS (CS_QUERY_REGISTRY (object_reg, iVFS));
+  csRef<iDataBuffer> fntfile (VFS->ReadFile (file));
   if (!fntfile)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -168,7 +167,6 @@ csDefaultFont *csDefaultFontServer::ReadFontFile(const char *file)
   if (data [0] != 'C' || data [1] != 'S' ||  data [2] != 'F')
   {
 error:
-    fntfile->DecRef ();
     return NULL;
   }
 
@@ -264,7 +262,6 @@ error:
     memcpy (fontdef.FontAlpha, binary + fontdef.Glyphs + fontsize, alphasize);
   }
 
-  fntfile->DecRef ();
   return new csDefaultFont (this, fontdef.Name, fontdef.First, fontdef.Glyphs,
     fontdef.Width, fontdef.Height, fontdef.Baseline, fontdef.FontBitmap, fontdef.IndividualWidth, fontdef.FontAlpha);
 }

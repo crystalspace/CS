@@ -764,7 +764,7 @@ void LevTool::Main ()
     return;
   }
 
-  iDataBuffer* buf = NULL;
+  csRef<iDataBuffer> buf;
   if (strstr (val, ".zip"))
   {
     vfs->Mount ("/tmp/levtool_data", val);
@@ -786,10 +786,9 @@ void LevTool::Main ()
     }
   }
 
-  iFile* fout = vfs->Open ("/this/world", VFS_FILE_WRITE);
+  csRef<iFile> fout (vfs->Open ("/this/world", VFS_FILE_WRITE));
   if (!fout)
   {
-    buf->DecRef ();
     ReportError ("Could not open file '/this/world'!");
     return;
   }
@@ -831,9 +830,6 @@ void LevTool::Main ()
   }
 
   delete parser;
-
-  fout->DecRef ();
-  buf->DecRef ();
 }
 
 /*---------------------------------------------------------------------*

@@ -288,11 +288,10 @@ void csMotionLoader::Report (int severity, const char* msg, ...)
 
 iMotionTemplate* csMotionLoader::LoadMotion (const char* fname )
 {
-  iDataBuffer *databuff = vfs->ReadFile (fname);
+  csRef<iDataBuffer> databuff (vfs->ReadFile (fname));
 
   if (!databuff || !databuff->GetSize ())
   {
-    if (databuff) databuff->DecRef ();
     Report (CS_REPORTER_SEVERITY_ERROR,
     	"Could not open motion file \"%s\" on VFS!", fname);
     return NULL;
@@ -324,20 +323,15 @@ iMotionTemplate* csMotionLoader::LoadMotion (const char* fname )
       {
 	m = motman->AddMotion (name);
 	if (LoadMotion (&parser, m, data))
-	{
-	  databuff->DecRef ();
 	  return m;
-	}
 	else
 	{
 	  m->DecRef ();
-	  databuff->DecRef ();
 	  return NULL;
 	}
       }
     }
   }
-  databuff->DecRef ();
   return NULL;
 }
 

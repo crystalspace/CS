@@ -1250,7 +1250,7 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
   char *reason = NULL;
 
   iCacheManager* cm = GetCacheManager ();
-  iDataBuffer* data = cm->ReadCache ("lm_precalc_info", NULL, 0);
+  csRef<iDataBuffer> data (csPtr<iDataBuffer> (cm->ReadCache ("lm_precalc_info", NULL, 0)));
   if (!data)
     reason = "no 'lm_precalc_info' found in cache";
   else
@@ -1291,8 +1291,6 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
 #undef CHECK
     }
   }
-
-  if (data) data->DecRef ();
 
   if (reason)
   {

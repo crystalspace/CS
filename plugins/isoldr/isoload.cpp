@@ -314,11 +314,10 @@ bool csIsoLoader::CheckToken(int cmd, const char* tag, char* data)
 
 bool csIsoLoader::LoadMapFile (const char* file)
 {
-  iDataBuffer *buf = VFS->ReadFile (file);
+  csRef<iDataBuffer> buf (VFS->ReadFile (file));
 
   if (!buf || !buf->GetSize ())
   {
-    if (buf) buf->DecRef ();
       ReportError ("crystalspace.iso.loader.loadmapfile.nomap",
     	"Could not open map file '%s' on VFS!", file);
     return false;
@@ -327,12 +326,8 @@ bool csIsoLoader::LoadMapFile (const char* file)
   //  iConfigFile *cfg = new csConfigFile ("map.cfg", VFS);
 
   if (!LoadMap (**buf))
-  {
-    buf->DecRef ();
     return false;
-  }
 
-  buf->DecRef ();
   return true;
 }
 

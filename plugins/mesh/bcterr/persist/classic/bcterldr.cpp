@@ -600,7 +600,7 @@ iBase* csBCTerrLoader::Parse (const char* pString,
           exit (0);
         }
 
-        iDataBuffer* buf = vfs->ReadFile (pStr);
+        csRef<iDataBuffer> buf (vfs->ReadFile (pStr));
         if (!buf || !buf->GetSize ())
         {
           printf ("Can't open file '%s' in vfs!\n", pStr);
@@ -615,7 +615,6 @@ iBase* csBCTerrLoader::Parse (const char* pString,
         }
         //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Loader","Set HeightMap");
         iState->SetHeightMap (ifile);
-        buf->DecRef ();
         vfs->DecRef ();
         loader->DecRef ();
       }

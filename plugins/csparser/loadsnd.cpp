@@ -37,10 +37,9 @@ csPtr<iSoundData> csLoader::LoadSoundData(const char* filename)
     return csPtr<iSoundData> (NULL);
 
   // read the file data
-  iDataBuffer *buf = VFS->ReadFile (filename);
+  csRef<iDataBuffer> buf (VFS->ReadFile (filename));
   if (!buf || !buf->GetSize ())
   {
-    if (buf) buf->DecRef ();
     ReportError (
 	      "crystalspace.maploader.parse.sound",
 	      "Cannot open sound file '%s' from VFS!", filename);
@@ -49,7 +48,6 @@ csPtr<iSoundData> csLoader::LoadSoundData(const char* filename)
 
   // load the sound
   iSoundData *Sound = SoundLoader->LoadSound(buf->GetUint8 (), buf->GetSize ());
-  buf->DecRef ();
 
   // check for valid sound data
   if (!Sound)

@@ -109,7 +109,7 @@ int main(int argc, const char* const args[])
   iSoundRender *pSR = CS_QUERY_REGISTRY (object_reg, iSoundRender);
 
   // load the sound
-  iDataBuffer *db = pVFS->ReadFile (args[1]);
+  csRef<iDataBuffer> db (pVFS->ReadFile (args[1]));
 
   // let the soundloader create a sounddata object from the data
   iSoundData *sd = pLoader->LoadSound (db->GetData (), db->GetSize ());
@@ -158,7 +158,6 @@ int main(int argc, const char* const args[])
   sh->DecRef ();
   pSR->DecRef ();
   sd->DecRef ();
-  db->DecRef ();
   pVFS->DecRef ();
   pLoader->DecRef ();
 
