@@ -6,6 +6,22 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Apr-2005
+	- res made the following changes:
+	    - Changed some internals of shader program variable mappings; now
+	      use the "ProgramParam" struct (variable maps now also support
+	      a slightly different syntax that allows for constant mappings:
+	      <variablemap destination="register 0" type="vector4">
+		1,2,3,4
+	      </variablemap>).
+	    - Added feature to shader program parameters/variable mappings to
+	      use shader expressions. For an example, see 
+	      std_lighting_detail_alpha_scroll shader.
+	    - Put namespace { } around code in csjngimg to avoid collisions
+	      when linking statically.
+	    - Changed how RGB data is handled by simpleformer; treats the RGB
+	      triplet as a 24bit number (R is most significant) instead of
+	      computing the RGB intensity.
 3-Apr-2005
 	- Eric Sunshine updated csBlockAllocator<> so that it automatically
 	  destroys contained objects at its own destruction time rather than
