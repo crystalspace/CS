@@ -51,7 +51,7 @@ private:
   bool imposter_ready;
 
 public:
-  csImposterProcTex (csImposterMesh *parent,iObjectRegistry *objreg);
+  csImposterProcTex (csImposterMesh *parent);
   ~csImposterProcTex ();
 
   bool GetImposterReady () { return imposter_ready; }

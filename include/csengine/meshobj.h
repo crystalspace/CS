@@ -243,13 +243,13 @@ private:
   /// Z-buf mode to use for drawing this object.
   csZBufMode zbufMode;
 
-  /// Flag indicating whether this mesh should try to imposter or not
+  /// Flag indicating whether this mesh should try to imposter or not.
   bool imposter_active;
 
-  /// Imposter Threshold Range
+  /// Imposter Threshold Range.
   csRef<iSharedVariable> min_imposter_distance;
 
-  /// Imposter Redo Threshold angle change
+  /// Imposter Redo Threshold angle change.
   csRef<iSharedVariable> imposter_rotation_tolerance;
 
   csImposterMesh *imposter_mesh;
@@ -477,15 +477,14 @@ public:
 
   //---------- iImposter Functions -----------------//
 
-  /// Set true if this Mesh should use Impostering
-  void SetImposterActive(bool flag,iObjectRegistry *objreg);
+  /// Set true if this Mesh should use Impostering.
+  void SetImposterActive (bool flag);
 
   /**
    * Determine if this mesh is using Impostering
    * (not if Imposter is being drawn, but simply considered).
    */
-  bool GetImposterActive() const
-  { return imposter_active; }
+  bool GetImposterActive () const { return imposter_active; }
 
   /**
    * Minimum Imposter Distance is the distance from camera 
@@ -493,7 +492,7 @@ public:
    * ptr here because value is a shared variable 
    * which can be changed at runtime for many objects.
    */
-  void SetMinDistance(iSharedVariable* dist)
+  void SetMinDistance (iSharedVariable* dist)
   { min_imposter_distance = dist; }
 
   /** 
@@ -503,7 +502,7 @@ public:
    * Angle greater than this triggers a re-render of
    * the imposter.
    */
-  void SetRotationTolerance(iSharedVariable* angle)
+  void SetRotationTolerance (iSharedVariable* angle)
   { imposter_rotation_tolerance = angle; }
 
   /**
@@ -511,19 +510,19 @@ public:
    * for use by main render process later, relative to
    * the specified Point Of View.
    */
-  void CreateImposter(csReversibleTransform& /*pov*/)
+  void CreateImposter (csReversibleTransform& /*pov*/)
   { /* implement later */ }
 
   /**
-   * Renders the imposter on the screen
+   * Renders the imposter on the screen.
    */
   bool DrawImposter (iRenderView *rview);
 
-  /// Determine if imposter or true rendering will be used
-  bool WouldUseImposter(csReversibleTransform& /*pov*/)
+  /// Determine if imposter or true rendering will be used.
+  bool WouldUseImposter (csReversibleTransform& /*pov*/)
   { /* implement later */ return false; }
 
-  /// This is true function to check distances.  Fn above may not be needed.
+  /// This is the function to check distances.  Fn above may not be needed.
   bool CheckImposterRelevant (iRenderView *rview);
   
   /**
@@ -816,18 +815,18 @@ public:
   struct MeshImposter : public iImposter
   {
     SCF_DECLARE_EMBEDDED_IBASE (csMeshWrapper);
-    virtual void SetImposterActive(bool flag,iObjectRegistry *objreg)
-    { scfParent->SetImposterActive(flag,objreg); }
-    virtual bool GetImposterActive() const
+    virtual void SetImposterActive (bool flag)
+    { scfParent->SetImposterActive(flag); }
+    virtual bool GetImposterActive () const
     { return scfParent->GetImposterActive(); }
-    virtual void SetMinDistance(iSharedVariable* dist)
-    { scfParent->SetMinDistance(dist); }
-    virtual void SetRotationTolerance(iSharedVariable* angle)
-    { scfParent->SetRotationTolerance(angle); }
-    virtual void CreateImposter(csReversibleTransform& pov)
-    { scfParent->CreateImposter(pov); }
-    virtual bool WouldUseImposter(csReversibleTransform& pov) const 
-    { return scfParent->WouldUseImposter(pov); }
+    virtual void SetMinDistance (iSharedVariable* dist)
+    { scfParent->SetMinDistance (dist); }
+    virtual void SetRotationTolerance (iSharedVariable* angle)
+    { scfParent->SetRotationTolerance (angle); }
+    virtual void CreateImposter (csReversibleTransform& pov)
+    { scfParent->CreateImposter (pov); }
+    virtual bool WouldUseImposter (csReversibleTransform& pov) const 
+    { return scfParent->WouldUseImposter (pov); }
   } scfiImposter;
 };
 

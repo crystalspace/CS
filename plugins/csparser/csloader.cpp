@@ -2969,11 +2969,9 @@ error:
   return false;
 }
 
-bool csLoader::ParseImposterSettings(iMeshWrapper* mesh,iDocumentNode *node)
+bool csLoader::ParseImposterSettings (iMeshWrapper* mesh, iDocumentNode *node)
 {
-  csRef<iImposter> imposter (SCF_QUERY_INTERFACE (
-                                mesh,
-	                        iImposter));
+  csRef<iImposter> imposter = SCF_QUERY_INTERFACE (mesh, iImposter);
   if (!imposter)
   {
     SyntaxService->ReportError (
@@ -2982,10 +2980,10 @@ bool csLoader::ParseImposterSettings(iMeshWrapper* mesh,iDocumentNode *node)
     return false;
   }
   const char *s = node->GetAttributeValue ("active");
-  if (s && !strcmp (s,"no"))
-    imposter->SetImposterActive (false,0);
+  if (s && !strcmp (s, "no"))
+    imposter->SetImposterActive (false);
   else
-    imposter->SetImposterActive (true,object_reg);
+    imposter->SetImposterActive (true);
 
   s = node->GetAttributeValue ("range");
   iSharedVariable *var = Engine->GetVariableList()->FindByName (s);
@@ -2993,7 +2991,7 @@ bool csLoader::ParseImposterSettings(iMeshWrapper* mesh,iDocumentNode *node)
   {
     SyntaxService->ReportError (
 	    "crystalspace.maploader.parse.meshobject",
-	    node, "Specified imposter range variable (%s) doesn't exist!",s);
+	    node, "Imposter range variable (%s) doesn't exist!", s);
     return false;
   }
   imposter->SetMinDistance (var);
@@ -3004,15 +3002,16 @@ bool csLoader::ParseImposterSettings(iMeshWrapper* mesh,iDocumentNode *node)
   {
     SyntaxService->ReportError (
 	    "crystalspace.maploader.parse.meshobject", node,
-	    "Specified imposter rotation tolerance variable doesn't exist!");
+	    "Imposter rotation tolerance variable (%s) doesn't exist!",
+	    s);
     return false;
   }
   imposter->SetRotationTolerance (var2);
-  char const* const name = mesh->QueryObject()->GetName();
-  ReportWarning("crystalspace.maploader.parse.meshobject", node, 
+  char const* const name = mesh->QueryObject()->GetName ();
+  ReportWarning ("crystalspace.maploader.parse.meshobject", node, 
     "Set mesh %s to imposter active=%s, range=%f, tolerance=%f", 
-    name ? name : "<noname>", imposter->GetImposterActive() ? "yes" : "no", 
-    var->Get(),var2->Get() );
+    name ? name : "<noname>", imposter->GetImposterActive () ? "yes" : "no", 
+    var->Get (), var2->Get ());
   return true;
 }
 

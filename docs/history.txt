@@ -9,6 +9,9 @@ chronological order.
 7-Jan-2004
         - Andrew Craig fixed the Jamfile for sprcal3dldr to link in the 
           required CAL3D library.
+	- Jorrit did some cleanups on the imposter code.
+	- Daniel Duhprey fixed scattering for 2 texture units for the
+	  terrain engine.
 6-Jan-2004
 	- Eric Sunshine changed the libbfd check in configure.ac so that it is
 	  not performed on Windows.  Newer versions of Mingw supply libbfd and

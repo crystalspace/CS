@@ -28,15 +28,15 @@
 #include "iengine/rview.h"
 #include "ivideo/graph3d.h"
 
-csImposterMesh::csImposterMesh(csMeshWrapper *parent,iObjectRegistry *objreg)
+csImposterMesh::csImposterMesh (csMeshWrapper *parent)
 {
   parent_mesh = parent;
-  tex		= new csImposterProcTex(this,objreg);
+  tex = new csImposterProcTex (this);
   ready	= false;
   incidence_dist = 0;
 }
 
-float csImposterMesh::CalcIncidenceAngleDist(iRenderView *rview)
+float csImposterMesh::CalcIncidenceAngleDist (iRenderView *rview)
 {
   // Jorrit, not sure about this correctness but it compiles at least. -Keith
 
@@ -50,12 +50,11 @@ float csImposterMesh::CalcIncidenceAngleDist(iRenderView *rview)
   return csSquaredDist::PointPoint (straight, pt);
 }
 
-bool csImposterMesh::CheckIncidenceAngle(iRenderView *rview, float tolerance)
+bool csImposterMesh::CheckIncidenceAngle (iRenderView *rview, float tolerance)
 {
   float const dist2 = CalcIncidenceAngleDist(rview);
   float diff = dist2 - incidence_dist;
-  if (diff < 0)
-      diff = -diff;
+  if (diff < 0) diff = -diff;
 
   // If not ok, mark for redraw of imposter
   if (diff > tolerance)
@@ -66,7 +65,7 @@ bool csImposterMesh::CheckIncidenceAngle(iRenderView *rview, float tolerance)
   return true;
 }
 
-void csImposterMesh::FindImposterRectangle(const iCamera *camera)
+void csImposterMesh::FindImposterRectangle (const iCamera *camera)
 {
   // Called from csImposterProcTex during Anim.
   //  (Recalc of texture causes recalc of imposter poly also.)
@@ -83,7 +82,7 @@ void csImposterMesh::FindImposterRectangle(const iCamera *camera)
 #endif
 }
 
-void csImposterMesh::Draw(iRenderView *rview)
+void csImposterMesh::Draw (iRenderView *rview)
 {
 #if 0  
   iGraphics3D *g3d = rview->GetG3D();

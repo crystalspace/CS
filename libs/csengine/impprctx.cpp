@@ -20,6 +20,7 @@
 #include "ivideo/graph3d.h"
 #include "cstool/csview.h"
 #include "cstool/proctex.h"
+#include "csengine/engine.h"
 #include "csengine/impprctx.h"
 #include "csgfx/memimage.h"
 #include "csutil/cscolor.h"
@@ -38,8 +39,7 @@
 
 //#include "iutil/vfs.h"
 
-csImposterProcTex::csImposterProcTex(csImposterMesh *parent,
-				     iObjectRegistry *objreg) : csProcTexture ()
+csImposterProcTex::csImposterProcTex (csImposterMesh *parent) : csProcTexture ()
 {
   mesh = parent;
 
@@ -48,7 +48,7 @@ csImposterProcTex::csImposterProcTex(csImposterMesh *parent,
 
   texFlags = CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;
 
-  csProcTexture::Initialize(objreg);
+  csProcTexture::Initialize (csEngine::object_reg);
 }
 
 csImposterProcTex::~csImposterProcTex ()

@@ -395,9 +395,9 @@ void csMeshWrapper::AddMeshToStaticLOD (int lod, iMeshWrapper* mesh)
 
 void csMeshWrapper::DrawInt (iRenderView *rview)
 {
-  if (imposter_active && CheckImposterRelevant(rview) )
+  if (imposter_active && CheckImposterRelevant (rview))
     if (DrawImposter (rview))
-    return;
+      return;
 
   DrawIntFull (rview);
 }
@@ -500,25 +500,25 @@ bool csMeshWrapper::DrawImposter (iRenderView *rview)
   }
 
   // Check for imposter already ready
-  if (!imposter_mesh->GetImposterReady())
+  if (!imposter_mesh->GetImposterReady ())
     return false;
 
   // Check for too much camera movement since last imposter render
   if (!imposter_mesh->CheckIncidenceAngle (rview,
-    imposter_rotation_tolerance->Get () ))
-      return false;
+	imposter_rotation_tolerance->Get ()))
+    return false;
 
   // Else draw imposter as-is.
   imposter_mesh->Draw (rview);
   return true;
 }
 
-void csMeshWrapper::SetImposterActive (bool flag,iObjectRegistry *objreg)
+void csMeshWrapper::SetImposterActive (bool flag)
 {
   imposter_active = flag;
   if (flag)
   {
-    imposter_mesh = new csImposterMesh (this, objreg);
+    imposter_mesh = new csImposterMesh (this);
     imposter_mesh->SetImposterReady (false);
   }
 }

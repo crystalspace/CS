@@ -29,9 +29,7 @@
 #include <iengine/sharevar.h>
 #include "csutil/scf.h"
 
-SCF_VERSION (iImposter, 0, 0, 1);
-
-struct iObjectRegistry;
+SCF_VERSION (iImposter, 0, 0, 2);
 
 /**
  * iImposter defines the interface a mesh (or other) class must
@@ -40,8 +38,8 @@ struct iObjectRegistry;
 struct iImposter : public iBase
 {
   /// Self explanatory
-  virtual void SetImposterActive(bool flag,iObjectRegistry *objreg)=0;
-  virtual bool GetImposterActive() const =0;
+  virtual void SetImposterActive (bool flag)=0;
+  virtual bool GetImposterActive () const =0;
 
   /**
    * Minimum Imposter Distance is the distance from camera 
@@ -49,7 +47,7 @@ struct iImposter : public iBase
    * ptr here because value is a shared variable 
    * which can be changed at runtime for many objects.
    */
-  virtual void SetMinDistance(iSharedVariable* dist) = 0;
+  virtual void SetMinDistance (iSharedVariable* dist) = 0;
 
   /** 
    * Rotation Tolerance is the maximum allowable 
@@ -58,19 +56,19 @@ struct iImposter : public iBase
    * Angle greater than this triggers a re-render of
    * the imposter.
    */
-  virtual void SetRotationTolerance(iSharedVariable* angle) = 0;
+  virtual void SetRotationTolerance (iSharedVariable* angle) = 0;
 
   /**
    * Tells the object to create its proctex and polygon
    * for use by main render process later.
    */
-  virtual void CreateImposter(csReversibleTransform& pov) = 0;
+  virtual void CreateImposter (csReversibleTransform& pov) = 0;
 
   /// Draw imposter on screen.
   /// private: virtual void Draw(iRenderView* rview) = 0;
 
   /// Determine if imposter or true rendering will be used
-  virtual bool WouldUseImposter(csReversibleTransform& pov) const = 0;
+  virtual bool WouldUseImposter (csReversibleTransform& pov) const = 0;
 };
 
 #endif // __CS_IENGINE_IMPOSTER_H__
