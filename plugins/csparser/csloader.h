@@ -285,7 +285,8 @@ public:
   virtual iTextureHandle *LoadTexture (const char* fname,
 	int Flags = CS_TEXTURE_3D, iTextureManager *tm = NULL);
   virtual iTextureWrapper *LoadTexture (const char *name, const char *fname,
-	int Flags = CS_TEXTURE_3D, iTextureManager *tm = NULL);
+	int Flags = CS_TEXTURE_3D, iTextureManager *tm = NULL,
+	bool reg = false);
 
   virtual iSoundData *LoadSoundData (const char *fname);
   virtual iSoundHandle *LoadSound (const char *fname);

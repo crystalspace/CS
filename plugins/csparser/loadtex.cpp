@@ -130,12 +130,12 @@ iTextureHandle *csLoader::LoadTexture (const char *fname, int Flags,
 }
 
 iTextureWrapper *csLoader::LoadTexture (const char *name, const char *fname,
-	int Flags, iTextureManager *tm)
+	int Flags, iTextureManager *tm, bool reg)
 {
   if (!Engine)
     return NULL;
 
-  iTextureHandle *TexHandle = LoadTexture(fname, Flags, tm);
+  iTextureHandle *TexHandle = LoadTexture (fname, Flags, tm);
   if (!TexHandle)
     return NULL;
 
@@ -151,5 +151,14 @@ iTextureWrapper *csLoader::LoadTexture (const char *name, const char *fname,
   MatWrapper->QueryObject ()->SetName (name);
   material->DecRef ();
 
+  if (reg && tm)
+  {
+    TexWrapper->Register (tm);
+    TexWrapper->GetTextureHandle()->Prepare ();
+    MatWrapper->Register (tm);
+    MatWrapper->GetMaterialHandle ()->Prepare ();
+  }
+
   return TexWrapper;
 }
+

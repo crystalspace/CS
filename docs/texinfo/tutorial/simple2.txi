@@ -64,7 +64,7 @@ bool Simple::Initialize(int argc, const char* const argv[])
 
   // Load a texture for our sprite.
   iTextureWrapper* txt = loader->LoadTexture ("spark",
-  	"/lib/std/spark.png");
+  	"/lib/std/spark.png", CS_TEXTURE_3D, txtmgr, true);
   if (txt == NULL)
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -72,12 +72,6 @@ bool Simple::Initialize(int argc, const char* const argv[])
     	"Error loading texture!");
     return false;
   @}
-  txt->Register (txtmgr);
-  txt->GetTextureHandle()->Prepare ();
-  iMaterialWrapper* mat =
-    engine->GetMaterialList ()->FindByName ("spark");
-  mat->Register (txtmgr);
-  mat->GetMaterialHandle ()->Prepare ();
 
   return true;
 @}
@@ -87,24 +81,31 @@ This code first loads a texture in our engine with
 @code{iLoader::LoadTexture()}.  The second argument is the file name for our
 texture (@sc{vfs} path) and the first argument is how that texture should be
 named in the engine.  In this case we use @samp{spark} for that because that's
-how the @file{sprite1} definition wants it.
+how the @file{sprite1} definition wants it. The third parameter indicates
+for what we want to use this texture. In this case we want to use it to texture
+map a model for the 3D engine so the texture must be prepared for 3D.
+The fourth parameter is the texture manager which will be used to register
+and prepare the texture and material. This is done automatically by
+this function because the fifth parameter is set to 'true'. In the previous
+tutorial we also used this function to load a texture but there we didn't
+specify the last three parameters. @samp{CS_TEXTURE_3D} is default so that
+doesn't have to be specified and because we were going to call
+@code{engine->Prepare()} later we also didn't specify the texture manager
+and the last boolean parameter because @code{Prepare()} automatically
+registers and prepares all textures and materials that are loaded.
 
-If this loading succeeds we need to register our texture with the
-texture manager. This is because we didn't put the loading of our texture
-before the @code{engine->Prepare()} call (which takes care of this
-registering automatically). The lines @code{txt->Register()} and
-@code{Prepare()} can be used at any time while the
-application is running to dynamically load additional textures. The
-first call to @code{Register()} registers the texture with the texture
-manager so that it is aware of this texture. The second call makes
-sure that the texture can really be used for 3D rendering by mapping
-it to the internal format used by the 3D rasterizer. If you plan to
-dynamically add a lot of textures in one step then you should call
-@code{Register()} once for every texture and then do
-@code{txtmgr->PrepareTextures()} instead. This will be more efficient.
+If this loading succeeds this function will register our texture with the
+texture manager. As mentioned above this is needed because we are loading
+this texture AFTER @code{engine->Prepare()}. So this is an easy way to
+dynamically add textures and materials even when the engine is already
+running. Note that if you plan to load many new textures and materials
+it is more efficient to not let this function register automatically but
+instead register them manually and then call @code{txtmgr->PrepareTextures())
+to prepare them all at once.
 
-After the texture has been created we still have to create and register
-a material. The engine works with materials. The material in this case
+Note that when you load a texture like this there will also be an
+associated material with the same name. The engine itself works with
+materials and doesn't directly use textures. The material in this case
 is simply a wrapper on top of the texture. But you could also add detail
 textures.
 

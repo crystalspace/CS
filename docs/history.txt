@@ -1,5 +1,14 @@
 The history order is reversed so that new features are at the top.
 
+7-Jan-2002
+	- Corrected the includes in the collision detection howto.
+	- Extended iLoader::LoadTexture() with a 'register' parameter which
+	  is default false. When set to true the loader will register and
+	  prepare the texture and material automatically. This is only
+	  for the version of LoadTexture() that accepts a 'name' and
+	  'filename'.
+	- Modified the simple2 tutorial for the above change (i.e.
+	  simplified it).
 5-Jan-2002
 	- Fixed a bug with the OpenGL renderer where it was trying to
 	  store a value of 0, 1, or 2 in a boolean :-)
@@ -2712,7 +2721,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	      look half-bad, actually.
 	    - Fixed small bug related to centering of text.
 	    - Fixed a bug related to the awsTexture manager. It seems that
-	      textures must ALWAYS be registered with the CS_TEXTURE3D flag in
+	      textures must ALWAYS be registered with the CS_TEXTURE_3D flag in
 	      order to work. Therefore, I fixed that problem, and also fixed a
 	      couple of other stupid bugs (like not calling Prepare...)
 	    - Added images to window to see how they look. Still need to

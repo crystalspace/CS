@@ -341,7 +341,7 @@ bool Simple::Initialize (int argc, const char* const argv[])
 
   // Load a texture for our sprite.
   iTextureWrapper* txt = loader->LoadTexture ("spark",
-  	"/lib/std/spark.png");
+  	"/lib/std/spark.png", CS_TEXTURE_3D, txtmgr, true);
   if (txt == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -349,11 +349,6 @@ bool Simple::Initialize (int argc, const char* const argv[])
     	"Error loading texture!");
     return false;
   }
-  txt->Register (txtmgr);
-  txt->GetTextureHandle()->Prepare ();
-  iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
-  mat->Register (txtmgr);
-  mat->GetMaterialHandle ()->Prepare ();
 
   // Load a sprite template from disk.
   iMeshFactoryWrapper* imeshfact = loader->LoadMeshObjectFactory (

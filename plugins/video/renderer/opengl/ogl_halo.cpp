@@ -83,7 +83,7 @@ csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
   {
     // Allocate our copy of the scanline which is power-of-two
     Alpha = new uint8 [Width * Height];
-	int i;
+    int i;
     for (i = 0; i < iHeight; i++)
     {
       // Copy a scanline from the supplied alphamap
@@ -165,6 +165,7 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
   /// The inverse width and height of the halo
   float inv_W = Wfact / w, inv_H = Hfact / h;
 
+  //???@@@glMatrixMode (GL_MODELVIEW);
   glPushMatrix ();
   glTranslatef (0, 0, 0);
 

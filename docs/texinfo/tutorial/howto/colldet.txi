@@ -177,7 +177,8 @@ the object changes.
 The include files useful for this section are:
 
 @example
-#include "iobject/object.h"
+#include "iutil/object.h"
+#include "iutil/plugin.h"
 #include "ivaria/collider.h"
 #include "ivaria/polymesh.h"
 #include "iengine/mesh.h"
