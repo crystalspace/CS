@@ -131,7 +131,7 @@ rule HeaderRule
   # care if we can't actually find the headers (they may have been
   # within ifdefs),
   local s = $(>:G=$(HDRGRIST:E)) ;
-                                                                                
+
   Includes $(<) : $(s) ;
   SEARCH on $(s) = $(HDRSEARCH) ;
   NoCare $(s) ;

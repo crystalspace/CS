@@ -14,8 +14,10 @@ if $(PYTHON.AVAILABLE) = "yes"
     SEARCH on $(sources) = $(TOP)/include/ivaria ;
         
     # scan for special swig includes
-    HDRRULE on $(target) = HeaderRule ;
-    HDRSCAN on $(target) = $(SWIG.HDRPATTERN) ;
+    HDRGRIST on $(sources) = $(HDRGRIST) ;
+    HDRSEARCH on $(sources) = $(SEARCH_SOURCE:E) $(SUBDIRHDRS) $(HDRS) $(STDHDRS) ;
+    HDRRULE on $(sources) = HeaderRule ;
+    HDRSCAN on $(sources) = $(SWIG.HDRPATTERN) ;
     SWIG.FLAGS on $(target) += -python -c++ -shadow -I$(TOP)/include ;
 
     Swig $(target) : $(sources) ;
