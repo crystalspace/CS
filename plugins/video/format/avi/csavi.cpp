@@ -78,7 +78,7 @@ void csAVIFormat::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (pSystem->GetObjectRegistry (), iReporter);
   if (rep)
     rep->ReportV (severity, "crystalspace.video.avi", msg, arg);
   else
