@@ -29,6 +29,8 @@ class csBox3;
 struct csTriangle;
 
 struct iMaterialWrapper;
+struct iGenMeshAnimationControl;
+struct iDocumentNode;
 
 SCF_VERSION (iGeneralMeshState, 0, 0, 3);
 
@@ -96,7 +98,7 @@ struct iGeneralMeshState : public iBase
   virtual bool IsShadowReceiving () const = 0;
 };
 
-SCF_VERSION (iGeneralFactoryState, 0, 1, 0);
+SCF_VERSION (iGeneralFactoryState, 0, 2, 0);
 
 /**
  * This interface describes the API for the general mesh factory.
@@ -201,6 +203,17 @@ struct iGeneralFactoryState : public iGeneralMeshState
   virtual bool IsBack2Front () const = 0;
 
   /**
+   * Set the animation control to use for this factory.
+   * See iGenMeshAnimationControl for more information.
+   */
+  virtual void SetAnimationControl (iGenMeshAnimationControl* anim_ctrl) = 0;
+
+  /**
+   * Get the current animation control for this factory.
+   */
+  virtual iGenMeshAnimationControl* GetAnimationControl () const = 0;
+
+  /**
    * @@@NR@@@
    * Adds an independantly named stream, sets to VertexCount
    */
@@ -222,6 +235,77 @@ struct iGeneralFactoryState : public iGeneralMeshState
    */
   virtual bool SetRenderBuffer (const char *name, float *value) = 0;
   virtual bool SetRenderBuffer (const char *name, int *value) = 0;
+};
+
+SCF_VERSION (iGenMeshAnimationControl, 0, 0, 1);
+
+/**
+ * Implementing this class allows the creation of classes that control
+ * animation of vertex, texel, normal, and color data right before it is
+ * being used. This can be used for various special effects. Note then when
+ * animating vertex that it is prefered that the bounding box of the
+ * object doesn't change too dramatically because this animation is
+ * called AFTER visibility culling!
+ */
+struct iGenMeshAnimationControl : public iBase
+{
+  /**
+   * Update the vertex data. Returns true if the vertex data
+   * was actually modified. The bounding box will be updated too
+   * in that case. This function will be called only once for the
+   * same ticks.
+   */
+  virtual bool UpdateVertices (csTicks current, csVector3* verts,
+  	int num_verts, csBox3& bbox) = 0;
+
+  /**
+   * Update the texel data. Returns true if the texel data
+   * was actually modified. This function will be called only once for the
+   * same ticks.
+   */
+  virtual bool UpdateTexels (csTicks current, csVector2* texels,
+  	int num_texels) = 0;
+
+  /**
+   * Update the normal data. Returns true if the normal data
+   * was actually modified. This function will be called only once for the
+   * same ticks.
+   */
+  virtual bool UpdateNormals (csTicks current, csVector3* normals,
+  	int num_normals) = 0;
+
+  /**
+   * Update the color data. Returns true if the color data
+   * was actually modified. This function will be called only once for the
+   * same ticks.
+   */
+  virtual bool UpdateColors (csTicks current, csColor* colors,
+  	int num_colors) = 0;
+
+  /**
+   * Setup this animation control from a document node.
+   * Returns 0 on success or an error description on failure.
+   */
+  virtual const char* Load (iDocumentNode* node) = 0;
+
+  /**
+   * Save this animation control to a document node.
+   * Returns 0 on success or an error description on failure.
+   */
+  virtual const char* Save (iDocumentNode* parent) = 0;
+};
+
+SCF_VERSION (iGenMeshAnimationControlFactory, 0, 0, 1);
+
+/**
+ * This class is a factory for creating animation controls.
+ */
+struct iGenMeshAnimationControlFactory : public iBase
+{
+  /**
+   * Create a new animation control.
+   */
+  virtual csPtr<iGenMeshAnimationControl> CreateAnimationControl () = 0;
 };
 
 #endif // __CS_IMESH_GENMESH_H__

@@ -565,6 +565,29 @@
                 <max x="0.1" y="0.1" z="0.1" />
             </box>
             <autonormals />
+	    <animcontrol plugin="crystalspace.mesh.anim.genmesh">
+	    	<group name="one">
+		    <vertex idx="0" weight=".5" />
+		    <vertex idx="1" weight=".5" />
+		    <vertex idx="2" weight=".5" />
+		    <vertex idx="3" weight=".5" />
+		</group>
+	    	<group name="two">
+		    <vertex idx="4" weight=".5" />
+		    <vertex idx="5" weight=".5" />
+		    <vertex idx="6" weight=".5" />
+		    <vertex idx="7" weight=".5" />
+		</group>
+		<script name="main">
+		    <move group="one" duration="1000" dx=".2" />
+		    <move group="two" duration="1000" dy=".2" />
+		    <delay time="1000" />
+		    <move group="one" duration="1000" dx="-.2" />
+		    <move group="two" duration="1000" dy="-.2" />
+		    <delay time="1000" />
+		    <repeat />
+		</script>
+	    </animcontrol>
         </params>
         <meshfact name="child1">
             <plugin>meshFact</plugin>
@@ -23084,11 +23107,11 @@
             <delay time="1000" />
             <enable trigger="animlight" />
         </sequence>
-        <sequence name="anim_sky">/* Time of day simulation */
+        <sequence name="anim_sky">
             <fadeambient sector="street1" red="1" green="1" blue="1" duration="1000" />
             <delay time="1000" />
             <fadeambient sector="street1" red="0" green="0" blue="0" duration="1000" />
-            <delay time="2000" />/* Time of day simulation */
+            <delay time="2000" />
             <setambient sector="street1" red="1.5" green="1.5" blue="1.5" />
             <delay time="75" />
             <setambient sector="street1" red="0" green="0" blue="0" />

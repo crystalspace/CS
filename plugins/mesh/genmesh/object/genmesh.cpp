@@ -1248,8 +1248,8 @@ void csGenmeshMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
               CS_BUFCOMP_FLOAT, 3);
         }
         mesh_colors_dirty_flag = false;
-        color_buffer->CopyToBuffer ( factory->GetColors(),
-        sizeof (csColor) * factory->GetVertexCount());        
+        color_buffer->CopyToBuffer (factory->GetColors(),
+          sizeof (csColor) * factory->GetVertexCount());        
       }
     }
     var->SetValue(color_buffer);
@@ -1404,6 +1404,8 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iMeshObjectType *pParent
 
   csRef<iEngine> eng = CS_QUERY_REGISTRY (object_reg, iEngine);
   engine = eng; // We don't want a circular reference!
+
+  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
 }
 
 csGenmeshMeshObjectFactory::~csGenmeshMeshObjectFactory ()
@@ -1437,6 +1439,16 @@ csGenmeshMeshObjectFactory::~csGenmeshMeshObjectFactory ()
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
 #endif
   SCF_DESTRUCT_IBASE ();
+}
+
+void csGenmeshMeshObjectFactory::SetAnimationControl (
+	iGenMeshAnimationControl* ac)
+{
+  anim_ctrl = ac;
+  anim_ctrl_vt_lasttick = vc->GetCurrentTicks ()-1;
+  anim_ctrl_tex_lasttick = vc->GetCurrentTicks ()-1;
+  anim_ctrl_nor_lasttick = vc->GetCurrentTicks ()-1;
+  anim_ctrl_col_lasttick = vc->GetCurrentTicks ()-1;
 }
 
 void csGenmeshMeshObjectFactory::SetBack2Front (bool b2f)
@@ -1630,11 +1642,60 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
 }
 */
 
+void csGenmeshMeshObjectFactory::AnimControlUpdateVertices ()
+{
+  csTicks c = vc->GetCurrentTicks ();
+  if (c != anim_ctrl_vt_lasttick)
+  {
+    anim_ctrl_vt_lasttick = c;
+    bool updated = anim_ctrl->UpdateVertices (c, mesh_vertices,
+      	  num_mesh_vertices, object_bbox);
+    if (updated) mesh_vertices_dirty_flag = true;
+  }
+}
+
+void csGenmeshMeshObjectFactory::AnimControlUpdateTexels ()
+{
+  csTicks c = vc->GetCurrentTicks ();
+  if (c != anim_ctrl_tex_lasttick)
+  {
+    anim_ctrl_tex_lasttick = c;
+    bool updated = anim_ctrl->UpdateTexels (c, mesh_texels,
+      	  num_mesh_vertices);
+    if (updated) mesh_texels_dirty_flag = true;
+  }
+}
+
+void csGenmeshMeshObjectFactory::AnimControlUpdateNormals ()
+{
+  csTicks c = vc->GetCurrentTicks ();
+  if (c != anim_ctrl_nor_lasttick)
+  {
+    anim_ctrl_nor_lasttick = c;
+    bool updated = anim_ctrl->UpdateNormals (c, mesh_normals,
+      	  num_mesh_vertices);
+    if (updated) mesh_normals_dirty_flag = true;
+  }
+}
+
+void csGenmeshMeshObjectFactory::AnimControlUpdateColors ()
+{
+  csTicks c = vc->GetCurrentTicks ();
+  if (c != anim_ctrl_col_lasttick)
+  {
+    anim_ctrl_col_lasttick = c;
+    bool updated = anim_ctrl->UpdateColors (c, mesh_colors,
+      	  num_mesh_vertices);
+    if (updated) mesh_colors_dirty_flag = true;
+  }
+}
+
 void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (
   csShaderVariable* var)
 {
   if (var->Name == vertex_name)
   {
+    if (anim_ctrl) AnimControlUpdateVertices ();
     if (mesh_vertices_dirty_flag)
     {
       if (!vertex_buffer)
@@ -1650,6 +1711,7 @@ void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (
   }
   if (var->Name == texel_name)
   {
+    if (anim_ctrl) AnimControlUpdateTexels ();
     if (mesh_texels_dirty_flag)
     {
       if (!texel_buffer)
@@ -1665,6 +1727,7 @@ void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (
   }
   if (var->Name == normal_name)
   {
+    if (anim_ctrl) AnimControlUpdateNormals ();
     if (mesh_normals_dirty_flag)
     {
       if (!normal_buffer)

@@ -64,7 +64,8 @@ enum
   XMLTOKEN_AUTONORMALS,
   XMLTOKEN_NOSHADOWS,
   XMLTOKEN_LOCALSHADOWS,
-  XMLTOKEN_BACK2FRONT
+  XMLTOKEN_BACK2FRONT,
+  XMLTOKEN_ANIMCONTROL
 };
 
 SCF_IMPLEMENT_IBASE (csGeneralFactoryLoader)
@@ -139,6 +140,7 @@ bool csGeneralFactoryLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("n", XMLTOKEN_N);
   xmltokens.Register ("renderbuffer", XMLTOKEN_RENDERBUFFER);
   xmltokens.Register ("back2front", XMLTOKEN_BACK2FRONT);
+  xmltokens.Register ("animcontrol", XMLTOKEN_ANIMCONTROL);
 
   xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
   xmltokens.Register ("manualcolors", XMLTOKEN_MANUALCOLORS);
@@ -504,6 +506,46 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	  num_vt++;
 	}
         break;
+      case XMLTOKEN_ANIMCONTROL:
+        {
+	  const char* pluginname = child->GetAttributeValue ("plugin");
+	  if (!pluginname)
+	  {
+	    synldr->ReportError (
+		    "crystalspace.genmeshfactoryloader.parse",
+		    child, "Plugin name missing for <animcontrol>!");
+	    return 0;
+	  }
+	  csRef<iGenMeshAnimationControlFactory> fact =
+	  	CS_QUERY_PLUGIN_CLASS (plugin_mgr, pluginname,
+		iGenMeshAnimationControlFactory);
+	  if (!fact)
+	  {
+	    fact = CS_LOAD_PLUGIN (plugin_mgr, pluginname,
+	    	iGenMeshAnimationControlFactory);
+	  }
+	  if (!fact)
+	  {
+	    synldr->ReportError (
+		"crystalspace.genmeshfactoryloader.parse",
+		child, "Could not load animation control plugin '%s'!",
+		pluginname);
+	    return 0;
+    	  }
+	  csRef<iGenMeshAnimationControl> anim_ctrl = fact->
+	  	CreateAnimationControl ();
+	  const char* error = anim_ctrl->Load (child);
+	  if (error)
+	  {
+	    synldr->ReportError (
+		"crystalspace.genmeshfactoryloader.parse",
+		child, "Error loading animation control: '%s'!",
+		error);
+	    return 0;
+	  }
+	  state->SetAnimationControl (anim_ctrl);
+	}
+	break;
       default:
 	synldr->ReportBadToken (child);
 	return 0;

@@ -13,6 +13,12 @@ chronological order.
 	  configure script. Among other issues, this resulted in a failure by
 	  the configure script to set up the makefile emulation layer if some
 	  of those modules were absent.
+	- Jorrit added support for genmesh animation plugins. There are new
+	  interfaces iGenMeshAnimationControl and
+	  iGenMeshAnimationControlFactory and you can call
+	  SetAnimationControl() on the mesh factory.
+	- Jorrit started work on a new gmeshanim plugin that is a script
+	  based animation plugin for genmesh. Doesn't work yet.
 9-Sep-2004
 	- Jorrit fixed a potential bug in csLoader::LoadMeshObjectFactory()
 	  where it would destroy the wrong factory after unsuccessful

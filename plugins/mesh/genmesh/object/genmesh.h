@@ -34,6 +34,7 @@
 #include "imesh/lighting.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/virtclk.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/vbufmgr.h"
 #include "csgeom/objmodel.h"
@@ -498,6 +499,20 @@ private:
   bool object_bbox_valid;
   bool initialized;
 
+  // For animation control.
+  csRef<iVirtualClock> vc;
+  csRef<iGenMeshAnimationControl> anim_ctrl;
+  csTicks anim_ctrl_vt_lasttick;
+  csTicks anim_ctrl_tex_lasttick;
+  csTicks anim_ctrl_nor_lasttick;
+  csTicks anim_ctrl_col_lasttick;
+  void SetAnimationControl (iGenMeshAnimationControl* anim_ctrl);
+  iGenMeshAnimationControl* GetAnimationControl () const { return anim_ctrl; }
+  void AnimControlUpdateVertices ();
+  void AnimControlUpdateTexels ();
+  void AnimControlUpdateNormals ();
+  void AnimControlUpdateColors ();
+
   csMeshedPolygon* polygons;
 
   /// Calculate bounding box and radius.
@@ -565,10 +580,31 @@ public:
   iMaterialWrapper* GetMaterialWrapper () const { return material; }
   void SetVertexCount (int n);
   int GetVertexCount () const { return num_mesh_vertices; }
-  csVector3* GetVertices () { SetupFactory (); return mesh_vertices; }
-  csVector2* GetTexels () { SetupFactory (); return mesh_texels; }
-  csVector3* GetNormals () { SetupFactory (); return mesh_normals; }
-  csColor* GetColors () { SetupFactory (); return mesh_colors; }
+  csVector3* GetVertices ()
+  {
+    SetupFactory ();
+    if (anim_ctrl) AnimControlUpdateVertices ();
+    return mesh_vertices;
+  }
+  csVector2* GetTexels ()
+  {
+    SetupFactory ();
+    if (anim_ctrl) AnimControlUpdateTexels ();
+    return mesh_texels;
+  }
+  csVector3* GetNormals ()
+  {
+    SetupFactory ();
+    if (anim_ctrl) AnimControlUpdateNormals ();
+    return mesh_normals;
+  }
+  csColor* GetColors ()
+  {
+    SetupFactory ();
+    if (anim_ctrl) AnimControlUpdateColors ();
+    return mesh_colors;
+  }
+
   void SetTriangleCount (int n);
 #ifndef CS_USE_NEW_RENDERER
   int GetTriangleCount () const { return top_mesh.num_triangles; }
@@ -807,6 +843,14 @@ public:
     virtual bool IsBack2Front () const
     {
       return scfParent->IsBack2Front ();
+    }
+    virtual void SetAnimationControl (iGenMeshAnimationControl* anim_ctrl)
+    {
+      scfParent->SetAnimationControl (anim_ctrl);
+    }
+    virtual iGenMeshAnimationControl* GetAnimationControl () const
+    {
+      return scfParent->GetAnimationControl ();
     }
     virtual bool AddRenderBuffer (const char *name, 
       csRenderBufferComponentType component_type, int component_size)

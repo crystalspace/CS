@@ -1,0 +1,10 @@
+SubDir TOP plugins mesh genmesh anim ;
+
+Description gmeshanim : "General mesh animation plugin" ;
+
+Plugin gmeshanim
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith gmeshanim : csgfx cstool csgeom csutil ;
+
+CompileGroups gmeshanim :  meshes ;
