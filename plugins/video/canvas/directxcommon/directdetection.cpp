@@ -34,7 +34,7 @@
 # define _strdup _fstrdup
 #endif
 
-void sys_fatalerror (char *str, HRESULT hRes)
+void SystemFatalError (char *str, HRESULT hRes)
 {
   LPVOID lpMsgBuf;
   char *szMsg;
@@ -265,7 +265,7 @@ static BOOL WINAPI DirectDetectionDDrawEnumCallback (GUID FAR * lpGUID,
   HRESULT hRes;
 
   if (FAILED (hRes = DirectDrawCreate (lpGUID, &pDD, NULL)))
-    sys_fatalerror ("Can't create DirectDraw device", hRes);
+    SystemFatalError ("Can't create DirectDraw device", hRes);
   
   ZeroMemory (&DriverCaps, sizeof (DDCAPS));
   DriverCaps.dwSize = sizeof (DDCAPS);
@@ -273,7 +273,7 @@ static BOOL WINAPI DirectDetectionDDrawEnumCallback (GUID FAR * lpGUID,
   HELCaps.dwSize = sizeof (DDCAPS);
   
   if (FAILED (hRes = pDD->GetCaps (&DriverCaps, &HELCaps)))
-    sys_fatalerror ("Can't get device capabilities for DirectDraw device", hRes);
+    SystemFatalError ("Can't get device capabilities for DirectDraw device", hRes);
   
   // some informations about device
   dd2d.DeviceName2D = _strdup (lpDriverName);
@@ -346,11 +346,11 @@ bool DirectDetection::checkDevices3D ()
 
         HRESULT hRes;
         if (FAILED (hRes = DirectDrawCreate (pGuid, &lpDD, NULL)))
-          sys_fatalerror ("Can't create DirectDraw device", hRes);
+          SystemFatalError ("Can't create DirectDraw device", hRes);
 
         lpDD->QueryInterface (IID_IDirect3D, (LPVOID *)&lpD3D);
         if (FAILED (hRes = lpD3D->EnumDevices (DirectDetectionD3DEnumCallback, (LPVOID *)&toy)))
-          sys_fatalerror ("Error when enumerating Direct3D devices.", hRes);
+          SystemFatalError ("Error when enumerating Direct3D devices.", hRes);
         
         lpD3D->Release ();
         lpDD->Release ();
@@ -367,7 +367,7 @@ bool DirectDetection::checkDevices2D ()
   // enumerate DDraw device
   HRESULT hRes;
   if (FAILED (hRes = DirectDrawEnumerate (DirectDetectionDDrawEnumCallback, this)))
-    sys_fatalerror ("Error when enumerating DirectDraw devices.", hRes);
+    SystemFatalError ("Error when enumerating DirectDraw devices.", hRes);
   
   return true;
 }

@@ -26,7 +26,7 @@
   ret = GlideLib_grGet( GR_NUM_BOARDS, 4, &val);
 
   if( !ret || !val) 
-    sys_fatalerror("csGraphics3DGlide::Open : No 3dfx chip found");
+    SystemFatalError ("csGraphics3DGlide::Open : No 3dfx chip found");
 
   GlideLib_grGlideInit();
 

@@ -76,7 +76,7 @@ CS_IMPLEMENT_PLUGIN
 
 #define WINDOW_STYLE (WS_POPUP | WS_MINIMIZEBOX | WS_POPUP | WS_SYSMENU)
 
-static void sys_fatalerror(char *str, HRESULT hRes = S_OK)
+static void SystemFatalError (char *str, HRESULT hRes = S_OK)
 {
   LPVOID lpMsgBuf;
   char* szMsg;
@@ -199,7 +199,7 @@ static void CreateIdentityPalette(csRGBpixel *p)
   hWndPalette = CreatePalette((LOGPALETTE *)&Palette);
   
   if(!hWndPalette) 
-    sys_fatalerror("Error creating identity palette.");
+    SystemFatalError ("Error creating identity palette.");
 }
 
 csGraphics2DOpenGL::csGraphics2DOpenGL(iBase *iParent) : 
@@ -226,7 +226,7 @@ bool csGraphics2DOpenGL::Initialize (iSystem *pSystem)
   // QI for iWin32SystemDriver //
   m_piWin32System = SCF_QUERY_INTERFACE (System, iWin32SystemDriver);
   if (!m_piWin32System)
-      sys_fatalerror("csGraphics2DDDraw3::Open(QI) -- iSystem passed does not support iWin32SystemDriver.");
+      SystemFatalError ("csGraphics2DDDraw3::Open(QI) -- iSystem passed does not support iWin32SystemDriver.");
   
   // Get the creation parameters //
   m_hInstance = m_piWin32System->GetInstance();
@@ -271,12 +271,12 @@ void csGraphics2DOpenGL::CalcPixelFormat ()
   pixelFormat = ChoosePixelFormat(hDC, &pfd);
   
   if (pixelFormat == 0)
-    sys_fatalerror("ChoosePixelFormat failed.");
+    SystemFatalError ("ChoosePixelFormat failed.");
   if (SetPixelFormat(hDC, pixelFormat, &pfd) != TRUE)
-    sys_fatalerror("SetPixelFormat failed.");
+    SystemFatalError ("SetPixelFormat failed.");
     
   if (DescribePixelFormat(hDC, pixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pfd) == 0)
-    sys_fatalerror("DescribePixelFormat failed.");
+    SystemFatalError ("DescribePixelFormat failed.");
 }
 
 bool csGraphics2DOpenGL::Open(const char *Title)
@@ -337,7 +337,7 @@ bool csGraphics2DOpenGL::Open(const char *Title)
 		(GetSystemMetrics(SM_CYSCREEN)-wheight)/2,
 		wwidth, wheight, NULL, NULL, m_hInstance, NULL );
   if( !m_hWnd )
-    sys_fatalerror("Cannot create Crystal Space window", GetLastError());
+    SystemFatalError ("Cannot create Crystal Space window", GetLastError());
 
   ShowWindow( m_hWnd, m_nCmdShow );
   UpdateWindow( m_hWnd );

@@ -29,7 +29,7 @@
 
 GlideLib * glLib;
 
-extern void sys_fatalerror(char *str, HRESULT hRes = S_OK);
+extern void SystemFatalError (char *str, HRESULT hRes = S_OK);
 
 // This Define should only work with VC ?
 #if !defined(COMP_VC)
@@ -39,7 +39,7 @@ extern void sys_fatalerror(char *str, HRESULT hRes = S_OK);
 	{ \
 	(name)=decl GetProcAddress(hModule,"_" #name "@" #stack); \
 	if((name)==NULL) \
-		sys_fatalerror("GlideLib::GlideLib() : Could not find " #name " function"); \
+		SystemFatalError ("GlideLib::GlideLib() : Could not find " #name " function"); \
 	}
 #endif
 
@@ -48,7 +48,7 @@ GlideLib::GlideLib(void)
   char * dllpath = "glide2x.dll"/*config->GetStr("Glide","GLIDEDLL","glide2x.dll")*/;
   hModule=LoadLibrary(dllpath);
   if(hModule==NULL)
-    sys_fatalerror("GlideLib::GlideLib could not load glide2x.dll");
+    SystemFatalError ("GlideLib::GlideLib could not load glide2x.dll");
   LOADFUNCTIONPROC(grGlideInit,(void (__stdcall*)(void)),0);
   LOADFUNCTIONPROC(grGlideShutdown,(void (__stdcall*)(void)),0);
   LOADFUNCTIONPROC(grGlideGetVersion,(void (__stdcall*)(char[80])),4);

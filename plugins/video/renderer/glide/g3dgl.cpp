@@ -98,8 +98,9 @@ long csGraphics3DGlide::m_vertstrulen =  sizeof(MyGrVertex);
 long csGraphics3DGlide::m_ZBufMode = 0;
 
 csGraphics3DGlide* csGraphics3DGlide::G3D = NULL;
+
 // Error Message handling
-void sys_fatalerror( char* thestr, int hRes=0 )
+void SystemFatalError ( char* thestr, int hRes=0 )
 {
 #if defined(OS_WIN32)
   if (hRes!=S_OK)
@@ -354,12 +355,12 @@ bool csGraphics3DGlide::Open(const char* Title)
 
   iRes=::getResolutionIndex (m_nWidth, m_nHeight);
   if (iRes==-1)
-    sys_fatalerror ("csGraphics3DGlide::Open() Invalid Resolution !");
+    SystemFatalError ("csGraphics3DGlide::Open() Invalid Resolution !");
   
   // We should find a way to allow to change the refresh rate        
   if (!(context=GlideLib_grSstWinOpen (hwnd, StatGlideRes[iRes].res,GR_REFRESH_60Hz, 
                 GR_COLORFORMAT_ARGB,GR_ORIGIN_LOWER_LEFT,2,1)))
-    sys_fatalerror ("csGraphics3DGlide::Open() : Could not open Window !");
+    SystemFatalError ("csGraphics3DGlide::Open() : Could not open Window !");
 
   m_piG2D->DoubleBuffer (true);        // RENDER IN BACKBUFFER
   GlideLib_grColorMask (FXTRUE,FXFALSE);                 // DISABLE ALPHA BUFFER

@@ -57,7 +57,7 @@ extern HINSTANCE ModuleHandle;
 extern int ApplicationShow;
 extern bool need_console;
 
-void sys_fatalerror(char *s)
+void SystemFatalError (char *s)
 {
   MessageBox(NULL, s, "Fatal Error", MB_OK | MB_ICONSTOP);
   exit (1);

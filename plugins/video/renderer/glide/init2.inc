@@ -34,10 +34,10 @@
 
   GlideLib_grSstQueryBoards(&hwconfig);
   if(hwconfig.num_sst==0) 
-    sys_fatalerror("csGraphics3DGlide2x::Open : No 3dfx chip found");
+    SystemFatalError ("csGraphics3DGlide2x::Open : No 3dfx chip found");
   GlideLib_grGlideInit();
   if(!GlideLib_grSstQueryHardware(&hwconfig))
-    sys_fatalerror("csGraphics3DGlide2x::Open : Unable to find any 3dfx chip");
+    SystemFatalError ("csGraphics3DGlide2x::Open : Unable to find any 3dfx chip");
         
   char szVersion[80];
   GlideLib_grGlideGetVersion(szVersion);
