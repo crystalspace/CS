@@ -94,7 +94,7 @@ Functionally, this port is comprised of two distinct system-dependent modules.
 --------
 
 This port of Crystal Space makes use of a number of platform-specific
-makefiles which are located in CS/mk/system.  A makefile exists for each
+makefiles which are located in CS/libs/cssys/next.  A makefile exists for each
 target platform.
 
     macosxs.mak             Defines MacOS/X Server-specific build attributes.

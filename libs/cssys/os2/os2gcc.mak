@@ -240,7 +240,7 @@ ifndef OS2LINK
 # if it is not pre-installed
 OS2LINK = ./os2link$(EXE)
 
-mk/system/os2gcc.mak: $(OS2LINK)
+libs/cssys/os2/os2gcc.mak: $(OS2LINK)
 
 $(OS2LINK): libs/cssys/os2/support/os2link.cpp
 	$(LD) $(LFLAGS.@) $(CFLAGS.optimize) $(LFLAGS.optimize) $^

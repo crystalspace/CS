@@ -12,6 +12,10 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+16-Feb-2000
+	- Eric Sunshine updated a number of documentation files to reflect
+	  the fact that platform-specific makefiles now reside within the
+	  CS/libs/cssys tree rather than CS/mk/system.
 15-Feb-2000
 	- Eric Sunshine worked around an OpenStep compiler bug which was
 	  triggeredy by ctLinkList.  The compiler generates unlinkable code

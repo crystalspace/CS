@@ -39,7 +39,7 @@ more time on my hands.
   Assign gg: <Your path where you have installed the GNU compiler>
 
   If you want to change the assign from gg: to something else
-  remember to also change it in CS/mk/system/amiga.mak
+  remember to also change it in CS/libs/cssys/amiga/amiga.mak
   ( -Igg:os-include/amiga )
 
 - Unpack the Crystal Space archive in a directory of your choice.
@@ -86,10 +86,10 @@ more time on my hands.
 
 - Compiling with FPU:
   Set DO_ASM=yes in file CS/mk/user.mak
-  Set FPUVER=-m68881 in file CS/mk/system/amiga.mak
+  Set FPUVER=-m68881 in file CS/libs/cssys/amiga/amiga.mak
 
 - Optimizing for 020, 040, or 060:
-  See the CPUVER flag comments in CS/mk/system/amiga.mak
+  See the CPUVER flag comments in CS/libs/cssys/amiga/amiga.mak
 
 - If you don't have png or jpeg installed set DO_PNG=no and DO_JPG=no
   in file CS/mk/user.mak. The GIF switch is require, because
@@ -102,7 +102,7 @@ more time on my hands.
   where the GNU make can find the Amiga specific includes like exec/type.h
   etc. This is essental, or Amiga.cpp and various other files will not be
   compiled.  The default is "GG:os-include/amiga/", but you can change
-  this in the CS/mk/system/amiga.mak file by changing the path on
+  this in the CS/libs/cssys/amiga/amiga.mak file by changing the path on
   the "INCLUDE_DIRS=" line.
 
 - When you're ready to start making the CrystalSpace project, type

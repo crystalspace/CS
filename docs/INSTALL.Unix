@@ -128,7 +128,8 @@ and some default 2D driver. Here are some other options:
 	- Software with SVGALIB
 	- Software with GGI
 
-To compile those drivers edit mk/system/linux.mak (or mk/system/solaris.mak)
+To compile those drivers edit the makefile in libs/cssys/unix which
+applies to your system (such as libs/cssys/unix/linux.mak, for instance)
 and edit the 'DRIVERS' statement as explained in the comments in the
 beginning. Then do 'make all' again and register the new drivers.
 
