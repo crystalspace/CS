@@ -19,6 +19,12 @@ The history order is reversed so that new features are at the top.
 	- Keith Fulton added iRegion->Add(iObject*) function to make
 	  adding objects to regions cleaner and easier.
 	  Also committed several compiler errors and warnings.
+	- Wouter fixed the openglcommon DrawPixel operation, which now
+	  uses floating point to address pixels. The same problem as for
+	  DrawLine seems to exist, where whole y values are later rounded
+	  up, shifting the result. The floating-point y value is slightly
+	  perturbed so its no longer on-the-edge. This makes g2dtest
+	  for opengl and software perform about the same on all clip tests.
 20-Jun-2003
 	- Marten fixed an error in the inline assembly in tcovbuf.cpp 
 	  which prevented it from compiling on msvc6
@@ -151,7 +157,7 @@ The history order is reversed so that new features are at the top.
 	  In gl3d the DrawPixmap routine is fixed to use the same
 	  computation as glcommon2d is using. 
 	  Computation of a y location is gly = height - y.
-	  The gly then has a range of 1..height. Still is is OK.
+	  The gly then has a range of 1..height. Still it is OK.
 	  On opengl gly=0.0 is off screen. gly=height is also off screen.
 	  Also, using gly=height-y gives results where absolute pixel
 	  values (as seen with screenshots) are equal to the pixels

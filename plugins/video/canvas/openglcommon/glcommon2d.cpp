@@ -401,9 +401,15 @@ void csGraphics2DGLCommon::DrawPixel (int x, int y, int color)
     // prepare for 2D drawing--so we need no fancy GL effects!
     bool gl_texture2d = statecache->IsEnabled_GL_TEXTURE_2D ();
     if (gl_texture2d) statecache->Disable_GL_TEXTURE_2D ();
+
+    // using floating point pixel addresses to fix an on-the-edge case.
+    // offsetting the y by a little just like for DrawLine.
+    // The whole pixels get rounded up, shifting the drawpixel.
+    float y1 = y;
+    if (fabs(float(int(y1))-y1) < 0.1) { y1 += 0.05; }
     setGLColorfromint (color);
     glBegin (GL_POINTS);
-    glVertex2i (x, Height - y);
+    glVertex2f (x, Height - y1);
     glEnd ();
 
     if (gl_texture2d) statecache->Enable_GL_TEXTURE_2D ();
