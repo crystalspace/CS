@@ -36,7 +36,7 @@ struct csCollisionPair
   csVector3 a1, b1, c1;	// First triangle
   csVector3 a2, b2, c2;	// Second triangle
 };
-//////////////////////////////////////////////////////
+
 SCF_VERSION (iCollider, 0, 2, 0);
 
 /**
@@ -45,15 +45,9 @@ SCF_VERSION (iCollider, 0, 2, 0);
 struct iCollider : public iBase
 {
 };
-//////////////////////////////////////////////////////
+
 SCF_VERSION (iCollideSystem, 0, 0, 3);
-//   
-//  THIS IS A REMINDER; CAN BE REMOVED AFTER COMMIT: 
-//   methods added:
-//
-//   iPrimSphereCollider* CreateSphereCollider (iPolygonMesh* mesh);
-//   iPrimBoxCollider*    CreateBoxCollider    (iPolygonMesh* mesh);
-//
+
 /**
  * This is the Collide plug-in. This plugin is a factory for creating
  * iCollider entities. A collider represents an entity in the
