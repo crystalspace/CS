@@ -722,19 +722,23 @@ void csGraphics2DDDraw6::SetRGB(int i, int r, int g, int b)
 
 bool csGraphics2DDDraw6::SetMouseCursor (csMouseCursorID iShape)
 {
+  HCURSOR hCursor;
+
   switch(iShape)
   {
-    case csmcNone: SetCursor(NULL); break;
-    case csmcArrow: SetCursor(LoadCursor (NULL, IDC_ARROW)); break;
-    case csmcMove: SetCursor(LoadCursor (NULL, IDC_SIZEALL)); break;
-    case csmcSizeNWSE: SetCursor(LoadCursor (NULL, IDC_SIZENWSE)); break;
-    case csmcSizeNESW: SetCursor(LoadCursor (NULL, IDC_SIZENESW)); break;
-    case csmcSizeNS: SetCursor(LoadCursor (NULL, IDC_SIZENS)); break;
-    case csmcSizeEW: SetCursor(LoadCursor (NULL, IDC_SIZEWE)); break;
-    case csmcStop: SetCursor(LoadCursor (NULL, IDC_NO)); break;
-    case csmcWait: SetCursor(LoadCursor (NULL, IDC_WAIT)); break;
+    case csmcNone:     hCursor = NULL; break;
+    case csmcArrow:    hCursor = LoadCursor (NULL, IDC_ARROW);    break;
+    case csmcMove:     hCursor = LoadCursor (NULL, IDC_SIZEALL);  break;
+    case csmcSizeNWSE: hCursor = LoadCursor (NULL, IDC_SIZENWSE); break;
+    case csmcSizeNESW: hCursor = LoadCursor (NULL, IDC_SIZENESW); break;
+    case csmcSizeNS:   hCursor = LoadCursor (NULL, IDC_SIZENS);   break;
+    case csmcSizeEW:   hCursor = LoadCursor (NULL, IDC_SIZEWE);   break;
+    case csmcStop:     hCursor = LoadCursor (NULL, IDC_NO);       break;
+    case csmcWait:     hCursor = LoadCursor (NULL, IDC_WAIT);     break;
     default: return false;
   }
+
+  SetWindowLong(m_hWnd,0,(LONG)hCursor);
   return true;
 }
 

@@ -409,8 +409,24 @@ void csGraphics2DOpenGL::SetRGB(int i, int r, int g, int b)
 
 bool csGraphics2DOpenGL::SetMouseCursor (csMouseCursorID iShape)
 {
-  (void)iShape;
-  return false;
+  HCURSOR hCursor;
+
+  switch(iShape)
+  {
+    case csmcNone:     hCursor = NULL; break;
+    case csmcArrow:    hCursor = LoadCursor (NULL, IDC_ARROW);    break;
+    case csmcMove:     hCursor = LoadCursor (NULL, IDC_SIZEALL);  break;
+    case csmcSizeNWSE: hCursor = LoadCursor (NULL, IDC_SIZENWSE); break;
+    case csmcSizeNESW: hCursor = LoadCursor (NULL, IDC_SIZENESW); break;
+    case csmcSizeNS:   hCursor = LoadCursor (NULL, IDC_SIZENS);   break;
+    case csmcSizeEW:   hCursor = LoadCursor (NULL, IDC_SIZEWE);   break;
+    case csmcStop:     hCursor = LoadCursor (NULL, IDC_NO);       break;
+    case csmcWait:     hCursor = LoadCursor (NULL, IDC_WAIT);     break;
+    default: return false;
+  }
+
+  SetWindowLong(m_hWnd,0,(LONG)hCursor);
+  return true;
 }
 
 bool csGraphics2DOpenGL::SetMousePosition (int x, int y)
