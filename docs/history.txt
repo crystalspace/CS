@@ -39,6 +39,9 @@ chronological order.
 	  updating the super lightmap data really. This fixes ForceRelight()
 	  in the sense that something happens now but it appears to be too
 	  bright.
+	- Eric Sunshine added iSCF::GetInterfaceName() to complement the
+	  existing iSCF::GetInterfaceID().
+	- Eric Sunshine added missing 'const' qualifiers to csStringSet.
 15-Dec-2003
 	- Matze reworked some jam rules so that subdirs are more robust now.
 	  This should also fix some msvcgen problems on jam.

@@ -45,7 +45,7 @@ csStringID csStringSet::Request (const char *Name)
   }
 }
 
-const char* csStringSet::Request (csStringID id)
+const char* csStringSet::Request (csStringID id) const
 {
   return (const char*)reverse_mapping.Get (id);
 }

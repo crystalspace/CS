@@ -82,7 +82,7 @@ public:
    * Request the string for a given ID. Return 0 if the string
    * has not been requested (yet).
    */
-  const char* Request (csStringID id);
+  const char* Request (csStringID id) const;
 
   /**
    * Delete all stored strings. When new strings are registered again, new

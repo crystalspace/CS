@@ -945,6 +945,12 @@ struct iSCF : public iBase
   virtual bool UnregisterClass (const char *iClassID) = 0;
 
   /**
+   * Return the name of an interface given an interface ID.  If the ID is
+   * unknown, null is returned.
+   */
+  virtual char const* GetInterfaceName (scfInterfaceID) const = 0;
+
+  /**
    * Return the interface ID number that belongs to the given interface.
    * If the interface is unknown, a new ID is allocated. This number can be
    * used to quickly determine whether two interfaces are equal.
@@ -991,7 +997,7 @@ struct iSCF : public iBase
 
 SCF_VERSION (iFactory, 0, 0, 1);
 SCF_VERSION (iBase, 0, 1, 0);
-SCF_VERSION (iSCF, 0, 2, 0);
+SCF_VERSION (iSCF, 0, 2, 1);
 
 /* @} */
 

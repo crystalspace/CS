@@ -86,6 +86,7 @@ public:
   virtual void UnloadUnusedModules ();
   virtual void ScanPluginsPath (const char* path, bool recursive = false,
     const char* context = 0);
+  virtual char const* GetInterfaceName (scfInterfaceID) const;
   virtual scfInterfaceID GetInterfaceID (const char *iInterface);
   virtual void Finish ();
   virtual iStringArray* QueryClassList (char const* pattern);
@@ -664,7 +665,7 @@ void *csSCF::CreateInstance (const char *iClassID, const char *iInterface,
     iBase *object = (iBase *)cf->CreateInstance ();
     if (object)
     {
-      instance = object->QueryInterface (GetInterfaceID (iInterface), iVersion);
+      instance = object->QueryInterface(GetInterfaceID(iInterface), iVersion);
       object->DecRef ();
 
       if (!instance)
@@ -897,6 +898,13 @@ bool csSCF::ClassRegistered (const char *iClassID)
   csScopedMutexLock lock (mutex);
   return (ClassRegistry->FindKey ((void*)iClassID,
   	ClassRegistry->CompareKey) >= 0);
+}
+
+
+char const* csSCF::GetInterfaceName (scfInterfaceID i) const
+{
+  csScopedMutexLock lock (mutex);
+  return InterfaceRegistry.Request(i);
 }
 
 scfInterfaceID csSCF::GetInterfaceID (const char *iInterface)
