@@ -69,7 +69,7 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csGraphics2DOpenGL);
     virtual void *GetProcAddress (const char *funcname)
-    { return wglGetProcAddress ((const GLubyte *)funcname); }
+    { return wglGetProcAddress ((const char *)funcname); }
   } scfiOpenGLInterface;
 
 protected:
