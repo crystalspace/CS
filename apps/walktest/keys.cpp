@@ -20,10 +20,10 @@
 #include "qint.h"
 #include "cssys/common/system.h"
 #include "walktest/walktest.h"
-#include "walktest/scon.h"
 #include "walktest/bot.h"
 #include "walktest/infmaze.h"
-#include "support/command.h"
+#include "apps/support/command.h"
+#include "csapputil/simpcons.h"
 #include "csengine/camera.h"
 #include "csengine/world.h"
 #include "csengine/csview.h"
@@ -1492,7 +1492,7 @@ void WalkTest::imm_rot_right_zaxis (float speed, bool slow, bool fast)
 void WalkTest::eatkeypress (int status,int key, bool shift, bool alt, bool ctrl)
 {
   if (System->Console->IsActive ()&&status)
-    ((SimpleConsole *)System->Console)->AddChar (key);
+    ((csSimpleConsole *)System->Console)->AddChar (key);
   else switch (key)
   {
     case CSKEY_TAB:
