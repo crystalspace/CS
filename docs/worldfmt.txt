@@ -329,9 +329,10 @@ Thing and object templates:
   <curve-center> ::= 'CURVECENTER' '(' <coordinate> ')'
   <curve-scale> ::= 'CURVESCALE' '(' <number> ')'
   <curve-control> ::= 'CURVECONTROL' '(' <coordinate> ':' <texture-coordinate> ')'
+  <template-file> ::= 'FILE' '(' <file-name> ')'
   <thing-tpl-comp> ::= <vertex> | <polygon-template> | <texnr> | <texlen> |
   		  <move> | <fog-desc> | <circle> | <bezier> | <curve-center> |
-		  <curve-scale> | <curve-control>
+		  <curve-scale> | <curve-control> | <template-file>
   <thing-template> ::= 'THING' <thingtpl-name> '(' { <thing-tpl-comp> } ')'
 
   <sixface-tpl-comp> ::= <move> | <texture-scale> | <texture> |
@@ -358,8 +359,10 @@ Sprites:
   <action-frame> :: 'F' '(' <frame-name> ',' <action-delay> ')'
   <sprite-action> :: = 'ACTION' <action-name> '(' { <action-frame> } ')' 
   <sprite-triangle> ::= 'TRIANGLE' '(' <v1> ',' <v2> ',' <v3> ')'
+  <sprite-skeleton> ::= ... @@@ (to be further defined here)
 
-  <sprite-tpl-comp> ::= <texnr> | <sprite-frame> | <sprite-action> | <sprite-triangle>
+  <sprite-tpl-comp> ::= <texnr> | <sprite-frame> | <sprite-action> | <sprite-triangle> |
+  		<template-file> | <sprite-skeleton>
   <sprite-template> ::= 'SPRITE' <spritetpl-name> '(' { <sprite-tpl-comp> } ')'
 
   <sp-template> ::= 'TEMPLATE' '(' <spritetpl-name> ',' <action-name> ')'
