@@ -64,6 +64,8 @@ chronological order.
 	- Eric Sunshine removed empty & unused data/config/render3d/opengl.cfg
 	  and data/config/render3d/render3d.cfg.  Also fixed a couple other
 	  configuration file-related problems.
+	- res fixed regexp_impl.c to actually honor the result of the regexp 
+	  check.	
 25-Feb-2004
 	- Fritz Elfert fixed the following lighting related crash in sprcal3d:
 	  Previously, csSpriteCal3DMeshObject managed a set of relevant lights
