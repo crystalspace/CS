@@ -14,17 +14,17 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 30-Nov-1999
-	- Eric Sunshine completely redesigned and rewrote the Network Driver
-	  interface and the Socket Network Driver from scratch.  The new
-	  design is far more abstract, simpler to use, and (hopefully) more
-	  applicable to a wider range of applications.  Is also now SCF-
-	  compatible.
+	- Eric Sunshine totally redesigned and rewrote iNetworkDriver and the
+	  Socket Network Driver from scratch.  The new design is far more
+	  abstract, simpler to use, and (hopefully) applicable to a wider
+	  range of applications.  It is also now SCF-compatible.
 	- Eric Sunshine patched up the Network Driver Demo to work with the
 	  new network driver architecture and to better illustrate its use.
 	  He also performed the SCF conversion on it.
 	- Eric Sunshine performed the SCF conversion on the Simple Network
 	  Manager.  He also renamed types, classes, & constants, and
 	  reformatted the source code to more closely follow CS guidelines.
+	- Eric Sunshine removed some obsolete COM junk from the sound drivers.
 29-Nov-1999
 	- Andrew Zabolotny did the following changes:
 	    - Fully rewrote halo support in software renderer. The
