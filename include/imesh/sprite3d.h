@@ -131,38 +131,49 @@ struct iSprite3DFactoryState : public iBase
   virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
 
   /**
-   * Add some vertices, normals, and texels. This function
-   * only reserves space for this. It will not actually update
-   * the information.
+   * Reserve space for the given number of vertices. A vertex includes
+   * information about its position, normal and texel. This function will
+   * not write any information into the reserved space.
    */
   virtual void AddVertices (int num) = 0;
-
-  /// Query the number of texels.
-  virtual int GetTexelCount () const = 0;
-  /// Get a texel.
-  virtual csVector2& GetTexel (int frame, int vertex) const = 0;
-  /// Get array of texels.
-  virtual csVector2* GetTexels (int frame) const = 0;
-  /// Set array of texels.  The array is copied.
-  virtual void SetTexels( csVector2 const* tex, int count, int frame) =0;
-
-  /// Query the number of vertices.
+  /// Return the current number of vertices
   virtual int GetVertexCount () const = 0;
+
   /// Get a vertex.
-  virtual csVector3& GetVertex (int frame, int vertex) const = 0;
+  virtual const csVector3& GetVertex (int frame, int vertex) const = 0;
+  /// Set a vertex.
+  virtual void SetVertex (int frame, int vertex, const csVector3 &Value) = 0;
   /// Get vertex array.
   virtual csVector3* GetVertices (int frame) const = 0;
-  /// Set array of texels.  The array is copied.
-  virtual void SetVertices( csVector3 const* vert, int count, int frame) =0;
+  /**
+   * Set array of vertices. The array is copied. It must contain as many
+   * vertices as the vertex count of this sprite.
+   */
+  virtual void SetVertices (csVector3 const* vert, int frame) = 0;
 
-  /// Query the number of normals.
-  virtual int GetNormalCount () const = 0;
+  /// Get a texel.
+  virtual const csVector2& GetTexel (int frame, int vertex) const = 0;
+  /// Set a texel.
+  virtual void SetTexel (int frame, int vertex, const csVector2 &Value) = 0;
+  /// Get array of texels.
+  virtual csVector2* GetTexels (int frame) const = 0;
+  /**
+   * Set array of texels. The array is copied. It must contain as many texels
+   * as the vertex count of this sprite.
+   */
+  virtual void SetTexels (csVector2 const* tex, int frame) = 0;
+
   /// Get a normal.
-  virtual csVector3& GetNormal (int frame, int vertex) const = 0;
+  virtual const csVector3& GetNormal (int frame, int vertex) const = 0;
+  /// Set a normal.
+  virtual void SetNormal (int frame, int vertex, const csVector3 &Value) = 0;
   /// Get normal array.
   virtual csVector3* GetNormals (int frame) const = 0;
-  /// Set array of normals.  The array is copied.
-  virtual void SetNormals( csVector3 const* norms, int count, int frame) =0;
+  /**
+   * Set array of normals. The array is copied. It must contain as many normals
+   * as the vertex count of this sprite.
+   */
+  virtual void SetNormals (csVector3 const* norms, int frame) = 0;
 
   /**
    * Add a triangle to the normal, texel, and vertex meshes

@@ -385,19 +385,19 @@ void add_tree_limbs (iSprite3DFactoryState* state, iSpriteFrame* frame,
   int anm_idx = frame->GetAnmIndex ();
   int tex_idx = frame->GetTexIndex ();
 
-  state->GetVertex (anm_idx, par_vertex_idx+0) = csVector3(-.05, 0, -.05);
-  state->GetVertex (anm_idx, par_vertex_idx+1) = csVector3(.05, 0, -.05);
-  state->GetVertex (anm_idx, par_vertex_idx+2) = csVector3(0, 0, .05);
-  state->GetVertex (anm_idx, par_vertex_idx+3) = csVector3(-.05, .45, -.05);
-  state->GetVertex (anm_idx, par_vertex_idx+4) = csVector3(.05, .45, -.05);
-  state->GetVertex (anm_idx, par_vertex_idx+5) = csVector3(0, .45, .05);
+  state->SetVertex (anm_idx, par_vertex_idx+0, csVector3(-.05, 0, -.05));
+  state->SetVertex (anm_idx, par_vertex_idx+1, csVector3(.05, 0, -.05));
+  state->SetVertex (anm_idx, par_vertex_idx+2, csVector3(0, 0, .05));
+  state->SetVertex (anm_idx, par_vertex_idx+3, csVector3(-.05, .45, -.05));
+  state->SetVertex (anm_idx, par_vertex_idx+4, csVector3(.05, .45, -.05));
+  state->SetVertex (anm_idx, par_vertex_idx+5, csVector3(0, .45, .05));
 
-  state->GetTexel (tex_idx, par_vertex_idx+0) = csVector2(0, 0);
-  state->GetTexel (tex_idx, par_vertex_idx+1) = csVector2(.99, 0);
-  state->GetTexel (tex_idx, par_vertex_idx+2) = csVector2(0, .99);
-  state->GetTexel (tex_idx, par_vertex_idx+3) = csVector2(.99, .99);
-  state->GetTexel (tex_idx, par_vertex_idx+4) = csVector2(.5, .5);
-  state->GetTexel (tex_idx, par_vertex_idx+5) = csVector2(.5, 0);
+  state->SetTexel (tex_idx, par_vertex_idx+0, csVector2(0, 0));
+  state->SetTexel (tex_idx, par_vertex_idx+1, csVector2(.99, 0));
+  state->SetTexel (tex_idx, par_vertex_idx+2, csVector2(0, .99));
+  state->SetTexel (tex_idx, par_vertex_idx+3, csVector2(.99, .99));
+  state->SetTexel (tex_idx, par_vertex_idx+4, csVector2(.5, .5));
+  state->SetTexel (tex_idx, par_vertex_idx+5, csVector2(.5, 0));
 
   if (recursion > 0)
   {
@@ -636,19 +636,19 @@ void add_ghost_limbs (iSprite3DFactoryState* state, iSpriteFrame* frame,
   int anm_idx = frame->GetAnmIndex ();
   int tex_idx = frame->GetTexIndex ();
 
-  state->GetVertex (anm_idx, par_vertex_idx+0) = csVector3(-dim, 0, -dim);
-  state->GetVertex (anm_idx, par_vertex_idx+1) = csVector3(dim, 0, -dim);
-  state->GetVertex (anm_idx, par_vertex_idx+2) = csVector3(0, 0, dim);
-  state->GetVertex (anm_idx, par_vertex_idx+3) = csVector3(-dim, .45, -dim);
-  state->GetVertex (anm_idx, par_vertex_idx+4) = csVector3(dim, .45, -dim);
-  state->GetVertex (anm_idx, par_vertex_idx+5) = csVector3(0, .45, dim);
+  state->SetVertex (anm_idx, par_vertex_idx+0, csVector3(-dim, 0, -dim));
+  state->SetVertex (anm_idx, par_vertex_idx+1, csVector3(dim, 0, -dim));
+  state->SetVertex (anm_idx, par_vertex_idx+2, csVector3(0, 0, dim));
+  state->SetVertex (anm_idx, par_vertex_idx+3, csVector3(-dim, .45, -dim));
+  state->SetVertex (anm_idx, par_vertex_idx+4, csVector3(dim, .45, -dim));
+  state->SetVertex (anm_idx, par_vertex_idx+5, csVector3(0, .45, dim));
 
-  state->GetTexel (tex_idx, par_vertex_idx+0) = csVector2(0, 0);
-  state->GetTexel (tex_idx, par_vertex_idx+1) = csVector2(.99, 0);
-  state->GetTexel (tex_idx, par_vertex_idx+2) = csVector2(0, .99);
-  state->GetTexel (tex_idx, par_vertex_idx+3) = csVector2(.99, .99);
-  state->GetTexel (tex_idx, par_vertex_idx+4) = csVector2(.5, .5);
-  state->GetTexel (tex_idx, par_vertex_idx+5) = csVector2(.5, 0);
+  state->SetTexel (tex_idx, par_vertex_idx+0, csVector2(0, 0));
+  state->SetTexel (tex_idx, par_vertex_idx+1, csVector2(.99, 0));
+  state->SetTexel (tex_idx, par_vertex_idx+2, csVector2(0, .99));
+  state->SetTexel (tex_idx, par_vertex_idx+3, csVector2(.99, .99));
+  state->SetTexel (tex_idx, par_vertex_idx+4, csVector2(.5, .5));
+  state->SetTexel (tex_idx, par_vertex_idx+5, csVector2(.5, 0));
 
   if (recursion > 0)
   {

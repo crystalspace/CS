@@ -354,9 +354,9 @@ public:
   void AddVertices (int num);
   /// Add a vertex, normal, and texel
   void AddVertex () { AddVertices (1); }
+  /// Query the number of vertices.
+  int GetVertexCount () const { return vertices.Get (0)->GetVertexCount (); }
 
-  /// Query the number of texels.
-  int GetTexelCount () const { return texels.Get(0)->GetVertexCount (); }
   /// Get a texel.
   csVector2& GetTexel (int frame, int vertex) const
     { return (*texels.Get(frame)) [vertex]; }
@@ -364,12 +364,9 @@ public:
   csVector2* GetTexels (int frame) const
     { return (*texels.Get(frame)).GetVertices (); }
   /// Set texel array.  The array is copied.
-  void SetTexels(csVector2 const* tex, int count, int frame)
-    { (*texels.Get(frame)).SetVertices(tex, count); }
+  void SetTexels(csVector2 const* tex, int frame)
+    { (*texels.Get(frame)).SetVertices(tex, GetVertexCount ()); }
 
-
-  /// Query the number of vertices.
-  int GetVertexCount () const { return vertices.Get (0)->GetVertexCount (); }
   /// Get a vertex.
   csVector3& GetVertex (int frame, int vertex) const
     { return (*vertices.Get(frame)) [vertex]; }
@@ -377,11 +374,9 @@ public:
   csVector3* GetVertices (int frame) const
     { return (*vertices.Get(frame)).GetVertices (); }
   /// Set vertex array.  The array is copied.
-  void SetVertices(csVector3 const* verts, int count, int frame)
-    { (*vertices.Get(frame)).SetVertices(verts, count); }
+  void SetVertices(csVector3 const* verts, int frame)
+    { (*vertices.Get(frame)).SetVertices(verts, GetVertexCount ()); }
 	
-  /// Query the number of normals.
-  int GetNormalCount () const { return normals.Get (0)->GetVertexCount (); }
   /// Get a normal.
   csVector3& GetNormal (int frame, int vertex) const
     { return (*normals.Get(frame)) [vertex]; }
@@ -389,8 +384,8 @@ public:
   csVector3* GetNormals (int frame) const
     { return (*normals.Get(frame)).GetVertices (); }
   /// Set normal array.  The array is copied.
-  void SetNormals(csVector3 const* norms, int count, int frame)
-    { (*normals.Get(frame)).SetVertices(norms, count); }
+  void SetNormals(csVector3 const* norms, int frame)
+    { (*normals.Get(frame)).SetVertices(norms, GetVertexCount ()); }
 
   /**
    * Add a triangle to the normal, texel, and vertex meshes
@@ -490,53 +485,57 @@ public:
     {
       scfParent->AddVertices (num);
     }
-    virtual int GetTexelCount () const
-    {
-      return scfParent->GetTexelCount ();
-    }
-    virtual csVector2& GetTexel (int frame, int vertex) const
-    {
-      return scfParent->GetTexel (frame, vertex);
-    }
-    virtual csVector2* GetTexels (int frame) const
-    {
-      return scfParent->GetTexels (frame);
-    }
-    virtual void SetTexels(csVector2 const* tex, int count, int frame)
-    {
-      scfParent->SetTexels(tex, count, frame);
-    }
     virtual int GetVertexCount () const
     {
       return scfParent->GetVertexCount ();
     }
-    virtual csVector3& GetVertex (int frame, int vertex) const
+    virtual const csVector3& GetVertex (int frame, int vertex) const
     {
       return scfParent->GetVertex (frame, vertex);
+    }
+    virtual void SetVertex (int frame, int vertex, const csVector3 &val)
+    {
+      scfParent->GetVertex (frame, vertex) = val;
     }
     virtual csVector3* GetVertices (int frame) const
     {
       return scfParent->GetVertices (frame);
     }
-    virtual void SetVertices(csVector3 const* verts, int count, int frame)
+    virtual void SetVertices(csVector3 const* verts, int frame)
     {
-      scfParent->SetVertices(verts, count, frame);
+      scfParent->SetVertices(verts, frame);
     }
-    virtual int GetNormalCount () const
+    virtual const csVector2& GetTexel (int frame, int vertex) const
     {
-      return scfParent->GetNormalCount ();
+      return scfParent->GetTexel (frame, vertex);
     }
-    virtual csVector3& GetNormal (int frame, int vertex) const
+    virtual void SetTexel (int frame, int vertex, const csVector2 &val)
+    {
+      scfParent->GetTexel (frame, vertex) = val;
+    }
+    virtual csVector2* GetTexels (int frame) const
+    {
+      return scfParent->GetTexels (frame);
+    }
+    virtual void SetTexels(csVector2 const* tex, int frame)
+    {
+      scfParent->SetTexels(tex, frame);
+    }
+    virtual const csVector3& GetNormal (int frame, int vertex) const
     {
       return scfParent->GetNormal (frame, vertex);
+    }
+    virtual void SetNormal (int frame, int vertex, const csVector3 &val)
+    {
+      scfParent->GetNormal (frame, vertex) = val;
     }
     virtual csVector3* GetNormals (int frame) const
     {
       return scfParent->GetNormals (frame);
     }
-    virtual void SetNormals(csVector3 const* norms, int count, int frame)
+    virtual void SetNormals(csVector3 const* norms, int frame)
     {
-      scfParent->SetNormals(norms, count, frame);
+      scfParent->SetNormals(norms, frame);
     }
     virtual void AddTriangle (int a, int b, int c)
     {

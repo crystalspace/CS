@@ -183,8 +183,8 @@ void csSprite3DMeshObjectFactory::AddVertices (int num)
 
   for (frame = 0; frame < frames.Length(); frame++)
   {
-    normals.Get (frame)->SetVertexCount (GetNormalCount () + num);
-    texels.Get (frame)->SetVertexCount (GetTexelCount () + num);
+    normals.Get (frame)->SetVertexCount (GetVertexCount () + num);
+    texels.Get (frame)->SetVertexCount (GetVertexCount () + num);
     vertices.Get (frame)->SetVertexCount (GetVertexCount () + num);
   }
 }
@@ -230,17 +230,17 @@ void csSprite3DMeshObjectFactory::GenerateLOD ()
   //@@@ turn this into a parameter or member variable?
   int lod_base_frame = 0;
 
-  csVector3* v = new csVector3[GetTexelCount()];
+  csVector3* v = new csVector3[GetVertexCount()];
 
-  for (i = 0; i < GetTexelCount(); i++)
+  for (i = 0; i < GetVertexCount(); i++)
     v[i] = GetVertex (lod_base_frame, i);
 
-  csTriangleVertices2* verts = new csTriangleVertices2 (texel_mesh, v, GetTexelCount());
+  csTriangleVertices2* verts = new csTriangleVertices2 (texel_mesh, v, GetVertexCount());
   delete [] v;
 
   delete [] emerge_from;
-  emerge_from = new int [GetTexelCount()];
-  int* translate = new int [GetTexelCount()];
+  emerge_from = new int [GetVertexCount()];
+  int* translate = new int [GetVertexCount()];
   csTriangleMesh2* new_mesh = new csTriangleMesh2 (*texel_mesh);
 
   csSpriteLOD::CalculateLOD (new_mesh, verts, translate, emerge_from);
@@ -248,19 +248,19 @@ void csSprite3DMeshObjectFactory::GenerateLOD ()
   for (i = 0 ; i < texels.Length () ; i++)
   {
     int j;
-    csVector2* new_texels = new csVector2 [GetTexelCount ()];
-    csVector3* new_vertices = new csVector3 [GetTexelCount ()];
-    csVector3* new_normals = new csVector3 [GetTexelCount ()];
+    csVector2* new_texels = new csVector2 [GetVertexCount ()];
+    csVector3* new_vertices = new csVector3 [GetVertexCount ()];
+    csVector3* new_normals = new csVector3 [GetVertexCount ()];
     csPoly2D* tx = texels.Get (i);
     csPoly3D* vt = vertices.Get (i);
     csPoly3D* vn = normals.Get (i);
-    for (j = 0 ; j < GetTexelCount () ; j++)
+    for (j = 0 ; j < GetVertexCount () ; j++)
     {
       new_texels[translate[j]] = (*tx)[j];
       new_vertices[translate[j]] = (*vt)[j];
       new_normals[translate[j]] = (*vn)[j];
     }
-    for (j = 0 ; j < GetTexelCount () ; j++)
+    for (j = 0 ; j < GetVertexCount () ; j++)
     {
       (*tx)[j] = new_texels[j];
       (*vt)[j] = new_vertices[j];
@@ -296,7 +296,7 @@ void csSprite3DMeshObjectFactory::ComputeBoundingBox ()
 
     csVector3 max_sq_radius (0);
     box.StartBoundingBox (GetVertex (frame, 0));
-    for ( vertex = 1 ; vertex < GetTexelCount() ; vertex++ )
+    for ( vertex = 1 ; vertex < GetVertexCount() ; vertex++ )
     {
       csVector3& v = GetVertex (frame, vertex);
       box.AddBoundingVertexSmart (v);
@@ -328,8 +328,8 @@ csSpriteFrame* csSprite3DMeshObjectFactory::AddFrame ()
 
   if (frames.Length() > 0)
   {
-    nr->SetVertexCount (GetNormalCount  ());
-    tx->SetVertexCount (GetTexelCount   ());
+    nr->SetVertexCount (GetVertexCount ());
+    tx->SetVertexCount (GetVertexCount ());
     vr->SetVertexCount (GetVertexCount ());
   }
 
@@ -376,7 +376,7 @@ void csSprite3DMeshObjectFactory::ComputeNormals (csSpriteFrame* frame)
 
   if (!tri_verts)
   {
-    tri_verts = new csTriangleVertices2 (texel_mesh, object_verts, GetTexelCount());
+    tri_verts = new csTriangleVertices2 (texel_mesh, object_verts, GetVertexCount());
   }
 
   csTriangle * tris = texel_mesh->GetTriangles();
@@ -399,7 +399,7 @@ void csSprite3DMeshObjectFactory::ComputeNormals (csSpriteFrame* frame)
   // calculate vertex normals, by averaging connected triangle normals
   int frame_number = frame->GetAnmIndex();
 
-  for (i = 0; i < GetTexelCount(); i++)
+  for (i = 0; i < GetVertexCount(); i++)
   {
     csTriangleVertex2 &vt = tri_verts->GetVertex (i);
     if (vt.num_con_triangles)
@@ -463,7 +463,7 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
 
   if (!tri_verts)
   {
-    tri_verts = new csTriangleVertices2 (texel_mesh, obj_verts, GetTexelCount());
+    tri_verts = new csTriangleVertices2 (texel_mesh, obj_verts, GetVertexCount());
   }
 
   csTriangle * tris = texel_mesh->GetTriangles();
@@ -485,8 +485,8 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
 
   // create a table that maps each vertex to the
   // first vertex that has the same coordinates
-  int * merge = new int [GetTexelCount()];
-  for (i = 0; i < GetTexelCount(); i++)
+  int * merge = new int [GetVertexCount()];
+  for (i = 0; i < GetVertexCount(); i++)
   {
     merge[i] = i;
     for (j = 0; j < i; j++)
@@ -504,10 +504,10 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
   csTriangleMesh2 merge_mesh;
   for (i = 0; i < num_triangles; i++)
     merge_mesh.AddTriangle (merge[tris[i].a], merge[tris[i].b], merge[tris[i].c]);
-  csTriangleVertices2 * tv = new csTriangleVertices2 (&merge_mesh, obj_verts, GetTexelCount());
+  csTriangleVertices2 * tv = new csTriangleVertices2 (&merge_mesh, obj_verts, GetVertexCount());
 
   // calculate vertex normals, by averaging connected triangle normals
-  for (i = 0; i < GetTexelCount(); i++)
+  for (i = 0; i < GetVertexCount(); i++)
   {
     csTriangleVertex2 &vt = tv->GetVertex (i);
     if (vt.num_con_triangles)
@@ -523,7 +523,7 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
   }
 
   // one last loop to fill in all of the merged vertex normals
-  for (i = 0; i < GetTexelCount(); i++)
+  for (i = 0; i < GetVertexCount(); i++)
   {
     csVector3 &n = GetNormal (frame, i);
     n = GetNormal (frame, merge [i]);
@@ -668,9 +668,9 @@ void csSprite3DMeshObject::AddVertexColor (int i, const csColor& col)
 {
   if (!vertex_colors)
   {
-    vertex_colors = new csColor [factory->GetTexelCount ()];
+    vertex_colors = new csColor [factory->GetVertexCount ()];
     int j;
-    for (j = 0 ; j < factory->GetTexelCount (); j++)
+    for (j = 0 ; j < factory->GetVertexCount (); j++)
       vertex_colors[j] = base_color;
   }
   vertex_colors [i] += col;
@@ -679,7 +679,7 @@ void csSprite3DMeshObject::AddVertexColor (int i, const csColor& col)
 void csSprite3DMeshObject::ResetVertexColors ()
 {
   if (vertex_colors)
-    for (int i = 0 ; i < factory->GetTexelCount (); i++)
+    for (int i = 0 ; i < factory->GetVertexCount (); i++)
       vertex_colors [i] = base_color;
   //delete [] vertex_colors;
   //vertex_colors = NULL;
@@ -688,7 +688,7 @@ void csSprite3DMeshObject::ResetVertexColors ()
 void csSprite3DMeshObject::FixVertexColors ()
 {
   if (vertex_colors)
-    for (int i = 0 ; i < factory->GetTexelCount (); i++)
+    for (int i = 0 ; i < factory->GetVertexCount (); i++)
       vertex_colors [i].Clamp (2., 2., 2.);
 }
 
@@ -716,12 +716,12 @@ int csSprite3DMeshObject::GetVertexToLightCount ()
   if (GetLodLevel () >= 0)
   {
     if (num_verts_for_lod == -1)
-      return factory->GetTexelCount ();
+      return factory->GetVertexCount ();
     else
       return num_verts_for_lod;
   }
   else
-    return factory->GetTexelCount ();
+    return factory->GetVertexCount ();
 }
   
 void csSprite3DMeshObject::GenerateSpriteLOD (int num_vts)
@@ -918,7 +918,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   	clip_z_plane) == false)
     return false;
  
-  UpdateWorkTables (factory->GetTexelCount());
+  UpdateWorkTables (factory->GetVertexCount());
   
 // Moving the lighting to below the lod.
 //  UpdateDeferedLighting (movable.GetPosition ());
@@ -1006,7 +1006,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
     // level. The integer part will be the number of vertices.
     // The fractional part will determine how much to morph
     // between the new vertex and the previous last vertex.
-    fnum = level_of_detail * (factory->GetTexelCount() + 1);
+    fnum = level_of_detail * (factory->GetVertexCount() + 1);
     num_verts_for_lod = (int)fnum;
     fnum -= num_verts_for_lod;  // fnum is now the fractional part.
 
@@ -1016,7 +1016,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   }
   else
   {
-    num_verts_for_lod = factory->GetTexelCount ();
+    num_verts_for_lod = factory->GetVertexCount ();
     m = factory->GetTexelMesh ();
   }
 
@@ -1193,15 +1193,15 @@ bool csSprite3DMeshObject::OldNextFrame (csTime current_time, bool onestep, bool
 
 csVector3* csSprite3DMeshObject::GetObjectVerts (csSpriteFrame* fr)
 {
-  UpdateWorkTables (factory->GetTexelCount ());
+  UpdateWorkTables (factory->GetVertexCount ());
   int fr_idx = fr->GetAnmIndex();
 
-  for (int i = 0; i < factory->GetTexelCount (); i++)
+  for (int i = 0; i < factory->GetVertexCount (); i++)
     obj_verts[i] = factory->GetVertex(fr_idx, i);
 
   if (skeleton_state)
   {
-    UpdateWorkTables (factory->GetTexelCount());
+    UpdateWorkTables (factory->GetVertexCount());
     skeleton_state->Transform (csTransform (), obj_verts.GetArray (),
     	tr_verts.GetArray ());
     return tr_verts.GetArray ();
@@ -1228,7 +1228,7 @@ void csSprite3DMeshObject::UpdateLighting (iLight** lights, int num_lights,
   if (GetLightingQuality() == CS_SPR_LIGHTING_LQ ||
       GetLightingQuality() == CS_SPR_LIGHTING_HQ )
   {
-    int num_texels = factory->GetTexelCount();
+    int num_texels = factory->GetVertexCount();
     // Reseting all of the vertex_colors to the base color.
     for (int i = 0 ; i < num_texels; i++)
       vertex_colors [i] = base_color;
@@ -1259,7 +1259,7 @@ void csSprite3DMeshObject::UpdateLighting (iLight** lights, int num_lights,
 
 void csSprite3DMeshObject::UpdateLightingRandom ()
 {
-//  int num_texels = factory->GetTexelCount();
+//  int num_texels = factory->GetVertexCount();
   int num_texels = GetVertexToLightCount();
   float r,g,b;
 
@@ -1285,7 +1285,7 @@ void csSprite3DMeshObject::UpdateLightingFast (iLight** lights, int num_lights,
   int light_num, j;
   
   float cosinus;
-  //int num_texels = factory->GetTexelCount();
+  //int num_texels = factory->GetVertexCount();
   int num_texels = GetVertexToLightCount();
   
   float light_bright_wor_dist;
@@ -1391,7 +1391,7 @@ void csSprite3DMeshObject::UpdateLightingLQ (iLight** lights, int num_lights,
 {
   int i, j;
 
-  //int num_texels = factory->GetTexelCount ();
+  //int num_texels = factory->GetVertexCount ();
   int num_texels = GetVertexToLightCount();
 
   float remainder = 1 - tween_ratio;
@@ -1464,7 +1464,7 @@ void csSprite3DMeshObject::UpdateLightingHQ (iLight** lights, int num_lights,
   int nf_idx = cur_action->GetCsNextFrame (cur_frame)->GetAnmIndex ();
 
   float remainder = 1 - tween_ratio;
-//  int num_texels = factory->GetTexelCount ();
+//  int num_texels = factory->GetVertexCount ();
   int num_texels = GetVertexToLightCount();
 
   // need vertices to calculate distance from light to each vertex

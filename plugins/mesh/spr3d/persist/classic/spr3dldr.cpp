@@ -628,7 +628,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
                 {
                   spr3dLook->AddVertices (1);
                 }
-                else if (i >= spr3dLook->GetTexelCount ())
+                else if (i >= spr3dLook->GetVertexCount ())
                 {
 	          ReportError (reporter,
 		    "crystalspace.sprite3dfactoryloader.parse.frame.vertices",
@@ -638,8 +638,8 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
 		  fact->DecRef ();
 		  return NULL;
                 }
-                spr3dLook->GetVertex (anm_idx, i) = csVector3 (x, y, z);
-                spr3dLook->GetTexel  (tex_idx, i) = csVector2 (u, v);
+                spr3dLook->SetVertex (anm_idx, i, csVector3 (x, y, z));
+                spr3dLook->SetTexel  (tex_idx, i, csVector2 (u, v));
                 i++;
                 break;
             }
@@ -654,7 +654,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
 	    fact->DecRef ();
 	    return NULL;
           }
-          if (i < spr3dLook->GetTexelCount ())
+          if (i < spr3dLook->GetVertexCount ())
           {
 	    ReportError (reporter,
 		"crystalspace.sprite3dfactoryloader.parse.frame.vertices",
@@ -814,7 +814,7 @@ void csSprite3DFactorySaver::WriteDown (iBase* obj, iStrVector * str,
     str->Push(csStrNew(buf));
     int anm_idx = frame->GetAnmIndex ();
     int tex_idx = frame->GetTexIndex ();
-    for(j=0; j<state->GetTexelCount(); j++)
+    for(j=0; j<state->GetVertexCount(); j++)
     {
       sprintf(buf, "  V(%g,%g,%g:%g,%g)\n", state->GetVertex(anm_idx, j).x,
         state->GetVertex(anm_idx, j).y, state->GetVertex(anm_idx, j).z,
