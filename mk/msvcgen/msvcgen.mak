@@ -94,6 +94,10 @@
 #	  wsock32.lib or opengl32.lib), whereas DSP.PROJECT.DEPEND always
 #	  refers to modules which are members of the project graph.
 #
+#	o DSP.PROJECT.DELAYLIBS -- List of DLLs (name without suffix) which 
+#	  should be delay-loaded (that is, there aren't loaded when the 
+#	  app/plugin is loaded, but the first time a function of it is called.)
+#
 #	o DSP.PROJECT.LFLAGS -- Specifies extra Windows-specific linker options
 #	  which should be used in addition to those already mentioned in the
 #	  template file.  Typically, linker options are only specified for

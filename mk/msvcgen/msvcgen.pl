@@ -892,6 +892,12 @@ Project Options:
                  the --depend option in that it refers to libraries which
                  exist outside of the project graph, whereas --depend always
                  refers to projects which are members of the project graph.
+    -Y <name>
+    --delayload=<name>
+    		 Specified the name of a DLL which should be delay loaded.
+    		 In prjdelay.tpi, \%delaylib\% is replaced with this value. 
+    		 All resulting strings are concatenated and replaced for
+    		 \%delaylibs\% in the project template.
     -l <flags>
     --lflags=<flags>
                  Specifies extra linker options which should be used in
