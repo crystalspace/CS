@@ -78,6 +78,13 @@ void csView::AddViewVertex (int x, int y)
 
 void csView::Draw ()
 {
+  UpdateClipper();
+  G3D->SetPerspectiveCenter ((int)camera->shift_x, (int)camera->shift_y);
+  world->Draw (camera, clipper);
+}
+
+void csView::UpdateClipper ()
+{
   if ((orig_width != G3D->GetWidth ()) || (orig_height != G3D->GetHeight()))
   {
     float xscale = ((float)G3D->GetWidth ())  / ((float)orig_width);
@@ -108,7 +115,6 @@ void csView::Draw ()
 
   if (!clipper)
   {
-
     if (view)
       clipper = new csPolygonClipper (view);
     else
