@@ -36,7 +36,7 @@ private:
   void CalcPixelFormat ();
 
 public:
-  SCF_DECLARE_IBASE_EXT (csGraphics2DOpenGL);
+  SCF_DECLARE_IBASE_EXT (csGraphics2DGLCommon);
 
   csGraphics2DOpenGL(iBase *iParent);
   virtual ~csGraphics2DOpenGL(void);
