@@ -678,22 +678,30 @@ file.
 
 @subheading @code{iEvent} Changes
 
-The @code{iEvent::Find()} method was renamed to @code{Retrieve()} and 
-possesses different return value semantics: more informaation than a simple
-@code{bool} is returned, however, in case of success @code{csEventErrNone}, 
-which has a value of 0, is returned. Hence @code{if}-statements to test whether
-retrieval of an attribute succeeded have to be changed, from:
+The @code{iEvent::Find()} method was renamed to @code{Retrieve()} and exhibits
+different return value semantics. Rather than returning a mere boolean result,
+it now returns one of the @samp{csEventError) enumeration constants.  Of
+particular note, in the case of success, @code{csEventErrNone} is returned,
+which has a value of 0. This success value could be misinterpreted as ``false''
+by the unwary when changing code to deal with this change. Conditionals which
+test if retrieval of an attribute succeeded must be changed to take this new
+semantic into account. For instance, code such as the following:
+
 @example
-iEvent* ev;
-if (ev->Find (...))
+iEvent* ev = @dots{};
+if (ev->Find(@{dots}))
 @{
-  /* ... */
+  @dots{}
 @}
 @end example
-To:
-iEvent* ev;
-if (ev->Retrieve (...) == csEventErrNone)
+
+@noindent
+must be changed to perform an explicit test on the return value of
+@code{Retrieve()}, rather than relying upon default boolean semantics:
+
+@example
+if (ev->Retrieve(@dots{}) == csEventErrNone)
 @{
-  /* ... */
+  @dots{}
 @}
 @end example
