@@ -2,7 +2,7 @@
 #define __MACOSX_OSXDelegate_h
 //=============================================================================
 //
-//	Copyright (C)1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999-2003 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -14,9 +14,10 @@
 //-----------------------------------------------------------------------------
 // OSXDelegate.h
 //
-//	The application's delegate.  Acts as a gateway between the AppKit and
-//	Crystal Space by forwarding Objective-C messages and events to the C++
-//	platform-specific assistant, OSXAssistant.
+//	An object which acts as a gateway between the AppKit and Crystal Space
+//	by forwarding Objective-C messages and events to the C++ platform-
+//	specific assistant, OSXAssistant.  Also acts as a listener for
+//	interesting notifications from the AppKit.
 //
 //-----------------------------------------------------------------------------
 #include "OSXConfigFile.h"

@@ -1,6 +1,6 @@
 //=============================================================================
 //
-//	Copyright (C)1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999-2003 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -12,9 +12,10 @@
 //-----------------------------------------------------------------------------
 // OSXDelegate.m
 //
-//	The application's delegate.  Acts as a gateway between the AppKit and
-//	Crystal Space by forwarding Objective-C messages and events to the C++
-//	platform-specific assistant, OSXAssistant.
+//	An object which acts as a gateway between the AppKit and Crystal Space
+//	by forwarding Objective-C messages and events to the C++ platform-
+//	specific assistant, OSXAssistant.  Also acts as a listener for
+//	interesting notifications from the AppKit.
 //
 //-----------------------------------------------------------------------------
 #include "OSXDelegate.h"
@@ -30,6 +31,7 @@
 #import <AppKit/NSView.h>
 #import <Foundation/NSAutoreleasePool.h>
 #import <Foundation/NSFileManager.h>
+#import <Foundation/NSNotification.h>
 #import <Foundation/NSProcessInfo.h>
 #import <Foundation/NSString.h>
 #import <Foundation/NSUserDefaults.h>
@@ -647,7 +649,16 @@ ND_PROTO(void,stop_event_loop)(OSXDelegateHandle handle)
   pool = [[NSAutoreleasePool alloc] init];
   NSApp = [OSXApplication sharedApplication];
   controller = [[OSXDelegate alloc] initWithDriver:handle];
-  [NSApp setDelegate:controller];
+  [[NSNotificationCenter defaultCenter]
+    addObserver:controller
+    selector:@selector(applicationDidBecomeActive:)
+    name:NSApplicationDidBecomeActiveNotification
+    object:NSApp];
+  [[NSNotificationCenter defaultCenter]
+    addObserver:controller
+    selector:@selector(applicationDidResignActive:)
+    name:NSApplicationDidResignActiveNotification
+    object:NSApp];
   [pool release];
   return controller;
 }
@@ -662,7 +673,7 @@ ND_PROTO(OSXDelegateHandle,startup)(OSXAssistant handle)
 + (void)shutdown:(OSXDelegate*)controller
 {
   NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-  [NSApp setDelegate:0];
+  [[NSNotificationCenter defaultCenter] removeObserver:controller];
   [controller showMouse];
   [controller flushGraphicsContext]; // Flush any pending `showcursor'.
   [controller release];

@@ -66,10 +66,19 @@ chronological order.
 	  OSXDelegate2D_OpenGL.h which prompted compilation warning.
 	- Eric Sunshine eliminated compilation warnings from old OpenGL
 	  renderer regarding invalid conversion from int* to GLint*.
-	- res added CS_USE_FAKE_WCHAR_TYPE to the list of predefined doxygen
+	- res added CS_USE_FAKE_WCHAR_TYPE to the list of predefined Doxygen
 	  macro names so the documentation for csUnicodeTransform is correct
 	  again.
 	- res updated the example in the csWtoC documentation.
+	- Eric Sunshine altered the behavior of OSXDelegate so that it no
+	  longer forcibly sets itself as the NSApplication's delegate.
+	  Instead, it now registers manually to receive the notifications in
+	  which it is interested.  This makes OSXDelegate friendlier to
+	  projects which need to use their own NSApplication delegate.  (The
+	  next step is to figure out how to alter OSXDelegate so that it no
+	  longer requires a custom NSApplication subclass.  Eliminating this
+	  requirement will make it much more friendly to external OSX-specific
+	  projects.)
 31-Jul-2003
 	- Jorrit replaced various occurances of csVector:
 	    - Replaced 'vTex' in OpenGL texture manager with
