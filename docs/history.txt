@@ -14,6 +14,12 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 10-Oct-1999
+	- Fixed bug in octree outline table which caused octree visibility
+	  culling not to work correctly in some cases.
+	- Finally found one of the bug in quadtree which prevented lighting
+	  from working properly! It is still not enough though...
+	- Found another bug in quadtree which prevented proper lighting.
+	  Still not enough...
 	- Eric Sunshine fixed the MacOS/X Server, OpenStep, and NextStep ports
 	  so that applications once again link following Andrew's recent
 	  system-wide changes.
