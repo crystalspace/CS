@@ -312,14 +312,18 @@ void csMetaObject3D::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
 void csMetaObject3D::notifyChildInserted (VobjectEvent &event)
 
 {
-  LOG ("vosobject3d", 4, "notifyChildInserted " << event.getContextualName());
+  LOG ("vosobject3d", 4, "notifyChildInserted " << event.getParent()->getURLstr()
+       << " " << event.getContextualName());
   if (event.getContextualName() == "a3dl:position" ||
       event.getContextualName() == "a3dl:orientation")
   {
     try
     {
       LOG("vosobject3d", 4, "adding property listener");
-      meta_cast<Property> (event.getChild())->addPropertyListener (this);
+      vRef<Property> p = meta_cast<Property> (event.getChild());
+      p->addParentListener (&DoNothingListener::static_);
+      p->addPropertyListener (this);
+      p->setPriority (Message::LowLatency);
     }
     catch (...)
     {
@@ -360,7 +364,10 @@ void csMetaObject3D::notifyChildReplaced (VobjectEvent &event)
 
     try
     {
-      meta_cast<Property> (event.getNewChild())->addPropertyListener (this);
+      vRef<Property> p = meta_cast<Property> (event.getChild());
+      p->addParentListener (&DoNothingListener::static_);
+      p->addPropertyListener (this);
+      p->setPriority (Message::LowLatency);
     }
     catch (...)
     {
@@ -370,11 +377,15 @@ void csMetaObject3D::notifyChildReplaced (VobjectEvent &event)
 
 void csMetaObject3D::notifyPropertyChange(const PropertyEvent &event)
 {
+  LOG("vosobject3d", 5, "entered notifyPropertyChange");
+
   try
   {
     if (event.getEvent() != PropertyEvent::PropertyRead)
     {
       vRef<ParentChildRelation> pcr = event.getProperty()->findParent (*this);
+      LOG("vosobject3d", 5, "found parent");
+
       if (pcr->getContextualName() == "a3dl:position")
       {
         double x = 0.0, y = 0.0, z = 0.0;
@@ -389,6 +400,12 @@ void csMetaObject3D::notifyPropertyChange(const PropertyEvent &event)
       {
         double x = 0.0, y = 0.0, z = 0.0, angle = 0.0;
         getOrientation (x,y,z,angle);
+
+        LOG("vosobject3d", 3, getURLstr() << " event value is \"" << event.getValue()
+            << "\", prop read is \""
+            << event.getProperty()->read() << "\" and getPos() gave us "
+            << x << " " << y << " " << z << " " << angle);
+
         csQuaternion q;
         q.SetWithAxisAngle (csVector3((float)x, (float)y, (float)z), angle * M_PI/180.0);
         vosa3dl->mainThreadTasks.push (new OrientateTask(this,csMatrix3(q)));

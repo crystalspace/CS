@@ -106,68 +106,70 @@ csRef<iVosSector> csVosA3DL::GetSector(const char* s)
   return r;
 }
 
+#define REPLACE_FACTORY(type, cls, oldfac, newfac)     \
+  Site::removeRemoteMetaObjectFactory(type, &oldfac); \
+  Site::removeLocalMetaObjectFactory(type, &oldfac); \
+  Site::removeLocalMetaObjectFactory(typeid(cls).name(), &oldfac);  \
+  Site::addRemoteMetaObjectFactory(type, type, &newfac); \
+  Site::addLocalMetaObjectFactory(type, &newfac); \
+  Site::addLocalMetaObjectFactory(typeid(cls).name(), &newfac);
+
+
 bool csVosA3DL::Initialize (iObjectRegistry *o)
 {
   LOG("csVosA3DL", 2, "Initializing");
 
-  Site::removeRemoteMetaObjectFactory("a3dl:object3D",
-                &A3DL::Object3D::new_Object3D);
-  Site::removeRemoteMetaObjectFactory("a3dl:object3D.cube",
-                &A3DL::Cube::new_Cube);
-  Site::removeRemoteMetaObjectFactory("a3dl:object3D.cone",
-                &A3DL::Cone::new_Cone);
-  Site::removeRemoteMetaObjectFactory("a3dl:object3D.polygonmesh",
-                &A3DL::PolygonMesh::new_PolygonMesh);
-  Site::removeRemoteMetaObjectFactory("a3dl:object3D.billboard",
-                &A3DL::Billboard::new_Billboard);
-  Site::removeRemoteMetaObjectFactory("a3dl:object3D.model",
-                &A3DL::Billboard::new_Billboard);
-  Site::removeRemoteMetaObjectFactory("a3dl:object3D.clone",
-                &A3DL::Clone::new_Clone);
-  Site::removeRemoteMetaObjectFactory("a3dl:object3D.sphere",
-                &A3DL::Sphere::new_Sphere);
-  Site::removeRemoteMetaObjectFactory("a3dl:object3D.cylinder",
-                &A3DL::Cylinder::new_Cylinder);
-  Site::removeRemoteMetaObjectFactory("a3dl:texture",
-                &A3DL::Texture::new_Texture);
-  Site::removeRemoteMetaObjectFactory("a3dl:material",
-                &A3DL::Material::new_Material);
-  Site::removeRemoteMetaObjectFactory("a3dl:light",
-                &A3DL::Light::new_Light);
-  Site::removeRemoteMetaObjectFactory("a3dl:sector",
-                &A3DL::Sector::new_Sector);
+  REPLACE_FACTORY("a3dl:object3D", A3DL::Object3D,
+                  A3DL::Object3D::new_Object3D,
+                  csMetaObject3D::new_csMetaObject3D);
 
-  Site::addRemoteMetaObjectFactory("a3dl:object3D", "a3dl:object3D",
-                                   &csMetaObject3D::new_csMetaObject3D);
-  Site::addRemoteMetaObjectFactory("a3dl:object3D.cube", "a3dl:object3D.cube",
-                                   &csMetaCube::new_csMetaCube);
-  Site::addRemoteMetaObjectFactory("a3dl:object3D.cone", "a3dl:object3D.cone",
-                                   &csMetaCone::new_csMetaCone);
-  Site::addRemoteMetaObjectFactory("a3dl:object3D.clone",
-                                   "a3dl:object3D.clone",
-                                   &csMetaClone::new_csMetaClone);
-  Site::addRemoteMetaObjectFactory("a3dl:object3D.polygonmesh",
-                                   "a3dl:object3D.polygonmesh",
-                                   &csMetaPolygonMesh::new_csMetaPolygonMesh);
-  Site::addRemoteMetaObjectFactory("a3dl:object3D.billboard",
-                                   "a3dl:object3D.billboard",
-                                   &csMetaBillboard::new_csMetaBillboard);
-  Site::addRemoteMetaObjectFactory("a3dl:object3D.model", "a3dl:object3D.model",
-                                   &csMetaModel::new_csMetaModel);
-  Site::addRemoteMetaObjectFactory("a3dl:object3D.sphere",
-                                   "a3dl:object3D.sphere",
-                                   &csMetaSphere::new_csMetaSphere);
-  Site::addRemoteMetaObjectFactory("a3dl:object3D.cylinder",
-                                   "a3dl:object3D.cylinder",
-                                   &csMetaCylinder::new_csMetaCylinder);
-  Site::addRemoteMetaObjectFactory("a3dl:texture", "a3dl:texture",
-                                   &csMetaTexture::new_csMetaTexture);
-  Site::addRemoteMetaObjectFactory("a3dl:material", "a3dl:material",
-                                   &csMetaMaterial::new_csMetaMaterial);
-  Site::addRemoteMetaObjectFactory("a3dl:light", "a3dl:light",
-                                   &csMetaLight::new_csMetaLight);
-  Site::addRemoteMetaObjectFactory("a3dl:sector", "a3dl:sector",
-                                   &csMetaSector::new_csMetaSector);
+  REPLACE_FACTORY("a3dl:object3D.cube", A3DL::Cube,
+                  A3DL::Cube::new_Cube,
+                  csMetaCube::new_csMetaCube);
+
+  REPLACE_FACTORY("a3dl:object3D.cone", A3DL::Cone,
+                  A3DL::Cone::new_Cone,
+                  csMetaCone::new_csMetaCone);
+
+  REPLACE_FACTORY("a3dl:object3D.clone", A3DL::Clone,
+                  A3DL::Clone::new_Clone,
+                  csMetaClone::new_csMetaClone);
+
+  REPLACE_FACTORY("a3dl:object3D.polygonmesh", A3DL::PolygonMesh,
+                  A3DL::PolygonMesh::new_PolygonMesh,
+                  csMetaPolygonMesh::new_csMetaPolygonMesh);
+
+  REPLACE_FACTORY("a3dl:object3D.billboard", A3DL::Billboard,
+                  A3DL::Billboard::new_Billboard,
+                  csMetaBillboard::new_csMetaBillboard);
+
+  REPLACE_FACTORY("a3dl:object3D.model", A3DL::Model,
+                  A3DL::Model::new_Model,
+                  csMetaModel::new_csMetaModel);
+
+  REPLACE_FACTORY("a3dl:object3D.sphere", A3DL::Sphere,
+                  A3DL::Sphere::new_Sphere,
+                  csMetaSphere::new_csMetaSphere);
+
+  REPLACE_FACTORY("a3dl:object3D.cylinder", A3DL::Cylinder,
+                  A3DL::Cylinder::new_Cylinder,
+                  csMetaCylinder::new_csMetaCylinder);
+
+  REPLACE_FACTORY("a3dl:texture", A3DL::Texture,
+                  A3DL::Texture::new_Texture,
+                  csMetaTexture::new_csMetaTexture);
+
+  REPLACE_FACTORY("a3dl:material", A3DL::Material,
+                  A3DL::Material::new_Material,
+                  csMetaMaterial::new_csMetaMaterial);
+
+  REPLACE_FACTORY("a3dl:light", A3DL::Light,
+                  A3DL::Light::new_Light,
+                  csMetaLight::new_csMetaLight);
+
+  REPLACE_FACTORY("a3dl:sector", A3DL::Sector,
+                  A3DL::Sector::new_Sector,
+                  csMetaSector::new_csMetaSector);
 
   objreg = o;
 
@@ -182,7 +184,8 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
   eventq->RegisterListener (this, CSMASK_FrameProcess);
 
   localsite.assign(new Site(true), false);
-  localsite->addSiteExtension(new LocalSocketSiteExtension());
+  //localsite->addSiteExtension(new LocalSocketSiteExtension());
+  localsite->addSiteExtension(new LocalVipSiteExtension());
 
 /*
   csRef<iDynamics> dynamics = CS_QUERY_REGISTRY (objreg, iDynamics);
