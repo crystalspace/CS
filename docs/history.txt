@@ -16,6 +16,13 @@ chronological order.
 	  load libraries which we might build, rather than for Crystal Space
 	  plugin modules. Obvious examples of foreign DLL's are the pure
 	  extension modules for Python, Perl, and Java.
+	- Eric Sunshine fixed problem where csperl5/perl5mod.cpp was still
+	  referencing the obsolete CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP macro.
+	- Eric Sunshine fixed problem in plugins/filesys/vfs/vfs.cfg.template
+	  where the TTF_PATH variable was misnamed on Unix. Also augmented
+	  mount information to take into account fact that TrueType fonts under
+	  X-Windows are now found in /usr/X11R6/libs/X11/fonts/TTF rather than
+	  the older /usr/X11R6/libs/X11/fonts/TrueType.
 17-Dec-2004
 	- Peter Amstutz updated the csvosa3dl plugin to compile with
 	  the current VOS CVS code.
