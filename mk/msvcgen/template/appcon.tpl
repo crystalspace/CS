@@ -52,7 +52,7 @@ LINK32=link.exe
 # ADD BASE LINK32 user32.lib advapi32.lib /nologo /subsystem:console /machine:I386
 # ADD LINK32 gdi32.lib user32.lib advapi32.lib %libs% /nologo /subsystem:console /machine:I386 /nodefaultlib:"LIBC" /out:"csrelease\temp\%project%\%target%" /libpath:"..\..\libs\cssys\win32\libs" %lflags% /OPT:NOREF
 # Begin Special Build Tool
-TargetPath=.\csrelease\temp\%project%\%target%
+TargetPath".\csrelease\temp\%project%\%target%"
 SOURCE="$(InputPath)"
 PostBuild_Cmds=echo Moving output to CS root.	copy "$(TargetPath)"  ..\..	echo Moving output to MSVC Release Bin.	copy "$(TargetPath)"  csrelease\bin
 # End Special Build Tool
@@ -81,7 +81,7 @@ LINK32=link.exe
 # ADD BASE LINK32 user32.lib advapi32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
 # ADD LINK32 gdi32.lib user32.lib advapi32.lib %libs% /nologo /subsystem:console /debug /machine:I386 /nodefaultlib:"LIBC" /out:"csdebug\temp\%project%\%target%" /pdbtype:sept /libpath:"..\..\libs\cssys\win32\libs" %lflags%
 # Begin Special Build Tool
-TargetPath=.\csdebug\temp\%project%\%target%
+TargetPath=".\csdebug\temp\%project%\%target%"
 SOURCE="$(InputPath)"
 PostBuild_Cmds=copy %0 post_build_debug.txt	echo Moving output to CS root.	copy "$(TargetPath)"  ..\..	echo Moving output to MSVC Debug Bin.	copy "$(TargetPath)"  csdebug\bin
 # End Special Build Tool
