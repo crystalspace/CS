@@ -144,7 +144,7 @@ STDMETHODIMP csNetworkDriverSockets::Disconnect(DWORD dwID)
 
 	char SockType;
 	int ProtoType;
-	int SizeOfSockType = sizeof(SockType);
+	socklen_t SizeOfSockType = sizeof(SockType);
 
 	if(!getsockopt(Socket[dwID], SOL_SOCKET, SO_TYPE, &SockType, &SizeOfSockType))
 	{
@@ -478,7 +478,7 @@ STDMETHODIMP csNetworkDriverSockets::Accept(DWORD dwLID/*listening socket*/, DWO
 
 #if !defined(NO_SOCKETS_SUPPORT)
 	sockaddr VisitorAddress;
-	int AddressLen = sizeof(sockaddr);
+	socklen_t AddressLen = sizeof(sockaddr);
 
 	Socket[*lpdwID] = accept(Socket[dwLID], &VisitorAddress, &AddressLen);
 

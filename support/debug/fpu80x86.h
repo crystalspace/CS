@@ -51,14 +51,16 @@ static inline unsigned int _control87(unsigned int newcw, unsigned int mask)
   (
         "       fclex                   \n"     // clear exceptions
         "       fstcw   %0              \n"     // oldcw = FPU control word
-        "       andl    %0,%%eax        \n"     // eax &= oldcw;
-        "       andl    %1,%%ecx        \n"     // ecx &= newcw
-        "       orl     %%ecx,%%eax     \n"     // eax |= ecx
-        "       movl    %%eax,%4        \n"     // tmpcw = eax
+	"       movl    %%ebx, %%eax    \n"
+        "       movl    %%ecx, %%edx    \n"
+        "       andl    %0,%%ebx        \n"     // eax &= oldcw;
+        "       andl    %1,%%edx        \n"     // ecx &= newcw
+        "       orl     %%edx,%%ebx     \n"     // eax |= ecx
+        "       movl    %%ebx,%4        \n"     // tmpcw = eax
         "       fldcw   %4              \n"     // load FPU control word
         : "=m" (oldcw)
 	: "g" (newcw), "a" (~mask), "c" (mask), "m" (tmpcw)
-	: "eax", "ecx", "memory"
+	: "ebx", "edx", "memory"
   );
   return oldcw & 0xffff;
 }
