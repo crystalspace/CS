@@ -22,7 +22,7 @@
 #include "cs2d/ggi/ggi2d.h"
 
 // This is the name of the DLL
-#define DLL_NAME "csggi2d.so"
+#define DLL_NAME "ggi2d.so"
 
 static unsigned int gRefCount = 0;
 static DllRegisterData gRegData =

@@ -47,6 +47,12 @@ csGraphics2DGGI::csGraphics2DGGI(ISystem* piSystem) : csGraphics2D (piSystem)
     exit (-1);
   }
 
+}
+
+void csGraphics2DGGI::Initialize ()
+{
+  csGraphics2D::Initialize ();
+
   Font = 0;
   Memory = NULL;
 

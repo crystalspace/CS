@@ -73,6 +73,7 @@ public:
   csGraphics2DGGI (ISystem* piSystem);
   virtual ~csGraphics2DGGI ();
 
+  virtual void Initialize ();
   virtual bool Open (char *Title);
   virtual void Close ();
 
