@@ -7,8 +7,6 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 8-Feb-2004
-	- Vincent Knecht updated cs.spec so we can build RPMs from cs current
-	  snapshot. Building is done by jam now.
 	- Eric Sunshine corrected Reed Hedges' changes to evdefs.h so that they
 	  are correct for plain-C compilers.  This file is processed by non-C++
 	  compilers (as noted by the comment at the very top of the file), so
@@ -22,6 +20,8 @@ chronological order.
 	  RANLIB to "", and use of "-s" option with ranlib for MacOS/X Panther.
 	  This allows the issues to be addressed in centralized locations, thus
 	  giving external simpler access to the solutions.
+	- Vincent Knecht updated cs.spec so we can build RPMs from CS current
+	  snapshot.  Building is now done with Jam.
 7-Feb-2004
         - Philip Wyett fixed make build of gl3d plugin after recent effects
 	  changes.  Make did not know how to build the source files from the
