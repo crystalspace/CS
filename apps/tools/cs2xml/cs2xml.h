@@ -50,6 +50,7 @@ public:
   int IsNumberList (const char* in);
   char* ToLower (const char* in);
 
+  void ParseMatrix (csParser *parser, char *buf, int indent);
   void WriteToken (int indent, const char* token, const char* name,
   	bool shortform, bool newline);
   void WriteVector3 (const char* params,

@@ -56,22 +56,10 @@ static void WriteStr (iFile* fout, const char* str)
   fout->Write (str, strlen (str));
 }
 
-static void WriteStruct (iFile* fout, int spaces, const char* token,
-	const char* name, const char* params)
-{
-  while (spaces > 4) { WriteStr (fout, "    "); spaces -= 4; }
-  while (spaces > 0) { WriteStr (fout, " "); spaces--; }
-  if (name == NULL)
-    Write (fout, "%s (%s)\n", token, params);
-  else
-    Write (fout, "%s '%s' (%s)\n", token, name, params);
-}
-
 static void PrintIndent (int cur_indent_level, char* msg, ...)
 {
   int i = cur_indent_level;
-  while (i >= 20) { printf ("                    "); i -= 20; }
-  while (i >= 4) { printf ("    "); i -= 4; }
+  while (i >= 8) { printf ("\t"); i -= 8; }
   while (i > 0) { printf (" "); i--; }
   va_list arg;
   va_start (arg, msg);
@@ -110,6 +98,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (FILE)
   CS_TOKEN_DEF (FIRST)
   CS_TOKEN_DEF (FOG)
+  CS_TOKEN_DEF (IDENTITY)
   CS_TOKEN_DEF (KEY)
   CS_TOKEN_DEF (LIGHT)
   CS_TOKEN_DEF (MATRIX)
@@ -121,7 +110,13 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (RADIUS)
   CS_TOKEN_DEF (RECTPARTICLES)
   CS_TOKEN_DEF (ROT)
+  CS_TOKEN_DEF (ROT_X)
+  CS_TOKEN_DEF (ROT_Y)
+  CS_TOKEN_DEF (ROT_Z)
   CS_TOKEN_DEF (SCALE)
+  CS_TOKEN_DEF (SCALE_X)
+  CS_TOKEN_DEF (SCALE_Y)
+  CS_TOKEN_DEF (SCALE_Z)
   CS_TOKEN_DEF (SECOND)
   CS_TOKEN_DEF (SHIFT)
   CS_TOKEN_DEF (T)
@@ -284,6 +279,146 @@ void Cs2Xml::WriteVector3 (const char* params,
   PrintIndent (0, "%s=%g %s=%g %s=%g", xname, x, yname, y, zname, z);
 }
 
+void Cs2Xml::ParseMatrix (csParser *parser, char *buf, int indent)
+{
+  CS_TOKEN_TABLE_START(commands)
+    CS_TOKEN_TABLE (IDENTITY)
+    CS_TOKEN_TABLE (ROT_X)
+    CS_TOKEN_TABLE (ROT_Y)
+    CS_TOKEN_TABLE (ROT_Z)
+    CS_TOKEN_TABLE (ROT)
+    CS_TOKEN_TABLE (SCALE_X)
+    CS_TOKEN_TABLE (SCALE_Y)
+    CS_TOKEN_TABLE (SCALE_Z)
+    CS_TOKEN_TABLE (SCALE)
+  CS_TOKEN_TABLE_END
+
+  char* params;
+  int cmd;
+  float angle;
+  float scaler;
+  int num;
+  float list[100];
+  const char* orig_buf = csStrNew (buf);
+
+  while ((cmd = parser->GetCommand (&buf, commands, &params)) > 0)
+  {
+    switch (cmd)
+    {
+      case CS_TOKEN_IDENTITY:
+        WriteToken (indent, "scale", NULL, false, false);
+	PrintIndent (0, "1</%s>\n", "scale");
+        break;
+      case CS_TOKEN_ROT_X:
+        csScanStr (params, "%f", &angle);
+        WriteToken (indent, "rotx", NULL, false, false);
+	PrintIndent (0, "%g</%s>\n", angle, "rotx");
+        break;
+      case CS_TOKEN_ROT_Y:
+        csScanStr (params, "%f", &angle);
+        WriteToken (indent, "roty", NULL, false, false);
+	PrintIndent (0, "%g</%s>\n", angle, "roty");
+        break;
+      case CS_TOKEN_ROT_Z:
+        csScanStr (params, "%f", &angle);
+        WriteToken (indent, "rotz", NULL, false, false);
+	PrintIndent (0, "%g</%s>\n", angle, "rotz");
+        break;
+      case CS_TOKEN_ROT:
+        csScanStr (params, "%F", list, &num);
+        if (num == 3)
+        {
+          WriteToken (indent, "rotx", NULL, false, false);
+	  PrintIndent (0, "%g</%s> ", list[0], "rotx");
+          WriteToken (indent, "rotz", NULL, false, false);
+	  PrintIndent (0, "%g</%s> ", list[2], "rotz");
+          WriteToken (indent, "roty", NULL, false, false);
+	  PrintIndent (0, "%g</%s>\n", list[1], "roty");
+        }
+        else
+	{
+	  // Error@@@
+	}
+        break;
+      case CS_TOKEN_SCALE_X:
+        csScanStr (params, "%f", &scaler);
+        WriteToken (indent, "scalex", NULL, false, false);
+	PrintIndent (0, "%g</%s>\n", scaler, "scalex");
+        break;
+      case CS_TOKEN_SCALE_Y:
+        csScanStr (params, "%f", &scaler);
+        WriteToken (indent, "scaley", NULL, false, false);
+	PrintIndent (0, "%g</%s>\n", scaler, "scaley");
+        break;
+      case CS_TOKEN_SCALE_Z:
+        csScanStr (params, "%f", &scaler);
+        WriteToken (indent, "scalez", NULL, false, false);
+	PrintIndent (0, "%g</%s>\n", scaler, "scalez");
+        break;
+      case CS_TOKEN_SCALE:
+        csScanStr (params, "%F", list, &num);
+        if (num == 1)      // One scaler; applied to entire matrix.
+	{
+          WriteToken (indent, "scale", NULL, false, false);
+	  PrintIndent (0, "%g</%s>\n", list[0], "scale");
+	}
+        else if (num == 3) // Three scalers; applied to X, Y, Z individually.
+	{
+          WriteToken (indent, "scalex", NULL, false, false);
+	  PrintIndent (0, "%g</%s> ", list[0], "scalex");
+          WriteToken (indent, "scaley", NULL, false, false);
+	  PrintIndent (0, "%g</%s> ", list[1], "scaley");
+          WriteToken (indent, "scalez", NULL, false, false);
+	  PrintIndent (0, "%g</%s>\n", list[2], "scalez");
+	}
+        else
+	{
+	  printf ("error 1\n"); fflush (stdout);
+	  // Error@@@
+	}
+        break;
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    // Neither SCALE, ROT, nor IDENTITY, so matrix may contain a single scaler
+    // or the nine values of a 3x3 matrix.
+    csScanStr (orig_buf, "%F", list, &num);
+    delete[] orig_buf;
+    if (num == 1)
+    {
+      WriteToken (indent, "scale", NULL, false, false);
+      PrintIndent (0, "%g</%s>\n", list[0], "scale");
+    }
+    else if (num == 9)
+    {
+      WriteToken (indent, "m11", NULL, false, false);
+      PrintIndent (0, "%g</%s> ", list[0], "m11");
+      WriteToken (0, "m12", NULL, false, false);
+      PrintIndent (0, "%g</%s> ", list[1], "m12");
+      WriteToken (0, "m13", NULL, false, false);
+      PrintIndent (0, "%g</%s>\n", list[2], "m13");
+      WriteToken (indent, "m21", NULL, false, false);
+      PrintIndent (0, "%g</%s> ", list[3], "m21");
+      WriteToken (0, "m22", NULL, false, false);
+      PrintIndent (0, "%g</%s> ", list[4], "m22");
+      WriteToken (0, "m23", NULL, false, false);
+      PrintIndent (0, "%g</%s>\n", list[5], "m23");
+      WriteToken (indent, "m31", NULL, false, false);
+      PrintIndent (0, "%g</%s> ", list[6], "m31");
+      WriteToken (0, "m32", NULL, false, false);
+      PrintIndent (0, "%g</%s> ", list[7], "m32");
+      WriteToken (0, "m33", NULL, false, false);
+      PrintIndent (0, "%g</%s>\n", list[8], "m33");
+    }
+    else
+    {
+      printf ("error 2 num=%d\n", num); fflush (stdout);
+      // Error @@@
+    }
+  }
+}
+
 void Cs2Xml::ParseGeneral (const char* parent_token,
 	int indent, csParser* parser, iFile* fout, char* buf)
 {
@@ -411,6 +546,34 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	    PrintIndent (0, "\n");
 	  }
 	  break;
+        case CS_TOKEN_MATRIX:
+	  {
+	    WriteToken (indent, tokname, name, false, true);
+	    ParseMatrix (parser, params, indent+2);
+            PrintIndent (indent, "</%s>\n", tokname);
+	  }
+	  break;
+        case CS_TOKEN_FILE:
+	  {
+	    char filename[2048];
+            csScanStr (params, "%s", filename);
+	    WriteToken (indent, tokname, name, false, false);
+	    PrintIndent (0, "%s", filename);
+            PrintIndent (0, "</%s>\n", tokname);
+	  }
+	  break;
+        case CS_TOKEN_T:
+        case CS_TOKEN_TRIANGLE:
+	  {
+	    WriteToken (indent, "t", name, false, false);
+	    int list[100];
+	    int num;
+	    csScanStr (params, "%D", list, &num);
+	    PrintIndent (0, "<t1>%d</t1> <t2>%d</t2> <t3>%d</t3>",
+	    	list[0], list[1], list[2]);
+            PrintIndent (0, "</%s>\n", "t");
+	  }
+	  break;
         case CS_TOKEN_AGING:
         case CS_TOKEN_BOX:
         case CS_TOKEN_CURVECENTER:
@@ -419,20 +582,16 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
         case CS_TOKEN_EMITBOX:
         case CS_TOKEN_EMITFIXED:
         case CS_TOKEN_F:
-        case CS_TOKEN_FILE:
         case CS_TOKEN_FOG:
         case CS_TOKEN_KEY:
         case CS_TOKEN_LIGHT:
-        case CS_TOKEN_MATRIX:
         case CS_TOKEN_NUM:
         case CS_TOKEN_PRIORITY:
         case CS_TOKEN_RADIUS:
         case CS_TOKEN_RECTPARTICLES:
         case CS_TOKEN_ROT:
         case CS_TOKEN_SCALE:
-        case CS_TOKEN_T:
         case CS_TOKEN_TRANSPARENT:
-        case CS_TOKEN_TRIANGLE:
         case CS_TOKEN_UV:
         case CS_TOKEN_W:
 	  WriteToken (indent, tokname, name, true, false);
