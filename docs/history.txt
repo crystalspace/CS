@@ -2,7 +2,7 @@ The history order is reversed so that new features are at the top.
 
 8-Jan-2002
 	- Committed a 'backwards compatibility' set from Rene Jager for the
-	  Python plugin and SWIG 1.1. The new cspython plugin is built when\
+	  Python plugin and SWIG 1.1. The new cspython plugin is built when
 	  USE_NEW_CSPYTHON_PLUGIN=yes during make. It is now put in
 	  mk/local.mak.
 	- Fixed frustvis/dynavis for completely flat objects.
@@ -22,7 +22,7 @@ The history order is reversed so that new features are at the top.
 	- Added GetLightNumber() to iLight. This can be used to check if
 	  a light has changed position, color, sector, or radius since last
 	  time you called that function.
-	- Bounding box is not correctly updated after doing HardTransform() on
+	- Bounding box was not correctly updated after doing HardTransform() on
 	  a 3D sprite.
 	- Added OnDestroy() to iLightCallback.
 	- The comments in iLightCallback indicated that it was safe to
