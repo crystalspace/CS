@@ -30,6 +30,13 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine fixed several compilation warnings which were recently
 	  introduced into the engine.  Mazed also once again builds on
 	  OpenStep.
+	- Did a significant optimization on the coverage mask tree
+	  GetIndex() routine. This routine alone was responsible for 50%
+	  of total processing time (in 640x480 OpenGL). So optimizing
+	  GetIndex is not bad.
+	- Made the coverage mask tree resolution independent. Note that
+	  currently the tree is limited to 1024x1024. This is not a
+	  strong limitation but just me being lazy :-)
 20-Dec-1999
 	- Thomas also added support for resizing textures to power of
 	  two coordinates in the engine.
