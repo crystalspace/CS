@@ -146,7 +146,7 @@ public:
   {
     typedef Iterator superclass;
   protected:
-    friend csIniFile;
+    friend class csIniFile;
     char* Section;
     DataIterator(const csIniFile&, const PrvINIbranch*, const char* Section);
     void Clone(const DataIterator&);
@@ -182,7 +182,7 @@ public:
   {
     typedef Iterator superclass;
   protected:
-    friend csIniFile;
+    friend class csIniFile;
     char* Section;
     char* Key;
     CommentIterator(const csIniFile&, const PrvINIbranch*,
