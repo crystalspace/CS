@@ -196,8 +196,11 @@ WalkTest::~WalkTest ()
   delete infinite_maze;
   delete huge_room;
   delete cslogo;
-  plbody->DecRef ();
-  pllegs->DecRef ();
+  if (Engine)
+  {
+    if (plbody) Engine->RemoveMesh (plbody);
+    if (pllegs) Engine->RemoveMesh (pllegs);
+  }
   delete [] recorded_perf_stats_name;
   if (perf_stats) perf_stats->DecRef ();
   if (Engine) Engine->DecRef ();

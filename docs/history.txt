@@ -1,5 +1,18 @@
 The history order is reversed so that new features are at the top.
 
+22-Jun-2001
+	- Fixed a bug in Walktest with the deletion of the legs/body
+	  collider. They were deleted with DecRef() but that is illegal
+	  since it is now required that they are deleted with
+	  engine->RemoveMesh().
+	- Implemented RemoveFromCache() in OpenGL 3D renderer. This is
+	  important for dynamic worlds because when a polygon is deleted
+	  the OpenGL renderer would not release information associated with
+	  that polygon. In particular the lightmap data was not released.
+	- Fixed a missing DecRef() on iThingState in the thing loader. That
+	  would leak a reference.
+	- Fixed a missing DecRef() in the thing loader when loading polygons.
+	- Removed csPolygonArrayNoFree. It is not used.
 21-Jun-2001
 	- Fixed a bug in the cleanup of sectors in the engine.  The portal
 	  references were not cleaned up.
@@ -46,9 +59,21 @@ The history order is reversed so that new features are at the top.
 	  prevent drawing.
 	- Replaced csDrawFunc with iDrawFuncCallback.
 	- Norman Kramer removed UnlinkCollection() from csEngine.
+	- Norman added missing DecRef() of iMeshObjectType in engine.cpp.
+	- Norman fixed a stupid typo Jorrit made in the calling of the callback
+	  in the spr3d plugin.
+	- Norman says: due to wrong method signature of csPlugIn::FreeItem
+	  it did not override and hence never got called.
+	- Norman added meshwrapper removal in csEngine::Clear().
+	- Norman fixed iso engine after Jorrit broke it due to the callback
+	  changes (uses new iDrawFuncCallback).
 	- Fixed a problem with the transparent sphere in flarge.
 	- Eric Sunshine removed several outdated DO_BLAH references from
 	  the documentation, and from mac/volatile.h and win32/volatile.h
+	- Christopher Nelson did the following to AWS:
+	    - Implemented children for components.
+	    - IMplemented almost all of the redraw algorithm.
+	- Philip Wyett fixed ptlab (changed delete to DecRef()).
 20-Jun-2001
 	- Made the resolving of portals to sectors a bit more robust
 	  by not resolving portals that point to sectors that already

@@ -84,6 +84,7 @@ csLightMap::csLightMap ()
 
 csLightMap::~csLightMap ()
 {
+  CS_ASSERT (cachedata == NULL);
   while (first_smap)
   {
     csShadowMap *smap = first_smap->next;

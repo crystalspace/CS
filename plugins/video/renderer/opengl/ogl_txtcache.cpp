@@ -486,6 +486,21 @@ void OpenGLLightmapCache::Clear ()
   }
 }
 
+void OpenGLLightmapCache::Uncache (iPolygonTexture *polytex)
+{
+  iLightMap* lm = polytex->GetLightMap ();
+  if (lm == NULL) return;
+  csLMCacheData* clm = (csLMCacheData *)lm->GetCacheData ();
+  if (!clm) return;
+  lm->SetCacheData (NULL);
+  csSuperLightMap* slm = &suplm[clm->super_lm_idx];
+  if (clm->prev) clm->prev->next = clm->next;
+  else slm->head = clm->next;
+  if (clm->next) clm->next->prev = clm->prev;
+  else slm->tail = clm->prev;
+  delete clm;
+}
+
 void OpenGLLightmapCache::Cache (iPolygonTexture *polytex)
 {
   Setup ();

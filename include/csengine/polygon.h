@@ -109,7 +109,7 @@ protected:
   /// Common constructor for derived classes
   csPolyTexType ();
   /// Destructor is virtual to be able to delete derived objects
-  virtual ~csPolyTexType () { }
+  virtual ~csPolyTexType ();
 
 public:
   /// Return a type for the kind of texturing used.

@@ -267,15 +267,19 @@ csPolyTexture::csPolyTexture ()
 csPolyTexture::~csPolyTexture ()
 {
   csEngine::current_engine->G3D->RemoveFromCache (this);
+  CS_ASSERT (cache_data[0] == NULL);
+  CS_ASSERT (cache_data[1] == NULL);
+  CS_ASSERT (cache_data[2] == NULL);
+  CS_ASSERT (cache_data[3] == NULL);
   if (lm) lm->DecRef ();
   if (ipolygon) ipolygon->DecRef ();
 }
 
 void csPolyTexture::SetLightMap (csLightMap* lightmap)
 {
+  if (lightmap) lightmap->IncRef ();
   if (lm) lm->DecRef ();
   lm = lightmap;
-  if (lm) lm->IncRef ();
 }
 
 void csPolyTexture::CreateBoundingTextureBox ()

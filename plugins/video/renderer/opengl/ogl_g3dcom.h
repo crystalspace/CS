@@ -560,7 +560,7 @@ public:
   virtual void ClearCache ();
 
   /// Remove some polygon from the cache.
-  virtual void RemoveFromCache (iPolygonTexture* /*poly_texture*/) { }
+  virtual void RemoveFromCache (iPolygonTexture* poly_texture);
 
   /// Get drawing buffer width
   virtual int GetWidth ()

@@ -86,30 +86,6 @@ public:
   { return (csPolygonInt **)root; }
 };
 
-/**
- * An dynamic array of csPolygon3D objects.
- * The difference with the above class is that this class
- * does not free the polygons.
- */
-class csPolygonArrayNoFree : public csVector
-{
-public:
-  /// Create the polygon array object
-  csPolygonArrayNoFree (int iLimit, int iDelta) : csVector (iLimit, iDelta)
-  { }
-
-  /// Find a polygon by name
-  virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
-
-  /// Get a polygon given its index in the array
-  csPolygon3D *Get (int iIndex) const;
-
-  /// Get the entire array of polygons as an array of pointers
-  csPolygonInt **GetArray ()
-  { return (csPolygonInt **)root; }
-};
-
-
 class csLightHalo;
 
 // Private class for keeping an array of halos

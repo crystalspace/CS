@@ -2979,6 +2979,11 @@ void csGraphics3DOGLCommon::CacheTexture (iMaterialHandle *imat_handle)
   }
 }
 
+void csGraphics3DOGLCommon::RemoveFromCache (iPolygonTexture* poly_texture)
+{
+  lightmap_cache->Uncache (poly_texture);
+}
+
 void csGraphics3DOGLCommon::CacheTexture (iPolygonTexture *texture)
 {
   CacheTexture (texture->GetMaterialHandle ());
@@ -3618,3 +3623,4 @@ void csGraphics3DOGLCommon::Guess_BlendMode (GLenum *src, GLenum*dst)
     *dst = GL_ZERO;
   }
 }
+

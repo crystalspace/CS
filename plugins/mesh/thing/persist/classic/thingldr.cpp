@@ -838,19 +838,22 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
   else
     poly3d->SetTextureSpace (tx_matrix, tx_vector);
 
-  iPolyTexType* ptt = poly3d->GetPolyTexType ();
-  iPolyTexLightMap* plm = QUERY_INTERFACE (ptt, iPolyTexLightMap);
-  if (uv_shift_given && plm)
+  if (uv_shift_given)
   {
-    plm->GetPolyTxtPlane ()->GetTextureSpace (tx_matrix, tx_vector);
-    // T = Mot * (O - Vot)
-    // T = Mot * (O - Vot) + Vuv      ; Add shift Vuv to final texture map
-    // T = Mot * (O - Vot) + Mot * Mot-1 * Vuv
-    // T = Mot * (O - Vot + Mot-1 * Vuv)
-    csVector3 shift (u_shift, v_shift, 0);
-    tx_vector -= tx_matrix.GetInverse () * shift;
-    poly3d->SetTextureSpace (tx_matrix, tx_vector);
-    plm->DecRef ();
+    iPolyTexType* ptt = poly3d->GetPolyTexType ();
+    iPolyTexLightMap* plm = QUERY_INTERFACE (ptt, iPolyTexLightMap);
+    if (plm)
+    {
+      plm->GetPolyTxtPlane ()->GetTextureSpace (tx_matrix, tx_vector);
+      // T = Mot * (O - Vot)
+      // T = Mot * (O - Vot) + Vuv      ; Add shift Vuv to final texture map
+      // T = Mot * (O - Vot) + Mot * Mot-1 * Vuv
+      // T = Mot * (O - Vot + Mot-1 * Vuv)
+      csVector3 shift (u_shift, v_shift, 0);
+      tx_vector -= tx_matrix.GetInverse () * shift;
+      poly3d->SetTextureSpace (tx_matrix, tx_vector);
+      plm->DecRef ();
+    }
   }
 
   if (do_mirror)
@@ -1139,16 +1142,14 @@ iBase* csThingLoader::Parse (const char* string, iEngine* engine,
 
   char* buf = (char*)string;
   ThingLoadInfo info;
-  if (load_thing_part (info, imeshwrap, engine, thing_state,
+  if (!load_thing_part (info, imeshwrap, engine, thing_state,
   	buf, 0, true))
   {
-    return fact;
-  }
-  else
-  {
     fact->DecRef ();
-    return NULL;
+    fact = NULL;
   }
+  thing_state->DecRef ();
+  return fact;
 }
 
 //---------------------------------------------------------------------------

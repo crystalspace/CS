@@ -247,6 +247,8 @@ public:
 
   /// Cache a lightmap.
   void Cache (iPolygonTexture *polytex);
+  /// Uncache a lightmap.
+  void Uncache (iPolygonTexture *polytex);
 
   /// Get the queue for a cached lightmap.
   csLightMapQueue* GetQueue (csLMCacheData* clm)

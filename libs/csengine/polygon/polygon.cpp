@@ -92,6 +92,10 @@ csPolyTexType::csPolyTexType ()
   MixMode = CS_FX_COPY;
 }
 
+csPolyTexType::~csPolyTexType ()
+{
+}
+
 csPolyTexLightMap::csPolyTexLightMap () : csPolyTexType ()
 {
   CONSTRUCT_EMBEDDED_IBASE(scfiPolyTexLightMap);
@@ -318,7 +322,7 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : csPolygonInt (),
 
   // Share txt_info with original polygon.
   txt_info = poly.txt_info;
-  txt_info->IncRef ();
+  if (txt_info) txt_info->IncRef ();
   txt_share_list = orig_poly->txt_share_list;
   orig_poly->txt_share_list = this;
 
