@@ -257,12 +257,12 @@ AS_VAR_SET_IF([cs_cv_shell_mkdir_p],
 #------------------------------------------------------------------------------
 # Check for NASM and extensions (such as %xdefine) which we require.
 #------------------------------------------------------------------------------
-AC_CHECK_PROGS([NASM], [nasm])
+AC_CHECK_PROGS([NASM], [nasmw nasm])
 AS_IF([test -n "$NASM"],
-    [AC_CACHE_CHECK([for nasm extensions], [cs_cv_prog_nasm_ok],
+    [AC_CACHE_CHECK([if nasm is sufficiently recent], [cs_cv_prog_nasm_ok],
 	[echo "%xdefine TEST" > conftest.asm
 	AS_IF([AC_RUN_LOG(
-	    [$NASM -f elf conftest.asm -o conftest.$OBJEXT 1>&2])],
+	    [$NASM conftest.asm -o conftest.$OBJEXT 1>&2])],
 	    [cs_cv_prog_nasm_ok=yes], [cs_cv_prog_nasm_ok=no])
 	rm -f conftest.*])
     AS_IF([test $cs_cv_prog_nasm_ok = yes],

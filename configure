@@ -3499,7 +3499,7 @@ fi
 #------------------------------------------------------------------------------
 # Check for NASM and extensions (such as %xdefine) which we require.
 #------------------------------------------------------------------------------
-for ac_prog in nasm
+for ac_prog in nasmw nasm
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -3540,14 +3540,14 @@ fi
 done
 
 if test -n "$NASM"; then
-  echo "$as_me:$LINENO: checking for nasm extensions" >&5
-echo $ECHO_N "checking for nasm extensions... $ECHO_C" >&6
+  echo "$as_me:$LINENO: checking if nasm is sufficiently recent" >&5
+echo $ECHO_N "checking if nasm is sufficiently recent... $ECHO_C" >&6
 if test "${cs_cv_prog_nasm_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   echo "%xdefine TEST" > conftest.asm
-	if { (echo "$as_me:$LINENO: \$NASM -f elf conftest.asm -o conftest.\$OBJEXT 1>&2") >&5
-  ($NASM -f elf conftest.asm -o conftest.$OBJEXT 1>&2) 2>&5
+	if { (echo "$as_me:$LINENO: \$NASM conftest.asm -o conftest.\$OBJEXT 1>&2") >&5
+  ($NASM conftest.asm -o conftest.$OBJEXT 1>&2) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; then

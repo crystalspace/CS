@@ -7,12 +7,11 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 2-Sep-2003
-	- Philip Wyett re-applied the Eric Sunshines Cygwin __argc __argv
-          fix in win32.cpp, which was overwritten by the old version
-          by another dev.
-            - Philip Wyett added CreateThread () and ExitThread () for
-              Cygwin port, as it does not have _beginthreadex () or
-              _endthreadex ().
+	- Philip Wyett re-applied Eric Sunshine's Cygwin __argc/__argv fix in
+          win32.cpp, which was overwritten by the old version by another
+          developer.
+	- Philip Wyett added CreateThread() and ExitThread() for Cygwin port,
+          as it does not have _beginthreadex() or _endthreadex().
 	- Jorrit changed the new renderer iGraphics3D API as follows:
 	  Removed ActivateBuffer, DeactivateBuffer, ActivateTexture, and
 	  DeactivateTexture. Instead there is now SetBufferState() and
@@ -39,6 +38,11 @@ chronological order.
 	- res fixed a bug in csHash<>::GetAll(). When you have a loop that 
 	  should iterate from n-1 to 0, it's better to decrement the loop
 	  counter than to increment.
+	- Eric Sunshine changed the NASM check in configure.ac so that it
+	  checks for `nasmw' in addition to `nasm', since `nasmw' is the
+	  program name on Windows.  Also fixed so that it no longer
+	  unnecessarily and (potentially) incorrectly passes "-f elf" to nasm
+	  during the test invocation.
 1-Sep-2003
 	- Jorrit unreverted the changes from Old_Belge on the sprcal3d
 	  mesh object. Unfortunatelly this means that this plugin now
