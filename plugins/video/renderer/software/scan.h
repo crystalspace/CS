@@ -219,6 +219,9 @@ struct csScanSetup
    * it is a (BLENDTABLE_MAX*2 x BLENDTABLE_MAX) matrix);
    */
   unsigned char *BlendingTable [NUMBLENDINGTABLES];
+
+  /// the blending table for proc. textures.
+  unsigned char *BlendingTableProc [NUMBLENDINGTABLES];
 };
 
 // The following should be accessible from assembly, so avoid C++ mangling
@@ -249,7 +252,8 @@ void csScan_Initialize ();
 /// Free all tables
 void csScan_Finalize ();
 /// Calculate blending tables (should be called each time pixel format changes)
-void csScan_CalcBlendTables (int rbits, int gbits, int bbits);
+void csScan_CalcBlendTables (unsigned char *BlendingTable[], int rbits, 
+  int gbits, int bbits);
 /// Initialize the scanline variables
 void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,
   iPolygonTexture* tex, csTextureHandleSoftware* texture, csTextureSoftware *untxt);

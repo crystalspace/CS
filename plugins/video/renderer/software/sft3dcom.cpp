@@ -695,8 +695,13 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
   if ((o_rbits != pfmt.RedBits)
    || (o_gbits != pfmt.GreenBits)
    || (o_bbits != pfmt.BlueBits))
-    csScan_CalcBlendTables (o_rbits = pfmt.RedBits, o_gbits = pfmt.GreenBits,
-      o_bbits = pfmt.BlueBits);
+    /// make blending tables
+    if(!texman->GetMainTextureManager()) /// if this is not procedural manager
+      csScan_CalcBlendTables (Scan.BlendingTable, o_rbits = pfmt.RedBits, 
+        o_gbits = pfmt.GreenBits, o_bbits = pfmt.BlueBits);
+    else 
+      csScan_CalcBlendTables (Scan.BlendingTableProc, o_rbits = pfmt.RedBits, 
+        o_gbits = pfmt.GreenBits, o_bbits = pfmt.BlueBits);
 }
 
 csDrawScanline* csGraphics3DSoftwareCommon::ScanProc_8_Alpha
@@ -2212,6 +2217,10 @@ void csGraphics3DSoftwareCommon::StartPolygonFX (iMaterialHandle* handle,
   Scan.AlphaMask = alpha_mask;
 
   Scan.BlendTable = NULL;
+  // array to select blend tables from
+  unsigned char **BlendingTable = Scan.BlendingTable; 
+  if(texman->GetMainTextureManager()) // proc manager uses its own blend tables
+    BlendingTable = Scan.BlendingTableProc;
   pqinfo.drawline = NULL;
   pqinfo.drawline_gouraud = NULL;
 
@@ -2224,13 +2233,13 @@ void csGraphics3DSoftwareCommon::StartPolygonFX (iMaterialHandle* handle,
     switch (mode & CS_FX_MASK_MIXMODE)
     {
       case CS_FX_ADD:
-        Scan.BlendTable = Scan.BlendingTable [BLENDTABLE_ADD];
+        Scan.BlendTable = BlendingTable [BLENDTABLE_ADD];
         break;
       case CS_FX_MULTIPLY:
-        Scan.BlendTable = Scan.BlendingTable [BLENDTABLE_MULTIPLY];
+        Scan.BlendTable = BlendingTable [BLENDTABLE_MULTIPLY];
         break;
       case CS_FX_MULTIPLY2:
-        Scan.BlendTable = Scan.BlendingTable [BLENDTABLE_MULTIPLY2];
+        Scan.BlendTable = BlendingTable [BLENDTABLE_MULTIPLY2];
         break;
       case CS_FX_ALPHA:
       {
@@ -2238,11 +2247,11 @@ void csGraphics3DSoftwareCommon::StartPolygonFX (iMaterialHandle* handle,
         if (alpha < 12)
           mode = (mode & ~CS_FX_MASK_MIXMODE) | CS_FX_COPY;
         else if (alpha < 96)
-          Scan.BlendTable = Scan.BlendingTable [BLENDTABLE_ALPHA25];
+          Scan.BlendTable = BlendingTable [BLENDTABLE_ALPHA25];
         else if (alpha < 160)
-          Scan.BlendTable = Scan.BlendingTable [BLENDTABLE_ALPHA50];
+          Scan.BlendTable = BlendingTable [BLENDTABLE_ALPHA50];
         else if (alpha < 244)
-          Scan.BlendTable = Scan.BlendingTable [BLENDTABLE_ALPHA75];
+          Scan.BlendTable = BlendingTable [BLENDTABLE_ALPHA75];
         else
           goto zfill_only;
         break;

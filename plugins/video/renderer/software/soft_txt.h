@@ -386,6 +386,12 @@ public:
   ///
   void SetProcTextureManager (csTextureManagerSoftware *proc_txt_mgr) 
   { proc_txtmgr =  proc_txt_mgr; }
+  ///
+  csTextureManagerSoftware *GetMainTextureManager () const 
+  { return main_txtmgr; }
+  ///
+  csTextureManagerSoftware *GetProcTextureManager () const
+  { return proc_txtmgr; }
 
 protected:
   /**

@@ -87,6 +87,7 @@ void csScan_Initialize ()
   Scan.exp_16 = new unsigned char [EXP_32_SIZE+3];
   // 6*8K
   memset (&Scan.BlendingTable, sizeof (Scan.BlendingTable), 0);
+  memset (&Scan.BlendingTableProc, sizeof (Scan.BlendingTableProc), 0);
 
   int i;
   for (i = 1; i < (1 << 12); i++)
@@ -99,13 +100,14 @@ void csScan_Initialize ()
     Scan.exp_16 [i] = QRound (32 * exp (-float (i) / 256.)) - 1;
 }
 
-void csScan_CalcBlendTables (int rbits, int gbits, int bbits)
+void csScan_CalcBlendTables (unsigned char *BlendingTable[], int rbits, 
+  int gbits, int bbits)
 {
   int i;
   // First free old blending tables
   for (i = 0; i < 6; i++)
-    if (Scan.BlendingTable [i])
-      delete [] Scan.BlendingTable [i];
+    if (BlendingTable [i])
+      delete [] BlendingTable [i];
 
   // Compute number of bits for our blending table
   unsigned int bits = MAX (MAX (rbits, gbits), bbits);
@@ -128,7 +130,7 @@ void csScan_CalcBlendTables (int rbits, int gbits, int bbits)
   if (bits2)
     table_size += 1 << (2 * bits2 + 1);
   for (i = 0; i < NUMBLENDINGTABLES; i++)
-    Scan.BlendingTable [i] = new unsigned char [table_size];
+    BlendingTable [i] = new unsigned char [table_size];
 
   unsigned int index = 0;
 
@@ -151,7 +153,7 @@ void csScan_CalcBlendTables (int rbits, int gbits, int bbits)
         #define CALC(idx,val)						     \
         {								     \
           register unsigned int tmp = val;				     \
-          Scan.BlendingTable [idx] [index] = (tmp < max_val) ? tmp : max_val;\
+          BlendingTable [idx] [index] = (tmp < max_val) ? tmp : max_val;\
         }
         CALC (BLENDTABLE_ADD,       dst + src);
         CALC (BLENDTABLE_MULTIPLY,  ((dst * src) + (max_val / 2)) >> max_bits);
@@ -169,7 +171,10 @@ void csScan_CalcBlendTables (int rbits, int gbits, int bbits)
 void csScan_Finalize ()
 {
   for (int i = 0; i < NUMBLENDINGTABLES; i++)
+  {
     delete [] Scan.BlendingTable [i];
+    delete [] Scan.BlendingTableProc [i];
+  }
   delete [] Scan.exp_16;
   delete [] Scan.exp_256;
   delete [] Scan.one_div_z;

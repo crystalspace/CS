@@ -245,6 +245,14 @@ struc csScanSetup
   unsigned_char_P BlendingTable_ALPHA25
   unsigned_char_P BlendingTable_ALPHA50
   unsigned_char_P BlendingTable_ALPHA75
+
+  ; Blending tables for proc. textures
+  unsigned_char_P BlendingTableProc_ADD
+  unsigned_char_P BlendingTableProc_MULTIPLY
+  unsigned_char_P BlendingTableProc_MULTIPLY2
+  unsigned_char_P BlendingTableProc_ALPHA25
+  unsigned_char_P BlendingTableProc_ALPHA50
+  unsigned_char_P BlendingTableProc_ALPHA75
 endstruc
 
 ; The only external variable of csScanSetup type
