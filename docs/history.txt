@@ -10,6 +10,8 @@ The history order has been reversed so that new features are at the top.
 	  csObject iterator.  The symptom of the bug was that
 	  csNodeIterator::IsFinished() reported the end of iteration one
 	  element too early.
+	- Eric Sunshine renamed iConsoleOutput::SystemExtension(va_list) to
+	  SystemExtensionV() since some compilers failed to grok the overload.
 24-Mar-2001
 	- Eric Sunshine made the following changes to the project:
 	    - Repaired an ultra nasty bug in csSystemDriver::LoadPlugIn().

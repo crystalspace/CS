@@ -100,7 +100,7 @@ public:
   virtual int GetMaxLineWidth () { return base->GetMaxLineWidth(); }
   virtual void RegisterPlugin (iPlugIn *p) { base->RegisterPlugin(p); }
   virtual bool ConsoleExtension (const char *command, ...);
-  virtual bool ConsoleExtension (const char *iCommand, va_list);
+  virtual bool ConsoleExtensionV (const char *iCommand, va_list);
 
   // Implement iPlugIn interface.
   struct eiPlugIn : public iPlugIn

@@ -540,12 +540,12 @@ bool csConsoleOutput::ConsoleExtension (const char *iCommand, ...)
 {
   va_list args;
   va_start (args, iCommand);
-  bool rc = ConsoleExtension(iCommand, args);
+  bool rc = ConsoleExtensionV(iCommand, args);
   va_end (args);
   return rc;
 }
 
-bool csConsoleOutput::ConsoleExtension (const char *iCommand, va_list args)
+bool csConsoleOutput::ConsoleExtensionV (const char *iCommand, va_list args)
 {
   bool rc = true;
   if (!strcmp (iCommand, "FlashTime"))

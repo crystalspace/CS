@@ -206,7 +206,7 @@ public:
   { (void)iCommand; return false; }
 
   /// Implement simple extension commands.
-  virtual bool ConsoleExtension (const char *iCommand, va_list args)
+  virtual bool ConsoleExtensionV (const char *iCommand, va_list args)
   { (void)iCommand; (void)args; return false; }
 
   // Implement iPlugIn interface.

@@ -145,7 +145,7 @@ public:
   virtual bool ConsoleExtension (const char *iCommand, ...);
 
   /// Implement simple extension commands.
-  virtual bool ConsoleExtension (const char *iCommand, va_list);
+  virtual bool ConsoleExtensionV (const char *iCommand, va_list);
 
   // Implement iPlugIn interface.
   struct eiPlugIn : public iPlugIn

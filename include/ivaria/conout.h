@@ -146,7 +146,7 @@ struct iConsoleOutput : public iBase
   virtual bool ConsoleExtension (const char *iCommand, ...) = 0;
 
   /// Implement simple extension commands.
-  virtual bool ConsoleExtension (const char *iCommand, va_list) = 0;
+  virtual bool ConsoleExtensionV (const char *iCommand, va_list) = 0;
 };
 
 #endif // __IVARIA_CONOUT_H__
