@@ -7,6 +7,7 @@ Copyright @copyright{} 1999, 2000 by Thomas Hieber@*
 Copyright @copyright{} 1999, 2000 by Seth Galbraith@*
 Copyright @copyright{} 1999, 2000 by Michael Dale Long@*
 Copyright @copyright{} 2000 by Samuel Humphreys@*
+Copyright @copyright{} 2000 by Martin Geisse@*
 Copyright @copyright{} 1999 by Alex Pfaffe@*
 Copyright @copyright{} 1999 by Michael Ewert@*
 Copyright @copyright{} 1999 by Robert Bate@*

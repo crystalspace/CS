@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @node Win32, Mingw, Unix, Platform Instructions
-@subsection Windows - using @sc{MSVC}++ compiler
+@subsection Windows - Using @sc{msvc}++ Compiler
 @cindex Windows, Building
 
 @emph{Originally written by Dan Ogles, @email{dogles@@peachtree.com}; updated

@@ -20,7 +20,7 @@ and some other useful goodies. This library requires the use of the external
 ZLib library which is used to read/write @sc{zip} archives. One modules from
 this library is explained in a separate section: @sc{scf}.
 
-@item SCF (Shared Class Facility)
+@item SCF @r{(Shared Class Facility)}
 The @sc{scf} is actually part of the @code{csUtil} library. It is explained
 in a separate section as it is both complex (compared to the rest of
 @code{csUtil}) and fundamental to the understanding of plug-ins. @xref{SCF}.

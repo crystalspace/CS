@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @node Mingw, NeXT, Win32, Platform Instructions
-@subsection Windows - using Mingw compiler
+@subsection Windows - Using Mingw Compiler
 
 @noindent
 @emph{Updated by Norman Kr@"amer, @email{norman@@users.sourceforge.net}.}
@@ -98,7 +98,7 @@ make -k clean all
 @subsubheading Customizing
 
 You may need to customize settings in @file{CS\libs\cssys\win32\win32gcc.mak},
-the Mingw32 makefile.  Check the the following variables:
+the Mingw32 makefile.  Check the following variables:
 
 @itemize @bullet
 @item
@@ -110,7 +110,7 @@ the Mingw32 makefile.  Check the the following variables:
 @end itemize
 
 Adjust them to match your system libraries.  For example, if you use the
-SGI OpenGL SDK instead of Microsoft's OpenGL, change @code{-lopengl32}
-and  @code{-lglut32} to @code{-lopengl} and @code{-lglut} in
-@code{LIBS.GL3D.SYSTEM}. Also in the file @file{CS\mk\user.mak} select
-which plugins you wish to compile.
+@sc{sgi} OpenGL @sc{sdk} instead of Microsoft's OpenGL, change
+@samp{-lopengl32} and @samp{-lglut32} to @samp{-lopengl} and @samp{-lglut} in
+@samp{LIBS.GL3D.SYSTEM}.  Also in the file @file{CS\mk\user.mak} select which
+plugins you wish to compile.

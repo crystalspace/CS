@@ -13,33 +13,32 @@ not mentioned here.
 
 Currently Crystal Space has the following features:
 
-@table @code
-@item csSys
+@table @emph
+@item System Driver
 A system library that will perform system-dependent operations for your
 program. This way your program is easily portably to any supported system.
 It includes a good plug-in system that offers you an interface to
-dynamically loaded drivers (.so or .dll), like the 3d rasterizer.
+dynamically loaded drivers (@file{.so} or @file{.dll}), like the 3D rasterizer.
 
-@item csGeom
-A 3d math library, including 2d and 3d vectors, matrices and polygons.
+@item Geometry Library
+A 3D math library, including 2D and 3D vectors, matrices and polygons.
 This libary can be used without the rest of Crystal Space.
 
-@item 2d and 3d rasterizer
+@item 2D Canvas / 3D Renderer
 These libraries allow you to draw directly on the screen, and to use
-hardware accelerated 3d drawing. They are independent from the engine and
+hardware accelerated 3D drawing. They are independent from the engine and
 perform only basic operations. You can actually use them if you want to
 write your own engine. The libraries include:
 
 @itemize @bullet
 @item
-Direct3D, Glide, and OpenGL support in Windows port (in various stages
-of completion :-)
+OpenGL, Direct3D, and Glide support in Windows port.
 
 @item
-OpenGL support for BeOS and Linux as well.
+OpenGL support for BeOS and Linux.
 
 @item
-Glide support for Linux (but not yet completely functional).
+Glide support for Linux.
 
 @item
 Drawing arbitrary sloped convex polygons.
@@ -64,8 +63,8 @@ texture need not be a square.
 Procedural textures.
 
 @item
-It is possible to map the texture on a polygon in various ways
-(rotated, scaled, mirrored, ...).
+It is possible to map the texture on a polygon in various ways such as via
+rotation, scaling, mirroring, etc.
 
 @item
 Transparent and semi-transparent textures allowing for see-through
@@ -78,12 +77,12 @@ Colored volumetric fog.
 Halos around lights.
 @end itemize
 
-@item csEngine
-The 3d engine. It offers all the advatages of the 3d rasterizer
-(see above).It currently has the following features:
+@item 3D Engine
+The engine features the following:
+
 @itemize @bullet
 @item
-True 6DOF engine.
+True six-degrees-of-freedom (@sc{6dof}).
 
 @item
 Integrated landscape engine.
@@ -96,29 +95,28 @@ Static lighting with real shadows. Lighting and shadows are
 precomputed before the world is displayed.
 
 @item
-Colored lighting! There are three different types of lights possible
-(can be controlled with a configuration file). These three light colors
-can be choosen from white, red, green, or blue. A light source can mix
-the three values.
+Colored lighting.  There are three different types of lights possible (can be
+controlled with a configuration file).  These three light colors can be choosen
+from white, red, green, or blue.  A light source can mix the three values.
 
 @item
 Pseudo-dynamic colored lights which cannot move but have very accurate
 shadows and can change intensity/color randomly.
 
 @item
-Dynamic colored lighting with support for shadows (Things and sprites
+Dynamic colored lighting with support for shadows (Things and Sprites
 are ignored currently).
 
 @item
-Support for frame and skeletal based 3D triangle mesh sprites with LOD
-via progressive meshes!
+Support for frame and skeletal based 3D triangle mesh sprites with
+level-of-detail (@sc{lod}) reduction via progressive meshes!
 
 @item
 Support for 2D sprites and particle systems.
 
 @item
 Portals are used for efficient and easy visibility sorting. In
-addition you can optionally enable a BSP for some sectors to allow for
+addition you can optionally enable a @sc{bsp} for some sectors to allow for
 even more powerful world definitions.
 
 @item
@@ -143,60 +141,49 @@ Dynamic gouraud shaded sky spheres.
 Curved surfaces.
 
 @item
-ZIP archive format to pack the world file, the textures and all other
+@sc{zip} archive format to pack the world file, the textures and all other
 needed data files for one level inside one file. Crystal Space will also
-use the same ZIP file to automatically add lightmap data. This will
-greatly speed up the startup of Crystal Space.
+use the same @sc{zip} file to automatically add lightmap data. This will
+greatly speed up the start-up of Crystal Space.
 
 @item
-Powerful world file format allows you to easily redefine the world
-(but a real editor would be better).
+Powerful text-based world file format allows you to easily redefine the world.
 
 @item
-ZIP libraries with commonly used objects and textures are also supported.
+Libraries of commonly used objects and textures are supported.
 @end itemize
 
-@item csUtil
-Utility library. These utilities can be extracted and used without the
-other stuff. Includes:
+@item Utility Library
+Much of the utility functionality in this library can be used independently
+of Crystal Space.  This library includes the following functionality:
+
 @itemize @bullet
 @item
-Reading INI files for program options.
+Reading configuration (@sc{ini}) files for program options.
 
 @item
-Reading and writing ZIP files as data files.
+Reading and writing @sc{zip} files as data files.
 
 @item
-Simple parser that you can use if INI files are not enough. It is used
+Simple parser that you can use if @sc{ini} files are not enough. It is used
 by the engine to read world files.
 
 @item
-Defining an interface for shared libraries (.so or .dll). This is used
-by the plug-in system.
+Defining an interface for shared libraries (@file{.so} or @sc{.dll}).  This is
+used by the plug-in system.
 
 @item
-Dynamic-size arrays (csVector).
+Dynamically-sized arrays (@code{csVector}).
 @end itemize
 
 @item @sc{vfs}
-Virtual file system.
+Virtual file system.  @xref{VFS}.
 
-@item csSndDrv / csSndRdr
-General sound system. Currently drivers are made for Linux, Macintosh,
-and Windows.
+@item Sound Driver / Sound Renderer
+General sound system.  Currently drivers exist for Linux, Macintosh, and
+Windows.
 
-@item csNetDrv
-General networking system on Linux, Windows, BeOS, MacOS/X Server,
-OpenStep, NextStep, and OS/2.
-
+@item Network Driver
+General networking support.  Currently supports socket-based networking via
+@sc{TCP/IP}.
 @end table
-
-Future plans:
-
-@itemize @bullet
-@item
-More powerful scripting language.
-
-@item
-More and better hardware accelerator support.
-@end itemize

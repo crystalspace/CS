@@ -51,18 +51,19 @@ Each word in the name is capitalized.
 @code{iThisIsAnInterface}.  @xref{SCF}.
 
 @item
-@emph{Doc++ and Comments}
+@emph{Doxygen and Comments}
 
-Use Doc++ comments in header files to document classes, methods, and
-functions. These comments are extracted with the Doc++ tool and @sc{html}
+Use Doxygen comments in header files to document classes, methods, and
+functions. These comments are extracted with the Doxygen tool and @sc{html}
 documentation is generated from them.
 
-@strong{Warning}: Always use Doc++ comments for a class. If you fail to do so
-then Doc++ will ignore comments for methods within the class itself.
+@strong{Warning}: Always use Doxygen comments for a class. If you fail to do so
+then Doxygen will ignore comments for methods within the class itself.
 
-A one line Doc++ comment uses three slashes (@samp{///}) rather than two as is
-typical for normal C++ comments.  Multi-line Doc++ comments are specified with
-@samp{/** @dots{} */} rather than @samp{/* @dots{} */}.  Here is an example:
+A one line Doxygen comment uses three slashes (@samp{///}) rather than two as
+is typical for normal C++ comments.  Multi-line Doxygen comments are specified
+with @samp{/** @dots{} */} rather than @samp{/* @dots{} */}.  Here is an
+example:
 
 @example
 /**
@@ -72,7 +73,7 @@ typical for normal C++ comments.  Multi-line Doc++ comments are specified with
 class csBlueBall
 @{
 private:
-  // A private function, so no Doc++ comment here,
+  // A private function, so no Doxygen comment here,
   // but still commented for readers of the header file.
   void PrivateFunction();
 

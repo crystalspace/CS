@@ -1,4 +1,4 @@
 @c -*-texinfo-*-
-@set UPDATED 21 November 2000
-@set EDITION 17.002.7
+@set UPDATED 3 December 2000
+@set EDITION 17.002.8
 @set VERSION 17.002

@@ -1,5 +1,14 @@
 The history order has been reversed so that new features are at the top.
 
+3-Dec-2000
+	-Eric Sunshine made the following changes to the documentation:
+	    - Fixed several Texinfo mark-up problems in msdos.txi, win32.txi,
+	      win32gcc.txi, 
+	    - Performed some re-writing and clean-up of features.txi.
+	    - Performed some minor reformatting of csgeom.txi, graphics.txi,
+	      and plugins/overview.txi.
+	    - Performed some minor re-writing of cssys.txi.
+	    - Replaced Doc++ references with Doxygen references in coding.txi.
 27-Nov-2000
 	- Fixed a bug in sprites recently introduced by Seth. The problem
 	  was a divide by zero when normalizing the null vector.
