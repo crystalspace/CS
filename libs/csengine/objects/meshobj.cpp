@@ -128,13 +128,11 @@ void csMeshWrapper::UpdateMove ()
 
 void csMeshWrapper::MoveToSector (csSector* s)
 {
-  s->AddMesh (this);
-  int i;
-  for (i = 0 ; i < children.Length () ; i++)
-  {
-    csMeshWrapper* spr = (csMeshWrapper*)children[i];
-    spr->MoveToSector (s);
-  }
+  // Only add this mesh to a sector if the parent is the engine.
+  // Otherwise we have a hierarchical object and in that case
+  // the parent object controls this.
+  if (parent->GetType () == csEngine::Type)
+    s->AddMesh (this);
 }
 
 void csMeshWrapper::RemoveFromSectors ()
@@ -147,11 +145,6 @@ void csMeshWrapper::RemoveFromSectors ()
     csSector* ss = (csSector*)sectors[i];
     if (ss)
       ss->UnlinkMesh (this);
-  }
-  for (i = 0 ; i < children.Length () ; i++)
-  {
-    csMeshWrapper* spr = (csMeshWrapper*)children[i];
-    spr->RemoveFromSectors ();
   }
 }
 
