@@ -23,7 +23,13 @@ which contains all headers, pre-built library files, and dynamic link libraries
 in pre-compiled form from the following location on the Crystal Space server:
 
 @noindent
+@ifnottex
 @uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc_libs_0.95dev002.zip}
+@end ifnottex
+@iftex
+@code{ftp://ftp.sunsite.dk/projects/crystal/support/win32/}@*
+@code{msvc_libs_0.95dev002.zip}
+@end iftex
 
 @noindent
 @uref{ftp://62.188.48.183/support/win32/msvc_libs_0.95dev002.zip}

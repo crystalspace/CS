@@ -30,14 +30,19 @@ projects from the Crystal Space build process.
 @subsubheading msvc_libs - Required
 
 Before you attempt to compile Crystal Space, you must download
-and install @file{msvc_libs}.  msvc_libs is a package containing all
+and install the ``msvc_libs'' archive.  This archive contains all
 third party header, pre-built library and dll files used by Crystal
-Space, i.e. @file{zlib.dll}, @file{libjpeg.dll}, @file{png.dll} and
-@file{xmlparse.dll} etc.  The latest version of the msvc_libs package
-@file{msvc_libs_0.95dev002.zip} can be downloaded from:
+Space, i.e. @file{zlib.dll}, @file{libjpeg.dll}, @file{png.dll}, etc.
+The latest version of thie archive can be downloaded from:
 
 @noindent
+@ifnottex
 @uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc_libs_0.95dev002.zip}
+@end ifnottex
+@iftex
+@code{ftp://ftp.sunsite.dk/projects/crystal/support/win32/}@*
+@code{msvc_libs_0.95dev002.zip}
+@end iftex
 
 @noindent
 @uref{ftp://62.188.48.183/support/win32/msvc_libs_0.95dev002.zip}

@@ -28,7 +28,7 @@ class MyClass
 @end example
 
 Smart pointers don't need to be initialized. So there is no need
-to do @code{engine = NULL} in the constructor of your class.
+to do @samp{engine = NULL} in the constructor of your class.
 There is also no need to clean them up. The reference to the engine
 will be cleaned up automatically when the instance of @code{MyClass}
 is deleted.
@@ -37,8 +37,8 @@ To fill the engine smart pointer with a pointer to the engine you
 can use the following code (assuming the engine plugin is loaded):
 
 @example
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
-  engine->CreateSector (); @dots{}
+engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+engine->CreateSector (); @dots{}
 @end example
 
 So that's it. I will show you how this would be written before smart
@@ -76,10 +76,10 @@ do things like @code{engine->CreateSector ()}).
 Here is another very common example on how you can use smart pointers:
 
 @example
-  csRef<iMeshWrapper> sprite (engine->CreateMeshWrapper (@dots{}));
-  csRef<iSprite3DState> state (SCF_QUERY_INTERFACE (
-  	sprite->GetMeshObject (), iSprite3DState));
-  state->SetAction ("default");
+csRef<iMeshWrapper> sprite(engine->CreateMeshWrapper(@dots{}));
+csRef<iSprite3DState> state (SCF_QUERY_INTERFACE (
+    sprite->GetMeshObject (), iSprite3DState));
+state->SetAction ("default");
 @end example
 
 @subsubheading What About csPtr?
@@ -94,24 +94,24 @@ It just stores the pointer. There are two ways to use the result of a
 function that returns a @code{csPtr}:
 
 @example
-  // Declaration of function.
-  struct iEngine
-  @{
-    virtual csPtr<iLight> CreateLight (@dots{}) = 0;
-    @dots{}
-  @}
+// Declaration of function.
+struct iEngine
+@{
+virtual csPtr<iLight> CreateLight (@dots{}) = 0;
+@dots{}
+@}
 
-  // First way to use this function (old style API):
-  iLight* light = engine->CreateLight (@dots{});
-  // Use 'light' pointer.
-  @dots{}
-  // DecRef() when ready.
-  if (light) light->DecRef ();
+// First way to use this function (old style API):
+iLight* light = engine->CreateLight (@dots{});
+// Use 'light' pointer.
+@dots{}
+// DecRef() when ready.
+if (light) light->DecRef ();
 
-  // Second way to use this function (new style API):
-  csRef<iLight> light (engine->CreateLight (@dots{}));
-  // Use 'light' pointer.
-  @dots{}
+// Second way to use this function (new style API):
+csRef<iLight> light (engine->CreateLight (@dots{}));
+// Use 'light' pointer.
+@dots{}
 @end example
 
 So when a @code{csPtr} is assigned to a @code{csRef} the pointer
@@ -127,8 +127,8 @@ without sacrificing API compatibility.
 Another way to use @code{csPtr} is as follows:
 
 @example
-  csRef<iView> view;
-  view = csPtr<iView> (new csView (@dots{}));
+csRef<iView> view;
+view = csPtr<iView> (new csView (@dots{}));
 @end example
 
 When making a new object (@code{new csView}) there is automatically
@@ -139,12 +139,12 @@ caused a memory leak because there would be two references to the
 view:
 
 @example
-  csRef<iView> view;
-  view = new csView (@dots{});	// Don't do this!
+csRef<iView> view;
+view = new csView (@dots{});  // Don't do this!
 @end example
 
-@em{WARNING} Only use @code{csPtr} in the situations described above!
-@em{Never} use a @code{csPtr} to store something. @em{Never} pass
+@emph{WARNING} Only use @code{csPtr} in the situations described above!
+@emph{Never} use a @code{csPtr} to store something. @emph{Never} pass
 @code{csPtr} instances as parameters to some other function.
 
 @subsubheading What About STRICT_SMART_POINTERS?
@@ -208,7 +208,7 @@ leak (or reference leak). i.e the following code is illegal because
 it ignores the returned mesh wrapper:
 
 @example
-  engine->CreateMeshWrapper (@dots{});	// Don't do this!
+engine->CreateMeshWrapper (@dots{});	// Don't do this!
 @end example
 
 Note that if you have enabled @samp{STRICT_SMART_POINTERS} and you
@@ -222,13 +222,13 @@ be careful when using @code{IncRef()} and @code{DecRef()} manually.
 Avoid constructs like this:
 
 @example
-  csRef<iMeshWrapper> mesh = @dots{};
-  @dots{}
-  mesh->DecRef ();
-  mesh = NULL;
+csRef<iMeshWrapper> mesh = @dots{};
+@dots{}
+mesh->DecRef ();
+mesh = NULL;
 @end example
 
-As this will cause @em{two} references to be decremented! And that is
+As this will cause @emph{two} references to be decremented! And that is
 most likely not what you want.
 
 @subsubheading Warning About DestroyApplication!
@@ -270,4 +270,3 @@ The include files useful for this section are:
 @example
 #include "csutil/ref.h"
 @end example
-

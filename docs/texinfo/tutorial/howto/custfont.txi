@@ -20,37 +20,45 @@ This HOWTO document does not address using the freetype2 server with
 the assumption that most programs will not want to depend
 on the font existing on all the potential targetted platforms.
 
-@subsubheading The standard fonts
+@subsubheading Standard Fonts
 
 Every font server is expected to return a font
 given the following strings:
 
-@table @code @code
-@item CSFONT_LARGE "*large"
-@item CSFONT_ITALIC "*italic"
-@item CSFONT_COURIER "*courier"
-@item CSFONT_SMALL "*small"
-@end table
+@itemize @bullet
+@item
+@code{CSFONT_LARGE "*large"}
+@item
+@code{CSFONT_ITALIC "*italic"}
+@item
+@code{CSFONT_COURIER "*courier"}
+@item
+@code{CSFONT_SMALL "*small"}
+@end itemize
 
 The default font server has these 4 fonts built in.  They are as
 follows:
 
-@table @code @code
-@item CSFONT_LARGE police
-@item CSFONT_ITALIC italic
-@item CSFONT_COURIER courier
-@item CSFONT_SMALL tiny
-@end table
+@itemize @bullet
+@item
+@code{CSFONT_LARGE police}
+@item
+@code{CSFONT_ITALIC italic}
+@item
+@code{CSFONT_COURIER courier}
+@item
+@code{CSFONT_SMALL tiny}
+@end itemize
 
 To use these fonts simply use the LoadFont method and
 pass the font desired.
 
 @example
-Font = Gfx2D->GetFontServer()->LoadFont(CSFONT_LARGE);
+Font = G2D->GetFontServer()->LoadFont(CSFONT_LARGE);
 @end example
 
 
-@subsubheading Loadable fonts
+@subsubheading Loadable Fonts
 
 The default font server will also look for a file in 
 the virtual file system with the name specified.  The
@@ -63,25 +71,26 @@ To specify an alternate font simply use the LoadFont method
 with the file name such as:
 
 @example
-Font = Gfx2D->GetFontServer ()->LoadFont ("/lib/fontshow/lucida36.csf");
+Font = G2D->GetFontServer()->LoadFont("/lib/fontshow/lucida36.csf");
 @end example
 
-@subsubheading Creating new loadable fonts
+@subsubheading Creating New Loadable Fonts
 
 The easiest way to create a loadable font is to
 use the csfontutil which runs on Windows platforms
-and converts a true type font to the CSF format.
+and converts a true type font to the @sc{csf} format.
 
 This program can be downloaded at:
 
+@noindent
 @uref{http://ohrthguy.freeshell.org/tools/csfontutil.htm}
 
-Once the CSF file is created it is can be included
+Once the @sc{csf} file is created it is can be included
 in the application no matter what platforms are 
 targetted.  The base font does not have to be on
 that system.
 
-@subsubheading Using an anti-aliased font
+@subsubheading Using Anti-Aliased Fonts
 
 When a font is created using the csfontutil program
 it creates it with anti-aliasing information.  This
@@ -89,5 +98,3 @@ information is currently only used by the OpenGL renderer.
 The software and other renderers do not check for 
 the "alpha map" associated with the font and so do
 not blend the edges of the fonts with the background.
-
-

@@ -28,6 +28,10 @@ The history order is reversed so that new features are at the top.
 	  ParseGeneral() was not recognizing all known tokens.
 	- Fixed UVEC, VVEC, and UV_SHIFT conversion in cs2xml.
 	- Fixed UVEC and VVEC handling in XML loader (syntax services).
+	- Eric Sunshine made the following changes to the Texinfo documents:
+	    - Fixed a slew of Texinfo markup syntax error and warnings.
+	    - Eliminated all of the overfull and underfull `hbox' warnings
+	      reported by TeX.
 17-Sep-2002
 	- Clarified some iMovable Doxygen comments.
 	- Fixed a serious bug in the csRef assignment operator for

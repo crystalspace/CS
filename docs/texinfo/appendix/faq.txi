@@ -425,9 +425,9 @@ object is not convex. In that case you better use @samp{ZUSE} for all objects
 and enable Z-clearing every frame. In world files you can do this by
 using the @samp{settings} block and enabling the @samp{clearzbuf} option.
 
-Note that you should use @code{engine->GetBeginDrawFlags()} in your
-call to @code{g3d->BeginDraw()} to ensure that this Z-buffer clearing will
-actually work (in fact you should @em{always} use @code{GetBeginDrawFlags()}).
+Note that you should invoke the method @code{engine->GetBeginDrawFlags()} in
+your call to @code{g3d->BeginDraw()} to ensure that this Z-buffer clearing will
+actually work (in fact you should @emph{always} use
+@code{GetBeginDrawFlags()}).
 
 @end itemize
-

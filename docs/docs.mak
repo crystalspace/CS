@@ -300,6 +300,13 @@ do-dvidoc:
 	$(OUT.DOC.DVI)/cs.dvi
 	$(RM) $(OUT.DOC.DVI)/texinfo.tex
 
+# Rule to warn user to check TeX output file.
+dviwarning:
+	@echo $"$"
+	@echo $">>> Documentation conversion completed without errors, however$"
+	@echo $">>> check $(DOC.DVI.LOG) for warnings about formatting problems.$"
+	@echo $"$"
+
 # Rule to generate DVI format output.  Target images are retained since
 # generated DVI file references them.
 dvidoc: \
@@ -309,10 +316,8 @@ dvidoc: \
   $(OUT.DOC.DVI).SOURCE \
   $(OUT.DOC.DVI)/eps.IMAGES \
   do-dvidoc \
-  $(OUT.DOC.DVI).ZAPSOURCE
-	@echo $"$"
-	@echo $">>> Check $(DOC.DVI.LOG) for warnings about formatting problems.$"
-	@echo $"$"
+  $(OUT.DOC.DVI).ZAPSOURCE \
+  dviwarning
 
 # Rule to perform actual PS conversion from DVI file.
 do-psdoc:
@@ -325,10 +330,8 @@ psdoc: \
   $(OUT.DOC.PS).CLEAN \
   $(OUT.DOC.PS) \
   dvidoc \
-  do-psdoc
-	@echo $"$"
-	@echo $">>> Check $(DOC.DVI.LOG) for warnings about formatting problems.$"
-	@echo $"$"
+  do-psdoc \
+  dviwarning
 
 # Rule to perform actual PDF conversion from PS file.
 do-pdfdoc:
@@ -339,10 +342,8 @@ pdfdoc: \
   $(OUT.DOC.PDF).CLEAN \
   $(OUT.DOC.PDF) \
   psdoc \
-  do-pdfdoc
-	@echo $"$"
-	@echo $">>> Check $(DOC.DVI.LOG) for warnings about formatting problems.$"
-	@echo $"$"
+  do-pdfdoc \
+  dviwarning
 
 # Rule to perform actual Info conversion of $(CSMANUAL_FILE).
 do-infodoc:
