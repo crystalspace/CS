@@ -149,6 +149,8 @@ private:
 
   csTinyXmlNode (csTinyDocumentSystem* sys);
 
+  TiDocumentAttribute* GetAttributeInternal (const char* name);
+
 public:
   virtual ~csTinyXmlNode ();
 

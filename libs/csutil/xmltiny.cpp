@@ -391,16 +391,26 @@ csRef<iDocumentAttributeIterator> csTinyXmlNode::GetAttributes ()
   return it;
 }
 
+TiDocumentAttribute* csTinyXmlNode::GetAttributeInternal (const char* name)
+{
+  TiDocumentAttribute* current = node->ToElement ()->FirstAttribute ();
+  while (current != NULL)
+  {
+    if (strcmp (name, current->Name ()) == 0)
+      return current;
+    current = current->Next ();
+  }
+  return NULL;
+}
+
 csRef<iDocumentAttribute> csTinyXmlNode::GetAttribute (const char* name)
 {
-  csRef<iDocumentAttributeIterator> it = GetAttributes ();
-  while (it->HasNext ())
-  {
-    csRef<iDocumentAttribute> attr = it->Next ();
-    if (strcmp (name, attr->GetName ()) == 0)
-      return attr;
-  }
   csRef<iDocumentAttribute> attr;
+  TiDocumentAttribute* a = GetAttributeInternal (name);
+  if (a)
+  {
+    attr = csPtr<iDocumentAttribute> (new csTinyXmlAttribute (a));
+  }
   return attr;
 }
 
@@ -413,16 +423,18 @@ const char* csTinyXmlNode::GetAttributeValue (const char* name)
 
 int csTinyXmlNode::GetAttributeValueAsInt (const char* name)
 {
-  csRef<iDocumentAttribute> attr = GetAttribute (name);
-  if (!attr) return 0;
-  return attr->GetValueAsInt ();
+  TiDocumentAttribute* a = GetAttributeInternal (name);
+  if (!a) return 0;
+  return a->IntValue ();
 }
 
 float csTinyXmlNode::GetAttributeValueAsFloat (const char* name)
 {
-  csRef<iDocumentAttribute> attr = GetAttribute (name);
-  if (!attr) return 0;
-  return attr->GetValueAsFloat ();
+  TiDocumentAttribute* a = GetAttributeInternal (name);
+  if (!a) return 0;
+  float f;
+  sscanf (a->Value (), "%f", &f);
+  return f;
 }
 
 void csTinyXmlNode::RemoveAttribute (const csRef<iDocumentAttribute>& attr)
