@@ -38,12 +38,14 @@ struct iAwsSinkManager;
 struct iAwsCanvas;
 struct iAwsKeyFactory;
 struct iAwsComponentFactory;
+struct iAwsConnectionNodeFactory;
 
 typedef iAwsComponent iAwsWindow;
 
 class  awsWindow;
 class  awsComponent;
 class  awsComponentNode;
+class  awsConnectionNode;
 class  awsComponentFactory;
 class  awsLayoutManager;
 
@@ -460,6 +462,9 @@ public:
 
   /** Creates a new key factory */
   virtual iAwsKeyFactory *CreateKeyFactory()=0;
+
+  /** Creates a new connection node factory */
+  virtual iAwsConnectionNodeFactory *CreateConnectionNodeFactory()=0;
 };
 
 
@@ -874,10 +879,29 @@ struct iAwsKeyFactory : public iBase
    virtual void AddPointKey (const char* name, csPoint v)=0;
    /// Add a connection key
    virtual void AddConnectionKey (const char* name, iAwsSink *s, unsigned long t, unsigned long sig)=0;
+   /// Add a connection node (from a factory)
+   virtual void AddConnectionNode (iAwsConnectionNodeFactory *node)=0;
    
    virtual iAwsComponentNode* GetThisNode () = 0;
 };
 
+SCF_VERSION (iAwsConnectionNodeFactory, 0, 0, 1);
+
+/// Interface for connection node factories.
+struct iAwsConnectionNodeFactory : public iBase
+{
+   /// Initializes the factory
+   virtual void Initialize ()=0;
+   /// Add a connection key
+   virtual void AddConnectionKey (
+                 const char* name,
+                 iAwsSink *s,
+                 unsigned long t,
+                 unsigned long sig)=0;
+
+   /// Get the base node
+   virtual awsConnectionNode* GetThisNode () = 0;
+};
 
 
 
