@@ -2316,7 +2316,7 @@ void csBugPlug::Dump (int indent, iMeshWrapper* mesh)
       	indent, "", sn ? sn : "?");
     }
   }
-  for (size_t i=0; i<mesh->GetChildren ()->GetCount (); ++i)
+  for (int i=0; i<mesh->GetChildren ()->GetCount (); ++i)
   {
     Dump (indent+4, mesh->GetChildren ()->Get (i));
   }
