@@ -67,7 +67,7 @@ static struct
   { 0, 0, 0, 0 }
 };
 
-const XModeCount = 16;
+int const XModeCount = 16;
 static struct
 {
   int Width, Height;
