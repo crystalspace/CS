@@ -290,6 +290,10 @@ public:
   virtual void DisableColorWrite ()
     { glColorMask (GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE); }
 
+  /// Draw a line
+  virtual void DrawLine(const csVector3 & v1,
+  const csVector3 & v2, float fov, int color);
+
   /**
    * Set optional clipper to use. If clipper == null
    * then there is no clipper.
@@ -367,8 +371,6 @@ public:
 
     virtual void Initialize( iObjectRegistry *reg);
 
-    /// Create a shaderprogram from a string describing it
-    virtual csPtr<iShaderProgram> CreateShaderProgram(const char* programstring, void* parameters, const char* type);
 
     virtual csSome GetObject(const char* name);
   } scfiShaderRenderInterface;

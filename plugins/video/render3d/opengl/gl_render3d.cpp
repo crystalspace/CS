@@ -19,6 +19,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "cssysdef.h"
 
+#include "qint.h"
+
 #include "csgeom/polyclip.h"
 #include "csgeom/transfrm.h"
 
@@ -101,6 +103,8 @@ csGLRender3D::csGLRender3D (iBase *parent)
   frustum_valid = false;
 
   do_near_plane = false;
+  viewwidth = 100;
+  viewheight = 100;
 
   stencilclipnum = 0;
   stencil_enabled = false;
@@ -636,6 +640,7 @@ bool csGLRender3D::Open ()
 
   // @@@ Should check what canvas to load
   G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, iGraphics2D);
+  object_reg->Register( G2D, "iGraphics2D");
   if (!G2D)
     return false;
 
@@ -673,7 +678,7 @@ bool csGLRender3D::Open ()
   csRef<iOpenGLInterface> gl = SCF_QUERY_INTERFACE (G2D, iOpenGLInterface);
   ext.InitExtensions (gl);
 
-  if (false && ext.CS_GL_NV_vertex_array_range && ext.CS_GL_NV_fence)
+  if ( false && ext.CS_GL_NV_vertex_array_range && ext.CS_GL_NV_fence)
   {
     csVARRenderBufferManager * bm = new csVARRenderBufferManager();
     bm->Initialize(this);
@@ -893,6 +898,44 @@ void csGLRender3D::SetObjectToCamera(csReversibleTransform* wvmatrix)
   ApplyObjectToCamera ();
 }
 
+void csGLRender3D::DrawLine(const csVector3 & v1, const csVector3 & v2, float fov, int color)
+{
+  if (v1.z < SMALL_Z && v2.z < SMALL_Z)
+    return;
+
+  float x1 = v1.x, y1 = v1.y, z1 = v1.z;
+  float x2 = v2.x, y2 = v2.y, z2 = v2.z;
+
+  if (z1 < SMALL_Z)
+  {
+    // x = t*(x2-x1)+x1;
+    // y = t*(y2-y1)+y1;
+    // z = t*(z2-z1)+z1;
+    float t = (SMALL_Z - z1) / (z2 - z1);
+    x1 = t * (x2 - x1) + x1;
+    y1 = t * (y2 - y1) + y1;
+    z1 = SMALL_Z;
+  }
+  else if (z2 < SMALL_Z)
+  {
+    // x = t*(x2-x1)+x1;
+    // y = t*(y2-y1)+y1;
+    // z = t*(z2-z1)+z1;
+    float t = (SMALL_Z - z1) / (z2 - z1);
+    x2 = t * (x2 - x1) + x1;
+    y2 = t * (y2 - y1) + y1;
+    z2 = SMALL_Z;
+  }
+  float iz1 = fov / z1;
+  int px1 = QInt (x1 * iz1 + (viewwidth / 2));
+  int py1 = viewheight - 1 - QInt (y1 * iz1 + (viewheight / 2));
+  float iz2 = fov / z2;
+  int px2 = QInt (x2 * iz2 + (viewwidth / 2));
+  int py2 = viewheight - 1 - QInt (y2 * iz2 + (viewheight / 2));
+
+  G2D->DrawLine (px1, py1, px2, py2, color);
+}
+
 void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
 {
   csRef<iStreamSource> source = mymesh->GetStreamSource ();
@@ -997,7 +1040,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
      shader = mathandle->GetMaterial()->GetShader();
 
   bool useshader = false;
-  if(shader)
+  if(shader && shader->IsValid())
   {
     useshader = true;
     csRef<iShaderTechnique> tech = shader->GetBestTechnique();
@@ -1005,7 +1048,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
     int currp;
     for(currp = 0; currp< tech->GetPassCount(); ++currp)
     {
-      tech->GetPass(currp)->Activate();
+      tech->GetPass(currp)->Activate(mymesh);
       glDrawElements (
       GL_TRIANGLES,
       mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
@@ -1030,6 +1073,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
         txthandle = layer->txt_handle;
         if (txthandle)
         {
+
           txtcache->Cache (txthandle);
           csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
             txthandle->GetPrivateObject ();
@@ -1195,16 +1239,6 @@ bool csGLRender3D::HandleEvent (iEvent& Event)
 ////////////////////////////////////////////////////////////////////
 //                    iShaderRenderInterface
 ////////////////////////////////////////////////////////////////////
-csPtr<iShaderProgram> csGLRender3D::eiShaderRenderInterface::CreateShaderProgram(const char* programstring, void* parameters, const char* type)
-{
-  int i;
-  for(i = 0; i < pluginlist.Length(); ++i)
-  {
-    if( ((iShaderProgramPlugin*)pluginlist.Get(i))->SupportType(type))
-      return ((iShaderProgramPlugin*)pluginlist.Get(i))->CreateShaderProgram(programstring, parameters, type);
-  }
-  return NULL;
-}
 
 csGLRender3D::eiShaderRenderInterface::eiShaderRenderInterface()
 {
@@ -1212,12 +1246,7 @@ csGLRender3D::eiShaderRenderInterface::eiShaderRenderInterface()
 
 csGLRender3D::eiShaderRenderInterface::~eiShaderRenderInterface()
 {
-  int i;
-  for(i = 0; i < pluginlist.Length(); ++i)
-  {
-    iShaderProgramPlugin* sp = (iShaderProgramPlugin*)pluginlist.Pop();
-    sp->DecRef();
-  }
+
 }
 
 csSome csGLRender3D::eiShaderRenderInterface::GetObject(const char* name)
@@ -1230,27 +1259,4 @@ csSome csGLRender3D::eiShaderRenderInterface::GetObject(const char* name)
 void csGLRender3D::eiShaderRenderInterface::Initialize(iObjectRegistry *reg)
 {
   object_reg = reg;
-  if(object_reg)
-  {
-    csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY(object_reg, iPluginManager);
-
-    iStrVector* classlist = iSCF::SCF->QueryClassList("crystalspace.render3d.shader.");
-    int const nmatches = classlist->Length();
-    if(nmatches != 0)
-    {
-      int i;
-      for(i = 0; i < nmatches; ++i)
-      {
-        const char* classname = classlist->Get(i);
-        csRef<iShaderProgramPlugin> plugin = CS_LOAD_PLUGIN(plugin_mgr, classname, iShaderProgramPlugin);
-        if(plugin)
-        {
-          scfParent->Report( CS_REPORTER_SEVERITY_NOTIFY, "Loaded plugin %s", classname);
-          pluginlist.Push(plugin);
-          plugin->IncRef();
-          plugin->Open();
-        }
-      }
-    }
-  }
 }
