@@ -50,7 +50,7 @@ csSoundData* AULoader::loadsound(UByte* buf, ULong size)
 {
   unsigned long index=0;
   csSoundData *sb= NULL;
-  void *data=NULL;
+  char *data=NULL;
   unsigned char dummy0, dummy1, dummy2, dummy3;
 
   unsigned long offset, nbytes, flag, freq, nchannels;

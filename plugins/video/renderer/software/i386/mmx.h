@@ -182,7 +182,7 @@ inline void mmxEnd ()
 9:              movl    %%edi, %%esi"                           \
     : "=S" (z_buffer)                                           \
     : "m" (izz), "m" (dzz), "c" (lastZbuf), "D" (z_buffer)      \
-    : "eax", "ebx", "ecx", "st", "st(1)", "st(2)", "st(3)",     \
+    : "eax", "ebx", "st", "st(1)", "st(2)", "st(3)",            \
       "st(4)", "st(5)", "st(6)", "st(7)"                        \
     );
 #endif

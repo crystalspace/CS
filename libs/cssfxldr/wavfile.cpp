@@ -66,7 +66,7 @@ csSoundData* WAVLoader::loadsound(UByte* buf, ULong size)
   int index=0;
 
   csSoundData *sb= NULL;
-  void *data=NULL;
+  char *data=NULL;
   UByte *ptr;
   UByte *ptr_end;
 

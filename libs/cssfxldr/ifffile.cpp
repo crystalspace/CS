@@ -45,7 +45,7 @@ csSoundData* IFFLoader::loadsound(UByte* buf, ULong size)
 {
   unsigned long index=0;
   csSoundData *sb= NULL;
-  void *data=NULL;
+  char *data=NULL;
   unsigned char dummy0, dummy1, dummy2, dummy3;
 
   unsigned long freq = 0, length_form, samples_size = 0, min_freq, max_freq;

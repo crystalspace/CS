@@ -58,7 +58,7 @@ LIB_PREFIX=
 LIBS.EXE=
 
 # Where can the Zlib library be found on this system?
-Z_LIBS=-lzdll
+Z_LIBS=-lz
 
 # Where can the PNG library be found on this system?
 PNG_LIBS=-lpngdll

@@ -40,7 +40,7 @@ inline void memsetd (void *dest, unsigned int value, size_t count)
   (	"	cld;"
 	"	rep;"
 	"	stosl;"
-	: : "D" (dest), "c" (count), "a" (value) : "eax", "ecx", "edi"
+	: : "D" (dest), "c" (count), "a" (value)
   );
 }
 #endif

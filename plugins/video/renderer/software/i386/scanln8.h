@@ -195,7 +195,7 @@
     : "=D" (_dest)							\
     : "m" (duFrac), "m" (dvFrac), "m" (_destend), "m" (oldEBP),		\
       "m" (dudvInt[1]), "m" (dzz), "m" (z_buffer), "m" (izz)		\
-    : "eax", "%ebx", "ecx", "edx", "esi", "edi" );			\
+    : "eax", "%ebx", "ecx", "edx", "esi" );				\
     uu = uu1;								\
     vv = vv1;
 #include "cs3d/software/scanln.inc"
@@ -534,7 +534,7 @@ void csScan_8_draw_pi_scanline_tex_zuse (void *dest, int len, unsigned long *zbu
   : "=D" (dest)
   : "m" (duFrac), "m" (dvFrac), "m" (destend), "m" (oldEBP),
     "m" (dudvInt[1]), "m" (dz), "m" (zbuff)
-  : "eax", "%ebx", "ecx", "edx", "esi", "edi" );
+  : "eax", "%ebx", "ecx", "edx", "esi" );
 }
 
 #ifdef DO_MMX
@@ -670,7 +670,7 @@ void csScan_8_mmx_draw_pi_scanline_tex_zuse (void *dest, int len, unsigned long 
   : "=D" (dest)
   : "m" (duFrac), "m" (dvFrac), "m" (destend), "m" (oldEBP),
     "m" (dudvInt[1]), "m" (z), "m" (dz), "m" (zbuff)
-  : "eax", "%ebx", "ecx", "edx", "esi", "edi" );
+  : "eax", "%ebx", "ecx", "edx", "esi" );
 }
 
 #endif // DO_MMX
