@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-Apr-2004
+	- Jorrit added iMeshWrapper->SetZBufModeRecursive(),
+	  SetFlagsRecursive(), and SetRenderPriorityRecursive(). These
+	  functions will do the same as their respective non recursive
+	  variants but they will also perform the operation on the
+	  children of the mesh (and their children).
+	- Extended the map loader so that when you use 'meshref' the flags
+	  like render priority, zbuf mode and so on will be propagated
+	  to the children too.
 8-Apr-2004
 	- Jorrit committed a patch to map2cs from Aren Blondahl:
 	    - Added Support for "_color" tag in light entities for support

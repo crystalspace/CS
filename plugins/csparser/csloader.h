@@ -567,7 +567,8 @@ private:
   bool HandleMeshParameter (iLoaderContext* ldr_context,
   	iMeshWrapper* mesh, iMeshWrapper* parent, iDocumentNode* child,
 	csStringID id, bool& handled, char*& priority,
-	bool do_portal_container, bool& staticpos, bool& staticshape);
+	bool do_portal_container, bool& staticpos, bool& staticshape,
+	bool recursive = false);
   /**
    * Load the mesh object from the map file.
    * The parent is not 0 if this mesh is going to be part of a hierarchical

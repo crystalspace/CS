@@ -387,6 +387,8 @@ public:
 
   /// Set the render priority for this object.
   void SetRenderPriority (long rp);
+  /// Set the render priority for this object and children.
+  void SetRenderPriorityRecursive (long rp);
   /// Get the render priority for this object.
   long GetRenderPriority () const
   {
@@ -395,8 +397,12 @@ public:
 
   /// Set the Z-buf drawing mode to use for this object.
   void SetZBufMode (csZBufMode mode) { zbufMode = mode; }
+  void SetZBufModeRecursive (csZBufMode mode);
   /// Get the Z-buf drawing mode.
   csZBufMode GetZBufMode () const { return zbufMode; }
+
+  /// Set flags for mesh and children.
+  void SetFlagsRecursive (uint32 mask, uint32 value);
 
   /**
    * Set a callback which is called just before the object is drawn.
@@ -706,6 +712,10 @@ public:
     {
       scfParent->SetRenderPriority (rp);
     }
+    virtual void SetRenderPriorityRecursive (long rp)
+    {
+      scfParent->SetRenderPriorityRecursive (rp);
+    }
     virtual long GetRenderPriority () const
     {
       return scfParent->GetRenderPriority ();
@@ -714,9 +724,17 @@ public:
     {
       return scfParent->flags;
     }
+    virtual void SetFlagsRecursive (uint32 mask, uint32 value)
+    {
+      return scfParent->SetFlagsRecursive (mask, value);
+    }
     virtual void SetZBufMode (csZBufMode mode)
     {
       scfParent->SetZBufMode (mode);
+    }
+    virtual void SetZBufModeRecursive (csZBufMode mode)
+    {
+      scfParent->SetZBufModeRecursive (mode);
     }
     virtual csZBufMode GetZBufMode () const
     {

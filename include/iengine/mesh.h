@@ -150,7 +150,7 @@ struct iMeshDrawCallback : public iBase
 };
 
 
-SCF_VERSION (iMeshWrapper, 0, 8, 0);
+SCF_VERSION (iMeshWrapper, 0, 8, 1);
 
 /**
  * A mesh wrapper is an engine-level object that wraps around an actual
@@ -331,6 +331,12 @@ struct iMeshWrapper : public iBase
   virtual long GetRenderPriority () const = 0;
 
   /**
+   * Same as SetRenderPriority() but this version will recursively set
+   * render priority for the children too.
+   */
+  virtual void SetRenderPriorityRecursive (long rp) = 0;
+
+  /**
    * Get flags for this meshwrapper. The following flags are supported:
    * <ul>
    * <li>#CS_ENTITY_CONVEX: entity is convex. This can help the engine with
@@ -344,6 +350,11 @@ struct iMeshWrapper : public iBase
    * </ul>
    */
   virtual csFlags& GetFlags () = 0;
+
+  /**
+   * Set some flags with the given mask for this mesh and all children.
+   */
+  virtual void SetFlagsRecursive (uint32 mask, uint32 flags) = 0;
 
   /**
    * Set the Z-buf drawing mode to use for this object.
@@ -360,6 +371,11 @@ struct iMeshWrapper : public iBase
    * Get the Z-buf drawing mode.
    */
   virtual csZBufMode GetZBufMode () const = 0;
+  /**
+   * Same as SetZBufMode() but this will also set the z-buf
+   * mode for the children too.
+   */
+  virtual void SetZBufModeRecursive (csZBufMode mode) = 0;
 
   /**
    * Do a hard transform of this object.

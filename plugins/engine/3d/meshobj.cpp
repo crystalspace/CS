@@ -228,6 +228,36 @@ void csMeshWrapper::RemoveFromSectors ()
   }
 }
 
+void csMeshWrapper::SetFlagsRecursive (uint32 mask, uint32 value)
+{
+  flags.Set (mask, value);
+  const iMeshList* ml = &GetChildren ();
+  if (!ml) return;
+  int i;
+  for (i = 0 ; i < ml->GetCount () ; i++)
+    ml->Get (i)->SetFlagsRecursive (mask, value);
+}
+
+void csMeshWrapper::SetZBufModeRecursive (csZBufMode mode)
+{
+  SetZBufMode (mode);
+  const iMeshList* ml = &GetChildren ();
+  if (!ml) return;
+  int i;
+  for (i = 0 ; i < ml->GetCount () ; i++)
+    ml->Get (i)->SetZBufModeRecursive (mode);
+}
+
+void csMeshWrapper::SetRenderPriorityRecursive (long rp)
+{
+  SetRenderPriority (rp);
+  const iMeshList* ml = &GetChildren ();
+  if (!ml) return;
+  int i;
+  for (i = 0 ; i < ml->GetCount () ; i++)
+    ml->Get (i)->SetRenderPriorityRecursive (rp);
+}
+
 void csMeshWrapper::SetRenderPriority (long rp)
 {
   render_priority = rp;

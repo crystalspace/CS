@@ -2349,7 +2349,8 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
 	iMeshWrapper* mesh, iMeshWrapper* parent, iDocumentNode* child,
 	csStringID id, bool& handled, char*& priority,
-	bool do_portal_container, bool& staticpos, bool& staticshape)
+	bool do_portal_container, bool& staticpos, bool& staticshape,
+	bool recursive)
 {
 #undef TEST_MISSING_MESH
 #define TEST_MISSING_MESH \
@@ -2427,7 +2428,10 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       break;
     case XMLTOKEN_PRIORITY:
       priority = csStrNew (child->GetContentsValue ());
-      mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
+      if (recursive)
+        mesh->SetRenderPriorityRecursive (Engine->GetRenderPriority (priority));
+      else
+        mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
       break;
     case XMLTOKEN_ADDON:
       TEST_MISSING_MESH
@@ -2436,27 +2440,45 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       break;
     case XMLTOKEN_NOLIGHTING:
       TEST_MISSING_MESH
-      mesh->GetFlags().Set (CS_ENTITY_NOLIGHTING);
+      if (recursive)
+        mesh->SetFlagsRecursive (CS_ENTITY_NOLIGHTING, CS_ENTITY_NOLIGHTING);
+      else
+        mesh->GetFlags ().Set (CS_ENTITY_NOLIGHTING, CS_ENTITY_NOLIGHTING);
       break;
     case XMLTOKEN_NOSHADOWS:
       TEST_MISSING_MESH
-      mesh->GetFlags().Set (CS_ENTITY_NOSHADOWS);
+      if (recursive)
+        mesh->SetFlagsRecursive (CS_ENTITY_NOSHADOWS, CS_ENTITY_NOSHADOWS);
+      else
+        mesh->GetFlags ().Set (CS_ENTITY_NOSHADOWS, CS_ENTITY_NOSHADOWS);
       break;
     case XMLTOKEN_NOHITBEAM:
       TEST_MISSING_MESH
-      mesh->GetFlags().Set (CS_ENTITY_NOHITBEAM);
+      if (recursive)
+        mesh->SetFlagsRecursive (CS_ENTITY_NOHITBEAM, CS_ENTITY_NOHITBEAM);
+      else
+        mesh->GetFlags ().Set (CS_ENTITY_NOHITBEAM, CS_ENTITY_NOHITBEAM);
       break;
     case XMLTOKEN_INVISIBLEMESH:
       TEST_MISSING_MESH
-      mesh->GetFlags().Set (CS_ENTITY_INVISIBLEMESH);
+      if (recursive)
+        mesh->SetFlagsRecursive (CS_ENTITY_INVISIBLEMESH, CS_ENTITY_INVISIBLEMESH);
+      else
+        mesh->GetFlags ().Set (CS_ENTITY_INVISIBLEMESH, CS_ENTITY_INVISIBLEMESH);
       break;
     case XMLTOKEN_INVISIBLE:
       TEST_MISSING_MESH
-      mesh->GetFlags().Set (CS_ENTITY_INVISIBLE);
+      if (recursive)
+        mesh->SetFlagsRecursive (CS_ENTITY_INVISIBLE, CS_ENTITY_INVISIBLE);
+      else
+        mesh->GetFlags ().Set (CS_ENTITY_INVISIBLE, CS_ENTITY_INVISIBLE);
       break;
     case XMLTOKEN_DETAIL:
       TEST_MISSING_MESH
-      mesh->GetFlags().Set (CS_ENTITY_DETAIL);
+      if (recursive)
+        mesh->SetFlagsRecursive (CS_ENTITY_DETAIL, CS_ENTITY_DETAIL);
+      else
+        mesh->GetFlags ().Set (CS_ENTITY_DETAIL, CS_ENTITY_DETAIL);
       break;
     case XMLTOKEN_IMPOSTER:
       TEST_MISSING_MESH
@@ -2466,37 +2488,78 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
     case XMLTOKEN_ZFILL:
       TEST_MISSING_MESH
       if (!priority) priority = csStrNew ("wall");
-      mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
-      mesh->SetZBufMode (CS_ZBUF_FILL);
+      if (recursive)
+      {
+        mesh->SetRenderPriorityRecursive (Engine->GetRenderPriority (priority));
+        mesh->SetZBufModeRecursive (CS_ZBUF_FILL);
+      }
+      else
+      {
+        mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
+        mesh->SetZBufMode (CS_ZBUF_FILL);
+      }
       break;
     case XMLTOKEN_ZUSE:
       TEST_MISSING_MESH
       if (!priority) priority = csStrNew ("object");
-      mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
-      mesh->SetZBufMode (CS_ZBUF_USE);
+      if (recursive)
+      {
+        mesh->SetRenderPriorityRecursive (Engine->GetRenderPriority (priority));
+        mesh->SetZBufModeRecursive (CS_ZBUF_USE);
+      }
+      else
+      {
+        mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
+        mesh->SetZBufMode (CS_ZBUF_USE);
+      }
       break;
     case XMLTOKEN_ZNONE:
       TEST_MISSING_MESH
       if (!priority) priority = csStrNew ("sky");
-      mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
-      mesh->SetZBufMode (CS_ZBUF_NONE);
+      if (recursive)
+      {
+        mesh->SetRenderPriorityRecursive (Engine->GetRenderPriority (priority));
+        mesh->SetZBufModeRecursive (CS_ZBUF_NONE);
+      }
+      else
+      {
+        mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
+        mesh->SetZBufMode (CS_ZBUF_NONE);
+      }
       break;
     case XMLTOKEN_ZTEST:
       TEST_MISSING_MESH
       if (!priority) priority = csStrNew ("alpha");
-      mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
-      mesh->SetZBufMode (CS_ZBUF_TEST);
+      if (recursive)
+      {
+        mesh->SetRenderPriorityRecursive (Engine->GetRenderPriority (priority));
+        mesh->SetZBufModeRecursive (CS_ZBUF_TEST);
+      }
+      else
+      {
+        mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
+        mesh->SetZBufMode (CS_ZBUF_TEST);
+      }
       break;
     case XMLTOKEN_CAMERA:
       TEST_MISSING_MESH
       if (!priority) priority = csStrNew ("sky");
-      mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
-      mesh->GetFlags().Set (CS_ENTITY_CAMERA);
+      if (recursive)
+      {
+        mesh->SetRenderPriorityRecursive (Engine->GetRenderPriority (priority));
+        mesh->SetFlagsRecursive (CS_ENTITY_CAMERA, CS_ENTITY_CAMERA);
+      }
+      else
+      {
+        mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
+        mesh->GetFlags ().Set (CS_ENTITY_CAMERA, CS_ENTITY_CAMERA);
+      }
       break;
     case XMLTOKEN_BADOCCLUDER:
       TEST_MISSING_MESH
       else
       {
+	// @@@ Do recursive too for children!
         csRef<iVisibilityObject> visobj = SCF_QUERY_INTERFACE (mesh,
   	  iVisibilityObject);
         visobj->GetCullerFlags ().Set (CS_CULLER_HINT_BADOCCLUDER);
@@ -2506,6 +2569,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       TEST_MISSING_MESH
       else
       {
+	// @@@ Do recursive too for children!
         csRef<iVisibilityObject> visobj = SCF_QUERY_INTERFACE (mesh,
   	  iVisibilityObject);
         visobj->GetCullerFlags ().Set (CS_CULLER_HINT_GOODOCCLUDER);
@@ -2515,6 +2579,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       TEST_MISSING_MESH
       else
       {
+	// @@@ Do recursive too for children!
 	iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
         if (objmodel->GetPolygonMeshShadows ())
           objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
@@ -2531,6 +2596,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       TEST_MISSING_MESH
       else
       {
+	// @@@ Do recursive too for children!
 	iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
         if (objmodel->GetPolygonMeshShadows ())
           objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
@@ -2657,7 +2723,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
     csStringID id = xmltokens.Request (value);
     bool handled;
     if (!HandleMeshParameter (ldr_context, mesh, 0, child, id,
-    	handled, priority, false, staticpos, staticshape))
+    	handled, priority, false, staticpos, staticshape, true))
       goto error;
     if (!handled) switch (id)
     {
@@ -2702,7 +2768,8 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
     goto error;
   }
   if (!priority) priority = csStrNew ("object");
-  mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
+  mesh->SetRenderPriorityRecursive (Engine->GetRenderPriority (priority));
+  // @@@ Do recursive too!
   mesh->GetMeshObject ()->GetFlags ().SetBool (CS_MESH_STATICPOS, staticpos);
   mesh->GetMeshObject ()->GetFlags ().SetBool (CS_MESH_STATICSHAPE, staticshape);
 
