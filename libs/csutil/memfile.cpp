@@ -29,6 +29,7 @@ const char* csMemFile::GetName() { return "#csMemFile"; }
 const char* csMemFile::GetData() const { return buffer; }
 size_t csMemFile::GetSize() { return size; }
 int csMemFile::GetStatus() { return VFS_STATUS_OK; }
+void csMemFile::Flush() {}
 bool csMemFile::AtEOF() { return (cursor >= size); }
 size_t csMemFile::GetPos() { return cursor; }
 void csMemFile::SetPos(size_t p) { cursor = p < size ? p : size; }

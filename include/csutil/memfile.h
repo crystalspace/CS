@@ -60,6 +60,8 @@ public:
   virtual size_t Read(char* Data, size_t DataSize);
   /// Write data to buffer
   virtual size_t Write(const char* Data, size_t DataSize);
+  /// Flush the stream.
+  virtual void Flush();
   /// Return true if at end of buffer
   virtual bool AtEOF();
   /// Query current cursor position
