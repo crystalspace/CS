@@ -4,7 +4,7 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 11-Jul-2003
-	- Jorrit added a conveniance csPolygonMeshCube class which represents
+	- Jorrit added a convenience csPolygonMeshCube class which represents
 	  an easy way to make a cube collider.
 	- In addition Jorrit did the following:
 	    - Simplified walktest a bit by using this new csPolygonMeshCube
@@ -1245,7 +1245,7 @@ The history order is reversed so that new features are at the top.
 	  object with the one from the factory. If they are different it
 	  will use the one from the object. This fix makes sure that objects
 	  can optionally override the object model if they need that.
-	- Jorrit added default csPolygonMesh implementation for conveniance.
+	- Jorrit added default csPolygonMesh implementation for convenience.
 	- Eric Sunshine fixed the DirectDraw check in configure.ac so that it
 	  actually works.  Problem was that it was not including windows.h.
 	  Also takes into account Jorrit's strange installation in which

@@ -2061,7 +2061,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Fixed 'bugplug' console command in walktest.
 	- Added iMeshObject functions: SetColor(), GetColor(),
 	  SetMaterialWrapper(), and GetMaterialWrapper(). These functions
-	  are conveniance functions so that it is easier to change
+	  are convenience functions so that it is easier to change
 	  color/material for all objects without having to query
 	  for the state interface. Not all mesh objects implement
 	  those functions though. For example, a thing mesh object
@@ -3765,7 +3765,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Philip Wyett fixed compile error under MSVC 6 for msmodel.cpp.
 9-Aug-2002
 	- Matthias Braun fixed registration of aws component factories.
-	- Added conveniance functions to get a value from a node (iXmlNode).
+	- Added convenience functions to get a value from a node (iXmlNode).
 	  This will basically search for the first TEXT child in the node and
 	  return the value of that child.
 	- Changed GetType()/SetType() to GetValue()/SetValue() in iXmlNode.
@@ -3854,7 +3854,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  which refered to 'children' so that they now specify 'nodes'.
 	  You can now access nodes by type and attributes by name more
 	  easily.
-	- Also added conveniance functions to iXmlAttribute to set values
+	- Also added convenience functions to iXmlAttribute to set values
 	  as int and float.
 	- Steven Geens added a motion test program. With this program you can
 	  see the motion manager in action.
@@ -4516,7 +4516,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  implements iMeshObject it will return that (useful for things).
 	  If that factory doesn't implement iMeshObject it will call
 	  NewInstance() and return that new mesh object instead.
-	- Added iEngine::CreateThingMesh() which is a conveniance function
+	- Added iEngine::CreateThingMesh() which is a convenience function
 	  that will create a thing mesh, place it in a sector, set ZUSE
 	  z-buffer mode, and 'object' render priority. It is very similar
 	  to CreateSectorWallsMesh() but that will use ZFILL and 'wall'
@@ -9545,7 +9545,7 @@ updated3-Jun-2002
 	  from copy and pasting from the simple1 app.
 	- Matze added a small fix from Rene Dudfield to csparser plugin.
 19-Nov-2001
-	- Added iEngine::RemoveObject() which is a conveniance function to
+	- Added iEngine::RemoveObject() which is a convenience function to
 	  'remove' a CS object from the engine. This will not clear the
 	  object but it will remove all references to that object that the
 	  engine itself keeps. This function works for: iSector, iCollection,
@@ -12495,7 +12495,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  it will be reused. Notation is XPLANE (x,dens). 'dens' is
 	  the tile value for the texture. dens==2 means the texture will be
 	  tiled once in an area of 2x2 units.
-	  Note that these new statements are for conveniance. They don't
+	  Note that these new statements are for convenience. They don't
 	  give much control over how the texture will be aligned on the
 	  polygon (i.e. the uv shift). If you want full control you still
 	  have to use the ADDON keyword with the plane plugin.
@@ -14454,7 +14454,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  initialization code somewhere in your app or plugin init:
 	    #include "ivaria/reporter.h"
 	    iReporter* reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-	- Added csReport() conveniance function. This function will use
+	- Added csReport() convenience function. This function will use
 	  the object registry to see if there is a reporter. If so it will
 	  use it, otherwise it will print to standard output. Example:
 	    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -14527,7 +14527,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  which is much nicer than 'Dummy title' :-)
 	- Added CS_REPORTER_SEVERITY_DEBUG severity level. This way the
 	  reporter will be able to do debug logging too.
-	- Added various conveniance functions to the iReporter interface:
+	- Added various convenience functions to the iReporter interface:
 	  ReportError, ReportWarning, ReportNotify, ReportBug, and
 	  ReportDebug.
 	- Fixed a bug in reporter plugin. It was returning true in
@@ -19225,7 +19225,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Updated documentation to reflect above changes and also added
 	  BASECOLOR keyword to the spr3d doc.
 	- Added iEngine::DeleteMeshFactory(), LoadMeshFactory(), and
-	  LoadMeshObject() conveniance functions. The last two are especially
+	  LoadMeshObject() convenience functions. The last two are especially
 	  nice as they give an easy way to load a mesh object or factory from
 	  a loader plugin.
 	- Added iMeshWrapper::AddChild() to add a child mesh to some parent
@@ -19750,7 +19750,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Added a new terrain engine. This one is a lot simpler than the
 	  DDG engine and is based on a function instead of a heightmap.
 	  You can of course use a function that reads from a heightmap. In
-	  the future there will be a conveniance function that does this.
+	  the future there will be a convenience function that does this.
 	  You can also optionally give a function that will return normals
 	  (for lighting). If you don't give such a function it will try
 	  to calculate the normals itself. The terrain engine supports
@@ -21485,7 +21485,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 17-Feb-2001
 	- csSector is now properly seperated from csPolygonSet. Sectors
 	  no longer contain polygons.
-	- Added csEngine::CreateSectorWalls() which is a conveniance
+	- Added csEngine::CreateSectorWalls() which is a convenience
 	  function that will create the thing which is supposed to
 	  contain the convex outline of the sector. This function is added
 	  to make it easier to convert old code that adds polygons to the
@@ -21885,11 +21885,11 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Added SCF interface iMeshWrapper which is the SCF version of
 	  csMeshWrapper. Also put a few functions in there so that it
 	  is possible to actually use it.
-	- Added CreateMeshFactory() and CreateMeshObject() conveniance
+	- Added CreateMeshFactory() and CreateMeshObject() convenience
 	  functions to iEngine. The first one creates a factory and the
 	  second one will create a mesh object given a factory and place
 	  it correctly in the world.
-	- Updated simple to use the new conveniance functions.
+	- Updated simple to use the new convenience functions.
 	- Norman Kramer started optimizing AVI plugin using u/v pipe.
 	- Added csLoader::LoadMeshObjectFactory() to load mesh object
 	  factories.
@@ -27588,7 +27588,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Fixed funcon plugin.
 	- Fixed metaballs plugin.
 	- Added iTextureManager::RegisterMaterial() which takes a texture
-	  handle instead of an iMaterial. This is for conveniance to make
+	  handle instead of an iMaterial. This is for convenience to make
 	  materials based on a single texture easily.
 	- Andrew Zabolotny did a HUGE HUGE update to CVS. This will cause
 	  big problems so stay away from CVS if you are not interested in
@@ -27808,7 +27808,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	      pixmaps, lines, pixels and text.
 	- Alex Pfaffe commited a few fixes to terrain engine (still not
 	  working properly though).
-	- Renamed csPluginCollider to csCollider. This class is a conveniance
+	- Renamed csPluginCollider to csCollider. This class is a convenience
 	  class that csengine users can use to attach iCollider's to
 	  engine objects (or game objects). Usage of this class is optional
 	  and the engine will never use it itself.
@@ -34005,7 +34005,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Large update to terrain engine from Alex Pfaffe.
 	    - Now renders 3000 triangles instead of only about 1000.
 	    - Large speed increase (from 6 FPS to about 17 FPS in software).
-	- Added conveniance functions SetFog and DisableFog to csPolygonSet.
+	- Added convenience functions SetFog and DisableFog to csPolygonSet.
 	- Blocks screen fades from black.
 	- Eric Sunshine fixed several compilation warnings regarding unused
 	  variables and assignments of float or double to integer in the new
