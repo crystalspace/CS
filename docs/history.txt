@@ -33,6 +33,7 @@ chronological order.
 	  - Changed sprcal3d lighting to properly update when the sprite is
 	    animated.
 	  - Updated sprcal3d to work with NR.
+	- res made sure the bounding box of sprcal3d objects is correct.
 3-Jan-2004
         - Philip Wyett continued a general cleanup of CS code formatting.
 	- Steven Geens fixed a very fatal typo in sprcal3dstate.

@@ -1704,9 +1704,14 @@ void csSpriteCal3DMeshObject::BaseAccessor::PreGetValue (
 	  CS_BUFCOMP_FLOAT, 3, false);
 	vertex_size = vertexCount;
       }
-      float* vertices = (float*)vertex_buffer->Lock (CS_BUF_LOCK_NORMAL);
-      render->getVertices (vertices);
-      vertex_buffer->Release ();
+
+      // @@@ Not the most optimal place to do that.
+      CS_ALLOC_STACK_ARRAY (float, vertexData, vertexCount * 3);
+      render->getVertices (vertexData);
+      meshobj->GetObjectBoundingBox (meshobj->object_bbox, 0, 
+	(csVector3 *)vertexData, vertexCount);
+      vertex_buffer->CopyToBuffer (vertexData, 
+	sizeof (float) * vertexCount * 3);
 
       float* normals = (float*)normal_buffer->Lock (CS_BUF_LOCK_NORMAL);
       render->getNormals (normals);
