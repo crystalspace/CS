@@ -28,6 +28,50 @@ chronological order.
 	  specific to the new renderer.
 	- Eric Sunshine augmented cspace.i so that it %ignores non-const
 	  csPoly3D::GetVertices(). This fixes build failure in csjava.
+	- Eric Sunshine added a Sort rule to helper.jam which returns its input
+	  sorted alphabetically.
+	- Eric Sunshine added a MasterHeader rule to helper.jam which, given a
+	  list of header files, synthesizes a "master header" which #includes
+	  all of them, and which is properly multiple-include protected.  The
+	  pseudo-target `masterheaders' will synthesize all requested master
+	  headers; `cleanmasterheaders' will destroy them; and
+	  `freezemasterheaders' will copy them from the build directory into
+	  the source tree.
+	- Eric Sunshine added a DirectoryMasterHeaders rule to helper.jam which
+	  is a convenience wrapper around MasterHeader. Given a list of
+	  directories, it recursively scans each directory and creates a master
+	  header for each directory which #includes the gleaned list of header
+	  files contained within that directory.
+	- Eric Sunshine added several "master header" files to the project
+	  which should simplify client usage.  Users can choose the level of
+	  granularity which suits them best. Users new to the SDK will probably
+	  want to #include <crystalspace.h> since it is simplest; whereas more
+	  advanced users may want to #include <csutil.h>, <cstool.h>, etc; and
+	  power users can continue to #include only the individual headers
+	  required by a particular piece of code.  The complete list of new
+	  headers is:
+            crystalspace.h  -- all public headers in entire SDK
+            csgeom.h        -- all of csgeom
+            csgfx.h         -- all of csgfx
+            cstool.h        -- all of cstool
+            csutil.h        -- all of csutil
+            csws.h          -- all of csws
+            iaws.h          -- all of iaws
+            iengine.h       -- all of iengine
+            igeom.h         -- all of igeom
+            igraphic.h      -- all of igraphic
+            imap.h          -- all of imap
+            imesh.h         -- all of imesh
+            inetwork.h      -- all of inetwork
+            isound.h        -- all of isound
+            itexture.h      -- all of itexture
+            iutil.h         -- all of iutil
+            ivaria.h        -- all of ivaria
+            ivideo.h        -- all of ivideo
+	  These headers can be re-created / refreshed at any time by invoking
+	  "jam freezemasterheaders".
+	- Eric Sunshine augmented jobber.pl so that it keeps the new master
+	  header files up-to-date.
 13-Sep-2004
 	- Eric Sunshine renamed the following symbols in order to avoid
 	  global namespace pollution:
@@ -104,7 +148,7 @@ chronological order.
 	- PK implemented about 70% of the particlessaver.
 	- PK fixed a bug in the xmlshader by adding a csNewStr() in
 	  SetFilename().
-	- Eric Sunshine fixed OR compilation error in genmesh.cpp. Also add
+	- Eric Sunshine fixed OR compilation error in genmesh.cpp. Also added
 	  extremely ugly const_cast<>'s to allow invocation of
 	  iVertexBuffer::LockBuffer() to compile. (Someone, please fix this in
 	  the cleanest way possible.)

@@ -352,3 +352,54 @@ of various @samp{CS_SYSDEF_PROVIDE_FACILITY} macros. It is now safe, even
 recommended, to include @file{cssysdef.h} in header files (@file{.h}). Doing so
 helps to make header files more self-contained, thus reducing the burden of
 clients of those headers.
+
+@subheading Convenience Headers
+
+For convenience, several top-level @dfn{master header} files have been added to
+the project. These should simplify client usage by allowing users to choose the
+level of granularity which suits them best.  The list of new header files
+follows.
+
+@table @code
+@item crystalspace.h
+All public headers in entire Crystal Space @sc{sdk}.
+@item csgeom.h
+All of @file{CS/include/csgeom}.
+@item csgfx.h
+All of @file{CS/include/csgfx}.
+@item cstool.h
+All of @file{CS/include/cstool}.
+@item csutil.h
+All of @file{CS/include/csutil}.
+@item csws.h
+All of @file{CS/include/csws}.
+@item iaws.h
+All of @file{CS/include/iaws}.
+@item iengine.h
+All of @file{CS/include/iengine}.
+@item igeom.h
+All of @file{CS/include/igeom}.
+@item igraphic.h
+All of @file{CS/include/igraphic}.
+@item imap.h
+All of @file{CS/include/imap}.
+@item imesh.h
+All of @file{CS/include/imesh}.
+@item inetwork.h
+All of @file{CS/include/inetwork}.
+@item isound.h
+All of @file{CS/include/isound}.
+@item itexture.h
+All of @file{CS/include/itexture}.
+@item iutil.h
+All of @file{CS/include/iutil}.
+@item ivaria.h
+All of @file{CS/include/ivaria}.
+@item ivideo.h
+All of @file{CS/include/ivideo}.
+@end table
+
+Users new to the SDK will probably want to include @file{crystalspace.h} since
+it is simplest; whereas more advanced users may want to include
+@file{csutil.h}, @file{cstool.h}, etc.; and power users can continue to include
+only the individual headers required by a particular piece of code.

@@ -87,7 +87,7 @@ use strict;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'jobber.pl';
-my $PROG_VERSION = '30';
+my $PROG_VERSION = '31';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000-2004 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -213,7 +213,12 @@ my $TEMPDIR = '/tmp';
 my @BINARY = ('(?i)\.(dsw|dsp)$');
 
 my @TARGETS =
-    ({ 'name'    => 'Visual-C++ project files',
+    ({ 'name'    => 'master header files',
+       'action'  => 'Repairing',
+       'build'    => 'jam freezemasterheaders',
+       'olddirs' => ['include'],
+       'log'     => 'Automated master header file repair.' },
+     { 'name'    => 'Visual-C++ project files',
        'action'  => 'Repairing',
        'build'    => 'jam msvcgen',
        'newdirs' => ['out/mk/msvc'],

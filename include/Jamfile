@@ -1,3 +1,88 @@
 SubDir TOP include ;
 
+#------------------------------------------------------------------------------
+# Installation
+#------------------------------------------------------------------------------
 Recurse InstallHeader : .h .i .inc .fun ;
+
+
+#------------------------------------------------------------------------------
+# Master-header creation / automation
+#------------------------------------------------------------------------------
+CS_MASTER_HEADER_BOILERPLATE =
+"/*
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+  
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+  
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#include \"cssysdef.h\"" ;
+
+rule MasterHeaderCsUtil
+{
+  # Order of platforms is significant: MacOS/X must appear before Unix since
+  # it is also Unix, but we want only the MacOS/X-specific headers.
+  local platforms = macosx unix win32 ;
+
+  local cond = "if" ;
+  local lines ;
+  local p ;
+  for p in $(platforms)
+  {
+    local files =
+      [ Filter
+        [ Sort [ Wildcard [ ConcatDirs csutil $(p) ] : *.h ] ] :
+          [ ConcatDirs csutil $(p) csosdefs.h ]
+          [ ConcatDirs csutil $(p) csconfig.h ] ] ;
+    if $(files)
+    {
+      lines +=
+        "#$(cond) defined(CS_PLATFORM_$(p:U))"
+        "#include \"$(files)\"" ;
+      cond = "elif" ;
+    }
+  }
+  lines += "#endif" ;
+  return [ MasterHeader csutil :
+    [ Filter [ Wildcard csutil : *.h ] : csutil/csosdefs.h ] :
+    $(CS_MASTER_HEADER_BOILERPLATE) :
+    $(lines) ] ;
+}
+
+CS_MASTER_HEADERS =
+  [ MasterHeaderCsUtil ]
+  [ DirectoryMasterHeaders
+      csgeom
+      csgfx
+      cstool
+      csws
+      iaws
+      iengine
+      igeom
+      igraphic
+      imap
+      imesh
+      inetwork
+      isound
+      itexture
+      iutil
+      ivaria
+      ivideo :
+      $(CS_MASTER_HEADER_BOILERPLATE) ] ;
+
+MasterHeader $(PACKAGE_NAME) :
+  csqint.h
+  csqsqrt.h
+  csver.h
+  $(CS_MASTER_HEADERS:G=) :
+  $(CS_MASTER_HEADER_BOILERPLATE) ;
