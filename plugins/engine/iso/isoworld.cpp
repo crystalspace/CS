@@ -48,7 +48,7 @@ void csIsoWorld::AddSprite(iIsoSprite *sprite)
   iIsoGrid *grid = FindGrid(sprite->GetPosition());
   if(!grid)
   {
-#if CS_DEBUG
+#ifdef CS_DEBUG
     printf("World: no grid to add sprite to.\n");
 #endif
     return;

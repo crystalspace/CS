@@ -322,7 +322,7 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
     color_verts = Get_color_verts ();
   }
 
-#if CS_DEBUG
+#ifdef CS_DEBUG
   // Check if the vertex buffers are locked.
   CS_ASSERT (mesh.buffers[0]->IsLocked ());
   if (mesh.num_vertices_pool > 1)

@@ -5067,7 +5067,7 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
 bool csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
 		bool setup)
 {
-#if CS_DEBUG
+#ifdef CS_DEBUG
   // Check if the vertex buffers are locked.
   CS_ASSERT (mesh.buffers[0]->IsLocked ());
   if (mesh.num_vertices_pool > 1)

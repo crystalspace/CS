@@ -27,6 +27,8 @@ chronological order.
 	- Eric Sunshine fixed bugs in particlesldr.cpp which were reported by
 	  Randall Foreman's Borland compiler.  Was returning 'false' from a
 	  couple functions declared to return csPtr<>.
+	- Eric Sunshine fixed a few additional problems reported by the Borland
+	  compiler.  Please use "#ifdef CS_DEBUG" rather than "#if CS_DEBUG".
 18-Jan-2004
 	- Jorrit removed unused 'next'/'prev' fields in csLight. These
 	  are no longer needed after the redesign of two days ago.
