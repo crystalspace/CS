@@ -16,6 +16,10 @@ can be given:
 Bugs to fix:
 	[S]  Investigate if there are any more memory leaks after
 	     unloading a level and if so fix them.
+	     This can most easily be done by using the debug graph in
+	     CS. To enable this just edit include/csutil/debug.h and
+	     remove the comment ('//') right before the define of
+	     CS_USE_GRAPHDEBUG. Then recompile.
 	[V]  Shoot a missile in hole in flarge. The walls of the hole
 	     become lit ok then but revert to full bright after missile
 	     particles have disappeared. Only with OpenGL.
@@ -33,27 +37,56 @@ Bugs to fix:
 	     with OpenGL.
 	[V]  Walktest + newsky: it appears that there are some visibility
 	     culling problems in some rare cases.
+	     Solution: try to find a spot that doesn't work right and
+	     remember with 'C'. Later on you can go back to that position
+	     with 'c' (after including debug info).
 	[V]  Fix radiosity so that it works again. Radiosity is currently
 	     disabled because several things had been rewritten and the
 	     radiosity code was left behind.
+	     To fix this we need to have a way to iterate over all polygons.
+	     This is not hard. Harder will be the fact that the lighting
+	     system has changed. It now works with the shadow bitmaps.
 	     [Bug 429283]
 	[V]  In isometric engine (isotest) + OpenGL some of the mesh
 	     objects (like the particle systems) are clipped wrong to the
 	     floor.
+	     This is a very hard bug. We have been hunting this bug for
+	     ages. Z-buffer accuracy problems have been suspected but this
+	     is probably not right because the problem arises on cards
+	     with 32-bit Z-buffer too.
 	[F]  Gouraud shaded polygons are not supported well: you can only
 	     define triangles that are gouraud shaded and not polygons in
 	     general.
+	     After closing inspection it seems that this *almost* works
+	     perfectly now. However there are cases when texture mapping
+	     is wrong.
 	     [Bug 202768]
 	[**] Lighting is not cached for gouraud shaded polygons.
 	     [Bug 202780]
 	[V]  Investigate if skeletal sprites work nicely with the
 	     visibility culling system.
+	     Major problem is that calculating a bounding box for a skeletal
+	     sprite is not easy. We have to find an efficient way to do this,
+	     especially when the transforms change.
 	     [Bug 204194]
+	[V]  Lighting for skeletal sprites is not good. The problem is that
+	     normals are precalculated for the 'base mesh'. When the mesh
+	     later animates (using the transforms) the normals will not
+	     change. A solution is perhaps to transform the normals with
+	     the hierarchical transform. But this will not work correctly
+	     for vertices that are connected to triangles that have vertices
+	     from other limbs.
+	     [Bug 493454]
 	[V]  Mesh objects outside the global bounding box of an
 	     infinite sector will not be visible.
+	     There is a work-around for this bug which is why this bug is
+	     not that bad. You can easily add small dummy geometry very far
+	     away to make the bounding box work. Problem is that this
+	     dummy geometry has to be part of the static mesh!
 	     [Bug 216698]
 	[V]  Light with explosion particle system is not correctly
 	     positioned.
+	     The question is if this light is a desired feature.
 	     [Bug 231392]
 	[V]  With OpenGL the lightmaps are not mapped correctly.
 	     This is very visible if you have two adjacent polygons which
@@ -61,6 +94,12 @@ Bugs to fix:
 	     polygons (in dmburg this situation occurs a few times).
 	     In that case the shadows on both polygons will not match
 	     exactly.
+	     Fixing this bug for real probably requires a change of the
+	     lightmap format (to make then one lumel bigger both horizontally
+	     as vertically). While this is relatively easy to do for
+	     static lightmaps the dynamic lightmaps might be more problematic.
+	     Also this may require a big change in the software renderer...
+	     Rather complicated bug. But an important one to fix.
 	     [Bug 405964]
 	[V]  Problem with keycolor + zbuffer:
 	     When a texture with keycolor transparency is rendered the
@@ -97,6 +136,8 @@ Bugs to fix:
 	[V]  Visibility culling does not work correctly on objects that
 	     are scaled using the movable (it works correctly with objects
 	     scaled using HardTransform).
+	     Problem here is that the bounding box is not recalculated when
+	     the movable is changed.
 	     [Bug 478072]
 
 API and Small Feature Additions:
