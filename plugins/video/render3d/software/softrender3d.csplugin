@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- soft3d.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphics3d.software</name>
+        <implementation>csSoftwareGraphics3D</implementation>
+        <description>Software graphics driver for Crystal Space</description>
+        <requires>
+          <class>crystalspace.font.server.</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

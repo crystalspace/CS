@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- softshader.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphics3d.shader.software</name>
+        <implementation>csSoftShader</implementation>
+        <description>Software specific shaderprogram provider for Graphics3D</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
