@@ -51,6 +51,7 @@ csOpenGLProcBackBuffer::~csOpenGLProcBackBuffer ()
   lightmap_cache = NULL;
   m_fogtexturehandle = 0;
   delete [] buffer;
+  System->QueueContextCloseEvent ((void*)G2D);
 }
 
 void csOpenGLProcBackBuffer::Close ()

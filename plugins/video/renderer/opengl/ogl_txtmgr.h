@@ -93,9 +93,8 @@ class csTextureProcOpenGL : public csTextureOpenGL
 {
 public:
   iGraphics3D *texG3D;
-  bool soft;
   csTextureProcOpenGL (csTextureMM *Parent, iImage *Image)
-    : csTextureOpenGL (Parent, Image), texG3D (NULL), soft (false)
+    : csTextureOpenGL (Parent, Image), texG3D (NULL)
   {};
   /// Destroy the texture
   virtual ~csTextureProcOpenGL ();

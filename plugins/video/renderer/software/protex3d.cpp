@@ -41,6 +41,7 @@ csSoftProcTexture3D::csSoftProcTexture3D (iBase *iParent)
 {
   CONSTRUCT_IBASE (iParent);
   soft_tex_mm = NULL;
+  parent_tex_mm = NULL;
   System = NULL;
   G2D = NULL;
   reprepare = false;
@@ -55,6 +56,8 @@ csSoftProcTexture3D::~csSoftProcTexture3D ()
     texman = NULL;
   }
 //    delete soft_tex_mm;
+  // Broadcast the closure of this context.
+  System->QueueContextCloseEvent ((void*)G2D);
 }
 
 bool csSoftProcTexture3D::Initialize (iSystem *iSys)
@@ -72,7 +75,8 @@ void csSoftProcTexture3D::Print (csRect *area)
 
   // As we've printed something we need to uncache it so the effects will be 
   // registered next frame.
-  parent_tcache->uncache_texture (0, (iTextureHandle*)parent_tex_mm);
+  if (parent_tex_mm)
+    parent_tcache->uncache_texture (0, (iTextureHandle*)parent_tex_mm);
 }
 
 bool csSoftProcTexture3D::Prepare 
@@ -139,7 +143,12 @@ bool csSoftProcTexture3D::Prepare
                   texman->RegisterTexture (im, CS_TEXTURE_2D | CS_TEXTURE_PROC);
     texman->PrepareTexture (soft_tex_mm);
   }
-
+#ifdef CS_DEBUG
+  if (alone_hint)
+    System->Printf (MSG_INITIALIZATION, "8bit software procedural texture buffer\n");
+  else
+    System->Printf (MSG_INITIALIZATION, "Software procedural texture buffer\n");
+#endif
   return true;
 }
 
@@ -197,12 +206,12 @@ iTextureHandle *csSoftProcTexture3D::CreateOffScreenRenderer
   iImage *tex_image = new csImageMemory (width, height, 
 					 (RGBPixel*)buffer, false);
 
-  csTextureMMSoftware *soft_mm = (csTextureMMSoftware *) texman->RegisterTexture (tex_image,
+  soft_tex_mm = (csTextureMMSoftware *) texman->RegisterTexture (tex_image,
 						 CS_TEXTURE_PROC | CS_TEXTURE_2D);
-  texman->PrepareTexture ((iTextureHandle*)soft_mm);
+  texman->PrepareTexture ((iTextureHandle*)soft_tex_mm);
 
   // Return the software texture managers handle for this procedural texture.
-  return soft_mm;
+  return soft_tex_mm;
 }
 
 void csSoftProcTexture3D::ConvertMode ()

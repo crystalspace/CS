@@ -465,6 +465,14 @@ void csWorld::Clear ()
   }
   delete textures; textures = NULL;
   textures = new csTextureList ();
+
+  if (world_states)
+  {
+    world_states->DeleteAll ();
+    delete world_states;
+    world_states = NULL;
+  }
+
   SetCuller (CS_CULLER_CBUFFER);
   delete render_pol2d_pool;
   render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory());
@@ -475,13 +483,6 @@ void csWorld::Clear ()
   // Clear all object libraries
   Library = NULL;
   Libraries.DeleteAll ();
-  
-  if (world_states)
-  {
-    world_states->DeleteAll ();
-    delete world_states;
-    world_states = NULL;
-  }
 }
 
 void csWorld::ResolveEngineMode ()
@@ -1650,6 +1651,15 @@ csWorld::csWorldState::csWorldState (csWorld *w)
 
 csWorld::csWorldState::~csWorldState ()
 {
+  if (world->G2D == G2D)
+  {
+    world->G3D->DecRef ();
+    world->G3D = NULL;
+    world->G2D = NULL;
+    world->c_buffer = NULL;
+    world->quad3d = NULL;
+    world->covtree = NULL;
+  }
   delete c_buffer;
   delete quad3d;
   delete covtree;
@@ -1706,19 +1716,34 @@ void csWorld::SetContext (iGraphics3D* g3d)
   G2D = g3d->GetDriver2D ();
   if (g3d != G3D)
   {
-    G3D->DecRef ();
+    if (G3D) G3D->DecRef ();
     G3D = g3d;
-    if (!world_states) world_states = new csWorldStateVector();
-    int idg3d = world_states->FindKey (g3d);
-    if (idg3d < 0)
+    if (!world_states) 
     {
+      world_states = new csWorldStateVector();
       Resize ();
       world_states->Push (new csWorldState (this));
     }
     else
     {
-      csWorldState *state = (csWorldState *)world_states->Get (idg3d);
-      state->Activate ();
+      int idg3d = world_states->FindKey (g3d);
+      if (idg3d < 0)
+      {
+	int c = GetCuller ();
+	// Null out the culler which belongs to another state so its not deleted.
+	c_buffer = NULL;
+	covtree = NULL;
+	quad3d = NULL;
+	frame_width = G3D->GetWidth ();
+	frame_height = G3D->GetHeight ();
+	SetCuller (c);
+	world_states->Push (new csWorldState (this));
+      }
+      else
+      {
+	csWorldState *state = (csWorldState *)world_states->Get (idg3d);
+	state->Activate ();
+      }
     }
     G3D->IncRef ();
   }

@@ -157,7 +157,8 @@ csOpenGLProcSoftware::~csOpenGLProcSoftware ()
       last = last->next_soft_tex;
     last->next_soft_tex = next_soft_tex;
   }
-  delete dummy_g2d;
+  system->QueueContextCloseEvent ((void*)dummy_g2d);
+  dummy_g2d->DecRef ();
 }
 
 void csOpenGLProcSoftware::ConvertAloneMode ()

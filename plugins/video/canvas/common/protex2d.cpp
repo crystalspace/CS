@@ -155,10 +155,7 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
 
 bool csProcTextureSoft2D::Open(const char *Title)
 {
-#ifdef CS_DEBUG
-  CsPrintf (MSG_INITIALIZATION, "Crystal Space procedural texture buffer\n");
-#endif
-  // Open your graphic interface
+  // Open the graphic interface
   return csGraphics2D::Open (Title);
 }
 

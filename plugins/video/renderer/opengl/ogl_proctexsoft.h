@@ -167,6 +167,7 @@ class csOpenGLProcSoftware2D : public iGraphics2D
 
   csOpenGLProcSoftware2D (iGraphics3D *g3d, csPixelFormat *pfmt)
   {
+    CONSTRUCT_IBASE (NULL);
     g2d = g3d->GetDriver2D ();
     soft_texman = g3d->GetTextureManager ();
     gl_pfmt = pfmt;

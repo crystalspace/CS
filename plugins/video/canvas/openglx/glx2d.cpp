@@ -339,7 +339,7 @@ bool csGraphics2DGLX::Open(const char *Title)
     active_GLVisual->depth, InputOutput, active_GLVisual->visual,
     CWBorderPixel | CWColormap | CWEventMask | CWBitGravity, &winattr);
 
-  XStoreName (dpy, window, Title);
+  XStoreName (dpy, WMwindow, Title);
 
   // Now communicate fully to the window manager our wishes using the non-mapped
   // leader_window to form a window_group

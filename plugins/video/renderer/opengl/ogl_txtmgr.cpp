@@ -83,6 +83,8 @@ void csTextureMMOpenGL::InitTexture (csTextureManagerOpenGL *texman,
   // textures are calculated correctly. In other words, the app writer need
   // not know about opengl texture size adjustments. smgh
   if (!image) return;
+  if (((flags & CS_TEXTURE_PROC) == CS_TEXTURE_PROC) && tex[0])
+    return;
   orig_width = image->GetWidth ();
   orig_height = image->GetHeight ();
 
