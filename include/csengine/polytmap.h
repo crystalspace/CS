@@ -159,7 +159,7 @@ public:
       scfParent->GetTextureSpace (tx_matrix, tx_vector);
     }
   } scfiPolyTxtPlane;
-  friend class PolyTxtPlane;
+  friend struct PolyTxtPlane;
 };
 
 #endif // __CS_POLYTMAP_H__
