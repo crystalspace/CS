@@ -23,6 +23,8 @@ chronological order.
 	- Eric Sunshine split Class::scfRemoveRefOwners() implementation in
 	  scf.h out into its own SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS() macro
 	  rather than having it bundled into SCF_IMPLEMENT_IBASE_DECREF().
+        - acraig fixed up some calls to SCF_DESTRUCT_IBASE() that had a 0 as
+          a param.
 4-Nov-2003
 	- Jorrit fixed a bug in Dynavis history culling. In some cases objects
 	  could remain visible for longer then expected because the history

@@ -631,7 +631,7 @@ csLightList::csLightList ()
 csLightList::~csLightList ()
 {
   RemoveAll ();
-  SCF_DESTRUCT_IBASE (0);
+  SCF_DESTRUCT_IBASE ();
 }
 
 iLight *csLightList::FindByID (const char* id) const
@@ -700,7 +700,7 @@ csLightingProcessInfo::csLightingProcessInfo (csLight* light, bool dynamic)
 
 csLightingProcessInfo::~csLightingProcessInfo()
 {
-  SCF_DESTRUCT_IBASE (0);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csLightingProcessInfo::AttachUserdata (iLightingProcessData* userdata)

@@ -55,7 +55,7 @@ csPortal::csPortal (csPortalContainer* parent)
 csPortal::~csPortal ()
 {
   delete[] name;
-  SCF_DESTRUCT_IBASE (0);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csPortal::SetSector (iSector *s)

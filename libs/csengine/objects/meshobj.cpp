@@ -1142,7 +1142,7 @@ csMeshFactoryList::csMeshFactoryList ()
 csMeshFactoryList::~csMeshFactoryList ()
 {
   RemoveAll ();
-  SCF_DESTRUCT_IBASE (0);
+  SCF_DESTRUCT_IBASE ();
 }
 
 int csMeshFactoryList::Add (iMeshFactoryWrapper *obj)
