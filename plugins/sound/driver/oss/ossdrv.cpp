@@ -24,7 +24,11 @@
 #include <stdarg.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <sys/soundcard.h>
+#if defined(OS_BSD)
+#  include <machine/soundcard.h>
+#else
+#  include <sys/soundcard.h>
+#endif
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <signal.h>
