@@ -22,6 +22,8 @@ chronological order.
 	- Jorrit did a big optimization in genmesh by allocating the
 	  hashes more efficiently (they don't need a hash that is preallocated
 	  at 257 items).
+	- Jorrit fixed a weird bug in walktest (introduced by res2k) which
+	  simply disabled coordshow directly after enabling it.
 19-Feb-2004
 	- res made the following changes:
 	    - A few minor cosmetic changes.

@@ -1586,7 +1586,6 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "coordshow"))
   {
     csCommandProcessor::change_boolean (arg, &Sys->do_show_coord, "coordshow");
-    if (Sys->do_show_coord) Sys->do_show_coord = false;
   }
   else if (!strcasecmp (cmd, "hi"))
   {
