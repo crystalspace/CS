@@ -1,5 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
+7-Nov-2000
+	- Fixed a bug to csSprite3D::HitBeamObject(). It was taking the
+	  wrong frame from the sprite to do the collision detection with.
 6-Nov-2000
 	- Eric Sunshine made the following changes to the project:
 	    - Visual-C++ DSW and DSP project files are now automatically

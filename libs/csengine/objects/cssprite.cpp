@@ -1323,7 +1323,8 @@ bool csSprite3D::HitBeamObject (const csVector3& start, const csVector3& end,
   csSegment3 seg (start, end);
   if (!csIntersect3::BoxSegment (b, seg, isect, pr))
     return false;
-  csVector3* verts = GetObjectVerts (tpl->GetFrame (cur_frame));
+  csFrame* cframe = cur_action->GetFrame (cur_frame);
+  csVector3* verts = GetObjectVerts (cframe);
   csTriangle* tris = tpl->GetTriangles ();
   int i;
   for (i = 0 ; i < tpl->GetNumTriangles () ; i++)
