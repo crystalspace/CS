@@ -138,6 +138,11 @@ while test $# -gt 0; do
   shift
 done
 
+#if users specified none, output all
+if test -z "$the_libs"; then
+	the_libs="-lcsengine -lcsws -lcsgeom -lcsgfx -lcstool -lcsutil -lcssys"
+fi
+
 #look for dependencies
 includedeps()
 {
