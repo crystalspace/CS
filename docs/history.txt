@@ -19,6 +19,7 @@ Short-term cleanups that need to be done:
 	  in mk/system/linux.mak if you want).
 	- Michael Dale Long added a clock skew fix to cctest.
 	- Brandon Ehle added iSCF support for use with plugin dlls.
+	- Some extra optimizations on coverage mask tree stuff.
 22-Dec-1999
 	- Eric Sunshine fixed the project so that it once again compiles on
 	  NextStep following recent changes.

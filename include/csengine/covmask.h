@@ -427,6 +427,17 @@ public:
 
 };
 
+/*
+ * This structure holds precalculated information for
+ * every edge of the polygon.
+ */
+struct csCovEdgeInfo
+{
+  float dxdy, dydx;	// dx/dy and dy/dx.
+  bool horizontal;	// True if dy near 0.
+  bool vertical;	// True if dx near 0.
+};
+
 /**
  * This class represents a lookup table for our coverage
  * masks. It is used by the coverage mask tree. The input
@@ -461,15 +472,16 @@ private:
   void BuildTables ();
 
   /**
-   * Take a line given as a start point and the two
-   * gradients dx/dy and dy/dz. Also take a box at position
+   * Take a line given as a start point and the edge information.
+   * Also take a box at position
    * (hor_offs,ver_offs)-(hor_offs+box_dim,ver_offs+box_dim)
    * (box_dim must be a power of two).
    * Return the index in the masks tables for the
    * intersection of the line with the box.
    */
   int GetIndex (const csVector2& start, const csVector2& stop,
-  	float dxdy, float dydx, int hor_offs, int ver_offs,
+  	const csCovEdgeInfo& edge,
+  	int hor_offs, int ver_offs,
 	int box_dim, int box_shift) const;
 
 public:
@@ -504,32 +516,32 @@ public:
   }
 
   /**
-   * Take a line given as a start point and the two
-   * gradients dx/dy and dy/dz. Also take a box at position
+   * Take a line given as a start point and the edge information.
+   * Also take a box at position
    * (hor_offs,ver_offs)-(hor_offs+box_dim,ver_offs+box_dim)
    * (box_dim must be a power of two).
    * Return the triage mask for the intersection of the line with the box.
    */
   csCovMaskTriage& GetTriageMask (const csVector2& start,
-  	const csVector2& stop, float dxdy, float dydx,
+  	const csVector2& stop, const csCovEdgeInfo& edge,
 	int hor_offs, int ver_offs, int box_dim, int box_shift) const
   {
-    return (triage_masks[GetIndex (start, stop, dxdy, dydx,
+    return (triage_masks[GetIndex (start, stop, edge,
     	hor_offs, ver_offs, box_dim, box_shift)]);
   }
 
   /**
-   * Take a line given as a start point and the two
-   * gradients dx/dy and dy/dz. Also take a box at position
+   * Take a line given as a start point and the edge information.
+   * Also take a box at position
    * (hor_offs,ver_offs)-(hor_offs+box_dim,ver_offs+box_dim)
    * (box_dim must be a power of two).
    * Return the mask for the intersection of the line with the box.
    */
   csCovMask& GetMask (const csVector2& start,
-  	const csVector2& stop, float dxdy, float dydx,
+  	const csVector2& stop, const csCovEdgeInfo& edge,
 	int hor_offs, int ver_offs, int box_dim, int box_shift) const
   {
-    return (masks[GetIndex (start, stop, dxdy, dydx,
+    return (masks[GetIndex (start, stop, edge,
     	hor_offs, ver_offs, box_dim, box_shift)]);
   }
 
@@ -538,7 +550,7 @@ public:
    * and return the triage mask for this polygon.
    */
   csCovMaskTriage GetTriageMask (csVector2* verts, int num_verts,
-  	float* dxdy, float* dydx,
+	csCovEdgeInfo* edges,
 	int hor_offs, int ver_offs, int box_dim, int box_shift) const;
 
   /**
@@ -546,7 +558,7 @@ public:
    * and return the mask for this polygon.
    */
   csCovMask GetMask (csVector2* verts, int num_verts,
-  	float* dxdy, float* dydx,
+	csCovEdgeInfo* edges,
 	int hor_offs, int ver_offs, int box_dim, int box_shift) const;
 };
 

@@ -48,23 +48,21 @@ public:
   /**
    * Test a polygon against this node (and children).
    * Returns true if polygon is visible.
-   * dxdy and dydx are an array of edge gradients for the polygon.
    * hor_offs, and ver_offs are the offset for the (0,0) corner
    * of the node.
    */
   bool TestPolygon (csVector2* poly, int num_verts,
-  	float* dxdy, float* dydx,
+	csCovEdgeInfo* edges,
   	int hor_offs, int ver_offs) const;
 
   /**
    * Insert a polygon in this node (and children).
    * Returns true if polygon was visible (i.e. tree is modified).
-   * dxdy and dydx are an array of edge gradients for the polygon.
    * hor_offs, and ver_offs are the offset for the (0,0) corner
    * of the node.
    */
   bool InsertPolygon (csVector2* poly, int num_verts,
-  	float* dxdy, float* dydx,
+	csCovEdgeInfo* edges,
   	int hor_offs, int ver_offs);
 
   /**
@@ -76,7 +74,7 @@ public:
    * the top-level node was empty and true otherwise.
    */
   bool UpdatePolygon (csVector2* poly, int num_verts,
-  	float* dxdy, float* dydx,
+	csCovEdgeInfo* edges,
   	int hor_offs, int ver_offs);
 
   /**
@@ -85,7 +83,7 @@ public:
    * of updating for the inverted polygon.
    */
   bool UpdatePolygonInverted (csVector2* poly, int num_verts,
-  	float* dxdy, float* dydx,
+	csCovEdgeInfo* edges,
   	int hor_offs, int ver_offs);
 
   /**
@@ -95,7 +93,7 @@ public:
    * parts of the tree which are not defined.
    */
   bool TestPolygonNotEmpty (csVector2* poly, int num_verts,
-  	float* dxdy, float* dydx,
+	csCovEdgeInfo* edges,
   	int hor_offs, int ver_offs) const;
 
   /**
@@ -148,23 +146,21 @@ public:
   /**
    * Test a polygon against this node.
    * Returns true if polygon is visible.
-   * dxdy and dydx are an array of edge gradients for the polygon.
    * hor_offs, and ver_offs are the offset for the (0,0) corner
    * of the node.
    */
   bool TestPolygon (csVector2* poly, int num_verts,
-  	float* dxdy, float* dydx,
+	csCovEdgeInfo* edges,
   	int hor_offs, int ver_offs) const;
 
   /**
    * Insert a polygon in this node.
    * Returns true if polygon was visible (i.e. mask is modified).
-   * dxdy and dydx are an array of edge gradients for the polygon.
    * hor_offs, and ver_offs are the offset for the (0,0) corner
    * of the node.
    */
   bool InsertPolygon (csVector2* poly, int num_verts,
-  	float* dxdy, float* dydx,
+	csCovEdgeInfo* edges,
   	int hor_offs, int ver_offs);
 
   /**
@@ -176,7 +172,7 @@ public:
    * the top-level node was empty and true otherwise.
    */
   bool UpdatePolygon (csVector2* poly, int num_verts,
-  	float* dxdy, float* dydx,
+	csCovEdgeInfo* edges,
   	int hor_offs, int ver_offs);
 
   /**
@@ -185,7 +181,7 @@ public:
    * of updating for the inverted polygon.
    */
   bool UpdatePolygonInverted (csVector2* poly, int num_verts,
-  	float* dxdy, float* dydx,
+	csCovEdgeInfo* edges,
   	int hor_offs, int ver_offs);
   /**
    * Test if a polygon is not empty for the given area on the
@@ -194,7 +190,7 @@ public:
    * parts of the tree which are not defined.
    */
   bool TestPolygonNotEmpty (csVector2* poly, int num_verts,
-  	float* dxdy, float* dydx,
+	csCovEdgeInfo* edges,
   	int hor_offs, int ver_offs) const;
 
   /**

@@ -333,7 +333,7 @@ void csCovMaskLUT::BuildTables ()
 
 int csCovMaskLUT::GetIndex (const csVector2& start,
 	const csVector2& stop,
-	float dxdy, float dydx,
+	const csCovEdgeInfo& edge,
 	int hor_offs, int ver_offs,
 	int box_dim, int box_shift) const
 {
@@ -358,34 +358,34 @@ int csCovMaskLUT::GetIndex (const csVector2& start,
   // intersection through the top and right edges of the box.
   int mask = 0;
 
-  if (ABS (dydx) >= SMALL_EPSILON)
+  if (!edge.horizontal)
   {
     // Top horizontal side.
-    f = -dxdy * (0+sta.y) + sta.x;
+    f = -edge.dxdy * (0+sta.y) + sta.x;
     if (f >= 0 && f < fbox_dim)
     {
       x_top = QInt (f);
       mask |= 0x8;
     }
     // Bottom horizontal side.
-    f = -dxdy * (fbox_dim+sta.y) + sta.x;
+    f = -edge.dxdy * (fbox_dim+sta.y) + sta.x;
     if (f >= 0 && f < fbox_dim)
     {
       x_bot = QInt (f);
       mask |= 0x4;
     }
   }
-  if (ABS (dxdy) >= SMALL_EPSILON)
+  if (!edge.vertical)
   {
     // Left vertical side.
-    f = -dydx * (0-sta.x) - sta.y;
+    f = -edge.dydx * (0-sta.x) - sta.y;
     if (f >= 0 && f < fbox_dim)
     {
       y_left = QInt (f);
       mask |= 0x2;
     }
     // Right vertical side.
-    f = -dydx * (fbox_dim-sta.x) - sta.y;
+    f = -edge.dydx * (fbox_dim-sta.x) - sta.y;
     if (f >= 0 && f < fbox_dim)
     {
       y_right = QInt (f);
@@ -432,8 +432,18 @@ int csCovMaskLUT::GetIndex (const csVector2& start,
     case 0xe:	// Top, left, and bottom side.
     case 0xd:	// Top, right, and bottom side.
     case 0x7:	// Bottom, left, and right side.
-      //CsPrintf (MSG_INTERNAL_ERROR,
-      	//"ERROR: Three intersections in csCovMaskLUT::GetIndex()!\n");
+#     if 0
+      CsPrintf (MSG_INTERNAL_ERROR,
+      	"ERROR: Three intersections in csCovMaskLUT::GetIndex()!\n");
+      printf ("  start=(%f,%f) stop=(%f,%f)\n", start.x, start.y, stop.x, stop.y);
+      printf ("  edge.dxdy=%f dydx=%f hor=%d ver=%d\n", edge.dxdy, edge.dydx,
+      	edge.horizontal, edge.vertical);
+      printf ("  hor_offs=%d ver_offs=%d box_dim=%d box_shift=%d\n",
+      	hor_offs, ver_offs, box_dim, box_shift);
+      printf ("  sta=(%f,%f) sto=(%f,%f)\n", sta.x, sta.y, sto.x, sto.y);
+      printf ("  mask=0x%x x_top=%d x_bot=%d, y_left=%d y_right=%d\n",
+      	mask, x_top, x_bot, y_left, y_right);
+#     endif
       break;
     case 0xf:	// All sides.
       //CsPrintf (MSG_INTERNAL_ERROR,
@@ -517,32 +527,32 @@ int csCovMaskLUT::GetIndex (const csVector2& start,
 }
 
 csCovMaskTriage csCovMaskLUT::GetTriageMask (csVector2* verts, int num_verts,
-  	float* dxdy, float* dydx, int hor_offs, int ver_offs,
+  	csCovEdgeInfo* edges, int hor_offs, int ver_offs,
 	int box_dim, int box_shift) const
 {
   csCovMaskTriage mask = GetTriageMask (verts[num_verts-1], verts[0],
-  	dxdy[num_verts-1], dydx[num_verts-1],
-	hor_offs, ver_offs, box_dim, box_shift);
+  	edges[num_verts-1], hor_offs, ver_offs, box_dim, box_shift);
   int i;
   for (i = 0 ; i < num_verts-1 ; i++)
   {
-    mask.Intersect (GetTriageMask (verts[i], verts[i+1], dxdy[i], dydx[i],
+    if (mask.IsEmpty ()) return mask;	// Stop if mask is already empty.
+    mask.Intersect (GetTriageMask (verts[i], verts[i+1], edges[i],
 	hor_offs, ver_offs, box_dim, box_shift));
   }
   return mask;
 }
 
 csCovMask csCovMaskLUT::GetMask (csVector2* verts, int num_verts,
-  	float* dxdy, float* dydx, int hor_offs, int ver_offs,
+  	csCovEdgeInfo* edges, int hor_offs, int ver_offs,
 	int box_dim, int box_shift) const
 {
   csCovMask mask = GetMask (verts[num_verts-1], verts[0],
-  	dxdy[num_verts-1], dydx[num_verts-1],
-	hor_offs, ver_offs, box_dim, box_shift);
+  	edges[num_verts-1], hor_offs, ver_offs, box_dim, box_shift);
   int i;
   for (i = 0 ; i < num_verts-1 ; i++)
   {
-    mask.Intersect (GetMask (verts[i], verts[i+1], dxdy[i], dydx[i],
+    if (mask.IsEmpty ()) return mask;	// Stop if mask is already empty.
+    mask.Intersect (GetMask (verts[i], verts[i+1], edges[i],
     	hor_offs, ver_offs, box_dim, box_shift));
   }
   return mask;
