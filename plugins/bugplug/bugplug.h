@@ -94,6 +94,7 @@ class csShadow;
 #define DEBUGCMD_MESHBBOX	1022	// Show BBOX of selected mesh
 #define DEBUGCMD_MESHRAD	1023	// How RADIUS of selected mesh
 #define DEBUGCMD_DEBUGGRAPH	1024	// Do a dump of the debug graph
+#define DEBUGCMD_TOGGLEXOR	1025	// Toggle c-buffer vs xor-buf
 
 /**
  * For key mappings.

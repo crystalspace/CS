@@ -500,6 +500,10 @@ bool csBugPlug::EatKey (iEvent& event)
         Report (CS_REPORTER_SEVERITY_NOTIFY, "Debug graph dumped!");
 	csDebuggingGraph::Dump (object_reg);
         break;
+      case DEBUGCMD_TOGGLEXOR:
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "Toggle c-buffer/XOR buffer!");
+	Engine->DebugCommand ("toggle_xorbuf");
+        break;
       case DEBUGCMD_HELP:
         Report (CS_REPORTER_SEVERITY_NOTIFY, "Sorry, cannot help you yet.");
         break;
@@ -904,6 +908,7 @@ int csBugPlug::GetCommandCode (const char* cmd)
   if (!strcmp (cmd, "meshbbox"))	return DEBUGCMD_MESHBBOX;
   if (!strcmp (cmd, "meshrad"))		return DEBUGCMD_MESHRAD;
   if (!strcmp (cmd, "debuggraph"))	return DEBUGCMD_DEBUGGRAPH;
+  if (!strcmp (cmd, "togglexor"))	return DEBUGCMD_TOGGLEXOR;
 
   return DEBUGCMD_UNKNOWN;
 }

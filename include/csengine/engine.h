@@ -51,6 +51,7 @@ class csCBufferCube;
 class csEngine;
 class csLight;
 class csCBuffer;
+class csXORBuffer;
 class csPoly2DPool;
 class csLightPatchPool;
 class csLightHalo;
@@ -378,6 +379,9 @@ private:
 
   /// Optional c-buffer used for rendering.
   csCBuffer* c_buffer;
+  /// Optional XOR-buffer used for rendering.
+  csXORBuffer* xor_buffer;
+  bool use_xorbuf;
 
   /// C-buffer cube used for lighting.
   csCBufferCube* cbufcube;
@@ -642,6 +646,11 @@ public:
    * Return c-buffer (or NULL if not used).
    */
   csCBuffer* GetCBuffer () const { return c_buffer; }
+
+  /**
+   * Return xor-buffer (or NULL if not used).
+   */
+  csXORBuffer* GetXORBuffer () const { return xor_buffer; }
 
   /**
    * Return cbuffer cube.
@@ -1084,6 +1093,8 @@ public:
   virtual iCollection* FindCollection (const char* name,
   	iRegion* region = NULL);
 
+  virtual void DebugCommand (const char* cmd);
+
   //----------------------- iCacheManager implementation ---------------------
 
   virtual void SetCacheManager (iCacheManager* cache_mgr);
@@ -1118,6 +1129,7 @@ private:
     iGraphics2D *G2D;
     iGraphics3D *G3D;
     csCBuffer* c_buffer;
+    csXORBuffer* xor_buffer;
     csCBufferCube* cbufcube;
     /// Creates an engine state by copying the relevant data members
     csEngineState (csEngine *this_engine);

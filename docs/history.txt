@@ -15,6 +15,23 @@ The history order is reversed so that new features are at the top.
 	  drawing in both directions (clockwise/anti-clockwise) and clipping.
 	  There is still much room for optimization. I will first get things
 	  working.
+	- Implemented InsertPolygon() and TestPolygon() in XOR buffer.
+	- Started supporting XOR buffer in engine. Now we'll be able to test
+	  performance and see if the XOR buffer is a suitable replacement
+	  for the c-buffer.
+	- Added iEngine::DebugCommand(). With this new method debugging
+	  commands can be performed in the engine. BugPlug can use this to
+	  perform certain debug options. At this moment the only supported
+	  command is 'toggle_xorbuf' which will toggle between c-buffer
+	  and XOR buffer.
+	- Bugplug now supports new 'togglexor' command (by default assigned
+	  to 'x' key).
+	- First performance results indicate that the c-buffer is still
+	  a lot faster. However, there is still considerable room for
+	  optimizations in the XOR buffer. Also keep in mind that even if
+	  the XOR buffer turns out to be slower I still will need it for
+	  the real dynamic PVS algorithms because the c-buffer cannot
+	  cope with non-convex outlines.
 17-Apr-2002
 	- Started working on new XOR buffer which *might* (if all goes
 	  well) replace the c-buffer. Nothing functional yet though.

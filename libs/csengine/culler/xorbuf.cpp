@@ -45,6 +45,7 @@ csXORBuffer::csXORBuffer (int w, int h)
   width, height, width_po2, w_shift, bufsize, numrows); fflush (stdout);
 
   buffer = new uint32[bufsize];
+  scr_buffer = new uint32[bufsize];
 
   debug_mode = false;
 }
@@ -52,11 +53,17 @@ csXORBuffer::csXORBuffer (int w, int h)
 csXORBuffer::~csXORBuffer ()
 {
   delete[] buffer;
+  delete[] scr_buffer;
+}
+
+void csXORBuffer::InitializePolygonBuffer ()
+{
+  memset (buffer, 0, bufsize << 2);
 }
 
 void csXORBuffer::Initialize ()
 {
-  memset (buffer, 0, bufsize << 2);
+  memset (scr_buffer, 0, bufsize << 2);
 }
 
 void csXORBuffer::DrawLeftLine (int x1, int y1, int x2, int y2)
@@ -436,6 +443,75 @@ void csXORBuffer::XORSweep ()
   }
 }
 
+bool csXORBuffer::InsertPolygon (csVector2* verts, int num_verts, bool negative)
+{
+  InitializePolygonBuffer ();
+  // @@@ This code is totally unoptimized and ignores the
+  // bounding box of the polygon. Using the 2D bounding box of the
+  // polygon a much more optimal rendering can be done.
+  DrawPolygon (verts, num_verts);
+
+  // In this routine we render the polygon to the polygon buffer
+  // and then we simulate (but don't actually perform for optimization
+  // purposes) a XOR sweep on that polygon buffer.
+
+  int i, x;
+  uint32* buf;
+  uint32* scr_buf;
+  bool mod = false;
+  uint32 init;
+  if (negative) init = ~0;
+  else init = 0;
+  for (i = 0 ; i < numrows ; i++)
+  {
+    buf = &buffer[i<<w_shift];
+    scr_buf = &scr_buffer[i<<w_shift];
+    uint32 first = init;
+    for (x = 0 ; x < width ; x++)
+    {
+      first ^= *buf++;
+      if ((~*scr_buf) & first)
+      {
+        mod = true;
+	*scr_buf++ |= first;
+      }
+      else
+      {
+        scr_buf++;
+      }
+      // @@@ Optimize to stop when 'first' becomes 0 again after being non-null.
+    }
+  }
+  return mod;
+}
+
+bool csXORBuffer::TestPolygon (csVector2* verts, int num_verts)
+{
+  InitializePolygonBuffer ();
+  // @@@ This code is totally unoptimized and ignores the
+  // bounding box of the polygon. Using the 2D bounding box of the
+  // polygon a much more optimal rendering can be done.
+  DrawPolygon (verts, num_verts);
+
+  int i, x;
+  uint32* buf;
+  uint32* scr_buf;
+  for (i = 0 ; i < numrows ; i++)
+  {
+    buf = &buffer[i<<w_shift];
+    scr_buf = &scr_buffer[i<<w_shift];
+    uint32 first = 0;
+    for (x = 0 ; x < width ; x++)
+    {
+      first ^= *buf++;
+      if ((~*scr_buf) & first) return true;
+      scr_buf++;
+      // @@@ Optimize to stop when 'first' becomes 0 again after being non-null.
+    }
+  }
+  return false;
+}
+
 static void DrawZoomedPixel (iGraphics2D* g2d, int x, int y, int col, int zoom)
 {
   if (zoom == 1)
@@ -473,6 +549,28 @@ void csXORBuffer::Debug_Dump (iGraphics2D* g2d, iGraphics3D* g3d, int zoom)
   for (i = 0 ; i < numrows ; i++)
   {
     uint32* row = &buffer[i<<w_shift];
+    for (x = 0 ; x < width ; x++)
+    {
+      uint32 c = *row++;
+      int yy = i*32;
+      for (y = 0 ; y < 32 ; y++)
+      {
+        DrawZoomedPixel (g2d, x, yy, (c & 1) ? col : 0, zoom);
+	c = c >> 1;
+	yy++;
+      }
+    }
+  }
+}
+
+void csXORBuffer::Debug_DumpScr (iGraphics2D* g2d, iGraphics3D* g3d, int zoom)
+{
+  iTextureManager *txtmgr = g3d->GetTextureManager ();
+  int col = txtmgr->FindRGB (200, 200, 200);
+  int x, y, i;
+  for (i = 0 ; i < numrows ; i++)
+  {
+    uint32* row = &scr_buffer[i<<w_shift];
     for (x = 0 ; x < width ; x++)
     {
       uint32 c = *row++;
@@ -529,7 +627,7 @@ bool csXORBuffer::Debug_ExtensiveTest (int num_iterations, csVector2* verts,
   int i;
   for (i = 0 ; i < num_iterations ; i++)
   {
-    Initialize ();
+    InitializePolygonBuffer ();
     num_verts = ((rand () >> 4) % 1)+3;
     switch (num_verts)
     {

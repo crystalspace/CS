@@ -28,6 +28,7 @@
 #include "csengine/stats.h"
 #include "csengine/sector.h"
 #include "csengine/cbufcube.h"
+#include "csengine/xorbuf.h"
 #include "csengine/bspbbox.h"
 #include "csengine/curve.h"
 #include "csengine/texture.h"
@@ -1411,6 +1412,18 @@ void csThing::DrawOnePolygon (
             poly->GetVertexCount (),
             true);
       }
+      else
+      {
+        csXORBuffer* xor_buffer = csEngine::current_engine->GetXORBuffer ();
+	if (xor_buffer)
+	{
+          xor_buffer->Initialize ();
+          xor_buffer->InsertPolygon (
+              poly->GetVertices (),
+              poly->GetVertexCount (),
+              true);
+	}
+      }
     }
 
     // Draw through the portal. If this fails we draw the original polygon
@@ -1758,6 +1771,7 @@ void *csThing::TestQueuePolygonArray (
   int num_verts;
   int i;
   csCBuffer *c_buffer = csEngine::current_engine->GetCBuffer ();
+  csXORBuffer *xor_buffer = csEngine::current_engine->GetXORBuffer ();
   bool visible;
   csPoly2DPool *render_pool = csEngine::current_engine->render_pol2d_pool;
   csPolygon2D *clip;
@@ -1842,13 +1856,24 @@ void *csThing::TestQueuePolygonArray (
                   icam->IsMirrored ()) &&
               clip->ClipAgainst (d->GetClipper ()))
             {
-              if (
-                c_buffer->TestPolygon (
-                    clip->GetVertices (),
-                    clip->GetVertexCount ()))
-              {
-                mark_vis = true;
-              }
+	      if (xor_buffer)
+	      {
+                if (xor_buffer->TestPolygon (
+                      clip->GetVertices (),
+                      clip->GetVertexCount ()))
+                {
+                  mark_vis = true;
+                }
+	      }
+	      else
+	      {
+                if (c_buffer->TestPolygon (
+                      clip->GetVertices (),
+                      clip->GetVertexCount ()))
+                {
+                  mark_vis = true;
+                }
+	      }
             }
           }
         }
@@ -1918,9 +1943,14 @@ void *csThing::TestQueuePolygonArray (
             // A portal is considered an non-transparent surface
             // here (i.e. a normal polygon). So we simply do
             // InsertPolygon() as opposed to TestPolygon() for portals.
-            visible = c_buffer->InsertPolygon (
-                clip->GetVertices (),
-                clip->GetVertexCount ());
+	    if (xor_buffer)
+              visible = xor_buffer->InsertPolygon (
+                  clip->GetVertices (),
+                  clip->GetVertexCount ());
+	    else
+              visible = c_buffer->InsertPolygon (
+                  clip->GetVertices (),
+                  clip->GetVertexCount ());
           }
         }
       }
@@ -1970,6 +2000,7 @@ void *csThing::TestQueuePolygonArray (
         poly_queue->Push (p, clip);
         Stats::polygons_accepted++;
         if (c_buffer && c_buffer->IsFull ()) return (void *)1;  // Stop
+	//@@@@@@@@@@@@@@@if (xor_buffer && xor_buffer->IsFull ()) return (void *)1;  // Stop
       }
       else
       {
@@ -2699,6 +2730,7 @@ bool CullOctreeNode (
   csOctreeNode *onode = (csOctreeNode *)node;
 
   csCBuffer *c_buffer;
+  csXORBuffer *xor_buffer;
   iRenderView *rview = (iRenderView *)data;
   static csPolygon2D &persp = *GetCullOctreeNodePerspPoly ();
   csVector3 array[7];
@@ -2713,6 +2745,7 @@ bool CullOctreeNode (
   //else if (w->IsPVSOnly ()) goto is_vis;
   //}
   c_buffer = w->GetCBuffer ();
+  xor_buffer = w->GetXORBuffer ();
 
   int num_array;
   csPlane3 *far_plane = icam->GetFarPlane ();
@@ -2808,9 +2841,15 @@ bool CullOctreeNode (
     if (!persp.ClipAgainst (rview->GetClipper ())) return false;
 
     // c-buffer test.
-    bool vis = c_buffer->TestPolygon (
-        persp.GetVertices (),
-        persp.GetVertexCount ());
+    bool vis;
+    if (xor_buffer)
+      vis = xor_buffer->TestPolygon (
+          persp.GetVertices (),
+          persp.GetVertexCount ());
+    else
+      vis = c_buffer->TestPolygon (
+          persp.GetVertices (),
+          persp.GetVertexCount ());
     if (!vis)
     {
       count_cull_node_notvis_cbuffer++;

@@ -37,6 +37,7 @@
 #include "csengine/lghtmap.h"
 #include "csengine/stats.h"
 #include "csengine/cbuffer.h"
+#include "csengine/xorbuf.h"
 #include "csengine/lppool.h"
 #include "csengine/radiosty.h"
 #include "csengine/region.h"
@@ -823,6 +824,8 @@ csEngine::csEngine (iBase *iParent) :
   textures = NULL;
   materials = NULL;
   c_buffer = NULL;
+  xor_buffer = NULL;
+  use_xorbuf = false;
   cbufcube = NULL;
   current_camera = NULL;
   current_engine = this;
@@ -900,6 +903,7 @@ csEngine::~csEngine ()
   delete cbufcube;
   delete rad_debug;
   delete c_buffer;
+  delete xor_buffer;
 
   // @@@ temp hack
   if (camera_hack) camera_hack->DecRef ();
@@ -1276,8 +1280,13 @@ void csEngine::ResetWorldSpecificSettings()
 void csEngine::InitCuller ()
 {
   delete c_buffer;
+  delete xor_buffer;
   c_buffer = NULL;
-  c_buffer = new csCBuffer (0, frame_width - 1, frame_height);
+  xor_buffer = NULL;
+  if (use_xorbuf)
+    xor_buffer = new csXORBuffer (frame_width, frame_height);
+  else
+    c_buffer = new csCBuffer (0, frame_width - 1, frame_height);
 }
 
 void csEngine::PrepareTextures ()
@@ -1688,6 +1697,14 @@ void csEngine::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
     {
       c_buffer->Initialize ();
       c_buffer->InsertPolygon (
+          view->GetClipPoly (),
+          view->GetVertexCount (),
+          true);
+    }
+    else if (xor_buffer)
+    {
+      xor_buffer->Initialize ();
+      xor_buffer->InsertPolygon (
           view->GetClipPoly (),
           view->GetVertexCount (),
           true);
@@ -2956,6 +2973,7 @@ csEngine::csEngineState::csEngineState (csEngine *e)
 {
   engine = e;
   c_buffer = e->c_buffer;
+  xor_buffer = e->xor_buffer;
   cbufcube = e->cbufcube;
   G2D = e->G2D;
   G3D = e->G3D;
@@ -2970,16 +2988,19 @@ csEngine::csEngineState::~csEngineState ()
     engine->G3D = NULL;
     engine->G2D = NULL;
     engine->c_buffer = NULL;
+    engine->xor_buffer = NULL;
     engine->cbufcube = NULL;
   }
 
   delete c_buffer;
+  delete xor_buffer;
   delete cbufcube;
 }
 
 void csEngine::csEngineState::Activate ()
 {
   engine->c_buffer = c_buffer;
+  engine->xor_buffer = xor_buffer;
   engine->cbufcube = cbufcube;
   engine->frame_width = G3D->GetWidth ();
   engine->frame_height = G3D->GetHeight ();
@@ -2989,6 +3010,7 @@ void csEngine::csEngineState::Activate ()
     engine->Resize ();
 
     c_buffer = engine->c_buffer;
+    xor_buffer = engine->xor_buffer;
     cbufcube = engine->cbufcube;
     resize = false;
   }
@@ -3049,6 +3071,7 @@ void csEngine::SetContext (iGraphics3D *g3d)
       {
         // Null out the culler which belongs to another state so its not deleted.
         c_buffer = NULL;
+        xor_buffer = NULL;
         cbufcube = NULL;
         frame_width = G3D->GetWidth ();
         frame_height = G3D->GetHeight ();
@@ -3089,6 +3112,19 @@ void csEngine::GetAmbientLight (csColor &c) const
   c.red = csLight::ambient_red / 255.0f;
   c.green = csLight::ambient_green / 255.0f;
   c.blue = csLight::ambient_blue / 255.0f;
+}
+
+void csEngine::DebugCommand (const char* cmd)
+{
+  if (!strcasecmp (cmd, "toggle_xorbuf"))
+  {
+    use_xorbuf = !use_xorbuf;
+    if (use_xorbuf)
+      Report ("Engine is using XOR buffer.");
+    else
+      Report ("Engine is using c-buffer.");
+    InitCuller ();
+  }
 }
 
 //-------------------End-Multi-Context-Support--------------------------------

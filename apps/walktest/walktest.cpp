@@ -367,7 +367,7 @@ void WalkTest::SetupFrame ()
   csXORBuffer* buf = new csXORBuffer (256, 256);
   static csVector2 poly[6];
 #if 0
-  buf->Initialize ();
+  buf->InitializePolygonBuffer ();
   cnt++;
   switch (((cnt >> 6) & 3))
   {
@@ -388,14 +388,14 @@ void WalkTest::SetupFrame ()
       break;
   }
   buf->GfxDump (Gfx3D->GetDriver2D (), Gfx3D, 2);
-#elif 1
+#elif 0
   static int num_verts;
   static bool did_test = false;
   if (did_test)
   {
     if (num_verts != -1)
     {
-      buf->Initialize ();
+      buf->InitializePolygonBuffer ();
       buf->SetDebugMode (true);
       buf->DrawPolygon (poly, num_verts);
       cnt++;
@@ -430,16 +430,20 @@ void WalkTest::SetupFrame ()
   static float oy = 0;
   static float dx = 1;
   static float dy = .63;
+  static csVector2 poly2[6];
   poly[3].Set (128+ox, 10+oy);
   poly[2].Set (150+ox, 200+oy);
   poly[1].Set (130+ox, 210+oy);
   poly[0].Set (10+ox, 30+oy);
-  buf->DrawPolygon (poly, 4);
-  buf->XORSweep ();
-  buf->Debug_Dump (Gfx3D->GetDriver2D (), Gfx3D);
-  cnt++;
-  if (((cnt >> 4) & 1) == 0)
-    buf->Debug_DrawPolygon (Gfx3D->GetDriver2D (), Gfx3D, poly, 4);
+
+  poly2[0].Set (140, 90);
+  poly2[1].Set (150, 140);
+  poly2[2].Set (130, 160);
+  poly2[3].Set (120, 100);
+
+  printf ("rc1 %d\n", buf->InsertPolygon (poly, 4, true));
+  printf ("rc2 %d\n", buf->InsertPolygon (poly2, 4));
+  buf->Debug_DumpScr (Gfx3D->GetDriver2D (), Gfx3D);
   ox += dx;
   oy += dy;
   if (ox < -200 || oy < -200 || ox > 200 || oy > 200)

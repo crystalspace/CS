@@ -39,7 +39,8 @@ private:
   int w_shift;		// Horizontal shift for width_po2.
   int numrows;
   int bufsize;
-  uint32* buffer;
+  uint32* scr_buffer;	// The total screen buffer.
+  uint32* buffer;	// The buffer for a single polygon.
   bool debug_mode;
 
   /**
@@ -53,6 +54,12 @@ public:
   csXORBuffer (int w, int h);
   /// Destroy the XOR buffer.
   ~csXORBuffer ();
+
+  /**
+   * Initialize the XOR polygon buffer to empty.
+   * This function is normally not called by user code.
+   */
+  void InitializePolygonBuffer ();
 
   /// Initialize the XOR buffer to empty.
   void Initialize ();
@@ -83,6 +90,28 @@ public:
   void DrawPolygon (csVector2* verts, int num_verts);
 
   /**
+   * Insert a polygon in the XOR buffer.
+   * This function will not do any backface culling and it will work
+   * perfectly in all orientations. Polygon has to be convex.
+   * It will update the screen buffer.
+   * Function returns false if polygon was not visible (i.e.
+   * screen buffer was not modified).
+   * If 'negative' is true the polygon is inserted inverted.
+   */
+  bool InsertPolygon (csVector2* verts, int num_verts, bool negative = false);
+
+  /**
+   * Test a polygon with the XOR buffer.
+   * This function will not do any backface culling and it will work
+   * perfectly in all orientations. Polygon has to be convex.
+   * It will not update the screen buffer but check if the polygon would
+   * have modified it.
+   * Function returns false if polygon was not visible (i.e.
+   * screen buffer would not have been modified).
+   */
+  bool TestPolygon (csVector2* verts, int num_verts);
+
+  /**
    * Do a XOR sweep on the entire buffer.
    * This function is normally not called by user code.
    */
@@ -92,6 +121,11 @@ public:
    * Do a graphical dump of the XOR buffer contents on screen.
    */
   void Debug_Dump (iGraphics2D* g2d, iGraphics3D* g3d, int zoom = 1);
+
+  /**
+   * Do a graphical dump of the XOR screen buffer contents on screen.
+   */
+  void Debug_DumpScr (iGraphics2D* g2d, iGraphics3D* g3d, int zoom = 1);
 
   /**
    * Draw a polygon on g2d for debugging purposes.
