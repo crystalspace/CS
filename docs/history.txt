@@ -14,6 +14,22 @@ chronological order.
           iAws::SetupCanvas (iGraphics2D *g2d=0, iGraphics3D *g3d=0)
           The default C++ usage of SetupCanvas expects a NULL pointer 
           to an iAwsCanvas.  The swig wrappers won't allow a NULL/0 to be used.
+	- Eric Sunshine changed confgure.ac to check for a usable FreeType2
+	  installation by testing for features actually required by Crystal
+	  Space, rather than simply checking the library's version number since
+	  the version number check was unreliable.  (For instance, one might
+	  install FreeType 2.1.3, yet "freetype-config --version" will report
+	  9.0.2 or some such.)
+	- Eric Sunshine augmented configure.ac so that it prefers "ranlib -s"
+	  on MacOS/X, since Panther emits a warning if the -s is omitted.
+	- Eric Sunshine augmented configure.ac so that the Carbon.h check is
+	  performed only by the compiler (and not by the preprocessor).  At
+	  least one MacOS/X user switches between gcc 2.95 and gcc 3.3 via a
+	  script which toggles the values of CC, CXX, and CPP in the
+	  environment, but the script uses "cpp" for CPP, rather than "gcc -E".
+	  This causes the Carbon.h check to fail when performed by the
+	  preprocessor since __APPLE__ and __GNUC__ are not defined.  By only
+	  performing the check via the compiler, we side-step this issue.
 11-Dec-2003
 	- Philipp Aumayr fixed a bug in AWS where a masked textbox raised an
 	  assert if the input was reactivated by clicking on the far right of

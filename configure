@@ -313,7 +313,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX RANLIB ac_ct_RANLIB DLLTOOL ac_ct_DLLTOOL DLLWRAP ac_ct_DLLWRAP WINDRES ac_ct_WINDRES OBJCOPY ac_ct_OBJCOPY FLEXBIN BISONBIN DOXYGEN TEXI2DVI DVIPS DVIPDF MAKEINFO INSTALL SWIGBIN MAKE JAM SET_MAKE CSLIBS_CONFIG ac_ct_CSLIBS_CONFIG NASM ac_ct_NASM MAKEDEP PERL PYTHON CPP EGREP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS FT2_CONFIG FT2_CFLAGS FT2_LIBS SDLCONFIG ac_ct_SDLCONFIG CGC CXXCPP LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX RANLIB ac_ct_RANLIB DLLTOOL ac_ct_DLLTOOL DLLWRAP ac_ct_DLLWRAP WINDRES ac_ct_WINDRES OBJCOPY ac_ct_OBJCOPY FLEXBIN BISONBIN DOXYGEN TEXI2DVI DVIPS DVIPDF MAKEINFO INSTALL SWIGBIN MAKE JAM SET_MAKE CSLIBS_CONFIG ac_ct_CSLIBS_CONFIG NASM ac_ct_NASM MAKEDEP PERL PYTHON CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP FT2CONFIG ac_ct_FT2CONFIG SDLCONFIG ac_ct_SDLCONFIG CGC CXXCPP LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -877,8 +877,6 @@ Optional Features:
                           processor will not work with earlier processors (for
                           example, Intel 686-specific code will not work with
                           a 586)
-  --disable-freetypetest  Do not try to compile and run
-                          a test FreeType program
   --enable-plugins        create plugin modules instead of linkable libraries
                           (default YES)
   --enable-meta-info-embedding
@@ -953,10 +951,6 @@ Optional Packages:
   --with-libode=dir       specify location of libode if not detected
                           automatically; searches dir, dir/include, and
                           dir/lib
-  --with-ft-prefix=PREFIX
-                          Prefix where FreeType is installed (optional)
-  --with-ft-exec-prefix=PREFIX
-                          Exec prefix where FreeType is installed (optional)
   --with-libvga=dir       specify location of libvga if not detected
                           automatically; searches dir, dir/include, and
                           dir/lib
@@ -7651,7 +7645,7 @@ fi
 
 #------------------------------------------------------------------------------
 # Check if compiler/linker recognizes -shared directive which is needed for
-# linking plugin modules.  Unfortunately, the Apple compiler (and possible
+# linking plugin modules.  Unfortunately, the Apple compiler (and possibly
 # others) require extra effort.  Even though the compiler does not recognize
 # the -shared option, it nevertheless returns a "success" result after
 # complaining that the option is unrecognized.  Worse, even -Werror fails to
@@ -10151,6 +10145,228 @@ fi
 
 
 
+
+    cs_host_os_normalized=''
+    case $host_os in
+	mingw*|cygwin*)
+	    cs_host_target=win32gcc
+	    cs_host_makefile=libs/cssys/win32/win32gcc.mak
+	    cs_host_family=windows
+	    ;;
+	darwin*)
+
+
+
+    # MacOS/X Panther ranlib complains if -s option is omitted.
+    if test -n "$RANLIB"; then
+  cs_build_prop_val=`echo x-s | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_makefile_text="${cs_makefile_text}CMD.RANLIB += $cs_build_prop_val
+"
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.RANLIB += \"$cs_build_prop_val\" ;
+"
+fi
+
+fi
+
+
+    # Both MacOS/X and Darwin are identified via $host_os as "darwin".  We need
+    # a way to distinguish between the two.  If Carbon.h is present, then
+    # assume MacOX/S; if not, assume Darwin.  If --with-x=yes was invoked, and
+    # Carbon.h is present, then assume that user wants to cross-build for
+    # Darwin even though build host is MacOS/X.  Implementation note: At least
+    # one MacOS/X user switches between gcc 2.95 and gcc 3.3 with a script
+    # which toggles the values of CC, CXX, and CPP.  Unfortunately, CPP was
+    # being set to run the preprocessor directly ("cpp", for instance) rather
+    # than running it via the compiler ("gcc -E", for instance).  The problem
+    # with running the preprocessor directly is that __APPLE__ and __GNUC__ are
+    # not defined, which causes the Carbon.h check to fail.  We avoid this
+    # problem by supplying a non-empty fourth argument to AC_CHECK_HEADER(),
+    # which causes it to test compile the header only (which is a more robust
+    # test), rather than also testing it via the preprocessor.
+
+    echo "$as_me:$LINENO: checking for Carbon/Carbon.h" >&5
+echo $ECHO_N "checking for Carbon/Carbon.h... $ECHO_C" >&6
+if test "${ac_cv_header_Carbon_Carbon_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+/* force compile */
+
+#include <Carbon/Carbon.h>
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_header_Carbon_Carbon_h=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_header_Carbon_Carbon_h=no
+fi
+rm -f conftest.$ac_objext conftest.$ac_ext
+fi
+echo "$as_me:$LINENO: result: $ac_cv_header_Carbon_Carbon_h" >&5
+echo "${ECHO_T}$ac_cv_header_Carbon_Carbon_h" >&6
+if test $ac_cv_header_Carbon_Carbon_h = yes; then
+  cs_host_macosx=yes
+else
+  cs_host_macosx=no
+fi
+
+
+
+    if test $cs_host_macosx = yes; then
+  echo "$as_me:$LINENO: checking for --with-x" >&5
+echo $ECHO_N "checking for --with-x... $ECHO_C" >&6
+	if test "${with_x+set}" = set && test "$with_x" = "yes"; then
+  echo "$as_me:$LINENO: result: yes (assume Darwin)" >&5
+echo "${ECHO_T}yes (assume Darwin)" >&6
+	    cs_host_macosx=no
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+fi
+
+
+    if test $cs_host_macosx = yes; then
+  cs_host_target=macosx
+	cs_host_makefile=libs/cssys/macosx/macosx.mak
+	cs_host_family=unix
+	cs_host_os_normalized='MacOS/X'
+
+	cs_header_text="${cs_header_text}#define OS_MACOSX
+"
+	cs_header_text="${cs_header_text}#define CS_24BIT_PIXEL_LAYOUT CS_24BIT_PIXEL_ARGB
+"
+
+	# We assume that we always have CoreAudio available on MacOS/X.
+	cs_jamconfig_text="${cs_jamconfig_text}COREAUDIO.AVAILABLE ?= \"yes\" ;
+"
+	cs_jamconfig_text="${cs_jamconfig_text}COREAUDIO.LFLAGS ?= \"-framework CoreAudio\" ;
+"
+
+	echo "$as_me:$LINENO: checking for Objective-C compiler" >&5
+echo $ECHO_N "checking for Objective-C compiler... $ECHO_C" >&6
+if test "${cs_cv_prog_objc+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cs_cv_prog_objc="$CC"
+fi
+echo "$as_me:$LINENO: result: $cs_cv_prog_objc" >&5
+echo "${ECHO_T}$cs_cv_prog_objc" >&6
+	cs_makefile_text="${cs_makefile_text}OBJC = $cs_cv_prog_objc -c
+"
+	cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJC ?= \"$cs_cv_prog_objc\" ;
+"
+	echo "$as_me:$LINENO: checking for Objective-C++ compiler" >&5
+echo $ECHO_N "checking for Objective-C++ compiler... $ECHO_C" >&6
+if test "${cs_cv_prog_objcxx+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cs_cv_prog_objcxx="$CXX"
+fi
+echo "$as_me:$LINENO: result: $cs_cv_prog_objcxx" >&5
+echo "${ECHO_T}$cs_cv_prog_objcxx" >&6
+	cs_makefile_text="${cs_makefile_text}OBJCXX = $cs_cv_prog_objcxx -c
+"
+	cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJC++ ?= \"$cs_cv_prog_objcxx\" ;
+"
+else
+  cs_host_target=unix
+	cs_host_makefile=libs/cssys/unix/unix.mak
+	cs_host_family=unix
+fi
+
+	    ;;
+	*)
+	    # Everything else is assumed to be Unix or Unix-like.
+	    cs_host_target=unix
+	    cs_host_makefile=libs/cssys/unix/unix.mak
+	    cs_host_family=unix
+	    ;;
+    esac
+
+case $cs_host_family in
+    windows)
+	cs_header_text="${cs_header_text}#define OS_WIN32
+"
+	if test -z "$cs_host_os_normalized"; then
+  cs_host_os_normalized='Win32'
+fi
+
+	;;
+    unix)
+	cs_header_text="${cs_header_text}#define OS_UNIX
+"
+	if test -z "$cs_host_os_normalized"; then
+  cs_host_os_normalized='Unix'
+fi
+
+	;;
+esac
+
+cs_host_os_normalized_uc="`echo "$cs_host_os_normalized" | $as_tr_cpp`"
+cs_makefile_text="${cs_makefile_text}TARGET = $cs_host_target
+"
+cs_makefile_text="${cs_makefile_text}TARGET_MAKEFILE = $cs_host_makefile
+"
+cs_makefile_text="${cs_makefile_text}OS = $cs_host_os_normalized_uc
+"
+cs_jamconfig_text="${cs_jamconfig_text}TARGET.OS ?= \"$cs_host_os_normalized_uc\" ;
+"
+cs_jamconfig_text="${cs_jamconfig_text}TARGET.OS.NORMALIZED ?= \"$cs_host_os_normalized\" ;
+"
+cs_header_text="${cs_header_text}#define CS_PLATFORM_NAME \"$cs_host_os_normalized\"
+"
+
+
+
+#------------------------------------------------------------------------------
+# Check for X-Windows.  If the X-Windows implementation is XFree86, then also
+# enable the `VideoMode' extension.
+#------------------------------------------------------------------------------
+
+
+
+
+
+    # Explicitly disable X checking on Windows to avoid discovering XFree86 in
+    # case Cygwin is installed.  Doing so allows us to avoid Mesa's OpenGL
+    # headers during the OpenGL check, and prefer Microsoft's OpenGL headers.
+    # The Mesa OpenGL headers cause link errors because they do not employ
+    # __stdcall.
+    case $host_os in
+	mingw*|cygwin*) with_x=no ;;
+    esac
+
+    # Explicitly disable X checking on MacOS/X in case the optional XFree86 is
+    # installed since we want to avoid an undesirable dependency upon XFree86
+    # in the CS executables and plugins.  If the user is actually
+    # cross-building for Darwin on MacOS/X, then the --with-x option will
+    # override this test (by setting cs_host_macosx to "no").
+    if test x$cs_host_macosx = xyes; then
+  with_x=no
+fi
+
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -10385,534 +10601,6 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
-
-echo "$as_me:$LINENO: checking for egrep" >&5
-echo $ECHO_N "checking for egrep... $ECHO_C" >&6
-if test "${ac_cv_prog_egrep+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if echo a | (grep -E '(a|b)') >/dev/null 2>&1
-    then ac_cv_prog_egrep='grep -E'
-    else ac_cv_prog_egrep='egrep'
-    fi
-fi
-echo "$as_me:$LINENO: result: $ac_cv_prog_egrep" >&5
-echo "${ECHO_T}$ac_cv_prog_egrep" >&6
- EGREP=$ac_cv_prog_egrep
-
-
-echo "$as_me:$LINENO: checking for ANSI C header files" >&5
-echo $ECHO_N "checking for ANSI C header files... $ECHO_C" >&6
-if test "${ac_cv_header_stdc+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
-#include <float.h>
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext
-if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
-  (eval $ac_compile) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest.$ac_objext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_header_stdc=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-ac_cv_header_stdc=no
-fi
-rm -f conftest.$ac_objext conftest.$ac_ext
-
-if test $ac_cv_header_stdc = yes; then
-  # SunOS 4.x string.h does not declare mem*, contrary to ANSI.
-  cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <string.h>
-
-_ACEOF
-if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
-  $EGREP "memchr" >/dev/null 2>&1; then
-  :
-else
-  ac_cv_header_stdc=no
-fi
-rm -f conftest*
-
-fi
-
-if test $ac_cv_header_stdc = yes; then
-  # ISC 2.0.2 stdlib.h does not declare free, contrary to ANSI.
-  cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <stdlib.h>
-
-_ACEOF
-if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
-  $EGREP "free" >/dev/null 2>&1; then
-  :
-else
-  ac_cv_header_stdc=no
-fi
-rm -f conftest*
-
-fi
-
-if test $ac_cv_header_stdc = yes; then
-  # /bin/cc in Irix-4.0.5 gets non-ANSI ctype macros unless using -ansi.
-  if test "$cross_compiling" = yes; then
-  :
-else
-  cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <ctype.h>
-#if ((' ' & 0x0FF) == 0x020)
-# define ISLOWER(c) ('a' <= (c) && (c) <= 'z')
-# define TOUPPER(c) (ISLOWER(c) ? 'A' + ((c) - 'a') : (c))
-#else
-# define ISLOWER(c) \
-                   (('a' <= (c) && (c) <= 'i') \
-                     || ('j' <= (c) && (c) <= 'r') \
-                     || ('s' <= (c) && (c) <= 'z'))
-# define TOUPPER(c) (ISLOWER(c) ? ((c) | 0x40) : (c))
-#endif
-
-#define XOR(e, f) (((e) && !(f)) || (!(e) && (f)))
-int
-main ()
-{
-  int i;
-  for (i = 0; i < 256; i++)
-    if (XOR (islower (i), ISLOWER (i))
-        || toupper (i) != TOUPPER (i))
-      exit(2);
-  exit (0);
-}
-_ACEOF
-rm -f conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  :
-else
-  echo "$as_me: program exited with status $ac_status" >&5
-echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-( exit $ac_status )
-ac_cv_header_stdc=no
-fi
-rm -f core core.* *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
-fi
-fi
-fi
-echo "$as_me:$LINENO: result: $ac_cv_header_stdc" >&5
-echo "${ECHO_T}$ac_cv_header_stdc" >&6
-if test $ac_cv_header_stdc = yes; then
-
-cat >>confdefs.h <<\_ACEOF
-#define STDC_HEADERS 1
-_ACEOF
-
-fi
-
-# On IRIX 5.3, sys/types and inttypes.h are conflicting.
-
-
-
-
-
-
-
-
-
-for ac_header in sys/types.h sys/stat.h stdlib.h string.h memory.h strings.h \
-                  inttypes.h stdint.h unistd.h
-do
-as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $ac_header" >&5
-echo $ECHO_N "checking for $ac_header... $ECHO_C" >&6
-if eval "test \"\${$as_ac_Header+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-$ac_includes_default
-
-#include <$ac_header>
-_ACEOF
-rm -f conftest.$ac_objext
-if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
-  (eval $ac_compile) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest.$ac_objext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  eval "$as_ac_Header=yes"
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-eval "$as_ac_Header=no"
-fi
-rm -f conftest.$ac_objext conftest.$ac_ext
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_Header'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_Header'}'`" >&6
-if test `eval echo '${'$as_ac_Header'}'` = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define `echo "HAVE_$ac_header" | $as_tr_cpp` 1
-_ACEOF
-
-fi
-
-done
-
-
-
-    cs_host_os_normalized=''
-    case $host_os in
-	mingw*|cygwin*)
-	    cs_host_target=win32gcc
-	    cs_host_makefile=libs/cssys/win32/win32gcc.mak
-	    cs_host_family=windows
-	    ;;
-	darwin*)
-
-
-
-    # Both MacOS/X and Darwin are identified via $host_os as "darwin".  We need
-    # a way to distinguish between the two.  If Carbon.h is present, then
-    # assume MacOX/S; if not, assume Darwin.  If --with-x=yes was invoked, and
-    # Carbon.h is present, then assume that user wants to cross-build for
-    # Darwin even though build host is MacOS/X.
-
-    if test "${ac_cv_header_Carbon_Carbon_h+set}" = set; then
-  echo "$as_me:$LINENO: checking for Carbon/Carbon.h" >&5
-echo $ECHO_N "checking for Carbon/Carbon.h... $ECHO_C" >&6
-if test "${ac_cv_header_Carbon_Carbon_h+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-fi
-echo "$as_me:$LINENO: result: $ac_cv_header_Carbon_Carbon_h" >&5
-echo "${ECHO_T}$ac_cv_header_Carbon_Carbon_h" >&6
-else
-  # Is the header compilable?
-echo "$as_me:$LINENO: checking Carbon/Carbon.h usability" >&5
-echo $ECHO_N "checking Carbon/Carbon.h usability... $ECHO_C" >&6
-cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-$ac_includes_default
-#include <Carbon/Carbon.h>
-_ACEOF
-rm -f conftest.$ac_objext
-if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
-  (eval $ac_compile) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest.$ac_objext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_header_compiler=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-ac_header_compiler=no
-fi
-rm -f conftest.$ac_objext conftest.$ac_ext
-echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
-echo "${ECHO_T}$ac_header_compiler" >&6
-
-# Is the header present?
-echo "$as_me:$LINENO: checking Carbon/Carbon.h presence" >&5
-echo $ECHO_N "checking Carbon/Carbon.h presence... $ECHO_C" >&6
-cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <Carbon/Carbon.h>
-_ACEOF
-if { (eval echo "$as_me:$LINENO: \"$ac_cpp conftest.$ac_ext\"") >&5
-  (eval $ac_cpp conftest.$ac_ext) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } >/dev/null; then
-  if test -s conftest.err; then
-    ac_cpp_err=$ac_c_preproc_warn_flag
-  else
-    ac_cpp_err=
-  fi
-else
-  ac_cpp_err=yes
-fi
-if test -z "$ac_cpp_err"; then
-  ac_header_preproc=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-  ac_header_preproc=no
-fi
-rm -f conftest.err conftest.$ac_ext
-echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
-echo "${ECHO_T}$ac_header_preproc" >&6
-
-# So?  What about this header?
-case $ac_header_compiler:$ac_header_preproc in
-  yes:no )
-    { echo "$as_me:$LINENO: WARNING: Carbon/Carbon.h: accepted by the compiler, rejected by the preprocessor!" >&5
-echo "$as_me: WARNING: Carbon/Carbon.h: accepted by the compiler, rejected by the preprocessor!" >&2;}
-    { echo "$as_me:$LINENO: WARNING: Carbon/Carbon.h: proceeding with the preprocessor's result" >&5
-echo "$as_me: WARNING: Carbon/Carbon.h: proceeding with the preprocessor's result" >&2;}
-    (
-      cat <<\_ASBOX
-## ------------------------------------ ##
-## Report this to bug-autoconf@gnu.org. ##
-## ------------------------------------ ##
-_ASBOX
-    ) |
-      sed "s/^/$as_me: WARNING:     /" >&2
-    ;;
-  no:yes )
-    { echo "$as_me:$LINENO: WARNING: Carbon/Carbon.h: present but cannot be compiled" >&5
-echo "$as_me: WARNING: Carbon/Carbon.h: present but cannot be compiled" >&2;}
-    { echo "$as_me:$LINENO: WARNING: Carbon/Carbon.h: check for missing prerequisite headers?" >&5
-echo "$as_me: WARNING: Carbon/Carbon.h: check for missing prerequisite headers?" >&2;}
-    { echo "$as_me:$LINENO: WARNING: Carbon/Carbon.h: proceeding with the preprocessor's result" >&5
-echo "$as_me: WARNING: Carbon/Carbon.h: proceeding with the preprocessor's result" >&2;}
-    (
-      cat <<\_ASBOX
-## ------------------------------------ ##
-## Report this to bug-autoconf@gnu.org. ##
-## ------------------------------------ ##
-_ASBOX
-    ) |
-      sed "s/^/$as_me: WARNING:     /" >&2
-    ;;
-esac
-echo "$as_me:$LINENO: checking for Carbon/Carbon.h" >&5
-echo $ECHO_N "checking for Carbon/Carbon.h... $ECHO_C" >&6
-if test "${ac_cv_header_Carbon_Carbon_h+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_cv_header_Carbon_Carbon_h=$ac_header_preproc
-fi
-echo "$as_me:$LINENO: result: $ac_cv_header_Carbon_Carbon_h" >&5
-echo "${ECHO_T}$ac_cv_header_Carbon_Carbon_h" >&6
-
-fi
-if test $ac_cv_header_Carbon_Carbon_h = yes; then
-  cs_host_macosx=yes
-else
-  cs_host_macosx=no
-fi
-
-
-
-    if test $cs_host_macosx = yes; then
-  echo "$as_me:$LINENO: checking for --with-x" >&5
-echo $ECHO_N "checking for --with-x... $ECHO_C" >&6
-	if test "${with_x+set}" = set && test "$with_x" = "yes"; then
-  echo "$as_me:$LINENO: result: yes (assume Darwin)" >&5
-echo "${ECHO_T}yes (assume Darwin)" >&6
-	    cs_host_macosx=no
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-fi
-
-
-    if test $cs_host_macosx = yes; then
-  cs_host_target=macosx
-	cs_host_makefile=libs/cssys/macosx/macosx.mak
-	cs_host_family=unix
-	cs_host_os_normalized='MacOS/X'
-
-	cs_header_text="${cs_header_text}#define OS_MACOSX
-"
-	cs_header_text="${cs_header_text}#define CS_24BIT_PIXEL_LAYOUT CS_24BIT_PIXEL_ARGB
-"
-
-	# We assume that we always have CoreAudio available on MacOS/X.
-	cs_jamconfig_text="${cs_jamconfig_text}COREAUDIO.AVAILABLE ?= \"yes\" ;
-"
-	cs_jamconfig_text="${cs_jamconfig_text}COREAUDIO.LFLAGS ?= \"-framework CoreAudio\" ;
-"
-
-	echo "$as_me:$LINENO: checking for Objective-C compiler" >&5
-echo $ECHO_N "checking for Objective-C compiler... $ECHO_C" >&6
-if test "${cs_cv_prog_objc+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cs_cv_prog_objc="$CC"
-fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_objc" >&5
-echo "${ECHO_T}$cs_cv_prog_objc" >&6
-	cs_makefile_text="${cs_makefile_text}OBJC = $cs_cv_prog_objc -c
-"
-	cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJC ?= \"$cs_cv_prog_objc\" ;
-"
-	echo "$as_me:$LINENO: checking for Objective-C++ compiler" >&5
-echo $ECHO_N "checking for Objective-C++ compiler... $ECHO_C" >&6
-if test "${cs_cv_prog_objcxx+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cs_cv_prog_objcxx="$CXX"
-fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_objcxx" >&5
-echo "${ECHO_T}$cs_cv_prog_objcxx" >&6
-	cs_makefile_text="${cs_makefile_text}OBJCXX = $cs_cv_prog_objcxx -c
-"
-	cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJC++ ?= \"$cs_cv_prog_objcxx\" ;
-"
-else
-  cs_host_target=unix
-	cs_host_makefile=libs/cssys/unix/unix.mak
-	cs_host_family=unix
-fi
-
-	    ;;
-	*)
-	    # Everything else is assumed to be Unix or Unix-like.
-	    cs_host_target=unix
-	    cs_host_makefile=libs/cssys/unix/unix.mak
-	    cs_host_family=unix
-	    ;;
-    esac
-
-case $cs_host_family in
-    windows)
-	cs_header_text="${cs_header_text}#define OS_WIN32
-"
-	if test -z "$cs_host_os_normalized"; then
-  cs_host_os_normalized='Win32'
-fi
-
-	;;
-    unix)
-	cs_header_text="${cs_header_text}#define OS_UNIX
-"
-	if test -z "$cs_host_os_normalized"; then
-  cs_host_os_normalized='Unix'
-fi
-
-	;;
-esac
-
-cs_host_os_normalized_uc="`echo "$cs_host_os_normalized" | $as_tr_cpp`"
-cs_makefile_text="${cs_makefile_text}TARGET = $cs_host_target
-"
-cs_makefile_text="${cs_makefile_text}TARGET_MAKEFILE = $cs_host_makefile
-"
-cs_makefile_text="${cs_makefile_text}OS = $cs_host_os_normalized_uc
-"
-cs_jamconfig_text="${cs_jamconfig_text}TARGET.OS ?= \"$cs_host_os_normalized_uc\" ;
-"
-cs_jamconfig_text="${cs_jamconfig_text}TARGET.OS.NORMALIZED ?= \"$cs_host_os_normalized\" ;
-"
-cs_header_text="${cs_header_text}#define CS_PLATFORM_NAME \"$cs_host_os_normalized\"
-"
-
-
-
-#------------------------------------------------------------------------------
-# Check for X-Windows.  If the X-Windows implementation is XFree86, then also
-# enable the `VideoMode' extension.
-#------------------------------------------------------------------------------
-
-
-
-
-
-    # Explicitly disable X checking on Windows to avoid discovering XFree86 in
-    # case Cygwin is installed.  Doing so allows us to avoid Mesa's OpenGL
-    # headers during the OpenGL check, and prefer Microsoft's OpenGL headers.
-    # The Mesa OpenGL headers cause link errors because they do not employ
-    # __stdcall.
-    case $host_os in
-	mingw*|cygwin*) with_x=no ;;
-    esac
-
-    # Explicitly disable X checking on MacOS/X in case the optional XFree86 is
-    # installed since we want to avoid an undesirable dependency upon XFree86
-    # in the CS executables and plugins.  If the user is actually
-    # cross-building for Darwin on MacOS/X, then the --with-x option will
-    # override this test (by setting cs_host_macosx to "no").
-    if test x$cs_host_macosx = xyes; then
-  with_x=no
-fi
 
 echo "$as_me:$LINENO: checking for X" >&5
 echo $ECHO_N "checking for X... $ECHO_C" >&6
@@ -12633,6 +12321,244 @@ fi
 
 
 # CS_GL_INCLUDE(CPP-MACRO,FALLBACK,HEADER)
+
+
+echo "$as_me:$LINENO: checking for egrep" >&5
+echo $ECHO_N "checking for egrep... $ECHO_C" >&6
+if test "${ac_cv_prog_egrep+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if echo a | (grep -E '(a|b)') >/dev/null 2>&1
+    then ac_cv_prog_egrep='grep -E'
+    else ac_cv_prog_egrep='egrep'
+    fi
+fi
+echo "$as_me:$LINENO: result: $ac_cv_prog_egrep" >&5
+echo "${ECHO_T}$ac_cv_prog_egrep" >&6
+ EGREP=$ac_cv_prog_egrep
+
+
+echo "$as_me:$LINENO: checking for ANSI C header files" >&5
+echo $ECHO_N "checking for ANSI C header files... $ECHO_C" >&6
+if test "${ac_cv_header_stdc+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <stdlib.h>
+#include <stdarg.h>
+#include <string.h>
+#include <float.h>
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_header_stdc=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_header_stdc=no
+fi
+rm -f conftest.$ac_objext conftest.$ac_ext
+
+if test $ac_cv_header_stdc = yes; then
+  # SunOS 4.x string.h does not declare mem*, contrary to ANSI.
+  cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <string.h>
+
+_ACEOF
+if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+  $EGREP "memchr" >/dev/null 2>&1; then
+  :
+else
+  ac_cv_header_stdc=no
+fi
+rm -f conftest*
+
+fi
+
+if test $ac_cv_header_stdc = yes; then
+  # ISC 2.0.2 stdlib.h does not declare free, contrary to ANSI.
+  cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <stdlib.h>
+
+_ACEOF
+if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+  $EGREP "free" >/dev/null 2>&1; then
+  :
+else
+  ac_cv_header_stdc=no
+fi
+rm -f conftest*
+
+fi
+
+if test $ac_cv_header_stdc = yes; then
+  # /bin/cc in Irix-4.0.5 gets non-ANSI ctype macros unless using -ansi.
+  if test "$cross_compiling" = yes; then
+  :
+else
+  cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <ctype.h>
+#if ((' ' & 0x0FF) == 0x020)
+# define ISLOWER(c) ('a' <= (c) && (c) <= 'z')
+# define TOUPPER(c) (ISLOWER(c) ? 'A' + ((c) - 'a') : (c))
+#else
+# define ISLOWER(c) \
+                   (('a' <= (c) && (c) <= 'i') \
+                     || ('j' <= (c) && (c) <= 'r') \
+                     || ('s' <= (c) && (c) <= 'z'))
+# define TOUPPER(c) (ISLOWER(c) ? ((c) | 0x40) : (c))
+#endif
+
+#define XOR(e, f) (((e) && !(f)) || (!(e) && (f)))
+int
+main ()
+{
+  int i;
+  for (i = 0; i < 256; i++)
+    if (XOR (islower (i), ISLOWER (i))
+        || toupper (i) != TOUPPER (i))
+      exit(2);
+  exit (0);
+}
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  :
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+( exit $ac_status )
+ac_cv_header_stdc=no
+fi
+rm -f core core.* *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+fi
+fi
+echo "$as_me:$LINENO: result: $ac_cv_header_stdc" >&5
+echo "${ECHO_T}$ac_cv_header_stdc" >&6
+if test $ac_cv_header_stdc = yes; then
+
+cat >>confdefs.h <<\_ACEOF
+#define STDC_HEADERS 1
+_ACEOF
+
+fi
+
+# On IRIX 5.3, sys/types and inttypes.h are conflicting.
+
+
+
+
+
+
+
+
+
+for ac_header in sys/types.h sys/stat.h stdlib.h string.h memory.h strings.h \
+                  inttypes.h stdint.h unistd.h
+do
+as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $ac_header" >&5
+echo $ECHO_N "checking for $ac_header... $ECHO_C" >&6
+if eval "test \"\${$as_ac_Header+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_includes_default
+
+#include <$ac_header>
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  eval "$as_ac_Header=yes"
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+eval "$as_ac_Header=no"
+fi
+rm -f conftest.$ac_objext conftest.$ac_ext
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_Header'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_Header'}'`" >&6
+if test `eval echo '${'$as_ac_Header'}'` = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define `echo "HAVE_$ac_header" | $as_tr_cpp` 1
+_ACEOF
+
+fi
+
+done
 
 
 
@@ -20896,193 +20822,394 @@ fi
 #------------------------------------------------------------------------------
 # Check for FreeType2.
 #------------------------------------------------------------------------------
-
-# Check whether --with-ft-prefix or --without-ft-prefix was given.
-if test "${with_ft_prefix+set}" = set; then
-  withval="$with_ft_prefix"
-  ft_config_prefix="$withval"
-else
-  ft_config_prefix=""
-fi;
-
-# Check whether --with-ft-exec-prefix or --without-ft-exec-prefix was given.
-if test "${with_ft_exec_prefix+set}" = set; then
-  withval="$with_ft_exec_prefix"
-  ft_config_exec_prefix="$withval"
-else
-  ft_config_exec_prefix=""
-fi;
-# Check whether --enable-freetypetest or --disable-freetypetest was given.
-if test "${enable_freetypetest+set}" = set; then
-  enableval="$enable_freetypetest"
-
-else
-  enable_fttest=yes
-fi;
-
-if test x$ft_config_exec_prefix != x ; then
-  ft_config_args="$ft_config_args --exec-prefix=$ft_config_exec_prefix"
-  if test x${FT2_CONFIG+set} != xset ; then
-    FT2_CONFIG=$ft_config_exec_prefix/bin/freetype-config
-  fi
-fi
-if test x$ft_config_prefix != x ; then
-  ft_config_args="$ft_config_args --prefix=$ft_config_prefix"
-  if test x${FT2_CONFIG+set} != xset ; then
-    FT2_CONFIG=$ft_config_prefix/bin/freetype-config
-  fi
-fi
-# Extract the first word of "freetype-config", so it can be a program name with args.
-set dummy freetype-config; ac_word=$2
+if test -n "$ac_tool_prefix"; then
+  for ac_prog in freetype-config
+  do
+    # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
+set dummy $ac_tool_prefix$ac_prog; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_path_FT2_CONFIG+set}" = set; then
+if test "${ac_cv_prog_FT2CONFIG+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  case $FT2_CONFIG in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_FT2_CONFIG="$FT2_CONFIG" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+  if test -n "$FT2CONFIG"; then
+  ac_cv_prog_FT2CONFIG="$FT2CONFIG" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
 for as_dir in $PATH
 do
   IFS=$as_save_IFS
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_FT2_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    ac_cv_prog_FT2CONFIG="$ac_tool_prefix$ac_prog"
     echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
 done
 done
 
-  test -z "$ac_cv_path_FT2_CONFIG" && ac_cv_path_FT2_CONFIG="no"
-  ;;
-esac
 fi
-FT2_CONFIG=$ac_cv_path_FT2_CONFIG
-
-if test -n "$FT2_CONFIG"; then
-  echo "$as_me:$LINENO: result: $FT2_CONFIG" >&5
-echo "${ECHO_T}$FT2_CONFIG" >&6
+fi
+FT2CONFIG=$ac_cv_prog_FT2CONFIG
+if test -n "$FT2CONFIG"; then
+  echo "$as_me:$LINENO: result: $FT2CONFIG" >&5
+echo "${ECHO_T}$FT2CONFIG" >&6
 else
   echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
 
+    test -n "$FT2CONFIG" && break
+  done
+fi
+if test -z "$FT2CONFIG"; then
+  ac_ct_FT2CONFIG=$FT2CONFIG
+  for ac_prog in freetype-config
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_ac_ct_FT2CONFIG+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$ac_ct_FT2CONFIG"; then
+  ac_cv_prog_ac_ct_FT2CONFIG="$ac_ct_FT2CONFIG" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_ac_ct_FT2CONFIG="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
 
-min_ft_version=2.1.3
-echo "$as_me:$LINENO: checking for FreeType - version >= $min_ft_version" >&5
-echo $ECHO_N "checking for FreeType - version >= $min_ft_version... $ECHO_C" >&6
-no_ft=""
-if test "$FT2_CONFIG" = "no" ; then
-  no_ft=yes
+fi
+fi
+ac_ct_FT2CONFIG=$ac_cv_prog_ac_ct_FT2CONFIG
+if test -n "$ac_ct_FT2CONFIG"; then
+  echo "$as_me:$LINENO: result: $ac_ct_FT2CONFIG" >&5
+echo "${ECHO_T}$ac_ct_FT2CONFIG" >&6
 else
-  FT2_CFLAGS=`$FT2_CONFIG $ft_config_args --cflags`
-  FT2_LIBS=`$FT2_CONFIG $ft_config_args --libs`
-  ft_config_major_version=`$FT2_CONFIG $ft_config_args --version | \
-         sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\1/'`
-  ft_config_minor_version=`$FT2_CONFIG $ft_config_args --version | \
-         sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\2/'`
-  ft_config_micro_version=`$FT2_CONFIG $ft_config_args --version | \
-         sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\3/'`
-  ft_min_major_version=`echo $min_ft_version | \
-         sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\1/'`
-  ft_min_minor_version=`echo $min_ft_version | \
-         sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\2/'`
-  ft_min_micro_version=`echo $min_ft_version | \
-         sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\3/'`
-  if test x$enable_fttest = xyes ; then
-    ft_config_is_lt=""
-    if test $ft_config_major_version -lt $ft_min_major_version ; then
-      ft_config_is_lt=yes
-    else
-      if test $ft_config_major_version -eq $ft_min_major_version ; then
-        if test $ft_config_minor_version -lt $ft_min_minor_version ; then
-          ft_config_is_lt=yes
-        else
-          if test $ft_config_minor_version -eq $ft_min_minor_version ; then
-            if test $ft_config_micro_version -lt $ft_min_micro_version ; then
-              ft_config_is_lt=yes
-            fi
-          fi
-        fi
-      fi
-    fi
-    if test x$ft_config_is_lt = xyes ; then
-      no_ft=yes
-    else
-      ac_save_CFLAGS="$CFLAGS"
-      ac_save_LIBS="$LIBS"
-      CFLAGS="$CFLAGS $FT2_CFLAGS"
-      LIBS="$FT2_LIBS $LIBS"
-      if test "$cross_compiling" = yes; then
-  echo $ac_n "cross compiling; assumed OK... $ac_c"
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  test -n "$ac_ct_FT2CONFIG" && break
+done
+
+  FT2CONFIG=$ac_ct_FT2CONFIG
+fi
+
+if test -n "$FT2CONFIG"; then
+  cs_cv_libft2=yes
+    cs_cv_libft2_cflags=`{ (echo "$as_me:$LINENO: \$FT2CONFIG --cflags") >&5
+  ($FT2CONFIG --cflags) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }`
+    cs_cv_libft2_lflags=''
+    cs_cv_libft2_libs=`{ (echo "$as_me:$LINENO: \$FT2CONFIG --libs") >&5
+  ($FT2CONFIG --libs) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }`
+    if test "" != yes; then
+  echo "$as_me:$LINENO: checking if freetype2 is sufficiently recent" >&5
+echo $ECHO_N "checking if freetype2 is sufficiently recent... $ECHO_C" >&6
+if test "${cs_cv_ft2_recent+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  cat >conftest.$ac_ext <<_ACEOF
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test $cs_cv_libft2_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libft2_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libft2_libs $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
 _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-
 #include <ft2build.h>
-#include FT_FREETYPE_H
-#include <stdio.h>
-#include <stdlib.h>
-
+	    #include FT_INTERNAL_OBJECTS_H
+	    #include FT_FREETYPE_H
+	    #include FT_GLYPH_H
+	    #include FT_MODULE_H
 int
-main()
+main ()
 {
-  FT_Library library;
-  FT_Error error;
-
-  error = FT_Init_FreeType(&library);
-
-  if (error)
-    return 1;
-  else
-  {
-    FT_Done_FreeType(library);
-    return 0;
-  }
+return
+	    FT_LOAD_TARGET_MONO|FT_RENDER_MODE_NORMAL|FT_ENCODING_UNICODE
+  ;
+  return 0;
 }
-
 _ACEOF
-rm -f conftest$ac_exeext
+rm -f conftest.$ac_objext conftest$ac_exeext
 if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   (eval $ac_link) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  :
+  cs_build_ok=yes
+	    break
 else
-  echo "$as_me: program exited with status $ac_status" >&5
-echo "$as_me: failed program was:" >&5
+  echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-( exit $ac_status )
-no_ft=yes
 fi
-rm -f core core.* *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+    done
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libft2_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libft2_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libft2_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_ft2_recent=yes
+		cs_cv_ft2_recent_cflags=$cs_build_cflags
+		cs_cv_ft2_recent_lflags=$cs_build_lflags
+		cs_cv_ft2_recent_libs=$cs_build_libs
+else
+  cs_cv_ft2_recent=no
 fi
-      CFLAGS="$ac_save_CFLAGS"
-      LIBS="$ac_save_LIBS"
-    fi             # test $ft_config_version -lt $ft_min_version
-  fi               # test x$enable_fttest = xyes
-fi                 # test "$FT2_CONFIG" = "no"
-if test x$no_ft = x ; then
-   echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-   cs_build_prop_val=`echo xyes | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+
+fi
+echo "$as_me:$LINENO: result: $cs_cv_ft2_recent" >&5
+echo "${ECHO_T}$cs_cv_ft2_recent" >&6
+else
+  echo "$as_me:$LINENO: checking if freetype2 is sufficiently recent" >&5
+echo $ECHO_N "checking if freetype2 is sufficiently recent... $ECHO_C" >&6
+	    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test $cs_cv_libft2_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libft2_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libft2_libs $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <ft2build.h>
+	    #include FT_INTERNAL_OBJECTS_H
+	    #include FT_FREETYPE_H
+	    #include FT_GLYPH_H
+	    #include FT_MODULE_H
+int
+main ()
+{
+return
+	    FT_LOAD_TARGET_MONO|FT_RENDER_MODE_NORMAL|FT_ENCODING_UNICODE
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  cs_build_ok=yes
+	    break
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+    done
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libft2_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libft2_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libft2_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_ft2_recent=yes
+		cs_cv_ft2_recent_cflags=$cs_build_cflags
+		cs_cv_ft2_recent_lflags=$cs_build_lflags
+		cs_cv_ft2_recent_libs=$cs_build_libs
+else
+  cs_cv_ft2_recent=no
+fi
+
+	    echo "$as_me:$LINENO: result: $cs_cv_ft2_recent" >&5
+echo "${ECHO_T}$cs_cv_ft2_recent" >&6
+fi
+
+    if test $cs_cv_ft2_recent = yes; then
+  if test "$cs_cv_libft2" = yes; then
+  cs_build_prop_val=`echo xyes | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}FT2.AVAILABLE = $cs_build_prop_val
 "
@@ -21090,15 +21217,7 @@ echo "${ECHO_T}yes" >&6
 "
 fi
 
-    cs_build_prop_val=`echo x$FT2_LIBS | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}FT2.LFLAGS = $cs_build_prop_val
-"
-    cs_jamconfig_text="${cs_jamconfig_text}FT2.LFLAGS ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-    cs_build_prop_val=`echo x$FT2_CFLAGS | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_prop_val=`echo x$cs_cv_libft2_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}FT2.CFLAGS = $cs_build_prop_val
 "
@@ -21106,35 +21225,24 @@ fi
 "
 fi
 
-else
-   echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-   if test "$FT2_CONFIG" = "no" ; then
-      :
-#     echo "*** The freetype-config script installed by FreeType 2 could not be found."
-#     echo "*** If FreeType 2 was installed in PREFIX, make sure PREFIX/bin is in"
-#     echo "*** your path, or set the FT2_CONFIG environment variable to the"
-#     echo "*** full path to freetype-config."
-   else
-     if test x$ft_config_is_lt = xyes ; then
-       echo "*** Your installed version of the FreeType 2 library is too old."
-       echo "*** If you have different versions of FreeType 2, make sure that"
-       echo "*** correct values for --with-ft-prefix or --with-ft-exec-prefix"
-       echo "*** are used, or set the FT2_CONFIG environment variable to the"
-       echo "*** full path to freetype-config."
-     else
-       echo "*** The FreeType test program failed to run.  If your system uses"
-       echo "*** shared libraries and they are installed outside the normal"
-       echo "*** system library path, make sure the variable LD_LIBRARY_PATH"
-       echo "*** (or whatever is appropiate for your system) is correctly set."
-     fi
-   fi
-   FT2_CFLAGS=""
-   FT2_LIBS=""
-   :
+	cs_build_prop_val=`echo x$cs_cv_libft2_lflags $cs_cv_libft2_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_makefile_text="${cs_makefile_text}FT2.LFLAGS = $cs_build_prop_val
+"
+    cs_jamconfig_text="${cs_jamconfig_text}FT2.LFLAGS ?= \"$cs_build_prop_val\" ;
+"
 fi
 
+fi
 
+else
+  cs_cv_ft2_recent_cflags=''
+	cs_cv_ft2_recent_lflags=''
+	cs_cv_ft2_recent_libs=''
+	:
+fi
+
+fi
 
 
 
@@ -30141,14 +30249,13 @@ s,@MAKEDEP@,$MAKEDEP,;t t
 s,@PERL@,$PERL,;t t
 s,@PYTHON@,$PYTHON,;t t
 s,@CPP@,$CPP,;t t
-s,@EGREP@,$EGREP,;t t
 s,@X_CFLAGS@,$X_CFLAGS,;t t
 s,@X_PRE_LIBS@,$X_PRE_LIBS,;t t
 s,@X_LIBS@,$X_LIBS,;t t
 s,@X_EXTRA_LIBS@,$X_EXTRA_LIBS,;t t
-s,@FT2_CONFIG@,$FT2_CONFIG,;t t
-s,@FT2_CFLAGS@,$FT2_CFLAGS,;t t
-s,@FT2_LIBS@,$FT2_LIBS,;t t
+s,@EGREP@,$EGREP,;t t
+s,@FT2CONFIG@,$FT2CONFIG,;t t
+s,@ac_ct_FT2CONFIG@,$ac_ct_FT2CONFIG,;t t
 s,@SDLCONFIG@,$SDLCONFIG,;t t
 s,@ac_ct_SDLCONFIG@,$ac_ct_SDLCONFIG,;t t
 s,@CGC@,$CGC,;t t

@@ -984,14 +984,26 @@ AC_DEFUN([_CS_CHECK_HOST_DARWIN],
     [AC_REQUIRE([AC_PROG_CC])
     AC_REQUIRE([AC_PROG_CXX])
 
+    # MacOS/X Panther ranlib complains if -s option is omitted.
+    AS_IF([test -n "$RANLIB"], [CS_BUILD_PROPERTY([CMD.RANLIB], [-s], [+])])
+
     # Both MacOS/X and Darwin are identified via $host_os as "darwin".  We need
     # a way to distinguish between the two.  If Carbon.h is present, then
     # assume MacOX/S; if not, assume Darwin.  If --with-x=yes was invoked, and
     # Carbon.h is present, then assume that user wants to cross-build for
-    # Darwin even though build host is MacOS/X.
+    # Darwin even though build host is MacOS/X.  Implementation note: At least
+    # one MacOS/X user switches between gcc 2.95 and gcc 3.3 with a script
+    # which toggles the values of CC, CXX, and CPP.  Unfortunately, CPP was
+    # being set to run the preprocessor directly ("cpp", for instance) rather
+    # than running it via the compiler ("gcc -E", for instance).  The problem
+    # with running the preprocessor directly is that __APPLE__ and __GNUC__ are
+    # not defined, which causes the Carbon.h check to fail.  We avoid this
+    # problem by supplying a non-empty fourth argument to AC_CHECK_HEADER(),
+    # which causes it to test compile the header only (which is a more robust
+    # test), rather than also testing it via the preprocessor.
 
     AC_CHECK_HEADER([Carbon/Carbon.h],
-	[cs_host_macosx=yes], [cs_host_macosx=no])
+	[cs_host_macosx=yes], [cs_host_macosx=no], [/* force compile */])
 
     AS_IF([test $cs_host_macosx = yes],
 	[AC_MSG_CHECKING([for --with-x])
@@ -1514,10 +1526,22 @@ CS_CHECK_LIBOPENAL
 #------------------------------------------------------------------------------
 # Check for FreeType2.
 #------------------------------------------------------------------------------
-AC_CHECK_FT2([2.1.3],
-    [CS_BUILD_PROPERTY([FT2.AVAILABLE], [yes])
-    CS_BUILD_PROPERTY([FT2.LFLAGS], [$FT2_LIBS])
-    CS_BUILD_PROPERTY([FT2.CFLAGS], [$FT2_CFLAGS])])
+AC_CHECK_TOOLS([FT2CONFIG], [freetype-config])
+AS_IF([test -n "$FT2CONFIG"],
+    [cs_cv_libft2=yes
+    cs_cv_libft2_cflags=`AC_RUN_LOG([$FT2CONFIG --cflags])`
+    cs_cv_libft2_lflags=''
+    cs_cv_libft2_libs=`AC_RUN_LOG([$FT2CONFIG --libs])`
+    CS_CHECK_BUILD([if freetype2 is sufficiently recent], [cs_cv_ft2_recent],
+	[AC_LANG_PROGRAM(
+	    [@%:@include <ft2build.h>
+	    #include FT_INTERNAL_OBJECTS_H
+	    #include FT_FREETYPE_H
+	    #include FT_GLYPH_H
+	    @%:@include FT_MODULE_H], [return
+	    FT_LOAD_TARGET_MONO|FT_RENDER_MODE_NORMAL|FT_ENCODING_UNICODE])],
+	[], [], [CS_EMIT_BUILD_RESULT([cs_cv_libft2], [FT2])], [], [],
+	[$cs_cv_libft2_cflags], [$cs_cv_libft2_lflags], [$cs_cv_libft2_libs])])
 
 
 
