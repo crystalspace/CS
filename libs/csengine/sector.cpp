@@ -558,7 +558,7 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   csCoverageMaskTree* covtree;
   csRenderView* rview = (csRenderView*)data;
   static csPolygon2D persp;
-  csVector3 array[6];
+  csVector3 array[7];
   csWorld* w = rview->world;
 
   if (w->IsPVS ())
@@ -572,30 +572,34 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   covtree = w->GetCovtree ();
   quad3d = w->GetQuad3D ();
   int num_array;
-  otree->GetConvexOutline (onode, pos, array, num_array);
+  otree->GetConvexOutline (onode, pos, array, num_array, rview->UseFarPlane ());
 
   if (num_array)
   {
+    int nVert = MIN (6, num_array); // if we use a farplane we could have up to 7 corners, 
+                                    // but the 7th we'll need not here
+    
     if (quad3d)
     {
       csVector3 test_poly[6];
-      for (i = 0 ; i < num_array ; i++)
+      
+      for (i = 0 ; i < nVert ; i++)
         test_poly[i] = array[i]-quad3d->GetCenter ();
       csBox3 bbox;
-      int rc = quad3d->TestPolygon (test_poly, num_array, bbox);
+      int rc = quad3d->TestPolygon (test_poly, nVert, bbox);
       bool visible = (rc != CS_QUAD3D_NOCHANGE);
       if (!visible) return false;
       goto is_vis;
     }
   
-    csVector3 cam[6];
+    csVector3 cam[7];
     // If all vertices are behind z plane then the node is
     // not visible. If some vertices are behind z plane then we
     // need to clip the polygon.
     // We also test the node against the view frustum here.
     int num_z_0 = 0;
     bool left = true, right = true, top = true, bot = true;
-    for (i = 0 ; i < num_array ; i++)
+    for (i = 0 ; i < nVert; i++)
     {
       cam[i] = rview->Other2This (array[i]);
       if (cam[i].z < SMALL_EPSILON) num_z_0++;
@@ -606,7 +610,7 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
     }
     if (left || right || top || bot) return false;
 
-    if (num_z_0 == num_array)
+    if (num_z_0 == nVert)
     {
       // Node behind camera.
       count_cull_node_notvis_behind++;
@@ -615,6 +619,8 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
     
     if (rview->UseFarPlane ())
     {
+      if (num_array == 7) // we havent transformed the 7th yet
+       cam[6] = rview->Other2This (array[6]);
       for (i = 0 ; i < num_array ; i++)
         if (rview->GetFarPlane ()->Classify (cam[i]) > SMALL_EPSILON) 
 	  break;
@@ -625,15 +631,15 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
     if (num_z_0 == 0)
     {
       // No vertices are behind. Just perspective correct.
-      for (i = 0 ; i < num_array ; i++)
+      for (i = 0 ; i < nVert ; i++)
         persp.AddPerspective (cam[i]);
     }
     else
     {
       // Some vertices are behind. We need to clip.
       csVector3 isect;
-      int i1 = num_array-1;
-      for (i = 0 ; i < num_array ; i++)
+      int i1 = nVert-1;
+      for (i = 0 ; i < nVert ; i++)
       {
         if (cam[i].z < SMALL_EPSILON)
 	{
