@@ -522,6 +522,7 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csArrayElementHandler::InitRegion;
 %include "csutil/array.h"
 
+%ignore scfInitialize;
 %include "csutil/scf.h"
 
 #ifndef CS_MINI_SWIG

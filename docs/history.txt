@@ -39,6 +39,9 @@ chronological order.
 	  initialize csPixelFormat::AlphaMask.  A subsequent call to
 	  csPixelFormat::complete() then accessed the uninitialized AlphaMask
 	  field.
+	- Eric Sunshine worked around more Swig 1.2.23 instability in the new
+	  "default arguments" features where it generated ambiguous and
+	  uncompilable code (at least with gcc 3.4.x) for scfInitialize().
 24-Nov-2004
 	- res fixed light flare halos for NR.
 	- res changed csRenderLoop::Draw() to save the clipper before drawing
