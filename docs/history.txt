@@ -75,6 +75,9 @@ chronological order.
 	  already, but a bit cleaner. It is only supported by very recent 
 	  Windowses, tho, and if not present, PATH is still patched like 
 	  before.
+	- Anders Stenberg fixed pico update problem by updating all the time.
+	- Anders Stenberg fixed a graphics2D implementation that dropped 
+	  alpha when blitting.
 29-Aug-2003
 	- renej added support for using CS from Java. SWIG is needed since
 	  no generated files are in the CVS repository. Building is done
