@@ -3,6 +3,17 @@ The history order is reversed so that new features are at the top.
 12-Feb-2003
 	- Performed several optimizations on the tinyxml parser. Hopefully
 	  it is now a little faster.
+	- Added three clipping routines to csRect. All three clip a line to
+	  a box:
+	    1. ClipLineGeneral: general clipping routine. Doesn't check for
+	       any trivial cases and is not safe for large coordinates
+	       (bigger than 15 bit int).
+	    2. ClipLine: general clipping routine. Checks for trivial cases
+	       (line fully outside box, vertical line, horizontal line)
+	       but is also not safe for large coordinates.
+	    3. ClipLineSafe: Checks for trivial cases and is safe for very
+	       large coordinates. This function will automatically switch
+	       to ClipLine() if the given coordinates are small enough.
 11-Feb-2003
 	- Fixed lightning command in walktest to also work if there is no light
 	  called 'l1'.
