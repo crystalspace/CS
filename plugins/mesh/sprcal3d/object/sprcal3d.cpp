@@ -923,15 +923,8 @@ void csSpriteCal3DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
       // select mesh and submesh for further data access
       if(pCalRenderer->selectMeshSubmesh(meshId, submeshId))
       {
-        int num_lights = lights.Length ();
-  
-        // Update Lighting for all relevant lights
-        InitSubmeshLighting (meshId, submeshId, pCalRenderer, movable);
-        for (int l = 0; l < num_lights; l++)
-        {
-          UpdateLightingSubmesh (lights[l], movable, pCalRenderer,
+        UpdateLightingSubmesh (lights, movable, pCalRenderer,
             meshId, submeshId);
-        }
       }
     }
   }
@@ -940,33 +933,45 @@ void csSpriteCal3DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
 }
 
 
-void csSpriteCal3DMeshObject::UpdateLightingSubmesh (iLight* light, 
+void csSpriteCal3DMeshObject::UpdateLightingSubmesh (const csArray<iLight*>& lights, 
 						     iMovable* movable,
 						     CalRenderer *pCalRenderer,
-						     int mesh, int submesh)
+						     int mesh, int submesh,float *have_normals)
 {
   int vertCount;
   vertCount = pCalRenderer->getVertexCount();
 
   int i;
-  csColor* colors = meshes_colors[mesh][submesh];
 
   // get the transformed normals of the submesh
-  static float meshNormals[30000][3];
-  pCalRenderer->getNormals(&meshNormals[0][0]);
-
-  //  if (!do_lighting)
-  //      return;
+  static float localNormals[60000];
+  float *meshNormals;
+  if (!have_normals)
+  {
+    pCalRenderer->getNormals(localNormals);
+    meshNormals = localNormals;
+  }
+  else
+  {
+    meshNormals = have_normals;
+  }
 
   // Do the lighting.
   csReversibleTransform trans = movable->GetFullTransform ();
   // the object center in world coordinates. "0" because the object
   // center in object space is obviously at (0,0,0).
   csColor color;
-  //for (l = 0 ; l < num_lights ; l++)
-  //{
-    //iLight* li = lights[l];
-    iLight* li = light;
+
+  int num_lights = lights.Length ();
+
+  // Make sure colors array exists and set all to ambient
+  InitSubmeshLighting (mesh, submesh, pCalRenderer, movable);
+  csColor* colors = meshes_colors[mesh][submesh];
+
+  // Update Lighting for all relevant lights
+  for (int l = 0; l < num_lights; l++)
+  {
+    iLight* li = lights[l];
     // Compute light position in object coordinates
     // @@@ Can be optimized a bit. E.g. store obj_light_pos so it can be
     //  reused by submesh lighting.
@@ -979,9 +984,11 @@ void csSpriteCal3DMeshObject::UpdateLightingSubmesh (iLight* light,
     csColor light_color = li->GetColor () * (256.0f / CS_NORMAL_LIGHT_LEVEL)
       * li->GetBrightnessAtDistance (qsqrt (obj_sq_dist));
 
+    int normal_index=0;
     for (i = 0; i < vertCount; i++)
     {
-      csVector3 normal(meshNormals[i][0],meshNormals[i][1],meshNormals[i][2]);
+      csVector3 normal(meshNormals[normal_index],meshNormals[normal_index+1],meshNormals[normal_index+2]);
+      normal_index+=3;
       float cosinus;
       if (obj_sq_dist < SMALL_EPSILON) cosinus = 1;
       else cosinus = obj_light_pos * normal; 
@@ -996,7 +1003,7 @@ void csSpriteCal3DMeshObject::UpdateLightingSubmesh (iLight* light,
 	colors[i] += color;
       }
     }
-  //}
+  }
 
   // Clamp all vertex colors to 2.
   for (i = 0 ; i < vertCount; i++)
@@ -1064,13 +1071,8 @@ void csSpriteCal3DMeshObject::UpdateLighting (iMovable* movable,
         // select mesh and submesh for further data access
         if(pCalRenderer->selectMeshSubmesh(meshId, submeshId))
         {
-          // Set submesh lighting
-          InitSubmeshLighting (meshId, submeshId, pCalRenderer, movable);
-          for (int i = 0; i < num_lights; i++)
-          {
-            UpdateLightingSubmesh (relevant_lights[i],
+            UpdateLightingSubmesh (relevant_lights,
               movable, pCalRenderer, meshId, submeshId);
-          }
         }
       }
     }
@@ -1430,12 +1432,13 @@ bool csSpriteCal3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   currentMovable = movable;
 #endif
 
-  if (factory->light_mgr)
-  {
-    const csArray<iLight*>& relevant_lights = factory->light_mgr
-    	->GetRelevantLights (logparent, -1, false);
-    UpdateLighting (relevant_lights, movable);
-  }
+// This is now done at rendertime each frame.
+//  if (factory->light_mgr)
+//  {
+//    const csArray<iLight*>& relevant_lights = factory->light_mgr
+//    	->GetRelevantLights (logparent, -1, false);
+//    UpdateLighting (relevant_lights, movable);
+//  }
 
   return true;
 }
@@ -2095,15 +2098,25 @@ void csSpriteCal3DMeshObject::BaseAccessor::PreGetValue (
 
       float* normals = (float*)normal_buffer->Lock (CS_BUF_LOCK_NORMAL);
       render->getNormals (normals);
+
+      const csArray<iLight*>& relevant_lights = meshobj->factory->light_mgr
+              ->GetRelevantLights (meshobj->logparent, -1, false);
+
+      meshobj->UpdateLightingSubmesh (relevant_lights, 
+                                      meshobj->currentMovable,
+                                      render,
+                                      mesh,
+                                      submesh,
+                                      normals);
+
       normal_buffer->Release ();
 
       float* texels = (float*)texel_buffer->Lock (CS_BUF_LOCK_NORMAL);
       render->getTextureCoordinates (0, texels);
       texel_buffer->Release ();
 
-      meshobj->UpdateLighting (meshobj->currentMovable, render);
       color_buffer->CopyToBuffer (meshobj->meshes_colors[mesh][submesh],
-	sizeof (float) * vertexCount * 3);
+	                                sizeof (float) * vertexCount * 3);
 
       render->endRendering();
 

@@ -575,8 +575,8 @@ private:
 #endif
   void InitSubmeshLighting (int mesh, int submesh, CalRenderer *pCalRenderer,
     iMovable* movable);
-  void UpdateLightingSubmesh (iLight* lights, iMovable* movable, 
-    CalRenderer *pCalRenderer, int mesh, int submesh);
+  void UpdateLightingSubmesh (const csArray<iLight*>& lights, iMovable* movable, 
+    CalRenderer *pCalRenderer, int mesh, int submesh,float *have_normals=NULL);
   void UpdateLighting (iMovable* movable, CalRenderer *pCalRenderer);
   void UpdateLighting (const csArray<iLight*>& lights,
       iMovable* movable);

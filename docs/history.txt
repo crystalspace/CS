@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Mar-2004
+	- Keith Fulton committed Performance enhancements to sprcal3d
+	  giving about 3x FPS in debug mode in viewmesh for a cal3d model.
+	  Most of the enhancements are to minimize calls to 
+	  CalRenderer::getNormals due to a lot of unnecessary lighting updates.
 13-Mar-2004
 	- John Harger fixed the nVidia part of the PS1 plugin so that it will
 	  use the correct texture target on a 'tex' instruction.
