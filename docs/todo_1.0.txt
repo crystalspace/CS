@@ -1,8 +1,8 @@
 The Big 1.0 TODO List:
 
-Every bug is classified with a few modifiers to indicate
-the bad effect they have on CS. The following modifiers
-can be given:
+Every bug is classified with a few modifiers to indicate the bad effect they
+have on CS.  The following modifiers can be given:
+
 	- V: visual effect. This means that solving this bug
 	  or implementing this feature would improve how the engine looks.
 	- S: stability. This bug causes loss of stability.
@@ -14,159 +14,244 @@ can be given:
 	- **: bug or feature has been fixed or implemented.
 
 Bugs to fix:
+	[S]  Very poor OpenGL/performance on MacOS/X and possibly other
+	     platforms.  dfryer@uvic.ca reports that his OpenGL profiler says
+	     that 95% of the time is spent in DrawArrays().  He further reports
+	     that he narrowed down the problem to a particular pass in
+	     DrawPolygonSingleTexture().  Apparently the lightmap pass (do_lm)
+	     is choking up the system.  Without the lightmap pass, he says
+	     performance is excellent.  Jorrit suspects that this might be
+	     caused by texture swapping.
+	[S]  CAMERA entity bug and vis culling causes bizarre HOM effects and
+	     disappearing/reappearing stars in csdemo.  Also probably affects
+	     other programs and maps, in which sudden and drastic pops in
+	     rendering occur.
+	[S]  Using either renderer, go to the main hall in flarge and add a
+	     light with shift-L.  The framerate immediately drops to between
+	     0.5 and 1.5 fps (on my computer) when facing into the room (not at
+	     a blank wall) and stays low until the light is removed (shift-1).
+	     (optimize mode)
+FIXED?	[S]  Using software renderer, go to the room in flarge with the spinning
+	     blocks and rings.  Add a light with shift-L.  The software
+	     renderer immediately crashes while trying to dereference a null
+	     pointer.  (optimize mode)
+FIXED?	[S]  Blocks crashes at exit time dereferencing a garbage pointer
+	     (sometimes null, sometimes not).  To reproduce: 1) Launch.  2)
+	     Start new game.  3) Press ESC to get back to menu.  4) Select Quit
+	     item.  5) Crash.  Note that this crash occurs randomly.  (optimize
+	     mode)
+FIXED?	[S]  walktest crashes randomly at exit time if a static light is added
+	     using either renderer.  To reproduce: 1) Launch walktest with
+	     flarge.  2) Go to main hall.  3) Add a light (shift-L).  4) Quit
+	     (press Q).  5) Crash (7 out of 10 times).  (optimize mode)
+	[S]  About 50% of the rockets fired in walktest fail to collide with a
+	     wall; and instead pass right through the wall.  Consequently, the
+	     rocket object is never removed from the world, nor is its dynamic
+	     light removed. (optimize mode)
+FIXED?	[S]  In walktest, if you fire a rocket and manually delete its dynamic
+	     light, walktest crashes when the rocket later tries to delete the
+	     light itself.  To reproduce: a) Launch walktest.  b) Fire a
+	     rocket.  c) While the rocket is still in flight or still
+	     exploding, press shift-1.  to delete the dynamic light.  d) Wait
+	     momentarily for the rocket to delete its own light.  e) Crash.
+	     (optimize mode)
+	[S]  cswseng crashes dereferencing a null pointer.  To reproduce: 1)
+	     Launch cswseng.  2) Press "New View".  3) Press "Quit".  4) Crash.
+	     (optimize mode)
+	[S]  cswstest crashes with dereference of null pointer.  To reproduce:
+	     1) Launch cswstest.  2) Open Grid test window.  3) Close Grid test
+	     window (or quit app).  4) Crash. (optimize mode)
+	[S]  mottest crashes dereferencing a null pointer.  To reproduce: 1)
+	     Launch mottest.  2) Press ESC.  3) Crash.  (optimize mode)
+	[S]  OpenGL renderer crashes dereferencing null pointer if font manager
+	     is not present.  To reproduce: 1) Launch netmtst with OpenGL
+	     renderer: ./netmtst -video=opengl.  2) Crash.
+	[S]  perftest crashes dereferencing a null pointer when using OpenGL.
+	     To reproduce: 1) Launch perftest with OpenGL.  2) Press space-bar
+	     several times.  3) Crash.  (optimize mode)
+	[S]  perftest used to print a message at the bottom of the window
+	     briefly describing each test.  These messages are no longer
+	     present.
+	[S]  simplecloth crashes consistently at startup dereferencing address
+	     0x0884 when run with the software renderer.  The program seems to
+	     run correctly with the OpenGL renderer.  (optimize mode) Matze
+	     Braun <matze@braunis.de> further reports that the bounding box of
+	     the cloth mesh is invalid and it always crashs at exit for him.
+	     Charles James Leonardo Quarra Cappiello <charsquarra@hotmail.com>
+	     further reports that MatzeB fixed the simplecloth crash at exit,
+	     but the fix is not yet in CVS.
+	[S]  Starting walktest with infinite or null renderer leads to direct
+	     crash
+	[S]  simpvs crashes immediately at startup dereferencing a null pointer.
+	     (optimize mode)
+	[S]  tbtut crashes after moving a bit in software mode.  Also, the
+	     program seems very incomplete.  Matze Braun <matze@braunis.de>
+	     reports: "I always start the app move 2 or 3 seconds forward
+	     (already at this point I get strangely culled polygons which
+	     aren't there in opengl mode) then I turn right, work a little bit
+	     and it crashes." Jorrit reports that valgrind indicates problems
+	     with this program.
+	[S]  Some canvases still clip improperly as shown by the clipping tests
+	     in g2dtest.  The Windows OpenGL canvas is one such canvas.
+	     Possibly, the MacOS/X canvases are also flawed.
+	[S]  cs2xml crashes when trying to convert castle.zip.  (optimize mode)
+	[S] unittest crashes and/or hangs:
+		./unittest -video=software
+		...
+		plugins/culling/dynavis/tcovbuf.cpp:707:
+			failed assertion 'w_shift >= 0'
+		Trace/Breakpoint ausgelst
+	[S]  Cloth plugin has a culling problem.  If any corner of the cloth's
+	     bbox is above the top border of the screen, then the entire cloth
+	     is culled.  Charles James Leonardo Quarra Cappiello
+	     <charsquarra@hotmail.com> wonders if this problem arose when the
+	     old culler was removed.
+	[S]  NetTut doesn't parse it's commandline (one always get an error
+	     message no matter what is entered at the command line).
+		Usage:  ./nettut [server/client] [tcp/udp] [hostname*] [port]
+		 * - specify hostname only if you are using client mode.
+	[S]  NetMantest or the netmanager plugin leaks
+	[S]  There are still numerous unreleased instances of SCF classes.
+	[S]  The frame around the fancy console looks strange.
 	[S]  Line drawing in software renderer is not stable (overwriting
-	     memory). This shows with BugPlug and also with AWS in some
-	     cases.
+	     memory).  This shows with BugPlug and also with AWS in some cases.
 	[O]  Add the ability to get different kinds of polygon meshes from
 	     objects: lower-lod version for culling, version for collision
 	     detection, version for lighting (casting shadows), ...
-	[O]  Mark polygons as being visible, used for shadow casting,
-	     used for culling, used for collision detection, ... (more
-	     general system).
-	[O]  Remove old octree based culler when Dynavis is ok and levtool
-	     can convert to Dynavis levels.
+	[O]  Mark polygons as being visible, used for shadow casting, used for
+	     culling, used for collision detection, ... (more general system).
+	[O]  Remove old octree based culler when Dynavis is ok and levtool can
+	     convert to Dynavis levels.
 	[O]  Implement splatting in Dynavis.
 	[O]  Implement 3-bit outline renderer in Dynavis.
 	[O]  Implement better kd-tree balancing in Dynavis.
 	[V]  Investigate if LOD for sprites is still working.
-	[S]  Investigate if there are any more memory leaks after
-	     unloading a level and if so fix them.
-	     This can most easily be done by using the debug graph in
-	     CS. To enable this just edit include/csutil/debug.h and
-	     remove the comment ('//') right before the define of
-	     CS_USE_GRAPHDEBUG. Then recompile.
-	[V]  Investigate various visible artifacts in the mazedex
-	     level. It appears that most of these have to do with the
-	     halos and only appear with OpenGL. One artifact appears
-	     to be Z-fighting (with OpenGL alone) and this occurs
-	     if you look into the reflecting table.
-	[V]  Static lighting no longer goes through space-warping
-	     portals.
-	[V]  One of the halos in flarge seems to disappear in some cases
-	     with OpenGL.
+	[S]  Investigate if there are any more memory leaks after unloading a
+	     level and if so fix them.  This can most easily be done by using
+	     the debug graph in CS.  To enable this just edit
+	     include/csutil/debug.h and remove the comment ('//') right before
+	     the define of CS_USE_GRAPHDEBUG.  Then recompile.
+	[V]  Investigate various visible artifacts in the mazedex level.  It
+	     appears that most of these have to do with the halos and only
+	     appear with OpenGL.  One artifact appears to be Z-fighting (with
+	     OpenGL alone) and this occurs if you look into the reflecting
+	     table.
+	[V]  Static lighting no longer goes through space-warping portals.
+	[V]  One of the halos in flarge seems to disappear in some cases with
+	     OpenGL.
 	[V]  Walktest + newsky: it appears that there are some visibility
-	     culling problems in some rare cases.
-	     Solution: try to find a spot that doesn't work right and
-	     remember with 'C'. Later on you can go back to that position
-	     with 'c' (after including debug info).
+	     culling problems in some rare cases.  Solution: try to find a spot
+	     that doesn't work right and remember with 'C'.  Later on you can
+	     go back to that position with 'c' (after including debug info).
 	     Here's a cam file for it:
-	     --snip--
-419.985 37.1595 375.409
--.94714 0 -.320818
-0 1 0
-.320818 0 -.94714
-"room"
-0
-	     --snap--
-	[V]  Fix radiosity so that it works again. Radiosity is currently
+		--snip--
+		419.985 37.1595 375.409
+		-.94714 0 -.320818
+		0 1 0
+		.320818 0 -.94714
+		"room"
+		0
+		--snap--
+	[V]  Fix radiosity so that it works again.  Radiosity is currently
 	     disabled because several things had been rewritten and the
-	     radiosity code was left behind.
-	     To fix this we need to have a way to iterate over all polygons.
-	     This is not hard. Harder will be the fact that the lighting
-	     system has changed. It now works with the shadow bitmaps.
+	     radiosity code was left behind.  To fix this we need to have a way
+	     to iterate over all polygons.  This is not hard.  Harder will be
+	     the fact that the lighting system has changed.  It now works with
+	     the shadow bitmaps.
 	     [Bug 429283]
 	[F]  Gouraud shaded polygons are not supported well: you can only
 	     define triangles that are gouraud shaded and not polygons in
-	     general.
-	     After closing inspection it seems that this *almost* works
-	     perfectly now. However there are cases when texture mapping
+	     general.  After closing inspection it seems that this *almost*
+	     works perfectly now.  However there are cases when texture mapping
 	     is wrong.
 	     [Bug 202768]
-	[V]  Investigate if skeletal sprites work nicely with the
-	     visibility culling system.
-	     Major problem is that calculating a bounding box for a skeletal
-	     sprite is not easy. We have to find an efficient way to do this,
-	     especially when the transforms change.
+	[V]  Investigate if skeletal sprites work nicely with the visibility
+	     culling system.  Major problem is that calculating a bounding box
+	     for a skeletal sprite is not easy.  We have to find an efficient
+	     way to do this, especially when the transforms change.
 	     [Bug 204194]
-	[V]  Lighting for skeletal sprites is not good. The problem is that
-	     normals are precalculated for the 'base mesh'. When the mesh
-	     later animates (using the transforms) the normals will not
-	     change. A solution is perhaps to transform the normals with
-	     the hierarchical transform. But this will not work correctly
-	     for vertices that are connected to triangles that have vertices
-	     from other limbs.
+	[V]  Lighting for skeletal sprites is not good.  The problem is that
+	     normals are precalculated for the 'base mesh'.  When the mesh
+	     later animates (using the transforms) the normals will not change.
+	     A solution is perhaps to transform the normals with the
+	     hierarchical transform.  But this will not work correctly for
+	     vertices that are connected to triangles that have vertices from
+	     other limbs.
 	     [Bug 493454]
-	[V]  Mesh objects outside the global bounding box of an
-	     infinite sector will not be visible.
-	     There is a work-around for this bug which is why this bug is
-	     not that bad. You can easily add small dummy geometry very far
-	     away to make the bounding box work. Problem is that this
-	     dummy geometry has to be part of the static mesh!
+	[V]  Mesh objects outside the global bounding box of an infinite sector
+	     will not be visible.  There is a work-around for this bug which is
+	     why this bug is not that bad.  You can easily add small dummy
+	     geometry very far away to make the bounding box work.  Problem is
+	     that this dummy geometry has to be part of the static mesh!
 	     [Bug 216698]
-	[V]  Light with explosion particle system is not correctly
-	     positioned.
+	[V]  Light with explosion particle system is not correctly positioned.
 	     The question is if this light is a desired feature.
 	     [Bug 231392]
-	[V]  The software renderer implementation of DrawTriangleMesh
-	     is still missing a few clipping features. In general it would
-	     be nice to investigate the use of the OpenGL clipping routines
-	     for software too.
+	[V]  The software renderer implementation of DrawTriangleMesh is still
+	     missing a few clipping features.  In general it would be nice to
+	     investigate the use of the OpenGL clipping routines for software
+	     too.
 	     [Bug 430207]
 	[V]  Investigate clipping bug in OpenGL.
 	     [Bug 430214]
 	[V]  In OpenGL adjacent polygons do not match nicely. Especially if
-	     you clear the background every frame you can easily notice
-	     gaps between polygons.
+	     you clear the background every frame you can easily notice gaps
+	     between polygons.
 	     [Bug 430601]
-	[V]  Investigate bugs related to the walktest 'portal' command and
-	     to portals in general.
-	     (For example: [Bug 473597])
-	     There also seem to be several clipping bugs still.
+	[V] Investigate bugs related to the walktest 'portal' command and to
+	     portals in general.  (For example: [Bug 473597]) There also seem
+	     to be several clipping bugs still.
 	[F]  When mounting a real directory on a VFS path you need to do:
 	        Mount ("this/is/a/dir$/", "/lib/whatever");
-	     i.e. the last '/' has to be preceeded with '$'. This needs
-	     to be fixed.
-	[**] With OpenGL the lightmaps are not mapped correctly.
-	     This is very visible if you have two adjacent polygons which
-	     have a different size and a shadow going over those two
-	     polygons (in dmburg this situation occurs a few times).
-	     In that case the shadows on both polygons will not match
-	     exactly.
-	     Fixing this bug for real probably requires a change of the
-	     lightmap format (to make then one lumel bigger both horizontally
-	     as vertically). While this is relatively easy to do for
-	     static lightmaps the dynamic lightmaps might be more problematic.
-	     Also this may require a big change in the software renderer...
-	     Rather complicated bug. But an important one to fix.
+	     That is, the last '/' has to be preceeded with '$'.  This needs to
+	     be fixed.
+	[**] With OpenGL the lightmaps are not mapped correctly.  This is very
+	     visible if you have two adjacent polygons which have a different
+	     size and a shadow going over those two polygons (in dmburg this
+	     situation occurs a few times).  In that case the shadows on both
+	     polygons will not match exactly.  Fixing this bug for real
+	     probably requires a change of the lightmap format (to make then
+	     one lumel bigger both horizontally as vertically).  While this is
+	     relatively easy to do for static lightmaps the dynamic lightmaps
+	     might be more problematic.  Also this may require a big change in
+	     the software renderer...  Rather complicated bug.  But an
+	     important one to fix.
 	     [Bug 405964]
-	[**] Fix the problem with adding -lutil for more recent
-	     versions of python. This should be automatic and not manual.
-	[**] Shoot a missile in hole in flarge. The walls of the hole
-	     become lit ok then but revert to full bright after missile
-	     particles have disappeared. Only with OpenGL.
-	[**] Fade effect no longer works in OpenGL (visible in csdemo and
-	     F5 key in walktest). May be related to the fact that a material
+	[**] Fix the problem with adding -lutil for more recent versions of
+	     python.  This should be automatic and not manual.
+	[**] Shoot a missile in hole in flarge.  The walls of the hole become
+	     lit ok then but revert to full bright after missile particles have
+	     disappeared.  Only with OpenGL.
+	[**] Fade effect no longer works in OpenGL (visible in csdemo and F5
+	     key in walktest).  May be related to the fact that a material
 	     without texture is used and this has recently changed.
-	[**] It seems that pseudo-dynamic lighting is not working
-	     correctly. In flarge you can see that near the stairs
-	     some polygons are not updated when the dynamic light
-	     changes intensity/color.
-	[**] Investigate if PlaceMesh() works correctly. I suspect it
-	     doesn't. May be related to bug [Bug 471637].
+	[**] It seems that pseudo-dynamic lighting is not working correctly.
+	     In flarge you can see that near the stairs some polygons are not
+	     updated when the dynamic light changes intensity/color.
+	[**] Investigate if PlaceMesh() works correctly.  I suspect it doesn't.
+	     May be related to bug [Bug 471637].
 	[**] Bug with models seen through portals [Bug 471638].
-	[**] In isometric engine (isotest) + OpenGL some of the mesh
-	     objects (like the particle systems) are clipped wrong to the
-	     floor.
-	     This is a very hard bug. We have been hunting this bug for
-	     ages. Z-buffer accuracy problems have been suspected but this
-	     is probably not right because the problem arises on cards
-	     with 32-bit Z-buffer too.
+	[**] In isometric engine (isotest) + OpenGL some of the mesh objects
+	     (like the particle systems) are clipped wrong to the floor.  This
+	     is a very hard bug.  We have been hunting this bug for ages.
+	     Z-buffer accuracy problems have been suspected but this is
+	     probably not right because the problem arises on cards with 32-bit
+	     Z-buffer too.
 	[**] Lighting is not cached for gouraud shaded polygons.
 	     [Bug 202780]
 	[**] Problem with keycolor + zbuffer:
-	     When a texture with keycolor transparency is rendered the
-	     software and hardware renderers currently behave differently.
-	     With software the z-buffer is only updated at those positions
-	     where the texture is actually drawn. This is very nice of
-	     course since that means you can essentially draw the keycolor
-	     texture using Z-buffer and objects drawn behind it will be correct.
-	     However this doesn't work with hardware. With hardware the
-	     Z-buffer is updated for the entire polygon regardsless of the
-	     key-color value.
-	     I'm not sure if it is actually possible to do otherwise with
-	     hardware. If not then the engine will have to solve this by
-	     sorting such polygons from back to front in relation to other
-	     objects in the same sector.
+	     When a texture with keycolor transparency is rendered the software
+	     and hardware renderers currently behave differently.  With
+	     software the z-buffer is only updated at those positions where the
+	     texture is actually drawn.  This is very nice of course since that
+	     means you can essentially draw the keycolor texture using Z-buffer
+	     and objects drawn behind it will be correct.  However this doesn't
+	     work with hardware.  With hardware the Z-buffer is updated for the
+	     entire polygon regardsless of the key-color value.  I'm not sure
+	     if it is actually possible to do otherwise with hardware.  If not
+	     then the engine will have to solve this by sorting such polygons
+	     from back to front in relation to other objects in the same
+	     sector.
 	     [Bug 409067]
 	[F]  Support space warping portals for GetNearbyObjects(), for
 	     PlaceMesh() and for lighting.
@@ -176,54 +261,48 @@ API and Small Feature Additions:
 	[F]  Translate point on polygon to texture space/object space
 	     coordinates (for selection). This is useful for Quark++.
 	[F]  Ability to close portals in map loader.
-	[F]  Support iPolygonMesh (for collision detection) in more
-	     mesh objects (like ball, cube, ...).
-	[V]  Support lighting of a thing mesh for lights in multiple
-	     sectors (and going through portals). i.e.
-	     iSector->ShineLights (iMeshWrapper).
-	[F]  Change key code and virtual key in keyboard event to use
-	     unicode.
-	[**] Automatic generation of lightmap cache names using MD5
-	     checksum of geometry. This is important for dynamic
-	     loading/reloading of worlds.
+	[F]  Support iPolygonMesh (for collision detection) in more mesh
+	     objects (like ball, cube, ...).
+	[V]  Support lighting of a thing mesh for lights in multiple sectors
+	     (and going through portals).
+	     i.e. iSector->ShineLights(iMeshWrapper).
+	[F]  Change key code and virtual key in keyboard event to use Unicode.
+	[**]  Automatic generation of lightmap cache names using MD5 checksum
+	     of geometry.  This is important for dynamic loading/reloading of
+	     worlds.
 	[**] Add iCamera::SetFarPlane().
 
 Global Additions and Stuff:
 	[F]  Direct3D8 Renderer.
-	[O]  Split of CS module in CS and CSextra. Applications like
-	     Blocks will then move to CSextra.
-	[F]  [OPTIONAL?] Configuration setup tool so that it is
-	     possible to edit config files with a GUI?
-	[S]  There are still a few places where we need to use the
-	     reporter for reporting error conditions.
-	[**] Remove Squawk after implementing a multi-view demo
-	     in WalkTest.
+	[O]  Split of CS module in CS and CSextra.  Applications like Blocks
+	     will then move to CSextra.
+	[F]  [OPTIONAL?] Configuration setup tool so that it is possible to
+	     edit config files with a GUI?
+	[S]  There are still a few places where we need to use the reporter for
+	     reporting error conditions.
+	[**] Remove Squawk after implementing a multi-view demo in WalkTest.
 
 Documentation Updates:
 	- Update the 'Configuration Files Section'.
 	- Write docs and/or HOWTO on the Python and LUA plugins.
 	- Write doc on the heightmap texture generation utility.
 	- Write HOWTO on creation of a mesh object.
-	- Write doc on how to create your own mesh object
-	  plugins.
+	- Write doc on how to create your own mesh object plugins.
 	- Write HOWTO on plugin creation in general.
 	- Complete docs on metaballs mesh object.
 	- Complete docs on haze mesh object.
-	- Write a HOWTO or other doc that explains the best
-	  way to create a level (i.e. detail objects, occluders,
-	  ...). Also explains when to use portals/sectors and
-	  when not.
+	- Write a HOWTO or other doc that explains the best way to create a
+	  level (i.e.  detail objects, occluders, ...).  Also explains when to
+	  use portals/sectors and when not.
 	- Tutorial on isometric engine.
-	- HOWTO on how to work with regions and load/unload
-	  parts of a map (dynamic loading/unloading).
+	- HOWTO on how to work with regions and load/unload parts of a map
+	  (dynamic loading/unloading).
 	- HOWTO on sound.
 	- Complete update of map format documentation.
-	- HOWTO on KEY and NODE system for game specific
-	  purposes (i.e. triggers, scripts, and things like that).
+	- HOWTO on KEY and NODE system for game specific purposes (i.e.
+	  triggers, scripts, and things like that).
 	- HOWTO on HUD.
-	- Go over the API documentation (doxygen comments) and
-	  see if they can be improved.
+	- Go over the API documentation (doxygen comments) and see if they can
+	  be improved.
 	- Complete the features lists.
 	- See if the credits/authors list is still up-to-date.
-
-
