@@ -46,6 +46,7 @@ csView::csView (csEngine *e, iGraphics3D* ig3d)
 
   pview = new csPolygon2D ();
   camera = new csCamera ();
+  icamera = QUERY_INTERFACE (camera, iCamera);
   clipper = NULL;
 
   orig_width = orig_height = 0;
@@ -53,11 +54,20 @@ csView::csView (csEngine *e, iGraphics3D* ig3d)
 
 csView::~csView ()
 {
+  if (icamera) icamera->DecRef ();
   G3D->DecRef ();
   delete bview;
   delete camera;
   delete pview;
   delete clipper;
+}
+
+void csView::SetCamera (csCamera* c)
+{
+  iCamera* icam = QUERY_INTERFACE (c, iCamera);
+  if (icamera) icamera->DecRef ();
+  icamera = icam;
+  camera = c;
 }
 
 void csView::ClearView ()
@@ -194,11 +204,6 @@ void csView::SetPerspectiveCenter (float x, float y)
 void csView::View::SetSector (iSector* sector)
 {
   scfParent->SetSector (sector->GetPrivateObject ());
-}
-
-iCamera* csView::View::GetCamera ()
-{
-  return QUERY_INTERFACE (scfParent->GetCamera (), iCamera);
 }
 
 void csView::View::SetCamera (iCamera* camera)

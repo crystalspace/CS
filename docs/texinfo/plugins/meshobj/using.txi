@@ -172,7 +172,7 @@ void SetupWorld ()
   ball = new csMeshWrapper (engine, ballMesh);
   ballMesh->DecRef ();
   ball->SetName ("MyBall");
-  engine->sprites.Push (ball);
+  engine->meshes.Push (ball);
   ball->GetMovable ().SetSector (room);
   m.Identity ();
   ball->GetMovable ().SetTransform (m);

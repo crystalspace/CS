@@ -34,7 +34,7 @@
 class csRegion;
 class csRadiosity;
 class csSector;
-class csSprite;
+class csMeshWrapper;
 class csTextureWrapper;
 class csMaterialWrapper;
 class csTextureList;
@@ -63,7 +63,6 @@ struct iSystem;
 struct iVFS;
 struct iMaterialWrapper;
 struct iRegion;
-struct iSprite;
 
 
 /**
@@ -332,7 +331,7 @@ private:
   // Start looking for stuff.
   void StartThings ();
   void StartStatLights ();
-  void StartSprites ();
+  void StartMeshes ();
   void EndSearch ();
 
   /// Construct an iterator and initialize to start.
@@ -372,7 +371,7 @@ struct csEngineConfig : public iConfig
 /**
  * The 3D engine.
  * This class manages all components which comprise a 3D world including
- * sectors, polygons, curves, sprites, etc.
+ * sectors, polygons, curves, mesh objects, etc.
  */
 class csEngine : public iEngine, public csObject
 {
@@ -446,14 +445,14 @@ public:
   csNamedObjVector curve_templates;
 
   /**
-   * List of all sprites in the engine. This vector contains objects
-   * of type csSprite*. Use UnlinkSprite() and RemoveSprite()
-   * to unlink and/or remove sprites from this list. These functions
-   * take care of correctly removing the sprites from all sectors
-   * as well. Note that after you add a sprite to the list you still
+   * List of all meshes in the engine. This vector contains objects
+   * of type csMeshWrapper*. Use UnlinkMesh() and RemoveMesh()
+   * to unlink and/or remove meshes from this list. These functions
+   * take care of correctly removing the meshes from all sectors
+   * as well. Note that after you add a mesh to the list you still
    * need to add it to all sectors that you want it to be visible in.
    */
-  csNamedObjVector sprites;
+  csNamedObjVector meshes;
 
   /**
    * List of all things in the engine. This vector contains objects
@@ -656,11 +655,11 @@ public:
   void PrepareSectors();
 
   /**
-   * Calls UpdateMove for all sprites to initialise bsp bounding boxes.
+   * Calls UpdateMove for all meshes to initialise bsp bounding boxes.
    * Call this after creating a BSP tree. csEngine::Prepare() will call
    * this function automatically so you normally don't have to call it.
    */
-  void PrepareSprites ();
+  void PrepareMeshes ();
 
   /**
    * Calculate all lighting information. Normally you shouldn't call
@@ -1010,16 +1009,16 @@ public:
   void NextFrame (cs_time current_time);
 
   /**
-   * Unlink a sprite from the engine (but do not delete it).
+   * Unlink a mesh from the engine (but do not delete it).
    * It is also removed from all sectors.
    */
-  void UnlinkSprite (csSprite* sprite);
+  void UnlinkMesh (csMeshWrapper* mesh);
 
   /**
-   * Unlink and delete a sprite from the engine.
+   * Unlink and delete a mesh from the engine.
    * It is also removed from all sectors.
    */
-  void RemoveSprite (csSprite* sprite);
+  void RemoveMesh (csMeshWrapper* mesh);
 
   /**
    * Unlink a thing from the engine (but do not delete it).
@@ -1175,7 +1174,7 @@ public:
   virtual iThing *FindSky (const char *iName, bool regionOnly = false);
   /// Find a thing template by name
   virtual iThing *FindThingTemplate (const char *iName, bool regionOnly = false);
-  /// Find a sprite by name
+  /// Find a mesh by name
   virtual iMeshWrapper *FindMeshObject (const char *iName, bool regionOnly = false);
   /// Find a mesh factory by name
   virtual iMeshFactoryWrapper *FindMeshFactory (const char *iName, bool regionOnly = false);

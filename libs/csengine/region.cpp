@@ -19,7 +19,6 @@
 #include "cssysdef.h"
 #include "qint.h"
 #include "csengine/region.h"
-#include "csengine/cssprite.h"
 #include "csengine/meshobj.h"
 #include "csengine/cscoll.h"
 #include "csengine/thing.h"
@@ -85,7 +84,7 @@ void csRegion::Region::DeleteAll ()
   // from this region parent.
   // Note that we traverse the list again and again for every
   // object type since the order in which objects types are deleted
-  // is important. i.e. we should first delete all sprites and things
+  // is important. i.e. we should first delete all meshes and things
   // and only then delete the sectors.
   int i;
   for (i = 0 ; i < copy.Length () ; i++)
@@ -97,10 +96,10 @@ void csRegion::Region::DeleteAll ()
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
-    if (copy[i] && ((csObject*)copy[i])->GetType () >= csSprite::Type)
+    if (copy[i] && ((csObject*)copy[i])->GetType () >= csMeshWrapper::Type)
     {
-      csSprite* o = (csSprite*)copy[i];
-      scfParent->engine->RemoveSprite (o);
+      csMeshWrapper* o = (csMeshWrapper*)copy[i];
+      scfParent->engine->RemoveMesh (o);
       copy[i] = NULL;
     }
 

@@ -1,5 +1,100 @@
 The history order has been reversed so that new features are at the top.
 
+13-Feb-2001
+	- Philip Wyett did some proof reading of the docs:
+	    - Added two missing web links for required mingw
+	      external dll's jpeg and png.
+	    - Grammar changes and added links.
+	    - Expanded MSVC version requirements for CS compilation (i.e.
+	      service pack 4, MS processor pack, ...).
+	    - Many typo's and cosmetic changes.
+	    - Update to Map2CS tutorial. Brings into line with use of
+	      WorldCraft 3.3 and simplified setup and usage instructions.
+	- Wouter Wijngaards did an update to the procedural sky so that
+	  it looks good in software too (disabled CS_PROC_TEXTURE_ALONE_HINT
+	  for the texture, so that the colormap is (re)computed in 8bit
+	  mode).
+	- Martin Geisse updated the apimod18.txi documentation on how
+	  to go from version 0.17 to 0.18 with regards to the config
+	  changes.
+	- Made all the members of csRenderView private and provided
+	  proper accessor functions. In particular added:
+	  	- SetEngine(), GetEngine()
+		- GetClipPlane()
+		- SetCallback(), GetCallback(), CallCallback(),
+		  GetCallbackData()
+		- GetFrustum()
+		- SetThisSector(), GetThisSector()
+		- SetPreviousSector(), GetPreviousSector()
+		- SetFogInfo(), GetFogInfo(), AddedFogInfo(), ResetFogInfo()
+		- GetG3D(), GetG2D()
+		- SetPortalPolygon(), GetPortalPolygon()
+		- GetView()
+		- HasClipPlane(), UseClipPlane()
+		- HasClipFrustum(), UseClipFrustum()
+	- Also added a copy constructor to csRenderView to correctly
+	  fix the ref counts.
+	- Since QUERY_INTERFACE does an implied IncRef() a lot of current
+	  code is not correctly handling this (i.e. does not call DecRef()).
+	  In addition QUERY_INTERFACE is not very efficient. So I rewrote
+	  a lot of the QUERY_INTERFACE calls so that the QUERY_INTERFACE
+	  result is remembered. The class remembering this result is
+	  now responsible for doing DecRef() when appropriate. This should
+	  make things slightly more efficient and certainly more correct:
+	  Here are the places where this is done:
+	  	- csView::SetCamera()
+		- csRenderView::SetView()
+		- csRenderView::SetEngine()
+		- csRenderView::camera
+	- Also fixed all of the apps where this DecRef() was missing.
+	- Fixed csEngine where this DecRef() was missing.
+	- Fixed csEngine::FindMeshObject() so that it will no longer crash
+	  when it cannot find the mesh.
+	- Fixed csEngine::FindTexture() so that it will no longer crash
+	  when it cannot find the texture.
+	- Fixed csEngine::FindCameraPosition() so that it will no longer
+	  crash when it cannot find the texture.
+	- Since csMeshWrapper is now the only class subclassing from
+	  csSprite it makes better sense to merge both classes into
+	  csMeshWrapper. So csSprite is now removed and the engine only
+	  talks about csMeshWrapper objects. This has the following
+	  additional consequences:
+	  	- csEngine::sprites is renamed to csEngine::meshes
+		- csEngine::UnlinkSprite/RemoveSprite renamed to <Xxx>Mesh.
+		- csEngine::PrepareSprites renamed to PrepareMeshes.
+		- csSector::sprites renamed to csSector::meshes
+	- Updated apimod18.txi with the full info on how to port csSprite3D
+	  to mesh object system.
+	- Fixed MazeD so that it correctly saves the new spr3d format
+	  instead of the old csSprite3D format.
+	- Extended iMeshObject with HitBeamObject() function. Only
+	  the spr3d plugin supports this at the moment. This is a todo
+	  for the other plugin types. csMeshWrapper will call this function
+	  now.
+12-Feb-2001
+	- Wouter Wijngaards fixed the loading crash for csfedit. Now
+	  csfedit will create a new font called 'LoadingError' when
+	  loading fails.
+	- Wouter also made a big quality improvement on the procedural
+	  sky. Adjusted several parameters. The result is that clouds
+	  look much wispier then before. This also makes the texture
+	  look smoother.
+	- Martin Geisse fixed a bug that crashed levtool when loading
+	  a non-3d-sprite mesh object.
+11-Feb-2001
+	- Martin Geisse fixed a bug that crashed cctest when map file
+	  was not found.
+	- Martin also fixed a very old msvc compiler warning (msvc doesn't
+	  like usage of 'this' pointer in member/base class initialization
+	  list in constructors).
+10-Feb-2001
+	- Martin Geisse did the following changes to the config system:
+	    - Added the config manager object. This object takes several
+	      config files and makes them look like a single config object
+	      to the outside.
+	    - Removed Prev() method from iterators because they caused
+	      problems with the config manager.
+	    - Fixed a case where the dirty flag was not set.
 9-Feb-2001
 	- Wouter Wijngaards added default =0 to csPixmap function.
 	- Philip Wyett fixed memory reference errors on app exit under

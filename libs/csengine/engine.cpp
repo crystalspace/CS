@@ -33,7 +33,6 @@
 #include "csengine/polytext.h"
 #include "csengine/thing.h"
 #include "csengine/csview.h"
-#include "csengine/cssprite.h"
 #include "csengine/meshobj.h"
 #include "csengine/cscoll.h"
 #include "csengine/sector.h"
@@ -439,9 +438,9 @@ void csObjectIt::StartStatLights ()
   cur_idx = 0;
 }
 
-void csObjectIt::StartSprites ()
+void csObjectIt::StartMeshes ()
 {
-  cur_type = &csSprite::Type;
+  cur_type = &csMeshWrapper::Type;
   cur_idx = 0;
 }
 
@@ -522,7 +521,7 @@ csObject* csObjectIt::Fetch ()
     if (CheckType (cur_type))
     {
       if (cur_idx >= cur_sector->lights.Length ())
-        StartSprites ();
+        StartMeshes ();
       else
       {
         do
@@ -536,22 +535,22 @@ csObject* csObjectIt::Fetch ()
 	}
 	while (cur_idx < cur_sector->lights.Length ());
         if (cur_idx >= cur_sector->lights.Length ())
-          StartSprites ();
+          StartMeshes ();
       }
     }
     else
-      StartSprites ();
+      StartMeshes ();
   }
-  // Handle csSprite.
-  if (cur_type == &csSprite::Type)
+  // Handle csMeshWrapper.
+  if (cur_type == &csMeshWrapper::Type)
   {
     if (CheckType (cur_type))
     {
-      if (cur_idx >= cur_sector->sprites.Length ())
+      if (cur_idx >= cur_sector->meshes.Length ())
         cur_type = &csSector::Type;
       else
       {
-        csObject* rc = (csObject*)cur_sector->sprites[cur_idx];
+        csObject* rc = (csObject*)cur_sector->meshes[cur_idx];
 	cur_idx++;
         return rc;
       }
@@ -770,7 +769,7 @@ void csEngine::Clear ()
   if (G3D) G3D->ClearCache ();
   halos.DeleteAll ();
   collections.DeleteAll ();
-  sprites.DeleteAll ();
+  meshes.DeleteAll ();
   things.DeleteAll ();
   skies.DeleteAll ();
   meshobj_factories.DeleteAll ();
@@ -949,12 +948,12 @@ void csEngine::PrepareSectors()
 
 // If a STAT_BSP level the loader call to UpdateMove is redundant when called
 // before csEngine::Prepare().
-void csEngine::PrepareSprites ()
+void csEngine::PrepareMeshes ()
 {
   int i;
-  for (i = 0 ; i < sprites.Length () ; i++)
+  for (i = 0 ; i < meshes.Length () ; i++)
   {
-    csSprite* sp = (csSprite*)sprites[i];
+    csMeshWrapper* sp = (csMeshWrapper*)meshes[i];
     sp->GetMovable ().UpdateMove ();
   }
 }
@@ -963,7 +962,7 @@ bool csEngine::Prepare ()
 {
   PrepareTextures ();
   PrepareSectors ();
-  PrepareSprites ();
+  PrepareMeshes ();
   // The images are no longer needed by the 3D engine.
   iTextureManager *txtmgr = G3D->GetTextureManager ();
   txtmgr->FreeImages ();
@@ -1285,7 +1284,7 @@ void csEngine::StartDraw (csCamera* c, csClipper* view, csRenderView& rview)
   ResolveEngineMode ();
 
   current_camera = c;
-  rview.engine = this;
+  rview.SetEngine (this);
 
   // This flag is set in HandleEvent on a cscmdContextResize event
   if (resize)
@@ -1296,7 +1295,7 @@ void csEngine::StartDraw (csCamera* c, csClipper* view, csRenderView& rview)
 
   top_clipper = view;
 
-  rview.clip_plane.Set (0, 0, 1, -1);   //@@@CHECK!!!
+  rview.GetClipPlane ().Set (0, 0, 1, -1);   //@@@CHECK!!!
 
   // Calculate frustum for screen dimensions (at z=1).
   float leftx = - c->GetShiftX () * c->GetInvFOV ();
@@ -1345,7 +1344,7 @@ void csEngine::Draw (csCamera* c, csClipper* view)
 {
   csRenderView rview (*c, view, G3D, G2D);
   StartDraw (c, view, rview);
-  rview.callback = NULL;
+  rview.SetCallback (NULL, NULL);
 
   csSector* s = c->GetSector ();
   s->Draw (rview);
@@ -1364,8 +1363,7 @@ void csEngine::DrawFunc (csCamera* c, csClipper* view,
   csRenderView rview (*c, view, G3D, G2D);
   StartDraw (c, view, rview);
 
-  rview.callback = callback;
-  rview.callback_data = callback_data;
+  rview.SetCallback (callback, callback_data);
 
   csSector* s = c->GetSector ();
   s->Draw (rview);
@@ -1485,17 +1483,17 @@ void csEngine::RemoveDynLight (csDynLight* dyn)
 void csEngine::NextFrame (cs_time current_time)
 {
   int i;
-  for (i = 0 ; i < sprites.Length () ; i++)
+  for (i = 0 ; i < meshes.Length () ; i++)
   {
-    csSprite* sp = (csSprite*)sprites[i];
+    csMeshWrapper* sp = (csMeshWrapper*)meshes[i];
     sp->NextFrame (current_time);
   }
 
   // Delete particle systems that self-destructed now.
-  i = sprites.Length ()-1;
+  i = meshes.Length ()-1;
   while (i >= 0)
   {
-    csSprite* sp = (csSprite*)sprites[i];
+    csMeshWrapper* sp = (csMeshWrapper*)meshes[i];
     if (sp->WantToDie ())
       delete sp;
     i--;
@@ -1546,23 +1544,23 @@ void csEngine::ReadConfig ()
         ("Engine.Lighting.Radiosity.SourcePatchSize", csRadiosity::source_patch_size);
 }
 
-void csEngine::UnlinkSprite (csSprite* sprite)
+void csEngine::UnlinkMesh (csMeshWrapper* mesh)
 {
-  sprite->GetMovable ().ClearSectors ();
-  int idx = sprites.Find (sprite);
+  mesh->GetMovable ().ClearSectors ();
+  int idx = meshes.Find (mesh);
   if (idx == -1) return;
-  sprites[idx] = NULL;
-  sprites.Delete (idx);
+  meshes[idx] = NULL;
+  meshes.Delete (idx);
 }
 
-void csEngine::RemoveSprite (csSprite* sprite)
+void csEngine::RemoveMesh (csMeshWrapper* mesh)
 {
-  sprite->GetMovable ().ClearSectors ();
-  int idx = sprites.Find (sprite);
+  mesh->GetMovable ().ClearSectors ();
+  int idx = meshes.Find (mesh);
   if (idx == -1) return;
-  sprites[idx] = NULL;
-  sprites.Delete (idx);
-  delete sprite;
+  meshes[idx] = NULL;
+  meshes.Delete (idx);
+  delete mesh;
 }
 
 void csEngine::UnlinkThing (csThing* thing)
@@ -1816,7 +1814,7 @@ bool csEngine::DeleteLibrary (const char *iName)
   } }
 
   DELETE_ALL_OBJECTS (collections, csCollection)
-  DELETE_ALL_OBJECTS (sprites, csSprite)
+  DELETE_ALL_OBJECTS (meshes, csMeshWrapper)
   DELETE_ALL_OBJECTS (meshobj_factories, csMeshFactoryWrapper)
   DELETE_ALL_OBJECTS (curve_templates, csCurveTemplate)
   DELETE_ALL_OBJECTS (thing_templates, csThing)
@@ -2029,12 +2027,15 @@ iThing *csEngine::FindThingTemplate (const char *iName, bool regionOnly)
 
 iMeshWrapper *csEngine::FindMeshObject (const char *iName, bool regionOnly)
 {
-  csMeshWrapper* sprite;
+  csMeshWrapper* mesh;
   if (regionOnly && region)
-    sprite = (csMeshWrapper*)FindObjectInRegion (region, sprites, iName);
+    mesh = (csMeshWrapper*)FindObjectInRegion (region, meshes, iName);
   else
-    sprite = (csMeshWrapper*)sprites.FindByName (iName);
-  return QUERY_INTERFACE (sprite, iMeshWrapper);
+    mesh = (csMeshWrapper*)meshes.FindByName (iName);
+  if (!mesh) return NULL;
+  iMeshWrapper* imesh = QUERY_INTERFACE (mesh, iMeshWrapper);
+  imesh->DecRef ();
+  return imesh;
 }
 
 iMeshFactoryWrapper *csEngine::FindMeshFactory (const char *iName, bool regionOnly)
@@ -2044,7 +2045,9 @@ iMeshFactoryWrapper *csEngine::FindMeshFactory (const char *iName, bool regionOn
     fact = (csMeshFactoryWrapper*)FindObjectInRegion (region, meshobj_factories, iName);
   else
     fact = (csMeshFactoryWrapper*)meshobj_factories.FindByName (iName);
-  return fact ? &fact->scfiMeshFactoryWrapper : NULL;
+  if (!fact) return NULL;
+  iMeshFactoryWrapper* ifact = &fact->scfiMeshFactoryWrapper;
+  return ifact;
 }
 
 iMaterialWrapper* csEngine::FindMaterial (const char* iName, bool regionOnly)
@@ -2054,7 +2057,9 @@ iMaterialWrapper* csEngine::FindMaterial (const char* iName, bool regionOnly)
     wr = (csMaterialWrapper*)FindObjectInRegion (region, *materials, iName);
   else
     wr = materials->FindByName (iName);
-  return wr ? &wr->scfiMaterialWrapper : NULL;
+  if (!wr) return NULL;
+  iMaterialWrapper* iwr = &wr->scfiMaterialWrapper;
+  return iwr;
 }
 
 csMaterialWrapper* csEngine::FindCsMaterial (const char* iName, bool regionOnly)
@@ -2074,6 +2079,7 @@ iTextureWrapper* csEngine::FindTexture (const char* iName, bool regionOnly)
     wr = (csTextureWrapper*)FindObjectInRegion (region, *textures, iName);
   else
     wr = textures->FindByName (iName);
+  if (!wr) return NULL;
   return &wr->scfiTextureWrapper;
 }
 
@@ -2094,6 +2100,7 @@ iCameraPosition* csEngine::FindCameraPosition (const char* iName, bool regionOnl
     wr = (csCameraPosition*)FindObjectInRegion (region, camera_positions, iName);
   else
     wr = (csCameraPosition*)camera_positions.FindByName (iName);
+  if (!wr) return NULL;
   return &wr->scfiCameraPosition;
 }
 
@@ -2101,6 +2108,7 @@ iView* csEngine::CreateView (iGraphics3D* g3d)
 {
   csView* view = new csView (this, g3d);
   iView* iview = QUERY_INTERFACE (view, iView);
+  iview->DecRef ();
   return iview;
 }
 
@@ -2109,7 +2117,9 @@ iStatLight* csEngine::CreateLight (const csVector3& pos, float radius,
 {
   csStatLight* light = new csStatLight (pos.x, pos.y, pos.z, radius,
   	color.red, color.green, color.blue, pseudoDyn);
-  return QUERY_INTERFACE (light, iStatLight);
+  iStatLight* il = QUERY_INTERFACE (light, iStatLight);
+  il->DecRef ();
+  return il;
 }
 
 iDynLight* csEngine::CreateDynLight (const csVector3& pos, float radius,
@@ -2118,7 +2128,9 @@ iDynLight* csEngine::CreateDynLight (const csVector3& pos, float radius,
   csDynLight* light = new csDynLight (pos.x, pos.y, pos.z, radius,
   	color.red, color.green, color.blue);
   AddDynLight (light);
-  return QUERY_INTERFACE (light, iDynLight);
+  iDynLight* il = QUERY_INTERFACE (light, iDynLight);
+  il->DecRef ();
+  return il;
 }
 
 void csEngine::RemoveDynLight (iDynLight* light)
@@ -2128,7 +2140,9 @@ void csEngine::RemoveDynLight (iDynLight* light)
 
 iTransformationManager* csEngine::GetTransformationManager ()
 {
-  return QUERY_INTERFACE (&tr_manager, iTransformationManager);
+  iTransformationManager* itr = QUERY_INTERFACE (&tr_manager, iTransformationManager);
+  itr->DecRef ();
+  return itr;
 }
 
 iMeshFactoryWrapper* csEngine::CreateMeshFactory (const char* classId,
@@ -2147,7 +2161,9 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (const char* classId,
   csMeshFactoryWrapper* mfactwrap = new csMeshFactoryWrapper (fact);
   if (name) mfactwrap->SetName (name);
   meshobj_factories.Push (mfactwrap);
-  return QUERY_INTERFACE (mfactwrap, iMeshFactoryWrapper);
+  iMeshFactoryWrapper* imfw = QUERY_INTERFACE (mfactwrap, iMeshFactoryWrapper);
+  imfw->DecRef ();
+  return imfw;
 }
 
 iMeshWrapper* csEngine::CreateMeshObject (iMeshFactoryWrapper* factory,
@@ -2158,14 +2174,16 @@ iMeshWrapper* csEngine::CreateMeshObject (iMeshFactoryWrapper* factory,
   csMeshWrapper* meshwrap = new csMeshWrapper (this, mesh);
   mesh->DecRef ();
   if (name) meshwrap->SetName (name);
-  sprites.Push (meshwrap);
+  meshes.Push (meshwrap);
   if (sector)
   {
     meshwrap->GetMovable ().SetSector (sector->GetPrivateObject ());
     meshwrap->GetMovable ().SetPosition (pos);
     meshwrap->GetMovable ().UpdateMove ();
   }
-  return QUERY_INTERFACE (meshwrap, iMeshWrapper);
+  iMeshWrapper* imw = QUERY_INTERFACE (meshwrap, iMeshWrapper);
+  imw->DecRef ();
+  return imw;
 }
 
 

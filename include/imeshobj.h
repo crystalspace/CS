@@ -38,7 +38,7 @@ typedef void (csMeshCallback) (iMeshObject* spr, iRenderView* rview,
 typedef void (csDrawCallback) (iMeshWrapper* spr, iRenderView* rview,
 	void* callbackData);
 
-SCF_VERSION (iMeshObject, 0, 0, 10);
+SCF_VERSION (iMeshObject, 0, 0, 11);
 
 /**
  * This is a general mesh object that the engine can interact with.
@@ -129,6 +129,13 @@ struct iMeshObject : public iBase
    * Return true if HardTransform is supported for this mesh object type.
    */
   virtual bool SupportsHardTransform () = 0;
+
+  /**
+   * Check if this mesh is hit by this object space vector.
+   * Return the collision point in object space coordinates.
+   */
+  virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
+  	csVector3& isect, float* pr) = 0;
 };
 
 SCF_VERSION (iMeshObjectFactory, 0, 0, 4);

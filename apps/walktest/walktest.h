@@ -460,7 +460,7 @@ extern void free_keymap ();
 extern void SaveCamera (iVFS*, const char *fName);
 extern bool LoadCamera (iVFS*, const char *fName);
 
-/// Apply lights to all static objects (currently only sprites)
+/// Apply lights to all static objects (currently only meshes)
 void light_statics ();
 
 #endif // __WALKTEST_H

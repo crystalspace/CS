@@ -374,7 +374,7 @@ void draw_edges (csRenderView* rview, int type, void* entity)
   int blue = txtmgr->FindRGB (0, 0, 255);
   int yellow = txtmgr->FindRGB (255, 255, 0);
 
-  bool hilighted_only = !!rview->callback_data;
+  bool hilighted_only = !!rview->GetCallbackData ();
   if (hilighted_only) selcol = yellow;
   else selcol = white;
   static csPolygon3D* last_poly = NULL;
@@ -389,7 +389,7 @@ void draw_edges (csRenderView* rview, int type, void* entity)
   {
     csPolygon2D* polygon = (csPolygon2D*)entity;
     if (!hilighted_only || Sys->selected_polygon == last_poly)
-      polygon->Draw (rview->g2d, selcol);
+      polygon->Draw (rview->GetG2D (), selcol);
   }
   else if (type == CALLBACK_POLYGONQ)
   {
@@ -400,7 +400,7 @@ void draw_edges (csRenderView* rview, int type, void* entity)
       int i;
       for (i = 0 ; i < dpfx->num ; i++)
       {
-        rview->g2d->DrawLine (dpfx->vertices[i].sx,
+        rview->GetG2D ()->DrawLine (dpfx->vertices[i].sx,
 	  csEngine::frame_height - 1 - dpfx->vertices[i].sy,
       	  dpfx->vertices[i1].sx,
 	  csEngine::frame_height - 1 - dpfx->vertices[i1].sy, blue);
@@ -413,7 +413,7 @@ void draw_edges (csRenderView* rview, int type, void* entity)
     if (!hilighted_only)
     {
       G3DTriangleMesh* mesh = (G3DTriangleMesh*)entity;
-      WalkDbgDrawMesh (*mesh, rview->g3d, rview->g2d);
+      WalkDbgDrawMesh (*mesh, rview->GetG3D (), rview->GetG2D ());
     }
   }
   else if (type == CALLBACK_SECTOR)
@@ -435,10 +435,10 @@ void draw_edges (csRenderView* rview, int type, void* entity)
           px = QInt (v.x * iz + rview->GetShiftX ());
           py = csEngine::frame_height - 1 - QInt (v.y * iz + rview->GetShiftY ());
           r = QInt (.3 * iz);
-          rview->g2d->DrawLine (px-r, py-r, px+r, py+r, selcol);
-          rview->g2d->DrawLine (px+r, py-r, px-r, py+r, selcol);
-          rview->g2d->DrawLine (px, py-2, px, py+2, red);
-          rview->g2d->DrawLine (px+2, py, px-2, py, red);
+          rview->GetG2D ()->DrawLine (px-r, py-r, px+r, py+r, selcol);
+          rview->GetG2D ()->DrawLine (px+r, py-r, px-r, py+r, selcol);
+          rview->GetG2D ()->DrawLine (px, py-2, px, py+2, red);
+          rview->GetG2D ()->DrawLine (px+2, py, px-2, py, red);
         }
       }
     }
@@ -958,7 +958,7 @@ void draw_frust_edges (csRenderView* rview, int type, void* entity)
     csPolygon2D* polygon = (csPolygon2D*)entity;
     int idx = dbf.queue.Find (last_poly);
     if (idx != -1)
-      polygon->Draw (rview->g2d, col);
+      polygon->Draw (rview->GetG2D (), col);
   }
 }
 

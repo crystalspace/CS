@@ -99,7 +99,7 @@ csMeshWrapper *add_test_mesh( csMeshFactoryWrapper *tmpl, csSector *aroom, csVie
   csMeshWrapper *tsprt;
   
   tsprt = tmpl->NewMeshObject (view->GetEngine ());
-  view->GetEngine ()->sprites.Push (tsprt);
+  view->GetEngine ()->meshes.Push (tsprt);
   tsprt->GetMovable ().SetSector (aroom);
   csXScaleMatrix3 m (2);
   tsprt->GetMovable ().SetTransform (m);
@@ -108,6 +108,7 @@ csMeshWrapper *add_test_mesh( csMeshFactoryWrapper *tmpl, csSector *aroom, csVie
 
   iSprite3DState* state = QUERY_INTERFACE (tsprt->GetMeshObject (), iSprite3DState);
   state->SetAction ("default");
+  state->DecRef ();
 
   return tsprt;
 }
@@ -250,6 +251,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
 
   iPolygonMesh* mesh = QUERY_INTERFACE (room, iPolygonMesh);
   (void)new csCollider(*room, cdsys, mesh);
+  mesh->DecRef ();
 
   engine->Prepare ();
 
@@ -376,10 +378,11 @@ void Phyztest::NextFrame ()
       }
 
       bot = tmpl->NewMeshObject (view->GetEngine ());
-      view->GetEngine ()->sprites.Push (bot);
+      view->GetEngine ()->meshes.Push (bot);
       bot->GetMovable ().SetSector (room);
       iSprite3DState* state = QUERY_INTERFACE (bot->GetMeshObject (), iSprite3DState);
       state->SetAction ("default");
+      state->DecRef ();
 
 
       // add the rigidbody physics object

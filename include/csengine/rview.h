@@ -24,6 +24,7 @@
 #include "csengine/camera.h"
 #include "irview.h"
 
+class csSector;
 class csClipper;
 class csMatrix3;
 class csVector3;
@@ -62,12 +63,17 @@ typedef void (csLightingFunc) (csFrustumView* lview, int type, void* entity);
  */
 class csRenderView : public csCamera
 {
-public:
+private:
   /// Engine handle.
   csEngine* engine;
+  iEngine* iengine;
 
   /// The 2D polygon describing how everything drawn inside should be clipped.
   csClipper* view;
+  iClipper2D* iview;
+
+  /// The camera this object represents.
+  iCamera* icamera;
 
   /// The 3D graphics subsystem used for drawing.
   iGraphics3D* g3d;
@@ -141,6 +147,7 @@ public:
    */
   bool added_fog_info;
 
+public:
   ///
   csRenderView ();
   ///
@@ -148,11 +155,64 @@ public:
   ///
   csRenderView (const csCamera& c, csClipper* v, iGraphics3D* ig3d,
     iGraphics2D* ig2d);
+  ///
+  csRenderView (const csRenderView& c);
+
+  /// Set the engine.
+  void SetEngine (csEngine* engine);
+  /// Get the engine.
+  csEngine* GetEngine () { return engine; }
+
+  /// Set this sector.
+  void SetThisSector (csSector* sect);
+  /// Get this sector.
+  csSector* GetThisSector () { return this_sector; }
+
+  /// Set previous sector.
+  void SetPreviousSector (csSector* sect);
+  /// Get previous sector.
+  csSector* GetPreviousSector () { return previous_sector; }
 
   ///
-  void SetView (csClipper* v) { view = v; }
+  void SetView (csClipper* v);
+  ///
+  csClipper* GetView () { return view; }
   ///
   void SetClipPlane (csPlane3& p) { clip_plane = p; }
+  ///
+  csPlane3& GetClipPlane () { return clip_plane; }
+  ///
+  bool HasClipPlane () { return do_clip_plane; }
+  ///
+  bool HasClipFrustum () { return do_clip_frustum; }
+  ///
+  void UseClipPlane (bool u) { do_clip_plane = u; }
+  ///
+  void UseClipFrustum (bool u) { do_clip_frustum = u; }
+
+  ///
+  void SetCallback (csDrawFunc* cb, void* cbdata)
+  {
+    callback = cb;
+    callback_data = cbdata;
+  }
+  ///
+  csDrawFunc* GetCallback ()
+  {
+    return callback;
+  }
+  ///
+  void* GetCallbackData ()
+  {
+    return callback_data;
+  }
+
+  /// Call callback.
+  void CallCallback (int type, void* data)
+  {
+    callback (this, type, data);
+  }
+
   /// Set the view frustum at z=1.
   void SetFrustum (float lx, float rx, float ty, float by)
   {
@@ -160,6 +220,62 @@ public:
     rightx = rx;
     topy = ty;
     boty = by;
+  }
+  /// Get the frustum.
+  void GetFrustum (float& lx, float& rx, float& ty, float& by)
+  {
+    lx = leftx;
+    rx = rightx;
+    ty = topy;
+    by = boty;
+  }
+
+  ///
+  void SetFogInfo (csFogInfo* fog)
+  {
+    fog_info = fog;
+    added_fog_info = true;
+  }
+  ///
+  void ResetFogInfo ()
+  {
+    added_fog_info = false;
+  }
+
+  ///
+  csFogInfo* GetFogInfo ()
+  {
+    return fog_info;
+  }
+
+  ///
+  bool AddedFogInfo ()
+  {
+    return added_fog_info;
+  }
+
+  ///
+  void SetPortalPolygon (csPolygon3D* por)
+  {
+    portal_polygon = por;
+  }
+
+  ///
+  csPolygon3D* GetPortalPolygon ()
+  {
+    return portal_polygon;
+  }
+
+  ///
+  iGraphics2D* GetG2D ()
+  {
+    return g2d;
+  }
+
+  ///
+  iGraphics3D* GetG3D ()
+  {
+    return g3d;
   }
 
   /**
@@ -197,8 +313,8 @@ public:
     {
       return (csRenderView*)scfParent;
     }
-    virtual iEngine* GetEngine ();
-    virtual iClipper2D* GetClipper ();
+    virtual iEngine* GetEngine () { return scfParent->iengine; }
+    virtual iClipper2D* GetClipper () { return scfParent->iview; }
     virtual bool IsClipperRequired () { return scfParent->do_clip_frustum; }
     virtual iGraphics2D* GetGraphics2D () { return scfParent->g2d; }
     virtual iGraphics3D* GetGraphics3D ()  { return scfParent->g3d; }
@@ -215,7 +331,7 @@ public:
       return scfParent->do_clip_plane;
     }
     virtual csFogInfo* GetFirstFogInfo () { return scfParent->fog_info; }
-    virtual iCamera* GetCamera ();
+    virtual iCamera* GetCamera () { return scfParent->icamera; }
     virtual void CalculateFogPolygon (G3DPolygonDP& poly)
     {
       scfParent->CalculateFogPolygon (poly);

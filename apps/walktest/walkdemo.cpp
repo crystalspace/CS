@@ -82,7 +82,7 @@ void RandomColor (float& r, float& g, float& b)
 
 extern iMeshWrapper* add_meshobj (char* tname, char* sname, csSector* where,
 	csVector3 const& pos, float size);
-extern void move_sprite (csSprite* sprite, csSector* where,
+extern void move_mesh (csMeshWrapper* sprite, csSector* where,
 	csVector3 const& pos);
 
 //===========================================================================
@@ -143,7 +143,7 @@ void add_particles_rain (csSector* sector, char* matname, int num, float speed)
     iMeshObject* mesh = factory->NewInstance ();
     csMeshWrapper* exp = new csMeshWrapper (Sys->view->GetEngine (), mesh);
     mesh->DecRef ();
-    Sys->view->GetEngine ()->sprites.Push (exp);
+    Sys->view->GetEngine ()->meshes.Push (exp);
     exp->GetMovable ().SetSector (sector);
     exp->GetMovable ().UpdateMove ();
 
@@ -158,6 +158,8 @@ void add_particles_rain (csSector* sector, char* matname, int num, float speed)
     rainstate->SetLighting (false);
     rainstate->SetBox (bbox.Min (), bbox.Max ());
     rainstate->SetFallSpeed (csVector3 (0, -speed, 0));
+    partstate->DecRef ();
+    rainstate->DecRef ();
   }
 }
 
@@ -219,7 +221,7 @@ void add_particles_snow (csSector* sector, char* matname, int num, float speed)
     iMeshObject* mesh = factory->NewInstance ();
     csMeshWrapper* exp = new csMeshWrapper (Sys->view->GetEngine (), mesh);
     mesh->DecRef ();
-    Sys->view->GetEngine ()->sprites.Push (exp);
+    Sys->view->GetEngine ()->meshes.Push (exp);
     exp->GetMovable ().SetSector (sector);
     exp->GetMovable ().UpdateMove ();
 
@@ -235,6 +237,8 @@ void add_particles_snow (csSector* sector, char* matname, int num, float speed)
     snowstate->SetBox (bbox.Min (), bbox.Max ());
     snowstate->SetFallSpeed (csVector3 (0, -speed, 0));
     snowstate->SetSwirl (0.2);
+    partstate->DecRef ();
+    snowstate->DecRef ();
   }
 }
 
@@ -262,7 +266,7 @@ void add_particles_fire (csSector* sector, char* matname, int num,
   iMeshObject* mesh = factory->NewInstance ();
   csMeshWrapper* exp = new csMeshWrapper (Sys->view->GetEngine (), mesh);
   mesh->DecRef ();
-  Sys->view->GetEngine ()->sprites.Push (exp);
+  Sys->view->GetEngine ()->meshes.Push (exp);
   exp->GetMovable ().SetSector (sector);
   exp->GetMovable ().UpdateMove ();
 
@@ -278,6 +282,8 @@ void add_particles_fire (csSector* sector, char* matname, int num,
   firestate->SetDirection (csVector3 (0, 1., 0));
   firestate->SetSwirl (0.6);
   firestate->SetColorScale (0.2);
+  partstate->DecRef ();
+  firestate->DecRef ();
 }
 
 //===========================================================================
@@ -304,7 +310,7 @@ void add_particles_fountain (csSector* sector, char* matname, int num,
   iMeshObject* mesh = factory->NewInstance ();
   csMeshWrapper* exp = new csMeshWrapper (Sys->view->GetEngine (), mesh);
   mesh->DecRef ();
-  Sys->view->GetEngine ()->sprites.Push (exp);
+  Sys->view->GetEngine ()->meshes.Push (exp);
   exp->GetMovable ().SetSector (sector);
   exp->GetMovable ().SetPosition (origin);
   exp->GetMovable ().UpdateMove ();
@@ -325,6 +331,8 @@ void add_particles_fountain (csSector* sector, char* matname, int num,
   fountstate->SetElevation (3.1415926/2.);
   fountstate->SetAzimuth (0);
   fountstate->SetOpening (.2);
+  partstate->DecRef ();
+  fountstate->DecRef ();
 }
 
 //===========================================================================
@@ -350,7 +358,7 @@ void add_particles_explosion (csSector* sector, const csVector3& center, char* m
   iMeshObject* mesh = factory->NewInstance ();
   csMeshWrapper* exp = new csMeshWrapper (Sys->view->GetEngine (), mesh);
   mesh->DecRef ();
-  Sys->view->GetEngine ()->sprites.Push (exp);
+  Sys->view->GetEngine ()->meshes.Push (exp);
   exp->GetMovable ().SetSector (sector);
   exp->GetMovable ().SetPosition (center);
   exp->GetMovable ().UpdateMove ();
@@ -376,6 +384,8 @@ void add_particles_explosion (csSector* sector, const csVector3& center, char* m
   expstate->SetFadeSprites (500);
   expstate->AddLight (QUERY_INTERFACE (Sys->engine, iEngine),
       	QUERY_INTERFACE (sector, iSector), 1000);
+  partstate->DecRef ();
+  expstate->DecRef ();
 }
 
 //===========================================================================
@@ -401,7 +411,7 @@ void add_particles_spiral (csSector* sector, const csVector3& bottom, char* matn
   iMeshObject* mesh = factory->NewInstance ();
   csMeshWrapper* exp = new csMeshWrapper (Sys->view->GetEngine (), mesh);
   mesh->DecRef ();
-  Sys->view->GetEngine ()->sprites.Push (exp);
+  Sys->view->GetEngine ()->meshes.Push (exp);
   exp->GetMovable ().SetSector (sector);
   exp->GetMovable ().SetPosition (bottom);
   exp->GetMovable ().UpdateMove ();
@@ -415,6 +425,8 @@ void add_particles_spiral (csSector* sector, const csVector3& bottom, char* matn
   iSpiralState* spirstate = QUERY_INTERFACE (mesh, iSpiralState);
   spirstate->SetNumberParticles (500);
   spirstate->SetSource (csVector3 (0, 0, 0));
+  partstate->DecRef ();
+  spirstate->DecRef ();
 }
 
 //===========================================================================
@@ -487,8 +499,10 @@ void add_tree_limbs (iSprite3DFactoryState* state, iSpriteFrame* frame,
                                                  csXRotMatrix3(.15);
     csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
     con->SetTransformation (trans);
-    add_tree_limbs (state, frame, QUERY_INTERFACE (con, iSkeletonLimb),
+    iSkeletonLimb* ilimb = QUERY_INTERFACE (con, iSkeletonLimb);
+    add_tree_limbs (state, frame, ilimb,
     	vertex_idx, par_vertex_idx, maxdepth, width, recursion+1);
+    ilimb->DecRef ();
   }
 }
 
@@ -498,8 +512,10 @@ iSkeleton* create_skeltree (iSprite3DFactoryState* state, iSpriteFrame* frame,
 {
   state->EnableSkeletalAnimation ();
   iSkeleton* skel = state->GetSkeleton ();
-  add_tree_limbs (state, frame, QUERY_INTERFACE (skel, iSkeletonLimb),
+  iSkeletonLimb* ilimb = QUERY_INTERFACE (skel, iSkeletonLimb);
+  add_tree_limbs (state, frame, ilimb,
   	vertex_idx, 0, maxdepth, width, 0);
+  ilimb->DecRef ();
   return skel;
 }
 
@@ -565,6 +581,7 @@ void animate_skeleton_tree (iSkeletonLimbState* limb)
     csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
     iSkeletonConnectionState* con = QUERY_INTERFACE (child, iSkeletonConnectionState);
     con->SetTransformation (trans);
+    con->DecRef ();
     animate_skeleton_tree (child);
     child = child->GetNextSibling ();
   }
@@ -576,6 +593,7 @@ void animate_skeleton_tree_cb (iMeshWrapper* spr, iRenderView* /*rview*/, void* 
   iSprite3DState* state = QUERY_INTERFACE (obj, iSprite3DState);
   iSkeletonState* sk_state = state->GetSkeletonState ();
   animate_skeleton_tree (QUERY_INTERFACE (sk_state, iSkeletonLimbState));
+  state->DecRef ();
 }
 
 // Add a skeletal tree sprite. If needed it will also create
@@ -605,6 +623,7 @@ void add_skeleton_tree (csSector* where, csVector3 const& pos, int depth,
     act->SetName ("a");
     act->AddFrame (fr, 100);
     create_skeltree (state, fr, vertex_idx, depth, width);
+    state->DecRef ();
   }
   iMeshWrapper* spr = add_meshobj (skelname, "__skeltree__", where, pos-csVector3 (0, Sys->cfg_body_height, 0), 1);
   spr->SetDrawCallback (animate_skeleton_tree_cb, NULL);
@@ -702,9 +721,11 @@ void add_ghost_limbs (iSprite3DFactoryState* state, iSpriteFrame* frame,
 	csXRotMatrix3 (.15);
     csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
     con->SetTransformation (trans);
-    add_ghost_limbs (state, frame, QUERY_INTERFACE (con, iSkeletonLimb),
+    iSkeletonLimb* ilimb = QUERY_INTERFACE (con, iSkeletonLimb);
+    add_ghost_limbs (state, frame, ilimb,
     	vertex_idx, par_vertex_idx,
     	maxdepth, 1, recursion+1, dim * .7);
+    ilimb->DecRef ();
   }
 }
 
@@ -714,8 +735,10 @@ iSkeleton* create_skelghost (iSprite3DFactoryState* state, iSpriteFrame* frame,
 {
   state->EnableSkeletalAnimation ();
   iSkeleton* skel = state->GetSkeleton ();
-  add_ghost_limbs (state, frame, QUERY_INTERFACE (skel, iSkeletonLimb),
+  iSkeletonLimb* ilimb = QUERY_INTERFACE (skel, iSkeletonLimb);
+  add_ghost_limbs (state, frame, ilimb,
   	vertex_idx, 0, maxdepth, width, 0, .2);
+  ilimb->DecRef ();
   return skel;
 }
 
@@ -766,6 +789,7 @@ void animate_skeleton_ghost (iSkeletonLimbState* limb)
     csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
     iSkeletonConnectionState* con = QUERY_INTERFACE (child, iSkeletonConnectionState);
     con->SetTransformation (trans);
+    con->DecRef ();
     animate_skeleton_ghost (child);
     child = child->GetNextSibling ();
   }
@@ -776,7 +800,10 @@ void animate_skeleton_ghost_cb (iMeshWrapper* spr, iRenderView* /*rview*/, void*
   iMeshObject* obj = spr->GetMeshObject ();
   iSprite3DState* state = QUERY_INTERFACE (obj, iSprite3DState);
   iSkeletonState* sk_state = state->GetSkeletonState ();
-  animate_skeleton_ghost (QUERY_INTERFACE (sk_state, iSkeletonLimbState));
+  iSkeletonLimbState* isk_limb = QUERY_INTERFACE (sk_state, iSkeletonLimbState);
+  animate_skeleton_ghost (isk_limb);
+  isk_limb->DecRef ();
+  state->DecRef ();
 }
 
 
@@ -807,6 +834,7 @@ void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth,
     act->SetName ("a");
     act->AddFrame (fr, 100);
     create_skelghost (state, fr, vertex_idx, maxdepth, width);
+    state->DecRef ();
   }
   iMeshWrapper* spr = add_meshobj (skelname, "__skelghost__", where, pos, 1);
   iMeshObject* obj = spr->GetMeshObject ();
@@ -816,9 +844,14 @@ void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth,
   iObject* sprobj = QUERY_INTERFACE (spr, iObject);
   (void)new csCollider (sprobj, Sys->collide_system, mesh);
   GhostSpriteInfo* gh_info = new GhostSpriteInfo ();
-  sprobj->ObjAdd (QUERY_INTERFACE (gh_info, iObject));
+  iObject* iobj = QUERY_INTERFACE (gh_info, iObject);
+  sprobj->ObjAdd (iobj);
   gh_info->dir = 1;
   spr->SetDrawCallback (animate_skeleton_ghost_cb, NULL);
+  iobj->DecRef ();
+  state->DecRef ();
+  mesh->DecRef ();
+  sprobj->DecRef ();
 }
 
 #define MAXSECTORSOCCUPIED  20
@@ -933,7 +966,7 @@ void add_bot (float size, csSector* where, csVector3 const& pos,
   bot = new Bot (Sys->view->GetEngine(), botmesh);
   botmesh->DecRef ();
   bot->SetName ("bot");
-  Sys->view->GetEngine ()->sprites.Push (bot);
+  Sys->view->GetEngine ()->meshes.Push (bot);
   bot->GetMovable ().SetSector (where);
   csMatrix3 m; m.Identity (); m = m * size;
   bot->GetMovable ().SetTransform (m);
@@ -942,6 +975,7 @@ void add_bot (float size, csSector* where, csVector3 const& pos,
   bot->GetMovable ().UpdateMove ();
   iSprite3DState* state = QUERY_INTERFACE (botmesh, iSprite3DState);
   state->SetAction ("default");
+  state->DecRef ();
   bot->next = first_bot;
   bot->light = dyn;
   first_bot = bot;
@@ -953,7 +987,7 @@ void del_bot ()
   {
     Bot* bot = first_bot;
     first_bot = bot->next;
-    Sys->view->GetEngine ()->RemoveSprite (bot);
+    Sys->view->GetEngine ()->RemoveMesh (bot);
   }
 }
 
@@ -1036,7 +1070,7 @@ void HandleDynLight (csDynLight* dyn)
             add_bot (1, dyn->GetSector (), dyn->GetCenter (), 0);
 	  }
 	  ms->sprite->GetMovable ().ClearSectors ();
-	  Sys->view->GetEngine ()->RemoveSprite (ms->sprite);
+	  Sys->view->GetEngine ()->RemoveMesh (ms->sprite);
 	}
         dyn->ObjRemove(dyn->GetChild (csDataObject::Type));
         if (ms->snd)
@@ -1067,7 +1101,7 @@ void HandleDynLight (csDynLight* dyn)
       else ms->dir.SetOrigin (v);
       dyn->Move (s, v.x, v.y, v.z);
       dyn->Setup ();
-      if (ms->sprite) move_sprite (ms->sprite, s, v);
+      if (ms->sprite) move_mesh (ms->sprite, s, v);
       if (Sys->Sound && ms->snd) ms->snd->SetPosition (v);
       break;
     }
@@ -1151,13 +1185,13 @@ void fire_missile ()
   {
     csMeshWrapper* sp = tmpl->NewMeshObject (Sys->view->GetEngine ());
     sp->SetName ("missile");
-    Sys->view->GetEngine ()->sprites.Push (sp);
+    Sys->view->GetEngine ()->meshes.Push (sp);
     sp->GetMovable ().SetSector (Sys->view->GetCamera ()->GetSector ());
     ms->sprite = sp;
     sp->GetMovable ().SetPosition (pos);
     csMatrix3 m = ms->dir.GetT2O ();
     sp->GetMovable ().SetTransform (m);
-    move_sprite (sp, Sys->view->GetCamera ()->GetSector (), pos);
+    move_mesh (sp, Sys->view->GetCamera ()->GetSector (), pos);
     sp->GetMovable ().UpdateMove ();
   } 
 }
@@ -1175,15 +1209,15 @@ void AttachRandomLight (csDynLight* light)
 
 //===========================================================================
 
-// Light all sprites and animate the skeletal trees.
+// Light all meshes and animate the skeletal trees.
 // This function does no effort at all to optimize stuff. It does
-// not test if the sprite is visible or not.
+// not test if the mesh is visible or not.
 void light_statics ()
 {
   csEngine* e = Sys->view->GetEngine ();
-  for (int i = 0 ; i < e->sprites.Length () ; i++)
+  for (int i = 0 ; i < e->meshes.Length () ; i++)
   {
-    csSprite* sp = (csSprite*)e->sprites [i];
+    csMeshWrapper* sp = (csMeshWrapper*)e->meshes [i];
     if (sp->GetType () == csMeshWrapper::Type)
     {
       csMeshWrapper* wrap = (csMeshWrapper*)sp;

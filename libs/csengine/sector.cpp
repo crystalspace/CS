@@ -23,7 +23,7 @@
 #include "csengine/dumper.h"
 #include "csengine/sector.h"
 #include "csengine/thing.h"
-#include "csengine/cssprite.h"
+#include "csengine/meshobj.h"
 #include "csengine/polygon.h"
 #include "csengine/pol2d.h"
 #include "csengine/polytext.h"
@@ -82,11 +82,11 @@ csSector::csSector (csEngine* engine) : csPolygonSet (engine)
 
 csSector::~csSector ()
 {
-  // Sprites, things, and collections are not deleted by the calls below. They
+  // Meshes, things, and collections are not deleted by the calls below. They
   // belong to csEngine.
   things.DeleteAll ();
   skies.DeleteAll ();
-  sprites.DeleteAll ();
+  meshes.DeleteAll ();
   collections.DeleteAll ();
 
   delete static_tree;
@@ -244,29 +244,29 @@ csPolygon3D* csSector::HitBeam (const csVector3& start, const csVector3& end,
 csObject* csSector::HitBeam (const csVector3& start, const csVector3& end,
 	csPolygon3D** polygonPtr)
 {
-  float r, best_sprite_r = 10000000000.;
-  csSprite* near_sprite = NULL;
+  float r, best_mesh_r = 10000000000.;
+  csMeshWrapper* near_mesh = NULL;
   csVector3 isect;
 
-  // First check all sprites in this sector.
+  // First check all meshes in this sector.
   int i;
-  for (i = 0 ; i < sprites.Length () ; i++)
+  for (i = 0 ; i < meshes.Length () ; i++)
   {
-    csSprite* sprite = (csSprite*)sprites[i];
-    if (sprite->HitBeam (start, end, isect, &r))
+    csMeshWrapper* mesh = (csMeshWrapper*)meshes[i];
+    if (mesh->HitBeam (start, end, isect, &r))
     {
-      if (r < best_sprite_r)
+      if (r < best_mesh_r)
       {
-        best_sprite_r = r;
-	near_sprite = sprite;
+        best_mesh_r = r;
+	near_mesh = mesh;
       }
     }
   }
 
   float best_poly_r;
   csPolygon3D* p = IntersectSegment (start, end, isect, &best_poly_r);
-  // We hit a polygon and the polygon is closer than the sprite.
-  if (p && best_poly_r < best_sprite_r)
+  // We hit a polygon and the polygon is closer than the mesh.
+  if (p && best_poly_r < best_mesh_r)
   {
     csPortal* po = p->GetPortal ();
     if (po)
@@ -283,9 +283,9 @@ csObject* csSector::HitBeam (const csVector3& start, const csVector3& end,
       return (csObject*)(p->GetParent ());
     }
   }
-  // The sprite is closer (or there is no sprite).
+  // The mesh is closer (or there is no mesh).
   if (polygonPtr) *polygonPtr = NULL;
-  return (csObject*)near_sprite;
+  return (csObject*)near_mesh;
 }
 
 void csSector::CreateLightMaps (iGraphics3D* g3d)
@@ -507,7 +507,7 @@ void* csSector::TestQueuePolygons (csSector* sector,
 {
   csRenderView* d = (csRenderView*)data;
   return sector->TestQueuePolygonArray (polygon, num, d, poly_queue,
-    d->engine->IsPVS ());
+    d->GetEngine ()->IsPVS ());
 }
 
 void csSector::DrawPolygonsFromQueue (csPolygon2DQueue* queue,
@@ -515,7 +515,7 @@ void csSector::DrawPolygonsFromQueue (csPolygon2DQueue* queue,
 {
   csPolygon3D* poly3d;
   csPolygon2D* poly2d;
-  csPoly2DPool* render_pool = rview->engine->render_pol2d_pool;
+  csPoly2DPool* render_pool = rview->GetEngine ()->render_pol2d_pool;
   while (queue->Pop (&poly3d, &poly2d))
   {
     poly3d->CamUpdate ();
@@ -560,7 +560,7 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   csRenderView* rview = (csRenderView*)data;
   static csPolygon2D persp;
   csVector3 array[7];
-  csEngine* w = rview->engine;
+  csEngine* w = rview->GetEngine ();
 
   if (w->IsPVS ())
   {
@@ -600,14 +600,16 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
     // We also test the node against the view frustum here.
     int num_z_0 = 0;
     bool left = true, right = true, top = true, bot = true;
+    float lx, rx, ty, by;
+    rview->GetFrustum (lx, rx, ty, by);
     for (i = 0 ; i < nVert; i++)
     {
       cam[i] = rview->Other2This (array[i]);
       if (cam[i].z < SMALL_EPSILON) num_z_0++;
-      if (left && cam[i].x >= cam[i].z * rview->leftx) left = false;
-      if (right && cam[i].x <= cam[i].z * rview->rightx) right = false;
-      if (top && cam[i].y >= cam[i].z * rview->topy) top = false;
-      if (bot && cam[i].y <= cam[i].z * rview->boty) bot = false;
+      if (left && cam[i].x >= cam[i].z * lx) left = false;
+      if (right && cam[i].x <= cam[i].z * rx) right = false;
+      if (top && cam[i].y >= cam[i].z * ty) top = false;
+      if (bot && cam[i].y <= cam[i].z * by) bot = false;
     }
     if (left || right || top || bot) return false;
 
@@ -670,7 +672,7 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
       }
     }
 
-    if (!persp.ClipAgainst (rview->view)) return false;
+    if (!persp.ClipAgainst (rview->GetView ())) return false;
 
     // c-buffer test.
     bool vis;
@@ -751,7 +753,7 @@ is_vis:
 // After rendering through a floating portal, the floating portal
 // itself needs to be covered by the Z-buffer. i.e. we need to make
 // sure that the Z-buffer thinks the portal is a regular polygon.
-// This is to make sure that sprites or other entities rendered
+// This is to make sure that meshes or other entities rendered
 // afterwards will not get rendered INSIDE the portal contents.
 //
 // Here is a list of all the entities that we can draw in a sector:
@@ -829,23 +831,23 @@ void csSector::Draw (csRenderView& rview)
   UpdateTransformation (rview);
   Stats::polygons_considered += polygons.Length ();
   int i;
-  rview.this_sector = this;
+  rview.SetThisSector (this);
 
   G3D_FOGMETHOD fogmethod = G3DFOGMETHOD_NONE;
 
-  if (rview.callback)
+  if (rview.GetCallback ())
   {
-    rview.callback (&rview, CALLBACK_SECTOR, (void*)this);
+    rview.CallCallback (CALLBACK_SECTOR, (void*)this);
   }
   else if (HasFog ())
   {
-    if ((fogmethod = rview.engine->fogmethod) == G3DFOGMETHOD_VERTEX)
+    if ((fogmethod = rview.GetEngine ()->fogmethod) == G3DFOGMETHOD_VERTEX)
     {
       csFogInfo* fog_info = new csFogInfo ();
-      fog_info->next = rview.fog_info;
-      if (rview.portal_polygon)
+      fog_info->next = rview.GetFogInfo ();
+      if (rview.GetPortalPolygon ())
       {
-        fog_info->incoming_plane = rview.portal_polygon->GetPlane ()->
+        fog_info->incoming_plane = rview.GetPortalPolygon ()->GetPlane ()->
 		GetCameraPlane ();
         fog_info->incoming_plane.Invert ();
 	fog_info->has_incoming_plane = true;
@@ -853,12 +855,11 @@ void csSector::Draw (csRenderView& rview)
       else fog_info->has_incoming_plane = false;
       fog_info->fog = &GetFog ();
       fog_info->has_outgoing_plane = true;
-      rview.fog_info = fog_info;
-      rview.added_fog_info = true;
+      rview.SetFogInfo (fog_info);
     }
     else if (fogmethod != G3DFOGMETHOD_NONE)
     {
-      rview.g3d->OpenFogObject (GetID (), &GetFog ());
+      rview.GetG3D ()->OpenFogObject (GetID (), &GetFog ());
     }
   }
 
@@ -870,16 +871,16 @@ void csSector::Draw (csRenderView& rview)
   }
 
   // In some cases this queue will be filled with all visible
-  // sprites.
-  csSprite** sprite_queue = NULL;
-  int num_sprite_queue = 0;
+  // meshes.
+  csMeshWrapper** mesh_queue = NULL;
+  int num_mesh_queue = 0;
   // For things we have a similar queue.
   csThing** thing_queue = NULL;
   int num_thing_queue = 0;
   // If the following flag is true the queues are actually used.
   bool use_object_queues = false;
 
-  int engine_mode = rview.engine->GetEngineMode ();
+  int engine_mode = rview.GetEngine ()->GetEngineMode ();
   if (engine_mode == CS_ENGINE_FRONT2BACK)
   {
     //-----
@@ -896,12 +897,12 @@ void csSector::Draw (csRenderView& rview)
       // This sector has a static polygon tree (octree).
       //-----
     
-      // Mark all sprites as invisible and clear the camera transformation
+      // Mark all meshes as invisible and clear the camera transformation
       // for their bounding boxes.
-      if (sprites.Length () > 0)
-        for (i = 0 ; i < sprites.Length () ; i++)
+      if (meshes.Length () > 0)
+        for (i = 0 ; i < meshes.Length () ; i++)
         {
-          csSprite* sp = (csSprite*)sprites[i];
+          csMeshWrapper* sp = (csMeshWrapper*)meshes[i];
 	  csPolyTreeObject* pt = sp->GetPolyTreeObject ();
 	  if (pt->GetWorldBoundingBox ().In (rview.GetOrigin ()))
 	    sp->MarkVisible ();
@@ -924,11 +925,11 @@ void csSector::Draw (csRenderView& rview)
 
       // Using the PVS, mark all sectors and polygons that are visible
       // from the current node.
-      if (rview.engine->IsPVS ())
+      if (rview.GetEngine ()->IsPVS ())
       {
         csOctree* otree = (csOctree*)static_tree;
-	if (rview.engine->IsPVSFrozen ())
-	  otree->MarkVisibleFromPVS (rview.engine->GetFrozenPosition ());
+	if (rview.GetEngine ()->IsPVSFrozen ())
+	  otree->MarkVisibleFromPVS (rview.GetEngine ()->GetFrozenPosition ());
 	else
 	  otree->MarkVisibleFromPVS (rview.GetOrigin ());
       }
@@ -947,23 +948,23 @@ void csSector::Draw (csRenderView& rview)
 
       // Traverse the tree front to back and push all visible polygons
       // on the queue. This traversal will also mark all visible
-      // sprites and things. They will be put on a queue later.
+      // meshes and things. They will be put on a queue later.
       static_tree->Front2Back (rview.GetOrigin (), &TestQueuePolygons,
       	&rview, CullOctreeNode, &rview);
 
-      // Fill the sprite and thing queues for all sprites and things
+      // Fill the mesh and thing queues for all meshes and things
       // that were visible.
       use_object_queues = true;
-      if (sprites.Length () > 0)
+      if (meshes.Length () > 0)
       {
-	// Push all visible sprites in a queue.
+	// Push all visible meshes in a queue.
 	// @@@ Avoid memory allocation?
-	sprite_queue = new csSprite* [sprites.Length ()];
-	num_sprite_queue = 0;
-        for (i = 0 ; i < sprites.Length () ; i++)
+	mesh_queue = new csMeshWrapper* [meshes.Length ()];
+	num_mesh_queue = 0;
+        for (i = 0 ; i < meshes.Length () ; i++)
         {
-          csSprite* sp = (csSprite*)sprites[i];
-	  if (sp->IsVisible ()) sprite_queue[num_sprite_queue++] = sp;
+          csMeshWrapper* sp = (csMeshWrapper*)meshes[i];
+	  if (sp->IsVisible ()) mesh_queue[num_mesh_queue++] = sp;
 	}
       }
       if (things.Length () > 0)
@@ -1083,53 +1084,53 @@ void csSector::Draw (csRenderView& rview)
 
     delete [] thing_queue;
 
-    // Draw sprites.
-    // To correctly support sprites in multiple sectors we only draw a
-    // sprite if the sprite is not in the sector we came from. If the
-    // sprite is also present in the previous sector then we will still
+    // Draw meshes.
+    // To correctly support meshes in multiple sectors we only draw a
+    // mesh if the mesh is not in the sector we came from. If the
+    // mesh is also present in the previous sector then we will still
     // draw it in any of the following cases:
     //    - the previous sector has fog
     //    - the portal we just came through has alpha transparency
     //    - the portal is a portal on a thing (i.e. a floating portal)
     //    - the portal does space warping
-    // In those cases we draw the sprite anyway. @@@ Note that we should
+    // In those cases we draw the mesh anyway. @@@ Note that we should
     // draw it clipped (in 3D) to the portal polygon. This is currently not
     // done.
-    csSector* previous_sector = rview.previous_sector;
+    csSector* previous_sector = rview.GetPreviousSector ();
 
     int spr_num;
-    if (sprite_queue) spr_num = num_sprite_queue;
-    else spr_num = sprites.Length ();
+    if (mesh_queue) spr_num = num_mesh_queue;
+    else spr_num = meshes.Length ();
 
-    if (rview.added_fog_info)
-      rview.fog_info->has_outgoing_plane = false;
+    if (rview.AddedFogInfo ())
+      rview.GetFogInfo ()->has_outgoing_plane = false;
 
     for (i = 0 ; i < spr_num ; i++)
     {
-      csSprite* sp;
-      if (sprite_queue) sp = sprite_queue[i];
-      else sp = (csSprite*)sprites[i];
+      csMeshWrapper* sp;
+      if (mesh_queue) sp = mesh_queue[i];
+      else sp = (csMeshWrapper*)meshes[i];
 
       if (!previous_sector || sp->GetMovable ().GetSectors ().Find (previous_sector) == -1)
       {
-        // Sprite is not in the previous sector or there is no previous sector.
+        // Mesh is not in the previous sector or there is no previous sector.
         sp->Draw (rview);
       }
       else
       {
         if (
-	  ((csPolygonSet*)rview.portal_polygon->GetParent ())->GetType ()
+	  ((csPolygonSet*)rview.GetPortalPolygon ()->GetParent ())->GetType ()
 	  	== csThing::Type ||
 	  previous_sector->HasFog () ||
-	  rview.portal_polygon->IsTransparent () ||
-	  rview.portal_polygon->GetPortal ()->flags.Check (CS_PORTAL_WARP))
+	  rview.GetPortalPolygon ()->IsTransparent () ||
+	  rview.GetPortalPolygon ()->GetPortal ()->flags.Check (CS_PORTAL_WARP))
 	{
 	  // @@@ Here we should draw clipped to the portal.
           sp->Draw (rview);
 	}
       }
     }
-    delete [] sprite_queue;
+    delete [] mesh_queue;
   }
 
   // Draw all terrain surfaces.
@@ -1143,10 +1144,10 @@ void csSector::Draw (csRenderView& rview)
   }
 
   // queue all halos in this sector to be drawn.
-  if (!rview.callback)
+  if (!rview.GetCallback ())
     for (i = lights.Length () - 1; i >= 0; i--)
       // Tell the engine to try to add this light into the halo queue
-      rview.engine->AddHalo ((csLight *)lights.Get (i));
+      rview.GetEngine ()->AddHalo ((csLight *)lights.Get (i));
 
   // Handle the fog, if any
   if (fogmethod != G3DFOGMETHOD_NONE)
@@ -1154,33 +1155,33 @@ void csSector::Draw (csRenderView& rview)
     G3DPolygonDFP g3dpoly;
     if (fogmethod == G3DFOGMETHOD_ZBUFFER)
     {
-      g3dpoly.num = rview.view->GetNumVertices ();
-      csVector2 *clipview = rview.view->GetClipPoly ();
+      g3dpoly.num = rview.GetView ()->GetNumVertices ();
+      csVector2 *clipview = rview.GetView ()->GetClipPoly ();
       memcpy (g3dpoly.vertices, clipview, g3dpoly.num * sizeof (csVector2));
       if (rview.GetSector () == this && draw_busy == 0)
       {
         // Since there is fog in the current camera sector we simulate
         // this by adding the view plane polygon.
-        rview.g3d->DrawFogPolygon (GetID (), g3dpoly, CS_FOG_VIEW);
+        rview.GetG3D ()->DrawFogPolygon (GetID (), g3dpoly, CS_FOG_VIEW);
       }
       else
       {
         // We must add a FRONT fog polygon for the clipper to this sector.
-        g3dpoly.normal = rview.clip_plane;
+        g3dpoly.normal = rview.GetClipPlane ();
 	g3dpoly.normal.Invert ();
         g3dpoly.inv_aspect = rview.GetInvFOV ();
-        rview.g3d->DrawFogPolygon (GetID (), g3dpoly, CS_FOG_FRONT);
+        rview.GetG3D ()->DrawFogPolygon (GetID (), g3dpoly, CS_FOG_FRONT);
       }
     }
-    else if (fogmethod == G3DFOGMETHOD_VERTEX && rview.added_fog_info)
+    else if (fogmethod == G3DFOGMETHOD_VERTEX && rview.AddedFogInfo ())
     {
-      csFogInfo *fog_info = rview.fog_info;
-      rview.fog_info = rview.fog_info->next;
+      csFogInfo *fog_info = rview.GetFogInfo ();
+      rview.SetFogInfo (rview.GetFogInfo ()->next);
       delete fog_info;
     }
   }
 
-  if (rview.callback) rview.callback (&rview, CALLBACK_SECTOREXIT, (void*)this);
+  if (rview.GetCallback ()) rview.CallCallback (CALLBACK_SECTOREXIT, (void*)this);
 
   draw_busy--;
 }

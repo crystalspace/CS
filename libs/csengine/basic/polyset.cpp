@@ -34,7 +34,7 @@
 #include "csengine/thing.h"
 #include "csengine/covtree.h"
 #include "csengine/bspbbox.h"
-#include "csengine/cssprite.h"
+#include "csengine/meshobj.h"
 #include "csengine/bsp.h"
 #include "csengine/keyval.h"
 #include "csgeom/polypool.h"
@@ -390,18 +390,18 @@ csPolygon3D* csPolygonSet::IntersectSegment (const csVector3& start,
 void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
 	csRenderView* d, bool use_z_buf)
 {
-  if (d->callback)
+  if (d->GetCallback ())
   {
-    d->callback (d, CALLBACK_POLYGON, (void*)p);
-    d->callback (d, CALLBACK_POLYGON2D, (void*)poly);
+    d->CallCallback (CALLBACK_POLYGON, (void*)p);
+    d->CallCallback (CALLBACK_POLYGON2D, (void*)poly);
   }
 
-  if (d->added_fog_info)
+  if (d->AddedFogInfo ())
   {
     // If fog info was added then we are dealing with vertex fog and
     // the current sector has fog. This means we have to complete the
     // fog_info structure with the plane of the current polygon.
-    d->fog_info->outgoing_plane = p->GetPlane ()->GetCameraPlane ();
+    d->GetFogInfo ()->outgoing_plane = p->GetPlane ()->GetCameraPlane ();
   }
 
   Stats::polygons_drawn++;
@@ -411,7 +411,7 @@ void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
   {
     bool filtered = false;
     // is_this_fog is true if this sector is fogged.
-    bool is_this_fog = d->this_sector->HasFog ();
+    bool is_this_fog = d->GetThisSector ()->HasFog ();
 
     // If there is filtering (alpha mapping or something like that) we need
     // to keep the texture plane so that it can be drawn after the sector has
@@ -419,7 +419,7 @@ void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
     // may be rendered again (through mirrors) possibly overwriting the plane.
     csPolyPlane* keep_plane = NULL;
 
-    if (d->g3d->GetRenderState (G3DRENDERSTATE_TRANSPARENCYENABLE))
+    if (d->GetG3D ()->GetRenderState (G3DRENDERSTATE_TRANSPARENCYENABLE))
       filtered = p->IsTransparent ();
               
     if (filtered || is_this_fog || (po && po->flags.Check (CS_PORTAL_ZFILL)))
@@ -432,11 +432,11 @@ void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
     // the maximum number that a sector is drawn (for mirrors).
     if (po->Draw (poly, p, *d))
     {
-      if (!d->callback)
+      if (!d->GetCallback ())
       {
 	if (filtered) poly->DrawFilled (d, p, keep_plane, use_z_buf);
-	if (is_this_fog) poly->AddFogPolygon (d->g3d, p, keep_plane,
-		d->IsMirrored (), d->this_sector->GetID (), CS_FOG_BACK);
+	if (is_this_fog) poly->AddFogPolygon (d->GetG3D (), p, keep_plane,
+		d->IsMirrored (), d->GetThisSector ()->GetID (), CS_FOG_BACK);
 	// Here we z-fill the portal contents to make sure that sprites
 	// that are drawn outside of this portal cannot accidently cross
 	// into the others sector space (we cannot trust the Z-buffer here).
@@ -444,13 +444,13 @@ void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
 	  poly->FillZBuf (d, p, keep_plane);
       }
     }
-    else if (!d->callback)
+    else if (!d->GetCallback ())
       poly->DrawFilled (d, p, p->GetPlane (), use_z_buf);
 
     // Cleanup.
     if (keep_plane) keep_plane->DecRef ();
   }
-  else if (!d->callback)
+  else if (!d->GetCallback ())
     poly->DrawFilled (d, p, p->GetPlane (), use_z_buf);
 }
 
@@ -461,7 +461,7 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num,
   csVector3* verts;
   int num_verts;
   int i;
-  csPoly2DPool* render_pool = d->engine->render_pol2d_pool;
+  csPoly2DPool* render_pool = d->GetEngine ()->render_pol2d_pool;
   csPolygon2D* clip;
   
   for (i = 0 ; i < num ; i++)
@@ -470,14 +470,14 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num,
     p = (csPolygon3D*)polygon[i];
     if (p->flags.Check (CS_POLY_NO_DRAW)) continue;
     p->CamUpdate ();
-    if (p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane3*)NULL,
+    if (p->ClipToPlane (d->HasClipPlane () ? &d->GetClipPlane () : (csPlane3*)NULL,
 	 	d->GetOrigin (), verts, num_verts)) //@@@Use pool for verts?
     {
       if (!d->UseFarPlane() || d->GetFarPlane()->ClipPolygon (verts, num_verts))
       {
         clip = (csPolygon2D*)(render_pool->Alloc ());
 	if (p->DoPerspective (*d, verts, num_verts, clip, NULL, d->IsMirrored ()) &&
-            clip->ClipAgainst (d->view))
+            clip->ClipAgainst (d->GetView ()))
         {
           p->GetPlane ()->WorldToCamera (*d, verts[0]);
           DrawOnePolygon (p, clip, d, use_z_buf);
@@ -495,11 +495,11 @@ void csPolygonSet::DrawPolygonArrayDPM (csPolygonInt** /*polygon*/, int /*num*/,
   // happens with sprites.
   int i;
   csReversibleTransform tr_o2c = (*d);
-  d->g3d->SetObjectToCamera (&tr_o2c);
-  d->g3d->SetClipper (d->view->GetClipPoly (), d->view->GetNumVertices ());
+  d->GetG3D ()->SetObjectToCamera (&tr_o2c);
+  d->GetG3D ()->SetClipper (d->GetView ()->GetClipPoly (), d->GetView ()->GetNumVertices ());
   // @@@ This should only be done when aspect changes...
-  d->g3d->SetPerspectiveAspect (d->GetFOV ());
-  d->g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
+  d->GetG3D ()->SetPerspectiveAspect (d->GetFOV ());
+  d->GetG3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
     use_z_buf ? CS_ZBUF_USE : CS_ZBUF_FILL);
 
   G3DPolygonMesh mesh;
@@ -559,8 +559,8 @@ void csPolygonSet::DrawPolygonArrayDPM (csPolygonInt** /*polygon*/, int /*num*/,
   // @@@ fog not supported yet.
   // @@@ clipping not supported yet.
 
-  if (!d->callback)
-    d->g3d->DrawPolygonMesh (mesh);
+  if (!d->GetCallback ())
+    d->GetG3D ()->DrawPolygonMesh (mesh);
   //else
   // @@@ Provide functionality for visible edges here...
 
@@ -580,11 +580,11 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
   csVector3* verts;
   int num_verts;
   int i, j;
-  csCBuffer* c_buffer = d->engine->GetCBuffer ();
-  csCoverageMaskTree* covtree = d->engine->GetCovtree ();
-  csQuadTree3D* quad3d = d->engine->GetQuad3D ();
+  csCBuffer* c_buffer = d->GetEngine ()->GetCBuffer ();
+  csCoverageMaskTree* covtree = d->GetEngine ()->GetCovtree ();
+  csQuadTree3D* quad3d = d->GetEngine ()->GetQuad3D ();
   bool visible;
-  csPoly2DPool* render_pool = d->engine->render_pol2d_pool;
+  csPoly2DPool* render_pool = d->GetEngine ()->render_pol2d_pool;
   csPolygon2D* clip;
   
   for (i = 0 ; i < num ; i++)
@@ -602,9 +602,9 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
       csObject* obj = bsppol->GetOriginator ();
       bool obj_vis;
       csPolyTreeBBox* tbb;
-      if (obj->GetType () >= csSprite::Type)
+      if (obj->GetType () >= csMeshWrapper::Type)
       {
-        csSprite* sp = (csSprite*)obj;
+        csMeshWrapper* sp = (csMeshWrapper*)obj;
 	obj_vis = sp->IsVisible ();
 	tbb = (csPolyTreeBBox*)(sp->GetPolyTreeObject ());
       }
@@ -647,13 +647,13 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	else
 	{
           clip = (csPolygon2D*)(render_pool->Alloc ());
-          if ( bsppol->ClipToPlane (d->do_clip_plane ? &d->clip_plane :
+          if ( bsppol->ClipToPlane (d->HasClipPlane () ? &d->GetClipPlane () :
 		  (csPlane3*)NULL, d->GetOrigin (), verts, num_verts))
 	  {
 	    if (!d->UseFarPlane	() || d->GetFarPlane ()->ClipPolygon (verts, num_verts))   
 	    {
                if (bsppol->DoPerspective (*d, verts, num_verts, clip, d->IsMirrored ()) 
-	          && clip->ClipAgainst (d->view) )
+	          && clip->ClipAgainst (d->GetView ()) )
                {
 	         if (covtree)
 	         {
@@ -670,9 +670,9 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	}
 	if (mark_vis)
 	{
-          if (obj->GetType () >= csSprite::Type)
+          if (obj->GetType () >= csMeshWrapper::Type)
           {
-            csSprite* sp = (csSprite*)obj;
+            csMeshWrapper* sp = (csMeshWrapper*)obj;
             sp->MarkVisible ();
 	  }
 	  else
@@ -707,7 +707,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
       {
         // Don't draw this polygon.
       }
-      else if (quad3d && !d->engine->IsPVSOnly ())
+      else if (quad3d && !d->GetEngine ()->IsPVSOnly ())
       {
 	csPlane3* wplane = p->GetPolyPlane ();
 	float cl = wplane->Classify (quad3d->GetCenter ());
@@ -728,15 +728,15 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
       {
         clip = (csPolygon2D*)(render_pool->Alloc ());
         if (
-         p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane3*)NULL,
+         p->ClipToPlane (d->HasClipPlane () ? &d->GetClipPlane () : (csPlane3*)NULL,
                             d->GetOrigin (), verts, num_verts)
 	 && (!d->UseFarPlane () || d->GetFarPlane ()->ClipPolygon (verts, num_verts))		    
          && p->DoPerspective (*d, verts, num_verts, clip, NULL,
                               d->IsMirrored ())
-         && clip->ClipAgainst (d->view))
+         && clip->ClipAgainst (d->GetView ()))
         {
           po = p->GetPortal ();
-	  if (d->engine->IsPVSOnly ())
+	  if (d->GetEngine ()->IsPVSOnly ())
             visible = true;
 	  if (covtree)
             visible = covtree->InsertPolygon (clip->GetVertices (),
@@ -754,12 +754,12 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	// polygon will be culled at this stage.
         clip = (csPolygon2D*)(render_pool->Alloc ());
         if (!(
-           p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane3*)NULL,
+           p->ClipToPlane (d->HasClipPlane () ? &d->GetClipPlane () : (csPlane3*)NULL,
                               d->GetOrigin (), verts, num_verts)
            && (!d->UseFarPlane () || d->GetFarPlane ()->ClipPolygon (verts, num_verts))		    
            && p->DoPerspective (*d, verts, num_verts, clip, NULL,
                                 d->IsMirrored ())
-           && clip->ClipAgainst (d->view)))
+           && clip->ClipAgainst (d->GetView ())))
 	{
 	  visible = false;
 	}

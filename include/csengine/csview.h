@@ -1,6 +1,6 @@
 /*
     CrystalSpace 3D renderer view
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -31,6 +31,7 @@ class csEngine;
 class csSector;
 class csClipper;
 struct iGraphics3D;
+struct iCamera;
 
 /**
  * The csView class encapsulates the top-level Crystal Space
@@ -53,6 +54,8 @@ private:
 
   // csCamera.
   csCamera *camera;
+  // iCamera.
+  iCamera* icamera;
   // Engine handle.
   csEngine *engine;
 
@@ -72,7 +75,7 @@ public:
   /// Get current camera.
   csCamera* GetCamera () { return camera; }
   /// Set current camera.
-  void SetCamera (csCamera* c) { camera = c; }
+  void SetCamera (csCamera* c);
 
   /// Clear clipping polygon.
   virtual void ClearView ();
@@ -104,7 +107,10 @@ public:
   {
     DECLARE_EMBEDDED_IBASE (csView);
     virtual void SetSector (iSector* sector);
-    virtual iCamera* GetCamera ();
+    virtual iCamera* GetCamera ()
+    {
+      return scfParent->icamera;
+    }
     virtual void SetCamera (iCamera* c);
     virtual void ClearView ()
     {

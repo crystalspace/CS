@@ -103,11 +103,11 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
   // Initialize the 2D/3D culler. We only traverse through portals
   // after the culler has been used in the previous sector so this is
   // safe to do here.
-  if (rview.engine->GetEngineMode () == CS_ENGINE_FRONT2BACK)
+  if (rview.GetEngine ()->GetEngineMode () == CS_ENGINE_FRONT2BACK)
   {
-    csCBuffer* c_buffer = rview.engine->GetCBuffer ();
-    csCoverageMaskTree* covtree = rview.engine->GetCovtree ();
-    csQuadTree3D* quad3d = rview.engine->GetQuad3D ();
+    csCBuffer* c_buffer = rview.GetEngine ()->GetCBuffer ();
+    csCoverageMaskTree* covtree = rview.GetEngine ()->GetCovtree ();
+    csQuadTree3D* quad3d = rview.GetEngine ()->GetQuad3D ();
     if (c_buffer)
     {
       c_buffer->Initialize ();
@@ -118,11 +118,11 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
       csVector3 corners[4];
       rview.InvPerspective (csVector2 (0, 0), 1, corners[0]);
       corners[0] = rview.Camera2World (corners[0]);
-      rview.InvPerspective (csVector2 (rview.engine->frame_width-1, 0), 1, corners[1]);
+      rview.InvPerspective (csVector2 (rview.GetEngine ()->frame_width-1, 0), 1, corners[1]);
       corners[1] = rview.Camera2World (corners[1]);
-      rview.InvPerspective (csVector2 (rview.engine->frame_width-1, rview.engine->frame_height-1), 1, corners[2]);
+      rview.InvPerspective (csVector2 (rview.GetEngine ()->frame_width-1, rview.GetEngine ()->frame_height-1), 1, corners[2]);
       corners[2] = rview.Camera2World (corners[2]);
-      rview.InvPerspective (csVector2 (0, rview.engine->frame_height-1), 1, corners[3]);
+      rview.InvPerspective (csVector2 (0, rview.GetEngine ()->frame_height-1), 1, corners[3]);
       corners[3] = rview.Camera2World (corners[3]);
       quad3d->SetMainFrustum (rview.GetOrigin (), corners);
       quad3d->MakeEmpty ();
@@ -144,13 +144,13 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
   csPolygonClipper new_view (new_clipper, rview.IsMirrored (), true);
 
   csRenderView new_rview = rview;
-  new_rview.view = &new_view;
-  new_rview.added_fog_info = false;
-  new_rview.portal_polygon = portal_polygon;
-  new_rview.previous_sector = rview.this_sector;
-  new_rview.clip_plane = portal_polygon->GetPlane ()->GetCameraPlane();
-  new_rview.clip_plane.Invert ();
-  if (flags.Check (CS_PORTAL_CLIPDEST)) new_rview.do_clip_plane = true;
+  new_rview.SetView (&new_view);
+  new_rview.ResetFogInfo ();
+  new_rview.SetPortalPolygon (portal_polygon);
+  new_rview.SetPreviousSector (rview.GetThisSector ());
+  new_rview.SetClipPlane (portal_polygon->GetPlane ()->GetCameraPlane());
+  new_rview.GetClipPlane ().Invert ();
+  if (flags.Check (CS_PORTAL_CLIPDEST)) new_rview.UseClipPlane (true);
 
   csTranCookie old_cookie = 0;
   if (flags.Check (CS_PORTAL_WARP))

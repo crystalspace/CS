@@ -111,6 +111,8 @@ public:
   virtual bool WantToDie () { return false; }
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () { return false; }
+  virtual bool HitBeamObject (const csVector3&, const csVector3&,
+  	csVector3&, float*) { return false; }
 
   //------------------------- iSprite2DState implementation ----------------
   class Sprite2DState : public iSprite2DState

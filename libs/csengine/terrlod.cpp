@@ -458,10 +458,10 @@ void csLODTerrain::Draw (csRenderView& rview, bool use_z_buf)
 {
 
 // HELP again ....
-    rview.g3d->SetObjectToCamera (&rview);
-    rview.g3d->SetClipper (rview.view->GetClipPoly (), rview.view->GetNumVertices ());
-    rview.g3d->SetPerspectiveAspect (rview.GetFOV ());
-    rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
+    rview.GetG3D ()->SetObjectToCamera (&rview);
+    rview.GetG3D ()->SetClipper (rview.GetView ()->GetClipPoly (), rview.GetView ()->GetNumVertices ());
+    rview.GetG3D ()->SetPerspectiveAspect (rview.GetFOV ());
+    rview.GetG3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
 			       use_z_buf ? CS_ZBUF_USE : CS_ZBUF_FILL);
 
     position = rview.GetOrigin();
@@ -502,10 +502,10 @@ void csLODTerrain::Draw (csRenderView& rview, bool use_z_buf)
     material->Visit ();
     g3dmesh->mat_handle[0] = material->GetMaterialHandle();
 
-    if (rview.callback)
-        rview.callback (&rview, CALLBACK_MESH, g3dmesh);
+    if (rview.GetCallback ())
+        rview.CallCallback (CALLBACK_MESH, (void*)g3dmesh);
     else
-	rview.g3d->DrawTriangleMesh (*g3dmesh);
+	rview.GetG3D ()->DrawTriangleMesh (*g3dmesh);
 
 }
 

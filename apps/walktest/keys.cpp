@@ -760,12 +760,10 @@ csMeshWrapper *FindNextClosestMesh (csMeshWrapper *baseMesh,
     closestZLocation = 32000;
   }
 
-  // @@@ This routine ignores 2D sprites for the moment.
-  for (meshIndex = 0; meshIndex < Sys->engine->sprites.Length(); meshIndex++)
+  // @@@ This routine ignores 2D meshes for the moment.
+  for (meshIndex = 0; meshIndex < Sys->engine->meshes.Length(); meshIndex++)
   {
-    csSprite* sp = (csSprite*)Sys->engine->sprites[meshIndex];
-    if (sp->GetType () != csMeshWrapper::Type) continue;
-    nextMesh = (csMeshWrapper*)sp;
+    nextMesh = (csMeshWrapper*)Sys->engine->meshes[meshIndex];
 
     if (nextMesh != baseMesh)
     {

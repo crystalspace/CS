@@ -24,7 +24,6 @@
 #include "csengine/sector.h"
 #include "csengine/thing.h"
 #include "csengine/lghtmap.h"
-#include "csengine/cssprite.h"
 #include "csengine/engine.h"
 #include "csengine/lppool.h"
 #include "csengine/polygon.h"

@@ -381,7 +381,7 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
   bool debug = false;
   bool mirror = rview->IsMirrored ();
 
-  rview->g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
+  rview->GetG3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
     use_z_buf ? CS_ZBUF_USE : CS_ZBUF_FILL);
 
   if (poly->GetTextureType () != POLYTXT_LIGHTMAP)
@@ -479,11 +479,11 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
     }
     PreparePolygonFX (&g3dpolyfx, vertices, num_vertices,
       orig_triangle, po_colors != NULL);
-    rview->g3d->StartPolygonFX (g3dpolyfx.mat_handle,
+    rview->GetG3D ()->StartPolygonFX (g3dpolyfx.mat_handle,
       ns->GetMixmode () | (po_colors ? CS_FX_GOURAUD : 0));
     rview->CalculateFogPolygon (g3dpolyfx);
-    rview->g3d->DrawPolygonFX (g3dpolyfx);
-    rview->g3d->FinishPolygonFX ();
+    rview->GetG3D ()->DrawPolygonFX (g3dpolyfx);
+    rview->GetG3D ()->FinishPolygonFX ();
   }
   else
   {
@@ -514,7 +514,7 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
 #ifdef DO_HW_UVZ
 #if 0
     g3dpoly.mirror          = mirror;
-    if (poly->isClipped || rview->view->LastClipResult () == CS_CLIP_INSIDE)
+    if (poly->isClipped || rview->GetView ()->LastClipResult () == CS_CLIP_INSIDE)
        g3dpoly.uvz = NULL;
     else
     {
@@ -546,11 +546,11 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
     g3dpoly.normal.D () = Dc;
 
     if (debug)
-      rview->g3d->DrawPolygonDebug (g3dpoly);
+      rview->GetG3D ()->DrawPolygonDebug (g3dpoly);
     else
     {
       rview->CalculateFogPolygon (g3dpoly);
-      rview->g3d->DrawPolygon (g3dpoly);
+      rview->GetG3D ()->DrawPolygon (g3dpoly);
     }
     
 #ifdef DO_HW_UVZ
@@ -563,7 +563,7 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
 void csPolygon2D::FillZBuf (csRenderView* rview, csPolygon3D* poly,
   csPolyPlane* plane)
 {
-  rview->g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_FILLONLY);
+  rview->GetG3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_FILLONLY);
 
   static G3DPolygonDP g3dpoly;
   g3dpoly.num = num_vertices;
@@ -593,7 +593,7 @@ void csPolygon2D::FillZBuf (csRenderView* rview, csPolygon3D* poly,
   g3dpoly.normal.C () = Cc;
   g3dpoly.normal.D () = Dc;
 
-  rview->g3d->DrawPolygon (g3dpoly);
+  rview->GetG3D ()->DrawPolygon (g3dpoly);
 }
 
 void csPolygon2D::AddFogPolygon (iGraphics3D* g3d, csPolygon3D* /*poly*/,

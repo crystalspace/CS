@@ -62,6 +62,7 @@
 #include "ivfs.h"
 #include "imotion.h"
 #include "iperstat.h"
+#include "imspr3d.h"
 
 extern WalkTest* Sys;
 
@@ -283,7 +284,7 @@ bool LoadCamera (iVFS* vfs, const char *fName)
   return true;
 }
 
-void move_sprite (csSprite* sprite, csSector* where, csVector3 const& pos)
+void move_mesh (csMeshWrapper* sprite, csSector* where, csVector3 const& pos)
 {
   sprite->GetMovable ().SetPosition (pos);
   sprite->GetMovable ().SetSector (where);
@@ -318,6 +319,7 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
   // Add this sprite template to the engine.
   iSprite3DFactoryState* fstate = QUERY_INTERFACE (result, iSprite3DFactoryState);
   fstate->SetMaterialWrapper (Sys->engine->FindMaterial (txtname));
+  fstate->DecRef ();
 
   csMeshFactoryWrapper* meshwrap = new csMeshFactoryWrapper (result);
   meshwrap->SetName (templatename);
@@ -333,8 +335,10 @@ iMeshWrapper* add_meshobj (char* tname, char* sname, csSector* where,
     Sys->Printf (MSG_CONSOLE, "Unknown mesh factory '%s'!\n", tname);
     return NULL;
   }
+  iSector* isector = QUERY_INTERFACE (where, iSector);
   iMeshWrapper* spr = Sys->engine->CreateMeshObject (tmpl, sname,
-  	QUERY_INTERFACE (where, iSector), pos);
+  	isector, pos);
+  isector->DecRef ();
   csMatrix3 m; m.Identity (); m = m * size;
   spr->GetMovable ()->SetTransform (m);
   spr->GetMovable ()->UpdateMove ();
@@ -348,13 +352,13 @@ void list_meshes (void)
 {
   int num_meshes;
   const char* mesh_name;
-  csSprite* mesh;
+  csMeshWrapper* mesh;
 
-  num_meshes = Sys->engine->sprites.Length();
+  num_meshes = Sys->engine->meshes.Length();
 
   for(int i = 0; i < num_meshes; i++)
   {
-    mesh = (csSprite*) Sys->engine->sprites[i];
+    mesh = (csMeshWrapper*) Sys->engine->meshes[i];
     mesh_name = mesh->GetName();
 
     if (mesh_name)
@@ -363,7 +367,7 @@ void list_meshes (void)
       Sys->Printf (MSG_CONSOLE, "A mesh with no name.\n");
   }
   Sys->Printf (MSG_CONSOLE, "There are:%d meshes\n",
-	       Sys->engine->sprites.Length());
+	       Sys->engine->meshes.Length());
 }
 
 //===========================================================================
@@ -395,6 +399,7 @@ void SetConfigOption (iBase* plugin, const char* optName, const char* optValue)
 	return;
       }
     }
+    config->DecRef ();
   }
 }
 
@@ -412,8 +417,10 @@ void SetConfigOption (iBase* plugin, const char* optName, csVariant& optValue)
       if (!config->GetOptionDescription (i, &odesc)) break;
       if (strcmp (odesc.name, optName) == 0)
 	config->SetOption (i, &optValue);
+	config->DecRef ();
 	return;
     }
+    config->DecRef ();
   }
 }
 
@@ -432,9 +439,11 @@ bool GetConfigOption (iBase* plugin, const char* optName, csVariant& optValue)
       if (strcmp (odesc.name, optName) == 0)
       {
 	config->GetOption (i, &optValue);
+	config->DecRef ();
 	return true;
       }
     }
+    config->DecRef ();
   }
   return false;
 }
@@ -532,7 +541,7 @@ void WalkTest::ParseKeyCmds (csObject* src)
     int k;
     for (k = 0 ; k < mesh->GetChildren ().Length () ; k++)
     {
-      csSprite* spr = (csSprite*)(mesh->GetChildren ()[k]);
+      csMeshWrapper* spr = (csMeshWrapper*)(mesh->GetChildren ()[k]);
       ParseKeyCmds (spr);
     }
   }
@@ -552,9 +561,9 @@ void WalkTest::ParseKeyCmds ()
       csThing* thing = (csThing*)(sector->things[j]);
       ParseKeyCmds (thing);
     }
-    for (j = 0 ; j < sector->sprites.Length () ; j++)
+    for (j = 0 ; j < sector->meshes.Length () ; j++)
     {
-      csSprite* sprite = (csSprite*)(sector->sprites[j]);
+      csMeshWrapper* sprite = (csMeshWrapper*)(sector->meshes[j]);
       ParseKeyCmds (sprite);
     }
   }
@@ -631,7 +640,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  fclear hi frustum zbuf debug0 debug1 debug2 edges palette\n");
     CONPRI("  db_boxshow db_boxcam1 db_boxcam2 db_boxsize1 db_boxsize2\n");
     CONPRI("  db_boxnode1 db_boxnode2 db_boxvis db_radstep db_radhi db_radtodo\n");
-    CONPRI("Sprites:\n");
+    CONPRI("Meshes:\n");
     CONPRI("  loadmesh addmesh delmesh listmeshes\n");
     CONPRI("  listactions setaction setmotion\n");
     CONPRI("Various:\n");
@@ -660,6 +669,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       iBase* plugin = Sys->GetPlugIn (i);
       iFactory* fact = QUERY_INTERFACE (plugin, iFactory);
       CsPrintf (MSG_CONSOLE, "%d: %s\n", i, fact->QueryDescription ());
+      fact->DecRef ();
     }
   }
   else if (!strcasecmp (cmd, "conflist"))
@@ -704,6 +714,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 		       break;
 	    }
           }
+	  config->DecRef ();
 	}
       }
     }
@@ -1001,7 +1012,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       printf ("1\n");
       Dumper::dump_stubs (otree);
     }
-    csSprite* spr = (csSprite*)Sys->engine->sprites[0];
+    csMeshWrapper* spr = (csMeshWrapper*)Sys->engine->meshes[0];
     if (spr)
     {
       Dumper::dump_stubs (spr->GetPolyTreeObject ());
@@ -1183,11 +1194,11 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       csOctree* octree = (csOctree*)(c->GetSector ()->GetStaticTree ());
       Dumper::dump_stubs (octree);
-      csNamedObjVector& sprites = Sys->view->GetEngine ()->sprites;
+      csNamedObjVector& meshes = Sys->view->GetEngine ()->meshes;
       int i;
-      for (i = 0 ; i < sprites.Length () ; i++)
+      for (i = 0 ; i < meshes.Length () ; i++)
       {
-        csSprite* spr = (csSprite*)sprites[i];
+        csMeshWrapper* spr = (csMeshWrapper*)meshes[i];
 	Dumper::dump_stubs (spr->GetPolyTreeObject ());
       }
     }
@@ -1468,9 +1479,9 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg)
     {
       ScanStr (arg, "%s", name);
-      csObject* obj = Sys->view->GetEngine ()->sprites.FindByName (name);
+      csObject* obj = Sys->view->GetEngine ()->meshes.FindByName (name);
       if (obj)
-        Sys->view->GetEngine ()->RemoveSprite ((csSprite*)obj);
+        Sys->view->GetEngine ()->RemoveMesh ((csMeshWrapper*)obj);
       else
         CsPrintf (MSG_CONSOLE, "Can't find mesh with that name!\n");
     }
@@ -1489,13 +1500,13 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg) cnt = ScanStr (arg, "%s,%s", name, action);
     if(cnt != 1)
     {
-      Sys->Printf (MSG_CONSOLE, "Expected parameters 'spritename'!\n");
-      Sys->Printf (MSG_CONSOLE, "To get the names use 'listsprites'\n");
+      Sys->Printf (MSG_CONSOLE, "Expected parameters 'meshname'!\n");
+      Sys->Printf (MSG_CONSOLE, "To get the names use 'listmeshes'\n");
     }
     else
     {
-      // See if the sprite exists.
-      csSprite* aspr = (csSprite *) Sys->engine->sprites.FindByName(name);
+      // See if the mesh exists.
+      csMeshWrapper* aspr = (csMeshWrapper *) Sys->engine->meshes.FindByName(name);
       if (aspr && aspr->GetType () >= csMeshWrapper::Type)
       {
         csMeshWrapper* wrap = (csMeshWrapper*)aspr;
@@ -1505,16 +1516,17 @@ bool CommandHandler (const char *cmd, const char *arg)
 	iSpriteAction* aspr_act;
 	int i;
 
-	for (i = 0; i < (fstate->GetNumActions()); i ++)
+	for (i = 0; i < (fstate->GetNumActions ()); i ++)
 	{
-	  aspr_act = fstate->GetAction(i);
-	  Sys->Printf (MSG_CONSOLE, "%s\n", aspr_act->GetName());
+	  aspr_act = fstate->GetAction (i);
+	  Sys->Printf (MSG_CONSOLE, "%s\n", aspr_act->GetName ());
 	}
+	fstate->DecRef ();
       }
       else
       {
-        Sys->Printf (MSG_CONSOLE, "Expected parameters 'spritename'!\n");
-        Sys->Printf (MSG_CONSOLE, "To get the names use 'listsprites'\n");
+        Sys->Printf (MSG_CONSOLE, "Expected parameters 'meshname'!\n");
+        Sys->Printf (MSG_CONSOLE, "To get the names use 'listmeshes'\n");
       }
     }
   }
@@ -1526,32 +1538,32 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg) cnt = ScanStr (arg, "%s,%s", name, action);
     if(cnt != 2)
     {
-      Sys->Printf (MSG_CONSOLE, "Expected parameters 'spritename,action'!\n");
-      Sys->Printf (MSG_CONSOLE, "To get the names use 'listsprites'\n");
+      Sys->Printf (MSG_CONSOLE, "Expected parameters 'meshname,action'!\n");
+      Sys->Printf (MSG_CONSOLE, "To get the names use 'listmeshes'\n");
     }
     else
     {
-      // Test to see if the sprite exists.
-      csSprite* aspr = (csSprite *) Sys->engine->sprites.FindByName(name);
-      if (aspr && aspr->GetType () >= csMeshWrapper::Type)
-      {
-        csMeshWrapper* wrap = (csMeshWrapper*)aspr;
-	iSprite3DState* state = QUERY_INTERFACE (wrap->GetMeshObject (), iSprite3DState);
-        // Test to see if the action exists for that sprite.
-        if(!state->SetAction(action))
-	{
-          Sys->Printf (MSG_CONSOLE,
-		       "Expected parameters 'spritename,action'!\n");
-	  Sys->Printf (MSG_CONSOLE,
-		 "That sprite does not have that action.\n");
-	}
-      }
+      // Test to see if the mesh exists.
+      csMeshWrapper* wrap = (csMeshWrapper *) Sys->engine->meshes.FindByName(name);
+      if (!wrap)
+        Sys->Printf (MSG_CONSOLE, "No such mesh!\n");
       else
       {
-        Sys->Printf (MSG_CONSOLE,
-		     "Expected parameters 'spritename,action'!\n");
-	Sys->Printf (MSG_CONSOLE,
-		 "That sprite does not exist, use the listsprites command.\n");
+        iSprite3DState* state = QUERY_INTERFACE (wrap->GetMeshObject (), iSprite3DState);
+        if (state)
+        {
+          // Test to see if the action exists for that sprite.
+          if (!state->SetAction (action))
+	  {
+            Sys->Printf (MSG_CONSOLE,
+		         "Expected parameters 'meshname,action'!\n");
+	    Sys->Printf (MSG_CONSOLE,
+		   "That mesh does not have that action.\n");
+	  }
+	  state->DecRef ();
+        }
+        else
+          Sys->Printf (MSG_CONSOLE, "Mesh is not a 3D sprite!");
       }
     }
   }
@@ -1563,37 +1575,40 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg) cnt = ScanStr (arg, "%s,%s", name, motion);
     if(cnt != 2)
     {
-      Sys->Printf (MSG_CONSOLE, "Expected parameters 'spritename,motion'!\n");
-      Sys->Printf (MSG_CONSOLE, "To get the names use 'listsprites'\n");
+      Sys->Printf (MSG_CONSOLE, "Expected parameters 'meshname,motion'!\n");
+      Sys->Printf (MSG_CONSOLE, "To get the names use 'listmeshes'\n");
     }
     else
     {
-      // Test to see if the sprite exists.
-      csSprite* aspr = (csSprite*) Sys->engine->sprites.FindByName (name);
-      if (aspr && aspr->GetType () >= csMeshWrapper::Type)
-      {
-        csMeshWrapper* wrap = (csMeshWrapper*)aspr;
-	iSprite3DState* state = QUERY_INTERFACE (wrap->GetMeshObject (), iSprite3DState);
-	iSkeletonBone *sb=QUERY_INTERFACE(state->GetSkeletonState(), iSkeletonBone);
-	if (sb)
-	{
-	  if (System->MotionMan)
-	  {
-	    if (!System->MotionMan->ApplyMotion(sb, motion))
-	      Sys->Printf (MSG_CONSOLE, "That motion does not exist!\n");
-	  }
-	  else
-	    Sys->Printf (MSG_CONSOLE, "No motion manager exists to animate the skeleton!\n");
-	}
-	else
-	  Sys->Printf (MSG_CONSOLE, "That sprite does not contain a skeleton!\n");
-      }
+      // Test to see if the mesh exists.
+      csMeshWrapper* wrap = (csMeshWrapper*) Sys->engine->meshes.FindByName (name);
+      if (!wrap)
+        Sys->Printf (MSG_CONSOLE, "No such mesh!\n");
       else
       {
-        Sys->Printf (MSG_CONSOLE,
-		     "Expected parameters 'spritename,motion'!\n");
-	Sys->Printf (MSG_CONSOLE,
-		 "That sprite does not exist, use the listsprites command.\n");
+	iSprite3DState* state = QUERY_INTERFACE (wrap->GetMeshObject (), iSprite3DState);
+        if (state)
+        {
+	  iSkeletonBone *sb=QUERY_INTERFACE(state->GetSkeletonState(), iSkeletonBone);
+	  if (sb)
+	  {
+	    if (System->MotionMan)
+	    {
+	      if (!System->MotionMan->ApplyMotion(sb, motion))
+	        Sys->Printf (MSG_CONSOLE, "That motion does not exist!\n");
+	    }
+	    else
+	      Sys->Printf (MSG_CONSOLE, "No motion manager exists to animate the skeleton!\n");
+	    sb->DecRef ();
+	  }
+	  else
+	    Sys->Printf (MSG_CONSOLE, "That sprite does not contain a skeleton!\n");
+	  state->DecRef ();
+        }
+	else
+	{
+          Sys->Printf (MSG_CONSOLE, "Mesh is not a 3D sprite!\n");
+	}
       }
     }
   }

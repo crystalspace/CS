@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -21,8 +21,9 @@
 
 #include "csobject/pobject.h"
 #include "csobject/nobjvec.h"
-#include "csengine/cssprite.h"
 #include "csengine/movable.h"
+#include "csengine/tranman.h"
+#include "csengine/bspbbox.h"
 #include "imeshobj.h"
 
 struct iMeshWrapper;
@@ -32,13 +33,63 @@ class csMeshWrapper;
 class csRenderView;
 class csCamera;
 class csMeshFactoryWrapper;
+class csPolyTreeObject;
+class csLight;
 
 /**
  * The holder class for all implementations of iMeshObject.
  */
-class csMeshWrapper : public csSprite
+class csMeshWrapper : public csPObject
 {
   friend class Dumper;
+  friend class csMovable;
+
+protected:
+  /// Points to Actor class which "owns" this object.
+  csObject* myOwner;
+
+  /**
+   * Points to the parent container object of this object.
+   * This is usually csEngine or csParticleSystem.
+   */
+  csObject* parent;
+
+  /**
+   * Camera space bounding box is cached here.
+   * GetCameraBoundingBox() will check the current cookie from the
+   * transformation manager to see if it needs to recalculate this.
+   */
+  csBox3 camera_bbox;
+
+  /// Current cookie for camera_bbox.
+  csTranCookie camera_cookie;
+
+  /// Defered lighting. If > 0 then we have defered lighting.
+  int defered_num_lights;
+
+  /// Flags to use for defered lighting.
+  int defered_lighting_flags;
+
+  /**
+   * Flag which is set to true when the object is visible.
+   * This is used by the c-buffer/bsp routines. The object itself
+   * will not use this flag in any way at all. It is simply intended
+   * for external visibility culling routines.
+   */
+  bool is_visible;
+
+  /**
+   * Position in the world.
+   */
+  csMovable movable;
+
+  /**
+   * Pointer to the object to place in the polygon tree.
+   */
+  csPolyTreeObject* ptree_obj;
+
+  /// Update defered lighting.
+  void UpdateDeferedLighting (const csVector3& pos);
 
 private:
   /// Bounding box for polygon trees.
@@ -60,11 +111,24 @@ private:
 
 protected:
   /**
-   * Update this sprite in the polygon trees.
+   * Update this object in the polygon trees.
    */
-  virtual void UpdateInPolygonTrees ();
-  /// Update movement.
-  virtual void UpdateMove ();
+  void UpdateInPolygonTrees ();
+
+  /// Move this object to the specified sector. Can be called multiple times.
+  void MoveToSector (csSector* s);
+
+  /// Remove this object from all sectors it is in (but not from the engine).
+  void RemoveFromSectors ();
+
+  /**
+   * Update transformations after the object has moved
+   * (through updating the movable instance).
+   * This MUST be done after you change the movable otherwise
+   * some of the internal data structures will not be updated
+   * correctly. This function is called by movable.UpdateMove();
+   */
+  void UpdateMove ();
 
 public:
   /// Constructor.
@@ -73,6 +137,16 @@ public:
   csMeshWrapper (csObject* theParent);
   /// Destructor.
   virtual ~csMeshWrapper ();
+
+  /// Set owner (actor) for this object.
+  void SetMyOwner (csObject* newOwner) { myOwner = newOwner; }
+  /// Get owner (actor) for this object.
+  csObject* GetMyOwner () { return myOwner; }
+
+  /// Set parent container for this object.
+  void SetParentContainer (csObject* newParent) { parent = newParent; }
+  /// Get parent container for this object.
+  csObject* GetParentContainer () { return parent; }
 
   /// Set the mesh factory.
   void SetFactory (csMeshFactoryWrapper* factory)
@@ -89,6 +163,12 @@ public:
   void SetMeshObject (iMeshObject* mesh);
   /// Get the mesh object.
   iMeshObject* GetMeshObject () const {return mesh;}
+
+  /// Get the pointer to the object to place in the polygon tree.
+  csPolyTreeObject* GetPolyTreeObject ()
+  {
+    return ptree_obj;
+  }
 
   /**
    * Set a callback which is called just before the object is drawn.
@@ -111,38 +191,69 @@ public:
   }
 
   /**
-   * Light object according to the given array of lights (i.e.
-   * fill the vertex color array).
-   */
-  virtual void UpdateLighting (csLight** lights, int num_lights);
-
-  /**
    * Do some initialization needed for visibility testing.
    * i.e. clear camera transformation.
    */
-  virtual void VisTestReset ()
+  void VisTestReset ()
   {
     bbox.ClearTransform ();
   }
+
+  /// Mark this object as visible.
+  void MarkVisible () { is_visible = true; }
+
+  /// Mark this object as invisible.
+  void MarkInvisible () { is_visible = false; }
+
+  /// Return if this object is visible.
+  bool IsVisible () { return is_visible; }
+
+  /**
+   * Light object according to the given array of lights (i.e.
+   * fill the vertex color array).
+   */
+  void UpdateLighting (csLight** lights, int num_lights);
+
+  /**
+   * Update lighting as soon as the object becomes visible.
+   * This will call engine->GetNearestLights with the supplied
+   * parameters.
+   */
+  void DeferUpdateLighting (int flags, int num_lights);
 
   /**
    * Draw this mesh object given a camera transformation.
    * If needed the skeleton state will first be updated.
    * Optionally update lighting if needed (DeferUpdateLighting()).
    */
-  virtual void Draw (csRenderView& rview);
+  void Draw (csRenderView& rview);
 
   /// Go the next animation frame.
-  virtual void NextFrame (cs_time current_time);
+  void NextFrame (cs_time current_time);
 
   /// Returns true if this object wants to die.
-  virtual bool WantToDie () { return mesh->WantToDie (); }
+  bool WantToDie () { return mesh->WantToDie (); }
 
   /**
-   * Check if this sprite is hit by this object space vector.
+   * Get the movable instance for this object.
+   * It is very important to call GetMovable().UpdateMove()
+   * after doing any kind of modification to this movable
+   * to make sure that internal data structures are
+   * correctly updated.
+   */
+  csMovable& GetMovable () { return movable; }
+
+  /**
+   * Check if this object is hit by this object space vector.
    * Return the collision point in object space coordinates.
    */
-  virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
+  bool HitBeamObject (const csVector3& start, const csVector3& end,
+  	csVector3& isect, float* pr);
+  /**
+   * Check if this object is hit by this world space vector.
+   * Return the collision point in world space coordinates.
+   */
+  bool HitBeam (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr);
 
   /// Get the children of this mesh object.
@@ -176,8 +287,20 @@ public:
    */
   float GetScreenBoundingBox (const csCamera& camera, csBox2& sbox, csBox3& cbox);
 
+  /**
+   * Rotate object in some manner in radians.
+   * This function operates by rotating the movable transform.
+   */
+  void Rotate (float angle);
+
+  /**
+   * Scale object by this factor.
+   * This function operates by scaling the movable transform.
+   */
+  void ScaleBy (float factor);
+
   CSOBJTYPE;
-  DECLARE_IBASE_EXT (csSprite);
+  DECLARE_IBASE_EXT (csPObject);
 
   //--------------------- iMeshWrapper implementation --------------------//
   struct MeshWrapper : public iMeshWrapper

@@ -129,6 +129,7 @@ void WalkTest::CreateColliders ()
   mesh = QUERY_INTERFACE (plbody, iPolygonMesh);
   body = new csCollider (*plbody, collide_system, mesh);
   body_radius = plbody->GetRadius ();
+  mesh->DecRef ();
 
   pllegs = new csPolygonSet (engine);
 
@@ -175,6 +176,7 @@ void WalkTest::CreateColliders ()
   mesh = QUERY_INTERFACE (pllegs, iPolygonMesh);
   legs = new csCollider (*pllegs, collide_system, mesh);
   legs_radius = pllegs->GetRadius ();
+  mesh->DecRef ();
 
   if (!body || !legs)
     do_cd = false;

@@ -369,7 +369,7 @@ void WalkTest::MoveSystems (cs_time elapsed_time, cs_time current_time)
     wentity->NextFrame (elapsed_time);
   }
 
-  // Move all particle systems and sprites.
+  // Move all particle systems and meshes.
   Sys->engine->NextFrame (current_time);
 
   // Record the first time this routine is called.
@@ -616,7 +616,7 @@ void WalkTest::DrawFrame3D (int drawflags, cs_time /*current_time*/)
     if (dyn->GetChild (csDataObject::Type)) HandleDynLight (dyn);
     dyn = dn;
   }
-  // Apply lighting to all sprites
+  // Apply lighting to all meshes
   light_statics ();
 
   //------------
@@ -1049,6 +1049,7 @@ void WalkTest::InitCollDet (csEngine* engine, csRegion* region)
     // Initialize the sector itself.
     mesh = QUERY_INTERFACE (sp, iPolygonMesh);
     (void)new csCollider (*sp, collide_system, mesh);
+    mesh->DecRef ();
     // Initialize the things in this sector.
     int i;
     for (i = 0 ; i < sp->things.Length () ; i++)
@@ -1056,17 +1057,21 @@ void WalkTest::InitCollDet (csEngine* engine, csRegion* region)
       csThing* tp = (csThing*)sp->things[i];
       mesh = QUERY_INTERFACE (tp, iPolygonMesh);
       (void)new csCollider (*tp, collide_system, mesh);
+      mesh->DecRef ();
     }
   }
   // Initialize all mesh objects for collision detection.
   int i;
-  for (i = 0 ; i < engine->sprites.Length () ; i++)
+  for (i = 0 ; i < engine->meshes.Length () ; i++)
   {
-    csSprite* sp = (csSprite*)engine->sprites[i];
+    csMeshWrapper* sp = (csMeshWrapper*)engine->meshes[i];
     if (region && !region->IsInRegion (sp)) continue;
     mesh = QUERY_INTERFACE (sp, iPolygonMesh);
     if (mesh)
+    {
       (void)new csCollider (*sp, collide_system, mesh);
+      mesh->DecRef ();
+    }
   }
 
   // Create a player object that follows the camera around.

@@ -26,7 +26,6 @@
 #include "csengine/campos.h"
 #include "csengine/sector.h"
 #include "csengine/thing.h"
-#include "csengine/cssprite.h"
 #include "csengine/meshobj.h"
 #include "csengine/polygon.h"
 #include "csengine/polytmap.h"
@@ -59,6 +58,7 @@
 #include "ildrplug.h"
 #include "iskel.h"
 #include "iskelbon.h"
+#include "imspr3d.h"
 
 typedef char ObName[30];
 /// The engine we are currently processing
@@ -79,7 +79,7 @@ public:
   static int things_loaded;
   static int lights_loaded;
   static int curves_loaded;
-  static int sprites_loaded;
+  static int meshes_loaded;
   static int sounds_loaded;
   static void Init()
   {
@@ -89,7 +89,7 @@ public:
     things_loaded   = 0;
     lights_loaded   = 0;
     curves_loaded   = 0;
-    sprites_loaded  = 0;
+    meshes_loaded  = 0;
     sounds_loaded   = 0;
   }
 };
@@ -100,7 +100,7 @@ int csLoaderStat::sectors_loaded  = 0;
 int csLoaderStat::things_loaded   = 0;
 int csLoaderStat::lights_loaded   = 0;
 int csLoaderStat::curves_loaded   = 0;
-int csLoaderStat::sprites_loaded  = 0;
+int csLoaderStat::meshes_loaded  = 0;
 int csLoaderStat::sounds_loaded   = 0;
 
 // Define all tokens used through this file
@@ -2761,7 +2761,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
           csMeshWrapper* sp = new csMeshWrapper (Engine);
           sp->SetName (name);
           LoadMeshObject (sp, params, sector);
-          Engine->sprites.Push (sp);
+          Engine->meshes.Push (sp);
           sp->GetMovable ().SetSector (sector);
 	  sp->GetMovable ().UpdateMove ();
         }
@@ -3137,7 +3137,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
           csMeshWrapper* sp = new csMeshWrapper (Engine);
           sp->SetName (name);
           LoadMeshObject (sp, params, sector);
-          Engine->sprites.Push (sp);
+          Engine->meshes.Push (sp);
           sp->GetMovable ().SetSector (sector);
 	  sp->GetMovable ().UpdateMove ();
         }
@@ -3782,8 +3782,8 @@ bool csLoader::AppendMapFile (csEngine* engine, const char* file,
     CsPrintf (MSG_INITIALIZATION, "Loaded map file:\n");
     CsPrintf (MSG_INITIALIZATION, "  %d polygons (%d portals),\n", csLoaderStat::polygons_loaded,
       csLoaderStat::portals_loaded);
-    CsPrintf (MSG_INITIALIZATION, "  %d sectors, %d things, %d sprites, \n", csLoaderStat::sectors_loaded,
-      csLoaderStat::things_loaded, csLoaderStat::sprites_loaded);
+    CsPrintf (MSG_INITIALIZATION, "  %d sectors, %d things, %d meshes, \n", csLoaderStat::sectors_loaded,
+      csLoaderStat::things_loaded, csLoaderStat::meshes_loaded);
     CsPrintf (MSG_INITIALIZATION, "  %d curves, %d lights, %d sounds.\n", csLoaderStat::curves_loaded,
       csLoaderStat::lights_loaded, csLoaderStat::sounds_loaded);
   } /* endif */
@@ -4048,97 +4048,6 @@ bool csLoader::LoadSounds (char* buf)
 
 //---------------------------------------------------------------------------
 
-bool csLoader::LoadSkeleton (iSkeletonLimb* limb, char* buf)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (LIMB)
-    CS_TOKEN_TABLE (VERTICES)
-    CS_TOKEN_TABLE (TRANSFORM)
-  CS_TOKEN_TABLE_END
-
-  CS_TOKEN_TABLE_START (tok_matvec)
-    CS_TOKEN_TABLE (MATRIX)
-    CS_TOKEN_TABLE (V)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  char* xname;
-
-  long cmd;
-  char* params;
-
-  iSkeletonConnection* con = QUERY_INTERFACE (limb, iSkeletonConnection);
-
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_LIMB:
-        {
-          iSkeletonConnection* newcon = limb->CreateConnection ();
-	  iSkeletonLimb* newlimb = QUERY_INTERFACE (newcon, iSkeletonLimb);
-	  if (name) newlimb->SetName (name);
-	  if (!LoadSkeleton (newlimb, params)) return false;
-	}
-        break;
-      case CS_TOKEN_TRANSFORM:
-        if (con)
-        {
-          char* params2;
-	  csMatrix3 m;
-	  csVector3 v (0, 0, 0);
-          while ((cmd = csGetObject (&params, tok_matvec, &xname, &params2)) > 0)
-          {
-    	    if (!params2)
-    	    {
-      	      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
-      	      fatal_exit (0, false);
-    	    }
-            switch (cmd)
-            {
-              case CS_TOKEN_MATRIX:
-                load_matrix (params2, m);
-		break;
-              case CS_TOKEN_V:
-                load_vector (params2, v);
-		break;
-            }
-          }
-	  csTransform tr (m, -m.GetInverse () * v);
-	  con->SetTransformation (tr);
-        }
-	else
-	{
-	  CsPrintf (MSG_FATAL_ERROR, "TRANSFORM not valid for this type of skeleton limb!\n");
-	  fatal_exit (0, false);
-	}
-	break;
-      case CS_TOKEN_VERTICES:
-        {
-          int list[1000], num;	//@@@ HARDCODED!!!
-          ScanStr (params, "%D", list, &num);
-          for (int i = 0 ; i < num ; i++) limb->AddVertex (list[i]);
-        }
-        break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the a sprite skeleton!\n",
-        csGetLastOffender ());
-    fatal_exit (0, false);
-  }
-
-  return true;
-}
-
-//---------------------------------------------------------------------------
-
 // @@@ MEMORY LEAK!!! We should unload all the plugins we load here.
 csVector csLoader::loaded_plugins;
 
@@ -4352,7 +4261,7 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
   char str[255];
   str[0] = 0;
 
-  csLoaderStat::sprites_loaded++;
+  csLoaderStat::meshes_loaded++;
   iLoaderPlugIn* plug = NULL;
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)

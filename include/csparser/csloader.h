@@ -127,9 +127,6 @@ class csLoader
   /// Parse a sector definition and return a new object
   static csSector* load_sector (char* secname, char* buf);
 
-  /// Load a skeleton part.
-  static bool LoadSkeleton (iSkeletonLimb*, char* buf);
-
   /// Load a Mesh Object Factory from the map file.
   static bool LoadMeshObjectFactory (csMeshFactoryWrapper* meshFact, char* buf);
 
@@ -169,7 +166,7 @@ class csLoader
 
   /**
    * Load a library into given engine.<p>
-   * A library is just a map file that contains just sprite templates,
+   * A library is just a map file that contains just mesh factories,
    * thing templates, sounds and textures.
    */
   static bool LoadLibrary (char* buf);
@@ -197,8 +194,8 @@ public:
    * Merge map file into engine (i.e. don't clear the current engine
    * contents first). If 'onlyRegion' is true then portals will only
    * connect to the sectors in the current region, things will only use
-   * thing templates defined in the current region and sprites will
-   * only use sprite templates defined in the current region.
+   * thing templates defined in the current region and meshes will
+   * only use mesh factories defined in the current region.
    */
   static bool AppendMapFile (csEngine*, const char* filename,
   	bool onlyRegion = true);

@@ -197,15 +197,6 @@ public:
    */
   virtual void Update (cs_time elapsed_time);
 
-  /**
-   * Check if this sprite is hit by this object space vector.
-   * Return the collision point in object space coordinates.
-   * @@@ TO BE IMPLEMENTED!
-   */
-  virtual bool HitBeamObject (const csVector3& /*start*/,
-    const csVector3& /*end*/, csVector3& /*isect*/, float* /*pr*/)
-    { return false; }
- 
   //------------------------ iMeshObject implementation ------------------------
   DECLARE_IBASE;
 
@@ -237,6 +228,8 @@ public:
     Update (elaps);
   }
   virtual bool WantToDie () { return to_delete; }
+  virtual bool HitBeamObject (const csVector3&, const csVector3&,
+  	csVector3&, float*) { return false; }
 
   //------------------------- iParticleState implementation ----------------
   class ParticleState : public iParticleState

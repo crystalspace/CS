@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,9 +20,10 @@
 #include "csengine/sector.h"
 #include "csengine/meshobj.h"
 #include "csengine/light.h"
+#include "csengine/engine.h"
 #include "igraph3d.h"
 
-IMPLEMENT_CSOBJTYPE (csMeshWrapper, csSprite)
+IMPLEMENT_CSOBJTYPE (csMeshWrapper, csPObject)
 
 IMPLEMENT_IBASE_EXT (csMeshWrapper)
   IMPLEMENTS_EMBEDDED_INTERFACE (iMeshWrapper)
@@ -33,9 +34,25 @@ IMPLEMENT_EMBEDDED_IBASE (csMeshWrapper::MeshWrapper)
 IMPLEMENT_EMBEDDED_IBASE_END
 
 csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
-	: csSprite (theParent), bbox (NULL)
+	: csPObject (), bbox (NULL)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiMeshWrapper);
+
+  movable.scfParent = this;
+  defered_num_lights = 0;
+  defered_lighting_flags = 0;
+  is_visible = false;
+  camera_cookie = 0;
+  myOwner = NULL;
+  parent = theParent;
+  movable.SetObject (this);
+  if (parent->GetType () >= csMeshWrapper::Type)
+  {
+    csMeshWrapper* sparent = (csMeshWrapper*)parent;
+    movable.SetParent (&sparent->GetMovable ());
+  }
+
+  csEngine::current_engine->AddToCurrentRegion (this);
   bbox.SetOwner (this);
   ptree_obj = &bbox;
   csMeshWrapper::mesh = mesh;
@@ -45,9 +62,25 @@ csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
 }
 
 csMeshWrapper::csMeshWrapper (csObject* theParent)
-	: csSprite (theParent), bbox (NULL)
+	: csPObject (), bbox (NULL)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiMeshWrapper);
+
+  movable.scfParent = this;
+  defered_num_lights = 0;
+  defered_lighting_flags = 0;
+  is_visible = false;
+  camera_cookie = 0;
+  myOwner = NULL;
+  parent = theParent;
+  movable.SetObject (this);
+  if (parent->GetType () >= csMeshWrapper::Type)
+  {
+    csMeshWrapper* sparent = (csMeshWrapper*)parent;
+    movable.SetParent (&sparent->GetMovable ());
+  }
+
+  csEngine::current_engine->AddToCurrentRegion (this);
   bbox.SetOwner (this);
   ptree_obj = &bbox;
   csMeshWrapper::mesh = NULL;
@@ -65,6 +98,11 @@ void csMeshWrapper::SetMeshObject (iMeshObject* mesh)
 csMeshWrapper::~csMeshWrapper ()
 {
   if (mesh) mesh->DecRef ();
+  if (parent->GetType () == csEngine::Type)
+  {
+    csEngine* engine = (csEngine*)parent;
+    engine->UnlinkMesh (this);
+  }
 }
 
 void csMeshWrapper::UpdateInPolygonTrees ()
@@ -96,7 +134,7 @@ void csMeshWrapper::UpdateInPolygonTrees ()
 
   bbox.Update (b, trans, this);
 
-  // Here we need to insert in trees where this sprite lives.
+  // Here we need to insert in trees where this mesh lives.
   for (i = 0 ; i < sects.Length () ; i++)
   {
     tree = ((csSector*)sects[i])->GetStaticTree ();
@@ -112,13 +150,64 @@ void csMeshWrapper::UpdateInPolygonTrees ()
 
 void csMeshWrapper::UpdateMove ()
 {
-  csSprite::UpdateMove ();
+  UpdateInPolygonTrees ();
   int i;
   for (i = 0 ; i < children.Length () ; i++)
   {
-    csSprite* spr = (csSprite*)children[i];
+    csMeshWrapper* spr = (csMeshWrapper*)children[i];
     spr->GetMovable ().UpdateMove ();
   }
+}
+
+void csMeshWrapper::MoveToSector (csSector* s)
+{
+  s->meshes.Push (this);
+}
+
+void csMeshWrapper::RemoveFromSectors ()
+{
+  if (GetPolyTreeObject ())
+    GetPolyTreeObject ()->RemoveFromTree ();
+  if (parent->GetType () != csEngine::Type) return;
+  int i;
+  csVector& sectors = movable.GetSectors ();
+  for (i = 0 ; i < sectors.Length () ; i++)
+  {
+    csSector* ss = (csSector*)sectors[i];
+    if (ss)
+    {
+      int idx = ss->meshes.Find (this);
+      if (idx >= 0)
+      {
+        ss->meshes[idx] = NULL;
+        ss->meshes.Delete (idx);
+      }
+    }
+  }
+}
+
+/// The list of lights that hit the mesh
+static DECLARE_GROWING_ARRAY_REF (light_worktable, csLight*);
+
+void csMeshWrapper::UpdateDeferedLighting (const csVector3& pos)
+{
+  if (defered_num_lights)
+  {
+    if (defered_num_lights > light_worktable.Limit ())
+      light_worktable.SetLimit (defered_num_lights);
+
+    csSector* sect = movable.GetSector (0);
+    int num_lights = csEngine::current_engine->GetNearbyLights (sect,
+      pos, defered_lighting_flags,
+      light_worktable.GetArray (), defered_num_lights);
+    UpdateLighting (light_worktable.GetArray (), num_lights);
+  }
+}
+
+void csMeshWrapper::DeferUpdateLighting (int flags, int num_lights)
+{
+  defered_num_lights = num_lights;
+  defered_lighting_flags = flags;
 }
 
 void csMeshWrapper::Draw (csRenderView& rview)
@@ -135,7 +224,7 @@ void csMeshWrapper::Draw (csRenderView& rview)
   int i;
   for (i = 0 ; i < children.Length () ; i++)
   {
-    csSprite* spr = (csSprite*)children[i];
+    csMeshWrapper* spr = (csMeshWrapper*)children[i];
     spr->Draw (rview);
   }
 }
@@ -146,7 +235,7 @@ void csMeshWrapper::NextFrame (cs_time current_time)
   int i;
   for (i = 0 ; i < children.Length () ; i++)
   {
-    csSprite* spr = (csSprite*)children[i];
+    csMeshWrapper* spr = (csMeshWrapper*)children[i];
     spr->NextFrame (current_time);
   }
 }
@@ -168,16 +257,48 @@ void csMeshWrapper::UpdateLighting (csLight** lights, int num_lights)
 
   for (i = 0 ; i < children.Length () ; i++)
   {
-    csSprite* spr = (csSprite*)children[i];
+    csMeshWrapper* spr = (csMeshWrapper*)children[i];
     spr->UpdateLighting (lights, num_lights);
   }
 }
 
 
-bool csMeshWrapper::HitBeamObject (const csVector3& /*start*/,
-  const csVector3& /*end*/, csVector3& /*isect*/, float* /*pr*/)
+bool csMeshWrapper::HitBeamObject (const csVector3& start,
+  const csVector3& end, csVector3& isect, float* pr)
 {
-  return false;
+  return mesh->HitBeamObject (start, end, isect, pr);
+}
+
+bool csMeshWrapper::HitBeam (const csVector3& start, const csVector3& end,
+	csVector3& isect, float* pr)
+{
+  const csReversibleTransform& trans = movable.GetTransform ();
+  csVector3 startObj = trans * start;
+  csVector3 endObj = trans * end;
+  bool rc = HitBeamObject (startObj, endObj, isect, pr);
+  if (rc)
+    isect = trans.This2Other (isect);
+  return rc;
+}
+
+void csMeshWrapper::ScaleBy (float factor)
+{
+  csMatrix3 trans = movable.GetTransform ().GetT2O ();
+  trans.m11 *= factor;
+  trans.m22 *= factor;
+  trans.m33 *= factor;
+  movable.SetTransform (trans);
+  UpdateMove ();
+}
+
+
+void csMeshWrapper::Rotate (float angle)
+{
+  csZRotMatrix3 rotz(angle);
+  movable.Transform (rotz);
+  csXRotMatrix3 rotx(angle);
+  movable.Transform (rotx);
+  UpdateMove ();
 }
 
 void csMeshWrapper::HardTransform (const csReversibleTransform& t)
@@ -186,10 +307,8 @@ void csMeshWrapper::HardTransform (const csReversibleTransform& t)
   int i;
   for (i = 0 ; i < children.Length () ; i++)
   {
-    csSprite* spr = (csSprite*)children[i];
-    // @@@ Change as soon as csMeshWrapper becomes csSprite.
-    if (spr->GetType () >= csMeshWrapper::Type)
-      ((csMeshWrapper*)spr)->HardTransform (t);
+    csMeshWrapper* spr = (csMeshWrapper*)children[i];
+    spr->HardTransform (t);
   }
 }
 
@@ -228,7 +347,7 @@ float csMeshWrapper::GetScreenBoundingBox (
   // Transform from camera to screen space.
   if (cbox.MinZ () <= 0)
   {
-    // Sprite is very close to camera.
+    // Mesh is very close to camera.
     // Just return a maximum bounding box.
     sbox.Set (-10000, -10000, 10000, 10000);
   }

@@ -127,7 +127,215 @@ to implement this method. Also, it was never used.
 @cindex csSprite2D
 @cindex Particle Systems
 
-@@@@@@TODO
+Particle systems, 2D sprites, and 3D sprites are now no longer in the
+engine. This means that classes like @code{csSprite3D}, @code{csSprite2D},
+@code{csParticleSystem}, ... are no longer accessible directly and now
+have to be accessed through the new mesh object plugin system.
+
+In the engine the two main classes are now @code{csMeshWrapper} and
+@code{csMeshFactoryWrapper}. @code{csMeshWrapper} replaces the original
+@code{csSprite} (superclass of all sprites). @code{csMeshFactoryWrapper}
+is roughly similar to what @code{csSpriteTemplate} used to do except
+that it is now also a parent for particle system and 2D sprite instances.
+
+The explanation below mainly tells you how to port the original @code{csSprite3D}
+code to the new system. The other stuff follows almost automatically from
+what you see below.
+
+Here is a list of things that are removed and which things
+you will have to use instead. More detailed info will come later:
+
+@itemize @bullet
+@item
+ @code{csSprite} -> @code{csMeshWrapper}
+@item
+ @code{csSprite2D} -> @code{csMeshWrapper}, @code{iSprite2DState}
+@item
+ @code{csSprite3D} -> @code{csMeshWrapper}, @code{iSprite3DState}
+@item
+ @code{csSpriteTemplate} -> @code{csMeshFactoryWrapper}, @code{iSprite3DFactoryState}
+@item
+ @code{csFrame} -> @code{iSpriteFrame}
+@item
+ @code{csSpriteAction} -> @code{iSpriteAction}
+@item
+ @code{csSkeleton} -> @code{iSkeleton}
+@item
+ @code{csSkeletonLimb} -> @code{iSkeletonLimb}
+@item
+ @code{csSkeletonConnection} -> @code{iSkeletonConnection}
+@item
+ @code{csSkeletonState} -> @code{iSkeletonState}
+@item
+ @code{csSkeletonLimbState} -> @code{iSkeletonLimbState}
+@item
+ @code{csSkeletonConnectionState} -> @code{iSkeletonConnectionState}
+@item
+ @code{iSprite} -> @code{iMeshWrapper}
+@item
+ @code{iSpriteTemplate} -> @code{iMeshFactoryWrapper}
+@item
+ @code{csLoade}::LoadSpriteTemplate()} -> use spr3dldr plugin to load factories
+@item
+ @code{csLoade}::LoadSprite()} -> use spr3dldr plugin to load sprites
+@item
+ @code{csEngine::sprites} -> @code{csEngine::meshes}
+@item
+ @code{csEngine::RemoveSprite} -> @code{csEngine::RemoveMesh}
+@item
+ @code{csEngine::UnlinkSprite} -> @code{csEngine::UnlinkMesh}
+@item
+ @code{csEngine::sprite_templates} -> @code{csEngine::meshobj_factories}
+@item
+ @code{csSector::sprites} -> @code{csSector::meshes}
+@end itemize
+
+In addition to that the @samp{SPRITE} keyworld in map files is also no longer
+supported. Instead you should use @samp{MESHOBJ}.
+
+First I recommend everyone who wants to port first to read the general
+documentation about the mesh object plugin system (@pxref{MeshObject}).
+Read this very carefully. A good understanding is required to do a
+succesful port.
+
+In addition to what is explained there are also two conveniance functions to
+create mesh factories and mesh objects:
+
+@example
+  /**
+   * Conveniance function to create a mesh factory from a given type.
+   * The type plugin will only be loaded if needed. 'classId' is the
+   * SCF name of the plugin (like 'crystalspace.mesh.object.cube').
+   * Returns NULL on failure. The factory will be registered with the engine
+   * under the given name. If there is already a factory with that name
+   * no new factory will be created but the found one is returned instead.
+   * If the name is NULL then no name will be set and no check will happen
+   * if the factory already exists.
+   */
+  virtual iMeshFactoryWrapper* CreateMeshFactory (const char* classId,
+        const char* name) = 0;
+
+  /**
+   * Conveniance function to create a mesh object for a given factory.
+   * If 'sector' is NULL then the mesh object will not be set to a position.
+   * Returns NULL on failure. The object will be given the specified name.
+   * 'name' can be NULL if no name is wanted. Different mesh objects can
+   * have the same name (in contrast with factory objects).
+   */
+  virtual iMeshWrapper* CreateMeshObject (iMeshFactoryWrapper* factory,
+        const char* name, iSector* sector, const csVector3& pos) = 0;
+@end example
+
+To see how to use them you can take a look at the simple application.
+
+Here are a few examples of old code compared to new code:
+
+@itemize @bullet
+@item
+Old Version:
+@example
+  // Load a sprite template from disk.
+  csSpriteTemplate* spritetmpl = csLoader::LoadSpriteTemplate (engine,
+   "/lib/std/sprite1");
+  // Add the sprite to the engine.
+  csSprite3D* sprite = spritetmpl->NewSprite (engine);
+  sprite->SetName ("MySprite");
+  engine->sprites.Push (sprite);
+  sprite->GetMovable ().SetSector (room);
+  csMatrix3 m; m.Identity (); m *= 5.;
+  sprite->GetMovable ().SetTransform (m);
+  sprite->GetMovable ().SetPosition (csVector3 (-3, 5, 3));
+  sprite->GetMovable ().UpdateMove ();
+  sprite->SetAction ("default");
+  sprite->InitSprite ();
+@end example
+@item
+New Version:
+@example
+  // Load a sprite template from disk.
+  csMeshFactoryWrapper* spritetmpl = csLoader::LoadMeshObjectFactory (engine,
+   "/lib/std/sprite1");
+  if (spritetmpl == NULL)
+  @{
+    Printf (MSG_FATAL_ERROR, "Error loading mesh object factory!\n");
+    cleanup ();
+    exit (1);
+  @}
+  // Add the sprite to the engine.
+  iMeshWrapper* sprite = engine->CreateMeshObject (
+       QUERY_INTERFACE (spritetmpl, iMeshFactoryWrapper),
+      "MySprite",
+      QUERY_INTERFACE (room, iSector),
+      csVector3 (-3, 5, 3));
+  csMatrix3 m; m.Identity (); m *= 5.;
+  sprite->GetMovable ()->SetTransform (m);
+  sprite->GetMovable ()->UpdateMove ();
+  iSprite3DState* spstate = QUERY_INTERFACE (sprite->GetMeshObject (), iSprite3DState);
+  spstate->SetAction ("default");
+  spstate->DecRef ();
+@end example
+@end itemize
+
+Keep in mind that for this to work /lib/std/sprite1 has to be modified from
+old to new syntax too (I already did this in CS).
+
+@itemize @bullet
+@item
+Old Syntax (sprite templates):
+@example
+  SPRITE 'mySpriteTmpl' (
+    TEXNR ('xxx.gif')
+    FRAME (...)
+    ...
+  )
+@end example
+@item
+New Syntax (mesh wrapper factory):
+@example
+  MESHOBJ 'mySpriteTmpl' (
+    PLUGIN ('crystalspace.mesh.loader.factory.sprite.3d')
+    PARAMS (
+      MATERIAL ('xxx')
+      FRAME (...)
+      ...
+    )
+  )
+@end example
+@end itemize
+
+@itemize @bullet
+@item
+Old Syntax (for sprites):
+@example
+  SPRITE 'mySprite' (
+    TEXNR ('xxx.gif')
+    TEMPLATE ('mySpriteTmpl', 'someAction')
+    MOVE (...)
+  )
+@end example
+@item
+New Syntax (mesh wrapper):
+@example
+  MESHOBJ 'mySprite' (
+    PLUGIN ('crystalspace.mesh.loader.sprite.3d')
+    PARAMS (
+      MATERIAL ('xxx')
+      FACTORY ('mySpriteTmpl')
+      ACTION ('someAction')
+    )
+    MOVE (...)
+  )
+@end example
+@end itemize
+
+Some notes:
+@itemize @bullet
+@item
+Notice that @samp{MOVE()} goes outside the @samp{PARAMS} block for a sprite.
+@item
+Note that the new @samp{spr3d} cannot work with textures. It needs materials.
+So add a definition to the @samp{MATERIALS} section.
+@end itemize
 
 @subheading @code{csPixmap} Moved and Renamed
 @cindex @code{csPixmap}
@@ -140,6 +348,13 @@ also an abstract class so where you would, in the past, instantiate
 In arguments and variables it is recommended you still use @samp{csPixmap} as
 it will allow you to use other kinds of pixmaps there, as well.
 
+@subheading @code{csRenderView} has no more public members
+@cindex @code{csRenderView}
+
+@code{csRenderView} has no public members anymore. You need to
+access everything through @code{Get...} and @code{Set...}. Check out
+the header for more details.
+
 @subheading General Use of @sc{scf} Interfaces
 @cindex @sc{scf} interfaces
 
@@ -150,3 +365,8 @@ Consequently, also use @samp{iMeshWrapper} instead of @samp{csMeshWrapper}, and
 @samp{iMaterialWrapper} instead of @samp{csMaterialWrapper}, and so on.  This
 will make the transition to version 1.0 easier when the engine will be fully
 accessible as a plugin.
+
+@subheading Various smaller changes
+
+@code{iGraphics2D::WriteChar()} is removed. Use @code{Write()} instead.
+

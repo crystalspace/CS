@@ -51,11 +51,11 @@ class csSector : public csPolygonSet
 
 public:
   /**
-   * List of sprites in this sector. Note that sprites also
+   * List of meshes in this sector. Note that meshes also
    * need to be in the engine list. This vector contains objects
-   * of type csSprite*.
+   * of type csMeshWrapper*.
    */
-  csVector sprites;
+  csVector meshes;
 
   /**
    * List of things in this sector.
@@ -149,7 +149,7 @@ public:
 
   /**
    * Option variable: render things?
-   * If this variable is false sprites and things are not rendered.
+   * If this variable is false meshes and things are not rendered.
    */
   static bool do_things;
 
@@ -180,7 +180,7 @@ public:
 
   /**
    * Destroy this sector. All things in this sector are also destroyed.
-   * Sprites are unlinked from the sector but not removed because they
+   * Meshes are unlinked from the sector but not removed because they
    * could be in other sectors.
    */
   virtual ~csSector ();
@@ -269,7 +269,7 @@ public:
 
   /**
    * Follow a beam from start to end and return the first object
-   * that is hit. Objects can be sprites, things, or sectors.
+   * that is hit. Objects can be meshes, things, or sectors.
    * In case it is a thing or sector the csPolygon3D field will be
    * filled with the polygon that was hit.
    * If polygonPtr is null then the polygon will not be filled in.

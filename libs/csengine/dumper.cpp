@@ -42,7 +42,6 @@
 #include "csengine/thing.h"
 #include "csengine/sector.h"
 #include "csengine/engine.h"
-#include "csengine/cssprite.h"
 #include "csengine/light.h"
 #include "csengine/lghtmap.h"
 

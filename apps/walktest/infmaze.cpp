@@ -254,6 +254,7 @@ void InfPortalCS::CompleteSector ()
   }
   iPolygonMesh* mesh = QUERY_INTERFACE (s, iPolygonMesh);
   (void)new csCollider (*s, Sys->collide_system, mesh);
+  mesh->DecRef ();
 }
 
 void InfPortalCS::CheckFrustum (csFrustumView& lview, int alpha)

@@ -230,7 +230,7 @@ void csDDGTerrain::Draw (csRenderView& rview, bool use_z_buf)
 
   // Get the FOV in angles.
   context->fov (rview.GetFOVAngle ());
-  context->aspect (float (rview.g3d->GetWidth ()) / (float)rview.g3d->GetHeight ());
+  context->aspect (float (rview.GetG3D ()->GetWidth ()) / (float)rview.GetG3D ()->GetHeight ());
 
   // Construct some clipping planes.
   context->extractPlanes (context->frustrum ());
@@ -299,11 +299,11 @@ void csDDGTerrain::Draw (csRenderView& rview, bool use_z_buf)
 
   } // end modified.
 
-  rview.g3d->SetObjectToCamera (&rview);
-  rview.g3d->SetClipper (rview.view->GetClipPoly (), rview.view->GetNumVertices ());
+  rview.GetG3D ()->SetObjectToCamera (&rview);
+  rview.GetG3D ()->SetClipper (rview.GetView ()->GetClipPoly (), rview.GetView ()->GetNumVertices ());
   // @@@ This should only be done when aspect changes...
-  rview.g3d->SetPerspectiveAspect (rview.GetFOV ());
-  rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
+  rview.GetG3D ()->SetPerspectiveAspect (rview.GetFOV ());
+  rview.GetG3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
       use_z_buf ? CS_ZBUF_USE : CS_ZBUF_FILL);
 
   // Setup the structure for DrawTriangleMesh.
@@ -375,10 +375,10 @@ void csDDGTerrain::Draw (csRenderView& rview, bool use_z_buf)
 
       rview.CalculateFogMesh (rview, g3dmesh);
 
-      if (rview.callback)
-        rview.callback (&rview, CALLBACK_MESH, (void*)&g3dmesh);
+      if (rview.GetCallback)
+        rview.CallCallback (CALLBACK_MESH, (void*)&g3dmesh);
       else
-        rview.g3d->DrawTriangleMesh (g3dmesh);
+        rview.GetG3D ()->DrawTriangleMesh (g3dmesh);
       // Increment the starting offset by the number of triangles that
       // were in this block.
       s += d;

@@ -122,7 +122,7 @@ public:
     virtual iThing *FindSky (const char *iName);
     /// Find a thing template in this region by name
     virtual iThing *FindThingTemplate (const char *iName);
-    /// Find a sprite in this region by name
+    /// Find a mesh in this region by name
     virtual iMeshWrapper *FindMeshObject (const char *iName);
     /// Find a mesh factory in this region by name
     virtual iMeshFactoryWrapper *FindMeshFactory (const char *iName);

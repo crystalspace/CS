@@ -21,7 +21,7 @@
 #include "csengine/movable.h"
 #include "csengine/sector.h"
 #include "csengine/thing.h"
-#include "csengine/cssprite.h"
+#include "csengine/meshobj.h"
 #include "csengine/cscoll.h"
 #include "isector.h"
 
@@ -78,9 +78,9 @@ void csMovable::ClearSectors ()
       csThing* th = (csThing*)object;
       th->RemoveFromSectors ();
     }
-    else if (object->GetType () >= csSprite::Type)
+    else if (object->GetType () >= csMeshWrapper::Type)
     {
-      csSprite* sp = (csSprite*)object;
+      csMeshWrapper* sp = (csMeshWrapper*)object;
       sp->RemoveFromSectors ();
     }
     else
@@ -103,9 +103,9 @@ void csMovable::AddSector (csSector* sector)
       csThing* th = (csThing*)object;
       th->MoveToSector (sector);
     }
-    else if (object->GetType () >= csSprite::Type)
+    else if (object->GetType () >= csMeshWrapper::Type)
     {
-      csSprite* sp = (csSprite*)object;
+      csMeshWrapper* sp = (csMeshWrapper*)object;
       sp->MoveToSector (sector);
     }
     else
@@ -123,9 +123,9 @@ void csMovable::UpdateMove ()
     csThing* th = (csThing*)object;
     th->UpdateMove ();
   }
-  else if (object->GetType () >= csSprite::Type)
+  else if (object->GetType () >= csMeshWrapper::Type)
   {
-    csSprite* sp = (csSprite*)object;
+    csMeshWrapper* sp = (csMeshWrapper*)object;
     sp->UpdateMove ();
   }
   else

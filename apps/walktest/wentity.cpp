@@ -81,8 +81,8 @@ csRotatingObject::csRotatingObject (csObject* p)
   remaining = 0;
   if (p->GetType () == csThing::Type)
     movable = &((csThing*)p)->GetMovable ();
-  else if (p->GetType () >= csSprite::Type)
-    movable = &((csSprite*)p)->GetMovable ();
+  else if (p->GetType () >= csMeshWrapper::Type)
+    movable = &((csMeshWrapper*)p)->GetMovable ();
 }
 
 void csRotatingObject::Activate ()

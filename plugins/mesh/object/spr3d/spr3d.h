@@ -1027,13 +1027,6 @@ public:
    */
   csVector3* GetObjectVerts (csSpriteFrame* fr);
 
-  /**
-   * Check if this sprite is hit by this object space vector.
-   * Return the collision point in object space coordinates.
-   */
-  virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr);
-
   /// Get the bounding box in transformed space.
   void GetTransformedBoundingBox (iTransformationManager* tranman,
       const csReversibleTransform& trans, csBox3& cbox);
@@ -1075,6 +1068,8 @@ public:
   virtual bool WantToDie () { return false; }
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () { return false; }
+  virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
+  	csVector3& isect, float* pr);
 
   //------------------ iPolygonMesh interface implementation ----------------//
   struct PolyMesh : public iPolygonMesh

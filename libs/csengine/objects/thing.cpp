@@ -227,10 +227,10 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
   // combining object to world and world to camera.
   csReversibleTransform obj_cam = rview;
   obj_cam /= movable.GetTransform ();
-  rview.g3d->SetObjectToCamera (&obj_cam);
-  rview.g3d->SetClipper (rview.view->GetClipPoly (), rview.view->GetNumVertices ());
-  rview.g3d->SetPerspectiveAspect (rview.GetFOV ());
-  rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
+  rview.GetG3D ()->SetObjectToCamera (&obj_cam);
+  rview.GetG3D ()->SetClipper (rview.GetView ()->GetClipPoly (), rview.GetView ()->GetNumVertices ());
+  rview.GetG3D ()->SetPerspectiveAspect (rview.GetFOV ());
+  rview.GetG3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
       use_z_buf ? CS_ZBUF_USE : CS_ZBUF_FILL);
 
   // Base of the mesh.
@@ -259,11 +259,11 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
     if (c->GetScreenBoundingBox (obj_cam, rview, bbox) < 0) continue;	// Not visible.
     // Test if we need and should clip to the current portal.
     int box_class;
-    box_class = rview.view->ClassifyBox (bbox);
+    box_class = rview.GetView ()->ClassifyBox (bbox);
     if (box_class == -1) continue; // Not visible.
 
     bool do_clip = false;
-    if (rview.do_clip_plane || rview.do_clip_frustum)
+    if (rview.HasClipPlane () || rview.HasClipFrustum ())
     {
       if (box_class == 0) do_clip = true;
     }
@@ -317,10 +317,10 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
     }
     rview.CalculateFogMesh (obj_cam, mesh);
 
-    if (rview.callback)
-      rview.callback (&rview, CALLBACK_MESH, (void*)&mesh);
+    if (rview.GetCallback ())
+      rview.CallCallback (CALLBACK_MESH, (void*)&mesh);
     else
-      rview.g3d->DrawTriangleMesh (mesh);
+      rview.GetG3D ()->DrawTriangleMesh (mesh);
   }
 }
 
@@ -342,7 +342,7 @@ void csThing::DrawInt (csRenderView& rview, bool use_z_buf)
 
   // @@@ Wouldn't it be nice if we checked if all vertices are behind the view plane?
   {
-    if (rview.callback) rview.callback (&rview, CALLBACK_THING, (void*)this);
+    if (rview.GetCallback ()) rview.CallCallback (CALLBACK_THING, (void*)this);
     Stats::polygons_considered += polygons.Length ();
 
     DrawCurves (rview, use_z_buf);
@@ -369,7 +369,7 @@ void csThing::DrawInt (csRenderView& rview, bool use_z_buf)
       DrawPolygonArrayDPM (polygons.GetArray (), polygons.Length (), &rview, use_z_buf);
     else
       DrawPolygonArray (polygons.GetArray (), polygons.Length (), &rview, use_z_buf);
-    if (rview.callback) rview.callback (&rview, CALLBACK_THINGEXIT, (void*)this);
+    if (rview.GetCallback ()) rview.CallCallback (CALLBACK_THINGEXIT, (void*)this);
   }
 
   draw_busy--;
@@ -389,7 +389,7 @@ void csThing::DrawFoggy (csRenderView& d)
   // @@@ Wouldn't it be nice if we checked all vertices against the Z plane?
   {
     csVector2 orig_triangle[3];
-    if (!d.callback) d.g3d->OpenFogObject (GetID (), &GetFog ());
+    if (!d.GetCallback ()) d.GetG3D ()->OpenFogObject (GetID (), &GetFog ());
     Stats::polygons_considered += polygons.Length ();
 
     d.SetMirrored (!d.IsMirrored ());
@@ -402,22 +402,22 @@ void csThing::DrawFoggy (csRenderView& d)
       bool front = csMath3::Visible (d.GetOrigin (), wplane);
 
       if (!front &&
-        p->ClipToPlane (d.do_clip_plane ? &d.clip_plane : (csPlane3*)NULL, d.GetOrigin (),
+        p->ClipToPlane (d.HasClipPlane () ? &d.GetClipPlane () : (csPlane3*)NULL, d.GetOrigin (),
               verts, num_verts, false) &&
         p->DoPerspective (d, verts, num_verts, clip, orig_triangle, d.IsMirrored ()) &&
-        clip->ClipAgainst (d.view))
+        clip->ClipAgainst (d.GetView ()))
       {
         p->GetPlane ()->WorldToCamera (d, verts[0]);
-	if (d.callback)
+	if (d.GetCallback ())
 	{
-          d.callback (&d, CALLBACK_POLYGON, (void*)p);
-          d.callback (&d, CALLBACK_POLYGON2D, (void*)clip);
+          d.CallCallback (CALLBACK_POLYGON, (void*)p);
+          d.CallCallback (CALLBACK_POLYGON2D, (void*)clip);
 	}
 
         Stats::polygons_drawn++;
 
-	if (!d.callback)
-          clip->AddFogPolygon (d.g3d, p, p->GetPlane (), d.IsMirrored (),
+	if (!d.GetCallback ())
+          clip->AddFogPolygon (d.GetG3D (), p, p->GetPlane (), d.IsMirrored (),
 	  	GetID (), CS_FOG_BACK);
       }
       render_pool->Free (clip);
@@ -432,28 +432,28 @@ void csThing::DrawFoggy (csRenderView& d)
       bool front = csMath3::Visible (d.GetOrigin (), wplane);
 
       if (front &&
-        p->ClipToPlane (d.do_clip_plane ? &d.clip_plane : (csPlane3*)NULL,
+        p->ClipToPlane (d.HasClipPlane () ? &d.GetClipPlane () : (csPlane3*)NULL,
 		d.GetOrigin (), verts, num_verts, true) &&
         p->DoPerspective (d, verts, num_verts, clip, orig_triangle,
 		d.IsMirrored ()) &&
-        clip->ClipAgainst (d.view))
+        clip->ClipAgainst (d.GetView ()))
       {
         p->GetPlane ()->WorldToCamera (d, verts[0]);
-	if (d.callback)
+	if (d.GetCallback ())
 	{
-          d.callback (&d, CALLBACK_POLYGON, (void*)p);
-          d.callback (&d, CALLBACK_POLYGON2D, (void*)clip);
+          d.CallCallback (CALLBACK_POLYGON, (void*)p);
+          d.CallCallback (CALLBACK_POLYGON2D, (void*)clip);
 	}
 
         Stats::polygons_drawn++;
 
-        if (!d.callback)
-	  clip->AddFogPolygon (d.g3d, p, p->GetPlane (), d.IsMirrored (),
+        if (!d.GetCallback ())
+	  clip->AddFogPolygon (d.GetG3D (), p, p->GetPlane (), d.IsMirrored (),
 	  	GetID (), CS_FOG_FRONT);
       }
       render_pool->Free (clip);
     }
-    if (!d.callback) d.g3d->CloseFogObject (GetID ());
+    if (!d.GetCallback ()) d.GetG3D ()->CloseFogObject (GetID ());
   }
 
   draw_busy--;

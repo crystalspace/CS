@@ -77,34 +77,75 @@ IMPLEMENT_EMBEDDED_IBASE (csRenderView::RenderView)
 IMPLEMENT_EMBEDDED_IBASE_END
 
 csRenderView::csRenderView () :
-    csCamera (), engine (NULL), view (NULL), g3d (NULL), g2d (NULL),
+    csCamera (), engine (NULL), iengine (NULL), view (NULL), iview (NULL),
+    g3d (NULL), g2d (NULL),
     portal_polygon (NULL), previous_sector (NULL), this_sector (NULL),
     do_clip_plane (false), do_clip_frustum (false),
     callback (NULL), callback_data (NULL), fog_info (NULL),
     added_fog_info (false)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiRenderView);
+  icamera = QUERY_INTERFACE (this, iCamera);
 }
 
 csRenderView::csRenderView (const csCamera& c) :
-    csCamera (c), engine (NULL), view (NULL), g3d (NULL), g2d (NULL),
+    csCamera (c), engine (NULL), iengine (NULL), view (NULL), iview (NULL),
+    g3d (NULL), g2d (NULL),
     portal_polygon (NULL), previous_sector (NULL), this_sector (NULL),
     do_clip_plane (false), do_clip_frustum (false),
     callback (NULL), callback_data (NULL), fog_info (NULL),
     added_fog_info (false)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiRenderView);
+  icamera = QUERY_INTERFACE (this, iCamera);
 }
 
 csRenderView::csRenderView (const csCamera& c, csClipper* v, iGraphics3D* ig3d,
     iGraphics2D* ig2d) :
-    csCamera (c), engine (NULL), view (v), g3d (ig3d), g2d (ig2d),
+    csCamera (c), engine (NULL), iengine (NULL), iview (NULL), g3d (ig3d), g2d (ig2d),
     portal_polygon (NULL), previous_sector (NULL), this_sector (NULL),
     do_clip_plane (false), do_clip_frustum (false),
     callback (NULL), callback_data (NULL), fog_info (NULL),
     added_fog_info (false)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiRenderView);
+  icamera = QUERY_INTERFACE (this, iCamera);
+  SetView (v);
+}
+
+csRenderView::csRenderView (const csRenderView& c)
+{
+  *this = c;
+  CONSTRUCT_EMBEDDED_IBASE (scfiRenderView);
+  icamera = QUERY_INTERFACE (this, iCamera);
+  if (iview) iview->IncRef ();
+  if (iengine) iengine->IncRef ();
+}
+
+void csRenderView::SetView (csClipper* view)
+{
+  iClipper2D* ic = QUERY_INTERFACE (view, iClipper2D);
+  if (iview) iview->DecRef ();
+  iview = ic;
+  csRenderView::view = view;
+}
+
+void csRenderView::SetEngine (csEngine* engine)
+{
+  iEngine* ien = QUERY_INTERFACE (engine, iEngine);
+  if (iengine) iengine->DecRef ();
+  iengine = ien;
+  csRenderView::engine = engine;
+}
+
+void csRenderView::SetThisSector (csSector* sect)
+{
+  this_sector = sect;
+}
+
+void csRenderView::SetPreviousSector (csSector* sect)
+{
+  previous_sector = sect;
 }
 
 // Remove this for old fog
@@ -479,20 +520,5 @@ bool csRenderView::ClipBBox (const csBox2& sbox, const csBox3& cbox,
   }
 
   return true;
-}
-
-iEngine* csRenderView::RenderView::GetEngine ()
-{
-  return QUERY_INTERFACE (scfParent->engine, iEngine);
-}
-
-iClipper2D* csRenderView::RenderView::GetClipper ()
-{
-  return QUERY_INTERFACE (scfParent->view, iClipper2D);
-}
-
-iCamera* csRenderView::RenderView::GetCamera ()
-{
-  return QUERY_INTERFACE (scfParent, iCamera);
 }
 
