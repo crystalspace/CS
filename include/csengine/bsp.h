@@ -54,6 +54,12 @@ private:
    */
   csPolygonIntArray polygons;
 
+  /**
+   * This flag is true if all polygons above are on the 'splitter' plane.
+   * In this case the BSP tree can backface cull them in one go.
+   */
+  bool polygons_on_splitter;
+
   /// The splitter plane.
   csPlane splitter;
 

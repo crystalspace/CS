@@ -12,6 +12,18 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+25-Feb-2000
+	- Fixed software texture cache so that it again allocates the
+	  texture cache based on number of pixels instead of bytes.
+	- Added optimization to BSP tree traversal so that back-facing
+	  polygon lists are not actually considered anymore. This improves
+	  performance a few 5-10% for large octree/bsp levels.
+	- Fixed assembly in bitset.h so that it is only used with GCC.
+	- Fixed software texture cache overwrite bug introduced with
+	  Andrew's latest changes. For example, dmburg would not run
+	  because of that bug.
+	- Increased size of bsp trees to 150 polygons (instead of 100)
+	  because that seems to give better results.
 24-Feb-2000
 	- Michael Dale Long did various fixes after Andrew's large change.
 	- Wyatt Miler did some fixes to Mac sound drivers.

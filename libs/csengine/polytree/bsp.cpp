@@ -27,6 +27,7 @@
 csBspNode::csBspNode ()
 {
   front = back = NULL;
+  polygons_on_splitter = true;
 }
 
 csBspNode::~csBspNode ()
@@ -228,11 +229,13 @@ void csBspTree::Build (csBspNode* node, csPolygonInt** polygons,
   if (!Covers (polygons, num))
   {
     // We have a convex set.
+    node->polygons_on_splitter = false;
     for (i = 0 ; i < num ; i++)
       node->AddPolygon (polygons[i]);
     return;
   }
 
+#if 0
   // If the set is not convex and all polygons have
   // been used as splitters then we temporarily
   // consider this a convex node too. This is not right@@@@@@
@@ -249,6 +252,7 @@ void csBspTree::Build (csBspNode* node, csPolygonInt** polygons,
       node->AddPolygon (polygons[i]);
     return;
   }
+#endif
 
   csPolygonInt* split_poly = polygons[SelectSplitter (polygons, was_splitter, num)];
   node->splitter = *(split_poly->GetPolyPlane ());
@@ -394,8 +398,11 @@ void* csBspTree::Back2Front (csBspNode* node, const csVector3& pos,
     if (rc) return rc;
     rc = func (sector, node->polygons.GetPolygons (), node->polygons.GetNumPolygons (), data);
     if (rc) return rc;
-    rc = node->TraverseObjects (sector, pos, func, data);
-    if (rc) return rc;
+    if (!node->polygons_on_splitter)
+    {
+      rc = node->TraverseObjects (sector, pos, func, data);
+      if (rc) return rc;
+    }
     rc = Back2Front (node->back, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
   }
@@ -432,8 +439,11 @@ void* csBspTree::Front2Back (csBspNode* node, const csVector3& pos,
     if (rc) return rc;
     rc = func (sector, node->polygons.GetPolygons (), node->polygons.GetNumPolygons (), data);
     if (rc) return rc;
-    rc = node->TraverseObjects (sector, pos, func, data);
-    if (rc) return rc;
+    if (!node->polygons_on_splitter)
+    {
+      rc = node->TraverseObjects (sector, pos, func, data);
+      if (rc) return rc;
+    }
     rc = Front2Back (node->front, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
   }
