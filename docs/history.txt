@@ -1,5 +1,14 @@
 The history order is reversed so that new features are at the top.
 
+27-Apr-2001
+	- Philip Wyett added csdemo.cfg to makefile inorder that it is
+	  generated into MSVC project workspace.
+	- Did some work on 3ds2lev:
+	    - Added -3 option to allow convertion to 3D sprites. Seems to
+	      be more or less working but it is not yet complete. I want
+	      to add support for multiple objects.
+	    - Added -vv option to do a very verbose output. With this option
+	      it will show all chunks in the 3DS files that it encounters.
 26-Apr-2001
 	- Philip Wyett fixed gcc outputting Worm.dll and Dog.dll. Now
 	  outputs worm.dll and dog.dll.
@@ -36,6 +45,21 @@ The history order is reversed so that new features are at the top.
 	  in the world but they are all currently invisible.
 	- Worked more on csdemo.
 	- Martin Geisse did a small bug fix in engine.cpp.
+	- Simplified the sequencer in csdemo. There is now no special handling
+	  of the camera path as opposed to mesh object paths. There are
+	  simply paths that are attached to either a mesh or a camera.
+	  Remove PATHMESH and PATHCAMERA commands and replaced with PATH.
+	  Also added the possibility to replace the object on a path with
+	  another. That way you can let the camera view be replaced by
+	  some object and set the camera else-where for example. This
+	  can be set with the ATTACH command.
+	- Martin Geisse changed csdemo to use a config file.
+	- Martin did some further work on csparser and csengine.
+	- Norman Kramer removed the DO_<image format> variables. select
+	  the image plugins by commenting in/out the appropriate PLUGIN
+	  lines.
+	- Norman Kramer added the ability to save jpg files to the jpg
+	  plugin.
 25-Apr-2001
 	- Philip Wyett cleaned up formatting in ptlab.cfg.
 	- Martin Geisse added an SCF interface for collection (iCollection).
