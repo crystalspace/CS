@@ -38,6 +38,9 @@ LIBS.EXE += \
   $(LIBS.SYSTEM) \
   $(LFLAGS.l)shell32 
 
+# Extra libraries needed for Python cspace module.
+PYTHMOD.LIBS.PLATFORM = gdi32 shell32
+
 # Sound library
 LIBS.SOUND.SYSTEM = $(LFLAGS.l)dsound $(LFLAGS.l)winmm
 

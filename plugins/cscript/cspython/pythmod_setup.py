@@ -3,8 +3,10 @@
 # Copyright (C) 2003 Rene Jager <renej@frog.nl>
 # License: LGPL
 
-# Arguments: install <derived-files-dir> <source-dir> <include-dir> \
-#                    <alt-include-dir> <libraries-dir> <setup-args>
+# Arguments: install <derived-files-dir> <source-dir> <include-dir> ... -- \
+#                    <libraries-dir> <lib> ... -- <setup-args>
+# You can list any number of include directories.  Terminate the list with --.
+# You can list any number of extra libraries (sans -l).  Terminate with --.
 # See cspython.mak for example usage.
 
 import sys, os, string, traceback, re
@@ -12,23 +14,31 @@ from distutils import ccompiler, sysconfig
 from distutils.core import setup, Extension
 
 # get non-distutils args and remove them
-derived_dir = sys.argv[1]
-src_dir = sys.argv[2]
-inc_dir = sys.argv[3]
-inc_dir_alt = sys.argv[4]
-lib_dir = sys.argv[5]
-sys.argv[1:6] = []
+i = 1
+derived_dir = sys.argv[i] ; i += 1
+src_dir = sys.argv[i] ; i += 1
+incs = []
+while i < len(sys.argv) and sys.argv[i] != '--':
+    incs.append(sys.argv[i])
+    i += 1
+i += 1 # skip '--'
+lib_dir = sys.argv[i] ; i += 1
+libs = []
+while i < len(sys.argv) and sys.argv[i] != '--':
+    libs.append(sys.argv[i])
+    i += 1
+sys.argv[1:i + 1] = []
+
+libs.extend(['cstool','csgfx','csgeom','cssys','csutil','cssys','csutil'])
 
 ext_module = Extension(
     '_cspace',
     [derived_dir+'/cs_pyth.cpp',
      src_dir+'/plugins/cscript/cspython/pythmod.cpp'
      ],
-    include_dirs=[inc_dir, inc_dir_alt],
+    include_dirs=incs,
     library_dirs=[lib_dir],
-    libraries=['cstool', 'csgfx', 'csgeom', 'cssys', 'csutil',
-               'cssys', 'csutil'
-              ]
+    libraries=libs
 )
 
 setup_kwargs = {
@@ -46,4 +56,3 @@ if ccompiler.get_default_compiler() == 'unix':
     sysconfig.get_config_vars()['LDSHARED'] = ldshared
 
 dist = apply(setup, [], setup_kwargs)
-

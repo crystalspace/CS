@@ -4,6 +4,14 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 22-Jul-2003
+	- Eric Sunshine reverted Phil's change to win32.cpp where he removed an
+	  invocation of CreateSolidBrush().  Instead, Eric patched
+	  pythmod_setup.py, cspython.mak, and win32gcc.mak so that the _cspace
+	  Python module is linked against against gdi32.lib, which is where
+	  CreateSolidBrush() is located.  (This is untested.  If you still
+	  experience trouble, please attempt to satisfy the link requirements
+	  by editing the makefiles or pythmod_setup.py, rather than disabling
+	  code in win32.cpp.)
         - Philip Wyett fixed inconsistent swig -I flag in make build
           and aligning it with jam build. cs_pyth.cpp will now be identical
           whether make or jam built.
