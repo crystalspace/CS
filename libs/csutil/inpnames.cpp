@@ -87,29 +87,6 @@ static struct csKeyMaskDef
   { NULL,	0		}
 };
 
-#ifdef COMP_VC
-int strncmpi (const char* first, const char* last, unsigned int count)
-{
-  int f, l;
-  int result = 0;
-  
-  if (count)
-  {
-    do
-    {
-      f = tolower (*first);
-      l = tolower (*last);
-      first++;
-      last++;
-    } while (--count && f && l && f == l);
-		
-    int result = f - l;
-  }
-
-  return result;
-}
-#endif
-
 iEvent* csParseInputDef (const char *name, iEvent* ev, bool use_modifiers = true)
 {
   int mod = 0;
@@ -118,7 +95,7 @@ iEvent* csParseInputDef (const char *name, iEvent* ev, bool use_modifiers = true
   {
     ismask = false;
     for (csKeyMaskDef *m = KeyMasks; m->key; m++)
-      if (! strncmpi (m->key, name, strlen (m->key)))
+      if (! strncasecmp (m->key, name, strlen (m->key)))
       {
         if (use_modifiers) mod |= m->mask;
         name += strlen (m->key);
@@ -126,7 +103,7 @@ iEvent* csParseInputDef (const char *name, iEvent* ev, bool use_modifiers = true
       }
   } while (ismask);
 
-  if (! strncmpi (name, "Mouse", 5))
+  if (! strncasecmp (name, "Mouse", 5))
   {
     name += 5;
     if (*name == 'X' || *name == 'x')
@@ -135,7 +112,7 @@ iEvent* csParseInputDef (const char *name, iEvent* ev, bool use_modifiers = true
       *ev = csEvent (0, csevMouseMove, 0, 1, 0, 0);
     else *ev = csEvent (0, csevMouseDown, 0, 0, atoi (name), mod);
   }
-  else if (! strncmpi (name, "Joystick", 8))
+  else if (! strncasecmp (name, "Joystick", 8))
   {
     name += 8;
     if (*name == 'X' || *name == 'x')
@@ -148,7 +125,7 @@ iEvent* csParseInputDef (const char *name, iEvent* ev, bool use_modifiers = true
   {
     int code = 0;
     for (csKeyCodeDef *c = KeyDefs; c->key; c++)
-      if (! strcmpi (c->key, name)) code = c->code;
+      if (! strcasecmp (c->key, name)) code = c->code;
     if (code) *ev = csEvent (0, csevKeyDown, code, 0, mod);
     else *ev = csEvent (0, csevKeyDown, 0, (int)*name, mod);
   }
@@ -164,6 +141,7 @@ csEvent& csParseInputDef (const char* name, csEvent& ev, bool use_modifiers = tr
 
 char* csGetInputDesc (iEvent *ev, char *buf, bool use_modifiers = true)
 {
+  (void) use_modifiers;
   char *ret = buf;
   int mod = 0;
   switch (ev->Type)
