@@ -46,7 +46,7 @@ DEP.SNDEAX = CSUTIL CSGEOM CSSYS
 MSVC.DSP += SNDEAX
 DSP.SNDEAX.NAME = sndrdreax
 DSP.SNDEAX.TYPE = plugin
-DSP.SNDEAX.LIBS = eax.lib eaxguid.lib
+DSP.SNDEAX.LIBS = eax.lib eaxguid.lib dsound.lib
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
