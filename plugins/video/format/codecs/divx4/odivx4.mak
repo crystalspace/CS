@@ -4,7 +4,7 @@ DESCRIPTION.odivx4 = Crystal Space DivX4 codec
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make odivx4        Make the $(DESCRIPTION.odivx4)$"
+  $(NEWLINE)echo $"  make odivx4       Make the $(DESCRIPTION.odivx4)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
