@@ -7,6 +7,16 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 14-Jan-2004
+	- Peter Amstutz rewrote the GenerateBox() method in the genmesh
+	  plugin to create a box with better texel settings 
+	  (the old code had texture warping bugs on certain sides of
+	  the box)
+	- Peter Amstutz added support for textures and materials to
+	  the csvosa3dl plugin.  It also loads "a3dl:object3D.cube"
+	  into the engine.
+	- Peter Amstutz modified the configure.ac script to add 
+	  the flags -D_REENTRANT and -fexceptions to the VOS cflags
+	  variable.
 	- res changed glrender3d to not depend on GLU any more. Though a GLU
 	  header was #included, no GLU function was used anyway.
 	- res sanitized line endings in ivideo/custcursor.h and the custom
