@@ -137,8 +137,6 @@ struc csScanSetup
   int FogPix;
   ; Fog density
   unsigned_int FogDensity;
-  ; The fog table for paletted (currently only 8-bit) modes
-  unsigned_char_P Fog8;
 
   ; A pointer to the texture.
   csTextureHandleSoftware_P Texture;
@@ -227,8 +225,6 @@ struc csScanSetup
 
   ; A table of exp(x) in the range 0..255; x == 0..EXP_256_SIZE
   unsigned_char_P exp_256;
-  ; Same in the range 0..31 for 8-bit fog
-  unsigned_char_P exp_16;
 
   ; Blending tables
   unsigned_char_P BlendingTable_ADD
