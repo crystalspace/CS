@@ -145,9 +145,12 @@ csString &csString::Append (const char *iStr, size_t iCount)
   if (iCount == (size_t)-1)
     iCount = strlen (iStr);
 
+  // We're not aborting here if iCount==0, because Replace is using it in a
+  // not fully correct way: Size=0; Append(str);
+
   size_t const NewSize = Size + iCount;
   SetCapacity (NewSize);
-  
+ 
   if (iCount > 0)
       memcpy (Data + Size, iStr, iCount);
 
