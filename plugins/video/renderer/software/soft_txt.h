@@ -119,12 +119,8 @@ public:
   /// Destroy the texture
   virtual ~csTextureSoftware ()
   { 
-    printf("*** csTextureSoftware dtor\n");
-    printf("*** del bmap\n");
     delete [] bitmap; 
-    printf("*** decref image %p\n", image);
     if (image) image->DecRef (); 
-    printf("*** exit csTextureSoftware dtor\n");
   }
 
   /// Return a pointer to texture data
