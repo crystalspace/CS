@@ -12,6 +12,13 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+2-Mar-2000
+	- Norman Kramer completely rewrote the glide texture cache
+	  handling. It now holds alphamaps too. On single TMU systems the
+	  tex memory is now properly shared between tex,light and alpha
+	  maps. Halos do work now.
+	- Seth Galbraith probably fixed a bug in the loading of MDL
+	  models to sprites.
 1-Mar-2000
 	- Norman Kramer did some further code cleanup and preparing for
 	  alphamap handling (halos) in glide driver.
