@@ -28,7 +28,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-PERL5TEST.EXE = perl5tst$(EXE)
+PERL5TEST.EXE = perl5test$(EXE)
 DIR.PERL5TEST = apps/tests/perl5tst
 OUT.PERL5TEST = $(OUT)/$(DIR.PERL5TEST)
 INC.PERL5TEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.PERL5TEST)/*.h))
@@ -41,7 +41,7 @@ LIB.PERL5TEST = $(foreach d,$(DEP.PERL5TEST),$($d.LIB))
 OUTDIRS += $(OUT.PERL5TEST)
 
 MSVC.DSP += PERL5TEST
-DSP.PERL5TEST.NAME = perl5tst
+DSP.PERL5TEST.NAME = perl5test
 DSP.PERL5TEST.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -66,14 +66,14 @@ perl5testclean:
 
 cleandep: perl5testcleandep
 perl5testcleandep:
-	-$(RM) $(OUT.PERL5TEST)/perl5tst.dep
+	-$(RM) $(OUT.PERL5TEST)/perl5test.dep
 
 ifdef DO_DEPEND
-dep: $(OUT.PERL5TEST) $(OUT.PERL5TEST)/perl5tst.dep
-$(OUT.PERL5TEST)/perl5tst.dep: $(SRC.PERL5TEST)
+dep: $(OUT.PERL5TEST) $(OUT.PERL5TEST)/perl5test.dep
+$(OUT.PERL5TEST)/perl5test.dep: $(SRC.PERL5TEST)
 	$(DO.DEPEND)
 else
--include $(OUT.PERL5TEST)/perl5tst.dep
+-include $(OUT.PERL5TEST)/perl5test.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

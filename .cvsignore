@@ -42,12 +42,13 @@ mdl2spr
 mdltest
 milk2spr
 mottest
-netmtst
+netmantest
 nettut
 out
+partedit
 pathtut
 perftest
-perl5tst
+perl5test
 pgtest
 phystut
 picview
@@ -64,6 +65,7 @@ simpmap
 simpvs
 tbconvert
 tbtut
+uninst
 unittest
 viewmesh
 vsh

@@ -26,7 +26,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-NETMANTEST.EXE = netmtst$(EXE)
+NETMANTEST.EXE = netmantest$(EXE)
 DIR.NETMANTEST = apps/tests/netmtst
 OUT.NETMANTEST = $(OUT)/$(DIR.NETMANTEST)
 INC.NETMANTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.NETMANTEST)/*.h))
@@ -39,7 +39,7 @@ LIB.NETMANTEST = $(foreach d,$(DEP.NETMANTEST),$($d.LIB))
 OUTDIRS += $(OUT.NETMANTEST)
 
 MSVC.DSP += NETMANTEST
-DSP.NETMANTEST.NAME = netmtst
+DSP.NETMANTEST.NAME = netmantest
 DSP.NETMANTEST.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -64,14 +64,14 @@ netmantestclean:
 
 cleandep: netmantestcleandep
 netmantestcleandep:
-	-$(RM) $(OUT.NETMANTEST)/netmtst.dep
+	-$(RM) $(OUT.NETMANTEST)/netmantest.dep
 
 ifdef DO_DEPEND
-dep: $(OUT.NETMANTEST) $(OUT.NETMANTEST)/netmtst.dep
-$(OUT.NETMANTEST)/netmtst.dep: $(SRC.NETMANTEST)
+dep: $(OUT.NETMANTEST) $(OUT.NETMANTEST)/netmantest.dep
+$(OUT.NETMANTEST)/netmantest.dep: $(SRC.NETMANTEST)
 	$(DO.DEPEND)
 else
--include $(OUT.NETMANTEST)/netmtst.dep
+-include $(OUT.NETMANTEST)/netmantest.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
