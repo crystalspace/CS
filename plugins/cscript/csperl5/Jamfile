@@ -57,7 +57,7 @@ if $(PERL5.SDK.AVAILABLE) = "yes"
   Plugin csperl5
 	  : $(FILES)
   ;
-  CFLAGS on csperl5 = -Wno-unused ;
+  CFlags csperl5 : -Wno-unused ;
   LinkWith csperl5 : cstool csgeom cssys csutil ;
   ExternalLibs csperl5 : PERL5 ;
   Help csperl5 : "Crystal Script Perl5 plug-in" ;

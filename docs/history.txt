@@ -3,6 +3,14 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+19-Jun-2003
+	- Oktal made the following changes to the Perl plugin and module:
+	    - Got rid of all the warnings in the Perl plugin and module,
+	      some by fixing them and some by ignoring them with compiler
+	      switches and pragmas.
+	    - Added csString to those classes wrapped by Swig (same change
+	      also made to Python module).
+	    - Uncommented the plugin from user.mak.
 18-Jun-2003
 	- Jorrit added a new 'do_logo' command to walktest. Assigned 'l' key
 	  to it. This command toggles the display of the logo.

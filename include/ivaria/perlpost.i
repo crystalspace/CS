@@ -671,24 +671,14 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
 
   csString __add__ (const char *other)
   {
-    csString result (self);
-    result->Append (other);
+    csString result (* self);
+    result.Append (other);
     return result;
-  }
-  csString* __add_ass__ (const char *other)
-  {
-    self->Append (other);
-    return self;
-  }
-  csString* __add_ass__ (csString &other)
-  {
-    self->Append (other);
-    return self;
   }
   csString __concat__ (const char *other)
   {
-    csString result (self);
-    result->Append (other);
+    csString result (* self);
+    result.Append (other);
     return result;
   }
   csString* __concat_ass__ (const char *other)
@@ -698,8 +688,8 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
   }
   csString __concat__ (csString &other)
   {
-    csString result (self);
-    result->Append (other);
+    csString result (* self);
+    result.Append (other);
     return result;
   }
   csString* __concat_ass__ (csString &other)
@@ -906,6 +896,6 @@ WRAP_SCRIPT_CLASS (iAwsSink,
 )
 
 // TODO: It is easy to add here more interfaces that you might want to
-//       implement in script.
+//       implement in script with WRAP_SCRIPT_CLASS().
 
 #endif // SWIGPERL5

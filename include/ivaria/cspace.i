@@ -185,7 +185,7 @@
 	INTERFACE_APPLY(iPolygonMesh)
 	INTERFACE_APPLY(iPolygonTexture)
 	INTERFACE_APPLY(iSCF)
-//	INTERFACE_APPLY(iScript)
+	INTERFACE_APPLY(iScript)
 	INTERFACE_APPLY(iSector)
 	INTERFACE_APPLY(iSectorList)
 	INTERFACE_APPLY(iSoundHandle)
@@ -318,6 +318,7 @@
 
 %include "cstypes.h"
 
+%immutable csWrapPtr::Type;
 %inline %{
 
 	// This pointer wrapper can be used to prevent code-bloat by macro's acting
@@ -436,21 +437,222 @@ TYPEMAP_OUT_csWrapPtr
 %include "csutil/cmdhelp.h"
 %include "csutil/strset.h"
 
+%ignore iString::operator const char *;
 %include "iutil/string.h"
-//%include "csutil/csstring.h"
 
+%ignore csString::Append (short);
+%ignore csString::Append (unsigned short);
+%ignore csString::Append (int);
+%ignore csString::Append (unsigned int);
+%ignore csString::Append (long);
+%ignore csString::Append (unsigned long);
+%ignore csString::Append (float);
+%ignore csString::Append (double);
+%ignore csString::Append (bool);
+%ignore csString::Replace (char);
+%ignore csString::Replace (unsigned char);
+%ignore csString::Replace (short);
+%ignore csString::Replace (unsigned short);
+%ignore csString::Replace (int);
+%ignore csString::Replace (unsigned int);
+%ignore csString::Replace (long);
+%ignore csString::Replace (unsigned long);
+%ignore csString::Replace (float);
+%ignore csString::Replace (double);
+%ignore csString::Replace (bool);
+%ignore csString::Format (short);
+%ignore csString::Format (unsigned short);
+%ignore csString::Format (int);
+%ignore csString::Format (unsigned int);
+%ignore csString::Format (long);
+%ignore csString::Format (unsigned long);
+%ignore csString::Format (float);
+%ignore csString::Format (double);
+%ignore csString::Format (short, int, int);
+%ignore csString::Format (unsigned short, int, int);
+%ignore csString::Format (int, int, int);
+%ignore csString::Format (unsigned int, int, int);
+%ignore csString::Format (long, int, int);
+%ignore csString::Format (unsigned long, int, int);
+%ignore csString::Format (float, int, int);
+%ignore csString::Format (double, int, int);
+%ignore csString::PadLeft (csString const &, size_t, char);
+%ignore csString::PadLeft (char, size_t, char);
+%ignore csString::PadLeft (unsigned char, size_t, char);
+%ignore csString::PadLeft (short, size_t, char);
+%ignore csString::PadLeft (unsigned short, size_t, char);
+%ignore csString::PadLeft (int, size_t, char);
+%ignore csString::PadLeft (unsigned int, size_t, char);
+%ignore csString::PadLeft (long, size_t, char);
+%ignore csString::PadLeft (unsigned long, size_t, char);
+%ignore csString::PadLeft (float, size_t, char);
+%ignore csString::PadLeft (double, size_t, char);
+%ignore csString::PadLeft (bool, size_t, char);
+%ignore csString::PadRight (csString const &, size_t, char);
+%ignore csString::PadRight (char, size_t, char);
+%ignore csString::PadRight (unsigned char, size_t, char);
+%ignore csString::PadRight (short, size_t, char);
+%ignore csString::PadRight (unsigned short, size_t, char);
+%ignore csString::PadRight (int, size_t, char);
+%ignore csString::PadRight (unsigned int, size_t, char);
+%ignore csString::PadRight (long, size_t, char);
+%ignore csString::PadRight (unsigned long, size_t, char);
+%ignore csString::PadRight (float, size_t, char);
+%ignore csString::PadRight (double, size_t, char);
+%ignore csString::PadRight (bool, size_t, char);
+%ignore csString::PadCenter (csString const &, size_t, char);
+%ignore csString::PadCenter (char, size_t, char);
+%ignore csString::PadCenter (unsigned char, size_t, char);
+%ignore csString::PadCenter (short, size_t, char);
+%ignore csString::PadCenter (unsigned short, size_t, char);
+%ignore csString::PadCenter (int, size_t, char);
+%ignore csString::PadCenter (unsigned int, size_t, char);
+%ignore csString::PadCenter (long, size_t, char);
+%ignore csString::PadCenter (unsigned long, size_t, char);
+%ignore csString::PadCenter (float, size_t, char);
+%ignore csString::PadCenter (double, size_t, char);
+%ignore csString::PadCenter (bool, size_t, char);
+%ignore csString::operator= (char);
+%ignore csString::operator= (unsigned char);
+%ignore csString::operator= (short);
+%ignore csString::operator= (unsigned short);
+%ignore csString::operator= (int);
+%ignore csString::operator= (unsigned int);
+%ignore csString::operator= (long);
+%ignore csString::operator= (unsigned long);
+%ignore csString::operator= (float);
+%ignore csString::operator= (double);
+%ignore csString::operator= (bool);
+%ignore csString::operator+= (char);
+%ignore csString::operator+= (unsigned char);
+%ignore csString::operator+= (short);
+%ignore csString::operator+= (unsigned short);
+%ignore csString::operator+= (int);
+%ignore csString::operator+= (unsigned int);
+%ignore csString::operator+= (long);
+%ignore csString::operator+= (unsigned long);
+%ignore csString::operator+= (float);
+%ignore csString::operator+= (double);
+%ignore csString::operator+= (bool);
+%ignore csString::operator const char*;
+%ignore operator+ (const char *, const csString &);
+%ignore operator+ (const csString &, const char *);
+%ignore operator<< (csString &, const csString &);
+%ignore operator<< (csString &, const char *);
+%ignore operator<< (csString &, char);
+%ignore operator<< (csString &, unsigned char);
+%ignore operator<< (csString &, short);
+%ignore operator<< (csString &, unsigned short);
+%ignore operator<< (csString &, int);
+%ignore operator<< (csString &, unsigned int);
+%ignore operator<< (csString &, long);
+%ignore operator<< (csString &, unsigned long);
+%ignore operator<< (csString &, float);
+%ignore operator<< (csString &, double);
+%ignore operator<< (csString &, bool);
+%include "csutil/csstring.h"
+
+%ignore csVector2::operator+ (const csVector2 &, const csVector2 &);
+%ignore csVector2::operator- (const csVector2 &, const csVector2 &);
+%ignore csVector2::operator* (const csVector2 &, const csVector2 &);
+%ignore csVector2::operator* (const csVector2 &, float);
+%ignore csVector2::operator* (float, const csVector2 &);
+%ignore csVector2::operator/ (const csVector2 &, float);
+%ignore csVector2::operator== (const csVector2 &, const csVector2 &);
+%ignore csVector2::operator!= (const csVector2 &, const csVector2 &);
+%ignore csVector2::operator< (const csVector2 &, float);
+%ignore csVector2::operator> (float, const csVector2 &);
 %ignore csVector2::operator[];
 %ignore csVector2::Norm (const csVector2 &);
 %include "csgeom/vector2.h"
 
+%ignore csVector3::operator+ (const csVector3 &, const csVector3 &);
+%ignore csVector3::operator+ (const csDVector3 &, const csVector3 &);
+%ignore csVector3::operator+ (const csVector3 &, const csDVector3 &);
+%ignore csVector3::operator- (const csVector3 &, const csVector3 &);
+%ignore csVector3::operator- (const csDVector3 &, const csVector3 &);
+%ignore csVector3::operator- (const csVector3 &, const csDVector3 &);
+%ignore csVector3::operator* (const csVector3 &, const csVector3 &);
+%ignore csVector3::operator% (const csVector3 &, const csVector3 &);
+%ignore csVector3::operator* (const csVector3 &, float);
+%ignore csVector3::operator* (float, const csVector3 &);
+%ignore csVector3::operator* (const csVector3 &, double);
+%ignore csVector3::operator* (double, const csVector3 &);
+%ignore csVector3::operator* (const csVector3 &, int);
+%ignore csVector3::operator* (int, const csVector3 &);
+%ignore csVector3::operator/ (const csVector3 &, float);
+%ignore csVector3::operator/ (const csVector3 &, double);
+%ignore csVector3::operator/ (const csVector3 &, int);
+%ignore csVector3::operator== (const csVector3 &, const csVector3 &);
+%ignore csVector3::operator!= (const csVector3 &, const csVector3 &);
+%ignore csVector3::operator>> (const csVector3 &, const csVector3 &);
+%ignore csVector3::operator<< (const csVector3 &, const csVector3 &);
+%ignore csVector3::operator< (const csVector3 &, float);
+%ignore csVector3::operator> (float, const csVector3 &);
 %ignore csVector3::operator[];
 %ignore csVector3::Norm (const csVector3 &);
 %ignore csVector3::Unit (const csVector3 &);
 %include "csgeom/vector3.h"
 
+%ignore csMatrix2::operator+ (const csMatrix2 &, const csMatrix2 &);
+%ignore csMatrix2::operator- (const csMatrix2 &, const csMatrix2 &);
+%ignore csMatrix2::operator* (const csMatrix2 &, const csMatrix2 &);
+%ignore csMatrix2::operator* (const csMatrix2 &, const csVector2 &);
+%ignore csMatrix2::operator* (const csMatrix2 &, float);
+%ignore csMatrix2::operator* (float, const csMatrix2 &);
+%ignore csMatrix2::operator/ (const csMatrix2 &, float);
 %include "csgeom/matrix2.h"
+
+%ignore csMatrix3::operator+ (const csMatrix3 &, const csMatrix3 &);
+%ignore csMatrix3::operator- (const csMatrix3 &, const csMatrix3 &);
+%ignore csMatrix3::operator* (const csMatrix3 &, const csMatrix3 &);
+%ignore csMatrix3::operator* (const csMatrix3 &, const csVector3 &);
+%ignore csMatrix3::operator* (const csMatrix3 &, float);
+%ignore csMatrix3::operator* (float, const csMatrix3 &);
+%ignore csMatrix3::operator/ (const csMatrix3 &, float);
+%ignore csMatrix3::operator== (const csMatrix3 &, const csMatrix3 &);
+%ignore csMatrix3::operator!= (const csMatrix3 &, const csMatrix3 &);
+%ignore csMatrix3::operator< (const csMatrix3 &, float);
+%ignore csMatrix3::operator> (float, const csMatrix3 &);
 %include "csgeom/matrix3.h"
+
+%ignore csTransform::operator* (const csVector3 &, const csTransform &);
+%ignore csTransform::operator* (const csTransform &, const csVector3 &);
+%ignore csTransform::operator*= (csVector3 &, const csTransform &);
+%ignore csTransform::operator* (const csPlane3 &, const csTransform &);
+%ignore csTransform::operator* (const csTransform &, const csPlane3 &);
+%ignore csTransform::operator*= (csPlane3 &, const csTransform &);
+%ignore csTransform::operator* (const csSphere &, const csTransform &);
+%ignore csTransform::operator* (const csTransform &, const csSphere &);
+%ignore csTransform::operator*= (csSphere &, const csTransform &);
+%ignore csTransform::operator* (const csMatrix3 &, const csTransform &);
+%ignore csTransform::operator* (const csTransform &, const csMatrix3 &);
+%ignore csTransform::operator*= (csMatrix3 &, const csTransform &);
+%ignore csTransform::operator*
+  (const csTransform &, const csReversibleTransform &);
+%ignore csReversibleTransform::operator/
+  (const csVector3 &, const csReversibleTransform &);
+%ignore csReversibleTransform::operator/=
+  (csVector3 &, const csReversibleTransform &);
+%ignore csReversibleTransform::operator/
+  (const csPlane3 &, const csReversibleTransform &);
+%ignore csReversibleTransform::operator/=
+  (csPlane3 &, const csReversibleTransform &);
+%ignore csReversibleTransform::operator/
+  (const csSphere &, const csReversibleTransform &);
+%ignore csReversibleTransform::operator*=
+  (csReversibleTransform &, const csReversibleTransform &);
+%ignore csReversibleTransform::operator*
+  (const csReversibleTransform &, const csReversibleTransform &);
+%ignore csReversibleTransform::operator*
+  (const csTransform &, const csReversibleTransform &);
+%ignore csReversibleTransform::operator/=
+  (csReversibleTransform &, const csReversibleTransform &);
+%ignore csReversibleTransform::operator/
+  (const csReversibleTransform &, const csReversibleTransform &);
 %include "csgeom/transfrm.h"
+
+%ignore csSphere::operator+ (const csSphere &, const csSphere &);
 %include "csgeom/sphere.h"
 
 %ignore csPlane2::A ();
@@ -476,7 +678,12 @@ TYPEMAP_OUT_csWrapPtr
 
 %include "csgeom/csrect.h"
 %include "csgeom/csrectrg.h"
+
+%ignore csQuaternion::operator+ (const csQuaternion &, const csQuaternion &);
+%ignore csQuaternion::operator- (const csQuaternion &, const csQuaternion &);
+%ignore csQuaternion::operator* (const csQuaternion &, const csQuaternion &);
 %include "csgeom/quaterni.h"
+
 %include "csgeom/spline.h"
 %include "csgeom/cspoint.h"
 
@@ -568,6 +775,7 @@ TYPEMAP_OUT_csWrapPtr
 %rename(FindString) iEvent::Find(const char *, char **, int);
 %rename(FindBool) iEvent::Find(const char *, bool &, int);
 %rename(FindVoidPtr) iEvent::Find(const char *, void **, uint32 &, int);
+#pragma SWIG nowarn=312; // nested union not supported
 %include "iutil/event.h"
 
 %include "iutil/evdefs.h"
@@ -603,9 +811,14 @@ TYPEMAP_OUT_csWrapPtr
 %include "ivideo/vbufmgr.h"
 %include "ivideo/material.h"
 %include "ivideo/natwin.h"
+
+%immutable csStreamDescription::name;
 %include "ivideo/codec.h"
 
 %include "igraphic/image.h"
+
+%immutable csImageIOFileFormatDescription::mime;
+%immutable csImageIOFileFormatDescription::subtype;
 %include "igraphic/imageio.h"
 
 %ignore iReporter::ReportV;

@@ -22,6 +22,8 @@
  * Renaming operators is the first stage of wrapping them.
  * We ignore operator [] and () and unary *
  * since these will have to be wrapped manually.
+ * We ignore operator &&= and ||=
+ * since they have nothing to which to be wrapped
  ****************************************************************************/
 %ignore			*::operator[];
 %ignore			*::operator();
@@ -54,6 +56,9 @@
 %rename(__dec__)	*::operator--;
 
 %rename(__copy__)	*::operator=;
+%rename(__add_ass__)	*::operator+=;
+%rename(__subtr_ass__)	*::operator-=;
+%rename(__mult_ass__)	*::operator*=;
 %rename(__divide_ass__)	*::operator/=;
 %rename(__modulo_ass__)	*::operator%=;
 %rename(__lshift_ass__)	*::operator<<=;
@@ -64,6 +69,9 @@
 
 %rename(__land__)	*::operator&&;
 %rename(__lor__)	*::operator||;
+
+%ignore			*::operator&&=;
+%ignore			*::operator||=;
 
 /****************************************************************************
  * Applying this Perl code is the second and final stage of wrapping
