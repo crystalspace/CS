@@ -49,6 +49,9 @@ ifeq ($(DO_JPG),yes)
   SRC.CSGFXLDR+=libs/csgfxldr/jpgimage.cpp
   LIBS.EXE+=$(JPG_LIBS)
 endif
+ifeq ($(DO_WAL),yes)
+  SRC.CSGFXLDR+=libs/csgfxldr/walimage.cpp
+endif
 
 CSGFXLDR.LIB = $(OUT)$(LIB_PREFIX)csgfxldr$(LIB)
 OBJ.CSGFXLDR = $(addprefix $(OUT),$(notdir $(SRC.CSGFXLDR:.cpp=$O)))
@@ -97,6 +100,9 @@ ifeq ($(DO_PNG),yes)
 endif
 ifeq ($(DO_JPG),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_JPG$">>volatile.tmp
+endif
+ifeq ($(DO_WAL),yes)
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_WAL$">>volatile.tmp
 endif
 
 endif # ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)

@@ -43,6 +43,9 @@ DO_TGA=yes
 # If 'yes' include support for JPG graphic files (not required currently).
 DO_JPG=yes
 
+# If 'yes' include support for WAL graphic files (not required currently).
+DO_WAL=yes
+
 # If 'yes' include sound support.
 DO_SOUND=yes
 

@@ -327,7 +327,9 @@ ImageFile* ImageFile::blend (Filter3x3* filt1)
 #if defined (DO_BMP)
   REGISTER_FORMAT (BMP)
 #endif
-
+#if defined (DO_WAL)
+  REGISTER_FORMAT(WAL)
+#endif
 // Unfortunately, we can't use static variable here since Register()
 // can happened to be called BEFORE loaderlist is initialized... so we
 // have to track initialization in Register() itself...
