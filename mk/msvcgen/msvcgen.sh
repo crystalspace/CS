@@ -27,9 +27,9 @@ fi
 
 if test -f Jamfile; then
     top=`cat Jamfile | sed '/^TOP *[?=]/!d;s/..*"\([^"]*\)".*/\1/'`
-    if test -z "$top"; then
-	top='.'
-    fi
+fi
+if test -z "$top"; then
+    top='.'
 fi
 
 if test $DO_MSVC6 = yes; then
