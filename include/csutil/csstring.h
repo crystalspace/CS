@@ -75,22 +75,14 @@ public:
   /// Get a reference to n'th character
   char& operator [] (size_t n)
   {
-#ifdef CS_DEBUG
-    if (n >= Size)
-      DEBUG_BREAK_MSG(("Trying to access string `%s' at position %lu\n", Data
-	    ? Data : "<null>", (unsigned long) n));
-#endif
+    CS_ASSERT (n < Size);
     return Data [n];
   }
 
   /// get n'th character
   char operator [] (size_t n) const
   {
-#ifdef CS_DEBUG
-    if (n >= Size)
-      DEBUG_BREAK_MSG(("Trying to access string '%s' at position %lu\n",
-	Data ? Data : "<null>", (unsigned long)n));
-#endif
+    CS_ASSERT (n < Size);
     return Data[n];
   }
   
@@ -100,22 +92,14 @@ public:
    */
   void SetAt (size_t n, const char c)
   {
-#ifdef CS_DEBUG
-    if (n >= Size)
-      DEBUG_BREAK_MSG (("Trying to set string`%s' at position %lu\n",
-        Data ? Data : "<null>", (unsigned long)n));
-#endif
+    CS_ASSERT (n < Size)
     Data [n] = c;
   }
 
   /// Get character at n'th position.
   char GetAt (size_t n) const
   {
-#ifdef CS_DEBUG
-    if (n >= Size)
-      DEBUG_BREAK_MSG (("Trying to access string `%s' at position %lu\n",
-        Data ? Data : "<null>", (unsigned long)n));
-#endif
+    CS_ASSERT (n < Size)
     return Data [n];
   }
 

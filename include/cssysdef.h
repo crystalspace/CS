@@ -423,9 +423,6 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #      define DEBUG_BREAK	{ static int x = 0; x /= x; }
 #    endif
 #  endif
-#  if !defined (DEBUG_BREAK_MSG)
-#    define DEBUG_BREAK_MSG(x)	{ printf x; DEBUG_BREAK; }
-#  endif
 #  if !defined (CS_ASSERT)
 #    if defined (COMP_VC)
 #      define  CS_ASSERT(x) assert(x)
@@ -443,8 +440,6 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #else
 #  undef DEBUG_BREAK
 #  define DEBUG_BREAK
-#  undef DEBUG_BREAK_MSG
-#  define DEBUG_BREAK_MSG(x)
 #  undef CS_ASSERT
 #  define CS_ASSERT(x)
 #endif

@@ -87,10 +87,8 @@ csString &csString::Truncate (size_t iPos)
 
 csString &csString::DeleteAt (size_t iPos, size_t iCount)
 {
-#ifdef CS_DEBUG
-  if (iPos >= Size || iPos + iCount > Size)
-    DEBUG_BREAK_MSG (("Tried to delete characters beyond the end of the string!\n"));
-#endif
+  CS_ASSERT (iPos < Size && iPos + iCount <= Size);
+  
   if (iPos + iCount < Size)
     memmove(Data + iPos, Data + iPos + iCount, Size - (iPos + iCount));
   Size -= iCount;
@@ -100,11 +98,7 @@ csString &csString::DeleteAt (size_t iPos, size_t iCount)
 
 csString &csString::Insert (size_t iPos, const csString &iStr)
 {
-#ifdef CS_DEBUG
-  if (iPos > Size)
-    DEBUG_BREAK_MSG (("Inserting `%s' beyond end of string `%s' at position %lu\n",
-      iStr.GetData (), Data ? Data : "<null>", (unsigned long)iPos));
-#endif
+  CS_ASSERT(iPos <= Size);
 
   if (Data == 0 || iPos == Size)
     return Append (iStr);
@@ -126,11 +120,7 @@ csString &csString::Insert (size_t iPos, const char iChar)
 
 csString &csString::Overwrite (size_t iPos, const csString &iStr)
 {
-#ifdef CS_DEBUG
-  if (iPos > Size)
-    DEBUG_BREAK_MSG (("Overwriting `%s' beyond end of string `%s' at position %lu\n",
-      iStr.GetData (), Data ? Data : "<null>", (unsigned long)iPos));
-#endif
+  CS_ASSERT (iPos <= Size);
 
   if (Data == 0 || iPos == Size)
     return Append (iStr);

@@ -1,5 +1,8 @@
 he history order is reversed so that new features are at the top.
 
+11-Jan-2002
+	- Matze removed DEBUG_BREAK_MSG again :) csString is using CS_ASSERT
+	  now
 10-Jan-2002
 	- Matze added an autoconf macro for CS to scripts/cs-config, no
 	  documentation on usage yet, but I think it should be clear how to use
