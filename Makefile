@@ -6,7 +6,7 @@
 
 .PHONY: help banner showplatforms showconfig platforms all depend configure \
   configbanner clean cleanlib cleandep distclean libs plugins drivers \
-  drivers2d drivers3d snddrivers netdrivers meshes softcanvas
+  drivers2d drivers3d snddrivers netdrivers meshes softcanvas show
 
 # The following two symbols are intended to be used in "echo" commands.
 # config.mak can override them depending on configured platform's requirements.
@@ -90,7 +90,7 @@ dep:
 
 depend: cleandep dep
 
-clean cleanlib cleandep distclean:
+clean cleanlib cleandep distclean show:
 	@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@
 
 unknown:

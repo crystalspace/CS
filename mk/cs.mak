@@ -16,7 +16,7 @@ include mk/user.mak
 -include config.mak
 include mk/common.mak
 
-.PHONY: depend clean cleanlib cleandep distclean
+.PHONY: depend clean cleanlib cleandep distclean show
 
 # Remove all standard suffixes to speed up make lookups
 .SUFFIXES:
@@ -221,6 +221,12 @@ $(OUT)%$O: %.asm
 
 $(OUTDIRS):
 	$(MKDIR)
+
+# A makefile debugging facility.  Prints out the expansion of the named
+# variable.  For instance, to print the expansion of SRC.SOFT3D, invoke
+# "make show V=SRC.SOFT3D" from the command-line.
+show:
+	@echo $"$V=$($V)$"
 
 # The following include should define system-dependent targets
 MAKESECTION=targets

@@ -90,6 +90,11 @@ The history order is reversed so that new features are at the top.
 	- Philip removed zlib png and jpeg libs from MSVC projects files and
 	  placed in the makefiles for apps or plugins in which they are
 	  required.
+	- Eric Sunshine added a makefile debugging facility which allows the
+	  user to easily view the expansion of any makefile variable.  To use,
+	  invoke the makefile target `show' and set the makefile variable `V'
+	  to the name of the variable of interest.  For instance, to display
+	  the expansion of $(SRC.SOFT3D), invoke "make show V=SRC.SOFT3D".
 13-Jun-2001
 	- Increased robustness of the Spider in BugPlug a little. If there
 	  are no sectors it will not start hunting. There is also a timeout
