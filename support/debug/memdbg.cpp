@@ -22,7 +22,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <ctype.h>
-#include <io.h>
+//#include <io.h>
 
 #include "sysdef.h"
 #include "memdbg.h"
