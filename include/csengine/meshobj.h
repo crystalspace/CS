@@ -339,6 +339,10 @@ public:
     {
       return scfParent->GetMeshObject ();
     }
+    virtual void SetMeshObject (iMeshObject* m)
+    {
+      scfParent->SetMeshObject (m);
+    }
     virtual iObject *QueryObject()
     {
       return scfParent;

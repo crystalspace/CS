@@ -108,6 +108,8 @@ struct iMeshWrapper : public iBase
   virtual csMeshWrapper* GetPrivateObject () = 0;
   /// Get the iMeshObject.
   virtual iMeshObject* GetMeshObject () = 0;
+  /// Set the iMeshObject.
+  virtual void SetMeshObject (iMeshObject*) = 0;
   /// Get the iObject for this mesh object.
   virtual iObject *QueryObject() = 0;
 

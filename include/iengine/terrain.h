@@ -42,6 +42,8 @@ struct iTerrainWrapper : public iBase
 
   /// Get the iTerrainObject.
   virtual iTerrainObject* GetTerrainObject () = 0;
+  /// Set the iTerrainObject.
+  virtual void SetTerrainObject (iTerrainObject*) = 0;
   /// Get the iObject for this terrain.
   virtual iObject *QueryObject() = 0;
 
@@ -67,6 +69,8 @@ struct iTerrainFactoryWrapper : public iBase
 {
   /// Get the iTerrainFactory.
   virtual iTerrainObjectFactory* GetTerrainObjectFactory () = 0;
+  /// Set the iTerrainFactory.
+  virtual void SetTerrainObjectFactory (iTerrainObjectFactory*) = 0;
   /// Get the iObject for this terrain factory.
   virtual iObject *QueryObject() = 0;
 };

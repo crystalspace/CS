@@ -117,6 +117,10 @@ public:
     {
       return scfParent->GetTerrainObject ();
     }
+    virtual void SetTerrainObject (iTerrainObject *t)
+    {
+      scfParent->SetTerrainObject (t);
+    }
     virtual iObject *QueryObject()
     {
       return scfParent;
@@ -174,6 +178,10 @@ public:
     virtual iTerrainObjectFactory* GetTerrainObjectFactory ()
     {
       return scfParent->GetTerrainObjectFactory ();
+    }
+    virtual void SetTerrainObjectFactory (iTerrainObjectFactory *f)
+    {
+      scfParent->SetTerrainObjectFactory (f);
     }
     virtual iObject *QueryObject()
     {

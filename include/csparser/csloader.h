@@ -27,6 +27,8 @@
 #include "csutil/util.h"
 #include "csgeom/quaterni.h"
 
+struct csRGBcolor;
+
 struct iImageIO;
 struct iSoundLoader;
 struct iEngine;
@@ -34,32 +36,22 @@ struct iVFS;
 struct iGraphics3D;
 struct iSoundRender;
 struct iLoaderPlugIn;
-struct iCollection;
 
-struct csRGBcolor;
+struct iObject;
+struct iCollection;
 struct iMotion;
 struct iMotionAnim;
 struct iSkeletonLimb;
-class csTextureWrapper;
-class csMaterialWrapper;
-class csPolygonTemplate;
-class csPolyPlane;
-class csPolyTxtPlane;
-class csCollection;
+struct iMaterialWrapper;
+struct iMeshFactoryWrapper;
+struct iMeshWrapper;
+struct iTerrainFactoryWrapper;
+struct iTerrainWrapper;
+
 class csStatLight;
-class csThing;
-class csEngine;
-class csCurveTemplate;
-class csSoundDataObject;
-class csMeshFactoryWrapper;
-class csMeshWrapper;
-class csParticleSystem;
 class csKeyValuePair;
 class csMapNode;
 class csSector;
-class csFrame;
-class csObject;
-class csPolygon3D;
 class csTerrainFactoryWrapper;
 class csTerrainWrapper;
 
@@ -114,7 +106,7 @@ class csLoader : public iLoader
   /// Parse a static light definition and return a new object
   csStatLight* load_statlight (char* name, char* buf);
   /// Parse a key definition and return a new object
-  csKeyValuePair* load_key (char* buf, csObject* pParent);
+  csKeyValuePair* load_key (char* buf, iObject* pParent);
   /// Parse a map node definition and return a new object
   csMapNode* load_node (char* name, char* buf, csSector* sec);
 
@@ -126,21 +118,24 @@ class csLoader : public iLoader
   /// Parse a sector definition and return a new object
   csSector* load_sector (char* secname, char* buf);
 
+  /// Resolve the portals of a csThing
+  void ResolvePortalSectors (iEngine* Engine, csThing* ps);
+
   /// Load a Mesh Object Factory from the map file.
-  bool LoadMeshObjectFactory (csMeshFactoryWrapper* meshFact, char* buf);
+  bool LoadMeshObjectFactory (iMeshFactoryWrapper* meshFact, char* buf);
 
   /**
    * Load the mesh object from the map file.
    */
-  bool LoadMeshObject (csMeshWrapper* mesh, char* buf);
+  bool LoadMeshObject (iMeshWrapper* mesh, char* buf);
 
   /// Load a Terrain Object Factory from the map file.
-  bool LoadTerrainObjectFactory (csTerrainFactoryWrapper* pTerrFact, char* buf);
+  bool LoadTerrainObjectFactory (iTerrainFactoryWrapper* pTerrFact, char* buf);
 
   /**
    * Load the terrain object from the map file.
    */
-  bool LoadTerrainObject( csTerrainWrapper *pTerrain, char* buf,
+  bool LoadTerrainObject( iTerrainWrapper *pTerrain, char* buf,
   	csSector* pSector );
 
   /**
@@ -199,12 +194,14 @@ class csLoader : public iLoader
   bool LoadMap (char* buf);
 
   /// Find a material (and create one from texture if possible)
-  csMaterialWrapper* FindMaterial (const char *iName);
+  iMaterialWrapper* FindMaterial (const char *iName);
 
 public:
   /********** iLoader implementation **********/
   DECLARE_IBASE;
   
+  // system driver
+  iSystem *System;
   // virtual file system
   iVFS *VFS;
   // image loader
