@@ -28,14 +28,20 @@ struct csPoint
   int x, y;
 
   /// Constructor: initialize the object with zeros
-  csPoint ()
-  { x = y = 0; }
+  csPoint ():x(0), y(0)
+  { }
   /// Constructor: initialize the object with given values
-  csPoint (int iX, int iY)
-  { x = iX; y = iY; }
+  csPoint (int iX, int iY):x(iX), y(iY)
+  { }
+  /// Constructor: initialize the object vy copying
+  csPoint (csPoint &v):x(v.x), y(v.y)
+  { }
   /// Set the coordinates of this point
   void Set (int iX, int iY)
   { x = iX; y = iY; }
+  /// Set the coordinates of this point from another point
+  void Set (csPoint &v)
+  { x = v.x; y = v.y; }
 };
 
 #endif
