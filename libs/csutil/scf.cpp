@@ -68,10 +68,14 @@ public:
   { RefCount++; }
 
   /// Decrement reference count for the library
-  void DecRef ()
+  bool DecRef ()
   {
     if ((--RefCount) <= 0)
-    LibraryRegistry->Delete (LibraryRegistry->Find (this));
+    {
+      LibraryRegistry->Delete (LibraryRegistry->Find (this));
+      return true;
+    }
+    return false;
   }
 
   /// Find a scfClassInfo for given class ID
@@ -222,15 +226,12 @@ void scfFactory::IncRef ()
       Library = (scfSharedLibrary *)LibraryRegistry->Get (libidx);
     else
       CHKB (Library = new scfSharedLibrary (LibraryName));
-    if (!Library->ok ())
+    if (Library->ok ())
+      ClassInfo = Library->Find (ClassID);
+    if (!Library->ok () || !ClassInfo)
     {
       Library->DecRef ();
-      return;
-    }
-    ClassInfo = Library->Find (ClassID);
-    if (!ClassInfo)
-    {
-      CHK (delete Library);
+      Library = NULL;
       return;
     }
   }
@@ -252,7 +253,8 @@ void scfFactory::DecRef ()
   scfRefCount--;
 #ifndef CS_STATIC_LINKED
   if (Library)
-    Library->DecRef ();
+    if (Library->DecRef ())
+      Library = NULL;
 #endif
 }
 
@@ -347,9 +349,7 @@ void *scfCreateInstance (const char *iClassID, const char *iInterfaceID,
     {
       instance = object->QueryInterface (iInterfaceID, iVersion);
       if (!instance)
-      {
         object->DecRef ();
-      }
     }
   } /* endif */
 
