@@ -135,7 +135,7 @@ void csArchive::ReadDirectory ()
   //// the corresponding directory entries (which are optional in zip files).
 
   // First, make a list of all possible directory components.
-  csString filename;
+  csString filename, slice;
   csSet<csStrKey, csConstCharHashKeyHandler> dset;
   for (size_t i = 0, n = dir.Length(); i < n; i++)
   {
@@ -150,11 +150,9 @@ void csArchive::ReadDirectory ()
       sep = slash;
       if (sep != (size_t)-1)
       {
-        char const ch = filename[++sep];
-	filename[sep] = 0;
-        if (!dset.In (filename.GetData()))
-          dset.AddNoTest (csStrKey (filename)); 
-        filename[sep] = ch;
+	filename.SubString (slice, 0, ++sep);
+        if (!dset.In (slice.GetData()))
+          dset.AddNoTest (csStrKey (slice)); 
       }
     }
   }

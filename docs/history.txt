@@ -43,6 +43,8 @@ chronological order.
 	  performed a small amount of re-writing to make it more sensible in
 	  the context of a HOWTO.
 	- Eric Sunshine added a "shaders" compile group to the build system.
+	- res fixed an occasional csString character access beyond its length
+	  in archive.cpp.
 12-Dec-2004
 	- Eric Sunshine worked around problem in csjava caused by new operator
 	  overrides in csColor and csColor4. Although modern C++ can deal with
