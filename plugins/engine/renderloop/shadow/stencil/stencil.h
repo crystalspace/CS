@@ -77,6 +77,10 @@ private:
   csArray<csVector3> edge_midpoints;
   csArray<csVector3> edge_normals;
 
+  // Mesh that was created when the original shadow mesh was auto-closed.
+  // Kept so that a new one isn't alloced every time.
+  csStencilPolygonMesh* closedMesh;
+
   bool enable_caps;
 
   bool meshShadows;

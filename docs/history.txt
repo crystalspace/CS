@@ -33,6 +33,11 @@ chronological order.
 	- Jorrit moved csRGBVector from csutil to csgfx. Firstly it belongs
 	  there, and secondly this avoids a circular dependency between
 	  csgfx and csutil.
+	- res made the following changes to the stencil shadow render step:
+	    - When a shadow mesh is auto-closed, the created polymesh is 
+	      reused the next time the shadow mesh has to be closed.
+	    - Don't draw shadow volumes when the shadow shader doesn't offer
+	      a suitable technique.
 18-Sep-2003
 	- res reverted Paul's change made to libs/cssys/win32/shellstuff.h
 	  yesterday which caused SHGetFolderPathW() to be used when present.

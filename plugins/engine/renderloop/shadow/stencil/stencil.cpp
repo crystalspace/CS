@@ -78,6 +78,7 @@ csStencilShadowCacheEntry::csStencilShadowCacheEntry (
   csStencilShadowCacheEntry::parent = parent;
   meshWrapper = mesh;
   model = 0;
+  closedMesh = 0;
 
   csRef<iObjectModel> model = mesh->GetMeshObject ()->GetObjectModel ();
   model->AddListener (this);
@@ -86,6 +87,7 @@ csStencilShadowCacheEntry::csStencilShadowCacheEntry (
 
 csStencilShadowCacheEntry::~csStencilShadowCacheEntry ()
 {
+  delete closedMesh;
 }
 
 void csStencilShadowCacheEntry::SetActiveLight (iLight *light, 
@@ -123,7 +125,7 @@ void csStencilShadowCacheEntry::SetActiveLight (iLight *light,
     unsigned int *buf = (unsigned int *)entry->shadow_index_buffer->Lock (
     	CS_BUF_LOCK_NORMAL);
     entry->edge_start = triangle_count*3;
-    entry->index_range = entry->edge_start;
+    int indexRange = entry->index_range = entry->edge_start;
 
     /* setup shadow caps */
     int i;
@@ -197,15 +199,17 @@ void csStencilShadowCacheEntry::SetActiveLight (iLight *light,
       csVector3 lightdir = entry->meshLightPos - edge_midpoints[i];
       if (((lightdir * edge_normals[i]) * (lightdir * edge_normals[i+1])) <= 0)
       {
-        buf[entry->index_range ++] = edge_indices[i*3 + 0];
-        buf[entry->index_range ++] = edge_indices[i*3 + 1];
-        buf[entry->index_range ++] = edge_indices[i*3 + 2];
-        buf[entry->index_range ++] = edge_indices[i*3 + 3];
-        buf[entry->index_range ++] = edge_indices[i*3 + 4];
-        buf[entry->index_range ++] = edge_indices[i*3 + 5];
+        buf[indexRange++] = edge_indices[i*3 + 0];
+        buf[indexRange++] = edge_indices[i*3 + 1];
+        buf[indexRange++] = edge_indices[i*3 + 2];
+        buf[indexRange++] = edge_indices[i*3 + 3];
+        buf[indexRange++] = edge_indices[i*3 + 4];
+        buf[indexRange++] = edge_indices[i*3 + 5];
       }
     }
 // #endif
+
+    entry->index_range = indexRange;
 
     entry->shadow_index_buffer->Release ();
   }
@@ -302,27 +306,35 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
     csStencilShadowCacheEntry::model = model;	
   }
 
-  //first try to use a MeshShadow polygonmesh
-  //but if we don't get any, attempt to use collidemesh
+  // Try to get a MeshShadow polygonmesh
   csRef<iPolygonMesh> mesh = model->GetPolygonMeshShadows ();
   if (mesh)
   {
+    // Stencil shadows need closed meshes.
     const csFlags& meshFlags = mesh->GetFlags ();
     // @@@ Not good when the object model changes often.
+    //  Store the information or so?
     if (meshFlags.Check (CS_POLYMESH_NOTCLOSED) || 
       (!meshFlags.Check (CS_POLYMESH_CLOSED) && 
       !csPolygonMeshTools::IsMeshClosed (mesh)))
     {
-      csStencilPolygonMesh* newMesh = new csStencilPolygonMesh;
-      newMesh->CopyFrom (mesh);
+      // If not closed, close it.
+      if (closedMesh == 0)
+	closedMesh = new csStencilPolygonMesh ();
+      closedMesh->CopyFrom (mesh);
 
       csArray<csMeshedPolygon> newPolys;
       int* vertidx;
       int vertidx_len;
       csPolygonMeshTools::CloseMesh (mesh, newPolys, vertidx, vertidx_len);
-      newMesh->AddPolys (newPolys, vertidx);
+      closedMesh->AddPolys (newPolys, vertidx);
 
-      mesh.AttachNew (newMesh);
+      mesh = closedMesh;
+    }
+    else
+    {
+      delete closedMesh;
+      closedMesh = 0;
     }
   }
   else
@@ -576,7 +588,9 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
 	iLight* light)
 {
   iShader* shadow;
-  if ((shadow = type->GetShadow ()) == 0)
+  iShaderTechnique* tech;
+  if (((shadow = type->GetShadow ()) == 0) || 
+    ((tech = shadow->GetBestTechnique ()) == 0))
   {
     for (int i = 0; i < steps.Length (); i++)
     {
@@ -665,7 +679,6 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
   {
     csVector3 rad, center;
     float maxRadius;
-    iShaderTechnique* tech = shadow->GetBestTechnique ();
     for (int p = 0; p < tech->GetPassCount (); p ++) 
     {
       iShaderPass* pass = tech->GetPass (p);

@@ -67,6 +67,9 @@ public:
 
   void CopyFrom (iPolygonMesh* polyMesh)
   {
+    delete[] secondary_vertidx;
+    secondary_vertidx = 0;
+
     int numVerts = polyMesh->GetVertexCount ();
     csVector3* oldVerts = polyMesh->GetVertices ();
     verts.SetLength (numVerts);
@@ -86,13 +89,12 @@ public:
 
     for (i = 0; i < numPolys; i++)
     {
-      csMeshedPolygon poly;
+      csMeshedPolygon& poly = polys[i];
       poly.num_vertices = oldPolys[i].num_vertices;
       poly.vertices = vertidx_p;
       memcpy (poly.vertices, oldPolys[i].vertices, 
 	poly.num_vertices * sizeof (int));
       vertidx_p += poly.num_vertices;
-      polys[i] = poly;
     }
 
     ShapeChanged ();
