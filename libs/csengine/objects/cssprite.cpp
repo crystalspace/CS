@@ -737,14 +737,15 @@ void csSprite3D::RemoveFromSectors ()
 {
   while (sectors.Length () > 0)
   {
-    csSector* ss = (csSector*)sectors[0];
-    sectors[0] = NULL;
-    sectors.Pop ();
-    int idx = ss->sprites.Find (this);
-    if (idx >= 0)
+    csSector* ss = (csSector*)sectors.Pop ();
+    if (ss)
     {
-      ss->sprites[idx] = NULL;
-      ss->sprites.Delete (idx);
+      int idx = ss->sprites.Find (this);
+      if (idx >= 0)
+      {
+        ss->sprites[idx] = NULL;
+        ss->sprites.Delete (idx);
+      }
     }
   }
 }
