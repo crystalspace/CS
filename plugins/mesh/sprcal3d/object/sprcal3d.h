@@ -485,7 +485,7 @@ private:
   csArray<csCal3DAnimation*> active_anims;
   csArray<float>             active_weights;
   bool is_idling;
-  int  default_idle_anim;
+  int  default_idle_anim,last_locked_anim;
   float idle_override_interval;
   int   idle_action;
 
@@ -983,6 +983,11 @@ public:
     {
       scfParent->SetAnimationTime(animationTime);
     }
+    virtual CalModel *GetCal3DModel()
+    {
+      return &scfParent->calModel;
+    }
+
 
   } scfiSpriteCal3DState;
   friend struct SpriteCal3DState;

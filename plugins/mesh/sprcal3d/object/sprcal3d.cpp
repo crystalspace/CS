@@ -714,6 +714,7 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
   meshVersion = 0;
   bboxVersion = (uint)-1;
   default_idle_anim = -1;
+  last_locked_anim = -1;
 }
 
 csSpriteCal3DMeshObject::~csSpriteCal3DMeshObject ()
@@ -782,11 +783,16 @@ void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
       	meshId]->default_material);
     }
   }
-  //  calModel.setMaterialSet(0);
+  // To get an accurate bbox below, you must have the model standing in the default anim first
+  calModel.getMixer()->blendCycle(0,1,0);
   calModel.update(0);
   last_update_time = csGetTicks();
 
   RecalcBoundingBox(object_bbox);
+  calModel.getMixer()->clearCycle(0,0);
+
+//  printf("Object bbox is (%1.2f, %1.2f, %1.2f) to (%1.2f, %1.2f, %1.2f)\n",
+//         object_bbox.MinX(),object_bbox.MinY(),object_bbox.MinZ(),object_bbox.MaxX(),object_bbox.MaxY(),object_bbox.MaxZ());
 
   // Copy the sockets list down to the mesh
   iSpriteCal3DSocket *factory_socket,*new_socket;
@@ -1914,6 +1920,11 @@ void csSpriteCal3DMeshObject::ClearAllAnims()
     // do not delete pop because ptr is shared with factory
     active_weights.Pop();
   }
+  if (last_locked_anim != -1)
+  {
+     calModel.getMixer()->removeAction(last_locked_anim);
+     last_locked_anim = -1;
+  }
 }
 
 bool csSpriteCal3DMeshObject::SetAnimCycle(const char *name, float weight)
@@ -2014,8 +2025,11 @@ bool csSpriteCal3DMeshObject::SetAnimAction(const char *name, float delayIn,
     return false;
 
   calModel.getMixer()->executeAction(idx,delayIn,delayOut,
-    1  ,factory->anims[idx]->lock  );
+                                     1  ,factory->anims[idx]->lock  );
 
+  if (factory->anims[idx]->lock)
+      last_locked_anim = idx;
+ 
   return true;
 }
 

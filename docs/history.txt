@@ -19,6 +19,18 @@ chronological order.
 	  methods which provide the same functionality without the dangerous
 	  and unportable union/struct. Also added similar accessors to
 	  csVector2 and csVector4.
+	- Keith added functionality to Sprcal3d.  Now when you set an action
+	  in sprcal3d, it remembers this and clears it explicitly when a new
+	  animation is set.  If the action has completed and has already been 
+	  removed this has no effect, but if the action is still in progress
+	  then the new animation will play accurately.  This is particularly
+	  important for autolock actions which stay on the last frame indefinitely.
+	  YOU NEED CAL3D CVS AS OF 6/28 TO BUILD THIS.
+	- Also, now on initial creation of the cal3d model, the bbox is
+	  calculated using frame 0 of anim 0 as the base instead of the meshes
+	  as loaded.  This is because most of the time 3d modelers model characters
+	  with their arms straight out instead of at their sides, which makes
+	  collider creation very wrong.
 27-Jun-2004
 	- res worked around a possible VC7 64bit warning in 
 	  csIntegralHashKeyHandler<>.
