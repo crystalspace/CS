@@ -699,9 +699,6 @@ void csTextureManagerSoftware::PrepareTextures ()
   // the ALONE_HINT
   if (main_txtmgr)
     main_txtmgr->ReprepareAloneProcs ();
-
-  if (!proc_txtmgr && !main_txtmgr)
-    delete [] Scan.GlobalCMap;
 }
 
 iTextureHandle *csTextureManagerSoftware::RegisterTexture (iImage* image,
