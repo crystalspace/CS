@@ -22,7 +22,6 @@
 #include "csengine/pol2d.h"
 #include "csengine/sector.h"
 #include "csengine/engine.h"
-#include "csengine/tranman.h"
 #include "csengine/stats.h"
 #include "csengine/cbuffer.h"
 #include "csengine/quadtr3d.h"
@@ -172,7 +171,6 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
   rview->GetClipPlane ().Invert ();
   if (flags.Check (CS_PORTAL_CLIPDEST)) rview->UseClipPlane (true);
 
-  csTranCookie old_cookie = 0;
   if (flags.Check (CS_PORTAL_WARP))
   {
     iCamera* inewcam = rview->CreateNewCamera ();
@@ -181,15 +179,11 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
     WarpSpace (inewcam->GetTransform (), mirror);
     inewcam->SetMirrored (mirror);
 
-    old_cookie = csEngine::current_engine->tr_manager.NewCameraFrame ();
     sector->Draw (rview);
   }
   else
     sector->Draw (rview);
   rview->RestoreRenderContext (old_ctxt);
-
-  if (flags.Check (CS_PORTAL_WARP))
-    csEngine::current_engine->tr_manager.RestoreCameraFrame (old_cookie);
 
   return true;
 }
@@ -247,10 +241,8 @@ void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
   // later.
   bool copied_frustums = false;
 
-  csTranCookie old_cookie = 0;
   if (flags.Check (CS_PORTAL_WARP))
   {
-    old_cookie = csEngine::current_engine->tr_manager.NewCameraFrame ();
     new_lview.light_frustum->Transform (&warp_wor);
 
     if (flags.Check (CS_PORTAL_MIRROR)) new_lview.mirror = !lview.mirror;
@@ -340,9 +332,6 @@ void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
   }
 
   sector->RealCheckFrustum (new_lview);
-
-  if (flags.Check (CS_PORTAL_WARP))
-    csEngine::current_engine->tr_manager.RestoreCameraFrame (old_cookie);
 
   if (copied_frustums)
   {

@@ -23,7 +23,6 @@
 #include "csutil/rng.h"
 #include "igraph3d.h"
 #include "isystem.h"
-#include "iengine.h"
 #include "icamera.h"
 #include "irview.h"
 #include "imovable.h"
@@ -603,7 +602,8 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   do_tweening = true;
   vis_cb = NULL;
 
-  camera_cookie = 0;
+  cur_cameranr = -1;
+  cur_movablenr = -1;
   MixMode = CS_FX_COPY;
   initialized = false;
   shapenr = 0;
@@ -754,16 +754,16 @@ void csSprite3DMeshObject::UpdateWorkTables (int max_size)
 }
 
 void csSprite3DMeshObject::GetTransformedBoundingBox (
-	iTransformationManager* tranman,
+	long cameranr, long movablenr,
 	const csReversibleTransform& trans, csBox3& cbox)
 {
-  csTranCookie cur_cookie = tranman->GetCookie ();
-  if (camera_cookie == cur_cookie)
+  if (cur_cameranr == cameranr && cur_movablenr == movablenr)
   {
     cbox = camera_bbox;
     return;
   }
-  camera_cookie = cur_cookie;
+  cur_cameranr = cameranr;
+  cur_movablenr = movablenr;
 
   if (skeleton_state)
   {
@@ -796,13 +796,12 @@ static void Perspective (const csVector3& v, csVector2& p, float fov,
 }
 
 float csSprite3DMeshObject::GetScreenBoundingBox (
-	iTransformationManager* tranman,
-	float fov, float sx, float sy,
+	long cameranr, long movablenr, float fov, float sx, float sy,
 	const csReversibleTransform& trans, csBox2& sbox, csBox3& cbox)
 {
   csVector2 oneCorner;
 
-  GetTransformedBoundingBox (tranman, trans, cbox);
+  GetTransformedBoundingBox (cameranr, movablenr, trans, cbox);
 
   // if the entire bounding box is behind the camera, we're done
   if ((cbox.MinZ () < 0) && (cbox.MaxZ () < 0))
@@ -875,8 +874,6 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
  
   iGraphics3D* g3d = rview->GetGraphics3D ();
   iCamera* camera = rview->GetCamera ();
-  iEngine* engine = rview->GetEngine ();
-  iTransformationManager* tranman = engine->GetTransformationManager ();
 
   // First create the transformation from object to camera space directly:
   //   W = Mow * O - Vow;
@@ -898,7 +895,9 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   //	   if rview has do_clip_plane set to true.
   csBox2 bbox;
   csBox3 bbox3;
-  if (GetScreenBoundingBox (tranman, fov, shiftx, shifty, tr_o2c, bbox, bbox3) < 0) return false;	// Not visible.
+  if (GetScreenBoundingBox (camera->GetCameraNumber (),
+  	movable->GetUpdateNumber (), fov, shiftx, shifty,
+  	tr_o2c, bbox, bbox3) < 0) return false;	// Not visible.
   bool do_clip;
   if (rview->ClipBBox (bbox, bbox3, do_clip) == false) return false;
  

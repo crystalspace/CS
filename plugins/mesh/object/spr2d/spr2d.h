@@ -25,7 +25,6 @@
 #include "imeshobj.h"
 #include "imspr2d.h"
 #include "igraph3d.h"
-#include "itranman.h"
 #include "iconfig.h"
 #include "iparticl.h"
 

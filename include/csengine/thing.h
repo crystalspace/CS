@@ -23,7 +23,6 @@
 #include "csobject/pobject.h"
 #include "csengine/bsp.h"
 #include "csengine/movable.h"
-#include "csengine/tranman.h"
 #include "csutil/flags.h"
 #include "csutil/cscolor.h"
 #include "csutil/csvector.h"
@@ -34,7 +33,6 @@
 #include "iviscull.h"
 #include "imeshobj.h"
 #include "irview.h"
-#include "itranman.h"
 
 class csSector;
 class csEngine;
@@ -197,8 +195,9 @@ private:
   csVector3* wor_verts;
   /// Vertices in camera space.
   csVector3* cam_verts;
-  /// Camera space vertices.
-  csTransformedSet cam_verts_set;
+  /// Camera number for which the above camera vertices are valid.
+  long cameranr;
+
   /**
    * This number indicates the last value of the movable number.
    * This thing can use this to check if the world space coordinates
@@ -462,7 +461,7 @@ public:
 
   /**
    * Return the camera space vector for the vertex.
-   * Make sure you recently called CamUpdate(). Otherwise it is
+   * Make sure you recently called UpdateTransformation(). Otherwise it is
    * possible that this coordinate will not be valid.
    */
   csVector3& Vcam (int idx) { return cam_verts[idx]; }
@@ -570,7 +569,7 @@ public:
   void MergeTemplate (csThing* tpl, csSector* sector, csMaterialList* matList,
   	const char* prefix, 
 	csMaterialWrapper* default_material = NULL,
-  	float default_texlen = 1, bool objspace = false,
+  	float default_texlen = 1,
 	csVector3* shift = NULL, csMatrix3* transform = NULL);
 
   /**
@@ -578,7 +577,7 @@ public:
    */
   void MergeTemplate (csThing* tpl, csSector* sector,
   	csMaterialWrapper* default_material = NULL,
-  	float default_texlen = 1, bool objspace = false,
+  	float default_texlen = 1,
 	csVector3* shift = NULL, csMatrix3* transform = NULL);
 
   /// Set parent template.
@@ -621,12 +620,6 @@ public:
    * Get the radius in object space for this polygon set.
    */
   const csVector3& GetRadius ();
-
-  /**
-   * Find the minimum and maximum Z values of all vertices in
-   * this polygon set (in camera space). This is used for planed fog.
-   */
-  void GetCameraMinMaxZ (float& minz, float& mazx);
 
   //----------------------------------------------------------------------
   // Visibility culler
@@ -737,18 +730,6 @@ public:
 				       float* pr = NULL);
 
   /**
-   * Intersect this polygon set in camera space with a polygon which
-   * coincides with plane Zc = <value> (a plane parallel to the view
-   * plane) and return a new polygon which is the intersection (as a 2D
-   * polygon with z not given). This function assumes that the
-   * polygon set is convex (so it can in general not be used for polygon
-   * sets which use a BSP tree) and gives unexpected results otherwise.
-   * Delete the returned polygon with 'delete []' when ready.
-   */
-  csVector2* IntersectCameraZPlane (float z, csVector2* clipper,
-  	int num_clip, int& num_pts);
-
-  /**
    * Check frustum visibility on this thing.
    */
   void RealCheckFrustum (csFrustumView& lview);
@@ -773,39 +754,10 @@ public:
   //----------------------------------------------------------------------
 
   /**
-   * Transform to the given camera if needed. This function works
-   * via the transformation manager and will only transform if needed.
+   * Transform to the given camera if needed. This function will use
+   * the camera number to avoid unneeded transformation.
    */
-  void UpdateTransformation (const csTransform& c)
-  {
-    cam_verts_set.Transform (wor_verts, num_vertices, c);
-    cam_verts = cam_verts_set.GetVertexArray ()->GetVertices ();
-  }
-
-  /**
-   * Translate with the given vector if needed. This function works
-   * via the transformation manager and will only translate if needed.
-   */
-  void UpdateTransformation (const csVector3& trans)
-  {
-    cam_verts_set.Translate (wor_verts, num_vertices, trans);
-    cam_verts = cam_verts_set.GetVertexArray ()->GetVertices ();
-  }
-
-  /// Make transformation table ready but don't do the transform yet.
-  void UpdateTransformation ()
-  {
-    cam_verts_set.Update ();
-    cam_verts_set.GetVertexArray ()->SetNumVertices (num_vertices);
-    cam_verts = cam_verts_set.GetVertexArray ()->GetVertices ();
-  }
-
-  /// Make sure the camera vertices are up-to-date to the current camera frame.
-  void CamUpdate ()
-  {
-    cam_verts_set.CheckUpdate ();
-    cam_verts = cam_verts_set.GetVertexArray ()->GetVertices ();
-  }
+  void UpdateTransformation (const csTransform& c, long cam_cameranr);
 
   /// Make sure the world vertices are up-to-date.
   void WorUpdate ();
@@ -820,9 +772,9 @@ public:
   void HardTransform (const csReversibleTransform& t);
 
   /// Get the array of camera vertices.
-  csVector3* GetCameraVertices ()
+  csVector3* GetCameraVertices (const csTransform& c, long cam_cameranr)
   {
-    CamUpdate ();
+    UpdateTransformation (c, cam_cameranr);
     return cam_verts;
   }
 

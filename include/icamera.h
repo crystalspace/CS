@@ -39,7 +39,7 @@
 class csCamera;
 struct iSector;
 
-SCF_VERSION (iCamera, 0, 0, 7);
+SCF_VERSION (iCamera, 0, 0, 8);
 
 /// Camera class.
 struct iCamera : public iBase
@@ -158,6 +158,14 @@ struct iCamera : public iBase
    * Get the current sector.
    */
   virtual iSector* GetSector () = 0;
+
+  /**
+   * Get the camera number. This number is changed for every new camera
+   * instance and it is also updated whenever the camera transformation
+   * changes. This number can be used to cache camera vertex arrays, for
+   * example.
+   */
+  virtual long GetCameraNumber () = 0;
 };
 
 #endif

@@ -1,5 +1,14 @@
 The history order has been reversed so that new features are at the top.
 
+REMOVE: itranman.h, tranman.h, tranman.cpp
+
+7-Mar-2001
+	- csThing::MergeTemplate() now works through object space coordinates
+	  all the time.
+	- Fixed a bug in the new camera system. When the camera didn't update
+	  then moving objects would not be refreshed correctly. The reason
+	  is that the camera vertices were only updated when the camera
+	  changes but they also need to be updated when the movable changes.
 6-Mar-2001
 	- Changed the following functions to work in object space instead
 	  of world space:
@@ -15,6 +24,28 @@ The history order has been reversed so that new features are at the top.
 	- Modified the csSector versions of IntersectSphere() and
 	  IntersectSegment() to correctly use the movable of the things
 	  if relevant to map world space to object space.
+	- Further converted the following functions to work in object space
+	  instead of world space:
+	    - csPolygon3D::ClipFrustum()
+	- Made some of the functions in csTransform virtual so that they
+	  can be overriden by subclasses (i.e. csCamera in this case).
+	- csCamera now has a number called 'cameranr' which is updated
+	  whenever a new camera is created or a camera is updated. This
+	  number can be used to check if an object transformed to camera
+	  space is still valid. You can get this number with GetCameraNumber().
+	- Also added iCamera::GetCameraNumber().
+	- Removed csPolygon3D::ClipFrustum() and csPolygon3D::ClipPoly().
+	- Removed csThing::GetCameraMinMaxZ().
+	- Removed csThing::IntersectCameraZPlane().
+	- Redesigned csThing and csPolygon3D camera vertex handling so that
+	  they no longer go through the transformation manager. Instead they
+	  use the camera number which is now defined in csCamera.
+	- Consequently removed the transformation manager.
+	- Fixed all mesh plugins that were using the transformation manager
+	  (cube, ball, and spr3d). They are now using the camera number
+	  instead.
+	- Fixed a bug in csThing::MergeTemplate(). The function would not
+	  copy the new moving flag from the template thing to the new instance.
 	- Eric Sunshine repaired the csgamtst.mak makefile.  Apparently it
 	  was just a verbatim copy of the pysimple makefile.
 	- Eric Sunshine fixed the gamecore makefile so that the plugin no

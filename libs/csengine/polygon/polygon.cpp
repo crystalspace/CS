@@ -942,54 +942,6 @@ void csPolygon3D::PlaneNormal (float* yz, float* zx, float* xy)
 }
 
 
-bool csPolygon3D::ClipPoly (csVector3* frustum, int m, bool mirror,
-	csVector3** dest, int* num_dest)
-{
-  int i, i1;
-  int num_vertices = GetVertices ().GetNumVertices ();
-  if (!frustum)
-  {
-    // Infinite frustum.
-    csVector3* dd = new csVector3 [num_vertices];
-    *dest = dd;
-    if (!mirror)
-      for (i = 0 ; i < num_vertices ; i++)
-        dd[i] = Vcam (i);
-    else
-      for (i = 0 ; i < num_vertices ; i++)
-        dd[i] = Vcam (num_vertices-i-1);
-    *num_dest = num_vertices;
-    return true;
-  }
-
-  csVector3* dd = new csVector3 [num_vertices+m];     // For safety
-  *dest = dd;
-  if (!mirror)
-    for (i = 0 ; i <num_vertices ; i++)
-      dd[i] = Vcam (i);
-  else
-    for (i = 0 ; i <num_vertices ; i++)
-      dd[i] = Vcam (num_vertices-i-1);
-  *num_dest = num_vertices;
-
-  i1 = -1;
-  csVector3 *p = frustum + m;
-
-  for (i = -m-1 ; ++i ; )
-  {
-    ClipPolyPlane (dd, num_dest, mirror, p[i1], p[i]);
-    if ((*num_dest) < 3)
-    {
-      delete [] dd;
-      *dest = NULL;
-      return false;
-    }
-    i1 = i;
-  }
-
-  return true;
-}
-
 // Clip a polygon against a plane.
 void csPolygon3D::ClipPolyPlane (csVector3* verts, int* num, bool mirror,
   csVector3& v1, csVector3& v2)
@@ -1058,15 +1010,6 @@ void csPolygon3D::ClipPolyPlane (csVector3* verts, int* num, bool mirror,
     verts[cw_offset+1] = isect_ccw;
     *num = 2 + cw_offset + (*num) - ccw_offset - 1;
   }
-}
-
-bool csPolygon3D::ClipFrustum (csVector3& center, csVector3* frustum,
-	int num_frustum, bool mirror,
-	csVector3** new_frustum, int* new_num_frustum)
-{
-  const csPlane3& wplane = plane->GetWorldPlane ();
-  if (wplane.Classify (center) > -SMALL_EPSILON) return false;
-  return ClipPoly (frustum, num_frustum, mirror, new_frustum, new_num_frustum);
 }
 
 bool csPolygon3D::ClipToPlane (csPlane3* portal_plane, const csVector3& v_w2c,

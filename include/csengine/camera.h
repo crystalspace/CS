@@ -65,6 +65,18 @@ private:
   void ComputeAngle (int width);
   static void ComputeDefaultAngle (int width);
 
+  /**
+   * Camera number. This number is changed for every new camera
+   * instance and it is also updated whenever the camera transformation
+   * changes. This number can be used to cache camera vertex arrays, for
+   * example.
+   */
+  long cameranr;
+  /**
+   * The last used camera number.
+   */
+  static long cur_cameranr;
+
 public:
   ///
   csCamera ();
@@ -74,6 +86,17 @@ public:
   csCamera (const csCamera& c);
   ///
   virtual ~csCamera ();
+
+  /**
+   * Get the camera number. This number is changed for every new camera
+   * instance and it is also updated whenever the camera transformation
+   * changes. This number can be used to cache camera vertex arrays, for
+   * example.
+   */
+  long GetCameraNumber ()
+  {
+    return cameranr;
+  }
 
   /**
    * Check if there is a polygon in front of us in the direction
@@ -138,7 +161,11 @@ public:
    * it is legal to have a camera which is viewing the
    * current sector from outside.
    */
-  void SetSector (csSector *s) { sector = s; }
+  void SetSector (csSector *s)
+  {
+    sector = s;
+    cameranr = cur_cameranr++;
+  }
 
   /**
    * Get the current sector of the camera.
@@ -158,7 +185,44 @@ public:
    * be reversed. This is useful if you are stepping into a
    * mirrored sector.
    */
-  void SetMirrored (bool m) { mirror = m; }
+  void SetMirrored (bool m)
+  {
+    if (mirror != m) cameranr = cur_cameranr++;
+    mirror = m;
+  }
+
+  /**
+   * Set 'other' to 'this' transformation matrix.
+   * csCamera overrides this in order to be able to update the
+   * camera number.
+   */
+  virtual void SetO2T (const csMatrix3& m)
+  {
+    csOrthoTransform::SetO2T (m);
+    cameranr = cur_cameranr++;
+  }
+
+  /**
+   * Set 'this' to 'other' transformation matrix.
+   * csCamera overrides this in order to be able to update the
+   * camera number.
+   */
+  virtual void SetT2O (const csMatrix3& m) 
+  {
+    csOrthoTransform::SetT2O (m);
+    cameranr = cur_cameranr++;
+  }
+
+  /**
+   * Set 'world' to 'this' translation.
+   * csCamera overrides this in order to be able to update the
+   * camera number.
+   */
+  virtual void SetO2TTranslation (const csVector3& v)
+  {
+    csOrthoTransform::SetO2TTranslation (v);
+    cameranr = cur_cameranr++;
+  }
 
   /**
    * Sets the absolute position of the camera inside the sector.
@@ -199,17 +263,20 @@ public:
   /**
    * Transform a worldspace point to camera space.
    */
-  inline csVector3 World2Camera (const csVector3& v) const { return Other2This (v); }
+  inline csVector3 World2Camera (const csVector3& v) const
+  { return Other2This (v); }
 
   /**
    * Transform a camera space point to world space.
    */
-  inline csVector3 Camera2World (const csVector3& v) const { return This2Other (v); }
+  inline csVector3 Camera2World (const csVector3& v) const
+  { return This2Other (v); }
 
   /**
    * Transform a camera space point to worldspace, relative to camera position.
    */
-  inline csVector3 Camera2WorldRelative (const csVector3& v) const { return This2OtherRelative (v); }
+  inline csVector3 Camera2WorldRelative (const csVector3& v) const
+  { return This2OtherRelative (v); }
 
   /**
    * Moves the camera a relative amount in world coordinates.
@@ -222,7 +289,8 @@ public:
   /**
    * Moves the camera a relative amount in camera coordinates.
    */
-  virtual void Move (const csVector3& v, bool cd = true) { MoveWorld (m_t2o * v, cd); }
+  virtual void Move (const csVector3& v, bool cd = true)
+  { MoveWorld (m_t2o * v, cd); }
 
   /**
    * Moves the camera a relative amount in world coordinates,
@@ -317,7 +385,8 @@ public:
     virtual float GetFOVAngle () { return scfParent->GetFOVAngle (); }
     virtual float GetShiftX () { return scfParent->GetShiftX (); }
     virtual float GetShiftY () { return scfParent->GetShiftY (); }
-    virtual csOrthoTransform& GetTransform () { return *(csOrthoTransform*)scfParent; }
+    virtual csOrthoTransform& GetTransform ()
+    { return *(csOrthoTransform*)scfParent; }
     virtual void SetPosition (const csVector3& v)
     {
       scfParent->SetPosition (v);
@@ -376,6 +445,10 @@ public:
       else return false;
     }
     virtual iSector* GetSector ();
+    virtual long GetCameraNumber ()
+    {
+      return scfParent->GetCameraNumber ();
+    }
   } scfiCamera;
   friend struct Camera;
 

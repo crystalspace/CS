@@ -22,7 +22,6 @@
 #include "csutil/scf.h"
 #include "csgeom/math3d.h"
 #include "csobject/nobjvec.h"
-#include "csengine/tranman.h"
 #include "csengine/arrays.h"
 #include "csengine/rview.h"
 #include "csobject/csobject.h"
@@ -494,8 +493,6 @@ public:
   csPoly2DPool* render_pol2d_pool;
   /// An object pool for lightpatches.
   csLightPatchPool* lightpatch_pool;
-  /// The transformation manager.
-  csTransformationManager tr_manager;
   /// The 3D driver
   iGraphics3D* G3D;
   /// The 2D driver
@@ -755,9 +752,6 @@ public:
     else
       return 0;
   }
-
-  /// Get the transformation manager.
-  virtual iTransformationManager* GetTransformationManager ();
 
   /**
    * Set the culler to use in CS_ENGINE_FRONT2BACK mode.

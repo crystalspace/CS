@@ -1070,13 +1070,13 @@ void csLoader::load_thing_part (csThing* thing, csSector* sec, PSLoadInfo& info,
           }
 	  if (info.use_mat_set)
           {
-            thing->MergeTemplate (t, sec, Engine->GetMaterials (), info.mat_set_name,
-              info.default_material, info.default_texlen, false);
+            thing->MergeTemplate (t, sec, Engine->GetMaterials (),
+	    	info.mat_set_name, info.default_material, info.default_texlen);
             info.use_mat_set = false;
 	  }
           else
-            thing->MergeTemplate (t, sec, info.default_material, info.default_texlen,
-		false);
+            thing->MergeTemplate (t, sec, info.default_material,
+	    	info.default_texlen);
           csLoaderStat::polygons_loaded += t->GetNumPolygons ();
         }
         break;
@@ -1097,13 +1097,14 @@ void csLoader::load_thing_part (csThing* thing, csSector* sec, PSLoadInfo& info,
           }
 	  if (info.use_mat_set)
           {
-            thing->MergeTemplate (t->GetPrivateObject (), sec, Engine->GetMaterials (), info.mat_set_name,
-              info.default_material, info.default_texlen, true);
+            thing->MergeTemplate (t->GetPrivateObject (), sec,
+	    	Engine->GetMaterials (), info.mat_set_name,
+		info.default_material, info.default_texlen);
             info.use_mat_set = false;
 	  }
           else
-            thing->MergeTemplate (t->GetPrivateObject (), sec, info.default_material, info.default_texlen,
-		true);
+            thing->MergeTemplate (t->GetPrivateObject (), sec,
+	    	info.default_material, info.default_texlen);
           csLoaderStat::polygons_loaded += t->GetPrivateObject ()->GetNumPolygons ();
         }
         break;

@@ -167,6 +167,7 @@ void csMovable::RemoveListener (iMovableListener* listener)
 
 void csMovable::UpdateMove ()
 {
+  updatenr++;
   if (object->GetType () >= csThing::Type)
   {
     csThing* th = (csThing*)object;
@@ -182,7 +183,6 @@ void csMovable::UpdateMove ()
     csCollection* col = (csCollection*)object;
     col->UpdateMove ();
   }
-  updatenr++;
   int i;
   for (i = 0 ; i < listeners.Length () ; i++)
   {

@@ -781,10 +781,13 @@ public:
 
   /**
    * Before calling a series of Vcam() you should call
-   * CamUpdate() first to make sure that the camera vertex set
+   * UpdateTransformation() first to make sure that the camera vertex set
    * is up-to-date.
    */
-  void CamUpdate () { thing->CamUpdate (); }
+  void UpdateTransformation (const csTransform& c, long cam_cameranr)
+  {
+    thing->UpdateTransformation (c, cam_cameranr);
+  }
 
   /**
    * Before calling a series of Vwor() you should call
@@ -966,40 +969,12 @@ public:
   csLightPatch* GetLightpatches () { return light_info.lightpatches; }
 
   /**
-   * Clip a polygon against a frustum in camera space.
-   * The frustum is defined with (0,0,0) as one of the
-   * points of the plane.<p>
-   *
-   * If the frustum == NULL then it is considered infinite.
-   * This function returns false (and does not allocate the
-   * clipped polygon) if the polygon is completely clipped
-   * away. Otherwise it will allocated a new array
-   * of csVector3 in dest.
-   */
-  bool ClipPoly (csVector3* frustum, int num_frustum,
-	bool mirror, csVector3** dest, int* num_dest);
-
-  /**
    * Clip a polygon against a plane (in camera space).
    * The plane is defined as going through v1, v2, and (0,0,0).
    * The 'verts' array is modified and 'num' is also modified if needed.
    */
   void ClipPolyPlane (csVector3* verts, int* num, bool mirror,
   	csVector3& v1, csVector3& v2);
-
-  /**
-   * See if a polygon is visible from the given center (in world space
-   * using backface culling) and then clip against the frustum and return
-   * a new frustum (in camera space with the frustum center at (0,0,0)).
-   * This function returns false if the polygon is completely clipped away
-   * or if it is not visible. No new_frustum will be allocated in that case.
-   * If 'mirror' is true the given frustum is mirrored (vertices in
-   * anti-clockwise order). This function correctly handles that case and
-   * will return a new frustum that is also mirrored.
-   */
-  bool ClipFrustum (csVector3& center, csVector3* frustum,
-  	int num_frustum, bool mirror,
-  	csVector3** new_frustum, int* new_num_frustum);
 
   /**
    * Initialize the lightmaps for this polygon.

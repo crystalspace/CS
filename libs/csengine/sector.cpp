@@ -1382,7 +1382,6 @@ void csSector::RealCheckFrustum (csFrustumView& lview)
     count_cull_dist = 0;
     count_cull_quad = 0;
     count_cull_not = 0;
-    static_thing->UpdateTransformation (center);
     frust_cnt = 50;
     static_tree->Front2Back (center, CheckFrustumPolygonsFB, (void*)&fdata,
       	CullOctreeNodeLighting, (void*)&lview);

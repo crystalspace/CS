@@ -50,7 +50,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
   defered_num_lights = 0;
   defered_lighting_flags = 0;
   is_visible = false;
-  camera_cookie = 0;
+  cameranr = -1;
   myOwner = NULL;
   parent = theParent;
   movable.SetObject (this);
@@ -77,7 +77,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent)
   defered_num_lights = 0;
   defered_lighting_flags = 0;
   is_visible = false;
-  camera_cookie = 0;
+  cameranr = -1;
   myOwner = NULL;
   parent = theParent;
   movable.SetObject (this);

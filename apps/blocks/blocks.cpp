@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -700,12 +700,12 @@ csThing* Blocks::create_cube_thing (float dx, float dy, float dz,
   engine->things.Push (cube);
   cube->SetName ("cubexxx");
   cube->GetMovable ().SetSector (room);
-  cube->SetMovingOption (CS_THING_MOVE_OCCASIONAL); // @@@ Change to often when that works!
   csVector3 shift (
   	(dx-shift_rotate.x)*CUBE_DIM,
   	(dz-shift_rotate.z)*CUBE_DIM,
 	(dy-shift_rotate.y)*CUBE_DIM);
-  cube->MergeTemplate (tmpl, room, cube_mat, 1, true, &shift, NULL);
+  cube->MergeTemplate (tmpl, room, cube_mat, 1, &shift, NULL);
+  cube->SetMovingOption (CS_THING_MOVE_OCCASIONAL); // @@@ should be OFTEN!
 
   csPolygon3D* p;
   p = cube->GetPolygon3D ("f1"); set_uv (p, 0, 0, 1, 0, 1, 1);
@@ -1584,7 +1584,7 @@ void Blocks::HandleGameMovement (cs_time elapsed_time)
         freeze_shape ();
         player1->checkForPlane ();
 
-	removePlanesVisual(player1);
+	removePlanesVisual (player1);
 
         if (!player1->transition) StartNewShape ();
         return;
@@ -2417,7 +2417,8 @@ void Blocks::NextFrame ()
   {
     if (initscreen) StartDemo ();
     HandleMovement (elapsed_time);
-    if (!Gfx3D->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS)) return;
+    if (!Gfx3D->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
+      return;
     view->Draw ();
     Gfx3D->FinishDraw ();
     Gfx3D->Print (NULL);
@@ -2480,7 +2481,8 @@ void Blocks::NextFrame ()
     if (player1->cur_speed > MAX_SPEED) player1->cur_speed = MAX_SPEED;
 
     // Tell Gfx3D we're going to display 3D things
-    if (!Gfx3D->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS)) return;
+    if (!Gfx3D->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
+      return;
     view->Draw ();
   }
 

@@ -34,7 +34,6 @@
 #include "imspr3d.h"
 #include "imater.h"
 #include "imeshobj.h"
-#include "itranman.h"
 #include "iconfig.h"
 
 struct iSystem;
@@ -854,13 +853,15 @@ private:
 
   /**
    * Camera space bounding box is cached here.
-   * GetCameraBoundingBox() will check the current cookie from the
-   * transformation manager to see if it needs to recalculate this.
+   * GetCameraBoundingBox() will check the current camera number
+   * to see if it needs to recalculate this.
    */
   csBox3 camera_bbox;
 
-  /// Current cookie for camera_bbox.
-  csTranCookie camera_cookie;
+  /// Current camera number.
+  long cur_cameranr;
+  /// Current movable number.
+  long cur_movablenr;
 
   // Remembered info between DrawTest and Draw.
   G3DTriangleMesh g3dmesh;
@@ -1043,7 +1044,7 @@ public:
   csVector3* GetObjectVerts (csSpriteFrame* fr);
 
   /// Get the bounding box in transformed space.
-  void GetTransformedBoundingBox (iTransformationManager* tranman,
+  void GetTransformedBoundingBox (long cameranr, long movablenr,
       const csReversibleTransform& trans, csBox3& cbox);
 
   /**
@@ -1053,9 +1054,9 @@ public:
    * on-screen. If the sprite is not on-screen, the X and Y values are not
    * valid.
    */
-  float GetScreenBoundingBox (iTransformationManager* tranman, float fov,
-      float sx, float sy,
-      const csReversibleTransform& trans, csBox2& sbox, csBox3& cbox);
+  float GetScreenBoundingBox (long cameranr, long movablenr,
+  	float fov, float sx, float sy,
+	const csReversibleTransform& trans, csBox2& sbox, csBox3& cbox);
 
   ///------------------------ iMeshObject implementation ------------------------
   DECLARE_IBASE;

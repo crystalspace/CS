@@ -82,17 +82,17 @@ public:
    * Set 'world' to 'this' translation. This is the vector V
    * from the transform equation T=M*(O-V).
    */
-  inline void SetO2TTranslation (const csVector3& v) { v_o2t = v; }
+  virtual void SetO2TTranslation (const csVector3& v) { v_o2t = v; }
 
   /**
    * Set origin of transformed coordinate system.
    */
-  inline void SetOrigin (const csVector3& v) { v_o2t = v; }
+  inline void SetOrigin (const csVector3& v) { SetO2TTranslation (v); }
 
   /**
    * Move the 'other' to 'this' translation by a specified amount.
    */
-  inline void Translate (const csVector3& v) { v_o2t += v; }
+  inline void Translate (const csVector3& v) { SetO2TTranslation (v_o2t + v); }
 
   /**
    * Transform vector in 'other' space v to a vector in 'this' space.
@@ -120,11 +120,12 @@ public:
   csPlane3 Other2This (const csPlane3& p) const;
 
   /**
-   * Convert a plane in 'other' space to 'this' space. This is an optimized version
-   * for which a point on the new plane is known (point). The result
+   * Convert a plane in 'other' space to 'this' space. This is an optimized
+   * version for which a point on the new plane is known (point). The result
    * is stored in 'result'.
    */
-  void Other2This (const csPlane3& p, const csVector3& point, csPlane3& result) const;
+  void Other2This (const csPlane3& p, const csVector3& point,
+  	csPlane3& result) const;
 
   /**
    * Apply a transformation to a 3D vector.
@@ -192,7 +193,7 @@ public:
    * V the transformation vector.
    */
   csReversibleTransform (const csMatrix3& o2t, const csVector3& pos) :
-   csTransform (o2t,pos) { m_t2o = m_o2t.GetInverse (); }
+    csTransform (o2t,pos) { m_t2o = m_o2t.GetInverse (); }
 
   /**
    * Initialize with the given transformation.

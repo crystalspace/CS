@@ -62,7 +62,6 @@
 #include "ievent.h"
 #include "icfgfile.h"
 #include "icfgmgr.h"
-#include "itranman.h"
 
 //---------------------------------------------------------------------------
 
@@ -822,8 +821,6 @@ void csEngine::Clear ()
   // Clear all regions.
   region = NULL;
   regions.DeleteAll ();
-
-  tr_manager.Initialize ();
 }
 
 void csEngine::ResolveEngineMode ()
@@ -981,8 +978,6 @@ bool csEngine::Prepare ()
 
 void csEngine::ShineLights (csRegion* region)
 {
-  tr_manager.NewFrame ();
-
   if (!do_not_force_relight)
   {
     // If recalculation is not forced then we check if the 'precalc_info'
@@ -1287,10 +1282,6 @@ void csEngine::StartDraw (csCamera* c, csClipper* view, csRenderView& rview)
   float topy = - c->GetShiftY () * c->GetInvFOV ();
   float boty = (frame_height - c->GetShiftY ()) * c->GetInvFOV ();
   rview.SetFrustum (leftx, rightx, topy, boty);
-
-  // Initialize our transformation manager so that we will get
-  // new transformed coordinates.
-  tr_manager.NewFrame ();
 
   // Initialize the 2D/3D culler.
   if (engine_mode == CS_ENGINE_FRONT2BACK)
@@ -2149,13 +2140,6 @@ iDynLight* csEngine::CreateDynLight (const csVector3& pos, float radius,
 void csEngine::RemoveDynLight (iDynLight* light)
 {
   RemoveDynLight (light->GetPrivateObject ());
-}
-
-iTransformationManager* csEngine::GetTransformationManager ()
-{
-  iTransformationManager* itr = QUERY_INTERFACE (&tr_manager, iTransformationManager);
-  itr->DecRef ();
-  return itr;
 }
 
 iMeshFactoryWrapper* csEngine::CreateMeshFactory (const char* classId,

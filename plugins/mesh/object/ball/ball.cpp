@@ -27,7 +27,6 @@
 #include "icamera.h"
 #include "iclip2.h"
 #include "iengine.h"
-#include "itranman.h"
 #include "ilight.h"
 #include "lightdef.h"
 #include "qsqrt.h"
@@ -47,7 +46,8 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   CONSTRUCT_EMBEDDED_IBASE (scfiBallState);
   csBallMeshObject::factory = factory;
   initialized = false;
-  camera_cookie = 0;
+  cur_cameranr = -1;
+  cur_movablenr = -1;
   radiusx = radiusy = radiusz = 1;
   max_radius.Set (1, 1, 1);
   shift.Set (0, 0, 0);
@@ -74,16 +74,16 @@ csBallMeshObject::~csBallMeshObject ()
   delete[] top_mesh.vertex_fog;
 }
 
-void csBallMeshObject::GetTransformedBoundingBox (iTransformationManager* tranman,
-    const csReversibleTransform& trans, csBox3& cbox)
+void csBallMeshObject::GetTransformedBoundingBox (long cameranr,
+	long movablenr, const csReversibleTransform& trans, csBox3& cbox)
 {
-  csTranCookie cur_cookie = tranman->GetCookie ();
-  if (camera_cookie == cur_cookie)
+  if (cur_cameranr == cameranr && cur_movablenr == movablenr)
   {
     cbox = camera_bbox;
     return;
   }
-  camera_cookie = cur_cookie;
+  cur_cameranr = cameranr;
+  cur_movablenr = movablenr;
 
   camera_bbox.StartBoundingBox (trans * csVector3 (-radiusx/2, -radiusy/2, -radiusz/2));
   camera_bbox.AddBoundingVertexSmart (trans * csVector3 ( radiusx/2, -radiusy/2, -radiusz/2));
@@ -115,13 +115,13 @@ void csBallMeshObject::SetRadius (float radiusx, float radiusy, float radiusz)
   shapenr++;
 }
 
-float csBallMeshObject::GetScreenBoundingBox (iTransformationManager* tranman,
-      float fov, float sx, float sy,
+float csBallMeshObject::GetScreenBoundingBox (long cameranr,
+      long movablenr, float fov, float sx, float sy,
       const csReversibleTransform& trans, csBox2& sbox, csBox3& cbox)
 {
   csVector2 oneCorner;
 
-  GetTransformedBoundingBox (tranman, trans, cbox);
+  GetTransformedBoundingBox (cameranr, movablenr, trans, cbox);
 
   // if the entire bounding box is behind the camera, we're done
   if ((cbox.MinZ () < 0) && (cbox.MaxZ () < 0))
@@ -368,8 +368,6 @@ bool csBallMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   SetupObject ();
   iGraphics3D* g3d = rview->GetGraphics3D ();
   iCamera* camera = rview->GetCamera ();
-  iEngine* engine = rview->GetEngine ();
-  iTransformationManager* tranman = engine->GetTransformationManager ();
 
   // First create the transformation from object to camera space directly:
   //   W = Mow * O - Vow;
@@ -391,7 +389,9 @@ bool csBallMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   //	   if rview has do_clip_plane set to true.
   csBox2 sbox;
   csBox3 cbox;
-  if (GetScreenBoundingBox (tranman, fov, shiftx, shifty, tr_o2c, sbox, cbox) < 0)
+  if (GetScreenBoundingBox (camera->GetCameraNumber (),
+  	movable->GetUpdateNumber (), fov, shiftx, shifty,
+  	tr_o2c, sbox, cbox) < 0)
     return false;
   bool do_clip;
   if (rview->ClipBBox (sbox, cbox, do_clip) == false)

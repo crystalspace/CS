@@ -25,7 +25,6 @@
 #include "imeshobj.h"
 #include "imball.h"
 #include "igraph3d.h"
-#include "itranman.h"
 
 struct iMaterialWrapper;
 class csBallMeshObjectFactory;
@@ -54,13 +53,15 @@ private:
 
   /**
    * Camera space bounding box is cached here.
-   * GetCameraBoundingBox() will check the current cookie from the
-   * transformation manager to see if it needs to recalculate this.
+   * GetCameraBoundingBox() will check the current camera number from the
+   * camera to see if it needs to recalculate this.
    */
   csBox3 camera_bbox;
 
-  /// Current cookie for camera_bbox.
-  csTranCookie camera_cookie;
+  /// Current camera number.
+  long cur_cameranr;
+  /// Current movable number.
+  long cur_movablenr;
 
   /**
    * Setup this object. This function will check if setup is needed.
@@ -79,7 +80,7 @@ public:
   virtual ~csBallMeshObject ();
 
   /// Get the bounding box in transformed space.
-  void GetTransformedBoundingBox (iTransformationManager* tranman,
+  void GetTransformedBoundingBox (long cameranr, long movablenr,
       const csReversibleTransform& trans, csBox3& cbox);
   /**
    * Get the coordinates of the ball in screen coordinates.
@@ -88,9 +89,9 @@ public:
    * on-screen. If the ball is not on-screen, the X and Y values are not
    * valid.
    */
-  float GetScreenBoundingBox (iTransformationManager* tranman, float fov,
-      float sx, float sy,
-      const csReversibleTransform& trans, csBox2& sbox, csBox3& cbox);
+  float GetScreenBoundingBox (long cameranr, long movablenr, float fov,
+  	float sx, float sy,
+	const csReversibleTransform& trans, csBox2& sbox, csBox3& cbox);
 
   /// Get the material for this ball.
   iMaterialWrapper* GetMaterialWrapper () { return material; }

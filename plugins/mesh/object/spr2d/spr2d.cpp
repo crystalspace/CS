@@ -28,7 +28,6 @@
 #include "icamera.h"
 #include "iclip2.h"
 #include "iengine.h"
-#include "itranman.h"
 #include "ilight.h"
 #include "lightdef.h"
 #include "qsqrt.h"

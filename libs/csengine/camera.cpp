@@ -36,6 +36,7 @@ IMPLEMENT_EMBEDDED_IBASE_END
 int csCamera::default_aspect = 0;
 float csCamera::default_inv_aspect = 0;
 float csCamera::default_fov_angle = 90;
+long csCamera::cur_cameranr = 0;
 
 csCamera::csCamera () : csOrthoTransform()
 {
@@ -50,6 +51,7 @@ csCamera::csCamera () : csOrthoTransform()
   shift_y = csEngine::frame_height / 2;
   use_farplane = false;
   fp = NULL;
+  cameranr = cur_cameranr++;
 }
 
 csCamera::csCamera (csCamera* c) : csOrthoTransform ()
@@ -57,6 +59,7 @@ csCamera::csCamera (csCamera* c) : csOrthoTransform ()
   *this = *c;
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiCamera);
+  cameranr = cur_cameranr++;
 }
 
 csCamera::csCamera (const csCamera& c) : csOrthoTransform ()
@@ -64,6 +67,7 @@ csCamera::csCamera (const csCamera& c) : csOrthoTransform ()
   *this = c;
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiCamera);
+  cameranr = cur_cameranr++;
 }
 
 csCamera::~csCamera ()
@@ -90,6 +94,7 @@ void csCamera::MoveWorld (const csVector3& v, bool cd)
     else sector = new_sector;
   }
   SetOrigin (new_position);
+  cameranr = cur_cameranr++;
 }
 
 void csCamera::RotateWorld (const csVector3& v, float angle)
@@ -101,13 +106,12 @@ void csCamera::RotateWorld (const csVector3& v, float angle)
   sa = sin (angle);
   
   SetT2O ( 
-
-   csMatrix3(
-         ca+(1-ca)*u.x*u.x, u.x*u.y*(1-ca)-u.z*sa, u.x*u.z*(1-ca)+u.y*sa,
-     u.x*u.y*(1-ca)+u.z*sa,     ca+(1-ca)*u.y*u.y, u.y*u.z*(1-ca)-u.x*sa,
-     u.x*u.z*(1-ca)-u.y*sa, u.y*u.z*(1-ca)+u.x*sa,     ca+(1-ca)*u.z*u.z)
-
-   * GetT2O () );
+    csMatrix3 (
+      ca+(1-ca)*u.x*u.x,      u.x*u.y*(1-ca)-u.z*sa,  u.x*u.z*(1-ca)+u.y*sa,
+      u.x*u.y*(1-ca)+u.z*sa,  ca+(1-ca)*u.y*u.y,      u.y*u.z*(1-ca)-u.x*sa,
+      u.x*u.z*(1-ca)-u.y*sa,  u.y*u.z*(1-ca)+u.x*sa,  ca+(1-ca)*u.z*u.z)
+      * GetT2O ());
+  cameranr = cur_cameranr++;
 }
 
 void csCamera::Rotate (const csVector3& v, float angle)
@@ -119,13 +123,12 @@ void csCamera::Rotate (const csVector3& v, float angle)
   sa = sin (angle);
   
   SetT2O (GetT2O () *
-
-   csMatrix3(
-         ca+(1-ca)*u.x*u.x, u.x*u.y*(1-ca)-u.z*sa, u.x*u.z*(1-ca)+u.y*sa,
-     u.x*u.y*(1-ca)+u.z*sa,     ca+(1-ca)*u.y*u.y, u.y*u.z*(1-ca)-u.x*sa,
-     u.x*u.z*(1-ca)-u.y*sa, u.y*u.z*(1-ca)+u.x*sa,     ca+(1-ca)*u.z*u.z)
-
-   );
+    csMatrix3(
+      ca+(1-ca)*u.x*u.x,      u.x*u.y*(1-ca)-u.z*sa,  u.x*u.z*(1-ca)+u.y*sa,
+      u.x*u.y*(1-ca)+u.z*sa,  ca+(1-ca)*u.y*u.y,      u.y*u.z*(1-ca)-u.x*sa,
+      u.x*u.z*(1-ca)-u.y*sa,  u.y*u.z*(1-ca)+u.x*sa,  ca+(1-ca)*u.z*u.z)
+      );
+  cameranr = cur_cameranr++;
 }
 
 void csCamera::LookAt (const csVector3& v, const csVector3& up)
@@ -205,9 +208,10 @@ void csCamera::Correct (int n, float* vals[])
   angle = atan2 (*vals[1], *vals[0]);
   angle = (2.*M_PI/n) * QRound(n * angle / (2*M_PI) );
   *vals[1] = qsqrt( (*vals[0])*(*vals[0]) + (*vals[1])*(*vals[1]) );
-  Correct(n, vals+1);
+  Correct (n, vals+1);
   r = *vals[1];
   *vals[0] = r*cos(angle);  *vals[1] = r*sin(angle); 
+  cameranr = cur_cameranr++;
 }
 
 void csCamera::SetFOVAngle (float a, int width)
@@ -218,6 +222,7 @@ void csCamera::SetFOVAngle (float a, int width)
   aspect = int (rview_fov*2.);
   inv_aspect = 1.0f / (rview_fov*2.);
   fov_angle = a;
+  cameranr = cur_cameranr++;
 }
 
 void csCamera::ComputeAngle (int width)

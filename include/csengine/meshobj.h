@@ -22,7 +22,6 @@
 #include "csobject/pobject.h"
 #include "csobject/nobjvec.h"
 #include "csengine/movable.h"
-#include "csengine/tranman.h"
 #include "imeshobj.h"
 #include "iviscull.h"
 
@@ -55,13 +54,13 @@ protected:
 
   /**
    * Camera space bounding box is cached here.
-   * GetCameraBoundingBox() will check the current cookie from the
-   * transformation manager to see if it needs to recalculate this.
+   * GetCameraBoundingBox() will check the last camera number from the
+   * camera to see if it needs to recalculate this.
    */
   csBox3 camera_bbox;
 
-  /// Current cookie for camera_bbox.
-  csTranCookie camera_cookie;
+  /// Last used camera number for camera_bbox.
+  long cameranr;
 
   /// Defered lighting. If > 0 then we have defered lighting.
   int defered_num_lights;

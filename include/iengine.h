@@ -1,6 +1,6 @@
 /*
     Crystal Space 3D Engine
-    Copyright (C) 1998-2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -41,10 +41,9 @@ struct iCameraPosition;
 struct iRegion;
 struct iView;
 struct iGraphics3D;
-struct iTransformationManager;
 struct iClipper2D;
 
-SCF_VERSION (iEngine, 0, 1, 14);
+SCF_VERSION (iEngine, 0, 1, 15);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -103,19 +102,20 @@ struct iEngine : public iPlugIn
   virtual void DeleteAll () = 0;
 
   /// Register a texture to be loaded during Prepare()
-  virtual iTextureWrapper* CreateTexture (const char *iName, const char *iFileName,
-    csColor *iTransp, int iFlags) = 0;
+  virtual iTextureWrapper* CreateTexture (const char *iName,
+  	const char *iFileName, csColor *iTransp, int iFlags) = 0;
   /// Register a material to be loaded during Prepare()
-  virtual iMaterialWrapper* CreateMaterial (const char *iName, iTextureWrapper* texture) = 0;
+  virtual iMaterialWrapper* CreateMaterial (const char *iName,
+  	iTextureWrapper* texture) = 0;
   /// Create a named camera position object
   virtual bool CreateCamera (const char *iName, const char *iSector,
-    const csVector3 &iPos, const csVector3 &iForward,
-    const csVector3 &iUpward) = 0;
+	const csVector3 &iPos, const csVector3 &iForward,
+	const csVector3 &iUpward) = 0;
   /// Create a key/value pair object
   virtual bool CreateKey (const char *iName, const char *iValue) = 0;
   /// Create a texture plane
   virtual bool CreatePlane (const char *iName, const csVector3 &iOrigin,
-    const csMatrix3 &iMatrix) = 0;
+	const csMatrix3 &iMatrix) = 0;
   /// Create a empty sector with given name
   virtual iSector *CreateSector (const char *iName) = 0;
   /// Create a empty thing with given name
@@ -157,7 +157,8 @@ struct iEngine : public iPlugIn
    * return things that belong in a region but are not connected to the
    * engine.
    */
-  virtual iThing *FindThingTemplate (const char *iName, bool regionOnly = false) = 0;
+  virtual iThing *FindThingTemplate (const char *iName,
+  	bool regionOnly = false) = 0;
   /**
    * Find a mesh object by name. If regionOnly is true then the returned
    * mesh object will belong to the current region. Note that this is different
@@ -165,7 +166,8 @@ struct iEngine : public iPlugIn
    * return mesh objects that belong in a region but are not connected to the
    * engine.
    */
-  virtual iMeshWrapper *FindMeshObject (const char *iName, bool regionOnly = false) = 0;
+  virtual iMeshWrapper *FindMeshObject (const char *iName,
+  	bool regionOnly = false) = 0;
   /**
    * Find a mesh factory by name. If regionOnly is true then the returned
    * factory will belong to the current region. Note that this is different
@@ -173,7 +175,8 @@ struct iEngine : public iPlugIn
    * return factories that belong in a region but are not connected to the
    * engine.
    */
-  virtual iMeshFactoryWrapper *FindMeshFactory (const char *iName, bool regionOnly = false) = 0;
+  virtual iMeshFactoryWrapper *FindMeshFactory (const char *iName,
+  	bool regionOnly = false) = 0;
   /**
    * Find a texture by name. If regionOnly is true then the returned
    * texture will belong to the current region. Note that this is different
@@ -181,7 +184,8 @@ struct iEngine : public iPlugIn
    * return textures that belong in a region but are not connected to the
    * engine.
    */
-  virtual iTextureWrapper* FindTexture (const char* iName, bool regionOnly = false) = 0;
+  virtual iTextureWrapper* FindTexture (const char* iName,
+  	bool regionOnly = false) = 0;
   /**
    * Find a material by name. If regionOnly is true then the returned
    * material will belong to the current region. Note that this is different
@@ -189,7 +193,8 @@ struct iEngine : public iPlugIn
    * return materials that belong in a region but are not connected to the
    * engine.
    */
-  virtual iMaterialWrapper* FindMaterial (const char* iName, bool regionOnly = false) = 0;
+  virtual iMaterialWrapper* FindMaterial (const char* iName,
+  	bool regionOnly = false) = 0;
   /**
    * Find a camera position by name. If regionOnly is true then the returned
    * campos will belong to the current region. Note that this is different
@@ -197,7 +202,8 @@ struct iEngine : public iPlugIn
    * return camera positions that belong in a region but are not connected
    * to the engine.
    */
-  virtual iCameraPosition* FindCameraPosition (const char* iName, bool regionOnly = false) = 0;
+  virtual iCameraPosition* FindCameraPosition (const char* iName,
+  	bool regionOnly = false) = 0;
 
   /// Enable/disable the lighting cache.
   virtual void EnableLightingCache (bool do_cache) = 0;
@@ -233,9 +239,6 @@ struct iEngine : public iPlugIn
    * Get the top-level clipper.
    */
   virtual iClipper2D* GetTopLevelClipper () = 0;
-
-  /// Get the transformation manager.
-  virtual iTransformationManager* GetTransformationManager () = 0;
 
   /**
    * Conveniance function to create a mesh factory from a given type.
