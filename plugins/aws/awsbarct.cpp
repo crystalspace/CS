@@ -544,12 +544,12 @@ awsBarChartFactory::awsBarChartFactory (
     awsComponentFactory(wmgr)
 {
   Register ("Bar Chart");
-  RegisterConstant ("bcsBump", awsBarChart::fsBump);
-  RegisterConstant ("bcsSimple", awsBarChart::fsSimple);
-  RegisterConstant ("bcsSunken", awsBarChart::fsSunken);
-  RegisterConstant ("bcsRaised", awsBarChart::fsRaised);
-  RegisterConstant ("bcsFlat", awsBarChart::fsFlat);
-  RegisterConstant ("bcsNone", awsBarChart::fsNone);
+  RegisterConstant ("bcfsBump", awsBarChart::fsBump);
+  RegisterConstant ("bcfsSimple", awsBarChart::fsSimple);
+  RegisterConstant ("bcfsSunken", awsBarChart::fsSunken);
+  RegisterConstant ("bcfsRaised", awsBarChart::fsRaised);
+  RegisterConstant ("bcfsFlat", awsBarChart::fsFlat);
+  RegisterConstant ("bcfsNone", awsBarChart::fsNone);
 
   RegisterConstant ("bcoRolling", awsBarChart::coRolling);
   RegisterConstant ("bcoRollLeft", awsBarChart::coRollLeft);
