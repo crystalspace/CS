@@ -96,9 +96,9 @@ private:
   * Check for x86 features. This function is written twice due to different
   * syntax for inline assembly on MSVC and GCC
   */
-  static inline void csProcessorCapability::CheckX86Processor ()
+  static inline void CheckX86Processor ()
   {
-    int32 capFlags;
+    int32 capFlags = 0;
     int CPUnum;
     int maxEax = 0;
     const char* procName = processorName;
