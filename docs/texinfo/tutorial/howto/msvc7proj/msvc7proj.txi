@@ -108,3 +108,19 @@ should have a @emph{Solution Explorer} window which looks like the image below.
 @end ifnotinfo
 
 @subsubheading Step 3 - Setting Crystal Space @sc{paths} inside @sc{msvc}.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap6}
+@end ifnotinfo
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap7}
+@end ifnotinfo
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap8}
+@end ifnotinfo
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap9}
+@end ifnotinfo
