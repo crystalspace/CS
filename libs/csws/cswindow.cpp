@@ -393,6 +393,13 @@ void csWindow::FixSize (int &newW, int &newH)
     } /* endif */
   } /* endif */
 
+  c = GetChild (CSWID_CLIENT);
+  if (c)
+  {
+    WindowToClient (minw, minh);
+    c->FixSize (minw, minh);
+    ClientToWindow (minw, minh);
+  }
   // Don't allow too small windows
   if (newW < minw) newW = minw;
   if (newH < minh) newH = minh;
@@ -485,4 +492,13 @@ void csWindow::ClientToWindow (int &ClientW, int &ClientH)
     ClientW += 2;
     ClientH += 2;
   }
+}
+
+void csWindow::WindowToClient (int &ClientW, int &ClientH)
+{
+  // determine the amount of space the window takes to draw its borders and stuff
+  int w=0, h=0;
+  ClientToWindow (w, h);
+  ClientW -= w;
+  ClientH -= h;
 }

@@ -30,6 +30,7 @@
 #include "csws/csapp.h"
 #include "csws/cswsutil.h"
 
+bool mytt=false;
 // The csComponent class itself
 csComponent::csComponent (csComponent *iParent) : state (CSS_VISIBLE),
   originalpalette (true), DragStyle (CS_DRAG_MOVEABLE), clipparent (NULL),

@@ -163,6 +163,34 @@ static int palette_csNotebook [] =
   cs_Color_Gray_M			// 3D border middle light
 };
 
+// GridCell class default palette
+static int palette_csGridCell [] =
+{
+  cs_Color_White,			// cell background
+  cs_Color_Black,			// cell border foreground color
+  cs_Color_White,			// cell border background color
+  cs_Color_Black,			// selected cell background
+  cs_Color_White,			// selected cell border foreground color
+  cs_Color_Black,			// selected cell border background color
+  cs_Color_Black,			// Data foreground color
+  cs_Color_White			// Data background color
+};
+
+// Grid class default palette
+static int palette_csGridView [] =
+{
+  cs_Color_Gray_L,			// Grid background
+  cs_Color_Gray_D,			// 3D border dark
+  cs_Color_Gray_M			// 3D border light
+};
+
+// Slider class default palette
+static int palette_csSlider [] =
+{
+  cs_Color_Cyan_L,			// Slider background
+  cs_Color_Red_L			// Slider fill color while in motion
+};
+
 // Pointers to all standard palettes
 csPaletteExport cswsPalette [] =
 {
@@ -177,5 +205,8 @@ csPaletteExport cswsPalette [] =
   { palette_csWindow,      sizeof (palette_csWindow)      / sizeof (int) },
   { palette_csListBoxItem, sizeof (palette_csListBoxItem) / sizeof (int) },
   { palette_csScrollBar,   sizeof (palette_csScrollBar)   / sizeof (int) },
-  { palette_csNotebook,    sizeof (palette_csNotebook)    / sizeof (int) }
+  { palette_csNotebook,    sizeof (palette_csNotebook)    / sizeof (int) },
+  { palette_csGridCell,    sizeof (palette_csGridCell)    / sizeof (int) },
+  { palette_csGridView,    sizeof (palette_csGridView)    / sizeof (int) },
+  { palette_csSlider,      sizeof (palette_csSlider)      / sizeof (int) }
 };
