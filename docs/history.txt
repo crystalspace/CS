@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+22-Mar-2002
+	- Fixed a bug in the calculation of LOD for sprites. This
+	  bug could cause crashes due to an array access at -1.
+	  Thanks to Norman for reporting this.
 19-Mar-2002
 	- Decreased maximum size of lightmaps for software renderer
 	  again. 16mil is WAY too much as that will not fit in the

@@ -251,8 +251,8 @@ void csTriangleVertices2::Dump ()
 
 //---------------------------------------------------------------------------
 
-void csSpriteLOD::CalculateLOD (csTriangleMesh2* mesh, csTriangleVertices2* verts,
-	int* translate, int* emerge_from)
+void csSpriteLOD::CalculateLOD (csTriangleMesh2* mesh,
+	csTriangleVertices2* verts, int* translate, int* emerge_from)
 {
   int i;
   // Calculate the cost for all vertices for the first time.
@@ -320,12 +320,18 @@ void csSpriteLOD::CalculateLOD (csTriangleMesh2* mesh, csTriangleVertices2* vert
       verts->GetVertex (id).CalculateCost (verts);
     }
   }
-  // Last index gets the only remaining vertex which should now have minimal cost.
+  // Last index gets the only remaining vertex which should now have
+  // minimal cost.
   from_vertices[col_idx] = verts->GetMinimalCostVertex ();
   to_vertices[col_idx] = -1;
 
+  // Vertex 0.
+  translate[from_vertices[col_idx]] = 0;
+  emerge_from[0] = -1;
+  col_idx--;
+
   // Fill the output arrays.
-  for (i = 0 ; i < verts->GetVertexCount () ; i++)
+  for (i = 1 ; i < verts->GetVertexCount () ; i++)
   {
     translate[from_vertices[col_idx]] = i;
     emerge_from[i] = translate[to_vertices[col_idx]];
@@ -336,4 +342,5 @@ void csSpriteLOD::CalculateLOD (csTriangleMesh2* mesh, csTriangleVertices2* vert
   delete [] to_vertices;
 }
 
-//---------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+
