@@ -42,10 +42,13 @@ public:
 
     bool WriteFile();
     
-    void OutpHeaderCS();
-    void OutpObjectsCS(bool lighting);
+    void WriteHeader();
+    void WriteFooter();
+    void WriteObjects(bool lighting);
+    void WriteVertices(Lib3dsMesh* mesh);
 protected:
     Lib3dsFile* p3dsFile;
+    unsigned int* newpointmap;
 };
 
 #endif

@@ -225,16 +225,16 @@ void Lib3dsConvertXYZ (Lib3dsFile* p3dsFile)
 
     // convert each triangle
     for ( i = 0 ; i < numTriangles ; i++ ) {
-        float v1 = pCurFace->points[0];
-        float v2 = pCurFace->points[1];
-        float v3 = pCurFace->points[2];
-        ConvertXYZ (v1, v2, v3);
-        pCurFace->points[0] = (short unsigned int)v1;
-        pCurFace->points[1] = (short unsigned int)v2;
-        pCurFace->points[2] = (short unsigned int)v3;
-
-        // go to next triangle
-        pCurFace++;
+      float v1 = pCurFace->points[0];
+      float v2 = pCurFace->points[1];
+      float v3 = pCurFace->points[2];
+      ConvertXYZ (v1, v2, v3);
+      pCurFace->points[0] = (short unsigned int)v1;
+      pCurFace->points[1] = (short unsigned int)v2;
+      pCurFace->points[2] = (short unsigned int)v3;
+      
+      // go to next triangle
+      pCurFace++;
     }
 
     // go to next mesh
@@ -312,61 +312,6 @@ void FindExchange (H3dsScene * scene, int find, int exchange)
       if(fa->p2 == find) fa->p2 = exchange;
     }
   }
-}
- */
-
-/**
- * Actually not used: must be redone for Lib3dsFile
-int RemoveDupVerts (H3dsScene * scene, H3dsMapVert * vrtmap, int verts)
-{
-  int vrttop=0, dot=0, currvtx, runvtx;
-  for (currvtx=0; currvtx<verts; currvtx++)
-  {
-    // Only process those vertices that has not been
-    // processed already.
-    if (vrtmap[currvtx].marked == 0)
-    {
-      // OK, we have a vertex, currvtx. Try to find all other
-      // vertices that have the same x,y,z values.
-      for (runvtx=currvtx+1; runvtx<verts; runvtx++)
-      {
-        // Skip all vertices that has been processed already.
-        // We already know that they don't have the same values.
-        if (vrtmap[runvtx].marked == 1)
-          continue;
-
-        // If we find another vertex with the same x,y,z values
-        // we must find and adjust all the indexes that point
-        // to that vertex so that they point to currvtx.
-        if (vrtmap[runvtx].ix == vrtmap[currvtx].ix &&
-            vrtmap[runvtx].iy == vrtmap[currvtx].iy &&
-            vrtmap[runvtx].iz == vrtmap[currvtx].iz)
-        {
-          // Make them point to the top of our optimized array
-          FindExchange (scene, runvtx, vrttop);
-
-          // Mark it so we don't process it again.
-          vrtmap[runvtx].marked=1;
-        }
-      }
-
-      // Now find all other indexes that points to currvtx
-      // and adjust them to the top of our optimized array, vrttop.
-      FindExchange (scene, currvtx, vrttop);
-
-      // Put currvtx on top of our optimized array.
-      vrtmap[vrttop] = vrtmap[currvtx];
-      vrttop++;
-    }
-
-    // Print some dots so that the user don't fall asleep
-    if ((flags & FLAG_VERBOSE) && dot++>20)
-    {
-      fprintf (stderr, ".");
-      dot=0;
-    }
-  }
-  return vrttop;
 }
  */
 
@@ -686,8 +631,9 @@ int main (int argc, char * argv[])
   if (!(flags & FLAG_LIST))
   {
     fprintf (stderr, "Writing output in CS format...");
-    writer.OutpHeaderCS ();
-    writer.OutpObjectsCS (flags & FLAG_LIGHTING);
+    writer.WriteHeader ();
+    writer.WriteObjects (flags & FLAG_LIGHTING);
+    writer.WriteFooter ();
 
     fprintf (stderr, "done! \n");
   }

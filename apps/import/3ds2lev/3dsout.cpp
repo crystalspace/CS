@@ -94,11 +94,14 @@ void Writer::Write(const char* line, ...)
 CSWriter::CSWriter(const char* filename, Lib3dsFile* data3d)
     : Writer (filename), p3dsFile(data3d)
 {
+  newpointmap = NULL;
 }
 
 CSWriter::CSWriter(FILE* f, Lib3dsFile* data3d)
     : Writer(f), p3dsFile(data3d)
 {
+  if (newpointmap)
+    delete[] newpointmap;
 }
 
 CSWriter::~CSWriter()
@@ -108,7 +111,7 @@ CSWriter::~CSWriter()
 /**
  * Outputs the header with TEXTURES, MATERIALS, PLUGINS.
  */
-void CSWriter::OutpHeaderCS()
+void CSWriter::WriteHeader ()
 {
   if (flags & FLAG_SPRITE)
   {
@@ -183,12 +186,101 @@ void CSWriter::OutpHeaderCS()
   }
 }
 
+void CSWriter::WriteFooter ()
+{
+  if (flags & FLAG_SPRITE)
+  {
+    WriteL ("ACTION 'default' (F (f1,1000))");
+    UnIndent();
+    WriteL (")"); // close MESHFACT
+  }
+  else
+  {
+    WriteL ("CULLER ('static')");
+
+    Lib3dsLight *pCurLight = p3dsFile->lights;
+    // output lights
+    while (pCurLight) {
+
+      // discart spot-lights
+      if (pCurLight->spot_light) {
+        fprintf (stderr, "Spotlight are not supported. Light '%s' will not be imported in CS\n", pCurLight->name);
+      // convert omni-lights
+      } else {
+        WriteL ("LIGHT (");
+	Indent();
+        WriteL ("CENTER (%g,%g,%g)",pCurLight->position[0], pCurLight->position[1], pCurLight->position[2]);
+        WriteL ("RADIUS (%g)",pCurLight->outer_range);
+        WriteL ("COLOR (%g,%g,%g)",pCurLight->color[0], pCurLight->color[1], pCurLight->color[2]);
+	UnIndent();
+	WriteL (")");
+      }
+
+      pCurLight = pCurLight->next;
+    }
+
+    UnIndent();
+    WriteL (")"); // close SECTOR
+    UnIndent();
+    WriteL (")"); // clode WORLD
+  }
+}
+
+void CSWriter::WriteVertices (Lib3dsMesh* mesh)
+{
+  if (flags & FLAG_SPRITE)
+  {
+    for (unsigned int vn = 0; vn < mesh->points; vn++)
+    {
+      float *xyz = mesh->pointL[vn].pos;
+      Lib3dsTexel* texel = &mesh->texelL[vn];
+      float u = 0, v = 0;
+
+      if (texel)
+      {
+	u = texel[0][0];
+	v = texel[0][1];
+      }
+
+      Write ("V(%g,%g,%g:", xyz[0], xyz[1], xyz[2]);
+      WriteL ("%g,%g)",u, (flags & FLAG_SWAP_V ? 1.-v : v));
+    }
+  }
+  else
+  {
+    if (newpointmap)
+      delete[] newpointmap;
+    newpointmap = new unsigned int[mesh->points];
+    memset (newpointmap, 0, sizeof(unsigned int) * mesh->points);
+
+    unsigned int newpoint = 0;
+    for (unsigned int v = 0; v < mesh->points; v++)
+    {
+      // doubled point? then do nothing
+      if (newpointmap[v] != 0)
+	continue;
+      
+      float* xyz1 = mesh->pointL[v].pos;
+      for (unsigned int v2 = v+1; v2 < mesh->points; v2++)
+      {
+	float* xyz2 = mesh->pointL[v2].pos;
+
+	if (xyz1[0] == xyz2[0] && xyz1[1]==xyz2[1] && xyz1[2] == xyz2[2])
+	  newpointmap[v2] = newpoint;
+      }
+      newpointmap[v] = newpoint;
+      WriteL ("VERTEX (%g,%g,%g)    ; %d", xyz1[0], xyz1[1], xyz1[2], newpoint);
+      newpoint++;
+    }
+  }
+}
+
 /**
  * Outputs all the objects present in the 3ds file.
  * Based on the object name we create MESHOBJ or PART.
  *
  */
-void CSWriter::OutpObjectsCS (bool lighting)
+void CSWriter::WriteObjects (bool lighting)
 {
   Lib3dsMesh *p3dsMesh = p3dsFile->meshes;
 
@@ -276,7 +368,7 @@ void CSWriter::OutpObjectsCS (bool lighting)
 		WriteL ("VISTREE()");
 		Write ("; Object Name: '%s'" , p3dsMesh->name);
                 WriteL (" Faces: %6d faces ", (int)p3dsMesh->faces);
-                Write ("PART '%s' (", p3dsMesh->name);
+                WriteL ("PART '%s' (", p3dsMesh->name);
 		Indent();
                 staticObj = true;
             }
@@ -293,10 +385,11 @@ void CSWriter::OutpObjectsCS (bool lighting)
             // close previous PART and MESHOBJ if present
             if (part)
             {
+		UnIndent();
                 WriteL (")"); WriteL (""); // end PART
 		UnIndent();
                 WriteL (")"); WriteL (""); // end MESHOBJ
-		UnIndent();               		
+		part = false;
             }
             Write ("; Object Name : %s ", p3dsMesh->name);
             WriteL (" Faces: %6d faces ", (int)p3dsMesh->faces);
@@ -320,40 +413,7 @@ void CSWriter::OutpObjectsCS (bool lighting)
 
     // <--output vertexes-->
 
-    // get the number of vertices in the current mesh
-    int numVertices = p3dsMesh->points;
-    int i;
-
-    // vertexes pointer
-    Lib3dsPoint *pCurPoint = p3dsMesh->pointL;
-    Lib3dsTexel *pCurTexel = p3dsMesh->texelL;
-
-    for (i = 0 ; i < numVertices ; i++ )
-    {
-      // index to the position on the list using index
-      float *xyz = pCurPoint->pos;
-      if (flags & FLAG_SPRITE)
-      {
-        float u = 0;
-        float v = 0;
-        if (pCurTexel != NULL)
-        {
-          u = pCurTexel[0][0];
-          v = pCurTexel[0][1];
-          pCurTexel++;
-        }
-
-        Write ("V(%g,%g,%g:", xyz[0], xyz[1], xyz[2]);
-        WriteL ("%g,%g)",u, (flags & FLAG_SWAP_V ? 1.-v : v));
-      }
-      else
-      {
-        WriteL ("VERTEX (%g,%g,%g)    ; %d", xyz[0], xyz[1], xyz[2], i);
-      }
-
-      // go to next vertex and texel
-      pCurPoint++;
-    }
+    WriteVertices(p3dsMesh);
 
     // <--output faces-->
 
@@ -363,6 +423,7 @@ void CSWriter::OutpObjectsCS (bool lighting)
     Lib3dsTexel *pTexelList = p3dsMesh->texelL;
 
     // output faces
+    int i;
     for (i=0; i<numFaces; i++)
     {
       if (flags & FLAG_SPRITE)
@@ -376,11 +437,17 @@ void CSWriter::OutpObjectsCS (bool lighting)
         if (p3dsFile->lights)
             lighting = true;
 
-        WriteL ("POLYGON 'x%d_%d'  (VERTICES (%d,%d,%d)%s",
-	             numMesh, i, pCurFace->points[0],
-		     pCurFace->points[1], pCurFace->points[2],
-	             lighting ? "" : " LIGHTING (no)");
+        WriteL ("POLYGON 'x%d_%d'  (", numMesh, i);
 	Indent();
+	unsigned int p1,p2,p3;
+	p1 = newpointmap[pCurFace->points[0]];
+	p2 = newpointmap[pCurFace->points[1]];
+	p3 = newpointmap[pCurFace->points[2]];
+	Write ("VERTICES (%d,%d,%d)", p1, p2, p3);
+	if (!lighting)
+	  Write (" LIGHTING (no)");
+	WriteL("");
+
         if (pTexelList)
         {
           Lib3dsTexel *mapV0 = (Lib3dsTexel*)pTexelList[pCurFace->points[0]];
@@ -398,8 +465,8 @@ void CSWriter::OutpObjectsCS (bool lighting)
                  u2, (flags & FLAG_SWAP_V ? 1.-v2 : v2));
         }
 
-        WriteL (")"); // close polygon
 	UnIndent();
+        WriteL (")"); // close polygon
       }
 
       // go to next face
@@ -407,14 +474,14 @@ void CSWriter::OutpObjectsCS (bool lighting)
     }
 
     if (meshobj) {
+	UnIndent();
 	WriteL(")"); WriteL(""); // close PARAMS tag
 	UnIndent();
 	WriteL(")"); WriteL(""); // close MESHOBJ
-	UnIndent();             	
         meshobj = false;
     } else {
-	WriteL (")"); WriteL("");
 	UnIndent();
+	WriteL (")");
     }
 
     // increment mesh count
@@ -425,48 +492,11 @@ void CSWriter::OutpObjectsCS (bool lighting)
   // if working on static object closes MESHOBJECT
   if (part)
   {
-     WriteL("("); WriteL(""); // close PARAMS
-     UnIndent();
-     WriteL("("); WriteL(""); // close MESHOBJ
-     UnIndent();                                  
-     part = false;
-  }
-
-  if (flags & FLAG_SPRITE)
-  {
-    WriteL ("ACTION 'default' (F (f1,1000))");
-    WriteL (")");
     UnIndent();
-  }
-  else
-  {
-    WriteL ("CULLER ('static')");
-
-    Lib3dsLight *pCurLight = p3dsFile->lights;
-    // output lights
-    while (pCurLight) {
-
-      // discart spot-lights
-      if (pCurLight->spot_light) {
-        fprintf (stderr, "Spotlight are not supported. Light '%s' will not be imported in CS\n", pCurLight->name);
-      // convert omni-lights
-      } else {
-        WriteL ("LIGHT (");
-	Indent();
-        WriteL ("CENTER (%g,%g,%g)",pCurLight->position[0], pCurLight->position[1], pCurLight->position[2]);
-        WriteL ("RADIUS (%g)",pCurLight->outer_range);
-        WriteL ("COLOR (%g,%g,%g)",pCurLight->color[0], pCurLight->color[1], pCurLight->color[2]);
-        WriteL (")");
-	UnIndent();
-      }
-
-      pCurLight = pCurLight->next;
-    }
-
-    WriteL (")");
+    WriteL(")"); WriteL(""); // close part
     UnIndent();
-    WriteL (")");
-    UnIndent();
+    WriteL(")"); WriteL(""); // close MESHOBJ
+    part = false;
   }
 }
 
