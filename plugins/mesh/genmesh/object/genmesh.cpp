@@ -1002,12 +1002,23 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
     {
       vertex_buffer = r3d->GetBufferManager ()->GetBuffer (
         sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC);
-      csVector3* vbuf = (csVector3*)vertex_buffer->Lock (
-      	iRenderBuffer::CS_BUF_LOCK_NORMAL);
-      memcpy (vbuf, mesh_vertices, sizeof (csVector3)*num_mesh_vertices);
+      csVector3* vbuf = (csVector3*)vertex_buffer->Lock(
+        iRenderBuffer::CS_BUF_LOCK_NORMAL);
+      if (vbuf)
+        memcpy (vbuf, mesh_vertices, sizeof (csVector3)*num_mesh_vertices);
+
       vertex_buffer->Release ();
       mesh_vertices_dirty_flag = false;
     }
+    if ( !vertex_buffer) return NULL;
+    if ( vertex_buffer->IsDiscarded() )
+    {
+      csVector3* vbuf = (csVector3*)vertex_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+      if(vbuf)
+        memcpy(vbuf, mesh_vertices, sizeof (csVector3)*num_mesh_vertices);
+      vertex_buffer->Release ();
+    }
+    vertex_buffer->CanDiscard(false);
     return vertex_buffer;
   }
   if (name == texel_name)
@@ -1018,10 +1029,20 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
         sizeof (csVector2)*num_mesh_vertices, CS_BUF_STATIC);
       csVector2* tbuf = (csVector2*)texel_buffer->Lock (
       	iRenderBuffer::CS_BUF_LOCK_NORMAL);
-      memcpy (tbuf, mesh_texels, sizeof (csVector2)*num_mesh_vertices);
+      if(tbuf)
+        memcpy (tbuf, mesh_texels, sizeof (csVector2)*num_mesh_vertices);
       texel_buffer->Release ();
       mesh_texels_dirty_flag = false;
     }
+    if ( !texel_buffer) return NULL;
+    if ( texel_buffer->IsDiscarded() )
+    {
+      csVector2* tbuf = (csVector2*)texel_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+      if(tbuf)
+        memcpy(tbuf, mesh_vertices, sizeof (csVector2)*num_mesh_vertices);
+      texel_buffer->Release ();
+    }
+    texel_buffer->CanDiscard(false);
     return texel_buffer;
   }
   if (name == normal_name)
@@ -1032,10 +1053,20 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
         sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC);
       csVector3 *nbuf = (csVector3*)normal_buffer->Lock (
       	iRenderBuffer::CS_BUF_LOCK_NORMAL);
-      memcpy (nbuf, mesh_normals, sizeof (csVector3)*num_mesh_vertices);
+      if(nbuf)
+        memcpy (nbuf, mesh_normals, sizeof (csVector3)*num_mesh_vertices);
       normal_buffer->Release ();
       mesh_normals_dirty_flag = false;
     }
+    if ( !normal_buffer) return NULL;
+    if ( normal_buffer->IsDiscarded() )
+    {
+      csVector3* nbuf = (csVector3*)normal_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+      if(nbuf)
+        memcpy(nbuf, mesh_vertices, sizeof (csVector3)*num_mesh_vertices);
+      normal_buffer->Release ();
+    }
+    normal_buffer->CanDiscard(false);
     return normal_buffer;
   }
   if (name == color_name)
@@ -1046,10 +1077,20 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
         sizeof (csColor)*num_mesh_vertices, CS_BUF_STATIC);
       csColor *cbuf = (csColor*)color_buffer->Lock (
       	iRenderBuffer::CS_BUF_LOCK_NORMAL);
-      memcpy (cbuf, mesh_colors, sizeof (csColor)*num_mesh_vertices);
+      if(cbuf)
+        memcpy (cbuf, mesh_colors, sizeof (csColor)*num_mesh_vertices);
       color_buffer->Release();
       mesh_colors_dirty_flag = false;
     }
+    if ( !color_buffer) return NULL;
+    if ( color_buffer->IsDiscarded() )
+    {
+      csColor* cbuf = (csColor*)color_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+      if(cbuf)
+        memcpy(cbuf, mesh_vertices, sizeof (csColor)*num_mesh_vertices);
+      color_buffer->Release ();
+    }
+    color_buffer->CanDiscard(false);
     return color_buffer;
   }
   if (name == index_name)
