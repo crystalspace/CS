@@ -55,6 +55,7 @@ struct iDataBuffer;
 struct iCamera;
 struct iRenderView;
 struct iSectorList;
+struct iProgressMeter;
 
 /**
  * Flag for GetNearbyLights().
@@ -129,7 +130,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 2, 2);
+SCF_VERSION (iEngine, 0, 2, 3);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -152,9 +153,10 @@ struct iEngine : public iBase
    * you loaded/created the world. It will prepare all lightmaps
    * for use and also free all images that were loaded for
    * the texture manager (the texture manager should have them
-   * locally now).
+   * locally now). The optional progress meter will be used to
+   * report progress.
    */
-  virtual bool Prepare () = 0;
+  virtual bool Prepare (iProgressMeter* meter = NULL) = 0;
 
   /**
    * Query the format to load textures (usually this depends on texture

@@ -33,13 +33,13 @@
 #include "csgeom/math3d.h"
 #include "csgeom/vector3.h"
 #include "csgeom/frustum.h"
-#include "csutil/cspmeter.h"
 #include "csutil/csppulse.h"
 #include "qsqrt.h"
 #include "igraphic/image.h"
 #include "imesh/thing/lightmap.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
+#include "ivaria/pmeter.h"
 #include <math.h>
 #include "qint.h"
 
@@ -806,15 +806,21 @@ float csRadiosity::stop_improvement = 10000.0;
 int   csRadiosity::stop_iterations = 1000;
 int   csRadiosity::source_patch_size = 2;
 
-csRadiosity :: csRadiosity(csEngine *current_engine)
+csRadiosity :: csRadiosity(csEngine *current_engine, iProgressMeter* meter)
 {
 //@@@ TEMPORARILY BROKEN!
 #if 0
   csEngine::current_engine->Report ("Preparing radiosity...");
   iterations = 0;
   engine = current_engine;
-  meter = new csProgressMeter(engine->System, 1000);
-  meter->SetGranularity(1);
+  csRadiosity::meter = meter;
+  if (meter)
+  {
+    meter->SetProgressDescription ("crystalspace.engine.lighting.radiosity",
+  	"Preparing radiosity...");
+    meter->SetTotal (1000);
+    meter->SetGranularity (1);
+  }
   pulse = new csProgressPulse(engine->System);
   // copy data needed, create list and all radpolys
   list = new csRadList();
@@ -859,7 +865,6 @@ csRadiosity :: ~csRadiosity()
   delete texturemap;
   delete shadow_matrix;
   delete pulse;
-  delete meter;
   // remove data needed.
   delete list;
 }
@@ -956,7 +961,7 @@ void csRadiosity :: DoRadiosity()
 
   csEngine::current_engine->Report ("Calculating radiosity (%d lightmaps).",
     list->GetElementCount());
-  meter->Restart();
+  if (meter) meter->Restart();
   shoot = list->PopHighest();
   if(shoot) {
     start_priority = shoot->GetPriority();
@@ -1023,11 +1028,13 @@ csRadElement* csRadiosity :: FetchNext()
 
   val = pow(val, 2.0f) * 0.98f;
 
-  int ticks_now = QRound( val * meter->GetTotal());
-  
-  while(meter->GetCurrent() < ticks_now)
+  if (meter)
   {
-    meter->Step();
+    int ticks_now = QRound( val * meter->GetTotal());
+    while(meter->GetCurrent() < ticks_now)
+    {
+      meter->Step();
+    }
   }
 
   // stop varibles
@@ -1058,10 +1065,11 @@ csRadElement* csRadiosity :: FetchNext()
 
   if(stop_now)
   {
-    while(meter->GetCurrent() < meter->GetTotal())
-    {
-      meter->Step();
-    }
+    if (meter)
+      while(meter->GetCurrent() < meter->GetTotal())
+      {
+        meter->Step();
+      }
 
     csEngine::current_engine->Report ("Finished radiosity (%s).", reason);
     

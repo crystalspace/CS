@@ -32,9 +32,9 @@ class csEngine;
 class csPolygon3D;
 class csLightMap;
 class csRGBLightMap;
-class csProgressMeter;
 class csProgressPulse;
 class csShadowFrustum;
+struct iProgressMeter;
 
 /// computes x ** (2 ** y), using only y multiplies.
 float FastPow2(float x, const int y);
@@ -556,7 +556,7 @@ private:
   bool showing_deltamaps;
 
   /// progress meter of the work
-  csProgressMeter *meter;
+  iProgressMeter *meter;
   /// pulse to see polygon shootings
   csProgressPulse *pulse;
   /// the probably highest priority, starting priority.
@@ -597,7 +597,7 @@ private:
 
 public:
   /// create all radiosity data.
-  csRadiosity(csEngine *current_engine);
+  csRadiosity(csEngine *current_engine, iProgressMeter* meter);
   /// get rid of radiosity data.
   ~csRadiosity();
   /// Does the whole radiosity thing. This is the one to call.

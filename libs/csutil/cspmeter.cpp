@@ -20,10 +20,18 @@
 #include "cssysdef.h"
 #include "csutil/cspmeter.h"
 
-csProgressMeter::csProgressMeter(iSystem* s, int n, int t) : sys(s), type(t),
-  granularity(10), tick_scale(2), total(n), current(0), anchor(0) {}
+SCF_IMPLEMENT_IBASE (csTextProgressMeter)
+  SCF_IMPLEMENTS_INTERFACE (iProgressMeter)
+SCF_IMPLEMENT_IBASE_END
 
-void csProgressMeter::Step()
+csTextProgressMeter::csTextProgressMeter (iSystem* s, int n, int t)
+	: sys(s), type(t), granularity(10), tick_scale(2),
+	  total(n), current(0), anchor(0)
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+}
+
+void csTextProgressMeter::Step()
 {
   if (current < total)
   {
@@ -51,22 +59,36 @@ void csProgressMeter::Step()
       sys->Printf(type, "%s", buff);
       anchor = extent;
     }
+    if (current == total)
+      sys->Printf(type, "\n");
   }
 }
 
-void csProgressMeter::Restart()
+void csTextProgressMeter::Restart()
 {
   Reset();
   sys->Printf(type, "0%%");
 }
 
-void csProgressMeter::SetGranularity(int n)
+void csTextProgressMeter::Abort ()
+{
+  current = total;
+  sys->Printf (type, "\n");
+}
+
+void csTextProgressMeter::Finalize ()
+{
+  current = total;
+  sys->Printf (type, "\n");
+}
+
+void csTextProgressMeter::SetGranularity(int n)
 {
   if (n >= 1 && n <= 100)
     granularity = n;
 }
 
-void csProgressMeter::SetTickScale(int n)
+void csTextProgressMeter::SetTickScale(int n)
 {
   if (n >= 1 && n <= 100)
     tick_scale = n;

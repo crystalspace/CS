@@ -18,7 +18,7 @@
 #include "cssysdef.h"
 #include "qint.h"
 #include "csutil/scf.h"
-#include "csutil/cspmeter.h"
+#include "ivaria/pmeter.h"
 #include "csengine/engine.h"
 #include "csengine/halo.h"
 #include "csengine/camera.h"
@@ -836,7 +836,7 @@ void csEngine::PrepareMeshes ()
   }
 }
 
-bool csEngine::Prepare ()
+bool csEngine::Prepare (iProgressMeter* meter)
 {
   PrepareTextures ();
   PrepareMeshes ();
@@ -848,14 +848,14 @@ bool csEngine::Prepare ()
 
   // Prepare lightmaps if we have any sectors
   if (sectors.Length ())
-    ShineLights ();
+    ShineLights (NULL, meter);
 
   CheckConsistency ();
 
   return true;
 }
 
-void csEngine::ShineLights (csRegion* region)
+void csEngine::ShineLights (csRegion* region, iProgressMeter* meter)
 {
   if (!do_not_force_relight)
   {
@@ -976,13 +976,17 @@ void csEngine::ShineLights (csRegion* region)
 
   int sn = 0;
   int num_meshes = meshes.Length ();
-  csProgressMeter meter (System);
 
   if (do_relight)
   {
     Report ("Initializing lighting (%d meshes).", num_meshes);
-    meter.SetTotal (num_meshes);
-    meter.Restart ();
+    if (meter)
+    {
+      meter->SetProgressDescription ("crystalspace.engine.lighting.init",
+    	"Initializing lighting (%d meshes).", num_meshes);
+      meter->SetTotal (num_meshes);
+      meter->Restart ();
+    }
   }
   for (sn = 0; sn < num_meshes ; sn++)
   {
@@ -1000,32 +1004,37 @@ void csEngine::ShineLights (csRegion* region)
 	linfo->DecRef ();
       }
     }
-    if (do_relight) meter.Step();
+    if (do_relight && meter) meter->Step();
   }
 
   csTime start, stop;
   start = System->GetTime ();
   if (do_relight)
   {
-    Report ("\nShining lights (%d lights).", light_count);
-    meter.SetTotal (light_count);
-    meter.Restart ();
+    Report ("Shining lights (%d lights).", light_count);
+    if (meter)
+    {
+      meter->SetProgressDescription ("crystalspace.engine.lighting.calc",
+    	"Shining lights (%d lights)", light_count);
+      meter->SetTotal (light_count);
+      meter->Restart ();
+    }
   }
   lit->Restart ();
   while ((l = lit->Fetch ()) != NULL)
   {
     ((csStatLight*)l)->CalculateLighting ();
-    if (do_relight) meter.Step();
+    if (do_relight && meter) meter->Step();
   }
   stop = System->GetTime ();
   if (do_relight)
-    Report ("\nTime taken: %.4f seconds.", (float)(stop-start)/1000.);
+    Report ("Time taken: %.4f seconds.", (float)(stop-start)/1000.);
 
   // Render radiosity
   if (use_new_radiosity && !do_not_force_relight && do_force_relight)
   {
     start = System->GetTime ();
-    csRadiosity *rad = new csRadiosity(this);
+    csRadiosity *rad = new csRadiosity (this, meter);
     if (do_rad_debug)
     {
       rad_debug = rad;
@@ -1037,14 +1046,19 @@ void csEngine::ShineLights (csRegion* region)
     }
     stop = System->GetTime ();
     if (do_relight)
-      Report ("\nTime taken: %.4f seconds.", (float)(stop-start)/1000.);
+      Report ("Time taken: %.4f seconds.", (float)(stop-start)/1000.);
   }
 
   if (do_relight)
   {
     Report ("Caching lighting (%d meshes).", num_meshes);
-    meter.SetTotal (num_meshes);
-    meter.Restart ();
+    if (meter)
+    {
+      meter->SetProgressDescription ("crystalspace.engine.lighting.cache",
+    	  "Caching lighting (%d meshes)", num_meshes);
+      meter->SetTotal (num_meshes);
+      meter->Restart ();
+    }
   }
   for (sn = 0; sn < num_meshes ; sn++)
   {
@@ -1061,13 +1075,13 @@ void csEngine::ShineLights (csRegion* region)
         linfo->DecRef ();
       }
     }
-    if (do_relight) meter.Step();
+    if (do_relight && meter) meter->Step();
   }
 
   csThing::current_light_frame_number++;
 
   if (do_relight)
-    Report ("\nUpdating VFS....");
+    Report ("Updating VFS....");
   if (!VFS->Sync ())
     Warn ("Error updating lighttable cache!\n");
   if (do_relight)

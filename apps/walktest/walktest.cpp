@@ -34,6 +34,7 @@
 #include "csutil/scanstr.h"
 #include "csutil/dataobj.h"
 #include "csutil/csobject.h"
+#include "csutil/cspmeter.h"
 #include "cssys/system.h"
 #include "cstool/cspixmap.h"
 #include "cstool/csfxscr.h"
@@ -1459,7 +1460,9 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
     // Prepare the engine. This will calculate all lighting and
     // prepare the lightmaps for the 3D rasterizer.
-    Engine->Prepare ();
+    csTextProgressMeter* meter = new csTextProgressMeter (this, CS_MSG_CONSOLE);
+    Engine->Prepare (meter);
+    delete meter;
   }
   else
   {
@@ -1508,7 +1511,9 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
     // Prepare the engine. This will calculate all lighting and
     // prepare the lightmaps for the 3D rasterizer.
-    Engine->Prepare ();
+    csTextProgressMeter* meter = new csTextProgressMeter (this, CS_MSG_CONSOLE);
+    Engine->Prepare (meter);
+    delete meter;
 
     Create2DSprites ();
 

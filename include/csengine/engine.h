@@ -59,6 +59,7 @@ struct iLight;
 struct iImageIO;
 struct iClipper2D;
 struct iReporter;
+struct iProgressMeter;
 
 SCF_DECLARE_FAST_INTERFACE (iEngine)
 SCF_DECLARE_FAST_INTERFACE (iSector)
@@ -547,7 +548,7 @@ public:
    * If the optional 'region' parameter is given then only lights will
    * be recalculated for the given region.
    */
-  void ShineLights (csRegion* region = NULL);
+  void ShineLights (csRegion* region = NULL, iProgressMeter* meter = NULL);
 
   /// Query the iObject for the engine.
   virtual iObject *QueryObject();
@@ -559,9 +560,10 @@ public:
    * you loaded/created the world. It will prepare all lightmaps
    * for use and also free all images that were loaded for
    * the texture manager (the texture manager should have them
-   * locally now).
+   * locally now). The optional progress meter will be used to
+   * report progress.
    */
-  virtual bool Prepare ();
+  virtual bool Prepare (iProgressMeter* meter = NULL);
 
   /**
    * Set the maximum number of polygons to process in

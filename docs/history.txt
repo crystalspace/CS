@@ -43,6 +43,16 @@ The history order is reversed so that new features are at the top.
 	- Fixed a few dependencies on csengine in csphyzik (related to
 	  debugging mostly). Also removed the conditional CRYSTALSPACE
 	  define.
+	- Added iProgressMeter SCF interface. This is a general interface
+	  for reporting progress for a lengthy calculation.
+	- Renamed the old csProgressMeter to csTextProgressMeter and let it
+	  implement iProgressMeter.
+	- Extended iEngine::Prepare() with a parameter for an optional
+	  progress meter. This means that it is now possible to let the
+	  engine process reports be displayed through another method (or
+	  not at all).
+	- WalkTest now uses the csTextProgressMeter and gives it to the
+	  engine.
 4-Jul-2001
 	- Added iCamera::SetTransform() which should be used to directly
 	  set the transform. It is illegal to assign to the result of

@@ -21,9 +21,10 @@
 #define __CS_CSPMETER_H__
 
 #include "isys/system.h"
+#include "ivaria/pmeter.h"
 
 /**
- * The csProgressMeter class displays a simple percentage-style textual
+ * The csTextProgressMeter class displays a simple percentage-style textual
  * progress meter.  By default, the meter is presented to the user by passing
  * CS_MSG_INITIALIZATION to the system print function.  This setting may be
  * changed with the SetMessageType() method.  After constructing a progress
@@ -44,7 +45,7 @@
  * needs a newline printed after 100% has been reached, then it is the
  * client's responsibility to print it.
  */
-class csProgressMeter
+class csTextProgressMeter : public iProgressMeter
 {
 private:
   iSystem* sys;
@@ -57,38 +58,15 @@ private:
 
 public:
   /// Constructs a new progress meter.
-  csProgressMeter(iSystem*, int total = 100, int type = CS_MSG_INITIALIZATION);
+  csTextProgressMeter (iSystem*, int total = 100,
+  	int type = CS_MSG_INITIALIZATION);
   /// Destroys the progress meter.
-  ~csProgressMeter() {}
+  virtual ~csTextProgressMeter () {}
 
   /// Set the message type for iSystem::Printf().
-  void SetMessageType(int n) { type = n; }
+  void SetMessageType (int n) { type = n; }
   /// Get the message type used for iSystem::Printf().
-  int GetMessageType() const { return type; }
-
-  /// Increment the meter by one unit and print a tick mark.
-  void Step();
-  /// Reset the meter to 0%.
-  void Reset() { current = 0; anchor = 0; }
-  /// Reset the meter and print the initial tick mark ("0%").
-  void Restart();
-
-  /// Set the total element count represented by the meter and perform a reset.
-  void SetTotal(int n) { total = n; Reset(); }
-  /// Get the total element count represented by the meter.
-  int GetTotal() const { return total; }
-  /// Get the current value of the meter (<= total).
-  int GetCurrent() const { return current; }
-
-  /**
-   * Set the refresh granularity.  Valid values are 1-100, inclusive.  Default
-   * is 10.  The meter is only refreshed after each "granularity" * number of
-   * units have passed.  For instance, if granularity is 20, then * the meter
-   * will only be updated at most 5 times, or every 20%.
-   */
-  void SetGranularity(int);
-  /// Get the refresh granularity.
-  int GetGranularity() const { return granularity; }
+  int GetMessageType () const { return type; }
 
   /**
    * Set the tick scale.  Valid values are 1-100, inclusive.  Default is 2.  A
@@ -96,9 +74,46 @@ public:
    * of 100 ticks will be printed.  A value of 2 means that each tick
    * represents two units, thus a total of 50 ticks will be printed, etc.
    */
-  void SetTickScale(int);
+  void SetTickScale (int);
   /// Get the tick scale.
-  int GetTickScale() const { return tick_scale; }
+  int GetTickScale () const { return tick_scale; }
+
+  SCF_DECLARE_IBASE;
+
+  /**
+   * Set the id and description of what we are currently monitoring.
+   * An id can be something like "crystalspace.engine.lighting.calculation".
+   */
+  virtual void SetProgressDescription (const char*, const char*, ...) { }
+  virtual void SetProgressDescriptionV (const char*, const char*, va_list) { }
+
+  /// Increment the meter by one unit and print a tick mark.
+  virtual void Step ();
+  /// Reset the meter to 0%.
+  virtual void Reset () { current = 0; anchor = 0; }
+  /// Reset the meter and print the initial tick mark ("0%").
+  virtual void Restart ();
+  /// Abort the meter.
+  virtual void Abort ();
+  /// Finalize the meter (i.e. we completed the task sooner than expected).
+  virtual void Finalize ();
+
+  /// Set the total element count represented by the meter and perform a reset.
+  virtual void SetTotal (int n) { total = n; Reset(); }
+  /// Get the total element count represented by the meter.
+  virtual int GetTotal () const { return total; }
+  /// Get the current value of the meter (<= total).
+  virtual int GetCurrent () const { return current; }
+
+  /**
+   * Set the refresh granularity.  Valid values are 1-100, inclusive.  Default
+   * is 10.  The meter is only refreshed after each "granularity" * number of
+   * units have passed.  For instance, if granularity is 20, then * the meter
+   * will only be updated at most 5 times, or every 20%.
+   */
+  virtual void SetGranularity (int);
+  /// Get the refresh granularity.
+  virtual int GetGranularity () const { return granularity; }
 };
 
 #endif // __CS_CSPMETER_H__
