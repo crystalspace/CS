@@ -128,9 +128,9 @@ void SysSystemDriver::Loop(void)
   while (!Shutdown && !ExitLoop)
   {
     static long prev_time = -1;
-    long new_prev_time = Time ();
-    NextFrame ((prev_time == -1) ? 0 : new_prev_time - prev_time, Time ());
-    prev_time = new_prev_time;
+    long cur_time = Time ();
+    NextFrame ((prev_time == -1) ? 0 : cur_time - prev_time, cur_time);
+    prev_time = cur_time;
   }
 }
 
