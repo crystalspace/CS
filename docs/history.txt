@@ -17,6 +17,9 @@ chronological order.
 	  compile on VC which doesn't have unistd.h.
 	- Eric Sunshine fixed cspython/Jamfile so that "jam help" emits a
 	  help message for the "pythmod" target.
+	- Eric Sunshine fixed problem in cspython/Jamfile where invocations of
+	  CFlags, LFlags, and ExternalLibs were dysfunctional for 'pythmod'
+	  target.
 22-Jul-2004
 	- Jorrit started work on adding a new test to csbench to test lots
 	  of smaller objects.

@@ -79,6 +79,8 @@ if $(PYTHON.AVAILABLE) = "yes"
   }
 
   pythmod_TARGET = $(pythmod) ;
+  pythmod_SOURCES = $(pythmodsrc) ;
+  pythmod_OBJECTS = $(pythmodobj) ;
   LinkWith pythmod : cstool csgfx csgeom csutil ;
   ExternalLibs pythmod : PYTHON ;
   CFlags pythmod : $(PLUGIN.CFLAGS) ;
