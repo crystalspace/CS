@@ -277,6 +277,7 @@ install_all: \
 	@echo $"Creating Lightmaps...$"
 	@echo $"---------------------$"
 	-@CRYSTAL=$"$(INSTALL_DIR)$" ; \
+	export CRYSTAL ; \
 	if test -f $(INSTALL_DIR)/bin/cslight.app/Contents/MacOS/cslight ; \
 	then \
 	$(INSTALL_DIR)/bin/cslight.app/Contents/MacOS/cslight -video=null flarge ; \
