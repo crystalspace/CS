@@ -162,5 +162,6 @@ endif # rootdefines & config
 ifeq ($(MAKESECTION)/$(ROOTCONFIG),rootdefines/volatile)
 
 MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define NO_SOCKETS_SUPPORT$">>volatile.tmp
+MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define USGISH$">>volatile.tmp
 
-endif # rootdefines & config
+endif # rootdefines & volatile
