@@ -221,7 +221,7 @@ VideoSystem::VideoSystem ()
     VideoRAM = 0;
   } /* endif */
 
-#if DEBUG
+#ifdef DEBUG
   char __oem [200];
   __oem [sizeof (__oem)] = 0;
   dosmemget ((size_t (vi.OEM) >> 16) * 16 + (size_t (vi.OEM) & 0xffff),
