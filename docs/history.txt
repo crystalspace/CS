@@ -1,6 +1,10 @@
 The history order is reversed so that new features are at the top.
 
 6-May-2001
+	- Martin Geisse made the following changes:
+	    - csengine now depends on the string server. All apps have
+	      been changed accordingly.
+	    - Added RTTI interface to iObject and csObject.
 	- Moved G3D->SetPerspectiveAspect() to init in csEngine::Draw()
 	  instead of everywhere else.
 	- Removed the obsolete inv_aspect field from the structures
