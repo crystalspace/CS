@@ -10,6 +10,11 @@ The history order is reversed so that new features are at the top.
 	  lot of pieces to keep 8).
 	- Eric Sunshine removed obsolete references to
 	  crystalspace.string.server from several files.
+	- Eric Sunshine worked around a NextStep compiler limitation where it
+	  disallows C++ expressions in functions declared `extern "C"'.  This
+	  problem was triggered by the SCF module_scfInitialize() function,
+	  which is created by the EXPORT_CLASS_TABLE() macro, and which
+	  contains the C++ expression `iSCF::SCF = SCF'.
 31-May-2001
 	- In an effort to understand how the keyframer section in 3DS
 	  works I extended 3ds2lev verbose option to also list the contents

@@ -93,6 +93,7 @@ struct iBase
     if (ibase == NULL) return NULL;
     else return ibase->QueryInterface (iInterfaceID, iVersion);
   }
+static iBase* foo;
 };
 
 /// This macro should make use of IncRef() safer.
@@ -333,14 +334,24 @@ struct scfClassInfo
  * Any module that exports a number of SCF classes can define a table
  * with a list ot all classes exported from this module. The LibraryName
  * parameter is used to construct the name of the table variable; usually
- * the table is returned by a function called LibraryName_scfInitialize.
+ * the table is returned by a function called LibraryName_scfInitialize().
  * This function also initializes the global (iSCF::SCF) pointer for each
- * module.
+ * module.  This ensures that iSCF::SCF will have a valid value in all loaded
+ * plugin modules.  Note that there are some very rare instances where a
+ * particularly picky (and probably buggy) compiler does not allow C++
+ * expressions within a function declared `extern "C"'.  For this reason,
+ * the iSCF::SCF variable is instead initialized in the
+ * LibraryName_scfUnitInitialize() function which is not qualified as
+ * `extern "C"'.
  */
 #define EXPORT_CLASS_TABLE(LibraryName)					\
+static inline void							\
+SCF_EXPORTED_NAME(LibraryName,_scfUnitInitialize)(iSCF *SCF)		\
+{ iSCF::SCF = SCF; }							\
 SCF_EXPORT_FUNCTION scfClassInfo*					\
 SCF_EXPORTED_NAME(LibraryName,_scfInitialize)(iSCF *SCF)		\
 {									\
+  SCF_EXPORTED_NAME(LibraryName,_scfUnitInitialize)(SCF);		\
   static scfClassInfo ExportClassTable [] =				\
   {
 
@@ -356,7 +367,6 @@ SCF_EXPORTED_NAME(LibraryName,_scfInitialize)(iSCF *SCF)		\
 #define EXPORT_CLASS_TABLE_END						\
     { 0, 0, 0, 0 }							\
   };									\
-  iSCF::SCF = SCF;							\
   return ExportClassTable;						\
 }
 
@@ -622,6 +632,8 @@ struct iSCF : public iBase
    */
   virtual void Finish () = 0;
 };
+
+extern iSCF* SCF;
 
 //-------------------------------------------- System-dependent defines -----//
 
