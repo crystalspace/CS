@@ -15,6 +15,9 @@ Short-term cleanups that need to be done:
 31-Jan-2000
 	- Eric Sunshine fixed unixconf.sh so that it correctly captures
 	  and interprets output of 'which' command.
+	- Eric Sunshine fixed the makefile for the csPython plug-in so that
+	  it correctly locates the Python library within PYTHON_LIB and
+	  also eliminated its reliance on the hard-coded 1.5 library name.
 30-Jan-2000
 	- Michael Dale Long made some fixes for the new console,
 	  particularly in page/up page down scrolling support. Fixed
