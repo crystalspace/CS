@@ -34,12 +34,13 @@ private:
   NeXTSystemDriver* system;
   NeXTDelegateHandle controller;	// Application & window delegate.
   iEventOutlet* event_outlet;		// Shared event outlet.
+  bool should_shutdown;			// cscmdQuit was received.
   void init_menu(iConfigFile*);
 
 public:
   NeXTAssistant(NeXTSystemDriver*);
   virtual ~NeXTAssistant();
-  void orphan() { system = 0; }
+  void orphan();
   void start_event_loop();
 
   virtual void request_shutdown();
@@ -63,6 +64,13 @@ public:
     virtual uint GetPotentiallyConflictingEvents();
     virtual uint QueryEventPriority(uint type);
   } scfiEventPlug;
+
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(NeXTAssistant);
+    virtual bool HandleEvent(iEvent&);
+  } scfiEventHandler;
+  friend struct eiEventHandler;
 
   SCF_DECLARE_IBASE;
 };

@@ -32,19 +32,26 @@ typedef void* NeXTAssistantHandle;
 SCF_IMPLEMENT_IBASE(NeXTAssistant)
   SCF_IMPLEMENTS_INTERFACE(iNeXTAssistant)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventPlug)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE(NeXTAssistant::eiEventPlug)
   SCF_IMPLEMENTS_INTERFACE(iEventPlug)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_EMBEDDED_IBASE(NeXTAssistant::eiEventHandler)
+  SCF_IMPLEMENTS_INTERFACE(iEventHandler)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-NeXTAssistant::NeXTAssistant(NeXTSystemDriver* p) : system(p)
+NeXTAssistant::NeXTAssistant(NeXTSystemDriver* p) :
+  system(p), event_outlet(0), should_shutdown(false)
 {
   SCF_CONSTRUCT_IBASE(0);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventPlug);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
   controller = NeXTDelegate_startup(this);
 
   iObjectRegistry* r = system->GetObjectRegistry();
@@ -52,7 +59,10 @@ NeXTAssistant::NeXTAssistant(NeXTSystemDriver* p) : system(p)
   {
     iEventQueue* q = CS_QUERY_REGISTRY(r, iEventQueue);
     if (q != 0)
+    {
       event_outlet = q->CreateEventOutlet(&scfiEventPlug);
+      q->RegisterListener(&scfiEventHandler, CSMASK_Broadcast);
+    }
   }
 }
 
@@ -63,7 +73,29 @@ NeXTAssistant::NeXTAssistant(NeXTSystemDriver* p) : system(p)
 NeXTAssistant::~NeXTAssistant()
 {
   NeXTDelegate_shutdown(controller);
-  event_outlet->DecRef();
+  if (event_outlet != 0)
+    event_outlet->DecRef();
+  orphan();
+}
+
+
+//-----------------------------------------------------------------------------
+// orphan
+//	System driver is disappearing, so cleanup.
+//-----------------------------------------------------------------------------
+void NeXTAssistant::orphan()
+{
+  if (system != 0)
+  {
+    iObjectRegistry* r = system->GetObjectRegistry();
+    if (r != 0)
+    {
+      iEventQueue* q = CS_QUERY_REGISTRY(r, iEventQueue);
+      if (q != 0)
+        q->RemoveListener(&scfiEventHandler);
+    }
+    system = 0;
+  }
 }
 
 
@@ -114,8 +146,7 @@ void NeXTAssistant::advance_state()
   }
 }
 
-bool NeXTAssistant::continue_running()
-{ return (system != 0 && !system->Shutdown); }
+bool NeXTAssistant::continue_running() { return !should_shutdown; }
 
 void NeXTAssistant::application_activated()
 {
@@ -201,5 +232,16 @@ NSD_PROTO(void,mouse_moved)(NeXTAssistantHandle h, int x, int y)
 //=============================================================================
 uint NeXTAssistant::eiEventPlug::GetPotentiallyConflictingEvents()
   { return (CSEVTYPE_Keyboard | CSEVTYPE_Mouse); }
-uint NeXTAssistant::eiEventPlug::QueryEventPriority(uint type)
+uint NeXTAssistant::eiEventPlug::QueryEventPriority(uint)
   { return 150; }
+
+
+//=============================================================================
+// iEventHandler Implementation
+//=============================================================================
+bool NeXTAssistant::eiEventHandler::HandleEvent(iEvent& e)
+{
+  if (e.Type == csevBroadcast && e.Command.Code == cscmdQuit)
+    scfParent->should_shutdown = true;
+  return false;
+}

@@ -602,7 +602,7 @@ bool csSystemDriver::HandleEvent (iEvent& e)
   return false;
 }
 
-void csSystemDriver::SetSystemDefaults (iConfigManager *Config)
+void csSystemDriver::SetSystemDefaults (iConfigManager*)
 {
   // First look in .cfg file
   csConfigAccess cfg;
