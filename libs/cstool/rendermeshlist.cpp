@@ -71,6 +71,20 @@ void csRenderMeshList::AddRenderMeshes (csRenderMesh** meshes, int num,
   }
 }
 
+void csRenderMeshList::Empty ()
+{
+  csPDelArray < renderMeshListInfo >::Iterator it = renderList.GetIterator ();
+
+  while (it.HasNext ())
+  {
+    renderMeshListInfo* listEnt = it.Next ();
+    if (0 == listEnt)
+      continue;
+
+    listEnt->meshList.Empty ();
+  }
+}
+
 /**
  * NOTE! This function sorts a bit unusual. First, put all elements
  * which is 0 at the end. (no elements really). Then sort according to RP

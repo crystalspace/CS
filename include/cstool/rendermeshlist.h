@@ -29,7 +29,7 @@ class csRenderMesh;
 
 /**
  * This class is used when we need to store, sort and then render a list of
- * rendermeshes. The meshes will be sorted according to shader on pointervalue
+ * rendermeshes.
  */
 class csRenderMeshList
 {
@@ -56,6 +56,11 @@ public:
    * do a sort within the RP.
    */
   void GetSortedMeshList (csArray<csRenderMesh*>& meshes);
+
+  /**
+   * Empty the meshlist. It will still hold the list of renderpriorities.
+   */
+  void Empty ();
 
 private:
   /// This struct contains one entry in the RP infoqueue
