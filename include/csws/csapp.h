@@ -40,6 +40,7 @@
 #include "csgfxppl.h"
 #include "csutil/cseventq.h"
 #include "csutil/csstrvec.h"
+#include "csutil/array.h"
 #include "csutil/cfgacc.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -145,7 +146,7 @@ protected:
   /**
    * This is a stack of csModalInfo instances to keep track of modality.
    */
-  csVector ModalInfo;
+  csArray<csModalInfo*> ModalInfo;
 
 public:
   /// The object registry.

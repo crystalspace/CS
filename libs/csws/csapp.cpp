@@ -141,7 +141,7 @@ csApp::~csApp ()
   // Clean up the modality stack.
   while (ModalInfo.Length () > 0)
   {
-    csModalInfo* mi = (csModalInfo*)ModalInfo.Pop ();
+    csModalInfo* mi = ModalInfo.Pop ();
     if (mi->userdata) mi->userdata->DecRef ();
     delete mi;
   }
@@ -763,28 +763,28 @@ void csApp::StopModal (int iCode)
 {
   if (ModalInfo.Length () == 0) return;
   int idx = ModalInfo.Length ()-1;
-  csModalInfo* mi = (csModalInfo*)ModalInfo[idx];
+  csModalInfo* mi = ModalInfo[idx];
   mi->component->SetState (CSS_MODAL, false);
   CaptureFocus (mi->old_focus);
   app->SendCommand (cscmdStopModal, (void*)iCode);
   if (mi->userdata) mi->userdata->DecRef ();
   // Don't use Pop because the event handler might already add new
   // modal components.
-  ModalInfo.Delete (idx);
+  ModalInfo.DeleteIndex (idx);
   delete mi;
 }
 
 csComponent* csApp::GetTopModalComponent ()
 {
   if (ModalInfo.Length () == 0) return 0;
-  csModalInfo* mi = (csModalInfo*)ModalInfo[ModalInfo.Length ()-1];
+  csModalInfo* mi = ModalInfo[ModalInfo.Length ()-1];
   return mi->component;
 }
 
 iBase* csApp::GetTopModalUserdata ()
 {
   if (ModalInfo.Length () == 0) return 0;
-  csModalInfo* mi = (csModalInfo*)ModalInfo[ModalInfo.Length ()-1];
+  csModalInfo* mi = ModalInfo[ModalInfo.Length ()-1];
   return mi->userdata;
 }
 

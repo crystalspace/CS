@@ -167,20 +167,20 @@ void csComponent::SetApp (csApp *newapp)
 
 void csComponent::InsertClipChild (csComponent *clipchild)
 {
-  if (clipchildren.Find ((void *)clipchild) < 0)
+  if (clipchildren.Find (clipchild) < 0)
   {
     if (clipchild->clipparent)
       clipchild->clipparent->DeleteClipChild (clipchild);
-    clipchildren.Push ((void *)clipchild);
+    clipchildren.Push (clipchild);
   }
   clipchild->clipparent = this;
 }
 
 void csComponent::DeleteClipChild (csComponent *clipchild)
 {
-  int num = clipchildren.Find ((void *)clipchild);
+  int num = clipchildren.Find (clipchild);
   if (num >= 0)
-    clipchildren.Delete (num);
+    clipchildren.DeleteIndex (num);
 }
 
 void csComponent::Insert (csComponent *comp)
@@ -599,7 +599,7 @@ AbortDrag:
 	  int i;
       for (i = clipchildren.Length () - 1; i >= 0; i--)
       {
-        csComponent *child = (csComponent *)clipchildren.Get (i);
+        csComponent *child = clipchildren[i];
         // If child is not visible, skip it
         if (child->GetState (CSS_VISIBLE))
         {
@@ -949,7 +949,7 @@ void csComponent::CheckDirtyTD (csRect &ioR)
     // "Clip children" are always topmost, so start from them
 	int i;
     for (i = clipchildren.Length () - 1; i >= 0; i--)
-      ((csComponent *)clipchildren.Get (i))->CheckDirtyTD (r);
+      clipchildren[i]->CheckDirtyTD (r);
 
     // Loop through all "direct" children top-down
     csComponent *c = top;
@@ -1034,7 +1034,7 @@ void csComponent::CheckDirtyBU (csRect &ioR)
   // Continue with "clip children" bottom-up
   int i;
   for (i = 0; i < clipchildren.Length (); i++)
-    ((csComponent *)clipchildren.Get (i))->CheckDirtyBU (r);
+    clipchildren[i]->CheckDirtyBU (r);
 
   // Add the dirty rectangle into output rectangle
   r.Move (bound.xmin, bound.ymin);
@@ -1170,7 +1170,7 @@ bool csComponent::SetRect (int xmin, int ymin, int xmax, int ymax)
 	  int i;
       for (i = clipchildren.Length () - 1; i >= 0; i--)
       {
-        csComponent *cur = (csComponent *)clipchildren.Get (i);
+        csComponent *cur = clipchildren[i];
         int dX = 0, dY = 0;
         LocalToGlobal (dX, dY);
         cur->GlobalToLocal (dX, dY);
@@ -1288,7 +1288,7 @@ void csComponent::Invalidate (csRect &area, bool fIncludeChildren,
     }
     while (i >= 0)
     {
-      child = (csComponent *)clipchildren.Get (i);
+      child = clipchildren[i];
       csRect dr (area);
       int dX = 0, dY = 0;
       LocalToGlobal (dX, dY);
@@ -1419,7 +1419,7 @@ void csComponent::Clip (cswsRectVector &rect, csComponent *last, bool forchild)
   int c;
   for (c = clipchildren.Length () - 1; c >= 0; c--)
   {
-    csComponent *nb = (csComponent *)clipchildren.Get (c);
+    csComponent *nb = clipchildren[c];
     if (nb == last)
       break;
     ClipChild (rect, nb);
@@ -1926,7 +1926,7 @@ csComponent *csComponent::GetChildAt (int x, int y,
   int i;
   for (i = clipchildren.Length () - 1; i >= 0; i--)
   {
-    csComponent *child = (csComponent *)clipchildren.Get (i);
+    csComponent *child = clipchildren[i];
     if (child->GetState (CSS_VISIBLE))
     {
       int nx = x, ny = y;

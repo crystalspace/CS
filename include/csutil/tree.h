@@ -20,21 +20,24 @@
 #define __CS_CSTREENODE_H__
 
 #include "csutil/csvector.h"
+#include "csutil/array.h"
 
 /**
  * A generic tree class.
  */
 class csTreeNode
 {
- public:
-
+public:
   /// Returns true if this node has no children.
   bool IsLeaf ()
   { return children.Length () == 0; }
 
   /// Remove a child node.
   void RemoveChild (csTreeNode *child)
-  { int idx = children.Find (child); if (idx != -1) children.Delete (idx); }
+  {
+    int idx = children.Find (child);
+    if (idx != -1) children.DeleteIndex (idx);
+  }
 
   /// Add a child node.
   void AddChild (csTreeNode *child)
@@ -46,9 +49,9 @@ class csTreeNode
 
   virtual ~csTreeNode ()
   {
-	int i;
+    int i;
     for(i=children.Length ()-1; i>=0; i--)
-      delete (csTreeNode*)children.Get (i);
+      delete children.Get (i);
     if (parent)
       parent->RemoveChild (this);
   }
@@ -75,10 +78,10 @@ class csTreeNode
       foundNode = this;
     while (i<children.Length () && !(foundNode && stopOnSuccess))
     {
-      dive = (SelBranch == 0) || SelBranch ((csTreeNode*)children.Get (i));
+      dive = (SelBranch == 0) || SelBranch (children[i]);
       if (dive)
-        foundNode = ((csTreeNode*)children.Get (i))->DSF (TreeFunc, SelBranch,
-	                                                  param, stopOnSuccess);
+        foundNode = (children[i])->DSF (TreeFunc, SelBranch,
+		param, stopOnSuccess);
 	i++;
     }
     return foundNode;
@@ -100,20 +103,20 @@ class csTreeNode
 		   		bool stopOnSuccess)
   {
     csTreeNode *node, *foundNode = 0;
-    csVector fifo;
+    csArray<csTreeNode*> fifo;
 
     fifo.Push (this);
     while (fifo.Length () > 0 && !(foundNode && stopOnSuccess))
     {
-      node = (csTreeNode*)fifo.Get (0); fifo.Delete (0);
+      node = fifo[0]; fifo.DeleteIndex (0);
       if (TreeFunc (node, param, stopOnSuccess))
         foundNode = node;
       if (!node->IsLeaf () && (SelBranch==0 || SelBranch (node)))
-	  {
-		int i;
+      {
+	int i;
         for (i=0; i < node->children.Length (); i++ )
-          fifo.Push (node->children.Get (i));
-	  }
+          fifo.Push (node->children[i]);
+      }
     }
     fifo.DeleteAll ();
     return foundNode;
@@ -121,7 +124,7 @@ class csTreeNode
 
  public:
   csTreeNode *parent; // parent node or 0 if toplevel
-  csVector children; // node children
+  csArray<csTreeNode*> children; // node children
 };
 
 #endif // __CS_CSTREENODE_H__

@@ -31,6 +31,7 @@
 #include "csgeom/csrect.h"
 #include "csutil/csvector.h"
 #include "csutil/parray.h"
+#include "csutil/array.h"
 #include "cstool/cspixmap.h"
 #include "cswspal.h"
 #include "ivideo/graph2d.h"
@@ -378,7 +379,7 @@ protected:
   /// Current font size
   int FontSize;
   /// An array of 'clip children', i.e. components which are clipped inside our bounds
-  csVector clipchildren;
+  csArray<csComponent*> clipchildren;
   /// This field is used to cache current clipping region during every Redraw()
   static cswsRectVector *visregion;
 

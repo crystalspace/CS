@@ -739,9 +739,9 @@ void csGrid::init (csComponent *pParent, csRect &rc, int iStyle, csGridCell *gc)
   SetState (CSS_SELECTABLE, true);
   vRegionStyles.Push (gc);
   vViews.Push (new csGridView (this, rc, (iStyle & ~(CSGS_HSPLIT|CSGS_VSPLIT))));
-  regions = new csRegionTree2D (rc, vRegionStyles.Get (0) );
+  regions = new csRegionTree2D (rc, vRegionStyles[0] );
   // rc below is a dummy and will be recalculated when SetRect is called
-  viewlayout = new csRegionTree2D (rc, vViews.Get (0) );
+  viewlayout = new csRegionTree2D (rc, vViews[0] );
   splitterX = splitterY = 0;
   if (iStyle & CSGS_HSPLIT)
     splitterX = new csSplitter (this);
@@ -771,7 +771,7 @@ csGrid::~csGrid ()
   delete regions;
 
   for (i = 0; i < vRegionStyles.Length (); i++)
-    delete (csGridCell *)vRegionStyles.Get (i);
+    delete vRegionStyles[i];
   //for (i=0; i<vViews.Length (); i++) delete (csGridView*)vViews.Get (i);
 
   delete viewlayout;

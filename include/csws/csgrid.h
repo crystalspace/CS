@@ -30,6 +30,7 @@
  
 #include "csws/csscrbar.h"
 #include "csutil/csvector.h"
+#include "csutil/array.h"
 #include "csutil/csstring.h"
 
 /**
@@ -400,11 +401,11 @@ protected:
   /// The grid data
   csSparseGrid *grid;
   /// The array of grid views
-  csVector vViews;
+  csArray<csGridView*> vViews;
   /// The actiove grid view
   csGridView *activeView;
   /// A vector containing the pattern csGridCell for every region;
-  csVector vRegionStyles;
+  csArray<csGridCell*> vRegionStyles;
   /// The horizontal and vertical dividers
   csSplitter *splitterX, *splitterY;
   /// cursor style
