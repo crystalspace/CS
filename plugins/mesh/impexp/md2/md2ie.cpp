@@ -236,7 +236,7 @@ iModelData *csModelConverterMD2::Load (UByte *Buffer, ULong Size)
   in.SetPosition (Header.SkinOffset);
   for (i = 0; i < Header.SkinCount; i++)
   {
-    csString *s = new csString (SIZEOF_MD2SKINNAME);
+    csString *s = new csString ((unsigned int)SIZEOF_MD2SKINNAME);
     in.Read (s->GetData (), SIZEOF_MD2SKINNAME);
     SkinNames.Push (s);
   }
