@@ -107,6 +107,8 @@ protected:
    * PolygonSet (Thing in csSector for example).
    */
   csPolygonSet* next;
+  /// Parent object (sector or world) in which this object is linked.
+  csObject* parent;
 
   /// Number of vertices
   int num_vertices;
@@ -378,9 +380,15 @@ public:
 
   /// Get the next polygonset in its linked list.
   csPolygonSet* GetNext () { return next; }
+  /// Get the parent for this polygonset.
+  csObject* GetParent () { return parent; }
 
-  /// Set the next polygonset in its linked list.
-  void SetNext (csPolygonSet* next) { csPolygonSet::next = next; }
+  /// Set the next polygonset and parent in its linked list.
+  void SetNext (csObject* parent, csPolygonSet* next)
+  {
+    csPolygonSet::parent = parent;
+    csPolygonSet::next = next;
+  }
 
   /**
    * Set the sector that this polygonset belongs to.

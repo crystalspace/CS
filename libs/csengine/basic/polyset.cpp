@@ -74,6 +74,9 @@ csPolygonSet::csPolygonSet () : csObject(),
   light_frame_number = -1;
 
   cam_verts_set.SetTransformationManager (&csWorld::current_world->tr_manager);
+
+  next = NULL;
+  parent = NULL;
 }
 
 csPolygonSet::~csPolygonSet ()

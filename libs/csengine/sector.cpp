@@ -103,7 +103,8 @@ void csSector::Prepare ()
 
 void csSector::AddThing (csThing* thing)
 {
-  thing->SetNext (first_thing);
+  if (thing->GetParent ()) return;
+  thing->SetNext (this, first_thing);
   first_thing = thing;
 }
 
@@ -112,6 +113,7 @@ bool csSector::RemoveThing (csThing* thing)
   if (first_thing == thing)
   {
     first_thing = (csThing*)thing->GetNext();
+    thing->SetNext (NULL, NULL);
     return true;
   }
   else
@@ -120,9 +122,10 @@ bool csSector::RemoveThing (csThing* thing)
     while (th)
     {
       csThing* next = (csThing*)th->GetNext();
-      if (next==thing)
+      if (next == thing)
       {
-        th->SetNext(next->GetNext());
+        th->SetNext (this, next->GetNext());
+        thing->SetNext (NULL, NULL);
         return true;
       }
       th = next;
@@ -159,13 +162,13 @@ void csSector::UseStaticTree (int mode, bool octree)
     {
       static_thing->Merge (sp);
       CHK (delete sp);
-      if (sp_prev) sp_prev->SetNext (n);
+      if (sp_prev) sp_prev->SetNext (this, n);
       else first_thing = n;
     }
     else sp_prev = sp;
     sp = n;
   }
-  static_thing->SetNext (first_thing);
+  static_thing->SetNext (this, first_thing);
   first_thing = static_thing;
   static_thing->CreateBoundingBox ();
 
