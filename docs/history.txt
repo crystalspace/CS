@@ -13,6 +13,8 @@ The history order is reversed so that new features are at the top.
 	- Matze changed autoconf script to use ?= instead of = in Jamconfig.
 	  This allows to override values on the jam commandline.
 	  (Example: jam -sMODE=optimize)
+	- res modified csendian.h the 3rd time to utilize CONST_INT64(). 
+	  The configure-time int64 test did the trick.
 11-Apr-2003
 	- Fixed a problem with portals in combination with <hardmove>
 	  and HardTransform(). The problem was that the sector and portal
