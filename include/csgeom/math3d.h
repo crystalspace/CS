@@ -279,7 +279,7 @@ public:
    * Intersect a 3D segment with a plane.  Returns true if there is an
    * intersection, with the intersection point returned in isect.
    */
-  static void Plane (
+  static bool Plane (
     const csVector3& u, const csVector3& v,
     const csVector3& normal, const csVector3& a, // plane
     csVector3& isect, float& dist);              // intersection point

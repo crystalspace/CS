@@ -433,15 +433,16 @@ bool csIntersect3::IntersectTriangle (const csVector3& tr1,
   return true;
 }
 
-void csIntersect3::Plane(const csVector3& u, const csVector3& v,
+bool csIntersect3::Plane(const csVector3& u, const csVector3& v,
                          const csVector3& normal, const csVector3& a,
                          csVector3& isect, float& dist)
 {
   float counter = normal * (u - a);
   float divider = normal * (v - u);
-  if (divider == 0) { isect = v; return; }
+  if (divider == 0) { isect = v; return false; }
   dist = -counter / divider;
   isect = u + dist*(v - u);
+  return true;
 }
 
 bool csIntersect3::Plane(const csVector3& u, const csVector3& v,

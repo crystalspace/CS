@@ -4,6 +4,8 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug in csRenderView::ClipBSphere. The bug was
 	  actually a false CS_ASSERT based on a wrong assumption
 	  that TestBSphere() is perfect which it isn't.
+	- Changed one of csIntersect3::Plane() to return true/false on
+	  intersection.
 31-Oct-2001
 	- Removed the windows pen support added by 'res'. I don't have
 	  the needed include files on mingw.
