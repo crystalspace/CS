@@ -62,6 +62,8 @@ SWIG.INTERFACE = plugins/cscript/common/cs.i
 SWIG.CSPYTHON = plugins/cscript/cspython/cs_pyth.cpp
 SWIG.CSPYTHON.OBJ = $(addprefix $(OUT),$(notdir $(SWIG.CSPYTHON:.cpp=$O)))
 
+TRASH.CSPYTHON = $(wildcard $(addprefix scripts/python/,*.pyc *.pyo))
+
 INC.CSPYTHON = $(wildcard plugins/cscript/cspython/*.h)
 SRC.CSPYTHON = \
   $(sort $(wildcard plugins/cscript/cspython/*.cpp) $(SWIG.CSPYTHON))
@@ -101,7 +103,8 @@ $(CSPYTHON): $(OBJ.CSPYTHON) $(LIB.CSPYTHON)
 	$(DO.PLUGIN) $(LIB.CSPYTHON.LOCAL)
 
 cspythonclean:
-	-$(RM) $(CSPYTHON) $(OBJ.CSPYTHON) $(OUTOS)cspython.dep
+	-$(RM) $(CSPYTHON) $(OBJ.CSPYTHON) $(TRASH.CSPYTHON) \
+	$(OUTOS)cspython.dep
 
 cspythonswig: cspythonswigclean cspython
 
