@@ -11,7 +11,7 @@ ifeq ($(X11.AVAILABLE),yes)
   PLUGINS+=video/canvas/softx
   PLUGINS+=video/canvas/linex
   ifeq ($(GL.AVAILABLE),yes)
-    PLUGINS+=video/renderer/opengl video/canvas/openglx
+    PLUGINS+=video/canvas/openglx
   endif
 
   # The X-Window plugin
@@ -21,9 +21,6 @@ ifeq ($(X11.AVAILABLE),yes)
   # Video Modes Plugin
   PLUGINS+=video/canvas/xextf86vm
 endif
-
-# udp/tcp network plugin
-PLUGINS+=net/driver/ensocket
 
 # video support
 # formats (this is the wrapping format for the video data)
@@ -60,12 +57,6 @@ include mk/unix.mak
 
 # Extra libraries needed on this system.
 LIBS.EXE+=$(LFLAGS.L)/usr/local/lib $(LFLAGS.l)m
-
-# Socket library
-LIBS.SOCKET.SYSTEM=
-
-# Where can the optional sound libraries be found on this system?
-SOUND_LIBS=
 
 # Indicate where special include files can be found.
 CFLAGS.INCLUDE=$(CFLAGS.I)/usr/local/include

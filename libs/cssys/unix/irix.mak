@@ -8,7 +8,7 @@ DESCRIPTION.OS.irix = Irix
 ifeq ($(X11.AVAILABLE),yes)
   PLUGINS+=video/canvas/softx
   ifeq ($(GL.AVAILABLE),yes)
-    PLUGINS+=video/renderer/opengl video/canvas/openglx
+    PLUGINS+=video/canvas/openglx
    endif
 
   # The X-Window plugin
@@ -24,9 +24,6 @@ endif
 
 # Sound renderer.
 PLUGINS+=sound/renderer/software
-
-# udp/tcp network plugin
-#PLUGINS+=net/driver/ensocket
 
 #--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
@@ -53,12 +50,6 @@ include mk/unix.mak
 
 # Extra libraries needed on this system.
 LIBS.EXE=$(LFLAGS.l)dl $(LFLAGS.l)m
-
-# Socket library
-LIBS.SOCKET.SYSTEM=$(LFLAGS.l)socket
-
-# Where can the optional sound libraries be found on this system?
-SOUND_LIBS=
 
 # Indicate where special include files can be found.
 CFLAGS.INCLUDE=

@@ -31,12 +31,11 @@ vpath %.cpp plugins/net/driver/ensocket
 ifeq ($(USE_PLUGINS),yes)
   ENSOCKET = $(OUTDLL)/ensocket$(DLL)
   LIB.ENSOCKET = $(foreach d,$(DEP.ENSOCKET),$($d.LIB))
-  LIB.ENSOCKET.SPECIAL = $(LIBS.SOCKET.SYSTEM)
   TO_INSTALL.DYNAMIC_LIBS += $(ENSOCKET)
 else
   ENSOCKET = $(OUT)/$(LIB_PREFIX)ensocket$(LIB)
   DEP.EXE += $(ENSOCKET)
-  LIBS.EXE += $(LIBS.SOCKET.SYSTEM)
+  LIBS.EXE += $(SOCKET.LFLAGS)
   SCF.STATIC += ensocket
   TO_INSTALL.STATIC_LIBS += $(ENSOCKET)
 endif
@@ -61,7 +60,7 @@ ifeq ($(MAKESECTION),targets)
 ensocket: $(OUTDIRS) $(ENSOCKET)
 
 $(ENSOCKET): $(OBJ.ENSOCKET) $(LIB.ENSOCKET)
-	$(DO.PLUGIN) $(LIB.ENSOCKET.SPECIAL)
+	$(DO.PLUGIN) $(SOCKET.LFLAGS)
 
 clean: ensocketclean
 ensocketclean:

@@ -8,16 +8,12 @@ DESCRIPTION.OS.linux = Linux
 # a joystick device plugin
 #PLUGINS+=device/joystick/linux
 
-# udp/tcp network plugin
-PLUGINS+=net/driver/ensocket
-
 # Choose which 2D/3D driver combinations you want to build/use
 ifeq ($(X11.AVAILABLE),yes)
   PLUGINS+=video/canvas/softx
   PLUGINS+=video/canvas/linex
   ifeq ($(GL.AVAILABLE),yes)
     PLUGINS+=video/canvas/openglx
-    PLUGINS+=video/renderer/opengl
     PLUGINS+=video/renderer/opengl-ext
   endif
 
@@ -72,12 +68,6 @@ include mk/unix.mak
 # Extra libraries needed on this system.
 LIBS.EXE+=$(LFLAGS.l)dl $(LFLAGS.l)m 
 #$(LFLAGS.l)gcc
-
-# Socket library
-LIBS.SOCKET.SYSTEM=
-
-# Where can the optional sound libraries be found on this system?
-SOUND_LIBS=
 
 # Indicate where special include files can be found.
 CFLAGS.INCLUDE=

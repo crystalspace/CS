@@ -1,5 +1,23 @@
 The history order is reversed so that new features are at the top.
 
+3-Jan-2002
+	- Eric Sunshine made the following changes:
+	    - Configuration phase now detects libmng automatically.  Added
+	      bin/chkmng.sh.
+	    - Configuration phase now determines proper linker flags for
+	      sockets.  Removed the now obsolete LIBS.SOCKET.SYSTEM makefile
+	      variable.  Added chksockt.sh.  Removed chkheadr.sh.
+	    - The following modules are now enabled automatically by user.mak
+	      if their prerequisite facilities are available:
+		- filesys/vfs
+		- video/renderer/opengl
+		- video/loader/png
+		- video/loader/jpg
+		- video/loader/mng
+		- net/driver/socket
+		- net/driver/ensocket
+		- cscript/cspython
+	    - Eliminated the unused SOUND_LIBS makefile variable.
 2-Jan-2003
 	- Eric Sunshine changed the OpenGL-related configuration script and
 	  makefiles so that it is now the responsibility of the configuration

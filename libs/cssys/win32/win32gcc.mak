@@ -12,11 +12,12 @@ PLUGINS += video/canvas/ddraw8
 #PLUGINS.DYNAMIC +=video/format/avi
 #PLUGINS.DYNAMIC +=video/format/codecs/opendivx
 
-# If you have the following line uncommented make sure that
-# GL.LFLAGS and optionally GL.CFLAGS are set.
-PLUGINS += video/canvas/openglwin video/renderer/opengl
+# Make sure that GL.LFLAGS and optionally GL.CFLAGS are set correctly below.
+GL.AVAILABLE = yes
+ifeq ($(GL.AVAILABLE),yes)
+PLUGINS += video/canvas/openglwin
+endif
 
-# Uncomment the line below to build the sound driver
 PLUGINS += sound/driver/waveoutsd
 
 #--------------------------------------------------- rootdefines & defines ---#
@@ -63,9 +64,6 @@ LIBS.EXE= $(LFLAGS.L)/usr/lib/w32api $(LFLAGS.l)gdi32 $(LIBS.SYSTEM) \
 # MS OpenGL
 GL.LFLAGS = $(LFLAGS.l)opengl32
 
-# Socket library
-LIBS.SOCKET.SYSTEM=$(LFLAGS.l)wsock32
-
 # Sound library
 LIBS.SOUND.SYSTEM=$(LFLAGS.l)dsound $(LFLAGS.l)winmm
 
@@ -74,9 +72,6 @@ LIBS.CSLUA.SYSTEM=$(LFLAGS.l)lua $(LFLAGS.l)lualib
 
 # Freetype library
 LIBS.FREETYPE.SYSTEM=$(LFLAGS.l)ttf
-
-# Where can the optional sound libraries be found on this system?
-SOUND_LIBS=
 
 # Indicate where special include files can be found.
 # for instance where your dx includes are
@@ -190,9 +185,9 @@ PLUGIN.POSTFLAGS=-mwindows -mconsole
 # How to make a shared AKA dynamic library
 
 ifeq ($(MODE),debug)
-	RCFLAGS=-DCS_DEBUG
+  RCFLAGS=-DCS_DEBUG
 else
-	RCFLAGS=
+  RCFLAGS=
 endif
 
 COMPILE_RES = windres --include-dir include $(RCFLAGS) 
@@ -216,14 +211,14 @@ DO.SHARED.PLUGIN.CORE = \
 DO.SHARED.PLUGIN.CORE += -mconsole
 
 DO.LINK.EXE = \
-	$(MAKEVERSIONINFO) $(OUT)/$(@:$(EXE)=-version.rc) \
-	  "$(DESCRIPTION.$*)" $(COMMAND_DELIM) \
-	$(MERGERES) $(OUT)/$(@:$(EXE)=-rsrc.rc) ./ \
-	  $(OUT)/$(@:$(EXE)=-version.rc) $($@.WINRSRC) $(COMMAND_DELIM) \
-	$(COMPILE_RES) -i $(OUT)/$(@:$(EXE)=-rsrc.rc) \
-	  -o $(OUT)/$(@:$(EXE)=-rsrc.o) $(COMMAND_DELIM) \
-	$(LINK) $(LFLAGS) $(LFLAGS.EXE) $(LFLAGS.@) $(^^) \
-	  $(OUT)/$(@:$(EXE)=-rsrc.o) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
+  $(MAKEVERSIONINFO) $(OUT)/$(@:$(EXE)=-version.rc) \
+    "$(DESCRIPTION.$*)" $(COMMAND_DELIM) \
+  $(MERGERES) $(OUT)/$(@:$(EXE)=-rsrc.rc) ./ \
+    $(OUT)/$(@:$(EXE)=-version.rc) $($@.WINRSRC) $(COMMAND_DELIM) \
+  $(COMPILE_RES) -i $(OUT)/$(@:$(EXE)=-rsrc.rc) \
+    -o $(OUT)/$(@:$(EXE)=-rsrc.o) $(COMMAND_DELIM) \
+  $(LINK) $(LFLAGS) $(LFLAGS.EXE) $(LFLAGS.@) $(^^) \
+    $(OUT)/$(@:$(EXE)=-rsrc.o) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
 
 DO.LINK.CONSOLE.EXE = $(DO.LINK.EXE)
 

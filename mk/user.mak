@@ -20,14 +20,24 @@
 # as shared libraries. Please think twice before adding anything to PLUGINS;
 # in most cases you will want to add to PLUGINS.DYNAMIC.
 
+ifeq ($(ZLIB.AVAILABLE),yes)
 PLUGINS += filesys/vfs
+endif
 PLUGINS += video/renderer/software
+ifeq ($(GL.AVAILABLE),yes)
+PLUGINS += video/renderer/opengl
+endif
 PLUGINS += video/loader/mplex
 PLUGINS += video/loader/gif
+ifeq ($(PNG.AVAILABLE),yes)
 PLUGINS += video/loader/png
+endif
+ifeq ($(JPEG.AVAILABLE),yes)
 PLUGINS += video/loader/jpg
+endif
 PLUGINS += video/loader/bmp
 PLUGINS += video/loader/tga
+PLUGINS += video/effects
 PLUGINS += sound/loader/mplex
 PLUGINS += sound/loader/au
 PLUGINS += sound/loader/aiff
@@ -73,15 +83,11 @@ PLUGINS += culling/frustvis
 PLUGINS += csparser
 PLUGINS += csparser/services
 PLUGINS += cssaver
-PLUGINS += video/effects
 PLUGINS += sequence
 PLUGINS += engseq
 
 PLUGINS.DYNAMIC += engine/iso
 PLUGINS.DYNAMIC += isoldr
-#PLUGINS.DYNAMIC += cscript/cspython
-#PLUGINS.DYNAMIC += cscript/csperl5
-#PLUGINS.DYNAMIC += cscript/cslua
 PLUGINS.DYNAMIC += video/renderer/line
 PLUGINS.DYNAMIC += video/renderer/null
 PLUGINS.DYNAMIC += video/renderer/inf
@@ -89,9 +95,13 @@ PLUGINS.DYNAMIC += video/canvas/null2d
 PLUGINS.DYNAMIC += video/canvas/memory
 PLUGINS.DYNAMIC += video/loader/sgi
 PLUGINS.DYNAMIC += video/loader/wal
-#PLUGINS.DYNAMIC += video/loader/jng
+ifeq ($(MNG.AVAILABLE),yes)
+PLUGINS.DYNAMIC += video/loader/jng
+endif
+ifeq ($(SOCKET.AVAILABLE),yes)
 PLUGINS.DYNAMIC += net/driver/socket
 PLUGINS.DYNAMIC += net/driver/ensocket
+endif
 PLUGINS.DYNAMIC += net/manager
 PLUGINS.DYNAMIC += console/output/standard
 PLUGINS.DYNAMIC += console/output/fancy
@@ -107,12 +117,26 @@ PLUGINS.DYNAMIC += font/server/fontplex
 PLUGINS.DYNAMIC += aws
 #PLUGINS.DYNAMIC += sound/loader/ogg
 #PLUGINS.DYNAMIC += sound/loader/mod
+#PLUGINS.DYNAMIC += sound/renderer/openal
 #PLUGINS.DYNAMIC += physics/odedynam
 #PLUGINS.DYNAMIC += physics/loader
 #PLUGINS.DYNAMIC += video/render3d/opengl
 #PLUGINS.DYNAMIC += video/render3d/shadermgr
 #PLUGINS.DYNAMIC += video/render3d/shaderplugins/glshader_arb
-#PLUGINS.DYNAMIC += sound/renderer/openal
+
+ifeq ($(PYTHON.AVAILABLE),yes)
+PLUGINS.DYNAMIC += cscript/cspython
+endif
+
+#PLUGINS.DYNAMIC += cscript/cslua
+
+# Unfortunately, we can not yet enable this module automatically -- even if
+# the configuration script detects its presence -- since it fails to build on
+# most platforms.
+ifeq ($(PERL.AVAILABLE),yes)
+#PLUGINS.DYNAMIC += cscript/csperl5
+endif
+
 
 #-----------------------------------------------------------------------------
 # Static Settings            *** TAKE NOTE ***

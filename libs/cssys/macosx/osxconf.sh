@@ -28,11 +28,11 @@ msg_result "${CXX}"
 # Check for tools.
 . ${BIN_DIR}/chktools.sh
 
-# Analyze system header files.
-. ${BIN_DIR}/chkheadr.sh
-
 # Check endianess.
 . ${BIN_DIR}/endtest.sh
+
+# Check for Socket support.
+. ${BIN_DIR}/chksockt.sh
 
 # Check for zlib.
 . ${BIN_DIR}/chkzlib.sh
@@ -42,6 +42,9 @@ msg_result "${CXX}"
 
 # Check for libjpeg.
 . ${BIN_DIR}/chkjpeg.sh
+
+# Check for libmng.
+. ${BIN_DIR}/chkmng.sh
 
 # Check for Pthread (required by some Python installations).
 . ${BIN_DIR}/chkpthrd.sh

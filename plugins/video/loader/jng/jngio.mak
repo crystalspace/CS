@@ -26,22 +26,16 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-# @@@ FIXME: In the future, auto-detect this.
-ifeq (,$(MNG.LFLAGS))
-  MNG.LFLAGS = $(LFLAGS.l)mng
-endif
-
-LIB.CSJNGIMG.LOCAL += $(MNG.LFLAGS) $(ZLIB.LFLAGS) $(JPEG.LFLAGS)
+MNG.LFLAGS += $(MNG.LFLAGS) $(ZLIB.LFLAGS) $(JPEG.LFLAGS)
 
 ifeq ($(USE_PLUGINS),yes)
   CSJNGIMG = $(OUTDLL)/csjngimg$(DLL)
   LIB.CSJNGIMG = $(foreach d,$(DEP.CSJNGIMG),$($d.LIB))
-  LIB.CSJNGIMG.SPECIAL += $(LIB.CSJNGIMG.LOCAL)
   TO_INSTALL.DYNAMIC_LIBS += $(CSJNGIMG)
 else
   CSJNGIMG = $(OUT)/$(LIB_PREFIX)csjngimg$(LIB)
   DEP.EXE += $(CSJNGIMG)
-  LIBS.EXE += $(LIB.CSJNGIMG.LOCAL)
+  LIBS.EXE += $(MNG.LFLAGS)
   SCF.STATIC += csjngimg
   TO_INSTALL.STATIC_LIBS += $(CSJNGIMG)
 endif
@@ -68,11 +62,11 @@ ifeq ($(MAKESECTION),targets)
 csjngimg: $(OUTDIRS) $(CSJNGIMG)
 
 $(OUT)/%$O: plugins/video/loader/jng/%.cpp
-	$(DO.COMPILE.CPP) $(MNG.CFLAGS) $(JPEG.CFLAGS) $(ZLIB.CFLAGS)
+	$(DO.COMPILE.CPP) $(MNG.CFLAGS)
 
 $(CSJNGIMG): $(OBJ.CSJNGIMG) $(LIB.CSJNGIMG)
 	$(DO.PLUGIN.PREAMBLE) \
-	$(DO.PLUGIN.CORE) $(LIB.CSJNGIMG.SPECIAL) \
+	$(DO.PLUGIN.CORE) $(MNG.LFLAGS) \
 	$(DO.PLUGIN.POSTAMBLE)
 
 clean: csjngimgclean

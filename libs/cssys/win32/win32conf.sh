@@ -22,11 +22,11 @@ BIN_DIR=bin
 # Check for tools
 . ${BIN_DIR}/chktools.sh
 
-# Analyse system headers
-. ${BIN_DIR}/chkheadr.sh
-
 # test for endianess
 . ${BIN_DIR}/endtest.sh
+
+# Check for Socket support.
+. ${BIN_DIR}/chksockt.sh
 
 # Check for zlib.
 . ${BIN_DIR}/chkzlib.sh
@@ -36,6 +36,9 @@ BIN_DIR=bin
 
 # Check for libjpeg.
 . ${BIN_DIR}/chkjpeg.sh
+
+# Check for libmng.
+. ${BIN_DIR}/chkmng.sh
 
 # Check for Readline (required by some Python installations).
 . ${BIN_DIR}/chkrdlin.sh

@@ -101,5 +101,7 @@ if not /%1/ == /mingw32/ goto nomingwex
   echo PNG.LFLAGS = -lpng -lz>>config.tmp
   echo JPEG.AVAILABLE = yes>>config.tmp
   echo JPEG.LFLAGS = -ljpeg>>config.tmp
+  echo SOCKET.AVAILABLE = yes>>config.tmp
+  echo SOCKET.LFLAGS = -lwsock32>>config.tmp
 
 :exit

@@ -51,9 +51,6 @@
 #    PYTHON.LFLAGS
 #	Makefile variable emitted to the standard output stream.  Value is the
 #	linker flags required for Python.
-#    PLUGINS.DYNAMIC
-#	Makefile variable emitted to the standard output stream.  The string
-#	"cscript/cspython" is appended to its value if Python is available.
 #==============================================================================
 
 precondition '-n "${LINK}"'
@@ -183,7 +180,6 @@ EOF
     echo "PYTHON.AVAILABLE = yes"
     echo "PYTHON.CFLAGS = ${PYTHON_CFLAGS}"
     echo "PYTHON.LFLAGS = ${PYTHON_LFLAGS}"
-    echo "PLUGINS.DYNAMIC += cscript/cspython"
     msg_result "yes"
     if [ -n "${PYTHON_CFLAGS}" ]; then
       msg_inform "python cflags... ${PYTHON_CFLAGS}"

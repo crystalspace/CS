@@ -7,7 +7,6 @@
 PLUGINS += video/canvas/macosx/cocoa
 PLUGINS += video/canvas/macosx/coregraphics
 PLUGINS += video/canvas/macosx/opengl
-PLUGINS += video/renderer/opengl
 PLUGINS += sound/driver/coreaudio
 PLUGINS += sound/renderer/software
 
@@ -15,7 +14,7 @@ DESCRIPTION.macosx = MacOS/X
 DESCRIPTION.OS.macosx = MacOS/X
 
 # Avoid linker complain about weak vs. non-weak frameworks.
-export MACOSX_DEPLOYMENT_TARGET=10.2
+export MACOSX_DEPLOYMENT_TARGET = 10.2
 
 #--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
@@ -81,12 +80,6 @@ LIBS.EXE =
 
 # Extra libraries needed only for executables (not plug-ins)
 LIBS.EXE.PLATFORM =
-
-# Socket library
-LIBS.SOCKET.SYSTEM =
-
-# Additional audio libraries.
-SOUND_LIBS =
 
 # Indicate where special include files can be found.
 CFLAGS.INCLUDE = $(addprefix $(CFLAGS.I),$(MACOSX.SOURCE_PATHS))

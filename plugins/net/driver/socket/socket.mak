@@ -31,12 +31,11 @@ vpath %.cpp plugins/net/driver/socket
 ifeq ($(USE_PLUGINS),yes)
   CSSOCKET = $(OUTDLL)/cssocket$(DLL)
   LIB.CSSOCKET = $(foreach d,$(DEP.CSSOCKET),$($d.LIB))
-  LIB.CSSOCKET.SPECIAL = $(LIBS.SOCKET.SYSTEM)
   TO_INSTALL.DYNAMIC_LIBS += $(CSSOCKET)
 else
   CSSOCKET = $(OUT)/$(LIB_PREFIX)cssocket$(LIB)
   DEP.EXE += $(CSSOCKET)
-  LIBS.EXE += $(LIBS.SOCKET.SYSTEM)
+  LIBS.EXE += $(SOCKET.LFLAGS)
   SCF.STATIC += cssocket
   TO_INSTALL.STATIC_LIBS += $(CSSOCKET)
 endif
@@ -61,7 +60,7 @@ ifeq ($(MAKESECTION),targets)
 cssocket: $(OUTDIRS) $(CSSOCKET)
 
 $(CSSOCKET): $(OBJ.CSSOCKET) $(LIB.CSSOCKET)
-	$(DO.PLUGIN) $(LIB.CSSOCKET.SPECIAL)
+	$(DO.PLUGIN) $(SOCKET.LFLAGS)
 
 clean: cssocketclean
 cssocketclean:

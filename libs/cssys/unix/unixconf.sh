@@ -28,11 +28,11 @@ UNIX_DIR=libs/cssys/unix
 # Check for tools
 . ${BIN_DIR}/chktools.sh
 
-# Analyse system headers
-. ${BIN_DIR}/chkheadr.sh
-
 # test for endianess
 . ${BIN_DIR}/endtest.sh
+
+# Check for Socket support.
+. ${BIN_DIR}/chksockt.sh
 
 # Check for zlib.
 . ${BIN_DIR}/chkzlib.sh
@@ -42,6 +42,9 @@ UNIX_DIR=libs/cssys/unix
 
 # Check for libjpeg.
 . ${BIN_DIR}/chkjpeg.sh
+
+# Check for libmng.
+. ${BIN_DIR}/chkmng.sh
 
 # Check for Pthread
 . ${BIN_DIR}/chkpthrd.sh
