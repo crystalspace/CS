@@ -56,7 +56,7 @@ chronological order.
                   --meta-file           %metafile%
                   --name                %name%, %upcasename%
                   --project-extension
-                  --project-name        %project%
+                  --project-name        %project%, %makefile%
                   --source-root         %sourceroot%
                   --target              %target%
                   --workspace-extension
