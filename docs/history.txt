@@ -7,7 +7,15 @@ The history order has been reversed so that new features are at the top.
 	- Fixed bug with deletion of sky things.
 	- Fixed bug with thing templates containing curved surfaces. This
 	  bug could cause walktest to crash at exit (for flarge).
+	- Wouter Wijngaards made ttf2fnt more robust. Fixed a big
+	  memory leak in reading binary fnt files.
+	- Philip Wyett fixed some compile errors in appLevTool.dsp related
+	  to ltsave. Philip also fixed some problems with plgVFS.dsp.
+	- Martin Geisse committed a fix to the MSVC project files from
+	  Adam Bailey.
 30-Sep-2000
+	- Martin Geisse updated the MSVC project files.
+	- Martin also fixed a bug in the sound system.
 	- Eric Sunshine fixed nasty bug in csHashMap/csHashSet where it would
 	  happily access negative array elements.
 	- Eric Sunshine fixed bug in csHashMap::DeleteAll(csHashKey) where it
@@ -27,7 +35,21 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine eliminated a compilation warning in levtool.cpp.
 	- Eric Sunshine fixed problems in simple.cpp and scf.cfg which
 	  prevented the 'simple' application from loading the console.
+	- Wouter Wijngaards added -binary flag to ttf2fnt, that will create
+	  a binary .fnt file. Not usable for #include, but csfont can
+	  read it very quickly.
+	- Wouter changed csfont server. It not only serves the preloaded
+	  fonts now, but it also serves dynamically added fonts (use
+	  ttf2fnt to make those .fnt files, read them from VFS).
+	- Thomas Hieber added interfaces for animated 3D objects to
+	  icsgame.h. Thomas also added definition of the collider selected
+	  classes interface and added basic network interface declaration.
 29-Sep-2000
+	- Philip Wyett removed references to dynlight.cpp/.h and
+	  thingtpl.cpp/.h from the VC project files.
+	- Wouter Wijngaards changed the file format of ttf2fnt output so
+	  that crucial information is added as comments starting with
+	  //XX. This makes the file readable at runtime.
 	- Eric Sunshine made the following changes to install.mak and the
 	  installation-related makefile targets:
 	    - Consolidated all of the installation-related makefile goop into
@@ -60,6 +82,10 @@ The history order has been reversed so that new features are at the top.
 	      introduction of efed.pl.
 	- Eric Sunshine fixed formatting of the help message in
 	  fontmanager.mak.
+	- Martin Geisse cleaned up sound code a bit.
+	- Thomas Hieber added interfaces for movement control to iccsgame.h.
+	  He also cleaned up some interfaces to make everything more
+	  consistent.
 28-Sep-2000
 	- Philip Wyett updated a few VC project files.
 	- Thomas Hieber did a very small update to icsgame.h.
