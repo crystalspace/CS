@@ -300,44 +300,49 @@ void csWsTest::TreeDialog ()
   csTreeItem *ti;
   csComponent *p = tc;
   ti = new csTreeItem (p, "CrystalSpace Platforms");
-  //  csComponent *u = new csTreeItem (ti, "Unix");
   
   csComponent *u = new csTreeItem (ti, "Unix");
-  new csTreeItem (u, "FreeBSD");
+  (void)new csTreeItem (u, "FreeBSD");
   csComponent *li = new csTreeItem (u, "Linux");
-  new csTreeItem (u, "Solaris");
-  new csTreeItem (u, "Cygnus");
-  new csTreeItem (ti, "BeOS");
-  new csTreeItem (ti, "Mac");
-  new csTreeItem (ti, "Next");
-  new csTreeItem (ti, "OS/2");
-  new csTreeItem (ti, "DJGPP");
-  csComponent *w = new csTreeItem (ti, "Win32");
-  new csTreeItem (w, "Win95");
-  new csTreeItem (w, "Win98");
-  new csTreeItem (w, "Win2000");
-  new csTreeItem (w, "WinNT");
+  csComponent *nx = new csTreeItem (u, "NeXT");
+  (void)new csTreeItem (nx, "NextStep");
+  (void)new csTreeItem (nx, "OpenStep");
+  csComponent *ap = new csTreeItem (u, "Apple");
+  (void)new csTreeItem (ap, "MacOS/X Server");
+  (void)new csTreeItem (ap, "MacOS/X");
+  (void)new csTreeItem (ap, "Darwin");
+  (void)new csTreeItem (u, "Solaris");
+  (void)new csTreeItem (u, "Cygnus");
+  (void)new csTreeItem (ti, "Macintosh");
+  (void)new csTreeItem (ti, "BeOS");
+  (void)new csTreeItem (ti, "OS/2");
+  (void)new csTreeItem (ti, "DJGPP");
+  csComponent *w = new csTreeItem (ti, "Windows");
+  csComponent *w32 = new csTreeItem (w, "Win32");
+  (void)new csTreeItem (w32, "Win95");
+  (void)new csTreeItem (w32, "Win98");
+  (void)new csTreeItem (w32, "Win2000");
+  (void)new csTreeItem (w32, "WinNT");
 
   csComponent *d3 = new csTreeItem (li, "3D Renderer");
   csComponent *sw = new csTreeItem (d3, "Software");
-  new csTreeItem (sw, "X-Windows");
-  new csTreeItem (sw, "SVGALIB console");
-  new csTreeItem (sw, "GGI console");
+  (void)new csTreeItem (sw, "X-Windows");
+  (void)new csTreeItem (sw, "SVGALIB console");
+  (void)new csTreeItem (sw, "GGI console");
   csComponent *hw = new csTreeItem (d3, "Hardware");
   csComponent *gl = new csTreeItem (hw, "Glide/Voodoo");
-  new csTreeItem (gl, "Glide2");
-  new csTreeItem (gl, "Glide3");
+  (void)new csTreeItem (gl, "Glide2");
+  (void)new csTreeItem (gl, "Glide3");
   csComponent *ogl= new csTreeItem (hw, "OpenGL");
-  new csTreeItem (ogl, "Mesa");
-  new csTreeItem (ogl, "MGL");
+  (void)new csTreeItem (ogl, "Mesa");
+  (void)new csTreeItem (ogl, "MGL");
   
   csComponent *sd = new csTreeItem (li, "SoundDriver");
-  new csTreeItem (sd, "OSS");
+  (void)new csTreeItem (sd, "OSS");
   
   //  ti->SetState (CSS_FOCUSED|CSS_TREEITEM_SELECTED, true);
   Execute (window);
   delete window;
-
 }
 
 void csWsTest::GridDialog ()

@@ -1,7 +1,9 @@
 The history order has been reversed so that new features are at the top.
 
 26-Jun-2000
-	- Eric Sunshine eliminated a compilation warning in cstree.cpp.
+	- Eric Sunshine eliminated a slew of compilation warning in cstree.cpp
+	  and cswstest.cpp.
+	- Eric Sunshine fixed several broken comments in sft3dcom.h.
 25-Jun-2000
 	- New tree control in CSWS from Norman Kramer.
 	- Did an experiment for speeding up OpenGL by putting the setup
