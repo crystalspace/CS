@@ -1,6 +1,10 @@
 The history order has been reversed so that new features are at the top.
 
 3-Oct-2000
+	- Fixed a bug in the 3dslev convertor where it would accidently
+	  remove small polygons.
+	- Fixed two bugs in the new UV coordinate setter. The new code
+	  was actually just ignored.
 	- Eric Sunshine replaced out-of-date crystalspace.console.stdout
 	  references in several programs (nstp, perfest, ttffnt) with new
 	  crystalspace.console.output.standard.

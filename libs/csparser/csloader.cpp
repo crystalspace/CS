@@ -1956,6 +1956,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
     CS_TOKEN_TABLE (PLANE)
     CS_TOKEN_TABLE (V)
     CS_TOKEN_TABLE (UV_SHIFT)
+    CS_TOKEN_TABLE (UV)
   CS_TOKEN_TABLE_END
 
   CS_TOKEN_TABLE_START (portal_commands)
@@ -2212,7 +2213,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
 	      {
 		float u1, v1, u2, v2, u3, v3;
 		tx_uv_given = true;
-                ScanStr (params, "%d,%f,%f,%d,%f,%f,%d,%f,%f",
+                ScanStr (params2, "%d,%f,%f,%d,%f,%f,%d,%f,%f",
 			&tx_uv_i1, &u1, &v1,
 			&tx_uv_i2, &u2, &v2,
 			&tx_uv_i3, &u3, &v3);
