@@ -63,6 +63,92 @@ The history order is reversed so that new features are at the top.
 	- The system driver will now register a lot of the common objects
 	  using the NULL tag instead of a name. The NULL tag is meant to be
 	  for default objects so this is better.
+	- Wouter Wijngaards changed picview app:
+	    - Title of main window is now 'Image view' not '3d view' :-)
+	    - Main window has smaller border, no menus/buttons, and cannot be
+	      moved/sized.
+	    - Redraw is OK when no image is being displayed.
+	    - Image is positioned nicely at original size.
+	- Christopher Nelson did the following:
+	    - Fixed a couple of bugs related to searching for a window def
+	      when there are none.
+	    - Added in the text-attribute to the parser. This means that a
+	      user can now specify Frame styles as follows:
+		Style: wfsNormal | wfsMinMaxClose
+	    - Text constants are part of the expression solver, so you can use
+	      all normal arithmetic operators (+, -, *, /, &, |, ^, "()", etc.)
+	      with them.  The expression is solved at parse-time, so it
+	      becomes a constant when queried. Text constants resolve to an
+	      integer value in all cases.  
+	    - Added RegisterConstant(), ConstantExists() and
+	      GetConstantValue() to the awsPreferenceManager so that constants
+	      can be used by the parsing engine.  
+	    - These types of parameters are queried the same way that all
+	      other parameters are, so there is no additional syntax needed
+	      for component designers.
+	    - Fixed a few minor bugs regarding component naming.
+	- Philip Wyett fixed fullscreen bug in OpenGL canvas for Windows
+	  where display misses depth.
+	- Norman Kramer did the following:
+	    - Extended AddToBufferStatic to handle streamed sounds.
+	    - Since everybody talks about it but no one seems to implement it:
+	      here is ogg vorbis fo CS :)
+1-Oct-2001
+	- Christopher Nelson removed debugging output in csrectrg.cpp since
+	  csRectRegion now seems stable.
+	- Martin Geisse made the following changes:
+	    - Modified iTextureList, iMaterialList and iSectorList to
+	      contain equivalent functions and also added some functions.
+	      This means that iSectorList::GetSector() has been renamed to
+	      Get().
+	    - Added Delete(pointer) to csBasicVector, csVector, typed vectors
+	      and object vectors.
+	    - Changed csMovableSectorList to use the object vector macro
+	      (nodelete version).
+	    - Started to clean up the region code.
+	- Norman Kramer fixed iso engine so it compiles again.
+	- Christopher Nelson did the following:
+	    - Fixed a small bug that had to do with invalidating windows
+	      when focus changed.
+	    - Added a bit of code to awsWindow::OnDraw() that makes the
+	      titlebar of the focused window be bright.
+	    - Fixed the dumb bug where if you had two window on screen, one
+	      of them would disappear if you moved the other.
+	    - Next up for windows:  close, max and minimize buttons.
+	    - Fixed the resize bug. Window moving and resizing should now be
+	      fine. Except for the "core dump on move to low" bug.  Not sure
+	      what's causing that, and I have a feeling that it could be in
+	      the proctex code.
+	    - Added event broadcast to children. Events propagate as follows:
+		1. The window first gets a chance at all events. If it uses
+		   them, then propagation stops there.  
+		2. Mouse events propagate to the window that contains it.
+		   Equally, mouse events only propagate down the hierarchy to
+		   components that contain the mouse. Mouse events are NEVER
+		   propagated to any component that does not contain the
+		   mouse, except for MouseExit messages which are sent to the
+		   component that just lost the mouse.  
+		3. Keyboard events propagate to EVERY child of the active
+		   window until one decides to accept them. This will change
+		   in the future so that the currently focused component gets
+		   keyboard messages. The other common way to do this is to
+		   limit keystrokes to the field that the mouse is over. I
+		   dislike this way of doing business, however, since it
+		   requires you to not bump the mouse.
+30-Sep-2001
+	- Norman Kramer removed some token defs from the thing loader.
+	- Martin Geisse added some safety checks for missing plugins to the
+	  level loader and removed the unused reference to the motion manager.
+29-Sep-2001
+	- Norman Kramer did the following:
+	    - ballldr: Replaced last two printf with Report.
+	    - ballldr: Fixed classname in error msg of mixmode.
+	    - Added GetVertices, GetVerticesC and GetVerticesW to
+	      iThingState to return a const csVector3*.
+	    - Added ParseTexture, ParseWarp and ParsePoly3d to syntaxservices.
+	      This will be handy for writing your own thing addons.
+	    - Thing loader now uses syntax services to parse polygons and
+	      stuff.
 28-Sep-2001
 	- Drastically increased quality of OpenGL texture mapping
 	  in 16-bit mode. An alpha channel was selected for all textures
@@ -74,6 +160,56 @@ The history order is reversed so that new features are at the top.
 	- Fixed additional bug in OpenGL texture mode selection so that
 	  textures with alpha channel are now also correctly transparent
 	  like before (i.e. GL_RGBA is used).
+	- Christopher made the following changes:
+	    - Some bug fixes on awswin.cpp.
+	    - The redraw system was optimized even more. Instead of blitting
+	      the whole proc texture on every redraw, the proc texture is only
+	      blitted when there are window move or size events. Otherwise
+	      the system maintains an update store of regions that contain
+	      windows. Only those regions are blitted. Of course, this
+	      doesn't save very much if you have a big, full-screen window,
+	      but it does if you have only a few small windows. This was
+	      implemented primarily because:
+		a. if you plan on having big full-screen windows (like for an
+		   editor, etc.) then you should run AWS on the primary canvas
+		   rather than the proc texture.
+                b. most games also have small HUD widgets that display useful
+		   information. Usually these are pretty small items, and
+		   they're all over the screen. Developing these with AWS lets
+		   you use the built-on event handlers and they're
+		   automatically updated.
+                c. for systems with smaller windows, it's a huge speed
+		   increase. In the software renderer it's at least twice as
+		   fast.
+	    - Added a fragment buffer to the region so that collisions can
+	      be handled more simply and correctly.
+	    - Reworked the include function to understand the fragment
+	      buffer.
+	    - Broke the exclude function when he added the fragment buffer.
+	    - Made a small optimization to the fragmentation routines that
+	      fix the fragment operation for some cases where the smaller
+	      rect needs to be fragmented.  
+	    - Added fragment marking and gathering operations.
+	    - Killed chopIntersection because it didn't work right.
+	    - Added more documentation to the header.
+	    - Turned of clipping because he wasn't doing it right.
+	    - Added a fragment rect display so that you can visually see
+	      what areas of the screen are being redrawn and copied each
+	      frame. Note that the ideal here is no overdraw. I think that
+	      the current system accomplishes that.
+	- Norman Kramer added new syntaxloader plugin for common syntax
+	  elements. This plugin contains functions for loading matrices,
+	  vectors, polygons and other common objects that have to be parsed
+	  by several of the loader plugins.
+	- Norman also fixed the 3ds.mak makefile.
+	- Norman extended syntax services with writing capabilities.
+	- Norman rewrote ball and cube loaders to use the syntax services.
+	- Martin Geisse slightly improved the comments in some interface
+	  headers.
+	- Philip Wyett defined a FUNCID for new TextSyntaxService, fixing
+	  compile errors in ball and cube loaders. Creator can redefine as
+	  they see fit this just repairs errors.
+	- Wyatt Miler fixed a few typos in msvc5.txi and msvc6.txi.
 27-Sep-2001
 	- The alphamap for textures in the software renderer was not cleaned
 	  up at destruction.
@@ -101,6 +237,26 @@ The history order is reversed so that new features are at the top.
 	  but just lets you go over all images in a directory. Future
 	  enhancements are going to be useful and the layout for the
 	  button window must be improved.
+	- Norman Kramer added missing decref of terrfunc mesh object.
+	- Christopher Nelson fixed the following:
+	    - More problems with fragment rules being slightly incorrect, and
+	      one rule being completely wrong.
+	    - The Include method, which is now slightly less optimal because
+	      I couldn't get chop edge intersection to work consistently.
+	    - A few items here and there related to accuracy.
+       - Christopher also did the following:
+	    - Along with the fixes to csRectRegion, I made a few changes 
+	      to the redraw code which will hopefully eliminate droppings.
+	      I realize that there are a few cases where this still occurs,
+	      and I'm unsure why.
+	    - The critical path to redraw a window is now a little shorter.
+	    - Redraws are now a little cleaner, and less complicated. As
+	      well, handling events is now cleaner as well. Top windows are
+	      checked for containment of the mouse before being sent events.
+	      If a window is not the container window, it is lowered and the
+	      container is risen. MouseEnter and MouseExit do not work yet,
+	      since they require a little more functionality from container
+	      components.
 26-Sep-2001
 	- Added the following new initialization functions to initapp (cstool
 	  library):
@@ -134,6 +290,9 @@ The history order is reversed so that new features are at the top.
 	  technique. Simple1 no longer inherits from SysSystemDriver.
 	- Shawn Carroll found a bug in the OpenGL texture cache where
 	  'if (thhack = 0)' should be 'if (thhack == 0)'.
+	- Philip Wyett added missing 'struct iEvent' and 'struct
+	  iEventHandler' to initapp.h.
+	- Norman Kramer added missing include of evdefs.h.
 25-Sep-2001
 	- Fixed a bug in csTransform::Other2This and This2Other for
 	  csSphere. The radius was not always calculated correctly.
@@ -141,6 +300,48 @@ The history order is reversed so that new features are at the top.
 	  an object was considered invisible even if it was visible.
 	- Fixed Python plugin for recent CS changes (const GetVertex...).
 	- Fixed LUA plugin for recent CS changes (const GetVertex...).
+	- Norman Kramer added makeEmpty to csrectrg.h and did another fix
+	  with regards to setting a pointer to NULL.
+	- Norman Kramer made some changes to the parser so that the problem
+	  is solved where you have 2 tokens and one being a substring of
+	  another. Previously you had to write the longer first. This is
+	  solved by sorting the tokentable according to the length of their
+	  elements.
+	- Christopher Nelson did the following:
+	  Modified Norman's changes because:
+	    - The makeEmpty code was already present in the .cpp where it
+	      should have been implemented anyway.  
+	    - Norman's code, while certainly not incorrect, did a lot more
+	      work than is necessary or possibly even advisable. makeEmpty is
+	      called at the end of each frame. So much deallocation and
+	      reallocation would thrash the heap and would create much more
+	      work than is needed. The point of makeEmpty is not to empty
+	      the memory out, but to empty the list. The easiest way to do
+	      that is simply to reset the count.
+	- Philip Wyett removed the aws plugin and test application from the
+	  default CS build process.
+24-Sep-2001
+	- Christopher Nelson did the following:
+	    - Fixed some more bugs in the RectRegion code. Hopefully there
+	      are no more serious bugs. There is some small test code in
+	      awstest now.
+	    - Added csRectRegion into the awsManager instead of the older
+	      bucket format. This method is more flexible and probably
+	      faster. It's also cleaner because there's no special case code.
+	      All rects are assumed to be optimal in the region.
+	    - Cleaned up a couple of items related to older redraw code.
+	- Philip Wyett did the following:
+	  Updated winlibs version number to 0.19h.
+	  Note this version of winlibs is the same as 0.19g but the
+	  zlib and png libs and dll's have been built with VC6 using
+	  the /LINK50COMPAT so they are again VC5 compatible.
+	  The new version of winlibs can be obtained via the
+	  Crystal Space documentation under MSVC specific build
+	  instructions - where links to the file on both the CS ftp site
+	  and my own mirror can be found.
+22-Sep-2001
+	- Norman Kramer did some fixes on emit loader with regards to
+	  reference counting.
 21-Sep-2001
 	- Fixed csSector::IntersectSegment() so that it no longer ignores
 	  all the other meshes if there is a culler. The culler is now
@@ -154,6 +355,7 @@ The history order is reversed so that new features are at the top.
 	  mesh wrapper that is hit instead of the csObject. This mesh will
 	  also be returned in all cases now.
 	- Accordingly modified csPortal::HitBeam().
+	- Wouter Wijngaards added better comments for iBallState.
 20-Sep-2001
 	- Fixed the bug in csFrustum::Classify() and BatchClassify().
 	  It now seems to work properly in all cases I could find.
