@@ -19,6 +19,9 @@
 
 /**\file
  */
+/**\addtogroup gfx
+ * @{
+ */
 //-----------------------------------------------------------------------------
 // Implementation Note: Eric Sunshine <sunshine@sunshineco.com>      1999/02/09
 //
@@ -61,16 +64,23 @@
 CS_STRUCT_ALIGN_4BYTE_BEGIN
 struct csRGBcolor
 {
+  /// The red, green, blue components
   unsigned char red, green, blue;
+  /// Constructor (initialize to zero)
   csRGBcolor () : red(0), green(0), blue(0) {}
+  /// Initialize the color with some R/G/B value
   csRGBcolor (unsigned char r, unsigned char g, unsigned char b) :
     red(r), green(g), blue(b) {}
+  /// Assign given red/green/blue values to this pixel
   void Set (unsigned char r, unsigned char g, unsigned char b)
   { red = r; green = g; blue = b; }
+  /// Compare with an csRGBcolor
   bool operator == (const csRGBcolor& c) const
   { return (c.red == red) && (c.green == green) && (c.blue == blue); }
+  /// Compare with an csRGBcolor
   bool operator != (const csRGBcolor& c) const
   { return !operator == (c); }
+  /// add two csRGBcolors
   csRGBcolor operator + (const csRGBcolor& c) const
   { return csRGBcolor (c.red + red, c.green + green, c.blue + blue); }
 } CS_STRUCT_ALIGN_4BYTE_END;
@@ -130,6 +140,7 @@ struct csRGBpixel
   /// Get the pixel intensity
   int Intensity ()
   { return (red + green + blue) / 3; }
+  /// Get the pixel luminance
   unsigned char Luminance ()
   { return (((int)red)*30 + ((int)green)*59 + ((int)blue)*11)/100; }
   /// Assign given red/green/blue values to this pixel
@@ -138,15 +149,18 @@ struct csRGBpixel
   /// Assign given red/green/blue/alpha values to this pixel
   void Set (const int r, const int g, const int b, const int a)
   { red = r; green = g; blue = b; alpha = a; }
+  /// Assign another csRGBpixel
   void Set (const csRGBpixel& p)
   /* : red (p.red), green (p.green), blue (p.blue), alpha (p.alpha) {} */
   { *(uint32*)this = *(uint32*)&p; }
+  /// Add a csRGBcolor
   void operator += (const csRGBcolor& c)
   {
       red   += c.red;
       green += c.green;
       blue  += c.blue;
   }
+  /// Add a csRGBcolor, may cause overflows!
   void UnsafeAdd(const csRGBcolor&c)
   { *(uint32*)this += *(uint32*)&c; }
 } CS_STRUCT_ALIGN_4BYTE_END;
@@ -175,6 +189,8 @@ struct csRGBpixel
 #define G_COEF_SQ	587
 /// Blue component sensivity, squared
 #define B_COEF_SQ	114
+/** @} */
+
 /** @} */
 
 #endif // __CS_RGBPIXEL_H__
