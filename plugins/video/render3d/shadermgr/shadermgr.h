@@ -68,7 +68,7 @@ public:
   /// Add a variable to this context
   virtual bool AddVariable(iShaderVariable* variable) ;
   /// Get variable
-  virtual iShaderVariable* GetVariable(const char* string);
+  virtual iShaderVariable* GetVariable(int namehash);
   /// Get all variable stringnames added to this context (used when creatingthem)
   virtual csBasicVector GetAllVariableNames() ; 
 
@@ -199,7 +199,7 @@ public:
   /// Add a variable to this context
   virtual bool AddVariable(iShaderVariable* variable);
   /// Get variable
-  virtual iShaderVariable* GetVariable(const char* string);
+  virtual iShaderVariable* GetVariable(int namehash);
   /// Get all variable stringnames in this context (used when creatingthem)
   virtual csBasicVector GetAllVariableNames(); 
 
@@ -343,7 +343,7 @@ public:
   /// Add a variable to this context
   virtual bool AddVariable(iShaderVariable* variable){return false;}
   /// Get variable
-  virtual iShaderVariable* GetVariable(const char* string);
+  virtual iShaderVariable* GetVariable(int namehash);
   /// Get all variable stringnames in this context (used when creatingthem)
   virtual csBasicVector GetAllVariableNames() {return csBasicVector();}
 
@@ -361,7 +361,7 @@ class csShaderVariable : public iShaderVariable
 {
 private:
   csString name;
-
+  int namehash;
   VariableType type;
 
   int intval;
@@ -377,13 +377,16 @@ public:
   {
     type = INT;
     intval = 0;
+    namehash = -1;
   }
   virtual ~csShaderVariable() { }
 
   virtual VariableType GetType() { return type; }
   virtual void SetType(VariableType newtype) { type = newtype; }
 
-  virtual void SetName(const char* name) { csShaderVariable::name = csString(name); }
+  virtual int GetHash () {return namehash; }
+
+  virtual void SetName(const char* name) { csShaderVariable::name = csString(name); namehash = csHashCompute(name); }
   virtual const char* GetName() { return name; }
   virtual bool GetValue(int& value) { if(type==INT) {value = intval; return true;} return false; }
   virtual bool GetValue(float& value) { if(type==VECTOR1) {value = floatval; return true;} return false; }

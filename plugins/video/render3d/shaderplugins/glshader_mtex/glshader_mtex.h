@@ -214,7 +214,7 @@ public:
   virtual bool AddVariable(iShaderVariable* variable) 
     { /*do not allow externals to add variables*/ return false; };
   /// Get variable
-  virtual iShaderVariable* GetVariable(const char* string);
+  virtual iShaderVariable* GetVariable(int namehash);
   /// Get all variable stringnames added to this context (used when creatingthem)
   virtual csBasicVector GetAllVariableNames(); 
 

@@ -56,9 +56,9 @@ void csShaderGLCGFP::Activate(iShaderPass* current, csRenderMesh* mesh)
     variablemapentry* e = (variablemapentry*)variablemap.Get(i);
     if (!e->parameter)
       continue;
-    iShaderVariable* lvar = GetVariable(e->name);
+    iShaderVariable* lvar = GetVariable(e->namehash);
     if(!lvar)
-      lvar = current->GetVariable(e->name);
+      lvar = current->GetVariable(e->namehash);
 
     if(lvar)
     {
@@ -286,7 +286,8 @@ bool csShaderGLCGFP::Load(iDocumentNode* program)
           memset(map->cgvarname, 0, strlen(cgvarname)+1); 
           memcpy(map->cgvarname, cgvarname, strlen(cgvarname));
           map->parameter = NULL;
-
+        
+          map->namehash = csHashCompute (varname);
           //save it for later
           variablemap.Push( map );
         }
@@ -349,9 +350,9 @@ csBasicVector csShaderGLCGFP::GetAllVariableNames()
   return res;
 }
 
-iShaderVariable* csShaderGLCGFP::GetVariable(const char* string)
+iShaderVariable* csShaderGLCGFP::GetVariable(int namehash)
 {
-  csHashIterator c(&variables, csHashCompute(string));
+  csHashIterator c(&variables, namehash);
 
   if(c.HasNext())
   {

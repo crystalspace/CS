@@ -58,9 +58,9 @@ void csShaderGLAVP::Activate(iShaderPass* current, csRenderMesh* mesh)
   for(i = 0; i < variablemap.Length(); ++i)
   {
     variablemapentry* e = (variablemapentry*)variablemap.Get(i);
-    iShaderVariable* lvar = GetVariable(e->name);
+    iShaderVariable* lvar = GetVariable(e->namehash );
     if(!lvar)
-      lvar = current->GetVariable(e->name);
+      lvar = current->GetVariable(e->namehash);
 
     if(lvar)
     {
@@ -287,6 +287,9 @@ bool csShaderGLAVP::Load(iDocumentNode* program)
           memcpy(map->name, varname, strlen(varname));
 
           map->registernum = child->GetAttributeValueAsInt("register");
+          //compute the namehash
+          map->namehash = csHashCompute (varname);
+
           //save it for later
           variablemap.Push( map );
         }
@@ -330,9 +333,9 @@ csBasicVector csShaderGLAVP::GetAllVariableNames()
   return res;
 }
 
-iShaderVariable* csShaderGLAVP::GetVariable(const char* string)
+iShaderVariable* csShaderGLAVP::GetVariable(int namehash)
 {
-  csHashIterator c(&variables, csHashCompute(string));
+  csHashIterator c(&variables, namehash);
 
   if(c.HasNext())
   {

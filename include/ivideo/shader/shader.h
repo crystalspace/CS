@@ -56,7 +56,7 @@ struct iShaderManager : iBase
   /// Add a variable to this context
   virtual bool AddVariable(iShaderVariable* variable) = 0;
   /// Get variable
-  virtual iShaderVariable* GetVariable(const char* string) = 0;
+  virtual iShaderVariable* GetVariable(int namehash) = 0;
   /// Get all variable stringnames added to this context (used when creatingthem)
   virtual csBasicVector GetAllVariableNames() = 0; 
 
@@ -97,7 +97,7 @@ struct iShader : iBase
   /// Add a variable to this context
   virtual bool AddVariable(iShaderVariable* variable) = 0;
   /// Get variable
-  virtual iShaderVariable* GetVariable(const char* string) = 0;
+  virtual iShaderVariable* GetVariable(int namehash) = 0;
   /// Get all variable stringnames in this context (used when creatingthem)
   virtual csBasicVector GetAllVariableNames() = 0; 
 
@@ -128,6 +128,8 @@ struct iShaderVariable : iBase
 
   virtual VariableType GetType() = 0;
   virtual void SetType(VariableType) = 0;
+
+  virtual int GetHash() = 0;
 
   virtual void SetName(const char*) = 0;
   virtual const char* GetName() = 0;
@@ -210,7 +212,7 @@ struct iShaderPass : iBase
   /// Add a variable to this context
   virtual bool AddVariable(iShaderVariable* variable) = 0;
   /// Get variable
-  virtual iShaderVariable* GetVariable(const char* string) = 0;
+  virtual iShaderVariable* GetVariable(int namehash) = 0;
   /// Get all variable stringnames added to this context (used when creatingthem)
   virtual csBasicVector GetAllVariableNames() = 0; 
 
@@ -259,7 +261,7 @@ struct iShaderProgram : iBase
   /// Add a variable to this context
   virtual bool AddVariable(iShaderVariable* variable) = 0;
   /// Get variable
-  virtual iShaderVariable* GetVariable(const char* string) = 0;
+  virtual iShaderVariable* GetVariable(int namehash) = 0;
   /// Get all variable stringnames added to this context (used when creatingthem)
   virtual csBasicVector GetAllVariableNames() = 0; 
 

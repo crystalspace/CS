@@ -184,9 +184,9 @@ csPtr<iShaderVariable> csShaderManager::CreateVariable(const char* name)
   return (iShaderVariable*)myVar;
 }
 
-iShaderVariable* csShaderManager::GetVariable(const char* name)
+iShaderVariable* csShaderManager::GetVariable(int namehash)
 {
-  csHashIterator cIter(variables, csHashCompute(name));
+  csHashIterator cIter(variables, namehash);
 
   if( cIter.HasNext() )
   {
@@ -342,10 +342,10 @@ bool csShader::AddVariable(iShaderVariable* variable)
   return true;
 }
 
-iShaderVariable* csShader::GetVariable(const char* name)
+iShaderVariable* csShader::GetVariable(int namehash)
 {
   iShaderVariable* var;
-  csHashIterator cIter(variables, csHashCompute(name));
+  csHashIterator cIter(variables, namehash);
 
   if( cIter.HasNext() )
   {
@@ -356,7 +356,7 @@ iShaderVariable* csShader::GetVariable(const char* name)
 
   if(parent)
   {
-    return parent->GetVariable(name);
+    return parent->GetVariable(namehash);
   }
 
   return NULL;
@@ -563,10 +563,10 @@ bool csShader::Prepare()
 }
 
 //==================== csShaderPass ==============//
-iShaderVariable* csShaderPass::GetVariable(const char* string)
+iShaderVariable* csShaderPass::GetVariable(int namehash)
 {
   iShaderVariable* var;
-  csHashIterator c(&variables, csHashCompute(string));
+  csHashIterator c(&variables, namehash);
 
   if(c.HasNext())
   {
@@ -577,7 +577,7 @@ iShaderVariable* csShaderPass::GetVariable(const char* string)
 
   if (parent && parent->GetParent())
   {
-    return parent->GetParent()->GetVariable(string);
+    return parent->GetParent()->GetVariable(namehash);
   }
 
   return NULL;

@@ -371,8 +371,28 @@ void csShaderGLMTEX::Activate(iShaderPass* current, csRenderMesh* mesh)
   {
     mtexlayer* layer = (mtexlayer*) texlayers.Get(i);
     ext->glActiveTextureARB(GL_TEXTURE0_ARB + i);
-    ext->glClientActiveTextureARB( GL_TEXTURE0_ARB + i);
 
+/*
+    if(layer->ccsource == CS_COLORSOURCE_MESH)
+    {
+      csRef<iRenderBuffer> cbuf = ss->GetBuffer(strset->Request("COLOR"));
+      if(cbuf)
+      {
+        glColorPointer(4,GL_FLOAT,0,cbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER) );
+        glEnableClientState( GL_COLOR_ARRAY);
+        layer->doCArr = true;
+      }
+    } else if (layer->ccsource == CS_COLORSOURCE_STREAM && layer->colorstream )
+    {
+      csRef<iRenderBuffer> cbuf = ss->GetBuffer(strset->Request(layer->colorstream));
+      if(cbuf)
+      {
+        glColorPointer(4,GL_FLOAT,0,cbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER) );
+        glEnableClientState( GL_COLOR_ARRAY);
+        layer->doCArr = true;
+      }
+    }
+*/
     GLuint texturehandle = 0;
     iTextureHandle* txt_handle = layer->texturehandle;
 
@@ -488,9 +508,9 @@ csBasicVector csShaderGLMTEX::GetAllVariableNames()
   return res;
 }
 
-iShaderVariable* csShaderGLMTEX::GetVariable(const char* string)
+iShaderVariable* csShaderGLMTEX::GetVariable(int namehash)
 {
-  csHashIterator c(&variables, csHashCompute(string));
+  csHashIterator c(&variables, namehash);
 
   if(c.HasNext())
   {
