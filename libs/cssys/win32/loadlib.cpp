@@ -21,6 +21,13 @@
 
 csLibraryHandle csLoadLibrary (const char* installpath, const char* szLibName)
 {
+  //First we look for the lib in the installdir
+  char FullPath[MAX_PATH];
+  sprintf(FullPath, installpath, szLibName);
+  csLibraryHandle lib = LoadLibrary (FullPath);
+  if (lib) return lib;
+
+  //if we didn't find it there, we let windows look in the default win locations.
   return LoadLibrary (szLibName);
 }
 
