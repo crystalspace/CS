@@ -8,10 +8,11 @@ rule ScanHeaders
   
   for i in $(files)
   {
-    if $(i:S) = ".h"
+    if $(i:S) = ".h" || $(i:S) = ".i"
     {
       SEARCH on $(i:G=header) = $(top) ;
-      Depends install_include : [ DoInstall $(i:G=header) : $(includedir) $(>) ] ;
+      Depends install_include :
+        [ DoInstall $(i:G=header) : $(includedir) $(>) ] ;
     }
     else
     {
@@ -31,4 +32,3 @@ if $(TOP) != "."
 {
   ScanHeaders $(BUILDTOP) ;
 }
-

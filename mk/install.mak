@@ -12,12 +12,13 @@
 #    a platform specific location (e.g.  System folder).
 #
 # Always copied:
-# TO_INSTALL.INCLUDE: does not exist, the entire include/ hierarchy is copied
-#    to include/.  (max 6 levels deep)
-# TO_INSTALL.DOCS: also does not exist, the docs/html dir is copied (all html)
-#    to docs/html, as well as all subdirs (8 deep) with gif, jpg, png, css;
-#    also docs/README.html is copied.
-# TO_INSTALL.SCRIPTS: does not exist. scripts/python is copied.
+# INSTALL_INCLUDE.FILES: does not exist, the entire include/ hierarchy is
+#    copied to include/.  (max 6 levels deep)
+# INSTALL_DOCS.FILES: also does not exist, the docs/html dir is copied (all
+#    html) to docs/html, as well as all subdirs (8 deep) with gif, jpg, png,
+#    css; also docs/README.html is copied.
+# INSTALL_SCRIPTS.FILES: does not exist.  scripts/python and scripts/perl5 are
+#    copied.
 #==============================================================================
 
 #------------------------------------------------------------- all defines ---#
@@ -74,11 +75,12 @@ INSTALL_DEPTH=* */* */*/* */*/*/* */*/*/*/* */*/*/*/*/* */*/*/*/*/*/* \
 
 # For the 'include/' hierarchy, only the header files detected here
 # will be copied
-INSTALL_INCLUDE.FILES = \
-  $(wildcard $(addprefix $(SRCDIR)/include/,$(addsuffix .h,$(INSTALL_DEPTH))))
+INSTALL_INCLUDE.FILES = $(wildcard $(addprefix $(SRCDIR)/include/,\
+  $(foreach s,.h .i,$(addsuffix $s,$(INSTALL_DEPTH)))))
 
-# Given all .h files in 'include/', take their directory parts, sort those,
-# and remove trailing '/', then add the INSTALL_DIR prefix
+# Given all installable files in 'include/', take their directory parts, sort
+# those, and remove trailing '/', then add the INSTALL_DIR prefix.  This gives
+# us a list of directories into which headers must be installed.
 INSTALL_INCLUDE.DIR = $(addprefix $(INSTALL_DIR)/,$(patsubst %/,%,$(sort \
   $(dir $(subst $(SRCDIR)/,,$(INSTALL_INCLUDE.FILES))))))
 INSTALL_INCLUDE.DESTFILES = $(addprefix $(INSTALL_DIR)/, \
@@ -102,7 +104,8 @@ INSTALL_DOCS.DESTFILES = $(addprefix $(INSTALL_DIR)/, \
   $(sort $(subst $(SRCDIR)/,,$(INSTALL_DOCS.FILES))))
 
 # Files to install for scripts.
-INSTALL_SCRIPTS.FILES = $(wildcard $(SRCDIR)/scripts/python/*.py)
+INSTALL_SCRIPTS.FILES = \
+  $(wildcard $(addprefix $(SRCDIR)/scripts/,python/*.py perl5/*.pm))
 INSTALL_SCRIPTS.DIR = $(addprefix $(INSTALL_DIR)/,$(patsubst %/,%,$(sort \
   $(dir $(subst $(SRCDIR)/,,$(INSTALL_SCRIPTS.FILES))))))
 INSTALL_SCRIPTS.DESTFILES = $(addprefix $(INSTALL_DIR)/,$(sort \
