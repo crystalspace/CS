@@ -410,8 +410,6 @@ struct iEngine : public iBase
   virtual void DeleteAll () = 0;
   virtual iTextureWrapper* CreateTexture (const char *iName,
   	const char *iFileName, csColor *iTransp, int iFlags) = 0;
-  virtual bool CreatePlane (const char *iName, const csVector3 &iOrigin,
-    const csMatrix3 &iMatrix) = 0;
   virtual iSector *CreateSector (const char *iName, bool link = true) = 0;
   virtual iMeshWrapper* CreateSectorWallsMesh (iSector* sector,
       const char* name) = 0;
