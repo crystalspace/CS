@@ -309,7 +309,7 @@ public:
 
 		The subclasses will wrap this function.
 	*/
-	const char * Value () const { return value.c_str (); }
+	virtual const char * Value () const = 0;
 
 	/** Changes the value of the node. Defined as:
 		@verbatim
@@ -320,7 +320,7 @@ public:
 		Text:		the text string
 		@endverbatim
 	*/
-	void SetValue (const char * _value) { value = _value;}
+	virtual void SetValue (const char * _value) = 0;
 
 	/// Delete all the children of this node. Does not affect 'this'.
 	void Clear();
@@ -436,16 +436,16 @@ protected:
 
 	// Figure out what is at *p, and parse it. Returns null if it is not an xml node.
 	TiDocumentNode* Identify( const char* start );
-	void CopyToClone( TiDocumentNode* target ) const	{ target->SetValue (value.c_str() );
-												  }
+	void CopyToClone( TiDocumentNode* target ) const
+	{
+	  target->SetValue (Value () );
+	}
 
 	TiDocumentNode*		parent;
 	NodeType		type;
 
 	TiDocumentNode*		firstChild;
 	TiDocumentNode*		lastChild;
-
-	TIXML_STRING	value;
 
 	TiDocumentNode*		prev;
 	TiDocumentNode*		next;
@@ -551,7 +551,7 @@ class TiXmlElement : public TiDocumentNode
 {
 public:
 	/// Construct an element.
-	TiXmlElement (const char * in_value);
+	TiXmlElement ();
 
 	virtual ~TiXmlElement();
 
@@ -603,6 +603,13 @@ public:
 
 	virtual void Print( FILE* cfile, int depth ) const;
 
+	virtual const char * Value () const { return value; }
+	void SetValueRegistered (const char * _value)
+	{
+	  value = _value;
+	}
+	virtual void SetValue (const char * _value);
+
 protected:
 
 	// Used to be public [internal use]
@@ -622,6 +629,7 @@ protected:
 
 private:
 	TiDocumentAttributeSet attributeSet;
+	const char* value;
 };
 
 
@@ -638,6 +646,9 @@ public:
 	virtual TiDocumentNode* Clone() const;
 	// [internal use]
 	virtual void Print( FILE* cfile, int depth ) const;
+	virtual const char * Value () const { return value.c_str (); }
+	virtual void SetValue (const char * _value) { value = _value;}
+
 protected:
 	// used to be public
 	virtual void StreamOut( TIXML_OSTREAM * out ) const;
@@ -646,6 +657,7 @@ protected:
 						 returns: next char past '>'
 	*/
 	virtual const char* Parse( const char* p );
+	TIXML_STRING	value;
 };
 
 
@@ -661,6 +673,8 @@ public:
 		SetValue( initValue );
 	}
 	virtual ~TiXmlText() {}
+	virtual const char * Value () const { return value.c_str (); }
+	virtual void SetValue (const char * _value) { value = _value;}
 
 protected :
 	// [internal use] Creates a new Element and returns it.
@@ -675,6 +689,7 @@ protected :
 							 returns: next char past '>'
 		*/
 	virtual const char* Parse( const char* p );
+	TIXML_STRING	value;
 };
 
 
@@ -692,9 +707,12 @@ public:
 		SetValue( initValue );
 	}
 	virtual ~TiXmlCData() {}
+	virtual const char * Value () const { return value.c_str (); }
+	virtual void SetValue (const char * _value) { value = _value;}
 
 protected :
 	virtual const char* Parse( const char* p );
+	TIXML_STRING	value;
 };
 
 /** In correct XML the declaration is the first entry in the file.
@@ -734,6 +752,8 @@ public:
 	virtual TiDocumentNode* Clone() const;
 	// [internal use]
 	virtual void Print( FILE* cfile, int depth ) const;
+	virtual const char * Value () const { return value.c_str (); }
+	virtual void SetValue (const char * _value) { value = _value;}
 
 protected:
 	// used to be public
@@ -748,6 +768,7 @@ private:
 	TIXML_STRING version;
 	TIXML_STRING encoding;
 	TIXML_STRING standalone;
+	TIXML_STRING	value;
 };
 
 
@@ -766,6 +787,8 @@ public:
 	virtual TiDocumentNode* Clone() const;
 	// [internal use]
 	virtual void Print( FILE* cfile, int depth ) const;
+	virtual const char * Value () const { return value.c_str (); }
+	virtual void SetValue (const char * _value) { value = _value;}
 protected:
 	// used to be public
 	virtual void StreamOut ( TIXML_OSTREAM * out ) const;
@@ -774,6 +797,7 @@ protected:
 						 returns: next char past '>'
 	*/
 	virtual const char* Parse( const char* p );
+	TIXML_STRING	value;
 };
 
 
@@ -793,6 +817,9 @@ public:
 	TiDocument( const char * documentName );
 
 	virtual ~TiDocument() {}
+
+	virtual const char * Value () const { return value.c_str (); }
+	virtual void SetValue (const char * _value) { value = _value;}
 
 	/** Load a file using the current document value.
 		Returns true if successful. Will delete any existing
@@ -849,6 +876,7 @@ private:
 	bool error;
 	int  errorId;
 	TIXML_STRING errorDesc;
+	TIXML_STRING	value;
 };
 
 #endif

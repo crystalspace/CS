@@ -405,7 +405,7 @@ TiDocumentNode* TiDocumentNode::Identify( const char* p )
 		#ifdef DEBUG_PARSER
 			TIXML_LOG( "XML parsing Element\n" );
 		#endif
-		returnNode = new TiXmlElement( "" );
+		returnNode = new TiXmlElement( );
 	}
 	else if ( StringEqual ( p, commentHeader) )
 	{
@@ -450,12 +450,16 @@ const char* TiXmlElement::Parse( const char* p )
 	p = SkipWhiteSpace( p+1 );
 
 	// Read the name.
-    p = ReadName( p, &value );
+	char inname[1000];
+	p = ReadName( p, inname );
 	if ( !p || !*p )
 	{
 		if ( document )	document->SetError( TIXML_ERROR_FAILED_TO_READ_ELEMENT_NAME );
 		return 0;
 	}
+	csStringID name_id = document->strings.Request (inname);
+	const char* reg_name = document->strings.Request (name_id);
+	SetValueRegistered (reg_name);
 
     TIXML_STRING endTag ("</");
 	endTag += value;

@@ -448,15 +448,22 @@ TiDocument* TiDocumentNode::GetDocument() const
 }
 
 
-TiXmlElement::TiXmlElement (const char * _value)
-: TiDocumentNode( TiDocumentNode::ELEMENT )
+TiXmlElement::TiXmlElement () : TiDocumentNode( TiDocumentNode::ELEMENT )
 {
 	firstChild = lastChild = 0;
-	value = _value;
+	value = NULL;
 }
 
 TiXmlElement::~TiXmlElement()
 {
+}
+
+void TiXmlElement::SetValue (const char * name)
+{
+  TiDocument* document = GetDocument ();
+  csStringID name_id = document->strings.Request (name);
+  const char* reg_name = document->strings.Request (name_id);
+  value = reg_name;
 }
 
 const char * TiXmlElement::Attribute( const char * name ) const
@@ -524,7 +531,7 @@ void TiXmlElement::Print( FILE* cfile, int depth ) const
 		fprintf( cfile, "    " );
 	}
 
-	fprintf( cfile, "<%s", value.c_str() );
+	fprintf( cfile, "<%s", value );
 
 	for (i = 0 ; i < attributeSet.set.Length () ; i++)
 	{
@@ -546,7 +553,7 @@ void TiXmlElement::Print( FILE* cfile, int depth ) const
 	{
 		fprintf( cfile, ">" );
 		firstChild->Print( cfile, depth + 1 );
-		fprintf( cfile, "</%s>", value.c_str() );
+		fprintf( cfile, "</%s>", value );
 	}
 	else
 	{
@@ -563,7 +570,7 @@ void TiXmlElement::Print( FILE* cfile, int depth ) const
 		fprintf( cfile, "\n" );
 		for( i=0; i<depth; ++i )
 		fprintf( cfile, "    " );
-		fprintf( cfile, "</%s>", value.c_str() );
+		fprintf( cfile, "</%s>", value );
 	}
 }
 
@@ -600,10 +607,11 @@ void TiXmlElement::StreamOut( TIXML_OSTREAM * stream ) const
 
 TiDocumentNode* TiXmlElement::Clone() const
 {
-	TiXmlElement* clone = new TiXmlElement( Value() );
+	TiXmlElement* clone = new TiXmlElement( );
 	if ( !clone )
 		return 0;
 
+	clone->SetValueRegistered (Value ());
 	CopyToClone( clone );
 
 	// Clone the attributes, then clone the children.
