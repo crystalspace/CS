@@ -76,8 +76,6 @@ csGraphics2DDDraw3::csGraphics2DDDraw3(iBase *iParent) :
 csGraphics2DDDraw3::~csGraphics2DDDraw3 ()
 {
   Close ();
-  if (m_piWin32Assistant)
-    m_piWin32Assistant->DecRef ();
 }
 
 void csGraphics2DDDraw3::Report (int severity, const char* msg, ...)
