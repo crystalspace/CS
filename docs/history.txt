@@ -54,7 +54,8 @@ chronological order.
 	  Instead the new timer is used to register events that will clean
 	  up the polygon mesh data later provided none of the modules is
 	  locking it.
-	- The thing mesh object now implements this way of cleanup.
+	- The thing mesh object now implements this way of cleanup. Still need
+	  to do this for the other mesh objects.
 8-Sep-2003
 	- Jorrit added csgfx to the stdsteps renderloop plugin (for Jam).
 	- Jorrit did the following changes to bring new and old renderer
