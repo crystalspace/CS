@@ -68,6 +68,22 @@ ${CXX} -c -fno-rtti conftest.cpp 2>/dev/null && echo "CFLAGS.SYSTEM += -fno-rtti
 # Remove dummy remains
 rm -f conftest.cpp conftest.o
 
+# Create a dummy NASM program
+echo "%xdefine TEST" >conftest.asm
+
+# Check if NASM is installed and if it has the right version
+[ -z "${NASM}" ] && NASM=`which nasm`
+
+if [ -n "${NASM}" ]; then
+  echo "NASM = "`basename ${NASM}`
+  # Well, we really should check here for obj format...
+  # but we'll use ELF as it really doesn't matter
+  ${NASM} -f elf conftest.asm -o conftest.o 2>/dev/null && echo "USE_NASM = yes"
+fi
+
+# Remove dummy remains
+rm -f conftest.asm conftest.o
+
 # Look where is X11 directory
 ([ -d /usr/X11 ] && echo "X11_PATH = /usr/X11") || \
 ([ -d /usr/X11R6 ] && echo "X11_PATH = /usr/X11R6") || \

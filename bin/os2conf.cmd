@@ -71,6 +71,22 @@
   call SysFileDelete testcpp
   call SysFileDelete testobj
 
+  testasm = "conftest.asm";
+  call lineout testasm, "%xdefine TEST"
+  call stream testasm, "C", "CLOSE";
+
+  call saycon ANSI.LGREEN"Testing whenever you have (the right version of) NASM installed"
+
+  "nasm -f win32 "testasm" -o "testobj" >nul 2>&1"
+  if rc = 0 then
+  do
+    call saycon  ANSI.LCYAN||"      supported: "ANSI.WHITE"USE_NASM = yes"
+    say "USE_NASM = yes"
+  end;
+  /* Remove temporary files */
+  call SysFileDelete testasm
+  call SysFileDelete testobj
+
   /* Now find Resource Compiler */
   testrc = "conftest.rc";
   testres = "conftest.res";
