@@ -32,6 +32,11 @@ The history order is reversed so that new features are at the top.
 	    - Fixed a slew of Texinfo markup syntax error and warnings.
 	    - Eliminated all of the overfull and underfull `hbox' warnings
 	      reported by TeX.
+	- Eric Sunshine elaborated the message in docs.mak which instructs
+	  users to check the log file after a DVI build in order to make it
+	  seem less like an error message.
+	- Eric Sunshine updated the Apple/NeXT build instructions to reflect
+	  present day conditions.
 17-Sep-2002
 	- Clarified some iMovable Doxygen comments.
 	- Fixed a serious bug in the csRef assignment operator for

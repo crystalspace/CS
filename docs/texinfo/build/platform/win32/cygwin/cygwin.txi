@@ -213,5 +213,3 @@ This will first remove all object files, libraries, etc.  from the
 
 The @samp{-k} option used in the @samp{make -k all} command instructs the
 compiler to ignore errors and continue compiling regardless.
-
-@subsubheading Troubleshooting

@@ -6,7 +6,7 @@
 @end macro
 
 @node NeXT, OS2, Cygwin, Platform Instructions
-@subsection MacOS/X, MacOS/X Server 1.0, OpenStep, NextStep
+@subsection MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, NextStep
 @cindex @sc{n}e@sc{xt}
 @cindex MacOS/X
 @cindex MacOS/X Server
@@ -14,13 +14,15 @@
 @cindex NextStep
 
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.  Copyright
-@copyright{} 1999, 2000, 2001 by Eric Sunshine.  Last updated
-23 October 2001.}
+@copyright{} 1999, 2000, 2001, 2002 by Eric Sunshine.  Last updated
+18 September 2002.}
 
-Crystal Space was ported to MacOS/X Server, OpenStep, and NextStep by Eric
-Sunshine in February of 1999 and has been continuously maintained and updated
-ever since.  If you have questions or comments about this port, please contact
-Eric Sunshine at @email{sunshine@@sunshineco.com}.
+Crystal Space was ported to MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep,
+and NextStep by Eric Sunshine.  If you have questions or comments about this
+port, please contact Eric Sunshine at @email{sunshine@@sunshineco.com}.  Matt
+Reda added MacOS/X-specific OpenGL, CoreGraphics, and CoreAudio drivers to the
+MacOS/X port.  If you have questions or comments about these drivers, please
+contact Matt Reda at @email{mreda@@mac.com} or Eric Sunshine.
 
 This section contains configuration, compilation, installation, and usage
 instructions for the MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep 4.2 and
@@ -48,25 +50,20 @@ information is applicable to the MacOS/X, MacOS/X Server 1.0 (Rhapsody)
 OpenStep, and NextStep ports.
 
 In addition to obtaining the project source code (@pxref{Where to Get}), you
-will also need to download and compile several support libraries used for
+may also need to download and compile several support libraries used for
 compression and image manipulation (@pxref{External Libraries}).  These
-libraries, @samp{zlib}, @samp{libpng}, and @samp{libjpeg}, are present on most
-current Unix installations, but are absent from MacOS/X, MacOS/X Server 1.0
-(Rhapsody), OpenStep, and NextStep.
+libraries, @samp{libpng} and @samp{libjpeg}, are present on many
+Unix installations, but are absent from MacOS/X, MacOS/X Server 1.0 (Rhapsody),
+OpenStep, and NextStep.  Furthermore, @samp{zlib} is abenst from MacOS/X Server
+1.0 (Rhapsody), OpenStep, and NextStep.
 
 @anchor{NeXT Resources}
-One common site from which to download these packages is from the Crystal Space
-download directory at @uref{ftp://sunsite.dk/projects/crystal/}.  These
-packages are known to work with MacOS/X, MacOS/X Server 1.0 (Rhapsody),
-OpenStep, and NextStep and have already been organized to fit correctly into
-the Crystal Space project hierarchy.
-
-You can download these packages using the following @sc{URLs}:
+You can download the required external libraries from their canonical download
+sites (@pxref{External Libraries}) or, as a convenience, you can find them all
+in Crystal Space ``support'' download directory at the following @sc{url}:
 
 @noindent
-@uref{ftp://sunsite.dk/projects/crystal/support/general/libjpeg-6a.tgz}@*
-@uref{ftp://sunsite.dk/projects/crystal/support/general/libpng_1.0.tgz}@*
-@uref{ftp://sunsite.dk/projects/crystal/support/general/zlib_1.1.1.tgz}
+@uref{ftp://sunsite.dk/projects/crystal/support/general/}
 
 Finally, if you are building Crystal Space on NextStep, you will need to
 download and install the @sc{gnu} @samp{make} program since Crystal Space
@@ -88,8 +85,9 @@ Building Crystal Space requires @sc{gnu}'s @samp{make} utility.  NextStep does
 not ship with @sc{gnu} @samp{make}, so it must be downloaded and installed
 before this project can be built.  MacOS/X, MacOS/X Server 1.0 (Rhapsody), and
 OpenStep all ship with @sc{gnu} @samp{make} already installed.  On these
-platforms, it is named @samp{gnumake}.  MacOS/X, MacOS/X Server 1.0 (Rhapsody),
-and OpenStep users may ignore this section and safely skip to the next one.
+platforms, it is named @samp{gnumake} and/or @samp{make}.  MacOS/X, MacOS/X
+Server 1.0 (Rhapsody), and OpenStep users may ignore this section and safely
+skip to the next one.
 
 NextStep users can find pre-built binaries of @sc{gnu} @samp{make} at these
 locations:
@@ -103,8 +101,8 @@ downloaded from one of the standard @sc{gnu} mirror sites; a couple of which
 are listed here:
 
 @noindent
-@uref{http://wuarchive.wustl.edu/systems/gnu/make/make-3.79.1.tar.gz}@*
-@uref{ftp://ftp.uu.net/systems/gnu/make/make-3.79.1.tar.gz}
+@uref{ftp://ftp.uu.net/systems/gnu/make/make-3.79.1.tar.gz}@*
+@uref{http://wuarchive.wustl.edu/systems/gnu/make/make-3.79.1.tar.gz}
 
 The current version of @sc{gnu} @samp{make} (3.79.1 at the time of this
 writing), does not correctly perform filename wildcard expansion
@@ -169,25 +167,29 @@ the Apple/@NeXT{} port is also available, @ref{NeXT Details}.
 gnutar xfz @var{CS-package-name}.tgz
 @end example
 
-The @sc{jpeg}, @sc{png}, and @sc{zlib} libraries must be installed within the
-@file{CS/libs} directory of Crystal Space.  If you obtained the archives for
-these libraries at the same site from which you obtained the Crystal Space
-source code package then they will automatically unpack into the correct
-directory.  If you obtained the packages elsewhere, then you must manually
-ensure that they are placed within @file{CS/libs/libjpeg},
-@file{CS/libs/libpng}, and @file{CS/libs/zlib}, respectively.
+If you have permission to do so, it is best to install the @sc{jpeg}, @sc{png},
+and optionally @sc{zlib} libraries in standard locations by following the
+installation instructions for each package (for example "make install").  In
+some cases, these libraries may already be present on your computer if you
+installed them separately or if they were installed by default.  (For instance,
+@sc{zlib} is already installed on MacOS/X.)
+
+If you do not have permission to install these libraries, you can still build
+Crystal Space by unpacking each external libraries into the @file{CS/libs}
+directory.  For example:
 
 @example
-gnutar xfz libjpeg*.tgz
-gnutar xfz libpng*.tgz
-gnutar xfz zlib*.tgz
+cd CS/libs
+gnutar xfz jpegsrc*.tar.gz
+gnutar xfz libpng*.tar.gz
+gnutar xfz zlib*.tar.gz
 @end example
 
 The standard library archive, @file{standard.zip} and the standard texture
 archive, @file{stdtex.zip} are included with the Crystal Space package within
-the @file{CS/data} directory.  If these archives are missing from the
-distribution, then you need to obtain them via some mechanism.  These files
-contain resources which are used by several Crystal Space demonstration
+the @file{CS/data} directory.  If, for some reason, these archives are missing
+from the distribution, then you need to obtain them via some mechanism.  These
+files contain resources which are used by several Crystal Space demonstration
 programs.  Do not unpack these files; Crystal Space uses them as-is.
 
 You will also need to have at least one @dfn{map} file in order to use the
@@ -266,31 +268,36 @@ which it is being built.
 @subsubsection Library Prerequisites
 
 Before building Crystal Space, it is necessary to build the supporting
-libraries, @samp{zlib}, @samp{libpng}, and @samp{libjpeg}.  Crystal Space
-makes uses of these libraries, even though they are not an intrinsic part of
-the project itself.
+libraries, @samp{libpng}, @samp{libjpeg}, and @samp{zlib} if needed.  Crystal
+Space makes uses of these libraries, even though they are not an intrinsic part
+of the project itself.
 
 These instructions assume that you wish to build multi-architecture libraries.
 Adjust the @code{CC="@dots{}"} directive to reflect the architectures you wish
 to include in the generated libraries.  If you do not wish to generate
 multi-architecture libraries, then omit the @code{CC="@dots{}"} directive
 altogether.  The list of supported architectures varies between MacOS/X,
-MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep.
-@xref{NeXT Architectures}.
+MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep.  @xref{NeXT
+Architectures}.  Assuming that you unpacked the libraries into the
+@file{CS/libs} directory, rather than installing the packages, you might build
+them as follows.
 
 @example
-cd CS/libs/zlib
-sh ./configure
-make libz.a CC="cc -arch i386 -arch m68k -arch sparc -arch hppa"
-
-cd ../libpng
-make -f makefile.std libpng.a \
+cd CS/libs/libpng*
+make -f scripts/makefile.std libpng.a \
   CC="cc -arch i386 -arch m68k -arch sparc -arch hppa"
 
-cd ../libjpeg
+cd ../*jpeg*
 sh ./configure
 make libjpeg.a CC="cc -arch i386 -arch m68k -arch sparc -arch hppa"
+
+cd ../zlib*
+sh ./configure
+make libz.a CC="cc -arch i386 -arch m68k -arch sparc -arch hppa"
 @end example
+
+You can substitute @samp{makefile.macosx} in place of @samp{makefile.std} in
+the build command if you are using MacOS/X when building @samp{libpng},
 
 @node NeXT Building, NeXT Running Programs, NeXT Libraries, NeXT
 @subsubsection Building
@@ -359,16 +366,17 @@ Or, for example, you could build only the WalkTest application and the plug-in
 modules which it most commonly requires.
 
 @example
-gnumake walkall  # @r{Builds WalkTest and required plug-ins}
+gnumake walkall  # @r{Builds WalkTest and most required plug-ins}
+gnumake drivers  # @r{Builds necessary video, audio, network drivers}
 @end example
 
 For finer control over which applications are built, you can invoke their
 targets directly.  For instance:
 
 @example
-gnumake walk    # @r{Builds @code{walktest}, the map exploration program}
-gnumake blks    # @r{Builds @code{blocks}, the 3D-Tetris style game}
-gnumake next2d  # @r{Builds @code{next2d}, the Cocoa-based 2D driver}
+gnumake walktest  # @r{Builds @code{walktest}, the map exploration program}
+gnumake blocks    # @r{Builds @code{blocks}, the 3D-Tetris style game}
+gnumake next2d    # @r{Builds @code{next2d}, the Cocoa-based 2D driver}
 @end example
 
 All programs require at least some plug-in modules to be present, so be sure to
@@ -389,10 +397,10 @@ WalkTest.  The most commonly used example map file is @file{flarge}.
 
 @strong{Note}: It is not currently possible to launch the Crystal Space
 demonstration applications by double-clicking on them via the Finder on
-MacOS/X, the Viewer in MacOS/X Server 1.0, or from the the Workspace Manager's
-File Viewer on OpenStep and NextStep.  This problem is a result of a limitation
-of the Finder, Viewer, and Workspace Manager applications.  When the Crystal
-Space demonstration applications are launched, they expect to find the
+MacOS/X, the Viewer in MacOS/X Server 1.0 (Rhapsody), or from the the Workspace
+Manager's File Viewer on OpenStep and NextStep.  This problem is a result of a
+limitation of the Finder, Viewer, and Workspace Manager applications.  When the
+Crystal Space demonstration applications are launched, they expect to find the
 configuration files @file{scf.cfg} and @file{vfs.cfg} in the @dfn{current
 directory}---which is generally the same directory in which the Crystal Space
 applications reside.  Unfortunately, neither Finder, Viewer, nor Workspace
@@ -444,14 +452,14 @@ To run WalkTest with a particular map (for instance, @file{flarge}) for the
 very first time, type:
 
 @example
-walktest --relight flarge
+./walktest --relight flarge
 @end example
 
 Subsequent uses of the map file do not require @samp{-relight}, in which case
 you can type:
 
 @example
-walktest flarge
+./walktest flarge
 @end example
 
 Once invoked, you will be able to explore the map file (@file{flarge}) by using
@@ -462,8 +470,26 @@ Other interesting applications, such as Blocks or csDemo, can be run by typing
 the application's name at the command line:
 
 @example
-blocks
-csdemo
+./blocks
+./csdemo
+@end example
+
+If you are using MacOS/X, you may want to take advantage of the improved
+animation rate and rendering quality of OpenGL.  There are two ways to enable
+the OpenGL renderer.  First, you may instruct a program to use OpenGL from the
+command-line:
+
+@example
+./walktest -video=opengl flarge
+@end example
+
+Second, you can enable OpenGL on a permenant basis for all applications by
+adding the following line to your @file{CS/data/config/user.cfg} file.  Once
+you have added this line to @file{user.cfg}, you no longer need to specify
+@samp{-video=opengl} on the command-line.
+
+@example
+Global.System.Plugins.iGraphics3D = crystalspace.graphics3d.opengl
 @end example
 
 Finally, it is possible to use the Apple/@NeXT{} defaults system to inform

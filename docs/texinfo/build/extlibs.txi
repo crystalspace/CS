@@ -65,13 +65,11 @@ Crystal Space relies upon the @code{zlib} library for reading @sc{zip} files.
 You can download @code{zlib} from:
 
 @noindent
-@uref{ftp://ftp.uu.net/graphics/png/src}@code{/zlib-?????.tar.gz}@*
-(as of this writing the current latest version is @file{zlib-1.1.4.tar.gz})
+@uref{http://www.gzip.org/zlib/}
 
-After downloading you must put the contents of that package in
-@file{CS/libs/zlib}. It is possible to put the library somewhere else as well
-(for example in the standard @file{/usr} directories) but you must ensure
-that the makefile will be able to find it (more on this later).
+After downloading you can either install the package normally (i.e. @samp{make
+install}) or unpack it into the directory @file{CS/libs/zlib}.  In general, if
+you have permission to do so, it is best to install the library.
 
 Read the compilation instructions included with @code{zlib} and compile it.
 
@@ -84,31 +82,28 @@ Crystal Space relies upon the @code{libpng} library for reading PNG graphic
 files.  You can download @code{libpng} from:
 
 @noindent
-@uref{ftp://ftp.uu.net/graphics/png/src}@code{/libpng-?????.tar.gz}@*
-(as of this writing the current latest version is @file{libpng-1.0.12.tar.gz})
+@uref{http://www.libpng.org/pub/png/libpng.html}
 
-After downloading you must put the contents of that package in
-@file{CS/libs/libpng}. It is possible to put the library somewhere else as well
-(for example in the standard @file{/usr} directories) but you must ensure
-that the makefile will be able to find it (more on this later).
+After downloading you can either install the package normally (i.e. @samp{make
+-f scripts/makefile.std install}) or unpack it into the directory
+@file{CS/libs/libpng}.  In general, if you have permission to do so, it is best
+to install the library.
 
-Read the compilation instructions included with @code{libpng} and compile it.
+Read the compilation instructions included with @code{zlib} and compile it.
 
 @subheading libjpeg
 @cindex libjpeg
 @cindex Libraries, libjpeg
 @cindex JPEG library
 
-Crystal Space relies upon the @code{libjpeg} library for reading JPEG graphic
-files.  You can download @code{libjpeg} from:
+Crystal Space relies upon the @code{libjpeg} library for reading @sc{jpeg}
+graphic files.  You can download @code{libjpeg} from:
 
 @noindent
-@uref{ftp://ftp.uu.net/graphics/jpeg}@code{/jpegsrc.???.tar.gz}@*
-(as of this writing the current latest version is @file{jpegsrc.v6b.tar.gz})
+@uref{http://www.ijg.org/files/}
 
-After downloading you must put the contents of that package in
-@file{CS/libs/libjpeg}. It is possible to put the library somewhere else as well
-(for example in the standard @file{/usr} directories) but you must ensure
-that the makefile will be able to find it (more on this later).
+After downloading you can either install the package normally (i.e. @samp{make
+install}) or unpack it into the directory @file{CS/libs/libpng}.  In general,
+if you have permission to do so, it is best to install the library.
 
-Read the compilation instructions included with @code{libjpeg} and compile it.
+Read the compilation instructions included with @code{zlib} and compile it.
