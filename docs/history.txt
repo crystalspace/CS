@@ -29,6 +29,13 @@ chronological order.
 	  that it is no longer a cache.
 	- Jorrit implemented the 'no copy' mode for software vertex buffers.
 	  Genmesh now uses that mode.
+	- Eric Sunshine fixed problem in wxgl/Jamfile where it neglected to
+	  mention `GL' in the ExternalLibs invocation, in addition to
+	  `WX'. Typically, this wouldn't matter since the output of wx-config
+	  --cflags, --libs, and --gl-libs provides sufficient information to
+	  make `GL' redundant, but on MacOS/X, we need the CS_OPENGL_PATH
+	  #define which comes from GL.CFLAGS in order to allow the preprocessor
+	  to locate the OpenGL headers.
 29-Sep-2004
 	- Rhad changed csMutexes in the windows software driver to
 	  critical sections.  Per MMsystem documentation, critical sections
