@@ -69,9 +69,9 @@ static inline int rgb_dist (int tR, int tG, int tB, int sR, int sG, int sB)
          B_COEF_SQ * sB * sB * (32 - ((max - tB) >> 3));
 }
 
-//------------------------------------------------------------- csColorMap ---//
+//------------------------------------------------------------- csColorMapLine ---//
 
-int csColorMap::find_rgb (int r, int g, int b, int *d)
+int csColorMapLine::find_rgb (int r, int g, int b, int *d)
 {
   CLIP_RGB;
 
@@ -90,7 +90,7 @@ int csColorMap::find_rgb (int r, int g, int b, int *d)
   return min;
 }
 
-int csColorMap::alloc_rgb (int r, int g, int b, int dist)
+int csColorMapLine::alloc_rgb (int r, int g, int b, int dist)
 {
   CLIP_RGB;
 
@@ -112,7 +112,7 @@ int csColorMap::alloc_rgb (int r, int g, int b, int dist)
     return i;
 }
 
-int csColorMap::FreeEntries ()
+int csColorMapLine::FreeEntries ()
 {
   int colors = 0;
   for (int i = 0; i < 256; i++)

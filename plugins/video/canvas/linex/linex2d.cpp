@@ -282,7 +282,7 @@ struct palent
   int cnt;
 };
 
-int cmp_palent (const void* p1, const void* p2)
+int cmp_palent_line (const void* p1, const void* p2)
 {
   const palent* pe1 = (palent*)p1;
   const palent* pe2 = (palent*)p2;
@@ -294,7 +294,7 @@ int cmp_palent (const void* p1, const void* p2)
     return 0;
 }
 
-int find_rgb_palent (palent* pe, int r, int g, int b)
+int find_rgb_palent_line (palent* pe, int r, int g, int b)
 {
   int i, min, mindist;
   mindist = 1000*256*256;

@@ -3,6 +3,18 @@ The history order has been reversed so that new features are at the top.
 31-Mar-2000
 	- Greatly simplified the new infinite renderer. Also removed
 	  a unix dependency.
+	- Further fixed static linking for line and software renderer
+	  so that they can actually be together in the same static
+	  executable.
+	- Andrew Zabolotny did the following changes:
+	    - Fixed a long-standing bug somebody introduced in fpu80x86.h.
+	      FPU control word was loaded with garbage, and (for me) it
+	      switched to single-precision mode (which was very bad and it
+	      segfaulted).
+	    - Re-implemented QInt(), QRound()/QInt16/QInt24 (using same old
+	      technique but at least I understand how it works now).
+	    - Changed poly_fill to not crash due to stack overflow anymore.
+	- Norman Kramer fixed a small include problem in glide.
 30-Mar-2000
 	- Added static compilation support for line renderer and new
 	  infinite renderer.

@@ -120,7 +120,7 @@ IMPLEMENT_IBASE (csGraphics3DSoftware)
 IMPLEMENT_IBASE_END
 
 #if defined (OS_LINUX)
-char* get_software_2d_driver ()
+static char* get_software_2d_driver ()
 {
   if (getenv ("GGI_DISPLAY"))
     return SOFTWARE_2D_DRIVER_GGI;
@@ -131,7 +131,7 @@ char* get_software_2d_driver ()
 }
 #elif defined (OS_UNIX) && !defined (OS_BE)
 // by the way, other unices has SVGALib support too... through GGI ;-)
-char* get_software_2d_driver ()
+static char* get_software_2d_driver ()
 {
   if (getenv ("GGI_DISPLAY"))
     return SOFTWARE_2D_DRIVER_GGI;

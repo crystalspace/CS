@@ -54,7 +54,7 @@ struct csAlphaTables
  * A class containing a colormap. A object of this class is used
  * for the global colormap in 8-bit modes.
  */
-class csColorMap
+class csColorMapLine
 {
 public:
   /**
@@ -68,7 +68,7 @@ public:
   bool alloc [256];
 
   /// Constructor
-  csColorMap ()
+  csColorMapLine ()
   { memset (alloc, sizeof (alloc), 0); }
 
   /// Find a value in the colormap and return the color index.
@@ -194,7 +194,7 @@ private:
 
 public:
   /// The global colormap (used in 256-color modes)
-  csColorMap cmap;
+  csColorMapLine cmap;
 
   /// Lookup table (8-bit modes)
   csAlphaTables *alpha_tables;

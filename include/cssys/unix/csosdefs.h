@@ -22,7 +22,6 @@
 
 #include <math.h>
 
-extern char* get_software_2d_driver ();
 #define SOFTWARE_2D_DRIVER get_software_2d_driver ()
 
 // The 2D graphics drivers used by software renderer on this platform
