@@ -39,7 +39,8 @@ awsBarChart::awsBarChart () :
   caption(NULL),
   yText(NULL),
   xText(NULL),
-  max_items(0)
+  max_items(0),
+  bar_color(0)
 {
   SCF_CONSTRUCT_IBASE (NULL);
 }
@@ -59,6 +60,8 @@ bool awsBarChart::Setup (iAws *_wmgr, awsComponentNode *settings)
 
   iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
 
+  unsigned char r=0, g=0, b=0;
+
   pm->LookupIntKey ("OverlayTextureAlpha", alpha_level);
   pm->GetInt (settings, "Style", frame_style);
   pm->GetInt (settings, "InnerStyle", inner_frame_style);
@@ -67,6 +70,10 @@ bool awsBarChart::Setup (iAws *_wmgr, awsComponentNode *settings)
   pm->GetString (settings, "Caption", caption);
   pm->GetString (settings, "XLegend", xText);
   pm->GetString (settings, "YLegend", yText);
+
+  pm->LookupRGBKey("ChartBarColor", r, g, b);
+
+  bar_color = pm->FindColor(r,g,b);
 
   bkg = pm->GetTexture ("Texture");
 
@@ -259,6 +266,7 @@ void awsBarChart::OnDraw (csRect clip)
 
   // Now draw chart!
   int bw = inner_frame.Width() / items.Length();
+  int bh = inner_frame.Height() / items.Length();
   int i;
   float max=0.0001;
 
@@ -273,16 +281,32 @@ void awsBarChart::OnDraw (csRect clip)
   {
     BarItem *bi = (BarItem *)items[i];
 
-    int x  = inner_frame.xmin + insets.xmin + (i*bw) + 1;
-    int sy = inner_frame.ymin + insets.ymin;
-    int ey = inner_frame.ymax - insets.ymax;
+    if (chart_options & coVerticalChart)
+    {
+      int y  = inner_frame.ymin + insets.ymin + (i*bh) + 1;
+      int sx = inner_frame.xmin + insets.xmin;
+      int ex = inner_frame.xmax - insets.xmax;
 
-    float vp = bi->value / max;
+      float vp = bi->value / max;
 
-    if (vp<1.0)
-     sy = sy + (int)((float)(ey-sy) * vp);
+      if (vp<1.0)
+	ex = ex - (int)((float)(ex-sx) * vp);
 
-    g2d->DrawBox(x, sy, bw-1, ey-sy, WindowManager ()->GetPrefMgr ()->GetColor (AC_RED)); 
+      g2d->DrawBox(sx, y, ex-sx, bh-1, bar_color); 
+    }
+    else
+    {
+      int x  = inner_frame.xmin + insets.xmin + (i*bw) + 1;
+      int sy = inner_frame.ymin + insets.ymin;
+      int ey = inner_frame.ymax - insets.ymax;
+
+      float vp = bi->value / max;
+
+      if (vp<1.0)
+	sy = sy + (int)((float)(ey-sy) * vp);
+
+      g2d->DrawBox(x, sy, bw-1, ey-sy, bar_color); 
+    }
   }
 }
 
@@ -374,6 +398,13 @@ awsBarChartFactory::awsBarChartFactory (
   RegisterConstant ("bcsRaised", awsBarChart::fsRaised);
   RegisterConstant ("bcsFlat", awsBarChart::fsFlat);
   RegisterConstant ("bcsNone", awsBarChart::fsNone);
+
+  RegisterConstant ("bcoRolling", awsBarChart::coRolling);
+  RegisterConstant ("bcoRollLeft", awsBarChart::coRollLeft);
+  RegisterConstant ("bcoRollRight", awsBarChart::coRollRight);
+  RegisterConstant ("bcoVertGridLines", awsBarChart::coVertGridLines);
+  RegisterConstant ("bcoHorzGridLines", awsBarChart::coHorzGridLines);
+  RegisterConstant ("bcoVerticalChart", awsBarChart::coVerticalChart);
 
   RegisterConstant ("signalBarChartClicked", awsBarChart::signalClicked);
 }

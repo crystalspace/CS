@@ -60,6 +60,9 @@ class awsBarChart :
   /// Maximum number of items to include in chart
   int max_items;
 
+  /// Color for bars
+  int bar_color;
+
 public:
   awsBarChart ();
   virtual ~awsBarChart();

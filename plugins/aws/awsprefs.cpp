@@ -134,6 +134,11 @@ int awsPrefManager::GetColor (int index)
   return sys_colors[index];
 }
 
+int awsPrefManager::FindColor(unsigned char r, unsigned char g, unsigned char b)
+{
+  return awstxtmgr->GetTextureManager ()->FindRGB (r, g, b);
+}
+
 iTextureHandle *awsPrefManager::GetTexture (char *name, char *filename)
 {
   if (awstxtmgr)

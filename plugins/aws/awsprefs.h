@@ -510,6 +510,9 @@ public:
   /// Gets the value of a color from the global AWS palette.
   virtual int GetColor (int index);
 
+  /// Finds the closest matching color
+  virtual int FindColor(unsigned char r, unsigned char g, unsigned char b);
+
   /// Gets the current default font
   virtual iFont *GetDefaultFont ();
 
