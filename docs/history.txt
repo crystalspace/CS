@@ -7,6 +7,25 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 13-Nov-2003
+	- Keith Fulton committed updated versions of the scripts for 3ds Max
+ 	  exporting.  I've had these for two months and forgot to commit them
+ 	  (I thought it was done already.)  See Luca Pancallo (Talad on irc),
+ 	  director of PlaneShift project with any questions about these -- he
+ 	  wrote them.
+	- res improved support for transparency in NR. An 'alphamode' has been
+	  added, for selection of what kind of transparency to use: none,
+	  binary(ie alpha test), smooth blending. It's another member in
+	  csRenderMesh. On the shader side, it can be set per pass. There's
+	  also an 'auto' mode, where the shader pass selects the alpha mode
+	  based on a specified texture (i.e. 'binary' mode for keycolored
+	  textures.)
+	- res fixed a problem in csRenderMeshList::CompareMeshListInfo(),
+ 	  where the arguments weren't casted correctly.
+	- res fixed a 'double to float conversion' MSVC warning in dynavis.
+	- res fixed a compile error in docconv.
+	- res fixed misinterpretion of the 'flags' TGA header field.
+	- res removed some leftover comments from
+	  plugins/video/render3d/opengl/gl_txtmgr.cpp.
 	- res fixed some visual glitches with 2D graphics on NR GL by adding 
 	  some code to choose the default texture unit and turning off alpha 
 	  test when entering 2D mode.
@@ -38,25 +57,6 @@ chronological order.
  	  Apparently some drivers (like ati radeon 7500 on win XP) corrupt the
  	  video memory if you don't.  Fix from Robin Stanton.
 	- Wouter added SetDefaultFont() to AwsPrefsManager.
-	- Keith Fulton committed updated versions of the scripts for 3ds Max
- 	  exporting.  I've had these for two months and forgot to commit them
- 	  (I thought it was done already.)  See Luca Pancallo (Talad on irc),
- 	  director of PlaneShift project with any questions about these -- he
- 	  wrote them.
-	- res improved support for transparency in NR. An 'alphamode' has been
-	  added, for selection of what kind of transparency to use: none,
-	  binary(ie alpha test), smooth blending. It's another member in
-	  csRenderMesh. On the shader side, it can be set per pass. There's
-	  also an 'auto' mode, where the shader pass selects the alpha mode
-	  based on a specified texture (i.e. 'binary' mode for keycolored
-	  textures.)
-	- res fixed a problem in csRenderMeshList::CompareMeshListInfo(),
- 	  where the arguments weren't casted correctly.
-	- res fixed a 'double to float conversion' MSVC warning in dynavis.
-	- res fixed a compile error in docconv.
-	- res fixed misinterpretion of the 'flags' TGA header field.
-	- res removed some leftover comments from
-	  plugins/video/render3d/opengl/gl_txtmgr.cpp.
 11-Nov-2003
 	- Eric Sunshine fixed MacOS/X application menu malfunction introduced
 	  on August 1, 2003 when configuration was changed so that OSXDelegate
