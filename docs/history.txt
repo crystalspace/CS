@@ -26,6 +26,7 @@ The history order is reversed so that new features are at the top.
 	  other Bourne or compatible shell the world over, fails with Bash
 	  1.14.  In particular, Base 1.14 failed to set cs_build_ok to "yes"
 	  and instead left the old value ("no") in place.
+	- De-obfuscated a loop in csHashMap::Delete().
 1-Mar-2003
 	- Greg Block changed the makefile for the xml documentsystem plugin to
 	  not override the values for the link flags to use when linking libxml
