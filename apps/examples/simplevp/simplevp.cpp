@@ -348,30 +348,6 @@ bool Simple::Initialize ()
     	"Error loading texture!");
     return false;
   }
-/*
-	iTextureWrapper* twl[1];
-	csTextureLayer tl[1];
-
-	tl[0].mode  = CS_FX_TRANSPARENT;
-	tl[0].txt_handle = NULL;
-	tl[0].uscale = 1;
-	tl[0].vscale = 1;
-	tl[0].ushift = 0;
-	tl[0].vshift = 0;
-	twl[0] = NULL;
-
-	twl[0] = loader->LoadTexture("grn", "/lib/std/green.gif",CS_TEXTURE_3D, txtmgr,true);
-
-
-	iMaterial* mymat = engine->CreateBaseMaterial(txt, 1,  twl, tl);
-	mymat->SetReflection(0.7f,0,0);
-	mymat->SetFlatColor(csRGBcolor(0,0,0));
-
-	iMaterialWrapper* mymwr = engine->GetMaterialList()->NewMaterial(mymat);
-	mymwr->QueryObject()->SetName("ms");
-	mymat->DecRef();
-*/
-//	iTextureWrapper* txt = engine->GetTextureList()->FindByName("ms");
 
 
 	//effectserver test
@@ -397,7 +373,6 @@ bool Simple::Initialize ()
 	pass1->SetStateVector4( efserver->RequestString("nvvertex program constant 1"), csEffectVector4(1.0f, 0.0f, 0.0f));
 
 	layer1=pass1->CreateLayer();
-//	layer2=pass1->CreateLayer();
   
 
 	layer1->SetStateFloat( efserver->RequestString("texture source"), 1);
@@ -406,20 +381,9 @@ bool Simple::Initialize ()
   layer1->SetStateString( efserver->RequestString("color source 1") , efserver->RequestString("vertex color"));
   layer1->SetStateString( efserver->RequestString("color operation") , efserver->RequestString("use source 1"));
 
-/*
-  layer2->SetStateFloat( efserver->RequestString("texture source") , 2 );
-  layer2->SetStateFloat( efserver->RequestString("texture coordinate source") , 1 );
-  layer2->SetStateString( efserver->RequestString("color source 1") , efserver->RequestString("texture color"));
-  layer2->SetStateString( efserver->RequestString("color source 2") , efserver->RequestString("previous layer color"));
-	layer2->SetStateString( efserver->RequestString("color source 3") , efserver->RequestString("vertex color"));
-  layer2->SetStateString( efserver->RequestString("color operation") , efserver->RequestString("interpolate"));
-*/
 
   Mat->SetEffect (effect);
   efserver->Validate(effect);
-
- // txt->Register (txtmgr);
- // txt->GetTextureHandle()->Prepare ();
 
 	
   MatWrapper->Register (txtmgr);
