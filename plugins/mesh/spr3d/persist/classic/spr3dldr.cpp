@@ -718,7 +718,6 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
         {
           int num, list[30];
           csScanStr (params, "%D", list, &num);
-printf ("num=%d\n", num); fflush (stdout);
           switch (num)
           {
             case 0  :  spr3dLook->MergeNormals ();                  break;
