@@ -64,6 +64,7 @@ chronological order.
 	  csArray<csShaderVariable> instances in the new renderer shader
 	  variable system to csPDelArray<csShaderVariable>.
 	- Jorrit fixed a compile error in Oktal's latest csPDelArray change.
+	- res added Jamfile and .csplugin files for glshader_fixed plugin.
 24-Aug-2003
 	- Luca added the CSTOOL library dependency to maya2spr makefile.
 	- Luca reverted his latest commit because the cstool library is not

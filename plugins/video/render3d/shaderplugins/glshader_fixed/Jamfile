@@ -1,0 +1,8 @@
+SubDir TOP plugins video render3d shaderplugins glshader_fixed ;
+
+Plugin glshader_fixed
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith glshader_fixed : csgeom csgfx cssys csutil ;
+
+Help glshader_fixed : "Crystal Space Render3d Shaderplugin for fixed function pipeline" ;
