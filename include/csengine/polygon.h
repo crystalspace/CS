@@ -34,7 +34,6 @@
 #include "imesh/thing/polygon.h"
 #include "csengine/polytext.h"
 
-class csSector;
 class csFrustumView;
 class csFrustumContext;
 class csMaterialWrapper;
@@ -710,7 +709,7 @@ public:
    * If 'null' is true and sector == 'NULL' then a NULL portal
    * is created.
    */
-  void SetCSPortal (csSector* sector, bool null = false);
+  void SetCSPortal (iSector* sector, bool null = false);
 
   /**
    * Set a pre-created portal on this polygon.
@@ -1135,9 +1134,9 @@ public:
    * if the polygon is not visible because of this.
    * If the polygon is deemed to be visible it will return true.
    */
-  bool DoPerspective (const csTransform& trans, csVector3* source,
-  	int num_verts, csPolygon2D* dest, csVector2* orig_triangle,
-	bool mirror);
+  bool DoPerspective (csVector3* source,
+  	int num_verts, csPolygon2D* dest, bool mirror,
+	int fov, float shift_x, float shift_y);
 
   /**
    * Classify this polygon with regards to a plane (in object space).  If this
@@ -1311,7 +1310,7 @@ public:
     }
     virtual iPortal* CreatePortal (iSector *iTarget)
     {
-      scfParent->SetCSPortal (iTarget->GetPrivateObject ());
+      scfParent->SetCSPortal (iTarget);
       return &(scfParent->GetPortal ()->scfiPortal);
     }
     virtual iPortal* GetPortal ()

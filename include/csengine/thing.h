@@ -1311,6 +1311,11 @@ public:
   virtual bool Initialize (iObjectRegistry *object_reg);
   void Clear ();
 
+  void Warn (const char *description, ...);
+  void Bug (const char *description, ...);
+  void Notify (const char *description, ...);
+  void Error (const char *description, ...);
+
   /// New Factory.
   virtual csPtr<iMeshObjectFactory> NewFactory ();
 

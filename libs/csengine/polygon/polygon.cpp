@@ -22,7 +22,6 @@
 #include "csengine/polytext.h"
 #include "csengine/polyplan.h"
 #include "csengine/polytmap.h"
-#include "csengine/engine.h"
 #include "csengine/lghtmap.h"
 #include "csengine/portal.h"
 #include "csengine/lppool.h"
@@ -33,6 +32,7 @@
 #include "iutil/vfs.h"
 #include "iutil/cache.h"
 #include "csgeom/matrix2.h"
+#include "csgeom/poly3d.h"
 #include "qint.h"
 #include "qsqrt.h"
 #include "ivideo/texture.h"
@@ -496,9 +496,9 @@ void csPolygon3D::Reset ()
 #endif
 }
 
-void csPolygon3D::SetCSPortal (csSector *sector, bool null)
+void csPolygon3D::SetCSPortal (iSector *sector, bool null)
 {
-  if (portal && portal->GetSector ()->GetPrivateObject () == sector)
+  if (portal && portal->GetSector () == sector)
     return ;
   if (portal && flags.Check (CS_POLY_DELETE_PORTAL))
   {
@@ -512,7 +512,7 @@ void csPolygon3D::SetCSPortal (csSector *sector, bool null)
   flags.Set (CS_POLY_DELETE_PORTAL);
   portal->flags.Reset (CS_PORTAL_WARP);
   if (sector)
-    portal->SetSector (&sector->scfiSector);
+    portal->SetSector (sector);
   else
     portal->SetSector (NULL);
   flags.Reset (CS_POLY_COLLDET);         // Disable CD by default for portals.
@@ -863,7 +863,7 @@ void csPolygon3D::Finish ()
   csPolyTexLightMap *lmi = GetLightMapInfo ();
   if (!lmi)
   {
-    csEngine::current_engine->ReportBug ("No txt_info in polygon!");
+    thing->thing_type->Bug ("No txt_info in polygon!");
     return ;
   }
 
@@ -876,28 +876,29 @@ void csPolygon3D::Finish ()
   {
     int lmw = csLightMap::CalcLightMapWidth (lmi->tex->w_orig);
     int lmh = csLightMap::CalcLightMapHeight (lmi->tex->h);
-    if ((lmw > csEngine::max_lightmap_w) || (lmh > csEngine::max_lightmap_h))
+    int max_lmw, max_lmh;
+    thing->thing_type->engine->GetMaxLightmapSize (max_lmw, max_lmh);
+    if ((lmw > max_lmw) || (lmh > max_lmh))
     {
-      csEngine::current_engine->Report ("Oversize lightmap (%dx%d > %dx%d) "
+      thing->thing_type->Notify ("Oversize lightmap (%dx%d > %dx%d) "
         "for polygon '%s'", lmw, lmh, 
-	csEngine::max_lightmap_w, csEngine::max_lightmap_h, GetName());
+	max_lmw, max_lmh, GetName());
     }
     else
     {
       csLightMap *lm = new csLightMap ();
       lmi->tex->SetLightMap (lm);
 
-      int r, g, b;
+      csColor ambient;
+      thing->thing_type->engine->GetAmbientLight (ambient);
+      lm->Alloc (lmi->tex->w_orig, lmi->tex->h,
+      	ambient.red * 255.0f,
+      	ambient.green * 255.0f,
+      	ambient.blue * 255.0f);
 
-      //@@@sector->GetAmbientColor (r, g, b);
-      r = csLight::ambient_red;
-      g = csLight::ambient_green;
-      b = csLight::ambient_blue;
-      lm->Alloc (lmi->tex->w_orig, lmi->tex->h, r, g, b);
-
-      if (!csEngine::current_engine->G3D->IsLightmapOK (lmi->GetPolyTex()))
+      if (!thing->thing_type->G3D->IsLightmapOK (lmi->GetPolyTex()))
       {
-	csEngine::current_engine->Report ("Renderer can't handle lightmap "
+	thing->thing_type->Notify ("Renderer can't handle lightmap "
 	  "for polygon '%s'", GetName());
 	flags.Set (CS_POLY_LM_REFUSED, CS_POLY_LM_REFUSED);
       }
@@ -1012,7 +1013,7 @@ void csPolygon3D::SetTextureSpace (
 
   if (ABS (det) < SMALL_EPSILON)
   {
-    csEngine::current_engine->Warn (
+    thing->thing_type->Warn (
       "Warning: badly specified UV coordinates for polygon '%s'!",
       GetName ());
     SetTextureSpace (p1, p2, 1);
@@ -1160,7 +1161,7 @@ int csPolygon3D::AddVertex (int v)
 {
   if (v >= thing->GetVertexCount ())
   {
-    csEngine::current_engine->ReportBug (
+    thing->thing_type->Bug (
         "Index number %d is too high for a polygon (max=%d) (polygon '%s')!",
         v,
         thing->GetVertexCount (),
@@ -1170,7 +1171,7 @@ int csPolygon3D::AddVertex (int v)
 
   if (v < 0)
   {
-    csEngine::current_engine->ReportBug ("Bad negative vertex index %d!", v);
+    thing->thing_type->Bug ("Bad negative vertex index %d!", v);
     return 0;
   }
 
@@ -1457,14 +1458,11 @@ bool csPolygon3D::ClipToPlane (
 #define EXPERIMENTAL_BUG_FIX  1
 
 bool csPolygon3D::DoPerspective (
-  const csTransform & /*trans*/,
   csVector3 *source,
   int num_verts,
   csPolygon2D *dest,
-  csVector2 *
-
-  /*orig_triangle*/,
-  bool mirror)
+  bool mirror,
+  int fov, float shift_x, float shift_y)
 {
   csVector3 *ind, *end = source + num_verts;
 
@@ -1623,13 +1621,11 @@ bool csPolygon3D::DoPerspective (
     // Next, for the reentry point.
     float rx, ry, rpointx, rpointy;
 
-    csEngine *eng = csEngine::current_engine;
-
     // Perspective correct the point.
-    float iz = eng->current_camera->GetFOV () / reentern->z;
+    float iz = fov / reentern->z;
     csVector2 rvert;
-    rvert.x = reentern->x * iz + eng->current_camera->GetShiftX ();
-    rvert.y = reentern->y * iz + eng->current_camera->GetShiftY ();
+    rvert.x = reentern->x * iz + shift_x;
+    rvert.y = reentern->y * iz + shift_y;
 
     if (reenter == exit && reenter->z > -SMALL_EPSILON)
     {
@@ -1936,7 +1932,7 @@ bool csPolygon3D::ReadFromCache (iFile* file)
           lmi->tex->h,
           this,
           true,
-          csEngine::current_engine))
+	  thing->thing_type->engine))
       lmi->tex->InitLightMaps ();
     lmi->lightmap_up_to_date = true;
     return true;
@@ -1985,10 +1981,10 @@ bool csPolygon3D::WriteToCache (iFile* file)
   {
     if (lmi->tex->lm == NULL) return true;
     lmi->lightmap_up_to_date = true;
-    if (csEngine::current_engine->GetLightingCacheMode ()
-          & CS_ENGINE_CACHE_WRITE)
+    if (thing->thing_type->engine->GetLightingCacheMode ()
+    	& CS_ENGINE_CACHE_WRITE)
       lmi->tex->lm->Cache (file, this, NULL,
-		csEngine::current_engine);
+	  thing->thing_type->engine);
     return true;
   }
 
@@ -1997,7 +1993,7 @@ bool csPolygon3D::WriteToCache (iFile* file)
   {
     goi->gouraud_up_to_date = true;
 
-    if (csEngine::current_engine->GetLightingCacheMode ()
+    if (thing->thing_type->engine->GetLightingCacheMode ()
           & CS_ENGINE_CACHE_WRITE)
     {
       file->Write ("lmpg", 4);
@@ -2029,8 +2025,8 @@ void csPolygon3D::PrepareLighting ()
   if (!lmi || !lmi->tex->lm) return ;
   lmi->tex->lm->ConvertToMixingMode ();
   lmi->tex->lm->ConvertFor3dDriver (
-      csEngine::current_engine->NeedPO2Maps,
-      csEngine::current_engine->MaxAspectRatio);
+      thing->thing_type->engine->GetLightmapsRequirePO2 (),
+      thing->thing_type->engine->GetMaxLightmapAspectRatio ());
 }
 
 void csPolygon3D::UpdateVertexLighting (

@@ -386,10 +386,8 @@ bool csLightMap::ReadFromCache (
     }
     else
     {
-      // @@@ TODO: Implement Warn back!!!
-      //Warn (
-          //"Warning! Light (%ld) not found!\n",
-          //ls.light_id);
+      parent->thing_type->Warn (
+          "Warning! Light (%ld) not found!\n", ls.light_id);
     }
   }
 

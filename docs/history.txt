@@ -16,6 +16,11 @@ The history order is reversed so that new features are at the top.
 	  the cosfact option from csEngine config to thing object type config.
 	- Added iEngine->AddToCurrentRegion(). This function was already
 	  present in csEngine.
+	- Added csThingObjectType::Warn(), Bug(), Notify(), and Error().
+	- Added iEngine->GetLightmapsRequirePO2() and
+	  iEngine->GetMaxLightmapAspectRatio().
+	- csPolygon3D class no longer requires access to csEngine and csLight
+	  classes.
 19-Dec-2002
 	- Added iDynLight->AddAffectedLightingInfo(). The plan is to make
 	  dynamic lights work on a base of meshes instead of curves and

@@ -173,7 +173,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 11, 0);
+SCF_VERSION (iEngine, 0, 12, 0);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -504,6 +504,10 @@ struct iEngine : public iBase
   virtual void GetMaxLightmapSize(int& w, int& h) = 0;
   /// Retrieve default maximum lightmap size
   virtual void GetDefaultMaxLightmapSize(int& w, int& h) = 0;
+  /// Get a boolean which indicates if power of two lightmaps are required.
+  virtual bool GetLightmapsRequirePO2 () const = 0;
+  /// Get the maximum aspect ratio for lightmaps.
+  virtual int GetMaxLightmapAspectRatio () const = 0;
   
   /**
    * Reset a subset of flags/settings (which may differ from one world/map to 

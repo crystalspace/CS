@@ -649,6 +649,9 @@ public:
   { w = default_max_lightmap_w; h = default_max_lightmap_h; }
   /// Return the default amount of ambient light
   virtual void GetDefaultAmbientLight (csColor &c) const;
+
+  virtual bool GetLightmapsRequirePO2 () const { return NeedPO2Maps; }
+  virtual int GetMaxLightmapAspectRatio () const { return MaxAspectRatio; }
   
   virtual csPtr<iFrustumView> CreateFrustumView ();
 

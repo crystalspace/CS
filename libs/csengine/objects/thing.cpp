@@ -58,32 +58,6 @@
 
 //---------------------------------------------------------------------------
 
-static void Warn (iObjectRegistry* object_reg, const char *description, ...)
-{
-  va_list arg;
-  va_start (arg, description);
-
-  csRef<iReporter> Reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-
-  if (Reporter)
-  {
-    Reporter->ReportV (
-        CS_REPORTER_SEVERITY_WARNING,
-        "crystalspace.engine.warning",
-        description,
-        arg);
-  }
-  else
-  {
-    csPrintfV (description, arg);
-    csPrintf ("\n");
-  }
-
-  va_end (arg);
-}
-
-//---------------------------------------------------------------------------
-
 SCF_IMPLEMENT_IBASE_EXT(csThing)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iThingState)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iLightingInfo)
@@ -576,45 +550,6 @@ void csThing::Prepare ()
     p->Finish ();
   }
   FireListeners ();
-
-
-  {
-static int total_size = 0;
-static int total_cnt = 0;
-    int size = sizeof (csThing);
-    int vtsize = sizeof (csVector3);
-    size += vtsize * max_vertices;	// obj_verts;
-    size += vtsize * num_cam_verts;	// cam_verts;
-    if (obj_verts != wor_verts)
-      size += vtsize * max_vertices;
-    if (obj_normals)
-      size += vtsize * num_vertices;
-    size += sizeof (csThingBBox);
-    size += 4 * polygons.Limit ();
-    size += GetName () ? strlen (GetName ())+3 : 0;
-    int polsize = sizeof (csPolygon3D) + sizeof (csPolyTexture)
-    	+ sizeof (csPolyTexLightMap) + sizeof (csPolyTxtPlane)
-	+ sizeof (csPolyPlane) + sizeof (csLightMap);
-    polsize *= polygons.Length ();
-    int i;
-    for (i = 0 ; i < polygons.Length () ; i++)
-    {
-      csPolygon3D *p = polygons.Get (i);
-      polsize += 4*4;	// Average indexes.
-      csPolyTexLightMap *lmi = p->GetLightMapInfo ();
-      if (lmi)
-      {
-        csLightMap* lm = lmi->GetPolyTex ()->GetCSLightMap ();
-	if (lm)
-	  polsize += lm->GetSize () * sizeof (csRGBpixel) * 2;
-      }
-    }
-
-    total_size += size+polsize;
-    total_cnt++;
-    //printf ("thing size=%d polysize=%d total=%d total_size=%d average_size=%d count=%d\n", size, polsize, size + polsize, total_size, total_size / total_cnt, total_cnt);
-  }
-
 }
 
 int csThing::AddCurveVertex (const csVector3 &v, const csVector2 &t)
@@ -1480,6 +1415,10 @@ void csThing::DrawPolygonArray (
     pclip_plane = NULL;
 
   csPlane3 *plclip = icam->GetFarPlane ();
+  bool mirrored = icam->IsMirrored ();
+  int fov = icam->GetFOV ();
+  float shift_x = icam->GetShiftX ();
+  float shift_y = icam->GetShiftY ();
 
   for (i = 0; i < num; i++)
   {
@@ -1498,12 +1437,8 @@ void csThing::DrawPolygonArray (
         clip = (csPolygon2D *) (render_pool->Alloc ());
         if (
           p->DoPerspective (
-              camtrans,
-              verts,
-              num_verts,
-              clip,
-              NULL,
-              icam->IsMirrored ()) &&
+              verts, num_verts,
+              clip, mirrored, fov, shift_x, shift_y) &&
           clip->ClipAgainst (d->GetClipper ()))
         {
           p->GetPlane ()->WorldToCamera (camtrans, verts[0]);
@@ -2429,8 +2364,7 @@ bool csThing::DrawCurves (
     mesh.use_vertex_color = gouraud;
     if (mesh.mat_handle == NULL)
     {
-      // @@@ Use other Warn!!!
-      Warn (thing_type->object_reg, "Warning! Curve without material!");
+      thing_type->Warn ("Warning! Curve without material!");
       continue;
     }
 
@@ -2598,10 +2532,14 @@ bool csThing::DrawFoggy (iRenderView *d, iMovable *)
 
   // @@@ Wouldn't it be nice if we checked all vertices against the Z plane?
   {
-    csVector2 orig_triangle[3];
     d->GetGraphics3D ()->OpenFogObject (GetID (), &GetFog ());
 
     icam->SetMirrored (!icam->IsMirrored ());
+    bool mirrored = icam->IsMirrored ();
+    int fov = icam->GetFOV ();
+    float shift_x = icam->GetShiftX ();
+    float shift_y = icam->GetShiftY ();
+
     for (i = 0; i < polygons.Length (); i++)
     {
       p = GetPolygon3D (i);
@@ -2626,12 +2564,8 @@ bool csThing::DrawFoggy (iRenderView *d, iMovable *)
             num_verts,
             false) &&
         p->DoPerspective (
-            camtrans,
-            verts,
-            num_verts,
-            clip,
-            orig_triangle,
-            icam->IsMirrored ()) &&
+            verts, num_verts,
+            clip, mirrored, fov, shift_x, shift_y) &&
         clip->ClipAgainst (d->GetClipper ()))
       {
         p->GetPlane ()->WorldToCamera (camtrans, verts[0]);
@@ -2649,6 +2583,7 @@ bool csThing::DrawFoggy (iRenderView *d, iMovable *)
     }
 
     icam->SetMirrored (!icam->IsMirrored ());
+    mirrored = icam->IsMirrored ();
     for (i = 0; i < polygons.Length (); i++)
     {
       p = GetPolygon3D (i);
@@ -2673,12 +2608,8 @@ bool csThing::DrawFoggy (iRenderView *d, iMovable *)
             num_verts,
             true) &&
         p->DoPerspective (
-            camtrans,
-            verts,
-            num_verts,
-            clip,
-            orig_triangle,
-            icam->IsMirrored ()) &&
+            verts, num_verts,
+            clip, mirrored, fov, shift_x, shift_y) &&
         clip->ClipAgainst (d->GetClipper ()))
       {
         p->GetPlane ()->WorldToCamera (camtrans, verts[0]);
@@ -3204,6 +3135,102 @@ void csThingObjectType::ClearPolyTxtPlanes ()
 void csThingObjectType::ClearCurveTemplates ()
 {
   curve_templates.DeleteAll ();
+}
+
+void csThingObjectType::Warn (const char *description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+
+  csRef<iReporter> Reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+
+  if (Reporter)
+  {
+    Reporter->ReportV (
+        CS_REPORTER_SEVERITY_WARNING,
+        "crystalspace.engine.warning",
+        description,
+        arg);
+  }
+  else
+  {
+    csPrintfV (description, arg);
+    csPrintf ("\n");
+  }
+
+  va_end (arg);
+}
+
+void csThingObjectType::Bug (const char *description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+
+  csRef<iReporter> Reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+
+  if (Reporter)
+  {
+    Reporter->ReportV (
+        CS_REPORTER_SEVERITY_BUG,
+        "crystalspace.engine.warning",
+        description,
+        arg);
+  }
+  else
+  {
+    csPrintfV (description, arg);
+    csPrintf ("\n");
+  }
+
+  va_end (arg);
+}
+
+void csThingObjectType::Error (const char *description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+
+  csRef<iReporter> Reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+
+  if (Reporter)
+  {
+    Reporter->ReportV (
+        CS_REPORTER_SEVERITY_ERROR,
+        "crystalspace.engine.warning",
+        description,
+        arg);
+  }
+  else
+  {
+    csPrintfV (description, arg);
+    csPrintf ("\n");
+  }
+
+  va_end (arg);
+}
+
+void csThingObjectType::Notify (const char *description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+
+  csRef<iReporter> Reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+
+  if (Reporter)
+  {
+    Reporter->ReportV (
+        CS_REPORTER_SEVERITY_NOTIFY,
+        "crystalspace.engine.warning",
+        description,
+        arg);
+  }
+  else
+  {
+    csPrintfV (description, arg);
+    csPrintf ("\n");
+  }
+
+  va_end (arg);
 }
 
 //---------------------------------------------------------------------------
