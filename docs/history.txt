@@ -66,6 +66,9 @@ chronological order.
 	- res fixed the GL font cache to properly display glyphs from mixed 
 	  font.
 	- res updated csutil/hashmap.h. Oops.
+	- res made the following changes:
+	    - Fixed font caches to deal with font size changes.
+	    - Added a FreeFont2 test to g2dtest.
 22-Aug-2003
 	- Oktal fixed a couple of typos in the Perl plugin, and fixed a bit of
 	  const correctness in iScriptObject.

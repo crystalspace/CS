@@ -143,13 +143,42 @@ int csFontCache::KnownFontArrayCompareToKey (
 csFontCache::KnownFont* csFontCache::GetCachedFont (iFont* font)
 {
   int idx = knownFonts.FindSortedKey (font, KnownFontArrayCompareToKey);
-  return (idx >= 0) ? knownFonts[idx] : 0;
+  csFontCache::KnownFont* knownFont = (idx >= 0) ? knownFonts[idx] : 0;
+  if (knownFont != 0)
+  {
+    if (knownFont->fontSize != font->GetSize ())
+    {
+      for (int i = 0; i < knownFont->planeGlyphs.Length (); i++)
+      {
+	PlaneGlyphs*& pg = knownFont->planeGlyphs[i];
+	if (pg != 0)
+	{
+	  for (int j = 0; j < GLYPH_INDEX_LOWER_COUNT; j++)
+	  {
+	    LRUEntry* entry = pg->entries[j];
+	    if (entry != 0) 
+	    {
+	      GlyphCacheData* cacheData = entry->cacheData;
+	      RemoveLRUEntry (entry);
+	      InternalUncacheGlyph (cacheData);
+	    }
+	  }
+	  delete pg;
+	  pg = 0;
+	}
+      }
+      knownFont->fontSize = font->GetSize ();
+      knownFont->purgeNeeded = false;
+    }
+  }
+  return knownFont;
 }
 
 csFontCache::KnownFont* csFontCache::CacheFont (iFont* font)
 {
   KnownFont* knownFont = new KnownFont;
   knownFont->font = font;
+  knownFont->fontSize = font->GetSize ();
   knownFont->purgeNeeded = false;
 
   knownFonts.InsertSorted (knownFont, KnownFontArrayCompareItems);

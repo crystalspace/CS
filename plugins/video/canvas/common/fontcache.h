@@ -132,6 +132,8 @@ protected:
   struct KnownFont
   {
     iFont* font;
+    /// The font size this font was cached for
+    int fontSize;
     PlaneGlyphsArray planeGlyphs;
     bool purgeNeeded;
   };

@@ -70,6 +70,7 @@ class G2DTestSystemDriver
     stBackBufferOFF,
     stTestUnicode1,
     stTestUnicode2,
+    stTestFreetype,
     stTestLineDraw,
     stTestLinePerf,
     stTestTextDraw,
@@ -141,6 +142,7 @@ private:
   void DrawBackBufferOFF ();
   void DrawUnicodeTest1 ();
   void DrawUnicodeTest2 ();
+  void DrawFreetypeTest ();
   void DrawLineTest ();
   void DrawLinePerf ();
   void DrawTextTest ();
@@ -278,6 +280,7 @@ void G2DTestSystemDriver::SetupFrame ()
     case stBackBufferOFF:
     case stTestUnicode1:
     case stTestUnicode2:
+    case stTestFreetype:
     case stTestLineDraw:
     case stTestLinePerf:
     case stTestTextDraw:
@@ -348,6 +351,11 @@ void G2DTestSystemDriver::SetupFrame ()
           break;
 	case stTestUnicode2:
 	  DrawUnicodeTest2 ();
+          EnterState (stTestFreetype);
+          EnterState (stWaitKey);
+          break;
+	case stTestFreetype:
+	  DrawFreetypeTest ();
           EnterState (stTestLineDraw);
           EnterState (stWaitKey);
           break;
@@ -863,6 +871,58 @@ void G2DTestSystemDriver::DrawUnicodeTest2 ()
     WriteCenteredWrapped (0, y, h, white, -1, iCanEatGlass[i]);
     y += h + fH;
     i += 2;
+  }
+
+  SetFont (fontCourier);
+  WriteCentered (2, 0, green, -1, "press any key to continue");
+}
+
+void G2DTestSystemDriver::DrawFreetypeTest ()
+{
+  const char* fontFaces[] = {"VeraSans", "VeraSansBoldOblique", 
+    "VeraSansMono", "VeraSerif", 0};
+  const int fontSizes[] = {4, 8, 12, 24, 0};
+
+  int w = myG2D->GetWidth ();
+  int h = myG2D->GetHeight ();
+  myG2D->SetClipRect(0,0,w,h);
+  myG2D->DrawBox(0,0,w,h, dsteel);
+
+  SetFont (fontItalic);
+  int tpos = -h / 2;
+  WriteCentered (0, tpos, white, -1, "FREETYPE2 PLUGIN TEST");
+
+  SetFont (fontLarge);
+  WriteCentered (0, tpos + 16*2, black,  -1, 
+    "If the FreeType2 plugin was built and activated in the");
+  WriteCentered (0, tpos + 16*3, black,  -1, 
+    "g2dtest.cfg file (it is by default), you should see text");
+  WriteCentered (0, tpos + 16*4, black,  -1, 
+    "in various faces and sizes below.");
+
+  int y = tpos + 16*7;
+  int i = 0;
+  while (fontFaces[i] != 0)
+  {
+    int fW, fH;
+    csRef<iFont> font = GetFont (fontFaces[i]);
+    if (font)
+    {
+      SetFont (font);
+      csString str;
+      int j = 0;
+      while (fontSizes[j] != 0)
+      {
+	str.Clear ();
+        str << fontFaces[i] << ", Size " << fontSizes[j];
+	font->SetSize (fontSizes[j]);
+        WriteCentered (0, y, yellow, -1, str.GetData ());
+        font->GetDimensions (str.GetData (), fW, fH);
+        y += fH + 4;
+	j++;
+      }
+    }
+    i++;
   }
 
   SetFont (fontCourier);
