@@ -17,6 +17,8 @@ ifeq ($(MAKESECTION),roottargets)
 all libs: csphyzik
 csphyzik:
 	$(MAKE_TARGET)
+csphyzikclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -44,7 +46,7 @@ $(CSPHYZIK.LIB): $(OBJ.CSPHYZIK)
 	$(DO.STATIC.LIBRARY)
 
 csphyzikclean:
-	-$(RM) $(CSPHYZIK.LIB)
+	-$(RM) $(CSPHYZIK.LIB) $(OBJ.CSPHYZIK)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)csphyzik.dep
