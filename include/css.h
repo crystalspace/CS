@@ -232,20 +232,15 @@
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
 #include "csgeom/vtpool.h"
+#include "csgeom/crysball.h"
 #endif
 
 // CS Engine
 #ifndef NO_CSENGINE
 #include "csengine/arrays.h"
 #include "csengine/bezier.h"
-#include "csengine/bsp.h"
-#include "csengine/bsp2d.h"
-#include "csengine/bspbbox.h"
 #include "csengine/camera.h"
 #include "csengine/campos.h"
-#include "csengine/cbufcube.h"
-#include "csengine/cbuffer.h"
-#include "csengine/crysball.h"
 #include "csengine/cscoll.h"
 #include "csengine/curve.h"
 #include "csengine/engine.h"
@@ -257,15 +252,12 @@
 #include "csengine/material.h"
 #include "csengine/meshobj.h"
 #include "csengine/movable.h"
-#include "csengine/octree.h"
 #include "csengine/pol2d.h"
 #include "csengine/poledges.h"
 #include "csengine/polygon.h"
-#include "csengine/polyint.h"
 #include "csengine/polyplan.h"
 #include "csengine/polytext.h"
 #include "csengine/polytmap.h"
-#include "csengine/polytree.h"
 #include "csengine/portal.h"
 #include "csengine/radiosty.h"
 #include "csengine/rdrprior.h"
@@ -275,7 +267,6 @@
 #include "csengine/stats.h"
 #include "csengine/texture.h"
 #include "csengine/thing.h"
-#include "csengine/treeobj.h"
 #include "csengine/wirefrm.h"
 #endif
 
