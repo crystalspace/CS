@@ -319,7 +319,14 @@ void Name (void (*p)())                                                \
  * of the plugin module with any special implementation details required by the
  * platform.
  */
-#if defined(CS_STATIC_LINKED) || !defined(CS_BUILD_SHARED_LIBS)
+#if defined(CS_STATIC_LINKED)
+
+#  ifndef CS_IMPLEMENT_PLUGIN
+#  define CS_IMPLEMENT_PLUGIN        					\
+          CS_IMPLEMENT_PLATFORM_PLUGIN 
+#  endif
+
+#elif !defined(CS_BUILD_SHARED_LIBS)
 
 #  ifndef CS_IMPLEMENT_PLUGIN
 #  define CS_IMPLEMENT_PLUGIN        					\

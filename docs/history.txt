@@ -15,7 +15,17 @@ chronological order.
 	  multitexturing modifiers.
 	- res fixed a cleanup bug in the jpg plugin after the latest changes.
 	- res made documentation tweaks to a few files in include/csutil.
-	- res added iJobQueue->Unqueue();
+	- res added iJobQueue->Unqueue().
+	- res made the following changes:
+	    - Moved some Win32-specific code from csosdefs.h into a .cpp file.
+	    - Made csExpandName a platform-specific function.
+	    - Fixed beeps on Win32 when hitting Alt+Character.
+	    - Reverted the recent udword->uintptr_t change to Opcode, didn't
+	      do that much good.
+	    - Added ability to set texture alpha type (previously, only the
+	      auto-detected value was available).
+	    - Removed a couple of tokens related to the obsolete effects 
+	      system from csparser.
 2-Feb-2005
 	- Jorrit removed CS_PROFSETUP. Setup is now automatic the first time
 	  you use CS_PROFSTART.

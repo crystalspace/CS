@@ -296,8 +296,11 @@ struct csMemMapInfo
 #define CS_SOUND_DRIVER "crystalspace.sound.driver.waveout"
 
 // SCF symbol export facility.
-#undef CS_EXPORTED_FUNCTION
-#define CS_EXPORTED_FUNCTION extern "C" __declspec(dllexport)
+#ifndef CS_STATIC_LINKED
+// No need to export the symbols when statically linking into one big binary.
+# undef CS_EXPORTED_FUNCTION
+# define CS_EXPORTED_FUNCTION extern "C" __declspec(dllexport)
+#endif
 
 #if defined (CS_COMPILER_BCC)
 #  define strcasecmp stricmp
@@ -338,17 +341,9 @@ struct csMemMapInfo
 #  define W_OK 4
 #endif
 
-#define CS_PROVIDES_VFS_VARS 1
-#ifdef CS_CSUTIL_LIB
-extern CS_EXPORT_SYM const char* csCheckPlatformVFSVar(const char* VarName);
-#else
-extern CS_IMPORT_SYM const char* csCheckPlatformVFSVar(const char* VarName);
-#endif
-
 #define CS_PROVIDES_EXPAND_PATH 1
 inline void csPlatformExpandPath(const char* path, char* buffer, int bufsize)
 {
-  GetFullPathName (path, bufsize, buffer, 0);
 }
 
 struct dirent

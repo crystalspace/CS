@@ -295,7 +295,7 @@ inline float csGetLittleEndianFloat16 (const void *buff)
 { uint16 s = csGetLittleEndianShort (buff); return csShortToFloat (s); }
 
 /// Set a little-endian short on a address
-inline void csSetLittleEndianShort (const void *buff, uint16 s)
+inline void csSetLittleEndianShort (void *buff, uint16 s)
 {
 #ifdef CS_STRICT_ALIGNMENT
   s = csLittleEndianShort (s);
@@ -306,7 +306,7 @@ inline void csSetLittleEndianShort (const void *buff, uint16 s)
 }
 
 /// Set a little-endian long on a address
-inline void csSetLittleEndianLong (const void *buff, uint32 l)
+inline void csSetLittleEndianLong (void *buff, uint32 l)
 {
 #ifdef CS_STRICT_ALIGNMENT
   l = csLittleEndianLong (l);
@@ -317,11 +317,11 @@ inline void csSetLittleEndianLong (const void *buff, uint32 l)
 }
 
 /// Set a little-endian 32-bit float on a address
-inline void csSetLittleEndianFloat32 (const void *buff, float f)
+inline void csSetLittleEndianFloat32 (void *buff, float f)
 { csSetLittleEndianLong (buff, csFloatToLong (f)); }
 
 /// Set a little-endian 16-bit float on a address
-inline void csSetLittleEndianFloat16 (const void *buff, float f)
+inline void csSetLittleEndianFloat16 (void *buff, float f)
 { csSetLittleEndianShort (buff, csFloatToShort (f)); }
 
 

@@ -325,13 +325,6 @@ bool csWin32KeyboardDriver::HandleKeyMessage (HWND hWnd, UINT message,
   csRef<iEvent> ev;
   switch (message)
   {
-    case WM_CHAR:
-    case WM_UNICHAR:
-      if (wParam != UNICODE_NOCHAR)
-      {
-	return true;
-      }
-      return false;
     case WM_IME_COMPOSITION:
       if (Imm32::ImmAvailable())
       {
@@ -485,6 +478,14 @@ bool csWin32KeyboardDriver::HandleKeyMessage (HWND hWnd, UINT message,
 	(modifiersState.modifiers[csKeyModifierTypeAlt] != 0));   // so Alt+F4 still works
     case WM_DEADCHAR:
     case WM_SYSDEADCHAR:
+    case WM_CHAR:
+    case WM_UNICHAR:
+    case WM_SYSCHAR:
+      if (wParam != UNICODE_NOCHAR)
+      {
+	return true; // Pretend we handle it. May get beeps otherwise.
+      }
+      return false;
     default:
       return false;
   }

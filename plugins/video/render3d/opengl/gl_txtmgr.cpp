@@ -173,6 +173,10 @@ void csGLTextureHandle::SetKeyColor (bool Enable)
 {
   SetTransp (Enable);
   SetTexupdateNeeded (true);
+  if (Enable && alphaType == csAlphaMode::alphaNone)
+    alphaType = csAlphaMode::alphaBinary;
+  else if (!Enable && alphaType == csAlphaMode::alphaBinary)
+    alphaType = csAlphaMode::alphaNone;
 }
 
 void csGLTextureHandle::SetKeyColor (uint8 red, uint8 green, uint8 blue)
@@ -180,6 +184,8 @@ void csGLTextureHandle::SetKeyColor (uint8 red, uint8 green, uint8 blue)
   transp_color.red = red;
   transp_color.green = green;
   transp_color.blue = blue;
+  if (alphaType == csAlphaMode::alphaNone)
+    alphaType = csAlphaMode::alphaNone;
   SetTransp (true);
   SetTexupdateNeeded (true);
 }
@@ -895,6 +901,7 @@ void csGLTextureHandle::PrepareKeycolor (iImage* image,
   csRGBpixel mean_color;
   CheckAlpha (w, h, _src, &transp_color, alphaType);
   ComputeMeanColor (w, h, _src, &transp_color, mean_color);
+  if (alphaType == csAlphaMode::alphaNone) return; // Nothing to fix up
 
   while (rows--)
   {

@@ -1054,6 +1054,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("fastmesh", XMLTOKEN_FASTMESH);
   xmltokens.Register ("file", XMLTOKEN_FILE);
   xmltokens.Register ("class", XMLTOKEN_CLASS);
+  xmltokens.Register ("alpha", XMLTOKEN_ALPHA);
   // 3d Texture
   xmltokens.Register ("texture3d", XMLTOKEN_TEXTURE3D);
   // Cubemaps
@@ -1157,34 +1158,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("staticshape", XMLTOKEN_STATICSHAPE);
   xmltokens.Register ("value", XMLTOKEN_VALUE);
 
-  xmltokens.Register ("alphamodifier1", XMLTOKEN_ALPHAMODIFIER1);
-  xmltokens.Register ("alphamodifier2", XMLTOKEN_ALPHAMODIFIER2);
-  xmltokens.Register ("alphamodifier3", XMLTOKEN_ALPHAMODIFIER3);
-  xmltokens.Register ("alphaoperation", XMLTOKEN_ALPHAOPERATION);
-  xmltokens.Register ("alphasource1", XMLTOKEN_ALPHASOURCE1);
-  xmltokens.Register ("alphasource2", XMLTOKEN_ALPHASOURCE2);
-  xmltokens.Register ("alphasource3", XMLTOKEN_ALPHASOURCE3);
-  xmltokens.Register ("blending", XMLTOKEN_BLENDING);
-  xmltokens.Register ("colormodifier1", XMLTOKEN_COLORMODIFIER1);
-  xmltokens.Register ("colormodifier2", XMLTOKEN_COLORMODIFIER2);
-  xmltokens.Register ("colormodifier3", XMLTOKEN_COLORMODIFIER3);
-  xmltokens.Register ("coloroperation", XMLTOKEN_COLOROPERATION);
-  xmltokens.Register ("colorsource1", XMLTOKEN_COLORSOURCE1);
-  xmltokens.Register ("colorsource2", XMLTOKEN_COLORSOURCE2);
-  xmltokens.Register ("colorsource3", XMLTOKEN_COLORSOURCE3);
-  xmltokens.Register ("destinationblend", XMLTOKEN_DESTINATIONBLEND);
-  xmltokens.Register ("pass", XMLTOKEN_PASS);
-  xmltokens.Register ("quality", XMLTOKEN_QUALITY);
-  xmltokens.Register ("shading", XMLTOKEN_SHADING);
-  xmltokens.Register ("sourceblend", XMLTOKEN_SOURCEBLEND);
-  xmltokens.Register ("technique", XMLTOKEN_TECHNIQUE);
-  xmltokens.Register ("texturesource", XMLTOKEN_TEXTURESOURCE);
-  xmltokens.Register ("texturecoordinatesource", XMLTOKEN_TEXTURECOORDSOURCE);
   xmltokens.Register ("variable", XMLTOKEN_VARIABLE);
-  xmltokens.Register ("vertexcolor", XMLTOKEN_VERTEXCOLOR);
-  xmltokens.Register ("vertexprogram", XMLTOKEN_VERTEXPROGRAM);
-  xmltokens.Register ("vertexprogramconstant", XMLTOKEN_VERTEXPROGRAMCONST);
-
   xmltokens.Register ("variables", XMLTOKEN_VARIABLELIST);
 
   xmltokens.Register ("run", XMLTOKEN_RUN);

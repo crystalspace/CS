@@ -34,6 +34,7 @@
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
 #include "csutil/util.h"
+#include "csutil/vfsplat.h"
 #include "iutil/objreg.h"
 #include "iutil/verbositymanager.h"
 
@@ -1133,11 +1134,9 @@ const char *VfsNode::GetValue (csVFS *Parent, const char *VarName)
   // can override them in config file or environment
 
   // check for OS-specific predefined variables
-#ifdef CS_PROVIDES_VFS_VARS
   value = csCheckPlatformVFSVar(VarName);
   if (value)
     return value;
-#endif
 
   static char path_separator [] = {VFS_PATH_SEPARATOR, 0};
   if (strcmp (VarName, path_separator) == 0)	// Path separator variable?

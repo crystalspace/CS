@@ -89,7 +89,7 @@ public:
   virtual int GetWidth() { return Width; }
   virtual int GetHeight() { return Height; }
   virtual int GetFormat() { return Format; }
-  virtual void ApplyTo(csImageMemory* image);
+  virtual void ApplyTo (csImageMemory* image);
 };
 
 //#define THREADED_LOADING

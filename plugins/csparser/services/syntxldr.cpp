@@ -882,9 +882,10 @@ bool csTextSyntaxService::WriteShaderVar (iDocumentNode* node,
 
 bool csTextSyntaxService::ParseAlphaMode (iDocumentNode* node, 
 					  iStringSet* strings,
-					  csAlphaMode& alphaMode)
+					  csAlphaMode& alphaMode, 
+					  bool allowAutoMode)
 {
-  CS_ASSERT (strings != 0);
+  CS_ASSERT (!allowAutoMode || (strings != 0));
 
 #define ALPHAMODE_WARN					\
   if (modeSet)						\
@@ -937,6 +938,11 @@ bool csTextSyntaxService::ParseAlphaMode (iDocumentNode* node,
 	}
 	break;
       case XMLTOKEN_AUTO:
+	if (!allowAutoMode)
+	{
+	  ReportBadToken (child);
+	  return false;
+	}
 	ALPHAMODE_WARN
 	{
 	  const char* def = node->GetAttributeValue("texture");

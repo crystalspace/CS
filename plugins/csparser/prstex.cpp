@@ -155,6 +155,8 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
   TextureLoaderContext context (txtname);
   csRef<iDocumentNode> ParamsNode;
   char* type = 0;
+  csAlphaMode::AlphaType alphaType;
+  bool overrideAlphaType = false;
 
   csRefArray<iDocumentNode> key_nodes;
 
@@ -291,6 +293,15 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
       case XMLTOKEN_CLASS:
 	{
 	  context.SetClass (child->GetContentsValue ());
+	}
+	break;
+      case XMLTOKEN_ALPHA:
+	{
+	  csAlphaMode am;
+	  if (!SyntaxService->ParseAlphaMode (child, 0, am, false))
+            goto error;
+	  overrideAlphaType = true;
+	  alphaType = am.alphaType;
 	}
 	break;
       default:
@@ -432,6 +443,8 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
       tex->SetKeyColor (csQint (transp.red * 255.99),
         csQint (transp.green * 255.99), csQint (transp.blue * 255.99));
     tex->SetTextureClass (context.GetClass ());
+    if (overrideAlphaType)
+      tex->GetTextureHandle()->SetAlphaType (alphaType);
 
     csRef<iProcTexture> ipt = csPtr<iProcTexture>
       (SCF_QUERY_INTERFACE (tex, iProcTexture));

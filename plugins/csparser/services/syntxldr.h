@@ -88,7 +88,7 @@ public:
   virtual bool ParseShaderVar (iDocumentNode* node, csShaderVariable& var);
   virtual bool WriteShaderVar (iDocumentNode* node, csShaderVariable* var);
   virtual bool ParseAlphaMode (iDocumentNode* node, iStringSet* strings,
-    csAlphaMode& alphaMode);
+    csAlphaMode& alphaMode, bool allowAutoMode);
   virtual bool WriteAlphaMode (iDocumentNode* node, iStringSet* strings,
     csAlphaMode* alphaMode);
   virtual bool ParseZMode (iDocumentNode* node, csZBufMode& zmode,

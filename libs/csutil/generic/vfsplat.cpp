@@ -19,36 +19,8 @@
 // Support for platform-specific VFS variables.
 #include "cssysdef.h"
 #include "csutil/vfsplat.h"
-#include <windows.h>
 
-#include "shellstuff.h"
-
-// Windows has built-in var "SystemRoot"
-// (env var on NT, but not 9x; so we provide it this way)
 const char* csCheckPlatformVFSVar(const char* VarName)
 {
-  if (!strcasecmp(VarName, "systemroot"))
-  {
-    static char szWindowsDirectory[MAX_PATH+1] = {'\0'};
-
-    if (!*szWindowsDirectory) 
-    {
-      GetWindowsDirectoryA(szWindowsDirectory, MAX_PATH);
-    }
-    return szWindowsDirectory;
-  }
-  
-  if (!strcasecmp(VarName, "homedir"))
-  {
-    static char szMyDocs[MAX_PATH+1] = {'\0'};
-
-    if (!*szMyDocs) 
-    {
-      if (!GetShellFolderPath (CSIDL_PERSONAL, szMyDocs)) return 0;
-    }
-    return szMyDocs;
-  }
-
   return 0;
 }
-

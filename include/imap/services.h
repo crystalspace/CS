@@ -208,7 +208,7 @@ struct iSyntaxService : public iBase
    * Parse an alphamode description. Returns true if successful.
    */
   virtual bool ParseAlphaMode (iDocumentNode* node, iStringSet* strings,
-    csAlphaMode& alphaMode) = 0;
+    csAlphaMode& alphaMode, bool allowAutoMode = true) = 0;
     
   /**
    * Write an alphamode description. Returns true if successful.

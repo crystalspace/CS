@@ -286,6 +286,8 @@ public:
 
   virtual csAlphaMode::AlphaType GetAlphaType () const
   { return alphaType; }
+  virtual void SetAlphaType (csAlphaMode::AlphaType alphaType)
+  { this->alphaType = alphaType; }
 
   virtual void Precache ();
 

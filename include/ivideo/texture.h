@@ -194,6 +194,14 @@ struct iTextureHandle : public iBase
    * \sa SetTextureClass
    */
   virtual const char* GetTextureClass () = 0;
+
+  /**
+   * Set the type of alpha associated with the texture.
+   * Usually, the alpha mode is auto-detected (alphaSmooth on images with alpha
+   * channels, alphaBinary on keycolored images, alphaNone otherwise), but can
+   * be overridden with this method.
+   */
+  virtual void SetAlphaType (csAlphaMode::AlphaType alphaType) = 0;
 };
 
 /** @} */
