@@ -256,6 +256,9 @@ private:
    */
   csTriangleVertices2* tri_verts;
 
+  /// The default mixing mode for new sprites
+  int MixMode;
+
   /// If true then this factory has been initialized.
   bool initialized;
 
@@ -462,6 +465,11 @@ public:
    */
   void MergeNormals ();
 
+  void SetMixMode (UInt mode)
+  { MixMode = mode; }
+  UInt GetMixMode () const
+  { return MixMode; }
+
   //------------------------ iMeshObjectFactory implementation --------------
   SCF_DECLARE_IBASE;
 
@@ -665,6 +673,10 @@ public:
     {
       scfParent->MergeNormals ();
     }
+    virtual void SetMixMode (UInt mode)
+    { scfParent->SetMixMode (mode); }
+    virtual UInt GetMixMode () const
+    { return scfParent->GetMixMode (); }
   } scfiSprite3DFactoryState;
 };
 

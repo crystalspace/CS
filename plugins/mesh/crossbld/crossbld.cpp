@@ -286,6 +286,7 @@ bool csCrossBuilder::BuildSpriteFactory (iModelData *Data,
   tgt->AddVertices (SpriteVertices.Length ());
 
   // create all frames in the target factory
+  bool NeedTiling = false;
   for (i=0; i<Frames.Length (); i++)
   {
     int FrameIndex = NumPreviousFrames + i;
@@ -297,9 +298,17 @@ bool csCrossBuilder::BuildSpriteFactory (iModelData *Data,
     {
       tgt->SetVertex (FrameIndex, j, Vertices->GetVertex (SpriteVertices [j]));
       tgt->SetNormal (FrameIndex, j, Vertices->GetNormal (SpriteNormals [j]));
-      tgt->SetTexel (FrameIndex, j, Vertices->GetTexel (SpriteTexels [j]));
+
+      csVector2 t = Vertices->GetTexel (SpriteTexels [j]);
+      tgt->SetTexel (FrameIndex, j, t);
+      if (t.x < 0 || t.y < 0 || t.x > 1 || t.y > 1)
+        NeedTiling = true;
     }
   }
+
+  // enable texture tiling if required
+  if (NeedTiling)
+    tgt->SetMixMode (tgt->GetMixMode () | CS_FX_TILING);
 
   /* Create all actions in the target factory. We also build a default
    * action (named 'default') if no action with this name exists. The

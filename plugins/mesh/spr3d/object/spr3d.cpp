@@ -166,6 +166,8 @@ csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iBase *pParent) :
   
   lod_level = DEFAULT_LOD;
   lod_level_config = CS_SPR_LOD_GLOBAL;
+  MixMode = CS_FX_COPY;
+
   initialized = false;
 }
 
@@ -656,6 +658,7 @@ void csSprite3DMeshObject::SetFactory (csSprite3DMeshObjectFactory* tmpl)
   if (tmpl->GetSkeleton ())
     skeleton_state = (csSkelState*)tmpl->GetSkeleton ()->CreateState ();
   EnableTweening (tmpl->IsTweeningEnabled ());
+  MixMode = tmpl->GetMixMode ();
 }
 
 void csSprite3DMeshObject::SetMaterial (iMaterialWrapper *material)

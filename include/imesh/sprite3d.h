@@ -286,6 +286,11 @@ struct iSprite3DFactoryState : public iBase
    * vertices are very close in each frame
    */
   virtual void MergeNormals () = 0;
+
+  /// Set default mix mode for new sprites.
+  virtual void SetMixMode (UInt mode) = 0;
+  /// Get default mix mode for new sprites.
+  virtual UInt GetMixMode () const = 0;
 };
 
 SCF_VERSION (iSprite3DState, 0, 0, 4);
