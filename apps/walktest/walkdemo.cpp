@@ -209,8 +209,8 @@ void add_particles_fire (iSector* sector, char* matname, int num,
   //firestate->SetDropSize (.02, .04);
   firestate->SetDropSize (0.04f, 0.08f);
   firestate->SetLighting (false);
-  firestate->SetOrigin (csBox3(origin-csVector3(0.2f, 0, 0.2f),
-    origin + csVector3(0.2f, 0.2f)));
+  firestate->SetOrigin (csBox3(-csVector3(0.2f, 0, 0.2f),
+    csVector3(0.2f, 0.2f)));
   firestate->SetDirection (csVector3 (0, 1.0f, 0));
   firestate->SetSwirl (1.6f);
   firestate->SetColorScale (0.2f);

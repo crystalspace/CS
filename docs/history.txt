@@ -20,6 +20,8 @@ chronological order.
 	  z-plane clipping from working correctly in case the plane clipper
 	  was not selected for the portal. This fixes the rotating door in
 	  flarge for NR too.
+	- Jorrit fixed 'flame' command in walktest so that it puts the
+	  flame particle system at the correct position.
 16-Jun-2004
 	- Jorrit cleaned up stencil clipping in the NR/OpenGL renderer.
 	  Now mask 128 is used for both stencil clipping and floating portals
