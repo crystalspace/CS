@@ -921,6 +921,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("check", XMLTOKEN_CHECK);
   xmltokens.Register ("setfog", XMLTOKEN_SETFOG);
   xmltokens.Register ("fadefog", XMLTOKEN_FADEFOG);
+  xmltokens.Register ("setvar", XMLTOKEN_SETVAR);
   xmltokens.Register ("setlight", XMLTOKEN_SETLIGHT);
   xmltokens.Register ("fadelight", XMLTOKEN_FADELIGHT);
   xmltokens.Register ("setambient", XMLTOKEN_SETAMBIENT);

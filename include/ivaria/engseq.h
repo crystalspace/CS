@@ -143,7 +143,7 @@ struct iEngineSequenceParameters : public iBase
   virtual csPtr<iParameterESM> CreateParameterESM (const char* name) = 0;
 };
 
-SCF_VERSION (iSequenceWrapper, 0, 2, 0);
+SCF_VERSION (iSequenceWrapper, 0, 3, 0);
 
 /**
  * A sequence wrapper. This objects holds the reference
@@ -201,6 +201,37 @@ struct iSequenceWrapper : public iBase
   virtual csPtr<iEngineSequenceParameters> CreateParameterBlock () = 0; 
 
   /**
+   * Operation: set a variable to a floating point value.
+   * If 'dvalue' is not 0 then that will be used instead of the absolute
+   * value. In that case 'dvalue' is added.
+   */
+  virtual void AddOperationSetVariable (csTicks time,
+  		iSharedVariable* var, float value, float dvalue = 0) = 0;
+
+  /**
+   * Operation: set a variable to the contents of another variable.
+   * If 'dvalue' is not 0 then that will be used instead of the absolute
+   * value. In that case 'dvalue' is added. 'dvalue' has to be a floating
+   * point variable for that to work. 'value' can be any type. The type
+   * of 'var' will be set to the type of 'value' in that case.
+   */
+  virtual void AddOperationSetVariable (csTicks time,
+  		iSharedVariable* var, iSharedVariable* value,
+		iSharedVariable* dvalue = 0) = 0;
+
+  /**
+   * Operation: set a variable to a vector.
+   */
+  virtual void AddOperationSetVariable (csTicks time,
+  		iSharedVariable* var, const csVector3& v) = 0;
+
+  /**
+   * Operation: set a variable to a color.
+   */
+  virtual void AddOperationSetVariable (csTicks time,
+  		iSharedVariable* var, const csColor& c) = 0;
+
+  /**
    * Operation: set a material on a mesh.
    */
   virtual void AddOperationSetMaterial (csTicks time, iParameterESM* mesh,
@@ -228,7 +259,7 @@ struct iSequenceWrapper : public iBase
    * Operation: set dynamic ambient light color.
    */
   virtual void AddOperationSetAmbient (csTicks time, iParameterESM* light,
-		  const csColor& color,iSharedVariable *colorvar) = 0;
+		  const csColor& color, iSharedVariable *colorvar) = 0;
 
   /**
    * Operation: fade dynamic ambient light to some color during some time.

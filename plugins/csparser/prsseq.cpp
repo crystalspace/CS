@@ -969,18 +969,127 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 	    	sector, col, duration);
 	}
 	break;
+      case XMLTOKEN_SETVAR:
+        {
+	  iSharedVariable *var = 0;
+	  const char* varname;
+	  if ((varname = child->GetAttributeValue ("var")) == 0)
+	  {
+	    SyntaxService->ReportError (
+			"crystalspace.maploader.parse.sequence", child,
+			"Please specify a variable name ('var' attribute)!");
+	    return 0;
+	  }
+	  var = FindSharedVariable (varname, iSharedVariable::SV_UNKNOWN);
+	  if (!var)
+	  {
+	    SyntaxService->ReportError (
+			"crystalspace.maploader.parse.sequence", child,
+			"Shared variable '%s' not found for 'var'!",
+			varname);
+	    return 0;
+	  }
+	  csRef<iDocumentAttribute> value_a = child->GetAttribute ("value");
+	  if (value_a)
+	  {
+	    float v = value_a->GetValueAsFloat ();
+	    sequence->AddOperationSetVariable (cur_time, var, v, 0);
+	    break;
+	  }
+	  csRef<iDocumentAttribute> add_a = child->GetAttribute ("add");
+	  if (add_a)
+	  {
+	    float v = add_a->GetValueAsFloat ();
+	    if (var->GetType () != iSharedVariable::SV_FLOAT)
+	    {
+	      SyntaxService->ReportError (
+			  "crystalspace.maploader.parse.sequence", child,
+			  "Variable '%s' is not a float variable!",
+			  varname);
+	      return 0;
+	    }
+	    sequence->AddOperationSetVariable (cur_time, var, 0, v);
+	    break;
+	  }
+	  const char* value_var_name = child->GetAttributeValue ("value_var");
+	  if (value_var_name)
+	  {
+	    iSharedVariable* srcvar = FindSharedVariable (value_var_name,
+	    	iSharedVariable::SV_UNKNOWN);
+	    if (!srcvar)
+	    {
+	      SyntaxService->ReportError (
+			  "crystalspace.maploader.parse.sequence", child,
+			  "Shared variable '%s' not found for 'value_var'!",
+			  value_var_name);
+	      return 0;
+	    }
+	    sequence->AddOperationSetVariable (cur_time, var, srcvar, 0);
+	    break;
+	  }
+	  const char* add_var_name = child->GetAttributeValue ("add_var");
+	  if (add_var_name)
+	  {
+	    iSharedVariable* addvar = FindSharedVariable (add_var_name,
+	    	iSharedVariable::SV_UNKNOWN);
+	    if (!addvar)
+	    {
+	      SyntaxService->ReportError (
+			  "crystalspace.maploader.parse.sequence", child,
+			  "Shared variable '%s' not found for 'add_var'!",
+			  add_var_name);
+	      return 0;
+	    }
+	    if (addvar->GetType () != iSharedVariable::SV_FLOAT)
+	    {
+	      SyntaxService->ReportError (
+			  "crystalspace.maploader.parse.sequence", child,
+			  "Variable '%s' is not a float variable!",
+			  varname);
+	      return 0;
+	    }
+	    sequence->AddOperationSetVariable (cur_time, var, 0, addvar);
+	    break;
+	  }
+	  csRef<iDocumentAttribute> x_a = child->GetAttribute ("x");
+	  if (x_a)
+	  {
+	    csVector3 v;
+	    v.x = child->GetAttributeValueAsFloat ("x");
+	    v.y = child->GetAttributeValueAsFloat ("y");
+	    v.z = child->GetAttributeValueAsFloat ("z");
+	    sequence->AddOperationSetVariable (cur_time, var, v);
+	    break;
+	  }
+	  csRef<iDocumentAttribute> red_a = child->GetAttribute ("red");
+	  if (red_a)
+	  {
+	    csColor c;
+	    c.red = child->GetAttributeValueAsFloat ("red");
+	    c.green = child->GetAttributeValueAsFloat ("green");
+	    c.blue = child->GetAttributeValueAsFloat ("blue");
+	    sequence->AddOperationSetVariable (cur_time, var, c);
+	    break;
+	  }
+	  SyntaxService->ReportError (
+			  "crystalspace.maploader.parse.sequence", child,
+			  "Invalid operation on shared variable '%s'!",
+			  varname);
+	  return 0;
+	}
+	break;
       case XMLTOKEN_SETAMBIENT:
         {
 	  csRef<iParameterESM> sector = ResolveOperationParameter (
 	  	ldr_context,
 	  	child, PARTYPE_SECTOR, "sector", seqname, base_params);
 	  if (!sector) return 0;
-	  iSharedVariable *var=0;
+	  iSharedVariable *var = 0;
 	  csColor col;
 	  const char *colvar;
 	  if ((colvar = child->GetAttributeValue ("color_var")) != 0)
 	  { // variable set at run time
-	    var = FindSharedVariable(colvar, iSharedVariable::SV_COLOR );
+	    var = FindSharedVariable (colvar, iSharedVariable::SV_COLOR );
 	    if (!var)
 	    {
 	      SyntaxService->ReportError (

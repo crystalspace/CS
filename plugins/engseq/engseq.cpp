@@ -220,6 +220,107 @@ public:
 //---------------------------------------------------------------------------
 
 /**
+ * Set variable operation.
+ */
+class OpSetVariable : public OpStandard
+{
+private:
+# define OP_SET_VAR_VALUE 0
+# define OP_SET_VAR_DVALUE 1
+# define OP_SET_VALUE 2
+# define OP_SET_DVALUE 3
+# define OP_SET_VECTOR 4
+# define OP_SET_COLOR 5
+  int op;
+  iSharedVariable* var;
+  iSharedVariable* value_var;
+  float value;
+  csVector3 vector;
+  csColor color;
+
+public:
+  OpSetVariable (iSharedVariable* var, float value, float dvalue)
+  {
+    OpSetVariable::var = var;
+    if (dvalue != 0)
+    {
+      op = OP_SET_DVALUE;
+      OpSetVariable::value = dvalue;
+    }
+    else
+    {
+      op = OP_SET_VALUE;
+      OpSetVariable::value = value;
+    }
+  }
+  OpSetVariable (iSharedVariable* var, iSharedVariable* value,
+  	iSharedVariable* dvalue)
+  {
+    OpSetVariable::var = var;
+    if (dvalue != 0)
+    {
+      op = OP_SET_VAR_DVALUE;
+      OpSetVariable::value_var = dvalue;
+    }
+    else
+    {
+      op = OP_SET_VAR_VALUE;
+      OpSetVariable::value_var = value;
+    }
+  }
+  OpSetVariable (iSharedVariable* var, const csVector3& v)
+  {
+    OpSetVariable::var = var;
+    op = OP_SET_VECTOR;
+    vector = v;
+  }
+  OpSetVariable (iSharedVariable* var, const csColor& c)
+  {
+    OpSetVariable::var = var;
+    op = OP_SET_COLOR;
+    color = c;
+  }
+
+  virtual void Do (csTicks /*dt*/, iBase* params)
+  {
+    switch (op)
+    {
+      case OP_SET_VAR_VALUE:
+        switch (value_var->GetType ())
+	{
+          case iSharedVariable::SV_FLOAT:
+            var->Set (value_var->Get ());
+	    break;
+          case iSharedVariable::SV_COLOR:
+            var->SetColor (value_var->GetColor ());
+	    break;
+          case iSharedVariable::SV_VECTOR:
+            var->SetVector (value_var->GetVector ());
+	    break;
+	}
+        break;
+      case OP_SET_VAR_DVALUE:
+        var->Set (var->Get () + value_var->Get ());
+        break;
+      case OP_SET_VALUE:
+        var->Set (value);
+        break;
+      case OP_SET_DVALUE:
+        var->Set (var->Get () + value);
+        break;
+      case OP_SET_VECTOR:
+        var->SetVector (vector);
+        break;
+      case OP_SET_COLOR:
+        var->SetColor (color);
+        break;
+    }
+  }
+};
+
+//---------------------------------------------------------------------------
+
+/**
  * Set material operation.
  */
 class OpSetMaterial : public OpStandard
@@ -385,10 +486,11 @@ public:
 
 //---------------------------------------------------------------------------
 
+static iEngineSequenceManager* debug_eseqmgr;//@@@@@@@@@@@@@@@@@@@@@@@@@@
+
 /**
  * Set ambient light operation.
  */
-static iEngineSequenceManager* debug_eseqmgr;//@@@@@@@@@@@@@@@@@@@@@@@@@@
 class OpSetAmbientLight : public OpStandard
 {
 private:
@@ -1061,6 +1163,39 @@ csPtr<iEngineSequenceParameters> csSequenceWrapper::CreateParameterBlock ()
   }
 
   return csPtr<iEngineSequenceParameters> (copyparams);
+}
+
+void csSequenceWrapper::AddOperationSetVariable (csTicks time,
+  		iSharedVariable* var, float value, float dvalue)
+{
+  OpSetVariable* op = new OpSetVariable (var, value, dvalue);
+  sequence->AddOperation (time, op);
+  op->DecRef ();
+}
+
+void csSequenceWrapper::AddOperationSetVariable (csTicks time,
+  		iSharedVariable* var, iSharedVariable* value,
+		iSharedVariable* dvalue)
+{
+  OpSetVariable* op = new OpSetVariable (var, value, dvalue);
+  sequence->AddOperation (time, op);
+  op->DecRef ();
+}
+
+void csSequenceWrapper::AddOperationSetVariable (csTicks time,
+  		iSharedVariable* var, const csVector3& v)
+{
+  OpSetVariable* op = new OpSetVariable (var, v);
+  sequence->AddOperation (time, op);
+  op->DecRef ();
+}
+
+void csSequenceWrapper::AddOperationSetVariable (csTicks time,
+  		iSharedVariable* var, const csColor& c)
+{
+  OpSetVariable* op = new OpSetVariable (var, c);
+  sequence->AddOperation (time, op);
+  op->DecRef ();
 }
 
 void csSequenceWrapper::AddOperationSetPolygonMaterial (csTicks time,

@@ -127,6 +127,15 @@ public:
   iEngineSequenceParameters* GetBaseParameterBlock ();
   csPtr<iEngineSequenceParameters> CreateParameterBlock ();
 
+  void AddOperationSetVariable (csTicks time,
+  		iSharedVariable* var, float value, float dvalue = 0);
+  void AddOperationSetVariable (csTicks time,
+  		iSharedVariable* var, iSharedVariable* value,
+		iSharedVariable* dvalue = 0);
+  void AddOperationSetVariable (csTicks time,
+  		iSharedVariable* var, const csVector3& v);
+  void AddOperationSetVariable (csTicks time,
+  		iSharedVariable* var, const csColor& c);
   void AddOperationSetMaterial (csTicks time, iParameterESM* mesh,
 		  iParameterESM* mat);
   void AddOperationSetPolygonMaterial (csTicks time, iParameterESM* polygon,
@@ -201,6 +210,27 @@ public:
     virtual csPtr<iEngineSequenceParameters> CreateParameterBlock ()
     {
       return scfParent->CreateParameterBlock ();
+    }
+    virtual void AddOperationSetVariable (csTicks time,
+  		iSharedVariable* var, float value, float dvalue = 0)
+    {
+      scfParent->AddOperationSetVariable (time, var, value, dvalue);
+    }
+    virtual void AddOperationSetVariable (csTicks time,
+  		iSharedVariable* var, iSharedVariable* value,
+		iSharedVariable* dvalue = 0)
+    {
+      scfParent->AddOperationSetVariable (time, var, value, dvalue);
+    }
+    virtual void AddOperationSetVariable (csTicks time,
+  		iSharedVariable* var, const csVector3& v)
+    {
+      scfParent->AddOperationSetVariable (time, var, v);
+    }
+    virtual void AddOperationSetVariable (csTicks time,
+  		iSharedVariable* var, const csColor& c)
+    {
+      scfParent->AddOperationSetVariable (time, var, c);
     }
     virtual void AddOperationSetPolygonMaterial (csTicks time,
     		  iParameterESM* polygon, iParameterESM* mat)
