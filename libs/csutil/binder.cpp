@@ -56,7 +56,7 @@ SCF_IMPLEMENT_IBASE (csInputBinder)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-csInputBinder::csInputBinder (int size = 127)
+csInputBinder::csInputBinder (int size)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   Hash = new csHashMap (size);
@@ -101,7 +101,7 @@ bool csInputBinder::HandleEvent (iEvent &ev)
   return false;
 }
 
-void csInputBinder::Bind (iEvent *ev, int *xvar = NULL, int *yvar = NULL)
+void csInputBinder::Bind (iEvent *ev, int *xvar, int *yvar)
 {
   if (! yvar) switch (ev->Type) {
     case csevMouseMove:
@@ -124,7 +124,7 @@ void csInputBinder::Bind (iEvent *ev, int *xvar = NULL, int *yvar = NULL)
   Hash->Put (key, (csHashObject)pair);
 }
 
-void csInputBinder::Bind (csEvent &ev, int *xvar = NULL, int *yvar = NULL)
+void csInputBinder::Bind (csEvent &ev, int *xvar, int *yvar)
 {
   Bind (&ev, xvar, yvar);
 }
