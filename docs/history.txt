@@ -56,6 +56,28 @@ chronological order.
 	  forced to apply a rule to each matching file).
 	- Jorrit fixed the NR so that it now also calls BeforeDrawing()
 	  callbacks before rendering a mesh. This was simply forgotten.
+	- Jorrit completely redesigned the genmesh animation system (even
+	  before the previous design was implemented :-). There are now
+	  three main classes:
+	    - iGenMeshAnimationControl: the animation control interface
+	      that is set on the genmesh.
+	    - iGenMeshAnimationControlFactory: the factory that is set on
+	      the genmesh factory.
+	    - iGenMeshAnimationControlType: the plugin itself from which
+	      one can create factories.
+	  In addition there is iGenMeshAnimationControlState which is an
+	  interface to set the state parameters specific to the gmeshanim
+	  way to do animation. Using this interface one will be able to
+	  execute named scripts to control how the animation will work.
+	  The advantage of this new system is that it will now be possible
+	  to have one animation scripting set defined for the factory but the
+	  genmesh objects themselves can actually execute different scripts
+	  and be in a different animation state. This wasn't possible in the
+	  previous design.
+	- Implemented gmeshanim to support 'jitter' animation. This is just
+	  a test to show that the system works. gmeshanim still needs to have
+	  a real scripting system. In data/flarge/world there is one box
+	  that uses this 'jitter' script.
 12-Sep-2004
 	- Jorrit fixed genmesh so it compiles with OR again.
 	- Jorrit did some more work on gmeshanim. Still unfinished.

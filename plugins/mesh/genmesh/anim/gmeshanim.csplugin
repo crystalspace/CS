@@ -5,7 +5,7 @@
     <classes>
       <class>
         <name>crystalspace.mesh.anim.genmesh</name>
-        <implementation>csGenmeshAnimationControlFactory</implementation>
+        <implementation>csGenmeshAnimationControlType</implementation>
         <description>Crystal Space General Mesh Animation Control</description>
       </class>
     </classes>

@@ -98,6 +98,11 @@ private:
   int num_sorted_mesh_triangles;
   csTriangle* sorted_mesh_triangles;
 
+  // The following three are only used in case animation control is required.
+  csRef<iRenderBuffer> vertex_buffer;
+  csRef<iRenderBuffer> texel_buffer;
+  csRef<iRenderBuffer> normal_buffer;
+
   csRef<iRenderBuffer> color_buffer;
   iMovable* lighting_movable;
 #endif
@@ -204,6 +209,25 @@ public:
   void GetRadius (csVector3& rad, csVector3& cent);
   void SetShadowCasting (bool m) { do_shadows = m; }
   void SetShadowReceiving (bool m) { do_shadow_rec = m; }
+
+  iVirtualClock* vc;
+  csRef<iGenMeshAnimationControl> anim_ctrl;
+  void SetAnimationControl (iGenMeshAnimationControl* anim_ctrl);
+  iGenMeshAnimationControl* GetAnimationControl () const { return anim_ctrl; }
+  const csVector3* AnimControlGetVertices ();
+  const csVector2* AnimControlGetTexels ();
+  const csVector3* AnimControlGetNormals ();
+  const csColor* AnimControlGetColors (csColor* source);
+  bool anim_ctrl_verts;
+  bool anim_ctrl_texels;
+  bool anim_ctrl_normals;
+  bool anim_ctrl_colors;
+
+  // This function sets up the shader variable context depending on
+  // the existance of an animation control. If there is no animation control
+  // then the factory will provide the vertex and other data. Otherwise the
+  // mesh itself will do it.
+  void SetupShaderVariableContext ();
 
   //----------------------- Shadow and lighting system ----------------------
   char* GenerateCacheName ();
@@ -379,6 +403,14 @@ public:
     {
       return scfParent->do_shadow_rec;
     }
+    virtual void SetAnimationControl (iGenMeshAnimationControl* anim_ctrl)
+    {
+      scfParent->SetAnimationControl (anim_ctrl);
+    }
+    virtual iGenMeshAnimationControl* GetAnimationControl () const
+    {
+      return scfParent->GetAnimationControl ();
+    }
   } scfiGeneralMeshState;
   friend class GeneralMeshState;
 
@@ -500,18 +532,13 @@ private:
   bool initialized;
 
   // For animation control.
-  csRef<iVirtualClock> vc;
-  csRef<iGenMeshAnimationControl> anim_ctrl;
-  csTicks anim_ctrl_vt_lasttick;
-  csTicks anim_ctrl_tex_lasttick;
-  csTicks anim_ctrl_nor_lasttick;
-  csTicks anim_ctrl_col_lasttick;
-  void SetAnimationControl (iGenMeshAnimationControl* anim_ctrl);
-  iGenMeshAnimationControl* GetAnimationControl () const { return anim_ctrl; }
-  void AnimControlUpdateVertices ();
-  void AnimControlUpdateTexels ();
-  void AnimControlUpdateNormals ();
-  void AnimControlUpdateColors ();
+  csRef<iGenMeshAnimationControlFactory> anim_ctrl_fact;
+  void SetAnimationControlFactory (iGenMeshAnimationControlFactory*
+  	anim_ctrl_fact);
+  iGenMeshAnimationControlFactory* GetAnimationControlFactory () const
+  {
+    return anim_ctrl_fact;
+  }
 
   csMeshedPolygon* polygons;
 
@@ -551,6 +578,8 @@ private:
 public:
   CS_LEAKGUARD_DECLARE (csGenmeshMeshObjectFactory);
 
+  csRef<iVirtualClock> vc;
+
   static csStringID vertex_name, texel_name, normal_name, color_name, 
     index_name, tangent_name, binormal_name;
   uint buffers_version;
@@ -583,25 +612,21 @@ public:
   csVector3* GetVertices ()
   {
     SetupFactory ();
-    if (anim_ctrl) AnimControlUpdateVertices ();
     return mesh_vertices;
   }
   csVector2* GetTexels ()
   {
     SetupFactory ();
-    if (anim_ctrl) AnimControlUpdateTexels ();
     return mesh_texels;
   }
   csVector3* GetNormals ()
   {
     SetupFactory ();
-    if (anim_ctrl) AnimControlUpdateNormals ();
     return mesh_normals;
   }
   csColor* GetColors ()
   {
     SetupFactory ();
-    if (anim_ctrl) AnimControlUpdateColors ();
     return mesh_colors;
   }
 
@@ -852,13 +877,14 @@ public:
     {
       return scfParent->IsBack2Front ();
     }
-    virtual void SetAnimationControl (iGenMeshAnimationControl* anim_ctrl)
+    virtual void SetAnimationControlFactory (iGenMeshAnimationControlFactory*
+    	anim_ctrl_fact)
     {
-      scfParent->SetAnimationControl (anim_ctrl);
+      scfParent->SetAnimationControlFactory (anim_ctrl_fact);
     }
-    virtual iGenMeshAnimationControl* GetAnimationControl () const
+    virtual iGenMeshAnimationControlFactory* GetAnimationControlFactory () const
     {
-      return scfParent->GetAnimationControl ();
+      return scfParent->GetAnimationControlFactory ();
     }
     virtual bool AddRenderBuffer (const char *name, 
       csRenderBufferComponentType component_type, int component_size)

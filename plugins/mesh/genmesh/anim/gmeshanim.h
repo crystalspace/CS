@@ -113,15 +113,13 @@ public:
  */
 class csGenmeshAnimationControl :
 	public iGenMeshAnimationControl,
-	public iGenMeshAnimationControlSetup
+	public iGenMeshAnimationControlState
 {
 private:
-  csPDelArray<csAnimControlGroup> groups;
-  csPDelArray<csAnimControlScript> scripts;
   csGenmeshAnimationControlFactory* factory;
 
-  const char* ParseGroup (iDocumentNode* node);
-  const char* ParseScript (iDocumentNode* node);
+  int num_animated_verts;
+  csVector3* animated_verts;
 
 public:
   /// Constructor.
@@ -132,19 +130,23 @@ public:
   SCF_DECLARE_IBASE;
 
   // --- For iGenMeshAnimationControl --------------------------------
-  virtual bool UpdateVertices (csTicks current, csVector3* verts,
-  	int num_verts, csBox3& bbox);
-  virtual bool UpdateTexels (csTicks current, csVector2* texels,
-  	int num_texels);
-  virtual bool UpdateNormals (csTicks current, csVector3* normals,
-  	int num_normals);
-  virtual bool UpdateColors (csTicks current, csColor* colors,
-  	int num_colors);
+  virtual bool AnimatesVertices () const { return true; }
+  virtual bool AnimatesTexels () const { return false; }
+  virtual bool AnimatesNormals () const { return false; }
+  virtual bool AnimatesColors () const { return false; }
+  virtual const csVector3* UpdateVertices (csTicks current,
+  	const csVector3* verts, int num_verts);
+  virtual const csVector2* UpdateTexels (csTicks current,
+  	const csVector2* texels, int num_texels);
+  virtual const csVector3* UpdateNormals (csTicks current,
+  	const csVector3* normals, int num_normals);
+  virtual const csColor* UpdateColors (csTicks current,
+  	const csColor* colors, int num_colors);
 
-  virtual const char* Load (iDocumentNode* node);
-  virtual const char* Save (iDocumentNode* parent);
-
-  // --- For iGenMeshAnimationControlSetup ---------------------------
+  // --- For iGenMeshAnimationControlState ---------------------------
+  virtual bool Execute (const char* scriptname) { return false; }
+  virtual void Stop () { }
+  virtual void Stop (const char* scriptname) { }
 };
 
 /**
@@ -155,7 +157,11 @@ class csGenmeshAnimationControlFactory : public iGenMeshAnimationControlFactory
 private:
   iObjectRegistry* object_reg;
 
-public:
+  csPDelArray<csAnimControlGroup> groups;
+  csPDelArray<csAnimControlScript> scripts;
+  const char* ParseGroup (iDocumentNode* node);
+  const char* ParseScript (iDocumentNode* node);
+
   csStringHash xmltokens;
 #define CS_TOKEN_ITEM_FILE "plugins/mesh/genmesh/anim/gmeshanim.tok"
 #include "cstool/tokenlist.h"
@@ -163,19 +169,43 @@ public:
 
 public:
   /// Constructor.
-  csGenmeshAnimationControlFactory (iBase*);
+  csGenmeshAnimationControlFactory (iObjectRegistry* object_reg);
   /// Destructor.
   virtual ~csGenmeshAnimationControlFactory ();
-  /// Initialize.
-  bool Initialize (iObjectRegistry* object_reg);
 
   virtual csPtr<iGenMeshAnimationControl> CreateAnimationControl ();
 
   SCF_DECLARE_IBASE;
 
+  // --- For iGenMeshAnimationControlFactory -------------------------
+  virtual const char* Load (iDocumentNode* node);
+  virtual const char* Save (iDocumentNode* parent);
+};
+
+/**
+ * Genmesh animation control type.
+ */
+class csGenmeshAnimationControlType : public iGenMeshAnimationControlType
+{
+private:
+  iObjectRegistry* object_reg;
+
+public:
+  /// Constructor.
+  csGenmeshAnimationControlType (iBase*);
+  /// Destructor.
+  virtual ~csGenmeshAnimationControlType ();
+  /// Initialize.
+  bool Initialize (iObjectRegistry* object_reg);
+
+  virtual csPtr<iGenMeshAnimationControlFactory> CreateAnimationControlFactory
+  	();
+
+  SCF_DECLARE_IBASE;
+
   struct eiComponent : public iComponent
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csGenmeshAnimationControlFactory);
+    SCF_DECLARE_EMBEDDED_IBASE(csGenmeshAnimationControlType);
     virtual bool Initialize (iObjectRegistry* object_reg)
     {
       return scfParent->Initialize (object_reg);

@@ -21,16 +21,31 @@
 
 #include "csutil/scf.h"
 
-SCF_VERSION (iGenMeshAnimationControlSetup, 0, 0, 3);
+SCF_VERSION (iGenMeshAnimationControlState, 0, 0, 3);
 
 /**
  * This interface describes the API for setting up the animation
- * control as implemented by the 'gmeshanim' plugin. The objects
+ * control as implemented by the 'gmeshanim' plugin. The objects that
  * implement iGenMeshAnimationControl also implement this interface.
  */
-struct iGenMeshAnimationControlSetup : public iBase
+struct iGenMeshAnimationControlState : public iBase
 {
-  // TODO: Add more manual setup methods!
+  /**
+   * Execute the given animation script. This will be done in addition
+   * to the scripts that are already running. Returns false in case of
+   * failure (usually a script that doesn't exist).
+   */
+  virtual bool Execute (const char* scriptname) = 0;
+
+  /**
+   * Stop execution of all animation scripts.
+   */
+  virtual void Stop () = 0;
+
+  /**
+   * Stop execution of the given script.
+   */
+  virtual void Stop (const char* scriptname) = 0;
 };
 
 #endif // __CS_IMESH_GMESHANIM_H__

@@ -516,15 +516,15 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 		    child, "Plugin name missing for <animcontrol>!");
 	    return 0;
 	  }
-	  csRef<iGenMeshAnimationControlFactory> fact =
+	  csRef<iGenMeshAnimationControlType> type =
 	  	CS_QUERY_PLUGIN_CLASS (plugin_mgr, pluginname,
-		iGenMeshAnimationControlFactory);
-	  if (!fact)
+		iGenMeshAnimationControlType);
+	  if (!type)
 	  {
-	    fact = CS_LOAD_PLUGIN (plugin_mgr, pluginname,
-	    	iGenMeshAnimationControlFactory);
+	    type = CS_LOAD_PLUGIN (plugin_mgr, pluginname,
+	    	iGenMeshAnimationControlType);
 	  }
-	  if (!fact)
+	  if (!type)
 	  {
 	    synldr->ReportError (
 		"crystalspace.genmeshfactoryloader.parse",
@@ -532,18 +532,18 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 		pluginname);
 	    return 0;
     	  }
-	  csRef<iGenMeshAnimationControl> anim_ctrl = fact->
-	  	CreateAnimationControl ();
-	  const char* error = anim_ctrl->Load (child);
+	  csRef<iGenMeshAnimationControlFactory> anim_ctrl_fact = type->
+	  	CreateAnimationControlFactory ();
+	  const char* error = anim_ctrl_fact->Load (child);
 	  if (error)
 	  {
 	    synldr->ReportError (
 		"crystalspace.genmeshfactoryloader.parse",
-		child, "Error loading animation control: '%s'!",
+		child, "Error loading animation control factory: '%s'!",
 		error);
 	    return 0;
 	  }
-	  state->SetAnimationControl (anim_ctrl);
+	  state->SetAnimationControlFactory (anim_ctrl_fact);
 	}
 	break;
       default:

@@ -124,6 +124,7 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
   scfiShaderVariableAccessor = new eiShaderVariableAccessor (this);
 #endif
   csGenmeshMeshObject::factory = factory;
+  vc = factory->vc;
   logparent = 0;
   initialized = false;
   cur_cameranr = -1;
@@ -148,6 +149,11 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
 
   dynamic_ambient.Set (0,0,0);
   ambient_version = 0;
+
+  anim_ctrl_verts = false;
+  anim_ctrl_texels = false;
+  anim_ctrl_normals = false;
+  anim_ctrl_colors = false;
 
 #ifdef CS_USE_NEW_RENDERER
   num_sorted_mesh_triangles = 0;
@@ -184,6 +190,55 @@ csGenmeshMeshObject::~csGenmeshMeshObject ()
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiShadowReceiver);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
   SCF_DESTRUCT_IBASE ();
+}
+
+const csVector3* csGenmeshMeshObject::AnimControlGetVertices ()
+{
+  return anim_ctrl->UpdateVertices (vc->GetCurrentTicks (),
+  	factory->GetVertices (),
+	factory->GetVertexCount ());
+}
+
+const csVector2* csGenmeshMeshObject::AnimControlGetTexels ()
+{
+  return anim_ctrl->UpdateTexels (vc->GetCurrentTicks (),
+  	factory->GetTexels (),
+	factory->GetVertexCount ());
+}
+
+const csVector3* csGenmeshMeshObject::AnimControlGetNormals ()
+{
+  return anim_ctrl->UpdateNormals (vc->GetCurrentTicks (),
+  	factory->GetNormals (),
+	factory->GetVertexCount ());
+}
+
+const csColor* csGenmeshMeshObject::AnimControlGetColors (csColor* source)
+{
+  return anim_ctrl->UpdateColors (vc->GetCurrentTicks (),
+  	source,
+	factory->GetVertexCount ());
+}
+
+void csGenmeshMeshObject::SetAnimationControl (
+	iGenMeshAnimationControl* ac)
+{
+  anim_ctrl = ac;
+  if (ac)
+  {
+    anim_ctrl_verts = ac->AnimatesVertices ();
+    anim_ctrl_texels = ac->AnimatesTexels ();
+    anim_ctrl_normals = ac->AnimatesNormals ();
+    anim_ctrl_colors = ac->AnimatesColors ();
+  }
+  else
+  {
+    anim_ctrl_verts = false;
+    anim_ctrl_texels = false;
+    anim_ctrl_normals = false;
+    anim_ctrl_colors = false;
+  }
+  SetupShaderVariableContext ();
 }
 
 void csGenmeshMeshObject::ClearPseudoDynLights ()
@@ -508,6 +563,64 @@ bool csGenmeshMeshObject::SetMaterialWrapper (iMaterialWrapper* mat)
   return true;
 }
 
+void csGenmeshMeshObject::SetupShaderVariableContext ()
+{
+#ifdef CS_USE_NEW_RENDERER
+  if (svcontext == 0)
+    svcontext = new csShaderVariableContext ();
+  csShaderVariable* sv;
+  if (!factory->back2front)
+  {
+    sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::index_name);
+    sv->SetAccessor (factory->scfiShaderVariableAccessor);
+  }
+  
+  bool ac_verts = false;
+  bool ac_texels = false;
+  bool ac_normals = false;
+  if (anim_ctrl)
+  {
+    ac_verts = anim_ctrl->AnimatesVertices ();
+    ac_texels = anim_ctrl->AnimatesTexels ();
+    ac_normals = anim_ctrl->AnimatesNormals ();
+  }
+
+  sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::vertex_name);
+  if (ac_verts)
+    sv->SetAccessor (scfiShaderVariableAccessor);
+  else
+    sv->SetAccessor (factory->scfiShaderVariableAccessor);
+
+  sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::texel_name);
+  if (ac_texels)
+    sv->SetAccessor (scfiShaderVariableAccessor);
+  else
+    sv->SetAccessor (factory->scfiShaderVariableAccessor);
+
+  sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::normal_name);
+  if (ac_normals)
+    sv->SetAccessor (scfiShaderVariableAccessor);
+  else
+    sv->SetAccessor (factory->scfiShaderVariableAccessor);
+
+  sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::tangent_name);
+  sv->SetAccessor (factory->scfiShaderVariableAccessor);
+  sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::binormal_name);
+  sv->SetAccessor (factory->scfiShaderVariableAccessor);
+
+  /*sv = dynDomain->GetVariableAdd (csGenmeshMeshObjectFactory::color_name);
+  sv->SetAccessor (&factory->shaderVarAccessor);*/
+  sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::color_name);
+  sv->SetAccessor (scfiShaderVariableAccessor);
+
+  for (size_t i=0;i<factory->GetAnonymousNames().Length();i++)
+  {
+    sv = svcontext->GetVariableAdd (factory->GetAnonymousNames().Get(i));
+    sv->SetAccessor (factory->scfiShaderVariableAccessor);
+  }
+#endif
+}
+  
 void csGenmeshMeshObject::SetupObject ()
 {
   if (!initialized)
@@ -531,38 +644,7 @@ void csGenmeshMeshObject::SetupObject ()
     CS_ASSERT (mater != 0);
     material_needs_visit = mater->IsVisitRequired ();
 
-#ifdef CS_USE_NEW_RENDERER
-    if (svcontext == 0)
-      svcontext = new csShaderVariableContext ();
-
-    csShaderVariable* sv;
-    if (!factory->back2front)
-    {
-      sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::index_name);
-      sv->SetAccessor (factory->scfiShaderVariableAccessor);
-    }
-    sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::vertex_name);
-    sv->SetAccessor (factory->scfiShaderVariableAccessor);
-    sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::texel_name);
-    sv->SetAccessor (factory->scfiShaderVariableAccessor);
-    sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::normal_name);
-    sv->SetAccessor (factory->scfiShaderVariableAccessor);
-    sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::tangent_name);
-    sv->SetAccessor (factory->scfiShaderVariableAccessor);
-    sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::binormal_name);
-    sv->SetAccessor (factory->scfiShaderVariableAccessor);
-
-    /*sv = dynDomain->GetVariableAdd (csGenmeshMeshObjectFactory::color_name);
-    sv->SetAccessor (&factory->shaderVarAccessor);*/
-    sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::color_name);
-    sv->SetAccessor (scfiShaderVariableAccessor);
-
-    for(size_t i=0;i<factory->GetAnonymousNames().Length();i++)
-    {
-      sv = svcontext->GetVariableAdd (factory->GetAnonymousNames().Get(i));
-      sv->SetAccessor (factory->scfiShaderVariableAccessor);
-    }
-#endif // CS_USE_NEW_RENDERER
+    SetupShaderVariableContext ();
   }
 }
 
@@ -958,10 +1040,11 @@ bool csGenmeshMeshObject::Draw (iRenderView* rview, iMovable* movable,
   m.mixmode = MixMode;
   CS_ASSERT (!vbuf->IsLocked ());
   const csBox3& b = factory->GetObjectBoundingBox ();
+  const csColor* c = do_manual_colors ? factory->GetColors () : lit_mesh_colors,
   vbufmgr->LockBuffer (vbuf,
-    factory->GetVertices (),
-    factory->GetTexels (),
-    do_manual_colors ? factory->GetColors () : lit_mesh_colors,
+    anim_ctrl_verts ? AnimControlGetVertices () : factory->GetVertices (),
+    anim_ctrl_texels ? AnimControlGetTexels () : factory->GetTexels (),
+    anim_ctrl_colors ? AnimControlGetColors (c) : c,
     factory->GetVertexCount (), 0,
     b);
   rview->CalculateFogMesh (g3d->GetObjectToCamera (), m);
@@ -1205,6 +1288,52 @@ iObjectModel* csGenmeshMeshObject::GetObjectModel ()
 #ifdef CS_USE_NEW_RENDERER
 void csGenmeshMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
 {
+  if (anim_ctrl)
+  {
+    // If we have an animation control then we must get the vertex data
+    // here.
+    int num_mesh_vertices = factory->GetVertexCount ();
+    if (var->Name == csGenmeshMeshObjectFactory::vertex_name)
+    {
+      if (!vertex_buffer)
+        vertex_buffer = g3d->CreateRenderBuffer (
+            sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC,
+            CS_BUFCOMP_FLOAT, 3);
+      const csVector3* mesh_vertices = AnimControlGetVertices ();
+      if (!mesh_vertices) mesh_vertices = factory->GetVertices ();
+      vertex_buffer->CopyToBuffer (
+          mesh_vertices, sizeof(csVector3)*num_mesh_vertices);
+      var->SetValue (vertex_buffer);
+      return;
+    }
+    if (var->Name == csGenmeshMeshObjectFactory::texel_name)
+    {
+      if (!texel_buffer)
+        texel_buffer = g3d->CreateRenderBuffer (
+            sizeof (csVector2)*num_mesh_vertices, CS_BUF_STATIC,
+            CS_BUFCOMP_FLOAT, 2);
+      const csVector2* mesh_texels = AnimControlGetTexels ();
+      if (!mesh_texels) mesh_texels = factory->GetTexels ();
+      texel_buffer->CopyToBuffer (
+          mesh_texels, sizeof (csVector2)*num_mesh_vertices);
+      var->SetValue (texel_buffer);
+      return;
+    }
+    if (var->Name == csGenmeshMeshObjectFactory::normal_name)
+    {
+      if (!normal_buffer)
+        normal_buffer = g3d->CreateRenderBuffer (
+            sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC,
+            CS_BUFCOMP_FLOAT, 3);
+      const csVector3* mesh_normals = AnimControlGetNormals ();
+      if (!mesh_normals) mesh_normals = factory->GetNormals ();
+      normal_buffer->CopyToBuffer (
+          mesh_normals, sizeof (csVector3)*num_mesh_vertices);
+      var->SetValue (normal_buffer);
+      return;
+    }
+  }
+
   if (var->Name == csGenmeshMeshObjectFactory::color_name)
   {
     if (!do_manual_colors && !do_shadow_rec && factory->light_mgr)
@@ -1215,11 +1344,11 @@ void csGenmeshMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
     {
       UpdateLighting2 (lighting_movable);
     }
-    if (mesh_colors_dirty_flag)
+    if (mesh_colors_dirty_flag || anim_ctrl_colors)
     {
       if (!do_manual_colors)
       {
-        if (!color_buffer || 
+        if (!color_buffer ||
             (color_buffer->GetSize() != (sizeof (csColor) * 
 	    num_lit_mesh_colors)))
         {
@@ -1231,8 +1360,13 @@ void csGenmeshMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
               CS_BUFCOMP_FLOAT, 3);
         }
         mesh_colors_dirty_flag = false;
-        color_buffer->CopyToBuffer (
-	    do_lighting ? lit_mesh_colors : static_mesh_colors,
+        const csColor* mesh_colors = 0;
+	if (anim_ctrl_colors)
+	  mesh_colors = AnimControlGetColors (
+		do_lighting ? lit_mesh_colors : static_mesh_colors);
+        else
+	  mesh_colors = do_lighting ? lit_mesh_colors : static_mesh_colors;
+        color_buffer->CopyToBuffer (mesh_colors,
 	    sizeof (csColor) * num_lit_mesh_colors);
       }
       else
@@ -1248,7 +1382,12 @@ void csGenmeshMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
               CS_BUFCOMP_FLOAT, 3);
         }
         mesh_colors_dirty_flag = false;
-        color_buffer->CopyToBuffer (factory->GetColors(),
+        const csColor* mesh_colors = 0;
+	if (anim_ctrl_colors)
+	  mesh_colors = AnimControlGetColors (factory->GetColors ());
+	else
+          mesh_colors = factory->GetColors ();
+        color_buffer->CopyToBuffer (mesh_colors,
           sizeof (csColor) * factory->GetVertexCount());        
       }
     }
@@ -1442,14 +1581,10 @@ csGenmeshMeshObjectFactory::~csGenmeshMeshObjectFactory ()
   SCF_DESTRUCT_IBASE ();
 }
 
-void csGenmeshMeshObjectFactory::SetAnimationControl (
-	iGenMeshAnimationControl* ac)
+void csGenmeshMeshObjectFactory::SetAnimationControlFactory (
+	iGenMeshAnimationControlFactory* ac)
 {
-  anim_ctrl = ac;
-  anim_ctrl_vt_lasttick = vc->GetCurrentTicks ()-1;
-  anim_ctrl_tex_lasttick = vc->GetCurrentTicks ()-1;
-  anim_ctrl_nor_lasttick = vc->GetCurrentTicks ()-1;
-  anim_ctrl_col_lasttick = vc->GetCurrentTicks ()-1;
+  anim_ctrl_fact = ac;
 }
 
 void csGenmeshMeshObjectFactory::SetBack2Front (bool b2f)
@@ -1642,61 +1777,12 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
 }
 */
 
-void csGenmeshMeshObjectFactory::AnimControlUpdateVertices ()
-{
-  csTicks c = vc->GetCurrentTicks ();
-  if (c != anim_ctrl_vt_lasttick)
-  {
-    anim_ctrl_vt_lasttick = c;
-    bool updated = anim_ctrl->UpdateVertices (c, mesh_vertices,
-      	  num_mesh_vertices, object_bbox);
-    if (updated) mesh_vertices_dirty_flag = true;
-  }
-}
-
-void csGenmeshMeshObjectFactory::AnimControlUpdateTexels ()
-{
-  csTicks c = vc->GetCurrentTicks ();
-  if (c != anim_ctrl_tex_lasttick)
-  {
-    anim_ctrl_tex_lasttick = c;
-    bool updated = anim_ctrl->UpdateTexels (c, mesh_texels,
-      	  num_mesh_vertices);
-    if (updated) mesh_texels_dirty_flag = true;
-  }
-}
-
-void csGenmeshMeshObjectFactory::AnimControlUpdateNormals ()
-{
-  csTicks c = vc->GetCurrentTicks ();
-  if (c != anim_ctrl_nor_lasttick)
-  {
-    anim_ctrl_nor_lasttick = c;
-    bool updated = anim_ctrl->UpdateNormals (c, mesh_normals,
-      	  num_mesh_vertices);
-    if (updated) mesh_normals_dirty_flag = true;
-  }
-}
-
-void csGenmeshMeshObjectFactory::AnimControlUpdateColors ()
-{
-  csTicks c = vc->GetCurrentTicks ();
-  if (c != anim_ctrl_col_lasttick)
-  {
-    anim_ctrl_col_lasttick = c;
-    bool updated = anim_ctrl->UpdateColors (c, mesh_colors,
-      	  num_mesh_vertices);
-    if (updated) mesh_colors_dirty_flag = true;
-  }
-}
-
 #ifdef CS_USE_NEW_RENDERER
 void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (
   csShaderVariable* var)
 {
   if (var->Name == vertex_name)
   {
-    if (anim_ctrl) AnimControlUpdateVertices ();
     if (mesh_vertices_dirty_flag)
     {
       if (!vertex_buffer)
@@ -1712,7 +1798,6 @@ void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (
   }
   if (var->Name == texel_name)
   {
-    if (anim_ctrl) AnimControlUpdateTexels ();
     if (mesh_texels_dirty_flag)
     {
       if (!texel_buffer)
@@ -1728,7 +1813,6 @@ void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (
   }
   if (var->Name == normal_name)
   {
-    if (anim_ctrl) AnimControlUpdateNormals ();
     if (mesh_normals_dirty_flag)
     {
       if (!normal_buffer)
@@ -2383,6 +2467,13 @@ csPtr<iMeshObject> csGenmeshMeshObjectFactory::NewInstance ()
   cm->SetManualColors (default_manualcolors);
   cm->SetShadowCasting (default_shadowcasting);
   cm->SetShadowReceiving (default_shadowreceiving);
+
+  if (anim_ctrl_fact)
+  {
+    csRef<iGenMeshAnimationControl> anim_ctrl = anim_ctrl_fact
+    	->CreateAnimationControl ();
+    cm->SetAnimationControl (anim_ctrl);
+  }
 
   csRef<iMeshObject> im (SCF_QUERY_INTERFACE (cm, iMeshObject));
   cm->DecRef ();

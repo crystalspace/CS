@@ -30,28 +30,17 @@ struct csTriangle;
 
 struct iMaterialWrapper;
 struct iGenMeshAnimationControl;
+struct iGenMeshAnimationControlFactory;
 struct iDocumentNode;
 
-SCF_VERSION (iGeneralMeshState, 0, 0, 3);
+SCF_VERSION (iGeneralMeshCommonState, 0, 0, 3);
 
 /**
- * This interface describes the API for the general mesh object.
- * <p>
- * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>Genmesh mesh object plugin (crystalspace.mesh.object.genmesh)
- *   <li>iMeshObjectFactory::NewInstance()
- *   </ul>
- * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>SCF_QUERY_INTERFACE() on iMeshWrapper::GetMeshObject()
- *   </ul>
- * Main users of this interface:
- *   <ul>
- *   <li>Genmesh Loader plugin (crystalspace.mesh.loader.genmesh)
- *   </ul>
+ * The common interface between genmesh meshes and factories.
+ * This interface is usually not used alone. Generally one
+ * uses iGeneralMeshState or iGeneralFactoryState.
  */
-struct iGeneralMeshState : public iBase
+struct iGeneralMeshCommonState : public iBase
 {
   /// Set material of mesh.
   virtual void SetMaterialWrapper (iMaterialWrapper* material) = 0;
@@ -98,6 +87,39 @@ struct iGeneralMeshState : public iBase
   virtual bool IsShadowReceiving () const = 0;
 };
 
+SCF_VERSION (iGeneralMeshState, 0, 0, 3);
+
+/**
+ * This interface describes the API for the general mesh object.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Genmesh mesh object plugin (crystalspace.mesh.object.genmesh)
+ *   <li>iMeshObjectFactory::NewInstance()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>SCF_QUERY_INTERFACE() on iMeshWrapper::GetMeshObject()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>Genmesh Loader plugin (crystalspace.mesh.loader.genmesh)
+ *   </ul>
+ */
+struct iGeneralMeshState : public iGeneralMeshCommonState
+{
+  /**
+   * Set the animation control to use for this mesh object.
+   * See iGenMeshAnimationControl for more information.
+   */
+  virtual void SetAnimationControl (iGenMeshAnimationControl* anim_ctrl) = 0;
+
+  /**
+   * Get the current animation control for this object.
+   */
+  virtual iGenMeshAnimationControl* GetAnimationControl () const = 0;
+};
+
 SCF_VERSION (iGeneralFactoryState, 0, 2, 0);
 
 /**
@@ -125,7 +147,7 @@ SCF_VERSION (iGeneralFactoryState, 0, 2, 0);
  *   <li>Genmesh Factory Loader plugin (crystalspace.mesh.loader.factory.genmesh)
  *   </ul>
  */
-struct iGeneralFactoryState : public iGeneralMeshState
+struct iGeneralFactoryState : public iGeneralMeshCommonState
 {
   /// Set the number of vertices to use for this mesh.
   virtual void SetVertexCount (int n) = 0;
@@ -208,15 +230,17 @@ struct iGeneralFactoryState : public iGeneralMeshState
   virtual bool IsBack2Front () const = 0;
 
   /**
-   * Set the animation control to use for this factory.
-   * See iGenMeshAnimationControl for more information.
+   * Set the animation control factory to use for this factory.
+   * See iGenMeshAnimationControlFactory for more information.
    */
-  virtual void SetAnimationControl (iGenMeshAnimationControl* anim_ctrl) = 0;
+  virtual void SetAnimationControlFactory (
+  	iGenMeshAnimationControlFactory* anim_ctrl) = 0;
 
   /**
-   * Get the current animation control for this factory.
+   * Get the current animation control factory for this factory.
    */
-  virtual iGenMeshAnimationControl* GetAnimationControl () const = 0;
+  virtual iGenMeshAnimationControlFactory* GetAnimationControlFactory ()
+  	const = 0;
 
   /**
    * @@@NR@@@
@@ -251,41 +275,88 @@ SCF_VERSION (iGenMeshAnimationControl, 0, 0, 1);
  * animating vertex that it is prefered that the bounding box of the
  * object doesn't change too dramatically because this animation is
  * called AFTER visibility culling!
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iGenMeshAnimationControlFactory::CreateAnimationControl()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iGeneralMeshState::GetAnimationControl()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>Genmesh plugin (crystalspace.mesh.object.genmesh)
+ *   </ul>
  */
 struct iGenMeshAnimationControl : public iBase
 {
-  /**
-   * Update the vertex data. Returns true if the vertex data
-   * was actually modified. The bounding box will be updated too
-   * in that case. This function will be called only once for the
-   * same ticks.
-   */
-  virtual bool UpdateVertices (csTicks current, csVector3* verts,
-  	int num_verts, csBox3& bbox) = 0;
+  /// Returns true if this control animates vertices.
+  virtual bool AnimatesVertices () const = 0;
+  /// Returns true if this control animates texels.
+  virtual bool AnimatesTexels () const = 0;
+  /// Returns true if this control animates normals.
+  virtual bool AnimatesNormals () const = 0;
+  /// Returns true if this control animates colors.
+  virtual bool AnimatesColors () const = 0;
 
   /**
-   * Update the texel data. Returns true if the texel data
-   * was actually modified. This function will be called only once for the
-   * same ticks.
+   * Given the factory vertex data, return the animated data.
+   * If this control doesn't animate vertices then it will return the
+   * source array unchanged.
    */
-  virtual bool UpdateTexels (csTicks current, csVector2* texels,
-  	int num_texels) = 0;
+  virtual const csVector3* UpdateVertices (csTicks current,
+  	const csVector3* verts, int num_verts) = 0;
 
   /**
-   * Update the normal data. Returns true if the normal data
-   * was actually modified. This function will be called only once for the
-   * same ticks.
+   * Given the factory texel data, return the animated data.
+   * If this control doesn't animate texels then it will return the
+   * source array unchanged.
    */
-  virtual bool UpdateNormals (csTicks current, csVector3* normals,
-  	int num_normals) = 0;
+  virtual const csVector2* UpdateTexels (csTicks current,
+  	const csVector2* texels, int num_texels) = 0;
 
   /**
-   * Update the color data. Returns true if the color data
-   * was actually modified. This function will be called only once for the
-   * same ticks.
+   * Given the factory normal data, return the animated data.
+   * If this control doesn't animate normals then it will return the
+   * source array unchanged.
    */
-  virtual bool UpdateColors (csTicks current, csColor* colors,
-  	int num_colors) = 0;
+  virtual const csVector3* UpdateNormals (csTicks current,
+  	const csVector3* normals, int num_normals) = 0;
+
+  /**
+   * Given the factory color data, return the animated data.
+   * If this control doesn't animate colors then it will return the
+   * source array unchanged.
+   */
+  virtual const csColor* UpdateColors (csTicks current,
+  	const csColor* colors, int num_colors) = 0;
+};
+
+SCF_VERSION (iGenMeshAnimationControlFactory, 0, 0, 1);
+
+/**
+ * This class is a factory for creating animation controls.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iGenMeshAnimationControlType::CreateAnimationControlFactory()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iGeneralFactoryState::GetAnimationControlFactory()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>Genmesh plugin (crystalspace.mesh.object.genmesh)
+ *   </ul>
+ */
+struct iGenMeshAnimationControlFactory : public iBase
+{
+  /**
+   * Create a new animation control.
+   */
+  virtual csPtr<iGenMeshAnimationControl> CreateAnimationControl () = 0;
 
   /**
    * Setup this animation control from a document node.
@@ -300,17 +371,33 @@ struct iGenMeshAnimationControl : public iBase
   virtual const char* Save (iDocumentNode* parent) = 0;
 };
 
-SCF_VERSION (iGenMeshAnimationControlFactory, 0, 0, 1);
+SCF_VERSION (iGenMeshAnimationControlType, 0, 0, 1);
 
 /**
- * This class is a factory for creating animation controls.
+ * This class is the animation control type.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Genmesh animation control plugin (crystalspace.mesh.anim.genmesh)
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>CS_QUERY_PLUGIN_CLASS()
+ *   <li>CS_LOAD_PLUGIN()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>Genmesh plugin (crystalspace.mesh.object.genmesh)
+ *   </ul>
  */
-struct iGenMeshAnimationControlFactory : public iBase
+struct iGenMeshAnimationControlType : public iBase
 {
   /**
-   * Create a new animation control.
+   * Create a new animation control factory.
    */
-  virtual csPtr<iGenMeshAnimationControl> CreateAnimationControl () = 0;
+  virtual csPtr<iGenMeshAnimationControlFactory> CreateAnimationControlFactory
+  	() = 0;
+
 };
 
 #endif // __CS_IMESH_GENMESH_H__
