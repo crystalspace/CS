@@ -1,4 +1,4 @@
-# AM_PATH_CS
+# AC_PATH_CS
 #
 # Checks for Crystal Space paths and libs,
 # This scripts tries first if it can find a cs-config in the actual path
@@ -12,7 +12,7 @@
 # Matze Braun <MatzeBraun@gmx.de>
 # Patrick McFarland (Diablo-D3) <unknown@panax.com>
 
-dnl AM_PATH_CS([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND [, LIBS]]]])
+dnl AC_PATH_CS([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND [, LIBS]]]])
 dnl Test for CS, and define CS_VERSION, CS_LONGVERSION, CS_CFLAGS, 
 dnl CS_CXXFLAGS, and CS_LIBS
 dnl
