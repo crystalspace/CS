@@ -19,6 +19,7 @@
 
 #include "video/canvas/common/graph2d.h"
 #include <GL/gl.h>
+#include "ifntrndr.h"
 
 /**
   This class contains
@@ -47,21 +48,22 @@ class csGraphics2DOpenGLFontServer
      */
     GLuint *Font_Offsets;
 
+    iFontRender *pFontRenderer;
     /// Build a font from font data
-    void BuildFont(FontDef &newfont);
+    void BuildFont(int iFont);
 
   public:
     /** The font server starts with 0 fonts in it, but you can pass
      * one in immediately to the constructor and start with one font.
      * Additional fonts must be added via AddFont()
      */
-    csGraphics2DOpenGLFontServer(FontDef *startfont = NULL);
+    csGraphics2DOpenGLFontServer(int nFonts, iFontRender *pFR);
 
     /** Add more fonts to the font server by passing FontDef's into this
      * method.  The font bitmap data will be encoded into an openGL-friendly
      * form
      */
-    void AddFont(FontDef &addme);
+    void AddFont(int fontId);
 
     /// Check how many fonts are stored in here
     int CountFonts() const { return Font_Count; }

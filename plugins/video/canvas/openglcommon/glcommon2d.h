@@ -21,7 +21,7 @@
 
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
-#include "video/canvas/openglcommon/gl2d_font.h"
+#include "gl2d_font.h"
 
 class OpenGLTextureCache;
 

@@ -22,24 +22,7 @@
 
 #include "csutil/scf.h"
 #include "igraph2d.h"
-
-/// This structure is used to define a external list of bitmap fonts
-struct FontDef
-{
-  /// Width of font (if IndividualWidth == NULL)
-  int Width;
-  /// Height of font
-  int Height;
-  /// Bytes per character
-  int BytesPerChar;
-  /// An array of character widths or NULL
-  unsigned char *IndividualWidth;
-  /// A pointer to font bitmap
-  unsigned char *FontBitmap;
-};
-
-/// The array containing the definitions of all fonts
-extern FontDef FontList[];
+#include "ifntrndr.h"
 
 ///
 #define CsPrintf System->Printf
@@ -69,6 +52,9 @@ public:
   /// The system driver.
   iSystem* System;
 
+  /// The font renderer
+  iFontRender *FontRenderer;
+  
   /// Current font number
   int Font;
   /// The width, height and depth of visual
@@ -219,6 +205,9 @@ public:
   /// Sets the type of the font.
   virtual void SetFontID (int FontID)
   { Font = FontID; }
+  /// Gets the font renderer.
+  virtual iFontRender *GetFontRender ()
+  { return FontRenderer; }
 
   /// Return the width of the framebuffer.
   virtual int GetWidth ()

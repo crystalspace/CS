@@ -22,17 +22,13 @@
 #include "sysdef.h"
 #include "video/canvas/common/graph2d.h"
 #include "isystem.h"
-#include "video/canvas/openglmac/oglFont.h"
+#include "oglFont.h"
 
 /** The constructor initializes it member variables and constructs the
  * first font, if one was passed into the constructor */
-csGraphics2DOpenGLFontServer::csGraphics2DOpenGLFontServer(FontDef *startfont)
-    : Font_Count(0), Font_Offsets(NULL)
+csGraphics2DOpenGLFontServer::csGraphics2DOpenGLFontServer(int /*nFonts*/, iFontRender *pFR)
+    : Font_Count(0), Font_Offsets(NULL), pFontRenderer(pFR)
 {
-
-    // intialize a first font, if we have one
-    if (startfont != NULL)
-	BuildFont(*startfont);
 
 }
 
@@ -42,14 +38,16 @@ csGraphics2DOpenGLFontServer::~csGraphics2DOpenGLFontServer()
     // (to be added)
 }
 
-void csGraphics2DOpenGLFontServer::BuildFont(FontDef &newfont)
+void csGraphics2DOpenGLFontServer::BuildFont(int iFont)
 {
     // we assume the FontDef is legal...
 
     // OK, update our member variables with new font information
 
     // need another spot in the array of offsets
-    if (Font_Offsets != NULL)
+    int height = pFontRenderer->GetMaximumHeight (iFont);
+    if (height==-1) return;
+    if (Font_Offsets!=NULL)
     {
     	GLuint *newoffsets = new GLuint[Font_Count+1];
 	for (int index=0; index < Font_Count; index++)
@@ -63,48 +61,41 @@ void csGraphics2DOpenGLFontServer::BuildFont(FontDef &newfont)
 
     // get a bank of list indices from GL, and stored in our array
     glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-    glGenLists(5);
-    GLuint newfontoffset = glGenLists(128);
+//    glGenLists(5);
+    GLuint newfontoffset = glGenLists(256);
 
     // since openGL's raster data is reversed from CS, we must
     // flip every character vertically.
     // make a temporary buffer to hold each character as we send it to
     // the openGL driver
 
-    unsigned char *flipbuffer = new unsigned char[newfont.BytesPerChar];
-    unsigned char *basebuffer = NULL;
-    int wordsize = (newfont.Width+7)/8;
-    int WordsPerChar = newfont.BytesPerChar/wordsize;
 
     // new shove all the raster data at openGL...
-    int charwidth = newfont.Width;
-    for (int characterindex=0; characterindex<128; characterindex++)
+    unsigned char *flipbuffer = NULL;
+    for (int characterindex=0; characterindex<256; characterindex++)
     {
-    	glNewList(newfontoffset+characterindex,GL_COMPILE);
+      int charwidth = pFontRenderer->GetCharWidth (iFont, characterindex);
+      int BytesPerRow = (charwidth+7)/8;
+      int Rows = pFontRenderer->GetCharHeight (iFont, characterindex);
+      flipbuffer = (unsigned char*)realloc (flipbuffer, BytesPerRow*Rows);
+      unsigned char *basebuffer = pFontRenderer->GetCharBitmap (iFont, characterindex);
+      
+      glNewList(newfontoffset+characterindex,GL_COMPILE);
 
-	// if the FontDef member IndividualWidth is non-NULL, we
-	// need to extract the character width of each character
-	// separately from that member, otherwise the width is
-	// the same for all characters
+      // copy into the flip buffer -- see flipbuffer declaration for
+      // the reason behind this code!
 
-	if (newfont.IndividualWidth != NULL)
-	    charwidth = newfont.IndividualWidth[characterindex];
-
-	// copy into the flip buffer -- see flipbuffer declaration for
-	// the reason behind this code!
-
-	basebuffer = newfont.FontBitmap + characterindex*newfont.BytesPerChar;
-	for (int wordindex=0; wordindex < WordsPerChar; wordindex++)
-	{
-	    for (int charindex=0; charindex < wordsize; charindex++)
-	    	flipbuffer[wordindex*wordsize+charindex] =
-			basebuffer[(WordsPerChar-wordindex-1)*wordsize+charindex];
-	}
-
+      for (int row=0; row < Rows; row++)
+      {
+        for (int col=0; col < BytesPerRow; col++)
+          flipbuffer[row*BytesPerRow+col] = 255;
+//			basebuffer[(Rows-row-1)*BytesPerRow+col];
+      }
+//printf("%d %d,%d\n", newfontoffset, charwidth, Rows);
 	// we assume that stepping to the next character involves moving
 	// 0 pixels in the y direction and moving 'charwidth' pixels to the
 	// right
-	glBitmap(charwidth, newfont.Height,  /* bitmap size */
+	glBitmap(charwidth, Rows,  /* bitmap size */
 		 0.0 , 0.0 , 			     /* offset from bitmap origin */
 		 charwidth, 0, 		     /* shift raster position by this */
 		 flipbuffer
@@ -117,12 +108,12 @@ void csGraphics2DOpenGLFontServer::BuildFont(FontDef &newfont)
     // need to know there is another font stored here
     Font_Count++;
 
-    delete[] flipbuffer;
+    free (flipbuffer);
 }
 
-void csGraphics2DOpenGLFontServer::AddFont(FontDef &addme)
+void csGraphics2DOpenGLFontServer::AddFont(int iFont)
 {
-    BuildFont(addme);
+    BuildFont(iFont);
 }
 
 /** Print some characters (finally!)  This is basically a wrapper
@@ -159,5 +150,6 @@ void csGraphics2DOpenGLFontServer::WriteCharacter(char writeme, int fontnumber)
     //printf("font %d, char %d, list %d",
     //		fontnumber, writeme, Font_Offsets[fontnumber] + writeme);
  
+printf("%d\n", Font_Offsets[fontnumber] + writeme);
     glCallList(Font_Offsets[fontnumber] + writeme);
 }

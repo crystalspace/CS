@@ -36,6 +36,7 @@
 csGraphics2D::csGraphics2D ()
 {
   Memory = NULL;
+  FontRenderer = NULL;
 }
 
 bool csGraphics2D::Initialize (iSystem* pSystem)
@@ -44,6 +45,10 @@ bool csGraphics2D::Initialize (iSystem* pSystem)
   // Get the system parameters
   System->GetSettings (Width, Height, Depth, FullScreen);
 
+  // get the fontrenderer
+  const char *p = pSystem->ConfigGetStr ("FontRender", CS_FUNCID_FONT, "crystalspace.font.render.default");
+  FontRenderer = LOAD_PLUGIN (pSystem, p, CS_FUNCID_FONT, iFontRender);
+//  FontRenderer = QUERY_PLUGIN_ID (pSystem, CS_FUNCID_FONT, iFontRender);
   Font = 0;
   pfmt.PalEntries = 256;
   pfmt.PixelBytes = 1;
@@ -65,6 +70,7 @@ bool csGraphics2D::Initialize (iSystem* pSystem)
 
 csGraphics2D::~csGraphics2D ()
 {
+  if (FontRenderer) FontRenderer->DecRef ();
   Close ();
 }
 
@@ -285,10 +291,7 @@ void csGraphics2D::Write (int x, int y, int fg, int bg, const char *text)
   for (; *text; ++text)
   {
     WriteChar(x, y, fg, bg, *text);
-    if (FontList[Font].IndividualWidth)
-      x += FontList[Font].IndividualWidth[(unsigned char)*text];
-    else
-      x += FontList[Font].Width;
+    x += FontRenderer->GetCharWidth ( Font, (unsigned char)*text );
   }
 }
 
@@ -486,19 +489,14 @@ bool csGraphics2D::PerformExtension (const char* args)
 
 int csGraphics2D::GetTextWidth (int Font, const char *text)
 {
-  if (FontList [Font].IndividualWidth)
-  {
-    int w = 0;
-    for (int i = strlen (text); i > 0; i--, text++)
-      w += FontList [Font].IndividualWidth[(unsigned char)*text];
-    return w;
-  } else
-    return (strlen (text) * FontList [Font].Width);
+  int w=0, h=0;
+  FontRenderer->GetTextDimensions (Font, text, w, h);
+  return w;
 }
 
 int csGraphics2D::GetTextHeight (int Font)
 {
-  return FontList [Font].Height;
+  return FontRenderer->GetMaximumHeight (Font);
 }
 
 void csGraphics2D::GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB)

@@ -76,9 +76,10 @@ bool csGraphics2DGLCommon::Open (const char *Title)
   // load font 'server'
   if (LocalFontServer == NULL)
   {
-    LocalFontServer = new csGraphics2DOpenGLFontServer (8);
-    for (int fontindex = 0; fontindex < 8; fontindex++)
-      LocalFontServer->AddFont (FontList [fontindex]);
+    int nFonts = FontRenderer->GetFontCount ();
+    LocalFontServer = new csGraphics2DOpenGLFontServer (nFonts, FontRenderer);
+    for (int fontindex = 0; fontindex < nFonts; fontindex++)
+      LocalFontServer->AddFont (fontindex);
   }
 
   Clear (0);
@@ -198,9 +199,9 @@ void csGraphics2DGLCommon::WriteChar (int x, int y, int fg, int /*bg*/, char c)
   // exact x,y location of each letter.  We manipulate the transform
   // directly, so any shift in WriteCharacter() is effectively ignored
   // due to the Push/PopMatrix calls
-
+//printf("%c x=%d\n", c, x);
   glPushMatrix();
-  glTranslatef (x, Height - y - FontList [Font].Height,0.0);
+  glTranslatef (x, Height - y - FontRenderer->GetCharHeight (Font, 'T'),0.0);
 
   LocalFontServer->WriteCharacter(c, Font);
   glPopMatrix ();

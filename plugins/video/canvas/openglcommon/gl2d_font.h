@@ -20,7 +20,7 @@
 #define __GL2D_FONT_H__
 
 #include <GL/gl.h>
-#include "video/canvas/common/graph2d.h"
+#include "ifntrndr.h"
 
 /**
   This class contains
@@ -40,6 +40,25 @@
   */
 class csGraphics2DOpenGLFontServer
 {
+  struct GLGlyph 
+  {
+    GLuint hTexture; // the texture where we find this character in
+    float x, y, width, texwidth; // location and size of the character
+  };
+  
+  class GLFontInfo
+  {
+    public:
+    
+      GLFontInfo (){}
+      ~GLFontInfo ();
+
+      void DrawCharacter (unsigned char c);
+           
+      GLGlyph glyphs[256];
+      float height, texheight;
+  };
+  
   /// number of fonts currently stored here
   int mFont_Count, mMax_Font_Count;
 
@@ -47,16 +66,15 @@ class csGraphics2DOpenGLFontServer
    * each font needs some extra information connected to how it is stored
    * internally
    */
-  class GLFontInfo;
-
   GLFontInfo **mFont_Information_Array;
-
+  iFontRender *pFontRender;
+  
 public:
   /**
    * The maximal number of fonts that can be registered.
    * Additional fonts must be added via AddFont()
    */
-  csGraphics2DOpenGLFontServer (int MaxFonts);
+  csGraphics2DOpenGLFontServer (int MaxFonts, iFontRender *pFR);
 
   /// Destructor cleans up all the OpenGL mess we left around
   ~csGraphics2DOpenGLFontServer ();
@@ -66,7 +84,7 @@ public:
    * method.  The font bitmap data will be encoded into an openGL-friendly
    * form
    */
-  void AddFont (FontDef &addme);
+  void AddFont (int fontId);
 
   /// Check how many fonts are stored in here
   int CountFonts () const { return mFont_Count; }

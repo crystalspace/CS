@@ -7,7 +7,6 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/video/canvas/common
 
 SRC.COMMON.DRV2D=plugins/video/canvas/common/graph2d.cpp \
-  plugins/video/canvas/common/fonts.cpp \
   plugins/video/canvas/common/scrshot.cpp
 
 SRC.COMMON.DRV2D.OPENGL=plugins/video/canvas/openglcommon/*.cpp

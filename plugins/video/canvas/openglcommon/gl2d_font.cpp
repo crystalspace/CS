@@ -27,140 +27,144 @@
 
 #include "video/canvas/openglcommon/gl2d_font.h"
 
-/// we need a definition of GLFontInfo, declared in the header file
-class csGraphics2DOpenGLFontServer::GLFontInfo
+csGraphics2DOpenGLFontServer::GLFontInfo::~GLFontInfo ()
 {
-public:
-  /**
-   * Constructor.  Pass in a CS font, which will be analyzed and
-   * used to build a texture holding all the characters.
-   */
-  GLFontInfo (FontDef &newfont);
+  GLuint hTex= glyphs[0].hTexture + 1;
+  for(int i=0; i < 256; i++)
+  {
+    if (hTex != glyphs[i].hTexture)
+    {
+      hTex = glyphs[i].hTexture;
+      glDeleteTextures (1, &glyphs[i].hTexture); 
+    }
+  }
+}
 
-  /**
-   * destructor.
-   * Destroys the texture that holds the font characters.
-   */
-  ~GLFontInfo ()
-  { glDeleteTextures (1, &mTexture_Handle); }
-
-  /**
-   * Call this to draw a character. The character is drawn on the
-   * screen using the current color, and a transform is applied
-   * to the modelview matrix to shift to the right. This is such
-   * that the next call to DrawCharacter will draw a character in the
-   * next cell over; that way you can make repeated calls without having
-   * to manually position each character
-   */
-  void DrawCharacter (unsigned char characterindex);
-
-private:
-  // handle referring to the texture used for this font
-  GLuint mTexture_Handle;
-
-  // size of characters in the texture, in texture coordinates
-  float mTexture_CharacterWidth;
-  float mTexture_CharacterHeight;
-
-  // size of characters in screen pixels
-  unsigned int mCharacterWidth;
-  unsigned int mCharacterHeight;
-
-  // describes layout of the characters in the texture
-  unsigned int mTexture_Characters_Per_Row;
-};
-
-csGraphics2DOpenGLFontServer::GLFontInfo::GLFontInfo (FontDef &newfont)
+void csGraphics2DOpenGLFontServer::AddFont (int fontId)
 {
-  // allocate handle for a new texture to hold this font
-  glGenTextures (1,&mTexture_Handle);
+  if (mFont_Count >= mMax_Font_Count)
+    return;
+  // we assume the FontDef is legal...
+  GLFontInfo *font = new GLFontInfo;
+  mFont_Information_Array [mFont_Count++] = font;
 
-  // set up the texture info
-  glBindTexture (GL_TEXTURE_2D, mTexture_Handle);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  unsigned char c=0;
+  float x, y;
+  int width, height;
+  int rows=1;
+  
+  x=y=256.0;
+  height = pFontRender->GetCharHeight (fontId, 'T'); // just a dummy parameter
 
-  // Construct a buffer of data for OpenGL. We must do some transformation
-  // of the Crystal Space data:
-  // -use unsigned bytes instead of bits (GL_BITMAP not supported? GJH)
-  // -width and height must be a power of 2
-  // -characters are laid out in a grid format, going across and
-  //  then down
-
-  // first figure out how many characters to cram into a row, and
-  // thus how many rows.  There are 256 pixels in a row, and
-  // 256 characters in the font as well.
+  font->height = height;
 
   const int basetexturewidth = 256;
-  const int fontcharactercount = 128;
-
-  mCharacterHeight = newfont.Height;
-  mCharacterWidth = FindNearestPowerOf2 (newfont.Width);
-  mTexture_Characters_Per_Row = basetexturewidth / mCharacterWidth;
-  int fontcharacterrows = fontcharactercount / mTexture_Characters_Per_Row;
-
-  int basetextureheight =
-    FindNearestPowerOf2 (newfont.Height * fontcharacterrows);
-
-  // now figure out the size of a single character in the texture,
-  // in texture coordinate space
-  mTexture_CharacterWidth = mCharacterWidth / (float)basetexturewidth;
-  mTexture_CharacterHeight = mCharacterHeight / (float)basetextureheight;
-
-  // build bitmap data in a format proper for OpenGL
-  // each pixel transforms into 1 byte alpha
-  unsigned int basepixelsize = 1;
-  unsigned char *fontbitmapdata;
-  CHK (fontbitmapdata =
-    new unsigned char [basetexturewidth * basetextureheight * basepixelsize]);
-
-  // transform each CS character onto a small rectangular section
-  // of the fontbitmap we have allocated for this font
-  for (int curcharacter = 0; curcharacter<128; curcharacter++)
+  // figure out how many charcter rows we need
+  width=0;
+  while (1)
   {
-    // locations in fontbitmap at which the current character will
-    // be stored
-    unsigned int curcharx = mCharacterWidth *
-      (curcharacter % mTexture_Characters_Per_Row);
-    unsigned int curchary = mCharacterHeight *
-      (curcharacter / mTexture_Characters_Per_Row);
-    unsigned char *characterbitmapbase =
-      fontbitmapdata + (curcharx + curchary * basetexturewidth * basepixelsize);
+    width+= pFontRender->GetCharWidth (fontId, c);
+    if (width>256)
+    {
+      rows++;
+      width= pFontRender->GetCharWidth (fontId, c);
+    }
+    if (c==255) break;
+    else c++;
+  }
+  
+  int basetextureheight = FindNearestPowerOf2 (MIN(height * rows, 256));
+  font->texheight = ((float)height) / basetextureheight;
+
+  int nTextures = 1 + rows/(256/height);
+  GLuint *nTexNames = new GLuint[ nTextures ];
+  int nCurrentTex=0;
+  unsigned int basepixelsize = 1;
+  unsigned char *fontbitmapdata, *characterbitmapbase;
+  bool GlyphBitsNotByteAligned;
+  fontbitmapdata = new unsigned char [basetexturewidth * basetextureheight * basepixelsize];
+  memset (fontbitmapdata, 0, basetexturewidth * basetextureheight * basepixelsize );
+  glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
+  // make new textur handles
+  glGenTextures (nTextures,nTexNames);
+
+  c=0;
+  while (1)
+  {
+    width = pFontRender->GetCharWidth (fontId, c);
+    GlyphBitsNotByteAligned = width&7;
+
+    // calculate the start of this character
+    if (x+width > 256)
+    {
+      x = 0;
+      y+=height;
+      if (y+height > 256)
+      {
+        y=0;
+	// if this is not the first handle we create, we hand over the data to opengl
+	if (c)
+	{
+          glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */, GL_ALPHA /* bytes-per-pixel */,
+                        basetexturewidth, basetextureheight, 0 /*border*/,
+                        GL_ALPHA, GL_UNSIGNED_BYTE, fontbitmapdata);
+	  nCurrentTex++;
+        }
+        // set up the texture info
+        glBindTexture (GL_TEXTURE_2D, nTexNames[nCurrentTex]);
+        glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+        glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+      }
+    }
+
+    characterbitmapbase = fontbitmapdata + ((int)y)*basetexturewidth*basepixelsize 
+                          + ((int)x)*basepixelsize;
+
+    // Construct a buffer of data for OpenGL. We must do some transformation
+    // of the Crystal Space data:
+    // -use unsigned bytes instead of bits (GL_BITMAP not supported? GJH)
+    // -width and height must be a power of 2
+    // -characters are laid out in a grid format, going across and
+    //  then down
 
     // points to location of the font source data
-    unsigned char *fontsourcebits =
-      newfont.FontBitmap + curcharacter * newfont.BytesPerChar;
+    unsigned char *fontsourcebits =  pFontRender->GetCharBitmap (fontId, c);
 
     // grab bits from the source, and stuff them into the font bitmap
     // one at a time
-    for (unsigned int pixely = 0; pixely < mCharacterHeight; pixely++)
+    unsigned char currentsourcebyte = *fontsourcebits;
+    for (int pixely = 0; pixely < height; pixely++)
     {
-      // grab a whole byte from the source; we will strip off the
-      // bits one at a time
-      unsigned char currentsourcebyte = *fontsourcebits++;
-      unsigned char destbytesetting;
-
-      for (unsigned int pixelx = 0; pixelx < mCharacterWidth; pixelx++)
+      for (int pixelx = 0; pixelx < width; pixelx++)
       {
         // strip a bit off and dump it into the base bitmap
-        destbytesetting = (currentsourcebyte & 128) ? 255 : 0;
-        *characterbitmapbase++ = destbytesetting;
-        currentsourcebyte = currentsourcebyte << 1;
+        *characterbitmapbase++ = (currentsourcebyte & 128) ? 255 : 0;
+        if ((pixelx&7)==7) currentsourcebyte = *++fontsourcebits;
+        else currentsourcebyte = currentsourcebyte << 1;
       }
-
+      if (GlyphBitsNotByteAligned){ currentsourcebyte = *++fontsourcebits; }
       // advance base bitmap pointer to the next row
-      characterbitmapbase += (basetexturewidth - mCharacterWidth) *basepixelsize;
+      if ( pixely+1 != height ) characterbitmapbase += (basetexturewidth - width) *basepixelsize;
     }
+    font->glyphs[c].width = width;
+    font->glyphs[c].texwidth = ((float)width) / basetexturewidth ;
+    font->glyphs[c].x = x / basetexturewidth;
+    font->glyphs[c].y = y / basetextureheight;
+    font->glyphs[c].hTexture = nTexNames[nCurrentTex];
+
+    x += width;
+    if (c==255) break;
+    else c++;
   }
 
-  // shove all the data at OpenGL...
-  glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
   glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */, GL_ALPHA /* bytes-per-pixel */,
-    basetexturewidth, basetextureheight, 0 /*border*/,
-    GL_ALPHA, GL_UNSIGNED_BYTE, fontbitmapdata);
+                basetexturewidth, basetextureheight, 0 /*border*/,
+                GL_ALPHA, GL_UNSIGNED_BYTE, fontbitmapdata);
 
+  delete [] nTexNames;
   CHK (delete [] fontbitmapdata);
 }
 
@@ -168,7 +172,7 @@ void csGraphics2DOpenGLFontServer::GLFontInfo::DrawCharacter (
   unsigned char characterindex)
 {
   // bind the texture containing this font
-  glBindTexture(GL_TEXTURE_2D,mTexture_Handle);
+  glBindTexture(GL_TEXTURE_2D, glyphs[characterindex].hTexture);
 
   // other required settings
   glEnable(GL_TEXTURE_2D);
@@ -176,19 +180,16 @@ void csGraphics2DOpenGLFontServer::GLFontInfo::DrawCharacter (
   glEnable(GL_ALPHA_TEST);
   glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-  // figure out location of the character in the texture
-  float chartexturex = mTexture_CharacterWidth * (characterindex % mTexture_Characters_Per_Row);
-  float chartexturey = mTexture_CharacterHeight * (characterindex / mTexture_Characters_Per_Row);
-
   // the texture coordinates must point to the correct character
   // the texture is a strip a wide as a single character and
   // as tall as 256 characters.  We must select a single
   // character from it
-  float tx1 = chartexturex, tx2 = chartexturex + mTexture_CharacterWidth;
-  float ty1 = chartexturey, ty2 = chartexturey + mTexture_CharacterHeight;
-
-  float x1 = 0.0, x2 = mCharacterWidth;
-  float y1 = 0.0, y2 = mCharacterHeight;
+  float tx1 = glyphs[characterindex].x;
+  float tx2 = tx1 + glyphs[characterindex].texwidth;
+  float ty1 = glyphs[characterindex].y;
+  float ty2 = ty1 + texheight;
+  float x1 = 0.0, x2 = glyphs[characterindex].width;
+  float y1 = 0.0, y2 = height;
 
   glAlphaFunc (GL_EQUAL,1.0);
 
@@ -199,15 +200,15 @@ void csGraphics2DOpenGLFontServer::GLFontInfo::DrawCharacter (
   glTexCoord2f (tx1,ty2); glVertex2f (x1,y1);
   glEnd ();
 
-  glTranslatef (8.0,0.0,0.0);
+  glTranslatef (x2,0.0,0.0);
   glDisable(GL_ALPHA_TEST);
 }
 
 /* The constructor initializes it member variables and constructs the
  * first font, if one was passed into the constructor
  */
-csGraphics2DOpenGLFontServer::csGraphics2DOpenGLFontServer (int MaxFonts)
-  : mFont_Count (0), mMax_Font_Count (MaxFonts), mFont_Information_Array (NULL)
+csGraphics2DOpenGLFontServer::csGraphics2DOpenGLFontServer (int MaxFonts, iFontRender *pFR)
+  : mFont_Count (0), mMax_Font_Count (MaxFonts), mFont_Information_Array (NULL), pFontRender(pFR)
 {
   CHK (mFont_Information_Array = new GLFontInfo * [MaxFonts]);
 }
@@ -222,14 +223,6 @@ csGraphics2DOpenGLFontServer::~csGraphics2DOpenGLFontServer ()
       CHKB (delete mFont_Information_Array [index]);
     CHK (delete [] mFont_Information_Array);
   }
-}
-
-void csGraphics2DOpenGLFontServer::AddFont (FontDef &addme)
-{
-  if (mFont_Count >= mMax_Font_Count)
-    return;
-  // we assume the FontDef is legal...
-  mFont_Information_Array [mFont_Count++] = new GLFontInfo (addme);
 }
 
 /* Print some characters (finally!)  This is basically a wrapper
