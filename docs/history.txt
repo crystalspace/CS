@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+28-Dec-2002
+	- Eric Sunshine changed chktools.sh so that it records the path of
+	  makedep in config.mak, if found.  This is consistent with its
+	  treatment of other detected tools.  cs.mak now respects this setting.
 24-Dec-2002
 	- Eric Sunshine added a patch to the canvas class which allows the
 	  configuration key "Video.DisplayNumber" to select the display

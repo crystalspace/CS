@@ -25,14 +25,20 @@
 #	Makefile variable emitted to the standard output stream.  Value is
 #	"yes" if nasm is available, otherwise the variable is not set.
 #    NASM.BIN
-#	Makefile variable emitted to the standard output stream.  Value is
-#	the path of the discovered nasm executable.
+#	Makefile variable emitted to the standard output stream.  Value is the
+#	path of the discovered nasm executable.
 #    DEPEND_TOOL
 #	Makefile varaible emitted to the standard output stream.  Value is
 #	"mkdep" if a special dependency generation tool was located.
 #    MAKEDEP.AVAILABLE
 #	Makefile variable emitted to the standard ouput stream.  Value is "yes"
 #	if the customized Crystal Space "makedep" program is available.
+#    CMD.MAKEDEP
+#	Makefile variable emitted to the standard output stream.  Value is the
+#	path of the discovered makedep executable.
+#    DEPEND_TOOL
+#	Makefile variable emitted to the standard output stream if a suitable
+#	version of makedep is discovered.  Value is "mkdep".
 #==============================================================================
 
 #------------------------------------------------------------------------------
@@ -105,10 +111,11 @@ fi
 [ -z "${MAKEDEP}" ] && MAKEDEP=`checktool makedep`
 if [ -n "${MAKEDEP}" ]; then
   msg_checking "for makedep extensions"
-  echo "DEPEND_TOOL = mkdep"
   MAKEDEP_VERSION=`makedep -V | sed -e "s/.*Version *//"`
   if [ `expr "${MAKEDEP_VERSION}" ">" 0.0.0` = "1" ]; then
     echo "MAKEDEP.AVAILABLE = yes"
+    echo "CMD.MAKEDEP = "`shellprotect "${MAKEDEP}"`
+    echo "DEPEND_TOOL = mkdep"
     msg_result "yes"
   else
     msg_result "no"

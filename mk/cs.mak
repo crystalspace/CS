@@ -148,7 +148,11 @@ ifndef DO.DEP
 dep: build.makedep
         MAKEDEP := ./makedep
       else
-        MAKEDEP := makedep
+        ifneq (,$(CMD.MAKEDEP))
+          MAKEDEP := $(CMD.MAKEDEP)
+        else
+          MAKEDEP := makedep
+        endif
       endif
       DO.DEP1 = $(MAKEDEP) $(subst $(CFLAGS.I),-I,$(CFLAGS.INCLUDE) )
       DO.DEP2 = $(filter-out %.asm,$^) -o $(BUCK)O -p $(BUCK)\(OUT\)/ -r -c -f $@
