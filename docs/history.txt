@@ -1,5 +1,9 @@
 The history order has been reversed so that new features are at the top.
 
+27-Jun-2000
+	- Fixed the bug when that could cause severe problems when
+	  loading a world for which the octree isn't valid anymore. The
+	  partially loaded octree was not cleaned up properly.
 26-Jun-2000
 	- Fixed memory leak while building BSP/octree.
 	- Eric Sunshine eliminated a slew of compilation warning in cstree.cpp

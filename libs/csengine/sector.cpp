@@ -153,8 +153,6 @@ void csSector::AddLight (csStatLight* light)
 
 void csSector::UseStaticTree (int mode, bool octree)
 {
-  // @@@ Always use octrees now.
-  octree = true;
   //mode = BSP_BALANCE_AND_SPLITS;
 
   delete static_tree; static_tree = NULL;
@@ -184,16 +182,9 @@ void csSector::UseStaticTree (int mode, bool octree)
   first_thing = static_thing;
   static_thing->CreateBoundingBox ();
 
-  if (octree)
-  {
-    csVector3 min_bbox, max_bbox;
-    static_thing->GetBoundingBox (min_bbox, max_bbox);
-    static_tree = new csOctree (this, min_bbox, max_bbox, 150/*15*/, mode);
-  }
-  else
-  {
-    static_tree = new csBspTree (this, mode);
-  }
+  csVector3 min_bbox, max_bbox;
+  static_thing->GetBoundingBox (min_bbox, max_bbox);
+  static_tree = new csOctree (this, min_bbox, max_bbox, 150/*15*/, mode);
 
   csString str ("vis/octree_");
   str += GetName ();
@@ -206,6 +197,11 @@ void csSector::UseStaticTree (int mode, bool octree)
     recalc_octree = !((csOctree*)static_tree)->ReadFromCache (
     	w->VFS, (const char*)str, static_thing->GetPolygonArray ().GetArray (),
 	static_thing->GetPolygonArray ().Length ());
+    if (recalc_octree)
+    {
+      delete static_tree;
+      static_tree = new csOctree (this, min_bbox, max_bbox, 150/*15*/, mode);
+    }
   }
   if (recalc_octree)
   {
