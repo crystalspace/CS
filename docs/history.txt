@@ -5,6 +5,10 @@ The history order is reversed so that new features are at the top.
 	  iMovable which was noted by <shri@vitalstate.co.uk>.
 	- Eric Sunshine corrected a copy/paste error in snow.txi pointed out by
 	  Tim <tirobu@gmx.de>.
+	- Eric Sunshine fixed problem with milk2spr when on Unix it failed to
+	  convert models which had been created/saved on Windows or older
+	  MacOS.  Problem was that it was explicitly looking for LF terminator
+	  without taking into account CRLF (Windows) or CR (Macintosh).
 13-Mar-2003
 	- Received some documentation fixes with regards to 3D sprites
 	  from Simon Posnjak <simon.posnjak@siol.net>.
