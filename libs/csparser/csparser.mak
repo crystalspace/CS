@@ -25,10 +25,10 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp libs/csparser
+vpath %.cpp libs/csparser libs/csparser/impexp
 
 CSPARSER.LIB = $(OUT)$(LIB_PREFIX)csparser$(LIB_SUFFIX)
-SRC.CSPARSER = $(wildcard libs/csparser/*.cpp)
+SRC.CSPARSER = $(wildcard libs/csparser/*.cpp libs/csparser/impexp/*.cpp)
 OBJ.CSPARSER = $(addprefix $(OUT),$(notdir $(SRC.CSPARSER:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)

@@ -8,7 +8,7 @@ DESCRIPTION.gl3d = Crystal Space OpenGL 3D driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-PLUGINHELP += $(NEWLINE)echo $"  make gl3d         Make the $(DESCRIPTION.gl3d)$"
+DRIVERHELP += $(NEWLINE)echo $"  make gl3d         Make the $(DESCRIPTION.gl3d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

@@ -8,7 +8,7 @@ DESCRIPTION.glbe2d = Crystal Space GL/Be 2D driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-PLUGINHELP += $(NEWLINE)echo $"  make glbe2d       Make the $(DESCRIPTION.glbe2d)$"
+DRIVERHELP += $(NEWLINE)echo $"  make glbe2d       Make the $(DESCRIPTION.glbe2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

@@ -66,7 +66,7 @@ OUT=$(OUTPROC)$(MODE)$(OUTSUFX.$(MAKE_DLL))/
 HEADER=$(wildcard *.h */*.h */*/*.h */*/*/*.h */*/*/*/*.h)
 
 CFLAGS.INCLUDE+=$(CFLAGS.I). $(CFLAGS.I)./include $(CFLAGS.I)./libs \
-  $(CFLAGS.I)./apps $(CFLAGS.I)./support
+  $(CFLAGS.I)./plugins $(CFLAGS.I)./apps $(CFLAGS.I)./support
   
 CFLAGS=$(CFLAGS.GENERAL) $(CFLAGS.$(MODE)) $(MEM)
 LFLAGS=$(LFLAGS.GENERAL) $(LFLAGS.$(MODE)) $(LFLAGS.L)$(OUT)

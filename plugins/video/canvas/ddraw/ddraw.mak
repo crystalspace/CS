@@ -8,7 +8,7 @@ DESCRIPTION.ddraw = Crystal Space Windows DirectDraw 2D driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-PLUGINHELP += $(NEWLINE)echo $"  make ddraw        Make the $(DESCRIPTION.ddraw)$"
+DRIVERHELP += $(NEWLINE)echo $"  make ddraw        Make the $(DESCRIPTION.ddraw)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

@@ -12,7 +12,7 @@
 DESCRIPTION.os2gcc = OS/2 with GCC/EMX
 
 # Choose which drivers you want to build/use
-DRIVERS=\
+DRIVERS+=\
   cs2d/csdive cs3d/software \
 #  csnetdrv/null csnetdrv/sockets csnetman/null csnetman/simple \
 #  cssnddrv/null cssndrdr/null cssndrdr/software \

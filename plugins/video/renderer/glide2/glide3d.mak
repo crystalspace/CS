@@ -8,7 +8,7 @@ DESCRIPTION.glide3d = Crystal Space Glide 3D driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-PLUGINHELP += $(NEWLINE)echo $"  make glide3d      Make the $(DESCRIPTION.glide3d)$"
+DRIVERHELP += $(NEWLINE)echo $"  make glide3d      Make the $(DESCRIPTION.glide3d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

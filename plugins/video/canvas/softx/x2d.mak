@@ -8,7 +8,7 @@ DESCRIPTION.x2d = Crystal Space XLib 2D driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-PLUGINHELP += $(NEWLINE)echo $"  make x2d          Make the $(DESCRIPTION.x2d)$"
+DRIVERHELP += $(NEWLINE)echo $"  make x2d          Make the $(DESCRIPTION.x2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

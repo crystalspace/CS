@@ -52,17 +52,18 @@ case $MACHINE in
 esac
 
 # Find the C++ compiler
-CXX=`which g++ | grep -v "no g++"`
-[ -z "${CXX}" ] && CXX=`which egcs | grep -v "no egcs"`
-[ -z "${CXX}" ] && CXX=`which gcc | grep -v "no gcc"`
-[ -z "${CXX}" ] && CXX=`which c++ | grep -v "no c++"`
+CXX=`which g++ | grep -v "[Nn]o"`
+[ -z "${CXX}" ] && CXX=`which egcs | grep -v "[Nn]o"`
+[ -z "${CXX}" ] && CXX=`which gcc | grep -v "[Nn]o"`
+[ -z "${CXX}" ] && CXX=`which c++ | grep -v "[Nn]o"`
 
 if [ -z "${CXX}" ]; then
   echo "$0: Cannot find an installed C++ compiler!" >&2
   exit 1
 fi
 
-echo "CXX = "`basename ${CXX}`
+CXX=`basename ${CXX}`
+echo "CXX = ${CXX}"
 
 # Create a dummy C++ program
 echo "int main () {}" >conftest.cpp
@@ -72,7 +73,7 @@ echo "int main () {}" >conftest.cpp
 (echo "$CPU" | grep -q [5-6]86 && ${CXX} -c -mpentium -march=i586 conftest.cpp && echo "CFLAGS.SYSTEM += -mpentium -march=i586") || \
 (echo "$CPU" | grep -q [3-9]86 && ${CXX} -c -m486 conftest.cpp && echo "CFLAGS.SYSTEM += -m486") || \
 (echo "$MACHINE" | grep -q alpha && ${CXX} -c -mieee conftest.cpp && echo "CFLAGS.SYSTEM += -mieee")
- 
+
 # Check for GCC-version-specific command-line options
 ${CXX} -c -fno-exceptions conftest.cpp 2>/dev/null && echo "CFLAGS.SYSTEM += -fno-exceptions"
 ${CXX} -c -fno-rtti conftest.cpp 2>/dev/null && echo "CFLAGS.SYSTEM += -fno-rtti"
@@ -101,7 +102,7 @@ rm -f conftest.asm conftest.o
 if [ -n "${MAKEDEP}" ]; then
   echo "DEPEND_TOOL = mkdep"
   MAKEDEP_VERSION=`makedep -V | sed -e "s/.*Version *//"`
-  if [ "${MAKEDEP_VERSION}" ">" "0.0.0" ]; then
+  if [ `expr "${MAKEDEP_VERSION}" ">" 0.0.0` = "1" ]; then
     echo "DEPEND_TOOL.INSTALLED = yes"
   fi
 fi

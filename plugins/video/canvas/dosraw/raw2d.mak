@@ -8,7 +8,7 @@ DESCRIPTION.raw2d = Crystal Space raw DOS SVGA driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-PLUGINHELP += $(NEWLINE)echo $"  make raw2d        Make the $(DESCRIPTION.raw2d)$"
+DRIVERHELP += $(NEWLINE)echo $"  make raw2d        Make the $(DESCRIPTION.raw2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

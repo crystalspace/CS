@@ -8,7 +8,7 @@ DESCRIPTION.csdive = Crystal Space OS/2 DIVE driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-PLUGINHELP += $(NEWLINE)echo $"  make csdive       Make the $(DESCRIPTION.csdive)$"
+DRIVERHELP += $(NEWLINE)echo $"  make csdive       Make the $(DESCRIPTION.csdive)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

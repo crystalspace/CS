@@ -10,7 +10,7 @@ include libs/cs2d/glide2common/glide2common2d.mak
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-PLUGINHELP += $(NEWLINE)echo $"  make glidebe2d    Make the $(DESCRIPTION.glidebe2d)$"
+DRIVERHELP += $(NEWLINE)echo $"  make glidebe2d    Make the $(DESCRIPTION.glidebe2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

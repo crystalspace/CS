@@ -8,7 +8,7 @@ DESCRIPTION.glos2 = Crystal Space OS/2 OpenGL 2D driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-PLUGINHELP += $(NEWLINE)echo $"  make glos2        Make the $(DESCRIPTION.glos2)$"
+DRIVERHELP += $(NEWLINE)echo $"  make glos2        Make the $(DESCRIPTION.glos2)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

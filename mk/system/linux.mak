@@ -5,7 +5,7 @@
 DESCRIPTION.linux = Linux
 
 # Choose which drivers you want to build/use
-DRIVERS=cs2d/softx cs3d/software csnetdrv/sockets \
+DRIVERS+=cs2d/softx cs3d/software csnetdrv/sockets \
   csnetman/simple cssnddrv/oss cssndrdr/software
 
 # uncomment the following to build SVGALIB 2D driver

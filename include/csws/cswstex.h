@@ -43,6 +43,8 @@ class csWSTexture
   int tr, tg, tb;
   // has texture transparent areas?
   bool IsTransp;
+  // Has transparent color changed?
+  bool TranspChanged;
   // texture handle for the 3D/2D driver
   iTextureHandle *Handle;
   // texture name
@@ -92,6 +94,11 @@ public:
   { return FileName; }
   /// Set texture file name
   void SetFileName (const char *iFileName);
+  /// Find nearest transparent color in image
+  void FixTransparency ();
+  /// Tell texture that transparent color has already been fixed
+  void DontFixTransparency ()
+  { TranspChanged = false; }
 };
 
 /// This class is a vector of csWSTexture's

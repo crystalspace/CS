@@ -13,10 +13,17 @@ ifneq ($(LIBRARY_SUBMAKEFILES),)
 endif
 
 ifeq ($(DRIVER_SUBMAKEFILES),)
-  DRIVER_SUBMAKEFILES=$(wildcard $(addsuffix /*.mak,$(addprefix libs/,$(DRIVERS) $(DRIVERS.SYSTEM))))
+  DRIVER_SUBMAKEFILES=$(wildcard $(addsuffix /*.mak,$(addprefix libs/,$(sort $(DRIVERS)))))
 endif
 ifneq ($(DRIVER_SUBMAKEFILES),)
   include $(DRIVER_SUBMAKEFILES)
+endif
+
+ifeq ($(PLUGINS_SUBMAKEFILES),)
+  PLUGINS_SUBMAKEFILES=$(wildcard $(addsuffix /*.mak,$(addprefix plugins/,$(sort $(PLUGINS)))))
+endif
+ifneq ($(PLUGINS_SUBMAKEFILES),)
+  include $(PLUGINS_SUBMAKEFILES)
 endif
 
 ifeq ($(APPLICATION_SUBMAKEFILES),)

@@ -8,7 +8,7 @@ DESCRIPTION.ggi2d = Crystal Space GGI 2D driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-PLUGINHELP += $(NEWLINE)echo $"  make ggi2d        Make the $(DESCRIPTION.ggi2d)$"
+DRIVERHELP += $(NEWLINE)echo $"  make ggi2d        Make the $(DESCRIPTION.ggi2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

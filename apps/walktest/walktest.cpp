@@ -40,13 +40,11 @@
 #include "csengine/pol2d.h"
 #include "csscript/csscript.h"
 #include "csscript/intscri.h"
-
 #include "csengine/cdobj.h"
 #include "csengine/collider.h"
-
 #include "csengine/csspr2d.h"
+#include "csparser/impexp.h"
 #include "csutil/inifile.h"
-#include "csutil/impexp.h"
 #include "csutil/csrect.h"
 #include "csobject/dataobj.h"
 #include "csgfxldr/csimage.h"

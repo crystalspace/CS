@@ -5,7 +5,7 @@
 DESCRIPTION.beos = BeOS
 
 # Choose which drivers you want to build/use
-DRIVERS=cs3d/software cs2d/be cs2d/openglbe cs3d/opengl \
+DRIVERS+=cs3d/software cs2d/be cs2d/openglbe cs3d/opengl \
   csnetdrv/null csnetdrv/sockets csnetman/null csnetman/simple \
   cssnddrv/null cssndrdr/null
 # Uncomment the following if you want to build/use Glide.

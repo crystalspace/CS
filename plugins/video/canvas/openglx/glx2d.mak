@@ -8,7 +8,7 @@ DESCRIPTION.glx2d = Crystal Space GL/X 2D driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-PLUGINHELP += $(NEWLINE)echo $"  make glx2d        Make the $(DESCRIPTION.glx2d)$"
+DRIVERHELP += $(NEWLINE)echo $"  make glx2d        Make the $(DESCRIPTION.glx2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

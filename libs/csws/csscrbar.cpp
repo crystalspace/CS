@@ -254,10 +254,11 @@ pagescroll:
           active_button = ((csComponent *)Event.Command.Info)->id;
           timer->Pause (SCROLL_START_INTERVAL);
           // fallback to timer pulse
+          goto pulse;
         case cscmdTimerPulse:
           if (Event.Command.Info == timer)
           {
-            if (active_button == SCROLL_UL)
+pulse:      if (active_button == SCROLL_UL)
               SetValue (status.value - status.step);
             else if (active_button == SCROLL_DR)
               SetValue (status.value + status.step);

@@ -33,7 +33,7 @@
 #include "csengine/portal.h"
 #include "csengine/dumper.h"
 #include "csengine/lppool.h"
-#include "csutil/cleanup.h"
+#include "csutil/garray.h"
 #include "igraph3d.h"
 #include "itexture.h"
 #include "itxtmgr.h"
@@ -43,6 +43,18 @@ bool csPolygon3D::do_not_force_recalc = false;
 int csPolygon3D::def_mipmap_size = 16;
 bool csPolygon3D::do_lightmap_highqual = true;
 bool csPolygon3D::do_cache_lightmaps = true;
+
+// This is a static vector array which is adapted to the
+// right size everytime it is used. In the beginning it means
+// that this array will grow a lot but finally it will
+// stabilize to a maximum size (not big). The advantage of
+// this approach is that we don't have a static array which can
+// overflow. And we don't have to do allocation every time we
+// come here. We do an IncRef on this object each time a new
+// csPolygon3D is created and an DecRef each time it is deleted.
+// Thus, when the world is cleaned, the array is automatically
+// cleaned too.
+DECLARE_GROWING_ARRAY (static, VectorArray, csVector3)
 
 //---------------------------------------------------------------------------
 
@@ -254,6 +266,8 @@ csPolygon3D::csPolygon3D (csTextureHandle* texture)
   light_info.flat_color.blue = 0;
 
   SetTextureType (POLYTXT_LIGHTMAP);
+
+  VectorArray.IncRef ();
 }
 
 csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt (),
@@ -287,15 +301,18 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt (),
   light_info.lightpatches = NULL;
   light_info.flat_color = poly.light_info.flat_color;
   light_info.dyn_dirty = false;
+
+  VectorArray.IncRef ();
 }
 
 csPolygon3D::~csPolygon3D ()
 {
-  CHKB (delete txt_info); txt_info = NULL;
+  CHK (delete txt_info); txt_info = NULL;
   if (delete_plane) CHKB (delete plane);
   if (delete_portal) CHKB (delete portal);
   while (light_info.lightpatches)
     csWorld::current_world->lightpatch_pool->Free (light_info.lightpatches);
+  VectorArray.DecRef ();
 }
 
 void csPolygon3D::SetTextureType (int type)
@@ -1450,17 +1467,6 @@ bool csPolygon3D::MarkRelevantShadowFrustrums (csLightView& lview,
   return true;
 }
 
-// csVectorArray is a subclass of csCleanable which is registered
-// to csWorld.cleanup.
-class csVectorArray : public csCleanable
-{
-public:
-  csVector3* array;
-  int size;
-  csVectorArray () : array (NULL), size (0) { }
-  virtual ~csVectorArray () { CHK (delete [] array); }
-};
-
 void csPolygon3D::CalculateLighting (csLightView* lview)
 {
   //@@@if (orig_poly) return; Be careful!!!
@@ -1470,30 +1476,10 @@ void csPolygon3D::CalculateLighting (csLightView* lview)
   csFrustrum* new_light_frustrum;
   csVector3& center = light_frustrum->GetOrigin ();
 
-  // This is a static vector array which is adapted to the
-  // right size everytime it is used. In the beginning it means
-  // that this array will grow a lot but finally it will
-  // stabilize to a maximum size (not big). The advantage of
-  // this approach is that we don't have a static array which can
-  // overflow. And we don't have to do allocation every time we
-  // come here. We register this memory to the 'cleanup' array
-  // in csWorld so that it will be freed later.
-
-  static csVectorArray* cleanable = NULL;
-  if (!cleanable)
-  {
-    CHK (cleanable = new csVectorArray ());
-    csWorld::current_world->cleanup.Push (cleanable);
-  }
-
   int num_vertices = GetVertices ().GetNumVertices ();
-  if (num_vertices > cleanable->size)
-  {
-    CHK (delete [] cleanable->array);
-    CHK (cleanable->array = new csVector3 [num_vertices]);
-    cleanable->size = num_vertices;
-  }
-  csVector3* poly = cleanable->array;
+  if (num_vertices > VectorArray.GetLimit ())
+    VectorArray.SetLimit (num_vertices);
+  csVector3 *poly = VectorArray.GetArray ();
 
   // If plane is not visible then return.
   if (!plane->VisibleFromPoint (center)) return;
@@ -1508,7 +1494,6 @@ void csPolygon3D::CalculateLighting (csLightView* lview)
     return;
 
   // Calculate the new frustrum for this polygon.
-
   int j;
   if (lview->mirror)
     for (j = 0 ; j < num_vertices ; j++)

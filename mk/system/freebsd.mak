@@ -5,7 +5,7 @@
 DESCRIPTION.freebsd = FreeBSD
 
 # Choose which drivers you want to build/use
-DRIVERS=cs2d/softx cs3d/software csnetdrv/null csnetman/null csnetman/simple \
+DRIVERS+=cs2d/softx cs3d/software csnetdrv/null csnetman/null csnetman/simple \
   cssnddrv/null cssndrdr/null cssndrdr/software csnetdrv/sockets cssnddrv/oss
 
 #---------------------------------------------------- rootdefines & defines ---#

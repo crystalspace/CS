@@ -8,7 +8,7 @@ DESCRIPTION.be2d = Crystal Space BeLib 2D driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-PLUGINHELP += $(NEWLINE)echo $"  make be2d         Make the $(DESCRIPTION.be2d)$"
+DRIVERHELP += $(NEWLINE)echo $"  make be2d         Make the $(DESCRIPTION.be2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

@@ -32,7 +32,6 @@
 #include "csengine/camera.h"
 #include "csengine/portal.h"
 #include "csengine/dumper.h"
-#include "csutil/cleanup.h"
 #include "igraph3d.h"
 #include "itexture.h"
 #include "itxtmgr.h"

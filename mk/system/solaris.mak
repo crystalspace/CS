@@ -5,7 +5,7 @@
 DESCRIPTION.solaris = Solaris
 
 # Choose which drivers you want to build/use
-DRIVERS=cs2d/softx cs3d/software csnetman/simple cssndrdr/software
+DRIVERS+=cs2d/softx cs3d/software csnetman/simple cssndrdr/software
 
 # uncomment the following to build GGI 2D driver
 #DRIVERS+=cs2d/ggi

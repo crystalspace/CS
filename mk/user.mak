@@ -24,9 +24,11 @@ ifndef MODE
   MODE=optimize
 endif
 
-# Default list of plugins
+# Default list of plugins to build
+# Note that you'll link all plugins into executable in the case of static build
 ifndef PLUGINS
-  PLUGINS=csclear cspython
+  PLUGINS=
+# PLUGINS=csclear cspython
 endif
 
 # Should we use NASM for assembly?

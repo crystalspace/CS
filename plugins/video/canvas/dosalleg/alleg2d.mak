@@ -8,7 +8,7 @@ DESCRIPTION.alleg2d = Crystal Space Allegro driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-PLUGINHELP += $(NEWLINE)echo $"  make alleg2d      Make the $(DESCRIPTION.alleg2d)$"
+DRIVERHELP += $(NEWLINE)echo $"  make alleg2d      Make the $(DESCRIPTION.alleg2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

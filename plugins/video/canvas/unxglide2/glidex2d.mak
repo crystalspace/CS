@@ -8,7 +8,7 @@ DESCRIPTION.glidex2d = Crystal Space Glide/X 2D driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-PLUGINHELP += $(NEWLINE)echo $"  make glidex2d        Make the $(DESCRIPTION.glidex2d)$"
+DRIVERHELP += $(NEWLINE)echo $"  make glidex2d        Make the $(DESCRIPTION.glidex2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

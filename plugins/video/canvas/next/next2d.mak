@@ -8,7 +8,7 @@ DESCRIPTION.next2d = Crystal Space NeXT 2D driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-PLUGINHELP += $(NEWLINE)echo $"  make next2d       Make the $(DESCRIPTION.next2d)$"
+DRIVERHELP += $(NEWLINE)echo $"  make next2d       Make the $(DESCRIPTION.next2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

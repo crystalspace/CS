@@ -6,8 +6,7 @@ DESCRIPTION.win32gcc = Windows with GNU C/C++
 # Choose which drivers you want to build/use
 # cs2d/ddraw6 cs2d/openglwin cs3d/direct3d5 cs3d/direct3d6 cs3d/opengl
 #
-DRIVERS=cs2d/ddraw \
-  cs3d/software \
+DRIVERS+=cs2d/ddraw cs3d/software \
   csnetdrv/null csnetman/null csnetman/simple \
   cssnddrv/null cssndrdr/null cssndrdr/software
 

@@ -8,7 +8,7 @@ DESCRIPTION.oss = Crystal Space OSS sound driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-PLUGINHELP += $(NEWLINE)echo $"  make oss          Make the $(DESCRIPTION.oss)$"
+DRIVERHELP += $(NEWLINE)echo $"  make oss          Make the $(DESCRIPTION.oss)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

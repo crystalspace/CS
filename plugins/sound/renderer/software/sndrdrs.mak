@@ -8,7 +8,7 @@ DESCRIPTION.sndrdrs = Crystal Space software sound renderer
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-PLUGINHELP += $(NEWLINE)echo $"  make sndrdrs      Make the $(DESCRIPTION.sndrdrs)$"
+DRIVERHELP += $(NEWLINE)echo $"  make sndrdrs      Make the $(DESCRIPTION.sndrdrs)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

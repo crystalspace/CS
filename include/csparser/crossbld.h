@@ -26,7 +26,7 @@
 #ifndef __CROSSBLD_H__
 #define __CROSSBLD_H__
 
-#include "csutil/impexp.h"
+#include "csparser/impexp.h"
 #include "csutil/vfs.h"
 #include "csengine/cssprite.h"
 #include "csengine/triangle.h"

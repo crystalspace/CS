@@ -8,7 +8,7 @@ DESCRIPTION.soft = Crystal Space software 3D driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-PLUGINHELP += $(NEWLINE)echo $"  make soft         Make the $(DESCRIPTION.soft)$"
+DRIVERHELP += $(NEWLINE)echo $"  make soft         Make the $(DESCRIPTION.soft)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

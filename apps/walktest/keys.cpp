@@ -39,7 +39,7 @@
 #include "csengine/cdobj.h"
 #include "csengine/collider.h"
 #include "csutil/scanstr.h"
-#include "csutil/impexp.h"
+#include "csparser/impexp.h"
 #include "csobject/dataobj.h"
 #include "cssfxldr/common/snddata.h"
 #include "csparser/snddatao.h"

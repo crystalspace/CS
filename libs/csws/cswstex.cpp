@@ -36,6 +36,7 @@ csWSTexture::csWSTexture (const char *iName, iImageFile *iImage,
   FileName = strnew (iImage->GetName ());
   Handle = NULL;
   TexMan = NULL;
+  TranspChanged = false;
 }
 
 csWSTexture::~csWSTexture ()
@@ -53,7 +54,10 @@ void csWSTexture::SetTransparent (int iR, int iG, int iB)
 {
   IsTransp = (iR >= 0) && (iG >= 0) && (iB >= 0);
   if (IsTransp)
+  {
     tr = iR; tg = iG; tb = iB;
+    TranspChanged = true;
+  }
   if (Handle)
     Handle->SetTransparent (iR, iG, iB);
 }
@@ -66,6 +70,35 @@ void csWSTexture::SetTransparent (bool iTransparent)
       Handle->SetTransparent (tr, tg, tb);
     else
       Handle->SetTransparent (-1, -1, -1);
+}
+
+void csWSTexture::FixTransparency ()
+{
+  if (!IsTransp || !TranspChanged || !Image)
+    return;
+
+  TranspChanged = false;
+
+  RGBPixel *src = Image->GetImageData ();
+  int size = Image->GetSize ();
+  RGBPixel color;
+  int colordist = 0x7fffffff;
+  while (size--)
+  {
+    int dR = src->red - tr;
+    int dG = src->green - tg;
+    int dB = src->blue - tb;
+    int dist = 299 * dR * dR + 587 * dG * dG + 114 * dB * dB;
+    if (colordist > dist)
+    {
+      colordist = dist;
+      color = *src;
+    }
+    src++;
+  }
+  tr = color.red;
+  tg = color.green;
+  tb = color.blue;
 }
 
 void csWSTexture::Register (iTextureManager *iTexMan)

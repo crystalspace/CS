@@ -5,7 +5,7 @@
 # Friendly names for building environment
 DESCRIPTION.djgpp = DOS with DJGPP
 
-DRIVERS=cs3d/software csnetdrv/null csnetman/null cssnddrv/null cssndrdr/null
+DRIVERS+=cs3d/software csnetdrv/null csnetman/null cssnddrv/null cssndrdr/null
 
 ifeq ($(USE_ALLEGRO),yes)
   DRIVERS += cs2d/alleg2

@@ -8,7 +8,7 @@ DESCRIPTION.netdrvs = Crystal Space socket network driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-PLUGINHELP += $(NEWLINE)echo $"  make netdrvs      Make the $(DESCRIPTION.netdrvs)$"
+DRIVERHELP += $(NEWLINE)echo $"  make netdrvs      Make the $(DESCRIPTION.netdrvs)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

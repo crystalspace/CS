@@ -21,6 +21,8 @@ include mk/common.mak
 SYSTARGETS=$(patsubst mk/system/%.mak,%,$(wildcard mk/system/*.mak))
 
 # The initial driver and application targets help text
+DRIVERHELP = \
+  echo $"The following Crystal Space drivers can be built:$"
 PLUGINHELP = \
   echo $"The following Crystal Space plug-in modules can be built:$"
 APPHELP = \
@@ -58,7 +60,7 @@ else
 MAKESECTION=rootdefines
 include mk/subs.mak
 
-help: banner showconfig pluginhelp libhelp apphelp pseudohelp
+help: banner showconfig driverhelp pluginhelp libhelp apphelp pseudohelp
 
 depend:
 	@$(MAKE) --no-print-directory -f mk/cs.mak $@ DO_DEPEND=yes
@@ -77,6 +79,10 @@ platforms:
 showconfig:
 	@echo $"  Configured for $(DESCRIPTION.$(TARGET)) with the following modifiers:$"
 	@echo $"  USE_SHARED_PLUGINS=$(USE_SHARED_PLUGINS) MODE=$(MODE) $(SYSMODIFIERS)$"
+	@echo $(SEPARATOR)
+
+driverhelp:
+	@$(DRIVERHELP)
 	@echo $(SEPARATOR)
 
 pluginhelp:

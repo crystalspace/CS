@@ -8,7 +8,7 @@ DESCRIPTION.svgalib2d = Crystal Space SVGALib 2D driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-PLUGINHELP += $(NEWLINE)echo $"  make svgalib2d    Make the $(DESCRIPTION.svgalib2d)$"
+DRIVERHELP += $(NEWLINE)echo $"  make svgalib2d    Make the $(DESCRIPTION.svgalib2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

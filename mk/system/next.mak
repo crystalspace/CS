@@ -8,10 +8,10 @@ ifeq ($(NEXT.FRIEND),yes)
 override DO_ASM=no
 
 # Choose which drivers you want to build/use
-DRIVERS=cs2d/next cs3d/software csnetdrv/sockets csnetman/simple
+DRIVERS+=cs2d/next cs3d/software csnetdrv/sockets csnetman/simple
 
 ifneq ($(NEXT.TARGET),)
-DESCRIPTION.$(NEXT.TARGET):=$(NEXT.DESCRIPTION)
+  DESCRIPTION.$(NEXT.TARGET):=$(NEXT.DESCRIPTION)
 endif
 
 #------------------------------------------ rootdefines, defines, config ------#

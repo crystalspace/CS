@@ -40,7 +40,6 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
   CONSTRUCT_IBASE (NULL)
   // Lower the priority of the main thread
-//  DosSetPriority (PRTYS_THREAD, PRTYC_REGULAR, PRTYD_MINIMUM, 0);
   DosSetPriority (PRTYS_THREAD, PRTYC_IDLETIME, PRTYD_MAXIMUM, 0);
 }
 
