@@ -32,6 +32,13 @@ chronological order.
 	- Peter Amstutz removed #ifndef CS_USE_NEW_RENDERER from
 	  sprbuild.cpp which caused models loaded using the crossbuilder
 	  plugin to not work in NR!
+	- Jorrit fixed the parsing of <portaltraversal> so that you can now
+	  also safely say <portaltraversal/> instead of
+	  <portaltraversal>yes</portaltraversal>. Same for <zoffset/>.
+	  Fixed a few other cases in CS where synldr->ParseBool() was used
+	  wrong (parsing of heightmap generation, <alwaysanimate/> for
+	  procedural textures, <persistent/> for render steps, and terrfunc
+	  parser).
 6-Jun-2004
 	- Jorrit modified the Jamfile so that the isotest application
 	  is only build with new renderer.

@@ -372,7 +372,7 @@ csPtr<iBase> csTerrFuncLoader::Parse (iDocumentNode* node,
 	  if (shiftnode) hshift = shiftnode->GetContentsValueAsFloat ();
 	  csRef<iDocumentNode> flipxnode = child->GetNode ("flipx");
 	  if(flipxnode)
-	    if(!synldr->ParseBool(flipxnode, flipx, false))
+	    if(!synldr->ParseBool(flipxnode, flipx, true))
 	    {
 	      synldr->ReportError (
 	        "crystalspace.maploader.parse.heightgen", flipxnode,
@@ -381,7 +381,7 @@ csPtr<iBase> csTerrFuncLoader::Parse (iDocumentNode* node,
 	    }
 	  csRef<iDocumentNode> flipynode = child->GetNode ("flipy");
 	  if(flipynode)
-	    if(!synldr->ParseBool(flipynode, flipy, false))
+	    if(!synldr->ParseBool(flipynode, flipy, true))
 	    {
 	      synldr->ReportError (
 	        "crystalspace.maploader.parse.heightgen", flipynode,

@@ -265,7 +265,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	}
 	break;
       case XMLTOKEN_ALWAYSANIMATE:
-	if (!SyntaxService->ParseBool (child, always_animate, false))
+	if (!SyntaxService->ParseBool (child, always_animate, true))
 	  goto error;
 	break;
       case XMLTOKEN_CLAMP:

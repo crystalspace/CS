@@ -77,7 +77,7 @@ csPtr<iBase> csGenericRSLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_PORTALTRAVERSAL:
         {
 	  bool result;
-	  if (!synldr->ParseBool (child, result, false))
+	  if (!synldr->ParseBool (child, result, true))
 	    return 0;
 	  step->SetPortalTraversal (result);
 	}
@@ -85,7 +85,7 @@ csPtr<iBase> csGenericRSLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_ZOFFSET:
 	{
 	  bool result;
-	  if (!synldr->ParseBool (child, result, false))
+	  if (!synldr->ParseBool (child, result, true))
 	    return 0;
 	  step->SetZOffset (result);
 	}

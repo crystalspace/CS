@@ -159,7 +159,7 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (iDocumentNode* node)
 	    hshift = shiftnode->GetContentsValueAsFloat ();
 	  csRef<iDocumentNode> flipxnode = child->GetNode ("flipx");
 	  if(flipxnode)
-	    if(!SyntaxService->ParseBool(flipxnode, flipx, false))
+	    if(!SyntaxService->ParseBool(flipxnode, flipx, true))
 	    {
 	      ReportError (
 	        "crystalspace.maploader.parse.heightgen",
@@ -168,7 +168,7 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (iDocumentNode* node)
 	    }
 	  csRef<iDocumentNode> flipynode = child->GetNode ("flipy");
 	  if(flipynode)
-	    if(!SyntaxService->ParseBool(flipynode, flipy, false))
+	    if(!SyntaxService->ParseBool(flipynode, flipy, true))
 	    {
 	      ReportError (
 	        "crystalspace.maploader.parse.heightgen",
@@ -215,7 +215,7 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (iDocumentNode* node)
 	    hshift = shiftnode->GetContentsValueAsFloat ();
 	  csRef<iDocumentNode> flipxnode = child->GetNode ("flipx");
 	  if(flipxnode)
-	    if(!SyntaxService->ParseBool(flipxnode, flipx, false))
+	    if(!SyntaxService->ParseBool(flipxnode, flipx, true))
 	    {
 	      ReportError (
 	        "crystalspace.maploader.parse.heightgen",
@@ -224,7 +224,7 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (iDocumentNode* node)
 	    }
 	  csRef<iDocumentNode> flipynode = child->GetNode ("flipy");
 	  if(flipynode)
-	    if(!SyntaxService->ParseBool(flipynode, flipy, false))
+	    if(!SyntaxService->ParseBool(flipynode, flipy, true))
 	    {
 	      ReportError (
 	        "crystalspace.maploader.parse.heightgen",

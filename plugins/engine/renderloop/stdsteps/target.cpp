@@ -123,7 +123,7 @@ csPtr<iBase> csTargetRSLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_PERSISTENT:
 	{
 	  bool p;
-	  if (!synldr->ParseBool (child, p, false))
+	  if (!synldr->ParseBool (child, p, true))
 	  {
 	    return 0;
 	  }
