@@ -24,20 +24,6 @@ C++FLAGS += $(COMPILER.CFLAGS) $(COMPILER.C++FLAGS)
 LINKLIBS += $(COMPILER.LFLAGS) $(COMPILER.LFLAGS.$(VARIANT)) ;
 LOCATE.OBJECTS = $(LOCATE.OBJECTS)/$(VARIANT) ;
 
-# Configuration for debug/optimized mode
-if $(VARIANT) = "debug"
-{
-  CCFLAGS += -DCS_DEBUG ;
-  C++FLAGS += -DCS_DEBUG ;
-}
-
-if $(VARIANT) = "profile"
-{
-  CCFLAGS += -g3 -pg ;
-  C++FLAGS += -g3 -pg ;
-  LINKLIBS += -g3 -pg ;
-}
-
 ##  SubVariant variantname
 ##    Specify subvarianet which are placed in separate compilation directories.
 SUBVARIANT ?= "" ;

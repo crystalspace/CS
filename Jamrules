@@ -11,6 +11,11 @@ if ! $(JAMCONFIG_READ)
   EXIT "Couldn't find config. Please configure the project." ;
 }
 
+# CFLAGS
+COMPILER.CFLAGS.debug += -DCS_DEBUG ;
+COMPILER.CFLAGS.profile += -g3 -pg ;
+COMPILER.LFLAGS.profile += -g3 -pg ;
+
 # csutil uses zlib
 APPLICATION.LFLAGS += $(ZLIB.LFLAGS) ;
 APPLICATION.CFLAGS += $(ZLIB.CFLAGS) ;
