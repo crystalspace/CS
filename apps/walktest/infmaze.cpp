@@ -221,7 +221,7 @@ static bool CompleteSectorCB (iPortal* portal, iBase* context, void* data)
     csSector* s = is->GetPrivateObject (); //@@@
     infinite_maze->connect_infinite (ipc->x1, ipc->y1, ipc->z1,
     	ipc->x2, ipc->y2, ipc->z2, false);
-    portal->SetPortal (is);
+    portal->SetSector (is);
     infinite_maze->random_loose_portals (ipc->x2, ipc->y2, ipc->z2);
     s->InitLightMaps (false);
     s->ShineLights ();

@@ -18,8 +18,8 @@
 
 #include "cssysdef.h"
 #include "csengine/keyval.h"
-#include "csengine/sector.h"
 #include "csengine/engine.h"
+#include "iengine/sector.h"
 
 //---------------------------------------------------------------------------
 
@@ -44,6 +44,21 @@ csKeyValuePair::~csKeyValuePair ()
   delete [] m_Value;
 }
 
+const char *csKeyValuePair::GetKey () const
+{
+  return GetName ();
+}
+
+void csKeyValuePair::SetKey (const char *s)
+{
+  SetName (s);
+}
+
+const char *csKeyValuePair::GetValue () const
+{
+  return m_Value;
+}
+
 void csKeyValuePair::SetValue (const char* value)
 {
   delete[] m_Value;
@@ -60,7 +75,7 @@ IMPLEMENT_EMBEDDED_IBASE (csMapNode::MapNode)
   IMPLEMENTS_INTERFACE (iMapNode)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csMapNode::csMapNode (const char* Name) : m_Position (0, 0, 0)
+csMapNode::csMapNode (const char* Name) : m_Position (0, 0, 0), m_pSector (NULL)
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiMapNode);
@@ -69,6 +84,28 @@ csMapNode::csMapNode (const char* Name) : m_Position (0, 0, 0)
 
 csMapNode::~csMapNode ()
 {
+}
+
+void csMapNode::SetPosition (const csVector3& pos)
+{
+  m_Position = pos;
+}
+
+const csVector3& csMapNode::GetPosition () const
+{
+  return m_Position;
+}
+
+iSector *csMapNode::GetSector () const
+{
+  return m_pSector;
+}
+
+void csMapNode::SetSector (iSector *pSector)
+{
+  if (m_pSector) m_pSector->QueryObject ()->ObjRemove (this);
+  m_pSector = pSector;
+  if (m_pSector) m_pSector->QueryObject ()->ObjAdd (this);
 }
 
 iMapNode* csMapNode::GetNode (iSector *pSector, const char* name,
@@ -82,18 +119,6 @@ iMapNode* csMapNode::GetNode (iSector *pSector, const char* name,
   }
 
   return NULL;
-}
-
-void csMapNode::MapNode::SetSector (iSector *pSector)
-{
-  scfParent->SetSector (pSector->GetPrivateObject ());
-}
-
-iSector* csMapNode::MapNode::GetSector () const
-{
-  iSector* sec = QUERY_INTERFACE (scfParent->GetSector (), iSector);
-  sec->DecRef ();
-  return sec;
 }
 
 //---------------------------------------------------------------------------

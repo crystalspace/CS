@@ -650,7 +650,7 @@ void csLoader::ResolvePortalSectors (iThingState *th)
     if (p && p->GetPortal ())
     {
       iPortal *portal = p->GetPortal ();
-      iSector *stmp = portal->GetPortal ();
+      iSector *stmp = portal->GetSector ();
       iSector *snew = Engine->FindSector (stmp->QueryObject ()->GetName (),
         ResolveOnlyRegion);
       if (!snew)
@@ -661,7 +661,7 @@ void csLoader::ResolvePortalSectors (iThingState *th)
           p->QueryObject ()->GetName ());
         fatal_exit (0, false);
       }
-      portal->SetPortal (snew);
+      portal->SetSector (snew);
       stmp->DecRef();
     }
   }

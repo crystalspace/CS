@@ -23,13 +23,11 @@
 #include "csutil/flags.h"
 #include "iengine/portal.h"
 
-class csObject;
-class csSector;
 class csPolygon2D;
 class csPolygon3D;
 class csStatLight;
+class csObject;
 struct iRenderView;
-struct iTextureHandle;
 struct iFrustumView;
 
 /**
@@ -40,7 +38,7 @@ class csPortal : public iPortal
 {
 private:
   /// The sector that this portal points to.
-  csSector* sector;
+  iSector* sector;
 
 public:
   /// Set of flags
@@ -68,63 +66,74 @@ protected:
   float filter_r, filter_g, filter_b;
 
 public:
-  /**
-   * Create a portal.
-   */
+  /// Create a portal.
   csPortal ();
 
   /// Destructor.
-  virtual ~csPortal () { }
+  virtual ~csPortal ();
+
+  //---- misc. manipulation functions ---------------------------------------
+
+  /// Return the sector that this portal points too.
+  iSector* GetSector () const;
 
   /**
-   * Return the sector that this portal points too.
+   * Set the sector that this portal points too. To avoid circular
+   * references, the sector is not IncRef'ed!
    */
-  csSector* GetSector () { return sector; }
+  void SetSector (iSector* s);
 
-  /**
-   * Set the sector that this portal points too.
-   */
-  void SetSector (csSector* s) { sector = s; }
+  /// Set portal flags (see CS_PORTAL_XXX values)
+  csFlags& GetFlags ();
 
-  /**
-   * Transform the warp matrix from object space to world space.
-   */
-  void ObjectToWorld (const csReversibleTransform& t);
+  /// Set the missing sector callback.
+  void SetPortalSectorCallback (csPortalSectorCallback cb, void* cbData);
 
-  /**
-   * Hard transform the warp matrix.
-   */
-  void HardTransform (const csReversibleTransform& t);
+  /// Get the missing sector callback.
+  csPortalSectorCallback GetPortalSectorCallback () const;
+
+  /// Get the missing sector callback data.
+  void* GetPortalSectorCallbackData () const;
+
+  /// Set the filter texture
+  void SetFilter (iTextureHandle* ft);
+  /// Get the filter texture
+  iTextureHandle* GetTextureFilter () const;
+
+  /// Set a color filter (instead of the texture).
+  void SetFilter (float r, float g, float b);
+  /// Get the current color filter
+  void GetColorFilter (float &r, float &g, float &b) const;
+
+  //---- space warping ------------------------------------------------------
+
+  /// Get the warping transformation in object space.
+  const csReversibleTransform& GetWarp () const;
 
   /**
    * Set the warping transformation for this portal in object space and world
    * space.
    */
-  virtual void SetWarp (const csTransform& t);
+  void SetWarp (const csTransform& t);
 
-  /**
-   * Get the warping transformation in object space.
+  /*
+   * Set the warping transformation for this portal in object space and world
+   * space.
    */
-  virtual const csReversibleTransform& GetWarp () { return warp_obj; }
+  void SetWarp (const csMatrix3 &m_w, const csVector3 &v_w_before,
+    const csVector3 &v_w_after);
 
-  /**
-   * Set the texture (used for filtering).
-   */
-  void SetTexture (iTextureHandle* ft) { filter_texture = ft; }
+  /// Set warping transformation to mirror
+  void SetMirror (iPolygon3D *iPoly);
 
-  /**
-   * Set the filter (instead of the texture).
-   */
-  void SetFilter (float r, float g, float b)
-  { filter_r = r; filter_g = g; filter_b = b; filter_texture = NULL; }
+  /// Transform the warp matrix from object space to world space.
+  void ObjectToWorld (const csReversibleTransform& t);
 
-  /**
-   * Warp a position in world space.
-   */
-  csVector3 Warp (const csVector3& pos)
-  {
-    return warp_wor.Other2This (pos);
-  }
+  /// Hard transform the warp matrix.
+  void HardTransform (const csReversibleTransform& t);
+
+  /// Warp a position in world space.
+  csVector3 Warp (const csVector3& pos) const;
 
   /**
    * Warp space using the given world->camera transformation.
@@ -136,7 +145,9 @@ public:
    * that the vertices are ordered anti-clockwise.  'mirror' will be modified
    * by warp_space if needed.
    */
-  void WarpSpace (csReversibleTransform& t, bool& mirror);
+  void WarpSpace (csReversibleTransform& t, bool& mirror) const;
+
+  //-------------------------------------------------------------------------
 
   /**
    * Draw the sector that is visible through this portal.
@@ -186,50 +197,14 @@ public:
    */
   bool CompleteSector (iBase* context);
 
-  //---------------------------- iPortal interface -----------------------------
-  DECLARE_IBASE;
-
-  /// Set portal flags (see CS_PORTAL_XXX values)
-  virtual csFlags& GetFlags () { return flags; }
-
-  /// Get the sector that the portal points to
-  virtual iSector *GetPortal ();
-  /// Set portal to point to specified sector
-  virtual void SetPortal (iSector *iDest);
-
-  /*
-   * Set the warping transformation for this portal in object space and world
-   * space.
-   */
-  virtual void SetWarp (const csMatrix3 &m_w, const csVector3 &v_w_before,
-    const csVector3 &v_w_after);
-  /// Set warping transformation to mirror
-  virtual void SetMirror (iPolygon3D *iPoly);
-
-  /// Set the missing sector callback.
-  virtual void SetPortalSectorCallback (csPortalSectorCallback cb,
-  	void* cbData)
-  {
-    sector_cb = cb;
-    sector_cbData = cbData;
-  }
-  /// Get the missing sector callback.
-  virtual csPortalSectorCallback GetPortalSectorCallback ()
-  {
-    return sector_cb;
-  }
-  /// Get the missing sector callback data.
-  virtual void* GetPortalSectorCallbackData ()
-  {
-    return sector_cbData;
-  }
-
   /**
    * Check frustum visibility of all polygons reachable through this portal.
    * Alpha is the alpha value you'd like to use to pass through this
    * portal (0 is no completely transparent, 100 is complete opaque).
    */
-  virtual void CheckFrustum (iFrustumView* lview, int alpha);
+  void CheckFrustum (iFrustumView* lview, int alpha);
+
+  DECLARE_IBASE;
 };
 
 #endif // __CS_PORTAL_H__

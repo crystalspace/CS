@@ -48,9 +48,6 @@ class csMeshWrapper : public csObject
   friend class csMovable;
 
 protected:
-  /// Points to Actor class which "owns" this object.
-  csObject* myOwner;
-
   /**
    * Points to the parent container object of this object.
    * This is usually csEngine or csParticleSystem.
@@ -160,11 +157,6 @@ public:
   csMeshWrapper (csObject* theParent, iMeshObject* mesh);
   /// Constructor.
   csMeshWrapper (csObject* theParent);
-
-  /// Set owner (actor) for this object.
-  void SetMyOwner (csObject* newOwner) { myOwner = newOwner; }
-  /// Get owner (actor) for this object.
-  csObject* GetMyOwner () const { return myOwner; }
 
   /// Set parent container for this object.
   void SetParentContainer (csObject* newParent) { parent = newParent; }

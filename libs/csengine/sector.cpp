@@ -557,7 +557,7 @@ csSector* csSector::FollowSegment (csReversibleTransform& t,
         po->WarpSpace (t, mirror);
 	new_position = po->Warp (new_position);
       }
-      csSector* dest_sect = po->GetSector ();
+      csSector* dest_sect = po->GetSector ()->GetPrivateObject ();
       return dest_sect ? dest_sect->FollowSegment (t, new_position, mirror) : (csSector*)NULL;
     }
     else

@@ -421,14 +421,14 @@ void csPolygon3D::Reset ()
 
 void csPolygon3D::SetCSPortal (csSector* sector, bool null)
 {
-  if (portal && portal->GetSector () == sector) return;
+  if (portal && portal->GetSector ()->GetPrivateObject () == sector) return;
   if (portal && flags.Check (CS_POLY_DELETE_PORTAL))
   { delete portal; portal = NULL; }
   if (!null && !sector) return;
   portal = new csPortal;
   flags.Set (CS_POLY_DELETE_PORTAL);
   portal->flags.Reset (CS_PORTAL_WARP);
-  portal->SetSector (sector);
+  portal->SetSector (&sector->scfiSector);
   flags.Reset (CS_POLY_COLLDET); // Disable CD by default for portals.
   //portal->SetTexture (texh->get_texture_handle ());
 }
@@ -752,7 +752,7 @@ void csPolygon3D::Finish ()
   lmi->Setup (this, material);
   lmi->tex->SetLightMap (NULL);
   if (portal)
-    portal->SetTexture (material->GetMaterialHandle ()->GetTexture ());
+    portal->SetFilter (material->GetMaterialHandle ()->GetTexture ());
 
   if (flags.Check (CS_POLY_LIGHTING)
   	&& csLightMap::CalcLightMapWidth (lmi->tex->w_orig) <= 256

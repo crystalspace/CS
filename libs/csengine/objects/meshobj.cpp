@@ -89,7 +89,6 @@ csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
   last_anim_time = 0;
   is_visible = false;
   wor_bbox_movablenr = -1;
-  myOwner = NULL;
   parent = theParent;
   movable.SetObject (this);
 
@@ -122,7 +121,6 @@ csMeshWrapper::csMeshWrapper (csObject* theParent)
   last_anim_time = 0;
   is_visible = false;
   wor_bbox_movablenr = -1;
-  myOwner = NULL;
   parent = theParent;
   movable.SetObject (this);
 

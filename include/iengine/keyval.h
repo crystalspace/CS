@@ -27,7 +27,9 @@ struct iSector;
 SCF_VERSION (iKeyValuePair, 0, 0, 1);
 
 /**
- * A Key Value pair.
+ * A Key Value pair. This object contains a 'key' string and a 'value' string.
+ * The 'key' string is the same as the name of the object as returned from
+ * the iObject.
  */
 struct iKeyValuePair : public iBase
 {
@@ -37,31 +39,35 @@ struct iKeyValuePair : public iBase
   /// Get the key string of the pair.
   virtual const char *GetKey () const = 0;
 
+  /// Set the key string of the pair
+  virtual void SetKey (const char* key) = 0;
+
   /// Get the value string of the pair
   virtual const char *GetValue () const = 0;
 
-  /// Set the value of a key in an object.
+  /// Set the value string of the pair
   virtual void SetValue (const char* value) = 0;
 };
 
 SCF_VERSION (iMapNode, 0, 0, 1);
 
 /**
- * A node.
+ * A node. This is an iObject that is bound to a position and a sector in
+ * the world.
  */
 struct iMapNode : public iBase
 {
   /// Get the iObject.
   virtual iObject *QueryObject() = 0;
 
-  ///
+  /// Set the position of the node
   virtual void SetPosition (const csVector3& pos) = 0;
-  ///
+  /// Get the position of the node
   virtual const csVector3& GetPosition () const = 0;
 
-  ///
+  /// Set the sector of the node
   virtual void SetSector (iSector *pSector) = 0;
-  ///
+  /// Get the sector of the node
   virtual iSector *GetSector () const = 0;
 };
 

@@ -47,6 +47,26 @@ csPortal::csPortal ()
   sector_cbData = NULL;
 }
 
+csPortal::~csPortal ()
+{
+  if (filter_texture) filter_texture->DecRef ();
+}
+
+iSector* csPortal::GetSector () const
+{
+  return sector;
+}
+
+void csPortal::SetSector (iSector* s)
+{
+  sector = s;
+}
+
+csFlags& csPortal::GetFlags ()
+{
+  return flags;
+}
+
 bool csPortal::CompleteSector (iBase* context)
 {
   if (sector)
@@ -100,7 +120,48 @@ void csPortal::SetWarp (const csMatrix3& m_w, const csVector3& v_w_before, const
   warp_wor = warp_obj;
 }
 
-void csPortal::WarpSpace (csReversibleTransform& t, bool& mirror)
+const csReversibleTransform& csPortal::GetWarp () const
+{
+  return warp_obj;
+}
+
+void csPortal::SetFilter (iTextureHandle* ft)
+{
+  if (filter_texture) filter_texture->DecRef ();
+  filter_texture = ft;
+  if (filter_texture) filter_texture->IncRef ();
+}
+
+iTextureHandle* csPortal::GetTextureFilter () const
+{
+  return filter_texture;
+}
+
+void csPortal::SetFilter (float r, float g, float b)
+{
+  filter_r = r;
+  filter_g = g;
+  filter_b = b;
+  if (filter_texture)
+  {
+    filter_texture->DecRef ();
+    filter_texture = NULL;
+  }
+}
+
+void csPortal::GetColorFilter (float &r, float &g, float &b) const
+{
+  r = filter_r;
+  g = filter_g;
+  b = filter_b;
+}
+
+csVector3 csPortal::Warp (const csVector3& pos) const
+{
+  return warp_wor.Other2This (pos);
+}
+
+void csPortal::WarpSpace (csReversibleTransform& t, bool& mirror) const
 {
   // warp_wor is a world -> warp space transformation.
   // t is a world -> camera space transformation.
@@ -129,7 +190,7 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
     }
   }
 
-  if (sector->draw_busy >= 5)
+  if (sector->GetPrivateObject ()->draw_busy >= 5)
     return false;
 
   Stats::portals_drawn++;
@@ -176,10 +237,10 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
     WarpSpace (inewcam->GetTransform (), mirror);
     inewcam->SetMirrored (mirror);
 
-    sector->Draw (rview);
+    sector->GetPrivateObject ()->Draw (rview);
   }
   else
-    sector->Draw (rview);
+    sector->GetPrivateObject ()->Draw (rview);
 
   rview->RestoreRenderContext (old_ctxt);
 
@@ -199,19 +260,23 @@ csPolygon3D* csPortal::HitBeam (const csVector3& start, const csVector3& end,
 {
   if (!CompleteSector (NULL)) return NULL;
 
-  if (sector->draw_busy >= 5)
+  if (sector->GetPrivateObject ()->draw_busy >= 5)
     return NULL;
   if (flags.Check (CS_PORTAL_WARP))
   {
     csVector3 new_start = warp_wor.Other2This (start);
     csVector3 new_end = warp_wor.Other2This (end);
     csVector3 new_isect;
-    csPolygon3D* p = sector->HitBeam (new_start, new_end, new_isect);
+    iPolygon3D* p = sector->HitBeam (new_start, new_end, new_isect);
     if (p)
       isect = warp_wor.This2Other (new_isect);
-    return p;
+    return p ? p->GetPrivateObject () : NULL;
   }
-  else return sector->HitBeam (start, end, isect);
+  else
+  {
+    iPolygon3D* p = sector->HitBeam (start, end, isect);
+    return p ? p->GetPrivateObject () : NULL;
+  }
 }
 
 csObject* csPortal::HitBeam (const csVector3& start, const csVector3& end,
@@ -219,22 +284,22 @@ csObject* csPortal::HitBeam (const csVector3& start, const csVector3& end,
 {
   if (!CompleteSector (NULL)) return NULL;
 
-  if (sector->draw_busy >= 5)
+  if (sector->GetPrivateObject ()->draw_busy >= 5)
     return NULL;
   if (flags.Check (CS_PORTAL_WARP))
   {
     csVector3 new_start = warp_wor.Other2This (start);
     csVector3 new_end = warp_wor.Other2This (end);
-    csObject* o = sector->HitBeam (new_start, new_end, polygonPtr);
+    csObject* o = sector->GetPrivateObject ()->HitBeam (new_start, new_end, polygonPtr);
     return o;
   }
-  else return sector->HitBeam (start, end, polygonPtr);
+  else return sector->GetPrivateObject ()->HitBeam (start, end, polygonPtr);
 }
 
 void csPortal::CheckFrustum (iFrustumView* lview, int alpha)
 {
   if (!CompleteSector (lview)) return;
-  if (sector->draw_busy > csSector::cfg_reflections) return;
+  if (sector->GetPrivateObject ()->draw_busy > csSector::cfg_reflections) return;
 
   csFrustumContext* old_ctxt = lview->GetFrustumContext ();
   lview->CreateFrustumContext ();
@@ -318,7 +383,7 @@ void csPortal::CheckFrustum (iFrustumView* lview, int alpha)
     }
   }
 
-  sector->RealCheckFrustum (lview);
+  sector->GetPrivateObject ()->RealCheckFrustum (lview);
 
   if (copied_frustums)
   {
@@ -330,18 +395,25 @@ stop:
   lview->RestoreFrustumContext (old_ctxt);
 }
 
-iSector *csPortal::GetPortal ()
-{
-  return &GetSector ()->scfiSector;
-}
-
-void csPortal::SetPortal (iSector *iDest)
-{
-  SetSector (iDest->GetPrivateObject ());
-}
-
 void csPortal::SetMirror (iPolygon3D *iPoly)
 {
   csPolygon3D *poly = iPoly->GetPrivateObject ();
   SetWarp (csTransform::GetReflect (*(poly->GetPolyPlane ())));
+}
+
+void csPortal::SetPortalSectorCallback (csPortalSectorCallback cb,
+	void* cbData)
+{
+  sector_cb = cb;
+  sector_cbData = cbData;
+}
+
+csPortalSectorCallback csPortal::GetPortalSectorCallback () const
+{
+  return sector_cb;
+}
+
+void* csPortal::GetPortalSectorCallbackData () const
+{
+  return sector_cbData;
 }

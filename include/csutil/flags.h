@@ -56,15 +56,15 @@ public:
   }
 
   /// Get flags.
-  unsigned Get ()
+  unsigned Get () const
   { return flags; }
 
   /// Check if any of the given flags are set.
-  bool Check (unsigned mask)
+  bool Check (unsigned mask) const
   { return (flags & mask) != 0; }
 
   /// Check if all the given flags are set.
-  bool CheckAll (unsigned mask)
+  bool CheckAll (unsigned mask) const
   { return (flags & mask) == mask; }
 };
 

@@ -20,7 +20,6 @@
 #define __IENGINE_PORTAL_H__
 
 #include "csutil/scf.h"
-#include "csutil/flags.h"
 
 /**
  * If this flag is set then this portal will clip all geometry in
@@ -65,6 +64,8 @@
 class csTransform;
 class csMatrix3;
 class csVector3;
+class csFlags;
+struct iTextureHandle;
 struct iSector;
 struct iPolygon3D;
 struct iPortal;
@@ -91,13 +92,41 @@ SCF_VERSION (iPortal, 0, 0, 4);
  */
 struct iPortal : public iBase
 {
-  /// Set portal flags (see CS_PORTAL_XXX values above)
+  //---- misc. manipulation functions ---------------------------------------
+
+  /// Return the sector that this portal points too.
+  virtual iSector* GetSector () const = 0;
+
+  /**
+   * Set the sector that this portal points too. To avoid circular
+   * references, the sector is not IncRef'ed!
+   */
+  virtual void SetSector (iSector* s) = 0;
+
+  /// Set portal flags (see CS_PORTAL_XXX values)
   virtual csFlags& GetFlags () = 0;
 
-  /// Get the sector that the portal points to
-  virtual iSector *GetPortal () = 0;
-  /// Set portal to point to specified sector
-  virtual void SetPortal (iSector *iDest) = 0;
+  /// Set the missing sector callback.
+  virtual void SetPortalSectorCallback (csPortalSectorCallback cb,
+    void* cbData) = 0;
+
+  /// Get the missing sector callback.
+  virtual csPortalSectorCallback GetPortalSectorCallback () const = 0;
+
+  /// Get the missing sector callback data.
+  virtual void* GetPortalSectorCallbackData () const = 0;
+
+  /// Set the filter texture
+  virtual void SetFilter (iTextureHandle* ft) = 0;
+  /// Get the filter texture
+  virtual iTextureHandle* GetTextureFilter () const = 0;
+
+  /// Set a color filter (instead of the texture).
+  virtual void SetFilter (float r, float g, float b) = 0;
+  /// Get the current color filter
+  virtual void GetColorFilter (float &r, float &g, float &b) const = 0;
+
+  //---- space warping ------------------------------------------------------
 
   /**
    * Set the warping transformation for this portal in object space and world
@@ -115,15 +144,37 @@ struct iPortal : public iBase
   virtual void SetMirror (iPolygon3D *iPoly) = 0;
 
   /// Get the warping transformation
-  virtual const csReversibleTransform &GetWarp () = 0;
+  virtual const csReversibleTransform &GetWarp () const = 0;
 
-  /// Set the missing sector callback.
-  virtual void SetPortalSectorCallback (csPortalSectorCallback cb,
-  	void* cbData) = 0;
-  /// Get the missing sector callback.
-  virtual csPortalSectorCallback GetPortalSectorCallback () = 0;
-  /// Get the missing sector callback data.
-  virtual void* GetPortalSectorCallbackData () = 0;
+  /// Transform the warp matrix from object space to world space.
+  virtual void ObjectToWorld (const csReversibleTransform& t) = 0;
+
+  /// Hard transform the warp matrix.
+  virtual void HardTransform (const csReversibleTransform& t) = 0;
+
+  /// Warp a position in world space.
+  virtual csVector3 Warp (const csVector3& pos) const = 0;
+
+  /**
+   * Warp space using the given world->camera transformation.
+   * This function modifies the given camera transformation to reflect
+   * the warping change.<p>
+   *
+   * 't' is the transformation from world to camera space.<br>
+   * 'mirror' is true if the camera transformation transforms all polygons so
+   * that the vertices are ordered anti-clockwise.  'mirror' will be modified
+   * by warp_space if needed.
+   */
+  virtual void WarpSpace (csReversibleTransform& t, bool& mirror) const = 0;
+
+  //-------------------------------------------------------------------------
+
+  /**
+   * Check if the destination sector is NULL and if so call
+   * the callback. This function returns false if the portal should
+   * not be traversed.
+   */
+  virtual bool CompleteSector (iBase* context) = 0;
 
   /**
    * Check frustum visibility of all polygons reachable through this portal.

@@ -21,14 +21,12 @@
 
 #include "csgeom/vector3.h"
 #include "csutil/csobject.h"
-#include "csutil/nobjvec.h"
 #include "iengine/keyval.h"
 
-class csSector;
-struct iSector;
-
 /**
- * A Key Value Pair.
+ * A Key Value pair. This object contains a 'key' string and a 'value' string.
+ * The 'key' string is the same as the name of the object as returned from
+ * the iObject.
  */
 class csKeyValuePair : public csObject
 {
@@ -39,10 +37,13 @@ public:
   virtual ~csKeyValuePair ();
 
   /// Get the key string of the pair.
-  const char *GetKey () const { return GetName (); }
+  const char *GetKey () const;
+
+  /// Set the key string of the pair.
+  void SetKey (const char *s);
 
   /// Get the value string of the pair
-  const char *GetValue () const { return m_Value; }
+  const char *GetValue () const;
 
   /// Set the value of a key in an object.
   void SetValue (const char* value);
@@ -54,6 +55,7 @@ public:
     DECLARE_EMBEDDED_IBASE (csKeyValuePair);
     virtual iObject *QueryObject() { return scfParent; }
     virtual const char *GetKey () const { return scfParent->GetKey (); }
+    virtual void SetKey (const char* s) { scfParent->SetKey (s); }
     virtual const char *GetValue () const { return scfParent->GetValue (); }
     virtual void SetValue (const char* value) { scfParent->SetValue (value); }
   } scfiKeyValuePair;
@@ -63,7 +65,8 @@ private:
 };
 
 /**
- * A node.
+ * A node. This is an iObject that is bound to a position and a sector in
+ * the world.
  */
 class csMapNode : public csObject
 {
@@ -73,15 +76,15 @@ public:
   /// The destructor as usual
   virtual ~csMapNode ();
 
-  ///
-  void SetPosition (const csVector3& pos) { m_Position = pos; }
-  ///
-  const csVector3& GetPosition () const { return m_Position; }
+  /// Set the position of the node
+  void SetPosition (const csVector3& pos);
+  /// Get the position of the node
+  const csVector3& GetPosition () const;
 
-  ///
-  void SetSector (csSector *pSector) { m_pSector = pSector; }
-  ///
-  csSector *GetSector () const { return m_pSector; }
+  /// Set the sector of the node
+  void SetSector (iSector *pSector);
+  /// Get the sector of the node
+  iSector *GetSector () const;
 
   /// Get a node with the given name and a given classname. (shortcut)
   static iMapNode *GetNode (iSector *pSector, const char *name,
@@ -92,21 +95,20 @@ public:
   struct MapNode : public iMapNode
   {
     DECLARE_EMBEDDED_IBASE (csMapNode);
-    virtual iObject *QueryObject() { return scfParent; }
+    virtual iObject *QueryObject()
+    { return scfParent; }
     virtual void SetPosition (const csVector3& pos)
-    {
-      scfParent->SetPosition (pos);
-    }
+    { scfParent->SetPosition (pos); }
     virtual const csVector3& GetPosition () const
-    {
-      return scfParent->GetPosition ();
-    }
-    virtual void SetSector (iSector *pSector);
-    virtual iSector *GetSector () const;
+    { return scfParent->GetPosition (); }
+    virtual void SetSector (iSector *sec)
+    { scfParent->SetSector (sec); }
+    virtual iSector *GetSector () const
+    { return scfParent->GetSector (); }
   } scfiMapNode;
 
 private:
-  csSector *m_pSector;
+  iSector *m_pSector;
   csVector3 m_Position;
 };
 
@@ -117,9 +119,9 @@ class csNodeIterator
 {
 public:
   /**
-   * The constructor. Theorectially, we could handle any csObject, but
+   * The constructor. Theorectially, we could handle any iObject, but
    * that doesn't make sense for the current implementation, so we 
-   * restrict it to csSector to avoid some pitfalls.<p>
+   * restrict it to iSector to avoid some pitfalls.<p>
    *
    * If a classname is given, search is restricted to nodes, in which
    * the key "classname" has the same value as the given classname.
