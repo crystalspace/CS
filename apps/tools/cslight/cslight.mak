@@ -40,7 +40,8 @@ LIB.CSLIGHT = $(foreach d,$(DEP.CSLIGHT),$($d.LIB))
 MSVC.DSP += CSLIGHT
 DSP.CSLIGHT.NAME = cslight
 DSP.CSLIGHT.TYPE = appcon
-DSP.CSLIGHT.RESOURCES = apps/tools/cslight/cslight.rc
+
+CSLIGHT.WINRSRC = apps/tools/cslight/cslight.rc
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

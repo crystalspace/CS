@@ -48,7 +48,8 @@ TO_INSTALL.DATA   += data/stdtex.zip
 MSVC.DSP += WALKTEST
 DSP.WALKTEST.NAME = walktest
 DSP.WALKTEST.TYPE = appcon
-DSP.WALKTEST.RESOURCES = libs/cssys/win32/rsrc/cs1.rc
+
+WALKTEST.WINRSRC = libs/cssys/win32/rsrc/cs1.rc
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

@@ -39,7 +39,8 @@ TO_INSTALL.EXE    += $(LEVTOOL.EXE)
 MSVC.DSP += LEVTOOL
 DSP.LEVTOOL.NAME = levtool
 DSP.LEVTOOL.TYPE = appcon
-#DSP.LEVTOOL.RESOURCES = libs/cssys/win32/rsrc/cs1.rc
+
+#WINRSRC.LEVTOOL = libs/cssys/win32/rsrc/cs1.rc
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

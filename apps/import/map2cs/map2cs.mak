@@ -42,7 +42,7 @@ TO_INSTALL.CONFIG += $(CFG.MAP2CS)
 MSVC.DSP += MAP2CS
 DSP.MAP2CS.NAME = map2cs
 DSP.MAP2CS.TYPE = appcon
-DSP.MAP2CS.LIBS = zlib
+DSP.MAP2CS.LIBS = libz
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
