@@ -80,12 +80,14 @@ private:
   /// Copy from one array to this.
   void CopyFrom (const csArray& source)
   {
-    if (&source == this) return;
-    DeleteAll ();
-    threshold = source.threshold;
-    SetLengthUnsafe (source.Length ());
-    for (int i=0 ; i<source.Length() ; i++)
-      ElementHandler::Construct (root + i, source[i]);
+    if (&source != this)
+    {
+      DeleteAll ();
+      threshold = source.threshold;
+      SetLengthUnsafe (source.Length ());
+      for (int i=0 ; i<source.Length() ; i++)
+        ElementHandler::Construct (root + i, source[i]);
+    }
   }
 
   // Adjust internal capacity of this array.
@@ -154,7 +156,7 @@ public:
     return *this;
   }
 
-  /// return the number of elements in the Array
+  /// Return the number of elements in the Array
   int Length () const
   {
     return count;
@@ -174,14 +176,16 @@ public:
    */
   void TransferTo (csArray& destination)
   {
-    if (&destination == this) return;
-    destination.DeleteAll ();
-    destination.root = root;
-    destination.count = count;
-    destination.capacity = capacity;
-    destination.threshold = threshold;
-    root = 0;
-    capacity = count = 0;
+    if (&destination != this)
+    {
+      destination.DeleteAll ();
+      destination.root = root;
+      destination.count = count;
+      destination.capacity = capacity;
+      destination.threshold = threshold;
+      root = 0;
+      capacity = count = 0;
+    }
   }
 
   /**
@@ -261,8 +265,7 @@ public:
    */
   int FindKey (void* key, ArrayCompareKeyFunction* comparekey) const
   {
-    int i;
-    for (i = 0 ; i < Length () ; i++)
+    for (int i = 0 ; i < Length () ; i++)
       if (comparekey (root[i], key) == 0)
         return i;
     return -1;
@@ -274,7 +277,7 @@ public:
   {
     SetLengthUnsafe (count + 1);
     ElementHandler::Construct (root + count - 1, what);
-    return (count - 1);
+    return count - 1;
   }
 
   /*
@@ -409,8 +412,7 @@ public:
   /// Find a element in array and return its index (or -1 if not found).
   int Find (T const& which) const
   {
-    int i;
-    for (i = 0 ; i < Length () ; i++)
+    for (int i = 0 ; i < Length () ; i++)
       if (root[i] == which)
         return i;
     return -1;
@@ -572,7 +574,7 @@ public:
     { return array.Get(currentelem++); }
 
     /** Reset the array to the first element */
-    void Return()
+    void Reset()
     { currentelem = 0; }
   protected:
     Iterator(const csArray<T, ElementHandler>& newarray)
