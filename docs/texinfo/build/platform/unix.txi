@@ -100,7 +100,7 @@ all files will be recompiled that are in need of recompiling.
 Then you need to do the following:
 
 @example
-make apps
+make all
 @end example
 
 If you selected @code{USE_SHARED_PLUGINS=yes} then this will generate an
