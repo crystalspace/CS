@@ -49,7 +49,7 @@ public:
 
   csFullscreenQuad (iRender3D* r3d, iStringSet* strings)
   {
-    SCF_CONSTRUCT_IBASE (NULL)
+    SCF_CONSTRUCT_IBASE (0)
 
       csFullscreenQuad::r3d = r3d;
 
@@ -94,7 +94,7 @@ public:
       return indices;
     if (name == texcoords_name)
       return texcoords;
-    return NULL;
+    return 0;
   }
 };
 
