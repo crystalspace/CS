@@ -24,6 +24,11 @@ The history order is reversed so that new features are at the top.
 	  of <texmap>) in thing.txi which was reported by Oroszi Balazs
 	  <oroszib@vpg.sulinet.hu>.
 	- Eric Sunshine repaired some poor wording in csutil.txi.
+	- Eric Sunshine rewrote the "Typed Arrays" section in csutil.txi.  In
+	  addition to other changes, it now provides much clearer warning about
+	  which classes are preferred, and which should be avoided.
+	- Eric Sunshine eliminated `hbox' warnings from the Texinfo files
+	  reported by TeX.
 10-Feb-2003
 	- Marten Svanfeldt fixed various bugs in TextureManager
 	- Philipp Aumayr added new TextureManager for Render3D with support

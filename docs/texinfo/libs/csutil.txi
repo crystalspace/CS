@@ -14,6 +14,10 @@ type-safe.  See later sections for additional information.
 
 @itemize @bullet
 @item
+@code{csArray<T>},
+@item
+@code{csGrowingArray<T>}
+@item
 @code{csRefArray<T>}
 @item
 @code{csRefArrayObject<T>}
@@ -21,10 +25,6 @@ type-safe.  See later sections for additional information.
 @code{csPArray<T>},
 @item
 @code{csPDelArray<T>}
-@item
-@code{csArray<T>},
-@item
-@code{csGrowingArray<T>}
 @end itemize
 
 Also in csutil are the @file{.cfg} file reader and the random
@@ -41,10 +41,10 @@ vectors. They will be explained in the next sections.
 
 @menu
 * csObject:: @code{csObject}
-* Typed Vectors:: @code{Typed Vectors}
+* Typed Arrays:: @code{Typed Arrays}
 @end menu
 
-@node csObject, Typed Vectors, csUtil, csUtil
+@node csObject, Typed Arrays, csUtil, csUtil
 @subsection @code{csObject}
 @cindex @code{csObject}
 
@@ -82,64 +82,68 @@ returned). This is slightly faster.
 Note that all these macros increase the reference count of the returned
 object by 1.
 
-@node Typed Vectors, , csObject, csUtil
-@subsection @code{Typed Vectors}
-@cindex @code{Typed Vectors}
+@node Typed Arrays, , csObject, csUtil
+@subsection Typed Arrays
+@cindex Typed Arrays
 
-Crystal Space currently has six types of typed vectors.  These arrays grow as
-needed to accomodate additions and insertions.
+Crystal Space currently has several styles of typed Arrays.  These arrays grow
+as needed to accommodate additions and insertions.
 
 @itemize
 @item
-@code{csRefArray<T>}: this is the prefered way to store references if you want
-to keep a reference to the objects in the array. i.e. when you add elements
-to this array it will increase the reference count and it will also decrease
-the reference count when the element is deleted again. This class can contain
-objects that implement the @code{IncRef()} and @code{DecRef()} functions
-(both @code{iBase} and @code{csRefCount} do that).
-Include file is @file{include/csutil/refarr.h}.
+@code{csArray<T>}: This is a generic, all-purpose dynamic array class.  It is
+suitable for any C++ type, including basic types (such as @samp{int}) and
+user-defined types (such as objects).  This class guarantees proper
+construction and destruction of objects as they are added to, and removed from
+the array.  Include file is @file{csutil/array.h}.
 
 @item
-@code{csRefArrayObject<T>}: this is a variant of @code{csRefArray<T>} that
-can hold objects that have a method @code{QueryObject()} which returns
-something from which you can call @code{GetName()}. In practice it means
-this is useful for all Crystal Space objects that implement @code{iObject}.
-In addition to the features of @code{csRefArray<T>} this class adds the
-ability to find elements by name.
-Include file is @file{include/csutil/nobjvec.h}.
+@code{csGrowingArray<T>}: Similar to @code{csArray<T>}, this array type can be
+used to store arbitrary objects, with the exception that it @emph{does not
+invoke constructors and destructors} of contained objects.  Use this class at
+your own peril; @code{csArray<T>} is almost always a better choice.  The only
+conceivable instance in which use of this class might be warranted is when
+micro-optimization is required; when you need to avoid the overhead of object
+construction, but this is highly dangerous and should be avoided in almost all
+cases.  This class is mainly useful in cases where you have simple objects
+(structures) and efficiency is of utmost importance.  Also, this array provides
+read access to the actual memory vector, which can be useful if you need to
+communicate with some external @sc{api}.  Include file is
+@file{csutil/garray.h}.
 
 @item
-@code{csPArray<T>}: this is similar to @code{csRefArray<T>} but no reference
-counts are maintained. This class also doesn't initialize new items (when you
-do @code{SetLength()} for example) and you are fully responsible for cleaning
-up the items in this array.
-Include file is @file{include/csutil/ptrarr.h}.
+@code{csRefArray<T>}: This is the preferred way to store an array of pointers
+to reference-counted objects.  This array type automatically invokes each
+object's @code{IncRef()} method at insertion time, and @code{DecRef()} at
+removal time.  All @sc{scf} objects (@pxref{SCF}) support these methods, as do
+objects derived from @code{csRefCount}.  Since @code{csRefArray<T>} is a
+templated class, it will also work with any other object which provides
+@code{IncRef()} and @code{DecRef()} methods.  Include file is
+@file{csutil/refarr.h}.
 
 @item
-@code{csPDelArray<T>}: this is similar to @code{csPArray<T>} but the elements
-are deleted (using @code{delete}) when removed from the array. This array
-takes care of initializating everything correctly (so that no double deletes
-can occur).
-Include file is @file{include/csutil/ptrarr.h}.
+@code{csRefArrayObject<T>}: This is a variant of @code{csRefArray<T>} which can
+hold objects that have a method @code{QueryObject()} which returns something
+from which you can call @code{GetName()}.  In practice it means this is useful
+for all Crystal Space objects that implement @code{iObject}.  In addition to
+the features of @code{csRefArray<T>} this class adds the ability to find
+elements by name.  Include file is @file{csutil/nobjvec.h}.
 
 @item
-@code{csArray<T>}: this array class can handle objects that are not pointers.
-It is best to avoid using this class for pointers as the four other array
-types above already provide support for that. This class takes proper care
-of constructing/destructing objects and can be used to contain any kind of
-object.
-Include file is @file{include/csutil/array.h}.
+@code{csPArray<T>}: @emph{This class is deprecated.} This array class only
+works works with with pointers to objects.  It does not initialize its
+elements.  It does not invoke an object's @code{IncRef()} and @code{DecRef()}
+methods.  Client code is fully responsible for cleaning up the items in this
+array.  In short, it is an extremely dangerous array class and shold not be
+used in new code.  @emph{Do not use this array type.} Instead, you should use
+@code{csArray<T>}.  Include file is @file{csutil/ptrarr.h}.
 
 @item
-@code{csGrowingArray<T>}: just like csArray<T> this array class can handle
-objects that are not pointers. It is best to avoid using this class for pointers
-as the four other array types above already provide support for that.
-Also note that you should not use this class for objects that require a
-constructor as this class doesn't do any initialization at all. This class
-is mainly useful in cases where you have simple objects (structures) and
-efficiency is of utmost importance. Also this array provides read access
-to the actual memory array which is useful if you want to communicate with
-external API's (for example, the OpenGL renderer uses this to store arrays
-of vectors and then it can pass the real array pointer to the OpenGL API).
-Include file is @file{include/csutil/garray.h}.
+@code{csPDelArray<T>}: @emph{This class is deprecated.} This is similar to
+@code{csPArray<T>}.  It is for pointers only.  It differs from
+@code{csPArray<T>} in that it invokes @samp{delete} for elements removed from
+the array.  Other than that difference, all of the warnings which apply to
+@code{csPArray<T>} also apply to this class.  You should not use this class for
+new code.  Instead, use @code{csArray<T>} or @code{csRefArray<T>}, depending
+upon your requirements.  Include file is @file{csutil/ptrarr.h}.
 @end itemize
