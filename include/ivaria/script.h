@@ -20,35 +20,286 @@
 #define __CS_IVARIA_SCRIPT_H__
 
 #include "csutil/scf.h"
+#include "csutil/ref.h"
+
+SCF_VERSION (iScriptObject, 0, 0, 1);
+
+/**
+ * This provides the interface to an object in an object-oriented scripting
+ * language.
+ *
+ * Several functions here take a variable-length argument list with a
+ * printf-style format string supporting all the argument types supported by
+ * printf, except width and precision specifiers, as they have no meaning here.
+ * In the case of "%p" (pointer), it can be proceeded in the format string by
+ * the type name of the object being pointed to. The "%O" (captial letter `O')
+ * format specifier works like "%p", signifies an iScriptObject.
+ */
+struct iScriptObject : public iBase
+{
+  /// Get the type name of the object.
+  virtual const char* GetType () const = 0;
+
+  /**
+   * Call a method in the object, with no return value.
+   * Returns false if the subroutine named does not exist.
+   * Format is a printf-style format string for the arguments.
+   */
+  virtual bool Call (const char *name, const char *format, ...)
+    CS_GNUC_PRINTF(3, 4) = 0;
+
+  /**
+   * Call a method in the object, with int return value.
+   * Returns false if the subroutine named does not exist.
+   * Format is a printf-style format string for the arguments.
+   */
+  virtual bool Call (const char *name, int &ret, const char *fmt, ...)
+    CS_GNUC_PRINTF(4, 5) = 0;
+
+  /**
+   * Call a method in the object, with float return value.
+   * Returns false if the subroutine named does not exist.
+   * Format is a printf-style format string for the arguments.
+   */
+  virtual bool Call (const char *name, float &ret, const char *fmt, ...)
+    CS_GNUC_PRINTF(4, 5) = 0;
+
+  /**
+   * Call a method in the object, with double return value.
+   * Returns false if the subroutine named does not exist.
+   * Format is a printf-style format string for the arguments.
+   */
+  virtual bool Call (const char *name, double &ret, const char *fmt, ...)
+    CS_GNUC_PRINTF(4, 5) = 0;
+
+  /**
+   * Call a method in the object, with string return value.
+   * Returns false if the subroutine named does not exist.
+   * Format is a printf-style format string for the arguments.
+   */
+  virtual bool Call (const char *name, char **ret, const char *fmt, ...)
+    CS_GNUC_PRINTF(4, 5) = 0;
+
+  /**
+   * Call a method in the object, with pointer return value.
+   * Returns false if the subroutine named does not exist.
+   * Format is a printf-style format string for the arguments.
+   */
+  virtual bool Call (const char *name, void **ret, const char *fmt, ...)
+    CS_GNUC_PRINTF(4, 5) = 0;
+
+  /**
+   * Call a method in the object, with object return value.
+   * Returns false if the subroutine named does not exist.
+   * Format is a printf-style format string for the arguments.
+   */
+  virtual bool Call (const char *name, csRef<iScriptObject> &ret,
+    const char *fmt, ...) CS_GNUC_PRINTF(4, 5) = 0;
+
+  /// Set the value of an int variable in the script interpreter.
+  /// Returns false if the named property does not exist.
+  virtual bool Set (const char *name, int data) = 0;
+
+  /// Set the value of a float variable in the script interpreter.
+  /// Returns false if the named property does not exist.
+  virtual bool Set (const char *name, float data) = 0;
+
+  /// Set the value of a double variable in the script interpreter.
+  /// Returns false if the named property does not exist.
+  virtual bool Set (const char *name, double data) = 0;
+
+  /// Set the value of a string variable in the script interpreter.
+  /// Returns false if the named property does not exist.
+  virtual bool Set (const char *name, char *data) = 0;
+
+  /// Set the value of a pointer variable in the script interpreter.
+  /// Returns false if the named property does not exist.
+  virtual bool Set (const char *name, void *data, const char *type) = 0;
+
+  /// Set the value of an object variable in the script interpreter.
+  /// Returns false if the named property does not exist.
+  virtual bool Set (const char *name, iScriptObject *data) = 0;
+
+  /// Set the value of a bool variable in the script interpreter.
+  /// Returns false if the named property does not exist.
+  virtual bool SetTruth (const char *name, bool isTrue) = 0;
+
+  /// Get the value of an int variable in the script interpreter.
+  /// Returns false if the named property does not exist.
+  virtual bool Get (const char *name, int &data) const = 0;
+
+  /// Get the value of a float variable in the script interpreter.
+  /// Returns false if the named property does not exist.
+  virtual bool Get (const char *name, float &data) const = 0;
+
+  /// Get the value of a double variable in the script interpreter.
+  /// Returns false if the named property does not exist.
+  virtual bool Get (const char *name, double &data) const = 0;
+
+  /// Get the value of a string variable in the script interpreter.
+  /// Returns false if the named property does not exist.
+  virtual bool Get (const char *name, char **data) const = 0;
+
+  /// Get the value of a pointer variable in the script interpreter.
+  /// Returns false if the named property does not exist.
+  virtual bool Get (const char *name, void **data, const char *type) const = 0;
+
+  /// Get the value of an object variable in the script interpreter.
+  /// Returns false if the named variable does not exist.
+  virtual bool Get (const char *name, csRef<iScriptObject> &data) const = 0;
+
+  /// Get the value of a bool variable in the script interpreter.
+  /// Returns false if the named property does not exist.
+  virtual bool GetTruth (const char *name, bool &isTrue) const = 0;
+};
 
 struct iObjectRegistry;
 
-SCF_VERSION (iScript, 0, 0, 1);
+SCF_VERSION (iScript, 0, 0, 2);
 
 /**
- * @@@ Please document iScript with Doxygen comments.
+ * This provides the interface to a scripting language interpreter.
+ *
+ * Several functions here take a variable-length argument list with a
+ * printf-style format string supporting all the argument types supported by
+ * printf, except width and precision specifiers, as they have no meaning here.
+ * In the case of "%p" (pointer), it can be proceeded in the format string by
+ * the type name of the object being pointed to. The "%O" (captial letter `O')
+ * format specifier works like "%p", signifies an iScriptObject.
  */
 struct iScript : public iBase
 {
-  /// Initialize
+  /// This function is deprecated and should no longer be used.
   virtual bool Initialize (iObjectRegistry *object_reg) = 0;
-  /// RunText
-  virtual bool RunText (const char *iStr) = 0;
-  /// LoadModule
-  virtual bool LoadModule (const char *iStr) = 0;
-  /// Store (Data in Name, Tag is specific to script language)
-  virtual bool Store(const char* name, void* data, void* tag) = 0;
+
+  /// This function is deprecated and should no longer be used.
+  virtual bool Store (const char* name, void* data, void* tag) = 0;
+
+  /// Run some script in the scripting language.
+  virtual bool RunText (const char *text) = 0;
+
+  /// Load a module in the script interpreter.
+  virtual bool LoadModule (const char *name) = 0;
+
+#if 0 // not yet implemented in Python
+  /**
+   * Call a subroutine in the script, with no return value.
+   * Returns false if the subroutine named does not exist.
+   * Format is a printf-style format string for the arguments.
+   */
+  virtual bool Call (const char *name, const char *format, ...)
+    CS_GNUC_PRINTF(3, 4) = 0;
+
+  /**
+   * Call a subroutine in the script, with int return value.
+   * Returns false if the subroutine named does not exist.
+   * Format is a printf-style format string for the arguments.
+   */
+  virtual bool Call (const char *name, int &ret, const char *fmt, ...)
+    CS_GNUC_PRINTF(4, 5) = 0;
+
+  /**
+   * Call a subroutine in the script, with float return value.
+   * Returns false if the subroutine named does not exist.
+   * Format is a printf-style format string for the arguments.
+   */
+  virtual bool Call (const char *name, float &ret, const char *fmt, ...)
+    CS_GNUC_PRINTF(4, 5) = 0;
+
+  /**
+   * Call a subroutine in the script, with double return value.
+   * Returns false if the subroutine named does not exist.
+   * Format is a printf-style format string for the arguments.
+   */
+  virtual bool Call (const char *name, double &ret, const char *fmt, ...)
+    CS_GNUC_PRINTF(4, 5) = 0;
+
+  /**
+   * Call a subroutine in the script, with string return value.
+   * Returns false if the subroutine named does not exist.
+   * Format is a printf-style format string for the arguments.
+   */
+  virtual bool Call (const char *name, char **ret, const char *fmt, ...)
+    CS_GNUC_PRINTF(4, 5) = 0;
+
+  /**
+   * Call a subroutine in the script, with pointer return value.
+   * Returns false if the subroutine named does not exist.
+   * Format is a printf-style format string for the arguments.
+   */
+  virtual bool Call (const char *name, void **ret, const char *fmt, ...)
+    CS_GNUC_PRINTF(4, 5) = 0;
+
+  /**
+   * Call a subroutine in the script, with object return value.
+   * Returns false if the subroutine named does not exist.
+   * Format is a printf-style format string for the arguments.
+   */
+  virtual bool Call (const char *name, csRef<iScriptObject> &ret,
+    const char *fmt, ...) CS_GNUC_PRINTF(4, 5) = 0;
+
+  /**
+   * Create an object in the script.
+   * Returns NULL if the constructor fails.
+   * CtorFormat is a printf-style format string for the arguments.
+   */
+  virtual csPtr<iScriptObject> NewObject (const char *type,
+    const char *ctorFormat, ...) const CS_GNUC_PRINTF(3, 4) = 0;
+
+  /// Set the value of an int variable in the script interpreter.
+  virtual bool Store (const char *name, int data) = 0;
+
+  /// Set the value of a float variable in the script interpreter.
+  virtual bool Store (const char *name, float data) = 0;
+
+  /// Set the value of a double variable in the script interpreter.
+  virtual bool Store (const char *name, double data) = 0;
+
+  /// Set the value of a string variable in the script interpreter.
+  virtual bool Store (const char *name, char *data) = 0;
+
+  /// Set the value of a pointer variable in the script interpreter.
+  virtual bool Store (const char *name, void *data, const char *type) = 0;
+
+  /// Set the value of an object variable in the script interpreter.
+  virtual bool Store (const char *name, iScriptObject *data) = 0;
+
+  /// Set the value of a bool variable in the script interpreter.
+  virtual bool SetTruth (const char *name, bool isTrue) = 0;
+
+  /// Get the value of an int variable in the script interpreter.
+  /// Returns false if the named variable does not exist.
+  virtual bool Retrieve (const char *name, int &data) const = 0;
+
+  /// Get the value of a float variable in the script interpreter.
+  /// Returns false if the named variable does not exist.
+  virtual bool Retrieve (const char *name, float &data) const = 0;
+
+  /// Get the value of a double variable in the script interpreter.
+  /// Returns false if the named variable does not exist.
+  virtual bool Retrieve (const char *name, double &data) const = 0;
+
+  /// Get the value of a string variable in the script interpreter.
+  /// Returns false if the named variable does not exist.
+  virtual bool Retrieve (const char *name, char **data) const = 0;
+
+  /// Get the value of a pointer variable in the script interpreter.
+  /// Returns false if the named variable does not exist, or is the wrong type.
+  virtual bool Retrieve (const char *name, void **data,
+    const char *type) const = 0;
+
+  /// Get the value of an object variable in the script interpreter.
+  /// Returns false if the named variable does not exist.
+  virtual bool Retrieve (const char *name, csRef<iScriptObject>&data) const = 0;
+
+  /// Get the value of a bool variable in the script interpreter.
+  /// Returns false if the named variable does not exist.
+  virtual bool GetTruth (const char *name, bool &isTrue) const = 0;
+
+  /// Remove a variable from the script interpreter.
+  /// Returns false if the named variable does not exist.
+  virtual bool Remove (const char *name) = 0;
+#endif
 };
 
 #endif // __CS_IVARIA_SCRIPT_H__
-
-
-
-
-
-
-
-
-
-
-
