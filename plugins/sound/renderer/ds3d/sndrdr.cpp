@@ -248,7 +248,7 @@ void csSoundRenderDS3D::UnregisterSound(iSoundHandle *snd)
   int n = SoundHandles.Find(hdl);
   if (n != -1)
   {
-    SoundHandles.Delete(n);
+    SoundHandles.DeleteIndex (n);
     hdl->Unregister();
   }
   mutex_SoundHandles->Release();
@@ -288,7 +288,7 @@ void csSoundRenderDS3D::Update()
     if (!src->IsPlaying())
     {
       //  Once a source has stopped playing it can be removed.
-      ActiveSources.Delete(i);
+      ActiveSources.DeleteIndex (i);
       i--;
     }
   }
@@ -324,7 +324,7 @@ void csSoundRenderDS3D::RemoveSource(csSoundSourceDS3D *src)
   int n=ActiveSources.Find(src);
   if (n!=-1)
   {
-    ActiveSources.Delete(n);
+    ActiveSources.DeleteIndex (n);
   }
   mutex_ActiveSources->Release();
 }
