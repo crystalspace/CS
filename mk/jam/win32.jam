@@ -166,7 +166,7 @@ rule PluginResourceWin32
 {
   local versionrc, metarc ;
 
-  versionrc = [ DoObjectGrist _versionrc.rc ] ;
+  versionrc = [ DoObjectGrist $(<)_versionrc.rc ] ;
   LOCATE on $(versionrc) = $(LOCATE_TARGET) ;
   SEARCH on $(versionrc) = $(LOCATE_TARGET) ;
   MakeVersionRc $(versionrc) : $(<) ;
@@ -174,7 +174,7 @@ rule PluginResourceWin32
   # This is order sensitive; metarc is appended to the output of versionrc.
   if $(EMBED_META) = "yes"
   {
-    metarc = [ DoObjectGrist _metarc.rc ] ;
+    metarc = [ DoObjectGrist $(<)_metarc.rc ] ;
     LOCATE on $(metarc) = $(LOCATE_TARGET) ;
     SEARCH on $(metarc) = $(LOCATE_TARGET) ;
     MakeMetadataRc $(metarc) : $(<) ;
