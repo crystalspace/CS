@@ -74,14 +74,10 @@ Simple::~Simple ()
   delete sky_d;
 
   //delete flock;
-}
 
-void cleanup ()
-{
   System->console_out ("Cleaning up...\n");
   delete System;
 }
-
 
 void Simple::SetTexSpace(csProcSkyTexture *skytex, csPolygon3D *poly, 
   int size, const csVector3& orig, const csVector3& upt, float ulen, 
@@ -127,7 +123,6 @@ bool Simple::Initialize (int argc, const char* const argv[],
   if (!Open ("Crystal Space Procedural Sky Demo"))
   {
     Printf (MSG_FATAL_ERROR, "Error opening system!\n");
-    cleanup ();
     exit (1);
   }
 
@@ -388,7 +383,7 @@ Flock::Flock(csEngine *engine, int num, iMaterialWrapper *mat, iSector *sector)
     sprstate->DecRef();
 
   }
-  state->DecRef();
+//  state->DecRef();
 }
 
 
@@ -479,15 +474,11 @@ int main (int argc, char* argv[])
   if (!System->Initialize (argc, argv, NULL))
   {
     System->Printf (MSG_FATAL_ERROR, "Error initializing system!\n");
-    cleanup ();
     exit (1);
   }
 
   // Main loop.
   System->Loop ();
-
-  // Cleanup.
-  cleanup ();
 
   return 0;
 }
