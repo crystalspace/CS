@@ -15,6 +15,7 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #include <math.h>
 #include <stdarg.h>
 
@@ -30,8 +31,33 @@
 #include "iutil/objreg.h"
 #include "igraphic/image.h"
 
-#define RESERVED_COLOR(c) ((c == 0) || (c == 255))
-#define CLIP_RGB  if (r < 0)  { r = 0; }  else if (r > 255) { r = 255; }  if (g < 0) { g = 0; } else if (g > 255) { g = 255; }  if (b < 0) { b = 0; } else if (b > 255) { b = 255; }
+#define RESERVED_COLOR (c) ((c == 0) || (c == 255))
+
+#define CLIP_RGB  \
+if (r < 0)        \
+{                 \
+  r = 0;          \
+}                 \
+else if (r > 255) \
+{                 \
+  r = 255;        \
+}                 \
+if (g < 0)        \
+{                 \
+  g = 0;          \
+}                 \
+else if (g > 255) \
+{                 \
+  g = 255;        \
+}                 \
+if (b < 0)        \
+{                 \
+  b = 0;          \
+}                 \
+else if (b > 255) \
+{                 \
+  b = 255;        \
+}
 
 /**
  * A nice observation about the properties of human eye:
@@ -75,12 +101,11 @@ static inline int rgb_dist (int tR, int tG, int tB, int sR, int sG, int sB)
     (32 - ((max - tB) >> 3));
 }
 
-//--------------------------------------------------- csTextureHandleNull ---//
 csTextureHandleNull::csTextureHandleNull (
   csTextureManagerNull *txtmgr,
   iImage *image,
-  int flags) :
-    csTextureHandle(image, flags)
+  int flags)
+: csTextureHandle(image, flags)
 {
   pal2glob = 0;
   (texman = txtmgr)->IncRef ();
@@ -93,7 +118,7 @@ csTextureHandleNull::~csTextureHandleNull ()
   delete[] (uint8 *)pal2glob;
 }
 
-csTexture *csTextureHandleNull::NewTexture (iImage *Image, bool )
+csTexture *csTextureHandleNull::NewTexture (iImage *Image, bool ismipmap)
 {
   return new csTextureNull (this, Image);
 }
@@ -102,7 +127,7 @@ void csTextureHandleNull::ComputeMeanColor ()
 {
   int i;
 
-  // Compute a common palette for all three mipmaps
+  // Compute a common palette for all three mipmaps.
   csColorQuantizer quant;
   quant.Begin ();
 
@@ -143,32 +168,37 @@ void csTextureHandleNull::ComputeMeanColor ()
           tc);
       }
       else
+      {
         quant.Remap (
           (csRGBpixel *)t->image->GetImageData (),
           t->get_size (),
           t->bitmap,
           tc);
+      }
 
-      // Get the alpha map for the texture, if present
+      // Get the alpha map for the texture, if present.
       if (t->image->GetFormat () & CS_IMGFMT_ALPHA)
       {
         csRGBpixel *srcimg = (csRGBpixel *)t->image->GetImageData ();
         size_t imgsize = t->get_size ();
         uint8 *dstalpha = t->alphamap = new uint8[imgsize];
 
-        // In 8- and 16-bit modes we limit the alpha to 5 bits (32 values)
-
+        // In 8- and 16-bit modes we limit the alpha to 5 bits (32 values).
         // This is related to the internal implementation of alphamap
-
         // routine and is quite enough for 5-5-5 and 5-6-5 modes.
         if (texman->pfmt.PixelBytes != 4)
+        {
           while (imgsize--)
             *dstalpha++ = srcimg++->alpha >> 3;
+        }
         else
-          while (imgsize--) *dstalpha++ = srcimg++->alpha;
+        {
+          while (imgsize--)
+            *dstalpha++ = srcimg++->alpha;
+        }
       }
 
-      // Very well, we don't need the iImage anymore, so free it
+      // Very well, we don't need the iImage anymore, so free it.
       DG_UNLINK (t, t->image);
       t->image->DecRef ();
       t->image = 0;
@@ -177,7 +207,7 @@ void csTextureHandleNull::ComputeMeanColor ()
 
   quant.End ();
 
-  // Compute the mean color from the palette
+  // Compute the mean color from the palette.
   csRGBpixel *src = palette;
   unsigned r = 0, g = 0, b = 0;
   for (i = 0; i < palette_size; i++)
@@ -203,19 +233,23 @@ void csTextureHandleNull::remap_texture (csTextureManager *texman)
       delete[] (uint16 *)pal2glob;
       pal2glob = new uint16[palette_size];
       for (i = 0; i < palette_size; i++)
+      {
         ((uint16 *)pal2glob)[i] = txm->encode_rgb (
             palette[i].red,
             palette[i].green,
             palette[i].blue);
+      }
       break;
     case 4:
       delete[] (uint32 *)pal2glob;
       pal2glob = new uint32[palette_size];
       for (i = 0; i < palette_size; i++)
+      {
         ((uint32 *)pal2glob)[i] = txm->encode_rgb (
             palette[i].red,
             palette[i].green,
             palette[i].blue);
+      }
       break;
   }
 }
@@ -226,12 +260,11 @@ void csTextureHandleNull::Prepare ()
   remap_texture (texman);
 }
 
-//----------------------------------------------- csTextureManagerNull ---//
 csTextureManagerNull::csTextureManagerNull (
   iObjectRegistry *object_reg,
   iGraphics2D *iG2D,
-  iConfigFile *config) :
-    csTextureManager(object_reg, iG2D)
+  iConfigFile *config)
+: csTextureManager(object_reg, iG2D)
 {
   read_config (config);
   G2D = iG2D;
@@ -260,13 +293,13 @@ void csTextureManagerNull::Clear ()
 uint32 csTextureManagerNull::encode_rgb (int r, int g, int b)
 {
   return ((r >> (8 - pfmt.RedBits)) << pfmt.RedShift) |
-    ((g >> (8 - pfmt.GreenBits)) << pfmt.GreenShift) |
-      ((b >> (8 - pfmt.BlueBits)) << pfmt.BlueShift);
+    ((g >> (8 - pfmt.GreenBits)) << pfmt.GreenShift)  |
+    ((b >> (8 - pfmt.BlueBits)) << pfmt.BlueShift);
 }
 
 void csTextureManagerNull::PrepareTextures ()
 {
-  // Create mipmaps for all textures
+  // Create mipmaps for all textures.
   int i;
   for (i = 0; i < textures.Length (); i++)
   {
@@ -295,4 +328,3 @@ void csTextureManagerNull::UnregisterTexture (csTextureHandleNull *handle)
   int idx = textures.Find (handle);
   if (idx >= 0) textures.DeleteIndex (idx);
 }
-

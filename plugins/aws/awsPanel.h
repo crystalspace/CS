@@ -32,25 +32,25 @@
 class awsPanel : public awsComponent  
 {
 protected:
-  /// Style
+  /// Style.
   int style;
 
-  /// Child exclusion region
+  /// Child exclusion region.
   csRectRegion todraw;
 
-  /// 3D frame drawer
+  /// 3D frame drawer.
   aws3DFrame frame_drawer;
 
-  /// True if the child_exclude region should be recalculated
+  /// True if the child_exclude region should be recalculated.
   bool todraw_dirty;
 
-  /// Textures for background and overlay
+  /// Textures for background and overlay.
   iTextureHandle *bkg, *ovl;
 
-  /// Alpha levels for background and overlay
+  /// Alpha levels for background and overlay.
   int bkg_alpha, ovl_alpha;
 
-  /// Subrects of the background and overlay textures to use
+  /// Subrects of the background and overlay textures to use.
   csRect bm_bkgsub, bm_ovlsub;
 public:
   awsPanel ();
