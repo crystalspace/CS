@@ -52,6 +52,7 @@ The history order is reversed so that new features are at the top.
 	      keyboard focus.  A properly formed application wrapper is
 	      reported to cure this problem.
 	- Removed a very old hack in the engine (camera_hack).
+	- Eric Sunshine fixed compilation errors in engseq and csparser.
 2-Oct-2002
 	- Cleaned up new thing smoothing code (code style, please people
 	  a tab == 8 spaces but indentation MUST be with 2 spaces!!!).
