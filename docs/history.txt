@@ -25,6 +25,9 @@ The history order is reversed so that new features are at the top.
 	  added missing entries.
 	- Updated docs so that it no longer says CS only works with
 	  Python 1.5.2.
+	- Matze changed aws to use bison/flex if present
+	- Matze included a hacked flex skeleton file to avoid an msvc error,
+  	  where it can't find unistd.h
 5-Jan-2002
 	- Fixed a bug with the OpenGL renderer where it was trying to
 	  store a value of 0, 1, or 2 in a boolean :-)
