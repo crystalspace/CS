@@ -19,6 +19,9 @@ The history order is reversed so that new features are at the top.
 	    - Memory trashing: Was not allocating sufficient memory for the
 	      working path buffer, thus corrupting memory beyond end of buffer.
 	    - Memory leak: Was leaking the working buffer.
+	- Eric Sunshine fixed library.jam so that it correctly resolves the new
+	  csutil/cssys dependency.  There are now several layers of circular
+	  dependencies between these two libraries.
 16-Jun-2003
 	- Oktal separated a multiple-argument %ignore directive into several
 	  single-argument ones, in perlpre.i, in order to support older

@@ -124,10 +124,14 @@ rule LibDepends
 #----------------------------------------------------------------------------
 # Helper rules to resolve inter library dependencies...
 
-# Resolving dependencies for libraries. When csutil depends on cssys und cssys
-# depend on csutil we need to get this output: -lcsutil -lcssys -lcsutil.
-# This algo isn't fully optimal, it would be possible to reorder the libs to
-# get fewer dependencies...
+# Resolving dependencies for libraries.  When csutil depends on cssys und cssys
+# depend on csutil we need list the libraries multiple times.  In fact, there
+# are so many circular dependencies between csutil and cssys, that they
+# typically need to appear interwoven up to three times each, like this:
+# -lcssys -lcsutil -lcssys -lcsutil -lcssys -lcsutil.  Because of the multile
+# dependencies, we run throught he $($(<)_depdnds) elements multiple times.
+# This algorithm isn't fully optimal, it be might be possible to reorder the
+# libraries to get fewer dependencies.
 rule _AddLibrary
 {
   local added i ;
@@ -135,7 +139,7 @@ rule _AddLibrary
   added = $(<) ;
   cs_liblisttemp += $(<) ;
     
-  for i in $($(<)_depends)
+  for i in $($(<)_depends) $($(<)_depends)
   {
     if [ IsElem $(i) : $(cs_liblisttemp) ]
     {
