@@ -448,7 +448,7 @@ const char* cswinMinidumpWriter::WriteWrappedMinidump (
   return 0;
 }
 
-#define TEST_EXCEPTION_HANDLER
+//#define TEST_EXCEPTION_HANDLER
 
 LONG WINAPI cswinMinidumpWriter::ExceptionFilter (
   struct _EXCEPTION_POINTERS* ExceptionInfo)
