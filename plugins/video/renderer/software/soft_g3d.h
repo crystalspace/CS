@@ -291,7 +291,6 @@ public:
    *    <li>CS_FOG_FRONT:       a front-facing polygon
    *    <li>CS_FOG_BACK:        a back-facing polygon
    *    <li>CS_FOG_VIEW:        the view-plane
-   *    <li>CS_FOG_PLANE:       used in planed fog mode
    * </ul>
    */
   STDMETHODIMP AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype);

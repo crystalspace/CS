@@ -84,7 +84,6 @@
 #define SCANPROC_ZFIL                   0x10
 #define SCANPROC_FOG                    0x11
 #define SCANPROC_FOG_VIEW               0x12
-#define SCANPROC_FOG_PLANE              0x13
 
 #define SCANPROCPI_FLAT_ZFIL            0x00
 #define SCANPROCPI_FLAT_ZUSE            0x01
@@ -229,7 +228,6 @@ csGraphics3DSoftware::csGraphics3DSoftware (ISystem* piSystem) : m_piG2D(NULL)
 
   fogMode = G3DFOGMETHOD_ZBUFFER;
   //fogMode = G3DFOGMETHOD_VERTEX;
-  //fogMode = G3DFOGMETHOD_PLANES;
 
   z_buffer = NULL;
   line_table = NULL;
@@ -303,7 +301,6 @@ void csGraphics3DSoftware::ScanSetup ()
 
       ScanProc [SCANPROC_FOG] = csScan_8_draw_scanline_fog;
       ScanProc [SCANPROC_FOG_VIEW] = csScan_8_draw_scanline_fog_view;
-//    ScanProc [SCANPROC_FOG_PLANE] = csScan_8_draw_scanline_fog_plane;
 
 //    ScanProcPI [SCANPROCPI_FLAT_ZFIL] = csScan_8_draw_pi_scanline_flat_zfil;
 //    ScanProcPI [SCANPROCPI_FLAT_ZUSE] = csScan_8_draw_pi_scanline_flat_zuse;
@@ -371,9 +368,6 @@ void csGraphics3DSoftware::ScanSetup ()
       ScanProc [SCANPROC_FOG_VIEW] = (pfmt.GreenBits == 5) ?
         csScan_16_draw_scanline_fog_view_555 :
         csScan_16_draw_scanline_fog_view_565;
-      ScanProc [SCANPROC_FOG_PLANE] = (pfmt.GreenBits == 5) ?
-        csScan_16_draw_scanline_fog_plane_555 :
-        csScan_16_draw_scanline_fog_plane_565;
 
       ScanProcPI [SCANPROCPI_FLAT_ZFIL] = csScan_16_draw_pi_scanline_flat_zfil;
       ScanProcPI [SCANPROCPI_FLAT_ZUSE] = csScan_16_draw_pi_scanline_flat_zuse;
@@ -450,7 +444,6 @@ void csGraphics3DSoftware::ScanSetup ()
 
       ScanProc [SCANPROC_FOG] = csScan_32_draw_scanline_fog;
       ScanProc [SCANPROC_FOG_VIEW] = csScan_32_draw_scanline_fog_view;
-      ScanProc [SCANPROC_FOG_PLANE] = csScan_32_draw_scanline_fog_plane;
 
       ScanProcPI [SCANPROCPI_FLAT_ZFIL] = csScan_32_draw_pi_scanline_flat_zfil;
       ScanProcPI [SCANPROCPI_FLAT_ZUSE] = csScan_32_draw_pi_scanline_flat_zuse;
@@ -1643,10 +1636,6 @@ STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly,
 
   if (poly.num < 3)
     return S_FALSE;
-  if (fogMode == G3DFOGMETHOD_PLANES && (fog_type == CS_FOG_FRONT || fog_type == CS_FOG_BACK))
-    return S_FALSE;
-  if (fogMode == G3DFOGMETHOD_ZBUFFER && fog_type == CS_FOG_PLANE)
-    return S_FALSE;
   if (fogMode == G3DFOGMETHOD_VERTEX)
     return S_FALSE;
 
@@ -1680,14 +1669,6 @@ STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly,
       N = -Bc*inv_Dc*inv_aspect;
       O = -Cc*inv_Dc;
     }
-  }
-  else if (fog_type == CS_FOG_PLANE)
-  {
-    // We are drawing planed fog. In this case our z is already known and fixed.
-    // We put it in 'O'.
-    M = 0;
-    N = 0;
-    O = 1./poly.fog_plane_z;
   }
 
   // Compute the min_y and max_y for this polygon in screen space coordinates.
@@ -1762,18 +1743,18 @@ STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly,
 
   // Select the right scanline drawing function.
   csDrawScanline* dscan = NULL;
-  int scan_index = fog_type == CS_FOG_FRONT ?
-    SCANPROC_FOG : fog_type == CS_FOG_BACK ?
-    SCANPROC_ZFIL : fog_type == CS_FOG_VIEW ?
-    SCANPROC_FOG_VIEW : fog_type == CS_FOG_PLANE ?
-    SCANPROC_FOG_PLANE : -1;
+  int scan_index =
+  	fog_type == CS_FOG_FRONT ?  SCANPROC_FOG :
+	fog_type == CS_FOG_BACK ?  SCANPROC_ZFIL :
+	fog_type == CS_FOG_VIEW ?  SCANPROC_FOG_VIEW :
+	-1;
 
   if ((scan_index < 0) || !(dscan = ScanProc [scan_index]))
     goto finish;   // Nothing to do.
 
   //@@@ Optimization note! We should have a seperate loop for CS_FOG_VIEW
-  // and CS_FOG_PLANE as they are much simpler and do not require
-  // the calculations for z. This would make things more efficient.
+  // as that is much simpler and does not require the calculations for z.
+  // This would make things more efficient.
 
   // Scan both sides of the polygon at once.
   // We start with two pointers at the top (as seen in y-inverted
@@ -2685,7 +2666,7 @@ STDMETHODIMP csGraphics3DSoftware::GetCaps(G3D_CAPS *caps)
   caps->PrimaryCaps.ShadeCaps = G3DRASTERCAPS_LIGHTMAP;
   caps->PrimaryCaps.PerspectiveCorrects = true;
   caps->PrimaryCaps.FilterCaps = G3D_FILTERCAPS((int)G3DFILTERCAPS_NEAREST | (int)G3DFILTERCAPS_MIPNEAREST);
-  caps->fog = G3D_FOGMETHOD((int)G3DFOGMETHOD_ZBUFFER | (int)G3DFOGMETHOD_PLANES);
+  caps->fog = G3D_FOGMETHOD((int)G3DFOGMETHOD_ZBUFFER);
 
   return 1;
 }

@@ -290,31 +290,6 @@ void csScan_32_draw_scanline_fog_view (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_scanline_fog_plane
-
-void csScan_32_draw_scanline_fog_plane (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
-{
-  if (xx <= 0) return;
-  (void)u_div_z; (void)v_div_z; (void)inv_z; (void)z_buf;
-  UShort* _dest = (UShort*)d;
-  UShort* _destend = _dest + xx;
-  int fd = Scan.exp_256 [Scan.FogDensity * PLANAR_FOG_DENSITY_COEF];
-
-  do
-  {
-    register int r = (fd * ((*_dest & 0x00ff0000) - Scan.FogR) >> 8) + Scan.FogR;
-    register int g = (fd * ((*_dest & 0x0000ff00) - Scan.FogG) >> 8) + Scan.FogG;
-    register int b = (fd * ((*_dest & 0x000000ff) - Scan.FogB) >> 8) + Scan.FogB;
-    *_dest++ = (r & 0x00ff0000) | (g & 0x0000ff00) | b;
-  }
-  while (_dest < _destend);
-}
-
-#endif // NO_draw_scanline_fog_plane
-
-//------------------------------------------------------------------
-
 #ifndef NO_draw_scanline_map_alpha50
 
 #define SCANFUNC csScan_32_draw_scanline_map_alpha50

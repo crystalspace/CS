@@ -223,13 +223,13 @@ public:
   /// Get the fog mode.
   STDMETHODIMP GetFogMode (G3D_FOGMETHOD& retval) 
   { 
-    retval = G3DFOGMETHOD_PLANES; return S_OK; 
+    retval = G3DFOGMETHOD_VERTEX; return S_OK; 
   }
 
   /// Get the fog mode.
   STDMETHODIMP SetFogMode (G3D_FOGMETHOD fogm) 
   { 
-    if (fogm == G3DFOGMETHOD_PLANES) return S_OK; 
+    if (fogm == G3DFOGMETHOD_VERTEX) return S_OK; 
     else return E_FAIL; 
   }
 

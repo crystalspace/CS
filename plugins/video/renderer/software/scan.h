@@ -355,10 +355,6 @@ extern "C" csDrawScanline csScan_16_draw_scanline_fog_565;
 extern "C" csDrawScanline csScan_16_draw_scanline_fog_view_555;
 /// Draw one horizontal scanline for fog assuming the camera is in fog.
 extern "C" csDrawScanline csScan_16_draw_scanline_fog_view_565;
-/// Draw a fogged horizontal scanline (no texture)
-extern "C" csDrawScanline csScan_16_draw_scanline_fog_plane_555;
-/// Draw a fogged horizontal scanline (no texture)
-extern "C" csDrawScanline csScan_16_draw_scanline_fog_plane_565;
 
 /// Draw one horizontal scanline (lighting and alpha transparency).
 extern "C" csDrawScanline csScan_16_draw_scanline_map_alpha50;
@@ -453,8 +449,6 @@ extern "C" csDrawScanline csScan_32_mmx_draw_scanline_tex_zfil;
 extern "C" csDrawScanline csScan_32_draw_scanline_fog;
 /// Draw one horizontal scanline for fog assuming the camera is in fog
 extern "C" csDrawScanline csScan_32_draw_scanline_fog_view;
-/// Draw a fogged horizontal scanline (no texture)
-extern "C" csDrawScanline csScan_32_draw_scanline_fog_plane;
 
 /// Draw one horizontal scanline (lighting and alpha transparency).
 extern "C" csDrawScanline csScan_32_draw_scanline_map_alpha50;

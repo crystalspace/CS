@@ -642,56 +642,6 @@ void csScan_16_draw_scanline_fog_view_565 (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_scanline_fog_plane_555
-
-void csScan_16_draw_scanline_fog_plane_555 (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
-{
-  if (xx <= 0) return;
-  (void)u_div_z; (void)v_div_z; (void)inv_z; (void)z_buf;
-  UShort* _dest = (UShort*)d;
-  UShort* _destend = _dest + xx;
-  int fd = Scan.exp_256 [Scan.FogDensity * PLANAR_FOG_DENSITY_COEF];
-
-  do
-  {
-    register int r = (fd * ((*_dest & 0x7c00) - Scan.FogR) >> 8) + Scan.FogR;
-    register int g = (fd * ((*_dest & 0x03e0) - Scan.FogG) >> 8) + Scan.FogG;
-    register int b = (fd * ((*_dest & 0x001f) - Scan.FogB) >> 8) + Scan.FogB;
-    *_dest++ = (r & 0x7c00) | (g & 0x03e0) | b;
-  }
-  while (_dest < _destend);
-}
-
-#endif // NO_draw_scanline_fog_plane_555
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_scanline_fog_plane_565
-
-void csScan_16_draw_scanline_fog_plane_565 (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
-{
-  if (xx <= 0) return;
-  (void)u_div_z; (void)v_div_z; (void)inv_z; (void)z_buf;
-  UShort* _dest = (UShort*)d;
-  UShort* _destend = _dest + xx;
-  int fd = Scan.exp_256 [Scan.FogDensity * PLANAR_FOG_DENSITY_COEF];
-
-  do
-  {
-    register int r = (fd * ((*_dest & 0xf800) - Scan.FogR) >> 8) + Scan.FogR;
-    register int g = (fd * ((*_dest & 0x07e0) - Scan.FogG) >> 8) + Scan.FogG;
-    register int b = (fd * ((*_dest & 0x001f) - Scan.FogB) >> 8) + Scan.FogB;
-    *_dest++ = (r & 0xf800) | (g & 0x07e0) | b;
-  }
-  while (_dest < _destend);
-}
-
-#endif // NO_draw_scanline_fog_plane_565
-
-//------------------------------------------------------------------
-
 #ifndef NO_draw_pi_scanline_tex_zuse
 
 #define PI_SCANFUNC csScan_16_draw_pi_scanline_tex_zuse

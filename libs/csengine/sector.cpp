@@ -545,64 +545,6 @@ void csSector::Draw (csRenderView& rview)
         rview.g3d->AddFogPolygon (GetID (), g3dpoly, CS_FOG_FRONT);
       }
     }
-    else if (fogmethod == G3DFOGMETHOD_PLANES)
-    {
-#     define FOG_PLANE_DIST 1.0                 //@@@SHOULD BE CONFIGURATION VALUE!
-      // the following uses 'z-gradation'.
-
-      csVector2* pts;
-      int num_pts;
-      g3dpoly.inv_aspect = csCamera::inv_aspect;
-
-      CHK(csVector2* clipper = new csVector2 [rview.view->GetNumVertices ()]);
-
-      float farthest, nearest;
-      GetCameraMinMaxZ (nearest, farthest);
-
-      // making z 'aligned'. Reduces visual artefacts
-      float z = FOG_PLANE_DIST*int(farthest/FOG_PLANE_DIST);
-
-      if (nearest < SMALL_Z) nearest = SMALL_Z;
-
-      float z_step = FOG_PLANE_DIST;
-                
-      float real_fog_density = GetFog().density;
-      GetFog().density = 1.0-exp(-GetFog().density*z_step);
-
-      for( ; z >= SMALL_Z ; z -= z_step)
-      {
-        float iz = csCamera::aspect/z;
-
-        // Take the current clipper and un-perspective project it back
-        // to camera space.
-        for (i = 0 ; i < rview.view->GetNumVertices () ; i++)
-        {
-          clipper[i].x = (rview.view->GetVertex (i).x - csWorld::shift_x) * z;
-          clipper[i].y = (rview.view->GetVertex (i).y - csWorld::shift_y) * z;
-        }
-
-        // Clip the clipper to the polygonset.
-        pts = IntersectCameraZPlane (z, clipper, rview.view->GetNumVertices (), num_pts);
-
-        if (pts)
-        {
-          // Perspective projection and copy to structure for 3D rasterizer.
-          g3dpoly.num = num_pts;
-          for (i = 0 ; i < num_pts ; i++)
-          {
-            g3dpoly.vertices[num_pts-i-1].sx = pts[i].x * iz + csWorld::shift_x;
-            g3dpoly.vertices[num_pts-i-1].sy = pts[i].y * iz + csWorld::shift_y;
-          }
-          CHK (delete [] pts);
-          g3dpoly.fog_plane_z = z;
-          rview.g3d->AddFogPolygon (GetID (), g3dpoly, CS_FOG_PLANE);
-        }
-      }
-
-      CHK (delete [] clipper);
-      GetFog().density = real_fog_density;
-      rview.g3d->CloseFogObject (GetID ());
-    }
     else if (fogmethod == G3DFOGMETHOD_VERTEX && rview.added_fog_info)
     {
       csFogInfo* fog_info = rview.fog_info;

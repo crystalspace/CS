@@ -40,7 +40,6 @@ interface ITextureHandle;
 #define CS_FOG_FRONT		0
 #define CS_FOG_BACK		1
 #define CS_FOG_VIEW		2
-#define CS_FOG_PLANE		3
 
 /**
  * Mix modes for DrawPolygonFX ()
@@ -201,13 +200,6 @@ struct G3DPolygonAFP
   /// Invert aspect ratio that was used to perspective project the vertices (1/fov)
   float inv_aspect;
 
-  /**
-   * In case we are dealing with planed fog this value contains
-   * the Z distance in camera space of the plane. Otherwise this
-   * value is not defined.
-   */
-  float fog_plane_z;
-
   /// The plane equation in camera space of this polygon. @@@ BAD NAME
   G3DPolyNormal normal;
 };
@@ -307,8 +299,7 @@ enum G3D_FOGMETHOD
 {
   G3DFOGMETHOD_NONE = 0x00,
   G3DFOGMETHOD_ZBUFFER = 0x01,
-  G3DFOGMETHOD_PLANES = 0x02,
-  G3DFOGMETHOD_VERTEX = 0x04
+  G3DFOGMETHOD_VERTEX = 0x02
 };
 
 ///
@@ -459,7 +450,6 @@ public:
    *	<li>CS_FOG_FRONT:	a front-facing polygon
    *	<li>CS_FOG_BACK:	a back-facing polygon
    *	<li>CS_FOG_VIEW:	the view-plane
-   *	<li>CS_FOG_PLANE:	used in planed fog mode
    * </ul>
    */
   STDMETHOD (AddFogPolygon) (CS_ID id, G3DPolygonAFP& poly, int fogtype) PURE;
