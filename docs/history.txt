@@ -7,6 +7,7 @@ The history order is reversed so that new features are at the top.
 	  Doesn't work at all at the moment so it is disabled by default.
 	  If you like segmentation faults you can enable it with the
 	  new 'toggle_tiled' command in Dynavis (assigned to '5' in bugplug).
+	- A few further fixes on Dynavis. Not enough to avoid crashes.
 10-Jun-2002
 	- Added an entry to the faq.
 9-Jun-2002

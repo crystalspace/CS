@@ -70,6 +70,18 @@ csLineOperation& csCoverageTile::AddOperation ()
 
 void csCoverageTile::PushLine (int x1, int y1, int x2, int y2, int dx)
 {
+  CS_ASSERT (x1 >= 0);
+  CS_ASSERT (x1 < (32<<16));
+  CS_ASSERT (x2 >= 0);
+  CS_ASSERT (x2 < (32<<16));
+  CS_ASSERT (y1 >= 0);
+  CS_ASSERT (y1 < 64);
+  CS_ASSERT (y2 >= 0);
+  CS_ASSERT (y2 < 64);
+  CS_ASSERT (x1+ABS (y2-y1)*dx >= 0);
+  CS_ASSERT (x1+ABS (y2-y1)*dx < (32<<16));
+  CS_ASSERT (x2-ABS (y1-y2)*dx >= 0);
+  CS_ASSERT (x2-ABS (y1-y2)*dx < (32<<16));
   csLineOperation& op = AddOperation ();
   op.op = OP_LINE;
   op.x1 = x1;
@@ -81,6 +93,12 @@ void csCoverageTile::PushLine (int x1, int y1, int x2, int y2, int dx)
 
 void csCoverageTile::PushVLine (int x, int y1, int y2)
 {
+  CS_ASSERT (x >= 0);
+  CS_ASSERT (x < (32<<16));
+  CS_ASSERT (y1 >= 0);
+  CS_ASSERT (y1 < 64);
+  CS_ASSERT (y2 >= 0);
+  CS_ASSERT (y2 < 64);
   csLineOperation& op = AddOperation ();
   op.op = OP_VLINE;
   op.x1 = x;
@@ -90,6 +108,8 @@ void csCoverageTile::PushVLine (int x, int y1, int y2)
 
 void csCoverageTile::PushFullVLine (int x)
 {
+  CS_ASSERT (x >= 0);
+  CS_ASSERT (x < (32<<16));
   csLineOperation& op = AddOperation ();
   op.op = OP_FULLVLINE;
   op.x1 = x;
@@ -521,7 +541,8 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     int dy = y2-y1;
     int dx = ((x2-x1)<<16) / (dy-yfurther);
     x1 <<= 16;
-    int x = x1 + dx*(63-y1);
+    x2 <<= 16;
+    int x = x1 + dx * (63 - (y1 & 63));
     csCoverageTile* tile = GetTile (tile_x1, tile_y1);
     tile->PushLine (x1 & xmask, y1 & 63, x & xmask, 63, dx);
     if (!tile->IsFull ()) MarkTileDirty (tile_x1, tile_y1);
