@@ -18,7 +18,7 @@ PLUGINS+= video/canvas/openglwin video/renderer/opengl
 # uncomment the line below to build the sound driver
 PLUGINS+= sound/driver/waveoutsd
 
-#---------------------------------------------------- rootdefines & defines ---#
+#--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 
 .SUFFIXES: .exe .dll
@@ -37,7 +37,7 @@ UPD=bin\dosupd.bat $@ DEST
 
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
-#------------------------------------------------------------------ defines ---#
+#----------------------------------------------------------------- defines ---#
 ifeq ($(MAKESECTION),defines)
 
 include mk/dos.mak
@@ -61,8 +61,11 @@ LIBS.OPENGL.SYSTEM=$(LFLAGS.l)opengl32 $(LFLAGS.l)glut32
 # Socket library
 LIBS.SOCKET.SYSTEM=$(LFLAGS.l)wsock32
 
-#sound dll
+# Sound library
 LIBS.SOUND.SYSTEM=$(LFLAGS.l)dsound $(LFLAGS.l)winmm
+
+# Python library
+LIBS.CSPYTHON.SYSTEM=$(LFLAGS.l)python15
 
 # Where can the Zlib library be found on this system?
 Z_LIBS=$(LFLAGS.l)z
@@ -169,11 +172,12 @@ DEPEND_TOOL=mkdep
 
 endif # ifeq ($(MAKESECTION),defines)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 # How to make a shared AKA dynamic library
-DO.SHARED.PLUGIN = dllwrap $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS) -mwindows
+DO.SHARED.PLUGIN = \
+  dllwrap $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS) -mwindows
 
 # Commenting out the following line will make the -noconsole option work
 # but the only way to redirect output will be WITH -noconsole (wacky :-)
@@ -182,7 +186,7 @@ DO.SHARED.PLUGIN += -mconsole
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#--------------------------------------------------------------- confighelp ---#
+#-------------------------------------------------------------- confighelp ---#
 ifeq ($(MAKESECTION),confighelp)
 
 ifneq (,$(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL)))
@@ -195,7 +199,7 @@ SYSHELP += \
 
 endif # ifeq ($(MAKESECTION),confighelp)
 
-#---------------------------------------------------------------- configure ---#
+#--------------------------------------------------------------- configure ---#
 ifeq ($(ROOTCONFIG),config)
 
 SYSCONFIG=bin\win32conf.bat mingw32

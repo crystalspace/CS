@@ -35,38 +35,34 @@ ifeq ($(MAKESECTION),postdefines)
 #TCLTK=-ltk8.0 -ltcl8.0 -L/usr/X11R6/lib -lX11
 PTHREAD=-lpthread
 
-ifneq ($(OS),WIN32)
-CFLAGS.PYTHON += $(CFLAGS.I)$(PYTHON_INC)
+ifneq (,$(strip $(PYTHON_INC)))
+  CFLAGS.PYTHON += $(CFLAGS.I)$(PYTHON_INC)
 endif
 
-ifneq ($(OS),WIN32)
-# PYTHON_LIB points at the Python library directory (often /usr/lib/python1.5).
-# The actual static link library usually resides in a "config" subdirectory of
-# the library directory.  The library's name is the same as the directory,
-# thus in this example, the library would be called "libpython1.5.a".
-LIB.CSPYTHON.SYSTEM += \
-  $(LFLAGS.L)$(PYTHON_LIB)/config $(LFLAGS.L)$(PYTHON_LIB) \
-  $(LFLAGS.l)$(notdir $(PYTHON_LIB)) $(TCLTK) $(PTHREAD)
-else
-LIB.CSPYTHON.SYSTEM +=
-ifndef LIBS.CSPYTHON.SYSTEM
-  LIB.CSPYTHON.SYSTEM = -lpython15
-else
-  LIB.CSPYTHON.SYSTEM = $(LIBS.CSPYTHON.SYSTEM)
+ifeq (,$(strip $(LIBS.CSPYTHON.SYSTEM)))
+ifneq (,$(strip $(PYTHON_LIB)))
+  # PYTHON_LIB points at the Python library directory (which is often
+  # /usr/lib/python1.5).  The actual static link library usually resides in a
+  # "config" subdirectory of the library directory.  The library's name is the
+  # same as the directory, thus in this example, the library would be called
+  # "libpython1.5.a".
+  LIBS.CSPYTHON.SYSTEM = \
+    $(LFLAGS.L)$(PYTHON_LIB)/config $(LFLAGS.L)$(PYTHON_LIB) \
+    $(LFLAGS.l)$(notdir $(PYTHON_LIB)) $(TCLTK) $(PTHREAD)
 endif
 endif
 
 ifeq ($(USE_PLUGINS),yes)
   CSPYTHON = $(OUTDLL)cspython$(DLL)
   LIB.CSPYTHON = $(foreach d,$(DEP.CSPYTHON),$($d.LIB))
-  LIB.CSPYTHON.LOCAL = $(LIB.CSPYTHON.SYSTEM)
-# TO_INSTALL.DYNAMIC_LIBS += $(CSPYTHON)
+  LIB.CSPYTHON.LOCAL = $(LIBS.CSPYTHON.SYSTEM)
+  TO_INSTALL.DYNAMIC_LIBS += $(CSPYTHON)
 else
   CSPYTHON = $(OUT)$(LIB_PREFIX)cspy$(LIB)
   DEP.EXE += $(CSPYTHON)
-  LIBS.EXE += $(LIB.CSPYTHON.SYSTEM)
+  LIBS.EXE += $(LIBS.CSPYTHON.SYSTEM)
   SCF.STATIC += cspython
-# TO_INSTALL.STATIC_LIBS += $(CSPYTHON)
+  TO_INSTALL.STATIC_LIBS += $(CSPYTHON)
 endif
 
 SWIG.INTERFACE = plugins/cscript/common/cs.i

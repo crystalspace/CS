@@ -1,8 +1,7 @@
 The history order has been reversed so that new features are at the top.
 
 25-Mar-2001
-	- Philip Wyett fixed runtime memory reference error in csconin.cpp
-	  under windows.
+	- Philip Wyett fixed null reference error in csconin.cpp under Windows.
 	- Eric Sunshine reverted above change to csconin.cpp by Philip Wyett
 	  since Philip's change was incorrect.  Eric applied the correct fix
 	  instead.
@@ -23,14 +22,18 @@ The history order has been reversed so that new features are at the top.
 	    - Removed refs to old/no longer needed MingW files.
 	    - Updated links to DOS Nasm and other support files,
 	      with respect to new location at 3D Downloads.
+	- Eric Sunshine reverted Philip Wyett's changes to cspython.mak for a
+	  couple of reasons.  First, as Philip mentioned in his log message,
+	  his changes were a bit of a hack.  Second, they actually broke the
+	  makefile with unbalanced instances of if/else/endif.  Instead, I
+	  generalized the makefile so that it should be able to handle Python
+	  via Mingw without any special hacks.
 24-Mar-2001
-	- Philip Wyett added Python plugin to MingW build process. This
+	- Philip Wyett added Python plugin to MingW build process.  This
 	  addition also adds the compilation of CS Python test app, thanks
-	  to unix makefile system.
-	  Edited 'cspython.mak' inorder to allow MingW to build the
-	  Python plugin correctly. Is a bit of a hack. Eric will probably
-	  find a more elegant way... :-)
-	- Norman Kramer renamed iConsole to iConsoleOutput.
+	  to Unix makefile system.  Edited 'cspython.mak' in order to allow
+	  MingW to build the Python plugin correctly.  Is a bit of a hack.
+	  Eric will probably find a more elegant way... :-)
 	- Eric Sunshine made the following changes to the project:
 	    - Repaired an ultra nasty bug in csSystemDriver::LoadPlugIn().
 	      This bug has been present since the introduction of SCF on
@@ -84,13 +87,6 @@ The history order has been reversed so that new features are at the top.
 	  file.  Takes special care to add directories before files, and also
 	  batches binary files separately from text files so that `-kb' can be
 	  applied as appropriate.
-	- Martin Geisse made the following changes:
-	    - WalkTest no longer plays unrecognized sounds in loop mode at
-	      startup.
-	    - Moved the `coord' file to standard.zip.
-	    - The system driver now prints debug messages on calls to
-	      Initialize(), Open(), Close() and the destructor
-	    - The initial debug level can now be set in the command line.
 	- Eric Sunshine removed the `coord' file from standard.zip since that
 	  was an inappropriate location for that file.  standard.zip is a
 	  static, system-level library which should be considered (and may very
@@ -108,6 +104,8 @@ The history order has been reversed so that new features are at the top.
 	    - The system driver now prints debug messages on calls to
 	      Initialize(), Open(), Close() and the destructor.
 	    - The initial debug level can now be set in the command line.
+	- Norman Kramer fixed an iConsole -> iConsoleOutput reference in a
+	  couple files which Eric missed.
 23-Mar-2001:
 	- Wouter Wijngaards made 'make win32gcc' correctly detect the
 	  presence of a bash (or other) shell used by the makefile system.
