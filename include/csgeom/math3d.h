@@ -300,6 +300,16 @@ public:
 	const csSegment3& seg, csVector3& isect);
 
   /**
+   * Intersect a 3D segment with a polygon. Returns true if there
+   * is an intersection. In that case the intersection point will
+   * be in 'isect'. Note that this function doesn't do
+   * backface culling.
+   */
+  static bool IntersectPolygon (const csPoly3D& poly,
+  	const csPlane3& poly_plane,
+	const csSegment3& seg, csVector3& isect);
+
+  /**
    * If a number of planes enclose a convex space (with their normals
    * pointing outwards).
    * This method returns true if they are intersected by a segment.
@@ -307,7 +317,7 @@ public:
    * dist contains the distance to that point (with distance between u and v
    * being 1)
    */
-  static bool Planes(
+  static bool Planes (
      const csVector3& u, const csVector3& v,
      const csPlane3* planes, int length,
      csVector3& isect, float& dist);

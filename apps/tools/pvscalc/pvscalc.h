@@ -59,6 +59,7 @@ class csPoly3DBox : public csPoly3D
 {
 private:
   csBox3 bbox;
+  csPlane3 plane;
   float area;
 
 public:
@@ -66,15 +67,109 @@ public:
   csPoly3DBox (const csPoly3DBox& other) : csPoly3D (other)
   {
     bbox = other.GetBBox ();
+    plane = other.GetPlane ();
     area = other.GetPrecalcArea ();
   }
 
-  /// Calculate the bbox and area.
+  /// Calculate the bbox, plane and area.
   void Calculate ();
   /// Get the bbox.
   const csBox3& GetBBox () const { return bbox; }
+  /// Get the plane.
+  const csPlane3& GetPlane () const { return plane; }
   /// Get the area.
   float GetPrecalcArea () const { return area; }
+};
+
+/**
+ * Every PVSCalcNode leaf (see below) will keep a kdtree of polygons
+ * in that leaf.
+ */
+struct PVSPolygonNode
+{
+  // Children.
+  PVSPolygonNode* child1;
+  PVSPolygonNode* child2;
+
+  // Box for this node.
+  csBox3 node_bbox;
+
+  // Split axis and position.
+  int axis;
+  float where;
+
+  // If this is a leaf then we keep a list of polygons here.
+  csArray<csPoly3DBox*> polygons;
+
+  PVSPolygonNode ()
+  {
+    child1 = child2 = 0;
+  }
+
+  ~PVSPolygonNode ()
+  {
+    delete child1;
+    delete child2;
+  }
+
+  // Test if a beam hits a polygon in this node.
+  bool HitBeam (const csSegment3& seg);
+};
+
+/**
+ * The PVS culler maintains the real kdtree node for us but we need to have
+ * additional information so that's why we keep a mirror tree.
+ */
+struct PVSCalcNode
+{
+  // Pointer to real node in the kdtree managed by PVSvis.
+  void* node;
+
+  // Box for this node.
+  csBox3 node_bbox;
+
+  // Parents and children.
+  PVSCalcNode* parent;
+  PVSCalcNode* child1;
+  PVSCalcNode* child2;
+
+  // If this is a leaf then we keep an additional KDtree for
+  // the polygons here.
+  PVSPolygonNode* polygon_tree;
+
+  // Invisible nodes for this node.
+  csSet<PVSCalcNode*> invisible_nodes;
+  // If true we have calculated visibility information for this node.
+  bool calculated_pvs;
+  // How many nodes are represented by this node. For a leaf this will
+  // be one.
+  int represented_nodes;
+
+  PVSCalcNode (void* node)
+  {
+    PVSCalcNode::node = node;
+    parent = 0;
+    child1 = child2 = 0;
+    polygon_tree = 0;
+    calculated_pvs = false;
+  }
+  ~PVSCalcNode ()
+  {
+    delete child1;
+    delete child2;
+    delete polygon_tree;
+  }
+  bool IsInvisible (PVSCalcNode* dest)
+  {
+    if (invisible_nodes.In (dest)) return true;
+    if (parent)
+      return parent->IsInvisible (dest);
+    else
+      return false;
+  }
+
+  // Test if a beam hits a polygon in this node.
+  bool HitBeam (const csSegment3& seg);
 };
 
 /**
@@ -87,8 +182,15 @@ private:
   iSector* sector;
   iPVSCuller* pvs;
   iStaticPVSTree* pvstree;
+
+  // Statistics information.
   int maxdepth;
+  int totalnodes;
   int countnodes;
+  csTicks starttime;
+
+  // The shadow KD tree used during calculations.
+  PVSCalcNode* shadow_tree;
 
   // Help variables used during calculation. They are here so that the internal
   // memory that they allocate on construction is reused.
@@ -104,10 +206,16 @@ private:
   PVSCalcProjectionPlane plane;
 
   /// Distribute a set of boxes to left/right.
-  void DistributeBoxes (int axis, float where,
+  static void DistributeBoxes (int axis, float where,
 	const csArray<csBox3>& boxlist,
 	csArray<csBox3>& boxlist_left,
 	csArray<csBox3>& boxlist_right);
+  /// Distribute a set of polygons to left right.
+  static void DistributePolygons (int axis, float where,
+	const csArray<csPoly3DBox*>& polylist,
+	csArray<csPoly3DBox*>& polylist_left,
+	csArray<csPoly3DBox*>& polylist_right);
+
   /// Build the kdtree.
   void BuildKDTree ();
   void BuildKDTree (void* node, const csArray<csBox3>& boxlist,
@@ -115,18 +223,52 @@ private:
 	bool minsize_only, int depth);
 
   /**
+   * Build the shadow KDTree from the KDTree in the culler.
+   */
+  PVSCalcNode* BuildShadowTree (void* node);
+
+  /**
+   * Build the polygon tree that is in the leaf of the shadow tree.
+   */
+  void BuildShadowTreePolygons (PVSPolygonNode* node, const csBox3& bbox_node,
+	const csArray<csPoly3DBox*>& polygons);
+
+  /**
+   * Distribute all polygons over the shadow tree and if needed
+   * build additional polygon trees in the leaves of the shadow tree.
+   */
+  void BuildShadowTreePolygons (PVSCalcNode* node,
+	const csArray<csPoly3DBox*>& polygons);
+
+  /**
+   * This is a quick test to see if two nodes can surely see
+   * each other. It works by doing a few HitBeam() calls. If there
+   * is a beam that hits no polygons then the two nodes can surely
+   * see each other.
+   */
+  bool NodesSurelyVisible (const csBox3& source, const csBox3& dest);
+
+  /**
    * Try to find a split between two boxes along an axis and return the
    * quality of that split. This is used for the building of the kdtree.
    */
-  float FindBestSplitLocation (int axis, float& where,
+  static float FindBestSplitLocation (int axis, float& where,
 	const csBox3& bbox1, const csBox3& bbox2);
 
   /**
    * Try to find the best split location for a number of boxes.
    * This is used for the building of the kdtree.
    */
-  float FindBestSplitLocation (int axis, float& where,
+  static float FindBestSplitLocation (int axis, float& where,
 	const csBox3& node_bbox, const csArray<csBox3>& boxlist);
+
+  /**
+   * Try to find the best split location for a number of boxes.
+   * This is used for the building of the kdtree.
+   * This version uses csPoly3DBox.
+   */
+  static float FindBestSplitLocation (int axis, float& where,
+	const csBox3& node_bbox, const csArray<csPoly3DBox*>& polylist);
 
   /// Sort all polygons on size.
   void SortPolygonsOnSize ();
@@ -173,8 +315,8 @@ private:
    * traversing the destination node. This will update the set of
    * invisible nodes.
    */
-  void RecurseDestNodes (void* sourcenode, void* destnode,
-	csSet<void*>& invisible_nodes);
+  void RecurseDestNodes (PVSCalcNode* sourcenode, PVSCalcNode* destnode,
+	csSet<PVSCalcNode*>& invisible_nodes);
 
 
   /**
@@ -184,8 +326,8 @@ private:
    * function as a copy so that it is ok to modify it. nodecounter is used
    * to be able to print out some progress.
    */
-  void RecurseSourceNodes (void* sourcenode, csSet<void*> invisible_nodes,
-  	int& nodecounter);
+  void RecurseSourceNodes (PVSCalcNode* sourcenode,
+  	csSet<PVSCalcNode*> invisible_nodes, int& nodecounter);
 
 public:
   PVSCalcSector (PVSCalc* parent, iSector* sector, iPVSCuller* pvs);

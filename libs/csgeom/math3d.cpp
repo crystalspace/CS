@@ -537,6 +537,57 @@ bool csIntersect3::IntersectTriangle (
   return (test1 == test2) && (test2 == test3) && (test1 != 0);
 }
 
+bool csIntersect3::IntersectPolygon (const csPoly3D& poly,
+  	const csPlane3& poly_plane,
+	const csSegment3& seg, csVector3& isect)
+{
+  float dist;
+  const csVector3& start = seg.Start ();
+  const csVector3& end = seg.End ();
+  if (!Plane (start, end, poly_plane, isect, dist))
+    return false;
+
+  // If this vector is perpendicular to the plane of the polygon we
+  // need to catch this case here.
+  float dot1 = poly_plane.D () +
+    poly_plane.A () * start.x +
+    poly_plane.B () * start.y +
+    poly_plane.C () * start.z;
+  float dot2 = poly_plane.D () + poly_plane.A () * end.x
+  	+ poly_plane.B () * end.y + poly_plane.C () * end.z;
+  if (ABS (dot1 - dot2) < SMALL_EPSILON) return false;
+
+  // If dot1 > 0 the polygon would have been backface culled.
+  // In this case we just use the result of this test to reverse
+  // the test below.
+  // Now we generate a plane between the starting point of the ray and
+  // every edge of the polygon. With the plane normal of that plane we
+  // can then check if the end of the ray is on the same side for all
+  // these planes.
+  csVector3 normal;
+  csVector3 relend = end;
+  relend -= start;
+
+  size_t i, i1;
+  i1 = poly.GetVertexCount () - 1;
+  for (i = 0; i < poly.GetVertexCount () ; i++)
+  {
+    csMath3::CalcNormal (normal, start, poly[i1], poly[i]);
+    if (dot1 > 0)
+    {
+      if ((relend * normal) < 0) return false;
+    }
+    else
+    {
+      if ((relend * normal) > 0) return false;
+    }
+
+    i1 = i;
+  }
+
+  return true;
+}
+
 bool csIntersect3::Planes (
    const csVector3& u, 
    const csVector3& v,

@@ -6,6 +6,25 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Feb-2005
+	- Jorrit added csIntersect3::IntersectPolygon() to intersect
+	  a polygon with a segment.
+	- Jorrit did the following pvscalc changes:
+	    - Added a shadow kdtree which is a representation of the
+	      PVStree kdtree but contains additional information useful
+	      during PVS calculation alone.
+	    - The progress indicator of the PVS calculator now shows
+	      the size (in nodes) of the source node and also the size
+	      (in nodes) of the nodes that are marked invisible.
+	    - We now make use of symmetry in visibility. If A cannot see
+	      B then B cannot see A either.
+	    - There is a big optimization in calculation time of PVS by
+	      doing a quick HitBeam() first before proceeding with
+	      the other calculations. i.e. if a beam between two nodes
+	      in the kdtree hits no polygons then we don't have to continue
+	      as we have visibility anyway.
+	    - Show total time, estimated remaining time, and average
+	      time per node.
 14-Feb-2005
 	- Chris made the minimum polygon UV determinant into a #define
 	  so that it would be more amenable to experimentation. 

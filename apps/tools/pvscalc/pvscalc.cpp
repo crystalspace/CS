@@ -29,12 +29,69 @@ CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
+bool PVSPolygonNode::HitBeam (const csSegment3& seg)
+{
+  // First test if this beam hits the box.
+  csVector3 isect;
+  if (csIntersect3::BoxSegment (node_bbox, seg, isect) == -1)
+  {
+    return false;
+  }
+
+  // Test the polygons.
+  size_t i;
+  for (i = 0 ; i < polygons.Length () ; i++)
+  {
+    if (csIntersect3::IntersectPolygon (*polygons[i],
+    	polygons[i]->GetPlane (), seg, isect))
+      return true;
+  }
+
+  if (child1)
+  {
+    // There are children.
+    if (child1->HitBeam (seg))
+      return true;
+    return child2->HitBeam (seg);
+  }
+  return false;
+}
+
+bool PVSCalcNode::HitBeam (const csSegment3& seg)
+{
+  // First test if this beam hits the box.
+  csVector3 isect;
+  if (csIntersect3::BoxSegment (node_bbox, seg, isect) == -1)
+  {
+    return false;
+  }
+
+  if (polygon_tree)
+  {
+    if (polygon_tree->HitBeam (seg))
+      return true;
+  }
+
+  if (child1)
+  {
+    // There are children.
+    if (child1->HitBeam (seg))
+      return true;
+    return child2->HitBeam (seg);
+  }
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+
 PVSCalcSector::PVSCalcSector (PVSCalc* parent, iSector* sector, iPVSCuller* pvs)
 {
   PVSCalcSector::parent = parent;
   PVSCalcSector::sector = sector;
   PVSCalcSector::pvs = pvs;
   pvstree = pvs->GetPVSTree ();
+
+  shadow_tree = 0;
 
   // @@@ Make dimension configurable?
   plane.covbuf = new csTiledCoverageBuffer (DIM_COVBUFFER, DIM_COVBUFFER);
@@ -45,6 +102,7 @@ PVSCalcSector::~PVSCalcSector ()
 {
   delete plane.covbuf;
   delete plane.covbuf_clipper;
+  delete shadow_tree;
 }
 
 void PVSCalcSector::DistributeBoxes (int axis, float where,
@@ -60,6 +118,28 @@ void PVSCalcSector::DistributeBoxes (int axis, float where,
       boxlist_left.Push (boxlist[i]);
     if (split >= 0)
       boxlist_right.Push (boxlist[i]);
+  }
+}
+
+void PVSCalcSector::DistributePolygons (int axis, float where,
+	const csArray<csPoly3DBox*>& polylist,
+	csArray<csPoly3DBox*>& polylist_left,
+	csArray<csPoly3DBox*>& polylist_right)
+{
+  size_t i;
+  for (i = 0 ; i < polylist.Length () ; i++)
+  {
+    int split = 0;
+    switch (axis)
+    {
+      case 0: split = polylist[i]->ClassifyX (where); break;
+      case 1: split = polylist[i]->ClassifyY (where); break;
+      case 2: split = polylist[i]->ClassifyZ (where); break;
+    }
+    if (split == CS_POL_FRONT || split == CS_POL_SPLIT_NEEDED)
+      polylist_left.Push (polylist[i]);
+    if (split == CS_POL_BACK || split == CS_POL_SPLIT_NEEDED)
+      polylist_right.Push (polylist[i]);
   }
 }
 
@@ -131,6 +211,72 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
       else if (bbox.Min (axis) > a+.0001) right++;
     }
     int cut = boxlist.Length ()-left-right;
+    // If we have no object on the left or right then this is a bad
+    // split which we should never take.
+    float qual;
+    if (left == 0 || right == 0)
+    {
+      qual = -1.0;
+    }
+    else
+    {
+      float qual_cut = 1.0 - (float (cut) * inv_num_objects);
+      float qual_balance = 1.0 - (float (ABS (left-right)) * inv_num_objects);
+      qual = 6.0 * qual_cut + qual_balance;
+    }
+    if (qual > best_qual)
+    {
+      best_qual = qual;
+      where = a;
+    }
+  }
+# undef FBSL_ATTEMPTS
+  return best_qual;
+}
+
+float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
+	const csBox3& node_bbox, const csArray<csPoly3DBox*>& polylist)
+{
+  size_t i, j;
+
+  // Calculate minimum and maximum value along the axis.
+  float mina = polylist[0]->GetBBox ().Min (axis);
+  float maxa = polylist[0]->GetBBox ().Max (axis);
+  for (i = 1 ; i < polylist.Length () ; i++)
+  {
+    const csBox3& bbox = polylist[i]->GetBBox ();
+    if (bbox.Min (axis) < mina) mina = bbox.Min (axis);
+    if (bbox.Max (axis) > maxa) maxa = bbox.Max (axis);
+  }
+  // Make sure we don't go outside node_box.
+  if (mina < node_bbox.Min (axis)) mina = node_bbox.Min (axis);
+  if (maxa > node_bbox.Max (axis)) maxa = node_bbox.Max (axis);
+
+  // Do 10 tests to find best split location. This should
+  // probably be a configurable parameter.
+
+  // @@@ Is the routine below very efficient?
+# define FBSL_ATTEMPTS 50
+  float a;
+  float best_qual = -2.0;
+  float inv_num_objects = 1.0 / float (polylist.Length ());
+  for (i = 0 ; i < FBSL_ATTEMPTS ; i++)
+  {
+    // Calculate a possible split location.
+    a = mina + float (i+1)*(maxa-mina)/float (FBSL_ATTEMPTS+1.0);
+    // Now count the number of objects that are completely
+    // on the left and the number of objects completely on the right
+    // side. The remaining objects are cut by this position.
+    int left = 0;
+    int right = 0;
+    for (j = 0 ; j < polylist.Length () ; j++)
+    {
+      const csBox3& bbox = polylist[j]->GetBBox ();
+      // The .0001 is for safety.
+      if (bbox.Max (axis) < a-.0001) left++;
+      else if (bbox.Min (axis) > a+.0001) right++;
+    }
+    int cut = polylist.Length ()-left-right;
     // If we have no object on the left or right then this is a bad
     // split which we should never take.
     float qual;
@@ -240,6 +386,108 @@ void PVSCalcSector::BuildKDTree ()
   countnodes = 1;
   maxdepth = 0;
   BuildKDTree (root, boxes, bbox, minsize, false, 0);
+  totalnodes = countnodes;
+}
+
+PVSCalcNode* PVSCalcSector::BuildShadowTree (void* node)
+{
+  if (!node) return 0;
+  PVSCalcNode* shadow_node = new PVSCalcNode (node);
+  shadow_node->node_bbox = pvstree->GetNodeBBox (node);
+  void* child1 = pvstree->GetFirstChild (node);
+  int count_child1 = 0;
+  if (child1)
+  {
+    PVSCalcNode* shadow_child1 = BuildShadowTree (child1);
+    shadow_node->child1 = shadow_child1;
+    count_child1 = shadow_child1->represented_nodes;
+  }
+  void* child2 = pvstree->GetSecondChild (node);
+  int count_child2 = 0;
+  if (child2)
+  {
+    PVSCalcNode* shadow_child2 = BuildShadowTree (child2);
+    shadow_node->child2 = shadow_child2;
+    count_child2 = shadow_child2->represented_nodes;
+  }
+  shadow_node->represented_nodes = 1 + count_child1 + count_child2;
+  return shadow_node;
+}
+
+void PVSCalcSector::BuildShadowTreePolygons (PVSPolygonNode* node,
+	const csBox3& bbox_node, const csArray<csPoly3DBox*>& polygons)
+{
+  node->node_bbox = bbox_node;
+
+  if (polygons.Length () == 0) return;
+  if (polygons.Length () <= 6)
+  {
+    node->polygons = polygons;
+    return;
+  }
+
+  float where0, where1, where2;
+  float q0 = FindBestSplitLocation (0, where0, bbox_node, polygons);
+  float q1 = FindBestSplitLocation (1, where1, bbox_node, polygons);
+  float q2 = FindBestSplitLocation (2, where2, bbox_node, polygons);
+  if (q0 > q1 && q0 > q2)
+  {
+    node->axis = 0;
+    node->where = where0;
+  }
+  else if (q1 > q0 && q1 > q2)
+  {
+    node->axis = 1;
+    node->where = where1;
+  }
+  else if (q2 >= 0)
+  {
+    node->axis = 2;
+    node->where = where2;
+  }
+  else
+  {
+    // All options are bad.
+    node->polygons = polygons;
+    return;	// No good split location.
+  }
+
+  csBox3 box1, box2;
+  bbox_node.Split (node->axis, node->where, box1, box2);
+  csArray<csPoly3DBox*> polygons_left;
+  csArray<csPoly3DBox*> polygons_right;
+  DistributePolygons (node->axis, node->where, polygons, polygons_left, polygons_right);
+  node->child1 = new PVSPolygonNode ();
+  node->child2 = new PVSPolygonNode ();
+  BuildShadowTreePolygons (node->child1, box1, polygons_left);
+  BuildShadowTreePolygons (node->child2, box2, polygons_right);
+}
+
+void PVSCalcSector::BuildShadowTreePolygons (PVSCalcNode* node,
+	const csArray<csPoly3DBox*>& polygons)
+{
+  if (polygons.Length () == 0) return;
+
+  if (node->child1)
+  {
+    // This node has children, that means we simply have to distribute
+    // the polygons over the two children.
+    int axis;
+    float where;
+    pvstree->GetAxisAndPosition (node->node, axis, where);
+    csArray<csPoly3DBox*> polygons_left;
+    csArray<csPoly3DBox*> polygons_right;
+    DistributePolygons (axis, where, polygons, polygons_left, polygons_right);
+    BuildShadowTreePolygons (node->child1, polygons_left);
+    BuildShadowTreePolygons (node->child2, polygons_right);
+  }
+  else
+  {
+    // This node has no children. Here we have to create a new polygon
+    // tree.
+    node->polygon_tree = new PVSPolygonNode ();
+    BuildShadowTreePolygons (node->polygon_tree, node->node_bbox, polygons);
+  }
 }
 
 void csPoly3DBox::Calculate ()
@@ -249,6 +497,7 @@ void csPoly3DBox::Calculate ()
   for (i = 1 ; i < GetVertexCount () ; i++)
     bbox.AddBoundingVertexSmart ((*this)[i]);
   area = GetArea ();
+  plane = ComputePlane ();
 }
 
 void PVSCalcSector::CollectGeometry (iMeshWrapper* mesh,
@@ -636,8 +885,56 @@ int PVSCalcSector::CastShadowsUntilFull (const csBox3& source)
   return status;
 }
 
-void PVSCalcSector::RecurseDestNodes (void* sourcenode, void* destnode,
-	csSet<void*>& invisible_nodes)
+bool PVSCalcSector::NodesSurelyVisible (const csBox3& source,
+	const csBox3& dest)
+{
+  // First we do a trivial test where we test if a few points of the boxes can
+  // see each other. If we hit no polygon then we don't have to continue
+  // testing with the coverage buffer.
+  if (!shadow_tree->HitBeam (csSegment3 (
+  	source.GetCenter (),
+    	dest.GetCenter ())))
+    return true;
+  if (!shadow_tree->HitBeam (csSegment3 (
+  	source.GetCorner (CS_BOX_CORNER_xyz),
+    	dest.GetCorner (CS_BOX_CORNER_XYZ))))
+    return true;
+  if (!shadow_tree->HitBeam (csSegment3 (
+  	source.GetCorner (CS_BOX_CORNER_Xyz),
+    	dest.GetCorner (CS_BOX_CORNER_xYZ))))
+    return true;
+  if (!shadow_tree->HitBeam (csSegment3 (
+  	source.GetCorner (CS_BOX_CORNER_xyZ),
+    	dest.GetCorner (CS_BOX_CORNER_XYz))))
+    return true;
+  if (!shadow_tree->HitBeam (csSegment3 (
+  	source.GetCorner (CS_BOX_CORNER_xYz),
+    	dest.GetCorner (CS_BOX_CORNER_XyZ))))
+    return true;
+
+  if (!shadow_tree->HitBeam (csSegment3 (
+  	source.GetCorner (CS_BOX_CORNER_XYZ),
+    	dest.GetCorner (CS_BOX_CORNER_xyz))))
+    return true;
+  if (!shadow_tree->HitBeam (csSegment3 (
+  	source.GetCorner (CS_BOX_CORNER_xYZ),
+    	dest.GetCorner (CS_BOX_CORNER_Xyz))))
+    return true;
+  if (!shadow_tree->HitBeam (csSegment3 (
+  	source.GetCorner (CS_BOX_CORNER_XYz),
+    	dest.GetCorner (CS_BOX_CORNER_xyZ))))
+    return true;
+  if (!shadow_tree->HitBeam (csSegment3 (
+  	source.GetCorner (CS_BOX_CORNER_XyZ),
+    	dest.GetCorner (CS_BOX_CORNER_xYz))))
+    return true;
+
+  return false;
+}
+
+void PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
+	PVSCalcNode* destnode,
+	csSet<PVSCalcNode*>& invisible_nodes)
 {
   // If sourcenode is equal to node then visibility is obvious. In that
   // case we don't proceed since all children of node will also be visible
@@ -649,43 +946,99 @@ void PVSCalcSector::RecurseDestNodes (void* sourcenode, void* destnode,
   // node is invisible for one of the parents of the sourcenode.
   if (invisible_nodes.In (destnode)) return;
 
+  // If the PVS of the destination node is already calculated and this node
+  // was invisible for the destination node then we can use symmetry. i.e.
+  // if A cannot see B then B cannot see A. With one-sided polygons there
+  // are situations where this is not true but in most maps this situation
+  // should not occur.
+  // One could contemplate also doing symmetry for visibility but that has
+  // the disadvantage of not being able to use the fact that calculating
+  // invisibility from the other side may result in an invisible node. So it
+  // is best to calculate invisibility from both A->B and B->A in that case.
+  if (destnode->calculated_pvs)
+  {
+    if (destnode->IsInvisible (sourcenode))
+    {
+      // sourcenode is invisible for destnode. So we mark destnode
+      // invisible for sourcenode.
+      invisible_nodes.Add (destnode);
+      pvstree->MarkInvisible (sourcenode->node, destnode->node);
+      sourcenode->invisible_nodes.Add (destnode);
+      int destrep = destnode->represented_nodes;
+      DBA(("S%d ", destrep));
+      DB(("S:Marked invisible (%g,%g,%g)-(%g,%g,%g) to (%g,%g,%g)-(%g,%g,%g)\n",
+    	    source.MinX (), source.MinY (), source.MinZ (),
+    	    source.MaxX (), source.MaxY (), source.MaxZ (),
+    	    dest.MinX (), dest.MinY (), dest.MinZ (),
+    	    dest.MaxX (), dest.MaxY (), dest.MaxZ ()));
+
+      // If the destination node is invisible that automatically implies
+      // that the children are invisible too. No need to recurse further.
+      return;
+    }
+  }
+
   // Here we have to do the actual shadow casting to see if 'sourcenode'
   // can see 'node'.
-  const csBox3& source = pvstree->GetNodeBBox (sourcenode);
-  const csBox3& dest = pvstree->GetNodeBBox (destnode);
+  const csBox3& source = sourcenode->node_bbox;
+  const csBox3& dest = destnode->node_bbox;
 
   // If the source node is contained in the destination node then
   // we know the destination node is visible. However we do have to continue
   // traversing to the children so we only skip the testing part.
   if (!dest.Overlap (source))
   {
-    DB(("\nTEST (%g,%g,%g)-(%g,%g,%g) -> (%g,%g,%g)-(%g,%g,%g)\n",
+    // First we do a trivial test to see if the nodes can surely see each
+    // other.
+    if (!NodesSurelyVisible (source, dest))
+    {
+      DB(("\nTEST (%g,%g,%g)-(%g,%g,%g) -> (%g,%g,%g)-(%g,%g,%g)\n",
 	source.MinX (), source.MinY (), source.MinZ (),
 	source.MaxX (), source.MaxY (), source.MaxZ (),
 	dest.MinX (), dest.MinY (), dest.MinZ (),
 	dest.MaxX (), dest.MaxY (), dest.MaxZ ()));
 
-    // If the projection plane failed to set up we still have to test
-    // children.
-    if (SetupProjectionPlane (source, dest))
-    {
-      int level = CastShadowsUntilFull (source);
-      if (level == 1)
+      // If the projection plane failed to set up we still have to test
+      // children.
+      if (SetupProjectionPlane (source, dest))
       {
-        // The coverage buffer is full! This means the destination node
-        // cannot be seen from the source node.
-        invisible_nodes.Add (destnode);
-        pvstree->MarkInvisible (sourcenode, destnode);
-	DBA(("-"));
-        DB(("Marked invisible (%g,%g,%g)-(%g,%g,%g) to (%g,%g,%g)-(%g,%g,%g)\n",
+        int level = CastShadowsUntilFull (source);
+        if (level == 1)
+        {
+          // The coverage buffer is full! This means the destination node
+          // cannot be seen from the source node.
+          invisible_nodes.Add (destnode);
+          pvstree->MarkInvisible (sourcenode->node, destnode->node);
+	  sourcenode->invisible_nodes.Add (destnode);
+	  int destrep = destnode->represented_nodes;
+	  DBA(("%d ", destrep));
+          DB(("Marked invisible (%g,%g,%g)-(%g,%g,%g) to (%g,%g,%g)-(%g,%g,%g)\n",
     	    source.MinX (), source.MinY (), source.MinZ (),
     	    source.MaxX (), source.MaxY (), source.MaxZ (),
     	    dest.MinX (), dest.MinY (), dest.MinZ (),
     	    dest.MaxX (), dest.MaxY (), dest.MaxZ ()));
 
-        // If the destination node is invisible that automatically implies
-        // that the children are invisible too. No need to recurse further.
-        return;
+	  // If visibility for the destination node was already calculated
+	  // and we are here then that means that this node was considered visible
+	  // for the destination node (otherwise we wouldn't have done these
+	  // calculations because of the symmetry test in the beginning of this
+	  // function).
+	  // But now we know that the destination node is invisible for this
+	  // node so we make use of symmetry and also mark this source node as
+	  // invisible in the destination node.
+	  if (destnode->calculated_pvs)
+	  {
+            pvstree->MarkInvisible (destnode->node, sourcenode->node);
+	    destnode->invisible_nodes.Add (sourcenode);
+	    int srcrep = sourcenode->represented_nodes;
+	    DBA(("I%d ", srcrep));
+            DB(("Marked invisible symmetry\n"));
+	  }
+
+          // If the destination node is invisible that automatically implies
+          // that the children are invisible too. No need to recurse further.
+          return;
+        }
       }
     }
   }
@@ -693,26 +1046,37 @@ void PVSCalcSector::RecurseDestNodes (void* sourcenode, void* destnode,
   // The destination node was visible and coverage buffer was partially
   // full. This means that we have to proceed to test visibility for the
   // children of the destination node.
-  void* child1 = pvstree->GetFirstChild (destnode);
-  if (child1) RecurseDestNodes (sourcenode, child1, invisible_nodes);
-  void* child2 = pvstree->GetSecondChild (destnode);
-  if (child2) RecurseDestNodes (sourcenode, child2, invisible_nodes);
+  if (destnode->child1)
+    RecurseDestNodes (sourcenode, destnode->child1, invisible_nodes);
+  if (destnode->child2)
+    RecurseDestNodes (sourcenode, destnode->child2, invisible_nodes);
 }
 
-void PVSCalcSector::RecurseSourceNodes (void* sourcenode,
-	csSet<void*> invisible_nodes, int& nodecounter)
+void PVSCalcSector::RecurseSourceNodes (PVSCalcNode* sourcenode,
+	csSet<PVSCalcNode*> invisible_nodes, int& nodecounter)
 {
   nodecounter--;
-  printf ("\nsource node %p (%d) ", sourcenode, nodecounter); fflush (stdout);
+  csTicks currenttime = csGetTicks ();
+  csTicks totaltime = currenttime - starttime;
+  float average = float (totaltime) / float (totalnodes-nodecounter);
+  csTicks remaining = (csTicks)(average * nodecounter);
+  printf ("\n%p (#n=%d cnt=%d) (tot=%ds rem=%ds avg=%gms) ",
+  	sourcenode, sourcenode->represented_nodes, nodecounter,
+	totaltime / 1000, remaining / 1000, average);
+  fflush (stdout);
+
   // We recurse through all destination nodes now. This will update the
   // set of invisible_nodes.
-  RecurseDestNodes (sourcenode, pvstree->GetRootNode (), invisible_nodes);
+  RecurseDestNodes (sourcenode, shadow_tree, invisible_nodes);
+
+  // We mark PVS for this node as being calculated.
+  sourcenode->calculated_pvs = true;
 
   // Traverse to the children to calculate visibility from there.
-  void* child1 = pvstree->GetFirstChild (sourcenode);
-  if (child1) RecurseSourceNodes (child1, invisible_nodes, nodecounter);
-  void* child2 = pvstree->GetSecondChild (sourcenode);
-  if (child2) RecurseSourceNodes (child2, invisible_nodes, nodecounter);
+  if (sourcenode->child1)
+    RecurseSourceNodes (sourcenode->child1, invisible_nodes, nodecounter);
+  if (sourcenode->child2)
+    RecurseSourceNodes (sourcenode->child2, invisible_nodes, nodecounter);
 }
 
 void PVSCalcSector::Calculate ()
@@ -729,14 +1093,14 @@ void PVSCalcSector::Calculate ()
   	bbox.MinX (), bbox.MinY (), bbox.MinZ (),
   	bbox.MaxX (), bbox.MaxY (), bbox.MaxZ ());
 
-  int i;
+  size_t i;
   csBox3 allbox, staticbox;
   allbox.StartBoundingBox ();
   staticbox.StartBoundingBox ();
   int allcount = 0, staticcount = 0;
   int allpcount = 0, staticpcount = 0;
   iMeshList* ml = sector->GetMeshes ();
-  for (i = 0 ; i < ml->GetCount () ; i++)
+  for (i = 0 ; i < (size_t)(ml->GetCount ()) ; i++)
   {
     iMeshWrapper* m = ml->Get (i);
     CollectGeometry (m, allbox, staticbox,
@@ -761,11 +1125,19 @@ void PVSCalcSector::Calculate ()
   	staticpcount, allpcount);
   parent->ReportInfo ("%d static polygons are big enough for building PVS",
   	polygons.Length ());
+  fflush (stdout);
 
   // From all geometry (static and dynamic) we now build the KDtree
-  // that is the base for visibility culling.
+  // that is the base for visibility culling. We also build the shadow
+  // tree that contains extra information we use during building.
   BuildKDTree ();
   pvstree->UpdateBoundingBoxes ();
+  delete shadow_tree;
+  shadow_tree = BuildShadowTree (pvstree->GetRootNode ());
+  csArray<csPoly3DBox*> polygon_ptrs;
+  for (i = 0 ; i < polygons.Length () ; i++)
+    polygon_ptrs.Push (&polygons[i]);
+  BuildShadowTreePolygons (shadow_tree, polygon_ptrs);
   parent->ReportInfo ("KDTree: max depth=%d, number of nodes=%d",
   	maxdepth, countnodes);
 
@@ -778,9 +1150,10 @@ void PVSCalcSector::Calculate ()
   // node that we're currently considering. That means that those nodes
   // are automatically invisible for the children too and don't have
   // to be considered anymore.
-  csSet<void*> invisible_nodes;
+  csSet<PVSCalcNode*> invisible_nodes;
   int nodecounter = countnodes;
-  RecurseSourceNodes (pvstree->GetRootNode (), invisible_nodes, nodecounter);
+  starttime = csGetTicks ();
+  RecurseSourceNodes (shadow_tree, invisible_nodes, nodecounter);
 
   // Write our KDTree with pvs.
   if (!pvstree->WriteOut ())

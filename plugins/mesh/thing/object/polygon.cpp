@@ -937,12 +937,9 @@ bool csPolygon3DStatic::IntersectRayNoBackFace (
   // need to catch this case here.
   csPlane3 &pl = polygon_data.plane_obj;
   float dot1 = pl.D () +
-    pl.A () *
-    start.x +
-    pl.B () *
-    start.y +
-    pl.C () *
-    start.z;
+    pl.A () * start.x +
+    pl.B () * start.y +
+    pl.C () * start.z;
   float dot2 = pl.D () + pl.A () * end.x + pl.B () * end.y + pl.C () * end.z;
   if (ABS (dot1 - dot2) < SMALL_EPSILON) return false;
 
