@@ -21,7 +21,7 @@ if test -r "$prefix/Makefile"; then
 	    libdir="$prefix/lib"
 	else
 	    #Thanks go to Jorge for this script magic...
-	    libdir=`find "$CRYSTAL/out" -name "libcssys.a"  | sed -e "s~\(.*\)/.*~\1~" -e "1q"`
+	    libdir=`ls -1d "$CRYSTAL"/out/*/* | sed -e "s~\(.*\)/.*~\1~" -e "1q"`
 	    if test -z "$libdir"; then
 	        echo "Couldn't detect dir with lib files, aborting!"
 		echo "  Did you already compile CS?"
