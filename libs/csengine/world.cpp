@@ -811,10 +811,10 @@ void csWorld::Draw (csCamera* c, csClipper* view)
 
   // draw all halos on the screen
   csHaloInformation* pinfo;
-  for (int cntHalos = 0; cntHalos < halos.Length(); cntHalos++)
+  for (int halo = halos.Length () - 1; halo >= 0; halo--)
   {
     bool halo_drawn = false;
-    pinfo = halos.Get(cntHalos);
+    pinfo = halos.Get (halo);
 
     float hintensity = pinfo->pLight->GetHaloIntensity ();
 
@@ -825,13 +825,9 @@ void csWorld::Draw (csCamera* c, csClipper* view)
       // this halo is completely invisible. kill it.
       if (hintensity <= 0)
       {
-        halos.Delete(cntHalos);
         pinfo->pLight->SetHaloInQueue (false);
-
-        HaloRast->DestroyHalo(pinfo->haloinfo);
-        delete pinfo;
-
-        cntHalos--;
+        HaloRast->DestroyHalo (pinfo->haloinfo);
+        halos.Delete (halo);
         continue;
       }
 
