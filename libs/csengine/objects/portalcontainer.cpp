@@ -19,9 +19,12 @@
 #include "qsqrt.h"
 #include "csgeom/sphere.h"
 #include "csgeom/poly3d.h"
-#include "igeom/objmodel.h"
-#include "csengine/portalcontainer.h"
 #include "csgeom/transfrm.h"
+#include "igeom/objmodel.h"
+#include "iengine/movable.h"
+#include "iengine/rview.h"
+#include "iengine/camera.h"
+#include "csengine/portalcontainer.h"
 
 // ---------------------------------------------------------------------------
 // csPortalContainerPolyMeshHelper
@@ -108,6 +111,8 @@ csPortalContainer::csPortalContainer (iEngine* engine) :
   scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMeshCD);
   scfiObjectModel.SetPolygonMeshViscull (&scfiPolygonMeshLOD);
   scfiObjectModel.SetPolygonMeshShadows (&scfiPolygonMeshLOD);
+
+  movable_nr = -1;
 }
 
 csPortalContainer::~csPortalContainer ()
@@ -118,24 +123,31 @@ void csPortalContainer::Prepare ()
 {
   if (prepared) return;
   prepared = true;
+  movable_nr = -1; // Make sure move stuff gets updated.
   data_nr++;
   csCompressVertex* vt = csVector3Array::CompressVertices (vertices);
   if (vt == 0) return;
   int i;
+  planes.DeleteAll ();
   for (i = 0 ; i < portals.Length () ; i++)
   {
     csPortal* prt = portals[i];
     int j;
     csArray<int>& vidx = prt->GetVertexIndices ();
+    csPoly3D poly;
     for (j = 0 ; j < vidx.Length () ; j++)
     {
       vidx[j] = vt[vidx[j]].new_idx;
+      poly.AddVertex (vertices[vidx[j]]);
     }
+    planes.Push (poly.ComputePlane ());
   }
   object_bbox.StartBoundingBox ();
   for (i = 0 ; i < vertices.Length () ; i++)
     object_bbox.AddBoundingVertex (vertices[i]);
   object_radius = object_bbox.Max () - object_bbox.GetCenter ();
+  max_object_radius = qsqrt (csSquaredDist::PointPoint (
+  	object_bbox.Max (), object_bbox.Min ())) * 0.5f;
 }
 
 //------------------- For iPortalContainer ---------------------------//
@@ -163,13 +175,58 @@ void csPortalContainer::RemovePortal (iPortal* portal)
   portals.Delete ((csPortal*)portal);
 }
 
+//------------------------- General ----------------------------------//
+
+void csPortalContainer::ObjectToWorld (iMovable* movable,
+	const csReversibleTransform& movtrans)
+{
+  if (movable_nr == movable->GetUpdateNumber ()) return;
+  movable_nr = movable->GetUpdateNumber ();
+  int i;
+  world_vertices.SetLength (vertices.Length ());
+  if (movable->IsFullTransformIdentity ())
+  {
+    world_vertices = vertices;
+    world_planes = planes;
+  }
+  else
+  {
+    for (i = 0 ; i < vertices.Length () ; i++)
+      world_vertices[i] = movtrans.This2Other (vertices[i]);
+    world_planes.DeleteAll ();
+    for (i = 0 ; i < planes.Length () ; i++)
+    {
+      csPlane3 p;
+      csVector3& world_vec = world_vertices[portals[i]->GetVertexIndices ()[0]];
+      movtrans.This2Other (planes[i], world_vec, p);
+      p.Normalize ();
+      world_planes.Push (p);
+    }
+  }
+}
+
 //--------------------- For iMeshObject ------------------------------//
 
 bool csPortalContainer::DrawTest (iRenderView* rview, iMovable* movable)
 {
   Prepare ();
-  (void)rview;
-  (void)movable;
+
+  iCamera *icam = rview->GetCamera ();
+  const csReversibleTransform& camtrans = icam->GetTransform ();
+  const csReversibleTransform& movtrans = movable->GetFullTransform ();
+
+  csSphere sphere;
+  sphere.SetCenter (object_bbox.GetCenter ());
+  sphere.SetRadius (max_object_radius);
+  csReversibleTransform tr_o2c = camtrans;
+  if (!movable->IsFullTransformIdentity ())
+    tr_o2c /= movtrans;
+  if (!rview->ClipBSphere (tr_o2c, sphere, clip_portal,
+  	clip_plane, clip_z_plane))
+    return false;
+
+  ObjectToWorld (movable, movtrans);
+
   return false;
 }
 

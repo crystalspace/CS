@@ -11,6 +11,8 @@ chronological order.
 	  to 32. On 3D cards, CS performs awfully bad with 16-bit displays
 	  because stencils are not hardware accelerated. So 32-bit is a better
 	  default.
+	- Jorrit implemented csPortalContainer::DrawTest(). This still leaves
+	  Draw() unimplemented.
 22-Sep-2003
 	- Eric Sunshine converted csengine.mak and thingmsh.mak over to the new
 	  style where built objects and resources are placed in their own

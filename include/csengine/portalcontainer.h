@@ -116,14 +116,29 @@ private:
 class csPortalContainer : public csMeshObject, public iPortalContainer
 {
 private:
-  csDirtyAccessArray<csVector3> vertices;
   csRefArray<csPortal> portals;
   bool prepared;
   // Number that is increased with every significant change.
   uint32 data_nr;
 
+  // Object space data.
+  csDirtyAccessArray<csVector3> vertices;
+  csArray<csPlane3> planes;	// One plane per portal.
   csBox3 object_bbox;
   csVector3 object_radius;
+  float max_object_radius;
+
+  // World space data. movable_nr is used to detect if it needs to be
+  // recalculated.
+  long movable_nr;
+  csDirtyAccessArray<csVector3> world_vertices;
+  csArray<csPlane3> world_planes;
+
+  // Probably only for old renderer: clip data between DrawTest->Draw. @@@OR@@@
+  int clip_portal, clip_plane, clip_z_plane;
+
+  /// Transform from object to world space.
+  void ObjectToWorld (iMovable* movable, const csReversibleTransform& movtrans);
 
 protected:
   /**
