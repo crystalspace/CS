@@ -28,6 +28,7 @@
 
 struct iEffectDefinition;
 struct iEffectTechnique;
+class csEffectStrings;
 
 SCF_VERSION (iEffectServer, 0, 0, 1);
 
@@ -46,10 +47,15 @@ public:
   /// Select the best technique in an effect, based on validity and quality settings.
   virtual iEffectTechnique* SelectAppropriateTechnique( iEffectDefinition* effect ) = 0;
 
+  /// Get a effect based on it's name
+  virtual iEffectDefinition* GetEffect(const char *s) = 0;
+
   /// Request an ID for a string.
   virtual csStringID RequestString( const char *s ) = 0;
   /// Request string for an ID.
   virtual const char* RequestString( csStringID id ) = 0;
+  /// Get our csEffectStrings
+  virtual inline csEffectStrings* GetStandardStrings() = 0;
 };
 
 #endif // __IEFFECTSERVER_H__
