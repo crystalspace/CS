@@ -58,6 +58,10 @@ The history order is reversed so that new features are at the top.
 	- In an effort to eliminate the big iso engine bug I added
 	  some asserts.
 	- Wouter Wijngaards fixed another bug in iso engine.
+	- Michael Voasse removed two debugging messages in software renderer.
+	- Philip Wyett moved struct RGB to be public in class awsRGBKey.
+	- Philip Wyett updated his mail address in the docs to:
+	      philipwyett@dsl.pipex.com
 17-Jul-2001
 	- Worked around an internal compiler error (for MingW compiler) in
 	  recent changes to crossbld.cpp by completely rearranging the
