@@ -19,6 +19,9 @@
 
 #include "cssysdef.h"
 
+#include "csutil/scf.h"
+#include "iutil/cfgfile.h"
+
 csPtr<iConfigFile> csGetPlatformConfig (const char* key)
 {
   return 0;
