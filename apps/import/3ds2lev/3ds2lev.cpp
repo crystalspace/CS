@@ -7,11 +7,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <math.h>
-#include "3dsload.h"
 #include "3dsout.h"
-#include "3dsco.h"
-
-// --------- new implementation
 #include "3ds2lev.h"
 
 
@@ -262,9 +258,9 @@ void Lib3dsConvertXYZ (Lib3dsFile* p3dsFile)
 
 /**
  * Actually not used: must be redone for Lib3dsFile
- */
-void FindCentrePoints (H3dsScene * scene)
+void FindCentrePoints (H3dsScene * scene, Lib3dsFile* p3dsFile)
 {
+
   float32 xmino= 1e30, ymino= 1e30, zmino= 1e30;
   float32 xmaxo=-1e30, ymaxo=-1e30, zmaxo=-1e30;
   int n, v;
@@ -298,10 +294,10 @@ void FindCentrePoints (H3dsScene * scene)
   scene->centre.y = ymaxo-(ymaxo-ymino)*0.5;
   scene->centre.z = zmaxo-(zmaxo-zmino)*0.5;
 }
+*/
 
 /**
  * Used by FindCentrePoints()
- */
 void FindExchange (H3dsScene * scene, int find, int exchange)
 {
   // Find all references to the 'find' vertice and replace
@@ -319,10 +315,10 @@ void FindExchange (H3dsScene * scene, int find, int exchange)
     }
   }
 }
+ */
 
 /**
  * Actually not used: must be redone for Lib3dsFile
- */
 int RemoveDupVerts (H3dsScene * scene, H3dsMapVert * vrtmap, int verts)
 {
   int vrttop=0, dot=0, currvtx, runvtx;
@@ -374,10 +370,10 @@ int RemoveDupVerts (H3dsScene * scene, H3dsMapVert * vrtmap, int verts)
   }
   return vrttop;
 }
+ */
 
 /**
  * Actually not used: must be redone for Lib3dsFile
- */
 void AdjustFaceIndexes (H3dsScene * scene)
 {
   int m=0, f, n;
@@ -394,10 +390,10 @@ void AdjustFaceIndexes (H3dsScene * scene)
     m+=mo->verts;
   }
 }
+ */
 
 /**
  * Actually not used: must be redone for Lib3dsFile
- */
 void CollectVertsAndMaps (H3dsScene * scene, H3dsMapVert * vrtmap)
 {
   int vn=0, mn, v, n, m, mmn;
@@ -432,6 +428,7 @@ void CollectVertsAndMaps (H3dsScene * scene, H3dsMapVert * vrtmap)
     }
   }
 }
+ */
 
 /**
  * Main function

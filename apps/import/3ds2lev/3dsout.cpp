@@ -4,8 +4,8 @@
  *  Author: Luca Pancallo 2000.09.28
  */
 
-#include "3dsco.h"
 #include "3dsout.h"
+#include "3ds2lev.h"
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
