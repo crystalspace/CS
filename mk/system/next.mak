@@ -1,6 +1,9 @@
 # This is an include file for all the makefiles which describes system specific
 # settings. Also have a look at mk/user.mak.
 
+# Only one of the cover makefiles should be including this file.  Ignore others.
+ifeq ($(NEXT.FRIEND),yes)
+
 # We don't want assembly for now
 override DO_ASM=no
 
@@ -8,8 +11,12 @@ override DO_ASM=no
 DRIVERS=cs2d/next cs3d/software csnetdrv/null csnetdrv/sockets \
   csnetman/null csnetman/simple cssnddrv/null cssndrdr/null
 
-#------------------------------------------ rootdefines, defines, configure ---#
-ifneq ($(findstring $(MAKESECTION),defines)$(findstring $(MAKESECTION),configure),)
+ifneq ($(NEXT.TARGET),)
+DESCRIPTION.$(NEXT.TARGET):=$(NEXT.DESCRIPTION)
+endif
+
+#------------------------------------------ rootdefines, defines, config ------#
+ifneq ($(findstring defines,$(MAKESECTION))$(findstring config,$(ROOTCONFIG)),)
 
 PROC.m68k  = M68K
 PROC.i386  = INTEL
@@ -23,7 +30,7 @@ ifeq ($(strip $(NEXT.TARGET_ARCHS)),)
 NEXT.TARGET_ARCHS := $(shell /usr/bin/arch)
 endif
 
-endif # MAKESECTION is rootdefines, defines, configure
+endif # MAKESECTION is rootdefines, defines; ROOTCONFIG is config
 
 #-------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -177,24 +184,35 @@ endif # ifeq ($(MAKESECTION),defines)
 #--------------------------------------------------------------- confighelp ---#
 ifeq ($(MAKESECTION),confighelp)
 
-# Since this makefile can be included mode than once,
-# don't allow adding help texts more than once
+# Since this makefile can be included more than once, disallow addition of
+# help messages more than once.
 ifndef ALREADY_INCLUDED
-
 ALREADY_INCLUDED = 1
 
-SYSHELP += \
-  $(NEWLINE)echo $"  make macosxs      Prepare for building under and for $(DESCRIPTION.macosxs)$" \
-  $(NEWLINE)echo $"  make openstep     Prepare for building under and for $(DESCRIPTION.openstep)$" \
-  $(NEWLINE)echo $"  make nextstep     Prepare for building under and for $(DESCRIPTION.nextstep)$"
+SYSHELP += $(NEXT.SYSHELP)
 
 # System-dependent help commands
 SYSMODIFIERSHELP += \
-  $(NEWLINE)echo $"  TARGET_ARCHS="$(NEXT.ARCHS)" (NextStep, MacOS/X, OpenStep)$" \
-  $(NEWLINE)echo $"      Target architectures to build. If not specified defaults to current.$" \
-  $(NEWLINE)echo $"      Possible values are: $(NEXT.ARCHS)$"
+  $(NEWLINE)echo $"  TARGET_ARCHS="$(sort $(NEXT.ARCHS.ALL))" ($(strip $(NEXT.DESCRIPTION.ALL)))$" \
+  $(NEWLINE)echo $"      Target architectures to build.  If not specified, then the current$" \
+  $(NEWLINE)echo $"      architecture is used.  Possible values are: $(NEXT.ARCHS.HELP)$"
+
+# Ensure that these variables are simply expanded by using :=
+# This will cause += to also perform simple expansion, which is necessary
+# since this makefile is included multiple times.
+NEXT.SYSHELP :=
+NEXT.ARCHS.HELP :=
+NEXT.ARCHS.ALL :=
 
 endif # ALREADY_INCLUDED
+
+NEXT.SYSHELP += \
+  $(NEWLINE)echo $"  make $(NEXT.TARGET)     Prepare for building under and for $(DESCRIPTION.$(NEXT.TARGET))$"
+NEXT.ARCHS.HELP += \
+  $(NEWLINE)echo $"          $(NEXT.ARCHS)  [$(NEXT.DESCRIPTION)]$"
+NEXT.ARCHS.ALL += $(NEXT.ARCHS)
+NEXT.DESCRIPTION.ALL := $(NEXT.DESCRIPTION.ALL)$(NEXT.COMMA) $(NEXT.DESCRIPTION)
+NEXT.COMMA = ,
 
 endif # ifeq ($(MAKESECTION),confighelp)
 
@@ -204,12 +222,10 @@ ifeq ($(ROOTCONFIG),config)
 # Currently this port does not support dynamic libraries
 override USE_DLL = no
 
-define SYSCONFIG
-  @echo DO_ASM = $(DO_ASM)>>config.tmp
-  ifneq ($(strip $(TARGET_ARCHS)),)
-    @echo TARGET_ARCHS = $(NEXT.TARGET_ARCHS)>>config.tmp
-  endif
-endef
+SYSCONFIG += $(NEWLINE)echo DO_ASM = $(DO_ASM)>>config.tmp
+ifneq ($(strip $(TARGET_ARCHS)),)
+  SYSCONFIG += $(NEWLINE)echo TARGET_ARCHS = $(NEXT.TARGET_ARCHS)>>config.tmp
+endif
 
 endif # ifeq ($(ROOTCONFIG),config)
 
@@ -220,3 +236,5 @@ MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define OS_NEXT_$(NEXT.FLAVOR)$">>volatile.
 MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define OS_NEXT_DESCRIPTION "$(NEXT.DESCRIPTION)"$">>volatile.tmp
 
 endif # ifeq ($(ROOTCONFIG),volatile)
+
+endif # ifeq ($(NEXT.FRIEND),yes)
