@@ -980,6 +980,8 @@ void CompressShadowFrustrums (csFrustrumList* list)
   }
   while (sf)
   {
+    if (sf->sector != cur_sector || sf->draw_busy != cur_draw_busy)
+      break;
     bool vis;
     if (cb)
       vis = cb->InsertPolygon (sf->GetVertices (), sf->GetNumVertices ());
@@ -994,8 +996,6 @@ void CompressShadowFrustrums (csFrustrumList* list)
     }
     else
       sf = sf->prev;
-    if (sf->sector != cur_sector || sf->draw_busy != cur_draw_busy)
-      break;
   }
 }
 

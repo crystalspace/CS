@@ -439,6 +439,7 @@ void* csOctree::Back2Front (csOctreeNode* node, const csVector3& pos,
 	void* culldata)
 {
   if (!node) return NULL;
+  if (cullfunc && !cullfunc (this, node, pos, culldata)) return NULL;
 
   ProcessTodo (node);
 
@@ -456,11 +457,8 @@ void* csOctree::Back2Front (csOctreeNode* node, const csVector3& pos,
 
 # undef __TRAVERSE__
 # define __TRAVERSE__(x) \
-  if (!cullfunc || cullfunc (this, node->children[x], pos, culldata)) \
-  { \
-    rc = Back2Front ((csOctreeNode*)node->children[x], pos, func, data, cullfunc, culldata); \
-    if (rc) return rc; \
-  }
+  rc = Back2Front ((csOctreeNode*)node->children[x], pos, func, data, cullfunc, culldata); \
+  if (rc) return rc;
 
   __TRAVERSE__ (7-cur_idx);
   __TRAVERSE__ ((7-cur_idx) ^ 1);
@@ -478,6 +476,7 @@ void* csOctree::Front2Back (csOctreeNode* node, const csVector3& pos,
 	void* culldata)
 {
   if (!node) return NULL;
+  if (cullfunc && !cullfunc (this, node, pos, culldata)) return NULL;
 
   ProcessTodo (node);
 
@@ -495,11 +494,8 @@ void* csOctree::Front2Back (csOctreeNode* node, const csVector3& pos,
 
 # undef __TRAVERSE__
 # define __TRAVERSE__(x) \
-  if (!cullfunc || cullfunc (this, node->children[x], pos, culldata)) \
-  { \
-    rc = Front2Back ((csOctreeNode*)node->children[x], pos, func, data, cullfunc, culldata); \
-    if (rc) return rc; \
-  }
+  rc = Front2Back ((csOctreeNode*)node->children[x], pos, func, data, cullfunc, culldata); \
+  if (rc) return rc;
 
   __TRAVERSE__ (cur_idx);
   __TRAVERSE__ (cur_idx ^ 1);
