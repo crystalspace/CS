@@ -9,3 +9,4 @@ environment.
 
 @imports{tutorial,intro.txi}
 @imports{tutorial,simple.txi}
+@imports{tutorial,csclear.txi}
