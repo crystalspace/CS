@@ -39,7 +39,7 @@ public:
     NeXTDriver2D::NeXTDriver2D( ISystem* );
     virtual ~NeXTDriver2D();
     virtual void Initialize();
-    virtual bool Open( char* title );
+    virtual bool Open( char const* title );
     virtual void Close();
     virtual void Print( csRect* = 0 );
     virtual bool SetMouseCursor( int shape, ITextureHandle* );
