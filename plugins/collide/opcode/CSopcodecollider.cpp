@@ -125,7 +125,7 @@ void csOPCODECollider::GeometryInitialize (iPolygonMesh* mesh)
        OPCC.NbVerts=vertcount;
        OPCC.Tris=indexholder;
        OPCC.Verts=vertholder;
-       OPCC.Rules = SPLIT_COMPLETE | SPLIT_SPLATTERPOINTS | SPLIT_BESTAXIS ;
+       OPCC.Rules = SPLIT_COMPLETE | SPLIT_SPLATTERPOINTS | SPLIT_GEOMCENTER ;
        OPCC.NoLeaf = true;
        OPCC.Quantized = true;
         };
