@@ -5056,11 +5056,6 @@ chronological order.
 29-Jun-2003
 	- Luca fixed the inconcistency of properties read and written by
 	  Set/GetProperty in the awsScrollBar class. He updated the texinfo
-<<<<<<< history.txt
-	  docs about scrollbar's properties too. He also fixed a bug in the
-	  aws documentation about the signalComponentCreated (called wrongly
-	  signalCreated).
-=======
 	  docs about scrollbar's properties too. He also fixed a bug in the
 	  aws documentation about the signalComponentCreated (called wrongly
 	  signalCreated).
@@ -5069,7 +5064,6 @@ chronological order.
 	  corruption seems to have been caused by an old progver.m4 macro file
 	  in Matze's CS/mk/autoconf directory or in some other location
 	  searched by Autoconf by default.
->>>>>>> 1.4414
 28-Jun-2003
 	- DeSigna fixed a small logic error in csGetKeyDesc(), where a ?:
 	  conditional had its values the wrong way round.
