@@ -61,6 +61,12 @@ public:
     return I_inv_world;
   }
 
+  ctMatrix3 get_I_world(){ 
+    const ctMatrix3 &R = RF.get_R();
+    ctMatrix3 I_world = R * I * (R.get_transpose()); 
+    return I_world;
+  }
+
   virtual ctMatrix3 get_impulse_I_inv(){ 
     return get_I_inv_world();
   }
