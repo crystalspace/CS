@@ -78,6 +78,7 @@ class csVertexBufferEXT : public iVertexBuffer
 
     /// Check if the buffer is locked.
     virtual bool IsLocked () const;
+    
     /**
     * Get the current array of vertices.
     */
@@ -90,6 +91,14 @@ class csVertexBufferEXT : public iVertexBuffer
     * Get the current array of colors.
     */
     virtual csColor* GetColors () const;
+    /**
+    * Get all of the current user arrays.
+    */
+    virtual float* GetUserArray (int index) const;
+    /**
+    * Get the number of components of one of the current user arrays.
+    */
+    virtual int GetUserArrayComponentCount (int index) const;
     /**
     * Get the number of vertices.
     */

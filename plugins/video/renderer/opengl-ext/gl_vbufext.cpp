@@ -118,6 +118,22 @@ csColor* csVertexBufferEXT::GetColors () const
 }
 
 /**
+* Get all of the current user arrays.
+*/
+float* csVertexBufferEXT::GetUserArray (int index) const
+{
+  return NULL; // Dummy return to avoid compiler errors
+}
+
+/**
+* Get the number of components of one of the current user arrays.
+*/
+int csVertexBufferEXT::GetUserArrayComponentCount (int index) const
+{
+  return 0; // Dummy return to avoid compiler errors
+}
+
+/**
 * Get the number of vertices.
 */
 int csVertexBufferEXT::GetVertexCount () const
