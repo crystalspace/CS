@@ -310,7 +310,25 @@ EXCLUDE                =
 # EXCLUDE_PATTERNS tag to specify one or more wildcard patterns to exclude 
 # certain files from those directories. 
 
-EXCLUDE_PATTERNS       = 
+EXCLUDE_PATTERNS       = \
+	*/include/csutil/win32/AL/* \
+	*/include/csutil/win32/Cg/* \
+	*/include/csutil/win32/cal3d/* \
+	*/include/csutil/win32/d3* \
+	*/include/csutil/win32/ddraw.h \
+	*/include/csutil/win32/dinput.h \
+	*/include/csutil/win32/dsound.h \
+	*/include/csutil/win32/freetype/* \
+	*/include/csutil/win32/ft2build.h \
+	*/include/csutil/win32/j* \
+	*/include/csutil/win32/lib3ds/* \
+	*/include/csutil/win32/libmng* \
+	*/include/csutil/win32/mikmod.h \
+	*/include/csutil/win32/ode/* \
+	*/include/csutil/win32/ogg/* \
+	*/include/csutil/win32/png* \
+	*/include/csutil/win32/vorbis/* \
+	*/include/csutil/win32/z*
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or 
 # directories that contain example code fragments that are included (see 

@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Oct-2005
+	- Eric Sunshine eliminated a few more warnings in the public CS headers
+	  reported by Doxygen.
+	- Eric Sunshine augmented the Doxygen configuration files devapi.dox
+	  and pubapi.dox so that they filter out the third-party headers which
+	  cs-win32libs installs into CS/include/csutil/win32.  Documentation
+	  for these extraneous headers does not belong in the CS API reference;
+	  and they even were conflicting with the CS headers.  (For instance,
+	  cal3d.h contains a \mainpage which conflicts with CS's own
+	  \mainpage.)
 16-Oct-2004
 	- Jorrit resumed work on the foliage mesh. Still unfinished.
 	- res added some code to initialize some structs used by the shader

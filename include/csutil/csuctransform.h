@@ -299,7 +299,7 @@ public:
     
   /**
    * Encode an Unicode character to UTF-16.
-   * \copydoc EncodeUTF8(const utf32_char,utf8_char*,bufsize)
+   * \copydoc EncodeUTF8(const utf32_char,utf8_char*,size_t)
    */
   inline static int EncodeUTF16 (const utf32_char ch, utf16_char* buf, 
     size_t bufsize)
@@ -326,7 +326,7 @@ public:
 
   /**
    * Encode an Unicode character to UTF-32.
-   * \copydoc EncodeUTF8(const utf32_char,utf8_char*,bufsize)
+   * \copydoc EncodeUTF8(const utf32_char,utf8_char*,size_t)
    */
   inline static int EncodeUTF32 (const utf32_char ch, utf32_char* buf, 
     size_t bufsize)
@@ -526,7 +526,7 @@ public:
 
   /**
    * Convert UTF-16 to platform-specific wide chars.
-   * \copydoc UTF8toWC(wchar_t*,size_t,utf8_char*,size_t)
+   * \copydoc UTF8toWC(wchar_t*,size_t,const utf8_char*,size_t)
    */
   inline static size_t UTF16toWC (wchar_t* dest, size_t destSize, 
     const utf16_char* source, size_t srcSize)
@@ -549,7 +549,7 @@ public:
 
   /**
    * Convert UTF-32 to platform-specific wide chars.
-   * \copydoc UTF8toWC(wchar_t*,size_t,utf8_char*,size_t)
+   * \copydoc UTF8toWC(wchar_t*,size_t,const utf8_char*,size_t)
    */
   inline static size_t UTF32toWC (wchar_t* dest, size_t destSize, 
     const utf32_char* source, size_t srcSize)
@@ -559,7 +559,7 @@ public:
   
   /**
    * Convert platform-specific wide chars to UTF-8.
-   * \copydoc UTF8toWC(wchar_t*,size_t,utf8_char*,size_t)
+   * \copydoc UTF8toWC(wchar_t*,size_t,const utf8_char*,size_t)
    */
   inline static size_t WCtoUTF8 (utf8_char* dest, size_t destSize, 
     const wchar_t* source, size_t srcSize)
@@ -569,7 +569,7 @@ public:
 
   /**
    * Convert platform-specific wide chars to UTF-16.
-   * \copydoc UTF8toWC(wchar_t*,size_t,utf8_char*,size_t)
+   * \copydoc UTF8toWC(wchar_t*,size_t,const utf8_char*,size_t)
    */
   inline static size_t WCtoUTF16 (utf16_char* dest, size_t destSize, 
     const wchar_t* source, size_t srcSize)
@@ -592,7 +592,7 @@ public:
 
   /**
    * Convert platform-specific wide chars to UTF-32.
-   * \copydoc UTF8toWC(wchar_t*,size_t,utf8_char*,size_t)
+   * \copydoc UTF8toWC(wchar_t*,size_t,const utf8_char*,size_t)
    */
   inline static size_t WCtoUTF32 (utf32_char* dest, size_t destSize, 
     const wchar_t* source, size_t srcSize)

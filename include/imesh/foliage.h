@@ -110,7 +110,7 @@ struct iFoliageObject : public iBase
    * algorithm.
    * \param fromslot is the source mesh to use for the reduction.
    * \param toslot is where the new geometry must be placed.
-   * \param factor is a number between 0 and 1 indicating how
+   * \param factory is a number between 0 and 1 indicating how
    *        many triangles must remain. 0 means none, and 1 means
    *        all.
    */
