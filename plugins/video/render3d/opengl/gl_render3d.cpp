@@ -526,6 +526,9 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
                                  int clip_z_plane,
 				 int tri_count)
 {
+  // @@@@ RETHINK!!! THIS IS A HUGE PERFORMANCE BOOST. BUT???
+  clip_z_plane = CS_CLIP_NOT;
+
   // There are two cases to consider.
   // 1. We have not encountered any floating portals yet. In that case
   //    we use scissor, stencil,  or plane clipping as directed by the

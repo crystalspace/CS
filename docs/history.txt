@@ -31,6 +31,9 @@ chronological order.
 	  further tests.
 	- Jorrit changed the OR GL renderer to also report number of rendered
 	  triangles when -verbose is given (similar to what NR does).
+	- Jorrit did a huge optimization to the NR renderer by disabling
+	  z=0 plane clipping. We have to see if this gives any problems
+	  at all.
 29-Jun-2004
 	- Jorrit fixed a bug in spr3d where manually specifying sprite normals
 	  didn't work.
