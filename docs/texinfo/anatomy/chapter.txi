@@ -36,5 +36,5 @@ Scripting
 @imports{anatomy,makefile.txi}
 @imports{anatomy,scf.txi}
 @imports{anatomy,vfs.txi}
-@imports{anatomy,memdbg.txi}
+@imports{anatomy,memdebug.txi}
 @importss{anatomy,platform,details.txi}
