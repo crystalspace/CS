@@ -3,6 +3,10 @@ The history order has been reversed so that new features are at the top.
 14-Mar-2001
 	- Fixed a bug in csRenderView. IncRef() should be DecRef(). Thanks
 	  to Norman Kramer for spotting this.
+	- Philip Wyett changed Visual C++ service pack recommendation to 5.
+	- Norman Kramer fixed the crashes that occured when farplanes were
+	  used (overlooked the problem a few times before realizing whats
+	  going on!).
 13-Mar-2001
 	- Philip Wyett fixed VC6 compile error in 'plgengine', created
 	  by move of 'int ApplicationShow;'. Modification was made to SCF
