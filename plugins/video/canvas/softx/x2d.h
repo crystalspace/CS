@@ -103,7 +103,7 @@ public:
   	const char* msg, va_list arg) 
   {
     if (!xwin->AlertV (type, title, okMsg, msg, arg))
-      csGraphics2DGLCommon::AlertV (type, title, okMsg, msg, arg);
+      csGraphics2D::AlertV (type, title, okMsg, msg, arg);
   }
 
   virtual void SetTitle (const char* title)
