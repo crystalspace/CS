@@ -1013,7 +1013,7 @@ float csSprite3DMeshObject::GetScreenBoundingBox (
   GetTransformedBoundingBox (cameranr, movablenr, trans, cbox);
 
   // if the entire bounding box is behind the camera, we're done
-  if ((cbox.MinZ () < 0) && (cbox.MaxZ () < 0))
+  if (cbox.MaxZ () < 0)
   {
     return -1;
   }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998,1999,2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2002 by Jorrit Tyberghein
     Largely rewritten by Ivan Avramovic <ivan@avramovic.com>
 
     This library is free software; you can redistribute it and/or
@@ -26,6 +26,7 @@
 #include "segment.h"
 
 class csPlane3;
+class csTransform;
 
 /**
  * The maximum value that a coordinate in the bounding box can use.
@@ -748,6 +749,14 @@ public:
   int Adjacent (const csBox3& other) const;
 
   /**
+   * Assume that 3D space is divided into 27 areas. One is inside
+   * the box. The other 26 are rectangular segments around the box.
+   * This function will calculate the right segment for a given point
+   * and return that.
+   */
+  int CalculatePointSegment (const csVector3& pos) const;
+
+  /**
    * Get a convex outline (not a polygon unless projected to 2D)
    * for for this box as seen from the given position.
    * The coordinates returned are world space coordinates.
@@ -781,6 +790,20 @@ public:
    * This routine is extremely efficient.
    */
   float SquaredOriginMaxDist () const;
+
+  /**
+   * Project this box to a 2D bounding box given the view point
+   * transformation and also the field-of-view and shift values (for
+   * perspective projection). The transform should transform from world
+   * to camera space (using Other2This). The minimum and maximum z
+   * are also calculated. If the bounding box is behind the camera
+   * then the 'sbox' will not be calculated (min_z and max_z are
+   * still calculated) and the function will return false.
+   * If the camera is inside the transformed box then this function will
+   * return true and a very big screen space bounding box is returned.
+   */
+  bool ProjectBox (const csTransform& trans, float fov, float sx, float sy,
+  	csBox2& sbox, float& min_z, float& max_z) const;
 
   /// Compute the union of two bounding boxes.
   csBox3& operator+= (const csBox3& box);

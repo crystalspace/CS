@@ -1,5 +1,13 @@
 The history order is reversed so that new features are at the top.
 
+17-May-2002
+	- Added csBox3::CalculatePointSegment() which calculates the
+	  segment (between 0 and 27) of a point relative to the box.
+	- Added csBox3::ProjectBox() which projects a 3D box to 2D
+	  given a transform.
+	- The Dynavis ProjectBBox routine is now replaced with the new
+	  ProjectBox() function. We should look in the rest of CS to
+	  see if we can replace it there too...
 16-May-2002
 	- Added a very efficient AABB/frustum intersection tester which
 	  has an associated clipmask to avoid testing planes that are no

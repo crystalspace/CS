@@ -213,41 +213,6 @@ static void Perspective (const csVector3& v, csVector2& p, float fov,
   p.y = v.y * iz + sy;
 }
 
-void csDynaVis::ProjectBBox (iCamera* camera, const csBox3& bbox, csBox2& sbox,
-	float& min_depth)
-{
-  // @@@ Can this be done in a smarter way?
-
-  const csReversibleTransform& trans = camera->GetTransform ();
-  float fov = camera->GetFOV ();
-  float sx = camera->GetShiftX ();
-  float sy = camera->GetShiftY ();
-  csVector2 oneCorner;
-
-  csBox3 cbox;
-  cbox.StartBoundingBox (trans * bbox.GetCorner (0));
-  cbox.AddBoundingVertexSmart (trans * bbox.GetCorner (1));
-  cbox.AddBoundingVertexSmart (trans * bbox.GetCorner (2));
-  cbox.AddBoundingVertexSmart (trans * bbox.GetCorner (3));
-  cbox.AddBoundingVertexSmart (trans * bbox.GetCorner (4));
-  cbox.AddBoundingVertexSmart (trans * bbox.GetCorner (5));
-  cbox.AddBoundingVertexSmart (trans * bbox.GetCorner (6));
-  cbox.AddBoundingVertexSmart (trans * bbox.GetCorner (7));
-
-  Perspective (cbox.Max (), oneCorner, fov, sx, sy);
-  sbox.StartBoundingBox (oneCorner);
-  csVector3 v (cbox.MinX (), cbox.MinY (), cbox.MaxZ ());
-  Perspective (v, oneCorner, fov, sx, sy);
-  sbox.AddBoundingVertexSmart (oneCorner);
-  Perspective (cbox.Min (), oneCorner, fov, sx, sy);
-  sbox.AddBoundingVertexSmart (oneCorner);
-  v.Set (cbox.MaxX (), cbox.MaxY (), cbox.MinZ ());
-  Perspective (v, oneCorner, fov, sx, sy);
-  sbox.AddBoundingVertexSmart (oneCorner);
-
-  min_depth = cbox.MinZ ();
-}
-
 static bool PrintObjects (csKDTree* treenode, void*, uint32)
 {
   int num_objects;
@@ -318,13 +283,16 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
 
   if (do_cull_coverage)
   {
-    ProjectBBox (data->rview->GetCamera (), node_bbox, sbox, min_depth);
-    if (!covbuf->TestRectangle (sbox, min_depth))
-    {
-      reason = INVISIBLE_TESTRECT;
-      vis = false;
-      goto end;
-    }
+    iCamera* camera = data->rview->GetCamera ();
+    float max_depth;
+    if (node_bbox.ProjectBox (camera->GetTransform (), camera->GetFOV (),
+    	camera->GetShiftX (), camera->GetShiftY (), sbox, min_depth, max_depth))
+      if (!covbuf->TestRectangle (sbox, min_depth))
+      {
+        reason = INVISIBLE_TESTRECT;
+        vis = false;
+        goto end;
+      }
   }
 
 end:
@@ -465,13 +433,17 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 
     if (do_cull_coverage)
     {
-      ProjectBBox (data->rview->GetCamera (), obj_bbox, sbox, min_depth);
-      if (!covbuf->TestRectangle (sbox, min_depth))
-      {
-        obj->reason = INVISIBLE_TESTRECT;
-	vis = false;
-        goto end;
-      }
+      iCamera* camera = data->rview->GetCamera ();
+      float max_depth;
+      if (obj_bbox.ProjectBox (camera->GetTransform (), camera->GetFOV (),
+    	  camera->GetShiftX (), camera->GetShiftY (), sbox,
+	  min_depth, max_depth))
+        if (!covbuf->TestRectangle (sbox, min_depth))
+        {
+          obj->reason = INVISIBLE_TESTRECT;
+	  vis = false;
+          goto end;
+        }
     }
 
     //---------------------------------------------------------------

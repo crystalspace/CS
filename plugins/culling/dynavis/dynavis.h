@@ -105,10 +105,6 @@ private:
   // Fill the bounding box with the current object status.
   void CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox);
 
-  // Calculate a screen bounding box for the given world space bbox.
-  void ProjectBBox (iCamera* camera, const csBox3& bbox, csBox2& sbox,
-  	float& min_depth);
-
   // Given an occluder, update it in the coverage buffer. @@@ iThingState!
   void UpdateCoverageBuffer (iCamera* camera, iMovable* movable,
   	iMeshWrapper* mesh, iThingState* thing);

@@ -16,9 +16,11 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #include <math.h>
 #include "cssysdef.h"
 #include "csgeom/box.h"
+#include "csgeom/transfrm.h"
 
 //---------------------------------------------------------------------------
 csBox2::bEdge csBox2:: edges[8] =
@@ -537,7 +539,7 @@ int csBox3::Adjacent (const csBox3 &other) const
   return -1;
 }
 
-int csBox3::GetVisibleSides (const csVector3 &pos, int *visible_sides) const
+int csBox3::CalculatePointSegment (const csVector3& pos) const
 {
   const csVector3 &bmin = Min ();
   const csVector3 &bmax = Max ();
@@ -567,6 +569,12 @@ int csBox3::GetVisibleSides (const csVector3 &pos, int *visible_sides) const
   else
     idx += 1;
 
+  return idx;
+}
+
+int csBox3::GetVisibleSides (const csVector3 &pos, int *visible_sides) const
+{
+  int idx = CalculatePointSegment (pos);
   const Outline &ol = outlines[idx];
   int num_array = ol.num_sides;
   int i;
@@ -582,31 +590,7 @@ void csBox3::GetConvexOutline (
 {
   const csVector3 &bmin = Min ();
   const csVector3 &bmax = Max ();
-  int idx;
-
-  // First select x part of coordinate.
-  if (pos.x < bmin.x)
-    idx = 0 * 9;
-  else if (pos.x > bmax.x)
-    idx = 2 * 9;
-  else
-    idx = 1 * 9;
-
-  // Then y part.
-  if (pos.y < bmin.y)
-    idx += 0 * 3;
-  else if (pos.y > bmax.y)
-    idx += 2 * 3;
-  else
-    idx += 1 * 3;
-
-  // Then z part.
-  if (pos.z < bmin.z)
-    idx += 0;
-  else if (pos.z > bmax.z)
-    idx += 2;
-  else
-    idx += 1;
+  int idx = CalculatePointSegment (pos);
 
   const Outline &ol = outlines[idx];
   num_array = (bVisible ? ol.num : MIN (ol.num, 6));
@@ -720,6 +704,58 @@ float csBox3::SquaredOriginMaxDist () const
   else
     res += MAX (maxbox.z * maxbox.z, minbox.z * minbox.z);
   return res;
+}
+
+static void Perspective (const csVector3& v, csVector2& p, float fov,
+    	float sx, float sy)
+{
+  float iz = fov / v.z;
+  p.x = v.x * iz + sx;
+  p.y = v.y * iz + sy;
+}
+
+bool csBox3::ProjectBox (const csTransform& trans, float fov,
+	float sx, float sy, csBox2& sbox, float& min_z, float& max_z) const
+{
+  const csVector3& origin = trans.GetOrigin ();
+  int idx = CalculatePointSegment (origin);
+  const Outline &ol = outlines[idx];
+  int num_array = MIN (ol.num, 6);
+
+  csBox3 cbox;
+  cbox.StartBoundingBox (trans * GetCorner (ol.vertices[0]));
+  int i;
+  for (i = 1; i < num_array; i++)
+  {
+    cbox.AddBoundingVertexSmart (trans * GetCorner (ol.vertices[i]));
+  }
+
+  min_z = cbox.MinZ ();
+  max_z = cbox.MaxZ ();
+
+  if (max_z < 0.0001) return false;
+  if (min_z <= 0)
+  {
+    sbox.Set (-10000, -10000, 10000, 10000);
+    return true;
+  }
+
+// @@@ In theory we can optimize here again by calling CalculatePointSegment
+// again for the new box and the 0,0,0 point. By doing that we could
+// avoid doing four perspective projections.
+  csVector2 oneCorner;
+  Perspective (cbox.Max (), oneCorner, fov, sx, sy);
+  sbox.StartBoundingBox (oneCorner);
+  csVector3 v (cbox.MinX (), cbox.MinY (), cbox.MaxZ ());
+  Perspective (v, oneCorner, fov, sx, sy);
+  sbox.AddBoundingVertexSmart (oneCorner);
+  Perspective (cbox.Min (), oneCorner, fov, sx, sy);
+  sbox.AddBoundingVertexSmart (oneCorner);
+  v.Set (cbox.MaxX (), cbox.MaxY (), cbox.MinZ ());
+  Perspective (v, oneCorner, fov, sx, sy);
+  sbox.AddBoundingVertexSmart (oneCorner);
+
+  return true;
 }
 
 csBox3 &csBox3::operator+= (const csBox3 &box)
