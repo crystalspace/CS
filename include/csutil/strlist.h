@@ -20,7 +20,7 @@
 #ifndef __STRLIST_H__
 #define __STRLIST_H__
 
-#include "csutil\csstring.h"
+#include "csutil/csstring.h"
 
 #define csSTRList csStringList
 
