@@ -7,6 +7,8 @@ The history order is reversed so that new features are at the top.
 	  sets do_fullbright to false before calling DrawPolygon. This
 	  bug would cause the stairs in flarge sometimes to be full
 	  bright.
+	- Applied a patch from Loic Dachary for improved diagnostics
+	  when loading plugins (findlib.cpp).
 27-Mar-2002
 	- Preparation for release 0.94. Updated version numbers.
 	- Norman Kramer reports: awsSource and awsSlot were never

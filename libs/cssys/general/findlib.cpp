@@ -42,7 +42,7 @@ const int CALLBACK_CONTINUE = 1;
 class iCallback
 {
 public:
-  virtual int File (const char *file) = 0;
+  virtual int File (const char *file, bool search_nodir) = 0;
 };
 
 class callbackLoadLibrary : public iCallback
@@ -51,34 +51,84 @@ public:
   callbackLoadLibrary ()
   {
     _handle = 0;
-    _file_found = 0;
-  }
-  
-  virtual int File (const char *file)
-  {
-    //struct stat st;
-    //if (stat (file, &st) == 0)
-    //{
-      _handle = csLoadLibrary (file);
-      if (!_handle) return CALLBACK_CONTINUE;
-      _file_found++;
-      return CALLBACK_STOP;
-    //}
-    //return CALLBACK_CONTINUE;
+    _file_found = false;
   }
 
+  virtual int File (const char *file, bool search_nodir)
+  {
+    int status;
+    _handle = csLoadLibrary (file);
+    if (!_handle)
+    {
+      if (search_nodir)
+      {
+	// There is no way to distinguish between a failed load
+	// because the file does not exist or because loading
+	// an existing file triggers errors (undefined symbols).
+	// The only course of action is to keep trying.
+	// _file_found is not set to true because we don't know
+	// for sure.
+	status = CALLBACK_CONTINUE;
+      }
+      else
+      {
+	// If load failed because the file contains errors (and not
+	// because it does not exist), then we must stop and display
+	// the error. If we kept trying to load other files, we would
+	// lose the error message and become unable to figure out why
+	// a given file is flawed.
+	struct stat st;
+	if (stat (file, &st) == 0)
+	{
+	  _file_found = true;
+	  status = CALLBACK_STOP;
+	}
+	else
+	{
+	  status = CALLBACK_CONTINUE;
+	}
+      }
+    }
+    else
+    {
+      // This is only for consistency purpose since _file_found is only
+      // supposed to be used for error checking, not when loading
+      // succeeds.
+      _file_found = true;
+      status = CALLBACK_STOP;
+    }
+    return status;
+  }
+
+  // The dynamic library handle or 0 if failed to load
   csLibraryHandle _handle;
-  int _file_found;
+  // Set to true if we know for sure that a file exists but cannot be loaded
+  // When implicitly searching in LD_LIBRARY_PATH or equivalent, we cannot
+  // figure out if the file exists or not, therefore _file_found is false.
+  bool _file_found;
 };
 
 class callbackPrint : public iCallback
 {
 public:
-  virtual int File (const char *file)
+  virtual int File (const char *file, bool search_nodir)
   {
-    fprintf (stderr, "\t%s: ", file);
-    csPrintLibraryError (file);
-    fprintf (stderr, "\n");
+    if (search_nodir)
+    {
+      // The only way to figure out why the load failed when searching
+      // in an implicit list of directories (LD_LIBRARY_PATH or
+      // equivalent) is to try again and display the resulting error.
+      // It may be a simple "file not found" but in the case where it is
+      // "failed to resolve symbol XXX" it is a precious bit of
+      // information that we need to display.
+      fprintf (stderr, "\tloading '%s' from LD_LIBRARY_PATH or equivalent gives:\n", file);
+      csLoadLibrary (file);
+      csPrintLibraryError (file);
+    }
+    else
+    {
+      fprintf (stderr, "\t%s: file not found\n", file);
+    }
     return CALLBACK_CONTINUE;
   }
 };
@@ -102,16 +152,16 @@ static void csFindLoadLibraryHelper (const char *iPrefix, const char *iName,
     for (j = 0 ; j < 2 ; j++)
     {
       if (j)
-        strcpy (lib + sl, iPrefix);
+	 strcpy (lib + sl, iPrefix);
       else
-        lib [sl] = 0;
+	 lib [sl] = 0;
       strcat (strcat (lib + sl, iName), iSuffix);
 
-      if (callback.File (lib) == CALLBACK_STOP)
-        return;
+      if (callback.File (lib, (i == -1 || sl == 0)) == CALLBACK_STOP)
+	 return;
 
       if (!iPrefix || iPrefix[0] == '\0')
-        break;
+	 break;
     }
   }
 
@@ -133,10 +183,12 @@ csLibraryHandle csFindLoadLibrary (const char *iPrefix, const char *iName,
     else
     {
       callbackPrint printer;
-      fprintf (stderr, "WARNING: %s, file not found, tried:\n", iName);
+      fprintf (stderr, "WARNING: %s, failed to load, because:\n", iName);
       csFindLoadLibraryHelper (iPrefix, iName, iSuffix, printer);
     }
   }
 
   return loader._handle;
 }
+
+
