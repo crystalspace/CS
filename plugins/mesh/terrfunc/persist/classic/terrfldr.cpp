@@ -663,7 +663,7 @@ iBase* csTerrFuncLoader::Parse (iDocumentNode* node,
 	    return NULL;
 	  }
 	  csRef<iImage> ifile;
-	  ifile = csPtr<iFile> (loader->Load (buf->GetUint8 (), buf->GetSize (),
+	  ifile = csPtr<iImage> (loader->Load (buf->GetUint8 (), buf->GetSize (),
 	  	CS_IMGFMT_TRUECOLOR));
 	  if (!ifile)
 	  {
