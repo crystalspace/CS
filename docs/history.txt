@@ -14,6 +14,22 @@ chronological order.
 	- Eric Sunshine fixed problem with 19-Dec-2004 change to
 	  csVFS::ChDirAuto() where the new code did not precisely mirror the
 	  semantics of the original code, thus some auto-mount attempts failed.
+	- Eric Sunshine augmented the "-multiply_defined suppress" linker check
+	  in configure.ac so that it first attempts the uglier equivalent
+	  "-Wl,-multiply_defined,suppress" in order to make life simpler for
+	  external projects using cs-config (which reports this linker option
+	  in response to --libs) in conjunction with GNU libtool. The problem
+	  with "-multiply_defined suppress" for GNU libtool users is that
+	  libtool re-orders linker arguments, not realizing that "suppress"
+	  must follow immediately after "-multiply_defined". The uglier
+	  equivalent does not suffer from this problem in the hands of libtool
+	  since it contains no whitespace.
+	- Eric Sunshine changed macosx.jam to use the ugly
+	  "-Wl,-framework,FooBar" instead of "-framework FooBar" for LINKLIBS
+	  in order to make life easier for external projects using the result
+	  of "cs-config --libs" in conjunction with GNU libtool. Without this,
+	  libtool would re-order its input arguments, not realizing that
+	  "-framework" and "FooBar" need to stick together.
 19-Dec-2004
 	- Eric Sunshine fixed problem on MacOS/X where output of `cs-config
 	  --libs' did not include "-framework AppKit -framework Foundation".

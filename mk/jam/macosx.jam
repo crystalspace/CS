@@ -19,9 +19,14 @@
 #==============================================================================
 SHELL ?= "/bin/sh" ;
 
-LINKLIBS += "-framework AppKit -framework Foundation" ;
-PLUGIN.LFLAGS += "-bundle" ;
 MACOSX_ENVIRONMENT = "export MACOSX_DEPLOYMENT_TARGET=10.2" ;
+PLUGIN.LFLAGS += "-bundle" ;
+# We use the ugly -Wl form, which does not contain embedded whitespace (unlike
+# "-framework AppKit"), to help external projects which use the result of
+# "cs-config --libs" in conjunction with GNU libtool, since libtool likes to
+# re-arrange arguments, not realizing that "-framwork" and "AppKit" need to
+# stay together.
+LINKLIBS += "-Wl,-framework,AppKit" "-Wl,-framework,Foundation" ;
 
 # Jambase in Jam 2.4 has a bug where it incorrectly defines RANLIB as "" for
 # MacOS/X, and this bogus value will override a RANLIB set via ?= in Jamconfig,
