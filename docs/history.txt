@@ -4,6 +4,12 @@ The history order has been reversed so that new features are at the top.
 	- Norman Kramer did further work on the video plugins.
 	  With exception of yuv2rgb conversion AVI is working.
 	- Wouter Wijngaards did nothing important to radiosity.
+	- Eric Sunshine eliminated a compilation warning in prsky.cpp.
+	- Eric Sunshine Made the following changes to inifile.cpp:
+	    - Eliminated compilation warnings about implicit conversion of
+	      void* to some other type.
+	    - GetYesNo() now also recognizes "1" as true in addition to "yes",
+	      "true", and "on".
 25-Jan-2001
 	- Wouter Wijngaards fixed mazed compilation, by adding csutil
 	  library after the cssys for linking.
