@@ -26,19 +26,10 @@
 #include "igraph2d.h"
 #include "igraph3d.h"
 
-// Sets up graphics drivers -- Assumes DirectX 5 or later & DirectDraw 3D
-#include "cssys/win32/DirectDetection.h"
+#include "cssys/win32/directdetection.h"
 
 #include <windowsx.h>
-
 #include <ddraw.h>
-
-// Use new DirectInput keyboard handling by Xavier Trochu (xtrochu@yahoo.com)?
-#ifdef DO_DINPUT_KEYBOARD
-#define DIRECTINPUT_VERSION  0x0300
-#include <dinput.h>
-#endif
-
 #include <stdio.h>
 #include <time.h>
 
@@ -182,9 +173,7 @@ DWORD WINAPI s_threadroutine (LPVOID param)
   HANDLE hEvent [2];
 //  HANDLE hevtMouse;
 
-  // Use 0x0300 instead of DIRECTINPUT_VERSION
-  // to allow the binaries run under NT4 (which has just DX3)
-  CHK_FAILED (DirectInputCreate (ModuleHandle, 0x0300, &lpdi, NULL));
+  CHK_FAILED (DirectInputCreate (ModuleHandle, DIRECTINPUT_VERSION, &lpdi, NULL));
   CHK_FAILED (lpdi->CreateDevice (GUID_SysKeyboard, &lpKbd, NULL));
   CHK_FAILED (lpKbd->SetDataFormat (&c_dfDIKeyboard));
   CHK_FAILED (lpKbd->SetCooperativeLevel (FindWindow (WINDOWCLASSNAME, NULL),
