@@ -75,7 +75,7 @@ COMBOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD /*fdwReason*/, LPVOID /*lpvRese
 
 #endif
 
-#ifdef OS_LINUX || OS_MACOS  || OS_BE
+#if defined( OS_LINUX ) || defined( OS_MACOS ) || defined( OS_BE )
   STDAPI DllInitialize ()
   {
        csCoInitialize (0);
