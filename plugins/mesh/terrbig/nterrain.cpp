@@ -22,6 +22,7 @@
 #include "imesh/object.h"
 #include "csutil/mmapio.h"
 #include "ivaria/reporter.h"
+#include "qsqrt.h"
 #include "nterrain.h"
 
 
@@ -29,14 +30,10 @@
 
 CS_IMPLEMENT_PLUGIN
 
-void nTerrain::SetVarianceAndRadius (nBlock &b, const nRect &bounds)
+void nTerrain::SetVariance(nBlock &b)
 {
-  float low=1e100;
-  float high=-1e100;
-  float radius;
-
-  if (b.ne<low)  low=b.ne;
-  if (b.ne>high) high=b.ne;
+  float low=b.ne;
+  float high=b.ne;
 
   if (b.nw<low)  low=b.nw;
   if (b.nw>high) high=b.nw;
@@ -52,19 +49,10 @@ void nTerrain::SetVarianceAndRadius (nBlock &b, const nRect &bounds)
 
   // Store variance
   b.variance = high-low;
-  b.midh = low + b.variance/2.0;
-  
-  // Generate radius, start with variance/2.
-  radius = b.variance/2.0;
-
-  // Check and see if the width/2 is bigger.
-  if (radius<bounds.w>>1) radius=bounds.w/2.0;
-
-  // Store radius
-  b.radius = radius;
+  b.midh = low;
 }
 
-void nTerrain::BuildTreeNode(FILE *f, unsigned int level, 
+float nTerrain::BuildTreeNode(FILE *f, unsigned int level, 
 	unsigned int parent_index, unsigned int child_num, nRect bounds, 
 	float *heightmap, unsigned int w)
 {
@@ -74,27 +62,37 @@ void nTerrain::BuildTreeNode(FILE *f, unsigned int level,
   nBlock b;
 
   // Get heights.
-  b.ne = 30 * heightmap[bounds.x +              (bounds.y * w)];
-  b.nw = 30 * heightmap[bounds.x + bounds.w-1 + (bounds.y * w)];
-  b.se = 30 * heightmap[bounds.x +              ((bounds.y + bounds.h-1) * w)];
-  b.sw = 30 * heightmap[bounds.x + bounds.w-1 + ((bounds.y + bounds.h-1) * w)];
-  b.center = 30 * heightmap[bounds.x +  mid  +  ((bounds.y + mid) * w)];
+  b.ne = 10 * heightmap[bounds.x +              (bounds.y * w)];
+  b.nw = 10 * heightmap[bounds.x + bounds.w-1 + (bounds.y * w)];
+  b.se = 10 * heightmap[bounds.x +              ((bounds.y + bounds.h-1) * w)];
+  b.sw = 10 * heightmap[bounds.x + bounds.w-1 + ((bounds.y + bounds.h-1) * w)];
+  b.center = 10 * heightmap[bounds.x +  mid  +  ((bounds.y + mid) * w)];
 
   // Set the variance for this block (the difference between the highest and lowest points.)
-  SetVarianceAndRadius(b, bounds);
+  SetVariance(b);
+
+  // Expand the quadtree until we get to the max resolution.
+  if (level<max_levels)
+  {
+    float var1 = BuildTreeNode(f, level+1, my_index, 0, nRect(bounds.x,bounds.y,cw,cw), heightmap, w);
+    float var2 = BuildTreeNode(f, level+1, my_index, 1, nRect(bounds.x+mid,bounds.y,cw,cw), heightmap, w);
+    float var3 = BuildTreeNode(f, level+1, my_index, 2, nRect(bounds.x,bounds.y+mid,cw,cw), heightmap, w);
+    float var4 = BuildTreeNode(f, level+1, my_index, 3, nRect(bounds.x+mid,bounds.y+mid,cw,cw), heightmap, w);
+
+    b.variance = (var1 > b.variance) ? var1 : b.variance;
+    b.variance = (var2 > b.variance) ? var2 : b.variance;
+    b.variance = (var3 > b.variance) ? var3 : b.variance;
+    b.variance = (var4 > b.variance) ? var4 : b.variance;
+  }
+  /* midh was set to low */
+  b.midh += b.variance/2.0;
+  b.radius = qsqrt(b.variance*b.variance + bounds.w*bounds.w/4.0);
 
   // Store the block in the file.
   fseek(f, my_index*nBlockLen, SEEK_SET);
   fwrite(&b, nBlockLen, 1, f);
 
-  // Expand the quadtree until we get to the max resolution.
-  if (level<max_levels)
-  {
-    BuildTreeNode(f, level+1, my_index, 0, nRect(bounds.x,bounds.y,cw,cw), heightmap, w);
-    BuildTreeNode(f, level+1, my_index, 1, nRect(bounds.x+mid,bounds.y,cw,cw), heightmap, w);
-    BuildTreeNode(f, level+1, my_index, 2, nRect(bounds.x,bounds.y+mid,cw,cw), heightmap, w);
-    BuildTreeNode(f, level+1, my_index, 3, nRect(bounds.x+mid,bounds.y+mid,cw,cw), heightmap, w);
-  }
+  return b.variance;
 }
 
 void nTerrain::BufferTreeNode(nBlock *b, nRect bounds)
@@ -105,7 +103,11 @@ void nTerrain::BufferTreeNode(nBlock *b, nRect bounds)
       se = info->vertices.Push(csVector3(bounds.x-mid, b->se, bounds.y+bounds.h-1-mid)),
       sw = info->vertices.Push(csVector3(bounds.x+bounds.w-1-mid, b->sw, bounds.y+bounds.h-1-mid)),
       center = info->vertices.Push(csVector3(bounds.x+bounds.h/2.0-mid, b->center, bounds.y+bounds.h/2.0-mid));
- 
+// printf ("ne %d %f %d\n", bounds.x-mid, b->ne, bounds.y-mid);
+// printf ("nw %d %f %d\n", bounds.x+bounds.w-1-mid, b->nw, bounds.y-mid);
+// printf ("se %d %f %d\n", bounds.x-mid, b->se, bounds.y+bounds.h-1-mid);
+// printf ("sw %d %f %d\n", bounds.x+bounds.w-1-mid, b->sw, bounds.y+bounds.h-1-mid);
+// printf ("center %f %f %f\n", bounds.x+bounds.h/2.0-mid, b->center, bounds.y+bounds.h/2.0-mid);
 
   float wid = (float)terrain_w;
   info->texels.Push(csVector2(bounds.x/wid, bounds.y/wid));
@@ -133,7 +135,7 @@ void nTerrain::BufferTreeNode(nBlock *b, nRect bounds)
 void nTerrain::ProcessTreeNode(iRenderView *rv, unsigned int level, unsigned int parent_index, unsigned int child_num, nRect bounds)
 {
   unsigned int my_index = (parent_index<<2) + child_num + NTERRAIN_QUADTREE_ROOT;
-  unsigned int mid = bounds.w>>1;
+  int mid = bounds.w>>1;
   unsigned int cw = mid+1;
   bool render_this=false;
   nBlock *b;
@@ -146,10 +148,11 @@ void nTerrain::ProcessTreeNode(iRenderView *rv, unsigned int level, unsigned int
   }
 
   // Create a bounding sphere.
-  csSphere bs(csVector3(bounds.x+mid, b->midh, bounds.y+mid), b->radius);
+  int c = terrain_w >> 1;
+  csSphere bs(csVector3 (bounds.x+mid-c, b->midh, bounds.y+mid-c), b->radius);
 
   // Test it for culling, return if it's not visible.
-  //if (!rv->TestBSphere(obj2cam, bs)) return;
+  if (!rv->TestBSphere(obj2cam, bs)) return;
 
   // If we are at the bottom level, we HAVE to render this block, so don't bother with the calcs.
   if (level>=max_levels)
@@ -158,14 +161,17 @@ void nTerrain::ProcessTreeNode(iRenderView *rv, unsigned int level, unsigned int
   else
   {
     // Get distance from center of block to camera, plus a small epsilon to avoid division by zero.
-    float distance = ((cam-bs.GetCenter()).SquaredNorm())+0.0001;
+    float distance = ((cam-bs.GetCenter()).Norm())+1e-10;
 
     // Get the error metric, in this case it's the ratio between variance and distance.
     float error_metric = b->variance / distance;
 
     if (error_metric<=error_metric_tolerance) {
+// printf ("%d early cull\n", level);
+// printf ("distance = %f\n", distance);
+// printf ("error = %f\n", error_metric);
       render_this=true;
-    }
+    } 
   }
 
   // Don't render this block, resolve to the next level.
@@ -192,24 +198,30 @@ void nTerrain::BuildTree(FILE *f, float *heightmap, unsigned int w)
   unsigned int x=0, y=0;
   nBlock b;
 
-  b.ne = heightmap[0];
+  b.ne = 10 * heightmap[0];
+  b.nw = 10 * heightmap[w-1];
+  b.se = 10 * heightmap[(w-1)*w];
+  b.sw = 10 * heightmap[w-1 + (w-1) * w];
+  b.center = 10 * heightmap[mid + mid * w];
 
-  b.nw = heightmap[w-1];
-  b.se = heightmap[(w-1)*w];
-  b.sw = heightmap[w-1 + (w-1) * w];
-  b.center = heightmap[mid + mid * w];
-
-  SetVarianceAndRadius (b, nRect (0,0,w,w));
+  SetVariance(b);
 
   b.midh = w; /* for this first block the w is encoded into midh */
 
+  float var1 = BuildTreeNode(f, 1, 0, 0, nRect(x,y,cw,cw), heightmap, w);
+  float var2 = BuildTreeNode(f, 1, 0, 1, nRect(x+mid,y,cw,cw), heightmap, w);
+  float var3 = BuildTreeNode(f, 1, 0, 2, nRect(x,y+mid,cw,cw), heightmap, w);
+  float var4 = BuildTreeNode(f, 1, 0, 3, nRect(x+mid,y+mid,cw,cw), heightmap, w);
+
+  b.variance = (var1 > b.variance) ? var1 : b.variance;
+  b.variance = (var2 > b.variance) ? var2 : b.variance;
+  b.variance = (var3 > b.variance) ? var3 : b.variance;
+  b.variance = (var4 > b.variance) ? var4 : b.variance;
+
+  b.radius = qsqrt(b.variance*b.variance + w*w/4.0);
+
   fseek (f, 0, SEEK_SET); 
   fwrite (&b, nBlockLen, 1, f);
-
-  BuildTreeNode(f, 1, 0, 0, nRect(x,y,cw,cw), heightmap, w);
-  BuildTreeNode(f, 1, 0, 1, nRect(x+mid,y,cw,cw), heightmap, w);
-  BuildTreeNode(f, 1, 0, 2, nRect(x,y+mid,cw,cw), heightmap, w);
-  BuildTreeNode(f, 1, 0, 3, nRect(x+mid,y+mid,cw,cw), heightmap, w);
 }
 
 void nTerrain::AssembleTerrain(iRenderView *rv, nTerrainInfo *terrinfo)
@@ -227,18 +239,17 @@ void nTerrain::AssembleTerrain(iRenderView *rv, nTerrainInfo *terrinfo)
   unsigned int cw = mid+1;
   unsigned int x=0, y=0;
   
-  csSphere bs (csVector3 (mid, b->variance/2.0, mid), b->radius);
+  csSphere bs (csVector3 (0, b->variance/2.0, 0), b->radius);
   if (!rv->TestBSphere(obj2cam, bs)) return;
 
-  float distance = ((cam-bs.GetCenter()).SquaredNorm())+0.0001;
+  float distance = ((cam-bs.GetCenter()).Norm())+0.0001;
 
   float error_metric = b->variance / distance;
 
-  /* TODO: LOD doesn't currently work
+  /* TODO: LOD doesn't currently work */
   if (error_metric <= error_metric_tolerance) {
     BufferTreeNode (b, nRect (0, 0, terrain_w+1, terrain_w+1));
   } else {
-  */
 
   // Buffer entire viewable terrain by first doing view culling on the block, then checking for the
   // error metric.  If the error metric fails, then we need to drop down another level. Begin that
@@ -249,9 +260,7 @@ void nTerrain::AssembleTerrain(iRenderView *rv, nTerrainInfo *terrinfo)
   ProcessTreeNode(rv, 1, 0, 2, nRect(x,y+mid,cw,cw));
   ProcessTreeNode(rv, 1, 0, 3, nRect(x+mid,y+mid,cw,cw));
 
-  /*
   }
-  */
 }
 
 void nTerrain::SetMaterialsList(iMaterialHandle **matlist, unsigned int nMaterials)
@@ -394,6 +403,7 @@ bool csBigTerrainObject::ConvertImageToMapFile (iFile *input,
 	"Unable to load image file\n");
     return false;
   }
+printf ("image w,h (%d, %d)\n", image->GetWidth(), image->GetHeight());
   if (image->GetWidth () != image->GetHeight ()) {
     image->Rescale (image->GetWidth (), image->GetWidth ());
   }
@@ -465,7 +475,7 @@ void csBigTerrainObject::InitMesh (nTerrainInfo *info)
     info->mesh[i].mat_handle = terrain->GetMaterialsList()[i];
     info->mesh[i].morph_factor = 0;
     info->mesh[i].num_vertices_pool = 1;
-    info->mesh[i].use_vertex_color = true;
+    info->mesh[i].use_vertex_color = false;
     info->mesh[i].do_morph_texels = false;
     info->mesh[i].do_morph_colors = false;
     info->mesh[i].do_fog = false;

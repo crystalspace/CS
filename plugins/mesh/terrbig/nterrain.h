@@ -195,7 +195,7 @@ class nTerrain
   unsigned int terrain_w;
 
   /// The transform to get object to camera space.
-  csReversibleTransform obj2cam;
+  csOrthoTransform obj2cam;
 
   /// This is the camera position, in object space.
   csVector3 cam;
@@ -227,10 +227,10 @@ class nTerrain
   }
 
   /// Sets the variance and radius of a partially filled in block.
-  void SetVarianceAndRadius(nBlock &b, const nRect &bounds);
+  void SetVariance(nBlock &b);
 
   /// Does the work of tree building, heightmap is the height data (0..1), w is the edge length of the heightmap, which must be square.
-  void BuildTreeNode(FILE *f, unsigned int level, unsigned int parent_index, unsigned int child_num, nRect bounds, float *heightmap, unsigned int w);
+  float BuildTreeNode(FILE *f, unsigned int level, unsigned int parent_index, unsigned int child_num, nRect bounds, float *heightmap, unsigned int w);
 
   /// Buffers the node passed into it for later drawing, bounds are needed to generate all the verts.
   void BufferTreeNode(nBlock *b, nRect bounds);
@@ -255,7 +255,7 @@ public:
   void AssembleTerrain(iRenderView *rv, nTerrainInfo *terrinfo);
 
   /// Sets the object to camera transform
-  void SetObjectToCamera(csReversibleTransform &o2c)
+  void SetObjectToCamera(csOrthoTransform &o2c)
   { obj2cam = o2c; }
 
   /// Sets the camera origin
@@ -282,7 +282,8 @@ public:
   void CreateMaterialMap(iFile *matmap, iImage *terrtex);
 
   nTerrain(csMemoryMappedIO *phm=NULL):max_levels(0), 
-             error_metric_tolerance(0.000001), 
+			 /* this is 4 pixel accuracy on 800x600 */
+             error_metric_tolerance(0.0025), 
 	     info(NULL), hm(phm), materials(NULL), 
 	     map_scale(0), map_mode(0) {}
 
