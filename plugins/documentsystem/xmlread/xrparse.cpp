@@ -36,6 +36,16 @@ TrXmlBase::Entity TrXmlBase::entity[ NUM_ENTITY ] =
 };
 
 
+char* TrXmlBase::SkipWhiteSpace( char* p )
+{
+  if ( !p || !*p )
+  {
+    return 0;
+  }
+  while ( isspace (*p)) p++;
+  return p;
+}
+
 const char* TrXmlBase::SkipWhiteSpace( const char* p )
 {
   if ( !p || !*p )
@@ -46,7 +56,25 @@ const char* TrXmlBase::SkipWhiteSpace( const char* p )
   return p;
 }
 
-const char* TrXmlBase::ReadName( const char* p, char* name)
+char* TrXmlBase::ReadName( char* p)
+{
+  // Names start with letters or underscores.
+  // After that, they can be letters, underscores, numbers,
+  // hyphens, or colons. (Colons are valid ony for namespaces,
+  // but tinyxml can't tell namespaces from names.)
+  if (p && *p && (isalpha ((unsigned char) *p) || *p == '_'))
+  {
+    while ((isalnum ((unsigned char) *p) 
+	|| *p == '_' || *p == '-' || *p == ':'))
+    {
+      p++;
+    }
+    return p;
+  }
+  return 0;
+}
+
+char* TrXmlBase::ReadName( char* p, char* name)
 {
   // Names start with letters or underscores.
   // After that, they can be letters, underscores, numbers,
@@ -56,7 +84,7 @@ const char* TrXmlBase::ReadName( const char* p, char* name)
   {
     char* pname = name;
     while ((isalnum ((unsigned char) *p) 
-  || *p == '_' || *p == '-' || *p == ':'))
+	|| *p == '_' || *p == '-' || *p == ':'))
     {
       *pname++ = *p++;
     }
@@ -67,10 +95,9 @@ const char* TrXmlBase::ReadName( const char* p, char* name)
   return 0;
 }
 
-const char* TrXmlBase::GetEntity( const char* p, char* value )
+char* TrXmlBase::GetEntity( char* p, char* value )
 {
   // Presume an entity, and pull it out.
-  // TrXmlString ent;
   int i;
 
   // Ignore the &#x entities.
@@ -104,7 +131,6 @@ const char* TrXmlBase::GetEntity( const char* p, char* value )
   *value = *p;  // Don't put back the last one, since we return it!
   return p+1;
 }
-
 
 bool TrXmlBase::StringEqual( const char* p, const char* tag)
 {
@@ -151,70 +177,14 @@ bool TrXmlBase::StringEqualIgnoreCase( const char* p,
   return false;
 }
 
-#define BUFSIZE 2000
-
-/**
- * This is a growing string class that keeps an initial unallocated
- * buffer to avoid memory allocation in the common case where the
- * string is small.
- */
-class GrowString
-{
-private:
-  char buf[BUFSIZE];
-  int max;
-  int len;
-  char* curbuf;
-  char* ptext;
-
-public:
-  GrowString ()
-  {
-    max = BUFSIZE;
-    len = 0;
-    curbuf = buf;
-    ptext = curbuf;
-    *ptext = 0;
-  }
-  ~GrowString ()
-  {
-    if (curbuf != buf) delete[] curbuf;
-  }
-
-  void AddChar (char c)
-  {
-    *ptext++ = c;
-    len++;
-    if (len >= max)
-    {
-      max += BUFSIZE;
-      char* newbuf = new char[max];
-      memcpy (newbuf, curbuf, len);
-      if (curbuf != buf) delete[] curbuf;
-      curbuf = newbuf;
-      ptext = curbuf+len;
-    }
-  }
-
-  char* GetNewCopy ()
-  {
-    char* copy = new char[len+1];
-    strcpy (copy, curbuf);
-    return copy;
-  }
-
-  const char* GetThisCopy () const
-  {
-    return curbuf;
-  }
-};
-
-
-const char* TrXmlBase::ReadText(const char* p, 
-        GrowString& buf,
+char* TrXmlBase::ReadText(char* p,
+	char*& buf, int& buflen,
         bool trimWhiteSpace, 
         const char* endTag)
 {
+  buf = p;
+  char* out = p;
+
   if (!trimWhiteSpace    // certain tags always keep whitespace
       || !condenseWhiteSpace )  // if true, whitespace is always kept
   {
@@ -223,21 +193,25 @@ const char* TrXmlBase::ReadText(const char* p,
     {
       char c;
       p = GetChar( p, &c );
-      buf.AddChar (c);
+      *out++ = c;
     }
   }
   else
   {
     bool whitespace = false;
+    bool first = true;
 
     // Remove leading white space:
     p = SkipWhiteSpace( p );
-    while (  *p && !StringEqual ( p, endTag) )
+    buf = p;
+    out = p;
+    while ( *p && !StringEqual ( p, endTag) )
     {
       if ( isspace( *p ) )
       {
         whitespace = true;
         ++p;
+	if (first) { buf = p; out = p; }
       }
       else
       {
@@ -245,20 +219,22 @@ const char* TrXmlBase::ReadText(const char* p,
         // new character. Any whitespace just becomes a space.
         if ( whitespace )
         {
-          buf.AddChar (' ');
+	  *out++ = ' ';
           whitespace = false;
         }
         char c;
         p = GetChar( p, &c );
-        buf.AddChar (c);
+	*out++ = c;
+	first = false;
       }
     }
   }
-  buf.AddChar (0);
+  // *out++ = 0;
+  buflen = out-buf;
   return p + strlen( endTag );
 }
 
-const char* TrDocument::Parse( TrDocument*,  const char* p )
+char* TrDocument::Parse( TrDocument*,  char* p )
 {
   // Parse away, at the document level. Since a document
   // contains nothing but other tags, most of what happens
@@ -274,7 +250,7 @@ const char* TrDocument::Parse( TrDocument*,  const char* p )
     return 0;
   }
 
-    p = SkipWhiteSpace( p );
+  p = SkipWhiteSpace( p );
   if ( !p )
   {
     SetError( TIXML_ERROR_DOCUMENT_EMPTY );
@@ -301,7 +277,7 @@ const char* TrDocument::Parse( TrDocument*,  const char* p )
 }
 
 
-const char* TrXmlElement::Parse( TrDocument* document, const char* p )
+char* TrXmlElement::Parse( TrDocument* document, char* p )
 {
   p = SkipWhiteSpace( p );
 
@@ -314,20 +290,27 @@ const char* TrXmlElement::Parse( TrDocument* document, const char* p )
   p = SkipWhiteSpace( p+1 );
 
   // Read the name.
-  char inname[1000];
-  p = ReadName( p, inname );
+  value = p;
+  p = ReadName( p );
+  char* endp = p;
+
   if ( !p || !*p )
   {
     document->SetError( TIXML_ERROR_FAILED_TO_READ_ELEMENT_NAME );
     return 0;
   }
-  csStringID name_id = document->strings.Request (inname);
-  const char* reg_name = document->strings.Request (name_id);
-  SetValueRegistered (reg_name);
 
-  TrXmlString endTag ("</");
-  endTag += value;
-  endTag += ">";
+  int endTaglen = endp-value;
+  char endTag[1000];
+  strcpy (endTag, "</");
+
+  char endchar = *endp;
+  *endp = 0;
+  strcpy (endTag+2, value);
+  *endp = endchar;
+
+  strcpy (endTag+2+endTaglen, ">");
+  endTaglen += 2+1;
 
   // Check for and read attributes. Also look for an empty
   // tag or an end tag.
@@ -349,6 +332,7 @@ const char* TrXmlElement::Parse( TrDocument* document, const char* p )
         return 0;
       }
       attributeSet.set.ShrinkBestFit ();
+      *endp = 0;
       return (p+1);
     }
     else if ( *p == '>' )
@@ -365,10 +349,11 @@ const char* TrXmlElement::Parse( TrDocument* document, const char* p )
       }
 
       // We should find the end tag now
-      if ( StringEqualIgnoreCase( p, endTag.c_str()) )
+      if ( StringEqualIgnoreCase( p, endTag) )
       {
-        p += endTag.length();
+        p += endTaglen;
         attributeSet.set.ShrinkBestFit ();
+        *endp = 0;
         return p;
       }
       else
@@ -390,16 +375,17 @@ const char* TrXmlElement::Parse( TrDocument* document, const char* p )
         return 0;
       }
       GetAttributeRegistered (attrib.Name()).
-        TakeOverValue (attrib.Value());
-      attrib.TakeOverValue (NULL);
+        TakeOverValue ((char*)attrib.Value(), attrib.GetValueLength ());
+      attrib.TakeOverValue (NULL, 0);
     }
   }
   attributeSet.set.ShrinkBestFit ();
+  *endp = 0;
   return p;
 }
 
 
-const char* TrXmlElement::ReadValue( TrDocument* document, const char* p )
+char* TrXmlElement::ReadValue( TrDocument* document, char* p )
 {
   // Read in text and elements in any order.
   p = SkipWhiteSpace( p );
@@ -474,7 +460,7 @@ const char* TrXmlElement::ReadValue( TrDocument* document, const char* p )
 }
 
 
-const char* TrXmlUnknown::Parse( TrDocument* document, const char* p )
+char* TrXmlUnknown::Parse( TrDocument* document, char* p )
 {
   p = SkipWhiteSpace( p );
   if ( !p || !*p || *p != '<' )
@@ -483,13 +469,13 @@ const char* TrXmlUnknown::Parse( TrDocument* document, const char* p )
     return 0;
   }
   ++p;
-    value = "";
+  value = p;
 
   while ( p && *p && *p != '>' )
   {
-    value += *p;
     ++p;
   }
+  vallen = p-value;
 
   if ( !p )
   {
@@ -500,7 +486,7 @@ const char* TrXmlUnknown::Parse( TrDocument* document, const char* p )
   return p;
 }
 
-const char* TrXmlComment::Parse( TrDocument* document, const char* p )
+char* TrXmlComment::Parse( TrDocument* document, char* p )
 {
   p = SkipWhiteSpace( p );
   const char* startTag = "<!--";
@@ -512,31 +498,26 @@ const char* TrXmlComment::Parse( TrDocument* document, const char* p )
     return 0;
   }
   p += strlen( startTag );
-  delete[] value;
-  GrowString buf;
-  p = ReadText( p, buf, false, endTag);
-  value = buf.GetNewCopy ();
+  p = ReadText( p, value, vallen, false, endTag);
   return p;
 }
 
 
-const char* TrDocumentAttribute::Parse( TrDocument* document, const char* p )
+char* TrDocumentAttribute::Parse( TrDocument* document, char* p )
 {
   p = TrXmlBase::SkipWhiteSpace( p );
   if ( !p || !*p ) return 0;
 
   // Read the name, the '=' and the value.
-  char inname[1000];
-  p = TrXmlBase::ReadName( p, inname );
+  name = p;
+  p = TrXmlBase::ReadName( p );
+  char* endp = p;
 
   if ( !p || !*p )
   {
     document->SetError( TIXML_ERROR_READING_ATTRIBUTES );
     return 0;
   }
-
-  csStringID name_id = document->strings.Request (inname);
-  name = document->strings.Request (name_id);
 
   p = TrXmlBase::SkipWhiteSpace( p );
   if ( !p || !*p || *p != '=' )
@@ -546,6 +527,7 @@ const char* TrDocumentAttribute::Parse( TrDocument* document, const char* p )
   }
 
   ++p;  // skip '='
+  *endp = 0;	// End the name field.
   p = TrXmlBase::SkipWhiteSpace( p );
   if ( !p || !*p )
   {
@@ -555,56 +537,53 @@ const char* TrDocumentAttribute::Parse( TrDocument* document, const char* p )
   
   const char* end;
 
-  delete[] value;
-  GrowString buf;
+  char* buf;
+  int buflen;
   if ( *p == '\'' )
   {
     ++p;
     end = "\'";
-    p = TrXmlBase::ReadText( p, buf, false, end);
+    p = TrXmlBase::ReadText( p, buf, buflen, false, end);
   }
   else if ( *p == '"' )
   {
     ++p;
     end = "\"";
-    p = TrXmlBase::ReadText( p, buf, false, end);
+    p = TrXmlBase::ReadText( p, buf, buflen, false, end);
   }
   else
   {
     // All attribute values should be in single or double quotes.
     // But this is such a common error that the parser will try
     // its best, even without them.
+    char* out = buf;
     while (    p && *p                    // existence
         && !isspace( *p ) && *p != '/' && *p != '>' )            // tag end
     {
-      buf.AddChar (*p);
-      ++p;
+      *out++ = *p++;
     }
+    buflen = out-buf;
   }
-  value = buf.GetNewCopy ();
+  value = buf;
+  vallen = buflen;
   return p;
 }
 
-const char* TrXmlText::Parse( TrDocument* document, const char* p )
+char* TrXmlText::Parse( TrDocument* document, char* p )
 {
   //TrDocument* doc = GetDocument();
   bool ignoreWhite = true;
 //  if ( doc && !doc->IgnoreWhiteSpace() ) ignoreWhite = false;
 
   const char* end = "<";
-  GrowString buf;
-  p = ReadText( p, buf, ignoreWhite, end);
-
-  csStringID value_id = document->strings.Request (buf.GetThisCopy ());
-  const char* reg_value = document->strings.Request (value_id);
-  SetValueRegistered (reg_value);
+  p = ReadText( p, value, vallen, ignoreWhite, end);
 
   if ( p )
     return p-1;  // don't truncate the '<'
   return 0;
 }
 
-const char* TrXmlCData::Parse( TrDocument* document, const char* p )
+char* TrXmlCData::Parse( TrDocument* document, char* p )
 {
   //TrDocument* doc = GetDocument();
   bool ignoreWhite = false;
@@ -612,19 +591,14 @@ const char* TrXmlCData::Parse( TrDocument* document, const char* p )
         //skip the <![CDATA[ 
         p += 9;
   const char* end = "]]>";
-  GrowString buf;
-  p = ReadText( p, buf, ignoreWhite, end);
-
-  csStringID value_id = document->strings.Request (buf.GetThisCopy ());
-  const char* reg_value = document->strings.Request (value_id);
-  SetValueRegistered (reg_value);
+  p = ReadText( p, value, vallen, ignoreWhite, end);
 
   if ( p )
     return p;
   return 0;
 }
 
-const char* TrXmlDeclaration::Parse( TrDocument* document, const char* p )
+char* TrXmlDeclaration::Parse( TrDocument* document, char* p )
 {
   p = SkipWhiteSpace( p );
   // Find the beginning, find the end, and look for
@@ -685,8 +659,7 @@ const char* TrXmlDeclaration::Parse( TrDocument* document, const char* p )
 
 bool TrXmlText::Blank() const
 {
-  unsigned int l = strlen (value);
-  for ( unsigned i=0; i<l; i++ )
+  for ( unsigned int i=0; i<(unsigned int)vallen; i++ )
     if ( !isspace( value[i] ) )
       return false;
   return true;

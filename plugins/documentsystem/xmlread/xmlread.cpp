@@ -23,6 +23,7 @@
 #include "iutil/vfs.h"
 #include "csutil/scf.h"
 #include "xriface.h"
+#include "xrpriv.h"
 
 struct csXmlReadDocWrapper : public iDocument
 {
@@ -41,6 +42,7 @@ public:
   virtual const char* Parse (iDataBuffer* buf);
   virtual const char* Parse (iString* str);
   virtual const char* Parse (const char* buf);
+  const char* ParseInPlace (char* buf);
   virtual const char* Write (iFile* file);
   virtual const char* Write (iString* str);
   virtual const char* Write (iVFS* vfs, const char* filename);
@@ -82,14 +84,13 @@ const char* csXmlReadDocWrapper::Parse (iFile* file)
 {
   char *buf = new char[file->GetSize()];
   file->Read (buf, file->GetSize());
-  const char *ret = Parse (buf);
-  delete[] buf;
+  const char *ret = ParseInPlace (buf);
   return ret;
 }
 
 const char* csXmlReadDocWrapper::Parse (iDataBuffer* buf)
 {
-  return Parse ((char*)buf->GetData());
+  return Parse ((const char*)buf->GetData());
 }
 
 const char* csXmlReadDocWrapper::Parse (iString* str)
@@ -108,6 +109,22 @@ const char* csXmlReadDocWrapper::Parse (const char* buf)
   }
   else
   {
+    return "Data does not seem to be XML.";
+  }
+}
+
+const char* csXmlReadDocWrapper::ParseInPlace (char* buf)
+{
+  char* b = buf;
+  while ((*b == ' ') || (*b == '\n') || (*b == '\t') || 
+    (*b == '\r')) b++;
+  if (*b == '<')
+  {
+    return ((csXmlReadDocument*)(iDocument*)xmlreaddoc)->ParseInPlace (buf);
+  }
+  else
+  {
+    delete[] buf;
     return "Data does not seem to be XML.";
   }
 }

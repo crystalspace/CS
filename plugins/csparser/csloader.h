@@ -59,7 +59,7 @@ struct iCrossBuilder;
 struct iCameraPosition;
 struct iDocumentNode;
 struct iDocument;
-struct iDataBuffer;
+struct iFile;
 
 struct iObject;
 struct iThingState;
@@ -500,14 +500,14 @@ private:
    * the case then we will use the XML parsers. Returns false on failure
    * to parse XML.
    */
-  bool TestXml (const char* file, iDataBuffer* buf, csRef<iDocument>& doc);
+  bool TestXml (const char* file, iFile* buf, csRef<iDocument>& doc);
 
   /**
    * XML: temporary function that checks if a given data buffer is actually
    * XML and will call the XML Parse function in that case. Otherwise it
    * will call the old style Parse function.
    */
-  csPtr<iBase> TestXmlPlugParse (iLoaderPlugin* plug, iDataBuffer* buf,
+  csPtr<iBase> TestXmlPlugParse (iLoaderPlugin* plug, iFile* buf,
   	iBase* context, const char* fname);
 
   /// Report any error.

@@ -322,7 +322,7 @@ void csLoader::ReportWarning (const char* id, iDocumentNode* node, const char* d
 // XML: temporary code to detect if we have an XML file. If that's
 // the case then we will use the XML parsers. Returns false on failure
 // to parse XML.
-bool csLoader::TestXml (const char* file, iDataBuffer* buf,
+bool csLoader::TestXml (const char* file, iFile* buf,
 	csRef<iDocument>& doc)
 {
   // @@@ Move to some better place
@@ -367,7 +367,7 @@ bool csLoader::TestXml (const char* file, iDataBuffer* buf,
   return true;
 }
 
-csPtr<iBase> csLoader::TestXmlPlugParse (iLoaderPlugin* plug, iDataBuffer* buf,
+csPtr<iBase> csLoader::TestXmlPlugParse (iLoaderPlugin* plug, iFile* buf,
   	iBase* context, const char* fname)
 {
   csRef<iDocument> doc;
@@ -406,9 +406,9 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
   csLoader::checkDupes = checkdupes;
   ldr_context = NULL;
 
-  csRef<iDataBuffer> buf (VFS->ReadFile (file));
+  csRef<iFile> buf (VFS->Open (file, VFS_FILE_READ));
 
-  if (!buf || !buf->GetSize ())
+  if (!buf)
   {
     ReportError (
 	      "crystalspace.maploader.parse.map",
@@ -451,9 +451,9 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
 
 bool csLoader::LoadLibraryFile (const char* fname)
 {
-  csRef<iDataBuffer> buf (VFS->ReadFile (fname));
+  csRef<iFile> buf (VFS->Open (fname, VFS_FILE_READ));
 
-  if (!buf || !buf->GetSize ())
+  if (!buf)
   {
     ReportError (
 	      "crystalspace.maploader.parse.library",
@@ -490,7 +490,7 @@ csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname)
   checkDupes = false;
   ldr_context = NULL;
 
-  csRef<iDataBuffer> databuff (VFS->ReadFile (fname));
+  csRef<iFile> databuff (VFS->Open (fname, VFS_FILE_READ));
 
   if (!databuff || !databuff->GetSize ())
   {
@@ -544,7 +544,7 @@ csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname)
 {
   if (!Engine) return NULL;
 
-  csRef<iDataBuffer> databuff (VFS->ReadFile (fname));
+  csRef<iFile> databuff (VFS->Open (fname, VFS_FILE_READ));
   csRef<iMeshWrapper> mesh;
 
   if (!databuff || !databuff->GetSize ())
@@ -1336,7 +1336,8 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	}
 	else
         {
-          csRef<iDataBuffer> buf (VFS->ReadFile (child->GetContentsValue ()));
+          csRef<iFile> buf (VFS->Open (child->GetContentsValue (),
+	  	VFS_FILE_READ));
 	  if (!buf)
 	  {
             SyntaxService->ReportError (
@@ -1353,8 +1354,12 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	    mof = TestXmlPlugParse (plug, buf, stemp->GetMeshObjectFactory (),
 	    	child->GetContentsValue ());
 	  else
-	    mof = binplug->Parse ((void*)(buf->GetUint8 ()),
+	  {
+	    csRef<iDataBuffer> dbuf = VFS->ReadFile (
+	    	child->GetContentsValue ());
+	    mof = binplug->Parse ((void*)(dbuf->GetUint8 ()),
 	  	GetLoaderContext (), stemp->GetMeshObjectFactory ());
+	  }
 	  if (!mof)
 	  {
 	    // Error is reported by plug->Parse().
@@ -2043,7 +2048,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 	      child, "Specify a VFS filename with 'paramsfile'!");
 	    return false;
 	  }
-          csRef<iDataBuffer> buf (VFS->ReadFile (fname));
+          csRef<iFile> buf (VFS->Open (fname, VFS_FILE_READ));
 	  if (!buf)
 	  {
             SyntaxService->ReportError (
@@ -2055,8 +2060,11 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 	  if (plug)
 	    mo = TestXmlPlugParse (plug, buf, NULL, fname);
 	  else
-	    mo = binplug->Parse ((void*)(buf->GetUint8 ()),
+	  {
+	    csRef<iDataBuffer> dbuf = VFS->ReadFile (fname);
+	    mo = binplug->Parse ((void*)(dbuf->GetUint8 ()),
 	  	GetLoaderContext (), NULL);
+	  }
           if (mo)
           {
 	    csRef<iMeshObject> mo2 (SCF_QUERY_INTERFACE (mo, iMeshObject));
@@ -2212,7 +2220,7 @@ bool csLoader::LoadAddOn (iDocumentNode* node, iBase* context)
 	      child, "Specify a VFS filename with 'paramsfile'!");
 	    return false;
 	  }
-          csRef<iDataBuffer> buf (VFS->ReadFile (fname));
+          csRef<iFile> buf (VFS->Open (fname, VFS_FILE_READ));
 	  if (!buf)
 	  {
             SyntaxService->ReportError (
@@ -2228,7 +2236,8 @@ bool csLoader::LoadAddOn (iDocumentNode* node, iBase* context)
 	  }
 	  else
 	  {
-	    csRef<iBase> ret (binplug->Parse ((void*)(buf->GetUint8 ()),
+	    csRef<iDataBuffer> dbuf = VFS->ReadFile (fname);
+	    csRef<iBase> ret (binplug->Parse ((void*)(dbuf->GetUint8 ()),
 	  	GetLoaderContext (), NULL));
 	    rc = (ret != NULL);
 	  }
@@ -3290,7 +3299,7 @@ bool csLoader::ParseShaderList (iDocumentNode* node)
         if (fileChild)
         {
           csRef<iVFS> vfs (CS_QUERY_REGISTRY (csLoader::object_reg, iVFS));
-          shader->Load (csRef<iDataBuffer> (vfs->ReadFile (fileChild->GetContentsValue ())));
+          shader->Load (vfs->ReadFile (fileChild->GetContentsValue ()));
         }
         else
         {

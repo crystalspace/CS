@@ -39,10 +39,8 @@ distribution.
 #include <iutil/string.h>
 #include <csutil/util.h>
 #include <csutil/array.h>
-#include <csutil/strset.h>
 #include <csutil/blkalloc.h>
 
-#include "xrstring.h"
 
 class TrDocument;
 class TrDocumentNodeChildren;
@@ -52,7 +50,6 @@ class TrXmlUnknown;
 class TrDocumentAttribute;
 class TrXmlText;
 class TrXmlDeclaration;
-class GrowString;
 
 enum
 {
@@ -122,30 +119,40 @@ public:
   { return condenseWhiteSpace; }
 
   static const char* SkipWhiteSpace( const char* );
+  static char* SkipWhiteSpace( char* );
 
   /**
    * Reads an XML name into the string provided. Returns
    * a pointer just past the last character of the name,
    * or 0 if the function has an error.
    */
-  static const char* ReadName( const char* p, char* name );
+  static char* ReadName( char* p, char* name );
+
+  /**
+   * Reads an XML name into the string provided. Returns
+   * a pointer just past the last character of the name,
+   * or 0 if the function has an error.
+   * This version reads the name in place.
+   */
+  static char* ReadName( char* p );
 
   /**
    * Reads text. Returns a pointer past the given end tag.
-   * Wickedly complex options, but it keeps the (sensitive) code in one place.
+   * This version parses in place (i.e. it modifies the in buffer and
+   * returns a pointer inside that).
    */
-  static const char* ReadText(  const char* in, GrowString& buf,
+  static char* ReadText(  char* in, char*& buf, int& buflen,
         bool ignoreWhiteSpace,
         const char* endTag);
 
 protected:
-  virtual const char* Parse( TrDocument* document, const char* p ) = 0;
+  virtual char* Parse( TrDocument* document, char* p ) = 0;
 
   // If an entity has been found, transform it into a character.
-  static const char* GetEntity( const char* in, char* value );
+  static char* GetEntity( char* in, char* value );
 
   // Get a character, while interpreting entities.
-  inline static const char* GetChar( const char* p, char* value )
+  inline static char* GetChar( char* p, char* value )
   {
     if ( *p == '&' )
     {
@@ -219,7 +226,7 @@ public:
    * @endverbatim
    * The subclasses will wrap this function.
    */
-  virtual const char * Value () const = 0;
+  virtual const char * Value () = 0;
 
   /// One step up the DOM.
   TrDocumentNodeChildren* Parent() const{ return parent; }
@@ -315,19 +322,20 @@ class TrDocumentAttribute
 public:
   /// Construct an empty attribute.
   TrDocumentAttribute() { name = NULL; value = NULL; }
-  ~TrDocumentAttribute () { delete[] value; }
+  ~TrDocumentAttribute () { }
 
   const char* Name()  const { return name; }
-  const char* Value() const { return value; }
-  char* Value() { return value; }
+  const char* Value() { value[vallen] = 0; return value; }
   const int IntValue() const;
   const double DoubleValue() const;
+  int GetValueLength () const { return vallen; }
 
   void SetName( const char* _name )  { name = _name; }
   /// Take over value so that this attribute has ownership.
-  void TakeOverValue( char* _value )
+  void TakeOverValue( char* _value, int _vallen )
   {
     value = _value;
+    vallen = _vallen;
   }
 
   bool operator==( const TrDocumentAttribute& rhs ) const
@@ -347,11 +355,12 @@ public:
    * Attribute parsing starts: first letter of the name
    * returns: the next char after the value end quote
    */
-  const char* Parse( TrDocument* document, const char* p );
+  char* Parse( TrDocument* document, char* p );
 
 private:
   const char* name;
   char* value;
+  int vallen;
 };
 
 
@@ -392,7 +401,7 @@ public:
    * Given an attribute name, attribute returns the value
    * for the attribute of that name, or null if none exists.
    */
-  const char* Attribute( const char* name ) const;
+  const char* Attribute( const char* name );
 
   /**
    * Given an attribute name, attribute returns the value
@@ -401,7 +410,7 @@ public:
    * the integer value will be put in the return 'i', if 'i'
    * is non-null.
    */
-  const char* Attribute( const char* name, int* i ) const;
+  const char* Attribute( const char* name, int* i );
 
   /// Get attribute with registered name.
   TrDocumentAttribute& GetAttributeRegistered (const char * reg_name);
@@ -419,12 +428,7 @@ public:
     return attributeSet.set[idx];
   }
 
-  /**
-   * Deletes an attribute with the given name.
-   */
-  void RemoveAttribute( const char * name );
-
-  virtual const char * Value () const { return value; }
+  virtual const char * Value () { return value; }
   void SetValueRegistered (const char * _value)
   {
     value = _value;
@@ -435,13 +439,13 @@ protected:
    * Attribtue parsing starts: next char past '<'
    * returns: next char past '>'
    */
-  virtual const char* Parse( TrDocument* document, const char* p );
+  virtual char* Parse( TrDocument* document, char* p );
 
   /*  [internal use]
    * Reads the "value" of the element -- another element, or text.
    * This should terminate with the current end tag.
    */
-  const char* ReadValue( TrDocument* document, const char* in );
+  char* ReadValue( TrDocument* document, char* in );
 
 private:
   TrDocumentAttributeSet attributeSet;
@@ -457,18 +461,19 @@ class TrXmlComment : public TrDocumentNode
 public:
   /// Constructs an empty comment.
   TrXmlComment() { value = NULL; type = COMMENT; }
-  virtual ~TrXmlComment() { delete[] value; }
+  virtual ~TrXmlComment() { }
 
-  virtual const char * Value () const { return value; }
+  virtual const char * Value () { value[vallen] = 0; return value; }
 
 protected:
   /*  [internal use]
    * Attribtue parsing starts: at the ! of the !--
    * returns: next char past '>'
    */
-  virtual const char* Parse( TrDocument* document, const char* p );
+  virtual char* Parse( TrDocument* document, char* p );
 
   char* value;
+  int vallen;
 };
 
 /**
@@ -488,11 +493,7 @@ public:
   virtual ~TrXmlText()
   {
   }
-  virtual const char * Value () const { return value; }
-  void SetValueRegistered (const char * _value)
-  {
-    value = _value;
-  }
+  virtual const char * Value () { value[vallen] = 0; return value; }
 
 protected :
   // [internal use]
@@ -501,9 +502,10 @@ protected :
    * Attribtue parsing starts: First char of the text
    * returns: next char past '>'
    */
-  virtual const char* Parse( TrDocument* document,  const char* p );
+  virtual char* Parse( TrDocument* document,  char* p );
 
-  const char* value;
+  char* value;
+  int vallen;
 };
 
 /**
@@ -522,7 +524,7 @@ public:
   virtual ~TrXmlCData() {}
 
 protected :
-  virtual const char* Parse( TrDocument* document,  const char* p );
+  virtual char* Parse( TrDocument* document,  char* p );
 };
 
 /**
@@ -552,25 +554,25 @@ public:
   virtual ~TrXmlDeclaration() {}
 
   /// Version. Will return empty if none was found.
-  const char * Version() const { return version.c_str (); }
+  const char * Version() const { return version; }
   /// Encoding. Will return empty if none was found.
-  const char * Encoding() const { return encoding.c_str (); }
+  const char * Encoding() const { return encoding; }
   /// Is this a standalone document?
-  const char * Standalone() const { return standalone.c_str (); }
+  const char * Standalone() const { return standalone; }
 
-  virtual const char * Value () const { return value.c_str (); }
+  virtual const char * Value () { return value; }
 
 protected:
   //  [internal use]
   //  Attribtue parsing starts: next char past '<'
   //           returns: next char past '>'
-  virtual const char* Parse( TrDocument* document,  const char* p );
+  virtual char* Parse( TrDocument* document,  char* p );
 
 private:
-  TrXmlString version;
-  TrXmlString encoding;
-  TrXmlString standalone;
-  TrXmlString value;
+  const char* version;
+  const char* encoding;
+  const char* standalone;
+  const char* value;
 };
 
 
@@ -583,18 +585,19 @@ private:
 class TrXmlUnknown : public TrDocumentNode
 {
 public:
-  TrXmlUnknown() { type = UNKNOWN; }
+  TrXmlUnknown() { value = NULL; type = UNKNOWN; }
   virtual ~TrXmlUnknown() {}
 
-  virtual const char * Value () const { return value.c_str (); }
+  virtual const char * Value () { value[vallen] = 0; return value; }
 protected:
   /*  [internal use]
    * Attribute parsing starts: First char of the text
    * returns: next char past '>'
    */
-  virtual const char* Parse( TrDocument* document,  const char* p );
+  virtual char* Parse( TrDocument* document,  char* p );
 
-  TrXmlString value;
+  char* value;
+  int vallen;
 };
 
 
@@ -606,20 +609,15 @@ protected:
 class TrDocument : public TrDocumentNodeChildren
 {
 public:
-  /// Interned strings.
-  csStringSet strings;
   /// Block allocator for elements.
   csBlockAllocator<TrXmlElement> blk_element;
   /// Block allocator for text.
   csBlockAllocator<TrXmlText> blk_text;
+  /// Copy of the input data.
+  char* input_data;
 
-  /// Create an empty document, that has no name.
-  TrDocument();
-  /**
-   * Create a document with a name. The name of the document is also the
-   * filename of the xml.
-   */
-  TrDocument( const char * documentName );
+  /// Create an empty document. Optional buf is given as input data.
+  TrDocument(char* buf = NULL);
 
   virtual ~TrDocument();
 
@@ -637,16 +635,16 @@ public:
     }
   }
 
-  virtual const char * Value () const { return value.c_str (); }
+  virtual const char * Value () { return NULL; }
 
   /// Parse the given null terminated block of xml data.
-  virtual const char* Parse( TrDocument* document,  const char* p );
+  virtual char* Parse( TrDocument* document,  char* p );
 
   /// If, during parsing, a error occurs, Error will be set to true.
   bool Error() const { return error; }
 
   /// Contains a textual (english) description of the error if one occurs.
-  const char * ErrorDesc() const { return errorDesc.c_str (); }
+  const char * ErrorDesc() const { return errorDesc; }
 
   /**
    * Generally, you probably want the error string ( ErrorDesc() ). But if you
@@ -668,8 +666,7 @@ public:
 private:
   bool error;
   int  errorId;
-  TrXmlString errorDesc;
-  TrXmlString value;
+  const char* errorDesc;
 };
 
 #endif

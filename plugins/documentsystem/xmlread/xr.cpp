@@ -197,16 +197,6 @@ TrDocumentNode* TrDocumentNodeChildren::FirstChild( const char * value ) const
 
 // -------------------------------------------------------------------------
 
-void TrXmlElement::RemoveAttribute( const char * name )
-{
-  int nodeidx = attributeSet.Find (name);
-  if ( nodeidx != -1 )
-  {
-    attributeSet.set.DeleteIndex (nodeidx);
-  }
-}
-
-
 TrDocument* TrDocumentNode::GetDocument() const
 {
   const TrDocumentNode* node;
@@ -231,7 +221,7 @@ TrXmlElement::~TrXmlElement()
 }
 
 
-const char * TrXmlElement::Attribute( const char * name ) const
+const char * TrXmlElement::Attribute( const char * name )
 {
   int nodeidx = attributeSet.Find (name);
 
@@ -242,7 +232,7 @@ const char * TrXmlElement::Attribute( const char * name ) const
 }
 
 
-const char * TrXmlElement::Attribute( const char * name, int* i ) const
+const char * TrXmlElement::Attribute( const char * name, int* i )
 {
   const char * s = Attribute( name );
   if ( i )
@@ -271,25 +261,14 @@ TrDocumentAttribute& TrXmlElement::GetAttributeRegistered (
   return attributeSet.set[idx];
 }
 
-TrDocument::TrDocument() :
-  strings (3541),
+TrDocument::TrDocument(char* buf) :
   blk_element (1000),
   blk_text (1000)
 {
   error = false;
   //  ignoreWhiteSpace = true;
   type = DOCUMENT;
-}
-
-TrDocument::TrDocument( const char * documentName ) :
-  strings (3541),
-  blk_element (1000),
-  blk_text (1000)
-{
-  //  ignoreWhiteSpace = true;
-  value = documentName;
-  error = false;
-  type = DOCUMENT;
+  input_data = buf;
 }
 
 TrDocument::~TrDocument ()
@@ -297,15 +276,18 @@ TrDocument::~TrDocument ()
   // Call explicit clear so that all children are destroyed
   // before 'blk_element' and 'blk_text' are destroyed.
   Clear ();
+  delete[] input_data;
 }
 
 const int TrDocumentAttribute::IntValue() const
 {
+  value[vallen] = 0;
   return atoi (value);
 }
 
 const double  TrDocumentAttribute::DoubleValue() const
 {
+  value[vallen] = 0;
   return atof (value);
 }
 

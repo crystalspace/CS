@@ -211,6 +211,9 @@ public:
   virtual const char* Write (iString*) { return "Read-only!"; }
   virtual const char* Write (iVFS*, const char*) { return "Read-only!"; }
 
+  csRef<iDocumentNode> CreateRoot (char* buf);
+  const char* ParseInPlace (char* buf);
+
   virtual int Changeable () { return CS_CHANGEABLE_NEVER; }
 };
 

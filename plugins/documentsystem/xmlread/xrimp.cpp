@@ -381,6 +381,14 @@ void csXmlReadDocument::Clear ()
   root = 0;
 }
 
+csRef<iDocumentNode> csXmlReadDocument::CreateRoot (char* buf)
+{
+  Clear ();
+  TrDocument* doc = new TrDocument (buf);
+  root = csPtr<iDocumentNode> (sys->Alloc (doc));
+  return root;
+}
+
 csRef<iDocumentNode> csXmlReadDocument::CreateRoot ()
 {
   Clear ();
@@ -429,10 +437,21 @@ const char* csXmlReadDocument::Parse (iString* str)
 
 const char* csXmlReadDocument::Parse (const char* buf)
 {
-  CreateRoot ();
+  CreateRoot (csStrNew (buf));
   TrDocument* doc = (TrDocument*)(((csXmlReadNode*)(iDocumentNode*)root)
   	->GetTiNode ());
-  doc->Parse (doc, buf);
+  doc->Parse (doc, doc->input_data);
+  if (doc->Error ())
+    return doc->ErrorDesc ();
+  return NULL;
+}
+
+const char* csXmlReadDocument::ParseInPlace (char* buf)
+{
+  CreateRoot (buf);
+  TrDocument* doc = (TrDocument*)(((csXmlReadNode*)(iDocumentNode*)root)
+  	->GetTiNode ());
+  doc->Parse (doc, doc->input_data);
   if (doc->Error ())
     return doc->ErrorDesc ();
   return NULL;

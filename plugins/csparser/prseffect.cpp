@@ -34,9 +34,9 @@
 
 bool csLoader::LoadEffectFile(const char* filename)
 {
-  csRef<iDataBuffer> buf (VFS->ReadFile (filename));
+  csRef<iFile> buf (VFS->Open (filename, VFS_FILE_READ));
 
-  if (!buf || !buf->GetSize ())
+  if (!buf)
   {
     ReportError (
 	      "crystalspace.maploader.parse.effect",
