@@ -1,7 +1,8 @@
 /*
     Dynamics/Kinematics modeling and simulation library.
     Copyright (C) 1999 by Michael Alexander Ewert
-
+                  2001 Anders Stenberg
+		  
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
@@ -124,6 +125,77 @@ ctVector3 ctSpringF::apply_F( ctDynamicEntity &pe )
 	//!me maybe don't need to normalize and find unit vector
 	//!me I think that d.Norm() and later mult d by disp divides out to 1
 	real disp = d.Norm() - rest_length;
+	if ( d*d > MIN_REAL ) // avoid divide by zero
+	  d = d.Unit();
+	else
+	  d = ctVector3(1, 0,0 );  
+
+	// f = -kx
+	f = d*disp*magnitude;
+	
+	if ( &pe == b1 )
+	{ 
+	  b1->sum_force(f);
+	  d = a1 - r1->get_world_offset ();
+	  b1->sum_torque ( d % f );
+	}
+	else if ( &pe == b2 && b2 != NULL )
+	{
+	  b2->sum_force (f);
+	  d = a2 - r2->get_world_offset ();
+	  b2->sum_torque ( d % f );
+	}
+	return f;			
+      }
+    }
+  }
+  return f;
+}
+
+
+ctVector3 ctCappedSpringF::apply_F( ctDynamicEntity &pe )
+{
+  ctVector3 f;
+  ctVector3 d;
+  ctVector3 a1;
+  ctVector3 a2;
+
+  if ( body_vector.get_size() == 2 && 
+       attachment_point_vector.get_size() == 2 )
+  {
+    ctPhysicalEntity *b1 = body_vector.get_first();
+    ctPhysicalEntity *b2 = body_vector.get_next();
+    
+    ctVector3 *orig_a1 = attachment_point_vector.get_first();
+    ctVector3 *orig_a2 = attachment_point_vector.get_next();
+
+    if ( b1 && orig_a1 && orig_a2 )
+    {
+      ctReferenceFrame *r1 = b1->get_RF();
+      ctReferenceFrame *r2 = ( b2 == NULL ) ? 
+	&(ctReferenceFrame::universe()) : b2->get_RF();
+
+      if ( r1 && r2 )
+      {
+	r1->this_to_world( a1, *orig_a1 );
+	r2->this_to_world( a2, *orig_a2 );
+				
+	if ( &pe == b1 ) 
+	  d = a2 - a1;
+	else if( &pe == b2 )
+	  d = a1 - a2;
+	else
+	{
+	  log( "ctSpringF: body applied not part of coupling\n" );
+	  return ctVector3(0,0,0);
+	}
+				
+	//!me maybe don't need to normalize and find unit vector
+	//!me I think that d.Norm() and later mult d by disp divides out to 1
+	real dist = d.Norm();
+	real disp = 0;
+	if ( dist>cap_max ) disp = dist-cap_max;
+	else if ( dist<cap_min ) disp = cap_min-dist;
 	if ( d*d > MIN_REAL ) // avoid divide by zero
 	  d = d.Unit();
 	else
