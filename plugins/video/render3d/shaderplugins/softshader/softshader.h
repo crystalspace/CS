@@ -45,8 +45,6 @@ public:
 
   virtual void Open();
 
-  virtual csPtr<iString> GetProgramID(const char* programstring);
-
 
   ////////////////////////////////////////////////////////////////////
   //                          iComponent

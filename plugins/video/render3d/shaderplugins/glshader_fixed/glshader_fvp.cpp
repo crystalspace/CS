@@ -345,12 +345,3 @@ bool csGLShaderFVP::Prepare()
 {
   return true;
 }
-
-csPtr<iString> csGLShaderFVP::GetProgramID()
-{
-  // @@@ Should make a real ID
-  csMD5::Digest d = csMD5::Encode("csGLShaderFVP");
-  scfString* str = new scfString();
-  str->Append((char const*)&d.data, sizeof(d.data));
-  return csPtr<iString>(str);
-}

@@ -114,11 +114,3 @@ bool csSoftShader_VP::Prepare()
 {
   return true;
 }
-
-csPtr<iString> csSoftShader_VP::GetProgramID()
-{
-  csMD5::Digest d = csMD5::Encode("csSoftShader_VP");
-  scfString* str = new scfString();
-  str->Append((char const*)&d.data, sizeof(d.data));
-  return csPtr<iString>(str);
-}

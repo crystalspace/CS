@@ -92,8 +92,6 @@ public:
   //                      iShaderProgram
   ////////////////////////////////////////////////////////////////////
 
-  virtual csPtr<iString> GetProgramID();
-
   /// Sets this program to be the one used when rendering
   virtual void Activate(iShaderPass* current, csRenderMesh* mesh);
 

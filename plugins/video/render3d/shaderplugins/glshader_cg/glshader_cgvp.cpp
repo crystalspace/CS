@@ -388,11 +388,3 @@ bool csShaderGLCGVP::Prepare()
   }
   return true;
 }
-
-csPtr<iString> csShaderGLCGVP::GetProgramID()
-{
-  csMD5::Digest d = csMD5::Encode(programstring);
-  scfString* str = new scfString();
-  str->Append((char const*)&d.data, sizeof(d.data));
-  return csPtr<iString>(str);
-}

@@ -262,7 +262,7 @@ struct iShaderPass : iShaderBranch
   virtual bool Prepare() = 0;
 };
 
-SCF_VERSION (iShaderProgram, 0,0,1);
+SCF_VERSION (iShaderProgram, 0,0,2);
 
 /** 
  * A shader-program is either a vertexprogram, fragmentprogram or any
@@ -270,9 +270,6 @@ SCF_VERSION (iShaderProgram, 0,0,1);
  */
 struct iShaderProgram : iShaderBranch
 {
-  /// Get a programid for the current program
-  virtual csPtr<iString> GetProgramID() = 0;
-
   /// Sets this program to be the one used when rendering
   virtual void Activate(iShaderPass* current, csRenderMesh* mesh) = 0;
 
