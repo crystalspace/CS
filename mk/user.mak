@@ -80,6 +80,7 @@ PLUGINS += engseq
 PLUGINS.DYNAMIC += engine/iso
 PLUGINS.DYNAMIC += isoldr
 #PLUGINS.DYNAMIC += cscript/cspython
+#PLUGINS.DYNAMIC += cscript/csperl5
 #PLUGINS.DYNAMIC += cscript/cslua
 PLUGINS.DYNAMIC += video/renderer/line
 PLUGINS.DYNAMIC += video/renderer/null

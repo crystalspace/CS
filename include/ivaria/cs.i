@@ -23,6 +23,23 @@
 
 %module cspace
 %{
+
+  #if defined(NO_HANDY_PERL_MACROS)
+    #undef Copy
+    #undef MAXXCOUNT
+    #undef MAXY_SIZE
+    #undef MAXYCOUNT
+    #undef Move
+    #undef New
+    #undef Newc
+    #undef Newz
+    #undef Renew
+    #undef Renewc
+    #undef Safefree
+    #undef StructCopy
+    #undef Zero
+  #endif
+
   #include "css.h"
 //***** SCF Wrappers
   int MakeVersion(int version0, int version1, int version2)

@@ -63,7 +63,7 @@ class csTimer : public csComponent
   /// Period start
   unsigned start;
   /// Pause time before counting begins
-  unsigned pause;
+  unsigned pausetime;
   /// Timer is stopped?
   bool Stopped;
 

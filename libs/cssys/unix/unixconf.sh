@@ -52,6 +52,9 @@ UNIX_DIR=libs/cssys/unix
 # Check for Phyton.
 . ${BIN_DIR}/chkpythn.sh
 
+# Check for Perl.
+. ${BIN_DIR}/chkperl.sh
+
 # Test for presence of SVGALIB.
 msg_checking "for svgalib"
 echo "#include <vga.h>" > conftest.cpp

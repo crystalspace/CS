@@ -42,7 +42,7 @@ void csTimer::Init (unsigned iPeriod)
   evento = NULL;
   state |= CSS_TRANSPARENT;
   timeout = iPeriod;
-  pause = 0;
+  pausetime = 0;
   Restart ();
 }
 
@@ -76,9 +76,9 @@ bool csTimer::HandleEvent (iEvent &Event)
   {
     unsigned current = app ? app->GetCurrentTime () : time (NULL);
     unsigned delta = current - start;
-    if (pause >= delta)
+    if (pausetime >= delta)
       return false;
-    pause = 0;
+    pausetime = 0;
     if (delta >= timeout)
     {
       if (parent)
@@ -110,6 +110,6 @@ void csTimer::Restart ()
 
 void csTimer::Pause (unsigned iPause)
 {
-  pause = iPause;
+  pausetime = iPause;
   Restart ();
 }

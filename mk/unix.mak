@@ -65,9 +65,6 @@ CD=cd
 # this command should be suitable for input back into the $(CD) command.
 PWD=pwd
 
-# The command to invoke a Perl interpreter.
-PERL=perl
-
 # Extra parameters for 'sed' which are used for doing 'make depend'.
 SYS_SED_DEPEND=
 
