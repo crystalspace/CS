@@ -21,6 +21,9 @@
 
 #include "csutil/typedvec.h"
 
+class csHashMapReversible;
+class csHashIteratorReversible;
+
 class csHashMap;
 
 /// An opaque hash key.
@@ -58,6 +61,7 @@ CS_DECLARE_TYPED_VECTOR (csHashBucketVector, csHashBucket);
 class csHashIterator
 {
   friend class csHashMap;
+  friend class csHashIteratorReversible;
 
 private:
   /// Current bucket we are iterating over. NULL if no more elements.
@@ -114,6 +118,7 @@ public:
 class csHashMap
 {
   friend class csHashIterator;
+  friend class csHashMapReversible;
 
 private:
   /// the list of buckets
