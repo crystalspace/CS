@@ -11,6 +11,7 @@ chronological order.
 	  the more conservative "rmdir", rather than "rm -rf", to remove the
 	  potentially bogus directory named "-p" which older versions of
 	  "mkdir" create.
+	- jamest changed swig wrapper to better support csBox* objects
 6-Dec-2003
 	- Eric Sunshine augmented checks for cslibs-config, nasm, and
 	  sdl-config to use AC_CHECK_TOOLS() rather than AC_CHECK_PROGS() in

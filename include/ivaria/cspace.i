@@ -705,6 +705,23 @@ TYPEMAP_OUT_csWrapPtr
 
 %include "csgeom/spline.h"
 %include "csgeom/cspoint.h"
+
+%ignore csBox2::operator+ (const csBox2& box1, const csBox2& box2);
+%ignore csBox2::operator+ (const csBox2& box, const csVector2& point);
+%ignore csBox2::operator* (const csBox2& box1, const csBox2& box2);
+%ignore csBox2::operator== (const csBox2& box1, const csBox2& box2);
+%ignore csBox2::operator!= (const csBox2& box1, const csBox2& box2);
+%ignore csBox2::operator< (const csBox2& box1, const csBox2& box2);
+%ignore csBox2::operator> (const csBox2& box1, const csBox2& box2);
+%ignore csBox2::operator< (const csVector2& point, const csBox2& box);
+%ignore csBox3::operator+ (const csBox3& box1, const csBox3& box2);
+%ignore csBox3::operator+ (const csBox3& box, const csVector3& point);
+%ignore csBox3::operator* (const csBox3& box1, const csBox3& box2);
+%ignore csBox3::operator== (const csBox3& box1, const csBox3& box2);
+%ignore csBox3::operator!= (const csBox3& box1, const csBox3& box2);
+%ignore csBox3::operator< (const csBox3& box1, const csBox3& box2);
+%ignore csBox3::operator> (const csBox3& box1, const csBox3& box2);
+%ignore csBox3::operator< (const csVector3& point, const csBox3& box);
 %include "csgeom/box.h"
 
 %rename(asRGBcolor) csRGBpixel::operator csRGBcolor;
@@ -1064,6 +1081,7 @@ uint _CS_FX_SETALPHA_INT (uint);
 		{ return f > *self; }
 %enddef
 
+
 // csgeom/vector2.h
 %extend csVector2
 {
@@ -1083,6 +1101,42 @@ uint _CS_FX_SETALPHA_INT (uint);
 		{ return *self / t; }
 	csVector3 project (const csVector3 & what) const
 		{ return what << *self; }
+}
+
+
+%define BOX_OBJECT_FUNCTIONS(B)
+	B operator + (const B & b) const
+		{ return *self + b; }
+	B operator * (const B & b ) const
+		{ return *self * b; }
+	bool operator != (const B & b ) const
+		{ return *self != b; }
+	bool operator < (const B & b ) const
+		{ return *self < b; }
+	bool operator > (const B & b ) const
+		{ return b > *self; }
+%enddef
+
+//csgeom/box.h
+%extend csBox2
+{
+  BOX_OBJECT_FUNCTIONS(csBox2)
+
+  csBox2 operator + (const csVector2 & point) const
+                { return *self + point; }
+  bool operator < ( const csVector2 & point ) const
+                { return point < *self; }
+}
+
+%extend csBox3
+{
+  BOX_OBJECT_FUNCTIONS(csBox3)
+
+  csBox3 operator + (const csVector3 & point) const
+                { return *self + point; }
+  bool operator < ( const csVector3 & point ) const
+                { return point < *self; }
+
 }
 
 // csgeom/plane3.h
