@@ -76,8 +76,7 @@ ifeq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), s390))
 	echo "CFLAGS.SYSTEM += -fsigned-char"  >> $(CURDIR)/CS/config.mak 
 endif
 	# Compile static libs without -fPIC
-	# not yet usable
-#	cd $(CURDIR)/CS; $(MAKE) libs
+	cd $(CURDIR)/CS; $(MAKE) libs
 	# Force -fPIC as compiling/linking option
 	echo "CFLAGS.SYSTEM += -fPIC"  >> $(CURDIR)/CS/config.mak 
 	echo "LFLAGS.EXE += -fPIC"  >> $(CURDIR)/CS/config.mak 
