@@ -560,8 +560,8 @@ bool csXWindow::HandleEvent (iEvent &Event)
 	  MAP_KEY (XK_Up, CSKEY_UP, CSKEY_UP);
 	  
 	  MAP_KEY (XK_KP_Down, CSKEY_PAD2, CSKEY_DOWN);
-	  MAP_KEY (XK_KP_2, CSKEY_PAD8, '2');
-	  MAP_KEY (XK_Down, CSKEY_UP, CSKEY_DOWN);
+	  MAP_KEY (XK_KP_2, CSKEY_PAD2, '2');
+	  MAP_KEY (XK_Down, CSKEY_DOWN, CSKEY_DOWN);
 	  
 	  MAP_KEY (XK_KP_Left, CSKEY_PAD4, CSKEY_LEFT);
 	  MAP_KEY (XK_KP_4, CSKEY_PAD4, '4');

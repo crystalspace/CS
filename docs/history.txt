@@ -26,6 +26,7 @@ chronological order.
 		static bla;
 	  Please use:
 		static int bla;
+	- res fixed a cut'n'paste error in the xwindow plugin.
 17-Oct-2003
 	- res added some files he forgot with his recent commit.
 	- Jorrit fixed the engine sequence manager a better way. With
