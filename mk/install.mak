@@ -17,6 +17,7 @@
 # TO_INSTALL.DOCS: also does not exist, the docs/html dir is copied (all htm)
 #    to docs/html, as well as all subdirs (2 deep) with gif, jpg, png; also
 #    docs/README.htm is copied, and docs/pubapi is copied (all htm, gif, css).
+# TO_INSTALL.SCRIPTS: does not exist. scripts/python is copied.
 #==============================================================================
 
 #------------------------------------------------------------- all defines ---#
@@ -93,6 +94,15 @@ INSTALL_DOCS.DIR = $(filter-out $(INSTALL_DIR), \
 INSTALL_DOCS.DESTFILES = \
   $(addprefix $(INSTALL_DIR)/,$(sort $(INSTALL_DOCS.FILES)))
 
+# Files to install for scripts, includes parent dirs (for scripts/).
+INSTALL_SCRIPTS.FILES = $(wildcard scripts/python/*.py)
+INSTALL_SCRIPTS.DIR1 = $(addprefix $(INSTALL_DIR)/, \
+  $(patsubst %/,%,$(sort $(dir $(INSTALL_SCRIPTS.FILES)))))
+INSTALL_SCRIPTS.DIR = $(filter-out $(INSTALL_DIR), $(sort \
+  $(INSTALL_SCRIPTS.DIR1) $(patsubst %/,%,$(dir $(INSTALL_SCRIPTS.DIR1)))))
+INSTALL_SCRIPTS.DESTFILES = \
+  $(addprefix $(INSTALL_DIR)/,$(sort $(INSTALL_SCRIPTS.FILES)))
+
 endif # ifeq ($(DO_INSTALL),yes)
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -108,7 +118,7 @@ ifeq ($(DO_INSTALL),yes)
 
 .PHONY: install_config install_data install_dynamiclibs install_staticlibs \
   install_exe install_include install_root install_logfile install_docs \
-  install_all
+  install_scripts install_all
 
 # Rule for creating installation directories.
 $(INSTALL_DIR) $(INSTALL_DIR)/bin $(INSTALL_DIR)/lib $(INSTALL_INCLUDE.DIR) \
@@ -175,6 +185,18 @@ $(INSTALL_DOCS.DESTFILES): $(INSTALL_DIR)/docs/% : docs/%
 install_docs: $(INSTALL_DIR)/docs $(INSTALL_DOCS.DIR) \
   $(INSTALL_DOCS.DESTFILES)
 
+# Install Scripts
+$(INSTALL_SCRIPTS.DIR): 
+	$(MKDIR)
+	@echo $@/deleteme.dir >> $(INSTALL_LOG)
+
+$(INSTALL_SCRIPTS.DESTFILES): $(INSTALL_DIR)/scripts/% : scripts/%
+	$(CP) $< $@
+	@echo $@ >> $(INSTALL_LOG)
+
+install_scripts: $(INSTALL_DIR)/scripts $(INSTALL_SCRIPTS.DIR) \
+  $(INSTALL_SCRIPTS.DESTFILES)
+
 # The Big Kafoozy!
 install_all: \
   $(TO_INSTALL.ROOT) \
@@ -191,6 +213,7 @@ install_all: \
   install_exe \
   install_include \
   install_docs \
+  install_scripts \
   install_root \
   install_logfile
 	@echo $"Installation complete.$"
