@@ -69,7 +69,10 @@ rule MasterHeaderCsUtil
       cond = "elif" ;
     }
   }
-  lines += "#endif" ;
+  if $(cond) != "if"
+  {
+    lines += "#endif" ;
+  }
   return [ MasterHeader csutil :
     [ Filter [ Wildcard csutil : *.h ] : $(CS_MASTER_HEADER_REJECTS) ] :
     $(CS_MASTER_HEADER_BOILERPLATE) :

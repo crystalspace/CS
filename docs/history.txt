@@ -19,6 +19,10 @@ chronological order.
 	- res moved csDirtyAccessArray<> into a new (and sensibly named) file
 	  csutil/dirtyaccessarray.h. Usage of csutil/garray.h is now 
 	  deprecated.
+	- Eric Sunshine fixed problem in include/Jamfile where the
+	  MasterHeaderCsUtil rule could emit an orphaned #endif if none of the
+	  platform-specific subdirectories of `csutil' contained any
+	  publish-worthy headers.
 18-Oct-2004
 	- res enhanced the OpenGL canvases so blending is always functioning
 	  (lack of an alpha channel in the frame buffer isn't really a reason
