@@ -45,6 +45,7 @@
 #include "ivaria/reporter.h"
 #include "genmaze.h"
 #include "isys/plugin.h"
+#include "iengine/material.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -62,12 +63,15 @@ IsoTest::IsoTest ()
   myG3D = NULL;
   kbd = NULL;
   mouse = NULL;
+  player = NULL;
   lastclick.Set(0,0,0);
   walking = false;
 }
 
 IsoTest::~IsoTest ()
 {
+  if (player) player->DecRef ();
+  if (light) light->DecRef();
   if (view) view->DecRef();
   if (myG2D) myG2D->DecRef();
   if (myG3D) myG3D->DecRef();
@@ -76,7 +80,6 @@ IsoTest::~IsoTest ()
   if (world) world->DecRef();
   if (engine) engine->DecRef();
   if (font) font->DecRef();
-  if (light) light->DecRef();
 }
 
 void IsoTest::Report (int severity, const char* msg, ...)
@@ -228,6 +231,9 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   iMaterialWrapper *halo = engine->CreateMaterialWrapper(
     "/lib/stdtex/flare_purp.jpg", "halo");
 
+
+  csVector3 startpos(10,0,5);
+
   // create a rectangular grid in the world
   // the grid is 10 units wide (from 0..10 in the +z direction)
   // the grid is 20 units tall (from 0..20 in the +x direction)
@@ -246,13 +252,14 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
         sprite->SetMaterialWrapper(math1);
       else sprite->SetMaterialWrapper(math2);
       world->AddSprite(sprite);
+      sprite->DecRef ();
       for(my=0; my<multy; my++)
         for(mx=0; mx<multx; mx++)
           grid->SetGroundValue(x, y, mx, my, 0.0);
     }
 
+ 
   // add the player sprite to the world
-  csVector3 startpos(10,0,5);
   player = engine->CreateFrontSprite(startpos, 1.3, 2.7);
   player->SetMaterialWrapper(snow);
   player->SetMixMode(CS_FX_ADD);
@@ -276,6 +283,8 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   sprite->SetMaterialWrapper(halo);
   sprite->SetMixMode(CS_FX_ADD);
   world->AddSprite(sprite);
+  scenelight->DecRef ();
+  sprite->DecRef ();
 
   // add a dynamic light for the player, above players head.
   light = engine->CreateLight();
@@ -292,14 +301,17 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   sprite = engine->CreateFloorSprite(csVector3(15,4,5), 1.0, 1.0);
   sprite->SetMaterialWrapper(math1);
   world->AddSprite(sprite);
+  sprite->DecRef ();
   for(my=0; my<4; my++)
   {
     sprite = engine->CreateXWallSprite(csVector3(15,my,5), 1.0, 1.0);
     sprite->SetMaterialWrapper(math1);
     world->AddSprite(sprite);
+    sprite->DecRef ();
     sprite = engine->CreateZWallSprite(csVector3(16,my,5), 1.0, 1.0);
     sprite->SetMaterialWrapper(math1);
     world->AddSprite(sprite);
+    sprite->DecRef ();
   }
 
   for(mx=0; mx<8; mx++)
@@ -307,31 +319,38 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
     sprite = engine->CreateFloorSprite(csVector3(5,4,2+mx), 1.0, 1.0);
     sprite->SetMaterialWrapper(math1);
     world->AddSprite(sprite);
+    sprite->DecRef ();
   }
   for(my=0; my<4; my++)
   {
     sprite = engine->CreateXWallSprite(csVector3(5,my,2), 1.0, 1.0);
     sprite->SetMaterialWrapper(math1);
     world->AddSprite(sprite);
+    sprite->DecRef ();
     sprite = engine->CreateXWallSprite(csVector3(5,my,7), 1.0, 1.0);
     sprite->SetMaterialWrapper(math2);
     world->AddSprite(sprite);
+    sprite->DecRef ();
     for(mx=0; mx<3; mx++)
     {
       sprite = engine->CreateZWallSprite(csVector3(6,my,2+mx), 1.0, 1.0);
       sprite->SetMaterialWrapper(math1);
       world->AddSprite(sprite);
+      sprite->DecRef ();
       sprite = engine->CreateZWallSprite(csVector3(6,my,7+mx), 1.0, 1.0);
       sprite->SetMaterialWrapper(math1);
       world->AddSprite(sprite);
+      sprite->DecRef ();
     }
   }
   sprite = engine->CreateZWallSprite(csVector3(6,3,5), 1.0, 1.0);
   sprite->SetMaterialWrapper(math1);
   world->AddSprite(sprite);
+  sprite->DecRef ();
   sprite = engine->CreateZWallSprite(csVector3(6,3,6), 1.0, 1.0);
   sprite->SetMaterialWrapper(math1);
   world->AddSprite(sprite);
+  sprite->DecRef ();
   for(x=0; x<3; x++)
     for(my=0; my<multy; my++)
       for(mx=0; mx<multx; mx++)
@@ -340,52 +359,27 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
         grid->SetGroundValue(7+x, 5, mx, my, 4.0);
       }
 
-  //bool res = grid->GroundHitBeam(csVector3(10,1,5), csVector3(15,-2,8));
-  //printf("Hitbeam gave %d\n", (int)res);
-  //res = grid->GroundHitBeam(csVector3(10,1,5), csVector3(20,0,10));
-  //printf("Hitbeam gave %d\n", (int)res);
-
   /// create a mesh object
   const char* classId = "crystalspace.mesh.object.cube";
   iMeshObjectFactory *mesh_fact = engine->CreateMeshFactory(classId, 
     "cubeFact");
 
-  ///*
   iCubeFactoryState* cubelook = SCF_QUERY_INTERFACE(mesh_fact, iCubeFactoryState);
   cubelook->SetMaterialWrapper(math2);
-  //cubelook->SetSize(.5, .5, .5);
   cubelook->SetSize(1,1,1);
   cubelook->SetMixMode (CS_FX_COPY);
   cubelook->DecRef();
-  //*/
-  /*
-  iSprite2DFactoryState *fstate = SCF_QUERY_INTERFACE(mesh_fact, 
-    iSprite2DFactoryState);
-  fstate->SetMaterialWrapper(math2);
-  fstate->SetMixMode(CS_FX_ADD);
-  fstate->SetLighting(false);
-  fstate->DecRef();
-  */
 
   iMeshObject *mesh_obj = mesh_fact->NewInstance();
-
-  /*
-  iSprite2DState *ostate = SCF_QUERY_INTERFACE(mesh_obj, iSprite2DState);
-  ostate->CreateRegularVertices(6, true);
-  ostate->DecRef();
-  //iParticle *pstate = SCF_QUERY_INTERFACE(mesh_obj, iParticle);
-  //pstate->ScaleBy(10.0);
-  //pstate->DecRef();
-  */
 
   /// add a mesh object sprite
   iIsoMeshSprite *meshspr = engine->CreateMeshSprite();
   meshspr->SetMeshObject(mesh_obj);
-  //meshspr->SetZBufMode(CS_ZBUF_NONE);
   meshspr->SetPosition( csVector3(12 + 0.5, +0.5, 2+0.5) );
   world->AddSprite(meshspr);
-
-  //player = meshspr;
+  mesh_obj->DecRef ();
+  mesh_fact->DecRef ();
+  meshspr->DecRef ();
   
   const char* fo_classId = "crystalspace.mesh.object.fountain";
   mesh_fact = engine->CreateMeshFactory(fo_classId, "fountainFact");
@@ -414,6 +408,9 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   meshspr->SetZBufMode(CS_ZBUF_TEST);
   meshspr->SetPosition( csVector3(10, 0, 8) );
   world->AddSprite(meshspr);
+  mesh_obj->DecRef ();
+  mesh_fact->DecRef ();
+  meshspr->DecRef ();
 
   // create second grid
   iIsoGrid *grid2 = world->CreateGrid(20, 10);
@@ -426,6 +423,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
       sprite = engine->CreateFloorSprite(csVector3(y,0,x), 1.0, 1.0);
       sprite->SetMaterialWrapper(math2);
       world->AddSprite(sprite);
+      sprite->DecRef ();
       for(my=0; my<multy; my++)
         for(mx=0; mx<multx; mx++)
           grid2->SetGroundValue(x-10, y-10, mx, my, 0.0);
@@ -438,6 +436,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   scenelight->SetAttenuation(CSISO_ATTN_INVERSE);
   scenelight->SetRadius(5.0);
   scenelight->SetColor(csColor(0.0, 0.4, 1.0));
+  scenelight->DecRef ();
   // add the light to both grids to make it look right.
   scenelight = engine->CreateLight();
   scenelight->SetPosition(csVector3(13,2,26));
@@ -445,11 +444,14 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   scenelight->SetAttenuation(CSISO_ATTN_INVERSE);
   scenelight->SetRadius(5.0);
   scenelight->SetColor(csColor(0.0, 0.4, 1.0));
+  scenelight->DecRef ();
 
+  
   /// add maze grid
   printf("Adding maze grid.\n");
   AddMazeGrid(world, 20, 20, math2, math1);
   printf("Adding maze grid done.\n");
+  
 
   // prepare texture manager
   txtmgr->PrepareTextures ();
@@ -458,6 +460,11 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
 
   // scroll view to show player position at center of screen
   view->SetScroll(startpos, csVector2(myG3D->GetWidth()/2, myG3D->GetHeight()/2));
+
+  math1->DecRef ();
+  math2->DecRef ();
+  snow->DecRef ();
+  halo->DecRef ();
 
   return true;
 }
@@ -485,15 +492,18 @@ static void AddWall(iIsoEngine *engine, iIsoWorld *world, iIsoGrid *grid,
     sprite->SetMaterialWrapper(side);
     //sprite->SetMixMode( CS_FX_COPY | CS_FX_TILING );
     world->AddSprite(sprite);
+    sprite->DecRef ();
     sprite = engine->CreateXWallSprite(csVector3(y+offy,bot,x+offy), 
       1.0, height);
     sprite->SetMaterialWrapper(side);
     //sprite->SetMixMode( CS_FX_COPY | CS_FX_TILING );
     world->AddSprite(sprite);
+    sprite->DecRef ();
   }
   sprite = engine->CreateFloorSprite(csVector3(y+offy,height,x+offx), 1.0, 1.0);
   sprite->SetMaterialWrapper(top);
   world->AddSprite(sprite);
+  sprite->DecRef ();
 }
 
 void IsoTest::AddMazeGrid(iIsoWorld *world, float posx, float posy,
@@ -557,22 +567,6 @@ void IsoTest::AddMazeGrid(iIsoWorld *world, float posx, float posy,
   int multy = 1;
   mazegrid->SetGroundMult(multx, multy);
 
-  /*
-  iIsoSprite *sprite; int mx, my;
-  for(y=(int)posy; y<posy+gridh; y++)
-    for(x=(int)posx; x<posx+gridw; x++)
-    {
-      // put tiles on the floor
-      sprite = engine->CreateFloorSprite(csVector3(y,0,x), 1.0, 1.0);
-      sprite->SetMaterialWrapper(floor);
-      world->AddSprite(sprite);
-      for(my=0; my<multy; my++)
-        for(mx=0; mx<multx; mx++)
-          mazegrid->SetGroundValue(x-posx, y-posy, mx, my, 0.0);
-    }
-   */
-
-
   // add a light
   iIsoLight* scenelight = engine->CreateLight();
   scenelight->SetPosition(csVector3(posy+height+0.5,10,posx+width+0.5));
@@ -580,6 +574,7 @@ void IsoTest::AddMazeGrid(iIsoWorld *world, float posx, float posy,
   scenelight->SetAttenuation(CSISO_ATTN_INVERSE);
   scenelight->SetRadius(10.0 + width/2 + height/2);
   scenelight->SetColor(csColor(0.0, 0.4, 1.0));
+  scenelight->DecRef ();
 
   // add walls
   
@@ -611,7 +606,6 @@ void IsoTest::AddMazeGrid(iIsoWorld *world, float posx, float posy,
     else ADDWALLFULL(gridw-1, y*2+1)
   }
 
-  //printf("y=%d\n", y);
   for(x=0; x<width; x++)
   {
     ADDWALLFULL(x*2, gridh-1)
@@ -702,7 +696,7 @@ void IsoTest::NextFrame ()
   
   // Start drawing 2D graphics.
   if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
-
+  
   char buf[255];
   sprintf(buf, "FPS: %g    loc(%g,%g,%g)", fps, player->GetPosition().x,
     player->GetPosition().y, player->GetPosition().z);
