@@ -886,16 +886,13 @@ public:
 
   ///---------------------- iPolygonMesh implementation ----------------------
   SCF_DECLARE_IBASE;
-  /// Get the number of vertices for this mesh.
   virtual int GetVertexCount () { return 8; }
-  /// Get the pointer to the array of vertices.
   virtual csVector3* GetVertices () { return verts; }
-  /// Get the number of polygons for this mesh.
   virtual int GetPolygonCount () { return 6; }
-  /// Get the pointer to the array of polygons.
   virtual csMeshedPolygon* GetPolygons () { return poly; }
-  /// Cleanup.
   virtual void Cleanup () { }
+  virtual bool IsDeformable () const { return false; }
+  virtual uint32 GetChangeNumber () const { return 0; }
 };
 
 SCF_IMPLEMENT_IBASE (UnitCubeMesh)

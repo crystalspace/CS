@@ -1,5 +1,12 @@
 The history order is reversed so that new features are at the top.
 
+11-Jan-2002
+	- Fixed a problem in genmesh where
+	  iObjectModel->GetPolygonMeshColldet() was not returning the
+	  polygon mesh implementation of the object.
+	- Also fixed Doxygen comments in iPolygonMesh for the two new
+	  methods (deformation).
+	- Fixed the unit tester in csgeom for the new methods.
 10-Jan-2002
 	- Made the calling of the movable callbacks safe so that they now
 	  can delete themselves from the movable. This basically amounts

@@ -209,7 +209,10 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObject);
     virtual long GetShapeNumber () const { return scfParent->shapenr; }
-    virtual iPolygonMesh* GetPolygonMeshColldet () { return NULL; }
+    virtual iPolygonMesh* GetPolygonMeshColldet ()
+    {
+      return &(scfParent->scfiPolygonMesh);
+    }
     virtual iPolygonMesh* GetPolygonMeshViscull () { return NULL; }
     virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
     { return NULL; }
