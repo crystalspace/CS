@@ -439,9 +439,6 @@ protected:
 	void CopyToClone( TiDocumentNode* target ) const	{ target->SetValue (value.c_str() );
 												  }
 
-	// Internal Value function returning a TIXML_STRING
-	TIXML_STRING SValue() const	{ return value ; }
-
 	TiDocumentNode*		parent;
 	NodeType		type;
 

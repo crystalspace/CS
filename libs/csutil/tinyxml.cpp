@@ -297,7 +297,8 @@ TiDocumentNode* TiDocumentNode::FirstChild( const char * value ) const
 	TiDocumentNode* node;
 	for ( node = firstChild; node; node = node->next )
 	{
-		if ( node->SValue() == TIXML_STRING( value ))
+		const char* node_val = node->Value ();
+		if (node_val && strcmp (node_val, value) == 0)
 			return node;
 	}
 	return 0;
@@ -308,7 +309,8 @@ TiDocumentNode* TiDocumentNode::LastChild( const char * value ) const
 	TiDocumentNode* node;
 	for ( node = lastChild; node; node = node->prev )
 	{
-		if ( node->SValue() == TIXML_STRING (value))
+		const char* node_val = node->Value ();
+		if (node_val && strcmp (node_val, value) == 0)
 			return node;
 	}
 	return 0;
@@ -345,7 +347,8 @@ TiDocumentNode* TiDocumentNode::NextSibling( const char * value ) const
 	TiDocumentNode* node;
 	for ( node = next; node; node = node->next )
 	{
-		if ( node->SValue() == TIXML_STRING (value))
+		const char* node_val = node->Value ();
+		if (node_val && strcmp (node_val, value) == 0)
 			return node;
 	}
 	return 0;
@@ -357,7 +360,8 @@ TiDocumentNode* TiDocumentNode::PreviousSibling( const char * value ) const
 	TiDocumentNode* node;
 	for ( node = prev; node; node = node->prev )
 	{
-		if ( node->SValue() == TIXML_STRING (value))
+		const char* node_val = node->Value ();
+		if (node_val && strcmp (node_val, value) == 0)
 			return node;
 	}
 	return 0;
