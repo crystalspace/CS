@@ -863,6 +863,7 @@ csRenderMesh** csHazeMeshObject::GetRenderMeshes (int &n, iRenderView* rview,
   g3dpoly->var [i].component = v1 + t * (v2 - v1); \
 }
 
+#ifndef CS_USE_NEW_RENDERER
 static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
   csVector2* clipped_verts, int num_vertices, csVertexStatus* clipped_vtstats,
   int orig_num_vertices, bool gouraud)
@@ -955,10 +956,10 @@ static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
     }
   }
 }
+#endif
 
 #undef INTERPOLATE
 #undef INTERPOLATE1
-
 
 void csHazeMeshObject::ComputeHullOutline(iHazeHull *hull, float layer_scale,
   const csVector3& campos, csReversibleTransform& tr_o2c, float fov, float shx,
