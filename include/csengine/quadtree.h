@@ -87,7 +87,7 @@ private:
    *  node_depth==1 means you are the root, and so on,
    *  if the node_depth == max_depth you are a leaf.
    */
-  typedef int (csQuadTree::quad_traverse_func)(csQuadTree* pObj, 
+  typedef int (quad_traverse_func)(csQuadTree* pObj, 
     const csBox2& node_bbox, int node_depth, int node_state, 
     int offset, int node_nr, void* data);
 
