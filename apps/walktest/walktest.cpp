@@ -679,7 +679,12 @@ int main (int argc, char* argv[])
     }
 
     // Load the standard library.
-    CSLoader::LoadLibrary (world, "standard", "standard.zip");
+    if (!CSLoader::LoadLibrary (world, "standard", "standard.zip"))
+    {
+      //Error message was already printed be CSLoader...
+      cleanup ();
+      fatal_exit (0, false);
+    }
 
     //Find the Crystal Space logo and set the renderer Flag to for_2d, to allow 
     //the use in the 2D part.
