@@ -97,25 +97,48 @@ def writeInitExtensions (extensions):
     for ext in extensions:
         name = ext.getAttribute ("name")
         if name.endswith("WGL",0,3):
-            output.write ("#ifdef _WIN32\n")
-        output.write ("  void Init" + name + " ()\n  {\n")
-        output.write ("    const char* ext = \"" + name +"\";\n");
-        output.write ("    char cfgkey[" + str (len (cfgprefix) + len (name) + 1) + "];\n");
-        output.write ("    sprintf (cfgkey, \"" + cfgprefix + "%s\", ext);\n");
-        output.write ("    bool allclear, funcTest;\n")
-        output.write ("    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);\n");
+	  output.write ("#ifdef _WIN32\n")
+	  output.write ("  void Init" + name + " (HDC hDC)\n  {\n")
+	else:
+	  output.write ("  void Init" + name + " ()\n  {\n")
         output.write ("    if (tested_CS_" + name + ") return;\n");
         output.write ("    tested_CS_" + name + " = true;\n")
-        if not name.endswith("GL_version_",0,11):
-            output.write ("    CS_" + ext.getAttribute ("name") + " = (strstr (extensions, ext) != NULL);\n")
-        else:
-            output.write ("    CS_" + ext.getAttribute ("name") + " = true;\n")
+        output.write ("    const char* ext = \"" + name +"\";\n");
+        output.write ("    char cfgkey[" + str (len (cfgprefix) + len (name) + 1) + "];\n");
+        output.write ("    sprintf (cfgkey, \"" + cfgprefix + "%s\", ext);\n\n");
+	# sligthly different ext checking for Win32
+        if ((name.startswith("GL_version_")) or 
+	  (name == "WGL_ARB_extensions_string") or 
+	  (name == "WGL_EXT_extensions_string")):
+          output.write ("    CS_" + ext.getAttribute ("name") + " = true;\n")
+	else:
+	  if name.endswith("WGL",0,3):
+	    output.write ("    if (!tested_CS_WGL_ARB_extensions_string) " +
+	      "InitWGL_ARB_extensions_string (hDC);\n");
+	    output.write ("    const char* extensions;\n");
+	    output.write ("    if (CS_WGL_ARB_extensions_string)\n");
+	    output.write ("    {\n");
+	    output.write ("      extensions = wglGetExtensionsStringARB (hDC);\n");
+	    output.write ("    }\n");
+	    output.write ("    else\n");
+	    output.write ("    {\n");
+	    output.write ("      extensions = " +
+	      " (const char*)glGetString (GL_EXTENSIONS);\n");
+	    output.write ("    }\n");
+	  else:
+	    output.write ("    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);\n");
+	  output.write ("    CS_" + ext.getAttribute ("name") + " = (strstr (extensions, ext) != NULL);\n")
+	output.write ("\n");
+        output.write ("    bool allclear, funcTest;\n")
+        if name.endswith("WGL",0,3):
+	  output.write ("    if (CS_" + name + ")\n");
+	else:
+	  output.write ("    if (gl && CS_" + name + ")\n");
         output.write ("\
-    if (gl && CS_" + name + ")\n\
     {\n");
         output.write ("      allclear = true;\n")
-        for func in ext.getElementsByTagName ("FUNCTION"):
-            writeFunctionInit (func)
+	for func in ext.getElementsByTagName ("FUNCTION"):
+	    writeFunctionInit (func)
         output.write ("      if (CS_" + name + " = allclear)\n")
         output.write ("      {\n");
         output.write ("\
@@ -149,19 +172,23 @@ def writeFunctionInit (func):
                   ") gl->GetProcAddress (\"" + \
                   name + "\")) != NULL);\n")
     output.write ("      if (!funcTest && config->GetBool \
-(\"Video.OpenGL.ReportMissingEntries\", true))\n");                
+(\"Video.OpenGL.ReportMissingEntries\", defaultReportMissingEntries))\n");                
     output.write ("        Report (\"Failed to retrieve %s\", \"" + name + "\");\n");
     output.write ("      allclear &= funcTest;\n");
-
 
 output.write (header.read ())
 writeDefinitions (xmldoc.getElementsByTagName ("EXTENSION"))
 output.write ("struct csGLExtensionManager\n\
 {\n\
 private:\n\
+#ifdef CS_DEBUG\n\
+  static const bool defaultReportMissingEntries = true;\n\
+#else\n\
+  static const bool defaultReportMissingEntries = false;\n\
+#endif\n\
   iObjectRegistry* object_reg;\n\
   csConfigAccess config;\n\
-  csRef<iOpenGLInterface> gl;\n\
+  iOpenGLInterface* gl;\n\
 \n\
   void Report (const char* msg, ...)\n\
   {\n\
@@ -180,20 +207,22 @@ private:\n\
   }\n\
 \n\
 public:\n\
-  void Open (iObjectRegistry* object_reg)\n\
+  void Initialize (iObjectRegistry* object_reg, iGraphics2D* g2d)\n\
   {\n\
     csGLExtensionManager::object_reg = object_reg;\n\
+    gl = csRef<iOpenGLInterface>\n\
+      (SCF_QUERY_INTERFACE (g2d, iOpenGLInterface));\n\
     // Low priority so canvas/renderer cfgs may override the settings\n\
     config.AddConfig (object_reg, \"/config/glext.cfg\", true,\n\
       iConfigManager::ConfigPriorityPlugin - 1);\n\
-    csRef<iGraphics2D> g2d (CS_QUERY_REGISTRY (object_reg, iGraphics2D));\n\
-    gl = csPtr<iOpenGLInterface>\n\
-      (SCF_QUERY_INTERFACE (g2d, iOpenGLInterface));\n\
+  }\n\
+  \n\
+  void Open ()\n\
+  {\n\
   }\n\
   \n\
   void Close ()\n\
   {\n\
-    gl = NULL;\n\
   }\n\
   \n\
 ");

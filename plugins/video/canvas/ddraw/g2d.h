@@ -94,7 +94,6 @@ protected:
   bool m_bDoubleBuffer;
   bool m_bVisible;
   bool m_bAllowWindowed;
-  int m_nDisplayFrequency;
 
   HRESULT InitSurfaces ();
   HRESULT ReleaseAllObjects ();

@@ -60,6 +60,12 @@ class csGraphics2DGLCommon : public csGraphics2D, public iEventPlug
 protected:
   /// Extension manager
   csGLExtensionManager ext;
+  /// Multisample samples
+  int multiSamples;
+  /// Whether to favor quality or speed.
+  bool multiFavorQuality;
+  /// Depth buffer resolution
+  int depthBits;
 public:
   SCF_DECLARE_IBASE_EXT(csGraphics2D);
 

@@ -39,6 +39,8 @@ csGraphics2DGLCommon::csGraphics2DGLCommon (iBase *iParent) :
 {
   EventOutlet = NULL;
   screen_shot = NULL;
+  multiSamples = 0;
+  multiFavorQuality = false;
 }
 
 bool csGraphics2DGLCommon::Initialize (iObjectRegistry *object_reg)
@@ -62,6 +64,13 @@ bool csGraphics2DGLCommon::Initialize (iObjectRegistry *object_reg)
   pfmt.complete ();
 
   statecache = new csGLStateCache();
+
+  ext.Initialize (object_reg, this);
+
+  depthBits = config->GetInt ("Video.OpenGL.DepthBits", 32);
+  multiSamples = config->GetInt ("Video.OpenGL.MultiSamples", 0);
+  multiFavorQuality = config->GetBool ("Video.OpenGL.MultisampleFavorQuality");
+
   return true;
 }
 
@@ -99,11 +108,11 @@ bool csGraphics2DGLCommon::Open ()
 
   if (reporter)
     reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
-        "crystalspace.canvas.openglcommon",
+      "crystalspace.canvas.openglcommon",
       "Using %s mode at resolution %dx%d.",
   FullScreen ? "full screen" : "windowed", Width, Height);
 
-  ext.Open (object_reg);
+  ext.Open ();
 
   if (version)
   {
@@ -120,6 +129,42 @@ bool csGraphics2DGLCommon::Open ()
       {
 	//ext.InitGL_version_1_3 ();
       }
+    }
+  }
+
+  ext.InitGL_ARB_multisample();
+
+  if (ext.CS_GL_ARB_multisample)
+  {
+    glGetIntegerv (GL_SAMPLES_ARB, &multiSamples);
+
+    if (multiSamples)
+    {
+      reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	"crystalspace.canvas.openglcommon",
+	"Multisample: %d samples",
+	multiSamples);
+
+      ext.InitGL_NV_multisample_filter_hint();
+      if (ext.CS_GL_NV_multisample_filter_hint)
+      {
+	glHint (GL_MULTISAMPLE_FILTER_HINT_NV,
+	  multiFavorQuality ? GL_NICEST : GL_FASTEST);
+	
+	GLint msHint;
+	glGetIntegerv (GL_MULTISAMPLE_FILTER_HINT_NV, &msHint);
+	reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "crystalspace.canvas.openglcommon",
+	  "Multisample settings: %s",
+	  ((msHint == GL_NICEST) ? "quality" :
+	   ((msHint == GL_FASTEST) ? "perfomrmance" : "unknown")));
+      }
+    }
+    else
+    {
+      reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	"crystalspace.canvas.openglcommon",
+	"Multisample: disabled");
     }
   }
 

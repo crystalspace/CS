@@ -82,6 +82,8 @@ csGraphics2D::csGraphics2D (iBase* parent)
   win_title = csStrNew ("Crystal Space Application");
   object_reg = NULL;
   AllowResizing = false;
+  refreshRate = 0;
+  vsync = false;
 }
 
 bool csGraphics2D::Initialize (iObjectRegistry* r)
@@ -96,6 +98,8 @@ bool csGraphics2D::Initialize (iObjectRegistry* r)
   Depth = config->GetInt ("Video.ScreenDepth", Depth);
   FullScreen = config->GetBool ("Video.FullScreen", FullScreen);
   DisplayNumber = config->GetInt ("Video.DisplayNumber", DisplayNumber);
+  refreshRate = config->GetInt ("Video.DisplayFrequency", 0);
+  vsync = config->GetBool ("Video.VSync", false);
 
   // Get the font server: A missing font server is NOT an error
   if (!FontServer)
@@ -240,6 +244,7 @@ bool csGraphics2D::Open ()
     LineAddress[i] = addr;
 
   SetClipRect (0, 0, Width, Height);
+
   return true;
 }
 

@@ -114,8 +114,6 @@ bool csGraphics2DDDraw3::Initialize (iObjectRegistry *object_reg)
   if (cmdline->GetOption ("sysmouse")) m_bHardwareCursor = true;
   if (cmdline->GetOption ("nosysmouse")) m_bHardwareCursor = false;
 
-  m_nDisplayFrequency = config->GetInt ("Video.DisplayFrequency", 0);
-
   return true;
 }
 
@@ -568,7 +566,7 @@ HRESULT csGraphics2DDDraw3::InitSurfaces ()
     LPDIRECTDRAW7 lpDD7;
     if (m_lpDD->QueryInterface (IID_IDirectDraw7, (LPVOID*)&lpDD7) == S_OK)
     {
-      hRet = lpDD7->SetDisplayMode (Width, Height, Depth, m_nDisplayFrequency, 0);
+      hRet = lpDD7->SetDisplayMode (Width, Height, Depth, refreshRate, 0);
       lpDD7->Release ();
     }
 #else

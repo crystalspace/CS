@@ -105,6 +105,11 @@ public:
    */
   virtual void ChangeDepth (int d);
 
+protected:
+  /// Screen refresh rate
+  int refreshRate;
+  /// Activate Vsync
+  bool vsync;
 private:
   /// Find a color in palette mode.
   int FindRGBPalette (int r, int g, int b);

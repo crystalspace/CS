@@ -10,6 +10,16 @@ The history order is reversed so that new features are at the top.
 	      from the old system where only the mesh objects themselves
 	      knew about the rendered meshes. Not all necessary adjustments
 	      have been done yet.
+	- res made the following changes:
+	    - Made several changes to the GL extensions manager to better
+	      support WGL exts.
+	    - Added support for multisample in OpenGL. So far, works on Win32
+	      only, as some platform-specific initializations are required.
+	    - Moved support for display refresh rate and vsync to common
+	      canvas classes. That means that they read the requested settings
+	      from the config; the actual application is still platform-
+	      dependent and only implemented on Win32 so far.
+	    - Added a GL configuration for ATI R300 (Radeon 9700/9700Pro.)
 21-May-2003
 	- Jorrit fixed the new csString::SubString() so that it is more
 	  efficient (no longer returns a new csString) and also documented

@@ -34,10 +34,14 @@ class csGraphics2DOpenGL : public csGraphics2DGLCommon
 {
 private:
   // Calculate the OpenGL pixel format.
-  void CalcPixelFormat ();
+  void CalcPixelFormat (int pixelFormat);
+  bool FindMultisampleFormat (int samples, int& pixelFormat);
+  static LRESULT CALLBACK DummyWindow (HWND hWnd, UINT message,
+    WPARAM wParam, LPARAM lParam);
 
   bool RestoreDisplayMode ();
 
+  virtual void CheckOptions ();
 public:
   SCF_DECLARE_IBASE_EXT (csGraphics2DGLCommon);
 
@@ -98,10 +102,7 @@ protected:
 
   bool m_bHardwareCursor;
 
-  int m_nDepthBits;
   uint m_nDisplayFrequency;
-  /// VSYNC enabled?
-  bool vsync;
 
   // Old window procedure (the one in win32.cpp)
   WNDPROC m_OldWndProc;

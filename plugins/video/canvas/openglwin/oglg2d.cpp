@@ -281,14 +281,13 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
   if (cmdline->GetOption ("sysmouse")) m_bHardwareCursor = true;
   if (cmdline->GetOption ("nosysmouse")) m_bHardwareCursor = false;
 
-  m_nDepthBits = config->GetInt ("Video.OpenGL.DepthBits", 32);
-  m_nDisplayFrequency = config->GetInt ("Video.DisplayFrequency", 0);
-  vsync = config->GetBool ("Video.VSync", false);
+  // store a copy of the refresh rate as we may need it later
+  m_nDisplayFrequency = refreshRate;
 
   return true;
 }
 
-void csGraphics2DOpenGL::CalcPixelFormat ()
+void csGraphics2DOpenGL::CalcPixelFormat (int pixelFormat)
 {
   PIXELFORMATDESCRIPTOR pfd = {
       sizeof(PIXELFORMATDESCRIPTOR),  /* size */
@@ -307,18 +306,25 @@ void csGraphics2DOpenGL::CalcPixelFormat ()
       0,                              /* alpha bits (ignored) */
       0,                              /* no accumulation buffer */
       0, 0, 0, 0,                     /* accum bits (ignored) */
-      m_nDepthBits,                   /* depth buffer */
+      depthBits,                   /* depth buffer */
+#ifndef CS_USE_NEW_RENDERER
       1,                              /* no stencil buffer */
+#else
+      8,
+#endif // CS_USE_NEW_RENDERER
       0,                              /* no auxiliary buffers */
       PFD_MAIN_PLANE,                 /* main layer */
       0,                              /* reserved */
       0, 0, 0                         /* no layer, visible, damage masks */
   };
 
-  int pixelFormat = ChoosePixelFormat (hDC, &pfd);
+  if (pixelFormat <= 0)
+  {
+    pixelFormat = ChoosePixelFormat (hDC, &pfd);
 
-  if (pixelFormat == 0)
-    SystemFatalError ("ChoosePixelFormat failed.");
+    if (pixelFormat == 0)
+      SystemFatalError ("ChoosePixelFormat failed.");
+  }
   if (SetPixelFormat (hDC, pixelFormat, &pfd) != TRUE)
     SystemFatalError ("SetPixelFormat failed.");
 
@@ -331,7 +337,7 @@ void csGraphics2DOpenGL::CalcPixelFormat ()
    * the correct color depth maybe try EnumDisplaySettings() instead.
    * but somehow the actual color depth should be retrieved. ]
    */
-  m_nDepthBits = pfd.cDepthBits;
+  depthBits = pfd.cDepthBits;
 
   hardwareAccelerated = !(pfd.dwFlags & PFD_GENERIC_FORMAT);
   if (!hardwareAccelerated)
@@ -353,11 +359,141 @@ void csGraphics2DOpenGL::CalcPixelFormat ()
   pfmt.PalEntries = 0;
 }
 
+struct DummyWndInfo
+{
+  int* pixelFormat;
+  csGraphics2DOpenGL* this_;
+  int samples;
+};
+
+bool csGraphics2DOpenGL::FindMultisampleFormat (int samples, 
+						int& pixelFormat)
+{
+  if (samples == 0) return true;
+
+  /*
+    To use multisampling, a special pixel format has to determined.
+    However, this determination works over a WGL ext - thus we need
+    a GL context. So we create a window just for checking that
+    ext.
+   */
+  static const char* dummyClassName = "CSGL_DummyWindow";
+
+  HINSTANCE ModuleHandle = GetModuleHandle(NULL);
+
+  WNDCLASS wc;
+  wc.hCursor        = NULL;
+  wc.hIcon	    = NULL;
+  wc.lpszMenuName   = NULL;
+  wc.lpszClassName  = dummyClassName;
+  wc.hbrBackground  = (HBRUSH)(COLOR_BTNFACE + 1);
+  wc.hInstance      = ModuleHandle;
+  wc.style          = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+  wc.lpfnWndProc    = DummyWindow;
+  wc.cbClsExtra     = 0;
+  wc.cbWndExtra     = 0;
+
+  if (!RegisterClass (&wc)) return false;
+
+  DummyWndInfo dwi;
+  dwi.pixelFormat = &pixelFormat;
+  dwi.this_ = this;
+  dwi.samples = samples;
+
+  HWND wnd = CreateWindow (dummyClassName, NULL, 0, CW_USEDEFAULT, 
+    CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 0, 0,
+    ModuleHandle, (LPVOID)&dwi);
+  DestroyWindow (wnd);
+
+  UnregisterClass (dummyClassName, ModuleHandle);
+
+  return false;
+}
+
+LRESULT CALLBACK csGraphics2DOpenGL::DummyWindow (HWND hWnd, UINT message,
+  WPARAM wParam, LPARAM lParam)
+{
+  switch(message)
+  {
+  case WM_CREATE:
+    {
+      DummyWndInfo* dwi = (DummyWndInfo*)(LPCREATESTRUCT(lParam)->lpCreateParams);
+
+      dwi->this_->hDC = GetWindowDC (hWnd);
+      dwi->this_->CalcPixelFormat (-1);
+
+      int pixelFormat = ::GetPixelFormat (dwi->this_->hDC);
+      PIXELFORMATDESCRIPTOR pfd;
+      if (DescribePixelFormat (dwi->this_->hDC, pixelFormat, 
+	sizeof(PIXELFORMATDESCRIPTOR), &pfd) == 0)
+	SystemFatalError ("DescribePixelFormat failed.");
+
+      dwi->this_->hGLRC = wglCreateContext (dwi->this_->hDC);
+      wglMakeCurrent (dwi->this_->hDC, dwi->this_->hGLRC);
+
+      csGLExtensionManager& ext = dwi->this_->ext;
+      ext.InitWGL_ARB_pixel_format (dwi->this_->hDC);
+      if (ext.CS_WGL_ARB_pixel_format)
+      {
+	BOOL status;
+	unsigned int numFormats = 0;
+	int iAttributes[20];
+	float fAttributes[] = {0.0f, 0.0f};
+
+	HDC hDC = GetDC(hWnd);
+	iAttributes[0] = WGL_DRAW_TO_WINDOW_ARB;
+	iAttributes[1] = GL_TRUE;
+	iAttributes[2] = WGL_ACCELERATION_ARB;
+	iAttributes[3] = WGL_FULL_ACCELERATION_ARB;
+	iAttributes[4] = WGL_COLOR_BITS_ARB;
+	iAttributes[5] = pfd.cColorBits;
+	iAttributes[6] = WGL_ALPHA_BITS_ARB;
+	iAttributes[7] = pfd.cAlphaBits ;
+	iAttributes[8] = WGL_DEPTH_BITS_ARB;
+	iAttributes[9] = pfd.cDepthBits;
+	iAttributes[10] = WGL_STENCIL_BITS_ARB;
+	iAttributes[11] = pfd.cStencilBits;
+	iAttributes[12] = WGL_DOUBLE_BUFFER_ARB;
+	iAttributes[13] = GL_TRUE;
+	iAttributes[14] = WGL_SAMPLE_BUFFERS_ARB;
+	iAttributes[15] = GL_TRUE;
+	iAttributes[16] = WGL_SAMPLES_ARB;
+	iAttributes[17] = dwi->samples;
+	iAttributes[18] = 0;
+	iAttributes[19] = 0;
+
+	if ((ext.wglChoosePixelFormatARB (hDC, iAttributes, fAttributes,
+	  1, dwi->pixelFormat, &numFormats) == GL_FALSE) || (numFormats == 0))
+	{
+	  *dwi->pixelFormat = -1;
+	}
+      }
+
+      wglDeleteContext (dwi->this_->hGLRC);
+      wglMakeCurrent (NULL, NULL);
+
+      ReleaseDC (hWnd, dwi->this_->hDC);
+    }
+    break;
+  }
+  return DefWindowProc (hWnd, message, wParam, lParam);
+}
+
+void csGraphics2DOpenGL::CheckOptions ()
+{
+  if (ext.CS_WGL_ARB_pixel_format)
+  {
+  }
+}
+
 bool csGraphics2DOpenGL::Open ()
 {
   if (is_open) return true;
   DWORD exStyle;
   DWORD style;
+
+  int pixelFormat = -1;
+  FindMultisampleFormat (multiSamples, pixelFormat);
 
   // create the window.
   if (FullScreen)
@@ -393,11 +529,11 @@ bool csGraphics2DOpenGL::Open ()
   SetWindowLong (m_hWnd, GWL_USERDATA, (LONG)this);
 
   hDC = GetDC (m_hWnd);
-  CalcPixelFormat ();
+  CalcPixelFormat (pixelFormat);
 
   Report (CS_REPORTER_SEVERITY_NOTIFY,
     "Using %d bits per pixel (%d color mode), %d bits depth buffer.", 
-    Depth, 1 << (Depth == 32 ? 24 : Depth), m_nDepthBits);
+    Depth, 1 << (Depth == 32 ? 24 : Depth), depthBits);
 
   hGLRC = wglCreateContext (hDC);
   wglMakeCurrent (hDC, hGLRC);
@@ -431,10 +567,11 @@ bool csGraphics2DOpenGL::Open ()
 
   if (ext.CS_WGL_EXT_swap_control)
   {
-    ext.wglSwapIntervalEXT (vsync? 1 : 0);
+    ext.wglSwapIntervalEXT (vsync ? 1 : 0);
+    vsync = (ext.wglGetSwapIntervalEXT() != 0);
     Report (CS_REPORTER_SEVERITY_NOTIFY,
       "VSync is %s.", 
-      (ext.wglGetSwapIntervalEXT()==0) ? "disabled" : "enabled");
+      vsync ? "enabled" : "disabled");
   }
 
   return true;
@@ -616,6 +753,8 @@ void csGraphics2DOpenGL::Activate (bool activated)
 
 void csGraphics2DOpenGL::SwitchDisplayMode (bool userMode)
 {
+  DEVMODE curdmode, dmode;
+
   if (userMode)
   {
     // set the default display mode
@@ -630,7 +769,6 @@ void csGraphics2DOpenGL::SwitchDisplayMode (bool userMode)
   {
     modeSwitched = false;
     // set the user-requested display mode
-    DEVMODE curdmode, dmode;
     ZeroMemory (&curdmode, sizeof(curdmode));
     curdmode.dmSize = sizeof (DEVMODE);
     curdmode.dmDriverExtra = 0;
@@ -692,11 +830,20 @@ void csGraphics2DOpenGL::SwitchDisplayMode (bool userMode)
       }
     }
     else
+    {
       modeSwitched = true;
+    }
   }
+
+  // retrieve actual refresh rate
+  ZeroMemory (&curdmode, sizeof(curdmode));
+  curdmode.dmSize = sizeof (DEVMODE);
+  curdmode.dmDriverExtra = 0;
+  EnumDisplaySettings (NULL, ENUM_CURRENT_SETTINGS, &curdmode);
+  refreshRate = curdmode.dmDisplayFrequency;
 }
 
 void csGraphics2DOpenGL::CheckWGLExtensions ()
 {
-  ext.InitWGL_EXT_swap_control ();
+  ext.InitWGL_EXT_swap_control (hDC);
 }
