@@ -22,7 +22,6 @@
 #include <stdio.h>
 
 #include <GL/gl.h>
-#include <GL/glu.h>
 
 #include "cssys/sysdriv.h"
 #include "qint.h"

@@ -45,7 +45,6 @@
 #include "csgfxldr/rgbpixel.h"
 
 #include <GL/gl.h>
-#include <GL/glu.h>
 
 #define SysPrintf System->Printf
 

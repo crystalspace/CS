@@ -23,6 +23,8 @@ The history order has been reversed so that new features are at the top.
 	      pixelblock.
 	    - Started NASM mmx routine for yuv2rgba: doesnt work yet and
 	      is not scheduled either.
+	- Removed glu.h includes from OpenGL plugins. We don't need it and it
+	  adds an unneeded dependency.
 4-Feb-2001
 	- Wouter Wijngaards changed includes, so that make depend works
 	  nicer for csfedit.
