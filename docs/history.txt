@@ -1,18 +1,22 @@
 The history order is reversed so that new features are at the top.
 
 24-Feb-2003
-	- Andrew Craig fixed error in csMeshMeshList::FreeItem where
-          the meshes were not being unprepared from sectors.
+	- Andrew Craig fixed error in csMeshMeshList::FreeItem() where the
+	  meshes were not being unprepared from sectors.
 	- Added some asserts in spr3d to check if cur_action is not NULL.
+	- Eric Sunshine removed the recently added empty mottest.cfg and
+	  instead fixed the problem of Debian installation failing by repairing
+	  the broken mottest.mak so that it no longer refers to a non-existent
+	  file.
 23-Feb-2003
-	- Christian Bayle fixed menu in debian package.
+	- Christian Bayle fixed menu in Debian package.
 	- Eric Sunshine made the following changes:
 	    - Fixed mk/autoconf/pkg.m4 so that it no longer aborts
 	      configuration and abuses the user just because an optional
 	      package is absent.
 	    - Fixed bin/autogen.sh so that it cleans up after itself.
 22-Feb-2003
-	- Christian Bayle made change in debian build
+	- Christian Bayle made change in Debian build
 	  Moved config files in /etc and added proper symlink
 	  Added a build dependancy on libode-dev
 	  Now build static lib without -fPIC to respect policy
@@ -146,7 +150,7 @@ The history order is reversed so that new features are at the top.
 	    - A more complete review of wrapped app-loading issues needs to
 	      take place in the future, to support application-bundled versions
 	      of CS.
-	- Christian Bayle made debian package build ok, but it remains some
+	- Christian Bayle made Debian package build ok, but it remains some
 	  problems with csdemo that is not installed by make install and
 	  segfault in walktest -video=software (building with gcc3.2.2)
 	- Eric Sunshine fixed problem reported by <groton@gmx.net> where
@@ -200,7 +204,7 @@ The history order is reversed so that new features are at the top.
 	- Daniel also fixed genmesh to handle anonymous buffers as well as
 	  make the vertex buffers slightly more efficient.
 	- Daniel changed which stream to use for shadows.
-	- Christian Bayle did some other debian related changes.
+	- Christian Bayle did some other Debian related changes.
 15-Feb-2003
 	- res checked if the image IO plugins work properly and fixed them
 	  if necessary:
@@ -1328,8 +1332,8 @@ The history order is reversed so that new features are at the top.
 19-Jan-2003
 	- Philip Wyett fixed mismatched delete vs. delete [] at
 	  destruction of 'nTerrainInfo' (terrbig).
-	- Christian Bayle added new debian package files mostly moved
-	  from debian to deb dir.
+	- Christian Bayle added new Debian package files mostly moved
+	  from Debian to deb dir.
 	- Marten Svanfeldt did the following:
 	    - Made csGLTextureCache a interface so that shaderplugins can
 	      access it.
@@ -5897,7 +5901,7 @@ The history order is reversed so that new features are at the top.
 	      just icons...)
 	    - Killed compres.sh
 	    - Mergeres is now used by msvcgen and the mingw build process.
-	- Peter Amstutz added default aws data files to the debian
+	- Peter Amstutz added default aws data files to the Debian
 	  distribution.
 	- Removed CS_GNUC_PRINTF macros with iGraphics2D->PerformExtension()
 	  since this doesn't make sense. PerformExtension() doesn't follow
@@ -8316,7 +8320,7 @@ updated3-Jun-2002
 	      single-texture mode.
 	- Christian Bayle changed size_t in socklen_t (for inet.h) to
 	  allow compile on ia64 and s390.
-	- Christian also did some changes to the debian files.
+	- Christian also did some changes to the Debian files.
 	- Norman Kramer fixed aws: lookup for window definition looped
 	  forever if def is not present. The double linked list is a
 	  circular list.
@@ -8386,7 +8390,7 @@ updated3-Jun-2002
 	- Norman renamed nettut target to netut to avoid circular makefile
 	  dependency on unix/linux.
 	- Christian Bayle modified arch.sh to add support for s390.
-	- Christian did some changes to the debian files.
+	- Christian did some changes to the Debian files.
 	- Norman Kramer indented the netut, joylins, ensocket, freefnt2, and
 	  odivx4 helplines in the makefile.
 10-Apr-2002
@@ -8757,7 +8761,7 @@ updated3-Jun-2002
 	  think the mmapio functions shouldn't go to that header at all.
 	- 'res' fixed alpha transparency (full transparent in OpenGL was
 	  fully opaque in software and vice versa).
-	- Christian Bayle added more dependencies to the debian scripts.
+	- Christian Bayle added more dependencies to the Debian scripts.
 	  Several other smaller changes.
 	- Mathew Sutcliffe modified the comments for binder.h. Added a main
 	  comment so it will show in the online docs.
