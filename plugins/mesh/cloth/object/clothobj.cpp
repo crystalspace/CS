@@ -364,18 +364,23 @@ StuffFactory::~StuffFactory()
 	if (factory_colors)    { delete [] factory_colors;   };
 	if (factory_triangles) { delete [] factory_triangles; };
 	
-};
+}
 
-bool StuffFactory::Initialize(iObjectRegistry* iO_R) { object_reg=iO_R; return true; };
+bool StuffFactory::Initialize(iObjectRegistry* iO_R)
+{
+  object_reg=iO_R;
+  return true;
+}
 
-csPtr<iMeshObject> StuffFactory::NewInstance() {
-
-csStuffObject *obj = new csStuffObject((iMeshObjectFactory*) this);
-bool initOk = obj->Initialize(object_reg);
-if (!initOk) { delete(obj);  return NULL;  };
-csRef<iMeshObject> itface (SCF_QUERY_INTERFACE ( obj, iMeshObject ));
-return csPtr<iMeshObject> (itface);	// DecRef is ok here.
-};
+csPtr<iMeshObject> StuffFactory::NewInstance()
+{
+  csStuffObject *obj = new csStuffObject((iMeshObjectFactory*) this);
+  bool initOk = obj->Initialize(object_reg);
+  if (!initOk) { delete(obj);  return NULL;  };
+  csRef<iMeshObject> itface (SCF_QUERY_INTERFACE ( obj, iMeshObject ));
+  obj->DecRef ();
+  return csPtr<iMeshObject> (itface);
+}
 
  void StuffFactory::HardTransform (const csReversibleTransform &) { };
  bool StuffFactory::SupportsHardTransform() const { return false; };
@@ -417,6 +422,7 @@ csPtr<iMeshObjectFactory> StuffMeshObjectType::NewFactory ()
   cm->Initialize(object_reg);
   csRef<iMeshObjectFactory> ifact (
   	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
-  return csPtr<iMeshObjectFactory> (ifact);	// DecRef is ok here.
+  cm->DecRef ();
+  return csPtr<iMeshObjectFactory> (ifact);
 }
 

@@ -121,7 +121,6 @@ WalkTest::WalkTest () :
   cslogo = NULL;
   anim_sky = NULL;
   anim_dirlight = NULL;
-  anim_dynlight = NULL;
 
   wf = NULL;
   map_mode = MAP_OFF;
@@ -440,12 +439,6 @@ void WalkTest::MoveSystems (csTicks elapsed_time, csTicks current_time)
     csYRotMatrix3 mat (.05 * TWO_PI * (float)elapsed_time/1000.);
     pos = mat * pos;
     state->SetDirLight (pos, col);
-  }
-  // Animate the psuedo-dynamic light if any.
-  if (anim_dynlight)
-  {
-    float t = fmod (float (current_time), float(2000.)) / 2000.;
-    anim_dynlight->SetColor (csColor (t, 0, 1-t));
   }
 
   // Update all busy entities.

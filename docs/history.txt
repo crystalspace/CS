@@ -13,6 +13,21 @@ The history order is reversed so that new features are at the top.
 	- Implemented 'onclick' trigger condition in the engine
 	  sequence manager so you can now listen to clicks on meshes.
 	  Untested...
+	- Onclick seems to work mostly but HitBeam() is not accurate
+	  enough. More work later...
+	- Replaced most 'entity_...' stuff in flarge with new sequencer
+	  operations.
+	- Removed support for most entity related stuff in walktest.
+	  A few still remain.
+	- Fixed several memory leaks with functions returning
+	  a csPtr casted from csRef and which still assumed that a
+	  DecRef() would happen (which it doesn't know because there
+	  is a constructor for csPtr from csRef which does an IncRef).
+	- Added the ability to start a trigger disabled in the trigger
+	  loader.
+	- Started working on cleaning up the sector HitBeam() routines
+	  and also making them more accurate. Unfinished so still unused
+	  at this moment.
 25-Sep-2002
 	- Sequence manager (the old one) can now cope with null trueSequence
 	  and falseSequence in the condition.

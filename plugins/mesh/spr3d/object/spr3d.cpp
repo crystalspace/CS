@@ -334,8 +334,7 @@ csPtr<iMeshObject> csSprite3DMeshObjectFactory::NewInstance ()
     ComputeBoundingBox ();
   }
 
-  csSprite3DMeshObject* spr;
-  spr = new csSprite3DMeshObject ();
+  csSprite3DMeshObject* spr = new csSprite3DMeshObject ();
   spr->SetFactory (this);
   spr->EnableTweening (do_tweening);
 
@@ -344,7 +343,8 @@ csPtr<iMeshObject> csSprite3DMeshObjectFactory::NewInstance ()
   spr->SetAction ("default");
   spr->InitSprite ();
   csRef<iMeshObject> im (SCF_QUERY_INTERFACE (spr, iMeshObject));
-  return csPtr<iMeshObject> (im);	// DecRef is ok here.
+  spr->DecRef ();
+  return csPtr<iMeshObject> (im);
 }
 
 void csSprite3DMeshObjectFactory::GenerateLOD ()
@@ -2106,7 +2106,8 @@ csPtr<iMeshObjectFactory> csSprite3DMeshObjectType::NewFactory ()
   cm->object_reg = object_reg;
   csRef<iMeshObjectFactory> ifact (
   	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
-  return csPtr<iMeshObjectFactory> (ifact);	// DecRef is ok here.
+  cm->DecRef ();
+  return csPtr<iMeshObjectFactory> (ifact);
 }
 
 #define NUM_OPTIONS 2

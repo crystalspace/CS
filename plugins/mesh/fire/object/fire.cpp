@@ -315,6 +315,7 @@ csPtr<iMeshObjectFactory> csFireMeshObjectType::NewFactory ()
   csFireMeshObjectFactory* cm = new csFireMeshObjectFactory (this, object_reg);
   csRef<iMeshObjectFactory> ifact (
   	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
-  return csPtr<iMeshObjectFactory> (ifact);	// DecRef is ok here.
+  cm->DecRef ();
+  return csPtr<iMeshObjectFactory> (ifact);
 }
 

@@ -4974,7 +4974,6 @@
                 </matrix>
                 <v x="15" y="3" z="8" />
             </move>
-            <key name="entity_Rotate" value="20,30,17,true" />
         </meshobj>
         <meshobj name="s_large2">
             <plugin>thing</plugin>
@@ -5769,13 +5768,11 @@
         <meshref name="cubeHierarchy">
             <factory>simpleCubeHierarchy</factory>
             <priority>object</priority>
-            <key name="entity_Rotate" value="0,100,0,true" />
             <move>
                 <v x="-1" y="0.3" z="11" />
             </move>
         </meshref>
         <meshobj name="cubard">
-            <key name="entity_Rotate" value="0,50,0,true" />
             <plugin>mesh</plugin>
             <params>
                 <factory>robotBody</factory>
@@ -5795,7 +5792,6 @@
                     </matrix>
                 </move>
                 <meshobj name="ball1">
-                    <key name="entity_Rotate" value="0,47,0,true" />
                     <plugin>crystalspace.mesh.loader.ball</plugin>
                     <params>
                         <factory>ballFact</factory>
@@ -5809,7 +5805,6 @@
                     </move>
                 </meshobj>
                 <meshobj name="ball2">
-                    <key name="entity_Rotate" value="0,0,76,true" />
                     <plugin>crystalspace.mesh.loader.ball</plugin>
                     <params>
                         <factory>ballFact</factory>
@@ -5823,7 +5818,6 @@
                     </move>
                 </meshobj>
                 <meshobj name="ball3">
-                    <key name="entity_Rotate" value="23,0,0,true" />
                     <plugin>crystalspace.mesh.loader.ball</plugin>
                     <params>
                         <factory>ballFact</factory>
@@ -5838,7 +5832,6 @@
                 </meshobj>
             </meshobj>
             <meshobj name="robotArmRight">
-                <key name="entity_Rotate" value="0,0,100,true" />
                 <plugin>mesh</plugin>
                 <params>
                     <factory>robotArm</factory>
@@ -5912,7 +5905,6 @@
                 </meshobj>
             </meshobj>
             <meshobj name="robotArmLeft">
-                <key name="entity_Rotate" value="0,0,10,true" />
                 <plugin>mesh</plugin>
                 <params>
                     <factory>robotArm</factory>
@@ -6816,7 +6808,6 @@
                 </matrix>
                 <v x="-16" y="-1" z="36" />
             </move>
-            <key name="entity_Rotate" value="90,0,0,yes" />
         </meshobj>
         <meshobj name="cube3">
             <plugin>thing</plugin>
@@ -6836,7 +6827,6 @@
                 <factory>cube</factory>
                 <moveable />
             </params>
-            <key name="entity_Rotate" value="90,0,0,yes" />
             <move>
                 <matrix>
                     <rotz>45</rotz>
@@ -6862,7 +6852,6 @@
                 <factory>cube</factory>
                 <moveable />
             </params>
-            <key name="entity_Rotate" value="0,0,180,yes" />
             <move>
                 <matrix>
                     <roty>10</roty>
@@ -6922,7 +6911,6 @@
             <move>
                 <v x="-16" y="1" z="30" />
             </move>
-            <key name="entity_Rotate" value="0,0,180,yes" />
         </meshobj>
         <meshobj name="band1">
             <plugin>thing</plugin>
@@ -6936,7 +6924,6 @@
                 </matrix>
                 <v x="-16" y="-2.6" z="25" />
             </move>
-            <key name="entity_Rotate" value="0,270,0,yes" />
         </meshobj>
         <meshobj name="band2">
             <plugin>thing</plugin>
@@ -6950,7 +6937,6 @@
                 </matrix>
                 <v x="-16" y="-1.85" z="25" />
             </move>
-            <key name="entity_Rotate" value="0,270,0,yes" />
         </meshobj>
         <light>
             <center x="-15" y="0" z="30" />
@@ -22945,30 +22931,139 @@
 	</sequence>
 
 	<sequence name="animhugelight">
-	    <fadelight light="hugeroom_light1" red="0" green="0" blue=".2" duration="3000" />
-	    <fadelight light="hugeroom_light2" red="0" green=".1" blue="0" duration="3000" />
+	    <fadelight light="hugeroom_light1" red="0" green="0" blue=".2"
+	    	duration="3000" />
+	    <fadelight light="hugeroom_light2" red="0" green=".1" blue="0"
+	    	duration="3000" />
 	    <delay>3000</delay>
-	    <fadelight light="hugeroom_light1" red="0" green=".3" blue=".8" duration="3000" />
-	    <fadelight light="hugeroom_light2" red="0" green=".2" blue=".3" duration="3000" />
+	    <fadelight light="hugeroom_light1" red="0" green=".3" blue=".8"
+	        duration="3000" />
+	    <fadelight light="hugeroom_light2" red="0" green=".2" blue=".3"
+	        duration="3000" />
 	    <delay>3000</delay>
-	    <fadelight light="hugeroom_light1" red="0" green=".2" blue=".3" duration="3000" />
-	    <fadelight light="hugeroom_light2" red="0" green="0" blue=".8" duration="3000" />
+	    <fadelight light="hugeroom_light1" red="0" green=".2" blue=".3"
+	        duration="3000" />
+	    <fadelight light="hugeroom_light2" red="0" green="0" blue=".8"
+	        duration="3000" />
 	    <delay>3000</delay>
-	    <fadelight light="hugeroom_light1" red="0" green=".4" blue=".7" duration="3000" />
-	    <fadelight light="hugeroom_light2" red="0" green=".4" blue=".3" duration="3000" />
+	    <fadelight light="hugeroom_light1" red="0" green=".4" blue=".7"
+	        duration="3000" />
+	    <fadelight light="hugeroom_light2" red="0" green=".4" blue=".3"
+	        duration="3000" />
 	    <delay>3000</delay>
-	    <fadelight light="hugeroom_light1" red="0" green=".1" blue=".5" duration="3000" />
-	    <fadelight light="hugeroom_light2" red="0" green=".2" blue=".6" duration="3000" />
+	    <fadelight light="hugeroom_light1" red="0" green=".1" blue=".5"
+	        duration="3000" />
+	    <fadelight light="hugeroom_light2" red="0" green=".2" blue=".6"
+	        duration="3000" />
 	    <delay>3000</delay>
 	    <enable trigger="animhugelight" />
 	</sequence>
 
-	<sequence name="rotball">
+	<sequence name="rot_shapes">
+	    <rotate mesh="cube2" duration="400">
+	        <rotx>1.5</rotx>
+                <v x="-16" y="-1" z="36" />
+	    </rotate>
+	    <rotate mesh="cube4" duration="1000">
+	        <roty>.5</roty>
+                <v x="-12" y="-1" z="36" />
+	    </rotate>
+	    <rotate mesh="cube6" duration="1000">
+	        <rotx>1.5</rotx>
+                <v x="-16" y="1" z="36" />
+	    </rotate>
+	    <rotate mesh="circle1" duration="1000">
+	        <rotz>2</rotz>
+                <v x="-16" y="1" z="30" />
+	    </rotate>
+	    <rotate mesh="band1" duration="1000">
+	        <roty>3</roty>
+                <v x="-16" y="-2.6" z="25" />
+	    </rotate>
+	    <rotate mesh="band2" duration="1000">
+	        <roty>3</roty>
+                <v x="-16" y="-1.85" z="25" />
+	    </rotate>
+	    <delay>400</delay>
+	    <rotate mesh="cube2" duration="300">
+	        <roty>.5</roty>
+                <v x="-16" y="-1" z="36" />
+	    </rotate>
+	    <delay>300</delay>
+	    <rotate mesh="cube2" duration="300">
+	        <rotz>.5</rotz>
+                <v x="-16" y="-1" z="36" />
+	    </rotate>
+	    <delay>300</delay>
+	    <enable trigger="rot_shapes" />
+	</sequence>
+
+	<sequence name="rot_cubard">
+	    <rotate mesh="cubard" duration="1000">
+	        <roty>2</roty>
+                <v x="4" y="0.3" z="12" />
+	    </rotate>
+	    <rotate mesh="cubard:robotHead:ball1" duration="1000">
+	        <roty>1.5</roty>
+                <v x="0" y="0.5" z="0" />
+	    </rotate>
+	    <rotate mesh="cubard:robotHead:ball2" duration="1000">
+	        <rotz>2.2</rotz>
+                <v x="0" y="0.5" z="0" />
+	    </rotate>
+	    <rotate mesh="cubard:robotHead:ball3" duration="1000">
+	        <rotx>1</rotx>
+                <v x="0" y="0.5" z="0" />
+	    </rotate>
+
+	    <rotate mesh="cubard:robotArmRight" duration="500">
+	        <rotz>-1.8</rotz>
+                <v x="0" y="0.23" z="-0.15" />
+	    </rotate>
+	    <rotate mesh="cubard:robotArmLeft" duration="500">
+	        <rotz>-.4</rotz>
+                <v x="0" y="0.23" z="0.15" />
+	    </rotate>
+	    <delay>500</delay>
+	    <rotate mesh="cubard:robotArmRight" duration="500">
+	        <rotz>1.8</rotz>
+                <v x="0" y="0.23" z="-0.15" />
+	    </rotate>
+	    <rotate mesh="cubard:robotArmLeft" duration="500">
+	        <rotz>.4</rotz>
+                <v x="0" y="0.23" z="0.15" />
+	    </rotate>
+	    <delay>500</delay>
+	    <enable trigger="rot_cubard" />
+	</sequence>
+
+	<sequence name="rot_transpBall">
 	    <rotate mesh="transpBall" duration="1000">
 	        <roty>3</roty>
+                <v x="15" y="4" z="14" />
 	    </rotate>
 	    <delay>1000</delay>
-	    <enable trigger="rotball" />
+	    <enable trigger="rot_transpBall" />
+	</sequence>
+
+	<sequence name="rot_s_large1">
+	    <rotate mesh="s_large1" duration="1000">
+	        <rotx>.4</rotx>
+	        <roty>.6</roty>
+	        <rotz>.34</rotz>
+                <v x="15" y="3" z="8" />
+	    </rotate>
+	    <delay>1000</delay>
+	    <enable trigger="rot_s_large1" />
+	</sequence>
+
+	<sequence name="rot_cubeHierarchy">
+	    <rotate mesh="cubeHierarchy" duration="1000">
+	        <roty>9</roty>
+                <v x="-1" y="0.3" z="11" />
+	    </rotate>
+	    <delay>1000</delay>
+	    <enable trigger="rot_cubeHierarchy" />
 	</sequence>
 
 	<sequence name="dobox">
@@ -23060,6 +23155,23 @@
 	    <run sequence="openbox" />
 	</sequence>
 
+	<sequence name="handle1">
+	    <rotate mesh="handle1" duration="500">
+	        <rotx>.4</rotx>
+                <v x="-14.7" y="0.8" z="8.8" />
+	    </rotate>
+	    <delay>500</delay>
+	    <enable trigger="handle1off" />
+	</sequence>
+	<sequence name="handle1off">
+	    <rotate mesh="handle1" duration="500">
+	        <rotx>-.4</rotx>
+                <v x="-14.7" y="0.8" z="8.8" />
+	    </rotate>
+	    <delay>500</delay>
+	    <enable trigger="handle1" />
+	</sequence>
+
 	<!--
 	 *** This sequence is fired when the camera is near the door.
 	 *** It will start the operation of moving the door. First
@@ -23127,21 +23239,52 @@
 
         <trigger name="animlight">
 	    <sectorvis sector="large" />
-	    <fire delay="0" sequence="animlight" />
+	    <fire sequence="animlight" />
 	</trigger>
 	
-	<trigger name="rotball">
-	    <fire delay="0" sequence="rotball" />
+	<trigger name="rot_shapes">
+	    <sectorvis sector="shapes" />
+	    <fire sequence="rot_shapes" />
+	</trigger>
+
+	<trigger name="rot_cubard">
+	    <sectorvis sector="large" />
+	    <fire sequence="rot_cubard" />
+	</trigger>
+
+	<trigger name="rot_transpBall">
+	    <sectorvis sector="large" />
+	    <fire sequence="rot_transpBall" />
+	</trigger>
+
+	<trigger name="rot_s_large1">
+	    <sectorvis sector="large" />
+	    <fire sequence="rot_s_large1" />
+	</trigger>
+
+	<trigger name="rot_cubeHierarchy">
+	    <sectorvis sector="large" />
+	    <fire sequence="rot_cubeHierarchy" />
 	</trigger>
 
 	<trigger name="animhugelight">
 	    <sectorvis sector="kamer2lhuge" />
-	    <fire delay="0" sequence="animhugelight" />
+	    <fire sequence="animhugelight" />
 	</trigger>
 
 	<trigger name="openbox">
 	    <sectorvis sector="kamer2lhuge" />
 	    <fire delay="1000" sequence="dobox" />
+	</trigger>
+
+	<trigger name="handle1">
+	    <onclick mesh="handle1" />
+	    <fire sequence="handle1" />
+	</trigger>
+	<trigger name="handle1off">
+	    <onclick mesh="handle1" />
+	    <fire sequence="handle1off" />
+	    <disable />
 	</trigger>
 
 	<!--

@@ -295,6 +295,21 @@ csPolygon3D *csSector::HitBeam (
     return NULL;
 }
 
+#if 0
+csMeshWrapper *csSector::HitBeam (
+  const csVector3 &start,
+  const csVector3 &end,
+  csVector3 &isect,
+  csPolygon3D **polygonPtr)
+{
+  GetVisibilityCuller ();
+  float r;
+  iMeshWrapper* mesh;
+  iPolygon3D* poly = culler->IntersectSegment (start, end, isect, &r, &mesh);
+  if (polygonPtr) *polygonPtr = poly ? poly->GetPrivateObject () : NULL;
+  return mesh ? mesh->GetPrivateObject () : NULL;
+}
+#else
 csMeshWrapper *csSector::HitBeam (
   const csVector3 &start,
   const csVector3 &end,
@@ -358,6 +373,7 @@ csMeshWrapper *csSector::HitBeam (
   isect = tsect;
   return near_mesh ? near_mesh->GetPrivateObject () : NULL;
 }
+#endif
 
 csPolygon3D *csSector::IntersectSegment (
   const csVector3 &start,

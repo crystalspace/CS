@@ -166,13 +166,18 @@ iSequenceTrigger* csLoader::LoadTrigger (iDocumentNode* node)
 	  trigger->FireSequence (delay, sequence);
 	}
         break;
+      case XMLTOKEN_DISABLE:
+        {
+	  trigger->SetEnabled (false);
+	}
+	break;
       default:
         SyntaxService->ReportBadToken (child);
 	return NULL;
     }
   }
 
-  return trigger;	// DecRef() is ok here.
+  return trigger;
 }
 
 bool csLoader::LoadTriggers (iDocumentNode* node)
@@ -513,7 +518,7 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
     }
   }
 
-  return sequence;	// DecRef() is ok here.
+  return sequence;
 }
 
 bool csLoader::LoadSequences (iDocumentNode* node)

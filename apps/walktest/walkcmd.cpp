@@ -890,39 +890,6 @@ void WalkTest::ParseKeyCmds (iObject* src)
       if (wrap)
         anim_dirlight = wrap;	// @@@ anim_dirlight should be csRef
     }
-    else if (!strcmp (kp->GetKey (), "cmd_AnimateDynLight"))
-    {
-      csRef<iLight> l (SCF_QUERY_INTERFACE (src, iLight));
-      if (l)
-        anim_dynlight = l;	// @@@ anim_dynlight should be csRef
-    }
-    else if (!strcmp (kp->GetKey (), "entity_Door"))
-    {
-      csRef<iMeshWrapper> wrap (SCF_QUERY_INTERFACE (src, iMeshWrapper));
-      if (wrap)
-      {
-        csVector3 hinge;
-        csScanStr (kp->GetValue (), "%f,%f,%f", &hinge.x, &hinge.y, &hinge.z);
-	csDoor* door = new csDoor (wrap);
-	door->SetHinge (hinge);
-        src->ObjAdd (door);
-	door->DecRef ();
-      }
-    }
-    else if (!strcmp (kp->GetKey (), "entity_Rotate"))
-    {
-      csVector3 angle;
-      bool always;
-      csScanStr (kp->GetValue (), "%f,%f,%f,%b", &angle.x, &angle.y, &angle.z,
-		&always);
-      csRotatingObject* rotobj = new csRotatingObject (src);
-      rotobj->SetAngles (angle);
-      rotobj->SetAlways (always);
-      src->ObjAdd (rotobj);
-      if (always)
-	Sys->busy_entities.Push (rotobj);
-      rotobj->DecRef ();
-    }
     else if (!strcmp (kp->GetKey (), "entity_WavePortal"))
     {
       csRef<iMeshWrapper> wrap (SCF_QUERY_INTERFACE (src, iMeshWrapper));
@@ -966,46 +933,6 @@ void WalkTest::ParseKeyCmds (iObject* src)
 	{
 	  Sys->Report (CS_REPORTER_SEVERITY_WARNING,
 	  	"This mesh object is not a thing!");
-	}
-      }
-    }
-    else if (!strcmp (kp->GetKey (), "entity_Light"))
-    {
-      csRef<iMeshWrapper> wrap (SCF_QUERY_INTERFACE (src, iMeshWrapper));
-      if (wrap)
-      {
-	csColor start_col, end_col;
-	float act_time;
-	char sector_name[100];
-	char light_name[100];
-        csScanStr (kp->GetValue (), "%s,%s,%f,%f,%f,%f,%f,%f,%f",
-	  sector_name, light_name,
-	  &start_col.red, &start_col.green, &start_col.blue,
-	  &end_col.red, &end_col.green, &end_col.blue, &act_time);
-	iSector* sect = Engine->GetSectors ()->FindByName (sector_name);
-	if (!sect)
-	{
-	  Sys->Report (CS_REPORTER_SEVERITY_WARNING,
-	  	"Sector '%s' not found! 'entity_Light' is ignored!",
-	  	sector_name);
-	}
-	else
-	{
-	  iLight* l = sect->GetLights ()->FindByName (light_name);
-	  if (!l)
-	  {
-	    Sys->Report (CS_REPORTER_SEVERITY_WARNING,
-	    	"Light '%s' not found! 'entity_Light' is ignored!",
-	  	light_name);
-	  }
-	  else
-	  {
-	    csLightObject* lobj = new csLightObject (l);
-	    lobj->SetColors (start_col, end_col);
-	    lobj->SetTotalTime (act_time);
-            src->ObjAdd (lobj);
-	    lobj->DecRef ();
-	  }
 	}
       }
     }

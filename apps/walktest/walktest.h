@@ -304,8 +304,6 @@ public:
 
   /// A pointer to the terrain for which we animate the dirlight.
   iMeshWrapper* anim_dirlight;
-  /// A pointer to a pseudo-dynamic light that we're animating.
-  iLight* anim_dynlight;
 
   /// A sprite to display the Crystal Space Logo
   csPixmap* cslogo;

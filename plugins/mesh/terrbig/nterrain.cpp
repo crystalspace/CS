@@ -793,6 +793,7 @@ csPtr<iMeshObjectFactory> csBigTerrainObjectType::NewFactory ()
   	object_reg);
   csRef<iMeshObjectFactory> ifact (
   	SCF_QUERY_INTERFACE (btf, iMeshObjectFactory));
-  return csPtr<iMeshObjectFactory> (ifact);	// DecRef is ok here.
+  btf->DecRef ();
+  return csPtr<iMeshObjectFactory> (ifact);
 }
 

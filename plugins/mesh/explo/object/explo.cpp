@@ -186,7 +186,8 @@ csPtr<iMeshObject> csExploMeshObjectFactory::NewInstance ()
   csExploMeshObject* cm =
     new csExploMeshObject (object_reg, (iMeshObjectFactory*)this);
   csRef<iMeshObject> im (SCF_QUERY_INTERFACE (cm, iMeshObject));
-  return csPtr<iMeshObject> (im);	// DecRef is ok here.
+  cm->DecRef ();
+  return csPtr<iMeshObject> (im);
 }
 
 //----------------------------------------------------------------------
@@ -224,6 +225,7 @@ csPtr<iMeshObjectFactory> csExploMeshObjectType::NewFactory ()
   	object_reg);
   csRef<iMeshObjectFactory> ifact (
   	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
-  return csPtr<iMeshObjectFactory> (ifact);	// DecRef is ok here.
+  cm->DecRef ();
+  return csPtr<iMeshObjectFactory> (ifact);
 }
 

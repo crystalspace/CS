@@ -320,7 +320,7 @@ public:
 
     virtual iSkeletonBone* GetNext ()
     {
-      csSkelLimbState* ls=scfParent->GetNext();
+      csSkelLimbState* ls = scfParent->GetNext();
       if (!ls) return NULL;
       csRef<iSkeletonBone> ibone (SCF_QUERY_INTERFACE(ls, iSkeletonBone));
       return ibone;	// DecRef is ok here.

@@ -135,9 +135,11 @@ void csNullmeshMeshObject::GetRadius (csVector3& rad, csVector3& cent)
 
 csPtr<iMeshObject> csNullmeshMeshObject::MeshObjectFactory::NewInstance ()
 {
-  csNullmeshMeshObject* cm = new csNullmeshMeshObject ((iMeshObjectFactory*)this);
+  csNullmeshMeshObject* cm = new csNullmeshMeshObject (
+  	(iMeshObjectFactory*)this);
   csRef<iMeshObject> im (SCF_QUERY_INTERFACE (cm, iMeshObject));
-  return csPtr<iMeshObject> (im);	// DecRef is ok here.
+  cm->DecRef ();
+  return csPtr<iMeshObject> (im);
 }
 
 //----------------------------------------------------------------------
@@ -173,6 +175,7 @@ csPtr<iMeshObjectFactory> csNullmeshMeshObjectType::NewFactory ()
   csNullmeshMeshObject* cm = new csNullmeshMeshObject (NULL);
   csRef<iMeshObjectFactory> ifact (
   	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
-  return csPtr<iMeshObjectFactory> (ifact);	// DecRef is ok here.
+  cm->DecRef ();
+  return csPtr<iMeshObjectFactory> (ifact);
 }
 

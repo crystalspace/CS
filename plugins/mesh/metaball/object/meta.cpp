@@ -557,7 +557,8 @@ csPtr<iMeshObject> csMetaBallFactory::NewInstance()
   csMetaBall* cm = new csMetaBall((iMeshObjectFactory *) this);
   cm->Initialize(object_reg);
   csRef<iMeshObject> im (SCF_QUERY_INTERFACE (cm, iMeshObject));
-  return csPtr<iMeshObject> (im);	// DecRef is ok here.
+  cm->DecRef ();
+  return csPtr<iMeshObject> (im);
 }
 
 SCF_IMPLEMENT_IBASE (csMetaBallType)
@@ -591,6 +592,7 @@ csPtr<iMeshObjectFactory> csMetaBallType::NewFactory()
   csMetaBallFactory* cm = new csMetaBallFactory(this, object_reg);
   csRef<iMeshObjectFactory> ifact (
   	SCF_QUERY_INTERFACE(cm, iMeshObjectFactory));
-  return csPtr<iMeshObjectFactory> (ifact);	// DecRef is ok here.
+  cm->DecRef ();
+  return csPtr<iMeshObjectFactory> (ifact);
 }
 
