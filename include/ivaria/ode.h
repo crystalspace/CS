@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2003 by Jorrit Tyberghein, Daniel Duhprey
+    Copyright (C) 2003 by Jorrit Tyberghein, Daniel Duhprey,
+    Leandro Motta Barros
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -18,6 +19,16 @@
 
 #ifndef __CS_IVARIA_ODE_H__
 #define __CS_IVARIA_ODE_H__
+
+#define int8 ode_int8
+#define uint8 ode_uint8
+#define int32 ode_int32
+#define uint32 ode_uint32
+#include <ode/ode.h>
+#undef ode_uint32
+#undef ode_int32
+#undef ode_uint8
+#undef ode_int8
 
 SCF_VERSION (iODEFrameUpdateCallback, 0, 0, 1);
 
@@ -180,5 +191,109 @@ struct iODEDynamicSystemState : public iBase
   virtual bool FastObjectsEnabled () = 0;
 
 };
+
+SCF_VERSION (iODEJointState, 0, 0, 1);
+
+/**
+ * TODO: Doc...
+ */
+
+enum ODEJointType
+{
+  CS_ODE_JOINT_TYPE_BALL = dJointTypeBall,
+  CS_ODE_JOINT_TYPE_HINGE = dJointTypeHinge,
+  CS_ODE_JOINT_TYPE_SLIDER = dJointTypeSlider,
+  CS_ODE_JOINT_TYPE_CONTACT = dJointTypeContact,
+  CS_ODE_JOINT_TYPE_UNIVERSAL = dJointTypeUniversal,
+  CS_ODE_JOINT_TYPE_HINGE2 = dJointTypeHinge2,
+  CS_ODE_JOINT_TYPE_FIXED = dJointTypeFixed,
+  CS_ODE_JOINT_TYPE_AMOTOR = dJointTypeAMotor
+};
+
+
+struct iODEJointState : public iBase
+{
+  virtual ODEJointType GetType() = 0;
+
+  // Baaad interface. Are those number axes? If so, perhaps pass it as
+  // parameter.
+  virtual void SetLoStop (float value) = 0;
+  virtual void SetHiStop (float value) = 0;
+  virtual void SetVel (float value) = 0;
+  virtual void SetFMax (float value) = 0;
+  virtual void SetFudgeFactor (float value) = 0;
+  virtual void SetBounce (float value) = 0;
+  virtual void SetCFM (float value) = 0;
+  virtual void SetStopERP (float value) = 0;
+  virtual void SetStopCFM (float value) = 0;
+  virtual void SetSuspensionERP (float value) = 0;
+  virtual void SetSuspensionCFM (float value) = 0;
+
+  virtual void SetLoStop2 (float value) = 0;
+  virtual void SetHiStop2 (float value) = 0;
+  virtual void SetVel2 (float value) = 0;
+  virtual void SetFMax2 (float value) = 0;
+  virtual void SetFudgeFactor2 (float value) = 0;
+  virtual void SetBounce2 (float value) = 0;
+  virtual void SetCFM2 (float value) = 0;
+  virtual void SetStopERP2 (float value) = 0;
+  virtual void SetStopCFM2 (float value) = 0;
+  virtual void SetSuspensionERP2 (float value) = 0;
+  virtual void SetSuspensionCFM2 (float value) = 0;
+
+  virtual void SetLoStop3 (float value) = 0;
+  virtual void SetHiStop3 (float value) = 0;
+  virtual void SetVel3 (float value) = 0;
+  virtual void SetFMax3 (float value) = 0;
+  virtual void SetFudgeFactor3 (float value) = 0;
+  virtual void SetBounce3 (float value) = 0;
+  virtual void SetCFM3 (float value) = 0;
+  virtual void SetStopERP3 (float value) = 0;
+  virtual void SetStopCFM3 (float value) = 0;
+  virtual void SetSuspensionERP3 (float value) = 0;
+  virtual void SetSuspensionCFM3 (float value) = 0;
+
+  virtual float GetLoStop (float value) = 0;
+  virtual float GetHiStop (float value) = 0;
+  virtual float GetVel (float value) = 0;
+  virtual float GetFMax (float value) = 0;
+  virtual float GetFudgeFactor (float value) = 0;
+  virtual float GetBounce (float value) = 0;
+  virtual float GetCFM (float value) = 0;
+  virtual float GetStopERP (float value) = 0;
+  virtual float GetStopCFM (float value) = 0;
+  virtual float GetSuspensionERP (float value) = 0;
+  virtual float GetSuspensionCFM (float value) = 0;
+
+  virtual float GetLoStop2 (float value) = 0;
+  virtual float GetHiStop2 (float value) = 0;
+  virtual float GetVel2 (float value) = 0;
+  virtual float GetFMax2 (float value) = 0;
+  virtual float GetFudgeFactor2 (float value) = 0;
+  virtual float GetBounce2 (float value) = 0;
+  virtual float GetCFM2 (float value) = 0;
+  virtual float GetStopERP2 (float value) = 0;
+  virtual float GetStopCFM2 (float value) = 0;
+  virtual float GetSuspensionERP2 (float value) = 0;
+  virtual float GetSuspensionCFM2 (float value) = 0;
+
+  virtual float GetLoStop3 (float value) = 0;
+  virtual float GetHiStop3 (float value) = 0;
+  virtual float GetVel3 (float value) = 0;
+  virtual float GetFMax3 (float value) = 0;
+  virtual float GetFudgeFactor3 (float value) = 0;
+  virtual float GetBounce3 (float value) = 0;
+  virtual float GetCFM3 (float value) = 0;
+  virtual float GetStopERP3 (float value) = 0;
+  virtual float GetStopCFM3 (float value) = 0;
+  virtual float GetSuspensionERP3 (float value) = 0;
+  virtual float GetSuspensionCFM3 (float value) = 0;
+
+  // This is a very ugly hack quite specific to NmS
+  virtual void SetHinge2Axis1 (const csVector3& axis) = 0;
+  virtual void SetHinge2Axis2 (const csVector3& axis) = 0;
+  virtual void SetHinge2Anchor (const csVector3& point) = 0;
+};
+
 
 #endif // __CS_IVARIA_ODE_H__

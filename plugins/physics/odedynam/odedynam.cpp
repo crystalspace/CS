@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2002 Anders Stenberg
+    Copyright (C) 2003 Leandro Motta Barros
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -74,7 +75,13 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csODEJoint)
   SCF_IMPLEMENTS_INTERFACE (iJoint)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iODEJointState)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csODEJoint::ODEJointState)
+  SCF_IMPLEMENTS_INTERFACE (iODEJointState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 
 SCF_IMPLEMENT_IBASE (csODEDefaultMoveCallback)
   SCF_IMPLEMENTS_INTERFACE (iDynamicsMoveCallback)
@@ -421,7 +428,7 @@ int csODEDynamics::CollideMeshBox (dGeomID mesh, dGeomID box, int flags,
         csPlane3 edgeplane(v1, v2, v2 - plane.Normal());
         //edgeplane.Normalize();
         if (edgeplane.Classify (contactpos) < 0)
-	{
+        {
           c->depth = -1;
           break;
         }
@@ -547,7 +554,7 @@ int csODEDynamics::CollideMeshCylinder (dGeomID mesh, dGeomID cyl, int flags,
         csPlane3 edgeplane(v1, v2, v2 - plane.Normal());
         //edgeplane.Normalize();
         if (edgeplane.Classify (contactpos) < 0)
-	{
+        {
           c->depth = -1;
           break;
         }
@@ -641,18 +648,18 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
          * for depth to this edge (especially important on sharp corners)
          */
         if ((proj >= (v1 * line)) && (proj <= (v2 * line)))
-	{
-	  float t = ((v1 - center) * (v2 - center)) / linelen;
+        {
+          float t = ((v1 - center) * (v2 - center)) / linelen;
           csVector3 projpt = v1 + (line * t);
           csVector3 newnorm = center - projpt;
           float dist = newnorm.Norm();
           depth = rad - dist;
           newnorm /= dist;
           plane.Set (newnorm.x, newnorm.y, newnorm.z, 0);
-	  break;
+          break;
         }
-	else
-	{
+        else
+        {
           /* this is an invalid the ball is outside the poly at this edge */
           depth = -1;
         }
@@ -846,9 +853,9 @@ void csODEDynamics::SetGlobalERP (float erp)
 
   for (int i = 0; i < systems.Length(); i ++) 
   {
-	csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-	  iODEDynamicSystemState);
-  	sys->SetERP (erp);
+    csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
+	   iODEDynamicSystemState);
+  	 sys->SetERP (erp);
   }
 }
 
@@ -857,9 +864,9 @@ void csODEDynamics::SetGlobalCFM (float cfm)
   csODEDynamics::cfm = cfm;
   for (int i = 0; i < systems.Length(); i ++) 
   {
-	csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-	  iODEDynamicSystemState);
-  	sys->SetCFM (cfm);
+    csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
+      iODEDynamicSystemState);
+    sys->SetCFM (cfm);
   }
 }
 
@@ -869,9 +876,9 @@ void csODEDynamics::EnableStepFast (bool enable)
 
   for (int i = 0; i < systems.Length(); i ++) 
   {
-	csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-	  iODEDynamicSystemState);
-  	sys->EnableStepFast (enable);
+    csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
+	   iODEDynamicSystemState);
+  	 sys->EnableStepFast (enable);
   }
 }
 
@@ -881,9 +888,9 @@ void csODEDynamics::SetStepFastIterations (int iter)
 
   for (int i = 0; i < systems.Length(); i ++) 
   {
-	csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-	  iODEDynamicSystemState);
-  	sys->SetStepFastIterations (iter);
+    csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
+      iODEDynamicSystemState);
+    sys->SetStepFastIterations (iter);
   }
 }
 
@@ -1689,6 +1696,8 @@ void csODERigidBody::Update ()
 csODEJoint::csODEJoint (csODEDynamicSystem *sys)
 {
   SCF_CONSTRUCT_IBASE (0);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiODEJointState);
+
   jointID = 0;
 
   body[0] = body[1] = 0;
@@ -1708,6 +1717,7 @@ csODEJoint::~csODEJoint ()
 {
   if (jointID)
     dJointDestroy (jointID);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiODEJointState);
   SCF_DESTRUCT_IBASE();
 }
 
@@ -1883,53 +1893,53 @@ void csODEJoint::BuildJoint ()
     {
       case 0:
         jointID = dJointCreateFixed (dynsys->GetWorldID(), 0);
-          dJointAttach (jointID, bodyID[0], bodyID[1]);
-          dJointSetFixed (jointID);
+        dJointAttach (jointID, bodyID[0], bodyID[1]);
+        dJointSetFixed (jointID);
         break;
       case 1:
         jointID = dJointCreateHinge (dynsys->GetWorldID(), 0);
-          dJointAttach (jointID, bodyID[0], bodyID[1]);
+        dJointAttach (jointID, bodyID[0], bodyID[1]);
         pos = transform.GetOrigin();
         dJointSetHingeAnchor (jointID, pos.x, pos.y, pos.z);
         rot = transform.GetO2T();
         if (rotConstraint[0])
-	{
+        {
           BuildHinge (rot.Col1(), minAngle.x, maxAngle.x);
         }
-	else if (rotConstraint[1])
-	{
+        else if (rotConstraint[1])
+        {
           BuildHinge (rot.Col2(), minAngle.y, maxAngle.y);
         }
-	else if (rotConstraint[2])
-	{
+        else if (rotConstraint[2])
+        {
           BuildHinge (rot.Col3(), minAngle.z, maxAngle.z);
         }
         // TODO: insert some mechanism for bounce, erp and cfm
         break;
       case 2:
         jointID = dJointCreateHinge2 (dynsys->GetWorldID(), 0);
-          dJointAttach (jointID, bodyID[0], bodyID[1]);
+        dJointAttach (jointID, bodyID[0], bodyID[1]);
         pos = transform.GetOrigin();
         dJointSetHinge2Anchor (jointID, pos.x, pos.y, pos.z);
         rot = transform.GetO2T();
 
         if (rotConstraint[0])
-	{
+        {
           if (rotConstraint[1])
-	  {
+          {
             BuildHinge2 (rot.Col2(), minAngle.y, maxAngle.y,
-             rot.Col1(), minAngle.x, maxAngle.x);
+              rot.Col1(), minAngle.x, maxAngle.x);
           }
-	  else
-	  {
+          else
+          {
             BuildHinge2 (rot.Col3(), minAngle.z, maxAngle.z,
-             rot.Col1(), minAngle.x, maxAngle.x);
+              rot.Col1(), minAngle.x, maxAngle.x);
           }
         }
-	else
-	{
+        else
+        {
           BuildHinge2 (rot.Col2(), minAngle.y, maxAngle.y,
-           rot.Col3(), minAngle.z, maxAngle.z);
+            rot.Col3(), minAngle.z, maxAngle.z);
         }
         break;
       case 3:
@@ -1950,15 +1960,15 @@ void csODEJoint::BuildJoint ()
           dJointAttach (jointID, bodyID[0], bodyID[1]);
         rot = transform.GetO2T();
         if (transConstraint[0])
-	{
+        {
           BuildSlider (rot.Col1(), minTrans.x, maxTrans.x);
         }
-	else if (transConstraint[1])
-	{
+        else if (transConstraint[1])
+        {
           BuildSlider (rot.Col2(), minTrans.y, maxTrans.y);
         }
-	else
-	{
+        else
+        {
           BuildSlider (rot.Col3(), minTrans.z, maxTrans.z);
         }
         break;
@@ -1971,6 +1981,68 @@ void csODEJoint::BuildJoint ()
     }
   } else {
     /* too unconstrained, don't create joint */
+  }
+}
+
+void csODEJoint::ODEJointState::SetParam (int parameter, float value)
+{
+  switch(GetType())
+  {
+    case CS_ODE_JOINT_TYPE_HINGE:
+      dJointSetHingeParam (scfParent->jointID, parameter, value);
+      break;
+    case CS_ODE_JOINT_TYPE_SLIDER:
+      dJointSetSliderParam (scfParent->jointID, parameter, value);
+      break;
+    case CS_ODE_JOINT_TYPE_HINGE2:
+      dJointSetHinge2Param (scfParent->jointID, parameter, value);
+      break;
+    case CS_ODE_JOINT_TYPE_AMOTOR:
+      dJointSetAMotorParam (scfParent->jointID, parameter, value);
+      break;
+    default:
+      ; // do nothing
+  }
+}
+
+float csODEJoint::ODEJointState::GetParam (int parameter)
+{
+  switch(GetType())
+  {
+    case CS_ODE_JOINT_TYPE_HINGE:
+      return dJointGetHingeParam (scfParent->jointID, parameter);
+    case CS_ODE_JOINT_TYPE_SLIDER:
+      return dJointGetSliderParam (scfParent->jointID, parameter);
+    case CS_ODE_JOINT_TYPE_HINGE2:
+      return dJointGetHinge2Param (scfParent->jointID, parameter);
+    case CS_ODE_JOINT_TYPE_AMOTOR:
+      return dJointGetAMotorParam (scfParent->jointID, parameter);
+    default:
+      return 0.0; // this is not a good... the error is ignored silently...
+  }
+}
+
+void csODEJoint::ODEJointState::SetHinge2Axis1 (const csVector3& axis)
+{
+  if (GetType() == CS_ODE_JOINT_TYPE_HINGE2)
+  {
+    dJointSetHinge2Axis1 (scfParent->jointID, axis[0], axis[1], axis[2]);
+  }
+}
+
+void csODEJoint::ODEJointState::SetHinge2Axis2 (const csVector3& axis)
+{
+  if (GetType() == CS_ODE_JOINT_TYPE_HINGE2)
+  {
+    dJointSetHinge2Axis2 (scfParent->jointID, axis[0], axis[1], axis[2]);
+  }
+}
+
+void csODEJoint::ODEJointState::SetHinge2Anchor (const csVector3& point)
+{
+  if (GetType() == CS_ODE_JOINT_TYPE_HINGE2)
+  {
+    dJointSetHinge2Anchor (scfParent->jointID, point[0], point[1], point[2]);
   }
 }
 
