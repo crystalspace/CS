@@ -1744,6 +1744,7 @@ csLoader::csLoader(iBase *p)
 csLoader::~csLoader()
 {
   loaded_plugins.DeleteAll ();
+  SCF_DEC_REF(Reporter);
   SCF_DEC_REF(VFS);
   SCF_DEC_REF(ImageLoader);
   SCF_DEC_REF(SoundLoader);
