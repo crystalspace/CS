@@ -23,6 +23,7 @@
 #include "iutil/comp.h"
 #include "csutil/scf.h"
 #include "csutil/csvector.h"
+#include "csutil/scopedmutexlock.h"
 #include "ivaria/reporter.h"
 
 /**
@@ -45,6 +46,7 @@ struct csReporterMessage
 class csReporter : public iReporter
 {
 private:
+  csRef<csMutex> mutex;
   iObjectRegistry *object_reg;
   csVector messages;
   csVector listeners;

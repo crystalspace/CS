@@ -28,6 +28,7 @@
 #include "csutil/refcount.h"
 #include "csutil/refarr.h"
 #include "csutil/util.h"
+#include "csutil/scopedmutexlock.h"
 
 struct iConsoleOutput;
 struct iFile;
@@ -78,6 +79,7 @@ private:
   bool dest_popup[5];
   bool msg_remove[5];
   bool show_msgid[5];
+  csRef<csMutex> mutex;
   csRefArray<csTimedMessage> messages;
 
   static csString DefaultDebugFilename();

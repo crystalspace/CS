@@ -21,6 +21,7 @@
 #include "csver.h"
 #include "csutil/scf.h"
 #include "csutil/util.h"
+#include "csutil/refarr.h"
 #include "reporter.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -46,6 +47,7 @@ csReporter::csReporter (iBase *iParent)
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   object_reg = NULL;
+  mutex = csMutex::Create (true);
 }
 
 csReporter::~csReporter ()
@@ -77,14 +79,26 @@ void csReporter::Report (int severity, const char* msgId,
 void csReporter::ReportV (int severity, const char* msgId,
   	const char* description, va_list arg)
 {
-  char buf[1024];
+  char buf[4000];
   vsprintf (buf, description, arg);
+
+  // To ensure thread-safety we first copy the listeners.
+  csRefArray<iReporterListener> copy;
+  {
+    csScopedMutexLock lock (mutex);
+    int i;
+    for (i = 0 ; i < listeners.Length () ; i++)
+    {
+      iReporterListener* listener = (iReporterListener*)listeners[i];
+      copy.Push (listener);
+    }
+  }
 
   bool add_msg = true;
   int i;
-  for (i = 0 ; i < listeners.Length () ; i++)
+  for (i = 0 ; i < copy.Length () ; i++)
   {
-    iReporterListener* listener = (iReporterListener*)listeners[i];
+    iReporterListener* listener = copy[i];
     if (listener->Report (this, severity, msgId, buf))
     {
       add_msg = false;
@@ -98,12 +112,15 @@ void csReporter::ReportV (int severity, const char* msgId,
     msg->severity = severity;
     msg->id = csStrNew (msgId);
     msg->description = csStrNew (buf);
+    csScopedMutexLock lock (mutex);
     messages.Push (msg);
   }
 }
 
 void csReporter::Clear (int severity)
 {
+  csScopedMutexLock lock (mutex);
+
   int i = 0;
   int len = messages.Length ();
   while (i < len)
@@ -124,6 +141,7 @@ void csReporter::Clear (int severity)
 
 void csReporter::Clear (const char* mask)
 {
+  csScopedMutexLock lock (mutex);
   int i = 0;
   int len = messages.Length ();
   while (i < len)
@@ -144,11 +162,13 @@ void csReporter::Clear (const char* mask)
 
 int csReporter::GetMessageCount () const
 {
+  csScopedMutexLock lock (mutex);
   return messages.Length ();
 }
 
 int csReporter::GetMessageSeverity (int idx) const
 {
+  csScopedMutexLock lock (mutex);
   if (idx < 0 || idx >= messages.Length ()) return -1;
   csReporterMessage* msg = (csReporterMessage*)messages[idx];
   return msg->severity;
@@ -156,6 +176,7 @@ int csReporter::GetMessageSeverity (int idx) const
 
 const char* csReporter::GetMessageId (int idx) const
 {
+  csScopedMutexLock lock (mutex);
   if (idx < 0 || idx >= messages.Length ()) return NULL;
   csReporterMessage* msg = (csReporterMessage*)messages[idx];
   return msg->id;
@@ -163,6 +184,7 @@ const char* csReporter::GetMessageId (int idx) const
 
 const char* csReporter::GetMessageDescription (int idx) const
 {
+  csScopedMutexLock lock (mutex);
   if (idx < 0 || idx >= messages.Length ()) return NULL;
   csReporterMessage* msg = (csReporterMessage*)messages[idx];
   return msg->description;
@@ -170,12 +192,14 @@ const char* csReporter::GetMessageDescription (int idx) const
 
 void csReporter::AddReporterListener (iReporterListener* listener)
 {
+  csScopedMutexLock lock (mutex);
   listeners.Push (listener);
   listener->IncRef ();
 }
 
 void csReporter::RemoveReporterListener (iReporterListener* listener)
 {
+  csScopedMutexLock lock (mutex);
   int idx = listeners.Find (listener);
   if (idx != -1)
   {
@@ -186,6 +210,7 @@ void csReporter::RemoveReporterListener (iReporterListener* listener)
 
 bool csReporter::FindReporterListener (iReporterListener* listener)
 {
+  csScopedMutexLock lock (mutex);
   int idx = listeners.Find (listener);
   return idx != -1;
 }

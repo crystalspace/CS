@@ -97,6 +97,7 @@ csReporterListener::csReporterListener (iBase *iParent)
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiReporterListener);
+  mutex = csMutex::Create (true);
   object_reg = NULL;
   reporter = NULL;
   scfiEventHandler = NULL;
@@ -220,6 +221,7 @@ bool csReporterListener::Report (iReporter*, int severity,
   {
     csRef<csTimedMessage> tm = csPtr<csTimedMessage> (
     	new csTimedMessage (msg.GetData ()));
+    csScopedMutexLock lock (mutex);
     messages.Push (tm);
   }
   return msg_remove[severity];
@@ -231,6 +233,7 @@ bool csReporterListener::HandleEvent (iEvent& event)
   {
     if (event.Command.Code == cscmdPostProcess)
     {
+      csScopedMutexLock lock (mutex);
       int l = messages.Length ();
       if (l > 0)
       {

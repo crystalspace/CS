@@ -34,5 +34,35 @@ is NOT ok to work on the same document in different threads. Also @sc{vfs}
 itself is not thread safe yet so avoid the @code{iDocument->Parse()} and
 @code{iDocument->Write()} calls that use @code{iFile} and/or @code{iVFS}.
 
+@item
+The syntax services plugin is safe for the basic parsing tools (vectors,
+matrices, reporting errors, ...). For polygons and thing related objects
+this hasn't been checked yet.
+
+@item
+The reporter plugin is fully thread-safe.
+
+@item
+The standard reporter listener plugin is thread-safe for basic operations
+but not for initialization. That should be done from the main thread.
+Also logging to file (@sc{vfs}) with @file{debug.txt} or otherwise
+is not thread-safe since @sc{vfs} itself is not thread-safe.
+Also note that thread-safety of the standard reporter listener depends
+on thread-safety of the output console that is being used. None of the
+output consoles have been tested yet so most likely it is actually not
+thread-safe.
+
+@item
+The following mesh object and factory loaders are thread-safe provided
+that the implementation of @code{iLoaderContext} is thread-safe. Please
+note that the default @code{iLoaderContext} is NOT thread-safe which makes
+all loader plugins unsafe by default.
+@itemize @bullet
+@item
+@emph{Genmesh loader}: aside from a small design mistake with streams in
+case the new renderer is used, the genmesh loader plugin is perfectly
+thread-safe.
+@end itemize
+
 @end itemize
 

@@ -32,6 +32,9 @@ The history order is reversed so that new features are at the top.
 	  and writing functions on iDocument that use either iFile or
 	  iVFS are not safe!
 	- The XMLRead parser has been made thread-safe in the same way.
+	- Made the reporter and standard reporter listener thread-safe.
+	  However the standard-reporter listener will only become
+	  really thread-safe after the output consoles are thread-safe.
 17-Apr-2003
 	- Fixed a bug in the common polygon buffer implementation where it
 	  was incrementing the ref count on poly_texture without testing if
@@ -67,8 +70,8 @@ The history order is reversed so that new features are at the top.
 16-Apr-2003
 	- Rene Jager updated Python scripting.
 	  The cspython plugin can now access CS almost completely.
-	  A python module can be built by "make pythmod" which allows for writing
-	  CS application python.
+	  A python module can be built by "make pythmod" which allows for
+	  writing CS application python.
 	  Base on Python 2.2.x and SWIG 1.3.17. For platforms where Python 2.2.x
 	  is run by the command "python2", use "PYTHON=python2" before
 	  "./configure" and "make *" commands.

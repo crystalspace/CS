@@ -336,7 +336,8 @@ csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
 	        {
 		  const char* fn = childchild->GetAttributeValue ("name");
 		  int d = childchild->GetAttributeValueAsInt ("delay");
-		  float disp = childchild->GetAttributeValueAsFloat ("displacement");
+		  float disp = childchild->GetAttributeValueAsFloat (
+		  	"displacement");
                   iSpriteFrame* ff = spr3dLook->FindFrame (fn);
                   if (!ff)
                   {
