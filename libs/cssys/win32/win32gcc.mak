@@ -239,7 +239,7 @@ MERGERES = $(RUN_SCRIPT) libs/cssys/win32/mergeres.sh
 DO.SHARED.PLUGIN.CORE = \
   $(MAKEVERSIONINFO) $(OUT)/$(@:$(DLL)=-version.rc) \
     "$(DESCRIPTION.$*)" $(COMMAND_DELIM) \
-  $(MERGERES) $(OUT)/$(@:$(DLL)=-rsrc.rc) "./" \
+  $(MERGERES) $(OUT)/$(@:$(DLL)=-rsrc.rc) ./ \
     $(OUT)/$(@:$(DLL)=-version.rc) $($@.WINRSRC) $(COMMAND_DELIM) \
   $(COMPILE_RES) -i $(OUT)/$(@:$(DLL)=-rsrc.rc) \
     -o $(OUT)/$(@:$(DLL)=-rsrc.o) $(COMMAND_DELIM) \
@@ -257,7 +257,7 @@ DO.SHARED.PLUGIN.CORE += -mconsole
 DO.LINK.EXE = \
 	$(MAKEVERSIONINFO) $(OUT)/$(@:$(EXE)=-version.rc) \
 	  "$(DESCRIPTION.$*)" $(COMMAND_DELIM) \
-	$(MERGERES) $(OUT)/$(@:$(EXE)=-rsrc.rc) "./" \
+	$(MERGERES) $(OUT)/$(@:$(EXE)=-rsrc.rc) ./ \
 	  $(OUT)/$(@:$(EXE)=-version.rc) $($@.WINRSRC) $(COMMAND_DELIM) \
 	$(COMPILE_RES) -i $(OUT)/$(@:$(EXE)=-rsrc.rc) \
 	  -o $(OUT)/$(@:$(EXE)=-rsrc.o) $(COMMAND_DELIM) \
