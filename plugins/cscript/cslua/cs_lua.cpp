@@ -91,6 +91,8 @@ int cspace_initialize(lua_State *L);
   }
 
 #include "isys/system.h"
+#include "isys/plugin.h"
+#include "iutil/objreg.h"
 #include "iengine/camera.h"
 #include "iengine/campos.h"
 #include "imesh/object.h"
@@ -8671,7 +8673,10 @@ static void *SwigiSystemToiBase(void *ptr) {
 }
 
 static iEngine * iSystem_Query_iEngine(iSystem *self) {
-      return CS_QUERY_PLUGIN(self, iEngine);
+      iObjectRegistry* object_reg = self->GetObjectRegistry ();
+      iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg,
+      	iPluginManager);
+      return CS_QUERY_PLUGIN(plugin_mgr, iEngine);
     }
 static int
 wrap_iSystem_Query_iEngine(lua_State *L)
@@ -8702,7 +8707,10 @@ wrap_iSystem_Query_iEngine(lua_State *L)
 }
 
 static iGraphics3D * iSystem_Query_iGraphics3D(iSystem *self) {
-      return CS_QUERY_PLUGIN(self, iGraphics3D);
+       iObjectRegistry* object_reg = self->GetObjectRegistry ();
+       iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg,
+       	iPluginManager);
+       return CS_QUERY_PLUGIN(plugin_mgr, iGraphics3D);
     }
 static int
 wrap_iSystem_Query_iGraphics3D(lua_State *L)
