@@ -481,23 +481,58 @@ bool csPolygonMeshTools::IsMeshClosed (iPolygonMesh* polyMesh)
 }
   
 void csPolygonMeshTools::CloseMesh (iPolygonMesh* polyMesh, 
-				 csArray<csMeshedPolygon>& newPolys)
+				 csArray<csMeshedPolygon>& newPolys,
+				 int*& vertidx, int& vertidx_len)
 {
-  int pc = polyMesh->GetPolygonCount ();
-  csMeshedPolygon* polys = polyMesh->GetPolygons ();
-  int p;
-  for (p = 0; p < pc; p++)
+  if (polyMesh->GetFlags ().Check (CS_POLYMESH_TRIANGLEMESH))
   {
-    const csMeshedPolygon& poly = polys[p];
-    csMeshedPolygon newPoly;
-    newPoly.num_vertices = poly.num_vertices;
-    newPoly.vertices = new int[poly.num_vertices];
-    int v;
-    for (v = 0; v < poly.num_vertices; v++)
+    int tc = polyMesh->GetTriangleCount ();
+    csTriangle* tris = polyMesh->GetTriangles ();
+    int p;
+    vertidx_len = tc * 3;
+    vertidx = new int[vertidx_len];
+    int* vertidx_p = vertidx;
+
+    for (p = 0; p < tc; p++)
     {
-      newPoly.vertices[v] = poly.vertices[poly.num_vertices - 1 - v];
+      const csTriangle& tri = tris[p];
+      csMeshedPolygon newPoly;
+      newPoly.num_vertices = 3;
+      newPoly.vertices = vertidx_p;
+      *vertidx_p++ = tri.c;
+      *vertidx_p++ = tri.b;
+      *vertidx_p++ = tri.a;
+      newPolys.Push (newPoly);
     }
-    newPolys.Push (newPoly);
+  }
+  else
+  {
+    int pc = polyMesh->GetPolygonCount ();
+    csMeshedPolygon* polys = polyMesh->GetPolygons ();
+    int p;
+    vertidx_len = 0;
+    for (p = 0; p < pc; p++)
+    {
+      const csMeshedPolygon& poly = polys[p];
+      vertidx_len += poly.num_vertices;
+    }
+    vertidx = new int[vertidx_len];
+    int* vertidx_p = vertidx;
+
+    for (p = 0; p < pc; p++)
+    {
+      const csMeshedPolygon& poly = polys[p];
+      csMeshedPolygon newPoly;
+      newPoly.num_vertices = poly.num_vertices;
+      newPoly.vertices = vertidx_p;
+      int v;
+      for (v = 0; v < poly.num_vertices; v++)
+      {
+        newPoly.vertices[v] = poly.vertices[poly.num_vertices - 1 - v];
+      }
+      vertidx_p += poly.num_vertices;
+      newPolys.Push (newPoly);
+    }
   }
 }
 

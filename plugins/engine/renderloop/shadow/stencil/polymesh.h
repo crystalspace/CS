@@ -28,6 +28,8 @@ class csStencilPolygonMesh : public csPolygonMesh
 private:
   csDirtyAccessArray<csVector3> verts;
   csDirtyAccessArray<csMeshedPolygon> polys;
+  csDirtyAccessArray<int> vertidx;
+  int* secondary_vertidx;
   csTriangle* triangles;
   int tri_count;
 
@@ -41,19 +43,20 @@ public:
   csStencilPolygonMesh ()
   {
     triangles = 0;
+    secondary_vertidx = 0;
   }
 
   virtual ~csStencilPolygonMesh ()
   {
-    int i;
-    for (i = 0; i < polys.Length (); i++)
-    {
-      delete[] polys[i].vertices;
-    }
+    delete[] secondary_vertidx;
   }
 
-  void AddPolys (const csArray<csMeshedPolygon>& polysToAdd)
+  /// AddPolys will take over ownership of vertidx.
+  void AddPolys (const csArray<csMeshedPolygon>& polysToAdd,
+  	int* vertidx)
   {
+    CS_ASSERT (secondary_vertidx == 0);
+    secondary_vertidx = vertidx;
     int i;
     for (i = 0; i < polysToAdd.Length (); i++)
     {
@@ -67,22 +70,28 @@ public:
     int numVerts = polyMesh->GetVertexCount ();
     csVector3* oldVerts = polyMesh->GetVertices ();
     verts.SetLength (numVerts);
-    int i;
-    for (i = 0; i < numVerts; i++)
-    {
-      verts[i].Set (oldVerts[i]);
-    }
+    memcpy (verts.GetArray (), oldVerts, sizeof (csVector3) * numVerts);
 
     int numPolys = polyMesh->GetPolygonCount ();
     csMeshedPolygon* oldPolys = polyMesh->GetPolygons ();
     polys.SetLength (numPolys);
+
+    int i;
+    // First count how many vertex indices we need.
+    int totvertidx = 0;
+    for (i = 0 ; i < numPolys ; i++)
+      totvertidx += oldPolys[i].num_vertices;
+    vertidx.SetLength (totvertidx);
+    int* vertidx_p = vertidx.GetArray ();
+
     for (i = 0; i < numPolys; i++)
     {
       csMeshedPolygon poly;
       poly.num_vertices = oldPolys[i].num_vertices;
-      poly.vertices = new int[poly.num_vertices];
+      poly.vertices = vertidx_p;
       memcpy (poly.vertices, oldPolys[i].vertices, 
 	poly.num_vertices * sizeof (int));
+      vertidx_p += poly.num_vertices;
       polys[i] = poly;
     }
 

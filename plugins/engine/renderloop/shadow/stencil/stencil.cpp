@@ -58,8 +58,8 @@ SCF_IMPLEMENT_IBASE (csStencilShadowCacheEntry)
   SCF_IMPLEMENTS_INTERFACE (iRenderBufferSource);
 SCF_IMPLEMENT_IBASE_END
 
-csStencilShadowCacheEntry::csStencilShadowCacheEntry (csStencilShadowStep* parent,
-						      iMeshWrapper* mesh)
+csStencilShadowCacheEntry::csStencilShadowCacheEntry (
+	csStencilShadowStep* parent, iMeshWrapper* mesh)
 {
   SCF_CONSTRUCT_IBASE (0);
   shadow_vertex_buffer = 0;
@@ -95,7 +95,8 @@ void csStencilShadowCacheEntry::SetActiveLight (iLight *light,
   //check if this light exists in cache, and if it is ok
   csLightCacheEntry *entry = lightcache.Get (light);
 
-  if (entry == 0) {
+  if (entry == 0)
+  {
     entry = new csLightCacheEntry ();
     entry->light = light;
     entry->meshLightPos = meshlightpos; 
@@ -118,7 +119,8 @@ void csStencilShadowCacheEntry::SetActiveLight (iLight *light,
         CS_BUFCOMP_UNSIGNED_INT, 1, true);
     }
 
-    unsigned int *buf = (unsigned int *)entry->shadow_index_buffer->Lock (CS_BUF_LOCK_NORMAL);
+    unsigned int *buf = (unsigned int *)entry->shadow_index_buffer->Lock (
+    	CS_BUF_LOCK_NORMAL);
     entry->edge_start = triangle_count*3;
     entry->index_range = entry->edge_start;
 
@@ -212,7 +214,8 @@ void csStencilShadowCacheEntry::SetActiveLight (iLight *light,
   active_edge_start = entry->edge_start;
 }
 
-void csStencilShadowCacheEntry::HandleEdge (EdgeInfo *e, csHash<EdgeInfo*>& edge_stack)
+void csStencilShadowCacheEntry::HandleEdge (EdgeInfo *e,
+	csHash<EdgeInfo*>& edge_stack)
 {
   double mplier = PI * 1e6;
   uint32 hash;
@@ -291,10 +294,10 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
   meshShadows = false;
   if (csStencilShadowCacheEntry::model != model)
   {
-   #ifdef SHADOW_CACHE_DEBUG
+#   ifdef SHADOW_CACHE_DEBUG
     printf ("New model %8.8x, old model %8.8x\n", model,
       csStencilShadowCacheEntry::model);
-   #endif
+#   endif
     csStencilShadowCacheEntry::model = model;	
   }
 
@@ -313,8 +316,10 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
       newMesh->CopyFrom (mesh);
 
       csArray<csMeshedPolygon> newPolys;
-      csPolygonMeshTools::CloseMesh (mesh, newPolys);
-      newMesh->AddPolys (newPolys);
+      int* vertidx;
+      int vertidx_len;
+      csPolygonMeshTools::CloseMesh (mesh, newPolys, vertidx, vertidx_len);
+      newMesh->AddPolys (newPolys, vertidx);
 
       mesh.AttachNew (newMesh);
     }
@@ -427,17 +432,11 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
 iRenderBuffer *csStencilShadowCacheEntry::GetRenderBuffer (csStringID name)
 {
   if (name == parent->shadow_vertex_name) 
-  {
     return shadow_vertex_buffer;
-  }
   if (name == parent->shadow_normal_name) 
-  {
     return shadow_normal_buffer;
-  }
   if (name == parent->shadow_index_name) 
-  {
     return active_index_buffer;
-  }
   return 0;
 }
 
@@ -821,7 +820,8 @@ iShader* csStencilShadowType::GetShadow ()
       CS_QUERY_REGISTRY (object_reg, iPluginManager));
 
     // Load the shadow vertex program 
-    csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
+    csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY (object_reg,
+    	iShaderManager);
     if (!shmgr) 
     {
       shmgr = CS_LOAD_PLUGIN (plugin_mgr,
@@ -911,9 +911,7 @@ csPtr<iBase> csStencilShadowLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_STEPS:
 	{
 	  if (!rsp.ParseRenderSteps (steps, child))
-	  {
 	    return 0;
-	  }
 	}
 	break;
       default:

@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Sep-2003
+	- Jorrit cleaned up some sources in the stencil renderloop.
+	- Jorrit did the following optimizations with regards to
+	  iPolygonMesh::CloseMesh() and the stencil renderloop:
+	      - CloseMesh() now returns a table of indices so it doesn't
+	        do an alloc for every single polygon.
+	      - The copy of the polygon mesh maintained by the stencil
+	        renderloop also avoids the per-polygon alloc now.
+	      - CloseMesh() now uses a more optimal way to close the mesh
+	        if it knows the base mesh prefers triangles.
 10-Sep-2003
 	- Philip Wyett made struct ShadowDrawVisCallback a friend to
 	  class csStencilShadowStep. This works round C2248 MSVC 6

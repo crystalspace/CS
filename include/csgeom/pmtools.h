@@ -125,12 +125,11 @@ public:
   /**
    * Close a polygon mesh.
    * The current implementation is rather naive; it just returns all faces,
-   * but flipped.
-   * \remark Don't forget to delete[] the 'vertices' fields of the polygons
-   *   returned in \p newPolys when you're done.
+   * but flipped. The returned table is a table of indices that are used
+   * in the returned polygons. Don't forget to delete[] that table!
    */
   static void CloseMesh (iPolygonMesh* polyMesh, 
-    csArray<csMeshedPolygon>& newPolys);
+    csArray<csMeshedPolygon>& newPolys, int*& vertidx, int& vertidx_len);
 
   /**
    * Triangulate a mesh from the polygon mesh data in the iPolygonMesh.
