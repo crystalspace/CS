@@ -255,4 +255,9 @@ Some renderers and video drivers depend on the @code{BeginDraw()} and
 every @code{BeginDraw()} must be followed by a @code{FinishDraw()} or nothing
 will be rendered.  Microsoft's DirectX renderer is known to have this
 requirement, so be sure to follow this guideline for maximum portability.
+
+@item
+@emph{Avoid Templates}
+
+Some compilers don't support templates, so you should not use them.
 @end enumerate
