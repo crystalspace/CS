@@ -18,7 +18,7 @@
 //-----------------------------------------------------------------------------
 #include "NeXTGetUsername.h"
 #import <Foundation/NSPathUtilities.h>
-#import <Foundatoin/NSString.h>
+#import <Foundation/NSString.h>
 
 //-----------------------------------------------------------------------------
 // NeXTGetUsername
