@@ -283,6 +283,7 @@ csFrustrum* csFrustrum::Intersect (csVector3* poly, int num)
     // If this frustrum is infinite then the intersection of this
     // frustrum with the other is equal to the other.
     CHK (new_frustrum = new csFrustrum (origin, poly, num));
+    new_frustrum->SetMirrored (IsMirrored ());
   }
   else if (IsEmpty ())
   {
@@ -296,6 +297,7 @@ csFrustrum* csFrustrum::Intersect (csVector3* poly, int num)
     // the origin of this frustrum and clip it to every plane from this
     // frustrum.
     CHK (new_frustrum = new csFrustrum (GetOrigin (), poly, num));
+    new_frustrum->SetMirrored (IsMirrored ());
     int i, i1;
     i1 = num_vertices-1;
     for (i = 0 ; i < num_vertices ; i++)

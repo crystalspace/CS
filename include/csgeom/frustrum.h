@@ -88,7 +88,11 @@ public:
   /// Get the origin of this frustrum.
   csVector3& GetOrigin () { return origin; }
 
-  /// Enable/disable mirroring.
+  /**
+   * Enable/disable mirroring.
+   * If mirroring is enabled this means that the frustrum polygon
+   * is given in anti-clockwise order.
+   */
   void SetMirrored (bool m) { mirrored = m; }
 
   /// Is this frustrum mirrored?
