@@ -457,7 +457,7 @@ void csSector::PrepareDraw (iRenderView *rview)
   GetVisibilityCuller ();
 
   int i;
-  iCamera *icam = rview->GetCamera ();
+  //  iCamera *icam = rview->GetCamera ();
   rview->SetThisSector (&scfiSector);
 
   i = sector_cb_vector.Length ()-1;
@@ -490,7 +490,7 @@ void csSector::PrepareDraw (iRenderView *rview)
 	    csReversibleTransform &mov_trans = mov->GetTransform ();
 // @@@ TEMPORARY: now CS_ENTITY_CAMERA only works at 0,0,0 position.
 mov_trans.SetOrigin (csVector3 (0));
-	    csVector3 old_movable_pos = mov_trans.GetOrigin ();
+//	    csVector3 old_movable_pos = mov_trans.GetOrigin ();
 	    iCamera *orig_cam = rview->GetOriginalCamera ();
 	    csOrthoTransform &orig_trans = orig_cam->GetTransform ();
 	    csVector3 v = orig_trans.GetO2TTranslation ();
