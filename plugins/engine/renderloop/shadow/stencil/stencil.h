@@ -143,7 +143,7 @@ public:
   virtual int GetStepCount ();
 
   struct ShadowDrawVisCallback : public iVisibilityCullerListener
-  {    
+  {
     csStencilShadowStep* parent;
 
     SCF_DECLARE_IBASE;
@@ -153,6 +153,7 @@ public:
     virtual void ObjectVisible (iVisibilityObject *visobject, 
       iMeshWrapper *mesh);
   } shadowDrawVisCallback;
+	friend struct ShadowDrawVisCallback;
 };
 
 class csStencilShadowFactory : public iRenderStepFactory
