@@ -18,6 +18,8 @@ The history order is reversed so that new features are at the top.
 	- Extended iVisibilityObject with GetMeshWrapper() function. This
 	  avoids a lot of extra query interface calls in the engine and
 	  visibility cullers.
+	- Eric Sunshine fixed a quoting problem in python.cex synthesis
+	  reported by Steven Geens <steven.geens@student.kuleuven.ac.be>.
 1-Dec-2002
 	- Fixed initialization plugin in the explosion mesh object. This
 	  could cause crashes in some cases.
