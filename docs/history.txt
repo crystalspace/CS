@@ -50,6 +50,9 @@ chronological order.
 	    - The fountain particle system now works through
 	      csNewParticleSystem. This means that it is faster and also
 	      works with the new renderer.
+	- Jorrit fixed a bug in csNewParticleSystem. If lighting was enabled
+	  it would pass an invalid color array to the renderer. This could
+	  cause very funky but invalid lighting effects.
 11-Feb-2004
 	- Jorrit optimized the csNewParticleSystem slightly (used by the
 	  rain mesh plugin) and also cleaned it up a bit.

@@ -438,6 +438,7 @@ void csNewParticleSystem::UpdateLighting (const csArray<iLight*>& lights,
   if (!Lighting) return;
   const csReversibleTransform &transform = movable->GetTransform ();
 
+  csColor* c = colors;
   for (int i=0; i<ParticleCount; i++)
   {
     csColor lightColor = Color;
@@ -452,6 +453,10 @@ void csNewParticleSystem::UpdateLighting (const csArray<iLight*>& lights,
     }
 
     LitColors [i] = lightColor;
+    *c++ = lightColor;
+    *c++ = lightColor;
+    *c++ = lightColor;
+    *c++ = lightColor;
   }
 }
 
@@ -517,8 +522,7 @@ bool csNewParticleSystem::Draw (iRenderView* rview, iMovable* mov,
   trimesh.vertex_fog = 0;
 
   // draw it!
-  vbufmgr->LockBuffer (vbuf, vertices, texels,
-  	Lighting ? LitColors : colors, VertexCount, 0, bbox);
+  vbufmgr->LockBuffer (vbuf, vertices, texels, colors, VertexCount, 0, bbox);
   g3d->DrawTriangleMesh (trimesh);
   vbufmgr->UnlockBuffer (vbuf);
 #endif
@@ -537,8 +541,7 @@ csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num)
 
   vertex_buffer->CopyToBuffer (vertices, sizeof (csVector3) * VertexCount);
   texel_buffer->CopyToBuffer (texels, sizeof (csVector2) * VertexCount);
-  color_buffer->CopyToBuffer (Lighting ? LitColors : colors,
-  	sizeof (csColor) * VertexCount);
+  color_buffer->CopyToBuffer (colors, sizeof (csColor) * VertexCount);
   index_buffer->CopyToBuffer (triangles,
       	sizeof (unsigned int) * TriangleCount *3);
 
@@ -589,9 +592,16 @@ void csNewParticleSystem::AddColor (const csColor& c)
   if (LitColors)
   {
     int i;
+    csColor* clr = colors;
     for (i = 0 ; i < ParticleCount ; i++)
     {
-      LitColors[i] += c;
+      csColor l = LitColors[i];
+      l += c;
+      LitColors[i] = l;
+      *clr++ = l;
+      *clr++ = l;
+      *clr++ = l;
+      *clr++ = l;
     }
   }
 }

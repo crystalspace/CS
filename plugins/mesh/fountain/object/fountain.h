@@ -49,7 +49,6 @@ protected:
   float speed, opening, azimuth, elevation, fall_time;
   float time_left; // from previous update
   int next_oldest;
-  float drop_width, drop_height;
 
   int FindOldest();
   void RestartParticle (int index, float pre_move);
@@ -61,7 +60,6 @@ public:
    * number : number of particles visible at one time
    * mat: material of particles. mixmode = mixmode used.
    * lighted: the particles will be lighted if true.
-   * drop_width, drop_height: size of rectangular particles.
    * spot is the origin of the fountain
    * accel is the particle acceleration, in m/s^2, the gravity.
    * fall_time is the seconds a particle gets to fall.
@@ -86,16 +84,14 @@ public:
   void SetDropSize (float dropwidth, float dropheight)
   {
     initialized = false;
-    drop_width = dropwidth;
-    drop_height = dropheight;
-    Scale.Set (drop_width, drop_height);
+    Scale.Set (dropwidth, dropheight);
     scfiObjectModel.ShapeChanged ();
   }
   /// Get the size of the particles.
   void GetDropSize (float& dropwidth, float& dropheight) const
   {
-    dropwidth = drop_width;
-    dropheight = drop_height;
+    dropwidth = Scale.x;
+    dropheight = Scale.y;
   }
   /// Set origin of the fountain.
   void SetOrigin (const csVector3& origin)
