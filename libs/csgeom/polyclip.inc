@@ -50,11 +50,12 @@
 #define BOXCLIP_INTERSECT				\
   /* Check if and where edges intersects */		\
   /* t = - (n * (a - c)) / (n * (b - a)) */		\
-  /* NB: denominator == 0 should never happen ??? */	\
-  t = ((py - ClipPoly [edge].y) * ClipData [edge].x	\
+  double denom = ((cx - px) * ClipData [edge].y -	\
+                  (cy - py) * ClipData [edge].x);	\
+  t = (denom == 0) ? 1.0 :				\
+      ((py - ClipPoly [edge].y) * ClipData [edge].x	\
      - (px - ClipPoly [edge].x) * ClipData [edge].y)	\
-     / ((cx - px) * ClipData [edge].y			\
-      - (cy - py) * ClipData [edge].x);			\
+     / denom;						\
 							\
   if (t <= 0)						\
   { tx = px; ty = py; }					\

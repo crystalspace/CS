@@ -56,7 +56,6 @@ UByte csBoxClipper::Clip (csVector2 *InPolygon, int InCount,
   csVector2 *OutPolygon, int &OutCount)
 {
 #include "boxclip.inc"
-
   OutCount = OutV;
   return Clipped ? CS_CLIP_CLIPPED : CS_CLIP_INSIDE;
 }
@@ -216,6 +215,7 @@ UByte csPolygonClipper::Clip (csVector2 *InPolygon, int InCount,
 {
   if (!ClipBox.Overlap (BoundingBox))
     return false;
+
   UByte rc = Clip (InPolygon, InCount, OutPolygon, OutCount);
   if (rc != CS_CLIP_OUTSIDE)
   {
