@@ -30,6 +30,23 @@
 #  define SHARED_EXTENSION ".so"
 #endif
 
+//***** Platform specifics
+
+#if defined (OS_WIN32)
+#  define PLATFORM_PLUGIN WINDOWS_PLUGIN
+#else
+#  define PLATFORM_PLUGIN UNIX_PLUGIN
+#endif
+
+#define WINDOWS_PLUGIN \
+extern HINSTANCE ModuleHandle; \
+extern "C" BOOL WINAPI DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID) { \
+	if(fdwReason == DLL_PROCESS_ATTACH) {ModuleHandle = hinstDLL; DllInitialize(); } \
+  return TRUE; \
+}
+
+#define UNIX_PLUGIN 
+
 //***** Huge define mess that shouldn't change (i.e. do not read after this point, skip to end of file)
 
 #define EXTENSION_FACTORY(ClassName) \
@@ -49,7 +66,6 @@ IMPLEMENT_UNKNOWN_NODELETE(cse##ClassName##Factory) \
 BEGIN_INTERFACE_TABLE(cse##ClassName##Factory) \
   IMPLEMENTS_INTERFACE(IClassFactory) \
 END_INTERFACE_TABLE()
-
 
 #define BEGIN_EXTENSION_REGISTRY() \
 static DllRegisterData gRegData[] = {
@@ -72,11 +88,6 @@ STDAPI DllInitialize () {	\
 	while(gRegData[i].clsid) gRegData[i++].szInProcServer=dll; \
 	return TRUE; \
 } \
-extern HINSTANCE ModuleHandle; \
-extern "C" BOOL WINAPI DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID) { \
-	if(fdwReason == DLL_PROCESS_ATTACH) {ModuleHandle = hinstDLL; DllInitialize(); } \
-  return TRUE; \
-} \
 STDAPI DllCanUnloadNow() {return gRefCount ? S_FALSE : S_OK;} \
 STDAPI DllRegisterServer () { \
 	HRESULT hr=S_FALSE; int i=0; \
@@ -88,6 +99,7 @@ STDAPI DllUnregisterServer () { \
 	while(gRegData[i].clsid) hr=csUnregisterServer (&(gRegData[i++])); \
 	return hr; \
 } \
+PLATFORM_PLUGIN \
 void cleanup() {} \
 int csMain (int, char** const) {return 0;}
 

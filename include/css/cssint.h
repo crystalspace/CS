@@ -30,7 +30,7 @@ interface IProgramConsole:public IUnknown {
 extern const GUID IID_ILanguageConsole;
 
 interface ILanguageConsole:public IUnknown {
-	STDMETHOD (Init)(IProgramConsole *iConsole) PURE;
+	STDMETHOD (InitConsole)(IProgramConsole *iConsole) PURE;
 	STDMETHOD (KeyPress)(int keycode) PURE;
 };
 
