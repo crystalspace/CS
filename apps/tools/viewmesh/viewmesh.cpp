@@ -105,6 +105,7 @@ void ViewMesh::Help ()
   printf ("Options for ViewMesh:\n");
   printf ("  -L=<file>          Load a library file (for textures/materials)\n");
   printf ("  -Scale=<ratio>     Scale the Object\n");
+  printf ("  -RoomSize=<units>  Make the room the specified radius, and 4*size high.  (default 5).\n");
   printf ("  <meshfile>         Load the specified mesh object\n");
 }
 
@@ -575,6 +576,17 @@ bool ViewMesh::Initialize ()
   VM_QUERYPLUGIN (loader, iLoader, "iLoader");
   VM_QUERYPLUGIN (g3d, iGraphics3D, "iGraphics3D");
 
+  csRef<iCommandLineParser> cmdline;
+  VM_QUERYPLUGIN (cmdline, iCommandLineParser, "iCommandLineParser");
+
+  const char* meshfilename = cmdline->GetName (0);
+  const char* texturefilename = cmdline->GetName (1);
+  const char* texturename = cmdline->GetName (2);
+  const char* scaleTxt = cmdline->GetOption("Scale");
+  const char* roomSize = cmdline->GetOption("RoomSize");
+
+  float size = (roomSize)?atof(roomSize):5;
+
   // Set up a null cache.
   iCacheManager *cachemgr = new csNullCacheManager ();
   engine->SetCacheManager (cachemgr);
@@ -615,50 +627,50 @@ bool ViewMesh::Initialize ()
   iPolygon3DStatic* p;
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
-  p->CreateVertex (csVector3 (-5, 0, 5));
-  p->CreateVertex (csVector3 (5, 0, 5));
-  p->CreateVertex (csVector3 (5, 0, -5));
-  p->CreateVertex (csVector3 (-5, 0, -5));
+  p->CreateVertex (csVector3 (-size, 0, size));
+  p->CreateVertex (csVector3 (size, 0, size));
+  p->CreateVertex (csVector3 (size, 0, -size));
+  p->CreateVertex (csVector3 (-size, 0, -size));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
-  p->CreateVertex (csVector3 (-5, 20, -5));
-  p->CreateVertex (csVector3 (5, 20, -5));
-  p->CreateVertex (csVector3 (5, 20, 5));
-  p->CreateVertex (csVector3 (-5, 20, 5));
+  p->CreateVertex (csVector3 (-size, 4*size, -size));
+  p->CreateVertex (csVector3 (size, 4*size, -size));
+  p->CreateVertex (csVector3 (size, 4*size, size));
+  p->CreateVertex (csVector3 (-size, 4*size, size));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
-  p->CreateVertex (csVector3 (-5, 20, 5));
-  p->CreateVertex (csVector3 (5, 20, 5));
-  p->CreateVertex (csVector3 (5, 0, 5));
-  p->CreateVertex (csVector3 (-5, 0, 5));
+  p->CreateVertex (csVector3 (-size, 4*size, size));
+  p->CreateVertex (csVector3 (size, 4*size, size));
+  p->CreateVertex (csVector3 (size, 0, size));
+  p->CreateVertex (csVector3 (-size, 0, size));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
-  p->CreateVertex (csVector3 (5, 20, 5));
-  p->CreateVertex (csVector3 (5, 20, -5));
-  p->CreateVertex (csVector3 (5, 0, -5));
-  p->CreateVertex (csVector3 (5, 0, 5));
+  p->CreateVertex (csVector3 (size, 4*size, size));
+  p->CreateVertex (csVector3 (size, 4*size, -size));
+  p->CreateVertex (csVector3 (size, 0, -size));
+  p->CreateVertex (csVector3 (size, 0, size));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
-  p->CreateVertex (csVector3 (-5, 20, -5));
-  p->CreateVertex (csVector3 (-5, 20, 5));
-  p->CreateVertex (csVector3 (-5, 0, 5));
-  p->CreateVertex (csVector3 (-5, 0, -5));
+  p->CreateVertex (csVector3 (-size, 4*size, -size));
+  p->CreateVertex (csVector3 (-size, 4*size, size));
+  p->CreateVertex (csVector3 (-size, 0, size));
+  p->CreateVertex (csVector3 (-size, 0, -size));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
-  p->CreateVertex (csVector3 (5, 20, -5));
-  p->CreateVertex (csVector3 (-5, 20, -5));
-  p->CreateVertex (csVector3 (-5, 0, -5));
-  p->CreateVertex (csVector3 (5, 0, -5));
+  p->CreateVertex (csVector3 (size, 4*size, -size));
+  p->CreateVertex (csVector3 (-size, 4*size, -size));
+  p->CreateVertex (csVector3 (-size, 0, -size));
+  p->CreateVertex (csVector3 (size, 0, -size));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
   csRef<iStatLight> light;
@@ -686,14 +698,6 @@ bool ViewMesh::Initialize ()
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 10, -4));
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
-
-  csRef<iCommandLineParser> cmdline;
-  VM_QUERYPLUGIN (cmdline, iCommandLineParser, "iCommandLineParser");
-
-  const char* meshfilename = cmdline->GetName (0);
-  const char* texturefilename = cmdline->GetName (1);
-  const char* texturename = cmdline->GetName (2);
-  const char* scaleTxt = cmdline->GetOption("Scale");
 
   if (scaleTxt != 0)
   {
