@@ -112,18 +112,18 @@ How can I register the plug-in library?
 
 @dfn{Registering} means to tell @sc{scf} the name of the plug-in that was given
 to it by its author, and a class or a dynamic library to associate it with.
-Plugin libraries can contain multiple @sc{scf} classes.  For example, to use
-the software graphics renderer @sc{scf} must know that the @sc{scf} class
+Plugin libraries can contain multiple named @sc{scf} classes.  For example, to
+use the software graphics renderer @sc{scf} must know that the @sc{scf} class
 @samp{crystalspace.graphics3d.software} can be found in @file{soft3d.dll}
 (Windows) or @file{soft3d.so} (Unix).  @sc{scf} determines dynamically which
-plugin libraries contain which @sc{scf} classes by consulting metainformation
+plugin libraries contain which @sc{scf} classes by consulting meta-information
 associated with each plugin.  Depending upon the platform, the associated
-metainformation may be bundled into the plugin itself, or it might exist in a
+meta-information may be bundled into the plugin itself, or it might exist in a
 separate file with a @file{.csplugin} extension alongside the plugin module.
 
-How you must register a library depends on whether it is a static library or a
+How you register a library depends on whether it is a static library or a
 dynamic library (@file{.dll} or @file{.so}).  For a static library, that is,
-one which is linked directly into the application, rather than loaded
+one which is linked directly into the application rather than loaded
 dynamically at run-time, put the following macro invocation at top-level in one
 of your C++ files once for each @sc{scf} class contained in your library:
 
@@ -144,7 +144,7 @@ human-readable string describing the purpose of the class, and
 this class depends.
 
 For a dynamic library, @sc{scf} will discover the plugin and register the
-contained classes automatically by consulting the associated metainformation.
+contained classes automatically by consulting the associated meta-information.
 
 @item
 How can I load the plug-in?
@@ -165,10 +165,10 @@ object registry also have a tag name associated with them. By convention
 the @emph{default} object for a given @sc{scf} interface will be
 added to the object registry with the tag name equal to the interface
 name. For example, a 3D renderer is a plug-in module that
-implements (among others) the @code{iGraphics3D} interface. At the same
+implements (among others) the @samp{iGraphics3D} interface. At the same
 time there can be multiple 3D renderers in memory (for example, for
 procedural textures). But the default 3D renderer will be registered
-with the tag name 'iGraphics3D'.
+with the tag name @samp{iGraphics3D}.
 
 Note that the decision which graphics driver you use (e.g. Software or
 OpenGL) is done at the time you load the plug-in by passing the name of
@@ -177,31 +177,31 @@ your program, this does not make a difference anymore. This makes it possible
 to exchange the driver simply by loading another driver, but without changing
 your main program.
 
-The CS modules themselves will use the standard plug-ins with the
+The Crystal Space modules themselves will use the standard plug-ins with the
 default tag name as explained above. For example, the 3d engine looks
 for the graphics driver by looking in the object registry for an object
-with the tag 'iGraphics3D'.
+with the tag @samp{iGraphics3D}.
 
 Now how can you actually load the plug-in? You can either load them
-manually in the code using the @code{CS_LOAD_PLUGIN} macro or else
+manually in the code using the @code{CS_LOAD_PLUGIN()} macro or else
 you can use the plugin loader. As explained above, the plugin loader
 can load plugins specified on the commandline, a config file, or else
 explicitly requested in the code. This is done in a specific way:
 The commandline has highest priority. i.e. if the user specified the
 OpenGL video driver on the commandline then this will be the plugin that
-is loaded on the 'iGraphics3D' tag. The config file and plugins requested
+is loaded on the @samp{iGraphics3D} tag. The config file and plugins requested
 from the code are ignored then (for that tag at least). The plugins
 requested from the code have lowest priority and only serve as a default
 if neither the commandline nor the config file specified a plug-in for
 the given tag.
 
-There is a class called @code{csInitializer} which contains various
+There is a class called @code{csInitializer()} which contains various
 convenience routines to help initialize a Crystal Space application.
-This class also contains a routine (@code{RequestPlugins}) which will
+This class also contains a routine (@code{RequestPlugins()}) which will
 use the plugin loader automatically.
 
 There are several advantages to using the plugin loader as opposed
-to manually loading plug-ins using @code{CS_LOAD_PLUGIN}:
+to manually loading plug-ins using @code{CS_LOAD_PLUGIN()}:
 
 @itemize @minus
 @item
@@ -214,7 +214,7 @@ that it needs is not yet present.
 The user is able to override the plug-ins loaded by the plugin loader.
 He or she can modify the config file or specify an alternative
 plug-in on the commandline. There is no way to change what plugin is
-loaded using CS_LOAD_PLUGIN() unless by recompilation (unless of course
+loaded using @code{CS_LOAD_PLUGIN()} unless by recompilation (unless of course
 you use some other way to read the config file and find out what plugin
 to load).
 @end itemize
@@ -229,7 +229,7 @@ the desired tag. The easiest way to do this is as follows:
 This macro will search the object registry for the default object
 implementing the given interface (i.e. the object registered with the
 tag equal to the interface name). Alternatively you can also use
-@code{CS_QUERY_REGISTRY_TAG} to get an object with a specific tag.
+@code{CS_QUERY_REGISTRY_TAG()} to get an object with a specific tag.
 
 @item
 Conclusion
@@ -313,7 +313,7 @@ is an important object. You can create the plugin manager with
 Crystal Space is an event-driven framework. So a Crystal Space application
 will also be event driven. The event queue manages the event system and
 sends events to listeners. Every module or plugin that implements
-@code{iEventHandler} can register itself with the event queue so it gets
+@samp{iEventHandler} can register itself with the event queue so it gets
 notified when certain events happen. You can create the event queue
 with @code{csInitializer::CreateEventQueue()} or
 @code{csInitializer::CreateEnvironment()}.
@@ -332,7 +332,7 @@ for the application you can use @code{csInitializer::SetupEventHandler()}.
 Most Crystal Space applications will be time-based. The virtual clock
 supports the notion of @sc{current time} and @sc{elapsed time}. It is
 called a virtual clock because it doesn't necessarily have to correspond
-with real time. A game can be paused for example. Note that a well-behaved
+with real time. For example, a game can be paused. Note that a well-behaved
 game should always take elapsed time (between two frames) into consideration
 for calculating what could have happened in that time. This is important
 especially for physics calculations and also for speed of moving objects.
@@ -347,8 +347,8 @@ The virtual clock can be created with
 @cindex Commandline Parser
 
 The commandline parser is responsible for parsing options from
-the commandline. If you properly initialize it with @code{argc} and
-@code{argv} then you can use it to query options that have been given
+the commandline. If you properly initialize it with @samp{argc} and
+@samp{argv} then you can use it to query options that have been given
 to the commandline. Several Crystal Space plugins and modules will also
 query the commandline so it is important to have this object correctly
 initialized. The commandline parser can be created with
@@ -367,30 +367,41 @@ also do that if they want.
 
 You can create the configuration manager with:
 
-@code{csInitializer::CreateConfigManager()}@*
+@example
+csInitializer::CreateConfigManager()
+@end example
 
 @noindent
 or
 
-@code{csInitializer::CreateEnvironment()}
+@example
+csInitializer::CreateEnvironment()
+@end example
 
 You can setup the configuration manager with:
 
-@code{csInitializer::SetupConfigManager()}.
+@example
+csInitializer::SetupConfigManager()
+@end example
 
 @subsubheading The Input Drivers
 @cindex Input Drivers
 
 There are three standard input drivers included with Crystal Space:
-keyboard, mouse, and joystick. Calling
+keyboard, mouse, and joystick. Calling:
 
-@code{csInitializer::CreateInputDrivers()}
+@example
+csInitializer::CreateInputDrivers()
+@end example
 
 @noindent
 or
 
-@code{csInitializer::CreateEnvironment()}
+@example
+csInitializer::CreateEnvironment()
+@end example
 
+@noindent
 will create the drivers and publish them via the object registry.  These
 drivers will post events to the global event queue.
 
@@ -401,7 +412,7 @@ We already mentioned several of the functions above. This class (for which
 the definition can be found in @file{include/cstool/initapp.h}) is a
 convenience class that can be used to help you setup everything needed to
 get the application running. In the tutorial below we will use several of the
-functions from @code{csInitializer}. This class contains only static member
+functions from @samp{csInitializer}. This class contains only static member
 functions.
 
 @node TutIntro Minimum Requirements, TutIntro Compilation, TutIntro Basic Concepts, Tutorial Introduction
@@ -423,13 +434,13 @@ able to include it again (due to header protection) and would then not be
 able to add the additional stuff that it may need.
 
 @item
-@code{CS_IMPLEMENT_APPLICATION} needs to be put in the beginning of
+@code{CS_IMPLEMENT_APPLICATION()} needs to be put in the beginning of
 the file (@emph{after} the includes).
 
 @item
 The @code{main()} function must be declared with the following prototype:
 @example
-int main(int argc, char *argv[]);
+int main(int argc, char const* argv[]);
 @end example
 @end itemize
 

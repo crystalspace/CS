@@ -40,7 +40,7 @@ fountain):
 @end example
 
 This will use the @dfn{mesh object loader} plug-in which is identified by the
-@sc{scf} name mentioned by the @code{plugin} statement to load a factory
+@sc{scf} name mentioned by the @samp{plugin} statement to load a factory
 (type @samp{iMeshObjectFactory}) and register it with the engine.  There are no
 parameters for the fountain's Mesh Object Factory so that's why the
 @samp{params} block is empty.  But you still have to specify it.  Other mesh
@@ -84,8 +84,7 @@ statement, within the definition of a room or sector, like this:
 @end example
 
 This code fragment uses the @samp{crystalspace.mesh.loader.fountain} loader
-plug-in named
-to load a Mesh Object (type
+plug-in named to load a Mesh Object (type
 @samp{iMeshObject}) and register it with the engine (while placing it in the
 current sector).  In this case there are many parameters.  The first parameter
 should always be the name of the factory.  This is true for all Mesh Objects

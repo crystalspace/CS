@@ -59,7 +59,7 @@ The above text should be put in a header file. Let's put it in
 
 First we include @file{csutil/scf.h}. This is a Crystal Space header
 for @sc{scf} which we need to get the definition of @samp{iBase} and the
-definition of the @samp{SCF_VERSION} macro.
+definition of the @code{SCF_VERSION()} macro.
 
 Then we declare @samp{csVector3} as a class. We do this so that we
 can later use @samp{csVector3} as a parameter in one of the @sc{api} methods.
@@ -88,8 +88,8 @@ interfaces.  All @sc{scf} interfaces need to inherit from @samp{iBase}.  This
 will ensure that we have reference counting (more on that later) and also takes
 care of the other internal @sc{scf} issues.
 
-In that structure we define two methods: @samp{DoSomething()} and
-@samp{GetSomething()}. Note that every method is defined as follows:
+In that structure we define two methods: @code{DoSomething()} and
+@code{GetSomething()}. Note that every method is defined as follows:
 
 @example
 virtual @dots{} = 0;
@@ -99,7 +99,7 @@ The @samp{= 0} means that we will not give an implementation here. The
 implementation will be provided by the plugin (see later).
 
 Note that it is good practice to use @samp{const} wherever applicable.  In the
-declaration of @samp{GetSomething()} we added @samp{const} at the end to
+declaration of @code{GetSomething()} we added @samp{const} at the end to
 indicate that this method will not change the object.  This is useful for two
 reasons:
 
@@ -115,7 +115,7 @@ method will not modify the object.
 
 After you defined the @sc{api} for your plugin it is now time to actually
 make the plugin implementation. First you define a header called
-@samp{myplug.h} with the following contents:
+@file{myplug.h} with the following contents:
 
 @example
 #ifndef __GAME_MYPLUG_H__
@@ -160,7 +160,7 @@ public:
 
 This requires a little explanation.  The @sc{Crystal Space} framework requires
 that every @sc{scf} class implement the @samp{iComponent} interface.  This
-interface has a single method, @samp{Initialize()}, with which the class will
+interface has a single method, @code{Initialize()}, with which the class will
 be initialized after it is instantiated.  This gives the instance a chance to
 perform various initialization operations and it also provides the instance
 with a pointer to the global object registry.
@@ -177,7 +177,7 @@ In the example above the class @samp{MyPlugin} inherits from
 @samp{MyPlugin}. To do that the method declarations from @samp{iMyApi} are
 copied to @samp{MyPlugin} except that the @samp{= 0} is removed. To indicate
 that this class represents an implementation of an @sc{scf} interface
-we additionally need the @samp{SCF_DECLARE_IBASE} macro. This macro
+we additionally need the @code{SCF_DECLARE_IBASE()} macro. This macro
 will take care of declaring the @code{DecRef()} and @code{IncRef()} functions
 to take care of reference counting. In addition the macro also
 declares @code{QueryInterface()} so that it is possible to request
@@ -202,13 +202,13 @@ whatever you like.  This name is just a convention in Crystal Space.
 Sometimes embedded classes are also made friend of the main
 class so that they can access the private information. In this case
 this is not needed. The only thing that @samp{Component} has is an
-@samp{Initialize()} method which immediately transfers control to
-the parent's @samp{Initialize()} method.
+@code{Initialize()} method which immediately transfers control to
+the parent's @code{Initialize()} method.
 
 @subsubheading Creating the Plugin Implementation (source)
 
 Now we create the main source file containing the implementation
-of our plugin. Let's call this @samp{myplug.cpp}:
+of our plugin. Let's call this @file{myplug.cpp}:
 
 @example
 #include "cssysdef.h"
@@ -262,21 +262,20 @@ int MyPlugin::GetSomething () const
 
 @end example
 
-The first macro is @samp{CS_IMPLEMENT_PLUGIN}. This indicates to the
+The first macro is @code{CS_IMPLEMENT_PLUGIN()}. This indicates to the
 @sc{Crystal Space} framework that this module will end up as a plugin
 (as opposed to an application or library). On some platforms this
 actually makes a difference; on others it does not.  For best portability,
 you should use this macro in exactly one C++ file within each plugin
 module.
 
-The first @samp{SCF_IMPLEMENT_IBASE} section describes what interfaces
-the class @samp{MyPlugin} implements. This section says that
-@samp{MyPlugin} implements @samp{iMyApi} directly and @samp{iComponent} through
-embedding.
+The first @code{SCF_IMPLEMENT_IBASE()} describes what interfaces the class
+@samp{MyPlugin} implements.  This section says that @samp{MyPlugin} implements
+@samp{iMyApi} directly and @samp{iComponent} through embedding.
 
-The second @samp{SCF_IMPLEMENT_EMBEDDED_IBASE} section lists the
-interfaces implemented by the class @samp{MyPlugin::Component} (the
-embedded class).  @samp{MyPlugin::Component} only implements @samp{iComponent}.
+The second @code{SCF_IMPLEMENT_EMBEDDED_IBASE()} lists the interfaces
+implemented by the class @samp{MyPlugin::Component} (the embedded class).
+@samp{MyPlugin::Component} only implements @samp{iComponent}.
 
 It is important to correctly use the above macros.  These macros will ensure
 that the implementation for @code{IncRef()}, @code{DecRef()}, and
@@ -302,9 +301,9 @@ count set to 1 and so on).
 
 The rest of the plugin is very straightforward. It is important
 to realize that you should do most initialization of the plugin
-in the @samp{Initialize()} function and not in the constructor. The reason
+in the @code{Initialize()} function and not in the constructor. The reason
 for this is that at construction time you cannot depend on the entire
-Crystal Space framework being ready. Also when @samp{Initialize()} is
+Crystal Space framework being ready. Also when @code{Initialize()} is
 called you get a pointer to the object registry which is essential
 for locating other modules and plugins loaded by the Crystal Space
 framework.
@@ -314,19 +313,19 @@ This should conclude the implementation of the plugin.
 @subsubheading Telling @sc{scf} About Your Plugin
 
 @sc{scf} discovers plugins automatically and dynamically.  It determines which
-plugin modules implement which @sc{scf} classes by consulting metainformation
-associated with each plugin.  The metainformation file for your plugin must
+plugin modules implement which @sc{scf} classes by consulting meta-information
+associated with each plugin.  The meta-information file for your plugin must
 have the same basename as your built plugin module, but with extension
 @file{.csplugin}.  For example, if the example plugin is built with the name
 @file{myplugin.dll} (Windows) or @file{myplugin.so} (Unix), then the associated
-metainformation file should be named @file{myplugin.csplugin}.  The
-metainformation file is a structed @sc{xml}-format document, and can contain
+meta-information file should be named @file{myplugin.csplugin}.  The
+meta-information file is a structured @sc{xml}-format document, and can contain
 any information relevant to the plugin module.  @sc{scf} expects to find a node
 named @samp{scf}, which contains @sc{scf}-related information about the plugin
 module.
 
-The @file{myplugin.csplugin} metainformation file for our example plugin module
-might look something like this:
+The @file{myplugin.csplugin} meta-information file for our example plugin module
+might look like this:
 
 @example
 <?xml version="1.0"?>
@@ -374,7 +373,7 @@ First include the header defining the @sc{api} of the plugin:
 #include "myapi.h"
 @end example
 
-Do @emph{not} include the @samp{myplug.h} header file! This is implementation
+Do @emph{not} include the @file{myplug.h} header file! This is implementation
 specific and you should not use the implementation of the plugin
 directly. Doing this invalidates the entire reason to use plugins
 in the first place.
@@ -397,7 +396,7 @@ Then it will use the plugin manager to load your plugin. Note that
 this can fail. You should always check the returned value to see if
 it is different from @samp{NULL}.
 
-Another way to load the plugin is through @samp{RequestPlugins()} which
+Another way to load the plugin is through @code{RequestPlugins()} which
 is called at initialization time:
 
 @example

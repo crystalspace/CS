@@ -577,13 +577,13 @@ in the engine (called @code{CreateSectorWallsMesh()}) which will create a
 thing mesh and add it to the given sector. The only thing that has to be
 done after this is add polygons to that mesh. To do this we first query
 the interface called @code{iThingState} from the thing mesh object.
-We use the macro @code{SCF_QUERY_INTERFACE} which is part of @sc{scf}
+We use the macro @code{SCF_QUERY_INTERFACE()} which is part of @sc{scf}
 (@pxref{SCF}). This will see if the mesh object (which is wrapped by
 the mesh wrapper) actually implements @code{iThingState} (which should
 be the case here) and if so it will return a pointer to the implementation
 of @code{iThingState}. All mesh objects implement some kind of state
 interface which is used to set up or query the state of that mesh object.
-Note that all interfaces which you query using @code{SCF_QUERY_INTERFACE}
+Note that all interfaces which you query using @code{SCF_QUERY_INTERFACE()}
 should be released when you no longer need them (by calling @code{DecRef()}).
 However in this example we assign them to a @code{csRef} which takes care of
 @code{DecRef()} for us.

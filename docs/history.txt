@@ -7,6 +7,14 @@ The history order is reversed so that new features are at the top.
 	- Jorrit removed obsolete bindings for radiosity commands for Walktest
 	  and added 'r' key to record movements on/off and 'shift-r' to play
 	  the recording.
+	- Eric Sunshine made the following documentation-related changes:
+	    - Continued updating user manual to reflect latest SCF changes.
+	    - Fixed a significant number of Texinfo mark-up problems in
+	      walktest.txi.
+	    - Updated extremely outdated information about configuration and
+	      configuration files in user manual.
+	    - Corrected several mark-up bloofles in various .txi documents.
+	    - Eliminated TeX `hbox' warnings.
 2-Jul-2003
 	- Eric Sunshine fixed some spelling errors in the user manual pointed
 	  out by Vincent Knecht <vince@iefr.ath.cx>: existance -> existence
