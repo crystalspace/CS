@@ -91,7 +91,7 @@ public:
     csHashIterator *it = Iterated.GetIterator(HashKey);
     while (it->HasNext()) {
       char *n = (char*)it->Next();
-      if (strcmp(n, Key)==0) {
+      if (strcasecmp(n, Key)==0) {
         delete it;
         return true;
       }

@@ -289,7 +289,7 @@ bool csConfigIterator::DoNext()
 bool csConfigIterator::CheckSubsection(const char *Key) const
 {
   return (SubsectionLength == 0 ||
-    strncmp(Key, Subsection, SubsectionLength) == 0);
+    strncasecmp(Key, Subsection, SubsectionLength) == 0);
 }
 
 bool csConfigIterator::Prev ()
@@ -780,8 +780,8 @@ csConfigNode *csConfigFile::FindNode(const char *Name, bool isSubsection) const
   while (n)
   {
     const char* s = n->GetName();
-    if (s && ((isSubsection && strncmp(s, Name, sz) == 0) ||
-       (strcmp(s, Name) == 0)))
+    if (s && ((isSubsection && strncasecmp(s, Name, sz) == 0) ||
+       (strcasecmp(s, Name) == 0)))
       return n;
     n = n->GetNext();
   }
