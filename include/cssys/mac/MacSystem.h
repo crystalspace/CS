@@ -46,7 +46,7 @@ public:
 	virtual void Alert( const char* s );
 	virtual void Warn( const char* s );
 
-	OSErr		HandleAppleEvent( AppleEvent *theEvent );
+	OSErr		HandleAppleEvent( const AppleEvent *theEvent );
 
 	DECLARE_IBASE_EXT (csSystemDriver);
 
