@@ -20,6 +20,9 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine eliminated symbolic naming conflict in several of the
 	  NetSpace sources where a variable named "Protocol" conflicted with
 	  the Objective-C class of same name.
+	- Eric Sunshine fixed a bug in csFont where it incorrectly computed
+	  FontCount (as one too large).  This could have been responsible for
+	  the crasher in OpenGL AddFont().
 9-May-2000
 	- -revis commandline option will now work to force recalculation
 	  of the octree. -norevis will not work for this as CS cannot
