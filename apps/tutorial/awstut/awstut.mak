@@ -33,7 +33,7 @@ vpath %.cpp apps/tutorial/awstut apps/support
 AWSTUT.EXE = awstut$(EXE)
 INC.AWSTUT = $(wildcard apps/tutorial/awstut/*.h)
 SRC.AWSTUT = $(wildcard apps/tutorial/awstut/*.cpp)
-OBJ.AWSTUT = $(addprefix $(OUT),$(notdir $(SRC.AWSTUT:.cpp=$O)))
+OBJ.AWSTUT = $(addprefix $(OUT)/,$(notdir $(SRC.AWSTUT:.cpp=$O)))
 DEP.AWSTUT = CSTOOL CSUTIL CSSYS CSUTIL CSGEOM CSGFX
 LIB.AWSTUT = $(foreach d,$(DEP.AWSTUT),$($d.LIB))
 CFG.AWSTUT = data/config/awstut.cfg
@@ -63,11 +63,11 @@ awstutclean:
 	-$(RM) $(AWSTUT.EXE) $(OBJ.AWSTUT)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)awstut.dep
-$(OUTOS)awstut.dep: $(SRC.AWSTUT)
+dep: $(OUTOS)/awstut.dep
+$(OUTOS)/awstut.dep: $(SRC.AWSTUT)
 	$(DO.DEP)
 else
--include $(OUTOS)awstut.dep
+-include $(OUTOS)/awstut.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

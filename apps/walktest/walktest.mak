@@ -36,7 +36,7 @@ vpath %.cpp apps/walktest apps/support
 WALKTEST.EXE = walktest$(EXE)
 INC.WALKTEST = $(wildcard apps/walktest/*.h)
 SRC.WALKTEST = $(wildcard apps/walktest/*.cpp)
-OBJ.WALKTEST = $(addprefix $(OUT),$(notdir $(SRC.WALKTEST:.cpp=$O)))
+OBJ.WALKTEST = $(addprefix $(OUT)/,$(notdir $(SRC.WALKTEST:.cpp=$O)))
 DEP.WALKTEST = CSTOOL CSENGINE CSGEOM CSTOOL CSGFX CSSYS CSUTIL CSSYS
 LIB.WALKTEST = $(foreach d,$(DEP.WALKTEST),$($d.LIB))
 CFG.WALKTEST = data/config/walktest.cfg data/config/autoexec.cfg
@@ -69,11 +69,11 @@ walkclean:
 	-$(RM) $(WALKTEST.EXE) $(OBJ.WALKTEST)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)walktest.dep
-$(OUTOS)walktest.dep: $(SRC.WALKTEST)
+dep: $(OUTOS)/walktest.dep
+$(OUTOS)/walktest.dep: $(SRC.WALKTEST)
 	$(DO.DEP)
 else
--include $(OUTOS)walktest.dep
+-include $(OUTOS)/walktest.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

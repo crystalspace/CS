@@ -31,7 +31,7 @@ vpath %.cpp apps/import/map2cs
 MAP2CS.EXE = map2cs$(EXE)
 INC.MAP2CS = $(wildcard apps/import/map2cs/*.h)
 SRC.MAP2CS = $(wildcard apps/import/map2cs/*.cpp)
-OBJ.MAP2CS = $(addprefix $(OUT),$(notdir $(SRC.MAP2CS:.cpp=$O)))
+OBJ.MAP2CS = $(addprefix $(OUT)/,$(notdir $(SRC.MAP2CS:.cpp=$O)))
 DEP.MAP2CS = CSGFX CSUTIL CSSYS CSUTIL CSGEOM
 LIB.MAP2CS = $(foreach d,$(DEP.MAP2CS),$($d.LIB))
 CFG.MAP2CS = data/config/map2cs.cfg
@@ -63,11 +63,11 @@ map2csclean:
 	-$(RM) $(MAP2CS.EXE) $(OBJ.MAP2CS)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)map2cs.dep
-$(OUTOS)map2cs.dep: $(SRC.MAP2CS)
+dep: $(OUTOS)/map2cs.dep
+$(OUTOS)/map2cs.dep: $(SRC.MAP2CS)
 	$(DO.DEP)
 else
--include $(OUTOS)map2cs.dep
+-include $(OUTOS)/map2cs.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

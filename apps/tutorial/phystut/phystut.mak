@@ -31,7 +31,7 @@ vpath %.cpp apps/tutorial/phystut
 PHYSTUT.EXE = phystut$(EXE)
 INC.PHYSTUT = $(wildcard apps/tutorial/phystut/*.h)
 SRC.PHYSTUT = $(wildcard apps/tutorial/phystut/*.cpp)
-OBJ.PHYSTUT = $(addprefix $(OUT),$(notdir $(SRC.PHYSTUT:.cpp=$O)))
+OBJ.PHYSTUT = $(addprefix $(OUT)/,$(notdir $(SRC.PHYSTUT:.cpp=$O)))
 DEP.PHYSTUT = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.PHYSTUT = $(foreach d,$(DEP.PHYSTUT),$($d.LIB))
 
@@ -59,11 +59,11 @@ tutphysclean:
 	-$(RM) $(PHYSTUT.EXE) $(OBJ.PHYSTUT)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)phys.dep
-$(OUTOS)phys.dep: $(SRC.PHYSTUT)
+dep: $(OUTOS)/phys.dep
+$(OUTOS)/phys.dep: $(SRC.PHYSTUT)
 	$(DO.DEP)
 else
--include $(OUTOS)phys.dep
+-include $(OUTOS)/phys.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

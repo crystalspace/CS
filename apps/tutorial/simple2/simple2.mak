@@ -31,7 +31,7 @@ vpath %.cpp apps/tutorial/simple2
 SIMPLE2.EXE = simple2$(EXE)
 INC.SIMPLE2 = $(wildcard apps/tutorial/simple2/*.h)
 SRC.SIMPLE2 = $(wildcard apps/tutorial/simple2/*.cpp)
-OBJ.SIMPLE2 = $(addprefix $(OUT),$(notdir $(SRC.SIMPLE2:.cpp=$O)))
+OBJ.SIMPLE2 = $(addprefix $(OUT)/,$(notdir $(SRC.SIMPLE2:.cpp=$O)))
 DEP.SIMPLE2 = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.SIMPLE2 = $(foreach d,$(DEP.SIMPLE2),$($d.LIB))
 
@@ -59,11 +59,11 @@ tutsimp2clean:
 	-$(RM) $(SIMPLE2.EXE) $(OBJ.SIMPLE2)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)simple2.dep
-$(OUTOS)simple2.dep: $(SRC.SIMPLE2)
+dep: $(OUTOS)/simple2.dep
+$(OUTOS)/simple2.dep: $(SRC.SIMPLE2)
 	$(DO.DEP)
 else
--include $(OUTOS)simple2.dep
+-include $(OUTOS)/simple2.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

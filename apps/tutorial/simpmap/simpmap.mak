@@ -30,7 +30,7 @@ vpath %.cpp apps/tutorial/simpmap
 SIMPMAP.EXE=simpmap$(EXE)
 INC.SIMPMAP = $(wildcard apps/tutorial/simpmap/*.h)
 SRC.SIMPMAP = $(wildcard apps/tutorial/simpmap/*.cpp)
-OBJ.SIMPMAP = $(addprefix $(OUT),$(notdir $(SRC.SIMPMAP:.cpp=$O)))
+OBJ.SIMPMAP = $(addprefix $(OUT)/,$(notdir $(SRC.SIMPMAP:.cpp=$O)))
 DEP.SIMPMAP = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.SIMPMAP = $(foreach d,$(DEP.SIMPMAP),$($d.LIB))
 
@@ -58,11 +58,11 @@ tutmapclean:
 	-$(RM) $(SIMPMAP.EXE) $(OBJ.SIMPMAP)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)simpmap.dep
-$(OUTOS)simpmap.dep: $(SRC.SIMPMAP)
+dep: $(OUTOS)/simpmap.dep
+$(OUTOS)/simpmap.dep: $(SRC.SIMPMAP)
 	$(DO.DEP)
 else
--include $(OUTOS)simpmap.dep
+-include $(OUTOS)/simpmap.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

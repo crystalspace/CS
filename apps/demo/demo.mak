@@ -30,7 +30,7 @@ vpath %.cpp apps/demo
 CSDEMO.EXE=csdemo$(EXE)
 INC.CSDEMO = $(wildcard apps/demo/*.h)
 SRC.CSDEMO = $(wildcard apps/demo/*.cpp)
-OBJ.CSDEMO = $(addprefix $(OUT),$(notdir $(SRC.CSDEMO:.cpp=$O)))
+OBJ.CSDEMO = $(addprefix $(OUT)/,$(notdir $(SRC.CSDEMO:.cpp=$O)))
 DEP.CSDEMO = CSGFX CSUTIL CSTOOL CSSYS CSGEOM CSUTIL CSSYS
 LIB.CSDEMO = $(foreach d,$(DEP.CSDEMO),$($d.LIB))
 CFG.CSDEMO = data/config/csdemo.cfg
@@ -61,11 +61,11 @@ csdemoclean:
 	-$(RM) $(CSDEMO.EXE) $(OBJ.CSDEMO)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)csdemo.dep
-$(OUTOS)csdemo.dep: $(SRC.CSDEMO)
+dep: $(OUTOS)/csdemo.dep
+$(OUTOS)/csdemo.dep: $(SRC.CSDEMO)
 	$(DO.DEP)
 else
--include $(OUTOS)csdemo.dep
+-include $(OUTOS)/csdemo.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

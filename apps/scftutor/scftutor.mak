@@ -37,25 +37,25 @@ LIB.SCFTUTOR = $(foreach d,$(DEP.SCFTUTOR),$($d.LIB))
 ZOO.EXE = zoo$(EXE)
 INC.ZOO = $(wildcard apps/scftutor/*.h)
 SRC.ZOO = apps/scftutor/zoo.cpp apps/scftutor/frog.cpp
-OBJ.ZOO = $(addprefix $(OUT),$(notdir $(SRC.ZOO:.cpp=$O)))
+OBJ.ZOO = $(addprefix $(OUT)/,$(notdir $(SRC.ZOO:.cpp=$O)))
 DEP.ZOO = $(DEP.SCFTUTOR)
 LIB.ZOO = $(LIB.SCFTUTOR)
 
 INC.DOG = apps/scftutor/idog.h apps/scftutor/iname.h
 SRC.DOG = apps/scftutor/dog.cpp
-OBJ.DOG = $(addprefix $(OUT),$(notdir $(SRC.DOG:.cpp=$O)))
+OBJ.DOG = $(addprefix $(OUT)/,$(notdir $(SRC.DOG:.cpp=$O)))
 DEP.DOG = $(DEP.SCFTUTOR)
 LIB.DOG = $(LIB.SCFTUTOR)
 
 INC.WORM = apps/scftutor/iworm.h
 SRC.WORM = apps/scftutor/worm.cpp
-OBJ.WORM = $(addprefix $(OUT),$(notdir $(SRC.WORM:.cpp=$O)))
+OBJ.WORM = $(addprefix $(OUT)/,$(notdir $(SRC.WORM:.cpp=$O)))
 DEP.WORM = $(DEP.SCFTUTOR)
 LIB.WORM = $(LIB.SCFTUTOR)
 
 ifeq ($(USE_PLUGINS),yes)
-  DOG.DLL  = $(OUTDLL)dog$(DLL)
-  WORM.DLL = $(OUTDLL)worm$(DLL)
+  DOG.DLL  = $(OUTDLL)/dog$(DLL)
+  WORM.DLL = $(OUTDLL)/worm$(DLL)
   #TO_INSTALL.DYNAMIC_LIBS += $(DOG.DLL) $(WORM.DLL)
 else
   SRC.ZOO += $(SRC.DOG) $(SRC.WORM)
@@ -108,11 +108,11 @@ scftutclean:
 	$(OBJ.WORM)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)scftut.dep
-$(OUTOS)scftut.dep: $(SRC.ZOO) $(SRC.DOG) $(SRC.WORM)
+dep: $(OUTOS)/scftut.dep
+$(OUTOS)/scftut.dep: $(SRC.ZOO) $(SRC.DOG) $(SRC.WORM)
 	$(DO.DEP)
 else
--include $(OUTOS)scftut.dep
+-include $(OUTOS)/scftut.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

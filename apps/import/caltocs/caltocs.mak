@@ -31,7 +31,7 @@ vpath %.cpp apps/import/caltocs
 
 CALTOCS.EXE = caltocs$(EXE)
 SRC.CALTOCS = $(wildcard apps/import/caltocs/*.cpp)
-OBJ.CALTOCS = $(addprefix $(OUT),$(notdir $(SRC.CALTOCS:.cpp=$O)))
+OBJ.CALTOCS = $(addprefix $(OUT)/,$(notdir $(SRC.CALTOCS:.cpp=$O)))
 
 TO_INSTALL.EXE    += $(CALTOCS.EXE)
 
@@ -58,11 +58,11 @@ caltocsclean:
 	-$(RM) $(CALTOCS.EXE) $(OBJ.CALTOCS)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)caltocs.dep
-$(OUTOS)caltocs.dep: $(SRC.CALTOCS)
+dep: $(OUTOS)/caltocs.dep
+$(OUTOS)/caltocs.dep: $(SRC.CALTOCS)
 	$(DO.DEP)
 else
--include $(OUTOS)caltocs.dep
+-include $(OUTOS)/caltocs.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

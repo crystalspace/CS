@@ -33,7 +33,7 @@ vpath %.cpp apps/tests/awstest apps/support
 AWSTEST.EXE = awstest$(EXE)
 INC.AWSTEST = $(wildcard apps/tests/awstest/*.h)
 SRC.AWSTEST = $(wildcard apps/tests/awstest/*.cpp)
-OBJ.AWSTEST = $(addprefix $(OUT),$(notdir $(SRC.AWSTEST:.cpp=$O)))
+OBJ.AWSTEST = $(addprefix $(OUT)/,$(notdir $(SRC.AWSTEST:.cpp=$O)))
 DEP.AWSTEST = CSTOOL CSUTIL CSSYS CSUTIL CSGEOM CSGFX
 LIB.AWSTEST = $(foreach d,$(DEP.AWSTEST),$($d.LIB))
 CFG.AWSTEST = data/config/awstest.cfg
@@ -63,11 +63,11 @@ awststclean:
 	-$(RM) $(AWSTEST.EXE) $(OBJ.AWSTEST)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)awstest.dep
-$(OUTOS)awstest.dep: $(SRC.AWSTEST)
+dep: $(OUTOS)/awstest.dep
+$(OUTOS)/awstest.dep: $(SRC.AWSTEST)
 	$(DO.DEP)
 else
--include $(OUTOS)awstest.dep
+-include $(OUTOS)/awstest.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -31,7 +31,7 @@ vpath %.cpp apps/tools/viewmesh
 VIEWMESH.EXE = viewmesh$(EXE)
 INC.VIEWMESH = $(wildcard apps/tools/viewmesh/*.h)
 SRC.VIEWMESH = $(wildcard apps/tools/viewmesh/*.cpp)
-OBJ.VIEWMESH = $(addprefix $(OUT),$(notdir $(SRC.VIEWMESH:.cpp=$O)))
+OBJ.VIEWMESH = $(addprefix $(OUT)/,$(notdir $(SRC.VIEWMESH:.cpp=$O)))
 DEP.VIEWMESH = CSWS CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.VIEWMESH = $(foreach d,$(DEP.VIEWMESH),$($d.LIB))
 
@@ -59,11 +59,11 @@ vmeshclean:
 	-$(RM) $(VIEWMESH.EXE) $(OBJ.VIEWMESH)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)viewmesh.dep
-$(OUTOS)viewmesh.dep: $(SRC.VIEWMESH)
+dep: $(OUTOS)/viewmesh.dep
+$(OUTOS)/viewmesh.dep: $(SRC.VIEWMESH)
 	$(DO.DEP)
 else
--include $(OUTOS)viewmesh.dep
+-include $(OUTOS)/viewmesh.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

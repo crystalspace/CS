@@ -31,7 +31,7 @@ vpath %.cpp apps/tutorial/simpvs
 SIMPVS.EXE = simpvs$(EXE)
 INC.SIMPVS = $(wildcard apps/tutorial/simpvs/*.h)
 SRC.SIMPVS = $(wildcard apps/tutorial/simpvs/*.cpp)
-OBJ.SIMPVS = $(addprefix $(OUT),$(notdir $(SRC.SIMPVS:.cpp=$O)))
+OBJ.SIMPVS = $(addprefix $(OUT)/,$(notdir $(SRC.SIMPVS:.cpp=$O)))
 DEP.SIMPVS = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.SIMPVS = $(foreach d,$(DEP.SIMPVS),$($d.LIB))
 
@@ -59,11 +59,11 @@ tutsimpvsclean:
 	-$(RM) $(SIMPVS.EXE) $(OBJ.SIMPVS)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)simpvs.dep
-$(OUTOS)simpvs.dep: $(SRC.SIMPVS)
+dep: $(OUTOS)/simpvs.dep
+$(OUTOS)/simpvs.dep: $(SRC.SIMPVS)
 	$(DO.DEP)
 else
--include $(OUTOS)simpvs.dep
+-include $(OUTOS)/simpvs.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

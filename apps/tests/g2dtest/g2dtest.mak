@@ -30,7 +30,7 @@ vpath %.cpp apps/tests/g2dtest
 G2DTEST.EXE = g2dtest$(EXE)
 INC.G2DTEST =
 SRC.G2DTEST = apps/tests/g2dtest/g2dtest.cpp
-OBJ.G2DTEST = $(addprefix $(OUT),$(notdir $(SRC.G2DTEST:.cpp=$O)))
+OBJ.G2DTEST = $(addprefix $(OUT)/,$(notdir $(SRC.G2DTEST:.cpp=$O)))
 DEP.G2DTEST = CSTOOL CSGFX CSSYS CSUTIL CSGEOM
 LIB.G2DTEST = $(foreach d,$(DEP.G2DTEST),$($d.LIB))
 
@@ -57,11 +57,11 @@ g2dtstclean:
 	-$(RM) $(G2DTEST.EXE) $(OBJ.G2DTEST)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)g2dtest.dep
-$(OUTOS)g2dtest.dep: $(SRC.G2DTEST)
+dep: $(OUTOS)/g2dtest.dep
+$(OUTOS)/g2dtest.dep: $(SRC.G2DTEST)
 	$(DO.DEP)
 else
--include $(OUTOS)g2dtest.dep
+-include $(OUTOS)/g2dtest.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

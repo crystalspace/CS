@@ -33,7 +33,7 @@ vpath %.cpp apps/tools/scfreg
 SCFREG.EXE = scfreg$(EXE)
 INC.SCFREG =
 SRC.SCFREG = apps/tools/scfreg/scfreg.cpp
-OBJ.SCFREG = $(addprefix $(OUT),$(notdir $(SRC.SCFREG:.cpp=$O)))
+OBJ.SCFREG = $(addprefix $(OUT)/,$(notdir $(SRC.SCFREG:.cpp=$O)))
 DEP.SCFREG = CSSYS CSUTIL CSGEOM
 LIB.SCFREG = $(foreach d,$(DEP.SCFREG),$($d.LIB))
 
@@ -61,11 +61,11 @@ scfrclean:
 	-$(RM) $(SCFREG.EXE) $(OBJ.SCFREG)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)scfreg.dep
-$(OUTOS)scfreg.dep: $(SRC.SCFREG)
+dep: $(OUTOS)/scfreg.dep
+$(OUTOS)/scfreg.dep: $(SRC.SCFREG)
 	$(DO.DEP)
 else
--include $(OUTOS)scfreg.dep
+-include $(OUTOS)/scfreg.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

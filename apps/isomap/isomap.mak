@@ -30,7 +30,7 @@ vpath %.cpp apps/isomap
 ISOMAP.EXE = isomap$(EXE)
 INC.ISOMAP = $(wildcard apps/isomap/*.h)
 SRC.ISOMAP = $(wildcard apps/isomap/*.cpp)
-OBJ.ISOMAP = $(addprefix $(OUT),$(notdir $(SRC.ISOMAP:.cpp=$O)))
+OBJ.ISOMAP = $(addprefix $(OUT)/,$(notdir $(SRC.ISOMAP:.cpp=$O)))
 DEP.ISOMAP = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSUTIL
 LIB.ISOMAP = $(foreach d,$(DEP.ISOMAP),$($d.LIB))
 #CFG.ISOMAP = data/config/isomap.cfg
@@ -60,11 +60,11 @@ isomapclean:
 	-$(RM) $(ISOMAP.EXE) $(OBJ.ISOMAP)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)isomap.dep
-$(OUTOS)isomap.dep: $(SRC.ISOMAP)
+dep: $(OUTOS)/isomap.dep
+$(OUTOS)/isomap.dep: $(SRC.ISOMAP)
 	$(DO.DEP)
 else
--include $(OUTOS)isomap.dep
+-include $(OUTOS)/isomap.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

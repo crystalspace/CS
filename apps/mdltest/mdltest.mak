@@ -31,7 +31,7 @@ vpath %.cpp apps/mdltest
 MDLTEST.EXE = mdltest$(EXE)
 INC.MDLTEST = $(wildcard apps/mdltest/*.h)
 SRC.MDLTEST = $(wildcard apps/mdltest/*.cpp)
-OBJ.MDLTEST = $(addprefix $(OUT),$(notdir $(SRC.MDLTEST:.cpp=$O)))
+OBJ.MDLTEST = $(addprefix $(OUT)/,$(notdir $(SRC.MDLTEST:.cpp=$O)))
 DEP.MDLTEST = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.MDLTEST = $(foreach d,$(DEP.MDLTEST),$($d.LIB))
 
@@ -59,11 +59,11 @@ mdltestclean:
 	-$(RM) $(MDLTEST.EXE) $(OBJ.MDLTEST)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)mdltest.dep
-$(OUTOS)mdltest.dep: $(SRC.MDLTEST)
+dep: $(OUTOS)/mdltest.dep
+$(OUTOS)/mdltest.dep: $(SRC.MDLTEST)
 	$(DO.DEP)
 else
--include $(OUTOS)mdltest.dep
+-include $(OUTOS)/mdltest.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

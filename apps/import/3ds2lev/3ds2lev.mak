@@ -30,7 +30,7 @@ vpath %.cpp apps/import/3ds2lev
 3DS2LEV.EXE = 3ds2lev$(EXE)
 INC.3DS2LEV = $(wildcard apps/import/3ds2lev/*.h)
 SRC.3DS2LEV = $(wildcard apps/import/3ds2lev/*.cpp)
-OBJ.3DS2LEV = $(addprefix $(OUT),$(notdir $(SRC.3DS2LEV:.cpp=$O)))
+OBJ.3DS2LEV = $(addprefix $(OUT)/,$(notdir $(SRC.3DS2LEV:.cpp=$O)))
 DEP.3DS2LEV = CSGEOM CSUTIL CSSYS CSUTIL
 LIB.3DS2LEV = $(foreach d,$(DEP.3DS2LEV),$($d.LIB))
 
@@ -58,12 +58,12 @@ $(3DS2LEV.EXE): $(OBJ.3DS2LEV) $(LIB.3DS2LEV)
 	-$(RM) $(3DS2LEV.EXE) $(OBJ.3DS2LEV)
 
 ifdef DO_DEPEND
-3ds2levdep: $(OUTOS)3ds2lev.dep
-#dep: $(OUTOS)3ds2lev.dep
-$(OUTOS)3ds2lev.dep: $(SRC.3DS2LEV)
+3ds2levdep: $(OUTOS)/3ds2lev.dep
+#dep: $(OUTOS)/3ds2lev.dep
+$(OUTOS)/3ds2lev.dep: $(SRC.3DS2LEV)
 	$(DO.DEP)
 else
--include $(OUTOS)3ds2lev.dep
+-include $(OUTOS)/3ds2lev.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

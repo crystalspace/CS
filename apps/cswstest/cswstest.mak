@@ -30,7 +30,7 @@ vpath %.cpp apps/cswstest apps/support
 CSWSTEST.EXE = cswstest$(EXE)
 INC.CSWSTEST = $(wildcard apps/cswstest/*.h)
 SRC.CSWSTEST = $(wildcard apps/cswstest/*.cpp)
-OBJ.CSWSTEST = $(addprefix $(OUT),$(notdir $(SRC.CSWSTEST:.cpp=$O)))
+OBJ.CSWSTEST = $(addprefix $(OUT)/,$(notdir $(SRC.CSWSTEST:.cpp=$O)))
 DEP.CSWSTEST = CSWS CSGFX CSGEOM CSSYS CSGEOM CSUTIL CSTOOL CSUTIL CSSYS CSUTIL
 LIB.CSWSTEST = $(foreach d,$(DEP.CSWSTEST),$($d.LIB))
 CFG.CSWSTEST = data/config/cswstest.cfg
@@ -60,11 +60,11 @@ cswstestclean:
 	-$(RM) $(CSWSTEST.EXE) $(OBJ.CSWSTEST)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)cswstest.dep
-$(OUTOS)cswstest.dep: $(SRC.CSWSTEST)
+dep: $(OUTOS)/cswstest.dep
+$(OUTOS)/cswstest.dep: $(SRC.CSWSTEST)
 	$(DO.DEP)
 else
--include $(OUTOS)cswstest.dep
+-include $(OUTOS)/cswstest.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

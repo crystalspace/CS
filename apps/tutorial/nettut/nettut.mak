@@ -31,7 +31,7 @@ vpath %.cpp apps/tutorial/nettut
 NETTUT.EXE = nettut$(EXE)
 INC.NETTUT = $(wildcard apps/tutorial/nettut/*.h)
 SRC.NETTUT = $(wildcard apps/tutorial/nettut/*.cpp)
-OBJ.NETTUT = $(addprefix $(OUT),$(notdir $(SRC.NETTUT:.cpp=$O)))
+OBJ.NETTUT = $(addprefix $(OUT)/,$(notdir $(SRC.NETTUT:.cpp=$O)))
 DEP.NETTUT = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.NETTUT = $(foreach d,$(DEP.NETTUT),$($d.LIB))
 
@@ -59,11 +59,11 @@ netutclean:
 	-$(RM) $(NETTUT.EXE) $(OBJ.NETTUT)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)nettut.dep
-$(OUTOS)nettut.dep: $(SRC.NETTUT)
+dep: $(OUTOS)/nettut.dep
+$(OUTOS)/nettut.dep: $(SRC.NETTUT)
 	$(DO.DEP)
 else
--include $(OUTOS)nettut.dep
+-include $(OUTOS)/nettut.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

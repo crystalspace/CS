@@ -30,7 +30,7 @@ vpath %.cpp apps/tools/makedep
 MAKEDEP.EXE=makedep$(EXE)
 INC.MAKEDEP = $(wildcard apps/tools/makedep/*.h)
 SRC.MAKEDEP = $(wildcard apps/tools/makedep/*.cpp)
-OBJ.MAKEDEP = $(addprefix $(OUT),$(notdir $(SRC.MAKEDEP:.cpp=$O)))
+OBJ.MAKEDEP = $(addprefix $(OUT)/,$(notdir $(SRC.MAKEDEP:.cpp=$O)))
 DEP.MAKEDEP =
 LIB.MAKEDEP = $(foreach d,$(DEP.MAKEDEP),$($d.LIB))
 
@@ -51,7 +51,7 @@ all: $(MAKEDEP.EXE)
 build.makedep: $(OUTDIRS) $(MAKEDEP.EXE)
 clean: mkdepclean
 
-$(OUT)main$O: apps/tools/makedep/main.cpp
+$(OUT)/main$O: apps/tools/makedep/main.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.MAKEDEP)
 
 $(MAKEDEP.EXE): $(OBJ.MAKEDEP) $(LIB.MAKEDEP)
@@ -61,11 +61,11 @@ mkdepclean:
 	-$(RM) $(MAKEDEP.EXE) $(OBJ.MAKEDEP)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)makedep.dep
-$(OUTOS)makedep.dep: $(SRC.MAKEDEP)
+dep: $(OUTOS)/makedep.dep
+$(OUTOS)/makedep.dep: $(SRC.MAKEDEP)
 	$(DO.DEP)
 else
--include $(OUTOS)makedep.dep
+-include $(OUTOS)/makedep.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -30,7 +30,7 @@ vpath %.cpp apps/perftest apps/support
 PERFTEST.EXE = perftest$(EXE)
 INC.PERFTEST = $(wildcard apps/perftest/*.h)
 SRC.PERFTEST = $(wildcard apps/perftest/*.cpp)
-OBJ.PERFTEST = $(addprefix $(OUT),$(notdir $(SRC.PERFTEST:.cpp=$O)))
+OBJ.PERFTEST = $(addprefix $(OUT)/,$(notdir $(SRC.PERFTEST:.cpp=$O)))
 DEP.PERFTEST = CSUTIL CSTOOL CSSYS CSGEOM CSUTIL CSGFX
 LIB.PERFTEST = $(foreach d,$(DEP.PERFTEST),$($d.LIB))
 
@@ -58,11 +58,11 @@ perftestclean:
 	-$(RM) $(PERFTEST.EXE) $(OBJ.PERFTEST)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)perftest.dep
-$(OUTOS)perftest.dep: $(SRC.PERFTEST)
+dep: $(OUTOS)/perftest.dep
+$(OUTOS)/perftest.dep: $(SRC.PERFTEST)
 	$(DO.DEP)
 else
--include $(OUTOS)perftest.dep
+-include $(OUTOS)/perftest.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

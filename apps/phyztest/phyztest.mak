@@ -30,7 +30,7 @@ vpath %.cpp apps/phyztest apps/support
 PHYZTEST.EXE = phyztest$(EXE)
 INC.PHYZTEST = $(wildcard apps/phyztest/*.h)
 SRC.PHYZTEST = $(wildcard apps/phyztest/*.cpp)
-OBJ.PHYZTEST = $(addprefix $(OUT),$(notdir $(SRC.PHYZTEST:.cpp=$O)))
+OBJ.PHYZTEST = $(addprefix $(OUT)/,$(notdir $(SRC.PHYZTEST:.cpp=$O)))
 DEP.PHYZTEST = CSTOOL CSENGINE CSTOOL CSGFX CSPHYZIK CSUTIL CSSYS CSGEOM \
   CSUTIL
 LIB.PHYZTEST = $(foreach d,$(DEP.PHYZTEST),$($d.LIB))
@@ -59,11 +59,11 @@ phyzclean:
 	-$(RM) $(PHYZTEST.EXE) $(OBJ.PHYZTEST)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)phyztest.dep
-$(OUTOS)phyztest.dep: $(SRC.PHYZTEST)
+dep: $(OUTOS)/phyztest.dep
+$(OUTOS)/phyztest.dep: $(SRC.PHYZTEST)
 	$(DO.DEP)
 else
--include $(OUTOS)phyztest.dep
+-include $(OUTOS)/phyztest.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

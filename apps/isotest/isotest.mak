@@ -30,7 +30,7 @@ vpath %.cpp apps/isotest
 ISOTEST.EXE = isotest$(EXE)
 INC.ISOTEST = $(wildcard apps/isotest/*.h)
 SRC.ISOTEST = $(wildcard apps/isotest/*.cpp)
-OBJ.ISOTEST = $(addprefix $(OUT),$(notdir $(SRC.ISOTEST:.cpp=$O)))
+OBJ.ISOTEST = $(addprefix $(OUT)/,$(notdir $(SRC.ISOTEST:.cpp=$O)))
 DEP.ISOTEST = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSUTIL
 LIB.ISOTEST = $(foreach d,$(DEP.ISOTEST),$($d.LIB))
 #CFG.ISOTEST = data/config/isotest.cfg
@@ -60,11 +60,11 @@ isotestclean:
 	-$(RM) $(ISOTEST.EXE) $(OBJ.ISOTEST)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)isotest.dep
-$(OUTOS)isotest.dep: $(SRC.ISOTEST)
+dep: $(OUTOS)/isotest.dep
+$(OUTOS)/isotest.dep: $(SRC.ISOTEST)
 	$(DO.DEP)
 else
--include $(OUTOS)isotest.dep
+-include $(OUTOS)/isotest.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

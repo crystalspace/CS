@@ -31,7 +31,7 @@ vpath %.cpp apps/tutorial/simplept
 SIMPLEPT.EXE = simplept$(EXE)
 INC.SIMPLEPT = $(wildcard apps/tutorial/simplept/*.h)
 SRC.SIMPLEPT = $(wildcard apps/tutorial/simplept/*.cpp)
-OBJ.SIMPLEPT = $(addprefix $(OUT),$(notdir $(SRC.SIMPLEPT:.cpp=$O)))
+OBJ.SIMPLEPT = $(addprefix $(OUT)/,$(notdir $(SRC.SIMPLEPT:.cpp=$O)))
 DEP.SIMPLEPT = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.SIMPLEPT = $(foreach d,$(DEP.SIMPLEPT),$($d.LIB))
 
@@ -59,11 +59,11 @@ tutsimpleptclean:
 	-$(RM) $(SIMPLEPT.EXE) $(OBJ.SIMPLEPT)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)simplept.dep
-$(OUTOS)simplept.dep: $(SRC.SIMPLEPT)
+dep: $(OUTOS)/simplept.dep
+$(OUTOS)/simplept.dep: $(SRC.SIMPLEPT)
 	$(DO.DEP)
 else
--include $(OUTOS)simplept.dep
+-include $(OUTOS)/simplept.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

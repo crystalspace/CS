@@ -30,7 +30,7 @@ vpath %.cpp apps/examples/cswseng
 CSWSENG.EXE = cswseng$(EXE)
 INC.CSWSENG = $(wildcard apps/examples/cswseng/*.h)
 SRC.CSWSENG = $(wildcard apps/examples/cswseng/*.cpp)
-OBJ.CSWSENG = $(addprefix $(OUT),$(notdir $(SRC.CSWSENG:.cpp=$O)))
+OBJ.CSWSENG = $(addprefix $(OUT)/,$(notdir $(SRC.CSWSENG:.cpp=$O)))
 DEP.CSWSENG = \
   CSWS CSTOOL CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.CSWSENG = $(foreach d,$(DEP.CSWSENG),$($d.LIB))
@@ -60,11 +60,11 @@ cswsengclean:
 	-$(RM) $(CSWSENG.EXE) $(OBJ.CSWSENG)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)cswseng.dep
-$(OUTOS)cswseng.dep: $(SRC.CSWSENG)
+dep: $(OUTOS)/cswseng.dep
+$(OUTOS)/cswseng.dep: $(SRC.CSWSENG)
 	$(DO.DEP)
 else
--include $(OUTOS)cswseng.dep
+-include $(OUTOS)/cswseng.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

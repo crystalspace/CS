@@ -31,7 +31,7 @@ vpath %.cpp apps/tutorial/simple1
 SIMPLE1.EXE = simple1$(EXE)
 INC.SIMPLE1 = $(wildcard apps/tutorial/simple1/*.h)
 SRC.SIMPLE1 = $(wildcard apps/tutorial/simple1/*.cpp)
-OBJ.SIMPLE1 = $(addprefix $(OUT),$(notdir $(SRC.SIMPLE1:.cpp=$O)))
+OBJ.SIMPLE1 = $(addprefix $(OUT)/,$(notdir $(SRC.SIMPLE1:.cpp=$O)))
 DEP.SIMPLE1 = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.SIMPLE1 = $(foreach d,$(DEP.SIMPLE1),$($d.LIB))
 
@@ -59,11 +59,11 @@ tutsimp1clean:
 	-$(RM) $(SIMPLE1.EXE) $(OBJ.SIMPLE1)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)simple1.dep
-$(OUTOS)simple1.dep: $(SRC.SIMPLE1)
+dep: $(OUTOS)/simple1.dep
+$(OUTOS)/simple1.dep: $(SRC.SIMPLE1)
 	$(DO.DEP)
 else
--include $(OUTOS)simple1.dep
+-include $(OUTOS)/simple1.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

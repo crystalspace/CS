@@ -30,7 +30,7 @@ vpath %.cpp apps/tests/unittest
 UNITTEST.EXE = unittest$(EXE)
 INC.UNITTEST = $(wildcard apps/tests/unittest/*.h)
 SRC.UNITTEST = $(wildcard apps/tests/unittest/*.cpp)
-OBJ.UNITTEST = $(addprefix $(OUT),$(notdir $(SRC.UNITTEST:.cpp=$O)))
+OBJ.UNITTEST = $(addprefix $(OUT)/,$(notdir $(SRC.UNITTEST:.cpp=$O)))
 DEP.UNITTEST = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSUTIL CSSYS
 LIB.UNITTEST = $(foreach d,$(DEP.UNITTEST),$($d.LIB))
 
@@ -61,11 +61,11 @@ unitclean:
 	-$(RM) $(UNITTEST.EXE) $(OBJ.UNITTEST)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)unittest.dep
-$(OUTOS)unittest.dep: $(SRC.UNITTEST)
+dep: $(OUTOS)/unittest.dep
+$(OUTOS)/unittest.dep: $(SRC.UNITTEST)
 	$(DO.DEP)
 else
--include $(OUTOS)unittest.dep
+-include $(OUTOS)/unittest.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -30,7 +30,7 @@ vpath %.cpp apps/blocks apps/support
 BLOCKS.EXE = blocks$(EXE)
 INC.BLOCKS = $(wildcard apps/blocks/*.h)
 SRC.BLOCKS = $(wildcard apps/blocks/*.cpp)
-OBJ.BLOCKS = $(addprefix $(OUT),$(notdir $(SRC.BLOCKS:.cpp=$O)))
+OBJ.BLOCKS = $(addprefix $(OUT)/,$(notdir $(SRC.BLOCKS:.cpp=$O)))
 DEP.BLOCKS = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.BLOCKS = $(foreach d,$(DEP.BLOCKS),$($d.LIB))
 CFG.BLOCKS = data/config/blocks.cfg
@@ -61,11 +61,11 @@ blocksclean:
 	-$(RM) $(BLOCKS.EXE) $(OBJ.BLOCKS)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)blocks.dep
-$(OUTOS)blocks.dep: $(SRC.BLOCKS)
+dep: $(OUTOS)/blocks.dep
+$(OUTOS)/blocks.dep: $(SRC.BLOCKS)
 	$(DO.DEP)
 else
--include $(OUTOS)blocks.dep
+-include $(OUTOS)/blocks.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -31,7 +31,7 @@ vpath %.cpp apps/tutorial/simpcd
 SIMPCD.EXE = simpcd$(EXE)
 INC.SIMPCD = $(wildcard apps/tutorial/simpcd/*.h)
 SRC.SIMPCD = $(wildcard apps/tutorial/simpcd/*.cpp)
-OBJ.SIMPCD = $(addprefix $(OUT),$(notdir $(SRC.SIMPCD:.cpp=$O)))
+OBJ.SIMPCD = $(addprefix $(OUT)/,$(notdir $(SRC.SIMPCD:.cpp=$O)))
 DEP.SIMPCD = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.SIMPCD = $(foreach d,$(DEP.SIMPCD),$($d.LIB))
 
@@ -59,11 +59,11 @@ tutsimpcdclean:
 	-$(RM) $(SIMPCD.EXE) $(OBJ.SIMPCD)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)simpcd.dep
-$(OUTOS)simpcd.dep: $(SRC.SIMPCD)
+dep: $(OUTOS)/simpcd.dep
+$(OUTOS)/simpcd.dep: $(SRC.SIMPCD)
 	$(DO.DEP)
 else
--include $(OUTOS)simpcd.dep
+-include $(OUTOS)/simpcd.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

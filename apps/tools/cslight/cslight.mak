@@ -31,7 +31,7 @@ vpath %.cpp apps/tools/cslight
 CSLIGHT.EXE = cslight$(EXE)
 INC.CSLIGHT = $(wildcard apps/tools/cslight/*.h)
 SRC.CSLIGHT = $(wildcard apps/tools/cslight/*.cpp)
-OBJ.CSLIGHT = $(addprefix $(OUT),$(notdir $(SRC.CSLIGHT:.cpp=$O)))
+OBJ.CSLIGHT = $(addprefix $(OUT)/,$(notdir $(SRC.CSLIGHT:.cpp=$O)))
 DEP.CSLIGHT = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.CSLIGHT = $(foreach d,$(DEP.CSLIGHT),$($d.LIB))
 
@@ -61,11 +61,11 @@ cslghtclean:
 	-$(RM) $(CSLIGHT.EXE) $(OBJ.CSLIGHT)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)cslight.dep
-$(OUTOS)cslight.dep: $(SRC.CSLIGHT)
+dep: $(OUTOS)/cslight.dep
+$(OUTOS)/cslight.dep: $(SRC.CSLIGHT)
 	$(DO.DEP)
 else
--include $(OUTOS)cslight.dep
+-include $(OUTOS)/cslight.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

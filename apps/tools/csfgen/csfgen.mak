@@ -33,7 +33,7 @@ vpath %.cpp apps/tools/csfgen
 CSFGEN.EXE = csfgen$(EXE)
 INC.CSFGEN = $(wildcard apps/tools/csfgen/*.h)
 SRC.CSFGEN = $(wildcard apps/tools/csfgen/*.cpp)
-OBJ.CSFGEN = $(addprefix $(OUT),$(notdir $(SRC.CSFGEN:.cpp=$O)))
+OBJ.CSFGEN = $(addprefix $(OUT)/,$(notdir $(SRC.CSFGEN:.cpp=$O)))
 DEP.CSFGEN = CSTOOL CSUTIL CSSYS CSGEOM CSUTIL
 LIB.CSFGEN = $(foreach d,$(DEP.CSFGEN),$($d.LIB))
 
@@ -61,11 +61,11 @@ csfgclean:
 	-$(RM) $(CSFGEN.EXE) $(OBJ.CSFGEN)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)csfgen.dep
-$(OUTOS)csfgen.dep: $(SRC.CSFGEN)
+dep: $(OUTOS)/csfgen.dep
+$(OUTOS)/csfgen.dep: $(SRC.CSFGEN)
 	$(DO.DEP)
 else
--include $(OUTOS)csfgen.dep
+-include $(OUTOS)/csfgen.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

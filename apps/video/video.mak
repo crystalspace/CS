@@ -33,7 +33,7 @@ vpath %.cpp apps/video
 CSVID.EXE=csvid$(EXE)
 INC.CSVID = $(wildcard apps/video/*.h)
 SRC.CSVID = $(wildcard apps/video/*.cpp)
-OBJ.CSVID = $(addprefix $(OUT),$(notdir $(SRC.CSVID:.cpp=$O)))
+OBJ.CSVID = $(addprefix $(OUT)/,$(notdir $(SRC.CSVID:.cpp=$O)))
 DEP.CSVID = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.CSVID = $(foreach d,$(DEP.CSVID),$($d.LIB))
 
@@ -61,11 +61,11 @@ vidclean:
 	-$(RM) $(CSVID.EXE) $(OBJ.CSVID)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)csvid.dep
-$(OUTOS)csvid.dep: $(SRC.CSVID)
+dep: $(OUTOS)/csvid.dep
+$(OUTOS)/csvid.dep: $(SRC.CSVID)
 	$(DO.DEP)
 else
--include $(OUTOS)csvid.dep
+-include $(OUTOS)/csvid.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

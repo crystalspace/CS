@@ -31,7 +31,7 @@ vpath %.cpp apps/import/milk2spr
 MILK2SPR.EXE = milk2spr$(EXE)
 INC.MILK2SPR = $(wildcard apps/import/milk2spr/*.h)
 SRC.MILK2SPR = $(wildcard apps/import/milk2spr/*.cpp)
-OBJ.MILK2SPR = $(addprefix $(OUT),$(notdir $(SRC.MILK2SPR:.cpp=$O)))
+OBJ.MILK2SPR = $(addprefix $(OUT)/,$(notdir $(SRC.MILK2SPR:.cpp=$O)))
 DEP.MILK2SPR = CSGFX CSUTIL CSSYS CSUTIL CSGEOM
 LIB.MILK2SPR = $(foreach d,$(DEP.MILK2SPR),$($d.LIB))
 
@@ -59,11 +59,11 @@ milk2sprclean:
 	-$(RM) $(MILK2SPR.EXE) $(OBJ.MILK2SPR)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)milk2spr.dep
-$(OUTOS)milk2spr.dep: $(SRC.MILK2SPR)
+dep: $(OUTOS)/milk2spr.dep
+$(OUTOS)/milk2spr.dep: $(SRC.MILK2SPR)
 	$(DO.DEP)
 else
--include $(OUTOS)milk2spr.dep
+-include $(OUTOS)/milk2spr.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

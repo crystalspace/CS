@@ -31,7 +31,7 @@ vpath %.cpp apps/tests/gfxtst
 GFXTEST.EXE = gfxtest$(EXE)
 INC.GFXTEST =
 SRC.GFXTEST = apps/tests/gfxtst/gfxtest.cpp
-OBJ.GFXTEST = $(addprefix $(OUT),$(notdir $(SRC.GFXTEST:.cpp=$O)))
+OBJ.GFXTEST = $(addprefix $(OUT)/,$(notdir $(SRC.GFXTEST:.cpp=$O)))
 DEP.GFXTEST = CSGFX CSTOOL CSUTIL CSGEOM CSSYS
 LIB.GFXTEST = $(foreach d,$(DEP.GFXTEST),$($d.LIB))
 
@@ -63,11 +63,11 @@ gfxtstclean:
 	-$(RM) $(GFXTEST.EXE) $(OBJ.GFXTEST)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)gfxtest.dep
-$(OUTOS)gfxtest.dep: $(SRC.GFXTEST)
+dep: $(OUTOS)/gfxtest.dep
+$(OUTOS)/gfxtest.dep: $(SRC.GFXTEST)
 	$(DO.DEP)
 else
--include $(OUTOS)gfxtest.dep
+-include $(OUTOS)/gfxtest.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

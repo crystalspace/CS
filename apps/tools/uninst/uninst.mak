@@ -30,7 +30,7 @@ vpath %.cpp apps/tools/uninst
 UNINST.EXE = uninst$(EXE)
 INC.UNINST =
 SRC.UNINST = apps/tools/uninst/uninst.cpp
-OBJ.UNINST = $(addprefix $(OUT),$(notdir $(SRC.UNINST:.cpp=$O)))
+OBJ.UNINST = $(addprefix $(OUT)/,$(notdir $(SRC.UNINST:.cpp=$O)))
 DEP.UNINST =
 LIB.UNINST =
 
@@ -59,11 +59,11 @@ uninstexeclean:
 	-$(RM) $(UNINST.EXE) $(OBJ.UNINST)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)uninst.dep
-$(OUTOS)uninst.dep: $(SRC.UNINST)
+dep: $(OUTOS)/uninst.dep
+$(OUTOS)/uninst.dep: $(SRC.UNINST)
 	$(DO.DEP)
 else
--include $(OUTOS)uninst.dep
+-include $(OUTOS)/uninst.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

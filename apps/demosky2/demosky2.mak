@@ -30,7 +30,7 @@ vpath %.cpp apps/demosky2 apps/support
 DEMOSKY2.EXE=demosky2$(EXE)
 INC.DEMOSKY2 = $(wildcard apps/demosky2/*.h)
 SRC.DEMOSKY2 = $(wildcard apps/demosky2/*.cpp)
-OBJ.DEMOSKY2 = $(addprefix $(OUT),$(notdir $(SRC.DEMOSKY2:.cpp=$O)))
+OBJ.DEMOSKY2 = $(addprefix $(OUT)/,$(notdir $(SRC.DEMOSKY2:.cpp=$O)))
 DEP.DEMOSKY2 = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.DEMOSKY2 = $(foreach d,$(DEP.DEMOSKY2),$($d.LIB))
 
@@ -58,11 +58,11 @@ demosky2clean:
 	-$(RM) $(DEMOSKY2.EXE) $(OBJ.DEMOSKY2)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)demosky2.dep
-$(OUTOS)demosky2.dep: $(SRC.DEMOSKY2)
+dep: $(OUTOS)/demosky2.dep
+$(OUTOS)/demosky2.dep: $(SRC.DEMOSKY2)
 	$(DO.DEP)
 else
--include $(OUTOS)demosky2.dep
+-include $(OUTOS)/demosky2.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -34,7 +34,7 @@ vpath %.cpp apps/pysimp apps/support
 PYSIMP.EXE = pysimp$(EXE)
 INC.PYSIMP = $(wildcard apps/pysimp/*.h)
 SRC.PYSIMP = $(wildcard apps/pysimp/*.cpp)
-OBJ.PYSIMP = $(addprefix $(OUT),$(notdir $(SRC.PYSIMP:.cpp=$O)))
+OBJ.PYSIMP = $(addprefix $(OUT)/,$(notdir $(SRC.PYSIMP:.cpp=$O)))
 DEP.PYSIMP = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.PYSIMP = $(foreach d,$(DEP.PYSIMP),$($d.LIB))
 
@@ -62,11 +62,11 @@ pysimpleclean:
 	-$(RM) $(PYSIMP.EXE) $(OBJ.PYSIMP)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)pysimp.dep
-$(OUTOS)pysimp.dep: $(SRC.PYSIMP)
+dep: $(OUTOS)/pysimp.dep
+$(OUTOS)/pysimp.dep: $(SRC.PYSIMP)
 	$(DO.DEP)
 else
--include $(OUTOS)pysimp.dep
+-include $(OUTOS)/pysimp.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

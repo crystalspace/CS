@@ -31,7 +31,7 @@ vpath %.cpp apps/tutorial/pathtut
 PATHTUT.EXE = pathtut$(EXE)
 INC.PATHTUT = $(wildcard apps/tutorial/pathtut/*.h)
 SRC.PATHTUT = $(wildcard apps/tutorial/pathtut/*.cpp)
-OBJ.PATHTUT = $(addprefix $(OUT),$(notdir $(SRC.PATHTUT:.cpp=$O)))
+OBJ.PATHTUT = $(addprefix $(OUT)/,$(notdir $(SRC.PATHTUT:.cpp=$O)))
 DEP.PATHTUT = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.PATHTUT = $(foreach d,$(DEP.PATHTUT),$($d.LIB))
 
@@ -59,11 +59,11 @@ tutpathclean:
 	-$(RM) $(PATHTUT.EXE) $(OBJ.PATHTUT)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)pathtut.dep
-$(OUTOS)pathtut.dep: $(SRC.PATHTUT)
+dep: $(OUTOS)/pathtut.dep
+$(OUTOS)/pathtut.dep: $(SRC.PATHTUT)
 	$(DO.DEP)
 else
--include $(OUTOS)pathtut.dep
+-include $(OUTOS)/pathtut.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

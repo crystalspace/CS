@@ -31,7 +31,7 @@ vpath %.cpp apps/tools/vsh
 VSH.EXE = vsh$(EXE)
 INC.VSH =
 SRC.VSH = apps/tools/vsh/vsh.cpp
-OBJ.VSH = $(addprefix $(OUT),$(notdir $(SRC.VSH:.cpp=$O)))
+OBJ.VSH = $(addprefix $(OUT)/,$(notdir $(SRC.VSH:.cpp=$O)))
 DEP.VSH = CSUTIL CSGFX CSTOOL CSSYS CSUTIL CSSYS CSGEOM
 LIB.VSH = $(foreach d,$(DEP.VSH),$($d.LIB))
 
@@ -59,11 +59,11 @@ vshellclean:
 	-$(RM) $(VSH.EXE) $(OBJ.VSH)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)vsh.dep
-$(OUTOS)vsh.dep: $(SRC.VSH)
+dep: $(OUTOS)/vsh.dep
+$(OUTOS)/vsh.dep: $(SRC.VSH)
 	$(DO.DEP)
 else
--include $(OUTOS)vsh.dep
+-include $(OUTOS)/vsh.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

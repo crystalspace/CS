@@ -30,7 +30,7 @@ vpath %.cpp apps/tools/csfedit apps/support
 CSFEDIT.EXE=csfedit$(EXE)
 INC.CSFEDIT = $(wildcard apps/tools/csfedit/*.h)
 SRC.CSFEDIT = $(wildcard apps/tools/csfedit/*.cpp)
-OBJ.CSFEDIT = $(addprefix $(OUT),$(notdir $(SRC.CSFEDIT:.cpp=$O)))
+OBJ.CSFEDIT = $(addprefix $(OUT)/,$(notdir $(SRC.CSFEDIT:.cpp=$O)))
 DEP.CSFEDIT = CSGFX CSWS CSTOOL CSUTIL CSSYS CSGEOM CSUTIL
 LIB.CSFEDIT = $(foreach d,$(DEP.CSFEDIT),$($d.LIB))
 
@@ -58,11 +58,11 @@ csfedtclean:
 	-$(RM) $(CSFEDIT.EXE) $(OBJ.CSFEDIT)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)csfedit.dep
-$(OUTOS)csfedit.dep: $(SRC.CSFEDIT)
+dep: $(OUTOS)/csfedit.dep
+$(OUTOS)/csfedit.dep: $(SRC.CSFEDIT)
 	$(DO.DEP)
 else
--include $(OUTOS)csfedit.dep
+-include $(OUTOS)/csfedit.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

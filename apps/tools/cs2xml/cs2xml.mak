@@ -30,7 +30,7 @@ vpath %.cpp apps/tools/cs2xml
 CS2XML.EXE = cs2xml$(EXE)
 INC.CS2XML = $(wildcard apps/tools/cs2xml/*.h)
 SRC.CS2XML = $(wildcard apps/tools/cs2xml/*.cpp)
-OBJ.CS2XML = $(addprefix $(OUT),$(notdir $(SRC.CS2XML:.cpp=$O)))
+OBJ.CS2XML = $(addprefix $(OUT)/,$(notdir $(SRC.CS2XML:.cpp=$O)))
 DEP.CS2XML = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSUTIL CSSYS
 LIB.CS2XML = $(foreach d,$(DEP.CS2XML),$($d.LIB))
 
@@ -60,11 +60,11 @@ csxmlconvclean:
 	-$(RM) $(CS2XML.EXE) $(OBJ.CS2XML)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)cs2xml.dep
-$(OUTOS)cs2xml.dep: $(SRC.CS2XML)
+dep: $(OUTOS)/cs2xml.dep
+$(OUTOS)/cs2xml.dep: $(SRC.CS2XML)
 	$(DO.DEP)
 else
--include $(OUTOS)cs2xml.dep
+-include $(OUTOS)/cs2xml.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
