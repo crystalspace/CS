@@ -152,18 +152,18 @@ public:
   }
   
   /**
-   * Smart pointer copy constructor.
+   * Smart pointer copy constructor from assignment-compatible csRef<T2>.
    */
-  csRef (csRef const& other) : obj (other.obj)
+  template <class T2>
+  csRef (csRef<T2> const& other) : obj ((T2*)other)
   {
     CSREF_TRACK_INCREF (obj, this);
   }
 
   /**
-   * Smart pointer copy constructor from assignment-compatible csRef<T2>.
+   * Smart pointer copy constructor.
    */
-  template <class T2>
-  csRef (csRef<T2> const& other) : obj ((T2*)other)
+  csRef (csRef const& other) : obj (other.obj)
   {
     CSREF_TRACK_INCREF (obj, this);
   }
@@ -259,19 +259,19 @@ public:
     *this = newObj;
   }
 
-  /// Assign another csRef<> of the same type to this one.
-  csRef& operator = (csRef const& other)
-  {
-    this->operator=(other.obj);
-    return *this;
-  }
-
   /// Assign another assignment-compatible csRef<T2> to this one.
   template <class T2>
   csRef& operator = (csRef<T2> const& other)
   {
     T* p = (T2*)other;
     this->operator=(p);
+    return *this;
+  }
+
+  /// Assign another csRef<> of the same type to this one.
+  csRef& operator = (csRef const& other)
+  {
+    this->operator=(other.obj);
     return *this;
   }
 

@@ -13,10 +13,16 @@ chronological order.
 	- Eric Sunshine fixed copy/paste error in win32/csosdefs.h.  It defined
 	  CS_IMPORT_SYM as __declspec(dllexport) rather than as
 	  __declspec(dllimport).  Also fixed a few minor issues in csexport.h.
-	- res fixed the software NR and software shader plugin to compile again.
+	- res fixed the software NR and software shader plugin to compile
+	  again.
 	- John Harger fixed csparser and xmlshader to report an error when
 	  a shader file could not be found, rather than dereferencing a null
 	  pointer.
+	- Eric Sunshine worked around MSVC6 limitation where it barfed on
+	  csRef<> when confronted with copy-constructors and assignment
+	  operators for types T and T2.  It turns out that MSVC6 will accept
+	  these as long as the templated versions (T2) appear before the
+	  non-templated versions (T).
 15-Mar-2004
 	- Anders Stenberg added a first version of a TerraFormer plugin. It
 	  will be responsible for feeding data to other plugins like terrain
