@@ -24,6 +24,8 @@ The history order is reversed so that new features are at the top.
 	  precalculated stuff. But it does improve lighting quality a lot,
 	  especially with low quality setting. Note that it slows down lighting
 	  again.
+	- Removed warning in CS_DECLARE_TYPED_VECTOR_NODELETE.
+	- Removed a few warnings in engine and WalkTest.
 15-Jul-2001
 	- New lighting system starts to work good enough so that I
 	  now removed the old system. There are still a few small problems

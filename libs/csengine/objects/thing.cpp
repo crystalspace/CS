@@ -1906,7 +1906,7 @@ bool csThing::DrawInt (iRenderView* rview, iMovable* movable, csZBufMode zMode)
   return true;	// @@@@ RETURN correct vis info
 }
 
-bool csThing::DrawFoggy (iRenderView* d, iMovable* movable)
+bool csThing::DrawFoggy (iRenderView* d, iMovable*)
 {
   draw_busy++;
   iCamera* icam = d->GetCamera ();
@@ -2151,10 +2151,12 @@ bool csThing::VisTest (iRenderView* irview)
 
 void csThing::RegisterShadowReceiver (iShadowReceiver* receiver)
 {
+  (void)receiver;
 }
 
 void csThing::UnregisterShadowReceiver (iShadowReceiver* receiver)
 {
+  (void)receiver;
 }
 
 struct CheckFrustData

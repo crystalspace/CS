@@ -2065,6 +2065,7 @@ iMeshWrapper* csEngine::LoadMeshObject (
 	const char* loaderClassId,
 	iDataBuffer* input, iSector* sector, const csVector3& pos)
 {
+  (void)classId;
   iLoaderPlugin* plug = CS_QUERY_PLUGIN_CLASS (System, loaderClassId, "MeshLdr",
   	iLoaderPlugin);
   if (!plug)

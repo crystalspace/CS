@@ -366,6 +366,8 @@ public:
   virtual void GetCoverageMatrix(csFrustumView* lview, 
                                  csCoverageMatrix* shadow_matrix)
   {
+      (void)lview;
+      (void)shadow_matrix;
 #if 0
 // @@@@@@@@@@@ REWRITE
     GetPolygon3D()->GetLightMapInfo()->GetPolyTex()->

@@ -96,6 +96,7 @@ csVector2 coord_check_vector;
 
 void select_object (iRenderView* rview, int type, void* entity)
 {
+  (void)rview; (void)type; (void)entity;
 #if 0
 //@@@@@@@@@@@@@
   if (type == CALLBACK_POLYGON2D)
@@ -428,6 +429,7 @@ void DrawOctreeBoxes (csOctreeNode* node,
 
 void DrawOctreeBoxes (int draw_level)
 {
+  (void)draw_level;
 #if 0
 //@@@
   csCamera* cam = Sys->view->GetCamera ();
@@ -463,6 +465,7 @@ static csVector3 GetVector3 (int plane_nr, float plane_pos,
 void CreateSolidThings (csEngine* engine, csSector* room,
 	csOctreeNode* node, int depth)
 {
+  (void)engine; (void)room; (void)node; (void)depth;
 #if 0
 //@@@
   if (!node) return;

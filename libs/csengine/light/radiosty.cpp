@@ -804,6 +804,7 @@ int   csRadiosity::source_patch_size = 2;
 
 csRadiosity :: csRadiosity(csEngine *current_engine, iProgressMeter* meter)
 {
+  (void)current_engine; (void)meter;
 //@@@ TEMPORARILY BROKEN!
 #if 0
   csEngine::current_engine->Report ("Preparing radiosity...");
@@ -1148,6 +1149,7 @@ void csRadiosity :: StartFrustum()
 static void frustum_curve_report_func (csObject *obj, csFrustumView* lview,
 	bool vis)
 {
+  (void)lview;
   if (!vis) return;
   // obtain RadCurve
   csRadElement *dest = csRadElement::GetRadElement(*(csCurve*)obj);
@@ -1276,6 +1278,7 @@ void csRadiosity :: ProcessDest(csRadElement *dest, csFrustumView *lview)
 
 bool csRadiosity :: PrepareShootDest(csRadElement *dest, csFrustumView *lview)
 {
+  (void)lview;
   shoot_dest = dest;
   // compute the factor for the light getting through. The same for
   // every lumel. This factor is expanded to be the formfactor * areafraction

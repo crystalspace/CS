@@ -259,6 +259,7 @@ void csStatLight::CalculateLighting (iMeshWrapper* th)
 
 void csStatLight::LightingFunc (csLightingFunc* callback, void* callback_data)
 {
+  (void)callback; (void)callback_data;
 #if 0
   csFrustumView lview;
   csFrustumContext* ctxt = lview.GetFrustumContext ();
