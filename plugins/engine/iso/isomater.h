@@ -265,20 +265,49 @@ public:
       if (mw) return &(mw->scfiMaterialWrapper);
       else return NULL;
     }
-    virtual int GetMaterialCount ()
+    virtual int AddMaterial (iMaterialWrapper *imw)
+    {
+      csIsoMaterialWrapper* mw = scfParent->NewMaterial (imw->GetMaterialHandle ());
+      if (mw) return Find (&(mw->scfiMaterialWrapper));
+      return -1;
+    }
+    virtual bool RemoveMaterial (int idx)
+    {
+      scfParent->RemoveIndex (idx);
+      return true;
+    }
+
+    virtual bool RemoveMaterial (iMaterialWrapper *imw)
+    {
+      int idx = Find (imw);
+      if (idx != -1)
+	RemoveMaterial (idx);
+      return idx != -1;
+    }
+
+    virtual void RemoveAll ()
+    {
+      for (int i=GetMaterialCount ()-1; i>=0; i--)
+	scfParent->RemoveIndex (i);
+    }
+    virtual int GetMaterialCount () const
     {
       return scfParent->Length ();
     }
-    virtual iMaterialWrapper* Get (int idx)
+    virtual iMaterialWrapper* Get (int idx) const
     {
       CS_ASSERT (idx >= 0 && idx < GetMaterialCount ());
       return &(scfParent->Get (idx)->scfiMaterialWrapper);
     }
-    virtual iMaterialWrapper* FindByName (const char* iName)
+    virtual iMaterialWrapper* FindByName (const char* iName) const
     {
       csIsoMaterialWrapper* mw = scfParent->FindByName (iName);
       if (mw) return &(mw->scfiMaterialWrapper);
       else return NULL;
+    }
+    virtual int Find (iMaterialWrapper *imw) const
+    {
+      return scfParent->Find (imw->GetPrivateObject ());
     }
   } scfiMaterialList;
 };
