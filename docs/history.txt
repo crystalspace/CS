@@ -47,6 +47,7 @@ chronological order.
 	  so that it can optionally emit its results via an EMITTER. This
 	  change obsoletes the CS_EMIT_CHECK_PYTHON() macro, which is now
 	  deprecated.
+	- res made the GL font cache better handle large fonts.
 13-Jan-2004
 	- Eric Sunshine renamed the 'memory' plugin to 'memory2d' for the
 	  following reasons:

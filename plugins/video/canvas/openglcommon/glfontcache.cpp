@@ -35,6 +35,8 @@
 #include "glcommon2d.h"
 #include "glfontcache.h"
 
+const GLenum fontFilterMode = GL_LINEAR;
+
 //---------------------------------------------------------------------------
 
 csGLFontCache::csGLFontCache (csGraphics2DGLCommon* G2D) : 
@@ -113,8 +115,8 @@ void csGLFontCache::Setup()
 
   glGenTextures (1, &texWhite);
   statecache->SetTexture (GL_TEXTURE_2D, texWhite);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, fontFilterMode);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, fontFilterMode);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
@@ -150,10 +152,22 @@ csGLFontCache::GlyphCacheData* csGLFontCache::InternalCacheGlyph (
   if (!alphaData)
     bitmapData = font->font->GetGlyphBitmap (glyph, bmetrics);
 
-  const int allocWidth = 
-    ((bmetrics.width + glyphAlign - 1) / glyphAlign) * glyphAlign;
-  const int allocHeight = 
-    ((bmetrics.height + glyphAlign - 1) / glyphAlign) * glyphAlign;
+  int allocWidth = bmetrics.width;
+  int allocHeight = bmetrics.height;
+  int coordCorrect = 0;
+  while ((allocWidth > texSize) || (allocHeight > texSize))
+  {
+    allocWidth = MAX ((allocWidth+1) / 2, 1);
+    allocHeight = MAX ((allocHeight+1) / 2, 1);
+    coordCorrect = 1;
+  }
+  /*if (glyphAlign != 1) // uncomment if glyphAlign gets != 1 someday
+  {
+    allocWidth = 
+      ((bmetrics.width + glyphAlign - 1) / glyphAlign) * glyphAlign;
+    allocHeight = 
+      ((bmetrics.height + glyphAlign - 1) / glyphAlign) * glyphAlign;
+  }*/
   size_t tex = 0;
   while (tex < textures.Length ())
   {
@@ -174,8 +188,8 @@ csGLFontCache::GlyphCacheData* csGLFontCache::InternalCacheGlyph (
 
     glGenTextures (1, &textures[tex].handle);
     statecache->SetTexture (GL_TEXTURE_2D, textures[tex].handle);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, fontFilterMode);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, fontFilterMode);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
@@ -205,8 +219,8 @@ csGLFontCache::GlyphCacheData* csGLFontCache::InternalCacheGlyph (
     {
       glGenTextures (1, &textures[tex].mirrorHandle);
       statecache->SetTexture (GL_TEXTURE_2D, textures[tex].mirrorHandle);
-      glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-      glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+      glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, fontFilterMode);
+      glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, fontFilterMode);
       glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
       glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
       *texImage = 0;
@@ -230,10 +244,14 @@ csGLFontCache::GlyphCacheData* csGLFontCache::InternalCacheGlyph (
     cacheData->flags = flags & RELEVANT_WRITE_FLAGS;
     cacheData->bmetrics = bmetrics;
     font->font->GetGlyphMetrics (glyph, cacheData->glyphMetrics);
-    cacheData->tx1 = (float)texRect.xmin / (float)texSize;
-    cacheData->ty1 = (float)texRect.ymin / (float)texSize;
-    cacheData->tx2 = (float)(texRect.xmin + bmetrics.width) / (float)texSize;
-    cacheData->ty2 = (float)(texRect.ymin + bmetrics.height) / (float)texSize;
+    const float tsf = (float)texSize;
+    // When using size-reduced glyphs, nudge the TCs slightly inward
+    // to reduce leaking in of neighbouring glyphs.
+    const float tccorrect = (float)((1 << coordCorrect) / 2) * (0.5f / tsf);
+    cacheData->tx1 = (float)texRect.xmin / tsf + tccorrect;
+    cacheData->ty1 = (float)texRect.ymin / tsf + tccorrect;
+    cacheData->tx2 = (float)(texRect.xmax) / tsf - tccorrect;
+    cacheData->ty2 = (float)(texRect.ymax) / tsf - tccorrect;
     cacheData->hasGlyph = true;
 
     CopyGlyphData (font->font, glyph, tex, bmetrics, texRect, bitmapData, 
@@ -257,6 +275,40 @@ void csGLFontCache::InternalUncacheGlyph (GlyphCacheData* cacheData)
   cacheDataAlloc.Free (glCacheData);
 }
 
+/**
+ * Shrink glyph data with a simple box filter.
+ */
+static void ShrinkGlyphData (uint8* glyph, int oldW, int oldH, int newW, int newH)
+{
+  const int boxX = (oldW + (newW - 1)) / newW;
+  const int boxY = (oldH + (newH - 1)) / newH;
+  CS_ALLOC_STACK_ARRAY (uint8, destLine, newW);
+
+  for (int y = 0; y < newH; y++)
+  {
+    uint8* srcLine = glyph + y * boxY * oldW;
+    for (int x = 0; x < newW; x++)
+    {
+      int val = 0; 
+      int cnt = 0;
+      uint8* box = srcLine + x * boxX;
+      int by = MIN (boxY, oldH - y * boxY);
+      while (by-- > 0)
+      {
+	int bx = MIN (boxX, oldW - x * boxX);
+	while (bx-- > 0)
+	{
+	  val += box[bx];
+	  cnt++;
+	}
+	box += oldW;
+      }
+      destLine[x] = (cnt > 0) ? (val / cnt) : 0;
+    }
+    memcpy (glyph + y * newW, destLine, newW);
+  }
+}
+
 void csGLFontCache::CopyGlyphData (iFont* font, utf32_char glyph, size_t tex, 
 				   const csBitmapMetrics& bmetrics, 
 				   const csRect& texRect, iDataBuffer* bitmapDataBuf, 
@@ -268,10 +320,11 @@ void csGLFontCache::CopyGlyphData (iFont* font, utf32_char glyph, size_t tex,
 
     glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
 
-    uint8* intData = new uint8[texRect.Width () * texRect.Height ()];
+    uint8* intData = new uint8[MAX((texRect.Width () * texRect.Height ()),
+      (bmetrics.width * bmetrics.height))];
 
     const uint8 valXor = multiTexText ? 0 : 0xff;
-    const int padX = texRect.Width() - bmetrics.width;
+    const int padX = MAX (texRect.Width() - bmetrics.width, 0);
     if (alphaDataBuf)
     {
       uint8* alphaData = alphaDataBuf->GetUint8 ();
@@ -317,6 +370,13 @@ void csGLFontCache::CopyGlyphData (iFont* font, utf32_char glyph, size_t tex,
 	  dest += padX;
 	}
       }
+    }
+
+    if ((texRect.Width() < bmetrics.width) || 
+      (texRect.Height() < bmetrics.height))
+    {
+      ShrinkGlyphData (intData, bmetrics.width, bmetrics.height,
+	texRect.Width(), texRect.Height());
     }
 
     glTexSubImage2D (GL_TEXTURE_2D, 0, texRect.xmin, texRect.ymin, 
