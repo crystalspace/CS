@@ -15,6 +15,9 @@ DESCRIPTION.OS.os2gcc = OS/2
 # Choose which drivers you want to build/use
 PLUGINS += video/canvas/csdive sound/renderer/software
 
+# udp/tcp network plugin
+#PLUGINS+=net/driver/ensocket
+
 # On OS/2 use CMD.EXE since it works better
 ifdef OS2_SHELL
 SHELL = $(OS2_SHELL)

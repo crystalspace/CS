@@ -11,6 +11,9 @@ PLUGINS+= sound/renderer/software
 PLUGINS+= video/canvas/ddraw
 #PLUGINS+= video/canvas/ddraw8
 
+# udp/tcp network plugin
+PLUGINS+=net/driver/ensocket
+
 # if u have the following line uncommented make sure one
 # LIBS.OPENGL.SYSTEM is set below or you have a custom
 # opengl dll installed as GL.dll (e.g. MESA)

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Network Drivers, csEngine, Sound Drivers, Plug-In Drivers
+@node Network Drivers, EN Socket, Sound Drivers, Plug-In Drivers
 @section Network Drivers
 @cindex Network Drivers
 
@@ -14,3 +14,10 @@ only a sockets driver.
 @emph{Network Manager}: System dependent network managers. There is currently
 only a simple manager.
 @end itemize
+
+@menu
+* En Socket::
+@end menu
+
+@imports{plugins,ensocket.txi}
+

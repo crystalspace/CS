@@ -8,6 +8,9 @@ DESCRIPTION.OS.irix = Irix
 # Choose which drivers you want to build/use
 PLUGINS+=video/canvas/softx sound/renderer/software
 
+# udp/tcp network plugin
+#PLUGINS+=net/driver/ensocket
+
 # Uncomment the following to build GGI 2D driver
 #PLUGINS+=video/canvas/ggi
 # Uncomment the following to build OpenGL stuff

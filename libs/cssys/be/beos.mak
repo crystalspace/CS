@@ -8,6 +8,9 @@ DESCRIPTION.OS.beos = BeOS
 # Choose which drivers you want to build/use
 PLUGINS += video/canvas/be video/canvas/openglbe video/renderer/opengl
 
+# udp/tcp network plugin
+#PLUGINS+=net/driver/ensocket
+
 # Be compiler does not currently grok CS assembly
 override DO_ASM=no
 override CS_NO_QSQRT=yes

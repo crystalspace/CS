@@ -10,6 +10,9 @@ PLUGINS+=video/canvas/softx
 # PLUGINS+=video/renderer/opengl video/canvas/openglx
 PLUGINS+=video/canvas/linex
 
+# udp/tcp network plugin
+#PLUGINS+=net/driver/ensocket
+
 # The X-Window plugin
 PLUGINS+=video/canvas/xwindow
 # Shared Memory Plugin

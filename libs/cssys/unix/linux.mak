@@ -8,6 +8,9 @@ DESCRIPTION.OS.linux = Linux
 # a joystick device plugin
 #PLUGINS+=device/joystick/linux
 
+# udp/tcp network plugin
+PLUGINS+=net/driver/ensocket
+
 # Choose which 2D/3D driver combinations you want to build/use
 PLUGINS+=video/canvas/softx
 PLUGINS+=video/canvas/openglx video/renderer/opengl
