@@ -200,7 +200,7 @@ bool csMetaBallLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-static uint ParseMixmode (char* buf)
+static uint ParseMixmode (csParser* parser, char* buf)
 {
   CS_TOKEN_TABLE_START (modes)
     CS_TOKEN_TABLE (COPY)
@@ -219,7 +219,7 @@ static uint ParseMixmode (char* buf)
 
   uint Mixmode = 0;
 
-  while ((cmd = csGetObject (&buf, modes, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, modes, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -245,7 +245,7 @@ static uint ParseMixmode (char* buf)
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    printf ("Token '%s' not found while parsing the modes!\n", csGetLastOffender ());
+    printf ("Token '%s' not found while parsing the modes!\n", parser->GetLastOffender ());
     return 0;
   }
   return Mixmode;
@@ -276,8 +276,10 @@ iBase* csMetaBallLoader::Parse (const char* string,
   iMetaBallState* ballstate = NULL;
   MetaParameters* mp = NULL;
 
+  csParser* parser = ldr_context->GetParser ();
+
   char* buf = (char*)string;
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -365,7 +367,7 @@ iBase* csMetaBallLoader::Parse (const char* string,
 	break;
       case CS_TOKEN_MIXMODE:
 		if (!ballstate) { printf("Please set FACTORY before MIXMODE\n"); return NULL; }
-        ballstate->SetMixMode (ParseMixmode (params));
+        ballstate->SetMixMode (ParseMixmode (parser, params));
 	break;
 	  case CS_TOKEN_LIGHTING:
 		if (!ballstate) { printf("Please set FACTORY before MIXMODE\n"); return NULL; }

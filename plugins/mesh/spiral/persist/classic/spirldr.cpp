@@ -214,7 +214,7 @@ bool csSpiralLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-static uint ParseMixmode (char* buf)
+static uint ParseMixmode (csParser* parser, char* buf)
 {
   CS_TOKEN_TABLE_START (modes)
     CS_TOKEN_TABLE (COPY)
@@ -233,7 +233,7 @@ static uint ParseMixmode (char* buf)
 
   uint Mixmode = 0;
 
-  while ((cmd = csGetObject (&buf, modes, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, modes, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -260,7 +260,7 @@ static uint ParseMixmode (char* buf)
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     printf ("Token '%s' not found while parsing the modes!\n",
-    	csGetLastOffender ());
+    	parser->GetLastOffender ());
     return 0;
   }
   return Mixmode;
@@ -287,8 +287,10 @@ iBase* csSpiralLoader::Parse (const char* string,
   iParticleState* partstate = NULL;
   iSpiralState* spiralstate = NULL;
 
+  csParser* parser = ldr_context->GetParser ();
+
   char* buf = (char*)string;
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -345,7 +347,7 @@ iBase* csSpiralLoader::Parse (const char* string,
 	}
 	break;
       case CS_TOKEN_MIXMODE:
-        partstate->SetMixMode (ParseMixmode (params));
+        partstate->SetMixMode (ParseMixmode (parser, params));
 	break;
       case CS_TOKEN_NUMBER:
         {

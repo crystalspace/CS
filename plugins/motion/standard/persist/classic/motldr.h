@@ -23,6 +23,7 @@
 #include "imap/writer.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "csutil/parser.h"
 
 struct iEngine;
 struct iObjectRegistry;
@@ -44,17 +45,17 @@ private:
 public:
   SCF_DECLARE_IBASE;
 
-  bool LoadBone (iMotionTemplate* mot, int bone, char* buf);
+  bool LoadBone (csParser* parser, iMotionTemplate* mot, int bone, char* buf);
 
   iMotionTemplate* LoadMotion ( const char *fname );
-  bool LoadMotion ( iMotionTemplate *mot, char *buf );
+  bool LoadMotion (csParser* parser, iMotionTemplate *mot, char *buf );
 
   /// Constructor
   csMotionLoader (iBase *);
   virtual ~csMotionLoader();
   virtual bool Initialize( iObjectRegistry *object_reg);
-  virtual iBase* Parse( const char* string, iLoaderContext* ldr_context,
-  	iBase *context );
+  virtual iBase* Parse (const char* string, 
+    iLoaderContext* ldr_context, iBase *context );
 
   void Report (int severity, const char* msg, ...);
 

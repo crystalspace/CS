@@ -27,6 +27,7 @@
 #include "csutil/util.h"
 #include "csgeom/quaterni.h"
 #include "iutil/plugin.h"
+#include "csutil/parser.h"
 
 class csGenerateImageTexture;
 class csGenerateImageValue;
@@ -70,6 +71,9 @@ class csLoader : public iLoader
 private:
   iLoaderContext* ldr_context;
   iLoaderContext* GetLoaderContext ();
+
+  /// the current parser
+  csParser parser;
 
   class csLoaderStats
   {

@@ -174,8 +174,10 @@ iBase* csTerrFuncLoader::Parse (const char* pString,
   iMeshObject* iTerrObj = NULL;
   iTerrFuncState* iTerrainState = NULL;
 
+  csParser* parser = ldr_context->GetParser ();
+
   char* pBuf = (char*)pString;
-  while ((cmd = csGetObject (&pBuf, commands, &pName, &pParams)) > 0)
+  while ((cmd = parser->GetObject (&pBuf, commands, &pName, &pParams)) > 0)
   {
     if (!pParams)
     {

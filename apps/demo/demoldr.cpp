@@ -127,7 +127,7 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
   char* params;
   csTicks cur_time = 0;
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -264,7 +264,7 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
   {
     demo->Report (CS_REPORTER_SEVERITY_ERROR,
       	"Token '%s' not found while parsing a sequence!",
-	csGetLastOffender ());
+	parser.GetLastOffender ());
     exit (-1);
   }
 }
@@ -281,7 +281,7 @@ void DemoSequenceLoader::LoadSequences (char* buf)
   long cmd;
   char* params;
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -337,7 +337,7 @@ void DemoSequenceLoader::LoadSequences (char* buf)
   {
     demo->Report (CS_REPORTER_SEVERITY_ERROR,
       	"Token '%s' not found while parsing sequences!",
-	csGetLastOffender ());
+	parser.GetLastOffender ());
     exit (-1);
   }
 }
@@ -348,9 +348,9 @@ void DemoSequenceLoader::LoadSequencesMain (char* buf)
     CS_TOKEN_TABLE (SEQUENCES)
   CS_TOKEN_TABLE_END
 
-  csResetParserLine ();
+  parser.ResetParserLine ();
   char *name, *data;
-  if (csGetObject (&buf, tokens, &name, &data))
+  if (parser.GetObject (&buf, tokens, &name, &data))
   {
     if (!data)
     {
@@ -362,7 +362,7 @@ void DemoSequenceLoader::LoadSequencesMain (char* buf)
   }
 }
 
-static bool ParseVectorList (char* buf, csVector3* list, int num)
+static bool ParseVectorList (csParser* parser, char* buf, csVector3* list, int num)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (V)
@@ -373,7 +373,7 @@ static bool ParseVectorList (char* buf, csVector3* list, int num)
   char* params;
 
   int n = 0;
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params) return false;
     switch (cmd)
@@ -414,7 +414,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
   int seq = 0;
   int num = 0;
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -581,7 +581,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	}
 	seq++;
 	csVector3* v = new csVector3[10000];
-	if (!ParseVectorList (params, v, num))
+	if (!ParseVectorList (&parser, params, v, num))
 	{
 	  delete[] v;
 	  demo->Report (CS_REPORTER_SEVERITY_ERROR,
@@ -601,7 +601,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	  exit (0);
 	}
 	csVector3* v = new csVector3[10000];
-	if (!ParseVectorList (params, v, num))
+	if (!ParseVectorList (&parser, params, v, num))
 	{
 	  delete[] v;
 	  demo->Report (CS_REPORTER_SEVERITY_ERROR,
@@ -621,7 +621,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	  exit (0);
 	}
 	csVector3* v = new csVector3[10000];
-	if (!ParseVectorList (params, v, num))
+	if (!ParseVectorList (&parser, params, v, num))
 	{
 	  delete[] v;
 	  demo->Report (CS_REPORTER_SEVERITY_ERROR,
@@ -638,7 +638,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
   {
     demo->Report (CS_REPORTER_SEVERITY_ERROR,
       	"Token '%s' not found while parsing a path!",
-	csGetLastOffender ());
+	parser.GetLastOffender ());
     exit (-1);
   }
 

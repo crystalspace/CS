@@ -185,6 +185,8 @@ iBase* csGeneralFactoryLoader::Parse (const char* string,
   long cmd;
   char* params, * params2;
 
+  csParser* parser = ldr_context->GetParser ();
+
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.mesh.object.genmesh", iMeshObjectType);
   if (!type)
@@ -207,7 +209,7 @@ iBase* csGeneralFactoryLoader::Parse (const char* string,
 
   bool auto_normals = false;
   char* buf = (char*)string;
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -262,7 +264,7 @@ iBase* csGeneralFactoryLoader::Parse (const char* string,
 	  int i = 0;
 	  csTriangle* tr = state->GetTriangles ();
 
-          while ((cmd = csGetObject (&params, tok_tri, &name, &params2)) > 0)
+          while ((cmd = parser->GetObject (&params, tok_tri, &name, &params2)) > 0)
           {
             if (!params2)
             {
@@ -299,7 +301,7 @@ iBase* csGeneralFactoryLoader::Parse (const char* string,
 	    ReportError (reporter,
 		"crystalspace.sprite3dfactoryloader.parse.frame.badtoken",
 		"Token '%s' not found while parsing triangles!",
-		csGetLastOffender ());
+		parser->GetLastOffender ());
 	    state->DecRef ();
 	    fact->DecRef ();
 	    return NULL;
@@ -311,7 +313,7 @@ iBase* csGeneralFactoryLoader::Parse (const char* string,
 	  int i = 0;
 	  csVector3* no = state->GetNormals ();
 
-          while ((cmd = csGetObject (&params, tok_frame, &name, &params2)) > 0)
+          while ((cmd = parser->GetObject (&params, tok_frame, &name, &params2)) > 0)
           {
             if (!params2)
             {
@@ -346,7 +348,7 @@ iBase* csGeneralFactoryLoader::Parse (const char* string,
 	    ReportError (reporter,
 		"crystalspace.sprite3dfactoryloader.parse.frame.badtoken",
 		"Token '%s' not found while parsing normals!",
-		csGetLastOffender ());
+		parser->GetLastOffender ());
 	    state->DecRef ();
 	    fact->DecRef ();
 	    return NULL;
@@ -358,7 +360,7 @@ iBase* csGeneralFactoryLoader::Parse (const char* string,
 	  int i = 0;
 	  csColor* co = state->GetColors ();
 
-          while ((cmd = csGetObject (&params, tok_colors, &name, &params2)) > 0)
+          while ((cmd = parser->GetObject (&params, tok_colors, &name, &params2)) > 0)
           {
             if (!params2)
             {
@@ -393,7 +395,7 @@ iBase* csGeneralFactoryLoader::Parse (const char* string,
 	    ReportError (reporter,
 		"crystalspace.sprite3dfactoryloader.parse.frame.badtoken",
 		"Token '%s' not found while parsing colors!",
-		csGetLastOffender ());
+		parser->GetLastOffender ());
 	    state->DecRef ();
 	    fact->DecRef ();
 	    return NULL;
@@ -406,7 +408,7 @@ iBase* csGeneralFactoryLoader::Parse (const char* string,
 	  csVector3* vt = state->GetVertices ();
 	  csVector2* te = state->GetTexels ();
 
-          while ((cmd = csGetObject (&params, tok_frame, &name, &params2)) > 0)
+          while ((cmd = parser->GetObject (&params, tok_frame, &name, &params2)) > 0)
           {
             if (!params2)
             {
@@ -442,7 +444,7 @@ iBase* csGeneralFactoryLoader::Parse (const char* string,
 	    ReportError (reporter,
 		"crystalspace.sprite3dfactoryloader.parse.frame.badtoken",
 		"Token '%s' not found while parsing vertices!",
-		csGetLastOffender ());
+		parser->GetLastOffender ());
 	    state->DecRef ();
 	    fact->DecRef ();
 	    return NULL;
@@ -557,8 +559,10 @@ iBase* csGeneralMeshLoader::Parse (const char* string,
   iMeshObject* mesh = NULL;
   iGeneralMeshState* meshstate = NULL;
 
+  csParser* parser = ldr_context->GetParser ();
+
   char* buf = (char*)string;
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -624,7 +628,7 @@ iBase* csGeneralMeshLoader::Parse (const char* string,
 	break;
       case CS_TOKEN_MIXMODE:
 	uint mm;
-	if (!synldr->ParseMixmode (params, mm))
+	if (!synldr->ParseMixmode (parser, params, mm))
 	{
 	  ReportError (reporter, "crystalspace.genmeshloader.parse.mixmode",
 	  	"Error parsing mixmode!");

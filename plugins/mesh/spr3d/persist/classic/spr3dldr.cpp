@@ -189,7 +189,7 @@ static bool load_quaternion (char* buf, csQuaternion &q)
   return true;
 }
 
-static bool load_matrix (iReporter* reporter, char* buf, csMatrix3 &m)
+static bool load_matrix (csParser* parser, iReporter* reporter, char* buf, csMatrix3 &m)
 {
   CS_TOKEN_TABLE_START(commands)
     CS_TOKEN_TABLE (IDENTITY)
@@ -211,7 +211,7 @@ static bool load_matrix (iReporter* reporter, char* buf, csMatrix3 &m)
   float list[30];
   const csMatrix3 identity;
 
-  while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
+  while ((cmd = parser->GetCommand (&buf, commands, &params)) > 0)
   {
     switch (cmd)
     {
@@ -309,7 +309,7 @@ static bool load_vector (char* buf, csVector3 &v)
   return true;
 }
 
-static uint ParseMixmode (iReporter* reporter, char* buf)
+static uint ParseMixmode (csParser* parser, iReporter* reporter, char* buf)
 {
   CS_TOKEN_TABLE_START (modes)
     CS_TOKEN_TABLE (COPY)
@@ -328,7 +328,7 @@ static uint ParseMixmode (iReporter* reporter, char* buf)
 
   uint Mixmode = 0;
 
-  while ((cmd = csGetObject (&buf, modes, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, modes, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -359,14 +359,15 @@ static uint ParseMixmode (iReporter* reporter, char* buf)
     ReportError (reporter,
 		"crystalspace.sprite3dloader.parse.mixmode.badtoken",
 		"Token '%s' not found while parsing mixmodes!",
-		csGetLastOffender ());
+		parser->GetLastOffender ());
     return ~0;
   }
   return Mixmode;
 }
 
-bool csSprite3DFactoryLoader::LoadSkeleton (iReporter* reporter,
-	iSkeletonLimb* limb, char* buf)
+bool csSprite3DFactoryLoader::LoadSkeleton (csParser* parser, 
+					    iReporter* reporter,
+					    iSkeletonLimb* limb, char* buf)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (LIMB)
@@ -388,7 +389,7 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iReporter* reporter,
 
   iSkeletonConnection* con = SCF_QUERY_INTERFACE (limb, iSkeletonConnection);
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -405,7 +406,7 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iReporter* reporter,
           iSkeletonConnection* newcon = limb->CreateConnection ();
 	  iSkeletonLimb* newlimb = SCF_QUERY_INTERFACE (newcon, iSkeletonLimb);
 	  if (name) newlimb->SetName (name);
-	  if (!LoadSkeleton (reporter, newlimb, params))
+	  if (!LoadSkeleton (parser, reporter, newlimb, params))
 	  {
 	    if (con) con->DecRef ();
 	    return false;
@@ -418,7 +419,7 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iReporter* reporter,
           char* params2;
 	  csMatrix3 m;
 	  csVector3 v (0, 0, 0);
-          while ((cmd = csGetObject(&params,tok_matvec,&xname,&params2)) > 0)
+          while ((cmd = parser->GetObject(&params,tok_matvec,&xname,&params2)) > 0)
           {
     	    if (!params2)
     	    {
@@ -431,7 +432,7 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iReporter* reporter,
             switch (cmd)
             {
               case CS_TOKEN_MATRIX:
-                if (!load_matrix (reporter, params2, m))
+                if (!load_matrix (parser, reporter, params2, m))
 		{
 		  con->DecRef ();
 		  return false;
@@ -484,7 +485,7 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iReporter* reporter,
     ReportError (reporter,
 		"crystalspace.sprite3dfactoryloader.parse.skeleton.badtoken",
 		"Token '%s' not found while parsing skeleton!",
-		csGetLastOffender ());
+		parser->GetLastOffender ());
     if (con) con->DecRef ();
     return false;
   }
@@ -494,7 +495,8 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iReporter* reporter,
 }
 
 iBase* csSprite3DFactoryLoader::Parse (const char* string,
-	iLoaderContext* ldr_context, iBase* context)
+				       iLoaderContext* ldr_context, 
+				       iBase* context)
 {
   // @@@ Implement MIXMODE
   CS_TOKEN_TABLE_START (commands)
@@ -520,6 +522,8 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
   char* params;
   char* params2;
   char str[255];
+
+  csParser* parser = ldr_context->GetParser ();
 
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.mesh.object.sprite.3d", iMeshObjectType);
@@ -554,7 +558,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
   	iSprite3DFactoryState);
 
   char* buf = (char*)string;
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -590,7 +594,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
 	  iSkeletonLimb* skellimb = SCF_QUERY_INTERFACE (skeleton,
 	  	iSkeletonLimb);
 	  if (name) skellimb->SetName (name);
-	  if (!LoadSkeleton (reporter, skellimb, params))
+	  if (!LoadSkeleton (parser, reporter, skellimb, params))
 	  {
 	    spr3dLook->DecRef ();
 	    fact->DecRef ();
@@ -605,7 +609,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
           act->SetName (name);
           int d;
           char fn[64];
-          while ((cmd = csGetObject (&params, tok_frameset, &name,
+          while ((cmd = parser->GetObject (&params, tok_frameset, &name,
 	  	&params2)) > 0)
           {
             if (!params2)
@@ -647,7 +651,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
           int tex_idx = fr->GetTexIndex ();
           int i = 0;
           float x, y, z, u, v;
-          while ((cmd = csGetObject (&params, tok_frame, &name, &params2)) > 0)
+          while ((cmd = parser->GetObject (&params, tok_frame, &name, &params2)) > 0)
           {
             if (!params2)
             {
@@ -688,7 +692,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
 	    ReportError (reporter,
 		"crystalspace.sprite3dfactoryloader.parse.frame.badtoken",
 		"Token '%s' not found while parsing frame '%s'!",
-		csGetLastOffender (), fr->GetName ());
+		parser->GetLastOffender (), fr->GetName ());
 	    spr3dLook->DecRef ();
 	    fact->DecRef ();
 	    return NULL;
@@ -960,8 +964,10 @@ iBase* csSprite3DLoader::Parse (const char* string,
   iMeshObject* mesh = NULL;
   iSprite3DState* spr3dLook = NULL;
 
+  csParser* parser = ldr_context->GetParser ();
+
   char* buf = (char*)string;
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -1025,7 +1031,7 @@ iBase* csSprite3DLoader::Parse (const char* string,
 	break;
       case CS_TOKEN_MIXMODE:
         {
-	  uint mm = ParseMixmode (reporter, params);
+	  uint mm = ParseMixmode (parser, reporter, params);
 	  if (mm == (uint)~0)
 	  {
 	    if (spr3dLook) spr3dLook->DecRef ();

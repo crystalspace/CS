@@ -75,7 +75,7 @@ bool csLoader::ParseMatrix (char* buf, csMatrix3 &m)
   float list[30];
   const csMatrix3 identity;
 
-  while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
+  while ((cmd = parser.GetCommand (&buf, commands, &params)) > 0)
   {
     switch (cmd)
     {
@@ -230,7 +230,7 @@ uint csLoader::ParseMixmode (char* buf)
 
   uint Mixmode = 0;
 
-  while ((cmd = csGetObject (&buf, modes, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, modes, &name, &params)) > 0)
   {
     if (!params)
     {

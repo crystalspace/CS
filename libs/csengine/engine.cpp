@@ -48,6 +48,7 @@
 #include "csutil/cfgacc.h"
 #include "csutil/debug.h"
 #include "csutil/vfscache.h"
+#include "csutil/parser.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "ivideo/halo.h"
@@ -2643,6 +2644,7 @@ class EngineLoaderContext : public iLoaderContext
 private:
   iEngine* Engine;
   iRegion* region;
+  csParser parser;
 
 public:
   EngineLoaderContext (iEngine* Engine, iRegion* region);
@@ -2654,6 +2656,7 @@ public:
   virtual iMaterialWrapper* FindMaterial (const char* name);
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name);
   virtual iMeshWrapper* FindMeshObject (const char* name);
+  virtual csParser* GetParser ();
 };
 
 SCF_IMPLEMENT_IBASE(EngineLoaderContext);
@@ -2690,6 +2693,11 @@ iMeshFactoryWrapper* EngineLoaderContext::FindMeshFactory (const char* name)
 iMeshWrapper* EngineLoaderContext::FindMeshObject (const char* name)
 {
   return Engine->FindMeshObject (name, region);
+}
+
+csParser* EngineLoaderContext::GetParser ()
+{
+  return &parser;
 }
 
 //------------------------------------------------------------------------

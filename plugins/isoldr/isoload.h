@@ -23,6 +23,7 @@
 #include "csutil/csvector.h"
 #include "csutil/util.h"
 #include "csutil/plugldr.h"
+#include "csutil/parser.h"
 
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -59,6 +60,8 @@ class csIsoLoader : public iIsoLoader
 private:
   iLoaderContext* ldr_context;
   iLoaderContext* GetLoaderContext ();
+
+  csParser parser;
 
   // csLoadedPluginVector Cut & Paste from - csloader.h
   // Perhaps theres a better way to do this ??

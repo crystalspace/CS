@@ -30,6 +30,7 @@ struct iShadowReceiver;
 struct iPolygon3D;
 struct iMeshWrapper;
 struct iPolygonMesh;
+struct iObjectModel;
 class csVector3;
 class csBox3;
 

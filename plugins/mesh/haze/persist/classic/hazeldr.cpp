@@ -135,7 +135,7 @@ bool csHazeFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-static uint ParseMixmode (char* buf)
+static uint ParseMixmode (csParser *parser, char* buf)
 {
   CS_TOKEN_TABLE_START (modes)
     CS_TOKEN_TABLE (COPY)
@@ -154,7 +154,7 @@ static uint ParseMixmode (char* buf)
 
   uint Mixmode = 0;
 
-  while ((cmd = csGetObject (&buf, modes, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, modes, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -181,14 +181,15 @@ static uint ParseMixmode (char* buf)
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     printf ("Token '%s' not found while parsing the modes!\n",
-    	csGetLastOffender ());
+    	parser->GetLastOffender ());
     return 0;
   }
   return Mixmode;
 }
 
 
-static iHazeHull* ParseHull (char* buf, iHazeFactoryState *fstate, float &s)
+static iHazeHull* ParseHull (csParser* parser, char* buf, 
+			     iHazeFactoryState *fstate, float &s)
 {
   CS_TOKEN_TABLE_START (emits)
     CS_TOKEN_TABLE (HAZEBOX)
@@ -208,7 +209,7 @@ static iHazeHull* ParseHull (char* buf, iHazeFactoryState *fstate, float &s)
   iHazeHullCreation *hullcreate = SCF_QUERY_INTERFACE(fstate,
     iHazeHullCreation);
 
-  while ((cmd = csGetObject (&buf, emits, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, emits, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -268,6 +269,8 @@ iBase* csHazeFactoryLoader::Parse (const char* string,
 
   csVector3 a;
 
+  csParser* parser = ldr_context->GetParser ();
+
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.mesh.object.haze", iMeshObjectType);
   if (!type)
@@ -282,7 +285,7 @@ iBase* csHazeFactoryLoader::Parse (const char* string,
   CS_ASSERT(hazefactorystate);
 
   char* buf = (char*)string;
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -307,7 +310,7 @@ iBase* csHazeFactoryLoader::Parse (const char* string,
 	}
 	break;
       case CS_TOKEN_MIXMODE:
-        hazefactorystate->SetMixMode (ParseMixmode (params));
+        hazefactorystate->SetMixMode (ParseMixmode (parser, params));
 	break;
       case CS_TOKEN_ORIGIN:
         {
@@ -324,7 +327,7 @@ iBase* csHazeFactoryLoader::Parse (const char* string,
       case CS_TOKEN_LAYER:
         {
 	  float layerscale = 1.0;
-	  iHazeHull *hull = ParseHull(params, hazefactorystate, layerscale);
+	  iHazeHull *hull = ParseHull(parser, params, hazefactorystate, layerscale);
           hazefactorystate->AddLayer (hull, layerscale);
 	}
 	break;
@@ -462,8 +465,8 @@ bool csHazeLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csHazeLoader::Parse (const char* string, iLoaderContext* ldr_context,
-	iBase*)
+iBase* csHazeLoader::Parse (const char* string, 
+			    iLoaderContext* ldr_context, iBase*)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (DIRECTIONAL)
@@ -484,8 +487,10 @@ iBase* csHazeLoader::Parse (const char* string, iLoaderContext* ldr_context,
   iHazeState* hazestate = NULL;
   csVector3 a;
 
+  csParser* parser = ldr_context->GetParser ();
+
   char* buf = (char*)string;
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -527,7 +532,7 @@ iBase* csHazeLoader::Parse (const char* string, iLoaderContext* ldr_context,
 	}
 	break;
       case CS_TOKEN_MIXMODE:
-        hazestate->SetMixMode (ParseMixmode (params));
+        hazestate->SetMixMode (ParseMixmode (parser, params));
 	break;
       case CS_TOKEN_ORIGIN:
         {
@@ -544,7 +549,7 @@ iBase* csHazeLoader::Parse (const char* string, iLoaderContext* ldr_context,
       case CS_TOKEN_LAYER:
         {
 	  float layerscale = 1.0;
-	  iHazeHull *hull = ParseHull(params, hazefactorystate, layerscale);
+	  iHazeHull *hull = ParseHull(parser, params, hazefactorystate, layerscale);
           hazestate->AddLayer (hull, layerscale);
 	}
 	break;

@@ -25,6 +25,7 @@ class csMatrix3;
 class csVector3;
 class csVector2;
 class csVector;
+class csParser;
 struct iPolygon3D;
 struct iEngine;
 struct iMaterialWrapper;
@@ -36,7 +37,7 @@ struct iLoaderContext;
 #define CSTEX_V2 4  // vector2 is given in texture description
 #define CSTEX_UV_SHIFT 8 // explicit (u,v) <-> vertex mapping is given in texture description
 
-SCF_VERSION (iSyntaxService, 0, 0, 3);
+SCF_VERSION (iSyntaxService, 1, 0, 0);
 
 /**
  * This component provides services for other loaders to easily parse
@@ -47,22 +48,22 @@ struct iSyntaxService : public iBase
   /**
    * Parse a MATRIX description. Returns true if successful.
    */
-  virtual bool ParseMatrix (char *buffer, csMatrix3 &m) = 0;
+  virtual bool ParseMatrix (csParser* parser, char *buffer, csMatrix3 &m) = 0;
 
   /**
    * Parse a VECTOR description. Returns true if successful.
    */
-  virtual bool ParseVector (char *buffer, csVector3 &v) = 0;
+  virtual bool ParseVector (csParser* parser, char *buffer, csVector3 &v) = 0;
 
   /**
    * Parse a MIXMODE description. Returns true if successful.
    */
-  virtual bool ParseMixmode (char *buffer, uint &mixmode) = 0;
+  virtual bool ParseMixmode (csParser* parser, char *buffer, uint &mixmode) = 0;
 
   /**
    * Parse a SHADING description. Returns true if successful.
    */
-  virtual bool ParseShading (char *buf, int &shading) = 0;
+  virtual bool ParseShading (csParser* parser, char *buf, int &shading) = 0;
 
   /**
    * Parse a texture description.
@@ -85,7 +86,8 @@ struct iSyntaxService : public iBase
    *     This is used to make errormessages more verbose.
    * </ul>
    */
-  virtual bool ParseTexture (char *buf, const csVector3* vref, uint &texspec,
+  virtual bool ParseTexture (csParser* parser, 
+  			     char *buf, const csVector3* vref, uint &texspec,
 			     csVector3 &tx_orig, csVector3 &tx1,
 			     csVector3 &tx2, csVector3 &len,
 			     csMatrix3 &tx_m, csVector3 &tx_v,
@@ -99,7 +101,8 @@ struct iSyntaxService : public iBase
    * Parses a WARP () specification.
    * flags: contains all flags found in the description.
    */
-  virtual  bool ParseWarp (char *buf, csVector &flags, bool &mirror,
+  virtual  bool ParseWarp (csParser* parser, 
+  			   char *buf, csVector &flags, bool &mirror,
   			   bool& warp, int& msv,
 			   csMatrix3 &m, csVector3 &before,
 			   csVector3 &after) = 0;
@@ -108,7 +111,8 @@ struct iSyntaxService : public iBase
   /**
    * Parses a POLYGON.
    */
-  virtual bool ParsePoly3d (iLoaderContext* ldr_context,
+  virtual bool ParsePoly3d (csParser* parser, 
+   			    iLoaderContext* ldr_context,
   			    iEngine* engine, iPolygon3D* poly3d, char* buf,
 			    float default_texlen,
 			    iThingState* thing_state, int vt_offset) = 0;

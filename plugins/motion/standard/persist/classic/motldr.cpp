@@ -27,6 +27,7 @@
 #include "iutil/databuff.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
+#include "imap/ldrctxt.h"
 
 #include "csgeom/transfrm.h"
 #include "csgeom/quaterni.h"
@@ -122,7 +123,7 @@ bool csMotionLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-static bool load_matrix (char* buf, csMatrix3 &m)
+static bool load_matrix (csParser *parser, char* buf, csMatrix3 &m)
 {
   CS_TOKEN_TABLE_START(commands)
     CS_TOKEN_TABLE(IDENTITY)
@@ -143,7 +144,7 @@ static bool load_matrix (char* buf, csMatrix3 &m)
   float list[30];
   const csMatrix3 identity;
 
-  while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
+  while ((cmd = parser->GetCommand (&buf, commands, &params)) > 0)
   {
     switch (cmd)
     {
@@ -266,9 +267,9 @@ iMotionTemplate* csMotionLoader::LoadMotion (const char* fname )
   char *name, *data;
   char *buf = **databuff;
   long cmd;
+  csParser parser;
 
-
-  if ((cmd=csGetObject (&buf, tokens, &name, &data)) > 0)
+  if ((cmd = parser.GetObject (&buf, tokens, &name, &data)) > 0)
   {
     if (!data)
     {
@@ -284,7 +285,7 @@ iMotionTemplate* csMotionLoader::LoadMotion (const char* fname )
       if (!m)
       {
 	m = motman->AddMotion (name);
-	if (LoadMotion (m, data))
+	if (LoadMotion (&parser, m, data))
 	{
 	  databuff->DecRef ();
 	  return m;
@@ -302,7 +303,7 @@ iMotionTemplate* csMotionLoader::LoadMotion (const char* fname )
   return NULL;
 }
 
-bool load_transform (char* buf, csVector3 &v, csQuaternion &q) {
+bool load_transform (csParser* parser, char* buf, csVector3 &v, csQuaternion &q) {
   CS_TOKEN_TABLE_START (tok_anim)
     CS_TOKEN_TABLE (POS)
     CS_TOKEN_TABLE (ROT)
@@ -319,14 +320,14 @@ bool load_transform (char* buf, csVector3 &v, csQuaternion &q) {
   char* params;
   char* params2;
 
-  while ( (cmd = csGetObject (&buf, tok_anim, &name, &params))>0 ) {
+  while ( (cmd = parser->GetObject (&buf, tok_anim, &name, &params))>0 ) {
     switch ( cmd ) {
       case CS_TOKEN_POS: {
         load_vector(params, v);
         break;
       }
       case CS_TOKEN_ROT:
-        while ( (cmd = csGetObject (&params, tok_rot, &name, &params2))>0 ) {
+        while ( (cmd = parser->GetObject (&params, tok_rot, &name, &params2))>0 ) {
           switch ( cmd ) {
             case CS_TOKEN_Q: {
                 load_quaternion(params2, q);
@@ -335,7 +336,7 @@ bool load_transform (char* buf, csVector3 &v, csQuaternion &q) {
 //TODO Implement me
             case CS_TOKEN_MATRIX: {
 		csMatrix3 m;
-                load_matrix(params2, m);
+                load_matrix(parser, params2, m);
 //		q.Set(m);
                 break;
               }
@@ -358,7 +359,7 @@ bool load_transform (char* buf, csVector3 &v, csQuaternion &q) {
 }
 
 
-bool csMotionLoader::LoadBone (iMotionTemplate* mot, int bone, char* buf)
+bool csMotionLoader::LoadBone (csParser* parser, iMotionTemplate* mot, int bone, char* buf)
 {
   CS_TOKEN_TABLE_START (tok_bone)
     CS_TOKEN_TABLE (FRAME)
@@ -368,7 +369,7 @@ bool csMotionLoader::LoadBone (iMotionTemplate* mot, int bone, char* buf)
   long cmd;
   char* params;
 
-  while((cmd = csGetObject (&buf, tok_bone, &name, &params))>0)
+  while((cmd = parser->GetObject (&buf, tok_bone, &name, &params))>0)
   {
     if (!params)
     {
@@ -383,7 +384,7 @@ bool csMotionLoader::LoadBone (iMotionTemplate* mot, int bone, char* buf)
         csScanStr(name, "%f", &frametime);
         csVector3 v(0,0,0);
         csQuaternion q(1,0,0,0);
-        load_transform(params, v, q);
+        load_transform(parser, params, v, q);
         mot->AddFrameBone(bone, frametime, v, q);
         break;
       }
@@ -392,13 +393,13 @@ bool csMotionLoader::LoadBone (iMotionTemplate* mot, int bone, char* buf)
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Token '%s' not found while parsing the a sprite template!",
-        csGetLastOffender ());
+        parser->GetLastOffender ());
     return false;
   }
   return true;
 }
 
-bool csMotionLoader::LoadMotion (iMotionTemplate* mot, char* buf)
+bool csMotionLoader::LoadMotion (csParser* parser, iMotionTemplate* mot, char* buf)
 {
   CS_TOKEN_TABLE_START (tok_commands)
     CS_TOKEN_TABLE (DURATION)
@@ -416,7 +417,7 @@ bool csMotionLoader::LoadMotion (iMotionTemplate* mot, char* buf)
   char* params;
   char* params2;
 
-  while ((cmd = csGetObject (&buf, tok_commands, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, tok_commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -429,7 +430,7 @@ bool csMotionLoader::LoadMotion (iMotionTemplate* mot, char* buf)
         float duration=0.0f;
         csScanStr(name, "%f", &duration);
         mot->SetDuration(duration);
-        while ( (cmd = csGetObject (&params, tok_duration, &name, &params2))>0 ) {
+        while ( (cmd = parser->GetObject (&params, tok_duration, &name, &params2))>0 ) {
           switch ( cmd ) {
             case CS_TOKEN_LOOP:
               mot->SetLoopCount(-1);
@@ -449,7 +450,7 @@ bool csMotionLoader::LoadMotion (iMotionTemplate* mot, char* buf)
       }
       case CS_TOKEN_BONE: {
         int bone=mot->AddBone(name);
-        LoadBone(mot, bone, params);
+        LoadBone(parser, mot, bone, params);
         break;
       }
     }
@@ -457,14 +458,14 @@ bool csMotionLoader::LoadMotion (iMotionTemplate* mot, char* buf)
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Token '%s' not found while parsing the a sprite template!",
-        csGetLastOffender ());
+        parser->GetLastOffender ());
     return false;
   }
   return true;
 }
 
 
-iBase* csMotionLoader::Parse ( const char *string, iLoaderContext*,
+iBase* csMotionLoader::Parse (const char *string, iLoaderContext* ldr_context,
 	iBase* /* context */ )
 {
   CS_TOKEN_TABLE_START(commands)
@@ -480,7 +481,9 @@ iBase* csMotionLoader::Parse ( const char *string, iLoaderContext*,
   str[0] = '\0';
   iMotionTemplate *m;
 
-  while (( cmd = csGetObject ( &buf, commands, &name, &params )) > 0)
+  csParser* parser = ldr_context->GetParser ();
+
+  while (( cmd = parser->GetObject ( &buf, commands, &name, &params )) > 0)
   {
 	if (!params)
 	{
@@ -495,7 +498,7 @@ iBase* csMotionLoader::Parse ( const char *string, iLoaderContext*,
 	    if (!m)
 	    {
 		  m = motman->AddMotion (name);
-		  LoadMotion (m, params);
+		  LoadMotion (parser, m, params);
 	    }
 	  }
 	  break;
@@ -514,7 +517,7 @@ iBase* csMotionLoader::Parse ( const char *string, iLoaderContext*,
 	{
 	  Report(CS_REPORTER_SEVERITY_ERROR,
 		  "Token '%s' not found while parsing the iMotionLoader plugin",
-			csGetLastOffender());
+			parser->GetLastOffender());
 	  return NULL;
 	}
 	return this;

@@ -24,6 +24,7 @@
 #include "csgeom/math3d.h"
 #include "csgeom/path.h"
 #include "csutil/csvector.h"
+#include "csutil/parser.h"
 
 struct iSequence;
 struct iSequenceManager;
@@ -47,6 +48,8 @@ private:
   iSequenceManager* seqmgr;
   Demo* demo;
   DemoSequenceManager* demoseq;
+
+  csParser parser;
 
   csNamedPath* LoadPath (char* buf, const char* name);
   void LoadSequence (char* buf, iSequence* seq);

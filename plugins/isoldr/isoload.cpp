@@ -139,9 +139,10 @@ class StdIsoLoaderContext : public iLoaderContext
 {
 private:
   iIsoEngine* Engine;
+  csParser* parser;
 
 public:
-  StdIsoLoaderContext (iIsoEngine* Engine);
+  StdIsoLoaderContext (iIsoEngine* Engine, csParser* parser);
   virtual ~StdIsoLoaderContext ();
 
   SCF_DECLARE_IBASE;
@@ -150,16 +151,18 @@ public:
   virtual iMaterialWrapper* FindMaterial (const char* name);
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name);
   virtual iMeshWrapper* FindMeshObject (const char* name);
+  virtual csParser* GetParser ();
 };
 
 SCF_IMPLEMENT_IBASE(StdIsoLoaderContext);
   SCF_IMPLEMENTS_INTERFACE(iLoaderContext);
 SCF_IMPLEMENT_IBASE_END;
 
-StdIsoLoaderContext::StdIsoLoaderContext (iIsoEngine* Engine)
+StdIsoLoaderContext::StdIsoLoaderContext (iIsoEngine* Engine, csParser* parser)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   StdIsoLoaderContext::Engine = Engine;
+  StdIsoLoaderContext::parser = parser;
 }
 
 StdIsoLoaderContext::~StdIsoLoaderContext ()
@@ -186,6 +189,11 @@ iMeshWrapper* StdIsoLoaderContext::FindMeshObject (const char* /*name*/)
   return NULL;
 }
 
+csParser* StdIsoLoaderContext::GetParser ()
+{
+  return parser;
+}
+
 //---------------------------------------------------------------------------
 
 
@@ -196,7 +204,7 @@ iLoaderContext* csIsoLoader::GetLoaderContext ()
 {
   if (!ldr_context)
   {
-    ldr_context = new StdIsoLoaderContext (Engine);
+    ldr_context = new StdIsoLoaderContext (Engine, &parser);
   }
   return ldr_context;
 }
@@ -268,7 +276,7 @@ void csIsoLoader::TokenError (const char *Object)
 {
   ReportError ("crystalspace.iso.loader.tokenerror.badtoken",
     "Token '%s' not found while parsing a %s!",
-    csGetLastOffender (), Object);
+    parser.GetLastOffender (), Object);
 }
 
 bool csIsoLoader::CheckParams(char* params, const char* tag, char *data)
@@ -289,7 +297,7 @@ bool csIsoLoader::CheckToken(int cmd, const char* tag, char* data)
 //     TokenError (tag);
      ReportNotify("%s\nfunction %s\ncmd %d\ndata %s or %s\n",
        "Bad token found while parsing - Diagnostics follow",
-       tag, cmd, data, csGetLastOffender ());
+       tag, cmd, data, parser.GetLastOffender ());
      return false;
   }
 
@@ -338,7 +346,7 @@ bool csIsoLoader::LoadMap (char* buf)
     CS_TOKEN_TABLE (START)
   CS_TOKEN_TABLE_END
 
-  csResetParserLine();
+  parser.ResetParserLine();
   char *name = NULL; 
   char *data = NULL;
   char *tag = "crystalspace.iso.loader.loadmap";
@@ -346,7 +354,7 @@ bool csIsoLoader::LoadMap (char* buf)
   bool set_view = false;
 
   // Parse the WORLD token
-  if ((cmd = csGetObject (&buf, tokens, &name, &data)) > 0)
+  if ((cmd = parser.GetObject (&buf, tokens, &name, &data)) > 0)
   {
     if (!CheckParams(data, tag, buf))
       return false;
@@ -358,7 +366,7 @@ bool csIsoLoader::LoadMap (char* buf)
 
   char* params;
 
-  while ((cmd = csGetObject (&data, commands, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&data, commands, &name, &params)) > 0)
   {
 
     if (!CheckParams (params, tag, data))
@@ -441,7 +449,7 @@ bool csIsoLoader::ParseStart (char* buf, const char* /*prefix*/)
   char* name;
   char* tag = "crystalspace.iso.loader.parsestart";
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
 
     if (!CheckParams (params, tag, buf))
@@ -451,7 +459,7 @@ bool csIsoLoader::ParseStart (char* buf, const char* /*prefix*/)
     {
       case CS_TOKEN_POSITION:
         {
-          if(!Syntax->ParseVector (params, start_v))
+          if(!Syntax->ParseVector (&parser, params, start_v))
             return false;
         }
         break;
@@ -476,7 +484,7 @@ bool csIsoLoader::ParsePluginList(char* buf, const char* /*prefix*/)
   char str[255];
   long cmd;
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
 
     if (!CheckParams(params, tag, buf))
@@ -510,7 +518,7 @@ bool csIsoLoader::ParseGridList (char* buf, const char* /*prefix*/)
   char* name;
   long cmd;
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
 
     if (!CheckParams(params, tag, buf))
@@ -547,7 +555,7 @@ bool csIsoLoader::ParseGrid (char* buf, const char* /*prefix*/)
   char* name;
   long cmd;
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
 
     if (!CheckParams(params, tag, buf))
@@ -624,7 +632,7 @@ bool csIsoLoader::ParseLight (char* buf, const char* /*prefix*/)
 
   iIsoLight *light = Engine->CreateLight();
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
 
     if (!CheckParams(params, tag, buf))
@@ -706,7 +714,7 @@ bool csIsoLoader::ParseTile2D (char* buf, const char* /*prefix*/)
 
 //  ReportNotify("Parsing tile 2D");
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!CheckParams (params, tag, buf))
       return false;
@@ -714,11 +722,11 @@ bool csIsoLoader::ParseTile2D (char* buf, const char* /*prefix*/)
     switch (cmd)
     {
       case CS_TOKEN_START:
-	      Syntax->ParseVector (params, start);
+	      Syntax->ParseVector (&parser, params, start);
         break;
 
       case CS_TOKEN_END:
-        Syntax->ParseVector (params, end);
+        Syntax->ParseVector (&parser, params, end);
         break;
 
       case CS_TOKEN_MATERIAL:
@@ -896,7 +904,7 @@ bool csIsoLoader::ParseMaterialList (char* buf, const char* /*prefix*/)
 
   char vfsfilename[255];
  
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
 
     if (!CheckParams(params, tag, buf))
@@ -948,7 +956,7 @@ bool csIsoLoader::ParseMeshFactory(char *buf, const char *prefix)
 
   SCF_DEC_REF (ldr_context); ldr_context = NULL;
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
 
     if (!CheckParams(params, tag, buf))
@@ -1061,7 +1069,7 @@ bool csIsoLoader::ParseMeshObject (char* buf, const char* prefix)
   //
   // Side effects are KEY doesnt work
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
 
     if (!CheckParams(params, tag, buf))
@@ -1102,7 +1110,7 @@ bool csIsoLoader::ParseMeshObject (char* buf, const char* prefix)
         {
           char* params2;
 
-          while ((cmd = csGetObject (&params, tok_matvec, &name, &params2)) > 0)
+          while ((cmd = parser.GetObject (&params, tok_matvec, &name, &params2)) > 0)
           {
 
             if (!CheckParams(params2, tag, params))
@@ -1115,7 +1123,7 @@ bool csIsoLoader::ParseMeshObject (char* buf, const char* prefix)
             {
               case CS_TOKEN_MATRIX:
                 {
-                  if (!Syntax->ParseMatrix (params2, m))
+                  if (!Syntax->ParseMatrix (&parser, params2, m))
 		                return false;
                   meshspr->SetTransform (m);
                 }
@@ -1123,7 +1131,7 @@ bool csIsoLoader::ParseMeshObject (char* buf, const char* prefix)
               
               case CS_TOKEN_V:
                 {
-                  if (!Syntax->ParseVector (params2, v))
+                  if (!Syntax->ParseVector (&parser, params2, v))
                     return false;
 
                   // Error check the vector, make sure it exists
@@ -1207,7 +1215,7 @@ bool csIsoLoader::LoadPlugins (char* buf)
   char str[255];
   long cmd;
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
 
     if (!CheckParams(params, tag, buf))

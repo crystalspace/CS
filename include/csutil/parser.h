@@ -26,15 +26,16 @@
  * Structure to describe a single token in a token table that is passed
  * to most token-parsing functions.
  */
-struct csTokenDesc
+class csTokenDesc
 {
+public:
   /// value returned when token is matched
   long	id;
   /// token to match
   char *token;
-  csTokenDesc (){id=0; token=NULL;}
-  ~csTokenDesc ()
-  {delete [] token;}
+
+  csTokenDesc () { id=0; token=NULL;  }
+  ~csTokenDesc () { delete [] token; }
 };
 
 class csTokenVector : public csVector
@@ -132,71 +133,93 @@ class csTokenVector : public csVector
 #define CS_PARSERR_TOKENNOTFOUND	-1
 
 /**
- * Get the current line number of the file being parsed.
+ * Provides a set of functions to parse CS ASCII data (like worlds, 
+ * sprites etc.)
  */
-int csGetParserLine ();
+class csParser 
+{
+private:
+  char last_offender[255];
 
-/**
- * Reset the line number of the line being parsed to line one.  This does not
- * rewind a file pointer or any other such operation.  It merely resets the
- * internal line number counter which is reported by csGetParserLine().
- */
-void csResetParserLine ();
+  int parser_line;
 
-/**
- * Get pointer to last offending token.
- */
-char* csGetLastOffender ();
+public:
+  /**
+   * Initialize the parser.
+   */
+  csParser ();
 
-/**
- * Get next token and his parameters.
- * Pass in a pointer to a buffer of text. This pointer is modified to point
- * to the text after the object description. The token id for the object is
- * returned. The name pointer will point to the optional name string in the
- * buffer. The data pointer will point to the optional data for the object.
- * <i>The text buffer will get modified so BEWARE.</i>
- * <p><b>eg text</b>:
- * <pre>
- *   ROOM 'test room' ( 1, 2, 3 )
- * </pre>
- * <p>returns CS_PARSERR_TOKENNOTFOUND on error.
- * <p>returns CS_PARSERR_EOF on EOF.
- */
-long csGetObject(char **buf, csTokenVector *tokens, char **name, char **data);
-/**
- * Pass in a pointer to a buffer of text. This pointer is modified to point
- * to the text after the command description. The token id for the command is
- * returned. The params pointer will point to the optional data for the object.
- * <i>The text buffer will get modified so BEWARE.</i>
- * <p><b>eg text</b>:
- * <code>
- *   TEXTURE( 1, 2, 3 )
- * </code>
- * <p>returning CS_PARSERR_TOKENNOTFOUND on error.
- * <p>returning CS_PARSERR_EOF on EOF.
- * <p><b>NOTE</b>: Should be modified to accept assignments like:
- * <code>
- *   LIGHT=1
- * </code>
- */
-long csGetCommand(char **buf, csTokenVector *tokens, char **params);
-/**
- * Returns the string of text between the open and close characters.
- * Modifies the buffer. Moves the buffer pointer to after the last delimiter.
- * Can return NULL; buffer MUST already be at the opening delimiter.
- * Skips nested delimiters too.
- * <p><b>NOTE</b>: Should skip quoted text, does not at this time.
- */
-char *csGetSubText(char **buf, char open, char close);
-/**
- * Skips any characters in the toSkip string.
- * Changes the buf pointer.
- */
-void csSkipCharacters(char **buf, const char *toSkip);
-/**
- * Returns the string of text after a = up to the next
- * whitespace. Terminates the string and moves the buf pointer.
- */
-char *csGetAssignmentText(char **buf);
+  /**
+   * Reset the line number of the line being parsed to line one.  This does not
+   * rewind a file pointer or any other such operation.  It merely resets the
+   * internal line number counter which is reported by csGetParserLine().
+   */
+  void ResetParserLine ();
+
+  /**
+   * Get the current line number of the file being parsed.
+   */
+  int GetParserLine ();
+
+  /**
+   * Get pointer to last offending token.
+   */
+  char* GetLastOffender ();
+
+  /**
+   * Get next token and his parameters.
+   * Pass in a pointer to a buffer of text. This pointer is modified to point
+   * to the text after the object description. The token id for the object is
+   * returned. The name pointer will point to the optional name string in the
+   * buffer. The data pointer will point to the optional data for the object.
+   * <i>The text buffer will get modified so BEWARE.</i>
+   * <p><b>eg text</b>:
+   * <pre>
+   *   ROOM 'test room' ( 1, 2, 3 )
+   * </pre>
+   * <p>returns CS_PARSERR_TOKENNOTFOUND on error.
+   * <p>returns CS_PARSERR_EOF on EOF.
+   */
+  long GetObject(char **buf, csTokenVector *tokens, char **name, char **data);
+
+  /**
+   * Pass in a pointer to a buffer of text. This pointer is modified to point
+   * to the text after the command description. The token id for the command is
+   * returned. The params pointer will point to the optional data for the object.
+   * <i>The text buffer will get modified so BEWARE.</i>
+   * <p><b>eg text</b>:
+   * <code>
+   *   TEXTURE( 1, 2, 3 )
+   * </code>
+   * <p>returning CS_PARSERR_TOKENNOTFOUND on error.
+   * <p>returning CS_PARSERR_EOF on EOF.
+   * <p><b>NOTE</b>: Should be modified to accept assignments like:
+   * <code>
+   *   LIGHT=1
+   * </code>
+   */
+  long GetCommand(char **buf, csTokenVector *tokens, char **params);
+  
+  /**
+   * Returns the string of text between the open and close characters.
+   * Modifies the buffer. Moves the buffer pointer to after the last delimiter.
+   * Can return NULL; buffer MUST already be at the opening delimiter.
+   * Skips nested delimiters too.
+   * <p><b>NOTE</b>: Should skip quoted text, does not at this time.
+   */
+  char *GetSubText(char **buf, char open, char close);
+  
+  /**
+   * Skips any characters in the toSkip string.
+   * Changes the buf pointer.
+   */
+  void SkipCharacters(char **buf, const char *toSkip);
+  
+  /**
+   * Returns the string of text after a = up to the next
+   * whitespace. Terminates the string and moves the buf pointer.
+   */
+  char *GetAssignmentText(char **buf);
+};
 
 #endif // __CS_PARSER_H__

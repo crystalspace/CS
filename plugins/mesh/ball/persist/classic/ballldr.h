@@ -55,8 +55,8 @@ public:
   virtual bool Initialize (iObjectRegistry *object_reg);
 
   /// Parse a given string and return a new object for it.
-  virtual iBase* Parse (const char* string, iLoaderContext* ldr_context,
-  	iBase* context);
+  virtual iBase* Parse (const char* string, 
+    iLoaderContext* ldr_context, iBase* context);
 
   struct eiComponent : public iComponent
   {
@@ -123,8 +123,8 @@ public:
   virtual bool Initialize (iObjectRegistry *object_reg);
 
   /// Parse a given string and return a new object for it.
-  virtual iBase* Parse (const char* string, iLoaderContext* ldr_context,
-  	iBase* context);
+  virtual iBase* Parse (const char* string, 
+    iLoaderContext* ldr_context, iBase* context);
 
   struct eiComponent : public iComponent
   {

@@ -160,7 +160,7 @@ bool csSprite2DFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-static uint ParseMixmode (iReporter* reporter, char* buf)
+static uint ParseMixmode (csParser *parser, iReporter* reporter, char* buf)
 {
   CS_TOKEN_TABLE_START (modes)
     CS_TOKEN_TABLE (COPY)
@@ -179,7 +179,7 @@ static uint ParseMixmode (iReporter* reporter, char* buf)
 
   uint Mixmode = 0;
 
-  while ((cmd = csGetObject (&buf, modes, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, modes, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -210,14 +210,15 @@ static uint ParseMixmode (iReporter* reporter, char* buf)
     ReportError (reporter,
 		"crystalspace.sprite2dloader.parse.mixmode.badtoken",
 		"Token '%s' not found while parsing mixmodes!",
-		csGetLastOffender ());
+		parser->GetLastOffender ());
     return ~0;
   }
   return Mixmode;
 }
 
-static void ParseAnim (iReporter* reporter, iSprite2DFactoryState* spr2dLook,
-	const char *animname, char *buf)
+static void ParseAnim (csParser* parser, iReporter* reporter, 
+		       iSprite2DFactoryState* spr2dLook, 
+		       const char *animname, char *buf)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (FRAME)
@@ -232,7 +233,7 @@ static void ParseAnim (iReporter* reporter, iSprite2DFactoryState* spr2dLook,
   iSprite2DUVAnimation *ani = spr2dLook->CreateUVAnimation ();
   ani->SetName (animname);
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -258,7 +259,7 @@ static void ParseAnim (iReporter* reporter, iSprite2DFactoryState* spr2dLook,
     ReportError (reporter,
 		"crystalspace.sprite2dfactoryloader.parse.badtoken",
 		"Token '%s' not found while parsing FRAME!",
-		csGetLastOffender ());
+		parser->GetLastOffender ());
     return;
   }
 }
@@ -277,6 +278,8 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string,
   long cmd;
   char* params;
   char str[255];
+
+  csParser* parser = ldr_context->GetParser ();
 
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.mesh.object.sprite.2d", iMeshObjectType);
@@ -298,7 +301,7 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string,
   	iSprite2DFactoryState);
 
   char* buf = (char*)string;
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -336,7 +339,7 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string,
 	break;
       case CS_TOKEN_MIXMODE:
         {
-	  uint mm = ParseMixmode (reporter, params);
+	  uint mm = ParseMixmode (parser, reporter, params);
 	  if (mm == (uint)~0)
 	  {
 	    spr2dLook->DecRef ();
@@ -348,7 +351,7 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string,
 	break;
       case CS_TOKEN_UVANIMATION:
 	{
-	  ParseAnim (reporter, spr2dLook, name, params);
+	  ParseAnim (parser, reporter, spr2dLook, name, params);
 	}
         break;
     }
@@ -447,7 +450,7 @@ bool csSprite2DLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 iBase* csSprite2DLoader::Parse (const char* string,
-	iLoaderContext* ldr_context, iBase*)
+				iLoaderContext* ldr_context, iBase*)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (FACTORY)
@@ -469,8 +472,10 @@ iBase* csSprite2DLoader::Parse (const char* string,
   iSprite2DState* spr2dLook = NULL;
   csColoredVertices* verts = NULL;
 
+  csParser* parser = ldr_context->GetParser ();
+
   char* buf = (char*)string;
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -517,7 +522,7 @@ iBase* csSprite2DLoader::Parse (const char* string,
 	break;
       case CS_TOKEN_MIXMODE:
         {
-	  uint mm = ParseMixmode (reporter, params);
+	  uint mm = ParseMixmode (parser, reporter, params);
 	  if (mm == (uint)~0)
 	  {
 	    if (spr2dLook) spr2dLook->DecRef ();

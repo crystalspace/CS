@@ -252,8 +252,8 @@ bool csBallLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csBallLoader::Parse (const char* string, iLoaderContext* ldr_context,
-	iBase*)
+iBase* csBallLoader::Parse (const char* string, 
+			    iLoaderContext* ldr_context, iBase*)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (MATERIAL)
@@ -277,8 +277,10 @@ iBase* csBallLoader::Parse (const char* string, iLoaderContext* ldr_context,
   iMeshObject* mesh = NULL;
   iBallState* ballstate = NULL;
 
+  csParser *parser = ldr_context->GetParser ();
+
   char* buf = (char*)string;
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -379,7 +381,7 @@ iBase* csBallLoader::Parse (const char* string, iLoaderContext* ldr_context,
 	break;
       case CS_TOKEN_MIXMODE:
 	uint mm;
-	if (!synldr->ParseMixmode (params, mm))
+	if (!synldr->ParseMixmode (parser, params, mm))
 	{
 	  ReportError (reporter, "crystalspace.ballloader.parse.mixmode",
 	  	"Error parsing mixmode!");

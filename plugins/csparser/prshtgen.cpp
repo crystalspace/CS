@@ -138,7 +138,7 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (char* buf)
   char* name;
   csGenerateImageValue* v = NULL;
 
-  if ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  if ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
     switch (cmd)
     {
@@ -235,7 +235,7 @@ csGenerateImageTexture* csLoader::ParseHeightgenTexture (char* buf)
   char* name;
   csGenerateImageTexture* t = NULL;
 
-  if ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  if ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
     switch (cmd)
     {
@@ -270,7 +270,7 @@ csGenerateImageTexture* csLoader::ParseHeightgenTexture (char* buf)
 	  csGenerateImageTextureBlend* tb = new csGenerateImageTextureBlend ();
 	  char* xname;
 	  char* params2;
-	  while ((cmd = csGetObject (&params, blend_commands,
+	  while ((cmd = parser.GetObject (&params, blend_commands,
 	  	&xname, &params2)) > 0)
 	  {
 	    switch (cmd)
@@ -291,7 +291,7 @@ csGenerateImageTexture* csLoader::ParseHeightgenTexture (char* buf)
 		  csGenerateImageTexture* txt = NULL;
 	  	  char* yname;
 	  	  char* params3;
-	  	  while ((cmd = csGetObject (&params2, layer_commands,
+	  	  while ((cmd = parser.GetObject (&params2, layer_commands,
 	  		  &yname, &params3)) > 0)
 	  	  {
 	    	    switch (cmd)
@@ -348,7 +348,7 @@ bool csLoader::ParseHeightgen (char* buf)
   int mw = 1, mh = 1;
   csGenerateImage* gen = new csGenerateImage ();
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
     switch (cmd)
     {

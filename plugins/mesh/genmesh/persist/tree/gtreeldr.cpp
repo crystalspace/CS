@@ -37,6 +37,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "imap/services.h"
+#include "imap/ldrctxt.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -648,8 +649,9 @@ bool csGeneralTreeFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csGeneralTreeFactoryLoader::Parse (const char* string,
-	iLoaderContext*, iBase* /* context */)
+iBase* csGeneralTreeFactoryLoader::Parse (
+	const char* string,
+	iLoaderContext* ldr_context, iBase* /* context */)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (HEIGHT)
@@ -658,6 +660,8 @@ iBase* csGeneralTreeFactoryLoader::Parse (const char* string,
   char* name;
   long cmd;
   char* params;
+
+  csParser* parser = ldr_context->GetParser ();
 
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.mesh.object.genmesh", iMeshObjectType);
@@ -680,7 +684,7 @@ iBase* csGeneralTreeFactoryLoader::Parse (const char* string,
   	iGeneralFactoryState);
 
   char* buf = (char*)string;
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {

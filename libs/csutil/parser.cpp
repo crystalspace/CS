@@ -24,29 +24,38 @@
 
 // A string containing white spaces (' ', '\t', '\n', '\r')
 static const char *kWhiteSpace = " \t\n\r";
-static char last_offender[255];
-static int parser_line;
 
-char* csGetLastOffender () { return last_offender; }
-
-// XXX: Here we have a problem: the parser_line variable is static and
-// therefor not shared across plugins, because the real fix (moving everything
-// into a class) takes time, we'll just always return -1 now...
-//int   csGetParserLine   () { return parser_line;   }
-int csGetParserLine() { return -1; }
-
-void  csResetParserLine () { parser_line = 1;      }
-
-long csGetObject (char **buf, csTokenVector * tokens, char **name, char **data)
+csParser::csParser ()
 {
-  csSkipCharacters (buf, kWhiteSpace);
+  ResetParserLine ();
+  last_offender[0] = 0;
+}
+
+void csParser::ResetParserLine ()
+{
+  parser_line = 1;
+}
+
+char* csParser::GetLastOffender () 
+{ 
+  return last_offender; 
+}
+
+int csParser::GetParserLine() 
+{ 
+  return parser_line; 
+}
+
+long csParser::GetObject (char **buf, csTokenVector * tokens, char **name, char **data)
+{
+  SkipCharacters (buf, kWhiteSpace);
 
   // skip comment lines.
   while (**buf == ';')
   {
     *buf = strchr (*buf, '\n');
     parser_line++;
-    csSkipCharacters (buf, kWhiteSpace);
+    SkipCharacters (buf, kWhiteSpace);
   }
 
   if (!**buf)                   // at end of file
@@ -72,28 +81,28 @@ long csGetObject (char **buf, csTokenVector * tokens, char **name, char **data)
   }
   // skip the token
   *buf += strlen (tokens->Get (i)->token);
-  csSkipCharacters (buf, kWhiteSpace);
+  SkipCharacters (buf, kWhiteSpace);
 
   // get optional name
-  *name = csGetSubText (buf, '\'', '\''); // single quotes
-  csSkipCharacters (buf, kWhiteSpace);
+  *name = GetSubText (buf, '\'', '\''); // single quotes
+  SkipCharacters (buf, kWhiteSpace);
 
   // get optional data
   if (**buf == '=') // An assignment rather than a command/object.
-    *data = csGetAssignmentText (buf);
+    *data = GetAssignmentText (buf);
   else
-    *data = csGetSubText (buf, '(', ')');
+    *data = GetSubText (buf, '(', ')');
 
   return tokens->Get (i)->id;
 }
 
-long csGetCommand (char **buf, csTokenVector * tokens, char **params)
+long csParser::GetCommand (char **buf, csTokenVector * tokens, char **params)
 {
   char *name;
-  return csGetObject (buf, tokens, &name, params);
+  return GetObject (buf, tokens, &name, params);
 }
 
-void csSkipCharacters (char **buf, const char *toSkip)
+void csParser::SkipCharacters (char **buf, const char *toSkip)
 {
   char ch;
   while ((ch = **buf) != 0)
@@ -106,7 +115,7 @@ void csSkipCharacters (char **buf, const char *toSkip)
   // we must be at the end of the buffer if we get here
 }
 
-char *csGetSubText (char **buf, char open, char close)
+char *csParser::GetSubText (char **buf, char open, char close)
 {
   if (**buf == 0 || **buf != open)
     return 0;
@@ -137,10 +146,10 @@ char *csGetSubText (char **buf, char open, char close)
   return result;
 }
 
-char *csGetAssignmentText (char **buf)
+char *csParser::GetAssignmentText (char **buf)
 {
   ++*buf;                       // skip the '='
-  csSkipCharacters (buf, kWhiteSpace);
+  SkipCharacters (buf, kWhiteSpace);
   char *result = *buf;
 
   // now, we need to find the next whitespace to end the data

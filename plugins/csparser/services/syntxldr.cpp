@@ -160,7 +160,7 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csTextSyntaxService::ParseMatrix (char *buf, csMatrix3 &m)
+bool csTextSyntaxService::ParseMatrix (csParser *parser, char *buf, csMatrix3 &m)
 {
   CS_TOKEN_TABLE_START(commands)
     CS_TOKEN_TABLE (IDENTITY)
@@ -180,7 +180,7 @@ bool csTextSyntaxService::ParseMatrix (char *buf, csMatrix3 &m)
   float scaler;
   const csMatrix3 identity;
 
-  while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
+  while ((cmd = parser->GetCommand (&buf, commands, &params)) > 0)
   {
     switch (cmd)
     {
@@ -263,7 +263,7 @@ bool csTextSyntaxService::ParseMatrix (char *buf, csMatrix3 &m)
   return true;
 }
 
-bool csTextSyntaxService::ParseVector (char *buf, csVector3 &v)
+bool csTextSyntaxService::ParseVector (csParser* parser, char *buf, csVector3 &v)
 {
   csScanStr (buf, "%F", list, &num);
   if (num == 3)
@@ -281,7 +281,7 @@ bool csTextSyntaxService::ParseVector (char *buf, csVector3 &v)
   return true;
 }
 
-bool csTextSyntaxService::ParseMixmode (char *buf, uint &mixmode)
+bool csTextSyntaxService::ParseMixmode (csParser* parser, char *buf, uint &mixmode)
 {
   CS_TOKEN_TABLE_START (modes)
     CS_TOKEN_TABLE (COPY)
@@ -300,7 +300,7 @@ bool csTextSyntaxService::ParseMixmode (char *buf, uint &mixmode)
 
   mixmode = 0;
 
-  while ((cmd = csGetObject (&buf, modes, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, modes, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -328,14 +328,14 @@ bool csTextSyntaxService::ParseMixmode (char *buf, uint &mixmode)
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     ReportError (reporter, "crystalspace.syntax.mixmode",
-      "Token '%s' not found while parsing the modes!",
-      csGetLastOffender ());
+      "Token '%s' (line %d) not recognized while parsing mixmode!",
+      parser->GetLastOffender (), parser->GetParserLine ());
     return false;
   }
   return true;
 }
 
-bool csTextSyntaxService::ParseShading (char *buf, int &shading)
+bool csTextSyntaxService::ParseShading (csParser* parser, char *buf, int &shading)
 {
   CS_TOKEN_TABLE_START (texturing_commands)
     CS_TOKEN_TABLE (NONE)
@@ -348,7 +348,7 @@ bool csTextSyntaxService::ParseShading (char *buf, int &shading)
   long cmd;
 
   shading = 0;
-  while ((cmd = csGetObject (&buf, texturing_commands, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, texturing_commands, &name, &params)) > 0)
     switch (cmd)
     {
     case CS_TOKEN_NONE:
@@ -367,8 +367,8 @@ bool csTextSyntaxService::ParseShading (char *buf, int &shading)
       if (cmd == CS_PARSERR_TOKENNOTFOUND)
       {
 	ReportError (reporter, "crystalspace.syntax.shading",
-	  "Token '%s' not found while parsing the shading specification!",
-	  csGetLastOffender ());
+	  "Token '%s' (line %d( not found while parsing the shading specification!",
+	  parser->GetLastOffender (), parser->GetParserLine ());
         return false;
       }
     };
@@ -377,6 +377,7 @@ bool csTextSyntaxService::ParseShading (char *buf, int &shading)
 }
 
 bool csTextSyntaxService::ParseTexture (
+	csParser* parser, 
 	char *buf, const csVector3* vref, uint &texspec,
 	csVector3 &tx_orig, csVector3 &tx1, csVector3 &tx2, csVector3 &len,
 	csMatrix3 &tx_m, csVector3 &tx_v,
@@ -409,7 +410,7 @@ bool csTextSyntaxService::ParseTexture (
   float flist[100];
   int num;
 
-  while ((cmd = csGetObject(&buf, tex_commands, &name, &params)) > 0)
+  while ((cmd = parser->GetObject(&buf, tex_commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -456,12 +457,12 @@ bool csTextSyntaxService::ParseTexture (
       break;
     case CS_TOKEN_MATRIX:
       texspec &= ~CSTEX_UV;
-      ParseMatrix (params, tx_m);
+      ParseMatrix (parser, params, tx_m);
       len.x = 0;
       break;
     case CS_TOKEN_V:
       texspec &= ~CSTEX_UV;
-      ParseVector (params, tx_v);
+      ParseVector (parser, params, tx_v);
       len.x = 0;
       break;
     case CS_TOKEN_PLANE:
@@ -477,14 +478,14 @@ bool csTextSyntaxService::ParseTexture (
     case CS_TOKEN_UVEC:
       texspec &= ~CSTEX_UV;
       texspec |= CSTEX_V1;
-      ParseVector (params, tx1);
+      ParseVector (parser, params, tx1);
       len.y = tx1.Norm ();
       tx1 += tx_orig;
       break;
     case CS_TOKEN_VVEC:
       texspec &= ~CSTEX_UV;
       texspec |= CSTEX_V2;
-      ParseVector (params, tx2);
+      ParseVector (parser, params, tx2);
       len.z = tx2.Norm ();
       tx2 += tx_orig;
       break;
@@ -530,6 +531,7 @@ bool csTextSyntaxService::ParseTexture (
 }
 
 bool csTextSyntaxService::ParseWarp (
+	csParser* parser, 
 	char *buf, csVector &flags, bool &mirror, bool &warp,
 	int& msv,
 	csMatrix3 &m, csVector3 &before, csVector3 &after)
@@ -549,7 +551,7 @@ bool csTextSyntaxService::ParseWarp (
   char *params, *name;
   long cmd;
 
-  while ((cmd = csGetObject (&buf, portal_commands, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, portal_commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -563,18 +565,18 @@ bool csTextSyntaxService::ParseWarp (
       csScanStr (params, "%d", &msv);
       break;
     case CS_TOKEN_MATRIX:
-      ParseMatrix (params, m);
+      ParseMatrix (parser, params, m);
       mirror = false;
       warp = true;
       break;
     case CS_TOKEN_V:
-      ParseVector (params, before);
+      ParseVector (parser, params, before);
       after = before;
       mirror = false;
       warp = true;
       break;
     case CS_TOKEN_W:
-      ParseVector (params, after);
+      ParseVector (parser, params, after);
       mirror = false;
       warp = true;
       break;
@@ -651,6 +653,7 @@ SCF_IMPLEMENT_IBASE (MissingSectorCallback)
 SCF_IMPLEMENT_IBASE_END
 
 bool csTextSyntaxService::ParsePoly3d (
+        csParser* parser, 
 	iLoaderContext* ldr_context,
 	iEngine* , iPolygon3D* poly3d, char* buf,
 	float default_texlen,
@@ -720,7 +723,7 @@ bool csTextSyntaxService::ParsePoly3d (
 
   char str[255];
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -802,7 +805,7 @@ bool csTextSyntaxService::ParsePoly3d (
 	  bool do_warp = false;
 	  int msv = -1;
 
-	  if (ParseWarp (params, flags, do_mirror, do_warp, msv,
+	  if (ParseWarp (parser, params, flags, do_mirror, do_warp, msv,
 	      m_w, v_w_before, v_w_after))
 	  {
 	    for (int i = 0; i < flags.Length (); i++)
@@ -838,7 +841,7 @@ bool csTextSyntaxService::ParsePoly3d (
 	csScanStr (params, "%f", &tx_len.x);
 	break;
       case CS_TOKEN_TEXTURE:
-	if (!ParseTexture (params, thing_state->GetVertices (), texspec,
+	if (!ParseTexture (parser, params, thing_state->GetVertices (), texspec,
 			   tx_orig, tx1, tx2, tx_len,
 			   tx_matrix, tx_vector,
 			   uv_shift,
@@ -917,7 +920,7 @@ bool csTextSyntaxService::ParsePoly3d (
 	      if (list[i] == list[(i-1+num)%num])
 	        csPrintf ("Duplicate vertex-index found! "
 			"(polygon '%s' line %d)ignored ...\n",
-			poly3d->QueryObject()->GetName(), csGetParserLine());
+			poly3d->QueryObject()->GetName(), parser->GetParserLine());
 	      else
 	        poly3d->CreateVertex (list[i]+vt_offset);
 	    }
@@ -927,7 +930,7 @@ bool csTextSyntaxService::ParsePoly3d (
       case CS_TOKEN_SHADING:
 	{
 	  int shading;
-	  if (ParseShading (params, shading))
+	  if (ParseShading (parser, params, shading))
               poly3d->SetTextureType (shading);
 	  else
 	  {
@@ -939,7 +942,7 @@ bool csTextSyntaxService::ParsePoly3d (
       case CS_TOKEN_MIXMODE:
         {
           uint mixmode;
-	  if (ParseMixmode (params, mixmode))
+	  if (ParseMixmode (parser, params, mixmode))
 	  {
 	    iPolyTexType* ptt = poly3d->GetPolyTexType ();
 	    ptt->SetMixMode (mixmode);
@@ -1007,7 +1010,7 @@ bool csTextSyntaxService::ParsePoly3d (
   {
     ReportError (reporter, "crystalspace.syntax.polygon",
       "Token '%s' not found while parsing a polygon ('%s')!",
-      csGetLastOffender (), poly3d->QueryObject()->GetName());
+      parser->GetLastOffender (), poly3d->QueryObject()->GetName());
     te->DecRef ();
     return false;
   }
@@ -1016,7 +1019,7 @@ bool csTextSyntaxService::ParsePoly3d (
   {
     ReportError (reporter, "crystalspace.syntax.polygon",
       "Polygon '%s' in line %d contains just %d vertices!",
-      poly3d->QueryObject()->GetName(), csGetParserLine (),
+      poly3d->QueryObject()->GetName(), parser->GetParserLine (),
       poly3d->GetVertexCount ());
     te->DecRef ();
     return false;

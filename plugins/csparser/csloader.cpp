@@ -81,9 +81,9 @@ class StdLoaderContext : public iLoaderContext
 private:
   iEngine* Engine;
   iRegion* region;
-
+  csParser* parser;
 public:
-  StdLoaderContext (iEngine* Engine, bool ResolveOnlyRegion);
+  StdLoaderContext (iEngine* Engine, bool ResolveOnlyRegion, csParser* parser);
   virtual ~StdLoaderContext ();
 
   SCF_DECLARE_IBASE;
@@ -92,16 +92,18 @@ public:
   virtual iMaterialWrapper* FindMaterial (const char* name);
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name);
   virtual iMeshWrapper* FindMeshObject (const char* name);
+  virtual csParser* GetParser ();
 };
 
 SCF_IMPLEMENT_IBASE(StdLoaderContext);
   SCF_IMPLEMENTS_INTERFACE(iLoaderContext);
 SCF_IMPLEMENT_IBASE_END;
 
-StdLoaderContext::StdLoaderContext (iEngine* Engine, bool ResolveOnlyRegion)
+StdLoaderContext::StdLoaderContext (iEngine* Engine, bool ResolveOnlyRegion, csParser* parser)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   StdLoaderContext::Engine = Engine;
+  StdLoaderContext::parser = parser;
   if (ResolveOnlyRegion)
     region = Engine->GetCurrentRegion ();
   else
@@ -150,6 +152,10 @@ iMeshFactoryWrapper* StdLoaderContext::FindMeshFactory (const char* name)
 iMeshWrapper* StdLoaderContext::FindMeshObject (const char* name)
 {
   return Engine->FindMeshObject (name, region);
+}
+csParser* StdLoaderContext::GetParser ()
+{
+  return parser;
 }
 
 //---------------------------------------------------------------------------
@@ -305,10 +311,10 @@ bool csLoader::LoadMap (char* buf)
     CS_TOKEN_TABLE (PLUGINS)
   CS_TOKEN_TABLE_END
 
-  csResetParserLine();
+  parser.ResetParserLine ();
   char *name, *data;
 
-  if (csGetObject (&buf, tokens, &name, &data))
+  if (parser.GetObject (&buf, tokens, &name, &data))
   {
     if (!data)
     {
@@ -320,7 +326,7 @@ bool csLoader::LoadMap (char* buf)
     long cmd;
     char* params;
 
-    while ((cmd = csGetObject (&data, commands, &name, &params)) > 0)
+    while ((cmd = parser.GetObject (&data, commands, &name, &params)) > 0)
     {
       if (!params)
       {
@@ -489,7 +495,7 @@ bool csLoader::LoadPlugins (char* buf)
   char* params;
   char str[255];
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -543,7 +549,7 @@ bool csLoader::LoadLibrary (char* buf)
   CS_TOKEN_TABLE_END
 
   char *name, *data;
-  if (csGetObject (&buf, tokens, &name, &data))
+  if (parser.GetObject (&buf, tokens, &name, &data))
   {
     // Empty LIBRARY () directive?
     if (!data)
@@ -552,7 +558,7 @@ bool csLoader::LoadLibrary (char* buf)
     long cmd;
     char* params;
 
-    while ((cmd = csGetObject (&data, commands, &name, &params)) > 0)
+    while ((cmd = parser.GetObject (&data, commands, &name, &params)) > 0)
     {
       if (!params)
       {
@@ -683,7 +689,7 @@ bool csLoader::LoadSounds (char* buf)
   long cmd;
   char* params;
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -698,7 +704,7 @@ bool csLoader::LoadSounds (char* buf)
       {
         const char* filename = name;
         char* maybename;
-        cmd = csGetCommand (&params, options, &maybename);
+        cmd = parser.GetCommand (&params, options, &maybename);
         if (cmd == CS_TOKEN_FILE)
           filename = maybename;
         else if (cmd == CS_PARSERR_TOKENNOTFOUND)
@@ -706,7 +712,7 @@ bool csLoader::LoadSounds (char* buf)
           ReportError (
 	    "crystalspace.maploader.parse.badtoken",
             "Unknown token '%s' found while parsing SOUND directive!",
-	    csGetLastOffender());
+	    parser.GetLastOffender());
 	  return false;
         }
         iSoundWrapper *snd =
@@ -740,7 +746,7 @@ bool csLoader::LoadLodControl (iLODControl* lodctrl, char* buf)
 
   float level = 1;
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -795,7 +801,7 @@ iMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
   char *name, *data;
   char *buf = **databuff;
 
-  if (csGetObject (&buf, tokens, &name, &data))
+  if (parser.GetObject (&buf, tokens, &name, &data))
   {
     if (!data)
     {
@@ -859,7 +865,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
   str[0] = 0;
   iMaterialWrapper *mat = NULL;
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -1106,7 +1112,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	    return false;
 	  }
           char* params2;
-          while ((cmd = csGetObject (&params, tok_matvec, &name, &params2)) > 0)
+          while ((cmd = parser.GetObject (&params, tok_matvec, &name, &params2)) > 0)
           {
             if (!params2)
             {
@@ -1155,7 +1161,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	  }
           char* params2;
 	  csReversibleTransform tr;
-          while ((cmd = csGetObject (&params, tok_matvec, &name, &params2)) > 0)
+          while ((cmd = parser.GetObject (&params, tok_matvec, &name, &params2)) > 0)
           {
             if (!params2)
             {
@@ -1237,7 +1243,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (char* buf)
   Stats->meshes_loaded++;
   iMeshWrapper* mesh = NULL;
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -1437,7 +1443,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (char* buf)
         {
           char* params2;
 	  csReversibleTransform tr;
-          while ((cmd = csGetObject (&params, tok_matvec, &name, &params2)) > 0)
+          while ((cmd = parser.GetObject (&params, tok_matvec, &name, &params2)) > 0)
           {
             if (!params2)
             {
@@ -1482,7 +1488,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (char* buf)
           char* params2;
           mesh->GetMovable ()->SetTransform (csMatrix3 ());     // Identity
           mesh->GetMovable ()->SetPosition (csVector3 (0));
-          while ((cmd = csGetObject (&params, tok_matvec, &name, &params2)) > 0)
+          while ((cmd = parser.GetObject (&params, tok_matvec, &name, &params2)) > 0)
           {
             if (!params2)
             {
@@ -1603,7 +1609,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
   Stats->meshes_loaded++;
   iLoaderPlugin* plug = NULL;
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -1737,7 +1743,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	  }
           char* params2;
 	  csReversibleTransform tr;
-          while ((cmd = csGetObject (&params, tok_matvec, &name, &params2)) > 0)
+          while ((cmd = parser.GetObject (&params, tok_matvec, &name, &params2)) > 0)
           {
             if (!params2)
             {
@@ -1774,7 +1780,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
           char* params2;
           mesh->GetMovable ()->SetTransform (csMatrix3 ());     // Identity
           mesh->GetMovable ()->SetPosition (csVector3 (0));
-          while ((cmd = csGetObject (&params, tok_matvec, &name, &params2)) > 0)
+          while ((cmd = parser.GetObject (&params, tok_matvec, &name, &params2)) > 0)
           {
             if (!params2)
             {
@@ -1969,7 +1975,7 @@ bool csLoader::LoadAddOn (char* buf, iBase* context)
 
   iLoaderPlugin* plug = NULL;
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -2027,7 +2033,7 @@ bool csLoader::LoadSettings (char* buf)
   long cmd;
   char* params;
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -2057,7 +2063,7 @@ bool csLoader::LoadSettings (char* buf)
 	    int newcellsize = csFindNearestPowerOf2(cellsize);
 	    ReportNotify ("lightmap cell size %d (line %d) "
 	      "is not a power of two, using %d", 
-	      cellsize, csGetParserLine(), newcellsize);
+	      cellsize, parser.GetParserLine(), newcellsize);
 	    cellsize = newcellsize;
 	  }
 	  Engine->SetLightmapCellSize (cellsize);
@@ -2065,7 +2071,7 @@ bool csLoader::LoadSettings (char* buf)
 	else
 	{
 	  ReportNotify ("bogus lightmap cell size %d, line %d", 
-	    cellsize, csGetParserLine());
+	    cellsize, parser.GetParserLine());
 	}
 	break;
       }
@@ -2082,7 +2088,7 @@ bool csLoader::LoadSettings (char* buf)
 	else
 	{
 	  ReportNotify ("bogus maximum lightmap size %dx%d, line %d", 
-	    max[0], max[1], csGetParserLine());
+	    max[0], max[1], parser.GetParserLine());
 	}
 	break;
       }
@@ -2116,7 +2122,7 @@ bool csLoader::LoadRenderPriorities (char* buf)
   long cmd;
   char* params;
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -2193,7 +2199,7 @@ iMeshWrapper* csLoader::LoadMeshObject (const char* fname)
   char *name, *data;
   char *buf = **databuff;
 
-  if (csGetObject (&buf, tokens, &name, &data))
+  if (parser.GetObject (&buf, tokens, &name, &data))
   {
     if (!data)
     {
@@ -2289,7 +2295,8 @@ iLoaderContext* csLoader::GetLoaderContext ()
 {
   if (!ldr_context)
   {
-    ldr_context = new StdLoaderContext (Engine, ResolveOnlyRegion);
+    ldr_context = new StdLoaderContext (Engine, ResolveOnlyRegion,
+      &parser);
   }
   return ldr_context;
 }
@@ -2337,8 +2344,8 @@ void csLoader::TokenError (const char *Object)
 {
   ReportError (
     "crystalspace.maploader.parse.badtoken",
-    "Token '%s' not found while parsing %s!",
-    csGetLastOffender (), Object);
+    "Token '%s' not recognized while parsing %s!",
+    parser.GetLastOffender (), Object);
 }
 
 //--- Parsing of Engine Objects ---------------------------------------------
@@ -2360,7 +2367,7 @@ iCollection* csLoader::ParseCollection (char* name, char* buf)
   iCollection* collection = Engine->GetCollections ()->NewCollection (name);
 
   char str[255];
-  while ((cmd = csGetObject (&buf, commands, &xname, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &xname, &params)) > 0)
   {
     if (!params)
     {
@@ -2484,7 +2491,7 @@ bool csLoader::ParseStart (char* buf, iCameraPosition* campos)
   if (strchr (buf, '('))
   {
     // New syntax.
-    while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
+    while ((cmd = parser.GetCommand (&buf, commands, &params)) > 0)
     {
       switch (cmd)
       {
@@ -2594,7 +2601,7 @@ iStatLight* csLoader::ParseStatlight (char* name, char* buf)
     dist = 1;
     r = g = b = 1;
     dyn = false;
-    while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
+    while ((cmd = parser.GetCommand (&buf, commands, &params)) > 0)
     {
       switch (cmd)
       {
@@ -2811,7 +2818,7 @@ iKeyValuePair* csLoader::ParseKey (char* buf, iObject* pParent)
     ReportError (
 		"crystalspace.maploader.parse.key",
     	        "Illegal Syntax for KEY() command in line %d!",
-		csGetParserLine());
+		parser.GetParserLine());
     return NULL;
   }
 }
@@ -2835,7 +2842,7 @@ iMapNode* csLoader::ParseNode (char* name, char* buf, iSector* sec)
   float y = 0;
   float z = 0;
 
-  while ((cmd = csGetObject (&buf, commands, &xname, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &xname, &params)) > 0)
   {
     if (!params)
     {
@@ -2903,7 +2910,7 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
   iSector *sector = Engine->CreateSector (secname);
   Stats->sectors_loaded++;
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {

@@ -259,7 +259,7 @@ public:
   }
 };
 
-static bool load_thing_part (iLoaderContext* ldr_context,
+static bool load_thing_part (csParser* parser, iLoaderContext* ldr_context,
 	iObjectRegistry* object_reg, iReporter* reporter,
 	iSyntaxService *synldr, ThingLoadInfo& info,
 	iEngine* engine, iThingState* thing_state,
@@ -296,7 +296,7 @@ static bool load_thing_part (iLoaderContext* ldr_context,
   char* params;
   char str[255];
 
-  while ((cmd = csGetObject (&buf, commands, &xname, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, commands, &xname, &params)) > 0)
   {
     if (!params)
     {
@@ -416,7 +416,7 @@ static bool load_thing_part (iLoaderContext* ldr_context,
         }
         break;
       case CS_TOKEN_PART:
-	if (!load_thing_part (ldr_context, object_reg, reporter, synldr, info,
+	if (!load_thing_part (parser, ldr_context, object_reg, reporter, synldr, info,
 		engine, thing_state, params,
 		thing_state->GetVertexCount (), false))
 	  return false;
@@ -519,7 +519,7 @@ Nag to Jorrit about this feature if you want it.");
 	  iPolygon3D* poly3d = thing_state->CreatePolygon (xname);
 	  if (info.default_material)
 	    poly3d->SetMaterial (info.default_material);
-	  if (!synldr->ParsePoly3d (ldr_context,
+	  if (!synldr->ParsePoly3d (parser, ldr_context,
 	  			    engine, poly3d, params,
 				    info.default_texlen, thing_state,
 				    vt_offset))
@@ -595,15 +595,17 @@ Nag to Jorrit about this feature if you want it.");
     ReportError (reporter,
 	"crystalspace.thingloader.parse.badformat",
 	"Token '%s' not found while parsing a thing!",
-    	csGetLastOffender ());
+    	parser->GetLastOffender ());
     return false;
   }
   return true;
 }
 
-iBase* csThingLoader::Parse (const char* string, iLoaderContext* ldr_context,
-	iBase*)
+iBase* csThingLoader::Parse (const char* string, 
+			     iLoaderContext* ldr_context, iBase*)
 {
+  csParser* parser = ldr_context->GetParser ();
+
   // Things only work with the real 3D engine and not with the iso engine.
   iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   CS_ASSERT (engine != NULL);
@@ -618,7 +620,7 @@ iBase* csThingLoader::Parse (const char* string, iLoaderContext* ldr_context,
 
   char* buf = (char*)string;
   ThingLoadInfo info;
-  if (!load_thing_part (ldr_context, object_reg, reporter, synldr, info,
+  if (!load_thing_part (parser, ldr_context, object_reg, reporter, synldr, info,
   	engine, thing_state, buf, 0, true))
   {
     fact->DecRef ();
@@ -712,8 +714,8 @@ bool csPlaneLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csPlaneLoader::Parse (const char* string, iLoaderContext*,
-	iBase* /*context*/)
+iBase* csPlaneLoader::Parse (const char* string, 
+			     iLoaderContext* ldr_context, iBase* /*context*/)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (ORIG)
@@ -731,6 +733,8 @@ iBase* csPlaneLoader::Parse (const char* string, iLoaderContext*,
   char* xname;
   long cmd;
   char* params;
+
+  csParser* parser = ldr_context->GetParser ();
 
   // Things only work with the real 3D engine and not with the iso engine.
   iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
@@ -750,7 +754,7 @@ iBase* csPlaneLoader::Parse (const char* string, iLoaderContext*,
   char name[255]; name[0] = 0;
   char* buf = (char*)string;
 
-  while ((cmd = csGetObject (&buf, commands, &xname, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, commands, &xname, &params)) > 0)
   {
     if (!params)
     {
@@ -767,11 +771,11 @@ iBase* csPlaneLoader::Parse (const char* string, iLoaderContext*,
         break;
       case CS_TOKEN_ORIG:
         tx1_given = true;
-        synldr->ParseVector (params, tx_orig);
+        synldr->ParseVector (parser, params, tx_orig);
         break;
       case CS_TOKEN_FIRST:
         tx1_given = true;
-        synldr->ParseVector (params, tx1);
+        synldr->ParseVector (parser, params, tx1);
         break;
       case CS_TOKEN_FIRST_LEN:
         csScanStr (params, "%f", &tx1_len);
@@ -779,27 +783,27 @@ iBase* csPlaneLoader::Parse (const char* string, iLoaderContext*,
         break;
       case CS_TOKEN_SECOND:
         tx2_given = true;
-        synldr->ParseVector (params, tx2);
+        synldr->ParseVector (parser, params, tx2);
         break;
       case CS_TOKEN_SECOND_LEN:
         csScanStr (params, "%f", &tx2_len);
         tx2_given = true;
         break;
       case CS_TOKEN_MATRIX:
-        synldr->ParseMatrix (params, tx_matrix);
+        synldr->ParseMatrix (parser, params, tx_matrix);
         break;
       case CS_TOKEN_V:
-        synldr->ParseVector (params, tx_vector);
+        synldr->ParseVector (parser, params, tx_vector);
         break;
       case CS_TOKEN_UVEC:
         tx1_given = true;
-        synldr->ParseVector (params, tx1);
+        synldr->ParseVector (parser, params, tx1);
         tx1_len = tx1.Norm ();
         tx1 += tx_orig;
         break;
       case CS_TOKEN_VVEC:
         tx2_given = true;
-        synldr->ParseVector (params, tx2);
+        synldr->ParseVector (parser, params, tx2);
         tx2_len = tx2.Norm ();
         tx2 += tx_orig;
         break;
@@ -810,7 +814,7 @@ iBase* csPlaneLoader::Parse (const char* string, iLoaderContext*,
     ReportError (reporter,
 	"crystalspace.planeloader.parse.badformat",
         "Token '%s' not found while parsing a plane!",
-    	csGetLastOffender ());
+    	parser->GetLastOffender ());
     return NULL;
   }
 
@@ -902,8 +906,8 @@ bool csBezierLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csBezierLoader::Parse (const char* string, iLoaderContext* ldr_context,
-	iBase* /*context*/)
+iBase* csBezierLoader::Parse (const char* string, 
+			      iLoaderContext* ldr_context, iBase* /*context*/)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (MATERIAL)
@@ -918,6 +922,8 @@ iBase* csBezierLoader::Parse (const char* string, iLoaderContext* ldr_context,
   char *params;
   char name[100];
 
+  csParser* parser = ldr_context->GetParser ();
+
   // Things only work with the real 3D engine and not with the iso engine.
   iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   CS_ASSERT (engine != NULL);
@@ -931,7 +937,7 @@ iBase* csBezierLoader::Parse (const char* string, iLoaderContext* ldr_context,
   char str[255];
 
   char* buf = (char*)string;
-  while ((cmd = csGetObject (&buf, commands, &xname, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, commands, &xname, &params)) > 0)
   {
     if (!params)
     {
@@ -985,7 +991,7 @@ iBase* csBezierLoader::Parse (const char* string, iLoaderContext* ldr_context,
     ReportError (reporter,
 	  "crystalspace.bezierloader.parse.badformat",
           "Token '%s' not found while parsing a bezier template!",
-    	  csGetLastOffender ());
+    	  parser->GetLastOffender ());
     return NULL;
   }
   return tmpl;

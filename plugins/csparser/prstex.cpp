@@ -73,7 +73,7 @@ bool csLoader::ParseTextureList (char* buf)
   long cmd;
   char* params;
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -119,7 +119,7 @@ bool csLoader::ParseMaterialList (char* buf, const char* prefix)
   long cmd;
   char* params;
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -157,7 +157,7 @@ iTextureWrapper* csLoader::ParseProcTex (char *name, char* buf)
   char *params;
   csProcTexture* pt = NULL;
 
-  while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
+  while ((cmd = parser.GetCommand (&buf, commands, &params)) > 0)
   {
     switch (cmd)
     {
@@ -233,7 +233,7 @@ iTextureWrapper* csLoader::ParseTexture (char *name, char* buf)
   bool do_transp = false;
   int flags = CS_TEXTURE_3D;
 
-  while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
+  while ((cmd = parser.GetCommand (&buf, commands, &params)) > 0)
   {
     switch (cmd)
     {
@@ -358,7 +358,7 @@ iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf, const char *pr
   csTextureLayer layers[4];
   iTextureWrapper* txt_layers[4];
 
-  while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
+  while ((cmd = parser.GetCommand (&buf, commands, &params)) > 0)
   {
     switch (cmd)
     {
@@ -409,7 +409,7 @@ iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf, const char *pr
 	  layers[num_txt_layer].vshift = 0;
 	  layers[num_txt_layer].mode = CS_FX_ADD | CS_FX_TILING;
 	  char* params2;
-	  while ((cmd = csGetCommand (&params, layerCommands,
+	  while ((cmd = parser.GetCommand (&params, layerCommands,
 		&params2)) > 0)
 	  {
 	    switch (cmd)

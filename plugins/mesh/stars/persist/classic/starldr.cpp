@@ -264,8 +264,10 @@ iBase* csStarLoader::Parse (const char* string,
   iMeshObject* mesh = NULL;
   iStarsState* starstate = NULL;
 
+  csParser* parser = ldr_context->GetParser ();
+  
   char* buf = (char*)string;
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {

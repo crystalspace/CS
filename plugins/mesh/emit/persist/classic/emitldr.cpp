@@ -234,7 +234,7 @@ bool csEmitLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-static uint ParseMixmode (char* buf)
+static uint ParseMixmode (csParser* parser, char* buf)
 {
   CS_TOKEN_TABLE_START (modes)
     CS_TOKEN_TABLE (COPY)
@@ -253,7 +253,7 @@ static uint ParseMixmode (char* buf)
 
   uint Mixmode = 0;
 
-  while ((cmd = csGetObject (&buf, modes, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, modes, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -280,15 +280,15 @@ static uint ParseMixmode (char* buf)
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     printf ("Token '%s' not found while parsing the modes!\n",
-    	csGetLastOffender ());
+    	parser->GetLastOffender ());
     return 0;
   }
   return Mixmode;
 }
 
 
-static iEmitGen3D* ParseEmit (char* buf, iEmitFactoryState *fstate,
-	float* weight)
+static iEmitGen3D* ParseEmit (csParser* parser, char* buf, 
+			      iEmitFactoryState *fstate, float* weight)
 {
   CS_TOKEN_TABLE_START (emits)
     CS_TOKEN_TABLE (WEIGHT)
@@ -313,7 +313,7 @@ static iEmitGen3D* ParseEmit (char* buf, iEmitFactoryState *fstate,
   float p,q,r,s,t;
   if (weight) *weight = 1.;
 
-  while ((cmd = csGetObject (&buf, emits, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, emits, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -369,7 +369,7 @@ static iEmitGen3D* ParseEmit (char* buf, iEmitFactoryState *fstate,
 	  if(!emix) emix = fstate->CreateMix();
 	  float amt;
 	  iEmitGen3D *gen;
-	  gen = ParseEmit(params, fstate, &amt);
+	  gen = ParseEmit(parser, params, fstate, &amt);
 	  emix->AddEmitter(amt, gen);
 	  SCF_DEC_REF (gen);
 	  result = emix;
@@ -415,8 +415,8 @@ static iEmitGen3D* ParseEmit (char* buf, iEmitFactoryState *fstate,
   return result;
 }
 
-iBase* csEmitLoader::Parse (const char* string, iLoaderContext* ldr_context,
-	iBase*)
+iBase* csEmitLoader::Parse (const char* string, 
+			    iLoaderContext* ldr_context, iBase*)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (AGING)
@@ -446,8 +446,10 @@ iBase* csEmitLoader::Parse (const char* string, iLoaderContext* ldr_context,
   iEmitFactoryState* emitfactorystate = NULL;
   iEmitState* emitstate = NULL;
 
+  csParser* parser = ldr_context->GetParser ();
+
   char* buf = (char*)string;
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -498,7 +500,7 @@ iBase* csEmitLoader::Parse (const char* string, iLoaderContext* ldr_context,
 	}
 	break;
       case CS_TOKEN_MIXMODE:
-        partstate->SetMixMode (ParseMixmode (params));
+        partstate->SetMixMode (ParseMixmode (parser, params));
 	break;
       case CS_TOKEN_NUMBER:
 	{
@@ -548,21 +550,21 @@ iBase* csEmitLoader::Parse (const char* string, iLoaderContext* ldr_context,
 	break;
       case CS_TOKEN_STARTPOS:
 	{
-	  emit = ParseEmit(params, emitfactorystate, NULL);
+	  emit = ParseEmit(parser, params, emitfactorystate, NULL);
 	  emitstate->SetStartPosEmit (emit);
 	  SCF_DEC_REF (emit);
 	}
 	break;
       case CS_TOKEN_STARTSPEED:
 	{
-	  emit = ParseEmit(params, emitfactorystate, NULL);
+	  emit = ParseEmit(parser, params, emitfactorystate, NULL);
 	  emitstate->SetStartSpeedEmit (emit);
 	  SCF_DEC_REF (emit);
 	}
 	break;
       case CS_TOKEN_STARTACCEL:
 	{
-	  emit = ParseEmit(params, emitfactorystate, NULL);
+	  emit = ParseEmit(parser, params, emitfactorystate, NULL);
 	  emitstate->SetStartAccelEmit (emit);
 	  SCF_DEC_REF (emit);
 	}
@@ -576,7 +578,7 @@ iBase* csEmitLoader::Parse (const char* string, iLoaderContext* ldr_context,
 	break;
       case CS_TOKEN_ATTRACTOR:
 	{
-	  emit = ParseEmit(params, emitfactorystate, NULL);
+	  emit = ParseEmit(parser, params, emitfactorystate, NULL);
 	  emitstate->SetAttractorEmit (emit);
 	  SCF_DEC_REF (emit);
 	}
