@@ -22,7 +22,7 @@
 #include "cssys/next/NeXTSystemDriver.h"
 #include "NeXTDelegate.h"
 #include "iutil/cfgfile.h"
-#include "version.h"
+#include "csversion.h"
 #include <stdarg.h>
 
 typedef void* NeXTSystemHandle;
