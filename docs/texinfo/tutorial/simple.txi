@@ -142,6 +142,7 @@ In the source file @file{simple.cpp} we place the following:
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 #include "csutil/cmdhelp.h"
+#include "csutil/event.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -160,19 +161,19 @@ Simple::~Simple ()
 bool Simple::Initialize ()
 @{
   if (!csInitializer::RequestPlugins (object_reg,
-  	CS_REQUEST_VFS,
-	CS_REQUEST_SOFTWARE3D,
-	CS_REQUEST_ENGINE,
-	CS_REQUEST_FONTSERVER,
-	CS_REQUEST_IMAGELOADER,
-	CS_REQUEST_LEVELLOADER,
-	CS_REQUEST_REPORTER,
-	CS_REQUEST_REPORTERLISTENER,
-	CS_REQUEST_END))
+        CS_REQUEST_VFS,
+        CS_REQUEST_OPENGL3D,
+        CS_REQUEST_ENGINE,
+        CS_REQUEST_FONTSERVER,
+        CS_REQUEST_IMAGELOADER,
+        CS_REQUEST_LEVELLOADER,
+        CS_REQUEST_REPORTER,
+        CS_REQUEST_REPORTERLISTENER,
+        CS_REQUEST_END))
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple",
-	"Can't initialize plugins!");
+        "crystalspace.application.simple",
+        "Can't initialize plugins!");
     return false;
   @}
 
@@ -188,8 +189,8 @@ bool Simple::Initialize ()
   if (!vc)
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple",
-	"Can't find the virtual clock!");
+        "crystalspace.application.simple",
+        "Can't find the virtual clock!");
     return false;
   @}
 
@@ -198,8 +199,8 @@ bool Simple::Initialize ()
   if (!engine)
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple",
-	"No iEngine plugin!");
+        "crystalspace.application.simple",
+        "No iEngine plugin!");
     return false;
   @}
 
@@ -207,8 +208,8 @@ bool Simple::Initialize ()
   if (!loader)
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple",
-    	"No iLoader plugin!");
+        "crystalspace.application.simple",
+        "No iLoader plugin!");
     return false;
   @}
 
@@ -216,8 +217,8 @@ bool Simple::Initialize ()
   if (!g3d)
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple",
-    	"No iGraphics3D plugin!");
+        "crystalspace.application.simple",
+        "No iGraphics3D plugin!");
     return false;
   @}
 
@@ -225,8 +226,8 @@ bool Simple::Initialize ()
   if (!kbd)
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple",
-    	"No iKeyboardDriver plugin!");
+        "crystalspace.application.simple",
+        "No iKeyboardDriver plugin!");
     return false;
   @}
 
@@ -235,14 +236,14 @@ bool Simple::Initialize ()
   if (!csInitializer::OpenApplication (object_reg))
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple",
-    	"Error opening system!");
+        "crystalspace.application.simple",
+        "Error opening system!");
     return false;
   @}
 
   csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-    	"crystalspace.application.simple",
-	"Simple Crystal Space Application version 0.1.");
+        "crystalspace.application.simple",
+        "Simple Crystal Space Application version 0.1.");
 
   return true;
 @}
@@ -303,8 +304,8 @@ actually happens here.
 
 Before doing anything at all, after including the necessary header files, we
 first need to use a few macros.  The CS_IMPLEMENT_APPLICATION macro is
-essential for every application using CS.  It makes sure that the @code{main()}
-routine is correctly linked and called on every platform.
+essential for every application using Crystal Space.  It makes sure that the
+@code{main()} routine is correctly linked and called on every platform.
 
 The main routine first calls @code{csInitializer::CreateEnvironment()}
 to make sure @sc{scf} is set up, the object registry is created, commandline
@@ -377,7 +378,9 @@ Then add the following code before @code{Simple::Initialize()}:
 @example
 bool Simple::HandleEvent (iEvent& ev)
 @{
-  if (ev.Type == csevKeyDown && ev.Key.Code == CSKEY_ESC)
+  if (ev.Type == csevKeyboard && 
+    csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown &&
+    csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC)
   @{
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
@@ -395,7 +398,7 @@ bool Simple::SimpleEventHandler (iEvent& ev)
 
 @code{HandleEvent()} checks if the @key{ESC} key has been pressed. If so it
 will use the object registry to find the global event queue object. Using
-@code{Broadcast} it will then broadcast the @code{cscmdQuit} message
+@code{Broadcast()} it will then broadcast the @samp{cscmdQuit} message
 to all interested parties. This will cause the application to quit by ending
 the default run loop.
 
@@ -403,14 +406,14 @@ We also need to initialize this event handler function. To do that add
 the following after the call to @code{csInitializer::RequestPlugins()}:
 
 @example
-  if (!csInitializer::SetupEventHandler(
-    object_reg, SimpleEventHandler))
-  @{
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple",
-	"Can't initialize event handler!");
-    return false;
-  @}
+if (!csInitializer::SetupEventHandler(
+  object_reg, SimpleEventHandler))
+@{
+  csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    "crystalspace.application.simple",
+    "Can't initialize event handler!");
+  return false;
+@}
 @end example
 
 @node Simple World, Simple Camera, Simple Event Handling, Tutorial Simple
@@ -453,8 +456,8 @@ bool Simple::Initialize ()
 @{
   @dots{}
   csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-    	"crystalspace.application.simple",
-	"Simple Crystal Space Application version 0.1.");
+        "crystalspace.application.simple",
+        "Simple Crystal Space Application version 0.1.");
 
   // Setup the texture manager
   iTextureManager* txtmgr = g3d->GetTextureManager ();
@@ -468,8 +471,8 @@ bool Simple::Initialize ()
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple",
-    	"Error loading 'stone4' texture!");
+        "crystalspace.application.simple",
+        "Error loading 'stone4' texture!");
     return false;
   @}
   iMaterialWrapper* tm =
@@ -490,15 +493,15 @@ bool Simple::Initialize ()
   iLightList* ll = room->GetLights ();
 
   light = engine->CreateLight (0, csVector3 (-3, 5, 0), 10,
-  	csColor (1, 0, 0), false);
+        csColor (1, 0, 0), false);
   ll->Add (light->QueryLight ());
 
   light = engine->CreateLight (0, csVector3 (3, 5,  0), 10,
-  	csColor (0, 0, 1), false);
+        csColor (0, 0, 1), false);
   ll->Add (light->QueryLight ());
 
   light = engine->CreateLight (0, csVector3 (0, 5, -3), 10,
-  	csColor (0, 1, 0), false);
+        csColor (0, 1, 0), false);
   ll->Add (light->QueryLight ());
 
   engine->Prepare ();
@@ -784,9 +787,9 @@ void Simple::SetupFrame ()
 That's all!  With this simple change you can rotate the camera with the left
 and right arrow keys and move forward and backward with the up and down arrow
 keys.  Try it out to see the effect.  To rotate the camera we use
-@code{RotateThis()} which expects a vector to rotate along and an angle given in
-radians (the speed parameter).  There are a number of predefined vectors which
-you can use.  A couple of them are used in this example.
+@code{RotateThis()} which expects a vector to rotate along and an angle given
+in radians (the speed parameter).  There are a number of predefined vectors
+which you can use.  A couple of them are used in this example.
 
 That's it for now.  In this tutorial you learned how to setup the Crystal
 Space system for use, how to create a simple room with some lights, event
@@ -794,4 +797,3 @@ handling, and how to handle some basic camera operations.
 
 You can now go on to the next tutorial (@pxref{Tutorial Simple 2})) to learn
 how to add a 3D sprite to this application.
-

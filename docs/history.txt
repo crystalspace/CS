@@ -6,37 +6,41 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Oct-2003
+	- Eric Sunshine updated `simple1' tutorial in the user manual to
+	  reflect recent changes to keyboard-related event handling.
 25-Oct-2003
-	- Rhad moved emitter list initialization into the 
-	  RecreateParticleSystem() member function of partedit.  This fixes 
-	  the crash when switching graphics since the last commit (oops!).
+	- Rhad moved emitter list initialization into the
+	  RecreateParticleSystem() member function of partedit.  This fixes the
+	  crash when switching graphics since the last commit (oops!).
 	- Rhad fixed partedit to shut down cleanly when the window is closed.
-	- Rhad added functionality to partedit to dump xml readable (mostly)
-	  by emitloader.  This output is dumped to the console at the moment.
-	  Placeholder windows have been added to the Aging Moments and 
+	- Rhad added functionality to partedit to dump xml readable (mostly) by
+	  emitloader.  This output is dumped to the console at the moment.
+	  Placeholder windows have been added to the Aging Moments and
 	  Load/Save screens indicating they are not yet complete.
-	  - At this point I am going to work on revising the UI layout so
-	    that it hopefully ends up less complicated (in code at least)
-	    and more functional (from a user perspective).
-	  - The emitloader plugin does not appear to be able to handle mix
-	    emitters with more than one child emitter.  The whole point of
-	    mix emitters is to use multiple child emitters, so this makes
-	    mix emitters unusable with the loader.
-	- Jorrit added the ability to Dynavis to change the tile size
-	  at compile time. Four sizes are possible: 64x32 (old default),
-	  32x64, 32x32, and 64x64. 32x64 appears to work a tiny bit faster then
-	  the others so it is now set as default.
-	- res fixed compilation of ddraw2d and glwin32 on older SDKs after 
+	    - At this point I am going to work on revising the UI layout so
+	      that it hopefully ends up less complicated (in code at least) and
+	      more functional (from a user perspective).
+	    - The emitloader plugin does not appear to be able to handle mix
+	      emitters with more than one child emitter.  The whole point of
+	      mix emitters is to use multiple child emitters, so this makes mix
+	      emitters unusable with the loader.
+	- Jorrit added the ability to Dynavis to change the tile size at
+	  compile time.  Four sizes are possible: 64x32 (old default), 32x64,
+	  32x32, and 64x64.  32x64 appears to work a tiny bit faster then the
+	  others so it is now set as default.
+	- res fixed compilation of ddraw2d and glwin32 on older SDKs after
 	  removing a #define.
-	- Luca replaced some "for(int i="  with  "int i; for(i =..." in genmesh plugin.
+	- Luca replaced some "for(int i=" with "int i; for(i =..." in genmesh
+	  plugin.
 	- Rhad added a check to awsManager::HandleEvent so that focus events
 	  related to windows which are deleted after the event is generated but
 	  prior to it being handled no longer cause a crash with a NULL pointer
 	  dereference.  Also formatted awsManager::HandleEvent for readability.
-	- Rhad fixed reference counting in awsWindow for the title member.
-	  The pointer was copied from the preference manager without an incref.
-	  If the title was changed, the shared copy was decref'd and destroyed.
-	  If the title was changed from the default then all other current 
+	- Rhad fixed reference counting in awsWindow for the title member.  The
+	  pointer was copied from the preference manager without an incref.  If
+	  the title was changed, the shared copy was decref'd and destroyed.
+	  If the title was changed from the default then all other current
 	  instances of the window and all future instances will crash when
 	  drawn.
 	- Rhad made AWS scrollbars behave a little nicer with tiny ranges by
@@ -44,45 +48,43 @@ chronological order.
 	  be needed anymore.  All the listboxes and scrolling things I could
 	  find to test work fine without it.
 24-Oct-2003
-	- res re-enabled a couple of MSVC warnings and fixed some occurences
-	  of VC warnings in the source.
-	- Jorrit changed walktest perftest so that it prints to standard
-	  output and it will also call FinishFrame() now for a more
-	  realistic result. Also fixed a bug with perftest if a number
-	  of iterations != 100 was used.
-	- Jorrit fixed stats in Dynavis so that it now reports the number
-	  of visible objects and nodes instead of the time it takes to
-	  calculate Dynavis. This is more useful.
-	- Jorrit added csBox3::ProjectOutline() which works similarly
-	  to ProjectBox() except that it projects the outline to a 2D
-	  polygon.
+	- res re-enabled a couple of MSVC warnings and fixed some occurences of
+	  VC warnings in the source.
+	- Jorrit changed walktest perftest so that it prints to standard output
+	  and it will also call FinishFrame() now for a more realistic result.
+	  Also fixed a bug with perftest if a number of iterations != 100 was
+	  used.
+	- Jorrit fixed stats in Dynavis so that it now reports the number of
+	  visible objects and nodes instead of the time it takes to calculate
+	  Dynavis.  This is more useful.
+	- Jorrit added csBox3::ProjectOutline() which works similarly to
+	  ProjectBox() except that it projects the outline to a 2D polygon.
 	- Jorrit fixed csBox3::ProjectBox() so that the calculated min_z/max_z
-	  actually accounts for all 8 vertices and not only the vertices
-	  of the outline.
-	- Jorrit changed the kdtree so that it sets the bounding boxes of
-	  the nodes maximum to -100000/100000. This avoids bugs in Dynavis
-	  which cannot easily handle these big bounding boxes. Unfortunately
-	  that restricts worlds that use Dynavis to be within that range.
-	  We'll have to see about better solutions in the future.
+	  actually accounts for all 8 vertices and not only the vertices of the
+	  outline.
+	- Jorrit changed the kdtree so that it sets the bounding boxes of the
+	  nodes maximum to -100000/100000.  This avoids bugs in Dynavis which
+	  cannot easily handle these big bounding boxes.  Unfortunately that
+	  restricts worlds that use Dynavis to be within that range.  We'll
+	  have to see about better solutions in the future.
 	- Jorrit changed the write queue operation in Dynavis to test every
-	  rectangle again after fetching an item from the write queue
-	  instead of only testing after fetching all items. This seems
-	  to improve performance slightly.
+	  rectangle again after fetching an item from the write queue instead
+	  of only testing after fetching all items.  This seems to improve
+	  performance slightly.
 	- Jorrit added code to test for polygons instead of just rectangles.
 	  This allows a test that better matches the shape of the node box.
-	  Using that does not help improve performance though. Perhaps
-	  we need to do this test only if the node is complex enough (i.e.
-	  has sufficient objects in it).
-	- Jorrit optimized Dynavis TestRectangle() a bit by splitting it
-	  in two routines which allows for early exit in case of write
-	  queue and also allows for faster second-time calls of
-	  TestRectangle().
+	  Using that does not help improve performance though.  Perhaps we need
+	  to do this test only if the node is complex enough (i.e.  has
+	  sufficient objects in it).
+	- Jorrit optimized Dynavis TestRectangle() a bit by splitting it in two
+	  routines which allows for early exit in case of write queue and also
+	  allows for faster second-time calls of TestRectangle().
 	- Jorrit added early exit code in Dynavis TestFullRect() to avoid
 	  comparing all 32 depths.
-	- Jorrit fixed a bug in Dynavis TestRect() which was initializing
-	  one row wrongly. The chance of this bug manifesting in real
-	  culling errors is very small though.
-	- res fixed csGetKeyDesc() to properly deal with keys that are 
+	- Jorrit fixed a bug in Dynavis TestRect() which was initializing one
+	  row wrongly.  The chance of this bug manifesting in real culling
+	  errors is very small though.
+	- res fixed csGetKeyDesc() to properly deal with keys that are
 	  modifiers.
 	- Eric Sunshine applied a patch from Fritz Elfert <felfert@to.com>
 	  which makes the following changes:
@@ -106,7 +108,7 @@ chronological order.
 	      unpredicted results. It now resembles behavior of a real
 	      filesystem more closely: Creating/Writing a file more than once
 	      simply overwrites the previous version in cache.
-	- Rhad fixed a typo that caused a lot of havok with components that 
+	- Rhad fixed a typo that caused a lot of havok with components that
 	  implemented signals.  If AWS was crashing today, update.  The
 	  SetOwner() member of awsSource was incorrectly ignoring the passed
 	  parameter, and setting the owner class member to itself.
@@ -211,7 +213,7 @@ chronological order.
 	- Rhad added float support to aws for scrollbars.  This involved some
 	  additions to the various aws interfaces.  It also involved expanding
 	  the parser a bit to handle numeric values with a decimal point.  I
-	  think everything worked out OK, but I'm not really proficient with 
+	  think everything worked out OK, but I'm not really proficient with
 	  flex or yacc, so if something doesn't appear to work, please let me
 	  know (or fix it!).
 	- Rhad fixed a bounds issue in partedit.
@@ -337,13 +339,13 @@ chronological order.
 	  adjusting acceleration instead of speed of particles.  This alters
 	  the effects of any particle system using the emitter plugin with
 	  an attractor noticably.
-	- Rhad fixed some bugs in partedit including position values carrying 
+	- Rhad fixed some bugs in partedit including position values carrying
 	  over into speed/accel/attractor.  Initial speed/accel weren't being
 	  properly updated in UI.
 	- Rhad fixed a bug in partedit where conical emitters where initialized
 	  incorrectly.
 	- Rhad fixed a bug in partedit that caused regular particles to be
-	  unavailsble after some changes last night, and another bug that 
+	  unavailsble after some changes last night, and another bug that
 	  caused negative forces on attractors (repulsors) to fail to function.
 	- Philip Wyett fixed typo in aws makefile, fixing make depend.
 	- Rhad made some changes to partedit so it doesn't need to recreate the
@@ -357,13 +359,13 @@ chronological order.
 	  broken since I don't know how that's supposed to work.
 	- Rhad changed the SetProperty() calls to awsScrollBar to expect floats
 	  instead of ints.  PLEASE NOTE THAT THIS MAY BREAK EXISTING FUNCTIONAL
-	  PROGRAMS WITHOUT COMPILER WARNINGS. (Thanks to void * cast calling 
+	  PROGRAMS WITHOUT COMPILER WARNINGS. (Thanks to void * cast calling
 	  convention) However, I have doubts that anyone is using this since the
 	  internal values in the scrollbar have been floats for some time and
-	  the GetProperty() call has always presumed it was filling in a 
+	  the GetProperty() call has always presumed it was filling in a
 	  float * .
 	- Rhad added some "experimental" UI to partedit.  Rather than adding a
-	  scrollbar for each element, there is currently one scroll bar in a 
+	  scrollbar for each element, there is currently one scroll bar in a
 	  separate window.  Any text box containing a float or int value that
 	  gains focus will be controlled by the global scroll bar (and extra
 	  text box) until another float or int textbox component gains is
