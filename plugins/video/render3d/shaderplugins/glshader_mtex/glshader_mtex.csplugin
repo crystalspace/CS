@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- glshader_mtex.csplugin -->
 <plugin>
-  <name>glshader_mtex</name>
   <scf>
     <classes>
       <class>

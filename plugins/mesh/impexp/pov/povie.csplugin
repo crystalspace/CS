@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- povie.csplugin -->
 <plugin>
-  <name>povie</name>
   <scf>
     <classes>
       <class>

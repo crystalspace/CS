@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- engseq.csplugin -->
 <plugin>
-  <name>engseq</name>
   <scf>
     <classes>
       <class>

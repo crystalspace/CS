@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- ensocket.csplugin -->
 <plugin>
-  <name>ensocket</name>
   <scf>
     <classes>
       <class>

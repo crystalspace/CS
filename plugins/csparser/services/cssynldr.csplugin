@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- cssynldr.csplugin -->
 <plugin>
-  <name>cssynldr</name>
   <scf>
     <classes>
       <class>

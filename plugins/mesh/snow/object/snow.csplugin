@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- snow.csplugin -->
 <plugin>
-  <name>snow</name>
   <scf>
     <classes>
       <class>

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- sndiff.csplugin -->
 <plugin>
-  <name>sndiff</name>
   <scf>
     <classes>
       <class>

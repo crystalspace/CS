@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- bezier.csplugin -->
 <plugin>
-  <name>bezier</name>
   <scf>
     <classes>
       <class>

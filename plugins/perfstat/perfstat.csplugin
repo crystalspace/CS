@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- perfstat.csplugin -->
 <plugin>
-  <name>perfstat</name>
   <scf>
     <classes>
       <class>

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- fontplex.csplugin -->
 <plugin>
-  <name>fontplex</name>
   <scf>
     <classes>
       <class>

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- thing.csplugin -->
 <plugin>
-  <name>thing</name>
   <scf>
     <classes>
       <class>

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- shadermgr.csplugin -->
 <plugin>
-  <name>shadermgr</name>
   <scf>
     <classes>
       <class>

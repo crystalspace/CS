@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- csfont.csplugin -->
 <plugin>
-  <name>csfont</name>
   <scf>
     <classes>
       <class>

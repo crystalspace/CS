@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- csddsimg.csplugin -->
 <plugin>
-  <name>csddsimg</name>
   <scf>
     <classes>
       <class>

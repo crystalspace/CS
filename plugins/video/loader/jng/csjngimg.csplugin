@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- csjngimg.csplugin -->
 <plugin>
-  <name>csjngimg</name>
   <scf>
     <classes>
       <class>

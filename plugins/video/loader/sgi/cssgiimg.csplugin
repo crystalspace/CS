@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- cssgiimg.csplugin -->
 <plugin>
-  <name>cssgiimg</name>
   <scf>
     <classes>
       <class>

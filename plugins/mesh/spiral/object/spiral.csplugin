@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- spiral.csplugin -->
 <plugin>
-  <name>spiral</name>
   <scf>
     <classes>
       <class>

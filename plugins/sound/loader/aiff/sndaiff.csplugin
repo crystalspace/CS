@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- sndaiff.csplugin -->
 <plugin>
-  <name>sndaiff</name>
   <scf>
     <classes>
       <class>

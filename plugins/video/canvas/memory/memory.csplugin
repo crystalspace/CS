@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- memory.csplugin -->
 <plugin>
-  <name>memory</name>
   <scf>
     <classes>
       <class>

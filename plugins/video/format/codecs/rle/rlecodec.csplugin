@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- rlecodec.csplugin -->
 <plugin>
-  <name>rlecodec</name>
   <scf>
     <classes>
       <class>

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- gtreeldr.csplugin -->
 <plugin>
-  <name>gtreeldr</name>
   <scf>
     <classes>
       <class>

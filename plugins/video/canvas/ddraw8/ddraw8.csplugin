@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- ddraw8.csplugin -->
 <plugin>
-  <name>ddraw8</name>
   <scf>
     <classes>
       <class>

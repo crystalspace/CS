@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- reporter.csplugin -->
 <plugin>
-  <name>reporter</name>
   <scf>
     <classes>
       <class>

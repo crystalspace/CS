@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- oglglide.csplugin -->
 <plugin>
-  <name>oglglide</name>
   <scf>
     <classes>
       <class>

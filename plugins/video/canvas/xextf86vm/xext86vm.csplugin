@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- xext86vm.csplugin -->
 <plugin>
-  <name>xext86vm</name>
   <scf>
     <classes>
       <class>

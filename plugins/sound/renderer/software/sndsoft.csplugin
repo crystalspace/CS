@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- sndsoft.csplugin -->
 <plugin>
-  <name>sndsoft</name>
   <scf>
     <classes>
       <class>

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- rain.csplugin -->
 <plugin>
-  <name>rain</name>
   <scf>
     <classes>
       <class>

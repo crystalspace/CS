@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- stdrep.csplugin -->
 <plugin>
-  <name>stdrep</name>
   <scf>
     <classes>
       <class>

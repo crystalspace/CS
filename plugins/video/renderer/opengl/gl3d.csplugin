@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- gl3d.csplugin -->
 <plugin>
-  <name>gl3d</name>
   <scf>
     <classes>
       <class>

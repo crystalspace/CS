@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- glwin32.csplugin -->
 <plugin>
-  <name>glwin32</name>
   <scf>
     <classes>
       <class>

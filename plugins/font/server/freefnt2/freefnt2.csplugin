@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- freefnt2.csplugin -->
 <plugin>
-  <name>freefnt2</name>
   <scf>
     <classes>
       <class>

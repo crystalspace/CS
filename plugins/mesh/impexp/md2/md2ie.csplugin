@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- md2ie.csplugin -->
 <plugin>
-  <name>md2ie</name>
   <scf>
     <classes>
       <class>

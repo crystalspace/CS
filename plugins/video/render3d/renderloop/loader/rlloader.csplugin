@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- rlloader.csplugin -->
 <plugin>
-  <name>rlloader</name>
   <scf>
     <classes>
       <class>

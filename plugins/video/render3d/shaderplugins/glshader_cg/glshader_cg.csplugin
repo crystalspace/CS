@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- glshader_cg.csplugin -->
 <plugin>
-  <name>glshader_cg</name>
   <scf>
     <classes>
       <class>

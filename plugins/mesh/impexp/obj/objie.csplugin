@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- objie.csplugin -->
 <plugin>
-  <name>objie</name>
   <scf>
     <classes>
       <class>

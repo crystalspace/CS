@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- fancycon.csplugin -->
 <plugin>
-  <name>fancycon</name>
   <scf>
     <classes>
       <class>

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- odivx.csplugin -->
 <plugin>
-  <name>odivx</name>
   <scf>
     <classes>
       <class>

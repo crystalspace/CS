@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- rainldr.csplugin -->
 <plugin>
-  <name>rainldr</name>
   <scf>
     <classes>
       <class>

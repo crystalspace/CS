@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- glrender3d.csplugin -->
 <plugin>
-  <name>glrender3d</name>
   <scf>
     <classes>
       <class>

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- csparser.csplugin -->
 <plugin>
-  <name>csparser</name>
   <scf>
     <classes>
       <class>

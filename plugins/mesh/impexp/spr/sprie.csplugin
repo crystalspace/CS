@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- sprie.csplugin -->
 <plugin>
-  <name>sprie</name>
   <scf>
     <classes>
       <class>

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- movierecorder.csplugin -->
 <plugin>
-  <name>movierecorder</name>
   <scf>
     <classes>
       <class>

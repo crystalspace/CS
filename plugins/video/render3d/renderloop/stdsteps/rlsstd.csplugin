@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- rlsstd.csplugin -->
 <plugin>
-  <name>rlsstd</name>
   <scf>
     <classes>
       <class>

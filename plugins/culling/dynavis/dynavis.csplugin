@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- dynavis.csplugin -->
 <plugin>
-  <name>dynavis</name>
   <scf>
     <classes>
       <class>

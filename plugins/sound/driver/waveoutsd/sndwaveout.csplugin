@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- sndwaveout.csplugin -->
 <plugin>
-  <name>sndwaveout</name>
   <scf>
     <classes>
       <class>

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- spr3dldr.csplugin -->
 <plugin>
-  <name>spr3dldr</name>
   <scf>
     <classes>
       <class>

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- ddraw2d.csplugin -->
 <plugin>
-  <name>ddraw2d</name>
   <scf>
     <classes>
       <class>

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- metagen.csplugin -->
 <plugin>
-  <name>metagen</name>
   <scf>
     <classes>
       <class>

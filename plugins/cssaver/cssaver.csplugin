@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- cssaver.csplugin -->
 <plugin>
-  <name>cssaver</name>
   <scf>
     <classes>
       <class>

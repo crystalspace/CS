@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- cstgaimg.csplugin -->
 <plugin>
-  <name>cstgaimg</name>
   <scf>
     <classes>
       <class>

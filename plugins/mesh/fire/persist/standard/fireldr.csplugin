@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- fireldr.csplugin -->
 <plugin>
-  <name>fireldr</name>
   <scf>
     <classes>
       <class>

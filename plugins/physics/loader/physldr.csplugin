@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- physldr.csplugin -->
 <plugin>
-  <name>physldr</name>
   <scf>
     <classes>
       <class>

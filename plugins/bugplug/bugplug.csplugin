@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- bugplug.csplugin -->
 <plugin>
-  <name>bugplug</name>
   <scf>
     <classes>
       <class>

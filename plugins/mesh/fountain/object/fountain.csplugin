@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- fountain.csplugin -->
 <plugin>
-  <name>fountain</name>
   <scf>
     <classes>
       <class>

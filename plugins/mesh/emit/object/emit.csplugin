@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- emit.csplugin -->
 <plugin>
-  <name>emit</name>
   <scf>
     <classes>
       <class>

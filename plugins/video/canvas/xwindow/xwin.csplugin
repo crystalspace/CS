@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- xwin.csplugin -->
 <plugin>
-  <name>xwin</name>
   <scf>
     <classes>
       <class>

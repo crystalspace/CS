@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- thingldr.csplugin -->
 <plugin>
-  <name>thingldr</name>
   <scf>
     <classes>
       <class>

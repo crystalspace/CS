@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- opcode.csplugin -->
 <plugin>
-  <name>opcode</name>
   <scf>
     <classes>
       <class>

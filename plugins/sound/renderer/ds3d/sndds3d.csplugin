@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- sndds3d.csplugin -->
 <plugin>
-  <name>sndds3d</name>
   <scf>
     <classes>
       <class>

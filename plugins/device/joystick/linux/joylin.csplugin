@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- joylin.csplugin -->
 <plugin>
-  <name>joylin</name>
   <scf>
     <classes>
       <class>

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- aseie.csplugin -->
 <plugin>
-  <name>aseie</name>
   <scf>
     <classes>
       <class>

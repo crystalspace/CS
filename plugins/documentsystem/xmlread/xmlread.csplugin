@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- xmlread.csplugin -->
 <plugin>
-  <name>xmlread</name>
   <scf>
     <classes>
       <class>

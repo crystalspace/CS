@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- engine.csplugin -->
 <plugin>
-  <name>engine</name>
   <scf>
     <classes>
       <class>

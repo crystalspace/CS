@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- motldr.csplugin -->
 <plugin>
-  <name>motldr</name>
   <scf>
     <classes>
       <class>

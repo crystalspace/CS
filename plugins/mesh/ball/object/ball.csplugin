@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- ball.csplugin -->
 <plugin>
-  <name>ball</name>
   <scf>
     <classes>
       <class>

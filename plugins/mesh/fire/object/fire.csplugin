@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- fire.csplugin -->
 <plugin>
-  <name>fire</name>
   <scf>
     <classes>
       <class>

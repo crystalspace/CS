@@ -25,6 +25,8 @@ The history order is reversed so that new features are at the top.
 	    - Fixed a number of Texinfo markup errors and problems in perl.txi.
 	    - Eliminated numerous overfull and underfull `hbox' warnings
 	      reported by TeX.
+	- Eric Sunshine removed the unused, obsolete, and deprecated top-level
+	  <name> node from the .csplugin files.
 21-Jun-2003
         - Philip Wyett updated win32.mak to reflect changes/additions in
           the general cssys library affecting MSVC port(s).

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- isoload.csplugin -->
 <plugin>
-  <name>isoload</name>
   <scf>
     <classes>
       <class>

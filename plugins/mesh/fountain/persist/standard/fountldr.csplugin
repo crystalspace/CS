@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- fountldr.csplugin -->
 <plugin>
-  <name>fountldr</name>
   <scf>
     <classes>
       <class>

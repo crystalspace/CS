@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- explo.csplugin -->
 <plugin>
-  <name>explo</name>
   <scf>
     <classes>
       <class>

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- csavi.csplugin -->
 <plugin>
-  <name>csavi</name>
   <scf>
     <classes>
       <class>

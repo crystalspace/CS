@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- aws.csplugin -->
 <plugin>
-  <name>aws</name>
   <scf>
     <classes>
       <class>

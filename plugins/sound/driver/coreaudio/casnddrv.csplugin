@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- casnddrv.csplugin -->
 <plugin>
-  <name>casnddrv</name>
   <scf>
     <classes>
       <class>

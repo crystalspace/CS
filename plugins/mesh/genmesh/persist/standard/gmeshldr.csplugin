@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- gmeshldr.csplugin -->
 <plugin>
-  <name>gmeshldr</name>
   <scf>
     <classes>
       <class>

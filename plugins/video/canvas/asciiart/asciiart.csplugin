@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- asciiart.csplugin -->
 <plugin>
-  <name>asciiart</name>
   <scf>
     <classes>
       <class>

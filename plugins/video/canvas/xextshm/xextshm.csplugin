@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- xextshm.csplugin -->
 <plugin>
-  <name>xextshm</name>
   <scf>
     <classes>
       <class>

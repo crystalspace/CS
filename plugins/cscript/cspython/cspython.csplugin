@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- cspython.csplugin -->
 <plugin>
-  <name>cspython</name>
   <scf>
     <classes>
       <class>

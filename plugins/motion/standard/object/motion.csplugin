@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- motion.csplugin -->
 <plugin>
-  <name>motion</name>
   <scf>
     <classes>
       <class>

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- snowldr.csplugin -->
 <plugin>
-  <name>snowldr</name>
   <scf>
     <classes>
       <class>

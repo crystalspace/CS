@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- sndogg.csplugin -->
 <plugin>
-  <name>sndogg</name>
   <scf>
     <classes>
       <class>

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- nullmesh.csplugin -->
 <plugin>
-  <name>nullmesh</name>
   <scf>
     <classes>
       <class>

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- terrfunc.csplugin -->
 <plugin>
-  <name>terrfunc</name>
   <scf>
     <classes>
       <class>

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- clothldr.csplugin -->
 <plugin>
-  <name>clothldr</name>
   <scf>
     <classes>
       <class>

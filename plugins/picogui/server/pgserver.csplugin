@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- pgserver.csplugin -->
 <plugin>
-  <name>pgserver</name>
   <scf>
     <classes>
       <class>

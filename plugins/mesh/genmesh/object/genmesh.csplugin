@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- genmesh.csplugin -->
 <plugin>
-  <name>genmesh</name>
   <scf>
     <classes>
       <class>

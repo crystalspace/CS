@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- x2d.csplugin -->
 <plugin>
-  <name>x2d</name>
   <scf>
     <classes>
       <class>

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- spirldr.csplugin -->
 <plugin>
-  <name>spirldr</name>
   <scf>
     <classes>
       <class>

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- cgdriver2d.csplugin -->
 <plugin>
-  <name>cgdriver2d</name>
   <scf>
     <classes>
       <class>

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- glosx2d.csplugin -->
 <plugin>
-  <name>glosx2d</name>
   <scf>
     <classes>
       <class>

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- cswalimg.csplugin -->
 <plugin>
-  <name>cswalimg</name>
   <scf>
     <classes>
       <class>

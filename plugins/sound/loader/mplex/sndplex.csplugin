@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- sndplex.csplugin -->
 <plugin>
-  <name>sndplex</name>
   <scf>
     <classes>
       <class>

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- cocoa2d.csplugin -->
 <plugin>
-  <name>cocoa2d</name>
   <scf>
     <classes>
       <class>

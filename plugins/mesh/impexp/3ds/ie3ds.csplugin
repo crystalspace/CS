@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- ie3ds.csplugin -->
 <plugin>
-  <name>ie3ds</name>
   <scf>
     <classes>
       <class>

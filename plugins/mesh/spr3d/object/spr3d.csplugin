@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- spr3d.csplugin -->
 <plugin>
-  <name>spr3d</name>
   <scf>
     <classes>
       <class>

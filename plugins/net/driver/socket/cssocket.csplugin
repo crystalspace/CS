@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- cssocket.csplugin -->
 <plugin>
-  <name>cssocket</name>
   <scf>
     <classes>
       <class>

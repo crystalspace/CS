@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- cloth.csplugin -->
 <plugin>
-  <name>cloth</name>
   <scf>
     <classes>
       <class>

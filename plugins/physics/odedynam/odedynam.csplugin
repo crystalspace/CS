@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- odedynam.csplugin -->
 <plugin>
-  <name>odedynam</name>
   <scf>
     <classes>
       <class>

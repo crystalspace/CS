@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- vfs.csplugin -->
 <plugin>
-  <name>vfs</name>
   <scf>
     <classes>
       <class>

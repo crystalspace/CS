@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- csbmpimg.csplugin -->
 <plugin>
-  <name>csbmpimg</name>
   <scf>
     <classes>
       <class>

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- soft3d.csplugin -->
 <plugin>
-  <name>soft3d</name>
   <scf>
     <classes>
       <class>

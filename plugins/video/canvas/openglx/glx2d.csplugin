@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- glx2d.csplugin -->
 <plugin>
-  <name>glx2d</name>
   <scf>
     <classes>
       <class>

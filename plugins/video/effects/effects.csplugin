@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- effects.csplugin -->
 <plugin>
-  <name>effects</name>
   <scf>
     <classes>
       <class>

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- netman.csplugin -->
 <plugin>
-  <name>netman</name>
   <scf>
     <classes>
       <class>

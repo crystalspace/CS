@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- ptanimimg.csplugin -->
 <plugin>
-  <name>ptanimimg</name>
   <scf>
     <classes>
       <class>

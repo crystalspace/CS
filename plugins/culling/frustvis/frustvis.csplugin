@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- frustvis.csplugin -->
 <plugin>
-  <name>frustvis</name>
   <scf>
     <classes>
       <class>

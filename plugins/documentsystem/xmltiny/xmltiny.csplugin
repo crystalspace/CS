@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- xmltiny.csplugin -->
 <plugin>
-  <name>xmltiny</name>
   <scf>
     <classes>
       <class>

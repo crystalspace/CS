@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- bezierldr.csplugin -->
 <plugin>
-  <name>bezierldr</name>
   <scf>
     <classes>
       <class>

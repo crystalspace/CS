@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- hazeldr.csplugin -->
 <plugin>
-  <name>hazeldr</name>
   <scf>
     <classes>
       <class>

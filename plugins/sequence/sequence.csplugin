@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- sequence.csplugin -->
 <plugin>
-  <name>sequence</name>
   <scf>
     <classes>
       <class>

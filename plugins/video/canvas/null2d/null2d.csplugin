@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- null2d.csplugin -->
 <plugin>
-  <name>null2d</name>
   <scf>
     <classes>
       <class>
