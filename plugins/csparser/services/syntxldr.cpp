@@ -139,26 +139,6 @@ enum
   XMLTOKEN_SECTOR
 };
 
-static void ReportError (iReporter* reporter, const char* id,
-	const char* description, ...)
-{
-  va_list arg;
-  va_start (arg, description);
-
-  if (reporter)
-  {
-    reporter->ReportV (CS_REPORTER_SEVERITY_ERROR, id, description, arg);
-  }
-  else
-  {
-    char buf[1024];
-    vsprintf (buf, description, arg);
-    csPrintf ("Error ID: %s\n", id);
-    csPrintf ("Description: %s\n", buf);
-  }
-  va_end (arg);
-}
-
 csTextSyntaxService::csTextSyntaxService (iBase *parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
@@ -1419,4 +1399,3 @@ csPtr<iString> csTextSyntaxService::Debug_UnitTest ()
 
   return NULL;
 }
-
