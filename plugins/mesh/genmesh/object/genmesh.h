@@ -28,6 +28,7 @@
 #include "csutil/hash.h"
 #include "csutil/garray.h"
 #include "csutil/weakref.h"
+#include "csutil/leakguard.h"
 #include "imesh/object.h"
 #include "imesh/genmesh.h"
 #include "imesh/lighting.h"
@@ -185,6 +186,8 @@ private:
 public:
   /// Constructor.
   csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory);
+
+  CS_LEAKGUARD_DECLARE (csGenmeshMeshObject);
 
   /// Destructor.
   virtual ~csGenmeshMeshObject ();
@@ -531,6 +534,8 @@ private:
 #endif
 
 public:
+  CS_LEAKGUARD_DECLARE (csGenmeshMeshObjectFactory);
+
   static csStringID vertex_name, texel_name, normal_name, color_name, 
     index_name, tangent_name, binormal_name;
   uint buffers_version;

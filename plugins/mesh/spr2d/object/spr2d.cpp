@@ -36,6 +36,9 @@
 #include "spr2d.h"
 #include "csqsqrt.h"
 
+CS_LEAKGUARD_IMPLEMENT (csSprite2DMeshObject)
+CS_LEAKGUARD_IMPLEMENT (csSprite2DMeshObjectFactory)
+
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csSprite2DMeshObject)

@@ -51,6 +51,9 @@
 
 #include "ivideo/rendermesh.h"
 
+CS_LEAKGUARD_IMPLEMENT (csGenmeshMeshObject)
+CS_LEAKGUARD_IMPLEMENT (csGenmeshMeshObjectFactory)
+
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csGenmeshMeshObject)

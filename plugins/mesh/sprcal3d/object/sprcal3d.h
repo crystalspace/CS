@@ -26,6 +26,7 @@
 #include "csutil/refarr.h"
 #include "csutil/hash.h"
 #include "csutil/weakref.h"
+#include "csutil/leakguard.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
 #include "csgeom/poly2d.h"
@@ -167,6 +168,8 @@ private:
   csFlags flags;
 
 public:
+  CS_LEAKGUARD_DECLARE (csSpriteCal3DMeshObjectFactory);
+
   iObjectRegistry* object_reg;
   iVirtualClock* vc;
 
@@ -610,6 +613,8 @@ private:
 
 public:
   SCF_DECLARE_IBASE;
+
+  CS_LEAKGUARD_DECLARE (csSpriteCal3DMeshObject);
 
   /// The parent.
   csSpriteCal3DMeshObjectFactory* factory;

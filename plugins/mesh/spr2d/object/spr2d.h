@@ -28,6 +28,7 @@
 #include "csutil/array.h"
 #include "csutil/refarr.h"
 #include "csutil/weakref.h"
+#include "csutil/leakguard.h"
 #include "cstool/rendermeshholder.h"
 #include "imesh/object.h"
 #include "imesh/sprite2d.h"
@@ -146,6 +147,8 @@ private:
 public:
   /// Constructor.
   csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory);
+
+  CS_LEAKGUARD_DECLARE (csSprite2DMeshObject);
 
   /// Destructor.
   virtual ~csSprite2DMeshObject ();
@@ -343,6 +346,8 @@ private:
 public:
   /// Polygon.
   G3DPolygonDPFX g3dpolyfx;
+
+  CS_LEAKGUARD_DECLARE (csSprite2DMeshObjectFactory);
 
   csRef<iLightManager> light_mgr;
   iObjectRegistry* object_reg;
