@@ -80,7 +80,7 @@ csgfxldrclean:
 
 ifdef DO_DEPEND
 $(OUTOS)csgfxldr.dep: $(SRC.CSGFXLDR)
-	$(DO.DEP) $(OUTOS)csgfxldr.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)csgfxldr.dep

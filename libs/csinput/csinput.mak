@@ -48,7 +48,7 @@ csinputclean:
 
 ifdef DO_DEPEND
 $(OUTOS)csinput.dep: $(SRC.CSINPUT)
-	$(DO.DEP) $(OUTOS)csinput.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)csinput.dep

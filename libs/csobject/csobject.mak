@@ -48,7 +48,7 @@ csobjectclean:
 
 ifdef DO_DEPEND
 $(OUTOS)csobject.dep: $(SRC.CSOBJECT)
-	$(DO.DEP) $(OUTOS)csobject.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)csobject.dep

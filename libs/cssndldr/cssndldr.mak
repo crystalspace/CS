@@ -70,7 +70,7 @@ cssndldrclean:
 
 ifdef DO_DEPEND
 $(OUTOS)cssndldr.dep: $(SRC.CSSNDLDR)
-	$(DO.DEP) $(OUTOS)cssndldr.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)cssndldr.dep

@@ -71,7 +71,7 @@ ggicleanlib:
 
 ifdef DO_DEPEND
 $(OUTOS)ggi2d.dep: $(SRC.GGI2D)
-	$(DO.DEP) $(OUTOS)ggi2d.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)ggi2d.dep

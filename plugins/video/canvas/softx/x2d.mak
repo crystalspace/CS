@@ -79,7 +79,7 @@ libxcleanlib:
 
 ifdef DO_DEPEND
 $(OUTOS)x2d.dep: $(SRC.XLIB2D)
-	$(DO.DEP) $(OUTOS)x2d.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)x2d.dep

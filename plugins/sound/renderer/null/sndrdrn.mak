@@ -69,7 +69,7 @@ sndrdrncleanlib:
 
 ifdef DO_DEPEND
 $(OUTOS)sndrdrn.dep: $(SRC.SNDRDRN)
-	$(DO.DEP) $(OUTOS)sndrdrn.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)sndrdrn.dep

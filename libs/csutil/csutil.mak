@@ -48,7 +48,7 @@ csutilclean:
 
 ifdef DO_DEPEND
 $(OUTOS)csutil.dep: $(SRC.CSUTIL)
-	$(DO.DEP) $(OUTOS)csutil.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)csutil.dep

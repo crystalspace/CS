@@ -48,7 +48,7 @@ csparserclean:
 
 ifdef DO_DEPEND
 $(OUTOS)csparser.dep: $(SRC.CSPARSER)
-	$(DO.DEP) $(OUTOS)csparser.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)csparser.dep

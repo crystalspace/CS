@@ -77,7 +77,7 @@ glidexcleanlib:
 
 ifdef DO_DEPEND
 $(OUTOS)glidex2d.dep: $(SRC.GLIDEX2D)
-	$(DO.DEP) $(OUTOS)glidex2d.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)glidex2d.dep

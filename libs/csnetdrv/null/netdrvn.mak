@@ -69,7 +69,7 @@ netdrvncleanlib:
 
 ifdef DO_DEPEND
 $(OUTOS)netdrvn.dep: $(SRC.NETDRVN)
-	$(DO.DEP) $(OUTOS)netdrvn.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)netdrvn.dep

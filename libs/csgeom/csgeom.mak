@@ -48,7 +48,7 @@ csgeomclean:
 
 ifdef DO_DEPEND
 $(OUTOS)csgeom.dep: $(SRC.CSGEOM)
-	$(DO.DEP) $(OUTOS)csgeom.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)csgeom.dep

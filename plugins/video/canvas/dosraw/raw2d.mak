@@ -62,7 +62,7 @@ raw2dcleanlib:
 
 ifdef DO_DEPEND
 $(OUTOS)raw2d.dep: $(SRC.RAW2D)
-	$(DO.DEP) $(OUTOS)raw2d.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)raw2d.dep

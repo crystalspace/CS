@@ -80,7 +80,7 @@ dive2dcleanlib:
 
 ifdef DO_DEPEND
 $(OUTOS)csdive.dep: $(SRC.CSDIVE)
-	$(DO.DEP) $(OUTOS)csdive.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)csdive.dep

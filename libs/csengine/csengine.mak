@@ -50,7 +50,7 @@ csengineclean:
 
 ifdef DO_DEPEND
 $(OUTOS)csengine.dep: $(SRC.CSENGINE)
-	$(DO.DEP) $(OUTOS)csengine.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)csengine.dep

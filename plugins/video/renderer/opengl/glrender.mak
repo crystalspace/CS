@@ -88,7 +88,7 @@ glcleanlib:
 
 ifdef DO_DEPEND
 $(OUTOS)glrender.dep: $(SRC.GL3D)
-	$(DO.DEP) $(OUTOS)glrender.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)glrender.dep

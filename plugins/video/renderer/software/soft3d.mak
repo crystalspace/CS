@@ -75,7 +75,7 @@ softcleanlib:
 
 ifdef DO_DEPEND
 $(OUTOS)soft3d.dep: $(SRC.SOFT3D)
-	$(DO.DEP) $(OUTOS)soft3d.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)soft3d.dep

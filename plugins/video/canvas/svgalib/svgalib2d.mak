@@ -74,7 +74,7 @@ svgalib2dcleanlib:
 
 ifdef DO_DEPEND
 $(OUTOS)svgalib2d.dep: $(SRC.SVGA2D)
-	$(DO.DEP) $(OUTOS)svgalib2d.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)svgalib2d.dep

@@ -68,7 +68,7 @@ osscleanlib:
 
 ifdef DO_DEPEND
 $(OUTOS)oss.dep: $(SRC.SNDOSS)
-	$(DO.DEP) $(OUTOS)oss.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)oss.dep

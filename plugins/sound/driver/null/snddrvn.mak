@@ -69,7 +69,7 @@ snddrvncleanlib:
 
 ifdef DO_DEPEND
 $(OUTOS)snddrvn.dep: $(SRC.SNDDRVN)
-	$(DO.DEP) $(OUTOS)snddrvn.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)snddrvn.dep

@@ -48,7 +48,7 @@ cswsclean:
 
 ifdef DO_DEPEND
 $(OUTOS)csws.dep: $(SRC.CSWS)
-	$(DO.DEP) $(OUTOS)csws.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)csws.dep

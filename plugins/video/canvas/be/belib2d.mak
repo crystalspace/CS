@@ -70,7 +70,7 @@ becleanlib:
 
 ifdef DO_DEPEND
 $(OUTOS)be2d.dep: $(SRC.BE2D)
-	$(DO.DEP) $(OUTOS)be2d.dep
+	$(DO.DEP)
 endif
 
 -include $(OUT)be2d.dep

@@ -94,7 +94,7 @@ glxcleanlib:
  
 ifdef DO_DEPEND
 $(OUTOS)glx2d.dep: $(SRC.GLX2D)
-	$(DO.DEP) $(OUTOS)glx2d.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)glx2d.dep

@@ -77,7 +77,7 @@ glide3dcleanlib:
 
 ifdef DO_DEPEND
 $(OUTOS)glide3d.dep: $(SRC.GLIDE3D)
-	$(DO.DEP) $(OUTOS)glide3d.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)glide3d.dep

@@ -74,7 +74,7 @@ glbecleanlib:
 
 ifdef DO_DEPEND
 $(OUTOS)glbe2d.dep: $(SRC.GLBE2D)
-	$(DO.DEP) $(OUTOS)glbe2d.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)glbe2d.dep
