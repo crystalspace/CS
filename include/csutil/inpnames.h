@@ -139,6 +139,25 @@ bool csParseMouseDef(const char* str, int* x, int* y,
                             int* button, csKeyModifiers* modifiers);
 
 /**
+ * Convert mouse specifiers and an optional set of modifiers into a free-form
+ * mouse event string.
+ * \param x If x is not zero, it translates to a MouseX event.
+ * \param y If y is not zero, it translates to a MouseY event.
+ * \param button If button is not zero, it translates to a Mouse<button> button
+ *        event.
+ * \param modifiers The modifiers to include in the string. Can be 0.
+ * \param distinguishModifiers Whether to out put distinguished modifiers.
+ *  (e.g. "LAlt" vs just "Alt".)
+ * \returns The mouse event string or an empty string if translation failed.
+ * \remark The resulting event is either a MouseX, MouseY or Button event
+ *         It will be tested in this order. So setting x and y to nonzero will
+ *         result in a MouseX event.
+ */
+csString csGetMouseDesc (int x, int y, int button,
+			      const csKeyModifiers* modifiers,
+			      bool distinguishModifiers = true);
+
+/**
  * Convert a free-format string into a set of values that can be compared
  * against the data of a joystick event.
  * \param str Strings are in the form "joystickX", "joystick2" etc.
@@ -156,10 +175,23 @@ bool csParseMouseDef(const char* str, int* x, int* y,
 bool csParseJoystickDef(const char* str, int* x, int* y,
   int* button, csKeyModifiers* modifiers);
 
-/*
-  @@@ TODO:
-    csGetMouseDesc
-    csGetJoystickDesc
+/**
+ * Convert joystick specifiers and an optional set of modifiers into a free-form
+ * joystick event string.
+ * \param x If x is not zero, it translates to a JoystickX event.
+ * \param y If y is not zero, it translates to a JoystickY event.
+ * \param button If button is not zero, it translates to a Joystick<button> 
+ *  button event.
+ * \param modifiers The modifiers to include in the string. Can be 0.
+ * \param distinguishModifiers Whether to out put distinguished modifiers.
+ *  (e.g. "LAlt" vs just "Alt".)
+ * \returns The joystick event string or an empty string if translation failed.
+ * \remark The resulting event is either a JoystickX, JoystickY or Button event
+ *         It will be tested in this order. So setting x and y to nonzero will
+ *         result in a JoystickX event.
  */
+csString csGetJoystickDesc (int x, int y, int button,
+			      const csKeyModifiers* modifiers,
+			      bool distinguishModifiers = true);
 
 #endif // __CS_UTIL_CSINPUTS_H__

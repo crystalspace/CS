@@ -370,6 +370,82 @@ bool csParseJoystickDef(const char* str, int* x, int* y,
   return csParseMoverDef("joystick", 8, str, x, y, button, modifiers);
 }
 
+static bool
+csGetMoverDef(csString& ret, const char* prefix, int x, int y, int button,
+	      const csKeyModifiers* modifiers, bool distinguishModifiers)
+{
+  ret = "";
+  if (modifiers)
+  {
+    for (uint m = 0; m < csKeyModifierTypeLast; m++)
+    {
+      if (modifiers->modifiers[m] == 0) continue;
+
+      if (distinguishModifiers && 
+	((modifiers->modifiers[m] & 0x80000000) == 0))
+      {
+	for (uint t = 0; t < csKeyModifierNumAny; t++)
+	{
+	  if (modifiers->modifiers[m] & (1 << t))
+	  {
+	    const char* key = GetModifierStr (m, t);
+	    if (key) 
+	      ret << key << '+';
+	    else
+	    {
+	      key = GetModifierStr (m, csKeyModifierNumAny);
+	      if (key) ret << key << t << '+';
+	    }
+	  }
+	}
+      }
+      else
+      {
+	const char* key = GetModifierStr (m, csKeyModifierNumAny);
+	if (key) ret << key << '+';
+      }
+    }
+  }
+
+  ret << prefix;
+
+  if (x)
+    ret << 'X';
+  else if (y)
+    ret << 'Y';
+  else if (button)
+    ret << button;
+  else
+    return false;
+
+  return true;
+}
+
+csString csGetMouseDesc (int x, int y, int button,
+			  const csKeyModifiers* modifiers,
+			  bool distinguishModifiers)
+{
+  
+  csString ret;
+  (void)csGetMoverDef(ret, "Mouse", x, y, button,
+		      modifiers, distinguishModifiers);
+  return ret;
+    
+}
+
+csString csGetJoystickDesc (int x, int y, int button,
+			    const csKeyModifiers* modifiers,
+			    bool distinguishModifiers)
+{
+  
+  csString ret;
+  (void)csGetMoverDef(ret, "Joystick", x, y, button,
+		      modifiers, distinguishModifiers);
+  return ret;
+    
+}
+
+
 //@@@TODO: optimize this function
 int csTypeOfInputDef(const char* str)
 {
@@ -481,7 +557,38 @@ csString csInputDefinition::GetDescription ()
 
 bool csInputDefinition::FromEvent (iEvent* event, bool useCookedKey)
 {
-  // @@@ Implement me
+  if (CS_IS_KEYBOARD_EVENT(*event))
+  {
+    csKeyEventData ked;
+    if (csKeyEventHelper::GetEventData (event, ked))
+    {
+      k.keyCode = (useCookedKey && (ked.codeCooked != 0)) 
+	? ked.codeCooked 
+	: ked.codeRaw;
+      containedType = csevKeyboard;
+      modifiers = ked.modifiers;
+      return true;
+    }
+  }
+  else if (CS_IS_MOUSE_EVENT(*event))
+  {
+    m = event->Mouse;
+    // Left/Right/any is lost in translation, we default to any
+    for (int mod=0; mod < csKeyModifierTypeLast; mod++)
+      if (m.Modifiers & (1<<mod))
+	modifiers.modifiers[mod] = csKeyModifierNumAny;
+    return true;
+  }
+  else if (CS_IS_JOYSTICK_EVENT(*event))
+  {
+    j = event->Joystick;
+    // Left/Right/any is lost in translation, we default to any
+    for (int mod=0; mod < csKeyModifierTypeLast; mod++)
+      if (m.Modifiers & (1<<mod))
+	modifiers.modifiers[mod] = csKeyModifierNumAny;
+    return true;
+  }
+
   return false;
 }
 

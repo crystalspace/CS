@@ -24,6 +24,8 @@ chronological order.
 	  using PS 1.4 programs (for ATI) and PS 1.1 (for nVidia). Let me know
 	  of any problems or errors. PS 1.4 emulation will work on all Radeon
 	  8500 and up, while PS 1.1 will only work on nVidia GeForce 3 and up.
+	- Norman Kraemer added the missing csGetMouseDesc, csGetJoystickDesc
+	  and FromEvent methods/funtions in the csInputDefinition class.
 1-Mar-2004
 	- res augmented the Win32 canvas to allow retrieval/setting of the
 	  window rectangle (via PerformExtension()).
