@@ -12,6 +12,11 @@ chronological order.
           all the makedep warnings.
         - Philip Wyett removed caltocs due to lack of general support
           and maintenance.
+	- Keith Fulton enabled new feature in sprcal3d.  It now keeps the
+	  iMaterialWrapper for each submesh in the model's calCoreMaterialId
+	  member.  cal3d never uses these values, so it is ok.  This enables
+	  the model to specify and use multiple materials (assigned
+	  independently to each mesh).
 10-Aug-2003
 	- Peter Amstutz added a check to "scan.cpp" of the software
 	  renderer so that it would not defer a null pointer (and hence crash)

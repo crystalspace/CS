@@ -263,10 +263,16 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	    attach = false;
 	else
 	    attach = true;
+	const char *def_matl = child->GetAttributeValue("material");
 
 	if (file)
 	{
-	  if (!newspr->LoadCoreMesh(file,name,attach))
+	  iMaterialWrapper *mat=0;
+	  if (def_matl)
+	  {
+	      mat = LoadMaterialTag(newspr,child,ldr_context,def_matl);
+	  }
+	  if (!newspr->LoadCoreMesh(file,name,attach,mat))
 	  {
 	    newspr->ReportLastError();
 	    return 0;
@@ -284,25 +290,8 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_MATERIAL:
       {
 	const char *file = child->GetAttributeValue("file");
-	if (file)
-	{
-          iMaterialWrapper* mat = ldr_context->FindMaterial (file);
-	  if (!mat)
-	  {
-	    synldr->ReportError (
-		  "crystalspace.spritecal3dfactoryloader.parse.unknownmaterial",
-		  child, "Couldn't find material named '%s'", file);
-            return 0;
-	  }
-	  newspr->AddCoreMaterial(mat);
-	}
-	else
-	{
-	    synldr->ReportError (
-		  "crystalspace.spritecal3dfactoryloader.parse.badfile",
-		  child,"file is a required attribute of <material> token in cal3d files.");
-	  return 0;
-	}
+	if (!LoadMaterialTag(newspr,child,ldr_context,file))
+	    return 0;
 	break;
       }
 
@@ -317,7 +306,33 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
   return csPtr<iBase> (fact);
 }
 
-
+iMaterialWrapper *csSpriteCal3DFactoryLoader::LoadMaterialTag(iSpriteCal3DFactoryState *newspr,
+							      iDocumentNode* child,
+							      iLoaderContext* ldr_context,
+							      const char *file)
+{
+    iMaterialWrapper* mat=0;
+    if (file)
+    {
+	mat = ldr_context->FindMaterial (file);
+	if (!mat)
+	{
+	    synldr->ReportError (
+		"crystalspace.spritecal3dfactoryloader.parse.unknownmaterial",
+		child, "Couldn't find material named '%s'", file);
+	    return 0;
+	}
+	newspr->AddCoreMaterial(mat);
+    }
+    else
+    {
+	synldr->ReportError (
+	    "crystalspace.spritecal3dfactoryloader.parse.badfile",
+	    child,"file is a required attribute of <material> token in cal3d files.");
+	return 0;
+    }
+    return mat;
+}
 
 
 //---------------------------------------------------------------------------

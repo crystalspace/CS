@@ -371,12 +371,14 @@ bool ViewMesh::HandleEvent (iEvent& ev)
         {
 	  if (menu->GetCheck(ev.Command.Code))
 	  {
-	    cal3dstate->DetachCoreMesh(ev.Command.Code - VIEWMESH_MESH_SELECT_START);
+	    csComponent *item = menu->GetItem (ev.Command.Code);
+	    cal3dstate->DetachCoreMesh( item->GetText () );
             menu->SetCheck(ev.Command.Code, false);
 	  }
 	  else
 	  {
-	    cal3dstate->AttachCoreMesh(ev.Command.Code - VIEWMESH_MESH_SELECT_START);
+	    csComponent *item = menu->GetItem (ev.Command.Code);
+	    cal3dstate->AttachCoreMesh( item->GetText () );
 	    sprite->DeferUpdateLighting(CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
             menu->SetCheck(ev.Command.Code, true);
 	  }

@@ -86,8 +86,9 @@ struct iSpriteCal3DFactoryState : public iBase
    * attach should be true if this mesh should be part of the mesh object
    * after it is first created, or false if it will be optionally added
    * later.
+   * defmat is the material which should be used when the object is created, if any.
    */
-  virtual bool LoadCoreMesh(const char *filename,const char *name,bool attach) = 0;
+  virtual bool LoadCoreMesh(const char *filename,const char *name,bool attach,iMaterialWrapper *defmat) = 0;
 
   /**
    * This jams a CS material into a cal3d material struct.
@@ -196,7 +197,7 @@ struct iSpriteCal3DState : public iBase
 
   /**
    * This attaches a mesh with the specified name (from xml) to the instance of
-   * the model.
+   * the model.  
    */
   virtual bool AttachCoreMesh(const char *meshname) = 0;
 
@@ -205,8 +206,9 @@ struct iSpriteCal3DState : public iBase
    * the model.  It is expected this function is only called by the mesh object
    * itself under normal circumstances.  Callers should normally refer to meshes
    * by name to prevent behavior changes when xml order is updated.
+   * iMatWrap is the iMaterialWrapper to be used in rendering.
    */
-  virtual bool AttachCoreMesh(int mesh_id) = 0;
+  virtual bool AttachCoreMesh(int mesh_id,int iMatWrap) = 0;
 
   /**
    * This detaches a mesh with the specified name (from xml) to the instance of

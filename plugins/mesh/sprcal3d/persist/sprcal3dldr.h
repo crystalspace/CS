@@ -38,6 +38,11 @@ private:
   csRef<iSyntaxService> synldr;
   csStringHash xmltokens;
 
+  iMaterialWrapper * LoadMaterialTag(iSpriteCal3DFactoryState *newspr,
+				     iDocumentNode* node,
+				     iLoaderContext* ldr_context,
+				     const char *file);
+
 public:
   SCF_DECLARE_IBASE;
 
