@@ -216,6 +216,12 @@ void csChunkLodTerrainFactory::SetSamplerRegion (
 
   datamap.SetLength (hm_x * hm_y);
 
+  const csVector3* positions = fullsample->SampleVector3 (vertex_name);
+  const csVector3* normals = fullsample->SampleVector3 (normal_name);
+  const csVector2* texcoords = fullsample->SampleVector2 (texcors_name);
+
+  const csVector2 tcScale (hm_x, hm_y);
+
   int i, j;
   for (j = 0; j < hm_y; j ++)
   {
@@ -223,9 +229,11 @@ void csChunkLodTerrainFactory::SetSamplerRegion (
     {
       int pos = i + j * hm_x;
 
-      datamap[pos].pos = fullsample->SampleVector3 (vertex_name)[pos];
-      datamap[pos].norm = fullsample->SampleVector3 (normal_name)[pos];
-      datamap[pos].tex = fullsample->SampleVector2 (texcors_name)[pos];
+      datamap[pos].pos = positions[pos];
+      datamap[pos].norm = normals[pos];
+      const csVector2& tc = texcoords[pos];
+      datamap[pos].tex.x = tc.x * tcScale.x;
+      datamap[pos].tex.y = tc.y * tcScale.y;
       datamap[pos].col = pos;
     }
   }

@@ -399,7 +399,7 @@ public:
 
   bool SetMaterialPalette (const csArray<iMaterialWrapper*>& pal);
   csArray<iMaterialWrapper*> GetMaterialPalette ();
-  bool SetMaterialMap (csArray<char> data, int x, int y);
+  bool SetMaterialMap (const csArray<char>& data, int x, int y);
   bool SetMaterialMap (iImage* map);
   csArray<char> GetMaterialMap ();
   bool SetLODValue (const char* parameter, float value);

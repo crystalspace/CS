@@ -529,18 +529,19 @@ void csSimpleSampler::CacheTexCoords ()
   int idx = 0;
 
   // Iterate through the samplepoints in the region
-  // Sample texture coordinates as x/z positions in heightmap space
-  csVector2 texCoord (minCorner.x, minCorner.z);
+  csVector2 texCoord (0, 0);
+  const csVector2 tcStep (
+    1.0f / (float)resolution, 1.0f / (float)resolution);
   for (unsigned int i = 0; i<resolution; ++i)
   {
-    texCoord.x = minCorner.x;
+    texCoord.x = 0; 
     for (unsigned int j = 0; j<resolution; ++j)
     {
       // Just assign the texture coordinate
       texCoords[idx++] = texCoord;
-      texCoord.x += sampleDistanceHeight.x;
+      texCoord.x += tcStep.x;
     }
-    texCoord.y += sampleDistanceHeight.z;
+    texCoord.y += tcStep.y;
   }
 }
 

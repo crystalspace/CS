@@ -203,12 +203,25 @@ void csTerrBlock::SetupMesh ()
             (res+1)*(res+1)*sizeof(csVector2));
   terrasampler->Cleanup ();
 
+  const csBox2& terrRegion = terr->region;
+  float terrW = terrRegion.MaxX() - terrRegion.MinX();
+  float terrH = terrRegion.MaxY() - terrRegion.MinY();
+  const csVector2 tcOffset (-terrRegion.MinX() + (center.x - size / 2.0),
+    -terrRegion.MinY() + (center.z - size / 2.0));
+  const csVector2 tcScale (size, size);
+
   bbox.Empty ();
   for (int j=0; j<(res+1); ++j)
   {
     for (int i=0; i<(res+1); ++i)
     {
-      bbox.AddBoundingVertexSmart (vertex_data[i+j*(res+1)]);
+      const int pos = i+j*(res+1);
+      bbox.AddBoundingVertexSmart (vertex_data[pos]);
+      // @@@ Not nice:
+      csVector2 tc (texcoord_data[pos]);
+      tc.x = (tc.x * tcScale.x) + tcOffset.x;
+      tc.y = (tc.y * tcScale.y) + tcOffset.y;
+      texcoord_data[pos] = tc;
       /*if ((j%2) && (i%2))
       {
         morphvertex_data[i+j*(res+1)] = (vertex_data[i-1+(j-1)*(res+1)]+
@@ -733,7 +746,7 @@ csArray<iMaterialWrapper*> csTerrainObject::GetMaterialPalette ()
   return palette;
 }
 
-bool csTerrainObject::SetMaterialMap (csArray<char> data, int w, int h)
+bool csTerrainObject::SetMaterialMap (const csArray<char>& data, int w, int h)
 {
   csRef<iGraphics3D> g3d = 
     CS_QUERY_REGISTRY (object_reg, iGraphics3D);
