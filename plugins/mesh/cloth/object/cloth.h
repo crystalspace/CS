@@ -34,6 +34,7 @@ struct iClothFactoryState;
 //#define      STATIC_CONSTRAINT
 #define      DYNAMIC_CONSTRAINT
 
+
 class Constraint
 {
 	public:
@@ -104,417 +105,415 @@ void ReallocFields(Constraint** Struct_F, int* StrSize, Constraint** Shear_F , i
 //**//**//**//**//**//**//**//**//**//**//**//**//**//
 class Integrator
 {
-	public:
+  public:
 		
-	Cloth*         cloth_object;
-	csVector3*     vertices;
-	csBitArray*    ConstrainedVertices;
-	uint           nverts;
+  Cloth*         cloth_object;
+  csVector3*     vertices;
+  csBitArray*    ConstrainedVertices;
+  uint           nverts;
 #if defined (DYNAMIC_CONSTRAINT)	
-	csBasicVector* fields;
-	csBasicVector* shear_fields;
+  csBasicVector* fields;
+  csBasicVector* shear_fields;
 #elif defined (STATIC_CONSTRAINT)
-	Constraint*    fields;
-	Constraint*    shear_fields;
-	int            field_size;
-	int            shearfield_size;
+  Constraint*    fields;
+  Constraint*    shear_fields;
+  int            field_size;
+  int            shearfield_size;
 #endif
-	float          structural_k;
-	float          shear_k;
-	float          density;
-	float          friction;
-	float          structural_rigidity;
-	float          shear_rigidity;
-	float          dt;
-	float          time;
-	csVector3      gravity;
-
-	csVector3*     velocities;
-	csVector3*     forces;
-	
+  float          structural_k;
+  float          shear_k;
+  float          density;
+  float          friction;
+  float          structural_rigidity;
+  float          shear_rigidity;
+  float          dt;
+  float          time;
+  csVector3      gravity;
+  csVector3*     velocities;
+  csVector3*     forces;
 #if defined(AMPC_PROVOT)
-	csVector3*     aux;	
-	csVector3*     tempvertices;
-	csVector3*     velocities1;	
-	csVector3*     velocities2;
-	csVector3*     velocities3;
-	csVector3*     forces1;
-	csVector3*     forces2;
-	csVector3*     forces3;	
+  csVector3*     aux;	
+  csVector3*     tempvertices;
+  csVector3*     velocities1;	
+  csVector3*     velocities2;
+  csVector3*     velocities3;
+  csVector3*     forces1;
+  csVector3*     forces2;
+  csVector3*     forces3;	
 #endif	
-			
-	Integrator( Cloth* obj )
-	{
-		cloth_object = obj;
-		vertices     = obj->vertices;
-		nverts       = obj->nverts;
+  Integrator( Cloth* obj )
+  {
+    cloth_object = obj;
+    vertices     = obj->vertices;
+    nverts       = obj->nverts;
 #if  defined(DYNAMIC_CONSTRAINT)		
-		fields       = obj->Edges;
-		shear_fields = obj->Shear_Neighbours;
+    fields       = obj->Edges;
+    shear_fields = obj->Shear_Neighbours;
 #elif defined(STATIC_CONSTRAINT)
-		obj -> ReallocFields( &fields, &field_size ,&shear_fields , &shearfield_size );
+    obj -> ReallocFields( &fields, &field_size ,&shear_fields , &shearfield_size );
 #endif		
-		gravity      = obj->gravity;
-		structural_k        = 7.0;
-		shear_k             = 7.0;
-		density             = 1.0;
-		friction            = 0.8;
-		structural_rigidity = 0.97;
-		shear_rigidity      = 0.8;
-		dt           = 0.05;
-		time         = 0.0;
-		uint  i;
-		velocities   = new csVector3 [ nverts ];
-		forces       = new csVector3 [ nverts ];
+    gravity      = obj->gravity;
+    structural_k        = 7.0;
+    shear_k             = 7.0;
+    density             = 1.0;
+    friction            = 0.95;
+    structural_rigidity = 0.9;
+    shear_rigidity      = 0.8;
+    dt           = 0.07;
+    time         = 0.0;
+    uint  i;
+    velocities   = new csVector3 [ nverts ];
+    forces       = new csVector3 [ nverts ];
 #if defined(AMPC_PROVOT)
-		tempvertices=new csVector3[nverts];  
-	    //Adams-Moulton predictor-corrector is used on this Integrator,
-		//a lot faster that Runge-Kutta 4, and as precise =), but uses
+    tempvertices=new csVector3[nverts];  
+            
+                //Adams-Moulton predictor-corrector is used on this Integrator,
+ 		//a lot faster that Runge-Kutta 4, and as precise =), but uses
 		//4 timesteps for velocities and forces!!, no very memory friendly as you could guess
-	     velocities1 = new csVector3[nverts];
-	     velocities2 = new csVector3[nverts];
-	     velocities3 = new csVector3[nverts];
-	     forces1     = new csVector3[nverts];
-		 forces2     = new csVector3[nverts];
-		 forces3     = new csVector3[nverts];
+    velocities1 = new csVector3[nverts];
+    velocities2 = new csVector3[nverts];
+    velocities3 = new csVector3[nverts];
+    forces1     = new csVector3[nverts];
+    forces2     = new csVector3[nverts];
+    forces3     = new csVector3[nverts];
 		 
-		 for (i=0;i<nverts;i++)
-  {	
-   forces3[i]=gravity;  //set all timestep buffers to default gravity at initialization
-   forces2[i]=gravity;   
-   forces1[i]=gravity;   
-    forces[i]=gravity;   
-  };
+    for (i=0;i<nverts;i++)
+       {	
+	forces3[i] = gravity;  //set all timestep buffers to default gravity at initialization
+	forces2[i] = gravity;   
+	forces1[i] = gravity;   
+	forces[i]  = gravity;   
+       };
 #endif		
-		
-	ConstrainedVertices = new csBitArray( nverts );
-	ConstrainedVertices->Clear(); 
-		for (i=9;i<15;i++) {ConstrainedVertices->SetBit(i); };
-	
+    ConstrainedVertices = new csBitArray( nverts );
+    ConstrainedVertices->Clear(); 
+  // the following is for demo , this shouldn't be here
+    for (i=9;i<18;i++) {ConstrainedVertices->SetBit(i); };
+    ConstrainedVertices->SetBit(45);
+    ConstrainedVertices->SetBit(46);
+    vertices[45]+=csVector3(0,0,1.1);
+    vertices[46]+=csVector3(0,0,1.2);
 	};
-	~Integrator()
+    ~Integrator()
     {
-		if (velocities)   { delete[] velocities; };
-		if (forces)       { delete[] forces;     };
+       if (velocities)   { delete[] velocities; };
+       if (forces)       { delete[] forces;     };
 #if defined(AMPC_PROVOT)
-		if (tempvertices)    { delete[] tempvertices; };
-		if (velocities1)     { delete[] velocities1; };
-		if (velocities2)     { delete[] velocities2; };
-		if (velocities3)     { delete[] velocities3; };
-		if (forces1)         { delete[] forces1; };
-		if (forces2)         { delete[] forces2; };
-		if (forces3)         { delete[] forces3; };
+       if (tempvertices)    { delete[] tempvertices; };
+       if (velocities1)     { delete[] velocities1; };
+       if (velocities2)     { delete[] velocities2; };
+       if (velocities3)     { delete[] velocities3; };
+       if (forces1)         { delete[] forces1; };
+       if (forces2)         { delete[] forces2; };
+       if (forces3)         { delete[] forces3; };
 #endif		
-	};
+     };
 	
-    inline void Swap() 
+inline void Swap() 
       {
 #if defined(AMPC_PROVOT)		  
-		  aux     = forces3;
-		  forces3 = forces2;
-		  forces2 = forces1;
-		  forces1 = forces;
-		  forces  = aux;
+        aux     = forces3;
+	forces3 = forces2;
+	forces2 = forces1;
+	forces1 = forces;
+	forces  = aux;
 		  
-		  aux         = velocities3;
-		  velocities3 = velocities2;
-		  velocities2 = velocities1;
-		  velocities1 = velocities;
-		  velocities  = aux;
+	aux         = velocities3;
+	velocities3 = velocities2;
+	velocities2 = velocities1;
+	velocities1 = velocities;
+	velocities  = aux;
 #endif		  
       };
 	  
-	inline void ComputeInitial()
-	  {
+inline void ComputeInitial()
+       {
 #if defined(AMPC_PROVOT)
 	ComputeFields();
 	ComputeShearFields();	  
         uint i;     
-		  cloth_object->object_bbox->StartBoundingBox ( *(cloth_object->shift) +vertices[0] );
-   for (i=0;i<nverts;i++)
-   {
+	cloth_object->object_bbox->StartBoundingBox ( *(cloth_object->shift) +vertices[0] );
+	for (i=0;i<nverts;i++)
+	  {
 	   //let apply here blunt integration (this is for first-timesteps only)
-	   velocities[i] = velocities1[i] + 0.5f * forces[i] * (dt/density); 
-	     vertices[i]+= velocities1[i]*dt;
-	      forces3[i] = density*gravity;              //clean what is going to be the new timestep buffer 
+	    velocities[i] = velocities1[i] + 0.5f * forces[i] * (dt/density); 
+	    vertices[i]+= velocities1[i]*dt;
+	    forces3[i] = density*gravity;              //clean what is going to be the new timestep buffer 
 	                                     //after the Swap() call and set to default gravity 
-       cloth_object->object_bbox->AddBoundingVertexSmart ( vertices[i] + *(cloth_object->shift) );
-		 	 };
-       Swap();                        //swap timebuffer   
+            cloth_object->object_bbox->AddBoundingVertexSmart ( vertices[i] + *(cloth_object->shift) );
+	   };
+        Swap();                        //swap timebuffer   
        // some boundary condition. Here for now
 #endif			 
       }; 
 	  
-	inline void ComputeFields()
-	{
-		Constraint* p;
-		csVector3   temp;
-		float       N;
+inline void ComputeFields()
+       {
+         Constraint* p;
+	 csVector3   temp;
+	 float       N;
 #if  defined(DYNAMIC_CONSTRAINT)		
-		int size    = fields->Length();  
-		for (int i=0; i < size ; i++ )
-			{
-				p       = (Constraint*) fields -> Get( i ); 
-				temp    = vertices [ p->v1 ] - vertices [ p->v0 ];
-				N       = temp.Norm();
-				
-				N       = structural_k*( ( N - p->L0 ) / N );
-				temp   *= N;
-				forces[ p->v0 ] += temp;
-				forces[ p->v1 ] -= temp;
-			};
+	 int size    = fields->Length();  
+	 for (int i=0; i < size ; i++ )
+	    {
+              p       = (Constraint*) fields -> Get( i ); 
+	      temp    = vertices [ p->v1 ] - vertices [ p->v0 ];
+	      N       = temp.Norm();
+	      
+	      N       = structural_k*( ( N - p->L0 ) / N );
+	      temp   *= N;
+	      forces[ p->v0 ] += temp;
+	      forces[ p->v1 ] -= temp;
+	    };
 #elif defined(STATIC_CONSTRAINT)
-		for (int i=0; i < field_size ; i++ )
-		    {
-				p       = &fields[ i ];
-				temp    = vertices [ p->v1 ] - vertices [ p->v0 ];
-				N       = temp.Norm();
-				
-				N       = structural_k*( ( N - p->L0 ) / N );
-				temp   *= N;
-				forces[ p->v0 ] += temp;
-				forces[ p->v1 ] -= temp;
-			};
+	 for (int i=0; i < field_size ; i++ )
+	    {
+	      p       = &fields[ i ];
+	      temp    = vertices [ p->v1 ] - vertices [ p->v0 ];
+	      N       = temp.Norm();
+	      		
+	      N       = structural_k*( ( N - p->L0 ) / N );
+	      temp   *= N;
+	      forces[ p->v0 ] += temp;
+	      forces[ p->v1 ] -= temp;
+	     };
 #endif			
 	}; 
 	
-	inline void ComputeShearFields()
-	{
-		Constraint* p;
-		csVector3   temp;
-		float       N;
+inline void ComputeShearFields()
+       {
+	  Constraint* p;
+	  csVector3   temp;
+	  float       N;
 #if  defined(DYNAMIC_CONSTRAINT)		
-		int size    = shear_fields->Length();  
-		for (int i=0; i < size ; i++ )
-			{
-				p       = (Constraint*) shear_fields -> Get( i ); 
-				temp    = vertices [ p->v1 ] - vertices [ p->v0 ];
-				N       = temp.Norm();
-				
-				N       = shear_k*( ( N - p->L0 ) / N );
-				temp   *= N;
-				forces[ p->v0 ] += temp;
-				forces[ p->v1 ] -= temp;
-			};
+	  int size    = shear_fields->Length();  
+	  for (int i=0; i < size ; i++ )
+	    {
+	      p       = (Constraint*) shear_fields -> Get( i ); 
+	      temp    = vertices [ p->v1 ] - vertices [ p->v0 ];
+	      N       = temp.Norm();
+
+	      N       = shear_k*( ( N - p->L0 ) / N );
+	      temp   *= N;
+	      forces[ p->v0 ] += temp;
+	      forces[ p->v1 ] -= temp;
+	    };
 #elif defined(STATIC_CONSTRAINT)
-		for (int i=0; i < shearfield_size ; i++)
-		    {
-				p       = &shear_fields[ i ];
-				temp    = vertices [ p->v1 ] - vertices [ p->v0 ];
-				N       = temp.Norm();
-				
-				N       = shear_k*( ( N - p->L0 ) / N );
-				temp   *= N;
-				forces[ p->v0 ] += temp;
-				forces[ p->v1 ] -= temp;
-			};
+	 for (int i=0; i < shearfield_size ; i++)
+	    {
+              p       = &shear_fields[ i ];
+	      temp    = vertices [ p->v1 ] - vertices [ p->v0 ];
+	      N       = temp.Norm();
+
+	      N       = shear_k*( ( N - p->L0 ) / N );
+	      temp   *= N;
+	      forces[ p->v0 ] += temp;
+	      forces[ p->v1 ] -= temp;
+	    };
 #endif			
 	}; 
 	
-	inline void ApplyProvotConstraint()
-	{
-	Constraint* p;
-	csVector3   temp;
-	float       N;
+inline void ApplyProvotConstraint()
+       {
+	 Constraint* p;
+	 csVector3   temp;
+	 float       N;
 #if   defined(DYNAMIC_CONSTRAINT)		
-	int size    = fields->Length();  
-	for (int i=0; i < size ; i++ )
+         int size    = fields->Length();  
+	 for (int i=0; i < size ; i++ )
 #elif defined(STATIC_CONSTRAINT)
-	for (int i=0; i < field_size ; i++ )
+	 for (int i=0; i < field_size ; i++ )
 #endif		
-		{
+	   {
 #if   defined(DYNAMIC_CONSTRAINT)			
-			p       = (Constraint*) fields -> Get( i ); 
+	     p       = (Constraint*) fields -> Get( i ); 
 #elif defined(STATIC_CONSTRAINT)
-			p       = &fields[ i ];
+             p       = &fields[ i ];
 #endif			
-			if (!( ConstrainedVertices->IsBitSet(p->v0) || ConstrainedVertices->IsBitSet(p->v1) ))
-				{
-					temp    = (vertices [ p->v1 ] - vertices [ p->v0 ]);
-					N       = temp.Norm();
-					if (structural_rigidity*N>p->L0)
-					{
-						temp *= 0.5*( structural_rigidity - p->L0/N ); 
-					    vertices[ p->v0 ] += temp;
-						vertices[ p->v1 ] -= temp;
-					};
-				}
-			else if ( ConstrainedVertices->IsBitSet(p->v0) )
-				{
-					temp    = (vertices [ p->v1 ] - vertices [ p->v0 ]);
-					N       = temp.Norm();
-					if (structural_rigidity*N>p->L0)
-					{
-						temp *= ( structural_rigidity - p->L0/N );
-						vertices[ p->v1 ] -= temp;
-					};
-				}
-			else if ( ConstrainedVertices->IsBitSet(p->v1) )
-				{
-					temp    = (vertices [ p->v1 ] - vertices [ p->v0 ]);
-					N       = temp.Norm();
-					if (structural_rigidity*N>p->L0)
-					{
-						temp *= ( structural_rigidity - p->L0/N );
-						vertices[ p->v0 ] += temp;
-					};
-				};					
-		};
+	     if (!( ConstrainedVertices->IsBitSet(p->v0) || ConstrainedVertices->IsBitSet(p->v1) ))
+		{
+		  temp    = (vertices [ p->v1 ] - vertices [ p->v0 ]);
+		  N       = temp.Norm();
+		  if (structural_rigidity*N>p->L0)
+		     {
+			temp *= 0.5*( structural_rigidity - p->L0/N ); 
+			vertices[ p->v0 ] += temp;
+			vertices[ p->v1 ] -= temp;
+		     };
+		}
+	     else if ( ConstrainedVertices->IsBitSet(p->v0) )
+		 {
+	            temp    = (vertices [ p->v1 ] - vertices [ p->v0 ]);
+		    N       = temp.Norm();
+		    if (structural_rigidity*N>p->L0)
+		       {
+			 temp *= ( structural_rigidity - p->L0/N );
+			 vertices[ p->v1 ] -= temp;
+		       };
+		  }
+	     else if ( ConstrainedVertices->IsBitSet(p->v1) )
+		  {
+	            temp    = (vertices [ p->v1 ] - vertices [ p->v0 ]);
+		    N       = temp.Norm();
+		    if (structural_rigidity*N>p->L0)
+		       {
+			  temp *= ( structural_rigidity - p->L0/N );
+			  vertices[ p->v0 ] += temp;
+		       };
+		  };					
+	    };
     };
 	
-
-	
-		inline void ApplyShearProvotConstraint()
-	{
-	Constraint* p;
-	csVector3   temp;
-	float       N;
+inline void ApplyShearProvotConstraint()
+       {
+	 Constraint* p;
+	 csVector3   temp;
+	 float       N;
 #if   defined(DYNAMIC_CONSTRAINT)		
-	int size    = shear_fields->Length();  
-	for (int i=0; i < size ; i++ )
+	 int size    = shear_fields->Length();  
+	 for (int i=0; i < size ; i++ )
 #elif defined(STATIC_CONSTRAINT)
-	for (int i=0; i < shearfield_size ; i++ )
+	 for (int i=0; i < shearfield_size ; i++ )
 #endif		
-		{
+	   {
 #if   defined(DYNAMIC_CONSTRAINT)			
-			p       = (Constraint*) shear_fields -> Get( i ); 
+	     p       = (Constraint*) shear_fields -> Get( i ); 
 #elif defined(STATIC_CONSTRAINT)
-			p       = &shear_fields[ i ];
+	     p       = &shear_fields[ i ];
 #endif			
-			if (!( ConstrainedVertices->IsBitSet(p->v0) || ConstrainedVertices->IsBitSet(p->v1) ))
-				{
-					temp    = (vertices [ p->v1 ] - vertices [ p->v0 ]);
-					N       = temp.Norm();
-					if (shear_rigidity*N>p->L0)
-					{
-						temp *= 0.5*( shear_rigidity - p->L0/N ); 
-					    vertices[ p->v0 ] += temp;
-						vertices[ p->v1 ] -= temp;
-					};
-				}
-			else if ( ConstrainedVertices->IsBitSet(p->v0) )
-				{
-					temp    = (vertices [ p->v1 ] - vertices [ p->v0 ]);
-					N       = temp.Norm();
-					if (shear_rigidity*N>p->L0)
-					{
-						temp *= ( shear_rigidity - p->L0/N );
-						vertices[ p->v1 ] -= temp;
-					};
-				}
-			else if ( ConstrainedVertices->IsBitSet(p->v1) )
-				{
-					temp    = (vertices [ p->v1 ] - vertices [ p->v0 ]);
-					N       = temp.Norm();
-					if (shear_rigidity*N>p->L0)
-					{
-						temp *= ( shear_rigidity - p->L0/N );
-						vertices[ p->v0 ] += temp;
-					};
-				};					
-		};
+	     if (!( ConstrainedVertices->IsBitSet(p->v0) || ConstrainedVertices->IsBitSet(p->v1) ))
+		{
+		  temp    = (vertices [ p->v1 ] - vertices [ p->v0 ]);
+		  N       = temp.Norm();
+		  if (shear_rigidity*N>p->L0)
+	             {
+			temp *= 0.5*( shear_rigidity - p->L0/N ); 
+			vertices[ p->v0 ] += temp;
+			vertices[ p->v1 ] -= temp;
+		     };
+		 }
+	     else if ( ConstrainedVertices->IsBitSet(p->v0) )
+		{
+		  temp    = (vertices [ p->v1 ] - vertices [ p->v0 ]);
+		  N       = temp.Norm();
+		  if (shear_rigidity*N>p->L0)
+	             {
+		        temp *= ( shear_rigidity - p->L0/N );
+			vertices[ p->v1 ] -= temp;
+		     };
+		}
+	     else if ( ConstrainedVertices->IsBitSet(p->v1) )
+		{
+		  temp    = (vertices [ p->v1 ] - vertices [ p->v0 ]);
+		  N       = temp.Norm();
+		  if (shear_rigidity*N>p->L0)
+		    {
+		       temp *= ( shear_rigidity - p->L0/N );
+		       vertices[ p->v0 ] += temp;
+		    };
+		};					
+	    };
     };
 	
-
-	
-	
-	
-	
-	inline void Compute()
-	{
-		uint i;
+inline void Compute()
+   {
+      uint i;
 #if defined(EULER_PROVOT)		
-		time += dt;
-		ComputeFields();
-		ComputeShearFields();
+      time += dt;
+      ComputeFields();
+      ComputeShearFields();
 		// WARNING:: this 2nd order reference should be profiled!! can be harmful!!
-		cloth_object -> object_bbox -> StartBoundingBox ( vertices[0] + *(cloth_object->shift) );
-		for (i=0;i<nverts;i++) 
-			{				
-				vertices[i]  += velocities[i]*dt;
-				if ( !ConstrainedVertices->IsBitSet(i) ) 
-					{
-						velocities[i]+= forces[i]*(dt/density); 
-					};
-				forces[i]     = density*gravity;   
-				cloth_object -> object_bbox -> AddBoundingVertexSmart ( vertices[i] + *(cloth_object->shift) );
-			};
+      cloth_object -> object_bbox -> StartBoundingBox ( vertices[0] + *(cloth_object->shift) );
+      for (i=0;i<nverts;i++) 
+        {				
+           vertices[i]  += velocities[i]*dt;
+           if ( !ConstrainedVertices->IsBitSet(i) ) 
+             {
+	       velocities[i]+= forces[i]*(dt/density); 
+	     };
+	   forces[i]     = density*gravity;   
+	   cloth_object -> object_bbox -> AddBoundingVertexSmart ( vertices[i] + *(cloth_object->shift) );
+	};
 		//printf("vertice[0]=%f",(vertices[0] + *cloth_object->shift).x);	
 		//ApplyShearProvotConstraint();	
-		ApplyProvotConstraint();
-		ApplyShearProvotConstraint();	
-		ApplyProvotConstraint();	
+      ApplyProvotConstraint();
+      ApplyShearProvotConstraint();	
+      ApplyProvotConstraint();	
 			
 // <<<<<<<<<<<<<<<-----Predictor Corrector-compute---------->>>>>>>>>>>>>>>			
 #elif defined(AMPC_PROVOT)      // Adams Moulton predictor corrector
 //  <<<<<<<<<<<<<<<<<<<<----------------------------->>>>>>>>>>>>>>>>>
 			
-		time+=dt;	
-	ComputeFields();
-	ComputeShearFields();		
-csVector3* aux2;  //swapping variables
-csVector3* aux3;
+       time+=dt;	
+       ComputeFields();
+       ComputeShearFields();		
+       csVector3* aux2;  //swapping variables
+       csVector3* aux3;
          
-for (i=0;i<nverts;i++)
-{
+       for (i=0;i<nverts;i++)
+        {
 	//predicted vertice positions
 	//IMPORTANT: note that velocities holds at this moment the value holded from velocities3 (t - 3h) which was swapped   
       //predicted velocities 
 	if ( !ConstrainedVertices->IsBitSet(i) ) 
-		{
-			tempvertices[i] = vertices[i]+(dt/24)*( 55*velocities1[i] - 59*velocities2[i] + 37*velocities3[i] - 9*velocities[i] ); 
-			velocities[i]   = friction*velocities1[i]+(dt/(24*density))*( 55*forces[i] - 59*forces1[i] + 37*forces2[i] - 9*forces3[i] );
-			forces3[i]      = density*gravity;
-		}
+	   {
+	      tempvertices[i] = vertices[i]+(dt/24)*( 55*velocities1[i] - 59*velocities2[i] + 37*velocities3[i] - 9*velocities[i] ); 
+	      velocities[i]   = friction*velocities1[i]+(dt/(24*density))*( 55*forces[i] - 59*forces1[i] + 37*forces2[i] - 9*forces3[i] );
+	      forces3[i]      = density*gravity;
+	   }
 	else 
 	{
-		velocities[i]   = 0.0;
-		tempvertices[i] = vertices[i];
-		forces3[i]      = 0.0;
+	      velocities[i]   = 0.0;
+	      tempvertices[i] = vertices[i];
+	      forces3[i]      = 0.0;
 	};
 
 // Now we need to recompute forces for the new vertices to apply corrector, ugh
-};
-aux3              = vertices;
-vertices          = tempvertices; 
-Swap              ();
-ComputeFields     ();   // this evaluation is done on the predicted vertice positions
-ComputeShearFields();
-aux2              = vertices;
-vertices          = aux3;
-tempvertices      = aux2;
-             cloth_object->object_bbox->StartBoundingBox ( *(cloth_object->shift) + vertices[0] );
-for (i=0;i<nverts;i++)
-   {      
+       };
+       aux3              = vertices;
+       vertices          = tempvertices; 
+       Swap              ();
+       ComputeFields     ();   // this evaluation is done on the predicted vertice positions
+       ComputeShearFields();
+       aux2              = vertices;
+       vertices          = aux3;
+       tempvertices      = aux2;
+       cloth_object->object_bbox->StartBoundingBox ( *(cloth_object->shift) + vertices[0] );
+       for (i=0;i<nverts;i++)
+	   {      
        // IMPORTANT: now, velocities is the timestep t - 2h, 
-   if ( !ConstrainedVertices->IsBitSet(i) ) 
-		{   
-	vertices   [i] += (dt/24)*( 9*velocities1[i] + 19*velocities2[i] - 5*velocities3[i] + velocities[i]); 
-	velocities1[i]  = velocities2[i] + (dt/(24*density))*( 9*forces[i] + 19*forces1[i] - 5*forces2[i] + forces3[i]);
-	forces     [i]  = density*gravity;   //clean temporal predicted force buffer and set to default gravity for
+             if ( !ConstrainedVertices->IsBitSet(i) ) 
+                {   
+		  vertices   [i] += (dt/24)*( 9*velocities1[i] + 19*velocities2[i] - 5*velocities3[i] + velocities[i]); 
+		  velocities1[i]  = velocities2[i] + (dt/(24*density))*( 9*forces[i] + 19*forces1[i] - 5*forces2[i] + forces3[i]);
+		  forces     [i]  = density*gravity;   //clean temporal predicted force buffer and set to default gravity for
 		}
-		else 
-			{
-				velocities1[i] = 0.0;
-				forces[i]      = 0.0;
-			};
-	  cloth_object->object_bbox->AddBoundingVertexSmart ( vertices[i] + *(cloth_object->shift) );
-	};
+	     else 
+	        {
+		  velocities1[i] = 0.0;
+		  forces[i]      = 0.0;
+		};
+	    cloth_object->object_bbox->AddBoundingVertexSmart ( vertices[i] + *(cloth_object->shift) );
+	   };
 	ApplyShearProvotConstraint();
 	ApplyProvotConstraint();
+	//ApplyShearProvotConstraint();
 	//ApplyProvotConstraint();
 	//ApplyProvotConstraint();
 	
 #endif 			
-	};
+   };
 	
-	inline void Update(uint /*msec*/)
-	{
+inline void Update(uint /*msec*/)
+    {
 		//do
 			//{
-				Compute();
-		        //printf("compute!");
-			//} while (time*1000<msec);				
+		//int u= (int)time;
+	Compute();
+		//if ( u!=((int)time)) 
+			//{ gravity.z+=0.1*gravity.x ; 
+			 // gravity.x-=0.1*gravity.z ;	};
+		       		
     };
 	
 		
