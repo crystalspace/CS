@@ -50,15 +50,16 @@ bool SysSystemDriver::GetInstallPath (char *oInstallPath, size_t iBufferSize)
   if(!path || !*path)
   {
     // no setting, use the default.
-    // is /usr/local/crystal a possible install? try opening vfs.cfg,
-    FILE *test = fopen("/usr/local/crystal/vfs.cfg", "r");
-    if(test==0)
+    // is the current dir a possible install? try opening vfs.cfg,
+    FILE *test = fopen("vfs.cfg", "r");
+    if(test!=0)
     {
-      // /usr/local/crystal is not valid. use current directory ""
+      // use current directory ""
+      fclose(test);
       strncpy(oInstallPath, "", iBufferSize);
       return true;
     }
-    fclose(test);
+    /// default.
     strncpy(oInstallPath, "/usr/local/crystal/", iBufferSize);
     return true;
   }
