@@ -59,6 +59,10 @@
 // removed eventually, when all platforms have been updated.
 //#define USE_EXTENSIONS 1
 
+// Define the following if you want to use an experimental stencil buffer
+// feature.
+//#define USE_STENCIL 1
+
 // ---------------------------------------------------------------------------
 
 // if you figure out how to support OpenGL extensions on your
@@ -507,8 +511,7 @@ void csGraphics3DOGLCommon::SetClipper (csVector2* vertices, int num_vertices)
   // even in cases where a box clipper would be better. We should
   // have a special SetBoxClipper call in iGraphics3D.
   clipper = new csPolygonClipper (vertices, num_vertices, false, true);
-#define EXP_STENCIL 0
-#if EXP_STENCIL
+#if USE_STENCIL
   if (true)
   {
     // First set up the stencil area.
@@ -522,6 +525,7 @@ void csGraphics3DOGLCommon::SetClipper (csVector2* vertices, int num_vertices)
     glColor4f (0, 0, 0, 0);
     glShadeModel (GL_FLAT);
     glDisable (GL_TEXTURE_2D);
+    glDisable (GL_DEPTH_TEST);
     glEnable (GL_BLEND);
     glBlendFunc (GL_ZERO, GL_ONE);
     glBegin (GL_TRIANGLE_FAN);
@@ -1421,7 +1425,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   // handle.  This includes software clipping.
   if (mesh.do_clip && clipper)
   {
-#if EXP_STENCIL
+#if USE_STENCIL
     if (true)
     {
       // Use the stencil area.
@@ -1774,7 +1778,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   glMatrixMode (GL_PROJECTION);
   glPopMatrix ();
 
-#if EXP_STENCIL
+#if USE_STENCIL
   if (mesh.do_clip && clipper)
   {
     if (true)
