@@ -15,7 +15,7 @@ Cal3D library.
 
 @@@@@@ WRITE ME: Please cover more topics.
 
-@subsubheading Example
+@subsubheading Making the model
 
 This is an example of how to load and view a cal3d file with viewmesh.
 
@@ -104,6 +104,32 @@ Select test.cal3d from the list of files.
 
 You should be able to see the Cally model, completely green.
 
+@subsubheading Displaying the model
+
+We now show you how to edit simple1 in order to load the CAL3D
+model.
+
+Add this to "apps/tutorial/simple1/simple1.cpp",
+at the end of "bool Simple::Initialize ()".
+@example
+csRef<iVFS> VFS (CS_QUERY_REGISTRY (object_reg, iVFS));
+VFS->ChDir ("/this/");//Why the ... is this necessary?
+csRef<iMeshFactoryWrapper> imeshfact (loader->LoadMeshObjectFactory (
+      "/this/test.cal3d"));
+if (imeshfact == 0)
+{
+  csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.application.simple1",
+      "Error loading mesh object factory!");
+  return false;
+}
+csRef<iMeshWrapper> sprite = engine->CreateMeshWrapper(
+    imeshfact, "Hulk", room,
+    csVector3 (0, 4, 0));
+@end example
+
+Now build simple1 (jam simple1) and run it from the CS directory.
+You should be looking right at the model.
 
 
 @subsubheading Morph Animations
