@@ -104,7 +104,9 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObject::eiShaderVariableAccessor)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 #endif
 
-csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
+csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
+	pseudoDynInfo (29, 32),
+	affecting_lights (29, 32)
 {
   SCF_CONSTRUCT_IBASE (0);
   //SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
@@ -318,42 +320,42 @@ bool csGenmeshMeshObject::ReadFromCache (iCacheManager* cache_mgr)
       int v;
       for (v = 0; v < num_lit_mesh_colors; v++)
       {
-    csColor& c = static_mesh_colors[v];
-    uint8 b;
-    if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b)) goto stop;
-    c.red = (float)b / (float)CS_NORMAL_LIGHT_LEVEL;
-    if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b)) goto stop;
-    c.green = (float)b / (float)CS_NORMAL_LIGHT_LEVEL;
-    if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b)) goto stop;
-    c.blue = (float)b / (float)CS_NORMAL_LIGHT_LEVEL;
+	csColor& c = static_mesh_colors[v];
+	uint8 b;
+	if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b)) goto stop;
+	c.red = (float)b / (float)CS_NORMAL_LIGHT_LEVEL;
+	if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b)) goto stop;
+	c.green = (float)b / (float)CS_NORMAL_LIGHT_LEVEL;
+	if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b)) goto stop;
+	c.blue = (float)b / (float)CS_NORMAL_LIGHT_LEVEL;
       }
 
       uint8 c;
       if (mf.Read ((char*)&c, sizeof (c)) != sizeof (c)) goto stop;
       while (c != 0)
       {
-    char lid[16];
-    if (mf.Read (lid, 16) != 16) goto stop;
-    iLight *l = factory->engine->FindLightID (lid);
-    if (!l) goto stop;
-    l->AddAffectedLightingInfo (&scfiLightingInfo);
+	char lid[16];
+	if (mf.Read (lid, 16) != 16) goto stop;
+	iLight *l = factory->engine->FindLightID (lid);
+	if (!l) goto stop;
+	l->AddAffectedLightingInfo (&scfiLightingInfo);
 
-    csShadowArray* shadowArr = new csShadowArray();
-    float* intensities = new float[num_lit_mesh_colors];
-    shadowArr->shadowmap = intensities;
-    for (int n = 0; n < num_lit_mesh_colors; n++)
-    {
-      uint8 b;
-      if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b))
-      {
-        delete shadowArr;
-        goto stop;
-      }
-      intensities[n] = (float)b / (float)CS_NORMAL_LIGHT_LEVEL;
-    }
-    pseudoDynInfo.Put (l, shadowArr);
+	csShadowArray* shadowArr = new csShadowArray();
+	float* intensities = new float[num_lit_mesh_colors];
+	shadowArr->shadowmap = intensities;
+	for (int n = 0; n < num_lit_mesh_colors; n++)
+	{
+          uint8 b;
+          if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b))
+          {
+            delete shadowArr;
+            goto stop;
+          }
+          intensities[n] = (float)b / (float)CS_NORMAL_LIGHT_LEVEL;
+	}
+	pseudoDynInfo.Put (l, shadowArr);
 
-    if (mf.Read ((char*)&c, sizeof (c)) != sizeof (c)) goto stop;
+        if (mf.Read ((char*)&c, sizeof (c)) != sizeof (c)) goto stop;
       }
       rc = true;
     }

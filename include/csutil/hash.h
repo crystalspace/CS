@@ -138,7 +138,7 @@ public:
     : Elements (size), Modulo (size), InitModulo (size),
       GrowRate (grow_rate), MaxSize (max_size), Size (0)
   {
-    Elements.SetLength (size, csArray<Element> (1, 7));
+    Elements.SetLength (size, csArray<Element> (0, 8));
   }
 
   /// Copy constructor.

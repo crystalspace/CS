@@ -17,6 +17,11 @@ chronological order.
 	  handling a bit faster.
 	- Jorrit made the rapid plugin a bit more optimal (memory usage) by
 	  using indexed triangles instead of triangles containing vectors.
+	- Jorrit optimized csHash by allocating the buckets with empty
+	  elements instead of one.
+	- Jorrit did a big optimization in genmesh by allocating the
+	  hashes more efficiently (they don't need a hash that is preallocated
+	  at 257 items).
 19-Feb-2004
 	- res made the following changes:
 	    - A few minor cosmetic changes.
