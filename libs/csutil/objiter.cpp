@@ -31,24 +31,34 @@ csTypedObjectIterator::~csTypedObjectIterator ()
 void csTypedObjectIterator::FetchObject ()
 {
   CurrentTypedObject = 0;
-  if (iter->IsFinished ())
+  if (!iter->HasNext ())
     return;
 
   scfInterfaceID id;
   int ver;
   GetRequestedInterface (id, ver);
 
-  CurrentTypedObject = csPtr<iBase> (
-  	(iBase*)(iter->GetObject ()->QueryInterface (id, ver)));
-  while (!CurrentTypedObject && !iter->IsFinished ())
+  while (iter->HasNext ())
   {
-    iter->Next ();
-    if (iter->IsFinished ())
-    {
-      return;
-    }
     CurrentTypedObject = csPtr<iBase> (
-  	(iBase*)(iter->GetObject ()->QueryInterface (id, ver)));
+  	(iBase*)(iter->Next ()->QueryInterface (id, ver)));
+    if (CurrentTypedObject) return;
   }
+}
+
+iBase* csTypedObjectIterator::FindName (const char* name)
+{
+  iObject* obj = iter->FindName (name);
+  if (obj)
+  {
+    scfInterfaceID id;
+    int ver;
+    GetRequestedInterface (id, ver);
+    CurrentTypedObject = csPtr<iBase> (
+  	(iBase*)(obj->QueryInterface (id, ver)));
+  }
+  else
+    CurrentTypedObject = 0;
+  return CurrentTypedObject;
 }
 

@@ -42,24 +42,21 @@ class csBox3;
 class csSphere;
 class csFlags;
 
-SCF_VERSION (iVisibilityObjectIterator, 0, 0, 1);
+SCF_VERSION (iVisibilityObjectIterator, 0, 1, 0);
 
 /**
  * Iterator to iterate over some visibility objects.
  */
 struct iVisibilityObjectIterator : public iBase
 {
-  /// Move forward.
-  virtual bool Next () = 0;
+  /// Are there more elements?
+  virtual bool HasNext () const = 0;
+
+  /// Get next element.
+  virtual iVisibilityObject* Next () = 0;
 
   /// Reset the iterator to the beginning.
   virtual void Reset () = 0;
-
-  /// Get the object we are pointing at.
-  virtual iVisibilityObject* GetObject () const = 0;
-
-  /// Check if we have any more children.
-  virtual bool IsFinished () const = 0;
 };
 
 SCF_VERSION (iVisibilityCuller, 0, 3, 2);

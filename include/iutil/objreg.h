@@ -112,7 +112,7 @@ struct iObjectRegistry : public iBase
   virtual csPtr<iObjectRegistryIterator> Get () = 0;
 };
 
-SCF_VERSION (iObjectRegistryIterator, 0, 0, 1);
+SCF_VERSION (iObjectRegistryIterator, 0, 1, 0);
 
 /**
  * Use an instance of this class to iterate over objects in the object
@@ -124,12 +124,7 @@ struct iObjectRegistryIterator : public iBase
    * Restart the iterator. Returns false if there are no ellements
    * in it.
    */
-  virtual bool Restart () = 0;
-
-  /**
-   * Get the current element. Return 0 if none (end of list).
-   */
-  virtual iBase* GetCurrent () = 0;
+  virtual bool Reset () = 0;
 
   /**
    * Return the current tag.
@@ -137,9 +132,14 @@ struct iObjectRegistryIterator : public iBase
   virtual const char* GetCurrentTag () = 0;
 
   /**
-   * Proceed with next element. Return true if there is one.
+   * Return true if there are more elements.
    */
-  virtual bool Next () = 0;
+  virtual bool HasNext () = 0;
+
+  /**
+   * Proceed with next element. Return the element is there is one.
+   */
+  virtual iBase* Next () = 0;
 };
 
 /** @} */

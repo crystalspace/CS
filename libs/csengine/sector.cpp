@@ -779,10 +779,9 @@ iPolygon3D *csSector::IntersectSegment (
   b.AddBoundingVertexSmart (end);
   csRef<iVisibilityObjectIterator> visit = culler->VisTest (b);
 
-  while (!visit->IsFinished ())
+  while (visit->HasNext ())
   {
-    iVisibilityObject* vo = visit->GetObject ();
-    visit->Next ();
+    iVisibilityObject* vo = visit->Next ();
     iMeshWrapper* mesh = vo->GetMeshWrapper ();
     if (!mesh || mesh->GetFlags ().Check (CS_ENTITY_INVISIBLE)) continue;
 
@@ -1479,11 +1478,10 @@ void csSector::DrawShadow (iRenderView* rview, iLight* light)
 
   csRef<iVisibilityObjectIterator> objInShadow = culler->VisTest (planes, 5);
 
-  while (!objInShadow->IsFinished() )
+  while (objInShadow->HasNext() )
   {
-    iMeshWrapper *sp = objInShadow->GetObject() ->GetMeshWrapper ();
+    iMeshWrapper *sp = objInShadow->Next() ->GetMeshWrapper ();
     sp->GetMeshObject ()->EnableShadowCaps ();
-    objInShadow->Next();
     number++;
   }
 
@@ -1496,10 +1494,10 @@ void csSector::DrawShadow (iRenderView* rview, iLight* light)
   
   csVector3 rad, center;
   float maxRadius = 0;
-  while (!objInLight->IsFinished ())
+  while (objInLight->HasNext ())
   {
     number++;
-    iMeshWrapper *sp = objInLight->GetObject() ->GetMeshWrapper ();
+    iMeshWrapper *sp = objInLight->Next() ->GetMeshWrapper ();
     if (sp) 
     {
       sp->GetRadius (rad, center);
@@ -1527,16 +1525,14 @@ void csSector::DrawShadow (iRenderView* rview, iLight* light)
         }
       } 
     }
-    objInLight->Next ();
   }
 
   //disable the reverses
   objInShadow->Reset ();
-  while (!objInShadow->IsFinished() )
+  while (objInShadow->HasNext() )
   {
-    iMeshWrapper *sp = objInShadow->GetObject() ->GetMeshWrapper ();
+    iMeshWrapper *sp = objInShadow->Next() ->GetMeshWrapper ();
     sp->GetMeshObject ()->DisableShadowCaps ();
-    objInShadow->Next();
   }  
   //printf ("%x - %d\n",(int)light, number);
 #endif

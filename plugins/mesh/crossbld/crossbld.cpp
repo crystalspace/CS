@@ -102,15 +102,14 @@ bool csCrossBuilder::BuildThing (iModelDataObject *Object,
 
   // copy the polygons
   csRef<iObjectIterator> it (Object->QueryObject ()->GetIterator ());
-  while (!it->IsFinished ())
+  while (it->HasNext ())
   {
     // test if this is a valid polygon
     // @@@ MEMORY LEAK???
     csRef<iModelDataPolygon> Polygon (
-      SCF_QUERY_INTERFACE (it->GetObject (), iModelDataPolygon));
+      SCF_QUERY_INTERFACE (it->Next (), iModelDataPolygon));
     if (!Polygon || Polygon->GetVertexCount () < 3)
     {
-      it->Next ();
       continue;
     }
     iPolygon3DStatic *ThingPoly = tgt->CreatePolygon ();
@@ -134,8 +133,6 @@ bool csCrossBuilder::BuildThing (iModelDataObject *Object,
       Vertices->GetTexel (Polygon->GetTexel(1)),
       Vertices->GetVertex (Polygon->GetVertex (2)),
       Vertices->GetTexel (Polygon->GetTexel(2)));
-
-    it->Next ();
   }
 
   return true;
@@ -155,7 +152,7 @@ iMeshFactoryWrapper *csCrossBuilder::BuildSpriteFactoryHierarchy (
   csRef<iMeshFactoryWrapper> MainWrapper;
 
   csModelDataObjectIterator it (Scene->QueryObject ());
-  while (!it.IsFinished ())
+  while (it.HasNext ())
   {
     csRef<iMeshFactoryWrapper> SubWrapper (Engine->CreateMeshFactory (
       "crystalspace.mesh.object.sprite.3d", 0));
@@ -176,7 +173,7 @@ iMeshFactoryWrapper *csCrossBuilder::BuildSpriteFactoryHierarchy (
     }
 
     sfState->SetMaterialWrapper (DefaultMaterial);
-    BuildSpriteFactory (it.Get (), sfState);
+    BuildSpriteFactory (it.Next (), sfState);
 
     if (MainWrapper)
     {
@@ -185,8 +182,6 @@ iMeshFactoryWrapper *csCrossBuilder::BuildSpriteFactoryHierarchy (
     }
     else
       MainWrapper = SubWrapper;
-
-    it.Next ();
   }
 
   MainWrapper->IncRef ();	// IncRef() to avoid smart pointer release.

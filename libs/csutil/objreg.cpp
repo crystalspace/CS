@@ -38,10 +38,10 @@ public:
   void Add (iBase* obj, char const* tag);
 
   SCF_DECLARE_IBASE;
-  virtual bool Restart ();
-  virtual iBase* GetCurrent ();
+  virtual bool Reset ();
   virtual const char* GetCurrentTag ();
-  virtual bool Next ();
+  virtual bool HasNext ();
+  virtual iBase* Next ();
 };
 
 SCF_IMPLEMENT_IBASE (csObjectRegistryIterator)
@@ -71,17 +71,11 @@ csObjectRegistryIterator::~csObjectRegistryIterator ()
   }
 }
 
-bool csObjectRegistryIterator::Restart ()
+bool csObjectRegistryIterator::Reset ()
 {
   cur_idx = 0;
   if (objects.Length () <= 0) return false;
   return true;
-}
-
-iBase* csObjectRegistryIterator::GetCurrent ()
-{
-  if (cur_idx >= objects.Length ()) return 0;
-  return (iBase*)objects[cur_idx];
 }
 
 const char* csObjectRegistryIterator::GetCurrentTag ()
@@ -90,11 +84,17 @@ const char* csObjectRegistryIterator::GetCurrentTag ()
   return (const char*)tags[cur_idx];
 }
 
-bool csObjectRegistryIterator::Next ()
+bool csObjectRegistryIterator::HasNext ()
 {
-  if (cur_idx >= objects.Length ()-1) return false;
-  cur_idx++;
+  if (cur_idx >= objects.Length ()) return false;
   return true;
+}
+
+iBase* csObjectRegistryIterator::Next ()
+{
+  cur_idx++;
+  if (cur_idx >= objects.Length ()) return 0;
+  return (iBase*)objects[cur_idx];
 }
 
 void csObjectRegistryIterator::Add (iBase* obj, char const* tag)

@@ -62,9 +62,9 @@ void csRegion::DeleteAll ()
   // messing up the iterator while we are deleting them.
   csPArray<iObject> copy;
   iter = GetIterator ();
-  for ( ; !iter->IsFinished (); iter->Next ())
+  while (iter->HasNext ())
   {
-    iObject *o = iter->GetObject ();
+    iObject *o = iter->Next ();
     copy.Push (o);
   }
 
@@ -203,10 +203,10 @@ bool csRegion::PrepareTextures ()
   // First register all textures to the texture manager.
   {
     iter = GetIterator ();
-    for ( ; !iter->IsFinished (); iter->Next ())
+    while (iter->HasNext ())
     {
       csRef<iTextureWrapper> csth (SCF_QUERY_INTERFACE (
-          iter->GetObject (),
+          iter->Next (),
           iTextureWrapper));
       if (csth)
       {
@@ -221,10 +221,10 @@ bool csRegion::PrepareTextures ()
   //@@@ Only prepare new textures: txtmgr->PrepareTextures ();
   {
     iter = GetIterator ();
-    for ( ; !iter->IsFinished (); iter->Next ())
+    while (iter->HasNext ())
     {
       csRef<iTextureWrapper> csth (SCF_QUERY_INTERFACE (
-          iter->GetObject (),
+          iter->Next (),
           iTextureWrapper));
       if (csth)
         csth->GetTextureHandle ()->Prepare ();
@@ -234,10 +234,10 @@ bool csRegion::PrepareTextures ()
   // Then register all materials to the texture manager.
   {
     iter = GetIterator ();
-    for ( ; !iter->IsFinished (); iter->Next ())
+    while (iter->HasNext ())
     {
       csRef<iMaterialWrapper> csmh (SCF_QUERY_INTERFACE (
-          iter->GetObject (),
+          iter->Next (),
           iMaterialWrapper));
       if (csmh)
         if (!csmh->GetMaterialHandle ()) csmh->Register (txtmgr);
@@ -248,10 +248,10 @@ bool csRegion::PrepareTextures ()
   //@@@ Only prepare new materials: txtmgr->PrepareMaterials ();
   {
     iter = GetIterator ();
-    for ( ; !iter->IsFinished (); iter->Next ())
+    while (iter->HasNext ())
     {
       csRef<iMaterialWrapper> csmh (SCF_QUERY_INTERFACE (
-          iter->GetObject (),
+          iter->Next (),
           iMaterialWrapper));
       if (csmh)
         csmh->GetMaterialHandle ()->Prepare ();

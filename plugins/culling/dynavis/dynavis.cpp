@@ -109,16 +109,14 @@ public:
     else delete vector;
   }
 
-  virtual bool Next()
+  virtual iVisibilityObject* Next()
   {
-    if (position < 0) return false;
+    if (position < 0) return 0;
+    iVisibilityObject* vo = (iVisibilityObject*)(vector->Get (position));
     position++;
     if (position == vector->Length ())
-    {
       position = -1;
-      return false;
-    }
-    return true;
+    return vo;
   }
 
   virtual void Reset()
@@ -129,13 +127,9 @@ public:
       position = 0;
   }
 
-  virtual iVisibilityObject* GetObject () const
+  virtual bool HasNext () const
   {
-    return (iVisibilityObject*)(vector->Get (position));
-  }
-  virtual bool IsFinished () const
-  {
-    return (position < 0);
+    return (position >= 0 && position <= vector->Length ());
   }
 };
 

@@ -347,13 +347,12 @@ void GenerateThing (iObjectRegistry* object_reg,
       iMeshObjectType);
 
   it->Reset();
-  while(!it->IsFinished())
+  while(it->HasNext())
   {
-    csRef<iModelDataObject> mdo (SCF_QUERY_INTERFACE(it->GetObject(),
+    csRef<iModelDataObject> mdo (SCF_QUERY_INTERFACE(it->Next(),
 		                    iModelDataObject));
     if(!mdo)
     {
-      it->Next();
       continue;
     }
     csRef<iMeshObjectFactory> thingFactory (thingType->NewFactory());
@@ -396,8 +395,6 @@ void GenerateThing (iObjectRegistry* object_reg,
     thingWrapper->GetMovable()->SetSector(sector);
     thingWrapper->GetMovable()->UpdateMove();
     thingWrapper->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
-
-    it->Next();
   }
 }
 
@@ -618,13 +615,11 @@ char* LookForKeyValue (iObjectIterator* it,const char* key)
 {
   char* value = new char[1024];
   it->Reset();
-  while(!it->IsFinished())
+  while (it->HasNext())
   {
-    csRef<iKeyValuePair> kp (
-    	SCF_QUERY_INTERFACE(it->GetObject(),iKeyValuePair));
+    csRef<iKeyValuePair> kp = SCF_QUERY_INTERFACE(it->Next(),iKeyValuePair);
     if(!kp)
     {
-      it->Next();
       continue;
     }
     if(!strcmp(key,kp->GetKey()))
@@ -632,7 +627,6 @@ char* LookForKeyValue (iObjectIterator* it,const char* key)
       strcpy(value ,kp->GetValue());
       return value;
     }
-    it->Next();
   }
   delete[] value;
   return 0;
@@ -729,17 +723,15 @@ void RegisterMaterials(iObjectIterator* it,iEngine* Engine,
   csRef<iKeyValuePair> kp;
   it->Reset();
 
-  while(!it->IsFinished())
+  while(it->HasNext())
   {
-    kp = SCF_QUERY_INTERFACE(it->GetObject(),iKeyValuePair);
+    kp = SCF_QUERY_INTERFACE(it->Next(),iKeyValuePair);
     if(!kp)
     {
-      it->Next();
       continue;
     }
     if(strcmp("defmaterial",kp->GetKey()))
     {
-      it->Next();
       continue;
     }
     matName = LookForMaterialName(kp->GetValue());
@@ -748,7 +740,6 @@ void RegisterMaterials(iObjectIterator* it,iEngine* Engine,
     if (matList->FindByName(matName))
     {
       //Is registered, let's go to another material
-      it->Next();
       delete [] matName;
     }
     else
@@ -760,7 +751,6 @@ void RegisterMaterials(iObjectIterator* it,iEngine* Engine,
         printf("Error loading %s texture!!",textFileName);
       }
       //Material registered, let's go to another one
-      it->Next();
       delete [] matName;
       delete [] textFileName;
     }
@@ -854,32 +844,30 @@ void WalkTest::ParseKeyNodes(iObject* src)
   csRef<iObjectIterator> it (src->GetIterator());
   csRef<iSector> sector (SCF_QUERY_INTERFACE(src,iSector));
 
-  while(!it->IsFinished())
+  while(it->HasNext())
   {
-    csRef<iMapNode> node (SCF_QUERY_INTERFACE(it->GetObject(), iMapNode));
+    iObject* node_obj = it->Next ();
+    csRef<iMapNode> node (SCF_QUERY_INTERFACE(node_obj, iMapNode));
     if(!node)
     {
-      it->Next();
       continue;
     }
-    csRef<iObjectIterator> it2 (it->GetObject()->GetIterator());
+    csRef<iObjectIterator> it2 (node_obj->GetIterator());
 
     BuildObject(object_reg, sector,it2, Engine, node->GetPosition(), myG3D,
 		LevelLoader, object_reg);
-    it->Next();
   }
 }
 
 void WalkTest::ParseKeyCmds (iObject* src)
 {
   csRef<iObjectIterator> it (src->GetIterator ());
-  while (!it->IsFinished ())
+  while (it->HasNext ())
   {
     csRef<iKeyValuePair> kp (
-    	SCF_QUERY_INTERFACE (it->GetObject (), iKeyValuePair));
+    	SCF_QUERY_INTERFACE (it->Next (), iKeyValuePair));
     if (!kp)
     {
-      it->Next ();
       continue;
     }
     if (!strcmp (kp->GetKey (), "cmd_AnimateSky"))
@@ -952,7 +940,6 @@ void WalkTest::ParseKeyCmds (iObject* src)
     {
       // Unknown command. Ignore for the moment.
     }
-    it->Next ();
   }
 
   csRef<iMeshWrapper> mesh (SCF_QUERY_INTERFACE (src, iMeshWrapper));
@@ -996,13 +983,12 @@ void WalkTest::ParseKeyCmds ()
 void WalkTest::ActivateObject (iObject* src)
 {
   csRef<iObjectIterator> it (src->GetIterator ());
-  while (!it->IsFinished ())
+  while (it->HasNext ())
   {
-    csRef<csWalkEntity> wentity (SCF_QUERY_INTERFACE (it->GetObject (),
+    csRef<csWalkEntity> wentity (SCF_QUERY_INTERFACE (it->Next (),
     	csWalkEntity));
     if (wentity)
       wentity->Activate ();
-    it->Next ();
   }
 }
 
@@ -2118,8 +2104,9 @@ bool CommandHandler (const char *cmd, const char *arg)
     RECORD_CMD (cmd);
     csRef<iLightIterator> lit (Sys->view->GetEngine ()->GetLightIterator ());
     iLight* l;
-    while ((l = lit->Fetch ()) != 0)
+    while (lit->HasNext ())
     {
+      l = lit->Next ();
       l->SetColor (csColor (0, 0, 0));
     }
   }

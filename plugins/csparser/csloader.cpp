@@ -183,10 +183,11 @@ iLight* StdLoaderContext::FindLight (const char *name)
   csRef<iLightIterator> li = Engine->GetLightIterator(region);
   iLight *light;
 
-  while ((light = li->Fetch ()) != 0)
+  while (li->HasNext ())
   {
-      if (!strcmp (light->GetPrivateObject ()->GetName (),name))
-	  return light;
+    light = li->Next ();
+    if (!strcmp (light->GetPrivateObject ()->GetName (),name))
+      return light;
   }
   return 0;
 }
@@ -298,10 +299,11 @@ iLight* ThreadedLoaderContext::FindLight (const char *name)
   csRef<iLightIterator> li = Engine->GetLightIterator(region);
   iLight *light;
 
-  while ((light = li->Fetch ()) != 0)
+  while (li->HasNext ())
   {
-      if (!strcmp (light->GetPrivateObject ()->GetName (),name))
-	  return light;
+    light = li->Next ();
+    if (!strcmp (light->GetPrivateObject ()->GetName (),name))
+      return light;
   }
   return 0;
 }

@@ -202,10 +202,9 @@ int FindSectors (csVector3 v, csVector3 d, iSector *s, iSector **sa)
   // @@@ Avoid this sqrt somehow? i.e. by having it in the objects.
   float size = qsqrt (d.x * d.x + d.y * d.y + d.z * d.z);
   csRef<iSectorIterator> it (Sys->Engine->GetNearbySectors (s, v, size));
-  iSector* sector;
-  while ((sector = it->Fetch ()) != 0)
+  while (it->HasNext ())
   {
-    sa[c++] = sector;
+    sa[c++] = it->Next ();
     if (c >= MAXSECTORSOCCUPIED) break;
   }
   return c;
@@ -222,9 +221,9 @@ int CollisionDetect (iEngine* Engine, csColliderWrapper *c, iSector* sp,
 
   csRef<iObjectIterator> objit (Engine->GetNearbyObjects (sp,
 	cdt->GetOrigin (), 3));		// 3 should be enough for moving around.
-  while (!objit->IsFinished ())
+  while (objit->HasNext ())
   {
-    iObject* mw_obj = objit->GetObject ();
+    iObject* mw_obj = objit->Next ();
     csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (mw_obj, iMeshWrapper));
     if (mw)
     {
@@ -240,7 +239,6 @@ int CollisionDetect (iEngine* Engine, csColliderWrapper *c, iSector* sp,
         return 1;
       // TODO, should test which one is the closest.
     }
-    objit->Next ();
   }
 
   return hit;

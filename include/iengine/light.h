@@ -391,7 +391,7 @@ struct iLightingProcessInfo : public iFrustumViewUserdata
   virtual void FinalizeLighting () = 0;
 };
 
-SCF_VERSION (iLightIterator, 0, 0, 1);
+SCF_VERSION (iLightIterator, 0, 1, 0);
 
 /**
  * Iterator to iterate over all static lights in the engine.
@@ -401,14 +401,18 @@ SCF_VERSION (iLightIterator, 0, 0, 1);
  */
 struct iLightIterator : public iBase
 {
-  /// Restart iterator.
-  virtual void Restart () = 0;
+  /// Return true if there are more elements.
+  virtual bool HasNext () = 0;
 
   /// Get light from iterator. Return 0 at end.
-  virtual iLight* Fetch () = 0;
+  virtual iLight* Next () = 0;
 
   /// Get the sector for the last fetched light.
   virtual iSector* GetLastSector () = 0;
+
+  /// Restart iterator.
+  virtual void Reset () = 0;
+
 };
 
 /** @} */

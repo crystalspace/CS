@@ -312,8 +312,7 @@ void csEngineMeshList::FreeItem (iMeshWrapper* mesh)
  * in the engine while it is being used.
  * If changes to the engine happen the results are unpredictable.
  */
-class csSectorIt :
-  public iSectorIterator
+class csSectorIt : public iSectorIterator
 {
 private:
   // The position and radius.
@@ -334,6 +333,13 @@ private:
 
   // Last position (from Fetch).
   csVector3 last_pos;
+
+  // Current sector.
+  iSector* current_sector;
+
+  /// Get sector from iterator. Return 0 at end.
+  iSector *FetchNext ();
+
 public:
   /// Construct an iterator and initialize to start.
   csSectorIt (iSector *sector, const csVector3 &pos, float radius);
@@ -344,10 +350,13 @@ public:
   SCF_DECLARE_IBASE;
 
   /// Restart iterator.
-  virtual void Restart ();
+  virtual void Reset ();
+
+  /// Return true if there are more elements.
+  virtual bool HasNext ();
 
   /// Get sector from iterator. Return 0 at end.
-  virtual iSector *Fetch ();
+  virtual iSector *Next ();
 
   /**
    * Get last position that was used from Fetch. This can be
@@ -380,15 +389,14 @@ public:
   SCF_DECLARE_IBASE;
 
   virtual void Reset ();
-  virtual bool Next ();
-  virtual iObject *GetObject () const;
-  virtual bool IsFinished () const;
+  virtual iObject* Next ();
+  virtual bool HasNext () const;
   virtual iObject *GetParentObj () const
   {
     return 0;
   }
 
-  virtual bool FindName (const char *name)  { (void)name; return false; }
+  virtual iObject* FindName (const char *name)  { (void)name; return 0; }
 };
 
 //---------------------------------------------------------------------------
@@ -402,7 +410,7 @@ csLightIt::csLightIt (csEngine *e, iRegion *r) :
   region(r)
 {
   SCF_CONSTRUCT_IBASE (0);
-  Restart ();
+  Reset ();
 }
 
 bool csLightIt::NextSector ()
@@ -416,13 +424,14 @@ bool csLightIt::NextSector ()
   return true;
 }
 
-void csLightIt::Restart ()
+void csLightIt::Reset ()
 {
   sector_idx = -1;
   light_idx = 0;
+  current_light = NULL;
 }
 
-iLight *csLightIt::Fetch ()
+iLight *csLightIt::FetchNext ()
 {
   iSector *sector;
   if (sector_idx == -1)
@@ -444,10 +453,29 @@ iLight *csLightIt::Fetch ()
     if (!NextSector ()) return 0;
 
     // Initialize iterator to start of sector and recurse.
-    return Fetch ();
+    return FetchNext ();
   }
 
   return sector->GetLights ()->Get (light_idx);
+}
+
+bool csLightIt::HasNext ()
+{
+  if (current_light != NULL) return true;
+  current_light = FetchNext ();
+  return current_light != NULL;
+}
+
+iLight *csLightIt::Next ()
+{
+  if (current_light == NULL)
+  {
+    current_light = FetchNext ();
+  }
+
+  iLight* l = current_light;
+  current_light = NULL;
+  return l;
 }
 
 iSector *csLightIt::GetLastSector ()
@@ -471,7 +499,7 @@ csSectorIt::csSectorIt (
   csSectorIt::radius = radius;
   recursive_it = 0;
 
-  Restart ();
+  Reset ();
 }
 
 csSectorIt::~csSectorIt ()
@@ -479,21 +507,22 @@ csSectorIt::~csSectorIt ()
   delete recursive_it;
 }
 
-void csSectorIt::Restart ()
+void csSectorIt::Reset ()
 {
   cur_poly = -1;
   delete recursive_it;
   recursive_it = 0;
   has_ended = false;
+  current_sector = NULL;
 }
 
-iSector *csSectorIt::Fetch ()
+iSector *csSectorIt::FetchNext ()
 {
   if (has_ended) return 0;
 
   if (recursive_it)
   {
-    iSector *rc = recursive_it->Fetch ();
+    iSector *rc = recursive_it->FetchNext ();
     if (rc)
     {
       last_pos = recursive_it->GetLastPosition ();
@@ -515,6 +544,26 @@ iSector *csSectorIt::Fetch ()
   has_ended = true;
   return 0;
 }
+
+bool csSectorIt::HasNext ()
+{
+  if (current_sector != NULL) return true;
+  current_sector = FetchNext ();
+  return current_sector != NULL;
+}
+
+iSector *csSectorIt::Next ()
+{
+  if (current_sector == NULL)
+  {
+    current_sector = FetchNext ();
+  }
+
+  iSector* s = current_sector;
+  current_sector = NULL;
+  return s;
+}
+
 
 //---------------------------------------------------------------------------
 
@@ -540,23 +589,18 @@ void csObjectListIt::Reset ()
   cur_idx = 0;
 }
 
-bool csObjectListIt::Next ()
+iObject* csObjectListIt::Next ()
 {
+printf ("csObjectListIt::Next\n"); fflush (stdout);
+  if (cur_idx >= num_objects) return 0;
   cur_idx++;
+  return (*list)[cur_idx-1];
+}
+
+bool csObjectListIt::HasNext () const
+{
+printf ("csObjectListIt::HasNext\n"); fflush (stdout);
   return cur_idx < num_objects;
-}
-
-iObject *csObjectListIt::GetObject () const
-{
-  if (cur_idx < num_objects)
-    return (*list)[cur_idx];
-  else
-    return 0;
-}
-
-bool csObjectListIt::IsFinished () const
-{
-  return cur_idx >= num_objects;
 }
 
 //---------------------------------------------------------------------------
@@ -1241,8 +1285,8 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
   // Count number of lights to process.
   iLight *l;
   int light_count = 0;
-  lit->Restart();
-  while (lit->Fetch()) light_count++;
+  lit->Reset ();
+  while (lit->HasNext ()) { lit->Next (); light_count++; }
 
   int sn = 0;
   int num_meshes = meshes.GetCount ();
@@ -1316,9 +1360,10 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
       meter->Restart ();
     }
 
-    lit->Restart ();
-    while ((l = lit->Fetch ()) != 0)
+    lit->Reset ();
+    while (lit->HasNext ())
     {
+      l = lit->Next ();
       ((csStatLight *)(l->GetPrivateObject ()))->CalculateLighting ();
       if (meter) meter->Step ();
     }
@@ -2234,10 +2279,9 @@ void csEngine::GetNearbyObjectList (iSector* sector,
   	csSphere (pos, radius));
 
   //@@@@@@@@ TODO ALSO SUPPORT LIGHTS!
-  while (!visit->IsFinished ())
+  while (visit->HasNext ())
   {
-    iVisibilityObject* vo = visit->GetObject ();
-    visit->Next ();
+    iVisibilityObject* vo = visit->Next ();
     iMeshWrapper* imw = vo->GetMeshWrapper ();
     if (imw)
     {
@@ -2742,10 +2786,11 @@ iLight* EngineLoaderContext::FindLight(const char *name)
   csRef<iLightIterator> li = Engine->GetLightIterator(region);
   iLight *light;
 
-  while ((light = li->Fetch ()) != 0)
+  while (li->HasNext ())
   {
-      if (!strcmp (light->QueryObject ()->GetName (),name))
-	  return light;
+    light = li->Next ();
+    if (!strcmp (light->QueryObject ()->GetName (),name))
+      return light;
   }
   return 0;
 }

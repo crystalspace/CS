@@ -240,15 +240,15 @@ csPtr<iDataBuffer> csModelConverterPOV::Save (iModelData *Data, const char *Form
 
   int TextureNum = 0;
   csModelDataObjectIterator it (Data->QueryObject ());
-  while (!it.IsFinished ())
+  while (it.HasNext ())
   {
-    iModelDataObject *Object = it.Get ();
+    iModelDataObject *Object = it.Next ();
     out << "mesh {\n";
 
     csModelDataPolygonIterator it2 (Object->QueryObject ());
-    while (!it2.IsFinished ())
+    while (it2.HasNext ())
     {
-      iModelDataPolygon *Polygon = it2.Get ();
+      iModelDataPolygon *Polygon = it2.Next ();
 
 	  int i;
       for (i=2; i<Polygon->GetVertexCount (); i++)
@@ -270,10 +270,8 @@ csPtr<iDataBuffer> csModelConverterPOV::Save (iModelData *Data, const char *Form
         out << "  }\n";
 	TextureNum = (TextureNum + 1) % 3;
       }
-      it2.Next ();
     }
     out << "}\n";
-    it.Next ();
   }
 
   int Length = out.Length () + 1;

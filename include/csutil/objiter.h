@@ -38,9 +38,9 @@
     { id = INTERFACE##_scfGetID (); ver = INTERFACE##_VERSION; }	\
   public:								\
     inline NAME (iObject *Parent) : csTypedObjectIterator (Parent)	\
-      { FetchObject (); }						\
-    inline INTERFACE *Get ()						\
-      { return (INTERFACE*)(iBase*)CurrentTypedObject; }		\
+      { }						\
+    inline INTERFACE *Next ()						\
+      { return (INTERFACE*)(iBase*)Next (); }		\
   };
 
 /**
@@ -62,30 +62,19 @@ public:
   virtual ~csTypedObjectIterator ();
 
   /// Move forward
-  inline bool Next();
+  iBase* Next()
+  {
+    FetchObject ();
+    return CurrentTypedObject;
+  }
   /// Reset the iterator to the beginning
-  inline void Reset();
-  /// Get the object we are pointing at
-  inline iObject *GetObject () const;
+  void Reset() { iter->Reset (); }
   /// Get the parent object
-  inline iObject *GetParentObj() const;
+  iObject *GetParentObj() const { return iter->GetParentObj (); }
   /// Check if we have any children of requested type
-  inline bool IsFinished () const;
+  bool HasNext () const { return iter->HasNext (); }
   /// Find the object with the given name
-  inline bool FindName (const char* name);
+  iBase* FindName (const char* name);
 };
-
-inline bool csTypedObjectIterator::Next()
-  { bool r = iter->Next (); FetchObject (); return r; }
-inline void csTypedObjectIterator::Reset()
-  { iter->Reset (); FetchObject (); }
-inline iObject *csTypedObjectIterator::GetObject () const
-  { return iter->GetObject (); }
-inline iObject *csTypedObjectIterator::GetParentObj() const
-  { return iter->GetParentObj (); }
-inline bool csTypedObjectIterator::IsFinished () const
-  { return iter->IsFinished (); }
-inline bool csTypedObjectIterator::FindName (const char* name)
-  { bool r = iter->FindName (name); FetchObject (); return r; }
 
 #endif // __CS_OBJITER_H__

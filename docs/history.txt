@@ -15,6 +15,21 @@ The history order is reversed so that new features are at the top.
 	  options for all loaded plugins AFTER all plugins are initialized.
 	  This fixes a lot of commandline options (like -ilace, -smaller
 	  for software renderer and -fov for engine).
+	- Jorrit changed the following iterators to conform to the new
+	  CS iterator standard which means there is a HasNext() function
+	  and a Next() (and optionally a Reset() if the iterator supports
+	  that).
+	      - iVisibilityObjectIterator
+	      - iLightIterator
+	      - iSectorIterator
+	      - iObjectIterator
+	      - iObjectRegistryIterator
+	      - csTypedObjectIterator
+	      - csModelDataActionIterator
+	      - csModelDataPolygonIterator
+	      - csModelDataTextureIterator
+	      - csModelDataMaterialIterator
+	      - csModelDataObjectIterator
 	- Eric Sunshine corrected ddraw/g2d.cpp so that it uses a fixed SCF
 	  class identifier in SCF_EXPORT_CLASS_DEP() rather than using the
 	  CS_SOFTWARE_2D_DRIVER macro which might change value, inadvertently

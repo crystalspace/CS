@@ -616,9 +616,9 @@ csPtr<iDataBuffer> csModelConverterASE::Save (iModelData *Data, const char *Form
   csTriangleVector tri;
 
   csModelDataPolygonIterator it (obj->QueryObject ());
-  while (!it.IsFinished ())
+  while (it.HasNext ())
   {
-    iModelDataPolygon *poly = it.Get ();
+    iModelDataPolygon *poly = it.Next ();
     int v1 = VertexTexelSet.Add (poly->GetVertex (0), -1, -1, poly->GetTexel (0));
     int vprev = VertexTexelSet.Add (poly->GetVertex (1), -1, -1, poly->GetTexel (1));
 
@@ -630,7 +630,6 @@ csPtr<iDataBuffer> csModelConverterASE::Save (iModelData *Data, const char *Form
       origtri.Push (new csExtTriangle (poly, 0, i-1, i));
       vprev = vn;
     }
-    it.Next ();
   }
 
   // Write the header.

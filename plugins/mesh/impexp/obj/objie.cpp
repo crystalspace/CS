@@ -549,9 +549,9 @@ csPtr<iDataBuffer> csModelConverterOBJ::Save (iModelData *Data, const char *Form
 
   // store polygons
   csModelDataPolygonIterator it (obj->QueryObject ());
-  while (!it.IsFinished ())
+  while (it.HasNext ())
   {
-    iModelDataPolygon *poly = it.Get ();
+    iModelDataPolygon *poly = it.Next ();
     out << "f";
 
     for (i=0; i<poly->GetVertexCount (); i++)
@@ -559,7 +559,6 @@ csPtr<iDataBuffer> csModelConverterOBJ::Save (iModelData *Data, const char *Form
         '/' << (poly->GetNormal (i)+1);
 
     out << '\n';
-    it.Next ();
   }
 
   int Size = out.Length ();

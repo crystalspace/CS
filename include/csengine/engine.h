@@ -89,9 +89,14 @@ private:
   int sector_idx;
   // Current light index.
   int light_idx;
+  // Get current light.
+  iLight* current_light;
 
   // Go to next sector. Return false if finished.
   bool NextSector ();
+
+  /// Get light from iterator. Return 0 at end.
+  iLight* FetchNext ();
 
 public:
   /// Construct an iterator and initialize to start.
@@ -102,10 +107,13 @@ public:
   SCF_DECLARE_IBASE;
 
   /// Restart iterator.
-  virtual void Restart ();
+  virtual void Reset ();
+
+  /// Return true if there are more elements.
+  virtual bool HasNext ();
 
   /// Get light from iterator. Return 0 at end.
-  virtual iLight* Fetch ();
+  virtual iLight* Next ();
 
   /// Get the sector for the last fetched light.
   virtual iSector* GetLastSector ();

@@ -231,4 +231,48 @@ base mesh), and that those meshes can be overridden by user-defined meshes
 (e.g. if the collision detection mesh needs to have a shape different from 
 the visible mesh.) 
 
+@subheading Iterator Changes
+@cindex @code{iVisibilityObjectIterator}
+@cindex @code{iLightIterator}
+@cindex @code{iSectorIterator}
+@cindex @code{iObjectIterator}
+@cindex @code{iObjectRegistryIterator}
+@cindex @code{csTypedObjectIterator}
+@cindex @code{csModelDataActionIterator}
+@cindex @code{csModelDataPolygonIterator}
+@cindex @code{csModelDataTextureIterator}
+@cindex @code{csModelDataMaterialIterator}
+@cindex @code{csModelDataObjectIterator}
+
+Changed the following iterators to conform to the following iterator standard:
+@example
+  bool iterator->HasNext() returns true if there are more items.
+  T* iterator->Next() returns next element or 0.
+  void Reset() optionally resets the iterator (not all implement this).
+@end example
+
+@itemize
+@item
+@code{iVisibilityObjectIterator}
+@item
+@code{iLightIterator}
+@item
+@code{iSectorIterator}
+@item
+@code{iObjectIterator}
+@item
+@code{iObjectRegistryIterator}
+@item
+@code{csTypedObjectIterator}
+@item
+@code{csModelDataActionIterator}
+@item
+@code{csModelDataPolygonIterator}
+@item
+@code{csModelDataTextureIterator}
+@item
+@code{csModelDataMaterialIterator}
+@item
+@code{csModelDataObjectIterator}
+@end itemize
 

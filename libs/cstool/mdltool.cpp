@@ -408,9 +408,9 @@ static bool CheckMaterialConflict (iModelDataObject *obj1)
   iModelDataMaterial *mat = 0;
 
   csModelDataPolygonIterator it = (obj1->QueryObject ());
-  while (!it.IsFinished ())
+  while (it.HasNext ())
   {
-    iModelDataMaterial *mat2 = it.Get ()->GetMaterial ();
+    iModelDataMaterial *mat2 = it.Next ()->GetMaterial ();
 
     if (mat2)
     {
@@ -420,8 +420,6 @@ static bool CheckMaterialConflict (iModelDataObject *obj1)
           return true;
       }
     }
-
-    it.Next ();
   }
 
   return false;
@@ -488,9 +486,9 @@ void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject
 
   // copy all polygons
   csModelDataPolygonIterator *polyit = new csModelDataPolygonIterator (src->QueryObject ());
-  while (!polyit->IsFinished ())
+  while (polyit->HasNext ())
   {
-    iModelDataPolygon *poly = polyit->Get ();
+    iModelDataPolygon *poly = polyit->Next ();
     iModelDataPolygon *NewPoly = new csModelDataPolygon ();
     dest->QueryObject ()->ObjAdd (NewPoly->QueryObject ());
 
@@ -504,8 +502,6 @@ void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject
     }
     NewPoly->SetMaterial (poly->GetMaterial ());
     NewPoly->DecRef ();
-
-    polyit->Next ();
   }
   delete polyit;
 
@@ -587,9 +583,9 @@ void csModelDataTools::CopyVerticesMapped (iModelDataObject *dest,
   ver->DecRef ();
 
   csModelDataActionIterator it (src->QueryObject ());
-  while (!it.IsFinished ())
+  while (it.HasNext ())
   {
-    iModelDataAction *OldAction = it.Get ();
+    iModelDataAction *OldAction = it.Next ();
     csRef<iModelDataAction> NewAction (
     	CS_GET_NAMED_CHILD_OBJECT (dest->QueryObject (),
 	iModelDataAction, OldAction->QueryObject ()->GetName ()));
@@ -618,16 +614,15 @@ void csModelDataTools::CopyVerticesMapped (iModelDataObject *dest,
 	ver->DecRef ();
       }
     }
-    it.Next ();
   }
 }
 
 static bool CheckActionConflict (iModelDataObject *obj1, iModelDataObject *obj2)
 {
   csModelDataActionIterator it (obj1->QueryObject ());
-  while (!it.IsFinished ())
+  while (it.HasNext ())
   {
-    iModelDataAction *Action = it.Get ();
+    iModelDataAction *Action = it.Next ();
 
     csRef<iModelDataAction> Action2 (
     	CS_GET_NAMED_CHILD_OBJECT (obj2->QueryObject (),
@@ -639,7 +634,6 @@ static bool CheckActionConflict (iModelDataObject *obj1, iModelDataObject *obj2)
       if (MergeTimes (Action->GetTotalTime (), time2) < 0)
         return true;
     }
-    it.Next ();
   }
 
   return false;
@@ -652,21 +646,19 @@ static bool CheckMaterialConflict (iModelDataObject *obj1,
 
   {
     csModelDataPolygonIterator it (obj1->QueryObject ());
-    while (!it.IsFinished ())
+    while (it.HasNext ())
     {
-      iModelDataPolygon *poly = it.Get ();
+      iModelDataPolygon *poly = it.Next ();
       if (poly->GetMaterial ()) mat1.Push (poly->GetMaterial ());
-      it.Next ();
     }
   }
 
   {
     csModelDataPolygonIterator it (obj2->QueryObject ());
-    while (!it.IsFinished ())
+    while (it.HasNext ())
     {
-      iModelDataPolygon *poly = it.Get ();
+      iModelDataPolygon *poly = it.Next ();
       if (poly->GetMaterial ()) mat2.Push (poly->GetMaterial ());
-      it.Next ();
     }
   }
 
@@ -725,9 +717,12 @@ void csModelDataTools::SplitObjectsByMaterial (iModelData *Scene)
   {
     csRef<iModelDataObject> obj = OldObjects.Pop ();
 
-    if (!CheckMaterialConflict (obj)) {
+    if (!CheckMaterialConflict (obj))
+    {
       Scene->QueryObject ()->ObjAdd (obj->QueryObject ());
-    } else {
+    }
+    else
+    {
       csModelDataPolygonVector Polygons;
       csModelDataMaterialVector Materials;
       csIntArray PolygonToNewObject;
@@ -735,14 +730,15 @@ void csModelDataTools::SplitObjectsByMaterial (iModelData *Scene)
 
       // build the Polygons, Materials and PolygonToNewObject lists
       csModelDataPolygonIterator it (obj->QueryObject ());
-      while (!it.IsFinished ())
+      while (it.HasNext ())
       {
-        iModelDataPolygon *poly = it.Get ();
+        iModelDataPolygon *poly = it.Next ();
 
 	Polygons.Push (poly);
 
         int n = Materials.Find (poly->GetMaterial ());
-        if (n == -1) {
+        if (n == -1)
+	{
           PolygonToNewObject.Push (NewObjects.Length ());
           Materials.Push (poly->GetMaterial ());
 
@@ -750,11 +746,11 @@ void csModelDataTools::SplitObjectsByMaterial (iModelData *Scene)
 	  NewObjects.Push (obj);
 	  Scene->QueryObject ()->ObjAdd (obj->QueryObject ());
 	  obj->DecRef ();
-        } else {
+        }
+	else
+	{
           PolygonToNewObject.Push (n);
         }
-
-        it.Next ();
       }
 
       // build the vertex mapping table and move the polygons
@@ -905,10 +901,9 @@ void csModelDataTools::Describe (iObject *obj, csString &out)
   CS_MDLTOOL_TRY_END
 
   csRef<iObjectIterator> it (obj->GetIterator ());
-  while (!it->IsFinished ())
+  while (it->HasNext ())
   {
-    Describe (it->GetObject (), contents);
-    it->Next ();
+    Describe (it->Next (), contents);
   }
 
   Indent -= 2;
@@ -928,10 +923,9 @@ void csModelDataTools::Describe (iObject *obj, csString &out)
 void csModelDataTools::CompressVertices (iModelData *Scene)
 {
   csModelDataObjectIterator it (Scene->QueryObject ());
-  while (!it.IsFinished ())
+  while (it.HasNext ())
   {
-    CompressVertices (it.Get ());
-    it.Next ();
+    CompressVertices (it.Next ());
   }
 }
 
@@ -944,15 +938,16 @@ void csModelDataTools::CompressVertices (iModelDataObject *Object)
   // collect all vertex frames and polygons
   VertexFrames.Push (Object->GetDefaultVertices ());
   csRef<iObjectIterator> it (Object->QueryObject ()->GetIterator ());
-  while (!it->IsFinished ())
+  while (it->HasNext ())
   {
-    csRef<iModelDataPolygon> Polygon (
-      SCF_QUERY_INTERFACE (it->GetObject (), iModelDataPolygon));
+    iObject* obj = it->Next ();
+    csRef<iModelDataPolygon> Polygon = SCF_QUERY_INTERFACE (obj,
+    	iModelDataPolygon);
     if (Polygon)
       Polygons.Push (Polygon);
 
     csRef<iModelDataAction> Action (
-      SCF_QUERY_INTERFACE (it->GetObject (), iModelDataAction));
+      SCF_QUERY_INTERFACE (obj, iModelDataAction));
     if (Action)
     {
       for (i=0; i<Action->GetFrameCount (); i++)
@@ -963,7 +958,6 @@ void csModelDataTools::CompressVertices (iModelDataObject *Object)
 	  VertexFrames.PushSmart (ver);
       }
     }
-    it->Next ();
   }
 
   // extract the data from one of the vertex frames into growing arrays

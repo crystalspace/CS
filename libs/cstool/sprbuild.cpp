@@ -50,9 +50,9 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
   csModelFrameVector Frames;
 
   it1 = Object->QueryObject ()->GetIterator ();
-  while (!it1->IsFinished ())
+  while (it1->HasNext ())
   {
-    csRef<iModelDataAction> ac (SCF_QUERY_INTERFACE (it1->GetObject (),
+    csRef<iModelDataAction> ac (SCF_QUERY_INTERFACE (it1->Next (),
     	iModelDataAction));
     if (ac)
     {
@@ -64,7 +64,6 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
 	  Frames.PushSmart (ver);
       }
     }
-    it1->Next ();
   }
 
   // we need at least one vertex frame
@@ -91,15 +90,14 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
   int vertices=0;
   // count polygons 
   it1 = Object->QueryObject ()->GetIterator ();
-  while (!it1->IsFinished ())
+  while (it1->HasNext ())
   {
     iModelDataPolygon *poly =
-      SCF_QUERY_INTERFACE (it1->GetObject (), iModelDataPolygon);
+      SCF_QUERY_INTERFACE (it1->Next (), iModelDataPolygon);
     if (poly)
     {
       vertices += poly->GetVertexCount ();
     }
-    it1->Next ();
   }
 
   // reserve memory
@@ -109,10 +107,10 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
 
   // copy polygon data (split polygons into triangles)
   it1 = Object->QueryObject ()->GetIterator ();
-  while (!it1->IsFinished ())
+  while (it1->HasNext ())
   {
     csRef<iModelDataPolygon> poly (
-    	SCF_QUERY_INTERFACE (it1->GetObject (), iModelDataPolygon));
+    	SCF_QUERY_INTERFACE (it1->Next (), iModelDataPolygon));
     if (poly)
     {
       // build the vertex array
@@ -128,7 +126,6 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
       if (!Material && poly->GetMaterial ())
         Material = poly->GetMaterial ();
     }
-    it1->Next ();
   }
 
 #else
@@ -152,10 +149,10 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
   UsedVerticesInfo *usedvertices = new UsedVerticesInfo [vertices];
 
   it1 = Object->QueryObject ()->GetIterator ();
-  while (!it1->IsFinished ())
+  while (it1->HasNext ())
   {
     csRef<iModelDataPolygon> poly (
-      SCF_QUERY_INTERFACE (it1->GetObject (), iModelDataPolygon));
+      SCF_QUERY_INTERFACE (it1->Next (), iModelDataPolygon));
     if (poly)
     {
       csIntArray PolyVertices;
@@ -200,7 +197,6 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
       if (!Material && poly->GetMaterial ())
         Material = poly->GetMaterial ();
     }
-    it1->Next ();
   }
 
   delete[] usedvertices;
@@ -246,10 +242,10 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
   bool FoundDefault = false;
 
   it1 = Object->QueryObject ()->GetIterator ();
-  while (!it1->IsFinished ())
+  while (it1->HasNext ())
   {
     csRef<iModelDataAction> ac (
-    	SCF_QUERY_INTERFACE (it1->GetObject (), iModelDataAction));
+    	SCF_QUERY_INTERFACE (it1->Next (), iModelDataAction));
     if (ac)
     {
       const char *name = ac->QueryObject ()->GetName ();
@@ -281,7 +277,6 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
       }
       FinishAction ();
     }
-    it1->Next ();
   }
 
   if (!FoundDefault)

@@ -118,7 +118,7 @@ struct iObject : public iBase
 };
 
 
-SCF_VERSION (iObjectIterator, 0, 0, 1);
+SCF_VERSION (iObjectIterator, 0, 1, 0);
 
 /**
  * This is an iterator for child objects of a csObject. Note that this
@@ -130,27 +130,24 @@ SCF_VERSION (iObjectIterator, 0, 0, 1);
 struct iObjectIterator : public iBase
 {
   /// Move forward
-  virtual bool Next() = 0;
+  virtual iObject* Next () = 0;
 
   /// Reset the iterator to the beginning
-  virtual void Reset() = 0;
-
-  /// Get the object we are pointing at
-  virtual iObject *GetObject () const = 0;
+  virtual void Reset () = 0;
 
   /// Get the parent object
-  virtual iObject* GetParentObj() const = 0;
+  virtual iObject* GetParentObj () const = 0;
 
-  /// Check if we have any children of requested type
-  virtual bool IsFinished () const = 0;
+  /// Check if we have any more children of requested type
+  virtual bool HasNext () const = 0;
 
   /**
    * traverses all csObjects and looks for an object with the given name
-   * returns true, if found, false if not found. You can then get the
-   * object by calling GetObj, and can continue search by calling Next and
+   * returns object if found.
+   * You can continue search by calling Next and
    * then do an other FindName, if you like.
    */
-  virtual bool FindName (const char* name) = 0;
+  virtual iObject* FindName (const char* name) = 0;
 };
 
 

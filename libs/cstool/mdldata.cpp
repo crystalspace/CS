@@ -529,29 +529,26 @@ csModelData::csModelData ()
 void csModelData::LoadImages (iVFS *vfs, iImageIO *io, int Format)
 {
   csModelDataTextureIterator it (&scfiObject);
-  while (!it.IsFinished ())
+  while (!it.HasNext ())
   {
-    it.Get ()->LoadImage (vfs, io, Format);
-    it.Next ();
+    it.Next ()->LoadImage (vfs, io, Format);
   }
 }
 
 void csModelData::RegisterTextures (iTextureList *tm)
 {
   csModelDataTextureIterator it (&scfiObject);
-  while (!it.IsFinished ())
+  while (it.HasNext ())
   {
-    it.Get ()->Register (tm);
-    it.Next ();
+    it.Next ()->Register (tm);
   }
 }
 
 void csModelData::RegisterMaterials (iMaterialList *ml)
 {
   csModelDataMaterialIterator it (&scfiObject);
-  while (!it.IsFinished ())
+  while (!it.HasNext ())
   {
-    it.Get ()->Register (ml);
-    it.Next ();
+    it.Next ()->Register (ml);
   }
 }

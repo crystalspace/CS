@@ -43,18 +43,29 @@ public:
   {
     Object->DecRef ();
   }
-  virtual bool Next()
+  virtual bool HasNext() const
   {
     if (Position < 0)
       return false;
+    if (Position+1 >= Object->Children->Length ())
+    {
+      return false;
+    }
+    return true;
+  }
+
+  virtual iObject* Next()
+  {
+    if (Position < 0)
+      return 0;
 
     Position++;
     if (Position == Object->Children->Length ())
     {
       Position = -1;
-      return false;
+      return 0;
     }
-    return true;
+    return Object->Children->Get (Position);
   }
   virtual void Reset()
   {
@@ -63,27 +74,19 @@ public:
     else
       Position = 0;
   }
-  virtual iObject *GetObject () const
-  {
-    return Object->Children->Get (Position);
-  }
   virtual iObject* GetParentObj() const
   {
     return Object;
   }
-  virtual bool IsFinished () const
+  virtual iObject* FindName (const char* name)
   {
-    return (Position < 0);
-  }
-  virtual bool FindName (const char* name)
-  {
-    while (!IsFinished ())
+    while (HasNext ())
     {
-      if (strcmp (GetObject ()->GetName (), name) == 0)
-        return true;
-      Next ();
+      iObject* o = Next ();
+      if (strcmp (o->GetName (), name) == 0)
+        return o;
     }
-    return false;
+    return 0;
   }
 };
 
@@ -120,10 +123,9 @@ csObject::csObject (csObject &o) : iObject(), Children (0), Name (0)
   InitializeObject ();
 
   csRef<iObjectIterator> it (o.GetIterator ());
-  while (!it->IsFinished ())
+  while (it->HasNext ())
   {
-    ObjAdd (it->GetObject ());
-    it->Next ();
+    ObjAdd (it->Next ());
   }
   SetName (o.GetName ());
 }
@@ -252,10 +254,9 @@ void csObject::ObjRemoveAll ()
 void csObject::ObjAddChildren (iObject *Parent)
 {
   csRef<iObjectIterator> it (Parent->GetIterator ());
-  while (!it->IsFinished ())
+  while (it->HasNext ())
   {
-    ObjAdd (it->GetObject ());
-    it->Next ();
+    ObjAdd (it->Next ());
   }
 }
 
