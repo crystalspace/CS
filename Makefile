@@ -97,8 +97,7 @@ endif
 # since several systems (OS/2, DOS and WIN32) have a "echo" that does
 # literal output, i.e. they do not strip quotes from string.
 linux solaris beos os2gcc os2wcc djgpp freebsd nextstep openstep rhapsody amiga unknown:
-	@echo # Automatically generated file, do not edit!>config.mak
-	@echo TARGET = $@>>config.mak
+	@echo TARGET = $@>config.mak
 	@echo SYSMAKEFILE = mk/system/$@.mak>>config.mak
 	@echo MODE = $(MODE)>>config.mak
 	@echo USE_DLL = $(USE_DLL)>>config.mak
