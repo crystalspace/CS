@@ -666,7 +666,11 @@ CS_CHECK_VTABLE_THUNKS
 # binary will not be backward compatible.  For instance, if Pentium-specific
 # instructions are used, the program will not work with earlier processors,
 # such as the Intel 486.  Because these options are potentially dangerous,
-# their use it controlled by the user via --enable-cpu-specific-instructions.
+# their use it controlled by the user via --enable-cpu-specific-optimizations
+# which accepts "no" (same as "disable"), "minimum" (the default), and
+# "maximum".  The "minimum" option selects optimizations which are likely to be
+# supported by reasonably modern hardware, thus making the resulting
+# executables fairly portable.
 #
 # CS_CHECK_CODE_GEN_FLAG(CPU-PATTERN, FLAGS, [LANGUAGE])
 #	If compiler- and CPU-specific optimization flags have not already been
@@ -686,21 +690,36 @@ AC_DEFUN([CS_CHECK_CODE_GEN_FLAG],
 		;;
 	esac])])
 
-AC_MSG_CHECKING([whether to use CPU-specific instructions])
-AC_ARG_ENABLE([cpu-specific-instructions],
-    [AC_HELP_STRING([--enable-cpu-specific-instructions],
-	[enable CPU-specific code generation (default YES); use with caution
-	since code for one CPU will not work with earlier CPUs (for example,
-	Pentium-specific code will not run on an Intel 486)])],
-    [], [enable_cpu_specific_instructions=yes])
-AC_MSG_RESULT([$enable_cpu_specific_instructions])
+AC_MSG_CHECKING([whether to use CPU-specific optimizations])
+AC_ARG_ENABLE([cpu-specific-optimizations],
+    [AC_HELP_STRING([--enable-cpu-specific-optimizations=level],
+	[enable CPU-specific optimizations; recognized levels are `no',
+	`minimum' or `min', `maximum' or `max' (default MINIMUM); the `minimum'
+	option selects optimizations which are likely to be supported by
+	reasonably modern hardware, thus making the resulting executables
+	fairly portable; use the `maximum' option with caution since code for
+	one processor will not work with earlier processors (for example, Intel
+	686-specific code will not work with a 586)])],
+    [case $enable_cpu_specific_optimizations in
+	yes|min) enable_cpu_specific_optimizations=minimum ;;
+	max) enable_cpu_specific_optimizations=maximum ;;
+    esac],
+    [enable_cpu_specific_optimizations=minimum])
+AC_MSG_RESULT([$enable_cpu_specific_optimizations])
 
-AS_IF([test $enable_cpu_specific_instructions = yes],
+case $enable_cpu_specific_optimizations in
+    no|minimum|maximum) ;;
+    *) AC_MSG_ERROR([unrecognized option; use `no', `minimum', or `maximum'])
+       ;;
+esac
+
+AS_IF([test $enable_cpu_specific_optimizations != no],
     [AC_CACHE_CHECK([for code generation flags], [cs_cv_prog_cxx_code_gen],
 	[cs_cv_prog_cxx_code_gen=no
-	CS_CHECK_CODE_GEN_FLAG([athlon], [-mcpu=athlon -march=athlon])
-	CS_CHECK_CODE_GEN_FLAG([*686], [-mcpu=pentiumpro -march=i686])
-	CS_CHECK_CODE_GEN_FLAG([*686], [-mpentiumpro -march=i686])
+	AS_IF([test $enable_cpu_specific_optimizations = maximum],
+	    [CS_CHECK_CODE_GEN_FLAG([athlon], [-mcpu=athlon -march=athlon])
+	    CS_CHECK_CODE_GEN_FLAG([*686], [-mcpu=pentiumpro -march=i686])
+	    CS_CHECK_CODE_GEN_FLAG([*686], [-mpentiumpro -march=i686])])
 	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-mcpu=pentium -march=i586])
 	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-mpentium -march=i586])
 	CS_CHECK_CODE_GEN_FLAG([[*[3-9]86]], [-mcpu=i486])

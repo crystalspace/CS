@@ -57,6 +57,24 @@ chronological order.
         - Philip Wyett rolled back cal3d plugin to pre Steven Geens Morph
           target changes. These changes were exclusively in the cal3d CVS only
           and experimental whereas CS requires the stable 0.9 cal3d release.
+	- Eric Sunshine modified configure.ac so that the user now has more
+	  control over the CPU-specific optimizations selected by the
+	  configuration script.  Previously, by default, configuration
+	  attempted to utilize the maximum optimizations possible for the host,
+	  but this resulted in unportable executables and plugins (for
+	  instance, the project built for an Intel 686 would not necessarily
+	  work on 586 hardware).  The user could select only to enable all
+	  optimizations or to disable optimizations altogether.  Now, however,
+	  the --enable-cpu-specific-optimizations option accepts "no",
+	  "minimum" (or "min"), and "maximum" (or "max").  The "minimum" option
+	  selects optimizations which are likely to be supported by reasonably
+	  modern hardware, thus resulting in fairly portable executables.  This
+	  is the default optimization setting.  The "maximum" option applies
+	  the highest optimizations supported by the host platform and
+	  produces the least portable executables.  Use this option only if you
+	  do not care about portability.  The "no" option (same as
+	  --disable-cpu-specific-optimizations) disables all CPU-specific
+	  optimizations.
 30-Aug-2003
 	- Old_Belge added the morph target support to sprcal3d.
 	- Eric Sunshine augmented configure.ac so that it emits the appropriate

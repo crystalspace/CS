@@ -867,11 +867,17 @@ if test -n "$ac_init_help"; then
 Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-  --enable-cpu-specific-instructions
-                          enable CPU-specific code generation (default YES);
-                          use with caution since code for one CPU will not
-                          work with earlier CPUs (for example,
-                          Pentium-specific code will not run on an Intel 486)
+  --enable-cpu-specific-optimizations=level
+                          enable CPU-specific optimizations; recognized levels
+                          are `no', `minimum' or `min', `maximum' or `max'
+                          (default MINIMUM); the `minimum' option selects
+                          optimizations which are likely to be supported by
+                          reasonably modern hardware, thus making the
+                          resulting executables fairly portable; use the
+                          `maximum' option with caution since code for one
+                          processor will not work with earlier processors (for
+                          example, Intel 686-specific code will not work with
+                          a 586)
   --disable-freetypetest  Do not try to compile and run
                           a test FreeType program
   --enable-optimize       build with optimizations enabled (default YES); same
@@ -5916,7 +5922,11 @@ fi
 # binary will not be backward compatible.  For instance, if Pentium-specific
 # instructions are used, the program will not work with earlier processors,
 # such as the Intel 486.  Because these options are potentially dangerous,
-# their use it controlled by the user via --enable-cpu-specific-instructions.
+# their use it controlled by the user via --enable-cpu-specific-optimizations
+# which accepts "no" (same as "disable"), "minimum" (the default), and
+# "maximum".  The "minimum" option selects optimizations which are likely to be
+# supported by reasonably modern hardware, thus making the resulting
+# executables fairly portable.
 #
 # CS_CHECK_CODE_GEN_FLAG(CPU-PATTERN, FLAGS, [LANGUAGE])
 #	If compiler- and CPU-specific optimization flags have not already been
@@ -5928,25 +5938,37 @@ fi
 #------------------------------------------------------------------------------
 
 
-echo "$as_me:$LINENO: checking whether to use CPU-specific instructions" >&5
-echo $ECHO_N "checking whether to use CPU-specific instructions... $ECHO_C" >&6
-# Check whether --enable-cpu-specific-instructions or --disable-cpu-specific-instructions was given.
-if test "${enable_cpu_specific_instructions+set}" = set; then
-  enableval="$enable_cpu_specific_instructions"
-
+echo "$as_me:$LINENO: checking whether to use CPU-specific optimizations" >&5
+echo $ECHO_N "checking whether to use CPU-specific optimizations... $ECHO_C" >&6
+# Check whether --enable-cpu-specific-optimizations or --disable-cpu-specific-optimizations was given.
+if test "${enable_cpu_specific_optimizations+set}" = set; then
+  enableval="$enable_cpu_specific_optimizations"
+  case $enable_cpu_specific_optimizations in
+	yes|min) enable_cpu_specific_optimizations=minimum ;;
+	max) enable_cpu_specific_optimizations=maximum ;;
+    esac
 else
-  enable_cpu_specific_instructions=yes
+  enable_cpu_specific_optimizations=minimum
 fi;
-echo "$as_me:$LINENO: result: $enable_cpu_specific_instructions" >&5
-echo "${ECHO_T}$enable_cpu_specific_instructions" >&6
+echo "$as_me:$LINENO: result: $enable_cpu_specific_optimizations" >&5
+echo "${ECHO_T}$enable_cpu_specific_optimizations" >&6
 
-if test $enable_cpu_specific_instructions = yes; then
+case $enable_cpu_specific_optimizations in
+    no|minimum|maximum) ;;
+    *) { { echo "$as_me:$LINENO: error: unrecognized option; use \`no', \`minimum', or \`maximum'" >&5
+echo "$as_me: error: unrecognized option; use \`no', \`minimum', or \`maximum'" >&2;}
+   { (exit 1); exit 1; }; }
+       ;;
+esac
+
+if test $enable_cpu_specific_optimizations != no; then
   echo "$as_me:$LINENO: checking for code generation flags" >&5
 echo $ECHO_N "checking for code generation flags... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_code_gen+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   cs_cv_prog_cxx_code_gen=no
+	if test $enable_cpu_specific_optimizations = maximum; then
 
     if test "$cs_cv_prog_cxx_code_gen" = no; then
   case $host_cpu in
@@ -6347,6 +6369,8 @@ fi
 
 		;;
 	esac
+fi
+
 fi
 
 
