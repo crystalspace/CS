@@ -70,9 +70,9 @@ csSectorLightList::~csSectorLightList ()
   delete kdtree;
 }
 
-void csSectorLightList::PrepareItem (iLight* item)
+void csSectorLightList::PrepareLight (iLight* item)
 {
-  csLightList::PrepareItem (item);
+  csLightList::PrepareLight (item);
   item->SetSector (&(sector->scfiSector));
 
   const csVector3& center = item->GetCenter ();
@@ -82,11 +82,11 @@ void csSectorLightList::PrepareItem (iLight* item)
   item->GetPrivateObject ()->SetChildNode (childnode);
 }
 
-void csSectorLightList::FreeItem (iLight* item)
+void csSectorLightList::FreeLight (iLight* item)
 {
   item->SetSector (0);
   kdtree->RemoveObject (item->GetPrivateObject ()->GetChildNode ());
-  csLightList::FreeItem (item);
+  csLightList::FreeLight (item);
 }
 
 //---------------------------------------------------------------------------
@@ -95,18 +95,18 @@ csSectorMeshList::csSectorMeshList ()
   sector = 0;
 }
 
-void csSectorMeshList::PrepareItem (iMeshWrapper* item)
+void csSectorMeshList::PrepareMesh (iMeshWrapper* item)
 {
   CS_ASSERT (sector != 0);
-  csMeshList::PrepareItem (item);
+  csMeshList::PrepareMesh (item);
   sector->PrepareMesh (item);
 }
 
-void csSectorMeshList::FreeItem (iMeshWrapper* item)
+void csSectorMeshList::FreeMesh (iMeshWrapper* item)
 {
   CS_ASSERT (sector != 0);
   sector->UnprepareMesh (item);
-  csMeshList::FreeItem (item);
+  csMeshList::FreeMesh (item);
 }
 
 //---------------------------------------------------------------------------
@@ -958,7 +958,7 @@ csSectorList::csSectorList ()
   SCF_CONSTRUCT_IBASE (0);
 }
 
-void csSectorList::FreeItem (iSector* item)
+void csSectorList::FreeSector (iSector* item)
 {
 }
 
@@ -969,13 +969,13 @@ int csSectorList::Add (iSector *obj)
 
 bool csSectorList::Remove (iSector *obj)
 {
-  FreeItem (obj);
+  FreeSector (obj);
   return list.Delete (obj);
 }
 
 bool csSectorList::Remove (int n)
 {
-  FreeItem (list[n]);
+  FreeSector (list[n]);
   return list.DeleteIndex (n);
 }
 
@@ -984,7 +984,7 @@ void csSectorList::RemoveAll ()
   int i;
   for (i = 0 ; i < list.Length () ; i++)
   {
-    FreeItem (list[i]);
+    FreeSector (list[i]);
   }
   list.DeleteAll ();
 }

@@ -573,10 +573,10 @@ public:
   csLightList ();
   virtual ~csLightList () { RemoveAll (); }
 
-  /// Override PrepareItem
-  virtual void PrepareItem (iLight*) { }
-  /// Override FreeItem
-  virtual void FreeItem (iLight*) { }
+  /// Override PrepareLight
+  virtual void PrepareLight (iLight*) { }
+  /// Override FreeLight
+  virtual void FreeLight (iLight*) { }
 
   virtual int GetCount () const { return list.Length (); }
   virtual iLight *Get (int n) const { return list.Get (n); }

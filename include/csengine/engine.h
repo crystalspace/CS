@@ -192,7 +192,7 @@ class csEngineMeshList : public csMeshList
 {
 public:
   virtual ~csEngineMeshList () { RemoveAll (); }
-  virtual void FreeItem (iMeshWrapper*);
+  virtual void FreeMesh (iMeshWrapper*);
 };
 
 /**

@@ -639,19 +639,19 @@ iLight *csLightList::FindByID (const char* id) const
 
 int csLightList::Add (iLight *obj)
 {
-  PrepareItem (obj);
+  PrepareLight (obj);
   return list.Push (obj);
 }
 
 bool csLightList::Remove (iLight *obj)
 {
-  FreeItem (obj);
+  FreeLight (obj);
   return list.Delete (obj);
 }
 
 bool csLightList::Remove (int n)
 {
-  FreeItem (list[n]);
+  FreeLight (list[n]);
   return list.DeleteIndex (n);
 }
 
@@ -660,7 +660,7 @@ void csLightList::RemoveAll ()
   int i;
   for (i = 0 ; i < list.Length () ; i++)
   {
-    FreeItem (list[i]);
+    FreeLight (list[i]);
   }
   list.DeleteAll ();
 }

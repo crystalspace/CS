@@ -43,7 +43,7 @@ csMovableSectorList::~csMovableSectorList ()
   DeleteAll ();
 }
 
-bool csMovableSectorList::PrepareItem (iSector* sector)
+bool csMovableSectorList::PrepareSector (iSector* sector)
 {
   // Check for a valid item.
   if (sector == 0) return false;
@@ -69,7 +69,7 @@ iSector *csMovableSectorList::SectorList::Get (int n) const
 
 int csMovableSectorList::SectorList::Add (iSector *obj)
 {
-  if (!scfParent->PrepareItem (obj)) return -1;
+  if (!scfParent->PrepareSector (obj)) return -1;
   return scfParent->Push (obj);
 }
 
@@ -155,7 +155,7 @@ void csMovable::SetSector (iSector *sector)
 {
   if (sectors.Length () == 1 && sector == sectors[0]) return ;
   ClearSectors ();
-  if (sectors.PrepareItem (sector))
+  if (sectors.PrepareSector (sector))
     sectors.Push (sector);
 }
 

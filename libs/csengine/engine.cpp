@@ -297,10 +297,10 @@ iCollection *csCollectionList::CollectionList::FindByName (
 
 //---------------------------------------------------------------------------
 
-void csEngineMeshList::FreeItem (iMeshWrapper* mesh)
+void csEngineMeshList::FreeMesh (iMeshWrapper* mesh)
 {
   mesh->GetMovable ()->ClearSectors ();
-  csMeshList::FreeItem (mesh);
+  csMeshList::FreeMesh (mesh);
 }
 
 //---------------------------------------------------------------------------

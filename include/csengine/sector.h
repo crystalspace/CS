@@ -64,10 +64,10 @@ public:
   /// Set the sector.
   void SetSector (csSector* s) { sector = s; }
 
-  /// Override PrepareItem
-  virtual void PrepareItem (iLight* light);
-  /// Override FreeItem
-  virtual void FreeItem (iLight* item);
+  /// Override PrepareLight
+  virtual void PrepareLight (iLight* light);
+  /// Override FreeLight
+  virtual void FreeLight (iLight* item);
 
   /// Get the kdtree for this light list.
   csKDTree* GetLightKDTree () const { return kdtree; }
@@ -87,10 +87,10 @@ public:
   /// Set the sector.
   void SetSector (csSector* sec) { sector = sec; }
 
-  /// Override PrepareItem
-  virtual void PrepareItem (iMeshWrapper* item);
-  /// Override FreeItem
-  virtual void FreeItem (iMeshWrapper* item);
+  /// Override PrepareMesh
+  virtual void PrepareMesh (iMeshWrapper* item);
+  /// Override FreeMesh
+  virtual void FreeMesh (iMeshWrapper* item);
 };
 
 SCF_VERSION (csSector, 0, 0, 2);
@@ -570,8 +570,8 @@ public:
   /// destructor
   virtual ~csSectorList () { RemoveAll (); }
 
-  /// Override FreeItem.
-  virtual void FreeItem (iSector* item);
+  /// Override FreeSector.
+  virtual void FreeSector (iSector* item);
 
   virtual int GetCount () const { return list.Length (); }
   virtual iSector *Get (int n) const { return list.Get (n); }

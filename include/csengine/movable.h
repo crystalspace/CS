@@ -42,7 +42,7 @@ public:
   virtual ~csMovableSectorList ();
   void SetMovable (csMovable* mov) { movable = mov; }
 
-  bool PrepareItem (iSector* item);
+  bool PrepareSector (iSector* item);
 
   class SectorList : public iSectorList
   {

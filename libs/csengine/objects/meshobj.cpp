@@ -758,21 +758,21 @@ iMeshWrapper* csMeshList::FindByNameWithChild (const char *Name) const
 
 int csMeshList::Add (iMeshWrapper *obj)
 {
-  PrepareItem (obj);
+  PrepareMesh (obj);
   list.Push (obj);
   return true;
 }
 
 bool csMeshList::Remove (iMeshWrapper *obj)
 {
-  FreeItem (obj);
+  FreeMesh (obj);
   list.Delete (obj);
   return true;
 }
 
 bool csMeshList::Remove (int n)
 {
-  FreeItem (list[n]);
+  FreeMesh (list[n]);
   list.DeleteIndex (n);
   return true;
 }
@@ -782,7 +782,7 @@ void csMeshList::RemoveAll ()
   int i;
   for (i = 0 ; i < list.Length () ; i++)
   {
-    FreeItem (list[i]);
+    FreeMesh (list[i]);
   }
   list.DeleteAll ();
 }
@@ -803,10 +803,10 @@ iMeshWrapper *csMeshList::FindByName (const char *Name) const
 //--------------------------------------------------------------------------
 // csMeshMeshList
 //--------------------------------------------------------------------------
-void csMeshMeshList::PrepareItem (iMeshWrapper* child)
+void csMeshMeshList::PrepareMesh (iMeshWrapper* child)
 {
   CS_ASSERT (mesh != 0);
-  csMeshList::PrepareItem (child);
+  csMeshList::PrepareMesh (child);
 
   // unlink the mesh from the engine or another parent.
   iMeshWrapper *oldParent = child->GetParentContainer ();
@@ -829,7 +829,7 @@ void csMeshMeshList::PrepareItem (iMeshWrapper* child)
   child->GetMovable ()->SetParent (&mesh->GetCsMovable ().scfiMovable);
 }
 
-void csMeshMeshList::FreeItem (iMeshWrapper* item)
+void csMeshMeshList::FreeMesh (iMeshWrapper* item)
 {
   CS_ASSERT (mesh != 0);
 
@@ -845,7 +845,7 @@ void csMeshMeshList::FreeItem (iMeshWrapper* item)
 
   mesh->RemoveMeshFromStaticLOD (item);
 
-  csMeshList::FreeItem (item);
+  csMeshList::FreeMesh (item);
 }
 
 //--------------------------------------------------------------------------
@@ -862,21 +862,21 @@ csMeshFactoryList::csMeshFactoryList ()
 
 int csMeshFactoryList::Add (iMeshFactoryWrapper *obj)
 {
-  PrepareItem (obj);
+  PrepareFactory (obj);
   list.Push (obj);
   return true;
 }
 
 bool csMeshFactoryList::Remove (iMeshFactoryWrapper *obj)
 {
-  FreeItem (obj);
+  FreeFactory (obj);
   list.Delete (obj);
   return true;
 }
 
 bool csMeshFactoryList::Remove (int n)
 {
-  FreeItem (list[n]);
+  FreeFactory (list[n]);
   list.Delete (Get (n));
   return true;
 }
@@ -886,7 +886,7 @@ void csMeshFactoryList::RemoveAll ()
   int i;
   for (i = 0 ; i < list.Length () ; i++)
   {
-    FreeItem (list[i]);
+    FreeFactory (list[i]);
   }
   list.DeleteAll ();
 }
@@ -905,10 +905,10 @@ iMeshFactoryWrapper *csMeshFactoryList::FindByName (
 //--------------------------------------------------------------------------
 // csMeshFactoryFactoryList
 //--------------------------------------------------------------------------
-void csMeshFactoryFactoryList::PrepareItem (iMeshFactoryWrapper* child)
+void csMeshFactoryFactoryList::PrepareFactory (iMeshFactoryWrapper* child)
 {
   CS_ASSERT (meshfact != 0);
-  csMeshFactoryList::PrepareItem (child);
+  csMeshFactoryList::PrepareFactory (child);
 
   // unlink the factory from another possible parent.
   if (child->GetParentContainer ())
@@ -917,10 +917,10 @@ void csMeshFactoryFactoryList::PrepareItem (iMeshFactoryWrapper* child)
   child->SetParentContainer (&meshfact->scfiMeshFactoryWrapper);
 }
 
-void csMeshFactoryFactoryList::FreeItem (iMeshFactoryWrapper* item)
+void csMeshFactoryFactoryList::FreeFactory (iMeshFactoryWrapper* item)
 {
   CS_ASSERT (meshfact != 0);
   item->SetParentContainer (0);
   meshfact->RemoveFactoryFromStaticLOD (item);
-  csMeshFactoryList::FreeItem (item);
+  csMeshFactoryList::FreeFactory (item);
 }

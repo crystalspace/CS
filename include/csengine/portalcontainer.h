@@ -20,11 +20,12 @@
 #define __CS_PORTALCONTAINER_H__
 
 #include "csengine/sectorobj.h"
+#include "iengine/portalcontainer.h"
 
 /**
  * This is a container class for portals.
  */
-class csPortalContainer : public csSectorObject
+class csPortalContainer : public csSectorObject, public iPortalContainer
 {
   virtual void MoveToSector (iSector*) { }
   virtual void RemoveFromSectors () { }
@@ -49,6 +50,9 @@ public:
 
   // For iVisibilityObject:
   virtual iMeshWrapper* GetMeshWrapper () const { return 0; }
+
+  // For iPortalContainer:
+  virtual iObject *QueryObject () { return (csObject*)this; }
 
   //--------------------- SCF stuff follows ------------------------------//
   SCF_DECLARE_IBASE_EXT (csSectorObject);

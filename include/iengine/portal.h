@@ -19,6 +19,12 @@
 #ifndef __CS_ENGINE_PORTAL_H__
 #define __CS_ENGINE_PORTAL_H__
 
+/**\file
+ */
+/**
+ * \addtogroup engine3d
+ * @{ */
+
 #include "csutil/scf.h"
 
 class csReversibleTransform;
@@ -288,6 +294,8 @@ struct iPortal : public iBase
   	csVector3& isect) = 0;
 
 };
+
+/** @} */
 
 #endif // __CS_ENGINE_PORTAL_H__
 
