@@ -17,6 +17,7 @@
 #include "awslabel.h"
 #include "awstxtbx.h"
 #include "awsradbt.h"
+#include "awschkbx.h"
 
 
 #include <stdio.h>
@@ -786,6 +787,8 @@ awsManager::RegisterCommonComponents()
   (void)new awsLabelFactory(this);
   (void)new awsTextBoxFactory(this);
   (void)new awsRadButtonFactory(this);
+  (void)new awsCheckBoxFactory(this);
+
 
   // Standard sink
   GetSinkMgr()->RegisterSink("awsStandardSink", new awsStandardSink());
