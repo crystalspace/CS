@@ -394,6 +394,15 @@ public:
     {
       return scfParent->GetCameraNumber ();
     }
+    virtual void Perspective (const csVector3& v, csVector2& p) const
+    {
+      scfParent->Perspective (v, p);
+    }
+    virtual void InvPerspective (const csVector2& p, float z,
+    	csVector3& v) const
+    {
+      scfParent->InvPerspective (p, z, v);
+    }
   } scfiCamera;
   friend struct Camera;
 

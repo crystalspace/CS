@@ -10,6 +10,12 @@ The history order is reversed so that new features are at the top.
 	- Made a csSpline superclass. Let csCubicSpline inherit from this.
 	  Added csBSpline and csCatmullRomSpline.
 	- csPath now inherits from csCatmullRomSpline. This is much nicer.
+	- Added csPath::SetXxxVector() and GetXxxVector().
+	- Added iCamera::Perspective() and InvPerspective().
+	- Added a new generic demo application. At this moment it is still
+	  not totally generic. For that I need the loader as a plugin which
+	  isn't possible yet. So at this moment you have to modify the app
+	  to have other objects. The sequences are load dynamically however.
 22-Apr-2001
 	- Norman Kramer split the image loader into several plugins
 	  (iImageIO). Also added support for image saving (currently only

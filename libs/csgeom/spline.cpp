@@ -91,7 +91,7 @@ void csSpline::RemovePoint (int idx)
   int dim;
   for (dim = 0 ; dim < dimensions ; dim++)
   {
-    float* d2 = &points2[dim*(num_points+1)];
+    float* d2 = &points2[dim*(num_points-1)];
     float* d = &points[dim*num_points];
     RemoveFloat (d2, d, idx, num_points);
   }

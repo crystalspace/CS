@@ -73,6 +73,48 @@ public:
   {
     SetVectorAsDimensionValues (6, v);
   }
+  /// Set one position vector.
+  void SetPositionVector (int idx, const csVector3& v)
+  {
+    SetDimensionValue (0, idx, v.x);
+    SetDimensionValue (1, idx, v.y);
+    SetDimensionValue (2, idx, v.z);
+  }
+  /// Set one up vector.
+  void SetUpVector (int idx, const csVector3& v)
+  {
+    SetDimensionValue (3, idx, v.x);
+    SetDimensionValue (4, idx, v.y);
+    SetDimensionValue (5, idx, v.z);
+  }
+  /// Set one forward vector.
+  void SetForwardVector (int idx, const csVector3& v)
+  {
+    SetDimensionValue (6, idx, v.x);
+    SetDimensionValue (7, idx, v.y);
+    SetDimensionValue (8, idx, v.z);
+  }
+  /// Get one position vector.
+  void GetPositionVector (int idx, csVector3& v)
+  {
+    v.x = GetDimensionValue (0, idx);
+    v.y = GetDimensionValue (1, idx);
+    v.z = GetDimensionValue (2, idx);
+  }
+  /// Get one up vector.
+  void GetUpVector (int idx, csVector3& v)
+  {
+    v.x = GetDimensionValue (3, idx);
+    v.y = GetDimensionValue (4, idx);
+    v.z = GetDimensionValue (5, idx);
+  }
+  /// Get one forward vector.
+  void GetForwardVector (int idx, csVector3& v)
+  {
+    v.x = GetDimensionValue (6, idx);
+    v.y = GetDimensionValue (7, idx);
+    v.z = GetDimensionValue (8, idx);
+  }
 
   /// Get the interpolated position.
   void GetInterpolatedPosition (csVector3& pos)

@@ -31,6 +31,7 @@ protected:
   float* time_points;
   float* points;
   bool precalculation_valid;
+  int idx;
 
 public:
   /// Create a spline with d dimensions and p points.
@@ -75,6 +76,11 @@ public:
   float* GetTimeValues () { return time_points; }
 
   /**
+   * Get one time point.
+   */
+  float GetTimeValue (int idx) { return GetTimeValues ()[idx]; }
+
+  /**
    * Set the values for some dimension.
    * 'd' should point to an array containing 'num_points' values.
    * These are the values that will be interpolated. The given
@@ -93,9 +99,23 @@ public:
   float* GetDimensionValues (int dim) { return &points[dim*num_points]; }
 
   /**
+   * Get the value for some dimension.
+   */
+  float GetDimensionValue (int dim, int idx)
+  {
+    float* d = &points[dim*num_points];
+    return d[idx];
+  }
+
+  /**
    * Calculate internal values for this spline given some time value.
    */
   virtual void Calculate (float time) = 0;
+
+  /**
+   * Get the index of the current point we are in (valid after Calculate()).
+   */
+  int GetCurrentIndex () { return idx; }
 
   /**
    * After calling Calculate() you can use this to fetch the value of
@@ -115,7 +135,6 @@ private:
 
   // The following values are calculated by Calculate() and
   // are used later by GetInterpolatedDimension().
-  int idx;
   float A, B, C, D;	// For computation of a spline value.
 
 private:
@@ -149,7 +168,6 @@ class csBSpline : public csSpline
 private:
   // The following values are calculated by Calculate() and
   // are used later by GetInterpolatedDimension().
-  int idx;
   float t;
 
 protected:

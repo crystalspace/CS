@@ -37,9 +37,11 @@
 #define VEC_TILT_DOWN  (-csVector3(-1,0,0))
 
 class csCamera;
+class csVector3;
+class csVector2;
 struct iSector;
 
-SCF_VERSION (iCamera, 0, 0, 8);
+SCF_VERSION (iCamera, 0, 0, 9);
 
 /// Camera class.
 struct iCamera : public iBase
@@ -131,6 +133,12 @@ struct iCamera : public iBase
    * example.
    */
   virtual long GetCameraNumber () = 0;
+
+  /// Calculate perspective corrected point for this camera.
+  virtual void Perspective (const csVector3& v, csVector2& p) const = 0;
+  /// Calculate inverse perspective corrected point for this camera.
+  virtual void InvPerspective (const csVector2& p, float z,
+  	csVector3& v) const = 0;
 };
 
 #endif
