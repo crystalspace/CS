@@ -352,18 +352,19 @@ void csCrossBuild_ThingTemplateFactory::Build_TriangleMesh (
 }
 
 csCrossBuild_Quake2Importer::csCrossBuild_Quake2Importer()
-      : localVFS (*(System->VFS) )
 {
+  localVFS = QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
 }
 
 
 csCrossBuild_Quake2Importer::csCrossBuild_Quake2Importer(iVFS *specialVFS)
-      : localVFS (*specialVFS)
 {
+  (localVFS = specialVFS)->IncRef ();
 }
 
 csCrossBuild_Quake2Importer::~csCrossBuild_Quake2Importer()
 {
+  DEC_REF (localVFS);
 }
 
 iMeshObjectFactory *csCrossBuild_Quake2Importer::Import_Quake2File (
@@ -456,7 +457,7 @@ iTextureWrapper *csCrossBuild_Quake2Importer::Import_Quake2Textures (
   char const*skinpath, char const*modelname, iEngine *importdestination) const
 {
   // go through and load all .pcx and .bmp files in the archive
-  iStrVector *skinlist = localVFS.FindFiles(skinpath);
+  iStrVector *skinlist = localVFS->FindFiles(skinpath);
   int const skinfilecount = skinlist->Length();
 
   iTextureWrapper *defaulttexture = NULL;
@@ -471,7 +472,7 @@ iTextureWrapper *csCrossBuild_Quake2Importer::Import_Quake2Textures (
 	|| (strcasecmp("bmp",fileextension) == 0)
        )
     {
-      iDataBuffer *imagedata = localVFS.ReadFile(skinfilename);
+      iDataBuffer *imagedata = localVFS->ReadFile(skinfilename);
 
       iImage *newskin = LoadImage(imagedata->GetUint8 (),
         imagedata->GetSize (), importdestination->GetTextureFormat ());
@@ -480,8 +481,10 @@ iTextureWrapper *csCrossBuild_Quake2Importer::Import_Quake2Textures (
 
       //if (!defaulttexture)
       defaulttexture = importdestination->GetTextureList ()->NewTexture (newskin);
-      defaulttexture->Register (System->G3D->GetTextureManager ());
-
+      iGraphics3D *G3D = QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
+      defaulttexture->Register (G3D->GetTextureManager ());
+      G3D->DecRef ();
+      
       printf("added texture %s...\n",skinfilename);
 
       const char *prefixstring = modelname;
