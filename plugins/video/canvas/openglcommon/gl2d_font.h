@@ -60,7 +60,7 @@ protected:
 
 #ifndef OPENGL_BITMAP_FONT
   // Auxiliary routine for "font-on-a-texture" approach
-  bool csGraphics2DOpenGLFontServer::ClipRect (float x, float y,
+  bool ClipRect (float x, float y,
     float &x1, float &y1, float &x2, float &y2, 
     float &tx1, float &ty1, float &tx2, float &ty2);
 #endif
