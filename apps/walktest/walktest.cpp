@@ -999,8 +999,16 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
       if (name)
       {
         name++;
-        sprintf (tmp, "$.$/data$/%s.zip, $.$/%s.zip, $(..)$/data$/%s.zip",
-          name, name, name);
+        //sprintf (tmp, "$.$/data$/%s.zip, $.$/%s.zip, $(..)$/data$/%s.zip",
+        //  name, name, name);
+	    const char *valfiletype = "";
+	    valfiletype = Config->GetStr ("World", "WORLDZIPTYPE" "");
+	    if(strcmp (valfiletype, "") ==0)
+		{
+	      valfiletype = "zip";
+		}
+        sprintf (tmp, "$.$/data$/%s.%s, $.$/%s.%s, $(..)$/data$/%s.%s",
+           name, valfiletype, name, valfiletype, name, valfiletype );
         VFS->Mount (world_dir, tmp);
       }
     }
