@@ -20,7 +20,7 @@ All files in @uref{ftp://ftp.linuxgames.com/crystal/support/mingw32/}
 @sc{nasm} (Netwide Assembler) for Windows@*
 @uref{ftp://ftp.linuxgames.com/crystal/nasm/nasm-0.98e-bin-w32.zip}
 @item
-Get the Mingw compiler itself, the most recently updated and well supported @sc{gcc} Windows compiler: @url{http://www.nanotech.wisc.edu/~khan/software/gnu-win32/}
+Get the Mingw compiler itself, the most recently updated and well supported @sc{gcc} Windows compiler: @url{http://www.mingw.org/} - Note: Get the latest @strong{release} (either the *-msvcrt.exe or *-crtdll.exe, the first is optimized the later is assured to work on all win32 platforms)
 @end itemize
 
 @subsubheading Installing the downloaded packages
