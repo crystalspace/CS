@@ -289,7 +289,6 @@ void Demo::SetupSector ()
 
   float size = 500.0; /// Size of the skybox -- around 0,0,0 for now.
   iPolygon3D* p;
-  printf ("down:\n");
   p = walls_state->CreatePolygon ("d");
   p->SetMaterial (engine->FindMaterial ("nebula_d"));
   p->CreateVertex (csVector3 (-size, -size, size));
@@ -300,7 +299,6 @@ void Demo::SetupSector ()
   	2.*size, p->GetVertex (3), 2.*size);
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
 
-  printf ("up:\n");
   p = walls_state->CreatePolygon ("u");
   p->SetMaterial (engine->FindMaterial ("nebula_u"));
   p->CreateVertex (csVector3 (-size, size, -size));
@@ -311,7 +309,6 @@ void Demo::SetupSector ()
   	2.*size, p->GetVertex (3), 2.*size);
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
 
-  printf ("front:\n");
   p = walls_state->CreatePolygon ("f");
   p->SetMaterial (engine->FindMaterial ("nebula_f"));
   p->CreateVertex (csVector3 (-size, size, size));
@@ -322,7 +319,6 @@ void Demo::SetupSector ()
 	2.*size, p->GetVertex (3), 2.*size);
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
 
-  printf ("right:\n");
   p = walls_state->CreatePolygon ("r");
   p->SetMaterial (engine->FindMaterial ("nebula_r"));
   p->CreateVertex (csVector3 (size, size, size));
@@ -333,7 +329,6 @@ void Demo::SetupSector ()
   	2.*size, p->GetVertex (3), 2.*size);
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
 
-  printf ("left:\n");
   p = walls_state->CreatePolygon ("l");
   p->SetMaterial (engine->FindMaterial ("nebula_l"));
   p->CreateVertex (csVector3 (-size, size, -size));
@@ -344,7 +339,6 @@ void Demo::SetupSector ()
   	2.*size, p->GetVertex (3), 2.*size);
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
 
-  printf ("back:\n");
   p = walls_state->CreatePolygon ("b");
   p->SetMaterial (engine->FindMaterial ("nebula_b"));
   p->CreateVertex (csVector3 (size, size, -size));
@@ -366,8 +360,6 @@ void Demo::SetupSector ()
   walls->SetZBufMode (CS_ZBUF_NONE);
   walls_state = QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
 
-  printf ("stars:\n");
-  printf ("down:\n");
   size = 200.0; /// Size of the skybox -- around 0,0,0 for now.
   p = walls_state->CreatePolygon ("d");
   p->SetMaterial (engine->FindMaterial ("stars"));
@@ -381,7 +373,6 @@ void Demo::SetupSector ()
   iPolyTexType* pt = p->GetPolyTexType ();
   pt->SetMixMode (CS_FX_ADD);
 
-  printf ("up:\n");
   p = walls_state->CreatePolygon ("u");
   p->SetMaterial (engine->FindMaterial ("stars"));
   p->CreateVertex (csVector3 (-size, size, -size));
@@ -394,7 +385,6 @@ void Demo::SetupSector ()
   pt = p->GetPolyTexType ();
   pt->SetMixMode (CS_FX_ADD);
 
-  printf ("front:\n");
   p = walls_state->CreatePolygon ("f");
   p->SetMaterial (engine->FindMaterial ("stars"));
   p->CreateVertex (csVector3 (-size, size, size));
@@ -407,7 +397,6 @@ void Demo::SetupSector ()
   pt = p->GetPolyTexType ();
   pt->SetMixMode (CS_FX_ADD);
 
-  printf ("right:\n");
   p = walls_state->CreatePolygon ("r");
   p->SetMaterial (engine->FindMaterial ("stars"));
   p->CreateVertex (csVector3 (size, size, size));
@@ -420,7 +409,6 @@ void Demo::SetupSector ()
   pt = p->GetPolyTexType ();
   pt->SetMixMode (CS_FX_ADD);
 
-  printf ("left:\n");
   p = walls_state->CreatePolygon ("l");
   p->SetMaterial (engine->FindMaterial ("stars"));
   p->CreateVertex (csVector3 (-size, size, -size));
@@ -433,7 +421,6 @@ void Demo::SetupSector ()
   pt = p->GetPolyTexType ();
   pt->SetMixMode (CS_FX_ADD);
 
-  printf ("back:\n");
   p = walls_state->CreatePolygon ("b");
   p->SetMaterial (engine->FindMaterial ("stars"));
   p->CreateVertex (csVector3 (size, size, -size));

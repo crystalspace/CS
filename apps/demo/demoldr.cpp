@@ -458,11 +458,12 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	int i;
 
 	// First get the list of relative speeds.
-	float list[10000];
+	float* list = new float[10000];
 	int n;
 	csScanStr (params, "%F", list+1, &n);	// Don't read in list[0]
 	if (n != num-1)
 	{
+	  delete[] list;
 	  demo->Printf (MSG_FATAL_ERROR,
 	  	"SPEED should use %d-1 entries in path '%s'!\n", num, pName);
 	  exit (0);
@@ -495,6 +496,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	for (i = 1 ; i < num ; i++) list[i] *= correct;
 
 	np->SetTimeValues (list);
+	delete[] list;
         break;
       }
       case CS_TOKEN_UNIFORMSPEED:
@@ -505,7 +507,6 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	  	"First use NUM, POS in path '%s'!\n", pName);
 	  exit (0);
 	}
-	float list[10000];
 	float* xv, * yv, * zv;
 	xv = np->GetDimensionValues (0);
 	yv = np->GetDimensionValues (1);
@@ -527,6 +528,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	// Calculate the time value for every path segment,
 	// given the total length of the path.
 	v0.Set (xv[0], yv[0], zv[0]);
+	float* list = new float[10000];
 	list[0] = 0;
 	float tot = 0;
 	for (i = 1 ; i < num ; i++)
@@ -538,6 +540,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	  v0 = v1;
 	}
 	np->SetTimeValues (list);
+	delete[] list;
         break;
       }
       case CS_TOKEN_TIMES:
@@ -549,15 +552,17 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	  exit (0);
 	}
 	int n;
-	float list[10000];
+	float* list = new float[10000];
 	csScanStr (params, "%F", list, &n);
 	if (n != num)
 	{
+	  delete[] list;
 	  demo->Printf (MSG_FATAL_ERROR,
 	  	"TIMES should use %d entries in path '%s'!\n", num, pName);
 	  exit (0);
 	}
 	np->SetTimeValues (list);
+        delete[] list;
 	break;
       }
       case CS_TOKEN_POS:
@@ -569,14 +574,16 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	  exit (0);
 	}
 	seq++;
-	csVector3 v[10000];
+	csVector3* v = new csVector3[10000];
 	if (!ParseVectorList (params, v, num))
 	{
+	  delete[] v;
 	  demo->Printf (MSG_FATAL_ERROR,
 	  	"POS should use %d entries in path '%s'!\n", num, pName);
 	  exit (0);
 	}
 	np->SetPositionVectors (v);
+	delete[] v;
 	break;
       }
       case CS_TOKEN_FORWARD:
@@ -587,14 +594,16 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	  	"First use NUM in path '%s'!\n", pName);
 	  exit (0);
 	}
-	csVector3 v[10000];
+	csVector3* v = new csVector3[10000];
 	if (!ParseVectorList (params, v, num))
 	{
+	  delete[] v;
 	  demo->Printf (MSG_FATAL_ERROR,
 	  	"FORWARD should use %d entries in path '%s'!\n", num, pName);
 	  exit (0);
 	}
 	np->SetForwardVectors (v);
+	delete[] v;
 	break;
       }
       case CS_TOKEN_UP:
@@ -605,14 +614,16 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	  	"First use NUM in path '%s'!\n", pName);
 	  exit (0);
 	}
-	csVector3 v[10000];
+	csVector3* v = new csVector3[10000];
 	if (!ParseVectorList (params, v, num))
 	{
+	  delete[] v;
 	  demo->Printf (MSG_FATAL_ERROR,
 	  	"UP should use %d entries in path '%s'!\n", num, pName);
 	  exit (0);
 	}
 	np->SetUpVectors (v);
+	delete[] v;
 	break;
       }
     }
@@ -627,5 +638,3 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 
   return np;
 }
-
-//-----------------------------------------------------------------------------

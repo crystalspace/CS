@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+24-Jun-2001
+	- Eric Sunshine repaired DemoSequenceLoader::LoadPath() so that it no
+	  longer allocates 10,000 element arrays of `float' and 'csVector3' on
+	  the stack, since such huge arrays are frequently unportable.  In this
+	  case, they blew the OpenStep stack, resulting in abnormal program
+	  termination.
 22-Jun-2001
 	- Fixed a bug in Walktest with the deletion of the legs/body
 	  collider. They were deleted with DecRef() but that is illegal
