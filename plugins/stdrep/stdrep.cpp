@@ -84,6 +84,18 @@ csReporterListener::csReporterListener (iBase *iParent)
   nativewm = NULL;
   reporter = NULL;
   debug_file = csStrNew ("debug.txt");
+#ifdef CS_DEBUG
+  SetMessageDestination (
+  	CS_REPORTER_SEVERITY_BUG, false, true, true, true, true);
+  SetMessageDestination (
+  	CS_REPORTER_SEVERITY_ERROR, false, true, true, true, true);
+  SetMessageDestination (
+  	CS_REPORTER_SEVERITY_WARNING, true, false, true, false, true);
+  SetMessageDestination (
+  	CS_REPORTER_SEVERITY_NOTIFY, true, false, true, false, true);
+  SetMessageDestination (
+  	CS_REPORTER_SEVERITY_DEBUG, true, false, true, false, true);
+#else
   SetMessageDestination (
   	CS_REPORTER_SEVERITY_BUG, false, true, true, true, true);
   SetMessageDestination (
@@ -94,6 +106,7 @@ csReporterListener::csReporterListener (iBase *iParent)
   	CS_REPORTER_SEVERITY_NOTIFY, false, false, true, false, false);
   SetMessageDestination (
   	CS_REPORTER_SEVERITY_DEBUG, false, false, false, false, true);
+#endif
   RemoveMessages (CS_REPORTER_SEVERITY_BUG, true);
   RemoveMessages (CS_REPORTER_SEVERITY_ERROR, true);
   RemoveMessages (CS_REPORTER_SEVERITY_WARNING, true);
@@ -101,8 +114,13 @@ csReporterListener::csReporterListener (iBase *iParent)
   RemoveMessages (CS_REPORTER_SEVERITY_DEBUG, true);
   ShowMessageID (CS_REPORTER_SEVERITY_BUG, true);
   ShowMessageID (CS_REPORTER_SEVERITY_ERROR, true);
+#ifdef CS_DEBUG
+  ShowMessageID (CS_REPORTER_SEVERITY_WARNING, true);
+  ShowMessageID (CS_REPORTER_SEVERITY_NOTIFY, true);
+#else
   ShowMessageID (CS_REPORTER_SEVERITY_WARNING, false);
   ShowMessageID (CS_REPORTER_SEVERITY_NOTIFY, false);
+#endif
   ShowMessageID (CS_REPORTER_SEVERITY_DEBUG, true);
 }
 
