@@ -21,6 +21,7 @@
 #include "cssysdef.h"
 #include "socket.h"
 #include "isystem.h"
+#include "ievent.h"
 #include "csutil/util.h"
 
 #define CS_NET_LISTEN_QUEUE_SIZE 5
@@ -207,24 +208,24 @@ csSocketDriver::csSocketDriver(iBase* p) : LastError(CS_NET_ERR_NO_ERROR)
 csSocketDriver::~csSocketDriver() {}
 void csSocketDriver::ClearError() { LastError = CS_NET_ERR_NO_ERROR; }
 
-bool csSocketDriver::Open()
+void csSocketDriver::Open()
 {
   ClearError();
   Sys->Printf (MSG_INITIALIZATION, "Initializing socket network driver: ");
   const bool ok = PlatformDriverStart();
   Sys->Printf (MSG_INITIALIZATION, ok ? "OK\n" : "FAILED\n");
-  return ok;
 }
 
-bool csSocketDriver::Close()
+void csSocketDriver::Close()
 {
   ClearError();
-  return PlatformDriverStop();
+  PlatformDriverStop();
 }
 
 bool csSocketDriver::Initialize(iSystem* p)
 {
   Sys = p;
+  Sys->CallOnEvents(this, CSMASK_Command | CSMASK_Broadcast);
   return true;
 }
 
@@ -362,3 +363,18 @@ bool csSocketDriver::PlatformDriverStop()
 }
 
 #endif
+
+bool csSocketDriver::HandleEvent (iEvent &e)
+{
+  if (e.Type == csevCommand || e.Type == csevBroadcast) {
+    switch (e.Command.Code) {
+    case cscmdSystemOpen:
+      Open();
+      break;
+    case cscmdSystemClose:
+      Close();
+      break;
+    }
+  }
+  return false;
+}

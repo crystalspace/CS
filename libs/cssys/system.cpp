@@ -501,10 +501,6 @@ bool csSystemDriver::Open (const char *Title)
     Depth *= 8;
   }
 
-  if (NetDrv)
-    if (!NetDrv->Open ())
-      return false;
-
   // Now pass the open event to all plugins
   csEvent Event (GetTime (), csevBroadcast, cscmdSystemOpen);
   HandleEvent (Event);
@@ -518,8 +514,6 @@ void csSystemDriver::Close ()
   csEvent Event (GetTime (), csevBroadcast, cscmdSystemClose);
   HandleEvent (Event);
 
-  if (NetDrv)
-    NetDrv->Close ();
   if (G3D)
     G3D->Close ();
 }

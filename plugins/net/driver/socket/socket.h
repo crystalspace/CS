@@ -96,8 +96,9 @@ public:
   csSocketDriver(iBase*);
   virtual ~csSocketDriver();
   virtual bool Initialize(iSystem*);
-  virtual bool Open();
-  virtual bool Close();
+  virtual bool HandleEvent (iEvent &/*Event*/);
+  void Open();
+  void Close();
   virtual csNetworkDriverCapabilities GetCapabilities() const;
   virtual csNetworkDriverError GetLastError () const { return LastError; }
     

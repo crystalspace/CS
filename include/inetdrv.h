@@ -165,8 +165,6 @@ struct iNetworkDriver : public iPlugIn
 
   // iPlugIn interface.
   virtual bool Initialize(iSystem*) = 0;
-  virtual bool Open() = 0;
-  virtual bool Close() = 0;
 };
 
 #endif // __CS_INETDRV_H__
