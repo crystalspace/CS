@@ -289,7 +289,7 @@ static void init_source (j_decompress_ptr cinfo)
 
 /*
  * Fill the input buffer --- called whenever buffer is emptied.
- * should never happen :)
+ * should never happen except in jpg files with errors :)
  */
 static boolean fill_input_buffer (j_decompress_ptr cinfo)
 {
@@ -462,10 +462,17 @@ bool ImageJpgFile::Load (UByte* iBuffer, ULong iSize)
 
     if (cinfo.output_components == 1)
       if (cinfo.quantize_colors)
+      {
+	// Safety.
+	if (bufp + row_stride > pixelcount) break;
         /* paletted image */
         memcpy (((UByte *)Image) + bufp, buffer [0], row_stride);
+      }
       else
-      { /* Grayscale image */
+      {
+	// Safety.
+	if (bufp + (int)cinfo.output_width > pixelcount) break;
+	/* Grayscale image */
         csRGBpixel *out = ((csRGBpixel *)Image) + bufp;
         for (i = 0; i < (int)cinfo.output_width; i++)
         {
@@ -474,7 +481,10 @@ bool ImageJpgFile::Load (UByte* iBuffer, ULong iSize)
         }
       }
     else
-    { /* rgb triplets */
+    {
+      // Safety.
+      if (bufp + (int)cinfo.output_width > pixelcount) break;
+      /* rgb triplets */
       csRGBpixel *out = ((csRGBpixel *)Image) + bufp;
       for (i = 0; i < (int)cinfo.output_width; i++)
         memcpy (out++, buffer [0] + i * 3, 3);

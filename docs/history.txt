@@ -12,6 +12,7 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug in gfxtest where it was using the Y size of the
 	  first image to scale all the others too if multiple images
 	  where given and scaling is enabled.
+	- Fixed a potential overflow bug in the jpg image loader.
 20-Dec-2001
 	- Fixed gfxtest so it will actually write out the PNG file correctly
 	  on windows (i.e. use binary mode for writing the file).
