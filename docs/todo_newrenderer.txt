@@ -28,12 +28,15 @@ Things that need to be done in new renderer:
 		- Will need some way to distinguish between 'static' and
 		  'dynamic' lights and objects (move vs non-move).
 	- Portals.
+		- Basic portals, DONE
+		- Z-filling not done
+		- Floating portals not done
 	- Debug lines and everything related to debugging support in g3d.
-	- Correct usage of cullers.
+	- Correct usage of cullers - DONE.
 	- Isometric engine.
 	- Shadows (needs fixing).
-	- Variable system (done, more or less).
-	- Materials (done, more or less).
+	- Variable system DONE
+	- Materials DONE
 	- Pseudo VP with similar functionality as old texture layers.
 	- Fix smoothed things. (Done)
 	- Better error handling. Everything is too crashy.

@@ -32,6 +32,7 @@ chronological order.
 	    mesh animates.
 	  - Added a 1-TU version of the OR lighting shader. Still has issues
 	    with transparency, tho.
+	- Marten updated todo_newrenderer.txt
 7-Jan-2004
         - Andrew Craig fixed the Jamfile for sprcal3dldr to link in the
 	  required CAL3D library.
