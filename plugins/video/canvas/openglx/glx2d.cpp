@@ -107,7 +107,7 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
   {
     GLX_RGBA, 
     GLX_DOUBLEBUFFER, 
-    GLX_DEPTH_SIZE, 1, 
+    GLX_DEPTH_SIZE, 8, 
     GLX_RED_SIZE, 4,
     GLX_BLUE_SIZE, 4,
     GLX_GREEN_SIZE, 4,
@@ -126,6 +126,7 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
     cmap = XCreateColormap (dpy, RootWindow (dpy, active_GLVisual->screen),
            active_GLVisual->visual, AllocNone);
     visual = active_GLVisual->visual;
+    CsPrintf (MSG_INITIALIZATION, "Seized Visual ID %d\n", visual->visualid);
   }
   else
   {
@@ -287,20 +288,8 @@ void csGraphics2DGLX::Close(void)
 }
 
 
-void csGraphics2DGLX::Print (csRect *area)
+void csGraphics2DGLX::Print (csRect * /*area*/)
 {
-/*  int i = Width*Height;
-  while (i > 0)
-  {
-    *dst++ = (*src & 0xf00) >> 4;
-    *dst++ = (*src & 0xf0);
-    *dst++ = (*src & 0xf) << 4;
-    src++;
-    i--;
-  }
-  glDrawPixels(Width,Height,GL_RGB,GL_UNSIGNED_BYTE,real_Memory);
-*/
-//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glXSwapBuffers (dpy,window);
   glFlush (); // not needed?
 }
@@ -328,7 +317,7 @@ bool csGraphics2DGLX::SetMouseCursor (csMouseCursorID iShape)
   } /* endif */
 }
 
-static Bool CheckKeyPress (Display *dpy, XEvent *event, XPointer arg)
+static Bool CheckKeyPress (Display * /*dpy*/, XEvent *event, XPointer arg)
 {
   XEvent *curevent = (XEvent *)arg;
   if ((event->type == KeyPress)
