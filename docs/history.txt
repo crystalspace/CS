@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Aug-2004
+	- Jorrit temporarily put back the old inpnames.h and inpnames.cpp
+	  until the new csInputDefinition class works well for normal keys
+	  too.
 11-Aug-2004
 	- PK implemented the SaverPlugin in genmesh, spr3dmesh and fixed a
 	  bug in the write down order of the other SaverPlugins.
