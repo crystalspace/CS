@@ -755,7 +755,7 @@ bool csGraphics3DOGLCommon::NewOpen ()
 	Report (CS_REPORTER_SEVERITY_NOTIFY, "read config for '%s' from %s",
 	  oglconfig.GetData(), cfgfile.GetData());
       }
-      oglconfigs.Push(oglconfig.GetData());
+      oglconfigs.Push(csStrNew (oglconfig.GetData()));
     } 
   }
   it->DecRef();

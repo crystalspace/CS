@@ -90,6 +90,12 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed csEventQueue so that it no longer leaks its
 	  "default" iEventOutlet.  This problem was pointed out by Jorge
 	  Acereda Macia <drslump@ono.com>.
+	- Fixed a bug in OpenGL renderer in combination with the new use
+	  of csStrVector. When pushing a new string on the vector you MUST
+	  allocate a copy because csStrVector doesn't do that automatically.
+	  However csStrVector will delete the string at destruction time
+	  so it was actually deleting a string which was already deleted
+	  because it belonged to a csString that was previously destructed.
 8-Nov-2001
 	- Jorge Acereda fixed a leak in ieplex.cpp where the result of a
 	  SCF::QueryClassList() wasn't DecRef()ed.
