@@ -50,6 +50,10 @@
 #include "csengine/csview.h"
 #include "igraph3d.h"
 #include "itxtmgr.h"
+// Stuff for sound
+#include "isndrdr.h"
+#include "csparser/snddatao.h"
+#include "cssfxldr/common/snddata.h"
 
 // ----------------------------------------------------
 // Start networking stuff.
@@ -2110,6 +2114,14 @@ void Blocks::InitWorld ()
   InitGameRoom ();
   InitDemoRoom ();
   Sys->world->Prepare ();
+
+#ifdef DO_SOUND
+  // Load the blocks.zip library where sound refs are stored
+  csLoader::LoadLibraryFile (world, "/data/blocks/library");
+  csSoundData* w = csSoundDataObject::GetSound(*world, "background.wav");
+  if (w && Sound) Sound->PlayEphemeral (w, true);
+#endif
+
 }
 
 
