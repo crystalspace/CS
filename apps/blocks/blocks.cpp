@@ -33,7 +33,6 @@
 #include "cssys/system.h"
 #include "csparser/csloader.h"
 #include "csutil/inifile.h"
-#include "csutil/vfs.h"
 #include "csgfxldr/csimage.h"
 #include "csengine/dumper.h"
 #include "csengine/texture.h"
@@ -47,6 +46,7 @@
 #include "csengine/thing.h"
 #include "csengine/textrans.h"
 #include "csengine/csview.h"
+#include "ivfs.h"
 #include "igraph3d.h"
 #include "itxtmgr.h"
 #include "isndrdr.h"
@@ -76,9 +76,8 @@ csView* view = NULL;
 #define Gfx3D System->G3D
 #define Gfx2D System->G2D
 
-//------------------------------ We need the VFS plugin and the 3D engine -----
+//------------------------------------------------- We need the 3D engine -----
 
-REGISTER_STATIC_LIBRARY (vfs)
 REGISTER_STATIC_LIBRARY (engine)
 
 int Blocks::white, Blocks::black, Blocks::red;

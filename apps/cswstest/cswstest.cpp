@@ -21,9 +21,6 @@
 #include "cssys/sysdriv.h"
 #include "csws/csws.h"
 
-// We need the Virtual File System plugin
-REGISTER_STATIC_LIBRARY (vfs)
-
 class csWsTest : public csApp
 {
   void ThemeDialog ();

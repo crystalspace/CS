@@ -33,9 +33,8 @@
 #include "iscript.h"
 #include "csengine/dumper.h"
 
-//------------------------------ We need the VFS plugin and the 3D engine -----
+//------------------------------------------------- We need the 3D engine -----
 
-REGISTER_STATIC_LIBRARY (vfs)
 REGISTER_STATIC_LIBRARY (engine)
 
 //-----------------------------------------------------------------------------

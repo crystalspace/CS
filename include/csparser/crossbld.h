@@ -27,7 +27,6 @@
 #define __CROSSBLD_H__
 
 #include "csparser/impexp.h"
-#include "csutil/vfs.h"
 #include "csengine/cssprite.h"
 #include "csengine/triangle.h"
 
@@ -207,7 +206,7 @@ class csCrossBuild_Quake2Importer
 
     // find a MD2 geometry file, load and return it, with all standard
     // actions already created
-    csSpriteTemplate *Import_Quake2SpriteTemplate(csFile &modelfile) const;
+    csSpriteTemplate *Import_Quake2SpriteTemplate(iFile *modelfile) const;
 
     // find textures in a directory and add to the world.  the texture names
     // are made by concatinating the modelname passed in and the
@@ -230,7 +229,7 @@ class csCrossBuild_Quake2Importer
     /// or whatever, to files.   If no VFS is supplied it will use
     /// the system VFS
     csCrossBuild_Quake2Importer();
-    csCrossBuild_Quake2Importer(csVFS &specialVFS);
+    csCrossBuild_Quake2Importer(iVFS *specialVFS);
     ~csCrossBuild_Quake2Importer();
 
     /// import quake 2 data by reading in a specified MD2 file.  Any

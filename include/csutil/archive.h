@@ -21,9 +21,10 @@
 #define __ARCHIVE_H__
 
 #include <stdio.h>
-#include <time.h>
 #include "csutil/zip.h"
 #include "csutil/csstrvec.h"
+
+struct csFileTime;
 
 /**
  * This class can be used to work with standard ZIP archives.
@@ -104,8 +105,8 @@ private:
 
   void ReadDirectory ();
   bool IsDeleted (const char *name) const;
-  void UnpackTime (ush zdate, ush ztime, tm &rtime) const;
-  void PackTime (tm &ztime, ush &rdate, ush &rtime) const;
+  void UnpackTime (ush zdate, ush ztime, csFileTime &rtime) const;
+  void PackTime (const csFileTime &ztime, ush &rdate, ush &rtime) const;
   bool ReadArchiveComment (FILE *file, size_t zipfile_comment_length);
   void LoadECDR (ZIP_end_central_dir_record &ecdr, char *buff);
   bool ReadCDFH (ZIP_central_directory_file_header &cdfh, FILE *file);
@@ -197,9 +198,9 @@ public:
   size_t GetFileSize (void *entry) const
   { return ((ArchiveEntry*)entry)->info.ucsize; }
   /// Query filetime from handle
-  void GetFileTime (void *entry, tm &ztime) const;
+  void GetFileTime (void *entry, csFileTime &ztime) const;
   /// Set filetime for handle
-  void SetFileTime (void *entry, tm &ztime);
+  void SetFileTime (void *entry, const csFileTime &ztime);
 
   /// Query archive filename
   char *GetName () const
@@ -209,7 +210,7 @@ public:
   { return comment; }
 };
 
-inline void csArchive::GetFileTime (void *entry, tm &ztime) const
+inline void csArchive::GetFileTime (void *entry, csFileTime &ztime) const
 {
   if (entry)
   {
@@ -219,7 +220,7 @@ inline void csArchive::GetFileTime (void *entry, tm &ztime) const
   } /* endif */
 }
 
-inline void csArchive::SetFileTime (void *entry, tm &ztime)
+inline void csArchive::SetFileTime (void *entry, const csFileTime &ztime)
 {
   if (entry)
   {

@@ -46,14 +46,15 @@
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csutil/token.h"
-#include "csutil/vfs.h"
 #include "csutil/inifile.h"
 #include "csutil/util.h"
 #include "cssys/system.h"
+#include "csgfxldr/csimage.h"
+#include "ivfs.h"
+#include "istring.h"
 #include "isndldr.h"
 #include "isnddata.h"
 #include "isndrdr.h"
-#include "csgfxldr/csimage.h"
 #include "itxtmgr.h"
 
 typedef char ObName[30];
@@ -2390,9 +2391,9 @@ iImage* csLoader::load_image (const char* name)
     return NULL;
   }
 
-  char *xname = System->VFS->ExpandPath (name);
-  ifile->SetName (xname);
-  delete [] xname;
+  iString *xname = System->VFS->ExpandPath (name);
+  ifile->SetName (*xname);
+  xname->DecRef ();
 
   return ifile;
 }

@@ -27,11 +27,11 @@
 #include "csengine/collider.h"
 #include "csengine/light.h"
 #include "csutil/inifile.h"
-#include "csutil/vfs.h"
 #include "walktest/wentity.h"
 #include "iworld.h"
 #include "iconsole.h"
 #include "iconinp.h"
+#include "ivfs.h"
 
 class Polygon3D;
 class WalkTest;

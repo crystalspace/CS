@@ -39,10 +39,10 @@
 
 #include "csengine/thing.h"
 #include "csengine/cssprite.h"
-#include "csutil/vfs.h"
 #include "csutil/inifile.h"
 #include "csutil/csstring.h"
 #include "cssys/csendian.h"
+#include "ivfs.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

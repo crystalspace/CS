@@ -1,65 +1,69 @@
-DESCRIPTION.enginep = Crystal Space Engine Plugin
+#---------------------------
+# Engine plugin submakefile
+#---------------------------
+
+DESCRIPTION.engine = Crystal Space 3D Engine Plugin
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make enginep      Make the $(DESCRIPTION.enginep)$"
+  $(NEWLINE)echo $"  make engine       Make the $(DESCRIPTION.engine)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: enginep enginepclean
-plugins all: enginep
-enginepclean:
+.PHONY: engine engineclean
+plugins all: engine
+engineclean:
 	$(MAKE_CLEAN)
-enginep:
+engine:
 	$(MAKE_TARGET) MAKE_DLL=yes
 
 endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-SRC.ENGINEP = $(wildcard plugins/engine/*.cpp)
-OBJ.ENGINEP = $(addprefix $(OUT),$(notdir $(SRC.ENGINEP:.cpp=$O)))
-LIB.ENGINEP = $(CSENGINE.LIB) $(CSTERR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB) \
+SRC.ENGINE = $(wildcard plugins/engine/*.cpp)
+OBJ.ENGINE = $(addprefix $(OUT),$(notdir $(SRC.ENGINE:.cpp=$O)))
+LIB.ENGINE = $(CSENGINE.LIB) $(CSTERR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB) \
   $(CSGEOM.LIB) $(CSOBJECT.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
-ENGINEP=$(OUTDLL)enginep$(DLL)
-DEP.ENGINEP=$(LIB.ENGINEP)
-LDFLAGS.ENGINEP=$(LIBS.EXE)
-TO_INSTALL.DYNAMIC_LIBS += $(ENGINEP)
+ENGINE=$(OUTDLL)engine$(DLL)
+DEP.ENGINE=$(LIB.ENGINE)
+LDFLAGS.ENGINE=$(LIBS.EXE)
+TO_INSTALL.DYNAMIC_LIBS += $(ENGINE)
 else
-ENGINEP=$(OUT)$(LIB_PREFIX)enginep$(LIB)
-DEP.EXE+=$(ENGINEP)
-CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_ENGINEP
-TO_INSTALL.STATIC_LIBS += $(ENGINEP)
+ENGINE=$(OUT)$(LIB_PREFIX)engine$(LIB)
+DEP.EXE+=$(ENGINE)
+CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_ENGINE
+TO_INSTALL.STATIC_LIBS += $(ENGINE)
 endif
 
-vpath %.cpp $(sort $(dir $(SRC.ENGINEP)))
+vpath %.cpp $(sort $(dir $(SRC.ENGINE)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: enginep enginepclean
-enginep: $(OUTDIRS) $(ENGINEP)
+.PHONY: engine engineclean
+engine: $(OUTDIRS) $(ENGINE)
 
-$(ENGINEP): $(OBJ.ENGINEP) $(DEP.ENGINEP)
-	$(DO.PLUGIN) $(LDFLAGS.ENGINEP)
+$(ENGINE): $(OBJ.ENGINE) $(DEP.ENGINE)
+	$(DO.PLUGIN) $(LDFLAGS.ENGINE)
 
-clean: enginepclean
-enginepclean:
-	-$(RM) $(ENGINEP) $(OBJ.ENGINEP) $(OUTOS)enginep.dep
+clean: engineclean
+engineclean:
+	-$(RM) $(ENGINE) $(OBJ.ENGINE) $(OUTOS)engine.dep
 
 ifdef DO_DEPEND
-dep: $(OUTOS)enginep.dep
-$(OUTOS)enginep.dep: $(SRC.ENGINEP)
+dep: $(OUTOS)engine.dep
+$(OUTOS)engine.dep: $(SRC.ENGINE)
 	$(DO.DEP)
 else
--include $(OUTOS)enginep.dep
+-include $(OUTOS)engine.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

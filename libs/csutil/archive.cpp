@@ -29,6 +29,7 @@
 #include "cssys/csendian.h"
 #include "csutil/util.h"
 #include "csutil/archive.h"
+#include "ivfs.h"	// For csFileTime
 
 // Default compression method to use when adding entries (there is no choice for now)
 #ifndef DEFAULT_COMPRESSION_METHOD
@@ -391,7 +392,9 @@ void *csArchive::NewFile (const char *name, size_t size, bool pack)
 
   time_t curtime = time (NULL);
   struct tm *curtm = localtime (&curtime);
-  SetFileTime ((void *)f, *curtm);
+  csFileTime ft;
+  ASSIGN_FILETIME (ft, *curtm);
+  SetFileTime ((void *)f, ft);
 
   lazy.Push (f);
 
@@ -678,27 +681,27 @@ bool csArchive::IsDeleted (const char *name) const
   return (del.FindSortedKey (name) >= 0);
 }
 
-void csArchive::UnpackTime (ush zdate, ush ztime, tm & rtime) const
+void csArchive::UnpackTime (ush zdate, ush ztime, csFileTime & rtime) const
 {
-  memset (&rtime, 0, sizeof (rtime));
+  memset (&rtime, 0, sizeof (csFileTime));
 
-  rtime.tm_year = (((zdate >> 9) & 0x7f) + 80);
-  rtime.tm_mon = ((zdate >> 5) & 0x0f) - 1;
-  rtime.tm_mday = (zdate & 0x1f);
+  rtime.year = (((zdate >> 9) & 0x7f) + 1980);
+  rtime.mon = ((zdate >> 5) & 0x0f) - 1;
+  rtime.day = (zdate & 0x1f);
 
-  rtime.tm_hour = ((ztime >> 11) & 0x1f);
-  rtime.tm_min = ((ztime >> 5) & 0x3f);
-  rtime.tm_sec = ((ztime & 0x1f) * 2);
+  rtime.hour = ((ztime >> 11) & 0x1f);
+  rtime.min = ((ztime >> 5) & 0x3f);
+  rtime.sec = ((ztime & 0x1f) * 2);
 }
 
-void csArchive::PackTime (tm & ztime, ush & rdate, ush & rtime) const
+void csArchive::PackTime (const csFileTime & ztime, ush & rdate, ush & rtime) const
 {
-  rdate = (((ztime.tm_year - 80) & 0x7f) << 9)
-        | (((ztime.tm_mon & 0x0f) + 1) << 5)
-        | (ztime.tm_mday & 0x1f);
-  rtime = ((ztime.tm_hour & 0x1f) << 11)
-        | ((ztime.tm_min & 0x3f) << 5)
-        | ((ztime.tm_sec / 2) & 0x1f);
+  rdate = (((ztime.year - 1980) & 0x7f) << 9)
+        | (((ztime.mon & 0x0f) + 1) << 5)
+        | (ztime.day & 0x1f);
+  rtime = ((ztime.hour & 0x1f) << 11)
+        | ((ztime.min & 0x3f) << 5)
+        | ((ztime.sec / 2) & 0x1f);
 }
 
 void csArchive::LoadECDR (ZIP_end_central_dir_record & ecdr, char *buff)

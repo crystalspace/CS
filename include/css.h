@@ -75,7 +75,6 @@
 //CS Util
 #ifndef NO_CSUTIL
 #include "csutil/inifile.h"
-#include "csutil/vfs.h"
 #endif
 
 //CS Parser

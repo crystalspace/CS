@@ -312,8 +312,8 @@ csCrossBuild_Quake2Importer::csCrossBuild_Quake2Importer()
 }
 
 
-csCrossBuild_Quake2Importer::csCrossBuild_Quake2Importer(csVFS &specialVFS)
-      : localVFS (specialVFS)
+csCrossBuild_Quake2Importer::csCrossBuild_Quake2Importer(iVFS *specialVFS)
+      : localVFS (*specialVFS)
 {
 }
 
@@ -326,10 +326,10 @@ csSpriteTemplate *csCrossBuild_Quake2Importer::Import_Quake2File (
   csWorld *importdestination) const
 {
 #if 0
-  csFile *modelfile = localVFS.Open(md2filebase,VFS_FILE_READ);
+  iFile *modelfile = localVFS.Open(md2filebase,VFS_FILE_READ);
 
   csSpriteTemplate *newtemplate = 
-  	Import_Quake2SpriteTemplate(*modelfile);
+  	Import_Quake2SpriteTemplate(modelfile);
 
   delete modelfile;
 
@@ -375,7 +375,7 @@ csSpriteTemplate *csCrossBuild_Quake2Importer::Import_Quake2File (
 
 
 csSpriteTemplate *csCrossBuild_Quake2Importer::Import_Quake2SpriteTemplate(
-			csFile &modelfile) const
+			iFile *modelfile) const
 {
 #if 0
   size_t modeldatasize = modelfile.GetSize();

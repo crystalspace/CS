@@ -33,9 +33,6 @@
 
 #define APP_TITLE	"Graphics canvas plugin test"
 
-// We need the Virtual File System plugin
-REGISTER_STATIC_LIBRARY (vfs)
-
 class G2DTestSystemDriver : public SysSystemDriver
 {
   // Application states

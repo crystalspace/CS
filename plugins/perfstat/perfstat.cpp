@@ -102,11 +102,18 @@ bool csPerfStats::HandleEvent (iEvent &event)
     frame_count++;
 
     cs_time current_time = System->GetTime ();
-    int elapsed_time = current_time - frame_start;
+
+    if (!frame_start)
+    {
+      frame_start = current_time;
+      frame_count = 0;
+    }
+
+    cs_time elapsed_time = current_time - frame_start;
 
     AccumulateTotals (current_time - frame_start);
     float new_fps = -1;
-    if (elapsed_time > resolution)
+    if (elapsed_time > cs_time (resolution))
     {
       frame->fps = new_fps = frame_count ?
         frame_count * 1000.0f / elapsed_time :
@@ -191,7 +198,7 @@ void csPerfStats::AccumulateTotals (cs_time elapsed_time)
     DEBUG_BREAK;
 #endif
   total_time += elapsed_time;
-  mean_fps = frame_num * 1000.0f / total_time;
+  mean_fps = total_time ? (frame_num * 1000.0f / total_time) : 0;
 //    total_polygons_considered += Stats::polygons_considered;
 //    total_polygons_rejected += Stats::polygons_rejected;
  

@@ -173,18 +173,18 @@ bool csStandardLoader::Load (const char *iName)
   if (sl > sizeof (fnw) - 5) sl = sizeof (fnw) - 5;
   memcpy (fnw, iName, sl); fnw [sl] = 0;
   strcpy (fnw + sl, ".csw");
-  tm ftw;
+  csFileTime ftw;
   bool csw_valid = false;
   if (vfs->GetFileTime (fnw, ftw))
   {
     // Now check if pre-tokenized file is up-to-date
-    tm fts;
+    csFileTime fts;
     if (vfs->GetFileTime (iName, fts))
     {
-      unsigned long tw = ftw.tm_sec + (ftw.tm_min + (ftw.tm_hour +
-        (ftw.tm_mday + (ftw.tm_mon + (ftw.tm_year - 70) * 12) * 32) * 24) * 60) * 60;
-      unsigned long ts = fts.tm_sec + (fts.tm_min + (fts.tm_hour +
-        (fts.tm_mday + (fts.tm_mon + (fts.tm_year - 70) * 12) * 32) * 24) * 60) * 60;
+      unsigned long tw = ftw.sec + (ftw.min + (ftw.hour +
+        (ftw.day + (ftw.mon + (ftw.year - 70) * 12) * 32) * 24) * 60) * 60;
+      unsigned long ts = fts.sec + (fts.min + (fts.hour +
+        (fts.day + (fts.mon + (fts.year - 70) * 12) * 32) * 24) * 60) * 60;
       csw_valid = (tw >= ts);
     }
     else

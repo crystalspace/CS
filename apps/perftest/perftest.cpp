@@ -28,10 +28,6 @@
 #include "itxtmgr.h"
 #include "iconsole.h"
 
-//------------------------------ We need the VFS plugin -----------------------
-
-REGISTER_STATIC_LIBRARY (vfs)
-
 //-----------------------------------------------------------------------------
 
 PerfTest::PerfTest ()

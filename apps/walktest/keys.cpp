@@ -308,13 +308,17 @@ void WalkTest::step (float speed,int keep_old)
     }
   }
 
+  float max_speed = cfg_walk_maxspeed * (Keyboard.GetKeyState (CSKEY_SHIFT) ? 2 : 1);
+
   while ((cur_time - start_time) >= 100)
   {
     if (pressed)
     {
       // accelerate
-      if (ABS (velocity.z) < cfg_walk_maxspeed)
+      if (ABS (velocity.z) < max_speed)
         velocity.z += step_speed;
+      else if (ABS (velocity.z) > max_speed)
+        velocity.z -= step_speed;
     }
     else
     {
@@ -350,13 +354,17 @@ void WalkTest::rotate (float speed,int keep_old)
     }
   }
 
+  float max_speed = cfg_rotate_maxspeed * (Keyboard.GetKeyState (CSKEY_SHIFT) ? 2 : 1);
+
   while ((cur_time - start_time) >= 100)
   {
     if (pressed)
     {
       // accelerate rotation
-      if (ABS (angle_velocity.y) < cfg_rotate_maxspeed)
+      if (ABS (angle_velocity.y) < max_speed)
         angle_velocity.y += angle_accel;
+      else if (ABS (angle_velocity.y) > max_speed)
+        angle_velocity.y -= angle_accel;
     }
     else
     {
@@ -453,7 +461,7 @@ void WalkTest::imm_rot_left_camera (float speed, bool slow, bool fast)
   if (map_mode == MAP_TXT) { wf->KeyLeftStrafe (speed, slow, fast); return; }
   if (map_mode) { wf->KeyLeft (speed, slow, fast); return; }
   if (slow)
-    view->GetCamera ()->Rotate (VEC_ROT_LEFT, speed * .005);
+    view->GetCamera ()->Rotate (VEC_ROT_LEFT, speed * .01);
   else if (fast)
     view->GetCamera ()->Rotate (VEC_ROT_LEFT, speed * .4);
   else
@@ -464,7 +472,7 @@ void WalkTest::imm_rot_left_world (float speed, bool slow, bool fast)
 {
   if (map_mode) return;
   if (slow)
-    view->GetCamera ()->RotateWorld (VEC_ROT_LEFT, speed * .005);
+    view->GetCamera ()->RotateWorld (VEC_ROT_LEFT, speed * .01);
   else if (fast)
     view->GetCamera ()->RotateWorld (VEC_ROT_LEFT, speed * .4);
   else
@@ -476,7 +484,7 @@ void WalkTest::imm_rot_right_camera (float speed, bool slow, bool fast)
   if (map_mode == MAP_TXT) { wf->KeyRightStrafe (speed, slow, fast); return; }
   if (map_mode) { wf->KeyRight (speed, slow, fast); return; }
   if (slow)
-    view->GetCamera ()->Rotate (VEC_ROT_RIGHT, speed * .005);
+    view->GetCamera ()->Rotate (VEC_ROT_RIGHT, speed * .01);
   else if (fast)
     view->GetCamera ()->Rotate (VEC_ROT_RIGHT, speed * .4);
   else
@@ -487,7 +495,7 @@ void WalkTest::imm_rot_right_world (float speed, bool slow, bool fast)
 {
   if (map_mode) return;
   if (slow)
-    view->GetCamera ()->RotateWorld (VEC_ROT_RIGHT, speed * .005);
+    view->GetCamera ()->RotateWorld (VEC_ROT_RIGHT, speed * .01);
   else if (fast)
     view->GetCamera ()->RotateWorld (VEC_ROT_RIGHT, speed * .4);
   else
@@ -498,7 +506,7 @@ void WalkTest::imm_rot_left_xaxis (float speed, bool slow, bool fast)
 {
   if (map_mode) { wf->KeyPgDn (speed, slow, fast); return; }
   if (slow)
-    view->GetCamera ()->Rotate (VEC_TILT_DOWN, speed * .005);
+    view->GetCamera ()->Rotate (VEC_TILT_DOWN, speed * .01);
   else if (fast)
     view->GetCamera ()->Rotate (VEC_TILT_DOWN, speed * .4);
   else
@@ -509,7 +517,7 @@ void WalkTest::imm_rot_right_xaxis (float speed, bool slow, bool fast)
 {
   if (map_mode) { wf->KeyPgUp (speed, slow, fast); return; }
   if (slow)
-    view->GetCamera ()->Rotate (VEC_TILT_UP, speed * .005);
+    view->GetCamera ()->Rotate (VEC_TILT_UP, speed * .01);
   else if (fast)
     view->GetCamera ()->Rotate (VEC_TILT_UP, speed * .4);
   else
@@ -520,7 +528,7 @@ void WalkTest::imm_rot_left_zaxis (float speed, bool slow, bool fast)
 {
   if (map_mode) return;
   if (slow)
-    view->GetCamera ()->Rotate (VEC_TILT_LEFT, speed * .005);
+    view->GetCamera ()->Rotate (VEC_TILT_LEFT, speed * .01);
   else if (fast)
     view->GetCamera ()->Rotate (VEC_TILT_LEFT, speed * .4);
   else
@@ -531,7 +539,7 @@ void WalkTest::imm_rot_right_zaxis (float speed, bool slow, bool fast)
 {
   if (map_mode) return;
   if (slow)
-    view->GetCamera ()->Rotate (VEC_TILT_RIGHT, speed * .005);
+    view->GetCamera ()->Rotate (VEC_TILT_RIGHT, speed * .01);
   else if (fast)
     view->GetCamera ()->Rotate (VEC_TILT_RIGHT, speed * .4);
   else
@@ -558,8 +566,8 @@ void WalkTest::eatkeypress (iEvent &Event)
   csKeyMap *m = mapping;
   while (m)
   {
-    if (key == m->key && shift == m->shift
-     && alt == m->alt && ctrl == m->ctrl)
+    if (key == m->key
+     && shift == m->shift && alt == m->alt && ctrl == m->ctrl)
     {
       if (m->need_status)
       {

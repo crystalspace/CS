@@ -314,7 +314,7 @@ void DoGravity (csVector3& pos, csVector3& vel)
     {
       Sys->on_ground = false;
       if (Sys->do_gravity && !Sys->move_3d)
-	vel.y -= 0.004;
+	vel.y -= 0.002;
     }
     else
     {

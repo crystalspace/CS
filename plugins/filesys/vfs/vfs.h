@@ -20,7 +20,7 @@
 #ifndef __CS_VFS_H__
 #define __CS_VFS_H__
 
-#include "csstrvec.h"
+#include "csutil/csstrvec.h"
 #include "ivfs.h"
 #include "iplugin.h"
 
@@ -147,10 +147,10 @@ public:
 
   /**
    * Expand given virtual path, interpret all "." and ".."'s relative to
-   * 'currend virtual directory'. Return a (new char [...])'ed string.
+   * 'currend virtual directory'. Return a new iString object.
    * If IsDir is true, expanded path ends in an '/', otherwise no.
    */
-  virtual char *ExpandPath (const char *Path, bool IsDir = false) const;
+  virtual iString *ExpandPath (const char *Path, bool IsDir = false) const;
 
   /// Check whenever a file exists
   virtual bool Exists (const char *Path) const;
@@ -188,14 +188,20 @@ public:
   virtual bool Initialize (iSystem *iSys);
 
   /// Query file local date/time
-  virtual bool GetFileTime (const char *FileName, tm &ztime) const;
+  virtual bool GetFileTime (const char *FileName, csFileTime &oTime) const;
   /// Set file local date/time
-  virtual bool SetFileTime (const char *FileName, tm &ztime);
+  virtual bool SetFileTime (const char *FileName, const csFileTime &iTime);
+
+  /// Query file size (without opening it)
+  virtual bool GetFileSize (const char *FileName, size_t &oSize);
+
+private:
+  /// Same as ExpandPath() but with less overhead
+  char *_ExpandPath (const char *Path, bool IsDir = false) const;
 
   /// Read and set the VFS config file
   bool ReadConfig (csIniFile *Config);
 
-private:
   /// Add a virtual link: real path can contain $(...) macros
   virtual bool AddLink (const char *VirtualPath, const char *RealPath);
 

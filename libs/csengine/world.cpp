@@ -55,6 +55,7 @@
 #include "csutil/util.h"
 #include "iimage.h"
 #include "ivfs.h"
+#include "istring.h"
 #include "ihalo.h"
 #include "itxtmgr.h"
 #include "igraph3d.h"
@@ -1849,9 +1850,9 @@ bool csWorld::CreateTexture (const char *iName, const char *iFileName,
     return false;
   }
 
-  char *xname = VFS->ExpandPath (iFileName);
-  ifile->SetName (xname);
-  delete [] xname;
+  iString *xname = VFS->ExpandPath (iFileName);
+  ifile->SetName (*xname);
+  xname->DecRef ();
 
   // Okay, now create the respective texture handle object
   csTextureWrapper *tex = GetTextures ()->FindByName (iName);

@@ -18,6 +18,7 @@
 # as shared libraries. Please think twice before adding anything to PLUGINS;
 # in most cases you will want to add to PLUGINS.DYNAMIC.
 PLUGINS += video/renderer video/canvas
+PLUGINS += filesys/vfs
 PLUGINS += simpcon
 PLUGINS += font/server/csfont 
 PLUGINS += colldet/rapid

@@ -28,15 +28,70 @@
 #define SYSDEF_UNLINK
 #include "cssysdef.h"
 #include "version.h"
-#include "csutil/vfs.h"
+#include "vfs.h"
 #include "csutil/archive.h"
 #include "csutil/util.h"
 #include "csutil/inifile.h"
 #include "csutil/scfstrv.h"
 #include "isystem.h"
+#include "istring.h"
 
 // Characters ignored in VFS paths (except in middle)
 #define CS_VFSSPACE		" \t"
+
+// A pretty dump iString class ...
+class _vfs_string : public iString
+{
+  char *s;
+public:
+  DECLARE_IBASE;
+
+  _vfs_string (char *is)
+  { CONSTRUCT_IBASE (NULL); s = is; }
+  virtual ~_vfs_string ()
+  { delete [] s; }
+
+  virtual void SetCapacity (size_t)
+  { /* not implemented */ }
+  virtual void Truncate (size_t)
+  { /* not implemented */ }
+  virtual void Reclaim ()
+  { /* not implemented */ }
+  inline void Clear ()
+  { /* not implemented */ }
+  virtual iString *Clone () const
+  { return NULL; }
+  virtual char *GetData () const
+  { return s; }
+  virtual size_t Length () const
+  { return strlen (s); }
+  inline bool IsEmpty () const
+  { return !*s; }
+  virtual inline char& operator [] (size_t iPos)
+  { return s [iPos]; }
+  virtual void SetAt (size_t iPos, char iChar)
+  { s [iPos] = iChar; }
+  virtual char GetAt (size_t iPos) const
+  { return s [iPos]; }
+  virtual void Insert (size_t, iString *)
+  { /* not implemented */ }
+  virtual void Overwrite (size_t, iString *)
+  { /* not implemented */ }
+  virtual iString &Append (const char *, size_t)
+  { return *(iString *)NULL; }
+  virtual iString &Append (const iString *, size_t)
+  { return *(iString *)NULL; }
+  virtual void Replace (const iString *, size_t)
+  { /* not implemented */ }
+  virtual bool Compare (const iString *iStr) const
+  { return false; }
+  virtual bool CompareNoCase (const iString *iStr) const
+  { return false; }
+};
+
+IMPLEMENT_IBASE (_vfs_string)
+  IMPLEMENTS_INTERFACE (iString);
+IMPLEMENT_IBASE_END
 
 //***********************************************************
 // NOTE on naming convention: public classes begin with "cs"
@@ -245,10 +300,11 @@ public:
   // Does file exists?
   bool Exists (const char *Suffix);
   // Query date/time
-  bool GetFileTime (const char *Suffix, tm &ztime) const;
+  bool GetFileTime (const char *Suffix, csFileTime &oTime) const;
   // Set date/time
-  bool SetFileTime (const char *Suffix, tm &ztime);
-
+  bool SetFileTime (const char *Suffix, const csFileTime &iTime);
+  // Get file size
+  bool GetFileSize (const char *Suffix, size_t &oSize);
 private:
   // Find a file either on disk or in archive - in this node only
   bool FindFile (const char *Suffix, char *RealPath, csArchive *&) const;
@@ -446,7 +502,7 @@ void DiskFile::CheckError ()
       break;
 #ifdef ENOSPC
     case ENOSPC:
-      Error = VFS_STATUS_NOSPC;
+      Error = VFS_STATUS_NOSPACE;
       break;
 #endif
 #ifdef EMFILE
@@ -587,7 +643,7 @@ size_t ArchiveFile::Write (const char *Data, size_t DataSize)
 {
   if (!Archive->Write (fh, Data, DataSize))
   {
-    Error = VFS_STATUS_NOSPC;
+    Error = VFS_STATUS_NOSPACE;
     return 0;
   }
   return DataSize;
@@ -985,7 +1041,7 @@ bool VfsNode::Exists (const char *Suffix)
   return FindFile (Suffix, fname, a);
 }
 
-bool VfsNode::GetFileTime (const char *Suffix, tm &ztime) const
+bool VfsNode::GetFileTime (const char *Suffix, csFileTime &oTime) const
 {
   char fname [MAXPATHLEN + 1];
   csArchive *a;
@@ -997,7 +1053,7 @@ bool VfsNode::GetFileTime (const char *Suffix, tm &ztime) const
     void *e = a->FindName (fname);
     if (!e)
       return false;
-    a->GetFileTime (e, ztime);
+    a->GetFileTime (e, oTime);
   }
   else
   {
@@ -1005,12 +1061,13 @@ bool VfsNode::GetFileTime (const char *Suffix, tm &ztime) const
     if (stat (fname, &st))
       return false;
     const time_t mtime = st.st_mtime;
-    ztime = *localtime (&mtime);
+    struct tm *curtm = localtime (&mtime);
+    ASSIGN_FILETIME (oTime, *curtm);
   }
   return true;
 }
 
-bool VfsNode::SetFileTime (const char *Suffix, tm &ztime)
+bool VfsNode::SetFileTime (const char *Suffix, const csFileTime &iTime)
 {
   char fname [MAXPATHLEN + 1];
   csArchive *a;
@@ -1022,12 +1079,36 @@ bool VfsNode::SetFileTime (const char *Suffix, tm &ztime)
     void *e = a->FindName (fname);
     if (!e)
       return false;
-    a->SetFileTime (e, ztime);
+    a->SetFileTime (e, iTime);
   }
   else
   {
     // Not supported for now since there's no portable way of doing that - A.Z.
     return false;
+  }
+  return true;
+}
+
+bool VfsNode::GetFileSize (const char *Suffix, size_t &oSize)
+{
+  char fname [MAXPATHLEN + 1];
+  csArchive *a;
+  if (!FindFile (Suffix, fname, a))
+    return false;
+
+  if (a)
+  {
+    void *e = a->FindName (fname);
+    if (!e)
+      return false;
+    oSize = a->GetFileSize (e);
+  }
+  else
+  {
+    struct stat st;
+    if (stat (fname, &st))
+      return false;
+    oSize = st.st_size;
   }
   return true;
 }
@@ -1125,7 +1206,7 @@ bool csVFS::ReadConfig (csIniFile *Config)
 
 bool csVFS::AddLink (const char *VirtualPath, const char *RealPath)
 {
-  char *xp = ExpandPath (VirtualPath, true);
+  char *xp = _ExpandPath (VirtualPath, true);
   VfsNode *e = new VfsNode (xp, VirtualPath, System);
   if (!e->AddRPath (RealPath, this))
   {
@@ -1137,7 +1218,7 @@ bool csVFS::AddLink (const char *VirtualPath, const char *RealPath)
   return true;
 }
 
-char *csVFS::ExpandPath (const char *Path, bool IsDir) const
+char *csVFS::_ExpandPath (const char *Path, bool IsDir) const
 {
   char outname [VFS_MAX_PATH_LEN + 1];
   size_t inp = 0, outp = 0, namelen = strlen (Path);
@@ -1202,6 +1283,12 @@ char *csVFS::ExpandPath (const char *Path, bool IsDir) const
   return ret;
 }
 
+iString *csVFS::ExpandPath (const char *Path, bool IsDir) const
+{
+  char *xp = _ExpandPath (Path, IsDir);
+  return new _vfs_string (xp);
+}
+
 VfsNode *csVFS::GetNode (const char *Path, char *NodePrefix,
   size_t NodePrefixSize) const
 {
@@ -1238,7 +1325,7 @@ bool csVFS::PreparePath (const char *Path, bool IsDir, VfsNode *&Node,
   char *Suffix, size_t SuffixSize) const
 {
   Node = NULL; *Suffix = 0;
-  char *fname = ExpandPath (Path, IsDir);
+  char *fname = _ExpandPath (Path, IsDir);
   if (!fname)
     return false;
 
@@ -1250,7 +1337,7 @@ bool csVFS::PreparePath (const char *Path, bool IsDir, VfsNode *&Node,
 bool csVFS::ChDir (const char *Path)
 {
   // First, transform Path to absolute
-  char *newwd = ExpandPath (Path, true);
+  char *newwd = _ExpandPath (Path, true);
   if (!newwd)
     return false;
 
@@ -1323,7 +1410,7 @@ iStrVector *csVFS::FindFiles (const char *Path) const
   }
   else
   {
-    char *s = ExpandPath (Path, true);
+    char *s = _ExpandPath (Path, true);
     strcpy (XPath, s);
     delete [] s;
   }
@@ -1463,7 +1550,7 @@ bool csVFS::Mount (const char *VirtualPath, const char *RealPath)
   if (!PreparePath (VirtualPath, true, node, suffix, sizeof (suffix))
    || suffix [0])
   {
-    char *xp = ExpandPath (VirtualPath, true);
+    char *xp = _ExpandPath (VirtualPath, true);
     node = new VfsNode (xp, VirtualPath, System);
     NodeList.Push (node);
   }
@@ -1540,7 +1627,7 @@ bool csVFS::SaveMounts (const char *FileName)
   return config->Save (FileName);
 }
 
-bool csVFS::GetFileTime (const char *FileName, tm &ztime) const
+bool csVFS::GetFileTime (const char *FileName, csFileTime &oTime) const
 {
   if (!FileName)
     return false;
@@ -1549,13 +1636,13 @@ bool csVFS::GetFileTime (const char *FileName, tm &ztime) const
   char suffix [VFS_MAX_PATH_LEN + 1];
   PreparePath (FileName, false, node, suffix, sizeof (suffix));
 
-  bool success = node ? node->GetFileTime (suffix, ztime) : false;
+  bool success = node ? node->GetFileTime (suffix, oTime) : false;
 
   ArchiveCache->CheckUp ();
   return success;
 }
 
-bool csVFS::SetFileTime (const char *FileName, tm &ztime)
+bool csVFS::SetFileTime (const char *FileName, const csFileTime &iTime)
 {
   if (!FileName)
     return false;
@@ -1564,7 +1651,22 @@ bool csVFS::SetFileTime (const char *FileName, tm &ztime)
   char suffix [VFS_MAX_PATH_LEN + 1];
   PreparePath (FileName, false, node, suffix, sizeof (suffix));
 
-  bool success = node ? node->SetFileTime (suffix, ztime) : false;
+  bool success = node ? node->SetFileTime (suffix, iTime) : false;
+
+  ArchiveCache->CheckUp ();
+  return success;
+}
+
+bool csVFS::GetFileSize (const char *FileName, size_t &oSize)
+{
+  if (!FileName)
+    return false;
+
+  VfsNode *node;
+  char suffix [VFS_MAX_PATH_LEN + 1];
+  PreparePath (FileName, false, node, suffix, sizeof (suffix));
+
+  bool success = node ? node->GetFileSize (suffix, oSize) : false;
 
   ArchiveCache->CheckUp ();
   return success;

@@ -87,9 +87,8 @@ converter *ImportExport;
 #define Gfx2D System->G2D
 
 
-//------------------------------ We need the VFS plugin and the 3D engine -----
+//------------------------------------------------- We need the 3D engine -----
 
-REGISTER_STATIC_LIBRARY (vfs)
 REGISTER_STATIC_LIBRARY (engine)
 
 //-----------------------------------------------------------------------------
@@ -870,7 +869,7 @@ void WalkTest::PrepareFrame (cs_time elapsed_time, cs_time current_time)
       player_spawned=true;
     }
 
-    for (; elapsed_time >= 25; elapsed_time -= 25, prev_time += 25)
+    for (; elapsed_time >= 10; elapsed_time -= 10, prev_time += 10)
     {
       if (move_3d)
       {

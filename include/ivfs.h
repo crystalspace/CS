@@ -25,11 +25,30 @@
 
 // forward declarations
 struct iStrVector;
-#if defined( OS_MACOS ) && defined( _MSL_USING_NAMESPACE )
-struct std::tm;
-#else
-struct tm;
-#endif
+struct iString;
+
+/**
+ * File time structure - used to query and set
+ * the last-modification time of a file.
+ */
+struct csFileTime
+{
+  int sec;		// 0..59
+  int min;		// 0..59
+  int hour;		// 0..23
+  int day;		// 1..31
+  int mon;		// 0..11
+  int year;		// 1900, 2001, ...
+};
+
+/// This macro can be used to assign a "struct tm" to a csFileTime
+#define ASSIGN_FILETIME(ft,tm)	\
+  (ft).sec = (tm).tm_sec;	\
+  (ft).min = (tm).tm_min;	\
+  (ft).hour = (tm).tm_hour;	\
+  (ft).day = (tm).tm_mday;	\
+  (ft).mon = (tm).tm_mon;	\
+  (ft).year = (tm).tm_year + 1900;
 
 /// Composite path divider
 #define VFS_PATH_DIVIDER        ','
@@ -52,7 +71,7 @@ struct tm;
 /// Unclassified error
 #define VFS_STATUS_OTHER	1
 /// Device has no more space for file data
-#define	VFS_STATUS_NOSPC	2
+#define	VFS_STATUS_NOSPACE	2
 /// Not enough system resources
 #define VFS_STATUS_RESOURCES	3
 /// Access denied: either you have no write access, or readonly filesystem
@@ -89,7 +108,7 @@ struct iFile : public iBase
 };
 
 
-SCF_VERSION (iVFS, 0, 0, 2);
+SCF_VERSION (iVFS, 0, 0, 3);
 
 /**
  * The Virtual Filesystem Class is intended to be the only way for Crystal
@@ -132,10 +151,10 @@ struct iVFS : public iPlugIn
 
   /**
    * Expand given virtual path, interpret all "." and ".."'s relative to
-   * 'currend virtual directory'. Return a (new char [...])'ed string.
+   * 'currend virtual directory'. Return a new iString object.
    * If IsDir is true, expanded path ends in an '/', otherwise no.
    */
-  virtual char *ExpandPath (const char *Path, bool IsDir = false) const = 0;
+  virtual iString *ExpandPath (const char *Path, bool IsDir = false) const = 0;
 
   /// Check whenever a file exists
   virtual bool Exists (const char *Path) const = 0;
@@ -170,9 +189,12 @@ struct iVFS : public iPlugIn
   virtual bool SaveMounts (const char *FileName) = 0;
 
   /// Query file date/time
-  virtual bool GetFileTime (const char *FileName, tm &ztime) const = 0;
+  virtual bool GetFileTime (const char *FileName, csFileTime &oTime) const = 0;
   /// Set file date/time
-  virtual bool SetFileTime (const char *FileName, tm &ztime) = 0;
+  virtual bool SetFileTime (const char *FileName, const csFileTime &iTime) = 0;
+
+  /// Query file size (without opening it)
+  virtual bool GetFileSize (const char *FileName, size_t &oSize) = 0;
 };
 
 #endif // __IVFS_H__
