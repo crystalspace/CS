@@ -138,8 +138,12 @@ public:
     { comp->Invalidate(area); }
 
     /// Get this component's frame
-    virtual csRect& Frame()
+    virtual csRect Frame()
     { return comp->Frame(); }
+
+    /// Get this component's client frame
+    virtual csRect ClientFrame()
+    { return comp->ClientFrame(); }
 
     /// Returns the named TYPE of the component, like "Radio Button", etc. This should always be overridden.
     virtual char *Type()
@@ -169,14 +173,25 @@ public:
     virtual void SetID(unsigned long _id)
     { comp->SetID(_id); }
 
-    /// Recursively moves children (and all nested children) by relative amount given.
-    virtual void MoveChildren(int delta_x, int delta_y)
-    { comp->MoveChildren(delta_x, delta_y); }
+    virtual iAwsComponent* FindChild(char* name)
+    { return comp->FindChild(name); }
+
+    virtual iAwsComponent* DoFindChild(unsigned int id)
+    { return comp->DoFindChild(id); }
+
+    virtual bool IsMaximized()
+    { return comp->IsMaximized(); }
+
+    virtual void Maximize()
+    { comp->Maximize(); }
+
+    virtual void UnMaximize()
+    { comp->UnMaximize(); }
 
 public:
     /// Adds a child
-    virtual void AddChild(iAwsComponent* child, bool owner=true)
-    { comp->AddChild(child, owner); }
+    virtual void AddChild(iAwsComponent* child)
+    { comp->AddChild(child); }
 
     /// Removes a child
     virtual void RemoveChild(iAwsComponent *child)
@@ -187,12 +202,15 @@ public:
     { return comp->GetChildCount(); }
 
     /// Get's a specific child
-    virtual iAwsComponent *GetChildAt(int i)
-    { return comp->GetChildAt(i); }
+    virtual iAwsComponent *GetTopChild()
+    { return comp->GetTopChild(); }
 
     /// Returns true if this component has children
     virtual bool HasChildren()
     { return comp->HasChildren(); }
+
+    virtual iAwsComponent *ChildAt(int x, int y)
+    { return comp->ChildAt(x,y); }
 
     /** Get's this components idea of the window manager.
       * Should be used internally by the component ONLY,
@@ -201,20 +219,32 @@ public:
     { return comp->Window()->WindowManager(); }
 
     /// Get's the window that this component resides in.
-    iAwsWindow *Window()
+    iAwsComponent *Window()
     { return comp->Window(); }
 
     /// Get's the parent component of this component;
     iAwsComponent *Parent()
     { return comp->Parent(); }
 
-    /// Sets the window that this component resides in.
-    virtual void SetWindow(iAwsWindow *win)
-    { comp->SetWindow(win); }
-
     /// Sets the parent component of this component;
     virtual void SetParent(iAwsComponent *parent)
     { comp->SetParent(parent); }
+
+      /// Get's the component above this one, NULL if there is none.
+    virtual iAwsComponent *ComponentAbove()
+    { return comp->ComponentAbove(); }
+
+    /// Get's the component below this one, NULL if there is none.
+    virtual iAwsComponent *ComponentBelow()
+    { return comp->ComponentAbove(); }
+
+    /// Set's the component above this one
+    virtual void SetComponentAbove(iAwsComponent *comp)
+    { comp->SetComponentAbove(comp); }
+
+    /// Set's the component below this one
+    virtual void SetComponentBelow(iAwsComponent *comp)
+    { comp->SetComponentBelow(comp); }
 
 public:
     /// Triggered when the component needs to draw
@@ -316,11 +346,13 @@ class awsEmbeddedComponentFactory : public iAwsComponentFactory
     awsEmbeddedComponentFactory(iAws *_wmgr)
     {
       wmgr=_wmgr;
+      if (wmgr) wmgr->IncRef();
     }
 
     /// Does nothing
     virtual ~awsEmbeddedComponentFactory()
     {
+      if (wmgr) wmgr->DecRef();
     }
 
     /// Returns the current window manager

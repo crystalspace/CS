@@ -30,7 +30,6 @@ struct iAws;
 struct iAwsSlot;
 struct iAwsSink;
 struct iAwsSource;
-struct iAwsWindow;
 struct iAwsParmList;
 struct iAwsComponent;
 struct iAwsPrefManager;
@@ -38,6 +37,8 @@ struct iAwsSinkManager;
 struct iAwsCanvas;
 struct iAwsKeyFactory;
 struct iAwsComponentFactory;
+
+typedef iAwsComponent iAwsWindow;
 
 class  awsWindow;
 class  awsComponent;
@@ -62,15 +63,13 @@ const   bool aws_debug=false;  // set to true to turn on debugging printf's
  * \addtogroup aws_sys_flags
  * @{ */
 
-/**
- * This flag makes the windowing system perform erases before drawing.  This slows
+/** This flag makes the windowing system perform erases before drawing.  This slows
  * the engine down somewhat, but is necessary in some circumstances (such as when using
  * the single proctex mode as a surface, or to draw to the high level visible context.)
  */
 const int AWSF_AlwaysEraseWindows=1;
 
-/** 
- * This flag makes the windowing system redraw every time, which is necessary when
+/** This flag makes the windowing system redraw every time, which is necessary when
  * drawing to the screen context since this gets erased every frame by the engine.
  * Note that this flag is NOT necessary if the engine will not be drawing to the
  * background with AWS.  In other words, if AWS has complete control of the screen
@@ -78,13 +77,20 @@ const int AWSF_AlwaysEraseWindows=1;
  */
 const int AWSF_AlwaysRedrawWindows=2;
 
+/** This flag makes windows come to the front solely by moving the mouse over them. If
+  * it is disabled then windows will only come to the front by having the mouse clicked
+  * in them
+  */
+const int AWSF_RaiseOnMouseOver = 4;
+
 /** @} */
+
 
 /**
  * \addtogroup aws
  * @{ */
 
-SCF_VERSION (iAws, 0, 1, 0);
+SCF_VERSION (iAws, 0, 2, 0);
 
 /// Interface for the window manager.
 struct iAws : public iBase
@@ -105,11 +111,14 @@ public:
   /// Find a component factory
   virtual iAwsComponentFactory *FindComponentFactory (char *name)=0;
 
-  /// Get the top window
-  virtual iAwsWindow *GetTopWindow()=0;
+  /// Get the top component
+  virtual iAwsComponent *GetTopComponent()=0;
 
-  /// Set the top window
-  virtual void       SetTopWindow(iAwsWindow *win)=0;
+  /// Set the top component
+  virtual void       SetTopComponent(iAwsComponent *win)=0;
+
+  /// Finds the smallest visible component which contains the point (x,y)
+  virtual iAwsComponent* ComponentAt(int x, int y)=0;
 
   /// Causes the current view of the window system to be drawn to the given graphics device.
   virtual void       Print(iGraphics3D *g3d, uint8 Alpha=0)=0;
@@ -118,16 +127,16 @@ public:
   virtual void       Redraw()=0;
 
   /// Mark a region dirty
-  virtual void       Mark(csRect &rect)=0;
+  virtual void       Mark(const csRect &rect)=0;
 
   /// Mark a section of the screen clean.
-  virtual void       Unmark(csRect &rect)=0;
+  virtual void       Unmark(const csRect &rect)=0;
 
   /// Erase a section of the screen next round (only useful if AlwaysEraseWindows flag is set)
-  virtual void       Erase(csRect &rect)=0;
+  virtual void       Erase(const csRect &rect)=0;
 
   /// Mask off a section that has been marked to erase.  This part won't be erased.
-  virtual void       MaskEraser(csRect &rect)=0;
+  virtual void       MaskEraser(const csRect &rect)=0;
 
   /// Tell the system to rebuild the update store
   virtual void       InvalidateUpdateStore()=0;
@@ -164,7 +173,7 @@ public:
   virtual iGraphics3D *G3D()=0;
 
   /// Instantiates a window based on a window definition.
-  virtual iAwsWindow *CreateWindowFrom(char *defname)=0;
+  virtual iAwsComponent *CreateWindowFrom(char *defname)=0;
 
   /// Creates a new embeddable component
   virtual iAwsComponent *CreateEmbeddableComponent()=0;
@@ -177,14 +186,14 @@ public:
    * <code>transition_type</code> is one of AWS_TRANSITION_*.
    * \sa \ref aws_window_trans
    */
-  virtual void CreateTransition(iAwsWindow *win, unsigned transition_type, float step_size=0.1)=0;
+  virtual void CreateTransition(iAwsComponent *win, unsigned transition_type, float step_size=0.1)=0;
 
   /**
    * Creates and enables a transition for a window, using a user specified start or finish (transition type defines which).
    * <code>transition_type</code> is one of AWS_TRANSITION_*.
    * \sa \ref aws_window_trans
    */
-  virtual void CreateTransitionEx(iAwsWindow *win, unsigned transition_type, float step_size, csRect &user)=0;
+  virtual void CreateTransitionEx(iAwsComponent *win, unsigned transition_type, float step_size, csRect &user)=0;
 
   /**
    * Sets one or more flags for different operating modes. 
@@ -413,7 +422,7 @@ struct iAwsSlot : public iBase
 };
 
 
-SCF_VERSION (iAwsComponent, 0, 0, 1);
+SCF_VERSION (iAwsComponent, 0, 1, 0);
 
 /// Interface that is the base of ALL components.
 struct iAwsComponent : public iAwsSource
@@ -440,7 +449,10 @@ struct iAwsComponent : public iAwsSource
   virtual void Invalidate(csRect area)=0;
 
   /// Get this component's frame
-  virtual csRect& Frame()=0;
+  virtual csRect Frame()=0;
+
+  /// Get this component's client area
+  virtual csRect ClientFrame()=0;
 
   /// Returns the named TYPE of the component, like "Radio Button", etc.
   virtual char *Type()=0;
@@ -469,17 +481,14 @@ struct iAwsComponent : public iAwsSource
   /** Should be used ONLY by this component, or an embedding object. */
   virtual iAws *WindowManager ()=0;
 
-  /// Gets the window that this component resides in.
-  virtual iAwsWindow *Window()=0;
-
   /// Gets the parent component of this component.
   virtual iAwsComponent *Parent()=0;
 
+  /// Gets the window this component is in
+  virtual iAwsComponent *Window()=0;
+
   /// Gets the layout manager for this component.
   virtual awsLayoutManager *Layout()=0;
-
-  /// Sets the window that this component resides in.
-  virtual void SetWindow(iAwsWindow *win)=0;
 
   /// Sets the parent component of this component.
   virtual void SetParent(iAwsComponent *parent)=0;
@@ -502,11 +511,35 @@ struct iAwsComponent : public iAwsSource
   /// Returns the state of the hidden flag
   virtual bool isHidden()=0;
 
+  /// Returns true if the component is maximized
+  virtual bool IsMaximized()=0;
+
   /// Hides a component
   virtual void Hide()=0;
 
   /// Shows a component
   virtual void Show()=0;
+
+  /// Moves a component
+  virtual void Move(int delta_x, int delta_y)=0;
+
+  /// Moves a component to an absolute location
+  virtual void MoveTo(int x, int y)=0;
+
+  /// Resizes a component
+  virtual void Resize(int width, int height)=0;
+
+  /// Resizes a component to an absolute rect
+  virtual void ResizeTo(csRect newFrame)=0;
+
+  /// Maximizes this component
+  virtual void Maximize()=0;
+
+  /// Returns the component to its unmaximized size
+  virtual void UnMaximize()=0;
+
+  /// Resizes all the children of this component using the current layout
+  virtual void LayoutChildren()=0;
 
   /// Returns the state of the DEAF flag
   virtual bool isDeaf()=0;
@@ -520,11 +553,17 @@ struct iAwsComponent : public iAwsSource
   /// Set's the unique id of this component. Note: only to be used by window manager.
   virtual void SetID(unsigned long _id)=0;
 
-  /// Recursively moves children (and all nested children) by relative amount given.
-  virtual void MoveChildren(int delta_x, int delta_y)=0;
+  /// Gets a child component by name, returns NULL on failure.
+  virtual iAwsComponent *FindChild(char *name)=0;
+
+  /// Gets a child component by id, returns NULL on failure
+  virtual iAwsComponent *DoFindChild(unsigned id)=0;
+
+  /// Returns the highest child (if any) whose frame contains (x,y)
+  virtual iAwsComponent* ChildAt(int x, int y)=0;
 
   /// Adds a child into this component.
-  virtual void AddChild(iAwsComponent* child, bool has_layout=false)=0;
+  virtual void AddChild(iAwsComponent* child)=0;
 
   /// Removes a child from this component.
   virtual void RemoveChild(iAwsComponent *child)=0;
@@ -533,10 +572,34 @@ struct iAwsComponent : public iAwsSource
   virtual int GetChildCount()=0;
 
   /// Get's a specific child
-  virtual iAwsComponent *GetChildAt(int i)=0;
+  virtual iAwsComponent *GetTopChild()=0;
+
+    /// Get's the component above this one, NULL if there is none.
+  virtual iAwsComponent *ComponentAbove()=0;
+
+  /// Get's the component below this one, NULL if there is none.
+  virtual iAwsComponent *ComponentBelow()=0;
+
+  /// Set's the component above this one
+  virtual void SetComponentAbove(iAwsComponent *comp)=0;
+
+  /// Set's the component below this one
+  virtual void SetComponentBelow(iAwsComponent *comp)=0;
+
+  /// Moves this component above all its siblings
+  virtual void Raise()=0;
+
+  /// Moves this component below all its siblings
+  virtual void Lower()=0;
 
   /// Returns true if this component has children
   virtual bool HasChildren()=0;
+
+  /// Sets the value of the redraw tag
+  virtual void SetRedrawTag(unsigned int tag)=0;
+
+  /// Gets the value of the redraw tag
+  virtual unsigned int RedrawTag()=0;
 
   /// Triggered when the component needs to draw
   virtual void OnDraw(csRect clip)=0;
@@ -579,71 +642,37 @@ struct iAwsComponent : public iAwsSource
 
   /// Triggered when a component is resized by the layout manager.
   virtual void OnResized()=0;
-};
 
+  /// Triggered when a child component has been moved
+  virtual void OnChildMoved() = 0;
 
-SCF_VERSION (iAwsWindow, 0, 0, 1);
-
-/// Interface for windows.
-struct iAwsWindow : public iAwsComponent
-{
-
-  /// Returns the named TYPE of the component, like "Radio Button", etc.
-  virtual char *Type()=0;
-
-  /// Sets the value of the redraw tag
-  virtual void SetRedrawTag(unsigned int tag)=0;
-
-  /// Gets the value of the redraw tag
-  virtual unsigned int RedrawTag()=0;
-
-  /// Raises a window to the top.
-  virtual void Raise()=0;
-
-  /// Lowers a window to the bottom.
-  virtual void Lower()=0;
-
-  /// Get's the window above this one, NULL if there is none.
-  virtual iAwsWindow *WindowAbove()=0;
-
-  /// Get's the window below this one, NULL if there is none.
-  virtual iAwsWindow *WindowBelow()=0;
-
-  /// Set's the window above this one
-  virtual void SetWindowAbove(iAwsWindow *win)=0;
-
-  /// Set's the window below this one
-  virtual void SetWindowBelow(iAwsWindow *win)=0;
-
-  /// Does some additional setup for windows, including linking into the window hierarchy.
-  virtual bool Setup(iAws *_wmgr, awsComponentNode *settings)=0;
-
-  /// Event triggered when a window is about to be raised
+  /// Triggered when the Raise function is called
   virtual void OnRaise()=0;
 
-  /// Event triggered when a window is about to be lowered
+  /// Triggered when the Lower function is called
   virtual void OnLower()=0;
 
-  /// Sets the engine view for this window
-  virtual void SetEngineView(iView *_view)=0;
+  /// Triggered when a child becomes hidden
+  virtual void OnChildHide()=0;
 
-  /// Gets a child component by name, returns NULL on failure.
-  virtual iAwsComponent *FindChild(char *name)=0;
+  /// Triggered when a child becomes shown
+  virtual void OnChildShow()=0;
 
-  /// Moves the window and all associated items (including children)
-  virtual void Move(int delta_x, int delta_y)=0;
 
-  /// Gets the engine view for this window
-  virtual iView *GetEngineView()=0;
+  /* Only awsComponent should make use of the funcs below. Nothing else =) */
 
-  /// Gets the preferred size of the component
-  virtual csRect getPreferredSize()=0;
+    /// Removes a component from the hierarchy
+    virtual void Unlink()=0;
 
-  /// Gets the minimum size that the component can be
-  virtual csRect getMinimumSize()=0;
+    /// Links a component into the hierarchy as a sibling above comp
+    virtual void LinkAbove(iAwsComponent* comp)=0;
 
-  /// Gets the inset amounts that are needed to fit components properly.
-  virtual csRect getInsets()=0;
+    /// Links a component into the hierarchy as a sibling below comp
+    virtual void LinkBelow(iAwsComponent* comp)=0;
+
+	/// Sets the top child
+	virtual void SetTopChild(iAwsComponent* child)=0;
+
 };
 
 
