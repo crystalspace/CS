@@ -733,7 +733,6 @@ csMapNode* csLoader::load_node (char* name, char* buf, csSector* sec)
   float x     = 0;
   float y     = 0;
   float z     = 0;
-  float angle = 0;
 
   while ((cmd = csGetObject (&buf, commands, &xname, &params)) > 0)
   {
@@ -762,7 +761,6 @@ csMapNode* csLoader::load_node (char* name, char* buf, csSector* sec)
   }
 
   pNode->SetPosition(csVector3(x,y,z));
-  pNode->SetAngle(angle);
 
   return pNode;
 }
