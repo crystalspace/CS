@@ -21,6 +21,7 @@ chronological order.
 	- Jorrit moved an error if a thing has no polygons after converting
 	  everything to portals. This error complained if a part had no polygons
 	  but it should only complain if the entire thing has none.
+	- Jorrit removed the unused csSector::IntersectSphere().
 9-oct-2003
 	- Jorrit added the following new functions to iThingFactoryState:
 	    - FindPolygonByName (const char*)

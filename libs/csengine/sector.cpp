@@ -512,18 +512,6 @@ iSector *csSector::FollowSegment (
   return &scfiSector;
 }
 
-iPolygon3D *csSector::IntersectSphere (
-  csVector3 &center,
-  float radius,
-  float *pr)
-{
-  float min_d = radius;
-  iPolygon3D *min_p = 0;
-  (void)center;
-  if (pr) *pr = min_d;
-  return min_p;
-}
-
 void csSector::PrepareDraw (iRenderView *rview)
 {
 #ifdef CS_USE_NEW_RENDERER

@@ -43,7 +43,6 @@ class csSector;
 class csStatLight;
 class csMeshWrapper;
 class csKDTree;
-struct iPolygon3D;
 struct iStatLight;
 struct iVisibilityCuller;
 struct iRenderView;
@@ -336,8 +335,8 @@ public:
 
   /**
    * Follow a beam from start to end and return the first object
-   * that is hit. In case it is a thing the iPolygon3D field will be
-   * filled with the polygon that was hit.
+   * that is hit. For some meshes the polygonPtr field will be
+   * filled with the polygon index that was hit.
    * If polygonPtr is null then the polygon will not be filled in.
    */
   iMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,
@@ -356,19 +355,6 @@ public:
    * this sector and possibly traverse through portals to other sectors.
    */
   void CheckFrustum (iFrustumView* lview);
-
-  /**
-   * Intersects world-space sphere with polygons of this set. Return
-   * polygon it hits with (or 0) and the intersection point
-   * in world coordinates. It will also return the polygon with the
-   * closest hit (the most nearby polygon).
-   * If 'pr' != 0 it will also return the distance where the
-   * intersection happened.
-   * Note. This function correctly accounts for portal polygons
-   * and could thus return a polygon not belonging to this sector.
-   */
-  iPolygon3D* IntersectSphere (csVector3& center, float radius,
-                               float* pr = 0);
 
   /**
    * Follow a segment starting at this sector. If the segment intersects
