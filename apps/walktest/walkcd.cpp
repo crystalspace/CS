@@ -84,7 +84,7 @@ int FindIntersection(csCdTriangle *t1,csCdTriangle *t2,csVector3 line[2])
 #define OYL  Sys->cfg_legs_offset
 #define DYL  (OY-OYL)
 
-void WalkTest::CreateColliders (void)
+void WalkTest::CreateColliders ()
 {
   csPolygon3D *p;
   csPolygonSet *pb = new csPolygonSet ();
