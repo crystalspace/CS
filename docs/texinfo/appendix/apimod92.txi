@@ -1,0 +1,90 @@
+@c -*-texinfo-*-
+@node API Modifications 92, API Modifications 18, API Modifications, API Modifications
+@appendixsec @sc{api} Changes from 0.90 to 0.92
+@cindex @sc{api} Changes
+
+This section documents the major changes between versions 0.90 and 0.92 of of
+Crystal Space.
+
+@subheading Texture Manager Changes
+@cindex @code{iTextureManager::UnregisterTexture()}
+@cindex @code{iTextureManager::UnregisterMaterial()}
+
+The functions @code{iTextureManager::UnregisterTexture()} and
+@code{iTextureManager::UnregisterMaterial()} have been removed.
+Instead use proper reference counting to remove textures and
+materials (i.e. @code{DecRef()}).
+
+@subheading iRegion
+@cindex @code{iRegion}
+
+The functions @code{iRegion::Find@dots{}()} will no longer increase
+the reference count of the returned objects.
+
+@subheading iThingState
+@cindex @code{iThingState}
+
+The following functions were made @code{const} in @code{iThingState}:
+@itemize @bullet
+@item
+@code{CurveTexel()}
+@item
+@code{CurveVertex()}
+@item
+@code{GetCurveVertices()}
+@item
+@code{GetCurveVertexCount()}
+@item
+@code{GetCurveCount()}
+@item
+@code{GetCurvesScale()}
+@item
+@code{GetMovingOption()}
+@item
+@code{GetPortalCount()}
+@item
+@code{GetPortal()}
+@item
+@code{GetPortalPolygon()}
+@item
+@code{GetVertexCount()}
+@end itemize
+
+Renamed two functions in @code{iThingState}:
+
+@itemize @bullet
+@item
+@code{CurveVertex()} to @code{GetCurveVertex()}
+@item
+@code{CurveTexel()} to @code{GetCuveTexel()}
+@end itemize
+
+Added several functions to @code{iThingState}:
+
+@itemize @bullet
+@item
+@code{FindPolygonIndex()}
+@item
+@code{RemovePolygon()}
+@item
+@code{RemovePolygons()}
+@item
+@code{SetVertex()}
+@item
+@code{DeleteVertex()}
+@item
+@code{DeleteVertices()}
+@item
+@code{SetCurveVertex()}
+@item
+@code{SetCurveTexel()}
+@item
+@code{ClearCurveVertices()}
+@item
+@code{FindCurveIndex()}
+@item
+@code{RemoveCurve()}
+@item
+@code{RemoveCurves()}
+@end itemize
+

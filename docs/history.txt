@@ -11,6 +11,7 @@ The history order is reversed so that new features are at the top.
 	  from user code.
 	- Removed RelinkMesh() from iSector. This is a private function
 	  and not to be used from user code.
+	- Added apimod appendix between 0.90 and 0.92.
 28-Nov-2001
 	- Made the test on bad UV coordinates for a polygon a little
 	  bit more strict so that it rejects more polygons. There were
