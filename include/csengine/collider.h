@@ -149,7 +149,7 @@ public:
   static void CollideReset ();
   static void SetFirstHit (bool fh) {firstHit = fh;}
   static bool GetFirstHit () {return firstHit;}
-  int Report (csCollider **id1, csCollider **id2);
+  static int Report (csCollider **id1, csCollider **id2);
   const csVector3 &GetRadius() const;
   /// If object has a child of type csCollider it is returned. Otherwise 0
   /// is returned.
