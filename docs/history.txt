@@ -53,6 +53,7 @@ chronological order.
 	      copy of flarge now produces a loadable (though incomplete) map
 	      file.
 	- Squee added missing check for OR in cssaver.
+	- res fixed the modification of a const char* in openglcommon.
 9-Dec-2004
 	- Keith Fulton added support for new animation callback system in
 	  cal3d.  See viewmesh.cpp for very simple example of how to use this.

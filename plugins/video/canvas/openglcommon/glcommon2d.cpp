@@ -761,7 +761,7 @@ bool csGraphics2DGLCommon::DebugCommand (const char* cmdstr)
   CS_ALLOC_STACK_ARRAY(char, cmd, strlen (cmdstr) + 1);
   strcpy (cmd, cmdstr);
   char* param = 0;
-  char* space = strchr (cmdstr, ' ');
+  char* space = strchr (cmd, ' ');
   if (space)
   {
     param = space + 1;
