@@ -8,6 +8,9 @@ The history order is reversed so that new features are at the top.
 	  This causes image degradation. Thanks to Norman Kramer for
 	  spotting this.
 	- Fixed a bug with the change above.
+	- Fixed additional bug in OpenGL texture mode selection so that
+	  textures with alpha channel are now also correctly transparent
+	  like before (i.e. GL_RGBA is used).
 27-Sep-2001
 	- The alphamap for textures in the software renderer was not cleaned
 	  up at destruction.

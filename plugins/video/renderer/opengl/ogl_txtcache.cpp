@@ -285,6 +285,10 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
 	}
 	if (txt) txt->KeyColorSet (true);
       }
+      // If the image has an alpha channel we also go to GL_RGBA.
+      if (((csTextureOpenGL *)txt_mm->get_texture (0))->get_image ()
+    	  ->GetFormat () & CS_IMGFMT_ALPHA)
+        src_mode = GL_RGBA;
 
       // now that the texture has been generated, send it to openGL
       glTexImage2D (GL_TEXTURE_2D, mipmaplevel, src_mode, tw, th,
@@ -330,6 +334,10 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
 	}
 	txt->KeyColorSet (true);
       }
+      // If the image has an alpha channel we also go to GL_RGBA.
+      if (((csTextureOpenGL *)txt_mm->get_texture (0))->get_image ()
+    	  ->GetFormat () & CS_IMGFMT_ALPHA)
+        src_mode = GL_RGBA;
       glTexImage2D (GL_TEXTURE_2D, 0, src_mode, tw, th,
 		    0, GL_RGBA, GL_UNSIGNED_BYTE, src);
     }
