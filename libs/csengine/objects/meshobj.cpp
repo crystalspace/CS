@@ -349,9 +349,8 @@ bool csMeshWrapper::HitBeam (const csVector3& start, const csVector3& end,
   csReversibleTransform trans = movable.GetFullTransform ();
   csVector3 startObj = trans.Other2This (start);
   csVector3 endObj = trans.Other2This (end);
-  bool rc = false;
-  if ((HitBeamBBox(startObj, endObj, isect, NULL) > -1)
-       && (rc = HitBeamOutline (startObj, endObj, isect, pr)))
+  bool rc = HitBeamOutline (startObj, endObj, isect, pr);
+  if (HitBeamBBox(startObj, endObj, isect, NULL) > -1 && rc)
           isect = trans.This2Other (isect);
   return rc;
 }
