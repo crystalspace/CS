@@ -24,6 +24,28 @@ The history order is reversed so that new features are at the top.
 	      to the time of the point you are editing.
 	    - Added new shuttle model from Michael Voase.
 	    - Added new station model from Thomas Hieber (as yet untextured).
+	    - Wouter Wijngaards did the following:
+	      Added a bumpmapping test application. It contains a procedural
+	      texture that is used to approximate bumpmapping. 3d hardware
+	      may be able to do bumpmapping nicer looking and faster, if it
+	      supports bumpmapping.  If it does not support bumpmapping,
+	      the procedural texture is a good fallback option, that will
+	      run on almost any hardware (and software too if we fix that).
+	      Note that the software renderer does not really like the
+	      tiling and DPFX calls, so the texture is stretched a bit -
+	      there is one triangle where you can see what it should look
+	      like. Under opengl the results look nice.
+	      Note that this is a test for now. The code has not been
+	      optimized at all.
+	      And the computed overlays could be cached too. So don't look at
+	      framerates.
+	      When you start the application, you can see some wood texture
+	      on the left (unbumpmapped). You can see a stone texture on the
+	      right (the bumpmap texture). And the wood bumpmapped with
+	      stone is in the middle. In the lower right hand corner you
+	      can see a debug view of the bumpmapping.
+	- Norman Kramer fixed the bug that made indexed bmp images fully
+	  transparent.
 27-Apr-2001
 	- Martin did some further work on csparser and csengine.
 	- Philip Wyett added csdemo.cfg to makefile inorder that it is
