@@ -59,13 +59,13 @@ csGraphics2DDDraw3::csGraphics2DDDraw3(iBase *iParent) :
   m_lpddPal (NULL),
   m_hWnd (NULL),
   m_hWndPalette (NULL),
+  m_piWin32Assistant (NULL),
   m_bPalettized (false),
   m_bPaletteChanged (false),
   m_nActivePage (0),
   m_bLocked (false),
   m_bDoubleBuffer (false),
-  m_bAllowWindowed (false),
-  m_piWin32Assistant (NULL)
+  m_bAllowWindowed (false)
 {
   m_hInstance = GetModuleHandle (NULL);
 }
@@ -147,7 +147,7 @@ bool csGraphics2DDDraw3::Open ()
   ASSERT (m_hWnd);
 
   // Subclass the window
-  m_OldWndProc = (WNDPROC)(m_hWnd, GWL_WNDPROC, (LONG) WindowProc);
+  m_OldWndProc = (WNDPROC)GetWindowLong(m_hWnd, GWL_WNDPROC);
   SetWindowLong (m_hWnd, GWL_USERDATA, (LONG)this);
 
   // Decide whenever we allow windowed mode at all
