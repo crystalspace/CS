@@ -594,6 +594,8 @@ sub DESTROY {
     }
 }
 
+*__lt__ = *cspacec::csString___lt__;
+*__gt__ = *cspacec::csString___gt__;
 *__eq__ = *cspacec::csString___eq__;
 *__seq__ = *cspacec::csString___seq__;
 *__string__ = *cspacec::csString___string__;
@@ -7535,6 +7537,10 @@ package cspace::iSoundSource;
 *GetPosition = *cspacec::iSoundSource_GetPosition;
 *SetVelocity = *cspacec::iSoundSource_SetVelocity;
 *GetVelocity = *cspacec::iSoundSource_GetVelocity;
+*SetMinimumDistance = *cspacec::iSoundSource_SetMinimumDistance;
+*SetMaximumDistance = *cspacec::iSoundSource_SetMaximumDistance;
+*GetMinimumDistance = *cspacec::iSoundSource_GetMinimumDistance;
+*GetMaximumDistance = *cspacec::iSoundSource_GetMaximumDistance;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -10119,7 +10125,6 @@ package cspace::iGraphics3D;
 *CreateHalo = *cspacec::iGraphics3D_CreateHalo;
 *DumpCache = *cspacec::iGraphics3D_DumpCache;
 *ClearCache = *cspacec::iGraphics3D_ClearCache;
-*PrecacheTexture = *cspacec::iGraphics3D_PrecacheTexture;
 *RemoveFromCache = *cspacec::iGraphics3D_RemoveFromCache;
 *GetVertexBufferManager = *cspacec::iGraphics3D_GetVertexBufferManager;
 *IsLightmapOK = *cspacec::iGraphics3D_IsLightmapOK;
@@ -10680,6 +10685,7 @@ package cspace::iTextureHandle;
 *GetAlphaMap = *cspacec::iTextureHandle_GetAlphaMap;
 *GetCanvas = *cspacec::iTextureHandle_GetCanvas;
 *GetAlphaType = *cspacec::iTextureHandle_GetAlphaType;
+*Precache = *cspacec::iTextureHandle_Precache;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -13108,6 +13114,7 @@ sub SOUND_LOOP () { $cspacec::SOUND_LOOP }
 sub SOUND3D_DISABLE () { $cspacec::SOUND3D_DISABLE }
 sub SOUND3D_RELATIVE () { $cspacec::SOUND3D_RELATIVE }
 sub SOUND3D_ABSOLUTE () { $cspacec::SOUND3D_ABSOLUTE }
+sub SOUND_DISTANCE_INFINITE () { $cspacec::SOUND_DISTANCE_INFINITE }
 sub VFS_PATH_DIVIDER () { $cspacec::VFS_PATH_DIVIDER }
 sub VFS_PATH_SEPARATOR () { $cspacec::VFS_PATH_SEPARATOR }
 sub VFS_MAX_PATH_LEN () { $cspacec::VFS_MAX_PATH_LEN }
