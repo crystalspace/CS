@@ -986,3 +986,7 @@ Removed @code{iEngine::EnableLightingCache()} and
 @code{iEngine::SetLightingCacheMode()} and
 @code{iEngine::GetLightingCacheMode()}.
 
+@code{FrameWidth} and @code{FrameHeight} are no longer available
+in @code{SysSystemDriver}. Instead you have to call @code{GetWidth()}
+and @code{GetHeight()} on the pointer to the canvas (@code{iGraphics2D}).
+
