@@ -3967,6 +3967,7 @@ class iEngine(iBase):
     def GetTextureList(*args): return _cspace.iEngine_GetTextureList(*args)
     def GetMaterialList(*args): return _cspace.iEngine_GetMaterialList(*args)
     def GetVariableList(*args): return _cspace.iEngine_GetVariableList(*args)
+    def AddMeshAndChildren(*args): return _cspace.iEngine_AddMeshAndChildren(*args)
     def CreateRegion(*args): return _cspace.iEngine_CreateRegion(*args)
     def GetRegions(*args): return _cspace.iEngine_GetRegions(*args)
     def FindMaterial(*args): return _cspace.iEngine_FindMaterial(*args)
