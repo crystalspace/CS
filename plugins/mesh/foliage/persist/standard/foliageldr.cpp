@@ -147,6 +147,9 @@ csPtr<iBase> csFoliageFactoryLoader::Parse (iDocumentNode* node,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
+      case XMLTOKEN_FACTORY:
+        // @@@ Write me.
+        // break; (fall through for now)
       default:
 	synldr->ReportBadToken (child);
 	return 0;
