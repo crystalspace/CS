@@ -994,11 +994,13 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
   switch (current_shadow_state)
   {
   case CS_SHADOW_VOLUME_PASS1:
-    statecache->SetStencilOp (GL_KEEP, GL_INCR, GL_KEEP);
+    // statecache->SetStencilOp (GL_KEEP, GL_INCR, GL_KEEP);
+    statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_INCR);
     statecache->SetStencilFunc (GL_ALWAYS, 0, 255);
     break;
   case CS_SHADOW_VOLUME_PASS2:
-    statecache->SetStencilOp (GL_KEEP, GL_DECR, GL_KEEP);
+    // statecache->SetStencilOp (GL_KEEP, GL_DECR, GL_KEEP);
+    statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_DECR);
     statecache->SetStencilFunc (GL_ALWAYS, 0, 255);
     break;
   case CS_SHADOW_VOLUME_USE:
@@ -1010,7 +1012,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
     break;
   }
 
-  if (current_shadow_state == CS_SHADOW_VOLUME_PASS1)
+  if (current_shadow_state == CS_SHADOW_VOLUME_PASS2)
     SetMirrorMode (!mymesh->do_mirror);
   else
     SetMirrorMode (mymesh->do_mirror);
