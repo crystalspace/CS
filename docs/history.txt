@@ -20,20 +20,25 @@ chronological order.
 	  the engine plugin. include/csengine and libs/csengine are now
 	  gone. Jorrit also fixed walktest so it no longer includes files
 	  from include/csengine.
-	- Luca added a very informative message in the bottom of the screen 
+	- Luca added a very informative message in the bottom of the screen
 	  for the waterdemo application.
-        - Matze removed csengine from cs-config
+        - Matze removed csengine from cs-config.
 	- res made the following changes to data/config/opengl.cfg:
-	    - Improved comment for Video.OpenGL.TextureDownsample
+	    - Improved comment for Video.OpenGL.TextureDownsample.
 	    - Added GL font cache settings.
+	- Eric Sunshine removed plugine/engine/3d/enginep.cpp since it is no
+	  longer needed.  This file existed solely to force a reference from
+	  the plugin to libcsengine.a to ensure that the library was actually
+	  linked into the plugin module.  Since all engine sources now reside
+	  in engine/3d and libcsengine.a is gone, this is no longer necessary.
 25-Jan-2004
         - Matze did some updates to the jam rules:
-            - I decided not to fight autoconf while using custom variable names.
-              This gives more trouble than necessary. So we're using bindir,
-              includedir, ... for installation directories now.
-            - Rewrote installation rules and used the ones from autojam
-            - fixed and simplified header install rules
-            - added new targets to install docu
+            - I decided not to fight autoconf while using custom variable
+              names.  This gives more trouble than necessary.  So we're using
+              bindir, includedir, etc., for installation directories now.
+            - Rewrote installation rules and used the ones from autojam.
+            - Fixed and simplified header install rules.
+            - Added new targets to install documentation.
         - Matze changed the csGet*Dir functions to return csString and
           introduced CRYSTAL_PLUGIN and CRYSTAL_CONFIG in the unix variant and
           changed the order in the linux variant a slight bit.
