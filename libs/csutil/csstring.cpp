@@ -427,8 +427,9 @@ csStringBase& csStringBase::Upcase()
 csStringBase &csStringBase::LTrim()
 {
   size_t i;
+  char* const p = GetData();
   for (i = 0; i < Size; i++)
-    if (!isspace ((unsigned char)Data[i]))
+    if (!isspace ((unsigned char)p[i]))
       break;
   if (i > 0)
     DeleteAt (0, i);

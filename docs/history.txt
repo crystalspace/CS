@@ -57,6 +57,7 @@ chronological order.
 	      repeatedly throwing it away and reallocating it. As with
 	      csStringBase, csStringFast now only frees the dynamic buffer upon
 	      explicit request via Free() or ShrinkBestFit().
+	- Jorrit fixed csStringBase::LTrim(). It forget to use GetData().
 	- Eric Sunshine fixed win32/csconfig.h so that CS_HAVE_INTPTR_T is
 	  defined for Borland.
 13-Mar-2005
