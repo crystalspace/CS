@@ -54,8 +54,6 @@ public:
   static bool Register (csSoundLoader* loader);
 
 protected:
-  ///
-  virtual ~csSoundLoader() {}
 
   /**
    * Load an image from the given buffer.
