@@ -35,17 +35,6 @@ char ShiftedKey [128-32] =
 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '{', '|', '}', '~', 127
 };
 
-// And this one performs backward conversion
-char UnshiftedKey [128-32] =
-{
-' ', '1', '\'','3', '4', '5', '7', '\'','9', '0', '8', '=', ',', '-', '.', '/',
-'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ';', ';', ',', '=', '.', '/',
-'2', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
-'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '[', '\\',']', '6', '-',
-'`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
-'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '[', '\\',']', '`', 127
-};
-
 //--//--//--//--//--//--//--//--//--//--//--//--//--/> Keyboard driver <--//--/
 
 csKeyboardDriver::csKeyboardDriver (csSystemDriver *system) :
@@ -59,50 +48,44 @@ void csKeyboardDriver::Reset ()
 {
   for (size_t i = 0; i < KeyState.GetBitCount (); i++)
     if (KeyState [i])
-      do_key (i < 256 ? i : i - 256 + CSKEY_FIRST, false);
+      do_key (i < 256 ? i : i - 256 + CSKEY_FIRST, 0, false);
 }
 
-void csKeyboardDriver::do_key (int key, bool down)
+void csKeyboardDriver::do_key (int iKey, int iChar, bool iDown)
 {
   int smask = (GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
             | (GetKeyState (CSKEY_CTRL) ? CSMASK_CTRL : 0)
             | (GetKeyState (CSKEY_ALT) ? CSMASK_ALT : 0);
 
-  if (down != GetKeyState (key))
+  if (iDown && !GetKeyState (iKey))
     smask |= CSMASK_FIRST;
 
-  if ((key >= 32) && (key < 128))
-    if (smask & CSMASK_SHIFT)
-      key = ShiftedKey [key - 32];
+  if (iChar < 0)
+  {
+    if (smask & CSMASK_ALT)
+      iChar = 0;
+    else if (smask & CSMASK_CTRL)
+      iChar = (iKey > 96 && iKey < 128) ? iKey - 96 : 0;
+    else if (smask & CSMASK_SHIFT)
+      iChar = (iKey >= 32 && iKey <= 127) ? ShiftedKey [iKey - 32] : 0;
+    else
+      iChar = (iKey >= 32 && iKey <= 255) ? iKey : 0;
+  }
 
-  SetKeyState (key, down);
+  SetKeyState (iKey, iDown);
   System->EventQueue.Put (new csEvent (System->GetTime (),
-    down ? csevKeyDown : csevKeyUp, key, smask));
+    iDown ? csevKeyDown : csevKeyUp, iKey, iChar, smask));
 }
 
-void csKeyboardDriver::do_key_extended (int key, int keytranslated, bool down)
+void csKeyboardDriver::SetKeyState (int iKey, bool iDown)
 {
-  int smask = (GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
-            | (GetKeyState (CSKEY_CTRL) ? CSMASK_CTRL : 0)
-            | (GetKeyState (CSKEY_ALT) ? CSMASK_ALT : 0);
-
-  if (down && !GetKeyState (key))
-    smask |= CSMASK_FIRST;
-
-  SetKeyState (key, down);
-  System->EventQueue.Put (new csEvent (System->GetTime (),
-    down ? csevKeyDown : csevKeyUp, keytranslated, smask));
+  int idx = (iKey < 256) ? iKey : (256 + iKey - CSKEY_FIRST);
+  if (iDown) KeyState.Set (idx); else KeyState.Reset (idx);
 }
 
-void csKeyboardDriver::SetKeyState (int key, bool state)
+bool csKeyboardDriver::GetKeyState (int iKey)
 {
-  int idx = (key < 256) ? key : (256 + key - CSKEY_FIRST);
-  if (state) KeyState.Set (idx); else KeyState.Reset (idx);
-}
-
-bool csKeyboardDriver::GetKeyState (int key)
-{
-  int idx = (key < 256) ? key : (256 + key - CSKEY_FIRST);
+  int idx = (iKey < 256) ? iKey : (256 + iKey - CSKEY_FIRST);
   return KeyState [idx];
 }
 
@@ -131,7 +114,7 @@ void csMouseDriver::do_button (int button, bool down, int x, int y)
   if (x != LastX || y != LastY)
     do_motion (x, y);
 
-  if (button == 0 || button >= CS_MAX_MOUSE_BUTTONS)
+  if (button <= 0 || button >= CS_MAX_MOUSE_BUTTONS)
     return;
 
   int smask = (System->GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)

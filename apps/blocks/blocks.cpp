@@ -2295,9 +2295,11 @@ void Blocks::HandleLoweringPlanes (time_t elapsed_time)
   csPolygonSet::current_light_frame_number++;
 }
 
-void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
+void Blocks::NextFrame ()
 {
-  SysSystemDriver::NextFrame (elapsed_time, current_time);
+  SysSystemDriver::NextFrame ();
+  time_t elapsed_time, current_time;
+  GetElapsedTime (elapsed_time, current_time);
 
   // -----------------------------------------------------------------
   // Start network stuff.

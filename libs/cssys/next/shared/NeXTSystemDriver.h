@@ -52,9 +52,8 @@ public:
     virtual ~NeXTSystemDriver();
     virtual bool Initialize( int argc, char const* const argv[],
 	char const* cfgfile );
-    virtual void SetSystemDefaults( csIniFile* );
     virtual void Help();
-    virtual void Loop ();
+    virtual void NextFrame ();
 
     bool continue_running() const { return !Shutdown; }
     void timer_fired();

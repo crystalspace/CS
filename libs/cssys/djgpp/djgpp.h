@@ -22,27 +22,34 @@
 #ifndef DJGPP_H
 #define DJGPP_H
 
-#include "idjgpp.h"
 #include "cssys/csinput.h"
 #include "cssys/system.h"
 
 /// DJGPP version.
-class SysSystemDriver : public csSystemDriver, public iDosSystemDriver
+class SysSystemDriver : public csSystemDriver, public iEventPlug
 {
 public:
   SysSystemDriver ();
+  virtual ~SysSystemDriver ();
 
-  virtual void Loop ();
+  virtual void NextFrame ();
+
+  /// Open the system
+  virtual bool Open (const char *Title);
+  /// Close the system
+  virtual void Close ();
+
+  /// Execute a system-dependent extension
+  virtual bool SystemExtension (const char *iCommand, ...);
 
   DECLARE_IBASE_EXT (csSystemDriver);
 
-  virtual bool Open (const char *Title);
-  virtual void Close ();
+  //------------------------- iEventPlug interface ---------------------------//
 
-  /// Implementation of iDosSystemDriver
-
-  /// Set mouse position since mouse driver is part of system driver
-  virtual bool SetMousePosition (int x, int y);
+  virtual unsigned GetPotentiallyConflictingEvents ()
+  { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
+  virtual unsigned QueryEventPriority (unsigned /*iType*/)
+  { return 100; }
 
 private:
   bool KeyboardOpened;
@@ -52,6 +59,7 @@ private:
   int mouse_sensivity_x;
   int mouse_sensivity_y;
   int mouse_sensivity_threshold;
+  iEventOutlet *EventOutlet;
 };
 
 #endif // DJGPP_H

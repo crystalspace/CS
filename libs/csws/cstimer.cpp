@@ -20,7 +20,6 @@
 #include "cssysdef.h"
 #include "csws/cstimer.h"
 #include "csws/csapp.h"
-#include "csws/cswssys.h"
 
 csTimer::csTimer (csComponent *iParent, unsigned long iPeriod)
   : csComponent (iParent)

@@ -27,73 +27,47 @@
 #define MOUSE_TEXTURE_NAME	"csws::Mouse"
 #define NO_VIRTUAL_POS		-999999
 
-csMousePointer::csMousePointer (csComponent *iParent, int ID, int x, int y,
-  int w, int h, int hsx, int hsy) : csComponent (iParent)
+csMousePointer::csMousePointer (csApp *iApp, csMouse *iParent, int ID,
+  int x, int y, int w, int h, int hsx, int hsy)
 {
+  app = iApp;
+  parent = iParent;
   id = ID;
   tX = x; tY = y; tW = w; tH = h;
   hsX = hsx; hsY = hsy;
-  Cursor = NULL;
-  Under = NULL;
-  state |= CSS_SELECTABLE;
 }
 
-csMousePointer::~csMousePointer ()
+void csMousePointer::Draw (int x, int y, csImageArea *&Under)
 {
-  delete Cursor;
-  Free ();
-}
-
-void csMousePointer::Draw (int x, int y)
-{
-  if (Cursor)
+  if (parent->Texture)
   {
     x -= hsX; y -= hsY;
     app->pplSaveArea (Under, x, y, tW, tH);
-    app->pplSprite2D (Cursor, x, y, tW, tH);
+    app->pplDrawPixmap (parent->Texture, x, y, tW, tH, tX, tY, tW, tH);
   } /* endif */
 }
 
-void csMousePointer::Undraw ()
-{
-  if (Under)
-  {
-    app->pplRestoreArea (Under, true);
-    Under = NULL;
-  } /* endif */
-}
+//--//--//--//--//--//--//--//--//--//--//--//--//--//-- csMouse -//--//--//--//
 
-void csMousePointer::Free ()
+csMouse::csMouse (csApp *iApp)
 {
-  if (Under)
-  {
-    app->pplFreeArea (Under);
-    Under = NULL;
-  }
-}
-
-void csMousePointer::SetTexture (iTextureHandle *tex)
-{
-  delete Cursor;
-  Cursor = new csPixmap (tex, tX, tY, tW, tH);
-  if (!Cursor->ok ())
-  {
-    delete Cursor;
-    Cursor = NULL;
-  } /* endif */
-}
-
-csMouse::csMouse (csComponent *iParent) : csComponent (iParent)
-{
+  app = iApp;
   MouseX = 0;
   MouseY = 0;
   Visible = 0;
   invisible = false;
   VirtualX = NO_VIRTUAL_POS;
+  AppFocused = true;
+  ActiveCursor = NULL;
+  memset (&Under, 0, sizeof (Under));
+  Texture = NULL;
 }
 
 csMouse::~csMouse ()
 {
+  for (int i = 0; i < MAX_SYNC_PAGES; i++)
+    if (Under [i])
+      app->pplFreeArea (Under [i]);
 }
 
 void csMouse::Move (int x, int y)
@@ -102,21 +76,24 @@ void csMouse::Move (int x, int y)
   MouseY = y;
 }
 
-void csMouse::Draw ()
+void csMouse::Draw (int Page)
 {
   // Draw mouse pointer
-  if (focused && (Visible == 0) && (!invisible))
+  if (ActiveCursor && AppFocused && (Visible == 0) && (!invisible))
     if (VirtualX != NO_VIRTUAL_POS)
-      ((csMousePointer *)focused)->Draw (VirtualX, VirtualY);
+      ActiveCursor->Draw (VirtualX, VirtualY, Under [Page]);
     else
-      ((csMousePointer *)focused)->Draw (MouseX, MouseY);
+      ActiveCursor->Draw (MouseX, MouseY, Under [Page]);
 }
 
-void csMouse::Undraw ()
+void csMouse::Undraw (int Page)
 {
-  // Restore the square under the mouse
-  if (focused)
-    ((csMousePointer *)focused)->Undraw ();
+  csImageArea *under = Under [Page];
+  if (under)
+  {
+    app->pplRestoreArea (under, true);
+    Under [Page] = NULL;
+  }
 }
 
 void csMouse::NewPointer (char *id, char *posdef)
@@ -125,20 +102,12 @@ void csMouse::NewPointer (char *id, char *posdef)
   ScanStr (id, "%d", &cID);
   int cX, cY, cW, cH, chX, chY;
   ScanStr (posdef, "%d,%d,%d,%d,%d,%d", &cX, &cY, &cW, &cH, &chX, &chY);
-  (void)new csMousePointer (this, cID, cX, cY, cW, cH, chX, chY);
-}
-
-static bool do_set_texture (csComponent *child, void *param)
-{
-  ((csMousePointer *)child)->SetTexture ((iTextureHandle *)param);
-  return false;
+  Pointers.Push (new csMousePointer (app, this, cID, cX, cY, cW, cH, chX, chY));
 }
 
 void csMouse::Setup ()
 {
-  iTextureHandle *tex = app->GetTexture (MOUSE_TEXTURE_NAME);
-  if (tex)
-    ForEach (do_set_texture, tex);
+  Texture = app->GetTexture (MOUSE_TEXTURE_NAME);
 }
 
 bool csMouse::HandleEvent (csEvent &Event)
@@ -158,10 +127,7 @@ bool csMouse::HandleEvent (csEvent &Event)
       switch (Event.Command.Code)
       {
         case cscmdFocusChanged:
-          if (Event.Command.Info == NULL)
-            Hide ();
-          else
-            Show ();
+          AppFocused = (bool)Event.Command.Info;
           break;
       } /* endswitch */
       return true;
@@ -175,22 +141,25 @@ bool csMouse::SetCursor (csMouseCursorID ID)
   bool virt = (VirtualX != NO_VIRTUAL_POS) &&
     ((VirtualX != MouseX) || (VirtualY != MouseY));
 
-  csMousePointer *Cur = (csMousePointer *)GetChild (ID);
-  if (Cur)
+  ActiveCursor = NULL;
+  for (int i = 0; i < Pointers.Length (); i++)
+    if (Pointers.Get (i)->id == ID)
+    {
+      ActiveCursor = Pointers.Get (i);
+      break;
+    }
+
+  if (ActiveCursor)
   {
     if (virt)
     {
       app->SwitchMouseCursor (csmcNone);
-      SetFocused (Cur);
       invisible = false;
     }
     else if (app->SwitchMouseCursor (ID))
       invisible = true;
     else
-    {
-      SetFocused (Cur);
       invisible = false;
-    } /* endif */
     return true;
   }
   else

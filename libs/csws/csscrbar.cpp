@@ -19,7 +19,6 @@
 
 #include "cssysdef.h"
 #include "csws/csscrbar.h"
-#include "csws/csmouse.h"
 #include "csws/csapp.h"
 
 // Minimal scroll button size
@@ -246,8 +245,7 @@ pagescroll:
         case cscmdButtonDown:
           if (Event.Command.Info == scroller)
           {
-            app->GetMouse ()->GetPosition (scrollerdx, scrollerdy);
-            scroller->GlobalToLocal (scrollerdx, scrollerdy);
+            scroller->GetMousePosition (scrollerdx, scrollerdy);
             return true;
           } /* endif */
           active_button = ((csComponent *)Event.Command.Info)->id;

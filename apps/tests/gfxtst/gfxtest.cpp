@@ -53,6 +53,8 @@ static struct option long_options[] =
   {"save", no_argument, 0, 'S'},
   {"display", optional_argument, 0, 'D'},
   {"heightmap", optional_argument, 0, 'H'},
+  {"info", no_argument, 0, 'I'},
+  {"strip-alpha", no_argument, 0, 'a'},
   {0, no_argument, 0, 0}
 };
 
@@ -68,6 +70,8 @@ static struct
   bool transp;
   int outputmode;
   float hmscale;
+  bool info;
+  bool stripalpha;
 } opt =
 {
   false,
@@ -79,7 +83,9 @@ static struct
   -1,
   false,
   0,
-  1/500.0
+  1/500.0,
+  false,
+  false
 };
 // Dont move inside the struct!
 static RGBPixel transpcolor;
@@ -98,11 +104,13 @@ static int display_help ()
   printf ("  -h   --help          Display this help text\n");
   printf ("  -v   --verbose       Comment on what's happening\n");
   printf ("  -V   --version       Display program version\n");
+  printf ("  -a   --strip-alpha   Remove alpha channel, if present\n");
   printf ("------------------- Output options (reciprocally exclusive): ------------------\n");
   printf ("  -S   --save          Output a PNG output image (default)\n");
   printf ("  -D   --display{=#,#} Display the image in ASCII format :-)\n");
   printf ("  -H   --heightmap{=#} Output a 3D heightmap in Crystal Space format\n");
   printf ("                       An optional scale argument may be specified\n");
+  printf ("  -I   --info          Display image info (and don't do anything more)\n");
   return 1;
 }
 
@@ -338,7 +346,7 @@ static bool process_file (const char *fname)
     return false;
   }
 
-  if (opt.verbose)
+  if (opt.verbose || opt.info)
   {
     printf ("Image size: %d x %d pixels, %d bytes\n", ifile->GetWidth (),
       ifile->GetHeight (), ifile->GetSize ());
@@ -370,6 +378,16 @@ static bool process_file (const char *fname)
     sprintf (strchr (suffix, 0), "-m%d", opt.mipmap);
   }
 
+  if (opt.stripalpha)
+  {
+    int format = ifile->GetFormat ();
+    if (format & CS_IMGFMT_ALPHA)
+    {
+      printf ("Removing alpha channel from image\n");
+      ifile->SetFormat (format & ~CS_IMGFMT_ALPHA);
+    }
+  }
+
   bool success = false;
   switch (opt.outputmode)
   {
@@ -381,6 +399,9 @@ static bool process_file (const char *fname)
       break;
     case 2:
       success = output_heightmap (fname, ifile);
+      break;
+    case 3:
+      success = true;
       break;
   }
 
@@ -399,7 +420,7 @@ int main (int argc, char **argv)
   programname = argv [0];
 
   int c;
-  while ((c = getopt_long (argc, argv, "8cd::s:m:t:DSH::hvV", long_options, NULL)) != EOF)
+  while ((c = getopt_long (argc, argv, "8cdas:m:t:D::H::IhvV", long_options, NULL)) != EOF)
     switch (c)
     {
       case '?':
@@ -413,6 +434,9 @@ int main (int argc, char **argv)
         break;
       case 'd':
         opt.dither = true;
+        break;
+      case 'a':
+        opt.stripalpha = true;
         break;
       case 'D':
         opt.outputmode = 1;
@@ -463,6 +487,10 @@ int main (int argc, char **argv)
           sscanf (optarg, "%g", &opt.hmscale);
           opt.hmscale *= 1/500.0;
         }
+        break;
+      case 'I':
+        opt.outputmode = 3;
+        opt.info = true;
         break;
       case 'h':
         return display_help ();

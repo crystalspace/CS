@@ -26,12 +26,12 @@
 #include "qint.h"
 #include "igraph2d.h"
 #include "csws/cscomp.h"
-#include "csws/csmouse.h"
 #include "csws/csapp.h"
+#include "csws/csmouse.h"
 #include "csws/cswsutil.h"
 
-bool mytt=false;
-// The csComponent class itself
+//--//--//--//--//--//--//--//--//--//--//--//--/ The csComponent class --//--//
+
 csComponent::csComponent (csComponent *iParent) : state (CSS_VISIBLE),
   originalpalette (true), DragStyle (CS_DRAG_MOVEABLE), clipparent (NULL),
   text (NULL), Font (csFontParent), FontSize (-1), Maximized (false), focused (NULL),

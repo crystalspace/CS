@@ -261,13 +261,15 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   return true;
 }
 
-void Phyztest::NextFrame (time_t elapsed_time, time_t current_time)
+void Phyztest::NextFrame ()
 {
+  SysSystemDriver::NextFrame ();
+  time_t elapsed_time, current_time;
+  GetElapsedTime (elapsed_time, current_time);
+
   int i;
   csMatrix3 m; 
   ctMatrix3 M;
-
-  superclass::NextFrame (elapsed_time, current_time);
 
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.) * (0.03 * 20);

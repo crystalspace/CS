@@ -19,9 +19,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-// In DOS we do not want printf() to work in graphics mode
-// since it shows garbage on screen
-
 #include <stdarg.h>
 #include <stdio.h>
 
@@ -41,9 +38,6 @@ void csSystemDriver::console_close ()
 // to be called instead of printf (exact same prototype/functionality of printf)
 void csSystemDriver::console_out (const char *str)
 {
-  if (EnableConsoleOutput)
-  {
-    fputs (str, stdout);
-    fflush (stdout);
-  }
+  fputs (str, stdout);
+  fflush (stdout);
 }

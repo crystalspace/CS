@@ -40,6 +40,7 @@
 
 static KeyboardHandler KH;
 static MouseHandler MH;
+bool EnablePrintf;
 
 static unsigned short ScanCodeToChar[128] =
 {
@@ -64,7 +65,7 @@ static unsigned short ScanCodeToChar[128] =
 //================================================================== System ====
 
 IMPLEMENT_IBASE_EXT (SysSystemDriver)
-  IMPLEMENTS_INTERFACE (iDosSystemDriver)
+  IMPLEMENTS_INTERFACE (iEventPlug)
 IMPLEMENT_IBASE_EXT_END
 
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
@@ -82,56 +83,56 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   __dpmi_int (0x33, &regs);
   MouseExists = !!(regs.x.ax);
   MouseOpened = false;
+  EnablePrintf = true;
+  EventOutlet = CreateEventOutlet (this);
 }
 
-void SysSystemDriver::Loop ()
+SysSystemDriver::~SysSystemDriver ()
+{
+  if (EventOutlet)
+    EventOutlet->DecRef ();
+}
+
+void SysSystemDriver::NextFrame ()
 {
   bool ExtKey = false;
-  while (!Shutdown && !ExitLoop)
+  // Fill in events ...
+  while (event_queue_tail != event_queue_head)
   {
-    static long prev_time = -1;
-    long new_prev_time = Time ();
-    NextFrame ((prev_time == -1) ? 0 : new_prev_time - prev_time, Time ());
-    prev_time = new_prev_time;
-
-    // Fill in events ...
-    while (event_queue_tail != event_queue_head)
+    switch (event_queue [event_queue_tail].Type)
     {
-      switch (event_queue [event_queue_tail].Type)
+      case 1:
       {
-        case 1:
+        int ScanCode = event_queue [event_queue_tail].Keyboard.ScanCode;
+        bool Down = (ScanCode < 0x80);
+
+        if ((ScanCode == 0xe0) || (ScanCode == 0xe1))
+          ExtKey = true;
+        else
         {
-          int ScanCode = event_queue [event_queue_tail].Keyboard.ScanCode;
-          bool Down = (ScanCode < 0x80);
+          // handle keypad '/'
+          if (ExtKey && (ScanCode == 0x35))
+            ScanCode = 0x6f;
 
-          if ((ScanCode == 0xe0) || (ScanCode == 0xe1))
-            ExtKey = true;
-          else
-          {
-            // handle keypad '/'
-            if (ExtKey && (ScanCode == 0x35))
-              ScanCode = 0x6f;
-
-            ScanCode = ScanCodeToChar [ScanCode & 0x7F];
-            if (ScanCode)
-              QueueKeyEvent (ScanCode, Down);
-          }
-          break;
+          ScanCode = ScanCodeToChar [ScanCode & 0x7F];
+          if (ScanCode)
+            EventOutlet->Key (ScanCode, -1, Down);
         }
-        case 2:
-        {
-          int Button = event_queue [event_queue_tail].Mouse.Button;
-          bool Down = event_queue [event_queue_tail].Mouse.Down;
-          int x = event_queue [event_queue_tail].Mouse.x;
-          int y = event_queue [event_queue_tail].Mouse.y;
+        break;
+      }
+      case 2:
+      {
+        int Button = event_queue [event_queue_tail].Mouse.Button;
+        bool Down = event_queue [event_queue_tail].Mouse.Down;
+        int x = event_queue [event_queue_tail].Mouse.x;
+        int y = event_queue [event_queue_tail].Mouse.y;
 
-          QueueMouseEvent (Button, Down, x, y);
-          break;
-        }
-      } /* endswitch */
-      event_queue_tail = (event_queue_tail + 1) & EVENT_QUEUE_MASK;
-    } /* endwhile */
-  } // while (!Shutdown && !ExitLoop)
+        EventOutlet->Mouse (Button, Down, x, y);
+        break;
+      }
+    } /* endswitch */
+    event_queue_tail = (event_queue_tail + 1) & EVENT_QUEUE_MASK;
+  } /* endwhile */
 }
 
 bool SysSystemDriver::Open (const char *Title)
@@ -224,15 +225,31 @@ void SysSystemDriver::Close ()
   }
 }
 
-bool SysSystemDriver::SetMousePosition (int x, int y)
+bool SysSystemDriver::SystemExtension (const char *iCommand, ...)
 {
-  if (!MouseOpened)
-    return false;
+  va_list args;
+  va_start (args, iCommand);
 
-  __dpmi_regs regs;
-  regs.x.cx = x;
-  regs.x.dx = y;
-  regs.x.ax = 0x04;
-  __dpmi_int (0x33, &regs);
-  return true;
+  bool rc = true;
+  if (!strcmp (iCommand, "SetMousePosition"))
+  {
+    int x = va_arg (args, int);
+    int y = va_arg (args, int);
+
+    if (MouseOpened)
+    {
+      __dpmi_regs regs;
+      regs.x.cx = x;
+      regs.x.dx = y;
+      regs.x.ax = 0x04;
+      __dpmi_int (0x33, &regs);
+    }
+  }
+  else if (!strcmp (iCommand, "EnablePrintf"))
+    EnablePrintf = va_arg (args, bool);
+  else
+    rc = false;
+
+  va_end (args);
+  return rc;
 }

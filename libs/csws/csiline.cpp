@@ -322,9 +322,9 @@ bool csInputLine::HandleEvent (csEvent &Event)
         default:
         {
 do_key:   if ((Event.Key.Modifiers & (CSMASK_CTRL | CSMASK_ALT))
-           || (Event.Key.Code < 32))
+           || (Event.Key.Char < 32))
             return false;
-          if ((Event.Key.Code > 255) || !IsValidChar (Event.Key.Code))
+          if ((Event.Key.Char > 255) || !IsValidChar (Event.Key.Char))
             return true;
           DeleteSelection ();
           char *tmp = (char *)alloca (maxlen + 1);
@@ -334,13 +334,13 @@ do_key:   if ((Event.Key.Modifiers & (CSMASK_CTRL | CSMASK_ALT))
           {
             if (sl >= maxlen)
               return true;
-            tmp [cursorpos] = Event.Key.Code;
+            tmp [cursorpos] = Event.Key.Char;
             strcpy (&tmp [cursorpos + 1], &text [cursorpos]);
           } else
           {
             if ((cursorpos > sl) || (cursorpos >= maxlen))
               return true;
-            tmp [cursorpos] = Event.Key.Code;
+            tmp [cursorpos] = Event.Key.Char;
             if (cursorpos == sl)
               tmp [sl + 1] = 0;
           } /* endif */

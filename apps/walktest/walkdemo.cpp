@@ -24,7 +24,6 @@
 #include "walktest/infmaze.h"
 #include "walktest/hugeroom.h"
 #include "apps/support/command.h"
-#include "cstools/simpcons.h"
 #include "csengine/dumper.h"
 #include "csengine/camera.h"
 #include "csengine/octree.h"

@@ -113,23 +113,14 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
 
   // Initialize the console
   if (Console != NULL)
-  {
-    // Setup console colors
-    Console->CacheColors (txtmgr);
-    ConsoleReady = true;
     // Don't let messages before this one appear
     Console->Clear ();
-  }
 
   // Some commercials...
   Printf (MSG_INITIALIZATION,
     "Crystal Space 3D Performance Tester 0.1.\n");
 
   txtmgr->SetPalette ();
-
-  // Update the console with the new palette
-  if (System->Console != NULL)
-    System->Console->CacheColors (txtmgr);
 
   const char *val;
   if ((val = GetOptionCL ("2d")))
@@ -150,9 +141,11 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
 
 static time_t last_time;
 
-void PerfTest::NextFrame (time_t elapsed_time, time_t current_time)
+void PerfTest::NextFrame ()
 {
-  superclass::NextFrame (elapsed_time, current_time);
+  SysSystemDriver::NextFrame ();
+  time_t elapsed_time, current_time;
+  GetElapsedTime (elapsed_time, current_time);
 
   // Tell 3D driver we're going to display 3D things.
   if (!G3D->BeginDraw (draw_3d ? CSDRAW_3DGRAPHICS : CSDRAW_2DGRAPHICS)) 

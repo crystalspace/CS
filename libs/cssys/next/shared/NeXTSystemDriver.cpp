@@ -31,7 +31,7 @@ IMPLEMENT_EMBEDDED_IBASE_END
 // Constructor
 //-----------------------------------------------------------------------------
 NeXTSystemDriver::NeXTSystemDriver() : csSystemDriver(), initialized(false),
-    controller(0), ticks(0), simulated_depth(0), next_config(0)
+    controller(0), simulated_depth(0), next_config(0)
     {
     CONSTRUCT_EMBEDDED_IBASE(scfiNeXTSystemDriver);
     printf("Crystal Space for " OS_NEXT_DESCRIPTION " " VERSION "\nPorted to "
@@ -68,7 +68,6 @@ bool NeXTSystemDriver::Initialize( int argc, char const* const argv[],
     {
     bool ok = false;
     init_system();
-    init_ticks();
     initialized = true;
     if (superclass::Initialize( argc, argv, cfgfile ))
 	{
@@ -83,6 +82,8 @@ bool NeXTSystemDriver::Initialize( int argc, char const* const argv[],
 //-----------------------------------------------------------------------------
 // SetSystemDefaults
 //-----------------------------------------------------------------------------
+#if 0
+    This one should move to the corresponding canvas driver
 void NeXTSystemDriver::SetSystemDefaults( csIniFile* config )
     {
     superclass::SetSystemDefaults( config );
@@ -90,6 +91,7 @@ void NeXTSystemDriver::SetSystemDefaults( csIniFile* config )
     simulated_depth = (s != 0 ?
 	atoi(s) : config->GetInt( "VideoDriver", "SimulateDepth", 0 ));
     }
+#endif
 
 
 //-----------------------------------------------------------------------------
@@ -128,10 +130,7 @@ void NeXTSystemDriver::timer_fired()
 //-----------------------------------------------------------------------------
 void NeXTSystemDriver::step_frame()
     {
-    long const now = Time();
-    long const elapsed = now - ticks;
-    ticks = now;
-    NextFrame( elapsed, now );
+    NextFrame();
     }
 
 

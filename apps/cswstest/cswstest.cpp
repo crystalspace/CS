@@ -18,7 +18,7 @@
 
 #define SYSDEF_PATH
 #include "cssysdef.h"
-#include "cssys/system.h"
+#include "cssys/sysdriv.h"
 #include "csws/csws.h"
 
 // We need the Virtual File System plugin
@@ -32,13 +32,12 @@ class csWsTest : public csApp
 
 public:
   /// Initialize maze editor
-  csWsTest (char *AppTitle);
+  csWsTest (iSystem *SysDriver);
 
   ///
   virtual bool HandleEvent (csEvent &Event);
 
-  virtual bool InitialSetup (int argc, const char* const argv[],
-    const char *ConfigName, const char* DataDir);
+  virtual bool InitialSetup ();
 };
 
 csWsTest *app;                        // The main Windowing System object
@@ -123,15 +122,14 @@ static int palette_csWsTest[] =
   cs_Color_White			// Start points
 };
 
-csWsTest::csWsTest (char *AppTitle) : csApp (AppTitle)
+csWsTest::csWsTest (iSystem *SysDriver) : csApp (SysDriver)
 {
   SetPalette (palette_csWsTest, sizeof (palette_csWsTest) / sizeof (int));
 }
 
-bool csWsTest::InitialSetup (int argc, const char* const argv[],
-  const char *ConfigName, const char* DataDir)
+bool csWsTest::InitialSetup ()
 {
-  if (!csApp::InitialSetup (argc, argv, ConfigName, DataDir))
+  if (!csApp::InitialSetup ())
     return false;
 
   printf (MSG_INITIALIZATION, "Crystal Space Windowing System test version %s (%s).\n", VERSION, RELEASE_DATE);
@@ -649,14 +647,19 @@ drawline:
  */
 int main (int argc, char* argv[])
 {
-  app = new csWsTest ("Crystal Space 3D maze editor");
+  SysSystemDriver System;
 
-  if (app->InitialSetup (argc, argv, "/config/MazeD.cfg", "/lib/MazeD"))
-  {
-    app->Loop ();
-  }
+  if (!System.Initialize (argc, argv, "/config/MazeD.cfg"))
+    return -1;
 
-  delete app;
+  if (!System.Open ("Crystal Space Windowing System testbed"))
+    return -1;
 
-  return (0);
+  // Create our application object
+  csWsTest app (&System);
+
+  if (app.InitialSetup ())
+    System.Loop ();
+
+  return 0;
 }

@@ -220,7 +220,8 @@ bool csMenuItem::HandleEvent (csEvent &Event)
       // Check hot key
       if ((underline_pos >= 0)
        && ((Event.Key.Modifiers & CSMASK_CTRL) == 0)
-       && (UPPERCASE (Event.Key.Code) == UPPERCASE (text [underline_pos])))
+       && ((UPPERCASE (Event.Key.Char) == UPPERCASE (text [underline_pos]))
+        || (UPPERCASE (Event.Key.Code) == UPPERCASE (text [underline_pos]))))
       {
         Press ();
         return true;

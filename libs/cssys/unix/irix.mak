@@ -56,7 +56,7 @@ CFLAGS.INCLUDE=-Ilibs/zlib -Ilibs/libpng -Ilibs/libjpeg
 CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM)
 
 # Flags for the compiler which are used when optimizing.
-CFLAGS.optimize=-O -fomit-frame-pointer
+CFLAGS.optimize=-O -fomit-frame-pointer -ffast-math
 
 # Flags for the compiler which are used when debugging.
 CFLAGS.debug=-g3 -gstabs

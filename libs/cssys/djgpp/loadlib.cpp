@@ -42,6 +42,22 @@ extern "C" void getcwd ();
 extern "C" void setjmp ();
 extern "C" void longjmp ();
 
+/*
+ * These symbols will be exported to loaded DXEs.
+ * Unfortunately, DJGPP does not support weak symbols
+ * (weak symbols in COFF will work only with binutils 2.9+)
+ * thus the following symbols will be in any your program that links
+ * against this module. On the other hand, making these symbols
+ * weak can result in symbol being NULL (and DXE not being loaded
+ * because you won't be able to resolve missing symbols). Thus the
+ * way it currently works is a bit costly (max ~20K of unused code)
+ * but is guaranteed always to work.
+ *
+ * To build a list of unresolved symbols in a set of modules execute
+ * the following command:
+ *
+ * dxe2gen --show-unres *.dxe | sort | uniq >file
+ */
 DXE_EXPORT_TABLE (syms)
   DXE_EXPORT (__builtin_delete)
   DXE_EXPORT (__builtin_new)

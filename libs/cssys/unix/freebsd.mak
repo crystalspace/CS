@@ -53,7 +53,7 @@ CFLAGS.INCLUDE=-I/usr/local/include
 CFLAGS.GENERAL=-Wall
 
 # Flags for the compiler which are used when optimizing.
-CFLAGS.optimize=-O6 -fomit-frame-pointer -malign-loops=2 -malign-jumps=2 -malign-functions=2
+CFLAGS.optimize=-O6 -fomit-frame-pointer -malign-loops=2 -malign-jumps=2 -malign-functions=2 -ffast-math
 
 # Flags for the compiler which are used when debugging.
 CFLAGS.debug=-g3 -gstabs

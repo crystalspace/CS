@@ -28,12 +28,12 @@
 #include "csws/csstatic.h"
 #include "csws/csradbut.h"
 #include "csws/cscwheel.h"
-#include "csws/cswssys.h"
 #include "csutil/csstrvec.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "cssys/csinput.h"
 #include "itxtmgr.h"
+#include "isystem.h"
 
 #define MSGBOX_TEXTURE "csws::MessageBoxIcons"
 
@@ -417,7 +417,7 @@ void RectUnion (csObjVector &rect, csRect &result)
     Combinations (n, n, doRectUnion, &ru);
 }
 
-void FindCFGBitmap (cswsSystemDriver* /*System*/, csStrVector &sv, char *id,
+void FindCFGBitmap (iSystem *System, csStrVector &sv, char *id,
   int *x, int *y, int *w, int *h)
 {
   char temp[256];
@@ -757,7 +757,7 @@ void cspFileDialog::Reread ()
   if (!(dh = opendir (path)))
   {
     csMessageBox (app, "Error", "Invalid directory");
-    System->Printf (MSG_INITIALIZATION, "Invalid directory path\n");
+    app->System->Printf (MSG_INITIALIZATION, "Invalid directory path\n");
   }
   else
   {
@@ -991,8 +991,8 @@ void cspColorDialog::UpdateInfo (bool UpdateSlider)
 
 void cspColorDialog::SetColor (int iColor)
 {
-  csPixelFormat *pfmt = System->G2D->GetPixelFormat ();
-  RGBPixel *palette = System->G2D->GetPalette ();
+  csPixelFormat *pfmt = app->GetG2D ()->GetPixelFormat ();
+  RGBPixel *palette = app->GetG2D ()->GetPalette ();
   if (pfmt->PalEntries)
   {
     r = float (palette [iColor].red) / 255;

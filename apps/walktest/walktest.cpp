@@ -16,6 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <stdarg.h>
+
 #define SYSDEF_PATH
 #define SYSDEF_ACCESS
 #include "cssysdef.h"
@@ -26,7 +28,6 @@
 #include "qint.h"
 #include "cssys/system.h"
 #include "apps/support/command.h"
-#include "cstools/simpcons.h"
 #include "csparser/csloader.h"
 #include "csgeom/frustum.h"
 #include "csengine/dumper.h"
@@ -56,7 +57,7 @@
 #include "csutil/csrect.h"
 #include "csutil/scanstr.h"
 #include "csobject/dataobj.h"
-#include "csobject/csobject.h"  
+#include "csobject/csobject.h"
 #include "csobject/objiter.h"
 #include "cssfxldr/common/snddata.h"
 #include "csgfxldr/pngsave.h"
@@ -99,7 +100,7 @@ WalkTest::WalkTest () :
   SysSystemDriver (), pos (0, 0, 0), velocity (0, 0, 0)
 {
   extern bool CommandHandler (const char *cmd, const char *arg);
-  Command::ExtraHandler = CommandHandler;
+  csCommandProcessor::ExtraHandler = CommandHandler;
   auto_script = NULL;
   view = NULL;
   infinite_maze = NULL;
@@ -151,10 +152,14 @@ WalkTest::WalkTest () :
   bgcolor_txtmap = 255;
   bgcolor_map = 0;
   bgcolor_fclear = 255;
+
+  ConsoleInput = NULL;
+  SmallConsole = false;
 }
 
 WalkTest::~WalkTest ()
 {
+  if (ConsoleInput) ConsoleInput->DecRef ();
   if (collide_system) collide_system->DecRef ();
   delete wf;
   delete [] auto_script;
@@ -256,10 +261,14 @@ void WalkTest::Help ()
 
 //-----------------------------------------------------------------------------
 
-void WalkTest::NextFrame (time_t elapsed_time, time_t current_time)
+void WalkTest::NextFrame ()
 {
   // The following will fetch all events from queue and handle them
-  SysSystemDriver::NextFrame (elapsed_time, current_time);
+  SysSystemDriver::NextFrame ();
+
+  time_t elapsed_time, current_time;
+  GetElapsedTime (elapsed_time, current_time);
+
   MoveSystems (elapsed_time, current_time);
   PrepareFrame (elapsed_time, current_time);
   DrawFrame (elapsed_time, current_time);
@@ -268,7 +277,7 @@ void WalkTest::NextFrame (time_t elapsed_time, time_t current_time)
   if (!busy_perf_test)
   {
     char buf[256];
-    if (Command::get_script_line (buf, 255)) Command::perform_line (buf);
+    if (csCommandProcessor::get_script_line (buf, 255)) csCommandProcessor::perform_line (buf);
   }
 }
 
@@ -338,12 +347,12 @@ void WalkTest::MoveSystems (time_t elapsed_time, time_t current_time)
     {
       extern void add_bot (float size, csSector* where, csVector3 const& pos,
 	                        float dyn_radius);
-      add_bot (2, view->GetCamera ()->GetSector (), 
+      add_bot (2, view->GetCamera ()->GetSector (),
                view->GetCamera ()->GetOrigin (), 0);
       next_bot_at = current_time+1000*10;
     }
   }
-  if (!System->Console->IsActive ())
+  if (!Console || !Console->GetVisible ())
   {
     int alt,shift,ctrl;
     float speed = 1;
@@ -351,15 +360,15 @@ void WalkTest::MoveSystems (time_t elapsed_time, time_t current_time)
     alt = GetKeyState (CSKEY_ALT);
     ctrl = GetKeyState (CSKEY_CTRL);
     shift = GetKeyState (CSKEY_SHIFT);
-    if (ctrl) 
+    if (ctrl)
       speed = .5;
-    if (shift) 
+    if (shift)
       speed = 2;
 
     /// Act as usual...
-    strafe (0,1); 
-    look (0,1); 
-    step (0,1); 
+    strafe (0,1);
+    look (0,1);
+    step (0,1);
     rotate (0,1);
 
     if (Sys->Sound)
@@ -382,7 +391,7 @@ void WalkTest::MoveSystems (time_t elapsed_time, time_t current_time)
   extern void move_bots (time_t);
   move_bots (elapsed_time);
 
-  if (move_forward) 
+  if (move_forward)
     step (1, 0);
 }
 
@@ -484,17 +493,29 @@ void WalkTest::DrawFrameExtraDebug ()
   }
 }
 
+void WalkTest::GfxWrite (int x, int y, int fg, int bg, char *str, ...)
+{
+  va_list arg;
+  char buf[256];
+
+  va_start (arg, str);
+  vsprintf (buf, str, arg);
+  va_end (arg);
+
+  G2D->Write (x, y, fg, bg, buf);
+}
+
 void WalkTest::DrawFrameConsole ()
 {
-  csSimpleConsole* scon = (csSimpleConsole*)System->Console;
-  scon->Print (NULL);
+  if (Console)
+    Console->Draw2D (NULL);
 
-  if (!scon->IsActive ())
+  if (!Console || !Console->GetVisible ())
   {
     if (do_fps)
     {
       GfxWrite(11, FRAME_HEIGHT-11, 0, -1, "FPS=%f", timeFPS);
-      GfxWrite(10, FRAME_HEIGHT-10, scon->get_fg (), -1, "FPS=%f", timeFPS);
+      GfxWrite(10, FRAME_HEIGHT-10, fgcolor_stats, -1, "FPS=%f", timeFPS);
     }
     if (do_stats)
     {
@@ -504,7 +525,7 @@ void WalkTest::DrawFrameConsole ()
 	Stats::portals_drawn, Stats::polygons_accepted,
 	Stats::polygons_rejected);
       GfxWrite(FRAME_WIDTH-30*8-1, FRAME_HEIGHT-11, 0, -1, "%s", buffer);
-      GfxWrite(FRAME_WIDTH-30*8, FRAME_HEIGHT-10, scon->get_fg (), -1,
+      GfxWrite(FRAME_WIDTH-30*8, FRAME_HEIGHT-10, fgcolor_stats, -1,
       	"%s", buffer);
     }
     else if (do_show_coord)
@@ -516,7 +537,7 @@ void WalkTest::DrawFrameConsole ()
         view->GetCamera ()->GetW2CTranslation ().z,
 	view->GetCamera ()->GetSector()->GetName ());
       Gfx2D->Write(FRAME_WIDTH-24*8-1, FRAME_HEIGHT-11, 0, -1, buffer);
-      Gfx2D->Write(FRAME_WIDTH-24*8, FRAME_HEIGHT-10, scon->get_fg (),
+      Gfx2D->Write(FRAME_WIDTH-24*8, FRAME_HEIGHT-10, fgcolor_stats,
       	-1, buffer);
     }
   }
@@ -554,6 +575,10 @@ void WalkTest::DrawFrame3D (int drawflags, time_t current_time)
 
   // no need to clear screen anymore
   drawflags = 0;
+
+  // Display the 3D parts of the console
+  if (Console)
+    Console->Draw3D (NULL);
 }
 
 
@@ -723,11 +748,11 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
     Gfx2D->Clear (col);
   }
 
-  if (!System->Console->IsActive ()
-    || ((csSimpleConsole*)(System->Console))->IsTransparent ())
-  {
+  if (!Console
+   || !Console->GetVisible ()
+   || SmallConsole
+   || Console->GetTransparency ())
     DrawFrame3D (drawflags, current_time);
-  }
 
   // Start drawing 2D graphics
   if (!Gfx3D->BeginDraw (drawflags | CSDRAW_2DGRAPHICS))
@@ -741,11 +766,9 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
   DrawFrameConsole ();
 
   // If console is not active we draw a few additional things.
-  csSimpleConsole* scon = (csSimpleConsole*)System->Console;
-  if (!scon->IsActive ())
-  {
-    DrawFrame2D();
-  }
+  if (!Console
+   || !Console->GetVisible ())
+    DrawFrame2D ();
 
   // Drawing code ends here
   Gfx3D->FinishDraw ();
@@ -835,14 +858,14 @@ void WalkTest::PrepareFrame (time_t elapsed_time, time_t current_time)
 
   if (cnt <= 0)
   {
-    time_t time1 = SysGetTime ();
+    time_t time1 = Time ();
     if (time0 != (time_t)-1)
     {
       if (time1 != time0)
         timeFPS = 10000.0f / (float)(time1 - time0);
     }
     cnt = 10;
-    time0 = SysGetTime ();
+    time0 = Time ();
   }
   cnt--;
 }
@@ -852,14 +875,14 @@ void perf_test (int num)
   Sys->busy_perf_test = true;
   time_t t1, t2, t;
   Sys->Printf (MSG_CONSOLE, "Performance test busy...\n");
-  t = t1 = SysGetTime ();
+  t = t1 = Sys->Time ();
   int i;
   for (i = 0 ; i < num ; i++)
   {
-    Sys->DrawFrame (SysGetTime ()-t, SysGetTime ());
-    t = SysGetTime ();
+    Sys->DrawFrame (Sys->Time ()-t, Sys->Time ());
+    t = Sys->Time ();
   }
-  t2 = SysGetTime ();
+  t2 = Sys->Time ();
   Sys->Printf (MSG_CONSOLE, "%f secs to render %d frames: %f fps\n",
         (float)(t2-t1)/1000., num, 100000./(float)(t2-t1));
   Sys->Printf (MSG_DEBUG_0, "%f secs to render %d frames: %f fps\n",
@@ -942,13 +965,8 @@ void start_console ()
       for (b = 0; b < 4; b++)
         txtmgr->ReserveColor (r * 32, g * 32, b * 64);
 
+  txtmgr->PrepareTextures ();
   txtmgr->SetPalette ();
-
-  ((csSimpleConsole *)System->Console)->SetupColors (txtmgr);
-  ((csSimpleConsole *)System->Console)->SetMaxLines (1000);       // Some arbitrary high value.
-  ((csSimpleConsole *)System->Console)->SetTransparent (0);
-
-  System->ConsoleReady = true;
 }
 
 void WalkTest::EndWorld ()
@@ -1012,7 +1030,7 @@ void WalkTest::Inititalize2DTextures ()
   // Find the Crystal Space logo and set the renderer Flag to for_2d, to allow
   // the use in the 2D part.
   texh = texlist->FindByName ("cslogo.gif");
-  if (texh) 
+  if (texh)
     texh->flags = CS_TEXTURE_2D;
 }
 
@@ -1042,6 +1060,10 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
 {
   if (!SysSystemDriver::Initialize (argc, argv, iConfigName))
     return false;
+
+  // Some commercials...
+  Printf (MSG_INITIALIZATION, "Crystal Space version %s (%s).\n", VERSION, RELEASE_DATE);
+  Printf (MSG_INITIALIZATION, "Created by Jorrit Tyberghein and others...\n\n");
 
   // Get all collision detection and movement config file parameters.
   cfg_jumpspeed = Config->GetFloat ("CD", "JUMPSPEED", 0.08);
@@ -1085,15 +1107,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     return false;
   }
 
-  // Create console object for text and commands.
-  System->Console = new csSimpleConsole (Config, Command::SharedInstance ());
-
   // Open the startup console
   start_console ();
-
-  // Some commercials...
-  Printf (MSG_INITIALIZATION, "Crystal Space version %s (%s).\n", VERSION, RELEASE_DATE);
-  Printf (MSG_INITIALIZATION, "Created by Jorrit Tyberghein and others...\n\n");
 
   // Set texture manager mode to verbose (useful for debugging)
   iTextureManager* txtmgr = Gfx3D->GetTextureManager ();
@@ -1125,7 +1140,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   }
 
   // Initialize the command processor with the world and camera.
-  Command::Initialize (world, view->GetCamera (), Gfx3D, System->Console, System);
+  csCommandProcessor::Initialize (world, view->GetCamera (), Gfx3D, System->Console, System);
 
   // Now we have two choices. Either we create an infinite
   // maze (random). This happens when the '-infinite' commandline
@@ -1291,10 +1306,10 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   csObjIterator sobj = world->GetIterator (csSoundDataObject::Type);
   while (!sobj.IsNull ())
   {
-    //sounds (other than standard) are from a zip specified in world file 
+    //sounds (other than standard) are from a zip specified in world file
     //SOUNDS section and specified in vfs.cfg in lib/sounds
-    csSoundData* wSoundData = ((csSoundDataObject&)(*sobj)).GetSound(); 
-    if (wSoundData && Sound) 
+    csSoundData* wSoundData = ((csSoundDataObject&)(*sobj)).GetSound();
+    if (wSoundData && Sound)
     {
       //don't play now if loaded for missile
       if ( wSoundData == csSoundDataObject::GetSound(*world, "tada.wav") ||
@@ -1315,9 +1330,27 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
 #endif
 
   Printf (MSG_INITIALIZATION, "--------------------------------------\n");
+  if (Console)
+  {
+    Console->SetVisible (false);
+    Console->AutoUpdate (false);
+    ConsoleInput = QUERY_PLUGIN (System, iConsoleInput);
+    if (ConsoleInput)
+    {
+      ConsoleInput->Bind (Console);
+      ConsoleInput->SetPrompt ("cs# ");
+      ConsoleInput->ExecuteCallback (csCommandProcessor::perform_callback, NULL);
+    }
+
+    // Set console to center of screen, if supported
+    int DeltaX = G2D->GetWidth () / 10;
+    int DeltaY = G2D->GetHeight () / 10;
+    SmallConsole = Console->ConsoleExtension ("SetPos", DeltaX, DeltaY,
+      G2D->GetWidth () - DeltaX * 2, G2D->GetHeight () - DeltaY * 2);
+  }
 
   // Wait one second before starting.
-  long t = Sys->Time ()+1000;
+  time_t t = Sys->Time ()+1000;
   while (Sys->Time () < t) ;
 
   // Allocate the palette as calculated by the texture manager.
@@ -1325,12 +1358,10 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   bgcolor_txtmap = txtmgr->FindRGB (128, 128, 128);
   bgcolor_map = 0;
   bgcolor_fclear = txtmgr->FindRGB (0, 255, 255);
+  fgcolor_stats = txtmgr->FindRGB (255, 255, 255);
 
   // Reinit console object for 3D engine use.
-  ((csSimpleConsole *)System->Console)->SetupColors (txtmgr);
-  ((csSimpleConsole *)System->Console)->SetMaxLines ();
-  ((csSimpleConsole *)System->Console)->SetTransparent ();
-  System->Console->Clear ();
+  if (Console) Console->Clear ();
 
   // Initialize our 3D view.
   view->SetSector (room);
@@ -1437,16 +1468,16 @@ int main (int argc, char* argv[])
   }
 
   // Start the 'autoexec.cfg' script and fully execute it.
-  Command::start_script ("/config/autoexec.cfg");
+  csCommandProcessor::start_script ("/config/autoexec.cfg");
   char cmd_buf[512];
-  while (Command::get_script_line (cmd_buf, 511))
-    Command::perform_line (cmd_buf);
+  while (csCommandProcessor::get_script_line (cmd_buf, 511))
+    csCommandProcessor::perform_line (cmd_buf);
 
   // If there is another script given on the commandline
   // start it but do not execute it yet. This will be done
   // frame by frame.
   if (Sys->auto_script)
-    Command::start_script (Sys->auto_script);
+    csCommandProcessor::start_script (Sys->auto_script);
 
   // The main loop.
   Sys->Loop ();

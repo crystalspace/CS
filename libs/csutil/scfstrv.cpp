@@ -24,35 +24,32 @@ IMPLEMENT_IBASE (scfStrVector)
   IMPLEMENTS_INTERFACE (iStrVector)
 IMPLEMENT_IBASE_END
 
-scfStrVector::~scfStrVector ()
-{ delete v; }
-
 int scfStrVector::Length () const
-{ return v->Length (); }
+{ return v.Length (); }
 
 void scfStrVector::Push (char *iValue)
-{ v->Push (iValue); }
+{ v.Push (iValue); }
 
 char *scfStrVector::Pop ()
-{ return (char *)v->Pop (); }
+{ return (char *)v.Pop (); }
 
 char *scfStrVector::Get (int iIndex) const
-{ return (char *)v->Get (iIndex); }
+{ return (char *)v.Get (iIndex); }
 
 int scfStrVector::Find (const char *iValue) const
-{ return v->FindKey (iValue); }
+{ return v.FindKey (iValue); }
 
 int scfStrVector::FindSorted (const char *iValue) const
-{ return v->FindSortedKey ((csConstSome)iValue); }
+{ return v.FindSortedKey ((csConstSome)iValue); }
 
 void scfStrVector::QuickSort ()
-{ v->QuickSort (); }
+{ v.QuickSort (); }
 
 void scfStrVector::Delete (int iIndex)
-{ v->Delete (iIndex); }
+{ v.Delete (iIndex); }
 
 void scfStrVector::Insert (int iIndex, char *iValue)
-{ v->Insert (iIndex, iValue); }
+{ v.Insert (iIndex, iValue); }
 
 void scfStrVector::DeleteAll ()
-{ v->DeleteAll (); }
+{ v.DeleteAll (); }

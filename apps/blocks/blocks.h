@@ -342,7 +342,7 @@ public:
   void ReplaceMenuItem (int idx, int menu_nr);
 
   // Handling of basic events and frame drawing.
-  virtual void NextFrame (time_t elapsed_time, time_t current_time);
+  virtual void NextFrame ();
   virtual bool HandleEvent (csEvent &Event);
   void HandleKey (int key, bool shift, bool alt, bool ctrl);
   void HandleGameKey (int key, bool shift, bool alt, bool ctrl);

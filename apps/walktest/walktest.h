@@ -29,6 +29,8 @@
 #include "csutil/vfs.h"
 #include "walktest/wentity.h"
 #include "iworld.h"
+#include "iconsole.h"
+#include "iconinp.h"
 
 class Polygon3D;
 class WalkTest;
@@ -245,6 +247,7 @@ public:
   bool do_light_frust;
   int cfg_draw_octree;
   int cfg_debug_check_frustum;
+  int fgcolor_stats;
 
   /// The selected light.
   csLight* selected_light;
@@ -270,6 +273,11 @@ public:
 
   /// Player's body (as a 3D model) and legs
   csPolygonSet *plbody, *pllegs;
+
+  /// The console input plugin
+  iConsoleInput *ConsoleInput;
+  /// Is the console smaller than the screen?
+  bool SmallConsole;
 
 public:
   ///
@@ -298,7 +306,7 @@ public:
   virtual void ParseKeyCmds ();
 
   ///
-  virtual void NextFrame (time_t elapsed_time, time_t current_time);
+  virtual void NextFrame ();
   ///
   void PrepareFrame (time_t elapsed_time, time_t current_time);
 
@@ -398,12 +406,14 @@ public:
   ///
   void handle_key_pgdn (float, bool shift, bool alt, bool ctrl);
   ///
-  void eatkeypress (int status, int key, bool shift, bool alt, bool ctrl);
+  void eatkeypress (csEvent &Event);
 
   /// Handle mouse click events
   virtual void MouseClick1Handler(csEvent &Event);
   virtual void MouseClick2Handler(csEvent &Event);
   virtual void MouseClick3Handler(csEvent &Event);
+
+  void GfxWrite (int x, int y, int fg, int bg, char *str, ...);
 };
 
 extern csVector2 coord_check_vector;

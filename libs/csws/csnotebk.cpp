@@ -614,7 +614,7 @@ bool csNotebook::HandleEvent (csEvent &Event)
            && ((Event.Key.Modifiers & CSMASK_CTRL) == 0)
            && (Event.Key.Modifiers & CSMASK_FIRST))
           for (int i = 0; i < pages.Length (); i++)
-            if (pages.Get (i)->IsHotKey (Event.Key.Code))
+            if (pages.Get (i)->IsHotKey (Event.Key.Char))
             {
               SelectTab (i);
               return true;

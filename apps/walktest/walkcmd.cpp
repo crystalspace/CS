@@ -26,7 +26,6 @@
 #include "walktest/hugeroom.h"
 #include "walktest/wentity.h"
 #include "apps/support/command.h"
-#include "cstools/simpcons.h"
 #include "csengine/keyval.h"
 #include "csengine/thing.h"
 #include "csengine/dumper.h"
@@ -58,6 +57,7 @@
 #include "isndbuf.h"
 #include "isndrdr.h"
 #include "igraph3d.h"
+#include "igraph2d.h"
 #include "ivfs.h"
 
 extern WalkTest* Sys;
@@ -431,7 +431,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 {
   if (!strcasecmp (cmd, "help"))
   {
-    Command::perform (cmd, arg);
+    csCommandProcessor::perform (cmd, arg);
 #   undef CONPRI
 #   define CONPRI(m) Sys->Printf (MSG_CONSOLE, m);
     CONPRI("-*- Additional commands -*-\n");
@@ -540,27 +540,27 @@ bool CommandHandler (const char *cmd, const char *arg)
     bind_key (arg);
   }
   else if (!strcasecmp (cmd, "fclear"))
-    Command::change_boolean (arg, &Sys->do_clear, "fclear");
+    csCommandProcessor::change_boolean (arg, &Sys->do_clear, "fclear");
   else if (!strcasecmp (cmd, "fps"))
-    Command::change_boolean (arg, &Sys->do_fps, "fps");
+    csCommandProcessor::change_boolean (arg, &Sys->do_fps, "fps");
   else if (!strcasecmp (cmd, "edges"))
-    Command::change_boolean (arg, &Sys->do_edges, "do_edges");
+    csCommandProcessor::change_boolean (arg, &Sys->do_edges, "do_edges");
   else if (!strcasecmp (cmd, "do_gravity"))
-    Command::change_boolean (arg, &Sys->do_gravity, "do_gravity");
+    csCommandProcessor::change_boolean (arg, &Sys->do_gravity, "do_gravity");
   else if (!strcasecmp (cmd, "inverse_mouse"))
-    Command::change_boolean (arg, &Sys->inverse_mouse, "inverse_mouse");
+    csCommandProcessor::change_boolean (arg, &Sys->inverse_mouse, "inverse_mouse");
   else if (!strcasecmp (cmd, "colldet"))
-    Command::change_boolean (arg, &Sys->do_cd, "colldet");
+    csCommandProcessor::change_boolean (arg, &Sys->do_cd, "colldet");
   else if (!strcasecmp (cmd, "frustum"))
-    Command::change_boolean (arg, &Sys->do_light_frust, "frustum");
+    csCommandProcessor::change_boolean (arg, &Sys->do_light_frust, "frustum");
   else if (!strcasecmp (cmd, "zbuf"))
-    Command::change_boolean (arg, &Sys->do_show_z, "zbuf");
+    csCommandProcessor::change_boolean (arg, &Sys->do_show_z, "zbuf");
   else if (!strcasecmp (cmd, "db_cbuffer"))
-    Command::change_boolean (arg, &Sys->do_show_cbuffer, "debug cbuffer");
+    csCommandProcessor::change_boolean (arg, &Sys->do_show_cbuffer, "debug cbuffer");
   else if (!strcasecmp (cmd, "db_frustum"))
-    Command::change_int (arg, &Sys->cfg_debug_check_frustum, "debug check frustum", 0, 2000000000);
+    csCommandProcessor::change_int (arg, &Sys->cfg_debug_check_frustum, "debug check frustum", 0, 2000000000);
   else if (!strcasecmp (cmd, "db_octree"))
-    Command::change_int (arg, &Sys->cfg_draw_octree, "debug octree", -1, 10);
+    csCommandProcessor::change_int (arg, &Sys->cfg_draw_octree, "debug octree", -1, 10);
   else if (!strcasecmp (cmd, "db_curleaf"))
   {
     csSector* room = Sys->view->GetCamera ()->GetSector ();
@@ -605,13 +605,13 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
   }
   else if (!strcasecmp (cmd, "palette"))
-    Command::change_boolean (arg, &Sys->do_show_palette, "palette");
+    csCommandProcessor::change_boolean (arg, &Sys->do_show_palette, "palette");
   else if (!strcasecmp (cmd, "move3d"))
-    Command::change_boolean (arg, &Sys->move_3d, "move3d");
+    csCommandProcessor::change_boolean (arg, &Sys->move_3d, "move3d");
   else if (!strcasecmp (cmd, "pvs"))
   {
     bool en = Sys->world->IsPVS ();
-    Command::change_boolean (arg, &en, "pvs");
+    csCommandProcessor::change_boolean (arg, &en, "pvs");
     if (en) 
       Sys->world->EnablePVS ();
     else
@@ -620,7 +620,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "pvsonly"))
   {
     bool en = Sys->world->IsPVSOnly ();
-    Command::change_boolean (arg, &en, "pvs only");
+    csCommandProcessor::change_boolean (arg, &en, "pvs only");
     if (en) 
       Sys->world->EnablePVSOnly ();
     else
@@ -629,7 +629,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "freezepvs"))
   {
     bool en = Sys->world->IsPVSFrozen ();
-    Command::change_boolean (arg, &en, "freeze pvs");
+    csCommandProcessor::change_boolean (arg, &en, "freeze pvs");
     if (en) 
       Sys->world->FreezePVS (Sys->view->GetCamera ()->GetOrigin ());
     else
@@ -639,7 +639,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     const char* const choices[4] = { "cbuffer", "quad3d", "covtree", NULL };
     int culler = Sys->world->GetCuller ();
-    Command::change_choice (arg, &culler, "culler", choices, 3);
+    csCommandProcessor::change_choice (arg, &culler, "culler", choices, 3);
     Sys->world->SetCuller (culler);
   }
   else if (!strcasecmp (cmd, "emode"))
@@ -647,23 +647,23 @@ bool CommandHandler (const char *cmd, const char *arg)
     const char* const choices[5] = { "auto", "back2front", "front2back",
     	"zbuffer", NULL };
     int emode = Sys->world->GetEngineMode ();
-    Command::change_choice (arg, &emode, "engine mode", choices, 4);
+    csCommandProcessor::change_choice (arg, &emode, "engine mode", choices, 4);
     Sys->world->SetEngineMode (emode);
   }
   else if (!strcasecmp (cmd, "freelook"))
   {
-    Command::change_boolean (arg, &Sys->do_freelook, "freelook");
+    csCommandProcessor::change_boolean (arg, &Sys->do_freelook, "freelook");
     if (Sys->do_freelook)
       System->G2D->SetMousePosition (FRAME_WIDTH / 2, FRAME_HEIGHT / 2);
   }
   else if (!strcasecmp (cmd, "stats"))
   {
-    Command::change_boolean (arg, &Sys->do_stats, "stats");
+    csCommandProcessor::change_boolean (arg, &Sys->do_stats, "stats");
     if (Sys->do_stats) Sys->do_show_coord = false;
   }
   else if (!strcasecmp (cmd, "coordshow"))
   {
-    Command::change_boolean (arg, &Sys->do_show_coord, "coordshow");
+    csCommandProcessor::change_boolean (arg, &Sys->do_show_coord, "coordshow");
     if (Sys->do_show_coord) Sys->do_stats = false;
   }
   else if (!strcasecmp (cmd, "hi"))
@@ -681,7 +681,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       if (hi->GetPortal ())
       {
         int a = hi->GetAlpha ();
-        Command::change_int (arg, &a, "portal alpha", 0, 100);
+        csCommandProcessor::change_int (arg, &a, "portal alpha", 0, 100);
 	hi->SetAlpha (a);
       }
       else Sys->Printf (MSG_CONSOLE, "Only for portals!\n");
@@ -1132,13 +1132,13 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "map"))
   {
     const char* const choices[5] = { "off", "overlay", "on", "txt", NULL };
-    Command::change_choice (arg, &Sys->map_mode, "map", choices, 4);
+    csCommandProcessor::change_choice (arg, &Sys->map_mode, "map", choices, 4);
   }
   else if (!strcasecmp (cmd, "mapproj"))
   {
     const char* const choices[5] = { "persp", "x", "y", "z", NULL };
     Sys->map_projection++;
-    Command::change_choice (arg, &Sys->map_projection, "map projection", choices, 4);
+    csCommandProcessor::change_choice (arg, &Sys->map_projection, "map projection", choices, 4);
     Sys->map_projection--;
   }
   else if (!strcasecmp (cmd, "snd_play"))
@@ -1158,7 +1158,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (Sys->Sound)
     {
       float vol = Sys->Sound->GetVolume ();
-      Command::change_float (arg, &vol, "snd_volume", 0.0, 1.0);
+      csCommandProcessor::change_float (arg, &vol, "snd_volume", 0.0, 1.0);
       Sys->Sound->SetVolume (vol);
     }
   }

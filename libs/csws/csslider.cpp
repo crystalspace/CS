@@ -32,59 +32,63 @@ csSlider::csSlider (csComponent *pParent) : csComponent (pParent)
 
 void csSlider::Draw ()
 {
-  if (isSliding){
+  if (isSliding)
     Box (0, 0, bound.Width (), bound.Height (), CSPAL_SLIDER_ACTIVE_FILL);
-  }else{
+  else
     Box (0, 0, bound.Width (), bound.Height (), CSPAL_SLIDER_FILL);
-  }
 }
 
 bool csSlider::HandleEvent (csEvent &Event)
 {
-  switch (Event.Type){
-  case csevMouseDoubleClick:
-  case csevMouseDown:
-    if (app->MouseOwner != this && Event.Mouse.Button == 1){
-      // we are going to capture the mouse to follow all movements
-      app->CaptureMouse (this);
-      isSliding = true;
-      Select ();
-      Invalidate ();
-      return true;
-    }
-    break;
-  case csevMouseUp:
-    if (isSliding && Event.Mouse.Button == 1){
-      app->CaptureMouse (NULL);
-      isSliding = false;
-      mx = Event.Mouse.x;
-      my = Event.Mouse.y;
-      parent->SendCommand (cscmdSliderPosSet, (void*)this);
-      Invalidate ();
-      return true;
-    }
-    break;
-  case csevMouseMove:
-    if (isSliding){
-      mx = Event.Mouse.x;
-      my = Event.Mouse.y;
-      if (isHorizontal)
-	SetPos (bound.xmin + mx, bound.ymin);
-      else
-	SetPos (bound.xmin, bound.ymin + my);
-      if (parent)
-	parent->SendCommand (cscmdSliderPosChanged, (void*)this);
-      Invalidate ();
-      return true;
-    }
-    break;
+  switch (Event.Type)
+  {
+    case csevMouseDoubleClick:
+    case csevMouseDown:
+      if (app->MouseOwner != this && Event.Mouse.Button == 1)
+      {
+        // we are going to capture the mouse to follow all movements
+        app->CaptureMouse (this);
+        isSliding = true;
+        Select ();
+        Invalidate ();
+        return true;
+      }
+      break;
+    case csevMouseUp:
+      if (isSliding && Event.Mouse.Button == 1)
+      {
+        app->CaptureMouse (NULL);
+        isSliding = false;
+        mx = Event.Mouse.x;
+        my = Event.Mouse.y;
+        parent->SendCommand (cscmdSliderPosSet, (void*)this);
+        Invalidate ();
+        return true;
+      }
+      break;
+    case csevMouseMove:
+      if (isSliding)
+      {
+        mx = Event.Mouse.x;
+        my = Event.Mouse.y;
+        if (isHorizontal)
+          SetPos (bound.xmin + mx, bound.ymin);
+        else
+          SetPos (bound.xmin, bound.ymin + my);
+        if (parent)
+          parent->SendCommand (cscmdSliderPosChanged, (void*)this);
+        Invalidate ();
+        return true;
+      }
+      break;
   }
   return csComponent::HandleEvent (Event);
 }
 
 bool csSlider::SetRect (int xmin, int ymin, int xmax, int ymax)
 {
-  if (csComponent::SetRect (xmin, ymin, xmax, ymax)){
+  if (csComponent::SetRect (xmin, ymin, xmax, ymax))
+  {
     isHorizontal = bound.Height () >  bound.Width ();
     return true;
   }

@@ -27,6 +27,7 @@
 #include "csutil/inifile.h"
 #include "csutil/csstrvec.h"
 #include "csutil/util.h"
+#include "istrvec.h"
 
 // Maximal INI line length
 #define CS_MAXINILINELEN 1024
@@ -631,6 +632,15 @@ csIniFile::DataIterator csIniFile::EnumData (const char* SectionPath,
 }
 
 bool csIniFile::EnumData (const char *SectionPath, csStrVector *oList) const
+{
+  bool Found;
+  DataIterator iterator (EnumData(SectionPath, Found));
+  while (iterator.NextItem())
+    oList->Push (strnew(iterator.GetName()));
+  return Found;
+}
+
+bool csIniFile::EnumData (const char *SectionPath, iStrVector *oList) const
 {
   bool Found;
   DataIterator iterator (EnumData(SectionPath, Found));

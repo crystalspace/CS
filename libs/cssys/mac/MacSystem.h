@@ -32,7 +32,7 @@
 
 class iMacGraphics;
 
-class SysSystemDriver : public csSystemDriver
+class SysSystemDriver : public csSystemDriver, public iEventPlug
 {
 public:
 				 SysSystemDriver();
@@ -41,22 +41,31 @@ public:
 	virtual void Close();
 
 	virtual bool Initialize ( int argc, const char* const argv[], const char *iConfigName );
-	virtual void Loop();
+	virtual void NextFrame ();
 
 	virtual void Alert( const char* s );
 	virtual void Warn( const char* s );
 
 	OSErr		HandleAppleEvent( AppleEvent *theEvent );
 
+	DECLARE_IBASE_EXT (csSystemDriver);
+
+	//------------------------- iEventPlug interface ---------------------------//
+
+	virtual unsigned GetPotentiallyConflictingEvents ()
+	{ return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
+	virtual unsigned QueryEventPriority (unsigned /*iType*/)
+	{ return 100; }
+
 private:
-	void		DispatchEvent( time_t current_time, EventRecord *theEvent, iMacGraphics* piG2D );
-	void		HandleMouseEvent( time_t current_time, EventRecord *theEvent, iMacGraphics* piG2D );
+	void		DispatchEvent( EventRecord *theEvent, iMacGraphics* piG2D );
+	void		HandleMouseEvent( EventRecord *theEvent, iMacGraphics* piG2D );
 	void		HandleMenuUpdate( void );
 	void		HandleMenuSelection( const short menuNum, const short itemNum );
-	void		HandleKey( time_t current_time, const unsigned char key, const char keycode, const short modifiers, bool down );
-	void		HandleHLEvent( time_t current_time, EventRecord *theEvent );
-	void		HandleOSEvent( time_t current_time, EventRecord *theEvent, iMacGraphics* piG2D );
-	void		ScanKeyboard( time_t current_time );
+	void		HandleKey( const unsigned char key, const char keycode, const short modifiers, bool down );
+	void		HandleHLEvent( EventRecord *theEvent );
+	void		HandleOSEvent( EventRecord *theEvent, iMacGraphics* piG2D );
+	void		ScanKeyboard( );
 	int			GetCommandLine( char ***arg );
 	int			ParseCommandLine( char *s );
 
@@ -73,6 +82,8 @@ private:
 	char 		*argv[MAX_ARGS + 1];
 
 	long		mKeyboardState[4];
+
+	iEventOutlet	*EventOutlet;
 };
 
 #endif /* MACSYSTEM_H */

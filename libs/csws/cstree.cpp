@@ -19,11 +19,11 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#define SYSDEF_CASE
 #include "cssysdef.h"
 #include "csws/cstree.h"
 #include "csws/cstimer.h"
 #include "csws/csscrbar.h"
-#include "csws/csmouse.h"
 #include "csws/csapp.h"
 #include "cssys/csinput.h"
 #include "csws/cswindow.h"
@@ -592,165 +592,165 @@ bool csTreeCtrl::HandleEvent (csEvent &Event)
   case csevKeyDown:
     switch (Event.Key.Code) 
     {
-    case CSKEY_UP:
-      if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
-      {
-	TreeCtrlNode *node = treeroot->FindItem (focused);
-	node = node->Prev ();
-	SendCommand (cscmdTreeTrack, (node ? (void *)node->item : NULL));
-	return true;
-      } /* endif */
-      return false;
-    case CSKEY_DOWN:
-      if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0) 
-      {
-	TreeCtrlNode *node = treeroot->FindItem (focused);
-	node = node->Next ();
-	SendCommand (cscmdTreeTrack, (void *)node->item);
-	return true;
-      } /* endif */
-      return false;
-    case CSKEY_LEFT:
-      if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL) 
-      {
-	if (deltax > TREE_HORIZONTAL_PAGESTEP)
-	  deltax -= TREE_HORIZONTAL_PAGESTEP;
-	else
-	  deltax = 0;
-	PlaceItems ();
-	return true;
-      }
-      else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0) 
-      {
-	if (deltax > 0)
-	  deltax--;
-	else
-	  return true;
-	PlaceItems ();
-	return true;
-      } /* endif */
-      return false;
-    case CSKEY_RIGHT:
-      if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL) 
-      {
-	if (deltax + TREE_HORIZONTAL_PAGESTEP <= maxdeltax)
-	  deltax += TREE_HORIZONTAL_PAGESTEP;
-	else
-	  deltax = maxdeltax;
-	PlaceItems ();
-	return true;
-      }
-      else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0) 
-      {
-	if (deltax  < maxdeltax)
-	  deltax++;
-	else
-	  return true;
-	PlaceItems ();
-	return true;
-      } /* endif */
-      return false;
-    case CSKEY_PGUP:
-      if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0) 
-      {
-	TreeCtrlNode *node = treeroot->FindItem (focused);
-	for (int i = 0; node && i < vertcount; i++)
-	{
-	  node = node->Prev ();
-	  SendCommand (cscmdTreeTrack, (node ? (void *)node->item : NULL));
-	}
-	return true;
-      }
-      else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL) 
-      {
-	TreeCtrlNode *node = (TreeCtrlNode *)(treeroot->IsLeaf () ? NULL : 
-				      ((TreeCtrlNode *)treeroot->children.Get (0))->Next ());
-	SendCommand (cscmdTreeTrack, (node? NULL : (void *)node->item) );
-	return true;
-      }
-      return false;
-    case CSKEY_PGDN:
-      if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
-      {
-	TreeCtrlNode *node = treeroot->FindItem (focused);
-	for (int i = 0; node && i < vertcount; i++)
-	{
-	  node = node->Next ();
-	  SendCommand (cscmdTreeTrack, (void *)node->item);
-	}
-	return true;
-      }
-      else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL)
-      {
-	SendCommand (cscmdTreeTrack, (void *)GetLast ());
-	return true;
-      }
-      return false;
-    case CSKEY_HOME:
-      if ((Event.Key.Modifiers & CSMASK_CTRL) && (deltax != 0))
-      {
-	deltax = 0;
-	PlaceItems ();
-	return true;
-      }
-      else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
-      {
-	TreeCtrlNode *node = (TreeCtrlNode *)(treeroot->IsLeaf () ? NULL : 
-	                                      treeroot->children.Get (0));
-	SendCommand (cscmdTreeTrack, (node ? (void *)node->item : NULL));
-	return true;
-      }
-      return false;
-    case CSKEY_END:
-      if ((Event.Key.Modifiers & CSMASK_CTRL) && (deltax != maxdeltax)) 
-      {
-	deltax = maxdeltax;
-	PlaceItems ();
-	return true;
-      }
-      else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
-      {
-	SendCommand (cscmdTreeTrack, (void *)GetLast ());
-	return true;
-      }
-      return false;
-    case '/':
-      if ((TreeStyle & CSTS_MULTIPLESEL) 
-         && ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL)) 
-      {
-	ForEachItem (do_select, NULL, false);
-	return true;
-      } /* endif */
-      return false;
-    case '\\':
-      if ((TreeStyle & CSTS_MULTIPLESEL) 
-         && ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL)) 
-      {
-	ForEachItem (do_deselect, NULL);
-	return true;
-      } /* endif */
-      return false;
-    default:
-      if ((Event.Key.Code >= ' ') && (Event.Key.Code <= 255) 
-         && !(Event.Key.Modifiers & (CSMASK_CTRL | CSMASK_ALT))) 
-      {
-	// Find first next item that starts with this letter
-	TreeCtrlNode *node, *focNode = treeroot->FindItem (focused);
-	if (focNode)
-	{
-	  node = focNode->Next ();
-	  while (node != focNode)
-	    if (node->item->SendCommand (cscmdTreeItemCheck, NULL) 
-               && (node->item->GetText () [0] == Event.Key.Code))
-	    {
-	      SendCommand (cscmdTreeTrack, (void *)node->item);
-	      return true;
-	    }
-	    else
-	      node = node->Next ();
-	}
-	return true;
-      }
+      case CSKEY_UP:
+        if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
+        {
+          TreeCtrlNode *node = treeroot->FindItem (focused);
+          node = node->Prev ();
+          SendCommand (cscmdTreeTrack, (node ? (void *)node->item : NULL));
+          return true;
+        } /* endif */
+        return false;
+      case CSKEY_DOWN:
+        if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0) 
+        {
+          TreeCtrlNode *node = treeroot->FindItem (focused);
+          node = node->Next ();
+          SendCommand (cscmdTreeTrack, (void *)node->item);
+          return true;
+        } /* endif */
+        return false;
+      case CSKEY_LEFT:
+        if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL) 
+        {
+          if (deltax > TREE_HORIZONTAL_PAGESTEP)
+            deltax -= TREE_HORIZONTAL_PAGESTEP;
+          else
+            deltax = 0;
+          PlaceItems ();
+          return true;
+        }
+        else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0) 
+        {
+          if (deltax > 0)
+            deltax--;
+          else
+            return true;
+          PlaceItems ();
+          return true;
+        } /* endif */
+        return false;
+      case CSKEY_RIGHT:
+        if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL) 
+        {
+          if (deltax + TREE_HORIZONTAL_PAGESTEP <= maxdeltax)
+            deltax += TREE_HORIZONTAL_PAGESTEP;
+          else
+            deltax = maxdeltax;
+          PlaceItems ();
+          return true;
+        }
+        else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0) 
+        {
+          if (deltax  < maxdeltax)
+            deltax++;
+          else
+            return true;
+          PlaceItems ();
+          return true;
+        } /* endif */
+        return false;
+      case CSKEY_PGUP:
+        if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0) 
+        {
+          TreeCtrlNode *node = treeroot->FindItem (focused);
+          for (int i = 0; node && i < vertcount; i++)
+          {
+            node = node->Prev ();
+            SendCommand (cscmdTreeTrack, (node ? (void *)node->item : NULL));
+          }
+          return true;
+        }
+        else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL) 
+        {
+          TreeCtrlNode *node = (TreeCtrlNode *)(treeroot->IsLeaf () ? NULL : 
+                                        ((TreeCtrlNode *)treeroot->children.Get (0))->Next ());
+          SendCommand (cscmdTreeTrack, (node? NULL : (void *)node->item) );
+          return true;
+        }
+        return false;
+      case CSKEY_PGDN:
+        if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
+        {
+          TreeCtrlNode *node = treeroot->FindItem (focused);
+          for (int i = 0; node && i < vertcount; i++)
+          {
+            node = node->Next ();
+            SendCommand (cscmdTreeTrack, (void *)node->item);
+          }
+          return true;
+        }
+        else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL)
+        {
+          SendCommand (cscmdTreeTrack, (void *)GetLast ());
+          return true;
+        }
+        return false;
+      case CSKEY_HOME:
+        if ((Event.Key.Modifiers & CSMASK_CTRL) && (deltax != 0))
+        {
+          deltax = 0;
+          PlaceItems ();
+          return true;
+        }
+        else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
+        {
+          TreeCtrlNode *node = (TreeCtrlNode *)(treeroot->IsLeaf () ? NULL : 
+                                                treeroot->children.Get (0));
+          SendCommand (cscmdTreeTrack, (node ? (void *)node->item : NULL));
+          return true;
+        }
+        return false;
+      case CSKEY_END:
+        if ((Event.Key.Modifiers & CSMASK_CTRL) && (deltax != maxdeltax)) 
+        {
+          deltax = maxdeltax;
+          PlaceItems ();
+          return true;
+        }
+        else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
+        {
+          SendCommand (cscmdTreeTrack, (void *)GetLast ());
+          return true;
+        }
+        return false;
+      case '/':
+        if ((TreeStyle & CSTS_MULTIPLESEL) 
+           && ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL)) 
+        {
+          ForEachItem (do_select, NULL, false);
+          return true;
+        } /* endif */
+        return false;
+      case '\\':
+        if ((TreeStyle & CSTS_MULTIPLESEL) 
+           && ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL)) 
+        {
+          ForEachItem (do_deselect, NULL);
+          return true;
+        } /* endif */
+        return false;
+      default:
+        if ((Event.Key.Char >= ' ') && (Event.Key.Char <= 255) 
+           && !(Event.Key.Modifiers & (CSMASK_CTRL | CSMASK_ALT))) 
+        {
+          // Find first next item that starts with this letter
+          TreeCtrlNode *node, *focNode = treeroot->FindItem (focused);
+          if (focNode)
+          {
+            node = focNode->Next ();
+            while (node != focNode)
+              if (node->item->SendCommand (cscmdTreeItemCheck, NULL) 
+                 && (UPPERCASE (node->item->GetText () [0]) == UPPERCASE (Event.Key.Char)))
+              {
+                SendCommand (cscmdTreeTrack, (void *)node->item);
+                return true;
+              }
+              else
+                node = node->Next ();
+          }
+          return true;
+        }
     } /* endswitch */
     break;
   case csevCommand:
@@ -827,8 +827,7 @@ bool csTreeCtrl::HandleEvent (csEvent &Event)
     case cscmdTimerPulse:
       if (app && app->MouseOwner == this)
       {
-	app->GetMouse ()->GetPosition (Event.Mouse.x, Event.Mouse.y);
-	GlobalToLocal (Event.Mouse.x, Event.Mouse.y);
+        GetMousePosition (Event.Mouse.x, Event.Mouse.y);
 	if (app->MouseOwner == this)
 	{
 	  TreeCtrlNode *node = treeroot->FindItem (focused);
@@ -840,8 +839,8 @@ bool csTreeCtrl::HandleEvent (csEvent &Event)
 	  else if ((Event.Mouse.y > bound.Height () - BorderHeight)
 		    || (hscroll  && (Event.Mouse.y >= hscroll->bound.ymin)))
 	  {
-	    node = (node ? node->Next () : NULL );
-	    SendCommand (cscmdTreeTrack,  (node ? (void *)node->item : NULL));
+	    node = (node ? node->Next () : NULL);
+	    SendCommand (cscmdTreeTrack, (node ? (void *)node->item : NULL));
 	  }
 	} /* endif */
       } /* endif */

@@ -44,12 +44,13 @@
 #include "cssys/csinput.h"
 
 /// Windows system driver
-class SysSystemDriver : public csSystemDriver, public iWin32SystemDriver
+class SysSystemDriver : public csSystemDriver, public iWin32SystemDriver, public iEventPlug
 {
 public:
   SysSystemDriver ();
+  virtual ~SysSystemDriver ();
   
-  virtual void Loop ();
+  virtual void NextFrame ();
   virtual void Alert (const char* s);
   virtual void Warn (const char* s);
 
@@ -66,6 +67,13 @@ public:
   virtual void Close ();
 
   DECLARE_IBASE_EXT (csSystemDriver);
+
+  //------------------------- iEventPlug interface ---------------------------//
+
+  virtual unsigned GetPotentiallyConflictingEvents ()
+  { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
+  virtual unsigned QueryEventPriority (unsigned /*iType*/)
+  { return 100; }
 
 private:
 #ifdef DO_DINPUT_KEYBOARD

@@ -25,24 +25,26 @@
 #include "cssys/csinput.h"
 #include "cssys/system.h"
 #include "cssys/be/icsbe.h"
+
 class CrystApp;
 
 class SysSystemDriver : public csSystemDriver, public iBeLibSystemDriver
 {
   typedef csSystemDriver superclass;
+
 protected:
   bool running;
   CrystApp* app;
 
 public:
+  DECLARE_IBASE_EXT (csSystemDriver);
+
   SysSystemDriver ();
   virtual bool Initialize (int argc, const char* const argv[],
     const char *iConfigName);
-  DECLARE_IBASE_EXT (csSystemDriver);
 
-  // Main event loop
-  virtual void Loop ();
-  long LoopThread ();
+  virtual void NextFrame ();
+  static long LoopThread (void *Self);
 
   /// Implementation of iBeLibSystemDriver
   void ProcessUserEvent (BMessage*);

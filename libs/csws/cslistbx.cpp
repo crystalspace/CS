@@ -17,11 +17,11 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#define SYSDEF_CASE
 #include "cssysdef.h"
 #include "csws/cslistbx.h"
 #include "csws/cstimer.h"
 #include "csws/csscrbar.h"
-#include "csws/csmouse.h"
 #include "csws/csapp.h"
 #include "cssys/csinput.h"
 
@@ -580,15 +580,15 @@ bool csListBox::HandleEvent (csEvent &Event)
           } /* endif */
           return false;
         default:
-          if ((Event.Key.Code >= ' ')
-           && (Event.Key.Code <= 255)
+          if ((Event.Key.Char >= ' ')
+           && (Event.Key.Char <= 255)
            && !(Event.Key.Modifiers & (CSMASK_CTRL | CSMASK_ALT)))
           {
             // Find first next item that starts with this letter
             csComponent *cur = focused->next;
             while (cur != focused)
               if (cur->SendCommand (cscmdListBoxItemCheck, NULL)
-               && (cur->GetText () [0] == Event.Key.Code))
+               && (UPPERCASE (cur->GetText () [0]) == UPPERCASE (Event.Key.Char)))
               {
                 SendCommand (cscmdListBoxTrack, (void *)cur);
                 return true;
@@ -666,8 +666,7 @@ bool csListBox::HandleEvent (csEvent &Event)
         case cscmdTimerPulse:
           if (app && app->MouseOwner == this)
           {
-            app->GetMouse ()->GetPosition (Event.Mouse.x, Event.Mouse.y);
-            GlobalToLocal (Event.Mouse.x, Event.Mouse.y);
+            GetMousePosition (Event.Mouse.x, Event.Mouse.y);
             if (app->MouseOwner == this)
             {
               if (Event.Mouse.y < BorderHeight)

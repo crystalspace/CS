@@ -31,15 +31,8 @@ public:
   // Constructor
   SysSystemDriver ();
 
-  // Main event loop
-  virtual void Loop ();
-  // Display system-specific help
-  virtual void Help ();
   // Sleep for given number of 1/1000 seconds
   virtual void Sleep (int SleepTime);
-
-  /// Toggle console text output (for consoles that share text/graphics mode)
-  virtual void EnablePrintf (bool /*iEnable*/) { }
 };
 
 #endif // __UNIX_H__

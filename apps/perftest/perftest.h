@@ -57,7 +57,7 @@ public:
 
   virtual bool Initialize (int argc, const char* const argv[],
     const char *iConfigName);
-  virtual void NextFrame (time_t elapsed_time, time_t current_time);
+  virtual void NextFrame ();
   virtual bool HandleEvent (csEvent &Event);
   
   iMaterialHandle* GetMaterial (int idx)

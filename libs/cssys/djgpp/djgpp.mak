@@ -80,7 +80,7 @@ CFLAGS.INCLUDE=-Ilibs/zlib -Ilibs/libpng -Ilibs/libjpeg
 CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM)
 
 # Flags for the compiler which are used when optimizing.
-CFLAGS.optimize=-s -O6 -fomit-frame-pointer
+CFLAGS.optimize=-s -O6 -fomit-frame-pointer -ffast-math
 
 # Flags for the compiler which are used when debugging.
 CFLAGS.debug=-g3
@@ -110,8 +110,8 @@ LFLAGS.DLL=
 NASMFLAGS.SYSTEM=-f coff -DEXTERNC_UNDERSCORE
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS = libs/cssys/djgpp/djgpp.cpp \
-	libs/cssys/general/printf.cpp libs/cssys/general/timing.cpp \
+SRC.SYS_CSSYS = libs/cssys/general/timing.cpp \
+	libs/cssys/djgpp/djgpp.cpp libs/cssys/djgpp/printf.cpp \
 	libs/cssys/djgpp/loadlib.cpp support/gnu/getopt*.c \
 	libs/cssys/djgpp/djmousys.s libs/cssys/djgpp/djkeysys.s
 
@@ -135,7 +135,7 @@ endif # ifeq ($(MAKESECTION),defines)
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-# How to make a shared/dynamic library
+# How to make a shared AKA dynamic library
 DO.SHARED.PLUGIN = dxe2gen -o $@ $(^^) $(L^) -U -E $(patsubst %.dxe,%,$(notdir $@))_GetClassTable -E djgpp $(LFLAGS.L)$(OUT)
 
 endif # ifeq ($(MAKESECTION),postdefines)

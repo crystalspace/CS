@@ -24,7 +24,6 @@
 #include "walktest/infmaze.h"
 #include "walktest/hugeroom.h"
 #include "apps/support/command.h"
-#include "cstools/simpcons.h"
 #include "csengine/dumper.h"
 #include "csengine/camera.h"
 #include "csengine/octree.h"
@@ -49,6 +48,7 @@
 #include "csparser/crossbld.h"
 #include "csgeom/math3d.h"
 #include "igraph3d.h"
+#include "igraph2d.h"
 
 extern WalkTest* Sys;
 
@@ -114,12 +114,8 @@ void map_key (const char* keyname, csKeyMap* map)
     map->shift = 1;
     map->key = *keyname;
   }
-  else if (*keyname >= 'a' && *keyname <= 'z')
-  {
-    if (map->shift) map->key = (*keyname)+'A'-'a';
-    else map->key = *keyname;
-  }
-  else map->key = *keyname;
+  else
+    map->key = *keyname;
 }
 
 char* keyname (csKeyMap* map)
@@ -542,62 +538,63 @@ void WalkTest::imm_rot_right_zaxis (float speed, bool slow, bool fast)
     view->GetCamera ()->Rotate (VEC_TILT_RIGHT, speed * .2);
 }
 
-void WalkTest::eatkeypress (int status, int key, bool shift, bool alt, bool ctrl)
+void WalkTest::eatkeypress (csEvent &Event)
 {
-  if (System->Console->IsActive () && status)
-    ((csSimpleConsole *)System->Console)->AddChar (key);
-  else switch (key)
-  {
-    case CSKEY_TAB:
-      if (status)
-        System->Console->Show ();
-      break;
+  int key = Event.Key.Code;
+  int status = (Event.Type == csevKeyDown);
+  bool shift = (Event.Key.Modifiers & CSMASK_SHIFT) != 0;
+  bool alt = (Event.Key.Modifiers & CSMASK_ALT) != 0;
+  bool ctrl = (Event.Key.Modifiers & CSMASK_CTRL) != 0;
 
-    default:
+  if (Console && Console->GetVisible () && status)
+  {
+    if (ConsoleInput)
+      ConsoleInput->HandleEvent (Event);
+    //@@KLUDGE
+    if (key != CSKEY_TAB)
+      return;
+  }
+
+  csKeyMap *m = mapping;
+  while (m)
+  {
+    if (key == m->key && shift == m->shift
+     && alt == m->alt && ctrl == m->ctrl)
+    {
+      if (m->need_status)
       {
-        csKeyMap *m = mapping;
-        while (m)
+        // Don't perform the command again if the key is already down
+        if (m->is_on != status)
         {
-          if (key == m->key && shift == m->shift
-           && alt == m->alt && ctrl == m->ctrl)
-          {
-            if (m->need_status)
-            {
-              // Don't perform the command again if the key is already down
-              if (m->is_on != status)
-              {
-                char buf [256];
-                sprintf (buf,"%s %d", m->cmd, status);
-                Command::perform_line (buf);
-                m->is_on = status;
-              }
-            }
-            else
-            {
-              if (status)
-                Command::perform_line (m->cmd);
-            }
-          }
-          else if (!status && key == m->key && m->is_on && m->need_status)
-          {
-            if (key == m->key || shift != m->shift || alt != m->alt || ctrl != m->ctrl)
-            {
-              char buf [256];
-              sprintf (buf,"%s 0", m->cmd);
-              Command::perform_line (buf);
-              m->is_on = 0;
-            }
-          }
-	  m = m->next;
+          char buf [256];
+          sprintf (buf,"%s %d", m->cmd, status);
+          csCommandProcessor::perform_line (buf);
+          m->is_on = status;
         }
       }
-      break;
+      else
+      {
+        if (status)
+          csCommandProcessor::perform_line (m->cmd);
+      }
+    }
+    else if (!status && key == m->key && m->is_on && m->need_status)
+    {
+      if (key == m->key || shift != m->shift || alt != m->alt || ctrl != m->ctrl)
+      {
+        char buf [256];
+        sprintf (buf,"%s 0", m->cmd);
+        csCommandProcessor::perform_line (buf);
+        m->is_on = 0;
+      }
+    }
+    m = m->next;
   }
 }
 
 
 // left mouse button
-void WalkTest::MouseClick1Handler(csEvent &Event)  
+void WalkTest::MouseClick1Handler(csEvent &Event)
 {
   (void)Event;
   move_forward = true;
@@ -621,9 +618,9 @@ void WalkTest::MouseClick2Handler(csEvent &Event)
   csPolygon3D* sel = sector->HitBeam (origin, origin + (vw-origin) * 10, isect);
   if (sel)
   {
-    if (Sys->selected_polygon == sel) 
+    if (Sys->selected_polygon == sel)
       Sys->selected_polygon = NULL;
-    else 
+    else
       Sys->selected_polygon = sel;
 
     csPolygonSet* ps = (csPolygonSet*)(sel->GetParent ());
@@ -641,7 +638,7 @@ void WalkTest::MouseClick2Handler(csEvent &Event)
 }
 
 // right mouse button
-void WalkTest::MouseClick3Handler(csEvent &Event)  
+void WalkTest::MouseClick3Handler(csEvent &Event)
 {
   csVector2   screenPoint;
   csSprite3D *closestSprite;
@@ -679,16 +676,8 @@ bool WalkTest::HandleEvent (csEvent &Event)
       }
     }
     case csevKeyDown:
-      eatkeypress (1,Event.Key.Code,
-        (Event.Key.Modifiers & CSMASK_SHIFT) != 0,
-        (Event.Key.Modifiers & CSMASK_ALT) != 0,
-        (Event.Key.Modifiers & CSMASK_CTRL) != 0);
-      break;
     case csevKeyUp:
-      eatkeypress (0,Event.Key.Code,
-        (Event.Key.Modifiers & CSMASK_SHIFT) != 0,
-        (Event.Key.Modifiers & CSMASK_ALT) != 0,
-        (Event.Key.Modifiers & CSMASK_CTRL) != 0);
+      eatkeypress (Event);
       break;
     case csevMouseDown:
       {

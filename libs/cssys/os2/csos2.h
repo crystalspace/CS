@@ -22,13 +22,12 @@
 
 #include "cssys/csinput.h"
 #include "cssys/system.h"
-#include "icsos2.h"
 
 /**
  * This is the System driver for OS/2. It implements all required
  * functionality for standard csSystemDriver class.
  */
-class SysSystemDriver : public csSystemDriver, public iOS2SystemDriver
+class SysSystemDriver : public csSystemDriver
 {
   /// Window position in percents
   int WindowX, WindowY;
@@ -41,35 +40,8 @@ public:
   /// Initialize system-dependent data
   SysSystemDriver ();
 
-  DECLARE_IBASE_EXT (csSystemDriver);
-
-  /// Check if configuration files requests 16 bits per pixel
-  virtual void SetSystemDefaults (csIniFile *config);
-
-  /**
-   * This is a function that prints the commandline help text.
-   * If system has system-dependent switches, it should override
-   * this method and type its own text (possibly invoking
-   * csSystemDriver::Help() first).
-   */
-  virtual void Help ();
-
-  /**
-   * System loop. This should be called last since it returns
-   * only on program exit
-   */
-  virtual void Loop ();
-
   /// The system is idle: we can sleep for a while
   virtual void Sleep (int SleepTime);
-
-  /// Implementation of iOS2SystemDriver
-
-  /// Get user settings
-  virtual void GetExtSettings (int &oWindowX, int &oWindowY,
-    int &oWindowWidth, int &oWindowHeight, bool &oHardwareCursor);
-  /// Put a keyboard event into event queue
-  virtual void KeyboardEvent (int ScanCode, bool Down);
 };
 
 #endif // __CSOS2_H__

@@ -59,6 +59,7 @@ void sys_fatalerror(char *s)
 }
 
 extern csSystemDriver* System; // Global pointer to system that can be used by event handler
+static iEventOutlet *EventOutlet;
 
 long FAR PASCAL WindowProc( HWND hWnd, UINT message,WPARAM wParam, LPARAM lParam );
 
@@ -112,7 +113,7 @@ static int s_KeyTable[257]=
 
 DWORD WINAPI s_threadroutine (LPVOID param)
 {
-  SysSystemDriver *System = (SysSystemDriver *)param;
+  iEventOutlet *EventOutlet = (iEventOutlet *)param;
   HRESULT hr;
   DWORD dwWait = INFINITE;
   char *buffer;
@@ -254,13 +255,13 @@ DWORD WINAPI s_threadroutine (LPVOID param)
             {
               lastkey = i;
               dwWait = AUTOREPEAT_WAITTIME;
-              System->QueueKeyEvent (s_KeyTable [i], true);
+              EventOutlet->Key (s_KeyTable [i], -1, true);
             }
             else
             {
               lastkey = -1;
               dwWait = INFINITE;
-              System->QueueKeyEvent (s_KeyTable[i], false);
+              EventOutlet->Key (s_KeyTable[i], -1, false);
             }
             break;
           }
@@ -302,13 +303,13 @@ DWORD WINAPI s_threadroutine (LPVOID param)
           {
             lastkey = lpdidod [i].dwOfs;
             dwWait = AUTOREPEAT_WAITTIME:
-            System->QueueKeyEvent (s_KeyTable [lpdidod [i].dwOfs], true);
+            EventOutlet->Key (s_KeyTable [lpdidod [i].dwOfs], -1, true);
           }
           else
           {
             lastkey = -1;
             dwWait = INFINITE;
-            System->QueueKeyEvent (s_KeyTable [lpdidod [i].dwOfs], false);
+            EventOutlet->Key (s_KeyTable [lpdidod [i].dwOfs], -1, false);
           }
         }
         delete[] lpdidod;
@@ -338,7 +339,7 @@ DWORD WINAPI s_threadroutine (LPVOID param)
         if ((lastkey >= 0) && (buffer [lastkey] & 0X80))
         {
           dwWait = AUTOREPEAT_TIME;
-          System->QueueKeyEvent (s_KeyTable [lastkey], true);
+          EventOutlet->Key (s_KeyTable [lastkey], -1, true);
         }
         else
         { // Strange.. we didn't get the message that the key was released !
@@ -368,6 +369,7 @@ DWORD WINAPI s_threadroutine (LPVOID param)
 
 IMPLEMENT_IBASE_EXT (SysSystemDriver)
   IMPLEMENTS_INTERFACE (iWin32SystemDriver)
+  IMPLEMENTS_INTERFACE (iEventPlug)
 IMPLEMENT_IBASE_EXT_END
 
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
@@ -387,6 +389,14 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   bool bResult;
   bResult = RegisterClass (&wc);
   ASSERT(bResult);
+
+  EventOutlet = CreateEventOutlet (this);
+}
+
+SysSystemDriver::~SysSystemDriver ()
+{
+  if (EventOutlet)
+    EventOutlet->DecRef ();
 }
 
 bool SysSystemDriver::Open (const char *Title)
@@ -397,7 +407,7 @@ bool SysSystemDriver::Open (const char *Title)
 #ifdef DO_DINPUT_KEYBOARD
   DWORD dwThreadId;
   m_hEvent = CreateEvent (NULL, FALSE, FALSE, NULL);
-  m_hThread = CreateThread (NULL, 0, s_threadroutine, this, 0, &dwThreadId);
+  m_hThread = CreateThread (NULL, 0, s_threadroutine, EventOutlet, 0, &dwThreadId);
   if (!m_hEvent || !m_hThread)
   {
     MessageBox (NULL, "CreateEvent() Failed!", NULL, MB_OK|MB_ICONERROR);
@@ -425,40 +435,33 @@ void SysSystemDriver::Close ()
 #endif
 }
 
-void SysSystemDriver::Loop ()
+void SysSystemDriver::NextFrame ()
 {
-  MSG msg;
-  iGraphics2DDDraw3* piG2Ddd3 = NULL;
+/*
+  this should be done only when palette has been changed?
 
-  piG2Ddd3 = QUERY_INTERFACE(System, iGraphics2DDDraw3);
-
+  iGraphics2DDDraw3* piG2Ddd3 = QUERY_INTERFACE (System, iGraphics2DDDraw3);
   if (piG2Ddd3)
   {
-    piG2Ddd3->SetColorPalette();
-
-    piG2Ddd3->DecRef();
-    piG2Ddd3 = NULL;
+    piG2Ddd3->SetColorPalette ();
+    piG2Ddd3->DecRef ();
   }
+*/
 
-  while(!Shutdown && !ExitLoop)
+  MSG msg;
+  while (PeekMessage (&msg, NULL, 0, 0, PM_NOREMOVE))
   {
-    if (PeekMessage (&msg, NULL, 0, 0, PM_NOREMOVE))
+    if (!GetMessage (&msg, NULL, 0, 0))
     {
-      if (!GetMessage (&msg, NULL, 0, 0))
-        return;
-      
-      TranslateMessage (&msg); 
-      DispatchMessage (&msg);
+      EventQueue.Put (new csEvent (Time (), csevBroadcast, cscmdQuit, NULL));
+      return;
     }
-    else
-    {
-      static long prev_time = -1;
-      long now     = Time ();
-      time_t elapsed = (prev_time == -1) ? 0 : now - prev_time;
-      prev_time = now;
-      NextFrame (elapsed, now);
-    }
+
+    TranslateMessage (&msg);
+    DispatchMessage (&msg);
   }
+
+  csSystemDriver::NextFrame ();
 }
 
 void SysSystemDriver::Alert (const char* s)
@@ -528,7 +531,7 @@ void WinKeyTrans (csSystemDriver* pSystemDriver, WPARAM wParam, bool down)
     case VK_SHIFT:   key = CSKEY_SHIFT; break;
   }
   if (key)
-    pSystemDriver->QueueKeyEvent (key, down);
+    EventOutlet->Key (key, -1, down);
 }
 #endif
 
@@ -541,7 +544,7 @@ long FAR PASCAL WindowProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
       break;
     case WM_ACTIVATE:
       if (System)
-        System->QueueFocusEvent (LOWORD (wParam) != WA_INACTIVE);
+        EventOutlet->Broadcast (cscmdFocusChanged, LOWORD (wParam) != WA_INACTIVE);
       break;
     case WM_DESTROY:
       PostQuitMessage (0);
@@ -551,8 +554,8 @@ long FAR PASCAL WindowProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
       if(System)
       {
         if (wParam == '\r') wParam = CSKEY_ENTER;
-        System->QueueKeyEvent (wParam, true);
-        System->QueueKeyEvent (wParam, false);
+        EventOutlet->Key (wParam, -1, true);
+        EventOutlet->Key (wParam, -1, false);
       }
       break;
     case WM_KEYDOWN:
@@ -567,32 +570,25 @@ long FAR PASCAL WindowProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
       break;
 #endif
     case WM_LBUTTONDOWN:
-      if (System)
-        System->QueueMouseEvent (1, true, LOWORD(lParam), HIWORD(lParam));
+      EventOutlet->Mouse (1, true, LOWORD(lParam), HIWORD(lParam));
       break;
     case WM_LBUTTONUP:
-      if (System)
-        System->QueueMouseEvent (1, false, LOWORD(lParam), HIWORD(lParam));
+      EventOutlet->Mouse (1, false, LOWORD(lParam), HIWORD(lParam));
       break;
     case WM_MBUTTONDOWN:
-      if (System)
-        System->QueueMouseEvent (3, true, LOWORD(lParam), HIWORD(lParam));
+      EventOutlet->Mouse (3, true, LOWORD(lParam), HIWORD(lParam));
       break;
     case WM_MBUTTONUP:
-      if (System)
-        System->QueueMouseEvent (3, false, LOWORD(lParam), HIWORD(lParam));
+      EventOutlet->Mouse (3, false, LOWORD(lParam), HIWORD(lParam));
       break;
     case WM_RBUTTONDOWN:
-      if (System)
-        System->QueueMouseEvent (2, true, LOWORD(lParam), HIWORD(lParam));
+      EventOutlet->Mouse (2, true, LOWORD(lParam), HIWORD(lParam));
       break;
     case WM_RBUTTONUP:
-      if (System)
-        System->QueueMouseEvent (2, false, LOWORD(lParam), HIWORD(lParam));
+      EventOutlet->Mouse (2, false, LOWORD(lParam), HIWORD(lParam));
       break;
     case WM_MOUSEMOVE:
-      if (System)
-        System->QueueMouseEvent (0, false, LOWORD(lParam), HIWORD(lParam));
+      EventOutlet->Mouse (0, false, LOWORD(lParam), HIWORD(lParam));
       break;
   }
   return DefWindowProc (hWnd, message, wParam, lParam);

@@ -150,7 +150,7 @@ void CrystApp::MessageReceived(BMessage* m)
 void CrystApp::queueMouseEvent(int button, bool down, BPoint where)
 {
   if (where.x >= 0 && where.y >= 0)
-    driver->QueueMouseEvent (button, down, where.x, where.y);
+    EventOutlet->Mouse (button, down, where.x, where.y);
 }
 
 void CrystApp::checkMouseMoved()
@@ -195,7 +195,7 @@ void CrystApp::checkModifier(long flags, long mask, int tag, bool& state) const
   if (state != new_state)
   {
     state = new_state;
-    driver->QueueKeyEvent(tag, state);
+    EventOutlet->Key (tag, -1, state);
   }
 }
 
@@ -254,7 +254,7 @@ void CrystApp::doKeyAction(BMessage* m)
       key = classifyFunctionKey(m);
     else
       key = classifyAsciiKey(c);
-    driver->QueueKeyEvent(key, m->what == B_KEY_DOWN);
+    EventOutlet->Key(key, -1, m->what == B_KEY_DOWN);
   }
 }
 
@@ -331,45 +331,31 @@ bool SysSystemDriver::Initialize (int argc, const char* const argv[],
   return superclass::Initialize(argc, argv, iConfigName);
 }
 
-static int32 begin_loop(void* data)
+void SysSystemDriver::NextFrame ()
 {
-  snooze(100000); // @@@FIXME: Necesary?
-  int32 const rc = ((SysSystemDriver*)data)->LoopThread();
-  be_app->PostMessage(B_QUIT_REQUESTED);
-  return rc;
-}
-
-// Note that Loop() must be able to handle recursive calls properly.
-// For instance, CSWS calls it recursively to implement modal loops.
-// The first time Loop() is called, it is called from the "main" thread.
-// All subsequent (recursive) calls come from "LoopThread", the thread
-// which is actually driving the Crystal Space run-loop.
-void SysSystemDriver::Loop()
-{
-  if (running)
-    LoopThread();
-  else
+  if (!running)
   {
+    // Start the BE application when we are called for the first time
+    // in a secondary thread. Then it stays there quietly and do all the
+    // dirty work for us (pump messages and so on).
     running = true;
-    thread_id my_thread = spawn_thread(begin_loop, "LoopThread",
-      B_DISPLAY_PRIORITY, (void*)this);
-    resume_thread(my_thread);
-    app->Run();
-    app->ShowMouse();
+    thread_id my_thread = spawn_thread (LoopThread, "LoopThread",
+      B_DISPLAY_PRIORITY, (void *)this);
+    resume_thread (my_thread);
   }
+
+  app->checkMouseMoved (); // @@@FIXME: Probably want to lock "moved" flag.
 }
 
-// This is the thread doing the loop itself.
-long SysSystemDriver::LoopThread()
+// This is the thread doing the main application loop
+long SysSystemDriver::LoopThread (void *Self)
 {
-  bigtime_t prev_time = Time();	
-  while (!Shutdown && !ExitLoop)
-  {
-    app->checkMouseMoved(); // @@@FIXME: Probably want to lock "moved" flag.
-    bigtime_t curr_time = Time();
-    NextFrame(curr_time - prev_time, curr_time);
-    prev_time=curr_time;
-  }	
+  SysSystemDriver *This = (SysSystemDriver *)Self;
+
+  snooze(100000); // @@@FIXME: Necesary?
+  This->app->Run ();
+  This->app->ShowMouse ();
+  This->app->PostMessage(B_QUIT_REQUESTED);
   return 0;
 }
 

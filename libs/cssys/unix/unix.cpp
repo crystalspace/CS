@@ -32,30 +32,11 @@
 
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
-}
-
-void SysSystemDriver::Help ()
-{
-  csSystemDriver::Help ();
-  Printf (MSG_STDOUT, "  -sdepth=<depth>    set simulated depth (8, 15, 16, or 32) (default=none)\n");
-  Printf (MSG_STDOUT, "  -shm/noshm         SHM extension (default 'yes')\n");
-}
-
-void SysSystemDriver::Loop(void)
-{
-  while (!Shutdown && !ExitLoop)
-  {
-    static long prev_time = -1;
-    long cur_time = Time ();
-    NextFrame ((prev_time == -1) ? 0 : cur_time - prev_time, cur_time);
-    prev_time = cur_time;
-  }
+  // Pretty complex system driver, don't you think?
 }
 
 #ifdef OS_SOLARIS
-extern "C" {
-int usleep(unsigned int);
-}
+extern "C" int usleep (unsigned);
 #endif
 
 void SysSystemDriver::Sleep (int SleepTime)

@@ -247,7 +247,7 @@ bool csButton::HandleEvent (csEvent &Event)
         case cscmdStaticHotKeyEvent:
         {
           csEvent *ev = (csEvent *)Event.Command.Info;
-          ev->Key.Code = ' ';
+          ev->Key.Code = CSKEY_SPACE;
           return csButton::HandleEvent (*ev);
         }
         case cscmdStaticMouseEvent:
@@ -323,8 +323,8 @@ bool csButton::HandleEvent (csEvent &Event)
     case csevKeyUp:
       if (app->KeyboardOwner)
         if (((underline_pos >= 0)
-          && (UPPERCASE (Event.Key.Code) == UPPERCASE (text [underline_pos])))
-         || ((Event.Key.Code == ' ')
+          && (UPPERCASE (Event.Key.Char) == UPPERCASE (text [underline_pos])))
+         || ((Event.Key.Code == CSKEY_SPACE)
           && (GetState (CSS_FOCUSED))))
         {
           if (!(ButtonStyle & CSBS_MULTICHOOSE))
@@ -355,10 +355,10 @@ bool csButton::HandleKeyPress (csEvent &Event)
     if (((underline_pos >= 0)
       && ((Event.Key.Modifiers & CSMASK_CTRL) == 0)
       && (Event.Key.Modifiers & CSMASK_FIRST)
-      && (UPPERCASE (Event.Key.Code) == UPPERCASE (text [underline_pos]))
+      && (UPPERCASE (Event.Key.Char) == UPPERCASE (text [underline_pos]))
       && (app->KeyboardOwner == NULL))
      || ((GetState (CSS_FOCUSED))
-      && (Event.Key.Code == ' ')
+      && (Event.Key.Code == CSKEY_SPACE)
       && (Event.Key.Modifiers & CSMASK_FIRST)
       && (!(Event.Key.Modifiers & (CSMASK_ALLSHIFTS - CSMASK_ALT)))))
     {

@@ -23,7 +23,17 @@
 #include <ctype.h>
 
 extern char ShiftedKey [];
-extern char UnshiftedKey [];
+
+// And this one performs backward conversion
+char UnshiftedKey [128-32] =
+{
+' ', '1', '\'','3', '4', '5', '7', '\'','9', '0', '8', '=', ',', '-', '.', '/',
+'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ';', ';', ',', '=', '.', '/',
+'2', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '[', '\\',']', '6', '-',
+'`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '[', '\\',']', '`', 127
+};
 
 static struct csKeyCodeDef
 {
@@ -161,8 +171,7 @@ bool csParseKeyDef (const char *iKeyDef, int &oKey, int &oShiftMask)
         if (is_shifted (key [0]))
           oShiftMask |= CSMASK_SHIFT;
 
-        key [0] = (oShiftMask & CSMASK_SHIFT) ?
-          char_shift (key [0]) : char_unshift (key [0]);
+        key [0] = char_unshift (key [0]);
         oKey = key [0];
         goto ok;
       }

@@ -21,6 +21,7 @@
 #include "cssysdef.h"
 #include "qint.h"
 #include "csws/csgfxppl.h"
+#include "csws/csmouse.h"
 #include "csutil/util.h"
 #include "isystem.h"
 #include "igraph2d.h"
@@ -143,6 +144,17 @@ void csGraphicsPipeline::Sprite2D (csPixmap *s2d, int x, int y, int w, int h)
   s2d->DrawScaled (G3D, x, y, w, h);
 }
 
+void csGraphicsPipeline::DrawPixmap (iTextureHandle *hTex, int sx, int sy,
+  int sw, int sh, int tx, int ty, int tw, int th)
+{
+  if (!BeginDraw (CSDRAW_2DGRAPHICS))
+    return;
+
+  INCLUDE_MIN_POINT (sx, sy);
+  INCLUDE_MAX_POINT (sx + sw, sy + sh);
+  G3D->DrawPixmap (hTex, sx, sy, sw, sh, tx, ty, tw, th);
+}
+
 void csGraphicsPipeline::SaveArea (csImageArea **Area, int x, int y, int w, int h)
 {
   if (!BeginDraw (CSDRAW_2DGRAPHICS))
@@ -254,19 +266,28 @@ void csGraphicsPipeline::Invalidate (csRect &rect)
   INCLUDE_MAX_POINT (rect.xmax, rect.ymax);
 }
 
-void csGraphicsPipeline::StartFrame (int iCurPage)
+void csGraphicsPipeline::StartFrame (csMouse *Mouse)
 {
   DontCacheFrame = false;
-  CurPage = iCurPage;
+  CurPage = G2D->GetPage ();
   if (CurPage > MaxPage)
     MaxPage = CurPage;
 
+  // Clear refresh rectangle
+  RefreshRect.Set (INT_MAX, INT_MAX, -INT_MAX, -INT_MAX);
+
+  // Restore previous background under mouse associated with current page
+  Mouse->Undraw (CurPage);
+
   // First, synchronize image with other video pages, if any
-  Sync (CurPage, RefreshRect.xmin, RefreshRect.ymin, RefreshRect.xmax,
-    RefreshRect.ymax);
+  PageCarry.Set (RefreshRect);
+  Sync (CurPage, PageCarry.xmin, PageCarry.ymin, PageCarry.xmax, PageCarry.ymax);
+
+  // Clear refresh rectangle again
+  RefreshRect.Set (INT_MAX, INT_MAX, -INT_MAX, -INT_MAX);
 }
 
-void csGraphicsPipeline::FinishFrame ()
+void csGraphicsPipeline::FinishFrame (csMouse *Mouse)
 {
   if (SyncArea [CurPage])
   {
@@ -274,11 +295,12 @@ void csGraphicsPipeline::FinishFrame ()
     SyncArea [CurPage] = NULL;
   }
 
-  // to avoid fiddling too much with floating-point coords, we just enlarge
-  // the min/max bounding box in both directions by one pixel.
   if (!RefreshRect.IsEmpty ())
   {
-    RefreshRect.xmin--; RefreshRect.xmax++; RefreshRect.ymin--; RefreshRect.ymax++;
+    // to avoid fiddling too much with floating-point coords, we just enlarge
+    // the min/max bounding box in both directions by one pixel.
+    RefreshRect.xmin--; RefreshRect.xmax++;
+    RefreshRect.ymin--; RefreshRect.ymax++;
 
     if (RefreshRect.xmin < 0) RefreshRect.xmin = 0;
     if (RefreshRect.ymin < 0) RefreshRect.ymin = 0;
@@ -289,6 +311,21 @@ void csGraphicsPipeline::FinishFrame ()
       SyncArea [CurPage] = G2D->SaveArea (RefreshRect.xmin, RefreshRect.ymin,
         RefreshRect.Width (), RefreshRect.Height ());
   }
+
+  // Save background under mouse and draw mouse cursor
+  Mouse->Draw (CurPage);
+  // Switch the backbuffer
+  FinishDraw ();
+}
+
+void csGraphicsPipeline::FinishDraw ()
+{
+  FinishDrawImp ();
+
+  PageCarry.Union (RefreshRect);
+  if (!PageCarry.IsEmpty ())
+    G3D->Print (&PageCarry);
+  DrawMode = 0;
 }
 
 // This procedure propagates all changes made to previous pages
@@ -341,18 +378,6 @@ void csGraphicsPipeline::Desync ()
       G2D->FreeArea (SyncArea [i]);
       SyncArea [i] = NULL;
     } /* endif */
-}
-
-void csGraphicsPipeline::FinishDraw ()
-{
-  FinishDrawImp ();
-
-  if (!RefreshRect.IsEmpty ())
-    G3D->Print (&RefreshRect);
-  DrawMode = 0;
-
-  // Clear refresh rectangle now
-  RefreshRect.Set (INT_MAX, INT_MAX, INT_MIN, INT_MIN);
 }
 
 bool csGraphicsPipeline::BeginDrawImp (int iMode)

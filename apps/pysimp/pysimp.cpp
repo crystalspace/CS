@@ -142,9 +142,11 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   return true;
 }
 
-void PySimple::NextFrame (time_t elapsed_time, time_t current_time)
+void PySimple::NextFrame ()
 {
-  superclass::NextFrame (elapsed_time, current_time);
+  SysSystemDriver::NextFrame ();
+  time_t elapsed_time, current_time;
+  GetElapsedTime (elapsed_time, current_time);
 
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.) * (0.03 * 20);
