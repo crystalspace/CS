@@ -184,6 +184,7 @@ int csFoliageObject::GetLODPolygonCount (float lod) const
 csFoliageMeshBlock::csFoliageMeshBlock ()
 {
   bbox.Empty ();
+  setup = true;
 }
 
 void csFoliageMeshBlock::AddGeometryInstance (csFoliageGeometry* geom,
@@ -204,22 +205,80 @@ void csFoliageMeshBlock::AddGeometryInstance (csFoliageGeometry* geom,
   {
     found_i = geom_instances.Push (csGeomInstances ());
     geom_instances[found_i].material = material;
+    geom_instances[found_i].total_triangles = 0;
+    geom_instances[found_i].total_vertices = 0;
   }
 
   csGeomInstances& gi = geom_instances[found_i];
   size_t geom_idx = gi.instances.Push (csFoliageGeometryInstance ());
   gi.instances[geom_idx].transform = trans;
   gi.instances[geom_idx].geometry = geom;
+  gi.total_triangles += geom->GetTriangles ().Length ();
+  gi.total_vertices += geom->GetVertices ().Length ();
+
+  setup = true;
+}
+
+void csFoliageMeshBlock::CreateBuffers ()
+{
+#if 0
+  size_t i, j;
+  size_t total_vertices = 0;
+  for (i = 0 ; i < geom_instances.Length () ; i++)
+  {
+    const csGeomInstances& gi = geom_instances[i];
+    total_vertices += gi.total_vertices;
+  }
+  csRef<iRenderBuffer> buffers[4];
+  g3d->CreateInterleavedRenderBuffers (
+  	sizeof (csFoliageVertex) * total_vertices,
+	CS_BUF_STATIC, 4, buffers);
+  vertex_buffer = buffers[0];
+  vertex_buffer->SetOffset (0);
+  vertex_buffer->SetComponentType (CS_BUFCOMP_FLOAT);
+  vertex_buffer->SetComponentCount (3);
+  vertex_buffer->SetStride (sizeof (csFoliageVertex));
+  texel_buffer = buffers[1];
+  texel_buffer->SetOffset (sizeof (csVector3));
+  texel_buffer->SetComponentType (CS_BUFCOMP_FLOAT);
+  texel_buffer->SetComponentCount (2);
+  texel_buffer->SetStride (sizeof (csFoliageVertex));
+  color_buffer = buffers[2];
+  color_buffer->SetOffset (sizeof (csVector3) + sizeof (csVector2));
+  color_buffer->SetComponentType (CS_BUFCOMP_FLOAT);
+  color_buffer->SetComponentCount (3);
+  color_buffer->SetStride (sizeof (csFoliageVertex));
+  normal_buffer = buffers[3];
+  normal_buffer->SetOffset (sizeof (csVector3) + sizeof (csVector2)
+  	+ sizeof (csColor));
+  normal_buffer->SetComponentType (CS_BUFCOMP_FLOAT);
+  normal_buffer->SetComponentCount (3);
+  normal_buffer->SetStride (sizeof (csFoliageVertex));
+
+  csFoliageVertex* data = (csFoliageVertex*)vertex_buffer->Lock (
+  	CS_BUF_LOCK_NORMAL);
+
+  for (i = 0 ; i < geom_instances.Length () ; i++)
+  {
+    const csGeomInstances& gi = geom_instances[i];
+    for (j = 0 ; j < gi.instances.Length () ; j++)
+    {
+      csFoliageGeometryInstance* geom = gi.instances[j];
+    }
+  }
+
+  vertex_buffer->Release ();
+#endif
 }
 
 void csFoliageMeshBlock::Draw (iGraphics3D* g3d, iRenderView* rview,
       uint32 frustum_mask, const csReversibleTransform& transform,
       csRenderMeshHolderSingle& rmHolder)
 {
-  if (!interleaved_buffer)
+  if (setup)
   {
-    //g3d->CreateInterleavedRenderBuffers (sizeof (csFoliageVertex)
-    	//* 0);
+    setup = false;
+    CreateBuffers ();
   }
 }
 

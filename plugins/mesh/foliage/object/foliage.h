@@ -157,6 +157,9 @@ struct csGeomInstances
 {
   csArray<csFoliageGeometryInstance> instances;
   iMaterialWrapper* material;
+  csRef<iRenderBuffer> index_buffer;
+  size_t total_triangles;
+  size_t total_vertices;
 };
 
 /**
@@ -172,12 +175,19 @@ private:
   // Interleaved render buffer for all foliage geometry in this
   // block.
   csRef<iRenderBuffer> interleaved_buffer;
-
-  // Render buffer for the triangle data.
-  csRef<iRenderBuffer> index_buffer;
+  csRef<iRenderBuffer> vertex_buffer;
+  csRef<iRenderBuffer> texel_buffer;
+  csRef<iRenderBuffer> color_buffer;
+  csRef<iRenderBuffer> normal_buffer;
 
   // One set of geometry instances for every material.
   csArray<csGeomInstances> geom_instances;
+
+  // If true the we need to setup the render meshes and buffers of this block.
+  bool setup;
+
+  // Create all the buffers.
+  void CreateBuffers ();
 
 public:
   /**
