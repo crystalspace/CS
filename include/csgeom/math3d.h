@@ -53,6 +53,13 @@ public:
    */
   csVector3 () { }
 
+  /**
+   * Make a new initialized vector.
+   * Creates a new vector and initializes it to m*<1,1,1>.  To create
+   * a vector initialized to the zero vector, use csVector3(0)
+   */
+  csVector3 (float m) : x(m), y(m), z(m) {}
+
   /// Make a new vector and initialize with the given values.
   csVector3 (float x, float y, float z = 0)
    { csVector3::x = x; csVector3::y = y; csVector3::z = z; }
@@ -170,16 +177,8 @@ public:
   /// Returns the norm (magnitude) of a vector.
   inline static float Norm (const csVector3& v) { return v.Norm(); }
 
-#if 1
   // Normalizes a vector to a unit vector.
-  // @@@ JTY: For some very strange reason this version does not work
-  // for me (PGCC on Linux).
-  // When I use this version pressing 'b' will distort the camera.
   inline static csVector3 Unit (const csVector3& v) { return v.Unit(); }
-#else
-  /// Normalizes a vector to a unit vector.
-  static csVector3 Unit (const csVector3& v) { return v/v.Norm (); }
-#endif
 
 };
 
@@ -284,32 +283,8 @@ public:
   /// Compute the determinant of this matrix.
   float Determinant () const;
 
-  /// Compute the eigen values and eigen vectors of this matrix.
-  int Eigen (csMatrix3* evectors, csVector3* evalues);
-
-  /// Compute the eigen vectors return largest one in 1st column.
-  int Eigens1 (csMatrix3 *evecs);
-
   /// Set this matrix to the identity matrix.
   void Identity ();
-
-  /**
-   * Return a rotation matrix around the X axis.
-   * 'angle' is given in radians.
-   */
-  static csMatrix3 GetXRotation (float angle);
-
-  /**
-   * Return a rotation matrix around the Y axis.
-   * 'angle' is given in radians.
-   */
-  static csMatrix3 GetYRotation (float angle);
-
-  /**
-   * Return a rotation matrix around the Z axis.
-   * 'angle' is given in radians.
-   */
-  static csMatrix3 GetZRotation (float angle);
 
   /// Add two matricies.
   friend csMatrix3 operator+ (const csMatrix3& m1, const csMatrix3& m2);
@@ -340,6 +315,39 @@ public:
   friend bool operator< (const csMatrix3& m, float f);
   /// Test if each component of a matrix is greater than a small epsilon value.
   friend bool operator> (float f, const csMatrix3& m);
+};
+
+/// An instance of csMatrix3 that is initialized as a rotation about X
+class csXRotMatrix3 : public csMatrix3
+{
+public:
+  /**
+   * Return a rotation matrix around the X axis.
+   * 'angle' is given in radians.
+   */
+  csXRotMatrix3 (float angle);
+};
+
+/// An instance of csMatrix3 that is initialized as a rotation about Y
+class csYRotMatrix3 : public csMatrix3
+{
+public:
+  /**
+   * Return a rotation matrix around the Y axis.
+   * 'angle' is given in radians.
+   */
+  csYRotMatrix3 (float angle);
+};
+
+/// An instance of csMatrix3 that is initialized as a rotation about Z
+class csZRotMatrix3 : public csMatrix3
+{
+public:
+  /**
+   * Return a rotation matrix around the Z axis.
+   * 'angle' is given in radians.
+   */
+  csZRotMatrix3 (float angle);
 };
 
 /**
@@ -427,7 +435,8 @@ public:
                           const csVector3& v1, const csVector3& v2)
   {
     // float s = p * (v1%v2); (original expression: expanded to the below:)
-    float s = p.x*(v1.y*v2.z-v1.z*v2.y) + p.y*(v1.z*v2.x-v1.x*v2.z) + p.z*(v1.x*v2.y-v1.y*v2.x);
+    float s = p.x*(v1.y*v2.z-v1.z*v2.y) + p.y*(v1.z*v2.x-v1.x*v2.z) + 
+              p.z*(v1.x*v2.y-v1.y*v2.x);
     if (s < 0) return 1;
     else if (s > 0) return -1;
     else return 0;
