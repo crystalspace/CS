@@ -95,6 +95,38 @@ csQuadtree::~csQuadtree ()
   CHK (delete root);
 }
 
+bool IsVisibleFull (const csPlane& plane,
+	csVector3* frustrum, int num_frust,
+  	csVector3* poly, int num_poly)
+{
+  int i1, j1, i, j;
+
+  // Here is the difficult case. We need to see if there is an
+  // edge from the polygon which intersects a frustrum plane.
+  // If so then polygon is visible. Otherwise not.
+  csVector3 normal;
+  csVector3 isect;
+  float dist;
+  j1 = num_frust-1;
+  for (j = 0 ; j < num_frust ; j++)
+  {
+    normal = frustrum[j] % frustrum[j1];
+    i1 = num_poly-1;
+    for (i = 0 ; i < num_poly ; i++)
+    {
+      if (csIntersect3::Plane (poly[i], poly[i1],
+      	normal.x, normal.y, normal.z, 0, isect, dist))
+      {
+        if (csMath3::Visible (isect, plane)) return true;
+      }
+      i1 = i;
+    }
+    j1 = j;
+  }
+  return false;
+}
+
+
 bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
 	csVector3* verts, int num_verts,
 	bool i00, bool i01, bool i11, bool i10)
@@ -134,7 +166,7 @@ bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
       }
 
     if (!vis)
-      vis = csFrustrum::IsVisibleFull (node->corners, 4, verts, num_verts);
+      vis = IsVisibleFull (plane_normal, node->corners, 4, verts, num_verts);
   }
 
   // If polygon is not visible in node then nothing happens
@@ -154,9 +186,6 @@ bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
     // of the node has changed (note that going from
     // CS_QUAD_PARTIAL to CS_QUAD_PARTIAL is also seen as a state
     // change because this means that the polygon may be visible here).
-//@@@The following line is not completely correct but it improves
-//speed a LOT!
-node->SetState (CS_QUAD_FULL);
     return true;
   }
   else
@@ -242,7 +271,7 @@ bool csQuadtree::TestPolygon (csQuadtreeNode* node,
       }
 
     if (!vis)
-      vis = csFrustrum::IsVisibleFull (node->corners, 4, verts, num_verts);
+      vis = IsVisibleFull (plane_normal, node->corners, 4, verts, num_verts);
   }
 
   // If polygon is not visible in node then nothing happens
@@ -260,7 +289,10 @@ bool csQuadtree::TestPolygon (csQuadtreeNode* node,
   {
     // This node has no children. This means that the polygon
     // is visible in this node.
-    return true;
+    // @@@ However, we shortcut this by saying the polygon is not visible.
+    // This is not completely correct but it speeds up things considerably.
+    return false;
+    //return true;
   }
   else
   {

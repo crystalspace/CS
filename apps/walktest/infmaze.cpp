@@ -28,6 +28,8 @@
 #include "csengine/texture.h"
 #include "csengine/light.h"
 #include "csengine/lghtmap.h"
+#include "csengine/cdobj.h"
+#include "csengine/collider.h"
 #include "csobject/nameobj.h"
 #include "csobject/dataobj.h"
 
@@ -229,35 +231,49 @@ void InfiniteMaze::random_loose_portals (int x1, int y1, int z1)
   }
 }
 
+void InfPortalCS::ConnectNewSector ()
+{
+  extern WalkTest* Sys;
+  InfiniteMaze* infinite_maze = Sys->infinite_maze;
+  csSector* s = infinite_maze->create_six_room (Sys->world, x2, y2, z2)->sector;
+  infinite_maze->connect_infinite (x1, y1, z1, x2, y2, z2, false);
+  SetSector (s);
+  infinite_maze->random_loose_portals (x2, y2, z2);
+  s->Prepare ();
+  s->InitLightMaps (false);
+  s->ShineLights ();
+  s->CreateLightMaps (System->piG3D);
+  while (lviews)
+  {
+    int old_draw_busy = s->draw_busy;
+    s->draw_busy = 0;
+    CalculateLighting (lviews->lv);
+    s->draw_busy = old_draw_busy;
+
+    LV* n = lviews->next;
+    CHK (delete lviews);
+    lviews = n;
+  }
+  CHK (csCollider* pCollider = new csCollider (s));
+  csColliderPointerObject::SetCollider (*s, pCollider, true);
+}
+
 bool InfPortalCS::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon, csRenderView& rview)
 {
   if (!GetSector ())
   {
-//printf ("Connect from %d,%d,%d to new room at %d,%d,%d\n", x1, y1, z1, x2, y2, z2);
-    extern WalkTest* Sys;
-    InfiniteMaze* infinite_maze = Sys->infinite_maze;
-    csSector* s = infinite_maze->create_six_room (Sys->world, x2, y2, z2)->sector;
-    infinite_maze->connect_infinite (x1, y1, z1, x2, y2, z2, false);
-    SetSector (s);
-    infinite_maze->random_loose_portals (x2, y2, z2);
-    s->Prepare ();
-    s->InitLightMaps (false);
-    s->ShineLights ();
-    s->CreateLightMaps (rview.g3d);
-    while (lviews)
-    {
-      int old_draw_busy = s->draw_busy;
-      s->draw_busy = 0;
-      CalculateLighting (lviews->lv);
-      s->draw_busy = old_draw_busy;
-
-      LV* n = lviews->next;
-      CHK (delete lviews);
-      lviews = n;
-
-    }
+    ConnectNewSector ();
   }
   return csPortal::Draw (new_clipper, portal_polygon, rview);
+}
+
+csSector* InfPortalCS::FollowSegment (csReversibleTransform& t, csVector3& new_position, bool& mirror)
+{
+  if (!GetSector ())
+  {
+    ConnectNewSector ();
+  }
+  return csPortal::FollowSegment (t, new_position, mirror);
 }
 
 void InfPortalCS::CalculateLighting (csLightView& lview)

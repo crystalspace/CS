@@ -196,6 +196,7 @@ csWorld::csWorld () : csObject (), start_vec (0, 0, 0)
   piHR = NULL;
   textures = NULL;
   c_buffer = NULL;
+  quadtree = NULL;
 
   csVector3 min_qbox (-10, -10, -10);
   csVector3 max_qbox (10, 10, 10);
@@ -220,8 +221,8 @@ csWorld::~csWorld ()
   CHK (delete lightpatch_pool);
   CHK (delete quadcube);
   cs->Release();
-  //  plugins->Release();
   CHK (delete plugins);
+  //  plugins->Release();
 }
 
 void csWorld::Clear ()
@@ -243,6 +244,7 @@ void csWorld::Clear ()
   CHK (delete textures); textures = NULL;
   CHK (textures = new csTextureList ());
   CHK (delete c_buffer); c_buffer = NULL;
+  CHK (delete quadtree); quadtree = NULL;
   CHK (delete render_pol2d_pool);
   CHK (render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory()));
   CHK (delete lightpatch_pool);
@@ -259,6 +261,8 @@ void csWorld::EnableCBuffer (bool en)
 {
   if (en)
   {
+    CHK (delete quadtree);
+    quadtree = NULL;
     if (c_buffer) return;
     CHK (c_buffer = new csCBuffer (0, frame_width-1, frame_height));
   }
@@ -266,6 +270,30 @@ void csWorld::EnableCBuffer (bool en)
   {
     CHK (delete c_buffer);
     c_buffer = NULL;
+  }
+}
+
+void csWorld::EnableQuadtree (bool en)
+{
+  if (en)
+  {
+    CHK (delete c_buffer);
+    c_buffer = NULL;
+    if (quadtree) return;
+    csVector3 corners[4];
+    float x = (frame_width/2) * csCamera::default_inv_aspect;
+    float y = (frame_height/2) * csCamera::default_inv_aspect;
+    float z = 1;
+    corners[0] = csVector3 (-x,  y, z);
+    corners[1] = csVector3 ( x,  y, z);
+    corners[2] = csVector3 ( x, -y, z);
+    corners[3] = csVector3 (-x, -y, z);
+    CHK (quadtree = new csQuadtree (corners, 5));
+  }
+  else
+  {
+    CHK (delete quadtree);
+    quadtree = NULL;
   }
 }
 
@@ -658,6 +686,10 @@ void csWorld::Draw (IGraphics3D* g3d, csCamera* c, csClipper* view)
     for (i = 0 ; i < num ; i++) verts[i] = view->GetVertex (i);
     c_buffer->InsertPolygon (verts, num, true);
   }
+  if (quadtree)
+  {
+    quadtree->MakeEmpty ();
+  }
 
   csSector* s = c->GetSector ();
   s->Draw (rview);
@@ -749,6 +781,7 @@ void csWorld::DrawFunc (IGraphics3D* g3d, csCamera* c, csClipper* view,
   tr_manager.NewFrame ();
 
   if (c_buffer) c_buffer->Initialize ();
+  if (quadtree) quadtree->MakeEmpty ();
 
   csSector* s = c->GetSector ();
   s->Draw (rview);

@@ -705,7 +705,7 @@ void csPolyTexture::FillLightMap (csLightView& lview)
 
   for(i=0;i<rpv;i++)
   {
-    projector=pl->m_world2tex * (polygon->Vcam(i) + light_frustrum->GetOrigin () - pl->v_world2tex);
+    projector=pl->m_world2tex * (polygon->Vwor(i) - pl->v_world2tex);
     rp[i].x=(projector.x*ww-Imin_u) / (mipmap_size)+0.5;
     rp[i].y=(projector.y*hh-Imin_v) / (mipmap_size)+0.5;
   }

@@ -351,6 +351,20 @@ void* csSector::TestQueuePolygons (csPolygonParentInt* pi,
   return sector->TestQueuePolygonArray (polygon, num, d, poly_queue);
 }
 
+//@@@ DEBUG
+//@@@int max_num_polygons = 1;
+//@@@int polygons_still_left = 1;
+
+void* csSector::TestQueuePolygonsQuad (csPolygonParentInt* pi,
+	csPolygonInt** polygon, int num, void* data)
+{
+  csRenderView* d = (csRenderView*)data;
+  csSector* sector = (csSector*)pi;
+//@@@
+//@@@if (polygons_still_left <= 0) return NULL;
+  return sector->TestQueuePolygonArrayQuad (polygon, num, d, poly_queue);
+}
+
 void csSector::DrawPolygonsFromQueue (csPolygon2DQueue* queue,
 	csRenderView* rview)
 {
@@ -486,6 +500,62 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   return true;
 }
 
+bool CullOctreeNodeQuad (csPolygonTree* tree, csPolygonTreeNode* node,
+	const csVector3& pos, void* data)
+{
+  if (!node) return false;
+  if (node->Type () != NODE_OCTREE) return true;
+  int i;
+  csOctree* otree = (csOctree*)tree;
+  csOctreeNode* onode = (csOctreeNode*)node;
+  csQuadtree* quadtree = csWorld::current_world->GetQuadtree ();
+  csRenderView* rview = (csRenderView*)data;
+  csVector3 array[6];
+  int num_array;
+  otree->GetConvexOutline (onode, pos, array, num_array);
+  if (num_array)
+  {
+    // If all vertices are behind z plane then the node is
+    // not visible.
+    int num_z_0 = 0;
+    for (i = 0 ; i < num_array ; i++)
+    {
+      array[i] = rview->Other2This (array[i]);
+      if (array[i].z < SMALL_EPSILON) num_z_0++;
+    }
+    if (num_z_0 == num_array)
+    {
+      // Node behind camera.
+      count_cull_node_notvis_behind++;
+      return false;
+    }
+
+    // Quadtree test.
+    if (!quadtree->TestPolygon (array, num_array))
+    {
+      count_cull_node_notvis_cbuffer++;
+      return false;
+    }
+  }
+  count_cull_node_vis++;
+  // If a node is visible we check wether or not it has a minibsp.
+  // If it has a minibsp then we need to transform all vertices used
+  // by that minibsp to camera space.
+  csVector3* cam;
+  int* indices;
+  int num_indices;
+  if (onode->GetMiniBspVerts ())
+  {
+    csPolygonSet* pset = (csPolygonSet*)(otree->GetParent ());
+    cam = pset->GetCameraVertices ();
+    indices = onode->GetMiniBspVerts ();
+    num_indices = onode->GetMiniBspNumVerts ();
+    for (i = 0 ; i < num_indices ; i++)
+      cam[indices[i]] = rview->Other2This (pset->Vwor (indices[i]));
+  }
+  return true;
+}
+
 void csSector::Draw (csRenderView& rview)
 {
   draw_busy++;
@@ -531,7 +601,8 @@ void csSector::Draw (csRenderView& rview)
   int num_sprite_queue = 0;
 
   csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
-  if (c_buffer)
+  csQuadtree* quadtree = csWorld::current_world->GetQuadtree ();
+  if (c_buffer || quadtree)
   {
     // @@@ We should make a pool for queues. The number of queues allocated
     // at the same time is bounded by the recursion through portals. So a
@@ -558,17 +629,12 @@ void csSector::Draw (csRenderView& rview)
       CHK (poly_queue = new csPolygon2DQueue (GetNumPolygons ()+
       	static_thing->GetNumPolygons ()));
       static_thing->UpdateTransformation ();
-//count_cull_node_notvis_behind = 0;
-//count_cull_node_vis_cutzplane = 0;
-//count_cull_node_notvis_cbuffer = 0;
-//count_cull_node_vis = 0;
-      static_tree->Front2Back (rview.GetOrigin (), &TestQueuePolygons,
-      	(void*)&rview, CullOctreeNode, (void*)&rview);
-//printf ("-(behind)=%d -(cbuffer)=%d +(cutzplane)=%d +(vis)=%d\n",
-//count_cull_node_notvis_behind,
-//count_cull_node_notvis_cbuffer,
-//count_cull_node_vis_cutzplane,
-//count_cull_node_vis);
+      if (c_buffer)
+        static_tree->Front2Back (rview.GetOrigin (), &TestQueuePolygons,
+      	  (void*)&rview, CullOctreeNode, (void*)&rview);
+      else
+        static_tree->Front2Back (rview.GetOrigin (), &TestQueuePolygonsQuad,
+      	  (void*)&rview, CullOctreeNodeQuad, (void*)&rview);
 
       if (sprites.Length () > 0)
       {
@@ -592,7 +658,11 @@ void csSector::Draw (csRenderView& rview)
       CHK (poly_queue = new csPolygon2DQueue (GetNumPolygons ()));
     }
     csPolygon2DQueue* queue = poly_queue;
-    TestQueuePolygons ((csPolygonParentInt*)this, polygons, num_polygon,
+    if (c_buffer)
+      TestQueuePolygons ((csPolygonParentInt*)this, polygons, num_polygon,
+    	(void*)&rview);
+    else
+      TestQueuePolygonsQuad ((csPolygonParentInt*)this, polygons, num_polygon,
     	(void*)&rview);
     DrawPolygonsFromQueue (queue, &rview);
     CHK (delete queue);
@@ -858,16 +928,16 @@ void* csSector::CalculateLightingPolygons (csPolygonParentInt*,
 {
   csPolygon3D* p;
   csLightView* lview = (csLightView*)data;
+  csVector3& center = lview->light_frustrum->GetOrigin ();
   int i, j;
   for (i = 0 ; i < num ; i++)
   {
     p = (csPolygon3D*)polygon[i];
     if (p->GetUnsplitPolygon ()) p = (csPolygon3D*)(p->GetUnsplitPolygon ());
-    p->CamUpdate ();
 
     csVector3 poly[50];	// @@@ HARDCODED! BAD!
     for (j = 0 ; j < p->GetNumVertices () ; j++)
-      poly[j] = p->Vcam (j);
+      poly[j] = p->Vwor (j)-center;
     if (p->GetPortal ())
     {
       p->CalculateLighting (lview);
@@ -922,11 +992,10 @@ void* CalculateLightingPolygonsFB (csPolygonParentInt*,
   for (i = 0 ; i < num ; i++)
   {
     p = (csPolygon3D*)polygon[i];
-    p->CamUpdate ();
 
     csVector3 poly[50];	// @@@ HARDCODED! BAD!
     for (j = 0 ; j < p->GetNumVertices () ; j++)
-      poly[j] = p->Vcam (j);
+      poly[j] = p->Vwor (j)-center;
     bool vis = false;
     if (p->GetPortal ())
       vis = qc->TestPolygon (poly, p->GetNumVertices ());
@@ -1147,7 +1216,6 @@ void csSector::CalculateLighting (csLightView& lview)
   // the position of the light (position of the light becomes
   // the new origin).
   csVector3& center = lview.light_frustrum->GetOrigin ();
-  UpdateTransformation (center);
 
   // Check if gouraud shading needs to be updated.
   if (light_frame_number != current_light_frame_number)

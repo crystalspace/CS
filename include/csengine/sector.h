@@ -109,6 +109,13 @@ private:
 
   /**
    * This function is called by the BSP tree traversal routine
+   * to test polygons against the quadtree and add them to a queue if needed.
+   */
+  static void* TestQueuePolygonsQuad (csPolygonParentInt*, csPolygonInt** polygon,
+  	int num, void* data);
+
+  /**
+   * This function is called by the BSP tree traversal routine
    * to update the lighting for a number of polygons.
    */
   static void* CalculateLightingPolygons (csPolygonParentInt*, csPolygonInt** polygon,

@@ -1044,7 +1044,7 @@ static bool CommandHandler (char *cmd, char *arg)
     Sys->Printf (MSG_CONSOLE, " picklight, droplight, colldet, stats, hi, frustrum\n");
     Sys->Printf (MSG_CONSOLE, " fps, perftest, capture, coordshow, zbuf, freelook\n");
     Sys->Printf (MSG_CONSOLE, " map, fire, debug0, debug1, debug2, edges, p_alpha, s_fog\n");
-    Sys->Printf (MSG_CONSOLE, " snd_play, snd_volume, do_gravity, cbuffer\n");
+    Sys->Printf (MSG_CONSOLE, " snd_play, snd_volume, do_gravity, cbuffer, quadtree\n");
     Sys->Printf (MSG_CONSOLE, " addbot, delbot, loadsprite, addsprite, addskel, addghost\n");
     Sys->Printf (MSG_CONSOLE, " step_forward, step_backward, strafe_left, strafe_right\n");
     Sys->Printf (MSG_CONSOLE, " look_up, look_down, rotate_left, rotate_right, jump, move3d\n");
@@ -1097,6 +1097,12 @@ static bool CommandHandler (char *cmd, char *arg)
     bool en = Sys->world->GetCBuffer () != NULL;
     Command::change_boolean (arg, &en, "cbuffer");
     Sys->world->EnableCBuffer (en);
+  }
+  else if (!strcasecmp (cmd, "quadtree"))
+  {
+    bool en = Sys->world->GetQuadtree () != NULL;
+    Command::change_boolean (arg, &en, "quadtree");
+    Sys->world->EnableQuadtree (en);
   }
   else if (!strcasecmp (cmd, "freelook"))
   {

@@ -1588,10 +1588,10 @@ void csPolygon3D::CalculateLighting (csLightView* lview)
   int j;
   if (lview->mirror)
     for (j = 0 ; j < num_vertices ; j++)
-      poly[j] = Vcam (num_vertices-j-1);
+      poly[j] = Vwor (num_vertices-j-1)-center;
   else
     for (j = 0 ; j < num_vertices ; j++)
-      poly[j] = Vcam (j);
+      poly[j] = Vwor (j)-center;
   new_light_frustrum = light_frustrum->Intersect (poly, num_vertices);
 
   if (new_light_frustrum)

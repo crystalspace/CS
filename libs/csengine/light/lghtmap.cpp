@@ -399,13 +399,16 @@ bool csLightMap::ReadFromCache (int w, int h, int lms, csPolygonSet* owner,
     ls.dist = convert_endian (ls.dist);
 
     light = world->FindLight (ls.x, ls.y, ls.z, ls.dist);
-    if (light->GetType () == csStatLight::Type() && poly)
+    if (light)
     {
-      csStatLight* slight = (csStatLight*)light;
-      slight->RegisterPolygon (poly);
+      if (light->GetType () == csStatLight::Type() && poly)
+      {
+        csStatLight* slight = (csStatLight*)light;
+        slight->RegisterPolygon (poly);
+      }
+      csShadowMap* smap = NewShadowMap (light, w, h, lms);
+      memcpy (smap->map, d, lm_size);
     }
-    csShadowMap* smap = NewShadowMap (light, w, h, lms);
-    memcpy (smap->map, d, lm_size);
     d += lm_size;
   }
 

@@ -816,6 +816,10 @@ int FindSectors (csVector3 v, csVector3 d, csSector *s, csSector **sa)
     {
       if (p->GetPlane ()->SquaredDistance (v) < size)
       {
+        if (Sys->do_infinite && !portal->GetSector ())
+	{
+	  ((InfPortalCS*)portal)->ConnectNewSector ();
+	}
         sa[c] = portal->GetSector ();
         c++;
       }
@@ -1433,8 +1437,8 @@ int main (int argc, char* argv[])
     // Load the "standard" library
     csLoader::LoadLibraryFile (world, "/lib/std/library");
 
-    //Find the Crystal Space logo and set the renderer Flag to for_2d, to allow
-    //the use in the 2D part.
+    // Find the Crystal Space logo and set the renderer Flag to for_2d, to allow
+    // the use in the 2D part.
     csTextureList *texlist = world->GetTextures ();
     ASSERT(texlist);
     csTextureHandle *texh = texlist->GetTextureMM ("cslogo.gif");
@@ -1447,7 +1451,7 @@ int main (int argc, char* argv[])
     // prepare the lightmaps for the 3D rasterizer.
     world->Prepare (Gfx3D);
 
-    //Create a 2D sprite for the Logo
+    // Create a 2D sprite for the Logo.
     if (texh)
     {
       int w, h;
@@ -1525,7 +1529,6 @@ int main (int argc, char* argv[])
   if (Sys->auto_script)
     Command::start_script (Sys->auto_script);
 
-  //TestFrustrum ();
   // The main loop.
   Sys->Loop ();
 
