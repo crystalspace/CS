@@ -439,13 +439,13 @@ class awsEmbeddedComponentFactory : public iAwsComponentFactory
     iAws *WindowManager() { return wmgr; }
 
     /// Registers this factory with the window manager
-    virtual void Register(char *type)
+    virtual void Register(const char *type)
     {
       wmgr->RegisterComponentFactory(this, type);
     }
 
     /// Registers constants for the parser so that we can construct right.
-    virtual void RegisterConstant(char *name, int value)
+    virtual void RegisterConstant(const char *name, int value)
     {
       wmgr->GetPrefMgr()->RegisterConstant(name, value);
     }
