@@ -1,3 +1,9 @@
+crystalspace-data (0.96-3) unstable; urgency=low
+
+  * Create CrystalSpace submenu (Closes: bug#196131)
+
+ -- Christian Bayle <bayle@debian.org>  Tue, 24 Jun 2003 23:27:11 +0200
+
 crystalspace-data (0.96-2) unstable; urgency=low
 
   * New upstream datas

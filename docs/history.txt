@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+09-Jul-2003
+	- Christian Bayle made some correction for debian build 
 15-Apr-2003
 	- Release of 0.96r004.
 14-Apr-2003

@@ -26,7 +26,7 @@ $(BUILDDIR)/wget-stamp: $(LEVELS)
 
 %.zip:
 	@cd $(BUILDDIR)/crystalspace-data-$(VERSION)/data; wget -nc -nd -nH $(SITE)/$@
-	cp ../../../homepage/img/$(shell basename $@ '.zip' ).jpg $(BUILDDIR)/crystalspace-data-$(VERSION)/data
+	-cp ../../../homepage/img/$(shell basename $@ '.zip' ).jpg $(BUILDDIR)/crystalspace-data-$(VERSION)/data
 
 %.avi:
 	@cd $(BUILDDIR)/crystalspace-data-$(VERSION)/data; wget -nc -nd -nH $(SITE)/$@

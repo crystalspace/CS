@@ -9,8 +9,8 @@ for name in dmburg maze newsky room sydney #jngtest mazedex
 do
 	cat >> $CURDIR/debian/crystalspace-data.menu <<-FIN
 ?package(crystalspace-data):needs=X11 \\
-  section="Games/Arcade"\\
-  hints="CrystalSpace,Levels,$videotype"\\
+  section="Games/Arcade/CrystalSpace"\\
+  hints="Levels,$videotype"\\
   title="Walktest $name $videotype" \\
   command="/usr/games/walktest -relight -video=$videotype $name"\\
   icon="/usr/share/pixmaps/$name.xpm"
@@ -19,8 +19,8 @@ done
 
 cat >> $CURDIR/debian/crystalspace-data.menu <<-FIN
 ?package(crystalspace-data):needs=X11 \\
-  section="Games/Arcade"\\
-  hints="CrystalSpace,Demos,$videotype"\\
+  section="Games/Arcade/CrystalSpace"\\
+  hints="Demos,$videotype"\\
   title="CSdemo $videotype" \\
   command="/usr/games/csdemo -video=$videotype"\\
   icon="/usr/share/pixmaps/demodata.xpm"
