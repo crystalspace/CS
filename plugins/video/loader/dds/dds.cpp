@@ -72,7 +72,7 @@ bool Loader::ProbeDXT1Alpha (const uint8* source, int w, int h, int depth,
 
 void Loader::DecompressDXT1 (csRGBpixel* buffer, const uint8* source, 
 			     int Width, int Height, int depth, 
-			     uint32 planesize)
+			     size_t planesize)
 {
   int          x, y, z, i, j, k, Select;
   unsigned char *Temp;
@@ -156,7 +156,7 @@ void Loader::DecompressDXT1 (csRGBpixel* buffer, const uint8* source,
 }
 
 void Loader::DecompressDXT2(csRGBpixel* buffer, const uint8* source, int width,
-			    int height, int depth, uint32 planesize)
+			    int height, int depth, size_t planesize)
 {
   // Can do color & alpha same as dxt3, but color is pre-multiplied
   // so the result will be wrong unless corrected.
@@ -171,7 +171,7 @@ struct DXTAlphaBlockExplicit
 
 void Loader::DecompressDXT3(csRGBpixel* buffer, const uint8* source,
 			    int Width, int Height, int depth, 
-			    uint32 planesize)
+			    size_t planesize)
 {
   int           x, y, z, i, j, k, Select;
   unsigned char *Temp;
@@ -258,7 +258,7 @@ void Loader::DecompressDXT3(csRGBpixel* buffer, const uint8* source,
 
 void Loader::DecompressDXT4 (csRGBpixel* buffer, const uint8* source, 
 			     int width, int height, int depth, 
-			     uint32 planesize)
+			     size_t planesize)
 {
   // Can do color & alpha same as dxt5, but color is pre-multiplied
   // so the result will be wrong unless corrected.
@@ -268,7 +268,7 @@ void Loader::DecompressDXT4 (csRGBpixel* buffer, const uint8* source,
 
 void Loader::DecompressDXT5 (csRGBpixel* buffer, const uint8* source, 
 			     int Width, int Height, int depth, 
-			     uint32 planesize)
+			     size_t planesize)
 {
   int             x, y, z, i, j, k, Select;
   const uint8     *Temp;
