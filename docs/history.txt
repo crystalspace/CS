@@ -22,8 +22,15 @@ The history order has been reversed so that new features are at the top.
 	- Andrew also removed the unneeded inclusion of lightdef.h from
 	  3D renderers. lightdef.h should go into include/csengine in the
 	  end.
+	- Andrew added a small NULL 3D renderer for use with simple CSWS
+	  programs. It contains a full-featured texture manager and
+	  displays only 2D pixmaps, the DrawPoly* functions are empty.
+	  It is very small and is useful if you want to statically link
+	  in a small project that makes use of CSWS.
 	- Norman Kramer did a coding style change to csTreeNode.
 	- Norman fixed glide renderer after Jorrit broke it yesterday.
+	- Norman added ForceFullRedraw() to CSWS for integration of CSWS
+	  into usual 3D programs.
 25-Jun-2000
 	- New tree control in CSWS from Norman Kramer.
 	- Did an experiment for speeding up OpenGL by putting the setup
