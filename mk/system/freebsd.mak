@@ -2,7 +2,7 @@
 # settings. Also have a look at mk/user.mak.
 
 # Choose which drivers you want to build/use
-DRIVERS=cs2d/x2d cs3d/software csnetdrv/null csnetman/null csnetman/simple \
+DRIVERS=cs2d/softx cs3d/software csnetdrv/null csnetman/null csnetman/simple \
   cssnddrv/null cssndrdr/null cssndrdr/software
 
 #---------------------------------------------------- rootdefines & defines ---#
@@ -85,9 +85,10 @@ LFLAGS.DLL=-Wl,-shared
 
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS = libs/cssys/unix/unix.cpp libs/cssys/unix/loadlib.cpp \
-  libs/cssys/general/printf.cpp libs/cssys/unix/timing.cpp \
-  support/general/fopen.cpp \
+  libs/cssys/general/printf.cpp libs/cssys/unix/utiming.cpp \
+  libs/cssys/general/fopen.cpp \
   support/gnu/getopt.c support/gnu/getopt1.c
+SRC.SYS_CSSYS_DLL = libs/cssys/unix/dummy.cpp
 
 # Where to put the dynamic libraries on this system?
 OUTDLL=
