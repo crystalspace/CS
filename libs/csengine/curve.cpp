@@ -189,9 +189,7 @@ void csCurve::CalculateLighting (csLightView& lview)
   UByte* mapB = map.mapB;
   csStatLight* light = (csStatLight*)lview.l;
 
-  float r200d = lview.r * NORMAL_LIGHT_LEVEL / light->GetRadius ();
-  float g200d = lview.g * NORMAL_LIGHT_LEVEL / light->GetRadius ();
-  float b200d = lview.b * NORMAL_LIGHT_LEVEL / light->GetRadius ();
+  csColor color = csColor (lview.r, lview.g, lview.b) * NORMAL_LIGHT_LEVEL;
   int l1, l2, l3;
 
   float cosfact = csPolyTexture::cfg_cosinus_factor;
@@ -219,21 +217,24 @@ void csCurve::CalculateLighting (csLightView& lview)
       cosinus += cosfact;
       if (cosinus < 0) cosinus = 0;
       else if (cosinus > 1) cosinus = 1;
+
+      float brightness = cosinus * light->GetBrightnessAtDistance (d);
+
       if (lview.r > 0)
       {
-        l1 = mapR[uv] + QRound (cosinus * r200d*(light->GetRadius () - d));
+        l1 = mapR[uv] + QRound (color.red * brightness);
         if (l1 > 255) l1 = 255;
         mapR[uv] = l1;
       }
       if (lview.g > 0 && mapG)
       {
-        l2 = mapG[uv] + QRound (cosinus * g200d*(light->GetRadius () - d));
+        l2 = mapG[uv] + QRound (color.green * brightness);
         if (l2 > 255) l2 = 255;
         mapG[uv] = l2;
       }
       if (lview.b > 0 && mapB)
       {
-        l3 = mapB[uv] + QRound (cosinus * b200d*(light->GetRadius () - d));
+        l3 = mapB[uv] + QRound (color.blue * brightness);
         if (l3 > 255) l3 = 255;
         mapB[uv] = l3;
       }

@@ -37,14 +37,17 @@ int csLight::ambient_white = DEFAULT_LIGHT_LEVEL;
 
 CSOBJTYPE_IMPL(csLight,csObject);
 
-csLight::csLight (float x, float y, float z, float dist,
+csLight::csLight (float x, float y, float z, float d,
 	      float red, float green, float blue) : csObject()
 {
   center.x = x;
   center.y = y;
   center.z = z;
-  csLight::dist = dist;
-  csLight::sqdist = dist*dist;
+
+  dist = d;
+  sqdist = d * d;
+  inv_dist = 1 / d;
+
   color.red = red;
   color.green = green;
   color.blue = blue;
@@ -54,10 +57,24 @@ csLight::csLight (float x, float y, float z, float dist,
   halo_max_intensity = 1.0f;
   halo_ref_count = 0;
   in_halo_queue = false;
+
+  attenuation = CS_ATTN_LINEAR;
 }
 
 csLight::~csLight ()
 {
+}
+
+float csLight::GetBrightnessAtDistance (float d)
+{
+  switch (attenuation)
+  {
+    case CS_ATTN_NONE      : return 1;
+    case CS_ATTN_LINEAR    : return 1 - d * inv_dist;
+    case CS_ATTN_INVERSE   : return 1 / d;
+    case CS_ATTN_REALISTIC : return 1 / (d*d);
+  }
+  return 0;
 }
 
 void csLight::CorrectForNocolor (unsigned char* rp, unsigned char* gp,

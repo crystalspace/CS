@@ -731,9 +731,7 @@ void csPolyTexture::FillLightMap (csLightView& lview)
     DB ((MSG_DEBUG_0, "frust+lcenter:(%f,%f,%f)\n", frustrum[mi].x+light_frustrum->GetOrigin ().x, frustrum[mi].y+light_frustrum->GetOrigin ().y, frustrum[mi].z+light_frustrum->GetOrigin ().z));
   }
 
-  float r200d = lview.r * NORMAL_LIGHT_LEVEL / light->GetRadius ();
-  float g200d = lview.g * NORMAL_LIGHT_LEVEL / light->GetRadius ();
-  float b200d = lview.b * NORMAL_LIGHT_LEVEL / light->GetRadius ();
+  csColor color = csColor (lview.r, lview.g, lview.b) * NORMAL_LIGHT_LEVEL;
 
   __texture_width=lw;
   __texture=(float*)calloc(lh*lw,sizeof(float));
@@ -840,7 +838,8 @@ void csPolyTexture::FillLightMap (csLightView& lview)
           d = csSquaredDist::PointPoint (lview.light_frustrum->GetOrigin (), v2);
           DB ((MSG_DEBUG_0, "    -> In viewing frustrum (distance %f compared with radius %f)\n", sqrt (d), light->GetRadius ()));
 
-	  if (d >= light->GetSquaredRadius ()) continue;
+          if (d >= light->GetSquaredRadius ()) continue;
+
 	  d = sqrt (d);
           DB ((MSG_DEBUG_0, "    -> *** HIT ***\n"));
 
@@ -855,8 +854,10 @@ void csPolyTexture::FillLightMap (csLightView& lview)
 	  cosinus += cosfact;
 	  if (cosinus < 0) cosinus = 0;
 	  else if (cosinus > 1) cosinus = 1;
+
 	  if (dyn)
 	  {
+          //@@@ (Note from Seth): What the heck is all this?
 	    dl = NORMAL_LIGHT_LEVEL/light->GetRadius ();
 	    l1 = l1 + QInt (lightness*QRound (cosinus * (NORMAL_LIGHT_LEVEL - d*dl)));
 	    if (l1 > 255) l1 = 255;
@@ -864,21 +865,23 @@ void csPolyTexture::FillLightMap (csLightView& lview)
 	  }
 	  else
 	  {
+          float brightness = cosinus * light->GetBrightnessAtDistance (d);
+
 	    if (lview.r > 0)
 	    {
-	      l1 = l1 + QInt (lightness*QRound (cosinus * r200d*(light->GetRadius () - d)));
+	      l1 = l1 + QInt (lightness*QRound (color.red * brightness));
 	      if (l1 > 255) l1 = 255;
 	      mapR[uv] = l1;
 	    }
 	    if (lview.g > 0 && mapG)
 	    {
-	      l2 = mapG[uv] + QInt (lightness*QRound (cosinus * g200d*(light->GetRadius () - d)));
+	      l2 = mapG[uv] + QInt (lightness*QRound (color.green * brightness));
 	      if (l2 > 255) l2 = 255;
 	      mapG[uv] = l2;
 	    }
 	    if (lview.b > 0 && mapB)
 	    {
-	      l3 = mapB[uv] + QInt (lightness*QRound (cosinus * b200d*(light->GetRadius () - d)));
+	      l3 = mapB[uv] + QInt (lightness*QRound (color.blue * brightness));
 	      if (l3 > 255) l3 = 255;
 	      mapB[uv] = l3;
 	    }
@@ -1001,15 +1004,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
     }
   }
 
-  //float r200d = lview.r * NORMAL_LIGHT_LEVEL / light->GetRadius ();
-  //float g200d = lview.g * NORMAL_LIGHT_LEVEL / light->GetRadius ();
-  //float b200d = lview.b * NORMAL_LIGHT_LEVEL / light->GetRadius ();
-  float r = light->GetColor ().red;
-  float g = light->GetColor ().green;
-  float b = light->GetColor ().blue;
-  float r200d = r * NORMAL_LIGHT_LEVEL / light->GetRadius ();
-  float g200d = g * NORMAL_LIGHT_LEVEL / light->GetRadius ();
-  float b200d = b * NORMAL_LIGHT_LEVEL / light->GetRadius ();
+  csColor color = light->GetColor () * NORMAL_LIGHT_LEVEL;
 
   int new_lw = lm->GetWidth ();
 
@@ -1150,6 +1145,7 @@ b:      if (scanL2 == MinIndex) goto finish;
           d = csSquaredDist::PointPoint (light->GetCenter (), v2);
 
     if (d >= light->GetSquaredRadius ()) continue;
+
     d = sqrt (d);
 
     //@@@ This is only right if we don't allow reflections for dynamic lights
@@ -1158,9 +1154,12 @@ b:      if (scanL2 == MinIndex) goto finish;
     cosinus += cosfact;
     if (cosinus < 0) cosinus = 0;
     else if (cosinus > 1) cosinus = 1;
-    if (r > 0)
+
+    float brightness = cosinus * light->GetBrightnessAtDistance (d);
+
+    if (color.red > 0)
     {
-      l1 = QRound (cosinus*r200d*(light->GetRadius () - d));
+      l1 = QRound (color.red * brightness);
       if (l1)
       {
         l1 += mapR[uv];
@@ -1168,9 +1167,9 @@ b:      if (scanL2 == MinIndex) goto finish;
         mapR[uv] = l1;
       }
     }
-    if (g > 0 && mapG)
+    if (color.green > 0 && mapG)
     {
-      l2 = QRound (cosinus*g200d*(light->GetRadius () - d));
+      l2 = QRound (color.green * brightness);
       if (l2)
       {
         l2 += mapG[uv];
@@ -1178,9 +1177,9 @@ b:      if (scanL2 == MinIndex) goto finish;
         mapG[uv] = l2;
       }
     }
-    if (b > 0 && mapB)
+    if (color.blue > 0 && mapB)
     {
-      l3 = QRound (cosinus*b200d*(light->GetRadius () - d));
+      l3 = QRound (color.blue * brightness);
       if (l3)
       {
         l3 += mapB[uv];

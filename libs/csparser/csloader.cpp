@@ -69,6 +69,7 @@ TOKEN_DEF_START
   TOKEN_DEF (ACTIVATE)
   TOKEN_DEF (ACTIVE)
   TOKEN_DEF (ALPHA)
+  TOKEN_DEF (ATTENUATION)
   TOKEN_DEF (BECOMING_ACTIVE)
   TOKEN_DEF (BECOMING_INACTIVE)
   TOKEN_DEF (BEZIER)
@@ -592,6 +593,7 @@ csCollection* csLoader::load_collection (char* name, csWorld* w, char* buf)
 csStatLight* csLoader::load_statlight (char* buf)
 {
   TOKEN_TABLE_START(commands)
+    TOKEN_TABLE (ATTENUATION)
     TOKEN_TABLE (CENTER)
     TOKEN_TABLE (RADIUS)
     TOKEN_TABLE (DYNAMIC)
@@ -603,8 +605,8 @@ csStatLight* csLoader::load_statlight (char* buf)
   char* params;
 
   LoadStat::lights_loaded++;
-  float x, y, z, dist, r, g, b;
-  int dyn;
+  float x, y, z, dist = 0, r, g, b;
+  int dyn, attenuation = CS_ATTN_LINEAR;
   bool halo = false;
 
   if (strchr (buf, ':'))
@@ -640,6 +642,13 @@ csStatLight* csLoader::load_statlight (char* buf)
         case TOKEN_HALO:
           halo = true;
           break;
+        case TOKEN_ATTENUATION:
+          char str [100];
+          ScanStr (params, "%s", str);
+          if (strcmp (str, "none")      == 0) attenuation = CS_ATTN_NONE;
+          if (strcmp (str, "linear")    == 0) attenuation = CS_ATTN_LINEAR;
+          if (strcmp (str, "inverse")   == 0) attenuation = CS_ATTN_INVERSE;
+          if (strcmp (str, "realistic") == 0) attenuation = CS_ATTN_REALISTIC;
       }
     }
     if (cmd == PARSERR_TOKENNOTFOUND)
@@ -649,8 +658,24 @@ csStatLight* csLoader::load_statlight (char* buf)
     }
   }
 
+  // implicit radius
+  if (dist == 0)
+  {
+    if (r > g && r > b) dist = r;
+    else if (g > b) dist = g;
+    else dist = b;
+    switch (attenuation)
+    {
+      case CS_ATTN_NONE      : dist = 100000000; break;
+      case CS_ATTN_LINEAR    : break;
+      case CS_ATTN_INVERSE   : dist = 16 * sqrt (dist); break;
+      case CS_ATTN_REALISTIC : dist = 256 * dist; break;
+    }
+  }
+
   CHK (csStatLight* l = new csStatLight (x, y, z, dist, r, g, b, dyn));
   if (halo) l->SetFlags (CS_LIGHT_HALO, CS_LIGHT_HALO);
+  l -> SetAttenuation (attenuation);
   return l;
 }
 

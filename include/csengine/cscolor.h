@@ -38,6 +38,9 @@ public:
   /// Initialize a color object with given R,G,B components
   csColor (float r, float g, float b)
   { red = r; green = g; blue = b; }
+  /// Initialize a color object with an existing color
+  csColor (csColor &c)
+  { red = c.red; green = c.green; blue = c.blue; }
   /// Set color to given R,G,B components
   void Set (float r, float g, float b)
   { red = r; green = g; blue = b; }
@@ -47,6 +50,12 @@ public:
   /// Assign one color object to another
   inline void operator= (const csColor &Copy)
   { red = Copy.red; green = Copy.green; blue = Copy.blue; }
+  /// Multiply this color by a scalar value
+  inline csColor operator* (float f)
+  { return csColor (red * f, green * f, blue * f); }
+  /// Multiply this color by a scalar value
+  inline void operator*= (float f)
+  { red *= f; green *= f; blue *= f; }
 };
 
 #endif /*CSCOLOR_H*/

@@ -1162,16 +1162,12 @@ void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights, csVector3* 
   GetObjectBoundingBox (obox);
   csVector3 obj_center = (obox.Min () + obox.Max ()) / 2;
   csVector3 wor_center = m_obj2world * obj_center - v_obj2world;
+  csColor color;
 
   for (i = 0 ; i < num_lights ; i++)
   {
-    csColor &light_color = lights [i]->GetColor ();
-    float light_radius = lights [i]->GetRadius ();
+    csColor &light_color = lights [i]->GetColor () * (256. / NORMAL_LIGHT_LEVEL);
     float sq_light_radius = lights [i]->GetSquaredRadius ();
-    float inv_light_radius = (256. / NORMAL_LIGHT_LEVEL) / light_radius;
-    float r2 = light_color.red   * inv_light_radius;
-    float g2 = light_color.green * inv_light_radius;
-    float b2 = light_color.blue  * inv_light_radius;
 
     // Compute light position in object coordinates
     csVector3 wor_light_pos = lights [i]->GetCenter ();
@@ -1195,21 +1191,11 @@ void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights, csVector3* 
 
       if (cosinus > 0)
       {
+        color = light_color;
         if (obj_sq_dist >= SMALL_EPSILON)
-	  cosinus /= obj_dist;
-        csColor color;
-        if (cosinus >= 1)
-          color.Set (
-            light_color.red   * (256. / NORMAL_LIGHT_LEVEL),
-            light_color.green * (256. / NORMAL_LIGHT_LEVEL),
-            light_color.blue  * (256. / NORMAL_LIGHT_LEVEL));
-        else
-        {
-          cosinus *= light_radius - wor_dist;
-          color.red   = cosinus * r2;
-          color.green = cosinus * g2;
-          color.blue  = cosinus * b2;
-        }
+          cosinus /= obj_dist;
+        if (cosinus < 1)
+          color *= cosinus * lights[i]->GetBrightnessAtDistance (wor_dist);
         AddVertexColor (j, color);
       }
     }
@@ -1223,16 +1209,12 @@ void csSprite3D::UpdateLightingHQ (csLight** lights, int num_lights, csVector3* 
 {
   int i, j;
   csFrame* this_frame = cur_action->GetFrame (cur_frame);
+  csColor color;
 
   for (i = 0 ; i < num_lights ; i++)
   {
-    csColor &light_color = lights [i]->GetColor ();
-    float light_radius = lights [i]->GetRadius ();
+    csColor &light_color = lights [i]->GetColor () * (256. / NORMAL_LIGHT_LEVEL);
     float sq_light_radius = lights [i]->GetSquaredRadius ();
-    float inv_light_radius = (256. / NORMAL_LIGHT_LEVEL) / light_radius;
-    float r2 = light_color.red   * inv_light_radius;
-    float g2 = light_color.green * inv_light_radius;
-    float b2 = light_color.blue  * inv_light_radius;
 
     // Compute light position in object coordinates
     csVector3 wor_light_pos = lights [i]->GetCenter ();
@@ -1258,21 +1240,11 @@ void csSprite3D::UpdateLightingHQ (csLight** lights, int num_lights, csVector3* 
 
       if ((cosinus > 0) && (wor_sq_dist < sq_light_radius))
       {
+        color = light_color;
         if (obj_sq_dist >= SMALL_EPSILON)
-	  cosinus /= sqrt (obj_sq_dist);
-        csColor color;
-        if (cosinus >= 1)
-          color.Set (
-            light_color.red   * (256. / NORMAL_LIGHT_LEVEL),
-            light_color.green * (256. / NORMAL_LIGHT_LEVEL),
-            light_color.blue  * (256. / NORMAL_LIGHT_LEVEL));
-        else
-        {
-          cosinus *= light_radius - sqrt (wor_sq_dist);
-          color.red   = cosinus * r2;
-          color.green = cosinus * g2;
-          color.blue  = cosinus * b2;
-        }
+          cosinus /= sqrt (obj_sq_dist);
+        if (cosinus < 1)
+          color *= cosinus * lights[i]->GetBrightnessAtDistance (sqrt (wor_sq_dist));
         AddVertexColor (j, color);
       }
     }

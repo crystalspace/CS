@@ -47,6 +47,21 @@ class csLightPatchPool;
 #define CS_LIGHT_HALO 2
 
 /**
+ * Attenuation controls how the brightness of a light fades with distance.
+ * There are four attenuation formulas:
+ * <ul>
+ *   <li> no attenuation = light * 1
+ *   <li> linear attenuation = light * (radius - distance) / radius
+ *   <li> inverse attenuation = light * (radius / distance)
+ *   <li> realistic attenuation = light * (radius^2 / distance^2)
+ * </ul>
+ */
+#define CS_ATTN_NONE      0
+#define CS_ATTN_LINEAR    1
+#define CS_ATTN_INVERSE   2
+#define CS_ATTN_REALISTIC 3
+
+/**
  * Superclass of all positional lights.
  * A light subclassing from this has a color, a position
  * and a radius.<P>
@@ -83,6 +98,8 @@ protected:
   float dist;
   /// Squared radius of light.
   float sqdist;
+  /// Inverse radius of light.
+  float inv_dist;
   /// Color.
   csColor color;
 
@@ -97,6 +114,9 @@ protected:
 
   /// Set of flags
   ULong flags;
+
+  /// Attenuation type
+  int attenuation;
 
 public:
   /// Config value: ambient red value.
@@ -160,6 +180,11 @@ public:
   float GetSquaredRadius () const { return sqdist; }
 
   /**
+   * Get the inverse radius.
+   */
+  float GetInverseRadius () const { return inv_dist; }
+
+  /**
    * Get the light color.
    */
   csColor& GetColor () { return color; }
@@ -216,7 +241,22 @@ public:
    * Query if the halo is in the queue.
    */
   bool GetHaloInQueue () const { return in_halo_queue; }
-  
+
+  /**
+   * Get the light's attenuation type
+   */
+  int GetAttenuation () {return attenuation;}
+
+  /**
+   * Change the light's attenuation type
+   */
+  void SetAttenuation (int a) {attenuation = a;}
+
+  /**
+   * Change the light's attenuation type
+   */
+  float GetBrightnessAtDistance (float d);
+
   /**
    * Change the given r, g, b value to the current mixing mode
    * (TRUE_RGB or NOCOLOR). In NOCOLOR mode this function will
@@ -231,7 +271,7 @@ public:
    * take the average of the three colors to return a grayscale
    * value.
    */
-  static void CorrectForNocolor (float* rp, float* gp, float* bp);
+  static void CorrectForNocolor (float* rp, float* gp, float* bp);  
 
   CSOBJTYPE;
 };
@@ -533,7 +573,7 @@ public:
    * Resize the light. This will NOT automatically recalculate the
    * view frustrum. You still need to call Setup() after this.
    */
-  void Resize (float radius) { dist = radius; sqdist = dist*dist; }
+  void Resize (float radius) { dist = radius; sqdist = dist*dist; inv_dist = 1 / dist; }
 
   /**
    * Unlink a light patch from the light patch list.
