@@ -102,9 +102,9 @@ public:
   virtual void Reset ();
 
   /// Call this routine to add a key down event to queue
-  void do_keypress (time_t evtime, int key);
+  virtual void do_keypress (time_t evtime, int key);
   /// Call this routine to add a key up event to queue
-  void do_keyrelease (time_t evtime, int key);
+  virtual void do_keyrelease (time_t evtime, int key);
 
 protected:
   /**
@@ -167,11 +167,11 @@ public:
   int GetLastY () { return LastMouseY; }
 
   /// Call this to add a 'mouse button down' event to queue
-  void do_buttonpress (time_t evtime, int button, int x, int y, bool shift, bool alt, bool ctrl);
+  virtual void do_buttonpress (time_t evtime, int button, int x, int y, bool shift, bool alt, bool ctrl);
   /// Call this to add a 'mouse button up' event to queue
-  void do_buttonrelease (time_t evtime, int button, int x, int y);
+  virtual void do_buttonrelease (time_t evtime, int button, int x, int y);
   /// Call this to add a 'mouse moved' event to queue
-  void do_mousemotion (time_t evtime, int x, int y);
+  virtual void do_mousemotion (time_t evtime, int x, int y);
 };
 
 #endif // __CSINPUT_H__
