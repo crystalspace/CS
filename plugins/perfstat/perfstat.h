@@ -20,7 +20,7 @@
 #define __CS_PERFSTAT_H__
 
 #include "csutil/util.h"
-#include "csutil/csvector.h"
+#include "csutil/parray.h"
 #include "ivaria/perfstat.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -45,16 +45,6 @@ protected:
   // string lengths
 #define FRAME_ENTRIES 1
 
-  class FrameVector : public csVector
-  {
-  public:
-    FrameVector (int ilimit = 0, int ithreshold = 0)
-      : csVector (ilimit, ithreshold) {};
-    /// Free a single element of the array
-    virtual bool FreeItem (void* Item)
-    { delete (FrameEntry*)Item; return true; }
-  };
-
   //-----------------------------------------------------------------------
   /// Structure which holds general stat info
   struct StatEntry
@@ -66,15 +56,6 @@ protected:
     { delete [] buf; }
   };
 
-  class StatVector : public csVector
-  {
-  public:
-    StatVector (int ilimit = 0, int ithreshold = 0)
-      : csVector (ilimit, ithreshold) {};
-    /// Free a single element of the array
-    virtual bool FreeItem (void* Item)
-    { delete (StatEntry*)Item; return true; }
-  };
   //------------------------------------------------------------------------
 
   iObjectRegistry* object_reg;
@@ -109,9 +90,9 @@ protected:
    * Vector to hold summary information from all subsections and
    * statlog_section
    */
-  StatVector *statvec;
+  csPDelArray<StatEntry> *statvec;
   /// The vector which records stats from every resolution number of frames
-  FrameVector *framevec;
+  csPDelArray<FrameEntry> *framevec;
   /// Frame specific data
   FrameEntry *frame;
 

@@ -20,7 +20,7 @@
 #define __CS_POLYTEXT_H__
 
 #include "csgeom/math3d.h"
-#include "csutil/csvector.h"
+#include "csutil/array.h"
 #include "csutil/cscolor.h"
 #include "imesh/thing/polygon.h"
 #include "iengine/light.h"
@@ -55,7 +55,7 @@ struct csLightingPolyTexQueue : public iLightingProcessData
 {
 private:
   // Vector containing csPolygonTexture pointers.
-  csVector polytxts;
+  csArray<csPolyTexture*> polytxts;
   iLight* light;
 
 public:

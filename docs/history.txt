@@ -45,7 +45,25 @@ for each given day, however, are in normal (ascending) chronological order.
 	    - Replaced 'layers' in haze with csPDelArray<csHazeLayer>.
 	    - Replaced 'particles' in csParticleSystem with
 	      csRefArray<iParticle>.
-      - res removed csVector from the Win32 WaveOut plugin.
+	- Jorrit replaced various occurances of csVector:
+	    - Replaced 'frames' in csSpriteAction2 with csArray<csSpriteFrame*>.
+	    - Replaced 'delays' in csSpriteAction2 with csArray<int>.
+	    - Replaced 'displacements' in csSpriteAction2 with csArray<float>.
+	    - Replaced 'frames' in csSprite3DMeshObjectFactory with
+	      csPDelArray<csSpriteFrame>.
+	    - Replaced 'actions' in csSprite3DMeshObjectFactory with
+	      csPDelArray<csSpriteAction2>.
+	    - Replaced 'sockets' in csSprite3DMeshObjectFactory with
+	      csPDelArray<csSpriteSocket>.
+	    - Replaced 'polytxts' in csLightingPolyTexQueue with
+	      csArray<csPolyTexture*>.
+	    - Replaced 'sector_cb_vector' in csPortal with
+	      csRefArray<iPortalCallback*>.
+	    - Replaced 'portal_cb_vector' in csPortal with
+	      csRefArray<iPortalCallback*>.
+	    - Replaced 'framevec' in perfstat with csPDelArray<FrameEntry>.
+	    - Replaced 'statvec' in perfstat with csPDelArray<StatEntry>.
+	- res removed csVector from the Win32 WaveOut plugin.
 29-Jul-2003
 	- Jorrit made scfStringArray actually work by adding the needed
 	  SCF_CONSTRUCT stuff.

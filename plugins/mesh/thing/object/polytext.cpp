@@ -1655,7 +1655,7 @@ void csLightingPolyTexQueue::UpdateMaps (
   int i;
   for (i = 0; i < polytxts.Length (); i++)
   {
-    csPolyTexture *pt = (csPolyTexture *)polytxts[i];
+    csPolyTexture *pt = polytxts[i];
     pt->UpdateFromShadowBitmap (light, lightpos, lightcolor);
   }
 

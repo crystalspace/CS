@@ -299,11 +299,11 @@ void csPerfStats::SetOutputFile (const char *Name, bool summary)
 {
   file_name = csStrNew (Name);
   statlog_section = this;
-  statvec = new StatVector (30, 100);
+  statvec = new csPDelArray<StatEntry> (30, 100);
   if (!summary)
   {
     head_section->frame_by_frame = true;
-    head_section->framevec = new FrameVector (1000, 500);
+    head_section->framevec = new csPDelArray<FrameEntry> (1000, 500);
     WriteFrameHeader ();
   }
 }
@@ -495,7 +495,7 @@ bool csPerfStats::WriteFile ()
     return false;
 
   for (i = 0; i < statvec_num; i++)
-    total_len += ((StatEntry*)statvec->Get (i))->len;
+    total_len += statvec->Get (i)->len;
   // subtract end of file characters
   total_len -= statvec_num;
 
@@ -528,7 +528,7 @@ bool csPerfStats::WriteFile ()
     char tbuf[15];
     for (i = 0; i < framevec_num; i++)
     {
-      FrameEntry* e = (FrameEntry*)head_section->framevec->Get (i);
+      FrameEntry* e = head_section->framevec->Get (i);
       sprintf (tbuf, "\n%d", resolution*(i+1));
       memcpy (buf, tbuf, strlen (tbuf) * sizeof(char));
       sprintf (tbuf, "%f", e->fps);
@@ -544,10 +544,10 @@ bool csPerfStats::WriteFile ()
   char *buf = buffer;
 
   // Print out the main header and main summary stats first.
-  StatEntry* e = (StatEntry*)statvec->Get (statvec_num-1);
+  StatEntry* e = statvec->Get (statvec_num-1);
   strncpy (buf, e->buf, e->len - 1);
   buf += e->len - 1;
-  e = (StatEntry*)statvec->Get (statvec_num-2);
+  e = statvec->Get (statvec_num-2);
   strncpy (buf, e->buf, e->len - 1);
   buf += e->len - 1;
 
@@ -558,7 +558,7 @@ bool csPerfStats::WriteFile ()
     StatEntry* se = 0;
     if (j < (statvec_num - 2))
     {
-      se = (StatEntry*)statvec->Get (j);
+      se = statvec->Get (j);
       j++;
     }
     for (i = 0; i < framevec_num; i++)
@@ -570,7 +570,7 @@ bool csPerfStats::WriteFile ()
 	se = 0;
 	if (j < (statvec_num - 2))
 	{
-	  se = (StatEntry*)statvec->Get (j);
+	  se = statvec->Get (j);
 	  j++;
 	}
       }
@@ -584,7 +584,7 @@ bool csPerfStats::WriteFile ()
   {
     for (i = 0; i < statvec_num - 2; i++)
     {
-      StatEntry* e = (StatEntry*)statvec->Get (i);
+      StatEntry* e = statvec->Get (i);
       strncpy (buf, e->buf, e->len - 1);
       buf += e->len - 1;
     }

@@ -56,17 +56,6 @@ csPortal::~csPortal ()
   // set to 0.
   CS_ASSERT (sector == 0);
   if (filter_texture) filter_texture->DecRef ();
-  int i;
-  for (i = 0 ; i < sector_cb_vector.Length () ; i++)
-  {
-    iPortalCallback* cb = (iPortalCallback*)sector_cb_vector.Get (i);
-    cb->DecRef ();
-  }
-  for (i = 0 ; i < portal_cb_vector.Length () ; i++)
-  {
-    iPortalCallback* cb = (iPortalCallback*)portal_cb_vector.Get (i);
-    cb->DecRef ();
-  }
 }
 
 csPortal* csPortal::Clone ()
@@ -173,7 +162,7 @@ bool csPortal::CompleteSector (iBase *context)
     i = portal_cb_vector.Length ()-1;
     while (i >= 0)
     {
-      iPortalCallback* cb = (iPortalCallback*)portal_cb_vector.Get (i);
+      iPortalCallback* cb = portal_cb_vector[i];
       rc = cb->Traverse (&(this->scfiPortal), context);
       if (!rc) break;
       i--;
@@ -188,7 +177,7 @@ bool csPortal::CompleteSector (iBase *context)
     int i = sector_cb_vector.Length ()-1;
     while (i >= 0)
     {
-      iPortalCallback* cb = (iPortalCallback*)sector_cb_vector.Get (i);
+      iPortalCallback* cb = sector_cb_vector[i];
       rc = cb->Traverse (&(this->scfiPortal), context);
       if (rc == true) break;
       i--;
@@ -589,22 +578,20 @@ void csPortal::SetMirror (const csPlane3& plane)
 void csPortal::SetPortalCallback (iPortalCallback *cb)
 {
   portal_cb_vector.Push (cb);
-  cb->IncRef ();
 }
 
 iPortalCallback *csPortal::GetPortalCallback (int idx) const
 {
-  return (iPortalCallback*)portal_cb_vector.Get (idx);
+  return portal_cb_vector[idx];
 }
 
 void csPortal::SetMissingSectorCallback (iPortalCallback *cb)
 {
   sector_cb_vector.Push (cb);
-  cb->IncRef ();
 }
 
 iPortalCallback *csPortal::GetMissingSectorCallback (int idx) const
 {
-  return (iPortalCallback*)sector_cb_vector.Get (idx);
+  return sector_cb_vector[idx];
 }
 

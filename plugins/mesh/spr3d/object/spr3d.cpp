@@ -118,15 +118,15 @@ void csSpriteAction2::SetName (char const* n)
 void csSpriteAction2::AddCsFrame (csSpriteFrame * f, int d, float displacement)
 {
   frames.Push (f);
-  delays.Push ((void*)d);
-  displacements.Push ((void*)*(float **)&displacement);
+  delays.Push (d);
+  displacements.Push (displacement);
 }
 
 void csSpriteAction2::AddFrame (iSpriteFrame * f, int d, float displacement)
 {
   frames.Push ((csSpriteFrame*)f);
-  delays.Push ((void*)d);
-  displacements.Push ((void*)*(float **)&displacement);
+  delays.Push (d);
+  displacements.Push (displacement);
 }
 
 //--------------------------------------------------------------------------
@@ -159,43 +159,6 @@ void csSpriteSocket::SetName (char const* n)
   else
     name = 0;
 }
-
-//--------------------------------------------------------------------------
-
-bool csSpriteFrameVector::FreeItem (void* Item)
-{
-  delete (csSpriteFrame *) Item;
-  return true;
-}
-
-csSpriteFrameVector::~csSpriteFrameVector ()
-{
-  DeleteAll ();
-}
-
-
-bool csSpriteActionVector::FreeItem (void* Item)
-{
-  delete (csSpriteAction2 *) Item;
-  return true;
-}
-
-csSpriteActionVector::~csSpriteActionVector ()
-{
-  DeleteAll ();
-}
-
-bool csSpriteSocketVector::FreeItem (void* Item)
-{
-  delete (csSpriteSocket *) Item;
-  return true;
-}
-
-csSpriteSocketVector::~csSpriteSocketVector ()
-{
-  DeleteAll ();
-}
-
 
 //--------------------------------------------------------------------------
 

@@ -21,10 +21,10 @@
 
 #include "cssys/sysfunc.h"
 #include "csutil/cscolor.h"
-#include "csutil/csvector.h"
+#include "csutil/array.h"
 #include "csutil/parray.h"
-#include "csutil/randomgen.h"
 #include "csutil/refarr.h"
+#include "csutil/randomgen.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
 #include "csgeom/poly2d.h"
@@ -149,7 +149,7 @@ public:
   csSpriteFrame* GetCsFrame (int f)
   {
     return (f < frames.Length ())
-    	? (csSpriteFrame *)frames [f]
+    	? frames [f]
 	: (csSpriteFrame*)0;
 	}
   /// Returns the looping frame after frame number f.
@@ -158,23 +158,21 @@ public:
     if (!reverse_action)
     {
       f++;
-      return f<frames.Length()
-      	? (csSpriteFrame*)frames[f]
-	: (csSpriteFrame*)frames[0];
+      return f<frames.Length() ? frames[f] : frames[0];
     }
     else
     {
       f--;
       return f>=0
-        ? (csSpriteFrame*)frames[f]
-	: (csSpriteFrame*)frames[frames.Length()-1];
+        ? frames[f]
+	: frames[frames.Length()-1];
     }
   }
   /// Query the frame number f.
   virtual iSpriteFrame* GetFrame (int f)
   {
     return (iSpriteFrame*)((f < frames.Length ())
-    	? (csSpriteFrame *)frames [f]
+    	? frames [f]
 	: (csSpriteFrame*)0);
   }
   /// Returns the looping frame after frame number f.
@@ -184,23 +182,23 @@ public:
     {
       f++;
       return (iSpriteFrame*)(f<frames.Length()
-      	? (csSpriteFrame*)frames[f]
-	: (csSpriteFrame*)frames[0]);
+      	? frames[f]
+	: frames[0]);
     }
     else
     {
       f--;
       return (iSpriteFrame*)(f>=0
-      	? (csSpriteFrame*)frames[f]
-	: (csSpriteFrame*)frames[frames.Length()-1]);
+      	? frames[f]
+	: frames[frames.Length()-1]);
     }
   }
   /// Get delay for frame number f
   virtual int GetFrameDelay (int f)
-  { return (int)delays [f]; }
+  { return delays [f]; }
   /// Get displacement for frame number f
   virtual float GetFrameDisplacement (int f)
-  { return * (float*) & displacements [f]; }
+  { return displacements [f]; }
 
   void SetReverseAction (bool reverse)
   { reverse_action = reverse; }
@@ -210,9 +208,9 @@ public:
 private:
   char *name;
   bool reverse_action;
-  csVector frames;
-  csVector delays;
-  csVector displacements;
+  csArray<csSpriteFrame*> frames;
+  csArray<int> delays;
+  csArray<float> displacements;
 };
 
 
@@ -252,45 +250,6 @@ public:
   SCF_DECLARE_IBASE;
 };
 
-/**
- * A vector for frames which knows how to clean them up.
- */
-class csSpriteFrameVector : public csVector
-{
-public:
-  /// Delete all inserted objects before deleting the object itself.
-  virtual ~csSpriteFrameVector ();
-
-  /// Free a item as a frame.
-  virtual bool FreeItem (void* Item);
-};
-
-/**
- * A vector for actions which knows how to clean them up.
- */
-class csSpriteActionVector : public csVector
-{
-public:
-  /// Delete all inserted objects before deleting the object itself.
-  virtual ~csSpriteActionVector ();
-
-  /// Free a item as an action.
-  virtual bool FreeItem (void* Item);
-};
-
-/**
- * A vector for actions which knows how to clean them up.
- */
-class csSpriteSocketVector : public csVector
-{
-public:
-  /// Delete all inserted objects before deleting the object itself.
-  virtual ~csSpriteSocketVector ();
-
-  /// Free a item as an action.
-  virtual bool FreeItem (void* Item);
-};
-
 class csSprite3DMeshObject;
 
 /**
@@ -323,12 +282,12 @@ private:
    */
   int* emerge_from;
 
-  /// The frames
-  csSpriteFrameVector frames;
-  /// The actions (a vector of csSpriteAction2 objects)
-  csSpriteActionVector actions;
-  /// The sockets of the sprite (a vector of csSpriteSocket objects)
-  csSpriteSocketVector sockets;
+  /// The frames.
+  csPDelArray<csSpriteFrame> frames;
+  /// The actions.
+  csPDelArray<csSpriteAction2> actions;
+  /// The sockets.
+  csPDelArray<csSpriteSocket> sockets;
 
   /// Enable tweening.
   bool do_tweening;
@@ -1103,7 +1062,7 @@ private:
    * Each mesh must have its own individual socket assignments,
    * but the vector must be copied down from the factory at create time.
    */
-  csSpriteSocketVector sockets;
+  csPDelArray<csSpriteSocket> sockets;
 
 public:
 

@@ -22,7 +22,7 @@
 #include "csgeom/transfrm.h"
 #include "csutil/flags.h"
 #include "csutil/csobject.h"
-#include "csutil/csvector.h"
+#include "csutil/refarr.h"
 #include "iengine/portal.h"
 
 class csPolygon2D;
@@ -54,9 +54,9 @@ protected:
   /// Warp transform in object space.
   csReversibleTransform warp_obj;
   /// List of callbacks called when a sector is missing (iPortalCallback).
-  csVector sector_cb_vector;
+  csRefArray<iPortalCallback> sector_cb_vector;
   /// List of callbacks called for traversing to a portal (iPortalCallback).
-  csVector portal_cb_vector;
+  csRefArray<iPortalCallback> portal_cb_vector;
   /// Maximum number of time a single sector will be visited by this portal.
   int max_sector_visit;
 
@@ -127,12 +127,7 @@ public:
   void SetPortalCallback (iPortalCallback* cb);
   void RemovePortalCallback (iPortalCallback* cb)
   {
-    int idx = portal_cb_vector.Find (cb);
-    if (idx != -1)
-    {
-      portal_cb_vector.Delete (idx);
-      cb->DecRef ();
-    }
+    portal_cb_vector.Delete (cb);
   }
   int GetPortalCallbackCount () const
   {
@@ -144,12 +139,7 @@ public:
   void SetMissingSectorCallback (iPortalCallback* cb);
   void RemoveMissingSectorCallback (iPortalCallback* cb)
   {
-    int idx = sector_cb_vector.Find (cb);
-    if (idx != -1)
-    {
-      sector_cb_vector.Delete (idx);
-      cb->DecRef ();
-    }
+    sector_cb_vector.Delete (cb);
   }
   int GetMissingSectorCallbackCount () const
   {
