@@ -1858,24 +1858,24 @@
 	    <enable trigger="moveLight" />
         </sequence>
         <sequence name="rotateTorus">
-	    <rotate mesh="Torus02" duration="2000">
+	    <rotate mesh="Torus02" duration="3000">
 	      <rotx>1</rotx>
 	      <v x="1" y="-13" z="-4" />
 	    </rotate>
-	    <rotate mesh="Torus03" duration="2000">
+	    <rotate mesh="Torus03" duration="3000">
 	      <rotx>1</rotx>
 	      <v x="-1" y="-12" z="-3" />
 	    </rotate>
-	    <rotate mesh="Torus01" duration="1000">
+	    <rotate mesh="Torus01" duration="1500">
 	      <rotx>1.5</rotx>
 	      <v x="0" y="-12" z="-4" />
 	    </rotate>
-	    <delay time="1000" />
-	    <rotate mesh="Torus01" duration="1000">
+	    <delay time="1500" />
+	    <rotate mesh="Torus01" duration="1500">
 	      <roty>1.2</roty>
 	      <v x="0" y="-12" z="-4" />
 	    </rotate>
-	    <delay time="1000" />
+	    <delay time="1500" />
 	    <enable trigger="rotateTorus" />
         </sequence>
     </sequences>
