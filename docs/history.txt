@@ -15,7 +15,7 @@ The history order has been reversed so that new features are at the top.
 	  which showed up with the introduction of Bison and Lex.
 	- Eric Sunshine eliminated several compilation warnings and problems
 	  throughout the project.
-	- Eric Sunshine repaird the project enough that it builds on NextStep
+	- Eric Sunshine repaired the project enough that it builds on NextStep
 	  once again.  Most of the programs even run, though some suffer from
 	  link problems when loading plug-in modules.
 	- Eric Sunshine made NeXTFrameBuffer15 more robust and tolerant of
@@ -53,6 +53,36 @@ The history order has been reversed so that new features are at the top.
 	      composite operations of forcing and inhibiting, respectively,
 	      recalculation of all cached information (such as visibility and
 	      lighting data).
+	- Eric Sunshine made the following changes to csString:
+	    - Added variations of Append() and operator+= for all of the basic
+	      types (including signed and unsigned).
+	    - Added handy left shift operators for all of the basic types.
+	      These operators provide a way to compose string in a simple,
+	      convenient, and completely type-safe fashion.  For example:
+	          str << "Hi " << name << ".  Your age is: " << age << '\n';
+	    - Fixed a bug in SetSize() where the resultant string size was one
+	      byte larger than requested.  Thus, when Clear() called
+	      SetSize(0), the string actually ended up with a length of one.
+	    - Renamed SetSize() to SetCapacity() for clarity.
+	    - Added Truncate() which shortens a string without freeing the
+	      storage.  (You can still call Reclaim() to free storage.)
+	    - Clear() now calls Truncate(0) for fast-and-dirty operation.
+	      For the old behaviour where storage was freed, call Reclaim()
+	      after Clear().
+	- Eric Sunshine cleaned up the implementation of scfString and iString.
+	- Eric Sunshine performed another partial overhaul of csIniFile.  The
+	  following changes were made:
+	    - Completely generalized and unified composition and decomposition
+	      of INI files regardless of input or output medium (physical
+	      filesystem, VFS, iFile, etc.).
+	    - Entirely eliminated all the special-case code (without any loss
+	      of functionality) which was added to csIniFile so that it could
+	      deal with abstract iFile.  The removal of this code _grealy_
+	      simplified the implementation.
+	    - Now uses iVFS rather than csVFS, thus no longer tied to any
+	      particular implementation.
+	- Eric Sunshine fixed a compilation error in math2d.cpp and a
+	  compilation warning in octree.cpp and csstatic.cpp.
 30-Apr-2000
 	- More work on the PVS.
 	- Added csBox2 and csBox3::GetCenter().
@@ -1423,8 +1453,7 @@ The history order has been reversed so that new features are at the top.
 	- W.C.A. Wijngaards <wouterw@cs.vu.nl> suggested a better comment for
 	  csmd5.h.
 	- Wouter also suggested a fix to eliminate key lag in the line driver.
-	- Finally Wouter also pointed me to a weird construct in
-	  libs/csutil/inifile.cpp.  I fixed it.
+	- Wouter discovered a weird construct in inifile.cpp.  Now fixed.
 	- Andrew Zabolotny did the following changes:
 	    - Re-inspected the polygon clipper.  The methods were enhanced a
 	      little, this also helped to catch a bug with software fog (in
@@ -2614,7 +2643,7 @@ The history order has been reversed so that new features are at the top.
 	    - Modified clients of csIniFile to work through the new iterator
 	      objects.
 	    - Added missing 'const' qualifiers to several methods.
-	- Eric Sunshine re-engineered the way the Apple/NeXT ports generation
+	- Eric Sunshine re-engineered the way the Apple/NeXT ports generate
 	  the application's main menu.  Details are as follows:
 	    - Moved the main menu configuration information for all Apple/NeXT
 	      platforms to the new configuration file "next.cfg" which is
