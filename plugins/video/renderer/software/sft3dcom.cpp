@@ -1160,6 +1160,14 @@ bool csGraphics3DSoftwareCommon::BeginDraw (int DrawFlags)
       return false;
   }
 
+  // Initialize the line table.
+  int i;
+  for (i = 0 ; i < height ; i++)
+    if (do_smaller_rendering)
+      line_table[i] = smaller_buffer + ((i*width)*pfmt.PixelBytes);
+    else
+      line_table[i] = G2D->GetPixelAt (0, i);
+
   if (render_target)
   {
     int txt_w, txt_h;
@@ -1223,13 +1231,6 @@ bool csGraphics3DSoftwareCommon::BeginDraw (int DrawFlags)
 
   if (DrawFlags & CSDRAW_3DGRAPHICS)
   {
-    // Initialize the line table.
-    int i;
-    for (i = 0 ; i < height ; i++)
-      if (do_smaller_rendering)
-        line_table[i] = smaller_buffer + ((i*width)*pfmt.PixelBytes);
-      else
-        line_table[i] = G2D->GetPixelAt (0, i);
     dbg_current_polygon = 0;
   }
   else if (DrawMode & CSDRAW_3DGRAPHICS)
