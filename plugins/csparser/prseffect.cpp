@@ -56,8 +56,7 @@ bool csLoader::LoadEffectFile(const char* filename)
   }
   else
   {
-    ReportNotify ("crystalspace.maploader.parse.effect",
-		    "All effectfiles MUST be xml-files (file '%s')!", filename);
+    ReportNotify ("All effectfiles MUST be xml-files (file '%s')!", filename);
     return false;
   }
 }

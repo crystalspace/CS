@@ -478,19 +478,25 @@ private:
   	iBase* context, const char* fname);
 
   /// Report any error.
-  void ReportError (const char* id, const char* description, ...);
+  void ReportError (const char* id, const char* description, ...)
+	CS_GNUC_PRINTF(3,4);
   /// Report a notification.
-  void ReportNotify (const char* description, ...);
+  void ReportNotify (const char* description, ...)
+	CS_GNUC_PRINTF(2,3);
   /// Report a warning.
-  void ReportWarning (const char* id, const char* description, ...);
+  void ReportWarning (const char* id, const char* description, ...)
+	CS_GNUC_PRINTF(3,4);
   /// Report a notification.
-  void ReportNotifyV (const char* id, const char* description, va_list arg);
+  void ReportNotifyV (const char* id, const char* description, va_list arg)
+	CS_GNUC_PRINTF(3,0);
   /// Report a notification.
-  void ReportNotify2 (const char* id, const char* description, ...);
+  void ReportNotify2 (const char* id, const char* description, ...)
+	CS_GNUC_PRINTF(3,4);
 
   /// Report a warning.
   void ReportWarning (const char* id, iDocumentNode* node,
-  	const char* description, ...);
+  	const char* description, ...)
+	CS_GNUC_PRINTF(4,5);
 
 public:
   /********** iLoader implementation **********/
