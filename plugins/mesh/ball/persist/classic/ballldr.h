@@ -63,7 +63,7 @@ public:
 /**
  * Ball factory saver.
  */
-class csBallFactorySaver : public iSaverPlugIn
+class csBallFactorySaver : public iSaverPlugin
 {
 private:
   iSystem* sys;
@@ -127,7 +127,7 @@ public:
 /**
  * Ball saver.
  */
-class csBallSaver : public iSaverPlugIn
+class csBallSaver : public iSaverPlugin
 {
 private:
   iSystem* sys;

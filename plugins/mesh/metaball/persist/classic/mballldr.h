@@ -59,7 +59,7 @@ public:
 /**
  * MetaBall factory saver.
  */
-class csMetaBallFactorySaver : public iSaverPlugIn
+class csMetaBallFactorySaver : public iSaverPlugin
 {
 private:
   iSystem* sys;
@@ -117,7 +117,7 @@ public:
 /**
  * MetaBall saver.
  */
-class csMetaBallSaver : public iSaverPlugIn
+class csMetaBallSaver : public iSaverPlugin
 {
 private:
   iSystem* sys;

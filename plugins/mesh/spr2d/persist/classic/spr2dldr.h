@@ -63,7 +63,7 @@ public:
 /**
  * Sprite2D factory saver.
  */
-class csSprite2DFactorySaver : public iSaverPlugIn
+class csSprite2DFactorySaver : public iSaverPlugin
 {
 private:
   iSystem* sys;
@@ -127,7 +127,7 @@ public:
 /**
  * Sprite2D saver.
  */
-class csSprite2DSaver : public iSaverPlugIn
+class csSprite2DSaver : public iSaverPlugin
 {
 private:
   iSystem* sys;

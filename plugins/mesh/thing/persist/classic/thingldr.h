@@ -57,7 +57,7 @@ public:
 /**
  * Thing saver.
  */
-class csThingSaver : public iSaverPlugIn
+class csThingSaver : public iSaverPlugin
 {
 private:
   iSystem* sys;
@@ -113,7 +113,7 @@ public:
 /**
  * Plane saver.
  */
-class csPlaneSaver : public iSaverPlugIn
+class csPlaneSaver : public iSaverPlugin
 {
 private:
   iSystem* sys;
@@ -169,7 +169,7 @@ public:
 /**
  * Bezier template saver.
  */
-class csBezierSaver : public iSaverPlugIn
+class csBezierSaver : public iSaverPlugin
 {
 private:
   iSystem* sys;

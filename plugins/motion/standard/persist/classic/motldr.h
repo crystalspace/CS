@@ -62,7 +62,7 @@ public:
   } scfiPlugin;
 };
 
-class csMotionSaver : public iSaverPlugIn
+class csMotionSaver : public iSaverPlugin
 {
 private:
   iSystem *sys;

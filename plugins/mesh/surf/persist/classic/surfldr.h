@@ -57,7 +57,7 @@ public:
 /**
  * Surf factory saver.
  */
-class csSurfFactorySaver : public iSaverPlugIn
+class csSurfFactorySaver : public iSaverPlugin
 {
 private:
   iSystem* sys;
@@ -113,7 +113,7 @@ public:
 /**
  * Surf saver.
  */
-class csSurfSaver : public iSaverPlugIn
+class csSurfSaver : public iSaverPlugin
 {
 private:
   iSystem* sys;

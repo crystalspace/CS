@@ -59,7 +59,7 @@ public:
 /**
  * Fire factory saver.
  */
-class csFireFactorySaver : public iSaverPlugIn
+class csFireFactorySaver : public iSaverPlugin
 {
 private:
   iSystem* sys;
@@ -117,7 +117,7 @@ public:
 /**
  * Fire saver.
  */
-class csFireSaver : public iSaverPlugIn
+class csFireSaver : public iSaverPlugin
 {
 private:
   iSystem* sys;

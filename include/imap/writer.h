@@ -25,12 +25,12 @@
 struct iEngine;
 struct iStrVector;
 
-SCF_VERSION (iSaverPlugIn, 0, 0, 1);
+SCF_VERSION (iSaverPlugin, 0, 0, 1);
 
 /**
  * This is a plugin to save with.
  */
-struct iSaverPlugIn : public iBase
+struct iSaverPlugin : public iBase
 {
   /** 
    *  Take a given object and push description onto the given string vector.

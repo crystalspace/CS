@@ -59,7 +59,7 @@ public:
 /**
  * Emit factory saver.
  */
-class csEmitFactorySaver : public iSaverPlugIn
+class csEmitFactorySaver : public iSaverPlugin
 {
 private:
   iSystem* sys;
@@ -117,7 +117,7 @@ public:
 /**
  * Emit saver.
  */
-class csEmitSaver : public iSaverPlugIn
+class csEmitSaver : public iSaverPlugin
 {
 private:
   iSystem* sys;

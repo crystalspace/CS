@@ -59,7 +59,7 @@ public:
 /**
  * Spiral factory saver.
  */
-class csSpiralFactorySaver : public iSaverPlugIn
+class csSpiralFactorySaver : public iSaverPlugin
 {
 private:
   iSystem* sys;
@@ -117,7 +117,7 @@ public:
 /**
  * Spiral saver.
  */
-class csSpiralSaver : public iSaverPlugIn
+class csSpiralSaver : public iSaverPlugin
 {
 private:
   iSystem* sys;

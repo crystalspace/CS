@@ -59,7 +59,7 @@ public:
 /**
  * Cube factory saver.
  */
-class csCubeFactorySaver : public iSaverPlugIn
+class csCubeFactorySaver : public iSaverPlugin
 {
 private:
   iSystem* sys;
@@ -117,7 +117,7 @@ public:
 /**
  * Cube saver.
  */
-class csCubeSaver : public iSaverPlugIn
+class csCubeSaver : public iSaverPlugin
 {
 private:
   iSystem* sys;

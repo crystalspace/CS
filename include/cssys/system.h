@@ -80,11 +80,11 @@ class csSystemDriver : public iSystem
   /*
    * This is a superset of csVector that can find by pointer a plugin.
    */
-  class csPlugInsVector : public csVector
+  class csPluginsVector : public csVector
   {
   public:
     // Create the vector
-    csPlugInsVector (int iLimit, int iDelta) : csVector (iLimit, iDelta) {}
+    csPluginsVector (int iLimit, int iDelta) : csVector (iLimit, iDelta) {}
     // Find a plugin either by its address or by his function ID
     virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const
     {
@@ -222,7 +222,7 @@ public:
   /// -------------------------- plug-ins --------------------------
 
   /// The list of all plug-ins
-  csPlugInsVector Plugins;
+  csPluginsVector Plugins;
 
   /// the width of this frame
   int FrameWidth;

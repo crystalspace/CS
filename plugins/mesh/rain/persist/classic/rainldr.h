@@ -60,7 +60,7 @@ public:
 /**
  * Rain factory saver.
  */
-class csRainFactorySaver : public iSaverPlugIn
+class csRainFactorySaver : public iSaverPlugin
 {
 private:
   iSystem* sys;
@@ -119,7 +119,7 @@ public:
 /**
  * Rain saver.
  */
-class csRainSaver : public iSaverPlugIn
+class csRainSaver : public iSaverPlugin
 {
 private:
   iSystem* sys;

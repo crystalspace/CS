@@ -59,7 +59,7 @@ public:
 /**
  * Fountain factory saver.
  */
-class csFountainFactorySaver : public iSaverPlugIn
+class csFountainFactorySaver : public iSaverPlugin
 {
 private:
   iSystem* sys;
@@ -118,7 +118,7 @@ public:
 /**
  * Fountain saver.
  */
-class csFountainSaver : public iSaverPlugIn
+class csFountainSaver : public iSaverPlugin
 {
 private:
   iSystem* sys;

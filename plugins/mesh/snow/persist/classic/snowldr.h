@@ -61,7 +61,7 @@ public:
 /**
  * Snow factory saver.
  */
-class csSnowFactorySaver : public iSaverPlugIn
+class csSnowFactorySaver : public iSaverPlugin
 {
 private:
   iSystem* sys;
@@ -119,7 +119,7 @@ public:
 /**
  * Snow saver.
  */
-class csSnowSaver : public iSaverPlugIn
+class csSnowSaver : public iSaverPlugin
 {
 private:
   iSystem* sys;

@@ -59,7 +59,7 @@ public:
 /**
  * Explosion factory saver.
  */
-class csExplosionFactorySaver : public iSaverPlugIn
+class csExplosionFactorySaver : public iSaverPlugin
 {
 private:
   iSystem* sys;
@@ -117,7 +117,7 @@ public:
 /**
  * Explosion saver.
  */
-class csExplosionSaver : public iSaverPlugIn
+class csExplosionSaver : public iSaverPlugin
 {
 private:
   iSystem* sys;
