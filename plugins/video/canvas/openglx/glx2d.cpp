@@ -33,6 +33,8 @@ END_INTERFACE_TABLE ()
 
 IMPLEMENT_UNKNOWN_NODELETE (csGraphics2DGLX)
 
+csGraphics2DOpenGLFontServer *csGraphics2DGLX::LocalFontServer = NULL;
+
 // csGraphics2DGLX function
 csGraphics2DGLX::csGraphics2DGLX (ISystem* piSystem) :
   csGraphics2D (piSystem), xim (NULL), cmap (0)
@@ -223,6 +225,16 @@ bool csGraphics2DGLX::Open(char *Title)
 
   glXMakeCurrent(dpy, window, active_GLContext);
 
+
+  if (LocalFontServer == NULL)
+  {
+       LocalFontServer = new csGraphics2DOpenGLFontServer(&FontList[0]);
+       for (int fontindex=1; 
+       		fontindex < 8;
+		fontindex++)
+	   LocalFontServer->AddFont(FontList[fontindex]);
+  }
+
   Clear (0);
   return true;
 }
@@ -249,6 +261,11 @@ void csGraphics2DGLX::Close(void)
   }
   // Close your graphic interface
   csGraphics2D::Close ();
+}
+
+void csGraphics2DGLX::Clear(int color)
+{
+  glClear(GL_COLOR_BUFFER_BIT);
 }
 
 void csGraphics2DGLX::Print (csRect *area)
@@ -398,12 +415,33 @@ void csGraphics2DGLX::ProcessEvents (void *Param)
     }
 }
 
+void csGraphics2DGLX::setGLColorfromint(int color)
+{
+  switch (pfmt.PixelBytes)
+  {
+  case 1: // paletted colors
+    glColor3i(Palette[color].red,
+    		Palette[color].green,
+		Palette[color].blue);
+    break;
+  case 2: // 16bit color
+  case 4: // truecolor
+    glColor3f( ( (color & pfmt.RedMask) >> pfmt.RedShift )     / (float)pfmt.RedBits,
+               ( (color & pfmt.GreenMask) >> pfmt.GreenShift ) / (float)pfmt.GreenBits,
+               ( (color & pfmt.BlueMask) >> pfmt.BlueShift )   / (float)pfmt.BlueBits);
+    break;
+  }
+}
+
 void csGraphics2DGLX::DrawLine (int x1, int y1, int x2, int y2, int color)
 {
+  // prepare for 2D drawing--so we need no fancy GL effects!
   glDisable (GL_TEXTURE_2D);
   glDisable (GL_BLEND);
+  glDisable (GL_DEPTH_TEST);
   glBegin (GL_LINES);
-  glColor3f (1., 1., 1.);
+  //glColor3f (1., 1., 1.);
+  setGLColorfromint(color);
   glVertex2i (x1, Height-y1-1);
   glVertex2i (x2, Height-y2-1);
   glEnd ();
@@ -411,10 +449,13 @@ void csGraphics2DGLX::DrawLine (int x1, int y1, int x2, int y2, int color)
 
 void csGraphics2DGLX::DrawHorizLine (int x1, int x2, int y, int color)
 {
+  // prepare for 2D drawing--so we need no fancy GL effects!
   glDisable (GL_TEXTURE_2D);
   glDisable (GL_BLEND);
+  glDisable (GL_DEPTH_TEST);
+  //glColor3f (1., 1., 1.);
+  setGLColorfromint(color);
   glBegin (GL_LINES);
-  glColor3f (1., 1., 1.);
   glVertex2i (x1, Height-y-1);
   glVertex2i (x2, Height-y-1);
   glEnd ();
@@ -422,23 +463,28 @@ void csGraphics2DGLX::DrawHorizLine (int x1, int x2, int y, int color)
 
 void csGraphics2DGLX::DrawPixelGL (int x, int y, int color)
 {
+  // prepare for 2D drawing--so we need no fancy GL effects!
   glDisable (GL_TEXTURE_2D);
   glDisable (GL_BLEND);
+  glDisable (GL_DEPTH_TEST);
+  //glColor3f (1., 1., 1.);
+  setGLColorfromint(color);
   glBegin (GL_POINTS);
-  glColor3f (1., 1., 1.);
   glVertex2i (x, Height-y-1);
   glEnd ();
 }
 
 void csGraphics2DGLX::WriteCharGL (int x, int y, int fg, int bg, char c)
 {
-  //glDisable (GL_TEXTURE_2D);
-  //glDisable (GL_BLEND);
-  //glColor3f (1., 1., 1.);
-  //glRasterPos2i (x, Height-y-1);
-  //glCallLists (1, GL_BYTE, (GLbyte*)&c);
+  // prepare for 2D drawing--so we need no fancy GL effects!
+  glDisable (GL_TEXTURE_2D);
+  glDisable (GL_BLEND);
+  glDisable (GL_DEPTH_TEST);
+  
+  setGLColorfromint(fg);
+  glRasterPos2i (x, Height-y-1);
 
-  //glDrawPixels ();
+  LocalFontServer->WriteCharacter(c,Font);
 }
 
 void csGraphics2DGLX::DrawSpriteGL (ITextureHandle *hTex, int sx, int sy,
