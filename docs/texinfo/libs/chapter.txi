@@ -15,7 +15,6 @@ graph.  @xref{Dependencies}.
 * csUtil:: Utility Library (@code{csUtil})
 * SCF:: Shared Class Facility (@sc{scf})
 * csGeom:: Geometry Library (@code{csGeom})
-* csParser:: Map File Parser (@code{csParser})
 * CSWS:: Crystal Space Windowing System (@sc{csws})
 * csPhyziks:: csPhyziks Library (@code{csphyzik})
 @end menu
@@ -25,6 +24,5 @@ graph.  @xref{Dependencies}.
 @imports{libs,csutil.txi}
 @imports{libs,scf.txi}
 @imports{libs,csgeom.txi}
-@imports{libs,csparser.txi}
 @imports{libs,csws.txi}
 @imports{libs,phyziks.txi}

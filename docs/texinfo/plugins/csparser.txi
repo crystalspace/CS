@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
-@node csParser, CSWS, csGeom, Libraries
-@section Map File Parser (@code{csParser})
+@node csParser
+@section The Map File Parser (@code{csParser})
 @cindex Map File Parser
 @cindex csParser
 
@@ -11,4 +11,4 @@ there is only a section describing the format of the map files.
 * Map File Format:: Format of Map File
 @end menu
 
-@imports{libs,mapfmt.txi}
+@imports{plugins,mapfmt.txi}

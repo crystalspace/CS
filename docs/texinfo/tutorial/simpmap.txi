@@ -84,8 +84,6 @@ Similarly for @file{simple.cpp}:
 
 CS_IMPLEMENT_APPLICATION
 
-SCF_REGISTER_STATIC_LIBRARY (lvlload)
-
 Simple::Simple ()
 @{
   view = NULL;

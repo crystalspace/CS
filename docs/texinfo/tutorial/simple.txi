@@ -131,10 +131,6 @@ In the source file @file{simple.cpp} we place the following:
 // Needed for every CS application.
 CS_IMPLEMENT_APPLICATION
 
-// We need the loader.
-// The line below will go away once the loader is a plugin.
-SCF_REGISTER_STATIC_LIBRARY (lvlload)
-
 Simple::Simple ()
 @{
   engine = NULL;
@@ -260,9 +256,6 @@ Before doing anything at all, after including the necessary header files, we
 first need to use a few macros.  The CS_IMPLEMENT_APPLICATION macro is
 essential for every application using CS.  It makes sure that the @code{main()}
 routine is correctly linked and called on every platform.
-SCF_REGISTER_STATIC_LIBRARY is a temporary macro which is now needed because the
-level loader already tries very hard to be a plugin but it really isn't.  Once
-the level loader is a plugin you only have to remove this macro call.
 
 The main routine first creates an instance of our
 @samp{Simple} class.  The next step is the creation of the world.  The world
