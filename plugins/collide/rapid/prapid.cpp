@@ -73,7 +73,10 @@
 #define CD_MAX_COLLISION    1000
 
 // This array contains the colliding pairs
-static CS_DECLARE_GROWING_ARRAY_REF (CD_contact, csCollisionPair);
+CS_TYPEDEF_GROWING_ARRAY_REF (prapid_CD_contact, csCollisionPair);
+CS_IMPLEMENT_STATIC_VAR (GetCD_contact, prapid_CD_contact,)
+
+static prapid_CD_contact *CD_contact = NULL;
 
 static int hits = 0;
 // Array of hits.
@@ -81,8 +84,9 @@ static csRapidCollider* hitv[CD_MAX_COLLISION][2];
 static int currHit;
 
 ///
-csMatrix3 csRapidCollider::mR;
-csVector3 csRapidCollider::mT (0, 0, 0);
+CS_IMPLEMENT_STATIC_CLASSVAR (csRapidCollider, mR, GetMR, csMatrix3,)
+CS_IMPLEMENT_STATIC_CLASSVAR (csRapidCollider, mT, GetMT, csVector3, 0)
+
 ///
 int   csRapidCollider::trianglesTested = 0;
 int   csRapidCollider::boxesTested     = 0;
@@ -102,6 +106,9 @@ Moment *Moment::stack = NULL;
 csRapidCollider::csRapidCollider (iPolygonMesh* mesh)
 {
   SCF_CONSTRUCT_IBASE (NULL);
+  CD_contact = GetCD_contact ();
+  GetMR ();
+  GetMT ();
   GeometryInitialize (mesh);
 }
 
@@ -114,7 +121,7 @@ void csRapidCollider::GeometryInitialize (iPolygonMesh* mesh)
 {
   m_pCollisionModel = NULL;
 
-  CD_contact.IncRef ();
+  CD_contact->IncRef ();
 
   int i, v;
   int tri_count = 0;
@@ -169,7 +176,7 @@ csRapidCollider::~csRapidCollider ()
     m_pCollisionModel = NULL;
   }
 
-  CD_contact.DecRef ();
+  CD_contact->DecRef ();
 }
 
 bool csRapidCollider::Collide (csRapidCollider &otherCollider,
@@ -233,8 +240,8 @@ bool csRapidCollider::Collide (csRapidCollider &otherCollider,
   // To transform tri's from model1's CS to model2's CS use this:
   //    x2 = mR . x1 + mT
 
-  csRapidCollider::mR = R1;
-  csRapidCollider::mT = T1;
+  *mR = R1;
+  *mT = T1;
 
   // reset the report fields
   csRapidCollider::numHits = 0;
@@ -361,7 +368,7 @@ int csRapidCollider::CollidePath (
 
 csCollisionPair *csRapidCollider::GetCollisions ()
 {
-  return CD_contact.GetArray ();
+  return CD_contact->GetArray ();
 }
 
 int project6 (csVector3 ax, csVector3 p1, csVector3 p2, csVector3 p3,
@@ -755,21 +762,21 @@ bool tri_contact (csVector3 P1, csVector3 P2, csVector3 P3,
 
 int add_collision (csCdTriangle *tr1, csCdTriangle *tr2)
 {
-  int limit = CD_contact.Limit ();
+  int limit = CD_contact->Limit ();
   if (csRapidCollider::numHits >= limit)
   {
 //  is this really needed? - A.Z.
 //  if (!limit)
 //    csRapidCollidernumHits = 0;
-    CD_contact.SetLimit (limit + 16);
+    CD_contact->SetLimit (limit + 16);
   }
-
-  CD_contact [csRapidCollider::numHits].a1 = tr1->p1;
-  CD_contact [csRapidCollider::numHits].b1 = tr1->p2;
-  CD_contact [csRapidCollider::numHits].c1 = tr1->p3;
-  CD_contact [csRapidCollider::numHits].a2 = tr2->p1;
-  CD_contact [csRapidCollider::numHits].b2 = tr2->p2;
-  CD_contact [csRapidCollider::numHits].c2 = tr2->p3;
+  
+  (*CD_contact) [csRapidCollider::numHits].a1 = tr1->p1;
+  (*CD_contact) [csRapidCollider::numHits].b1 = tr1->p2;
+  (*CD_contact) [csRapidCollider::numHits].c1 = tr1->p3;
+  (*CD_contact) [csRapidCollider::numHits].a2 = tr2->p1;
+  (*CD_contact) [csRapidCollider::numHits].b2 = tr2->p2;
+  (*CD_contact) [csRapidCollider::numHits].c2 = tr2->p3;
   csRapidCollider::numHits++;
 
   return false;
@@ -1010,11 +1017,11 @@ bool csCdBBox::TrianglesHaveContact(csCdBBox *pBox1, csCdBBox *pBox2)
   int rc;  // return code
 
   csVector3 i1 =
-    ((csRapidCollider::mR * pBox1->m_pTriangle->p1) + csRapidCollider::mT);
+    ((*csRapidCollider::mR * pBox1->m_pTriangle->p1) + *csRapidCollider::mT);
   csVector3 i2 =
-    ((csRapidCollider::mR * pBox1->m_pTriangle->p2) + csRapidCollider::mT);
+    ((*csRapidCollider::mR * pBox1->m_pTriangle->p2) + *csRapidCollider::mT);
   csVector3 i3 =
-    ((csRapidCollider::mR * pBox1->m_pTriangle->p3) + csRapidCollider::mT);
+    ((*csRapidCollider::mR * pBox1->m_pTriangle->p3) + *csRapidCollider::mT);
 
   csRapidCollider::trianglesTested++;
 

@@ -61,13 +61,6 @@ private:
   	const csMatrix3& R, const csVector3& T);
 
   /**
-    * Global variables
-    * Matrix, and Vector used for collision testing.
-    */
-  static csMatrix3 mR;
-  static csVector3 mT;
-
-  /**
    * Statistics, to allow early bailout.
    * If the number of triangles tested is too high the BBox structure
    * probably isn't very good.
@@ -88,6 +81,13 @@ private:
   void GeometryInitialize (iPolygonMesh *mesh);
 
 public:
+  /**
+    * Global variables
+    * Matrix, and Vector used for collision testing.
+    */
+  CS_DECLARE_STATIC_CLASSVAR (mR, GetMR, csMatrix3)
+  CS_DECLARE_STATIC_CLASSVAR (mT, GetMT, csVector3)
+
   static int numHits;
 
   /// Create a collider based on geometry.
