@@ -20,7 +20,7 @@ CompileGroups frustvis   : walkall ;
 CompileGroups imgplex    : walkall ; 
 CompileGroups meshes     : walkall ; 
 CompileGroups ptanimimg  : walkall ;
-CompileGroups rapid      : walkall ;
+CompileGroups opcode     : walkall ;
 CompileGroups reporter   : walkall ;
 CompileGroups sequence   : walkall ;
 CompileGroups simpcon    : walkall ;

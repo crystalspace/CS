@@ -86,7 +86,7 @@ if $(USE_NEW_RENDERER) = "yes"
     nullmesh
     rain
     rainldr
-    rapid
+    opcode
     reporter
     sequence
     simpcon
@@ -157,7 +157,7 @@ else
     nullmesh
     rain
     rainldr
-    rapid
+    opcode
     reporter
     sequence
     simpcon
