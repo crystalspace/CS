@@ -109,7 +109,7 @@
 	<regexp string="glversion" pattern="1.2 Mesa 5.0" />
       </conditions>
       <applicable>
-	<usecfg>novbo</usecfg>
+	<usecfg>preferclipplane</usecfg>
       </applicable>
     </rule>
     <rule description="Disable VBO for Linux ATI drivers 3.2.8">
