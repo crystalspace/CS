@@ -13,6 +13,32 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+5-Dec-1999
+	- Continued work on the coverage mask tree. The masks start to work
+	  now but there is still a bug somewhere in the calculation of the
+	  lookup tables.
+	- Michael Ewert added code for collision and impulse response,
+	  modified joint friction maximum and replaced refs and assignements
+	  of v and w to accessor methods. Michael also enhanced the
+	  phyztest demo with an object that bounces off walls and floors
+	  (press TAB).
+	- Thomas Hieber cleaned up the BMP loader code and fixed the bug
+	  that caused black seams in the BMP textures. Thomas also removed
+	  some 'unreachable code' warnings.
+	- Thomas Hieber added support to Map2CS for directly reading
+	  WAD3 files (HalfLife texture archives).
+	- Michael Dale Long fixed a tiny bug for GCC 2.95.
+4-Dec-1999
+	- Fixed CR/LF problems in LaTeX docs from Wyatt Miler.
+	- Thomas Hieber added the first version of manual sectoring to
+	  Map2CS. It is almost feature complete. Elimination of hidden
+	  polygons and other eye candy (like fog or mirrors) is still
+	  missing.
+3-Dec-1999
+	- Fixes to Crystal Clear Physics from Michael Dale Long.
+2-Dec-1999
+	- Cleanup of LaTeX docs from Wyatt Miler.
+	- Michael Ewert fixed bug in physics code by making set_v virtual.
 1-Dec-1999
 	- Eric Sunshine ported the new halo implementation to NeXT.
 	- Eric Sunshine made csClear and cctest work on NextStep again by
@@ -151,7 +177,7 @@ Short-term cleanups that need to be done:
 	  port.
 	- Alex Pfaffe changed terrain engine so that it no longer needs
 	  the ddgQueue class.
-	- Updates to documentation from Wyatt Miller (checked in by
+	- Updates to documentation from Wyatt Miler (checked in by
 	  Brandon Ehle).
 23-Nov-1999
 	- Robert Bate cleaned up the Macintosh port with relation to the
@@ -209,7 +235,7 @@ Short-term cleanups that need to be done:
 	      coordinates. Defaults to false (relative).
 	    - Fixed bug left by Andrew when he changed scfInterface to
 	      struct.
-	- Changes to LaTeX docs from Brandon Ehle (and Wyatt Miller).
+	- Changes to LaTeX docs from Brandon Ehle (and Wyatt Miler).
 20-Nov-1999
 	- More work on cspython and SWIG from Brandon Ehle.
 	- Brandon Ehle fixed the unix load library function to display
