@@ -71,18 +71,22 @@ m4_define([CS_VCHK_PATCOUNT], [len(m4_bpatsubst(CS_VCHK_PATTERNLIST([$1]), [[^dc
 dnl CS_VCHK_EXTRACTVERSION(EXTRACT_CALL, MIN_VERSION, PATTERN, PRGPREFIX, COMPARISION)
 m4_define([CS_VCHK_EXTRACTVERSION], 
 [dnl
-ac_[]$4[]_is_version=`$1 | sed 'CS_VCHK_SEDEXPRALL([$3])'`
-ac_[]$4[]_min_version=`echo $2 | sed 'CS_VCHK_SEDEXPRALL([$3])'`
+ac_$4_is_version=`$1 | sed 'CS_VCHK_SEDEXPRALL([$3])'`
+ac_$4_min_version=`echo $2 | sed 'CS_VCHK_SEDEXPRALL([$3])'`
 CS_VCHK_RUNTH( CS_VCHK_PATCOUNT([$3]),
-	[ac_[]$4[]_is_version_[]i=`echo $ac_[]$4[]_is_version | sed 'CS_VCHK_SEDEXPRNTH([$3], [i])'`
+	[ac_$4_is_ver_[]i=`echo $ac_$4_is_version | sed 'CS_VCHK_SEDEXPRNTH([$3], [i])'`
 ])dnl
 CS_VCHK_RUNTH( CS_VCHK_PATCOUNT([$3]),
-	[ac_[]$4[]_min_version_[]i=`echo $ac_[]$4[]_min_version | sed 'CS_VCHK_SEDEXPRNTH([$3], [i])'`
+	[ac_$4_min_ver_[]i=`echo $ac_$4_min_version | sed 'CS_VCHK_SEDEXPRNTH([$3], [i])'`
 ])dnl
-ac_cv_[]$4[]_bad_luck=
+ac_cv_check_version_$4_bad=
 CS_VCHK_RUNTH( CS_VCHK_PATCOUNT([$3]),
-	[test -z $ac_cv_[]$4[]_bad_luck && expr "$ac_[]$4[]_is_version_[]i" "$5" "$ac_[]$4[]_min_version_[]i" >/dev/null || ac_cv_[]$4[]_bad_luck=yes
+[test -z $ac_cv_check_version_$4_bad && { expr "$ac_$4_is_ver_[]i" "$5" "$ac_$4_min_ver_[]i" >/dev/null || ac_cv_check_version_$4_bad=yes ; }
+test -z $ac_cv_check_version_$4_bad && { expr "$ac_$4_min_ver_[]i" "$5" "$ac_$4_is_ver_[]i" >/dev/null || ac_cv_check_version_$4_bad=no ; }
 ])dnl
+if test -z $ac_cv_check_version_$4_bad ; then
+  ac_cv_check_version_$4_bad=no ;
+fi
 ])
 
 ##############################################################################
@@ -104,16 +108,15 @@ CS_VCHK_RUNTH( CS_VCHK_PATCOUNT([$3]),
 #                     .. everything else is taken as separator -you better dont 
 #                        try stuff like space, slash or comma
 #
-# The test results in ac_cv_PREFIX_bad_luck being either empty or equal to
-# string yes.
+# The test results in ac_cv_check_version_PREFIX_bad being either yes or no.
 ##############################################################################
 AC_DEFUN(AC_CHECK_PROG_VERSION,
 [dnl
 m4_define([DO_CMP], [m4_if($8,,[>=],[$8])])
 AC_MSG_CHECKING([for $1 - version DO_CMP $3])
-AC_CACHE_VAL(ac_cv_$5_bad_luck, 
+AC_CACHE_VAL(ac_cv_check_version_$5_bad, 
              [CS_VCHK_EXTRACTVERSION([$2], [$3], [$4], [$5], [DO_CMP])])
-if test -z $ac_cv_$5_bad_luck ; then
+if test $ac_cv_check_version_$5_bad = no ; then
    AC_MSG_RESULT(yes)
    m4_if([$6], , :, [$6])
 else
