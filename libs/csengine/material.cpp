@@ -132,7 +132,7 @@ csShaderVariable* csMaterial::GetVar (csStringID name, bool create)
   csRef<csShaderVariable> var = GetVariable (name);
   if ((var == 0) && create)
   {
-    var = engine->ShaderManager->CreateVariable (name);
+    var = new csShaderVariable (name);
     AddVariable (var);
   }
   return var;
@@ -389,8 +389,12 @@ iTextureHandle* csMaterial::GetTexture (csStringID name)
 {
 #ifdef CS_USE_NEW_RENDERER
   iTextureWrapper* tex;
-  GetVar (name)->GetValue (tex);
-  return tex->GetTextureHandle ();
+  csShaderVariable* var = GetVar (name);
+  if (var)
+  {
+    var->GetValue (tex);
+    return tex ? tex->GetTextureHandle () : 0;
+  }
   //return texHandles.Get (name);
 #else
   if (name == nameDiffuseTexture)
@@ -399,8 +403,8 @@ iTextureHandle* csMaterial::GetTexture (csStringID name)
   if (name == nameTextureLayer2) return texture_layers[1].txt_handle;
   if (name == nameTextureLayer3) return texture_layers[2].txt_handle;
   if (name == nameTextureLayer4) return texture_layers[3].txt_handle;
-  return 0;
 #endif
+  return 0;
 }
 
 #ifndef CS_USE_NEW_RENDERER

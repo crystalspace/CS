@@ -21,6 +21,9 @@ chronological order.
 	    - Rewrote ivideo/shader/shader.h We should move this file to
 	      ivideo.
 	- res re-added VC7 project files.
+	- res added VC7 project files for the xmlshader plugins.
+	- res fixed xmlshader.mak.
+	- res made various compile and semantic fixes.
 24-Nov-2003
 	- Eric Sunshine performed minor clean up of the new cslibs test in
 	  configure.ac.  Now wraps cslibs-config invocations in AC_RUN_LOG().

@@ -46,7 +46,7 @@ SCF_IMPLEMENT_IBASE(csGLShaderFVP)
   SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
 SCF_IMPLEMENT_IBASE_END
 
-void csGLShaderFVP::Activate(csRenderMesh* mesh)
+void csGLShaderFVP::Activate ()
 {
 
 }

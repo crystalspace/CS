@@ -74,7 +74,7 @@ struct iShaderManager : public iBase, public iShaderVariableContext
   virtual const csRefArray<iShader> &GetShaders ()  = 0;
 
   /// Register a compiler to the manager
-  virtual void RegisterCompiler(iShaderCompiler* compiler) = 0;
+  virtual void RegisterCompiler (iShaderCompiler* compiler) = 0;
   /// Get a shadercompiler by name
   virtual iShaderCompiler* GetCompiler(const char* name) = 0;
 };

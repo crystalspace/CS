@@ -17,9 +17,11 @@
 */
 
 #include "cssysdef.h"
+#include "iutil/comp.h"
 #include "iutil/plugin.h"
 #include "csutil/util.h"
 #include "csutil/scfstr.h"
+#include "csutil/scfstrset.h"
 #include "xmlshader.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -27,6 +29,7 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY (csXMLShaderCompiler)
 
 SCF_IMPLEMENT_IBASE(csXMLShaderCompiler)
+  SCF_IMPLEMENTS_INTERFACE(iComponent)
   SCF_IMPLEMENTS_INTERFACE(iShaderCompiler)
 SCF_IMPLEMENT_IBASE_END
 
@@ -43,6 +46,21 @@ csXMLShaderCompiler::csXMLShaderCompiler(iBase* parent)
 csXMLShaderCompiler::~csXMLShaderCompiler()
 {
 
+}
+
+bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
+{
+  objectreg = object_reg;
+
+  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    object_reg, "crystalspace.renderer.stringset", iStringSet);
+  if (!strings)
+  {
+    strings = csPtr<iStringSet> (new csScfStringSet ());
+    object_reg->Register (strings, "crystalspace.renderer.stringset");
+  }
+
+  return true;
 }
 
 void csXMLShaderCompiler::BuildTokens ()
@@ -191,7 +209,7 @@ bool csXMLShaderCompiler::LoadPass(iDocumentNode *node, csXMLShader::shaderPass 
   {
     program = LoadProgram(programNode, pass);
     if (program)
-      pass->vp = program;
+      pass->fp = program;
     else
     {
       //report error!!
@@ -273,9 +291,10 @@ bool csXMLShaderCompiler::LoadPass(iDocumentNode *node, csXMLShader::shaderPass 
     }
     if (found)
     {
-      int a = attrib<100?attrib:attrib-100;
+      int a = CS_VATTRIB_IS_SPECIFIC (attrib) ? 
+	attrib - CS_VATTRIB_SPECIFIC_FIRST : attrib;
       pass->bufferID[a] = strings->Request (mapping->GetAttributeValue ("buffer")); //MUST HAVE STRINGS
-      pass->bufferGeneric[a] = attrib<100;
+      pass->bufferGeneric[a] = CS_VATTRIB_IS_GENERIC (attrib);
 
       csShaderVariable *varRef=0;
       varRef = pass->GetVariableRecursive(pass->bufferID[a]);
@@ -344,14 +363,14 @@ bool csXMLShaderCompiler::LoadSVBlock (iDocumentNode *node,
   return true;
 }
 
-iShaderProgram* csXMLShaderCompiler::LoadProgram (iDocumentNode *node,
-                                                  csXMLShader::shaderPass *pass)
+csPtr<iShaderProgram> csXMLShaderCompiler::LoadProgram (
+  iDocumentNode *node, csXMLShader::shaderPass *pass)
 {
   csRef<iShaderProgram> program;
 
   const char *pluginprefix = "crystalspace.graphics3d.shader.";
   char *plugin = new char[strlen(pluginprefix) + 255 + 1];
-  strcat(plugin, pluginprefix);
+  strcpy (plugin, pluginprefix);
   
   strncat (plugin, node->GetAttributeValue("plugin"), 255);
   
@@ -369,9 +388,15 @@ iShaderProgram* csXMLShaderCompiler::LoadProgram (iDocumentNode *node,
       return 0;
   }
 
-  program = plg->CreateProgram (node->GetAttributeValue("typ"));
+  program = plg->CreateProgram (node->GetAttributeValue("type"));
 
-  return program;
+  csArray<iShaderVariableContext*> staticDomains;
+  staticDomains.Push (pass);
+  staticDomains.Push (pass->owner);
+  if (!program->Compile (staticDomains))
+    return 0;
+
+  return csPtr<iShaderProgram> (program);
 }
 
 bool csXMLShaderCompiler::ValidateTemplate(iDocumentNode *templ)

@@ -76,17 +76,17 @@ public:
   //==================== iShaderManager ================//
 
   /// Register a shader to the shadermanager. Compiler should register all shaders
-  virtual void RegisterShader(iShader* shader);
+  virtual void RegisterShader (iShader* shader);
   /// Get a shader by name
-  virtual iShader* GetShader(const char* name);
+  virtual iShader* GetShader (const char* name);
   /// Returns all shaders that have been created
   virtual const csRefArray<iShader> &GetShaders () { return shaders; }
 
 
   /// Register a compiler to the manager
-  virtual void RegisterCompiler(iShaderCompiler* compiler);
+  virtual void RegisterCompiler (iShaderCompiler* compiler);
   /// Get a shadercompiler by name
-  virtual iShaderCompiler* GetCompiler(const char* name);
+  virtual iShaderCompiler* GetCompiler (const char* name);
 
   /// Report a message.
   void Report (int severity, const char* msg, ...);
@@ -110,8 +110,8 @@ public:
   }
 
   /// Fill a csShaderVariableList
-  virtual void FillVariableList (csShaderVariableList *list) const
-    { svContextHelper.FillVariableList (list); }
+  virtual unsigned int FillVariableList (csShaderVariableProxyList *list) const
+    { return svContextHelper.FillVariableList (list); }
 
   //==================== iComponent ====================//
   bool Initialize(iObjectRegistry* objreg);

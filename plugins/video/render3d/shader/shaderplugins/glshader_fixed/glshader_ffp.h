@@ -160,10 +160,10 @@ public:
   ////////////////////////////////////////////////////////////////////
 
   /// Sets this program to be the one used when rendering
-  virtual void Activate(csRenderMesh* mesh);
+  virtual void Activate ();
 
   /// Deactivate program so that it's not used in next rendering
-  virtual void Deactivate();
+  virtual void Deactivate ();
 
     /// Setup states needed for proper operation of the shader
   virtual void SetupState (csRenderMesh* mesh,
@@ -189,8 +189,8 @@ public:
   { return svContextHelper.GetVariable (name); }
 
   /// Fill a csShaderVariableList
-  virtual void FillVariableList (csShaderVariableList *list) const
-  { svContextHelper.FillVariableList (list); }
+  virtual unsigned int FillVariableList (csShaderVariableProxyList* list) const
+  { return svContextHelper.FillVariableList (list); }
 
   /// Get a named variable from this context, and any context above/outer
   virtual csShaderVariable* GetVariableRecursive (csStringID name) const

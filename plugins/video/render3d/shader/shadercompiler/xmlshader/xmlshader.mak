@@ -36,21 +36,19 @@ ifeq ($(USE_PLUGINS),yes)
   LIB.XMLSHADER = $(foreach d,$(DEP.XMLSHADER),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(XMLSHADER)
 else
-  SHADERMGR = $(OUT)/$(LIB_PREFIX)xmlshader$(LIB)
+  XMLSHADER = $(OUT)/$(LIB_PREFIX)xmlshader$(LIB)
   DEP.EXE += $(XMLSHADER)
   SCF.STATIC += xmlshader
   TO_INSTALL.STATIC_LIBS += $(XMLSHADER)
 endif
 
-INF.XMLSHADER = $(SRCDIR)/plugins/video/render3d/shader/shadermgr/shadermgr.csplugin
+INF.XMLSHADER = $(SRCDIR)/plugins/video/render3d/shader/shadercompiler/xmlshader/xmlshader.csplugin
 INC.XMLSHADER = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/render3d/shader/shadercompiler/xmlshader/*.h \
   plugins/video/render3d/shader/common/*.h))
 SRC.XMLSHADER = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/render3d/shader/shadercompiler/xmlshader/*.cpp \
   plugins/video/render3d/shader/common/*.cpp))
-OBJ.XMLSHADER = $(addprefix $(OUT)/,$(notdir $(SRC.SHADERMGR:.cpp=$O)))
+OBJ.XMLSHADER = $(addprefix $(OUT)/,$(notdir $(SRC.XMLSHADER:.cpp=$O)))
 DEP.XMLSHADER = CSGFX CSTOOL CSGEOM CSUTIL CSUTIL
-
-TO_INSTALL.CONFIG += $(CFG.SHADERMGR)
 
 MSVC.DSP += XMLSHADER
 DSP.XMLSHADER.NAME = xmlshader
@@ -65,7 +63,7 @@ ifeq ($(MAKESECTION),targets)
 
 xmlshader: $(OUTDIRS) $(XMLSHADER)
 
-$(SHADERMGR): $(OBJ.XMLSHADER) $(LIB.XMLSHADER)
+$(XMLSHADER): $(OBJ.XMLSHADER) $(LIB.XMLSHADER)
 	$(DO.PLUGIN)
 
 clean: xmlshaderclean

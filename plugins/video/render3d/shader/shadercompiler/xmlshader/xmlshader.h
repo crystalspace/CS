@@ -67,47 +67,56 @@ public:
 
   /// iShaderVariableContext members
   /// Get a named variable from this context
-  virtual csShaderVariable* GetVariable (csStringID name) const {
+  virtual csShaderVariable* GetVariable (csStringID name) const 
+  {
     return staticVariables.GetVariable (name);
   }
   /// Get a named variable from this context, and any context above/outer
-  virtual csShaderVariable* GetVariableRecursive (csStringID name) const{
+  virtual csShaderVariable* GetVariableRecursive (csStringID name) const
+  {
     csShaderVariable* var;
     var=GetVariable (name);
     if(var) return var;
     return 0;
   }
   /// Fill a csShaderVariableList. Return number of variables filled
-  virtual unsigned int FillVariableList (csShaderVariableProxyList *list) const{
+  virtual unsigned int FillVariableList (csShaderVariableProxyList *list) const
+  {
     return staticVariables.FillVariableList (list);
   }
 
 private:
   /// Add a variable to this context
-  virtual void AddVariable (csShaderVariable *variable){}
+  virtual void AddVariable (csShaderVariable *variable) {}
 
   //helpers for static and dynamic variables
   csShaderVariableContextHelper staticVariables;
   csShaderVariableProxyList dynamicVariables;
 
-  struct shaderPass : public iShaderVariableContext{
+  struct shaderPass : public iShaderVariableContext
+  {
+    virtual ~shaderPass () { }
+
     /// Get a named variable from this context
-    virtual csShaderVariable* GetVariable (csStringID name) const{
+    virtual csShaderVariable* GetVariable (csStringID name) const
+    {
       return staticVariables.GetVariable (name);
     }
     /// Get a named variable from this context, and any context above/outer
-    virtual csShaderVariable* GetVariableRecursive (csStringID name) const{
+    virtual csShaderVariable* GetVariableRecursive (csStringID name) const
+    {
       csShaderVariable* var;
       var=GetVariable (name);
       if(var) return var;
       return owner->GetVariableRecursive (name);
     }
     /// Fill a csShaderVariableList. Return number of variables filled
-    virtual unsigned int FillVariableList (csShaderVariableProxyList *list) const{
+    virtual unsigned int FillVariableList (csShaderVariableProxyList *list) const
+    {
       return staticVariables.FillVariableList (list);
     }
     /// Add a variable to this context
-    virtual void AddVariable (csShaderVariable *variable){}
+    virtual void AddVariable (csShaderVariable *variable) {}
 
     static const int STREAMMAX = 16;
     static const int TEXTUREMAX = 16;
@@ -167,13 +176,15 @@ private:
   csRef<iGraphics3D> g3d;
 };
 
-class csXMLShaderCompiler : public iShaderCompiler
+class csXMLShaderCompiler : public iShaderCompiler, public iComponent
 {
 public:
   SCF_DECLARE_IBASE;
   csXMLShaderCompiler(iBase* parent);
 
   virtual ~csXMLShaderCompiler();
+
+  virtual bool Initialize (iObjectRegistry* object_reg);
 
   /// Get a name identifying this compiler
   virtual const char* GetName() 
@@ -190,10 +201,11 @@ public:
 
 private:
   //struct to hold all techniques, until we decide which to use
-  struct techniqueKeeper{
+  struct techniqueKeeper
+  {
     techniqueKeeper(iDocumentNode *n, unsigned int p) : node(n), priority(p)
     {}
-    iDocumentNode *node;
+    csRef<iDocumentNode> node;
     unsigned int priority;
   };
 
@@ -210,7 +222,7 @@ private:
     staticVariables, csShaderVariableProxyList *dynamicVariables) ;
 
   //load a shaderprogram
-  iShaderProgram* LoadProgram (iDocumentNode *node, csXMLShader::shaderPass *pass);
+  csPtr<iShaderProgram> LoadProgram (iDocumentNode *node, csXMLShader::shaderPass *pass);
 
   /// XML Token and management
   csStringHash xmltokens;

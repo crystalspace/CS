@@ -275,7 +275,7 @@ bool csGLShaderFFP::Compile(csArray<iShaderVariableContext*> &staticDomains)
   return true;
 }
 
-void csGLShaderFFP::Activate(csRenderMesh* mesh)
+void csGLShaderFFP::Activate ()
 {
   for(int i = 0; i < MIN(maxlayers, texlayers.Length()); ++i)
   {

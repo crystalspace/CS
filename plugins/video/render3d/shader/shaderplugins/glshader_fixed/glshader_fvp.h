@@ -60,7 +60,7 @@ private:
     csStringID specularvar;     csRef<csShaderVariable> specularVarRef;
     csStringID attenuationvar;  csRef<csShaderVariable> attenuationVarRef;
     int lightnum;
-    csShaderVariableList dynVars;
+    csShaderVariableProxyList dynVars;
   };
 
   
@@ -82,7 +82,7 @@ private:
   bool validProgram;
 
   csShaderVariableContextHelper svContextHelper;
-  csShaderVariableList dynamicVars;
+  csShaderVariableProxyList dynamicVars;
 public:
   SCF_DECLARE_IBASE;
 
@@ -107,7 +107,7 @@ public:
   ////////////////////////////////////////////////////////////////////
 
   /// Sets this program to be the one used when rendering
-  virtual void Activate(csRenderMesh* mesh);
+  virtual void Activate ();
 
   /// Deactivate program so that it's not used in next rendering
   virtual void Deactivate();
@@ -135,8 +135,8 @@ public:
   { return svContextHelper.GetVariable (name); }
 
   /// Fill a csShaderVariableList
-  virtual void FillVariableList (csShaderVariableList *list) const
-  { svContextHelper.FillVariableList (list); }
+  virtual unsigned int FillVariableList (csShaderVariableProxyList*list) const
+  { return svContextHelper.FillVariableList (list); }
 
   /// Get a named variable from this context, and any context above/outer
   virtual csShaderVariable* GetVariableRecursive (csStringID name) const
