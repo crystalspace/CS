@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Jul-2004
+	- Eric Sunshine added a "sufficiently recent" test to the Cg check in
+	  configure.ac.  This is needed since the CS Cg shader requires
+	  features of Cg 1.2.x (at minimum).
 3-Jul-2004
 	- Remi Bonnet fixed a few signed/unsigned comparisons warnings and a
 	  bug in aws where unsigned can't be used.

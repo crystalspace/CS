@@ -1531,6 +1531,16 @@ AC_DEFUN([CS_CHECK_LIBCG],
 	[cg CG])
 
     AS_IF([test $cs_cv_libCg = yes],
+	[CS_CHECK_BUILD([if Cg is sufficiently recent], [cs_cv_libCg_recent],
+	    [AC_LANG_PROGRAM(
+	    	[[#include <Cg/cg.h>]], [cgGetEnumString(CG_UNKNOWN);])],
+	    [], [], [], [], [],
+	    [$cs_cv_libCg_cflags],
+	    [$cs_cv_libCg_lflags],
+	    [$cs_cv_libCg_libs])],
+	[cs_cv_libCg_recent=no])
+
+    AS_IF([test $cs_cv_libCg_recent = yes],
 	[CS_CHECK_LIB_WITH([CgGL],
 	    [AC_LANG_PROGRAM(
 		[[#include <Cg/cg.h>
