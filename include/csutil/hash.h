@@ -393,12 +393,6 @@ public:
       return ret;
     }
 
-    /// Delete the next element.
-    void DeleteNext ()
-    {
-      hash->Elements[bucket].DeleteIndex (element);
-    }
-
     /// Move the iterator back to the first element.
     void Reset () { element = 0; Seek (); }
   };
@@ -480,12 +474,6 @@ public:
       return Next ();
     }
 
-    /// Delete the next element.
-    void DeleteNext ()
-    {
-      hash->Elements[bucket].DeleteIndex (element);
-    }
-
     /// Move the iterator back to the first element.
     void Reset () { Zero (); Init (); FindItem (); }
   };
@@ -494,7 +482,7 @@ public:
   /**
    * Return an iterator for the hash, to iterate only over the elements
    * with the given key.
-   * Modifying the hash (except with DeleteNext) while you have open iterators
+   * Modifying the hash while you have open iterators
    * will cause undefined behaviour.
    */
   Iterator GetIterator (const K& key) const
@@ -504,7 +492,7 @@ public:
 
   /**
    * Return an iterator for the hash, to iterate over all elements.
-   * Modifying the hash (except with DeleteNext) while you have open iterators
+   * Modifying the hash while you have open iterators
    * will cause undefined behaviour.
    */
   GlobalIterator GetIterator () const

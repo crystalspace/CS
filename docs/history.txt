@@ -43,6 +43,10 @@ chronological order.
 	  Previously, it was a dependency only of 'install', which meant that
 	  it got built only at installation time (unless the user built it
 	  explicitly).
+	- Jorrit removed DeleteNext() from the iterators in csHash. These
+	  functions could not compile (the 'hash' that is given to the iterators
+	  is const so it cannot be modified) and since nobody seems to be
+	  needing them (they are broken anyway)...
 16-May-2004
         - Philip Wyett eliminated gcc compiler warnings in simpleformer.cpp.
         - Andrew Craig enhanced viewmesh by letting the user select a mesh 
