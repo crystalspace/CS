@@ -1,7 +1,4 @@
-#ifndef __CS_AWS_BAR_CHART_H__
-#define __CS_AWS_BAR_CHART_H__
-
-/**************************************************************************
+/*
     Copyright (C) 2000-2001 by Christopher Nelson
 
     This library is free software; you can redistribute it and/or
@@ -17,12 +14,15 @@
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-*****************************************************************************/
+*/
+
+#ifndef __CS_AWS_BARCT_H__
+#define __CS_AWS_BARCT_H__
+
 #include "awsPanel.h"
 #include "awstimer.h"
 
-class awsBarChart :
-  public awsPanel
+class awsBarChart : public awsPanel
 {
   /// Flag for inner frame style.
   int inner_frame_style;
@@ -33,10 +33,10 @@ class awsBarChart :
   /// Caption text for this component
   iString *caption;
 
-  /// Text for "Y" legend
+  /// Text for "Y" legend.
   iString *yText;
 
-  /// Text for "X" legend
+  /// Text for "X" legend.
   iString *xText;
 
   /// Each item has a value and label.
@@ -46,33 +46,33 @@ class awsBarChart :
     iString *label;
   };
 
-  /// Keeps track of all chart items (fifo buffer)
+  /// Keeps track of all chart items (fifo buffer).
   BarItem *items;
 
-  /// Number of items in chart
+  /// Number of items in chart.
   int count_items;
 
-  /// Size of items buffer
+  /// Size of items buffer.
   int items_buffer_size;
 
-  /// Maximum number of items to include in chart
+  /// Maximum number of items to include in chart.
   int max_items;
 
-  /// Color for bars
+  /// Color for bars.
   int bar_color;
 
-  /// The timer that drives the update for the chart
+  /// The timer that drives the update for the chart.
   awsTimer *update_timer;
-
-
 public:
   awsBarChart ();
-  virtual ~awsBarChart();
+  virtual ~awsBarChart ();
 
   /******* Chart Options **********************/
   
-  /** The chart rolls, so that when it has reached MaxItems width, the oldest item
-   * in the chart falls off the edge and the new one is added to the other side.
+  /**
+   * The chart rolls, so that when it has reached MaxItems width, the
+   * oldest item in the chart falls off the edge and the new one is added
+   * to the other side.
    */
   static const int coRolling;
 
@@ -91,7 +91,6 @@ public:
   /// Chart is vertical rather than horizontal
   static const int coVerticalChart;
 
-
   /******* Signals **********************/
 
   /// An up and down motion for the button
@@ -99,15 +98,14 @@ public:
 
   /// A signal that tells the app it should update the rolling chart.
   static const int signalTimer;
-
 public:
   /// Get's the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
-  /// Gets properties
+  /// Gets properties.
   bool GetProperty (const char *name, void **parm);
 
-  /// Sets properties
+  /// Sets properties.
   bool SetProperty (const char *name, void *parm);
 
   /// Performs "scripted" execution.
@@ -118,30 +116,31 @@ public:
 
 public:
 
-  /// Triggered when the component needs to draw
+  /// Triggered when the component needs to draw.
   virtual void OnDraw (csRect clip);
 
 protected:
-  /// Add a new item to the top
-  void Push(BarItem &i, bool normal=true);
+  /// Add a new item to the top.
+  void Push (BarItem &i, bool normal=true);
 
-  /// Kill an item from the bottom 
-  void Pop(bool normal=true);
-
+  /// Kill an item from the bottom .
+  void Pop (bool normal=true);
 };
 
-class awsBarChartFactory :
-  public awsComponentFactory
+class awsBarChartFactory : public awsComponentFactory
 {
 public:
-
-  /// Calls register to register the component that it builds with the window manager
+  /**
+   * Calls register to register the component that it builds with the
+   * window manager.
+   */
   awsBarChartFactory (iAws *wmgr);
 
-  /// Does nothing
+  /// Does nothing.
   virtual ~awsBarChartFactory ();
 
   /// Returns a newly created component of the type this factory handles.
   virtual iAwsComponent *Create ();
 };
-#endif // __CS_AWS_BAR_CHART_H__
+
+#endif // __CS_AWS_BARCT_H__
