@@ -1450,8 +1450,7 @@ bool csPolygon3D::MarkRelevantShadowFrustrums (csLightView& lview,
   // the light frustrum. There is no checking done if shadow frustrums obscure
   // each other.
 
-  int i, count;
-  bool contains;
+  int i;
   csShadowFrustrum* sf = lview.shadows.GetFirst ();
   while (sf)
   {
