@@ -53,7 +53,6 @@ class SysSystemDriver : public csSystemDriver, public iWin32SystemDriver
 public:
   SysSystemDriver ();
   
-  virtual void Close ();
   virtual void Loop ();
   virtual void Alert (const char* s);
   virtual void Warn (const char* s);
