@@ -23,17 +23,24 @@ skin "Metal Windows"
   Windowbuttons: "/lib/windows/metalwb.png"
 }
 
-window "Splash" from "Normal Window"
+window "Splash"
 {
   Frame: (100,200)-(400,300)
-  Style: Normal
+  Style: wfsNormal
 
 }
 
-window "New User" from "Normal Window"
+window "Another"
+{
+  Frame: (200,300)-(500,400)
+  Style: wfsNormal
+
+}
+
+window "New User"
 {
   Frame: (100, 200) - (400, 500)
-  Style: Bitmapped
+  Style: wfsBitmap
   Overlay: "/lib/windows/newuserovl.png"
   Back:    "/lib/windows/newuserbck.png"
   Overlayalpha: 192
