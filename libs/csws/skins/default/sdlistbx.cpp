@@ -127,6 +127,9 @@ void csDefaultListBoxSkin::Draw (csComponent &This)
        This.Pixmap(This.GetFrameBitmap(), 1, 1, This.bound.Width ()-BorderWidth, This.bound.Height ()-BorderHeight, 0, 0, This.GetAlpha());
        This.Rect3D (0, 0, This.bound.Width (), This.bound.Height (),CSPAL_LISTBOX_LIGHT3D, CSPAL_LISTBOX_DARK3D);					       
      break;
+     case cslfsTexturedNoFrame:
+       This.Pixmap(This.GetFrameBitmap(), 1, 1, This.bound.Width ()-BorderWidth, This.bound.Height ()-BorderHeight, 0, 0, This.GetAlpha());
+     break;
      case cslfsBitmap:
        This.Pixmap(This.GetFrameBitmap(), 0, 0, This.GetAlpha()); 
      break;

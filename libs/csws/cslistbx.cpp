@@ -216,6 +216,7 @@ csListBox::csListBox (csComponent *iParent, int iStyle,
        sbsty=cssfsThinRect;
        state|=CSS_TRANSPARENT;
        break;
+     case cslfsTexturedNoFrame: 
      case cslfsBitmap:
        BorderWidth=BorderHeight=0;
        sbsty=cssfsThinRect;
