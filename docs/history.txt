@@ -67,6 +67,8 @@ chronological order.
 	  project files. We are now getting to the point where there should be
 	  very few, if any, 64-bit portability problems in the project, and we
 	  would like to identify any which still remain.
+	- Jorrit added a -quick option to pvscalc. That will just create
+	  the kdtree so that the level works but nothing more.
 21-Mar-2005
 	- Eric Sunshine re-wrote crystal.m4 essentially from scratch since it
 	  was fragile, obfuscated, and unnecessarily complex.

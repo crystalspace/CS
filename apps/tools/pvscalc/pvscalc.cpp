@@ -1595,7 +1595,7 @@ void PVSCalcSector::RecurseSourceNodes (PVSCalcNode* sourcenode,
     RecurseSourceNodes (sourcenode->child2, invisible_nodes, nodecounter);
 }
 
-void PVSCalcSector::Calculate ()
+void PVSCalcSector::Calculate (bool do_quick)
 {
   parent->ReportInfo ("Calculating PVS for '%s'!",
   	sector->QueryObject ()->GetName ());
@@ -1699,7 +1699,8 @@ void PVSCalcSector::Calculate ()
   starttime = csGetTicks ();
   total_invisnodes = 0;
   total_visnodes = 0;
-  RecurseSourceNodes (shadow_tree, invisible_nodes, nodecounter);
+  if (!do_quick)
+    RecurseSourceNodes (shadow_tree, invisible_nodes, nodecounter);
 
   // Write our KDTree with pvs.
   if (!pvstree->WriteOut ())
@@ -1770,6 +1771,7 @@ bool PVSCalcSector::FeedMetaInformation (iDocumentNode* node)
 PVSCalc::PVSCalc ()
 {
   SetApplicationName ("CrystalSpace.PVSCalcMap");
+  do_quick = false;
 }
 
 PVSCalc::~PVSCalc ()
@@ -1883,7 +1885,7 @@ bool PVSCalc::LoadMap ()
   const char* mapfile = cmdline->GetName (0);
   if (!mapfile)
   {
-    ReportError ("Required parameters: <mapdir/zip> [ <sectorname> ]!");
+    ReportError ("Required parameters: <mapdir/zip> [-quick] [ <sectorname> ]!");
     return false;
   }
 
@@ -1901,6 +1903,8 @@ bool PVSCalc::LoadMap ()
   // that have PVS will be calculated.
   sectorname = cmdline->GetName (1);
 
+  do_quick = cmdline->GetOption ("quick");
+
   return true;
 }
 
@@ -1914,7 +1918,7 @@ bool PVSCalc::CalculatePVS (iSector* sector, iPVSCuller* pvs)
       if (!pvscalcsector.FeedMetaInformation (meta_info[i].meta_node))
         return false;
   }
-  pvscalcsector.Calculate ();
+  pvscalcsector.Calculate (do_quick);
   return true;
 }
 

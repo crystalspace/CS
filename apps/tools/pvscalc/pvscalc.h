@@ -477,7 +477,7 @@ public:
   /**
    * Calculate the PVS for this sector.
    */
-  void Calculate ();
+  void Calculate (bool do_quick);
 };
 
 /**
@@ -549,6 +549,9 @@ private:
 
   /// Set the current dir to the requested mapfile.
   bool SetMapDir (const char* map_dir);
+
+  // Quick PVS calculation.
+  bool do_quick;
 
   /**
    * Calculate PVS for the given sector and culler.
