@@ -321,26 +321,10 @@
         <params>
             <numvt>4</numvt>
             <numtri>4</numtri>
-            <v x="-2" y="0" z="-2" u="0" v="0" />
-            <v x="-2" y="4" z="-2" u="1" v="0" />
-            <v x="-2" y="4" z="2" u="1" v="1" />
-            <v x="-2" y="0" z="2" u="0" v="1" />
-            <t v1="3" v2="0" v3="1" />
-            <t v1="1" v2="2" v3="3" />
-            <t v1="1" v2="0" v3="3" />
-            <t v1="3" v2="2" v3="1" />
-            <autonormals />
-        </params>
-    </meshfact>
-    <meshfact name="squareR">
-        <plugin>meshFact</plugin>
-        <params>
-            <numvt>4</numvt>
-            <numtri>4</numtri>
-            <v x="2" y="0" z="-2" u="0" v="0" />
-            <v x="2" y="4" z="-2" u="1" v="0" />
-            <v x="2" y="4" z="2" u="1" v="1" />
-            <v x="2" y="0" z="2" u="0" v="1" />
+            <v x="0" y="0" z="-2" u="0" v="0" />
+            <v x="0" y="4" z="-2" u="1" v="0" />
+            <v x="0" y="4" z="2" u="1" v="1" />
+            <v x="0" y="0" z="2" u="0" v="1" />
             <t v1="3" v2="0" v3="1" />
             <t v1="1" v2="2" v3="3" />
             <t v1="1" v2="0" v3="3" />
@@ -353,26 +337,10 @@
         <params>
             <numvt>4</numvt>
             <numtri>4</numtri>
-            <v x="-2" y="0" z="2" u="0" v="0" />
-            <v x="2" y="0" z="2" u="1" v="0" />
-            <v x="2" y="4" z="2" u="1" v="1" />
-            <v x="-2" y="4" z="2" u="0" v="1" />
-            <t v1="3" v2="0" v3="1" />
-            <t v1="1" v2="2" v3="3" />
-            <t v1="1" v2="0" v3="3" />
-            <t v1="3" v2="2" v3="1" />
-            <autonormals />
-        </params>
-    </meshfact>
-    <meshfact name="squareD">
-        <plugin>meshFact</plugin>
-        <params>
-            <numvt>4</numvt>
-            <numtri>4</numtri>
-            <v x="-2" y="0" z="-2" u="0" v="0" />
-            <v x="2" y="0" z="-2" u="1" v="0" />
-            <v x="2" y="4" z="-2" u="1" v="1" />
-            <v x="-2" y="4" z="-2" u="0" v="1" />
+            <v x="-2" y="0" z="0" u="0" v="0" />
+            <v x="2" y="0" z="0" u="1" v="0" />
+            <v x="2" y="4" z="0" u="1" v="1" />
+            <v x="-2" y="4" z="0" u="0" v="1" />
             <t v1="3" v2="0" v3="1" />
             <t v1="1" v2="2" v3="3" />
             <t v1="1" v2="0" v3="3" />
@@ -19286,17 +19254,17 @@
                     <material>mosaic</material>
                 </params>
                 <move>
-                    <v x="0" y="0" z="0" />
+                    <v x="-2" y="0" z="0" />
                 </move>
             </meshobj>
             <meshobj name="plateR">
                 <plugin>mesh</plugin>
                 <params>
-                    <factory>squareR</factory>
+                    <factory>squareL</factory>
                     <material>mosaic</material>
                 </params>
                 <move>
-                    <v x="0" y="0" z="0" />
+                    <v x="2" y="0" z="0" />
                 </move>
             </meshobj>
             <meshobj name="plateU">
@@ -19306,24 +19274,36 @@
                     <material>mosaic</material>
                 </params>
                 <move>
-                    <v x="0" y="0" z="0" />
+                    <v x="0" y="0" z="2" />
                 </move>
             </meshobj>
             <meshobj name="plateD">
                 <plugin>mesh</plugin>
                 <params>
-                    <factory>squareD</factory>
+                    <factory>squareU</factory>
                     <material>mosaic</material>
                 </params>
                 <move>
-                    <v x="0" y="0" z="0" />
+                    <v x="0" y="0" z="-2" />
                 </move>
             </meshobj>
         </meshobj>
-        <light name="hugeroom_light">
-            <center x="-80" y="-16" z="13" />
-            <radius>200</radius>
+        <light name="hugeroom_light1">
+            <center x="-100" y="-6" z="13" />
+            <radius>300</radius>
             <color red="0" green="0.2" blue="0.7" />
+            <dynamic />
+        </light>
+        <light name="hugeroom_light2">
+            <center x="-80" y="-20" z="13" />
+            <radius>300</radius>
+            <color red="0" green="0.2" blue="0.7" />
+            <dynamic />
+        </light>
+        <light name="hugeroom_light3">
+            <center x="-80" y="-16" z="13" />
+            <radius>4</radius>
+            <color red=".5" green="0.2" blue="0.7" />
             <dynamic />
         </light>
     </sector>
@@ -22892,27 +22872,32 @@
 	    <delay>1000</delay>
 	    <fadelight light="l1" red="0" green="0" blue="1" duration="1000" />
 	    <delay>1000</delay>
-	    <runsequence>animlight</runsequence>
+	    <enabletrigger>animlight</enabletrigger>
 	</sequence>
 
 	<sequence name="animhugelight">
-	    <fadelight light="hugeroom_light" red="0" green="0" blue=".2" duration="3000" />
+	    <fadelight light="hugeroom_light1" red="0" green="0" blue=".2" duration="3000" />
+	    <fadelight light="hugeroom_light2" red="0" green=".1" blue="0" duration="3000" />
 	    <delay>3000</delay>
-	    <fadelight light="hugeroom_light" red="0" green=".3" blue=".8" duration="3000" />
+	    <fadelight light="hugeroom_light1" red="0" green=".3" blue=".8" duration="3000" />
+	    <fadelight light="hugeroom_light2" red="0" green=".2" blue=".3" duration="3000" />
 	    <delay>3000</delay>
-	    <fadelight light="hugeroom_light" red="0" green=".2" blue=".3" duration="3000" />
+	    <fadelight light="hugeroom_light1" red="0" green=".2" blue=".3" duration="3000" />
+	    <fadelight light="hugeroom_light2" red="0" green="0" blue=".8" duration="3000" />
 	    <delay>3000</delay>
-	    <fadelight light="hugeroom_light" red="0" green=".4" blue=".7" duration="3000" />
+	    <fadelight light="hugeroom_light1" red="0" green=".4" blue=".7" duration="3000" />
+	    <fadelight light="hugeroom_light2" red="0" green=".4" blue=".3" duration="3000" />
 	    <delay>3000</delay>
-	    <fadelight light="hugeroom_light" red="0" green=".1" blue=".5" duration="3000" />
+	    <fadelight light="hugeroom_light1" red="0" green=".1" blue=".5" duration="3000" />
+	    <fadelight light="hugeroom_light2" red="0" green=".2" blue=".6" duration="3000" />
 	    <delay>3000</delay>
-	    <runsequence>animhugelight</runsequence>
+	    <enabletrigger>animhugelight</enabletrigger>
 	</sequence>
 
 	<sequence name="rotball">
 	    <rotate mesh="transpBall" axis="1" angle="3" duration="1000" />
 	    <delay>1000</delay>
-	    <runsequence>rotball</runsequence>
+	    <enabletrigger>rotball</enabletrigger>
 	</sequence>
 
 	<sequence name="openbox">

@@ -30,14 +30,40 @@
 #include "iengine/statlght.h"
 #include "ivaria/sequence.h"
 
+static iSequenceWrapper* FindCreateSequence (iEngineSequenceManager* eseqmgr,
+		const char* name)
+{
+  iSequenceWrapper* sequence = eseqmgr->FindSequenceByName (name);
+  if (!sequence)
+  {
+    // We don't need the ref returned by CreateSequence().
+    csRef<iSequenceWrapper> seqwrap = eseqmgr->CreateSequence (name);
+    sequence = seqwrap;
+  }
+  return sequence;
+}
+
+static iSequenceTrigger* FindCreateTrigger (iEngineSequenceManager* eseqmgr,
+		const char* name)
+{
+  iSequenceTrigger* trigger = eseqmgr->FindTriggerByName (name);
+  if (!trigger)
+  {
+    // We don't need the ref returned by CreateTrigger().
+    csRef<iSequenceTrigger> trigwrap = eseqmgr->CreateTrigger (name);
+    trigger = trigwrap;
+  }
+  return trigger;
+}
+
 iSequenceTrigger* csLoader::LoadTrigger (iDocumentNode* node)
 {
   const char* trigname = node->GetAttributeValue ("name");
   // LoadTriggers() already checked for the presence of the engine
   // sequence manager.
 
-  csRef<iSequenceTrigger> trigger = GetEngineSequenceManager ()
-  	->CreateTrigger (trigname);
+  iSequenceTrigger* trigger = FindCreateTrigger (
+	GetEngineSequenceManager (), trigname);
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -66,16 +92,8 @@ iSequenceTrigger* csLoader::LoadTrigger (iDocumentNode* node)
       case XMLTOKEN_FIRE:
 	{
 	  const char* seqname = child->GetContentsValue ();
-	  iSequenceWrapper* sequence = GetEngineSequenceManager ()
-	  	->FindSequenceByName (seqname);
-	  if (!sequence)
-	  {
-	    SyntaxService->ReportError (
-		"crystalspace.maploader.parse.trigger",
-		child, "Couldn't find sequence '%s' in trigger '%s'!", seqname,
-		trigname);
-	    return NULL;
-	  }
+	  iSequenceWrapper* sequence = FindCreateSequence (
+		GetEngineSequenceManager (), seqname);
 	  csTicks delay = child->GetAttributeValueAsInt ("delay");
 	  trigger->FireSequence (delay, sequence);
 	}
@@ -122,8 +140,8 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
   // LoadSequences() already checked for the presence of the engine
   // sequence manager.
 
-  csRef<iSequenceWrapper> sequence = GetEngineSequenceManager ()
-  	->CreateSequence (seqname);
+  iSequenceWrapper* sequence = FindCreateSequence (
+	GetEngineSequenceManager (), seqname);
 
   csTicks cur_time = 0;
 
@@ -139,16 +157,8 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
       case XMLTOKEN_RUNSEQUENCE:
         {
 	  const char* seqname2 = child->GetContentsValue ();
-	  iSequenceWrapper* sequence2 = GetEngineSequenceManager ()
-	  	->FindSequenceByName (seqname2);
-	  if (!sequence2)
-	  {
-	    SyntaxService->ReportError (
-		"crystalspace.maploader.parse.trigger",
-		child, "Couldn't find sequence '%s' in sequence '%s'!",
-		seqname2, seqname);
-	    return NULL;
-	  }
+	  iSequenceWrapper* sequence2 = FindCreateSequence (
+		GetEngineSequenceManager (), seqname2);
 	  sequence->GetSequence ()->AddRunSequence (cur_time,
 	  	sequence2->GetSequence ());
 	}
@@ -265,16 +275,8 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
       case XMLTOKEN_ENABLETRIGGER:
         {
 	  const char* trigname = child->GetContentsValue ();
-	  iSequenceTrigger* trigger = GetEngineSequenceManager ()
-	  	->FindTriggerByName (trigname);
-	  if (!trigger)
-	  {
-	    SyntaxService->ReportError (
-		"crystalspace.maploader.parse.sequence",
-		child, "Couldn't find trigger '%s' in sequence '%s'!", trigname,
-		seqname);
-	    return NULL;
-	  }
+	  iSequenceTrigger* trigger = FindCreateTrigger (
+		GetEngineSequenceManager (), trigname);
 	  sequence->AddOperationTriggerState (cur_time,
 	  	trigger, true);
 	}
@@ -282,16 +284,8 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
       case XMLTOKEN_DISABLETRIGGER:
         {
 	  const char* trigname = child->GetContentsValue ();
-	  iSequenceTrigger* trigger = GetEngineSequenceManager ()
-	  	->FindTriggerByName (trigname);
-	  if (!trigger)
-	  {
-	    SyntaxService->ReportError (
-		"crystalspace.maploader.parse.sequence",
-		child, "Couldn't find trigger '%s' in sequence '%s'!", trigname,
-		seqname);
-	    return NULL;
-	  }
+	  iSequenceTrigger* trigger = FindCreateTrigger (
+		GetEngineSequenceManager (), trigname);
 	  sequence->AddOperationTriggerState (cur_time,
 	  	trigger, false);
 	}
