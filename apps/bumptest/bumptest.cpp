@@ -309,12 +309,6 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
     return false;
   }
 
-  if (!csInitializer::Initialize (object_reg))
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Initialization error!");
-    return false;
-  }
-
   if (!csInitializer::SetupEventHandler (object_reg, BumpEventHandler))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Initialization error!");

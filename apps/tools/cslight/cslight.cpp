@@ -189,12 +189,6 @@ bool Lighter::Initialize (int argc, const char* const argv[],
     return false;
   }
 
-  if (!csInitializer::Initialize (object_reg))
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Can't init app!");
-    return false;
-  }
-
   // Check for commandline help.
   if (csCommandLineHelper::CheckHelp (object_reg))
   {

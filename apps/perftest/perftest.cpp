@@ -159,12 +159,6 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
     return false;
   }
 
-  if (!csInitializer::Initialize (object_reg))
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't init app!");
-    return false;
-  }
-
   if (!csInitializer::SetupEventHandler (object_reg, PerfEventHandler))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't init app!");

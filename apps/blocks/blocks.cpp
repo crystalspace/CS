@@ -3184,12 +3184,6 @@ int main (int argc, char* argv[])
     return -1;
   }
 
-  if (!csInitializer::Initialize (object_reg))
-  {
-    Sys->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
-    return -1;
-  }
-
   if (!csInitializer::SetupEventHandler (object_reg, BlocksEventHandler))
   {
     Sys->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");

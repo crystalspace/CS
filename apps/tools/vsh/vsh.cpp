@@ -523,9 +523,6 @@ int main (int argc, char *argv [])
 	CS_REQUEST_END))
     return -1;
 
-  if (!csInitializer::Initialize (object_reg))
-    return -1;
-
   VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!VFS)
   {

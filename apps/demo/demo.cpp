@@ -869,12 +869,6 @@ bool Demo::Initialize (int argc, const char* const argv[],
     return false;
   }
 
-  if (!csInitializer::Initialize (object_reg))
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't initialize app!");
-    return false;
-  }
-
   if (!csInitializer::SetupEventHandler (object_reg, DemoEventHandler))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't initialize event handler!");

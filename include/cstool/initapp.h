@@ -176,25 +176,6 @@ public:
   static bool RequestPlugins (iObjectRegistry*, ...);
 
   /**
-   * Really initialize the application. This will initialize all loaded
-   * plugins and also put the following known objects in the object
-   * registry with NULL tag (if present):
-   * <ul>
-   * <li>iVFS
-   * <li>iGraphics3D
-   * <li>iGraphics2D
-   * <li>iFontServer
-   * <li>iEngine
-   * <li>iConsoleOutput
-   * <li>iLoader
-   * <li>iImageIO
-   * <li>iReporter
-   * <li>iStandardReporterListener
-   * </ul>
-   */
-  static bool Initialize (iObjectRegistry*);
-
-  /**
    * Send the cscmdOpen command to all loaded plugins.
    * This should be done after initializing them (Initialize()).
    */

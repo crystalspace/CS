@@ -456,14 +456,6 @@ int main (int argc, char *argv[])
     return -1;
   }
 
-  if (!csInitializer::Initialize (object_reg))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.graphics3d.gfxtest",
-	"Error initializing system !");
-    return -1;
-  }
-
   // Check for commandline help.
   if (csCommandLineHelper::CheckHelp (object_reg))
   {

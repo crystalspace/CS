@@ -171,12 +171,6 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
     return false;
   }
 
-  if (!csInitializer::Initialize (object_reg))
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Could not init app!");
-    return false;
-  }
-
   if (!csInitializer::SetupEventHandler (object_reg, AwsEventHandler))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Could not setup event handler!");

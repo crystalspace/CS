@@ -54,6 +54,15 @@ The @sc{scf} (@pxref{SCF}) system is the core low-level memory framework
 for Crystal Space. You must initialize this before doing anything else
 (one way is to use @code{csInitializer::InitializeSCF()}).
 
+@subsubheading Reference Counting
+@cindex reference counting
+
+Reference counting is a very important part of the Crystal Space
+framework. Read the @sc{scf} (@pxref{SCF}) documentation for more information
+about this but keep in mind that it is very important and try to make
+sure you manage references correctly in your own code. Missing a
+@code{DecRef()} can cause big memory leaks.
+
 @subsubheading The Object Registry
 @cindex @code{iObjectRegistry}
 @cindex Object Registry
@@ -208,57 +217,68 @@ int main(int argc, char *argv[]);
 Following these guidelines will help to ensure that your application builds
 and runs on all platforms supported by Crystal Space.
 
-@node Simple Main Structure, Simple Event Handling, Simple Minimum Requirements, Tutorial Simple
-@subsection Simple Main Structure
-@cindex Tutorial Simple Main Structure
-@cindex Simple Main Structure, Tutorial
+@node Simple Header File, Simple Event Handling, Simple Minimum Requirements, Tutorial Simple
+@subsection Simple Header File
+@cindex Tutorial Simple Header File
+@cindex Simple Header File, Tutorial
 
-@@@@@@ TUTORIAL NO LONGER VALID FROM THIS POINT ON!
-
-First a little explanation.  @samp{SysSystemDriver} is a system dependent
-class which is reponsible for controlling the main Crystal Space stuff.  It
-loads and initializes the needed components (drivers) and also manages the
-main event loop.  The @file{simple} application creates a subclass of this to
-provide it with its own functionality.  So we start by creating an include
-file @file{simple.h} with the following contents:
+It is good practice to always put defines and declares in header
+files as opposed to source files. In some cases it is even needed. Here
+we will show the header file for a simple Crystal Space application.
+Although this is not strictly required, we use a class to encapsulate
+the application logic. Our @file{simple.h} header looks as follows:
 
 @example
 #ifndef __SIMPLE_H__
 #define __SIMPLE_H__
 
 #include <stdarg.h>
-#include "cssys/sysdriv.h"
 
 struct iEngine;
 struct iLoader;
 struct iGraphics3D;
 struct iKeyboardDriver;
+struct iSector;
+struct iView;
+struct iVirtualClock;
+struct iObjectRegistry;
+struct iEvent;
 
-class Simple : public SysSystemDriver
+class Simple
 @{
-  typedef SysSystemDriver superclass;
 private:
+  iObjectRegistry* object_reg;
   iEngine* engine;
   iLoader* loader;
   iGraphics3D* g3d;
   iKeyboardDriver* kbd;
-
+  iVirtualClock* vc;
+ 
 public:
   Simple ();
-  virtual ~Simple ();
+  ~Simple ();
 
-  virtual bool Initialize (int argc, const char* const argv[],
-    char const *iConfigName);
+  bool Initialize (int argc, const char* const argv[]);
+  void Start ();
 @};
 
-#endif // __SIMPLE_H__
+#endif // __SIMPLE1_H__
 @end example
+
+In the @code{Simple} class we keep a number of references to important
+objects that we are going to need a lot. That way we don't have to get
+them every time when we need them. Other than that we have a constructor
+which will do the initialization of these variables, a destructor which
+will clean up the application, an initialization function which will
+be responsible for the full set up of Crystal Space and our application,
+and finally a @code{Start()} function to start the event handler.
 
 In the source file @file{simple.cpp} we place the following:
 
 @example
 #include "cssysdef.h"
-#include "cssys/system.h"
+#include "cssys/sysfunc.h"
+#include "iutil/vfs.h"
 #include "csutil/cscolor.h"
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
@@ -267,15 +287,16 @@ In the source file @file{simple.cpp} we place the following:
 #include "iutil/event.h"
 #include "iutil/objreg.h"
 #include "iutil/csinput.h"
+#include "iutil/virtclk.h"
 #include "iengine/sector.h"
 #include "iengine/engine.h"
 #include "iengine/camera.h"
 #include "iengine/light.h"
 #include "iengine/statlght.h"
 #include "iengine/texture.h"
+#include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "iengine/material.h"
-#include "iengine/mesh.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
 #include "imesh/object.h"
@@ -284,14 +305,19 @@ In the source file @file{simple.cpp} we place the following:
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
+#include "ivideo/fontserv.h"
+#include "igraphic/imageio.h"
 #include "imap/parser.h"
 #include "ivaria/reporter.h"
+#include "ivaria/stdrep.h"
+#include "csutil/cmdhelp.h"
 
-// Needed for every CS application.
 CS_IMPLEMENT_APPLICATION
 
-// The global system driver
-Simple *System;
+//-----------------------------------------------------------------------------
+
+// The global pointer to simple
+Simple *simple;
 
 Simple::Simple ()
 @{
@@ -299,143 +325,128 @@ Simple::Simple ()
   loader = NULL;
   g3d = NULL;
   kbd = NULL;
+  vc = NULL;
 @}
 
 Simple::~Simple ()
 @{
+  if (vc) vc->DecRef ();
   if (engine) engine->DecRef ();
-  if (loader) loader->DecRef ();
+  if (loader) loader->DecRef();
   if (g3d) g3d->DecRef ();
   if (kbd) kbd->DecRef ();
+  csInitializer::DestroyApplication (object_reg);
 @}
 
-void Cleanup ()
+bool Simple::Initialize (int argc, const char* const argv[])
 @{
-  csPrintf ("Cleaning up...\n");
-  delete System;
-@}
+  object_reg = csInitializer::CreateEnvironment ();
+  if (!object_reg) return false;
 
-bool Simple::Initialize (int argc, const char* const argv[],
-  char const* iConfigName)
-@{
-  if (!superclass::Initialize (argc, argv, iConfigName))
+  csInitializer::SetupCommandLineParser (object_reg, argc, argv);
+  if (!csInitializer::RequestPlugins (object_reg,
+  	CS_REQUEST_VFS,
+	CS_REQUEST_SOFTWARE3D,
+	CS_REQUEST_ENGINE,
+	CS_REQUEST_FONTSERVER,
+	CS_REQUEST_IMAGELOADER,
+	CS_REQUEST_LEVELLOADER,
+	CS_REQUEST_REPORTER,
+	CS_REQUEST_REPORTERLISTENER,
+	CS_REQUEST_END))
+  @{
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple",
+	"Can't initialize plugins!");
     return false;
+  @}
 
-  iObjectRegistry* object_reg = GetObjectRegistry ();
-  csInitializeApplication (object_reg);
+  // Check for commandline help.
+  if (csCommandLineHelper::CheckHelp (object_reg))
+  @{
+    csCommandLineHelper::Help (object_reg);
+    return false;
+  @}
+
+  // The virtual clock.
+  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  if (!vc)
+  @{
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple",
+	"Can't find the virtual clock!");
+    return false;
+  @}
 
   // Find the pointer to engine plugin
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simple",
 	"No iEngine plugin!");
-    exit (1);
+    return false;
   @}
-  engine->IncRef ();
 
   loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!loader)
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simple",
     	"No iLoader plugin!");
-    exit (1);
+    return false;
   @}
-  loader->IncRef ();
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!g3d)
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simple",
     	"No iGraphics3D plugin!");
-    exit (1);
+    return false;
   @}
-  g3d->IncRef ();
 
   kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
   if (!kbd)
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simple",
     	"No iKeyboardDriver plugin!");
-    exit (1);
+    return false;
   @}
-  kbd->IncRef();
 
-  // Open the main system. This will open all
-  // the previously loaded plug-ins.
-  if (!Open ())
+  // Open the main system. This will open all the previously loaded plug-ins.
+  if (!csInitializer::OpenApplication (object_reg))
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simple",
     	"Error opening system!");
-    Cleanup ();
-    exit (1);
+    return false;
   @}
 
   csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-    	"crystalspace.application.simple1",
-	"Simple Crystal Space Application.");
-
-  // First disable the lighting cache.
-  // Our app is simple enough not to need this.
-  engine->SetLightingCacheMode (0);
-
-  // Create our world.
-  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-    	"crystalspace.application.simple1",
-  	"Creating world...");
-  engine->Prepare ();
-  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-    	"crystalspace.application.simple1",
-  	"Created.");
+    	"crystalspace.application.simple",
+	"Simple Crystal Space Application version 0.1.");
 
   return true;
 @}
 
-/*---------------*
- * Main function *
- *---------------*/
+void Simple::Start ()
+@{
+  csDefaultRunLoop (object_reg);
+@}
+
+/*---------------------------------------------------------------------*
+ * Main function
+ *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 @{
-  srand (time (NULL));
+  simple = new Simple ();
 
-  // Create our main class.
-  System = new Simple ();
+  if (simple->Initialize (argc, argv))
+    simple->Start ();
 
-  // We want at least the minimal set of plugins
-  System->RequestPlugin (
-    "crystalspace.kernel.vfs:VFS");
-  System->RequestPlugin (
-    "crystalspace.font.server.default:FontServer");
-  System->RequestPlugin (
-    "crystalspace.graphic.image.io.multiplex:ImageLoader");
-  System->RequestPlugin (
-    "crystalspace.graphics3d.software:VideoDriver");
-  System->RequestPlugin (
-    "crystalspace.engine.3d:Engine");
-  System->RequestPlugin (
-    "crystalspace.level.loader:LevelLoader");
-
-  // Initialize the main system. This will load all needed
-  // plug-ins (3D, 2D, network, etc.) and initialize them.
-  if (!System->Initialize (argc, argv, NULL))
-  @{
-    csReport (System->GetObjectRegistry (), CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
-    	"Error initializing system.");
-    Cleanup ();
-    exit (1);
-  @}
-
-  // Main loop.
-  System->Loop ();
-
-  // Cleanup.
-  Cleanup ();
+  delete simple;
   return 0;
 @}
 @end example
@@ -444,6 +455,26 @@ This is almost the simplest possible application and it is absolutely useless.
 Also don't run it on an operating system where you can't kill a running
 application because there is no way to stop the application once it has
 started running.
+
+Even though this application is useless it already has a lot of features
+that are going to be very useful later. Here is a short summary of all
+the things and features it already has:
+
+@itemize
+@item
+It will open a window.
+@item
+You can control the size of the window and the video driver used
+for that window with commandline options (@code{-video} and @code{-mode}
+commandline options).
+@item
+It will give commandline help when you use the @code{-help} commandline
+option.
+@item
+It has the following plugins initialized and ready to use: engine, 3D
+renderer, canvas, reporter, reporter listener, font server, image loader,
+level loader, and VFS.
+@end itemize
 
 Before we start making this application more useful lets have a look at what
 actually happens here.
@@ -455,49 +486,50 @@ routine is correctly linked and called on every platform.
 
 The main routine first creates an instance of our
 @samp{Simple} class. We put this instance into a global variable to make
-access to it easier. The next step is the creation of the world.  The world
-is actually the main 3D engine class and is one of the most important classes
-for interfacing with the engine (see @samp{iEngine} reference for more
-information).
+access to it easier. The next step is initialization. The first thing the
+@code{Initialize()} function does is to create the environment with
+@code{csInitializer::CreateEnvironment()}. This will initialize @sc{scf},
+create the object registry, and then create a number of other useful
+entities (plugin manager, event queue, ...).
 
-To initialize the system, we call @code{Initialize()} on our @samp{Simple}
-instance.  This is a function inherited from @samp{SysSystemDriver} and is
-responsible for initializing all needed plugins.  It is also responsible for
-parsing the command line and feeding all the options to the appropriate
-handlers.  Note that you should always test for failure of such routines as
-there may be various reasons for failure.
+Note the usage of the @code{csReport()} function. This is a conveniance
+function to send a message (usually an error or notification) to the
+reporter plugin. It works a lot like @code{printf} except that you
+additionally need to give the severity level and an identifier which can give
+someone listening to the reporter an idea of the origin of the message.
 
-Because we are making a simple application we don't have a config file.
-This means that the third argument to @code{Initialize()} will be @samp{NULL}
-(name of config file). It also means we cannot depend on the config file
-to load plugins (like 3D driver and so on) so we have to do that in the code
-by explicitely calling @code{RequestPlugin()} for all plugins that we
-want.
+Then we call @code{csInitializer::SetupCommandLineParser()} to setup
+the commandline parser. This will allow the rest of the initialization
+pass to actually read the commandline.
 
-@samp{csInitializeApplication()} will find and register various global objects
-(like the 3D driver, engine, ...) to the object registry. You must call
-this function so that @code{CS_QUERY_REGISTRY()} will work. In addition this
-function will also set up a reporter (which is used for error and other
-reporting by the rest of the Crystal Space system) and a reporter listener
-which will listen to the reporter and show the messages to the user. It
-is possible to use your own reporter and reporter listener if the default
-ones are not sufficient for your game needs. This can be used (for example)
-to report messages on a graphical console or some other medium.
+@code{csInitializer::RequestPlugins()} will use the config file (which
+we are not using in this tutorial), the commandline and the requested
+plugins to find out which plugins to load. The commandline has highest
+priority, followed by the config file and lastly the requested plugins.
 
-@samp{Initialize()} retrieves a pointer to the engine via a call to the
-@sc{scf} function @code{CS_QUERY_REGISTRY()} and then ``opens'' the system,
-which basically means that all plugins are opened (i.e.  a window will
-be opened). All plugins that were specified in the config file or requested
-for with @code{RequestPlugin()} will also be loaded and opened. This function
-can also fail, so again test for this.
-In addition to retrieving a pointer to the engine it will also get a pointer
-to the level loader (which we are going to use later to load textures) and
-the 3D driver itself.
+The @code{csCommandLineHelper::CheckHelp()} function will check if the
+@code{-help} commandline option is given and if so show the help for
+all loaded plugins (every plugin that is loaded in memory is capable of
+extending the commandline options).
 
-The call to @code{Loop()} puts Crystal Space in the main event loop.  This is
-where the application really starts running and interacting with the user.
-This call returns as soon as an exit message was received by the system at
-which point we call @code{Cleanup()} to clean up everything.
+After that we will query the object registry to find out all the common
+objects that we're going to need later and store a reference in our
+main class. At destruction time we must then release these references
+with @code{DecRef()}.
+
+Finally when all this is done we actually open the window with
+@code{csInitializer::OpenApplication()}. This will send the
+@code{cscmdSystemOpen} message to all components that are listening
+to the event queue. One of the plugins that does this is the 3D renderer
+which will then open its window (or enable graphics on a non-windowing
+operating system).
+
+This concludes the initialization pass.
+
+In @code{Simple::Start()} we will start the default main loop by
+calling @code{csDefaultRunLoop()}. This function will only return when
+the application exits (which this example cannot yet do). Basically
+this function will start the loop to handle events.
 
 @node Simple Event Handling, Simple World, Simple Main Structure, Tutorial Simple
 @subsection Event Handling
@@ -505,44 +537,65 @@ which point we call @code{Cleanup()} to clean up everything.
 @cindex Simple Tutorial Event Handling
 
 To make the testing somewhat easier we will add a way to terminate the
-application by responding to the @key{ESC} key.  Add the following public
-method to our class in @file{simple.h}:
+application by responding to the @key{ESC} key.  Add the following private
+methods to our class in @file{simple.h}:
 
 @example
-virtual bool HandleEvent (iEvent&);
+  static bool SimpleEventHandler (iEvent& ev);
+  bool HandleEvent (iEvent& ev);
 @end example
 
-HandleEvent() is inherited from the system driver and is automatically called
-as each event is received, several of which can accumulate between frames.
-Our version checks if the @key{ESC} key has been pressed. If so it
-will use the object registry to find the global event queue object. Using
-@code{Broadcast} it will then broadcast the @code{cscmdQuit} message
-to all interested parties. This will cause the application to quit.
-Now add this code to @file{simple.cpp}:
+The static function @code{SimpleEventHandler()} will be registered to
+the event queue. It has to be a static function because the event queue
+expects to call a normal C-style function (alternatively you could also
+implement this by making a subclass of @code{iEventHandler} but this is
+more complicated and not really required).
+
+@code{HandleEvent()} is the real event handler. @code{SimpleEventHandler()}
+only serves as a stub function to call @code{HandleEvent()}.
+
+Then add the following code before @code{Simple::Initialize()}:
 
 @example
-bool Simple::HandleEvent (iEvent& Event)
+bool Simple::HandleEvent (iEvent& ev)
 @{
-  if (superclass::HandleEvent (Event))
-    return true;
-
-  if (Event.Type == csevKeyDown && Event.Key.Code == CSKEY_ESC)
+  if (ev.Type == csevKeyDown && ev.Key.Code == CSKEY_ESC)
   @{
-    iEventQueue* q =
-      CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
-    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
+    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    if (q)
+    @{
+      q->GetEventOutlet()->Broadcast (cscmdQuit);
+      q->DecRef ();
+    @}
     return true;
   @}
-
   return false;
+@}
+
+bool Simple::SimpleEventHandler (iEvent& ev)
+@{
+  return simple->HandleEvent (ev);
 @}
 @end example
 
-This code first gives the superclass a chance to respond to the event.  If the
-superclass couldn't handle the event, then our code tries to do so by checking
-for the @key{ESC} key and beginning the termination sequence if it found that
-that key had been pressed.  Otherwise @samp{false} is returned to indicate
-that the event was not handled at all.
+@code{HandleEvent()} checks if the @key{ESC} key has been pressed. If so it
+will use the object registry to find the global event queue object. Using
+@code{Broadcast} it will then broadcast the @code{cscmdQuit} message
+to all interested parties. This will cause the application to quit by ending
+the default run loop.
+
+We also need to initialize this event handler function. To do that add
+the following after the call to @code{csInitializer::RequestPlugins()}:
+
+@example
+  if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
+  @{
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple",
+	"Can't initialize event handler!");
+    return false;
+  @}
+@end example
 
 @node Simple World, Simple Camera, Simple Event Handling, Tutorial Simple
 @subsection Creating a ``World''
@@ -562,21 +615,17 @@ for the @key{ESC} key to quit.  We assume this is the application you always
 wanted to have?  No?  Ok then, let's create some 3D stuff.
 
 We'll add a texture manager, a room (technically called a @dfn{sector}) and
-some lights.  First, add these relevant declarations to @file{simple.h} so
-that it looks like this:
+some lights.  First, add a pointer to our main sector to the @code{Simple}
+class header file:
 
 @example
 @dots{}
 struct iSector;
-
-class Simple : public SysSystemDriver
+@dots{}
+class Simple
 @{
-  typedef SysSystemDriver superclass;
 private:
-  iEngine* engine;
-  iLoader* loader;
-  iGraphics3D* g3d;
-  iKeyboardDriver* kbd;
+  @dots{}
   iSector* room;
   @dots{}
 @end example
@@ -585,14 +634,13 @@ Now add these chunks of code (texture manager, room, lights) to
 @file{simple.cpp}:
 
 @example
-bool Simple::Initialize (int argc, const char* const argv[],
-  char const* iConfigName)
+bool Simple::Initialize (int argc, const char* const argv[])
 @{
   @dots{}
-  // Open the main system. This will open all
-  // the previously loaded plug-ins.
-  if (!Open ())
+  if (!csInitializer::OpenApplication (object_reg))
+  @{
     @dots{}
+  @}
 
   // Setup the texture manager
   iTextureManager* txtmgr = g3d->GetTextureManager ();
@@ -601,26 +649,23 @@ bool Simple::Initialize (int argc, const char* const argv[],
   // Initialize the texture manager
   txtmgr->ResetPalette ();
   @dots{}
-  // Create the world.
-  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-    	"crystalspace.application.simple1",
-  	"Creating world...");
+  // First disable the lighting cache. Our app is simple enough
+  // not to need this.
+  engine->SetLightingCacheMode (0);
 
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simple",
     	"Error loading 'stone4' texture!");
-    Cleanup ();
-    exit (1);
+    return false;
   @}
-  iMaterialWrapper* tm =
-    engine->GetMaterialList ()->FindByName ("stone");
+  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   room = engine->CreateSector ("room");
   iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
-  iThingState* walls_state =
-    SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
+  iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
+  	iThingState);
   iPolygon3D* p;
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
@@ -675,24 +720,25 @@ bool Simple::Initialize (int argc, const char* const argv[],
 
   iStatLight* light;
   iLightList* ll = room->GetLights ();
+
   light = engine->CreateLight (NULL, csVector3 (-3, 5, 0), 10,
   	csColor (1, 0, 0), false);
-  ll->AddLight (light->QueryLight ());
+  ll->Add (light->QueryLight ());
   light->DecRef ();
+
   light = engine->CreateLight (NULL, csVector3 (3, 5,  0), 10,
   	csColor (0, 0, 1), false);
-  ll->AddLight (light->QueryLight ());
+  ll->Add (light->QueryLight ());
   light->DecRef ();
+
   light = engine->CreateLight (NULL, csVector3 (0, 5, -3), 10,
   	csColor (0, 1, 0), false);
-  ll->AddLight (light->QueryLight ());
+  ll->Add (light->QueryLight ());
   light->DecRef ();
 
   engine->Prepare ();
-  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-    	"crystalspace.application.simple1",
-  	"Created.");
 
+  iTextureManager* txtmgr = g3d->GetTextureManager ();
   txtmgr->SetPalette ();
   return true;
 @}
@@ -703,7 +749,9 @@ The first parameter is the name of the texture as it will be known in the
 engine; and the third is the
 actual filename on the @sc{vfs} volume (@pxref{VFS}).  Note, if you don't have
 the @file{stone4.gif} texture you can use another one.  The only requirement
-is that it must have sizes which are a power of 2 (e.g. 64x64). This functions
+is that it must have sizes which are a power of 2 (e.g. 64x64) (note that
+CS will scale them automatically if this requirement isn't met but this can
+reduce quality). This functions
 returns a @samp{iTextureWrapper} which we don't use.  Instead we use
 the @samp{iMaterialWrapper} which is created automatically by
 @code{LoadTexture()}.
@@ -775,9 +823,10 @@ will prepare all textures and create all lightmaps if needed.  Only after this
 call can you start rendering your world, because lightmaps may have to be
 converted to a format more suitable for the chosen 3D renderer.
 
-The last code we added allocates the palette.  Note that is needed even if you
-are running on a true-color display which has no palette.  That's because the
-code does some other things beside setting up a palette.
+The last code we added allocates the palette with the texture manager.
+Note that is needed even if you are running on a true-color display which
+has no palette.  That's because the code does some other things beside
+setting up a palette.
 
 Ok, now we have created our room and properly initialized it.  If you would
 compile and run this application you would still see a black screen.  Why?
@@ -797,19 +846,17 @@ easier.  Now edit @file{simple.h} to make use of @code{iView}:
 
 @example
 @dots{}
-struct iSector;
 struct iView;
 @dots{}
 
-class Simple : public SysSystemDriver
+class Simple
 @{
 private:
   @dots{}
   iView* view;
-
-public:
   @dots{}
-  virtual void NextFrame ();
+  void SetupFrame ();
+  void FinishFrame ();
   @dots{}
 @end example
 
@@ -830,17 +877,13 @@ Simple::~Simple ()
 @}
 @end example
 
-At the end of our @code{Initialize()} function we add the following:
+At the end of our @code{Initialize()} function (before
+@code{txtmgr->SetPalette()} we add the following:
 
 @example
-bool Simple::Initialize (int argc, const char* const argv[],
-  char const* iConfigName)
+bool Simple::Initialize (int argc, const char* const argv[])
 @{
   @dots{}
-  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-    	"crystalspace.application.simple1",
-  	"Created.");
-
   view = new csView (engine, g3d);
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
@@ -864,42 +907,80 @@ which has almost the size of the window.  We set this viewing rectangle with
 @code{SetRectangle()}.
 
 Now, this still isn't enough.  We have a camera but the camera is not used.
-We still need to write a @code{NextFrame()} method which tells the camera to
-actually render the 3D image at each animation frame.  Implement NextFrame()
-as follows:
+We still have to write code that actually draws the screen. We will do this
+in the functions @code{SetupFrame()} and @code{FinishFrame()}. Note that
+Crystal Space is event driver so the actual drawing needs to be triggered
+by the event handler. Add the following code somewhere in the source file:
 
 @example
-void Simple::NextFrame ()
+void Simple::SetupFrame ()
 @{
-  superclass::NextFrame ();
-
   // Tell 3D driver we're going to display 3D things.
-  if (!g3d->BeginDraw (
-      engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
-      return;
+  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
+    return;
 
   // Tell the camera to render into the frame buffer.
   view->Draw ();
+@}
 
-  // Drawing code ends here.
+void Simple::FinishFrame ()
+@{
   g3d->FinishDraw ();
-  // Display the final output.
   g3d->Print (NULL);
 @}
 @end example
 
-First we indicate to the 3D rasterizer that we want to start drawing 3D
-graphics.  This call makes sure that the needed buffers are set up and
+Modify the event handler like this:
+
+@example
+bool Simple::HandleEvent (iEvent& ev)
+@{
+  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
+  @{
+    simple->SetupFrame ();
+    return true;
+  @}
+  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
+  @{
+    simple->FinishFrame ();
+    return true;
+  @}
+  else if (ev.Type == csevKeyDown && ev.Key.Code == CSKEY_ESC)
+  @dots{}
+@end example
+
+Drawing the screen is split in two parts. First there is the part that
+is done in @code{SetupFrame()}. Here we will actually fill the display.
+In this case we let the engine do most of that work by calling
+@code{view->Draw()}. But in principle you can do any kind of drawing here.
+
+In @code{SetupFrame()} we first have to indicate to the 3D rasterizer that
+we want to start drawing 3D graphics.  This call makes sure that the
+needed buffers are set up and
 performs all necessary initialization. The engine often needs extra settings
 for this as well so you @emph{must} call @code{engine->GetBeginDrawFlags()} to
 get these flags and or them with the ones that you want.
-Then we draw through our view by calling @code{iView::Draw()} which
-updates the view area with the 3D world data as seen through the camera.
-After this we finish 3D drawing with
-@code{FinishDraw()} and then update the display by calling @code{Print()}.
-The @samp{NULL} pointer given to @code{Print()} is the area that you want to
-update (it is a rectangle).  If @samp{NULL} is used then the entire window is
-updated.
+
+The second part is in @code{FinishFrame()} where we actually dump the
+frame to the screen. The reason this is split is that other components
+(plugins) in Crystal Space may choose to listen to events to draw additional
+things on top of the 3D view rendered in @code{SetupFrame()}. When a frame
+needs to be rendered the Crystal Space framework will send four messages:
+
+@itemize
+@item
+@code{cscmdPreProcess} is sent first. This allows plugins to preprocess
+things before drawing can happen.
+@item
+@code{cscmdProcess} follows. In this pass the application will render.
+@item
+@code{cscmdPostProcess} is after that. This is the pass that can be used
+by external components to render on top of the view rendered by the
+application.
+@item
+@code{cscmdFinalProcess} is last. In this pass the application will display
+the frame on screen.
+@end itemize
 
 Compile and run this example.  For the first time you should see something.  A
 solid wall.  Congratulations, you have created your first almost useful
@@ -914,15 +995,13 @@ Crystal Space application.
 Staring at that solid wall gets a bit boring after some time.  The problem is
 that we can't move the camera to change our view point.  Let's add some code
 to do exactly this.  Edit @file{simple.cpp} again and change
-@file{NextFrame()} as follows:
+@file{SetupFrame()} as follows:
 
 @example
-void Simple::NextFrame ()
+void Simple::SetupFrame ()
 @{
-  superclass::NextFrame ();
-  // First get elapsed time from the system driver.
-  csTicks elapsed_time, current_time;
-  GetElapsedTime (elapsed_time, current_time);
+  // First get elapsed time from the virtual clock.
+  csTicks elapsed_time = vc->GetElapsedTicks ();
   
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
@@ -956,4 +1035,5 @@ Space system for use, how to create a simple room with some lights, event
 handling, and how to handle some basic camera operations.
 
 You can now go on to the next tutorial (@pxref{Tutorial Simple 2})) to learn
-how to add a 3D sprite to this engine.
+how to add a 3D sprite to this application.
+

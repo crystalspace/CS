@@ -25,14 +25,16 @@ struct iEngine;
 struct iLoader;
 struct iGraphics3D;
 struct iKeyboardDriver;
-struct iSector;
-struct iView;
 struct iVirtualClock;
 struct iObjectRegistry;
+struct iEvent;
+struct iSector;
+struct iView;
 
 class Simple
 {
-public:
+private:
+  iObjectRegistry* object_reg;
   iEngine* engine;
   iLoader* loader;
   iGraphics3D* g3d;
@@ -40,16 +42,18 @@ public:
   iVirtualClock* vc;
   iSector* room;
   iView* view;
-  iObjectRegistry* object_reg;
  
-public:
-  Simple ();
-  virtual ~Simple ();
-
-  bool Initialize (int argc, const char* const argv[]);
-  bool HandleEvent (iEvent&);
+  static bool SimpleEventHandler (iEvent& ev);
+  bool HandleEvent (iEvent& ev);
   void SetupFrame ();
   void FinishFrame ();
+
+public:
+  Simple ();
+  ~Simple ();
+
+  bool Initialize (int argc, const char* const argv[]);
+  void Start ();
 };
 
 #endif // __SIMPLE1_H__

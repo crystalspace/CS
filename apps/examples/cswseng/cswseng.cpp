@@ -589,14 +589,6 @@ int main (int argc, char* argv[])
   cmdline->AddOption ("mode", "800x600");
   cmdline->DecRef ();
 
-  if (!csInitializer::Initialize (object_reg))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.cswseng",
-	"Can't initialize system!");
-    return -1;
-  }
-
   // Check for commandline help.
   if (csCommandLineHelper::CheckHelp (object_reg))
   {

@@ -1310,12 +1310,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     return false;
   }
 
-  if (!csInitializer::Initialize (object_reg))
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Failed to initialize!");
-    return false;
-  }
-
   SetDefaults ();
 
   if (!csInitializer::SetupEventHandler (object_reg, WalkEventHandler))

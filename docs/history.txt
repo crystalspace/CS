@@ -1,5 +1,19 @@
 The history order is reversed so that new features are at the top.
 
+19-Oct-2001
+	- Removed diagnostic messages from image multiplexer. Those are
+	  not really needed.
+	- Removed diagnostic message from csparser. Changed one
+	  notify message to an error message (the inability to find VFS
+	  is an error).
+	- Removed csInitializer::Initialize() since it does nothing more
+	  than initialize the hidden system driver variable. Since the
+	  system driver is going to be removed it is better to remove
+	  Initialize() as well. Since on some platforms this Initialize()
+	  is still needed we just delay it to later (in OpenApplication()).
+	- Updated the simple1 tutorial in code to make it look cleaner.
+	- Updated the simple1 tutorial documentation. Simple2 tutorial is
+	  still outdated though.
 18-Oct-2001
 	- Michael Voase shifted water and fire proctex down to the basement.
 	- Removed usage of cs_snprintf in cfgfile.cpp and

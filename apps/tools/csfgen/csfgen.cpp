@@ -275,12 +275,6 @@ int main (int argc, char* argv[])
     return -1;
   }
 
-  if (!csInitializer::Initialize (object_reg))
-  {
-    fprintf (stderr, "couldn't init app! (perhaps some plugins are missing?)");
-    return -1;
-  }
-
   programname = argv [0];
 
   int c;

@@ -849,13 +849,6 @@ int main (int argc, char *argv[])
   G2DTestSystemDriver System (argc, argv);
   Sys = &System;
   iObjectRegistry* object_reg = System.object_reg;
-  if (!csInitializer::Initialize (object_reg))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.g2dtest",
-        "Unable to init app!");
-    return -1;
-  }
 
   if (!csInitializer::SetupEventHandler (object_reg, G2DEventHandler))
   {

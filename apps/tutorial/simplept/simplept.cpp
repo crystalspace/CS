@@ -165,14 +165,6 @@ bool Simple::Initialize (int argc, const char* const argv[])
     return false;
   }
 
-  if (!csInitializer::Initialize (object_reg))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
-	"Can't start application!");
-    return false;
-  }
-
   if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,

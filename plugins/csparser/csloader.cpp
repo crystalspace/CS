@@ -1931,15 +1931,15 @@ bool csLoader::Initialize(iObjectRegistry *object_Reg)
 
   GET_PLUGIN (Reporter, iReporter, "reporter");
 
-  ReportNotify("Initializing loader plug-in ");
   loaded_plugins.plugin_mgr = plugin_mgr;
 
   // get the virtual file system plugin
   VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!VFS)
   {
-    ReportNotify (
-      "Failed to initialize the loader: No VFS plugin.");
+    ReportError (
+	"crystalspace.maploader.novfs",
+	"Failed to initialize the loader: No VFS plugin.");
     return false;
   }
 

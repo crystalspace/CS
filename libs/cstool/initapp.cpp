@@ -67,6 +67,7 @@
 
 static SysSystemDriver* global_sys = NULL;
 static bool config_done = false;
+static bool sys_init_done = false;
 static iEventHandler* installed_event_handler = NULL;
 
 iObjectRegistry* csInitializer::CreateEnvironment ()
@@ -293,12 +294,6 @@ bool csInitializer::RequestPlugins (iObjectRegistry* r, ...)
   return rc;
 }
 
-bool csInitializer::Initialize (iObjectRegistry* r)
-{
-  if (!config_done) SetupConfigManager (r, NULL);
-  return global_sys->Initialize ();
-}
-
 bool csInitializer::SetupEventHandler (
   iObjectRegistry* r, iEventHandler* evhdlr, unsigned int eventmask)
 {
@@ -338,6 +333,14 @@ bool csInitializer::SetupEventHandler (
 
 bool csInitializer::OpenApplication (iObjectRegistry* r)
 {
+  if (!config_done) SetupConfigManager (r, NULL);
+  // @@@ Temporary.
+  if (!sys_init_done)
+  {
+    if (!global_sys->Initialize ()) return false;
+    sys_init_done = true;
+  }
+
   // Pass the open event to all interested listeners.
   csEvent Event (csGetTicks (), csevBroadcast, cscmdSystemOpen);
   iEventQueue* EventQueue = CS_QUERY_REGISTRY (r, iEventQueue);
