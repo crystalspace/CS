@@ -308,11 +308,15 @@ void csSprite3DMeshObjectFactory::AddVertices (int num)
 {
   int frame;
 
+  int oldvt = GetVertexCount ();
   for (frame = 0; frame < frames.Length(); frame++)
   {
-    normals.Get (frame)->SetVertexCount (GetVertexCount () + num);
-    texels.Get (frame)->SetVertexCount (GetVertexCount () + num);
-    vertices.Get (frame)->SetVertexCount (GetVertexCount () + num);
+    normals.Get (frame)->SetVertexCount (oldvt + num);
+    memset (normals.Get (frame)->GetVertices () + oldvt, 0,
+    	sizeof (csVector3) * num);
+    	
+    texels.Get (frame)->SetVertexCount (oldvt + num);
+    vertices.Get (frame)->SetVertexCount (oldvt + num);
   }
 }
 
@@ -550,7 +554,7 @@ void csSprite3DMeshObjectFactory::ComputeNormals (csSpriteFrame* frame)
     if (vt.con_triangles.Length ())
     {
       csVector3 &n = GetNormal (frame_number, i);
-      //if (n.IsZero())
+      if (n.IsZero())
       {
         n.Set (0,0,0);
         for (j = 0; j < vt.con_triangles.Length (); j++)

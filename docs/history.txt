@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Jun-2004
+	- Jorrit fixed a bug in spr3d where manually specifying sprite normals
+	  didn't work.
 28-Jun-2004
 	- Eric Sunshine fixed csApplicationFramework destructor so that it does
 	  not bomb out if csApplicationFramework::Main() was not called.
