@@ -36,6 +36,7 @@
 #include "awsbarct.h"
 #include "awsstbar.h"
 #include "awsimgvw.h"
+#include "awsmled.h"
 
 #include "awscmpt.h"
 #include "awscscr.h"
@@ -1180,6 +1181,7 @@ void awsManager::RegisterCommonComponents ()
   (void)new awsNotebookPageFactory (this);
   (void)new awsNotebookButtonFactory (this);
   (void)new awsImageViewFactory (this);
+  (void)new awsMultiLineEditFactory (this);
   
   RegisterComponentFactory (new awsComponentFactory (this), "awsComponent");
 
