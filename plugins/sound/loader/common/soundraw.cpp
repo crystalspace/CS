@@ -162,8 +162,9 @@ void *ConvertChannels(void *d, const csSoundFormat *oldfmt,
 void *ConvertFreq(void *d, const csSoundFormat *oldfmt,
   const csSoundFormat *newfmt, long &NumSamples)
   {
-  float Factor=newfmt->Freq/oldfmt->Freq;
+  float Factor=newfmt->Freq/(float)oldfmt->Freq;
   unsigned long NewNumSamples=(unsigned long)(NumSamples*Factor);
+
   if (oldfmt->Bits==16)
   {
     CONVERT_FREQ_TYPE(short,oldfmt->Channels);
