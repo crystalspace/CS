@@ -368,7 +368,8 @@ Then add the following somewhere before the creation of the view:
   @}
   if (!room)
   @{
-    Printf (CS_MSG_FATAL_ERROR, "Can't find a valid starting position!\n");
+    Printf (CS_MSG_FATAL_ERROR,
+      "Can't find a valid starting position!\n");
     cleanup ();
     exit (1);
   @}

@@ -407,8 +407,8 @@ bool Simple::Initialize (int argc, const char const* const argv[],
 
   room = engine->CreateSector ("room");
   iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
-  iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
-  	iThingState);
+  iThingState* walls_state =
+    SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
   iPolygon3D* p;
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);

@@ -268,9 +268,164 @@ Everything that does not fit anywhere else
 
 @subheading Global @sc{api} Changes
 
+All @sc{scf} macro names are now prefixed with @samp{SCF_} in order to avoid
+polluting the global namespace.
+
+@itemize @bullet
+@item
+@code{CONSTRUCT_EMBEDDED_IBASE} @result{} @code{SCF_CONSTRUCT_EMBEDDED_IBASE}
+@item
+@code{CONSTRUCT_IBASE} @result{} @code{SCF_CONSTRUCT_IBASE}
+@item
+@code{CREATE_INSTANCE} @result{} @code{SCF_CREATE_INSTANCE}
+@item
+@code{DECLARE_EMBEDDED_IBASE} @result{} @code{SCF_DECLARE_EMBEDDED_IBASE}
+@item
+@code{DECLARE_FACTORY} @result{} @code{SCF_DECLARE_FACTORY}
+@item
+@code{DECLARE_FAST_INTERFACE} @result{} @code{SCF_DECLARE_FAST_INTERFACE}
+@item
+@code{DECLARE_IBASE_EXT} @result{} @code{SCF_DECLARE_IBASE_EXT}
+@item
+@code{DECLARE_IBASE} @result{} @code{SCF_DECLARE_IBASE}
+@item
+@code{DEC_REF} @result{} @code{SCF_DEC_REF}
+@item
+@code{EXPORT_CLASS_DEP} @result{} @code{SCF_EXPORT_CLASS_DEP}
+@item
+@code{EXPORT_CLASS_TABLE_END} @result{} @code{SCF_EXPORT_CLASS_TABLE_END}
+@item
+@code{EXPORT_CLASS_TABLE} @result{} @code{SCF_EXPORT_CLASS_TABLE}
+@item
+@code{EXPORT_CLASS} @result{} @code{SCF_EXPORT_CLASS}
+@item
+@code{IMPLEMENTS_EMBEDDED_INTERFACE} @result{} @code{SCF_IMPLEMENTS_EMBEDDED_INTERFACE}
+@item
+@code{IMPLEMENTS_INTERFACE_COMMON} @result{} @code{SCF_IMPLEMENTS_INTERFACE_COMMON}
+@item
+@code{IMPLEMENTS_INTERFACE} @result{} @code{SCF_IMPLEMENTS_INTERFACE}
+@item
+@code{IMPLEMENT_EMBEDDED_IBASE_DECREF} @result{} @code{SCF_IMPLEMENT_EMBEDDED_IBASE_DECREF}
+@item
+@code{IMPLEMENT_EMBEDDED_IBASE_END} @result{} @code{SCF_IMPLEMENT_EMBEDDED_IBASE_END}
+@item
+@code{IMPLEMENT_EMBEDDED_IBASE_GETREFCOUNT} @result{}@*@code{SCF_IMPLEMENT_EMBEDDED_IBASE_GETREFCOUNT}
+@item
+@code{IMPLEMENT_EMBEDDED_IBASE_INCREF} @result{} @code{SCF_IMPLEMENT_EMBEDDED_IBASE_INCREF}
+@item
+@code{IMPLEMENT_EMBEDDED_IBASE_QUERY_END} @result{}@*@code{SCF_IMPLEMENT_EMBEDDED_IBASE_QUERY_END}
+@item
+@code{IMPLEMENT_EMBEDDED_IBASE_QUERY} @result{} @code{SCF_IMPLEMENT_EMBEDDED_IBASE_QUERY}
+@item
+@code{IMPLEMENT_EMBEDDED_IBASE} @result{} @code{SCF_IMPLEMENT_EMBEDDED_IBASE}
+@item
+@code{IMPLEMENT_FACTORY} @result{} @code{SCF_IMPLEMENT_FACTORY}
+@item
+@code{IMPLEMENT_IBASE_DECREF} @result{} @code{SCF_IMPLEMENT_IBASE_DECREF}
+@item
+@code{IMPLEMENT_IBASE_END} @result{} @code{SCF_IMPLEMENT_IBASE_END}
+@item
+@code{IMPLEMENT_IBASE_EXT_DECREF} @result{} @code{SCF_IMPLEMENT_IBASE_EXT_DECREF}
+@item
+@code{IMPLEMENT_IBASE_EXT_END} @result{} @code{SCF_IMPLEMENT_IBASE_EXT_END}
+@item
+@code{IMPLEMENT_IBASE_EXT_GETREFCOUNT} @result{} @code{SCF_IMPLEMENT_IBASE_EXT_GETREFCOUNT}
+@item
+@code{IMPLEMENT_IBASE_EXT_INCREF} @result{} @code{SCF_IMPLEMENT_IBASE_EXT_INCREF}
+@item
+@code{IMPLEMENT_IBASE_EXT_QUERY_END} @result{} @code{SCF_IMPLEMENT_IBASE_EXT_QUERY_END}
+@item
+@code{IMPLEMENT_IBASE_EXT_QUERY} @result{} @code{SCF_IMPLEMENT_IBASE_EXT_QUERY}
+@item
+@code{IMPLEMENT_IBASE_EXT} @result{} @code{SCF_IMPLEMENT_IBASE_EXT}
+@item
+@code{IMPLEMENT_IBASE_GETREFCOUNT} @result{} @code{SCF_IMPLEMENT_IBASE_GETREFCOUNT}
+@item
+@code{IMPLEMENT_IBASE_INCREF} @result{} @code{SCF_IMPLEMENT_IBASE_INCREF}
+@item
+@code{IMPLEMENT_IBASE_QUERY_END} @result{} @code{SCF_IMPLEMENT_IBASE_QUERY_END}
+@item
+@code{IMPLEMENT_IBASE_QUERY} @result{} @code{SCF_IMPLEMENT_IBASE_QUERY}
+@item
+@code{IMPLEMENT_IBASE} @result{} @code{SCF_IMPLEMENT_IBASE}
+@item
+@code{INC_REF} @result{} @code{SCF_INC_REF}
+@item
+@code{QUERY_INTERFACE_FAST} @result{} @code{SCF_QUERY_INTERFACE_FAST}
+@item
+@code{QUERY_INTERFACE_SAFE} @result{} @code{SCF_QUERY_INTERFACE_SAFE}
+@item
+@code{QUERY_INTERFACE} @result{} @code{SCF_QUERY_INTERFACE}
+@item
+@code{REGISTER_STATIC_CLASS_DEP} @result{} @code{SCF_REGISTER_STATIC_CLASS_DEP}
+@item
+@code{REGISTER_STATIC_CLASS} @result{} @code{SCF_REGISTER_STATIC_CLASS}
+@item
+@code{REGISTER_STATIC_LIBRARY} @result{} @code{SCF_REGISTER_STATIC_LIBRARY}
+@end itemize
+
+Macro names related to @code{iSystem::Printf()} are now prefixed with
+@samp{CS_} in order to avoid polluting the global namespace.
+
+@itemize
+@item
+@code{MSG_INTERNAL_ERROR} @result{} @code{CS_MSG_INTERNAL_ERROR}
+@item
+@code{MSG_FATAL_ERROR} @result{} @code{CS_MSG_FATAL_ERROR}
+@item
+@code{MSG_WARNING} @result{} @code{CS_MSG_WARNING}
+@item
+@code{MSG_INITIALIZATION} @result{} @code{CS_MSG_INITIALIZATION}
+@item
+@code{MSG_CONSOLE} @result{} @code{CS_MSG_CONSOLE}
+@item
+@code{MSG_STDOUT} @result{} @code{CS_MSG_STDOUT}
+@item
+@code{MSG_DEBUG_0} @result{} @code{CS_MSG_DEBUG_0}
+@item
+@code{MSG_DEBUG_1} @result{} @code{CS_MSG_DEBUG_1}
+@item
+@code{MSG_DEBUG_2} @result{} @code{CS_MSG_DEBUG_2}
+@item
+@code{MSG_DEBUG_0F} @result{} @code{CS_MSG_DEBUG_0F}
+@item
+@code{MSG_DEBUG_1F} @result{} @code{CS_MSG_DEBUG_1F}
+@item
+@code{MSG_DEBUG_2F} @result{} @code{CS_MSG_DEBUG_2F}
+@end itemize
+
+Plugin management macro names are now prefixed with @samp{CS_} in order to
+avoid polluting the global namespace.
+
+@itemize
+@item
+@code{QUERY_PLUGIN} @result{} @code{CS_QUERY_PLUGIN}
+@item
+@code{QUERY_PLUGIN_ID} @result{} @code{CS_QUERY_PLUGIN_ID}
+@item
+@code{QUERY_PLUGIN_CLASS} @result{} @code{CS_QUERY_PLUGIN_CLASS}
+@item
+@code{LOAD_PLUGIN} @result{} @code{CS_LOAD_PLUGIN}
+@item
+@code{_LOAD_PLUGIN} @result{} @code{_CS_LOAD_PLUGIN}
+@end itemize
+
+Macros for classifying events are now prefixed with @samp{CS_} in order to
+avoid polluting the global namespace.
+
+@itemize
+@item
+@code{IS_KEYBOARD_EVENT} @result{} @code{CS_IS_KEYBOARD_EVENT}
+@item
+@code{IS_MOUSE_EVENT} @result{} @code{CS_IS_MOUSE_EVENT}
+@item
+@code{IS_JOYSTICK_EVENT} @result{} @code{CS_IS_JOYSTICK_EVENT}
+@item
+@code{IS_NETWORK_EVENT} @result{} @code{CS_IS_NETWORK_EVENT}
+@end itemize
+
 Methods in many classes and @sc{scf} interfaces have been renamed in order to
 improve naming consistency throughout the project.
-
 The following method names changes follow the pattern where
 @code{GetNumSomething()} or @code{GetNumberSomething()} became
 @code{GetSomethingCount()}.
@@ -281,19 +436,25 @@ The following method names changes follow the pattern where
 @item
 @code{GetNumActions()} @result{} @code{GetActionCount()}
 @item
-@code{GetNumChars()} @result{} @code{GetCharCount()}
+@code{GetNumberAging()} @result{} @code{GetAgingCount()}
+@item
+@code{GetNumberEmitters()} @result{} @code{GetEmitterCount()}
+@item
+@code{GetNumberMetaBalls()} @result{} @code{GetMetaBallCount()}
+@item
+@code{GetNumberParticles()} @result{} @code{GetParticleCount()}
 @item
 @code{GetNumCameraPositions()} @result{} @code{GetCameraPositionCount()}
 @item
-@code{GetNumPolyTxtPlanes()} @result{} @code{GetPolyTxtPlaneCount()}
+@code{GetNumChars()} @result{} @code{GetCharCount()}
 @item
 @code{GetNumCollections()} @result{} @code{GetCollectionCount()}
 @item
 @code{GetNumCollisionPairs()} @result{} @code{GetCollisionPairCount()}
 @item
-@code{GetNumCurveVertices()} @result{} @code{GetCurveVertexCount()}
-@item
 @code{GetNumCurves()} @result{} @code{GetCurveCount()}
+@item
+@code{GetNumCurveVertices()} @result{} @code{GetCurveVertexCount()}
 @item
 @code{GetNumDimensions()} @result{} @code{GetDimensionCount()}
 @item
@@ -327,6 +488,8 @@ The following method names changes follow the pattern where
 @item
 @code{GetNumPolygons()} @result{} @code{GetPolygonCount()}
 @item
+@code{GetNumPolyTxtPlanes()} @result{} @code{GetPolyTxtPlaneCount()}
+@item
 @code{GetNumRepeats()} @result{} @code{GetRepeatCount()}
 @item
 @code{GetNumShadows()} @result{} @code{GetShadowCount()}
@@ -343,13 +506,19 @@ The following method names changes follow the pattern where
 @item
 @code{GetNumVertices()} @result{} @code{GetVertexCount()}
 @item
-@code{GetNumberMetaBalls()} @result{} @code{GetMetaBallCount()}
+@code{GetNumVertsToLight()} @result{} @code{GetVertexToLightCount()}
 @item
-@code{GetNumberParticles()} @result{} @code{GetParticleCount()}
+@code{GetStaticNumSamples()} @result{} @code{GetStaticSampleCount()}
 @item
 @code{NumVertices()} @result{} @code{GetVertexCount()}
 @item
 @code{ReportNumberTriangles()} @result{} @code{ReportTriangleCount()}
+@item
+@code{SetNumber()} @result{} @code{SetCount()}
+@item
+@code{SetNumberMetaBalls()} @result{} @code{SetMetaBallCount()}
+@item
+@code{SetNumberParticles()} @result{} @code{SetParticleCount()}
 @item
 @code{SetNumEdges()} @result{} @code{SetEdgeCount()}
 @item
@@ -359,21 +528,7 @@ The following method names changes follow the pattern where
 @item
 @code{SetNumVertices()} @result{} @code{SetVertexCount()}
 @item
-@code{SetNumberMetaBalls()} @result{} @code{SetMetaBallCount()}
-@item
-@code{GetNumberEmitters()} @result{} @code{GetEmitterCount()}
-@item
-@code{GetNumberAging()} @result{} @code{GetAgingCount()}
-@item
-@code{SetNumberParticles()} @result{} @code{SetParticleCount()}
-@item
-@code{GetNumVertsToLight()} @result{} @code{GetVertexToLightCount()}
-@item
-@code{GetStaticNumSamples()} @result{} @code{GetStaticSampleCount()}
-@item
 @code{Update_Num()} @result{} @code{UpdateCount()}
-@item
-@code{SetNumber()} @result{} @code{SetCount()}
 @end itemize
 
 The prefix @samp{cs} was added to the following list of functions, and their
@@ -381,37 +536,25 @@ names were also normalized.
 
 @itemize @bullet
 @item
-@code{RndNum()} @result{} @code{csRndNum()}
+@code{ByteSwap16bit()} @result{} @code{csByteSwap16bit()}
 @item
-@code{strnew()} @result{} @code{csStrNew()}
+@code{ByteSwap16bitBuffer()} @result{} @code{csByteSwap16bitBuffer()}
+@item
+@code{ByteSwap32bit()} @result{} @code{csByteSwap32bit()}
+@item
+@code{ByteSwap32bitBuffer()} @result{} @code{csByteSwap32bitBuffer()}
 @item
 @code{Combinations()} @result{} @code{csCombinations()}
 @item
 @code{expandname()} @result{} @code{csExpandName()}
 @item
-@code{splitpath()} @result{} @code{csSplitPath()}
+@code{FindNearestPowerOf2()} @result{} @code{csFindNearestPowerOf2()}
 @item
 @code{fnamematches()} @result{} @code{csFilenameMatches()}
 @item
-@code{ScanStr()} @result{} @code{csScanStr()}
-@item
-@code{iSwap()} @result{} @code{csSwapInt()}
-@item
-@code{fSwap()} @result{} @code{csSwapFloat()}
-@item
 @code{fSquare()} @result{} @code{csSquareFloat()}
 @item
-@code{ByteSwap32bit()} @result{} @code{csByteSwap32bit()}
-@item
-@code{ByteSwap16bit()} @result{} @code{csByteSwap16bit()}
-@item
-@code{ByteSwap32bitBuffer()} @result{} @code{csByteSwap32bitBuffer()}
-@item
-@code{ByteSwap16bitBuffer()} @result{} @code{csByteSwap16bitBuffer()}
-@item
-@code{FindNearestPowerOf2()} @result{} @code{csFindNearestPowerOf2()}
-@item
-@code{IsPowerOf2()} @result{} @code{csIsPowerOf2()}
+@code{fSwap()} @result{} @code{csSwapFloat()}
 @item
 @code{GenerateHalo()} @result{} @code{csGenerateHalo()}
 @item
@@ -423,7 +566,19 @@ names were also normalized.
 @item
 @code{get_token_int()} @result{} @code{csGetTokenInt()}
 @item
+@code{IsPowerOf2()} @result{} @code{csIsPowerOf2()}
+@item
+@code{iSwap()} @result{} @code{csSwapInt()}
+@item
+@code{RndNum()} @result{} @code{csRndNum()}
+@item
+@code{ScanStr()} @result{} @code{csScanStr()}
+@item
 @code{skip_token()} @result{} @code{csSkipToken()}
+@item
+@code{splitpath()} @result{} @code{csSplitPath()}
+@item
+@code{strnew()} @result{} @code{csStrNew()}
 @end itemize
 
 @subheading @code{csfx} Library Renamed

@@ -173,8 +173,8 @@ bool Simple::Initialize (int argc, const char* const argv[],
   csMatrix3 m; m.Identity (); m *= 5.;
   sprite->GetMovable ()->SetTransform (m);
   sprite->GetMovable ()->UpdateMove ();
-  iSprite3DState* spstate = SCF_QUERY_INTERFACE (sprite->GetMeshObject (),
-  	iSprite3DState);
+  iSprite3DState* spstate =
+    SCF_QUERY_INTERFACE (sprite->GetMeshObject (), iSprite3DState);
   spstate->SetAction ("default");
   imeshfact->DecRef ();
   spstate->DecRef ();
