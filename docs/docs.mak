@@ -234,9 +234,8 @@ apidoc: $(OUT.DOC.API).CLEAN $(OUT.DOC.API)/index.html
 # Rule to perform actual HTML conversion of $(CSMANUAL_FILE).
 do-htmldoc:
 	cd $(OUT.DOC.HTML); $(PERL) $(OUT.DOC.UNDO)/$(TEXI2HTML) \
-	-init_file $(OUT.DOC.UNDO)/$(TEXI2HTMLINIT) -short_extn \
-	-top_file cs.htm -split section -subdir . -prefix cs \
-	-I $(OUT.DOC.UNDO)/$(CSMANUAL_DIR) -verbose $(CSMANUAL_FILE)
+	-init_file $(OUT.DOC.UNDO)/$(TEXI2HTMLINIT) -prefix cs \
+	-I $(OUT.DOC.UNDO)/$(CSMANUAL_DIR) $(CSMANUAL_FILE)
 
 # Rule to generate HTML format output.  Target images are retained since
 # generated HTML files reference them.

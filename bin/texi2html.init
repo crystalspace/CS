@@ -80,18 +80,20 @@ $T2H_NUMBER_SECTIONS = 1;
 # (resp. chapter) and separate pages for Top, ToC, Overview, Index,
 # Glossary, About.
 # otherwise, create monolitich html file which contains whole document
-#$T2H_SPLIT = 'section';
-$T2H_SPLIT = undef;
+$T2H_SPLIT = 'section';
+#$T2H_SPLIT = undef;
 
 # -subdir
 # if set put result files in this directory
 # if not set result files are put into current directory
-$T2H_SUBDIR = 'html';
+#$T2H_SUBDIR = 'html';
+$T2H_SUBDIR = '.';
 
 # -short_extn
 # If this is set all HTML file will have extension ".htm" instead of
 # ".html". This is helpful when shipping the document to PC systems.
-$T2H_SHORTEXTN = 0;
+#$T2H_SHORTEXTN = 0;
+$T2H_SHORTEXTN = 1;
 
 # -prefix
 # Set the output file prefix, prepended to all .html, .gif and .pl files.
@@ -115,7 +117,8 @@ $T2H_IDX_SUMMARY = '';
 
 # -verbose
 # if set, chatter about what we are doing
-$T2H_VERBOSE = 0;
+#$T2H_VERBOSE = 0;
+$T2H_VERBOSE = 1;
 
 # -lang
 # For page titles use $T2H_WORDS->{$T2H_LANG}->{...} as title.
