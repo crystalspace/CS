@@ -1661,7 +1661,9 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
     else
     {
       rm = meshes[m];
-      *rm = *allRenderMeshes[m];
+      // Not yet initialized.
+      if (rm->indexend == 0)
+        *rm = *allRenderMeshes[m];
     }
 
     rm->clip_portal = clip_portal;

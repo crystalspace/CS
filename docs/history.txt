@@ -18,6 +18,8 @@ chronological order.
 	  custom code for growing array. This should also considerably
 	  speed up csPoly3D (and thus loading of sprites which makes
 	  heavy use of csPoly3D).
+	- Jorrit did a small optimization on sprcal3d which avoids the
+	  copy of the rendermeshes all the time.
 21-Aug-2004
 	- Jorrit added more leakguards to CS.
         - Philip Wyett fixed attempts to load
