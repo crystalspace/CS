@@ -314,20 +314,23 @@ public:
   ~csLightMapQueue ()
   {
 
-    if(!ownsData){
-      if(gltxtCached) delete[] gltxtCached;
-      if(glvertsCached) delete[] glvertsCached;
-      if(trisCached) delete[] trisCached;
-      if(gltxtFogCached) delete[] gltxtFogCached;
-      if(glcolorsFogCached) delete[]glcolorsFogCached;
-    };
-    delete[] tris;
-    delete[] glverts;
-    delete[] gltxt;
-    /*if(glcolorsFog) delete[] glcolorsFog;
-    if(gltxtFog) delete[] gltxtFog;*/
+    if (!ownsData)
+    {
+      delete[] gltxtCached;
+      delete[] glvertsCached;
+      delete[] trisCached;
+      delete[] gltxtFogCached;
+      delete[] glcolorsFogCached;
+    }
+    else
+    {
+      delete[] gltxt;
+      delete[] glverts;
+      delete[] tris;
+      delete[] gltxtFog;
+      delete[] glcolorsFog;
+    }
   }
-
 };
 
 /**
