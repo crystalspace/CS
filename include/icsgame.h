@@ -632,35 +632,42 @@ SCF_VERSION (iDataLoader, 0, 1, 0);
 struct iDataLoader : public iBase
 {
   /**
-   * Opens a Data Context. This operation can be compared to switching
-   * to a subdirectory in a filesystem. All following operations will
-   * happen relative to that Context. A top level context could be for 
-   * example the name of an entity. This function returns false, if the
-   * given context does not exist.
+   * return the name of the current context
    */
-  virtual bool OpenContext(const char* Context) = 0;
-  
-  /**
-   * Closes a Context that has been opened by OpenContext
-   */
-  virtual void CloseContext() = 0;
+  virtual const char* GetName() = 0;
 
   /**
    * return the data of the current context
    */
-  virtual const char* GetCurrentContextData() = 0;
+  virtual const char* GetData() = 0;
+
+  /**
+   * Gets a specific contained Data Context. This function returns 
+   * NULL, if the given context does not exist.
+   */
+  virtual iDataLoader* GetContext(const char* Context) = 0;
+  
+  /**
+   * Gets the value of the Element with the given name
+   */
+  virtual const char* GetAttributeData(const char* Key) = 0;
+
+  /**
+   * Gets the value of the Context with the given name
+   */
+  virtual const char* GetContextData(const char* Context) = 0;
 
   /**
    * Gets the name of the first context in the current context, or NULL 
    * if there is no Context at all
    */
-  virtual const char* GetFirstContext(geMAPITERATOR& iter) = 0;
+  virtual iDataLoader* GetFirstContext(geMAPITERATOR& iter) = 0;
 
   /**
    * Gets the name of the next context in the current context, or NULL 
    * if there is no further Context.
    */
-  virtual const char* GetNextContext(geMAPITERATOR& iter) = 0;
+  virtual iDataLoader* GetNextContext(geMAPITERATOR& iter) = 0;
 
   /**
    * Gets the name and value of the first attribute in the current context, 
@@ -678,15 +685,6 @@ struct iDataLoader : public iBase
                                 const char*& Key, 
                                 const char*& Value) = 0;
 
-  /**
-   * Gets the value of the Element with the given name
-   */
-  virtual const char* GetAttributeData(const char* Key) = 0;
-
-  /**
-   * Gets the value of the Context with the given name
-   */
-  virtual const char* GetContextData(const char* Context) = 0;
 };
 
 //---------------------------------------------------------------------------
@@ -708,6 +706,9 @@ struct iDataLoaderFile : public iBase
    * went wrong loading the file.
    */
   virtual bool Read(iVFS* pVFS, const char* filename) = 0;
+
+  /// Get the root context of the file.
+  virtual iDataLoader* GetContext() = 0;
 };
 
 //---------------------------------------------------------------------------
