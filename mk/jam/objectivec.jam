@@ -18,14 +18,15 @@ rule ObjC
 {
   Depends $(<) : $(>) ;
 
-  OBJCFLAGS on $(>) += $(OBJCFLAGS) $(CCFLAGS) $(OPTIM) ;
+  CCFLAGS on $(<) += $(CCFLAGS) $(SUBDIRCCFLAGS) ;
+  OBJCFLAGS on $(<) += $(OBJCFLAGS) ;
   CCHDRS on $(<) = [ on $(<) FIncludes $(HDRS) ] ;
   CCDEFS on $(<) = [ on $(<) FDefines $(DEFINES) ] ;
 }
 
 actions ObjC
 {
-  $(CMD.OBJC) -c -o $(<) $(OBJCFLAGS) $(CCDEFS) $(CCHDRS) $(>)
+  $(CMD.OBJC) -c -o $(<) $(CCFLAGS) $(OBJCFLAGS) $(CCDEFS) $(CCHDRS) $(>)
 }
 }
 
@@ -44,13 +45,14 @@ rule ObjC++
 {
   Depends $(<) : $(>) ;
   
-  OBJC++FLAGS on $(>) += $(OBJC++FLAGS) $(C++FLAGS) $(OPTIM) ;
+  C++FLAGS on $(<) += $(C++FLAGS) $(SUBDIRC++FLAGS) ;
+  OBJC++FLAGS on $(<) += $(OBJC++FLAGS) ;
   CCHDRS on $(<) = [ on $(<) FIncludes $(HDRS) ] ;
   CCDEFS on $(<) = [ on $(<) FDefines $(DEFINES) ] ;
 }
 
 actions ObjC++
 {
-  $(CMD.OBJC++) -c -o $(<) $(OBJC++FLAGS) $(CCDEFS) $(CCHDRS) $(>)
+  $(CMD.OBJC++) -c -o $(<) $(C++FLAGS) $(OBJC++FLAGS) $(CCDEFS) $(CCHDRS) $(>)
 }
 }

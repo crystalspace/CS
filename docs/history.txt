@@ -29,6 +29,16 @@ The history order is reversed so that new features are at the top.
 	  extra library target for each plugin and has some helper rules so
 	  that you can easily construct your static builds yourself. But there
 	  isn't a global static mode anymore in jam.
+	- Eric Sunshine made the following Jam-related changes:
+	    - Fixed bug in objectivec.jam reported by Matt Reda where OBJCFLAGS
+	      and OBJC++FLAGS were being set incorrectly on $(>) rather than
+	      $(<) in ObjC and ObjC++ rules, respectively.
+	    - Fixed problem in objectivec.jam where the ObjC and ObjC++ rules
+	      were not utilizing CCFLAGS and C++FLAGS set on specific object
+	      files if those flags were added by the CFlags/LFlags (or
+	      indirectly via ExternalLibs) rules in module-specific Jamefiles.
+	    - Augmented macosx/opengl/Jamfile to also respect .c, .C, .mm, and
+	      .M file extensions.
 21-May-2003
 	- Jorrit fixed the new csString::SubString() so that it is more
 	  efficient (no longer returns a new csString) and also documented
@@ -50,31 +60,30 @@ The history order is reversed so that new features are at the top.
 	      portals to any mesh object). However later on most functions
 	      still query for iThingState so this promise of more generality
 	      is not fulfilled yet.
-	- DeSigna brought manual section 6.4.6 (SCF Examples)
-	  up-to-date with current SCF workings.
+	- DeSigna brought manual section 6.4.6 (SCF Examples) up-to-date with
+	  current SCF workings.
 	- res made a few changes to bugplug to have it work more nicely with
 	  the new renderer. The most 'drastic' changes is that 
 	  G3D->FinishDraw() is now called after the FPS is shown.
-	- res changed render3d to push the current modelview/projection 
+	- res changed render3d to push the current modelview/projection
 	  matrices when beginning 2D drawing and popping them when it ends.
-	  Before, the 2d ortho projection matrix was preserved causing 
-	  wrong drawing of meshes.
+	  Before, the 2d ortho projection matrix was preserved causing wrong
+	  drawing of meshes.
 20-May-2003
 	- Philip Wyett worked around problem of incorrect pathed cs_pyth.cpp
-          being included in the cspython MSVC project file. Added variable
-          CSPYTHON_MSVC_EXCLUDE and wrapped the bad line in the makefile.
-          The variable is only true for the MSVCGEN process to force
-          exclusion from our project files and will not affect nix or
-          other platforms.
-	- Jorrit removed csArray and csPArray->GetArray() again as this
-	  breaks encapsulation.
+	  being included in the cspython MSVC project file.  Added variable
+	  CSPYTHON_MSVC_EXCLUDE and wrapped the bad line in the makefile.  The
+	  variable is only true for the MSVCGEN process to force exclusion from
+	  our project files and will not affect nix or other platforms.
+	- Jorrit removed csArray and csPArray->GetArray() again as this breaks
+	  encapsulation.
 	- Jorrit added iObjectModel->GetPolygonMeshShadows() and
-	  SetPolygonMeshShadows(). This will be used by the shadow manager
-	  in the new renderer. Implemented this in csObjectModel and also
-	  fixed all mesh objects.
-	- Jorrit extended the loader so you can now specify <shadows/>
-	  in a <polymesh> to indicate that the polymesh is for shadows (this
-	  is in addition to <viscull/> and <colldet/>).
+	  SetPolygonMeshShadows().  This will be used by the shadow manager in
+	  the new renderer.  Implemented this in csObjectModel and also fixed
+	  all mesh objects.
+	- Jorrit extended the loader so you can now specify <shadows/> in a
+	  <polymesh> to indicate that the polymesh is for shadows (this is in
+	  addition to <viscull/> and <colldet/>).
 	- res scrapped the 'experimental' token list macros in favor of a more
 	  stable & portable solution suggested by Eric Sunshine.
 	- res changed csShaderGLAVP so that shader variables are fetched in
