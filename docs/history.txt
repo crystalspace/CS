@@ -47,6 +47,7 @@ chronological order.
 	    NASM.BIN      --> CMD.NASM
 	    USE_XFREE86VM --> XFREE86VM.AVAILABLE
 	    HAS_CAL3D     --> CAL3D.AVAILABLE
+	- Jorrit fixed awstest and awstut so they no longer use /this.
 3-Feb-2004
 	- Eric Sunshine fixed syntax error in aws.mak introduced yesterday
 	  which manifested when running 'msvcgen' targets.

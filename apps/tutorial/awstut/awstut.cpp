@@ -179,9 +179,9 @@ bool AwsTutorial::Initialize (int argc, const char* const argv[])
   aws->GetSinkMgr ()->RegisterSink ("testButtonSink", sink);
 
   // now load preferences
-  if (!aws->GetPrefMgr()->Load ("/this/data/temp/windows_skin.def"))
+  if (!aws->GetPrefMgr()->Load ("/temp/windows_skin.def"))
     Report(CS_REPORTER_SEVERITY_ERROR, "couldn't load skin definition file!");
-  if (!aws->GetPrefMgr()->Load ("/this/data/temp/awstut.def"))
+  if (!aws->GetPrefMgr()->Load ("/temp/awstut.def"))
     Report(CS_REPORTER_SEVERITY_ERROR, "couldn't load definition file!");
   aws->GetPrefMgr ()->SelectDefaultSkin ("Windows");
 
