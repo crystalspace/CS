@@ -456,6 +456,12 @@ struct iAwsComponent : public iAwsSource
 
   /// Triggered when the keyboard focus is gained
   virtual bool OnGainFocus()=0;
+
+  /// Triggered at the start of each frame
+  virtual bool OnFrame()=0;
+
+  /// Triggered when a child is added to the parent (triggered on the child)
+  virtual void OnAdded()=0;
 };
 
 
