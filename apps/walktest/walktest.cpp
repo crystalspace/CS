@@ -1048,7 +1048,8 @@ bool WalkTest::SetMapDir (const char* map_dir)
   }
   if (!myVFS->ChDir (map_dir))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "The directory on VFS for map file does not exist!");
+    Report (CS_REPORTER_SEVERITY_ERROR,
+    	"The directory on VFS for map file does not exist!");
     return false;
   }
   return true;
@@ -1292,9 +1293,15 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
     // Load two textures that are used in the maze.
     if (!LevelLoader->LoadTexture ("txt", "/lib/std/stone4.gif"))
+    {
+      Report (CS_REPORTER_SEVERITY_ERROR, "Failed to load /lib/std/stone4.gif");
       return false;
+    }
     if (!LevelLoader->LoadTexture ("txt2", "/lib/std/mystone2.gif"))
+    {
+      Report (CS_REPORTER_SEVERITY_ERROR, "Failed to load /lib/std/mystone2.gif");
       return false;
+    }
 
     if (do_infinite)
     {
@@ -1406,7 +1413,10 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
       }
       if (!LevelLoader->LoadMapFile ("world", false, region, !do_regions,
       		do_dupes))
+      {
+        Report (CS_REPORTER_SEVERITY_ERROR, "Failing to load map!");
         return false;
+      }
       if (do_regions)
       {
         // First we force a clear of the cache manager in the engine

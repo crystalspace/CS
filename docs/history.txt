@@ -9,8 +9,9 @@ chronological order.
 19-Mar-2004
 	- Keith Fulton fixed very obvious bug in RecalcBoundingBox where
 	  old bbox was not cleared out before new points were added.
-	- Added a skeleton update as soon as an anim cycle is added, which
-	  makes the bbox update.  This enables accurate colliders to be created.
+	- Keith also added a skeleton update as soon as an anim cycle is
+	  added, which makes the bbox update. This enables accurate colliders
+	  to be created.
 18-Mar-2004
 	- Anders Stenberg changed the terraformer interface a bit (made Sample
 	  functions return pointers to data instead of filling out supplied
@@ -33,6 +34,8 @@ chronological order.
 	- res changed the nada reftracker to being not dllexported.
 	- res augmented csws with the DLL goop.
 	- res removed a superflouos csTriangle from the ASE plugin.
+	- Jorrit added better error reporting to walktest in order to find
+	  out why CS is now broken.
 17-Mar-2004
 	- Duhprey added a simple terraformer loader plugin
 	- Eric Sunshine fixed copy/paste error in terraformer loader makefile
