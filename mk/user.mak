@@ -103,21 +103,6 @@ endif
 # don't support this, setting this option to 'yes' does nothing.
 DO_ASM=yes
 
-# If 'yes' include sound support.
-DO_SOUND=yes
-
-# If "yes" include AIFF support
-DO_AIFF=yes
-
-# If "yes" include IFF support
-DO_IFF=yes
-
-# If "yes" include AU support
-DO_AU=yes
-
-# If "yes" include WAV support
-DO_WAV=yes
-
 # If "yes" include MMX support in software renderer
 DO_MMX=yes
 
