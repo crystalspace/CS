@@ -67,7 +67,7 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed inconsistencies in Jam build system which
 	  resulted in failure to compile Objective-C (and Objective-C++) source
 	  files.  Problem was inconsistent naming of variable and rules;
-	  somtimes used OCc, but other times used ObjC.  Now uses ObjC and
+	  some times used OCc, but other times used ObjC.  Now uses ObjC and
 	  ObjC++ uniformly (since those are the common and well understood
 	  abbreviations).  Also added .M as registered file type for
 	  Objective-C++.
