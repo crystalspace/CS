@@ -88,7 +88,7 @@ class csGridBagConstraint : public csLayoutConstraint
   };
 
   // for internal uses
-
+  bool bSized;
   csVector2 mPrefCompSize;
 
 };
@@ -143,13 +143,13 @@ class csGridBagLayout : public csLayout2
   csGridBagLayout (csComponent *pParent);
   ~csGridBagLayout ();
 
+  virtual void RemoveLayoutComponent (csComponent* comp);
   virtual void SuggestSize (int &sugw, int &sugh);
   virtual void LayoutContainer ();
 
   virtual void MaximumLayoutSize (int &w, int &h);
   virtual double GetLayoutAlignmentX ();
   virtual double GetLayoutAlignmentY ();
-  virtual void InvalidateLayout ();
 
   csGridBagConstraint c;
 

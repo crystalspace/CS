@@ -95,6 +95,9 @@ public:
   /// Set new cursor position and extend selection if extendsel == true
   void SetCursorPos (int NewPos, bool ExtendSel);
 
+  /// Report the minimal size of inputline
+  virtual void SuggestSize (int &w, int &h);
+
   /// Check whenever new cursor position is valid
   virtual bool IsValidPos (int NewPos);
 
