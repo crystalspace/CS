@@ -2,22 +2,22 @@ The history order has been reversed so that new features are at the top.
 
 15-Nov-2000
 	- Samuel Humphreys did the following:
-	    - Cleaned up csview, now resizes box views properly again and
-	      now polygon views.
+	    - Cleaned up csview, now resizes box views properly again and now
+	      polygon views.
 	    - Added emacs fontification to boxclip.
-	    - Experimental fix for G2D line clipper. The layout widget
-	      freezes in cswstest, caught in an infinite loop within
-	      the line clipper. Tested on linux. I presume the fuzz to
-	      fxmax and fymax was added for some purpose...it seems to
-	      work better for me without it.
+	    - Experimental fix for G2D line clipper.  The layout widget freezes
+	      in cswstest, caught in an infinite loop within the line clipper.
+	      Tested on linux.  I presume the fuzz to fxmax and fymax was added
+	      for some purpose...it seems to work better for me without it.
+	- Eric Sunshine fixed an inconsistency with handling of reference
+	  counts in LoadFont() in the csFont and FreeFont font servers.
 14-Nov-2000
 	- Eric Sunshine eliminated the obsolete crystalspace.sound.driver.null
 	  entry from scf.cfg.
-	- Thomas Hieber reworked the interface of iEntity, to make the
-	  design much more modular and lightweight, without sacrificing any
-	  funtionality and only little performance. This change was
-	  inspired by Jorrits description of the Entity System of Dreams
-	  Eternal.
+	- Thomas Hieber reworked the interface of iEntity, to make the design
+	  much more modular and lightweight, without sacrificing any
+	  funtionality and only little performance.  This change was inspired
+	  by Jorrits description of the Entity System of Dreams Eternal.
 	- Norman Kramer added triangulation of high order polygons when
 	  creating a sprite (for model importer).
 	- Norman also modified the wavefront (.obj) reader to recognize

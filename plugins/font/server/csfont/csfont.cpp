@@ -116,6 +116,7 @@ iFont *csDefaultFontServer::LoadFont (const char *filename)
         if (fontdef->Name) delete [] fontdef->Name;
         fontdef->Name = strnew(filename);
         fonts.Push(fontdef);
+        fontdef->IncRef ();
         return fontdef;
       }
     }
@@ -251,7 +252,7 @@ csDefaultFont* csDefaultFontServer::ReadFntFile(const char *file)
       goto error_exit;
     }
     cp += strlen(startstr) +1; /// also skip \n
-    if( fntfile->GetSize () - (cp - **fntfile) < (unsigned int)( bitmaplen + 256 ) )
+    if(fntfile->GetSize() - (cp - **fntfile) < (unsigned int)(bitmaplen + 256))
     {
       System->Printf(MSG_WARNING, "File %s is too short.\n", file);
       goto error_exit;
@@ -346,15 +347,15 @@ error_exit:
 }
 
 
-//--//--//--//--//--//--//--//--//--//--//--//--//--//- The font object --//--//
+//--//--//--//--//--//--//--//--//--//--//--//--//--//- The font object -//--//
 
 IMPLEMENT_IBASE (csDefaultFont)
   IMPLEMENTS_INTERFACE (iFont)
 IMPLEMENT_IBASE_END
 
 csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
-  int width, int height, int bytesperchar, uint8 *bitmap, uint8 *individualwidth)
-  : DeleteCallbacks (4, 4)
+  int width, int height, int bytesperchar, uint8 *bitmap,
+  uint8 *individualwidth) : DeleteCallbacks (4, 4)
 {
   CONSTRUCT_IBASE (parent);
   Parent = parent;
@@ -382,7 +383,7 @@ csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
 csDefaultFont::~csDefaultFont ()
 {
   for (int i = DeleteCallbacks.Length () - 2; i >= 0; i -= 2)
-    ((DeleteNotify)DeleteCallbacks.Get (i)) (this, DeleteCallbacks.Get (i + 1));
+    ((DeleteNotify)DeleteCallbacks.Get (i))(this, DeleteCallbacks.Get (i + 1));
 
   Parent->NotifyDelete (this);
   if (Name [0] != '*')

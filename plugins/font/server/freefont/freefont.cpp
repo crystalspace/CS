@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Norman Krämer
+    Copyright (C) 2000 by Norman Kramer
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -55,7 +55,8 @@ bool csFreeTypeServer::Initialize (iSystem *Sys)
 
   if (TT_Init_FreeType (&engine))
   {
-    System->Printf (MSG_FATAL_ERROR, "Could not create a TrueType engine instance !\n");
+    System->Printf (MSG_FATAL_ERROR,
+      "Could not create a TrueType engine instance !\n");
     return false;
   }
 
@@ -117,6 +118,7 @@ iFont *csFreeTypeServer::LoadFont (const char *filename)
     return NULL;
   }
   fonts.Put (font);
+  font->IncRef ();
   return font;
 }
 
@@ -130,7 +132,7 @@ iFont *csFreeTypeServer::GetFont (int iIndex)
   return NULL;
 }
 
-//--------------------------------------------// A FreeType font object //----//
+//-------------------------------------------// A FreeType font object //----//
 
 IMPLEMENT_IBASE (csFreeTypeFont)
   IMPLEMENTS_INTERFACE (iFont)
@@ -147,7 +149,7 @@ csFreeTypeFont::csFreeTypeFont (const char *filename) : DeleteCallbacks (4, 4)
 csFreeTypeFont::~csFreeTypeFont ()
 {
   for (int i = DeleteCallbacks.Length () - 2; i >= 0; i -= 2)
-    ((DeleteNotify)DeleteCallbacks.Get (i)) (this, DeleteCallbacks.Get (i + 1));
+    ((DeleteNotify)DeleteCallbacks.Get (i))(this, DeleteCallbacks.Get (i + 1));
   if (face.z)
     TT_Close_Face (face);
 }
@@ -226,20 +228,23 @@ bool csFreeTypeFont::Load (csFreeTypeServer *server)
 {
   if (TT_Open_Face (server->engine, name, &face))
   {
-    server->System->Printf (MSG_WARNING, "Font file %s could not be loaded!\n", name);
+    server->System->Printf (MSG_WARNING,
+      "Font file %s could not be loaded!\n", name);
     return false;
   }
 
   int error;
   if ((error = TT_Get_Face_Properties (face, &prop)))
   {
-    server->System->Printf(MSG_WARNING, "Get_Face_Properties: error %d.\n", error);
+    server->System->Printf(MSG_WARNING,
+      "Get_Face_Properties: error %d.\n", error);
     return false;
   }
 
   if ((error = TT_New_Instance (face, &instance)))
   {
-    server->System->Printf(MSG_WARNING, "Could not create an instance of Font %s."
+    server->System->Printf(MSG_WARNING,
+      "Could not create an instance of Font %s."
       " The font is probably broken!\n", name);
     return false;
   }
@@ -253,7 +258,7 @@ bool csFreeTypeFont::Load (csFreeTypeServer *server)
   while (i < prop.num_CharMaps)
   {
     if ((error = TT_Get_CharMap_ID (face, i, &pID, &eID)))
-      server->System->Printf (MSG_WARNING, "Get_CharMap_ID: error %d.\n", error);
+      server->System->Printf(MSG_WARNING,"Get_CharMap_ID: error %d.\n",error);
     if (server->platformID == pID && server->encodingID == eID)
       break;
     i++;
@@ -268,7 +273,7 @@ bool csFreeTypeFont::Load (csFreeTypeServer *server)
 
     if ((error = TT_Get_CharMap_ID (face, 0, &pID, &eID)))
     {
-      server->System->Printf (MSG_WARNING, "Get_CahrMap_ID: error %d.\n", error);
+      server->System->Printf(MSG_WARNING,"Get_CahrMap_ID: error %d.\n",error);
       return false;
     }
     server->System->Printf (MSG_INITIALIZATION, "Will instead use encoding %d"
