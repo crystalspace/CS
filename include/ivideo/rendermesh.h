@@ -91,7 +91,22 @@ struct csRenderMesh
   /// Clipping parameter
   int clip_z_plane;
 
-  /// Mirror mode
+  /**
+   * Mirror mode - whether the mesh should be mirrored.
+   * Essentially toggles between back- and front-face culling. 
+   * It should be set to \p true if \a object2camera contains a negative
+   * scaling. Basically, in almost any case it should be set to the camera's
+   * mirror mode.
+   *
+   * \example
+   * iCamera* camera;
+   * csRenderMesh myMesh;
+   *   ...
+   * myMesh.object2camera = camera->GetTransform () / 
+   *   movable->GetFullTransform ();
+   * myMesh.do_mirror = camera->IsMirrored ();
+   * \endexample
+   */
   bool do_mirror;
 
   /// Mesh type

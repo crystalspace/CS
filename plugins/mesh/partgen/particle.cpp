@@ -621,7 +621,11 @@ csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num, iRenderView* rvie
   rm->clip_portal = ClipPortal;
   rm->clip_plane = ClipPlane;
   rm->clip_z_plane = ClipZ;
-  rm->do_mirror = camera->IsMirrored ();
+  rm->do_mirror = false/* camera->IsMirrored () */; 
+    /*
+      Force to false as the front-face culling will let the particle 
+      disappear. 
+     */
   rm->meshtype = CS_MESHTYPE_TRIANGLES;
   rm->indexstart = 0;
   rm->indexend = TriangleCount * 3;

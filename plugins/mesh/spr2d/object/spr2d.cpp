@@ -499,7 +499,11 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
   rm->clip_portal = clip_portal;
   rm->clip_plane = clip_plane;
   rm->clip_z_plane = clip_z_plane;
-  rm->do_mirror = camera->IsMirrored ();
+  rm->do_mirror = false/* camera->IsMirrored () */; 
+    /*
+      Force to false as the front-face culling will let the sprite 
+      disappear. 
+     */
   rm->indexstart = 0;
   rm->indexend = vertices.Length();
   rm->inUse = true;
