@@ -21,7 +21,7 @@
 #include "cssysdef.h"
 #include "csutil/event.h"
 
-utf32_char csKeyEventHelper::GetRawCode (iEvent* event)
+utf32_char csKeyEventHelper::GetRawCode (const iEvent* event)
 {
   uint32 code;
   if (!event->Find ("keyCodeRaw", code))
@@ -29,7 +29,7 @@ utf32_char csKeyEventHelper::GetRawCode (iEvent* event)
   return code;
 }
 
-utf32_char csKeyEventHelper::GetCookedCode (iEvent* event)
+utf32_char csKeyEventHelper::GetCookedCode (const iEvent* event)
 {
   uint32 code;
   if (!event->Find ("keyCodeCooked", code))
@@ -37,7 +37,7 @@ utf32_char csKeyEventHelper::GetCookedCode (iEvent* event)
   return code;
 }
 
-void csKeyEventHelper::GetModifiers (iEvent* event, 
+void csKeyEventHelper::GetModifiers (const iEvent* event, 
 				     csKeyModifiers& modifiers)
 {
   memset (&modifiers, 0, sizeof (modifiers));
@@ -48,7 +48,7 @@ void csKeyEventHelper::GetModifiers (iEvent* event,
   memcpy (&modifiers, mod, MIN (sizeof (modifiers), modSize));
 }
 
-csKeyEventType csKeyEventHelper::GetEventType (iEvent* event)
+csKeyEventType csKeyEventHelper::GetEventType (const iEvent* event)
 {
   uint8 type;
   if (!event->Find ("keyEventType", type))
@@ -56,14 +56,14 @@ csKeyEventType csKeyEventHelper::GetEventType (iEvent* event)
   return (csKeyEventType)type;
 }
 
-bool csKeyEventHelper::GetAutoRepeat (iEvent* event)
+bool csKeyEventHelper::GetAutoRepeat (const iEvent* event)
 {
   bool autoRep;
   if (!event->Find ("keyAutoRepeat", autoRep)) return false;
   return autoRep;
 }
 				    
-csKeyCharType csKeyEventHelper::GetCharacterType (iEvent* event)
+csKeyCharType csKeyEventHelper::GetCharacterType (const iEvent* event)
 {
   uint8 type;
   if (!event->Find ("keyCharType", type))
@@ -71,7 +71,7 @@ csKeyCharType csKeyEventHelper::GetCharacterType (iEvent* event)
   return (csKeyCharType)type;
 }
 
-bool csKeyEventHelper::GetEventData (iEvent* event, csKeyEventData& data)
+bool csKeyEventHelper::GetEventData (const iEvent* event, csKeyEventData& data)
 {
   if (!CS_IS_KEYBOARD_EVENT (*event)) return false;
 
@@ -85,7 +85,7 @@ bool csKeyEventHelper::GetEventData (iEvent* event, csKeyEventData& data)
   return true;
 }
 
-uint32 csKeyEventHelper::GetModifiersBits (iEvent* event)
+uint32 csKeyEventHelper::GetModifiersBits (const iEvent* event)
 {
   csKeyModifiers m;
   GetModifiers (event, m);
