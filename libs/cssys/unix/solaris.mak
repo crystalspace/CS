@@ -41,22 +41,19 @@ NEED_SOCKET_LIB=yes
 LIBS.EXE=-ldl -lnsl -lm
 
 # Where can the Zlib library be found on this system?
-#Z_LIBS=-Llibs/zlib -lz
 Z_LIBS=-L/usr/local/lib -lz
 
 # Where can the PNG library be found on this system?
-#PNG_LIBS=-Llibs/libpng -lpng
 PNG_LIBS=-L/usr/local/lib -lpng
 
 # Where can the JPG library be found on this system?
-#JPG_LIBS=-Llibs/libjpeg -ljpeg
 JPG_LIBS=-L/usr/local/lib -ljpeg
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
 
 # Indicate where special include files can be found.
-CFLAGS.INCLUDE=-Ilibs/zlib -I/usr/local/include
+CFLAGS.INCLUDE=-I/usr/local/include
 
 # General flags for the compiler which are used in any case.
 CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM)
@@ -89,7 +86,7 @@ LFLAGS.DLL=-Wl,-G
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS=libs/cssys/unix/unix.cpp libs/cssys/unix/loadlib.cpp \
   libs/cssys/general/printf.cpp libs/cssys/unix/utiming.cpp \
-  support/gnu/getopt.c support/gnu/getopt1.c
+  libs/cssys/general/getopt.cpp
 
 # The C compiler.
 CC=gcc -c

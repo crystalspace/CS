@@ -84,8 +84,6 @@ protected:
 public:
   /// takes the maximum size of the cache
   D3DCache (int max_size, csCacheType type, int bpp);
-  ///
-  virtual ~D3DCache();
 
   ///
   void cache_texture (iTextureHandle *texture);
@@ -126,6 +124,9 @@ public:
   D3DTextureCache(int nMaxSize, bool bHardware, LPDIRECTDRAW4 pDDraw, 
                   LPDIRECT3DDEVICE3 pDevice, int nBpp, bool bMipmapping,
 		  csGraphics3DCaps *pRendercaps);
+  virtual ~D3DTextureCache ()
+  { Clear (); }
+
   ///
   virtual void Dump();
   
@@ -155,6 +156,9 @@ private:
 public:
   ///
   D3DLightMapCache(int nMaxSize, bool bHardware, LPDIRECTDRAW4 pDDraw, LPDIRECT3DDEVICE3 pDevice, int nBpp);
+  ///
+  virtual ~D3DLightMapCache ()
+  { Clear (); }
   ///
   virtual void Dump();
   

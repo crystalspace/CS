@@ -52,7 +52,6 @@ public:
   
   virtual void NextFrame ();
   virtual void Alert (const char* s);
-  virtual void Warn (const char* s);
 
   /// Implementation of iWin32SystemDriver interface.
 
@@ -66,9 +65,14 @@ public:
   virtual bool Open (const char *Title);
   virtual void Close ();
 
-  DECLARE_IBASE_EXT (csSystemDriver);
+  /// Perform extension function
+  bool SystemExtension (const char *iCommand, ...);
+
+  /// The system is idle: we can sleep for a while
+  virtual void Sleep (int SleepTime);
 
   //------------------------- iEventPlug interface ---------------------------//
+  DECLARE_IBASE_EXT (csSystemDriver);
 
   virtual unsigned GetPotentiallyConflictingEvents ()
   { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
@@ -76,6 +80,10 @@ public:
   { return 100; }
 
 private:
+  static long FAR PASCAL WindowProc (HWND hWnd, UINT message,
+    WPARAM wParam, LPARAM lParam);
+
+  HCURSOR m_hCursor;
 #ifdef DO_DINPUT_KEYBOARD
   HANDLE m_hEvent;
   HANDLE m_hThread;

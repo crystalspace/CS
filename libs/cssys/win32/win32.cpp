@@ -1,32 +1,33 @@
 /*
     Copyright (C) 1998-2000 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "cssysdef.h"
+#include <stdarg.h>
 
+#include "cssysdef.h"
 #include "csgeom/math3d.h"
 #include "cssys/system.h"
 #include "cssys/win32/win32.h"
 #include "csutil/inifile.h"
+#include "igraph2d.h"
 #include "igraph3d.h"
 
 // Sets up graphics drivers -- Assumes DirectX 5 or later & DirectDraw 3D
 #include "cssys/win32/DirectDetection.h"
-#include "video/canvas/ddraw/ig2d.h"
 
 #include <windowsx.h>
 
@@ -57,7 +58,7 @@ extern char**	_argv;
 #endif
 
 
-HINSTANCE ModuleHandle;
+extern HINSTANCE ModuleHandle;
 bool ApplicationActive = true;
 int ApplicationShow;
 
@@ -70,38 +71,79 @@ void sys_fatalerror(char *s)
 extern csSystemDriver* System; // Global pointer to system that can be used by event handler
 static iEventOutlet *EventOutlet;
 
-long FAR PASCAL WindowProc( HWND hWnd, UINT message,WPARAM wParam, LPARAM lParam );
-
 //-----------------------------------------------// The System Driver //------//
 
 #ifdef DO_DINPUT_KEYBOARD
 
 /*
- * This table performs the translation from keycode to character.
- * It use this english keyboard layout.
- * ----
- * PS: They may be some errors, it's quite difficult to check. So if you
- * have some keys that are not handled correctly, You'd better check this first.
- *
-*/
-static int s_KeyTable[257]=
+ * This table performs the translation from keycode to Crystal Space key code.
+ */
+static unsigned short ScanCodeToChar [256] =
 {
-  0,
-  CSKEY_ESC,'1','2','3','4','5','6','7','8','9','0','-','=',CSKEY_BACKSPACE,CSKEY_TAB,
-  'q','w','e','r','t','y','u','i','o','p','[',']','\n',
-  CSKEY_CTRL,'a','s','d','f','g','h','j','k','l',';','\'','`',CSKEY_SHIFT,'\\',
-  'z','x','c','v','b','n','m',',','.','/',CSKEY_SHIFT,CSKEY_PADMULT,CSKEY_ALT,
-  ' ',0/*DIK_CAPITAL*/,
-  CSKEY_F1,CSKEY_F2,CSKEY_F3,CSKEY_F4,CSKEY_F5,CSKEY_F6,CSKEY_F7,CSKEY_F8,CSKEY_F9,CSKEY_F10,
-  0/*DIK_NUMLOCK*/,0/*DIK_SCROLL*/,
-  CSKEY_HOME,CSKEY_UP,CSKEY_PGUP,CSKEY_PADMINUS,CSKEY_LEFT,CSKEY_CENTER,CSKEY_RIGHT,CSKEY_PADPLUS,CSKEY_END,CSKEY_DOWN,CSKEY_PGDN,CSKEY_INS,'.',
-  0/*DIK_OEM_102*/,CSKEY_F11,CSKEY_F12,0,0,0,0,0,0,0,0,0,0,0,0/*DIK_F13*/,0/*DIK_F14*/,0/*DIK_F15*/,0,0,0,0,0,0,0,0,0,
-  0/*DIK_KANA*/,0,0,0/*DIK_ABNT_C1*/,0,0,0,0,0,0/*DIK_CONVERT*/,0,0/*DIK_NOCONVERT*/,
-  0,0/*DIK_YEN*/,0/*DIK_ABNT_C2*/,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'=',0,0,0/*DIK_CIRCUMFLEX*/,0/*DIK_AT*/,
-  0/*DIK_COLON*/,0/*DIK_UNDERLINE*/,0/*DIK_KANJI*/,0/*DIK_STOP*/,0/*DIK_AX*/,0/*DIK_UNLABELED*/,0,0,0,0,
-  '\n',CSKEY_CTRL,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  CSKEY_DEL,0,CSKEY_PADDIV,0,0/*DIK_SYSRQ*/,CSKEY_ALT,0,0,0,0,0,0,0,0,0,0,0,0,0/*DIK_PAUSE*/,0,
-  CSKEY_HOME,CSKEY_UP,CSKEY_PGUP,0,CSKEY_LEFT,0,CSKEY_RIGHT,0,CSKEY_END,CSKEY_DOWN,CSKEY_PGDN,CSKEY_INS,CSKEY_DEL
+  0,              CSKEY_ESC,      '1',            '2',
+  '3',            '4',            '5',            '6',		// 00..07
+  '7',            '8',            '9',            '0',
+  '-',            '=',            CSKEY_BACKSPACE,CSKEY_TAB,	// 08..0F
+  'q',            'w',            'e',            'r',
+  't',            'y',            'u',            'i',		// 10..17
+  'o',            'p',            '[',            ']',
+  CSKEY_ENTER,    CSKEY_CTRL,     'a',            's',		// 18..1F
+  'd',            'f',            'g',            'h',
+  'j',            'k',            'l',            ';',		// 20..27
+  39,             '`',            CSKEY_SHIFT,    '\\',
+  'z',            'x',            'c',            'v',		// 28..2F
+  'b',            'n',            'm',            ',',
+  '.',            '/',            CSKEY_SHIFT,    CSKEY_PADMULT,// 30..37
+  CSKEY_ALT,      ' ',            0,              CSKEY_F1,
+  CSKEY_F2,       CSKEY_F3,       CSKEY_F4,       CSKEY_F5,	// 38..3F
+  CSKEY_F6,       CSKEY_F7,       CSKEY_F8,       CSKEY_F9,
+  CSKEY_F10,      0,              0,              CSKEY_HOME,	// 40..47
+  CSKEY_UP,       CSKEY_PGUP,     CSKEY_PADMINUS, CSKEY_LEFT,
+  CSKEY_CENTER,   CSKEY_RIGHT,    CSKEY_PADPLUS,  CSKEY_END,	// 48..4F
+  CSKEY_DOWN,     CSKEY_PGDN,     CSKEY_INS,      CSKEY_DEL,
+  0,              0,              0,              CSKEY_F11,	// 50..57
+  CSKEY_F12,      0,              0,              0,
+  0,              0,              0,              0,		// 58..5F
+  0,              0,              0,              0,
+  0,              0,              0,              0,		// 60..67
+  0,              0,              0,              0,
+  0,              0,              0,              0,		// 68..6F
+  0,              0,              0,              0,
+  0,              0,              0,              0,		// 70..77
+  0,              0,              0,              0,
+  0,              0,              0,              0,		// 78..7F
+  0,              0,              0,              0,
+  0,              0,              0,              0,		// 80..87
+  0,              0,              0,              0,
+  0,              0,              0,              0,		// 88..8F
+  0,              0,              0,              0,
+  0,              0,              0,              0,		// 90..97
+  0,              0,              0,              0,
+  CSKEY_ENTER,    CSKEY_CTRL,     0,              0,		// 98..9F
+  0,              0,              0,              0,
+  0,              0,              0,              0,		// A0..A7
+  0,              0,              0,              0,
+  0,              0,              0,              0,		// A8..AF
+  0,              0,              0,              ',',
+  0,              CSKEY_PADDIV,   0,              0,		// B0..B7
+  CSKEY_ALT,      0,              0,              0,
+  0,              0,              0,              0,		// B8..BF
+  0,              0,              0,              0,
+  0,              0,              0,              CSKEY_HOME,	// C0..C7
+  CSKEY_UP,       CSKEY_PGUP,     0,              CSKEY_LEFT,
+  0,              CSKEY_RIGHT,    0,              CSKEY_END,	// C8..CF
+  CSKEY_DOWN,     CSKEY_PGDN,     CSKEY_INS,      CSKEY_DEL,
+  0,              0,              0,              0,		// D0..D7
+  0,              0,              0,              0,
+  0,              0,              0,              0,		// D8..DF
+  0,              0,              0,              0,
+  0,              0,              0,              0,		// E0..E7
+  0,              0,              0,              0,
+  0,              0,              0,              0,		// E8..EF
+  0,              0,              0,              0,
+  0,              0,              0,              0,		// F0..F7
+  0,              0,              0,              0,
+  0,              0,              0,              0		// F8..FF
 };
 
 // This macro is for COM calls. If it fails, it shows a MessageBox then
@@ -132,9 +174,9 @@ DWORD WINAPI s_threadroutine (LPVOID param)
 #else
 #endif
   LPDIRECTINPUT lpdi = NULL;
-  LPDIRECTINPUTDEVICE lpKbd = NULL; 
+  LPDIRECTINPUTDEVICE lpKbd = NULL;
   //Setup for directinput mouse code
-  LPDIRECTINPUTDEVICE lpMouse = NULL; 
+  LPDIRECTINPUTDEVICE lpMouse = NULL;
 
   HANDLE hEvent [2];
 //  HANDLE hevtMouse;
@@ -143,9 +185,9 @@ DWORD WINAPI s_threadroutine (LPVOID param)
   // to allow the binaries run under NT4 (which has just DX3)
   CHK_FAILED (DirectInputCreate (ModuleHandle, 0x0300, &lpdi, NULL));
   CHK_FAILED (lpdi->CreateDevice (GUID_SysKeyboard, &lpKbd, NULL));
-  CHK_FAILED (lpKbd->SetDataFormat (&c_dfDIKeyboard)); 
+  CHK_FAILED (lpKbd->SetDataFormat (&c_dfDIKeyboard));
   CHK_FAILED (lpKbd->SetCooperativeLevel (FindWindow (WINDOWCLASSNAME, NULL),
-									  DISCL_FOREGROUND | DISCL_NONEXCLUSIVE)); 
+									  DISCL_FOREGROUND | DISCL_NONEXCLUSIVE));
 
   //Setup for directinput mouse code
   /*
@@ -178,7 +220,7 @@ DWORD WINAPI s_threadroutine (LPVOID param)
     dpd.dwData=10; // The size of the buffer (should be more than sufficient)
 #if DIRECTINPUT_VERSION < 0x0700
     CHK_FAILED (lpKbd->SetProperty (DIPROP_BUFFERSIZE, &dpd));
-#else 
+#else
     //For incomprehensible reason, SetProperty() parameters type has
     //changed between DX6.1 and DX7 SDK
     CHK_FAILED (lpKbd->SetProperty (DIPROP_BUFFERSIZE, &dpd.diph));
@@ -264,13 +306,13 @@ DWORD WINAPI s_threadroutine (LPVOID param)
             {
               lastkey = i;
               dwWait = AUTOREPEAT_WAITTIME;
-              EventOutlet->Key (s_KeyTable [i], -1, true);
+              EventOutlet->Key (ScanCodeToChar [i], -1, true);
             }
             else
             {
               lastkey = -1;
               dwWait = INFINITE;
-              EventOutlet->Key (s_KeyTable[i], -1, false);
+              EventOutlet->Key (ScanCodeToChar[i], -1, false);
             }
             break;
           }
@@ -312,13 +354,13 @@ DWORD WINAPI s_threadroutine (LPVOID param)
           {
             lastkey = lpdidod [i].dwOfs;
             dwWait = AUTOREPEAT_WAITTIME:
-            EventOutlet->Key (s_KeyTable [lpdidod [i].dwOfs], -1, true);
+            EventOutlet->Key (ScanCodeToChar [lpdidod [i].dwOfs], -1, true);
           }
           else
           {
             lastkey = -1;
             dwWait = INFINITE;
-            EventOutlet->Key (s_KeyTable [lpdidod [i].dwOfs], -1, false);
+            EventOutlet->Key (ScanCodeToChar [lpdidod [i].dwOfs], -1, false);
           }
         }
         delete[] lpdidod;
@@ -348,7 +390,7 @@ DWORD WINAPI s_threadroutine (LPVOID param)
         if ((lastkey >= 0) && (buffer [lastkey] & 0X80))
         {
           dwWait = AUTOREPEAT_TIME;
-          EventOutlet->Key (s_KeyTable [lastkey], -1, true);
+          EventOutlet->Key (ScanCodeToChar [lastkey], -1, true);
         }
         else
         { // Strange.. we didn't get the message that the key was released !
@@ -384,8 +426,8 @@ IMPLEMENT_IBASE_EXT_END
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
   WNDCLASS wc;
-  wc.hCursor        = LoadCursor(0, IDC_ARROW);
-  wc.hIcon          = LoadIcon( NULL, IDI_APPLICATION );
+  wc.hCursor        = NULL;
+  wc.hIcon          = LoadIcon (NULL, IDI_APPLICATION);
   wc.lpszMenuName   = NULL;
   wc.lpszClassName  = WINDOWCLASSNAME;
   wc.hbrBackground  = 0;
@@ -397,7 +439,8 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 
   bool bResult;
   bResult = RegisterClass (&wc);
-  ASSERT(bResult);
+  ASSERT (bResult);
+  m_hCursor = LoadCursor (0, IDC_ARROW);
 
   EventOutlet = CreateEventOutlet (this);
 }
@@ -446,17 +489,6 @@ void SysSystemDriver::Close ()
 
 void SysSystemDriver::NextFrame ()
 {
-/*
-  this should be done only when palette has been changed?
-
-  iGraphics2DDDraw3* piG2Ddd3 = QUERY_INTERFACE (System, iGraphics2DDDraw3);
-  if (piG2Ddd3)
-  {
-    piG2Ddd3->SetColorPalette ();
-    piG2Ddd3->DecRef ();
-  }
-*/
-
   MSG msg;
   while (PeekMessage (&msg, NULL, 0, 0, PM_NOREMOVE))
   {
@@ -482,21 +514,12 @@ void SysSystemDriver::Alert (const char* s)
 
   if (FullScreen)
   {
-    //If fullscreen mode is active, we switch to default screen, because
-    //otherwise this message will not be seen.
+    // If fullscreen mode is active, we switch to default screen, because
+    // otherwise this message will not be seen.
     ChangeDisplaySettings (NULL, 0);
   }
-         
-  MessageBox (NULL, s, "Fatal Error", MB_OK | MB_ICONSTOP);
-  debug_out (true, s);
-}
 
-void SysSystemDriver::Warn (const char* s)
-{
-  //In windows there is no safe way to display a messagebox and then continue work when
-  //you are in fullscreen mode. (If you know some way: You are welcome to change this)
-  //For the moment we will display Warning as console messages.
-  Printf (MSG_CONSOLE, "Warning:\n%s", s);
+  MessageBox (NULL, s, "Fatal Error", MB_OK | MB_ICONSTOP);
   debug_out (true, s);
 }
 
@@ -519,106 +542,199 @@ int SysSystemDriver::GetCmdShow () const
 
 //----------------------------------------// Windows input translator //------//
 
-#ifndef DO_DINPUT_KEYBOARD
-void WinKeyTrans (csSystemDriver* pSystemDriver, WPARAM wParam, bool down)
-{
-  if (!pSystemDriver)
-    return;
+#define MAX_SCANCODE 0x3c
 
-  int key = 0;
+/*
+    This table does not contain special key codes, since those are
+    handled by the switch() in WinKeyTrans().
+*/
+
+static unsigned char ScanCodeToChar [MAX_SCANCODE] =
+{
+  0,              0,              '1',            '2',
+  '3',            '4',            '5',            '6',		// 00..07
+  '7',            '8',            '9',            '0',
+  '-',            '=',            0,              0,		// 08..0F
+  'q',            'w',            'e',            'r',
+  't',            'y',            'u',            'i',		// 10..17
+  'o',            'p',            '[',            ']',
+  0,              0,              'a',            's',		// 18..1F
+  'd',            'f',            'g',            'h',
+  'j',            'k',            'l',            ';',		// 20..27
+  39,             '`',            0,              '\\',
+  'z',            'x',            'c',            'v',		// 28..2F
+  'b',            'n',            'm',            ',',
+  '.',            '/',            0,              0,            // 30..37
+  0,              ' ',            0,              0
+};
+
+static unsigned char LastCharCode [MAX_SCANCODE];
+
+void WinKeyTrans (WPARAM wParam, bool down)
+{
+  int key = 0, chr = 0;
   switch (wParam)
   {
-    case VK_END:     key = CSKEY_END; break;
-    case VK_UP:      key = CSKEY_UP; break;
-    case VK_DOWN:    key = CSKEY_DOWN; break;
-    case VK_LEFT:    key = CSKEY_LEFT; break;
-    case VK_RIGHT:   key = CSKEY_RIGHT; break;
-    case VK_PRIOR:   key = CSKEY_PGUP; break;
-    case VK_NEXT:    key = CSKEY_PGDN; break;
-    case VK_MENU:    key = CSKEY_ALT; break;
-    case VK_CONTROL: key = CSKEY_CTRL; break;
-    case VK_SHIFT:   key = CSKEY_SHIFT; break;
+    case VK_MENU:     key = CSKEY_ALT; break;
+    case VK_CONTROL:  key = CSKEY_CTRL; break;
+    case VK_SHIFT:    key = CSKEY_SHIFT; break;
+    case VK_UP:       key = CSKEY_UP; break;
+    case VK_DOWN:     key = CSKEY_DOWN; break;
+    case VK_LEFT:     key = CSKEY_LEFT; break;
+    case VK_RIGHT:    key = CSKEY_RIGHT; break;
+    case VK_CLEAR:    key = CSKEY_CENTER; break;
+    case VK_INSERT:   key = CSKEY_INS; break;
+    case VK_DELETE:   key = CSKEY_DEL; break;
+    case VK_PRIOR:    key = CSKEY_PGUP; break;
+    case VK_NEXT:     key = CSKEY_PGDN; break;
+    case VK_HOME:     key = CSKEY_HOME; break;
+    case VK_END:      key = CSKEY_END; break;
+    case VK_RETURN:   key = CSKEY_ENTER; chr = '\n'; break;
+    case VK_BACK:     key = CSKEY_BACKSPACE; chr = '\b'; break;
+    case VK_TAB:      key = CSKEY_TAB; chr = '\t'; break;
+    case VK_ESCAPE:   key = CSKEY_ESC; chr = '\e'; break;
+    case VK_F1:       key = CSKEY_F1; break;
+    case VK_F2:       key = CSKEY_F2; break;
+    case VK_F3:       key = CSKEY_F3; break;
+    case VK_F4:       key = CSKEY_F4; break;
+    case VK_F5:       key = CSKEY_F5; break;
+    case VK_F6:       key = CSKEY_F6; break;
+    case VK_F7:       key = CSKEY_F7; break;
+    case VK_F8:       key = CSKEY_F8; break;
+    case VK_F9:       key = CSKEY_F9; break;
+    case VK_F10:      key = CSKEY_F10; break;
+    case VK_F11:      key = CSKEY_F11; break;
+    case VK_F12:      key = CSKEY_F12; break;
+    case VK_ADD:      key = CSKEY_PADPLUS; chr = '+'; break;
+    case VK_SUBTRACT: key = CSKEY_PADMINUS; chr = '-'; break;
+    case VK_MULTIPLY: key = CSKEY_PADMULT; chr = '*'; break;
+    case VK_DIVIDE:   key = CSKEY_PADDIV; chr = '/'; break;
   }
   if (key)
-    EventOutlet->Key (key, -1, down);
+    EventOutlet->Key (key, chr, down);
 }
 #endif
 
-long FAR PASCAL WindowProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
+long FAR PASCAL SysSystemDriver::WindowProc (HWND hWnd, UINT message,
+  WPARAM wParam, LPARAM lParam)
 {
   switch (message)
   {
     case WM_ACTIVATEAPP:
       ApplicationActive = wParam;
+      memset (&LastCharCode, 0, sizeof (LastCharCode));
       break;
     case WM_ACTIVATE:
       if (System)
-        EventOutlet->Broadcast (cscmdFocusChanged, LOWORD (wParam) != WA_INACTIVE);
+        EventOutlet->Broadcast (cscmdFocusChanged,
+          (void *)(LOWORD (wParam) != WA_INACTIVE));
       break;
     case WM_DESTROY:
       PostQuitMessage (0);
       break;
 #ifndef DO_DINPUT_KEYBOARD
+    case WM_SYSCHAR:
     case WM_CHAR:
-      if(System)
+    {
+      int scancode = (lParam >> 16) & 0xff;
+      int key = (scancode < MAX_SCANCODE) ? ScanCodeToChar [scancode] : 0;
+      if (key || (wParam >= ' '))
       {
-        if (wParam == '\r') wParam = CSKEY_ENTER;
-        EventOutlet->Key (wParam, -1, true);
-        EventOutlet->Key (wParam, -1, false);
+        EventOutlet->Key (key, wParam, true);
+        LastCharCode [scancode] = wParam;
       }
       break;
+    }
     case WM_KEYDOWN:
     case WM_SYSKEYDOWN:
-      WinKeyTrans (System, wParam, true);
+      WinKeyTrans (wParam, true);
       if (wParam == VK_MENU) return 0;
       break;
     case WM_KEYUP:
     case WM_SYSKEYUP:
-      WinKeyTrans (System, wParam, false);
+    {
+      WinKeyTrans (wParam, false);
       if (wParam == VK_MENU) return 0;
+      // Check if this is the keyup event for a former WM_CHAR
+      int scancode = (lParam >> 16) & 0xff;
+      if ((scancode < MAX_SCANCODE) && LastCharCode [scancode])
+      {
+        int key = (scancode < MAX_SCANCODE) ? ScanCodeToChar [scancode] : 0;
+        EventOutlet->Key (key, LastCharCode [scancode], false);
+        LastCharCode [scancode] = 0;
+      }
       break;
+    }
 #endif
     case WM_LBUTTONDOWN:
-      EventOutlet->Mouse (1, true, LOWORD(lParam), HIWORD(lParam));
-      break;
-    case WM_LBUTTONUP:
-      EventOutlet->Mouse (1, false, LOWORD(lParam), HIWORD(lParam));
-      break;
-    case WM_MBUTTONDOWN:
-      EventOutlet->Mouse (3, true, LOWORD(lParam), HIWORD(lParam));
-      break;
-    case WM_MBUTTONUP:
-      EventOutlet->Mouse (3, false, LOWORD(lParam), HIWORD(lParam));
-      break;
     case WM_RBUTTONDOWN:
-      EventOutlet->Mouse (2, true, LOWORD(lParam), HIWORD(lParam));
-      break;
+    case WM_MBUTTONDOWN:
+      SetCapture (hWnd);
+      EventOutlet->Mouse ((message == WM_LBUTTONDOWN) ? 1 :
+        (message == WM_RBUTTONDOWN) ? 2 : 3, true,
+        short (LOWORD (lParam)), short (HIWORD (lParam)));
+      return TRUE;
+    case WM_LBUTTONUP:
     case WM_RBUTTONUP:
-      EventOutlet->Mouse (2, false, LOWORD(lParam), HIWORD(lParam));
-      break;
+    case WM_MBUTTONUP:
+      ReleaseCapture ();
+      EventOutlet->Mouse ((message == WM_LBUTTONUP) ? 1 :
+        (message == WM_RBUTTONUP) ? 2 : 3, false,
+        short (LOWORD (lParam)), short (HIWORD (lParam)));
+      return TRUE;
     case WM_MOUSEMOVE:
-      EventOutlet->Mouse (0, false, LOWORD(lParam), HIWORD(lParam));
-      break;
+      SetCursor (((SysSystemDriver *)System)->m_hCursor);
+      EventOutlet->Mouse (0, false,
+        short (LOWORD (lParam)), short (HIWORD (lParam)));
+      return TRUE;
   }
   return DefWindowProc (hWnd, message, wParam, lParam);
 }
 
-
-extern int csMain (int argc, char* argv[]);
-
-// The main entry for GUI applications
-int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
-  LPSTR lpCmdLine, int nCmdShow)
+bool SysSystemDriver::SystemExtension (const char *iCommand, ...)
 {
-  ModuleHandle = hInstance;
-  ApplicationShow = nCmdShow;
-  (void)lpCmdLine;
-  (void)hPrevInstance;
+  va_list args;
+  va_start (args, iCommand);
 
-  return
-#if defined(COMP_BC) || defined (__CYGWIN__)
-    csMain ( _argc,  _argv);
-#else
-    csMain (__argc, __argv);
-#endif
+  bool rc = true;
+  if (!strcmp (iCommand, "SetCursor"))
+  {
+    char *CursorID;
+    switch (va_arg (args, int))
+    {
+      case csmcNone:     CursorID = (char *)-1;   break;
+      case csmcArrow:    CursorID = IDC_ARROW;    break;
+      case csmcMove:     CursorID = IDC_SIZEALL;  break;
+      case csmcSizeNWSE: CursorID = IDC_SIZENWSE; break;
+      case csmcSizeNESW: CursorID = IDC_SIZENESW; break;
+      case csmcSizeNS:   CursorID = IDC_SIZENS;   break;
+      case csmcSizeEW:   CursorID = IDC_SIZEWE;   break;
+      case csmcStop:     CursorID = IDC_NO;       break;
+      case csmcWait:     CursorID = IDC_WAIT;     break;
+      default:           CursorID = 0;            break;
+    }
+
+    bool *success = va_arg (args, bool *);
+    if (CursorID)
+    {
+      m_hCursor = (CursorID != (char *)-1) ? LoadCursor (NULL, CursorID) : NULL;
+      *success = true;
+    }
+    else
+    {
+      m_hCursor = NULL;
+      *success = false;
+    }
+    SetCursor (m_hCursor);
+  }
+  else
+    rc = false;
+
+  va_end (args);
+  return rc;
+}
+
+void SysSystemDriver::Sleep (int SleepTime)
+{
+  ::Sleep (SleepTime);
 }

@@ -35,7 +35,6 @@ DIR *opendir (const char *name)
   char tname [MAXPATHLEN + 1];
   strcpy (tname, name);
   strcat (tname, "\\*");
-//  strcat (tname, "\*");
 
   if ((dh->handle = _findfirst (tname, &dh->fd)) == -1L)
   {

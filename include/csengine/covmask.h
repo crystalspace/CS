@@ -87,22 +87,7 @@ public:
    * 's' is 0 or 1.
    * 'bit' is the index in the mask (between 0 and CS_CM_BITS-1).
    */
-  void SetState (int bit, int s)
-  {
-#   if defined(CS_CM_4x4)
-      in = (in & ~(1<<bit)) | (s<<bit);
-#   elif defined(CS_CM_8x8)
-      if (bit < 32)
-      {
-	in = (in & ~(1<<bit)) | (s<<bit);
-      }
-      else
-      {
-	bit -= 32;
-	in2 = (in2 & ~(1<<bit)) | (s<<bit);
-      }
-#   endif
-  }
+  inline void SetState (int bit, int s);
 
   /**
    * Get the state of mask bits.
@@ -110,22 +95,7 @@ public:
    * Note that this is not an efficient function.
    * It is ment mostly for debugging.
    */
-  int GetState (int bit) const
-  {
-#   if defined(CS_CM_4x4)
-      return (in & (1<<bit)) >> bit;
-#   elif defined(CS_CM_8x8)
-      if (bit < 32)
-      {
-        return (in & (1<<bit)) >> bit;
-      }
-      else
-      {
-	bit -= 32;
-        return (in2 & (1<<bit)) >> bit;
-      }
-#   endif
-  }
+  inline int GetState (int bit) const;
 
   /// Dump state of this mask.
   void Dump () const;
@@ -270,21 +240,7 @@ public:
    * 'so' and 'si' are 0 or 1.
    * 'bit' is the index in the mask (between 0 and CS_CM_BITS-1).
    */
-  void SetState (int bit, int so, int si)
-  {
-    csCovMask::SetState (bit, si);
-#   if defined(CS_CM_4x4)
-      out = (out & ~(1<<bit)) | (so<<bit);
-#   elif defined(CS_CM_8x8)
-      if (bit < 32)
-	out = (out & ~(1<<bit)) | (so<<bit);
-      else
-      {
-	bit -= 32;
-	out2 = (out2 & ~(1<<bit)) | (so<<bit);
-      }
-#   endif
-  }
+  inline void SetState (int bit, int so, int si);
 
   /**
    * Get the state of two coverage mask bits.
@@ -294,25 +250,7 @@ public:
    * Note that this is not an efficient function.
    * It is ment mostly for debugging.
    */
-  int GetState (int bit) const
-  {
-#   if defined(CS_CM_4x4)
-      return (((out & (1<<bit)) >> bit) << 1) |
-      	     ((in & (1<<bit)) >> bit);
-#   elif defined(CS_CM_8x8)
-      if (bit < 32)
-      {
-        return (((out & (1<<bit)) >> bit) << 1) |
-      	       ((in & (1<<bit)) >> bit);
-      }
-      else
-      {
-	bit -= 32;
-        return (((out2 & (1<<bit)) >> bit) << 1) |
-      	       ((in2 & (1<<bit)) >> bit);
-      }
-#   endif
-  }
+  inline int GetState (int bit) const;
 
   /// Dump state of this mask.
   void Dump () const;
@@ -561,6 +499,76 @@ public:
 	csCovEdgeInfo* edges,
 	int hor_offs, int ver_offs, int box_dim, int box_shift) const;
 };
+
+inline void csCovMask::SetState (int bit, int s)
+{
+#if defined(CS_CM_4x4)
+  in = (in & ~(1<<bit)) | (s<<bit);
+#elif defined(CS_CM_8x8)
+  if (bit < 32)
+  {
+    in = (in & ~(1<<bit)) | (s<<bit);
+  }
+  else
+  {
+    bit -= 32;
+    in2 = (in2 & ~(1<<bit)) | (s<<bit);
+  }
+#endif
+}
+
+inline int csCovMask::GetState (int bit) const
+{
+#if defined(CS_CM_4x4)
+  return (in & (1<<bit)) >> bit;
+#elif defined(CS_CM_8x8)
+  if (bit < 32)
+  {
+    return (in & (1<<bit)) >> bit;
+  }
+  else
+  {
+    bit -= 32;
+    return (in2 & (1<<bit)) >> bit;
+  }
+#endif
+}
+
+inline void csCovMaskTriage::SetState (int bit, int so, int si)
+{
+  csCovMask::SetState (bit, si);
+#if defined(CS_CM_4x4)
+  out = (out & ~(1<<bit)) | (so<<bit);
+#elif defined(CS_CM_8x8)
+  if (bit < 32)
+    out = (out & ~(1<<bit)) | (so<<bit);
+  else
+  {
+    bit -= 32;
+    out2 = (out2 & ~(1<<bit)) | (so<<bit);
+  }
+#endif
+}
+
+int csCovMaskTriage::GetState (int bit) const
+{
+#if defined(CS_CM_4x4)
+  return (((out & (1<<bit)) >> bit) << 1) |
+         ((in & (1<<bit)) >> bit);
+#elif defined(CS_CM_8x8)
+  if (bit < 32)
+  {
+    return (((out & (1<<bit)) >> bit) << 1) |
+           ((in & (1<<bit)) >> bit);
+  }
+  else
+  {
+    bit -= 32;
+    return (((out2 & (1<<bit)) >> bit) << 1) |
+           ((in2 & (1<<bit)) >> bit);
+  }
+#endif
+}
 
 #endif /*COVMASK_H*/
 

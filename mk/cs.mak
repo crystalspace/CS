@@ -55,7 +55,6 @@ endif
 .SUFFIXES: $O $(EXE) $(LIB) $(DLL) .S .c .cpp .h .asm .ash .y
 
 # Define paths automatically searched for source files
-vpath %.c support/gnu
 vpath %.cpp support/debug
 
 # Directory for object files
@@ -139,7 +138,7 @@ ifndef DO.DEP
     ifeq ($(DEPEND_TOOL),mkdep)
       # If mkdep is already installed, don't build it
       ifneq ($(MAKEDEP.INSTALLED),yes)
-        dep: mkdep
+dep: mkdep
       endif
       DO.DEP1 = makedep $(MEM) $(subst $(CFLAGS.I),-I,$(CFLAGS.INCLUDE) )
       DO.DEP2 = $(filter-out %.asm,$^) -o $(BUCK)O -p $(BUCK)\(OUT\) -r -c -f $@

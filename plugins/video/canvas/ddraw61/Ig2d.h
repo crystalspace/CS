@@ -22,6 +22,8 @@ struct iGraphics2DDDraw6 : public iBase
   virtual void SetColorPalette (void) = 0;
   ///
   virtual void SetFor3D(bool For3D) = 0;
+  ///
+  virtual void SetModeSwitchCallback (void (*Callback) (void *), void *Data) = 0;
 };
 
 #endif

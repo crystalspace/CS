@@ -63,19 +63,19 @@ ifeq ($(USE_SHARED_PLUGINS),no)
 endif
 
 # Where can the Zlib library be found on this system?
-Z_LIBS=LIBP libs/zlib L zdll
+Z_LIBS=L zdll
 
 # Where can the PNG library be found on this system?
-PNG_LIBS=LIBP libs/libpng L pngdll
+PNG_LIBS=L pngdll
 
 # Where can the JPG library be found on this system?
-JPG_LIBS=LIBP libs/libjpeg L jpegdll
+JPG_LIBS=L jpegdll
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
 
 # Indicate where special include files can be found.
-CFLAGS.INCLUDE=-i=libs/zlib -i=libs/libpng -i=libs/libjpeg
+CFLAGS.INCLUDE=
 
 # General flags for the compiler which are used in any case.
 CFLAGS.GENERAL=-bm -w3 -5s -fp5 -zc -zld -zq
@@ -138,7 +138,7 @@ NASMFLAGS.SYSTEM=-f obj -DEXTERNC_UNDERSCORE
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS = libs/cssys/general/printf.cpp libs/cssys/general/timing.cpp \
   libs/cssys/os2/csos2.cpp libs/cssys/os2/loadlib.cpp \
-  libs/cssys/os2/scancode.cpp support/gnu/getopt.c support/gnu/getopt1.c
+  libs/cssys/os2/scancode.cpp libs/cssys/general/getopt.cpp
 SRC.SYS_CSSYS_DLL=libs/cssys/os2/dllentry.cpp
 
 # The C compiler.

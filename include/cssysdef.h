@@ -313,7 +313,7 @@
 #  ifndef __STDC__
 #    define __STDC__ 1
 #  endif
-#  include "support/gnu/getopt.h"
+#  include "cssys/getopt.h"
 #endif
 
 #ifdef SYSDEF_SOCKETS

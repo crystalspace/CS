@@ -65,7 +65,7 @@ public :
     {
       m_Dev->GetTexture(i, &m_Texture[i]);
       if (m_Texture[i])
-        HRESULT h = m_Texture[i]->Release();
+        m_Texture[i]->Release ();
       for (j = 1; j < MAX_STATES; j++)
       {
         HRESULT hResult;
@@ -124,6 +124,8 @@ public :
 
   inline void SetTextureAddress(D3DTEXTUREADDRESS Address)
   {
+    SetStageState(0, D3DTSS_ADDRESS, Address);
+  }
 #if 0
     if (m_TextureAddress != Address)
     {
@@ -134,10 +136,7 @@ public :
     {
       m_piSystem->Printf(MSG_CONSOLE, "Dublicate Tex Address %X\n", Address);
     }
-#else
-    SetStageState(0, D3DTSS_ADDRESS, Address);
 #endif
-  }
 
   inline void SetZFunc(D3DCMPFUNC Func)
   {

@@ -47,17 +47,17 @@ enum
 class csTimer : public csComponent
 {
   /// Timer period in milliseconds
-  time_t timeout;
+  unsigned timeout;
   /// Period start
-  time_t start;
+  unsigned start;
   /// Pause time before counting begins
-  time_t pause;
+  unsigned pause;
   /// Timer is stopped?
   bool Stopped;
 
 public:
   /// Create timer object: the timer is created in running state
-  csTimer (csComponent *iParent, unsigned long iPeriod);
+  csTimer (csComponent *iParent, unsigned iPeriod);
 
   /// Handle external events and generate timeouts
   virtual bool HandleEvent (csEvent &Event);
@@ -69,7 +69,7 @@ public:
   void Restart ();
 
   /// Pause for specified time
-  void Pause (unsigned long iPause);
+  void Pause (unsigned iPause);
 
   /// Check if timer is running
   bool Running () { return !Stopped; }

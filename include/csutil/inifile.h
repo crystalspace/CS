@@ -29,7 +29,7 @@
 class csStrVector;
 struct iStrVector;
 
-class csIniFile : public csBase
+class csIniFile
 {
 private:
   // Branch types

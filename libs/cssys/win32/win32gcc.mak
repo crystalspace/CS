@@ -1,13 +1,11 @@
 # This is the makefile for MinGW32 compiler (gcc for Win32)
 
 # Friendly names for building environment
-DESCRIPTION.win32gcc = Windows with GNU C/C++
+DESCRIPTION.win32gcc = Windows with MinGW32 GNU C/C++
 
 # Choose which drivers you want to build/use
-# video/canvas/ddraw6 video/canvas/openglwin video/renderer/direct3d5
-# video/renderer/direct3d6 video/renderer/opengl
-#
-PLUGINS+=video/canvas/ddraw video/renderer/software sound/renderer/software
+PLUGINS+=video/canvas/ddraw video/renderer/software sound/renderer/software \
+  video/canvas/ddraw61 video/renderer/direct3d61 video/renderer/opengl
 
 # Uncomment the following to get an startup console window
 #CONSOLE_FLAGS = -DWIN32_USECONSOLE
@@ -46,13 +44,13 @@ LIB_PREFIX=lib
 LIBS.EXE=
 
 # Where can the Zlib library be found on this system?
-Z_LIBS=-Llibs/zlib -lz
+Z_LIBS=-lz
 
 # Where can the PNG library be found on this system?
-PNG_LIBS=-Llibs/libpng -lpng
+PNG_LIBS=-lpng
 
 # Where can the JPG library be found on this system?
-JPG_LIBS=-Llibs/libjpeg -ljpeg
+JPG_LIBS=-ljpeg
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
@@ -61,13 +59,18 @@ SOUND_LIBS=
 NEED_SOCKET_LIB=
 
 # Indicate where special include files can be found.
-CFLAGS.INCLUDE=-Ilibs/zlib -Ilibs/libpng -Ilibs/libjpeg
+CFLAGS.INCLUDE=
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM) -fvtable-thunks
+CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM) -fvtable-thunks -pipe
 
 # Flags for the compiler which are used when optimizing.
-CFLAGS.optimize=-s -O6 -fomit-frame-pointer -ffast-math
+CFLAGS.optimize=-s -O3 -ffast-math
+ifneq ($(shell gcc --version),2.95.2)
+# WARNING: mingw32 2.95.2 has a bug that causes incorrect code
+# to be generated if you use -fomit-frame-pointer
+CFLAGS.optimize += -fomit-frame-pointer
+endif
 
 # Flags for the compiler which are used when debugging.
 CFLAGS.debug=-g
@@ -105,9 +108,9 @@ ARFLAGS=cr
 NASMFLAGS.SYSTEM=-f win32 -DEXTERNC_UNDERSCORE
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS = libs/cssys/win32/printf.cpp libs/cssys/win32/timing.cpp \
+SRC.SYS_CSSYS = libs/cssys/win32/win32printf.cpp libs/cssys/win32/timing.cpp \
   libs/cssys/win32/dir.cpp libs/cssys/win32/win32.cpp \
-  libs/cssys/win32/loadlib.cpp support/gnu/getopt.c support/gnu/getopt1.c
+  libs/cssys/win32/loadlib.cpp libs/cssys/general/getopt.cpp
 SRC.SYS_CSSYS_EXE=libs/cssys/win32/exeentry.cpp
 SRC.SYS_CSSYS_DLL=libs/cssys/win32/dllentry.cpp
 
@@ -143,6 +146,14 @@ LFLAGS.CONSOLE.EXE=
 DEPEND_TOOL=mkdep
 
 endif # ifeq ($(MAKESECTION),defines)
+
+#-------------------------------------------------------------- postdefines ---#
+ifeq ($(MAKESECTION),postdefines)
+
+# How to make a shared AKA dynamic library
+DO.SHARED.PLUGIN = dllwrap -q -s --no-export-all-symbols --dllname $* -o $@ $(^^) $(L^) $(LFLAGS.L)$(OUT) -mwindows
+
+endif # ifeq ($(MAKESECTION),postdefines)
 
 #--------------------------------------------------------------- confighelp ---#
 ifeq ($(MAKESECTION),confighelp)

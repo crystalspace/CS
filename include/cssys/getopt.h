@@ -17,12 +17,8 @@
    write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
 
-#ifndef _GETOPT_H
-#define _GETOPT_H 1
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
+#ifndef __GETOPT_H__
+#define __GETOPT_H__
 
 #if defined(__NeXT__) || defined(__APPLE__)
 // NeXT already has a valid getopt; avoid link errors.
@@ -105,15 +101,7 @@ struct option
 #define required_argument	1
 #define optional_argument	2
 
-#if defined (__STDC__) && __STDC__
-#ifdef __GNU_LIBRARY__
-/* Many other libraries have conflicting prototypes for getopt, with
-   differences in the consts, in stdlib.h.  To avoid compilation
-   errors, only prototype getopt for the GNU C library.  */
 extern int getopt (int argc, char *const *argv, const char *shortopts);
-#else /* not __GNU_LIBRARY__ */
-extern int getopt ();
-#endif /* __GNU_LIBRARY__ */
 extern int getopt_long (int argc, char *const *argv, const char *shortopts,
 		        const struct option *longopts, int *longind);
 extern int getopt_long_only (int argc, char *const *argv,
@@ -125,16 +113,5 @@ extern int _getopt_internal (int argc, char *const *argv,
 			     const char *shortopts,
 		             const struct option *longopts, int *longind,
 			     int long_only);
-#else /* not __STDC__ */
-extern int getopt ();
-extern int getopt_long ();
-extern int getopt_long_only ();
 
-extern int _getopt_internal ();
-#endif /* __STDC__ */
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* _GETOPT_H */
+#endif // __GETOPT_H__

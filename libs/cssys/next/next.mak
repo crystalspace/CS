@@ -88,21 +88,20 @@ LIBS.EXE=
 LIBS.EXE.PLATFORM=$(NEXT.LIBS)
 
 # Where can the Zlib library be found on this system?
-Z_LIBS=$(LFLAGS.L)libs/zlib $(LFLAGS.l)z
+Z_LIBS=$(LFLAGS.l)z
 
 # Where can the PNG library be found on this system?
-PNG_LIBS=$(LFLAGS.L)libs/libpng $(LFLAGS.l)png
+PNG_LIBS=$(LFLAGS.l)png
 
 # Where can the JPG library be found on this system?
-JPG_LIBS=$(LFLAGS.L)libs/libjpeg $(LFLAGS.l)jpeg
+JPG_LIBS=$(LFLAGS.l)jpeg
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
 
 # Indicate where special include files can be found.
 CFLAGS.INCLUDE=$(NEXT.INCLUDE_DIRS) \
-  $(addprefix $(CFLAGS.I),$(NEXT.SOURCE_PATHS)) \
-  $(CFLAGS.I)libs/zlib $(CFLAGS.I)libs/libpng $(CFLAGS.I)libs/libjpeg
+  $(addprefix $(CFLAGS.I),$(NEXT.SOURCE_PATHS))
 
 # General flags for the compiler which are used in any case.
 CFLAGS.GENERAL=$(NEXT.CFLAGS.GENERAL) $(NEXT.ARCH_FLAGS) -fno-common -pipe
@@ -141,8 +140,8 @@ LFLAGS.DLL= $(NEXT.LFLAGS.DLL)
 NASMFLAGS.SYSTEM=
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS = libs/cssys/general/printf.cpp \
-  $(wildcard $(addsuffix /*.cpp,$(NEXT.SOURCE_PATHS)) support/gnu/getopt*.c)
+SRC.SYS_CSSYS = libs/cssys/general/printf.cpp libs/cssys/general/getopt.cpp \
+  $(wildcard $(addsuffix /*.cpp,$(NEXT.SOURCE_PATHS)))
 
 # Where to put dynamic libraries on this system?
 OUTDLL=$(NEXT.PLUGIN_DIR)

@@ -42,11 +42,6 @@ D3DCache::D3DCache (int max_size, csCacheType type, int bpp)
   head = tail = NULL;
 }
 
-D3DCache::~D3DCache ()
-{
-  Clear ();
-}
-
 void D3DCache::cache_texture (iTextureHandle *texture)
 {
   if (type != CS_TEXTURE)

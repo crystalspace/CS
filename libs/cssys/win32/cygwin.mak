@@ -40,13 +40,13 @@ include mk/dos.mak
 LIBS.EXE=
 
 # Where can the Zlib library be found on this system?
-Z_LIBS=-Llibs/zlib -lz
+Z_LIBS=-lz
 
 # Where can the PNG library be found on this system?
-PNG_LIBS=-Llibs/libpng -lpng
+PNG_LIBS=-lpng
 
 # Where can the JPG library be found on this system?
-JPG_LIBS=-Llibs/libjpeg -ljpeg
+JPG_LIBS=-ljpeg
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
@@ -55,7 +55,7 @@ SOUND_LIBS=
 NEED_SOCKET_LIB=
 
 # Indicate where special include files can be found.
-CFLAGS.INCLUDE=-Ilibs/zlib -Ilibs/libpng -Ilibs/libjpeg
+CFLAGS.INCLUDE=
 
 # General flags for the compiler which are used in any case.
 CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM)
@@ -106,7 +106,7 @@ NASMFLAGS.SYSTEM=-f win32 -DEXTERNC_UNDERSCORE
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS = libs/cssys/win32/printf.cpp libs/cssys/win32/timing.cpp \
   libs/cssys/win32/dir.cpp libs/cssys/win32/win32.cpp \
-  libs/cssys/win32/loadlib.cpp support/gnu/getopt.c support/gnu/getopt1.c
+  libs/cssys/win32/loadlib.cpp libs/cssys/general/getopt.cpp
 SRC.SYS_CSSYS_EXE=libs/cssys/win32/exeentry.cpp
 SRC.SYS_CSSYS_DLL=libs/cssys/win32/dllentry.cpp
 

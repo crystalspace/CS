@@ -44,6 +44,7 @@ csSimpleInput::csSimpleInput (iBase *iParent) : History (16, 16)
   History.Push (strnew (""));
   line = new char [linemax = 80];
   InsertMode = true;
+  MaxLines = 50;
 }
 
 csSimpleInput::~csSimpleInput ()

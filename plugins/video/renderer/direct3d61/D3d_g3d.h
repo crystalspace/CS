@@ -163,8 +163,12 @@ class csGraphics3DDirect3DDx6 : public iGraphics3D
   /// The system driver
   iSystem* m_piSystem;
 
+  /// whether the device is locked or not.
+  bool m_bIsLocked;
   /// Verbose mode
   bool m_bVerbose;
+  /// Do we support mipmaps?
+  bool m_bMipmapping;
 
   /// The private config file
   csIniFile *config;
@@ -205,7 +209,7 @@ public:
   /// The constructor. It is passed an interface to the system using it.
   csGraphics3DDirect3DDx6 (iBase*);
   /// the destructor.
-  ~csGraphics3DDirect3DDx6 ();
+  virtual ~csGraphics3DDirect3DDx6 ();
   
   ///
   virtual bool Initialize (iSystem *iSys);
@@ -233,7 +237,7 @@ public:
   virtual void DrawLine (const csVector3& v1, const csVector3& v2, float fov, int color);
   
   /// Start a series of DrawPolygonFX
-  virtual void StartPolygonFX (iTextureHandle* handle, UInt mode);
+  virtual void StartPolygonFX (iMaterialHandle* handle, UInt mode);
 
   /// Finish a series of DrawPolygonFX
   virtual void FinishPolygonFX ();
@@ -322,7 +326,7 @@ public:
   /// Draw a polygon mesh.
   virtual void DrawPolygonMesh (G3DPolygonMesh& mesh)
   {
-	DefaultDrawPolygonMesh (mesh, this, m_o2c, m_pClipper, m_Aspect, m_InvAspect, m_nWidth, m_nHeight);
+    DefaultDrawPolygonMesh (mesh, this, m_o2c, m_pClipper, m_Aspect, m_InvAspect, m_nWidth, m_nHeight);
   }
 
   /** Adjust the given texture size to an optimal size. This will take into
@@ -374,8 +378,6 @@ private:
   static HRESULT CALLBACK EnumPixelFormatsCallback(LPDDPIXELFORMAT lpddpf, LPVOID lpUserArg);
   /// used to get the appropriate device.
   bool EnumDevices(void);
-  /// whether the device is locked or not.
-  bool m_bIsLocked;
   
   /// used to set up polygon geometry before rasterization.
   inline void SetupPolygon( G3DPolygonDP& poly, float& J1, float& J2, float& J3, 
@@ -389,7 +391,8 @@ private:
   void BatchStartPolygonFX(iTextureHandle* handle, UInt mode);
   void BatchFinishPolygonFX();
   void BatchDrawPolygonFX(G3DPolygonDPFX& poly);
-
+  void ReinitCaches ();
+  static void ModeSwitchCallback (void *Data);
 };
 
 #endif // D3D_g3d_H

@@ -119,7 +119,7 @@ NASMFLAGS.SYSTEM=
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS = libs/cssys/win32/printf.cpp libs/cssys/win32/timing.cpp \
   libs/cssys/win32/dir.cpp libs/cssys/win32/win32.cpp \
-  libs/cssys/win32/loadlib.cpp support/gnu/getopt.c support/gnu/getopt1.c
+  libs/cssys/win32/loadlib.cpp libs/cssys/general/getopt.cpp
 SRC.SYS_CSSYS_EXE=libs/cssys/win32/exeentry.cpp
 SRC.SYS_CSSYS_DLL=libs/cssys/win32/dllentry.cpp
 

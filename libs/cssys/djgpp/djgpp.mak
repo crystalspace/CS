@@ -62,19 +62,19 @@ LIBS.SORT += -ldl
 endif
 
 # Where can the Zlib library be found on this system?
-Z_LIBS=-Llibs/zlib -lz$(ZLIB.SUFFIX)
+Z_LIBS=-lz$(ZLIB.SUFFIX)
 
 # Where can the PNG library be found on this system?
-PNG_LIBS=-Llibs/libpng -lpng$(LIBPNG.SUFFIX)
+PNG_LIBS=-lpng$(LIBPNG.SUFFIX)
 
 # Where can the JPG library be found on this system?
-JPG_LIBS=-Llibs/libjpeg -ljpeg$(LIBJPEG.SUFFIX)
+JPG_LIBS=-ljpeg$(LIBJPEG.SUFFIX)
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
 
 # Indicate where special include files can be found.
-CFLAGS.INCLUDE=-Ilibs/zlib -Ilibs/libpng -Ilibs/libjpeg
+CFLAGS.INCLUDE=
 
 # General flags for the compiler which are used in any case.
 CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM)
@@ -112,7 +112,7 @@ NASMFLAGS.SYSTEM=-f coff -DEXTERNC_UNDERSCORE
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS = libs/cssys/general/timing.cpp \
 	libs/cssys/djgpp/djgpp.cpp libs/cssys/djgpp/printf.cpp \
-	libs/cssys/djgpp/loadlib.cpp support/gnu/getopt*.c \
+	libs/cssys/djgpp/loadlib.cpp libs/cssys/general/getopt.cpp \
 	libs/cssys/djgpp/djmousys.s libs/cssys/djgpp/djkeysys.s
 
 # The C compiler.

@@ -16,13 +16,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-// G3D_D3D.CPP
-// csGraphics3DDirect3DDx6 implementation file
-// Written by Dan Ogles
-// Some modifications by Nathaniel Saint Martin
-
-// Ported to COM by Dan Ogles on 8.26.98
-// modified by Tristan McLure  09/08/1999
 #define INITGUID
 
 #include "cssysdef.h"
@@ -89,42 +82,7 @@ struct D3DTLVERTEX2
 // lame Utils
 //
 
-// quick fix, this was causing foging problems
-//#ifdef PROC_INTEL
-#if 0
-// This will only work for positive values.
-// float cmp greater
-inline bool FLOATCMPG(float a, float b)
-{
-  unsigned int A = *((unsigned int *) &a);
-  unsigned int B = *((unsigned int *) &b);
-
-  if (A > B)
-    return true;
-
-  return false;
-}
-
-// float cmp less
-inline bool FLOATCMPL(float a, float b)
-{
-  unsigned int A = *((unsigned int *) &a);
-  unsigned int B = *((unsigned int *) &b);
-
-  if (A < B)
-    return true;
-
-  return false;
-}
-
-#else
-#define FLOATCMPG(a, b) (a > b)
-#define FLOATCMPL(a, b) (a < b)
-#endif
-
-#define CLAMP(a, b) (a = (FLOATCMPG(a, b) ? b : a))
-#define CLAMPG(a, b) CLAMP(a, b)
-#define CLAMPL(a, b) (a = (FLOATCMPL(a, b) ? b : a))
+#define CLAMP(a, b) if ((a) > (b)) (a) = (b)
 
 #define D3DRGB_(r, g, b) \
     (0xff000000L | ( (QInt(((r) * 255))) << 16) | ((QInt(((g) * 255))) << 8) | QInt(((b) * 255)))
@@ -209,21 +167,21 @@ HRESULT CALLBACK csGraphics3DDirect3DDx6::EnumPixelFormatsCallback(LPDDPIXELFORM
     }
   }
   // Search a 16/32 bits format
-  else if(lpddpf->dwRGBBitCount >=16)
+  else if (lpddpf->dwRGBBitCount >=16)
   {
     if (lpddpf->dwRGBBitCount == 16)
     {
       //Only use that format, if there has not been found annother format. (That might be the
       //32 Bit texture formtat if use32BitTexture is true)
-      if(!bGotLitDesc)
+      if (!bGotLitDesc)
       {
-        memcpy(&csGraphics3DDirect3DDx6::m_ddsdLightmapSurfDesc.ddpfPixelFormat, lpddpf, sizeof(DDPIXELFORMAT));
+        memcpy (&csGraphics3DDirect3DDx6::m_ddsdLightmapSurfDesc.ddpfPixelFormat, lpddpf, sizeof(DDPIXELFORMAT));
         bGotLitDesc = true;
       }
 
-      if(!bGotTexDesc)
+      if (!bGotTexDesc)
       {
-        memcpy(&csGraphics3DDirect3DDx6::m_ddsdTextureSurfDesc.ddpfPixelFormat, lpddpf, sizeof(DDPIXELFORMAT));
+        memcpy (&csGraphics3DDirect3DDx6::m_ddsdTextureSurfDesc.ddpfPixelFormat, lpddpf, sizeof(DDPIXELFORMAT));
         bGotTexDesc = true;
       }
     }
@@ -232,9 +190,9 @@ HRESULT CALLBACK csGraphics3DDirect3DDx6::EnumPixelFormatsCallback(LPDDPIXELFORM
       if (use32BitTexture)
       {
         //This will override a potentially found 16 Bit texture mode:
-        memcpy(&csGraphics3DDirect3DDx6::m_ddsdLightmapSurfDesc.ddpfPixelFormat, lpddpf, sizeof(DDPIXELFORMAT));
+        memcpy (&csGraphics3DDirect3DDx6::m_ddsdLightmapSurfDesc.ddpfPixelFormat, lpddpf, sizeof(DDPIXELFORMAT));
         bGotLitDesc = true;
-        memcpy(&csGraphics3DDirect3DDx6::m_ddsdTextureSurfDesc.ddpfPixelFormat, lpddpf, sizeof(DDPIXELFORMAT));
+        memcpy (&csGraphics3DDirect3DDx6::m_ddsdTextureSurfDesc.ddpfPixelFormat, lpddpf, sizeof(DDPIXELFORMAT));
         bGotTexDesc = true;
       }
     }
@@ -243,36 +201,37 @@ HRESULT CALLBACK csGraphics3DDirect3DDx6::EnumPixelFormatsCallback(LPDDPIXELFORM
   return D3DENUMRET_OK; // keep on looking
 }
 
-csGraphics3DDirect3DDx6::csGraphics3DDirect3DDx6 (iBase *iParent) : 
-  m_bIsHardware(false),
-  m_bHaloEffect(false),
-  m_dwDeviceBitDepth(0),
-  m_hd3dBackMat(NULL),
-  m_bIsLocked(false),
-  m_iTypeLightmap(-1),
-  m_pLightmapCache(NULL),
-  m_lpD3D(NULL),
-  m_lpd3dBackMat(NULL),
-  m_pDirectDevice(NULL),
-  m_lpd3dDevice(NULL),
-  m_lpd3dDevice2(NULL),
-  m_lpd3dViewport(NULL),
-  m_lpDD4(NULL),
-  m_lpddDevice(NULL),
-  m_lpddPrimary(NULL),
-  m_lpddZBuffer(NULL),
-  m_pTextureCache(NULL),
-  m_piSystem(NULL),
-  m_bVerbose(true),
-  config(NULL),
-  m_nHeight(0),
-  m_nHalfHeight(0),
-  m_nWidth(0),
-  m_nHalfWidth(0),
-  m_mixmode(0),
-  m_ZBufMode(CS_ZBUF_NONE),
-  m_nDrawMode(0),
-  m_pClipper(NULL)
+csGraphics3DDirect3DDx6::csGraphics3DDirect3DDx6 (iBase *iParent) :
+  m_lpDD4 (NULL),
+  m_lpddPrimary (NULL),
+  m_lpddDevice (NULL),
+  m_lpD3D (NULL),
+  m_lpddZBuffer (NULL),
+  m_lpd3dDevice (NULL),
+  m_lpd3dDevice2 (NULL),
+  m_lpd3dViewport (NULL),
+  m_lpd3dBackMat (NULL),
+  m_hd3dBackMat (0),
+  m_bIsHardware (false),
+  m_dwDeviceBitDepth (0),
+  m_pTextureCache (NULL),
+  m_pLightmapCache (NULL),
+  m_iTypeLightmap (-1),
+  m_bHaloEffect (false),
+  m_nWidth (0),
+  m_nHeight (0),
+  m_nHalfWidth (0),
+  m_nHalfHeight (0),
+  m_ZBufMode (CS_ZBUF_NONE),
+  m_nDrawMode (0),
+  m_mixmode (0),
+  m_pClipper (NULL),
+  m_pDirectDevice (NULL),
+  m_piSystem (NULL),
+  m_bIsLocked (false),
+  m_bVerbose (true),
+  m_bMipmapping (false),
+  config (NULL)
 {
   CONSTRUCT_IBASE (iParent);
 
@@ -315,8 +274,6 @@ bool csGraphics3DDirect3DDx6::Initialize (iSystem *iSys)
 {
   m_piSystem = iSys;
   m_piSystem->IncRef ();
-
-  m_piSystem->Printf (MSG_INITIALIZATION, "\nDirect3DRender DX6.1 selected\n");
 
   iVFS* v = QUERY_PLUGIN_ID (m_piSystem, CS_FUNCID_VFS, iVFS);
   config = new csIniFile(v, "/config/direct3ddx6.cfg");
@@ -363,7 +320,7 @@ void ComputeShift(int& sr, int& sl, unsigned mask)
   }       
 }
 
-bool csGraphics3DDirect3DDx6::Open(const char* Title)
+bool csGraphics3DDirect3DDx6::Open (const char* Title)
 {
   LPD3DDEVICEDESC lpD3dDeviceDesc;
   DWORD dwDeviceMemType;
@@ -373,8 +330,7 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   HRESULT hRes;
   BOOL ddsdFound = FALSE;
   D3DMATERIAL d3dMaterial;
-  bool bMipmapping;
-  
+
   IDirectDraw4* lpDD4 = NULL;
   DDSCAPS2 ddsCaps;
 //  DDCAPS_DX6 dd6caps;
@@ -384,6 +340,8 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   // Get the direct detection device.
   iGraphics2DDDraw6* pSysGInfo = QUERY_INTERFACE(m_piG2D, iGraphics2DDDraw6);
   ASSERT(pSysGInfo);
+  if (pSysGInfo)
+    pSysGInfo->SetModeSwitchCallback (ModeSwitchCallback, this);
 
   pSysGInfo->SetFor3D(true);
 
@@ -421,8 +379,8 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   // dwTotal = dd6caps.dwVidMemTotal;
   // dwFree = dd6caps.dwVidMemFree;
   
-  m_piSystem->Printf (MSG_INITIALIZATION, " %d bytes VideoMem Total \n", dwTotal);
-  m_piSystem->Printf (MSG_INITIALIZATION, " %d bytes VideoMem Free \n", dwFree);
+  m_piSystem->Printf (MSG_INITIALIZATION, "  %d bytes VideoMem Total \n", dwTotal);
+  m_piSystem->Printf (MSG_INITIALIZATION, "  %d bytes VideoMem Free \n", dwFree);
 
   FINAL_RELEASE (lpDD4);
   
@@ -464,7 +422,7 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
     ASSERT( FALSE );
   }
   
-  m_piSystem->Printf (MSG_INITIALIZATION, " %d-bit Colordepth selected\n", ddsd.ddpfPixelFormat.dwRGBBitCount);
+  m_piSystem->Printf (MSG_INITIALIZATION, "  %d-bit Colordepth selected\n", ddsd.ddpfPixelFormat.dwRGBBitCount);
   // assign globals for software/hardware
   lpD3dDeviceDesc = m_pDirectDevice->GetDesc3D();
   memcpy(&m_Guid, m_pDirectDevice->GetGuid3D(), sizeof(GUID));
@@ -491,12 +449,12 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   hRes = m_lpddDevice->GetPixelFormat(&ddpfTest);
   if (FAILED(hRes))
   {
-    m_piSystem->Printf (MSG_FATAL_ERROR, " Cannot get pixel-format of rendering target. ! \n");
+    m_piSystem->Printf (MSG_FATAL_ERROR, "  Cannot get pixel-format of rendering target. ! \n");
     return false;   
   }
 
   dwZBufferBitDepth = ddpfTest.dwRGBBitCount;
-  m_piSystem->Printf (MSG_INITIALIZATION, " %d-bit Z-Buffer depth selected\n", dwZBufferBitDepth);
+  m_piSystem->Printf (MSG_INITIALIZATION, "  %d-bit Z-Buffer depth selected\n", dwZBufferBitDepth);
  
   m_Caps.minTexHeight = lpD3dDeviceDesc->dwMinTextureHeight;
   m_Caps.minTexWidth  = lpD3dDeviceDesc->dwMinTextureWidth;
@@ -505,8 +463,8 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
 
   if (lpD3dDeviceDesc->dpcTriCaps.dwTextureCaps & D3DPTEXTURECAPS_SQUAREONLY)
   {
-    m_piSystem->Printf (MSG_INITIALIZATION, " Warning: Your Direct3D Device supports only square textures!\n");
-    m_piSystem->Printf (MSG_INITIALIZATION, "          This is a potential performance hit!\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, "  Warning: Your Direct3D Device supports only square textures!\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, "           This is a potential performance hit!\n");
     m_Caps.MaxAspectRatio = 1;
   }
   else
@@ -537,11 +495,9 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
 
   if (FAILED(hRes) || ddsd.ddpfPixelFormat.dwSize == 0)
   {
-    m_piSystem->Printf (MSG_FATAL_ERROR, " Z-Buffer enumeration failed. ! \n");
+    m_piSystem->Printf (MSG_FATAL_ERROR, "  Z-Buffer enumeration failed. ! \n");
     return false;   
   }
- 
-  m_piSystem->Printf (MSG_INITIALIZATION, " Resolution: %d x %d selected\n", ddsd.dwWidth, ddsd.dwHeight);
  
  // ddsd.dwZBufferBitDepth = dwZBufferBitDepth;
  // dwZBufferBitDepth is not longer part of ddsd under DX6.x
@@ -550,7 +506,7 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   hRes = m_lpDD4->CreateSurface(&ddsd, &m_lpddZBuffer, NULL);
   if (FAILED(hRes))
   {
-    m_piSystem->Printf (MSG_FATAL_ERROR, " Error creating Z-Buffer, 'CreateSurface' failed ! \n");
+    m_piSystem->Printf (MSG_FATAL_ERROR, "  Error creating Z-Buffer, 'CreateSurface' failed ! \n");
     return false;   
   }
 
@@ -559,7 +515,7 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
     return false; 
 
   if(m_bVerbose)
-    m_piSystem->Printf (MSG_INITIALIZATION, " Use %d depth for ZBuffer.\n", dwZBufferBitDepth);
+    m_piSystem->Printf (MSG_INITIALIZATION, "  Use %d depth for ZBuffer.\n", dwZBufferBitDepth);
 
   // get the device interface
   hRes = m_lpD3D->CreateDevice(m_Guid, m_lpddDevice, &m_lpd3dDevice2, NULL);
@@ -597,7 +553,7 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
 
   if (!bGotTexDesc && !bGotLitDesc)
   {
-    m_piSystem->Printf (MSG_INITIALIZATION, " ERROR : No 16 or 32 bits texture format supported in hardware.\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, "  ERROR : No 16 or 32 bits texture format supported in hardware.\n");
     hRes = E_FAIL;
     return false;
   }    
@@ -605,116 +561,94 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   if(m_bVerbose)
   {
     if(m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRGBBitCount==16)
-      m_piSystem->Printf (MSG_INITIALIZATION, " Using 16-bit texture format.\n");
+      m_piSystem->Printf (MSG_INITIALIZATION, "  Using 16-bit texture format.\n");
     else
-      m_piSystem->Printf (MSG_INITIALIZATION, " Using 32-bit texture format.\n");
+      m_piSystem->Printf (MSG_INITIALIZATION, "  Using 32-bit texture format.\n");
   }
 
   // select type of lightmapping
-  if (m_pDirectDevice->GetAlphaBlend() && !config->GetYesNo("Direct3DDX6","DISABLE_LIGHTMAP", false))
+  if (m_pDirectDevice->GetAlphaBlend () && !config->GetYesNo ("Direct3DDX6","DISABLE_LIGHTMAP", false))
   {
-    if (m_pDirectDevice->GetAlphaBlendType() == 1)
-    {
+    if (m_pDirectDevice->GetAlphaBlendType () == 1)
       m_iTypeLightmap = 1;
-    }
     else
     {
-      m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Bad lightmapping supported.\n");
+      m_piSystem->Printf (MSG_INITIALIZATION, "  WARNING : Bad lightmapping supported.\n");
       m_iTypeLightmap = 2;
+    }
+
+    if (m_bVerbose)
+    {
+      if (m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwRGBBitCount == 8)
+        m_piSystem->Printf (MSG_INITIALIZATION, "  Using 8-bit palettized format for lightmap memory.\n");
+      else if (m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwRGBBitCount == 16)
+        m_piSystem->Printf (MSG_INITIALIZATION, "  Using 16-bit lightmap format.\n");
+      else
+        m_piSystem->Printf (MSG_INITIALIZATION, "  Using 32-bit lightmap format.\n");
     }
   }
   else
   {
     if (config->GetYesNo ("Direct3DDX6", "DISABLE_LIGHTMAP", false))
-      m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Lightmapping disabled by user.\n");
+      m_piSystem->Printf (MSG_INITIALIZATION, "  WARNING : Lightmapping disabled by user.\n");
     else
-      m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Lightmapping not supported by hardware.\n");
+      m_piSystem->Printf (MSG_INITIALIZATION, "  WARNING : Lightmapping not supported by hardware.\n");
     m_iTypeLightmap = 0;
   }
 
-  if (!m_iTypeLightmap)
-  {
-    m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Lightmapping disabled.\n");
-  }
-  else
-  {
-    if(m_bVerbose)
-    {
-      if(m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwRGBBitCount==8)
-        m_piSystem->Printf (MSG_INITIALIZATION, " Using 8-bit palettized format for lightmap memory.\n");
-      else if(m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwRGBBitCount==16)
-        m_piSystem->Printf (MSG_INITIALIZATION, " Using 16-bit lightmap format.\n");
-      else
-        m_piSystem->Printf (MSG_INITIALIZATION, " Using 32-bit lightmap format.\n");
-    }
-  }
-
   // set Halo effect configuration
-  if (m_pDirectDevice->GetAlphaBlendHalo() && !config->GetYesNo("Direct3DDX6","DISABLE_HALO", false))
-    m_bHaloEffect = true;
+  bool bHaloDisabled = config->GetYesNo ("Direct3DDX6","DISABLE_HALO", false);
+  m_bHaloEffect = m_pDirectDevice->GetAlphaBlendHalo () && !bHaloDisabled;
+
+  if (m_bHaloEffect)
+  {
+    if (m_bVerbose)
+      m_piSystem->Printf (MSG_INITIALIZATION, "  Using %d-bit format for halo effect\n",
+        m_ddsdHaloSurfDesc.ddpfPixelFormat.dwRGBBitCount);
+  }
   else
   {
-    if(m_pDirectDevice->GetAlphaBlendHalo() && config->GetYesNo("Direct3DDX6","DISABLE_HALO", false))
-      m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Halo effect disabled by user.\n");
+    if (bHaloDisabled)
+      m_piSystem->Printf (MSG_INITIALIZATION, "  WARNING : Halo effect disabled by user.\n");
     else
-      m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Halo effect not supported by hardware.\n");
-    m_bHaloEffect = false;
+      m_piSystem->Printf (MSG_INITIALIZATION, "  WARNING : Halo effect not supported by hardware.\n");
   }
 
   if (!bGotHaloDesc && m_bHaloEffect)
   {
-    m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : No halo texture format supported by hardware.\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, "  WARNING : No halo texture format supported by hardware.\n");
     m_bHaloEffect = false;
   }
 
-  if(!m_bHaloEffect)
-  {
-    m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Halo effect disabled.\n");
-  }
-  else
-  {
-    if(m_bVerbose)
-      m_piSystem->Printf (MSG_INITIALIZATION, " Using %d-bit format for halo effect\n",
-        m_ddsdHaloSurfDesc.ddpfPixelFormat.dwRGBBitCount);
-  }
-
-  if(m_bVerbose)
-  {
-    m_piSystem->Printf (MSG_INITIALIZATION, " Using 24-bit internal format for texture\n");
-  }
-
   // set mipmapping configuration
-  if (m_pDirectDevice->GetMipmap() && !config->GetYesNo("Direct3DDX6","DISABLE_MIPMAP", false))
-  {  bMipmapping = true;
-     m_piSystem->Printf (MSG_INITIALIZATION, " Mipmapping enabled and supported\n");
+  bool bDisableMipmap = config->GetYesNo("Direct3DDX6","DISABLE_MIPMAP", false);
+  m_bMipmapping = m_pDirectDevice->GetMipmap () && bDisableMipmap;
+  if (m_bMipmapping)
+  {
+    if (m_bVerbose)
+      m_piSystem->Printf (MSG_INITIALIZATION, "  Mipmapping enabled and supported\n");
   }
   else
   {
-    if(config->GetYesNo("Direct3DDX6","DISABLE_MIPMAP", false)
-      && m_pDirectDevice->GetMipmap())
-      m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Mipmapping disabled by user.\n");
+    if (bDisableMipmap)
+      m_piSystem->Printf (MSG_INITIALIZATION, "  WARNING : Mipmapping disabled by user.\n");
     else
-      m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Mipmapping not supported in hardware.\n");
-    bMipmapping = false;
-  }
-  if(!bMipmapping)
-  {
-    m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Mipmapping disabled.\n");
+      m_piSystem->Printf (MSG_INITIALIZATION, "  WARNING : Mipmapping not supported in hardware.\n");
   }
 
   // create a black background
-  hRes = m_lpD3D->CreateMaterial(&m_lpd3dBackMat, NULL);
-  if (FAILED(hRes))
+  hRes = m_lpD3D->CreateMaterial (&m_lpd3dBackMat, NULL);
+  if (FAILED (hRes))
   {
-    m_piSystem->Printf (MSG_INITIALIZATION, " Error creating Backgroundmaterial!\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, "  Error creating Backgroundmaterial!\n");
     return false;
   }
-  memset(&d3dMaterial, 0, sizeof(d3dMaterial));
-  d3dMaterial.dwSize = sizeof(d3dMaterial);
+  memset (&d3dMaterial, 0, sizeof (d3dMaterial));
+  d3dMaterial.dwSize = sizeof (d3dMaterial);
   d3dMaterial.dwRampSize = 1;
   
-  hRes = m_lpd3dBackMat->SetMaterial(&d3dMaterial);
-  if (FAILED(hRes))
+  hRes = m_lpd3dBackMat->SetMaterial (&d3dMaterial);
+  if (FAILED (hRes))
   {
     m_piSystem->Printf (MSG_INITIALIZATION, "Error setting Backgroundmaterial!\n");
     return false;     
@@ -752,88 +686,111 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
     return false;
   }
   // set default render-states.
-  m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_CULLMODE, D3DCULL_NONE);
-  m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, TRUE);
-  m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SPECULARENABLE, FALSE);
-  
-  hRes = m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_TEXTUREMAG, D3DFILTER_LINEAR);
+  m_lpd3dDevice2->SetRenderState (D3DRENDERSTATE_CULLMODE, D3DCULL_NONE);
+  m_lpd3dDevice2->SetRenderState (D3DRENDERSTATE_TEXTUREPERSPECTIVE, TRUE);
+  m_lpd3dDevice2->SetRenderState (D3DRENDERSTATE_SPECULARENABLE, FALSE);
+
+  hRes = m_lpd3dDevice2->SetRenderState (D3DRENDERSTATE_TEXTUREMAG, D3DFILTER_LINEAR);
   if (FAILED(hRes))
-    m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_TEXTUREMAG, D3DFILTER_NEAREST);
+    m_lpd3dDevice2->SetRenderState (D3DRENDERSTATE_TEXTUREMAG, D3DFILTER_NEAREST);
   
-  m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_TEXTUREMIN, D3DFILTER_LINEARMIPLINEAR);
+  m_lpd3dDevice2->SetRenderState (D3DRENDERSTATE_TEXTUREMIN, D3DFILTER_LINEARMIPLINEAR);
   if (FAILED(hRes))
   {
-    hRes = m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_TEXTUREMIN, D3DFILTER_MIPLINEAR);
+    hRes = m_lpd3dDevice2->SetRenderState (D3DRENDERSTATE_TEXTUREMIN, D3DFILTER_MIPLINEAR);
     if (FAILED(hRes))
-      m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_TEXTUREMIN, D3DFILTER_LINEAR);
+      m_lpd3dDevice2->SetRenderState (D3DRENDERSTATE_TEXTUREMIN, D3DFILTER_LINEAR);
   }
   
-  if(config->GetYesNo("Direct3DDX6","ENABLE_DITHER", true))
+  if (config->GetYesNo ("Direct3DDX6","ENABLE_DITHER", true))
     m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DITHERENABLE, TRUE);
   else
     m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DITHERENABLE, FALSE);
   
-  m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ONE);
-  m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ZERO);
+  m_lpd3dDevice2->SetRenderState (D3DRENDERSTATE_SRCBLEND, D3DBLEND_ONE);
+  m_lpd3dDevice2->SetRenderState (D3DRENDERSTATE_DESTBLEND, D3DBLEND_ZERO);
 
   // Set default Z-buffer mode.
-  m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, TRUE);
-  m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ZENABLE, TRUE);
+  m_lpd3dDevice2->SetRenderState (D3DRENDERSTATE_ZWRITEENABLE, TRUE);
+  m_lpd3dDevice2->SetRenderState (D3DRENDERSTATE_ZENABLE, TRUE);
   m_ZBufMode = CS_ZBUF_FILL;
   
-  // save half of the memory for textures,
-  // half for lightmaps
-  m_piSystem->Printf (MSG_INITIALIZATION, "Initializing lightmap- and texturecache...");
-  // Here is the "Assertion failed!"-bug I get on my machine
-  if (m_iTypeLightmap != 0)
-  {
-    m_pTextureCache = new D3DTextureCache (dwFree/2, m_bIsHardware, m_lpDD4, m_lpd3dDevice2, m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRGBBitCount, bMipmapping, &m_Caps);
-    m_pLightmapCache = new D3DLightMapCache(dwFree/2, m_bIsHardware, m_lpDD4, m_lpd3dDevice2, m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwRGBBitCount);
-  }
-  else
-  {
-    m_pTextureCache = new D3DTextureCache(dwFree, m_bIsHardware, m_lpDD4, m_lpd3dDevice2, m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRGBBitCount, bMipmapping, &m_Caps);
-    m_pLightmapCache = NULL;
-  }
-  
-  m_piSystem->Printf (MSG_INITIALIZATION, "completed!\n");
+  m_piSystem->Printf (MSG_INITIALIZATION, "Initializing lightmap and texture caches ...");
+  ReinitCaches ();
+  m_piSystem->Printf (MSG_INITIALIZATION, " completed!\n");
 
   // init the viewport.
  
-  SetDimensions(m_nWidth, m_nHeight);
-  m_piSystem->Printf (MSG_INITIALIZATION, "SetDimensions succesfull!\n");
+  SetDimensions (m_nWidth, m_nHeight);
 
   // clear the Z-buffer    
   rect.x1 = 0; rect.y1 = 0; 
   rect.x2 = m_nWidth; rect.y2 = m_nHeight;
   
-  hRes = m_lpd3dViewport->Clear(1, &rect, D3DCLEAR_ZBUFFER);
-  if (FAILED(hRes))
+  hRes = m_lpd3dViewport->Clear (1, &rect, D3DCLEAR_ZBUFFER);
+  if (FAILED (hRes))
     return false;
 
-  ConfigureRendering();
+  ConfigureRendering ();
   // init render state cache
-  m_States.Initialize(m_lpd3dDevice2, m_piSystem);
+  m_States.Initialize (m_lpd3dDevice2, m_piSystem);
   // the buffer size could be potentially tweaked for better performance
-  m_VertexCache.Initialize(m_lpd3dDevice2, 32);
+  m_VertexCache.Initialize (m_lpd3dDevice2, 32);
   // set to false if we want to revert on "older" PolygonFX (supports fogging)
   m_bBatchPolygonFX = false; //true;
 
   return true;
 }
 
-void csGraphics3DDirect3DDx6::Close()
+void csGraphics3DDirect3DDx6::Close ()
 {
-  m_VertexCache.ShutDown();
+  m_VertexCache.ShutDown ();
 
-  ClearCache();
+  ClearCache ();
   
-  FINAL_RELEASE(m_lpd3dBackMat);
-  FINAL_RELEASE(m_lpd3dViewport);
-  FINAL_RELEASE(m_lpd3dDevice2);
-  FINAL_RELEASE(m_lpd3dBackMat);
-  FINAL_RELEASE(m_lpd3dViewport);
-  FINAL_RELEASE(m_lpD3D);
+  FINAL_RELEASE (m_lpd3dBackMat);
+  FINAL_RELEASE (m_lpd3dViewport);
+  FINAL_RELEASE (m_lpd3dDevice2);
+  FINAL_RELEASE (m_lpd3dBackMat);
+  FINAL_RELEASE (m_lpd3dViewport);
+  FINAL_RELEASE (m_lpD3D);
+}
+
+void csGraphics3DDirect3DDx6::ReinitCaches ()
+{
+  delete m_pTextureCache;
+  delete m_pLightmapCache;
+
+  DDSCAPS2 ddsCaps;
+  DWORD dwTotal, dwFree;
+
+  memset (&ddsCaps, 0, sizeof (ddsCaps));
+  ddsCaps.dwCaps = DDSCAPS_TEXTURE;
+  m_lpDD4->GetAvailableVidMem (&ddsCaps, &dwTotal, &dwFree);
+
+  // save 2/3 of the memory for textures, 1/3 for lightmaps
+  DWORD dwTexCacheSize = dwFree;
+  DWORD dwLMapCacheSize = 0;
+  if (m_iTypeLightmap != 0)
+  {
+    dwLMapCacheSize = dwTexCacheSize * 1 / 3;
+    dwTexCacheSize -= dwLMapCacheSize;
+  }
+  m_pTextureCache = NULL;
+  m_pLightmapCache = NULL;
+
+  if (dwTexCacheSize)
+    m_pTextureCache = new D3DTextureCache (dwTexCacheSize, m_bIsHardware,
+      m_lpDD4, m_lpd3dDevice2, m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRGBBitCount,
+      m_bMipmapping, &m_Caps);
+  if (dwLMapCacheSize)
+    m_pLightmapCache = new D3DLightMapCache (dwLMapCacheSize, m_bIsHardware,
+      m_lpDD4, m_lpd3dDevice2, m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwRGBBitCount);
+}
+
+void csGraphics3DDirect3DDx6::ModeSwitchCallback (void *Data)
+{
+  ((csGraphics3DDirect3DDx6 *)Data)->ReinitCaches ();
 }
 
 // TODO/FIXME : - implement some of this into DirectDetection
@@ -843,7 +800,7 @@ void csGraphics3DDirect3DDx6::Close()
 // This makes obsolete alot of initialization done in ::Open()
 void csGraphics3DDirect3DDx6::ConfigureRendering()
 {  
-  LPD3DDEVICEDESC lpD3dDeviceDesc = m_pDirectDevice->GetDesc3D();
+  LPD3DDEVICEDESC lpD3dDeviceDesc = m_pDirectDevice->GetDesc3D ();
 
   // single pass multitexturing detection
   if (lpD3dDeviceDesc->wMaxSimultaneousTextures >= 2)
@@ -912,13 +869,16 @@ void csGraphics3DDirect3DDx6::ConfigureRendering()
     m_lpd3dDevice2->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_SELECTARG2);
     m_lpd3dDevice2->SetTextureStageState(1, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
 
-    struct _TexOpList {
-    DWORD Flag;
-    D3DTEXTUREOP Op;
-    } TexOpList [] = {D3DTEXOPCAPS_MODULATE2X,  D3DTOP_MODULATE2X,
-              D3DTEXOPCAPS_MODULATE,  D3DTOP_MODULATE,
-              D3DTEXOPCAPS_ADDSIGNED, D3DTOP_ADDSIGNED2X,
-              D3DTEXOPCAPS_ADD,     D3DTOP_ADD,
+    struct _TexOpList
+    {
+      DWORD Flag;
+      D3DTEXTUREOP Op;
+    } TexOpList [] =
+    {
+      { D3DTEXOPCAPS_MODULATE2X, D3DTOP_MODULATE2X },
+      { D3DTEXOPCAPS_MODULATE, D3DTOP_MODULATE },
+      { D3DTEXOPCAPS_ADDSIGNED, D3DTOP_ADDSIGNED2X },
+      { D3DTEXOPCAPS_ADD, D3DTOP_ADD }
     };
 
     m_LightmapTextureOp = D3DTOP_DISABLE;
@@ -926,9 +886,9 @@ void csGraphics3DDirect3DDx6::ConfigureRendering()
     // NOTE : Im not too sure what's the proper way of validating
     //        this stuff, maybe Im doing something wrong.
 
-    for (int i = 0; i < sizeof(TexOpList)/sizeof(_TexOpList); i++)
+    for (size_t i = 0; i < sizeof (TexOpList) / sizeof (_TexOpList); i++)
     {
-      if (lpD3dDeviceDesc->dwTextureOpCaps & TexOpList[i].Flag)
+      if (lpD3dDeviceDesc->dwTextureOpCaps & TexOpList [i].Flag)
       {
         m_lpd3dDevice2->SetTextureStageState(1, D3DTSS_COLOROP, TexOpList[i].Op);
 
@@ -998,7 +958,7 @@ void csGraphics3DDirect3DDx6::ConfigureRendering()
       {D3DPBLENDCAPS_ONE,       D3DPBLENDCAPS_SRCCOLOR, D3DBLEND_ONE,       D3DBLEND_SRCCOLOR},
     };
 
-    for (int i = 0; i < sizeof(BlendList)/sizeof(_BlendList); i++)
+    for (size_t i = 0; i < sizeof (BlendList) / sizeof (_BlendList); i++)
     {
       if ((lpD3dDeviceDesc->dpcTriCaps.dwSrcBlendCaps  & BlendList[i].SrcFlag) &&
           (lpD3dDeviceDesc->dpcTriCaps.dwDestBlendCaps & BlendList[i].DstFlag))
@@ -1027,7 +987,7 @@ void csGraphics3DDirect3DDx6::ConfigureRendering()
   };
 
   // TODO : store translucency type
-  for (int i = 0; i < sizeof(TransList)/sizeof(_TransList); i++)
+  for (size_t i = 0; i < sizeof (TransList) / sizeof (_TransList); i++)
   {
     if ((lpD3dDeviceDesc->dpcTriCaps.dwSrcBlendCaps  & TransList[i].SrcFlag) &&
         (lpD3dDeviceDesc->dpcTriCaps.dwDestBlendCaps & TransList[i].DstFlag))
@@ -1042,7 +1002,7 @@ void csGraphics3DDirect3DDx6::ConfigureRendering()
 
 } // end of void csGraphics3DDirect3DDx6::ConfigureRendering()
 
-void csGraphics3DDirect3DDx6::SetDimensions(int nWidth, int nHeight)
+void csGraphics3DDirect3DDx6::SetDimensions (int nWidth, int nHeight)
 {
   D3DVIEWPORT2 d3dViewport;
   
@@ -1081,7 +1041,7 @@ bool csGraphics3DDirect3DDx6::BeginDraw (int nDrawFlags)
     // if graphics is in 3D mode, turn it off
     if (m_nDrawMode & CSDRAW_3DGRAPHICS)
       FinishDraw ();
-    
+
     // if 2D mode is not enabled, turn it on
     if (!(m_nDrawMode & CSDRAW_2DGRAPHICS))
       m_piG2D->BeginDraw ();
@@ -1091,20 +1051,20 @@ bool csGraphics3DDirect3DDx6::BeginDraw (int nDrawFlags)
     // if graphics is in 2D mode, turn it off
     if (m_nDrawMode & CSDRAW_2DGRAPHICS)
       FinishDraw ();
-    
+
     // if 3D mode is not enabled, turn it on
     if (!(m_nDrawMode & CSDRAW_3DGRAPHICS))
     {
       HRESULT hRes;
       DWORD dwClearFlag = 0;
       D3DRECT rect;
-      
+
       rect.x1 = 0; rect.x2 = m_nWidth;
       rect.y1 = 0; rect.y2 = m_nHeight;
-      
+
       if (nDrawFlags & CSDRAW_CLEARZBUFFER)
         dwClearFlag |= D3DCLEAR_ZBUFFER;
-      
+
       if (nDrawFlags & CSDRAW_CLEARSCREEN)
         dwClearFlag |= D3DCLEAR_TARGET;
 
@@ -1114,16 +1074,15 @@ bool csGraphics3DDirect3DDx6::BeginDraw (int nDrawFlags)
         if (FAILED(hRes))
           return E_FAIL;
       }
-      
+
       hRes = m_lpd3dDevice2->BeginScene();
       if (FAILED(hRes))
         return E_FAIL;
-      
     } 
   } 
-  
+
   m_nDrawMode = nDrawFlags;
-  
+
   return true;
 }
 
@@ -1138,9 +1097,9 @@ void csGraphics3DDirect3DDx6::FinishDraw ()
   {
     // end our scene (we're in 3D state)
     HRESULT hRes;
-    
-    hRes = m_lpd3dDevice2->EndScene();
-    if (FAILED(hRes))
+
+    hRes = m_lpd3dDevice2->EndScene ();
+    if (FAILED (hRes))
       return;
   }
   m_nDrawMode = 0;
@@ -1149,26 +1108,24 @@ void csGraphics3DDirect3DDx6::FinishDraw ()
 void csGraphics3DDirect3DDx6::DumpCache()
 {
   m_pTextureCache->Dump();
-  m_pLightmapCache->Dump();
+  if (m_pLightmapCache)
+    m_pLightmapCache->Dump();
 }
 
-void csGraphics3DDirect3DDx6::ClearCache()
+void csGraphics3DDirect3DDx6::ClearCache ()
 {
-  if ( m_pTextureCache ) 
-  {
-    m_pTextureCache->Clear();
-  }
-  if ( m_pLightmapCache )
-  {
-    m_pLightmapCache->Clear();
-  }
+  if (m_pTextureCache) 
+    m_pTextureCache->Clear ();
+  if (m_pLightmapCache)
+    m_pLightmapCache->Clear ();
 }
 
 void csGraphics3DDirect3DDx6::CacheTexture (iPolygonTexture *texture)
 {
-  iTextureHandle* txt_handle = texture->GetTextureHandle ();
-  m_pTextureCache->cache_texture (txt_handle);
-  m_pLightmapCache->cache_lightmap (texture); //THFIXME
+  iMaterialHandle *mat_handle = texture->GetMaterialHandle ();
+  m_pTextureCache->cache_texture (mat_handle->GetTexture ());
+  if (m_pLightmapCache)
+    m_pLightmapCache->cache_lightmap (texture); //THFIXME
 }
 
 void csGraphics3DDirect3DDx6::UncacheTexture (iTextureHandle *handle)
@@ -1177,45 +1134,46 @@ void csGraphics3DDirect3DDx6::UncacheTexture (iTextureHandle *handle)
   //@@guess what.... right, todo.
 }
 
-void csGraphics3DDirect3DDx6::SetupPolygon( G3DPolygonDP& poly, float& J1, float& J2, float& J3, 
-                                        float& K1, float& K2, float& K3,
-                                        float& M,  float& N,  float& O  )
+void csGraphics3DDirect3DDx6::SetupPolygon (G3DPolygonDP& poly,
+  float& J1, float& J2, float& J3,
+  float& K1, float& K2, float& K3,
+  float& M,  float& N,  float& O)
 {
   float P1, P2, P3, P4, Q1, Q2, Q3, Q4;
   
-  float Ac = poly.normal.A (),
-    Bc = poly.normal.B (),
-    Cc = poly.normal.C (),
-    Dc = poly.normal.D ();
+  float Ac = poly.normal.A ();
+  float Bc = poly.normal.B ();
+  float Cc = poly.normal.C ();
+  float Dc = poly.normal.D ();
   
   float inv_aspect = poly.inv_aspect;
   
   // Get the plane normal of the polygon. Using this we can calculate
   // '1/z' at every screen space point.
-  
+
   if (ABS (Dc) < 0.06)
   {
     M = 0;
     N = 0;
-    O = 1/(poly.z_value);
+    O = 1 / (poly.z_value);
   }
   else
   {
-    float inv_Dc = 1/Dc;
-    
-    M = -Ac*inv_Dc*inv_aspect;
-    N = -Bc*inv_Dc*inv_aspect;
-    O = -Cc*inv_Dc;
+    float inv_Dc = 1 / Dc;
+
+    M = -Ac * inv_Dc * inv_aspect;
+    N = -Bc * inv_Dc * inv_aspect;
+    O = -Cc * inv_Dc;
   }
-  
+
   P1 = poly.plane.m_cam2tex->m11;
   P2 = poly.plane.m_cam2tex->m12;
   P3 = poly.plane.m_cam2tex->m13;
-  P4 = -(P1*poly.plane.v_cam2tex->x + P2*poly.plane.v_cam2tex->y + P3*poly.plane.v_cam2tex->z);
+  P4 = -(P1 * poly.plane.v_cam2tex->x + P2 * poly.plane.v_cam2tex->y + P3 * poly.plane.v_cam2tex->z);
   Q1 = poly.plane.m_cam2tex->m21;
   Q2 = poly.plane.m_cam2tex->m22;
   Q3 = poly.plane.m_cam2tex->m23;
-  Q4 = -(Q1*poly.plane.v_cam2tex->x + Q2*poly.plane.v_cam2tex->y + Q3*poly.plane.v_cam2tex->z);
+  Q4 = -(Q1 * poly.plane.v_cam2tex->x + Q2 * poly.plane.v_cam2tex->y + Q3 * poly.plane.v_cam2tex->z);
   
   
   if (ABS (Dc) < 0.06)
@@ -1230,25 +1188,23 @@ void csGraphics3DDirect3DDx6::SetupPolygon( G3DPolygonDP& poly, float& J1, float
   }
   else
   {
-    J1 = P1 * inv_aspect + P4*M;
-    J2 = P2 * inv_aspect + P4*N;
-    J3 = P3              + P4*O;
-    K1 = Q1 * inv_aspect + Q4*M;
-    K2 = Q2 * inv_aspect + Q4*N;
-    K3 = Q3              + Q4*O;
+    J1 = P1 * inv_aspect + P4 * M;
+    J2 = P2 * inv_aspect + P4 * N;
+    J3 = P3              + P4 * O;
+    K1 = Q1 * inv_aspect + Q4 * M;
+    K2 = Q2 * inv_aspect + Q4 * N;
+    K3 = Q3              + Q4 * O;
   }
 }
 
-void csGraphics3DDirect3DDx6::MultitextureDrawPolygon(G3DPolygonDP & poly)
+void csGraphics3DDirect3DDx6::MultitextureDrawPolygon (G3DPolygonDP &poly)
 {
-  ASSERT( m_lpd3dDevice2 );
+  ASSERT (m_lpd3dDevice2);
 
-  bool bLightmapExists = true,
-  bColorKeyed = false,
-  bKeyColor;
-  
+  bool bLightmapExists = true;
+  bool bColorKeyed = false;
   int  poly_alpha;
-  
+
   float J1, J2, J3, K1, K2, K3;
   float M, N, O;
   int i;
@@ -1263,16 +1219,13 @@ void csGraphics3DDirect3DDx6::MultitextureDrawPolygon(G3DPolygonDP & poly)
     return;
 
   // set up the geometry.
-  SetupPolygon( poly, J1, J2, J3, K1, K2, K3, M, N, O );
+  SetupPolygon (poly, J1, J2, J3, K1, K2, K3, M, N, O);
 
   poly_alpha = poly.alpha;
-  if ((poly_alpha > 0) && m_bRenderKeyColor)
-    bKeyColor = true;
-  else
-    bKeyColor = false;
+  bool bKeyColor = (poly_alpha > 0) && m_bRenderKeyColor;
 
-  //Mipmapping is done for us by DirectX, so we will always select the texture with
-  //the highest resolution.
+  // Mipmapping is done for us by DirectX, so we will always select
+  // the texture with the highest resolution.
   iPolygonTexture *pTex = poly.poly_texture;
 
   if (!pTex)
@@ -1282,55 +1235,48 @@ void csGraphics3DDirect3DDx6::MultitextureDrawPolygon(G3DPolygonDP & poly)
   CacheTexture (pTex);
 
   // retrieve the texture from the cache by handle.
-  csTextureMMDirect3D* txt_mm = (csTextureMMDirect3D*)poly.txt_handle->GetPrivateObject ();
+  csTextureMMDirect3D *txt_mm =
+    (csTextureMMDirect3D *)poly.mat_handle->GetTexture ()->GetPrivateObject ();
   pTexCache = (csD3DCacheData *)txt_mm->GetCacheData ();
 
   bColorKeyed = txt_mm->GetKeyColor ();
 
   // retrieve the lightmap from the cache.
-  iLightMap* piLM = pTex->GetLightMap ();
+  iLightMap *piLM = pTex->GetLightMap ();
 
-  if ( piLM  && m_bRenderLightmap) 
+  if (piLM && m_bRenderLightmap)
   {
     pLightCache = (csD3DCacheData *)piLM->GetCacheData ();
     if (!pLightCache)
-    {
       bLightmapExists = false;
-    }
   }
   else
-  {
-    bLightmapExists=false;
-  }
-
-  if(m_iTypeLightmap == 0)
     bLightmapExists = false;
 
-  if ( bKeyColor )
+  if (m_iTypeLightmap == 0)
+    bLightmapExists = false;
+
+  if (bKeyColor)
   {
-    m_States.SetAlphaBlendEnable(true);
-    m_States.SetDstBlend(m_TransDstBlend);
-    m_States.SetSrcBlend(m_TransSrcBlend);
+    m_States.SetAlphaBlendEnable (true);
+    m_States.SetDstBlend (m_TransDstBlend);
+    m_States.SetSrcBlend (m_TransSrcBlend);
   }
   else
   {
-    m_States.SetAlphaBlendEnable(false);
+    m_States.SetAlphaBlendEnable (false);
   }
 
-  if ( bColorKeyed )
-  {
-    m_States.SetColorKeyEnable(true);
-  }
+  if (bColorKeyed)
+    m_States.SetColorKeyEnable (true);
   else
-  {
-    m_States.SetColorKeyEnable(false);
-  }
+    m_States.SetColorKeyEnable (false);
 
-  m_States.SetTexture(0, pTexCache->Texture.lptex);
+  m_States.SetTexture (0, pTexCache->Texture.lptex);
 
-  float lightmap_scale_u, lightmap_scale_v;
+  float lightmap_scale_u = 0, lightmap_scale_v = 0;
   float lightmap_low_u, lightmap_low_v;
-  if (bLightmapExists )
+  if (bLightmapExists)
   {
     // set lightmap stuff
     iLightMap *thelightmap = pTex->GetLightMap ();
@@ -1340,41 +1286,37 @@ void csGraphics3DDirect3DDx6::MultitextureDrawPolygon(G3DPolygonDP & poly)
     int lmheight     = thelightmap->GetHeight ();
     int lmrealheight = thelightmap->GetRealHeight ();
 
-    float scale_u = (float)(lmrealwidth-1)  / (float)lmwidth;
-    float scale_v = (float)(lmrealheight-1) / (float)lmheight;
+    float scale_u = (float)(lmrealwidth - 1)  / (float)lmwidth;
+    float scale_v = (float)(lmrealheight - 1) / (float)lmheight;
 
     float lightmap_high_u, lightmap_high_v;
-    pTex->GetTextureBox(lightmap_low_u,lightmap_low_v,
-                       lightmap_high_u,lightmap_high_v);
+    pTex->GetTextureBox (lightmap_low_u,lightmap_low_v,
+                         lightmap_high_u,lightmap_high_v);
 
     lightmap_scale_u = scale_u / (lightmap_high_u - lightmap_low_u), 
     lightmap_scale_v = scale_v / (lightmap_high_v - lightmap_low_v);
 
-    m_States.SetTexture   (1, pLightCache->LightMap.lptex);
-    m_States.SetStageState(1, D3DTSS_COLOROP, m_LightmapTextureOp);
+    m_States.SetTexture    (1, pLightCache->LightMap.lptex);
+    m_States.SetStageState (1, D3DTSS_COLOROP, m_LightmapTextureOp);
   }
   else
   {
-    m_States.SetStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+    m_States.SetStageState (1, D3DTSS_COLOROP, D3DTOP_DISABLE);
   }
 
   D3DCOLOR vertex_color;
 
   if (bKeyColor)
-  {
-    vertex_color = RGBA_MAKE(0xFF, 0xFF, 0xFF, QInt(poly_alpha * (255.0f / 100.0f)));
-  }
+    vertex_color = RGBA_MAKE (0xFF, 0xFF, 0xFF, QInt (poly_alpha * (255.0f / 100.0f)));
   else
-  {
-  // TODO : turn off color component interpolation if no transparency
-    vertex_color = RGBA_MAKE(0xFF, 0xFF, 0xFF, 0xFF);
-  }
+    // TODO : turn off color component interpolation if no transparency
+    vertex_color = RGBA_MAKE (0xFF, 0xFF, 0xFF, 0xFF);
 
-  VERIFY_RESULT(m_lpd3dDevice2->Begin(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX2,
-                D3DDP_DONOTUPDATEEXTENTS), DD_OK);  
+  VERIFY_RESULT (m_lpd3dDevice2->Begin (D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX2,
+    D3DDP_DONOTUPDATEEXTENTS), DD_OK);  
 
   // render texture-mapped poly
-  for (i=0; i < poly.num; i++)
+  for (i = 0; i < poly.num; i++)
   {
     float sx = poly.vertices[i].sx - m_nHalfWidth;
     float sy = poly.vertices[i].sy - m_nHalfHeight;
@@ -1389,8 +1331,8 @@ void csGraphics3DDirect3DDx6::MultitextureDrawPolygon(G3DPolygonDP & poly)
 
     vx.sz = z*(float)SCALE_FACTOR;
 
-      if(vx.sz>0.9999)
-        vx.sz=0.9999;
+    if (vx.sz > 0.9999)
+      vx.sz = 0.9999;
 
     vx.color = vertex_color;
     vx.rhw = one_over_sz;
@@ -1405,87 +1347,85 @@ void csGraphics3DDirect3DDx6::MultitextureDrawPolygon(G3DPolygonDP & poly)
       vx.tv2 = (vx.tv - lightmap_low_v) * lightmap_scale_v;
     }
 
-    VERIFY_RESULT(m_lpd3dDevice2->Vertex( &vx ), DD_OK);
+    VERIFY_RESULT (m_lpd3dDevice2->Vertex (&vx), DD_OK);
   }
 
-  m_lpd3dDevice2->End(0);
+  m_lpd3dDevice2->End (0);
 
   // If there is vertex fog then we apply that last.
   if (poly.use_fog)
   {
-    m_States.SetAlphaBlendEnable(true);
-    m_States.SetZFunc(D3DCMP_LESSEQUAL);
-    m_States.SetDstBlend(D3DBLEND_SRCALPHA);
-    m_States.SetSrcBlend(D3DBLEND_INVSRCALPHA);
-    m_States.SetTexture(0, NULL);
-    m_States.SetStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+    m_States.SetAlphaBlendEnable (true);
+    m_States.SetZFunc (D3DCMP_LESSEQUAL);
+    m_States.SetDstBlend (D3DBLEND_SRCALPHA);
+    m_States.SetSrcBlend (D3DBLEND_INVSRCALPHA);
+    m_States.SetTexture (0, NULL);
+    m_States.SetStageState (1, D3DTSS_COLOROP, D3DTOP_DISABLE);
 
-    VERIFY_RESULT(m_lpd3dDevice2->Begin(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS), DD_OK);
+    VERIFY_RESULT (m_lpd3dDevice2->Begin (D3DPT_TRIANGLEFAN,
+      D3DFVF_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS), DD_OK);
 
-    for (i=0; i<poly.num; i++)
+    for (i = 0; i < poly.num; i++)
     {
       D3DTLVERTEX vx;
-      float sx = poly.vertices[i].sx - m_nHalfWidth;
-      float sy = poly.vertices[i].sy - m_nHalfHeight;
+      float sx = poly.vertices [i].sx - m_nHalfWidth;
+      float sy = poly.vertices [i].sy - m_nHalfHeight;
       float one_over_sz = (M * sx + N * sy + O);
 
       z = 1.0f  / one_over_sz;
 
-      vx.sx = poly.vertices[i].sx;
-      vx.sy = m_nHeight-poly.vertices[i].sy;
-      vx.sz = z*(float)SCALE_FACTOR;
+      vx.sx = poly.vertices [i].sx;
+      vx.sy = m_nHeight - poly.vertices [i].sy;
+      vx.sz = z * (float)SCALE_FACTOR;
 
-//      if(vx.sz>0.9999)
-//        vx.sz=0.9999;
+//    if (vx.sz > 0.9999)
+//      vx.sz = 0.9999;
 
       vx.rhw = one_over_sz;
 
-    float I = poly.fog_info[i].intensity;
-    CLAMPG(I, 1.0f);
-    I = 1.0f - I;
+      float I = poly.fog_info [i].intensity;
+      CLAMP (I, 1.0f);
+      I = 1.0f - I;
 
-      float r = poly.fog_info[i].r > 1.0f ? 1.0f : poly.fog_info[i].r;
-      float g = poly.fog_info[i].g > 1.0f ? 1.0f : poly.fog_info[i].g;
-      float b = poly.fog_info[i].b > 1.0f ? 1.0f : poly.fog_info[i].b;
+      float r = poly.fog_info [i].r > 1.0f ? 1.0f : poly.fog_info [i].r;
+      float g = poly.fog_info [i].g > 1.0f ? 1.0f : poly.fog_info [i].g;
+      float b = poly.fog_info [i].b > 1.0f ? 1.0f : poly.fog_info [i].b;
 
-      vx.color    = D3DRGBA_(r, g, b, I);
-
+      vx.color = D3DRGBA_(r, g, b, I);
       vx.specular = 0;
 
-      VERIFY_RESULT(m_lpd3dDevice2->Vertex( &vx ), DD_OK);
+      VERIFY_RESULT (m_lpd3dDevice2->Vertex (&vx), DD_OK);
     }
-    VERIFY_RESULT(m_lpd3dDevice2->End(0), DD_OK);
+    VERIFY_RESULT (m_lpd3dDevice2->End (0), DD_OK);
   }
 } // end of ::MultitextureDrawPolygon
 
-
 // TODO : Vertex fogging should be implemented through the specular component,
-//      no need for an additional pass.
+//        no need for an additional pass.
 void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
 {
-  ASSERT( m_lpd3dDevice2 );
+  ASSERT (m_lpd3dDevice2);
 
   if (m_bMultiTexture)
   {
-  MultitextureDrawPolygon(poly);
-  return;
+    MultitextureDrawPolygon (poly);
+    return;
   }
 
-  bool bLightmapExists = true,
-  bColorKeyed = false,
-  bKeyColor;
+  bool bLightmapExists = true;
+  bool bColorKeyed = false;
   
-  int  poly_alpha;
+  int poly_alpha;
   
   float J1, J2, J3, K1, K2, K3;
   float M, N, O;
   int i;
 
-  csD3DCacheData* pTexCache   = NULL;
-  csD3DCacheData* pLightCache = NULL;
+  csD3DCacheData *pTexCache = NULL;
+  csD3DCacheData *pLightCache = NULL;
   // NOTE : is it better to have this as a class member?
   //    or use d3d vertex buffers
-  D3DTLVERTEX vx[100];
+  D3DTLVERTEX vx [100];
 
   float z;
 
@@ -1493,16 +1433,13 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
     return;
 
   // set up the geometry.
-  SetupPolygon( poly, J1, J2, J3, K1, K2, K3, M, N, O );
+  SetupPolygon (poly, J1, J2, J3, K1, K2, K3, M, N, O);
 
   poly_alpha = poly.alpha;
-  if ((poly_alpha > 0) && m_bRenderKeyColor)
-    bKeyColor = true;
-  else
-    bKeyColor = false;
+  bool bKeyColor = (poly_alpha > 0) && m_bRenderKeyColor;
 
-  //Mipmapping is done for us by DirectX, so we will always select the texture with
-  //the highest resolution.
+  // Mipmapping is done for us by DirectX, so we will always select
+  // the texture with the highest resolution.
   iPolygonTexture *pTex = poly.poly_texture;
 
   if (!pTex)
@@ -1512,7 +1449,8 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
   CacheTexture (pTex);
 
   // retrieve the texture from the cache by handle.
-  csTextureMMDirect3D* txt_mm = (csTextureMMDirect3D*)poly.txt_handle->GetPrivateObject ();
+  csTextureMMDirect3D* txt_mm =
+    (csTextureMMDirect3D *)poly.mat_handle->GetTexture ()->GetPrivateObject ();
   pTexCache = (csD3DCacheData *)txt_mm->GetCacheData ();
 
   bColorKeyed = txt_mm->GetKeyColor ();
@@ -1524,56 +1462,42 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
   {
     pLightCache = (csD3DCacheData *)piLM->GetCacheData ();
     if (!pLightCache)
-    {
       bLightmapExists = false;
-    }
   }
   else
-  {
-    bLightmapExists=false;
-  }
+    bLightmapExists = false;
 
   if (m_iTypeLightmap == 0)
     bLightmapExists = false;
 
-  if ( bKeyColor )
+  if (bKeyColor)
   {
-    m_States.SetAlphaBlendEnable(true);
-    m_States.SetDstBlend(m_TransDstBlend);
-    m_States.SetSrcBlend(m_TransSrcBlend);
+    m_States.SetAlphaBlendEnable (true);
+    m_States.SetDstBlend (m_TransDstBlend);
+    m_States.SetSrcBlend (m_TransSrcBlend);
   }
   else
-  {
     m_States.SetAlphaBlendEnable(false);
-  }
 
-  if ( bColorKeyed )
-  {
-    m_States.SetColorKeyEnable(true);
-  }
+  if (bColorKeyed)
+    m_States.SetColorKeyEnable (true);
   else
-  {
-    m_States.SetColorKeyEnable(false);
-  }
+    m_States.SetColorKeyEnable (false);
 
-  m_States.SetTexture(0, pTexCache->Texture.lptex);
+  m_States.SetTexture (0, pTexCache->Texture.lptex);
 
   D3DCOLOR vertex_color;
 
 //  if (bKeyColor && bLightmapExists)
   if (bKeyColor)
-  {
     vertex_color = D3DRGBA_(1.0f, 1.0f, 1.0f, (float)poly_alpha * (1.0f / 100.0f));
-  }
   else
-  {
     vertex_color = D3DRGBA_(1.0f, 1.0f, 1.0f, 1.0f);
-  }
 
-  m_States.SetTextureAddress(D3DTADDRESS_WRAP);
+  m_States.SetTextureAddress (D3DTADDRESS_WRAP);
 
   // render texture-mapped poly
-  for (i=0; i < poly.num; i++)
+  for (i = 0; i < poly.num; i++)
   {
     float sx = poly.vertices[i].sx - m_nHalfWidth;
     float sy = poly.vertices[i].sy - m_nHalfHeight;
@@ -1596,18 +1520,18 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
     vx[i].tv = v_over_sz * z;
   }
 
-  VERIFY_RESULT(m_lpd3dDevice2->DrawPrimitive(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX,
-                        vx, i, D3DDP_DONOTUPDATEEXTENTS), DD_OK);
+  VERIFY_RESULT(m_lpd3dDevice2->DrawPrimitive(D3DPT_TRIANGLEFAN,
+    D3DFVF_TLVERTEX, vx, i, D3DDP_DONOTUPDATEEXTENTS), DD_OK);
 
 //----
 
   if (bLightmapExists)
   {
     // set blending modes
-    m_States.SetAlphaBlendEnable(true);
-    m_States.SetSrcBlend(m_LightmapSrcBlend);
-    m_States.SetDstBlend(m_LightmapDstBlend);
-    m_States.SetTextureAddress(D3DTADDRESS_CLAMP);
+    m_States.SetAlphaBlendEnable (true);
+    m_States.SetSrcBlend (m_LightmapSrcBlend);
+    m_States.SetDstBlend (m_LightmapDstBlend);
+    m_States.SetTextureAddress (D3DTADDRESS_CLAMP);
 
     float lightmap_scale_u, lightmap_scale_v;
     float lightmap_low_u, lightmap_low_v;
@@ -1647,17 +1571,17 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
   // If there is vertex fog then we apply that last.
   if (poly.use_fog)
   {
-    m_States.SetAlphaBlendEnable(true);
-    m_States.SetZFunc(D3DCMP_LESSEQUAL);
-    m_States.SetDstBlend(D3DBLEND_SRCALPHA);
-    m_States.SetSrcBlend(D3DBLEND_INVSRCALPHA);
-    m_States.SetTexture(0, NULL);
+    m_States.SetAlphaBlendEnable (true);
+    m_States.SetZFunc (D3DCMP_LESSEQUAL);
+    m_States.SetDstBlend (D3DBLEND_SRCALPHA);
+    m_States.SetSrcBlend (D3DBLEND_INVSRCALPHA);
+    m_States.SetTexture (0, NULL);
 
-    for (i=0; i<poly.num; i++)
+    for (i = 0; i < poly.num; i++)
     {
-    float I = poly.fog_info[i].intensity;
-    CLAMPG(I, 1.0f);
-    I = 1.0f - I;      
+      float I = poly.fog_info[i].intensity;
+      CLAMP (I, 1.0f);
+      I = 1.0f - I;      
 
       float r = poly.fog_info[i].r > 1.0f ? 1.0f : poly.fog_info[i].r;
       float g = poly.fog_info[i].g > 1.0f ? 1.0f : poly.fog_info[i].g;
@@ -1666,24 +1590,24 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
       vx[i].color = D3DRGBA_(r, g, b, I);
     }
 
-  VERIFY_RESULT(m_lpd3dDevice2->DrawPrimitive(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX,
-                        vx, i, D3DDP_DONOTUPDATEEXTENTS), DD_OK);
+    VERIFY_RESULT (m_lpd3dDevice2->DrawPrimitive (D3DPT_TRIANGLEFAN,
+      D3DFVF_TLVERTEX, vx, i, D3DDP_DONOTUPDATEEXTENTS), DD_OK);
   }
+} // end of DrawPolygon()
 
-}  // end of DrawPolygon()
-
-void csGraphics3DDirect3DDx6::StartPolygonFX (iTextureHandle* handle, UInt mode)
+void csGraphics3DDirect3DDx6::StartPolygonFX (iMaterialHandle* handle, UInt mode)
 {
   m_gouraud = ((mode & CS_FX_GOURAUD) != 0);
   m_mixmode = mode;
 
 //  m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SPECULARENABLE, true);
 
-  csD3DCacheData* pTexData;
+  csD3DCacheData *pTexData = NULL;
   if (handle)
   {
-    csTextureMMDirect3D* txt_mm = (csTextureMMDirect3D*)handle->GetPrivateObject ();
-    m_pTextureCache->cache_texture (handle);
+    csTextureMMDirect3D *txt_mm =
+      (csTextureMMDirect3D*)handle->GetTexture ()->GetPrivateObject ();
+    m_pTextureCache->cache_texture (handle->GetTexture ());
 
     pTexData = (csD3DCacheData *)txt_mm->GetCacheData ();
     m_States.SetColorKeyEnable(txt_mm->GetKeyColor ());
@@ -1691,9 +1615,7 @@ void csGraphics3DDirect3DDx6::StartPolygonFX (iTextureHandle* handle, UInt mode)
     m_textured = true;
   }
   else
-  {
     m_textured = false;
-  }
 
   // PolygonFXs dont use multitexturing
   m_States.SetStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
@@ -1703,7 +1625,6 @@ void csGraphics3DDirect3DDx6::StartPolygonFX (iTextureHandle* handle, UInt mode)
   // SRC:   Color of the texel (content of the texture to be drawn)
   // DEST:  Color of the pixel on screen
   // Alpha: Alpha value of the polygon
-  bool enable_blending = true;
   switch (mode & CS_FX_MASK_MIXMODE)
   {
     case CS_FX_MULTIPLY:
@@ -1760,10 +1681,10 @@ void csGraphics3DDirect3DDx6::StartPolygonFX (iTextureHandle* handle, UInt mode)
     m_States.SetTexture(0, NULL);
 } // end of StartPolygonFX()
 
-void csGraphics3DDirect3DDx6::FinishPolygonFX()
+void csGraphics3DDirect3DDx6::FinishPolygonFX ()
 {
   if (m_bBatchPolygonFX)
-    BatchFinishPolygonFX();
+    BatchFinishPolygonFX ();
 }
 
 //
@@ -1772,11 +1693,11 @@ void csGraphics3DDirect3DDx6::FinishPolygonFX()
 // but d3d cant "OverModulate", clamp anything outside of [0..1],
 // we could try to counter balance this with a specular component
 //
-void csGraphics3DDirect3DDx6::DrawPolygonFX(G3DPolygonDPFX& poly)
+void csGraphics3DDirect3DDx6::DrawPolygonFX (G3DPolygonDPFX& poly)
 {
   if (m_bBatchPolygonFX)
   {
-    BatchDrawPolygonFX(poly);
+    BatchDrawPolygonFX (poly);
     return;
   }
 
@@ -1793,9 +1714,8 @@ void csGraphics3DDirect3DDx6::DrawPolygonFX(G3DPolygonDPFX& poly)
     CLAMP(flat_r, 1.0f);
     CLAMP(flat_g, 1.0f);
     CLAMP(flat_b, 1.0f);
-
-    FlatColor = D3DRGBA_(flat_r, flat_g, flat_b, m_alpha);
   }
+  FlatColor = D3DRGBA_(flat_r, flat_g, flat_b, m_alpha);
 
   VERIFY_RESULT( m_lpd3dDevice2->Begin(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS), DD_OK );
 
@@ -1874,7 +1794,7 @@ void csGraphics3DDirect3DDx6::DrawPolygonFX(G3DPolygonDPFX& poly)
       vx.rhw = poly.vertices[i].z;
 
       float I = poly.fog_info[i].intensity;
-      CLAMPG(I, 1.0f);
+      CLAMP(I, 1.0f);
       I = 1.0f - I;      
 
       float r = poly.fog_info[i].r > 1.0f ? 1.0f : poly.fog_info[i].r;
@@ -1909,7 +1829,7 @@ void csGraphics3DDirect3DDx6::BatchFinishPolygonFX()
   m_VertexCache.EmptyBuffer();
 }
 
-void csGraphics3DDirect3DDx6::BatchDrawPolygonFX(G3DPolygonDPFX& poly)
+void csGraphics3DDirect3DDx6::BatchDrawPolygonFX (G3DPolygonDPFX& poly)
 {
   int i;
   D3DTLVERTEX vx[2];
@@ -1924,10 +1844,8 @@ void csGraphics3DDirect3DDx6::BatchDrawPolygonFX(G3DPolygonDPFX& poly)
     CLAMP(flat_r, 1.0f);
     CLAMP(flat_g, 1.0f);
     CLAMP(flat_b, 1.0f);
-
-    if (!m_gouraud)
-      FlatColor = D3DRGBA_(flat_r, flat_g, flat_b, m_alpha);
   }
+  FlatColor = D3DRGBA_(flat_r, flat_g, flat_b, m_alpha);
 
 //-- make base vertex
   vx[0].sx = poly.vertices[0].sx;
@@ -2131,10 +2049,10 @@ bool csGraphics3DDirect3DDx6::SetRenderState(G3D_RENDERSTATEOPTION option, long 
   return true;
 }
 
-long csGraphics3DDirect3DDx6::GetRenderState(G3D_RENDERSTATEOPTION op)
+long csGraphics3DDirect3DDx6::GetRenderState (G3D_RENDERSTATEOPTION op)
 {
   DWORD d3d_value, mode;
-  switch(op)
+  switch (op)
   {
     case G3DRENDERSTATE_ZBUFFERMODE:
       mode = 0;

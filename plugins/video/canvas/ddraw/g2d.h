@@ -23,32 +23,30 @@
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
 #include "cssys/win32/win32itf.h"
-#include "video/canvas/ddraw/ig2d.h"
 
 /// Windows version.
-class csGraphics2DDDraw3 : public csGraphics2D, public iGraphics2DDDraw3
+class csGraphics2DDDraw3 : public csGraphics2D
 {
 public:
   DECLARE_IBASE;
 
-  csGraphics2DDDraw3(iBase *iParent);
+  csGraphics2DDDraw3 (iBase *iParent);
   // Uses3D is currently not specified
-  // virtual init(iSystem* piSystem, bool bUses3D=false);
-  virtual ~csGraphics2DDDraw3(void);
+  virtual ~csGraphics2DDDraw3 ();
   
+  virtual bool Initialize (iSystem *pSystem);
+
   virtual bool Open (const char *Title);
   virtual void Close ();
   
   virtual void Print (csRect *area = NULL);
   
-  virtual void SetRGB(int i, int r, int g, int b);
+  virtual void SetRGB (int i, int r, int g, int b);
 
-  virtual bool PerformExtension (const char *args);
+  virtual bool PerformExtension (const char *iCommand, ...);
 	
-  virtual bool Initialize (iSystem *pSystem);
-
-  virtual bool BeginDraw();
-  virtual void FinishDraw();
+  virtual bool BeginDraw ();
+  virtual void FinishDraw ();
   
   virtual bool SetMouseCursor (csMouseCursorID iShape);
 
@@ -59,58 +57,47 @@ public:
   virtual bool DoubleBuffer (bool Enable);
   virtual bool GetDoubleBufferState ();
 
-  int m_nGraphicsReady;
-
-  ///--------------- iGraphics2DDDraw3 interface implementation ---------------
-  ///
-  virtual void GetDirectDrawDriver (LPDIRECTDRAW* lplpDirectDraw);
-  ///
-  virtual void GetDirectDrawPrimary (LPDIRECTDRAWSURFACE* lplpDirectDrawPrimary);
-  ///
-  virtual void GetDirectDrawBackBuffer (LPDIRECTDRAWSURFACE* lplpDirectDrawBackBuffer);
-  ///
-  virtual void GetDirectDetection (IDirectDetectionInternal** lplpDDetection);
-  ///
-  virtual HRESULT SetColorPalette ();
-  ///
-  virtual void SetFor3D(bool For3D);
-
 protected:
-  void SecondaryInit();
+  static long FAR PASCAL WindowProc (HWND hWnd, UINT message,
+    WPARAM wParam, LPARAM lParam);
 
   LPDIRECTDRAW m_lpDD;
   LPDIRECTDRAWSURFACE m_lpddsPrimary;
   LPDIRECTDRAWSURFACE m_lpddsBack;
   LPDIRECTDRAWPALETTE m_lpddPal;
   
-  iWin32SystemDriver* m_piWin32System;
-
   HWND m_hWnd;
-  HINSTANCE  m_hInstance;
-  int m_nCmdShow;
-  
+  HINSTANCE m_hInstance;
+  HPALETTE m_hWndPalette;
+
+  // Old window procedure (the one in win32.cpp)
+  WNDPROC m_OldWndProc;
+
   bool m_bPalettized;
   bool m_bPaletteChanged;
   int m_nActivePage;
   bool m_bDisableDoubleBuffer;
   bool m_bLocked;
-  bool m_bUses3D;
   bool m_bHardwareCursor;
   
-  unsigned char *LockBackBuf();
+  // Saves the window size & pos.
+  RECT m_rcWindow;
+  // true if double buffer is enabled
+  bool m_bDoubleBuffer;
+  bool m_bVisible;
+  bool m_bAllowWindowed;
 
-	RECT m_rcWindow;             // Saves the window size & pos.
-	RECT m_rcViewport;           // Pos. & size to blt from
-	RECT m_rcScreen;             // Screen pos. for blt
+  HRESULT InitSurfaces ();
+  HRESULT ReleaseAllObjects ();
+  HRESULT ChangeCoopLevel ();
+  HRESULT InitFail (HRESULT hRet, LPCTSTR szError);
 
-	bool m_bWindowed;
-  bool m_bReady;
-
-	HRESULT InitSurfaces(HWND hWnd);
-	HRESULT ReleaseAllObjects(HWND hWnd);
-	HRESULT ChangeCoopLevel(HWND hWnd );
-	HRESULT InitFail(HWND hWnd, HRESULT hRet, LPCTSTR szError, ...);
-
+  void ClearSystemPalette ();
+  bool CreateIdentityPalette (RGBPixel *p);
+  // Check if palette has changed and if so, realize it
+  void SetColorPalette ();
+  // Refresh a rectangle on client area from back buffer
+  void Refresh (RECT &rect);
 };
 
 #endif

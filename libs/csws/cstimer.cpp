@@ -21,7 +21,7 @@
 #include "csws/cstimer.h"
 #include "csws/csapp.h"
 
-csTimer::csTimer (csComponent *iParent, unsigned long iPeriod)
+csTimer::csTimer (csComponent *iParent, unsigned iPeriod)
   : csComponent (iParent)
 {
   state |= CSS_TRANSPARENT;
@@ -38,8 +38,8 @@ bool csTimer::HandleEvent (csEvent &Event)
    && (Event.Type == csevBroadcast)
    && (Event.Command.Code == cscmdPreProcess))
   {
-    time_t current = app->GetCurrentTime ();
-    time_t delta = current - start;
+    unsigned current = app->GetCurrentTime ();
+    unsigned delta = current - start;
     if (pause >= delta)
       return false;
     pause = 0;
@@ -67,7 +67,7 @@ void csTimer::Restart ()
   start = app->GetCurrentTime ();
 }
 
-void csTimer::Pause (unsigned long iPause)
+void csTimer::Pause (unsigned iPause)
 {
   pause = iPause;
   Restart ();

@@ -82,7 +82,7 @@ NASMFLAGS.SYSTEM=-f aoutb -DEXTERNC_UNDERSCORE
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS = libs/cssys/unix/unix.cpp libs/cssys/unix/loadlib.cpp \
   libs/cssys/general/printf.cpp libs/cssys/unix/utiming.cpp \
-  support/gnu/getopt.c support/gnu/getopt1.c
+  libs/cssys/general/getopt.cpp
 SRC.SYS_CSSYS_DLL = libs/cssys/unix/dummy.cpp
 
 # The C compiler.

@@ -659,6 +659,9 @@ protected:
   void DrawUnderline (int iX, int iY, const char *iText, int iUnderlinePos,
     int iColor);
 
+  /// Check if the keyboard event fits given hot key
+  bool CheckHotKey (csEvent &iEvent, char iHotKey);
+
   /// Utility functions: return position one word left from StartPos
   static int WordLeft (const char *iText, int StartPos);
   /// Return position one word right from StartPos

@@ -698,6 +698,15 @@ void csSystemDriver::SetSystemDefaults (csIniFile *Config)
   if ((val = GetOptionCL ("depth")))
     Depth = atoi (val);
 
+  if ((val = GetOptionCL ("fs")))
+    if (!strcmp (val, "no"))
+      FullScreen = false;
+    else if (!val [0] || !strcmp (val, "yes"))
+      FullScreen = true;
+    else
+      Printf (MSG_INITIALIZATION, "Unknown value `%s' for -fs switch: "
+        "`yes' or `no' expected\n", val);
+
   Mouse.SetDoubleClickTime (
     Config->GetInt ("MouseDriver", "DoubleClickTime", 300),
     Config->GetInt ("MouseDriver", "DoubleClickDist", 2));

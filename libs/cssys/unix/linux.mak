@@ -57,19 +57,19 @@ NEED_SOCKET_LIB=no
 LIBS.EXE+=-ldl -lm  
 
 # Where can the Zlib library be found on this system?
-Z_LIBS=-Llibs/zlib -lz
+Z_LIBS=-lz
 
 # Where can the PNG library be found on this system?
-PNG_LIBS=-Llibs/libpng -lpng
+PNG_LIBS=-lpng
 
 # Where can the JPG library be found on this system?
-JPG_LIBS=-Llibs/libjpeg -ljpeg
+JPG_LIBS=-ljpeg
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
 
 # Indicate where special include files can be found.
-CFLAGS.INCLUDE=-Ilibs/zlib -Ilibs/libpng -Ilibs/libjpeg
+CFLAGS.INCLUDE=
 
 # General flags for the compiler which are used in any case.
 # -fno-exceptions and -fno-rtti have effect only for gcc >= 2.8.x

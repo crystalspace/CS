@@ -7,7 +7,8 @@ DESCRIPTION.win32vc = Win32 with MSVC
 # video/canvas/ddraw6 video/canvas/openglwin video/renderer/direct3d5
 # video/renderer/direct3d6 video/renderer/opengl
 #
-PLUGINS+=video/canvas/ddraw video/renderer/software sound/renderer/software
+PLUGINS+=video/canvas/ddraw video/renderer/software sound/renderer/software \
+  video/canvas/ddraw61 video/renderer/direct3d61 video/renderer/opengl
 
 # Uncomment the following to get an startup console window
 #CONSOLE_FLAGS = -DWIN32_USECONSOLE
@@ -45,19 +46,19 @@ ARFLAGS=-nologo
 ARFLAGS.@=-out:$@
 
 # Where can the Zlib library be found on this system?
-Z_LIBS=-libpath:libs/zlib zdll.lib
+Z_LIBS=zdll.lib
 
 # Where can the PNG library be found on this system?
-PNG_LIBS=-libpath:libs/libpng pngdll.lib
+PNG_LIBS=pngdll.lib
 
 # Where can the JPG library be found on this system?
-JPG_LIBS=-libpath:libs/libjpeg jpegdll.lib
+JPG_LIBS=jpegdll.lib
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
 
 # Indicate where special include files can be found.
-CFLAGS.INCLUDE=-Ilibs/zlib -Ilibs/libpng -Ilibs/libjpeg
+CFLAGS.INCLUDE=
 
 # General flags for the compiler which are used in any case.
 CFLAGS.GENERAL=-MD -W3 -nologo -DWINDOWS -DZLIB_DLL $(CONSOLE_FLAGS)
@@ -113,7 +114,7 @@ NASMFLAGS.SYSTEM=-f win32 -DEXTERNC_UNDERSCORE
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS = libs/cssys/win32/printf.cpp libs/cssys/win32/timing.cpp \
   libs/cssys/win32/dir.cpp libs/cssys/win32/win32.cpp \
-  libs/cssys/win32/loadlib.cpp support/gnu/getopt.c support/gnu/getopt1.c
+  libs/cssys/win32/loadlib.cpp libs/cssys/general/getopt.cpp
 SRC.SYS_CSSYS_EXE=libs/cssys/win32/exeentry.cpp
 SRC.SYS_CSSYS_DLL=libs/cssys/win32/dllentry.cpp
 

@@ -19,6 +19,8 @@
 
 #include <stddef.h>
 #include <ctype.h>
+
+#define SYSDEF_CASE
 #include "cssysdef.h"
 #include "csengine/cspixmap.h"
 #include "cssys/csevent.h"
@@ -854,11 +856,11 @@ bool csComponent::SetDragRect (int xmin, int ymin, int xmax, int ymax)
   int w = xmax - xmin;
   int h = ymax - ymin;
   FixSize (w, h);
-  if (xmax == bound.xmax)
+  if ((xmax == bound.xmax) && (xmin != bound.xmin))
     xmin = xmax - w;
   else
     xmax = xmin + w;
-  if (ymax == bound.ymax)
+  if ((ymax == bound.ymax) && (ymin != bound.ymin))
     ymin = ymax - h;
   else
     ymax = ymin + h;
@@ -1659,4 +1661,19 @@ void csComponent::FindMaxFreeRect (csRect &area)
 
   // Restore mouse cursor
   SetMouse (oldMouse);
+}
+
+bool csComponent::CheckHotKey (csEvent &iEvent, char iHotKey)
+{
+  if ((iEvent.Key.Modifiers & CSMASK_CTRL)
+   || !(iEvent.Key.Modifiers & CSMASK_FIRST))
+    return false;
+
+  iHotKey = UPPERCASE (iHotKey);
+  char Key;
+  if (iEvent.Key.Modifiers & CSMASK_ALT)
+    Key = UPPERCASE (iEvent.Key.Code);
+  else
+    Key = UPPERCASE (iEvent.Key.Char);
+  return Key == iHotKey;
 }
