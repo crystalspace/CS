@@ -39,6 +39,12 @@ The history order has been reversed so that new features are at the top.
 	  is easy to fix.
 	- Added csFlags::SetBool(unsigned,bool) to set all values in a mask
 	  to either 1 or 0 depending on the bool value.
+	- Eric Sunshine adjusted the 'clean' target in the dnapp makefile.
+	- Eric Sunshine implemented support for CSKEY_PADPLUS, CSKEY_PADMINUS,
+	  CSKEY_PADMULT, and CSKEY_PADDIV in the OpenStep port.  Andrew
+	  recently added these constants to csevent.h.
+	- Eric Sunshine fixed a couple copy/paste errors in NeXTDelegate.cpp
+	  for NextStep.
 26-Jun-2000
 	- Fixed memory leak while building BSP/octree.
 	- Eric Sunshine eliminated a slew of compilation warning in cstree.cpp
