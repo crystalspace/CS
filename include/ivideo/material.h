@@ -22,12 +22,13 @@
 #include "csutil/scf.h"
 
 /// Default material `diffuse' parameter
-#define CS_DEFMAT_DIFFUSE	0.7f
+#define CS_DEFMAT_DIFFUSE 0.7f
 /// Default material `ambient' parameter
-#define CS_DEFMAT_AMBIENT	0.0f
+#define CS_DEFMAT_AMBIENT 0.0f
 /// Default material `reflection' parameter
-#define CS_DEFMAT_REFLECTION	0.0f
+#define CS_DEFMAT_REFLECTION  0.0f
 
+struct iEffectDefinition;
 struct iTextureHandle;
 struct csRGBpixel;
 struct csRGBcolor;
@@ -39,12 +40,12 @@ struct csRGBcolor;
 struct csTextureLayer
 {
   iTextureHandle* txt_handle;
-  uint mode;		// Mode: one of CS_FX_ADD ...
-  float uscale, vscale;	// Txt mapping scale relative to parent texture
-  float ushift, vshift;	// Txt mapping shift relative to parent texture
+  uint mode;    // Mode: one of CS_FX_ADD ...
+  float uscale, vscale; // Txt mapping scale relative to parent texture
+  float ushift, vshift; // Txt mapping shift relative to parent texture
 };
 
-SCF_VERSION (iMaterial, 0, 0, 4);
+SCF_VERSION (iMaterial, 0, 0, 5);
 
 /**
  * This class represents a material as seen from the engine
@@ -55,6 +56,16 @@ SCF_VERSION (iMaterial, 0, 0, 4);
  */
 struct iMaterial : public iBase
 {
+  /**
+   * Set the material's effect.
+   */
+  virtual void SetEffect (iEffectDefinition *ed) = 0;
+
+  /**
+   * Get the effect from the material.
+   */
+  virtual iEffectDefinition *GetEffect () = 0;
+
   /**
    * Get the base texture from the material.
    */
@@ -85,7 +96,7 @@ struct iMaterial : public iBase
    * Get light reflection parameters for this material.
    */
   virtual void GetReflection (
-  	float &oDiffuse, float &oAmbient, float &oReflection) = 0;
+    float &oDiffuse, float &oAmbient, float &oReflection) = 0;
   /**
    * Set the reflection parameters.
    */

@@ -7,6 +7,17 @@ The history order is reversed so that new features are at the top.
 	  plugin is completely unused and unusable until I manage
 	  to fix the problem. I will add more documentaiton about this
 	  new system later.
+	- I found out what routine is crashing. It is the new version
+	  of DrawTriangleMesh() which seems to give problems in some cases.
+	  As a workaround I just call OldDrawTriangleMesh(). This basically
+	  means that the effect system is not yet functional although it is
+	  now fully in CVS. Still have to debug what's wrong with the
+	  new implementation of DrawTriangleMesh().
+	  Documentation and extensions to the current loader for the
+	  new effects will be added soon.
+	- In addition to effects the patch from Anders also adds an
+	  OpenGL state cache to the OpenGL canvases. That should
+	  optimize state changes and speed up a little more.
 2-Aug-2002
 	- Eric Sunshine eliminated several unnecessary, and inadvertently
 	  inserted, event dispatch loops from csEventQueue::Process().

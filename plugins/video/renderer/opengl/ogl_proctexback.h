@@ -73,7 +73,7 @@ class csOpenGLProcBackBuffer : public csGraphics3DOGLCommon
   virtual ~csOpenGLProcBackBuffer ();
 
   void Prepare (csGraphics3DOGLCommon *g3d, csTextureHandleOpenGL *tex,
-		csPixelFormat *ipfmt, bool bpersistent);
+    csPixelFormat *ipfmt, bool bpersistent);
 
   virtual bool Open ()
   { return false; }
@@ -105,7 +105,7 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
   SCF_DECLARE_IBASE;
 
   csOpenGLProcBackBuffer2D (iGraphics2D *ig2d, int iwidth, int iheight,
-			    csPixelFormat *ipfmt);
+          csPixelFormat *ipfmt);
   virtual ~csOpenGLProcBackBuffer2D ();
 
   virtual bool Open () { return false; }

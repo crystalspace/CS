@@ -210,8 +210,8 @@ public:
   int* tris;
   /// Vertices.
   int num_vertices, max_vertices;
-  GLfloat* glverts;	// 4*max_vertices
-  GLfloat* gltxt;	// 2*max_vertices
+  GLfloat* glverts; // 4*max_vertices
+  GLfloat* gltxt; // 2*max_vertices
 
   int num_fog_colors, max_fog_colors;
   GLfloat* glcolorsFog;

@@ -110,14 +110,14 @@ public:
 
   /// Initialize the object
   csTextureHandleOpenGL (iImage *image, int flags, GLenum sourceFormat,
-  	int bpp, csGraphics3DOGLCommon *iG3D);
+    int bpp, csGraphics3DOGLCommon *iG3D);
   /// Delete the texture object
   virtual ~csTextureHandleOpenGL ();
   /// Adjust size, mipmap, create procedural texture etc
   void InitTexture (csTextureManagerOpenGL *texman, csPixelFormat *pfmt);
 
   virtual bool csTextureHandleOpenGL::GetMipMapDimensions (int mipmap,
-  	int &w, int &h);
+    int &w, int &h);
 
   /// Override from csTextureHandle.
   virtual void GetOriginalDimensions (int& w, int& h)
@@ -189,8 +189,8 @@ class csTextureManagerOpenGL : public csTextureManager
   static formatDescription glformats [];
   ///
   csTextureManagerOpenGL (iObjectRegistry* object_reg,
-			  iGraphics2D* iG2D, iConfigFile *config,
-			  csGraphics3DOGLCommon *iG3D);
+        iGraphics2D* iG2D, iConfigFile *config,
+        csGraphics3DOGLCommon *iG3D);
   ///
   virtual ~csTextureManagerOpenGL ();
 

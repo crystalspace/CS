@@ -350,10 +350,10 @@ public:
   
   ///Adds a polygon to the polygon buffer
   virtual void AddPolygon (int* verts, int num_verts,
-	const csPlane3& poly_normal,
-	int mat_index,
-	const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
-	iPolygonTexture* poly_texture);
+  const csPlane3& poly_normal,
+  int mat_index,
+  const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
+  iPolygonTexture* poly_texture);
 
   ///Adds a material to the polygon buffer
   virtual void AddMaterial (iMaterialHandle* mat_handle);

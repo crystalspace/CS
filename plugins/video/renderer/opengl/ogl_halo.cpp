@@ -27,6 +27,7 @@
 #include "ogl_g3dcom.h"
 #include "ivideo/halo.h"
 #include "ogl_txtcache.h"
+#include "video/canvas/openglcommon/glstates.h"
 
 class csOpenGLHalo : public iHalo
 {
@@ -98,7 +99,7 @@ csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
   // Create handle
   glGenTextures (1, &halohandle);
   // Activate handle
-  glBindTexture (GL_TEXTURE_2D, halohandle);
+  csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, halohandle);
 
   // Jaddajaddajadda
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -177,8 +178,8 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
   csGraphics3DOGLCommon::SetGLZBufferFlags (CS_ZBUF_NONE);
   glEnable (GL_TEXTURE_2D);
 
-  glShadeModel (GL_FLAT);
-  glBindTexture (GL_TEXTURE_2D, halohandle);
+  csGraphics3DOGLCommon::statecache->SetShadeModel (GL_FLAT);
+  csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, halohandle);
 
   csGraphics3DOGLCommon::SetupBlend (dstblend, 0, false);
   glColor4f (R, G, B, iIntensity);

@@ -260,6 +260,9 @@ public:
   /// Release the original material (iMaterial).
   void FreeMaterial ();
 
+  /// Get the material.
+  iMaterial* GetMaterial () { return material; }
+
   /// Get the number of texture layers.
   int GetTextureLayerCount () { return num_texture_layers; }
   /// Get a texture layer.

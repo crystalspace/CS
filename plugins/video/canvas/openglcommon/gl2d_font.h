@@ -28,6 +28,8 @@
 
 #include "csutil/csvector.h"
 #include "ivideo/fontserv.h"
+#include "video/canvas/common/graph2d.h"
+#include "video/canvas/openglcommon/iglstates.h"
 
 // Define the following macro to use glBitmap() text drawing approach
 // rather than default "font-on-a-texture" approach.
@@ -113,6 +115,10 @@ protected:
   /// Pointer to our callback routine.
   iFontDeleteNotify* delete_callback;
 
+  // Graphics2D
+  iGraphics2D *g2d;
+  // State cache
+  iGLStateCache *statecache;
 #ifndef OPENGL_BITMAP_FONT
   // Auxiliary routine for "font-on-a-texture" approach
   bool ClipRect (float x, float y,
@@ -121,7 +127,7 @@ protected:
 #endif
 public:
   /// Initialize the font cache and load all the static fonts
-  GLFontCache (iFontServer *fs);
+  GLFontCache (iFontServer *fs, iGraphics2D *g);
 
   /// Clean up all remaining font cache items
   ~GLFontCache ();

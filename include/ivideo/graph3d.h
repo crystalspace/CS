@@ -40,14 +40,15 @@ struct iVertexBufferManager;
 struct iTextureManager;
 struct iTextureHandle;
 struct iMaterialHandle;
+struct iMaterial;
 struct iClipper2D;
 struct iHalo;
 struct csRGBpixel;
 struct csPixelFormat;
 
-#define CS_FOG_FRONT	0
-#define CS_FOG_BACK		1
-#define CS_FOG_VIEW		2
+#define CS_FOG_FRONT  0
+#define CS_FOG_BACK   1
+#define CS_FOG_VIEW   2
 
 //======================================================================
 // For vertex based fog the following defines are used:
@@ -219,7 +220,8 @@ enum csZBufMode
   CS_ZBUF_TEST     = 0x00000002,
   CS_ZBUF_USE      = 0x00000003,
   CS_ZBUF_FILLONLY = 0x00000004,
-  CS_ZBUF_EQUAL    = 0x00000005
+  CS_ZBUF_EQUAL    = 0x00000005,
+  CS_ZBUF_SPECIAL  = 0x00000006
 };
 
 ///
@@ -661,9 +663,9 @@ struct iGraphics3D : public iBase
    * will have been added before the first front-facing polygon.
    * fogtype can be:<br>
    * <ul>
-   *	<li>CS_FOG_FRONT:	a front-facing polygon
-   *	<li>CS_FOG_BACK:	a back-facing polygon
-   *	<li>CS_FOG_VIEW:	the view-plane
+   *  <li>CS_FOG_FRONT: a front-facing polygon
+   *  <li>CS_FOG_BACK:  a back-facing polygon
+   *  <li>CS_FOG_VIEW:  the view-plane
    * </ul>
    */
   virtual void DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, int fogtype) = 0;
@@ -677,7 +679,7 @@ struct iGraphics3D : public iBase
 
   /// Draw a line in camera space.
   virtual void DrawLine (const csVector3& v1, const csVector3& v2,
-  	float fov, int color) = 0;
+    float fov, int color) = 0;
 
   /// Create a halo of the specified color and return a handle.
   virtual iHalo *CreateHalo (float iR, float iG, float iB,

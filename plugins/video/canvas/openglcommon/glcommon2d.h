@@ -23,6 +23,7 @@
 #include "video/canvas/common/graph2d.h"
 #include "gl2d_font.h"
 #include "iutil/event.h"
+#include "video/canvas/openglcommon/glstates.h"
 
 class OpenGLTextureCache;
 class GLFontCache;
@@ -42,6 +43,9 @@ class csGraphics2DGLCommon : public csGraphics2D, public iEventPlug
 {
   /// hold the CS fonts in an OpenGL-friendly format
   GLFontCache *FontCache;
+
+  /// Cache for GL states
+  csGLStateCache* statecache;
 
   /// Decompose a color ID into r,g,b components
   void DecomposeColor (int iColor, GLubyte &oR, GLubyte &oG, GLubyte &oB);

@@ -38,7 +38,8 @@ csMaterial::csMaterial () :
   num_texture_layers(0),
   diffuse(CS_DEFMAT_DIFFUSE),
   ambient(CS_DEFMAT_AMBIENT),
-  reflection(CS_DEFMAT_REFLECTION)
+  reflection(CS_DEFMAT_REFLECTION),
+  effect(NULL)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialEngine);
@@ -50,7 +51,8 @@ csMaterial::csMaterial (iTextureWrapper *w) :
   num_texture_layers(0),
   diffuse(CS_DEFMAT_DIFFUSE),
   ambient(CS_DEFMAT_AMBIENT),
-  reflection(CS_DEFMAT_REFLECTION)
+  reflection(CS_DEFMAT_REFLECTION),
+  effect(NULL)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialEngine);
@@ -92,6 +94,16 @@ void csMaterial::AddTextureLayer (
   num_texture_layers++;
 
   txtwrap->IncRef ();
+}
+
+void csMaterial::SetEffect (iEffectDefinition *ed)
+{
+  effect = ed;
+}
+
+iEffectDefinition *csMaterial::GetEffect ()
+{
+  return effect;
 }
 
 iTextureHandle *csMaterial::GetTexture ()

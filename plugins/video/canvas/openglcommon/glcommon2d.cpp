@@ -24,6 +24,8 @@
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include "qint.h"
+#include "video/canvas/openglcommon/iglstates.h"
+#include "video/canvas/openglcommon/glstates.h"
 
 // This header should be moved
 #include "video/renderer/common/pixfmt.h"
@@ -59,6 +61,7 @@ bool csGraphics2DGLCommon::Initialize (iObjectRegistry *object_reg)
   pfmt.PalEntries = 0;
   pfmt.complete ();
 
+  statecache = new csGLStateCache();
   return true;
 }
 
@@ -67,6 +70,7 @@ csGraphics2DGLCommon::~csGraphics2DGLCommon ()
   Close ();
   if (EventOutlet)
     EventOutlet->DecRef ();
+  delete statecache;
 }
 
 bool csGraphics2DGLCommon::Open ()
@@ -74,7 +78,7 @@ bool csGraphics2DGLCommon::Open ()
   if (is_open) return true;
   // initialize font cache object
   if (!FontCache)
-    FontCache = new GLFontCache (FontServer);
+    FontCache = new GLFontCache (FontServer, this);
 
   if (!csGraphics2D::Open ())
     return false;
@@ -87,14 +91,14 @@ bool csGraphics2DGLCommon::Open ()
     if (reporter)
       reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
         "crystalspace.canvas.openglcommon",
-      	"OpenGL renderer: %s (vendor: %s) version %s",
+        "OpenGL renderer: %s (vendor: %s) version %s",
         renderer ? renderer : "unknown", vendor ? vendor: "unknown", version ? version : "unknown");
 
   if (reporter)
     reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
         "crystalspace.canvas.openglcommon",
-    	"Using %s mode at resolution %dx%d.",
-	FullScreen ? "full screen" : "windowed", Width, Height);
+      "Using %s mode at resolution %dx%d.",
+  FullScreen ? "full screen" : "windowed", Width, Height);
 
   glClearColor (0., 0., 0., 0.);
   glClearDepth (-1.0);
@@ -105,6 +109,8 @@ bool csGraphics2DGLCommon::Open ()
   glViewport (0, 0, Width, Height);
   Clear (0);
   if (reporter) reporter->DecRef ();
+
+  statecache->InitCache();
 
   return true;
 }
@@ -204,8 +210,8 @@ void csGraphics2DGLCommon::DrawLine (
     // prepare for 2D drawing--so we need no fancy GL effects!
     bool gl_texture2d = glIsEnabled(GL_TEXTURE_2D);
     bool gl_alphaTest = glIsEnabled(GL_ALPHA_TEST);
-    if (gl_texture2d) glDisable (GL_TEXTURE_2D);
-    if (gl_alphaTest) glDisable (GL_ALPHA_TEST);
+    if (gl_texture2d) statecache->DisableState (GL_TEXTURE_2D);
+    if (gl_alphaTest) statecache->DisableState (GL_ALPHA_TEST);
     setGLColorfromint (color);
 
     // This is a workaround for a hard-to-really fix problem with OpenGL:
@@ -221,8 +227,8 @@ void csGraphics2DGLCommon::DrawLine (
     glVertex2f (x2, Height - y2);
     glEnd ();
 
-    if (gl_texture2d) glEnable (GL_TEXTURE_2D);
-    if (gl_alphaTest) glEnable (GL_ALPHA_TEST);
+    if (gl_texture2d) statecache->EnableState (GL_TEXTURE_2D);
+    if (gl_alphaTest) statecache->EnableState (GL_ALPHA_TEST);
   }
 }
 
@@ -244,7 +250,7 @@ void csGraphics2DGLCommon::DrawBox (int x, int y, int w, int h, int color)
   y = Height - y;
   // prepare for 2D drawing--so we need no fancy GL effects!
   bool gl_texture2d = glIsEnabled(GL_TEXTURE_2D);
-  if (gl_texture2d) glDisable (GL_TEXTURE_2D);
+  if (gl_texture2d) statecache->DisableState (GL_TEXTURE_2D);
   setGLColorfromint (color);
 
   glBegin (GL_QUADS);
@@ -254,7 +260,7 @@ void csGraphics2DGLCommon::DrawBox (int x, int y, int w, int h, int color)
   glVertex2i (x, y - h);
   glEnd ();
 
-  if (gl_texture2d) glEnable (GL_TEXTURE_2D);
+  if (gl_texture2d) statecache->EnableState (GL_TEXTURE_2D);
 }
 
 void csGraphics2DGLCommon::DrawPixel (int x, int y, int color)
@@ -263,14 +269,14 @@ void csGraphics2DGLCommon::DrawPixel (int x, int y, int color)
   {
     // prepare for 2D drawing--so we need no fancy GL effects!
     bool gl_texture2d = glIsEnabled(GL_TEXTURE_2D);
-    if (gl_texture2d) glDisable (GL_TEXTURE_2D);
+    if (gl_texture2d) statecache->DisableState (GL_TEXTURE_2D);
     setGLColorfromint(color);
 
     glBegin (GL_POINTS);
     glVertex2i (x, Height - y);
     glEnd ();
 
-    if (gl_texture2d) glEnable (GL_TEXTURE_2D);
+    if (gl_texture2d) statecache->EnableState (GL_TEXTURE_2D);
   }
 }
 
@@ -280,13 +286,13 @@ void csGraphics2DGLCommon::Write (iFont *font, int x, int y, int fg, int bg,
   if (bg >= 0)
   {
     bool gl_texture2d = glIsEnabled(GL_TEXTURE_2D);
-    if (gl_texture2d) glDisable (GL_TEXTURE_2D);
+    if (gl_texture2d) statecache->DisableState (GL_TEXTURE_2D);
 
     int fw, fh;
     font->GetDimensions (text, fw, fh);
     DrawBox (x, y, fw, fh, bg);
 
-    if (gl_texture2d) glEnable (GL_TEXTURE_2D);
+    if (gl_texture2d) statecache->EnableState (GL_TEXTURE_2D);
   }
 
   setGLColorfromint (fg);
@@ -337,9 +343,9 @@ csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)
   }
   bool gl_texture2d = glIsEnabled(GL_TEXTURE_2D);
   bool gl_alphaTest = glIsEnabled(GL_ALPHA_TEST);
-  if (gl_texture2d) glDisable (GL_TEXTURE_2D);
-  if (gl_alphaTest) glDisable (GL_ALPHA_TEST);
-  //glDisable (GL_DITHER);
+  if (gl_texture2d) statecache->DisableState (GL_TEXTURE_2D);
+  if (gl_alphaTest) statecache->DisableState (GL_ALPHA_TEST);
+  //csGLStates::DisableState (GL_DITHER);
   GLenum format, type;
   switch (pfmt.PixelBytes)
   {
@@ -363,8 +369,8 @@ csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)
   }
   glReadPixels (x, y, w, h, format, type, dest);
 
-  if (gl_texture2d) glEnable (GL_TEXTURE_2D);
-  if (gl_alphaTest) glEnable (GL_ALPHA_TEST);
+  if (gl_texture2d) statecache->EnableState (GL_TEXTURE_2D);
+  if (gl_alphaTest) statecache->EnableState (GL_ALPHA_TEST);
   return Area;
 }
 
@@ -372,9 +378,9 @@ void csGraphics2DGLCommon::RestoreArea (csImageArea *Area, bool Free)
 {
   bool gl_texture2d = glIsEnabled(GL_TEXTURE_2D);
   bool gl_alphaTest = glIsEnabled(GL_ALPHA_TEST);
-  if (gl_texture2d) glDisable (GL_TEXTURE_2D);
-  if (gl_alphaTest) glDisable (GL_ALPHA_TEST);
-  //glDisable (GL_DITHER);
+  if (gl_texture2d) statecache->DisableState (GL_TEXTURE_2D);
+  if (gl_alphaTest) statecache->DisableState (GL_ALPHA_TEST);
+  //csGLStates::DisableState (GL_DITHER);
   if (Area)
   {
     GLenum format, type;
@@ -404,8 +410,8 @@ void csGraphics2DGLCommon::RestoreArea (csImageArea *Area, bool Free)
       FreeArea (Area);
   } /* endif */
 
-  if (gl_texture2d) glEnable (GL_TEXTURE_2D);
-  if (gl_alphaTest) glEnable (GL_ALPHA_TEST);
+  if (gl_texture2d) statecache->EnableState (GL_TEXTURE_2D);
+  if (gl_alphaTest) statecache->EnableState (GL_ALPHA_TEST);
 }
 
 iImage *csGraphics2DGLCommon::ScreenShot ()
@@ -425,18 +431,18 @@ iImage *csGraphics2DGLCommon::ScreenShot ()
   {
     case 1:
       glReadPixels (0, 0, Width, Height, GL_COLOR_INDEX,
-		    GL_UNSIGNED_BYTE, screen_shot);
+        GL_UNSIGNED_BYTE, screen_shot);
       break;
 #ifdef GL_VERSION_1_2
     case 2:
       // experimental
       glReadPixels (0, 0, Width, Height, GL_RGB,
-		    GL_UNSIGNED_SHORT_5_6_5, screen_shot);
+        GL_UNSIGNED_SHORT_5_6_5, screen_shot);
       break;
 #endif
     default:
       glReadPixels (0, 0, Width, Height, GL_RGBA,
-		    GL_UNSIGNED_BYTE, screen_shot);
+        GL_UNSIGNED_BYTE, screen_shot);
       break;
   }
 
@@ -457,7 +463,7 @@ iImage *csGraphics2DGLCommon::ScreenShot ()
 #else 
         *s = ((*s & 0xFF) << 24) | ((*s & 0xFFFFFF00) >> 8);
 #endif
-	s++;
+  s++;
     }
   }
 
@@ -469,13 +475,18 @@ iImage *csGraphics2DGLCommon::ScreenShot ()
   return ss;
 }
 
-bool csGraphics2DGLCommon::PerformExtensionV (char const* command, va_list)
+bool csGraphics2DGLCommon::PerformExtensionV (char const* command, va_list args)
 {
   if (!strcasecmp (command, "flush"))
   {
     glFlush ();
     glFinish ();
     return true;
+  }
+  if (!strcasecmp (command, "getstatecache"))
+  {
+    iGLStateCache** cache = va_arg (args, iGLStateCache**);
+    (*cache) = SCF_QUERY_INTERFACE( statecache, iGLStateCache );
   }
   return false;
 }

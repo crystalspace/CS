@@ -32,6 +32,7 @@
 #include "ivaria/reporter.h"
 #include "ivideo/sproctxt.h"
 #include "ivideo/txtmgr.h"
+#include "video/canvas/openglcommon/glstates.h"
 
 #include "video/renderer/common/pixfmt.h"
 
@@ -108,7 +109,7 @@ iTextureHandle *csOpenGLProcSoftware::TxtHandleVector::RegisterAndPrepare (iText
 }
 
 void csOpenGLProcSoftware::TxtHandleVector::AddTextureHandles (iTextureHandle *soft,
-					 iTextureHandle *ogl)
+           iTextureHandle *ogl)
 {
   Push (new txt_handles (soft, ogl));
 }
@@ -222,8 +223,8 @@ bool csOpenGLProcSoftware::Prepare(
   if (!soft_proc_g3d)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.graphics3d.opengl",
-	"Error creating offscreen software renderer");
+      "crystalspace.graphics3d.opengl",
+  "Error creating offscreen software renderer");
     return false;
   }
   plugin_mgr->DecRef();
@@ -233,8 +234,8 @@ bool csOpenGLProcSoftware::Prepare(
   if (!isoft_proc)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-	"crystalspace.graphics3d.opengl",
-    	"Error creating offscreen software renderer");
+  "crystalspace.graphics3d.opengl",
+      "Error creating offscreen software renderer");
     soft_proc_g3d->DecRef ();
     return false;
   }
@@ -289,10 +290,10 @@ bool csOpenGLProcSoftware::Prepare(
 
 void csOpenGLProcSoftware::Print (csRect *area)
 {
-  glEnable (GL_TEXTURE_2D);
+  csGraphics3DOGLCommon::statecache->EnableState (GL_TEXTURE_2D);
   csGraphics3DOGLCommon::SetGLZBufferFlags (CS_ZBUF_NONE);
   csGraphics3DOGLCommon::SetupBlend (CS_FX_COPY, 0, false);
-  glDisable (GL_ALPHA_TEST);
+  csGraphics3DOGLCommon::statecache->DisableState (GL_ALPHA_TEST);
 
   g3d->Print (area);
 
@@ -301,10 +302,10 @@ void csOpenGLProcSoftware::Print (csRect *area)
   {
     // Texture is in tha cache, update texture directly.
     //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-    glBindTexture (GL_TEXTURE_2D, tex_data->Handle);
+    csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, tex_data->Handle);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
-		    width, height,
-		    GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+        width, height,
+        GL_RGBA, GL_UNSIGNED_BYTE, buffer);
   }
   else
   {
@@ -393,7 +394,7 @@ void csOpenGLProcSoftware::DrawTriangleMesh (G3DTriangleMesh& mesh)
   int idx = txts_vector->FindKey ((void*)mesh.mat_handle->GetTexture ());
   if (idx == -1) // @@@ grow grow grow
     dmat.handle = txts_vector->RegisterAndPrepare (
-    	mesh.mat_handle->GetTexture ());
+      mesh.mat_handle->GetTexture ());
   else
     dmat.handle =(iTextureHandle*) txts_vector->Get (idx)->soft_txt;
   g3d->DrawTriangleMesh (cmesh);
@@ -403,7 +404,7 @@ void csOpenGLProcSoftware::DrawPolygonMesh (G3DPolygonMesh& mesh)
 {
   iPolygonBuffer* pb = mesh.polybuf;
   iMaterialHandle** old_materials = new iMaterialHandle* [
-  	pb->GetMaterialCount ()];
+    pb->GetMaterialCount ()];
   dummyMaterial* dmat = new dummyMaterial[pb->GetMaterialCount ()];
   int i;
   for (i = 0 ; i < pb->GetMaterialCount () ; i++)
@@ -526,7 +527,7 @@ iVertexBufferManager *csOpenGLProcSoftware::GetVertexBufferManager ()
 }
 
 iHalo *csOpenGLProcSoftware::CreateHalo (float iR, float iG, float iB,
-	                         unsigned char *iAlpha, int iWidth, int iHeight)
+                           unsigned char *iAlpha, int iWidth, int iHeight)
 {
   return g3d->CreateHalo (iR, iG, iB, iAlpha, iWidth, iHeight);
 }

@@ -23,10 +23,12 @@
 #include "ogl_txtcache.h"
 #include "ogl_txtmgr.h"
 #include "ogl_g3dcom.h"
-#include "imesh/thing/lightmap.h"	//@@@!!!
-#include "imesh/thing/polygon.h"	//@@@!!!
+#include "imesh/thing/lightmap.h" //@@@!!!
+#include "imesh/thing/polygon.h"  //@@@!!!
 #include "ivideo/graph3d.h"
 #include "ivaria/reporter.h"
+#include "video/canvas/openglcommon/glstates.h"
+
 
 // need definitions of R24(), G24(), and B24()
 #ifndef CS_NORMAL_LIGHT_LEVEL
@@ -150,7 +152,7 @@ OpenGLTextureCache::~OpenGLTextureCache ()
 void OpenGLTextureCache::Cache (iTextureHandle *txt_handle)
 {
   csTxtCacheData *cached_texture = (csTxtCacheData *)
-  	txt_handle->GetCacheData ();
+    txt_handle->GetCacheData ();
 
   if (cached_texture)
   {
@@ -230,7 +232,7 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
 
   if (reload)
   {
-    glBindTexture (GL_TEXTURE_2D, d->Handle);
+    csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, d->Handle);
   }
   else
   {
@@ -238,7 +240,7 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
 
     glGenTextures (1, &texturehandle);
     d->Handle = texturehandle;
-    glBindTexture (GL_TEXTURE_2D, texturehandle);
+    csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, texturehandle);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   }
@@ -271,13 +273,13 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
     csTextureOpenGL *togl = txt_mm->vTex[i];
     if (togl->compressed == GL_FALSE)
       glTexImage2D (GL_TEXTURE_2D, i, txt_mm->TargetFormat (),
-      	togl->get_width (), togl->get_height (),
-	0, txt_mm->SourceFormat (), txt_mm->SourceType (), togl->image_data);
+        togl->get_width (), togl->get_height (),
+  0, txt_mm->SourceFormat (), txt_mm->SourceType (), togl->image_data);
     else
       csGraphics3DOGLCommon::glCompressedTexImage2DARB (
-      	GL_TEXTURE_2D, i, (GLenum)togl->internalFormat,
-	togl->get_width (), togl->get_height (), 0,
-	togl->size, togl->image_data);
+        GL_TEXTURE_2D, i, (GLenum)togl->internalFormat,
+  togl->get_width (), togl->get_height (), 0,
+  togl->size, togl->image_data);
   }
 }
 
@@ -422,7 +424,7 @@ void csLightMapQueue::AddFogTexelsFast(csVector2* work_fog_texels)
 void csLightMapQueue::Flush (GLuint Handle)
 {
   if (num_triangles <= 0 || num_vertices <= 0) return;
-  glBindTexture (GL_TEXTURE_2D, Handle);
+  csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, Handle);
   glVertexPointer (4, GL_FLOAT, 0, glverts);
   glTexCoordPointer (2, GL_FLOAT, 0, gltxt);
   glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, tris); 
@@ -432,7 +434,7 @@ void csLightMapQueue::FlushFog (GLuint HandleFog)
 {  
   if (num_triangles <= 0 || num_vertices <= 0) return;
   
-  glBindTexture(GL_TEXTURE_2D, HandleFog);
+  csGraphics3DOGLCommon::statecache->SetTexture(GL_TEXTURE_2D, HandleFog);
   glVertexPointer (4, GL_FLOAT, 0, glverts);
   glTexCoordPointer(2,GL_FLOAT,0,gltxtFog);
   glColorPointer (3, GL_FLOAT, 0, glcolorsFog);
@@ -498,8 +500,8 @@ void csLightMapQueue::LoadArrays()
 csSuperLightMap::csSuperLightMap ()
 {
   region = new csSubRectangles (
-  	csRect (0, 0, OpenGLLightmapCache::super_lm_size,
-	OpenGLLightmapCache::super_lm_size));
+    csRect (0, 0, OpenGLLightmapCache::super_lm_size,
+  OpenGLLightmapCache::super_lm_size));
   cacheData = NULL;
 }
 
@@ -558,7 +560,7 @@ void OpenGLLightmapCache::Setup ()
     GLuint lightmaphandle;
     glGenTextures (1, &lightmaphandle);
     suplm[i].Handle = lightmaphandle;
-    glBindTexture (GL_TEXTURE_2D, lightmaphandle);
+    csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, lightmaphandle);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -569,7 +571,7 @@ void OpenGLLightmapCache::Setup ()
     char* buf = new char [super_lm_size*super_lm_size*4];
     memset (buf, 0, 4*super_lm_size*super_lm_size);
     glTexImage2D (GL_TEXTURE_2D, 0, 3, super_lm_size, super_lm_size,
-		    0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
+        0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
     delete[] buf;
   }
 }
@@ -653,7 +655,7 @@ void OpenGLLightmapCache::Cache(csTrianglesPerSuperLightmap* s, bool dirty,
           int lmheight = lm->GetHeight();
          csRGBpixel* lm_data = lm->GetMapData();
           csRect r = rectangleArray[i];
-          glBindTexture (GL_TEXTURE_2D, SLMHandle);
+          csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, SLMHandle);
           glTexSubImage2D(GL_TEXTURE_2D, 0,r.xmin,r.ymin,
             lmwidth, lmheight,GL_RGBA,GL_UNSIGNED_BYTE,lm_data);
         }
@@ -695,7 +697,7 @@ void OpenGLLightmapCache::Cache(csTrianglesPerSuperLightmap* s, bool dirty,
     int lmheigth = lm->GetHeight();
     csRGBpixel* lm_data = lm->GetMapData();
     csRect r = rectangleArray[i];
-    glBindTexture (GL_TEXTURE_2D, SLMHandle);    
+    csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, SLMHandle);    
     glTexSubImage2D(GL_TEXTURE_2D, 0,r.xmin,r.ymin,
       lmwidth, lmheigth,GL_RGBA,GL_UNSIGNED_BYTE,lm_data);
   }
@@ -757,7 +759,7 @@ void OpenGLLightmapCache::Cache (iPolygonTexture *polytex)
       int prev_lm = cur_lm;
       while (num_proc > 0)
       {
-	prev_lm = (prev_lm+super_lm_num-1)%super_lm_num;
+  prev_lm = (prev_lm+super_lm_num-1)%super_lm_num;
         if(suplm[prev_lm].cacheData == NULL) 
         {
           suplm[prev_lm].cacheData = new csLMCacheDataQueue();
@@ -774,22 +776,22 @@ void OpenGLLightmapCache::Cache (iPolygonTexture *polytex)
 
         }
 
-	if (clm)
-  	{ 
-	  clm->super_lm_idx = prev_lm;
-	  num_proc = 0;	// Stop.
+  if (clm)
+    { 
+    clm->super_lm_idx = prev_lm;
+    num_proc = 0; // Stop.
         }
-	else 
-  	{ 
-	  num_proc--;
-	}
+  else 
+    { 
+    num_proc--;
+  }
       }
 
       if (!clm)
       {
         // There was no room in the current super-lightmap and neither
-	// was there room in the previous one. We allocate a new
-	// super-lightmap here.
+  // was there room in the previous one. We allocate a new
+  // super-lightmap here.
         cur_lm = (cur_lm+1)%super_lm_num;
         num_lm_processed++;
 
@@ -802,12 +804,12 @@ void OpenGLLightmapCache::Cache (iPolygonTexture *polytex)
         suplm[cur_lm].Clear ();
         suplm[cur_lm].cacheData = new csLMCacheDataQueue();
 
-	// Now allocate the first lightmap in this super-lightmap.
-	// This can not fail.
-	SourceData sd;
-	sd.LMDataSource = piLM;
-	clm = (csLMCacheData*)suplm[cur_lm].Alloc (lmwidth, lmheight, sd);
-	clm->super_lm_idx = cur_lm;
+  // Now allocate the first lightmap in this super-lightmap.
+  // This can not fail.
+  SourceData sd;
+  sd.LMDataSource = piLM;
+  clm = (csLMCacheData*)suplm[cur_lm].Alloc (lmwidth, lmheight, sd);
+  clm->super_lm_idx = cur_lm;
       }
     }
 
@@ -858,10 +860,10 @@ void OpenGLLightmapCache::Load (csLMCacheData *d)
   int lmheight = lightmap_info->GetHeight ();
   csRGBpixel* lm_data = lightmap_info->GetMapData ();
 
-  glBindTexture (GL_TEXTURE_2D, d->Handle);
+  csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, d->Handle);
   csRect& r = d->super_lm_rect;
   glTexSubImage2D (GL_TEXTURE_2D, 0, r.xmin, r.ymin,
-  	lmwidth, lmheight, GL_RGBA, GL_UNSIGNED_BYTE, lm_data);
+    lmwidth, lmheight, GL_RGBA, GL_UNSIGNED_BYTE, lm_data);
 }
 
 void OpenGLLightmapCache::FlushIfNeeded ()
@@ -888,7 +890,7 @@ void OpenGLLightmapCache::Flush ()
   }
   if (!flush_needed) return;
   g3d->SetGLZBufferFlagsPass2 (queue_zbuf_mode, true);
-  glEnable (GL_TEXTURE_2D);
+  csGraphics3DOGLCommon::statecache->EnableState (GL_TEXTURE_2D);
   glColor4f (1, 1, 1, 0);
   csGraphics3DOGLCommon::SetupBlend (CS_FX_SRCDST, 0, false);
   csGraphics3DOGLCommon::SetClientStates (CS_CLIENTSTATE_VT);
@@ -927,7 +929,7 @@ void OpenGLLightmapCache::Flush (int sup_idx)
 //Luckily this is rare. It can only happen if one frame needs lightmaps
 //from ALL the super-lightmaps at once.
   g3d->SetGLZBufferFlagsPass2 (queue_zbuf_mode, true);
-  glEnable (GL_TEXTURE_2D);
+  csGraphics3DOGLCommon::statecache->EnableState (GL_TEXTURE_2D);
   csGraphics3DOGLCommon::SetupBlend (CS_FX_SRCDST, 0, false);
   csGraphics3DOGLCommon::SetClientStates (CS_CLIENTSTATE_VT);
   lm_queue.Flush (suplm[sup_idx].Handle);

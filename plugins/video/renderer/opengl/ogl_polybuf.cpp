@@ -105,7 +105,7 @@ csTriangleInfo::csTriangleInfo()
 
 
 csTriangleArrayPolygonBuffer::csTriangleArrayPolygonBuffer (iVertexBufferManager* mgr)
-	: csPolygonBuffer (mgr)
+  : csPolygonBuffer (mgr)
 {
 
   vertices = NULL;
@@ -193,8 +193,8 @@ void csTrianglesPerMaterial::CopyInfoPolygons()
 csTrianglesPerSuperLightmap::csTrianglesPerSuperLightmap()
 {
   region = new csSubRectangles (
-  	csRect (0, 0, OpenGLLightmapCache::super_lm_size,
-	OpenGLLightmapCache::super_lm_size));
+    csRect (0, 0, OpenGLLightmapCache::super_lm_size,
+  OpenGLLightmapCache::super_lm_size));
 
   numTriangles = 0;
   numTexels = 0;
@@ -208,8 +208,8 @@ csTrianglesPerSuperLightmap::csTrianglesPerSuperLightmap()
 csTrianglesPerSuperLightmap::csTrianglesPerSuperLightmap(int numVertex)
 {
   region = new csSubRectangles (
-  	csRect (0, 0, OpenGLLightmapCache::super_lm_size,
-	OpenGLLightmapCache::super_lm_size));
+    csRect (0, 0, OpenGLLightmapCache::super_lm_size,
+  OpenGLLightmapCache::super_lm_size));
   
   numTriangles = 0;
   numTexels = 0;
@@ -960,10 +960,10 @@ void csTriangleArrayPolygonBuffer::MarkLightmapsDirty()
 }
 
 void csTriangleArrayPolygonBuffer::AddPolygon (int* verts, int num_verts,
-	const csPlane3& poly_normal,
-  	int mat_index,
-	const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
-	iPolygonTexture* poly_texture)
+  const csPlane3& poly_normal,
+    int mat_index,
+  const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
+  iPolygonTexture* poly_texture)
 {
   /* We have to:
    * Generate triangles
@@ -1109,7 +1109,7 @@ void csTriangleArrayPolygonBuffer::AddMaterial (iMaterialHandle* mat_handle)
 }
 
 void csTriangleArrayPolygonBuffer::SetMaterial (int idx,
-	iMaterialHandle* mat_handle)
+  iMaterialHandle* mat_handle)
 {
   materials[idx] = mat_handle;
 }
@@ -1185,7 +1185,7 @@ csColor* csTriangleArrayPolygonBuffer::GetColors(TrianglesNode*t)
 
 
 csTriangleArrayVertexBufferManager::csTriangleArrayVertexBufferManager
-	(iObjectRegistry* object_reg) : csVertexBufferManager (object_reg)
+  (iObjectRegistry* object_reg) : csVertexBufferManager (object_reg)
 {
 }
 

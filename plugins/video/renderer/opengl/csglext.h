@@ -473,6 +473,72 @@ typedef void (csAPIENTRY * csPFNGLTBUFFERMASK3DFXPROC) (GLuint mask);
 typedef void (csAPIENTRY * csPFNGLSAMPLEMASKEXTPROC) (GLclampf value, GLboolean invert);
 typedef void (csAPIENTRY * csPFNGLSAMPLEPATTERNEXTPROC) (GLenum pattern);
 typedef void (csAPIENTRY * csPFNGLTEXTURECOLORMASKSGISPROC) (GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha);
+
+typedef GLboolean (csAPIENTRY * csPFNGLAREPROGRAMSRESIDENTNVPROC) (GLsizei n, const GLuint *programs, GLboolean *residences);
+typedef void (csAPIENTRY * csPFNGLBINDPROGRAMNVPROC) (GLenum target, GLuint id);
+typedef void (csAPIENTRY * csPFNGLDELETEPROGRAMSNVPROC) (GLsizei n, const GLuint *programs);
+typedef void (csAPIENTRY * csPFNGLEXECUTEPROGRAMNVPROC) (GLenum target, GLuint id, const GLfloat *params);
+typedef void (csAPIENTRY * csPFNGLGENPROGRAMSNVPROC) (GLsizei n, GLuint *programs);
+typedef void (csAPIENTRY * csPFNGLGETPROGRAMPARAMETERDVNVPROC) (GLenum target, GLuint index, GLenum pname, GLdouble *params);
+typedef void (csAPIENTRY * csPFNGLGETPROGRAMPARAMETERFVNVPROC) (GLenum target, GLuint index, GLenum pname, GLfloat *params);
+typedef void (csAPIENTRY * csPFNGLGETPROGRAMIVNVPROC) (GLuint id, GLenum pname, GLint *params);
+typedef void (csAPIENTRY * csPFNGLGETPROGRAMSTRINGNVPROC) (GLuint id, GLenum pname, GLubyte *program);
+typedef void (csAPIENTRY * csPFNGLGETTRACKMATRIXIVNVPROC) (GLenum target, GLuint address, GLenum pname, GLint *params);
+typedef void (csAPIENTRY * csPFNGLGETVERTEXATTRIBDVNVPROC) (GLuint index, GLenum pname, GLdouble *params);
+typedef void (csAPIENTRY * csPFNGLGETVERTEXATTRIBFVNVPROC) (GLuint index, GLenum pname, GLfloat *params);
+typedef void (csAPIENTRY * csPFNGLGETVERTEXATTRIBIVNVPROC) (GLuint index, GLenum pname, GLint *params);
+typedef void (csAPIENTRY * csPFNGLGETVERTEXATTRIBPOINTERVNVPROC) (GLuint index, GLenum pname, GLvoid* *pointer);
+typedef GLboolean (csAPIENTRY * csPFNGLISPROGRAMNVPROC) (GLuint id);
+typedef void (csAPIENTRY * csPFNGLLOADPROGRAMNVPROC) (GLenum target, GLuint id, GLsizei len, const GLubyte *program);
+typedef void (csAPIENTRY * csPFNGLPROGRAMPARAMETER4DNVPROC) (GLenum target, GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w);
+typedef void (csAPIENTRY * csPFNGLPROGRAMPARAMETER4DVNVPROC) (GLenum target, GLuint index, const GLdouble *v);
+typedef void (csAPIENTRY * csPFNGLPROGRAMPARAMETER4FNVPROC) (GLenum target, GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
+typedef void (csAPIENTRY * csPFNGLPROGRAMPARAMETER4FVNVPROC) (GLenum target, GLuint index, const GLfloat *v);
+typedef void (csAPIENTRY * csPFNGLPROGRAMPARAMETERS4DVNVPROC) (GLenum target, GLuint index, GLuint count, const GLdouble *v);
+typedef void (csAPIENTRY * csPFNGLPROGRAMPARAMETERS4FVNVPROC) (GLenum target, GLuint index, GLuint count, const GLfloat *v);
+typedef void (csAPIENTRY * csPFNGLREQUESTRESIDENTPROGRAMSNVPROC) (GLsizei n, const GLuint *programs);
+typedef void (csAPIENTRY * csPFNGLTRACKMATRIXNVPROC) (GLenum target, GLuint address, GLenum matrix, GLenum transform);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIBPOINTERNVPROC) (GLuint index, GLint fsize, GLenum type, GLsizei stride, const GLvoid *pointer);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB1DNVPROC) (GLuint index, GLdouble x);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB1DVNVPROC) (GLuint index, const GLdouble *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB1FNVPROC) (GLuint index, GLfloat x);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB1FVNVPROC) (GLuint index, const GLfloat *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB1SNVPROC) (GLuint index, GLshort x);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB1SVNVPROC) (GLuint index, const GLshort *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB2DNVPROC) (GLuint index, GLdouble x, GLdouble y);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB2DVNVPROC) (GLuint index, const GLdouble *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB2FNVPROC) (GLuint index, GLfloat x, GLfloat y);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB2FVNVPROC) (GLuint index, const GLfloat *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB2SNVPROC) (GLuint index, GLshort x, GLshort y);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB2SVNVPROC) (GLuint index, const GLshort *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB3DNVPROC) (GLuint index, GLdouble x, GLdouble y, GLdouble z);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB3DVNVPROC) (GLuint index, const GLdouble *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB3FNVPROC) (GLuint index, GLfloat x, GLfloat y, GLfloat z);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB3FVNVPROC) (GLuint index, const GLfloat *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB3SNVPROC) (GLuint index, GLshort x, GLshort y, GLshort z);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB3SVNVPROC) (GLuint index, const GLshort *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB4DNVPROC) (GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB4DVNVPROC) (GLuint index, const GLdouble *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB4FNVPROC) (GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB4FVNVPROC) (GLuint index, const GLfloat *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB4SNVPROC) (GLuint index, GLshort x, GLshort y, GLshort z, GLshort w);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB4SVNVPROC) (GLuint index, const GLshort *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB4UBNVPROC) (GLuint index, GLubyte x, GLubyte y, GLubyte z, GLubyte w);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIB4UBVNVPROC) (GLuint index, const GLubyte *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIBS1DVNVPROC) (GLuint index, GLsizei count, const GLdouble *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIBS1FVNVPROC) (GLuint index, GLsizei count, const GLfloat *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIBS1SVNVPROC) (GLuint index, GLsizei count, const GLshort *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIBS2DVNVPROC) (GLuint index, GLsizei count, const GLdouble *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIBS2FVNVPROC) (GLuint index, GLsizei count, const GLfloat *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIBS2SVNVPROC) (GLuint index, GLsizei count, const GLshort *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIBS3DVNVPROC) (GLuint index, GLsizei count, const GLdouble *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIBS3FVNVPROC) (GLuint index, GLsizei count, const GLfloat *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIBS3SVNVPROC) (GLuint index, GLsizei count, const GLshort *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIBS4DVNVPROC) (GLuint index, GLsizei count, const GLdouble *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIBS4FVNVPROC) (GLuint index, GLsizei count, const GLfloat *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIBS4SVNVPROC) (GLuint index, GLsizei count, const GLshort *v);
+typedef void (csAPIENTRY * csPFNGLVERTEXATTRIBS4UBVNVPROC) (GLuint index, GLsizei count, const GLubyte *v);
+
 #endif
 
 #ifdef CSGL_FOR_ALL
@@ -618,6 +684,7 @@ typedef void (csAPIENTRY * csPFNGLTEXTURECOLORMASKSGISPROC) (GLboolean red, GLbo
 #define CSGL_SGIX_resample
 #define CSGL_SGIS_point_line_texgen
 #define CSGL_SGIS_texture_color_mask
+#define CSGL_NV_vertex_program
 #endif
 
 #define CS_PREP_GL_FUNCTION(fType,fName) \
@@ -1447,6 +1514,73 @@ CS_PREP_GL_FUNCTION (csPFNGLSAMPLEPATTERNEXTPROC, glSamplePatternEXT);
 CS_PREP_GL_FUNCTION (csPFNGLTEXTURECOLORMASKSGISPROC, glTextureColorMaskSGIS);
 #endif
 
+#ifdef CSGL_NV_vertex_program
+CS_PREP_GL_FUNCTION( csPFNGLAREPROGRAMSRESIDENTNVPROC, glAreProgramsResidentNV );
+CS_PREP_GL_FUNCTION( csPFNGLBINDPROGRAMNVPROC, glBindProgramNV );
+CS_PREP_GL_FUNCTION( csPFNGLDELETEPROGRAMSNVPROC, glDeleteProgramsNV );
+CS_PREP_GL_FUNCTION( csPFNGLEXECUTEPROGRAMNVPROC, glExecuteProgramNV );
+CS_PREP_GL_FUNCTION( csPFNGLGENPROGRAMSNVPROC, glGenProgramsNV );
+CS_PREP_GL_FUNCTION( csPFNGLGETPROGRAMPARAMETERDVNVPROC, glGetProgramParameterdvNV );
+CS_PREP_GL_FUNCTION( csPFNGLGETPROGRAMPARAMETERFVNVPROC, glGetProgramParameterfvNV );
+CS_PREP_GL_FUNCTION( csPFNGLGETPROGRAMIVNVPROC, glGetProgramivNV );
+CS_PREP_GL_FUNCTION( csPFNGLGETPROGRAMSTRINGNVPROC, glGetProgramStringNV );
+CS_PREP_GL_FUNCTION( csPFNGLGETTRACKMATRIXIVNVPROC, glGetTrackMatrixivNV );
+CS_PREP_GL_FUNCTION( csPFNGLGETVERTEXATTRIBDVNVPROC, glGetVertexAttribdvNV );
+CS_PREP_GL_FUNCTION( csPFNGLGETVERTEXATTRIBFVNVPROC, glGetVertexAttribfvNV );
+CS_PREP_GL_FUNCTION( csPFNGLGETVERTEXATTRIBIVNVPROC, glGetVertexAttribivNV );
+CS_PREP_GL_FUNCTION( csPFNGLGETVERTEXATTRIBPOINTERVNVPROC, glGetVertexAttribPointervNV );
+CS_PREP_GL_FUNCTION( csPFNGLISPROGRAMNVPROC, glIsProgramNV );
+CS_PREP_GL_FUNCTION( csPFNGLLOADPROGRAMNVPROC, glLoadProgramNV );
+CS_PREP_GL_FUNCTION( csPFNGLPROGRAMPARAMETER4DNVPROC, glProgramParameter4dNV );
+CS_PREP_GL_FUNCTION( csPFNGLPROGRAMPARAMETER4DVNVPROC, glProgramParameter4dvNV );
+CS_PREP_GL_FUNCTION( csPFNGLPROGRAMPARAMETER4FNVPROC, glProgramParameter4fNV );
+CS_PREP_GL_FUNCTION( csPFNGLPROGRAMPARAMETER4FVNVPROC, glProgramParameter4fvNV );
+CS_PREP_GL_FUNCTION( csPFNGLPROGRAMPARAMETERS4DVNVPROC, glProgramParameters4dvNV );
+CS_PREP_GL_FUNCTION( csPFNGLPROGRAMPARAMETERS4FVNVPROC, glProgramParameters4fvNV );
+CS_PREP_GL_FUNCTION( csPFNGLREQUESTRESIDENTPROGRAMSNVPROC, glRequestResidentProgramsNV );
+CS_PREP_GL_FUNCTION( csPFNGLTRACKMATRIXNVPROC, glTrackMatrixNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIBPOINTERNVPROC, glVertexAttribPointerNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB1DNVPROC, glVertexAttrib1dNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB1DVNVPROC, glVertexAttrib1dvNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB1FNVPROC, glVertexAttrib1fNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB1FVNVPROC, glVertexAttrib1fvNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB1SNVPROC, glVertexAttrib1sNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB1SVNVPROC, glVertexAttrib1svNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB2DNVPROC, glVertexAttrib2dNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB2DVNVPROC, glVertexAttrib2dvNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB2FNVPROC, glVertexAttrib2fNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB2FVNVPROC, glVertexAttrib2fvNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB2SNVPROC, glVertexAttrib2sNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB2SVNVPROC, glVertexAttrib2svNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB3DNVPROC, glVertexAttrib3dNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB3DVNVPROC, glVertexAttrib3dvNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB3FNVPROC, glVertexAttrib3fNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB3FVNVPROC, glVertexAttrib3fvNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB3SNVPROC, glVertexAttrib3sNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB3SVNVPROC, glVertexAttrib3svNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB4DNVPROC, glVertexAttrib4dNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB4DVNVPROC, glVertexAttrib4dvNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB4FNVPROC, glVertexAttrib4fNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB4FVNVPROC, glVertexAttrib4fvNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB4SNVPROC, glVertexAttrib4sNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB4SVNVPROC, glVertexAttrib4svNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB4UBNVPROC, glVertexAttrib4ubNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIB4UBVNVPROC, glVertexAttrib4ubvNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIBS1DVNVPROC, glVertexAttribs1dvNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIBS1FVNVPROC, glVertexAttribs1fvNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIBS1SVNVPROC, glVertexAttribs1svNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIBS2DVNVPROC, glVertexAttribs2dvNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIBS2FVNVPROC, glVertexAttribs2fvNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIBS2SVNVPROC, glVertexAttribs2svNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIBS3DVNVPROC, glVertexAttribs3dvNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIBS3FVNVPROC, glVertexAttribs3fvNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIBS3SVNVPROC, glVertexAttribs3svNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIBS4DVNVPROC, glVertexAttribs4dvNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIBS4FVNVPROC, glVertexAttribs4fvNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIBS4SVNVPROC, glVertexAttribs4svNV );
+CS_PREP_GL_FUNCTION( csPFNGLVERTEXATTRIBS4UBVNVPROC, glVertexAttribs4ubvNV );
+#endif
+
 #ifdef CSGL_FOR_ALL
 #undef CSGL_VERSION_1_2
 #undef CSGL_ARB_multitexture
@@ -1590,6 +1724,7 @@ CS_PREP_GL_FUNCTION (csPFNGLTEXTURECOLORMASKSGISPROC, glTextureColorMaskSGIS);
 #undef CSGL_SGIX_resample
 #undef CSGL_SGIS_point_line_texgen
 #undef CSGL_SGIS_texture_color_mask
+#undef CSGL_NV_vertex_program
 #endif
 
 #undef CSGL_FOR_ALL
@@ -4513,5 +4648,102 @@ CS_PREP_GL_FUNCTION (csPFNGLTEXTURECOLORMASKSGISPROC, glTextureColorMaskSGIS);
 #ifndef GL_TEXTURE_COLOR_WRITEMASK_SGIS
 #define GL_TEXTURE_COLOR_WRITEMASK_SGIS   (GLenum)0x81EF
 #endif
+
+#ifndef GL_SUBTRACT_ARB
+#define GL_SUBTRACT_ARB                   0x84E7
+#endif
+#ifndef GL_DOT3_RGB_ARB
+#define GL_DOT3_RGB_ARB                   0x86AE
+#endif
+#ifndef GL_DOT3_RGBA_ARB
+#define GL_DOT3_RGBA_ARB                  0x86AF
+#endif
+
+#ifndef GL_NV_vertex_program
+#define GL_NV_vertex_program 1
+#define GL_VERTEX_PROGRAM_NV              0x8620
+#define GL_VERTEX_STATE_PROGRAM_NV        0x8621
+#define GL_ATTRIB_ARRAY_SIZE_NV           0x8623
+#define GL_ATTRIB_ARRAY_STRIDE_NV         0x8624
+#define GL_ATTRIB_ARRAY_TYPE_NV           0x8625
+#define GL_CURRENT_ATTRIB_NV              0x8626
+#define GL_PROGRAM_LENGTH_NV              0x8627
+#define GL_PROGRAM_STRING_NV              0x8628
+#define GL_MODELVIEW_PROJECTION_NV        0x8629
+#define GL_IDENTITY_NV                    0x862A
+#define GL_INVERSE_NV                     0x862B
+#define GL_TRANSPOSE_NV                   0x862C
+#define GL_INVERSE_TRANSPOSE_NV           0x862D
+#define GL_MAX_TRACK_MATRIX_STACK_DEPTH_NV 0x862E
+#define GL_MAX_TRACK_MATRICES_NV          0x862F
+#define GL_MATRIX0_NV                     0x8630
+#define GL_MATRIX1_NV                     0x8631
+#define GL_MATRIX2_NV                     0x8632
+#define GL_MATRIX3_NV                     0x8633
+#define GL_MATRIX4_NV                     0x8634
+#define GL_MATRIX5_NV                     0x8635
+#define GL_MATRIX6_NV                     0x8636
+#define GL_MATRIX7_NV                     0x8637
+#define GL_CURRENT_MATRIX_STACK_DEPTH_NV  0x8640
+#define GL_CURRENT_MATRIX_NV              0x8641
+#define GL_VERTEX_PROGRAM_POINT_SIZE_NV   0x8642
+#define GL_VERTEX_PROGRAM_TWO_SIDE_NV     0x8643
+#define GL_PROGRAM_PARAMETER_NV           0x8644
+#define GL_ATTRIB_ARRAY_POINTER_NV        0x8645
+#define GL_PROGRAM_TARGET_NV              0x8646
+#define GL_PROGRAM_RESIDENT_NV            0x8647
+#define GL_TRACK_MATRIX_NV                0x8648
+#define GL_TRACK_MATRIX_TRANSFORM_NV      0x8649
+#define GL_VERTEX_PROGRAM_BINDING_NV      0x864A
+#define GL_PROGRAM_ERROR_POSITION_NV      0x864B
+#define GL_VERTEX_ATTRIB_ARRAY0_NV        0x8650
+#define GL_VERTEX_ATTRIB_ARRAY1_NV        0x8651
+#define GL_VERTEX_ATTRIB_ARRAY2_NV        0x8652
+#define GL_VERTEX_ATTRIB_ARRAY3_NV        0x8653
+#define GL_VERTEX_ATTRIB_ARRAY4_NV        0x8654
+#define GL_VERTEX_ATTRIB_ARRAY5_NV        0x8655
+#define GL_VERTEX_ATTRIB_ARRAY6_NV        0x8656
+#define GL_VERTEX_ATTRIB_ARRAY7_NV        0x8657
+#define GL_VERTEX_ATTRIB_ARRAY8_NV        0x8658
+#define GL_VERTEX_ATTRIB_ARRAY9_NV        0x8659
+#define GL_VERTEX_ATTRIB_ARRAY10_NV       0x865A
+#define GL_VERTEX_ATTRIB_ARRAY11_NV       0x865B
+#define GL_VERTEX_ATTRIB_ARRAY12_NV       0x865C
+#define GL_VERTEX_ATTRIB_ARRAY13_NV       0x865D
+#define GL_VERTEX_ATTRIB_ARRAY14_NV       0x865E
+#define GL_VERTEX_ATTRIB_ARRAY15_NV       0x865F
+#define GL_MAP1_VERTEX_ATTRIB0_4_NV       0x8660
+#define GL_MAP1_VERTEX_ATTRIB1_4_NV       0x8661
+#define GL_MAP1_VERTEX_ATTRIB2_4_NV       0x8662
+#define GL_MAP1_VERTEX_ATTRIB3_4_NV       0x8663
+#define GL_MAP1_VERTEX_ATTRIB4_4_NV       0x8664
+#define GL_MAP1_VERTEX_ATTRIB5_4_NV       0x8665
+#define GL_MAP1_VERTEX_ATTRIB6_4_NV       0x8666
+#define GL_MAP1_VERTEX_ATTRIB7_4_NV       0x8667
+#define GL_MAP1_VERTEX_ATTRIB8_4_NV       0x8668
+#define GL_MAP1_VERTEX_ATTRIB9_4_NV       0x8669
+#define GL_MAP1_VERTEX_ATTRIB10_4_NV      0x866A
+#define GL_MAP1_VERTEX_ATTRIB11_4_NV      0x866B
+#define GL_MAP1_VERTEX_ATTRIB12_4_NV      0x866C
+#define GL_MAP1_VERTEX_ATTRIB13_4_NV      0x866D
+#define GL_MAP1_VERTEX_ATTRIB14_4_NV      0x866E
+#define GL_MAP1_VERTEX_ATTRIB15_4_NV      0x866F
+#define GL_MAP2_VERTEX_ATTRIB0_4_NV       0x8670
+#define GL_MAP2_VERTEX_ATTRIB1_4_NV       0x8671
+#define GL_MAP2_VERTEX_ATTRIB2_4_NV       0x8672
+#define GL_MAP2_VERTEX_ATTRIB3_4_NV       0x8673
+#define GL_MAP2_VERTEX_ATTRIB4_4_NV       0x8674
+#define GL_MAP2_VERTEX_ATTRIB5_4_NV       0x8675
+#define GL_MAP2_VERTEX_ATTRIB6_4_NV       0x8676
+#define GL_MAP2_VERTEX_ATTRIB7_4_NV       0x8677
+#define GL_MAP2_VERTEX_ATTRIB8_4_NV       0x8678
+#define GL_MAP2_VERTEX_ATTRIB9_4_NV       0x8679
+#define GL_MAP2_VERTEX_ATTRIB10_4_NV      0x867A
+#define GL_MAP2_VERTEX_ATTRIB11_4_NV      0x867B
+#define GL_MAP2_VERTEX_ATTRIB12_4_NV      0x867C
+#define GL_MAP2_VERTEX_ATTRIB13_4_NV      0x867D
+#define GL_MAP2_VERTEX_ATTRIB14_4_NV      0x867E
+#define GL_MAP2_VERTEX_ATTRIB15_4_NV      0x867F
+#endif 
 
 #endif

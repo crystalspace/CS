@@ -26,12 +26,14 @@
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
+#include "video/canvas/openglcommon/glstates.h"
 
 #if defined(CS_OPENGL_PATH)
 #include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
 #else
 #include <GL/gl.h>
 #endif
+
 
 csOpenGLProcBackBuffer::csOpenGLProcBackBuffer (iBase *parent) :
   csGraphics3DOGLCommon (parent)
@@ -129,21 +131,21 @@ bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
     switch (pixel_bytes)
     {
       case 1:
-	format = GL_COLOR_INDEX;
-	type = GL_UNSIGNED_BYTE;
-	break;
+  format = GL_COLOR_INDEX;
+  type = GL_UNSIGNED_BYTE;
+  break;
   #ifdef GL_VERSION_1_2
       case 2:
-	format = GL_RGB;
-	type = GL_UNSIGNED_SHORT_5_6_5;
-	break;
+  format = GL_RGB;
+  type = GL_UNSIGNED_SHORT_5_6_5;
+  break;
   #endif
       case 4:
-	format = GL_RGBA;
-	type = GL_UNSIGNED_BYTE;
-	break;
+  format = GL_RGBA;
+  type = GL_UNSIGNED_BYTE;
+  break;
       default:
-	return false; // invalid format
+  return false; // invalid format
     }
     glReadPixels (0, 0, width, height,
       format, type, backbuffercopy);  */
@@ -161,7 +163,7 @@ bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
     // corner of the screen and upside down.
     glOrtho (0.0f, (GLdouble) width, (GLdouble) height, 0.0f, -1.0f, 10.0f);
     // but this flips front/back of walls...
-    glCullFace (GL_BACK);
+    statecache->SetCullFace (GL_BACK);
 
     glMatrixMode (GL_MODELVIEW);
     glPushMatrix();
@@ -176,11 +178,11 @@ bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
 
       // Get texture handle
       GLuint texturehandle =
-	((csTxtCacheData *)tex_mm->GetCacheData ())->Handle;
-      glShadeModel (GL_FLAT);
-      glEnable (GL_TEXTURE_2D);
+  ((csTxtCacheData *)tex_mm->GetCacheData ())->Handle;
+      statecache->SetShadeModel (GL_FLAT);
+      statecache->EnableState (GL_TEXTURE_2D);
       glColor4f (1.0f,1.0f,1.0f,1.0f);
-      glBindTexture (GL_TEXTURE_2D, texturehandle);
+      statecache->SetTexture (GL_TEXTURE_2D, texturehandle);
       do_quad = true;
       csGraphics3DOGLCommon::SetupBlend (CS_FX_COPY, 0, false);
     }
@@ -188,7 +190,7 @@ bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
 
   if ((DrawFlags & CSDRAW_CLEARSCREEN) && !do_quad)
   {
-    glDisable (GL_TEXTURE_2D);
+    statecache->DisableState (GL_TEXTURE_2D);
     glColor3f (0,0,0);
     do_quad = true;
   }
@@ -206,9 +208,9 @@ bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
     csGraphics3DOGLCommon::SetGLZBufferFlags (CS_ZBUF_FILL);
     if (!do_quad)
     {
-      glDisable (GL_TEXTURE_2D);
+      statecache->DisableState (GL_TEXTURE_2D);
       csGraphics3DOGLCommon::SetupBlend (CS_FX_TRANSPARENT, 0, false);
-      glShadeModel (GL_FLAT);
+      statecache->SetShadeModel (GL_FLAT);
       glColor4f (0.0f,0.0f,0.0f,0.0f);
     }
     do_quad = true;
@@ -243,8 +245,8 @@ void csOpenGLProcBackBuffer::FinishDraw ()
 {
   if ((!(DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))))
     return;
-  csGraphics3DOGLCommon::FinishDraw ();
-  glCullFace (GL_FRONT);
+  FinishDraw ();
+  statecache->SetCullFace (GL_FRONT);
   glMatrixMode (GL_PROJECTION);
   glPopMatrix();
   glMatrixMode (GL_MODELVIEW);
@@ -257,10 +259,10 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
 {
   // Optimise: copy over area only
   (void)area;
-  glEnable (GL_TEXTURE_2D);
+  statecache->EnableState (GL_TEXTURE_2D);
   csGraphics3DOGLCommon::SetGLZBufferFlags (CS_ZBUF_NONE);
   csGraphics3DOGLCommon::SetupBlend (CS_FX_COPY, 0, false);
-  glDisable (GL_ALPHA_TEST);
+  statecache->DisableState (GL_ALPHA_TEST);
 
   csTxtCacheData *tex_data = (csTxtCacheData*) tex_mm->GetCacheData();
 
@@ -276,16 +278,16 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
     tex_data->Handle = 0;
     glGenTextures (1, &tex_data->Handle);*/
     // Texture is in tha cache, update texture directly.
-    glBindTexture (GL_TEXTURE_2D, tex_data->Handle);
+    statecache->SetTexture (GL_TEXTURE_2D, tex_data->Handle);
     //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
 /*    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-		     rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
+         rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-		     rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);*/
+         rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);*/
 
     glCopyTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, 0,0,width,height,0);
   }
@@ -298,27 +300,27 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
     {
 
       glReadPixels (0,0, width, height, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
-		    buffer);
+        buffer);
 
       csRGBpixel *dst = tex_0->get_image_data();
       uint16 bb = 8 - pfmt.BlueBits;
       uint16 gb = 8 - pfmt.GreenBits;
       uint16 rb = 8 - pfmt.RedBits;
       uint16 *src = (uint16*) buffer;
-	  int i;
+    int i;
       for (i = 0; i < width*height; i++, src++, dst++)
       {
-	dst->red = ((*src & pfmt.RedMask) >> pfmt.RedShift) << rb;
-	dst->green = ((*src & pfmt.GreenMask) >> pfmt.GreenShift) << gb;
-	dst->blue = ((*src & pfmt.BlueMask) >> pfmt.BlueShift) << bb;
+  dst->red = ((*src & pfmt.RedMask) >> pfmt.RedShift) << rb;
+  dst->green = ((*src & pfmt.GreenMask) >> pfmt.GreenShift) << gb;
+  dst->blue = ((*src & pfmt.BlueMask) >> pfmt.BlueShift) << bb;
       }
     }
     else
       glReadPixels (0, 0, width, height,
-		    GL_RGBA, GL_UNSIGNED_BYTE, tex_0->get_image_data());
+        GL_RGBA, GL_UNSIGNED_BYTE, tex_0->get_image_data());
 #else
     glReadPixels (0,0, width, height, tex_mm->SourceFormat (),
-		  tex_mm->SourceType (), tex_0->get_image_data ());
+      tex_mm->SourceType (), tex_0->get_image_data ());
 #endif
   }
 
@@ -390,12 +392,12 @@ csOpenGLProcBackBuffer2D::~csOpenGLProcBackBuffer2D ()
 void csOpenGLProcBackBuffer2D::Clear (int color)
 {
   CS_ASSERT (pfmt->PixelBytes != 1);
-  glDisable (GL_TEXTURE_2D);
+  csGraphics3DOGLCommon::statecache->DisableState (GL_TEXTURE_2D);
   csGraphics3DOGLCommon::SetGLZBufferFlags (CS_ZBUF_NONE);
   csGraphics3DOGLCommon::SetupBlend (CS_FX_COPY, 0, false);
   glColor3f (float (color & pfmt->RedMask  ) / pfmt->RedMask,
-	     float (color & pfmt->GreenMask) / pfmt->GreenMask,
-	     float (color & pfmt->BlueMask ) / pfmt->BlueMask);
+       float (color & pfmt->GreenMask) / pfmt->GreenMask,
+       float (color & pfmt->BlueMask ) / pfmt->BlueMask);
 
   glBegin (GL_QUADS);
   glVertex2i (0, 0);
@@ -406,14 +408,14 @@ void csOpenGLProcBackBuffer2D::Clear (int color)
 }
 
 void csOpenGLProcBackBuffer2D::DrawLine (float x1, float y1,
-					    float x2, float y2, int color)
+              float x2, float y2, int color)
 {
   g2d->DrawLine (x1, frame_height - height + y1,
-		 x2, frame_height - height + y2, color);
+     x2, frame_height - height + y2, color);
 }
 
 void csOpenGLProcBackBuffer2D::DrawBox (int x, int y, int w, int h,
-					   int color)
+             int color)
 {
   g2d->DrawBox (x, frame_height - height + y, w, h, color);
 }

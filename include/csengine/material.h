@@ -25,9 +25,11 @@
 #include "csutil/nobjvec.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
+#include "ivideo/effects/efdef.h"
 
 struct iTextureWrapper;
 struct iTextureManager;
+
 
 
 SCF_VERSION (csMaterialWrapper, 0, 0, 1);
@@ -55,6 +57,9 @@ private:
   float ambient;
   /// The reflectiveness of the material
   float reflection;
+  
+  /// The effect associated with this material
+  iEffectDefinition* effect;
 
 public:
   /**
@@ -96,10 +101,14 @@ public:
 
   /// Add a texture layer (currently only one supported).
   void AddTextureLayer (iTextureWrapper* txtwrap, uint mode,
-      	float uscale, float vscale, float ushift, float vshift);
+        float uscale, float vscale, float ushift, float vshift);
 
   //--------------------- iMaterial implementation ---------------------
 
+  /// Set effect.
+  virtual void SetEffect (iEffectDefinition *ed);
+  /// Get effect.
+  virtual iEffectDefinition *GetEffect ();
   /// Get texture.
   virtual iTextureHandle* GetTexture ();
   /// Get num texture layers.

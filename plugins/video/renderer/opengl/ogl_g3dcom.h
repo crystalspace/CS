@@ -43,6 +43,10 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
+#include "video/canvas/openglcommon/iglstates.h"
+
+#include "ivideo/effects/efserver.h"
+#include "ivideo/effects/efclient.h"
 
 struct iGraphics2D;
 class OpenGLTextureCache;
@@ -83,15 +87,15 @@ public:
   // Vertices.
   int num_vertices;
   int max_vertices;
-  GLfloat* glverts;	// 4*max_vertices
-  GLfloat* gltxt;	// 2*max_vertices
-  GLfloat* glcol;	// 4*max_vertices
-  GLfloat* layer_gltxt;	// 2*max_vertices
+  GLfloat* glverts; // 4*max_vertices
+  GLfloat* gltxt; // 2*max_vertices
+  GLfloat* glcol; // 4*max_vertices
+  GLfloat* layer_gltxt; // 2*max_vertices
 
   // Triangles.
   int num_triangles;
   int max_triangles;
-  int* tris;		// 3*max_triangles
+  int* tris;    // 3*max_triangles
 
   /// Add some vertices. Return index of the added vertices.
   int AddVertices (int num);
@@ -110,13 +114,13 @@ public:
   GLfloat* GetLayerGLTxt (int idx) { return &layer_gltxt[idx<<1]; }
 
   csPolyQueue () :
-	mat_handle (NULL), mixmode (~0), z_buf_mode (CS_ZBUF_NONE),
-  	flat_color_r (0), flat_color_g (0), flat_color_b (0),
+  mat_handle (NULL), mixmode (~0), z_buf_mode (CS_ZBUF_NONE),
+    flat_color_r (0), flat_color_g (0), flat_color_b (0),
 
-	num_vertices (0), max_vertices (0),
-	glverts (NULL), gltxt (NULL), glcol (NULL), layer_gltxt (NULL),
-	num_triangles (0), max_triangles (0),
-	tris (NULL) { }
+  num_vertices (0), max_vertices (0),
+  glverts (NULL), gltxt (NULL), glcol (NULL), layer_gltxt (NULL),
+  num_triangles (0), max_triangles (0),
+  tris (NULL) { }
   ~csPolyQueue ()
   {
     delete[] glverts;
@@ -138,14 +142,14 @@ public:
   // Vertices.
   int num_vertices;
   int max_vertices;
-  GLfloat* glverts;	// 4*max_vertices
-  GLfloat* fog_color;	// 3*max_vertices
-  GLfloat* fog_txt;	// 2*max_vertices
+  GLfloat* glverts; // 4*max_vertices
+  GLfloat* fog_color; // 3*max_vertices
+  GLfloat* fog_txt; // 2*max_vertices
 
   // Triangles.
   int num_triangles;
   int max_triangles;
-  int* tris;		// 3*max_triangles
+  int* tris;    // 3*max_triangles
 
   /// Add some vertices. Return index of the added vertices.
   int AddVertices (int num);
@@ -163,11 +167,11 @@ public:
   GLfloat* GetFogTxt (int idx) { return &fog_txt[idx<<1]; }
 
   csFogQueue () :
-	z_buf_mode (CS_ZBUF_NONE),
-	num_vertices (0), max_vertices (0),
-	glverts (NULL), fog_color (NULL), fog_txt (NULL),
-	num_triangles (0), max_triangles (0),
-	tris (NULL) { }
+  z_buf_mode (CS_ZBUF_NONE),
+  num_vertices (0), max_vertices (0),
+  glverts (NULL), fog_color (NULL), fog_txt (NULL),
+  num_triangles (0), max_triangles (0),
+  tris (NULL) { }
   ~csFogQueue ()
   {
     delete[] glverts;
@@ -177,18 +181,21 @@ public:
   }
 };
 
-#define OPENGL_KEYCOLOR_MIN_ALPHA	0.5f // alphafunc is disabled below this
+#define OPENGL_KEYCOLOR_MIN_ALPHA 0.5f // alphafunc is disabled below this
 
-#define OPENGL_CLIP_AUTO		'a'	// Used for auto-detection.
-#define OPENGL_CLIP_NONE		'n'
-#define OPENGL_CLIP_ZBUF		'z'
-#define OPENGL_CLIP_STENCIL		's'
-#define OPENGL_CLIP_PLANES		'p'
-#define OPENGL_CLIP_SOFTWARE		'0'
-#define OPENGL_CLIP_LAZY_NONE		'N'
-#define OPENGL_CLIP_LAZY_ZBUF		'Z'
-#define OPENGL_CLIP_LAZY_STENCIL	'S'
-#define OPENGL_CLIP_LAZY_PLANES		'P'
+#define OPENGL_CLIP_AUTO    'a' // Used for auto-detection.
+#define OPENGL_CLIP_NONE    'n'
+#define OPENGL_CLIP_ZBUF    'z'
+#define OPENGL_CLIP_STENCIL   's'
+#define OPENGL_CLIP_PLANES    'p'
+#define OPENGL_CLIP_SOFTWARE    '0'
+#define OPENGL_CLIP_LAZY_NONE   'N'
+#define OPENGL_CLIP_LAZY_ZBUF   'Z'
+#define OPENGL_CLIP_LAZY_STENCIL  'S'
+#define OPENGL_CLIP_LAZY_PLANES   'P'
+
+#define EFFECTFLAG_RUINSZCLIPPING 1
+#define EFFECTFLAG_RUINSSCLIPPING 2
 
 /**
  * This is an additional blend mode that is used to get the best detected
@@ -223,9 +230,11 @@ class csGraphics3DOGLCommon : public iGraphics3D
 public:
   static csGraphics3DOGLCommon* ogl_g3d;
 
+  static iGLStateCache* statecache;
+
   /**
    * Set proper GL flags based on ZBufMode.
-   * This is the ONLY legal way to set the z-buffer flags!
+   * This is no longer the only legal way to set the z-buffer flags
    */
   static void SetGLZBufferFlags (csZBufMode flags);
 
@@ -267,6 +276,21 @@ public:
   static void SetMirrorMode (bool mirror);
 
 private:
+
+  iEffectServer* effectserver;
+
+
+  // [lightmap no/yes ][fog 0/1][mixmode]
+  iEffectDefinition* StockEffects[2][2][9];
+
+  /// Inits stock effects
+  void InitStockEffects();
+
+  csStringID GLBlendToString( GLenum blend );
+
+  /// Get a technique corresponding to a given mesh
+  iEffectTechnique* GetStockTechnique( G3DTriangleMesh& mesh );
+
   /**
    * Return true if two z-buf modes are compatible.
    * Two z-buf modes can be compatible even if they are different
@@ -306,9 +330,9 @@ private:
     bool transform,
     bool mirror,
     bool exact_clipping,
-    bool plane_clipping,	// Clip to the near plane
-    bool z_plane_clipping,	// Clip to the z plane
-    bool frustum_clipping);	// Clip to the frustum planes
+    bool plane_clipping,  // Clip to the near plane
+    bool z_plane_clipping,  // Clip to the z plane
+    bool frustum_clipping); // Clip to the frustum planes
 
   /**
    * Given information from a mesh, clip the mesh to the frustum.
@@ -441,7 +465,7 @@ private:
    * is assumed).
    */
   static void DebugDrawElements (iGraphics2D* g2d, int num_tri3, int* tris,
-  	GLfloat* verts, int color, bool coords3d, bool transformed);
+    GLfloat* verts, int color, bool coords3d, bool transformed);
 
 protected:
   friend class csOpenGLHalo;
@@ -594,7 +618,6 @@ protected:
   float M, N, O;
   float J1, J2, J3, K1, K2, K3;
 
-
   // declare all the extension function pointers
 # define _CSGLEXT_
 # define CSGL_FOR_ALL
@@ -607,7 +630,9 @@ static fType fName
   static bool ARB_multitexture;
   static bool ARB_texture_compression;
   static bool NV_vertex_array_range;
+  static bool NV_vertex_program;
   static bool ARB_texture_env_combine;
+  static bool ARB_texture_env_dot3;
   static bool SGIS_generate_mipmap;
 
 public:
@@ -691,7 +716,7 @@ public:
 
   /// Draw a line in camera space.
   virtual void DrawLine (const csVector3& v1, const csVector3& v2,
-  	float fov, int color);
+    float fov, int color);
 
   /// Draw a polygon with special effects.
   virtual void DrawPolygonFX (G3DPolygonDPFX& poly);
@@ -794,6 +819,7 @@ public:
 
   /// Draw a triangle mesh.
   virtual void DrawTriangleMesh (G3DTriangleMesh& mesh);
+  virtual void OldDrawTriangleMesh (G3DTriangleMesh& mesh);
   /**
    * Debug version that draws outlines only. Is automatically
    * called by DrawTriangleMesh if needed.
@@ -833,9 +859,9 @@ public:
    * will have been added before the first front-facing polygon.
    * fogtype can be:
    * <ul>
-   *	<li>CS_FOG_FRONT:	a front-facing polygon
-   *	<li>CS_FOG_BACK:	a back-facing polygon
-   *	<li>CS_FOG_VIEW:	the view-plane
+   *  <li>CS_FOG_FRONT: a front-facing polygon
+   *  <li>CS_FOG_BACK:  a back-facing polygon
+   *  <li>CS_FOG_VIEW:  the view-plane
    * </ul>
    * On the OpenGL driver this function is not used.  Instead the
    * fog is drawn as an additional texture on each polygon that
@@ -896,6 +922,16 @@ public:
    * anything.
    */
   void DrawPolygonZFill (G3DPolygonDP &poly);
+
+  /// Validate a technique
+  bool Validate (iEffectTechnique* technique);
+
+  struct eiEffectClient : public iEffectClient
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DOGLCommon);
+    virtual bool Validate (iEffectTechnique* technique)
+    { return scfParent->Validate (technique); }
+  } scfiEffectClient;
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DOGLCommon);

@@ -22,9 +22,10 @@
 #include <stdio.h>
 
 #include "cssysdef.h"
-#include "video/canvas/common/graph2d.h"
 #include "csutil/util.h"
 #include "qint.h"
+#include "video/canvas/common/graph2d.h"
+#include "video/canvas/openglcommon/iglstates.h"
 
 #include "gl2d_font.h"
 
@@ -110,8 +111,12 @@ void FontDeleteNotify::BeforeDelete (iFont *font)
   This->CacheFree (font);
 }
 
-GLFontCache::GLFontCache (iFontServer *fs) : FontCache (8, 8)
+GLFontCache::GLFontCache (iFontServer *fs, iGraphics2D *g) : FontCache (8, 8)
 {
+  g2d = g;
+  SCF_INC_REF( g2d );
+  g2d->PerformExtension( "getstatecache", &statecache );
+
   int i = 0;
   delete_callback = new FontDeleteNotify ();
   ((FontDeleteNotify*)delete_callback)->glyphset = this;
@@ -128,6 +133,8 @@ GLFontCache::~GLFontCache ()
   for (i = 0; i < FontCache.Length (); i++)
     FontCache.Get (i)->font->RemoveDeleteCallback (delete_callback);
   delete_callback->DecRef ();
+
+  SCF_DEC_REF( g2d );
 }
 
 GLGlyphSet *GLFontCache::CacheFont (iFont *font)
@@ -206,7 +213,7 @@ GLGlyphSet *GLFontCache::CacheFont (iFont *font)
         }
         // set up the texture info
         memset (fontbitmapdata, 0, fontbitmapsize);
-        glBindTexture (GL_TEXTURE_2D, nTexNames [nCurrentTex]);
+        statecache->SetTexture (GL_TEXTURE_2D, nTexNames [nCurrentTex]);
         glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -226,7 +233,7 @@ GLGlyphSet *GLFontCache::CacheFont (iFont *font)
     // grab bits from the source, and stuff them into the font bitmap
     // one at a time
     uint8 currentsourcebyte = *fontsourcebits;
-	int pixelx, pixely;
+  int pixelx, pixely;
     for (pixely = 0; pixely < maxheight; pixely++)
     {
       for (pixelx = 0; pixelx < width; pixelx++)
@@ -322,12 +329,12 @@ void GLFontCache::Write (iFont *font, int x, int y, const char *text)
   glPushMatrix ();
   glTranslatef (x, y, 0);
 
-  glEnable (GL_TEXTURE_2D);
+  statecache->EnableState (GL_TEXTURE_2D);
   glShadeModel (GL_FLAT);
   glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-  glEnable (GL_ALPHA_TEST);
-  glAlphaFunc (GL_EQUAL, 1.0);
+  statecache->EnableState (GL_ALPHA_TEST);
+  statecache->SetAlphaFunc (GL_EQUAL, 1.0);
 
   float texheight = gs->texheight;
 
@@ -348,7 +355,7 @@ void GLFontCache::Write (iFont *font, int x, int y, const char *text)
     {
       glEnd ();
       hLastTexture = hTexture;
-      glBindTexture (GL_TEXTURE_2D, hTexture);
+      statecache->SetTexture (GL_TEXTURE_2D, hTexture);
       glBegin (GL_QUADS);
     }
     // the texture coordinates must point to the correct character
@@ -375,7 +382,7 @@ void GLFontCache::Write (iFont *font, int x, int y, const char *text)
 
   glEnd ();
 
-  glDisable (GL_ALPHA_TEST);
+  statecache->DisableState (GL_ALPHA_TEST);
   glPopMatrix ();
 }
 

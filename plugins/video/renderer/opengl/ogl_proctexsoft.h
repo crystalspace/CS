@@ -179,7 +179,7 @@ class csOpenGLProcSoftware : public iGraphics3D
   virtual void DrawPolygon (G3DPolygonDP& poly);
   virtual void DrawPolygonDebug (G3DPolygonDP& poly);
   virtual void DrawLine (const csVector3& v1, const csVector3& v2,
-			 float fov, int color);
+       float fov, int color);
   virtual void DrawPolygonFX (G3DPolygonDPFX& poly);
   virtual void DrawTriangleMesh (G3DTriangleMesh& mesh);
   virtual void DrawPolygonMesh (G3DPolygonMesh& mesh);
@@ -223,7 +223,7 @@ class csOpenGLProcSoftware : public iGraphics3D
   virtual iTextureManager *GetTextureManager ();
   virtual iVertexBufferManager* GetVertexBufferManager ();
   virtual iHalo *CreateHalo (float iR, float iG, float iB,
-			     unsigned char *iAlpha, int iWidth, int iHeight);
+           unsigned char *iAlpha, int iWidth, int iHeight);
   virtual void DrawPixmap (iTextureHandle*, int sx, int sy, int sw, int sh,
     int tx, int ty, int tw, int th, uint8 Alpha);
 
