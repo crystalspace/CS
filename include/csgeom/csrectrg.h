@@ -72,9 +72,9 @@ public:
   ~csRectRegion();
 
   /// Add a rect to this region; may cause unions, but will not adjance (see csRect).
-  void Include(csRect &rect);
+  void Include(const csRect &rect);
   /// Exclude a rect from this region; may cause splitting. NOTE: broken!!!
-  void Exclude(csRect &rect);
+  void Exclude(const csRect &rect);
   /// Clips everything in the region to the borders given.
   void ClipTo(csRect &clip);
 
