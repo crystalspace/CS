@@ -23,25 +23,22 @@
 #include "csextern.h"
 
 /**
- * A lightweight template double-linked list.
- * This is VERY lightweight and not tested very well, as it was writen for
- * one single purpose, and it has not been extended to be more general.
+ * A lightweight double-linked list template.  Copies the elements into the
+ * list for storages.  Assumes that type T supports copy construction.
  */
 template <class T>
 class csList
 {
 protected:
   /**
-   * Template which describs the data stored in the linked list
-   * For example a list of ints uses csListElement<int>
+   * Template which describes the data stored in the linked list
+   * For example a list of ints uses csListElement<int>.
    */
   struct csListElement
   {
     /// Use specified data
-    csListElement(const T& d, csListElement* newnext,
-			      csListElement* newprev)
-      : next(newnext), prev(newprev), data(d)
-    {}
+    csListElement(const T& d, csListElement* newnext, csListElement* newprev) :
+      next(newnext), prev(newprev), data(d) {}
 
     /// Next element in list. If this is the last one, then next is 0
     csListElement* next;
@@ -49,7 +46,7 @@ protected:
     /// Previous element in list. If this is the first one, prev is 0
     csListElement* prev;
 
-    /// Accual data
+    /// Stored data
     T data;
   };
 
@@ -58,9 +55,7 @@ protected:
 
 public:
   /// Default constructor
-  csList()
-    : head(0), tail(0)
-  {}
+  csList() : head(0), tail(0) {}
 
   /// Copy constructor
   csList(const csList &other);
@@ -76,10 +71,10 @@ public:
     /// Constructor
     Iterator() : ptr(0)
     { }
-    /// Copy Constructor
+    /// Copy constructor
     Iterator(const Iterator& other)
     { ptr = other.ptr; }
-    /// Another Copy Constructor
+    /// Constructor.
     Iterator(const csList<T> &list, bool reverse = false)
     {
       reversed = reverse;
@@ -88,7 +83,7 @@ public:
     }
     /// Assignment operator
     const Iterator& operator= (const Iterator& other)
-    { ptr = other.ptr; return *this; }
+    { ptr = other.ptr; reversed = other.reversed; return *this; }
     /// Test if the Iterator is set to a valid element.
     bool HasCurrent() const
     { return ptr != 0; }
@@ -126,30 +121,30 @@ public:
     /// Advance to next element and return it.
     T* Next ()
     {
-      T* rc = *this;
-      ptr = ptr->next;
-      return rc;
+      if (ptr != 0)
+        ptr = ptr->next;
+      return *this;
     }
     /// Backup to previous element and return it.
     T* Prev()
     {
-      T* rc = *this;
-      ptr = ptr->prev;
-      return rc;
+      if (ptr != 0)
+        ptr = ptr->prev;
+      return *this;
     }
     /// Advance to next element and return it.
     Iterator& operator++()
     {
-      T* rc = *this;
-      ptr = ptr->next;
-      return rc;
+      if (ptr != 0)
+        ptr = ptr->next;
+      return *this;
     }
     /// Backup to previous element and return it.
     Iterator& operator--()
     {
-      T* rc = *this;
-      ptr = ptr->prev;
-      return rc;
+      if (ptr != 0)
+        ptr = ptr->prev;
+      return *this;
     }
   protected:
     friend class csList<T>;
@@ -207,9 +202,10 @@ public:
     return true;
   }
   
-  bool IsEmpty ()
+  bool IsEmpty () const
   {
-    return (head==0) && (head==0);
+    CS_ASSERT((head == 0 && tail == 0) || (head !=0 && tail != 0));
+    return head == 0;
   }
 
 private:
@@ -222,20 +218,20 @@ template <class T>
 inline csList<T>::csList(const csList<T> &other) : head(0), tail(0)
 {
   csListElement* e = other.head;
-  while( e != 0)
+  while (e != 0)
   {
     PushBack (e->data);
     e = e->next;
   }
 }
 
-/// Assignment, erase and deep-copy
+/// Assignment, deep-copy
 template <class T>
 inline csList<T>& csList<T>::operator= (const csList<T> &other)
 {
   DeleteAll ();
   csListElement* e = other.head;
-  while(e != 0)
+  while (e != 0)
   {
     PushBack (e->data);
     e = e->next;
@@ -243,12 +239,12 @@ inline csList<T>& csList<T>::operator= (const csList<T> &other)
   return *this;
 }
 
-/// Delete all elements, do not touche the raw data
+/// Delete all elements
 template <class T>
 inline void csList<T>::DeleteAll ()
 {
   csListElement *cur = head, *next = 0;
-  while(cur != 0)
+  while (cur != 0)
   {
     next = cur->next;
     delete cur;
@@ -284,7 +280,7 @@ inline typename csList<T>::Iterator csList<T>::PushFront (const T& item)
 }
 
 template <class T>
-inline void csList<T>::InsertBefore (Iterator &it, const T& item)
+inline void csList<T>::InsertAfter (Iterator &it, const T& item)
 {
   csListElement* el = it.ptr;
   csListElement* next = el->next;
@@ -298,7 +294,7 @@ inline void csList<T>::InsertBefore (Iterator &it, const T& item)
 }
 
 template <class T>
-inline void csList<T>::InsertAfter (Iterator &it, const T& item)
+inline void csList<T>::InsertBefore (Iterator &it, const T& item)
 {
   csListElement* el = it.ptr;
   csListElement* next = el;
@@ -318,7 +314,7 @@ inline void csList<T>::Delete (Iterator &it)
   if (!el)
     return;
 
-  // Advance the iterator so we can delete the data its using
+  // Advance the iterator so we can delete the data it's using
   if (it.IsReverse())
       --it;
   else
