@@ -52,6 +52,9 @@ chronological order.
 	    - Converted over to new build style where generated resources are
 	      placed in a cocoa2d-specific build directory, rather than directly
 	      in $(OUT).
+	- Eric Sunshine fixed bugs in cgdriver2d.mak and glosx2d.mak where they
+	  were prefixing one extra $(SRCDIR)/ to several of the computed path
+	  containers.
 20-Oct-2003
         - Philip Wyett added 'joytest' to CS/ root .cvsignore file.
 	- Jorrit added thing.cfg.

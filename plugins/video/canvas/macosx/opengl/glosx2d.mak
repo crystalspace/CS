@@ -53,6 +53,10 @@ endif # ifeq ($(MAKESECTION),defines)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
+vpath %.cpp $(SRCDIR)/plugins/video/canvas/macosx/common
+vpath %.m   $(SRCDIR)/plugins/video/canvas/macosx/common
+vpath %.mm  $(SRCDIR)/plugins/video/canvas/macosx/common
+
 ifeq ($(USE_PLUGINS),yes)
   GLOSX2D = $(OUTDLL)/glosx2d$(DLL)
   LIB.GLOSX2D = $(foreach d,$(DEP.GLOSX2D),$($d.LIB))
@@ -65,11 +69,11 @@ else
 endif
 
 INF.GLOSX2D = $(SRCDIR)/plugins/video/canvas/macosx/opengl/glosx2d.csplugin
-INC.GLOSX2D = $(wildcard $(addprefix $(SRCDIR)/,$(INC.COMMON.DRV2D) $(INC.COMMON.DRV2D.OPENGL) \
-  $(addsuffix /*.h,$(MACOSX.SOURCE_GLOSX2D_PATHS))))
-SRC.GLOSX2D = $(wildcard $(addprefix $(SRCDIR)/,$(SRC.COMMON.DRV2D) $(SRC.COMMON.DRV2D.OPENGL) \
+INC.GLOSX2D = $(wildcard $(addprefix $(SRCDIR)/,$(INC.COMMON.DRV2D) $(INC.COMMON.DRV2D.OPENGL)) \
+  $(addsuffix /*.h,$(MACOSX.SOURCE_GLOSX2D_PATHS)))
+SRC.GLOSX2D = $(wildcard $(addprefix $(SRCDIR)/,$(SRC.COMMON.DRV2D) $(SRC.COMMON.DRV2D.OPENGL)) \
   $(addsuffix /*.cpp,$(MACOSX.SOURCE_GLOSX2D_PATHS)) \
-  $(addsuffix /*.m,$(MACOSX.SOURCE_GLOSX2D_PATHS))))
+  $(addsuffix /*.m,$(MACOSX.SOURCE_GLOSX2D_PATHS)))
 OBJ.GLOSX2D = $(addprefix $(OUT)/, \
   $(notdir $(subst .cpp,$O,$(SRC.GLOSX2D:.m=$O))))
 DEP.GLOSX2D = CSGEOM CSUTIL

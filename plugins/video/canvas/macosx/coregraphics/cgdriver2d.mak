@@ -52,9 +52,9 @@ endif # ifeq ($(MAKESECTION),defines)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp $(SRCDIR)/$(MACOSX.SOURCE_CG2D_PATHS)
-vpath %.m   $(SRCDIR)/$(MACOSX.SOURCE_CG2D_PATHS)
-vpath %.mm  $(SRCDIR)/$(MACOSX.SOURCE_CG2D_PATHS)
+vpath %.cpp $(MACOSX.SOURCE_CG2D_PATHS)
+vpath %.m   $(MACOSX.SOURCE_CG2D_PATHS)
+vpath %.mm  $(MACOSX.SOURCE_CG2D_PATHS)
 
 ifeq ($(USE_PLUGINS),yes)
   CGDRIVER2D = $(OUTDLL)/cgdriver2d$(DLL)
@@ -67,12 +67,13 @@ else
   TO_INSTALL.STATIC_LIBS += $(CGDRIVER2D)
 endif
 
-INF.CGDRIVER2D = $(SRCDIR)/plugins/video/canvas/macosx/coregraphics/cgdriver2d.csplugin
-INC.CGDRIVER2D = $(wildcard $(addprefix $(SRCDIR)/,$(INC.COMMON.DRV2D) \
-  $(addsuffix /*.h,$(MACOSX.SOURCE_CG2D_PATHS))))
-SRC.CGDRIVER2D = $(wildcard $(addprefix $(SRCDIR)/,$(SRC.COMMON.DRV2D) \
+INF.CGDRIVER2D = \
+  $(SRCDIR)/plugins/video/canvas/macosx/coregraphics/cgdriver2d.csplugin
+INC.CGDRIVER2D = $(wildcard $(addprefix $(SRCDIR)/,$(INC.COMMON.DRV2D)) \
+  $(addsuffix /*.h,$(MACOSX.SOURCE_CG2D_PATHS)))
+SRC.CGDRIVER2D = $(wildcard $(addprefix $(SRCDIR)/,$(SRC.COMMON.DRV2D)) \
   $(addsuffix /*.cpp,$(MACOSX.SOURCE_CG2D_PATHS)) \
-  $(addsuffix /*.m,$(MACOSX.SOURCE_CG2D_PATHS))))
+  $(addsuffix /*.m,$(MACOSX.SOURCE_CG2D_PATHS)))
 OBJ.CGDRIVER2D = $(addprefix $(OUT)/, \
   $(notdir $(subst .cpp,$O,$(SRC.CGDRIVER2D:.m=$O))))
 DEP.CGDRIVER2D = CSUTIL
@@ -91,7 +92,8 @@ $(CGDRIVER2D): $(OBJ.CGDRIVER2D) $(LIB.CGDRIVER2D)
 
 clean: cgdriver2dclean
 cgdriver2dclean:
-	-$(RMDIR) $(CGDRIVER2D) $(OBJ.CGDRIVER2D) $(OUTDLL)/$(notdir $(INF.CGDRIVER2D))
+	-$(RMDIR) $(CGDRIVER2D) $(OBJ.CGDRIVER2D) \
+	$(OUTDLL)/$(notdir $(INF.CGDRIVER2D))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/cgdriver2d.dep
