@@ -3202,9 +3202,17 @@ bool csGraphics3DSoftwareCommon::SetRenderState (G3D_RENDERSTATEOPTION op,
       return false;
 #endif
     case G3DRENDERSTATE_INTERLACINGENABLE:
-      if (!G2D->DoubleBuffer (!value))
-        return false;
-      do_interlaced = value ? 0 : -1;
+      if (!value)
+      {
+	G2D->DoubleBuffer (true);
+	do_interlaced = -1;
+      }
+      else
+      {
+        if (!G2D->DoubleBuffer (false))
+          return false;
+        do_interlaced = 0;
+      }
       break;
     case G3DRENDERSTATE_INTERPOLATIONSTEP:
       Scan.InterpolMode = value;

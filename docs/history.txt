@@ -88,6 +88,8 @@ The history order is reversed so that new features are at the top.
 	  NASM flags, thus preventing NASM assembly files from appearing in
 	  generated DSP files even if the environment which is generating the
 	  DSP files has NASM enabled.
+	- Fixed a bug with G3DRENDERSTATE_INTERLACINGENABLE and software
+	  renderer. The setting was not correctly processed.
 	- Eric Sunshine eliminated a compilation warning in walkcmd.cpp
 	  regarding "computed value not used."
 10-Jun-2001
