@@ -434,10 +434,11 @@ protected:
   csVector3 accel;
   csVector3* part_pos;
   csVector3* part_speed;
+  float *part_age;
   float speed, opening, azimuth, elevation, fall_time;
-  int next_restart; // index 
   float time_left; // from previous update
 
+  int FindOldest();
   void RestartParticle(int index, float pre_move);
 
 public:

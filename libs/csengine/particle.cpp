@@ -592,6 +592,7 @@ csFountainParticleSystem :: csFountainParticleSystem(csObject* theParent,
 {
   part_pos = new csVector3[number];
   part_speed = new csVector3[number];
+  part_age = new float[number];
   origin = spot;
   csFountainParticleSystem::accel = accel;
   csFountainParticleSystem::fall_time = fall_time;
@@ -607,7 +608,6 @@ csFountainParticleSystem :: csFountainParticleSystem(csObject* theParent,
     GetParticle(i)->SetMixmode(mixmode);
     RestartParticle(i, (fall_time / float(number)) * float(number-i));
   }
-  next_restart = 0; // first one is now the oldest one
   time_left = 0.0;
 }
 
@@ -615,6 +615,7 @@ csFountainParticleSystem :: ~csFountainParticleSystem()
 {
   delete[] part_pos;
   delete[] part_speed;
+  delete[] part_age;
 }
 
 
@@ -646,10 +647,24 @@ void csFountainParticleSystem :: RestartParticle(int index, float pre_move)
   // pre move a bit (in a perfect arc)
   part_speed[index] += accel * pre_move;
   part_pos[index] += part_speed[index] * pre_move;
+  part_age[index] = pre_move;
 
   GetParticle(index)->SetPosition(part_pos[index]);
 }
 
+
+int csFountainParticleSystem :: FindOldest()
+{
+  float max_age = 0.0;
+  int index = 0;
+  for(int i=0; i<amt; i++)
+    if(part_age[i] > max_age)
+    {
+      max_age = part_age[i];
+      index = i;
+    }
+  return index;
+}
 
 void csFountainParticleSystem :: Update(time_t elapsed_time)
 {
@@ -662,6 +677,7 @@ void csFountainParticleSystem :: Update(time_t elapsed_time)
     part_speed[i] += accel * delta_t;
     part_pos[i] += part_speed[i] * delta_t;
     GetParticle(i)->SetPosition (part_pos[i]); 
+    part_age[i] += delta_t;
   }
 
   /// restart a number of particles
@@ -669,8 +685,7 @@ void csFountainParticleSystem :: Update(time_t elapsed_time)
   float todo_time = elapsed_time + time_left;
   while(todo_time > intersperse)
   {
-    RestartParticle(next_restart, todo_time);
-    next_restart++;
+    RestartParticle(FindOldest(), todo_time);
     todo_time -= intersperse;
   }
   time_left = todo_time;
