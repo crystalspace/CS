@@ -159,9 +159,10 @@ protected:
   /**
    * Test a number of polygons against the c-buffer and insert them to the
    * c-buffer if visible and also add them to a queue.
+   * If 'pvs' is true then the PVS is used (polygon->IsVisible()).
    */
   void* TestQueuePolygonArray (csPolygonInt** polygon, int num, csRenderView* d,
-  	csPolygon2DQueue* poly_queue);
+  	csPolygon2DQueue* poly_queue, bool pvs);
 
 private:
   /// Fog information.

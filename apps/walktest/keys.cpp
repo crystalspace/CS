@@ -1218,13 +1218,21 @@ static bool CommandHandler (char *cmd, char *arg)
   }
   else if (!strcasecmp (cmd, "debug2"))
   {
-#   if 0
+#   if 1
+    if (Sys->world->IsPVS ())
+    {
+      Sys->world->DisablePVS ();
+      Sys->Printf (MSG_CONSOLE, "Disabled PVS.\n");
+    }
+    else
+    {
+      Sys->world->EnablePVS ();
+      Sys->Printf (MSG_CONSOLE, "Enabled PVS.\n");
+    }
+#   else
     extern bool do_covtree_dump;
     do_covtree_dump = !do_covtree_dump;
-//#   else
-    extern bool debug_pvs;
-    debug_pvs = !debug_pvs;
-#   endif
+#endif
     //Sys->Printf (MSG_CONSOLE, "No debug2 implementation in this version.\n");
   }
   else if (!strcasecmp (cmd, "strafe_left"))

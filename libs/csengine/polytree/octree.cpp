@@ -23,6 +23,9 @@
 #include "csengine/treeobj.h"
 #include "csengine/sector.h"
 #include "csengine/world.h"
+#include "csengine/covcube.h"
+#include "csengine/polygon.h"
+#include "csengine/thing.h"
 #include "isystem.h"
 
 //---------------------------------------------------------------------------
@@ -272,6 +275,21 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
 #elif 0
   // @@@ Choose while trying to maximize the area of solid space
   // This will improve occlusion!
+  // One way to do this:
+  //    - Consider each plane (x,y,z) seperatelly.
+  //    - Try several values for each plane.
+  //    - Intersect plane with all polygons: resulting in set of lines.
+  //    - Possibly organize lines in 2D BSP or beam tree.
+  //    - Take a few samples on the plane and for every sample
+  //      we draw four lines (to above, down, right, and left). We
+  //      intersect every line with the nearest line from the intersections
+  //      and calculate the distance. Also by checking the normal of the
+  //      line we intersect with we can see if we are in solid or open
+  //      space. The four distances are used to calculate an approx
+  //      area of solid and open space. We add all solid space areas and
+  //      subtract all open space areas and so we have a total solid space
+  //      approx.
+  //    - Take the plane with most solid space.
 #else
   for (i = 0 ; i < 500 ; i++)
   {
@@ -302,6 +320,7 @@ void csOctree::Build (csOctreeNode* node, const csVector3& bmin,
 
   if (num == 0)
   {
+    node->leaf = true;
     return;
   }
 
@@ -311,6 +330,7 @@ void csOctree::Build (csOctreeNode* node, const csVector3& bmin,
     CHK (bsp = new csBspTree (sector, mode));
     bsp->Build (polygons, num);
     node->SetMiniBsp (bsp);
+    node->leaf = true;
     return;
   }
 
@@ -508,6 +528,165 @@ void csOctree::MarkVisibleFromPVS (const csVector3& pos)
     csOctreeVisible& ovis = pvs[i];
     ovis.GetOctreeNode ()->MarkVisible ();
   }
+}
+
+struct PVSBuildData
+{
+  csCovcube* cube;
+  csVector3 center;
+};
+
+void* MarkPolygonsVisiblePVS (csSector*,
+	csPolygonInt** polygon, int num, void* data)
+{
+  PVSBuildData* pvsdata = (PVSBuildData*)data;
+  csCovcube* cube = pvsdata->cube;
+  const csVector3& center = pvsdata->center;
+  int i, j;
+  for (i = 0 ; i < num ; i++)
+  {
+    if (polygon[i]->GetType () != 1) continue;
+    csPolygon3D* p = (csPolygon3D*)polygon[i];
+
+    csVector3 poly[50];	// @@@ HARDCODED! BAD!
+    for (j = 0 ; j < p->GetNumVertices () ; j++)
+      poly[j] = p->Vwor (j)-center;
+
+    bool vis = cube->InsertPolygon (poly, p->GetNumVertices ());
+    if (vis) p->MarkVisible (); //@@@ Backface culling?
+  }
+  return NULL;
+}
+
+bool CullOctreeNodePVS (csPolygonTree* tree, csPolygonTreeNode* node,
+	const csVector3& /*pos*/, void* data)
+{
+  if (!node) return false;
+  if (node->Type () != NODE_OCTREE) return true;
+
+  csOctree* otree = (csOctree*)tree;
+  csOctreeNode* onode = (csOctreeNode*)node;
+
+  PVSBuildData* pvsdata = (PVSBuildData*)data;
+  csCovcube* cube = pvsdata->cube;
+  const csVector3& center = pvsdata->center;
+
+  // Test node against coverage mask cube.
+  csVector3 outline[6];
+  int num_outline;
+  otree->GetConvexOutline (onode, center, outline, num_outline);
+  if (num_outline > 0)
+  {
+    int i;
+    for (i = 0 ; i < num_outline ; i++)
+      outline[i] -= center;
+    if (!cube->TestPolygon (outline, num_outline)) return false;
+  }
+  onode->MarkVisible ();
+  return true;
+}
+
+void csOctree::AddToPVS (csPVS& pvs, csOctreeNode* node)
+{
+  if (!node) return;
+  if (!node->IsVisible ()) return;
+
+  int new_pvs_idx = pvs.GetLimit ();
+  pvs.SetLimit (new_pvs_idx+1);
+  pvs[new_pvs_idx].SetOctreeNode (node);
+
+  if (node->GetMiniBsp ())
+  {
+    csBspTree* bsp = node->GetMiniBsp ();
+    bsp->AddToPVS (pvs[new_pvs_idx].GetPolygons ());
+  }
+
+  int i;
+  for (i = 0 ; i < 8 ; i++)
+    AddToPVS (pvs, (csOctreeNode*)node->children[i]);
+}
+
+void csOctree::BuildPVSForLeaf (csThing* thing,
+	csOctreeNode* leaf, csCovcube* cube)
+{
+printf ("*"); fflush (stdout);
+  // Here we simulate a limited rendering on a 2D culler
+  // cube. This is used to test for visibility so that we
+  // can mark everything we encounter (nodes and polygons)
+  // as visible.
+
+  // Mark all objects in the world as invisible.
+  csOctreeNode::pvs_cur_vis_nr++;
+
+  // @@@ This algorithm is not good. It just samples a few
+  // points in the cube and gathers all visible objects seen
+  // from that point. It has two problems:
+  //    1. Not accurate: it is possible to miss polygons or
+  //       entire nodes that are visible from some point we
+  //       didn't test.
+  //    2. Not fast.
+  // But this is easy to code and a temporary algorithm to
+  // test the PVS in principle.
+  const csVector3& bmin = leaf->GetMinCorner ();
+  const csVector3& bmax = leaf->GetMaxCorner ();
+  csVector3 steps = (bmax-bmin)/2.;
+  csVector3 pos;
+  PVSBuildData pvsdata;
+  pvsdata.center = pos;
+  pvsdata.cube = cube;
+  for (pos.x = bmin.x+steps.x/2. ; pos.x < bmax.x ; pos.x += steps.x)
+    for (pos.y = bmin.y+steps.y/2. ; pos.y < bmax.y ; pos.y += steps.y)
+      for (pos.z = bmin.z+steps.z/2. ; pos.z < bmax.z ; pos.z += steps.z)
+      {
+        // Traverse the tree as seen from this position and mark every
+	// node and polygon we see as visible.
+        cube->MakeEmpty ();
+        thing->UpdateTransformation (pos);
+	Front2Back (pos, MarkPolygonsVisiblePVS, (void*)&pvsdata,
+		CullOctreeNodePVS, (void*)&pvsdata);
+      }
+
+  // Now that we have traversed the tree for several positions we have
+  // found all (not really, see above) visible nodes and polygons. Here
+  // we will fetch them all and put them in the PVS for this leaf.
+  csPVS& pvs = leaf->GetPVS ();
+  pvs.SetLimit (0);
+  AddToPVS (pvs, (csOctreeNode*)root);
+}
+
+void csOctree::BuildPVS (csThing* thing,
+	csOctreeNode* node, csCovcube* cube)
+{
+  if (!node) return;
+
+  if (node->IsLeaf ())
+  {
+    // We have a leaf, here we start our pvs building.
+
+    // @@@ Optimization note: it might be a good idea to
+    // add a few deeper levels in the octree for the purpose
+    // of the PVS only. i.e. our octree with mini-bsp tree
+    // may remain exactly the same as it is now but we add
+    // extra smaller octree leafs so that our granularity
+    // for the PVS is better. Those octree leafs are ignored
+    // by the normal polygon/node traversal process.
+    BuildPVSForLeaf (thing, node, cube);
+  }
+  else
+  {
+    // Traverse to the children.
+    int i;
+    for (i = 0 ; i < 8 ; i++)
+      BuildPVS (thing, (csOctreeNode*)node->children[i], cube);
+  }
+}
+
+void csOctree::BuildPVS (csThing* thing)
+{
+  csCovcube* cube;
+  CHK (cube = new csCovcube (csWorld::current_world->GetCovMaskLUT ()));
+  BuildPVS (thing, (csOctreeNode*)root, cube);
+  CHK (delete cube);
 }
 
 void csOctree::Statistics ()

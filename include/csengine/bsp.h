@@ -159,6 +159,12 @@ private:
    */
   void ProcessTodo (csBspNode* node);
 
+  /**
+   * Add all visible polygons in this tree to
+   * the given polygon array (for PVS).
+   */
+  void AddToPVS (csBspNode* node, csPolygonArray& polygons);
+
 public:
   /**
    * Create an empty tree for a parent container.
@@ -214,6 +220,15 @@ public:
    * Return true if bsp tree is empty.
    */
   bool IsEmpty () { return root ? root->IsEmpty () : false; }
+
+  /**
+   * Add all visible polygons in this tree to
+   * the given polygon array (for PVS).
+   */
+  void AddToPVS (csPolygonArray& polygons)
+  {
+    AddToPVS ((csBspNode*)root, polygons);
+  }
 };
 
 #endif /*BSP_H*/

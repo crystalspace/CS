@@ -12,9 +12,6 @@ list first.
 
 <ul>
 <li> General todo: fix all bugs in bugs.txt :-)
-<li> Continue with more support for sprite lighting. This is almost
-     finished but there are still a few missing things (like the
-     ability to see which dynamic lights affected a sprite).
 <li> Optimizing lighting. Using the convex outline of objects
      we can still do some opts.
 <li> Maybe implement shadows for sprites and things using a simpler
@@ -49,9 +46,8 @@ list first.
 <li> Optimize the collision detection system.
 <li> Fully implement or approximate 2*SRC*DST in hardware (with gamma or
      something else).
-<li> Integrate landscape engine (ROAM) with CS. Also integrate dynamic sky
-     support which is also in the ROAM engine from Alex Pfaffe.
-<li> Physics module? Is this still needed? What do we need here?
+<li> Continue integration of landscape engine (ROAM) with CS. Also integrate
+     dynamic sky support which is also in the ROAM engine from Alex Pfaffe.
 <li> Scripting: Make SCF interfaces (IDL) for the engine.
 <li> Scripting: Ad hoc scripting language?
 <li> Scripting: interface with existing language (Python, Scheme, ...)
@@ -76,12 +72,6 @@ list first.
 <li> Try to use the NASM assembler code in the Windows/VC port as well.
 <li> Better world loader with support for plug-ins (to allow apps to insert
      game specific data in a world file).
-<li> Import entities from MDL, 3DS, ...
-<li> Implement vertex fog for Direct3D and Glide. Further improve vertex fog
-     support in OpenGL and maybe support limited version of vertex fog for
-     software (testing purposes).
-<li> Resolve TXTMODE mess (private, global, and 24bit). Some mode/display
-     combinations are obsolete or not well supported.
 <li> Special effects (bumpmapping, explosions, particles, smoke, ...)
 <li> 2D sprites (flat sprites).
 <li> Particle system. Maybe using pixels or 2D sprites.
@@ -92,7 +82,6 @@ list first.
 <li> Allow flags and config values for objects to be set from within the
      world file.
 <li> Gravity configuration value for WalkTest.
-<li> Do mipmapping based on texel density instead of fixed distances.
 <li> Automatic portal generation (used in MazeD or Crystal Space itself).
 <li> Fix cleanup problems in engine.
 <li> Better error handling and checking for invalid data in the engine.
@@ -101,21 +90,14 @@ list first.
 <li> LOD on things. Maybe user specified.
 <li> Artificial Intelligence?
 <li> Spotlight support.
-<li> Ability to load textures later after the world has already loaded.
-     It's almost there but not yet :-)
-<li> Correct textures for special hardware (like square limitation on RIVA
-     128 and 256x256 limitation on Voodoo).
 <li> Two adjacent polygons may not have correctly connected lightmaps. In
      other words: there may be a dark border when there should not be any.
      This probably needs to be solved by a second pass through all the
      lightmaps.
-<li> Calculate lightmaps in a higher resolution and then down-sample them
-     for better quality.
 <li> Full radiosity on lightmaps.
 <li> Need to continue cleanup of code (we are constantly busy with this :-)
 <li> Continue cleaning up the language, the API, and the interface to create
      the world.
-<li> We need to improve the quality of the 8-bit palette generator.
 <li> Allow the choice between a fixed palette or a computed
      palette. Control how the palette should be computed (adherence
      to the colors in the bitmaps), ...
@@ -158,8 +140,6 @@ list first.
 <li> Consider rewriting parts of the texture cache in assembler. They
      still take a lot of time.
 <li> Transform the planes of polygons only once if they are shared.
-<li> Make a special optimized algorithm for the texture cache private
-     memory pool.
 <li> Optimization with cross product as suggested by Segher Boessenkool:
      (a1 b2 - a2 b1) becomes (a1 - b1) (a2 + b2) - (a1 a2) + (b1 b2).
      (a1 a2) and (b1 b2) can be precomputed. This mainly affects
@@ -181,6 +161,8 @@ list first.
      to have more accurate shadows. Default lightmap size is 16.
      Currently this does not need to be a power of 2 but I would
      not use anything else because future optimizations could depend on this.
+<li> Combine lightmaps in one texture for hardware renderers.
+<li> Implement fast hardware versions of DrawTriangleMesh().
 <li> Joystick/mouse support.
 <li> Make a map in 3D a bit like in Descent.
 </ul>

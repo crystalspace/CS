@@ -30,6 +30,8 @@ class csPolygonInt;
 class csOctree;
 class csOctreeNode;
 class csBspTree;
+class csCovcube;
+class csThing;
 class Dumper;
 
 #define OCTREE_FFF 0
@@ -55,7 +57,7 @@ private:
   csOctreeNode* node;
   
 public:
-  csOctreeVisible() : polygons(8,16), node(NULL) {}
+  csOctreeVisible() : polygons (8, 16), node (NULL) {}
   /// Set octree node.
   void SetOctreeNode (csOctreeNode* onode) { node = onode; }
   /// Get octree node.
@@ -231,6 +233,24 @@ private:
 	int* tot_max_depth, int* min_max_depth, int* max_max_depth,
 	int* tot_tot_poly, int* min_tot_poly, int* max_tot_poly);
 
+  /**
+   * Build PVS for this leaf.
+   */
+  void BuildPVSForLeaf (csThing* thing,
+  	csOctreeNode* leaf, csCovcube* cube);
+
+  /**
+   * Build PVS for this node.
+   */
+  void BuildPVS (csThing* thing,
+  	csOctreeNode* node, csCovcube* cube);
+
+  /**
+   * Add all visible nodes and polygons in this tree to
+   * the given pvs.
+   */
+  void AddToPVS (csPVS& pvs, csOctreeNode* node);
+
 public:
   /**
    * Create an empty tree for the given parent, a bounding box defining the
@@ -287,6 +307,12 @@ public:
    * nodes and polygons.
    */
   void MarkVisibleFromPVS (const csVector3& pos);
+
+  /**
+   * Build the PVS for this octree and the csThing
+   * to which this octree belongs.
+   */
+  void BuildPVS (csThing* thing);
 
   /**
    * Build vertex tables for minibsp leaves. These tables are

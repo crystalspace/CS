@@ -205,27 +205,6 @@ Action:  Control the FOV (Field Of Vision) of the display.
 	 This command corresponds with the -fov commandline option
 	 and with the FOV configuration option.
 
-Command: dmipmap1
-Type:    value command
-Action:  Control the distance at which mipmapping level 1 starts to
-	 get effect.
-	 This command corresponds with the -dmipmap1 command option
-	 and with the DMIPMAP1 configuration option.
-
-Command: dmipmap2
-Type:    value command
-Action:  Control the distance at which mipmapping level 2 starts to
-	 get effect.
-	 This command corresponds with the -dmipmap2 command option
-	 and with the DMIPMAP2 configuration option.
-
-Command: dmipmap3
-Type:    value command
-Action:  Control the distance at which mipmapping level 3 starts to
-	 get effect.
-	 This command corresponds with the -dmipmap3 command option
-	 and with the DMIPMAP3 configuration option.
-
 Command: hi
 Type:    general command
 Action:  Hilight the named polygon in the current sector. If the polygon
@@ -354,26 +333,6 @@ Type:    boolean command
 Action:  Experimental feature. Disable/enable texel filtering (default
 	 off). This will slow down the engine considerably and the
 	 current implementation also shows artifacts.
-
-Command: subcache
-Type:    value command
-Action:  Control the optimization of sub-textures in the cache. If 0
-         this optimization will be disabled and textures will always be
-         calculated completely. If any other size (power of two) then every
-         texture will logically be split in sub-textures of the given size
-         and only the visible sub-textures will be calculated (if needed).
-         While this does not improve memory usage of the cache this optimization
-         greatly improves the speed at which the cache is used and also make
-         sure that the overhead of filling a texture is more equally spread
-         accross several frames. Default value is 32.
-
-Command: dyncache
-type:    boolean command
-Action:  If the sub-texture optimization is enabled (see the 'subcache' command)
-         then this option controls if an additional optimization with dynamic
-	 lighting is performed. With this optimization enabled (default) dynamic
-	 lights will only cause recalculation of the sub-textures that were
-	 really touched by the dynamic light.
 
 Command: dblbuff
 Type:    boolean command

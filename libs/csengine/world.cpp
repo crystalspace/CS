@@ -215,6 +215,7 @@ csWorld::csWorld (iBase *iParent) : csObject (), start_vec (0, 0, 0)
   covtree_lut = NULL;
   current_camera = NULL;
   current_world = this;
+  use_pvs = false;
  
   //@@@
   //CHK (quadcube = new csQuadcube (8));
@@ -353,6 +354,7 @@ void csWorld::Clear ()
   CHK (render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory()));
   CHK (delete lightpatch_pool);
   CHK (lightpatch_pool = new csLightPatchPool ());
+  use_pvs = false;
 }
 
 void csWorld::EnableLightingCache (bool en)

@@ -22,6 +22,7 @@
 #include "csengine/bsp.h"
 #include "csengine/sector.h"
 #include "csengine/world.h"
+#include "csengine/polygon.h"
 #include "isystem.h"
 
 //---------------------------------------------------------------------------
@@ -538,6 +539,18 @@ int* csBspTree::GetVertices (int& count)
   CHK (delete [] idx);
   CHK (delete [] idx2);
   return indices;
+}
+
+void csBspTree::AddToPVS (csBspNode* node, csPolygonArray& polygons)
+{
+  if (!node) return;
+  int i;
+  for (i = 0 ; i < node->polygons.GetNumPolygons () ; i++)
+  {
+    if (node->polygons.GetPolygon (i)->GetType () != 1) continue;
+    csPolygon3D* p = (csPolygon3D*)(node->polygons.GetPolygon (i));
+    if (p->IsVisible ()) polygons.Push (p);
+  }
 }
 
 //---------------------------------------------------------------------------

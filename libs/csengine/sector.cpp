@@ -189,6 +189,8 @@ void csSector::UseStaticTree (int mode, bool octree)
   static_thing->CompressVertices ();
   CsPrintf (MSG_INITIALIZATION, "Build vertex tables...\n");
   if (octree) { ((csOctree*)static_tree)->BuildVertexTables (); }
+  //CsPrintf (MSG_INITIALIZATION, "Build PVS...\n");
+  //if (octree) { ((csOctree*)static_tree)->BuildPVS (static_thing); }
   CsPrintf (MSG_INITIALIZATION, "DONE!\n");
 }
 
@@ -349,7 +351,8 @@ void* csSector::TestQueuePolygons (csSector* sector,
   csPolygonInt** polygon, int num, void* data)
 {
   csRenderView* d = (csRenderView*)data;
-  return sector->TestQueuePolygonArray (polygon, num, d, poly_queue);
+  return sector->TestQueuePolygonArray (polygon, num, d, poly_queue,
+    csWorld::current_world->IsPVS ());
 }
 
 void csSector::DrawPolygonsFromQueue (csPolygon2DQueue* queue,
@@ -395,6 +398,13 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   int i;
   csOctree* otree = (csOctree*)tree;
   csOctreeNode* onode = (csOctreeNode*)node;
+
+  if (csWorld::current_world->IsPVS ())
+  {
+    // Test for PVS.
+    if (!onode->IsVisible ()) { printf ("-"); return false; }
+  }
+
   csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
   csQuadtree* quadtree = csWorld::current_world->GetQuadtree ();
   csCoverageMaskTree* covtree = csWorld::current_world->GetCovtree ();
@@ -691,6 +701,12 @@ void csSector::Draw (csRenderView& rview)
         }
       }
 
+      if (csWorld::current_world->IsPVS ())
+      {
+        csOctree* otree = (csOctree*)static_tree;
+	otree->MarkVisibleFromPVS (rview.GetOrigin ());
+      }
+
       CHK (poly_queue = new csPolygon2DQueue (polygons.Length ()+
       	static_thing->GetNumPolygons ()));
       static_thing->UpdateTransformation ();
@@ -715,7 +731,8 @@ void csSector::Draw (csRenderView& rview)
       CHK (poly_queue = new csPolygon2DQueue (polygons.Length ()));
     }
     csPolygon2DQueue* queue = poly_queue;
-    TestQueuePolygons (this, polygons.GetArray (), polygons.Length (), &rview);
+    TestQueuePolygonArray (polygons.GetArray (), polygons.Length (), &rview,
+    	queue, false);
     DrawPolygonsFromQueue (queue, &rview);
     CHK (delete queue);
   }

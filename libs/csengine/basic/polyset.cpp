@@ -462,7 +462,7 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num,
 
 
 void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
-	csRenderView* d, csPolygon2DQueue* poly_queue)
+	csRenderView* d, csPolygon2DQueue* poly_queue, bool pvs)
 {
   csPolygon3D* p;
   csPortal* po;
@@ -526,9 +526,18 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
     else
     {
       // We're dealing with a csPolygon3D.
+
+      // @@@ We should only alloc the 2D polygon when we need to do it.
+      // So this means further down the 'if'.
+      p = (csPolygon3D*)polygon[i];
+      if (pvs && !p->IsVisible ())
+      {
+        // Polygon is not visible because of PVS.
+	printf (".");
+        continue;
+      }
       clip = (csPolygon2D*)(render_pool->Alloc ());
       visible = false;
-      p = (csPolygon3D*)polygon[i];
       if ( !p->dont_draw &&
            p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane*)NULL,
 	 	  d->GetOrigin (), verts, num_verts) &&

@@ -279,6 +279,9 @@ private:
   /// Coverage mask cube used for lighting.
   csCovcube* covcube;
 
+  /// Use PVS.
+  bool use_pvs;
+
   /// Flag set when window resized.
   bool resize;
 
@@ -377,6 +380,11 @@ public:
   csCoverageMaskTree* GetCovtree () { return covtree; }
 
   /**
+   * Return the lookup table used for the coverage mask tree.
+   */
+  csCovMaskLUT* GetCovMaskLUT () { return covtree_lut; }
+
+  /**
    * Enable/disable quadtree.
    */
   void EnableQuadtree (bool en);
@@ -395,6 +403,21 @@ public:
    * Return coverage mask cube.
    */
   csCovcube* GetCovcube () { return covcube; }
+
+  /**
+   * Enable PVS.
+   */
+  void EnablePVS () { use_pvs = true; }
+
+  /**
+   * Disable PVS.
+   */
+  void DisablePVS () { use_pvs = false; }
+
+  /**
+   * Is PVS enabled?
+   */
+  bool IsPVS () { return use_pvs; }
 
   /**
    * Cache lighting. If true (default) then lighting will be cached in
