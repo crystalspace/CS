@@ -111,7 +111,7 @@ rm -rf "$RPM_BUILD_ROOT"
 %{prefix}/include/igraphic/*.h
 
 %changelog
-* Fri Feb 28 2004 Vincent Knecht <vknecht@users.sourceforge.net> 20040228-1
+* Sat Feb 28 2004 Vincent Knecht <vknecht@users.sourceforge.net> 20040228-1
 - Added lightmaps cache computation for flarge and partsys
 
 * Sat Feb 28 2004 Philip Wyett <philip@wyett.net>
