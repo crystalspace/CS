@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+31-Oct-2001
+	- Removed the windows pen support added by 'res'. I don't have
+	  the needed include files on mingw.
 30-Oct-2001
 	- Matze changed code structure of viewmesh a bit. I'll add csws
 	  interfaces tomorrow
