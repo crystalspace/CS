@@ -62,69 +62,70 @@ void map_key (const char* _keyname, csKeyMap* map)
   map->need_status = 0;
   char* keyname = new char[strlen(_keyname) + 1];
   strcpy (keyname, _keyname);
-  char* dash = strchr (keyname, '-');
+  char* wordstart = keyname;
+  char* dash = strchr (wordstart, '-');
   while (dash)
   {
     *dash = 0;
-    if (!strcmp (keyname, "shift")) map->shift = 1;
-    else if (!strcmp (keyname, "alt")) map->alt = 1;
-    else if (!strcmp (keyname, "ctrl")) map->ctrl = 1;
-    else if (!strcmp (keyname, "status")) map->need_status = 1;
+    if (!strcmp (wordstart, "shift")) map->shift = 1;
+    else if (!strcmp (wordstart, "alt")) map->alt = 1;
+    else if (!strcmp (wordstart, "ctrl")) map->ctrl = 1;
+    else if (!strcmp (wordstart, "status")) map->need_status = 1;
     else Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-    	"Bad modifier '%s'!", keyname);
+    	"Bad modifier '%s'!", wordstart);
 
     *dash = '-';
-    strcpy (keyname, dash+1);
-    dash = strchr (keyname, '-');
+    wordstart = dash+1;
+    dash = strchr (wordstart, '-');
   }
 
-  if (!strcmp (keyname, "tab")) map->key = CSKEY_TAB;
-  else if (!strcmp (keyname, "space")) map->key = ' ';
-  else if (!strcmp (keyname, "esc")) map->key = CSKEY_ESC;
-  else if (!strcmp (keyname, "enter")) map->key = CSKEY_ENTER;
-  else if (!strcmp (keyname, "bs")) map->key = CSKEY_BACKSPACE;
-  else if (!strcmp (keyname, "up")) map->key = CSKEY_UP;
-  else if (!strcmp (keyname, "down")) map->key = CSKEY_DOWN;
-  else if (!strcmp (keyname, "right")) map->key = CSKEY_RIGHT;
-  else if (!strcmp (keyname, "left")) map->key = CSKEY_LEFT;
-  else if (!strcmp (keyname, "pgup")) map->key = CSKEY_PGUP;
-  else if (!strcmp (keyname, "pgdn")) map->key = CSKEY_PGDN;
-  else if (!strcmp (keyname, "home")) map->key = CSKEY_HOME;
-  else if (!strcmp (keyname, "end")) map->key = CSKEY_END;
-  else if (!strcmp (keyname, "ins")) map->key = CSKEY_INS;
-  else if (!strcmp (keyname, "del")) map->key = CSKEY_DEL;
-  else if (!strcmp (keyname, "f1")) map->key = CSKEY_F1;
-  else if (!strcmp (keyname, "f2")) map->key = CSKEY_F2;
-  else if (!strcmp (keyname, "f3")) map->key = CSKEY_F3;
-  else if (!strcmp (keyname, "f4")) map->key = CSKEY_F4;
-  else if (!strcmp (keyname, "f5")) map->key = CSKEY_F5;
-  else if (!strcmp (keyname, "f6")) map->key = CSKEY_F6;
-  else if (!strcmp (keyname, "f7")) map->key = CSKEY_F7;
-  else if (!strcmp (keyname, "f8")) map->key = CSKEY_F8;
-  else if (!strcmp (keyname, "f9")) map->key = CSKEY_F9;
-  else if (!strcmp (keyname, "f10")) map->key = CSKEY_F10;
-  else if (!strcmp (keyname, "f11")) map->key = CSKEY_F11;
-  else if (!strcmp (keyname, "f12")) map->key = CSKEY_F12;
+  if (!strcmp (wordstart, "tab")) map->key = CSKEY_TAB;
+  else if (!strcmp (wordstart, "space")) map->key = ' ';
+  else if (!strcmp (wordstart, "esc")) map->key = CSKEY_ESC;
+  else if (!strcmp (wordstart, "enter")) map->key = CSKEY_ENTER;
+  else if (!strcmp (wordstart, "bs")) map->key = CSKEY_BACKSPACE;
+  else if (!strcmp (wordstart, "up")) map->key = CSKEY_UP;
+  else if (!strcmp (wordstart, "down")) map->key = CSKEY_DOWN;
+  else if (!strcmp (wordstart, "right")) map->key = CSKEY_RIGHT;
+  else if (!strcmp (wordstart, "left")) map->key = CSKEY_LEFT;
+  else if (!strcmp (wordstart, "pgup")) map->key = CSKEY_PGUP;
+  else if (!strcmp (wordstart, "pgdn")) map->key = CSKEY_PGDN;
+  else if (!strcmp (wordstart, "home")) map->key = CSKEY_HOME;
+  else if (!strcmp (wordstart, "end")) map->key = CSKEY_END;
+  else if (!strcmp (wordstart, "ins")) map->key = CSKEY_INS;
+  else if (!strcmp (wordstart, "del")) map->key = CSKEY_DEL;
+  else if (!strcmp (wordstart, "f1")) map->key = CSKEY_F1;
+  else if (!strcmp (wordstart, "f2")) map->key = CSKEY_F2;
+  else if (!strcmp (wordstart, "f3")) map->key = CSKEY_F3;
+  else if (!strcmp (wordstart, "f4")) map->key = CSKEY_F4;
+  else if (!strcmp (wordstart, "f5")) map->key = CSKEY_F5;
+  else if (!strcmp (wordstart, "f6")) map->key = CSKEY_F6;
+  else if (!strcmp (wordstart, "f7")) map->key = CSKEY_F7;
+  else if (!strcmp (wordstart, "f8")) map->key = CSKEY_F8;
+  else if (!strcmp (wordstart, "f9")) map->key = CSKEY_F9;
+  else if (!strcmp (wordstart, "f10")) map->key = CSKEY_F10;
+  else if (!strcmp (wordstart, "f11")) map->key = CSKEY_F11;
+  else if (!strcmp (wordstart, "f12")) map->key = CSKEY_F12;
   /*
-  else if (*(keyname+1) != 0) Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-  	"Bad key '%s'!", keyname);
-  else if ((*keyname >= 'A' && *keyname <= 'Z') ||
-    strchr ("!@#$%^&*()_+", *keyname))
+  else if (*(wordstart+0) != 0) Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+  	"Bad key '%s'!", wordstart);
+  else if ((*wordstart >= 'A' && *wordstart <= 'Z') ||
+    strchr ("!@#$%^&*()_+", *wordstart))
   {
     map->shift = 1;
-    map->key = *keyname;
+    map->key = *wordstart;
   }
   */
   else
   {
     utf32_char key;
-    size_t nameLen = strlen (keyname);
+    size_t nameLen = strlen (wordstart);
     bool charValid;
-    int encLen = csUnicodeTransform::UTF8Decode ((utf8_char*)keyname, 
+    int encLen = csUnicodeTransform::UTF8Decode ((utf8_char*)wordstart, 
       nameLen, key, &charValid);
     if (!charValid || ((size_t)encLen < nameLen))
     {
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Bad key '%s'!", keyname);
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Bad key '%s'!", wordstart);
     }
     else
       map->key = key;

@@ -49,6 +49,8 @@ chronological order.
 	- Wouter Wijngaards added a new canvas that uses libcaca. It displays 
 	  asciiart in colour. Using the console.driver set to ncurses in 
 	  data/config/cacacanvas.cfg you can even run in the linux console.
+	- Wouter Wijngaards fixed map_key in walktest so that it no longer
+	  called strcpy with overlapping src and destination.
 24-Mar-2005
 	- res removed a >= 0 comparison with an unsigned var from array.h.
 	- res fixed some wrong ref counting caused by iLoader->LoadTexture()
