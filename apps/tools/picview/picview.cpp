@@ -237,7 +237,6 @@ void PicView::ButtonNext (void* app, iAwsSource *source)
 
 void PicView::ButtonQuit (void* app, iAwsSource *source)
 {
-  PicView* picview = (PicView*)app;
   csRef<iEventQueue> q = CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
   if (q.IsValid()) q->GetEventOutlet()->Broadcast(cscmdQuit);
 }
