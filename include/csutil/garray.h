@@ -86,7 +86,7 @@
  * </pre>
  */
 #define TYPEDEF_GROWING_ARRAY(Name, Type)				\
-  TYPEDEF_GROWING_ARRAY_EXT (Name, Type, , )
+  TYPEDEF_GROWING_ARRAY_EXT (Name, Type, ;,  ;)
 
 /**
  * Same as TYPEDEF_GROWING_ARRAY but contains additionally an reference
