@@ -233,9 +233,8 @@ int csODEDynamics::CollideMeshBox (dGeomID mesh, dGeomID box, int flags,
   csReversibleTransform boxt = GetGeomTransform (box);
 
   iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (mesh);
-  if (!m) { return 0; }
+  CS_ASSERT (m);
   iPolygonMesh *p = SCF_QUERY_INTERFACE (m->GetMeshObject(), iPolygonMesh);
-  if (!p) { return 0; }
   csVector3 *vertex_table = p->GetVertices ();
   csMeshedPolygon *polygon_list = p->GetPolygons ();
 
@@ -275,15 +274,28 @@ int csODEDynamics::CollideMeshBox (dGeomID mesh, dGeomID box, int flags,
       dContactGeom *c = &tempcontacts[j];
       csVector3 contactpos(c->pos[0], c->pos[1], c->pos[2]);
       // make sure the point lies inside the polygon
-      for (k = 0; k < polycollide[i].num_vertices-1; k ++) {
-        csPlane3 edgeplane(mesht * vertex_table[polycollide[i].vertices[k]] / mesht,
-          mesht * vertex_table[polycollide[i].vertices[k+1]] / mesht,
-          mesht * vertex_table[polycollide[i].vertices[k+1]] / mesht - plane.Normal());
+      int vcount = polycollide[i].num_vertices;
+      for (k = 0; k < vcount-1; k ++) {
+	int ind1 = polycollide[i].vertices[k];
+	int ind2 = polycollide[i].vertices[k+1];
+        csPlane3 edgeplane(vertex_table[ind1] / mesht,
+          vertex_table[ind2] / mesht,
+          vertex_table[ind2] / mesht - plane.Normal());
         edgeplane.Normalize();
         if (edgeplane.Classify (contactpos) < 0) {
           c->depth = -1;
           break;
         }
+      }
+      /* get the wrap around case */
+      int ind1 = polycollide[i].vertices[vcount-1];
+      int ind2 = polycollide[i].vertices[0];
+      csPlane3 edgeplane(vertex_table[ind1] / mesht,
+        vertex_table[ind2] / mesht,
+        vertex_table[ind2] / mesht - plane.Normal());
+      edgeplane.Normalize();
+      if (edgeplane.Classify (contactpos) < 0) {
+        c->depth = -1;
       }
       if (c->depth >= 0) {
         dContactGeom *out = (dContactGeom *)((char *)outcontacts + skip * outcount);
@@ -311,15 +323,15 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
   csVector3 center(pos[0], pos[1], pos[2]);
   dReal rad = dGeomSphereGetRadius (sphere); 
   iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (mesh);
-  if (!m) { return 0; }
+  CS_ASSERT (m);
   iPolygonMesh *p = SCF_QUERY_INTERFACE (m->GetMeshObject(), iPolygonMesh);
-  if (!p) { return 0; }
   csVector3 *vertex_table = p->GetVertices ();
   csMeshedPolygon *polygon_list = p->GetPolygons ();
 
   csReversibleTransform mesht = GetGeomTransform (mesh);
 
   int outcount = 0;
+
   for (int i = 0; i < p->GetPolygonCount() && outcount < N; i ++) {
     csPlane3 plane(vertex_table[polygon_list[i].vertices[0]] / mesht,
       vertex_table[polygon_list[i].vertices[1]] / mesht,
@@ -328,21 +340,32 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
     if (plane.Classify (center) < 0) {
       continue;
     }
-
     float depth = rad - plane.Distance (center);
     if (depth < 0) {
       continue;
     }
-
-    for (int j = 0; j < polygon_list[i].num_vertices-1; j ++) {
-      csPlane3 edgeplane(vertex_table[polygon_list[i].vertices[j]] / mesht,
-        vertex_table[polygon_list[i].vertices[j+1]] / mesht,
-        vertex_table[polygon_list[i].vertices[j+1]] / mesht - plane.Normal());
+    int vcount = polygon_list[i].num_vertices;
+    for (int j = 0; j < vcount-1; j ++) {
+      int ind1 = polygon_list[i].vertices[j];
+      int ind2 = polygon_list[i].vertices[j+1];
+      csPlane3 edgeplane(vertex_table[ind1] / mesht,
+        vertex_table[ind2] / mesht,
+        vertex_table[ind2] / mesht - plane.Normal());
       edgeplane.Normalize();	
       if (edgeplane.Classify (center) < 0) {
         depth = -1;
         break;
       }
+    }
+    /* get the one last edge from END to 0 */
+    int ind1 = polygon_list[i].vertices[vcount-1];
+    int ind2 = polygon_list[i].vertices[0];
+    csPlane3 edgeplane (vertex_table[ind1] / mesht,
+      vertex_table[ind2] / mesht,
+      vertex_table[ind2] / mesht - plane.Normal());
+    edgeplane.Normalize ();
+    if (edgeplane.Classify (center) < 0) {
+      depth = -1;
     }
     if (depth < 0) {
       continue;
@@ -363,9 +386,15 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
 
 void csODEDynamics::GetAABB (dGeomID g, dReal aabb[6])
 {
-  iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (g);
   csBox3 box;
-  m->GetWorldBoundingBox (box);
+  csReversibleTransform mesht = GetGeomTransform (g);
+  iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (g);
+  iPolygonMesh *p = SCF_QUERY_INTERFACE (m->GetMeshObject(), iPolygonMesh);
+  csVector3 *vertex_table = p->GetVertices ();
+  box.StartBoundingBox ();
+  for (int i = 0; i < p->GetVertexCount(); i ++) {
+    box.AddBoundingVertex (vertex_table[i] / mesht);
+  }
   aabb[0] = box.MinX(); aabb[1] = box.MaxX();
   aabb[2] = box.MinY(); aabb[3] = box.MaxY();
   aabb[4] = box.MinZ(); aabb[5] = box.MaxZ();
