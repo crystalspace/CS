@@ -32,6 +32,11 @@ The history order is reversed so that new features are at the top.
 	- Matze started to merge his jam build system:
 	    - Added configure-jam.ac file and changed autogen.sh to generate
 	      a configure-jam as well.
+	    - fixed some issues with the new jam build. It should now even
+	      work with the latest stable jam 2.4 version.
+	    - Fixed a problem with compiling outside source directory when the
+	      sources had already been configured and contained a
+	      include/volatile.h
 	- res added a check to -plugin cmd line switch handler for 
 	  the plugin specified being registered in the class registry. 
 	  If not, 'crystalspace.utilities.' is added to the beginning of 
