@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+29-Nov-2002
+	- Possibly fixed a bug in HardTransform for skeletal sprites. Instead
+	  of transforming all vertices only the vertices in the root are
+	  transformed and also the transforms of all children of the root.
+	  This has not been tested though.
 28-Nov-2002
 	- Eric Sunshine disabled the "experimental" render3d project by default
 	  for MSVC users since its many compilation problems were causing

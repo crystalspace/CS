@@ -765,14 +765,42 @@ csSpriteAction2* csSprite3DMeshObjectFactory::FindAction (const char *n) const
 
 void csSprite3DMeshObjectFactory::HardTransform (const csReversibleTransform& t)
 {
-  int num = GetVertexCount ();
-  int numf = GetFrameCount ();
-  int i, j;
-  for (i = 0 ; i < numf ; i++)
+  if (skeleton)
   {
-    csVector3* verts = GetVertices (i);
-    for (j = 0 ; j < num ; j++)
-      verts[j] = t.This2Other (verts[j]);
+    // If there is a skeleton we only have to transform the vertices of the
+    // root limb and change the transforms of all children connecting to
+    // the root.
+    int vt_cnt = skeleton->GetVertexCount ();
+    int* vt = skeleton->GetVertices ();
+    int i;
+    csVector3* verts = GetVertices (0);
+    for (i = 0 ; i < vt_cnt ; i++)
+      verts[vt[i]] = t.This2Other (verts[vt[i]]);
+    iSkeletonLimb* c = skeleton->GetChildren ();
+    while (c)
+    {
+      csRef<iSkeletonConnection> con = SCF_QUERY_INTERFACE (c,
+      	iSkeletonConnection);
+      if (con)
+      {
+        csTransform& tr = con->GetTransformation ();
+	// @@@ Not sure about the line below.
+	con->SetTransformation (t * tr);
+      }
+      c = c->GetNextSibling ();
+    }
+  }
+  else
+  {
+    int num = GetVertexCount ();
+    int numf = GetFrameCount ();
+    int i, j;
+    for (i = 0 ; i < numf ; i++)
+    {
+      csVector3* verts = GetVertices (i);
+      for (j = 0 ; j < num ; j++)
+        verts[j] = t.This2Other (verts[j]);
+    }
   }
 }
 
