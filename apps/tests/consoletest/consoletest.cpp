@@ -59,13 +59,15 @@ int main (int argc, char* argv[])
 
   csPrintf ("\n");
 
+  char const* nully = 0;
   csPrintf ("Formatting tests:\n");
-  csPrintf (" %%%%: %%  null %%s: %s  null %%p: %p\n", 0, 0);
+  csPrintf (" %%%%: %%  null %%s: %s  null %%p: %p\n", nully, nully);
   static const char charStr[] = "A char string \xe2\x98\xba";
   static const wchar_t wcharStr[] = L"A wchar_t string \x263A";
   csPrintf (" %s\n", charStr);
   csPrintf (" %ls\n", wcharStr);
-  csPrintf (" (some) bogus formats: %bogus %- 0#10.2y %jd %kd\n", (intmax_t)123);
+  char const* bogus = " (some) bogus formats: %bogus %- 0#10.2y %jd %kd\n";
+  csPrintf (bogus, (intmax_t)123);
 
   csPrintf ("\n");
   csPrintf ("Examples shamelessly stolen from libc manual:\n");
@@ -132,7 +134,8 @@ int main (int argc, char* argv[])
   csPrintf ("%0.*f ", 4, 123.456);
   csPrintf ("%0*.*f ", 12, 4, 123.456);
   csPrintf ("\n");
-  csPrintf ("%5$d %3$s %2$d %1$d\n", 1, 2, "3", 4, 5);
+  char const* pacifygcc = "%5$d %3$s %2$d %1$d\n";
+  csPrintf (pacifygcc, 1, 2, "3", 4, 5);
   return 0;
 }
 
