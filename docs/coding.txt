@@ -149,3 +149,13 @@ Beware of code which tries to access values of primitive types at non-even
 memory locations or locations which are not multiples of the type's size,
 since some platforms require "natural alignment" and will generate faults if
 data is accessed at incorrect locations.
+
+
+===============================================================================
+RULE 11: Avoid Global Objects With Constructors in Dynamically Loaded Libraries
+===============================================================================
+
+Avoid placing global objects which require automatic construction in
+dynamically loaded libraries.  Some platforms fail to call the object's
+constructor at the time the library is loaded.  Therefore it is unsafe to rely
+on such objects.
