@@ -211,37 +211,54 @@ struct mmioInfo
     unsigned int file_size;
 };
 
-// Fills in the mmioInfo struct by mapping in filename.  Returns true on success, false otherwise.
-inline 
-bool
-MemoryMapFile(mmioInfo *platform, char *filename)
+// Fills in the mmioInfo struct by mapping in filename.
+// Returns true on success, false otherwise.
+inline bool MemoryMapFile(mmioInfo* info, char const* filename)
 {  
-  if (
-      (platform->hMappedFile=CreateFile(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL))==INVALID_HANDLE_VALUE ||
-      (platform->file_size=GetFileSize(platform->hMappedFile, NULL)) == 0xFFFFFFFF                                                    ||          
-      (platform->hFileMapping = CreateFileMapping(platform->hMappedFile, NULL, PAGE_READONLY, 0, 0, NULL)) == NULL                              ||          
-      (platform->data = (unsigned char *)MapViewOfFile(platform->hFileMapping, FILE_MAP_READ, 0, 0, platform->file_size))==NULL 
-     )                                                                                              
-  {                                                                                                 
-    return false;                                                                        
-  }                                                                                                 
-  else                                                                                              
+  bool ok = false;
+  HANDLE file, mapping = INVALID_HANDLE_VALUE;
+  file = CreateFile(
+    filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+  if (file != INVALID_HANDLE_VALUE)
   {
-    return true;                                                                         
+    unsigned int const sz = GetFileSize(file, NULL);
+    if (sz != 0xFFFFFFFF)
+    {
+      mapping = CreateFileMapping(file, NULL, PAGE_READONLY, 0, 0, NULL);
+      if (mapping != NULL)
+      {
+	unsigned char* p =
+	  (unsigned char*)MapViewOfFile(mapping, FILE_MAP_READ, 0, 0, sz)
+	if (p != NULL)
+	{
+	  info->hMappedFile = file;
+	  info->hFileMapping = mapping;
+	  info->data = p;
+	  info->file_size = sz;
+	  ok = true;
+	}
+      }
+    }
   }
+  if (!ok)
+  {
+    if (mapping != NULL)
+      CloseHandle(mapping);
+    if (file != INVALID_HANDLE_VALUE)
+      CloseHandle(file);
+  }
+  return ok;
 }
 
-inline 
-void
-UnMemoryMapFile(mmioInfo *platform)
+inline void UnMemoryMapFile(mmioInfo* info)
 {
-  if (platform->data!=NULL)
+  if (info->data != NULL)
     UnmapViewOfFile(platform->data);
 
-  if (platform->hMappedFile!=INVALID_HANDLE_VALUE)
+  if (info->hMappedFile != INVALID_HANDLE_VALUE)
     CloseHandle(platform->hMappedFile);
 
-  if (platform->hFileMapping!=INVALID_HANDLE_VALUE)
+  if (info->hFileMapping != INVALID_HANDLE_VALUE)
     CloseHandle(platform->hFileMapping);
 }
 

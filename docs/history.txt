@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+3-Sep-2002
+	- Eric Sunshine eliminated a problem introduced yesterday into
+	  next/csosdefs.h.
+	- Eric Sunshine re-wrote each of the platform-specific implementations
+	  of MemoryMapFile() in order to eliminate potential resource leakage
+	  problems.
 2-Sep-2002
 	- A bad XML token again results in an error as it should.
 	- Converted motion loader so that it loads XML too. The support

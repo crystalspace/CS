@@ -18,39 +18,37 @@ struct mmioInfo
     unsigned int file_size;
 };
 
-// Fills in the mmioInfo struct by mapping in filename.  Returns true on success, false otherwise.
-inline 
-bool
-MemoryMapFile(mmioInfo *platform, const char *filename)
+// Fill in the mmioInfo struct by mapping in filename.
+// Returns true on success, false otherwise.
+inline bool MemoryMapFile(mmioInfo* info, char const* filename)
 {   
-  struct stat statInfo;
-  
-  // Have 'nix map this file in for use
-  if (
-      (platform->hMappedFile = open(filename, O_RDONLY)) == -1   ||
-      (fstat(platform->hMappedFile, &statInfo )) == -1           ||
-      (int)(platform->data = (unsigned char *)mmap(0, statInfo.st_size, PROT_READ, 0, platform->hMappedFile, 0)) == -1
-     )
+  bool ok = false;
+  struct stat st;
+  int const fd = open(filename, O_RDONLY);
+  if (fd != -1 && fstat(fd, &st) != -1)
   {
-    return false;
+    unsigned char* p=(unsigned char*)mmap(0, st.st_size, PROT_READ, 0, fd, 0);
+    if ((int)p != -1)
+    {
+      info->hMappedFile = fd;
+      info->data = p;
+      info->file_size = st.st_size;
+      ok = true;
+    }
   }
-  else
-  {
-    platform->file_size=statInfo.st_size;
-    return true;
-  }
+  if (!ok && fd != -1)
+    close(fd);
+  return ok;
 }
 
-inline 
-void
-UnMemoryMapFile(mmioInfo *platform)
+inline void UnMemoryMapFile(mmioInfo* info)
 {
-  if (platform->data != 0)
+  if (info->data != 0)
 #ifdef OS_SOLARIS  
-    munmap((char *)platform->data, platform->file_size);
+    munmap((char *)info->data, info->file_size);
 #else
-    munmap(platform->data, platform->file_size);
+    munmap(info->data, info->file_size);
 #endif
-  if (platform->hMappedFile != -1)
-    close(platform->hMappedFile);
+  if (info->hMappedFile != -1)
+    close(info->hMappedFile);
 }

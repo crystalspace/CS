@@ -73,20 +73,15 @@
 #  endif
 #endif
 
-//---------------------------------------------------------------------------
-// filesystem settings
-//---------------------------------------------------------------------------
-#define CS_MAXPATHLEN	256
-#define PATH_SEPARATOR	'/'
 
 //-----------------------------------------------------------------------------
 // The 2D graphics driver used by the software renderer on this platform.
 //-----------------------------------------------------------------------------
 #undef  CS_SOFTWARE_2D_DRIVER
-#ifdef __APPLE__
-#  define CS_SOFTWARE_2D_DRIVER "crystalspace.graphics2d.coregraphics"
+#if defined(OS_NEXT_MACOSXS)
+#define CS_SOFTWARE_2D_DRIVER "crystalspace.graphics2d.coregraphics"
 #else
-#  define CS_SOFTWARE_2D_DRIVER "crystalspace.graphics2d.next"
+#define CS_SOFTWARE_2D_DRIVER "crystalspace.graphics2d.next"
 #endif
 
 #undef  CS_OPENGL_2D_DRIVER
@@ -116,10 +111,11 @@ static inline char* strdup(char const* s)
 
 
 //-----------------------------------------------------------------------------
-// Provide CS_MAXPATHLEN with a reasonable value.
+// Provide CS_MAXPATHLEN and PATH_SEPARATOR with proper values.
 //-----------------------------------------------------------------------------
 #include <sys/param.h>
 #define CS_MAXPATHLEN MAXPATHLEN
+#define PATH_SEPARATOR '/'
 
 
 //-----------------------------------------------------------------------------
@@ -162,12 +158,12 @@ static inline char* strdup(char const* s)
 
 static inline char* getcwd(char* p, size_t size)
 {
-  char s[ CS_MAXPATHLEN ];
+  char s[CS_MAXPATHLEN];
   char* r = getwd(s);
   if (r != 0)
   {
     strncpy(p, r, size - 1);
-    p[ size - 1 ] = '\0';
+    p[size - 1] = '\0';
     r = p;
   }
   return r;
@@ -254,75 +250,57 @@ static inline char* getcwd(char* p, size_t size)
 
 
 //-----------------------------------------------------------------------------
-// This is the (hopefully) MAC OS X compliant mmap code.
-// It supplies the hardware interface for memory-mapped I/O
+// MacOS/X mmap() functionality for memory-mapped I/O.
 //-----------------------------------------------------------------------------
+#if defined(OS_NEXT_MACOSX) && defined(CS_SYSDEF_PROVIDE_HARDWARE_MMIO)
 
-#if defined(OS_NEXT_MACOSX)
+#define CS_HAS_MEMORY_MAPPED_IO 1
 
-#ifdef CS_SYSDEF_PROVIDE_HARDWARE_MMIO
-
-// Needed for Memory-Mapped IO functions below.
 #include <unistd.h>
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 
-// Defines that this platform supports hardware memory-mapped i/o
-#define CS_HAS_MEMORY_MAPPED_IO 1
-
 // Unix specific memory mapped I/O platform dependent stuff
 struct mmioInfo
 {          
-    /// Handle to the mapped file 
-    int hMappedFile;
-
-    /// Base pointer to the data
-    unsigned char *data;
-
-    /// File size
-    unsigned int file_size;
+  int file;               // Handle to the mapped file.
+  unsigned int file_size; // File size.
+  unsigned char* data;    // Base pointer to the data.
 };
 
-// Fills in the mmioInfo struct by mapping in filename.  Returns true on success, false otherwise.
-inline 
-bool
-MemoryMapFile(mmioInfo *platform, char *filename)
+// Fill in the mmioInfo struct by mapping in filename.
+// Returns true on success, false otherwise.
+inline bool MemoryMapFile(mmioInfo* info, char const* filename)
 {   
-  struct stat statInfo;
-  
-  // Have 'nix map this file in for use
-  if (
-      (platform->hMappedFile = open(filename, O_RDONLY)) == -1   ||
-      (fstat(platform->hMappedFile, &statInfo )) == -1           ||
-      (int)(platform->data = (unsigned char *)mmap(0, statInfo.st_size, PROT_READ, 0, platform->hMappedFile, 0)) == -1
-     )
+  bool ok = false;
+  struct stat st;
+  int const fd = open(filename, O_RDONLY);
+  if (fd != -1 && fstat(fd, &st) != -1)
   {
-    return false;
+    unsigned char* p=(unsigned char*)mmap(0, st.st_size, PROT_READ, 0, fd, 0);
+    if ((int)p != -1)
+    {
+      info->file = fd;
+      info->data = p;
+      info->file_size = st.st_size;
+      ok = true;
+    }
   }
-  else
-  {
-    platform->file_size=statInfo.st_size;
-    return true;
-  }
+  if (!ok && fd != -1)
+    close(fd);
+  return ok;
 }
 
-inline 
-void
-UnMemoryMapFile(mmioInfo *platform)
+inline void UnMemoryMapFile(mmioInfo* info)
 {
-  if (platform->data != NULL)
-    munmap(platform->data, platform->file_size);
-
-  if (platform->hMappedFile != -1)
-    close(platform->hMappedFile);
+  if (info->data != 0)
+    munmap(info->data, info->file_size);
+  if (info->file != -1)
+    close(info->file);
 }
 
-#endif // memory-mapped I/O
-
-
-#endif // OS_NEXT_MACOSX
-
+#endif // OS_NEXT_MACOSX && CS_SYSDEF_PROVIDE_HARDWARE_MMIO
 
 #endif // __NeXT_csosdefs_h

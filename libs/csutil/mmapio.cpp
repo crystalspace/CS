@@ -3,7 +3,7 @@
 #include "cssysdef.h"
 #include "csutil/mmapio.h"
 
-csMemoryMappedIO::csMemoryMappedIO(unsigned _block_size, char *filename):
+csMemoryMappedIO::csMemoryMappedIO(unsigned _block_size, char const *filename):
   block_size(_block_size)
 {
   valid_mmio_object = MemoryMapFile(&platform, filename);
@@ -19,7 +19,7 @@ csMemoryMappedIO::~csMemoryMappedIO()
 #ifndef CS_HAS_MEMORY_MAPPED_IO
 
 bool
-csMemoryMappedIO::MemoryMapFile(mmioInfo *_platform, char *filename)
+csMemoryMappedIO::MemoryMapFile(mmioInfo *_platform, char const *filename)
 {
   // Clear the page map
   page_map = NULL;

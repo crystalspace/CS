@@ -128,7 +128,7 @@ private:
 public:
   /** Block size is the size of blocks that you want to get from the file, filename is the name of the file to
    * map.  Indexes will be resolved to absolute_index=index*block_size */
-  csMemoryMappedIO(unsigned _block_size, char *filename);
+  csMemoryMappedIO(unsigned _block_size, char const *filename);
 
   /** Destroys the mmapio object, closes open files, and releases memory.
    */
@@ -190,7 +190,7 @@ private:
   void CachePage(unsigned int page);
 
   /// Maps file into memory
-  bool MemoryMapFile(mmioInfo *platform, char *filename);
+  bool MemoryMapFile(mmioInfo *platform, char const *filename);
 
   /// Unmaps file from memory
   void UnMemoryMapFile(mmioInfo *platform);
