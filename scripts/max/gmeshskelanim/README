@@ -3,6 +3,6 @@ Studio.
 
 Some notes:
 
-- Copy iPhysique.gup to your max_dir/plugins and restart max. 
-- After biped creation use physique modifier.
+- Copy IPhysique.gup to your max_dir/plugins and restart MAX.
+- After biped creation use `physique modifier'.
 - All vertices should be "rigid" type when rigging model.
