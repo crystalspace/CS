@@ -22,6 +22,7 @@
 //-----------------------------------------------------------------------------
 #include "cssysdef.h"
 #include "NeXTDelegate.h"
+#include "NeXTKeymap.h"
 #include "cssys/next/NeXTSystemDriver.h"
 extern "Objective-C" {
 #import <appkit/Application.h>
@@ -32,6 +33,10 @@ extern "C" {
 #include <string.h>
 }
 int const TRACK_TAG = 9797;
+
+#if !defined(NX_FUNCTIONSET)
+#define NX_FUNCTIONSET 0xfe /* Cousin to NX_ASCIISET and NX_SYMBOLSET. */
+#endif
 
 //-----------------------------------------------------------------------------
 // For each keystroke, Crystal Space expects a raw key code and a cooked
@@ -46,6 +51,7 @@ int const TRACK_TAG = 9797;
 //      shift-e  e    E
 //      F        f    F
 //      alt-m    m    "mu" *
+//      shift-4  4    $
 //
 // (*) For alt-m, the cooked character depends upon the user's current key
 // mapping.  It may actually be mapped to any character, but is often mapped to
@@ -77,10 +83,10 @@ enum
     K_BACKSPACE		= '\b',		// ascii-set
     K_ESCAPE		= 0x1b,		// ascii-set
     K_DELETE		= 0x7f,		// ascii-set
-    K_LEFT		= 0xac,		// symbol-set
-    K_UP		= 0xad,		// symbol-set
-    K_RIGHT		= 0xae,		// symbol-set
-    K_DOWN		= 0xaf,		// symbol-set
+    K_LEFT		= 0xac,		// symbol-set, numeric-pad mask
+    K_UP		= 0xad,		// symbol-set, numeric-pad mask
+    K_RIGHT		= 0xae,		// symbol-set, numeric-pad mask
+    K_DOWN		= 0xaf,		// symbol-set, numeric-pad mask
     K_KP_CENTER		= '5',		// ascii-set, numeric-pad mask
     K_KP_LEFT		= '4',		// ascii-set, numeric-pad mask
     K_KP_UP		= '8',		// ascii-set, numeric-pad mask
@@ -96,14 +102,27 @@ enum
     K_KP_DIVIDE		= '/',		// ascii-set, numeric-pad mask
     K_KP_PLUS		= '+',		// ascii-set, numeric-pad mask
     K_KP_MINUS		= '-',		// symbol-set, numeric-pad mask
-    K_KP_ENTER		= 0x03,		// 254-set
-    K_ED_PAGE_UP	= 0x30,		// 254-set
-    K_ED_PAGE_DOWN	= 0x31,		// 254-set
-    K_ED_HOME		= 0x2e,		// 254-set
-    K_ED_END		= 0x2f,		// 254-set
-    K_ED_INSERT		= 0x2c,		// 254-set
-    K_ED_DELETE		= 0x2d,		// 254-set
+    K_KP_ENTER		= 0x03,		// function-set
+    K_ED_PAGE_UP	= 0x30,		// function-set
+    K_ED_PAGE_DOWN	= 0x31,		// function-set
+    K_ED_HOME		= 0x2e,		// function-set
+    K_ED_END		= 0x2f,		// function-set
+    K_ED_INSERT		= 0x2c,		// function-set
+    K_ED_DELETE		= 0x2d,		// function-set
+    K_F1		= 0x20,		// function-set
+    K_F2		= 0x21,		// function-set
+    K_F3		= 0x22,		// function-set
+    K_F4		= 0x23,		// function-set
+    K_F5		= 0x24,		// function-set
+    K_F6		= 0x25,		// function-set
+    K_F7		= 0x26,		// function-set
+    K_F8		= 0x27,		// function-set
+    K_F9		= 0x28,		// function-set
+    K_F10		= 0x29,		// function-set
+    K_F11		= 0x2a,		// function-set
+    K_F12		= 0x2b,		// function-set
     };
+
 
 //=============================================================================
 // IMPLEMENTATION
@@ -400,18 +419,31 @@ static void timer_handler( DPSTimedEntry, double, void* data )
 
 
 //-----------------------------------------------------------------------------
-// classifyOtherSet::
+// classifyFunctionSet::
 //-----------------------------------------------------------------------------
-- (void)classifyOtherSet:(int*)raw :(int*)cooked
+- (void)classifyFunctionSet:(int*)raw :(int*)cooked
     {
+    *cooked = -1;
     switch (*raw)
 	{
-	case K_ED_PAGE_UP:   *raw = CSKEY_PGUP; *cooked = -1; break;
-	case K_ED_PAGE_DOWN: *raw = CSKEY_PGDN; *cooked = -1; break;
-	case K_ED_HOME:      *raw = CSKEY_HOME; *cooked = -1; break;
-	case K_ED_END:       *raw = CSKEY_END;  *cooked = -1; break;
-	case K_ED_INSERT:    *raw = CSKEY_INS;  *cooked = -1; break;
-	case K_ED_DELETE:    *raw = CSKEY_DEL;  *cooked = -1; break;
+	case K_ED_PAGE_UP:   *raw = CSKEY_PGUP; break;
+	case K_ED_PAGE_DOWN: *raw = CSKEY_PGDN; break;
+	case K_ED_HOME:      *raw = CSKEY_HOME; break;
+	case K_ED_END:       *raw = CSKEY_END;  break;
+	case K_ED_INSERT:    *raw = CSKEY_INS;  break;
+	case K_ED_DELETE:    *raw = CSKEY_DEL;  break;
+	case K_F1:           *raw = CSKEY_F1;   break;
+	case K_F2:           *raw = CSKEY_F2;   break;
+	case K_F3:           *raw = CSKEY_F3;   break;
+	case K_F4:           *raw = CSKEY_F4;   break;
+	case K_F5:           *raw = CSKEY_F5;   break;
+	case K_F6:           *raw = CSKEY_F6;   break;
+	case K_F7:           *raw = CSKEY_F7;   break;
+	case K_F8:           *raw = CSKEY_F8;   break;
+	case K_F9:           *raw = CSKEY_F9;   break;
+	case K_F10:          *raw = CSKEY_F10;  break;
+	case K_F11:          *raw = CSKEY_F11;  break;
+	case K_F12:          *raw = CSKEY_F12;  break;
 	}
     }
 
@@ -419,7 +451,7 @@ static void timer_handler( DPSTimedEntry, double, void* data )
 //-----------------------------------------------------------------------------
 // classifyAsciiSet::
 //	*NOTE* The so-called "backspace" key on the keyboard actually sends
-//	DEL, however, Crystal Space would like to see it as CSKEY_BACKSPACE.
+//	DEL, however Crystal Space would like to see it as CSKEY_BACKSPACE.
 //-----------------------------------------------------------------------------
 - (void)classifyAsciiSet:(int*)raw :(int*)cooked
     {
@@ -478,15 +510,20 @@ static void timer_handler( DPSTimedEntry, double, void* data )
     *raw = *cooked = 0;
     if ((p->flags & NX_COMMANDMASK) == 0)
 	{
-	*raw = p->data.key.charCode;	// @@@FIXME: Derive `real' raw code.
-	*cooked = p->data.key.charCode;
-	if ((p->flags & NX_NUMERICPADMASK) != 0)
-	    [self classifyKeypad:raw:cooked];
-	else if (p->data.key.charSet != NX_ASCIISET)
-	    [self classifyOtherSet:raw:cooked];
-	else
-	    [self classifyAsciiSet:raw:cooked];
-	ok = YES;
+	NeXTKeymap::Binding const& binding =
+	    keymap->binding_for_scan_code( p->data.key.keyCode );
+	if (binding.is_bound())
+	    {
+	    *raw = binding.code;
+	    *cooked = p->data.key.charCode;
+	    if ((p->flags & NX_NUMERICPADMASK) != 0)
+		[self classifyKeypad:raw:cooked];
+	    else if (binding.character_set == NX_FUNCTIONSET)
+		[self classifyFunctionSet:raw:cooked];
+	    else if (binding.character_set == NX_ASCIISET)
+		[self classifyAsciiSet:raw:cooked];
+	    ok = YES;
+	    }
 	}
     return ok;
     }
@@ -692,6 +729,7 @@ static void timer_handler( DPSTimedEntry, double, void* data )
     animationWindow = 0;
     oldEventMask = 0;
     driver = p;
+    keymap = new NeXTKeymap;
     timer = 0;
     modifiers = 0;
     mouseHidden = NO;
@@ -709,6 +747,7 @@ static void timer_handler( DPSTimedEntry, double, void* data )
     {
     [self stopTimer];
     [self freeWindowTitle];
+    delete keymap;
     return [super free];
     }
 

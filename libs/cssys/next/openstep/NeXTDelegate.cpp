@@ -44,6 +44,7 @@ extern "Objective-C" {
 //      shift-e  e    E
 //      F        f    F
 //      alt-m    m    "mu" *
+//      shift-4  4    $
 //
 // (*) For alt-m, the cooked character depends upon the user's current key
 // mapping.  It may actually be mapped to any character, but is often mapped to
@@ -356,18 +357,18 @@ enum
 	case K_ED_END:       *raw = CSKEY_END;   break;
 	case K_ED_INSERT:    *raw = CSKEY_INS;   break;
 	case K_ED_DELETE:    *raw = CSKEY_DEL;   break;
-	case K_F1:           *raw = CSKEY_F1;   break;
-	case K_F2:           *raw = CSKEY_F2;   break;
-	case K_F3:           *raw = CSKEY_F3;   break;
-	case K_F4:           *raw = CSKEY_F4;   break;
-	case K_F5:           *raw = CSKEY_F5;   break;
-	case K_F6:           *raw = CSKEY_F6;   break;
-	case K_F7:           *raw = CSKEY_F7;   break;
-	case K_F8:           *raw = CSKEY_F8;   break;
-	case K_F9:           *raw = CSKEY_F9;   break;
-	case K_F10:          *raw = CSKEY_F10;  break;
-	case K_F11:          *raw = CSKEY_F11;  break;
-	case K_F12:          *raw = CSKEY_F12;  break;
+	case K_F1:           *raw = CSKEY_F1;    break;
+	case K_F2:           *raw = CSKEY_F2;    break;
+	case K_F3:           *raw = CSKEY_F3;    break;
+	case K_F4:           *raw = CSKEY_F4;    break;
+	case K_F5:           *raw = CSKEY_F5;    break;
+	case K_F6:           *raw = CSKEY_F6;    break;
+	case K_F7:           *raw = CSKEY_F7;    break;
+	case K_F8:           *raw = CSKEY_F8;    break;
+	case K_F9:           *raw = CSKEY_F9;    break;
+	case K_F10:          *raw = CSKEY_F10;   break;
+	case K_F11:          *raw = CSKEY_F11;   break;
+	case K_F12:          *raw = CSKEY_F12;   break;
 	}
     }
 

@@ -1,14 +1,35 @@
 The history order has been reversed so that new features are at the top.
 
 22-Dec-2000
-	- Eliminated a bug in the procedural texture manager for the
-	  software renderer. The problem was that only the first 8-bit
-	  proc texture was correctly initialized.
-	- Fixed csfx so that there is only one Initialize() method now
-	  as was originally intended.
-	- Disabled lighting for the fire polygon that is created in simple.
-	  Now fire will actually look like fire and not green :-)
-	- Disabled lighting for water too.
+	- Eliminated a bug in the procedural texture manager for the software
+	  renderer.  The problem was that only the first 8-bit proc texture was
+	  correctly initialized.
+	- Fixed csfx so that there is only one Initialize() method now as was
+	  originally intended.
+	- Disabled lighting for the fire and water polygons that are created in
+	  simple.  Now fire and water will actually look like fire and water
+	  without having a green tint (from the nearby green light).
+	- Eric Sunshine made the following changes to the project:
+	    - Upgraded the NextStep port of Crystal Space to be fully
+	      compatible with Andrew's National Keyboard Support.  Implementing
+	      this required reverse engineering internal NextStep data
+	      structures and writing code to extract the appropriate
+	      information.  See the discussion in the new NeXTKeymap.cpp file
+	      for a detailed explanation.  (National Keyboard Support had
+	      already been enabled for the MacOS/X Server and OpenStep ports
+	      several days earlier.)
+	    - Fixed a long-standing problem with keyboard handling in the
+	      NextStep port.  Keystrokes modified by the Alternate key were
+	      never interpreted correctly by Crystal Space.  The reason for
+	      this was that NextStep had already cooked the keystroke
+	      completely out of recognition by the time Crystal Space had a
+	      chance to see it, and there was no way to retrieve the original,
+	      unmodified keystroke.  Reverse engineering the internal NeXT data
+	      structures for National Keyboard Support made it possible to fix
+	      this problem by making the unmodified (raw) keystroke available.
+	    - Implemented F1 - F12 function key translation in the NextStep
+	      port.  (These keys had already been implemented in the MacOS/X
+	      Server and OpenStep ports several days earlier.)
 21-Dec-2000
 	- Philip Wyett fixed a small bug in texture.h.
 	- Philip also found a bug in ~SoftwareCachedTexture () which

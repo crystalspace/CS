@@ -13,7 +13,7 @@
 @cindex NextStep Details
 
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.  Copyright
-@copyright{} 1999, 2000 by Eric Sunshine.  Last updated 8 September 2000.}
+@copyright{} 1999, 2000 by Eric Sunshine.  Last updated 22 December 2000.}
 
 This section contains comprehensive and detailed implementation information
 about the MacOS/X Server, OpenStep 4.2, and NextStep 3.3 ports of Crystal
@@ -657,11 +657,10 @@ preferred depth any longer.  May as well simplify the code by once again using
 @code{+[NSWindow defaultDepthLimit]}.
 
 @item
-Consider
-flushing only part of the frame buffer to the display upon invocation of
-@code{csGraphics2D::Print()} rather than the entire frame buffer.  Be careful,
-though.  The current technique of flushing the entire frame buffer takes
-advantage of out-of-line data in Mach messages, so it is very fast.
+Consider flushing only part of the frame buffer to the display upon invocation
+of @code{csGraphics2D::Print()} rather than the entire frame buffer.  Be
+careful, though.  The current technique of flushing the entire frame buffer
+takes advantage of out-of-line data in Mach messages, so it is very fast.
 
 @item
 Re-write event handling so that it no longer relies on a timer to drive
@@ -703,21 +702,6 @@ directory in which the Crystal Space applications reside.  Unfortunately,
 neither Viewer nor Workspace Manager provide the necessary information for
 Crystal Space to locate these administrative files.  Therefore, at this time,
 all Crystal Space applications @emph{must} be launched from the command-line.
-
-@item
-Keyboard events generated with the @key{ALT} modifier are not correctly
-translated to Crystal Space events.  The reason is that NextStep @dfn{cooks}
-the key-code completely into some other character prior to sending the
-key-down event, and there is no way to recover the original unmodified
-key-code.  This is a shortcoming in @NeXT{}'s event system.  Fortunately
-neither MacOS/X Server nor OpenStep suffer from this problem since both
-provide the much needed ability to recover the uncooked key-code.  One
-possible solution to this problem for NextStep is to use the raw keyboard
-scan-code and manually cook that into the appropriate @sc{ascii} key-code.  I
-have begun preliminary work on this solution by reverse-engineering @NeXT{}'s
-@file{.keymapping} file format.  With this information, it should be possible
-to build a table capable of translating scan-codes to the @sc{ascii} codes
-which Crystal Space expects.
 @end itemize
 
 @unmacro NeXT

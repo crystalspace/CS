@@ -30,11 +30,13 @@ extern "C" {
 #import <dpsclient/event.h>
 }
 @class View, Window;
+class NeXTKeymap;
 class NeXTSystemDriver;
 
 @interface NeXTDelegate : Object
     {
     NeXTSystemDriver* driver;
+    NeXTKeymap* keymap;
     Window* animationWindow;
     int oldEventMask;
     DPSTimedEntry timer;
