@@ -113,7 +113,7 @@ bool csBasicVector::DeleteChunk (int n, int size)
 { // no run-time checks here, just in debug mode
   CS_ASSERT( (n >= 0) && (n < count) );
   CS_ASSERT( (size > 0) && ( n + size <= count ) );
-  const int nmove  = count - n;
+  const int nmove  = count - n - size;
   if ( nmove > 0 )
     memmove (&root [ n ] , &root [ n + size ] , nmove * sizeof (csSome) );
   
