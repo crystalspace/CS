@@ -35,6 +35,8 @@ chronological order.
 	  will load a map, take all static geometry and then calculate the
 	  PVS data for it which can be used by PVSvis. Currently this tool
 	  is only a copy of simpmap tutorial.
+	- res fixed cswinCallStackHelper to pass the correct settings when
+	  stackwalking on the x86_64 platform.
 17-Dec-2004
 	- Peter Amstutz updated the csvosa3dl plugin to compile with
 	  the current VOS CVS code.

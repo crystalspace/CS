@@ -487,6 +487,14 @@ csCallStack* cswinCallStackHelper::CreateCallStack (HANDLE hProc,
   frame.AddrFrame.Offset = context.Ebp;
   frame.AddrFrame.Mode = AddrModeFlat;
 #elif (CS_PROCESSOR_SIZE == 64)
+  machineType = IMAGE_FILE_MACHINE_AMD64;
+  frame.AddrPC.Offset = context.Rip;
+  frame.AddrPC.Mode = AddrModeFlat;
+  frame.AddrStack.Offset = context.Rsp;
+  frame.AddrStack.Mode = AddrModeFlat;
+  frame.AddrFrame.Offset = context.Rbp;
+  frame.AddrFrame.Mode = AddrModeFlat;
+  /* @@@ Code below is for IA64.
   // Reference: http://www.mcse.ms/archive108-2003-11-97141.html
   machineType = IMAGE_FILE_MACHINE_IA64;
   frame.AddrPC.Offset = context.StIIP;
@@ -495,6 +503,7 @@ csCallStack* cswinCallStackHelper::CreateCallStack (HANDLE hProc,
   frame.AddrStack.Mode = AddrModeFlat;
   frame.AddrBStore.Offset = context.RsBSP;
   frame.AddrBStore.Mode = AddrModeFlat;
+  */
 #else // CS_PROCESSOR_SIZE
 #error Do not know how to stack walk for your processor word size.
 #endif // CS_PROCESSOR_SIZE
