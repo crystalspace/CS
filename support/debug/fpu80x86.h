@@ -43,8 +43,6 @@
      ---1 ---- ---- ---- = IC_PROJECTIVE - -Inf == +Inf
 */
 
-#error useme
-
 static inline unsigned int csControl87(unsigned int newcw, unsigned int mask)
 {
   int oldcw;
