@@ -12,8 +12,12 @@
 # The following include file should define all variables
 # needed for this makefile to work. Please do not change
 # the include order unless you know what you are doing!
-include mk/user.mak
+MAKESECTION=earlyinit
 -include config.mak
+ifneq ($(TARGET_MAKEFILE),)
+  include $(TARGET_MAKEFILE)
+endif
+include mk/user.mak
 include mk/common.mak
 
 .PHONY: depend clean cleanlib cleandep distclean show

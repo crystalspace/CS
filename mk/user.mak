@@ -6,6 +6,10 @@
 # Documentation copyright (C)1999-2001 by Eric Sunshine.
 #=============================================================================
 
+# Include a local makefile where you can add additional targets or whatever.
+# This comes in handy, if you don't want to alter the original CS makefiles.
+-include mk/local.mak
+
 #-----------------------------------------------------------------------------
 # Dynamic Settings
 # Changes to these settings will be reflected in the makefile system
@@ -217,16 +221,22 @@ endif
 
 # If 'yes' include assembly optimizations in Crystal Space.  On systems that
 # don't support this, setting this option to 'yes' does nothing.
-DO_ASM=yes
+ifndef DO_ASM
+  DO_ASM=yes
+endif
 
 # If "yes" include MMX support in software renderer
-DO_MMX=yes
+ifndef DO_MMX
+  DO_MMX=yes
+endif
 
 # Set to 1 to use Mesa instead of "real" OpenGL.  You can define MESA_PATH
 # variable in environment to point to MesaGL base path. If Mesa is not
 # used then you can use OPENGL_PATH to point to the base of the OpenGL
 # libraries and includes.
-USE_MESA=0
+ifndef USE_MESA
+  USE_MESA=0
+endif
 
 # The tool used to build dependencies. The possible values are:
 # none  - Cannot build dependencies on this platform
@@ -235,7 +245,3 @@ USE_MESA=0
 ifndef DEPEND_TOOL
   DEPEND_TOOL=cc
 endif
-
-# Include a local makefile where you can add additional targets or whatever.
-# This comes in handy, if you don't want to alter the original CS makefiles.
--include mk/local.mak

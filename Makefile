@@ -18,6 +18,10 @@
 RECMAKEFLAGS=--no-print-directory --no-builtin-rules
 MAKEFLAGS+=r
 
+MAKESECTION=earlyinit
+ifneq ($(TARGET_MAKEFILE),)
+  include $(TARGET_MAKEFILE)
+endif
 include mk/user.mak
 include mk/common.mak
 

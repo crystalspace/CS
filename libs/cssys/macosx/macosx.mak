@@ -10,6 +10,8 @@ PLUGINS += video/canvas/macosx/opengl
 PLUGINS += sound/driver/coreaudio
 PLUGINS += sound/renderer/software
 
+GL.AVAILABLE = yes
+
 DESCRIPTION.macosx = MacOS/X
 DESCRIPTION.OS.macosx = MacOS/X
 
@@ -97,7 +99,6 @@ CFLAGS.GENERAL = \
 CFLAGS.PIXEL_LAYOUT = -DCS_24BIT_PIXEL_LAYOUT=CS_24BIT_PIXEL_ARGB
 
 # OpenGL support.
-GL.AVAILABLE = yes
 GL.CFLAGS = -DCS_OPENGL_PATH=OpenGL
 GL.LFLAGS = -framework OpenGL
 
