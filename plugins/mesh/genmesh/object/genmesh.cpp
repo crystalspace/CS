@@ -919,7 +919,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
       for (int i = 0; i < num_mesh_triangles; i ++) {
         ibuf[i * 3 + 0] = mesh_triangles[i].a;
         ibuf[i * 3 + 1] = mesh_triangles[i].b;
-        ibuf[i * 3 + 2] = mesh_triangles[i].a;
+        ibuf[i * 3 + 2] = mesh_triangles[i].c;
       }
       index_buffer->Release ();
     }
