@@ -282,18 +282,6 @@ bool ddgTBinMesh::init( double *worldToCameraMatrix, ddgBBox *camClipBox, float 
 		}
 	}
 	i = 0;
-#ifdef _DEBUG
-	//cerr << endl;
-	while (i < _bintreeMax)
-	{
-		if (_bintree[i])
-		{
-			//cerr << _bintree[i] << endl;
-		}
-		i++;
-	}
-#endif
-	//cerr << endl << "Calculating wedgies:";
 
     return false;
 }
@@ -405,9 +393,6 @@ void ddgTBinMesh::initBrothers( void )
         lk = k;
 		k = kk;  // 2^n
 	}
-//	for (t = 0; t < _triNo+2; t++)
-//				cerr << "[" << t << "," << stri[t].brother << "]";
-	//cerr << "done\n";
 }
 
 //static bool debugDraw = false;
