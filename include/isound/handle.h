@@ -47,7 +47,11 @@ struct iSoundHandle : public iBase
   virtual bool IsStatic() = 0;
 
   /// play an instance of this sound
-  virtual void Play(bool Loop = false) = 0;
+  /// For Loop == true it returns a iSoundSource you have to Stop ()
+  /// if you want to get rid of the looping sound
+  /// (also if you want to unload your SoundRenderer)
+  /// If Loop is false NULL is returned
+  virtual iSoundSource *Play(bool Loop = false) = 0;
   /// create a sound source
   virtual iSoundSource *CreateSource(int Mode3d) = 0;
 
