@@ -24,6 +24,9 @@ chronological order.
 	  sourceType of the texture is equal to GL_UNSIGNED_SHORT_5_6_5
 	  (i.e. 16 bit) then it would allocate not enough memory to keep
 	  the image_data in.
+	- Jorrit modified the thing plugin so that by default it will only
+	  give 10 warnings about bad UV coordinates unless the -verbose
+	  commandline option is given.
 25-Feb-2004
 	- Fritz Elfert fixed the following lighting related crash in sprcal3d:
 	  Previously, csSpriteCal3DMeshObject managed a set of relevant lights

@@ -620,6 +620,7 @@ void csPolygon3DStatic::GetTextureSpace (
   }
 }
 
+static int bad_poly_counter = 0;
 void csPolygon3DStatic::SetTextureSpace (
   const csVector3 &p1,
   const csVector2 &uv1,
@@ -655,9 +656,11 @@ void csPolygon3DStatic::SetTextureSpace (
 
   if (ABS (det) < 0.0001f)
   {
-    thing_static->thing_type->Warn (
-      "Warning: bad UV coordinates for poly '%s'!",
-      GetName ());
+    bad_poly_counter++;
+    if (csThingObjectType::do_verbose || bad_poly_counter < 10)
+      thing_static->thing_type->Warn (
+        "Warning: bad UV coordinates for poly '%s'!",
+        GetName ());
     SetTextureSpace (p1, p2, 1);
     return ;
   }
