@@ -1,15 +1,11 @@
 %define name    crystalspace
 %define version 0.99
-%define release 6
+%define release 7
 %define prefix	/usr
 
 %define with_DEBUG 0
 %{?_without_debug: %{expand: %%global with_DEBUG 0}}
 %{?_with_debug: %{expand: %%global with_DEBUG 1}}
-                                                                                                         
-%define with_OR 0
-%{?_without_oldrenderer: %{expand: %%global with_OR 0}}
-%{?_with_oldrenderer: %{expand: %%global with_OR 1}}
                                                                                                          
 %define with_PERL 0
 %{?_without_perl: %{expand: %%global with_PERL 0}}
@@ -55,9 +51,6 @@ Documentation (manual and public API reference) for CrystalSpace free 3D SDK.
 sh  configure \
 %if %{with_DEBUG}
  --enable-debug \
-%endif
-%if %{with_OR}
- --enable-old-renderer \
 %endif
 %if %{with_PERL}
  --with-perl \
@@ -143,6 +136,9 @@ rm -rf "$RPM_BUILD_ROOT"
 %{prefix}/include/%{name}/igraphic/*.h
 
 %changelog
+* Mon Dec 13 2004 Eric Sunshine <sunshine@sunshineco.com> 0.99-7
+- The old-renderer has been retired.
+
 * Sun Nov 28 2004 Eric Sunshine <sunsihne@sunshineco.com> 0.99-6
 - Crystal Space now has its own domain: crystalspace3d.org.
 - New renderer is now default (configure with --enable-old-renderer for old).

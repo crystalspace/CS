@@ -19,61 +19,11 @@
 #
 #==============================================================================
 
-MSVC_WORKSPACE_OLDRENDERER_REJECTS =
-  chunklod
-  csjava
-  csperl5
-  cspython
-  glrender3d
-  glshader_arb
-  glshader_cg
-  glshader_fixed
-  glshader_ps1
-  grpnrall
-  isotest
-  nullrender3d
-  render3dcommon
-  shadermgr
-  softrender3d
-  softshader
-  terrainldr
-  waterdemo
-  xmlshader
-  ;
-
-MSVC_WORKSPACE_TYPICAL_REJECTS =
-  gl3d
-  null3d
-  renderercommon
-  soft3d
-  ;
-
 # Everything.
 # MsvcGenWorkspace all : : "grp.+_(?!all$)" ;
 
-# What the typical user will need. Presently, everything but the old renderer
-# and wxWidgets.
-MsvcGenWorkspace typical : :
-  $(MSVC_WORKSPACE_TYPICAL_REJECTS)
-  "grp.+_(?!typical$)"
-  wx
-  ;
-
-# Similar to "typical" but using the old renderer instead of the new.
-MsvcGenWorkspace oldrenderer : :
-  $(MSVC_WORKSPACE_OLDRENDERER_REJECTS)
-  "grp.+_(?!oldrenderer$)"
-  wx
-  ;
+# What the typical user will need. Presently, everything but wxWidgets.
+MsvcGenWorkspace typical : : "grp.+_(?!typical$)" wx ;
 
 # Similar to "typical", but with wxWidgets.
-MsvcGenWorkspace wxtypical : :
-  $(MSVC_WORKSPACE_TYPICAL_REJECTS)
-  "grp.+_(?!wxtypical$)"
-  ;
-
-# Similar to "oldrenderer", but with wxWidgets.
-MsvcGenWorkspace wxoldrenderer : :
-  $(MSVC_WORKSPACE_OLDRENDERER_REJECTS)
-  "grp.+_(?!wxoldrenderer$)"
-  ;
+MsvcGenWorkspace wxtypical : : "grp.+_(?!wxtypical$)" ;

@@ -51,16 +51,18 @@ Description walkall  	 : "Walktest application and all required plugins" ;
 Description openglcanvas : "canvases for the OpenGL renderer" ;
 Description softcanvas   : "canvases for the software renderer" ;
 Description proctexes    : "procedural texture plugins" ;
-Description nrall        : "new-renderer-related modules" ;
+Description renderall    : "all renderer-related modules" ;
 RegisterCompileGroups sounddrivers soundloaders imageloaders fontservers
 		      canvases renderers meshes walkall openglcanvas 
-		      softcanvas proctexes nrall ;
+		      softcanvas proctexes renderall ;
 
 # Historic group aliases.
 NotFile drivers2d ;
 Depends drivers2d : canvases ;
 NotFile drivers3d ;
 Depends drivers3d : renderers ;
+NotFile nrall ;
+Depends nrall : renderall ;
 
 # Process subdirectories.  NOTE: Unfortunately, Jam rules are presently
 # order-sensitive; Library targets must be seen by Jam before Application and

@@ -20,34 +20,10 @@
 #==============================================================================
 
 #------------------------------------------------------------------------------
-# Crystal Space adds several additional build configurations to the default set
+# Crystal Space adds additional build configurations to the default set
 # provided by the generic, project-agnostic builds[] array (control.tlib).
 #------------------------------------------------------------------------------
 builds = builds.merge([
-  {
-    tag => 'release',
-    name => 'Release_OR',
-    defines => ['NDEBUG','CS_USE_OLD_RENDERER'],
-    defineskey => 'define',
-    cflagskey => 'cflags',
-    incdirskey => 'include',
-    lflagskey => 'lflags',
-    libskey => 'library',
-    libdirskey => 'libdir',
-    priority => 300
-  },
-  {
-    tag => 'debug',
-    name => 'Debug_OR',
-    defines => ['_DEBUG','CS_DEBUG','CS_USE_OLD_RENDERER'],
-    defineskey => 'definedebug',
-    cflagskey => 'cflagsdebug',
-    incdirskey => 'includedebug',
-    lflagskey => 'lflagsdebug',
-    libskey => 'librarydebug',
-    libdirskey => 'libdirdebug',
-    priority => 400
-  },
   {
     tag => 'debug',
     name => 'ExtensiveMemDebug',
@@ -59,19 +35,6 @@ builds = builds.merge([
     libskey => 'librarydebug',
     libdirskey => 'libdirdebug',
     priority => 500
-  },
-  {
-    tag => 'debug',
-    name => 'ExtensiveMemDebug_OR',
-    defines => ['_DEBUG','CS_DEBUG','CS_USE_OLD_RENDERER',
-		'CS_EXTENSIVE_MEMDEBUG'],
-    defineskey => 'definedebug',
-    cflagskey => 'cflagsdebug',
-    incdirskey => 'includedebug',
-    lflagskey => 'lflagsdebug',
-    libskey => 'librarydebug',
-    libdirskey => 'libdirdebug',
-    priority => 600
   }]);
 
 END %]
