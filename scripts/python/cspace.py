@@ -410,6 +410,7 @@ class csVector2(_object):
         _swig_setattr(self, csVector2, 'this', _cspace.new_csVector2(*args))
         _swig_setattr(self, csVector2, 'thisown', 1)
     def Set(*args): return _cspace.csVector2_Set(*args)
+    def Get(*args): return _cspace.csVector2_Get(*args)
     def Norm(*args): return _cspace.csVector2_Norm(*args)
     def SquaredNorm(*args): return _cspace.csVector2_SquaredNorm(*args)
     def Rotate(*args): return _cspace.csVector2_Rotate(*args)
@@ -450,6 +451,15 @@ class csVector3(_object):
     __getattr__ = lambda self, name: _swig_getattr(self, csVector3, name)
     def __repr__(self):
         return "<C csVector3 instance at %s>" % (self.this,)
+    __swig_setmethods__["x"] = _cspace.csVector3_x_set
+    __swig_getmethods__["x"] = _cspace.csVector3_x_get
+    if _newclass:x = property(_cspace.csVector3_x_get, _cspace.csVector3_x_set)
+    __swig_setmethods__["y"] = _cspace.csVector3_y_set
+    __swig_getmethods__["y"] = _cspace.csVector3_y_get
+    if _newclass:y = property(_cspace.csVector3_y_get, _cspace.csVector3_y_set)
+    __swig_setmethods__["z"] = _cspace.csVector3_z_set
+    __swig_getmethods__["z"] = _cspace.csVector3_z_get
+    if _newclass:z = property(_cspace.csVector3_z_get, _cspace.csVector3_z_set)
     def __init__(self, *args):
         _swig_setattr(self, csVector3, 'this', _cspace.new_csVector3(*args))
         _swig_setattr(self, csVector3, 'thisown', 1)
@@ -459,6 +469,7 @@ class csVector3(_object):
     def __pos__(*args): return _cspace.csVector3___pos__(*args)
     def __neg__(*args): return _cspace.csVector3___neg__(*args)
     def Set(*args): return _cspace.csVector3_Set(*args)
+    def Get(*args): return _cspace.csVector3_Get(*args)
     def Norm(*args): return _cspace.csVector3_Norm(*args)
     def SquaredNorm(*args): return _cspace.csVector3_SquaredNorm(*args)
     def Unit(*args): return _cspace.csVector3_Unit(*args)
@@ -5520,6 +5531,7 @@ class iSpriteCal3DState(iBase):
     def GetAnimationTime(*args): return _cspace.iSpriteCal3DState_GetAnimationTime(*args)
     def GetAnimationDuration(*args): return _cspace.iSpriteCal3DState_GetAnimationDuration(*args)
     def SetAnimationTime(*args): return _cspace.iSpriteCal3DState_SetAnimationTime(*args)
+    def GetCal3DModel(*args): return _cspace.iSpriteCal3DState_GetCal3DModel(*args)
     def __del__(self, destroy=_cspace.delete_iSpriteCal3DState):
         try:
             if self.thisown: destroy(self)
