@@ -154,6 +154,9 @@ void csGraphics2DGLCommon::DecomposeColor (int iColor,
       oR = ((iColor & pfmt.RedMask  ) >> pfmt.RedShift  );
       oG = ((iColor & pfmt.GreenMask) >> pfmt.GreenShift);
       oB = ((iColor & pfmt.BlueMask ) >> pfmt.BlueShift );
+      oR = oR << (8-pfmt.RedBits);
+      oG = oG << (8-pfmt.GreenBits);
+      oB = oB << (8-pfmt.BlueBits);
       break;
   }
 }
