@@ -96,7 +96,7 @@ struct iString : public iBase
   { return Clone ()->Append (&iStr); }
 
   /// Convert iString into ASCIIZ
-  operator char * () const
+  operator const char * () const
   { return GetData (); }
 
   /// Check if two strings are equal
