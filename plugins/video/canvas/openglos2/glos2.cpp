@@ -171,14 +171,14 @@ csGraphics2DOS2GL::csGraphics2DOS2GL (ISystem* piSystem) :
 
   if (!SUCCEEDED (piSystem->QueryInterface (IID_IOS2SystemDriver, (void**)&OS2System)))
   {
-    CsPrintf (MSG_FATAL_ERROR, "The system driver does not support the IOS2SystemDriver interface\n");
+    SysPrintf (MSG_FATAL_ERROR, "The system driver does not support the IOS2SystemDriver interface\n");
     exit (-1);
   }
 
   // Initialize OpenGL
   if (!gdGLInitialize ())
   {
-    CsPrintf (MSG_FATAL_ERROR, "Unable to initialize OpenGL library\n");
+    SysPrintf (MSG_FATAL_ERROR, "Unable to initialize OpenGL library\n");
     exit (-1);
   }
 }
@@ -189,18 +189,6 @@ csGraphics2DOS2GL::~csGraphics2DOS2GL (void)
   // Deallocate OpenGL resources
   gdGLDeinitialize ();
   FINAL_RELEASE (OS2System);
-}
-
-void csGraphics2DOS2GL::CsPrintf (int msgtype, char *format, ...)
-{
-  va_list arg;
-  char buf[256];
-
-  va_start (arg, format);
-  vsprintf (buf, format, arg);
-  va_end (arg);
-
-  System->Print (msgtype, buf);
 }
 
 void csGraphics2DOS2GL::Initialize ()
@@ -232,7 +220,7 @@ void csGraphics2DOS2GL::Initialize ()
       pfmt.BlueMask   = 0x00000f00;
       break;
     default:
-      CsPrintf (MSG_FATAL_ERROR, "ERROR: %d bits per pixel modes not supported\n", Depth);
+      SysPrintf (MSG_FATAL_ERROR, "ERROR: %d bits per pixel modes not supported\n", Depth);
       break;
   } /* endswitch */
   complete_pixel_format ();
@@ -255,7 +243,7 @@ bool csGraphics2DOS2GL::Open (char *Title)
   rq.Parm.CreateWindow.Title = Title;
   if ((rc = PMcall (pmcmdCreateWindow, &rq)) != pmrcOK)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Cannot create PM window: no resources bound to executable?\n");
+    SysPrintf (MSG_FATAL_ERROR, "Cannot create PM window: no resources bound to executable?\n");
     return false;
   }
   WinHandle = rq.Parm.CreateWindow.Handle;
@@ -266,7 +254,7 @@ bool csGraphics2DOS2GL::Open (char *Title)
   rq.Parm.CreateCtx.ContextFlags = PixelFormat;
   if ((rc = PMcall (pmcmdCreateGLctx, &rq)) != pmrcOK)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Cannot create OpenGL context\n");
+    SysPrintf (MSG_FATAL_ERROR, "Cannot create OpenGL context\n");
     return false;
   }
 
@@ -283,7 +271,7 @@ bool csGraphics2DOS2GL::Open (char *Title)
   rq.Parm.BindCtx.Handle = WinHandle;
   if ((rc = PMcall (pmcmdBindGLctx, &rq)) != pmrcOK)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Cannot bind OpenGL context to window!\n");
+    SysPrintf (MSG_FATAL_ERROR, "Cannot bind OpenGL context to window!\n");
     return false;
   }
 

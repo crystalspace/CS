@@ -169,10 +169,13 @@ csGraphics3DSoftware::csGraphics3DSoftware (ISystem* piSystem) : m_piG2D(NULL)
 {
   HRESULT hRes;
   CLSID clsid2dDriver;
-  char *sz2DDriver = SOFTWARE_2D_DRIVER;        // "crystalspace.graphics2d.xxx"
+  char *sz2DDriver;
   IGraphics2DFactory* piFactory = NULL;
   tcache = NULL;
   txtmgr = NULL;
+
+  config = new csIniFile ("softrndr.cfg");
+  sz2DDriver = config->GetStr ("Hardware", "DRIVER", SOFTWARE_2D_DRIVER);
 
   m_piSystem = piSystem;
 
@@ -550,7 +553,7 @@ void csGraphics3DSoftware::SetCacheSize (long size)
 
 STDMETHODIMP csGraphics3DSoftware::Initialize ()
 {
-  txtmgr->SetConfig (config = new csIniFile ("softrndr.cfg"));
+  txtmgr->SetConfig (config);
 
   m_piG2D->Initialize ();
   txtmgr->InitSystem ();

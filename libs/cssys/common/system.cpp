@@ -203,6 +203,12 @@ bool csSystemDriver::Open (char *Title)
   // the initialization order is crucial! do not reorder!
   if (FAILED (piG3D->Open (Title)))
     return false;
+  // Query frame width/height/depth as it possibly has been adjusted after open
+  piGI->GetWidth (FrameWidth);
+  piGI->GetHeight (FrameHeight);
+  piGI->GetPixelBytes (Depth);
+  Depth *= 8;
+
   if (!Keyboard->Open (EventQueue))
     return false;
   if (!Mouse->Open (GetISystemFromSystem (this), EventQueue))
@@ -868,7 +874,6 @@ STDMETHODIMP csSystemDriver::XSystem::GetSubSystemPtr(void **retval, int iSubSys
   return S_OK;
 }
 
-
 STDMETHODIMP csSystemDriver::XSystem::ConfigGetInt (char *Section, char *Key,
   int &Value, int Default)
 {
@@ -887,5 +892,36 @@ STDMETHODIMP csSystemDriver::XSystem::ConfigGetYesNo (char *Section, char *Key,
   bool &Value, bool Default)
 {
   Value = Default; if (config) Value = config->GetYesNo (Section, Key, Default);
+  return S_OK;
+}
+
+STDMETHODIMP csSystemDriver::XSystem::QueueKeyEvent (int KeyCode, bool Down)
+{
+  METHOD_PROLOGUE (csSystemDriver, System);
+  if (!KeyCode)
+    return E_FAIL;
+
+  time_t time = pThis->Time ();
+
+  if (Down)
+    pThis->Keyboard->do_keypress (time, KeyCode);
+  else
+    pThis->Keyboard->do_keyrelease (time, KeyCode);
+  return S_OK;
+}
+
+STDMETHODIMP csSystemDriver::XSystem::QueueMouseEvent (int Button,
+  int Down, int x, int y, int ShiftFlags)
+{
+  METHOD_PROLOGUE (csSystemDriver, System);
+  time_t time = System->Time ();
+
+  if (Button == 0)
+    pThis->Mouse->do_mousemotion (time, x, y);
+  else if (Down)
+    pThis->Mouse->do_buttonpress (time, Button, x, y, ShiftFlags & CSMASK_SHIFT,
+      ShiftFlags & CSMASK_ALT, ShiftFlags & CSMASK_CTRL);
+  else
+    pThis->Mouse->do_buttonrelease (time, Button, x, y);
   return S_OK;
 }

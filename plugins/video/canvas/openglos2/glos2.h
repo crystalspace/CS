@@ -105,7 +105,6 @@ protected:
   DECLARE_INTERFACE_TABLE (csGraphics2DOS2GL)
 
 private:
-  void CsPrintf (int msgtype, char *format, ...);
   static void KeyboardHandlerStub (void *Self, unsigned char ScanCode, int Down,
     unsigned char RepeatCount, int ShiftFlags);
   static void MouseHandlerStub (void *Self, int Button, int Down, int x, int y,

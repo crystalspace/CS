@@ -185,14 +185,14 @@ csGraphics2DOS2DIVE::csGraphics2DOS2DIVE (ISystem* piSystem) :
 
   if (!SUCCEEDED (piSystem->QueryInterface (IID_IOS2SystemDriver, (void**)&OS2System)))
   {
-    CsPrintf (MSG_FATAL_ERROR, "The system driver does not support the IOS2SystemDriver interface\n");
+    SysPrintf (MSG_FATAL_ERROR, "The system driver does not support the IOS2SystemDriver interface\n");
     exit (-1);
   }
 
   // Initialize DIVE
   if (!gdDiveInitialize ())
   {
-    CsPrintf (MSG_FATAL_ERROR, "Unable to initialize DIVE\n");
+    SysPrintf (MSG_FATAL_ERROR, "Unable to initialize DIVE\n");
     exit (-1);
   }
 }
@@ -203,18 +203,6 @@ csGraphics2DOS2DIVE::~csGraphics2DOS2DIVE (void)
   // Deallocate DIVE resources
   gdDiveDeinitialize ();
   FINAL_RELEASE (OS2System);
-}
-
-void csGraphics2DOS2DIVE::CsPrintf (int msgtype, char *format, ...)
-{
-  va_list arg;
-  char buf[256];
-
-  va_start (arg, format);
-  vsprintf (buf, format, arg);
-  va_end (arg);
-
-  System->Print (msgtype, buf);
 }
 
 void csGraphics2DOS2DIVE::Initialize ()
@@ -299,7 +287,7 @@ void csGraphics2DOS2DIVE::Initialize ()
     case 8:
       break;
     default:
-      CsPrintf (MSG_FATAL_ERROR, "ERROR: %d bits per pixel modes not supported\n", Depth);
+      SysPrintf (MSG_FATAL_ERROR, "ERROR: %d bits per pixel modes not supported\n", Depth);
       break;
   } /* endswitch */
 
@@ -366,7 +354,7 @@ void csGraphics2DOS2DIVE::Initialize ()
 
   if ((Depth >> 3) != pfmt.PixelBytes)
   {
-    CsPrintf (MSG_WARNING, "WARNING: %d bpp mode requested, but not available: using %d bpp mode\n",
+    SysPrintf (MSG_WARNING, "WARNING: %d bpp mode requested, but not available: using %d bpp mode\n",
       Depth, pfmt.PixelBytes << 3);
   }
 }
@@ -381,14 +369,14 @@ bool csGraphics2DOS2DIVE::Open (char *Title)
   FGVideoMode Mode = // selected mode with double buffering
   { Width, Height, PixelFormat, 2, vmfWindowed };
 
-  CsPrintf (MSG_INITIALIZATION, "Using %c%c%c%c pixel format\n",
+  SysPrintf (MSG_INITIALIZATION, "Using %c%c%c%c pixel format\n",
     PixelFormat, PixelFormat >> 8, PixelFormat >> 16, PixelFormat >> 24);
 
   // Create PM window
   rq.Parm.CreateWindow.Title = Title;
   if ((rc = PMcall (pmcmdCreateWindow, &rq)) != pmrcOK)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Cannot create PM window: no resources bound to executable?\n");
+    SysPrintf (MSG_FATAL_ERROR, "Cannot create PM window: no resources bound to executable?\n");
     return false;
   }
   WinHandle = rq.Parm.CreateWindow.Handle;
@@ -397,7 +385,7 @@ bool csGraphics2DOS2DIVE::Open (char *Title)
   rq.Parm.CreateCtx.Mode = &Mode;
   if ((rc = PMcall (pmcmdCreateDIVEctx, &rq)) != pmrcOK)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Cannot create DIVE context\n");
+    SysPrintf (MSG_FATAL_ERROR, "Cannot create DIVE context\n");
     return false;
   }
 
@@ -416,7 +404,7 @@ bool csGraphics2DOS2DIVE::Open (char *Title)
   rq.Parm.BindCtx.DesktopH = DesktopH;
   if ((rc = PMcall (pmcmdBindDIVEctx, &rq)) != pmrcOK)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Cannot bind DIVE context to window!\n");
+    SysPrintf (MSG_FATAL_ERROR, "Cannot bind DIVE context to window!\n");
     return false;
   }
 
@@ -463,7 +451,7 @@ bool csGraphics2DOS2DIVE::Open (char *Title)
       DrawSprite = DrawSprite32;
       break;
     default:
-      CsPrintf (MSG_WARNING, "WARNING: No 2D routines for selected mode!\n");
+      SysPrintf (MSG_WARNING, "WARNING: No 2D routines for selected mode!\n");
       break;
   } /* endif */
 

@@ -73,7 +73,6 @@ void csGraphics2D::Initialize ()
   system->GetFullScreenSetting (FullScreen);
 
   Font = 0;
-  SetClipRect (0, 0, Width, Height);
   pfmt.PalEntries = 256;
   pfmt.PixelBytes = 1;
   // Initialize pointers to default drawing methods
@@ -110,6 +109,7 @@ bool csGraphics2D::Open (char *Title)
   for (i = 0, addr = 0; i < Height; i++, addr += bpl)
     LineAddress[i] = addr;
 
+  SetClipRect (0, 0, Width, Height);
   return true;
 }
 

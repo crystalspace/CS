@@ -73,6 +73,10 @@ interface ISystem : public IUnknown
   STDMETHOD (ConfigGetStr) (char *Section, char *Key, char *&Value, char *Default = NULL) PURE;
   /// Get a string configuration value
   STDMETHOD (ConfigGetYesNo) (char *Section, char *Key, bool &Value, bool Default = false) PURE;
+  /// Put a keyboard event into event queue 
+  STDMETHOD (QueueKeyEvent) (int KeyCode, bool Down) PURE;
+  /// Put a mouse event into event queue 
+  STDMETHOD (QueueMouseEvent) (int Button, int Down, int x, int y, int ShiftFlags) PURE;
 };
 
 #endif
