@@ -276,10 +276,10 @@ void csMeshWrapper::PlaceMesh ()
   if (movable_sectors->GetCount () == 0) return ; // Do nothing
   csSphere sphere;
   csVector3 radius;
-  mesh->GetRadius (radius, sphere.GetCenter ());
+  mesh->GetObjectModel ()->GetRadius (radius, sphere.GetCenter ());
 
   iSector *sector = movable_sectors->Get (0);
-  movable.SetSector (sector);                     // Make sure all other sectors are removed
+  movable.SetSector (sector);       // Make sure all other sectors are removed
 
   // Transform the sphere from object to world space.
   float max_radius = radius.x;
@@ -349,7 +349,7 @@ int csMeshWrapper::HitBeamBBox (
   float *pr)
 {
   csBox3 b;
-  mesh->GetObjectBoundingBox (b, CS_BBOX_MAX);
+  mesh->GetObjectModel ()->GetObjectBoundingBox (b, CS_BBOX_MAX);
 
   csSegment3 seg (start, end);
   return csIntersect3::BoxSegment (b, seg, isect, pr);
@@ -411,7 +411,7 @@ void csMeshWrapper::GetWorldBoundingBox (csBox3 &cbox)
     wor_bbox_movablenr = movable.GetUpdateNumber ();
 
     csBox3 obj_bbox;
-    mesh->GetObjectBoundingBox (obj_bbox, CS_BBOX_MAX);
+    mesh->GetObjectModel ()->GetObjectBoundingBox (obj_bbox, CS_BBOX_MAX);
 
     // @@@ Maybe it would be better to really calculate the bounding box
 
@@ -432,7 +432,7 @@ void csMeshWrapper::GetWorldBoundingBox (csBox3 &cbox)
 
 void csMeshWrapper::GetRadius (csVector3 &rad, csVector3 &cent) const
 {
-  mesh->GetRadius (rad, cent);
+  mesh->GetObjectModel ()->GetRadius (rad, cent);
   if (children.Length () > 0)
   {
     float max_radius = rad.x;
@@ -468,7 +468,7 @@ void csMeshWrapper::GetTransformedBoundingBox (
   csBox3 &cbox)
 {
   csBox3 box;
-  mesh->GetObjectBoundingBox (box);
+  mesh->GetObjectModel ()->GetObjectBoundingBox (box);
   cbox.StartBoundingBox (trans * box.GetCorner (0));
   cbox.AddBoundingVertexSmart (trans * box.GetCorner (1));
   cbox.AddBoundingVertexSmart (trans * box.GetCorner (2));

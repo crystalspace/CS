@@ -24,10 +24,11 @@
 #include "csutil/cscolor.h"
 #include "imesh/object.h"
 #include "imesh/genmesh.h"
-#include "ivideo/graph3d.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "ivideo/graph3d.h"
 #include "ivideo/vbufmgr.h"
+#include "igeom/objmodel.h"
 
 struct iMaterialWrapper;
 struct iObjectRegistry;
@@ -104,6 +105,8 @@ public:
   csColor GetColor () const { return color; }
   void SetManualColors (bool m) { do_manual_colors = m; }
   bool IsManualColors () const { return do_manual_colors; }
+  void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
+  void GetRadius (csVector3& rad, csVector3& cent);
 
   //----------------------- iMeshObject implementation ------------------------
   SCF_DECLARE_IBASE;
@@ -126,8 +129,6 @@ public:
   {
     return vis_cb;
   }
-  virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
-  virtual void GetRadius (csVector3& rad, csVector3& cent);
   virtual void NextFrame (csTicks /*current_time*/) { }
   virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform&) { }
@@ -136,10 +137,29 @@ public:
     csVector3& isect, float *pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr);
-  virtual long GetShapeNumber () const { return shapenr; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
-  virtual iPolygonMesh* GetWriteObject () { return NULL; }
+
+  //------------------------- iObjectModel implementation ----------------
+  class ObjectModel : public iObjectModel
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObject);
+    virtual long GetShapeNumber () const { return scfParent->shapenr; }
+    virtual iPolygonMesh* GetPolygonMesh () { return NULL; }
+    virtual iPolygonMesh* GetSmallerPolygonMesh () { return NULL; }
+    virtual iPolygonMesh* CreateLowerDetailPolygonMesh (float) { return NULL; }
+    virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
+    {
+      scfParent->GetObjectBoundingBox (bbox, type);
+    }
+    virtual void GetRadius (csVector3& rad, csVector3& cent)
+    {
+      scfParent->GetRadius (rad, cent);
+    }
+  } scfiObjectModel;
+  friend class ObjectModel;
+
+  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 
   //------------------------- iGeneralMeshState implementation ----------------
   class GeneralMeshState : public iGeneralMeshState

@@ -4,6 +4,16 @@ The history order is reversed so that new features are at the top.
 	- Added include/igeom/polymesh.h to css.h.
 	- Fixed bug with csEvCord not calling SCF_CONSTRUCT_IBASE in
 	  constructor.
+	- Added new iObjectModel interface. This interface represents a
+	  generic way to look at some geometry in object space. This
+	  is the most generic way to look at a mesh object.
+	- Added iMeshObject::GetObjectModel() and added this to all
+	  mesh object implementations...
+	- Removed iMeshObject::GetShapeNumber(), GetRadius(),
+	  GetObjectBoundingBox(), and GetWriteObject() since these are now in
+	  GetObjectModel().
+	- Removed iVisibilityObject::GetShapeNumber(), GetBoundingBox(),
+	  and GetWriteObject(). Replaced with GetObjectModel().
 20-May-2002
 	- csThing now implements GetWriteObject(). Currently it will
 	  just return the full detail version of the thing. A lower

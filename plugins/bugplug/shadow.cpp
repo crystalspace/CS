@@ -29,11 +29,17 @@
 
 SCF_IMPLEMENT_IBASE (csShadow)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csShadow::ObjectModel)
+  SCF_IMPLEMENTS_INTERFACE (iObjectModel)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csShadow::csShadow ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   wrap = NULL;
   shadow_mesh = NULL;
   do_bbox = true;
@@ -81,7 +87,8 @@ bool csShadow::Draw (iRenderView* rview, iMovable*, csZBufMode)
   {
     int bbox_color = G3D->GetTextureManager ()->FindRGB (0, 255, 255);
     csBox3 bbox;
-    shadow_mesh->GetMeshObject ()->GetObjectBoundingBox (bbox);
+    shadow_mesh->GetMeshObject ()->GetObjectModel ()->
+    	GetObjectBoundingBox (bbox);
     csVector3 vxyz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xyz);
     csVector3 vXyz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_Xyz);
     csVector3 vxYz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xYz);
@@ -107,7 +114,7 @@ bool csShadow::Draw (iRenderView* rview, iMovable*, csZBufMode)
   {
     int rad_color = G3D->GetTextureManager ()->FindRGB (0, 255, 0);
     csVector3 radius, r, center;
-    shadow_mesh->GetMeshObject ()->GetRadius (radius,center);
+    shadow_mesh->GetMeshObject ()->GetObjectModel ()->GetRadius (radius,center);
     csVector3 trans_o = tr_o2c * center;
     r.Set (radius.x, 0, 0);
     G3D->DrawLine (trans_o-r, trans_o+r, fov, rad_color);

@@ -1226,7 +1226,7 @@ void csBugPlug::Dump (iMeshWrapper* mesh)
       fact->DecRef ();
     }
     csBox3 bbox;
-    obj->GetObjectBoundingBox (bbox);
+    obj->GetObjectModel ()->GetObjectBoundingBox (bbox);
     Report (CS_REPORTER_SEVERITY_DEBUG, "        Object bounding box:");
     Dump (8, bbox);
   }

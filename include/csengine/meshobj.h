@@ -561,20 +561,12 @@ public:
     {
       return &(scfParent->movable.scfiMovable);
     }
-    virtual long GetShapeNumber () const
-    {
-      return scfParent->mesh->GetShapeNumber ();
-    }
-    virtual void GetBoundingBox (csBox3& bbox)
-    {
-      scfParent->mesh->GetObjectBoundingBox (bbox, CS_BBOX_MAX);
-    }
     virtual void MarkVisible () { scfParent->MarkVisible (); }
     virtual void MarkInvisible () { scfParent->MarkInvisible (); }
     virtual bool IsVisible () const { return scfParent->IsVisible (); }
-    virtual iPolygonMesh* GetWriteObject ()
+    virtual iObjectModel* GetObjectModel ()
     {
-      return scfParent->mesh->GetWriteObject ();
+      return scfParent->mesh->GetObjectModel ();
     }
   } scfiVisibilityObject;
   friend struct VisObject;

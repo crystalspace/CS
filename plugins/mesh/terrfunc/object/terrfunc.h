@@ -27,6 +27,7 @@
 #include "imesh/terrfunc.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "igeom/objmodel.h"
 #include "ivideo/vbufmgr.h"
 #include "qsqrt.h"
 
@@ -442,42 +443,45 @@ public:
 
   int CollisionDetect (csTransform *p);
 
-// Take a block index value and convert it to an x,y value
+  // Take a block index value and convert it to an x,y value
   inline void Index2Block( int index, int& x, int& y)
-	{ x = index % blockxy; y = index / blockxy; }
-// Take a block x,y vaue and convert it to an index
+  { x = index % blockxy; y = index / blockxy; }
+  // Take a block x,y vaue and convert it to an index
   inline void Block2Index( int x, int y, int& index )
-	{ index = y * blockxy + x; }
-// Find the nearest top left block to point p.
+  { index = y * blockxy + x; }
+  // Find the nearest top left block to point p.
   void Object2Block( csVector3 p, int& x, int& y)
-	{
-	  x = int ( inv_block_stepx * ( p.x - topleft.x));
-	  y = int ( inv_block_stepy * ( p.z - topleft.z));
-	}
-// Find the nearest top left grid to point p.
+  {
+    x = int ( inv_block_stepx * ( p.x - topleft.x));
+    y = int ( inv_block_stepy * ( p.z - topleft.z));
+  }
+  // Find the nearest top left grid to point p.
   void Object2Grid( csVector3 p, int& block_index, int& x, int& y)
-	{
-	  csVector3 block_corner;
-	  Object2Block(p, x, y);
-	  Block2Object(x, y, block_corner);
-	  Block2Index(x, y, block_index);
-	  x = int ( inv_grid_stepx * ( p.x - block_corner.x ));
-	  y = int ( inv_grid_stepy * ( p.z - block_corner.z ));
-	}
-// Find the top left corner of grid x,y in block bx,by
+  {
+    csVector3 block_corner;
+    Object2Block(p, x, y);
+    Block2Object(x, y, block_corner);
+    Block2Index(x, y, block_index);
+    x = int ( inv_grid_stepx * ( p.x - block_corner.x ));
+    y = int ( inv_grid_stepy * ( p.z - block_corner.z ));
+  }
+  // Find the top left corner of grid x,y in block bx,by
   void Grid2Object( int bx, int by, int x, int y, csVector3& p)
-	{
-	  Block2Object(bx, by, p);
-	  p.x += x * grid_stepx;
-	  p.z += y * grid_stepy;
-	}
-// Find the top left corner of block x,y
+  {
+    Block2Object(bx, by, p);
+    p.x += x * grid_stepx;
+    p.z += y * grid_stepy;
+  }
+  // Find the top left corner of block x,y
   void Block2Object( int x, int y, csVector3& p)
-	{
-	  p.x = x * scale.x + topleft.x;
-	  p.y = topleft.y;
-	  p.z = y * scale.z + topleft.z;
-	}
+  {
+    p.x = x * scale.x + topleft.x;
+    p.y = topleft.y;
+    p.z = y * scale.z + topleft.z;
+  }
+
+  void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
+  void GetRadius (csVector3& rad, csVector3& cent);
 
   ///--------------------- iMeshObject implementation ---------------------
   SCF_DECLARE_IBASE;
@@ -501,9 +505,6 @@ public:
     return vis_cb;
   }
 
-  virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
-  virtual void GetRadius (csVector3& rad, csVector3& cent);
-
   virtual void NextFrame (csTicks) { }
   virtual bool WantToDie () const { return false; }
 
@@ -511,14 +512,32 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
-  virtual iPolygonMesh* GetWriteObject () { return NULL; }
 
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
         csVector3& isect, float* pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr);
 
-  virtual long GetShapeNumber () const { return 1; }
+  //------------------------- iObjectModel implementation ----------------
+  class ObjectModel : public iObjectModel
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csTerrFuncObject);
+    virtual long GetShapeNumber () const { return 1; }
+    virtual iPolygonMesh* GetPolygonMesh () { return NULL; }
+    virtual iPolygonMesh* GetSmallerPolygonMesh () { return NULL; }
+    virtual iPolygonMesh* CreateLowerDetailPolygonMesh (float) { return NULL; }
+    virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
+    {
+      scfParent->GetObjectBoundingBox (bbox, type);
+    }
+    virtual void GetRadius (csVector3& rad, csVector3& cent)
+    {
+      scfParent->GetRadius (rad, cent);
+    }
+  } scfiObjectModel;
+  friend class ObjectModel;
+
+  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 
   /**  RDS NOTE: this is from iTerrainObject, what matches???  **/
   //------------------------- iTerrFuncState implementation ----------------

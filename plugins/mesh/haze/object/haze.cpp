@@ -416,8 +416,13 @@ csHazeHullCone::~csHazeHullCone()
 
 SCF_IMPLEMENT_IBASE (csHazeMeshObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iHazeState)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csHazeMeshObject::ObjectModel)
+  SCF_IMPLEMENTS_INTERFACE (iObjectModel)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csHazeMeshObject::HazeState)
   SCF_IMPLEMENTS_INTERFACE (iHazeState)
@@ -426,6 +431,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory)
 {
   SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiHazeState);
   csHazeMeshObject::factory = factory;
   logparent = NULL;

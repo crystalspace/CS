@@ -39,12 +39,17 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csBallMeshObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iBallState)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csBallMeshObject::BallState)
   SCF_IMPLEMENTS_INTERFACE (iBallState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csBallMeshObject::ObjectModel)
+  SCF_IMPLEMENTS_INTERFACE (iObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csBallMeshObject::eiVertexBufferManagerClient)
@@ -55,6 +60,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
 {
   SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiBallState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
   csBallMeshObject::factory = factory;
@@ -483,7 +489,7 @@ bool csBallMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 #if 1
   csVector3 radius;
   csSphere sphere;
-  GetRadius (radius, sphere.GetCenter ());
+  scfiObjectModel.GetRadius (radius, sphere.GetCenter ());
   float max_radius = radius.x;
   if (max_radius < radius.y) max_radius = radius.y;
   if (max_radius < radius.z) max_radius = radius.z;

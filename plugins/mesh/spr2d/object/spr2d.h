@@ -30,6 +30,7 @@
 #include "iutil/config.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "igeom/objmodel.h"
 #include "spr2duv.h"
 
 struct iMaterialWrapper;
@@ -119,7 +120,11 @@ public:
    */
   void CreateRegularVertices (int n, bool setuv);
 
-  ///------------------------ iMeshObject implementation ------------------------
+  void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
+  void GetRadius (csVector3& rad, csVector3& cent)
+  { rad =  radius; cent.Set(0,0,0); }
+
+  ///----------------------- iMeshObject implementation ------------------------
   SCF_DECLARE_IBASE;
 
   virtual iMeshObjectFactory* GetFactory () const { return ifactory; }
@@ -137,9 +142,6 @@ public:
   {
     return vis_cb;
   }
-  virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
-  virtual void GetRadius (csVector3& rad, csVector3& cent)
-	{ rad =  radius; cent.Set(0,0,0); }
   virtual void NextFrame (csTicks current_time);
   virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform& t);
@@ -150,22 +152,46 @@ public:
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr)
   { return HitBeamOutline(start, end, isect, pr); }
-  virtual long GetShapeNumber () const { return shapenr; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
-  virtual iPolygonMesh* GetWriteObject () { return NULL; }
+
+  //------------------------- iObjectModel implementation ----------------
+  class ObjectModel : public iObjectModel
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csSprite2DMeshObject);
+    virtual long GetShapeNumber () const { return scfParent->shapenr; }
+    virtual iPolygonMesh* GetPolygonMesh () { return NULL; }
+    virtual iPolygonMesh* GetSmallerPolygonMesh () { return NULL; }
+    virtual iPolygonMesh* CreateLowerDetailPolygonMesh (float) { return NULL; }
+    virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
+    {
+      scfParent->GetObjectBoundingBox (bbox, type);
+    }
+    virtual void GetRadius (csVector3& rad, csVector3& cent)
+    {
+      scfParent->GetRadius (rad, cent);
+    }
+  } scfiObjectModel;
+  friend class ObjectModel;
+
+  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 
   //------------------------- iSprite2DState implementation ----------------
   class Sprite2DState : public iSprite2DState
   {
     SCF_DECLARE_EMBEDDED_IBASE (csSprite2DMeshObject);
-    virtual void SetLighting (bool l) { scfParent->initialized = false; scfParent->lighting = l; }
+    virtual void SetLighting (bool l)
+    {
+      scfParent->initialized = false;
+      scfParent->lighting = l;
+    }
     virtual bool HasLighting () const { return scfParent->lighting; }
     virtual void SetMaterialWrapper (iMaterialWrapper* material)
     {
       scfParent->material = material;
     }
-    virtual iMaterialWrapper* GetMaterialWrapper () const { return scfParent->material; }
+    virtual iMaterialWrapper* GetMaterialWrapper () const
+    { return scfParent->material; }
     virtual void SetMixMode (uint mode) { scfParent->MixMode = mode; }
     virtual uint GetMixMode () const { return scfParent->MixMode; }
     virtual csColoredVertices& GetVertices ()
@@ -307,11 +333,13 @@ public:
     {
       scfParent->material = material;
     }
-    virtual iMaterialWrapper* GetMaterialWrapper () const { return scfParent->material; }
+    virtual iMaterialWrapper* GetMaterialWrapper () const
+    { return scfParent->material; }
     virtual void SetMixMode (uint mode) { scfParent->MixMode = mode; }
     virtual uint GetMixMode () const { return scfParent->MixMode; }
 
-    virtual int GetUVAnimationCount () const {return scfParent->GetUVAnimationCount();}
+    virtual int GetUVAnimationCount () const
+    { return scfParent->GetUVAnimationCount(); }
     virtual iSprite2DUVAnimation *CreateUVAnimation ()
     { return scfParent->CreateUVAnimation (); }
     virtual void RemoveUVAnimation (iSprite2DUVAnimation *anim)

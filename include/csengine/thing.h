@@ -29,6 +29,7 @@
 #include "csutil/csvector.h"
 #include "csutil/garray.h"
 #include "igeom/polymesh.h"
+#include "igeom/objmodel.h"
 #include "iengine/viscull.h"
 #include "iengine/mesh.h"
 #include "iengine/rview.h"
@@ -1145,7 +1146,7 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE (csThing);
   } scfiPolygonMesh;
 
-  //-------------------- Lower detail iPolygonMesh implementation ---------------
+  //------------------- Lower detail iPolygonMesh implementation ---------------
   struct PolyMeshLOD : public PolyMeshHelper
   {
     PolyMeshLOD ();
@@ -1196,6 +1197,32 @@ public:
   } scfiVisibilityCuller;
   friend struct VisCull;
 
+  //------------------------- iObjectModel implementation ----------------
+  class ObjectModel : public iObjectModel
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csThing);
+    virtual long GetShapeNumber () const { return scfParent->shapenr; }
+    virtual iPolygonMesh* GetPolygonMesh ()
+    {
+      return &(scfParent->scfiPolygonMesh);
+    }
+    virtual iPolygonMesh* GetSmallerPolygonMesh ()
+    {
+      return &(scfParent->scfiPolygonMeshLOD);
+    }
+    virtual iPolygonMesh* CreateLowerDetailPolygonMesh (float) { return NULL; }
+    virtual void GetObjectBoundingBox (csBox3& bbox,
+    	int /*type = CS_BBOX_NORMAL*/)
+    {
+      scfParent->GetBoundingBox (bbox);
+    }
+    virtual void GetRadius (csVector3& rad, csVector3& cent)
+    {
+      scfParent->GetRadius (rad, cent);
+    }
+  } scfiObjectModel;
+  friend class ObjectModel;
+
   //-------------------- iMeshObject interface implementation ----------
   struct MeshObject : public iMeshObject
   {
@@ -1215,13 +1242,6 @@ public:
     virtual void SetVisibleCallback (iMeshObjectDrawCallback* /*cb*/) { }
     virtual iMeshObjectDrawCallback* GetVisibleCallback () const
     { return NULL; }
-    virtual void GetObjectBoundingBox (csBox3& bbox,
-    	int /*type = CS_BBOX_NORMAL*/)
-    {
-      scfParent->GetBoundingBox (bbox);
-    }
-    virtual void GetRadius ( csVector3& rad, csVector3& cent)
-	  { scfParent->GetRadius (rad,cent); }
     virtual void NextFrame (csTicks /*current_time*/) { }
     virtual bool WantToDie () const { return false; }
     virtual void HardTransform (const csReversibleTransform& t)
@@ -1235,10 +1255,12 @@ public:
     virtual bool HitBeamObject (const csVector3& /*start*/,
     	const csVector3& /*end*/,
   	csVector3& /*isect*/, float* /*pr*/) { return false; }
-    virtual long GetShapeNumber () const { return scfParent->shapenr; }
     virtual void SetLogicalParent (iBase* lp) { scfParent->logparent = lp; }
     virtual iBase* GetLogicalParent () const { return scfParent->logparent; }
-    virtual iPolygonMesh* GetWriteObject () { return scfParent->GetWriteObject (); }
+    virtual iObjectModel* GetObjectModel ()
+    {
+      return &(scfParent->scfiObjectModel);
+    }
   } scfiMeshObject;
   friend struct MeshObject;
 

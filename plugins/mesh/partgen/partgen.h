@@ -28,6 +28,7 @@
 #include "imesh/object.h"
 #include "imesh/partsys.h"
 #include "imesh/particle.h"
+#include "igeom/objmodel.h"
 
 struct iMeshObjectFactory;
 struct iMaterialWrapper;
@@ -215,6 +216,19 @@ public:
    */
   virtual void Update (csTicks elapsed_time);
 
+  void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
+  {
+    (void)type;
+    SetupObject ();
+    bbox = csParticleSystem::bbox;
+  }
+  void GetRadius (csVector3& rad, csVector3& cent)
+  {
+    SetupObject ();
+    rad = radius;
+    cent = bbox.GetCenter();
+  }
+
   //------------------------ iMeshObject implementation ------------------------
   SCF_DECLARE_IBASE;
 
@@ -233,18 +247,6 @@ public:
   {
     return vis_cb;
   }
-  virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
-  {
-    (void)type;
-    SetupObject ();
-    bbox = csParticleSystem::bbox;
-  }
-  virtual void GetRadius (csVector3& rad, csVector3& cent)
-  {
-    SetupObject ();
-    rad = radius;
-    cent = bbox.GetCenter();
-  }
   virtual void NextFrame (csTicks current_time)
   {
     csTicks elaps = 0;
@@ -261,10 +263,29 @@ public:
   { return false; }
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*) { return false; }
-  virtual long GetShapeNumber () const { return shapenr; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
-  virtual iPolygonMesh* GetWriteObject () { return NULL; }
+
+  //------------------------- iObjectModel implementation ----------------
+  class ObjectModel : public iObjectModel
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csParticleSystem);
+    virtual long GetShapeNumber () const { return scfParent->shapenr; }
+    virtual iPolygonMesh* GetPolygonMesh () { return NULL; }
+    virtual iPolygonMesh* GetSmallerPolygonMesh () { return NULL; }
+    virtual iPolygonMesh* CreateLowerDetailPolygonMesh (float) { return NULL; }
+    virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
+    {
+      scfParent->GetObjectBoundingBox (bbox, type);
+    }
+    virtual void GetRadius (csVector3& rad, csVector3& cent)
+    {
+      scfParent->GetRadius (rad, cent);
+    }
+  } scfiObjectModel;
+  friend class ObjectModel;
+
+  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 
   //------------------------- iParticleState implementation ----------------
   class ParticleState : public iParticleState

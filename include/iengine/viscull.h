@@ -101,10 +101,6 @@ struct iVisibilityObject : public iBase
 {
   /// Get the reference to the movable from this object.
   virtual iMovable* GetMovable () const = 0;
-  /// Get the shape number of the underlying object.
-  virtual long GetShapeNumber () const = 0;
-  /// Get the bounding box of the object in object space.
-  virtual void GetBoundingBox (csBox3& bbox) = 0;
   /**
    * Mark the object as visible. This will be called by the visibility
    * culler whenever it thinks the object is visible.
@@ -122,17 +118,9 @@ struct iVisibilityObject : public iBase
   virtual bool IsVisible () const = 0;
 
   /**
-   * Get an optional polygon mesh that can be used as a write object
-   * for a visibility system. If this is null the object will not
-   * be used as a write object (but only as a read object for visibility
-   * testing). The write object should be completely contained in the
-   * original object. If the shape of the object changes (GetShapeNumber())
-   * then the visibility system will know that the geometry has changed.
-   * Different visibility objects may share the same write object.
-   * In that case the visibility system may use that reduce memory
-   * and computation usage based on this.
+   * Get the object model corresponding with this object.
    */
-  virtual iPolygonMesh* GetWriteObject () = 0;
+  virtual iObjectModel* GetObjectModel () = 0;
 };
 
 #endif // __IENGINE_VISCULL_H__

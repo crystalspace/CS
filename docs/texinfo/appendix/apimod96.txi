@@ -12,3 +12,16 @@ Crystal Space.
 The header for @code{iPolygonMesh} has moved from @file{include/ivaria}
 to @file{include/igeom}.
 
+@subheading iMeshObject changes
+@cindex @code{iMeshObject}
+@cindex @code{iVisibilityObject}
+@cindex @code{iObjectModel}
+
+The functions @code{iMeshObject::GetShapeNumber()},
+@code{iMeshObject::GetObjectBoundingBox()} and @code{iMeshObject::GetRadius()}
+have been removed. Instead there is now a new routine called
+@code{iMeshObject::GetObjectModel()} which will return an instance of
+@code{iObjectModel}. The functions can be called from that instance.
+
+A similar change has happened in the @code{iVisibilityObject} interface.
+

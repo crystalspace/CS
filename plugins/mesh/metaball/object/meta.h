@@ -29,6 +29,7 @@
 #include "imesh/metaball.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "igeom/objmodel.h"
 #include "ivideo/vbufmgr.h"
 
 class csMaterialHandle;
@@ -123,7 +124,7 @@ public:
   virtual int ReportTriangleCount ()
   { return mesh.num_triangles; }
 
-// Where the real work gets done....
+  // Where the real work gets done....
   void CalculateMetaBalls (void);
   void CalculateBlob (int x, int y, int z);
   void FillCell (int x, int y, int z, csTesselator::GridCell &c);
@@ -131,7 +132,11 @@ public:
   float potential (const csVector3 &p);
   int check_cell_assume_inside (const csTesselator::GridCell &c);
   void InitTables (void);
-///-------------------- iMeshObject implementation --------------
+
+  void GetObjectBoundingBox ( csBox3& bbox, int type = CS_BBOX_NORMAL );
+  void GetRadius (csVector3& radius, csVector3& cent)
+  { radius =  rad; cent = object_bbox.GetCenter(); }
+  ///-------------------- iMeshObject implementation --------------
 
   virtual iMeshObjectFactory * GetFactory() const { return factory; }
   virtual bool DrawTest ( iRenderView* rview, iMovable* movable );
@@ -153,7 +158,6 @@ public:
   void GetTransformedBoundingBox( long cam_num, long move_num,
     const csReversibleTransform& trans, csBox3& cbox);
   void CreateBoundingBox();
-  virtual void GetObjectBoundingBox ( csBox3& bbox, int type = CS_BBOX_NORMAL );
   virtual void NextFrame(csTicks /* current_time */ );
   virtual bool WantToDie() const { return false; }
   virtual void HardTransform( const csReversibleTransform &t );
@@ -162,20 +166,37 @@ public:
     csVector3& isect, float* pr);
   virtual bool HitBeamObject( const csVector3& start, const csVector3& end,
     csVector3& isect, float* pr);
-  virtual long GetShapeNumber() const { return shape_num; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
-  virtual iPolygonMesh* GetWriteObject () { return NULL; }
 
-  virtual void GetRadius(csVector3& radius, csVector3& cent)
-	{ radius =  rad; cent = object_bbox.GetCenter(); }
   virtual uint GetMixMode() { return MixMode; }
   virtual void SetMixMode(uint mode) { MixMode = mode; }
   virtual bool IsLighting() { return do_lighting; }
   virtual void SetLighting( bool set ) { do_lighting = set; }
   virtual iMaterialWrapper *GetMaterial() { return th; }
 
-///-------------------- Meta Ball state implementation
+  //------------------------- iObjectModel implementation ----------------
+  class ObjectModel : public iObjectModel
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csMetaBall);
+    virtual long GetShapeNumber () const { return scfParent->shape_num; }
+    virtual iPolygonMesh* GetPolygonMesh () { return NULL; }
+    virtual iPolygonMesh* GetSmallerPolygonMesh () { return NULL; }
+    virtual iPolygonMesh* CreateLowerDetailPolygonMesh (float) { return NULL; }
+    virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
+    {
+      scfParent->GetObjectBoundingBox (bbox, type);
+    }
+    virtual void GetRadius (csVector3& rad, csVector3& cent)
+    {
+      scfParent->GetRadius (rad, cent);
+    }
+  } scfiObjectModel;
+  friend class ObjectModel;
+
+  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
+
+  ///-------------------- Meta Ball state implementation
   class MetaBallState : public iMetaBallState
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMetaBall);

@@ -30,17 +30,18 @@
 #include "csgeom/box.h"
 #include "plugins/mesh/spr3d/object/sprtri.h"
 #include "plugins/mesh/spr3d/object/skel3d.h"
-#include "ivideo/graph3d.h"
-#include "igeom/polymesh.h"
 #include "imesh/sprite3d.h"
-#include "ivideo/material.h"
+#include "imesh/object.h"
 #include "iengine/material.h"
 #include "iengine/lod.h"
-#include "imesh/object.h"
 #include "iutil/config.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "igeom/polymesh.h"
+#include "igeom/objmodel.h"
+#include "ivideo/graph3d.h"
 #include "ivideo/vbufmgr.h"
+#include "ivideo/material.h"
 #include "qint.h"
 
 #define ALL_LOD_FEATURES (CS_LOD_TRIANGLE_REDUCTION|CS_LOD_DISTANCE_REDUCTION)
@@ -1248,6 +1249,9 @@ public:
   /// For LOD.
   int GetLODPolygonCount (float lod) const;
 
+  void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
+  void GetRadius (csVector3& rad, csVector3 &cent);
+
   ///------------------------ iMeshObject implementation ----------------------
   SCF_DECLARE_IBASE;
 
@@ -1272,8 +1276,6 @@ public:
   {
     return vis_cb;
   }
-  virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
-  virtual void GetRadius (csVector3& rad, csVector3 &cent);
   virtual void NextFrame (csTicks current_time)
   {
     OldNextFrame (current_time);
@@ -1285,10 +1287,8 @@ public:
     csVector3& intersect, float* pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
     csVector3& intersect, float* pr);
-  virtual long GetShapeNumber () const { return shapenr; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
-  virtual iPolygonMesh* GetWriteObject () { return NULL; }
 
   //------------------ iPolygonMesh interface implementation ----------------//
   struct PolyMesh : public iPolygonMesh
@@ -1326,6 +1326,30 @@ public:
     csMeshedPolygon* polygons;
   } scfiPolygonMesh;
   friend struct PolyMesh;
+
+  //------------------------- iObjectModel implementation ----------------
+  class ObjectModel : public iObjectModel
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObject);
+    virtual long GetShapeNumber () const { return scfParent->shapenr; }
+    virtual iPolygonMesh* GetPolygonMesh ()
+    {
+      return &(scfParent->scfiPolygonMesh);
+    }
+    virtual iPolygonMesh* GetSmallerPolygonMesh () { return NULL; }
+    virtual iPolygonMesh* CreateLowerDetailPolygonMesh (float) { return NULL; }
+    virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
+    {
+      scfParent->GetObjectBoundingBox (bbox, type);
+    }
+    virtual void GetRadius (csVector3& rad, csVector3& cent)
+    {
+      scfParent->GetRadius (rad, cent);
+    }
+  } scfiObjectModel;
+  friend class ObjectModel;
+
+  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 
   //--------------------- iSprite3DState implementation -------------//
   struct Sprite3DState : public iSprite3DState

@@ -29,27 +29,8 @@ struct iRenderView;
 struct iMovable;
 struct iLight;
 struct iPolygonMesh;
+struct iObjectModel;
 class csReversibleTransform;
-
-/**
- * For iMeshObject::GetObjectBoundingBox() get a normal bounding box which
- * may or may not be recalculated depending on the changing geometry of
- * the object.
- */
-#define CS_BBOX_NORMAL 0
-/**
- * For iMeshObject::GetObjectBoundingBox() get a totally accurate bounding
- * box. Not all plugins support this. Some will just return a normal
- * bounding box.
- */
-#define CS_BBOX_ACCURATE 1
-/**
- * For iMeshObject::GetObjectBoundingBox() get the maximum bounding box
- * that this object will ever use. For objects that don't have a preset
- * maximum bounding box this just has to be a reasonable estimate of
- * a realistic maximum bounding box.
- */
-#define CS_BBOX_MAX 2
 
 SCF_VERSION (iMeshObjectDrawCallback, 0, 0, 1);
 
@@ -63,7 +44,7 @@ struct iMeshObjectDrawCallback : public iBase
 };
 
 
-SCF_VERSION (iMeshObject, 0, 0, 21);
+SCF_VERSION (iMeshObject, 0, 1, 0);
 
 /**
  * This is a general mesh object that the engine can interact with. The mesh
@@ -119,29 +100,6 @@ struct iMeshObject : public iBase
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const = 0;
 
   /**
-   * Get the bounding box in object space for this mesh object.
-   * Type has three possibilities:
-   * <ul>
-   * <li> CS_BBOX_NORMAL: get a normal bounding box which
-   *      may or may not be recalculated depending on the changing
-   *      geometry of the object.
-   * <li> CS_BBOX_ACCURATE: get a totally accurate bounding
-   *      box. Not all plugins support this. Some will just return a normal
-   *      bounding box.
-   * <li> CS_BBOX_MAX: get the maximum bounding box
-   *      that this object will ever use. For objects that don't have a
-   *      preset maximum bounding box this just has to be a reasonable
-   *      estimate of a realistic maximum bounding box.
-   * </ul>
-   */
-  virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)=0;
-
-  /**
-   * Get the radius and center of this object in object space.
-   */
-  virtual void GetRadius ( csVector3& radius, csVector3& center) = 0;
-
-  /**
    * Control animation of this object.
    */
   virtual void NextFrame (csTicks current_time) = 0;
@@ -191,14 +149,6 @@ struct iMeshObject : public iBase
   	csVector3& isect, float* pr) = 0;
 
   /**
-   * Return a number which will change as soon as the object undergoes
-   * a fundamental change that affects the maximum bounding box. Using
-   * this number you can test if you need to get the bounding box again
-   * and perform calculations on that.
-   */
-  virtual long GetShapeNumber () const = 0;
-
-  /**
    * Set a reference to some logical parent in the context that holds
    * the mesh objects. When a mesh object is used in the context of the
    * 3D engine then this will be an iMeshWrapper. In case it is used
@@ -216,17 +166,9 @@ struct iMeshObject : public iBase
   virtual iBase* GetLogicalParent () const = 0;
 
   /**
-   * Get an optional polygon mesh that can be used as a write object
-   * for a visibility system. If this is null the object will not
-   * be used as a write object (but only as a read object for visibility
-   * testing). The write object should be completely contained in the
-   * original object. If the shape of the object changes (GetShapeNumber())
-   * then the visibility system will know that the geometry has changed.
-   * Different mesh objects may share the same write object.
-   * In that case the visibility system may use that reduce memory
-   * and computation usage based on this.
+   * Get the generic interface describing the geometry of this mesh.
    */
-  virtual iPolygonMesh* GetWriteObject () = 0;
+  virtual iObjectModel* GetObjectModel () = 0;
 };
 
 SCF_VERSION (iMeshObjectFactory, 0, 0, 5);

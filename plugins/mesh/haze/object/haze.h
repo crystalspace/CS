@@ -27,6 +27,7 @@
 #include "imesh/haze.h"
 #include "imesh/particle.h"
 #include "ivideo/graph3d.h"
+#include "igeom/objmodel.h"
 #include "iutil/config.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -35,9 +36,11 @@ struct iMaterialWrapper;
 struct iCamera;
 class csHazeMeshObjectFactory;
 
-/** haze layer
-*/
-class csHazeLayer {
+/**
+ * haze layer
+ */
+class csHazeLayer
+{
 public:
   /// hull
   iHazeHull *hull;
@@ -50,7 +53,8 @@ public:
 };
 
 /// a haze hull
-class csHazeHull : public iHazeHull {
+class csHazeHull : public iHazeHull
+{
 protected:
   /// total counts
   int total_poly, total_vert, total_edge;
@@ -127,7 +131,8 @@ public:
 
 
 /** box haze hull */
-class csHazeHullBox : public csHazeHull {
+class csHazeHullBox : public csHazeHull
+{
   csVector3 min, max;
 public:
   SCF_DECLARE_IBASE;
@@ -147,7 +152,8 @@ public:
 };
 
 /** cone haze hull */
-class csHazeHullCone : public csHazeHull {
+class csHazeHullCone : public csHazeHull
+{
   int nr_sides;
   csVector3 start, end;
   float start_radius, end_radius;
@@ -297,6 +303,9 @@ public:
   void DrawPolyAdapt(iRenderView *rview, iGraphics3D *g3d, iMaterialHandle *mat,
     int num_sides, csVector3* pts, csVector2* uvs,
     float layer_scale, float quality);
+  void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
+  void GetRadius (csVector3& rad, csVector3& cent)
+  { rad =  radius; cent.Set(0,0,0); }
 
   ///------------------------ iMeshObject implementation ------------------------
   SCF_DECLARE_IBASE;
@@ -316,9 +325,6 @@ public:
   {
     return vis_cb;
   }
-  virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
-  virtual void GetRadius (csVector3& rad, csVector3& cent)
-	{ rad =  radius; cent.Set(0,0,0); }
   virtual void NextFrame (csTicks current_time);
   virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform& t);
@@ -328,10 +334,29 @@ public:
   { return false; }
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*) { return false; }
-  virtual long GetShapeNumber () const { return shapenr; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
-  virtual iPolygonMesh* GetWriteObject () { return NULL; }
+
+  //------------------------- iObjectModel implementation ----------------
+  class ObjectModel : public iObjectModel
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csHazeMeshObject);
+    virtual long GetShapeNumber () const { return scfParent->shapenr; }
+    virtual iPolygonMesh* GetPolygonMesh () { return NULL; }
+    virtual iPolygonMesh* GetSmallerPolygonMesh () { return NULL; }
+    virtual iPolygonMesh* CreateLowerDetailPolygonMesh (float) { return NULL; }
+    virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
+    {
+      scfParent->GetObjectBoundingBox (bbox, type);
+    }
+    virtual void GetRadius (csVector3& rad, csVector3& cent)
+    {
+      scfParent->GetRadius (rad, cent);
+    }
+  } scfiObjectModel;
+  friend class ObjectModel;
+
+  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 
   //------------------------- iHazeState implementation ----------------
   class HazeState : public iHazeState
@@ -341,7 +366,8 @@ public:
     {
       scfParent->material = material;
     }
-    virtual iMaterialWrapper* GetMaterialWrapper () const { return scfParent->material; }
+    virtual iMaterialWrapper* GetMaterialWrapper () const
+    { return scfParent->material; }
     virtual void SetMixMode (uint mode) { scfParent->MixMode = mode; }
     virtual uint GetMixMode () const { return scfParent->MixMode; }
     virtual void SetOrigin(const csVector3& pos) { scfParent->origin = pos; }
@@ -419,7 +445,8 @@ public:
     {
       scfParent->material = material;
     }
-    virtual iMaterialWrapper* GetMaterialWrapper () const { return scfParent->material; }
+    virtual iMaterialWrapper* GetMaterialWrapper () const
+    { return scfParent->material; }
     virtual void SetMixMode (uint mode) { scfParent->MixMode = mode; }
     virtual uint GetMixMode () const { return scfParent->MixMode; }
     virtual void SetOrigin(const csVector3& pos) { scfParent->origin = pos; }

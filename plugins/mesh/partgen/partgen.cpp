@@ -38,8 +38,13 @@
 
 SCF_IMPLEMENT_IBASE (csParticleSystem)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iParticleState)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csParticleSystem::ObjectModel)
+  SCF_IMPLEMENTS_INTERFACE (iObjectModel)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csParticleSystem::ParticleState)
   SCF_IMPLEMENTS_INTERFACE (iParticleState)
@@ -49,6 +54,7 @@ csParticleSystem::csParticleSystem (iObjectRegistry* object_reg,
 	iMeshObjectFactory* factory)
 {
   SCF_CONSTRUCT_IBASE (factory);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiParticleState);
   initialized = false;
   csParticleSystem::factory = factory;

@@ -24,9 +24,10 @@
 #include "csutil/cscolor.h"
 #include "imesh/object.h"
 #include "imesh/ball.h"
-#include "ivideo/graph3d.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "igeom/objmodel.h"
+#include "ivideo/graph3d.h"
 #include "ivideo/vbufmgr.h"
 
 struct iMaterialWrapper;
@@ -200,6 +201,7 @@ public:
   /// paint a sky
   void PaintSky(float time, float **dayvert, float **nightvert,
     float **topsun, float **sunset);
+  void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
 
   //----------------------- iMeshObject implementation ------------------------
   SCF_DECLARE_IBASE;
@@ -219,9 +221,6 @@ public:
   {
     return vis_cb;
   }
-  virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
-  virtual void GetRadius (csVector3& rad, csVector3& cent)
-	{ rad = max_radius; cent.Set(shift); }
   virtual void NextFrame (csTicks /*current_time*/) { }
   virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform& t);
@@ -230,10 +229,30 @@ public:
     csVector3& isect, float *pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr);
-  virtual long GetShapeNumber () const { return shapenr; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
-  virtual iPolygonMesh* GetWriteObject () { return NULL; }
+
+  //------------------------- iObjectModel implementation ----------------
+  class ObjectModel : public iObjectModel
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csBallMeshObject);
+    virtual long GetShapeNumber () const { return scfParent->shapenr; }
+    virtual iPolygonMesh* GetPolygonMesh () { return NULL; }
+    virtual iPolygonMesh* GetSmallerPolygonMesh () { return NULL; }
+    virtual iPolygonMesh* CreateLowerDetailPolygonMesh (float) { return NULL; }
+    virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
+    {
+      scfParent->GetObjectBoundingBox (bbox, type);
+    }
+    virtual void GetRadius (csVector3& rad, csVector3& cent)
+    {
+      rad = scfParent->max_radius;
+      cent.Set (scfParent->shift);
+    }
+  } scfiObjectModel;
+  friend class ObjectModel;
+
+  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 
   //------------------------- iBallState implementation ----------------
   class BallState : public iBallState

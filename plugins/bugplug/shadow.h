@@ -21,6 +21,7 @@
 
 #include "imesh/object.h"
 #include "csgeom/box.h"
+#include "igeom/objmodel.h"
 
 struct iEngine;
 struct iMeshWrapper;
@@ -99,6 +100,18 @@ public:
     isec = intersect;
   }
 
+  void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
+  {
+    (void)type;
+    bbox.Set (-100000, -100000, -100000, 100000, 100000, 100000);
+    return;
+  }
+  void GetRadius (csVector3& rad, csVector3& cent)
+  {
+     rad.Set (200000, 200000, 200000);
+     cent.Set (0,0,0);
+  }
+
   SCF_DECLARE_IBASE;
 
   virtual iMeshObjectFactory* GetFactory () const { return NULL; }
@@ -107,17 +120,6 @@ public:
   virtual bool Draw (iRenderView*, iMovable*, csZBufMode);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback*) { }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const { return NULL; }
-  virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
-  {
-    (void)type;
-    bbox.Set (-100000, -100000, -100000, 100000, 100000, 100000);
-    return;
-  }
-  virtual void GetRadius (csVector3& rad, csVector3& cent)
-  {
-     rad.Set(200000, 200000, 200000);
-	 cent.Set(0,0,0);
-  }
   virtual void NextFrame (csTicks) { }
   virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform&) { }
@@ -127,10 +129,29 @@ public:
   { return false; }
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*) { return false; }
-  virtual long GetShapeNumber () const { return 1; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
-  virtual iPolygonMesh* GetWriteObject () { return NULL; }
+
+  //------------------------- iObjectModel implementation ----------------
+  class ObjectModel : public iObjectModel
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csShadow);
+    virtual long GetShapeNumber () const { return 1; }
+    virtual iPolygonMesh* GetPolygonMesh () { return NULL; }
+    virtual iPolygonMesh* GetSmallerPolygonMesh () { return NULL; }
+    virtual iPolygonMesh* CreateLowerDetailPolygonMesh (float) { return NULL; }
+    virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
+    {
+      scfParent->GetObjectBoundingBox (bbox, type);
+    }
+    virtual void GetRadius (csVector3& rad, csVector3& cent)
+    {
+      scfParent->GetRadius (rad, cent);
+    }
+  } scfiObjectModel;
+  friend class ObjectModel;
+
+  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 };
 
 #endif // __CS_SHADOW_H__

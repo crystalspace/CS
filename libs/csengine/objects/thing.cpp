@@ -61,6 +61,7 @@ long csThing::current_light_frame_number = 0;
 SCF_IMPLEMENT_IBASE_EXT(csThing)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iThingState)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iLightingInfo)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iObjectModel)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPolygonMesh)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iVisibilityCuller)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshObject)
@@ -73,6 +74,10 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::LightingInfo)
   SCF_IMPLEMENTS_INTERFACE(iLightingInfo)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::ObjectModel)
+  SCF_IMPLEMENTS_INTERFACE(iObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::PolyMesh)
@@ -100,6 +105,7 @@ csThing::csThing (iBase *parent) :
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiThingState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityCuller);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshObject);
@@ -3277,7 +3283,7 @@ void csThing::RegisterVisObject (iVisibilityObject *visobj)
   // from the one that the objects currently have so that we know
   // we will add the object to the tree when we first need it.
   vinf->last_movablenr = visobj->GetMovable ()->GetUpdateNumber () - 1;
-  vinf->last_shapenr = visobj->GetShapeNumber () - 1;
+  vinf->last_shapenr = visobj->GetObjectModel ()->GetShapeNumber () - 1;
   visobjects.Push (vinf);
   visobj->IncRef ();
 }
@@ -3305,7 +3311,7 @@ void csThing::CheckVisUpdate (csVisObjInfo *vinf)
   iVisibilityObject *visobj = vinf->visobj;
   iMovable *movable = visobj->GetMovable ();
   long movablenr = movable->GetUpdateNumber ();
-  long shapenr = visobj->GetShapeNumber ();
+  long shapenr = visobj->GetObjectModel ()->GetShapeNumber ();
   if (movablenr != vinf->last_movablenr || shapenr != vinf->last_shapenr)
   {
     vinf->last_movablenr = movablenr;
@@ -3317,7 +3323,7 @@ void csThing::CheckVisUpdate (csVisObjInfo *vinf)
     if (!movable->InSector ()) return ;
 
     csBox3 b;
-    visobj->GetBoundingBox (b);
+    visobj->GetObjectModel ()->GetObjectBoundingBox (b, CS_BBOX_MAX);
 
     csReversibleTransform trans = movable->GetFullTransform ().GetInverse ();
     bbox->Update (b, trans, vinf);
@@ -3372,7 +3378,7 @@ bool csThing::VisTest (iRenderView *irview)
         // If the current viewpoint is inside the bounding box of the
         // object then we consider the object visible.
         csBox3 bbox;
-        vo->GetBoundingBox (bbox);
+        vo->GetObjectModel ()->GetObjectBoundingBox (bbox, CS_BBOX_MAX);
         if (bbox.In (origin))
           vo->MarkVisible ();
         else

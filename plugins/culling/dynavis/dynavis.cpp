@@ -26,6 +26,7 @@
 #include "csgeom/matrix3.h"
 #include "csgeom/math3d.h"
 #include "igeom/polymesh.h"
+#include "igeom/objmodel.h"
 #include "iutil/objreg.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
@@ -135,7 +136,7 @@ void csDynaVis::CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox)
 {
   iMovable* movable = visobj->GetMovable ();
   csBox3 box;
-  visobj->GetBoundingBox (box);
+  visobj->GetObjectModel ()->GetObjectBoundingBox (box, CS_BBOX_MAX);
   csReversibleTransform trans = movable->GetFullTransform ();
   bbox.StartBoundingBox (trans.This2Other (box.GetCorner (0)));
   bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (1)));
@@ -154,7 +155,7 @@ void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
   visobj->IncRef ();
   iMovable* movable = visobj->GetMovable ();
   visobj_wrap->update_number = movable->GetUpdateNumber ();
-  visobj_wrap->shape_number = visobj->GetShapeNumber ();
+  visobj_wrap->shape_number = visobj->GetObjectModel ()->GetShapeNumber ();
 
   csBox3 bbox;
   CalculateVisObjBBox (visobj, bbox);
@@ -190,13 +191,14 @@ void csDynaVis::UpdateObjects ()
       visobj_vector[i];
     iVisibilityObject* visobj = visobj_wrap->visobj;
     iMovable* movable = visobj->GetMovable ();
-    if (visobj->GetShapeNumber () != visobj_wrap->shape_number ||
+    iObjectModel* objmodel = visobj->GetObjectModel ();
+    if (objmodel->GetShapeNumber () != visobj_wrap->shape_number ||
     	movable->GetUpdateNumber () != visobj_wrap->update_number)
     {
       csBox3 bbox;
       CalculateVisObjBBox (visobj, bbox);
       kdtree->MoveObject (visobj_wrap->child, bbox);
-      visobj_wrap->shape_number = visobj->GetShapeNumber ();
+      visobj_wrap->shape_number = objmodel->GetShapeNumber ();
       visobj_wrap->update_number = movable->GetUpdateNumber ();
     }
     visobj->MarkInvisible ();
@@ -322,16 +324,18 @@ end:
   return vis;
 }
 
-void csDynaVis::UpdateCoverageBuffer (iCamera* camera, iVisibilityObject* visobj)
+void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
+	iVisibilityObject* visobj)
 {
   iMovable* movable = visobj->GetMovable ();
-  iPolygonMesh* polymesh = visobj->GetWriteObject ();
+  iPolygonMesh* polymesh = visobj->GetObjectModel ()->GetSmallerPolygonMesh ();
 
   const csVector3* verts = polymesh->GetVertices ();
   int vertex_count = polymesh->GetVertexCount ();
   int poly_count = polymesh->GetPolygonCount ();
 
-  csReversibleTransform trans = camera->GetTransform () / movable->GetFullTransform ();
+  csReversibleTransform trans = camera->GetTransform ()
+  	/ movable->GetFullTransform ();
   float fov = camera->GetFOV ();
   float sx = camera->GetShiftX ();
   float sy = camera->GetShiftY ();
@@ -448,7 +452,8 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 
     // Object is visible. Let it update the coverage buffer if we
     // are using do_cull_coverage.
-    if (do_cull_coverage && obj->visobj->GetWriteObject ())
+    if (do_cull_coverage && obj->visobj->GetObjectModel ()->
+    	GetSmallerPolygonMesh ())
     {
       UpdateCoverageBuffer (data->rview->GetCamera (), obj->visobj);
     }
