@@ -44,6 +44,8 @@ The history order is reversed so that new features are at the top.
 	      improvement of 14 -> 19 FPS which is nothing to sneer at!
 	- Fixed CS a little for compilation on Solaris/X86. Fixes given
 	  to me by Markus Korth <mkorth@military.de>.
+	- Eric Sunshine eliminated "unused variable" compilation warning from
+	  csgfxppl.cpp.
 11-Oct-2001
 	- Moved the plugin manager implementation out of the system driver
 	  into csPluginManager (in csutil/plugmgr.h). Modified

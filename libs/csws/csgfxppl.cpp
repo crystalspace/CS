@@ -62,7 +62,6 @@ void csGraphicsPipeline::Initialize (iObjectRegistry *object_reg)
 {
   MaxPage = 0;
   DrawMode = 0;
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   memset (SyncArea, 0, sizeof (SyncArea));
   G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (G3D)
