@@ -20,7 +20,6 @@
 #include "cssys/sysfunc.h"
 #include <windows.h>
 #include <gl/gl.h>
-//#include <penwin.h>
 
 #include "csutil/scf.h"
 #include "oglg2d.h"
@@ -495,8 +494,9 @@ bool csGraphics2DOpenGL::SetMouseCursor (csMouseCursorID iShape)
     case csmcNone:     hCursor = NULL; break;
     case csmcArrow:    hCursor = LoadCursor (NULL, IDC_ARROW);    break;
     case csmcMove:     hCursor = LoadCursor (NULL, IDC_SIZEALL);  break;
-    //case csmcCross:    hCursor = LoadCursor (NULL, IDC_CROSS);	  break;
+    case csmcCross:    hCursor = LoadCursor (NULL, IDC_CROSS);	  break;
     //case csmcPen:      hCursor = LoadCursor (NULL, IDC_PEN);	  break;
+    case csmcPen:      hCursor = LoadCursor (NULL, MAKEINTRESOURCE(32631));	  break;
     case csmcSizeNWSE: hCursor = LoadCursor (NULL, IDC_SIZENWSE); break;
     case csmcSizeNESW: hCursor = LoadCursor (NULL, IDC_SIZENESW); break;
     case csmcSizeNS:   hCursor = LoadCursor (NULL, IDC_SIZENS);   break;

@@ -863,7 +863,8 @@ bool Win32Assistant::SetCursor (int cursor)
     case csmcNone:     CursorID = (char *)-1;   break;
     case csmcArrow:    CursorID = IDC_ARROW;    break;
     case csmcCross:    CursorID = IDC_CROSS;	break;
-    case csmcPen:      CursorID = 32631;/*IDC_PEN;*/	break;
+    //case csmcPen:      CursorID = IDC_PEN;	break;
+    case csmcPen:      CursorID = MAKEINTRESOURCE(32631);	break;
     case csmcMove:     CursorID = IDC_SIZEALL;  break;
     case csmcSizeNWSE: CursorID = IDC_SIZENWSE; break;
     case csmcSizeNESW: CursorID = IDC_SIZENESW; break;
