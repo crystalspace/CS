@@ -34,6 +34,7 @@
 #include "voslight.h"
 #include "vosmodel.h"
 #include "vosclone.h"
+#include "vossphere.h"
 
 #include <vos/metaobjects/a3dl/a3dl.hh>
 
@@ -88,6 +89,8 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
                 &A3DL::Billboard::new_Billboard);
   Site::removeRemoteMetaObjectFactory("a3dl:object3D.clone",
                 &A3DL::Clone::new_Clone);
+  Site::removeRemoteMetaObjectFactory("a3dl:object3D.sphere",
+                &A3DL::Sphere::new_Sphere);
   Site::removeRemoteMetaObjectFactory("a3dl:texture",
                 &A3DL::Texture::new_Texture);
   Site::removeRemoteMetaObjectFactory("a3dl:material",
@@ -112,6 +115,8 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
                                    &csMetaBillboard::new_csMetaBillboard);
   Site::addRemoteMetaObjectFactory("a3dl:object3D.model", "a3dl:object3D.model",
                                    &csMetaModel::new_csMetaModel);
+  Site::addRemoteMetaObjectFactory("a3dl:object3D.sphere", "a3dl:object3D.sphere",
+                                   &csMetaSphere::new_csMetaSphere);
   Site::addRemoteMetaObjectFactory("a3dl:texture", "a3dl:texture",
                                    &csMetaTexture::new_csMetaTexture);
   Site::addRemoteMetaObjectFactory("a3dl:material", "a3dl:material",
