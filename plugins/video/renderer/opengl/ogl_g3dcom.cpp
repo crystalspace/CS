@@ -5542,15 +5542,14 @@ void csGraphics3DOGLCommon::SetupClipPortals ()
       }
       else
       {
-        printf ("STENCIL!\n"); fflush (stdout);
         csClipPortal* cp = clipportal_stack.Top ();
 
         // First set up the stencil area.
         statecache->Enable_GL_STENCIL_TEST ();
         glClearStencil (0);
         glClear (GL_STENCIL_BUFFER_BIT);
-        statecache->SetStencilFunc (GL_ALWAYS, 1, 0);
-        statecache->SetStencilOp (GL_KEEP, GL_REPLACE, GL_KEEP);
+        statecache->SetStencilFunc (GL_ALWAYS, 1, 1);
+        statecache->SetStencilOp (GL_KEEP, GL_ZERO, GL_REPLACE);
         // USE OR FILL@@@?
 	csZBufMode old_mode = z_buf_mode;
 	z_buf_mode = CS_ZBUF_USE;
@@ -5560,7 +5559,6 @@ void csGraphics3DOGLCommon::SetupClipPortals ()
         statecache->SetStencilFunc (GL_EQUAL, 1, 1);
         statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
 
-#if 1
 	// First clear the z-buffer here.
 	z_buf_mode = CS_ZBUF_FILLONLY;
 	SetGLZBufferFlags (z_buf_mode);
@@ -5574,7 +5572,6 @@ void csGraphics3DOGLCommon::SetupClipPortals ()
 	glVertex4f (0.0*100000.0, float (height-1)*100000.0, -1.0, 100000.0);
 	glEnd ();
 	glColorMask (true, true, true, true);
-#endif
 
 	z_buf_mode = old_mode;
       }

@@ -17,6 +17,9 @@ The history order is reversed so that new features are at the top.
 	  These could cause some clipping errors in some cases.
 	- Disable stencil in BeginDraw() now. That solves a problem with
 	  the new OpenPortals() feature.
+	- The new floating portal feature appears to be working mostly.
+	  The door in flarge now has a transparent surface. Mirrors nicely
+	  especially when it is opening (move close to the door).
 24-Mar-2003
 	- Cleaned up indentation in new event code. Note to Jonathan:
 	  a tab == 8 spaces. Indentation == 2 spaces.
