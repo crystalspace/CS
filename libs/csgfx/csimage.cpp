@@ -710,3 +710,91 @@ int csImageFile::HasMipmaps() const
 {
   return 0;
 }
+
+bool csImageFile::Copy (iImage* simage, int x, int y,
+	int width, int height ) const
+{
+  if (width<0) return false;
+  if (height<0) return false;
+  if (x+width>GetWidth()) return false;
+  if (y+height>GetHeight()) return false;
+
+  if (simage->GetWidth()<width) return false;
+  if (simage->GetHeight()<height) return false;
+
+  int i;
+  if (Alpha)
+  {
+    for (i=0; i<height; i++)
+      memcpy (Alpha + (i+y)*Width + x, simage->GetAlpha() + i*width, width);
+  }
+
+  if (Image)
+  {
+    switch (Format & CS_IMGFMT_MASK)
+    {
+      case CS_IMGFMT_NONE:
+        break;
+      case CS_IMGFMT_PALETTED8:
+        for ( i=0; i<height; i++ )
+	  memcpy ((uint8*)Image + (i+y)*Width + x,
+	  	(uint8*)simage->GetImageData() + i*width,  width);
+        break;
+      case CS_IMGFMT_TRUECOLOR:
+        for ( i=0; i<height; i++ )
+          memcpy ((csRGBpixel*)Image + (i+y)*Width + x,
+	  	(csRGBpixel*)simage->GetImageData() + i*width,
+		width * sizeof (csRGBpixel));
+        break;
+    }
+  }
+
+  return true;
+}
+
+bool csImageFile::CopyScale (iImage* simage, int x, int y,
+	int width, int height ) const
+{
+  if (width<0) return false;
+  if (height<0) return false;
+
+  csRef<iImage> psimage;
+  psimage = simage->Clone();
+  psimage->Rescale(width,height);
+
+  Copy (psimage,x,y,width,height);
+
+  return true;
+}
+
+bool csImageFile::CopyTile (iImage* simage, int x, int y,
+	int width, int height ) const
+{
+  if (width<0) return false;
+  if (height<0) return false;
+
+  int sWidth = simage->GetWidth();
+  int sHeight = simage->GetHeight();
+
+  int wfactor = int ((float)width/(float)sWidth);
+  int hfactor = int ((float)height/(float)sHeight);
+
+  if (wfactor<1) wfactor=1;
+  if (hfactor<1) hfactor=1;
+
+  csRef<iImage> psimage;
+  psimage = simage->Clone();
+
+  psimage->Rescale(wfactor*sWidth,hfactor*sHeight);
+
+  for (int i=0;i<wfactor;i++)
+    for(int j=0;j<hfactor;j++)
+      psimage->Copy (simage,i*sWidth,j*sHeight,sWidth,sHeight);
+
+  psimage->Rescale (width,height);
+
+  Copy (psimage,x,y,width,height);
+
+  return true;
+}
+

@@ -142,6 +142,22 @@ struct iImage : public iBase
   /// Check if image has a keycolour stored with it.
   virtual bool HasKeyColor () const = 0;
 
+  /// Copy an image as subpart in the actual Image.
+  virtual bool Copy (iImage* sImage, int x, int y,
+  	int width, int height) const = 0;
+  /**
+   * Copy an image as subpart in the actual Image and scale it to the
+   * given size.
+   */
+  virtual bool CopyScale (iImage* sImage, int x, int y, int width,
+  	int height) const = 0;
+  /**
+   * Copy an image as subpart in the actual Image and tile and scale it
+   * to the given size.
+   */
+  virtual bool CopyTile (iImage* sImage, int x, int y,
+  	int width, int height) const = 0;
+
   /**
    * Check if image has a keycolour stored with it.
    * \deprecated Use HasKeyColor() instead.
@@ -175,3 +191,4 @@ struct iImage : public iBase
 /** @} */
 
 #endif // __CS_IGRAPHIC_IMAGE_H__
+

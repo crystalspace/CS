@@ -8,6 +8,10 @@ chronological order.
 
 27-Nov-2004
 	- Jorrit did a few minor changes to foliage. Nothing significant.
+	- Jorrit submitted a patch from Marc Prüßmeier which adds the following
+	  three functions to iImage: Copy, CopyScale, and CopyTile. Only
+	  csImage implements those. The other implementations of iImage
+	  simply return false here.
 26-Nov-2004
 	- Eric Sunshine added capability to cscript/csperl5/Jamfile to create
 	  pure-Perl extension module `cspace' (Jam target `perl5mod'). This

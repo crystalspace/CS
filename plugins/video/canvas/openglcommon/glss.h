@@ -69,6 +69,14 @@ public:
   { return 0; }
   virtual void CheckAlpha ()
   { }
+  virtual bool Copy (iImage* sImage, int x, int y, int width, int height) const
+  { return false; }
+  virtual bool CopyScale (iImage* sImage, int x, int y,
+  	int width, int height) const
+  { return false; }
+  virtual bool CopyTile (iImage* sImage, int x, int y,
+  	int width, int height) const 
+  { return false; }
   virtual bool HasKeyColor () const
   { return 0; }
   virtual bool HasKeycolor () const
@@ -85,3 +93,4 @@ public:
 };
 
 #endif
+

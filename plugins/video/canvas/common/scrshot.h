@@ -78,6 +78,25 @@ public:
   /// Check if the alpha channel is valid
   virtual void CheckAlpha ()
   { }
+  /// Copy an image as subpart in the actual Image.
+  virtual bool Copy (iImage* sImage, int x, int y, int width, int height) const
+  { return false; }
+  /**
+   * Copy an image as subpart in the actual Image and scale it to
+   * the given size.
+   */
+  virtual bool CopyScale (iImage* sImage, int x, int y,
+  	int width, int height) const
+  { return false; }
+  /**
+   * Copy an image as subpart in the actual Image and tile and scale it
+   * to the given size.
+   */
+  virtual bool CopyTile (iImage* sImage, int x, int y,
+  	int width, int height) const 
+  { return false; }
+
+
   /// Check if image has a keycolour stored with it.
   virtual bool HasKeyColor () const
   { return 0; }
@@ -97,3 +116,4 @@ public:
 };
 
 #endif // __CS_SCRSHOT_H__
+

@@ -48,6 +48,14 @@ public:
   virtual void SetFormat (int iFormat);
   virtual csPtr<iImage> Clone () const;
   virtual csPtr<iImage> Crop (int x, int y, int width, int height) const;
+  virtual bool Copy (iImage* sImage, int x, int y, int width, int height) const
+  { return false; }
+  virtual bool CopyScale (iImage* sImage, int x, int y,
+  	int width, int height) const
+  { return false; }
+  virtual bool CopyTile (iImage* sImage, int x, int y,
+  	int width, int height) const 
+  { return false; }
   virtual bool HasKeyColor () const { return 0; }
   virtual bool HasKeycolor () const { return HasKeyColor(); }
   virtual void GetKeyColor (int &r, int &g, int &b) const { r=0; g=0; b=0; }
@@ -58,3 +66,4 @@ public:
 };
 
 #endif // __M2S_IMG_H__
+
