@@ -114,6 +114,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
     	"No iEngine plugin!");
     exit (1);
   }
+  engine->IncRef ();
 
   loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!loader)
@@ -123,6 +124,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
     	"No iLoader plugin!");
     exit (1);
   }
+  loader->IncRef ();
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!g3d)
@@ -132,6 +134,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
     	"No iGraphics3D plugin!");
     exit (1);
   }
+  g3d->IncRef ();
 
   kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
   if (!kbd)
@@ -218,7 +221,6 @@ bool Simple::Initialize (int argc, const char* const argv[],
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   txtmgr->SetPalette ();
-  VFS->DecRef ();
   return true;
 }
 
