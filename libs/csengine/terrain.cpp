@@ -191,7 +191,6 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
   bool modified = true;
 
   unsigned int i = 0, s = 0, d = 0, n = 0, nd = 0;
-  unsigned int j;
   ddgTBinTree *bt;
 
   // Currently the CS version of the terrain engine uses a clipping
