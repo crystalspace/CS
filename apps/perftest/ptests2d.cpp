@@ -136,7 +136,7 @@ void StringTester::Draw (iGraphics3D* /*g3d*/)
 
 Tester* StringTester::NextTester ()
 {
-  font->DecRef ();
+  font = NULL;
   delete [] line;
   return NULL;
 }

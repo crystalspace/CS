@@ -41,20 +41,20 @@ public:
   iObjectRegistry* object_reg;
 
 private:
-  iEngine* engine;
-  iLoader* loader;
-  iGraphics3D* g3d;
-  iKeyboardDriver* kbd;
+  csRef<iEngine> engine;
+  csRef<iLoader> loader;
+  csRef<iGraphics3D> g3d;
+  csRef<iKeyboardDriver> kbd;
   iSector* room;
-  iView* view;
-  iVirtualClock* vc;
+  csRef<iView> view;
+  csRef<iVirtualClock> vc;
   csEngineProcTex* ProcTexture;
 
 public:
-  Simple ();
+  Simple (iObjectRegistry* object_reg);
   virtual ~Simple ();
 
-  bool Initialize (int argc, const char* const argv[]);
+  bool Initialize ();
   void Start ();
   bool HandleEvent (iEvent&);
   void SetupFrame ();
@@ -65,9 +65,9 @@ class csEngineProcTex
 {
 private:
   csRef<iTextureHandle> TexHandle;
-  iGraphics3D *ptG3D;
-  iEngine *Engine;
-  iView *View;
+  csRef<iGraphics3D> ptG3D;
+  csRef<iEngine> Engine;
+  csRef<iView> View;
 
 public:
   csEngineProcTex ();

@@ -43,6 +43,10 @@ void csTypedObjectIterator::FetchObject ()
   while (!CurrentTypedObject && !iter->IsFinished ())
   {
     iter->Next ();
+    if (iter->IsFinished ())
+    {
+      return;
+    }
     CurrentTypedObject = csPtr<iBase> (
   	(iBase*)(iter->GetObject ()->QueryInterface (id, ver)));
   }

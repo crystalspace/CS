@@ -1343,8 +1343,6 @@ CsfEdit::CsfEdit (iObjectRegistry *object_reg, csSkin &Skin)
 {
   int pal = csRegisterPalette (palette_CsfEdit, sizeof (palette_CsfEdit) / sizeof (int));
   SetPalette (pal);
-  mainfont = NULL;
-  tinyfont = NULL;
   editfont = NULL;
   saveitem = NULL;
   closeitem = NULL;
@@ -1353,10 +1351,7 @@ CsfEdit::CsfEdit (iObjectRegistry *object_reg, csSkin &Skin)
 CsfEdit::~CsfEdit ()
 {
   /// first delete the editfont - might save itself.
-  if(editfont) delete editfont;
-
-  if (mainfont) mainfont->DecRef ();
-  if (tinyfont) tinyfont->DecRef ();
+  delete editfont;
 }
 
 bool CsfEdit::Initialize ()

@@ -250,7 +250,8 @@ iModelData *Simple::ImportModel (const char *fn)
     exit (1);
   }
 
-  iModelData *mdl = converter->Load (filebuf->GetUint8 (), filebuf->GetSize ());
+  csRef<iModelData> mdl (
+  	converter->Load (filebuf->GetUint8 (), filebuf->GetSize ()));
   if (!mdl)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Invalid model file: '%s' !", fn);
@@ -258,40 +259,25 @@ iModelData *Simple::ImportModel (const char *fn)
     exit (1);
   }
 
+  mdl->IncRef ();	// Avoid smart pointer release.
   return mdl;
 }
 
 //-----------------------------------------------------------------------------
 
-Simple::Simple ()
+Simple::Simple (iObjectRegistry* object_reg)
 {
-  vc = NULL;
-  view = NULL;
-  engine = NULL;
-  loader = NULL;
-  g3d = NULL;
-  kbd = NULL;
+  Simple::object_reg = object_reg;
 }
 
 Simple::~Simple ()
 {
-  if (vc) vc->DecRef ();
-  if (view) view->DecRef ();
-  if (engine) engine->DecRef ();
-  if (loader) loader->DecRef();
-  if (g3d) g3d->DecRef ();
-  if (crossbuilder) crossbuilder->DecRef ();
-  if (converter) converter->DecRef ();
-  if (vfs) vfs->DecRef ();
-  if (kbd) kbd->DecRef ();
 }
 
 void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
-  iObjectRegistry* object_reg = System->object_reg;
   delete System; System = NULL;
-  csInitializer::DestroyApplication (object_reg);
 }
 
 static bool SimpleEventHandler (iEvent& ev)
@@ -312,12 +298,8 @@ static bool SimpleEventHandler (iEvent& ev)
   }
 }
 
-bool Simple::Initialize (int argc, const char* const argv[],
-  const char *iConfigName)
+bool Simple::Initialize (const char *iConfigName)
 {
-  object_reg = csInitializer::CreateEnvironment (argc, argv);
-  if (!object_reg) return false;
-
   if (!csInitializer::SetupConfigManager (object_reg, iConfigName))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't initialize app!");
@@ -514,7 +496,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   engine->Prepare ();
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Created.");
 
-  view = new csView (engine, g3d);
+  view = csPtr<iView> (new csView (engine, g3d));
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -3*rad));
   iGraphics2D* g2d = g3d->GetDriver2D ();
@@ -583,13 +565,15 @@ void Simple::FinishFrame ()
 int main (int argc, char* argv[])
 {
   srand (time (NULL));
+  iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
+  if (!object_reg) return false;
 
   // Create our main class.
-  System = new Simple ();
+  System = new Simple (object_reg);
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
-  if (!System->Initialize (argc, argv, NULL))
+  if (!System->Initialize (NULL))
   {
     System->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
     Cleanup ();
@@ -601,6 +585,8 @@ int main (int argc, char* argv[])
 
   // Cleanup.
   Cleanup ();
+
+  csInitializer::DestroyApplication (object_reg);
 
   return 0;
 }

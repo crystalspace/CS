@@ -34,14 +34,10 @@
 
 csEngineProcTex::csEngineProcTex()
 {
-  ptG3D = NULL;
-  Engine = NULL;
-  View = NULL;
 }
 
 csEngineProcTex::~csEngineProcTex ()
 {
-  SCF_DEC_REF (View);
 }
 
 bool csEngineProcTex::Initialize (iGraphics3D *g3d, iEngine *engine,
@@ -68,7 +64,7 @@ bool csEngineProcTex::Initialize (iGraphics3D *g3d, iEngine *engine,
 
   // set up a view for the engine
   iSector *room = Engine->GetSectors ()->FindByName ("room");
-  View = new csView (Engine, ptG3D);
+  View = csPtr<iView> (new csView (Engine, ptG3D));
   View->GetCamera ()->GetTransform ().SetOrigin (csVector3 (-0.5,0,0));
   View->GetCamera ()->SetSector (room);
   View->SetRectangle (0, 0, 256, 256);
@@ -97,3 +93,4 @@ void csEngineProcTex::Update (csTicks CurrentTime)
   // switch back to the old context
   Engine->SetContext (oldContext);
 }
+

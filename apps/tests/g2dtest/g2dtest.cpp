@@ -90,12 +90,12 @@ class G2DTestSystemDriver
   // Switch backbuffer while waiting for a key
   bool SwitchBB;
   // Current font
-  iFont *font;
+  csRef<iFont> font;
   // Event Outlet
   iEventOutlet* EventOutlet;
 
 public:
-  iGraphics2D *myG2D;
+  csRef<iGraphics2D> myG2D;
   iObjectRegistry* object_reg;
 
 public:
@@ -140,7 +140,6 @@ G2DTestSystemDriver::G2DTestSystemDriver (int argc, char* argv[])
   state_sptr = 0;
   EnterState (stStartup);
   SwitchBB = false;
-  font = NULL;
   pfmt_init = false;
 
   object_reg = csInitializer::CreateEnvironment (argc, argv);
@@ -176,8 +175,6 @@ G2DTestSystemDriver::~G2DTestSystemDriver ()
 {
   if (EventOutlet != 0)
     EventOutlet->DecRef();
-  if (font != 0)
-    font->DecRef();
 }
 
 void G2DTestSystemDriver::EnterState (appState newstate, int arg)
@@ -465,7 +462,6 @@ int G2DTestSystemDriver::MakeColor (int r, int g, int b)
 
 void G2DTestSystemDriver::SetFont (const char *iFontID)
 {
-  if (font) font->DecRef ();
   iFontServer *fs = myG2D->GetFontServer ();
   font = fs->LoadFont (iFontID);
 }
@@ -1179,8 +1175,11 @@ int main (int argc, char *argv[])
   iNativeWindow* nw = System.myG2D->GetNativeWindow ();
   if (nw) nw->SetTitle (APP_TITLE);
 
-  csDefaultRunLoop(object_reg);
   System.myG2D->Close();
-  System.myG2D->DecRef ();
+  System.myG2D = NULL;
+  plugin_mgr = NULL;
+  cmdline = NULL;
+
+  csDefaultRunLoop(object_reg);
   return 0;
 }

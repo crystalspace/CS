@@ -82,23 +82,14 @@ ViewMesh::ViewMesh (iObjectRegistry *object_reg, csSkin &Skin)
     : csApp (object_reg, Skin)
 {
   SetBackgroundStyle(csabsNothing);
-  view = NULL;
-  engine = NULL;
-  loader = NULL;
-  g3d = NULL;
   menu = NULL;
   dialog = NULL;
-  imeshfact = NULL;
   cammode = movenormal;
   spritepos = csVector3(0,10,0);
 }
 
 ViewMesh::~ViewMesh ()
 {
-  if (view) view->DecRef ();
-  if (engine) engine->DecRef ();
-  if (loader) loader->DecRef();
-  if (g3d) g3d->DecRef ();
   if (menu) delete menu;
   if (dialog) delete dialog;
 }
@@ -597,7 +588,7 @@ bool ViewMesh::Initialize ()
   engine->Prepare ();
   Printf (CS_REPORTER_SEVERITY_NOTIFY, "Created.");
 
-  view = new csView (engine, g3d);
+  view = csPtr<iView> (new csView (engine, g3d));
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 10, -4));
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());

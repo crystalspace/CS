@@ -38,12 +38,12 @@ public:
   iObjectRegistry* object_reg;
 
 private:
-  iAws* aws;
+  csRef<iAws> aws;
   iAwsPrefManager* awsprefs;
-  iAwsCanvas* awsCanvas;
-  iGraphics3D* myG3D;
-  iGraphics2D* myG2D;
-  iVirtualClock* vc;
+  csRef<iAwsCanvas> awsCanvas;
+  csRef<iGraphics3D> myG3D;
+  csRef<iGraphics2D> myG2D;
+  csRef<iVirtualClock> vc;
 
   static void SetPass (void* awstut, iAwsSource *source);
   static void SetUser (void* awstut, iAwsSource *source);

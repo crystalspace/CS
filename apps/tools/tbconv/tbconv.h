@@ -31,7 +31,7 @@ struct iFile;
 class TerrBigTool
 {
 public:
-  TerrBigTool (int argc, char **argv);
+  TerrBigTool (iObjectRegistry* object_reg);
   ~TerrBigTool ();
 
   bool Init ();
@@ -40,11 +40,11 @@ public:
   void ReportError (const char *description, ...);
 private:
   iObjectRegistry *object_reg;
-  iCommandLineParser *cmdline;
-  iVFS *vfs;
-  iImageIO *imageio;
+  csRef<iCommandLineParser> cmdline;
+  csRef<iVFS> vfs;
+  csRef<iImageIO> imageio;
   
-  iFile *input;
+  csRef<iFile> input;
   FILE *output;
 
   float scale;

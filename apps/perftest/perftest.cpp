@@ -28,6 +28,7 @@
 #include "ivideo/natwin.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/fontserv.h"
+#include "ivideo/material.h"
 #include "ivaria/conout.h"
 #include "igraphic/imageio.h"
 #include "igraphic/image.h"
@@ -54,19 +55,11 @@ PerfTest::PerfTest ()
 {
   draw_3d = true;
   draw_2d = true;
-  vc = NULL;
-  myG3D = NULL;
-  myVFS = NULL;
-  ImageLoader = NULL;
   test_skip = false;
 }
 
 PerfTest::~PerfTest ()
 {
-  SCF_DEC_REF (vc);
-  SCF_DEC_REF (myG3D);
-  SCF_DEC_REF (myVFS);
-  if (ImageLoader) ImageLoader->DecRef();
 }
 
 void PerfTest::Report (int severity, const char* msg, ...)
@@ -80,6 +73,7 @@ void PerfTest::Report (int severity, const char* msg, ...)
   {
     csPrintfV (msg, arg);
     csPrintf ("\n");
+    fflush (stdout);
   }
   va_end (arg);
 }
@@ -92,7 +86,7 @@ void Cleanup ()
   csInitializer::DestroyApplication (object_reg);
 }
 
-iMaterialHandle* PerfTest::LoadMaterial (char* file)
+csPtr<iMaterialHandle> PerfTest::LoadMaterial (char* file)
 {
   iTextureManager* txtmgr = myG3D->GetTextureManager ();
   csRef<iImage> image;
@@ -108,8 +102,7 @@ iMaterialHandle* PerfTest::LoadMaterial (char* file)
   csRef<iTextureHandle> texture (
   	txtmgr->RegisterTexture (image, CS_TEXTURE_3D));
   if (!texture) exit (-1);
-  iMaterialHandle* mat = txtmgr->RegisterMaterial (texture);
-  return mat;
+  return txtmgr->RegisterMaterial (texture);
 }
 
 static bool PerfEventHandler (iEvent& ev)

@@ -31,12 +31,9 @@
 
 CS_IMPLEMENT_APPLICATION
 
-TerrBigTool::TerrBigTool (int argc, char **argv) 
+TerrBigTool::TerrBigTool (iObjectRegistry* object_reg)
 {
-  if ((object_reg = csInitializer::CreateEnvironment (argc, argv)) == NULL) {
-    ReportError ("Cannot create environment\n");
-    abort ();
-  }
+  TerrBigTool::object_reg = object_reg;
   if (!csInitializer::RequestPlugins (object_reg,
         CS_REQUEST_VFS,
 	CS_REQUEST_IMAGELOADER,
@@ -45,17 +42,22 @@ TerrBigTool::TerrBigTool (int argc, char **argv)
     abort ();
   }
   
-  if ((cmdline = CS_QUERY_REGISTRY (object_reg, iCommandLineParser)) == NULL) {
+  cmdline = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
+  if (cmdline == NULL)
+  {
     ReportError ("Cannot query command line parser\n");
     abort ();
   }
-  cmdline->Initialize (argc, argv);
   cmdline->AddOption ("scale", "10.0");
-  if ((vfs = CS_QUERY_REGISTRY (object_reg, iVFS)) == NULL) {
+  vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+  if (vfs == NULL)
+  {
     ReportError ("Unable to get vfs plugin\n");
     abort ();	
   }
-  if ((imageio = CS_QUERY_REGISTRY (object_reg, iImageIO)) == NULL) {
+  imageio = CS_QUERY_REGISTRY (object_reg, iImageIO);
+  if (imageio == NULL)
+  {
     ReportError ("Unable to get imageio plugin\n");
     abort ();	
   }
@@ -63,27 +65,28 @@ TerrBigTool::TerrBigTool (int argc, char **argv)
 
 TerrBigTool::~TerrBigTool ()
 {
-  if (imageio) { imageio->DecRef(); }
-  if (vfs) { vfs->DecRef(); }	
-  if (cmdline) { cmdline->DecRef(); }
-  csInitializer::DestroyApplication (object_reg);
 }
 
 bool TerrBigTool::Init ()
 {
   float scale;
   const char *scalestr;
-  if ((scalestr = cmdline->GetOption ("scale")) == NULL) {
+  if ((scalestr = cmdline->GetOption ("scale")) == NULL)
+  {
     scale = 10.0;
-  } else {
-  	sscanf (scalestr, "%f", &scale);
   }
-  if (!cmdline->GetName(0) || !cmdline->GetName(1)) {
+  else
+  {
+    sscanf (scalestr, "%f", &scale);
+  }
+  if (!cmdline->GetName(0) || !cmdline->GetName(1))
+  {
     ReportError ("Format tbtool inputfile outputfile\n");
     return false;
   }
   input = vfs->Open (cmdline->GetName(0), VFS_FILE_MODE | VFS_FILE_READ);
-  if (!input) {
+  if (!input)
+  {
     ReportError ("Unable to open %s on vfs\n", cmdline->GetName(0));
     return false;
   }
@@ -125,11 +128,24 @@ void TerrBigTool::ReportError (const char *description, ...)
   va_end (arg);
 }
 
-int main (int argc, char **argv) {
-  TerrBigTool tbt (argc, argv);
-  if (tbt.Init() && tbt.Convert()) {
-    return 0;
-  } else {
+int main (int argc, char **argv)
+{
+  iObjectRegistry* object_reg;
+  if ((object_reg = csInitializer::CreateEnvironment (argc, argv)) == NULL)
+  {
+    printf ("Cannot create environment!\n");
     return -1;
   }
+
+  int rc;
+  {
+    TerrBigTool tbt (object_reg);
+    if (tbt.Init() && tbt.Convert())
+      rc = 0;
+    else
+      rc = -1;
+  }
+  csInitializer::DestroyApplication (object_reg);
+  return rc;
 }
+

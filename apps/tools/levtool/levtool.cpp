@@ -509,8 +509,6 @@ void ltThing::CreateVertexInfo ()
 LevTool::LevTool ()
 {
   object_reg = NULL;
-  cmdline = NULL;
-  vfs = NULL;
 }
 
 LevTool::~LevTool ()
@@ -521,11 +519,6 @@ LevTool::~LevTool ()
     ltThing* th = (ltThing*)things.Get (i);
     delete th;
   }
-
-  if (cmdline) cmdline->DecRef ();
-  if (vfs) vfs->DecRef ();
-  if (object_reg)
-    csInitializer::DestroyApplication (object_reg);
 }
 
 void LevTool::ParseWorld (csParser* parser, iFile* fout, char* buf)
@@ -842,7 +835,9 @@ int main (int argc, char* argv[])
 
   LevTool* lt = new LevTool ();
 
+  iObjectRegistry* object_reg;
   lt->object_reg = csInitializer::CreateEnvironment (argc, argv);
+  object_reg = lt->object_reg;
   if (!lt->object_reg)
     return -1;
   if (!csInitializer::RequestPlugins (lt->object_reg,
@@ -855,6 +850,8 @@ int main (int argc, char* argv[])
 
   lt->Main ();
   delete lt;
+
+  csInitializer::DestroyApplication (object_reg);
 
   return 0;
 }

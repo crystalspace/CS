@@ -43,25 +43,24 @@ public:
   iObjectRegistry* object_reg;
 
 private:
-  iEngine* engine;
-  iLoader* loader;
-  iGraphics3D* g3d;
+  csRef<iEngine> engine;
+  csRef<iLoader> loader;
+  csRef<iGraphics3D> g3d;
   iSector* room;
-  iView* view;
-  iCrossBuilder* crossbuilder;
-  iModelConverter* converter;
-  iVFS *vfs;
-  iKeyboardDriver* kbd;
-  iVirtualClock* vc;
+  csRef<iView> view;
+  csRef<iCrossBuilder> crossbuilder;
+  csRef<iModelConverter> converter;
+  csRef<iVFS> vfs;
+  csRef<iKeyboardDriver> kbd;
+  csRef<iVirtualClock> vc;
 
 public:
-  Simple ();
+  Simple (iObjectRegistry* object_reg);
   virtual ~Simple ();
 
   void Report (int severity, const char* msg, ...);
 
-  bool Initialize (int argc, const char* const argv[],
-	const char *iConfigName);
+  bool Initialize (const char *iConfigName);
   bool HandleEvent (iEvent&);
   void SetupFrame ();
   void FinishFrame ();

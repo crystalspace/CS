@@ -116,16 +116,10 @@ bool ceControlWindow::HandleEvent (iEvent& Event)
 PicViewApp::PicViewApp (iObjectRegistry *object_reg, csSkin &skin)
 	: csApp (object_reg, skin)
 {
-  pG3D = NULL;
-  VFS = NULL;
-  image_loader = NULL;
 }
 
 PicViewApp::~PicViewApp ()
 {
-  if (pG3D) pG3D->DecRef ();
-  if (VFS) VFS->DecRef ();
-  if (image_loader) image_loader->DecRef ();
 }
 
 bool PicViewApp::Initialize ()
@@ -368,6 +362,9 @@ int main (int argc, char* argv[])
     	"crystalspace.application.picview", "Error initializing system!");
 
   delete theApp;
+  g3d = NULL;	// Release before DestroyApplication().
+  cmdline = NULL;
+
   csInitializer::DestroyApplication (object_reg);
   return 0;
 }

@@ -55,13 +55,13 @@ private:
   Tester* current_tester;
   /// true if user requests to skip the rest of the test (spacebar)
   bool test_skip;
-  iMaterialHandle* materials[4];
+  csRef<iMaterialHandle> materials[4];
   // Load a material.
-  iMaterialHandle* LoadMaterial (char* file);
-  iImageIO *ImageLoader;
-  iGraphics3D *myG3D;
-  iVFS *myVFS;
-  iVirtualClock* vc;
+  csPtr<iMaterialHandle> LoadMaterial (char* file);
+  csRef<iImageIO> ImageLoader;
+  csRef<iGraphics3D> myG3D;
+  csRef<iVFS> myVFS;
+  csRef<iVirtualClock> vc;
 
 public:
   PerfTest ();

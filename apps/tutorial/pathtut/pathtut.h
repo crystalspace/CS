@@ -37,13 +37,13 @@ class PathTut
 {
 private:
   iObjectRegistry* object_reg;
-  iEngine* engine;
-  iLoader* loader;
-  iGraphics3D* g3d;
-  iKeyboardDriver* kbd;
-  iVirtualClock* vc;
+  csRef<iEngine> engine;
+  csRef<iLoader> loader;
+  csRef<iGraphics3D> g3d;
+  csRef<iKeyboardDriver> kbd;
+  csRef<iVirtualClock> vc;
   iSector* room;
-  iView* view;
+  csRef<iView> view;
   csRef<iMeshWrapper> sprite;
   csPath*   m_Path;
   csTicks   m_Duration; //Time for 1 Complete Circle
@@ -55,7 +55,7 @@ private:
   void InitializePath();
   void Animate(csTicks elapsedTime);
 public:
-  PathTut ();
+  PathTut (iObjectRegistry* object_reg);
   ~PathTut ();
 
   bool Initialize (int argc, const char* const argv[]);

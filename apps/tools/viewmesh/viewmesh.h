@@ -39,14 +39,14 @@ struct iMeshObjectFactory;
 class ViewMesh : public csApp
 {
 private:
-  iEngine* engine;
-  iLoader* loader;
-  iGraphics3D* g3d;
+  csRef<iEngine> engine;
+  csRef<iLoader> loader;
+  csRef<iGraphics3D> g3d;
   iSector* room;
-  iView* view;
+  csRef<iView> view;
   csRef<iMeshWrapper> sprite;
   csVector3 spritepos;
-  iMeshObjectFactory* imeshfact;
+  csRef<iMeshObjectFactory> imeshfact;
 
   csMenu *menu;
   csWindow *dialog;

@@ -123,18 +123,10 @@ void csGfxProgressMeter::SetGranularity(int n)
 
 Lighter::Lighter ()
 {
-  engine = NULL;
-  loader = NULL;
-  g3d = NULL;
-  vc = NULL;
 }
 
 Lighter::~Lighter ()
 {
-  if (engine) engine->DecRef ();
-  if (loader) loader->DecRef();
-  if (g3d) g3d->DecRef ();
-  if (vc) vc->DecRef ();
 }
 
 void Lighter::Report (int severity, const char* msg, ...)

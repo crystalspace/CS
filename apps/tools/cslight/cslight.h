@@ -94,18 +94,18 @@ public:
 class Lighter
 {
 public:
-  iEngine* engine;
-  iLoader* loader;
-  iGraphics3D* g3d;
-  iGraphics2D* g2d;
-  iFont* font;
-  iTextureHandle* logo;
+  csRef<iEngine> engine;
+  csRef<iLoader> loader;
+  csRef<iGraphics3D> g3d;
+  csRef<iGraphics2D> g2d;
+  csRef<iFont> font;
+  csRef<iTextureHandle> logo;
   int color_bg;
   int color_text;
   int color_done;
   int color_todo;
   iObjectRegistry* object_reg;
-  iVirtualClock* vc;
+  csRef<iVirtualClock> vc;
 
   /**
    * Set the current VFS dir to the given map_dir.

@@ -53,9 +53,9 @@ enum
 class PicViewApp : public csApp
 {
 public:
-  iGraphics3D *pG3D;
-  iVFS* VFS;
-  iImageIO* image_loader;
+  csRef<iGraphics3D> pG3D;
+  csRef<iVFS> VFS;
+  csRef<iImageIO> image_loader;
   ceImageView* image_view;
   csWindow* image_window;
   csRef<iStrVector> files;

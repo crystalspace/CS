@@ -60,20 +60,10 @@ AwsTutorial *System;
 
 AwsTutorial::AwsTutorial()
 {
-  vc = NULL;
-  myG3D = NULL;
-  myG2D = NULL;
-  aws = NULL;
-  awsCanvas = NULL;
 }
 
 AwsTutorial::~AwsTutorial()
 {
-  SCF_DEC_REF (vc);
-  SCF_DEC_REF (aws);
-  SCF_DEC_REF (myG3D);
-  SCF_DEC_REF (myG2D);
-  SCF_DEC_REF (awsCanvas);
 }
 
 static bool AwsEventHandler (iEvent& ev)
@@ -164,7 +154,7 @@ bool AwsTutorial::Initialize (int argc, const char* const argv[])
   iTextureManager* txtmgr = myG3D->GetTextureManager ();
   txtmgr->SetPalette();
 
-  awsCanvas = aws->CreateCustomCanvas (myG2D, myG3D);
+  awsCanvas = csPtr<iAwsCanvas> (aws->CreateCustomCanvas (myG2D, myG3D));
 
   // In combination with the g2d->Clear() that happens in SetupFrame()
   // we also set the AWSF_AlwaysRedrawWindows flag so that resizing our

@@ -12,6 +12,9 @@ The history order is reversed so that new features are at the top.
 	- Added a howto on smart pointers.
 	- More csPtr/csRef changes.
 	- Replaced strcmp with strcasecmp in efserver.cpp.
+	- Fixed some memory leaks in odedynamics.
+	- More csPtr/csRef changes.
+	- Fixed a bug in csTypedObjectIterator::FetchObject().
 11-Sep-2002
 	- Further csPtr/csRef cleanups by removing the cast operator.
 	- Added a new STRICT_SMART_POINTERS flag in mk/user.mak. If this

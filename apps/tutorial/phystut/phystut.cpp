@@ -65,26 +65,10 @@ Simple *simple;
 Simple::Simple (iObjectRegistry* obj)
 {
   object_reg = obj;
-  engine = NULL;
-  loader = NULL;
-  g3d = NULL;
-  kbd = NULL;
-  vc = NULL;
-  view = NULL;
 }
 
 Simple::~Simple ()
 {
-  if (boxFact) boxFact->DecRef ();
-  if (ballFact) ballFact->DecRef ();
-  if (vc) vc->DecRef ();
-  if (engine) engine->DecRef ();
-  if (loader) loader->DecRef ();
-  if (g3d) g3d->DecRef ();
-  if (kbd) kbd->DecRef ();
-  if (view) view->DecRef ();
-  if (dyn) dyn->DecRef ();
-  if (dynSys) dynSys->DecRef ();
   dyn->RemoveSystem (dynSys);
 }
 
@@ -380,7 +364,7 @@ bool Simple::Initialize ()
 
   engine->Prepare ();
 
-  view = new csView (engine, g3d);
+  view = csPtr<iView> (new csView (engine, g3d));
   iCamera *c = view->GetCamera ();
   c->SetSector (room);
   c->GetTransform ().SetOrigin (csVector3 (0, 0, -4.5));

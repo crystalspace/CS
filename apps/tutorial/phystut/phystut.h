@@ -42,22 +42,18 @@ class Simple
 {
 private:
   iObjectRegistry* object_reg;
-  iEngine* engine;
-  iLoader* loader;
-  iGraphics3D* g3d;
-  iKeyboardDriver* kbd;
-  iVirtualClock* vc;
+  csRef<iEngine> engine;
+  csRef<iLoader> loader;
+  csRef<iGraphics3D> g3d;
+  csRef<iKeyboardDriver> kbd;
+  csRef<iVirtualClock> vc;
   iSector* room;
-  iView* view;
+  csRef<iView> view;
 
-  /*
   csRef<iDynamics> dyn;
   csRef<iDynamicSystem> dynSys;
-  */
-  iDynamics *dyn;
-  iDynamicSystem *dynSys;
-  iMeshFactoryWrapper* boxFact;
-  iMeshFactoryWrapper* ballFact;
+  csRef<iMeshFactoryWrapper> boxFact;
+  csRef<iMeshFactoryWrapper> ballFact;
 
   static bool SimpleEventHandler (iEvent& ev);
   bool HandleEvent (iEvent& ev);

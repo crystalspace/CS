@@ -43,7 +43,7 @@ CS_IMPLEMENT_APPLICATION
 
 char *programversion = "0.0.1";
 char *programname;
-iImageIO *ImageLoader = NULL;
+csRef<iImageIO> ImageLoader;
 
 static struct option long_options[] =
 {
@@ -471,8 +471,8 @@ static bool process_file (const char *fname)
   if (opt.sharpen)
   {
     printf ("Sharpening image with strength %d\n", opt.sharpen);
-    iImage *ifile2 = csPtr<iImage> (
-    	ifile->Sharpen (opt.transp ? &transpcolor : NULL, opt.sharpen));
+    csRef<iImage> ifile2 (csPtr<iImage> (
+    	ifile->Sharpen (opt.transp ? &transpcolor : NULL, opt.sharpen)));
     ifile = ifile2;
   }
 
@@ -679,7 +679,7 @@ int main (int argc, char *argv[])
 
   for (; optind < argc; ++optind)
     process_file (argv [optind]);
-  ImageLoader->DecRef();
+  ImageLoader = NULL;
 
   return 0;
 }

@@ -103,8 +103,9 @@ bool csODEDynamics::Initialize (iObjectRegistry* object_reg)
 csPtr<iDynamicSystem> csODEDynamics::CreateSystem ()
 {
   csODEDynamicSystem* system = new csODEDynamicSystem ();
-  iDynamicSystem* isystem = SCF_QUERY_INTERFACE (system, iDynamicSystem);
+  csRef<iDynamicSystem> isystem (SCF_QUERY_INTERFACE (system, iDynamicSystem));
   systems.Push (isystem);
+  isystem->IncRef ();	// Avoid smart pointer release.
   return csPtr<iDynamicSystem> (isystem);
 }
 
@@ -253,7 +254,8 @@ int csODEDynamics::CollideMeshBox (dGeomID mesh, dGeomID box, int flags,
 
   iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (mesh);
   CS_ASSERT (m);
-  iPolygonMesh *p = SCF_QUERY_INTERFACE (m->GetMeshObject(), iPolygonMesh);
+  csRef<iPolygonMesh> p (
+  	SCF_QUERY_INTERFACE (m->GetMeshObject(), iPolygonMesh));
   csVector3 *vertex_table = p->GetVertices ();
   csMeshedPolygon *polygon_list = p->GetPolygons ();
 
@@ -359,7 +361,8 @@ int csODEDynamics::CollideMeshCylinder (dGeomID mesh, dGeomID cyl, int flags,
 
   iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (mesh);
   CS_ASSERT (m);
-  iPolygonMesh *p = SCF_QUERY_INTERFACE (m->GetMeshObject(), iPolygonMesh);
+  csRef<iPolygonMesh> p (
+  	SCF_QUERY_INTERFACE (m->GetMeshObject(), iPolygonMesh));
   csVector3 *vertex_table = p->GetVertices ();
   csMeshedPolygon *polygon_list = p->GetPolygons ();
 
@@ -459,7 +462,8 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
   dReal rad = dGeomSphereGetRadius (sphere); 
   iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (mesh);
   CS_ASSERT (m);
-  iPolygonMesh *p = SCF_QUERY_INTERFACE (m->GetMeshObject(), iPolygonMesh);
+  csRef<iPolygonMesh> p (
+  	SCF_QUERY_INTERFACE (m->GetMeshObject(), iPolygonMesh));
   csVector3 *vertex_table = p->GetVertices ();
   csMeshedPolygon *polygon_list = p->GetPolygons ();
 
@@ -562,10 +566,12 @@ void csODEDynamics::GetAABB (dGeomID g, dReal aabb[6])
   csBox3 box;
   csReversibleTransform mesht = GetGeomTransform (g);
   iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (g);
-  iPolygonMesh *p = SCF_QUERY_INTERFACE (m->GetMeshObject(), iPolygonMesh);
+  csRef<iPolygonMesh> p (
+  	SCF_QUERY_INTERFACE (m->GetMeshObject(), iPolygonMesh));
   csVector3 *vertex_table = p->GetVertices ();
   box.StartBoundingBox ();
-  for (int i = 0; i < p->GetVertexCount(); i ++) {
+  for (int i = 0; i < p->GetVertexCount(); i ++)
+  {
     box.AddBoundingVertex (vertex_table[i] / mesht);
   }
   aabb[0] = box.MinX(); aabb[1] = box.MaxX();
@@ -762,7 +768,8 @@ bool csODERigidBody::AttachColliderMesh (iMeshWrapper *mesh,
   dGeomTransformSetGeom (id, gid);
 
   csOBB b;
-  iPolygonMesh *p = SCF_QUERY_INTERFACE (mesh->GetMeshObject(), iPolygonMesh);
+  csRef<iPolygonMesh> p (
+  	SCF_QUERY_INTERFACE (mesh->GetMeshObject(), iPolygonMesh));
   b.FindOBB (p->GetVertices(), p->GetVertexCount());
   dMassSetBox (&m, density, b.MaxX()-b.MinX(), b.MaxY()-b.MinY(), b.MaxZ()-b.MinZ());
 

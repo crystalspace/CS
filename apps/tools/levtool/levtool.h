@@ -149,8 +149,8 @@ class LevTool
 {
 public:
   iObjectRegistry* object_reg;
-  iVFS* vfs;
-  iCommandLineParser* cmdline;
+  csRef<iVFS> vfs;
+  csRef<iCommandLineParser> cmdline;
   csVector things;
 
   void ReportError (const char* description, ...);

@@ -75,14 +75,9 @@ void CreatePolygon (iThingState *th, int v1, int v2, int v3, int v4,
 // The global system driver
 Simple *simple;
 
-Simple::Simple ()
+Simple::Simple (iObjectRegistry* object_reg)
 {
-  view = NULL;
-  engine = NULL;
-  loader = NULL;
-  g3d = NULL;
-  kbd = NULL;
-  vc = NULL;
+  Simple::object_reg = object_reg;
 }
 
 Simple::~Simple ()
@@ -111,16 +106,7 @@ Simple::~Simple ()
       ProcTexture->GetTextureHandle()->GetProcTextureInterface());
   }
 
-  if (view) view->DecRef ();
-  if (engine) engine->DecRef ();
-  if (loader) loader->DecRef();
-  if (g3d) g3d->DecRef ();
-  if (kbd) kbd->DecRef ();
-  if (vc) vc->DecRef ();
-  
   delete ProcTexture;
-  
-  csInitializer::DestroyApplication (object_reg);
 }
 
 static bool SimpleEventHandler (iEvent& ev)
@@ -141,11 +127,8 @@ static bool SimpleEventHandler (iEvent& ev)
   }
 }
 
-bool Simple::Initialize (int argc, const char* const argv[])
+bool Simple::Initialize ()
 {
-  object_reg = csInitializer::CreateEnvironment (argc, argv);
-  if (!object_reg) return false;
-
   if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,
 	CS_REQUEST_SOFTWARE3D,
@@ -308,7 +291,7 @@ bool Simple::Initialize (int argc, const char* const argv[])
     	"crystalspace.application.simplept",
   	"Created.");
 
-  view = new csView (engine, g3d);
+  view = csPtr<iView> (new csView (engine, g3d));
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, 0));
   iGraphics2D* g2d = g3d->GetDriver2D ();
@@ -384,16 +367,20 @@ void Simple::Start ()
 int main (int argc, char* argv[])
 {
   srand (time (NULL));
+  iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
+  if (!object_reg) return -1;
 
   // Create our main class.
-  simple = new Simple ();
+  simple = new Simple (object_reg);
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
-  if (simple->Initialize (argc, argv))
-	  simple->Start ();
+  if (simple->Initialize ())
+    simple->Start ();
 
   delete simple;
+
+  csInitializer::DestroyApplication (object_reg);
 
   return 0;
 }

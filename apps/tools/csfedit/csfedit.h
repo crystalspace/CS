@@ -156,7 +156,7 @@ public:
 class CsfEdit : public csApp
 {
   /// reliable fonts, for display
-  iFont *mainfont, *tinyfont;
+  csRef<iFont> mainfont, tinyfont;
   /// the font being edited
   csEditFont *editfont;
   /// menu item to gray or not

@@ -63,27 +63,15 @@ CS_IMPLEMENT_APPLICATION
 // The global pointer to PathTut
 PathTut *pathtut;
 
-PathTut::PathTut ()
+PathTut::PathTut (iObjectRegistry* object_reg)
 {
-  engine = NULL;
-  loader = NULL;
-  g3d = NULL;
-  kbd = NULL;
-  vc = NULL;
-  view = NULL;
+  PathTut::object_reg = object_reg;
   m_Path = NULL;
 }
 
 PathTut::~PathTut ()
 {
-  if (vc) vc->DecRef ();
-  if (engine) engine->DecRef ();
-  if (loader) loader->DecRef();
-  if (g3d) g3d->DecRef ();
-  if (kbd) kbd->DecRef ();
-  if (view) view->DecRef ();
   if (m_Path) delete m_Path;
-  csInitializer::DestroyApplication (object_reg);
 }
 
 void PathTut::SetupFrame ()
@@ -154,9 +142,6 @@ bool PathTut::PathTutEventHandler (iEvent& ev)
 
 bool PathTut::Initialize (int argc, const char* const argv[])
 {
-  object_reg = csInitializer::CreateEnvironment (argc, argv);
-  if (!object_reg) return false;
-
   if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,
 	CS_REQUEST_SOFTWARE3D,
@@ -328,7 +313,7 @@ bool PathTut::Initialize (int argc, const char* const argv[])
 
   engine->Prepare ();
 
-  view = new csView (engine, g3d);
+  view = csPtr<iView> (new csView (engine, g3d));
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
   iGraphics2D* g2d = g3d->GetDriver2D ();
@@ -474,12 +459,18 @@ void PathTut::Start ()
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  pathtut = new PathTut ();
+  iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
+  if (!object_reg) return false;
+
+  pathtut = new PathTut (object_reg);
 
   if (pathtut->Initialize (argc, argv))
     pathtut->Start ();
 
   delete pathtut;
+
+  csInitializer::DestroyApplication (object_reg);
+
   return 0;
 }
 

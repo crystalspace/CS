@@ -61,25 +61,13 @@ CS_IMPLEMENT_APPLICATION
 Simple *simple;
 csVideoPreferences* vidprefs = NULL;
 
-Simple::Simple ()
+Simple::Simple (iObjectRegistry* object_reg)
 {
-  engine = NULL;
-  loader = NULL;
-  g3d = NULL;
-  kbd = NULL;
-  vc = NULL;
-  view = NULL;
+  Simple::object_reg = object_reg;
 }
 
 Simple::~Simple ()
 {
-  if (vc) vc->DecRef ();
-  if (engine) engine->DecRef ();
-  if (loader) loader->DecRef();
-  if (g3d) g3d->DecRef ();
-  if (kbd) kbd->DecRef ();
-  if (view) view->DecRef ();
-  csInitializer::DestroyApplication (object_reg);
 }
 
 void Simple::SetupFrame ()
@@ -158,11 +146,8 @@ bool Simple::SimpleEventHandler (iEvent& ev)
   return simple->HandleEvent (ev);
 }
 
-bool Simple::Initialize (int argc, const char* const argv[])
+bool Simple::Initialize ()
 {
-  object_reg = csInitializer::CreateEnvironment (argc, argv);
-  if (!object_reg) return false;
-
   if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -364,11 +349,15 @@ void Simple::Start ()
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  simple = new Simple ();
+  iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
+  if (!object_reg) return false;
+  simple = new Simple (object_reg);
 
-  if (simple->Initialize (argc, argv))
+  if (simple->Initialize ())
     simple->Start ();
 
   delete simple;
+  csInitializer::DestroyApplication (object_reg);
+
   return 0;
 }
