@@ -361,9 +361,6 @@ void csGLFontCache::WriteStringBaseline (iFont *font, int pen_x, int pen_y,
       }
     }
 
-    int x = pen_x + cacheData->left;
-    int y = pen_y + cacheData->top;
-
     float x_left = x1;
     x1 = x1 + cacheData->left;
     float x_right, x2 = x_right = x1 + cacheData->w;
