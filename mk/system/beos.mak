@@ -5,10 +5,17 @@
 DESCRIPTION.beos = BeOS
 
 # Choose which drivers you want to build/use
-DRIVERS=cs3d/software cs2d/be2d csnetdrv/null csnetman/null \
+DRIVERS=cs3d/software cs2d/be cs2d/openglbe cs3d/opengl \
+  csnetdrv/null csnetdrv/sockets csnetman/null csnetman/simple \
   cssnddrv/null cssndrdr/null
-# Uncomment the following if you want to build/use OpenGL
-# DRIVERS+=cs3d/opengl cs2d/openglbe
+# Uncomment the following if you want to build/use Glide.
+# DRIVERS+=cs2d/beglide2 cs3d/glide2
+
+# We don't want assembly for now
+override DO_ASM=no
+
+# Until this is auto-detected, we assume it to be true.
+override BUGGY_EGCS_COMPILER=yes
 
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
@@ -47,14 +54,14 @@ Z_LIBS=-lz
 PNG_LIBS=-lpng
 
 # Where can the JPG library be found on this system?
-JPG_LIBS=-ljpeg
+JPG_LIBS=-Llibs/libjpeg -ljpeg
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
 
 # Indicate where special include files can be found.
-CFLAGS.INCLUDE= -I/boot/develop/headers/be/opengl $(CFLAGS.I). \
- $(CFLAGS.I)./include $(CFLAGS.I)./libs $(CFLAGS.I)./apps $(CFLAGS.I)./support
+CFLAGS.INCLUDE=$(CFLAGS.I). $(CFLAGS.I)include $(CFLAGS.I)libs \
+ $(CFLAGS.I)apps $(CFLAGS.I)support $(CFLAGS.I)libs/libjpeg
 
 # General flags for the compiler which are used in any case.
 CFLAGS.GENERAL=-Wall -Wno-multichar -Wno-ctor-dtor-privacy 
@@ -85,7 +92,8 @@ LFLAGS.DLL= -nostart
 
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS=libs/cssys/be/csbe.cpp libs/cssys/be/loadlib.cpp \
- libs/cssys/general/printf.cpp libs/cssys/general/fopen.cpp libs/cssys/be/loadlib.cpp
+ libs/cssys/general/printf.cpp libs/cssys/general/fopen.cpp \
+ libs/cssys/be/loadlib.cpp
 
 # Where to put dynamic libraries on this system?
 OUTDLL=add-ons/
@@ -129,6 +137,11 @@ DO_SHM=no
 # We don't need separate directories for dynamic libraries
 OUTSUFX.yes=
 
+# Defineds for OpenGL 3D driver
+OPENGL.LIBS.DEFINED=1
+CFLAGS.GL3D+=$(CFLAGS.I)/boot/develop/headers/be/opengl 
+LIBS.LOCAL.GL3D+=$(LFLAGS.l)GL
+
 endif # ifeq ($(MAKESECTION),defines)
 
 #--------------------------------------------------------------- confighelp ---#
@@ -138,3 +151,18 @@ SYSHELP += \
   $(NEWLINE)echo $"  make beos         Prepare for building under and for $(DESCRIPTION.beos)$"
 
 endif # ifeq ($(MAKESECTION),confighelp)
+
+#---------------------------------------------------------------- configure ---#
+ifeq ($(MAKESECTION)/$(ROOTCONFIG),rootdefines/config)
+
+SYSCONFIG += $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
+SYSCONFIG += $(NEWLINE)echo override BUGGY_EGCS_COMPILER = $(BUGGY_EGCS_COMPILER)>>config.tmp
+
+endif # rootdefines & config
+
+#--------------------------------------------------------------- volatile.h ---#
+ifeq ($(MAKESECTION)/$(ROOTCONFIG),rootdefines/volatile)
+
+MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define NO_SOCKETS_SUPPORT$">>volatile.tmp
+
+endif # rootdefines & config
