@@ -1067,6 +1067,9 @@ csMeshFactoryWrapper::csMeshFactoryWrapper (
   csMeshFactoryWrapper::meshFact = meshFact;
   parent = 0;
   children.SetMeshFactory (this);
+
+  zbufMode = CS_ZBUF_USE;
+  render_priority = csEngine::current_engine->GetObjectRenderPriority ();
 }
 
 csMeshFactoryWrapper::csMeshFactoryWrapper ()
@@ -1074,6 +1077,9 @@ csMeshFactoryWrapper::csMeshFactoryWrapper ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshFactoryWrapper);
   parent = 0;
   children.SetMeshFactory (this);
+
+  zbufMode = CS_ZBUF_USE;
+  render_priority = csEngine::current_engine->GetObjectRenderPriority ();
 }
 
 csMeshFactoryWrapper::~csMeshFactoryWrapper ()
@@ -1082,6 +1088,31 @@ csMeshFactoryWrapper::~csMeshFactoryWrapper ()
   // removed after the destructor has already finished.
   children.RemoveAll ();
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiMeshFactoryWrapper);
+}
+
+void csMeshFactoryWrapper::SetZBufModeRecursive (csZBufMode mode)
+{
+  SetZBufMode (mode);
+  const iMeshFactoryList* ml = &children;
+  if (!ml) return;
+  int i;
+  for (i = 0 ; i < ml->GetCount () ; i++)
+    ml->Get (i)->SetZBufModeRecursive (mode);
+}
+
+void csMeshFactoryWrapper::SetRenderPriorityRecursive (long rp)
+{
+  SetRenderPriority (rp);
+  const iMeshFactoryList* ml = &children;
+  if (!ml) return;
+  int i;
+  for (i = 0 ; i < ml->GetCount () ; i++)
+    ml->Get (i)->SetRenderPriorityRecursive (rp);
+}
+
+void csMeshFactoryWrapper::SetRenderPriority (long rp)
+{
+  render_priority = rp;
 }
 
 void csMeshFactoryWrapper::SetMeshObjectFactory (iMeshObjectFactory *meshFact)
@@ -1097,6 +1128,8 @@ iMeshWrapper *csMeshFactoryWrapper::NewMeshObject ()
 
   if (GetName ()) mesh->QueryObject ()->SetName (GetName ());
   mesh->SetFactory (&scfiMeshFactoryWrapper);
+  mesh->SetRenderPriority (render_priority);
+  mesh->SetZBufMode (zbufMode);
 
   if (static_lod)
   {

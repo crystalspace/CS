@@ -14,6 +14,10 @@ chronological order.
 	- Eric Sunshine fixed problem in wxWidgets check in configure.ac where
 	  a couple cache variables were not being assigned values in all code
 	  paths.
+	- Jorrit added the ability to set zmode flags (ZUSE, ZFILL, ZTEST,
+	  or ZNONE) and render priority (object, alpha, wall, ...) to
+	  mesh factories too. These will be used as defaults when creating
+	  objects from those factories.
 25-Sep-2004
 	- res copied Matze's change of GLAPI in glextmanager.h (empty instead 
 	  of 'extern') over to the GL extension manager templates.

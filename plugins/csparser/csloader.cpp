@@ -2443,6 +2443,24 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	  stemp->HardTransform (tr);
         }
         break;
+
+      case XMLTOKEN_ZUSE:
+        stemp->SetZBufMode (CS_ZBUF_USE);
+        break;
+      case XMLTOKEN_ZFILL:
+        stemp->SetZBufMode (CS_ZBUF_FILL);
+        break;
+      case XMLTOKEN_ZNONE:
+        stemp->SetZBufMode (CS_ZBUF_NONE);
+        break;
+      case XMLTOKEN_ZTEST:
+        stemp->SetZBufMode (CS_ZBUF_TEST);
+        break;
+      case XMLTOKEN_PRIORITY:
+        stemp->SetRenderPriority (
+		Engine->GetRenderPriority (child->GetContentsValue ()));
+        break;
+
       default:
 	SyntaxService->ReportBadToken (child);
         return false;
@@ -3069,7 +3087,11 @@ bool csLoader::HandleMeshObjectPluginResult (iBase* mo, iDocumentNode* child,
     csRef<iMeshFactoryWrapper> mfw = SCF_QUERY_INTERFACE (lp,
 	      	iMeshFactoryWrapper);
     if (mfw)
+    {
       mesh->SetFactory (mfw);
+      mesh->SetZBufMode (mfw->GetZBufMode ());
+      mesh->SetRenderPriority (mfw->GetRenderPriority ());
+    }
   }
   return true;
 }
@@ -3407,8 +3429,8 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
     }
   }
 
-  if (!priority) priority = csStrNew ("object");
-  mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
+  if (priority)
+    mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
   mesh->GetMeshObject ()->GetFlags ().SetBool (CS_MESH_STATICPOS, staticpos);
   mesh->GetMeshObject ()->GetFlags ().SetBool (CS_MESH_STATICSHAPE, staticshape);
 
@@ -4626,8 +4648,8 @@ bool csLoader::ParsePortals (iLoaderContext* ldr_context,
     }
   }
 
-  if (!priority) priority = csStrNew ("object");
-  container_mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
+  if (priority)
+    container_mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
   container_mesh->GetMeshObject ()->GetFlags ().SetBool (CS_MESH_STATICPOS,
   	staticpos);
   container_mesh->GetMeshObject ()->GetFlags ().SetBool (CS_MESH_STATICSHAPE,

@@ -884,6 +884,11 @@ private:
    */
   csRef<csStaticLODFactoryMesh> static_lod;
 
+  /// Suggestion for new children created from factory.
+  long render_priority;
+  /// Suggestion for new children created from factory.
+  csZBufMode zbufMode;
+
 private:
   /// Destructor.
   virtual ~csMeshFactoryWrapper ();
@@ -945,6 +950,17 @@ public:
   void RemoveFactoryFromStaticLOD (iMeshFactoryWrapper* mesh);
   void AddFactoryToStaticLOD (int lod, iMeshFactoryWrapper* mesh);
 
+  // Flags that are used for children.
+  void SetZBufMode (csZBufMode mode) { zbufMode = mode; }
+  csZBufMode GetZBufMode () const { return zbufMode; }
+  void SetZBufModeRecursive (csZBufMode mode);
+  void SetRenderPriority (long rp);
+  long GetRenderPriority () const
+  {
+    return render_priority;
+  }
+  void SetRenderPriorityRecursive (long rp);
+
   SCF_DECLARE_IBASE_EXT (csObject);
 
   //----------------- iMeshFactoryWrapper implementation --------------------//
@@ -998,6 +1014,30 @@ public:
     virtual void AddFactoryToStaticLOD (int lod, iMeshFactoryWrapper* fact)
     {
       scfParent->AddFactoryToStaticLOD (lod, fact);
+    }
+    virtual void SetZBufMode (csZBufMode mode)
+    {
+      scfParent->SetZBufMode (mode);
+    }
+    virtual csZBufMode GetZBufMode () const
+    {
+      return scfParent->GetZBufMode ();
+    }
+    virtual void SetZBufModeRecursive (csZBufMode mode)
+    {
+      scfParent->SetZBufModeRecursive (mode);
+    }
+    virtual void SetRenderPriority (long rp)
+    {
+      scfParent->SetRenderPriority (rp);
+    }
+    virtual long GetRenderPriority () const
+    {
+      return scfParent->GetRenderPriority ();
+    }
+    virtual void SetRenderPriorityRecursive (long rp)
+    {
+      scfParent->SetRenderPriorityRecursive (rp);
     }
   } scfiMeshFactoryWrapper;
   friend struct MeshFactoryWrapper;

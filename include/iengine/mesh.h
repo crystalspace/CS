@@ -664,6 +664,57 @@ struct iMeshFactoryWrapper : public iBase
    * from the list of factories however.
    */
   virtual void RemoveFactoryFromStaticLOD (iMeshFactoryWrapper* fact) = 0;
+
+  /**
+   * Set the Z-buf drawing mode to use for this factory. All objects created
+   * from this factory will have this mode as default.
+   * Possible values are:
+   * <ul>
+   * <li>#CS_ZBUF_NONE: do not read nor write the Z-buffer.
+   * <li>#CS_ZBUF_FILL: only write the Z-buffer but do not read.
+   * <li>#CS_ZBUF_USE: write and read the Z-buffer.
+   * <li>#CS_ZBUF_TEST: only read the Z-buffer but do not write.
+   * </ul>
+   */
+  virtual void SetZBufMode (csZBufMode mode) = 0;
+  /**
+   * Get the Z-buf drawing mode.
+   */
+  virtual csZBufMode GetZBufMode () const = 0;
+  /**
+   * Same as SetZBufMode() but this will also set the z-buf
+   * mode for the children too.
+   */
+  virtual void SetZBufModeRecursive (csZBufMode mode) = 0;
+
+  /**
+   * The renderer will render all objects in a sector based on this
+   * number. Low numbers get rendered first. High numbers get rendered
+   * later. The value for the factory is used as a default for objects
+   * created from that factory. There are a few often used slots:
+   * <ul>
+   * <li>1. Sky objects are rendered before
+   *     everything else. Usually they are rendered using ZFILL (or ZNONE).
+   * <li>2. Walls are rendered after that. They
+   *     usually use ZFILL.
+   * <li>3. After that normal objects are
+   *     rendered using the Z-buffer (ZUSE).
+   * <li>4. Alpha transparent objects or objects
+   *     using some other transparency system are rendered after that. They
+   *     are usually rendered using ZTEST.
+   * </ul>
+   */
+  virtual void SetRenderPriority (long rp) = 0;
+  /**
+   * Get the render priority.
+   */
+  virtual long GetRenderPriority () const = 0;
+
+  /**
+   * Same as SetRenderPriority() but this version will recursively set
+   * render priority for the children too.
+   */
+  virtual void SetRenderPriorityRecursive (long rp) = 0;
 };
 
 SCF_VERSION (iMeshList, 0, 0, 1);
