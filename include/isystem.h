@@ -104,7 +104,7 @@
  * `Interface' is a interface name (iGraphics2D, iVFS and so on).
  */
 #define QUERY_PLUGIN(Object,Interface)					\
-  (Interface *)Object->QueryPlugIn (#Interface, VERSION_##Interface)
+  (Interface *)(Object)->QueryPlugIn (#Interface, VERSION_##Interface)
 
 /**
  * Find a plugin by his functionality ID. First the plugin with requested
@@ -116,7 +116,7 @@
  * for some basic interface, say iBase or iPlugIn.
  */
 #define QUERY_PLUGIN_ID(Object,FuncID,Interface)			\
-  (Interface *)Object->QueryPlugIn (FuncID, #Interface, VERSION_##Interface)
+  (Interface *)(Object)->QueryPlugIn (FuncID, #Interface, VERSION_##Interface)
 
 /**
  * Find a plugin by his class ID and functionality ID. First the plugin
@@ -129,7 +129,7 @@
  * say iBase or iPlugIn.
  */
 #define QUERY_PLUGIN_CLASS(Object,ClassID,FuncID,Interface)			\
-  (Interface *)Object->QueryPlugIn (ClassID, FuncID, #Interface, VERSION_##Interface)
+  (Interface *)(Object)->QueryPlugIn (ClassID, FuncID, #Interface, VERSION_##Interface)
 
 /**
  * Tell system driver to load a plugin.

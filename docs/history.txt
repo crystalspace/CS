@@ -75,6 +75,11 @@ The history order has been reversed so that new features are at the top.
 	    - Renamed the preprocessor flag NO_QSQRT to CS_NO_QSQRT.
 	    - Fixed a minor problem in -[NeXTDelegate localize:toView:x:y:]
 	      where the conversion of the mouse's Y-coordinate was off by one.
+	- Eric Sunshine fixed the QUERY_PLUGIN() macros in isystem.h so that it
+	  is possible to call them as QUERY_PLUGIN(&object, iBlah) rather than
+	  having to resort to the ugly QUERY_PLUGIN((&object), iBlah).
+	- Eric Sunshine fixed vfstest.cpp so that it no longer instantiates
+	  the VFS plug-in twice.
 7-Jan-2001
 	- Made usage of qisqrt() more sensible. First test if square
 	  is less than some amount then you don't have to do the entire
