@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Jul-2004
+	- Jorrit fixed a big bug in csSafeCopyArray. The problem was that
+	  csArray was using 'memmove' but that function is illegal in the
+	  context of csSafeCopyArray. Solved this by adding a new MemMove()
+	  function to the memory allocator used by csArray.
+	  This fixes InsertSorted(), Insert(), DeleteRange(), and DeleteIndex().
 13-Jul-2004
 	- Eric Sunshine changed cspace.i so that it no longer exports any
 	  va_list functions, such as csPrintfV(), PerformExtensionV(),
