@@ -53,6 +53,7 @@ Options:
 	[--libs]
 	[--cflags]
 	[--cxxflags]
+	[--includes]
 	[--makevars]
 	[--help]
 Libraries:
@@ -202,6 +203,9 @@ while test $# -gt 0; do
     --cflags)
         show_cflags=true
         ;;
+    --includes)
+	show_includes=true
+	;;
     --cxxflags)
 	show_cxxflags=true
 	;;
@@ -252,10 +256,16 @@ done
 
 if test -n "$show_cflags"; then
 	echo "-I$includedir $common_cflags $add_cflags"
-fi
-if test -n "$show_cxxflags"; then
+else
+    if test -n "$show_cxxflags"; then
 	echo "-I$includedir $common_cxxflags $add_cxxflags"
-fi
+    else
+	if test -n "$show_includes"; then
+	    echo "-I$includedir"
+	fi
+    fi
+fi    
+    
 if test -n "$show_libs"; then
     #if users specified no lib, output all
     if test -z "$the_libs"; then
