@@ -148,9 +148,7 @@ bool csAnonRenderBufferManager::SetRenderBuffer (const char *name, float *value,
   }
   if (i == anon_buffers.Length()) return false;
 
-  float *buf = (float *)anon_buffers[i]->buf->Lock(CS_BUF_LOCK_NORMAL);
-  memcpy (buf, value, sizeof (float) * anon_buffers[i]->size * numverts);
-  anon_buffers[i]->buf->Release ();
+  anon_buffers[i]->buf->CopyToBuffer (value, sizeof (float) * anon_buffers[i]->size * numverts);
   return true;
 }
 
@@ -168,9 +166,7 @@ bool csAnonRenderBufferManager::SetRenderBuffer (const char *name, int *value, i
   }
   if (i == anon_buffers.Length()) return false;
 
-  int *buf = (int *)anon_buffers[i]->buf->Lock(CS_BUF_LOCK_NORMAL);
-  memcpy (buf, value, sizeof (int) * anon_buffers[i]->size * numverts);
-  anon_buffers[i]->buf->Release ();
+  anon_buffers[i]->buf->CopyToBuffer (value, sizeof (int) * anon_buffers[i]->size * numverts);
   return true;
 }
 
