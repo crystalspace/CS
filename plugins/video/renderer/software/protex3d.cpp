@@ -37,6 +37,7 @@ IMPLEMENT_IBASE_END
 csSoftProcTexture3D::csSoftProcTexture3D (iBase *iParent)
   : csGraphics3DSoftwareCommon ()
 {
+  is_for_procedural_textures = true;
   CONSTRUCT_IBASE (iParent);
   soft_tex_mm = NULL;
   parent_tex_mm = NULL;

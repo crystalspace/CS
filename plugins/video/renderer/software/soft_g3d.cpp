@@ -48,6 +48,7 @@ IMPLEMENT_IBASE_END
 csGraphics3DSoftware::csGraphics3DSoftware (iBase *iParent)
   : csGraphics3DSoftwareCommon ()
 {
+  is_for_procedural_textures = false;
   CONSTRUCT_IBASE (iParent);
   CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
   csScan_Initialize ();

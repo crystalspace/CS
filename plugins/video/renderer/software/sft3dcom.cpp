@@ -188,6 +188,7 @@ csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon () :
   width = height = -1;
   partner = NULL;
   title = NULL;
+  is_for_procedural_textures = false;
 }
 
 csGraphics3DSoftwareCommon::~csGraphics3DSoftwareCommon ()
@@ -696,12 +697,18 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
    || (o_gbits != pfmt.GreenBits)
    || (o_bbits != pfmt.BlueBits))
     /// make blending tables
-    if(!texman->GetMainTextureManager()) /// if this is not procedural manager
+    if(!is_for_procedural_textures) /// if this is not procedural manager
+    {
       csScan_CalcBlendTables (Scan.BlendingTable, o_rbits = pfmt.RedBits, 
         o_gbits = pfmt.GreenBits, o_bbits = pfmt.BlueBits);
+	printf("Calc main blend tables \n");
+    }
     else 
+    {
       csScan_CalcBlendTables (Scan.BlendingTableProc, o_rbits = pfmt.RedBits, 
         o_gbits = pfmt.GreenBits, o_bbits = pfmt.BlueBits);
+	printf("Calc proc blend tables \n");
+    }
 }
 
 csDrawScanline* csGraphics3DSoftwareCommon::ScanProc_8_Alpha
@@ -2219,7 +2226,7 @@ void csGraphics3DSoftwareCommon::StartPolygonFX (iMaterialHandle* handle,
   Scan.BlendTable = NULL;
   // array to select blend tables from
   unsigned char **BlendingTable = Scan.BlendingTable; 
-  if(texman->GetMainTextureManager()) // proc manager uses its own blend tables
+  if(is_for_procedural_textures) // proc manager uses its own blend tables
     BlendingTable = Scan.BlendingTableProc;
   pqinfo.drawline = NULL;
   pqinfo.drawline_gouraud = NULL;

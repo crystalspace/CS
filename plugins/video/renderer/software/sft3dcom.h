@@ -60,6 +60,9 @@ protected:
   /// Driver this driver is sharing info with (if any)
   csGraphics3DSoftwareCommon *partner;
 
+  /// if this is a procedural texture manager
+  bool is_for_procedural_textures;
+
   /// ID/window name of this context
   const char *title;
 
