@@ -27,13 +27,13 @@ below) for creating a new project.
 @end ifnotinfo
 
 Firstly we need to select the type of project we wish to create.  Crystal Space
-applications are Win32 applications and primarily work from a console
-base.  This still allows the creation of @emph{Graphical User Interface}
-(@sc{gui}) applications.  However, it also allows you to use the @emph{-console}
-command line switch and access more verbose runtime data normally only
-available with debug builds.  If you do wish to create standard win32
-applications, you may do so.  However... the @emph{-console} switch will
-not operate correctly in that type of application.
+applications are Win32 applications and primarily work from a console base.
+This still allows the creation of @emph{Graphical User Interface} (@sc{gui})
+applications.  However, it also allows you to use the @emph{-console} command
+line switch and access more verbose runtime data normally only available with
+debug builds.  If you do wish to create standard win32 applications, you may do
+so.  However...  the @emph{-console} switch will not operate correctly in that
+type of application.
 
 In the @emph{Project Types:} window select @emph{Visual C++ projects}.  Next we
 move to the @emph{Templates:} window and choose the application type we wish to
@@ -98,7 +98,7 @@ then hover over @emph{Add} until the sub menu appears and then click on
 @end ifnotinfo
 
 After selecting the desired file(s) you wish to add, click on the @emph{Open}
-button to finalize your choice(s) and be returned back to the @sc{msvc ide}.  
+button to finalize your choice(s) and be returned back to the @sc{msvc ide}.
 Repeat this process twice adding @file{simple1.cpp} to the @emph{Source Files}
 folder and @file{simple1.h} to the @emph{Header Files} folder. Once done you
 should have a @emph{Solution Explorer} window which looks like the image below.
@@ -109,25 +109,41 @@ should have a @emph{Solution Explorer} window which looks like the image below.
 
 @subsubheading Step 3 - Setting Crystal Space @sc{paths} inside @sc{msvc}.
 
-First thing we need todo is point MSVC to both Crystal Spaces @file{include} and both the release and debug build @file{libs} directories, so it may access them at compile/link time. Select @emph{Tools} from the @emph{File menu} and then @emph{Options}@dots{} You will now be presented with the @emph{Options} dialog box, which can be seen below.
+First thing we need todo is point MSVC to both Crystal Spaces @file{include}
+and both the release and debug build @file{libs} directories, so it may access
+them at compile/link time.  Select @emph{Tools} from the @emph{File menu} and
+then @emph{Options}@dots{} You will now be presented with the @emph{Options}
+dialog box, which can be seen below.
 
 @ifnotinfo
 @picturesss{tutorial,howto,msvc7proj,snap6}
 @end ifnotinfo
 
-Click @emph{Projects} folder of the @emph{Options} dialog. Now click on @emph{VC++ Directories}.
+Click @emph{Projects} folder of the @emph{Options} dialog.  Now click on
+@emph{VC++ Directories}.
 
 @ifnotinfo
 @picturesss{tutorial,howto,msvc7proj,snap7}
 @end ifnotinfo
 
-Lets first add the path to the location of the Crystal Space @file{include} directory. Select @emph{Include files} in the @emph{Show directories} for drop down menu. Next click on the @emph{New Line} button (folder beneath the drop down menu). Click the browse button (button with three dots) on the right hand side, enabling you to select the Crystal Space @emph{include} directory - wherever it is on your system. See the image below for an example of it set.
+Lets first add the path to the location of the Crystal Space @file{include}
+directory.  Select @emph{Include files} in the @emph{Show directories} for drop
+down menu.  Next click on the @emph{New Line} button (folder beneath the drop
+down menu).  Click the browse button (button with three dots) on the right hand
+side, enabling you to select the Crystal Space @emph{include} directory -
+wherever it is on your system.  See the image below for an example of it set.
 
 @ifnotinfo
 @picturesss{tutorial,howto,msvc7proj,snap8}
 @end ifnotinfo
 
-To set the paths to the Crystal Space lib files, you must remember you need to add two - one pointing to the location where the release libs are and another to where the debug libs are located. In the @emph{Show directories} for drop down menu, now select @emph{Library files}. Follow the same browse and selection procedure as you used when adding the @file{include} path, adding the following paths - adjusting for where you have Crystal Space located on your system.
+To set the paths to the Crystal Space lib files, you must remember you need to
+add two - one pointing to the location where the release libs are and another
+to where the debug libs are located.  In the @emph{Show directories} for drop
+down menu, now select @emph{Library files}.  Follow the same browse and
+selection procedure as you used when adding the @file{include} path, adding the
+following paths - adjusting for where you have Crystal Space located on your
+system.
 
 @noindent
 @file{CS\mk\visualc7\csrelease\bin\libs\}
@@ -145,27 +161,48 @@ Once done, click on the @emph{OK} button and return to the MSVC IDE.
 
 @subsubheading Step 4 - Setting Preprocessor Definitions in MSVC.
 
-Crystal Space essentially has three preprocessor definitions which MUST be set in-order to successfully compile and link your application. They are @code{WIN32_VOLATILE}, which is added whether the build is release or debug. @code{__CRYSTAL_SPACE__}, which is also set whether the build is release or debug. And finally @code{CS_RELEASE} or @code{CS_DEBUG}, which is added as you may guess @code{CS_RELEASE} in the settings for release builds and @code{CS_DEBUG} in the settings for debug builds.
+Crystal Space essentially has three preprocessor definitions which MUST be set
+in-order to successfully compile and link your application.  They are
+@code{WIN32_VOLATILE}, which is added whether the build is release or debug.
+@code{__CRYSTAL_SPACE__}, which is also set whether the build is release or
+debug.  And finally @code{CS_RELEASE} or @code{CS_DEBUG}, which is added as you
+may guess @code{CS_RELEASE} in the settings for release builds and
+@code{CS_DEBUG} in the settings for debug builds.
 
-To set the preprocessor definitions for your project. Select your project in the @emph{Workspace} window. See area highlighted in blue in the image below. Now, from the @emph{Project} menu select @emph{Properties}. Alternatively, you can right click on the highlighted area in the @emph{Workspace} and then click on @emph{Properties} - both ways work.
+To set the preprocessor definitions for your project.  Select your project in
+the @emph{Workspace} window.  See area highlighted in blue in the image below.
+Now, from the @emph{Project} menu select @emph{Properties}.  Alternatively, you
+can right click on the highlighted area in the @emph{Workspace} and then click
+on @emph{Properties} - both ways work.
 
 @ifnotinfo
 @picturesss{tutorial,howto,msvc7proj,snap5}
 @end ifnotinfo
 
-Once you have clicked on @emph{Properties}. You will then be presented with the @emph{Properties} dialog box, which can be seen in the image below.
+Once you have clicked on @emph{Properties}.  You will then be presented with
+the @emph{Properties} dialog box, which can be seen in the image below.
 
 @ifnotinfo
 @picturesss{tutorial,howto,msvc7proj,snap10}
 @end ifnotinfo
 
-Open the C/C++ folder and select @emph{Preprocessor}. Insert the appropriate definitions in the @emph{Preprocessor Definitions} text box i.e. for a debug build @code{WIN32_VOLATILE}, @code{__CRYSTAL_SPACE__} and @code{CS_DEBUG}, making sure to seperate with semi-colons. Alternatively, you can click the elipsis (@dots{}) button to pull up an easier view. An example of the ones entered for a debug build can be seen in the image below.
+Open the C/C++ folder and select @emph{Preprocessor}.  Insert the appropriate
+definitions in the @emph{Preprocessor Definitions} text box i.e.  for a debug
+build @code{WIN32_VOLATILE}, @code{__CRYSTAL_SPACE__} and @code{CS_DEBUG},
+making sure to seperate with semi-colons.  Alternatively, you can click the
+elipsis (@dots{}) button to pull up an easier view.  An example of the ones
+entered for a debug build can be seen in the image below.
 
 @ifnotinfo
 @picturesss{tutorial,howto,msvc7proj,snap11}
 @end ifnotinfo
 
-Open the C/C++ folder and select @emph{Preprocessor}. Insert the appropriate definitions in the @emph{Preprocessor Definitions} text box i.e. for a release build @code{WIN32_VOLATILE}, @code{__CRYSTAL_SPACE__} and @code{CS_RELEASE}, making sure to seperate with semi-colons. Alternatively, you can click the elipsis (@dots{}) button to pull up an easier view. An example the ones entered for a release build can be seen in the image below.
+Open the C/C++ folder and select @emph{Preprocessor}.  Insert the appropriate
+definitions in the @emph{Preprocessor Definitions} text box i.e.  for a release
+build @code{WIN32_VOLATILE}, @code{__CRYSTAL_SPACE__} and @code{CS_RELEASE},
+making sure to seperate with semi-colons.  Alternatively, you can click the
+elipsis (@dots{}) button to pull up an easier view.  An example the ones
+entered for a release build can be seen in the image below.
 
 @ifnotinfo
 @picturesss{tutorial,howto,msvc7proj,snap12}
@@ -175,23 +212,32 @@ Once done, click on the OK button and return to the MSVC IDE.
 
 @subsubheading Step 5 - Setting Run-Time Library Used with Crystal Space Applications.
 
-As in step 4 we need to change one or more project settings. Select your project in the @emph{Workspace} window. See area highlighted in blue in the image below. Now, from the @emph{Project} menu select @emph{Properties}. Alternatively, you can right click on the highlighted area in the @emph{Workspace} and then click on @emph{Properties} - both ways work.
+As in step 4 we need to change one or more project settings.  Select your
+project in the @emph{Workspace} window.  See area highlighted in blue in the
+image below.  Now, from the @emph{Project} menu select @emph{Properties}.
+Alternatively, you can right click on the highlighted area in the
+@emph{Workspace} and then click on @emph{Properties} - both ways work.
 
 @ifnotinfo
 @picturesss{tutorial,howto,msvc7proj,snap5}
 @end ifnotinfo
 
-Once you have clicked on @emph{Properties}, you will be presented with the @emph{Properties} dialog box once again.
+Once you have clicked on @emph{Properties}, you will be presented with the
+@emph{Properties} dialog box once again.
 
-Open the C/C++ folder and select @emph{Code Generation}. Crystal Space uses the Multithreaded DLL run-time internally, so to avoid conflict and errors applications should use the same.
+Open the C/C++ folder and select @emph{Code Generation}.  Crystal Space uses
+the Multithreaded DLL run-time internally, so to avoid conflict and errors
+applications should use the same.
 
-For debug builds you need to select @emph{Debug Multithreaded DLL} from the @emph{Runtime Library} drop down menu. As can be seen in the image below.
+For debug builds you need to select @emph{Debug Multithreaded DLL} from the
+@emph{Runtime Library} drop down menu.  As can be seen in the image below.
 
 @ifnotinfo
 @picturesss{tutorial,howto,msvc7proj,snap13}
 @end ifnotinfo
 
-For release builds you need to select @emph{Multithreaded DLL} from the @emph{Runtime Library} drop down menu. As can be seen in the image below.
+For release builds you need to select @emph{Multithreaded DLL} from the
+@emph{Runtime Library} drop down menu.  As can be seen in the image below.
 
 @ifnotinfo
 @picturesss{tutorial,howto,msvc7proj,snap14}
@@ -201,27 +247,55 @@ Once done, click on the @emph{OK} button and return to the MSVC IDE.
 
 @subsubheading Step 6 - Setting the Crystal Space static libs to link with.
 
-When compiling Crystal Space in release and debug mode, you will end up with the following static libs, some of which you may require at some point in your own applications if you use the functionality contained within a given library.
+When compiling Crystal Space in release and debug mode, you will end up with
+the following static libs, some of which you may require at some point in your
+own applications if you use the functionality contained within a given library.
 
 Crystal Space debug library names (the @emph{_d} indicates a debug CS library):
 
-@file{libcssys_d.lib} @file{libcsengine_d.lib} @file{libcsutil_d.lib} @file{libcsgeom_d.lib} @file{libcsgfx_d.lib} @file{libcstool_d.lib} @file{libcsws_d.lib}
+@iftex
+@code{libcsengine_d.lib libcsutil_d.lib libcsgeom_d.lib}@*
+@code{libcsgfx_d.lib libcstool_d.lib libcsws_d.lib}
+@end iftex
+@ifnottex
+@code{libcsengine_d.lib libcsutil_d.lib libcsgeom_d.lib libcsgfx_d.lib libcstool_d.lib libcsws_d.lib}
+@end ifnottex
 
 Crystal Space release library names:
 
-@file{libcssys.lib} @file{libcsengine.lib} @file{libcsutil.lib} @file{libcsgeom.lib} @file{libcsgfx.lib} @file{libcstool.lib} @file{libcsws.lib}
+@iftex
+@code{libcsengine.lib libcsutil.lib libcsgeom.lib}@*
+@code{libcsgfx.lib libcstool.lib libcsws.lib}
+@end iftex
+@ifnottex
+@code{libcsengine.lib libcsutil.lib libcsgeom.lib libcsgfx.lib libcstool.lib libcsws.lib}
+@end ifnottex
 
-To add the necessary libraries to link our application. As in step 4 we need to change one or more project settings. Select your project in the @emph{Workspace} window. See area highlighted in blue in the image below. Now, from the @emph{Project} menu select @emph{Properties}. Alternatively, you can right click on the highlighted area in the @emph{Workspace} and then click on @emph{Properties} - both ways work.
+To add the necessary libraries to link our application.  As in step 4 we need
+to change one or more project settings.  Select your project in the
+@emph{Workspace} window.  See area highlighted in blue in the image below.
+Now, from the @emph{Project} menu select @emph{Properties}.  Alternatively, you
+can right click on the highlighted area in the @emph{Workspace} and then click
+on @emph{Properties} - both ways work.
 
 @ifnotinfo
 @picturesss{tutorial,howto,msvc7proj,snap5}
 @end ifnotinfo
 
-For our application we need only need link with a few of the available Crystal Space static libraries. Open the @emph{Linker} folder and select @emph{Input}. In the text box @emph{Additional Dependencies} add the Crystal Space libraries as named below into the box with those already there.
+For our application we need only need link with a few of the available Crystal
+Space static libraries.  Open the @emph{Linker} folder and select @emph{Input}.
+In the text box @emph{Additional Dependencies} add the Crystal Space libraries
+as named below into the box with those already there.
 
 Debug:
 
-@file{libcssys_d.lib} @file{libcsutil_d.lib} @file{libcsgeom_d.lib} @file{libcsgfx_d.lib} @file{libcstool_d.lib}
+@iftex
+@code{libcsutil_d.lib libcsgeom_d.lib libcsgfx_d.lib}@*
+@code{libcstool_d.lib}
+@end iftex
+@ifnottex
+@code{libcsutil_d.lib libcsgeom_d.lib libcsgfx_d.lib libcstool_d.lib}
+@end ifnottex
 
 See image below for example of debug build link settings.
 
@@ -231,7 +305,13 @@ See image below for example of debug build link settings.
 
 Release:
 
-@file{libcssys.lib} @file{libcsutil.lib} @file{libcsgeom.lib} @file{libcsgfx.lib} @file{libcstool.lib}
+@iftex
+@code{libcsutil.lib libcsgeom.lib libcsgfx.lib}@*
+@code{libcstool.lib}
+@end iftex
+@ifnottex
+@code{libcsutil.lib libcsgeom.lib libcsgfx.lib libcstool.lib}
+@end ifnottex
 
 See image below for example of release build link settings.
 
@@ -239,7 +319,8 @@ See image below for example of release build link settings.
 @picturesss{tutorial,howto,msvc7proj,snap16}
 @end ifnotinfo
 
-Finally, click on @emph{OK} to return to the MSVC IDE and then build the project.
+Finally, click on @emph{OK} to return to the MSVC IDE and then build the
+project.
 
 @subsubheading Commonly encountered problems.
 
@@ -258,7 +339,8 @@ Error executing cl.exe.
 simple1.exe - 1 error(s), 0 warning(s)
 @end example
 
-@strong{A.} Repeat @emph{Step 4} - You seem to have not set one or more of the preprocessor definitions correctly.
+@strong{A.} Repeat @emph{Step 4} - You seem to have not set one or more of the
+preprocessor definitions correctly.
 
 @item
 @strong{Q.} I get the following link errors:
@@ -313,7 +395,9 @@ Error executing link.exe.
 simple1.exe - 15 error(s), 0 warning(s)
 @end example
 
-@strong{A.} This would indicate that you have forgotten to add the Crystal Space static libraries to link with. Work through @emph{Step 6} again and re-check the settings you have entered.
+@strong{A.} This would indicate that you have forgotten to add the Crystal
+Space static libraries to link with.  Work through @emph{Step 6} again and
+re-check the settings you have entered.
 
 @item
 @strong{Q.} I get the following link errors:
@@ -350,5 +434,9 @@ Error executing link.exe.
 simple1.exe - 10 error(s), 1 warning(s)
 @end example
 
-@strong{A.} This or similar LNK2005 errors, tend to indicate that you have forgotten to set the correct run-time library in the project settings. Work through @emph{Step 5} again and make sure you have your project set to @emph{Debug Multithreaded DLL} or @emph{Multithreaded DLL} for debug and release builds respectively.
+@strong{A.} This or similar LNK2005 errors, tend to indicate that you have
+forgotten to set the correct run-time library in the project settings.  Work
+through @emph{Step 5} again and make sure you have your project set to
+@emph{Debug Multithreaded DLL} or @emph{Multithreaded DLL} for debug and
+release builds respectively.
 @end itemize

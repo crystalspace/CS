@@ -348,15 +348,15 @@ might look like this:
 
 @noindent
 Each @sc{scf} class exported by the plugin should be presented in a
-@samp{class} node within the @samp{classes} group.  Each class has a
-@samp{name}, which is the @sc{scf} name of the class; an @samp{implementation},
-which is the name of the C++ class implementing the @sc{scf} class; a
-@samp{description}; and optionally a @samp{requires} node, which lists the
-other @sc{scf} classes upon which this class depends.  Any number of classes
-may appear in the @samp{requires} group.  If your plugin depends only upon a
-certain type of class, rather than a specific @sc{scf} class, then you list
-only the prefix portion of the desired class type, as shown in this example
-(where we desire any 3D renderer).
+@code{<class>} node within the @code{<classes>} group.  Each class has a
+@code{<name>}, which is the @sc{scf>} name of the class; an
+@code{<implementation>}, which is the name of the C++ class implementing the
+@sc{scf>} class; a @code{<description>}; and optionally a @code{<requires>}
+node, which lists the other @sc{scf>} classes upon which this class depends.
+Any number of classes may appear in the @code{<requires>} group.  If your
+plugin depends only upon a certain type of class, rather than a specific
+@sc{scf} class, then you list only the prefix portion of the desired class
+type, as shown in this example (where we desire any 3D renderer).
 
 @subsubheading Compiling the Plugin
 

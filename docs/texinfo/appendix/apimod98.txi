@@ -501,16 +501,287 @@ For @samp{iMaterialEngine} and related: @code{GetTextureWrapper()} for
 layers now expects a @samp{csStringID} instead of an integer.
 
 @subheading @sc{scf} Changes
+@cindex @sc{scf}
+@cindex meta-information
+@cindex plugins
+@cindex @file{.csplugin} files
 
-The @code{SCF_CREATE_INSTANCE()} macro returns @code{csPtr<>}, in order to be
-consistent with the rest of the @sc{scf} instantiation and query macros.
+@noindent
+@emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.}
+
+The monolithic and inflexible plugin-registry database, @file{scf.cfg}, has
+been eliminated.  Instead, plugin modules are now self-describing via a
+meta-information resource associated with each module.  More importantly, it is
+possible to access this meta-information without actually loading the plugin,
+thus avoiding a time-consuming and costly operation.
+
+A plugin's meta-information is now stored in an @sc{xml}-format file rather
+than being hard-coded via the plugin's C++ code.  The meta-information file is
+named after the associated plugin module, except with filename extension
+@file{.csplugin}.  For instance, the meta-information for the @file{vfs.so} (or
+@file{vfs.dll}) plugin will be named @file{vfs.csplugin}.
+
+Since the meta-information is now maintained via an external resource, the
+following @sc{scf} macros, which were used to export this information from the
+C++ code, have been removed:
+
+@itemize @bullet
+@item
+@code{SCF_EXPORT_CLASS_TABLE()}
+@item
+@code{SCF_EXPORT_CLASS()}
+@item
+@code{SCF_EXPORT_CLASS_DEP()}
+@item
+@code{SCF_EXPORT_CLASS_TABLE_END}
+@end itemize
+
+To deal with this change in your own code, simply remove the entire
+@code{SCF_EXPORT_CLASS_TABLE()} block from the C++ code which implements the
+plugin module.
+
+Creation of the meta-information resource file involves a straight-forward
+translation of the information from the obsolete @sc{scf} macros into a
+structured @sc{xml}-format file.  For example:
+
+@example
+SCF_EXPORT_CLASS_TABLE(foo)
+  SCF_EXPORT_CLASS(
+    MyClass1,
+    "myproj.myplugin.foo1",
+    "My first custom foo class")
+  SCF_EXPORT_CLASS_DEP(
+    MyClass2,
+    "myproj.myplugin.foo2",
+    "My second custom foo class",
+    "myproj.myplugin.bar1,myproj.myplugin.bar2")
+SCF_EXPORT_CLASS_TABLE_END
+@end example
+
+This table exports two C++ classes, @samp{MyClass1} and @samp{MyClass2} under
+the @sc{scf} class names @samp{myproj.myplugin.foo1} and
+@samp{myproj.myplugin.foo2}, respectively.  Furthermore, the second exported
+class has a dependency upon two other @sc{scf} classes,
+@samp{myproj.myplugin.bar1} and @samp{myproj.myplugin.bar2}.  To convert
+this to an @sc{xml}-format meta-information resource, just copy the above
+values into the appropriate @sc{xml} nodes.  For instance:
+
+@example
+<?xml version="1.0"?>
+<!-- myplugin.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>myproj.myplugin.foo1</name>
+        <implementation>MyClass1</implementation>
+        <description>My first custom foo class</description>
+      </class>
+      <class>
+        <name>myproj.myplugin.foo2</name>
+        <implementation>MyClass2</implementation>
+        <description>My second custom foo class</description>
+        <requires>
+          <class>myproj.myplugin.bar1</class>
+          <class>myproj.myplugin.bar2</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>
+@end example
+
+The top-level node of a meta-information file is named @code{<plugin>}.  All
+@sc{scf}-related information is contained within an @code{<scf>} child node.
+Plugin modules can export multiple named @sc{scf} classes.  Each exported class
+is represented by a @code{<class>} node within the @code{<classes>} group.  The
+@code{<name>} node of a @code{<class>} is the class' @sc{scf} name.  The
+@code{<implementation>} node references the C++ class which actually implements
+the named @sc{scf} class.  This is the same name that is privided as an
+argument to the @code{SCF_IMPLEMENT_FACTORY()} macro.  When an @sc{scf} class
+depends upon other @sc{scf} classes, the dependencies are indicated via the
+optional @code{<requires>} group, which contains one @code{<class>} node per
+dependency.
+
+Meta-information in the @file{.csplugin} file is extensible; it is not
+restricted to @sc{scf}-only usage.  Plugin authors can choose to publish
+supplementary information about plugins in addition to the @sc{scf} information
+already published.  As a hypothetical example, image loading plugins might
+desire to publish @dfn{image indentification} information which would allow the
+image loading multiplexor to selectively request image loading plugins
+@emph{on-demand}, rather than requesting all plugins unconditionally, even if
+they are not needed.  Here is a possible meta-information table for a @sc{png}
+image loader (with the @code{<scf>} node collapsed to @samp{@dots{}} for the
+sake of illustration):
+
+@example
+<?xml version="1.0"?>
+<!-- cspngimg.csplugin -->
+<plugin>
+  <scf>...</scf>
+  <imageloader>
+    <imagetype>
+      <class>crystalspace.graphic.image.io.png</class>
+      <identify>
+        <mimetype>image/png</mimetype>
+        <extension>png</extension>
+        <extension>PNG</extension>
+        <scan length="4" bytes="\0x89PNG"/>
+     </identify>
+    </imagetype>
+  </imageloader>
+</plugin>
+@end example
+
+In this example, the @sc{png} loader meta-information tells the multiplexor
+several different ways to identify a @sc{png} image:
+
+@itemize @bullet
+@item
+By checking @sc{mime} type, if available.
+@item
+By checking file extension, if available.
+@item
+By checking for the @dfn{magic} identification string @samp{\0x89PNG} in the
+raw image data.
+@end itemize
+
+@noindent
+If the multiplexor identifies the image as @sc{png}, only then will it actually
+request the @sc{png} loader plugin.
+
+At program launch time, @sc{scf} discovers plugins automatically by searching a
+set of directories, and creates an internal database associating available
+@sc{scf} class names with the plugin modules which implement them.  The
+directories which @sc{scf} searches by default are:
+
+@itemize @bullet
+@item
+The application resource directory as returned by @code{csGetResourceDir()}.
+On most platforms, this is the same as the directory containing the
+application, however, on MacOS/X, it is the @file{Resources} directory within
+the Cocoa application wrapper.
+
+@item
+The directory containing the application (or containing the Cocoa application
+wrapper for MacOS/X) as returned by @code{csGetAppDir()}.
+
+@item
+The installed Crystal Space resource directories as returned by
+@code{csGetConfigPath()}.  This is often the value of the @samp{CRYSTAL}
+environment variable, or the @samp{CrystalSpaceRoot} default setting on MacOS/X
+(which is often stored within the @samp{NSGlobalDomain} domain).
+@end itemize
+
+If you would like @sc{scf} to scan additional directories, you can invoke
+either of these two functions:
+
+@itemize @bullet
+@item
+@code{scfInitialize (csPluginPaths const*)}
+@item
+@code{iSCF::ScanPluginsPath(char const*, bool, char const*)}
+@end itemize
+
+Finally, if need to manually register a single plugin module with @sc{scf} for
+which you know the native pathname (not a @sc{vfs} pathname), you can invoke
+@code{iSCF::RegisterPlugin()}.
+
+For those relatively rare cases when a named @sc{scf} class is built directly
+into an application, rather than being implemented via a plugin, the class must
+be registered with @sc{scf} manually since @sc{scf} will not otherwise be able
+to discover the class automatically as it does with plugin modules.  Manual
+registration is accomplished with the @code{SCF_REGISTER_STATIC_CLASS()} macro.
+This macro existed previously, but accepted a different set of arguments.  The
+new arguments are:
+
+@example
+SCF_REGISTER_STATIC_CLASS(
+  C++Class,
+  "scf.class.name",
+  "description",
+  "comma-separated dependency list" or NULL)
+@end example
+
+@noindent
+Invoke this macro in one of the source files of your application; usually in
+the source file which implements the class.  For instance:
+
+@example
+SCF_REGISTER_STATIC_CLASS(
+  MyClass2,
+  "myproj.myplugin.foo2",
+  "My second custom foo class",
+  "myproj.myplugin.bar1,myproj.myplugin.bar2")
+@end example
+
+If you used to @code{SCF_REGISTER_STATIC_LIBRARY()} or
+@code{SCF_REGISTER_STATIC_CLASS_DEP()} for this same purpose, you must now
+instead use @code{SCF_REGISTER_STATIC_CLASS()}.  (A macro named
+@code{SCF_REGISTER_STATIC_LIBRARY()} still exists, but it has a completely
+different purpose than the original version, and is typically only used by very
+low-level mechanisms, rather than by end-users.  See
+@file{CS/include/csutil/scf.h} for the gory details, if you are curious.)
+
+The Crystal Space @file{configure} script option
+@samp{--enable-meta-info-embedding} controls whether or not the build system
+embeds the plugin meta-information into plugin modules (if supported by the
+platform), and whether or not the plugin loader looks for embedded
+meta-information.  If this option is disabled, or if embedding is not supported
+by the platform, then the meta-information is laid down alongside the built
+plugin module (@file{.so} or @file{.dll}) in a text file with the same name as
+the plugin module, except with extension @file{.csplugin}.  The
+meta-information embedding option is enabled, by default.
+
+The platform-specific plugin loaders are capable of reading plugin
+meta-information when it is embedded and when it exists in a stand-alone
+@file{.csplugin} resource.  Even when configured for embedding, the plugin
+loaders will still be able to recognize and utilize external @file{.csplugin}
+resource.  This means that Crystal Space-based projects with unsophisticated
+build systems, which are incapable of embedding meta-information into the
+plugin module, can still create usable plugins by simply placing a copy of the
+@file{.csplugin} file alongside the plugin executable (@file{.so} or
+@file{.dll}).
+
+External projects which are based upon Crystal Space's Jam build system
+(@file{CS/mk/jam}) inherit, for free, the capability of embedding
+meta-information within plugin modules (if supported by the platform).  Simply
+grab the newer @file{.jam} files from @file{CS/mk/jam}, and add a few
+definitions to the project's @file{Jamconfig} file.  The exact set of
+definitions is platform-specific, so consult the appropriate Jam file
+(@file{unix.jam}, @file{win32.jam}, or @file{macosx.jam}) to determine
+precisely which which definitions are required.  Here is a list of definitions
+required at the time of writing:
+
+@table @asis
+@item Unix
+@code{EMBED_META = yes}@*
+@code{LIBBFD.AVAILABLE = yes}@*
+@code{OBJCOPY.AVAILABLE = yes}@*
+@code{CMD.OBJCOPY = objcopy}
+
+@item Windows
+@code{EMBED_META = yes}
+
+@item MacOS/X
+@code{EMBED_META = yes}
+@end table
+
+The @file{scfreg} tool whose job was to manipulate the monolithic @sc{scf}
+plugin-registry database, @file{scf.cfg}, has been eliminated since it is no
+longer required.
+
+The @code{SCF_CREATE_INSTANCE()} macro now returns @code{csPtr<>}, for
+consistency with the other @sc{scf} instantiation and query macros.  This means
+that you should now assign the result of @code{SCF_CREATE_INSTANCE()} to a
+@code{csRef<>}.
 
 @subheading csSys Library Removed
 
 The @file{cssys} library has been merged into the @file{csutil} library.  This
-eliminates many problems which resulted from the large number of circular
+eliminates many problems resulting from the large number of circular
 dependencies which existed between these two libraries.  From the client
-viewpoint, this manifests merely as the removal of the link library
+viewpoint, this manifests merely as the removal of the static link library
 @file{libcssys.a} (Unix) or @file{cssys.lib} (Windows).  To account for this
 change, simply eliminate the reference to this library from your build scripts,
 makefiles, or project files.

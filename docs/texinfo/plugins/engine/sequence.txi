@@ -267,7 +267,7 @@ needs to be enabled again. That's why two parameters are used.
 A lot more is possible here. I will give a short summary of all commands
 (that are not operations) that are supported in sequences here:
 
-@table @samp
+@table @code
 @item args
 Use this to enumerate all arguments to this sequence. You
 only have to specify the name of the arguments here.
@@ -293,7 +293,7 @@ of the sequence). If you want to use a parameter for an operation that
 uses an argument to the sequence then you have to add @samp{_par} to the
 parameter name like this: @samp{light_par}.
 
-@table @samp
+@table @code
 @item run
 This operation will run the given sequence. Parameter is
 @samp{sequence}.
@@ -400,7 +400,7 @@ The other variable doesn't have to be a float.
 
 Here is a list of all conditions that are supported in a trigger:
 
-@table @samp
+@table @code
 @item onclick
 True when the given mesh is clicked on. Parameter is
 @samp{mesh}.

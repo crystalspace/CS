@@ -17,6 +17,20 @@ chronological order.
 	  the new portal objects. This still leaves functions like
 	  FollowSegment() and IntersectSegment().
 	- Added a test standalone portal to flarge (in comments for now).
+	- Eric Sunshine upgraded a bunch of outdated information in the
+	  reference-counting HOWTO in the user manual, and added lot of
+	  important information which was missing.
+	- Eric Sunshine heavily revised the SCF chapter of the user manual.  It
+	  was extremely outdated.  Also documented all of the features of the
+	  revised SCF implementation, such as .csplugin meta-files and
+	  automatic plugin discovery.
+	- Eric Sunshine update apimod98.txi to reflect all of the major SCF
+	  changes for version 0.98.
+	- Eric Sunshine finished updating the user manual to reflect all of the
+	  recent SCF changes.
+	- Eric Sunshine fixed formatting problems in msvc7proj.txi, and
+	  eliminated TeX warnings.
+	- Eric Sunshine repaired some mark-up problems in sequence.txi.
 23-Sep-2003
 	- Jorrit changed the default display depth in video.cfg from 16
 	  to 32. On 3D cards, CS performs awfully bad with 16-bit displays
@@ -2868,7 +2882,7 @@ chronological order.
 	  Upon reception of a 'keydown' message for such keys, CS enqueues a
 	  key event; however, Windows generates another message containing the
 	  keycode translated to a character.
-	- res attempted to update & fix cs-config on win32.
+	- res attempted to update & fix cs-config on Win32.
 	- res fixed a usage of GetLongPath() in instpath.cpp. Replaced it with
 	  a call to csExpandPath().
 7-Jul-2003
@@ -2981,7 +2995,7 @@ chronological order.
 	  conditional had its values the wrong way round.
         - JTarbox fixed it so the fast_mem_copy code is only active with a MSVC
 	  less then version 7.
-	- res fixed win32 csosdefs.h to use fast_mem_copy only on MSVC.  The
+	- res fixed Win32 csosdefs.h to use fast_mem_copy only on MSVC.  The
 	  recent changes caused that fast_mem_copy was used on VC < 7 _and_
 	  non-VC platforms.
 27-Jun-2003
@@ -3451,7 +3465,7 @@ chronological order.
 	  csprocessorcap.h.
 	- res fixed a couple of NR makefiles for proper MSVC project
 	  generation.
-	- res removed sysinit.cpp from win32 cssys. Win32 has it's own version
+	- res removed sysinit.cpp from Win32 cssys. Win32 has it's own version
 	  of those functions.
         - Philip Wyett performed a minor cleanup in win32.mak and added
           #include "cssys/syspath", fixing the compile error in the Python
@@ -3543,7 +3557,7 @@ chronological order.
 	    - Moved scanning invokation to scfInitialize().
 	    - A platform-dependent function, csScanPluginsDir(), returns
 	      plugin filenames and metadata.
-	    - Such a function is provided for Win32. For unix and macosx,
+	    - Such a function is provided for Win32. For unix and MacOS/X,
 	      the "old" function that scans for .csplugin files is used.
 	- res made the following changes:
 	    - The DirectDraw configure time test now also tests for
@@ -4106,7 +4120,7 @@ chronological order.
 31-May-2003
 	- Oktal fixed an error in the Perl plugin that only appeared with
 	  certain versions of Perl, to do with their funny macros.
-	- Anders Stenberg fixed a bug on win32 where the main output window
+	- Anders Stenberg fixed a bug on Win32 where the main output window
 	  wasn't shown sometimes because of a badly initialized variable
 	  (cmdshow).
 	- Keith Fulton fixed the OverrideAction problem, which was that if
@@ -4460,7 +4474,7 @@ chronological order.
 	      store an int8 as a string of length 1, so overrode the typemap to
 	      force it to store it as an int32.
 	    - Added an %ignore csGetPlatformConfig; to cspace.i because that
-	      function is only defined for win32 and will cause a link error on
+	      function is only defined for Win32 and will cause a link error on
 	      other platforms.
 	    - Added #undef for MIN and MAX to csperl5.cpp to stop the macro
 	      redefinition errors when they're defined by the Perl headers.
@@ -4477,7 +4491,7 @@ chronological order.
 	      in the platform specific files now.
 	    - Option handling changed. The options are passed along and tested
 	      directly now, instead of setting strange flags.
-	    - New rules for .rc file handling on win32
+	    - New rules for .rc file handling on Win32
 	    - Win32 rules now generate fileversion resource files without
 	      invoking external scripts
 	    - Introduced a debug mode for the rules
@@ -4498,7 +4512,7 @@ chronological order.
 	- res updated the GL ext manager generator script to contain Jorrits
 	  latest csGLExtensionManager fix.
 	- Matze added some macros for gathering additional project info in
-	  autoconf. This will be used to fill in stuff in the macosx and win32
+	  autoconf. This will be used to fill in stuff in the MacOS/X and Win32
 	  rc files.
 	- Matze fixed a bug he introduced by implementing the custom
 	  header file scanning: header files haven't been scanned anymore so
@@ -4536,7 +4550,7 @@ chronological order.
 	    - Fixed problem in objectivec.jam where the ObjC and ObjC++ rules
 	      were not utilizing CCFLAGS and C++FLAGS set on specific object
 	      files if those flags were added by the CFlags/LFlags (or
-	      indirectly via ExternalLibs) rules in module-specific Jamefiles.
+	      indirectly via ExternalLibs) rules in module-specific Jamfiles.
 	    - Augmented macosx/opengl/Jamfile to also respect .c, .C, .mm, and
 	      .M file extensions.
 	- Eric Sunshine made the following corrections to Matze's recent
@@ -5397,7 +5411,7 @@ chronological order.
 	  the Makefile (see Oktal 30-Apr-2003). It is still disabled, because
 	  I can't figure out how to enable and test it (see Matze 29-Apr-2003)
 	- Matze fixed a double declaration of window_item in skinpars.yy
-	- Matze fixed a problem with jamrules on win32. shellscripts should be
+	- Matze fixed a problem with jamrules on Win32. shellscripts should be
 	  invoked through the shell.
 	- Matze made the configure script respect the CFLAGS, CXXFLAGS,
 	  CPPFLAGS and LDFLAGS passed to configure. Also augmented the
@@ -7332,7 +7346,7 @@ chronological order.
 	  when run under Bash 1.14.  The culprit was the one-liner
 	  "cs_build_ok=yes break" which, although it works correctly with every
 	  other Bourne or compatible shell the world over, fails with Bash
-	  1.14.  In particular, Base 1.14 failed to set cs_build_ok to "yes"
+	  1.14.  In particular, Bash 1.14 failed to set cs_build_ok to "yes"
 	  and instead left the old value ("no") in place.
 	- De-obfuscated a loop in csHashMap::Delete().
 	- res made the following changes to the Win32 port:
@@ -7907,10 +7921,10 @@ chronological order.
 	  Changed the way CS looks for the install path a bit:
 	    - Remove csGetInstallPath function and added csGetConfigPath
 	      and csGetPluginPaths.
-	    - Changed win32, unix and mac implementations accordingly. All 3
-	      compile and the win32 and unix one run fine for me. However I'm
-	      not able to test the macos one, as the shell server can't run
-	      any graphical app (and also not vsh for some reason).
+	    - Changed Win32, Unix and MacOS/Ximplementations accordingly.  All
+	      three compile and the win32 and unix one run fine for me.
+	      However I'm not able to test the macos one, as the shell server
+	      can't run any graphical app (and also not vsh for some reason).
 	    - Changed some #includes: When the include file is on the same
 	      directory don't do #include "walktest/walktest.h" but only
 	      #include "walktest.h"
@@ -8525,7 +8539,7 @@ chronological order.
 	  enable/disable functions for various states. The hashmap is thus
 	  no longer needed. This change gives a small but noticable performance
 	  increase.
-	- 'res' did the following:
+	- res did the following:
 	    - Some sequences reference themselves. Added comments to
 	      world file about that fact (and only those comments this
 	      time).
@@ -8652,7 +8666,7 @@ chronological order.
 	- Eric Sunshine changed csconf.mak so that it now extracts sections
 	  delimited by <cs-config> and </cs-config> directly from the
 	  platform-specific makefile and inserts them verbatim into the
-	  generated cs-config script for the -makevars option.  This replaces
+	  generated cs-config script for the --makevars option.  This replaces
 	  the fragile $(subst) magic in csconf.mak which was attempting to
 	  protect $@ in emitted variables, and also generally prevents
 	  clobbering of other makefile special variables, such as $*, and
@@ -8664,7 +8678,7 @@ chronological order.
 	    - Optimization to volumes for new renderer.
 	    - Small change for transformations in genmesh (needed for
 	      the optimization).
-	- 'res' did the following:
+	- res did the following:
 	    - Replaced ilogb() with csLog2() in terrbig.
 	    - Leaks fixed in terrbig.
 	    - Walktest now properly cleans up if initialization fails.
@@ -8724,7 +8738,7 @@ chronological order.
 	- Philip Wyett did the following:
 	    - Fixed delete vs. delete[] mismatch in aws.
 	    - Fixed CR/LF reading problem under Cygwin (engine.cfg).
-	- 'res' did the following:
+	- res did the following:
 	    - Some line endings were messed up in loadlib.cpp.
 	    - Effects system now returns smart pointers in some cases.
 	    - Fixed some memory leaks in the effects system and GL state
@@ -8767,7 +8781,7 @@ chronological order.
 	  implicit dependency upon DLLs in Cygwin's /bin directory).
 	- Philip Wyett did the following:
 	    - Fixup in msmodel.cpp to match new CS_ALLOC_STACK_ARRAY.
-	- 'res' did the following:
+	- res did the following:
 	    - Win32Assistant IncRef()'d the object registry but did not
 	      DecRef() it.
 	    - Plugins won't be unloaded w/ MSVC extensive memdebug
@@ -8784,14 +8798,14 @@ chronological order.
 	      iGraphics2D registered at the time aws is loaded. Changed
 	      loading order in vidprefs.cpp to fix a bug reported by Eric.
 	    - Added check an warning message about iGraphics2D to aws.
-	- 'res' did the following:
+	- res did the following:
 	    - walktest: default font is loaded if user-specified one fails
 	    - Renamed ALLOC_STACK_ARRAY to CS_ALLOC_STACK_ARRAY. Flipped
 	      order of var & type parameters so it matches the C++ variabel
 	      declaration (type first, then name).
-	    - win32: console windows are only hidden after an app window was
+	    - Win32: console windows are only hidden after an app window was
 	      created.
-	    - win32: plugins now export a function which returns the used
+	    - Win32: plugins now export a function which returns the used
 	      compiler. If it doesn't match the app compiler the plugin isn't
 	      loaded (so mixing MinGW & MSVC binaries will cause an error
 	      report instead of just a crash).
@@ -8807,7 +8821,7 @@ chronological order.
 	    - Updated glshader_mtex.cpp to follow newest interface. Added
 	      iRenderMesh* to Deactivate.
 	- Norman Kramer renamed PLUGINS.DYNAMIC to PLUGINS in win32gcc.mak.
-	- 'res' did the following:
+	- res did the following:
 	    - Small change to the LoadLibrary error reporting: instead of
 	      GetLastError() calling twice, its return value is now stored
 	      (theoretically, FormatMessage() could change the last error
@@ -9022,7 +9036,7 @@ chronological order.
 	- Eric Sunshine updated the configure script so that it emits the
 	  makefile variables COMP and OS to config.mak, and also now emits
 	  DEPEND_TOOL=cc if makedep is missing or has the incorrect version.
-	- Eric Sunshine eliminated compilation warnigns from the cloth plugin.
+	- Eric Sunshine eliminated compilation warnings from the cloth plugin.
 	- Eric Sunshine fixed bugs in md32spr.mak.
 14-Jan-2003
 	- Keith Fulton fixed a bug in csPArray and csRefArray where DeleteAll()
@@ -9050,7 +9064,7 @@ chronological order.
 	  keep no refs to the listeners).
 	- Fixed the documentation on typed vectors and added documentation
 	  for all new templated arrays.
-	- Got a fix from res so that the console on win32 works again
+	- Got a fix from res so that the console on Win32 works again
 	  (in debug mode).
 	- Fixed a bad bug in the OpenGL renderer (wrong usage of
 	  csGrowingArray) which could cause severe crashes when using
@@ -9060,13 +9074,13 @@ chronological order.
 	- Added InsertSorted() and FindSortedKey() to csPArray and
 	  csPDelArray. Fixed motion plugin with that.
 13-Jan-2003
-	- 'res' did the following:
+	- res did the following:
 	    - Fixed 'entry point not found' for MSVC6/ExtMemDebug config.
 	    - Reverted commit of my 'personal' csall.dsw.
 	- Philip Wyett fixed MSVC templates.
 	- Steven Geens fixed msmodel.cpp so that a 0,0,0 normal is not used.
 	- Andreas Busch modified meshobj documents from old syntax to XML.
-	- 'res' did the following:
+	- res did the following:
 	    - Re-added appgui MSVC template. The difference is just in
 	      Release buils; creates a GUI subsystem app instead of a
 	      binary app.
@@ -9146,7 +9160,7 @@ chronological order.
 11-Jan-2003
 	- Keith Fulton added GetReverseAction() to get whether the current
 	  action is operating in reverse or not.
-	- 'res' did the following:
+	- res did the following:
 	    - Memdebug.cpp compiles again on MSVC.
 	    - MSVC6 projects now have 'ExtensiveMemDebug' configuration as
 	      well.
@@ -9216,16 +9230,16 @@ chronological order.
 	      usign SetOverrideAction, which allows the sprite to run
 	      a named animation one time, then auto-reverts back to
 	      whatever action was going on before.
-	- 'res' changed param 'type' to 'value' in
+	- res changed param 'type' to 'value' in
 	  iDocumentNode::GetNode[s].
-	- 'res' changed configuration name "ExtensiveDebug" to
+	- res changed configuration name "ExtensiveDebug" to
 	  "ExtensiveMemDebug".
 	- Philip Wyett fixed iso engine and viewmesh.
 	- Charlls Al'Quarra added GetBitArray() to csBitArray to get the
 	  full array so specialized (sequential) manipulations/reading
 	  can be done without the overhead of calling for individual bits.
 8-Jan-2003
-	- 'res' did the following:
+	- res did the following:
 	    - Moved shellstuff.h from include/cssys/win32 to
 	      libs/cssys/win32.
 	    - Put #ifndef around #define CSIDL_PROGRAM_FILES.
@@ -9299,7 +9313,7 @@ chronological order.
 	- Eric Sunshine updated aged entries in Contributors section of user
 	  manual.
 6-Jan-2003
-	- 'res' did the following:
+	- res did the following:
 	    - Removed ChangeDisplaySettings() from win32.cpp.
 	    - Added code to glwin32 canvas to prevent unnecessary mode
 	      switches, as inspired by Ben Thomas
