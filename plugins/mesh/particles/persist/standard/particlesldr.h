@@ -62,6 +62,18 @@ public:
   /// Parse the force block
   bool ParseForce (iDocumentNode *node, iParticlesFactoryState *state);
 
+  /// Parse constant color block
+  bool ParseColorConstant (iDocumentNode *node, iParticlesFactoryState *state);
+
+  /// Parse linear color block
+  bool ParseColorLinear (iDocumentNode *node, iParticlesFactoryState *state);
+
+  /// Parse looping color block
+  bool ParseColorLooping (iDocumentNode *node, iParticlesFactoryState *state);
+
+  /// Parse heat color block
+  bool ParseColorHeat (iDocumentNode *node, iParticlesFactoryState *state);
+
   /// Parse the color gradient block
   bool ParseGradient (iDocumentNode *node, iParticlesFactoryState *state);
 
@@ -137,6 +149,18 @@ public:
 
   /// Parse the force block
   bool ParseForce (iDocumentNode *node, iParticlesObjectState *state);
+
+  /// Parse constant color block
+  bool ParseColorConstant (iDocumentNode *node, iParticlesObjectState *state);
+
+  /// Parse linear color block
+  bool ParseColorLinear (iDocumentNode *node, iParticlesObjectState *state);
+
+  /// Parse looping color block
+  bool ParseColorLooping (iDocumentNode *node, iParticlesObjectState *state);
+
+  /// Parse heat color block
+  bool ParseColorHeat (iDocumentNode *node, iParticlesObjectState *state);
 
   /// Parse the color gradient block
   bool ParseGradient (iDocumentNode *node, iParticlesObjectState *state);

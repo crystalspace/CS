@@ -61,13 +61,15 @@ enum
   XMLTOKEN_TIME_VARIATION,
   XMLTOKEN_INITIAL_PARTICLES,
   XMLTOKEN_PARTICLES_PER_SECOND,
-  XMLTOKEN_HEAT_FUNCTION,
+  XMLTOKEN_COLOR_METHOD,
   XMLTOKEN_GRADIENT,
   XMLTOKEN_RADIUS,
   XMLTOKEN_DAMPENER,
   XMLTOKEN_MASS,
   XMLTOKEN_MASSVARIATION,
   XMLTOKEN_AUTOSTART,
+  XMLTOKEN_TRANSFORM_MODE,
+  XMLTOKEN_BASE_HEAT,
   XMLTOKEN_PHYSICS_PLUGIN
 };
 
@@ -119,13 +121,15 @@ bool csParticlesFactoryLoader::Initialize (iObjectRegistry* objreg)
   xmltokens.Register ("timevariation", XMLTOKEN_TIME_VARIATION);
   xmltokens.Register ("initial", XMLTOKEN_INITIAL_PARTICLES);
   xmltokens.Register ("pps", XMLTOKEN_PARTICLES_PER_SECOND);
-  xmltokens.Register ("heatfunction", XMLTOKEN_HEAT_FUNCTION);
+  xmltokens.Register ("colormethod", XMLTOKEN_COLOR_METHOD);
   xmltokens.Register ("gradient", XMLTOKEN_GRADIENT);
   xmltokens.Register ("radius", XMLTOKEN_RADIUS);
   xmltokens.Register ("dampener", XMLTOKEN_DAMPENER);
   xmltokens.Register ("mass", XMLTOKEN_MASS);
   xmltokens.Register ("massvariation", XMLTOKEN_MASSVARIATION);
   xmltokens.Register ("autostart", XMLTOKEN_AUTOSTART);
+  xmltokens.Register ("transformmode", XMLTOKEN_TRANSFORM_MODE);
+  xmltokens.Register ("temp", XMLTOKEN_BASE_HEAT);
   xmltokens.Register ("physicsplugin", XMLTOKEN_PHYSICS_PLUGIN);
   return true;
 }
@@ -194,9 +198,6 @@ csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_EMITTER:
         ParseEmitter (child, state);
         break;
-      case XMLTOKEN_FORCE:
-        ParseForce (child, state);
-        break;
       case XMLTOKEN_DIFFUSION:
         state->SetDiffusion (child->GetContentsValueAsFloat ());
         break;
@@ -212,9 +213,6 @@ csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
         break;
       case XMLTOKEN_TIME_VARIATION:
         state->SetTimeVariation (child->GetContentsValueAsFloat ());
-        break;
-      case XMLTOKEN_GRADIENT:
-        ParseGradient (child, state);
         break;
       case XMLTOKEN_INITIAL_PARTICLES:
         state->SetInitialParticleCount (child->GetContentsValueAsInt ());
@@ -234,8 +232,25 @@ csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_AUTOSTART:
       {
         const char *autostart = child->GetContentsValue ();
-        if(!strcmp(autostart, "false")) state->SetAutoStart (false);
-        else state->SetAutoStart (true);
+        if(!strcmp(autostart, "no")) state->SetAutoStart (false);
+        else if(!strcmp(autostart, "yes")) state->SetAutoStart (true);
+        else 
+        {
+          synldr->ReportError ("crystalspace.particles.factory.loader",
+            child, "Unknown autostart parameter '%s'!", autostart);
+        }
+        break;
+      }
+      case XMLTOKEN_TRANSFORM_MODE:
+      {
+        const char *mode = child->GetContentsValue ();
+        if(!strcmp(mode, "no")) state->SetTransformMode (false);
+        else if(!strcmp(mode, "yes")) state->SetTransformMode (true);
+        else 
+        {
+          synldr->ReportError ("crystalspace.particles.factory.loader",
+            child, "Unknown transform mode parameter '%s'!", mode);
+        }
         break;
       }
       case XMLTOKEN_PHYSICS_PLUGIN:
@@ -244,28 +259,41 @@ csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_DAMPENER:
         state->SetDampener (child->GetContentsValueAsFloat ());
         break;
-      case XMLTOKEN_HEAT_FUNCTION:
+      case XMLTOKEN_COLOR_METHOD:
       {
-        csParticleHeatFunction heat = CS_PART_HEAT_SPEED;
-        const char *str = child->GetContentsValue ();
+        const char *str = child->GetAttributeValue ("type");
         if (!str)
         {
           synldr->ReportError ("crystalspace.particles.factory.loader",
-            child, "No falloff type specified!");
-          return 0;
+            child, "No color method type specified!");
+          return false;
         }
         if (!strcmp (str, "constant"))
-	        heat = CS_PART_HEAT_CONSTANT;
-        else if (!strcmp (str, "time_linear"))
-	        heat = CS_PART_HEAT_TIME_LINEAR;
-        else if (!strcmp (str, "speed"))
-	        heat = CS_PART_HEAT_SPEED;
+        {
+          ParseColorConstant (child, state);
+        }
+        else if (!strcmp (str, "linear"))
+        {
+          ParseColorLinear (child, state);
+        }
+        else if (!strcmp (str, "looping"))
+        {
+          ParseColorLooping (child, state);
+        }
+        else if (!strcmp (str, "heat"))
+        {
+          ParseColorHeat (child, state);
+        }
+        else if (!strcmp (str, "callback"))
+        {
+          synldr->ReportError ("crystalspace.particles.factory.loader",
+            child, "You cannot specify callback color method in loader!");
+        }
         else
         {
           synldr->ReportError ("crystalspace.particles.factory.loader",
-            child, "Unknown heat function '%s'!", str);
+            child, "Unknown color method '%s'!", str);
         }
-        state->SetParticleHeatFunction (heat);
         break;
       }
       default:
@@ -311,6 +339,9 @@ bool csParticlesFactoryLoader::ParseEmitter (iDocumentNode *node,
         break;
       case XMLTOKEN_TIME:
         state->SetEmitTime (child->GetContentsValueAsFloat ());
+        break;
+      case XMLTOKEN_FORCE:
+        ParseForce (child, state);
         break;
       default:
         synldr->ReportError ("crystalspace.particles.factory.loader",
@@ -380,11 +411,11 @@ bool csParticlesFactoryLoader::ParseForce (iDocumentNode *node,
           return 0;
         }
         if (!strcmp (str, "constant"))
-	  falloff = CS_PART_FALLOFF_CONSTANT;
+	        falloff = CS_PART_FALLOFF_CONSTANT;
         else if (!strcmp (str, "linear"))
-	  falloff = CS_PART_FALLOFF_LINEAR;
+	        falloff = CS_PART_FALLOFF_LINEAR;
         else if (!strcmp (str, "parabolic"))
-	  falloff = CS_PART_FALLOFF_PARABOLIC;
+	        falloff = CS_PART_FALLOFF_PARABOLIC;
         else
         {
           synldr->ReportError ("crystalspace.particles.factory.loader",
@@ -409,11 +440,11 @@ bool csParticlesFactoryLoader::ParseForce (iDocumentNode *node,
           return false;
         }
         if (!strcmp (str, "constant"))
-	  radius_falloff = CS_PART_FALLOFF_CONSTANT;
+	        radius_falloff = CS_PART_FALLOFF_CONSTANT;
         else if (!strcmp (str, "linear"))
-	  radius_falloff = CS_PART_FALLOFF_LINEAR;
+	        radius_falloff = CS_PART_FALLOFF_LINEAR;
         else if (!strcmp (str, "parabolic"))
-	  radius_falloff = CS_PART_FALLOFF_PARABOLIC;
+	        radius_falloff = CS_PART_FALLOFF_PARABOLIC;
         else
         {
           synldr->ReportError ("crystalspace.particles.factory.loader",
@@ -447,6 +478,145 @@ bool csParticlesFactoryLoader::ParseForce (iDocumentNode *node,
     synldr->ReportError ("crystalspace.particles.factory.loader",
       node, "Unknown force type '%s'!", type);
     return false;
+  }
+  return true;
+}
+
+bool csParticlesFactoryLoader::ParseColorConstant (iDocumentNode *node,
+  iParticlesFactoryState *state)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  bool method_set = false;
+  while (it->HasNext())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_COLOR:
+      {
+        csColor color;
+        synldr->ParseColor (child, color);
+        state->SetConstantColorMethod (color);
+        method_set = true;
+        break;
+      }
+      default:
+        synldr->ReportError ("crystalspace.particles.factory.loader",
+          child, "Unknown token '%s'!", value);
+    }
+  }
+  if(!method_set)
+  {
+     synldr->ReportError ("crystalspace.particles.factory.loader",
+          node, "No constant color specified!");
+  }
+  return true;
+}
+
+bool csParticlesFactoryLoader::ParseColorLinear (iDocumentNode *node,
+  iParticlesFactoryState *state)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  bool method_set = false;
+  while (it->HasNext())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_GRADIENT:
+      {
+        ParseGradient (child, state);
+        state->SetLinearColorMethod ();
+        method_set = true;
+        break;
+      }
+      default:
+        synldr->ReportError ("crystalspace.particles.factory.loader",
+          child, "Unknown token '%s'!", value);
+    }
+  }
+  if(!method_set)
+  {
+     synldr->ReportError ("crystalspace.particles.factory.loader",
+          node, "No gradient specified!");
+  }
+  return true;
+}
+
+bool csParticlesFactoryLoader::ParseColorLooping (iDocumentNode *node,
+  iParticlesFactoryState *state)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  int actions = 0;
+  while (it->HasNext())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_GRADIENT:
+      {
+        ParseGradient(child, state);
+        actions |= 1;
+        break;
+      }
+      case XMLTOKEN_TIME:
+      {
+        float time = child->GetContentsValueAsFloat ();
+        state->SetLoopingColorMethod (time);
+        actions |= 2;
+        break;
+      }
+      default:
+        synldr->ReportError ("crystalspace.particles.factory.loader",
+          child, "Unknown token '%s'!", value);
+    }
+  }
+  if(actions != 3)
+  {
+     synldr->ReportError ("crystalspace.particles.factory.loader",
+          node, "You must specify a gradient and loop time!");
+  }
+  return true;
+}
+
+bool csParticlesFactoryLoader::ParseColorHeat (iDocumentNode *node,
+  iParticlesFactoryState *state)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  bool method_set = false;
+  while (it->HasNext())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_BASE_HEAT:
+      {
+        float base_heat = child->GetContentsValueAsFloat ();
+        state->SetHeatColorMethod (base_heat);
+        method_set = true;
+        break;
+      }
+      default:
+        synldr->ReportError ("crystalspace.particles.factory.loader",
+          child, "Unknown token '%s'!", value);
+    }
+  }
+  if(!method_set)
+  {
+     synldr->ReportError ("crystalspace.particles.factory.loader",
+          node, "You must specify a base heat (temp)!");
   }
   return true;
 }
@@ -558,13 +728,14 @@ bool csParticlesObjectLoader::Initialize (iObjectRegistry* objreg)
   xmltokens.Register ("gravity", XMLTOKEN_GRAVITY);
   xmltokens.Register ("ttl", XMLTOKEN_TIME_TO_LIVE);
   xmltokens.Register ("timevariation", XMLTOKEN_TIME_VARIATION);
-  xmltokens.Register ("heatfunction", XMLTOKEN_HEAT_FUNCTION);
+  xmltokens.Register ("colormethod", XMLTOKEN_COLOR_METHOD);
   xmltokens.Register ("gradient", XMLTOKEN_GRADIENT);
   xmltokens.Register ("radius", XMLTOKEN_RADIUS);
   xmltokens.Register ("dampener", XMLTOKEN_DAMPENER);
   xmltokens.Register ("mass", XMLTOKEN_MASS);
   xmltokens.Register ("massvariation", XMLTOKEN_MASSVARIATION);
-  xmltokens.Register ("autostart", XMLTOKEN_AUTOSTART);
+  xmltokens.Register ("transformmode", XMLTOKEN_TRANSFORM_MODE);
+  xmltokens.Register ("temp", XMLTOKEN_BASE_HEAT);
   xmltokens.Register ("physicsplugin", XMLTOKEN_PHYSICS_PLUGIN);
   return true;
 }
@@ -621,9 +792,6 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_EMITTER:
         ParseEmitter (child, state);
         break;
-      case XMLTOKEN_FORCE:
-        ParseForce (child, state);
-        break;
       case XMLTOKEN_DIFFUSION:
         state->SetDiffusion (child->GetContentsValueAsFloat ());
         break;
@@ -640,9 +808,6 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_TIME_VARIATION:
         state->SetTimeVariation (child->GetContentsValueAsFloat ());
         break;
-      case XMLTOKEN_GRADIENT:
-        ParseGradient (child, state);
-        break;
       case XMLTOKEN_INITIAL_PARTICLES:
         state->SetInitialParticleCount (child->GetContentsValueAsInt ());
         break;
@@ -658,15 +823,15 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_MASSVARIATION:
         state->SetMassVariation (child->GetContentsValueAsFloat ());
         break;
-      case XMLTOKEN_AUTOSTART:
+      case XMLTOKEN_TRANSFORM_MODE:
       {
-        const char *autostart = child->GetContentsValue ();
-        if(!strcmp(autostart, "no")) state->SetAutoStart (false);
-        else if(!strcmp(autostart, "yes")) state->SetAutoStart (true);
+        const char *mode = child->GetContentsValue ();
+        if(!strcmp(mode, "no")) state->SetTransformMode (false);
+        else if(!strcmp(mode, "yes")) state->SetTransformMode (true);
         else 
         {
-          synldr->ReportError ("crystalspace.particles.object.loader",
-            child, "Unknown autostart parameter '%s'!", autostart);
+          synldr->ReportError ("crystalspace.particles.factory.loader",
+            child, "Unknown transform mode parameter '%s'!", mode);
         }
         break;
       }
@@ -676,28 +841,41 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_DAMPENER:
         state->SetDampener (child->GetContentsValueAsFloat ());
         break;
-      case XMLTOKEN_HEAT_FUNCTION:
+      case XMLTOKEN_COLOR_METHOD:
       {
-        csParticleHeatFunction heat = CS_PART_HEAT_SPEED;
-        const char *str = child->GetContentsValue ();
+        const char *str = child->GetAttributeValue ("type");
         if (!str)
         {
-          synldr->ReportError ("crystalspace.particles.object.loader",
-            child, "No falloff type specified!");
+          synldr->ReportError ("crystalspace.particles.factory.loader",
+            child, "No color method type specified!");
           return false;
         }
         if (!strcmp (str, "constant"))
-	        heat = CS_PART_HEAT_CONSTANT;
-        else if (!strcmp (str, "time_linear"))
-	        heat = CS_PART_HEAT_TIME_LINEAR;
-        else if (!strcmp (str, "speed"))
-	        heat = CS_PART_HEAT_SPEED;
+        {
+          ParseColorConstant (child, state);
+        }
+        else if (!strcmp (str, "linear"))
+        {
+          ParseColorLinear (child, state);
+        }
+        else if (!strcmp (str, "looping"))
+        {
+          ParseColorLooping (child, state);
+        }
+        else if (!strcmp (str, "heat"))
+        {
+          ParseColorHeat (child, state);
+        }
+        else if (!strcmp (str, "callback"))
+        {
+          synldr->ReportError ("crystalspace.particles.factory.loader",
+            child, "You cannot specify callback color method in loader!");
+        }
         else
         {
-          synldr->ReportError ("crystalspace.particles.object.loader",
-            child, "Unknown heat function '%s'!", str);
+          synldr->ReportError ("crystalspace.particles.factory.loader",
+            child, "Unknown color method '%s'!", str);
         }
-        state->SetParticleHeatFunction (heat);
         break;
       }
       default:
@@ -743,6 +921,9 @@ bool csParticlesObjectLoader::ParseEmitter (iDocumentNode *node,
         break;
       case XMLTOKEN_TIME:
         state->SetEmitTime (child->GetContentsValueAsFloat ());
+        break;
+      case XMLTOKEN_FORCE:
+        ParseForce (child, state);
         break;
       default:
         synldr->ReportError ("crystalspace.particles.factory.loader",
@@ -812,11 +993,11 @@ bool csParticlesObjectLoader::ParseForce (iDocumentNode *node,
           return false;
         }
         if (!strcmp (str, "constant"))
-	  falloff = CS_PART_FALLOFF_CONSTANT;
+      	  falloff = CS_PART_FALLOFF_CONSTANT;
         else if (!strcmp (str, "linear"))
-	  falloff = CS_PART_FALLOFF_LINEAR;
+	        falloff = CS_PART_FALLOFF_LINEAR;
         else if (!strcmp (str, "parabolic"))
-	  falloff = CS_PART_FALLOFF_PARABOLIC;
+	        falloff = CS_PART_FALLOFF_PARABOLIC;
         else
         {
           synldr->ReportError ("crystalspace.particles.object.loader",
@@ -841,11 +1022,11 @@ bool csParticlesObjectLoader::ParseForce (iDocumentNode *node,
           return false;
         }
         if (!strcmp (str, "constant"))
-	  radius_falloff = CS_PART_FALLOFF_CONSTANT;
+      	  radius_falloff = CS_PART_FALLOFF_CONSTANT;
         else if (!strcmp (str, "linear"))
-	  radius_falloff = CS_PART_FALLOFF_LINEAR;
+	        radius_falloff = CS_PART_FALLOFF_LINEAR;
         else if (!strcmp (str, "parabolic"))
-	  radius_falloff = CS_PART_FALLOFF_PARABOLIC;
+	        radius_falloff = CS_PART_FALLOFF_PARABOLIC;
         else
         {
           synldr->ReportError ("crystalspace.particles.object.loader",
@@ -879,6 +1060,145 @@ bool csParticlesObjectLoader::ParseForce (iDocumentNode *node,
     synldr->ReportError ("crystalspace.particles.object.loader",
       node, "Unknown force type '%s'!", type);
     return false;
+  }
+  return true;
+}
+
+bool csParticlesObjectLoader::ParseColorConstant (iDocumentNode *node,
+  iParticlesObjectState *state)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  bool method_set = false;
+  while (it->HasNext())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_COLOR:
+      {
+        csColor color;
+        synldr->ParseColor (child, color);
+        state->SetConstantColorMethod (color);
+        method_set = true;
+        break;
+      }
+      default:
+        synldr->ReportError ("crystalspace.particles.object.loader",
+          child, "Unknown token '%s'!", value);
+    }
+  }
+  if(!method_set)
+  {
+     synldr->ReportError ("crystalspace.particles.object.loader",
+          node, "No constant color specified!");
+  }
+  return true;
+}
+
+bool csParticlesObjectLoader::ParseColorLinear (iDocumentNode *node,
+  iParticlesObjectState *state)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  bool method_set = false;
+  while (it->HasNext())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_GRADIENT:
+      {
+        ParseGradient (child, state);
+        state->SetLinearColorMethod ();
+        method_set = true;
+        break;
+      }
+      default:
+        synldr->ReportError ("crystalspace.particles.object.loader",
+          child, "Unknown token '%s'!", value);
+    }
+  }
+  if(!method_set)
+  {
+     synldr->ReportError ("crystalspace.particles.object.loader",
+          node, "No gradient specified!");
+  }
+  return true;
+}
+
+bool csParticlesObjectLoader::ParseColorLooping (iDocumentNode *node,
+  iParticlesObjectState *state)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  int actions = 0;
+  while (it->HasNext())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_GRADIENT:
+      {
+        ParseGradient(child, state);
+        actions |= 1;
+        break;
+      }
+      case XMLTOKEN_TIME:
+      {
+        float time = child->GetContentsValueAsFloat ();
+        state->SetLoopingColorMethod (time);
+        actions |= 2;
+        break;
+      }
+      default:
+        synldr->ReportError ("crystalspace.particles.object.loader",
+          child, "Unknown token '%s'!", value);
+    }
+  }
+  if(actions != 3)
+  {
+     synldr->ReportError ("crystalspace.particles.object.loader",
+          node, "You must specify a gradient and loop time!");
+  }
+  return true;
+}
+
+bool csParticlesObjectLoader::ParseColorHeat (iDocumentNode *node,
+  iParticlesObjectState *state)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  bool method_set = false;
+  while (it->HasNext())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_BASE_HEAT:
+      {
+        float base_heat = child->GetContentsValueAsFloat ();
+        state->SetHeatColorMethod (base_heat);
+        method_set = true;
+        break;
+      }
+      default:
+        synldr->ReportError ("crystalspace.particles.object.loader",
+          child, "Unknown token '%s'!", value);
+    }
+  }
+  if(!method_set)
+  {
+     synldr->ReportError ("crystalspace.particles.object.loader",
+          node, "You must specify a base heat (temp)!");
   }
   return true;
 }

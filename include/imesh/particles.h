@@ -47,12 +47,13 @@ enum csParticleFalloffType
 };
 
 /// Particle heat function
-enum csParticleHeatFunction
+enum csParticleColorMethod
 {
-  CS_PART_HEAT_CONSTANT,
-  CS_PART_HEAT_TIME_LINEAR,
-  CS_PART_HEAT_SPEED,
-  CS_PART_HEAT_CALLBACK
+  CS_PART_COLOR_CONSTANT,
+  CS_PART_COLOR_LINEAR,
+  CS_PART_COLOR_LOOPING,
+  CS_PART_COLOR_HEAT,
+  CS_PART_COLOR_CALLBACK
 };
 
 /// Particle emit type
@@ -81,7 +82,7 @@ struct csParticlesData
   float sort;
 };
 
-SCF_VERSION (iParticlesObjectState, 0, 0, 1);
+SCF_VERSION (iParticlesObjectState, 0, 1, 0);
 
 struct iParticlesObjectState : public iBase
 {
@@ -175,17 +176,55 @@ struct iParticlesObjectState : public iBase
   /// Get the time variation
   virtual float GetTimeVariation () = 0;
 
-  /// Set the particle heat function to a built-in function or a callback
-  virtual void SetParticleHeatFunction(csParticleHeatFunction type, float (*callback)(float time, float speed, float dist) = NULL) = 0;
-
   /// Add a color to the gradient
   virtual void AddColor (csColor color) = 0;
 
   /// Clear the color gradient
   virtual void ClearColors () = 0;
 
-  /// Set a color callback (heat is 0.0 for no heat, 1.0 for maximum heat)
-  virtual void SetColorCallback (csColor (*callback)(float heat) = NULL) = 0;
+  /// Set the color method to a constant color
+  virtual void SetConstantColorMethod (csColor color) = 0;
+
+  /**
+   * Set the color method to linear color (based on time to live 
+   * using the gradient (specified above using ClearColors() and
+   * AddColor() )
+   */
+  virtual void SetLinearColorMethod () = 0;
+
+  /**
+   * Set the color method to looping color (loops forever, cycling
+   * once per seconds specified)
+   */
+  virtual void SetLoopingColorMethod (float seconds) = 0;
+
+  /**
+   * Set the color method to use heat (calculated by the physics plugin)
+   * \param base_temp The temperature in degrees C at the emitter
+   */
+  virtual void SetHeatColorMethod (int base_temp) = 0;
+
+  /**
+   * Set the color method to use a callback 
+   * \param time Time left for particle
+   *   (1.0 for just born ranging to 0.0 for dead)
+   */
+  virtual void SetColorCallback (csColor (*callback)(float time)) = 0;
+
+  /// Get the particle color method
+  virtual csParticleColorMethod GetParticleColorMethod () = 0;
+
+  /// Get the constant color (for constant color method)
+  virtual csColor GetConstantColor () = 0;
+
+  /// Get the loop time (for looping color method)
+  virtual float GetColorLoopTime () = 0;
+
+  /// Get the base heat (for heat color method)
+  virtual float GetBaseHeat () = 0;
+
+  /// Get the color callback
+  virtual void GetColorCallback (csColor (**callback)(float time)) = 0;
 
   /// Set the particle radius
   virtual void SetParticleRadius (float radius) = 0;
@@ -211,8 +250,8 @@ struct iParticlesObjectState : public iBase
   /// Get the random variation in particle mass
   virtual float GetMassVariation () = 0;
 
-  /// Set whether the emitter automatically starts (default: true)
-  virtual void SetAutoStart (bool autostart) = 0;
+  /// Set whether to apply the mesh's transform to the individual particles
+  virtual void SetTransformMode (bool transform) = 0;
 
   /**
    * Change the particle physics plugin
@@ -222,12 +261,16 @@ struct iParticlesObjectState : public iBase
 
   /**
    * (Re)Start the particle emitter. This is automatically called when
-   * the particle mesh object is created
+   * the particle mesh object is created if autostart is enabled
+   * (default:yes)
    */
   virtual void Start () = 0;
 
-  /// Stop this particle system from emitting any more particles
+  /// Stop this particle object from emitting any more particles
   virtual void Stop () = 0;
+
+  /// Returns true if this particle simulation is running
+  virtual bool IsRunning () = 0;
 
   /**
    * Update the particle system (should only be called by an 
@@ -237,7 +280,7 @@ struct iParticlesObjectState : public iBase
 
 };
 
-SCF_VERSION (iParticlesFactoryState, 0, 0, 1);
+SCF_VERSION (iParticlesFactoryState, 0, 1, 0);
 
 struct iParticlesFactoryState : public iBase
 {
@@ -289,17 +332,40 @@ struct iParticlesFactoryState : public iBase
   /// Set the random variation in particle time to live, in seconds
   virtual void SetTimeVariation (float variation) = 0;
 
-  /// Set the particle heat function to a built-in function or a callback
-  virtual void SetParticleHeatFunction(csParticleHeatFunction type, float (*callback)(float time, float speed, float dist) = NULL) = 0;
+  /// Set the color method to a constant color
+  virtual void SetConstantColorMethod (csColor color) = 0;
+
+  /**
+   * Set the color method to linear color (based on time to live 
+   * using the gradient (specified above using ClearColors() and
+   * AddColor() )
+   */
+  virtual void SetLinearColorMethod () = 0;
+
+  /**
+   * Set the color method to looping color (loops forever, cycling
+   * once per seconds specified)
+   */
+  virtual void SetLoopingColorMethod (float seconds) = 0;
+
+  /**
+   * Set the color method to use heat (calculated by the physics plugin)
+   * \param base_temp The temperature in degrees C at the emitter
+   */
+  virtual void SetHeatColorMethod (int base_temp) = 0;
+
+  /**
+   * Set the color method to use a callback 
+   * \param time Time left for particle
+   *   (1.0 for just born ranging to 0.0 for dead)
+   */
+  virtual void SetColorCallback (csColor (*callback)(float time) = NULL) = 0;
 
   /// Add a color to the gradient
   virtual void AddColor (csColor color) = 0;
 
   /// Clear the color gradient
   virtual void ClearColors () = 0;
-
-  /// Set a color callback (heat is 0.0 for no heat, 1.0 for maximum heat)
-  virtual void SetColorCallback (csColor (*callback)(float heat) = NULL) = 0;
 
   /// Set the point radius
   virtual void SetParticleRadius (float radius) = 0;
@@ -325,6 +391,9 @@ struct iParticlesFactoryState : public iBase
   /// Set whether the emitter automatically starts (default: true)
   virtual void SetAutoStart (bool autostart) = 0;
 
+  /// Set whether to apply the mesh's transform to the individual particles
+  virtual void SetTransformMode (bool transform) = 0;
+
   /**
    * Set the particle physics plugin
    * (Defaults to 'crystalspace.particles.physics.simple')
@@ -333,7 +402,7 @@ struct iParticlesFactoryState : public iBase
 };
 
 
-SCF_VERSION (iParticlesPhysics, 0, 0, 1);
+SCF_VERSION (iParticlesPhysics, 0, 1, 0);
 
 struct iParticlesPhysics : public iBase
 {

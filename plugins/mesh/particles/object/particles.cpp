@@ -127,9 +127,9 @@ csParticlesFactory::csParticlesFactory (csParticlesType* p,
 
   physics_plugin = "crystalspace.particles.physics.simple";
 
-  heat_function = CS_PART_HEAT_SPEED;
+  color_method = CS_PART_COLOR_CONSTANT;
+  constant_color = csColor(1,1,1);
 
-  heat_callback = NULL;
   color_callback = NULL;
 }
 
@@ -221,15 +221,18 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
 
   gradient_colors = p->gradient_colors;
 
-  heat_function = p->heat_function;
-
-  heat_callback = p->heat_callback;
+  color_method = p->color_method;
+  constant_color = p->constant_color;
+  base_heat = p->base_heat;
+  loop_time = p->loop_time;
   color_callback = p->color_callback;
 
   emitter = csVector3(0.0f, 0.0f, 0.0f);
   radius = 1.0f;
   dead_particles = 0;
   point_sprites = p->g3d->GetCaps ()->SupportsPointSprites;
+
+  running = false;
 
   dynDomain = new csShaderVariableContext ();
 
@@ -301,11 +304,18 @@ bool csParticlesObject::DrawTest (iRenderView* rview, iMovable* movable)
   iCamera* cam = rview->GetCamera ();
 
   tr_o2c = cam->GetTransform ();
-  emitter = movable->GetFullPosition();
-  csReversibleTransform test;
-  test.Identity();
-  test.SetOrigin (emitter);
-  tr_o2c /= test;
+  if(!transform_mode)
+  {
+    emitter = movable->GetFullPosition();
+    csReversibleTransform trans;
+    trans.Identity();
+    trans.SetOrigin (emitter);
+    tr_o2c /= trans;
+  }
+  else
+  {
+    tr_o2c /= movable->GetFullTransform ();
+  }
 
   int vertnum = 0;
   if ((vertnum = point_data.Length () - dead_particles) < 1) return false;
@@ -599,6 +609,7 @@ void csParticlesObject::Start ()
 
   new_particles = (float)initial_particles;
   total_elapsed_time = 0.0f;
+  running = true;
 }
 
 void csParticlesObject::Stop ()
@@ -610,7 +621,6 @@ void csParticlesObject::Stop ()
 bool csParticlesObject::Update (float elapsed_time)
 {
   if (elapsed_time <= 0.0) return true;
-  float new_radius = 0.0f;
 
   if (total_elapsed_time < emit_time)
   {
@@ -620,8 +630,12 @@ bool csParticlesObject::Update (float elapsed_time)
 
   if(dead_particles-new_particles >= point_data.Length())
   {
+    running = false;
     return true;
   }
+  running = true;
+
+  float new_radius = 0.0f;
 
   if ((dead_particles-new_particles) < point_data.Length () * 0.30f)
   {
@@ -636,7 +650,7 @@ bool csParticlesObject::Update (float elapsed_time)
       p.time_to_live = -1.0f;
     }
   }
-  else if (dead_particles > point_data.Length () * 0.70f && 
+  else if (dead_particles - new_particles > point_data.Length () * 0.70f && 
            point_data.Length() > 1)
     {
     int oldlen = point_data.Length();
@@ -646,6 +660,7 @@ bool csParticlesObject::Update (float elapsed_time)
 
   int i;
   int dead_offset = point_data.Length() - dead_particles;
+
   for (i = 0; i < (int)new_particles; i++)
   {
     csParticlesData &point = point_data[i + dead_offset];
@@ -689,55 +704,57 @@ bool csParticlesObject::Update (float elapsed_time)
       continue;
     }
 
-    float heat = 1.0f;
-    switch (heat_function)
-    {
-    case CS_PART_HEAT_CONSTANT:
-      break;
-    case CS_PART_HEAT_TIME_LINEAR:
-      if (point.time_to_live < 0.0f) heat = 0.0f;
-      else heat = point.time_to_live / (time_to_live + time_variation);
-      break;
-    case CS_PART_HEAT_SPEED:
-      heat = 1.0f;
-      if (heat < 0.0f) heat = 0.0f;
-      break;
-    case CS_PART_HEAT_CALLBACK:
-      // TODO: this needs to be re-evaluated
-      /*heat = heat_callback (times[i] / time_to_live,
-        force_amount / force_range_squared,
-        dist_squared / force_range_squared);*/
-      break;
-    }
-
     // The color functions
-    int color_len;
-    if ((color_len=gradient_colors.Length()))
+    switch (color_method)
     {
-      // With a gradient
-      float cref = (1.0f - heat) * (float)(color_len-1);
-      int index = (int)floor(cref);
-      csColor color1 = gradient_colors.Get(index);
-      csColor color2 = color1;
-      if (index != color_len - 1)
+    case CS_PART_COLOR_CONSTANT:
+      point.color.x = constant_color.red;
+      point.color.y = constant_color.blue;
+      point.color.z = constant_color.green;
+      point.color.w = 1.0f;
+      break;
+    case CS_PART_COLOR_LINEAR:
+    {
+      float colortime = point.time_to_live / (time_to_live + time_variation);
+      int color_len=gradient_colors.Length();
+      if (color_len)
       {
-        color2 = gradient_colors.Get(index + 1);
+        // With a gradient
+        float cref = (1.0f - colortime) * (float)(color_len-1);
+        int index = (int)floor(cref);
+        csColor color1 = gradient_colors.Get(index);
+        csColor color2 = color1;
+        if (index != color_len - 1)
+        {
+          color2 = gradient_colors.Get(index + 1);
+        }
+
+        float pos = cref - floor(cref);
+
+        point.color.x = ((1.0f - pos) * color1.red) + (pos * color2.red);
+        point.color.y = ((1.0f - pos) * color1.green) + (pos * color2.green);
+        point.color.z = ((1.0f - pos) * color1.blue) + (pos * color2.blue);
       }
-
-      float pos = cref - floor(cref);
-
-      point.color.x = ((1.0f - pos) * color1.red) + (pos * color2.red);
-      point.color.y = ((1.0f - pos) * color1.green) + (pos * color2.green);
-      point.color.z = ((1.0f - pos) * color1.blue) + (pos * color2.blue);
+      else
+      {
+        // With no gradient set, use mesh's base color instead (fade to black)
+        point.color.x = basecolor.red * colortime;
+        point.color.y = basecolor.green * colortime;
+        point.color.z = basecolor.blue * colortime;
+      }
+      point.color.w = colortime;
+      break;
     }
-    else
-    {
-      // With no gradient set, use mesh's base color instead (fade to black)
-      point.color.x = basecolor.red * heat;
-      point.color.y = basecolor.green * heat;
-      point.color.z = basecolor.blue * heat;
+    case CS_PART_COLOR_HEAT:
+      // TODO: Do this
+      break;
+    case CS_PART_COLOR_CALLBACK:
+      {
+      float colortime = point.time_to_live / (time_to_live + time_variation);
+      csColor color = color_callback( colortime);
+      break;
+      }
     }
-    point.color.w = point.time_to_live / (time_to_live + time_variation);
 
     csVector3 transformed = tr_o2c.Other2This(point.position);
     point.sort = transformed.z;

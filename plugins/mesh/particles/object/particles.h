@@ -100,6 +100,7 @@ private:
   float dampener;
 
   bool autostart;
+  bool transform_mode;
 
   int particles_per_second;
   int initial_particles;
@@ -118,10 +119,12 @@ private:
 
   csArray<csColor> gradient_colors;
 
-  csParticleHeatFunction heat_function;
+  float loop_time;
+  float base_heat;
+  csColor constant_color;
+  csParticleColorMethod color_method;
 
-  float (*heat_callback)(float time, float speed, float dist);
-  csColor (*color_callback)(float heat);
+  csColor (*color_callback)(float time);
 public:
   SCF_DECLARE_IBASE;
 
@@ -191,28 +194,37 @@ public:
   void SetTimeVariation (float variation)
   { time_variation = variation; }
 
-  void SetParticleHeatFunction(csParticleHeatFunction type,
-    float (*callback)(float time, float speed, float dist))
-  {
-    heat_function = type;
-    heat_callback = callback;
-  }
   void AddColor (csColor color)
   {
     gradient_colors.Push(color);
   }
   void ClearColors ()
+  { gradient_colors.DeleteAll (); }
+  void SetConstantColorMethod (csColor color)
   {
-    gradient_colors.DeleteAll ();
+    color_method = CS_PART_COLOR_CONSTANT;
+    constant_color = color;
   }
-  void SetColorCallback (csColor (*callback)(float heat) = NULL)
+  void SetLinearColorMethod ()
+  { color_method = CS_PART_COLOR_LINEAR; }
+  void SetLoopingColorMethod (float seconds)
   {
+    color_method = CS_PART_COLOR_LOOPING;
+    loop_time = seconds;
+  }
+  void SetHeatColorMethod (int base_temp)
+  {
+    color_method = CS_PART_COLOR_HEAT;
+    base_heat = base_temp;
+  }
+  void SetColorCallback (csColor (*callback)(float time) = NULL)
+  {
+    CS_ASSERT(callback);
+    color_method = CS_PART_COLOR_CALLBACK;
     color_callback = callback;
   }
   void SetParticleRadius (float rad)
-  {
-    particle_radius = rad;
-  }
+  { particle_radius = rad; }
   void SetDampener (float damp)
   { dampener = damp; }
   float GetDampener ()
@@ -227,6 +239,8 @@ public:
   { return mass_variation; }
   void SetAutoStart (bool a)
   { autostart = a; }
+  void SetTransformMode (bool transform)
+  { transform_mode = transform; }
   void SetPhysicsPlugin (const char *plugin)
   { physics_plugin = plugin; }
 
@@ -269,14 +283,19 @@ public:
     { scfParent->SetTimeToLive (time); }
     virtual void SetTimeVariation (float variation)
     { scfParent->SetTimeVariation (variation); }
-    virtual void SetParticleHeatFunction(csParticleHeatFunction type,
-      float (*callback)(float time, float speed, float dist) = NULL)
-    { scfParent->SetParticleHeatFunction (type, callback); }
     virtual void AddColor (csColor color)
     { scfParent->AddColor (color); }
     virtual void ClearColors ()
     { scfParent->ClearColors (); }
-    virtual void SetColorCallback (csColor (*callback)(float heat) = NULL)
+    virtual void SetConstantColorMethod (csColor color)
+    { scfParent->SetConstantColorMethod (color); }
+    virtual void SetLinearColorMethod ()
+    { scfParent->SetLinearColorMethod (); }
+    virtual void SetLoopingColorMethod (float seconds)
+    { scfParent->SetLoopingColorMethod (seconds); }
+    virtual void SetHeatColorMethod (int base_temp)
+    { scfParent->SetHeatColorMethod (base_temp); }
+    virtual void SetColorCallback (csColor (*callback)(float time) = NULL)
     { scfParent->SetColorCallback (callback); }
     virtual void SetParticleRadius (float radius)
     { scfParent->SetParticleRadius (radius); }
@@ -292,6 +311,8 @@ public:
     { return scfParent->GetMass (); }
     virtual void SetAutoStart (bool autostart)
     { scfParent->SetAutoStart (autostart); }
+    virtual void SetTransformMode (bool transform)
+    { scfParent->SetTransformMode (transform); }
     virtual float GetMassVariation ()
     { return scfParent->GetMassVariation (); }
     virtual void SetPhysicsPlugin (const char *plugin)
@@ -363,17 +384,20 @@ private:
   float dampener;
 
   bool autostart;
+  bool running;
+  bool transform_mode;
 
   float diffusion;
 
   float particle_radius;
 
   csArray<csColor> gradient_colors;
+  float loop_time;
+  float base_heat;
+  csColor constant_color;
+  csParticleColorMethod color_method;
 
-  csParticleHeatFunction heat_function;
-
-  float (*heat_callback)(float time, float speed, float dist);
-  csColor (*color_callback)(float heat);
+  csColor (*color_callback)(float time);
 
   csDirtyAccessArray<csParticlesData> point_data;
   struct i_vertex {
@@ -524,12 +548,6 @@ public:
   { time_to_live = time; }
   void SetTimeVariation (float variation)
   { time_variation = variation; }
-  void SetParticleHeatFunction(csParticleHeatFunction type,
-    float (*callback)(float time, float speed, float dist))
-  {
-    heat_function = type;
-    heat_callback = callback;
-  }
   void AddColor (csColor color)
   {
     gradient_colors.Push(color);
@@ -538,8 +556,27 @@ public:
   {
     gradient_colors.DeleteAll ();
   }
-  void SetColorCallback (csColor (*callback)(float heat) = NULL)
+  void SetConstantColorMethod (csColor color)
   {
+    color_method = CS_PART_COLOR_CONSTANT;
+    constant_color = color;
+  }
+  void SetLinearColorMethod ()
+  { color_method = CS_PART_COLOR_LINEAR; }
+  void SetLoopingColorMethod (float seconds)
+  {
+    color_method = CS_PART_COLOR_LOOPING;
+    loop_time = seconds;
+  }
+  void SetHeatColorMethod (int base_temp)
+  {
+    color_method = CS_PART_COLOR_HEAT;
+    base_heat = base_temp;
+  }
+  void SetColorCallback (csColor (*callback)(float time) = NULL)
+  {
+    CS_ASSERT(callback);
+    color_method = CS_PART_COLOR_CALLBACK;
     color_callback = callback;
   }
   void SetParticleRadius (float rad);
@@ -590,13 +627,25 @@ public:
   { mass_variation = variation; }
   float GetMassVariation ()
   { return mass_variation; }
-  float GetMass()
+  float GetMass ()
   { return particle_mass; }
-  void SetAutoStart (bool a)
-  { autostart = a; }
+  virtual csParticleColorMethod GetParticleColorMethod ()
+  { return color_method; }
+  virtual csColor GetConstantColor ()
+  { return constant_color; }
+  virtual float GetColorLoopTime ()
+  { return loop_time; }
+  virtual float GetBaseHeat ()
+  { return base_heat; }
+  virtual void GetColorCallback (csColor (**callback)(float time))
+  { *callback = color_callback; }
+  void SetTransformMode (bool transform)
+  { transform_mode = transform; }
 
   void Start ();
   void Stop ();
+  bool IsRunning ()
+  { return running; }
 
   bool Update (float elapsed_time);
 
@@ -639,15 +688,30 @@ public:
     { scfParent->SetTimeToLive (time); }
     virtual void SetTimeVariation (float variation)
     { scfParent->SetTimeVariation (variation); }
-    virtual void SetParticleHeatFunction(csParticleHeatFunction type,
-      float (*callback)(float time, float speed, float dist) = NULL)
-    { scfParent->SetParticleHeatFunction (type, callback); }
     virtual void AddColor (csColor color)
     { scfParent->AddColor (color); }
     virtual void ClearColors ()
     { scfParent->ClearColors (); }
-    virtual void SetColorCallback (csColor (*callback)(float heat) = NULL)
+    virtual void SetConstantColorMethod (csColor color)
+    { scfParent->SetConstantColorMethod (color); }
+    virtual void SetLinearColorMethod ()
+    { scfParent->SetLinearColorMethod (); }
+    virtual void SetLoopingColorMethod (float seconds)
+    { scfParent->SetLoopingColorMethod (seconds); }
+    virtual void SetHeatColorMethod (int base_temp)
+    { scfParent->SetHeatColorMethod (base_temp); }
+    virtual void SetColorCallback (csColor (*callback)(float time) = NULL)
     { scfParent->SetColorCallback (callback); }
+    virtual csParticleColorMethod GetParticleColorMethod ()
+    { return scfParent->GetParticleColorMethod (); }
+    virtual csColor GetConstantColor ()
+    { return scfParent->GetConstantColor (); }
+    virtual float GetColorLoopTime ()
+    { return scfParent->GetColorLoopTime (); }
+    virtual float GetBaseHeat ()
+    { return scfParent->GetBaseHeat (); }
+    virtual void GetColorCallback (csColor (**callback)(float time))
+    { return scfParent->GetColorCallback (callback); }
     virtual void SetParticleRadius (float radius)
     { scfParent->SetParticleRadius (radius); }
     virtual int GetParticlesPerSecond ()
@@ -695,14 +759,16 @@ public:
     { return scfParent->GetMass (); }
     virtual float GetMassVariation ()
     { return scfParent->GetMassVariation (); }
-    virtual void SetAutoStart (bool autostart)
-    { scfParent->SetAutoStart (autostart); }
+    virtual void SetTransformMode (bool transform)
+    { scfParent->SetTransformMode (transform); }
     virtual void ChangePhysicsPlugin (const char *plugin)
     { scfParent->LoadPhysicsPlugin (plugin); }
     virtual void Start ()
     { scfParent->Start (); }
     virtual void Stop ()
     { scfParent->Stop (); }
+    virtual bool IsRunning ()
+    { return scfParent->IsRunning (); }
     virtual void Update (float elapsed_time)
     { scfParent->Update (elapsed_time); }
   } scfiParticlesObjectState;

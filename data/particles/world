@@ -80,8 +80,8 @@
         </step>
         <step plugin="crystalspace.renderloop.step.generic">
           <shadertype>particles</shadertype>
-          <zoffset>yes</zoffset>
-          <ztest />
+          <zoffset>no</zoffset>
+          <zuse />
         </step>
       </steps>
     </params>
@@ -192,16 +192,16 @@
 	  <plugin>crystalspace.mesh.loader.factory.particles</plugin>
 	    <params>
 		  <emitter type="sphere">
-				<time>300</time>
-				<innerradius>0.01</innerradius>
-				<outerradius>0.03</outerradius>
+			<time>300</time>
+			<innerradius>0.01</innerradius>
+			<outerradius>0.03</outerradius>
+		    <force type="linear">
+			  <direction x="0.5" y="1" z="0"/>
+  			  <amount>10</amount>
+			  <range>3.0</range>
+			  <falloff>linear</falloff>
+		    </force>
 		  </emitter>
-		  <force type="linear">
-			<direction x="0.5" y="1" z="0"/>
-			<amount>10</amount>
-			<range>3.0</range>
-			<falloff>linear</falloff>
-		  </force>
 		  <dampener>0.1</dampener>
 		  <mass>5</mass>
 		  <massvariation>2.5</massvariation>
@@ -212,28 +212,29 @@
 		  <radius>0.1</radius>
 		  <ttl>5</ttl>
 		  <timevariation>0.5</timevariation>
-		  <heatfunction>time_linear</heatfunction>
-		  <gradient>
-			<color red="0" green="0" blue="1"/>
-			<color red="0" green="0.5" blue="1"/>
-			<color red="1" green="1" blue="1"/>
-		  </gradient>
+		  <colormethod type="linear">
+  		    <gradient>
+			  <color red="0" green="0" blue="1"/>
+			  <color red="0" green="0.5" blue="1"/>
+			  <color red="1" green="1" blue="1"/>
+		    </gradient>
+	      </colormethod>
 	  </params>
 	</meshfact>
 	<meshfact name="fireFACT">
 	  <plugin>crystalspace.mesh.loader.factory.particles</plugin>
 	    <params>
 		  <emitter type="sphere">
-				<time>300</time>
-				<innerradius>0.1</innerradius>
-				<outerradius>0.3</outerradius>
+			<time>300</time>
+			<innerradius>0.1</innerradius>
+			<outerradius>0.3</outerradius>
+		    <force type="linear">
+			  <direction x="0" y="1" z="0"/>
+			  <amount>20</amount>
+			  <range>1.0</range>
+			  <falloff>linear</falloff>
+		    </force>
 		  </emitter>
-		  <force type="linear">
-			<direction x="0" y="1" z="0"/>
-			<amount>20</amount>
-			<range>1.0</range>
-			<falloff>linear</falloff>
-		  </force>
 		  <dampener>3.0</dampener>
 		  <mass>1</mass>
 		  <pps>300</pps>
@@ -243,18 +244,19 @@
 		  <radius>0.3</radius>
 		  <ttl>1</ttl>
 		  <timevariation>0.5</timevariation>
-		  <heatfunction>time_linear</heatfunction>
-		  <gradient>
-			<color red="1.00" green="0.35" blue="0.00"/>
-			<color red="1.00" green="0.32" blue="0.00"/>
-			<color red="1.00" green="0.22" blue="0.00"/>
-			<color red="0.80" green="0.12" blue="0.00"/>
-			<color red="0.60" green="0.00" blue="0.00"/>
-			<color red="0.40" green="0.00" blue="0.00"/>
-			<color red="0.20" green="0.00" blue="0.00"/>
-			<color red="0.00" green="0.00" blue="0.00"/>
-			<color red="0.00" green="0.00" blue="0.00"/>
-		  </gradient>
+		  <colormethod type="linear">
+		    <gradient>
+			  <color red="1.00" green="0.35" blue="0.00"/>
+   			  <color red="1.00" green="0.32" blue="0.00"/>
+			  <color red="1.00" green="0.22" blue="0.00"/>
+			  <color red="0.80" green="0.12" blue="0.00"/>
+			  <color red="0.60" green="0.00" blue="0.00"/>
+			  <color red="0.40" green="0.00" blue="0.00"/>
+			  <color red="0.20" green="0.00" blue="0.00"/>
+			  <color red="0.00" green="0.00" blue="0.00"/>
+			  <color red="0.00" green="0.00" blue="0.00"/>
+		    </gradient>
+		</colormethod>
 	  </params>
 	</meshfact>
 
@@ -324,6 +326,7 @@
 	  <move>
 		<v x="-2.5" y="1" z="5"/>
 	  </move>
+      <priority>alpha</priority>
 	</meshobj>
 	<meshobj name="fire">
 		<plugin>crystalspace.mesh.loader.particles</plugin>
@@ -332,9 +335,10 @@
 			<material>particle</material>
 		</params>
 		<move>
-			<v x="0" y="1" z="5"/>
+			<v x="0" y="1" z="7"/>
 		</move>
-	  </meshobj>
+      <priority>alpha</priority>
+	</meshobj>
   </sector>
 
 </world>
