@@ -75,8 +75,15 @@ for tuple in ${PNG_DIRS}; do
     PNG_LFLAGS="-L${lib_dir}"
   fi
 
-  PNG_CFLAGS="${PNG_CFLAGS} ${ZLIB_CFLAGS}"
-  PNG_LFLAGS="${PNG_LFLAGS} -lpng ${ZLIB_LFLAGS}"
+  PNG_LFLAGS="${PNG_LFLAGS} -lpng"
+
+  if [ -n "${ZLIB_CFLAGS}" ]; then
+    PNG_CFLAGS="${PNG_CFLAGS} ${ZLIB_CFLAGS}"
+  fi
+  if [ -n "${ZLIB_LFLAGS}" ]; then
+    PNG_LFLAGS="${PNG_LFLAGS} ${ZLIB_LFLAGS}"
+  fi
+
   ${LINK} -o testpng testpng.cpp ${PNG_CFLAGS} ${PNG_LFLAGS} 1>/dev/null 2>&1
   if [ $? -eq 0 ]; then
     PNG_OK=1
