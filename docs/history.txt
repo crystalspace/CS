@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+23-Jan-2005
+	- Eric Sunshine applied a boundary-condition fix from Andrew Mann for
+	  the timspec::tv_nsec overflow check in csPosixCondition::Wait().
 22-Jan-2005
 	- res made the following changes:
 	    - Silenced some compiler warnings on VC2005.
