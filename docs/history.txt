@@ -1209,7 +1209,7 @@ chronological order.
 	    - Eliminated extremely dangerous and potentially fatal assumption
 	      in csEvent where, in several places, it blindly assumed that an
 	      iEvent passed in by a client was a csEvent or csPoolEvent.
-	    - Corrrected very bizarre code in csEvent::UnflattenCrystal() which
+	    - Corrected very bizarre code in csEvent::UnflattenCrystal() which
 	      performed a static cast of `this' to csPoolEvent, checked if the
 	      result of the cast was zero (which will never be the case), and
 	      then performed conditional behavior based upon that result.
