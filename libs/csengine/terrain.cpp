@@ -163,6 +163,7 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   */
   // Alex: here it is I think:
   const csMatrix3& orientation = rview.GetO2T ();
+  int aspect = rview.aspect;
 
   /*
     
