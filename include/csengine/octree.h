@@ -33,6 +33,8 @@ class csCBuffer;
 class csThing;
 class csPVS;
 class Dumper;
+struct iVFS;
+struct iFile;
 
 #define OCTREE_FFF 0
 #define OCTREE_FFB 1
@@ -326,6 +328,13 @@ private:
    */
   void BuildPVS (csThing* thing, csOctreeNode* node);
 
+  /// Cache this node and children.
+  void Cache (csOctreeNode* node, iFile* cf);
+
+  /// Read this node from cache and also children.
+  bool ReadFromCache (iFile* cf, csOctreeNode* node,
+  	const csVector3& bmin, const csVector3& bmax,
+  	csPolygonInt** polygons, int num);
 public:
   /**
    * Create an empty tree for the given parent, a bounding box defining the
@@ -403,6 +412,17 @@ public:
 
   /// Print statistics about this octree.
   void Statistics ();
+
+  /**
+   * Cache this entire octree and PVS to disk (VFS).
+   */
+  void Cache (iVFS* vfs, char* name);
+
+  /**
+   * Read this entire octree and PVS from disk (VFS).
+   * Returns false if not cache, or cache not valid.
+   */
+  bool ReadFromCache (iVFS* vfs, char* name, csPolygonInt** polygons, int num);
 };
 
 #endif /*OCTREE_H*/

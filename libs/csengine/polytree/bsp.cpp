@@ -555,4 +555,29 @@ void csBspTree::AddToPVS (csBspNode* node, csPolygonArrayNoFree* polygons)
   AddToPVS (node->back, polygons);
 }
 
+void csBspTree::Cache (csBspNode* node, iFile* cf)
+{
+  if (!node) return;
+  WriteString (cf, "BNODE", 5);
+  WriteLong (cf, node->polygons.GetNumPolygons ());	// Consistency check
+  WriteBool (cf, node->polygons_on_splitter);
+  WritePlane3 (cf, node->splitter);
+  if (node->front)
+  {
+    WriteByte (cf, 0);	// Indicate front node.
+    Cache ((csBspNode*)node->front, cf);
+  }
+  if (node->back)
+  {
+    WriteByte (cf, 1);	// Indicate back node.
+    Cache ((csBspNode*)node->back, cf);
+  }
+  WriteByte (cf, 255);	// No more nodes.
+}
+
+void csBspTree::Cache (iFile* cf)
+{
+  Cache ((csBspNode*)root, cf);
+}
+
 //---------------------------------------------------------------------------

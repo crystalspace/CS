@@ -19,6 +19,8 @@
 #include "sysdef.h"
 #include "csengine/polytree.h"
 #include "csengine/treeobj.h"
+#include "cssys/csendian.h"
+#include "ivfs.h"
 
 csPolygonTreeNode::~csPolygonTreeNode ()
 {
@@ -104,5 +106,110 @@ bool csPolygonTree::Covers (csPolygonInt** polygons, int num)
 
   // None of the polygons covers the other.
   return false;
+}
+
+void csPolygonTree::WriteString (iFile* cf, char* str, int len)
+{
+  cf->Write (str, len);
+}
+
+void csPolygonTree::WriteBox3 (iFile* cf, const csBox3& box)
+{
+  float f;
+  f = convert_endian (box.MinX ()); cf->Write ((char*)&f, 4);
+  f = convert_endian (box.MinY ()); cf->Write ((char*)&f, 4);
+  f = convert_endian (box.MinZ ()); cf->Write ((char*)&f, 4);
+  f = convert_endian (box.MaxX ()); cf->Write ((char*)&f, 4);
+  f = convert_endian (box.MaxY ()); cf->Write ((char*)&f, 4);
+  f = convert_endian (box.MaxZ ()); cf->Write ((char*)&f, 4);
+}
+
+void csPolygonTree::WriteVector3 (iFile* cf, const csVector3& v)
+{
+  float f;
+  f = convert_endian (v.x); cf->Write ((char*)&f, 4);
+  f = convert_endian (v.y); cf->Write ((char*)&f, 4);
+  f = convert_endian (v.z); cf->Write ((char*)&f, 4);
+}
+
+void csPolygonTree::WritePlane3 (iFile* cf, const csPlane3& v)
+{
+  float f;
+  f = convert_endian (v.A ()); cf->Write ((char*)&f, 4);
+  f = convert_endian (v.B ()); cf->Write ((char*)&f, 4);
+  f = convert_endian (v.C ()); cf->Write ((char*)&f, 4);
+  f = convert_endian (v.D ()); cf->Write ((char*)&f, 4);
+}
+
+void csPolygonTree::WriteLong (iFile* cf, long l)
+{
+  l = convert_endian (l); cf->Write ((char*)&l, 4);
+}
+
+void csPolygonTree::WriteByte (iFile* cf, unsigned char b)
+{
+  cf->Write ((char*)&b, 1);
+}
+
+void csPolygonTree::WriteBool (iFile* cf, bool b)
+{
+  char c = (char)b;
+  cf->Write (&c, 1);
+}
+
+void csPolygonTree::ReadString (iFile* cf, char* str, int len)
+{
+  cf->Read (str, len);
+}
+
+void csPolygonTree::ReadBox3 (iFile* cf, csBox3& box)
+{
+  float f;
+  csVector3 bmin, bmax;
+  cf->Read ((char*)&f, 4); bmin.x = convert_endian (f);
+  cf->Read ((char*)&f, 4); bmin.y = convert_endian (f);
+  cf->Read ((char*)&f, 4); bmin.z = convert_endian (f);
+  cf->Read ((char*)&f, 4); bmax.x = convert_endian (f);
+  cf->Read ((char*)&f, 4); bmax.y = convert_endian (f);
+  cf->Read ((char*)&f, 4); bmax.z = convert_endian (f);
+  box.Set (bmin, bmax);
+}
+
+void csPolygonTree::ReadVector3 (iFile* cf, csVector3& v)
+{
+  float f;
+  cf->Read ((char*)&f, 4); v.x = convert_endian (f);
+  cf->Read ((char*)&f, 4); v.y = convert_endian (f);
+  cf->Read ((char*)&f, 4); v.z = convert_endian (f);
+}
+
+void csPolygonTree::ReadPlane3 (iFile* cf, csPlane3& v)
+{
+  float f;
+  cf->Read ((char*)&f, 4); v.A () = convert_endian (f);
+  cf->Read ((char*)&f, 4); v.B () = convert_endian (f);
+  cf->Read ((char*)&f, 4); v.C () = convert_endian (f);
+  cf->Read ((char*)&f, 4); v.D () = convert_endian (f);
+}
+
+long csPolygonTree::ReadLong (iFile* cf)
+{
+  long l;
+  cf->Read ((char*)&l, 4);
+  return convert_endian (l);
+}
+
+unsigned char csPolygonTree::ReadByte (iFile* cf)
+{
+  unsigned char b;
+  cf->Read ((char*)&b, 1);
+  return b;
+}
+
+bool csPolygonTree::ReadBool (iFile* cf)
+{
+  char c;
+  cf->Read ((char*)&c, 1);
+  return (bool)c;
 }
 

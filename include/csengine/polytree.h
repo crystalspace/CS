@@ -20,6 +20,9 @@
 #define POLYTREE_H
 
 #include "csgeom/math3d.h"
+#include "csgeom/plane3.h"
+#include "csgeom/vector3.h"
+#include "csgeom/box.h"
 #include "csengine/arrays.h"
 
 class csSector;
@@ -29,6 +32,7 @@ class csPolygonTreeNode;
 class csPolygonStub;
 class csPolyTreeObject;
 class Dumper;
+struct iFile;
 
 
 #define NODE_OCTREE 1
@@ -131,6 +135,24 @@ protected:
 
   /// Clear the nodes.
   void Clear () { CHK (delete root); }
+
+  // Various routines to write to an iFile. Used by 'Cache'.
+  void WriteString (iFile* cf, char* str, int len);
+  void WriteBox3 (iFile* cf, const csBox3& box);
+  void WriteVector3 (iFile* cf, const csVector3& v);
+  void WritePlane3 (iFile* cf, const csPlane3& v);
+  void WriteLong (iFile* cf, long l);
+  void WriteByte (iFile* cf, unsigned char b);
+  void WriteBool (iFile* cf, bool b);
+
+  // Various routines to write from an iFile. Used by 'ReadFromCache'.
+  void ReadString (iFile* cf, char* str, int len);
+  void ReadBox3 (iFile* cf, csBox3& box);
+  void ReadVector3 (iFile* cf, csVector3& v);
+  void ReadPlane3 (iFile* cf, csPlane3& v);
+  long ReadLong (iFile* cf);
+  unsigned char ReadByte (iFile* cf);
+  bool ReadBool (iFile* cf);
 
 public:
   /**

@@ -27,6 +27,7 @@
 class csBspTree;
 class csPolygonArrayNoFree;
 class Dumper;
+struct iFile;
 
 // The BSP tree can be build using the following criteria:
 #define BSP_MINIMIZE_SPLITS 1		// Minimize the number of polygon splits
@@ -166,6 +167,9 @@ private:
    */
   void AddToPVS (csBspNode* node, csPolygonArrayNoFree* polygons);
 
+  /// Cache this node and children.
+  void Cache (csBspNode* node, iFile* cf);
+
 public:
   /**
    * Create an empty tree for a parent container.
@@ -230,6 +234,9 @@ public:
   {
     AddToPVS ((csBspNode*)root, polygons);
   }
+
+  /// Cache this tree.
+  void Cache (iFile* cf);
 };
 
 #endif /*BSP_H*/

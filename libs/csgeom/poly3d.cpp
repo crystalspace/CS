@@ -94,6 +94,7 @@ void csPoly3D::ProjectXPlane (const csVector3& point, float plane_x,
 	csPoly2D* poly2d)
 {
   poly2d->SetNumVertices (0);
+  poly2d->GetBoundingBox ().StartBoundingBox ();
   csVector2 p;
   csVector3 v;
   float x_dist = plane_x - point.x;
@@ -101,8 +102,8 @@ void csPoly3D::ProjectXPlane (const csVector3& point, float plane_x,
   for (i = 0 ; i < num_vertices ; i++)
   {
     v = vertices[i]-point;
-    p.x = x_dist * v.y / v.x;
-    p.y = x_dist * v.z / v.x;
+    p.x = point.y + x_dist * v.y / v.x;
+    p.y = point.z + x_dist * v.z / v.x;
     poly2d->AddVertex (p);
   }
 }
@@ -111,6 +112,7 @@ void csPoly3D::ProjectYPlane (const csVector3& point, float plane_y,
 	csPoly2D* poly2d)
 {
   poly2d->SetNumVertices (0);
+  poly2d->GetBoundingBox ().StartBoundingBox ();
   csVector2 p;
   csVector3 v;
   float y_dist = plane_y - point.y;
@@ -118,8 +120,8 @@ void csPoly3D::ProjectYPlane (const csVector3& point, float plane_y,
   for (i = 0 ; i < num_vertices ; i++)
   {
     v = vertices[i]-point;
-    p.x = y_dist * v.x / v.y;
-    p.y = y_dist * v.z / v.y;
+    p.x = point.x + y_dist * v.x / v.y;
+    p.y = point.z + y_dist * v.z / v.y;
     poly2d->AddVertex (p);
   }
 }
@@ -128,6 +130,7 @@ void csPoly3D::ProjectZPlane (const csVector3& point, float plane_z,
 	csPoly2D* poly2d)
 {
   poly2d->SetNumVertices (0);
+  poly2d->GetBoundingBox ().StartBoundingBox ();
   csVector2 p;
   csVector3 v;
   float z_dist = plane_z - point.z;
@@ -135,8 +138,8 @@ void csPoly3D::ProjectZPlane (const csVector3& point, float plane_z,
   for (i = 0 ; i < num_vertices ; i++)
   {
     v = vertices[i]-point;
-    p.x = z_dist * v.x / v.z;
-    p.y = z_dist * v.y / v.z;
+    p.x = point.x + z_dist * v.x / v.z;
+    p.y = point.y + z_dist * v.y / v.z;
     poly2d->AddVertex (p);
   }
 }

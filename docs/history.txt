@@ -1,5 +1,13 @@
 The history order has been reversed so that new features are at the top.
 
+7-May-2000
+	- More work on PVS. Still not working properly though.
+	- Started working on saving and loading of octree and PVS.
+	  This will help debugging this thing as computing it is
+	  time consuming.
+6-May-2000
+	- Fixed several bugs in PVS and routines used by PVS. It finally
+	  starts to resemble doing PVS work for real.
 5-May-2000
 	- Andrew Zabolotny removed some relatively expensive unneeded
 	  code from lighting routines which should make lighting (both
@@ -20,6 +28,8 @@ The history order has been reversed so that new features are at the top.
 	- Fixed a fix by Eric to radiosity (suggested by Wouter Wijngaards).
 	- Fixed memory leak in new lighting code from Andrew.
 	- Further debug work on PVS. Still not working properly though.
+	- Wouter Wijngaards updated radiosity. It is still buggy though.
+	- Fixed bug in csPoly3D::ProjectXPlane (and Y/Z).
 4-May-2000
 	- Chris Bruner did some various cleanups in some files.
 	- Borland Ehle did an attempt to unify makefile for all Win32
