@@ -15,6 +15,9 @@ chronological order.
 	  mixmode will be used.
 	- res made some fixes so NR properly respects the "alpha" mixmode.
         - Fritz Elfert fixed an msvc compile error in the null renderer.
+	- Eric Sunshine added some content to the front page of the API
+	  reference manual since people seem to be regularly been confused by
+	  its emptiness and easily miss the links at the very top of the page.
 23-Feb-2004
 	- Jorrit moved the Engine.Lighthing.LightmapQuality config option
 	  from engine.cfg to thing.cfg (and renamed it
