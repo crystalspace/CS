@@ -63,6 +63,7 @@
 #include "imsnow.h"
 #include "imrain.h"
 #include "imspiral.h"
+#include "imspr3d.h"
 
 extern WalkTest* Sys;
 
@@ -423,8 +424,8 @@ void add_particles_spiral (csSector* sector, const csVector3& bottom, char* matn
 
 // Recursive function to add limbs to a skeletal tree. This also builds
 // the sprite template.
-void add_tree_limbs (csSpriteTemplate* tmpl, csFrame* frame,
-	csSkeletonLimb* parent, int& vertex_idx,
+void add_tree_limbs (iSprite3DFactoryState* state, iSpriteFrame* frame,
+	iSkeletonLimb* parent, int& vertex_idx,
 	int prev_par_idx, int maxdepth, int width, int recursion)
 {
   int par_vertex_idx = vertex_idx;
@@ -435,45 +436,45 @@ void add_tree_limbs (csSpriteTemplate* tmpl, csFrame* frame,
   parent->AddVertex (vertex_idx++);
   parent->AddVertex (vertex_idx++);
 
-  tmpl->AddVertices(6);
+  state->AddVertices (6);
 
   int anm_idx = frame->GetAnmIndex ();
   int tex_idx = frame->GetTexIndex ();
 
-  tmpl->GetVertex(anm_idx, par_vertex_idx+0) = csVector3(-.05, 0, -.05);
-  tmpl->GetVertex(anm_idx, par_vertex_idx+1) = csVector3(.05, 0, -.05);
-  tmpl->GetVertex(anm_idx, par_vertex_idx+2) = csVector3(0, 0, .05);
-  tmpl->GetVertex(anm_idx, par_vertex_idx+3) = csVector3(-.05, .45, -.05);
-  tmpl->GetVertex(anm_idx, par_vertex_idx+4) = csVector3(.05, .45, -.05);
-  tmpl->GetVertex(anm_idx, par_vertex_idx+5) = csVector3(0, .45, .05);
+  state->GetVertex (anm_idx, par_vertex_idx+0) = csVector3(-.05, 0, -.05);
+  state->GetVertex (anm_idx, par_vertex_idx+1) = csVector3(.05, 0, -.05);
+  state->GetVertex (anm_idx, par_vertex_idx+2) = csVector3(0, 0, .05);
+  state->GetVertex (anm_idx, par_vertex_idx+3) = csVector3(-.05, .45, -.05);
+  state->GetVertex (anm_idx, par_vertex_idx+4) = csVector3(.05, .45, -.05);
+  state->GetVertex (anm_idx, par_vertex_idx+5) = csVector3(0, .45, .05);
 
-  tmpl->GetTexel(tex_idx, par_vertex_idx+0) = csVector2(0, 0);
-  tmpl->GetTexel(tex_idx, par_vertex_idx+1) = csVector2(.99, 0);
-  tmpl->GetTexel(tex_idx, par_vertex_idx+2) = csVector2(0, .99);
-  tmpl->GetTexel(tex_idx, par_vertex_idx+3) = csVector2(.99, .99);
-  tmpl->GetTexel(tex_idx, par_vertex_idx+4) = csVector2(.5, .5);
-  tmpl->GetTexel(tex_idx, par_vertex_idx+5) = csVector2(.5, 0);
+  state->GetTexel (tex_idx, par_vertex_idx+0) = csVector2(0, 0);
+  state->GetTexel (tex_idx, par_vertex_idx+1) = csVector2(.99, 0);
+  state->GetTexel (tex_idx, par_vertex_idx+2) = csVector2(0, .99);
+  state->GetTexel (tex_idx, par_vertex_idx+3) = csVector2(.99, .99);
+  state->GetTexel (tex_idx, par_vertex_idx+4) = csVector2(.5, .5);
+  state->GetTexel (tex_idx, par_vertex_idx+5) = csVector2(.5, 0);
 
   if (recursion > 0)
   {
     // Create connection triangles with previous set
-    tmpl->AddTriangle (prev_par_idx+3, prev_par_idx+5, par_vertex_idx+0);
-    tmpl->AddTriangle (prev_par_idx+5, par_vertex_idx+2, par_vertex_idx+0);
-    tmpl->AddTriangle (prev_par_idx+4, par_vertex_idx+1, par_vertex_idx+2);
-    tmpl->AddTriangle (prev_par_idx+5, prev_par_idx+4, par_vertex_idx+2);
-    tmpl->AddTriangle (prev_par_idx+4, par_vertex_idx+0, par_vertex_idx+1);
-    tmpl->AddTriangle (prev_par_idx+4, prev_par_idx+3, par_vertex_idx+0);
+    state->AddTriangle (prev_par_idx+3, prev_par_idx+5, par_vertex_idx+0);
+    state->AddTriangle (prev_par_idx+5, par_vertex_idx+2, par_vertex_idx+0);
+    state->AddTriangle (prev_par_idx+4, par_vertex_idx+1, par_vertex_idx+2);
+    state->AddTriangle (prev_par_idx+5, prev_par_idx+4, par_vertex_idx+2);
+    state->AddTriangle (prev_par_idx+4, par_vertex_idx+0, par_vertex_idx+1);
+    state->AddTriangle (prev_par_idx+4, prev_par_idx+3, par_vertex_idx+0);
   }
   // Create base triangles
-  tmpl->AddTriangle (par_vertex_idx+0, par_vertex_idx+5, par_vertex_idx+3);
-  tmpl->AddTriangle (par_vertex_idx+0, par_vertex_idx+2, par_vertex_idx+5);
-  tmpl->AddTriangle (par_vertex_idx+2, par_vertex_idx+4, par_vertex_idx+5);
-  tmpl->AddTriangle (par_vertex_idx+2, par_vertex_idx+1, par_vertex_idx+4);
-  tmpl->AddTriangle (par_vertex_idx+1, par_vertex_idx+3, par_vertex_idx+4);
-  tmpl->AddTriangle (par_vertex_idx+1, par_vertex_idx+0, par_vertex_idx+3);
+  state->AddTriangle (par_vertex_idx+0, par_vertex_idx+5, par_vertex_idx+3);
+  state->AddTriangle (par_vertex_idx+0, par_vertex_idx+2, par_vertex_idx+5);
+  state->AddTriangle (par_vertex_idx+2, par_vertex_idx+4, par_vertex_idx+5);
+  state->AddTriangle (par_vertex_idx+2, par_vertex_idx+1, par_vertex_idx+4);
+  state->AddTriangle (par_vertex_idx+1, par_vertex_idx+3, par_vertex_idx+4);
+  state->AddTriangle (par_vertex_idx+1, par_vertex_idx+0, par_vertex_idx+3);
 
   if (recursion >= maxdepth) return;
-  csSkeletonConnection* con;
+  iSkeletonConnection* con;
   int i;
   int rwidth;
   if (width < 0)
@@ -482,22 +483,24 @@ void add_tree_limbs (csSpriteTemplate* tmpl, csFrame* frame,
 
   for (i = 0 ; i < rwidth ; i++)
   {
-    con = new csSkeletonConnection ();
-    parent->AddChild (con);
+    con = parent->CreateConnection ();
     csMatrix3 tr = csYRotMatrix3 (0) * csZRotMatrix3(.15) *
                                                  csXRotMatrix3(.15);
     csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
     con->SetTransformation (trans);
-    add_tree_limbs (tmpl, frame, con, vertex_idx, par_vertex_idx, maxdepth, width, recursion+1);
+    add_tree_limbs (state, frame, QUERY_INTERFACE (con, iSkeletonLimb),
+    	vertex_idx, par_vertex_idx, maxdepth, width, recursion+1);
   }
 }
 
 // Create a skeletal tree.
-csSkeleton* create_skeltree (csSpriteTemplate* tmpl, csFrame* frame,
+iSkeleton* create_skeltree (iSprite3DFactoryState* state, iSpriteFrame* frame,
 	int& vertex_idx, int maxdepth, int width)
 {
-  csSkeleton* skel = new csSkeleton ();
-  add_tree_limbs (tmpl, frame, skel, vertex_idx, 0, maxdepth, width, 0);
+  state->EnableSkeletalAnimation ();
+  iSkeleton* skel = state->GetSkeleton ();
+  add_tree_limbs (state, frame, QUERY_INTERFACE (skel, iSkeletonLimb),
+  	vertex_idx, 0, maxdepth, width, 0);
   return skel;
 }
 
@@ -585,16 +588,19 @@ void add_skeleton_tree (csSector* where, csVector3 const& pos, int depth,
   if (!tmpl)
   {
     tmpl = new csSpriteTemplate ();
+    iSprite3DFactoryState* state = QUERY_INTERFACE (tmpl, iSprite3DFactoryState);
     tmpl->SetName (skelname);
     Sys->engine->sprite_templates.Push (tmpl);
-    tmpl->SetMaterial (Sys->engine->GetMaterials ()->FindByName ("white"));
+    state->SetMaterialWrapper (QUERY_INTERFACE (
+    	Sys->engine->GetMaterials ()->FindByName ("white"), iMaterialWrapper));
     int vertex_idx = 0;
-    csFrame* fr = tmpl->AddFrame ();
+    iSpriteFrame* fr = state->AddFrame ();
     fr->SetName ("f");
-    csSpriteAction* act = tmpl->AddAction ();
+    iSpriteAction* act = state->AddAction ();
     act->SetName ("a");
     act->AddFrame (fr, 100);
-    tmpl->SetSkeleton (create_skeltree (tmpl, fr, vertex_idx, depth, width));
+    create_skeltree (state, fr, vertex_idx, depth, width);
+    // @@@TEMPORARY
     tmpl->GenerateLOD ();
     tmpl->ComputeBoundingBox ();
   }
@@ -634,7 +640,8 @@ IMPLEMENT_CSOBJTYPE (GhostSpriteInfo, csObject);
 
 // Recursive function to add limbs to a skeletal ghost. This also builds
 // the sprite template.
-void add_ghost_limbs (csSpriteTemplate* tmpl, csFrame* frame, csSkeletonLimb* parent, int& vertex_idx,
+void add_ghost_limbs (iSprite3DFactoryState* state, iSpriteFrame* frame,
+	iSkeletonLimb* parent, int& vertex_idx,
 	int prev_par_idx, int maxdepth, int width, int recursion, float dim)
 {
   int par_vertex_idx = vertex_idx;
@@ -645,66 +652,68 @@ void add_ghost_limbs (csSpriteTemplate* tmpl, csFrame* frame, csSkeletonLimb* pa
   parent->AddVertex (vertex_idx++);
   parent->AddVertex (vertex_idx++);
 
-  tmpl->AddVertices (6);
+  state->AddVertices (6);
 
   int anm_idx = frame->GetAnmIndex ();
   int tex_idx = frame->GetTexIndex ();
 
-  tmpl->GetVertex(anm_idx, par_vertex_idx+0) = csVector3(-dim, 0, -dim);
-  tmpl->GetVertex(anm_idx, par_vertex_idx+1) = csVector3(dim, 0, -dim);
-  tmpl->GetVertex(anm_idx, par_vertex_idx+2) = csVector3(0, 0, dim);
-  tmpl->GetVertex(anm_idx, par_vertex_idx+3) = csVector3(-dim, .45, -dim);
-  tmpl->GetVertex(anm_idx, par_vertex_idx+4) = csVector3(dim, .45, -dim);
-  tmpl->GetVertex(anm_idx, par_vertex_idx+5) = csVector3(0, .45, dim);
+  state->GetVertex (anm_idx, par_vertex_idx+0) = csVector3(-dim, 0, -dim);
+  state->GetVertex (anm_idx, par_vertex_idx+1) = csVector3(dim, 0, -dim);
+  state->GetVertex (anm_idx, par_vertex_idx+2) = csVector3(0, 0, dim);
+  state->GetVertex (anm_idx, par_vertex_idx+3) = csVector3(-dim, .45, -dim);
+  state->GetVertex (anm_idx, par_vertex_idx+4) = csVector3(dim, .45, -dim);
+  state->GetVertex (anm_idx, par_vertex_idx+5) = csVector3(0, .45, dim);
 
-  tmpl->GetTexel(tex_idx, par_vertex_idx+0) = csVector2(0, 0);
-  tmpl->GetTexel(tex_idx, par_vertex_idx+1) = csVector2(.99, 0);
-  tmpl->GetTexel(tex_idx, par_vertex_idx+2) = csVector2(0, .99);
-  tmpl->GetTexel(tex_idx, par_vertex_idx+3) = csVector2(.99, .99);
-  tmpl->GetTexel(tex_idx, par_vertex_idx+4) = csVector2(.5, .5);
-  tmpl->GetTexel(tex_idx, par_vertex_idx+5) = csVector2(.5, 0);
+  state->GetTexel (tex_idx, par_vertex_idx+0) = csVector2(0, 0);
+  state->GetTexel (tex_idx, par_vertex_idx+1) = csVector2(.99, 0);
+  state->GetTexel (tex_idx, par_vertex_idx+2) = csVector2(0, .99);
+  state->GetTexel (tex_idx, par_vertex_idx+3) = csVector2(.99, .99);
+  state->GetTexel (tex_idx, par_vertex_idx+4) = csVector2(.5, .5);
+  state->GetTexel (tex_idx, par_vertex_idx+5) = csVector2(.5, 0);
 
   if (recursion > 0)
   {
     // Create connection triangles with previous set
-    tmpl->AddTriangle (prev_par_idx+3, prev_par_idx+5, par_vertex_idx+0);
-    tmpl->AddTriangle (prev_par_idx+5, par_vertex_idx+2, par_vertex_idx+0);
-    tmpl->AddTriangle (prev_par_idx+4, par_vertex_idx+1, par_vertex_idx+2);
-    tmpl->AddTriangle (prev_par_idx+5, prev_par_idx+4, par_vertex_idx+2);
-    tmpl->AddTriangle (prev_par_idx+4, par_vertex_idx+0, par_vertex_idx+1);
-    tmpl->AddTriangle (prev_par_idx+4, prev_par_idx+3, par_vertex_idx+0);
+    state->AddTriangle (prev_par_idx+3, prev_par_idx+5, par_vertex_idx+0);
+    state->AddTriangle (prev_par_idx+5, par_vertex_idx+2, par_vertex_idx+0);
+    state->AddTriangle (prev_par_idx+4, par_vertex_idx+1, par_vertex_idx+2);
+    state->AddTriangle (prev_par_idx+5, prev_par_idx+4, par_vertex_idx+2);
+    state->AddTriangle (prev_par_idx+4, par_vertex_idx+0, par_vertex_idx+1);
+    state->AddTriangle (prev_par_idx+4, prev_par_idx+3, par_vertex_idx+0);
   }
   // Create base triangles
-  tmpl->AddTriangle (par_vertex_idx+0, par_vertex_idx+5, par_vertex_idx+3);
-  tmpl->AddTriangle (par_vertex_idx+0, par_vertex_idx+2, par_vertex_idx+5);
-  tmpl->AddTriangle (par_vertex_idx+2, par_vertex_idx+4, par_vertex_idx+5);
-  tmpl->AddTriangle (par_vertex_idx+2, par_vertex_idx+1, par_vertex_idx+4);
-  tmpl->AddTriangle (par_vertex_idx+1, par_vertex_idx+3, par_vertex_idx+4);
-  tmpl->AddTriangle (par_vertex_idx+1, par_vertex_idx+0, par_vertex_idx+3);
+  state->AddTriangle (par_vertex_idx+0, par_vertex_idx+5, par_vertex_idx+3);
+  state->AddTriangle (par_vertex_idx+0, par_vertex_idx+2, par_vertex_idx+5);
+  state->AddTriangle (par_vertex_idx+2, par_vertex_idx+4, par_vertex_idx+5);
+  state->AddTriangle (par_vertex_idx+2, par_vertex_idx+1, par_vertex_idx+4);
+  state->AddTriangle (par_vertex_idx+1, par_vertex_idx+3, par_vertex_idx+4);
+  state->AddTriangle (par_vertex_idx+1, par_vertex_idx+0, par_vertex_idx+3);
 
   if (recursion >= maxdepth) return;
-  csSkeletonConnection* con;
+  iSkeletonConnection* con;
   int i;
   for (i = 0 ; i < width ; i++)
   {
-    con = new csSkeletonConnection ();
-    parent->AddChild (con);
+    con = parent->CreateConnection ();
     csMatrix3 tr = csYRotMatrix3 (0) *
     	csZRotMatrix3 (.15) *
 	csXRotMatrix3 (.15);
     csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
     con->SetTransformation (trans);
-    add_ghost_limbs (tmpl, frame, con, vertex_idx, par_vertex_idx,
+    add_ghost_limbs (state, frame, QUERY_INTERFACE (con, iSkeletonLimb),
+    	vertex_idx, par_vertex_idx,
     	maxdepth, 1, recursion+1, dim * .7);
   }
 }
 
 // Create a skeletal ghost.
-csSkeleton* create_skelghost (csSpriteTemplate* tmpl, csFrame* frame,
+iSkeleton* create_skelghost (iSprite3DFactoryState* state, iSpriteFrame* frame,
 	int& vertex_idx, int maxdepth, int width)
 {
-  csSkeleton* skel = new csSkeleton ();
-  add_ghost_limbs (tmpl, frame, skel, vertex_idx, 0, maxdepth, width, 0, .2);
+  state->EnableSkeletalAnimation ();
+  iSkeleton* skel = state->GetSkeleton ();
+  add_ghost_limbs (state, frame, QUERY_INTERFACE (skel, iSkeletonLimb),
+  	vertex_idx, 0, maxdepth, width, 0, .2);
   return skel;
 }
 
@@ -779,16 +788,19 @@ void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth,
   if (!tmpl)
   {
     tmpl = new csSpriteTemplate ();
+    iSprite3DFactoryState* state = QUERY_INTERFACE (tmpl, iSprite3DFactoryState);
     tmpl->SetName (skelname);
     Sys->engine->sprite_templates.Push (tmpl);
-    tmpl->SetMaterial (Sys->engine->GetMaterials ()->FindByName ("green"));
+    state->SetMaterialWrapper (QUERY_INTERFACE (
+    	Sys->engine->GetMaterials ()->FindByName ("green"), iMaterialWrapper));
     int vertex_idx = 0;
-    csFrame* fr = tmpl->AddFrame ();
+    iSpriteFrame* fr = state->AddFrame ();
     fr->SetName ("f");
-    csSpriteAction* act = tmpl->AddAction ();
+    iSpriteAction* act = state->AddAction ();
     act->SetName ("a");
     act->AddFrame (fr, 100);
-    tmpl->SetSkeleton (create_skelghost (tmpl, fr, vertex_idx, maxdepth, width));
+    create_skelghost (state, fr, vertex_idx, maxdepth, width);
+    // @@@ TEMPORARY
     tmpl->GenerateLOD ();
     tmpl->ComputeBoundingBox ();
   }
