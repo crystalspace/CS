@@ -189,21 +189,17 @@ csLightHalo::~csLightHalo ()
   if (Light) Light->flags.SetBool (CS_LIGHT_ACTIVEHALO, false);
 }
 
-bool csLightHalo::IsVisible (csEngine const &Engine, csVector3 &v)
+bool csLightHalo::IsVisible (iCamera* camera, csEngine* Engine, csVector3 &v)
 {
   if (v.z > SMALL_Z)
   {
-    float iz = Engine.current_camera->GetFOV () / v.z;
-    v.x = v.x * iz + Engine.current_camera->GetShiftX ();
-    v.y = Engine.frame_height - 1 - (v.y * iz + Engine.current_camera->GetShiftY ());
+    float iz = camera->GetFOV () / v.z;
+    v.x = v.x * iz + camera->GetShiftX ();
+    v.y = Engine->frame_height - 1 - (v.y * iz + camera->GetShiftY ());
 
-    if (Engine.top_clipper->IsInside (csVector2 (v.x, v.y)))
+    if (Engine->top_clipper->IsInside (csVector2 (v.x, v.y)))
     {
-      #ifndef CS_USE_NEW_RENDERER
-      float zv = Engine.G3D->GetZBuffValue (QRound (v.x), QRound (v.y));
-      #else
-      float zv = 1;
-      #endif
+      float zv = Engine->G3D->GetZBuffValue (QRound (v.x), QRound (v.y));
       return v.z <= zv;
     }
   }
@@ -244,7 +240,8 @@ bool csLightHalo::ComputeNewIntensity (
   return true;
 }
 
-bool csLightHalo::Process (csTicks ElapsedTime, const csEngine &Engine)
+bool csLightHalo::Process (csTicks ElapsedTime, iCamera* camera, 
+			   csEngine* Engine)
 {
   // Whenever the center of halo (the light) is directly visible
   bool halo_vis = false;
@@ -256,7 +253,7 @@ bool csLightHalo::Process (csTicks ElapsedTime, const csEngine &Engine)
   float xtl = 0, ytl = 0;
 
   // Project the halo.
-  csVector3 v = Engine.current_camera->GetTransform ().Other2This (
+  csVector3 v = camera->GetTransform ().Other2This (
       Light->GetCenter ());
 
   // The clipped halo polygon
@@ -265,7 +262,7 @@ bool csLightHalo::Process (csTicks ElapsedTime, const csEngine &Engine)
   // Number of vertices in HaloClip array
   int HaloVCount = 32;
 
-  halo_vis = IsVisible (Engine, v);
+  halo_vis = IsVisible (camera, Engine, v);
 
   // Create a rectangle containing the halo and clip it against screen
   float hw = Handle->GetWidth () * 0.5f;
@@ -280,7 +277,7 @@ bool csLightHalo::Process (csTicks ElapsedTime, const csEngine &Engine)
   };
 
   // Clip the halo against clipper
-  if (Engine.top_clipper->Clip (HaloPoly, 4, HaloClip, HaloVCount))
+  if (Engine->top_clipper->Clip (HaloPoly, 4, HaloClip, HaloVCount))
   {
     xtl = HaloPoly[0].x;
     ytl = HaloPoly[0].y;
@@ -313,15 +310,16 @@ csLightFlareHalo::~csLightFlareHalo ()
 {
 }
 
-bool csLightFlareHalo::Process (csTicks elapsed_time, csEngine const &engine)
+bool csLightFlareHalo::Process (csTicks elapsed_time, iCamera* camera, 
+				csEngine* engine)
 {
   // Whenever the center of halo (the light) is directly visible
   bool halo_vis = false;
 
   // Project the halo.
-  csVector3 v = engine.current_camera->GetTransform ().Other2This (
+  csVector3 v = camera->GetTransform ().Other2This (
       Light->GetCenter ());
-  halo_vis = IsVisible (engine, v);
+  halo_vis = IsVisible (camera, engine, v);
 
   /// compute new intensity
   float hintensity = Light->GetHalo ()->GetIntensity ();
@@ -331,11 +329,11 @@ bool csLightFlareHalo::Process (csTicks elapsed_time, csEngine const &engine)
 
   /// the perspective center of the view is the axis of the flare
   csVector2 center (
-              engine.current_camera->GetShiftX (),
-              engine.current_camera->GetShiftY ());
+              camera->GetShiftX (),
+              camera->GetShiftY ());
 
   /// start point of the flare is the (projected) light position
-  csVector2 start (v.x, engine.current_camera->GetShiftY () * 2.0f - v.y);
+  csVector2 start (v.x, camera->GetShiftY () * 2.0f - v.y);
 
   /// deltaposition, 1.0 positional change.
   csVector2 deltapos = center - start;
@@ -344,7 +342,7 @@ bool csLightFlareHalo::Process (csTicks elapsed_time, csEngine const &engine)
   csFlareComponent *p = flare->GetComponents ();
   while (p)
   {
-    ProcessFlareComponent (engine, p, start, deltapos);
+    ProcessFlareComponent (*engine, p, start, deltapos);
     p = p->next;
   }
 

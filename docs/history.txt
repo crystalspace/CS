@@ -11,6 +11,8 @@ chronological order.
 	  in meshes' children if needed.
 	- res ported OpenPortal() to NR. Still has issues, tho.
 	- res updated todo_newrenderer.txt.
+	- res ported the halo stuff to NR. Work somewhat (except flares), but
+	  could be better.
 11-Apr-2004
 	- Eric Sunshine applied a patch from Andres Freund <andres@anarazel.de>
 	  to several of the templated csArray<> subclasses which ensures that

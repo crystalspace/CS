@@ -26,6 +26,7 @@
 #include "iengine/halo.h"
 
 class csEngine;
+struct iCamera;
 struct iMaterialWrapper;
 
 /**
@@ -139,7 +140,8 @@ public:
 
 
 /** structure used to keep flare component information */
-struct csFlareComponent {
+struct csFlareComponent 
+{
   /// position, (0.= at light, 1.=center)
   float position;
   /// width and height (1.0 gives size of a normal halo)
@@ -232,13 +234,14 @@ public:
    * reached zero intensity and should be removed from halo queue.
    * The function also actually projects, clips and draws the halo.
    */
-  virtual bool Process (csTicks ElapsedTime, csEngine const&);
+  virtual bool Process (csTicks ElapsedTime, iCamera* camera, 
+    csEngine* engine);
 
   /**
    * see if camera position is visible, returns it projected onto screen.
    * Called by Process.
    */
-  bool IsVisible(csEngine const& engine, csVector3& v);
+  bool IsVisible(iCamera* camera, csEngine* engine, csVector3& v);
 
   /**
    * add up elapsed time, and returns new intensity, given the current
@@ -271,7 +274,8 @@ public:
   virtual ~csLightFlareHalo();
 
   /// process the halo.
-  virtual bool Process (csTicks elapsed_time, csEngine const& engine);
+  virtual bool Process (csTicks ElapsedTime, iCamera* camera, 
+    csEngine* engine);
   /// process a flare component (clip and draw it).
   void ProcessFlareComponent(csEngine const& engine, csFlareComponent *comp,
     csVector2 const& start, csVector2 const& deltapos);

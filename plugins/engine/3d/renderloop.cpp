@@ -101,14 +101,18 @@ void csRenderLoop::Draw (iCamera *c, iClipper2D *view)
   
   Draw (&rview, c->GetSector());
   
-
   // draw all halos on the screen
-/*  if (halos.Length () > 0)
+  /*
+    @@@ Would be nice to have that more NR-like - go through renderloop,
+    use shaders ...
+   */
+  if (engine->halos.Length () > 0)
   {
-    csTicks elapsed = virtual_clock->GetElapsedTicks ();
-    for (int halo = halos.Length () - 1; halo >= 0; halo--)
-      if (!halos[halo]->Process (elapsed, *this)) halos.Delete (halo);
-  }*/
+    csTicks elapsed = engine->virtual_clock->GetElapsedTicks ();
+    for (int halo = engine->halos.Length () - 1; halo >= 0; halo--)
+      if (!engine->halos[halo]->Process (elapsed, c, engine)) 
+	engine->halos.DeleteIndex (halo);
+  }
 
   engine->G3D->SetClipper (0, CS_CLIPPER_NONE);
 }
@@ -131,6 +135,13 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s)
     }
     s->DecRecLevel ();
     shadermanager->PopVariables (varStack);
+
+    // @@@ See above note about halos.
+    iLightList* lights = s->GetLights();
+    for (i = lights->GetCount () - 1; i >= 0; i--)
+      // Tell the engine to try to add this light into the halo queue
+      engine->AddHalo (rview->GetCamera(), 
+        lights->Get (i)->GetPrivateObject ());
   }
 }
 

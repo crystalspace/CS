@@ -184,8 +184,6 @@ private:
 
   int GetMaxTextureSize () const { return rendercaps.maxTexWidth; }
 
-  void SetGlOrtho (bool inverted);
-
   // Enables offsetting of Z values
   void EnableZOffset ()
   // @@@ Jorrit: to avoid flickering I had to increase the
@@ -199,9 +197,6 @@ private:
   { statecache->Disable_GL_POLYGON_OFFSET_FILL (); }
 
   void SetZMode (csZBufMode mode, bool internal);
-
-  void SetMixMode (uint mode);
-  void SetAlphaType (csAlphaMode::AlphaType alphaType);
 
   void SetMirrorMode (bool mirror);
 
@@ -259,6 +254,11 @@ public:
   /// Get a pointer to our texture manager
   iTextureManager* GetTextureManager () 
     { return (iTextureManager*)((csGLTextureManager*)txtmgr); }
+
+  void SetMixMode (uint mode);
+  void SetAlphaType (csAlphaMode::AlphaType alphaType);
+  void SetGlOrtho (bool inverted);
+  float GetAspect () const { return aspect; }
 
   /// Create a renderbuffer
   virtual csPtr<iRenderBuffer> CreateRenderBuffer (int size, 
@@ -450,6 +450,10 @@ public:
   virtual csPtr<iPolygonRenderer> CreatePolygonRenderer ();
   virtual void DrawSimpleMesh (const csSimpleRenderMesh& mesh);
 
+  virtual iHalo* CreateHalo (float, float, float,
+    unsigned char *, int, int);
+  virtual float GetZBuffValue (int, int);
+
   //=========================================================================
   // Below this line are all functions that are not yet implemented by
   // the new renderer or are not going to be implemented ever. In the
@@ -457,7 +461,6 @@ public:
   // to the new renderer. @@@NR@@@
   //=========================================================================
   virtual uint32 *GetZBuffAt (int, int) { return 0; }
-  virtual float GetZBuffValue (int, int) { return 0; }
   virtual void DrawPolygon (G3DPolygonDP&) { CS_ASSERT (false); }
   virtual void DrawPolygonDebug (G3DPolygonDP&) { CS_ASSERT (false); }
   virtual void DrawPolygonFX (G3DPolygonDPFX&) { CS_ASSERT (false); }
@@ -466,8 +469,6 @@ public:
   virtual void OpenFogObject (CS_ID, csFog*) { CS_ASSERT (false); }
   virtual void DrawFogPolygon (CS_ID, G3DPolygonDFP&,int) { CS_ASSERT (false); }
   virtual void CloseFogObject (CS_ID) { CS_ASSERT (false); }
-  virtual iHalo *CreateHalo (float, float, float,
-    unsigned char *, int, int) { return 0; }
   virtual void DumpCache () { }
   virtual void ClearCache () { }
   virtual void RemoveFromCache (iRendererLightmap*) { }

@@ -1791,7 +1791,7 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
   {
     csTicks elapsed = virtual_clock->GetElapsedTicks ();
     for (int halo = halos.Length () - 1; halo >= 0; halo--)
-      if (!halos[halo]->Process (elapsed, *this))
+      if (!halos[halo]->Process (elapsed, c, this))
 	halos.DeleteIndex (halo);
   }
 
@@ -1857,32 +1857,27 @@ void csEngine::LoadDefaultRenderLoop (const char* fileName)
 #endif
 }
 
-void csEngine::AddHalo (csLight *Light)
+void csEngine::AddHalo (iCamera* camera, csLight *Light)
 {
   if (!Light->GetHalo () || Light->flags.Check (CS_LIGHT_ACTIVEHALO))
     return ;
 
   // Transform light pos into camera space and see if it is directly visible
-  csVector3 v = current_camera->GetTransform ().Other2This (
-      Light->GetCenter ());
+  csVector3 v = camera->GetTransform ().Other2This (Light->GetCenter ());
 
   // Check if light is behind us
   if (v.z <= SMALL_Z) return ;
 
   // Project X,Y into screen plane
-  float iz = current_camera->GetFOV () / v.z;
-  v.x = v.x * iz + current_camera->GetShiftX ();
-  v.y = frame_height - 1 - (v.y * iz + current_camera->GetShiftY ());
+  float iz = camera->GetFOV () / v.z;
+  v.x = v.x * iz + camera->GetShiftX ();
+  v.y = frame_height - 1 - (v.y * iz + camera->GetShiftY ());
 
   // If halo is not inside visible region, return
   if (!top_clipper->IsInside (csVector2 (v.x, v.y))) return ;
 
-#ifndef CS_USE_NEW_RENDERER
   // Check if light is not obscured by anything
   float zv = G3D->GetZBuffValue (QRound (v.x), QRound (v.y));
-#else
-  float zv = 1;
-#endif // CS_USE_NEW_RENDERER
   if (v.z > zv) return ;
 
   // Halo size is 1/4 of the screen height; also we make sure its odd
@@ -1899,7 +1894,6 @@ void csEngine::AddHalo (csLight *Light)
 
   // Okay, put the light into the queue: first we generate the alphamap
   unsigned char *Alpha = Light->GetHalo ()->Generate (hs);
-#ifndef CS_USE_NEW_RENDERER
   iHalo *handle = G3D->CreateHalo (
       Light->GetColor ().red,
       Light->GetColor ().green,
@@ -1907,9 +1901,6 @@ void csEngine::AddHalo (csLight *Light)
       Alpha,
       hs,
       hs);
-#else
-  iHalo *handle = 0;
-#endif // CS_USE_NEW_RENDERER
   // We don't need alpha map anymore
   delete[] Alpha;
 

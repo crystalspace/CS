@@ -780,7 +780,7 @@ public:
   /**
    * Add a halo attached to given light to the engine.
    */
-  void AddHalo (csLight* Light);
+  void AddHalo (iCamera* camera, csLight* Light);
 
   /**
    * Remove halo attached to given light from the engine.
