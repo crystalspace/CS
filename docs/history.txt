@@ -16,6 +16,9 @@ chronological order.
 	  during the second map to fail as the static lightmap was removed
 	  by then. Fixed this by refreshing the static lightmap in this
 	  situation.
+	- Jorrit added a new pvstest world file. This simple world will
+	  be used to test the efficiency of the PVS calculator and PVS
+	  visibility culler.
 24-Jan-2005
 	- Jorrit reverted a fix from res2k in walktest/keys.cpp which changes
 	  the way keys are parsed. This fix breaks parsing of keys with
