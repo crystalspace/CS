@@ -41,7 +41,8 @@ public:
 	virtual void Close();
 
 	virtual bool Initialize ( int argc, const char* const argv[], const char *iConfigName );
-	virtual void NextFrame ();
+	virtual void Loop ();
+//	virtual void NextFrame ();
 
 	virtual void Alert( const char* s );
 	virtual void Warn( const char* s );
@@ -76,6 +77,10 @@ private:
 
 	bool		mInputSprocketsAvailable;
 	bool		mInputSprocketsRunning;
+
+	bool			mDriverNeedsEvent;
+	iGraphics2D*	mG2D;
+	iMacGraphics*	mIG2D;
 
 	char		CommandLine[256];
 	char		argStr[256];

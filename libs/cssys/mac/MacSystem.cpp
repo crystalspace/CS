@@ -51,6 +51,10 @@
 #define EnableMenuItem( m, n ) EnableItem( m,n )
 #define DisableMenuItem( m, n ) DisableItem( m,n )
 #define GetQDGlobalsArrow( m ) ( *m = qd.arrow )
+#define kForegroundSleep 0
+#else
+#include <CarbonEvents.h>
+#define kForegroundSleep 10
 #endif
 
 #define SCAN_KEYBOARD       0
@@ -73,11 +77,7 @@
 #define kCommandLineString      1024
 
 static OSErr GetPath( FSSpec theFSSpec, char *theString );
-#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
-static OSErr AppleEventHandler( AppleEvent *event, AppleEvent *reply, long refCon );
-#else
-static pascal OSErr AppleEventHandler( const AppleEvent *event, AppleEvent *reply, unsigned long refCon );
-#endif
+static pascal OSErr AppleEventHandler( const AppleEvent *event, AppleEvent *reply, long refCon );
 static AEEventHandlerUPP AppleEventHandlerUPP = NULL;
 static SysSystemDriver * gSysSystemDriver = NULL;
 
@@ -110,6 +110,11 @@ SysSystemDriver::SysSystemDriver()
         MoreMasters();
 
     gSysSystemDriver = this;
+
+    mDriverNeedsEvent = false;
+
+    mG2D = NULL;
+    mIG2D = NULL;
 
     /*
      *  Initialize all the needed managers.
@@ -156,7 +161,7 @@ SysSystemDriver::SysSystemDriver()
     /*
      *  Setup the handler for the apple events.
      */
-    AppleEventHandlerUPP = NewAEEventHandlerProc( AppleEventHandler );
+    AppleEventHandlerUPP = NewAEEventHandlerUPP( AppleEventHandler );
     if ( AppleEventHandlerUPP )
         AEInstallEventHandler( typeWildCard, typeWildCard,
                               (AEEventHandlerUPP)AppleEventHandlerUPP, 0, FALSE );
@@ -217,8 +222,6 @@ SysSystemDriver::SysSystemDriver()
 }
 
 
-static iMacGraphics* piG2D = NULL;
-
 SysSystemDriver::~SysSystemDriver()
 {
     /*
@@ -243,12 +246,8 @@ SysSystemDriver::~SysSystemDriver()
     }
 #endif
 
-    if (EventOutlet)
+    if (EventOutlet) {
         EventOutlet->DecRef ();
-
-    if ( piG2D ) {
-        piG2D->DecRef();
-        piG2D = NULL;
     }
 }
 
@@ -272,12 +271,18 @@ static void NLtoCR( UInt8 *theString )
 
 void SysSystemDriver::Alert(const char* s)
 {
-    Str255  theMessage;
+    Str255          theMessage;
+    iGraphics2D *   theG2D = NULL;
+    iMacGraphics *  theiG2D = NULL;
 
-    if ( G2D )
-        piG2D = QUERY_INTERFACE(G2D, iMacGraphics);
-    if ( piG2D ) {
-        piG2D->PauseDisplayContext();
+    theG2D = QUERY_PLUGIN( this, iGraphics2D );
+
+    if ( theG2D ) {
+        theiG2D = QUERY_INTERFACE(theG2D, iMacGraphics);
+    }
+
+    if ( theiG2D ) {
+        theiG2D->PauseDisplayContext();
     }
 
     strcpy( (char *)&theMessage[1], s );
@@ -286,20 +291,31 @@ void SysSystemDriver::Alert(const char* s)
     ParamText( "\pFatal Error", theMessage, "\p", "\p" );
     StopAlert( kAlertOrWarningDialog, NULL );
 
-    if ( piG2D ) {
-        piG2D->ActivateDisplayContext();
+    if ( theiG2D ) {
+        theiG2D->ActivateDisplayContext();
+        theiG2D->DecRef();
+    }
+
+    if ( theG2D ) {
+        theG2D->DecRef();
     }
 }
 
 
 void SysSystemDriver::Warn(const char* s)
 {
-    Str255  theMessage;
+    Str255          theMessage;
+    iGraphics2D *   theG2D = NULL;
+    iMacGraphics *  theiG2D = NULL;
 
-    if ( G2D )
-        piG2D = QUERY_INTERFACE(G2D, iMacGraphics);
-    if ( piG2D ) {
-        piG2D->PauseDisplayContext();
+    theG2D = QUERY_PLUGIN( this, iGraphics2D );
+
+    if ( theG2D ) {
+        theiG2D = QUERY_INTERFACE(theG2D, iMacGraphics);
+    }
+
+    if ( theiG2D ) {
+        theiG2D->PauseDisplayContext();
     }
 
     strcpy( (char *)&theMessage[1], s );
@@ -308,8 +324,13 @@ void SysSystemDriver::Warn(const char* s)
     ParamText( "\pWarning", theMessage, "\p", "\p" );
     CautionAlert( kAlertOrWarningDialog, NULL );
 
-    if ( piG2D ) {
-        piG2D->ActivateDisplayContext();
+    if ( theiG2D ) {
+        theiG2D->ActivateDisplayContext();
+        theiG2D->DecRef();
+    }
+
+    if ( theG2D ) {
+        theG2D->DecRef();
     }
 }
 
@@ -382,35 +403,67 @@ bool SysSystemDriver::Initialize (int argc, const char* const argv[], const char
 }
 
 
-void SysSystemDriver::NextFrame ()
+// --------------------------------------------------------------------------
+
+#if TARGET_API_MAC_CARBON || TARGET_API_MAC_OSX
+static pascal void IdleTimer (EventLoopTimerRef inTimer, void* userData)
 {
-    static bool driverNeedsEvent = false;
-    EventRecord anEvent;
+	#pragma unused (inTimer, userData)
+	gSysSystemDriver->NextFrame();
+}
 
-	csSystemDriver::NextFrame();
 
-    if (!piG2D)
-    {
-        piG2D = QUERY_INTERFACE (G2D, iMacGraphics);
+// --------------------------------------------------------------------------
 
-        if (piG2D)
-        {
-            driverNeedsEvent = piG2D->DoesDriverNeedEvent ();
-            piG2D->SetColorPalette ();
-        }
+static EventLoopTimerUPP GetTimerUPP (void)
+{
+	static EventLoopTimerUPP	sTimerUPP = NULL;
+	
+	if (sTimerUPP == NULL)
+		sTimerUPP = NewEventLoopTimerUPP (IdleTimer);
+	
+	return sTimerUPP;
+}
+#endif
+
+void SysSystemDriver::Loop ()
+{
+  EventRecord theEvent;
+#if TARGET_API_MAC_CARBON || TARGET_API_MAC_OSX
+  OSStatus theError;
+  EventLoopTimerRef theTimer = NULL;
+#endif
+
+  mG2D = QUERY_PLUGIN( this, iGraphics2D );
+
+  if ( mG2D ) {
+    mIG2D = QUERY_INTERFACE(mG2D, iMacGraphics);
+  }
+
+  if (mIG2D) {
+    mDriverNeedsEvent = mIG2D->DoesDriverNeedEvent ();
+    mIG2D->SetColorPalette ();
+  }
 
 #if ! SCAN_KEYBOARD
-        SetEventMask( everyEvent );
+  SetEventMask( everyEvent );
 #endif
 
 #if USE_INPUTSPROCKETS
-        if (mInputSprocketsAvailable)
-        {
-            ISpResume ();
-            mInputSprocketsRunning = true;
-        }
+  if (mInputSprocketsAvailable)  {
+    ISpResume ();
+    mInputSprocketsRunning = true;
+  }
 #endif
-    }
+
+#if TARGET_API_MAC_CARBON || TARGET_API_MAC_OSX
+  theError = InstallEventLoopTimer (GetMainEventLoop(), 0, 0.000001, GetTimerUPP(), 0, &theTimer);
+#endif
+
+  while (!Shutdown && !ExitLoop) {
+#if ! TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
+    NextFrame ();
+#endif
 
 #if SCAN_KEYBOARD
     ScanKeyboard ();
@@ -418,40 +471,66 @@ void SysSystemDriver::NextFrame ()
 
 #if USE_INPUTSPROCKETS
     if (mInputSprocketsAvailable && mInputSprocketsRunning)
-        ISpTickle ();
+      ISpTickle ();
 #endif
 
     /*
      *  Get the next event in the queue.
      */
-    if (WaitNextEvent (everyEvent, &anEvent, 1, NULL)) {
-        /*
-         *  If we got an event, check to see if sioux wants it
-         */
-        if (!SIOUXHandleOneEvent ( &anEvent )) { 
-	        /*
-	         *  If sioux doesn't want it, check to see if the driver needs it.
-	         */
-	        if ( (!driverNeedsEvent) || (piG2D==NULL) || (!piG2D->HandleEvent (&anEvent))) {
-		        /*
-		         *  Otherwise handle it.
-		         */
-		        DispatchEvent (&anEvent, piG2D );
-		    }
-		}
-    } else {
-        /*
-         *  No event in the queue, get the mouse location so we can track it.
-         */
-        Point   theMouse;
-        bool    isIn = false;
-
-        theMouse = anEvent.where;
-        if (( piG2D ) && ( piG2D->PointInWindow( &theMouse ) )) {
-            EventOutlet->Mouse( 0, 0, theMouse.h, theMouse.v );
+    if (WaitNextEvent (everyEvent, &theEvent, kForegroundSleep, NULL)) {
+      /*
+       *  If we got an event, check to see if sioux wants it
+       */
+      if (!SIOUXHandleOneEvent ( &theEvent )) { 
+	    /*
+	     *  If sioux doesn't want it, check to see if the driver needs it.
+	     */
+	    if ( (!mDriverNeedsEvent) || (mIG2D==NULL) || (!mIG2D->HandleEvent (&theEvent))) {
+		  /*
+           *  Otherwise handle it.
+           */
+           DispatchEvent (&theEvent, mIG2D );
         }
+      }
+    } else {
+      /*
+       *  No event in the queue, get the mouse location so we can track it.
+       */
+      Point   theMouse;
+      bool    isIn = false;
+
+      theMouse = theEvent.where;
+      if (( mIG2D ) && ( mIG2D->PointInWindow( &theMouse ) )) {
+        EventOutlet->Mouse( 0, 0, theMouse.h, theMouse.v );
+      }
     }
+  }
+
+  ExitLoop = false;
+
+#if TARGET_API_MAC_CARBON || TARGET_API_MAC_OSX
+  if (theTimer) {
+    RemoveEventLoopTimer( theTimer );
+  }
+#endif
+
+  if ( mIG2D ) {
+    mIG2D->DecRef();
+    mIG2D = NULL;
+  }
+
+  if ( mG2D ) {
+    mG2D->DecRef();
+    mG2D = NULL;
+  }
 }
+
+#if 0
+void SysSystemDriver::NextFrame ()
+{
+	csSystemDriver::NextFrame();
+}
+#endif
 
 
 void SysSystemDriver::DispatchEvent( EventRecord *theEvent, iMacGraphics* piG2D )
@@ -1145,11 +1224,7 @@ void SysSystemDriver::HandleHLEvent( EventRecord *theEvent )
  *
  *      Callback for handling Apple Events
  */
-#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
-static OSErr AppleEventHandler( AppleEvent *event, AppleEvent *reply, long refCon )
-#else
-static pascal OSErr AppleEventHandler( const AppleEvent *event, AppleEvent *reply, unsigned long refCon )
-#endif
+static pascal OSErr AppleEventHandler( const AppleEvent *event, AppleEvent *reply, long refCon )
 {
 #pragma unused( reply, refCon )
 
