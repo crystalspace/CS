@@ -3,6 +3,9 @@ The history order is reversed so that new features are at the top.
 10-May-2001
 	- Fixed a bug in clipper detection for OpenGL. In some cases it
 	  would select 'N' for the required clipper which is not allowed.
+	- Renamed the VERY old Sparse3D and WideSparse3D classes to conform
+	  to CS coding guidelines (i.e. csSparse3D and csWideSparse3D) and
+	  also made the functions start with a capital letter.
 9-May-2001
 	- Martin Geisse added a version of typed vectors that don't delete
 	  their elements.

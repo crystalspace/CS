@@ -1,6 +1,6 @@
 /*
     Sparse 3-D matrix.
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -22,31 +22,31 @@
 
 /**
  * General 3D sparse matrix class. This is an abstract class.
- * Specific implementations are WideSparce3D and DenseSparse3D.
+ * Specific implementations are csWideSparce3D and csDenseSparse3D.
  */
-class Sparse3D
+class csSparse3D
 {
 public:
   ///
-  Sparse3D () { }
+  csSparse3D () { }
   ///
-  virtual ~Sparse3D () { }
+  virtual ~csSparse3D () { }
 
   ///
-  virtual void clear () = 0;
+  virtual void Clear () = 0;
 
   ///
-  virtual void set (int x, int y, int z, void* obj) = 0;
+  virtual void Set (int x, int y, int z, void* obj) = 0;
 
   ///
-  virtual void* get (int x, int y, int z) = 0;
+  virtual void* Get (int x, int y, int z) = 0;
 
   ///
-  virtual void del (int x, int y, int z) = 0;
+  virtual void Del (int x, int y, int z) = 0;
 };
 
 /**
- * This implementation of Sparse3D is very suited where the
+ * This implementation of csSparse3D is very suited where the
  * accesses will be very widely spaced (for example: one element
  * at (-1000,0,0) and one at (1000,0,0)). Getting and setting
  * elements is not as efficient as with DenseSparse3D but it
@@ -58,7 +58,7 @@ public:
  * are close together. The speed of access is much better (no need
  * to scan lists).
  */
-class WideSparse3D : public Sparse3D
+class csWideSparse3D : public csSparse3D
 {
 private:
   ///
@@ -96,21 +96,21 @@ private:
 
 public:
   ///
-  WideSparse3D ();
+  csWideSparse3D ();
   ///
-  virtual ~WideSparse3D ();
+  virtual ~csWideSparse3D ();
 
   ///
-  virtual void clear ();
+  virtual void Clear ();
 
   ///
-  virtual void set (int x, int y, int z, void* obj);
+  virtual void Set (int x, int y, int z, void* obj);
 
   ///
-  virtual void* get (int x, int y, int z);
+  virtual void* Get (int x, int y, int z);
 
   ///
-  virtual void del (int x, int y, int z);
+  virtual void Del (int x, int y, int z);
 };
 
 #endif // __SPARSE3D_H__

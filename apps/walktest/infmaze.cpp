@@ -35,7 +35,7 @@
 
 InfiniteMaze::InfiniteMaze ()
 {
-  infinite_world = new WideSparse3D ();
+  infinite_world = new csWideSparse3D ();
 }
 
 InfiniteMaze::~InfiniteMaze ()
@@ -159,7 +159,7 @@ InfRoomData* InfiniteMaze::create_six_room (csEngine* engine, int x, int y, int 
   ird->isector = QUERY_INTERFACE (room, iSector);
   ird->walls = walls;
   ird->walls_state = walls_state;
-  infinite_world->set (x, y, z, (void*)ird);
+  infinite_world->Set (x, y, z, (void*)ird);
   csDataObject* irddata = new csDataObject (ird);
   room->ObjAdd (irddata);
   return ird;
@@ -167,8 +167,8 @@ InfRoomData* InfiniteMaze::create_six_room (csEngine* engine, int x, int y, int 
 
 void InfiniteMaze::connect_infinite (int x1, int y1, int z1, int x2, int y2, int z2, bool create_portal1)
 {
-  InfRoomData* s1 = (InfRoomData*)(infinite_world->get (x1, y1, z1));
-  InfRoomData* s2 = (InfRoomData*)(infinite_world->get (x2, y2, z2));
+  InfRoomData* s1 = (InfRoomData*)(infinite_world->Get (x1, y1, z1));
+  InfRoomData* s2 = (InfRoomData*)(infinite_world->Get (x2, y2, z2));
   char* p1, * p2;
   if (x1 == x2)
     if (y1 == y2)
@@ -264,13 +264,13 @@ void InfiniteMaze::create_loose_portal (int x1, int y1, int z1,
   else
     if (x1 < x2) p1 = "e";
     else p1 = "w";
-  InfRoomData* s = (InfRoomData*)(infinite_world->get (x1, y1, z1));
+  InfRoomData* s = (InfRoomData*)(infinite_world->Get (x1, y1, z1));
   iPolygon3D* po = s->walls_state->GetPolygon (p1);
   iPortal* portal = po->CreateNullPortal ();
   InfPortalCS* prt = new InfPortalCS ();
   prt->x1 = x1; prt->y1 = y1; prt->z1 = z1;
   prt->x2 = x2; prt->y2 = y2; prt->z2 = z2;
-  infinite_world->set (x2, y2, z2, (void*)1);
+  infinite_world->Set (x2, y2, z2, (void*)1);
   portal->SetPortalSectorCallback (CompleteSectorCB,
   	(void*)prt);
 }
@@ -284,22 +284,22 @@ void InfiniteMaze::random_loose_portals (int x1, int y1, int z1)
     switch ((rand () >> 3) % 6)
     {
       case 0:
-        if (!infinite_world->get (x1+1, y1, z1)) { create_loose_portal (x1, y1, z1, x1+1, y1, z1); cnt--; }
+        if (!infinite_world->Get (x1+1, y1, z1)) { create_loose_portal (x1, y1, z1, x1+1, y1, z1); cnt--; }
 	break;
       case 1:
-        if (!infinite_world->get (x1-1, y1, z1)) { create_loose_portal (x1, y1, z1, x1-1, y1, z1); cnt--; }
+        if (!infinite_world->Get (x1-1, y1, z1)) { create_loose_portal (x1, y1, z1, x1-1, y1, z1); cnt--; }
 	break;
       case 2:
-        if (!infinite_world->get (x1, y1+1, z1)) { create_loose_portal (x1, y1, z1, x1, y1+1, z1); cnt--; }
+        if (!infinite_world->Get (x1, y1+1, z1)) { create_loose_portal (x1, y1, z1, x1, y1+1, z1); cnt--; }
 	break;
       case 3:
-        if (!infinite_world->get (x1, y1-1, z1)) { create_loose_portal (x1, y1, z1, x1, y1-1, z1); cnt--; }
+        if (!infinite_world->Get (x1, y1-1, z1)) { create_loose_portal (x1, y1, z1, x1, y1-1, z1); cnt--; }
 	break;
       case 4:
-        if (!infinite_world->get (x1, y1, z1+1)) { create_loose_portal (x1, y1, z1, x1, y1, z1+1); cnt--; }
+        if (!infinite_world->Get (x1, y1, z1+1)) { create_loose_portal (x1, y1, z1, x1, y1, z1+1); cnt--; }
 	break;
       case 5:
-        if (!infinite_world->get (x1, y1, z1-1)) { create_loose_portal (x1, y1, z1, x1, y1, z1-1); cnt--; }
+        if (!infinite_world->Get (x1, y1, z1-1)) { create_loose_portal (x1, y1, z1, x1, y1, z1-1); cnt--; }
 	break;
     }
     max--;

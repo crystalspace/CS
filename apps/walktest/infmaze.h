@@ -24,8 +24,8 @@
 #include "csengine/lview.h"
 
 class csEngine;
-class Sparse3D;
-class WideSparse3D;
+class csSparse3D;
+class csWideSparse3D;
 class csSector;
 class csMeshWrapper;
 class csFrustumContext;
@@ -52,7 +52,7 @@ struct InfRoomData
 class InfiniteMaze
 {
 private:
-  WideSparse3D* infinite_world;
+  csWideSparse3D* infinite_world;
 
 public:
   ///

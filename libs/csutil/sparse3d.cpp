@@ -1,6 +1,6 @@
 /*
     Sparse 3-D matrix.
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -21,17 +21,17 @@
 #include "cssysdef.h"
 #include "csutil/sparse3d.h"
 
-WideSparse3D::WideSparse3D ()
+csWideSparse3D::csWideSparse3D ()
 {
   first_x = NULL;
 }
 
-WideSparse3D::~WideSparse3D ()
+csWideSparse3D::~csWideSparse3D ()
 {
-  clear ();
+  Clear ();
 }
 
-WideSparse3D::HdX* WideSparse3D::get_header_x (int x)
+csWideSparse3D::HdX* csWideSparse3D::get_header_x (int x)
 {
   HdX* l = first_x;
   while (l)
@@ -42,7 +42,7 @@ WideSparse3D::HdX* WideSparse3D::get_header_x (int x)
   return NULL;
 }
 
-WideSparse3D::HdY* WideSparse3D::get_header_y (HdX* y_list, int y)
+csWideSparse3D::HdY* csWideSparse3D::get_header_y (HdX* y_list, int y)
 {
   if (!y_list) return NULL;
   HdY* l = y_list->first_y;
@@ -54,7 +54,7 @@ WideSparse3D::HdY* WideSparse3D::get_header_y (HdX* y_list, int y)
   return NULL;
 }
 
-WideSparse3D::SparseCell* WideSparse3D::get_cell_z (HdY* z_list, int z)
+csWideSparse3D::SparseCell* csWideSparse3D::get_cell_z (HdY* z_list, int z)
 {
   if (!z_list) return NULL;
   SparseCell* l = z_list->first_z;
@@ -67,12 +67,12 @@ WideSparse3D::SparseCell* WideSparse3D::get_cell_z (HdY* z_list, int z)
 }
 
 
-void WideSparse3D::clear ()
+void csWideSparse3D::Clear ()
 {
   //@@@ To be implemented
 }
 
-void WideSparse3D::set (int x, int y, int z, void* obj)
+void csWideSparse3D::Set (int x, int y, int z, void* obj)
 {
   HdX* lx = get_header_x (x);
   HdY* ly = get_header_y (lx, y);
@@ -107,7 +107,7 @@ void WideSparse3D::set (int x, int y, int z, void* obj)
   lz->obj = obj;
 }
 
-void* WideSparse3D::get (int x, int y, int z)
+void* csWideSparse3D::Get (int x, int y, int z)
 {
   HdX* lx = get_header_x (x);
   HdY* ly = get_header_y (lx, y);
@@ -116,7 +116,7 @@ void* WideSparse3D::get (int x, int y, int z)
   return NULL;
 }
 
-void WideSparse3D::del (int x, int y, int z)
+void csWideSparse3D::Del (int x, int y, int z)
 {
   HdX* lx = get_header_x (x);
   HdY* ly = get_header_y (lx, y);
