@@ -60,7 +60,7 @@ STDMETHODIMP csSoundRenderNull::GetListener(ISoundListener ** ppv )
   return m_pListener->QueryInterface (IID_ISoundListener, (void**)ppv);
 }
 
-STDMETHODIMP csSoundRenderNull::CreateSource(ISoundSource ** ppv, csSoundBuffer *snd)
+STDMETHODIMP csSoundRenderNull::CreateSource(ISoundSource ** ppv, csSoundBuffer* /*snd*/)
 {
   csSoundSourceNull* pNew = new csSoundSourceNull ();
   if (!pNew)
@@ -89,17 +89,17 @@ STDMETHODIMP csSoundRenderNull::Update()
   return S_OK;
 }
 
-STDMETHODIMP csSoundRenderNull::SetVolume(float vol)
+STDMETHODIMP csSoundRenderNull::SetVolume(float /*vol*/)
 {
   return S_OK;
 }
 
-STDMETHODIMP csSoundRenderNull::GetVolume(float *vol)
+STDMETHODIMP csSoundRenderNull::GetVolume(float* /*vol*/)
 {
   return S_OK;
 }
 
-STDMETHODIMP csSoundRenderNull::PlayEphemeral(csSoundBuffer *snd)
+STDMETHODIMP csSoundRenderNull::PlayEphemeral(csSoundBuffer* /*snd*/)
 {
   return S_OK;
 }

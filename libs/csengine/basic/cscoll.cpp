@@ -49,7 +49,7 @@ void csCollection::SetMove (csSector* home, float x, float y, float z)
       ((csThing*)(objects[i]))->SetMove (home, x, y, z);
 }
 
-void csCollection::SetTransform (csMatrix3& matrix)
+void csCollection::SetTransform (const csMatrix3& matrix)
 {
   for (int i = 0 ; i < objects.Length() ; i++)
     if ( ((csObject*)(objects[i]))->GetType () == csThing::Type())

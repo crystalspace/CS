@@ -47,7 +47,7 @@ csSoundDriverNull::~csSoundDriverNull()
   if(memory) delete [] memory;
 }
 
-STDMETHODIMP csSoundDriverNull::Open(ISoundRender *render, int frequency, bool bit16, bool stereo)
+STDMETHODIMP csSoundDriverNull::Open(ISoundRender* /*render*/, int frequency, bool bit16, bool stereo)
 {
   SysPrintf (MSG_INITIALIZATION, "\nSoundDriver Null selected\n");
 

@@ -150,7 +150,7 @@ public:
    * Set the transformation matrix to rotate the thing in some
    * orientation.
    */
-  void SetTransform (csMatrix3& matrix);
+  void SetTransform (const csMatrix3& matrix);
 
   /**
    * Set the world to object tranformation.

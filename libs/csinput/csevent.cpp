@@ -39,7 +39,7 @@ csEvent::csEvent (long iTime, int eType, int mx, int my, int mbutton, int mShift
   Mouse.ShiftKeys = mShiftKeys;
 }
 
-csEvent::csEvent (long iTime, int eType, unsigned int cCode, void *cInfo)
+csEvent::csEvent (long iTime, int eType, int cCode, void *cInfo)
 {
   Time = iTime;
   Type = eType;

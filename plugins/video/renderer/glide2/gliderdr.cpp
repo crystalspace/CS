@@ -64,7 +64,7 @@ void STDAPICALLTYPE ModuleRelease()
 HINSTANCE DllHandle;
 
 // our main entry point...should be called when we're loaded.
-BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
+BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD /*fdwReason*/, LPVOID /*lpvReserved*/)
 {
   DllHandle = hinstDLL;
   

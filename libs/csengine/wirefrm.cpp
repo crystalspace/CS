@@ -263,7 +263,7 @@ csWfColor* csWireFrame::RegisterColor (int r, int g, int b)
   return c;
 }
 
-csWfVertex* csWireFrame::AddVertex (csVector3& v)
+csWfVertex* csWireFrame::AddVertex (const csVector3& v)
 {
   CHK (csWfVertex* vt = new csWfVertex ());
   vt->SetLocation (v);

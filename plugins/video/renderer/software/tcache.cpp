@@ -868,8 +868,8 @@ void TextureCache::show_lightmap_grid (TCacheData& tcd, TCacheLightedTexture* tc
   }
 }
 
-void TextureCache::create_lighted_texture_lightmaps (TCacheData& tcd, TCacheLightedTexture* tclt,
-	csTextureManagerSoftware* txtmgr)
+void TextureCache::create_lighted_texture_lightmaps (TCacheData& /*tcd*/, TCacheLightedTexture* /*tclt*/,
+  csTextureManagerSoftware* /*txtmgr*/)
 {
 #if 0
   int w = tcd.width;

@@ -418,7 +418,7 @@ void csTextureMM::remap_texture_32 (csTextureManager* new_palette)
 }
 
 
-void csHardwareAcceleratedTextureMM::convert_to_internal (csTextureManager* tex,
+void csHardwareAcceleratedTextureMM::convert_to_internal (csTextureManager* /*tex*/,
                                                           IImageFile* imfile, 
                                                           unsigned char* bm)
 {

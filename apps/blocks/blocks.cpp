@@ -454,7 +454,7 @@ void Blocks::move_camera ()
   view->GetCamera ()->SetPosition (pos); view->GetCamera ()->LookAt (view_origin-pos, cam_move_up);
 }
 
-void Blocks::eatkeypress (int key, bool shift, bool alt, bool ctrl)
+void Blocks::eatkeypress (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/)
 {
   switch (key)
   {

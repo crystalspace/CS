@@ -89,7 +89,7 @@ public:
   /// Add a vertex to this template.
   void AddVertex (float x, float y, float z);
   /// Add a vertex to this template.
-  void AddVertex (csVector3& v) { AddVertex (v.x, v.y, v.z); }
+  void AddVertex (const csVector3& v) { AddVertex (v.x, v.y, v.z); }
   /// Add a polygon template to this thing template.
   void AddPolygon (csPolygonTemplate* p);
 

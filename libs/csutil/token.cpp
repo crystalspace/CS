@@ -108,7 +108,7 @@ char* get_token (char** buf)
 void skip_token (char** buf, char* tok){skip_token (buf, tok, NULL);}
 void skip_token (char** buf, char* tok, char* msg)
 #else
-void skip_token (char** buf, char* tok, char* msg)
+void skip_token (char** buf, char* tok, char* /*msg*/)
 #endif
 {
   char* t = get_token (buf);

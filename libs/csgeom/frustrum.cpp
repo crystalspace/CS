@@ -94,7 +94,7 @@ void csFrustrum::ExtendVertexArray (int num)
   max_vertices += num;
 }
 
-void csFrustrum::AddVertex (csVector3& v)
+void csFrustrum::AddVertex (const csVector3& v)
 {
   if (num_vertices >= max_vertices) ExtendVertexArray (10);
   vertices[num_vertices] = v;
@@ -328,7 +328,7 @@ csFrustrum* csFrustrum::Intersect (csVector3* poly, int num)
   return new_frustrum;
 }
 
-bool csFrustrum::Contains (csVector3& point)
+bool csFrustrum::Contains (const csVector3& point)
 {
   if (backplane)
   {

@@ -235,7 +235,7 @@ void csGraphics2DGlide2x::Close(void)
 	csGraphics2D::Close ();
 }
 
-void csGraphics2DGlide2x::Print (csRect *area)
+void csGraphics2DGlide2x::Print (csRect* /*area*/)
 {
 }
 

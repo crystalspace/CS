@@ -144,13 +144,13 @@ bool csCurve::IsLightable()
 }
 
 // Default PosInSpace does nothing
-void csCurve::PosInSpace (csVector3& vec, double u, double v)
+void csCurve::PosInSpace (csVector3& /*vec*/, double /*u*/, double /*v*/)
 {
   return;
 }
 
 // Default Normal does nothing
-void csCurve::Normal (csVector3& vec, double u, double v)
+void csCurve::Normal (csVector3& /*vec*/, double /*u*/, double /*v*/)
 {
   return;
 }

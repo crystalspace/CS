@@ -122,7 +122,7 @@ public:
   /**
    * Add a vertex (2D) to the polygon.
    */
-  void AddVertex (csVector2& v) { AddVertex (v.x, v.y); }
+  void AddVertex (const csVector2& v) { AddVertex (v.x, v.y); }
 
   /**
    * Add a vertex (2D) to the polygon.

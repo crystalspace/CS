@@ -142,8 +142,8 @@ csPolygon3D* csSector::HitBeam (csVector3& start, csVector3& end)
     if (p)
     {
       sq_dist = (isect.x-start.x)*(isect.x-start.x) +
-	(isect.y-start.y)*(isect.y-start.y) +
-	(isect.z-start.z)*(isect.z-start.z);
+        (isect.y-start.y)*(isect.y-start.y) +
+        (isect.z-start.z)*(isect.z-start.z);
       if (sq_dist < min_sq_dist) { min_sq_dist = sq_dist; min_poly = p; }
     }
     sp = (csThing*)(sp->GetNext ());
@@ -179,7 +179,7 @@ void csSector::CreateLightmaps (IGraphics3D* g3d)
 }
 
 csPolygon3D* csSector::IntersectSegment (const csVector3& start, const csVector3& end,
-				      csVector3& isect, float* pr)
+                                      csVector3& isect, float* pr)
 {
   csThing* sp = first_thing;
   while (sp)
@@ -193,7 +193,7 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start, const csVector3
 }
 
 csSector* csSector::FollowSegment (csReversibleTransform& t, csVector3& new_position,
-				bool& mirror)
+                                bool& mirror)
 {
   csVector3 isect;
   csPolygon3D* p = sector->IntersectSegment (t.GetOrigin (), new_position, isect);
@@ -234,21 +234,21 @@ csPolygon3D* csSector::IntersectSphere (csVector3& center, float radius, float* 
       hit.z = d*(-C-center.z)+center.z;
       if (p->IntersectRay (center, hit))
       {
-	csPortal* po = p->GetPortal ();
-	if (po)
-	{
-	  p = po->IntersectSphere (center, min_d, &d);
-	  if (p)
-	  {
-	    min_d = d;
-	    min_p = p;
-	  }
-	}
-	else
-	{
-	  min_d = d;
-	  min_p = p;
-	}
+        csPortal* po = p->GetPortal ();
+        if (po)
+        {
+          p = po->IntersectSphere (center, min_d, &d);
+          if (p)
+          {
+            min_d = d;
+            min_p = p;
+          }
+        }
+        else
+        {
+          min_d = d;
+          min_p = p;
+        }
       }
     }
   }
@@ -296,7 +296,7 @@ void csSector::Draw (csRenderView& rview)
   TransformWorld2Cam (rview);
   Stats::polygons_considered += num_polygon;
 
-  G3D_FOGMETHOD fogmethod;
+  G3D_FOGMETHOD fogmethod = G3DFOGMETHOD_NONE;
   if (HasFog ())
   {
     rview.g3d->OpenFogObject (GetID (), &GetFog ());
@@ -336,7 +336,7 @@ void csSector::Draw (csRenderView& rview)
     //
     // We should see if there are better alternatives to Z-sort which are
     // more accurate in more cases (@@@).
-    csThing* sort_list[100];	// @@@HARDCODED == BAD == EASY!
+    csThing* sort_list[100];    // @@@HARDCODED == BAD == EASY!
     int sort_idx = 0;
     int i;
     csThing* sp = first_thing;
@@ -359,7 +359,7 @@ void csSector::Draw (csRenderView& rview)
       while (sp)
       {
         if (sp->CheckFlags (CS_ENTITY_CONVEX) || sp->GetFog ().enabled)
-	  sort_list[sort_idx++] = sp;
+          sort_list[sort_idx++] = sp;
         sp = (csThing*)(sp->GetNext ());
       }
     }
@@ -375,7 +375,7 @@ void csSector::Draw (csRenderView& rview)
         sp = sort_list[i];
         if (sp->GetFog ().enabled) sp->DrawFoggy (rview);
         else if (!sp->IsMerged () && sp->CheckFlags (CS_ENTITY_CONVEX))
-      	  sp->Draw (rview, false);
+          sp->Draw (rview, false);
       }
     }
 
@@ -412,7 +412,7 @@ void csSector::Draw (csRenderView& rview)
       
       // this light is already in the queue.
       if (light->GetHaloInQueue ())
-	continue;
+        continue;
       
       CHK (csHaloInformation* cshaloinfo = new csHaloInformation);
       
@@ -420,26 +420,26 @@ void csSector::Draw (csRenderView& rview)
       
       if (cshaloinfo->v.z > SMALL_Z)
       {
-	float iz = rview.aspect/cshaloinfo->v.z;
-	cshaloinfo->v.x = cshaloinfo->v.x * iz + csWorld::shift_x;
-	cshaloinfo->v.y = csWorld::frame_height - 1 - (cshaloinfo->v.y * iz + csWorld::shift_y);
+        float iz = rview.aspect/cshaloinfo->v.z;
+        cshaloinfo->v.x = cshaloinfo->v.x * iz + csWorld::shift_x;
+        cshaloinfo->v.y = csWorld::frame_height - 1 - (cshaloinfo->v.y * iz + csWorld::shift_y);
 
-	cshaloinfo->pLight = light;
-	
-	cshaloinfo->r = light->GetColor ().red;
-	cshaloinfo->g = light->GetColor ().green;
-	cshaloinfo->b = light->GetColor ().blue;
-	cshaloinfo->intensity = 0.0f;
-	
-	if (piHR->TestHalo(&cshaloinfo->v) == S_OK)
-	{
-	  piHR->CreateHalo(cshaloinfo->r, cshaloinfo->g, cshaloinfo->b, &cshaloinfo->haloinfo);
-	  csWorld::current_world->AddHalo (cshaloinfo);
-	}
+        cshaloinfo->pLight = light;
+        
+        cshaloinfo->r = light->GetColor ().red;
+        cshaloinfo->g = light->GetColor ().green;
+        cshaloinfo->b = light->GetColor ().blue;
+        cshaloinfo->intensity = 0.0f;
+        
+        if (piHR->TestHalo(&cshaloinfo->v) == S_OK)
+        {
+          piHR->CreateHalo(cshaloinfo->r, cshaloinfo->g, cshaloinfo->b, &cshaloinfo->haloinfo);
+          csWorld::current_world->AddHalo (cshaloinfo);
+        }
       }
       else
       {
-	CHK (delete cshaloinfo);
+        CHK (delete cshaloinfo);
       }
     }
   }
@@ -487,7 +487,7 @@ void csSector::Draw (csRenderView& rview)
     }
     else
     {
-#     define FOG_PLANE_DIST 1.0			//@@@SHOULD BE CONFIGURATION VALUE!
+#     define FOG_PLANE_DIST 1.0                 //@@@SHOULD BE CONFIGURATION VALUE!
       // the following uses 'z-gradation'.
 
       csVector2* pts;
@@ -506,38 +506,38 @@ void csSector::Draw (csRenderView& rview)
 
       float distance_available = farthest-nearest;
       float z_step = FOG_PLANE_DIST;
-		
+                
       float real_fog_density = GetFog().density;
       GetFog().density = 1.0-exp(-GetFog().density*z_step);
 
       for( ; z >= SMALL_Z ; z -= z_step)
       {
-	float iz = csCamera::aspect/z;
+        float iz = csCamera::aspect/z;
 
-	// Take the current clipper and un-perspective project it back
-	// to camera space.
-	for (i = 0 ; i < rview.view->GetNumVertices () ; i++)
-	{
-	  clipper[i].x = (rview.view->GetVertex (i).x - csWorld::shift_x) * z;
-	  clipper[i].y = (rview.view->GetVertex (i).y - csWorld::shift_y) * z;
-	}
+        // Take the current clipper and un-perspective project it back
+        // to camera space.
+        for (i = 0 ; i < rview.view->GetNumVertices () ; i++)
+        {
+          clipper[i].x = (rview.view->GetVertex (i).x - csWorld::shift_x) * z;
+          clipper[i].y = (rview.view->GetVertex (i).y - csWorld::shift_y) * z;
+        }
 
-	// Clip the clipper to the polygonset.
-	pts = IntersectCameraZPlane (z, clipper, rview.view->GetNumVertices (), num_pts);
+        // Clip the clipper to the polygonset.
+        pts = IntersectCameraZPlane (z, clipper, rview.view->GetNumVertices (), num_pts);
 
-	if (pts)
-	{
-	  // Perspective projection and copy to structure for 3D rasterizer.
-	  g3dpoly.num = num_pts;
-	  for (i = 0 ; i < num_pts ; i++)
-	  {
-	    g3dpoly.vertices[num_pts-i-1].sx = pts[i].x * iz + csWorld::shift_x;
-	    g3dpoly.vertices[num_pts-i-1].sy = pts[i].y * iz + csWorld::shift_y;
-	  }
-	  CHK (delete [] pts);
-	  g3dpoly.fog_plane_z = z;
-	  rview.g3d->AddFogPolygon (GetID (), g3dpoly, CS_FOG_PLANE);
-	}
+        if (pts)
+        {
+          // Perspective projection and copy to structure for 3D rasterizer.
+          g3dpoly.num = num_pts;
+          for (i = 0 ; i < num_pts ; i++)
+          {
+            g3dpoly.vertices[num_pts-i-1].sx = pts[i].x * iz + csWorld::shift_x;
+            g3dpoly.vertices[num_pts-i-1].sy = pts[i].y * iz + csWorld::shift_y;
+          }
+          CHK (delete [] pts);
+          g3dpoly.fog_plane_z = z;
+          rview.g3d->AddFogPolygon (GetID (), g3dpoly, CS_FOG_PLANE);
+        }
       }
 
       CHK (delete [] clipper);
@@ -583,22 +583,22 @@ void csSector::Draw (csRenderView& rview)
         iz = rview.aspect/v.z;
         px = QInt (v.x * iz + csWorld::shift_x);
         py = csWorld::frame_height - 1 - QInt (v.y * iz + csWorld::shift_y);
-	r = QInt (.3 * iz);
-	if (do_coord_check)
-	{
+        r = QInt (.3 * iz);
+        if (do_coord_check)
+        {
      // DAN: Commented out this code for now, until we decide
      // where to put light selection. 10.05.98
-/*	  if (ABS (coord_check_vector.x - px) < 5 && ABS (coord_check_vector.y - (csWorld::frame_height-1-py)) < 5)
-	  {
-	    rview.g3d->selected_light = lights[i];
-	    CsPrintf (MSG_CONSOLE, "Selected light %s/(%f,%f,%f).\n", 
+/*        if (ABS (coord_check_vector.x - px) < 5 && ABS (coord_check_vector.y - (csWorld::frame_height-1-py)) < 5)
+          {
+            rview.g3d->selected_light = lights[i];
+            CsPrintf (MSG_CONSOLE, "Selected light %s/(%f,%f,%f).\n", 
                       csNameObject::GetName(*this), lights[i]->GetCenter ().x, 
                       lights[i]->GetCenter ().y, lights[i]->GetCenter ().z);
-	    CsPrintf (MSG_DEBUG_0, "Selected light %s/(%f,%f,%f).\n", 
+            CsPrintf (MSG_DEBUG_0, "Selected light %s/(%f,%f,%f).\n", 
                       csNameObject::GetName(*this), lights[i]->GetCenter ().x,
                       lights[i]->GetCenter ().y, lights[i]->GetCenter ().z);
-	  }*/
-	}
+          }*/
+        }
         rview.g2d->DrawLine (px-r, py-r, px+r, py+r, white);
         rview.g2d->DrawLine (px+r, py-r, px-r, py+r, white);
         rview.g2d->DrawLine (px, py-2, px, py+2, red);
@@ -680,35 +680,35 @@ csThing** csSector::MarkVisibleThings (csLightView& lview, int& num_things)
       if (bbox)
       {
         // First we check if any of the vertices of the bounding
-	// box is in the frustrum. If so then it is certainly visible.
-	if (lf->Contains (sp->Vwor (bbox->i1)-center) ||
-	    lf->Contains (sp->Vwor (bbox->i2)-center) ||
-	    lf->Contains (sp->Vwor (bbox->i3)-center) ||
-	    lf->Contains (sp->Vwor (bbox->i4)-center) ||
-	    lf->Contains (sp->Vwor (bbox->i5)-center) ||
-	    lf->Contains (sp->Vwor (bbox->i6)-center) ||
-	    lf->Contains (sp->Vwor (bbox->i7)-center) ||
-	    lf->Contains (sp->Vwor (bbox->i8)-center))
-	  vis = true;
-	else
-	{
-	  // None of the vertices of the bounding box is in the
-	  // light frustrum. In this case it is still possible
-	  // that the light frustrum passes through the bounding box.
-	  // To test this we consider all six faces of the bounding
-	  // box and see if a single ray from the light frustrum passes
-	  // through any of those faces.
-	  csVector3& ray = lf->GetVertex (0);
-	  // Unfinished!!! Here we need some more code but I'm not sure
-	  // how to do this efficiently.
-	  //@@@@@@@@@@@@@@@@@@
-	  vis = true;
-	}
+        // box is in the frustrum. If so then it is certainly visible.
+        if (lf->Contains (sp->Vwor (bbox->i1)-center) ||
+            lf->Contains (sp->Vwor (bbox->i2)-center) ||
+            lf->Contains (sp->Vwor (bbox->i3)-center) ||
+            lf->Contains (sp->Vwor (bbox->i4)-center) ||
+            lf->Contains (sp->Vwor (bbox->i5)-center) ||
+            lf->Contains (sp->Vwor (bbox->i6)-center) ||
+            lf->Contains (sp->Vwor (bbox->i7)-center) ||
+            lf->Contains (sp->Vwor (bbox->i8)-center))
+          vis = true;
+        else
+        {
+          // None of the vertices of the bounding box is in the
+          // light frustrum. In this case it is still possible
+          // that the light frustrum passes through the bounding box.
+          // To test this we consider all six faces of the bounding
+          // box and see if a single ray from the light frustrum passes
+          // through any of those faces.
+          csVector3& ray = lf->GetVertex (0);
+          // Unfinished!!! Here we need some more code but I'm not sure
+          // how to do this efficiently.
+          //@@@@@@@@@@@@@@@@@@
+          vis = true;
+        }
       }
       else
       {
         CsPrintf (MSG_WARNING, "Bounding box for thing not found!\n");
-	vis = true;
+        vis = true;
       }
     }
 
@@ -718,13 +718,13 @@ csThing** csSector::MarkVisibleThings (csLightView& lview, int& num_things)
       if (num_things > cleanable->size)
       {
         CHK (csThing** new_array = new csThing* [cleanable->size+5]);
-	if (cleanable->array)
-	{
-	  memcpy (new_array, cleanable->array, sizeof (csThing*)*cleanable->size);
+        if (cleanable->array)
+        {
+          memcpy (new_array, cleanable->array, sizeof (csThing*)*cleanable->size);
           CHK (delete [] cleanable->array);
-	}
-	cleanable->array = new_array;
-	cleanable->size += 5;
+        }
+        cleanable->array = new_array;
+        cleanable->size += 5;
       }
       cleanable->array[num_things-1] = sp;
     }
@@ -782,9 +782,9 @@ void csSector::CalculateLighting (csLightView& lview)
   // @@@ Here we would like to do an optimization pass on all
   // the generated shadow frustrums. In essence this pass would try to
   // find all shadow frustrums which are:
-  //	- outside the current light frustrum and thus are not relevant
-  //	- completely inside another shadow frustrum and thus do not
-  //	  contribute to the shadow
+  //    - outside the current light frustrum and thus are not relevant
+  //    - completely inside another shadow frustrum and thus do not
+  //      contribute to the shadow
   // Note that we already do something similar when finally mapping
   // the light on a polygon but doing it here would eliminate the
   // frustrums earlier in the process.
@@ -826,9 +826,9 @@ void csSector::CalculateLighting (csLightView& lview)
 struct SectorShineInfo
 {
   csStatLight* light;
-  csVector3 center;	// The center of the light (possibly warped)
-  bool mirror;		// If everything is mirrored.
-  csVector3* frustrum;	// A (possibly warped) view frustrum for the light.
+  csVector3 center;     // The center of the light (possibly warped)
+  bool mirror;          // If everything is mirrored.
+  csVector3* frustrum;  // A (possibly warped) view frustrum for the light.
   int num_frustrum;
   // These two are only used for dump_frustrum
   csTransform *trans;
@@ -836,7 +836,8 @@ struct SectorShineInfo
 };
 #endif
 
-void* csSector::DumpFrustrumPolygons (csPolygonParentInt*, csPolygonInt** polygon, int num, void* data)
+void* csSector::DumpFrustrumPolygons (csPolygonParentInt*, csPolygonInt** /*polygon*/, 
+                                      int /*num*/, void* /*data*/)
 {
 #if 0
   csPolygon3D* p;
@@ -855,7 +856,7 @@ void* csSector::DumpFrustrumPolygons (csPolygonParentInt*, csPolygonInt** polygo
     csVector3* new_frustrum = NULL;
     int new_num_frustrum = 0;
     if (p->ClipFrustrum (d->light->GetCenter (), d->frustrum, d->num_frustrum, false/*@@@unsupported*/,
-    	&new_frustrum, &new_num_frustrum))
+        &new_frustrum, &new_num_frustrum))
     {
       int j;
       csVector3 light_cam;
@@ -885,8 +886,8 @@ void* csSector::DumpFrustrumPolygons (csPolygonParentInt*, csPolygonInt** polygo
   return NULL;
 }
 
-void csSector::DumpFrustrum (csStatLight* l, csVector3* frustrum, int num_frustrum,
-	csTransform& t)
+void csSector::DumpFrustrum (csStatLight* /*l*/, csVector3* /*frustrum*/, int /*num_frustrum*/,
+        csTransform& /*t*/)
 {
 //@@@ Maybe move to application?
 #if 0
@@ -993,7 +994,7 @@ void* csSector::BeamPolygons (csPolygonParentInt*, csPolygonInt** polygon, int n
       else
       {
         csVector3 isect;
-	p->GetPlane ()->IntersectSegment (d->start, d->end, isect, NULL);
+        p->GetPlane ()->IntersectSegment (d->start, d->end, isect, NULL);
         d->sqdist = csSquaredDist::PointPoint (isect, d->start);
         return (void*)p;
       }
@@ -1003,7 +1004,7 @@ void* csSector::BeamPolygons (csPolygonParentInt*, csPolygonInt** polygon, int n
 }
 
 csPolygon3D* csSector::FollowBeam (csVector3& start, csVector3& end, csPolygon3D* poly,
-				float* sqdist)
+                                float* sqdist)
 {
   BeamInfo beam;
   beam.start = start;
@@ -1032,7 +1033,7 @@ csPolygon3D* csSector::FollowBeam (csVector3& start, csVector3& end, csPolygon3D
       if (!p || sqdist2 < beam.sqdist)
       {
         p = p2;
-	beam.sqdist = sqdist2;
+        beam.sqdist = sqdist2;
       }
     }
     sp = (csThing*)(sp->GetNext ());
@@ -1070,7 +1071,7 @@ bool csSector::HitBeam (csVector3& start, csVector3& end, csPolygon3D* poly, flo
   float exp_sqdist = csSquaredDist::PointPoint (start, end);
   
   if (!poly->GetSector ()->bsp && poly->GetSector () == p->GetSector () &&
-  	(csPolygonSet*)(p->GetParent ()) == (csPolygonSet*)(p->GetSector ()))
+        (csPolygonSet*)(p->GetParent ()) == (csPolygonSet*)(p->GetSector ()))
   {
     // If the polygon that is hit is a member of the same sector as
     // our sector, and if the sector does NOT use a bsp (it is convex),
@@ -1127,9 +1128,9 @@ csStatLight* csSector::FindLight (float x, float y, float z, float dist)
   {
     csStatLight* l = (csStatLight*)lights[i];
     if (ABS (x-l->GetCenter ().x) < SMALL_EPSILON &&
-    	ABS (y-l->GetCenter ().y) < SMALL_EPSILON &&
-    	ABS (z-l->GetCenter ().z) < SMALL_EPSILON &&
-    	ABS (dist-l->GetRadius ()) < SMALL_EPSILON)
+        ABS (y-l->GetCenter ().y) < SMALL_EPSILON &&
+        ABS (z-l->GetCenter ().z) < SMALL_EPSILON &&
+        ABS (dist-l->GetRadius ()) < SMALL_EPSILON)
       return l;
   }
   return NULL;

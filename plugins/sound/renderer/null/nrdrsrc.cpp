@@ -40,7 +40,7 @@ csSoundSourceNull::~csSoundSourceNull()
 
 }
 
-STDMETHODIMP csSoundSourceNull::PlaySource(bool inLoop)
+STDMETHODIMP csSoundSourceNull::PlaySource(bool /*inLoop*/)
 {
   return S_OK;
 }

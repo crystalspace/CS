@@ -247,7 +247,7 @@ public:
   /**
    * Just add a new vertex to the polygonset.
    */
-  int AddVertex (csVector3& v) { return AddVertex (v.x, v.y, v.z); }
+  int AddVertex (const csVector3& v) { return AddVertex (v.x, v.y, v.z); }
 
   /**
    * Just add a new vertex to the polygonset.
@@ -259,7 +259,7 @@ public:
    * a vertex close to the wanted position. In that case
    * don't add a new vertex but return the index of the old one.
    */
-  int AddVertexSmart (csVector3& v) { return AddVertexSmart (v.x, v.y, v.z); }
+  int AddVertexSmart (const csVector3& v) { return AddVertexSmart (v.x, v.y, v.z); }
 
   /**
    * Add a vertex but first check if there is already

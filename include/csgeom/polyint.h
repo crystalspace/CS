@@ -95,7 +95,7 @@ public:
    * Add a vertex from the container to the polygon and return
    * the index (starting with 0) of the added vertex.
    */
-  virtual int AddVertex (csVector3& v) = 0;
+  virtual int AddVertex (const csVector3& v) = 0;
 
   /**
    * Finish adding vertices.

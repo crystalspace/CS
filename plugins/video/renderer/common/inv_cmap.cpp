@@ -517,7 +517,7 @@ blueloop( int restart )
 static void
 maxfill( unsigned long *buffer, long rside, long gside, long bside )
 {
-    register unsigned long maxv = ~0L;
+    register unsigned long maxv = ~0UL;
     register long i;
     register unsigned long *bp;
 

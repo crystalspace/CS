@@ -44,9 +44,9 @@ bool csPolyTexture::subtex_dynlight = true;
 IMPLEMENT_UNKNOWN_NODELETE( csPolyTexture )
 
 BEGIN_INTERFACE_TABLE( csPolyTexture )
-	IMPLEMENTS_COMPOSITE_INTERFACE( PolygonTexture )
+  IMPLEMENTS_COMPOSITE_INTERFACE( PolygonTexture )
 END_INTERFACE_TABLE()
-	
+  
 csPolyTexture::csPolyTexture ()
 {
   dyn_dirty = true;
@@ -104,10 +104,10 @@ void csPolyTexture::CreateBoundingTextureBox ()
   DB ((MSG_DEBUG_0, "  Vertices in world-space:\n"));
   for (i = 0 ; i < polygon->GetNumVertices () ; i++)
   {
-    v1 = polygon->Vwor (i);	 	// Coordinates of vertex in world space.
+    v1 = polygon->Vwor (i);   // Coordinates of vertex in world space.
     DB ((MSG_DEBUG_0, "      %d:(%f,%f,%f)\n", i, v1.x, v1.y, v1.z));
     v1 -= pl->v_world2tex;
-    v2 = (pl->m_world2tex) * v1;	// Coordinates of vertex in texture space.
+    v2 = (pl->m_world2tex) * v1;  // Coordinates of vertex in texture space.
     if (v2.x < min_u) min_u = v2.x;
     if (v2.x > max_u) max_u = v2.x;
     if (v2.y < min_v) min_v = v2.y;
@@ -226,22 +226,22 @@ bool csPolyTexture::RecalcDynamicLights ()
         green = light->GetColor ().green;
         blue = light->GetColor ().blue;
         csLight::CorrectForNocolor (&red, &green, &blue);
-	p = smap->map;
-	last_p = p+lm_size;
-	do
-	{
-	  s = *p++;
+  p = smap->map;
+  last_p = p+lm_size;
+  do
+  {
+    s = *p++;
           l = *mapR + QRound (red * s);
-	  if (l > 255) l = 255;
+    if (l > 255) l = 255;
           *mapR++ = l;
           l = *mapG + QRound (green * s); if (l > 255) l = 255;
-	  if (l > 255) l = 255;
-	  *mapG++ = l;
+    if (l > 255) l = 255;
+    *mapG++ = l;
           l = *mapB + QRound (blue * s); if (l > 255) l = 255;
-	  if (l > 255) l = 255;
+    if (l > 255) l = 255;
           *mapB++ = l;
-	}
-	while (p < last_p);
+  }
+  while (p < last_p);
 
         smap = smap->next;
       }
@@ -260,15 +260,15 @@ bool csPolyTexture::RecalcDynamicLights ()
         green = light->get_green ();
         blue = light->get_blue ();
         csLight::mixing_dependent_strengths (&red, &green, &blue);
-	p = smap->map;
-	last_p = p+lm_size;
-	do
-	{
+  p = smap->map;
+  last_p = p+lm_size;
+  do
+  {
           l = *mapR + QRound (red * (*p++));
-	  if (l > 255) l = 255;
+    if (l > 255) l = 255;
           *mapR++ = l;
-	}
-	while (p < last_p);
+  }
+  while (p < last_p);
 
         smap = smap->next;
       }
@@ -298,7 +298,7 @@ bool csPolyTexture::RecalcDynamicLights ()
     int lh = lm->GetHeight ();
     int ru, rv, idx;
     int lv, lu, luv, luv_v;
-    int num = csPolyTexture::subtex_size >> mipmap_shift;	// Horiz/vert number of lightmap boxes in one sub-texture
+    int num = csPolyTexture::subtex_size >> mipmap_shift; // Horiz/vert number of lightmap boxes in one sub-texture
     int numu, numv;
     int uu, vv;
 
@@ -314,35 +314,35 @@ bool csPolyTexture::RecalcDynamicLights ()
       {
         // If already dirty we don't need to check.
         if (!dirty_matrix[idx])
-	{
+  {
           lu = (ru * csPolyTexture::subtex_size) >> mipmap_shift;
-	  luv = luv_v + lu;
+    luv = luv_v + lu;
           if (lu+num >= lw-1) numu = lw-lu-1;
-	  else numu = num;
-	  // <= num here because I want to include the boundaries of the next
-	  // sub-texture in the test as well.
-	  for (vv = 0 ; vv <= numv ; vv++)
-	  {
-	    
-	    for (uu = 0 ; uu <= numu ; uu++)
-	    {
-	      // If we find a difference this sub-texture is dirty. I would like to have
-	      // a multi-break statement but unfortunatelly C++ does not have this. That's
-	      // why I use the goto. Yes I know! goto's are EVIL!
-	      if ((oldmap.mapR[luv] != remap.mapR[luv]) ||
-	          (oldmap.mapG && (oldmap.mapG[luv] != remap.mapG[luv])) ||
-	      	  (oldmap.mapB && (oldmap.mapB[luv] != remap.mapB[luv])))
-	      {
-	        dirty_matrix[idx] = 1;
-		dirty_cnt++;
-		goto stop;
-	      }
-	      luv++;
-	    }
-	    luv += lw-num-1;
-	  }
-	  stop: ;
-	}
+    else numu = num;
+    // <= num here because I want to include the boundaries of the next
+    // sub-texture in the test as well.
+    for (vv = 0 ; vv <= numv ; vv++)
+    {
+      
+      for (uu = 0 ; uu <= numu ; uu++)
+      {
+        // If we find a difference this sub-texture is dirty. I would like to have
+        // a multi-break statement but unfortunatelly C++ does not have this. That's
+        // why I use the goto. Yes I know! goto's are EVIL!
+        if ((oldmap.mapR[luv] != remap.mapR[luv]) ||
+            (oldmap.mapG && (oldmap.mapG[luv] != remap.mapG[luv])) ||
+            (oldmap.mapB && (oldmap.mapB[luv] != remap.mapB[luv])))
+        {
+          dirty_matrix[idx] = 1;
+    dirty_cnt++;
+    goto stop;
+        }
+        luv++;
+      }
+      luv += lw-num-1;
+    }
+    stop: ;
+  }
       }
     }
   }
@@ -443,7 +443,7 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
     int x=visible.left,y=visible.top;
     for (int i=0 ; i<height ; i++)
       for (int j=0 ; j<width ; j++)
-	__draw_func (j+x, i+y, 1);
+  __draw_func (j+x, i+y, 1);
 
     depth--;
     return;
@@ -498,18 +498,18 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
 
       if (now_we_are==where_are_we)
       {
-	if (i)
-	  p2[where_are_we][n2[where_are_we]++]=p2d[i];
+  if (i)
+    p2[where_are_we][n2[where_are_we]++]=p2d[i];
       }
       else
       {
-	float y=(p2d[prev].y*(p2d[i].x-sub_x)+p2d[i].y*(sub_x-p2d[prev].x))/(p2d[i].x-p2d[prev].x);
-	csVector2 p(sub_x,y);
+  float y=(p2d[prev].y*(p2d[i].x-sub_x)+p2d[i].y*(sub_x-p2d[prev].x))/(p2d[i].x-p2d[prev].x);
+  csVector2 p(sub_x,y);
 
-	p2[0][n2[0]++]=p2[1][n2[1]++]=p;
+  p2[0][n2[0]++]=p2[1][n2[1]++]=p;
 
-	if (i)
-	  p2[now_we_are][n2[now_we_are]++]=p2d[i];
+  if (i)
+    p2[now_we_are][n2[now_we_are]++]=p2d[i];
       }
 
       where_are_we=now_we_are;
@@ -547,18 +547,18 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
 
       if (now_we_are==where_are_we)
       {
-	if (i)
-	  p2[where_are_we][n2[where_are_we]++]=p2d[i];
+  if (i)
+    p2[where_are_we][n2[where_are_we]++]=p2d[i];
       }
       else
       {
-	float x=(p2d[prev].x*(p2d[i].y-sub_y)+p2d[i].x*(sub_y-p2d[prev].y))/(p2d[i].y-p2d[prev].y);
-	csVector2 p(x, sub_y);
+  float x=(p2d[prev].x*(p2d[i].y-sub_y)+p2d[i].x*(sub_y-p2d[prev].y))/(p2d[i].y-p2d[prev].y);
+  csVector2 p(x, sub_y);
 
-	p2[0][n2[0]++]=p2[1][n2[1]++]=p;
+  p2[0][n2[0]++]=p2[1][n2[1]++]=p;
 
-	if (i)
-	  p2[now_we_are][n2[now_we_are]++]=p2d[i];
+  if (i)
+    p2[now_we_are][n2[now_we_are]++]=p2d[i];
       }
 
       where_are_we=now_we_are;
@@ -593,7 +593,7 @@ void csPolyTexture::FillLightmap (csLightView& lview)
   csStatLight* light = (csStatLight*)lview.l;
   DB ((MSG_DEBUG_0, "#### shine_lightmaps #### light:(%f,%f,%f)\n", light->GetCenter ().x, light->GetCenter ().y, light->GetCenter ().z));
 
-  int lw = lm->GetWidth ();	// @@@ DON'T NEED TO GO TO PO2 SIZES
+  int lw = lm->GetWidth (); // @@@ DON'T NEED TO GO TO PO2 SIZES
   int lh = lm->GetHeight ();
 
   int u, uv;
@@ -640,8 +640,8 @@ void csPolyTexture::FillLightmap (csLightView& lview)
   invww = 1. / (float)ww;
   invhh = 1. / (float)hh;
 
-  bool hit;			// Set to true if there is a hit
-  bool first_time = false;	// Set to true if this is the first pass for the dynamic light
+  bool hit;     // Set to true if there is a hit
+  bool first_time = false;  // Set to true if this is the first pass for the dynamic light
   int dyn;
 
   unsigned char* mapR;
@@ -738,9 +738,9 @@ void csPolyTexture::FillLightmap (csLightView& lview)
   {
     for (u=0;u<lw;u++,uv++)
     {
-	//@@@ (Note from Jorrit): The following test should not be needed
-	// but it appears to be anyway. 'uv' can get too large.
-	if (uv >= lm_size) continue;
+  //@@@ (Note from Jorrit): The following test should not be needed
+  // but it appears to be anyway. 'uv' can get too large.
+  if (uv >= lm_size) continue;
 
         float usual_value=1.0;
 
@@ -800,74 +800,74 @@ void csPolyTexture::FillLightmap (csLightView& lview)
             v1.z = - (txt_D + txt_A*v1.x + txt_B*v1.y) / txt_C;
           v2 = vv + m_t2w * v1;
 
-	  // Check if the point on the polygon is shadowed. To do this
-	  // we traverse all shadow frustrums and see if it is contained in any of them.
-	  csShadowFrustrum* shadow_frust;
-	  shadow_frust = lview.shadows.GetFirst ();
-	  bool shadow = false;
-	  while (shadow_frust)
-	  {
-	    if (shadow_frust->relevant && shadow_frust->polygon != polygon)
-	      if (shadow_frust->Contains (v2-shadow_frust->GetOrigin ()))
-	        { shadow = true; break; }
-	    shadow_frust = shadow_frust->next;
-	  }
-	  if (!shadow) { rc = false; break; }
+    // Check if the point on the polygon is shadowed. To do this
+    // we traverse all shadow frustrums and see if it is contained in any of them.
+    csShadowFrustrum* shadow_frust;
+    shadow_frust = lview.shadows.GetFirst ();
+    bool shadow = false;
+    while (shadow_frust)
+    {
+      if (shadow_frust->relevant && shadow_frust->polygon != polygon)
+        if (shadow_frust->Contains (v2-shadow_frust->GetOrigin ()))
+          { shadow = true; break; }
+      shadow_frust = shadow_frust->next;
+    }
+    if (!shadow) { rc = false; break; }
 
-	  if (!do_accurate_things) break;
-	  rc = true;
+    if (!do_accurate_things) break;
+    rc = true;
         }
 
         if (!rc)
         {
-	  //@@@ I think this is wrong and the next line is right!
+    //@@@ I think this is wrong and the next line is right!
           //d = csSquaredDist::PointPoint (light->GetCenter (), v2);
           d = csSquaredDist::PointPoint (lview.light_frustrum->GetOrigin (), v2);
           DB ((MSG_DEBUG_0, "    -> In viewing frustrum (distance %f compared with radius %f)\n", sqrt (d), light->GetRadius ()));
 
-	  if (d >= light->GetSquaredRadius ()) continue;
-	  d = sqrt (d);
+    if (d >= light->GetSquaredRadius ()) continue;
+    d = sqrt (d);
           DB ((MSG_DEBUG_0, "    -> *** HIT ***\n"));
 
-	  hit = true;
+    hit = true;
 
-	  l1 = mapR[uv];
+    l1 = mapR[uv];
 
-	  //@@@ I think this is wrong and the next line is right!
-	  //float cosinus = (v2-light->GetCenter ())*polygon->GetPolyPlane ()->Normal ();
-	  float cosinus = (v2-lview.light_frustrum->GetOrigin ())*polygon->GetPolyPlane ()->Normal ();
-	  cosinus /= d;
-	  cosinus += cosfact;
-	  if (cosinus < 0) cosinus = 0;
-	  else if (cosinus > 1) cosinus = 1;
-	  if (dyn)
-	  {
-	    dl = NORMAL_LIGHT_LEVEL/light->GetRadius ();
-	    l1 = l1 + lightness*QRound (cosinus * (NORMAL_LIGHT_LEVEL - d*dl));
-	    if (l1 > 255) l1 = 255;
-	    mapR[uv] = l1;
-	  }
-	  else
-	  {
-	    if (lview.r > 0)
-	    {
-	      l1 = l1 + lightness*QRound (cosinus * r200d*(light->GetRadius () - d));
-	      if (l1 > 255) l1 = 255;
-	      mapR[uv] = l1;
-	    }
-	    if (lview.g > 0 && mapG)
-	    {
-	      l2 = mapG[uv] + lightness*QRound (cosinus * g200d*(light->GetRadius () - d));
-	      if (l2 > 255) l2 = 255;
-	      mapG[uv] = l2;
-	    }
-	    if (lview.b > 0 && mapB)
-	    {
-	      l3 = mapB[uv] + lightness*QRound (cosinus * b200d*(light->GetRadius () - d));
-	      if (l3 > 255) l3 = 255;
-	      mapB[uv] = l3;
-	    }
-	  }
+    //@@@ I think this is wrong and the next line is right!
+    //float cosinus = (v2-light->GetCenter ())*polygon->GetPolyPlane ()->Normal ();
+    float cosinus = (v2-lview.light_frustrum->GetOrigin ())*polygon->GetPolyPlane ()->Normal ();
+    cosinus /= d;
+    cosinus += cosfact;
+    if (cosinus < 0) cosinus = 0;
+    else if (cosinus > 1) cosinus = 1;
+    if (dyn)
+    {
+      dl = NORMAL_LIGHT_LEVEL/light->GetRadius ();
+      l1 = l1 + lightness*QRound (cosinus * (NORMAL_LIGHT_LEVEL - d*dl));
+      if (l1 > 255) l1 = 255;
+      mapR[uv] = l1;
+    }
+    else
+    {
+      if (lview.r > 0)
+      {
+        l1 = l1 + lightness*QRound (cosinus * r200d*(light->GetRadius () - d));
+        if (l1 > 255) l1 = 255;
+        mapR[uv] = l1;
+      }
+      if (lview.g > 0 && mapG)
+      {
+        l2 = mapG[uv] + lightness*QRound (cosinus * g200d*(light->GetRadius () - d));
+        if (l2 > 255) l2 = 255;
+        mapG[uv] = l2;
+      }
+      if (lview.b > 0 && mapB)
+      {
+        l3 = mapB[uv] + lightness*QRound (cosinus * b200d*(light->GetRadius () - d));
+        if (l3 > 255) l3 = 255;
+        mapB[uv] = l3;
+      }
+    }
         }
         //mapR[uv] = 128;
         //mapG[uv] = 128;
@@ -908,7 +908,7 @@ void csPolyTexture::FillLightmap (csLightView& lview)
 /* Modified by me to correct some lightmap's border problems -- D.D. */
 void csPolyTexture::ShineDynLightmap (csLightPatch* lp)
 {
-  int lw = (w>>mipmap_shift)+2;		// @@@ DON'T NEED TO GO TO 'W', 'W_ORIG' SHOULD BE SUFFICIENT!
+  int lw = (w>>mipmap_shift)+2;   // @@@ DON'T NEED TO GO TO 'W', 'W_ORIG' SHOULD BE SUFFICIENT!
   int lh = (h>>mipmap_shift)+2;
 
   int u, uv;
@@ -1035,14 +1035,14 @@ a:      if (scanR2 == MinIndex) goto finish;
 */
         fyR = QRound(floor(f_uv[scanR2].y));
         float dyR = (f_uv[scanR1].y - f_uv[scanR2].y);
-	sxR = f_uv[scanR1].x;
+  sxR = f_uv[scanR1].x;
         if (dyR != 0)
         {
           dxR = (f_uv[scanR2].x - sxR) / dyR;
-	  // horizontal pixel correction
+    // horizontal pixel correction
           sxR += dxR * (f_uv[scanR1].y - ((float)sy));
         }
-	else dxR = 0;
+  else dxR = 0;
         leave = false;
       }
       if (sy <= fyL)
@@ -1062,14 +1062,14 @@ b:      if (scanL2 == MinIndex) goto finish;
 */
         fyL = QRound(floor(f_uv[scanL2].y));
         float dyL = (f_uv[scanL1].y - f_uv[scanL2].y);
-	sxL = f_uv[scanL1].x;
+  sxL = f_uv[scanL1].x;
         if (dyL != 0)
         {
           dxL = (f_uv[scanL2].x - sxL) / dyL;
           // horizontal pixel correction
           sxL += dxL * (f_uv[scanL1].y - ((float)sy));
         }
-	else dxL = 0;
+  else dxL = 0;
         leave = false;
       }
     }
@@ -1086,7 +1086,7 @@ b:      if (scanL2 == MinIndex) goto finish;
       float _l=sxL,_r=sxR;
 
       if(_r>_l) {float _=_r; _r=_l; _l=_;}
-		
+    
       xL = QRound (ceil(_l))+1;
       xR = QRound (floor(_r));
 
@@ -1101,9 +1101,9 @@ b:      if (scanL2 == MinIndex) goto finish;
       {
         uv = sy*new_lw+u;
 
-	//@@@ (Note from Jorrit): The following test should not be needed
-	// but it appears to be anyway. 'uv' can get both negative and too large.
-	if (uv < 0 || uv >= lm_size) continue;
+  //@@@ (Note from Jorrit): The following test should not be needed
+  // but it appears to be anyway. 'uv' can get both negative and too large.
+  if (uv < 0 || uv >= lm_size) continue;
 
         ru = u  << mipmap_shift;
         rv = sy << mipmap_shift;
@@ -1116,63 +1116,63 @@ b:      if (scanL2 == MinIndex) goto finish;
           v1.z = - (txt_D + txt_A*v1.x + txt_B*v1.y) / txt_C;
         v2 = vv + m_t2w * v1;
 
-	// Check if the point on the polygon is shadowed. To do this
-	// we traverse all shadow frustrums and see if it is contained in any of them.
-	csShadowFrustrum* shadow_frust;
-	shadow_frust = lp->shadows.GetFirst ();
-	bool shadow = false;
-	while (shadow_frust)
-	{
-	  if (shadow_frust->relevant && shadow_frust->polygon != polygon)
-	    if (shadow_frust->Contains (v2-shadow_frust->GetOrigin ()))
-	      { shadow = true; break; }
-	  shadow_frust = shadow_frust->next;
-	}
+  // Check if the point on the polygon is shadowed. To do this
+  // we traverse all shadow frustrums and see if it is contained in any of them.
+  csShadowFrustrum* shadow_frust;
+  shadow_frust = lp->shadows.GetFirst ();
+  bool shadow = false;
+  while (shadow_frust)
+  {
+    if (shadow_frust->relevant && shadow_frust->polygon != polygon)
+      if (shadow_frust->Contains (v2-shadow_frust->GetOrigin ()))
+        { shadow = true; break; }
+    shadow_frust = shadow_frust->next;
+  }
 
-	if (!shadow)
+  if (!shadow)
         {
-	  //@@@ This is only right if we don't allow reflections for dynamic lights
+    //@@@ This is only right if we don't allow reflections for dynamic lights
           d = csSquaredDist::PointPoint (light->GetCenter (), v2);
 
-	  if (d >= light->GetSquaredRadius ()) continue;
-	  d = sqrt (d);
+    if (d >= light->GetSquaredRadius ()) continue;
+    d = sqrt (d);
 
-	  //@@@ This is only right if we don't allow reflections for dynamic lights
-	  float cosinus = (v2-light->GetCenter ())*polygon->GetPolyPlane ()->Normal ();
-	  cosinus /= d;
-	  cosinus += cosfact;
-	  if (cosinus < 0) cosinus = 0;
-	  else if (cosinus > 1) cosinus = 1;
-	  if (r > 0)
-	  {
-	    l1 = QRound (cosinus*r200d*(light->GetRadius () - d));
-	    if (l1)
-	    {
-	      l1 += mapR[uv];
-	      if (l1 > 255) l1 = 255;
-	      mapR[uv] = l1;
-	    }
-	  }
-	  if (g > 0 && mapG)
-	  {
-	    l2 = QRound (cosinus*g200d*(light->GetRadius () - d));
-	    if (l2)
-	    {
-	      l2 += mapG[uv];
-	      if (l2 > 255) l2 = 255;
-	      mapG[uv] = l2;
-	    }
-	  }
-	  if (b > 0 && mapB)
-	  {
-	    l3 = QRound (cosinus*b200d*(light->GetRadius () - d));
-	    if (l3)
-	    {
-	      l3 += mapB[uv];
-	      if (l3 > 255) l3 = 255;
-	      mapB[uv] = l3;
-	    }
-	  }
+    //@@@ This is only right if we don't allow reflections for dynamic lights
+    float cosinus = (v2-light->GetCenter ())*polygon->GetPolyPlane ()->Normal ();
+    cosinus /= d;
+    cosinus += cosfact;
+    if (cosinus < 0) cosinus = 0;
+    else if (cosinus > 1) cosinus = 1;
+    if (r > 0)
+    {
+      l1 = QRound (cosinus*r200d*(light->GetRadius () - d));
+      if (l1)
+      {
+        l1 += mapR[uv];
+        if (l1 > 255) l1 = 255;
+        mapR[uv] = l1;
+      }
+    }
+    if (g > 0 && mapG)
+    {
+      l2 = QRound (cosinus*g200d*(light->GetRadius () - d));
+      if (l2)
+      {
+        l2 += mapG[uv];
+        if (l2 > 255) l2 = 255;
+        mapG[uv] = l2;
+      }
+    }
+    if (b > 0 && mapB)
+    {
+      l3 = QRound (cosinus*b200d*(light->GetRadius () - d));
+      if (l3)
+      {
+        l3 += mapB[uv];
+        if (l3 > 255) l3 = 255;
+        mapB[uv] = l3;
+      }
+    }
         }
       }
 

@@ -610,7 +610,7 @@ int csPolygon3D::AddVertex (int v)
   return num_vertices-1;
 }
 
-int csPolygon3D::AddVertex (csVector3& v)
+int csPolygon3D::AddVertex (const csVector3& v)
 {
   int i = poly_set->AddVertexSmart (v);
   AddVertex (i);
@@ -872,8 +872,8 @@ bool csPolygon3D::ClipToPlane (csPlane* portal_plane, const csVector3& v_w2c,
 
 #define EXPERIMENTAL_BUG_FIX 1
 bool csPolygon3D::DoPerspective (const csTransform& trans,
-	csVector3* source, int num_verts, csPolygon2D* dest, csVector2* orig_triangle,
-	bool mirror)
+  csVector3* source, int num_verts, csPolygon2D* dest, csVector2* /*orig_triangle*/,
+  bool mirror)
 {
   csVector3 *ind, *end = source+num_verts;
 
@@ -1834,7 +1834,7 @@ void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* 
   }
 }
 
-void csPolygon2D::AddFogPolygon (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* plane, bool mirror, CS_ID id, int fogtype)
+void csPolygon2D::AddFogPolygon (IGraphics3D* g3d, csPolygon3D* /*poly*/, csPolyPlane* plane, bool mirror, CS_ID id, int fogtype)
 {
   int i;
 

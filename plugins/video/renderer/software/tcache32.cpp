@@ -208,7 +208,9 @@ void TextureCache32::create_lighted_texture_24bit (TCacheData& tcd, TCacheLighte
   }
 }
 
-void TextureCache32::show_lightmap_grid (TCacheData& tcd, TCacheLightedTexture* tclt, csTextureManagerSoftware* txtmgr)
+void TextureCache32::show_lightmap_grid (TCacheData& /*tcd*/, 
+                                         TCacheLightedTexture* /*tclt*/, 
+                                         csTextureManagerSoftware* /*txtmgr*/)
 {
 #if 0
   int w = tcd.width;
@@ -243,8 +245,8 @@ void TextureCache32::show_lightmap_grid (TCacheData& tcd, TCacheLightedTexture* 
 #endif
 }
 
-void TextureCache32::create_lighted_texture_lightmaps (TCacheData& tcd, TCacheLightedTexture* tclt,
-	csTextureManagerSoftware* txtmgr)
+void TextureCache32::create_lighted_texture_lightmaps (TCacheData& /*tcd*/, TCacheLightedTexture* /*tclt*/,
+  csTextureManagerSoftware* /*txtmgr*/)
 {
 #if 0
   int w = tcd.width;

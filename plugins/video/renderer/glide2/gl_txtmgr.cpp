@@ -49,8 +49,8 @@ csTextureMMGlide::~csTextureMMGlide ()
 {
 }
 
-void csTextureMMGlide::convert_to_internal (csTextureManager* tex,
-	IImageFile* imfile, unsigned char* bm)
+void csTextureMMGlide::convert_to_internal (csTextureManager* /*tex*/,
+                                            IImageFile* imfile, unsigned char* bm)
 {
   int w,h,x,y;
 
@@ -452,7 +452,7 @@ STDMETHODIMP csTextureManagerGlide::FreeImages ()
   return S_OK;
 }
 
-STDMETHODIMP csTextureManagerGlide::ReserveColor (int r, int g, int b, bool privcolor)
+STDMETHODIMP csTextureManagerGlide::ReserveColor (int /*r*/, int /*g*/, int /*b*/, bool /*privcolor*/)
 {
   return S_OK;
 }

@@ -431,7 +431,9 @@ STDMETHODIMP csNetworkDriverSockets::KillAll()
 	return hResult;
 }
 
-STDMETHODIMP csNetworkDriverSockets::Accept(DWORD dwLID/*listening socket*/, DWORD *lpdwID/*server socket*/, CS_NET_ADDRESS *lpCSNetAddress/*out*/)
+STDMETHODIMP csNetworkDriverSockets::Accept(DWORD dwLID/*listening socket*/, 
+                                            DWORD *lpdwID/*server socket*/, 
+                                            CS_NET_ADDRESS* /*lpCSNetAddress*//*out*/)
 {
 	if(!SocksReady)
 	{

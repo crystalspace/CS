@@ -100,6 +100,9 @@ private:
   int rstate_mipmap;
   bool rstate_edges;
 
+  bool        m_gouraud;
+  DPFXMixMode m_mixmode;
+
   /// use 16 bit texture else 8 bit
   bool use16BitTexture;
 
@@ -133,16 +136,16 @@ public:
   /// Draw the projected polygon with light and texture.
   STDMETHODIMP DrawPolygon (G3DPolygonDP& poly);
   /// Draw debug poly
-  STDMETHODIMP DrawPolygonDebug(G3DPolygonDP& poly)   { return E_NOTIMPL; }
+  STDMETHODIMP DrawPolygonDebug(G3DPolygonDP& /*poly*/)   { return E_NOTIMPL; }
 
   /// Draw a Line.
   STDMETHODIMP DrawLine (csVector3& v1, csVector3& v2, float fov,  int color);
  
   /// Start DrawPolygonQuick drawing.
-  STDMETHODIMP StartPolygonQuick (ITextureHandle* handle, bool gouraud) { return S_OK; }
+  STDMETHODIMP StartPolygonQuick (ITextureHandle* handle, bool gouraud);
 
   /// Finish DrawPolygonQuick drawing.
-  STDMETHODIMP FinishPolygonQuick () { return S_OK; }
+  STDMETHODIMP FinishPolygonQuick ();
 
   /// Draw a projected (non-perspective correct) polygon.
   STDMETHODIMP DrawPolygonQuick (G3DPolygonDPQ& poly);
@@ -166,7 +169,7 @@ public:
   STDMETHODIMP UncacheTexture (IPolygonTexture *piPT);
 
   /// Set the texture cache size.
-  STDMETHODIMP SetCacheSize (long size) { return S_OK; }
+  STDMETHODIMP SetCacheSize (long /*size*/) { return S_OK; }
 
   /// Dump the texture cache.
   STDMETHODIMP DumpCache(void);

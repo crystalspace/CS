@@ -30,7 +30,14 @@
 #pragma warning(disable:4244)   // conversion from 'double' to 'float'
 #pragma warning(disable:4305)   // conversion from 'const double' to 'float'
 #pragma warning(disable:4018)   // Signed unsigned warnings
+#pragma warning(disable:4805)   // unsafe mix of bool and int.
 #pragma warning(disable:4800)   // Forcing value to bool
+#pragma warning(disable:4514)   // Removal of unreferenced inline function
+#pragma warning(disable:4097)   // use of xxx as synonym for a classname
+#pragma warning(disable:4127)   // conditional expression is constant
+#pragma warning(disable:4189)   // local variable is intialized but not referenced
+#pragma warning(disable:4706)   // Assignmet in conditional expression
+#pragma warning(disable:4611)   // interaction between _setjmp and C++ destructors not portable
 #endif
 
 #if defined(COMP_WCC) || defined(COMP_BC)

@@ -61,7 +61,7 @@ public:
   /**
    * Set the transformation matrix for all objects in the collection.
    */
-  void SetTransform (csMatrix3& matrix);
+  void SetTransform (const csMatrix3& matrix);
 
   /**
    * Relative move.

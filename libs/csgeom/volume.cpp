@@ -97,7 +97,7 @@ void csVolume::CutByPlane (const csPlane& cutter)
   (void)cutter;
 }
 
-bool csVolume::Contains (csVector3& p)
+bool csVolume::Contains (const csVector3& p)
 {
   (void)p;
   return false;

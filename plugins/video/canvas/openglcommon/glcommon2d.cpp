@@ -189,7 +189,7 @@ void csGraphics2DGLCommon::DrawPixelGL (int x, int y, int color)
   glEnd ();
 }
 
-void csGraphics2DGLCommon::WriteCharGL (int x, int y, int fg, int bg, char c)
+void csGraphics2DGLCommon::WriteCharGL (int x, int y, int fg, int /*bg*/, char c)
 {
   // prepare for 2D drawing--so we need no fancy GL effects!
   glDisable (GL_TEXTURE_2D);

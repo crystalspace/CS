@@ -70,11 +70,11 @@ void csThing::SetConvex (bool c)
       if (i != center_idx)
       {
         if (obj_verts[i].x < minx) minx = obj_verts[i].x;
-	if (obj_verts[i].x > maxx) maxx = obj_verts[i].x;
+  if (obj_verts[i].x > maxx) maxx = obj_verts[i].x;
         if (obj_verts[i].y < miny) miny = obj_verts[i].y;
-	if (obj_verts[i].y > maxy) maxy = obj_verts[i].y;
+  if (obj_verts[i].y > maxy) maxy = obj_verts[i].y;
         if (obj_verts[i].z < minz) minz = obj_verts[i].z;
-	if (obj_verts[i].z > maxz) maxz = obj_verts[i].z;
+  if (obj_verts[i].z > maxz) maxz = obj_verts[i].z;
       }
     obj_verts[center_idx].Set ((minx+maxx)/2, (miny+maxy)/2, (minz+maxz)/2);
     wor_verts[center_idx].Set ((minx+maxx)/2, (miny+maxy)/2, (minz+maxz)/2);
@@ -100,7 +100,7 @@ void csThing::SetMove (csSector* home, float x, float y, float z)
   sector = home;
 }
 
-void csThing::SetTransform (csMatrix3& matrix)
+void csThing::SetTransform (const csMatrix3& matrix)
 {
   obj.SetT2O (matrix);
 }
@@ -147,8 +147,8 @@ csPolygon3D* csThing::IntersectSphere (csVector3& center, float radius, float* p
       hit.z = d*(-C-center.z)+center.z;
       if (p->IntersectRay (center, hit))
       {
-	min_d = d;
-	min_p = p;
+  min_d = d;
+  min_p = p;
       }
     }
   }
@@ -179,8 +179,8 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
   int control_x[3];
   int control_y[3];
   csVector2 persp[3];
-  UByte* mapR, * mapG, * mapB;
-  int lm_width, lm_height;
+  UByte* mapR=NULL, * mapG=NULL, * mapB=NULL;
+  int lm_width=0, lm_height=0;
 
   // Loop over all curves
   csCurve* c;
@@ -255,61 +255,61 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
       int k;
       for (k = 0 ; k < 3 ; k++)
       {
-	if (varr[k]->z >= SMALL_Z)
-	{
-	  float iz = csCamera::aspect/varr[k]->z;
-	  persp[k].x = varr[k]->x * iz + csWorld::shift_x;
-	  persp[k].y = varr[k]->y * iz + csWorld::shift_y;
-	}
-	else
-	  visible = false;
+  if (varr[k]->z >= SMALL_Z)
+  {
+    float iz = csCamera::aspect/varr[k]->z;
+    persp[k].x = varr[k]->x * iz + csWorld::shift_x;
+    persp[k].y = varr[k]->y * iz + csWorld::shift_y;
+  }
+  else
+    visible = false;
       }
 
       // Draw all triangles.
       if (visible)
       {
-	//-----
-	// Do backface culling.
-	//-----
-	if (csMath2::Area2 (persp [0].x, persp [0].y,
-			    persp [1].x, persp [1].y,
-			    persp [2].x, persp [2].y) >= 0)
-	  continue;
+  //-----
+  // Do backface culling.
+  //-----
+  if (csMath2::Area2 (persp [0].x, persp [0].y,
+          persp [1].x, persp [1].y,
+          persp [2].x, persp [2].y) >= 0)
+    continue;
 
-	// Clip triangle
-	int rescount;
-	csVector2 *cpoly = rview.view->Clip (persp, 3, rescount);
-	if (!cpoly) continue;
+  // Clip triangle
+  int rescount;
+  csVector2 *cpoly = rview.view->Clip (persp, 3, rescount);
+  if (!cpoly) continue;
 
-	poly.num = rescount;
-	int j;
-	for (j = 0; j < 3; j++)
-	{
-	  if (varr[j]->z > 0.0001)
-	    poly.vertices [j].z = 1 / varr[j]->z;
-	  poly.vertices [j].u = texes[j]->x;
-	  poly.vertices [j].v = texes[j]->y;
-	  if (gouraud)
-	  {
-	    int lm_idx = control_y[j]*(lm_width+2) + control_x[j];
-	    //@@@ NOT EFFICIENT!
-	    poly.vertices[j].r = ((float)mapR[lm_idx])/256.;
-	    poly.vertices[j].g = ((float)mapG[lm_idx])/256.;
-	    poly.vertices[j].b = ((float)mapB[lm_idx])/256.;
-	  }
-	}
+  poly.num = rescount;
+  int j;
+  for (j = 0; j < 3; j++)
+  {
+    if (varr[j]->z > 0.0001)
+      poly.vertices [j].z = 1 / varr[j]->z;
+    poly.vertices [j].u = texes[j]->x;
+    poly.vertices [j].v = texes[j]->y;
+    if (gouraud)
+    {
+      int lm_idx = control_y[j]*(lm_width+2) + control_x[j];
+      //@@@ NOT EFFICIENT!
+      poly.vertices[j].r = ((float)mapR[lm_idx])/256.;
+      poly.vertices[j].g = ((float)mapG[lm_idx])/256.;
+      poly.vertices[j].b = ((float)mapB[lm_idx])/256.;
+    }
+  }
 
-	for (j = 0; j < rescount; j++)
-	{
-	  poly.vertices [j].sx = cpoly [j].x;
-	  poly.vertices [j].sy = cpoly [j].y;
-	}
-	CHK (delete[] cpoly);
+  for (j = 0; j < rescount; j++)
+  {
+    poly.vertices [j].sx = cpoly [j].x;
+    poly.vertices [j].sy = cpoly [j].y;
+  }
+  CHK (delete[] cpoly);
 
-	//poly.pi_triangle = ; //DPQFIX
+  //poly.pi_triangle = ; //DPQFIX
         PreparePolygonQuick (&poly, (csVector2 *)persp, gouraud);
-	// Draw resulting polygon
-	rview.g3d->DrawPolygonQuick (poly);
+  // Draw resulting polygon
+  rview.g3d->DrawPolygonQuick (poly);
       }
     }
     rview.g3d->FinishPolygonQuick ();
@@ -341,7 +341,7 @@ void csThing::Draw (csRenderView& rview, bool use_z_buf)
       csVector3 wv = wor_verts[0];
       csVector3 world_coord = obj.This2Other (wv);
       csVector3 camera_coord = rview.Other2This (world_coord);
-	
+  
       if (camera_coord.z > 0.0001)
       {
         res=(int)(40.0/camera_coord.z);
@@ -385,9 +385,9 @@ void csThing::DrawFoggy (csRenderView& d)
 
       if ( !front &&
            p->ClipToPlane (d.do_clip_plane ? &d.clip_plane : (csPlane*)NULL, d.GetOrigin (),
-	   	verts, num_verts, false) &&
+      verts, num_verts, false) &&
            p->DoPerspective (d, verts, num_verts, &csPolygon2D::clipped, orig_triangle, d.IsMirrored ()) &&
-	   csPolygon2D::clipped.ClipAgainst (d.view) )
+     csPolygon2D::clipped.ClipAgainst (d.view) )
       {
         if (wf)
         {
@@ -401,19 +401,19 @@ void csThing::DrawFoggy (csRenderView& d)
         }
         Stats::polygons_drawn++;
 
-	csPolygon2D::clipped.AddFogPolygon (d.g3d, p, p->GetPlane (), d.IsMirrored (),
-		GetID (), CS_FOG_BACK);
+  csPolygon2D::clipped.AddFogPolygon (d.g3d, p, p->GetPlane (), d.IsMirrored (),
+    GetID (), CS_FOG_BACK);
 
         long do_edges;
         d.g3d->GetRenderState (G3DRENDERSTATE_EDGESENABLE, do_edges);
-	if (do_edges)
-	{
-  	  ITextureManager* txtmgr;
-  	  d.g3d->GetTextureManager (&txtmgr);
-  	  int white;
-  	  txtmgr->FindRGB (255, 255, 255, white);
+  if (do_edges)
+  {
+      ITextureManager* txtmgr;
+      d.g3d->GetTextureManager (&txtmgr);
+      int white;
+      txtmgr->FindRGB (255, 255, 255, white);
           csPolygon2D::clipped.Draw (d.g2d, white);
-	}
+  }
       }
     }
     d.SetMirrored (!d.IsMirrored ());
@@ -425,9 +425,9 @@ void csThing::DrawFoggy (csRenderView& d)
 
       if ( front &&
            p->ClipToPlane (d.do_clip_plane ? &d.clip_plane : (csPlane*)NULL, d.GetOrigin (),
-	   	verts, num_verts, true) &&
+      verts, num_verts, true) &&
            p->DoPerspective (d, verts, num_verts, &csPolygon2D::clipped, orig_triangle, d.IsMirrored ()) &&
-	   csPolygon2D::clipped.ClipAgainst (d.view) )
+     csPolygon2D::clipped.ClipAgainst (d.view) )
       {
         if (wf)
         {
@@ -441,19 +441,19 @@ void csThing::DrawFoggy (csRenderView& d)
         }
         Stats::polygons_drawn++;
 
-	csPolygon2D::clipped.AddFogPolygon (d.g3d, p, p->GetPlane (), d.IsMirrored (),
-		GetID (), CS_FOG_FRONT);
+  csPolygon2D::clipped.AddFogPolygon (d.g3d, p, p->GetPlane (), d.IsMirrored (),
+    GetID (), CS_FOG_FRONT);
 
         long do_edges;
         d.g3d->GetRenderState (G3DRENDERSTATE_EDGESENABLE, do_edges);
-	if (do_edges)
-	{
-  	  ITextureManager* txtmgr;
-  	  d.g3d->GetTextureManager (&txtmgr);
-  	  int white;
-  	  txtmgr->FindRGB (255, 255, 255, white);
+  if (do_edges)
+  {
+      ITextureManager* txtmgr;
+      d.g3d->GetTextureManager (&txtmgr);
+      int white;
+      txtmgr->FindRGB (255, 255, 255, white);
           csPolygon2D::clipped.Draw (d.g2d, white);
-	}
+  }
       }
     }
     d.g3d->CloseFogObject (GetID ());
@@ -500,8 +500,8 @@ void csThing::CalculateLighting (csLightView& lview)
   draw_busy--;
 }
 
-void csThing::DumpFrustrum (csStatLight* l, csVector3* frustrum, int num_frustrum,
-	csTransform& t)
+void csThing::DumpFrustrum (csStatLight* /*l*/, csVector3* /*frustrum*/, int /*num_frustrum*/,
+  csTransform& /*t*/)
 {
 //@@@
 #if 0
@@ -518,7 +518,7 @@ void csThing::DumpFrustrum (csStatLight* l, csVector3* frustrum, int num_frustru
     csVector3* new_frustrum = NULL;
     int new_num_frustrum = 0;
     if (p->ClipFrustrum (l->get_center (), frustrum, num_frustrum, false/*@@@unsupported*/,
-    	&new_frustrum, &new_num_frustrum))
+      &new_frustrum, &new_num_frustrum))
     {
       ITextureManager* txtmgr;
       g3d->GetTextureManager (&txtmgr);
@@ -590,9 +590,9 @@ void csThing::Merge (csThing* other)
 
 
 void csThing::MergeTemplate (csThingTemplate* tpl,
-	csTextureHandle* default_texture, float default_texlen,
-	CLights* default_lightx,
-	csVector3* shift, csMatrix3* transform)
+  csTextureHandle* default_texture, float default_texlen,
+  CLights* default_lightx,
+  csVector3* shift, csMatrix3* transform)
 {
   (void)default_texlen;
   int i, j;
@@ -623,9 +623,9 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
     for (j = 0 ; j < pt->GetNumVertices () ; j++)
       p->AddVertex (merge_vertices[idx[j]]);
     p->SetFlags (CS_POLY_LIGHTING|CS_POLY_MIPMAP|CS_POLY_FLATSHADING,
-    	(pt->IsLighted () ? CS_POLY_LIGHTING : 0) |
-    	(pt->IsMipmapped () ? CS_POLY_MIPMAP : 0) |
-    	(pt->UseFlatColor () ? CS_POLY_FLATSHADING : 0));
+      (pt->IsLighted () ? CS_POLY_LIGHTING : 0) |
+      (pt->IsMipmapped () ? CS_POLY_MIPMAP : 0) |
+      (pt->UseFlatColor () ? CS_POLY_FLATSHADING : 0));
     p->SetTextureSpace (pt->GetTextureMatrix (), pt->GetTextureVector ());
     if (pt->UseGouraud ())
       p->SetColor (0, 0, 0, 0);

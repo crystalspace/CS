@@ -119,7 +119,7 @@ csTextureMMSoftware::~csTextureMMSoftware ()
 }
 
 void csTextureMMSoftware::convert_to_internal (csTextureManager* tex,
-	IImageFile* imfile, unsigned char* bm)
+  IImageFile* imfile, unsigned char* bm)
 {
   csTextureManagerSoftware* texs = (csTextureManagerSoftware*)tex;
   if (texs->txtMode == TXT_GLOBAL)
@@ -131,7 +131,7 @@ void csTextureMMSoftware::convert_to_internal (csTextureManager* tex,
 }
 
 void csTextureMMSoftware::convert_to_internal_global (csTextureManagerSoftware* tex,
-	IImageFile* imfile, unsigned char* bm)
+  IImageFile* imfile, unsigned char* bm)
 {
   int s;
   imfile->GetSize (s);
@@ -148,8 +148,8 @@ void csTextureMMSoftware::convert_to_internal_global (csTextureManagerSoftware* 
       *bm++ = tex->find_rgb (bmsrc->red, bmsrc->green, bmsrc->blue);
 }
 
-void csTextureMMSoftware::convert_to_internal_24bit (csTextureManagerSoftware* tex,
-	IImageFile* imfile, unsigned char* bm)
+void csTextureMMSoftware::convert_to_internal_24bit (csTextureManagerSoftware* /*tex*/,
+  IImageFile* imfile, unsigned char* bm)
 {
   int s;
   imfile->GetSize (s);
@@ -167,8 +167,8 @@ void csTextureMMSoftware::convert_to_internal_24bit (csTextureManagerSoftware* t
       *bml++ = (bmsrc->red << 16) | (bmsrc->green << 8) | bmsrc->blue;
 }
 
-void csTextureMMSoftware::convert_to_internal_private (csTextureManagerSoftware* tex,
-	IImageFile* imfile, unsigned char* bm)
+void csTextureMMSoftware::convert_to_internal_private (csTextureManagerSoftware* /*tex*/,
+  IImageFile* imfile, unsigned char* bm)
 {
   int s;
   imfile->GetSize (s);
@@ -1287,7 +1287,7 @@ STDMETHODIMP csTextureManagerSoftware::FreeImages ()
   return S_OK;
 }
 
-STDMETHODIMP csTextureManagerSoftware::ReserveColor (int r, int g, int b, bool privcolor)
+STDMETHODIMP csTextureManagerSoftware::ReserveColor (int r, int g, int b, bool /*privcolor*/)
 {
   alloc_rgb (r, g, b, 0);
   return S_OK;

@@ -166,8 +166,8 @@ void SysMouseDriver::Close()
 // The System driver ////////////////
 
 BEGIN_INTERFACE_TABLE(SysSystemDriver)
-	IMPLEMENTS_COMPOSITE_INTERFACE(Win32SystemDriver)
-	IMPLEMENTS_COMPOSITE_INTERFACE(System)
+        IMPLEMENTS_COMPOSITE_INTERFACE(Win32SystemDriver)
+        IMPLEMENTS_COMPOSITE_INTERFACE(System)
 END_INTERFACE_TABLE()
 
 IMPLEMENT_UNKNOWN_NODELETE(SysSystemDriver)
@@ -240,29 +240,30 @@ IMPLEMENT_COMPOSITE_UNKNOWN_AS_EMBEDDED( SysSystemDriver, Win32SystemDriver )
 
 STDMETHODIMP SysSystemDriver::XWin32SystemDriver::GetInstance(HINSTANCE* retval)
 {
-	*retval = gb_hInstance;
-	return S_OK;
+        *retval = gb_hInstance;
+        return S_OK;
 }
 
 STDMETHODIMP SysSystemDriver::XWin32SystemDriver::GetIsActive()
 {
-	return gb_bActive ? S_OK : S_FALSE;
+        return gb_bActive ? S_OK : S_FALSE;
 }
 
 STDMETHODIMP SysSystemDriver::XWin32SystemDriver::GetCmdShow(int* retval)
 {
-	*retval = gb_nCmdShow;
-	return S_OK;
+        *retval = gb_nCmdShow;
+        return S_OK;
 }
 
 // Windows input translator ////////////
 
-inline void WinKeyTrans(csSystemDriver* pSystemDriver, WPARAM wParam, bool shift, bool alt, bool ctrl, bool down)
+inline void WinKeyTrans(csSystemDriver* pSystemDriver, WPARAM wParam, 
+                        bool /*shift*/, bool /*alt*/, bool /*ctrl*/, bool down)
 {
   if(!pSystemDriver) return;
   
   // handle standard alphabetical.
-/*		if((wParam >= 'A') && (wParam <= 'z'))
+/*              if((wParam >= 'A') && (wParam <= 'z'))
     {
       if(down)
         pSystemDriver->Keyboard->do_keypress (SysGetTime (), wParam + ('a' - 'A')) ;
@@ -390,8 +391,8 @@ long FAR PASCAL WindowProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
   case WM_CHAR:
     if(System)
     {
-	System->Keyboard->do_keypress (SysGetTime (), wParam) ;
-	System->Keyboard->do_keyrelease (SysGetTime (), wParam) ;
+        System->Keyboard->do_keypress (SysGetTime (), wParam) ;
+        System->Keyboard->do_keyrelease (SysGetTime (), wParam) ;
     }
     break;
     
@@ -456,8 +457,8 @@ long FAR PASCAL WindowProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 
 extern int main (int argc, char* argv[]);
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, 
-                   LPSTR lpCmdLine, int nCmdShow )
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, 
+                   LPSTR /*lpCmdLine*/, int nCmdShow )
 {
   gb_hInstance = hInstance;
   DllHandle = gb_hInstance;

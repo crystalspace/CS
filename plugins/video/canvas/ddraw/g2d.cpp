@@ -27,35 +27,35 @@ DirectDetectionDevice * DirectDevice;
 
 void sys_fatalerror(char *str, HRESULT hRes = S_OK)
 {
-	LPVOID lpMsgBuf;
-	char* szMsg;
-	char szStdMessage[] = "Last Error: ";
-	if (FAILED(hRes))
-	{
-		DWORD dwResult;
-		dwResult = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL,
-								 hRes,  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
-							     (LPTSTR) &lpMsgBuf, 0, NULL );
-	
-		if (dwResult != 0)
-		{
-			szMsg = new char[strlen((const char*)lpMsgBuf) + strlen(str) + strlen(szStdMessage) + 1];
-			strcpy( szMsg, str );
-			strcat( szMsg, szStdMessage );
-			strcat( szMsg, (const char*)lpMsgBuf );
-			
-			LocalFree( lpMsgBuf );
-			
-			MessageBox (NULL, szMsg, "Fatal Error in DirectDraw2D.dll", MB_OK|MB_TOPMOST);
-			delete szMsg;
+  LPVOID lpMsgBuf;
+  char* szMsg;
+  char szStdMessage[] = "Last Error: ";
+  if (FAILED(hRes))
+  {
+    DWORD dwResult;
+    dwResult = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL,
+                 hRes,  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
+                   (LPTSTR) &lpMsgBuf, 0, NULL );
+  
+    if (dwResult != 0)
+    {
+      szMsg = new char[strlen((const char*)lpMsgBuf) + strlen(str) + strlen(szStdMessage) + 1];
+      strcpy( szMsg, str );
+      strcat( szMsg, szStdMessage );
+      strcat( szMsg, (const char*)lpMsgBuf );
+      
+      LocalFree( lpMsgBuf );
+      
+      MessageBox (NULL, szMsg, "Fatal Error in DirectDraw2D.dll", MB_OK|MB_TOPMOST);
+      delete szMsg;
 
-			exit(1);
-		}
-	}
+      exit(1);
+    }
+  }
 
-	MessageBox(NULL, str, "Fatal Error in DirectDraw2D.dll", MB_OK|MB_TOPMOST);
-	
-	exit(1);
+  MessageBox(NULL, str, "Fatal Error in DirectDraw2D.dll", MB_OK|MB_TOPMOST);
+  
+  exit(1);
 }
 
 /////The 2D Graphics Driver//////////////
@@ -181,7 +181,7 @@ csGraphics2DDDraw3::csGraphics2DDDraw3(ISystem* piSystem, bool bUses3D) :
   // QI for IWin32SystemDriver //
   ddrval = piSystem->QueryInterface(IID_IWin32SystemDriver, (void**)&m_piWin32System);
   if (FAILED(ddrval))
-  	  sys_fatalerror("csGraphics2DDDraw3::Open(QI) -- ISystem passed does not support IWin32SystemDriver.", ddrval);
+      sys_fatalerror("csGraphics2DDDraw3::Open(QI) -- ISystem passed does not support IWin32SystemDriver.", ddrval);
 }
 
 csGraphics2DDDraw3::~csGraphics2DDDraw3(void)
@@ -238,7 +238,9 @@ void csGraphics2DDDraw3::Initialize ()
   if (ddrval != DD_OK)
     sys_fatalerror("csGraphics2DDDraw3::Open(DirectDrawCreate) Can't create DirectDraw device", ddrval);
 
-  int RedMask, GreenMask, BlueMask;
+  int RedMask   = 0x00FF0000;
+  int GreenMask = 0x0000FF00;
+  int BlueMask  = 0x000000FF;
 
   if(!FullScreen)
   {
@@ -325,7 +327,7 @@ void csGraphics2DDDraw3::Initialize ()
     // calculate CS's pixel format structure.
     pfmt.PixelBytes = 4;
     pfmt.PalEntries = 0;
-   	
+   
     pfmt.RedMask = RedMask;
     pfmt.GreenMask = GreenMask;
     pfmt.BlueMask = BlueMask;
@@ -349,14 +351,14 @@ bool csGraphics2DDDraw3::Open(char *Title)
   DWORD exStyle = 0;
   DWORD style = WS_POPUP;
   if (!FullScreen)
-	  style |= WS_CAPTION;
+    style |= WS_CAPTION;
   
   int wwidth,wheight;
   wwidth=Width+2*GetSystemMetrics(SM_CXSIZEFRAME);
   wheight=Height+2*GetSystemMetrics(SM_CYSIZEFRAME)+GetSystemMetrics(SM_CYCAPTION);
   
   m_hWnd = CreateWindowEx(exStyle, NAME, Title, style,
-	                      (GetSystemMetrics(SM_CXSCREEN)-wwidth)/2,
+                        (GetSystemMetrics(SM_CXSCREEN)-wwidth)/2,
                           (GetSystemMetrics(SM_CYSCREEN)-wheight)/2,
                           wwidth, wheight, NULL, NULL, m_hInstance, NULL );
   if( !m_hWnd )
@@ -521,10 +523,10 @@ bool csGraphics2DDDraw3::DoubleBuffer ()
   return true;
 }
 
-void csGraphics2DDDraw3::Print (csRect *area)
+void csGraphics2DDDraw3::Print (csRect* /*area*/)
 {
   RECT r={0,0,Width,Height};
-  POINT	pt;
+  POINT pt;
   HRESULT ddrval;
   
   while( 1 )
@@ -535,11 +537,11 @@ void csGraphics2DDDraw3::Print (csRect *area)
       if( ddrval == DDERR_SURFACELOST ) 
       { 
         ddrval = m_lpddsPrimary->Restore();
-	if( m_lpddsBack ) 
+        if( m_lpddsBack ) 
         { 
           if( m_lpddsBack->IsLost() != DD_OK ) 
             m_lpddsBack->Restore(); 
-	} 
+        } 
       }
     }
     else
@@ -554,21 +556,25 @@ void csGraphics2DDDraw3::Print (csRect *area)
       r.right += pt.x;
       r.bottom += pt.y;
       
-      HDC hdc;
-      HPALETTE oldPal;
       
       if(m_bPalettized)
       {
+        HDC      hdc;
+        HPALETTE oldPal;
+
         hdc = GetDC(m_hWnd);
         
         oldPal = SelectPalette(hdc, hWndPalette, FALSE);
         RealizePalette(hdc);
-      }
-      
-      ddrval = m_lpddsPrimary->Blt(&r, m_lpddsBack, NULL, DDBLT_WAIT, NULL);
-      
-      if(m_bPalettized)
+
+        ddrval = m_lpddsPrimary->Blt(&r, m_lpddsBack, NULL, DDBLT_WAIT, NULL);
+
         SelectPalette(hdc, oldPal, FALSE);
+      }
+      else
+      {
+        ddrval = m_lpddsPrimary->Blt(&r, m_lpddsBack, NULL, DDBLT_WAIT, NULL);
+      }
     }
     if( ddrval == DD_OK ) break;
     
@@ -601,11 +607,15 @@ unsigned char *csGraphics2DDDraw3::LockBackBuf()
   }
   
   ddsd.dwSize = sizeof(ddsd);
-  while (ret== DDERR_WASSTILLDRAWING)
+
+  do
+  {
     ret=m_lpddsBack->Lock(NULL, &ddsd, DDLOCK_SURFACEMEMORYPTR, NULL);
+  }
+  while (ret==DDERR_WASSTILLDRAWING);
   
   if (ret!=DD_OK)
-	  sys_fatalerror("There was an error locking the DirectDraw surface.", ret);
+    sys_fatalerror("There was an error locking the DirectDraw surface.", ret);
 
   m_bLocked = true;
 
@@ -678,6 +688,7 @@ void csGraphics2DDDraw3::SetRGB(int i, int r, int g, int b)
 bool csGraphics2DDDraw3::SetMouseCursor (int iShape, ITextureHandle *hBitmap)
 {
   (void)hBitmap;
+  (void)iShape;
 
   return false; //the code below needs more work on the general Win32 files, 
                 //but just returning false will give us a working MazeD for now

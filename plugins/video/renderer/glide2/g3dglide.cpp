@@ -375,10 +375,12 @@ csGraphics3DGlide2x::csGraphics3DGlide2x(ISystem* piSystem) :
 {
   HRESULT hRes;
 // BM 21-02: Not existing definition replaced
+#if !defined (OS_WIN32) && !defined (OS_MACOS)
 #ifndef GLIDE_2D_DRIVER
   char *sz2DDriver = "crystalspace.graphics3d.glide.2x";
 #else
   char *sz2DDriver = GLIDE_2D_DRIVER;
+#endif
 #endif
 
   IGraphics2DFactory* piFactory = NULL;
@@ -797,7 +799,9 @@ STDMETHODIMP csGraphics3DGlide2x::SetZBufMode (ZBufMode mode)
 
 #define SNAP (( float ) ( 3L << 18 ))
 
-void csGraphics3DGlide2x::RenderPolygonSinglePass (GrVertex * verts, int num, bool haslight,TextureHandler*text,TextureHandler*light,bool is_transparent)
+void csGraphics3DGlide2x::RenderPolygonSinglePass (GrVertex * verts, int num, bool haslight,
+                                                   TextureHandler* text, TextureHandler* light,
+                                                   bool /*is_transparent*/)
 {
   int i;
   for(i=0;i<num;i++) 
@@ -996,8 +1000,8 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
 
   //HighColorCacheAndManage_Data* tcache;
   //HighColorCacheAndManage_Data* lcache;
-  HighColorCache_Data* tcache;
-  HighColorCache_Data* lcache;
+  HighColorCache_Data* tcache = NULL;
+  HighColorCache_Data* lcache = NULL;
   
   // retrieve the cached texture handle.
   tcache = txt_mm->get_hicolorcache();
@@ -1032,7 +1036,7 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
   }
   else
   {
-      GlideLib_grConstantColorValue(0xFFFFFFFF);
+    GlideLib_grConstantColorValue(0xFFFFFFFF);
   }
         
   verts=new GrVertex[poly.num];
@@ -1123,6 +1127,19 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
   return S_OK;
 }
 
+/// Start DrawPolygonQuick drawing.
+STDMETHODIMP csGraphics3DGlide2x::StartPolygonQuick (ITextureHandle* /*handle*/, bool gouraud) 
+{ 
+  m_gouraud = gouraud;
+  return S_OK; 
+}
+
+/// Finish DrawPolygonQuick drawing.
+STDMETHODIMP csGraphics3DGlide2x::FinishPolygonQuick () 
+{ 
+  return S_OK; 
+}
+
 /// Draw a projected (non-perspective correct) polygon.
 STDMETHODIMP csGraphics3DGlide2x::DrawPolygonQuick (G3DPolygonDPQ& poly)
 {
@@ -1153,7 +1170,7 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygonQuick (G3DPolygonDPQ& poly)
       verts[i].y = y + SNAP;
       x-=m_nHalfWidth;
       y-=m_nHalfHeight;
-      if(gouraud)
+      if(m_gouraud)
       {
         verts[i].r = poly.vertices[i].r*255;
         verts[i].g = poly.vertices[i].g*255;
@@ -1199,7 +1216,7 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygonQuick (G3DPolygonDPQ& poly)
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DGlide2x::StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, bool gouraud)
+STDMETHODIMP csGraphics3DGlide2x::StartPolygonFX(ITextureHandle* handle, DPFXMixMode /*mode*/, bool gouraud)
 {
   //This implementation is pretty wrong, but at least, it will show something on the screen
   return StartPolygonQuick(handle, gouraud);
@@ -1211,7 +1228,7 @@ STDMETHODIMP csGraphics3DGlide2x::FinishPolygonFX()
   return FinishPolygonQuick();
 }
 
-STDMETHODIMP csGraphics3DGlide2x::DrawPolygonFX(G3DPolygonDPFX& poly, bool gouraud)
+STDMETHODIMP csGraphics3DGlide2x::DrawPolygonFX(G3DPolygonDPFX& poly, bool /*gouraud*/)
 {
   //This implementation is pretty wrong, but at least, it will show something on the screen
   G3DPolygonDPQ newpoly;
@@ -1259,7 +1276,7 @@ STDMETHODIMP csGraphics3DGlide2x::ClearCache(void)
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DGlide2x::DrawFltLight(G3DFltLight& light)
+STDMETHODIMP csGraphics3DGlide2x::DrawFltLight(G3DFltLight& /*light*/)
 {
     return E_NOTIMPL;
 }
@@ -1430,17 +1447,19 @@ STDMETHODIMP csGraphics3DGlide2x::GetZBufPoint(int, int, unsigned long** retval)
   return E_NOTIMPL;
 }
 
-STDMETHODIMP csGraphics3DGlide2x::OpenFogObject (CS_ID id, csFog* fog)
+STDMETHODIMP csGraphics3DGlide2x::OpenFogObject (CS_ID /*id*/, csFog* /*fog*/)
 {
   return E_NOTIMPL;
 }
 
-STDMETHODIMP csGraphics3DGlide2x::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype)
+STDMETHODIMP csGraphics3DGlide2x::AddFogPolygon (CS_ID /*id*/, 
+                                                 G3DPolygonAFP& /*poly*/, 
+                                                 int /*fogtype*/)
 {
   return E_NOTIMPL;
 }
 
-STDMETHODIMP csGraphics3DGlide2x::CloseFogObject (CS_ID id)
+STDMETHODIMP csGraphics3DGlide2x::CloseFogObject (CS_ID /*id*/)
 {
   return E_NOTIMPL;
 }
@@ -1755,7 +1774,7 @@ csGraphics3DGlide2x::csHaloDrawer::~csHaloDrawer()
   FINAL_RELEASE(mpiG2D);
 }
 
-void csGraphics3DGlide2x::csHaloDrawer::drawline_vertical(int x, int y1, int y2)
+void csGraphics3DGlide2x::csHaloDrawer::drawline_vertical(int /*x*/, int y1, int y2)
 {
   int i;
   unsigned long* buf;

@@ -145,7 +145,7 @@ void HighColorCache::Add(IPolygonTexture *polytex)
 {
     HighColorCache_Data *cached_texture;
     ILightMap *piLM; 
-    HighColorCache_Data* l;
+    HighColorCache_Data* l = NULL;
     
     // first recalcul of lightmap
     bool dl;

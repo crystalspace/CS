@@ -488,7 +488,7 @@ csDrawScanline csGraphics3DSoftware::ScanProc_16_Alpha
 }
 
 csDrawScanline csGraphics3DSoftware::ScanProc_32_Alpha
-  (csGraphics3DSoftware *This, int alpha)
+  (csGraphics3DSoftware* /*This*/, int alpha)
 {
   Scan.AlphaFact = (alpha * 256) / 100;
 
@@ -2162,7 +2162,8 @@ finish:
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DSoftware::StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, bool gouraud)
+STDMETHODIMP csGraphics3DSoftware::StartPolygonFX(ITextureHandle* /*handle*/, 
+                                                  DPFXMixMode /*mode*/, bool /*gouraud*/)
 {
 #if 0
   //The following code definitely is a MESS: I just copied it from StartPolygonQuick, and did some
@@ -2329,7 +2330,8 @@ STDMETHODIMP csGraphics3DSoftware::FinishPolygonFX()
   return FinishPolygonQuick();
 }
 
-STDMETHODIMP csGraphics3DSoftware::DrawPolygonFX(G3DPolygonDPFX& poly, bool gouraud)
+STDMETHODIMP csGraphics3DSoftware::DrawPolygonFX(G3DPolygonDPFX& poly, 
+                                                 bool /*gouraud*/)
 {
   //This implementation is pretty wrong, but at least, it will show something on the screen
   G3DPolygonDPQ newpoly;

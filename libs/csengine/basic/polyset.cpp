@@ -763,8 +763,8 @@ int find_chull (int nverts, csVector2 *vertices, csVector2 *&chull)
 
 #define EPS	0.00001
 
-csVector2* csPolygonSet::IntersectCameraZPlane (float z,csVector2 *clipper,
-	int num_clip, int &num_vertices)
+csVector2* csPolygonSet::IntersectCameraZPlane (float z,csVector2* /*clipper*/,
+  int /*num_clip*/, int &num_vertices)
 {
   int i, j, n, num_pts=0;
 

@@ -248,7 +248,7 @@ void csSprite3D::SetMove (float x, float y, float z)
   v_obj2world.z = -z;
 }
 
-void csSprite3D::SetTransform (csMatrix3& matrix)
+void csSprite3D::SetTransform (const csMatrix3& matrix)
 {
   m_obj2world = matrix;
   m_world2obj = m_obj2world.GetInverse ();
@@ -289,7 +289,7 @@ BOOL gePosition::MoveTo(csVector3 Pos)
   }
 }
 */
-bool csSprite3D::MoveTo(csVector3 &move_to)
+bool csSprite3D::MoveTo(const csVector3 &move_to)
 {
   csVector3 old_place(v_obj2world.x,v_obj2world.y,v_obj2world.z);
   csOrthoTransform OldPos (csMatrix3(1,0,0,0,1,0,0,0,1), old_place);
@@ -420,9 +420,9 @@ void csSprite3D::Draw (csRenderView& rview)
   // Calculate the right LOD level for this sprite.
   // Select the appropriate mesh.
   csTriangleMesh* m;
-  int* emerge_from;
+  int* emerge_from = NULL;
   int num_verts;
-  float fnum;
+  float fnum = 0.0f;
   if (cfg_lod_detail < 0 || cfg_lod_detail == 1)
   {
     m = tpl->GetBaseMesh ();

@@ -314,7 +314,7 @@ public:
    * already exists in the containing csPolygonSet. If so,
    * return that index. Otherwise add the new vertex.
    */
-  int AddVertex (csVector3& v);
+  int AddVertex (const csVector3& v);
 
   /**
    * Add a vertex in a smart way: check if the vertex

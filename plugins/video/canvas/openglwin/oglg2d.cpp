@@ -155,7 +155,7 @@ void CreateIdentityPalette(RGBpaletteEntry *p)
     sys_fatalerror("Error creating identity palette.");
 }
 
-csGraphics2DOpenGL::csGraphics2DOpenGL(ISystem* piSystem, bool bUses3D) : 
+csGraphics2DOpenGL::csGraphics2DOpenGL(ISystem* piSystem, bool /*bUses3D*/) : 
                    csGraphics2DGLCommon (piSystem),
                    m_hWnd(NULL),
                    m_bDisableDoubleBuffer(false),
@@ -390,7 +390,7 @@ bool csGraphics2DOpenGL::DoubleBuffer ()
   return m_bDisableDoubleBuffer;
 }
 
-void csGraphics2DOpenGL::Print (csRect *area)
+void csGraphics2DOpenGL::Print (csRect */*area*/)
 {
   SwapBuffers(hDC);
   glFlush();

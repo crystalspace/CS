@@ -213,7 +213,7 @@ void GlideTextureCache::Load(HighColorCacheAndManage_Data *d)
  if(bdef)
  {
     unsigned char *lpSrc = NULL;
-    unsigned short *mem = NULL;
+    //unsigned short *mem = NULL;
     //RGBpaletteEntry* GPalette;
 
     //piTM->GetBitmap(&lpSrc);

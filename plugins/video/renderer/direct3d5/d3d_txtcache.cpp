@@ -93,9 +93,9 @@ void D3DTextureCache::Load(HighColorCache_Data *d)
   unsigned long *lpL;
   unsigned char *lpSrc, *lpySrc;
   
-  int red_shift, red_scale;
-  int green_shift, green_scale;
-  int blue_shift, blue_scale;
+  int red_shift   = 0, red_scale   = 0;
+  int green_shift = 0, green_scale = 0;
+  int blue_shift  = 0, blue_scale  = 0;
   
   ASSERT( m_lpDD );
   
@@ -458,9 +458,9 @@ void D3DLightMapCache::Load(HighColorCache_Data *d)
   unsigned long m;
   int s;
   
-  int red_shift, red_scale;
-  int green_shift, green_scale;
-  int blue_shift, blue_scale;
+  int red_shift   = 0, red_scale   = 0;
+  int green_shift = 0, green_scale = 0;
+  int blue_shift  = 0, blue_scale  = 0;
   
   if (bpp!=8)
   {

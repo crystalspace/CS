@@ -141,7 +141,7 @@ HRESULT CALLBACK csGraphics3DDirect3DDx5::EnumTextFormatsCallback(LPDDSURFACEDES
 csGraphics3DDirect3DDx5::csGraphics3DDirect3DDx5(ISystem* piSystem) : 
 m_bIsHardware(false),
 m_bHaloEffect(false),
-m_dwDeviceBitDepth(-1),
+m_dwDeviceBitDepth(0),
 m_hd3dBackMat(NULL),
 m_bIsLocked(false),
 m_iTypeLightmap(-1),
@@ -247,7 +247,7 @@ STDMETHODIMP csGraphics3DDirect3DDx5::Open(char* Title)
   LPD3DDEVICEDESC lpD3dDeviceDesc;
   DWORD dwDeviceMemType;
   DWORD dwZBufferMemType;
-  DWORD dwZBufferBitDepth;
+  DWORD dwZBufferBitDepth = 0;
   DDSURFACEDESC ddsd;
   HRESULT hRes;
   BOOL ddsdFound = FALSE;
@@ -884,8 +884,8 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
   float M, N, O;
   int i;
   
-  HighColorCache_Data* pTexCache;
-  HighColorCache_Data* pLightCache;
+  HighColorCache_Data* pTexCache   = NULL;
+  HighColorCache_Data* pLightCache = NULL;
   D3DTLVERTEX vx;
   
   IPolygonTexture* pTex;
@@ -1059,11 +1059,14 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
       if(!bTransparent)
       {
         if(m_iTypeLightmap == 2)
-          vx.color = D3DRGBA(1.0, 1.0, 1.0, 1.0);
+          vx.color = (D3DCOLOR) D3DRGBA(1.0f, 1.0f, 1.0f, 1.0f);
         else
-          vx.color = D3DRGB(1.0, 1.0, 1.0);
+          vx.color = D3DRGB(1.0f, 1.0f, 1.0f);
       }
-      else vx.color = D3DRGBA(1.0, 1.0, 1.0, (float)poly_alpha/100.0f);
+      else 
+      {
+        vx.color = D3DRGBA(1.0f, 1.0f, 1.0f, (float)poly_alpha/100.0f);
+      }
       
       vx.specular = 0;
 
@@ -1110,6 +1113,8 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
 
 STDMETHODIMP csGraphics3DDirect3DDx5::StartPolygonQuick(ITextureHandle* handle, bool gouraud )
 { 
+  m_gouraud = gouraud;
+
   HighColorCache_Data *pTexData;
   
   csTextureMMDirect3D* txt_mm = (csTextureMMDirect3D*)GetcsTextureMMFromITextureHandle (handle);
@@ -1142,7 +1147,7 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonQuick (G3DPolygonDPQ& poly)
     vx.sy = m_nHeight-poly.vertices[i].sy;
     vx.sz = SCALE_FACTOR / poly.vertices[i].z;
     vx.rhw = poly.vertices[i].z;
-    if (gouraud)
+    if (m_gouraud)
       vx.color = D3DRGB(poly.vertices[i].r, poly.vertices[i].g, poly.vertices[i].b);
     else
       vx.color = D3DRGB(0.8, 0.8, 0.8);
@@ -1237,6 +1242,8 @@ STDMETHODIMP csGraphics3DDirect3DDx5::FinishPolygonFX()
 
 STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonFX(G3DPolygonDPFX& poly, bool gouraud)
 {
+  m_gouraud = gouraud;
+
   int i;
   D3DTLVERTEX vx;
 
@@ -1272,7 +1279,7 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonFX(G3DPolygonDPFX& poly, bool g
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx5::DrawFltLight(G3DFltLight& light)
+STDMETHODIMP csGraphics3DDirect3DDx5::DrawFltLight(G3DFltLight& /*light*/)
 {
   return E_NOTIMPL;
 }
@@ -1287,7 +1294,7 @@ STDMETHODIMP csGraphics3DDirect3DDx5::GetCaps(G3D_CAPS *caps)
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx5::GetStringError( HRESULT hRes, char* szErrorString )
+STDMETHODIMP csGraphics3DDirect3DDx5::GetStringError( HRESULT /*hRes*/, char* /*szErrorString*/ )
 {
   return E_NOTIMPL;
 }
@@ -1444,17 +1451,19 @@ STDMETHODIMP csGraphics3DDirect3DDx5::GetRenderState(G3D_RENDERSTATEOPTION op, l
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx5::OpenFogObject (CS_ID id, csFog* fog)
+STDMETHODIMP csGraphics3DDirect3DDx5::OpenFogObject (CS_ID /*id*/, csFog* /*fog*/)
 {
   return E_NOTIMPL;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx5::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype)
+STDMETHODIMP csGraphics3DDirect3DDx5::AddFogPolygon (CS_ID /*id*/, 
+                                                     G3DPolygonAFP& /*poly*/, 
+                                                     int /*fogtype*/)
 {
   return E_NOTIMPL;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx5::CloseFogObject (CS_ID id)
+STDMETHODIMP csGraphics3DDirect3DDx5::CloseFogObject (CS_ID /*id*/)
 {
   return E_NOTIMPL;
 }
@@ -1904,7 +1913,7 @@ csGraphics3DDirect3DDx5::csHaloDrawer::~csHaloDrawer()
   FINAL_RELEASE(mpiG2D);
 }
 
-void csGraphics3DDirect3DDx5::csHaloDrawer::drawline_vertical(int x, int y1, int y2)
+void csGraphics3DDirect3DDx5::csHaloDrawer::drawline_vertical(int /*x*/, int y1, int y2)
 {
   int i;
   unsigned long* buf;

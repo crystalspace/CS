@@ -144,7 +144,7 @@ STDMETHODIMP csSoundRenderDS3D::SetVolume(float vol)
 
 STDMETHODIMP csSoundRenderDS3D::GetVolume(float *vol)
 {
-  long dsvol;
+  long dsvol=DSBVOLUME_MIN;
   if (m_pListener)
   {
     m_pListener->m_pDS3DPrimaryBuffer->GetVolume(&dsvol);
@@ -154,7 +154,7 @@ STDMETHODIMP csSoundRenderDS3D::GetVolume(float *vol)
   return S_OK;
 }
 
-STDMETHODIMP csSoundRenderDS3D::PlayEphemeral(csSoundBuffer *snd)
+STDMETHODIMP csSoundRenderDS3D::PlayEphemeral(csSoundBuffer* /*snd*/)
 {
   return S_OK;
 }

@@ -185,7 +185,7 @@ public:
   /// Draw the projected polygon with light and texture.
   STDMETHODIMP DrawPolygon (G3DPolygonDP& poly);
   /// Draw debug poly
-  STDMETHODIMP DrawPolygonDebug(G3DPolygonDP& poly)   { return E_NOTIMPL; }
+  STDMETHODIMP DrawPolygonDebug(G3DPolygonDP& /*poly*/)   { return E_NOTIMPL; }
   
   /// Draw a Line.
   STDMETHODIMP DrawLine (csVector3& v1, csVector3& v2, float fov, int color);
@@ -221,7 +221,7 @@ public:
   STDMETHODIMP GetCaps(G3D_CAPS *caps);
   
   /// Set the texture cache size.
-  STDMETHODIMP SetCacheSize (long size) { return S_OK; }
+  STDMETHODIMP SetCacheSize (long /*size*/) { return S_OK; }
   
   /// Dump the texture cache.
   STDMETHODIMP DumpCache(void);

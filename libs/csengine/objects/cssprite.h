@@ -336,7 +336,7 @@ public:
    * Set the transformation matrix to rotate the sprite in some
    * orientation
    */
-  void SetTransform (csMatrix3& matrix);
+  void SetTransform (const csMatrix3& matrix);
 
   /**
    * Relative move
@@ -351,7 +351,7 @@ public:
   /**
    * Absolute move
    */
-  bool MoveTo(csVector3& v);
+  bool MoveTo(const csVector3& v);
 
   /**
    * The same as above

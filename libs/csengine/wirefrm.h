@@ -99,7 +99,7 @@ public:
   csVector3& GetLocation () { return loc; }
 
   ///
-  void SetLocation (csVector3& v) { loc = v; }
+  void SetLocation (const csVector3& v) { loc = v; }
   ///
   void SetLocation (float x, float y, float z) { loc.x = x; loc.y = y; loc.z = z; }
 
@@ -226,7 +226,7 @@ public:
   csWfColor* RegisterColor (int r, int g, int b);
 
   ///
-  csWfVertex* AddVertex (csVector3& v);
+  csWfVertex* AddVertex (const csVector3& v);
   ///
   csWfLine* AddLine (csVector3& v1, csVector3& v2);
   ///

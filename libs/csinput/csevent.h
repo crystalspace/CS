@@ -268,7 +268,7 @@ public:
   csEvent (long iTime, int eType, int mx, int my, int mbutton, int mShiftKeys);
 
   /// Create a command event object
-  csEvent (long iTime, int eType, unsigned int cCode, void *cInfo = NULL);
+  csEvent (long iTime, int eType, int cCode, void *cInfo = NULL);
 
   /// Destroy an event object
   virtual ~csEvent ();

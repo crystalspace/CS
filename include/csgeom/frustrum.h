@@ -119,7 +119,7 @@ public:
   /**
    * Add a vertex to the frustrum polygon.
    */
-  void AddVertex (csVector3& v);
+  void AddVertex (const csVector3& v);
 
   /**
    * Get the number of vertices.
@@ -186,7 +186,7 @@ public:
    * Check if a point (given relative to the origin of the frustrum)
    * is inside the frustrum.
    */
-  bool Contains (csVector3& point);
+  bool Contains (const csVector3& point);
 
   /// Return true if frustrum is empty.
   bool IsEmpty () const { return !wide && vertices == NULL; }

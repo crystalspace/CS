@@ -726,8 +726,8 @@ void csScan_16_draw_scanline_fog_plane_555 (int xx, unsigned char* d,
 
 #ifndef NO_draw_scanline_fog_plane_565
 
-void csScan_16_draw_scanline_fog_plane_565 (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
+void csScan_16_draw_scanline_fog_plane_565 (int /*xx*/, unsigned char* /*d*/,
+  unsigned long* /*z_buf*/, float /*inv_z*/, float /*u_div_z*/, float /*v_div_z*/)
 {
 }
 

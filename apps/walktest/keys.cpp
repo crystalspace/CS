@@ -45,11 +45,6 @@
 
 #include "igraph3d.h"
 
-#ifdef COMP_VC
-   // disable annoying warning of unsafe mix of bool and int.
-#  pragma warning(disable:4805)
-#endif
-
 csKeyMap* mapping = NULL;
 
 Bot* first_bot = NULL;

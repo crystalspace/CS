@@ -41,7 +41,7 @@ typedef struct
 #define NUM_ThreadPriority 3
 struct
 {
-	DWORD priority;
+  int  priority;
   char *name;
 } ThreadPriority[NUM_ThreadPriority]=
 {
@@ -349,10 +349,11 @@ DWORD WINAPI csSoundDriverWaveOut::waveOutThreadProc( LPVOID dwParam)
     }
     else return msg.wParam;
   }
-  return -1;
+  return 0xFFFFFFFF;
 }
 
-void CALLBACK csSoundDriverWaveOut::waveOutProc(HWAVEOUT hwo, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2)
+void CALLBACK csSoundDriverWaveOut::waveOutProc(HWAVEOUT /*hwo*/, UINT uMsg, DWORD /*dwInstance*/, 
+                                                DWORD dwParam1, DWORD /*dwParam2*/)
 {
   if (uMsg==MM_WOM_DONE)
   {

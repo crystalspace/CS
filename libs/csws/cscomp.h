@@ -274,7 +274,7 @@ public:
     void *param = NULL, bool Zorder = false);
 
   /// Find a child component by its ID
-  csComponent *GetChild (unsigned int find_id);
+  csComponent *GetChild (int find_id);
 
   /// Set the application for this object and all its children
   void SetApp (csApp *newapp);

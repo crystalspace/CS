@@ -102,7 +102,7 @@ public:
   void CutByPlane (const csPlane& cutter);
 
   /// Return true if a point lies within volume.
-  bool Contains (csVector3& p);
+  bool Contains (const csVector3& p);
 
   /// Return true if volume is empty.
   bool IsEmpty ();

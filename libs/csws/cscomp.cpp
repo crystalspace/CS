@@ -210,7 +210,7 @@ static bool find_child_by_id (csComponent *child, void *find_id)
   return (child->id == (unsigned int)find_id);
 }
 
-csComponent *csComponent::GetChild (unsigned int find_id)
+csComponent *csComponent::GetChild (int find_id)
 {
   return ForEach (find_child_by_id, (void *)find_id);
 }
