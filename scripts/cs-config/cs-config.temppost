@@ -2,12 +2,12 @@
 depends()
 {
     case $1 in
-	-lcsutil) DEPS="-lcssys";;
+	-lcsutil) DEPS="-lcssys -lcsgeom";;
 	-lcssys) DEPS="-lcsutil";;
 	-lcsengine) DEPS="-lcssys -lcsutil -lcstool -lcsgeom";;
 	-lcsgeom) DEPS="-lcsutil -lcssys";;
 	-lcsgfx) DEPS="-lcssys -lcsutil";;
-	-lcstool) DEPS="-lcsutil -lcssys";;
+	-lcstool) DEPS="-lcsutil -lcssys -lcsgeom";;
 	-lcsws) DEPS="-lcsgfx -lcsgeom -lcsutil -lcssys";;
 	*) DEPS=""
     esac
@@ -21,7 +21,7 @@ if test -r "$prefix/Makefile"; then
 	    libdir="$prefix/lib"
 	else
 	    #Thanks go to Jorge for this script magic...
-	    libdir=`ls -1d "$CRYSTAL"/out/*/* | sed -e "s~\(.*\)/.*~\1~" -e "1q"`
+	    libdir=`ls -1d "$CRYSTAL"/out/*/*/*/libcssys.a | sed -e "s~\(.*\)/.*~\1~" -e "1q"`
 	    if test -z "$libdir"; then
 	        echo "Couldn't detect dir with lib files, aborting!"
 		echo "  Did you already compile CS?"
