@@ -718,6 +718,12 @@ struct iGraphics3D : public iBase
    * of the vertex buffer manager!
    */
   virtual iVertexBufferManager* GetVertexBufferManager () = 0;
+
+  /**
+   * Check if renderer can handle a lightmap.
+   * Returns true if it can, false if not.
+   */
+  virtual bool IsLightmapOK(iPolygonTexture* poly_texture) = 0;
 };
 
 #endif // __IVIDEO_GRAPH3D_H__

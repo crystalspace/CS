@@ -226,6 +226,9 @@ class csOpenGLProcSoftware : public iGraphics3D
 			     unsigned char *iAlpha, int iWidth, int iHeight);
   virtual void DrawPixmap (iTextureHandle*, int sx, int sy, int sw, int sh,
     int tx, int ty, int tw, int th, uint8 Alpha);
+
+  virtual bool IsLightmapOK (iPolygonTexture* poly_texture)
+  { return g3d->IsLightmapOK(poly_texture); }
 };
 
 

@@ -42,7 +42,7 @@ struct iConfigFile;
 #define MAX_INDEXED_FOG_TABLES	8
 
 // Maximum size of a single lightmap, in pixels
-#define MAX_LIGHTMAP_SIZE	256*256*16*2 //1000000
+#define MAX_LIGHTMAP_SIZE	1500000
 
 /// This structure is used to hold references to all current fog objects.
 struct FogBuffer
@@ -465,6 +465,9 @@ public:
   /// Get the vertex buffer manager.
   virtual iVertexBufferManager* GetVertexBufferManager ()
   { return vbufmgr; }
+
+  /// Check if lightmap is not too large
+  virtual bool IsLightmapOK (iPolygonTexture* poly_texture);
 
   /// Get Z-buffer value at given X,Y position
   virtual float GetZBuffValue (int x, int y);

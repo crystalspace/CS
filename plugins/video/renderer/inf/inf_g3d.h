@@ -299,6 +299,10 @@ public:
     int, int, uint8)
   { }
 
+  /// Check if lightmap is not too large
+  virtual bool IsLightmapOK (iPolygonTexture* poly_texture)	    
+  { return true; }
+
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DInfinite);

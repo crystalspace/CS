@@ -244,6 +244,10 @@ public:
   virtual iVertexBufferManager* GetVertexBufferManager ()
   { return vbufmgr; }
 
+  /// Check if lightmap is not too large
+  virtual bool IsLightmapOK (iPolygonTexture* poly_texture)	    
+  { return true; }
+
   /// Get Z-buffer value at given X,Y position
   virtual float GetZBuffValue (int, int) { return 0; }
 

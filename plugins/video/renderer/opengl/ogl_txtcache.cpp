@@ -431,7 +431,7 @@ void OpenGLLightmapCache::Cache (iPolygonTexture *polytex)
 	// was there room in the previous one. We allocate a new
 	// super-lightmap here.
         cur_lm = (cur_lm+1)%super_lm_num;
-	printf ("New cur_lm=%d\n", cur_lm); fflush (stdout);//@@@
+	//printf ("New cur_lm=%d\n", cur_lm); fflush (stdout);//@@@
         num_lm_processed++;
 
         // Make sure all lightmaps are rendered.
@@ -576,3 +576,9 @@ void OpenGLLightmapCache::Flush (int sup_idx)
   lm_queue.Flush (suplm[sup_idx].Handle);
 }
 
+bool OpenGLLightmapCache::IsLightmapOK (iPolygonTexture *polytex)
+{
+  return (polytex->GetLightMap () &&
+    (polytex->GetLightMap ()->GetWidth () <= super_lm_size) &&
+    (polytex->GetLightMap ()->GetHeight () <= super_lm_size));
+}

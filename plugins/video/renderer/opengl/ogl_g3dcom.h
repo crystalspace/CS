@@ -816,6 +816,9 @@ public:
    */
   void DrawPolygonSingleTexture (G3DPolygonDP &poly);
 
+  /// Check if lightmap is not too large
+  virtual bool IsLightmapOK (iPolygonTexture* poly_texture);
+
   /**
    * Draw a polygon but only do z-fill. Do not actually render
    * anything.

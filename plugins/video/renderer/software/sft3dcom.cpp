@@ -3517,3 +3517,9 @@ float csGraphics3DSoftwareCommon::GetZBuffValue (int x, int y)
   return 16777216.0 / float (zbf);
 }
 
+bool csGraphics3DSoftwareCommon::IsLightmapOK (iPolygonTexture* poly_texture)
+{
+  return ((poly_texture->GetWidth () * poly_texture->GetHeight ()) < MAX_LIGHTMAP_SIZE);
+}
+
+

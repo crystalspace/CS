@@ -5213,3 +5213,9 @@ iTextureManager *csGraphics3DOGLCommon::GetTextureManager ()
 {
   return txtmgr;
 }
+
+bool csGraphics3DOGLCommon::IsLightmapOK (iPolygonTexture* poly_texture)
+{
+  return lightmap_cache->IsLightmapOK (poly_texture);
+}
+

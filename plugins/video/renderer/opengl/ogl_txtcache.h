@@ -275,6 +275,9 @@ public:
 
   /// Clear the entire lightmap cache.
   void Clear ();
+
+  /// Check if lightmap blows size limit
+  bool IsLightmapOK (iPolygonTexture *polytex);
 };
 
 #endif // __GL_TEXTURECACHE_H__
