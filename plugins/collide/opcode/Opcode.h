@@ -65,7 +65,7 @@
         #define __asm  				__asm__
 
 
-	#define	Log
+	#define	Log		printf
 	#define	SetIceError		false
 	#define	EC_OUTOFMEMORY	"Out of memory"
 	#define	Alignment

@@ -33,7 +33,6 @@
 #include "iutil/comp.h"
 #include "csgeom/vector3.h"
 #include "ivaria/collider.h"
-#include "csutil/csdllist.h"
 #include "csgeom/transfrm.h"
 #include "CSopcodecollider.h"
 #include "Opcode.h"
