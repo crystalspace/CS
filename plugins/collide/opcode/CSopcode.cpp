@@ -73,6 +73,8 @@ csOPCODECollideSystem::csOPCODECollideSystem (iBase *pParent)
   TreeCollider.SetTemporalCoherence (true);
   N_pairs = 0;
   pairs = 0;
+  col1 = 0;
+  col2 = 0;
 }
 
 csOPCODECollideSystem::~csOPCODECollideSystem ()
@@ -216,19 +218,20 @@ csCollisionPair* csOPCODECollideSystem::GetCollisionPairs ()
 {     
   int size = (int) (udword(TreeCollider.GetNbPairs ()));
   N_pairs = size;
-  if (N_pairs == 0) { return 0; };
+  if (N_pairs == 0) return 0;
   const Pair* colPairs=TreeCollider.GetPairs ();
   Point* vertholder0 = col1->vertholder;
+  if (!vertholder0) return 0;
   Point* vertholder1 = col2->vertholder;
+  if (!vertholder1) return 0;
   udword* indexholder0 = col1->indexholder;
+  if (!indexholder0) return 0;
   udword* indexholder1 = col2->indexholder;
+  if (!indexholder1) return 0;
   Point* current;
   int i, j;
   
-  if (pairs)
-  {
-    delete[] pairs;
-  }	   
+  delete[] pairs;
   pairs = new csCollisionPair[N_pairs];
    
   // it really sucks having to copy all this each Collide query, but
@@ -252,25 +255,34 @@ csCollisionPair* csOPCODECollideSystem::GetCollisionPairs ()
   {
     j = 3 * colPairs[i].id0;
     current = &vertholder0[indexholder0[j]];		 
-    pairs[i].a1 = T1.This2Other (csVector3 (current->x, current->y, current->z)); 
+    pairs[i].a1 = csVector3 (current->x, current->y, current->z);
     current = &vertholder0[indexholder0[j + 1]];		 
-    pairs[i].b1 = T1.This2Other (csVector3 (current->x, current->y, current->z)); 
+    pairs[i].b1 = csVector3 (current->x, current->y, current->z);
     current = &vertholder0[indexholder0[j + 2]];		 
-    pairs[i].c1 = T1.This2Other (csVector3 (current->x, current->y, current->z)); 
+    pairs[i].c1 = csVector3 (current->x, current->y, current->z);
 
     j = 3 * colPairs[i].id1; 
     current = &vertholder1[indexholder1[j ]];		 
-    pairs[i].a2 = T2.This2Other (csVector3 (current->x, current->y, current->z)); 
+    pairs[i].a2 = csVector3 (current->x, current->y, current->z);
     current = &vertholder1[indexholder1[j + 1 ]];		 
-    pairs[i].b2 = T2.This2Other (csVector3 (current->x, current->y, current->z)); 
+    pairs[i].b2 = csVector3 (current->x, current->y, current->z);
     current = &vertholder1[indexholder1[j + 2 ]];		 
-    pairs[i].c2 = T2.This2Other (csVector3 (current->x, current->y, current->z)); 
+    pairs[i].c2 = csVector3 (current->x, current->y, current->z);
   }
   return pairs;
 }
 
 int csOPCODECollideSystem::GetCollisionPairCount ()
 {
+  Point* vertholder0 = col1->vertholder;
+  if (!vertholder0) return 0;
+  Point* vertholder1 = col2->vertholder;
+  if (!vertholder1) return 0;
+  udword* indexholder0 = col1->indexholder;
+  if (!indexholder0) return 0;
+  udword* indexholder1 = col2->indexholder;
+  if (!indexholder1) return 0;
+
   int size = (int) (udword(TreeCollider.GetNbPairs ()));
   N_pairs = size;
   return N_pairs;

@@ -32,6 +32,17 @@ chronological order.
 	  the extra planes and not clip on those.
 	- Jorrit added an entry for the Linux Rage128 drivers to set
 	  the BrokenStencil option to true (in the gldrivers.xml database).
+	- Jorrit fixed a bug in the Opcode collision detection plugin. It
+	  would crash if it tried to check collision with an object that
+	  has no triangles.
+	- Jorrit found out that RAPID and OPCODE interprete csCollisionPair
+	  differently. RAPID interpretes it as returning a triangle in
+	  object space, while OPCODE interpretes it as returning in world
+	  space. The RAPID interpretation is correct so I fixed OPCODE
+	  to conform to that. By doing this walktest can now finally work
+	  properly with the OPCODE plugin.
+	- Jorrit clearly documented how csCollisionPair should be
+	  interpreted in the API documentation.
 4-Apr-2004
 	- res moved the attenuation texture generation to the light iter 
 	  plugin. Still the same texture for all lights, though. Plan is to

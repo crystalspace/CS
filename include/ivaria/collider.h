@@ -29,6 +29,7 @@ class csReversibleTransform;
 
 /**
  * A structure used to return collision pairs.
+ * These coordinates are in object space.
  */
 struct csCollisionPair
 {
@@ -79,7 +80,8 @@ struct iCollideSystem : public iBase
   /**
    * Get pointer to current array of collision pairs.
    * This array will grow with every call to Collide until you clear
-   * it using 'ResetCollisionPairs'.
+   * it using 'ResetCollisionPairs'. Note that the triangles are
+   * in object space and not world space!
    */
   virtual csCollisionPair* GetCollisionPairs () = 0;
 
