@@ -1,849 +1,2263 @@
-WORLD (
-  TEXTURES (
-    ;TEXTURE 'abstract_a032.jpg' (FILE (/lib/stdtex/abstract_a032.jpg))
-    TEXTURE 'abstract_a032.jpg' (FILE (/lib/stdtex/bricks.jpg))
-    ;TEXTURE 'andrew_wood.jpg' (FILE (/lib/stdtex/andrew_wood.jpg))
-    ;TEXTURE 'andrew_wood.jpg' (FILE (/lib/stdtex/floors_1_d1n__128.jpg))
-    TEXTURE 'andrew_wood.jpg' (FILE (/lib/stdtex/my_wood.jpg))
-    TEXTURE 'raindrop' (FILE (/lib/std/raindrop.png))
-    TEXTURE 'snow' (FILE (/lib/std/snow.jpg))
-    TEXTURE 'spark' (FILE (/lib/std/spark.png))
-    TEXTURE 'flare_picir' (FILE (/lib/stdtex/flare_picir.jpg))
-    TEXTURE 'flare_center' (FILE (/lib/stdtex/flare_center.jpg))
-    TEXTURE 'andrew_marble4' (FILE (/lib/std/andrew_marble4.gif))
-    TEXTURE 'sky' (FILE (/lib/stdtex/sky.jpg))
-    TEXTURE 'fpart' (FILE (/lib/stdtex/fpart.png))
-    TEXTURE 'fp2' (FILE (/lib/stdtex/fp2.png))
-    TEXTURE 'hazecirc' (FILE (/lib/stdtex/hazecirc.jpg))
-    TEXTURE 'hazebasic' (FILE (/lib/stdtex/hazebasic.png))
-    PROCTEX 'plasma' (TYPE (PLASMA))
-  )
-  MATERIALS (
-    MATERIAL 'wood' (TEXTURE ('andrew_wood.jpg'))
-    MATERIAL 'abstract' (TEXTURE ('abstract_a032.jpg'))
-    MATERIAL 'raindrop' (TEXTURE ('raindrop'))
-    MATERIAL 'snow' (TEXTURE ('snow'))
-    MATERIAL 'spark' (TEXTURE ('spark'))
-    MATERIAL 'flare_picir' (TEXTURE ('flare_picir'))
-    MATERIAL 'flare_center' (TEXTURE ('flare_center'))
-    MATERIAL 'andrew_marble4' (TEXTURE ('andrew_marble4'))
-    MATERIAL 'sky' (TEXTURE ('sky'))
-    MATERIAL 'fpart' (TEXTURE ('fpart'))
-    MATERIAL 'fp2' (TEXTURE ('fp2'))
-    MATERIAL 'hazecirc' (TEXTURE ('hazecirc'))
-    MATERIAL 'hazebasic' (TEXTURE ('hazebasic'))
-  )
-  PLUGINS (
-    PLUGIN 'thing' ('crystalspace.mesh.loader.thing')
-    PLUGIN 'fireFact' ('crystalspace.mesh.loader.factory.fire')
-    PLUGIN 'fire' ('crystalspace.mesh.loader.fire')
-    PLUGIN 'rainFact' ('crystalspace.mesh.loader.factory.rain')
-    PLUGIN 'rain' ('crystalspace.mesh.loader.rain')
-    PLUGIN 'snowFact' ('crystalspace.mesh.loader.factory.snow')
-    PLUGIN 'snow' ('crystalspace.mesh.loader.snow')
-    PLUGIN 'fountainFact' ('crystalspace.mesh.loader.factory.fountain')
-    PLUGIN 'fountain' ('crystalspace.mesh.loader.fountain')
-    PLUGIN 'emitFact' ('crystalspace.mesh.loader.factory.emit')
-    PLUGIN 'emit' ('crystalspace.mesh.loader.emit')
-    PLUGIN 'hazeFact' ('crystalspace.mesh.loader.factory.haze')
-    PLUGIN 'haze' ('crystalspace.mesh.loader.haze')
-    PLUGIN 'spiralFact' ('crystalspace.mesh.loader.factory.spiral')
-    PLUGIN 'spiral' ('crystalspace.mesh.loader.spiral')
-    PLUGIN 'plane' ('crystalspace.mesh.loader.thing.plane')
-  )
-  RENDERPRIORITIES (
-    PRIORITY 'sky' (1,NONE)
-    PRIORITY 'wall' (2,NONE)
-    PRIORITY 'object' (3,NONE)
-    PRIORITY 'alpha' (4,BACK2FRONT)
-  )
-
-  MESHFACT 'fireFact' (
-    PLUGIN ('fireFact')
-    PARAMS ()
-  )
-  MESHFACT 'rainFact' (
-    PLUGIN ('rainFact')
-    PARAMS ()
-  )
-  MESHFACT 'snowFact' (
-    PLUGIN ('snowFact')
-    PARAMS ()
-  )
-  MESHFACT 'emitFact' (
-    PLUGIN ('emitFact')
-    PARAMS ()
-  )
-  MESHFACT 'fountainFact' (
-    PLUGIN ('fountainFact')
-    PARAMS ()
-  )
-  MESHFACT 'spiralFact' (
-    PLUGIN ('spiralFact')
-    PARAMS ()
-  )
-  MESHFACT 'hazeFact' (
-    PLUGIN ('hazeFact')
-    PARAMS ()
-  )
-
-  ADDON (
-    PLUGIN ('plane')
-    PARAMS (
-      NAME ('floor')
-      ORIG (0,-1,0)
-      FIRST (1,-1,0)
-      FIRST_LEN (5)
-      SECOND (0,-1,1)
-      SECOND_LEN (5)
-    )
-  )
-  ADDON (
-    PLUGIN ('plane')
-    PARAMS (
-      NAME ('ceiling')
-      ORIG (0,5,0)
-      FIRST (1,5,0)
-      FIRST_LEN (5)
-      SECOND (0,5,1)
-      SECOND_LEN (5)
-    )
-  )
-
-  SECTOR 'room' (
-    MESHOBJ 'walls' (
-	ZFILL ()
-	PLUGIN ('thing')
-	PARAMS (
-	  VERTEX (-20,-1,-20) VERTEX (-20,-1,20)
-	  VERTEX (20,-1,20) VERTEX (20,-1,-20)
-	  VERTEX (-20,5,-20) VERTEX (-20,5,20)
-	  VERTEX (20,5,20) VERTEX (20,5,-20)
-	  VERTEX (-20,-1,-1) VERTEX (-20,-1,1)
-	  VERTEX (-1,-1,20) VERTEX (1,-1,20)
-	  VERTEX (20,-1,1) VERTEX (20,-1,-1)
-	  VERTEX (1,-1,-20) VERTEX (-1,-1,-20)
-	  VERTEX (-20,5,-1) VERTEX (-20,5,1)
-	  VERTEX (-1,5,20) VERTEX (1,5,20)
-	  VERTEX (20,5,1) VERTEX (20,5,-1)
-	  VERTEX (1,5,-20) VERTEX (-1,5,-20)
-    	  MATERIAL ('abstract')
-	  TEXLEN (5)
-	  POLYGON 'down1' (VERTICES (0,1,10,15) MATERIAL ('wood') COSFACT(0.8)
-	    TEXTURE (PLANE (floor)))
-	  POLYGON 'down2' (VERTICES (15,10,11,14) MATERIAL ('wood') COSFACT(0.8)
-	    TEXTURE (PLANE (floor)))
-	  POLYGON 'down3' (VERTICES (14,11,2,3) MATERIAL ('wood') COSFACT(0.8)
-	    TEXTURE (PLANE (floor)))
-	  POLYGON 'up1' (VERTICES (5,4,23,18) MATERIAL ('wood') COSFACT(0.8)
-	    TEXTURE (PLANE (ceiling)))
-	  POLYGON 'up2' (VERTICES (18,23,22,19) MATERIAL ('wood') COSFACT(0.8)
-	      TEXTURE (PLANE (ceiling)))
-	  POLYGON 'up3' (VERTICES (19,22,7,6) MATERIAL ('wood') COSFACT(0.8)
-	      TEXTURE (PLANE (ceiling)))
-	  POLYGON 'front1' (VERTICES (5,18,10,1))
-	  POLYGON 'front2' (VERTICES (18,19,11,10) PORTAL ('room0,1'))
-	  POLYGON 'front3' (VERTICES (19,6,2,11))
-	  POLYGON 'back1' (VERTICES (7,22,14,3))
-	  POLYGON 'back2' (VERTICES (22,23,15,14))
-	  POLYGON 'back3' (VERTICES (23,4,0,15))
-	  POLYGON 'right1' (VERTICES (6,20,12,2))
-	  POLYGON 'right2' (VERTICES (20,21,13,12) PORTAL ('room1,0'))
-	  POLYGON 'right3' (VERTICES (21,7,3,13))
-	  POLYGON 'left1' (VERTICES (4,16,8,0))
-	  POLYGON 'left2' (VERTICES (16,17,9,8))
-	  POLYGON 'left3' (VERTICES (17,5,1,9))
-	)
-      LMCACHE (room_walls)
-    )
-    LIGHT (CENTER (0, 0, 0) RADIUS (40) COLOR (1,1,1))
-    MESHOBJ 'flame' (
-      PRIORITY (alpha)
-      PLUGIN ('fire')
-      ZTEST ()
-      MOVE (V (-10,0,-10))
-      PARAMS (
-	FACTORY ('fireFact')
-	MIXMODE (ADD ())
-	NUMBER (50)
-	MATERIAL ('raindrop')
-	ORIGIN (0,0,0)
-	DROPSIZE (0.04,0.08)
-	LIGHTING (off)
-	SWIRL (1.3)
-	COLORSCALE (0.2)
-      )
-    )
-    MESHOBJ 'snowfall' (
-      PRIORITY (alpha)
-      PLUGIN ('snow')
-      ZTEST ()
-      MOVE (V (10,0,10))
-      PARAMS (
-	FACTORY ('snowFact')
-	BOX (-5,-.3,-5, 10,6,10);
-	MIXMODE (ADD ())
-	NUMBER (500)
-	MATERIAL ('snow')
-	DROPSIZE(0.17, 0.17)
-	LIGHTING (off)
-	SWIRL (0.5)
-	COLOR (0.2, 0.2, 0.5)
-	FALLSPEED(0, -.4, 0);
-      )
-    )
-    MESHOBJ 'rainfall' (
-      PRIORITY (alpha)
-      PLUGIN ('rain')
-      ZTEST ()
-      MOVE (V (-10,0,10))
-      PARAMS (
-	FACTORY ('rainFact')
-	BOX (-10,-.3,-5, 5,6,10);
-	MIXMODE (ADD ())
-	NUMBER (500)
-	MATERIAL ('raindrop')
-	DROPSIZE(0.02, 0.37)
-	LIGHTING (off)
-	COLOR (0.2, 0.35, 0.5)
-	FALLSPEED(0, -2.84, 0);
-      )
-    )
-    MESHOBJ 'fount1' (
-      PRIORITY (alpha)
-      PLUGIN (fountain)
-      PARAMS (
-        FACTORY (fountainFact)
-        NUMBER (300)
-        MATERIAL ('spark')
-        ORIGIN (0,0,0)
-        DROPSIZE (.15,.15)
-        COLOR (0.7,0.9,1.0)
-        ACCEL (0,-0.3,0)
-        FALLTIME (9)
-        SPEED (1.8)
-        ;ELEVATION (1.5) ;straight up
-        ELEVATION (1.0)
-        AZIMUTH (1.75)
-        OPENING (.2)
-        MIXMODE (ADD ())
-      )
-      ZTEST ()
-      MOVE (V (+15,-0,-15))
-    )
-  )
-  SECTOR 'room0,1' (
-    MESHOBJ 'walls' (
-	ZFILL ()
-	PLUGIN ('thing')
-	PARAMS (
-	  VERTEX (-20,-1,-20) VERTEX (-20,-1,20)
-	  VERTEX (20,-1,20) VERTEX (20,-1,-20)
-	  VERTEX (-20,5,-20) VERTEX (-20,5,20)
-	  VERTEX (20,5,20) VERTEX (20,5,-20)
-	  VERTEX (-20,-1,-1) VERTEX (-20,-1,1)
-	  VERTEX (-1,-1,20) VERTEX (1,-1,20)
-	  VERTEX (20,-1,1) VERTEX (20,-1,-1)
-	  VERTEX (1,-1,-20) VERTEX (-1,-1,-20)
-	  VERTEX (-20,5,-1) VERTEX (-20,5,1)
-	  VERTEX (-1,5,20) VERTEX (1,5,20)
-	  VERTEX (20,5,1) VERTEX (20,5,-1)
-	  VERTEX (1,5,-20) VERTEX (-1,5,-20)
-    	  MATERIAL ('abstract')
-	  TEXLEN (5)
-	  POLYGON 'down1' (VERTICES (0,1,10,15) MATERIAL ('wood') COSFACT(0.8)
-	    TEXTURE (PLANE (floor)))
-	  POLYGON 'down2' (VERTICES (15,10,11,14) MATERIAL ('wood') COSFACT(0.8)
-	    TEXTURE (PLANE (floor)))
-	  POLYGON 'down3' (VERTICES (14,11,2,3) MATERIAL ('wood') COSFACT(0.8)
-	    TEXTURE (PLANE (floor)))
-	  POLYGON 'up1' (VERTICES (5,4,23,18) MATERIAL ('wood') COSFACT(0.8)
-	    TEXTURE (PLANE (ceiling)))
-	  POLYGON 'up2' (VERTICES (18,23,22,19) MATERIAL ('wood') COSFACT(0.8)
-	      TEXTURE (PLANE (ceiling)))
-	  POLYGON 'up3' (VERTICES (19,22,7,6) MATERIAL ('wood') COSFACT(0.8)
-	      TEXTURE (PLANE (ceiling)))
-	  POLYGON 'front1' (VERTICES (5,18,10,1))
-	  POLYGON 'front2' (VERTICES (18,19,11,10) PORTAL ('room0,2'))
-	  POLYGON 'front3' (VERTICES (19,6,2,11))
-	  POLYGON 'back1' (VERTICES (7,22,14,3))
-	  POLYGON 'back2' (VERTICES (22,23,15,14) PORTAL ('room'))
-	  POLYGON 'back3' (VERTICES (23,4,0,15))
-	  POLYGON 'right1' (VERTICES (6,20,12,2))
-	  POLYGON 'right2' (VERTICES (20,21,13,12))
-	  POLYGON 'right3' (VERTICES (21,7,3,13))
-	  POLYGON 'left1' (VERTICES (4,16,8,0))
-	  POLYGON 'left2' (VERTICES (16,17,9,8))
-	  POLYGON 'left3' (VERTICES (17,5,1,9))
-	)
-      HARDMOVE (V (0,0,40))
-      LMCACHE (room0_1_walls)
-    )
-    LIGHT (CENTER (0, 0, 40) RADIUS (40) COLOR (0,0,1))
-    MESHOBJ 'emit1' (
-      PRIORITY (alpha)
-      PLUGIN ('emit')
-      ZTEST ()
-      MOVE (V (-10,0,50))
-      PARAMS (
-	FACTORY ('emitFact')
-	MIXMODE (ADD ())
-	NUMBER (50)
-	MATERIAL ('spark')
-	RECTPARTICLES(0.12, 0.12)
-	LIGHTING (off)
-	TOTALTIME (5000)
-	STARTPOS (EMITFIXED (0,0,0))
-	STARTSPEED (EMITFIXED (0,0.5,0))
-	STARTACCEL (EMITFIXED (0,0,0))
-	;ATTRACTOR ()
-	;ATTRACTORFORCE (1.0)
-	; age: time, rgb,  alpha, swirl, rotspeed, scale
-        AGING (0, 1.0,1.0,1.0, 0.3, 1.0, 0.0, 0.1)
-        AGING (1000, 0.0,1.0,1.0, 0.3, 0.0, 1.0, 0.4)
-        AGING (2000, 0.6,0.0,1.0, 0.3, 0.0, 20.0, 1.5)
-        AGING (3000, 0.3,0.0,0.5, 0.3, 0.0, 1.0, 1.0)
-        AGING (5000, 0.3,0.0,0.5, 1.0, 0.0, 0.0, 1.0)
-      )
-    )
-    MESHOBJ 'emit2' (
-      PRIORITY (alpha)
-      PLUGIN ('emit')
-      ZTEST ()
-      MOVE (V (+10,0,50))
-      PARAMS (
-	FACTORY ('emitFact')
-	MIXMODE (ADD ())
-	NUMBER (50)
-	MATERIAL ('flare_picir')
-	RECTPARTICLES(0.32, 0.32)
-	LIGHTING (off)
-	TOTALTIME (5000)
-	STARTPOS (EMITBOX (-5,0,-5, 10,0,10))
-	STARTSPEED (EMITFIXED (0,1.0,0))
-	STARTACCEL (EMITFIXED (0,0,0))
-	;ATTRACTOR ()
-	;ATTRACTORFORCE (1.0)
-	; age: time, rgb,       alpha, swirl, rotspeed, scale
-        AGING (0000, 0.0,0.4,1.0, 0.3, 0.0, 0.0, 0.3)
-        AGING (3000, 0.0,0.4,0.8, 0.3, 0.3, 0.0, 1.0)
-        AGING (4000, 0.0,0.4,0.8, 0.3, 0.3, 0.0, 1.0)
-        AGING (5000, 0.0,0.4,0.8, 1.0, 0.3, 0.0, 3.0)
-      )
-    )
-    MESHOBJ 'emit3' (
-      PRIORITY (alpha)
-      KEY ("entity_Rotate", "0,10,0,true")
-      PLUGIN ('emit')
-      ZTEST ()
-      MOVE (V (-10,2.0,30))
-      PARAMS (
-	FACTORY ('emitFact')
-	MIXMODE (ADD ())
-	NUMBER (200)
-	MATERIAL ('spark')
-	RECTPARTICLES(0.1, 0.1)
-	LIGHTING (off)
-	TOTALTIME (4000)
-	STARTPOS (EMITSPHERE (0,0,0,  1.5,2))
-	STARTSPEED (EMITFIXED (0,0,0))
-	STARTACCEL (EMITFIXED (0,0,0))
-	;ATTRACTOR ()
-	;ATTRACTORFORCE (1.0)
-	; age: time, rgb,       alpha, swirl, rotspeed, scale
-        AGING (   0, 0.0,0.4,0.8, 1.0, 0.0, 0.0, 1.0)
-        AGING ( 500, 0.0,0.4,0.8, 0.3, 0.0, 0.0, 1.0)
-        AGING (3500, 0.0,0.4,0.8, 0.3, 0.0, 0.0, 1.0)
-        AGING (4000, 0.0,0.4,0.8, 1.0, 0.0, 0.0, 1.0)
-      )
-    )
-    MESHOBJ 'emit4' (
-      PRIORITY (alpha)
-      PLUGIN ('emit')
-      ZTEST ()
-      MOVE (V (+15,0,25))
-      PARAMS (
-	FACTORY ('emitFact')
-	MIXMODE (ADD ())
-	NUMBER (500)
-	MATERIAL ('raindrop')
-	;RECTPARTICLES(0.2, 0.2)
-	REGULARPARTICLES(8, 0.2)
-	LIGHTING (off)
-	TOTALTIME (4000)
-	STARTPOS (EMITSPHERE (0,2.0,0,  0,0.5))
-	STARTSPEED (EMITBOX (-1,-1,-1, 1, 1, 1))
-	STARTACCEL (EMITFIXED (0,0,0))
-	ATTRACTOR (EMITFIXED(+0, 3, 4))
-	ATTRACTORFORCE (0.5)
-	; age: time, rgb,       alpha, swirl, rotspeed, scale
-        AGING (   0, 1.0,1.0,0.2, 1.0, 0.0, 0.0, 1.0)
-        AGING (1000, 1.0,0.2,0.8, 0.3, 0.0, 0.0, 1.0)
-        AGING (3000, 1.0,0.2,0.0, 0.6, 0.0, 0.0, 0.8)
-        AGING (4000, 0.1,0.2,0.8, 1.0, 0.0, 0.0, 0.3)
-      )
-    )
-  )
-  SECTOR 'room0,2' (
-    MESHOBJ 'walls' (
-	ZFILL ()
-	PLUGIN ('thing')
-	PARAMS (
-	  VERTEX (-20,-1,-20) VERTEX (-20,-1,20)
-	  VERTEX (20,-1,20) VERTEX (20,-1,-20)
-	  VERTEX (-20,5,-20) VERTEX (-20,5,20)
-	  VERTEX (20,5,20) VERTEX (20,5,-20)
-	  VERTEX (-20,-1,-1) VERTEX (-20,-1,1)
-	  VERTEX (-1,-1,20) VERTEX (1,-1,20)
-	  VERTEX (20,-1,1) VERTEX (20,-1,-1)
-	  VERTEX (1,-1,-20) VERTEX (-1,-1,-20)
-	  VERTEX (-20,5,-1) VERTEX (-20,5,1)
-	  VERTEX (-1,5,20) VERTEX (1,5,20)
-	  VERTEX (20,5,1) VERTEX (20,5,-1)
-	  VERTEX (1,5,-20) VERTEX (-1,5,-20)
-    	  MATERIAL ('abstract')
-	  TEXLEN (5)
-	  POLYGON 'down1' (VERTICES (0,1,10,15) MATERIAL ('wood') COSFACT(0.8)
-	    TEXTURE (PLANE (floor)))
-	  POLYGON 'down2' (VERTICES (15,10,11,14) MATERIAL ('wood') COSFACT(0.8)
-	    TEXTURE (PLANE (floor)))
-	  POLYGON 'down3' (VERTICES (14,11,2,3) MATERIAL ('wood') COSFACT(0.8)
-	    TEXTURE (PLANE (floor)))
-	  POLYGON 'up1' (VERTICES (5,4,23,18) MATERIAL ('wood') COSFACT(0.8)
-	    TEXTURE (PLANE (ceiling)))
-	  POLYGON 'up2' (VERTICES (18,23,22,19) MATERIAL ('wood') COSFACT(0.8)
-	      TEXTURE (PLANE (ceiling)))
-	  POLYGON 'up3' (VERTICES (19,22,7,6) MATERIAL ('wood') COSFACT(0.8)
-	      TEXTURE (PLANE (ceiling)))
-	  POLYGON 'front1' (VERTICES (5,18,10,1))
-	  POLYGON 'front2' (VERTICES (18,19,11,10))
-	  POLYGON 'front3' (VERTICES (19,6,2,11))
-	  POLYGON 'back1' (VERTICES (7,22,14,3))
-	  POLYGON 'back2' (VERTICES (22,23,15,14) PORTAL ('room0,1'))
-	  POLYGON 'back3' (VERTICES (23,4,0,15))
-	  POLYGON 'right1' (VERTICES (6,20,12,2))
-	  POLYGON 'right2' (VERTICES (20,21,13,12))
-	  POLYGON 'right3' (VERTICES (21,7,3,13))
-	  POLYGON 'left1' (VERTICES (4,16,8,0))
-	  POLYGON 'left2' (VERTICES (16,17,9,8) PORTAL ('room-1,2'))
-	  POLYGON 'left3' (VERTICES (17,5,1,9))
-	)
-      HARDMOVE (V (0,0,80))
-      LMCACHE (room0_2_walls)
-    )
-    LIGHT (CENTER (0, 0, 80) RADIUS (40) COLOR (1,0,1))
-    MESHOBJ 'fire' (
-      PRIORITY (alpha)
-      PLUGIN ('fire')
-      ZTEST ()
-      MOVE (V (-10,0,70))
-      PARAMS (
-	FACTORY ('fireFact')
-	MIXMODE (ADD ())
-	NUMBER (200)
-	MATERIAL ('raindrop')
-	ORIGINBOX (-2.,0,-2., 2.,0,2.)
-	DROPSIZE (0.1,0.2)
-	DIRECTION (0, 2, 0)
-	LIGHTING (off)
-	SWIRL (1.6)
-	COLORSCALE (0.2)
-      )
-    )
-    MESHOBJ 'spiral' (
-      PRIORITY (alpha)
-      PLUGIN ('spiral')
-      ZTEST ()
-      MOVE (V (+10,0,70))
-      PARAMS (
-	FACTORY ('spiralFact')
-	MIXMODE (ADD ())
-	NUMBER (200)
-	MATERIAL ('raindrop')
-	COLOR (0.2, 0.9, 0.2)
-	SOURCE (0,0,0)
-	;DROPSIZE (0.04,0.08)
-	;LIGHTING (off)
-      )
-    )
-    MESHOBJ 'emit5' (
-      PRIORITY (alpha)
-      PLUGIN ('emit')
-      ZTEST ()
-      MOVE (V (+10,-1,90))
-      PARAMS (
-	FACTORY ('emitFact')
-	MIXMODE (COPY ())
-	NUMBER (200)
-	MATERIAL ('andrew_marble4')
-	REGULARPARTICLES(12, 0.5)
-	LIGHTING (on)
-	TOTALTIME (2500)
-	STARTPOS (EMITCYLINDER (0,0,0, 0,2,0, 1,1))
-	STARTSPEED (EMITCYLINDERTANGENT (0,0,0, 0,2,0, 1.7,1.7))
-	STARTACCEL (EMITFIXED (0,0.0,0))
-	ATTRACTOR (EMITFIXED (0,5,0))
-	ATTRACTORFORCE (0.5)
-	; age: time, rgb,  alpha, swirl, rotspeed, scale
-        AGING (   0, 1.0,1.0,1.0, 1.0, 0.0, 0.0, 1.0)
-        AGING ( 500, 1.0,1.0,1.0, 0.5, 0.0, 0.0, 1.0)
-        AGING (2000, 1.0,1.0,1.0, 0.5, 0.0, 0.0, 1.0)
-        AGING (2500, 1.0,1.0,1.0, 1.0, 0.0, 0.0, 1.0)
-      )
-    )
-    MESHOBJ 'emit6' (
-      PRIORITY (alpha)
-      PLUGIN ('emit')
-      ZTEST ()
-      KEY ("entity_Rotate", "0,50,0,true")
-      MOVE (V (-10,-1,90))
-      PARAMS (
-	FACTORY ('emitFact')
-	MIXMODE (MULTIPLY2 ())
-	NUMBER (200)
-	MATERIAL ('sky')
-	REGULARPARTICLES(4, 0.25)
-	LIGHTING (off)
-	TOTALTIME (1000)
-	STARTPOS (EMITCYLINDER (0,0,0, 0,0.2,0, 2.9,3))
-	STARTSPEED (EMITFIXED (0,1.0,0))
-	STARTACCEL (EMITFIXED (0,0.0,0))
-	ATTRACTOR (EMITFIXED (0,0,0))
-	ATTRACTORFORCE (-2.5)
-	; age: time, rgb,  alpha, swirl, rotspeed, scale
-        AGING (   0, 1.0,1.0,1.0, 0.0, 0.0, 0.0, 1.0)
-        AGING ( 200, 1.0,1.0,1.0, 0.0, 0.0, 1.0, 1.0)
-        AGING ( 800, 1.0,1.0,1.0, 0.0, 0.0, 1.0, 1.0)
-        AGING (1000, 1.0,1.0,1.0, 0.0, 0.0, 2.0, 1.0)
-      )
-    )
-  )
-  SECTOR 'room-1,2' (
-    MESHOBJ 'walls' (
-	ZFILL ()
-	PLUGIN ('thing')
-	PARAMS (
-	  VERTEX (-20,-1,-20) VERTEX (-20,-1,20)
-	  VERTEX (20,-1,20) VERTEX (20,-1,-20)
-	  VERTEX (-20,5,-20) VERTEX (-20,5,20)
-	  VERTEX (20,5,20) VERTEX (20,5,-20)
-	  VERTEX (-20,-1,-1) VERTEX (-20,-1,1)
-	  VERTEX (-1,-1,20) VERTEX (1,-1,20)
-	  VERTEX (20,-1,1) VERTEX (20,-1,-1)
-	  VERTEX (1,-1,-20) VERTEX (-1,-1,-20)
-	  VERTEX (-20,5,-1) VERTEX (-20,5,1)
-	  VERTEX (-1,5,20) VERTEX (1,5,20)
-	  VERTEX (20,5,1) VERTEX (20,5,-1)
-	  VERTEX (1,5,-20) VERTEX (-1,5,-20)
-    	  MATERIAL ('abstract')
-	  TEXLEN (5)
-	  POLYGON 'down1' (VERTICES (0,1,10,15) MATERIAL ('wood') COSFACT(0.8)
-	    TEXTURE (PLANE (floor)))
-	  POLYGON 'down2' (VERTICES (15,10,11,14) MATERIAL ('wood') COSFACT(0.8)
-	    TEXTURE (PLANE (floor)))
-	  POLYGON 'down3' (VERTICES (14,11,2,3) MATERIAL ('wood') COSFACT(0.8)
-	    TEXTURE (PLANE (floor)))
-	  POLYGON 'up1' (VERTICES (5,4,23,18) MATERIAL ('wood') COSFACT(0.8)
-	    TEXTURE (PLANE (ceiling)))
-	  POLYGON 'up2' (VERTICES (18,23,22,19) MATERIAL ('wood') COSFACT(0.8)
-	      TEXTURE (PLANE (ceiling)))
-	  POLYGON 'up3' (VERTICES (19,22,7,6) MATERIAL ('wood') COSFACT(0.8)
-	      TEXTURE (PLANE (ceiling)))
-	  POLYGON 'front1' (VERTICES (5,18,10,1))
-	  POLYGON 'front2' (VERTICES (18,19,11,10))
-	  POLYGON 'front3' (VERTICES (19,6,2,11))
-	  POLYGON 'back1' (VERTICES (7,22,14,3))
-	  POLYGON 'back2' (VERTICES (22,23,15,14))
-	  POLYGON 'back3' (VERTICES (23,4,0,15))
-	  POLYGON 'right1' (VERTICES (6,20,12,2))
-	  POLYGON 'right2' (VERTICES (20,21,13,12) PORTAL ('room0,2'))
-	  POLYGON 'right3' (VERTICES (21,7,3,13))
-	  POLYGON 'left1' (VERTICES (4,16,8,0))
-	  POLYGON 'left2' (VERTICES (16,17,9,8))
-	  POLYGON 'left3' (VERTICES (17,5,1,9))
-	)
-      HARDMOVE (V (-40,0,80))
-      LMCACHE (room-1_2_walls)
-    )
-    LIGHT (CENTER (-40, 0, 80) RADIUS (40) COLOR (1,1,0))
-    MESHOBJ 'emit7' (
-      PRIORITY (alpha)
-      PLUGIN ('emit')
-      ZTEST ()
-      MOVE (V (-50,-1,70))
-      PARAMS (
-	FACTORY ('emitFact')
-	MIXMODE (COPY ())
-	NUMBER (50)
-	MATERIAL ('andrew_marble4')
-	REGULARPARTICLES(6, 1.0)
-	LIGHTING (off)
-	TOTALTIME (10000)
-	STARTPOS (EMITBOX (-2,0,-2, 2,2.2,2))
-	STARTSPEED (EMITFIXED (0,0,0))
-	STARTACCEL (EMITFIXED (0,0,0))
-	;ATTRACTOR (EMITFIXED (0,0,0))
-	;ATTRACTORFORCE (-2.5)
-	; age: time, rgb,  alpha, swirl, rotspeed, scale
-        AGING (   0, 1.0,1.0,1.0, 1.0, 0.1, 0.0, 1.0)
-        AGING ( 200, 1.0,1.0,1.0, 0.8, 0.1, 0.0, 1.0)
-        AGING (4300, 1.0,1.0,1.0, 0.8, 0.1, 1.0, 1.0)
-        AGING (4700, 1.0,1.0,1.0, 0.8, 0.1, 0.0, 1.0)
-        AGING (9800, 1.0,1.0,1.0, 0.8, 0.2, 0.0, 1.0)
-        AGING (10000, 1.0,1.0,1.0, 1.0, 0.1, 0.0, 1.0)
-      )
-    )
-    MESHOBJ 'emit8' (
-      PRIORITY (alpha)
-      PLUGIN ('emit')
-      ZTEST ()
-      MOVE (V (-30,-1,70))
-      PARAMS (
-	FACTORY ('emitFact')
-	MIXMODE (ADD ())
-	NUMBER (10)
-	MATERIAL ('spark')
-	REGULARPARTICLES(7, 0.04)
-	LIGHTING (off)
-	TOTALTIME (5000)
-	STARTPOS (
-	  EMITMIX (WEIGHT(2.0) EMITLINE(-1,2,0, +1,2,0))
-	  EMITMIX (WEIGHT(3.0) EMITLINE( 0,0,0,  0,3,0))
-	)
-	STARTSPEED (EMITFIXED (0,0,0))
-	STARTACCEL (EMITFIXED (0,0,0))
-	;ATTRACTOR (EMITFIXED (0,0,0))
-	;ATTRACTORFORCE (-2.5)
-	; age: time, rgb,  alpha, swirl, rotspeed, scale
-        AGING (   0, 1.0,1.0,1.0, 1.0, 0.0, 0.0, 0.01)
-        AGING ( 200, 1.0,1.0,1.0, 0.8, 0.0, 0.0, 0.3)
-        AGING (4400, 1.0,1.0,1.0, 0.8, 0.0, 0.0, 0.3)
-        AGING (4800, 1.0,1.0,1.0, 0.0, 0.0, 10.0, 5.0)
-        AGING (5000, 1.0,1.0,1.0, 1.0, 0.0, 0.0, 1.0)
-      )
-    )
-    MESHOBJ 'emit9' (
-      PRIORITY (alpha)
-      PLUGIN ('emit')
-      ZTEST ()
-      MOVE (V (-50,-1,90))
-      PARAMS (
-	FACTORY ('emitFact')
-	MIXMODE (COPY ())
-	NUMBER (100)
-	MATERIAL ('fpart')
-	REGULARPARTICLES(6, 1.0)
-	LIGHTING (off)
-	TOTALTIME (10000)
-	STARTPOS (EMITBOX (-2,0,-2, 2,2.2,2))
-	STARTSPEED (EMITFIXED (0,-0.2,0))
-	STARTACCEL (EMITFIXED (0,0.1,0))
-	;ATTRACTOR (EMITFIXED (0,0,0))
-	;ATTRACTORFORCE (-2.5)
-	; age: time, rgb,  alpha, swirl, rotspeed, scale
-        AGING (   0, 0.0,0.0,0.4, 1.0, 0.1, 0.0, 1.0)
-        AGING ( 200, 0.0,0.0,0.4, 0.8, 0.1, 0.0, 1.0)
-        AGING (4300, 0.0,0.0,0.4, 0.8, 0.1, 1.0, 1.0)
-        AGING (4700, 0.0,0.0,0.4, 0.8, 0.1, 0.0, 1.0)
-        AGING (9800, 0.0,0.0,0.4, 0.8, 0.2, 0.0, 1.0)
-        AGING (10000, 0.0,0.0,0.4, 1.0, 0.1, 0.0, 1.0)
-      )
-    )
-    MESHOBJ 'emit10' (
-      PRIORITY (alpha)
-      PLUGIN ('emit')
-      ZTEST ()
-      MOVE (V (-30,-1,90))
-      PARAMS (
-	FACTORY ('emitFact')
-	MIXMODE (COPY ())
-	NUMBER (100)
-	MATERIAL ('fp2')
-	REGULARPARTICLES(8, 0.9)
-	LIGHTING (off)
-	TOTALTIME (5000)
-	STARTPOS (EMITSPHERE (0,0.5,0, 0, 0.4))
-	STARTSPEED (EMITSPHERE (-0.3,0,0, 0, .3))
-	STARTACCEL (EMITFIXED (0,0.2,0))
-	ATTRACTOR (EMITBOX (-0.2,2,-0.2, +0.2,2,+0.2))
-	ATTRACTORFORCE (0.15)
-	; age: time, rgb,  alpha, swirl, rotspeed, scale
-        AGING (   0, 1.0,1.0,1.0, 1.0, 0.0, 0.0, 0.5)
-        AGING ( 200, 1.0,1.0,1.0, 0.0, 0.1, 0.0, 0.5)
-        AGING (1300, 1.0,1.0,0.2, 0.2, 0.1, 1.0, 1.0)
-        AGING (2700, 1.0,0.5,0.2, 0.5, 0.1, 1.0, 0.8)
-        AGING (3600, 0.2,0.2,0.2, 0.5, 0.0, 0.0, 1.5)
-        AGING (5000, 0.0,0.0,0.0, 1.0, 0.0, 0.0, 1.5)
-      )
-    )
-  )
-  SECTOR 'room1,0' (
-    MESHOBJ 'walls' (
-	ZFILL ()
-	PLUGIN ('thing')
-	PARAMS (
-	  VERTEX (-20,-1,-20) VERTEX (-20,-1,20)
-	  VERTEX (20,-1,20) VERTEX (20,-1,-20)
-	  VERTEX (-20,5,-20) VERTEX (-20,5,20)
-	  VERTEX (20,5,20) VERTEX (20,5,-20)
-	  VERTEX (-20,-1,-1) VERTEX (-20,-1,1)
-	  VERTEX (-1,-1,20) VERTEX (1,-1,20)
-	  VERTEX (20,-1,1) VERTEX (20,-1,-1)
-	  VERTEX (1,-1,-20) VERTEX (-1,-1,-20)
-	  VERTEX (-20,5,-1) VERTEX (-20,5,1)
-	  VERTEX (-1,5,20) VERTEX (1,5,20)
-	  VERTEX (20,5,1) VERTEX (20,5,-1)
-	  VERTEX (1,5,-20) VERTEX (-1,5,-20)
-    	  MATERIAL ('abstract')
-	  TEXLEN (5)
-	  POLYGON 'down1' (VERTICES (0,1,10,15) MATERIAL ('wood') COSFACT(0.8)
-	    TEXTURE (PLANE (floor)))
-	  POLYGON 'down2' (VERTICES (15,10,11,14) MATERIAL ('wood') COSFACT(0.8)
-	    TEXTURE (PLANE (floor)))
-	  POLYGON 'down3' (VERTICES (14,11,2,3) MATERIAL ('wood') COSFACT(0.8)
-	    TEXTURE (PLANE (floor)))
-	  POLYGON 'up1' (VERTICES (5,4,23,18) MATERIAL ('wood') COSFACT(0.8)
-	    TEXTURE (PLANE (ceiling)))
-	  POLYGON 'up2' (VERTICES (18,23,22,19) MATERIAL ('wood') COSFACT(0.8)
-	      TEXTURE (PLANE (ceiling)))
-	  POLYGON 'up3' (VERTICES (19,22,7,6) MATERIAL ('wood') COSFACT(0.8)
-	      TEXTURE (PLANE (ceiling)))
-	  POLYGON 'front1' (VERTICES (5,18,10,1))
-	  POLYGON 'front2' (VERTICES (18,19,11,10))
-	  POLYGON 'front3' (VERTICES (19,6,2,11))
-	  POLYGON 'back1' (VERTICES (7,22,14,3))
-	  POLYGON 'back2' (VERTICES (22,23,15,14))
-	  POLYGON 'back3' (VERTICES (23,4,0,15))
-	  POLYGON 'right1' (VERTICES (6,20,12,2))
-	  POLYGON 'right2' (VERTICES (20,21,13,12) PORTAL ('room2,0'))
-	  POLYGON 'right3' (VERTICES (21,7,3,13))
-	  POLYGON 'left1' (VERTICES (4,16,8,0))
-	  POLYGON 'left2' (VERTICES (16,17,9,8) PORTAL ('room'))
-	  POLYGON 'left3' (VERTICES (17,5,1,9))
-	)
-      HARDMOVE (V (40,0,0))
-      LMCACHE (room1_0_walls)
-    )
-    LIGHT (CENTER (40, 0, 0) RADIUS (40) COLOR (1,0,0))
-    MESHOBJ 'haze1' (
-      PRIORITY (alpha)
-      PLUGIN ('haze')
-      ZTEST ()
-      MOVE (V (30,1.1,10))
-      PARAMS (
-	FACTORY ('hazeFact')
-	MIXMODE (ADD ())
-	MATERIAL ('hazecirc')
-	ORIGIN ( 0,-2,0 )
-	DIRECTIONAL ( 0,1,0 )
-        LAYER( SCALE(0.5) HAZEBOX( -2,-2,-2, 2,2,2 ) )
-      )
-    )
-    MESHOBJ 'haze2' (
-      PRIORITY (alpha)
-      PLUGIN ('haze')
-      ZTEST ()
-      MOVE (V (30,0.1,-10))
-      PARAMS (
-	FACTORY ('hazeFact')
-	MIXMODE (ADD ())
-	MATERIAL ('hazebasic')
-	;MATERIAL ('plasma')
-	ORIGIN ( 0,-1,0 )
-	DIRECTIONAL ( 0,1,0 )
-	LAYER( SCALE(0.5) HAZECONE(17, 0,-1,0, 0,5,0 , 1, .3) )
-      )
-    )
-    MESHOBJ 'haze3' (
-      PRIORITY (alpha)
-      PLUGIN ('haze')
-      ZTEST ()
-      MOVE (V (50,0.1,-10))
-      PARAMS (
-	FACTORY ('hazeFact')
-	MIXMODE (COPY ())
-	MATERIAL ('fpart')
-	ORIGIN ( 0,-1,0 )
-	DIRECTIONAL ( 0,1,0 )
-	LAYER( SCALE(0.5) HAZECONE(16, 0,-1,0, 0,5,0 , 1, 4.0) )
-      )
-    )
-    MESHOBJ 'haze4' (
-      PRIORITY (alpha)
-      PLUGIN ('haze')
-      ZTEST ()
-      MOVE (V (50,0.1,+10))
-      PARAMS (
-	FACTORY ('hazeFact')
-	MIXMODE (ADD ())
-	MATERIAL ('flare_picir')
-	ORIGIN ( 0,1,0 )
-	DIRECTIONAL ( 0,1,0 )
-        LAYER( SCALE(0.5) HAZEBOX( -1,-1,-.3, 1,3,.3 ) )
-      )
-    )
-  )
-  SECTOR 'room2,0' (
-    MESHOBJ 'walls' (
-	ZFILL ()
-	PLUGIN ('thing')
-	PARAMS (
-	  VERTEX (-20,-1,-20) VERTEX (-20,-1,20)
-	  VERTEX (20,-1,20) VERTEX (20,-1,-20)
-	  VERTEX (-20,5,-20) VERTEX (-20,5,20)
-	  VERTEX (20,5,20) VERTEX (20,5,-20)
-	  VERTEX (-20,-1,-1) VERTEX (-20,-1,1)
-	  VERTEX (-1,-1,20) VERTEX (1,-1,20)
-	  VERTEX (20,-1,1) VERTEX (20,-1,-1)
-	  VERTEX (1,-1,-20) VERTEX (-1,-1,-20)
-	  VERTEX (-20,5,-1) VERTEX (-20,5,1)
-	  VERTEX (-1,5,20) VERTEX (1,5,20)
-	  VERTEX (20,5,1) VERTEX (20,5,-1)
-	  VERTEX (1,5,-20) VERTEX (-1,5,-20)
-    	  MATERIAL ('abstract')
-	  TEXLEN (5)
-	  POLYGON 'down1' (VERTICES (0,1,10,15) MATERIAL ('wood') COSFACT(0.8)
-	    TEXTURE (PLANE (floor)))
-	  POLYGON 'down2' (VERTICES (15,10,11,14) MATERIAL ('wood') COSFACT(0.8)
-	    TEXTURE (PLANE (floor)))
-	  POLYGON 'down3' (VERTICES (14,11,2,3) MATERIAL ('wood') COSFACT(0.8)
-	    TEXTURE (PLANE (floor)))
-	  POLYGON 'up1' (VERTICES (5,4,23,18) MATERIAL ('wood') COSFACT(0.8)
-	    TEXTURE (PLANE (ceiling)))
-	  POLYGON 'up2' (VERTICES (18,23,22,19) MATERIAL ('wood') COSFACT(0.8)
-	      TEXTURE (PLANE (ceiling)))
-	  POLYGON 'up3' (VERTICES (19,22,7,6) MATERIAL ('wood') COSFACT(0.8)
-	      TEXTURE (PLANE (ceiling)))
-	  POLYGON 'front1' (VERTICES (5,18,10,1))
-	  POLYGON 'front2' (VERTICES (18,19,11,10))
-	  POLYGON 'front3' (VERTICES (19,6,2,11))
-	  POLYGON 'back1' (VERTICES (7,22,14,3))
-	  POLYGON 'back2' (VERTICES (22,23,15,14))
-	  POLYGON 'back3' (VERTICES (23,4,0,15))
-	  POLYGON 'right1' (VERTICES (6,20,12,2))
-	  POLYGON 'right2' (VERTICES (20,21,13,12))
-	  POLYGON 'right3' (VERTICES (21,7,3,13))
-	  POLYGON 'left1' (VERTICES (4,16,8,0))
-	  POLYGON 'left2' (VERTICES (16,17,9,8) PORTAL ('room1,0'))
-	  POLYGON 'left3' (VERTICES (17,5,1,9))
-	)
-      HARDMOVE (V (80,0,0))
-      LMCACHE (room2_0_walls)
-    )
-    MESHOBJ 'haze5' (
-      PRIORITY (alpha)
-      PLUGIN ('haze')
-      ZTEST ()
-      MOVE (V (70,0.1,-10))
-      PARAMS (
-	FACTORY ('hazeFact')
-	MIXMODE (ADD ())
-	MATERIAL ('plasma')
-	ORIGIN ( 0,-1,0 )
-	DIRECTIONAL ( 0,1,0 )
-	LAYER( SCALE(0.5) HAZECONE(17, 0,-1,0, 0,5,0 , 1, .3) )
-      )
-    )
-    LIGHT (CENTER (80, 0, 0) RADIUS (40) COLOR (0,1,0))
-  )
-)
+<world>
+    <textures>
+        <texture name="abstract_a032.jpg">
+            <file>/lib/stdtex/bricks.jpg</file>
+        </texture>
+        <texture name="andrew_wood.jpg">
+            <file>/lib/stdtex/my_wood.jpg</file>
+        </texture>
+        <texture name="raindrop">
+            <file>/lib/std/raindrop.png</file>
+        </texture>
+        <texture name="snow">
+            <file>/lib/std/snow.jpg</file>
+        </texture>
+        <texture name="spark">
+            <file>/lib/std/spark.png</file>
+        </texture>
+        <texture name="flare_picir">
+            <file>/lib/stdtex/flare_picir.jpg</file>
+        </texture>
+        <texture name="flare_center">
+            <file>/lib/stdtex/flare_center.jpg</file>
+        </texture>
+        <texture name="andrew_marble4">
+            <file>/lib/std/andrew_marble4.gif</file>
+        </texture>
+        <texture name="sky">
+            <file>/lib/stdtex/sky.jpg</file>
+        </texture>
+        <texture name="fpart">
+            <file>/lib/stdtex/fpart.png</file>
+        </texture>
+        <texture name="fp2">
+            <file>/lib/stdtex/fp2.png</file>
+        </texture>
+        <texture name="hazecirc">
+            <file>/lib/stdtex/hazecirc.jpg</file>
+        </texture>
+        <texture name="hazebasic">
+            <file>/lib/stdtex/hazebasic.png</file>
+        </texture>
+        <proctex name="plasma">
+            <type>plasma</type>
+        </proctex>
+    </textures>
+    <materials>
+        <material name="wood">
+            <texture>andrew_wood.jpg</texture>
+        </material>
+        <material name="abstract">
+            <texture>abstract_a032.jpg</texture>
+        </material>
+        <material name="raindrop">
+            <texture>raindrop</texture>
+        </material>
+        <material name="snow">
+            <texture>snow</texture>
+        </material>
+        <material name="spark">
+            <texture>spark</texture>
+        </material>
+        <material name="flare_picir">
+            <texture>flare_picir</texture>
+        </material>
+        <material name="flare_center">
+            <texture>flare_center</texture>
+        </material>
+        <material name="andrew_marble4">
+            <texture>andrew_marble4</texture>
+        </material>
+        <material name="sky">
+            <texture>sky</texture>
+        </material>
+        <material name="fpart">
+            <texture>fpart</texture>
+        </material>
+        <material name="fp2">
+            <texture>fp2</texture>
+        </material>
+        <material name="hazecirc">
+            <texture>hazecirc</texture>
+        </material>
+        <material name="hazebasic">
+            <texture>hazebasic</texture>
+        </material>
+    </materials>
+    <plugins>
+        <plugin name="thing">crystalspace.mesh.loader.thing</plugin>
+        <plugin name="fireFact">crystalspace.mesh.loader.factory.fire</plugin>
+        <plugin name="fire">crystalspace.mesh.loader.fire</plugin>
+        <plugin name="rainFact">crystalspace.mesh.loader.factory.rain</plugin>
+        <plugin name="rain">crystalspace.mesh.loader.rain</plugin>
+        <plugin name="snowFact">crystalspace.mesh.loader.factory.snow</plugin>
+        <plugin name="snow">crystalspace.mesh.loader.snow</plugin>
+        <plugin name="fountainFact">crystalspace.mesh.loader.factory.fountain</plugin>
+        <plugin name="fountain">crystalspace.mesh.loader.fountain</plugin>
+        <plugin name="emitFact">crystalspace.mesh.loader.factory.emit</plugin>
+        <plugin name="emit">crystalspace.mesh.loader.emit</plugin>
+        <plugin name="hazeFact">crystalspace.mesh.loader.factory.haze</plugin>
+        <plugin name="haze">crystalspace.mesh.loader.haze</plugin>
+        <plugin name="spiralFact">crystalspace.mesh.loader.factory.spiral</plugin>
+        <plugin name="spiral">crystalspace.mesh.loader.spiral</plugin>
+        <plugin name="plane">crystalspace.mesh.loader.thing.plane</plugin>
+    </plugins>
+    <renderpriorities>
+        <priority name="sky">
+            <level>1</level>
+            <sort>NONE</sort>
+        </priority>
+        <priority name="wall">
+            <level>2</level>
+            <sort>NONE</sort>
+        </priority>
+        <priority name="object">
+            <level>3</level>
+            <sort>NONE</sort>
+        </priority>
+        <priority name="alpha">
+            <level>4</level>
+            <sort>BACK2FRONT</sort>
+        </priority>
+    </renderpriorities>
+    <meshfact name="fireFact">
+        <plugin>fireFact</plugin>
+        <params />
+    </meshfact>
+    <meshfact name="rainFact">
+        <plugin>rainFact</plugin>
+        <params />
+    </meshfact>
+    <meshfact name="snowFact">
+        <plugin>snowFact</plugin>
+        <params />
+    </meshfact>
+    <meshfact name="emitFact">
+        <plugin>emitFact</plugin>
+        <params />
+    </meshfact>
+    <meshfact name="fountainFact">
+        <plugin>fountainFact</plugin>
+        <params />
+    </meshfact>
+    <meshfact name="spiralFact">
+        <plugin>spiralFact</plugin>
+        <params />
+    </meshfact>
+    <meshfact name="hazeFact">
+        <plugin>hazeFact</plugin>
+        <params />
+    </meshfact>
+    <addon>
+        <plugin>plane</plugin>
+        <params>
+            <name>floor</name>
+            <orig x="0" y="-1" z="0" />
+            <first x="1" y="-1" z="0" />
+            <firstlen>5</firstlen>
+            <second x="0" y="-1" z="1" />
+            <secondlen>5</secondlen>
+        </params>
+    </addon>
+    <addon>
+        <plugin>plane</plugin>
+        <params>
+            <name>ceiling</name>
+            <orig x="0" y="5" z="0" />
+            <first x="1" y="5" z="0" />
+            <firstlen>5</firstlen>
+            <second x="0" y="5" z="1" />
+            <secondlen>5</secondlen>
+        </params>
+    </addon>
+    <sector name="room">
+        <meshobj name="walls">
+            <zfill />
+            <plugin>thing</plugin>
+            <params>
+                <v x="-20" y="-1" z="-20" />
+                <v x="-20" y="-1" z="20" />
+                <v x="20" y="-1" z="20" />
+                <v x="20" y="-1" z="-20" />
+                <v x="-20" y="5" z="-20" />
+                <v x="-20" y="5" z="20" />
+                <v x="20" y="5" z="20" />
+                <v x="20" y="5" z="-20" />
+                <v x="-20" y="-1" z="-1" />
+                <v x="-20" y="-1" z="1" />
+                <v x="-1" y="-1" z="20" />
+                <v x="1" y="-1" z="20" />
+                <v x="20" y="-1" z="1" />
+                <v x="20" y="-1" z="-1" />
+                <v x="1" y="-1" z="-20" />
+                <v x="-1" y="-1" z="-20" />
+                <v x="-20" y="5" z="-1" />
+                <v x="-20" y="5" z="1" />
+                <v x="-1" y="5" z="20" />
+                <v x="1" y="5" z="20" />
+                <v x="20" y="5" z="1" />
+                <v x="20" y="5" z="-1" />
+                <v x="1" y="5" z="-20" />
+                <v x="-1" y="5" z="-20" />
+                <material>abstract</material>
+                <texlen>5</texlen>
+                <p name="down1">
+                    <v>0</v>
+                    <v>1</v>
+                    <v>10</v>
+                    <v>15</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>floor</plane>
+                    </texmap>
+                </p>
+                <p name="down2">
+                    <v>15</v>
+                    <v>10</v>
+                    <v>11</v>
+                    <v>14</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>floor</plane>
+                    </texmap>
+                </p>
+                <p name="down3">
+                    <v>14</v>
+                    <v>11</v>
+                    <v>2</v>
+                    <v>3</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>floor</plane>
+                    </texmap>
+                </p>
+                <p name="up1">
+                    <v>5</v>
+                    <v>4</v>
+                    <v>23</v>
+                    <v>18</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>ceiling</plane>
+                    </texmap>
+                </p>
+                <p name="up2">
+                    <v>18</v>
+                    <v>23</v>
+                    <v>22</v>
+                    <v>19</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>ceiling</plane>
+                    </texmap>
+                </p>
+                <p name="up3">
+                    <v>19</v>
+                    <v>22</v>
+                    <v>7</v>
+                    <v>6</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>ceiling</plane>
+                    </texmap>
+                </p>
+                <p name="front1">
+                    <v>5</v>
+                    <v>18</v>
+                    <v>10</v>
+                    <v>1</v>
+                </p>
+                <p name="front2">
+                    <v>18</v>
+                    <v>19</v>
+                    <v>11</v>
+                    <v>10</v>
+                    <portal>
+                        <sector>room0,1</sector>
+                    </portal>
+                </p>
+                <p name="front3">
+                    <v>19</v>
+                    <v>6</v>
+                    <v>2</v>
+                    <v>11</v>
+                </p>
+                <p name="back1">
+                    <v>7</v>
+                    <v>22</v>
+                    <v>14</v>
+                    <v>3</v>
+                </p>
+                <p name="back2">
+                    <v>22</v>
+                    <v>23</v>
+                    <v>15</v>
+                    <v>14</v>
+                </p>
+                <p name="back3">
+                    <v>23</v>
+                    <v>4</v>
+                    <v>0</v>
+                    <v>15</v>
+                </p>
+                <p name="right1">
+                    <v>6</v>
+                    <v>20</v>
+                    <v>12</v>
+                    <v>2</v>
+                </p>
+                <p name="right2">
+                    <v>20</v>
+                    <v>21</v>
+                    <v>13</v>
+                    <v>12</v>
+                    <portal>
+                        <sector>room1,0</sector>
+                    </portal>
+                </p>
+                <p name="right3">
+                    <v>21</v>
+                    <v>7</v>
+                    <v>3</v>
+                    <v>13</v>
+                </p>
+                <p name="left1">
+                    <v>4</v>
+                    <v>16</v>
+                    <v>8</v>
+                    <v>0</v>
+                </p>
+                <p name="left2">
+                    <v>16</v>
+                    <v>17</v>
+                    <v>9</v>
+                    <v>8</v>
+                </p>
+                <p name="left3">
+                    <v>17</v>
+                    <v>5</v>
+                    <v>1</v>
+                    <v>9</v>
+                </p>
+            </params>
+            <lmcache>room_walls</lmcache>
+        </meshobj>
+        <light name="light1">
+            <center x="0" y="0" z="0" />
+            <radius>40</radius>
+            <color red="1" green="1" blue="1" />
+        </light>
+        <meshobj name="flame">
+            <priority>alpha</priority>
+            <plugin>fire</plugin>
+            <ztest />
+            <move>
+                <v x="-10" y="0" z="-10" />
+            </move>
+            <params>
+                <factory>fireFact</factory>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <number>50</number>
+                <material>raindrop</material>
+                <origin x="0" y="0" z="0" />
+                <dropsize w="0.04" h="0.08" />
+                <lighting>no</lighting>
+                <swirl>1.3</swirl>
+                <colorscale>0.2</colorscale>
+            </params>
+        </meshobj>
+        <meshobj name="snowfall">
+            <priority>alpha</priority>
+            <plugin>snow</plugin>
+            <ztest />
+            <move>
+                <v x="10" y="0" z="10" />
+            </move>
+            <params>
+                <factory>snowFact</factory>
+                <box>
+                    <min x="-5" y="-0.3" z="-5" />
+                    <max x="10" y="6" z="10" />
+                </box>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <number>500</number>
+                <material>snow</material>
+                <dropsize w="0.17" h="0.17" />
+                <lighting>no</lighting>
+                <swirl>0.5</swirl>
+                <color red="0.2" green="0.2" blue="0.5" />
+                <fallspeed x="0" y="-0.4" z="0" />
+            </params>
+        </meshobj>
+        <meshobj name="rainfall">
+            <priority>alpha</priority>
+            <plugin>rain</plugin>
+            <ztest />
+            <move>
+                <v x="-10" y="0" z="10" />
+            </move>
+            <params>
+                <factory>rainFact</factory>
+                <box>
+                    <min x="-10" y="-0.3" z="-5" />
+                    <max x="5" y="6" z="10" />
+                </box>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <number>500</number>
+                <material>raindrop</material>
+                <dropsize w="0.02" h="0.37" />
+                <lighting>no</lighting>
+                <color red="0.2" green="0.35" blue="0.5" />
+                <fallspeed x="0" y="-2.84" z="0" />
+            </params>
+        </meshobj>
+        <meshobj name="fount1">
+            <priority>alpha</priority>
+            <plugin>fountain</plugin>
+            <params>
+                <factory>fountainFact</factory>
+                <number>300</number>
+                <material>spark</material>
+                <origin x="0" y="0" z="0" />
+                <dropsize w="0.15" h="0.15" />
+                <color red="0.7" green="0.9" blue="1" />
+                <accel x="0" y="-0.3" z="0" />
+                <falltime>9</falltime>
+                <speed>1.8</speed>
+                <elevation>1</elevation>
+                <azimuth>1.75</azimuth>
+                <opening>0.2</opening>
+                <mixmode>
+                    <add />
+                </mixmode>
+            </params>
+            <ztest />
+            <move>
+                <v x="15" y="-0" z="-15" />
+            </move>
+        </meshobj>
+    </sector>
+    <sector name="room0,1">
+        <meshobj name="walls">
+            <zfill />
+            <plugin>thing</plugin>
+            <params>
+                <v x="-20" y="-1" z="-20" />
+                <v x="-20" y="-1" z="20" />
+                <v x="20" y="-1" z="20" />
+                <v x="20" y="-1" z="-20" />
+                <v x="-20" y="5" z="-20" />
+                <v x="-20" y="5" z="20" />
+                <v x="20" y="5" z="20" />
+                <v x="20" y="5" z="-20" />
+                <v x="-20" y="-1" z="-1" />
+                <v x="-20" y="-1" z="1" />
+                <v x="-1" y="-1" z="20" />
+                <v x="1" y="-1" z="20" />
+                <v x="20" y="-1" z="1" />
+                <v x="20" y="-1" z="-1" />
+                <v x="1" y="-1" z="-20" />
+                <v x="-1" y="-1" z="-20" />
+                <v x="-20" y="5" z="-1" />
+                <v x="-20" y="5" z="1" />
+                <v x="-1" y="5" z="20" />
+                <v x="1" y="5" z="20" />
+                <v x="20" y="5" z="1" />
+                <v x="20" y="5" z="-1" />
+                <v x="1" y="5" z="-20" />
+                <v x="-1" y="5" z="-20" />
+                <material>abstract</material>
+                <texlen>5</texlen>
+                <p name="down1">
+                    <v>0</v>
+                    <v>1</v>
+                    <v>10</v>
+                    <v>15</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>floor</plane>
+                    </texmap>
+                </p>
+                <p name="down2">
+                    <v>15</v>
+                    <v>10</v>
+                    <v>11</v>
+                    <v>14</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>floor</plane>
+                    </texmap>
+                </p>
+                <p name="down3">
+                    <v>14</v>
+                    <v>11</v>
+                    <v>2</v>
+                    <v>3</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>floor</plane>
+                    </texmap>
+                </p>
+                <p name="up1">
+                    <v>5</v>
+                    <v>4</v>
+                    <v>23</v>
+                    <v>18</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>ceiling</plane>
+                    </texmap>
+                </p>
+                <p name="up2">
+                    <v>18</v>
+                    <v>23</v>
+                    <v>22</v>
+                    <v>19</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>ceiling</plane>
+                    </texmap>
+                </p>
+                <p name="up3">
+                    <v>19</v>
+                    <v>22</v>
+                    <v>7</v>
+                    <v>6</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>ceiling</plane>
+                    </texmap>
+                </p>
+                <p name="front1">
+                    <v>5</v>
+                    <v>18</v>
+                    <v>10</v>
+                    <v>1</v>
+                </p>
+                <p name="front2">
+                    <v>18</v>
+                    <v>19</v>
+                    <v>11</v>
+                    <v>10</v>
+                    <portal>
+                        <sector>room0,2</sector>
+                    </portal>
+                </p>
+                <p name="front3">
+                    <v>19</v>
+                    <v>6</v>
+                    <v>2</v>
+                    <v>11</v>
+                </p>
+                <p name="back1">
+                    <v>7</v>
+                    <v>22</v>
+                    <v>14</v>
+                    <v>3</v>
+                </p>
+                <p name="back2">
+                    <v>22</v>
+                    <v>23</v>
+                    <v>15</v>
+                    <v>14</v>
+                    <portal>
+                        <sector>room</sector>
+                    </portal>
+                </p>
+                <p name="back3">
+                    <v>23</v>
+                    <v>4</v>
+                    <v>0</v>
+                    <v>15</v>
+                </p>
+                <p name="right1">
+                    <v>6</v>
+                    <v>20</v>
+                    <v>12</v>
+                    <v>2</v>
+                </p>
+                <p name="right2">
+                    <v>20</v>
+                    <v>21</v>
+                    <v>13</v>
+                    <v>12</v>
+                </p>
+                <p name="right3">
+                    <v>21</v>
+                    <v>7</v>
+                    <v>3</v>
+                    <v>13</v>
+                </p>
+                <p name="left1">
+                    <v>4</v>
+                    <v>16</v>
+                    <v>8</v>
+                    <v>0</v>
+                </p>
+                <p name="left2">
+                    <v>16</v>
+                    <v>17</v>
+                    <v>9</v>
+                    <v>8</v>
+                </p>
+                <p name="left3">
+                    <v>17</v>
+                    <v>5</v>
+                    <v>1</v>
+                    <v>9</v>
+                </p>
+            </params>
+            <hardmove>
+                <v x="0" y="0" z="40" />
+            </hardmove>
+            <lmcache>room0_1_walls</lmcache>
+        </meshobj>
+        <light name="light2">
+            <center x="0" y="0" z="40" />
+            <radius>40</radius>
+            <color red="0" green="0" blue="1" />
+        </light>
+        <meshobj name="emit1">
+            <priority>alpha</priority>
+            <plugin>emit</plugin>
+            <ztest />
+            <move>
+                <v x="-10" y="0" z="50" />
+            </move>
+            <params>
+                <factory>emitFact</factory>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <number>50</number>
+                <material>spark</material>
+                <rectparticles w="0.12" h="0.12" />
+                <lighting>no</lighting>
+                <totaltime>5000</totaltime>
+                <startpos>
+                    <emitfixed x="0" y="0" z="0" />
+                </startpos>
+                <startspeed>
+                    <emitfixed x="0" y="0.5" z="0" />
+                </startspeed>
+                <startaccel>
+                    <emitfixed x="0" y="0" z="0" />
+                </startaccel>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>0</time>
+                    <alpha>0.3</alpha>
+                    <swirl>1</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>0.1</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="1" blue="1" />
+                    <time>1000</time>
+                    <alpha>0.3</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>1</rotspeed>
+                    <scale>0.4</scale>
+                </aging>
+                <aging>
+                    <color red="0.6" green="0" blue="1" />
+                    <time>2000</time>
+                    <alpha>0.3</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>20</rotspeed>
+                    <scale>1.5</scale>
+                </aging>
+                <aging>
+                    <color red="0.3" green="0" blue="0.5" />
+                    <time>3000</time>
+                    <alpha>0.3</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>1</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="0.3" green="0" blue="0.5" />
+                    <time>5000</time>
+                    <alpha>1</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+            </params>
+        </meshobj>
+        <meshobj name="emit2">
+            <priority>alpha</priority>
+            <plugin>emit</plugin>
+            <ztest />
+            <move>
+                <v x="10" y="0" z="50" />
+            </move>
+            <params>
+                <factory>emitFact</factory>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <number>50</number>
+                <material>flare_picir</material>
+                <rectparticles w="0.32" h="0.32" />
+                <lighting>no</lighting>
+                <totaltime>5000</totaltime>
+                <startpos>
+                    <emitbox>
+                        <min x="-5" y="0" z="-5" />
+                        <max x="10" y="0" z="10" />
+                    </emitbox>
+                </startpos>
+                <startspeed>
+                    <emitfixed x="0" y="1" z="0" />
+                </startspeed>
+                <startaccel>
+                    <emitfixed x="0" y="0" z="0" />
+                </startaccel>
+                <aging>
+                    <color red="0" green="0.4" blue="1" />
+                    <time>0</time>
+                    <alpha>0.3</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>0.3</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0.4" blue="0.8" />
+                    <time>3000</time>
+                    <alpha>0.3</alpha>
+                    <swirl>0.3</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0.4" blue="0.8" />
+                    <time>4000</time>
+                    <alpha>0.3</alpha>
+                    <swirl>0.3</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0.4" blue="0.8" />
+                    <time>5000</time>
+                    <alpha>1</alpha>
+                    <swirl>0.3</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>3</scale>
+                </aging>
+            </params>
+        </meshobj>
+        <meshobj name="emit3">
+            <priority>alpha</priority>
+            <key name="entity_Rotate" value="0,10,0,true" />
+            <plugin>emit</plugin>
+            <ztest />
+            <move>
+                <v x="-10" y="2" z="30" />
+            </move>
+            <params>
+                <factory>emitFact</factory>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <number>200</number>
+                <material>spark</material>
+                <rectparticles w="0.1" h="0.1" />
+                <lighting>no</lighting>
+                <totaltime>4000</totaltime>
+                <startpos>
+                    <emitsphere x="0" y="0" z="0" p="1.5" q="2" />
+                </startpos>
+                <startspeed>
+                    <emitfixed x="0" y="0" z="0" />
+                </startspeed>
+                <startaccel>
+                    <emitfixed x="0" y="0" z="0" />
+                </startaccel>
+                <aging>
+                    <color red="0" green="0.4" blue="0.8" />
+                    <time>0</time>
+                    <alpha>1</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0.4" blue="0.8" />
+                    <time>500</time>
+                    <alpha>0.3</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0.4" blue="0.8" />
+                    <time>3500</time>
+                    <alpha>0.3</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0.4" blue="0.8" />
+                    <time>4000</time>
+                    <alpha>1</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+            </params>
+        </meshobj>
+        <meshobj name="emit4">
+            <priority>alpha</priority>
+            <plugin>emit</plugin>
+            <ztest />
+            <move>
+                <v x="15" y="0" z="25" />
+            </move>
+            <params>
+                <factory>emitFact</factory>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <number>500</number>
+                <material>raindrop</material>
+                <regularparticles sides="8" radius="0.2" />
+                <lighting>no</lighting>
+                <totaltime>4000</totaltime>
+                <startpos>
+                    <emitsphere x="0" y="2" z="0" p="0" q="0.5" />
+                </startpos>
+                <startspeed>
+                    <emitbox>
+                        <min x="-1" y="-1" z="-1" />
+                        <max x="1" y="1" z="1" />
+                    </emitbox>
+                </startspeed>
+                <startaccel>
+                    <emitfixed x="0" y="0" z="0" />
+                </startaccel>
+                <attractor>
+                    <emitfixed x="0" y="3" z="4" />
+                </attractor>
+                <attractorforce>0.5</attractorforce>
+                <aging>
+                    <color red="1" green="1" blue="0.2" />
+                    <time>0</time>
+                    <alpha>1</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="0.2" blue="0.8" />
+                    <time>1000</time>
+                    <alpha>0.3</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="0.2" blue="0" />
+                    <time>3000</time>
+                    <alpha>0.6</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>0.8</scale>
+                </aging>
+                <aging>
+                    <color red="0.1" green="0.2" blue="0.8" />
+                    <time>4000</time>
+                    <alpha>1</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>0.3</scale>
+                </aging>
+            </params>
+        </meshobj>
+    </sector>
+    <sector name="room0,2">
+        <meshobj name="walls">
+            <zfill />
+            <plugin>thing</plugin>
+            <params>
+                <v x="-20" y="-1" z="-20" />
+                <v x="-20" y="-1" z="20" />
+                <v x="20" y="-1" z="20" />
+                <v x="20" y="-1" z="-20" />
+                <v x="-20" y="5" z="-20" />
+                <v x="-20" y="5" z="20" />
+                <v x="20" y="5" z="20" />
+                <v x="20" y="5" z="-20" />
+                <v x="-20" y="-1" z="-1" />
+                <v x="-20" y="-1" z="1" />
+                <v x="-1" y="-1" z="20" />
+                <v x="1" y="-1" z="20" />
+                <v x="20" y="-1" z="1" />
+                <v x="20" y="-1" z="-1" />
+                <v x="1" y="-1" z="-20" />
+                <v x="-1" y="-1" z="-20" />
+                <v x="-20" y="5" z="-1" />
+                <v x="-20" y="5" z="1" />
+                <v x="-1" y="5" z="20" />
+                <v x="1" y="5" z="20" />
+                <v x="20" y="5" z="1" />
+                <v x="20" y="5" z="-1" />
+                <v x="1" y="5" z="-20" />
+                <v x="-1" y="5" z="-20" />
+                <material>abstract</material>
+                <texlen>5</texlen>
+                <p name="down1">
+                    <v>0</v>
+                    <v>1</v>
+                    <v>10</v>
+                    <v>15</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>floor</plane>
+                    </texmap>
+                </p>
+                <p name="down2">
+                    <v>15</v>
+                    <v>10</v>
+                    <v>11</v>
+                    <v>14</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>floor</plane>
+                    </texmap>
+                </p>
+                <p name="down3">
+                    <v>14</v>
+                    <v>11</v>
+                    <v>2</v>
+                    <v>3</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>floor</plane>
+                    </texmap>
+                </p>
+                <p name="up1">
+                    <v>5</v>
+                    <v>4</v>
+                    <v>23</v>
+                    <v>18</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>ceiling</plane>
+                    </texmap>
+                </p>
+                <p name="up2">
+                    <v>18</v>
+                    <v>23</v>
+                    <v>22</v>
+                    <v>19</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>ceiling</plane>
+                    </texmap>
+                </p>
+                <p name="up3">
+                    <v>19</v>
+                    <v>22</v>
+                    <v>7</v>
+                    <v>6</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>ceiling</plane>
+                    </texmap>
+                </p>
+                <p name="front1">
+                    <v>5</v>
+                    <v>18</v>
+                    <v>10</v>
+                    <v>1</v>
+                </p>
+                <p name="front2">
+                    <v>18</v>
+                    <v>19</v>
+                    <v>11</v>
+                    <v>10</v>
+                </p>
+                <p name="front3">
+                    <v>19</v>
+                    <v>6</v>
+                    <v>2</v>
+                    <v>11</v>
+                </p>
+                <p name="back1">
+                    <v>7</v>
+                    <v>22</v>
+                    <v>14</v>
+                    <v>3</v>
+                </p>
+                <p name="back2">
+                    <v>22</v>
+                    <v>23</v>
+                    <v>15</v>
+                    <v>14</v>
+                    <portal>
+                        <sector>room0,1</sector>
+                    </portal>
+                </p>
+                <p name="back3">
+                    <v>23</v>
+                    <v>4</v>
+                    <v>0</v>
+                    <v>15</v>
+                </p>
+                <p name="right1">
+                    <v>6</v>
+                    <v>20</v>
+                    <v>12</v>
+                    <v>2</v>
+                </p>
+                <p name="right2">
+                    <v>20</v>
+                    <v>21</v>
+                    <v>13</v>
+                    <v>12</v>
+                </p>
+                <p name="right3">
+                    <v>21</v>
+                    <v>7</v>
+                    <v>3</v>
+                    <v>13</v>
+                </p>
+                <p name="left1">
+                    <v>4</v>
+                    <v>16</v>
+                    <v>8</v>
+                    <v>0</v>
+                </p>
+                <p name="left2">
+                    <v>16</v>
+                    <v>17</v>
+                    <v>9</v>
+                    <v>8</v>
+                    <portal>
+                        <sector>room-1,2</sector>
+                    </portal>
+                </p>
+                <p name="left3">
+                    <v>17</v>
+                    <v>5</v>
+                    <v>1</v>
+                    <v>9</v>
+                </p>
+            </params>
+            <hardmove>
+                <v x="0" y="0" z="80" />
+            </hardmove>
+            <lmcache>room0_2_walls</lmcache>
+        </meshobj>
+        <light name="light3">
+            <center x="0" y="0" z="80" />
+            <radius>40</radius>
+            <color red="1" green="0" blue="1" />
+        </light>
+        <meshobj name="fire">
+            <priority>alpha</priority>
+            <plugin>fire</plugin>
+            <ztest />
+            <move>
+                <v x="-10" y="0" z="70" />
+            </move>
+            <params>
+                <factory>fireFact</factory>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <number>200</number>
+                <material>raindrop</material>
+                <originbox>
+                    <min x="-2" y="0" z="-2" />
+                    <max x="2" y="0" z="2" />
+                </originbox>
+                <dropsize w="0.1" h="0.2" />
+                <direction x="0" y="2" z="0" />
+                <lighting>no</lighting>
+                <swirl>1.6</swirl>
+                <colorscale>0.2</colorscale>
+            </params>
+        </meshobj>
+        <meshobj name="spiral">
+            <priority>alpha</priority>
+            <plugin>spiral</plugin>
+            <ztest />
+            <move>
+                <v x="10" y="0" z="70" />
+            </move>
+            <params>
+                <factory>spiralFact</factory>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <number>200</number>
+                <material>raindrop</material>
+                <color red="0.2" green="0.9" blue="0.2" />
+                <source x="0" y="0" z="0" />
+            </params>
+        </meshobj>
+        <meshobj name="emit5">
+            <priority>alpha</priority>
+            <plugin>emit</plugin>
+            <ztest />
+            <move>
+                <v x="10" y="-1" z="90" />
+            </move>
+            <params>
+                <factory>emitFact</factory>
+                <mixmode>
+                    <copy />
+                </mixmode>
+                <number>200</number>
+                <material>andrew_marble4</material>
+                <regularparticles sides="12" radius="0.5" />
+                <lighting>yes</lighting>
+                <totaltime>2500</totaltime>
+                <startpos>
+                    <emitcylinder p="-1.99261" q="0.8">
+                        <min x="0" y="0" z="0" />
+                        <max x="0" y="2" z="0" />
+                    </emitcylinder>
+                </startpos>
+                <startspeed>
+                    <emitcylindertangent p="-1.99261" q="0.8">
+                        <min x="0" y="0" z="0" />
+                        <max x="0" y="2" z="0" />
+                    </emitcylindertangent>
+                </startspeed>
+                <startaccel>
+                    <emitfixed x="0" y="0" z="0" />
+                </startaccel>
+                <attractor>
+                    <emitfixed x="0" y="5" z="0" />
+                </attractor>
+                <attractorforce>0.5</attractorforce>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>0</time>
+                    <alpha>1</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>500</time>
+                    <alpha>0.5</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>2000</time>
+                    <alpha>0.5</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>2500</time>
+                    <alpha>1</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+            </params>
+        </meshobj>
+        <meshobj name="emit6">
+            <priority>alpha</priority>
+            <plugin>emit</plugin>
+            <ztest />
+            <key name="entity_Rotate" value="0,50,0,true" />
+            <move>
+                <v x="-10" y="-1" z="90" />
+            </move>
+            <params>
+                <factory>emitFact</factory>
+                <mixmode>
+                    <multiply2 />
+                </mixmode>
+                <number>200</number>
+                <material>sky</material>
+                <regularparticles sides="4" radius="0.25" />
+                <lighting>no</lighting>
+                <totaltime>1000</totaltime>
+                <startpos>
+                    <emitcylinder p="-1.99261" q="0">
+                        <min x="0" y="0" z="0" />
+                        <max x="0" y="0.2" z="0" />
+                    </emitcylinder>
+                </startpos>
+                <startspeed>
+                    <emitfixed x="0" y="1" z="0" />
+                </startspeed>
+                <startaccel>
+                    <emitfixed x="0" y="0" z="0" />
+                </startaccel>
+                <attractor>
+                    <emitfixed x="0" y="0" z="0" />
+                </attractor>
+                <attractorforce>-2.5</attractorforce>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>0</time>
+                    <alpha>0</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>200</time>
+                    <alpha>0</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>1</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>800</time>
+                    <alpha>0</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>1</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>1000</time>
+                    <alpha>0</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>2</rotspeed>
+                    <scale>1</scale>
+                </aging>
+            </params>
+        </meshobj>
+    </sector>
+    <sector name="room-1,2">
+        <meshobj name="walls">
+            <zfill />
+            <plugin>thing</plugin>
+            <params>
+                <v x="-20" y="-1" z="-20" />
+                <v x="-20" y="-1" z="20" />
+                <v x="20" y="-1" z="20" />
+                <v x="20" y="-1" z="-20" />
+                <v x="-20" y="5" z="-20" />
+                <v x="-20" y="5" z="20" />
+                <v x="20" y="5" z="20" />
+                <v x="20" y="5" z="-20" />
+                <v x="-20" y="-1" z="-1" />
+                <v x="-20" y="-1" z="1" />
+                <v x="-1" y="-1" z="20" />
+                <v x="1" y="-1" z="20" />
+                <v x="20" y="-1" z="1" />
+                <v x="20" y="-1" z="-1" />
+                <v x="1" y="-1" z="-20" />
+                <v x="-1" y="-1" z="-20" />
+                <v x="-20" y="5" z="-1" />
+                <v x="-20" y="5" z="1" />
+                <v x="-1" y="5" z="20" />
+                <v x="1" y="5" z="20" />
+                <v x="20" y="5" z="1" />
+                <v x="20" y="5" z="-1" />
+                <v x="1" y="5" z="-20" />
+                <v x="-1" y="5" z="-20" />
+                <material>abstract</material>
+                <texlen>5</texlen>
+                <p name="down1">
+                    <v>0</v>
+                    <v>1</v>
+                    <v>10</v>
+                    <v>15</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>floor</plane>
+                    </texmap>
+                </p>
+                <p name="down2">
+                    <v>15</v>
+                    <v>10</v>
+                    <v>11</v>
+                    <v>14</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>floor</plane>
+                    </texmap>
+                </p>
+                <p name="down3">
+                    <v>14</v>
+                    <v>11</v>
+                    <v>2</v>
+                    <v>3</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>floor</plane>
+                    </texmap>
+                </p>
+                <p name="up1">
+                    <v>5</v>
+                    <v>4</v>
+                    <v>23</v>
+                    <v>18</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>ceiling</plane>
+                    </texmap>
+                </p>
+                <p name="up2">
+                    <v>18</v>
+                    <v>23</v>
+                    <v>22</v>
+                    <v>19</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>ceiling</plane>
+                    </texmap>
+                </p>
+                <p name="up3">
+                    <v>19</v>
+                    <v>22</v>
+                    <v>7</v>
+                    <v>6</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>ceiling</plane>
+                    </texmap>
+                </p>
+                <p name="front1">
+                    <v>5</v>
+                    <v>18</v>
+                    <v>10</v>
+                    <v>1</v>
+                </p>
+                <p name="front2">
+                    <v>18</v>
+                    <v>19</v>
+                    <v>11</v>
+                    <v>10</v>
+                </p>
+                <p name="front3">
+                    <v>19</v>
+                    <v>6</v>
+                    <v>2</v>
+                    <v>11</v>
+                </p>
+                <p name="back1">
+                    <v>7</v>
+                    <v>22</v>
+                    <v>14</v>
+                    <v>3</v>
+                </p>
+                <p name="back2">
+                    <v>22</v>
+                    <v>23</v>
+                    <v>15</v>
+                    <v>14</v>
+                </p>
+                <p name="back3">
+                    <v>23</v>
+                    <v>4</v>
+                    <v>0</v>
+                    <v>15</v>
+                </p>
+                <p name="right1">
+                    <v>6</v>
+                    <v>20</v>
+                    <v>12</v>
+                    <v>2</v>
+                </p>
+                <p name="right2">
+                    <v>20</v>
+                    <v>21</v>
+                    <v>13</v>
+                    <v>12</v>
+                    <portal>
+                        <sector>room0,2</sector>
+                    </portal>
+                </p>
+                <p name="right3">
+                    <v>21</v>
+                    <v>7</v>
+                    <v>3</v>
+                    <v>13</v>
+                </p>
+                <p name="left1">
+                    <v>4</v>
+                    <v>16</v>
+                    <v>8</v>
+                    <v>0</v>
+                </p>
+                <p name="left2">
+                    <v>16</v>
+                    <v>17</v>
+                    <v>9</v>
+                    <v>8</v>
+                </p>
+                <p name="left3">
+                    <v>17</v>
+                    <v>5</v>
+                    <v>1</v>
+                    <v>9</v>
+                </p>
+            </params>
+            <hardmove>
+                <v x="-40" y="0" z="80" />
+            </hardmove>
+            <lmcache>room-1_2_walls</lmcache>
+        </meshobj>
+        <light name="light4">
+            <center x="-40" y="0" z="80" />
+            <radius>40</radius>
+            <color red="1" green="1" blue="0" />
+        </light>
+        <meshobj name="emit7">
+            <priority>alpha</priority>
+            <plugin>emit</plugin>
+            <ztest />
+            <move>
+                <v x="-50" y="-1" z="70" />
+            </move>
+            <params>
+                <factory>emitFact</factory>
+                <mixmode>
+                    <copy />
+                </mixmode>
+                <number>50</number>
+                <material>andrew_marble4</material>
+                <regularparticles sides="6" radius="1" />
+                <lighting>no</lighting>
+                <totaltime>10000</totaltime>
+                <startpos>
+                    <emitbox>
+                        <min x="-2" y="0" z="-2" />
+                        <max x="2" y="2.2" z="2" />
+                    </emitbox>
+                </startpos>
+                <startspeed>
+                    <emitfixed x="0" y="0" z="0" />
+                </startspeed>
+                <startaccel>
+                    <emitfixed x="0" y="0" z="0" />
+                </startaccel>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>0</time>
+                    <alpha>1</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>200</time>
+                    <alpha>0.8</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>4300</time>
+                    <alpha>0.8</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>1</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>4700</time>
+                    <alpha>0.8</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>9800</time>
+                    <alpha>0.8</alpha>
+                    <swirl>0.2</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>10000</time>
+                    <alpha>1</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+            </params>
+        </meshobj>
+        <meshobj name="emit8">
+            <priority>alpha</priority>
+            <plugin>emit</plugin>
+            <ztest />
+            <move>
+                <v x="-30" y="-1" z="70" />
+            </move>
+            <params>
+                <factory>emitFact</factory>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <number>10</number>
+                <material>spark</material>
+                <regularparticles sides="7" radius="0.04" />
+                <lighting>no</lighting>
+                <totaltime>5000</totaltime>
+                <startpos>
+                    <emitmix>
+                        <weight>2</weight>
+                        <emitline>
+                            <min x="-1" y="2" z="0" />
+                            <max x="1" y="2" z="0" />
+                        </emitline>
+                    </emitmix>
+                    <emitmix>
+                        <weight>3</weight>
+                        <emitline>
+                            <min x="0" y="0" z="0" />
+                            <max x="0" y="3" z="0" />
+                        </emitline>
+                    </emitmix>
+                </startpos>
+                <startspeed>
+                    <emitfixed x="0" y="0" z="0" />
+                </startspeed>
+                <startaccel>
+                    <emitfixed x="0" y="0" z="0" />
+                </startaccel>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>0</time>
+                    <alpha>1</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>0.01</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>200</time>
+                    <alpha>0.8</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>0.3</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>4400</time>
+                    <alpha>0.8</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>0.3</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>4800</time>
+                    <alpha>0</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>10</rotspeed>
+                    <scale>5</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>5000</time>
+                    <alpha>1</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+            </params>
+        </meshobj>
+        <meshobj name="emit9">
+            <priority>alpha</priority>
+            <plugin>emit</plugin>
+            <ztest />
+            <move>
+                <v x="-50" y="-1" z="90" />
+            </move>
+            <params>
+                <factory>emitFact</factory>
+                <mixmode>
+                    <copy />
+                </mixmode>
+                <number>100</number>
+                <material>fpart</material>
+                <regularparticles sides="6" radius="1" />
+                <lighting>no</lighting>
+                <totaltime>10000</totaltime>
+                <startpos>
+                    <emitbox>
+                        <min x="-2" y="0" z="-2" />
+                        <max x="2" y="2.2" z="2" />
+                    </emitbox>
+                </startpos>
+                <startspeed>
+                    <emitfixed x="0" y="-0.2" z="0" />
+                </startspeed>
+                <startaccel>
+                    <emitfixed x="0" y="0.1" z="0" />
+                </startaccel>
+                <aging>
+                    <color red="0" green="0" blue="0.4" />
+                    <time>0</time>
+                    <alpha>1</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0" blue="0.4" />
+                    <time>200</time>
+                    <alpha>0.8</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0" blue="0.4" />
+                    <time>4300</time>
+                    <alpha>0.8</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>1</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0" blue="0.4" />
+                    <time>4700</time>
+                    <alpha>0.8</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0" blue="0.4" />
+                    <time>9800</time>
+                    <alpha>0.8</alpha>
+                    <swirl>0.2</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0" blue="0.4" />
+                    <time>10000</time>
+                    <alpha>1</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+            </params>
+        </meshobj>
+        <meshobj name="emit10">
+            <priority>alpha</priority>
+            <plugin>emit</plugin>
+            <ztest />
+            <move>
+                <v x="-30" y="-1" z="90" />
+            </move>
+            <params>
+                <factory>emitFact</factory>
+                <mixmode>
+                    <copy />
+                </mixmode>
+                <number>100</number>
+                <material>fp2</material>
+                <regularparticles sides="8" radius="0.9" />
+                <lighting>no</lighting>
+                <totaltime>5000</totaltime>
+                <startpos>
+                    <emitsphere x="0" y="0.5" z="0" p="0" q="0.4" />
+                </startpos>
+                <startspeed>
+                    <emitsphere x="-0.3" y="0" z="0" p="0" q="0.3" />
+                </startspeed>
+                <startaccel>
+                    <emitfixed x="0" y="0.2" z="0" />
+                </startaccel>
+                <attractor>
+                    <emitbox>
+                        <min x="-0.2" y="2" z="-0.2" />
+                        <max x="0.2" y="2" z="0.2" />
+                    </emitbox>
+                </attractor>
+                <attractorforce>0.15</attractorforce>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>0</time>
+                    <alpha>1</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>0.5</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>200</time>
+                    <alpha>0</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>0.5</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="0.2" />
+                    <time>1300</time>
+                    <alpha>0.2</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>1</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="0.5" blue="0.2" />
+                    <time>2700</time>
+                    <alpha>0.5</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>1</rotspeed>
+                    <scale>0.8</scale>
+                </aging>
+                <aging>
+                    <color red="0.2" green="0.2" blue="0.2" />
+                    <time>3600</time>
+                    <alpha>0.5</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1.5</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0" blue="0" />
+                    <time>5000</time>
+                    <alpha>1</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1.5</scale>
+                </aging>
+            </params>
+        </meshobj>
+    </sector>
+    <sector name="room1,0">
+        <meshobj name="walls">
+            <zfill />
+            <plugin>thing</plugin>
+            <params>
+                <v x="-20" y="-1" z="-20" />
+                <v x="-20" y="-1" z="20" />
+                <v x="20" y="-1" z="20" />
+                <v x="20" y="-1" z="-20" />
+                <v x="-20" y="5" z="-20" />
+                <v x="-20" y="5" z="20" />
+                <v x="20" y="5" z="20" />
+                <v x="20" y="5" z="-20" />
+                <v x="-20" y="-1" z="-1" />
+                <v x="-20" y="-1" z="1" />
+                <v x="-1" y="-1" z="20" />
+                <v x="1" y="-1" z="20" />
+                <v x="20" y="-1" z="1" />
+                <v x="20" y="-1" z="-1" />
+                <v x="1" y="-1" z="-20" />
+                <v x="-1" y="-1" z="-20" />
+                <v x="-20" y="5" z="-1" />
+                <v x="-20" y="5" z="1" />
+                <v x="-1" y="5" z="20" />
+                <v x="1" y="5" z="20" />
+                <v x="20" y="5" z="1" />
+                <v x="20" y="5" z="-1" />
+                <v x="1" y="5" z="-20" />
+                <v x="-1" y="5" z="-20" />
+                <material>abstract</material>
+                <texlen>5</texlen>
+                <p name="down1">
+                    <v>0</v>
+                    <v>1</v>
+                    <v>10</v>
+                    <v>15</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>floor</plane>
+                    </texmap>
+                </p>
+                <p name="down2">
+                    <v>15</v>
+                    <v>10</v>
+                    <v>11</v>
+                    <v>14</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>floor</plane>
+                    </texmap>
+                </p>
+                <p name="down3">
+                    <v>14</v>
+                    <v>11</v>
+                    <v>2</v>
+                    <v>3</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>floor</plane>
+                    </texmap>
+                </p>
+                <p name="up1">
+                    <v>5</v>
+                    <v>4</v>
+                    <v>23</v>
+                    <v>18</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>ceiling</plane>
+                    </texmap>
+                </p>
+                <p name="up2">
+                    <v>18</v>
+                    <v>23</v>
+                    <v>22</v>
+                    <v>19</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>ceiling</plane>
+                    </texmap>
+                </p>
+                <p name="up3">
+                    <v>19</v>
+                    <v>22</v>
+                    <v>7</v>
+                    <v>6</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>ceiling</plane>
+                    </texmap>
+                </p>
+                <p name="front1">
+                    <v>5</v>
+                    <v>18</v>
+                    <v>10</v>
+                    <v>1</v>
+                </p>
+                <p name="front2">
+                    <v>18</v>
+                    <v>19</v>
+                    <v>11</v>
+                    <v>10</v>
+                </p>
+                <p name="front3">
+                    <v>19</v>
+                    <v>6</v>
+                    <v>2</v>
+                    <v>11</v>
+                </p>
+                <p name="back1">
+                    <v>7</v>
+                    <v>22</v>
+                    <v>14</v>
+                    <v>3</v>
+                </p>
+                <p name="back2">
+                    <v>22</v>
+                    <v>23</v>
+                    <v>15</v>
+                    <v>14</v>
+                </p>
+                <p name="back3">
+                    <v>23</v>
+                    <v>4</v>
+                    <v>0</v>
+                    <v>15</v>
+                </p>
+                <p name="right1">
+                    <v>6</v>
+                    <v>20</v>
+                    <v>12</v>
+                    <v>2</v>
+                </p>
+                <p name="right2">
+                    <v>20</v>
+                    <v>21</v>
+                    <v>13</v>
+                    <v>12</v>
+                    <portal>
+                        <sector>room2,0</sector>
+                    </portal>
+                </p>
+                <p name="right3">
+                    <v>21</v>
+                    <v>7</v>
+                    <v>3</v>
+                    <v>13</v>
+                </p>
+                <p name="left1">
+                    <v>4</v>
+                    <v>16</v>
+                    <v>8</v>
+                    <v>0</v>
+                </p>
+                <p name="left2">
+                    <v>16</v>
+                    <v>17</v>
+                    <v>9</v>
+                    <v>8</v>
+                    <portal>
+                        <sector>room</sector>
+                    </portal>
+                </p>
+                <p name="left3">
+                    <v>17</v>
+                    <v>5</v>
+                    <v>1</v>
+                    <v>9</v>
+                </p>
+            </params>
+            <hardmove>
+                <v x="40" y="0" z="0" />
+            </hardmove>
+            <lmcache>room1_0_walls</lmcache>
+        </meshobj>
+        <light name="light5">
+            <center x="40" y="0" z="0" />
+            <radius>40</radius>
+            <color red="1" green="0" blue="0" />
+        </light>
+        <meshobj name="haze1">
+            <priority>alpha</priority>
+            <plugin>haze</plugin>
+            <ztest />
+            <move>
+                <v x="30" y="1.1" z="10" />
+            </move>
+            <params>
+                <factory>hazeFact</factory>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <material>hazecirc</material>
+                <origin x="0" y="-2" z="0" />
+                <directional x="0" y="1" z="0" />
+                <layer>
+                    <scale>0.5</scale>
+                    <hazebox>
+                        <min x="-2" y="-2" z="-2" />
+                        <max x="2" y="2" z="2" />
+                    </hazebox>
+                </layer>
+            </params>
+        </meshobj>
+        <meshobj name="haze2">
+            <priority>alpha</priority>
+            <plugin>haze</plugin>
+            <ztest />
+            <move>
+                <v x="30" y="0.1" z="-10" />
+            </move>
+            <params>
+                <factory>hazeFact</factory>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <material>hazebasic</material>
+                <origin x="0" y="-1" z="0" />
+                <directional x="0" y="1" z="0" />
+                <layer>
+                    <scale>0.5</scale>
+                    <hazecone p="1" q="0.3" number="17">
+                        <min x="0" y="-1" z="0" />
+                        <max x="0" y="5" z="0" />
+                    </hazecone>
+                </layer>
+            </params>
+        </meshobj>
+        <meshobj name="haze3">
+            <priority>alpha</priority>
+            <plugin>haze</plugin>
+            <ztest />
+            <move>
+                <v x="50" y="0.1" z="-10" />
+            </move>
+            <params>
+                <factory>hazeFact</factory>
+                <mixmode>
+                    <copy />
+                </mixmode>
+                <material>fpart</material>
+                <origin x="0" y="-1" z="0" />
+                <directional x="0" y="1" z="0" />
+                <layer>
+                    <scale>0.5</scale>
+                    <hazecone p="1" q="4" number="16">
+                        <min x="0" y="-1" z="0" />
+                        <max x="0" y="5" z="0" />
+                    </hazecone>
+                </layer>
+            </params>
+        </meshobj>
+        <meshobj name="haze4">
+            <priority>alpha</priority>
+            <plugin>haze</plugin>
+            <ztest />
+            <move>
+                <v x="50" y="0.1" z="10" />
+            </move>
+            <params>
+                <factory>hazeFact</factory>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <material>flare_picir</material>
+                <origin x="0" y="1" z="0" />
+                <directional x="0" y="1" z="0" />
+                <layer>
+                    <scale>0.5</scale>
+                    <hazebox>
+                        <min x="-1" y="-1" z="-0.3" />
+                        <max x="1" y="3" z="0.3" />
+                    </hazebox>
+                </layer>
+            </params>
+        </meshobj>
+    </sector>
+    <sector name="room2,0">
+        <meshobj name="walls">
+            <zfill />
+            <plugin>thing</plugin>
+            <params>
+                <v x="-20" y="-1" z="-20" />
+                <v x="-20" y="-1" z="20" />
+                <v x="20" y="-1" z="20" />
+                <v x="20" y="-1" z="-20" />
+                <v x="-20" y="5" z="-20" />
+                <v x="-20" y="5" z="20" />
+                <v x="20" y="5" z="20" />
+                <v x="20" y="5" z="-20" />
+                <v x="-20" y="-1" z="-1" />
+                <v x="-20" y="-1" z="1" />
+                <v x="-1" y="-1" z="20" />
+                <v x="1" y="-1" z="20" />
+                <v x="20" y="-1" z="1" />
+                <v x="20" y="-1" z="-1" />
+                <v x="1" y="-1" z="-20" />
+                <v x="-1" y="-1" z="-20" />
+                <v x="-20" y="5" z="-1" />
+                <v x="-20" y="5" z="1" />
+                <v x="-1" y="5" z="20" />
+                <v x="1" y="5" z="20" />
+                <v x="20" y="5" z="1" />
+                <v x="20" y="5" z="-1" />
+                <v x="1" y="5" z="-20" />
+                <v x="-1" y="5" z="-20" />
+                <material>abstract</material>
+                <texlen>5</texlen>
+                <p name="down1">
+                    <v>0</v>
+                    <v>1</v>
+                    <v>10</v>
+                    <v>15</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>floor</plane>
+                    </texmap>
+                </p>
+                <p name="down2">
+                    <v>15</v>
+                    <v>10</v>
+                    <v>11</v>
+                    <v>14</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>floor</plane>
+                    </texmap>
+                </p>
+                <p name="down3">
+                    <v>14</v>
+                    <v>11</v>
+                    <v>2</v>
+                    <v>3</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>floor</plane>
+                    </texmap>
+                </p>
+                <p name="up1">
+                    <v>5</v>
+                    <v>4</v>
+                    <v>23</v>
+                    <v>18</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>ceiling</plane>
+                    </texmap>
+                </p>
+                <p name="up2">
+                    <v>18</v>
+                    <v>23</v>
+                    <v>22</v>
+                    <v>19</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>ceiling</plane>
+                    </texmap>
+                </p>
+                <p name="up3">
+                    <v>19</v>
+                    <v>22</v>
+                    <v>7</v>
+                    <v>6</v>
+                    <material>wood</material>
+                    <cosfact>0.8</cosfact>
+                    <texmap>
+                        <plane>ceiling</plane>
+                    </texmap>
+                </p>
+                <p name="front1">
+                    <v>5</v>
+                    <v>18</v>
+                    <v>10</v>
+                    <v>1</v>
+                </p>
+                <p name="front2">
+                    <v>18</v>
+                    <v>19</v>
+                    <v>11</v>
+                    <v>10</v>
+                </p>
+                <p name="front3">
+                    <v>19</v>
+                    <v>6</v>
+                    <v>2</v>
+                    <v>11</v>
+                </p>
+                <p name="back1">
+                    <v>7</v>
+                    <v>22</v>
+                    <v>14</v>
+                    <v>3</v>
+                </p>
+                <p name="back2">
+                    <v>22</v>
+                    <v>23</v>
+                    <v>15</v>
+                    <v>14</v>
+                </p>
+                <p name="back3">
+                    <v>23</v>
+                    <v>4</v>
+                    <v>0</v>
+                    <v>15</v>
+                </p>
+                <p name="right1">
+                    <v>6</v>
+                    <v>20</v>
+                    <v>12</v>
+                    <v>2</v>
+                </p>
+                <p name="right2">
+                    <v>20</v>
+                    <v>21</v>
+                    <v>13</v>
+                    <v>12</v>
+                </p>
+                <p name="right3">
+                    <v>21</v>
+                    <v>7</v>
+                    <v>3</v>
+                    <v>13</v>
+                </p>
+                <p name="left1">
+                    <v>4</v>
+                    <v>16</v>
+                    <v>8</v>
+                    <v>0</v>
+                </p>
+                <p name="left2">
+                    <v>16</v>
+                    <v>17</v>
+                    <v>9</v>
+                    <v>8</v>
+                    <portal>
+                        <sector>room1,0</sector>
+                    </portal>
+                </p>
+                <p name="left3">
+                    <v>17</v>
+                    <v>5</v>
+                    <v>1</v>
+                    <v>9</v>
+                </p>
+            </params>
+            <hardmove>
+                <v x="80" y="0" z="0" />
+            </hardmove>
+            <lmcache>room2_0_walls</lmcache>
+        </meshobj>
+        <meshobj name="haze5">
+            <priority>alpha</priority>
+            <plugin>haze</plugin>
+            <ztest />
+            <move>
+                <v x="70" y="0.1" z="-10" />
+            </move>
+            <params>
+                <factory>hazeFact</factory>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <material>plasma</material>
+                <origin x="0" y="-1" z="0" />
+                <directional x="0" y="1" z="0" />
+                <layer>
+                    <scale>0.5</scale>
+                    <hazecone p="1" q="0.3" number="17">
+                        <min x="0" y="-1" z="0" />
+                        <max x="0" y="5" z="0" />
+                    </hazecone>
+                </layer>
+            </params>
+        </meshobj>
+        <light name="light6">
+            <center x="80" y="0" z="0" />
+            <radius>40</radius>
+            <color red="0" green="1" blue="0" />
+        </light>
+    </sector>
+</world>

@@ -33,12 +33,14 @@
 #include "qint.h"
 #include "csutil/csstring.h"
 #include "iutil/object.h"
+#include "iutil/document.h"
 #include "iengine/material.h"
 #include "iutil/objreg.h"
 #include "iutil/vfs.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "imap/ldrctxt.h"
+#include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -50,6 +52,16 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (NUMBER)
   CS_TOKEN_DEF (SOURCE)
 CS_TOKEN_DEF_END
+
+enum
+{
+  XMLTOKEN_COLOR = 1,
+  XMLTOKEN_FACTORY,
+  XMLTOKEN_MATERIAL,
+  XMLTOKEN_MIXMODE,
+  XMLTOKEN_NUMBER,
+  XMLTOKEN_SOURCE
+};
 
 SCF_IMPLEMENT_IBASE (csSpiralFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
@@ -105,6 +117,26 @@ SCF_EXPORT_CLASS_TABLE (spirldr)
     "Crystal Space Spiral Mesh Saver")
 SCF_EXPORT_CLASS_TABLE_END
 
+static void ReportError (iReporter* reporter, const char* id,
+	const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+
+  if (reporter)
+  {
+    reporter->ReportV (CS_REPORTER_SEVERITY_ERROR, id, description, arg);
+  }
+  else
+  {
+    char buf[1024];
+    vsprintf (buf, description, arg);
+    csPrintf ("Error ID: %s\n", id);
+    csPrintf ("Description: %s\n", buf);
+  }
+  va_end (arg);
+}
+
 csSpiralFactoryLoader::csSpiralFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
@@ -125,6 +157,22 @@ bool csSpiralFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 iBase* csSpiralFactoryLoader::Parse (const char* /*string*/,
+	iLoaderContext*, iBase* /* context */)
+{
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.spiral", iMeshObjectType);
+  if (!type)
+  {
+    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.spiral",
+    	iMeshObjectType);
+    printf ("Load TYPE plugin crystalspace.mesh.object.spiral\n");
+  }
+  iMeshObjectFactory* fact = type->NewFactory ();
+  type->DecRef ();
+  return fact;
+}
+
+iBase* csSpiralFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iLoaderContext*, iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
@@ -172,12 +220,15 @@ csSpiralLoader::csSpiralLoader (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   plugin_mgr = NULL;
+  synldr = NULL;
+  reporter = NULL;
 }
 
 csSpiralLoader::~csSpiralLoader ()
 {
   SCF_DEC_REF (plugin_mgr);
   SCF_DEC_REF (synldr);
+  SCF_DEC_REF (reporter);
 }
 
 bool csSpiralLoader::Initialize (iObjectRegistry* object_reg)
@@ -185,6 +236,14 @@ bool csSpiralLoader::Initialize (iObjectRegistry* object_reg)
   csSpiralLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+
+  xmltokens.Register ("color", XMLTOKEN_COLOR);
+  xmltokens.Register ("factory", XMLTOKEN_FACTORY);
+  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
+  xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
+  xmltokens.Register ("number", XMLTOKEN_NUMBER);
+  xmltokens.Register ("source", XMLTOKEN_SOURCE);
   return true;
 }
 
@@ -285,6 +344,92 @@ iBase* csSpiralLoader::Parse (const char* string,
 
   if (partstate) partstate->DecRef ();
   if (spiralstate) spiralstate->DecRef ();
+  return mesh;
+}
+
+iBase* csSpiralLoader::Parse (iDocumentNode* node,
+	iLoaderContext* ldr_context, iBase*)
+{
+  csRef<iMeshObject> mesh;
+  csRef<iParticleState> partstate;
+  csRef<iSpiralState> spiralstate;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_COLOR:
+	{
+	  csColor color;
+	  if (!synldr->ParseColor (child, color))
+	    return NULL;
+	  partstate->SetColor (color);
+	}
+	break;
+      case XMLTOKEN_SOURCE:
+	{
+	  csVector3 s;
+	  if (!synldr->ParseVector (child, s))
+	    return NULL;
+	  spiralstate->SetSource (s);
+	}
+	break;
+      case XMLTOKEN_FACTORY:
+	{
+	  const char* factname = child->GetContentsValue ();
+	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
+	  if (!fact)
+	  {
+      	    ReportError (reporter,
+		"crystalspace.ballloader.parse.unknownfactory",
+		"Couldn't find factory '%s'!", factname);
+	    return NULL;
+	  }
+	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
+          partstate.Take (SCF_QUERY_INTERFACE (mesh, iParticleState));
+          spiralstate.Take (SCF_QUERY_INTERFACE (mesh, iSpiralState));
+	}
+	break;
+      case XMLTOKEN_MATERIAL:
+	{
+	  const char* matname = child->GetContentsValue ();
+          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+	  if (!mat)
+	  {
+      	    ReportError (reporter,
+		"crystalspace.ballloader.parse.unknownmaterial",
+		"Couldn't find material '%s'!", matname);
+            return NULL;
+	  }
+	  partstate->SetMaterialWrapper (mat);
+	}
+	break;
+      case XMLTOKEN_MIXMODE:
+	{
+	  uint mode;
+	  if (!synldr->ParseMixmode (child, mode))
+	    return NULL;
+          partstate->SetMixMode (mode);
+	}
+	break;
+      case XMLTOKEN_NUMBER:
+        spiralstate->SetParticleCount (child->GetContentsValueAsInt ());
+        break;
+      default:
+      	ReportError (reporter,
+		"crystalspace.ballloader.parse.badtoken",
+		"Unexpected token '%s' in spiral loader!", value);
+	return NULL;
+    }
+  }
+
+  // Incref to avoid smart pointer from cleaning up.
+  if (mesh) mesh->IncRef ();
   return mesh;
 }
 

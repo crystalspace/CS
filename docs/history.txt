@@ -1,5 +1,13 @@
 The history order is reversed so that new features are at the top.
 
+21-Aug-2002
+	- Implemented XML version of the spiral loader.
+	- Fixed a bug in cs2xml with parsing of the RADIUS
+	  keyword. This RADIUS can be used for single radius (lights)
+	  or vectors.
+	- Fixed a similar bug with SCALE which can be used with
+	  two or one parameter.
+	- Converted partsys to XML. Seems to be working fine now.
 20-Aug-2002
 	- Implemented XML version of the spr2d mesh object loader.
 	- Added new ParseBox() in syntax services (for XML).

@@ -512,7 +512,6 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
   	!= CS_PARSERR_EOF)
   {
     char* tokname = ToLower (parser->GetUnknownToken (), true);
-    printf ("%s\n", tokname); fflush (stdout);
       switch (cmd)
       {
         case CS_TOKEN_PORTAL:
@@ -575,14 +574,21 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
         case CS_TOKEN_SHIFT:
         case CS_TOKEN_CURVECENTER:
 	  {
-	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
-	    	CS_NODE_ELEMENT, NULL);
-	    child->SetValue (tokname);
+	    csRef<iDocumentNode> child;
 	    float x, y, z;
-	    csScanStr (params, "%f,%f,%f", &x, &y, &z);
-	    child->SetAttributeAsFloat ("x", x);
-	    child->SetAttributeAsFloat ("y", y);
-	    child->SetAttributeAsFloat ("z", z);
+	    int num = csScanStr (params, "%f,%f,%f", &x, &y, &z);
+	    if (num == 3)
+	    {
+	      child = parent->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+	      child->SetValue (tokname);
+	      child->SetAttributeAsFloat ("x", x);
+	      child->SetAttributeAsFloat ("y", y);
+	      child->SetAttributeAsFloat ("z", z);
+	    }
+	    else
+	    {
+	      child = CreateValueNodeAsFloat (parent, tokname, x);
+	    }
 	    if (name) child->SetAttribute ("name", name);
 	  }
 	  break;
@@ -1234,13 +1240,20 @@ defaulthalo:
 	  break;
         case CS_TOKEN_SCALE:
 	  {
-	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
-	    	  CS_NODE_ELEMENT, NULL);
-	    child->SetValue (tokname);
+	    csRef<iDocumentNode> child;
 	    float x, y;
-	    csScanStr (params, "%f,%f", &x, &y);
-	    child->SetAttributeAsFloat ("x", x);
-	    child->SetAttributeAsFloat ("y", y);
+	    int num = csScanStr (params, "%f,%f", &x, &y);
+	    if (num == 2)
+	    {
+	      child = parent->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+	      child->SetValue (tokname);
+	      child->SetAttributeAsFloat ("x", x);
+	      child->SetAttributeAsFloat ("y", y);
+	    }
+	    else
+	    {
+	      child = CreateValueNodeAsFloat (parent, tokname, x);
+	    }
 	  }
 	  break;
 	case CS_TOKEN_TYPE:
