@@ -336,7 +336,7 @@ void draw_map (csRenderView* /*rview*/, int type, void* entity)
 // that is currently visible. This is useful to debug clipping errors
 // and other visual errors.
 int dump_visible_indent = 0;
-void dump_visible (csRenderView* rview, int type, void* entity)
+void dump_visible (csRenderView* /*rview*/, int type, void* entity)
 {
   int i;
   char indent_spaces[255];
