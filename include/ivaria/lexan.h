@@ -19,7 +19,6 @@
 #ifndef __IVARIA_LEXAN_H__
 #define __IVARIA_LEXAN_H__
 
-#include "cssysdef.h"
 #include "iutil/databuff.h"
 #include "iutil/string.h"
 
