@@ -5,11 +5,19 @@ The history order is reversed so that new features are at the top.
 	  updated msvc_libs and the links too msvc_libs in the docs. 
 	- Eric Sunshine committed the CS/scripts/worldcraft/crystal.fgd
 	  submission from Leandro Ezequiel Lovisolo <lovisolo@datafull.com>.
-	- Marten Svanfeldt added a fix which improves quality in new renderer
-	  by texture-mipmap level biasing.
 	- Eric Sunshine fixed a memory leak in csGetPluginPaths() for MacOS/X.
 	  An invocation of csStrNew(), which should have been eliminated in the
 	  previous commit, was left in place.
+	- Marten Svanfeldt added a fix which improves quality in new renderer
+	  by texture-mipmap level biasing.
+	- Eric Sunshine converted the ISO engine makefile so that object-files
+	  for that module are placed in a module-specific object-file
+	  directory, rather than in the common out/PLATFORM/CPU/mode directory.
+	  This change corrects the broken and monolithic design limitation of
+	  the makefile system where no two source files in the entire project
+	  can have the same name even if they reside in different module
+	  directories.  This change can be used as a template for anyone else
+	  who wants to help augment the makefiles.
 1-Mar-2003
 	- Greg Block changed the makefile for the xml documentsystem plugin to
 	  not override the values for the link flags to use when linking libxml
@@ -37,6 +45,13 @@ The history order is reversed so that new features are at the top.
 	    - Reverted Duhpreys changes to genmesh as they don't work.
 	- Marten Svanfeldt fixed a bug in glshader_mtex which made a shader
 	  valid even if it had to many layers.
+	- Rudolf Putocek picked up where Eric Sunshine left off and converted
+	  the remaining makefiles in CS/apps so that object-files for a module
+	  are placed in a module-specific object-file directory, rather than in
+	  the common out/PLATFORM/CPU/mode directory.  This change corrects the
+	  broken and monolithic design limitation of the makefile system where
+	  no two source files in the entire project can have the same name even
+	  if they reside in different module directories.
 28-Feb-2003
 	- Eric Sunshine instructed Doxygen to ignore include/volatile.h.  Since
 	  its contents are specific to each person's installation, thus it does

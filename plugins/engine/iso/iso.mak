@@ -24,22 +24,22 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/engine/iso
-
 ifeq ($(USE_PLUGINS),yes)
   ISO = $(OUTDLL)/iso$(DLL)
   LIB.ISO = $(foreach d,$(DEP.ISO),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(ISO)
 else
-  ISO = $(OUT)/$(LIB_PREFIX)iso$(LIB)
+  ISO = $(OUT.ISO)/$(LIB_PREFIX)iso$(LIB)
   DEP.EXE += $(ISO)
   SCF.STATIC += iso
   TO_INSTALL.STATIC_LIBS += $(ISO)
 endif
 
-INC.ISO = $(wildcard plugins/engine/iso/*.h)
-SRC.ISO = $(wildcard plugins/engine/iso/*.cpp)
-OBJ.ISO = $(addprefix $(OUT)/,$(notdir $(SRC.ISO:.cpp=$O)))
+DIR.ISO = plugins/engine/iso
+OUT.ISO = $(OUT)/$(DIR.ISO)
+INC.ISO = $(wildcard $(DIR.ISO)/*.h)
+SRC.ISO = $(wildcard $(DIR.ISO)/*.cpp)
+OBJ.ISO = $(addprefix $(OUT.ISO)/,$(notdir $(SRC.ISO:.cpp=$O)))
 DEP.ISO = CSUTIL CSSYS CSGEOM CSGFX CSUTIL CSSYS
 
 MSVC.DSP += ISO
@@ -50,22 +50,33 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: iso isoclean
-iso: $(OUTDIRS) $(ISO)
+.PHONY: iso isoclean isocleandep
+
+iso: $(OUT.ISO) $(ISO)
+
+$(OUT.ISO)/%$O: $(DIR.ISO)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(ISO): $(OBJ.ISO) $(LIB.ISO)
 	$(DO.PLUGIN)
+
+$(OUT.ISO):
+	$(MKDIRS)
 
 clean: isoclean
 isoclean:
 	-$(RM) $(ISO) $(OBJ.ISO)
 
+cleandep: isocleandep
+isocleandep:
+	-$(RM) $(OUT.ISO)/iso.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/iso.dep
-$(OUTOS)/iso.dep: $(SRC.ISO)
-	$(DO.DEP)
+dep: $(OUT.ISO) $(OUT.ISO)/iso.dep
+$(OUT.ISO)/iso.dep: $(SRC.ISO)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/iso.dep
+-include $(OUT.ISO)/iso.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
