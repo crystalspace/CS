@@ -31,6 +31,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iutil/plugin.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/graph2d.h"
 #include "ivideo/shader/shader.h"
 
 #include "glshader_cgvp.h"
@@ -64,6 +65,7 @@ csGLShader_CG::csGLShader_CG(iBase* parent)
   cgSetErrorCallback (ErrorCallback);
 
   enable = false;
+  isOpen = false;
 }
 
 csGLShader_CG::~csGLShader_CG()
@@ -92,36 +94,40 @@ bool csGLShader_CG::SupportType(const char* type)
 {
   if (!enable)
     return false;
-  if( strcasecmp(type, "gl_cg_vp") == 0)
+  if( strcasecmp(type, "vp") == 0)
     return true;
-  if( strcasecmp(type, "gl_cg_fp") == 0)
+  if( strcasecmp(type, "fp") == 0)
     return true;
   return false;
 }
 
 csPtr<iShaderProgram> csGLShader_CG::CreateProgram(const char* type)
 {
-  if( strcasecmp(type, "gl_cg_vp") == 0)
-    return csPtr<iShaderProgram>(new csShaderGLCGVP(object_reg, context));
-  else if( strcasecmp(type, "gl_cg_fp") == 0)
-    return csPtr<iShaderProgram>(new csShaderGLCGFP(object_reg, context));
+  if( strcasecmp(type, "vp") == 0)
+    return csPtr<iShaderProgram>(new csShaderGLCGVP(this));
+  else if( strcasecmp(type, "fp") == 0)
+    return csPtr<iShaderProgram>(new csShaderGLCGFP(this));
   else return 0;
 }
 
 void csGLShader_CG::Open()
 {
-
+  if (isOpen) return;
   if(!object_reg)
     return;
 
   csRef<iGraphics3D> r = CS_QUERY_REGISTRY(object_reg,iGraphics3D);
   csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r,
-  	iShaderRenderInterface);
+	iShaderRenderInterface);
 
   csRef<iFactory> f = SCF_QUERY_INTERFACE (r, iFactory);
   if (f != 0 && strcmp ("crystalspace.graphics3d.opengl", 
-    f->QueryClassID ()) == 0)
+	f->QueryClassID ()) == 0)
     enable = true;
+  else
+    return;
+
+  isOpen = true;
 }
 
 ////////////////////////////////////////////////////////////////////

@@ -50,19 +50,6 @@ void csShaderGLCGVP::Activate()
 
   cgGLEnableProfile (cgGetProgramProfile (program));
 
-
-  /*csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
-  csShaderVariable* var = GetVariable (strings->Request ("STANDARD_LIGHT_0_POSITION"));
-  if (var)
-  {
-    CGparameter param = cgGetNamedParameter (program, "LightPos");
-    csVector4 blah;
-    var->GetValue (blah);
-    if (cgIsParameter(param))
-      cgGLSetParameter4f(param, blah.x, blah.y, blah.z, blah.w);
-  } else printf("Not found!\n");*/
-
   for(i = 0; i < matrixtrackers.Length(); ++i)
   {
     cgGLSetStateMatrixParameter (
@@ -79,17 +66,20 @@ void csShaderGLCGVP::Deactivate()
   cgGLDisableProfile (cgGetProgramProfile (program));
 }
 
-void csShaderGLCGVP::SetupState ( csRenderMesh *mesh, 
-	const csArray<iShaderVariableContext*>& dynamicDomains)
+void csShaderGLCGVP::SetupState (csRenderMesh* mesh,
+  const CS_SHADERVAR_STACK &stacks)
 {
   int i;
 
   // set variables
   for(i = 0; i < variablemap.Length(); ++i)
   {
-    if (!variablemap[i].parameter)
-      continue;
-    csShaderVariable* lvar = GetVariable(variablemap[i].name);
+    // Check if it's statically linked
+    csRef<csShaderVariable> lvar = variablemap[i].statlink;
+    // If not, we check the stack
+    if (!lvar && variablemap[i].name<stacks.Length ()
+        && stacks[variablemap[i].name].Length () > 0)
+      lvar = stacks[variablemap[i].name].Top ();
 
     if(lvar)
     {
@@ -125,60 +115,8 @@ void csShaderGLCGVP::SetupState ( csRenderMesh *mesh,
           }
           break;
         default:
-	  break;
+	        break;
       }
-    }
-  }
-
-  if (dynamicVars.Length() > 0)
-  {
-    for(i=0;i<dynamicDomains.Length();i++)
-    {
-      dynamicDomains[i]->FillVariableList(&dynamicVars);
-    }
-  }
-
-  for(i = 0; i < dynamicVars.Length(); ++i)
-  {
-    csShaderVariable* lvar = dynamicVars.Get(i).shaderVariable;
-
-    if(lvar)
-    {
-      switch(lvar->GetType())
-      {
-        case csShaderVariable::INT:
-          {
-            int intval;
-            if(lvar->GetValue(intval))
-              cgGLSetParameter1f(variablemap[i].parameter, (float)intval);
-          }
-          break;
-        case csShaderVariable::FLOAT:
-          {
-            float fval;
-            if(lvar->GetValue(fval))
-              cgGLSetParameter1f(variablemap[i].parameter, (float)fval);
-          }
-          break;
-        case csShaderVariable::VECTOR3:
-          {
-            csVector3 v3;
-            if(lvar->GetValue(v3))
-              cgGLSetParameter3f(variablemap[i].parameter, v3.x, v3.y, v3.z);
-          }
-          break;
-        case csShaderVariable::VECTOR4:
-          {
-            csVector4 v4;
-            if(lvar->GetValue(v4))
-              cgGLSetParameter4f(variablemap[i].parameter,
-	        v4.x, v4.y, v4.z, v4.w);
-          }
-          break;
-        default:
-	  break;
-      }
-      dynamicVars.Get (i).shaderVariable = 0;
     }
   }
 }
@@ -187,10 +125,34 @@ void csShaderGLCGVP::ResetState()
 {
 }
 
-bool csShaderGLCGVP::Compile(csArray<iShaderVariableContext*> &staticDomains)
+bool csShaderGLCGVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 {
-  // i guess here should be the code from Prepare()
-  return false;
+  shaderPlug->Open ();
+
+  csShaderVariable *var;
+  int i,j;
+
+  for (i = 0; i < variablemap.Length (); i++)
+  {
+    // Check if we've got it locally
+    var = svcontext.GetVariable(variablemap[i].name);
+    if (!var)
+    {
+      // If not, check the static contexts
+      for (j=0;j<staticContexts.Length();j++)
+      {
+        var = staticContexts[j]->GetVariable (variablemap[i].name);
+        if (var) break;
+      }
+    }
+    if (var)
+    {
+      // We found it, so we add it as a static mapping
+      variablemap[i].statlink = var;
+    }
+  }
+
+  return LoadProgramStringToGL (programstring);
 }
 
 bool csShaderGLCGVP::LoadProgramStringToGL(const char* programstring)
@@ -198,9 +160,16 @@ bool csShaderGLCGVP::LoadProgramStringToGL(const char* programstring)
   if(!programstring)
     return false;
 
-  program = cgCreateProgram (context, CG_SOURCE,
-    programstring, cgGLGetLatestProfile (CG_GL_VERTEX),
-    "main", 0);
+  CGprofile profile = CG_PROFILE_UNKNOWN;
+
+  if(cg_profile.Length ())
+    profile = cgGetProfile (cg_profile.GetData ());
+
+  if(profile == CG_PROFILE_UNKNOWN)
+    profile = cgGLGetLatestProfile (CG_GL_VERTEX);
+
+  program = cgCreateProgram (shaderPlug->context, CG_SOURCE,
+    programstring, profile, "main", 0);
 
   if (!program)
     return false;
@@ -216,26 +185,12 @@ void csShaderGLCGVP::BuildTokenHash()
   xmltokens.Register("declare",XMLTOKEN_DECLARE);
   xmltokens.Register("variablemap",XMLTOKEN_VARIABLEMAP);
   xmltokens.Register("program", XMLTOKEN_PROGRAM);
+  xmltokens.Register("profile", XMLTOKEN_PROFILE);
 
   xmltokens.Register("integer", 100+csShaderVariable::INT);
   xmltokens.Register("float", 100+csShaderVariable::FLOAT);
-  //xmltokens.Register("string", 100+csShaderVariable::STRING);
   xmltokens.Register("vector3", 100+csShaderVariable::VECTOR3);
-}
-
-bool csShaderGLCGVP::Load(iDataBuffer* program)
-{
-  csRef<iDocumentSystem> xml (CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
-  if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
-  csRef<iDocument> doc = xml->CreateDocument ();
-  const char* error = doc->Parse (program);
-  if (error != 0)
-  { 
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.graphics3d.shader.glcg", "XML error '%s'!", error);
-    return false;
-  }
-  return Load(doc->GetRoot());
+  xmltokens.Register("vector4", 100+csShaderVariable::VECTOR4);
 }
 
 bool csShaderGLCGVP::Load(iDocumentNode* program)
@@ -246,9 +201,9 @@ bool csShaderGLCGVP::Load(iDocumentNode* program)
   BuildTokenHash();
 
   csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(
-  	object_reg, iShaderManager);
+  	shaderPlug->object_reg, iShaderManager);
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-	object_reg, "crystalspace.shared.stringset", iStringSet);
+	shaderPlug->object_reg, "crystalspace.shared.stringset", iStringSet);
 
 
   csRef<iDocumentNode> variablesnode = program->GetNode("cgvp");
@@ -269,18 +224,21 @@ bool csShaderGLCGVP::Load(iDocumentNode* program)
             programstring = csStrNew (child->GetContentsValue ());
           }
           break;
+        case XMLTOKEN_PROFILE:
+          cg_profile = child->GetContentsValue ();
+          break;
         case XMLTOKEN_DECLARE:
           {
             //create a new variable
             csRef<csShaderVariable> var = 
-	      csPtr<csShaderVariable>(new csShaderVariable ( strings->
+	            csPtr<csShaderVariable>(new csShaderVariable ( strings->
 							     Request (child->
 								      GetAttributeValue ("name"))));
             // @@@ Will leak! Should do proper refcounting.
             var->IncRef ();
 
             csStringID idtype = xmltokens.Request (
-	    	child->GetAttributeValue("type"));
+	    	      child->GetAttributeValue("type"));
             idtype -= 100;
             var->SetType( (csShaderVariable::VariableType) idtype);
             switch(idtype)
@@ -291,16 +249,22 @@ bool csShaderGLCGVP::Load(iDocumentNode* program)
               case csShaderVariable::FLOAT:
                 var->SetValue (child->GetAttributeValueAsFloat("default"));
                 break;
-		//case csShaderVariable::STRING:
-                //var->SetValue (new scfString (child->GetAttributeValue (
-		//	"default")));
-                //break;
               case csShaderVariable::VECTOR3:
+              {
                 const char* def = child->GetAttributeValue("default");
                 csVector3 v;
                 sscanf(def, "%f,%f,%f", &v.x, &v.y, &v.z);
                 var->SetValue( v );
                 break;
+              }
+              case csShaderVariable::VECTOR4:
+              {
+                const char* def = child->GetAttributeValue("default");
+                csVector4 v;
+                sscanf(def, "%f,%f,%f,%f", &v.x, &v.y, &v.z, &v.w);
+                var->SetValue( v );
+                break;
+              }
             }
             AddVariable (var);
           }

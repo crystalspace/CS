@@ -26,6 +26,11 @@ chronological order.
 	  8500 and up, while PS 1.1 will only work on nVidia GeForce 3 and up.
 	- Norman Kraemer added the missing csGetMouseDesc, csGetJoystickDesc
 	  and FromEvent methods/funtions in the csInputDefinition class.
+	- John Harger fixed the Cg plugin so it works again. Also added a
+	  <profile></profile> option to force a profile instead of using
+	  whatever the newest supported profile is. (Useful for forcing
+	  arbvp1 vertex programs so you can use the "glstate") Newest profile
+	  is still the default behavior.
 1-Mar-2004
 	- res augmented the Win32 canvas to allow retrieval/setting of the
 	  window rectangle (via PerformExtension()).

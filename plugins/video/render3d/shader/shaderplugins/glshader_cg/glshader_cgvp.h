@@ -21,10 +21,14 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __GLSHADER_CGVP_H__
 
 #include "../../common/shaderplugin.h"
+#include "csgfx/shadervarcontext.h"
+#include "ivideo/shader/shader.h"
 #include "csutil/strhash.h"
 
 #include <Cg/cg.h>
 #include <Cg/cgGL.h>
+
+#include "glshader_cg.h"
 
 class csShaderGLCGVP : public iShaderProgram
 {
@@ -34,7 +38,8 @@ private:
     XMLTOKEN_CGVP = 1,
     XMLTOKEN_DECLARE,
     XMLTOKEN_VARIABLEMAP,
-    XMLTOKEN_PROGRAM
+    XMLTOKEN_PROGRAM,
+    XMLTOKEN_PROFILE
   };
 
   struct variablemapentry
@@ -44,6 +49,9 @@ private:
     csStringID name;
     char* cgvarname;
     CGparameter parameter;
+    // Variables that can be resolved statically at shader load
+    // or compilation is put in "statlink"
+    csRef<csShaderVariable> statlink;
   };
 
   struct matrixtrackerentry
@@ -57,10 +65,10 @@ private:
   csArray<variablemapentry> variablemap;
   csArray<matrixtrackerentry> matrixtrackers;
 
-  csRef<iObjectRegistry> object_reg;
-  CGcontext context;
+  csGLShader_CG* shaderPlug;
 
   CGprogram program;
+  csString cg_profile;
 
   csStringHash xmltokens;
 
@@ -70,17 +78,15 @@ private:
 
   bool validProgram;
 
-  csShaderVariableContextHelper svContextHelper;
-  csShaderVariableProxyList dynamicVars;
+  csShaderVariableContext svcontext;
 public:
   SCF_DECLARE_IBASE;
 
-  csShaderGLCGVP(iObjectRegistry* objreg, CGcontext context)
+  csShaderGLCGVP(csGLShader_CG* shaderPlug)
   {
     SCF_CONSTRUCT_IBASE (0);
     validProgram = true;
-    this->object_reg = objreg;
-    this->context = context;
+    this->shaderPlug = shaderPlug;
     programstring = 0;
     program = 0;
   }
@@ -101,14 +107,14 @@ public:
   ////////////////////////////////////////////////////////////////////
 
   /// Sets this program to be the one used when rendering
-  virtual void Activate();
+  virtual void Activate ();
 
   /// Deactivate program so that it's not used in next rendering
   virtual void Deactivate();
 
   /// Setup states needed for proper operation of the shader
   virtual void SetupState (csRenderMesh* mesh,
-    const csArray<iShaderVariableContext*> &dynamicDomains);
+    const CS_SHADERVAR_STACK &stacks);
 
   /// Reset states to original
   virtual void ResetState ();
@@ -116,14 +122,12 @@ public:
   /// Check if valid
   virtual bool IsValid() { return validProgram;} 
 
-    /// Loads shaderprogram from buffer
-  virtual bool Load(iDataBuffer* program);
-
   /// Loads from a document-node
   virtual bool Load(iDocumentNode* node);
 
   /// Compile a program
-  virtual bool Compile(csArray<iShaderVariableContext*> &staticDomains);
+  virtual bool Compile(csArray<iShaderVariableContext*> &staticContexts);
+
 
   /**
    * Prepares the shaderprogram for usage. Must be called before the shader
@@ -133,25 +137,26 @@ public:
 
   //=================== iShaderVariableContext ================//
   /// Add a variable to this context
-  virtual void AddVariable (csShaderVariable *variable)
-  { svContextHelper.AddVariable (variable); }
+  void AddVariable (csShaderVariable *variable)
+    { svcontext.AddVariable (variable); }
 
   /// Get a named variable from this context
-  virtual csShaderVariable* GetVariable (csStringID name) const
-  { return svContextHelper.GetVariable (name); }
+  csShaderVariable* GetVariable (csStringID name) const
+    { return svcontext.GetVariable (name); }
 
-  /// Fill a csShaderVariableList
-  virtual unsigned int FillVariableList (csShaderVariableProxyList *list) const
-  { return svContextHelper.FillVariableList (list); }
+  /**
+  * Push the variables of this context onto the variable stacks
+  * supplied in the "stacks" argument
+  */
+  void PushVariables (CS_SHADERVAR_STACK &stacks) const
+    { svcontext.PushVariables (stacks); }
 
-  /// Get a named variable from this context, and any context above/outer
-  virtual csShaderVariable* GetVariableRecursive (csStringID name) const
-  {
-    csShaderVariable* var;
-    var=GetVariable (name);
-    if(var) return var;
-    return 0;
-  }
+  /**
+  * Pop the variables of this context off the variable stacks
+  * supplied in the "stacks" argument
+  */
+  void PopVariables (CS_SHADERVAR_STACK &stacks) const
+    { svcontext.PopVariables (stacks); }
 };
 
 

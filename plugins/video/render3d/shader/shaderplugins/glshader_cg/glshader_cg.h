@@ -20,6 +20,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __GLSHADER_CG_H__
 #define __GLSHADER_CG_H__
 
+#include "iutil/comp.h"
+#include "../../common/shaderplugin.h"
 #include "ivideo/shader/shader.h"
 
 #include <Cg/cg.h>
@@ -28,13 +30,14 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 class csGLShader_CG : public iShaderProgramPlugin
 {
 private:
-  static csRef<iObjectRegistry> object_reg;
-  static CGcontext context;
-
   static void ErrorCallback ();
 
   bool enable;
+  bool isOpen;
 public:
+  static csRef<iObjectRegistry> object_reg;
+  static CGcontext context;
+
   SCF_DECLARE_IBASE;
   
   csGLShader_CG (iBase *parent);
