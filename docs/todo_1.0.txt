@@ -108,10 +108,13 @@ Bugs to fix:
 	     Eric responds: The clipping tests in g2dtest were added after the
 	     semantics changed.  The tests were added specifically to test if
 	     canvases were respecting the new semantics.
+	[S]  Line drawing in software renderer is not stable (overwriting
+	     memory).  This shows with BugPlug and also with AWS in some cases.
+	     Is this related to incorrect clipping?  (See above item.)
 	[S]  cs2xml crashes when trying to convert castle.zip.  (optimize mode)
 	     (note by Jorrit: cannot reproduce).
 	[O]  levtool fails to convert castle.zip (after it has been converted
-		with cs2xml)
+		with cs2xml)  Matze: Please clarify this item.
 	[S]  unittest crashes and/or hangs:
 		./unittest -video=software
 		...
@@ -131,15 +134,13 @@ Bugs to fix:
 		 * - specify hostname only if you are using client mode.
 	[S]  NetMantest or the netmanager plugin leaks
 	[S]  There are still numerous unreleased instances of SCF classes.
-	     Update: When talking about walktest this only true in the
-		    flarge map. Problem is probably the hirarchical mesh
-		    factory there.
-	[S]  The frame around the fancy console looks strange.
+	     Update: When talking about walktest this only true in the flarge
+	     map.  Problem is probably the hirarchical mesh factory there.
+	[S]  The frame around the fancy console looks "strange" (Matze's
+	     phrasing).
 	[**] Restoration of dllwrap uses $* which gets eaten by cs-config.
 	     Need to figure out some way to prevent $* from being eaten.  The
 	     technique for protecting $@ does not seem to work for $*.
-	[S]  Line drawing in software renderer is not stable (overwriting
-	     memory).  This shows with BugPlug and also with AWS in some cases.
 	[**] Add the ability to get different kinds of polygon meshes from
 	     objects: lower-lod version for culling, version for collision
 	     detection, version for lighting (casting shadows), ...
