@@ -143,3 +143,10 @@ rule GetVar
 {
   return $($(<)) ;
 }
+
+##  Copy target : source
+##    Copy source file to target.
+actions Copy
+{
+  cp $(>) $(<)
+}

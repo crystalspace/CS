@@ -240,9 +240,3 @@ actions CopyImages
 {
   find $(>) -name "$(WILDCARD)" -exec "cp" "{}" "$(<)" ';'
 }
-
-actions Copy
-{
-  cp $(>) $(<)
-}
-
