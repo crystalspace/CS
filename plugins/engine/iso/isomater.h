@@ -90,6 +90,10 @@ public:
 
   //--------------------- iMaterial implementation ---------------------
 
+  /// Set effect.
+  virtual void SetEffect (iEffectDefinition *ed);
+  /// Get effect.
+  virtual iEffectDefinition *GetEffect ();
   /// Get texture.
   virtual iTextureHandle* GetTexture ();
   /// Number of texture layers.
