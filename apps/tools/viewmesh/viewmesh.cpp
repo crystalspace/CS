@@ -19,6 +19,7 @@
 
 /* ViewMesh: tool for displaying mesh objects (3d sprites) */
 #include "viewmesh.h"
+#include "csutil/scfstr.h"
 
 // Hack: work around problems caused by #defining 'new'
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
@@ -1721,7 +1722,7 @@ void ViewMesh::StdDlgDirSelect (void* awst, iAwsSource *s)
   if (csString("..") == *text)
   {
     size_t i = newpath->Slice(0,newpath->Length()-1)->FindLast('/')+1;
-    printf("%d", i);
+    printf("%lu", (unsigned long)i);
     newpath = newpath->Slice(0,i);
   }
   else
