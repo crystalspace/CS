@@ -61,4 +61,10 @@
 
   del conftest.*
 
+  if /%WINDIR%/ == // goto nowindoze
+  echo ---=== Press any key so that Seth Galbraith can quietly sleep ===---
+  pause >nul
+
+:nowindoze
+
   exit 0
