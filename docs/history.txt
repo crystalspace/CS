@@ -26,7 +26,7 @@ chronological order.
 	- Jorrit optimized pvscalc a bit by making the test for relevant
 	  polygons faster.
 	- Jorrit optimized pvscalc by remembering the bounding box for every
-	  polygon and using that to quickly discard relevant polygons. That
+	  polygon and using that to quickly discard irrelevant polygons. That
 	  optimization removes the number one function in the profile result.
 	- Jorrit optimized the csPoly3D::ProjectXPlane() and other functions
 	  so that they avoid calling csPoly2D::AddVertex() in a loop.
