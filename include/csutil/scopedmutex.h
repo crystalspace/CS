@@ -37,13 +37,13 @@
 class csScopedMutex
 {
 public:
-  csScopedMutex (csMutex& newmutex)
+  csScopedMutex (csMutex* newmutex)
     : mutex(newmutex)
-  { mutex.LockWait (); }
+  { mutex->LockWait (); }
   ~csScopedMutex ()
-  { mutex.Release (); }
+  { mutex->Release (); }
 
-  csMutex& mutex;
+  csMutex* mutex;
 };
 
 #endif
