@@ -1398,11 +1398,11 @@ bool csGraphics3DGlide2x::SetRenderState (G3D_RENDERSTATEOPTION option, long val
     case G3DRENDERSTATE_ZBUFFERMODE:
       m_ZBufMode = value;
 
-      if (mode & CS_ZBUF_TEST)
+      if (value & CS_ZBUF_TEST)
         GlideLib_grDepthMask (FXFALSE);
       else
         GlideLib_grDepthMask (FXTRUE);    
-      if (mode & CS_ZBUF_FILL)      // write-only
+      if (value & CS_ZBUF_FILL)      // write-only
         GlideLib_grDepthBufferFunction (GR_CMP_ALWAYS);
       else 
         GlideLib_grDepthBufferFunction (GR_CMP_LEQUAL);

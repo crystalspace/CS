@@ -70,7 +70,7 @@ private:
   bool m_bVRetrace;
 
   /// The current read/write settings for the Z-buffer.
-  csZBufMode m_ZBufMode;
+  long int m_ZBufMode;
 
   /// The current drawing mode (2D/3D)
   int m_nDrawMode;
@@ -207,7 +207,7 @@ public:
   /// Set a renderstate boolean.
   virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
   
-  /// Get the capabilities of this driver: NOT IMPLEMENTED.
+  /// Get the capabilities of this driver
   virtual csGraphics3DCaps *GetCaps ()
   { return &m_Caps; }
 
