@@ -7,6 +7,8 @@
 #ifndef __CS_WIN32_VOLATILE_H__
 #define __CS_WIN32_VOLATILE_H__
 
+#define CS_PACKAGE_NAME "crystalspace"
+
 #define OS_WIN32
 #if !defined(CS_PLATFORM_NAME)
 #  define CS_PLATFORM_NAME "Win32"
