@@ -113,7 +113,8 @@ csObject::csObject (csObject &o) : Children (NULL), Name (NULL)
   csObject (NULL);
   
   iObjectIterator *it = o.GetIterator ();
-  while (!it->IsFinished ()) {
+  while (!it->IsFinished ())
+  {
     ObjAdd (it->GetObject ());
     it->Next ();
   }
@@ -257,7 +258,8 @@ void* csObject::GetChild (int InterfaceID, int Version,
   int i;
   for (i = 0; i < Children->Length (); i++)
   {
-    if (Name) {
+    if (Name)
+    {
       const char *OtherName = Children->Get (i)->GetName ();
       if (!OtherName) continue;
       if (strcmp(OtherName, Name)) continue;
