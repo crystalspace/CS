@@ -100,6 +100,11 @@ ${CXX} -c socktest.cpp 2>/dev/null || echo "CS_USE_FAKE_SOCKLEN_TYPE = yes"
 
 rm -f socktest.cpp socktest.o
 
+# Test for presence of SVGALIB.
+echo "#include <vga.h>" > conftest.cpp
+${CXX} -c conftest.cpp 2>/dev/null && echo "PLUGINS += video/canvas/svgalib"
+rm -f conftest.cpp conftest.o
+
 # Create a dummy NASM program
 echo "%xdefine TEST" >conftest.asm
 

@@ -9,12 +9,11 @@ PLUGINS+=video/canvas/softx video/renderer/software
 PLUGINS+=video/renderer/opengl video/canvas/openglx
 PLUGINS+=video/canvas/linex
 
-# uncomment the following to build SVGALIB, GGI 2D, and/or SDL drivers
-PLUGINS+=video/canvas/svgalib
+# Uncomment the following to build GGI 2D and/or SDL drivers
 #PLUGINS+=video/canvas/ggi 
 #PLUGINS+=video/canvas/sdl 
 
-# uncomment the following to build sound drivers
+# Uncomment the following to build sound drivers
 #PLUGINS+=sound/driver/oss sound/renderer/software
 
 # Uncomment some of the following if you have a special MESA version that uses
