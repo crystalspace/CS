@@ -52,6 +52,7 @@ DEP.SNDWOS = CSUTIL CSSYS CSUTIL
 MSVC.DSP += SNDWOS
 DSP.SNDWOS.NAME = sndwaveout
 DSP.SNDWOS.TYPE = plugin
+DSP.SNDWOS.LIBS = winmm
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
