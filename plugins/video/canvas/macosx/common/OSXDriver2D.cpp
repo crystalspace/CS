@@ -165,11 +165,11 @@ bool OSXDriver2D::HandleEvent(iEvent &ev)
         }
     }
     else if ((ev.Type == csevKeyboard) && 
-      (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown))
+            (csKeyEventHelper::GetEventType(&ev) == csKeyEventTypeDown))
     {
-      if ((csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ENTER) && 
-        (csKeyEventHelper::GetModifiersBits (&ev) & CSMASK_ALT))
-	handled = ToggleFullscreen();
+        if ((csKeyEventHelper::GetRawCode(&ev) == CSKEY_ENTER) && 
+            (csKeyEventHelper::GetModifiersBits(&ev) & CSMASK_ALT))
+            handled = ToggleFullscreen();
     }
 
     return handled;
