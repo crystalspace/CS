@@ -160,13 +160,11 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   JORRIT:
      this code is copied from the ogl_g3d renderer.
   csMatrix3 orientation = o2c.GetO2T();
-  */
+
   // Alex: here it is I think:
   const csMatrix3& orientation = rview.GetO2T ();
   int aspect = rview.aspect;
 
-  /*
-    
   // set up coordinate transform
   GLfloat matrixholder[16];
 

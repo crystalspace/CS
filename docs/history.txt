@@ -5,6 +5,8 @@ The history order has been reversed so that new features are at the top.
 	- Various small changes to csTerrain to help Alex integrate his
 	  engine again.
 	- Frank O'Connor fixed Win32 release build.
+	- Eric Sunshine eliminated some compilation warnings in the terrain
+	  library.
 18-May-2000
 	- Frank O'Connor added __CRYSTAL_SPACE__ define to VC project file.
 	- Another small terrain update from Alex Pfaffe.
