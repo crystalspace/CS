@@ -59,7 +59,8 @@ void csTextureOpenGLDynamic::CreateInterfaces (iGraphics3D *parentG3D,
 
 csTextureOpenGLDynamic::~csTextureOpenGLDynamic ()
 { 
-  texG3D->DecRef (); 
+  if (texG3D)
+	texG3D->DecRef (); 
 }
 
 //---------------------------------------------------------------------------
