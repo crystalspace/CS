@@ -362,6 +362,11 @@ public:
 
     virtual csOrthoTransform& GetTransform ()
     { return *(csOrthoTransform*)scfParent; }
+    virtual void SetTransform (const csOrthoTransform& tr)
+    {
+      *(csOrthoTransform*)scfParent = tr;
+      scfParent->cameranr = scfParent->cur_cameranr++;
+    }
     virtual void MoveWorld (const csVector3& v, bool cd = true)
     { scfParent->MoveWorld (v, cd); }
     virtual void Move (const csVector3& v, bool cd = true)

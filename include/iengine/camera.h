@@ -41,7 +41,7 @@ class csVector3;
 class csVector2;
 struct iSector;
 
-SCF_VERSION (iCamera, 0, 0, 10);
+SCF_VERSION (iCamera, 0, 0, 11);
 
 /// Camera class.
 struct iCamera : public iBase
@@ -70,8 +70,18 @@ struct iCamera : public iBase
   /**
    * Get the transform corresponding to this camera. In this transform,
    * 'other' is world space and 'this' is camera space.
+   * WARNING! It is illegal to directly assign to the given transform
+   * in order to modify it. To change the entire transform you have
+   * to use SetTransform(). Note that it is legal to modify the
+   * returned transform otherwise. Just do not assign to it.
    */
   virtual csOrthoTransform& GetTransform () = 0;
+  /**
+   * Set the transform corresponding to this camera. In this transform,
+   * 'other' is world space and 'this' is camera space.
+   */
+  virtual void SetTransform (const csOrthoTransform& tr) = 0;
+
   /**
    * Moves the camera a relative amount in world coordinates.
    * If 'cd' is true then collision detection with objects and things

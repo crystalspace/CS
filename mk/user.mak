@@ -71,11 +71,9 @@ PLUGINS.DYNAMIC += video/loader/wal
 PLUGINS.DYNAMIC += net/driver/socket
 PLUGINS.DYNAMIC += console/output/standard
 PLUGINS.DYNAMIC += console/output/fancy
-PLUGINS.DYNAMIC += dungeon
 PLUGINS.DYNAMIC += font/server/fontplex
 #PLUGINS.DYNAMIC += font/server/freefont
 #PLUGINS.DYNAMIC += aws
-#PLUGINS.DYNAMIC += csgame/gamecore
 
 #-----------------------------------------------------------------------------
 # Static Settings            *** TAKE NOTE ***

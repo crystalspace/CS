@@ -1,5 +1,13 @@
 The history order is reversed so that new features are at the top.
 
+4-Jul-2001
+	- Added iCamera::SetTransform() which should be used to directly
+	  set the transform. It is illegal to assign to the result of
+	  iCamera::GetTransform() directly but I did not make the result
+	  'const' since it is legal to do modifications on the returned
+	  transform using other methods (like RotateThis() and SetPosition()).
+	- Removed dungeon plugin and test app due to lack of maintenance.
+	- Removed csgame plugin and test app due to lack of maintenance.
 3-Jul-2001
 	- Fixed the Python plugin after Martin's changes.
 	- Added iEngine::GetCameraPosition() which takes a name as a parameter
@@ -74,6 +82,42 @@ The history order is reversed so that new features are at the top.
 	  dumped into the same `out' directory, which means that no two source
 	  files in the entire project can have the same name.  I plan to
 	  address this problem sometime soon.
+	- Philip Wyett fixed the SDL canvas so it does SDL_ShowCursor = true
+	  on Open().
+	- Philip also fixed SDL driver kicking out following message on Win32:
+	  WARNING: Your operating system is not tested  yet with sdl2d
+	  video driver.
+	  SDL plugin works on Win98/SE/ME and Win2k. I cannot test on
+	  NT4, but all seems to be well on OS's tested via VC6 buillds. :-)
+	- Philip did some manual updates to VC project files.
+	- Philip fixed Walktest after Eric renamed a few crossbuilder
+	  include files.
+	- Philip added CSTOOL to crossbld.mak to fix a link error on mingw.
+	- Philip added crossbuld plugin to glbal process so mdltest works. :-/
+	- Philip fixed an include error in mdltest.
+	- Philip removed the EAX sound renderer due to lack of maintenance.
+	- Brandon Ehle did the following:
+	    - Fixed csLua scripting plugin and removed all global
+	      variables where applicable. Changed the architecture such
+	      that you use the global system variable rather than calling
+	      GetSystem() at startup.
+	    - Added some new classes to cs.i and fixed some existing problems.
+	    - Regenerated both python and lua swig interfaces.
+	    - Added the options -python and -lua to pysimple so that world
+	      geometry doesn't get generated twice by both plugin tests.
+	- Martin Geisse added iEngine::GetAmbientLight() and SetAmbientLight().
+	- Martin also did the following:
+	    - Fixed the header protectors in imesh/mdlconv.h and
+	      imesh/mdldata.h (they had the wrong directory in their name).
+	    - Moved all model data related classes to cstool. Although they
+	      are primarily used by the model file converters, it also makes
+	      sense to use them from elsewhere (for example, the
+	      crossbuilder test app :-)
+	    - Added a first implementation of the crossbuilder (a plugin that
+	      can be used to create mesh objects from imported model files).
+	      Currently it cannot do more than extract vertices and polygons
+	      into things.
+	    - Added a test app for the crossbuilder (mdltest).
 2-Jul-2001
 	- Removed the bad and global 'thisclass' pointer from the Python
 	  plugin.  Removed the 'GetSystem()' call from 'cs.i'.  The Python
