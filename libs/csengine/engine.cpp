@@ -2039,7 +2039,6 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (const char* classId,
   if (!type) type = LOAD_PLUGIN (System, classId, "MeshObj", iMeshObjectType);
   if (!type) return NULL;
   iMeshObjectFactory* fact = type->NewFactory ();
-  type->DecRef ();
   if (!fact) return NULL;
   // don't pass the name to avoid a second search
   iMeshFactoryWrapper *fwrap = CreateMeshFactory (fact, NULL);
