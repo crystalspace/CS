@@ -24,15 +24,34 @@
 #include "csutil/scfstr.h"
 #include "csutil/xmltiny.h"
 
+static char* get_line(char* buff, int nbuff, FILE* fp)
+{
+  char* rc = fgets(buff, nbuff, fp);
+  if (rc != 0)
+  {
+    // Client expects LF terminator only; normalize CRLF and CR to LF.
+    int const n = strlen(buff);
+    if (n >= 2 && buff[n - 2] == '\r' && buff[n - 1] == '\n')	// WINDOWS
+    {
+      buff[n - 2] = '\n';
+      buff[n - 1] = '\0';
+    }
+    else if (n >= 1 && buff[n - 1] == '\r')			// MACINTOSH
+    {
+      buff[n - 1] = '\n';
+    }
+  }
+  return rc;
+}
 
 bool MsModel::IsFileMsModel(const char* msfile)
 {
-  FILE *file = fopen (msfile, "rt");
+  FILE *file = fopen (msfile, "r");
   if(!file)
     return false;
   char szLine[256];
 
-  if (fgets (szLine, 256, file) != NULL)
+  if (get_line (szLine, 256, file) != NULL)
   {
      if (strcmp(szLine,"// MilkShape 3D ASCII\n") == 0)
      {
@@ -150,7 +169,7 @@ void MsModel::clearError()
 
 bool MsModel::ReadMsFile(const char* msfile)
 {
-  FILE *file = fopen (msfile, "rt");
+  FILE *file = fopen (msfile, "r");
   if (!file)
     return setError("Couldn't open file.",file);
   
@@ -160,7 +179,7 @@ bool MsModel::ReadMsFile(const char* msfile)
   char szName[MS_MAX_NAME];
     
   // Scanning for the ID tag // MilkShape 3D ASCII
-  if (!fgets (szLine, 256, file))
+  if (!get_line (szLine, 256, file))
   {
     return setError("Unexpected ending of file.",file);
   }
@@ -170,7 +189,7 @@ bool MsModel::ReadMsFile(const char* msfile)
   }
   
   //This is followed by a space
-  if (!fgets (szLine, 256, file))
+  if (!get_line (szLine, 256, file))
   {
     return setError("Unexpected ending of file.",file);
   }
@@ -182,7 +201,7 @@ bool MsModel::ReadMsFile(const char* msfile)
   //The number of Frames
   //I wasn't able to find or generate a case with more than 1 frame.
   //Eventhough the number of frames is higher.
-  if (!fgets (szLine, 256, file))
+  if (!get_line (szLine, 256, file))
   {
     return setError("Unexpected ending of file.",file);
   }
@@ -206,7 +225,7 @@ bool MsModel::ReadMsFile(const char* msfile)
     //I wasn't able to find or generate a case with more than 1 frame.
     //Eventhough the number of frames is higher.
     //So we just break the loop if we don't find another frame.
-    if (!fgets (szLine, 256, file))
+    if (!get_line (szLine, 256, file))
     {
       return setError("Unexpected ending of file.",file);
     }
@@ -215,7 +234,7 @@ bool MsModel::ReadMsFile(const char* msfile)
       break;
     }
     //This is followed by a space
-    if (!fgets (szLine, 256, file))
+    if (!get_line (szLine, 256, file))
     {
       return setError("Unexpected ending of file.",file);
     }
@@ -234,7 +253,7 @@ bool MsModel::ReadMsFile(const char* msfile)
     //We can only use one mesh in CS,
     //or else we can't define a skeleton.
     int nbMeshes = 0;
-    if (!fgets (szLine, 256, file))
+    if (!get_line (szLine, 256, file))
     {
       return setError("Unexpected ending of file.",file);
     }
@@ -254,7 +273,7 @@ bool MsModel::ReadMsFile(const char* msfile)
       // So we'll only use the first material.
       int meshFlags = 0;
       int meshMaterialIndex = 0;
-      if (!fgets (szLine, 256, file))
+      if (!get_line (szLine, 256, file))
       {
         return setError("Unexpected ending of file.",file);
       }
@@ -265,7 +284,7 @@ bool MsModel::ReadMsFile(const char* msfile)
       
       //Scanning for the number of vertices in a mesh.
       int nbVertices = 0;
-      if (!fgets (szLine, 256, file))
+      if (!get_line (szLine, 256, file))
       {
         return setError("Unexpected ending of file.",file);
       }      
@@ -281,7 +300,7 @@ bool MsModel::ReadMsFile(const char* msfile)
         //We alsow store the bone index for future reference.
         //The bone index is necessary for bulding the skeleton.
         //I don't know what the flags mean.
-        if (!fgets (szLine, 256, file))
+        if (!get_line (szLine, 256, file))
         {
           return setError("Unexpected ending of file.",file);
         }
@@ -306,7 +325,7 @@ bool MsModel::ReadMsFile(const char* msfile)
       // So you'll need a normalCount variable.
       // Scanning for the number of normals
       int nbNormals = 0;
-      if (!fgets (szLine, 256, file))
+      if (!get_line (szLine, 256, file))
       {
         return setError("Unexpected ending of file.",file);
       }
@@ -318,7 +337,7 @@ bool MsModel::ReadMsFile(const char* msfile)
       for (int normalIndex = 0; normalIndex < nbNormals; normalIndex++)
       {
         // We don't use normals in CS.
-        if (!fgets (szLine, 256, file))
+        if (!get_line (szLine, 256, file))
         {
           return setError("Unexpected ending of file.",file);
         }
@@ -333,7 +352,7 @@ bool MsModel::ReadMsFile(const char* msfile)
       
       // Scanning for the number of triangles
       int nbTriangles = 0;
-      if (!fgets (szLine, 256, file))
+      if (!get_line (szLine, 256, file))
       {
         return setError("Unexpected ending of file.",file);
       }
@@ -352,7 +371,7 @@ bool MsModel::ReadMsFile(const char* msfile)
         long normal2       = 0;
         long normal3       = 0;
         int smoothingGroup = 0;
-        if (!fgets (szLine, 256, file))
+        if (!get_line (szLine, 256, file))
         {
           return setError("Unexpected ending of file.",file);
         }
@@ -431,7 +450,7 @@ bool MsModel::ReadMsFile(const char* msfile)
   //If we exited the loop irregulary we allready scanned the next line.
   if(frameIndex==nbFrames)
   {
-    if (!fgets (szLine, 256, file))
+    if (!get_line (szLine, 256, file))
     {
       return setError("Unexpected ending of file.",file);
     }
@@ -445,7 +464,7 @@ bool MsModel::ReadMsFile(const char* msfile)
   // We can only use one material per mesh in CS.
   // So we will only use the first one.
   int nbMaterials = 0;
-  if (!fgets (szLine, 256, file))
+  if (!get_line (szLine, 256, file))
   {
     return setError("Unexpected ending of file.",file);
   }
@@ -456,7 +475,7 @@ bool MsModel::ReadMsFile(const char* msfile)
   for (int materialIndex = 0; materialIndex < nbMaterials; materialIndex++)
   {
     // The name of the material.
-    if (!fgets (szLine, 256, file))
+    if (!get_line (szLine, 256, file))
     {
       return setError("Unexpected ending of file.",file);
     }
@@ -472,7 +491,7 @@ bool MsModel::ReadMsFile(const char* msfile)
       
     // Various features not supported by CS.
     // ambient
-    if (!fgets (szLine, 256, file))
+    if (!get_line (szLine, 256, file))
     {
       return setError("Unexpected ending of file.",file);
     }
@@ -483,7 +502,7 @@ bool MsModel::ReadMsFile(const char* msfile)
     }
     
     // diffuse
-    if (!fgets (szLine, 256, file))
+    if (!get_line (szLine, 256, file))
     {
      return setError("Unexpected ending of file.",file);
     }
@@ -494,7 +513,7 @@ bool MsModel::ReadMsFile(const char* msfile)
     }
     
     // specular
-    if (!fgets (szLine, 256, file))
+    if (!get_line (szLine, 256, file))
     {
       return setError("Unexpected ending of file.",file);
     }
@@ -505,7 +524,7 @@ bool MsModel::ReadMsFile(const char* msfile)
     }
     
     // emissive
-    if (!fgets (szLine, 256, file))
+    if (!get_line (szLine, 256, file))
     {
       return setError("Unexpected ending of file.",file);
     }
@@ -516,7 +535,7 @@ bool MsModel::ReadMsFile(const char* msfile)
     }
     
     // shininess
-    if (!fgets (szLine, 256, file))
+    if (!get_line (szLine, 256, file))
     {
       return setError("Unexpected ending of file.",file);
     }
@@ -527,7 +546,7 @@ bool MsModel::ReadMsFile(const char* msfile)
     }
     
     // transparency
-    if (!fgets (szLine, 256, file))
+    if (!get_line (szLine, 256, file))
     {
       return setError("Unexpected ending of file.",file);
     }
@@ -538,7 +557,7 @@ bool MsModel::ReadMsFile(const char* msfile)
     }
     
     // diffuse texture
-    if (!fgets (szLine, 256, file))
+    if (!get_line (szLine, 256, file))
     {
       return setError("Unexpected ending of file.",file);
     }
@@ -560,7 +579,7 @@ bool MsModel::ReadMsFile(const char* msfile)
     }
     
     // alpha texture
-    if (!fgets (szLine, 256, file))
+    if (!get_line (szLine, 256, file))
     {
        return setError("Unexpected ending of file.",file);
     }
@@ -578,7 +597,7 @@ bool MsModel::ReadMsFile(const char* msfile)
   }
   
   // A space after the materials.
-  if (!fgets (szLine, 256, file))
+  if (!get_line (szLine, 256, file))
   {
     return setError("Unexpected ending of file.",file);
   }
@@ -589,7 +608,7 @@ bool MsModel::ReadMsFile(const char* msfile)
   
   
   // A line indicating the number of joints.
-  if (!fgets (szLine, 256, file))
+  if (!get_line (szLine, 256, file))
   {
     return setError("Unexpected ending of file.",file);
   }
@@ -617,7 +636,7 @@ bool MsModel::ReadMsFile(const char* msfile)
   for (int jointIndex = 0; jointIndex < nbJoints; jointIndex++)
   {
     //Scanning for the name of a joint.
-    if (!fgets (szLine, 256, file))
+    if (!get_line (szLine, 256, file))
     {
       return setError("Unexpected ending of file.",file);
     }
@@ -628,7 +647,7 @@ bool MsModel::ReadMsFile(const char* msfile)
     strcpy(names[jointIndex],szName);
     
     // Scanning for the name of the parent of a joint.
-    if (!fgets (szLine, 256, file))
+    if (!get_line (szLine, 256, file))
     {
       return setError("Unexpected ending of file.",file);
     }
@@ -649,7 +668,7 @@ bool MsModel::ReadMsFile(const char* msfile)
     //Scanning for flags, position, rotation
     csVector3 Position, Rotation;
     int jointFlags = 0;
-    if (!fgets (szLine, 256, file))
+    if (!get_line (szLine, 256, file))
     {
       return setError("Unexpected ending of file.",file);
     }
@@ -672,7 +691,7 @@ bool MsModel::ReadMsFile(const char* msfile)
     
     // Scanning for position key count.
     joints[jointIndex]->nbPositionKeys = 0;
-    if (!fgets (szLine, 256, file))
+    if (!get_line (szLine, 256, file))
     {
       return setError("Unexpected ending of file.",file);
     }  
@@ -688,7 +707,7 @@ bool MsModel::ReadMsFile(const char* msfile)
       scalar_t x    = 0;
       scalar_t y    = 0;
       scalar_t z    = 0;
-      if (!fgets (szLine, 256, file))
+      if (!get_line (szLine, 256, file))
       {
         return setError("Unexpected ending of file.",file);
       }
@@ -702,7 +721,7 @@ bool MsModel::ReadMsFile(const char* msfile)
     
     // Scanning for rotation key count
     joints[jointIndex]->nbRotationKeys = 0;
-    if (!fgets (szLine, 256, file))
+    if (!get_line (szLine, 256, file))
     {
       return setError("Unexpected ending of file.",file);
     }
@@ -718,7 +737,7 @@ bool MsModel::ReadMsFile(const char* msfile)
       scalar_t x    = 0;
       scalar_t y    = 0;
       scalar_t z    = 0;
-      if (!fgets (szLine, 256, file))
+      if (!get_line (szLine, 256, file))
       {
         return setError("Unexpected ending of file.",file);
       }
