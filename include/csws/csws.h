@@ -23,7 +23,6 @@
 /**
  * Current CrystalSpace Windowing System class hierarchy:
  * <pre>
- * [ csBase ]
  *   |--[ csRect ]			// Rectangle
  *   |--[ csVector ]            	// Vector of some objects (FreeItem = NOP)
  *   |    |--[ csStrVector ]    	// Vector of strings (FreeItem = delete[])
@@ -61,7 +60,6 @@
  */
 
 // Forward declarations
-class csBase;
 class csRect;
 class csVector;
 class csStrVector;
@@ -99,7 +97,6 @@ struct iEvent;
 
 // Include all Windowing System components
 #include "csgeom/csrect.h"		// Rectangle class
-#include "csutil/csbase.h"		// Base class
 #include "csutil/csvector.h"		// Vector of objects
 #include "csutil/csstrvec.h"		// Vector of string objects
 #include "cssys/csevent.h"		// Event class

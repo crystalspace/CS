@@ -21,7 +21,6 @@
 #define __CSGFXPPL_H__
 
 #include "csgeom/csrect.h"
-#include "csutil/csbase.h"
 #include "cstool/cspixmap.h"
 #include "ivideo/graph2d.h"
 

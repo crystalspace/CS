@@ -21,8 +21,7 @@
 #define __CSCOMP_H__
 
 #include "csgeom/csrect.h"
-#include "csutil/csbase.h"
-#include "csutil/csobjvec.h"
+#include "csutil/csvector.h"
 #include "cstool/cspixmap.h"
 #include "cswspal.h"
 #include "ivideo/graph2d.h"
@@ -326,7 +325,7 @@ enum
  * anything you draw inside the Draw() method is overlayed onto parent
  * component's image.
  */
-class csComponent : public csBase
+class csComponent
 {
 protected:
   /// Object state flags (see CSS_XXX flags)
