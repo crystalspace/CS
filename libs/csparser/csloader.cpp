@@ -163,6 +163,11 @@ csPolyPlane* CSLoader::load_polyplane (char* buf, char* name)
 
   while ((cmd = csGetObject (&buf, commands, &xname, &params)) > 0)
   {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
     switch (cmd)
     {
       case kTokenPlaneOrig:
@@ -310,6 +315,11 @@ csCollection* CSLoader::load_collection (char* name, csWorld* w, char* buf)
   char str[255];
   while ((cmd = csGetObject (&buf, commands, &xname, &params)) > 0)
   {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
     switch (cmd)
     {
       case kTokenColThing:
@@ -666,6 +676,11 @@ csThing* CSLoader::load_sixface (char* name, csWorld* /*w*/, char* buf,
 
   while ((cmd = csGetObject (&buf, commands, &xname, &params)) > 0)
   {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
     switch (cmd)
     {
       case kTokenSixConvex:
@@ -687,6 +702,11 @@ csThing* CSLoader::load_sixface (char* name, csWorld* /*w*/, char* buf,
           obj = csReversibleTransform(); // identity transform
           while ((cmd = csGetObject (&params, tok_matvec, &xname, &params2)) > 0)
           {
+    	    if (!params2)
+    	    {
+      	      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
+      	      fatal_exit (0, false);
+    	    }
             switch (cmd)
             {
               case 1: 
@@ -940,6 +960,11 @@ csThing* CSLoader::load_thing (char* name, csWorld* w, char* buf,
 
   while ((cmd = csGetObject (&buf, commands, &xname, &params)) > 0)
   {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
     switch (cmd)
     {
       case kTokenThingMoveable:
@@ -953,6 +978,11 @@ csThing* CSLoader::load_thing (char* name, csWorld* w, char* buf,
           char* params2;
           while ((cmd=csGetObject(&params, tok_matvec, &xname, &params2)) > 0)
           {
+    	    if (!params2)
+    	    {
+      	      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
+      	      fatal_exit (0, false);
+    	    }
             switch (cmd)
             {
               case 1: 
@@ -1083,6 +1113,11 @@ csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
     switch (cmd)
     {
       case kTokenPolTexNr:
@@ -1146,6 +1181,11 @@ csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
           bool do_static = false;
           while ((cmd = csGetObject (&params, pCommands, &name, &params2)) > 0)
           {
+    	    if (!params2)
+    	    {
+      	      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
+      	      fatal_exit (0, false);
+    	    }
             switch (cmd)
             {
               case kTokenPTexMatrix:
@@ -1181,6 +1221,11 @@ csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
       case kTokenPolTexture:
         while ((cmd = csGetObject (&params, tCommands, &name, &params2)) > 0)
         {
+    	  if (!params2)
+    	  {
+      	    CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
+      	    fatal_exit (0, false);
+	  }
           switch (cmd)
           {
             case kTokenPTexOrig:
@@ -1372,6 +1417,11 @@ csCurve* CSLoader::load_bezier (char* polyname, csWorld* w, char* buf,
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
     switch (cmd)
     {
       case kTokenPolTexNr:
@@ -1387,6 +1437,11 @@ csCurve* CSLoader::load_bezier (char* polyname, csWorld* w, char* buf,
       case kTokenPolTexture:
         while ((cmd = csGetObject (&params, tCommands, &name, &params2)) > 0)
         {
+          if (!params2)
+          {
+            CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
+            fatal_exit (0, false);
+          }
           switch (cmd)
           {
             case kTokenPTexOrig:
@@ -1612,6 +1667,11 @@ csPolygonTemplate* CSLoader::load_ptemplate (char* ptname, char* buf,
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
     switch (cmd)
     {
       case kTokenPolTTexNr:
@@ -1652,6 +1712,11 @@ csPolygonTemplate* CSLoader::load_ptemplate (char* ptname, char* buf,
       case kTokenPolTTexture:
         while ((cmd = csGetObject (&params, tCommands, &name, &params2)) > 0)
         {
+          if (!params2)
+          {
+            CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
+            fatal_exit (0, false);
+          }
           switch (cmd)
           {
             case kTokenPTTexOrig:
@@ -1797,6 +1862,11 @@ csCurveTemplate* CSLoader::load_beziertemplate (char* ptname, char* buf,
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
     switch (cmd)
     {
       case kTokenPolTTexNr:
@@ -1813,6 +1883,11 @@ csCurveTemplate* CSLoader::load_beziertemplate (char* ptname, char* buf,
       case kTokenPolTTexture:
         while ((cmd = csGetObject (&params, tCommands, &name, &params2)) > 0)
         {
+          if (!params2)
+          {
+            CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
+            fatal_exit (0, false);
+          }
           switch (cmd)
           {
             case kTokenPTTexOrig:
@@ -1922,6 +1997,11 @@ csThingTemplate* CSLoader::load_thingtpl (char* tname, char* buf,
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
     switch (cmd)
     {
       case kTokenPSetVertex:
@@ -2082,6 +2162,11 @@ csThingTemplate* CSLoader::load_sixtpl(char* tname,char* buf,csTextureList* text
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
     switch (cmd)
     {
       case kTokenTSixFog:
@@ -2528,6 +2613,11 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
     switch (cmd)
     {
       case kTokenRoomBsp:
@@ -2686,6 +2776,11 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
           portals[num_portals].alpha = 0;
           while ((cmd = csGetObject (&params, pCommands, &name, &params2)) > 0)
           {
+            if (!params2)
+            {
+              CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
+              fatal_exit (0, false);
+            }
             switch (cmd)
             {
               case kTokenPortPoly:
@@ -2703,6 +2798,11 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
                   char* params3;
                   while ((cmd = csGetObject (&params2, mCommands, &name, &params3)) > 0)
                   {
+                    if (!params3)
+                    {
+                      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params2);
+                      fatal_exit (0, false);
+                    }
                     switch (cmd)
                     {
                       case kTokenWarpMatrix:
@@ -3024,6 +3124,11 @@ csSector* CSLoader::load_sector (char* secname, csWorld* w, char* buf,
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
     switch (cmd)
     {
       case kTokenSectorSkyDome:
@@ -3307,11 +3412,21 @@ bool CSLoader::load_library_def (csLibrary* library, csWorld* w, Archive* ar, ch
 
   if (csGetObject (&buf, tokens, &name, &data))
   {
+    if (!data)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
     long cmd;
     char* params;
 
     while ((cmd = csGetObject (&data, commands, &name, &params)) > 0)
     {
+      if (!params)
+      {
+        CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", data);
+        fatal_exit (0, false);
+      }
       switch (cmd)
       {
         case kTokenLibDefTexs:
@@ -3432,11 +3547,21 @@ bool CSLoader::LoadWorld (csWorld* world, LanguageLayer* layer, char* buf)
 
   if (csGetObject (&buf, tokens, &name, &data))
   {
+    if (!data)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
     long cmd;
     char* params;
 
     while ((cmd = csGetObject (&data, commands, &name, &params)) > 0)
     {
+      if (!params)
+      {
+        CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", data);
+        fatal_exit (0, false);
+      }
       switch (cmd)
       {
         case kTokenWorldSpriteTmp:
@@ -3650,6 +3775,11 @@ bool CSLoader::LoadTextures (csTextureList* textures, char* buf, csWorld* world,
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
     switch (cmd)
     {
       case kTokenTexsMaxT:
@@ -3740,6 +3870,11 @@ bool CSLoader::LoadSounds (csWorld* world, char* buf, Archive* ar)
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
     switch (cmd)
     {
       case kTokenSoundsSound:
@@ -3787,6 +3922,11 @@ bool CSLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTexture
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
     switch (cmd)
     {
       case kTokenSTplTexNr:
@@ -3804,6 +3944,11 @@ bool CSLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTexture
           char fn[64];
           while ((cmd = csGetObject (&params, tok_frameset, &name, &params2)) > 0)
           {
+            if (!params2)
+            {
+              CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
+              fatal_exit (0, false);
+            }
             switch (cmd)
             {
               case 2:
@@ -3830,6 +3975,11 @@ bool CSLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTexture
           float x, y, z, u, v;
           while ((cmd = csGetObject (&params, tok_frame, &name, &params2)) > 0)
           {
+            if (!params2)
+            {
+              CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
+              fatal_exit (0, false);
+            }
             switch (cmd)
             {
             case 2:
@@ -3916,6 +4066,11 @@ bool CSLoader::LoadSprite (csSprite3D* spr, csWorld* w, char* buf, csTextureList
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
     switch (cmd)
     {
       case kTokenSpriteMove:
@@ -3925,6 +4080,11 @@ bool CSLoader::LoadSprite (csSprite3D* spr, csWorld* w, char* buf, csTextureList
           spr->SetMove (0, 0, 0);
           while ((cmd = csGetObject (&params, tok_matvec, &name, &params2)) > 0)
           {
+            if (!params2)
+            {
+              CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
+              fatal_exit (0, false);
+            }
             switch (cmd)
             {
              case 1: spr->SetTransform (CSLoader::load_matrix (params2));  break;
