@@ -53,18 +53,7 @@ typedef int bool;
  * @{ */
 #if !defined(CS_BUILTIN_SIZED_TYPES)
 
-/**\typedef int64 
- * unsigned 64 bit integer
- */
-/**\typedef uint64 
- * signed 64 bit integer
- */
-/**\def CONST_INT64(x)
- * specify 64 bit signed integer constant
- */
-/**\def CONST_UINT64(x)
- * specify 64 bit uinsigned integer constant
- */
+
 #ifndef CS_HAS_STDINT_H
 /// unsigned 8-bit integer (0..255)
 typedef unsigned char uint8;
@@ -79,26 +68,27 @@ typedef unsigned int uint32;
 /// signed 32-bit integer (-2 147 483 648..2 147 483 647)
 typedef int int32;
 #ifdef COMP_GCC
+/// unsigned 64 bit integer
 typedef unsigned long long uint64;
+/// signed 64 bit integer
 typedef long long int64;
+/// specify 64 bit integer constant
 #define CONST_INT64(x) x ## LL
+/// specify 64 bit unsigned integer constant
 #define CONST_UINT64(x) x ## ULL
 #else
 # ifdef COMP_VC
+/// unsigned 64 bit integer
 typedef unsigned __int64 uint64;
+/// signed 64 bit integer
 typedef __int64 int64;
+/// specify 64 bit integer constant
 #define CONST_INT64(x) x##i64
+/// specify 64 bit unsigned integer constant
 #define CONST_UINT64(x) x##ui64
 # else
 #  warning NO definition for 64 bit integers defined for your compiler
-
-// duplicated GCC stuff here so doxygen has something to show.
-typedef unsigned long long uint64;
-typedef long long int64;
-#define CONST_INT64(x) x ## LL
-#define CONST_UINT64(x) x ## ULL
 # endif
-
 #endif // end of #ifdef COMP_GCC
 
 #else

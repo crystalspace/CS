@@ -170,15 +170,16 @@ static inline float long2float (int32 l)
   return (float) ldexp (mant, exp);
 }
 
+#ifdef COMP_GCC // GCC likes LL for 64bit values
 /// Convert a double to a cross-platform 64-bit format (no endianess adjustments!)
 static inline int64 double2longlong (double d)
 {
   int exp;
-  int64 mant = (int64) (frexp (d, &exp) * CONST_INT64(0x1000000000000));
-  int64 sign = mant & CONST_INT64(0x800000000000000);
+  int64 mant = (int64) (frexp (d, &exp) * 0x1000000000000LL);
+  int64 sign = mant & 0x800000000000000LL;
   if (mant < 0) mant = -mant;
   if (exp > 32767) exp = 32767; else if (exp < -32768) exp = -32768;
-  return sign | ((int64 (exp) & 0x7fff) << 48) | (mant & CONST_INT64(0xffffffffffff));
+  return sign | ((int64 (exp) & 0x7fff) << 48) | (mant & 0xffffffffffffLL);
 }
 
 /// Convert a 64-bit cross-platform double to native format (no endianess adjustments!)
@@ -186,10 +187,37 @@ static inline double longlong2double (int64 i)
 {
   int64 exp = (i >> 48) & 0x7fff;
   if (exp & 0x4000) exp = exp | ~0x7fff;
-  double mant = double (i & CONST_INT64(0xffffffffffff)) / CONST_INT64(0x1000000000000);
-  if (i & CONST_INT64(0x8000000000000000)) mant = -mant;
+  double mant = double (i & 0xffffffffffffLL) / 0x1000000000000LL;
+  if (i & 0x8000000000000000LL) mant = -mant;
   return ldexp (mant, exp);
 }
+#else
+# ifdef COMP_VC
+/// Convert a double to a cross-platform 64-bit format (no endianess adjustments!)
+static inline int64 double2longlong (double d)
+{
+  int exp;
+  int64 mant = (int64) (frexp (d, &exp) * 0x1000000000000L);
+  int64 sign = mant & 0x800000000000000L;
+  if (mant < 0) mant = -mant;
+  if (exp > 32767) exp = 32767; else if (exp < -32768) exp = -32768;
+  return sign | ((int64 (exp) & 0x7fff) << 48) | (mant & 0xffffffffffffL);
+}
+
+/// Convert a 64-bit cross-platform double to native format (no endianess adjustments!)
+static inline double longlong2double (int64 i)
+{
+  int64 exp = (i >> 48) & 0x7fff;
+  if (exp & 0x4000) exp = exp | ~0x7fff;
+  double mant = double (i & 0xffffffffffffL) / 0x1000000000000L;
+  if (i & 0x8000000000000000L) mant = -mant;
+  return ldexp (mant, exp);
+}
+# else
+#  warning CS cannot determine how to handle 64bit values in code, please report this.
+# endif
+#endif // COMP_GCC
+
 
 /**
  * The following routines are used for converting floating-point numbers
