@@ -260,10 +260,15 @@ void HighColorCache::Clear ()
             ITextureHandle* piMMC;
 
             head->pSource->QueryInterface (IID_ITextureHandle, (void**)&piMMC);
-    	    csTextureMMOpenGL* txt_mm2 = (csTextureMMOpenGL*)GetcsTextureMMFromITextureHandle (piMMC);
-            txt_mm2->set_in_videomemory (false);
-            txt_mm2->set_hicolorcache (NULL);
-            piMMC->Release ();
+
+						if(piMMC)
+						{
+		   				csTextureMMOpenGL* txt_mm2 = (csTextureMMOpenGL*)GetcsTextureMMFromITextureHandle (piMMC);
+		          txt_mm2->set_in_videomemory (false);
+			        txt_mm2->set_hicolorcache (NULL);
+
+				      piMMC->Release ();
+						}
         }
         else if(type==HIGHCOLOR_LITCACHE)
         {
@@ -271,10 +276,13 @@ void HighColorCache::Clear ()
 
             head->pSource->QueryInterface( IID_ILightMap, (void**)&piLM );
 
-            piLM->SetHighColorCache(NULL);
-            piLM->SetInVideoMemory(false);
+						if(piLM)
+						{
+	            piLM->SetHighColorCache(NULL);
+		          piLM->SetInVideoMemory(false);
 
-            piLM->Release();
+			        piLM->Release();
+						}
         }
         head = n;
     }
