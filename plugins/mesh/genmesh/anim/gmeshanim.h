@@ -90,7 +90,10 @@ enum ac_opcode
   AC_STOP,
   AC_DELAY,
   AC_REPEAT,
-  AC_MOVE
+  AC_MOVE,
+  AC_ROTX,
+  AC_ROTY,
+  AC_ROTZ
 };
 
 /**
@@ -104,12 +107,18 @@ struct ac_instruction
   {
     struct
     {
-      int group_id;
+      size_t group_id;
       csTicks duration;
       float dx;
       float dy;
       float dz;
     } movement;
+    struct
+    {
+      size_t group_id;
+      csTicks duration;
+      float angle;
+    } rotate;
     struct
     {
       csTicks time;
@@ -145,6 +154,30 @@ public:
 };
 
 /**
+ * A running movement operation.
+ */
+struct ac_move_execution
+{
+  csAnimControlGroup* group;
+  csTicks final;
+  csVector3 delta_per_tick;
+  csVector3 final_position;
+};
+
+/**
+ * A running rotate operation.
+ */
+struct ac_rotate_execution
+{
+  csAnimControlGroup* group;
+  csTicks final;
+  int axis;
+  csReversibleTransform base_transform;
+  float delta_angle_per_tick;
+  float final_angle;
+};
+
+/**
  * The runtime state information for a running script. This class does
  * the actual operations in the script in a time based fashion.
  */
@@ -152,15 +185,13 @@ class csAnimControlRunnable
 {
 private:
   csAnimControlScript* script;
+  csGenmeshAnimationControlFactory* factory;
   size_t current_instruction;
 
-  // Current movement operation.
-  struct mov
-  {
-    csTicks final;
-    csVector3 delta_per_tick;
-    csVector3 final_position;
-  } movement;
+  // Current movement operations.
+  csArray<ac_move_execution> moves;
+  // Current rotate operations.
+  csArray<ac_rotate_execution> rotates;
   // Current delay operation.
   struct del
   {
@@ -168,7 +199,8 @@ private:
   } delay;
 
 public:
-  csAnimControlRunnable (csAnimControlScript* script);
+  csAnimControlRunnable (csAnimControlScript* script,
+  	csGenmeshAnimationControlFactory* factory);
   ~csAnimControlRunnable ();
 
   // Return true if one of the group transforms was actually modified.

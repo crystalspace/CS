@@ -25,6 +25,9 @@ chronological order.
 	  correctly with the latest macosx.jam even if those projects have not
 	  updated their configure scripts to emit an unconditional RANLIB
 	  value.
+	- Jorrit finished the basic gmeshanim plugin. Moving and rotating of
+	  vertex groups works. Still a lot todo but all the basics are there
+	  now.
 14-Sep-2004
 	- Eric Sunshine fixed bug in msvcgen.jam's LinkWith override where it
 	  did not distinguish between release and debug libraries & linker

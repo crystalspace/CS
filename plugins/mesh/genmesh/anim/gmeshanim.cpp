@@ -84,11 +84,12 @@ ac_instruction& csAnimControlScript::AddInstruction (ac_opcode opcode)
 
 //-------------------------------------------------------------------------
 
-csAnimControlRunnable::csAnimControlRunnable (csAnimControlScript* script)
+csAnimControlRunnable::csAnimControlRunnable (csAnimControlScript* script,
+    csGenmeshAnimationControlFactory* factory)
 {
   csAnimControlRunnable::script = script;
+  csAnimControlRunnable::factory = factory;
   current_instruction = 0;
-  movement.final = 0;
   delay.final = 0;
 }
 
@@ -101,10 +102,60 @@ bool csAnimControlRunnable::Do (csTicks current, bool& stop)
   stop = false;
   bool mod = false;
 
-  if (current < movement.final)
+  const csPDelArray<csAnimControlGroup>& groups = factory->GetGroups ();
+
+  //-------
+  // Perform all running moves.
+  //-------
+  size_t i = moves.Length ();
+  while (i > 0)
   {
+    i--;
+    ac_move_execution& m = moves[i];
+    if (current < m.final)
+    {
+      m.group->GetTransform ().SetOrigin (m.final_position
+	  -float (m.final-current) * m.delta_per_tick);
+    }
+    else
+    {
+      m.group->GetTransform ().SetOrigin (m.final_position);
+      moves.DeleteIndexFast (i);
+    }
     mod = true;
   }
+
+  //-------
+  // Perform all running rotates.
+  //-------
+  i = rotates.Length ();
+  while (i > 0)
+  {
+    i--;
+    ac_rotate_execution& m = rotates[i];
+    float angle;
+    if (current < m.final)
+      angle = m.final_angle - (m.final-current) * m.delta_angle_per_tick;
+    else
+      angle = m.final_angle;
+    csMatrix3 rot;
+    switch (m.axis)
+    {
+      case 0: rot = csXRotMatrix3 (angle); break;
+      case 1: rot = csYRotMatrix3 (angle); break;
+      case 2: rot = csZRotMatrix3 (angle); break;
+    }
+    m.group->GetTransform () = m.base_transform *
+	csReversibleTransform (rot, csVector3 (0));
+
+    if (current >= m.final)
+      rotates.DeleteIndexFast (i);
+    mod = true;
+  }
+
+  //-------
+  // Delay if needed.
+  //-------
   if (current < delay.final)
   {
     return mod;
@@ -118,6 +169,7 @@ bool csAnimControlRunnable::Do (csTicks current, bool& stop)
   while (true)
   {
     const ac_instruction& inst = instructions[current_instruction];
+    current_instruction++;
     switch (inst.opcode)
     {
       case AC_STOP:
@@ -125,21 +177,58 @@ bool csAnimControlRunnable::Do (csTicks current, bool& stop)
         return mod;
       case AC_DELAY:
         delay.final = current + inst.delay.time;
-	printf ("delay=%d %d\n", delay.final, current);
-        current_instruction++;
         return mod;
       case AC_REPEAT:
         current_instruction = 0;
-	printf ("repeat called!\n"); fflush (stdout);
         return mod;
+      case AC_ROTX:
+      case AC_ROTY:
+      case AC_ROTZ:
+	{
+	  ac_rotate_execution m;
+	  m.final = current + inst.rotate.duration;
+	  m.group = groups[inst.rotate.group_id];
+	  m.base_transform = m.group->GetTransform ();
+	  m.final_angle = inst.rotate.angle;
+	  m.axis = inst.opcode - AC_ROTX;
+	  if (inst.rotate.duration == 0)
+	  {
+	    // Rotate instantly.
+	    csMatrix3 rot;
+	    switch (m.axis)
+	    {
+	      case 0: rot = csXRotMatrix3 (m.final_angle); break;
+	      case 1: rot = csYRotMatrix3 (m.final_angle); break;
+	      case 2: rot = csZRotMatrix3 (m.final_angle); break;
+	    }
+	    m.group->GetTransform () *= csReversibleTransform (rot, csVector3 (0));
+	  }
+	  else
+	  {
+	    m.delta_angle_per_tick = m.final_angle / float (inst.rotate.duration);
+	    rotates.Push (m);
+	  }
+	}
+	break;
       case AC_MOVE:
-        // If there is a movement operation in progress we abort that.
-	// @@@ Take final position from there???
-	movement.final = current + inst.movement.duration;
-	movement.delta_per_tick = 1.0;//@@@
-	//@@@movement.final_position;
-	printf ("move called!\n"); fflush (stdout);
-        current_instruction++;
+	{
+	  ac_move_execution m;
+	  m.final = current + inst.movement.duration;
+	  m.group = groups[inst.movement.group_id];
+	  csVector3 current_pos = m.group->GetTransform ().GetOrigin ();
+	  csVector3 delta (inst.movement.dx, inst.movement.dy, inst.movement.dz);
+	  m.final_position = current_pos + delta;
+	  if (inst.movement.duration == 0)
+	  {
+	    // Move instantly.
+	    m.group->GetTransform ().SetOrigin (m.final_position);
+	  }
+	  else
+	  {
+	    m.delta_per_tick = delta / float (inst.movement.duration);
+	    moves.Push (m);
+	  }
+	}
         break;
     }
   }
@@ -261,18 +350,6 @@ const csVector3* csGenmeshAnimationControl::UpdateVertices (csTicks current,
     }
   }
 
-
-#if 0
-  memcpy (animated_verts, verts, num_animated_verts * sizeof (csVector3));
-  size_t i;
-  for (i = 0 ; i < (size_t)num_animated_verts ; i++)
-  {
-    animated_verts[i].x += (float (rand () % 100) / 100.0)/5.0 -.1;
-    animated_verts[i].y += (float (rand () % 100) / 100.0)/5.0 -.1;
-    animated_verts[i].z += (float (rand () % 100) / 100.0)/5.0 -.1;
-  }
-#endif
-
   return animated_verts;
 }
 
@@ -301,7 +378,8 @@ bool csGenmeshAnimationControl::Execute (const char* scriptname)
 {
   csAnimControlScript* script = factory->FindScript (scriptname);
   if (!script) return false;
-  csAnimControlRunnable* runnable = new csAnimControlRunnable (script);
+  csAnimControlRunnable* runnable = new csAnimControlRunnable (script,
+      factory);
   running_scripts.Push (runnable);
   return true;
 }
@@ -401,6 +479,18 @@ const char* csGenmeshAnimationControlFactory::ParseGroup (iDocumentNode* node,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
+      case XMLTOKEN_RANGE:
+        {
+	  int from_idx = child->GetAttributeValueAsInt ("from");
+	  int to_idx = child->GetAttributeValueAsInt ("to");
+	  if (to_idx < from_idx)
+	    return "Bad range in group definition!";
+	  float weight = child->GetAttributeValueAsFloat ("weight");
+	  int i;
+	  for (i = from_idx ; i <= to_idx ; i++)
+	    group->AddVertex (i, weight);
+	}
+        break;
       case XMLTOKEN_VERTEX:
         {
 	  int idx = child->GetAttributeValueAsInt ("idx");
@@ -468,6 +558,42 @@ const char* csGenmeshAnimationControlFactory::ParseScript (iDocumentNode* node)
 	  instr.movement.dz = child->GetAttributeValueAsFloat ("dz");
 	}
         break;
+      case XMLTOKEN_ROTX:
+	{
+	  const char* groupname = child->GetAttributeValue ("group");
+	  if (!groupname) return "Missing group name for <rotx>!";
+	  size_t group_id = FindGroupIndex (groupname);
+	  if (group_id == (size_t)~0) return "Can't find group for <rotx>!";
+	  ac_instruction& instr = ad.script->AddInstruction (AC_ROTX);
+	  instr.rotate.group_id = group_id;
+	  instr.rotate.duration = child->GetAttributeValueAsInt ("duration");
+	  instr.rotate.angle = child->GetAttributeValueAsFloat ("angle");
+	}
+	break;
+      case XMLTOKEN_ROTY:
+	{
+	  const char* groupname = child->GetAttributeValue ("group");
+	  if (!groupname) return "Missing group name for <roty>!";
+	  size_t group_id = FindGroupIndex (groupname);
+	  if (group_id == (size_t)~0) return "Can't find group for <roty>!";
+	  ac_instruction& instr = ad.script->AddInstruction (AC_ROTY);
+	  instr.rotate.group_id = group_id;
+	  instr.rotate.duration = child->GetAttributeValueAsInt ("duration");
+	  instr.rotate.angle = child->GetAttributeValueAsFloat ("angle");
+	}
+	break;
+      case XMLTOKEN_ROTZ:
+	{
+	  const char* groupname = child->GetAttributeValue ("group");
+	  if (!groupname) return "Missing group name for <rotz>!";
+	  size_t group_id = FindGroupIndex (groupname);
+	  if (group_id == (size_t)~0) return "Can't find group for <rotz>!";
+	  ac_instruction& instr = ad.script->AddInstruction (AC_ROTZ);
+	  instr.rotate.group_id = group_id;
+	  instr.rotate.duration = child->GetAttributeValueAsInt ("duration");
+	  instr.rotate.angle = child->GetAttributeValueAsFloat ("angle");
+	}
+	break;
       case XMLTOKEN_DELAY:
         {
 	  ac_instruction& instr = ad.script->AddInstruction (AC_DELAY);

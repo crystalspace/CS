@@ -567,22 +567,18 @@
             <autonormals />
 	    <animcontrol plugin="crystalspace.mesh.anim.genmesh">
 	    	<group name="one">
-		    <vertex idx="0" weight=".5" />
-		    <vertex idx="1" weight=".5" />
-		    <vertex idx="2" weight=".5" />
-		    <vertex idx="3" weight=".5" />
+		    <range from="0" to="11" weight=".5" />
 		</group>
 	    	<group name="two">
-		    <vertex idx="4" weight=".5" />
-		    <vertex idx="5" weight=".5" />
-		    <vertex idx="6" weight=".5" />
-		    <vertex idx="7" weight=".5" />
+		    <range from="12" to="23" weight=".5" />
 		</group>
 		<script name="main">
-		    <move group="one" duration="1000" dx=".2" />
+		    <rotz group="two" duration="1000" angle="2" />
+		    <move group="one" duration="1000" dy="-.2" />
 		    <move group="two" duration="1000" dy=".2" />
 		    <delay time="1000" />
-		    <move group="one" duration="1000" dx="-.2" />
+		    <rotx group="one" duration="1000" angle="2" />
+		    <move group="one" duration="1000" dy=".2" />
 		    <move group="two" duration="1000" dy="-.2" />
 		    <delay time="1000" />
 		    <repeat />
