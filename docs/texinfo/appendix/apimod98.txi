@@ -877,8 +877,8 @@ corresponding @code{SCF_CONSTRUCT_IBASE()} and
 these macros within your class' destructor, just as you invoke the
 corresponding @sc{scf} construction macros in your class' constructor.
 
-The @code{SCF_CREATE_INSTANCE()} macro now returns @code{csPtr<>}, for
-consistency with the other @sc{scf} instantiation and query macros.  This means
+The @code{SCF_CREATE_INSTANCE()} macro now returns @code{csPtr<>} to be
+consistent with the other @sc{scf} instantiation and query macros.  This means
 that you should now assign the result of @code{SCF_CREATE_INSTANCE()} to a
 @code{csRef<>}.
 
@@ -886,39 +886,69 @@ The macros @code{SCF_SET_REF()}, @code{SCF_INC_REF()}, and @code{SCF_DEC_REF()}
 have been removed. Instead you should use @code{csRef<>}.
 
 The query template class @code{scfInterface<>} has been introduced.  This class
-provides a means to query static information about @sc{scf} interfaces, such
-as an interface's current version number.  Presently, this class allows access
-to the following static information:
+provides a means to query static information about @sc{scf} interfaces, such as
+an interface's version number.  Presently, this class allows access to the
+following static information:
 
 @itemize @bullet
-@item
-@code{GetVersion()}---Retrieves the interface's current version number.
-
 @item
 @code{GetID()}---Retrieves the interface's low-level identifier as an
 @samp{scfInterfaceID}, which is typically a small integer.  @sc{scf} identifies
 interfaces internally by an @sc{id} for performance reasons.
+
+@item
+@code{GetName()}---Retrieves the interface's name as a null-terminated
+C-string.
+
+@item
+@code{GetVersion()}---Retrieves the interface's current version number.
 @end itemize
 
-As an example, you can retrieve the version number of the @samp{iFooBar}
-interface with the following code:
+Here is an example illustrating how to retrieve various pieces of information
+about an interface.
 
 @example
-int ver = scfInterface<iFooBar>::GetVersion();
+int ver = scfInterface<iFoo>::GetVersion();
+scfInterfaceID ident = scfInterface<iFoo>::GetID();
+char const* name = scfInterface<iFoo>::GetName();
 @end example
-
-The version and identifier also continue to be available, as usual, via the
-constant @samp{name_VERSION} and semi-hidden @code{name_scfGetID()} function,
-respectively, where @var{name} is the name of the interface (for instance,
-@samp{iFooBar_VERSION} and @code{iFooBar_scfGetID()}).  You can continue to use
-these older methods of accessing this static information, but the new
-@code{scfInterface<>} approach is cleaner.
 
 An important benefit of the new @code{scfInterface<>} template class is that it
 is now possible for template authors to perform queries for interface-related
-information.  For example, the author of a new template class may know the
+information.  For example, the author of a new template class may know an
 @sc{scf} interface via only the opaque identifier @code{T}, yet it is still
 possible to query @code{T}'s version using @code{scfInterfce<T>::GetVersion()}.
+
+The old hidden, semi-private @sc{api} for obtaining interface information via
+the global @samp{name_VERSION} constant and global @code{name_scfGetID()}
+function has been removed.  Conversion from the old @sc{api} to the new is
+straight forward.  For example:
+
+@itemize @bullet
+@item
+@code{iFoo_VERSION} @result{} @code{scfInterface<iFoo>::GetVersion()}
+@item
+@code{iFoo_scfGetID()} @result{} @code{scfInterface<iFoo>::GetID()}
+@end itemize
+
+A consequence of this change is that it is no longer possible to invoke the
+@code{SCF_VERSION()} macro inside an alternate namespace.  If previously you
+were invoking this macro within your project's own namespace, you must relocate
+the invocation so that it appears outside the namespace.  For example:
+
+@example
+#include <csutil/scf.h>
+
+namespace MyProject
+@{
+  struct iMyInterface : public iBase
+  @{
+    @dots{}
+  @};
+@}
+
+SCF_VERSION(MyProject::iMyInterface, 1, 0, 0);
+@end example
 
 @subheading csSys Library Removed
 

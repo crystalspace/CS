@@ -44,8 +44,8 @@ struct iVFS;
  * Utility macros to select what plugins you want to have loaded.
  * @{ */
 /// Request a plugin.
-#define CS_REQUEST_PLUGIN(Name,Interface) \
-  Name, #Interface, iSCF::SCF->GetInterfaceID(#Interface), Interface##_VERSION
+#define CS_REQUEST_PLUGIN(Name,Interface) Name, #Interface, \
+  scfInterface<Interface>::GetID(), scfInterface<Interface>::GetVersion()
 /// Marker for the end of the requested plugins list.
 #define CS_REQUEST_END \
   0

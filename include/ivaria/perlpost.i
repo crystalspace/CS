@@ -181,23 +181,40 @@
 %}
 
 /****************************************************************************
- * This is a hack to get the iBlah_VERSION constant for any interface, given
- * the "iBlah" is provided as a string.
+ * Retrieve the version number of an interface which is provided as a string.
  * Used by the macro replacements below.
  ****************************************************************************/
 %{
   int scfGetVersion (const char *iface)
   {
-    char *var = (char *) malloc (strlen (iface) + 9);
+    dSP;
+    int ver;
+    int nresult;
+    char boilerplate[] = "_scfGetVersion";
+    int const nboilerplate = sizeof(boilerplate); // Includes null terminator.
+    char *var = (char *) malloc (strlen (iface) + nboilerplate);
     strcpy (var, iface);
-    strcat (var, "_VERSION");
+    strcat (var, boilerplate);
 
-    SV *sv = get_sv (var, 0);
+    ENTER;
+    SAVETMPS;
+    PUSHMARK(SP);
+    PUTBACK;
+    nresult = call_pv(var, G_SCALAR | G_NOARGS);
+    SPAGAIN;
 
     free (var);
 
-    if (sv) return SvIV (sv);
-    else return -1;
+    if (nresult != 1)
+      croak("Expected exactly one result from scfGetVersion()\n");
+
+    ver = POPi;
+
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+
+    return ver;
   }
 %}
 

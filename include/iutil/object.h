@@ -35,23 +35,25 @@ struct iObjectIterator;
  */
 #define CS_GET_CHILD_OBJECT(object,Interface)			\
   csPtr<Interface> ((Interface*)(object)->GetChild(		\
-  Interface##_scfGetID (), Interface##_VERSION))
+  scfInterface<Interface>::GetID(), scfInterface<Interface>::GetVersion()))
 
 /**
  * You can use this macro to get a child object with the given name and
  * interface from a csObject. The returned object will be IncRef'ed.
  */
 #define CS_GET_NAMED_CHILD_OBJECT(object,Interface,name)		\
-  csPtr<Interface> ((Interface*)(object)->GetChild			\
-  (Interface##_scfGetID (), Interface##_VERSION, name))
+  csPtr<Interface> ((Interface*)(object)->GetChild(			\
+  scfInterface<Interface>::GetID(), scfInterface<Interface>::GetVersion(), \
+  name))
 
 /**
  * This is the same as CS_GET_CHILD_OBJECT, but stops at the first object
  * with the given name, even if it does not implement the requested interface.
  */
 #define CS_GET_FIRST_NAMED_CHILD_OBJECT(object,Interface,name)		\
-  csPtr<Interface> ((Interface*)(object)->GetChild			\
-  (Interface##_scfGetID (), Interface##_VERSION, name, true))
+  csPtr<Interface> ((Interface*)(object)->GetChild(			\
+  scfInterface<Interface>::GetID(), scfInterface<Interface>::GetVersion(), \
+  name, true))
 
 
 SCF_VERSION (iObject, 0, 3, 0);

@@ -488,13 +488,14 @@ the carrier object's constructor.  Likewise, you should not call
 @node SCF Versions, SCF Client, SCF Multiple Interfaces, SCF
 @subsection Interface Versions
 
-Unlike @sc{com}, @sc{scf} supports interface versions.  That is, a shared
-class could implement version 0.3.6 of given interface, and if client requests
-that interface of a version lower or equal than 0.3.6, a correct interface
-pointer is returned.  For this to work you need to define inside each
-interface header file a constant called @samp{VERSION_i@var{InterfaceName}}
-that defines the current version of given interface.  To correctly support
-different versions of interfaces you should follow these guidelines:
+Unlike @sc{com}, @sc{scf} supports interface versions.  That is, a shared class
+could implement version 0.3.6 of given interface, and if client requests that
+interface of a version lower or equal than 0.3.6, a correct interface pointer
+is returned.  For this to work you need to define inside each interface header
+file a specialization of the @code{scfInterface<>} template class for each
+interface.  This specialization must provide the interface's version number as
+the result of its @code{GetVersion()} method.  To correctly support different
+versions of interfaces you should follow these guidelines:
 
 @itemize @bullet
 @item
@@ -528,7 +529,8 @@ compatible with interface version.  In fact, the
 @code{SCF_IMPLEMENTS_EMBEDDED_INTERFACE()} macros employ this function
 automatically.
 
-For easier definition of versioned interfaces you can use the
+Since specializing the @code{scfInterface<>} template for each interface is an
+onerous task, you can instead automate the task via use of the
 @code{SCF_VERSION()} macro.
 
 @example
@@ -537,7 +539,23 @@ SCF_VERSION(iMyGraphics3D, 0, 0, 1);
 struct iMyGraphics3D : public iBase
 @{
   @dots{}
+@};
+@end example
+
+If you are placing your interfaces in your project's own namespace, then you
+must invoke the @code{SCF_VERSION()} macro outside your namespace.  For
+instance:
+
+@example
+namespace MyProject
+@{
+  struct iMyGraphics3D : public iBase
+  @{
+    @dots{}
+  @};
 @}
+
+SCF_VERSION(MyProject::iMyGraphics3D, 0, 0, 1);
 @end example
 
 @node SCF Client, SCF Meta Info, SCF Versions, SCF

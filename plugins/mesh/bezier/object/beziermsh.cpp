@@ -78,7 +78,7 @@ SCF_IMPLEMENT_IBASE(csBezierMesh)
     if (iPolygonMesh_scfID == (scfInterfaceID)-1)				
       iPolygonMesh_scfID = iSCF::SCF->GetInterfaceID ("iPolygonMesh");		
     if (iInterfaceID == iPolygonMesh_scfID &&				
-      scfCompatibleVersion (iVersion, iPolygonMesh_VERSION))		
+      scfCompatibleVersion(iVersion, scfInterface<iPolygonMesh>::GetVersion()))
     {
 #ifdef CS_DEBUG
       printf ("Deprecated feature use: iPolygonMesh queried from Bezier "

@@ -6,6 +6,63 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-Nov-2003
+	- Eric Sunshine removed the ugly, semi-private, legacy name_VERSION and
+	  name_scfGetID() API which SCF_VERSION() created for each declared
+	  interface.  This functionality has been entirely subsumed by the
+	  newer scfInterface<> template.  Also, supporting both the old and new
+	  APIs in parallel made it impossible for projects using namespaces to
+	  invoke SCF_VERSION() (it would generate compilation errors both
+	  inside and outside the namespace).  With the legacy API removed,
+	  SCF_VERSION() can once again be used by projects using namespaces
+	  (though the macro must be invoked outside the namespace).
+	- Eric Sunshine patched cspace.i and the custom-code for each of the
+	  Swig-supported languages (Python, Perl5, and Java) to work with
+	  scfInterface<> rather than accessing the obsolete name_VERSION global
+	  constant when requesting an interface's version number.
+	- Eric Sunshine eliminated Swig complaints about redeclaration of
+	  CS_CRYSTAL_PROTOCOL, CS_MUSCLE_PROTOCOL, and CS_XML_PROTOCOL in
+	  javapre.i for csjava.
+	- Eric Sunshine fixed the following problems in csperl5.mak:
+	    - Fixed bug: Was placing the generated pure-Perl5 module
+	      (.pm/.so/.dll) into the source directory (CS/scripts/csperl5).
+	      This is incorrect because the source directory might be read-only
+	      or shared.  Now instead places the generated module into
+	      $(OUTPROC)/perl5.  This mirrors the behavior of the pythmod
+	      target which places the pure-Python module in $(OUTPROC)/python.
+	    - Fixed bug: Failed to respect $(SRCDIR) when trying to locate the
+	      perl5.cin input file, thus causing the csperl5 target to fail
+	      when building outside the source directory.
+	    - Fixed bug: Added several missing dependency rules for generated
+	      files.
+	    - Fixed bug: csperl5clean target failed to remove many of the
+	      generated resources, such as the .cex file, and the .pm and .inc
+	      derived files.
+	    - Fixed bug: Swig would be run every single time the csperl5 target
+	      was invoked even if the Swig-generated file was up-to-date.
+	      This, in turn, would cause the Swig-generated file to be
+	      recompiled each time (a 25-minute undertaking on Eric's
+	      computer).
+	    - Now places derived source files in a subdirectory of
+	      $(OUTDERIVED) rather than directly into $(OUTDERIVED) in order to
+	      avoid potential collisions.
+	- Eric Sunshine made the following changes to cspython.mak:
+	    - Fixed bug: pythmod target failed to utilize the factory-supplied
+	      cspace.py from CS/scripts/python if Swig was not installed, thus
+	      causing build failure.
+	    - Fixed bug: cspythonclean and pythmodclean targets failed to
+	      remove all of the generated resources, such as the .py file.
+	    - Changed some makefile variable names in order to avoid global
+	      namespace pollution.  For instance, SWIG.OUTDIR becomes
+	      SWIG.CSPYTHON.OUTDIR, and SWIG.INTERFACE becomes
+	      SWIG.CSPYTHON.INTERFACE.
+	    - Now places derived source files in a subdirectory of
+	      $(OUTDERIVED) rather than directly into $(OUTDERIVED) in order to
+	      avoid potential collisions.
+	- Eric Sunshine re-enabled csperl5 in user.mak since the Swig-generated
+	  files are now kept up to date by a daily cron job, and because Eric
+	  fixed all other build problems (at least on Unix) which plagued the
+	  module.
 24-Nov-2003
 	- Eric Sunshine performed minor clean up of the new cslibs test in
 	  configure.ac.  Now wraps cslibs-config invocations in AC_RUN_LOG().

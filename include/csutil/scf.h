@@ -408,7 +408,7 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
   if (Interface##_scfID == (scfInterfaceID)-1)				\
     Interface##_scfID = iSCF::SCF->GetInterfaceID (#Interface);		\
   if (iInterfaceID == Interface##_scfID &&				\
-    scfCompatibleVersion (iVersion, Interface##_VERSION))		\
+    scfCompatibleVersion (iVersion, scfInterface<Interface>::GetVersion())) \
   {									\
     (Object)->IncRef ();						\
     return STATIC_CAST(Interface*, Object);				\
@@ -686,7 +686,7 @@ typedef void* (*scfFactoryFunc)(iBase*);
 #define SCF_CREATE_INSTANCE(ClassID,Interface)				\
   csPtr<Interface> (                                                    \
     (Interface *)iSCF::SCF->CreateInstance (				\
-    ClassID, #Interface, Interface##_VERSION))
+    ClassID, #Interface, scfInterface<Interface>::GetVersion()))
 
 /**
  * SCF_VERSION can be used to define an interface's version number;
@@ -701,14 +701,6 @@ typedef void* (*scfFactoryFunc)(iBase*);
  * </pre>
  */
 #define SCF_VERSION(Name,Major,Minor,Micro)				\
-int const Name##_VERSION = SCF_CONSTRUCT_VERSION(Major, Minor, Micro);	\
-inline static scfInterfaceID Name##_scfGetID()				\
-{									\
-  static scfInterfaceID ID = (scfInterfaceID)-1;			\
-  if (ID == (scfInterfaceID)(-1))					\
-    ID = iSCF::SCF->GetInterfaceID(#Name);				\
-  return ID;								\
-}									\
 struct Name;								\
 CS_SPECIALIZE_TEMPLATE							\
 class scfInterface<Name>						\
@@ -767,7 +759,7 @@ public:
  */
 #define SCF_QUERY_INTERFACE(Object,Interface)				\
   csPtr<Interface> ((Interface *)(Object)->QueryInterface (		\
-  Interface##_scfGetID (), Interface##_VERSION))
+  scfInterface<Interface>::GetID (), scfInterface<Interface>::GetVersion()))
 
 /**
  * Shortcut macro to query given interface from given object.
@@ -776,7 +768,7 @@ public:
  */
 #define SCF_QUERY_INTERFACE_SAFE(Object,Interface)			\
   csPtr<Interface> ((Interface *)(iBase::QueryInterfaceSafe ((Object),	\
-  Interface##_scfGetID (), Interface##_VERSION)))
+  scfInterface<Interface>::GetID (), scfInterface<Interface>::GetVersion())))
 
 /**
  * This function should be called to initialize client SCF library.

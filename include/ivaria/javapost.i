@@ -40,13 +40,12 @@
 {
     const char * s = jenv->GetStringUTFChars($input, 0);
     const char * dot = strrchr(s, '.');
-    strcpy(className, dot?dot+1:s);
+    strcpy(className, "net/sourceforge/crystal/");
+    strcat(className, dot?dot+1:s);
     $1 = className;
     jenv->ReleaseStringUTFChars($input, s);
-    char methodName[1024];
-    sprintf(methodName, "get%c%s_VERSION", toupper(className[0]), className+1);
-    jclass cls = jenv->FindClass("net/sourceforge/crystal/cspace");
-    jmethodID mid = jenv->GetStaticMethodID(cls, methodName, "()I");
+    jclass cls = jenv->FindClass(className);
+    jmethodID mid = jenv->GetStaticMethodID(cls, "scfGetVersion", "()I");
     $2 = jenv->CallStaticIntMethod(cls, mid);
 }
 %typemap(jni) (const char * iface, int iface_ver) "jstring"

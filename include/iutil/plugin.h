@@ -40,7 +40,7 @@ struct iComponent;
  */
 #define CS_QUERY_PLUGIN_CLASS(Object,ClassID,Interface)			\
   csPtr<Interface> ((Interface *)((Object)->QueryPlugin			\
-  (ClassID, #Interface, Interface##_VERSION)))
+  (ClassID, #Interface, scfInterface<Interface>::GetVersion())))
 
 /**
  * Tell plugin manager driver to load a plugin.
@@ -50,7 +50,7 @@ struct iComponent;
  */
 #define CS_LOAD_PLUGIN(Object,ClassID,Interface)			\
   csPtr<Interface> ((Interface *)((Object)->LoadPlugin			\
-  (ClassID, #Interface, Interface##_VERSION)))
+  (ClassID, #Interface, scfInterface<Interface>::GetVersion())))
 
 SCF_VERSION (iPluginIterator, 0, 0, 1);
 

@@ -186,7 +186,8 @@ iVFS* csInitializer::SetupVFS(iObjectRegistry* r, const char* pluginID)
   if (!VFS)
   {
     csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (r, iPluginManager));
-    VFS = csPtr<iVFS> ((iVFS*)(plugin_mgr->QueryPlugin ("iVFS", iVFS_VERSION)));
+    VFS = csPtr<iVFS> ((iVFS*)(plugin_mgr->QueryPlugin (
+      "iVFS", scfInterface<iVFS>::GetVersion())));
   }
   if (!VFS)
   {

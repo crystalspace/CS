@@ -1,4 +1,4 @@
-DESCRIPTION.csperl5 = Crystal Space Perl5 scripting plugin
+DESCRIPTION.csperl5 = Crystal Space Perl5 plugin
 DESCRIPTION.csperl5maintainer = SWIG Perl5 files
 DESCRIPTION.swigperl5gen = SWIG Perl5 files (forcibly)
 DESCRIPTION.swigperl5inst = SWIG Perl5 files (install)
@@ -56,7 +56,9 @@ SRC.CSPERL5 = $(wildcard $(addprefix $(SRCDIR)/,plugins/cscript/csperl5/*.cpp))
 OBJ.CSPERL5 = $(addprefix $(OUT)/,$(notdir $(SRC.CSPERL5:.cpp=$O)))
 DEP.CSPERL5 = CSTOOL CSGEOM CSUTIL CSUTIL
 
-PERLXSI.C = $(OUTDERIVED)/csperlxs.c
+CSPERL5.DERIVED = $(OUTDERIVED)/perl5
+
+PERLXSI.C = $(CSPERL5.DERIVED)/csperlxs.c
 PERLXSI.O = $(OUT)/$(notdir $(PERLXSI.C:.c=$O))
 
 SWIG.I = $(SRCDIR)/include/ivaria/cspace.i
@@ -64,16 +66,20 @@ SWIG.MOD = cspace
 SWIG.PERL5.DIR = $(SRCDIR)/scripts/perl5
 SWIG.PERL5.PM = $(SWIG.PERL5.DIR)/$(SWIG.MOD).pm
 SWIG.PERL5.C = $(SWIG.PERL5.DIR)/cswigpl5.inc
-SWIG.PERL5.PM.IN = $(OUTDERIVED)/$(notdir $(SWIG.PERL5.PM))
-SWIG.PERL5.C.IN = $(OUTDERIVED)/$(notdir $(SWIG.PERL5.C))
+SWIG.PERL5.PM.IN = $(CSPERL5.DERIVED)/$(notdir $(SWIG.PERL5.PM))
+SWIG.PERL5.C.IN = $(CSPERL5.DERIVED)/$(notdir $(SWIG.PERL5.C))
 SWIG.PERL5.CPP = $(SRCDIR)/plugins/cscript/csperl5/cswigpl5.cpp
 SWIG.PERL5.O = $(OUT)/$(notdir $(SWIG.PERL5.CPP:.cpp=$O))
-SWIG.PERL5.DLL = $(SWIG.PERL5.DIR)/$(SWIG.MOD)$(DLL)
+SWIG.PERL5.INSTALLDIR = $(OUTPROC)/perl5
+SWIG.PERL5.DLL = $(SWIG.PERL5.INSTALLDIR)/$(SWIG.MOD)$(DLL)
+SWIG.PERL5.INSTALLPM = $(SWIG.PERL5.INSTALLDIR)/$(notdir $(SWIG.PERL5.PM))
 
 CEX.CSPERL5 = perl5.cex
-CIN.CSPERL5 = plugins/cscript/csperl5/perl5.cin
+CIN.CSPERL5 = $(SRCDIR)/plugins/cscript/csperl5/perl5.cin
 
 PERL5.CFLAGS += -Wno-unused
+
+OUTDIRS += $(CSPERL5.DERIVED) $(SWIG.PERL5.INSTALLDIR)
 
 #MSVC.DSP += MSCSPERL5
 #DSP.MSCSPERL5.NAME = csperl5
@@ -107,12 +113,15 @@ ifeq ($(MAKESECTION), targets)
 
 .PHONY: csperl5 swigperl5gen csperl5clean swigperl5clean csperl5maintainerclean
 
-csperl5: $(OUTDIRS) $(CSPERL5) $(SWIG.PERL5.DLL) $(CEX.CSPERL5)
+csperl5: $(OUTDIRS) $(SWIG.PERL5.INSTALLPM) $(CSPERL5) $(SWIG.PERL5.DLL) \
+  $(CEX.CSPERL5)
 
 $(CSPERL5): $(OBJ.CSPERL5) $(LIB.CSPERL5) $(PERLXSI.O) $(SWIG.PERL5.DLL)
 	$(DO.PLUGIN.PREAMBLE) \
 	$(DO.PLUGIN.CORE) $(PERL5.LFLAGS) \
 	$(DO.PLUGIN.POSTAMBLE)
+
+$(SRC.CSPERL5): $(SWIG.PERL5.C.IN)
 
 $(OUT)/%$O: $(SRCDIR)/plugins/cscript/csperl5/%.cpp
 	$(DO.COMPILE.CPP) $(PERL5.CFLAGS)
@@ -136,14 +145,14 @@ $(PERLXSI.O): $(PERLXSI.C)
 	$(DO.COMPILE.C) $(PERL5.CFLAGS)
 
 ifeq (,$(SWIGBIN))
-$(SWIG.PERL5.PM.IN):
+$(SWIG.PERL5.PM.IN): $(SWIG.PERL5.PM)
 	-$(RM) $(SWIG.PERL5.PM.IN)
 	$(CP) $(SWIG.PERL5.PM) $(SWIG.PERL5.PM.IN)
-$(SWIG.PERL5.C.IN):
+$(SWIG.PERL5.C.IN): $(SWIG.PERL5.C)
 	-$(RM) $(SWIG.PERL5.C.IN)
 	$(CP) $(SWIG.PERL5.C) $(SWIG.PERL5.C.IN)
 else
-$(SWIG.PERL5.PM.IN) $(SWIG.PERL5.C.IN): $(OUTDIRS)
+$(SWIG.PERL5.PM.IN) $(SWIG.PERL5.C.IN): $(SWIG.I)
 	-$(SWIGBIN) -perl5 -c++ -shadow -const -Iinclude -I$(SRCDIR)/include \
 	-module $(SWIG.MOD) -o $(SWIG.PERL5.C.IN) $(SWIG.I)
 	$(SED) '/$(BUCK)Header:/d' < $(SWIG.PERL5.C.IN) > $(SWIG.PERL5.C.IN).sed
@@ -165,11 +174,20 @@ endif
 
 $(SWIG.PERL5.O): $(SWIG.PERL5.CPP)
 	$(filter-out -W -Wunused -Wall -Wmost,$(DO.COMPILE.CPP) \
-	$(PERL5.CFLAGS) -DPERL_POLLUTE $(CFLAGS.I)$(SWIG.PERL5.DIR))
+	$(PERL5.CFLAGS) -DPERL_POLLUTE $(CFLAGS.I)$(CSPERL5.DERIVED))
 
-#@@@ Kludge: we leave out PREAMBLE and POSTAMPLE since we don't want metadata
+# @@@ Kludge: We omit PREAMBLE and POSTAMBLE since we don't want metadata.
+# The more correct way to do this is to invoke Perl's own extension building
+# facility.  (This is especially true since the ugly sans-PREAMBLE/POSTAMBLE
+# hack is bound to fail on any number of platforms since platform-specific
+# build rules are not guaranteed to split metadata embedding off into the
+# PREAMBLE/POSTAMBLE macros.)
 $(SWIG.PERL5.DLL): $(SWIG.PERL5.O) $(LIB.CSPERL5)
 	$(DO.SHARED.PLUGIN.CORE) $(PERL5.LFLAGS)
+
+$(SWIG.PERL5.INSTALLPM): $(SWIG.PERL5.PM.IN)
+	$(RM) $@
+	$(CP) $(SWIG.PERL5.PM.IN) $@
 
 $(CEX.CSPERL5): $(CIN.CSPERL5)
 	@echo Generating perl5 cs-config extension...
@@ -182,8 +200,10 @@ clean: csperl5clean
 maintainerclean: csperl5maintainerclean
 
 csperl5clean: swigperl5clean
-	-$(RMDIR) $(CSPERL5) $(OBJ.CSPERL5) $(OUTDLL)/$(notdir $(INF.CSPERL5)) \
-	$(PERLXSI.O) $(PERLXSI.C) $(SWIG.PERL5.O) $(SWIG.PERL5.DLL)
+	-$(RMDIR) $(CSPERL5) $(OBJ.CSPERL5) \
+	$(OUTDLL)/$(notdir $(INF.CSPERL5)) $(CEX.CSPERL5) \
+	$(PERLXSI.O) $(PERLXSI.C) $(SWIG.PERL5.O) $(SWIG.PERL5.DLL) \
+	$(SWIG.PERL5.INSTALLPM) $(CSPERL5.DERIVED) $(SWIG.PERL5.INSTALLDIR)
 
 swigperl5clean:
 	-$(RM) $(SWIG.PERL5.C.IN) $(SWIG.PERL5.PM.IN)

@@ -2700,8 +2700,8 @@ void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
   if (!dyn)
   {
     csRef<iLightingProcessData> lpd = lpi->QueryUserdata (
-    	csLightingPolyTexQueue_scfGetID (),
-	csLightingPolyTexQueue_VERSION);
+    	scfInterface<csLightingPolyTexQueue>::GetID (),
+	scfInterface<csLightingPolyTexQueue>::GetVersion());
     lptq = (csLightingPolyTexQueue*)(iLightingProcessData*)lpd;
     if (!lptq)
     {

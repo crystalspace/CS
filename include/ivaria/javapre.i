@@ -27,6 +27,9 @@
 %constant int CS_CRYSTAL_PROTOCOL = 0x43533030;
 %constant int CS_MUSCLE_PROTOCOL = 0x504d3030;
 %constant int CS_XML_PROTOCOL = 0x584d4d30;
+%ignore CS_CRYSTAL_PROTOCOL;
+%ignore CS_MUSCLE_PROTOCOL;
+%ignore CS_XML_PROTOCOL;
 
 %typemap(javabase) iBase "cspace";
 

@@ -409,7 +409,6 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT(
 %define INTERFACE_PRE(T)
 
 	%nodefault T;
-	%ignore T##_scfGetID ();
 
 	TYPEMAP_OUT_csRef(T)
 	TYPEMAP_OUT_csPtr(T)
@@ -896,7 +895,9 @@ TYPEMAP_OUT_csWrapPtr
 
 	%extend T
 	{
-		~ T () { if (self) self->DecRef (); }
+		virtual ~ T () { if (self) self->DecRef (); }
+		static int scfGetVersion()
+		{ return scfInterface<T>::GetVersion(); }
 	}
 
 %enddef

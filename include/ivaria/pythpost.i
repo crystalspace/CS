@@ -226,7 +226,7 @@ csWrapPtr _CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
 	def _GetIntfId (intf):
 		return cvar.iSCF_SCF.GetInterfaceID(intf.__name__)
 	def _GetIntfVersion (intf):
-		return eval('%s_VERSION' % intf.__name__, locals(), globals())
+		return eval('%s_scfGetVersion()' % intf.__name__, locals(), globals())
 
 	def CS_QUERY_REGISTRY (reg, intf):
 		return _CS_QUERY_REGISTRY (reg, intf.__name__, _GetIntfVersion(intf))
@@ -264,7 +264,7 @@ csWrapPtr _CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
 	def CS_REQUEST_PLUGIN (name, intf):
 		return (
 			name, intf.__name__, cvar.iSCF_SCF.GetInterfaceID(intf.__name__),
-			eval('%s_VERSION' % intf.__name__, locals(), globals())
+			eval('%s_scfGetVersion()' % intf.__name__, locals(), globals())
 		)
 
 	def CS_REQUEST_VFS ():

@@ -98,14 +98,14 @@ endif
 
 TO_INSTALL.EXE += python.cex
 
-SWIG.OUTDIR = $(OUTDERIVED)
-SWIG.INTERFACE = $(SRCDIR)/include/ivaria/cspace.i
+SWIG.CSPYTHON.OUTDIR = $(OUTDERIVED)/python
+SWIG.CSPYTHON.INTERFACE = $(SRCDIR)/include/ivaria/cspace.i
 ifneq ($(CSPYTHON_MSVC_EXCLUDE),yes)
-SWIG.CSPYTHON = $(SWIG.OUTDIR)/cs_pyth.cpp
+SWIG.CSPYTHON = $(SWIG.CSPYTHON.OUTDIR)/cs_pyth.cpp
 endif
 SWIG.CSPYTHON.CVS = $(SRCDIR)/plugins/cscript/cspython/cs_pyth.cpp
 SWIG.CSPYTHON.OBJ = $(addprefix $(OUT)/,$(notdir $(SWIG.CSPYTHON:.cpp=$O)))
-SWIG.CSPYTHON.PY = $(SWIG.OUTDIR)/cspace.py
+SWIG.CSPYTHON.PY = $(SWIG.CSPYTHON.OUTDIR)/cspace.py
 SWIG.CSPYTHON.PY.CVS = $(SRCDIR)/scripts/python/cspace.py
 
 TRASH.CSPYTHON = $(wildcard $(addprefix $(SRCDIR)/scripts/python/,*.pyc *.pyo))
@@ -122,10 +122,12 @@ SRC.PYTHMOD = $(SRCDIR)/plugins/cscript/cspython/pythmod.cpp $(SWIG.CSPYTHON)
 OBJ.PYTHMOD = $(addprefix $(OUT)/, $(notdir $(SRC.PYTHMOD:.cpp=$O)))
 DEP.PYTHMOD = $(DEP.CSPYTHON)
 
+OUTDIRS += $(SWIG.CSPYTHON.OUTDIR) $(PYTHMOD.BUILDBASE) $(PYTHMOD.INSTALLDIR)
+
 MSVC.DSP += CSPYTHON
 DSP.CSPYTHON.NAME = cspython
 DSP.CSPYTHON.TYPE = plugin
-DSP.CSPYTHON.RESOURCES = $(SWIG.INTERFACE)
+DSP.CSPYTHON.RESOURCES = $(SWIG.CSPYTHON.INTERFACE)
 DSP.CSPYTHON.CFLAGS = /D "SWIG_GLOBAL"
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -143,7 +145,7 @@ all: $(CSPYTHON.LIB)
 endif
 cspython: $(OUTDIRS) $(CSPYTHON) python.cex
 ifneq ($(MAKE_PYTHON_MODULE),no)
-pythmod: $(OUTDIRS) $(PYTHMOD)
+pythmod: $(OUTDIRS) $(SWIG.CSPYTHON.PY) $(PYTHMOD)
 endif
 clean: cspythonclean pythmodclean
 maintainerclean: cspythonmaintainerclean
@@ -163,8 +165,9 @@ SWIG.CSPYTHON.DEPS=\
 	$(SRCDIR)/include/ivaria/pythpost.i
 
 ifneq (,$(SWIGBIN))
-$(SWIG.CSPYTHON): $(SWIG.INTERFACE) $(SWIG.CSPYTHON.DEPS)
-	$(SWIGBIN) $(SWIGFLAGS) -o $(SWIG.CSPYTHON) $(SWIG.INTERFACE)
+$(SWIG.CSPYTHON) $(SWIG.CSPYTHON.PY): \
+  $(SWIG.CSPYTHON.INTERFACE) $(SWIG.CSPYTHON.DEPS)
+	$(SWIGBIN) $(SWIGFLAGS) -o $(SWIG.CSPYTHON) $(SWIG.CSPYTHON.INTERFACE)
 	$(SED) '/$(BUCK)Header:/d' < $(SWIG.CSPYTHON) > $(SWIG.CSPYTHON).sed
 	$(RM) $(SWIG.CSPYTHON)
 	$(MV) $(SWIG.CSPYTHON).sed $(SWIG.CSPYTHON)
@@ -172,6 +175,9 @@ else
 $(SWIG.CSPYTHON): $(SWIG.CSPYTHON.CVS)
 	-$(RM) $(SWIG.CSPYTHON)
 	$(CP) $(SWIG.CSPYTHON.CVS) $(SWIG.CSPYTHON)
+$(SWIG.CSPYTHON.PY): $(SWIG.CSPYTHON.PY.CVS)
+	-$(RM) $(SWIG.CSPYTHON.PY)
+	$(CP) $(SWIG.CSPYTHON.PY.CVS) $(SWIG.CSPYTHON.PY)
 endif
 
 python.cex: $(SRCDIR)/plugins/cscript/cspython/python.cin
@@ -189,19 +195,21 @@ $(CSPYTHON): $(OBJ.CSPYTHON) $(LIB.CSPYTHON)
 	$(DO.PLUGIN.CORE) $(LIB.CSPYTHON.LOCAL) \
 	$(DO.PLUGIN.POSTAMBLE)
 
-$(PYTHMOD.INSTALLDIR):
-	-$(MKDIRS)
-
 ifeq ($(PYTHON.DISTUTILS),yes)
-$(PYTHMOD): $(PYTHMOD.INSTALLDIR) $(SRC.PYTHMOD) $(LIB.PYTHMOD)
-	$(PYTHON) $(SRCDIR)/plugins/cscript/cspython/pythmod_setup.py $(SWIG.OUTDIR) $(SRCDIR) $(SRCDIR)/include ./include $(OUT) -- $(OUT) $(PYTHMOD.LIBS.PLATFORM) -- build -q --build-base=$(PYTHMOD.BUILDBASE) install -q --install-lib=$(PYTHMOD.INSTALLDIR)
+$(PYTHMOD): $(SRC.PYTHMOD) $(LIB.PYTHMOD)
+	$(PYTHON) $(SRCDIR)/plugins/cscript/cspython/pythmod_setup.py \
+	$(SWIG.CSPYTHON.OUTDIR) $(SRCDIR) $(SRCDIR)/include ./include $(OUT) \
+	-- $(OUT) $(PYTHMOD.LIBS.PLATFORM) -- build -q \
+	--build-base=$(PYTHMOD.BUILDBASE) install -q \
+	--install-lib=$(PYTHMOD.INSTALLDIR)
 else
 $(PYTHMOD):
 	@echo $(DESCRIPTION.pythmod)" not supported: distutils not available!"
 endif
 
 pythmodclean:
-	-$(RMDIR) $(SWIG.CSPYTHON) $(PYTHMOD) $(PYTHMOD.BUILDBASE)
+	-$(RMDIR) $(SWIG.CSPYTHON) $(SWIG.CSPYTHON.PY) $(PYTHMOD) \
+	$(PYTHMOD.BUILDBASE) $(PYTHMOD.INSTALLDIR) $(SWIG.CSPYTHON.OUTDIR)
 
 ifeq ($(DO_SWIGPYTHINST),yes)
 swigpythinst: $(OUTDIRS) $(SWIG.CSPYTHON.CVS) $(SWIG.CSPYTHON.PY.CVS)
@@ -216,7 +224,9 @@ $(SWIG.CSPYTHON.PY.CVS): $(SWIG.CSPYTHON.PY)
 endif
 
 cspythonclean: swigpythclean
-	-$(RMDIR) $(CSPYTHON) $(OBJ.CSPYTHON) $(OUTDLL)/$(notdir $(INF.CSPYTHON)) $(TRASH.CSPYTHON) python.cex
+	-$(RMDIR) $(CSPYTHON) $(OBJ.CSPYTHON) \
+	$(OUTDLL)/$(notdir $(INF.CSPYTHON)) $(TRASH.CSPYTHON) python.cex \
+	$(SWIG.CSPYTHON) $(SWIG.CSPYTHON.PY) $(SWIG.CSPYTHON.OUTDIR)
 
 swigpythgen: $(OUTDIRS) swigpythclean $(SWIG.CSPYTHON)
 

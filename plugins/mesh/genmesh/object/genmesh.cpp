@@ -67,7 +67,7 @@ SCF_IMPLEMENT_IBASE (csGenmeshMeshObject)
     if (iPolygonMesh_scfID == (scfInterfaceID)-1)				
       iPolygonMesh_scfID = iSCF::SCF->GetInterfaceID ("iPolygonMesh");		
     if (iInterfaceID == iPolygonMesh_scfID &&				
-      scfCompatibleVersion (iVersion, iPolygonMesh_VERSION))		
+      scfCompatibleVersion(iVersion, scfInterface<iPolygonMesh>::GetVersion()))
     {
 #ifdef CS_DEBUG
       printf ("Deprecated feature use: iPolygonMesh queried from Genmesh "
@@ -1102,7 +1102,7 @@ SCF_IMPLEMENT_IBASE (csGenmeshMeshObjectFactory)
     if (iPolygonMesh_scfID == (scfInterfaceID)-1)				
       iPolygonMesh_scfID = iSCF::SCF->GetInterfaceID ("iPolygonMesh");		
     if (iInterfaceID == iPolygonMesh_scfID &&				
-      scfCompatibleVersion (iVersion, iPolygonMesh_VERSION))		
+      scfCompatibleVersion(iVersion, scfInterface<iPolygonMesh>::GetVersion()))
     {
       printf ("Deprecated feature use: iPolygonMesh queried from GenMesh "
 	"factory; use iObjectModel->GetPolygonMeshColldet() instead.\n");
