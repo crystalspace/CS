@@ -9,8 +9,9 @@ In this tutorial we explain a bit about @sc{vfs}, texture management and
 how you can add a simple sprite to the simple application.
 
 Crystal Space has the concept of mesh factories and meshes. A mesh is basically
-some kind of 3D object. Crystal Space supports several kinds of meshes. The
-one in which we're interested here is the 3D sprite mesh. A mesh
+some kind of 3D object. Crystal Space supports several kinds of meshes. In
+the previous tutorial we used the thing mesh to create the geometry of
+our room. In this tutorial we will use the 3D sprite mesh. A mesh
 factory is like a blue-print for a mesh (or sprite). It defines how the mesh
 looks and how it animates. Before you can use a mesh you need to have a
 mesh factory. Once you have a mesh factory you can create multiple
@@ -62,9 +63,9 @@ bool Simple::Initialize(int argc, char const* const argv[],
   @dots{}
   txtmgr->SetPalette ();
 
-  // Load a texture for our sprite and fetch the material.
-  csTextureWrapper* txt =
-    csLoader::LoadTexture (engine, "spark", "/lib/std/spark.png");
+  // Load a texture for our sprite.
+  iTextureWrapper* txt = loader->LoadTexture ("spark",
+  	"/lib/std/spark.png");
   if (txt == NULL)
   @{
     Printf (MSG_FATAL_ERROR, "Error loading texture!\n");
@@ -72,17 +73,18 @@ bool Simple::Initialize(int argc, char const* const argv[],
     exit (1);
   @}
   txt->Register (txtmgr);
-  txt->GetTextureHandle ()->Prepare ();
-  csMaterialWrapper* mat =
-    engine->GetMaterials ()->FindByName ("spark");
+  txt->GetTextureHandle()->Prepare ();
+  iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
   mat->Register (txtmgr);
   mat->GetMaterialHandle ()->Prepare ();
+
+  return true;
 @}
 @end example
 
 This code first loads a texture in our engine with
-@code{csLoader::LoadTexture()}.  The third argument is the file name for our
-texture (@sc{vfs} path) and the second argument is how that texture should be
+@code{iLoader::LoadTexture()}.  The second argument is the file name for our
+texture (@sc{vfs} path) and the first argument is how that texture should be
 named in the engine.  In this case we use @samp{spark} for that because that's
 how the @file{sprite1} definition wants it.
 
@@ -90,7 +92,7 @@ If this loading succeeds we need to register our texture with the
 texture manager. This is because we didn't put the loading of our texture
 before the @code{engine->Prepare()} call (which takes care of this
 registering automatically). The lines @code{txt->Register()} and
-@code{txt->Prepare()} can be used at any time while the
+@code{Prepare()} can be used at any time while the
 application is running to dynamically load additional textures. The
 first call to @code{Register()} registers the texture with the texture
 manager so that it is aware of this texture. The second call makes
@@ -102,7 +104,8 @@ dynamically add a lot of textures in one step then you should call
 
 After the texture has been created we still have to create and register
 a material. The engine works with materials. The material in this case
-is simply a wrapper on top of the texture.
+is simply a wrapper on top of the texture. But you could also add detail
+textures.
 
 @node Simple Loading Mesh Factory, Simple Creating Mesh, Simple Loading Material, Tutorial Simple 2
 @subsection Loading a Mesh Factory in Memory
@@ -120,19 +123,20 @@ bool Simple::Initialize (int argc, const char* const argv[],
 @{
   @dots{}
   // Load a sprite template from disk.
-  csMeshFactoryWrapper* spritetmpl =
-    csLoader::LoadMeshObjectFactory (engine, "/lib/std/sprite1");
-  if (spritetmpl == NULL)
+  iMeshFactoryWrapper* imeshfact = loader->LoadMeshObjectFactory (
+  	"/lib/std/sprite1");
+  if (imeshfact == NULL)
   @{
     Printf (MSG_FATAL_ERROR, "Error loading mesh object factory!\n");
     cleanup ();
     exit (1);
   @}
+
   return true;
 @}
 @end example
 
-This example uses @code{csLoader::LoadMeshObjectFactory()} to load the
+This example uses @code{iLoader::LoadMeshObjectFactory()} to load the
 mesh factory from the given location. The name of the mesh factory
 will be 'box' as that is the name given in the file @file{sprite1} itself.
 
@@ -145,6 +149,12 @@ in the next section.
 @cindex Tutorial Simple Creating Mesh
 @cindex Simple Creating Mesh, Tutorial
 
+First we need to add an additional include to the include section:
+
+@example
+#include "imesh/sprite3d.h"
+@end example
+
 To create a mesh just add the following code in
 @code{Simple::Initialize} (before @code{return true} and after
 the code we just added to load the mesh factory):
@@ -154,20 +164,20 @@ bool Simple::Initialize (int argc, const char* const argv[],
   const char *iConfigName)
 @{
   @dots{}
+
   // Add the sprite to the engine.
-  iMeshFactoryWrapper* imeshfact = QUERY_INTERFACE (
-  	spritetmpl, iMeshFactoryWrapper);
   iMeshWrapper* sprite = engine->CreateMeshObject (
-  	imeshfact, "MySprite", iroom,
+  	imeshfact, "MySprite", room,
 	csVector3 (-3, 5, 3));
   csMatrix3 m; m.Identity (); m *= 5.;
   sprite->GetMovable ()->SetTransform (m);
   sprite->GetMovable ()->UpdateMove ();
-  iSprite3DState* spstate = QUERY_INTERFACE (
-  	sprite->GetMeshObject (), iSprite3DState);
+  iSprite3DState* spstate = QUERY_INTERFACE (sprite->GetMeshObject (),
+  	iSprite3DState);
   spstate->SetAction ("default");
   imeshfact->DecRef ();
   spstate->DecRef ();
+  sprite->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
 
   return true;
 @}
@@ -200,5 +210,12 @@ to see.
 
 Whenever you are done with some interface you obtained through
 @code{QUERY_INTERFACE()} you should release the pointer with @code{DecRef()}.
+
+The last call to @code{DeferUpdateLighting} is interesting. If you don't
+call this then the sprite will be black. This call tells the engine
+to update lighting on this sprite as soon as it is being rendered. You
+need to call this function again when lights move or when the object
+itself moves. Note that this function is not very expensive. It will only
+recalculate lighting when the object is really visible.
 
 This concludes the second Simple tutorial.

@@ -23,6 +23,11 @@
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csfx/gentrtex.h"
+#include "csfx/proctex.h"
+#include "csfx/prdots.h"
+#include "csfx/prfire.h"
+#include "csfx/prplasma.h"
+#include "csfx/prwater.h"
 #include "csgfx/csimage.h"
 #include "csparser/crossbld.h"
 #include "csparser/csloader.h"
@@ -158,6 +163,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (POSITION)
   CS_TOKEN_DEF (PRIORITY)
   CS_TOKEN_DEF (PROCEDURAL)
+  CS_TOKEN_DEF (PROCTEX)
   CS_TOKEN_DEF (RADIUS)
   CS_TOKEN_DEF (REFLECTION)
   CS_TOKEN_DEF (REGION)
@@ -184,6 +190,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (TEXTURE)
   CS_TOKEN_DEF (TEXTURES)
   CS_TOKEN_DEF (TRANSPARENT)
+  CS_TOKEN_DEF (TYPE)
   CS_TOKEN_DEF (MAT_SET)
   CS_TOKEN_DEF (V)
   CS_TOKEN_DEF (VALUE)
@@ -913,6 +920,7 @@ bool csLoader::LoadTextures (char* buf)
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (TEXTURE)
     CS_TOKEN_TABLE (HEIGHTGEN)
+    CS_TOKEN_TABLE (PROCTEX)
   CS_TOKEN_TABLE_END
 
   char* name;
@@ -935,6 +943,9 @@ bool csLoader::LoadTextures (char* buf)
       case CS_TOKEN_HEIGHTGEN:
         heightgen_process (params);
         break;
+      case CS_TOKEN_PROCTEX:
+        ParseProcTex (name, params);
+	break;
     }
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
@@ -2253,6 +2264,64 @@ bool csLoader::ParseColor (char *buf, csRGBcolor &c)
 
 //--- Parsing of Engine Objects ---------------------------------------------
 
+iTextureWrapper* csLoader::ParseProcTex (char *name, char* buf)
+{
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (TYPE)
+  CS_TOKEN_TABLE_END
+
+  long cmd;
+  char *params;
+  csProcTexture* pt = NULL;
+
+  while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
+  {
+    switch (cmd)
+    {
+      case CS_TOKEN_TYPE:
+        if (pt)
+	{
+	  System->Printf (MSG_WARNING,
+	  	"TYPE of proctex already specified!");
+	}
+	else
+	{
+          if (!strcmp (params, "DOTS"))
+	    pt = new csProcDots ();
+	  else if (!strcmp (params, "PLASMA"))
+	    pt = new csProcPlasma ();
+	  else if (!strcmp (params, "WATER"))
+	    pt = new csProcWater ();
+	  else if (!strcmp (params, "FIRE"))
+	    pt = new csProcFire ();
+	  else
+	  {
+	    System->Printf (MSG_FATAL_ERROR,
+	  	"Unknown TYPE '%s' of proctex!\n", params);
+	    return NULL;
+	  }
+	}
+        break;
+    }
+  }
+
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    TokenError ("a proctex specification");
+    return NULL;
+  }
+
+  if (pt == NULL)
+  {
+    System->Printf (MSG_FATAL_ERROR,
+	  	"TYPE of proctex not given!\n");
+    return NULL;
+  }
+
+  pt->Initialize (System, Engine, G3D->GetTextureManager (), name);
+  return pt->GetTextureWrapper ();
+}
+
 iTextureWrapper* csLoader::ParseTexture (char *name, char* buf)
 {
   CS_TOKEN_TABLE_START (commands)
@@ -2620,6 +2689,15 @@ iStatLight* csLoader::ParseStatlight (char* name, char* buf)
         int NumSpokes;
         float Roundness;
       } nova;
+      struct
+      {
+        iMaterialWrapper* mat_center;
+        iMaterialWrapper* mat_spark1;
+        iMaterialWrapper* mat_spark2;
+        iMaterialWrapper* mat_spark3;
+        iMaterialWrapper* mat_spark4;
+        iMaterialWrapper* mat_spark5;
+      } flare;
     };
   } halo;
 
@@ -2665,24 +2743,53 @@ iStatLight* csLoader::ParseStatlight (char* name, char* buf)
         case CS_TOKEN_HALO:
 	  str[0] = 0;
           cnt = ScanStr (params, "%s", str);
-          if (cnt == 0 || !strncmp (str, "CROSS", 5))
+          if (cnt == 0 || !strcmp (str, "CROSS"))
           {
-            params = strchr (str, ',');
+            params = strchr (params, ',');
             if (params) params++;
 defaulthalo:
             halo.type = 1;
             halo.cross.Intensity = 2.0; halo.cross.Cross = 0.45;
             if (params)
-              ScanStr (params, "%f,%f", &halo.cross.Intensity, &halo.cross.Cross);
+              ScanStr (params, "%f,%f", &halo.cross.Intensity,
+	      	&halo.cross.Cross);
           }
-          else if (!strncmp (str, "NOVA", 5))
+          else if (!strcmp (str, "NOVA"))
           {
-            params = strchr (str, ',');
+            params = strchr (params, ',');
             if (params) params++;
             halo.type = 2;
-            halo.nova.Seed = 0; halo.nova.NumSpokes = 100; halo.nova.Roundness = 0.5;
+            halo.nova.Seed = 0; halo.nova.NumSpokes = 100;
+	    halo.nova.Roundness = 0.5;
             if (params)
-              ScanStr (params, "%d,%d,%f", &halo.nova.Seed, &halo.nova.NumSpokes, &halo.nova.Roundness);
+              ScanStr (params, "%d,%d,%f", &halo.nova.Seed,
+	      	&halo.nova.NumSpokes, &halo.nova.Roundness);
+          }
+          else if (!strcmp (str, "FLARE"))
+          {
+            params = strchr (params, ',');
+            if (params) params++;
+            halo.type = 3;
+	    char mat_names[8][255];
+	    int cur_idx = 0;
+	    while (params && cur_idx < 6)
+	    {
+	      char* end = strchr (params, ',');
+	      int l;
+	      if (end) l = end-params;
+	      else l = strlen (params);
+	      strncpy (mat_names[cur_idx], params, l);
+	      mat_names[cur_idx][l] = 0;
+	      cur_idx++;
+	      params = end+1;
+	    }
+	    fflush (stdout);
+	    halo.flare.mat_center = FindMaterial (mat_names[0]);
+	    halo.flare.mat_spark1 = FindMaterial (mat_names[1]);
+	    halo.flare.mat_spark2 = FindMaterial (mat_names[2]);
+	    halo.flare.mat_spark3 = FindMaterial (mat_names[3]);
+	    halo.flare.mat_spark4 = FindMaterial (mat_names[4]);
+	    halo.flare.mat_spark5 = FindMaterial (mat_names[5]);
           }
           else
             goto defaulthalo;
@@ -2717,14 +2824,43 @@ defaulthalo:
     }
   }
 
-  iStatLight* l = Engine->CreateLight (name, csVector3(x, y, z), dist, csColor(r, g, b), dyn);
+  iStatLight* l = Engine->CreateLight (name, csVector3(x, y, z),
+  	dist, csColor(r, g, b), dyn);
   switch (halo.type)
   {
     case 1:
-      l->QueryLight ()->CreateCrossHalo (halo.cross.Intensity, halo.cross.Cross);
+      l->QueryLight ()->CreateCrossHalo (halo.cross.Intensity,
+      	halo.cross.Cross);
       break;
     case 2:
-      l->QueryLight ()->CreateNovaHalo (halo.nova.Seed, halo.nova.NumSpokes, halo.nova.Roundness);
+      l->QueryLight ()->CreateNovaHalo (halo.nova.Seed, halo.nova.NumSpokes,
+      	halo.nova.Roundness);
+      break;
+    case 3:
+      {
+	iMaterialWrapper* ifmc = halo.flare.mat_center;
+	iMaterialWrapper* ifm1 = halo.flare.mat_spark1;
+	iMaterialWrapper* ifm2 = halo.flare.mat_spark2;
+	iMaterialWrapper* ifm3 = halo.flare.mat_spark3;
+	iMaterialWrapper* ifm4 = halo.flare.mat_spark4;
+	iMaterialWrapper* ifm5 = halo.flare.mat_spark5;
+        iFlareHalo* flare = l->QueryLight ()->CreateFlareHalo ();
+	flare->AddComponent (0.0, 1.2, 1.2, CS_FX_ADD, ifmc);
+	flare->AddComponent (0.3, 0.1, 0.1, CS_FX_ADD, ifm3);
+	flare->AddComponent (0.6, 0.4, 0.4, CS_FX_ADD, ifm4);
+	flare->AddComponent (0.8, .05, .05, CS_FX_ADD, ifm5);
+	flare->AddComponent (1.0, 0.7, 0.7, CS_FX_ADD, ifm1);
+	flare->AddComponent (1.3, 0.1, 0.1, CS_FX_ADD, ifm3);
+	flare->AddComponent (1.5, 0.3, 0.3, CS_FX_ADD, ifm4);
+	flare->AddComponent (1.8, 0.1, 0.1, CS_FX_ADD, ifm5);
+	flare->AddComponent (2.0, 0.5, 0.5, CS_FX_ADD, ifm2);
+	flare->AddComponent (2.1, .15, .15, CS_FX_ADD, ifm3);
+	flare->AddComponent (2.5, 0.2, 0.2, CS_FX_ADD, ifm3);
+	flare->AddComponent (2.8, 0.4, 0.4, CS_FX_ADD, ifm4);
+	flare->AddComponent (3.0, 3.0, 3.0, CS_FX_ADD, ifm1);
+	flare->AddComponent (3.1, 0.05, 0.05, CS_FX_ADD, ifm5);
+	flare->AddComponent (3.3, .15, .15, CS_FX_ADD, ifm2);
+      }
       break;
   }
   l->QueryLight ()->SetAttenuation (attenuation);

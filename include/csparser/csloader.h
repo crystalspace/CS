@@ -106,6 +106,8 @@ class csLoader : public iLoader
 
   /// Parse a texture definition and add the texture to the engine
   iTextureWrapper* ParseTexture (char *name, char* buf);
+  /// Parse a proc texture definition and add the texture to the engine
+  iTextureWrapper* ParseProcTex (char *name, char* buf);
   /// Parse a material definition and add the material to the engine
   iMaterialWrapper* ParseMaterial (char *name, char* buf, const char* prefix = NULL);
   /// Parse a collection definition and add the collection to the engine

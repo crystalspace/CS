@@ -80,13 +80,17 @@ file @file{simple.h} with the following contents:
 #include <stdarg.h>
 #include "cssys/sysdriv.h"
 
-class csEngine;
+struct iEngine;
+struct iLoader;
+struct iGraphics3D;
 
 class Simple : public SysSystemDriver
 @{
   typedef SysSystemDriver superclass;
-public:
-  csEngine* engine;
+private:
+  iEngine* engine;
+  iLoader* loader;
+  iGraphics3D* g3d;
 
 public:
   Simple ();
@@ -104,30 +108,45 @@ In the source file @file{simple.cpp} we place the following:
 @example
 #include "cssysdef.h"
 #include "cssys/system.h"
+#include "csutil/cscolor.h"
 #include "apps/simple/simple.h"
-#include "csengine/sector.h"
-#include "csengine/engine.h"
-#include "csengine/csview.h"
-#include "csengine/camera.h"
-#include "csengine/light.h"
-#include "csengine/polygon.h"
-#include "csengine/texture.h"
-#include "csparser/csloader.h"
+#include "iengine/sector.h"
+#include "iengine/engine.h"
+#include "iengine/view.h"
+#include "iengine/camera.h"
+#include "iengine/light.h"
+#include "iengine/polygon.h"
+#include "iengine/texture.h"
+#include "iengine/mesh.h"
+#include "iengine/movable.h"
+#include "iengine/material.h"
+#include "iengine/thing.h"
+#include "imesh/object.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
+#include "ivideo/texture.h"
+#include "ivideo/material.h"
+#include "imap/parser.h"
 
+// Needed for every CS application.
 CS_IMPLEMENT_APPLICATION
 
-// We need the 3D engine
-REGISTER_STATIC_LIBRARY (engine)
+// We need the loader.
+// The line below will go away once the loader is a plugin.
+REGISTER_STATIC_LIBRARY (lvlload)
 
 Simple::Simple ()
 @{
   engine = NULL;
+  loader = NULL;
+  g3d = NULL;
 @}
 
 Simple::~Simple ()
 @{
+  if (engine) engine->DecRef ();
+  if (loader) loader->DecRef ();
+  if (g3d) g3d->DecRef ();
 @}
 
 void cleanup ()
@@ -142,14 +161,26 @@ bool Simple::Initialize (int argc, const char const* const argv[],
     return false;
 
   // Find the pointer to engine plugin
-  iEngine* Engine = QUERY_PLUGIN (this, iEngine);
-  if (!Engine)
+  engine = QUERY_PLUGIN (this, iEngine);
+  if (!engine)
   @{
-    CsPrintf (MSG_FATAL_ERROR, "No iEngine plugin!\n");
+    Printf (MSG_FATAL_ERROR, "No iEngine plugin!\n");
     exit (1);
   @}
-  engine = Engine->GetCsEngine ();
-  Engine->DecRef ();
+
+  loader = QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
+  if (!loader)
+  @{
+    Printf (MSG_FATAL_ERROR, "No iLoader plugin!\n");
+    abort ();
+  @}
+
+  g3d = QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
+  if (!g3d)
+  @{
+    Printf (MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
+    abort ();
+  @}
 
   // Open the main system. This will open all
   // the previously loaded plug-ins.
@@ -187,16 +218,17 @@ int main (int argc, char* argv[])
 
   // We want at least the minimal set of plugins
   System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
-  System->RequestPlugin (
-    "crystalspace.graphics3d.software:VideoDriver");
+  System->RequestPlugin ("crystalspace.font.server.default:FontServer");
+  System->RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");
+  System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
   System->RequestPlugin ("crystalspace.engine.core:Engine");
+  System->RequestPlugin ("crystalspace.level.loader:LevelLoader");
 
   // Initialize the main system. This will load all needed
   // plug-ins (3D, 2D, network, etc.) and initialize them.
   if (!System->Initialize (argc, argv, NULL))
   @{
-    System->Printf (MSG_FATAL_ERROR,
-      "Error initializing system.\n");
+    System->Printf (MSG_FATAL_ERROR, "Error initializing system.\n");
     cleanup ();
     exit (1);
   @}
@@ -216,10 +248,20 @@ application because there is no way to stop the application once it has
 started running.
 
 Before we start making this application more useful lets have a look at what
-actually happens here.  The main routine first creates an instance of our
+actually happens here.
+
+Before doing anything at all we first need to use a few macros.
+CS_IMPLEMENT_APPLICATION is essential for every application using CS.
+It makes sure that the @code{main()} routine is correctly linked and
+called on every platform. REGISTER_STATIC_LIBRARY is a temporary macro
+which is now needed because the level loader already tries very hard
+to be a plugin but it really isn't. Once the level loader is a plugin
+you only have to remove this macro call.
+
+The main routine first creates an instance of our
 @samp{Simple} class.  The next step is the creation of the world.  The world
 is actually the main 3D engine class and is one of the most important classes
-for interfacing with the engine (see @samp{csEngine} reference for more
+for interfacing with the engine (see @samp{iEngine} reference for more
 information).
 
 To initialize the system, we call @code{Initialize()} on our @samp{Simple}
@@ -229,10 +271,22 @@ parsing the command line and feeding all the options to the appropriate
 handlers.  Note that you should always test for failure of such routines as
 there may be various reasons for failure.
 
+Because we are making a simple application we don't have a config file.
+This means that the third argument to @code{Initialize()} will be @samp{NULL}
+(name of config file). It also means we cannot depend on the config file
+to load plugins (like 3D driver and so on) so we have to do that in the code
+by explicitely calling @code{RequestPlugin()} for all plugins that we
+want.
+
 @samp{Initialize()} retrieves a pointer to the engine via a call to the
 @sc{scf} function @code{QUERY_PLUGIN()} and then ``opens'' the system, which
 basically means that all graphics subsystems are opened (i.e.  a window will
-be opened).  This function can also fail, so again test for this.
+be opened). All plugins that were specified in the config file or requested
+for with @code{RequestPlugin()} will also be loaded and opened. This function
+can also fail, so again test for this.
+In addition to retrieving a pointer to the engine it will also get a pointer
+to the level loader (which we are going to use later to load textures) and
+the 3D driver itself.
 
 The call to @code{Loop()} puts Crystal Space in the main event loop.  This is
 where the application really starts running and interacting with the user.
@@ -283,6 +337,12 @@ that the event was not handled at all.
 @subsection Creating a ``World''
 @cindex Tutorial, Creating a ``World''
 @cindex World, Creating, Simple Tutorial
+@cindex iMaterialWrapper
+@cindex iSector
+@cindex iThingState
+@cindex iPolygon3D
+@cindex iStatLight
+@cindex iMeshWrapper
 
 Now we have a very exciting application which opens a black window and waits
 for the @key{ESC} key to quit.  We assume this is the application you always
@@ -294,19 +354,16 @@ that it looks like this:
 
 @example
 @dots{}
-#include "csgeom/math2d.h"
-#include "csgeom/math3d.h"
-
-class csSector;
-class csView;
-class csEngine;
+struct iSector;
 
 class Simple : public SysSystemDriver
 @{
   typedef SysSystemDriver superclass;
-public:
-  csSector* room;
-  csEngine* engine;
+private:
+  iEngine* engine;
+  iLoader* loader;
+  iGraphics3D* g3d;
+  iSector* room;
   @dots{}
 @end example
 
@@ -333,59 +390,78 @@ bool Simple::Initialize (int argc, const char const* const argv[],
   // Create the world.
   Printf (MSG_INITIALIZATION, "Creating world...\n");
 
-  csLoader::LoadTexture (engine, "stone", "/lib/std/stone4.gif");
-  csMaterialWrapper* tm = engine->GetMaterials ()->FindByName ("stone");
+  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
+  @{
+    Printf (MSG_FATAL_ERROR, "Error loading 'stone4' texture!\n");
+    cleanup ();
+    exit (1);
+  @}
+  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
-  room = engine->CreateCsSector ("room");
-  csPolygon3D* p;
-  p = room->NewPolygon (tm);
-  p->AddVertex (-5, 0,  5);
-  p->AddVertex ( 5, 0,  5);
-  p->AddVertex ( 5, 0, -5);
-  p->AddVertex (-5, 0, -5);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+  room = engine->CreateSector ("room");
+  iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
+  iThingState* walls_state = QUERY_INTERFACE (walls->GetMeshObject (),
+  	iThingState);
+  iPolygon3D* p;
+  p = walls_state->CreatePolygon ();
+  p->SetMaterial (tm);
+  p->CreateVertex (csVector3 (-5, 0, 5));
+  p->CreateVertex (csVector3 (5, 0, 5));
+  p->CreateVertex (csVector3 (5, 0, -5));
+  p->CreateVertex (csVector3 (-5, 0, -5));
+  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
-  p = room->NewPolygon (tm);
-  p->AddVertex (-5, 20, -5);
-  p->AddVertex ( 5, 20, -5);
-  p->AddVertex ( 5, 20,  5);
-  p->AddVertex (-5, 20,  5);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+  p = walls_state->CreatePolygon ();
+  p->SetMaterial (tm);
+  p->CreateVertex (csVector3 (-5, 20, -5));
+  p->CreateVertex (csVector3 (5, 20, -5));
+  p->CreateVertex (csVector3 (5, 20, 5));
+  p->CreateVertex (csVector3 (-5, 20, 5));
+  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
-  p = room->NewPolygon (tm);
-  p->AddVertex (-5, 20, 5);
-  p->AddVertex ( 5, 20, 5);
-  p->AddVertex ( 5,  0, 5);
-  p->AddVertex (-5,  0, 5);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+  p = walls_state->CreatePolygon ();
+  p->SetMaterial (tm);
+  p->CreateVertex (csVector3 (-5, 20, 5));
+  p->CreateVertex (csVector3 (5, 20, 5));
+  p->CreateVertex (csVector3 (5, 0, 5));
+  p->CreateVertex (csVector3 (-5, 0, 5));
+  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
-  p = room->NewPolygon (tm);
-  p->AddVertex (5, 20,  5);
-  p->AddVertex (5, 20, -5);
-  p->AddVertex (5,  0, -5);
-  p->AddVertex (5,  0,  5);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+  p = walls_state->CreatePolygon ();
+  p->SetMaterial (tm);
+  p->CreateVertex (csVector3 (5, 20, 5));
+  p->CreateVertex (csVector3 (5, 20, -5));
+  p->CreateVertex (csVector3 (5, 0, -5));
+  p->CreateVertex (csVector3 (5, 0, 5));
+  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
-  p = room->NewPolygon (tm);
-  p->AddVertex (-5, 20, -5);
-  p->AddVertex (-5, 20,  5);
-  p->AddVertex (-5,  0,  5);
-  p->AddVertex (-5,  0, -5);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+  p = walls_state->CreatePolygon ();
+  p->SetMaterial (tm);
+  p->CreateVertex (csVector3 (-5, 20, -5));
+  p->CreateVertex (csVector3 (-5, 20, 5));
+  p->CreateVertex (csVector3 (-5, 0, 5));
+  p->CreateVertex (csVector3 (-5, 0, -5));
+  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
-  p = room->NewPolygon (tm);
-  p->AddVertex ( 5, 20, -5);
-  p->AddVertex (-5, 20, -5);
-  p->AddVertex (-5,  0, -5);
-  p->AddVertex ( 5,  0, -5);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+  p = walls_state->CreatePolygon ();
+  p->SetMaterial (tm);
+  p->CreateVertex (csVector3 (5, 20, -5));
+  p->CreateVertex (csVector3 (-5, 20, -5));
+  p->CreateVertex (csVector3 (-5, 0, -5));
+  p->CreateVertex (csVector3 (5, 0, -5));
+  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
-  csStatLight* light;
-  light = new csStatLight (-3, 5,  0, 10, 1, 0, 0, false);
+  walls_state->DecRef ();
+
+  iStatLight* light;
+  light = engine->CreateLight (NULL, csVector3 (-3, 5, 0), 10,
+  	csColor (1, 0, 0), false);
   room->AddLight (light);
-  light = new csStatLight ( 3, 5,  0, 10, 0, 0, 1, false);
+  light = engine->CreateLight (NULL, csVector3 (3, 5,  0), 10,
+  	csColor (0, 0, 1), false);
   room->AddLight (light);
-  light = new csStatLight ( 0, 5, -3, 10, 0, 1, 0, false);
+  light = engine->CreateLight (NULL, csVector3 (0, 5, -3), 10,
+  	csColor (0, 1, 0), false);
   room->AddLight (light);
 
   engine->Prepare ();
@@ -396,26 +472,47 @@ bool Simple::Initialize (int argc, const char const* const argv[],
 @}
 @end example
 
-This extra code first loads a texture with @code{LoadTexture()}.  The first
-parameter is the engine into which to load the texture; the second parameter is
-the name of the texture as it will be known in the engine; and the third is the
+This extra code first loads a texture with @code{LoadTexture()}.
+The first parameter is the name of the texture as it will be known in the
+engine; and the third is the
 actual filename on the @sc{vfs} volume (@pxref{VFS}).  Note, if you don't have
 the @file{stone4.gif} texture you can use another one.  The only requirement
 is that it must have sizes which are a power of 2 (e.g. 64x64). This functions
-returns a @samp{csTextureWrapper} which we don't use.  Instead we use
-the @samp{csMaterialWrapper} which is created automatically bye
+returns a @samp{iTextureWrapper} which we don't use.  Instead we use
+the @samp{iMaterialWrapper} which is created automatically by
 @code{LoadTexture()}.
 
-Then we create our room with @code{CreateCsSector()}.  This room will initially
-be empty.  A room in Crystal Space is represented by @samp{csSector} which is
-basicly a convex set of polygons.
+Then we create our room with @code{CreateSector()}.  This room will initially
+be empty.  A room in Crystal Space is represented by @samp{iSector} which is
+basically a container which can hold geometrical objects. Objects
+in Crystal Space are represented by @sc{mesh objects} (@pxref{MeshObject}).
+There are several types of mesh objects in Crystal Space. Every type of
+mesh object represents some different way to represent geometry. In this
+tutorial we are only going to use the 'thing' mesh object type. This mesh
+object type is very useful for walls of indoor type levels or buildings.
 
-Now we create the six walls of our room.  To do this we call
-@code{NewPolygon()} for every wall.  This call expects one parameter: the
-material to use.  @code{NewPolygon()} returns a pointer to a
-@samp{csPolygon3D}.  This polygon will be empty so you need to add vertices
-and also define how the texture should be mapped on that polygon.  To add
-vertices we use @code{AddVertex()} which expects a location in object space.
+Now we want create the six walls of our room. First we make our thing mesh
+object. Because this is a very common case there is a conveniance function
+in the engine (called @code{CreateSectorWallsMesh()}) which will create a
+thing mesh and add it to the given sector. The only thing that has to be
+done after this is add polygons to that mesh. To do this we first query
+the interface called @code{iThingState} from the thing mesh object.
+We use the macro @code{QUERY_INTERFACE} which is part of @sc{scf}
+(@pxref{SCF}). This will see if the mesh object (which is wrapped by
+the mesh wrapper) actually implements @code{iThingState} (which should
+be the case here) and if so it will return a pointer to the implementation
+of @code{iThingState}. All mesh objects implement some kind of state
+interface which is used to set up or query the state of that mesh object.
+Note that all interfaces which you query using @code{QUERY_INTERFACE}
+should be released when you no longer need them (by calling @code{DecRef()}).
+
+The returned thing state we can now use to create polygons by calling
+@code{CreatePolygon()} for every wall. This will return a pointer to a
+polygon (@code{iPolygon3D}). On this we can set various parameters like
+the material. Then we add four vertices (note that in Crystal Space
+a polygon is visible if vertices are oriented clock-wise). The location
+given to @code{CreateVertex()} is in object space (in contrast with
+world space and camera space).
 To define how the texture is mapped on the polygon we use
 @code{SetTextureSpace()}.  There are several versions of this function.  The
 one we use in this tutorial is one of the simplest but it offers the least
@@ -426,18 +523,19 @@ texture will be scaled so that one texture tile is exactly 3x3 world units in
 size.
 
 Finally we create some lights in our room to make sure that we actually are
-able to see the walls.  The class @samp{csStatLight} represents a static light
-which can not move and change intensity.  We create three such lights and add
-them to the room with @code{AddLight()}.  When creating a light we use eight
-parameters.  The first three are the location of the light in the world.  Then
-follows a radius.  The light will not affect polygons which are outside the
-sphere described by the center of the light and the radius.  The three
-following parameters are the color of the light in @sc{rgb} format
-(@code{<1,1,1>} means white and @code{<0,0,0>} means black).  The last
-parameter indicates whether or not we want to have a pseudo-dynamic light.  A
-pseudo-dynamic light still cannot move but it can change intensity.  There are
-some performance costs associated with pseudo-dynamic lights so it is not
-enabled by default.
+able to see the walls.  The interface @samp{iStatLight} represents a static
+light which can not move and change intensity.  We create three such lights
+and add them to the room with @code{AddLight()}.  When creating a light we use
+several parameters. First we have the name of the light. This is not used
+often and mostly you can set this to @code{NULL}. The second parameter is
+the location of the light in the world. Then follows a radius. The light will
+not affect polygons which are outside the sphere described by the center of
+the light and the radius.  The next parameter is the color of the light in
+@sc{rgb} format (@code{<1,1,1>} means white and @code{<0,0,0>} means black).
+The last parameter indicates whether or not we want to have a pseudo-dynamic
+light.  A pseudo-dynamic light still cannot move but it can change intensity.
+There are some performance costs associated with pseudo-dynamic lights so
+it is not enabled by default.
 
 The call to @code{Prepare()} prepares the engine for rendering your scene.  It
 will prepare all textures and create all lightmaps if needed.  Only after this
@@ -456,26 +554,27 @@ Because we have not created a camera through which you can see.
 @subsection The Camera
 @cindex Tutorial, Camera
 @cindex Camera, Tutorial
+@cindex iView
+@cindex iCamera
 
-In Crystal Space there is a class called @samp{csView} which encapsulates both
-@samp{csCamera} and @samp{csClipper} instances.  In principle you can use
-those classes directly but using csView is easier.  Now edit @file{simple.h}
-to make use of @samp{csView}:
+In Crystal Space there is an interface called @code{iView} which
+encapsulates both @samp{iCamera} and @code{iClipper2D} instances.
+In principle you can use those classes directly but using @code{iView} is
+easier.  Now edit @file{simple.h} to make use of @code{iView}:
 
 @example
 @dots{}
-class csView;
+struct iSector;
+struct iView;
 @dots{}
-class csEngine;
 
 class Simple : public SysSystemDriver
 @{
+private:
+  @dots{}
+  iView* view;
+
 public:
-  csSector* room;
-  @dots{}
-  csView* view;
-  @dots{}
-  csEngine* engine;
   @dots{}
   virtual void NextFrame ();
   @dots{}
@@ -487,21 +586,18 @@ and destructor of @samp{Simple}:
 @example
 Simple::Simple ()
 @{
-  @dots{}
   view = NULL;
   @dots{}
-  engine = NULL;
 @}
 
 Simple::~Simple ()
 @{
-  @dots{}
-  delete view;
+  if (view) view->DecRef ();
   @dots{}
 @}
 @end example
 
-At the end of our Initialize() function we add the following:
+At the end of our @code{Initialize()} function we add the following:
 
 @example
 bool Simple::Initialize (int argc, const char const* const argv[],
@@ -510,9 +606,9 @@ bool Simple::Initialize (int argc, const char const* const argv[],
   @dots{}
   Printf (MSG_INITIALIZATION, "Created.\n");
 
-  view = new csView (engine, G3D);
-  view->SetSector (room);
-  view->GetCamera ()->SetPosition (csVector3 (0, 5, 0));
+  view = engine->CreateView (g3d);
+  view->GetCamera ()->SetSector (room);
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
   view->SetRectangle (0, 0, FrameWidth, FrameHeight);
 
   txtmgr->SetPalette ();
@@ -542,7 +638,7 @@ void Simple::NextFrame ()
   superclass::NextFrame ();
 
   // Tell 3D driver we're going to display 3D things.
-  if (!G3D->BeginDraw (
+  if (!g3d->BeginDraw (
       engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
       return;
 
@@ -550,9 +646,9 @@ void Simple::NextFrame ()
   view->Draw ();
 
   // Drawing code ends here.
-  G3D->FinishDraw ();
+  g3d->FinishDraw ();
   // Display the final output.
-  G3D->Print (NULL);
+  g3d->Print (NULL);
 @}
 @end example
 
@@ -561,7 +657,7 @@ graphics.  This call makes sure that the needed buffers are set up and
 performs all necessary initialization. The engine often needs extra settings
 for this as well so you @emph{must} call @code{engine->GetBeginDrawFlags()} to
 get these flags and or them with the ones that you want.
-Then we draw through our view by calling @code{csView::Draw()} which
+Then we draw through our view by calling @code{iView::Draw()} which
 updates the view area with the 3D world data as seen through the camera.
 After this we finish 3D drawing with
 @code{FinishDraw()} and then update the display by calling @code{Print()}.
@@ -588,7 +684,6 @@ to do exactly this.  Edit @file{simple.cpp} again and change
 void Simple::NextFrame ()
 @{
   superclass::NextFrame ();
-  @dots{}
   // First get elapsed time from the system driver.
   cs_time elapsed_time, current_time;
   GetElapsedTime (elapsed_time, current_time);
@@ -597,13 +692,13 @@ void Simple::NextFrame ()
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
 
   if (GetKeyState (CSKEY_RIGHT))
-    view->GetCamera ()->Rotate (VEC_ROT_RIGHT, speed);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed);
   if (GetKeyState (CSKEY_LEFT))
-    view->GetCamera ()->Rotate (VEC_ROT_LEFT, speed);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_LEFT, speed);
   if (GetKeyState (CSKEY_PGUP))
-    view->GetCamera ()->Rotate (VEC_TILT_UP, speed);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_UP, speed);
   if (GetKeyState (CSKEY_PGDN))
-    view->GetCamera ()->Rotate (VEC_TILT_DOWN, speed);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_DOWN, speed);
   if (GetKeyState (CSKEY_UP))
     view->GetCamera ()->Move (VEC_FORWARD * 4 * speed);
   if (GetKeyState (CSKEY_DOWN))
@@ -615,7 +710,7 @@ void Simple::NextFrame ()
 That's all!  With this simple change you can rotate the camera with the left
 and right arrow keys and move forward and backward with the up and down arrow
 keys.  Try it out to see the effect.  To rotate the camera we use
-@code{Rotate()} which expects a vector to rotate along and an angle given in
+@code{RotateThis()} which expects a vector to rotate along and an angle given in
 radians (the speed parameter).  There are a number of predefined vectors which
 you can use.  A couple of them are used in this example.
 

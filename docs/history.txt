@@ -1,5 +1,19 @@
 The history order is reversed so that new features are at the top.
 
+15-Jun-2001
+	- Added the ability to the parser to load proc textures (fire,
+	  water, dots, and plasma). Instead of saying 'TEXTURE' in the
+	  textures block of the world file you can say 'PROCTEX'. Check
+	  out data/flarge/world for an example (in the large hall there
+	  is a rotating cube with all the proc textures on).
+	- Added 'FLARE' type to the possible NOVA types in the loader
+	  (in addition to 'NOVA' and 'CROSS'). Added an example of
+	  this in flarge (go to the street).
+	- Updated the first part of the simple tutorial so that it works
+	  again with latest CVS. Also brought back simple to the tutorial
+	  state (i.e. removed halos and proc textures).
+	- Also added a transparent floating sphere which has the plasma
+	  proc texture on it (in flarge).
 14-Jun-2001
 	- Made the terrain visibility checker more efficient and more robust.
 	  The calculation of the extent works completely different now and
@@ -99,6 +113,27 @@ The history order is reversed so that new features are at the top.
 	  MSVC in 3dsload.cpp.
 	- Eric Sunshine fixed the `drivers' makefile target so that it also
 	  builds the Socket network driver.
+	- Martin Geisse did the following:
+	    - Cleaned up the code for csPortal, csKeyValuePair and csMapNode.
+	    - Added several csPortal methods to iPortal.
+	    - Renamed iPortal::GetPortal / SetPortal to GetSector and
+	      SetSector.
+	    - Added the missing SetKey to iKeyValuePair.
+	    - Removed the unused 'MyOwner' member of csMeshWrapper.
+	    - Added some missing const specifiers to methods of csFlags.
+	- Martin also added dummy files for the model import/export,
+	  crossbuilder and sprite/thing impexp loader plug-ins. The plugins
+	  are still work in progress, and the dummy files are there to make
+	  the makefiles work.
+	- Philip Wyett added makefiles for the new impexp plugins (thingie,
+	  spr3die, povie, crossbld, and multiplex.
+	- Philip also added a fix from Jason Moyers which changes return
+	  'false' to return 'NULL' (in libs/csparser).
+	- Christopher Nelson updated interface definitions for aws.
+	- Christopher also added useful querying classes to the preference
+	  manager to select a current skin, and to be able to get values from
+	  the skin tree. Also added NameToId mapping function.  Added some
+	  more items to the interface definition files.
 13-Jun-2001
 	- Increased robustness of the Spider in BugPlug a little. If there
 	  are no sectors it will not start hunting. There is also a timeout

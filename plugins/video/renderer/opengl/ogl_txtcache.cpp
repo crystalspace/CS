@@ -468,6 +468,7 @@ void OpenGLLightmapCache::Setup ()
     // can be a NULL pointer. Unfortunatelly not all drivers seem to
     // support that. So I give a dummy texture here.
     char* buf = new char [super_lm_size*super_lm_size*4];
+    memset (buf, 0, 4*super_lm_size*super_lm_size);
     glTexImage2D (GL_TEXTURE_2D, 0, 3, super_lm_size, super_lm_size,
 		    0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
     delete[] buf;
