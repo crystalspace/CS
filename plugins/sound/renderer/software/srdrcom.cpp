@@ -71,7 +71,7 @@ csSoundRenderSoftware::csSoundRenderSoftware(iBase* piBase) : Listener(0)
   ActivateMixing = false;
   owning = downing = false;
   data = csCondition::Create ();
-  mixing = csMutex::Create ();
+  mixing = csMutex::Create (true);
 }
 
 void csSoundRenderSoftware::Report (int severity, const char* msg, ...)
@@ -319,12 +319,23 @@ void csSoundRenderSoftware::MixingFunction()
   // test if we have a sound driver
   if(!SoundDriver) return;
 
+  // Get a mixing lock.  Mutex is recursive.
+  mixing->LockWait ();
+
   // if no sources exist, there may be an optimized way to handle this
-  if (Sources.Length()==0 && SoundDriver->IsHandleVoidSound()) return;
+  if (Sources.Length()==0 && SoundDriver->IsHandleVoidSound())
+  {
+    mixing->Release();
+    return;
+  }
 
   // lock sound memory
   SoundDriver->LockMemory(&memory, &memorysize);
-  if(!memory || memorysize<1) return;
+  if(!memory || memorysize<1) 
+  {
+    mixing->Release();
+    return;
+  }
 
   // clear the buffer
   if (is16Bits()) memset(memory,0,memorysize);
@@ -358,6 +369,7 @@ void csSoundRenderSoftware::MixingFunction()
   }
 */
   SoundDriver->UnlockMemory();
+  mixing->Release();
 }
 
 bool csSoundRenderSoftware::HandleEvent (iEvent &e)

@@ -7,6 +7,10 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 28-Sep-2004
+	- Rhad mutexed some portions of the software renderer to reduce
+	  thread contention issues.  This is not a complete fix but should
+	  reduce problems to distortion during the stopping, starting
+	  and switching of sound sources and handles.
 	- Rhad changed the Windows waveout sound driver to properly handle
 	  threading issues, buffer sounds better, manage memory better, and
 	  not blow up randomly.

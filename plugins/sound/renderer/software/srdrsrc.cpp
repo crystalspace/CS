@@ -45,6 +45,7 @@ csSoundSourceSoftware::csSoundSourceSoftware(csSoundRenderSoftware *srdr,
   SoundPos = 0;
   SoundHandle = hdl;
   SampleOffset=0.0f;
+  mutex_RenderLock=csMutex::Create(true);
 }
 
 csSoundSourceSoftware::~csSoundSourceSoftware()
@@ -54,6 +55,7 @@ csSoundSourceSoftware::~csSoundSourceSoftware()
 
 void csSoundSourceSoftware::Play(unsigned long pMethod)
 {
+
   PlayMethod=pMethod;
   if (!Active){ Active=true; SoundRender->AddSource(this); }
   if (PlayMethod & SOUND_RESTART) Restart();
@@ -134,6 +136,8 @@ csVector3 csSoundSourceSoftware::GetVelocity()
 
 void csSoundSourceSoftware::Prepare(float BaseVolume)
 {
+  csScopedMutexLock lock(mutex_RenderLock);
+
   // frequency
   CalcFreqFactor=FrequencyFactor;
 
@@ -324,6 +328,8 @@ void csSoundSourceSoftware::WriteBuffer(const void *Source, void *Dest,
 
 void csSoundSourceSoftware::AddToBufferStatic(void *mem, long size)
 {
+  csScopedMutexLock lock(mutex_RenderLock);
+
   iSoundData *snd = SoundHandle->Data;
   if (!snd) return;
 

@@ -22,6 +22,8 @@
 #define __CS_SOUNDBUFFERSOFTWARE_H__
 
 #include "isound/source.h"
+#include "csutil/thread.h"
+#include "csutil/scopedmutexlock.h"
 
 class csSoundRenderSoftware;
 class csSoundHandleSoftware;
@@ -94,6 +96,9 @@ public:
 protected:
   // restart the sound to the beginning
   void Restart();
+  // Controls access to data that may be used by the renderer in another thread
+  csRef<csMutex> mutex_RenderLock;
+
 };
 
 #endif //  __CS_SOUNDBUFFERSOFTWARE_H__
