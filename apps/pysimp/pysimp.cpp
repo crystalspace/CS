@@ -95,6 +95,8 @@ bool PySimple::Initialize (int argc, const char* const argv[],
 
   // Initialize the python plugin.
   iScript* is = LOAD_PLUGIN (this, "crystalspace.script.python", "Python", iScript);
+  if (!is)
+    return 0;
 
   csLoader::LoadTexture (engine, "stone", "/lib/std/stone4.gif");
 
