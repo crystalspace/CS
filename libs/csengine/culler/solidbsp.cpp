@@ -19,6 +19,8 @@
 #include "sysdef.h"
 #include "qint.h"
 #include "csengine/solidbsp.h"
+#include "csengine/pol2d.h"
+#include "csengine/world.h"
 #include "igraph2d.h"
 #include "itxtmgr.h"
 
@@ -138,13 +140,27 @@ void csSolidBsp::MakeEmpty ()
   root->solid = false;
 }
 
+bool ddd = false;
+
 bool csSolidBsp::InsertPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
 {
-  if (node->solid) return false;
-  if (poly->GetNumEdges () == 0) return false;
+if (ddd)
+{
+printf ("=== InsertPolygon ===\n");
+int i;
+for (i = 0 ; i < poly->GetNumEdges () ; i++)
+printf ("  %d (%f,%f)-(%f,%f)\n", i, (*poly)[i].v1.x, (*poly)[i].v1.y,
+(*poly)[i].v2.x, (*poly)[i].v2.y);
+if (node->left) printf ("  children. Splitter=%f,%f,%f\n", node->splitter.A (),
+node->splitter.B (), node->splitter.C ());
+if (node->solid) printf ("  solid\n");
+}
+  if (node->solid) { if (ddd) printf ("  FALSE(1)\n"); return false; }
+  if (poly->GetNumEdges () == 0) { if (ddd) printf ("  FALSE(2)\n"); return false; }
 
   if (node->left)
   {
+if (ddd) printf ("  BRANCH: children\n");
     // If this node has children then we split to the given
     // splitter in this node.
     csPoly2DEdges* left_poly, * right_poly;
@@ -156,21 +172,25 @@ bool csSolidBsp::InsertPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
 
     if (onplane)
     {
+if (ddd) printf ("  BRANCH: onplane\n");
       // If there was an edge on the splitter plane then we know that
       // the polygon can not be both in the left and the right side.
       // If the two polygons are both empty then we mark one of the two
       // nodes as solid depending on the edge from the original polygon.
       if (left_poly->GetNumEdges () == 0 && right_poly->GetNumEdges () == 0)
       {
+if (ddd) printf ("  BRANCH: left->edges==0 right->edges==0\n");
         rc1 = rc2 = false;
         csPlane2 edge_plane ((*poly)[0].v1, (*poly)[0].v2);
 	if (SIGN (edge_plane.A ()) == SIGN (node->splitter.A ()) &&
 	    SIGN (edge_plane.B ()) == SIGN (node->splitter.B ()))
 	{
+if (ddd) printf ("  BRANCH: planes equal -> right solid\n");
 	  // Two planes are equal. This means that the right node
 	  // will be solid.
 	  if (!node->right->solid)
 	  {
+if (ddd) printf ("  BRANCH: right solid\n");
             node->right->solid = true;
 	    node_pool.Free (node->right->left); node->right->left = NULL;
 	    node_pool.Free (node->right->right); node->right->right = NULL;
@@ -181,8 +201,10 @@ bool csSolidBsp::InsertPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
 	{
 	  // Two planes are negated. This means that the left node
 	  // will be solid.
+if (ddd) printf ("  BRANCH: planes negated -> left solid\n");
 	  if (!node->left->solid)
 	  {
+if (ddd) printf ("  BRANCH: left solid\n");
             node->left->solid = true;
 	    node_pool.Free (node->left->left); node->left->left = NULL;
 	    node_pool.Free (node->left->right); node->left->right = NULL;
@@ -192,19 +214,23 @@ bool csSolidBsp::InsertPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
       }
       else
       {
+if (ddd) printf ("  BRANCH: left->insert right->insert\n");
         rc1 = InsertPolygon (node->left, left_poly);
         rc2 = InsertPolygon (node->right, right_poly);
       }
     }
     else
     {
+if (ddd) printf ("  BRANCH: not onplane\n");
       if (left_poly->GetNumEdges () == 0)
       {
+if (ddd) printf ("  BRANCH: left->edges==0\n");
         // Left polygon has no edges. We test if the left node
         // is completely contained in the right polygon. In that
         // case we can clear the subtree and mark it as solid.
         if (!node->left->solid && right_poly->In (node->split_center))
         {
+if (ddd) printf ("  BRANCH: left->solid=true\n");
           node->left->solid = true;
 	  node_pool.Free (node->left->left); node->left->left = NULL;
 	  node_pool.Free (node->left->right); node->left->right = NULL;
@@ -212,12 +238,18 @@ bool csSolidBsp::InsertPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
         }
         else rc1 = false;
       }
-      else rc1 = InsertPolygon (node->left, left_poly);
+else
+{
+if (ddd) printf ("  BRANCH: left->insert\n");
+      rc1 = InsertPolygon (node->left, left_poly);
+}
 
       if (right_poly->GetNumEdges () == 0)
       {
+if (ddd) printf ("  BRANCH: right->edges==0\n");
         if (!node->right->solid && left_poly->In (node->split_center))
         {
+if (ddd) printf ("  BRANCH: right->solid=true\n");
           node->right->solid = true;
 	  node_pool.Free (node->right->left); node->right->left = NULL;
 	  node_pool.Free (node->right->right); node->right->right = NULL;
@@ -225,11 +257,16 @@ bool csSolidBsp::InsertPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
         }
         else rc2 = false;
       }
-      else rc2 = InsertPolygon (node->right, right_poly);
+else
+{
+if (ddd) printf ("  BRANCH: right->insert\n");
+      rc2 = InsertPolygon (node->right, right_poly);
+}
     }
 
     if (node->left->solid && node->right->solid)
     {
+if (ddd) printf ("  BRANCH: both are solid\n");
       node_pool.Free (node->left); node->left = NULL;
       node_pool.Free (node->right); node->right = NULL;
       node->solid = true;
@@ -241,19 +278,36 @@ bool csSolidBsp::InsertPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
   }
   else
   {
+if (ddd) printf ("  BRANCH: no children\n");
     // Node has no children so we take a new splitter and
     // create children.
     // @@@ Consider a lazy option where you don't subdivide
     // the polygon until really needed.
     csSolidBspNode* n = node;
-    int i;
+    int i, i1;
+    i1 = poly->GetNumEdges ()-1;
     for (i = 0 ; i < poly->GetNumEdges () ; i++)
     {
+      // If we have more than one edge then we test if this edge
+      // is colinear with the previous one. In that case we simply
+      // ignore the edge.
+      if (i1 != i)
+        if (ABS (csMath2::Area2 ((*poly)[i1].v1, (*poly)[i1].v2,
+		(*poly)[i].v2)) < EPSILON &&
+            ABS (csMath2::Area2 ((*poly)[i1].v1, (*poly)[i1].v2,
+		(*poly)[i].v1)) < EPSILON)
+	{
+	  i1 = i;
+	  continue;
+	}
       n->splitter.Set ((*poly)[i].v1, (*poly)[i].v2);
       n->split_center = ((*poly)[i].v1 + (*poly)[i].v2) / 2;
+      n->split_start = (*poly)[i].v1;
+      n->split_end = (*poly)[i].v2;
       n->left = node_pool.Alloc ();
       n->right = node_pool.Alloc ();
       n = n->right;
+      i1 = i;
     }
     n->solid = true;
 
@@ -354,14 +408,25 @@ bool csSolidBsp::TestPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
   return false;
 }
 
+csPolygon2D debug_poly2d;
+
 bool csSolidBsp::InsertPolygon (csVector2* verts, int num_verts)
 {
   csPoly2DEdges* poly = poly_pool.Alloc ();
   poly->SetNumEdges (0);
+  debug_poly2d.SetNumVertices (0);
+  ddd = csWorld::ProcessLastPolygon ();
+if (ddd)
+{
+printf ("====================================\n");
+Dump();
+printf ("------------------------------------\n");
+}
   int i, i1;
   i1 = num_verts-1;
   for (i = 0 ; i < num_verts ; i++)
   {
+    debug_poly2d.AddVertex (verts[i]);
     poly->AddEdge (verts[i1], verts[i]);
     i1 = i;
   }
@@ -399,6 +464,32 @@ bool csSolidBsp::TestPolygon (csVector2* verts, int num_verts)
   bool rc = TestPolygon (root, poly);
   poly_pool.Free (poly);
   return rc;
+}
+
+void csSolidBsp::Dump (csSolidBspNode* node, int level)
+{
+  if (!node) return;
+  int i;
+  char spaces[100];
+  for (i = 0 ; i < level ; i++) spaces[i] = ' ';
+  spaces[i] = 0;
+  if (node->solid)
+    printf ("%s solid\n", spaces);
+  if (node->left)
+  {
+    printf ("%s children. Splitter=%f,%f,%f\n", spaces,
+        node->splitter.A (), node->splitter.B (), node->splitter.C ());
+    printf ("%s Split_center=%f,%f edge=%f,%f - %f,%f\n", spaces,
+        node->split_center.x, node->split_center.y,
+	node->split_start.x, node->split_start.y,
+	node->split_end.x, node->split_end.y);
+    printf ("%s left side:\n", spaces);
+    Dump (node->left, level+1);
+    printf ("%s right side:\n", spaces);
+    Dump (node->right, level+1);
+  }
+  else
+    printf ("%s no children\n", spaces);
 }
 
 static int white, red, blue, green, yellow, black;

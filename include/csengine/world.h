@@ -237,19 +237,19 @@ public:
    */
   csNamedObjVector sprites;
 
-  // Remember dimensions of display.
+  /// Remember dimensions of display.
   static int frame_width, frame_height;
-  // Remember iSystem interface.
+  /// Remember iSystem interface.
   static iSystem* System;
-  // Current world.
+  /// Current world.
   static csWorld* current_world;
-  // An object pool for 2D polygons used by the rendering process.
+  /// An object pool for 2D polygons used by the rendering process.
   csPoly2DPool* render_pol2d_pool;
-  // An object pool for lightpatches.
+  /// An object pool for lightpatches.
   csLightPatchPool* lightpatch_pool;
-  // The transformation manager.
+  /// The transformation manager.
   csTransformationManager tr_manager;
-  // The 3D driver
+  /// The 3D driver
   iGraphics3D* G3D;
 
 private:
@@ -261,6 +261,10 @@ private:
   csHaloVector halos;  
   /// If true then the lighting cache is enabled.
   bool do_lighting_cache;
+  /// Debugging: maximum number of polygons to process in one frame.
+  static int max_process_polygons;
+  /// Current number of processed polygons.
+  static int cur_process_polygons;
 
   /// Optional c-buffer used for rendering.
   csCBuffer* c_buffer;
@@ -365,6 +369,36 @@ public:
    * locally now).
    */
   bool Prepare ();
+
+  /**
+   * Set the maximum number of polygons to process in
+   * one frame. This is mainly useful for debugging.
+   */
+  static void SetMaxProcessPolygons (int m) { max_process_polygons = m; }
+
+  /**
+   * Get the maximum number of polygons to process in one frame.
+   */
+  static int GetMaxProcessPolygons () { return max_process_polygons; }
+
+  /**
+   * Indicate that we will process another polygon. Returns false
+   * if we need to stop.
+   */
+  static bool ProcessPolygon ()
+  {
+    if (cur_process_polygons > max_process_polygons) return false;
+    cur_process_polygons++;
+    return true;
+  }
+
+  /**
+   * Return true if we are processing the last polygon.
+   */
+  static bool ProcessLastPolygon ()
+  {
+    return cur_process_polygons >= max_process_polygons;
+  }
 
   /**
    * Enable/disable c-buffer.

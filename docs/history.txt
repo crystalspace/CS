@@ -12,7 +12,35 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+20-Mar-2000
+	- Michael Dale Long did a few changes to CrystalClear:
+	    - Major update to ccActor. Sprite code should be fully
+	      operational now, including collision detection. Support for
+	      Things is in place but still untested.
+	    - Major rewrite of the iEntityManager interface. Now supports
+	      associating data with entities, as well as assigning the
+	      data to specific lists, to be used by a given CrystalClear
+	      plugin, without the need for plugins to maintain their own
+	      data lists.
+	    - All the other changes I made but have forgotten about are
+	      in here, too. :)
+	- Michael also updated iConsole's SCF version number after Norman's
+	  changes.
+	- Jorrit removed a warning in simpcons.h.
+	- W.C.A. Wijngaards <wouterw@cs.vu.nl> suggested a better comment
+	  for csmd5.h.
+	- Wouter also suggested a fix to eliminate key lag in the line
+	  driver.
+	- Finally Wouter also pointed me to a weird construct in
+	  libs/csutil/inifile.cpp. I fixed it.
 19-Mar-2000
+	- Thomas Hieber added proper support for skyboxes in maps without
+	  manual sectoring.
+	- Thomas also updated the Map2CS documentation.
+	- Seth Galbraith added MIPMAP(no) and DITHER(yes) for sky
+	  textures in Squawk.
+	- Norman Kramer changed the dependency rules again after Andrew
+	  changed them the last time.
 	- Eric Sunshine completed Phase Two of Eric's Big Documentation
 	  Overhaul {tm}.
 	    - Created custom Texinfo macro packages which allow the Crystal
@@ -86,6 +114,20 @@ Short-term cleanups that need to be done:
 	    - Began repairing Texinfo mark-up problems.  Added Emacs "texinfo"
 	      mode selection to each file ("@c -*-texinfo-*-).
 	    - Performed a full Texinfo conversion on the license file.
+18-Mar-2000
+	- Added Set/GetMaxProcessPolygons() function to csWorld to control
+	  the maximum number of polygons to process every frame. This is
+	  mainly for debugging.
+	- Added 'db_procpol' command to control this number from the
+	  console.
+	- Renamed 'maxpol' to 'db_maxpol'.
+	- Norman Kramer added a Draw3D() method to iConsole. Call this as
+	  last thing before BeginDraw (CSDRAW_2DGRAPHICS) if your console
+	  has a 3D part to draw (like border decorations or some nice
+	  background effects).
+	- Norman also did a fix to the csConsole plugin: cursor shows up
+	  now if the console only covers a portion of screen (via
+	  SetPosition()).
 17-Mar-2000
 	- Andrew Zabolotny did the following changes:
 	   - Re-implemented bi-linear filtering (enabled by "trilinear"
@@ -123,6 +165,8 @@ Short-term cleanups that need to be done:
 		    $(DO.DEP) $(CFLAGS.SOMETHING)
 	- Michael Dale Long fixed the 'make depend' target of the
 	  cctest app.
+	- Changed csMath2::Area2, Left, and Right to have csVector2
+	  arguments.
 	- Eric Sunshine fixed a warning about a floating backslash within
 	  a // comment in ddgvec.cpp.
 	- Eric Sunshine completed Phase One of Eric's Big Documentation
@@ -163,6 +207,9 @@ Short-term cleanups that need to be done:
 	      resulted from the other two directories (and particularly from
 	      newdoc), in the past.
 	    - Too many other changes to remember. :-)
+	- Norman Kramer did a small fix to the csConsole plugin:
+	  when first char was typed it crashed because it was trying to
+	  append a NULL to a string.
 16-Mar-2000
 	- Michael Dale Long did some changes to Crystal Clear:
 	    - Rewrote ccActor class to make it less prone to errors of

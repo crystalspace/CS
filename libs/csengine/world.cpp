@@ -181,6 +181,8 @@ int csWorld::frame_width;
 int csWorld::frame_height;
 iSystem* csWorld::System = NULL;
 csWorld* csWorld::current_world = NULL;
+int csWorld::max_process_polygons = 2000000000;
+int csWorld::cur_process_polygons = 0;
 
 IMPLEMENT_CSOBJTYPE (csWorld,csObject);
 
@@ -991,6 +993,7 @@ void csWorld::Draw (csCamera* c, csClipper* view)
   }
 
   csSector* s = c->GetSector ();
+  cur_process_polygons = 0;
   s->Draw (rview);
   // draw all halos on the screen
   for (int halo = halos.Length () - 1; halo >= 0; halo--)
@@ -1070,6 +1073,7 @@ void csWorld::DrawFunc (csCamera* c, csClipper* view,
   if (covtree) covtree->MakeEmpty ();
 
   csSector* s = c->GetSector ();
+  cur_process_polygons = 0;
   s->Draw (rview);
 }
 

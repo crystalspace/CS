@@ -243,14 +243,14 @@ public:
    * Returns twice the signed area of the triangle determined by a,b,c,
    * positive if a,b,c are oriented ccw, and negative if cw.
    */
-  static float Area2 (float ax, float ay,
-                      float bx, float by,
-                      float cx, float cy)
+  static float Area2 (const csVector2& a,
+  		      const csVector2& b,
+  		      const csVector2& c)
   {
     return
-      ax * by - ay * bx +
-      ay * cx - ax * cy +
-      bx * cy - cx * by;
+      a.x * b.y - a.y * b.x +
+      a.y * c.x - a.x * c.y +
+      b.x * c.y - c.x * b.y;
   }
 
   /**
@@ -258,11 +258,11 @@ public:
    * Returns true iff c is strictly to the right of the directed
    * line through a to b.
    */
-  static bool Right (float ax, float ay,
-                     float bx, float by,
-                     float cx, float cy)
+  static float Right (const csVector2& a,
+  		      const csVector2& b,
+  		      const csVector2& c)
   {
-    return Area2 (ax, ay, bx, by, cx, cy) <= -SMALL_EPSILON;
+    return Area2 (a, b, c) <= -SMALL_EPSILON;
   }
 
   /**
@@ -270,11 +270,11 @@ public:
    * Returns true iff c is strictly to the left of the directed
    * line through a to b.
    */
-  static bool Left (float ax, float ay,
-                    float bx, float by,
-                    float cx, float cy)
+  static float Left (const csVector2& a,
+  		     const csVector2& b,
+  		     const csVector2& c)
   {
-    return Area2 (ax, ay, bx, by, cx, cy) >= SMALL_EPSILON;
+    return Area2 (a, b, c) >= SMALL_EPSILON;
   }
 
   /**

@@ -254,9 +254,9 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
   	// Do backface culling. Note that this depends on mirroring
 	// of the current view.
   	//-----
-  	float area = csMath2::Area2 (persp [ct.i1].x, persp [ct.i1].y,
-          		 	     persp [ct.i2].x, persp [ct.i2].y,
-          		 	     persp [ct.i3].x, persp [ct.i3].y);
+  	float area = csMath2::Area2 (persp [ct.i1],
+          		 	     persp [ct.i2],
+          		 	     persp [ct.i3]);
 
 	if (mirror)
 	{

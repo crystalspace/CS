@@ -47,6 +47,9 @@ private:
   csPlane2 splitter;
   /// Center point on original edge that was using for the splitter plane.
   csVector2 split_center;
+//@@@
+// For debugging: start,end
+csVector2 split_start, split_end;
   /// True if this node is solid.
   bool solid;
 
@@ -137,6 +140,9 @@ private:
   void GfxDump (csSolidBspNode* node, iGraphics2D* ig2d, int depth,
   	csPoly2D& poly);
 
+  /// Text dump.
+  void Dump (csSolidBspNode* node, int level);
+
 public:
   /**
    * Create an empty tree.
@@ -184,6 +190,11 @@ public:
    * Do a graphical dump of the solid BSP tree.
    */
   void GfxDump (iGraphics2D* ig2d, iTextureManager* itxtmgr, int depth);
+
+  /**
+   * Do a text dump of the solid BSP tree.
+   */
+  void Dump () { Dump (root, 1); }
 };
 
 #endif /*SOLIDBSP_H*/

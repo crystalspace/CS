@@ -461,7 +461,6 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num,
   }
 }
 
-
 void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	csRenderView* d, csPolygon2DQueue* poly_queue, bool pvs)
 {
@@ -480,6 +479,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
   
   for (i = 0 ; i < num ; i++)
   {
+    if (!csWorld::ProcessPolygon ()) return (void*)1;
     if (polygon[i]->GetType () == 3)
     {
       // We're dealing with a csBspPolygon.

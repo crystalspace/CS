@@ -2115,6 +2115,7 @@ void Blocks::InitWorld ()
   InitDemoRoom ();
   Sys->world->Prepare ();
 
+#undef DO_SOUND
 #ifdef DO_SOUND
   // Load the blocks.zip library where sound refs are stored
   csLoader::LoadLibraryFile (world, "/data/blocks/Library");

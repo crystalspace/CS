@@ -364,9 +364,7 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d, csTransfo
       // Do backface culling. Note that this depends on the
       // mirroring of the current view.
       //-----
-      float area = csMath2::Area2 (persp [a].x, persp [a].y,
-                          	   persp [b].x, persp [b].y,
-                          	   persp [c].x, persp [c].y);
+      float area = csMath2::Area2 (persp [a], persp [b], persp [c]);
       int j, idx, dir;
       if (!area) continue;
       if (mesh.do_mirror)

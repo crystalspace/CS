@@ -552,8 +552,13 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
       csSolidBsp* solidbsp = Sys->world->GetSolidBsp ();
       if (solidbsp)
       {
-        Gfx2D->Clear (0);
 #	if 1
+        Gfx2D->Clear (0);
+	solidbsp->GfxDump (Gfx2D, Gfx3D->GetTextureManager (), covtree_level);
+	extern csPolygon2D debug_poly2d;
+	debug_poly2d.Draw (Gfx2D, Gfx3D->GetTextureManager ()->FindRGB (0, 255, 0));
+#	elif 0
+        Gfx2D->Clear (0);
 	solidbsp->MakeEmpty ();
 	csCamera* c = view->GetCamera ();
 	csPolygon2D poly1, poly2, poly3, poly4;
