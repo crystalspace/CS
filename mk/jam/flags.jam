@@ -67,7 +67,7 @@ rule LFlags
 
   if $($(<)_TYPE) = plugin
   {
-    LFlags $(<)_static : $(>) ;
+    $(<)_static.LFLAGS += $(>) ;
   }
 }
 
