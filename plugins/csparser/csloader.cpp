@@ -4413,6 +4413,7 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
   	  container_name ? container_name : name,
   	  parent, destSector,
   	  poly.GetVertices (), poly.GetVertexCount (), portal);
+    AddToRegion (ldr_context, mesh->QueryObject ());
   }
   else
   {
@@ -4421,6 +4422,7 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
   	  container_name ? container_name : name,
   	  sourceSector, csVector3 (0), destSector,
   	  poly.GetVertices (), poly.GetVertexCount (), portal);
+    AddToRegion (ldr_context, mesh->QueryObject ());
   }
   container_mesh = mesh;
   if (name)

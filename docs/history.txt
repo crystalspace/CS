@@ -16,6 +16,9 @@ chronological order.
 	- Jorrit fixed a bug in the engine where upon removal of a region
 	  it tried to fetch the engine sequence manager even if that plugin
 	  was not loaded yet. This caused crashes at exit for Crystal Core.
+	- Jorrit fixed a bug in the map loader. It forgot to register portals
+	  to the current region. This caused the portal objects to linger when
+	  the region was deleted.
 11-Jul-2004
 	- res made the following changes:
 	    - Removed the fake bool stuff. Compilers that are able to deal with
