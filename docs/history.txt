@@ -60,6 +60,15 @@ chronological order.
 	      what I want it to do.
 	- Anders Stenberg added three pass PPL technique for cards with just 
 	  two texture units. Also inlined all FFPs.
+	- Marten Svanfeldt made the following changes:
+	    - Added a Reset() member to csArray<T>::Iterator to reset the iterator.
+	    - Added the class csRenderMeshList which is a utilityclass used by
+	      the rendersteps to collect csRenderMeshes after culling and sort
+	      those correctly according to renderpriority and z-order.
+	    - Added correct usage of culling in the generic renderloopstep.
+	      It is correct when just culling against a rview. Functions to
+	      cull properly against lightvolumes and portals is still work 
+	      in progress.
 7-Sep-2003
 	- Jorrit performed a lot of changes to unify the new and old
 	  renderer branches:
