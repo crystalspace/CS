@@ -1,9 +1,9 @@
 #ifndef __CS_VERSION_H__
 #define __CS_VERSION_H__
 
-#define CS_VERSION	"0.16"	/* NOTE: Update docs/texinfo/version.txi  */
-#define CS_SUBVERSION	"002"	/* whenever updating these two values.    */
-#define RELEASE_DATE	"Wed, 28-Jun-2000"
+#define CS_VERSION	"0.17"	/* NOTE: Update docs/texinfo/version.txi  */
+#define CS_SUBVERSION	"001"	/* whenever updating these two values.    */
+#define RELEASE_DATE	"Wed, 1-Sep-2000"
 
 #if defined(OS_SOLARIS)
 #  define OS_VERSION "Solaris"
