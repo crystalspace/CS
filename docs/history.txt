@@ -9,6 +9,7 @@ chronological order.
 19-Aug-2004
 	- Jorrit added support for key/value pairs to materials and textures
 	  in the loader.
+        - Philip Wyett fixed mismatched delete/delete[] in dds.cpp
 18-Aug-2004
 	- Jorrit fixed the NR null renderer so that it also returns a
 	  valid iPolygonRenderer instance on calling

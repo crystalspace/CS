@@ -39,7 +39,7 @@ Loader::Loader ()
 Loader::~Loader ()
 {
   delete[] positions;
-  delete[] header;
+  delete header;
 }
 
 void Loader::SetSource (void* buffer, size_t bufferlen)
@@ -729,4 +729,3 @@ void Loader::CorrectPremult (csRGBpixel* buffer, uint32 planesize)
 }
   
 } // end of namespace dds
-
