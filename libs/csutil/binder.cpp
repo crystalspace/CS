@@ -64,7 +64,8 @@ csHashKey csHashComputeEvent (iEvent const& ev)
     case csevKeyDown:
     case csevKeyUp:
       return CSMASK_Keyboard
-        | ((ev.Key.Char < 256 ? ev.Key.Char : ev.Key.Code) << 16);
+        | ((ev.Key.Code >= CSKEY_FIRST && ev.Key.Code <= CSKEY_LAST
+            ? ev.Key.Code : ev.Key.Char) << 16);
 
     case csevMouseMove:
       return CSMASK_MouseMove

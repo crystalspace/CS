@@ -44,6 +44,8 @@ The history order is reversed so that new features are at the top.
 	- Fixed several application makefiles to also link with CSSYS
 	  at the end now. This is needed because of the new csMutex
 	  dependencies.
+	- Oktal swapped round a conditional expression in csHashComputeEvent
+	  that was causing some event types to be improperly encoded.
 17-Apr-2003
 	- Fixed a bug in the common polygon buffer implementation where it
 	  was incrementing the ref count on poly_texture without testing if
