@@ -232,10 +232,10 @@ bool Video::Initialize (int argc, const char* const argv[],
 
   // load the videoformat plugin
   Printf (CS_MSG_INITIALIZATION, "Loading an iVideoFormat.\n");
-  pVideoFormat = SCF_CREATE_INSTANCE ("crystalspace.video.format.avi", iStreamFormat);
+  pVideoFormat = CS_LOAD_PLUGIN (this,
+    "crystalspace.video.format.avi", "VideoFormat", iStreamFormat);
 
-  Printf (CS_MSG_INITIALIZATION, "initializing iVideoFormat.\n");
-  if (pVideoFormat && pVideoFormat->Initialize (this))
+  if (pVideoFormat)
   {
     iVFS *pVFS = CS_QUERY_PLUGIN (this, iVFS);
     if (pVFS)
