@@ -47,6 +47,15 @@ chronological order.
 	  iGenMeshSkeletonBone interface which it implements.  This made it
 	  unbuildable with older compilers which do not allow the return type
 	  of an overloaded virtual method to change.
+	- res added methods to csString to find and find&replace a substring.
+	- res fixed csGLTextureHandle::GetImageName() returning a 0 string if
+	  the texture wasn't prepared yet.
+	- res fixed in the GL renderer the use of a 3D projection in 2D mode 
+	  if the 3D mode was initialized but nothing was drawn.
+	- res fixed access of an uninit var in the DDS loader.
+	- res updated cssaver for the new cubemap syntax.
+	- res added ability to walktest to optionally enable saver flag. Edit
+	  walktest.cfg or run with "-saveable".
 5-Feb-2005
 	- Mike Handverger fixed a bug in iDynamicSystem::AttachColliderMesh
           ODE needs number of tris * 3 to build the mesh data.

@@ -73,6 +73,14 @@ void csString::ExpandIfNeeded(size_t NewSize)
   }
 }
 
+void csString::Mug (csString& other)
+{
+  delete[] Data;
+  Size = other.Size;
+  MaxSize = other.MaxSize;
+  Data = other.Detach();
+}
+
 void csString::SetGrowsBy(size_t n)
 {
   if (n < DEFAULT_GROW_BY)
@@ -289,6 +297,38 @@ size_t csString::FindLast (char c, size_t pos) const
       return tmp - Data;
 
   return (size_t)-1;
+}
+
+size_t csString::FindStr (const char* str, size_t pos) const
+{
+  if (pos > Size || Data == 0)
+    return (size_t)-1;
+
+  char const* tmp = strstr (Data + pos, str);
+  if (!tmp) 
+    return (size_t)-1;
+
+  return tmp - Data;
+}
+
+void csString::FindReplace (const char* str, const char* replaceWith)
+{
+  csString newStr;
+
+  size_t p = 0;
+  const size_t strLen = strlen (str);
+
+  while (true)
+  {
+    size_t strPos = FindStr (str, p);
+    if (strPos == (size_t)-1) break;
+    newStr.Append (Data + p, strPos - p);
+    newStr.Append (replaceWith);
+    p = strPos + strLen;
+  }
+  newStr.Append (Data + p, Size - p);
+
+  Mug (newStr);
 }
 
 // Note: isalpha(int c),  toupper(int c), tolower(int c), isspace(int c)

@@ -213,11 +213,14 @@ void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh, int &md)
 
 const char* csGLTextureHandle::GetImageName () const
 {
-  return origName;
+  if (image.IsValid()) 
+    return image->GetName();
+  else
+    return origName;
 }
 
-void csGLTextureHandle::GetMeanColor (uint8 &red, uint8 &green, uint8 &blue)
-  const
+void csGLTextureHandle::GetMeanColor (uint8 &red, uint8 &green, 
+				      uint8 &blue) const
 {
   red = green = blue = 0;
 }

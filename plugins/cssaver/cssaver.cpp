@@ -95,6 +95,14 @@ bool csSaver::Initialize(iObjectRegistry* p)
   engine = CS_QUERY_REGISTRY(object_reg, iEngine);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+
+  if (!engine->GetSaveableFlag())
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+      "crystalspace.plugin.cssaver",
+      "'Saveable' flag not set in engine. Saved worlds can be incomplete.");
+  }
+
   return true;
 }
 
@@ -158,102 +166,98 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
     iTextureWrapper *texWrap=texList->Get(i);
     iTextureHandle* texHand = texWrap->GetTextureHandle ();
     csRef<iDocumentNode>child = current->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    const char *name=texWrap->QueryObject()->GetName();
+    const char *name = texWrap->QueryObject()->GetName();
     if (name && *name)
       child->SetAttribute("name", name);
 
     // Save keys...
     SaveKeys (child, texWrap->QueryObject ());
 
-    // TBD: Heightgen?
+    child->SetValue("texture"); // texture node
     int texTarget = texHand->GetTextureTarget ();
+    const char* filename = texHand->GetImageName ();
+    // Cubemaps and 3D textures need special "filename logic"
+    if ((texTarget <= iTextureHandle::CS_TEX_IMG_2D) && filename && *filename)
+    {
+      CreateValueNode(child, "file", filename);
+    }
+
+    int r,g,b, r2 = -1,g2 = -1,b2 = -1;
+    texWrap->GetKeyColor(r, g, b);
+    if (r != -1)
+    {
+      iImage* img = texWrap->GetImageFile();
+      if (img && img->HasKeyColor())
+      {
+        img->GetKeyColor(r2, g2, b2);
+      }
+      if (r != r2 || g != g2 || b != b2)
+      {
+        csColor col (r * ONE_OVER_256, g * ONE_OVER_256, b * ONE_OVER_256);
+        synldr->WriteColor (CreateNode (child, "transparent"), &col);
+      }
+    }
+  
+    synldr->WriteBool (child, "for2d", texWrap->GetFlags () & CS_TEXTURE_2D, false);
+    // No for3d as that's default
+    synldr->WriteBool (child, "mipmap", !(texWrap->GetFlags () & CS_TEXTURE_NOMIPMAPS), true);
+    synldr->WriteBool (child, "dither", texWrap->GetFlags () & CS_TEXTURE_DITHER, false);
+    synldr->WriteBool (child, "clamp", texWrap->GetFlags () & CS_TEXTURE_CLAMP, false);
+    synldr->WriteBool (child, "filter", !(texWrap->GetFlags () & CS_TEXTURE_NOFILTER), true);
+    synldr->WriteBool (child, "keepimage", texWrap->KeepImage (), false);
+
+    const char* texClass = texWrap->GetTextureClass();
+    if ((texClass != 0) && (strcmp (texClass, "default") != 0))
+      CreateValueNode (child, "class", texClass);
+
     if (texTarget == iTextureHandle::CS_TEX_IMG_CUBEMAP)
     {
-      child->SetValue ("cubemap"); // cubemap node
-      const char* texClass = texWrap->GetTextureClass();
-      if ((texClass != 0) && (strcmp (texClass, "default") != 0))
-	CreateValueNode (child, "class", texClass);
+      csString imgName (filename);
 
-      static const char* faceNames[] = {"east", "west", "top", "bottom", 
-	"north", "south"};
-      csString imgName (texHand->GetImageName());
-      if (!imgName.IsEmpty())
+      if (imgName.FindFirst (':') == (size_t)-1)
       {
-	uint face = 0;
-	size_t pos = 0;
-
-	while ((pos < imgName.Length()) && (face < 6))
+	CreateValueNode(child, "file", filename);
+      }
+      else
+      {
+	csRef<iDocumentNode> params = 
+	  child->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	params->SetValue ("params");
+	static const char* faceNames[] = {"east", "west", "top", "bottom", 
+	  "north", "south"};
+	if (!imgName.IsEmpty())
 	{
-	  size_t colon = imgName.FindFirst (':', pos);
-	  size_t subStrLen;
-	  if (colon == 0)
-	    subStrLen = imgName.Length() - pos;
-	  else
-	    subStrLen = colon - pos;
-	  if (subStrLen > 0)
-	    CreateValueNode (child, faceNames[face], 
-	      imgName.Slice (pos, subStrLen));
-	  face++;
-	  pos = colon + 1;
+	  uint face = 0;
+	  size_t pos = 0;
+
+	  while ((pos < imgName.Length()) && (face < 6))
+	  {
+	    size_t colon = imgName.FindFirst (':', pos);
+	    size_t subStrLen;
+	    if (colon == 0)
+	      subStrLen = imgName.Length() - pos;
+	    else
+	      subStrLen = colon - pos;
+	    if (subStrLen > 0)
+	      CreateValueNode (params, faceNames[face], 
+		imgName.Slice (pos, subStrLen));
+	    face++;
+	    pos = colon + 1;
+	  }
 	}
       }
     }
     else if (texTarget == iTextureHandle::CS_TEX_IMG_3D)
     {
-      child->SetValue ("texture3d"); // texture3d node
-      const char* texClass = texWrap->GetTextureClass();
-      if ((texClass != 0) && (strcmp (texClass, "default") != 0))
-	CreateValueNode (child, "class", texClass);
-
-      int w,h,d;
-      if (texHand->GetRendererDimensions (w, h, d) && (d != 0))
-      {
-        /*for (int i=0; i<d; i++)
-          CreateValueNode (child, "layer", texHand->GetImageName (i));*/
-      }
+      /* ... */
     }
     else
     {
-      child->SetValue("texture"); // texture node
-
-      const char* filename = texHand->GetImageName ();
-      if (filename && *filename)
-      {
-        CreateValueNode(child, "file", filename);
-	const char* texClass = texWrap->GetTextureClass();
-	if ((texClass != 0) && (strcmp (texClass, "default") != 0))
-	  CreateValueNode (child, "class", texClass);
-
-        int r,g,b, r2,g2,b2;
-        texWrap->GetKeyColor(r, g, b);
-        if (r != -1)
-        {
-          iImage* img = texWrap->GetImageFile();
-          if (img && img->HasKeyColor())
-          {
-            img->GetKeyColor(r2, g2, b2);
-          }
-          if (r != r2 || g != g2 || b != b2)
-          {
-            csColor col (r * ONE_OVER_256, g * ONE_OVER_256, b * ONE_OVER_256);
-            synldr->WriteColor (CreateNode (child, "transparent"), &col);
-          }
-        }
-      
-        synldr->WriteBool (child, "for2d", texWrap->GetFlags () & CS_TEXTURE_2D, false);
-        // No for3d as that's default
-        synldr->WriteBool (child, "mipmap", !(texWrap->GetFlags () & CS_TEXTURE_NOMIPMAPS), true);
-        synldr->WriteBool (child, "dither", texWrap->GetFlags () & CS_TEXTURE_DITHER, false);
-        synldr->WriteBool (child, "clamp", texWrap->GetFlags () & CS_TEXTURE_CLAMP, false);
-        synldr->WriteBool (child, "filter", !(texWrap->GetFlags () & CS_TEXTURE_NOFILTER), true);
-        synldr->WriteBool (child, "keepimage", texWrap->KeepImage (), false);
-      }
-
       iTextureCallback* texCb = texWrap->GetUseCallback();
       if (!texCb) continue;
 
       csRef<iProcTexCallback> proctexCb = 
-        SCF_QUERY_INTERFACE(texCb, iProcTexCallback);
+	SCF_QUERY_INTERFACE(texCb, iProcTexCallback);
       if (!proctexCb) continue;
 
       iProcTexture* proctex = proctexCb->GetProcTexture();
@@ -268,20 +272,20 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
       csRef<iFactory> fact = SCF_QUERY_INTERFACE(textype, iFactory);
       if (!fact) continue;
 
-      char loadername[128] = "";
-      csFindReplace(loadername, fact->QueryClassID(), ".type.", ".loader.",128);
+      csString loadername (fact->QueryClassID());
+      loadername.FindReplace (".type.", ".loader.");
       CreateValueNode(child, "type", GetPluginName (loadername, "Tex"));
 
-      char savername[128] = "";
-      csFindReplace(savername, fact->QueryClassID(), ".type.", ".saver.", 128);
+      csString savername (fact->QueryClassID());
+      savername.FindReplace (".type.", ".saver.");
 
       //Invoke the iSaverPlugin::WriteDown
       csRef<iSaverPlugin> saver = 
-        CS_QUERY_PLUGIN_CLASS(plugin_mgr, savername, iSaverPlugin);
+	CS_QUERY_PLUGIN_CLASS(plugin_mgr, savername, iSaverPlugin);
       if (!saver) 
-        saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iSaverPlugin);
+	saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iSaverPlugin);
       if (saver)
-        saver->WriteDown(proctex, child);
+	saver->WriteDown(proctex, child);
 
       synldr->WriteBool (child, "alwaysanimate", proctex->GetAlwaysAnimate (), false);
     }
@@ -777,11 +781,10 @@ bool csSaver::SaveSectorMeshes(iMeshList *meshList, iDocumentNode *parent)
         SCF_QUERY_INTERFACE(meshobjectfactory->GetMeshObjectType(), iFactory);
     else
     {
-      char error[128];
-      sprintf(error, "Factory less Mesh found! %s => \
-                        Please fix or report to Jorrit ;)", name);
       csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.plugin.cssaver", error);
+        "crystalspace.plugin.cssaver", 
+	"Factory-less Mesh found! %s => Please fix or report to Jorrit ;)", 
+	name);
     }
     if (factory)
     {

@@ -68,11 +68,11 @@ void csImageCubeMapMaker::UpdateName ()
   csString newName;
   newName.Format ("%s:%s:%s:%s:%s:%s",
     cubeImages[0].IsValid() ? cubeImages[0]->GetName() : "",
-    cubeImages[1].IsValid() ? cubeImages[0]->GetName() : "",
-    cubeImages[2].IsValid() ? cubeImages[0]->GetName() : "",
-    cubeImages[3].IsValid() ? cubeImages[0]->GetName() : "",
-    cubeImages[4].IsValid() ? cubeImages[0]->GetName() : "",
-    cubeImages[5].IsValid() ? cubeImages[0]->GetName() : "");
+    cubeImages[1].IsValid() ? cubeImages[1]->GetName() : "",
+    cubeImages[2].IsValid() ? cubeImages[2]->GetName() : "",
+    cubeImages[3].IsValid() ? cubeImages[3]->GetName() : "",
+    cubeImages[4].IsValid() ? cubeImages[4]->GetName() : "",
+    cubeImages[5].IsValid() ? cubeImages[5]->GetName() : "");
   delete[] fName;
   fName = csStrNew (newName);
 }

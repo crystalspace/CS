@@ -193,7 +193,8 @@ csPtr<iImage> csDDSImageIO::Load (iDataBuffer* buf, int format)
 
   if ((dataType == csrawDXT1) && 
     (dds::Loader::ProbeDXT1Alpha (buf->GetUint8() + imgOffset,
-    head.width, head.height, Depth, dataSize)))
+    head.width, head.height, Depth, 
+    DataSize (dataType, bpp, head.width, head.height, Depth))))
     dataType = csrawDXT1Alpha;
 
   if ((dataType < csrawAlphaFirst) || (dataType > csrawAlphaLast))

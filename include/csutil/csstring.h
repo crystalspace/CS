@@ -74,6 +74,8 @@ protected:
   // depending upon configuration.
   void ExpandIfNeeded(size_t NewSize);
 
+  /// Move the data pointer and associated info over from \a other.
+  void Mug (csString& other);
 public:
   /**
    * Advise the string that it should allocate enough space to hold up to
@@ -344,7 +346,7 @@ public:
    * \param p Start position of search (default 0).
    * \return First position of character, or (size_t)-1 if not found.
    */
-  size_t FindFirst (char c, size_t p = 0) const;
+  size_t FindFirst (char c, size_t pos = 0) const;
 
   /**
    * Find the first occurrence of any of a set of characters in the string.
@@ -352,7 +354,7 @@ public:
    * \param p Start position of search (default 0).
    * \return First position of character, or (size_t)-1 if not found.
    */
-  size_t FindFirst (const char *c, size_t p = 0) const;
+  size_t FindFirst (const char *c, size_t pos = 0) const;
 
   /**
    * Find the last occurrence of a character in the string.
@@ -361,7 +363,21 @@ public:
    *   the search to begin at the very end of string.
    * \return Last position of character, or (size_t)-1 if not found.
    */
-  size_t FindLast (char c, size_t p = (size_t)-1) const;
+  size_t FindLast (char c, size_t pos = (size_t)-1) const;
+  
+  /**
+   * Find the occurrence of a substring in the string.
+   * \param str String to locate.
+   * \param p Start position of search (default 0).
+   * \return First position of string, or (size_t)-1 if not found.
+   */
+  size_t FindStr (const char* str, size_t pos = 0) const;
+
+  /**
+   * Find the occurrence of a substring in the string and replace it with
+   * another string.
+   */
+  void FindReplace (const char* str, const char* replaceWith);
 
 #define STR_APPEND(TYPE,FMT,SZ) csString& Append(TYPE n) \
   { char s[SZ]; cs_snprintf(s, SZ, FMT, n); return Append(s); }

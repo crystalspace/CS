@@ -148,6 +148,7 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent) : isOpen (false)
   clipping_stencil_enabled = false;
   clipportal_dirty = true;
   clipportal_floating = 0;
+  cliptype = CS_CLIPPER_NONE;
 }
 
 csGLGraphics3D::~csGLGraphics3D()
@@ -1190,6 +1191,9 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 	SetGlOrtho (false);
       //glViewport (0, 0, viewwidth, viewheight);
       glViewport (0, 0, viewwidth, viewheight);
+      needProjectionUpdate = false; 
+      /* Explicitly avoid update. The 3D mode projection will not work in
+       * 2D mode. */
 
       statecache->SetMatrixMode (GL_MODELVIEW);
       glLoadIdentity ();
