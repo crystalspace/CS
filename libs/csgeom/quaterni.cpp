@@ -116,3 +116,111 @@ csQuaternion csQuaternion::Slerp (
       scale0 * y + scale1 * quat2.x,
       scale0 * z + scale1 * -quat2.r);
 }
+
+
+csQuaternion::csQuaternion(const csMatrix3& mat)
+{
+    float  tr, s;
+    int    i;
+
+    tr = mat.m11 + mat.m22 + mat.m33 + 1.0;
+
+    // check the diagonal
+    if (tr > 0.0) {
+        s = 0.5 / sqrt (tr);
+        r = 0.25 / s;
+        x = (mat.m32 - mat.m23) * s;
+        y = (mat.m13 - mat.m31) * s;
+        z = (mat.m21 - mat.m12) * s;
+    } else {
+        // diagonal is negative
+        i = 1;
+        if (mat.m22 > mat.m11) i = 2;
+        if ((i == 1 && mat.m33 > mat.m11)
+            || (i == 2 && mat.m33 > mat.m22)) i = 3;
+
+            /*
+            m11 = 0
+            m12 = 1
+            m13 = 2
+            m21 = 4
+            m22 = 5
+            m23 = 6
+            m31 = 8
+            m32 = 9
+            m33 = 10
+            */
+
+        switch(i) {
+        case 1:
+            s = sqrt ((mat.m11 - (mat.m22 + mat.m33)) + 1.0);
+
+            x = s * 0.5;
+
+            if (s != 0.0) s = 0.5 / s;
+
+            y = (mat.m12 + mat.m21) * s;
+            z = (mat.m13 + mat.m31) * s;
+            r = (mat.m23 - mat.m32) * s;
+            break;
+        case 2:
+            s = sqrt ((mat.m22 - (mat.m33 + mat.m11)) + 1.0);
+
+            y = 0.5 * s;
+
+            if (s != 0.0) s = 0.5 / s;
+
+            x = (mat.m12 + mat.m21) * s;
+            z = (mat.m23 + mat.m32) * s;
+            r = (mat.m13 - mat.m31) * s;
+
+            break;
+        case 3:
+            s = sqrt ((mat.m33 - (mat.m11 + mat.m22)) + 1.0);
+
+            z = 0.5 * s;
+
+            if (s != 0.0) s = 0.5 / s;
+
+            x = (mat.m13 + mat.m31) * s;
+            y = (mat.m23 + mat.m32) * s;
+            r = (mat.m12 - mat.m21) * s;
+            break;
+        }
+    }
+}
+
+
+void csQuaternion::Invert()
+{
+    float norm, invNorm;
+
+    norm = x * x + y * y + z * z + r * r;
+
+    invNorm = (float) (1.0 / norm);
+
+    x = -x * invNorm;
+    y = -y * invNorm;
+    z = -z * invNorm;
+    r =  r * invNorm;
+}
+
+void csQuaternion::GetAxisAngle(csVector3& axis, float& phi) const
+{
+    phi = 2.0 * acos(r);
+    float ss = sin(phi/2.0);
+    axis.x = x / ss;
+    axis.y = y / ss;
+    axis.z = z / ss;
+
+}
+
+void csQuaternion::SetWithAxisAngle(csVector3 axis, float phi)
+{
+    axis.Normalize();
+    float ss = sin(phi/2.0);
+    r = cos(phi/2.0);
+    x = axis.x * ss;
+    y = axis.y * ss;
+    z = axis.z * ss;
+}

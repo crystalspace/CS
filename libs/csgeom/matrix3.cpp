@@ -136,47 +136,33 @@ csMatrix3 csMatrix3::GetTranspose () const
 float csMatrix3::Determinant () const
 {
   return m11 * (m22 * m33 - m23 * m32)
-  	- m12 * (m21 * m33 - m23 * m31)
-	+ m13 * (m21 * m32 - m22 * m31);
+    - m12 * (m21 * m33 - m23 * m31)
+    + m13 * (m21 * m32 - m22 * m31);
 }
 
 void csMatrix3::Set (const csQuaternion &quat)
 {
-  float s;
-  float xs, ys, zs;
-  float wx, wy, wz;
-  float xx, xy, xz;
-  float yy, yz, zz;
-  float x = quat.x;
-  float y = quat.y;
-  float z = quat.z;
-  float w = quat.r;
+  float rx, ry, rz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
 
-  // For unit Quat, just set s = 2 or set xs = x + x, etc.
-  s = 2 / (x * x + y * y + z * z + w * w);
+  // calculate coefficients
+  x2 = quat.x + quat.x;
+  y2 = quat.y + quat.y;
+  z2 = quat.z + quat.z;
+  xx = quat.x * x2;   xy = quat.x * y2;   xz = quat.x * z2;
+  yy = quat.y * y2;   yz = quat.y * z2;   zz = quat.z * z2;
+  rx = quat.r * x2;   ry = quat.r * y2;   rz = quat.r * z2;
 
-  xs = x * s;
-  ys = y * s;
-  zs = z * s;
-  wx = w * xs;
-  wy = w * ys;
-  wz = w * zs;
-  xx = x * xs;
-  xy = x * ys;
-  xz = x * zs;
-  yy = y * ys;
-  yz = y * zs;
-  zz = z * zs;
+  m11 = 1.0 - (yy + zz);
+  m12 = xy - rz;
+  m13 = xz + ry;
 
-  m11 = 1.0f - (yy + zz);
-  m12 = xy + wz;
-  m13 = xz - wy;
-  m21 = xy - wz;
-  m22 = 1.0f - (xx + zz);
-  m23 = yz + wx;
-  m31 = xz + wy;
-  m32 = yz - wx;
-  m33 = 1.0f - (xx + yy);
+  m21 = xy + rz;
+  m22 = 1.0 - (xx + zz);
+  m23 = yz - rx;
+
+  m31 = xz - ry;
+  m32 = yz + rx;
+  m33 = 1.0 - (xx + yy);
 }
 
 csMatrix3 operator+ (const csMatrix3 &m1, const csMatrix3 &m2)
