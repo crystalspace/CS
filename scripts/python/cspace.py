@@ -9218,6 +9218,7 @@ class iTextureHandle(iBase):
     def Precache(*args): return _cspace.iTextureHandle_Precache(*args)
     def SetTextureClass(*args): return _cspace.iTextureHandle_SetTextureClass(*args)
     def GetTextureClass(*args): return _cspace.iTextureHandle_GetTextureClass(*args)
+    def SetAlphaType(*args): return _cspace.iTextureHandle_SetAlphaType(*args)
     def __del__(self, destroy=_cspace.delete_iTextureHandle):
         try:
             if self.thisown: destroy(self)
