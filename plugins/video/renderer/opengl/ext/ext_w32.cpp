@@ -136,7 +136,7 @@ extern PFNGLMULTITEXCOORD4DVARB glMultiTexCoord4dvARB;
 #define GL_CLIENT_ACTIVE_TEXTURE_ARB	0x84E1
 #define GL_MAX_TEXTURE_UNITS_ARB	0x84E2
 
-#include "cssysdef.h"
+//#include "cssysdef.h"
 #include <windows.h>
 #include "../ogl_g3d.h"
 
