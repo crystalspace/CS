@@ -1,7 +1,7 @@
 #ifndef D3D_STATES_H
 #define D3D_STATES_H
 
-#include "iSystem.h"
+#include "isys/isystem.h"
 
 //====================================================
 // csStateCacheDirect3DDx6

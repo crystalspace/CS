@@ -27,7 +27,7 @@
 #include "ivideo/itexture.h"
 #include "iengine/itexture.h"
 #include "iengine/ilghtmap.h"
-#include "IGraph3d.h"
+#include "ivideo/igraph3d.h"
 #include "csutil/util.h"
 
 //----------------------------------------------------------------------------//
