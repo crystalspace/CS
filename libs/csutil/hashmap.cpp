@@ -123,6 +123,7 @@ void csGlobalHashIterator::GotoNextElementConst ()
 
 csHashObject csGlobalHashIterator::Next ()
 {
+  CS_ASSERT(bucket);
   csHashObject obj = ((*bucket)[element_index]).object;
   GotoNextElement ();
   return obj;
@@ -130,6 +131,7 @@ csHashObject csGlobalHashIterator::Next ()
 
 const csHashObject csGlobalHashIterator::NextConst ()
 {
+  CS_ASSERT(cbucket);
   csHashObject obj = ((*cbucket)[element_index]).object;
   GotoNextElementConst ();
   return obj;
@@ -205,6 +207,7 @@ void csHashIterator::GotoNextSameKeyConst ()
 
 csHashObject csHashIterator::Next ()
 {
+  CS_ASSERT(bucket);
   csHashObject obj = ((*bucket)[element_index]).object;
   current_index = element_index;
   GotoNextSameKey ();
@@ -213,6 +216,7 @@ csHashObject csHashIterator::Next ()
 
 const csHashObject csHashIterator::NextConst ()
 {
+  CS_ASSERT(cbucket);
   csHashObject obj = ((*bucket)[element_index]).object;
   current_index = element_index;
   GotoNextSameKeyConst ();
