@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "avistrv.h"
 #include "isystem.h"
+#include "itexture.h"
 #include "itxtmgr.h"
 
 IMPLEMENT_IBASE (csAVIStreamVideo)
@@ -57,7 +58,7 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
   pChunk = new csAVIFormat::AVIDataChunk;
   pChunk->currentframe = 0;
   pChunk->currentframepos = NULL;
-  sprintf (pChunk->id, "%2dd", nStreamNumber);
+  sprintf (pChunk->id, "%02dd", nStreamNumber);
   pChunk->id[3] = '\0';
 
   nStream = nStreamNumber;
@@ -69,6 +70,24 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
 
   bTimeSynced = false;
   fxmode = CS_FX_COPY;
+  polyfx.num = 4;
+  polyfx.use_fog = false;
+  polyfx.vertices[0].u = 0;
+  polyfx.vertices[0].v = 0;
+  polyfx.vertices[1].u = 1;
+  polyfx.vertices[1].v = 0;
+  polyfx.vertices[2].u = 1;
+  polyfx.vertices[2].v = 1;
+  polyfx.vertices[3].u = 0;
+  polyfx.vertices[3].v = 1;
+  for (int i=0; i<4; i++)
+  {
+    polyfx.vertices[i].r = 1;
+    polyfx.vertices[i].g = 1;
+    polyfx.vertices[i].b = 1;
+    polyfx.vertices[i].z = 1;
+  }
+
   if (pMaterial) pMaterial->DecRef ();
   pMaterial = NULL;
   // load the CODEC
@@ -123,6 +142,7 @@ bool csAVIStreamVideo::SetRect (int x, int y, int w, int h)
   polyfx.vertices[2].sy = y+h;
   polyfx.vertices[3].sx = x;
   polyfx.vertices[3].sy = y+h;
+  memimage.Rescale (w, h);
   return true;
 }
 
@@ -160,10 +180,22 @@ void csAVIStreamVideo::NextFrame ()
 {
   if (NextFrameGetMaterial ())
   {
+  unsigned int zbuf = pG3D->GetRenderState( G3DRENDERSTATE_ZBUFFERMODE );
+  bool btex = pG3D->GetRenderState( G3DRENDERSTATE_TEXTUREMAPPINGENABLE ) != 0;
+  bool bgour = pG3D->GetRenderState( G3DRENDERSTATE_GOURAUDENABLE ) != 0;
+
+  pG3D->SetRenderState( G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_NONE );
+  pG3D->SetRenderState( G3DRENDERSTATE_TEXTUREMAPPINGENABLE, true );
+  pG3D->SetRenderState( G3DRENDERSTATE_GOURAUDENABLE, false );
+
     polyfx.mat_handle = pMaterial;
     pG3D->StartPolygonFX (polyfx.mat_handle, fxmode);
     pG3D->DrawPolygonFX (polyfx);
     pG3D->FinishPolygonFX ();
+
+  pG3D->SetRenderState( G3DRENDERSTATE_ZBUFFERMODE, zbuf );
+  pG3D->SetRenderState( G3DRENDERSTATE_TEXTUREMAPPINGENABLE, btex );
+  pG3D->SetRenderState( G3DRENDERSTATE_GOURAUDENABLE, bgour );
   }
 }
 
@@ -225,6 +257,7 @@ void csAVIStreamVideo::makeMaterial ()
 
   iTextureManager *txtmgr = pG3D->GetTextureManager();
   iTextureHandle *pFrameTex = txtmgr->RegisterTexture (&memimage, CS_TEXTURE_NOMIPMAPS);
+  pFrameTex->Prepare ();
   pMaterial = txtmgr->RegisterMaterial (pFrameTex);
   pMaterial->Prepare ();
 }

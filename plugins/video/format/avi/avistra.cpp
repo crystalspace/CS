@@ -54,7 +54,7 @@ bool csAVIStreamAudio::Initialize (const csAVIFormat::AVIHeader *ph,
   pChunk = new csAVIFormat::AVIDataChunk;
   pChunk->currentframe = 0;
   pChunk->currentframepos = NULL;
-  sprintf (pChunk->id, "%2dw", nStreamNumber);
+  sprintf (pChunk->id, "%02dw", nStreamNumber);
   pChunk->id[3] = '\0';
 
   nStream = nStreamNumber;
