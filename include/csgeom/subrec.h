@@ -26,8 +26,15 @@
  */
 class csSubRect : public csRect
 {
-private:
+public:
   csSubRect* next, * prev;
+
+  /// Create a new rectangle.
+  csSubRect (int ixmin, int iymin, int ixmax, int iymax)
+  	: csRect (ixmin, iymin, ixmax, iymax), next (NULL), prev (NULL) { }
+
+  /// Copy constructor.
+  csSubRect (const csRect &copy) : csRect (copy), next (NULL), prev (NULL) { }
 };
 
 /**
@@ -40,6 +47,8 @@ class csSubRectangles
 protected:
   /// Dimensions of this region.
   csRect region;
+  /// First empty region.
+  csSubRect* first;
 
 public:
   /// Allocate a new empty region with the given size.
@@ -60,6 +69,11 @@ public:
    * Allocate a new rectangle. Return false if there is no room
    */
   bool Alloc (int w, int h, csRect& rect);
+
+  /**
+   * For debugging: dump all free rectangles.
+   */
+  void Dump ();
 };
 
 #endif // __CS_SUBREC_H__

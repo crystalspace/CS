@@ -3,6 +3,11 @@ The history order is reversed so that new features are at the top.
 21-May-2001
 	- Added non-functional emit loader/saver which Wouter can complete.
 	- Wouter worked on emit loader. I did a small enhancement too.
+	- Finished the first version of csSubRectangles. It seems to work
+	  now so it is ready for using in the lightmap combination code.
+	  Note however that the algorithm used in csSubRectangles is not
+	  very sophisticated. It is a start to see how far we go. Optimization
+	  can come later.
 20-May-2001
 	- Philip Wyett started a big overhaul of CS/Visual C++ docs.
 	- Wouter Wijngaards added an emittor particle system. This is a very

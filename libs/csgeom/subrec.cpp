@@ -22,21 +22,95 @@
 csSubRectangles::csSubRectangles (const csRect& region)
 {
   csSubRectangles::region = region;
+  first = NULL;
+  Clear ();
 }
 
 csSubRectangles::~csSubRectangles ()
 {
   Clear ();
+  delete first;		// Clean up the first region.
 }
 
 void csSubRectangles::Clear ()
 {
+  while (first)
+  {
+    csSubRect* n = first->next;
+    delete first;
+    first = n;
+  }
+  first = new csSubRect (region);
+  first->prev = NULL;
+  first->next = NULL;
 }
 
 bool csSubRectangles::Alloc (int w, int h, csRect& rect)
 {
-  //@@@ TODO
-  (void)w; (void)h; (void)rect;
+  // @@@ This is not a good algo. Needs to be improved!
+  csSubRect* near_fit = NULL;
+  csSubRect* fit = NULL;
+  csSubRect* s = first;
+  while (s)
+  {
+    int rw = s->Width ();
+    int rh = s->Height ();
+    if (w == rw && h == rh)
+    {
+      // We have an exact fit. Return now.
+      if (s->prev) s->prev->next = s->next;
+      else first = s->next;
+      if (s->next) s->next->prev = s->prev;
+      rect = *s;
+      delete s;
+      return true;
+    }
+    else if (w <= rw && h <= rh)
+    {
+      if (w == rw || h == rh) near_fit = s;
+      else fit = s;
+    }
+    s = s->next;
+  }
+  if (near_fit)
+  {
+    // We have a near fit (i.e. one dimensions fits exactly).
+    rect.Set (near_fit->xmin, near_fit->ymin,
+    	near_fit->xmin+w, near_fit->ymin+h);
+    // Shrink the free block.
+    int rw = near_fit->Width ();
+    if (w == rw)
+      near_fit->Set (near_fit->xmin, near_fit->ymin+h,
+    	near_fit->xmax, near_fit->ymax);
+    else
+      near_fit->Set (near_fit->xmin+w, near_fit->ymin,
+    	near_fit->xmax, near_fit->ymax);
+    return true;
+  }
+  else if (fit)
+  {
+    // We have to create an additional block.
+    rect.Set (fit->xmin, fit->ymin, fit->xmin+w, fit->ymin+h);
+    csSubRect* s2 = new csSubRect (fit->xmin+w, fit->ymin,
+    	fit->xmax, fit->ymin+h);
+    s2->next = first;
+    s2->prev = NULL;
+    if (first) first->prev = s2;
+    first = s2;
+    fit->Set (fit->xmin, fit->ymin+h, fit->xmax, fit->ymax);
+    return true;
+  }
+  // No room.
   return false;
+}
+
+void csSubRectangles::Dump ()
+{
+  csSubRect* s = first;
+  while (s)
+  {
+    printf ("  free: %d,%d,%d,%d\n", s->xmin, s->ymin, s->xmax, s->ymax);
+    s = s->next;
+  }
 }
 
