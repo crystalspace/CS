@@ -54,6 +54,8 @@ protected:
 
   void OptimizePolygon (iPolygon3D *p);
 
+  void ReportV (const char* msgid, int severity, 
+	iDocumentNode* errornode, const char* msg, va_list arg);
 public:
 
   SCF_DECLARE_IBASE;
@@ -141,6 +143,8 @@ public:
   virtual void ReportError (const char* msgid, iDocumentNode* errornode,
 	const char* msg, ...);
   virtual void ReportBadToken (iDocumentNode* badtokennode);
+  virtual void Report (const char* msgid, int severity, 
+	iDocumentNode* errornode, const char* msg, ...);
 
 private:
   /// make it plugable

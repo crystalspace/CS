@@ -56,7 +56,6 @@ MSVC.PLUGINS.REQUIRED =         \
   sound/renderer/software       \
   video/canvas/ddraw            \
   video/canvas/openglwin        \
-  video/renderer/opengl-ext     \
   video/format/avi              \
   video/format/codecs/rle       \
   video/loader/jng              \

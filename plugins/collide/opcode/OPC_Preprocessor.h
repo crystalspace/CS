@@ -44,7 +44,7 @@
 		#endif
 
 		#if defined(_CPPUNWIND)
-			#error Please disable exceptions...
+//			#error Please disable exceptions...
 		#endif
 
 		#if defined(_MT)

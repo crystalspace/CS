@@ -98,6 +98,7 @@ public:
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name);
   virtual iMeshWrapper* FindMeshObject (const char* name);
   virtual csParser* GetParser ();
+  virtual iTextureWrapper* FindTexture (const char* name);
 };
 
 SCF_IMPLEMENT_IBASE(StdLoaderContext);
@@ -129,21 +130,17 @@ iSector* StdLoaderContext::FindSector (const char* name)
 
 iMaterialWrapper* StdLoaderContext::FindMaterial (const char* name)
 {
+  // @@@ in case the material is not found a replacement is taken.
+  // however, somehow the location of the errorneous material name
+  // should be reported. 
   iMaterialWrapper* mat = Engine->FindMaterial (name, region);
   if (mat)
     return mat;
 
-  loader->ReportWarning ("crystalspace.maploader", 
-    "Could not find material '%s'.", name);
-  loader->ReportNotify (" Creating new material ...");
-  iTextureWrapper* tex = Engine->FindTexture (name, region);
-  if (!tex)
-  {
-    tex = loader->LoadTexture (name, name);
-    if (tex) loader->ReportNotify (" ...using new texture '%s'", name);
-  }
-  else
-    loader->ReportNotify (" ...using loaded texture '%s'", name);
+  loader->ReportNotify ("crystalspace.maploader", 
+    "Could not find material '%s'. "
+    "Creating new material using texture '%s'", name);
+  iTextureWrapper* tex = FindTexture (name);
   if (tex)
   {
     // Add a default material with the same name as the texture
@@ -184,6 +181,26 @@ iMeshWrapper* StdLoaderContext::FindMeshObject (const char* name)
 csParser* StdLoaderContext::GetParser ()
 {
   return parser;
+}
+
+iTextureWrapper* StdLoaderContext::FindTexture (const char* name)
+{
+  // @@@ in case the texture is not found a replacement is taken.
+  // however, somehow the location of the errorneous texture name
+  // should be reported. 
+  iTextureWrapper* result;
+  if (region)
+    result = region->FindTexture (name);
+  else
+    result = Engine->GetTextureList ()->FindByName (name);
+
+  if (!result)
+  {
+    loader->ReportNotify ("crystalspace.maploader", 
+      "Could not find texture '%s'. Attempting to load.", name);
+    result = loader->LoadTexture (name, name);
+  }
+  return result;
 }
 
 //---------------------------------------------------------------------------
@@ -345,6 +362,15 @@ void csLoader::ReportWarning (const char* id, const char* description, ...)
   va_end (arg);
 }
 
+void csLoader::ReportWarning (const char* id, iDocumentNode* node, const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+  char buf[1024];
+  vsprintf (buf, description, arg);
+  va_end (arg);
+  SyntaxService->Report (id, CS_REPORTER_SEVERITY_WARNING, node, buf);
+}
 //---------------------------------------------------------------------------
 
 // XML: temporary code to detect if we have an XML file. If that's

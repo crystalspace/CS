@@ -478,7 +478,7 @@ bool csPlatformStartup(iObjectRegistry* r)
   char installDir[MAX_PATH];
   csGetInstallPath(installDir, sizeof(installDir));
   ToLower (installDir, installDir);
-  int idlen = strlen(installDir);
+  size_t idlen = strlen(installDir);
   idlen--;
   installDir[idlen] = 0;
   

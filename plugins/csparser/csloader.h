@@ -497,6 +497,8 @@ private:
   /// Report a notification.
   void ReportNotify2 (const char* id, const char* description, ...);
 
+  /// Report a warning.
+  void ReportWarning (const char* id, iDocumentNode* node, const char* description, ...);
 public:
   /********** iLoader implementation **********/
   SCF_DECLARE_IBASE;

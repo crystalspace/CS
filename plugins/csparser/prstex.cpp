@@ -21,6 +21,7 @@
 #include "qint.h"
 #include "csutil/parser.h"
 #include "csloader.h"
+#include "imap/ldrctxt.h"
 #include "csutil/scanstr.h"
 #include "iutil/document.h"
 #include "cstool/proctex.h"
@@ -374,15 +375,12 @@ iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf, const char *pr
       case CS_TOKEN_TEXTURE:
       {
         csScanStr (params, "%s", str);
-	if (ResolveOnlyRegion && Engine->GetCurrentRegion ())
-	  texh = Engine->GetCurrentRegion ()->FindTexture (str);
-	else
-          texh = Engine->GetTextureList ()->FindByName (str);
+	texh = GetLoaderContext()->FindTexture (str);
         if (!texh)
         {
 	  ReportError (
-	      "crystalspace.maploader.parse.material",
-	      "Cannot find texture '%s' for material `%s'", str, name);
+ 	    "crystalspace.maploader.parse.material",
+	    "Cannot find texture '%s' for material `%s'", str, name);
 	  return NULL;
         }
         break;
@@ -764,18 +762,14 @@ iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node,
       case XMLTOKEN_TEXTURE:
         {
 	  const char* txtname = child->GetContentsValue ();
-	  if (ResolveOnlyRegion && Engine->GetCurrentRegion ())
-	    texh = Engine->GetCurrentRegion ()->FindTexture (txtname);
-	  else
-            texh = Engine->GetTextureList ()->FindByName (txtname);
+	  texh = GetLoaderContext()->FindTexture (txtname);
           if (!texh)
           {
-	    SyntaxService->ReportError (
-	        "crystalspace.maploader.parse.material",
-	        child, "Cannot find texture '%s' for material `%s'",
-		txtname, matname);
-	    return NULL;
-          }
+ 	    ReportError (
+ 	      "crystalspace.maploader.parse.material",
+ 	      "Cannot find texture '%s' for material `%s'", txtname, matname);
+ 	    return NULL;
+           }
 	}
         break;
       case XMLTOKEN_COLOR:

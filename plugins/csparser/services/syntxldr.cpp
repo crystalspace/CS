@@ -1573,6 +1573,22 @@ bool csTextSyntaxService::ParseColor (iDocumentNode* node, csColor &c)
 
 bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode)
 {
+#define MIXMODE_EXCLUSIVE				\
+  if (mixmode & CS_FX_MASK_MIXMODE)			\
+  {							\
+    if (!warned)					\
+    {							\
+      Report ("crystalspace.syntax.mixmode",		\
+        CS_REPORTER_SEVERITY_WARNING,			\
+	child,						\
+	"Multiple exclusive mixmodes specified! "	\
+	"Only first one will be used.");		\
+      warned = true;					\
+    }							\
+  }							\
+  else
+
+  bool warned = false;
   mixmode = 0;
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -1583,12 +1599,16 @@ bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode)
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
-      case XMLTOKEN_COPY: mixmode |= CS_FX_COPY; break;
-      case XMLTOKEN_MULTIPLY: mixmode |= CS_FX_MULTIPLY; break;
-      case XMLTOKEN_MULTIPLY2: mixmode |= CS_FX_MULTIPLY2; break;
-      case XMLTOKEN_ADD: mixmode |= CS_FX_ADD; break;
+      case XMLTOKEN_COPY: 
+	MIXMODE_EXCLUSIVE mixmode |= CS_FX_COPY; break;
+      case XMLTOKEN_MULTIPLY: 
+	MIXMODE_EXCLUSIVE mixmode |= CS_FX_MULTIPLY; break;
+      case XMLTOKEN_MULTIPLY2: 
+	MIXMODE_EXCLUSIVE mixmode |= CS_FX_MULTIPLY2; break;
+      case XMLTOKEN_ADD: 
+	MIXMODE_EXCLUSIVE mixmode |= CS_FX_ADD; break;
       case XMLTOKEN_ALPHA:
-        {
+        MIXMODE_EXCLUSIVE {
 	  mixmode &= ~CS_FX_MASK_ALPHA;
 	  float alpha = child->GetContentsValueAsFloat ();
 	  mixmode |= CS_FX_SETALPHA (alpha);
@@ -1603,6 +1623,8 @@ bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode)
     }
   }
   return true;
+
+#undef MIXMODE_EXCLUSIVE
 }
 
 bool csTextSyntaxService::ParseTextureMapping (
@@ -2276,10 +2298,27 @@ void csTextSyntaxService::ReportError (const char* msgid,
 {
   va_list arg;
   va_start (arg, msg);
-  csString errpath;
-  errpath.FormatV (msg, arg);
+  ReportV (msgid, CS_REPORTER_SEVERITY_ERROR, errornode, msg, arg);
+  va_end (arg);
+}
+
+void csTextSyntaxService::Report (const char* msgid, int severity, 
+	iDocumentNode* errornode, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  ReportV (msgid, severity, errornode, msg, arg);
+  va_end (arg);
+}
+
+void csTextSyntaxService::ReportV (const char* msgid, int severity, 
+	iDocumentNode* errornode, const char* msg, va_list arg)
+{
+  csString errmsg;
+  errmsg.FormatV (msg, arg);
   bool first = true;
 
+  csString nodepath;
   csRef<iDocumentNode> n (errornode);
   while (n)
   {
@@ -2287,41 +2326,42 @@ void csTextSyntaxService::ReportError (const char* msgid,
     const char* name = n->GetAttributeValue ("name");
     if (name || (v && *v))
     {
-      if (first) { errpath = "\n" + errpath; first = false; }
-      else errpath = "," + errpath;
+      if (first) { nodepath = nodepath; first = false; }
+      else nodepath = "," + nodepath;
       if (name)
       {
-        errpath = ")" + errpath;
-        errpath = name + errpath;
-        errpath = "(" + errpath;
+        nodepath = ")" + nodepath;
+        nodepath = name + nodepath;
+        nodepath = "(" + nodepath;
       }
       if (v && *v)
       {
-        errpath = v + errpath;
+        nodepath = v + nodepath;
       }
     }
     n = n->GetParent ();
   }
+  if (nodepath != "")
+    errmsg.Format ("%s\n[node: %s]", 
+      (const char*)errmsg,
+      (const char*)nodepath);
 
   if (reporter)
   {
-    reporter->Report (CS_REPORTER_SEVERITY_ERROR, msgid, "%s",
-    	(const char*)errpath);
+    reporter->Report (severity, msgid, "%s",
+    	(const char*)errmsg);
   }
   else
   {
-    char buf[2048];
-    sprintf (buf, "%s", (const char*)errpath);
     csPrintf ("Error ID: %s\n", msgid);
-    csPrintf ("Description: %s\n", buf);
+    csPrintf ("Description: %s\n", (const char*)errmsg);
   }
-
-  va_end (arg);
 }
 
 void csTextSyntaxService::ReportBadToken (iDocumentNode* badtokennode)
 {
-  ReportError ("crystalspace.syntax.badtoken",
+  Report ("crystalspace.syntax.badtoken",
+        CS_REPORTER_SEVERITY_WARNING,
   	badtokennode, "Unexpected token '%s'!",
 	badtokennode->GetValue ());
 }

@@ -152,6 +152,7 @@ public:
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name);
   virtual iMeshWrapper* FindMeshObject (const char* name);
   virtual csParser* GetParser ();
+  virtual iTextureWrapper* FindTexture (const char* name);
 };
 
 SCF_IMPLEMENT_IBASE(StdIsoLoaderContext);
@@ -192,6 +193,11 @@ iMeshWrapper* StdIsoLoaderContext::FindMeshObject (const char* /*name*/)
 csParser* StdIsoLoaderContext::GetParser ()
 {
   return parser;
+}
+
+iTextureWrapper* StdIsoLoaderContext::FindTexture (const char* name)
+{
+  return NULL;
 }
 
 //---------------------------------------------------------------------------

@@ -168,8 +168,12 @@ bool csReporterListener::Report (iReporter*, int severity,
   if (dest_console[severity] && console)
     console->PutText (msgbuf);
   if (dest_alert[severity] && nativewm)
+  {
+  if (show_msgid[severity])
+    sprintf (msgbuf, "%s:\n%s", msgID, description);
     nativewm->Alert (CS_ALERT_ERROR, "Fatal Error!",
     	"Ok", msgbuf);
+  }
   if (dest_debug[severity] && debug_file)
   {
     static FILE *f = NULL;

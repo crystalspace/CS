@@ -53,7 +53,7 @@ struct iDocumentNode;
 #define CSTEX_UV_SHIFT 8 
 /** @} */
 
-SCF_VERSION (iSyntaxService, 1, 1, 3);
+SCF_VERSION (iSyntaxService, 1, 1, 4);
 
 /**
  * This component provides services for other loaders to easily parse
@@ -293,6 +293,12 @@ struct iSyntaxService : public iBase
    * eventually call ReportError().
    */
   virtual void ReportBadToken (iDocumentNode* badtokennode) = 0;
+
+  /**
+   * Report something, also gives a path in the XML tree.
+   */
+  virtual void Report (const char* msgid, int severity, 
+    iDocumentNode* errornode, const char* msg, ...) = 0;
 };
 
 /** @} */

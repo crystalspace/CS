@@ -2597,6 +2597,7 @@ public:
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name);
   virtual iMeshWrapper* FindMeshObject (const char* name);
   virtual csParser* GetParser ();
+  virtual iTextureWrapper* FindTexture (const char* name);
 };
 
 SCF_IMPLEMENT_IBASE(EngineLoaderContext);
@@ -2638,6 +2639,11 @@ iMeshWrapper* EngineLoaderContext::FindMeshObject (const char* name)
 csParser* EngineLoaderContext::GetParser ()
 {
   return &parser;
+}
+
+iTextureWrapper* EngineLoaderContext::FindTexture (const char* name)
+{
+  return Engine->FindTexture (name, region);
 }
 
 //------------------------------------------------------------------------
