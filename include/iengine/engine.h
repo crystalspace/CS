@@ -171,7 +171,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 7, 0);
+SCF_VERSION (iEngine, 0, 7, 1);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -358,6 +358,9 @@ struct iEngine : public iBase
   /// Create a static/pseudo-dynamic light. name can be NULL.
   virtual iStatLight* CreateLight (const char* name, const csVector3& pos,
   	float radius, const csColor& color, bool pseudoDyn) = 0;
+  /// Find a static/pseudo-dynamic light by name.
+  virtual iStatLight* FindLight (const char *Name, bool RegionOnly = false)
+    const = 0;
   /// Create a dynamic light.
   virtual iDynLight* CreateDynLight (const csVector3& pos, float radius,
   	const csColor& color) = 0;
