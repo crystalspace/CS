@@ -185,7 +185,7 @@ void csShaderGLMTEX::BuildTokenHash()
   xmltokens.Register ("environment", XMLTOKEN_ENVIRONMENT);
 
   xmltokens.Register("integer", 100+iShaderVariable::INT);
-  xmltokens.Register("float", 100+iShaderVariable::VECTOR1);
+  xmltokens.Register("float", 100+iShaderVariable::FLOAT);
   xmltokens.Register("string", 100+iShaderVariable::STRING);
   xmltokens.Register("vector3", 100+iShaderVariable::VECTOR3);
 
@@ -497,6 +497,11 @@ csBasicVector csShaderGLMTEX::GetAllVariableNames()
     res.PushSmart( (void*)((iShaderVariable*)c.Next())->GetName());
   }
   return res;
+}
+
+csSymbolTable* csShaderGLMTEX::GetSymbolTable()
+{
+  return 0;
 }
 
 iShaderVariable* csShaderGLMTEX::GetVariable(int namehash)

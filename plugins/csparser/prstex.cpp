@@ -410,7 +410,8 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   csRef<iEffectDefinition> efdef ;
 #ifdef CS_USE_NEW_RENDERER
   csArray<csStringID> shadertypes;
-  csArray<iShader*> shaders;
+  //csArray<iShader*> shaders;
+  csArray<iShaderWrapper*> shaders;
 
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
     object_reg, "crystalspace.renderer.stringset", iStringSet);
@@ -570,7 +571,9 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
             break;
           }
           shadertypes.Push (strings->Request(shadertype));
-          shaders.Push (shader);
+          //shaders.Push (shader);
+	  csRef<iShaderWrapper> wrapper = shaderMgr->CreateWrapper (shader);
+	  shaders.Push (wrapper);
         }
         break;
 #endif //CS_USE_NEW_RENDERER
@@ -608,7 +611,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
     mat->QueryObject()->SetName (matname);
 #ifdef CS_USE_NEW_RENDERER
   for (int i=0; i<shaders.Length (); i++)
-    if (shaders[i]->Prepare ())
+    //if (shaders[i]->Prepare ())
       material->SetShader (shadertypes[i], shaders[i]);
 #endif // CS_USE_NEW_RENDERER
   // dereference material since mat already incremented it

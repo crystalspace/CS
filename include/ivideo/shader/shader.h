@@ -33,6 +33,7 @@ struct iString;
 struct iDataBuffer;
 struct iDocumentNode;
 class csSymbolTable;
+struct iMaterial;
 
 struct iShaderManager;
 struct iShaderRenderInterface;
@@ -164,7 +165,7 @@ struct iShaderVariable : iBase
   virtual const char* GetName() const = 0;
   virtual bool GetValue(int& value) const = 0;
   virtual bool GetValue(float& value) const = 0;
-  virtual bool GetValue(iString* value) const = 0;
+  virtual bool GetValue(iString*& value) const = 0;
   virtual bool GetValue(csVector3& value) const = 0;
   virtual bool GetValue(csVector4& value) const = 0;
   virtual bool SetValue(int value) = 0;
@@ -295,7 +296,7 @@ SCF_VERSION (iShaderProgram, 0,0,1);
 struct iShaderProgram : iBase
 {
   /// Get a programid for the current program
-  virtual csPtr<iString> GetProgramID() const = 0;
+  virtual csPtr<iString> GetProgramID() = 0;
 
   /// Sets this program to be the one used when rendering
   virtual void Activate(iShaderPass* current, csRenderMesh* mesh) = 0;
@@ -312,9 +313,9 @@ struct iShaderProgram : iBase
   /* Propertybag - get property, return false if no such property found
    * Which properties there is is implementation specific
    */
-  virtual bool GetProperty(const char* name, iString* string) const = 0;
-  virtual bool GetProperty(const char* name, int* string) const = 0;
-  virtual bool GetProperty(const char* name, csVector3* string) const = 0;
+  virtual bool GetProperty(const char* name, iString* string) = 0;
+  virtual bool GetProperty(const char* name, int* string) = 0;
+  virtual bool GetProperty(const char* name, csVector3* string) = 0;
 //  virtual bool GetProperty(const char* name, csVector4* string) const = 0;
 
   /* Propertybag - set property.
@@ -330,12 +331,12 @@ struct iShaderProgram : iBase
   /// Get variable
   virtual iShaderVariable* GetVariable(int namehash) = 0;
   /// Get all variable names added to this context (used when creating them)
-  virtual csBasicVector GetAllVariableNames() const = 0;
+  virtual csBasicVector GetAllVariableNames() = 0;
   /// Get the symbol table (used by the implementation to store the variables)
   virtual csSymbolTable* GetSymbolTable() = 0;
 
   /// Check if valid
-  virtual bool IsValid() const = 0;
+  virtual bool IsValid() = 0;
 
   /// Loads shaderprogram from buffer
   virtual bool Load(iDataBuffer* program) = 0;
@@ -351,7 +352,7 @@ struct iShaderProgram : iBase
 SCF_VERSION(iShaderProgramPlugin, 0,0,1);
 struct iShaderProgramPlugin : iBase
 {
-  virtual csPtr<iShaderProgram> CreateProgram(const char* type) const = 0;
+  virtual csPtr<iShaderProgram> CreateProgram(const char* type) = 0;
   virtual bool SupportType(const char* type) = 0;
   virtual void Open() = 0;
 };

@@ -141,7 +141,7 @@ public:
   SCF_DECLARE_IBASE;
 
   /// Retrieve the flags set for this texture
-  virtual int GetFlags () const;
+  virtual int GetFlags ();
 
   /// Enable key color
   virtual void SetKeyColor (bool Enable);
@@ -150,7 +150,7 @@ public:
   virtual void SetKeyColor (uint8 red, uint8 green, uint8 blue);
 
   /// Get the key color status (false if disabled, true if enabled).
-  virtual bool GetKeyColor () const;
+  virtual bool GetKeyColor ();
 
   /// Get the key color
   virtual void GetKeyColor (uint8 &red, uint8 &green, uint8 &blue);
@@ -239,7 +239,7 @@ public:
    * This depends both on whenever the original image had an alpha channel
    * and of the fact whenever the renderer supports alpha maps at all.
    */
-  virtual bool GetAlphaMap () const;
+  virtual bool GetAlphaMap ();
 
   /**
    * Merge this texture into current palette, compute mipmaps and so on.
@@ -314,7 +314,8 @@ public:
   /**
    * Get associated shader
    */
-  virtual iShader* GetShader (csStringID type) { return material->GetShader (type); }
+  virtual iShader* GetShader (csStringID type) 
+  { return material->GetShader (type)->GetShader(); }
 
   /**
    * Get a texture from the material.

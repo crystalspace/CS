@@ -149,7 +149,7 @@ void csGLTextureHandle::FreeImage ()
   images = 0;
 }
 
-int csGLTextureHandle::GetFlags () const
+int csGLTextureHandle::GetFlags ()
 {
   return flags;
 }
@@ -169,7 +169,7 @@ void csGLTextureHandle::SetKeyColor (uint8 red, uint8 green, uint8 blue)
   texupdate_needed = true;
 }
 
-bool csGLTextureHandle::GetKeyColor () const
+bool csGLTextureHandle::GetKeyColor ()
 {
   return(transp_color.alpha == 1);
 }
@@ -360,14 +360,14 @@ bool csGLTextureHandle::FindFormatType ()
   return true;
 }
 
-void csGLTextureHandle::GetKeyColor (uint8 &red, uint8 &green, uint8 &blue) const
+void csGLTextureHandle::GetKeyColor (uint8 &red, uint8 &green, uint8 &blue)
 {
   red = transp_color.red;
   green = transp_color.green;
   blue = transp_color.blue;
 }
 
-bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &mw, int &mh) const
+bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &mw, int &mh)
 {
   if(cachedata)
   {
@@ -390,16 +390,16 @@ bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &mw, int &mh) const
   return true; 
 }
 
-void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh) const
+void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh)
 {
   if(images.IsValid() && (*images)[0].IsValid())
   {
-    mw = (*images)[0]->GetWidth();
-    mh = (*images)[0]->GetHeight();
+    mw = (*images)[0]->GetWidth() << txtmgr->texture_downsample;
+    mh = (*images)[0]->GetHeight() << txtmgr->texture_downsample;
   }
 }
 
-bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &mw, int &mh, int &md) const
+bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &mw, int &mh, int &md)
 {
   if(cachedata)
   {
@@ -421,7 +421,7 @@ bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &mw, int &mh, int &
   return true; 
 }
 
-void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh, int &md) const
+void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh, int &md)
 {
   if(images.IsValid() && (*images)[0].IsValid())
   {
@@ -436,7 +436,7 @@ void csGLTextureHandle::SetTextureTarget(int target)
   this->target = target;
 }
 
-void csGLTextureHandle::GetMeanColor (uint8 &red, uint8 &green, uint8 &blue) const
+void csGLTextureHandle::GetMeanColor (uint8 &red, uint8 &green, uint8 &blue)
 {
   red = green = blue = 0;
 }
@@ -456,7 +456,7 @@ void *csGLTextureHandle::GetPrivateObject ()
   return (csGLTextureHandle *)this;
 }
 
-bool csGLTextureHandle::GetAlphaMap () const
+bool csGLTextureHandle::GetAlphaMap ()
 {
   return has_alpha;
 }
@@ -896,6 +896,8 @@ csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
   max_tex_size = R3D->GetMaxTextureSize ();
   read_config (config);
   Clear ();
+
+  glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
 }
 
 void csGLTextureManager::read_config (iConfigFile *config)
@@ -1064,7 +1066,7 @@ void csGLTextureManager::SetVerbose (bool vb)
   verbose = vb;
 }
 
-int csGLTextureManager::GetTextureFormat () const
+int csGLTextureManager::GetTextureFormat ()
 {
   return CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA;
 }

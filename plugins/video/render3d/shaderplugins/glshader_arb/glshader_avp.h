@@ -129,6 +129,7 @@ public:
   virtual iShaderVariable* GetVariable(int namehash);
   /// Get all variable stringnames added to this context (used when creatingthem)
   virtual csBasicVector GetAllVariableNames(); 
+  virtual csSymbolTable* GetSymbolTable();
 
   /// Check if valid
   virtual bool IsValid() { return validProgram;} 

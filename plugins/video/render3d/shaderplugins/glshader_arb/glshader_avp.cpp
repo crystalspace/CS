@@ -82,7 +82,7 @@ void csShaderGLAVP::SetupState (iShaderPass *current, csRenderMesh *mesh)
                                               (float)intval, (float)intval, (float)intval, (float)intval);
         }
         break;
-      case iShaderVariable::VECTOR1:
+      case iShaderVariable::FLOAT:
         {
           float fval;
           if(lvar->GetValue(fval))
@@ -175,7 +175,7 @@ void csShaderGLAVP::BuildTokenHash()
   xmltokens.Register("program", XMLTOKEN_PROGRAM);
 
   xmltokens.Register("integer", 100+iShaderVariable::INT);
-  xmltokens.Register("float", 100+iShaderVariable::VECTOR1);
+  xmltokens.Register("float", 100+iShaderVariable::FLOAT);
   xmltokens.Register("string", 100+iShaderVariable::STRING);
   xmltokens.Register("vector3", 100+iShaderVariable::VECTOR3);
 }
@@ -237,7 +237,7 @@ bool csShaderGLAVP::Load(iDocumentNode* program)
           case iShaderVariable::INT:
             var->SetValue( child->GetAttributeValueAsInt("default") );
             break;
-          case iShaderVariable::VECTOR1:
+          case iShaderVariable::FLOAT:
             var->SetValue( child->GetAttributeValueAsFloat("default") );
             break;
           case iShaderVariable::STRING:
@@ -298,6 +298,11 @@ csBasicVector csShaderGLAVP::GetAllVariableNames()
     res.PushSmart( (void*)((iShaderVariable*)c.Next())->GetName());
   }
   return res;
+}
+
+csSymbolTable* csShaderGLAVP::GetSymbolTable()
+{
+  return 0;
 }
 
 iShaderVariable* csShaderGLAVP::GetVariable(int namehash)

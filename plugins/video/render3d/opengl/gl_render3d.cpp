@@ -153,7 +153,7 @@ csGLRender3D::~csGLRender3D()
 ////////////////////////////////////////////////////////////////////
 
 
-void csGLRender3D::Report (int severity, const char* msg, ...) const
+void csGLRender3D::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
@@ -241,7 +241,7 @@ void csGLRender3D::SetZMode (csZBufMode mode)
   }
 }
 
-csZBufMode csGLRender3D::GetZModePass2 (csZBufMode mode) const
+csZBufMode csGLRender3D::GetZModePass2 (csZBufMode mode)
 {
   switch (mode)
   {

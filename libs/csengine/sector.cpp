@@ -429,11 +429,15 @@ void csRenderMeshList::PrepareFrame (iRenderView* rview)
   camtrans = &currentView->GetCamera ()->GetTransform ();
 }
 
-csRenderMeshList::csRenderMeshList(csSector* sector)
+csRenderMeshList::csRenderMeshList (csSector* sector)
 {
   SCF_CONSTRUCT_IBASE(0);
 
   csRenderMeshList::sector = sector;
+}
+
+csRenderMeshList::~csRenderMeshList ()
+{
 }
 
 int csRenderMeshList::GetCount ()
@@ -1512,7 +1516,7 @@ void csSector::DrawLight (iRenderView* rview, iLight* light, bool drawAfter)
   const csRefArray<iShaderWrapper> &shader_list = shmgr->GetShaders ();
   for (i = 0; i < shader_list.Length(); i ++) {
 	if (shader_sort.Get ((csHashKey)((iShaderWrapper*)shader_list[i])) == 0) { continue; }
-    iShaderTechnique *tech = shader_list[i]->GetBestTechnique ();
+    iShaderTechnique *tech = 0;// to have it compile // shader_list[i]->GetBestTechnique ();
 
     for (int p=0; p<tech->GetPassCount (); p++)
     {

@@ -25,6 +25,7 @@
 #include "ivideo/material.h"
 #include "iengine/material.h"
 #include "ivideo/texture.h"
+#include "ivideo/shader/shader.h"
 #include "iengine/texture.h"
 //#include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
@@ -274,7 +275,8 @@ public:
   /**
    * Get shader associated with a shader type
    */
-  virtual iShader *GetShader (csStringID type) { return material->GetShader(type); }
+  virtual iShader *GetShader (csStringID type) 
+  { return material->GetShader(type)->GetShader(); }
 
   /**
    * Get a texture from the material.
