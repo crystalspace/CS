@@ -14,6 +14,9 @@ The history order has been reversed so that new features are at the top.
 	- Made OpenGL DrawTriangleMesh a bit faster. It now does less
 	  copy of data.
 	- Spiral particle system now looks like a spiral a bit.
+	- Wouter Wijngaards made a speed improvement to radiosity (several
+	  factors faster now). It also works for bsp levels and has no more
+	  black borders. White borders on lightmaps are still there though.
 20-Apr-2000
 	- Andrew Zabolotny did another try to fix the Windows port
 	  by adding an assembly version of memcpy.
