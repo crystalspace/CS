@@ -3814,7 +3814,7 @@ bool csLoader::LoadWorldFile (csWorld* world, LanguageLayer* layer, const char* 
     return false;
   }
 
-  csIniFile* cfg = new csIniFile ("world.cfg");
+  CHK (csIniFile* cfg = new csIniFile ("world.cfg"));
   if (cfg)
   {
     csPolygon3D::def_mipmap_size = cfg->GetInt ("Lighting", "LIGHTMAP_SIZE",

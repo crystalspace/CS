@@ -473,7 +473,7 @@ public:
   /**
    * Add a halo to the world.
    */
-  void AddHalo (csHaloInformation* pinfo);
+  void AddHalo (csHaloInformation* iHalo);
 
   /**
    * Check if a light has a halo attached.

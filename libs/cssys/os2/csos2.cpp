@@ -39,10 +39,8 @@ IMPLEMENT_IBASE_END
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
   CONSTRUCT_IBASE (NULL)
-#ifdef DEBUG
-  /* Set main thread to idle priority - easier to debug if app loops */
-  DosSetPriority (PRTYS_THREAD, PRTYC_IDLETIME, PRTYD_MAXIMUM, 0L);
-#endif
+  // Lower the priority of the main thread
+  DosSetPriority (PRTYS_THREAD, PRTYC_REGULAR, PRTYD_MINIMUM, 0);
 }
 
 void SysSystemDriver::SetSystemDefaults (csIniFile *config)

@@ -33,7 +33,7 @@ csColliderPointerObject::csColliderPointerObject(csCollider* pCollider, bool Aut
 csColliderPointerObject::~csColliderPointerObject()
 {
   if (m_AutoDelete)
-    delete m_pCollider;
+    CHKB (delete m_pCollider);
 }
 
 csCollider* csColliderPointerObject::GetCollider(csObject& csobj)

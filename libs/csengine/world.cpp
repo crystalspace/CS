@@ -340,12 +340,13 @@ bool csWorld::HandleEvent (csEvent &Event)
 
 void csWorld::Clear ()
 {
-  sectors.DeleteAll ();
-  planes.DeleteAll ();
+  halos.DeleteAll ();
   collections.DeleteAll ();
+  sprites.DeleteAll ();
   sprite_templates.DeleteAll ();
   thing_templates.DeleteAll ();
-  sprites.DeleteAll ();
+  sectors.DeleteAll ();
+  planes.DeleteAll ();
 
   while (first_dyn_lights)
   {
@@ -894,11 +895,11 @@ void csWorld::DrawFunc (csCamera* c, csClipper* view,
   s->Draw (rview);
 }
 
-void csWorld::AddHalo (csHaloInformation* pinfo)
+void csWorld::AddHalo (csHaloInformation* iHalo)
 {
-  pinfo->pLight->AddReference ();
-  pinfo->pLight->SetHaloInQueue (true);
-  halos.Push(pinfo);
+  iHalo->pLight->AddReference ();
+  iHalo->pLight->SetHaloInQueue (true);
+  halos.Push(iHalo);
 }
 
 bool csWorld::HasHalo (csLight* pLight)

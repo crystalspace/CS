@@ -71,10 +71,8 @@ csArchive::csArchive (const char *filename)
 
 csArchive::~csArchive ()
 {
-  if (filename)
-    CHKB (delete [] filename);
-  if (comment)
-    CHKB (delete [] comment);
+  CHK (delete [] filename);
+  CHK (delete [] comment);
   if (file)
     fclose (file);
 }
@@ -305,7 +303,7 @@ char *csArchive::ReadEntry (FILE *infile, ArchiveEntry * f)
       || (!ReadLFH (lfh, infile))
       || (fseek (infile, lfh.filename_length + lfh.extra_field_length, SEEK_CUR)))
   {
-    CHK (delete[] out_buff);
+    CHK (delete [] out_buff);
     return NULL;
   }
   switch (f->info.compression_method)
@@ -314,7 +312,7 @@ char *csArchive::ReadEntry (FILE *infile, ArchiveEntry * f)
       {
         if (fread (out_buff, 1, f->info.csize, infile) < f->info.csize)
         {
-          CHK (delete[] out_buff);
+          CHK (delete [] out_buff);
           return NULL;
         } /* endif */
         break;
@@ -333,7 +331,7 @@ char *csArchive::ReadEntry (FILE *infile, ArchiveEntry * f)
         err = inflateInit2 (&zs, -DEF_WBITS);
         if (err != Z_OK)
         {
-          CHK (delete[] out_buff);
+          CHK (delete [] out_buff);
           return NULL;
         }
         while (bytes_left)
@@ -358,7 +356,7 @@ char *csArchive::ReadEntry (FILE *infile, ArchiveEntry * f)
         if ((err != Z_STREAM_END)
          && ((err != Z_BUF_ERROR) || bytes_left || zs.avail_out))
         {
-          //CHK (delete[] out_buff);
+          //CHK (delete [] out_buff);
           //return NULL;
         }
         break;
@@ -366,7 +364,7 @@ char *csArchive::ReadEntry (FILE *infile, ArchiveEntry * f)
     default:
       {
         /* Can't handle this compression algorythm */
-        CHK (delete[] out_buff);
+        CHK (delete [] out_buff);
         return NULL;
       }
   } /* endswitch */
@@ -390,9 +388,7 @@ void *csArchive::NewFile (const char *name, size_t size, bool pack)
     cdfh.compression_method = ZIP_STORE;
   cdfh.ucsize = size;
 
-  ArchiveEntry *f;
-
-  CHKB (f = new ArchiveEntry (name, cdfh));
+  CHK (ArchiveEntry *f = new ArchiveEntry (name, cdfh));
 
   time_t curtime = time (NULL);
   struct tm *curtm = localtime (&curtime);
@@ -475,7 +471,7 @@ bool csArchive::WriteZipArchive ()
       CHK (char *this_name = new char[lfh.filename_length + 1]);
       if (fread (this_name, 1, lfh.filename_length, file) < lfh.filename_length)
       {
-        CHK (delete[] this_name);
+        CHK (delete [] this_name);
         goto temp_failed;
       }
       this_name[lfh.filename_length] = 0;
@@ -485,14 +481,14 @@ bool csArchive::WriteZipArchive ()
     skip_file:
         bytes_to_skip = lfh.extra_field_length + lfh.csize;
         bytes_to_copy = 0;
-        CHK (delete[] this_name);
+        CHK (delete [] this_name);
       }
       else
       {
         this_file = (ArchiveEntry *) FindName (this_name);
         if (this_file)
         {
-          CHK (delete[] this_name);
+          CHK (delete [] this_name);
           if (this_file->info.csize != lfh.csize)
             goto temp_failed;   /* Broken archive */
           this_file->ReadExtraField (file, lfh.extra_field_length);
@@ -793,18 +789,14 @@ csArchive::ArchiveEntry::ArchiveEntry (const char *name,
 csArchive::ArchiveEntry::~ArchiveEntry ()
 {
   FreeBuffer ();
-  if (comment)
-    CHKB (delete [] comment);
-  if (extrafield)
-    CHKB (delete [] extrafield);
-  if (filename)
-    CHKB (delete [] filename);
+  CHK (delete [] comment);
+  CHK (delete [] extrafield);
+  CHK (delete [] filename);
 }
 
 void csArchive::ArchiveEntry::FreeBuffer ()
 {
-  if (buffer)
-    CHKB (delete[] buffer);
+  CHK (delete [] buffer);
   buffer = NULL;
   buffer_pos = 0;
 }
@@ -904,7 +896,7 @@ bool csArchive::ArchiveEntry::ReadExtraField (FILE *infile, size_t extra_field_l
 {
   if (extrafield && (info.extra_field_length != extra_field_length))
   {
-    CHK (delete[] extrafield);
+    CHK (delete [] extrafield);
     extrafield = NULL;
   }
   info.extra_field_length = extra_field_length;
@@ -921,7 +913,7 @@ bool csArchive::ArchiveEntry::ReadFileComment (FILE *infile, size_t file_comment
 {
   if (comment && (info.file_comment_length != file_comment_length))
   {
-    CHK (delete[] comment);
+    CHK (delete [] comment);
     comment = NULL;
   }
   info.file_comment_length = file_comment_length;

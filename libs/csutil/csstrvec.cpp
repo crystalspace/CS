@@ -23,8 +23,7 @@
 
 bool csStrVector::FreeItem (csSome Item)
 {
-  if (Item)
-    delete[] (char *) Item;
+  CHKB (delete [] (char *) Item);
   return true;
 }
 

@@ -169,7 +169,7 @@ static MRESULT EXPENTRY PMmanager (HWND Handle, ULONG Message, MPARAM MsgParm1, 
 
 static void PMthread (void *)
 {
-  DosSetPriority (PRTYS_THREAD, PRTYC_TIMECRITICAL, 0, 0);
+  DosSetPriority (PRTYS_THREAD, PRTYC_REGULAR, PRTYD_MAXIMUM, 0);
   CHK (dA = new diveApp ());
   if (dA)
   {

@@ -22,8 +22,7 @@
 
 bool csObjVector::FreeItem (csSome Item)
 {
-  if (Item)
-    delete (csBase *) Item;
+  CHKB (delete (csBase *) Item);
   return true;
 }
 

@@ -41,7 +41,7 @@ csPolygon2DFactory* csPolygon2DFactory::SharedFactory()
 {
   static csPolygon2DFactory* p = 0;
   if (p == 0)
-    CHK (p = new csPolygon2DFactory);
+    CHKB (p = new csPolygon2DFactory);
   return p;
 }
 

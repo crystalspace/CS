@@ -150,7 +150,7 @@ public:
   scfClassRegistry () : csVector (16, 16) {}
   virtual ~scfClassRegistry () { DeleteAll (); }
   virtual bool FreeItem (csSome Item)
-  { if (Item) CHKB (delete (scfFactory *)Item); return true; }
+  { CHKB (delete (scfFactory *)Item); return true; }
   virtual int CompareKey (csSome Item, csConstSome Key, int) const
   { return strcmp (((scfFactory *)Item)->ClassID, (char *)Key); }
   virtual int Compare (csSome Item1, csSome Item2, int) const

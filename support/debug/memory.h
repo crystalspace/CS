@@ -28,28 +28,12 @@
 
 #include <stdio.h>
 
-extern volatile char MemFile[];
-extern volatile int MemLine;
-
-#define CHK(x) strcpy ((char *)MemFile, __FILE__); MemLine = __LINE__; x; MemLine = -1
+#define CHK(x) PushLoc (__FILE__, __LINE__); x; PopLoc ()
 #define CHKB(x) { CHK(x); }
 
-void* operator new (size_t);
-void operator delete (void*);
-void dump_mem_list ();
-
-// 'MemEntry' is a system structure on the Amiga, thus the name change.
-struct MemEntryA
-{
-  MemEntryA* next, * prev;
-  void* p;
-  size_t size;
-  char* file;
-  int line;
-  bool freed;	// If this is a block that is already free.
-  char* free_file;
-  int free_line;
-};
+extern void PushLoc (char *iFileName, int iLineNo);
+extern void PopLoc ();
+extern void dump_mem_list ();
 
 #else /*MEM_CHECK*/
 
@@ -59,4 +43,3 @@ struct MemEntryA
 #endif /*MEM_CHECK*/
 
 #endif /*MEMORY_H*/
-
