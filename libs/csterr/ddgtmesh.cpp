@@ -272,12 +272,12 @@ bool ddgTBinMesh::init( double *worldToCameraMatrix, ddgBBox *camClipBox, float 
 		for (j = 0; j < _nc; j++)
 		{
 			_bintree[2*(i*_nc+j)]->pNeighbourDiag( _bintree[2*(i*_nc+j)+1]);
-			_bintree[2*(i*_nc+j)]->pNeighbourLeft( (j==0)? NULL: _bintree[2*(i*_nc+j-1)+1]);
-			_bintree[2*(i*_nc+j)]->pNeighbourTop( (i==0)? NULL: _bintree[2*((i-1)*_nc+j)+1]);
+			_bintree[2*(i*_nc+j)]->pNeighbourLeft( (j==0)? 0: _bintree[2*(i*_nc+j-1)+1]);
+			_bintree[2*(i*_nc+j)]->pNeighbourTop( (i==0)? 0: _bintree[2*((i-1)*_nc+j)+1]);
 			//
 			_bintree[2*(i*_nc+j)+1]->pNeighbourDiag( _bintree[2*(i*_nc+j)]);
-			_bintree[2*(i*_nc+j)+1]->pNeighbourLeft( (j+1==_nc)? NULL: _bintree[2*(i*_nc+j+1)]);
-			_bintree[2*(i*_nc+j)+1]->pNeighbourTop( (i+1==_nr)? NULL: _bintree[2*((i+1)*_nc+j)]);
+			_bintree[2*(i*_nc+j)+1]->pNeighbourLeft( (j+1==_nc)? 0: _bintree[2*(i*_nc+j+1)]);
+			_bintree[2*(i*_nc+j)+1]->pNeighbourTop( (i+1==_nr)? 0: _bintree[2*((i+1)*_nc+j)]);
 		}
 	}
 	i = 0;
@@ -366,7 +366,7 @@ void ddgTBinMesh::initBrothers( void )
                 stri[klk+t].brother = stri[lk+t].brother + lk + b;
             }
     	    // Check Edge cases
-			else if (b = edge(kt))
+			else if ((b = edge(kt)) != 0)
 			{
 				if (b==3) // Diagonal.
 				{
@@ -674,8 +674,8 @@ unsigned int ddgTBinMesh::balanceQueue(void)
 void ddgTBinMesh::pos(float *x, float *z, ddgTBinTree **bt, unsigned int *r, unsigned int *c)
 {
     // Find the global(mesh) column and row of this coordinate.
-	unsigned int gr = x < 0 ? 0 : (unsigned int)(*x/ddgTBinMesh_size);
-	unsigned int gc = z < 0 ? 0 : (unsigned int)(*z/ddgTBinMesh_size);
+	unsigned int gr = *x < 0 ? 0 : (unsigned int)(*x/ddgTBinMesh_size);
+	unsigned int gc = *z < 0 ? 0 : (unsigned int)(*z/ddgTBinMesh_size);
 	if (gr >= _nr) gr = _nr-1;
 	if (gc >= _nc) gc = _nc-1;
     // Find the offset in the tree and row and column within the tree.
