@@ -79,5 +79,8 @@ endif
 ifeq ($(DO_MMX),yes)
   MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_MMX$">>volatile.tmp
 endif
+ifeq ($(NEED_FAKE_BOOL),yes)
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define NO_BOOL_TYPE$">>volatile.tmp
+endif
 
 endif # ifeq ($(ROOTCONFIG),volatile)
