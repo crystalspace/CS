@@ -30,6 +30,7 @@
 #include "igraphic/imageio.h"
 #include "imesh/terrfunc.h"
 #include "imesh/object.h"
+#include "iengine/material.h"
 #include "iengine/mesh.h"
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
