@@ -29,9 +29,14 @@
 #include "csgfx/shaderexp.h"
 #include "csgfx/shadervar.h"
 
+/**\addtogroup gfx
+ * @{ 
+ */
+ 
 class CS_CRYSTALSPACE_EXPORT csShaderExpressionAccessor : 
   public iShaderVariableAccessor
 {
+private:
   csShaderExpression* expression;
 public:
   SCF_DECLARE_IBASE;
@@ -41,11 +46,6 @@ public:
 
   virtual void PreGetValue (csShaderVariable *variable);
 };
-
-/**\addtogroup gfx
- * @{ 
- */
- 
  
 /** @} */
 
