@@ -4356,11 +4356,14 @@ while (@lines) {
     {
      my @args = split (/\s*,\s*/, $1);
      my $base = $args[0];
-     my $image = 
-       LocateIncludeFile("$base.png") || 
-       LocateIncludeFile("$base.jpg") ||
-       LocateIncludeFile("$base.gif");
-     warn "$ERROR no image file for $base: $_" unless ($image && -e $image);
+     
+#### Matze modification
+     my $image = 	
+       LocateImageFile("$base.png") || 
+       LocateImageFile("$base.jpg") ||
+       LocateImageFile("$base.gif");
+     warn "$ERROR no image file for $base: $_" unless ($image);
+### end of Matze modification
      "<IMG SRC=\"$image\" ALT=\"$base\">";
      ($T2H_CENTER_IMAGE ?
       "<CENTER><IMG SRC=\"$image\" ALT=\"$base\"></CENTER>" :
@@ -4920,6 +4923,21 @@ sub LocateIncludeFile
   }
   return undef;
 }
+
+#### Matze's modification: Use the image paths as given in the texinfo file
+sub LocateImageFile
+{
+  my $file = shift;
+  my $dir;
+
+  return $file if (-e $file && -r $file);
+  foreach $dir (@T2H_INCLUDE_DIRS)
+  {
+    return "$file" if (-e "$dir/$file" && -r "$dir/$file");
+  }
+  return undef;
+}
+#### end of Matze's modification
 
 sub clean_name 
 {

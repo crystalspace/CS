@@ -2,28 +2,123 @@
 # Rules for creating Documentation
 #============================================================================
 
-# XXX: this should be detected by configure
-TEXI2HTML = $(PERL) $(TOP)/docs/support/texi2html ;
-DOXYGEN = doxygen ;
-
-##  Texi2DVI targetname : texifile : dvifile [ : subdir ]
-##    Creates dvofoöe out of the texifile
-rule Texi2DVI
+if $(PERL)
 {
-  SEARCH on $(>) = $(SUBDIR) ;
-
-  local _dir = [ FDirName $(LOCATE.DOCS) $(SUBDIR) $(4) ] ;
-  LOCATE on $(3) = $(_dir) ;
-  Depends $(<) : $(_dir) ;
-  MkDir $(_dir) ;
-
-  TEXIFLAGS on $(>) += -I $(SUBDIR) ;
-  Depends $(<) : $(3) ;
-  Depends $(3) : $(>) ;
-  RunTexi2DVI $(3) : $(>) ;
+  CMD.RUNTEXI2HTML ?= "$(SHELL) $(TOP)/docs/support/runtexi2html.sh" ;
+  CMD.TEXI2HTML ?= "$(PERL) $(TOP)/docs/support/texi2html" ;
 }
 
-##  Texi2HTML targetname : texifile : subdir
+if $(CMD.MAKEINFO)
+{
+
+CMD.RUNMAKEINFO ?= "$(SHELL) $(TOP)/docs/support/runmakeinfo.sh" ;
+
+##  Texinfo targetname : texinfofile : output format [ : subdir ]
+##    Convert texinfo into another format
+rule Texinfo
+{
+  local dir = [ FDirName $(LOCATE.DOCS) $(SUBDIR_TOKENS) $(4) ] ;
+  
+  MkDir $(dir) ;
+  Depends $(<) : $(dir) ;
+  
+  DIR on $(<) = $(dir) ;
+  FORMAT on $(<) = $(3) ;
+  
+  Depends $(<) : $(>) ;
+  RunMakeInfo $(<) : $(>) ;
+  NotFile $(<) ;
+  Always $(<) ;
+}
+}
+
+if $(CMD.TEXI2DVI)
+{
+
+CMD.RUNTEXI2DVI ?= "$(SHELL) $(TOP)/docs/support/runtexi2dvi.sh" ;
+
+##  Texi2DVI targetname : texifile [ : subdir ]
+##    Creates dvi out of the texifile
+rule Texi2DVI
+{
+  local dir = [ FDirName $(LOCATE.DOCS) $(SUBDIR_TOKENS) $(3) ] ;
+  local target = $(>:R=$(dir):S=.dvi) ;
+
+  Depends $(<) : $(target) ;
+
+  MkDir $(dir) ;
+  Depends $(target) : $(dir) ;
+
+  FLAGS.TEXI2DVI on $(target) += -I $(SUBDIR) ;
+  SEARCH on $(>) = $(SUBDIR) ;
+  Depends $(target) : $(>) ;
+  RunTexi2DVI $(target) : $(>) ;
+  NotFile $(target) ;
+  Always $(target) ;
+}
+
+if $(CMD.DVIPS)
+{
+
+##  Texi2DVI targetname : texifile [ : subdir ]
+##    Creates ps out of the texifile              
+rule Texi2PS
+{
+    local dir = [ FDirName $(LOCATE.DOCS) $(SUBDIR_TOKENS) $(3) ] ;
+    local dvitarget = $(>:R=$(dir):S=.dvi) ;
+    local target = $(>:R=$(dir):S=.ps) ;
+    
+    Depends $(<) : $(target) ;
+    Depends $(target) : $(dvitarget) ;
+    
+    MkDir $(dir) ;
+    Depends $(dvitarget) : $(dir) ;
+
+    FLAGS.TEXI2DVI on $(target) += -I $(SUBDIR) ;
+    DIR on $(target) = $(dir) ;
+    SEARCH on $(>) = $(SUBDIR) ;
+    Depends $(dvitarget) : $(>) ;
+    RunTexi2DVI $(dvitarget) : $(>) ;
+    RunDviPs $(target) : $(dvitarget) ;
+    NotFile $(target) $(dvitarget) ;
+    Always $(target) $(dvitarget) ;
+}
+
+}
+
+if $(CMD.DVIPDF)
+{
+
+rule Texi2PDF
+{
+    local dir = [ FDirName $(LOCATE.DOCS) $(SUBDIR_TOKENS) $(3) ] ;
+    local dvitarget = $(>:R=$(dir):S=.dvi) ;
+    local target = $(>:R=$(dir):S=.pdf) ;
+    
+    Depends $(<) : $(target) ;
+    Depends $(target) : $(dvitarget) ;
+    
+    MkDir $(dir) ;
+    Depends $(dvitarget) : $(dir) ;
+
+    FLAGS.TEXI2DVI on $(target) += -I $(SUBDIR) ;
+    DIR on $(target) = $(dir) ;
+    SEARCH on $(>) = $(SUBDIR) ;
+    Depends $(dvitarget) : $(>) ;
+    RunTexi2DVI $(dvitarget) : $(>) ;
+    RunDviPdf $(target) : $(dvitarget) ;
+    NotFile $(target) $(dvitarget) ;
+    Always $(target) $(dvitarget) ;
+}
+
+}
+
+} # if $(CMD.TEXI2DVI)
+
+if $(CMD.TEXI2HTML)
+{
+
+##  Texi2HTML targetname : texifile [ : subdir ]
 ##    Generate html documentation from texinfo files. Flags can be specified
 ##    with the TEXIFLAGS variable.
 rule Texi2HTML
@@ -31,20 +126,48 @@ rule Texi2HTML
   SEARCH on $(>) = $(SUBDIR) ;
 
   # Create Output directory
-  local _dir = [ FDirName $(LOCATE.DOCS) $(SUBDIR) $(3) ] ;
-  DOCDIR_$(<) = $(_dir) ;
-  Depends $(<) : $(_dir) ;
-  MkDir $(_dir) ;
+  local dir = [ FDirName $(LOCATE.DOCS) $(SUBDIR_TOKENS) $(3) ] ;
+  DOCDIR_$(<) = $(dir) ;
+  Depends $(<) : $(dir) ;
+  MkDir $(dir) ;
 
-  TEXIFLAGS on $(<) += -subdir=$(_dir) ;
+  OUTDIR on $(<) = $(dir) ;
   NotFile $(<) ;
   Always $(<) ;
   Depends $(<) : $(>) ;
   RunTexi2HTML $(<) : $(>) ;
 }
 
-##  DoxyGen targetname : doxyprofile : subdir : additional files
-##    Run doxygen from TOP build dir to extract comments from headers and
+}
+
+if $(CMD.TEXI2PDF)
+{
+
+##  Texi2DVI targetname : texifile [ : subdir ]
+##    Creates pdf out of the texifile
+rule Texi2PDF
+{
+  local dir = [ FDirName $(LOCATE.DOCS) $(SUBDIR_TOKENS) $(3) ] ;    
+  local target = $(>:R=$(dir):S=.pdf) ;
+
+  Depends $(<) : $(target) ;
+
+  MkDir $(dir) ;
+  Depends $(target) : $(dir) ;
+
+  FLAGS.TEXI2PDF on $(target) += -I $(SUBDIR) ;
+  SEARCH on $(>) = $(SUBDIR) ;
+  Depends $(target) : $(>) ;
+  RunTexi2PDF $(target) : $(>) ;
+}                                                             
+
+}
+
+if $(CMD.DOXYGEN)
+{
+
+##  DoxyGen targetname : doxyprofile [ : subdir : additional files ]
+##    Run doxygen from TOP source dir to extract comments from headers and
 ##    build an API documentation. Flags can be passed through the DOXYFLAGS
 ##    variable.
 rule DoxyGen
@@ -52,42 +175,70 @@ rule DoxyGen
   SEARCH on $(>) = $(SUBDIR) ;
 
   # Create Output directory
-  local _dir = [ FDirName $(LOCATE.DOCS) $(SUBDIR) $(3) ] ;
-  DOCDIR_$(<) = $(_dir) ; 
-  Depends $(<) : $(_dir) ;
-  MkDir $(_dir) ;
+  local dir = [ FDirName $(LOCATE.DOCS) $(SUBDIR_TOKENS) $(3) ] ;
+  DOCDIR_$(<) = $(dir) ; 
+  Depends $(<) : $(dir) ;
+  MkDir $(dir) ;
 
   NotFile $(<) ;
   Always $(<) ;
   Depends $(<) : $(>) ;
-  RunDoxyGen $(<) : $(>) : $(_dir) ;
+  RunDoxyGen $(<) : $(>) : $(dir) ;
 
-  local _i ;
-  for _i in $(4)
+  # copy over additional files
+  local i ;
+  for i in $(4)
   {
-    LOCATE on $(_i:G=copy) = $(SUBDIR) ;
-    Copy $(_i:G=copy) : $(_dir) ;
-    Always $(_i:G=copy) ;
-    Depends $(<) : $(_i:G=copy) ;
+    LOCATE on $(i:G=copy) = $(SUBDIR) ;
+    Copy $(i:G=copy) : $(dir) ;
+    Always $(i:G=copy) ;
+    Depends $(<) : $(i:G=copy) ;
   }
 }
 
+}
+
 #----------------------------------------------------------------------------
+# private part
  
 actions RunTexi2HTML
 {
-  $(TEXI2HTML) $(TEXIFLAGS) $(>)
+  $(CMD.RUNTEXI2HTML) "$(CMD.TEXI2HTML)" "$(CMD.MKDIRS)" "$(>)" "$(OUTDIR)" "$(FLAGS.TEXI2HTML)"
 }
 
 actions RunTexi2DVI
 {
-  $(TEXI2DVI) $(TEXI2DVIFLAGS) --batch --quiet $(>)
-  mv $(>:S=.dvi) $(<)
+  $(CMD.RUNTEXI2DVI) "$(CMD.TEXI2DVI)" "$(CMD.MKDIRS)" "$(<)" "$(>)" "$(FLAGS.TEXI2DVI)"
+}
+
+actions RunTexi2PDF
+{
+  $(CMD.TEXI2PDF) $(FLAGS.TEXI2PDF) --batch --quiet -o $(<) $(>)
+}
+
+actions RunDviPs
+{
+  cd $(DIR) && $(CMD.DVIPS) $(FLAGS.DVIPS) -q -o $(<:BS) $(>:BS)
+}
+
+actions RunDviPdf
+{
+  cd $(DIR) && $(CMD.DVIPDF) $(FLAGS.DVI2PDF) $(>:BS) $(<:BS)
+}
+
+actions RunMakeInfo
+{
+  $(CMD.RUNMAKEINFO) "$(CMD.MAKEINFO)" "$(CMD.MKDIRS)" "$(DIR)"  "$(>)" "$(FORMAT)" "$(FLAGS.MAKEINFO)"
 }
 
 actions RunDoxyGen
 {
-  $(DOXYGEN) $(>)
+  TOP=$(TOP) $(CMD.DOXYGEN) $(>)
+}
+
+actions CopyImages
+{
+  find $(>) -name "$(WILDCARD)" -exec "cp" "{}" "$(<)" ';'
 }
 
 actions Copy

@@ -198,8 +198,14 @@ AS_IF([test -n "$DOXYGEN"], [CS_BUILD_PROPERTY([CMD.DOXYGEN], [$DOXYGEN])])
 AC_CHECK_PROGS([TEXI2DVI], [texi2dvi])
 AS_IF([test -n "$TEXI2DVI"], [CS_BUILD_PROPERTY([CMD.TEXI2DVI], [$TEXI2DVI])])
 
-AC_CHECK_PROGS([TEXI2PDF], [texi2pdf])
-AS_IF([test -n "$TEXI2PDF"], [CS_BUILD_PROPERTY([CMD.TEXI2PDF], [$TEXI2PDF])])
+AC_CHECK_PROGS([DVIPS], [dvips])
+AS_IF([test -n "$DVIPS"], [CS_BUILD_PROPERTY([CMD.DVIPS], [$DVIPS])])
+
+AC_CHECK_PROGS([DVIPDF], [dvipdf])
+AS_IF([test -n "$DVIPDF"], [CS_BUILD_PROPERTY([CMD.DVIPDF], [$DVIPDF])])
+
+AC_CHECK_PROGS([MAKEINFO], [makeinfo])
+AS_IF([test -n "$MAKEINFO"], [CS_BUILD_PROPERTY([CMD.MAKEINFO], [$MAKEINFO])])
 
 AC_CHECK_PROGS([INSTALL], [install])
 AS_IF([test -n "$INSTALL"], [CS_BUILD_PROPERTY([CMD.INSTALL], [$INSTALL])])
@@ -217,8 +223,6 @@ AS_IF([test -n "$LUASWIGBIN"],
 AC_CHECK_PROGS([MAKE], [gnumake gmake make])
 AC_CHECK_PROGS([JAM], [jam])
 AC_PROG_MAKE_SET
-
-
 
 #------------------------------------------------------------------------------
 # Determine how to make a directory tree.  We need to know the exact commands,
@@ -1780,13 +1784,17 @@ CS_JAMCONFIG_PROPERTY([CONFIGURE_INVOCATION], [$0 $ac_configure_args])
 # Output generated files.
 #------------------------------------------------------------------------------
 CS_HEADER_OUTPUT([include/volatile.h])
-CS_MAKEFILE_OUTPUT([config.mak])
 CS_JAMCONFIG_OUTPUT([Jamconfig])
-AC_CONFIG_FILES([Makefile Jamfile])
+AC_CONFIG_FILES([Jamfile Makefile]) #XXX: seems we can't put AC_CONFIG_FILES
+				    # in a conditional
 
-# Queue makefile cache creation if caching enabled.
-AS_IF([test $enable_makefile_cache = yes],
-    [AC_CONFIG_COMMANDS([cache.mak],
-	[rm -f cache.mak ; ${MAKE} recache], [MAKE=${MAKE-make}])])
+# only output makefile stuff when building inside source directory
+AS_IF([test -e "$ac_top_builddir""configure"],[
+      CS_MAKEFILE_OUTPUT([config.mak])
+      # Queue makefile cache creation if caching enabled.
+      AS_IF([test $enable_makefile_cache = yes],
+	[AC_CONFIG_COMMANDS([cache.mak],
+	    [rm -f cache.mak ; ${MAKE} recache], [MAKE=${MAKE-make}])])
+    ])
 
 AC_OUTPUT

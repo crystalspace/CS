@@ -5,7 +5,6 @@
 if $(MSVCGEN_CONFIG)
 {
 
-SHELL = /bin/sh ;
 MSVCGEN = "$(PERL) $(TOP)/mk/msvcgen/msvcgen.pl" ;
 MKVERRES = "$(SHELL) $(TOP)/libs/cssys/win32/mkverres.sh" ;
 MERGERES = "$(SHELL) $(TOP)/libs/cssys/win32/mergeres.sh" ;

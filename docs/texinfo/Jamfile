@@ -1,15 +1,35 @@
 SubDir TOP docs texinfo ;
 
-if $(PERL)
+if $(CMD.TEXI2HTML)
 {
-  TEXIFLAGS on htmldocs += -init_file=$(TOP)/docs/support/texi2html.init -prefix=cs ;
+  FLAGS.TEXI2HTML on htmldocs += -init_file=$(TOP)/docs/support/texi2html.init -prefix=cs ;
   Texi2HTML htmldocs : cs-unix.txi : html ;
+  Help htmldocs : "user manual in html format" ;
 
   InstallDocDir htmldocs ;
 }
 
-if $(TEXI2DVI)
+if $(CMD.TEXI2DVI)
 {
-  Texi2DVI dvidocs : cs-unix.txi ;
+  Texi2DVI dvidocs : cs-unix.txi : dvi ;
+  Help dvidocs : "user manual in dvi format" ;
 }
 
+if $(CMD.DVIPS)
+{
+  Texi2PS psdocs : cs-unix.txi : ps ;
+  Help psdocs : "user manual in ps format" ;
+}
+
+if $(CMD.MAKEINFO)
+{
+  Texinfo infodocs : cs-unix.txi : info : info ;
+  FLAGS.MAKEINFO on infodocs += --output=crystal.info ;
+  Help infodocs : "user manual in info format" ;
+}
+  
+if $(CMD.DVIPDF)
+{
+  Texi2PDF pdfdocs : cs-unix.txi : pdf ;
+  Help pdfdocs : "user manual in pdf format" ;
+}

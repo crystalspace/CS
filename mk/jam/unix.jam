@@ -8,6 +8,8 @@ if $(PTHREAD.AVAILABLE) = "yes"
   CCFLAGS += $(PTHREAD.CFLAGS) ;
 }
 
+SHELL ?= "/bin/sh" ;
+
 # only use nasm on x86 for now...
 NASM.FLAGS += -f elf ;
 SUFPLUGIN ?= .so ;

@@ -18,6 +18,8 @@ actions Archive
   $(CMD.AR) $(<) $(>)
 }
 
+SHELL ?= "/bin/sh" ;
+
 APPLICATION.LFLAGS += -framework AppKit -framework Foundation ;
 APPLICATION.CONSOLE.LFLAGS += -framework AppKit -framework Foundation ;
 PLUGIN.LFLAGS += -bundle -framework AppKit -framework Foundation ;

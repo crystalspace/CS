@@ -68,8 +68,9 @@ rule PluginFromObjects
     NotFile $(<) ;
   }
 
-  Depends $(target) : $(>) ;
   Depends plugins : $(target) ;   
+  Depends $(target) : $(>) ;
+
   MakeLocate $(target) : $(LOCATE.TARGETS) ;
 
   # Install rules

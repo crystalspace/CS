@@ -2,6 +2,9 @@
 # Jam configuration and actions for Win32
 #============================================================================
 SUFPLUGIN ?= .dll ;
+
+SHELL ?= "/bin/sh" ;
+
 NASM.FLAGS += -f win32 -DEXTERNC_UNDERSCORE ;
 CCFLAGS += -pipe -I/usr/include/directx ;
 C++FLAGS += -pipe -I/usr/include/directx ;
