@@ -349,25 +349,27 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
     for (int j = 0; j < vcount-1; j ++) {
       int ind1 = polygon_list[i].vertices[j];
       int ind2 = polygon_list[i].vertices[j+1];
-      csPlane3 edgeplane(vertex_table[ind1] / mesht,
-        vertex_table[ind2] / mesht,
-        vertex_table[ind2] / mesht - plane.Normal());
+      csVector3 v1 = vertex_table[ind1] / mesht;
+      csVector3 v2 = vertex_table[ind2] / mesht;
+      csPlane3 edgeplane(v1, v2, v2 - plane.Normal());
       edgeplane.Normalize();	
       if (edgeplane.Classify (center) < 0) {
-        csVector3 line = vertex_table[ind2] - vertex_table[ind1];
+        csVector3 line = v2 - v1;
+	float linelen = line.SquaredNorm();
         line.Normalize();
         float proj = center * line;
         /* if the point projects on this edge, but outside the poly test 
          * for depth to this edge (especially important on sharp corners)
          */
-        if ((proj > (vertex_table[ind1] * line)) &&
-            (proj < (vertex_table[ind2] * line))) {
-          csVector3 projpt = vertex_table[ind1] + line * proj;
+        if ((proj >= (v1 * line)) && (proj <= (v2 * line))) {
+	  float t = ((v1 - center) * (v2 - center)) / linelen;
+          csVector3 projpt = v1 + (line * t);
           csVector3 newnorm = center - projpt;
           float dist = newnorm.Norm();
           depth = rad - dist;
           newnorm /= dist;
           plane.Set (newnorm.x, newnorm.y, newnorm.z, 0);
+	  break;
         } else {
           /* this is an invalid the ball is outside the poly at this edge */
           depth = -1;
@@ -377,20 +379,21 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
     /* get the one last edge from END to 0 */
     int ind1 = polygon_list[i].vertices[vcount-1];
     int ind2 = polygon_list[i].vertices[0];
-    csPlane3 edgeplane (vertex_table[ind1] / mesht,
-      vertex_table[ind2] / mesht,
-      vertex_table[ind2] / mesht - plane.Normal());
+    csVector3 v1 = vertex_table[ind1] / mesht;
+    csVector3 v2 = vertex_table[ind2] / mesht;
+    csPlane3 edgeplane (v1, v2, v2 - plane.Normal());
     edgeplane.Normalize ();
     if (edgeplane.Classify (center) < 0) {
-      csVector3 line = vertex_table[ind2] - vertex_table[ind1];
+      csVector3 line = v2 - v1;
+      float linelen = line.SquaredNorm ();
       line.Normalize();
       float proj = center * line;
       /* if the point projects on this edge, but outside the poly test 
        * for depth to this edge (especially important on sharp corners)
        */
-      if ((proj > (vertex_table[ind1] * line)) &&
-          (proj < (vertex_table[ind2] * line))) {
-        csVector3 projpt = vertex_table[ind1] + line * proj;
+      if ((proj >= (v1 * line)) && (proj <= (v2 * line))) {
+	float t = ((v1 - center) * (v2 - center)) / linelen;
+        csVector3 projpt = v1 + (line * t);
         csVector3 newnorm = center - projpt;
         float dist = newnorm.Norm();
         depth = rad - dist;
