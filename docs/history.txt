@@ -97,6 +97,12 @@ The history order has been reversed so that new features are at the top.
 	      TEXTURING (GOURAUD) instead. This gains us a little memory.
 	    - In addition to TEXNR() everywhere it appears MATTERIAL is
 	      accepted as a synonym; one day TEXNR should die.
+	    - Some fixes for DJGPP. Will work with latest binutils and
+	      djgpp (binutils 2.9.5 and gcc 2.95.2). Latest binutils seems
+	      to spit on __attribute__((constructor)), thus I have used a
+	      C++ class for startup initialization of loadlib.cpp. The
+	      keyboard doesn't respond now though... dunno, maybe its
+	      related to my (weird) system configuration.
 	- Norman Kramer updated the win32gcc.txi documentation to make it
 	  a little clearer.
 	- The big change from Andrew triggered a strange behaviour in
@@ -110,6 +116,7 @@ The history order has been reversed so that new features are at the top.
 	  I also renamed csTextureHandle to csTextureWrapper and replace
 	  Get/Set MaterialHandle with Get/Set MaterialWrapper in various
 	  places. No doubt you'll have to modify your applications for this.
+	- Martin Geisse fixed a compiler warning under msvc5.
 20-Aug-2000
 	- Norman Kramer updated the install documentation for the win32gcc
 	  target.
