@@ -54,6 +54,8 @@ chronological order.
 	  which were present when the new-renderer was enabled.
 	- Eric Sunshine eliminated scads of compilation warnings from the new
 	  renderer plugins.
+	- Eric Sunshine eliminated compilation warning from
+	  portalcontainer.cpp.
 28-Sep-2003
 	- Eric Sunshine corrected erroneous comments in
 	  CS/mk/autoconf/compiler.m4.
