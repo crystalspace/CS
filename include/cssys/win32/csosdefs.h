@@ -92,6 +92,9 @@ struct mmioInfo
 {
     /// Handle to the mapped file 
     HANDLE hMappedFile;
+
+    /// Handle to the mapping
+    HANDLE hFileMapping;
   
     /// Base pointer to the data
     unsigned char *data;
@@ -104,11 +107,12 @@ struct mmioInfo
 inline 
 bool
 MemoryMapFile(mmioInfo *platform, char *filename)
-{
+{  
   if (
-      (platform->hMappedFile = OpenFileMapping(FILE_MAP_READ, false, filename)) == NULL ||          
-      (platform->file_size=GetFileSize(platform->hMappedFile, NULL)) == 0xFFFFFFFF                 ||          
-      (platform->data = (unsigned char *)MapViewOfFile(platform->hMappedFile, FILE_MAP_READ, 0, 0, platform->file_size))==NULL 
+      (platform->hMappedFile=CreateFile(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL))==INVALID_HANDLE_VALUE ||
+      (platform->file_size=GetFileSize(platform->hMappedFile, NULL)) == 0xFFFFFFFF                                                    ||          
+      (platform->hFileMapping = CreateFileMapping(platform->hMappedFile, NULL, PAGE_READONLY, 0, 0, NULL)) == NULL                              ||          
+      (platform->data = (unsigned char *)MapViewOfFile(platform->hFileMapping, FILE_MAP_READ, 0, 0, platform->file_size))==NULL 
      )                                                                                              
   {                                                                                                 
     return false;                                                                        
@@ -126,8 +130,11 @@ UnMemoryMapFile(mmioInfo *platform)
   if (platform->data!=NULL)
     UnmapViewOfFile(platform->data);
 
-  if (platform->hMappedFile!=NULL)
+  if (platform->hMappedFile!=INVALID_HANDLE_VALUE)
     CloseHandle(platform->hMappedFile);
+
+  if (platform->hFileMapping!=INVALID_HANDLE_VALUE)
+    CloseHandle(platform->hFileMapping);
 }
 
 #endif
