@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <GL/gl.h>
 
@@ -331,6 +332,12 @@ void csGraphics2DOpenGL::CalcPixelFormat ()
    * but somehow the actual color depth should be retrieved. ]
    */
   m_nDepthBits = pfd.cDepthBits;
+
+  if (pfd.dwFlags & PFD_GENERIC_FORMAT)
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING,
+      "No hardware acceleration!");
+  }
 }
 
 bool csGraphics2DOpenGL::Open ()
@@ -408,6 +415,15 @@ bool csGraphics2DOpenGL::Open ()
   else
     m_bPalettized = false;
   m_bPaletteChanged = false;
+
+  CheckWGLExtensions ();
+
+  if (HasWGL_EXT_swap_control)
+  {
+    wglSwapIntervalEXT (0);
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "VSYNC is disabled.");
+  }
 
   return true;
 }
@@ -630,6 +646,39 @@ void csGraphics2DOpenGL::SwitchDisplayMode ()
         Report (CS_REPORTER_SEVERITY_WARNING,
           "gl2d error: display change gave unknown error.");
         break;
+    }
+  }
+}
+
+// check that an extension string is not part of a longer string
+// ('tho its rather unprobable)
+bool checkExtension (const char* ext, const char * exts)
+{
+  const char* espos = strstr (exts, ext);
+  if (!espos) return false;
+  return (((espos == exts) || (*(espos-1) == ' ')) &&
+    ((*(espos + strlen(ext)) == 0) || (*(espos + strlen(ext)) == ' ')));
+}
+
+void csGraphics2DOpenGL::CheckWGLExtensions ()
+{
+  csPFNWGLGETEXTENSIONSSTRINGARBPROC wglGetExtensionsStringARB;
+
+  HasWGL_EXT_swap_control = false;
+
+  wglGetExtensionsStringARB = (csPFNWGLGETEXTENSIONSSTRINGARBPROC)
+    wglGetProcAddress("wglGetExtensionsStringARB");
+
+  if (wglGetExtensionsStringARB)
+  {
+    const char* wglExtensions = wglGetExtensionsStringARB(hDC);
+    if (checkExtension ("WGL_EXT_swap_control", wglExtensions))
+    {
+      wglSwapIntervalEXT = (csPFNWGLSWAPINTERVALEXTPROC)
+	wglGetProcAddress ("wglSwapIntervalEXT");
+      wglGetSwapIntervalEXT = (csPFNWGLGETSWAPINTERVALEXTPROC)
+	wglGetProcAddress ("wglGetSwapIntervalEXT");
+      HasWGL_EXT_swap_control = wglSwapIntervalEXT && wglGetSwapIntervalEXT;
     }
   }
 }

@@ -20,6 +20,7 @@
 #define __SYSG2D_H__
 
 #include <GL/gl.h>
+#include "wglext.h"
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
 #include "video/canvas/openglcommon/gl2d_font.h"
@@ -111,6 +112,19 @@ protected:
   void Activate (bool activate);
   // Setup fullscreen display mode
   void SwitchDisplayMode ();
+
+  /**
+   * try to get wglGetExtensionsStringARB() and retrieve the extensions 
+   * string
+   */
+  void CheckWGLExtensions ();
+
+  /// WGL_EXT_swap_control present?
+  bool HasWGL_EXT_swap_control;
+  /// Enable/disable VSYNC
+  csPFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
+  /// retrieve VSYNC status
+  csPFNWGLGETSWAPINTERVALEXTPROC wglGetSwapIntervalEXT;
 };
 
 #endif
