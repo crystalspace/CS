@@ -306,10 +306,7 @@ csPolyPlane* csLoader::load_polyplane (char* buf, char* name)
   }
 
   if (tx1_given)
-    if (tx2_given) ppl->SetTextureSpace (
-	csVector3(tx1_orig.x, tx1_orig.y, tx1_orig.z),
-	csVector3(tx1.x, tx1.y, tx1.z), tx1_len,
-	csVector3(tx2.x, tx2.y, tx2.z), tx2_len);
+    if (tx2_given) ppl->SetTextureSpace (tx1_orig, tx1, tx1_len, tx2, tx2_len);
     else { CsPrintf (MSG_FATAL_ERROR, "Not supported!\n"); fatal_exit (0, false); }
   else ppl->SetTextureSpace (tx_matrix, tx_vector);
 
@@ -1880,16 +1877,13 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
   if (tx1_given)
     if (tx2_given)
       TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-        csVector3(tx1_orig.x, tx1_orig.y, tx1_orig.z),
-        csVector3(tx1.x, tx1.y, tx1.z), tx1_len,
-        csVector3(tx2.x, tx2.y, tx2.z), tx2_len);
+        tx1_orig, tx1, tx1_len, tx2, tx2_len);
     else
     {
       float A, B, C;
       ptemplate->PlaneNormal (&A, &B, &C);
       TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-        tx1_orig.x, tx1_orig.y, tx1_orig.z,
-        tx1.x, tx1.y, tx1.z, tx1_len,
+        tx1_orig, tx1, tx1_len,
         A, B, C);
     }
   else if (tx_len)
