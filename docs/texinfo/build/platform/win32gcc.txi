@@ -19,19 +19,12 @@ Download the following packages:
 
 @itemize @bullet
 @item
-Crystal Space MingW package 'cs_mingw_0.40.exe' from the Mingw32 support
-directory at Linux Games This package contains all the recent MingW package
-releases i.e.  all the files necessary to compile Crystal Space successfully.
+Crystal Space MingW package @file{cs_mingw_0.40.exe} from the Mingw32 support
+directory at Linux Games.  This package contains all the recent MingW package
+releases (i.e. all the files necessary to compile Crystal Space successfully).
 
-@iftex
-@noindent
-@uref{ftp://ftp.sunsite.dk/projects/crystal/}@*
-@uref{support/mingw32/cs_mingw_0.40.exe}
-@end iftex
-@ifnottex
 @noindent
 @uref{ftp://ftp.sunsite.dk/projects/crystal/support/mingw32/cs_mingw_0.40.exe}
-@end ifnottex
 
 @item
 @sc{nasm} (Netwide Assembler) for Windows @samp{nasm-0.98e-bin-w32.zip}

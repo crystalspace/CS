@@ -18,20 +18,12 @@ Many computer systems come with these libraries pre-installed.
 If the libraries are not already available on your system, then see the
 following sections for information about how to obtain them.
 
-Windows and @sc{dos} users can download a single package @emph{winlibs0.19.zip} containing
-all three dynamic link libraries in precompiled form from the following location at the
-Crystal Space site:
+Windows and @sc{dos} users can download a single package @file{winlibs0.19.zip}
+containing all three dynamic link libraries in pre-compiled form from the
+following location at the Crystal Space site:
 
 @noindent
-@iftex
-@noindent
-@uref{ftp://ftp.sunsite.dk/projects/crystal/}@*
-@uref{support/win32/winlibs0.19.zip}
-@end iftex
-@ifnottex
-@noindent
 @uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/winlibs0.19.zip}
-@end ifnottex
 
 @subheading zlib
 @cindex zlib

@@ -5,6 +5,9 @@ The history order is reversed so that new features are at the top.
 	  that you had to do SCF_QUERY_INTERFACE() in order to get the
 	  pointer to VFS, G3D, and other plugins from the system driver.
 	  This should be CS_QUERY_PLUGIN().
+	- Eric Sunshine fixed several minor issues in the Texinfo files.
+	  Also upgraded apimod19.txi to mention CS_QUERY_PLUGIN_ID() rather
+	  than CS_QUERY_PLUGIN().
 25-Jun-2001
 	- Added iBase::GetRefCount(). This way you can now get the reference
 	  counter from any SCF interface. Note that this is ONLY for debugging

@@ -221,15 +221,8 @@ and install @emph{winlibs}.  Winlibs is a set of Dynamic Link Libraries
 @samp{xmlparse.dll}.  The latest version of the winlibs package
 @samp{winlibs0.19.zip} can be downloaded from:
 
-@iftex
-@noindent
-@uref{ftp://ftp.sunsite.dk/projects/crystal/}@*
-@uref{support/win32/winlibs0.19.zip}
-@end iftex
-@ifnottex
 @noindent
 @uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/winlibs0.19.zip}
-@end ifnottex
 
 Once you have downloaded the winlbs package, extract it too your @samp{CS\}
 root directory.
