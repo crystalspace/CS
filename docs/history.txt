@@ -15,6 +15,8 @@ The history order is reversed so that new features are at the top.
 	  makefiles.
 	- Eric Sunshine fixed next.mak so that it also runs the support scripts
 	  chkheadr.sh and chktools.sh at configuration time.
+	- Eric Sunshine eliminated a number of compilation warnings in the
+	  OpenGL renderer.
 12-Sep-2002
 	- Fixed a crash at exit bug in Blocks.
 	- Fixed stupid bug in star loader that crashed csdemo.
