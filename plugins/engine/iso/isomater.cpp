@@ -211,7 +211,7 @@ void csIsoMaterialList::RemoveIndex(int i)
   if(i==Length()-1)
   {
     (void)Pop(); // pop last element from the list
-    lastindex = Length();
+    if(Length()<lastindex) lastindex = Length();
     return;
   }
   /// remove from middle of list
