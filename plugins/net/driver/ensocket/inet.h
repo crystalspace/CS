@@ -76,7 +76,7 @@ class csNetworkSocket2 : public iNetworkSocket2
 class csNetworkDriver2 : public iNetworkDriver2
 {
 
- friend csNetworkSocket2;
+ friend class csNetworkSocket2;
  public:
   csNetworkDriver2 (iBase *parent);	// constructor
   virtual ~csNetworkDriver2();	// distructor
