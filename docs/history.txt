@@ -36,6 +36,9 @@ chronological order.
 	  lowest detail object. This will be slower but looks a LOT better.
 	- Jorrit changed bruteblock so it reports lighting progress on stdout
 	  if -verbose is given.
+	- Jorrit fixed another visual glitch in bruteblock where it would
+	  sometimes miss a material that is used by a splatter because
+	  the box dimensions were calculated to exact.
 5-Oct-2004
 	- Rhad fixed a long standing bug in the Ogg loader.
 	  - Per specs, SEEK_END must seek 1 byte past the end of data

@@ -639,9 +639,14 @@ bool csTerrBlock::IsMaterialUsed (int index)
     materialsChecked[index] = true;
     materialsUsed.SetLength (index + 1);
 
-    csBox2 heightmapSpace (center.x - size / 2.0, 
-      center.z - size / 2.0, center.x + size / 2.0, 
-      center.z + size / 2.0);
+    // Slightly overexagerate the heightmap Space so that
+    // we don't miss materials due to just being at the border
+    // of a block.
+    csBox2 heightmapSpace (
+    	center.x - size / 2.0 -1.0,
+	center.z - size / 2.0 -1.0,
+	center.x + size / 2.0 + 1.0,
+	center.z + size / 2.0 + 1.0);
     const csBox2& terrRegion = terr->region;
 
     float wm = ((float)(terr->materialMapW - 1)) /
