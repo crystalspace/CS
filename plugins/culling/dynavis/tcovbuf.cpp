@@ -363,8 +363,6 @@ fillCol:
           : "g" (cc), "g" (c), "g" (fvalueTemp), "g" (tile_full), "g" (allOnes)
           : "eax", "ecx", "esi", "edi", "edx");
         //fvalue = fvalueTemp;
-  #else
-    #error Unsupported compiler. Please contact CS development team for details.
   #endif // End of COMP_VC, COMP_GCC or ELSE.
       }
       else
@@ -514,8 +512,6 @@ fillCol2:
           : "g" (cc), "g" (c), "g" (fvalueTemp), "g" (tile_full), "g" (allOnes)
           : "eax", "ecx", "esi", "edi", "edx");
           //fvalue = fvalueTemp;
-  #else
-    #error Unsupported compiler. Please contact CS development team for details.
   #endif // End of COMP_VC, COMP_GCC or ELSE.
       }
       else
