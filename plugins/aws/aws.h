@@ -19,6 +19,7 @@
 *****************************************************************************/
 #include "iaws/aws.h"
 #include "iaws/awsparm.h"
+#include "iaws/awscnvs.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csgeom/csrect.h"
@@ -88,35 +89,8 @@ class awsManager : public iAws
    /// The object registry pointer, needed at odd times.
    iObjectRegistry *object_reg;
   
-   /// Handle to our procedural texture, which the user can have us draw on.
-   class awsCanvas : public csProcTexture
-   {
-     public:
-  
-        /// Create a new texture.
-        awsCanvas ();
-  
-        /// Destroy this texture
-        virtual ~awsCanvas () {}
-
-        /// This is actually not used ever.  The window manager doesn't "animate", and only refreshes the canvas when needed.
-        virtual void Animate (csTicks current_time);
-
-        /// Get the iGraphics2D interface so that components can use it.
-        iGraphics2D *G2D() 
-        { return ptG2D; }
-
-        /// Get the iGraphics3D interface so that components can use it.
-        iGraphics3D *G3D() 
-        { return ptG3D; }
-	
-	/// Set dimensions of texture
-	void SetSize(int w, int h);
-
-   };
-
-   /// Procedural texture canvas instantiation
-   awsCanvas canvas;
+   /// canvas instantiation
+   iAwsCanvas *canvas;
 
    /** 
     * Defines the mapping between a factory and it's interned name.  Used for window template instantiation.
@@ -131,8 +105,8 @@ class awsManager : public iAws
    /// Contains the list of factory to ID mappings.
    csDLinkList component_factories;
    
-   /// Is true if the window manager is using the internal canvas, else false.
-   bool UsingDefaultContext;
+//   /// Is true if the window manager is using the internal canvas, else false.
+//   bool UsingDefaultContext;
    
    /** Is true if the default context has already been initialized.  This is
      neccessary because csProcTex has some unusual assumptions about the
@@ -141,7 +115,7 @@ class awsManager : public iAws
      switches to a different context, and then switches back, we wouldn't want
      them to possibly die by re-initing the thing again.
    */
-   bool DefaultContextInitialized;
+   //bool DefaultContextInitialized;
    
 public:
     SCF_DECLARE_IBASE;
@@ -230,10 +204,17 @@ public:
 
 public:
     /// Set the contexts however you want
-    virtual void SetContext(iGraphics2D *g2d, iGraphics3D *g3d);
+    virtual void SetCanvas(iAwsCanvas *newCanvas);
 
-    /// Set the context to the procedural texture
-    virtual void SetDefaultContext(iEngine* engine, iTextureManager* txtmgr);
+    /// Get the current context
+    virtual iAwsCanvas* GetCanvas();
+
+    /// Create a default canvas, covering the whole screen
+    virtual iAwsCanvas *CreateDefaultCanvas(iEngine* engine, iTextureManager* txtmgr);
+
+    /// Create a default canvas, just a single proctex
+    virtual iAwsCanvas *CreateDefaultCanvas(iEngine* engine, iTextureManager* txtmgr, 
+      int width, int height, const char *name);
 
     /// Get the iGraphics2D interface so that components can use it.
     virtual iGraphics2D *G2D(); 

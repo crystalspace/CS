@@ -22,6 +22,7 @@
 #include "awsgrpfr.h"
 #include "awslistbx.h"
 
+#include "awscmpt.h"
 
 #include <stdio.h>
 
@@ -39,13 +40,11 @@ awsManager::awsManager(iBase *p):prefmgr(NULL), sinkmgr(NULL),
                top(NULL), mouse_in(NULL), keyb_focus(NULL),
                mouse_captured(false),
                ptG2D(NULL), ptG3D(NULL), object_reg(NULL), 
-               UsingDefaultContext(false), DefaultContextInitialized(false)
+               canvas(NULL)
 {
   SCF_CONSTRUCT_IBASE (p);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
-
-  canvas.DisableAutoUpdate();
 }
 
 awsManager::~awsManager()
@@ -59,7 +58,6 @@ awsManager::~awsManager()
     delete (awsComponentFactoryMap *)p;
     component_factories.RemoveItem ();
   }
-
 }
 
 bool 
@@ -181,71 +179,60 @@ awsManager::SetTopWindow(iAwsWindow *_top)
 { top = _top; }
 
 void 
-awsManager::SetContext(iGraphics2D *g2d, iGraphics3D *g3d)
+awsManager::SetCanvas(iAwsCanvas *newCanvas)
 {
-   if (g2d && g3d)
+   if (newCanvas)
    {
-       ptG2D = g2d;
-       ptG3D = g3d;
-       
-       frame.Set(0,0,ptG2D->GetWidth(), ptG2D->GetHeight());
-       
-       UsingDefaultContext=false;
+      if (canvas) canvas->DecRef();
+      canvas = newCanvas;
+      canvas->IncRef();
 
-       Mark(frame);
+      ptG2D = canvas->G2D();
+      ptG3D = canvas->G3D();
+       
+      ptG2D->DoubleBuffer(false);
+      ptG3D->BeginDraw(CSDRAW_2DGRAPHICS);
+      ptG2D->Clear(ptG3D->GetTextureManager()->FindRGB(255,0,255));
+      ptG3D->FinishDraw();
+      ptG3D->Print(NULL);
+
+      prefmgr->SetTextureManager(ptG3D->GetTextureManager());
+      prefmgr->SetFontServer(ptG2D->GetFontServer());
+
+      frame.Set(0,0,ptG2D->GetWidth(), ptG2D->GetHeight());
+       
+      Mark(frame);
    }
 }
 
-void 
-awsManager::SetDefaultContext(iEngine* engine, iTextureManager* txtmgr)
+iAwsCanvas* 
+awsManager::GetCanvas() 
 {
-  if (!DefaultContextInitialized)
-  {
-    canvas.SetSize(proctex_width, proctex_height);
-    canvas.SetKeyColor(255,0,255);
-    if (!canvas.Initialize(object_reg, engine, txtmgr, "awsCanvas"))
-      printf("aws-debug: SetDefaultContext failed to initialize the memory canvas.\n");
-    else
-      printf("aws-debug: Memory canvas initialized!\n");
-    
-    if (!canvas.PrepareAnim())
-      printf("aws-debug: Prepare anim failed!\n");
-    else
-      printf("aws-debug: Prepare anim succeeded.\n");
-   
-//    if (engine!=NULL)
-//    {
-//       iTextureWrapper *tw = engine->GetTextureList()->NewTexture(canvas.GetTextureWrapper()->GetTextureHandle());
-//       iMaterialWrapper *canvasMat = engine->CreateMaterial("awsCanvasMat", tw);
-//    }
-    
-    DefaultContextInitialized=true;
-  }
-            
-  ptG2D = canvas.G2D();
-  ptG3D = canvas.G3D();
-  
-  printf("aws-debug: G2D=%p G3D=%p\n", ptG2D, ptG3D);
+  if (canvas) canvas->IncRef();
+  return canvas;
+}
 
-  if (txtmgr)
-    GetPrefMgr()->SetTextureManager(txtmgr);
+iAwsCanvas *
+awsManager::CreateDefaultCanvas(iEngine* engine, iTextureManager* txtmgr) 
+{
+  iAwsCanvas *canvas = new awsMultiProctexCanvas(
+    engine->GetContext()->GetDriver2D()->GetWidth(), 
+    engine->GetContext()->GetDriver2D()->GetHeight(), 
+    object_reg, engine, txtmgr);
+  SCF_INC_REF(canvas);
 
-  if (ptG2D)
-    GetPrefMgr()->SetFontServer(ptG2D->GetFontServer());
-    
-  if (ptG2D && ptG3D) 
-  {
-    ptG2D->DoubleBuffer(false);
-    ptG3D->BeginDraw(CSDRAW_2DGRAPHICS);
-    ptG2D->Clear(txtmgr->FindRGB(255,0,255));
-    ptG3D->FinishDraw();
-    ptG3D->Print(NULL);
-    
-    frame.Set(0,0,ptG2D->GetWidth(), ptG2D->GetHeight());
-    
-    Mark(frame);
-    UsingDefaultContext=true;
-  }
+  return canvas;
+}
+
+iAwsCanvas *
+awsManager::CreateDefaultCanvas(iEngine* engine, iTextureManager* txtmgr, int width, 
+		    int height, const char *name) 
+{
+  iAwsCanvas *canvas = new awsSingleProctexCanvas(
+    width, height, object_reg, engine, txtmgr, name);
+  SCF_INC_REF(canvas);
+
+  return canvas;
 }
 
 void
@@ -313,16 +300,19 @@ awsManager::Print(iGraphics3D *g3d)
   for(i=0; i<updatestore.Count(); ++i)
   {
     csRect r(updatestore.RectAt(i));
-    g3d->DrawPixmap(canvas.GetTextureWrapper()->GetTextureHandle(),
+    /*g3d->DrawPixmap(canvas->GetTextureWrapper()->GetTextureHandle(),
                     r.xmin,r.ymin,r.xmax-r.xmin,r.ymax-r.ymin,
                     r.xmin,r.ymin,r.xmax-r.xmin,r.ymax-r.ymin,
-                    0);
+                    0);*/
+    
+    canvas->Show(&r);
 
+    //printf("update: (%d,%d)-(%d,%d)\n", r.xmin, r.ymin, r.xmax, r.ymax);
   }
 
-/*
+
   // Debug code
-  iGraphics2D *g2d = g3d->GetDriver2D();
+  /*iGraphics2D *g2d = g3d->GetDriver2D();
   for(i=0; i<updatestore.Count(); ++i)
   {
     csRect r(updatestore.RectAt(i));
@@ -332,8 +322,7 @@ awsManager::Print(iGraphics3D *g3d)
     g2d->DrawLine(r.xmin, r.ymax, r.xmax, r.ymax, GetPrefMgr()->GetColor(AC_WHITE));
     g2d->DrawLine(r.xmax, r.ymin, r.xmax, r.ymax, GetPrefMgr()->GetColor(AC_WHITE));
 
-  }
-*/
+  } */
 }
 
 void       
@@ -341,7 +330,7 @@ awsManager::Redraw()
 {
    static unsigned redraw_tag = 1;
    static csRect bounds(0,0,proctex_width,proctex_height);
-   //int    erasefill = GetPrefMgr()->GetColor(AC_TRANSPARENT);
+   int    erasefill = GetPrefMgr()->GetColor(AC_TRANSPARENT);
    int    i;
         
 
@@ -349,7 +338,7 @@ awsManager::Redraw()
    
    ptG3D->BeginDraw(CSDRAW_2DGRAPHICS);
    
-   ptG2D->SetClipRect(0,0,proctex_width, proctex_width);
+   ptG2D->SetClipRect(0,0,ptG2D->GetWidth(), ptG2D->GetHeight());
 
    //if (redraw_tag%2) ptG2D->DrawBox( 0,  0,25, 25, GetPrefMgr()->GetColor(AC_SHADOW));
    //else              ptG2D->DrawBox( 0,  0,25, 25, GetPrefMgr()->GetColor(AC_HIGHLIGHT));
@@ -360,7 +349,7 @@ awsManager::Redraw()
    
    /******* The following code is only executed if there is something to redraw *************/
    
-   //if (updatestore_dirty && UsingDefaultContext)
+   //if (updatestore_dirty)
      //ptG2D->DrawBox(0,0, proctex_width,proctex_height,erasefill);
 
 
@@ -443,20 +432,17 @@ awsManager::Redraw()
           ptG2D->DrawLine(dr.xmax, dr.ymin, dr.xmax, dr.ymax, GetPrefMgr()->GetColor(AC_WHITE));
    }*/
    
-   ptG2D->SetClipRect(0,0,proctex_width, proctex_width);
+   //ptG2D->SetClipRect(0,0,proctex_width, proctex_width);
 
    // This only needs to happen when drawing to the default context.
-   if (UsingDefaultContext)
-   {
-     
-     ptG3D->FinishDraw ();
-     ptG3D->Print(&bounds);
+    
+   ptG3D->FinishDraw ();
+   //ptG3D->Print(&bounds);
 
      //UpdateStore();
 
      //for(i=0; i<updatestore.Count(); ++i)
        //ptG3D->Print(&(updatestore.RectAt(i)));
-   }
 
    // Reset the dirty region
    dirty.makeEmpty();
@@ -474,7 +460,7 @@ awsManager::RedrawWindow(iAwsWindow *win, csRect &dirtyarea)
        return;
 
      /// Draw the window first.
-     //csRect clip(win->Frame());
+     csRect clip(win->Frame());
 
      /// Clip the window to it's intersection with the dirty rectangle
      //clip.Intersect(dirtyarea);
@@ -836,26 +822,3 @@ iGraphics3D *
 awsManager::G3D() 
 { return ptG3D; }
     
-
-//// Canvas stuff  //////////////////////////////////////////////////////////////////////////////////
-
-
-awsManager::awsCanvas::awsCanvas ()
-{
-  mat_w=proctex_width;
-  mat_h=proctex_height;
-  
-  texFlags = CS_TEXTURE_2D | CS_TEXTURE_PROC;
-   
-}
-
-void 
-awsManager::awsCanvas::Animate (csTicks current_time)
-{
-  (void)current_time;
-}
-
-void 
-awsManager::awsCanvas::SetSize(int w, int h)
-{  mat_w=w; mat_h=h; }
-
