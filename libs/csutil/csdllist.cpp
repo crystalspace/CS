@@ -112,6 +112,26 @@ bool csDLinkList::AddItem(void *theObj)
    }
 
 
+bool csDLinkList::AddCurrentItem(void *theObj)
+   {
+   csDLListItem *newItem;
+
+   if(!currentItem || !firstItem) return false;
+
+   newItem = new csDLListItem;
+   if (!newItem)
+      return false;
+
+   newItem->theObject = theObj;
+
+   newItem->nextItem = currentItem->nextItem;
+   currentItem->nextItem = newItem;
+   newItem->prevItem = currentItem;
+   newItem->nextItem->prevItem = newItem;
+
+   return true;
+   }
+
 void csDLinkList::RemoveItem()
    {
    if (!currentItem)

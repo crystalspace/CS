@@ -65,6 +65,12 @@ public:
    */
   bool AddItem (void *theObj);
 
+  /**
+   * Add an item to the list, immediately after the current item.  Then
+   * set the current item to be the one just added.
+   */
+  bool AddCurrentItem (void *theObj);
+
   /// Remove the currentItem from the list.
   void RemoveItem ();
   /// Remove the specified item from the list.
