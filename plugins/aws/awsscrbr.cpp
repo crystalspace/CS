@@ -583,6 +583,7 @@ SCF_IMPLEMENT_IBASE_END
 
 awsScrollBarFactory::awsScrollBarFactory(iAws *wmgr):awsComponentFactory(wmgr)
 {
+  SCF_CONSTRUCT_IBASE (NULL);
   Register("Scroll Bar");
   RegisterConstant("sbfsVertical",  awsScrollBar::fsVertical);
   RegisterConstant("sbfsHorizontal", awsScrollBar::fsHorizontal);
