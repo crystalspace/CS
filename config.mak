@@ -1,9 +1,0 @@
-TARGET = linux
-SYSMAKEFILE = mk/system/linux.mak
-MODE = optimize
-USE_DLL = yes
-PROC = INTEL
-CXX = g++
-CFLAGS.SYSTEM += -m486 
-CFLAGS.SYSTEM += -fno-rtti
-X11_PATH = /usr/X11
