@@ -29,15 +29,15 @@ if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(CMD.SWIG) &&
   Depends $(common) : $(javadir:G=dir) ;
   MkDir $(javadir:G=dir) ;
 
-  {
-    local LOCATE_TARGET = $(javadir) ;
-    Swig $(common) :
-      [ DoSourceGrist cspace.i ] :
-      java :
-      -c++ -java -package com.crystalspace :
-      [ ConcatDirs $(TOP) include ] :
-      [ ConcatDirs $(TOP) include ivaria ] ;
-  }
+  Swig $(common) :
+    [ DoSourceGrist cspace.i ] :
+    java :
+    -c++ -java -package com.crystalspace :
+    [ ConcatDirs $(TOP) include ] :
+    [ ConcatDirs $(TOP) include ivaria ] :
+    :
+    :
+    src com crystalspace ;
   CleanDir javaswigclean : $(javabase) ;
   Depends csjavaclean : javaswigclean ;
 

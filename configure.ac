@@ -119,7 +119,7 @@ CS_EMIT_BUILD_PROPERTY([INSTALL], [$INSTALL])
 
 AC_CHECK_PROGS([SWIG], [swig])
 AS_IF([test -n "$SWIG"],
-    [CS_CHECK_PROG_VERSION([swig], [$SWIG -version 2>&1], [1.3.14],
+    [CS_CHECK_PROG_VERSION([swig], [$SWIG -version 2>&1], [1.3.20],
 	[9.9|.9], [CS_EMIT_BUILD_PROPERTY([CMD.SWIG], [$SWIG])])])
 
 CS_CHECK_LIBTOOL

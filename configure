@@ -3804,8 +3804,8 @@ fi
 done
 
 if test -n "$SWIG"; then
-  echo "$as_me:$LINENO: checking if swig version >= 1.3.14" >&5
-echo $ECHO_N "checking if swig version >= 1.3.14... $ECHO_C" >&6
+  echo "$as_me:$LINENO: checking if swig version >= 1.3.20" >&5
+echo $ECHO_N "checking if swig version >= 1.3.20... $ECHO_C" >&6
 if test "${cs_cv_prog_swig_version_ok_annotated+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -3830,10 +3830,10 @@ test -n "$cs_prog_swig_is_version" && test -z $cs_prog_swig_is_suffix_done  && {
 
 
 
-test -z $cs_prog_swig_min_version && cs_prog_swig_min_version=`echo 1.3.14 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_prog_swig_min_version && cs_prog_swig_min_version=`echo 1.3.20 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_swig_min_version" && test -z $cs_prog_swig_min_suffix_done  && { cs_prog_swig_min_suffix_done=yes ; cs_prog_swig_min_suffix= ; }
 
-test -z $cs_prog_swig_min_version && cs_prog_swig_min_version=`echo 1.3.14 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_prog_swig_min_version && cs_prog_swig_min_version=`echo 1.3.20 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_swig_min_version" && test -z $cs_prog_swig_min_suffix_done  && { cs_prog_swig_min_suffix_done=yes ; cs_prog_swig_min_suffix=.0 ; }
 
 

@@ -48,8 +48,8 @@ if $(CMD.SWIG)
     \\1/
     /\$Header:/d'" ;
 
-  ## Swig targets : swigfile : language [ : swigflags [ : swigincdirs 
-  ##     [ : swigfiledir [ : frozendirs [ : tag ]]]]]
+  ## Swig targets : swigfile : language [ : swigflags [ : swigincdirs
+  ##     [ : swigfiledir [ : frozendirs [ : tag [ : outdir ]]]]]]
   ##   Given a Swig input file `swigfile', generate `targets' for scripting
   ##   language `language'.  The first element of `targets' should name the
   ##   generated C or C++ file, and the remaining optional elements should name
@@ -71,7 +71,11 @@ if $(CMD.SWIG)
   ##   are copied to that directory.  If it contains two elements, then the
   ##   first element of `targets' is copied to the first element of
   ##   `frozentargdirs', and all remaining elements of `targets' are copied to
-  ##   the second element of `frozentargdirs'.
+  ##   the second element of `frozentargdirs'. `outdir', if provided, specifies
+  ##   a subdirectory relative to $(LOCATE_TARGET) in which Swig should place
+  ##   the language-specific support files. This might be useful, for instance,
+  ##   when Swig is in Java mode, and the .java files must be placed in a
+  ##   directory hierarchy which reflects the full package name.
   rule Swig
   {
     local target = $(1[1]) ;
@@ -84,6 +88,7 @@ if $(CMD.SWIG)
     local frozentargetdir = $(7[1]) ;
     local frozenotherdir = $(7[2-]) ;
     local tag = $(8) ;
+    local outdir = $(9) ;
 
     if ! $(frozenotherdir) { frozenotherdir = $(frozentargetdir) ; }
     if ! $(tag) { tag = $(language) ; }
@@ -99,7 +104,8 @@ if $(CMD.SWIG)
     }
 
     SWIG.FLAGS on $(target) +=
-      $(SWIG.FLAGS) -$(language) $(swigflags) -I$(swigincdirs) ;
+      $(SWIG.FLAGS) -$(language) $(swigflags) -I$(swigincdirs)
+      -outdir [ ConcatDirs $(LOCATE_TARGET) $(outdir) ] ;
 
     # Allow Swig input file to reside at location other than $(SEARCH_SOURCE).
     if $(swigfiledir)
@@ -110,7 +116,7 @@ if $(CMD.SWIG)
     {
       SEARCH on $(swigfile) = $(SEARCH_SOURCE) ;
     }
-        
+
     # Scan for special Swig includes.
     HDRGRIST on $(swigfile) = $(HDRGRIST) ;
     HDRSEARCH on $(swigfile) =
@@ -148,7 +154,7 @@ if $(CMD.SWIG)
       Help $(tag)freeze : "Copy generated Swig files to source directory" ;
     }
   }
-  
+
   actions RunSwig
   {
     $(CMD.SWIG) $(SWIG.FLAGS) -o $(<) $(>)
@@ -172,7 +178,7 @@ if $(CMD.SWIG)
     local object = [ DoObjectGrist $(<:S=$(SUFOBJ)) ] ;
     local cppfile = $(<:S=.cpp) ;
     local script = $(<:S=.$(SWIG.SIMPLE.EXT)) ;
-    
+
     C++ $(object) : $(cppfile) ;
     Swig $(cppfile) $(script) : $(<) : $(SWIG.SIMPLE.LANGUAGE) :
       $(SWIG.SIMPLE.FLAGS) ;
@@ -183,7 +189,7 @@ if $(CMD.SWIG)
 
   if ! $(NO_SWIG_HEADER_SCANNING)
   {
-    SWIG.HDRPATTERN = 
+    SWIG.HDRPATTERN =
       "^[ 	]*[%#][ 	]*include[ 	]*[<\"]([^\">]*)[\">].*$" ;
     RegisterHeaderRule HeaderRule : $(SWIG.HDRPATTERN) : .i ;
   }

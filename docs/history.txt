@@ -21,6 +21,15 @@ chronological order.
 	  compilers which complain about ambiguous type names within templates;
 	  not for declaration of template arguments.
         - Philip Wyett updated OR to eliminate garray.h deprecation warnings.
+	- Eric Sunshine augmented the Swig rule (swig.jam) so that it once
+	  again utilizes Swig's -outdir option for depositing generated files.
+	  This is needed to work around a problem where Swig on Windows was
+	  dumping generated .java, .py, and .pm files into the current working
+	  directory, rather than into the desired subdirectory of the build
+	  tree (ex: ./out/.../csjava/src/com/crystalspace).
+	- Eric Sunshine upgraded the Swig check in configure.ac so that it
+	  demands at least version 1.3.20 since that is the first version
+	  providing the -outdir option.
 19-Oct-2004
 	- Jorrit worked further on foliage mesh. Added support for
 	  specifying LOD control in a foliage object.
