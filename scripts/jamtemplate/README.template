@@ -45,7 +45,7 @@ XXX Fill in some text
  0. Build the project
  1. Make sure you have write permissions to the install directories. On
     unix/linux this usually means that you have to be the root user.
- 1. Run "jam install"
+ 2. Run "jam install"
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
