@@ -22,6 +22,11 @@
 #include "csutil/hashmap.h"
 #include "csutil/binder.h"
 
+struct csEvBind
+{
+  void *x, *y;
+};
+
 csHashKey csHashComputeEvent (iEvent *ev)
 {
   switch (ev->Type)
