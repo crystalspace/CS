@@ -235,9 +235,11 @@ iBase* csObjectRegistry::Get (char const* tag, scfInterfaceID id, int version)
       iBase* interf = (iBase*)(b->QueryInterface (id, version));
       if (!interf)
       {
+#ifdef CS_DEBUG
         printf ("WARNING! Suspicious: object with tag '%s' does not implement "
 	        "interface '%s'!\n", t, iSCF::SCF->GetInterfaceName(id));
 	fflush (stdout);
+#endif
 	return 0;
       }
       return interf;
