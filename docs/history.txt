@@ -7,9 +7,16 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 5-Jan-2005
+	- res tweaked the pattern(s) for the NV GF FX rules.
+	- res changed the cs_floatrand_seed definition to properly compile on
+	  Win32 with shared libs.
+	- res fixed compilation of the verbosity stuff on Win32 with shared 
+	  libs.
 	- Vincent Knecht changed rpm/cs.spec to put utilities in their own
 	  package, named crystalspace-utils. Also updated the RPM Howto in
 	  the manual.
+	- res changed the cs_floatrand_seed definition again, so it now 
+	  hopefully works on non-Win32 again.
 4-Jan-2005
 	- Jorrit added a new iSectorMeshCallback and associated setter
 	  functions in iSector. With this callback you can get notified whenever

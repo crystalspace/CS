@@ -24,7 +24,7 @@
 
 #include "csextern.h"
 
-CS_CSUTIL_EXPORT_VAR unsigned int cs_floatrand_seed;
+extern CS_CSUTIL_EXPORT unsigned int cs_floatrand_seed;
 
 static inline float csFastRandFloat ()
 {

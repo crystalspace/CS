@@ -22,3 +22,5 @@
 #include "cssysdef.h"
 #include "csextern.h"
 #include "csutil/floatrand.h"
+
+CS_CSUTIL_EXPORT unsigned int cs_floatrand_seed = 0;
