@@ -15,6 +15,16 @@ chronological order.
 	  bug caused, at least some, Copy invocations to be ignored if the
 	  target location was ".".
 	- Jorrit worked a bit further on foliage.
+	- Eric Sunshine worked around Swig/Perl 1.3.22 bug where it emits
+	  illegal expressions, such as `new (sometype)[n]' rather than `new
+	  sometype[n]' (at least gcc considers it illegal).
+	- Eric Sunshine altered the Java, Python, and Perl Jamfiles so that
+	  they deposit generated .jar, .py, .pm, and .dll (.so) files at the
+	  root of the build tree rather than somewhere deep inside the build
+	  tree. This should make it simpler for developers to test these
+	  modules since CLASSPATH, PYTHONPATH, PERL5LIB, and LD_LIBRARY_PATH
+	  can now be pointed at the top of the build tree rather than having to
+	  point them at specific deeply nested subdirectories within the tree.
 21-Oct-2004
 	- Eric Sunshine made the following changes to the DDS image loader:
 	    - Fixed bug in dds::Loader::ReadHeader() where it could/would

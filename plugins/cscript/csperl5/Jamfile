@@ -46,7 +46,6 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
 
   if $(CMD.SWIG)
   {
-    targetdir = $(LOCATE_TARGET) ;
     Swig $(target) $(pmfile) :
       [ FGristFiles cspace.i ] :
       perl5 :
@@ -55,12 +54,21 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
       [ ConcatDirs $(TOP) include ivaria ] :
       [ ConcatDirs $(TOP) scripts perl5 ] ;
     Depends csperl5clean : perl5swigclean ;
+    targetdir = $(LOCATE_TARGET) ;
+    SEARCH on $(pmfile) = $(targetdir) ;
   }
   else
   {
     targetdir = [ ConcatDirs $(TOP) scripts perl5 ] ;
     SEARCH on $(target) = $(targetdir) ;
+    SEARCH on $(pmfile) = $(targetdir) ;
   }
+
+  local pmfilefinal = $(pmfile:G=final) ;
+  MakeLocate $(pmfilefinal) : $(LOCATE.TARGETS) ;
+  Copy $(pmfilefinal) : $(pmfile) ;
+  Depends $(pmfilefinal) : $(pmfile) ;
+  Clean csperl5clean : $(pmfilefinal) ;
 
   local perlxs = [ FGristFiles csperlxs.c ] ;
   PerlEmbedGlueFile $(perlxs) ;
@@ -74,13 +82,15 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
     [ FIncludes $(targetdir) ]
     $(COMPILER.C++FLAGS.WARNING.NO_UNUSED)
     $(COMPILER.C++FLAGS.WARNING.NO_UNINITIALIZED) ;
+  Depends csperl5 : $(pmfilefinal) ;
 
   rule InstallCSPerl5PM
   {
-    local SUBDIR = $(2) ; # Temporary override for InstallData.
-    InstallData $(1) : $(3) ;
+    # Temporary SUBDIR override for InstallData.
+    local SUBDIR = [ on $(<) GetVar LOCATE ] ;
+    InstallData $(<) : $(>) ;
   }
-  InstallCSPerl5PM $(pmfile) : $(targetdir) : perl5 ;
+  InstallCSPerl5PM $(pmfilefinal) : perl5 ;
 
 
   # Note that '__EOF__' is purposely quoted to prevent shell from intrepreting

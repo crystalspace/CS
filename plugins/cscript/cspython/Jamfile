@@ -7,7 +7,6 @@ if $(PYTHON.AVAILABLE) = "yes"
   #--------
   local common = cs_pyth.cpp ;
   local cspacepy = [ DoSourceGrist cspace.py ] ;
-  local cspacepydir ;
 
   if ! [ Property build : projgen ]
   {
@@ -23,21 +22,28 @@ if $(PYTHON.AVAILABLE) = "yes"
 	[ ConcatDirs $(TOP) include ivaria ] :
 	$(SEARCH_SOURCE) [ ConcatDirs $(TOP) scripts python ] ;
       Depends cspythonclean : pythonswigclean ;
-      cspacepydir = $(LOCATE_TARGET) ;
+      SEARCH on $(cspacepy) = $(LOCATE_TARGET) ;
     }
     else
     {
       SEARCH on $(common) = $(SEARCH_SOURCE) ;
-      cspacepydir = [ ConcatDirs $(TOP) scripts python ] ;
+      SEARCH on $(cspacepy) = [ ConcatDirs $(TOP) scripts python ] ;
     }
   }
 
+  local cspacepyfinal = $(cspacepy:G=final) ;
+  MakeLocate $(cspacepyfinal) : $(LOCATE.TARGETS) ;
+  Copy $(cspacepyfinal) : $(cspacepy) ;
+  Depends $(cspacepyfinal) : $(cspacepy) ;
+  Clean cspythonclean : $(cspacepyfinal) ;
+
   rule InstallCSPythonPY
   {
-    local SUBDIR = $(2) ; # Temporary override for InstallData.
-    InstallData $(1) : $(3) ;
+    # Temporary SUBDIR override for InstallData.
+    local SUBDIR = [ on $(<) GetVar LOCATE ] ;
+    InstallData $(<) : $(>) ;
   }
-  InstallCSPythonPY $(cspacepy) : $(cspacepydir) : python ;
+  InstallCSPythonPY $(cspacepyfinal) : python ;
 
 
   #--------
@@ -51,6 +57,7 @@ if $(PYTHON.AVAILABLE) = "yes"
     [ FDefines SWIG_GLOBAL ]
     $(COMPILER.C++FLAGS.WARNING.NO_UNUSED) 
     $(COMPILER.C++FLAGS.WARNING.NO_UNINITIALIZED) ;
+  Depends cspython : $(cspacepyfinal) ;
 
 
   #--------
@@ -86,9 +93,10 @@ if $(PYTHON.AVAILABLE) = "yes"
   CFlags pythmod : $(PLUGIN.CFLAGS) ;
   LFlags pythmod : $(PLUGIN.LFLAGS) $(LINKLIBS) ;
   NotFile pythmod ;
+  Depends pythmod : $(cspacepyfinal) ;
   Depends pythmod : $(pythmod) ;
   Depends plugins : pythmod ;
-  MakeLocate $(pythmod) : $(LOCATE_TARGET) ;
+  MakeLocate $(pythmod) : $(LOCATE.TARGETS) ;
   Depends $(pythmod) : $(pythmodobj) ;
   LinkPlugin $(pythmod) : $(pythmodobj) ;
 

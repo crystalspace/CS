@@ -65,9 +65,10 @@ if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(CMD.SWIG) &&
   CFlags javamod : $(PLUGIN.CFLAGS) $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
   LFlags javamod : $(PLUGIN.LFLAGS) $(LINKLIBS) ;
   Depends csjava : $(javamod) ;
-  MakeLocate $(javamod) : $(LOCATE_TARGET) ;
+  MakeLocate $(javamod) : $(LOCATE.TARGETS) ;
   Depends $(javamod) : $(javamodobj) ;
   LinkPlugin $(javamod) : $(javamodobj) ;
+  Clean csjavaclean : $(javamod) ;
 
   local jar_extra = [ Wildcard [ ConcatDirs com crystalspace ] : *.java ] ;
   SEARCH on $(jar_extra) = $(SEARCH_SOURCE) ;
@@ -91,7 +92,6 @@ if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(CMD.SWIG) &&
   Copy $(buildxml:G=build) : $(buildxml) ;
   Clean csjavaclean : $(buildxml:G=build) ;
   Depends $(jar) : $(common) $(buildxml:G=build) $(jar_extra:BSG=built) ;
-  Depends csjava : $(jar) ;
   MakeLocate $(jar) : $(LOCATE_TARGET) ;
 
   actions Ant
@@ -102,12 +102,19 @@ if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(CMD.SWIG) &&
   Clean csjavaclean : $(jar) ;
   CleanDir csjavaclean : $(buildbase) ;
 
+  local jarfinal = $(jar:G=csjavafinal) ;
+  MakeLocate $(jarfinal) : $(LOCATE.TARGETS) ;
+  Copy $(jarfinal) : $(jar) ;
+  Depends $(jarfinal) : $(jar) ;
+  Depends csjava : $(jarfinal) ;
+  Clean csjavaclean : $(jarfinal) ;
+
   rule InstallJavaJar
   {
     local SUBDIR = $(2) ;
     InstallData $(1) : $(3) ;
   }
-  InstallJavaJar $(jar) : $(LOCATE_TARGET) : java ;
+  InstallJavaJar $(jarfinal) : $(LOCATE_TARGET) : java ;
 
   rule InstallJavamod
   {

@@ -21,19 +21,29 @@
 
 if $(CMD.SWIG)
 {
-  # Post-processing of the Swig-generated C++ file.  We need to ensure that
-  # <stdint.h> defines INT64_C() and cousins, which means that the
-  # __STDC_CONSTANT_MACROS and __STDC_LIMIT_MACROS macros must be defined
-  # before <stdint.h> is included.  In some Python installations, Python.h
-  # includes <stdint.h>, and Swig-generated output includes Python.h before we
-  # ever have a chance to define the __STDC_* macros.  There is no
+  # Post-processing of the Swig-generated C++ file.
+  #
+  # (1) We need to ensure that <stdint.h> defines INT64_C() and cousins, which
+  # means that the __STDC_CONSTANT_MACROS and __STDC_LIMIT_MACROS macros must
+  # be defined before <stdint.h> is included.  In some Python installations,
+  # Python.h includes <stdint.h>, and Swig-generated output includes Python.h
+  # before we ever have a chance to define the __STDC_* macros.  There is no
   # Swig-supported mechanism allowing us to insert these #defines before
-  # Python.h is included, so we post-process the output file.  Also, we delete
-  # any lines containing the CVS `Header' keyword to ensure that CVS does not
-  # consider the file changed simply because `Header' expansion differs.
-  # Finally, we #undefine _DEBUG, to ensure that python23.lib is used by MSVC
-  # instead of python23_d.lib.  (Despite the fact that these customizations
-  # might seem project-specific, they should be safe for all projects.)
+  # Python.h is included, so we post-process the output file.
+  #
+  # (2) We #undefine _DEBUG, to ensure that python23.lib is used by MSVC
+  # instead of python23_d.lib.
+  #
+  # (3) Delete any lines containing the CVS `Header' keyword to ensure that CVS
+  # does not consider the file changed simply because `Header' expansion
+  # differs.
+  #
+  # (4) Swig 1.3.22 for Perl emits illegal expressions `new (sometype)[n]'
+  # rather than `new sometype[n]' (at least gcc considers it illegal),
+  # therefore, we transform the expression by dropping the parentheses.
+  #
+  # (Despite the fact that these customizations might seem project-specific,
+  # they should be safe for all projects.)
   SWIG.SED_SCRIPT =
     "'s/\\([ 	]*#[ 	]*include[ 	][ 	]*[<\"]Python.h[>\"]\\)/\\
     #ifndef __STDC_CONSTANT_MACROS\\
@@ -45,8 +55,9 @@ if $(CMD.SWIG)
     #ifndef DEBUG_PYTHON\\
     #undef _DEBUG\\
     #endif\\
-    \\1/
-    /\$Header:/d'" ;
+    \\1/g
+    /\$Header:/d
+    s/new[ 	][ 	]*(\\([^)][^)]*\\))[ 	]*\\[/new \\1 [/g'" ;
 
   ## Swig targets : swigfile : language [ : swigflags [ : swigincdirs
   ##     [ : swigfiledir [ : frozendirs [ : tag [ : outdir ]]]]]]
