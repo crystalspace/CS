@@ -111,10 +111,18 @@ bool awsImageView::GetProperty (const char *name, void **parm)
 bool awsImageView::SetProperty (const char *name, void *parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
-  if (strcmp(name, "Color")==0)
+  if (strcmp(name, "Color") == 0)
   {
-	color = (int)parm;
-	return true;
+    color = (int)parm;
+    return true;
+  }
+  else
+  if (strcmp(name, "Image") == 0)
+  {
+    // Old img1 will stay in AWS cache
+    img1 = WindowManager ()->GetPrefMgr ()->GetTexture ((const char *)parm,
+                                                        (const char *)parm);
+    return true;
   }
 
   return false;
