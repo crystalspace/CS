@@ -21,7 +21,6 @@
 
 #include "csgeom/matrix3.h"
 #include "csutil/refarr.h"
-#include "csutil/csvector.h"
 #include "csutil/csobject.h"
 #include "iengine/collectn.h"
 

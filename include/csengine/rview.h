@@ -22,7 +22,6 @@
 #include "csgeom/math3d.h"
 #include "csgeom/frustum.h"
 #include "csengine/camera.h"
-#include "csutil/csvector.h"
 #include "iengine/rview.h"
 #include "iengine/engine.h"
 
@@ -92,14 +91,14 @@ private:
    * Update the csRenderContextFrustum to the given clipper.
    */
   void UpdateFrustum (iClipper2D* clip, csRenderContextFrustum*
-  	frust);
+    frust);
 
   /**
    * Given a csRenderContextFrustum and a bounding sphere calculate if
    * the sphere is fully inside and fully outside that frustum.
    */
   static void TestSphereFrustum (csRenderContextFrustum* frust,
-  	const csVector3& center, float radius, bool& inside, bool& outside);
+    const csVector3& center, float radius, bool& inside, bool& outside);
 
 public:
   ///
@@ -256,7 +255,7 @@ public:
    * This function will take care of correctly enabling/disabling fog.
    */
   virtual void CalculateFogMesh (const csTransform& tr_o2c,
-  	G3DTriangleMesh& mesh);
+    G3DTriangleMesh& mesh);
 
   /**
    * Calculate the fog information in the given G3DPolygonMesh
@@ -277,7 +276,7 @@ public:
    * transform object to camera space.
    */
   virtual bool TestBSphere (const csReversibleTransform& o2c,
-  	const csSphere& sphere);
+    const csSphere& sphere);
   /**
    * Check if the given bounding sphere (in object space coordinates)
    * is visibile in this render view. The given transformation should
@@ -287,8 +286,8 @@ public:
    * DrawPolygonMesh.
    */
   virtual bool ClipBSphere (const csReversibleTransform& o2c,
-  	const csSphere& sphere,
-	int& clip_portal, int& clip_plane, int& clip_z_plane);
+    const csSphere& sphere,
+  int& clip_portal, int& clip_plane, int& clip_z_plane);
   /**
    * Check if the screen bounding box of an object is visible in
    * this render view. If true is returned (visible) then clip_plane,
@@ -297,7 +296,7 @@ public:
    * plane clipping.
    */
   virtual bool ClipBBox (const csBox2& sbox, const csBox3& cbox,
-      	int& clip_portal, int& clip_plane, int& clip_z_plane);
+        int& clip_portal, int& clip_plane, int& clip_z_plane);
 
   /**
    * Get current sector.

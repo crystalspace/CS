@@ -24,7 +24,6 @@
 #include "csutil/nobjvec.h"
 #include "csutil/refarr.h"
 #include "csutil/cscolor.h"
-#include "csutil/csvector.h"
 #include "iutil/objref.h"
 #include "csengine/light.h"
 #include "csengine/meshobj.h"
@@ -51,7 +50,7 @@ class csSectorLightList : public csLightList
 {
 private:
   csSector* sector;
-  csKDTree* kdtree;	// kdtree to help find lights faster.
+  csKDTree* kdtree; // kdtree to help find lights faster.
 
 public:
   /// constructor
@@ -333,7 +332,7 @@ public:
    * if a polygon is returned.
    */
   iPolygon3D* HitBeam (const csVector3& start, const csVector3& end,
-  	csVector3& isect);
+    csVector3& isect);
 
   /**
    * Follow a beam from start to end and return the first object
@@ -342,7 +341,7 @@ public:
    * If polygonPtr is null then the polygon will not be filled in.
    */
   csMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,
-  	csVector3& intersect, iPolygon3D** polygonPtr, bool accurate = false);
+    csVector3& intersect, iPolygon3D** polygonPtr, bool accurate = false);
 
   /**
    * Check visibility in a frustum way for all things and polygons in
@@ -409,9 +408,9 @@ public:
    * If 'mesh' != NULL the mesh will be filled in.
    */
   iPolygon3D* IntersectSegment (const csVector3& start,
-	const csVector3& end, csVector3& isect,
-	float* pr = NULL, bool only_portals = false,
-	csMeshWrapper** p_mesh = NULL);
+  const csVector3& end, csVector3& isect,
+  float* pr = NULL, bool only_portals = false,
+  csMeshWrapper** p_mesh = NULL);
 
   /**
    * Calculate the bounding box of all objects in this sector.
@@ -523,11 +522,11 @@ public:
       { scfParent->DisableFog (); }
 #endif // CS_USE_NEW_RENDERER
     virtual iPolygon3D* HitBeam (const csVector3& start, const csVector3& end,
-  	csVector3& isect);
+    csVector3& isect);
     virtual iMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,
-  	csVector3& intersect, iPolygon3D** polygonPtr, bool accurate = false);
+    csVector3& intersect, iPolygon3D** polygonPtr, bool accurate = false);
     virtual iSector* FollowSegment (csReversibleTransform& t,
-  	csVector3& new_position, bool& mirror, bool only_portals = false);
+    csVector3& new_position, bool& mirror, bool only_portals = false);
     virtual void Draw (iRenderView* rview)
       { scfParent->Draw (rview); }
 #ifdef CS_USE_NEW_RENDERER

@@ -21,6 +21,13 @@ The history order is reversed so that new features are at the top.
 	- res fixed some flawed doxygen comments, removed all doxygen-specific
 	  files from docs/support and changed docs/docs.mak to utilize the
 	  docs/doxygen directory instead.
+	- Bart Boatwright changed all instances of csFrustum::Intersect to
+	  return csPtr<csFrustum> rather than csFrustum*; csFrustumContext,
+	  csFrustumView, csBezierLightPatch, csLightPath now using smart
+	  pointers; added csFrustumContext::SetNewShadow and ::SetNewFrustum
+	  methods; csShadowBlock using csRefArray instead of deprecated
+	  csVector; removed some unnecessary includes of csvector.h; removed
+	  tabs from some files.
 22-Apr-2003
 	- Eric Sunshine added links for the new CrystalDoc translation project
 	  to the Crystal Space web site.  Also cleaned up the web site's main

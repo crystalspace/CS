@@ -31,29 +31,23 @@ SCF_IMPLEMENT_IBASE_END
 
 csFrustumView::csFrustumView () :
   object_func (NULL),
-  userdata (NULL),
   things_shadow (false),
   ctxt (NULL)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   ctxt = new csFrustumContext ();
 
-  csShadowBlockList *sbl = new csShadowBlockList ();
-  ctxt->SetShadows ((iShadowBlockList *)sbl, false);
+  ctxt->SetNewShadows (new csShadowBlockList ());
 }
 
 csFrustumView::~csFrustumView ()
 {
-  if (ctxt->GetLightFrustum ()) ctxt->GetLightFrustum ()->DecRef ();
-  if (!ctxt->IsShared ()) ctxt->GetShadows ()->DecRef ();
   delete ctxt;
-  if (userdata) userdata->DecRef ();
 }
 
 void csFrustumView::StartNewShadowBlock ()
 {
-  if (!ctxt->IsShared ()) ctxt->GetShadows ()->DecRef ();
-  ctxt->SetShadows ((iShadowBlockList *) (new csShadowBlockList ()), false);
+  ctxt->SetNewShadows (new csShadowBlockList ());
 }
 
 void csFrustumView::CreateFrustumContext ()
@@ -65,7 +59,7 @@ void csFrustumView::CreateFrustumContext ()
   // A pool would work very well here since we have limited recusion depth.
   ctxt = new csFrustumContext ();
   *ctxt = *old_ctxt;
-  ctxt->SetShadows (old_ctxt->GetShadows (), true);
+  ctxt->SetShadows (old_ctxt->GetShadows ());
 }
 
 void csFrustumView::SetFrustumContext (csFrustumContext *new_ctxt)
@@ -77,7 +71,7 @@ csFrustumContext *csFrustumView::CopyFrustumContext ()
 {
   csFrustumContext *new_ctxt = new csFrustumContext ();
   *new_ctxt = *ctxt;
-  new_ctxt->SetShadows (ctxt->GetShadows (), true);
+  new_ctxt->SetShadows (ctxt->GetShadows ());
   return new_ctxt;
 }
 
@@ -88,7 +82,6 @@ void csFrustumView::RestoreFrustumContext (csFrustumContext *original)
 
   //@@@ HANDLING OF LightFrustum
   if (old_ctxt->GetLightFrustum ()) old_ctxt->GetLightFrustum ()->DecRef ();
-  if (!old_ctxt->IsShared ()) old_ctxt->GetShadows ()->DecRef ();
   delete old_ctxt;
 }
 
@@ -128,13 +121,13 @@ void csShadowBlock::AddRelevantShadows (
     {
       if (trans)
       {
-        csShadowFrustum *copycsf = new csShadowFrustum (*csf);
+        csRef<csShadowFrustum> copycsf;
+        copycsf.AttachNew (new csShadowFrustum (*csf));
         copycsf->Transform (trans);
         IntAddShadow (copycsf);
       }
       else
       {
-        csf->IncRef ();
         IntAddShadow (csf);
       }
     }
@@ -158,7 +151,6 @@ void csShadowBlock::AddRelevantShadows (csShadowBlockList *source)
     csShadowFrustum *csf = (csShadowFrustum *)shadow_it->Next ();
     if (csf->IsRelevant ())
     {
-      csf->IncRef ();
       IntAddShadow (csf);
     }
   }
@@ -177,7 +169,6 @@ void csShadowBlock::AddAllShadows (csShadowBlockList *source)
   while (shadow_it->HasNext ())
   {
     csShadowFrustum *csf = (csShadowFrustum *)shadow_it->Next ();
-    csf->IncRef ();
     IntAddShadow (csf);
   }
 
@@ -201,10 +192,9 @@ void csShadowBlock::AddUniqueRelevantShadows (csShadowBlockList *source)
     if (csf->IsRelevant ())
     {
       for (i = 0; i < cnt; i++)
-        if (((csShadowFrustum *)shadows[i]) == csf) break;
+        if (shadows[i] == csf) break;
       if (i >= cnt)
       {
-        csf->IncRef ();
         IntAddShadow (csf);
       }
     }
@@ -224,17 +214,17 @@ csFrustum *csShadowBlock::AddShadow (
   int num_verts,
   csPlane3 &backplane)
 {
-  csShadowFrustum *sf = new csShadowFrustum (origin, num_verts);
+  csRef<csShadowFrustum> sf;
+  sf.AttachNew (new csShadowFrustum (origin, num_verts));
   sf->SetBackPlane (backplane);
   sf->SetUserData (userData);
   IntAddShadow (sf);
-  return (csFrustum *)sf;
+  return sf;
 }
 
 void csShadowBlock::UnlinkShadow (int idx)
 {
-  csShadowFrustum *sf = (csShadowFrustum *)shadows[idx];
-  sf->DecRef ();
+  csShadowFrustum *sf = shadows[idx];
   shadows.Delete (idx);
   bbox_valid = false;
 }
@@ -247,7 +237,7 @@ const csBox3& csShadowBlock::GetBoundingBox ()
     int i, j;
     for (i = 0 ; i < shadows.Length () ; i++)
     {
-      csShadowFrustum *sf = (csShadowFrustum *)shadows[i];
+      csShadowFrustum *sf = shadows[i];
       for (j = 0 ; j < sf->GetVertexCount () ; j++)
         bbox.AddBoundingVertex (sf->GetVertex (j));
     }

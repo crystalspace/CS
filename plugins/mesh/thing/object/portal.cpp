@@ -91,8 +91,8 @@ iReferencedObject *csPortal::GetReferencedObject () const
 {
   if (!sector) return NULL;
   csRef<iReferencedObject> ref = SCF_QUERY_INTERFACE (sector,
-  	iReferencedObject);
-  return ref;	// DecRef is ok.
+    iReferencedObject);
+  return ref; // DecRef is ok.
 }
 
 void csPortal::SetReferencedObject (iReferencedObject *b)
@@ -184,7 +184,7 @@ bool csPortal::CompleteSector (iBase *context)
 }
 
 void csPortal::ObjectToWorld (const csReversibleTransform &t,
-	csReversibleTransform& warp_wor) const
+  csReversibleTransform& warp_wor) const
 {
   if (flags.Check (CS_PORTAL_STATICDEST))
     warp_wor = warp_obj * t;
@@ -267,7 +267,7 @@ void csPortal::GetColorFilter (float &r, float &g, float &b) const
 }
 
 csVector3 csPortal::Warp (const csReversibleTransform& t,
-		const csVector3 &pos) const
+    const csVector3 &pos) const
 {
   if (flags.Check (CS_PORTAL_WARP))
   {
@@ -284,7 +284,7 @@ csVector3 csPortal::Warp (const csReversibleTransform& t,
 }
 
 void csPortal::WarpSpace (const csReversibleTransform& warp_wor,
-		csReversibleTransform &t, bool &mirror) const
+    csReversibleTransform &t, bool &mirror) const
 {
   // warp_wor is a world -> warp space transformation.
   // t is a world -> camera space transformation.
@@ -436,7 +436,7 @@ iMeshWrapper *csPortal::HitBeam (
 #endif
 
 void csPortal::CheckFrustum (iFrustumView *lview,
-		const csReversibleTransform& t, int alpha)
+    const csReversibleTransform& t, int alpha)
 {
   if (!CompleteSector (lview)) return ;
   if (sector->GetRecLevel () > 1)
@@ -448,7 +448,7 @@ void csPortal::CheckFrustum (iFrustumView *lview,
 
   csFrustumContext *new_ctxt = lview->GetFrustumContext ();
   if (old_ctxt->GetLightFrustum ())
-    new_ctxt->SetLightFrustum (new csFrustum (*old_ctxt->GetLightFrustum ()));
+    new_ctxt->SetNewLightFrustum (new csFrustum (*old_ctxt->GetLightFrustum ()));
   lview->StartNewShadowBlock ();
 
   // If copied_frustums is true we copied the frustums and we need to

@@ -59,7 +59,7 @@ private:
   csRef<iShadowBlock> shadows;
 
   /// frustum of where the visible light hits (for use with curves)
-  csFrustum *light_frustum;
+  csRef<csFrustum> light_frustum;
 
 public:
   /**
@@ -142,6 +142,8 @@ public:
 
   /// Set the light frustum.
   void SetLightFrustum (csFrustum* lf) { light_frustum = lf; }
+  /// Set the light frustum.
+  void SetNewLightFrustum (csPtr<csFrustum> lf) { light_frustum = lf; }
   /// Get the light frustum.
   csFrustum* GetLightFrustum () { return light_frustum; }
 };

@@ -114,7 +114,7 @@ csPolygon3DStatic::~csPolygon3DStatic ()
 csPolygon3DStatic* csPolygon3DStatic::Clone ()
 {
   csPolygon3DStatic* clone = thing_static->thing_type
-  	->blk_polygon3dstatic.Alloc ();
+    ->blk_polygon3dstatic.Alloc ();
   clone->SetMaterial (material);
   clone->SetName (name);
   clone->vertices = vertices;
@@ -225,7 +225,7 @@ void csPolygon3DStatic::MappingSetTextureSpace (
   const csVector3 u (xu, yu, zu);
   const csVector3 v (xv, yv, zv);
   csTextureTrans::compute_texture_space (mapping->m_obj2tex,
-  	mapping->v_obj2tex, o, u, v);
+    mapping->v_obj2tex, o, u, v);
   thing_static->scfiObjectModel.ShapeChanged ();
 }
 
@@ -408,7 +408,7 @@ bool csPolygon3DStatic::IsTransparent ()
 
   iTextureHandle *txt_handle = GetMaterialHandle ()->GetTexture ();
   return txt_handle && ((txt_handle->GetAlphaMap ()
-  	|| txt_handle->GetKeyColor ()));
+    || txt_handle->GetKeyColor ()));
 }
 
 int csPolygon3DStatic::Classify (const csPlane3 &pl)
@@ -534,7 +534,7 @@ void csPolygon3DStatic::CreateBoundingTextureBox ()
   csVector3 v1, v2;
   for (i = 0; i < GetVertices ().GetVertexCount (); i++)
   {
-    v1 = Vobj (i);           	      // Coordinates of vertex in object space.
+    v1 = Vobj (i);                  // Coordinates of vertex in object space.
     v1 -= mapping->v_obj2tex;
     v2 = (mapping->m_obj2tex) * v1;   // Coordinates of vertex in texture space.
     if (v2.x < min_u) min_u = v2.x;
@@ -588,7 +588,7 @@ void csPolygon3DStatic::Finish ()
   if (IsTextureMappingEnabled ())
   {
     if (!material || (material->GetMaterialHandle () &&
-    	!material->GetMaterialHandle ()->GetTexture ()))
+      !material->GetMaterialHandle ()->GetTexture ()))
     {
       EnableTextureMapping (false);
       return ;
@@ -613,7 +613,7 @@ void csPolygon3DStatic::Finish ()
     {
       thing_static->thing_type->Notify ("Oversize lightmap (%dx%d > %dx%d) "
         "for polygon '%s'", lmw, lmh, 
-	max_lmw, max_lmh, GetName());
+  max_lmw, max_lmh, GetName());
     }
   }
 
@@ -880,7 +880,7 @@ bool csPolygon3DStatic::PointOnPolygon (const csVector3 &v)
 }
 
 bool csPolygon3DStatic::IntersectRay (const csVector3 &start,
-		const csVector3 &end)
+    const csVector3 &end)
 {
   // First we do backface culling on the polygon with respect to
   // the starting point of the beam.
@@ -1010,9 +1010,9 @@ bool csPolygon3DStatic::IntersectSegmentPlane (
     plane_obj.C () * (z2 - z1);
   if (ABS (denom) < SMALL_EPSILON) return false;  // Lines are parallel
   num = -(plane_obj.A () * x1 +
-	  plane_obj.B () * y1 +
-	  plane_obj.C () * z1 +
-	  plane_obj.D ());
+    plane_obj.B () * y1 +
+    plane_obj.C () * z1 +
+    plane_obj.D ());
   r = num / denom;
 
   // Calculate 'r' and 'isect' even if the intersection point is
@@ -1117,7 +1117,7 @@ void csPolygon3D::WorldToCameraPlane (
 }
 
 void csPolygon3D::ComputeCameraPlane (const csReversibleTransform& t,
-  	csPlane3& pl)
+    csPlane3& pl)
 {
   csVector3 cam_vert = t.Other2This (Vwor (0));
   WorldToCameraPlane (t, cam_vert, pl);
@@ -1135,7 +1135,7 @@ void csPolygon3D::ObjectToWorld (
   plane_wor.Normalize ();
 
   if (txt_info) txt_info->ObjectToWorld (static_data->mapping->m_obj2tex,
-  	static_data->mapping->v_obj2tex, t);
+    static_data->mapping->v_obj2tex, t);
 }
 
 #define TEXW(t) ((t)->w_orig)
@@ -1153,21 +1153,21 @@ void csPolygon3D::Finish ()
     if (static_data->flags.Check (CS_POLY_LIGHTING))
     {
       csLightMap *lm = static_data->thing_static->thing_type
-      	->blk_lightmap.Alloc ();
+        ->blk_lightmap.Alloc ();
       txt_info->SetLightMap (lm);
 
       csColor ambient;
       thing->GetStaticData ()->thing_type->engine->GetAmbientLight (ambient);
       lm->Alloc (static_data->mapping->w_orig, static_data->mapping->h,
-      	  int(ambient.red * 255.0f),
-      	  int(ambient.green * 255.0f),
-      	  int(ambient.blue * 255.0f));
+          int(ambient.red * 255.0f),
+          int(ambient.green * 255.0f),
+          int(ambient.blue * 255.0f));
   
       csThingObjectType* thing_type = thing->GetStaticData ()->thing_type;
       if (!thing_type->G3D->IsLightmapOK (txt_info))
       {
         thing_type->Notify ("Renderer can't handle lightmap "
-	    "for polygon '%s'", static_data->GetName());
+      "for polygon '%s'", static_data->GetName());
         static_data->flags.Set (CS_POLY_LM_REFUSED, CS_POLY_LM_REFUSED);
       }
     }
@@ -1679,7 +1679,7 @@ bool csPolygon3D::DoPerspective (
     // Add the rest of the vertices, which are all NORMAL points.
     if (needfinish)
       while (ind < end) dest->AddPerspective (*ind++,
-      	fov, shift_x, shift_y);
+        fov, shift_x, shift_y);
   } /* if (exit || reenter) */
 
   // Do special processing (all points are NEAR or BEHIND)
@@ -1748,7 +1748,7 @@ const char* csPolygon3D::ReadFromCache (iFile* file)
           static_data->mapping->w_orig,
           static_data->mapping->h,
           this,
-	  thing->GetStaticData ()->thing_type->engine);
+    thing->GetStaticData ()->thing_type->engine);
     if (error != NULL)
     {
       txt_info->InitLightMaps ();
@@ -1767,9 +1767,9 @@ bool csPolygon3D::WriteToCache (iFile* file)
     if (txt_info->lm == NULL) return true;
     txt_info->lightmap_up_to_date = true;
     if (thing->GetStaticData ()->thing_type->engine->GetLightingCacheMode ()
-    	& CS_ENGINE_CACHE_WRITE)
+      & CS_ENGINE_CACHE_WRITE)
       txt_info->lm->Cache (file, this,
-	  thing->GetStaticData ()->thing_type->engine);
+    thing->GetStaticData ()->thing_type->engine);
     return true;
   }
 
@@ -1793,7 +1793,7 @@ void csPolygon3D::FillLightMapDynamic (iFrustumView* lview)
   // a light patch for this polygon.
   // @@@ Lots of pointers to get the lightpatch pool!!!
   csLightPatch *lp = thing->GetStaticData ()->thing_type->
-  	lightpatch_pool->Alloc ();
+    lightpatch_pool->Alloc ();
   csRef<iShadowBlock> sb = lview->CreateShadowBlock ();
   lp->SetShadowBlock (sb);
   AddLightpatch (lp);
@@ -1858,7 +1858,7 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
       if (sfp == NULL)
       {
         shadow_it->MarkRelevant (true);
-	continue;
+  continue;
       }
 
       switch (csFrustum::BatchClassify (
@@ -1919,21 +1919,21 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
           shadow_it->MarkRelevant (false);
           break;
         case CS_FRUST_COVERED:
-	  {
-	    // To see if we really have a 'covered' case we first
-	    // test if the covering polygon isn't behind the first
-	    // polygon. To do that we take a ray from the center of
-	    // the light to the plane of the other polygon and see
-	    // if it intersects.
-	    csVector3 isect;
-	    float dist;
-	    if (!csIntersect3::Plane (center, Vwor (0), sfp->GetPolyPlane (),
-	    	isect, dist))
-	    {
+    {
+      // To see if we really have a 'covered' case we first
+      // test if the covering polygon isn't behind the first
+      // polygon. To do that we take a ray from the center of
+      // the light to the plane of the other polygon and see
+      // if it intersects.
+      csVector3 isect;
+      float dist;
+      if (!csIntersect3::Plane (center, Vwor (0), sfp->GetPolyPlane (),
+        isect, dist))
+      {
               shadow_it->MarkRelevant (false);
-	      break;
-	    }
-	  }
+        break;
+      }
+    }
           shadow_it->DecRef ();
           return false;
       }
@@ -1950,13 +1950,13 @@ bool csPolygon3D::MarkRelevantShadowFrustums (iFrustumView* lview)
 
   // First translate plane to center of frustum.
   poly_plane.DD += poly_plane.norm * lview->GetFrustumContext ()
-  	->GetLightFrustum ()->GetOrigin ();
+    ->GetLightFrustum ()->GetOrigin ();
   poly_plane.Invert ();
   return MarkRelevantShadowFrustums (lview, poly_plane);
 }
 
 void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
-		iMovable* movable)
+    iMovable* movable)
 {
   csFrustum *light_frustum = lview->GetFrustumContext ()->GetLightFrustum ();
   const csVector3 &center = light_frustum->GetOrigin ();
@@ -1974,7 +1974,7 @@ void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
     return ;
 
   csPortal *po;
-  csFrustum *new_light_frustum;
+  csRef<csFrustum> new_light_frustum;
 
   csVector3 *poly;
   int num_vertices;
@@ -2017,7 +2017,6 @@ void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
 
   if (min_sqdist >= lview->GetSquaredRadius ())
   {
-    delete new_light_frustum;
     return ;
   }
 
@@ -2047,7 +2046,7 @@ void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
   {
     if (!po->flags.Check (CS_PORTAL_MIRROR))
       po->CheckFrustum (lview, movable->GetTransform (),
-		      static_data->GetAlpha ());
+          static_data->GetAlpha ());
   }
 
 stop:
@@ -2055,8 +2054,8 @@ stop:
 }
 
 void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
-	iMovable* movable,
-	csLightingPolyTexQueue* lptq, bool vis)
+  iMovable* movable,
+  csLightingPolyTexQueue* lptq, bool vis)
 {
   bool do_smooth = GetParent ()->GetStaticData ()->GetSmoothingFlag ();
 
@@ -2078,7 +2077,7 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
   // If distance is too small or greater than the radius of the light
   // then we have a trivial case (no hit).
   if ((!do_smooth && dist_to_plane < SMALL_EPSILON)
-  	|| dist_to_plane >= lview->GetRadius ())
+    || dist_to_plane >= lview->GetRadius ())
     return ;
 
   // In the following algorithm we ignore the light frustum and only
@@ -2134,16 +2133,14 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
     else
       for (j = 0; j < num_vertices; j++) poly[j] = Vwor (j) - center;
 
-    csFrustum *new_light_frustum = light_frustum->Intersect (
-        poly,
-        num_vertices);
-
     // @@@ Check if this isn't a memory leak.
-    new_ctxt->SetLightFrustum (new_light_frustum);
-    if (new_light_frustum)
+    new_ctxt->SetNewLightFrustum (light_frustum->Intersect (
+        poly,
+        num_vertices));
+    if (new_ctxt->GetLightFrustum ())
     {
       po->CheckFrustum ((iFrustumView *)lview,
-		      movable->GetTransform (), static_data->GetAlpha ());
+          movable->GetTransform (), static_data->GetAlpha ());
     }
 
     lview->RestoreFrustumContext (old_ctxt);
@@ -2151,7 +2148,7 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
 }
 
 void csPolygon3D::FillLightMapStatic (iFrustumView *lview,
-	csLightingPolyTexQueue* lptq, bool vis)
+  csLightingPolyTexQueue* lptq, bool vis)
 {
   if (txt_info)
   {

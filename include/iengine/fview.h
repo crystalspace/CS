@@ -29,10 +29,9 @@
 #include "csgeom/plane3.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/box.h"
+#include "iengine/shadows.h"
 
 struct iFrustumView;
-struct iShadowBlock;
-struct iShadowBlockList;
 struct iMeshWrapper;
 class csFrustum;
 class csFrustumContext;
@@ -54,7 +53,7 @@ struct iFrustumViewUserdata : public iBase
  * CastShadows() procedure from the visibility culler).
  */
 typedef void (csFrustumViewObjectFunc)(iMeshWrapper* mesh,
-	iFrustumView* lview, bool vis);
+  iFrustumView* lview, bool vis);
 
 /**
  * This structure keeps track of the current frustum context.
@@ -70,7 +69,7 @@ private:
    * expanded with every traversal through a portal but it needs
    * to be restored to original state again before returning.
    */
-  iShadowBlockList* shadows;
+  csRef<iShadowBlockList> shadows;
   /**
    * This flag is true if the list of shadows is shared with some
    * other csFrustumView.
@@ -84,14 +83,13 @@ private:
    * The frustum for the light. Everthing that falls in this frustum
    * is lit unless it also is in a shadow frustum.
    */
-  csFrustum* light_frustum;
+  csRef<csFrustum> light_frustum;
 
 public:
   /// Constructor.
   csFrustumContext () :
-  	shadows (NULL),
-	shared (false),
-	mirror (false)
+    shared (false),
+    mirror (false)
   { }
 
   csFrustumContext& operator= (csFrustumContext const& c)
@@ -106,7 +104,13 @@ public:
   /// Get the list of shadows.
   iShadowBlockList* GetShadows () { return shadows; }
   /// Set the list of shadows.
-  void SetShadows (iShadowBlockList* shad, bool sh)
+  void SetShadows (iShadowBlockList* shad, bool sh = true)
+  {
+    shadows = shad;
+    shared = sh;
+  }
+  /// Set a new (already IncRef'd) list of shadows.
+  void SetNewShadows (csPtr<iShadowBlockList> shad, bool sh = false)
   {
     shadows = shad;
     shared = sh;
@@ -116,6 +120,8 @@ public:
 
   /// Set the light frustum.
   void SetLightFrustum (csFrustum* lf) { light_frustum = lf; }
+  /// Set a new (already IncRef'd) light frustrum
+  void SetNewLightFrustum (csPtr<csFrustum> lf) { light_frustum = lf; }
   /// Get the light frustum.
   csFrustum* GetLightFrustum () { return light_frustum; }
 

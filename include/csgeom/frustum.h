@@ -37,13 +37,13 @@ class csTransform;
  * covers the frustum or is partly inside, partly outside.
  * @{ */
 /// The polygon is fully outside frustum
-#define CS_FRUST_OUTSIDE	0
+#define CS_FRUST_OUTSIDE  0
 /// The polygon is fully inside frustum
-#define CS_FRUST_INSIDE		1
+#define CS_FRUST_INSIDE   1
 /// The polygon fully covers the frustum
-#define CS_FRUST_COVERED	2
+#define CS_FRUST_COVERED  2
 /// The polygon is partially inside frustum
-#define CS_FRUST_PARTIAL	3
+#define CS_FRUST_PARTIAL  3
 /** @} */
 
 /**
@@ -57,7 +57,7 @@ struct csClipInfo
 # define CS_CLIPINFO_ORIGINAL 0
 # define CS_CLIPINFO_ONEDGE 1
 # define CS_CLIPINFO_INSIDE 2
-  int type;	// One of CS_CLIPINFO_???
+  int type; // One of CS_CLIPINFO_???
   union
   {
     struct { int idx; } original;
@@ -114,16 +114,16 @@ struct csClipInfo
     {
       case CS_CLIPINFO_ORIGINAL:
         printf ("%s ORIGINAL idx=%d\n", ind, original.idx);
-	break;
+  break;
       case CS_CLIPINFO_ONEDGE:
         printf ("%s ONEDGE i1=%d i2=%d r=%g\n", ind, onedge.i1, onedge.i2,
-		onedge.r);
+    onedge.r);
         break;
       case CS_CLIPINFO_INSIDE:
         printf ("%s INSIDE r=%g\n", ind, inside.r);
-	inside.ci1->Dump (indent+2);
-	inside.ci2->Dump (indent+2);
-	break;
+  inside.ci1->Dump (indent+2);
+  inside.ci2->Dump (indent+2);
+  break;
     }
     fflush (stdout);
   }
@@ -190,14 +190,14 @@ public:
 
   /// Create a new empty frustum.
   csFrustum (const csVector3& o) : pool (&csDefaultVertexArrayPool::GetDefaultPool()),
-  	origin (o), vertices (NULL), num_vertices (0), max_vertices (0),
-	backplane (NULL), wide (false), mirrored (false), ref_count (1)
+    origin (o), vertices (NULL), num_vertices (0), max_vertices (0),
+  backplane (NULL), wide (false), mirrored (false), ref_count (1)
   { }
 
   /// Create a new empty frustum with another pool.
   csFrustum (const csVector3& o, csVertexArrayPool* pl) : pool (pl),
-  	origin (o), vertices (NULL), num_vertices (0), max_vertices (0),
-	backplane (NULL), wide (false), mirrored (false), ref_count (1)
+    origin (o), vertices (NULL), num_vertices (0), max_vertices (0),
+  backplane (NULL), wide (false), mirrored (false), ref_count (1)
   { }
 
   /**
@@ -206,7 +206,7 @@ public:
    * If the given polygon is NULL then we create an empty frustum.
    */
   csFrustum (const csVector3& o, csVector3* verts, int num_verts,
-      	csPlane3* backp = NULL);
+        csPlane3* backp = NULL);
 
   /**
    * Create a frustum given a number of vertices and a backplane.
@@ -214,7 +214,7 @@ public:
    * The polygon is given relative to the origin 'o'.
    */
   csFrustum (const csVector3& o, int num_verts,
-      	csVertexArrayPool* pl, csPlane3* backp = NULL);
+        csVertexArrayPool* pl, csPlane3* backp = NULL);
 
   /// Copy constructor.
   csFrustum (const csFrustum &copy);
@@ -304,7 +304,7 @@ public:
    * with CS_CLIPINFO_ORIGINAL instances and correct indices.
    */
   static void ClipToPlane (csVector3* vertices, int& num_vertices,
-	csClipInfo* clipinfo, const csVector3& v1, const csVector3& v2);
+  csClipInfo* clipinfo, const csVector3& v1, const csVector3& v2);
 
   /**
    * Clip a frustum (defined from 0,0,0 origin) to the given plane.
@@ -315,7 +315,7 @@ public:
    * instances and correct indices.
    */
   static void ClipToPlane (csVector3* vertices, int& num_vertices,
-	csClipInfo* clipinfo, const csPlane3& plane);
+  csClipInfo* clipinfo, const csPlane3& plane);
 
   /**
    * Clip the polygon of this frustum to the postive side of an arbitrary plane
@@ -333,7 +333,7 @@ public:
    * after usage. If there is no intersection this function
    * returns NULL.
    */
-  csFrustum* Intersect (const csFrustum& other);
+  csPtr<csFrustum> Intersect (const csFrustum& other);
 
   /**
    * Intersect a convex polygon with this volume. The convex polygon
@@ -349,7 +349,7 @@ public:
    * Note that the frustum polygon of the returned csFrustum is
    * guaranteed to be coplanar with the given polygon.
    */
-  csFrustum* Intersect (csVector3* poly, int num);
+  csPtr<csFrustum> Intersect (csVector3* poly, int num);
 
   /**
    * Intersect a convex polygon with this volume. The convex polygon
@@ -365,7 +365,7 @@ public:
    * Note that the frustum polygon of the returned csFrustum is
    * guaranteed to be coplanar with the given polygon.
    */
-  static csFrustum* Intersect (
+  static csPtr<csFrustum> Intersect (
     const csVector3& frust_origin, csVector3* frust, int num_frust,
     csVector3* poly, int num);
 
@@ -383,7 +383,7 @@ public:
    * Note that the frustum polygon of the returned csFrustum is
    * guaranteed to be coplanar with the given triangle.
    */
-  static csFrustum* Intersect (
+  static csPtr<csFrustum> Intersect (
     const csVector3& frust_origin, csVector3* frust, int num_frust,
     const csVector3& v1, const csVector3& v2, const csVector3& v3);
 
@@ -400,7 +400,7 @@ public:
    * Use this if you have to classify a batch of polygons against the same frustum.
    */
   static int BatchClassify (csVector3* frustum, csVector3* frustumNormals, int num_frust,
-			    csVector3* poly, int num_poly);
+          csVector3* poly, int num_poly);
 
   /**
    * Check if a point (given relative to the origin of the frustum)

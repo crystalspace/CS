@@ -27,10 +27,10 @@
  * @{ */
  
 #include "csutil/scf.h"
+#include "csgeom/frustum.h"
 
 struct iShadowBlock;
 struct iShadowBlockList;
-class csFrustum;
 class csTransform;
 class csPlane3;
 class csVector3;
@@ -83,7 +83,7 @@ struct iShadowBlock : public iBase
    * a copy is made and the shadows are transformed.
    */
   virtual void AddRelevantShadows (iShadowBlock* source,
-  	csTransform* trans = NULL) = 0;
+    csTransform* trans = NULL) = 0;
 
   /**
    * Copy all relevant shadow frustums from another shadow block list
@@ -112,7 +112,7 @@ struct iShadowBlock : public iBase
    * vertices still need to be initialized.
    */
   virtual csFrustum* AddShadow (const csVector3& origin, void* userData,
-  	int num_verts, csPlane3& backplane) = 0;
+    int num_verts, csPlane3& backplane) = 0;
 
   /// Unlink a shadow frustum from the list and dereference it.
   virtual void UnlinkShadow (int idx) = 0;
@@ -149,7 +149,7 @@ struct iShadowBlockList : public iBase
    * relevant (i.e. that potentially shadow the given bounding box).
    */
   virtual iShadowIterator* GetShadowIterator (
-  	const csBox3& bbox, bool reverse = false) = 0;
+    const csBox3& bbox, bool reverse = false) = 0;
 
   /// Create a new shadow block and append to the list.
   virtual iShadowBlock* NewShadowBlock (int num_shadows = 30) = 0;

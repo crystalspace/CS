@@ -22,7 +22,7 @@
 #include "csgeom/math3d.h"
 #include "csgeom/frustum.h"
 #include "csgeom/box.h"
-#include "csutil/csvector.h"
+#include "csutil/refarr.h"
 #include "iengine/shadows.h"
 #include "iengine/fview.h"
 
@@ -90,12 +90,12 @@ private:
   csShadowBlock* cur;
   int i, cur_num;
   bool onlycur;
-  int dir;	// 1 or -1 for direction.
-  csBox3 bbox;	// If use_bbox is true only iterate over relevant shadow blocks.
+  int dir;  // 1 or -1 for direction.
+  csBox3 bbox;  // If use_bbox is true only iterate over relevant shadow blocks.
   bool use_bbox;
   csShadowIterator (csShadowBlock* cur, bool onlycur, int dir);
   csShadowIterator (const csBox3& bbox, csShadowBlock* cur,
-  	bool onlycur, int dir);
+    bool onlycur, int dir);
   csShadowFrustum* cur_shad;
 
 public:
@@ -137,17 +137,17 @@ class csShadowBlock : public iShadowBlock
 
 private:
   csShadowBlock* next, * prev;
-  csVector shadows;
+  csRefArray<csShadowFrustum> shadows;
   uint32 shadow_region;
-  csBox3 bbox;	// The bbox (in light space) for all shadows in this block.
-  bool bbox_valid;	// If true bbox is valid.
+  csBox3 bbox;  // The bbox (in light space) for all shadows in this block.
+  bool bbox_valid;  // If true bbox is valid.
 
   void IntAddShadow (csShadowFrustum* csf);
 
 public:
   /// Create a new empty list.
   csShadowBlock (uint32 region = (uint32)~0, int max_shadows = 30,
-  	int delta = 30);
+    int delta = 30);
 
   /// Destroy the list and release all shadow references.
   virtual ~csShadowBlock ();
@@ -155,13 +155,6 @@ public:
   /// Dereference all shadows in the list.
   virtual void DeleteShadows ()
   {
-    int i;
-    for (i = 0 ; i < shadows.Length () ; i++)
-    {
-      csShadowFrustum* sf = (csShadowFrustum*)shadows[i];
-      CS_ASSERT (sf != NULL);
-      sf->DecRef ();
-    }
     shadows.DeleteAll ();
     bbox_valid = false;
   }
@@ -184,7 +177,7 @@ public:
    * a copy is made and the shadows are transformed.
    */
   virtual void AddRelevantShadows (iShadowBlock* source,
-  	csTransform* trans = NULL);
+    csTransform* trans = NULL);
 
   /**
    * Copy all relevant shadow frustums from another shadow block list
@@ -234,7 +227,7 @@ public:
    * vertices still need to be initialized.
    */
   virtual csFrustum* AddShadow (const csVector3& origin, void* userData,
-  	int num_verts, csPlane3& backplane);
+    int num_verts, csPlane3& backplane);
 
   /// Unlink a shadow frustum from the list and dereference it.
   virtual void UnlinkShadow (int idx);
@@ -248,8 +241,7 @@ public:
   /// Get the specified shadow.
   csFrustum* GetShadow (int idx)
   {
-    return (csFrustum*)(
-	(csShadowFrustum*)(idx < shadows.Length () ? shadows[idx] : NULL));
+    return (idx < shadows.Length () ? shadows[idx] : NULL);
   }
 
   /**
@@ -260,7 +252,7 @@ public:
     int i;
     for (i = 0 ; i < shadows.Length () ; i++)
     {
-      csShadowFrustum* sf = (csShadowFrustum*)shadows[i];
+      csShadowFrustum* sf = shadows[i];
       CS_ASSERT (sf != NULL);
       sf->Transform (trans);
     }
@@ -277,7 +269,7 @@ public:
   iShadowIterator* GetShadowIterator (bool reverse = false)
   {
     return (iShadowIterator*)(new csShadowIterator (this, true,
-    	reverse ? -1 : 1));
+      reverse ? -1 : 1));
   }
 
   /// Get the region for this shadow block.
@@ -399,13 +391,13 @@ public:
   virtual iShadowIterator* GetShadowIterator (bool reverse = false)
   {
     return (iShadowIterator*)(new csShadowIterator (first, false,
-    	reverse ? -1 : 1));
+      reverse ? -1 : 1));
   }
   virtual iShadowIterator* GetShadowIterator (
-  	const csBox3& bbox, bool reverse = false)
+    const csBox3& bbox, bool reverse = false)
   {
     return (iShadowIterator*)(new csShadowIterator (bbox, first, false,
-    	reverse ? -1 : 1));
+      reverse ? -1 : 1));
   }
 
   virtual uint32 MarkNewRegion ()
@@ -437,7 +429,7 @@ private:
   /// A function that is called for every node that is visited.
   csFrustumViewObjectFunc* object_func;
   /// User data for the entire process.
-  iFrustumViewUserdata* userdata;
+  csRef<iFrustumViewUserdata> userdata;
 
   /// Radius we want to check.
   float radius;
@@ -535,7 +527,7 @@ public:
   /// Set or clear userdata.
   virtual void SetUserdata (iFrustumViewUserdata* data)
   {
-    SCF_SET_REF (userdata, data);
+    userdata = data;
   }
   /// Get userdata.
   virtual iFrustumViewUserdata* GetUserdata ()

@@ -20,7 +20,6 @@
 #define __CS_SHAREVAR_H__
 
 #include "csutil/nobjvec.h"
-#include "csutil/csvector.h"
 #include "csutil/csstring.h"
 #include "iengine/sharevar.h"
 #include "csutil/csobject.h"
@@ -84,7 +83,7 @@ public:
 
     virtual iObject* QueryObject () { return scfParent; }
     virtual void Set(float val)
-    {	scfParent->Set(val); }
+    { scfParent->Set(val); }
     virtual float Get() const
     {   return scfParent->Get(); }
     virtual void SetName (const char *iName)

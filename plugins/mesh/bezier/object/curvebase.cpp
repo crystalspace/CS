@@ -247,7 +247,7 @@ void csCurve::UnlinkLightPatch (csBezierLightPatch *lp)
 bool csCurve::RecalculateDynamicLights ()
 {
   // first combine the static and pseudo-dynamic lights
-	// @@@@@@@@@@@@@@@@
+  // @@@@@@@@@@@@@@@@
   if (!LightMap || !LightMap->UpdateRealLightMap (0, 0, 0,
       ParentThing->GetLightVersion ()>light_version ))
     return false;
@@ -345,7 +345,7 @@ void csCurve::ShineDynLight (csBezierLightPatch *lp)
         cosinus = 1;
 
       float brightness = cosinus * light->QueryLight ()->
-      	GetBrightnessAtDistance (d);
+        GetBrightnessAtDistance (d);
 
       if (color.red > 0)
       {
@@ -450,8 +450,8 @@ void csCurve::CalculateLightingStatic (iFrustumView *lview, bool vis)
     if (!smap)
     {
       smap = LightMap->NewShadowMap (l,
-		      CURVE_LM_SIZE * csCurveLightMap::lightcell_size,
-		      CURVE_LM_SIZE * csCurveLightMap::lightcell_size);
+          CURVE_LM_SIZE * csCurveLightMap::lightcell_size,
+          CURVE_LM_SIZE * csCurveLightMap::lightcell_size);
     }
 
     ShadowMap = smap->GetArray ();
@@ -576,7 +576,7 @@ void csCurve::CalculateLightingDynamic (iFrustumView *lview)
   lp->GetShadowBlock ()->AddAllShadows (
       lview->GetFrustumContext ()->GetShadows ());
 
-  lp->SetLightFrustum (
+  lp->SetNewLightFrustum (
       new csFrustum (*lview->GetFrustumContext ()->GetLightFrustum ()));
 }
 
@@ -591,9 +591,9 @@ void csCurve::InitializeDefaultLighting ()
   LightMap->Alloc (
       CURVE_LM_SIZE * csCurveLightMap::lightcell_size,
       CURVE_LM_SIZE * csCurveLightMap::lightcell_size,
-      	int(ambient.red * 255.0f),
-      	int(ambient.green * 255.0f),
-      	int(ambient.blue * 255.0f));
+        int(ambient.red * 255.0f),
+        int(ambient.green * 255.0f),
+        int(ambient.blue * 255.0f));
   LightmapUpToDate = false;
 }
 
@@ -608,9 +608,9 @@ const char* csCurve::ReadFromCache (iFile* file)
   LightMap->Alloc (
       CURVE_LM_SIZE * csCurveLightMap::lightcell_size,
       CURVE_LM_SIZE * csCurveLightMap::lightcell_size,
-      	int(ambient.red * 255.0f),
-	int(ambient.green * 255.0f),
-      	int(ambient.blue * 255.0f));
+        int(ambient.red * 255.0f),
+  int(ambient.green * 255.0f),
+        int(ambient.blue * 255.0f));
 
   const char* error = LightMap->ReadFromCache (
       file,
@@ -965,7 +965,7 @@ void csBezierCurve::GetObjectBoundingBox (csBox3 &bbox)
 }
 
 csBezierCurve::csBezierCurve (csBezierMeshObjectType* thing_type)
-	: csCurve (thing_type)
+  : csCurve (thing_type)
 {
   int i, j;
   for (i = 0; i < 3; i++)

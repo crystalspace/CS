@@ -19,7 +19,6 @@
 #ifndef __CS_MOVABLE_H__
 #define __CS_MOVABLE_H__
 
-#include "csutil/csvector.h"
 #include "csutil/refarr.h"
 #include "csutil/nobjvec.h"
 #include "iengine/movable.h"

@@ -634,7 +634,7 @@ void csFrustum::ClipToPlane (
   }
 }
 
-csFrustum *csFrustum::Intersect (const csFrustum &other)
+csPtr<csFrustum> csFrustum::Intersect (const csFrustum &other)
 {
   if (other.IsEmpty ()) return NULL;
   if (other.IsInfinite ())
@@ -646,7 +646,7 @@ csFrustum *csFrustum::Intersect (const csFrustum &other)
   return Intersect (other.vertices, other.num_vertices);
 }
 
-csFrustum *csFrustum::Intersect (
+csPtr<csFrustum> csFrustum::Intersect (
   const csVector3 &frust_origin,
   csVector3 *frust,
   int num_frust,
@@ -682,7 +682,7 @@ csFrustum *csFrustum::Intersect (
   return new_frustum;
 }
 
-csFrustum *csFrustum::Intersect (
+csPtr<csFrustum> csFrustum::Intersect (
   const csVector3 &frust_origin,
   csVector3 *frust,
   int num_frust,
@@ -714,7 +714,7 @@ csFrustum *csFrustum::Intersect (
   return new_frustum;
 }
 
-csFrustum *csFrustum::Intersect (csVector3 *poly, int num)
+csPtr<csFrustum> csFrustum::Intersect (csVector3 *poly, int num)
 {
   csFrustum *new_frustum;
   if (IsInfinite ())

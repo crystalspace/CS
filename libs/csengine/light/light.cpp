@@ -374,7 +374,7 @@ iCrossHalo *csLight::Light::CreateCrossHalo (float intensity, float cross)
   scfParent->SetHalo (halo);
 
   csRef<iCrossHalo> ihalo (SCF_QUERY_INTERFACE (halo, iCrossHalo));
-  return ihalo;	// DecRef is ok here.
+  return ihalo; // DecRef is ok here.
 }
 
 iNovaHalo *csLight::Light::CreateNovaHalo (
@@ -386,7 +386,7 @@ iNovaHalo *csLight::Light::CreateNovaHalo (
   scfParent->SetHalo (halo);
 
   csRef<iNovaHalo> ihalo (SCF_QUERY_INTERFACE (halo, iNovaHalo));
-  return ihalo;	// DecRef is ok here.
+  return ihalo; // DecRef is ok here.
 }
 
 iFlareHalo *csLight::Light::CreateFlareHalo ()
@@ -395,7 +395,7 @@ iFlareHalo *csLight::Light::CreateFlareHalo ()
   scfParent->SetHalo (halo);
 
   csRef<iFlareHalo> ihalo (SCF_QUERY_INTERFACE (halo, iFlareHalo));
-  return ihalo;	// DecRef is ok here.
+  return ihalo; // DecRef is ok here.
 }
 
 //---------------------------------------------------------------------------
@@ -436,7 +436,7 @@ csStatLight::~csStatLight ()
 }
 
 static void object_light_func (iMeshWrapper *mesh, iFrustumView *lview,
-	bool vis)
+  bool vis)
 {
   if (!vis) return;
   iShadowReceiver* receiver = mesh->GetShadowReceiver ();
@@ -458,16 +458,16 @@ void csStatLight::CalculateLighting ()
   lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
   lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
 
-  csLightingProcessInfo *lpi = new csLightingProcessInfo (
-      this, false);
+  csRef<csLightingProcessInfo> lpi;
+  lpi.AttachNew (new csLightingProcessInfo (
+      this, false));
   lview.SetUserdata (lpi);
 
-  ctxt->SetLightFrustum (new csFrustum (center));
+  ctxt->SetNewLightFrustum (new csFrustum (center));
   ctxt->GetLightFrustum ()->MakeInfinite ();
   sector->CheckFrustum ((iFrustumView *) &lview);
 
   lpi->FinalizeLighting ();
-  lpi->DecRef ();
 }
 
 void csStatLight::CalculateLighting (iMeshWrapper *th)
@@ -484,17 +484,17 @@ void csStatLight::CalculateLighting (iMeshWrapper *th)
   lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
   lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
 
-  csLightingProcessInfo *lpi = new csLightingProcessInfo (
-      this, false);
+  csRef<csLightingProcessInfo> lpi;
+  lpi.AttachNew (new csLightingProcessInfo (
+      this, false));
   lview.SetUserdata (lpi);
 
-  ctxt->SetLightFrustum (new csFrustum (center));
+  ctxt->SetNewLightFrustum (new csFrustum (center));
   ctxt->GetLightFrustum ()->MakeInfinite ();
 
   lview.CallObjectFunction (th, true);
 
   lpi->FinalizeLighting ();
-  lpi->DecRef ();
 }
 
 void csStatLight::AddAffectedLightingInfo (iLightingInfo* li)
@@ -576,16 +576,16 @@ void csDynLight::Setup ()
   lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
   lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
 
-  csLightingProcessInfo *lpi = new csLightingProcessInfo (
-      this, true);
+  csRef<csLightingProcessInfo> lpi;
+  lpi.AttachNew (new csLightingProcessInfo (
+      this, true));
   lview.SetUserdata (lpi);
 
-  ctxt->SetLightFrustum (new csFrustum (center));
+  ctxt->SetNewLightFrustum (new csFrustum (center));
   ctxt->GetLightFrustum ()->MakeInfinite ();
   sector->CheckFrustum ((iFrustumView *) &lview);
 
   lpi->FinalizeLighting ();
-  lpi->DecRef ();
 }
 
 void csDynLight::AddAffectedLightingInfo (iLightingInfo* li)
@@ -692,13 +692,13 @@ void csLightingProcessInfo::AttachUserdata (iLightingProcessData* userdata)
 }
 
 csPtr<iLightingProcessData> csLightingProcessInfo::QueryUserdata (
-	scfInterfaceID id, int version)
+  scfInterfaceID id, int version)
 {
   int i;
   for (i = 0 ; i < userdatas.Length () ; i++)
   {
     iLightingProcessData* ptr = (iLightingProcessData*)(
-    	userdatas[i]->QueryInterface (id, version));
+      userdatas[i]->QueryInterface (id, version));
     if (ptr)
     {
       return csPtr<iLightingProcessData> (ptr);

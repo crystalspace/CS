@@ -23,7 +23,6 @@
 #include "csutil/csobject.h"
 #include "csutil/cscolor.h"
 #include "csutil/flags.h"
-#include "csutil/csvector.h"
 #include "csutil/nobjvec.h"
 #include "csutil/hashmap.h"
 #include "csutil/refarr.h"
@@ -137,7 +136,7 @@ public:
    * type. The light will not have a halo by default.
    */
   csLight (float x, float y, float z, float dist,
-  	 float red, float green, float blue);
+     float red, float green, float blue);
 
   /**
    * Destroy the light. Note that destroying a light
@@ -373,7 +372,7 @@ public:
 #endif
     virtual iCrossHalo* CreateCrossHalo (float intensity, float cross);
     virtual iNovaHalo* CreateNovaHalo (int seed, int num_spokes,
-  	float roundness);
+    float roundness);
     virtual iFlareHalo* CreateFlareHalo ();
     virtual csFlags& GetFlags () { return scfParent->flags; }
     virtual void SetLightCallback (iLightCallback* cb)
@@ -430,8 +429,8 @@ public:
    * The light will not have a halo by default.
    */
   csStatLight (float x, float y, float z, float dist,
-  	 float red, float green, float blue,
-	 bool dynamic);
+     float red, float green, float blue,
+   bool dynamic);
   /**
    * Destroy the light. Note that destroying a light
    * may not have the expected effect. Static lights result
@@ -520,7 +519,7 @@ public:
    * sector and call 'Setup()' first.
    */
   csDynLight (float x, float y, float z, float dist,
-  	 float red, float green, float blue);
+     float red, float green, float blue);
 
   /**
    * Remove the dynamic light from all polygons (i.e.
@@ -671,7 +670,7 @@ public:
 
   /// Query for userdata based on SCF type.
   virtual csPtr<iLightingProcessData> QueryUserdata (scfInterfaceID id,
-  	int version);
+    int version);
 
   /// Finalize lighting.
   virtual void FinalizeLighting ();

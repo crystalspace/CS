@@ -30,13 +30,11 @@ csLightPatch::csLightPatch ()
   vertices = NULL;
   polygon = NULL;
   light = NULL;
-  light_frustum = NULL;
 }
 
 csLightPatch::~csLightPatch ()
 {
   delete[] vertices;
-  if (light_frustum) light_frustum->DecRef ();
   RemovePatch ();
 }
 
@@ -44,11 +42,7 @@ void csLightPatch::RemovePatch ()
 {
   if (polygon) polygon->UnlinkLightpatch (this);
   shadows->DeleteShadows ();
-  if (light_frustum)
-  {
-    light_frustum->DecRef ();
-    light_frustum = NULL;
-  }
+  light_frustum = NULL;
 }
 
 void csLightPatch::Initialize (int n)

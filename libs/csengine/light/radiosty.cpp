@@ -405,14 +405,14 @@ csRadElement *csRadElement::GetRadElement (csPolygon3D &object)
 {
   // we are attached to the original polygon as a child.
   csRef<csRadPoly> rp (CS_GET_CHILD_OBJECT (&object, csRadPoly));
-  return rp;	// DecRef is ok here.
+  return rp;  // DecRef is ok here.
 }
 
 csRadElement *csRadElement::GetRadElement (csCurve &object)
 {
   // we are attached to the original curve as a child.
   csRef<csRadCurve> rc (CS_GET_CHILD_OBJECT (&object, csRadCurve));
-  return rc;	// DecRef is ok here.
+  return rc;  // DecRef is ok here.
 }
 
 void csRadElement::ShowDeltaMap ()
@@ -1238,7 +1238,7 @@ void csRadiosity::StartFrustum ()
 
   center -= shoot_src->GetAvgNormal () * 0.1f;
 
-  ctxt->SetLightFrustum (new csFrustum (center));
+  ctxt->SetNewLightFrustum (new csFrustum (center));
   ctxt->GetLightFrustum ()->MakeInfinite ();
 
   // add a backplane to frustum to clip to it... But which plane?
@@ -1344,7 +1344,7 @@ static void frustum_polygon_report_func (
     num_vert = num_vertices;
   }
 
-  new_ctxt->SetLightFrustum (light_frustum->Intersect (poly, num_vert));
+  new_ctxt->SetNewLightFrustum (light_frustum->Intersect (poly, num_vert));
 
   // empty intersection, none covered (will be skipped)
   if (!new_ctxt->GetLightFrustum ()) goto stop;
@@ -1379,8 +1379,7 @@ static void frustum_polygon_report_func (
     for (j = 0; j < num_vertices; j++)
       poly[j] = destpoly3d->Vwor (j) - center;
 
-  delete new_ctxt->GetLightFrustum ();
-  new_ctxt->SetLightFrustum (
+  new_ctxt->SetNewLightFrustum (
       old_ctxt->GetLightFrustum ()->Intersect (poly, num_vertices));
   if (!new_ctxt->GetLightFrustum ()) goto stop;
 

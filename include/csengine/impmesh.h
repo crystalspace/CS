@@ -18,7 +18,6 @@
 #ifndef __CS_IMPMESH_H__
 #define __CS_IMPMESH_H__
 
-#include "csutil/csvector.h"
 #include "csutil/nobjvec.h"
 #include "iengine/movable.h"
 #include "iengine/sector.h"
@@ -37,12 +36,12 @@ class csImposterMesh
 {
 private:
     csMeshWrapper *parent_mesh;  /// Who is this an imposter for.
-    csImposterProcTex *tex;	 /// Texture which is drawn on rect
-    csPoly3D cutout;		 /// Rect for cardboard cutout version
-    bool     ready;		 /// Whether texture must be redrawn
-    float    incidence_dist;	 /// Angle of incidence to camera last time rendered
-    csBox2   screen_rect;	 /// Rectangle occupied by imposter on screen
-    csBox3   camera_box;	 /// Bounding box of object being impostered
+    csImposterProcTex *tex;  /// Texture which is drawn on rect
+    csPoly3D cutout;     /// Rect for cardboard cutout version
+    bool     ready;    /// Whether texture must be redrawn
+    float    incidence_dist;   /// Angle of incidence to camera last time rendered
+    csBox2   screen_rect;  /// Rectangle occupied by imposter on screen
+    csBox3   camera_box;   /// Bounding box of object being impostered
 
 public:
     csImposterMesh (csMeshWrapper *parent,iObjectRegistry *objreg);

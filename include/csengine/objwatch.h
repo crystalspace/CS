@@ -19,7 +19,6 @@
 #ifndef __CS_OBJWATCH_H__
 #define __CS_OBJWATCH_H__
 
-#include "csutil/csvector.h"
 #include "csutil/refarr.h"
 #include "csutil/parray.h"
 #include "iengine/objwatch.h"
