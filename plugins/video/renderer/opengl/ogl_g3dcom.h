@@ -155,6 +155,13 @@ protected:
   iClipper2D* clipper;
   /// Clipper type.
   bool cliptype;
+  /**
+   * If true then we already have initialized our toplevel portal.
+   * This flag is set to false after BeginDraw() and will be set to true
+   * by the first call to SetClipper with type CS_CLIPPER_TOPLEVEL.
+   */
+  bool toplevel_init;
+
   /// The current near plane.
   csPlane3 near_plane;
   /// If the near plane is used.

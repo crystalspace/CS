@@ -183,6 +183,7 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon ():
   ARB_multitexture = false;
   clipper = NULL;
   cliptype = CS_CLIPPER_NONE;
+  toplevel_init = false;
 
   // see note above
   tr_verts.IncRef ();
@@ -511,6 +512,28 @@ void csGraphics3DOGLCommon::SetClipper (iClipper2D* clip, int cliptype)
   clipper = clip;
   if (!clipper) cliptype = CS_CLIPPER_NONE;
   csGraphics3DOGLCommon::cliptype = cliptype;
+
+#if 0
+// @@@ TODO: init z-buffer
+  if (!toplevel_init && cliptype == CS_CLIPPER_TOPLEVEL)
+  {
+    // We have a toplevel clipper and we didn't initialize it yet.
+    // In this case we will update the Z-buffer around the top-level
+    // portal so that we don't need clipping for DrawTriangleMesh.
+    // @@@ SideNote! This toplevel_init could cause problems for multiple
+    // views. Have to think about this.
+    toplevel_init = true;
+    int nv = clipper->GetNumVertices ();
+    csVector2* v = clipper->GetClipPoly ();
+    int i, i1;
+    i1 = nv-1;
+    for (i = 0 ; i < nv ; i++)
+    {
+      i1 = i;
+    }
+  }
+#endif
+
 #if USE_STENCIL
   if (clipper && true/*use_clipper*/)
   {
@@ -563,6 +586,8 @@ bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
   DrawMode = DrawFlags;
 
   end_draw_poly ();
+
+  toplevel_init = false;
 
   return true;
 }
@@ -1420,8 +1445,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     want_clipping = true;
   // @@@ Temporary: for this case I would like to use the z-buffer border
   // around the toplevel portal.
-  //if (mesh.clip_portal == CS_CLIP_TOPLEVEL)
-    //want_clipping = true;
+  if (mesh.clip_portal == CS_CLIP_TOPLEVEL)
+    want_clipping = true;
   // @@@ Temporary.
   if (mesh.clip_plane == CS_CLIP_NEEDED)
     want_clipping = true;
@@ -1436,7 +1461,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
     }
 #else
-  
     // If we have no stencil buffer then we just use the default version.
     DefaultDrawTriangleMesh (mesh, this, o2c, clipper, cliptype, aspect,
     	width2, height2);
