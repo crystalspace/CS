@@ -18,6 +18,7 @@ The history order has been reversed so that new features are at the top.
 	  CS_POLY_NO_DRAW was used for that but this is now used for what
 	  it is actually ment: i.e. to indicate a polygon that should not
 	  be drawn. This fixes the new CS_ENGINE_ZBUFFER engine mode.
+	- Got an updated doc to csPhyziks from Michael Ewert.
 23-Jul-2000
 	- Cleaned up some coverage mask tree statictics.
 	- Added csWorld::SetEngineMode() with which you can control how

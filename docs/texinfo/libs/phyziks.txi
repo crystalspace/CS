@@ -6,13 +6,14 @@
 @cindex Libraries, csphyzik
 
 @noindent
-@emph{Written by Michael Alexander Ewert.  Last updated 6 December 1999.}
+@emph{Written by Michael Alexander Ewert.  Last updated 22 July 2000.}
+@emph{michael_ewert@hotmail.com}
 
 This library is a work in progress so many things will change (and probably
 already have by the time you read this).
 
 The Phyziks (@file{csphyzik}) library is a dynamics modeling and simulation
-engine.  The core of the engine is a numerical integrator that solves the
+engine.  Focus is currently on rigid body dynamics.  The core of the engine is a numerical integrator that solves the
 equations of motion for given bodies.  Different types of bodies will have
 different equations of motion.  A simple example would be the equations of
 motion for the center of mass of a rigid body.
@@ -37,7 +38,7 @@ Force = mass * acceleration. So @code{a = F/m}. Plug into second @sc{ode}.
 You would add the body to the engine and any forces that act on it.  When
 you tell the engine to evolve the system, it will figure out the new value
 for the state of your body.  Then you would request the new position from
-the engine via a pointer to your body.  That value would be used that to
+the engine via a pointer to your body.  That value would be used to
 update the position of the object that represents your body in the renderer.
 
 @menu
@@ -49,6 +50,7 @@ update the position of the object that represents your body in the renderer.
 * csPhyziks Solvers:: Solvers
 * csPhyziks Evolve-Collide-Update Loop:: Evolve-Collide-Update Loop
 * csPhyziks ODE Solvers:: @sc{ode} Solvers
+* csPhyziks Usage Guide:: Usage Guide
 @end menu
 
 @node csPhyziks World, csPhyziks Bodies, csPhyziks, csPhyziks
@@ -92,7 +94,7 @@ Now the rigid body we added should have been moved by the gravity force.
 @node csPhyziks Bodies, csPhyziks Forces, csPhyziks World, csPhyziks
 @subsection Bodies
 
-The inheritance heirarchy for bodies looks something like this:
+The inheritance hierarchy for bodies looks something like this:
 
 @example
 ctPhysicalEntity
@@ -124,6 +126,7 @@ solid object without moving parts is most likely a rigid body.  The best way
 to create one and add it to a world is like so:
 
 @example
+ctWorld phyz_world;
 ctRigidBody* rb = ctRigidBody::new_ctRigidBody();
 phyz_world.add_rigidbody(rb);
 @end example
@@ -145,10 +148,10 @@ rb->set_v(ctVector3(1, 0, 0));
 rb->calc_simple_I_tensor(0.2, 0.4, 0.2);
 @end example
 
-That last step will calculate an inertia tensor for a solid rectangular block
+That last step will calculate an inertia tensor for a solid rectangular block of uniform density,
 with dimensions of width 0.2, height 0.4 and depth 0.2 (x,y,z). An inertia
 tensor is used to calculate the response to angular forces and impulses.
-Every shape of object has a different type of inertia tensor.
+Every shape of object has a different type of inertia tensor.  You must set a mass before you specify the inertia tensor.
 
 You can set the orientation of the body directly (by setting the
 transformation matrix), or like so:
@@ -192,6 +195,8 @@ rb1->add_force(sf);
 rb2->add_force(sf);
 @end example
 
+Specify the second body as NULL, to indicate that end is attached to the world and is therefore immovable.
+
 Simple forces would be something like a rocket engine or other kind of force
 that only acts on one body.
 
@@ -203,9 +208,10 @@ bodies connected to it by joints.  Such as a chain or a human figure.
 Currently revolute (like a hinge) joints and prismatic (like an air pump)
 joints are implemented.  Also the articulated body can not at present have any
 closed loops in it.  Articulated bodies can have one end fixed immovably to
-the world reference frame or be free floating.
+the world reference frame, be free floating or be attached to an entity who's movement is specified by the user.
 
 @example
+// use new_ctRigidBody makes sure the rb will have a suitable reference frame.
 rb = ctRigidBody::new_ctRigidBody();
 // Create an articulated body with a rigid body.
 ab_parent = new ctArticulatedBody(rb);
@@ -226,12 +232,14 @@ ab_parent->link_revolute(
 @end example
 
 Now when evolved the articulated body will move in a dynamically correct
-manner in response to any external and internal forces (if the featherstone
+manner in response to any external and internal forces (if the Featherstone
 solver is used).
 
 It is possible to define your own joints from @samp{ctJoint}.  You can then
 overload the @code{get_actuator_magnitude()} method to implement a joint with
-a motor that will exert whatever force you like at that joint.
+a motor that will exert whatever force you like at that joint.  There is such a joint implemented that enforces angle constraints on the joint, @samp{ctConstrainedRevoluteJoint}.  Add this joint using @code{parent_ab->link_joint( new_constrained_joint, child_ab )}.  You can set the angles that joint is constrained to using @code{set_constraint( max_angle, min_angle )}.  Test out your joint and modify the spring and damping constants to get the proper behavior.  e.g. if your joint bounces back too much at the constraint, your spring constant is too high.
+
+You can attach the root of an articulated body to some object from your own side of the code.  The attached ab's root will move however you specify and the correct physical behavior will result for the rest of the ab.  Do this by subclassing @samp{ctKinematicEntity} and implementing all it's methods ( minimally you need to implement @code{get_a()}.  These methods tell the physics module how your object moves.  You can use this to attach hair or a chain or whatever to your game characters.  After you create your subclass, you attach your articulated body root to it with @code{abroot->attach_to_entity( &your_kinematic_entity )}.  Make sure you have grounded your root first with @code{abroot->make_grounded()}.  Now if you want to detach that chain you should just be able to call @code{abroot->make_ungrounded()}.
 
 @node csPhyziks Impulses, csPhyziks Solvers, csPhyziks Articulated Bodies, csPhyziks
 @subsection Impulses
@@ -249,68 +257,24 @@ rb->apply_impulse(
 @node csPhyziks Solvers, csPhyziks Evolve-Collide-Update Loop, csPhyziks Impulses, csPhyziks
 @subsection Solvers
 
-Every object has a solver that represents the algorithm used to help calulate
+Every object has a solver that represents the algorithm used to help calculate
 its change in state each time step.  A @samp{ctPhysicalEntity} or any of it's
 subclasses can change what solver it uses at any time.
 
 @node csPhyziks Evolve-Collide-Update Loop, csPhyziks ODE Solvers, csPhyziks Solvers, csPhyziks
-@subsection Evolve-Collide-Update Loop
+@subsection Catastrophes
 
-This section will outline a good strategy for your main loop using the Phyziks
-library.  The simplest way to evolve you system from time @samp{t_start} to
-@samp{t_end} is as follows.
+A @samp{catastrophe} is an event where there is a discontinuity in the system and the ODE solver can't cope with it.  So you need to resolve the catastrophe situation before the system can be evolved any further.  The main catastrophe event ( actually the only one used in most rigid-body simulations ) we deal with is a collision.  So I use the term catastrophe and collision interchangeably here.
 
-The goal is to evolve the @samp{csphyziks} engine, then figure out if any
-thing crashed into anything else; deal with those collisions and finally
-update the data structures representing your objects for the renderer.  The
-minimum @samp{csphyzik} data you need to keep around on your end of things
-are:
+Setting up a collision catastrophe.
 
-@enumerate
-@item
-A @samp{ctWorld} object.
-@item
-A pointer to each @samp{ctPhysicalEntity} class (or a more useful subclass
-like @samp{ctRigidBody}) that you have instantiated and has some meaning to
-the rest of your program.
-@end enumerate
+Note: there is no collision detection capability in csphyziks.  Ben Sprague has been making good progress on one and hopefully it will be integrated in the future.  SOLID is a pretty decent GPL CD engine that works well for colliding contacts, although it requires a few more features before it can be used for resting contact.
 
-Here is a simple evolve-collide-upate cycle, using pseudo-code:
+First thing you need to do is subclass @samp{ctCatastropheManager} and implement @code{check_catastrophe()} which returns > 0 if there was a catastrophe and @code{handle_catastrophe()} which will be called when the simulation has been backed up to a point just before the first catastrophe was encountered ( within the catastrophe defined epsilon of time ).  Then you add your @samp{ctCatastropheManager} to the world using @code{ctWorld::register_catastrophe_manager( ctCatastropheManager *your_cat_manager )}.  
 
-@example
-phyz_world.evolve(t_start, t_end);
-loop @r{through all game entities}:
-    @r{update your collider object from the rigidbody}
-    @r{detect any collisions (you are responsible for supplying this code)}
-    if @r{there is a collision respond as follows}:
-        @r{fill in the fields of a @code{ctContact} object}:
-            contact.body_a = @r{a} ctPhysicalEntity *
-                @r{the first body involved in the collision}
-            contact.body_b = @r{a} ctPhysicalEntity *
-                @r{the second body involved in the collision}
-                if @r{you hit an immovable object (i.e. wall, floor)}:
-                    set body_b to NULL
-                end if
-            contact.contact_p =
-                @r{the exact point of contact between the two bodies}
-            contact.n = @r{the collision normal}
-            contact.resitution =
-                @r{value from 0.0 to 1.0 that determines the ``bounce'' factor}
-                @r{of the collision; 0 = no bounce, 1.0 = no energy lost in}
-                @r{collision}
-        // hand control over to phyziks engine
-        rb_a->resolve_collision(the_contact);
-    end if
-end loop
+Now every time you call @code{ctWorld::evolve( real t1, real t2 )} it will make a callback to @code{check_catastrophe()} where you do your collision ( or whatever ) check using the position and orientations of the rigid bodies at that time.  If there was a collision, keep track of what objects collided and return the maximum interpenetration distance ( or just a number greater than 0 if you like ).  If there was no collision return 0.  Now the physics engine will rewind the state of the system and call @code{check_catastrophe()} again, and repeat until you finally return 0, indicating there was no catastrophe.  Now the physics engine will make a callback to @code{handle_catastrophe()} where you must resolve all catastrophes that occurred during the most recent call to @code{check_catastrophe()}, so you need to maintain a list of those objects that collided last check.  In the case of resolving collisions you need to fill out a @samp{ctCollidingContact} object and pass it to @code{ctWorld::resolve_collision( ctCollidingContact *this_collision )} for each collision, which will apply an impulse to both bodies and send them on a path away from each other.  
 
-loop @r{through all game entities}
-    @r{get position/orientation from rigidbody for this entity}
-    @r{update position/orientation of object to be rendered for this entity}
-end loop
-@end example
-
-The above code is quite simplistic, it doesn't find the exact time of
-collision.  A couple of things need to be explained.  The collision normal and
+A couple of things need to be explained.  The collision normal and
 contact point must be figured out by the collision detection routines, which
 are not part of the @samp{csphyziks} library.  The collision normal is the
 vector that specifies what component of the objects momentum to bounce back.
@@ -323,10 +287,9 @@ edges.  Or you can just take a best guess if you don't have a very accurate
 collision detection system.
 
 To find the exact time of collision involves rewinding the @samp{csphyziks}
-simulation and trying with smaller time steps until you have reached a minimum
-collision distance.  This can be quite a time-consuming process.
+simulation and trying with smaller time steps until csphyziks has reached a minimum collision distance.  This can be quite a time-consuming process.
 
-The collision response code does not currently support multiple points of
+The collision response code does not accurately handle multiple points of
 simultaneous collision on one object.
 
 @node csPhyziks ODE Solvers, , csPhyziks Evolve-Collide-Update Loop, csPhyziks
@@ -338,7 +301,7 @@ fairly good one for stability and has only a moderate performance hit.
 
 If you notice your objects freaking out and disappearing (usually by flying
 off into space), you probably have a stability problem.  Springs with high
-magnitudes (stiff) are a classic for stability problems.
+constants (stiff) are a classic for stability problems.
 
 If you need either more speed or more stability, you may want to use a
 different one.  Improved stability means decreased performance and vice versa.
@@ -351,5 +314,26 @@ as well.  So you can try to fix instability by using a more sophisticated
 @sc{ode} solver like Runga-Kutta with adaptive step sizing (not yet
 implemented), but the resulting performance hit could cause more instability.
 So it can be a no-win situation when choosing and @sc{ode} solver if you have
-a very low frame-rate.  Then it's time to up the system requirements of the
-computer.
+a very low frame-rate.  Then it's time to up the system requirements of your application.
+
+@node csPhyziks Usage Guide, csPhyziks
+@subsection Usage Guide
+
+The way you use this physics module in your application is very application specific.  Since games are the most common type of application this section will mostly cover recommended usage for games.
+
+If your game is a space-ship type game, I would recommend putting all your game objects under primary control of the physics engine.  Thrown in some gravity wells for planets, subclass @samp{ctForce} to create your rocket engine, add a rigid body for each game object, apply impulses when something gets hit and things should work out well for you. 
+
+If your game has animated models running around and blowing each other up or running obstacle courses, you probably do NOT want to put everything under control of the physics module.  I would recommend using the physics module for special effects and appropriate game-play objects.  i.e. attach a tail to your character as an articulated body, use rigid bodies for gibbs or explosion debris, have an articulated body for your characters that only gets activated when you want them to act like a rag-doll, use articulated bodies for ropes that your char can swing on, trees that sway in the wind, etc...
+
+I would recommend using several ctWorlds that isolate distinct element from each other, so that during a catastrophe time-slicing search your whole simulation doesn't bog down.  i.e. have one ctWorld for all your debris and gibbs, if you have a tail on your main character add that as an articulated body to it's own ctWorld.  
+
+@emph{Caveats} 
+
+This module is a tool, and used properly, could really enhance the reality of your game worlds.  You need to control and interpret the results to make sure they make sense and are consistent with your games behavior. 
+
+At the time of writing, continuous contact with the ground is only partial implemented ( the solver is there.... ).  This is a pretty important feature, and its absence limits what you can do with this module.  However the main tools; impulse response ( rigid body and articulated body ), grounded articulated bodies and @samp{ctKinematicEntity} attached articulated bodies.  These features are sufficient for many nifty dynamically controlled elements.  
+
+
+
+
+
