@@ -134,10 +134,6 @@ class csGraphics3DSoftware : public iGraphics3D
   /// Mipmap selection coefficient (normal == 1.0)
   float mipmap_coef;
 
-  /// Do we want dithering? (dummy for now)
-  bool rstate_dither;
-  /// Do we want specular lighting? (dummy for now)
-  bool rstate_specular;
   /// Do we want mipmaps?
   int rstate_mipmap;
 
@@ -145,7 +141,7 @@ class csGraphics3DSoftware : public iGraphics3D
   int DrawMode;
 
   /// draw_scanline_xxx routines
-  csDrawScanline* ScanProc [0x14];
+  csDrawScanline* ScanProc [0x12];
   /// draw_pi_scanline_xxx routines
   csDrawPIScanline* ScanProcPI [4];
   /// draw_pi_scanline_gouraud_xxx routines
@@ -213,9 +209,9 @@ public:
   /// Option variable: render textures?
   bool do_textured;
   /// Option variable: do very expensive bilinear filtering? (0/1/2)
-  unsigned char do_bilin_filt;
+  unsigned char bilinear_filter;
   /// Do we want Gouraud Shaded polygons?
-  bool rstate_gouraud;
+  bool do_gouraud;
 
   /// Do interlacing? (-1 - no, 0/1 - yes)
   int do_interlaced;

@@ -300,7 +300,6 @@ csGraphics3DDirect3DDx6::csGraphics3DDirect3DDx6 (iBase *iParent) :
   zdist_mipmap3 = 40;
 
   rstate_dither = false;
-  rstate_specular = false;
   rstate_bilinearmap = false;
   rstate_trilinearmap = true;
   rstate_gouraud = true;
@@ -2153,9 +2152,6 @@ bool csGraphics3DDirect3DDx6::SetRenderState(G3D_RENDERSTATEOPTION option, long 
       else
         VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DITHERENABLE, FALSE), DD_OK);
       break;
-    case G3DRENDERSTATE_SPECULARENABLE:
-      rstate_specular = value;
-      break;
     case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
       rstate_bilinearmap = value;
       break;
@@ -2201,8 +2197,6 @@ long csGraphics3DDirect3DDx6::GetRenderState(G3D_RENDERSTATEOPTION op)
     case G3DRENDERSTATE_DITHERENABLE:
       VERIFY_RESULT(m_lpd3dDevice2->GetRenderState(D3DRENDERSTATE_DITHERENABLE, &d3d_value), DD_OK);
       return (d3d_value == TRUE)?true:false;
-    case G3DRENDERSTATE_SPECULARENABLE:
-      return rstate_specular;
     case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
       return rstate_bilinearmap;
     case G3DRENDERSTATE_TRILINEARMAPPINGENABLE:

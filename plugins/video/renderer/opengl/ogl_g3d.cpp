@@ -1119,9 +1119,6 @@ bool csGraphics3DOpenGL::SetRenderState (G3D_RENDERSTATEOPTION op, long value)
   case G3DRENDERSTATE_DITHERENABLE:
     m_renderstate.dither = value;
     break;
-  case G3DRENDERSTATE_SPECULARENABLE:
-    m_renderstate.specular = value;
-    break;
   case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
     texture_cache->SetBilinearMapping (value);
     break;
@@ -1173,8 +1170,6 @@ long csGraphics3DOpenGL::GetRenderState (G3D_RENDERSTATEOPTION op)
     return (bool) (z_buf_mode & CS_ZBUF_FILL);
   case G3DRENDERSTATE_DITHERENABLE:
     return m_renderstate.dither;
-  case G3DRENDERSTATE_SPECULARENABLE:
-    return m_renderstate.specular;
   case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
     return texture_cache->GetBilinearMapping ();
   case G3DRENDERSTATE_TRILINEARMAPPINGENABLE:

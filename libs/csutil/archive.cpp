@@ -74,8 +74,7 @@ csArchive::~csArchive ()
 {
   CHK (delete [] filename);
   CHK (delete [] comment);
-  if (file)
-    fclose (file);
+  if (file) fclose (file);
 }
 
 void csArchive::ReadDirectory ()
@@ -444,6 +443,9 @@ bool csArchive::WriteZipArchive ()
   char buff [16 * 1024];
   bool success = false;
   int n = 0;
+
+  // Check if file is opened for reading first
+  if (!file) return false;
 
   // Step one: Copy archive file into a temporary file,
   // skipping entries marked as 'deleted'

@@ -160,15 +160,13 @@ csGraphics3DSoftware::csGraphics3DSoftware (iBase *iParent) : G2D (NULL)
   do_textured = true;
   do_interlaced = -1;
   ilace_fastmove = false;
-  do_bilin_filt = 0;
+  bilinear_filter = 0;
   do_transp = true;
   do_textured = true;
   do_smaller_rendering = false;
   smaller_buffer = NULL;
   rstate_mipmap = 0;
-  rstate_gouraud = true;
-  rstate_specular = true;
-  rstate_dither = false;
+  do_gouraud = true;
 
   dbg_max_polygons_to_draw = 2000000000;        // After 2 billion polygons we give up :-)
 
@@ -254,7 +252,7 @@ void csGraphics3DSoftware::ScanSetup ()
       ScanProc [SCANPROC_TEX_ZUSE] = csScan_8_draw_scanline_tex_zuse;
 
       ScanProc [SCANPROC_MAP_ZFIL] =
-        do_bilin_filt ? csScan_8_draw_scanline_map_filt_zfil :
+        bilinear_filter ? csScan_8_draw_scanline_map_filt_zfil :
 #ifdef DO_MMX
         UseMMX ? csScan_8_mmx_draw_scanline_map_zfil :
 #endif
@@ -300,13 +298,21 @@ void csGraphics3DSoftware::ScanSetup ()
       ScanProc [SCANPROC_TEX_ZUSE] = csScan_16_draw_scanline_tex_zuse;
 
       ScanProc [SCANPROC_MAP_ZFIL] =
-        do_bilin_filt == 2 ? csScan_16_draw_scanline_map_filt2_zfil :
-        do_bilin_filt == 1 ? csScan_16_draw_scanline_map_filt_zfil :
+        bilinear_filter == 2 ?
+        (pfmt.GreenBits == 5 ?
+          csScan_16_draw_scanline_map_filt2_zfil_555 :
+          csScan_16_draw_scanline_map_filt2_zfil_565) :
+        bilinear_filter == 1 ? csScan_16_draw_scanline_map_filt_zfil :
 #ifdef DO_MMX
         UseMMX ? csScan_16_mmx_draw_scanline_map_zfil :
 #endif
         csScan_16_draw_scanline_map_zfil;
-      ScanProc [SCANPROC_MAP_ZUSE] = csScan_16_draw_scanline_map_zuse;
+      ScanProc [SCANPROC_MAP_ZUSE] =
+        bilinear_filter == 2 ?
+        (pfmt.GreenBits == 5 ?
+          csScan_16_draw_scanline_map_filt2_zuse_555 :
+          csScan_16_draw_scanline_map_filt2_zuse_565) :
+        csScan_16_draw_scanline_map_zuse;
 
       ScanProc [SCANPROC_TEX_KEY_ZFIL] = csScan_16_draw_scanline_tex_key_zfil;
       ScanProc [SCANPROC_TEX_KEY_ZUSE] = csScan_16_draw_scanline_tex_key_zuse;
@@ -371,11 +377,14 @@ void csGraphics3DSoftware::ScanSetup ()
       ScanProc [SCANPROC_TEX_ZUSE] = csScan_32_draw_scanline_tex_zuse;
 
       ScanProc [SCANPROC_MAP_ZFIL] =
+        bilinear_filter == 2 ? csScan_32_draw_scanline_map_filt2_zfil :
 #if defined (DO_MMX) && defined (DO_NASM)
         UseMMX ? csScan_32_mmx_draw_scanline_map_zfil :
 #endif
         csScan_32_draw_scanline_map_zfil;
-      ScanProc [SCANPROC_MAP_ZUSE] = csScan_32_draw_scanline_map_zuse;
+      ScanProc [SCANPROC_MAP_ZUSE] =
+        bilinear_filter == 2 ? csScan_32_draw_scanline_map_filt2_zuse :
+        csScan_32_draw_scanline_map_zuse;
 
       ScanProc [SCANPROC_TEX_KEY_ZFIL] = csScan_32_draw_scanline_tex_key_zfil;
       ScanProc [SCANPROC_TEX_KEY_ZUSE] = csScan_32_draw_scanline_tex_key_zuse;
@@ -1943,7 +1952,7 @@ static struct
 void csGraphics3DSoftware::StartPolygonFX (iTextureHandle* handle,
   UInt mode)
 {
-  if (!rstate_gouraud || !do_lighting)
+  if (!do_gouraud || !do_lighting)
     mode &= ~CS_FX_GOURAUD;
 
   if (handle)
@@ -2164,10 +2173,10 @@ void csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
   sy = fyL = fyR = QRound (poly.vertices [top].sy);
 
   // Decide whenever we should use Gouraud or flat (faster) routines
-  bool use_gouraud = (pqinfo.drawline_gouraud != NULL)
+  bool do_gouraud = (pqinfo.drawline_gouraud != NULL)
     && ((pqinfo.mixmode & CS_FX_GOURAUD)
      || (pqinfo.mixmode & CS_FX_MASK_MIXMODE) != CS_FX_COPY);
-  if (use_gouraud && !(pqinfo.mixmode & CS_FX_GOURAUD))
+  if (do_gouraud && !(pqinfo.mixmode & CS_FX_GOURAUD))
   {
     rL = pqinfo.redFact   << 8;
     gL = pqinfo.greenFact << 8;
@@ -2343,7 +2352,7 @@ void csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
           unsigned long *zbuff = z_buffer + width * screenY + xl;
           unsigned char *dest = line_table [screenY] + (xl << pixel_shift);
 
-          if (use_gouraud)
+          if (do_gouraud)
             pqinfo.drawline_gouraud (dest, l, zbuff, uu, duu, vv, dvv,
               zL, dz, pqinfo.bm, pqinfo.shf_w, rr, gg, bb, drr, dgg, dbb, clamp);
           else
@@ -2468,19 +2477,14 @@ bool csGraphics3DSoftware::SetRenderState (G3D_RENDERSTATEOPTION op,
       }
       break;
     case G3DRENDERSTATE_DITHERENABLE:
-      rstate_dither = value;
-      ScanSetup ();
-      break;
-    case G3DRENDERSTATE_SPECULARENABLE:
-      rstate_specular = value;
-      ScanSetup ();
+      texman->dither_textures = value;
       break;
     case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
-      do_bilin_filt = value ? 1 : 0;
+      bilinear_filter = value ? 1 : 0;
       ScanSetup ();
       break;
     case G3DRENDERSTATE_TRILINEARMAPPINGENABLE:
-      do_bilin_filt = value ? 2 : 0;
+      bilinear_filter = value ? 2 : 0;
       ScanSetup ();
       break;
     case G3DRENDERSTATE_TRANSPARENCYENABLE:
@@ -2518,7 +2522,7 @@ bool csGraphics3DSoftware::SetRenderState (G3D_RENDERSTATEOPTION op,
       if (dbg_max_polygons_to_draw < 0) dbg_max_polygons_to_draw = 0;
       break;
     case G3DRENDERSTATE_GOURAUDENABLE:
-      rstate_gouraud = value;
+      do_gouraud = value;
       break;
     default:
       return false;
@@ -2538,13 +2542,11 @@ long csGraphics3DSoftware::GetRenderState(G3D_RENDERSTATEOPTION op)
     case G3DRENDERSTATE_ZBUFFERFILLENABLE:
       return (bool)(z_buf_mode & CS_ZBUF_FILL);
     case G3DRENDERSTATE_DITHERENABLE:
-      return rstate_dither;
-    case G3DRENDERSTATE_SPECULARENABLE:
-      return rstate_specular;
+      return texman->dither_textures;
     case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
-      return do_bilin_filt == 1 ? 1 : 0;
+      return bilinear_filter == 1 ? 1 : 0;
     case G3DRENDERSTATE_TRILINEARMAPPINGENABLE:
-      return do_bilin_filt == 2 ? 1 : 0;
+      return bilinear_filter == 2 ? 1 : 0;
     case G3DRENDERSTATE_TRANSPARENCYENABLE:
       return do_transp;
     case G3DRENDERSTATE_MIPMAPENABLE:
@@ -2566,7 +2568,7 @@ long csGraphics3DSoftware::GetRenderState(G3D_RENDERSTATEOPTION op)
     case G3DRENDERSTATE_MAXPOLYGONSTODRAW:
       return dbg_max_polygons_to_draw;
     case G3DRENDERSTATE_GOURAUDENABLE:
-      return rstate_gouraud;
+      return do_gouraud;
     default:
       return 0;
   }
@@ -2695,7 +2697,7 @@ bool csGraphics3DSoftware::csSoftConfig::SetOption (int id, csVariant* value)
     case 4: scfParent->do_mmx = value->v.b; break;
 #endif
     case 5: scfParent->texman->Gamma = value->v.f; break;
-    case 6: scfParent->rstate_gouraud = value->v.b; break;
+    case 6: scfParent->do_gouraud = value->v.b; break;
     case 7: scfParent->do_smaller_rendering = value->v.b; break;
     default: return false;
   }
@@ -2716,7 +2718,7 @@ bool csGraphics3DSoftware::csSoftConfig::GetOption (int id, csVariant* value)
     case 4: value->v.b = scfParent->do_mmx; break;
 #endif
     case 5: value->v.f = scfParent->texman->Gamma; break;
-    case 6: value->v.b = scfParent->rstate_gouraud; break;
+    case 6: value->v.b = scfParent->do_gouraud; break;
     case 7: value->v.b = scfParent->do_smaller_rendering; break;
     default: return false;
   }

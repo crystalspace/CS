@@ -124,7 +124,6 @@ protected:
   struct
   {
     bool dither; // dither colors?
-    bool specular; // draw specular highlights?
     bool trilinearmap; // texel/mipmap interpolate?
     bool gouraud; // gouraud shading on polygons?
     bool alphablend; // enable transparency?

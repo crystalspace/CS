@@ -225,12 +225,6 @@ struc csScanSetup
   ; The inverse colormap (extracted from texture manager)
   unsigned_char_P inv_cmap;
 
-  ; table used for bilinear filtering
-  int_P filter_mul_table;
-
-  ; table used for DrawPolygonFX
-  unsigned_short_P color_565_table;
-
   ; 4096 1/z values where z is in fixed-point 0.12 format
   unsigned_int_P one_div_z;
 

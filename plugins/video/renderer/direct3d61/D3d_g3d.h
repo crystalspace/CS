@@ -127,7 +127,6 @@ class csGraphics3DDirect3DDx6 : public iGraphics3D
    * these override any other variable settings.
    */
   bool rstate_dither;
-  bool rstate_specular;
   bool rstate_bilinearmap;
   bool rstate_trilinearmap;
   bool rstate_gouraud;

@@ -409,7 +409,6 @@ csGraphics3DGlide2x::csGraphics3DGlide2x(iBase* iParent) :
   m_Caps.fog = G3DFOGMETHOD_VERTEX;
   
   m_renderstate.dither = false;
-  m_renderstate.specular = false;
   m_renderstate.bilinearmap = true;
   m_renderstate.trilinearmap = false;
   m_renderstate.gouraud = true;
@@ -1452,9 +1451,6 @@ bool csGraphics3DGlide2x::SetRenderState (G3D_RENDERSTATEOPTION option, long val
       m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DITHERENABLE, FALSE);
 */
     break;
-  case G3DRENDERSTATE_SPECULARENABLE:
-    m_renderstate.specular = value;
-    break;
   case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
     m_renderstate.bilinearmap = value;
     break;
@@ -1498,8 +1494,6 @@ long csGraphics3DGlide2x::GetRenderState (G3D_RENDERSTATEOPTION op)
       return (bool)(m_ZBufMode & CS_ZBUF_FILL);
     case G3DRENDERSTATE_DITHERENABLE:
       return false;
-    case G3DRENDERSTATE_SPECULARENABLE:
-      return m_renderstate.specular;
     case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
       return m_renderstate.bilinearmap;
     case G3DRENDERSTATE_TRILINEARMAPPINGENABLE:

@@ -42,6 +42,14 @@
 
 #endif //!NO_ASSEMBLER
 
+#if defined (CS_LITTLE_ENDIAN)
+#  define LEFT(x)	(x & 0xffff)
+#  define RIGHT(x)	(x >> 16)
+#elif defined (CS_BIG_ENDIAN)
+#  define LEFT(x)	(x >> 16)
+#  define RIGHT(x)	(x & 0xffff)
+#endif
+
 //--//--//--//--//--//--//--//--//--//--//--//--//-- draw_scanline_XXXX --//--//
 
 #include "scanxx.inc"
@@ -54,34 +62,34 @@
 #define SCANMAP
 #define SCANLOOP \
     int filter_du, filter_dv;						\
-      while(_dest<=_destend&&((vv<BAILOUT_CONSTANT||uu<BAILOUT_CONSTANT)||(vv>=Scan.th2fp-BAILOUT_CONSTANT||uu>=Scan.tw2fp-BAILOUT_CONSTANT)))\
-      {                                                                   \
-        *_dest++ = srcTex[((vv>>16)<<shifter) + (uu>>16)];                \
-        uu += duu;							\
-        vv += dvv;							\
-      }                                                                   \
-      while ((_dest <= _destend)&&!((vv<BAILOUT_CONSTANT||uu<BAILOUT_CONSTANT)||(vv>=Scan.th2fp-BAILOUT_CONSTANT||uu>=Scan.tw2fp-BAILOUT_CONSTANT)))\
+    while(_dest<=_destend&&((vv<BAILOUT_CONSTANT||uu<BAILOUT_CONSTANT)||(vv>=Scan.th2fp-BAILOUT_CONSTANT||uu>=Scan.tw2fp-BAILOUT_CONSTANT)))\
+    {                                                                   \
+      *_dest++ = srcTex[((vv>>16)<<shifter) + (uu>>16)];                \
+      uu += duu;							\
+      vv += dvv;							\
+    }                                                                   \
+    while ((_dest <= _destend)&&!((vv<BAILOUT_CONSTANT||uu<BAILOUT_CONSTANT)||(vv>=Scan.th2fp-BAILOUT_CONSTANT||uu>=Scan.tw2fp-BAILOUT_CONSTANT)))\
+    {									\
+      if ((((long)_dest) & csGraphics3DSoftware::filter_bf) != 0)				\
       {									\
-        if ((((long)_dest) & csGraphics3DSoftware::filter_bf) != 0)				\
-        {									\
-          if ((uu&0xffff) < 64*256) filter_du = -1;			\
-          else if ((uu&0xffff) > 192*256) filter_du = 1;			\
-          else filter_du = 0;						\
-          if ((vv&0xffff) < 64*256) filter_dv = -1;			\
-          else if ((vv&0xffff) > 192*256) filter_dv = 1;			\
-          else filter_dv = 0;						\
-        }									\
-        else filter_du = filter_dv = 0;					\
-        *_dest++ = srcTex[(((vv>>16)+filter_dv)<<shifter) + ((uu>>16)+filter_du)];\
-        uu += duu;							\
-        vv += dvv;							\
+        if ((uu&0xffff) < 64*256) filter_du = -1;			\
+        else if ((uu&0xffff) > 192*256) filter_du = 1;			\
+        else filter_du = 0;						\
+        if ((vv&0xffff) < 64*256) filter_dv = -1;			\
+        else if ((vv&0xffff) > 192*256) filter_dv = 1;			\
+        else filter_dv = 0;						\
       }									\
-      while(_dest<=_destend)                                              \
-      {                                                                   \
-        *_dest++ = srcTex[((vv>>16)<<shifter) + (uu>>16)];                \
-        uu += duu;							\
-        vv += dvv;							\
-    }
+      else filter_du = filter_dv = 0;					\
+      *_dest++ = srcTex[(((vv>>16)+filter_dv)<<shifter) + ((uu>>16)+filter_du)];\
+      uu += duu;							\
+      vv += dvv;							\
+    }									\
+    while(_dest<=_destend)                                              \
+    {                                                                   \
+      *_dest++ = srcTex[((vv>>16)<<shifter) + (uu>>16)];                \
+      uu += duu;							\
+      vv += dvv;							\
+  }
 
 #define SCANEND \
     do									\
@@ -96,42 +104,61 @@
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_scanline_map_filt2_zfil
+#ifndef NO_draw_scanline_map_filt2_zfil_565
 
-#define SCANFUNC csScan_16_draw_scanline_map_filt2_zfil
+/*
+  We process two pixels at a time (in a single CPU register):
+     +--------+---------+    +--------+---------+
+  T: |top-left|top-right| B: |bot-left|bot-right|
+     +--------+---------+    +--------+---------+
+  We isolate the r/g/b components in both pixels at once and multiply
+  the double word with the V fractional value. Then we combine the left
+  and right halves. We use 16 gradations for interpolation, which is
+  quite enough for 16-bit modes.
+  Using one reg has a drawback: the subtraction operation do not perform
+  independent subtractions from both components; the least significant
+  bit of left pixel component could be garbled by right pixel's influence.
+*/
+
+#define SCANFUNC csScan_16_draw_scanline_map_filt2_zfil_565
 #define SCANMAP
-#define SCANLOOP \
-      unsigned int w,gb;		\
-      unsigned short color,r;		\
-      while(_dest<=_destend)\
-      {                                                                   \
-        int addr=(((vv>>16))<<shifter)+(uu>>16);\
-        int _=((uu&X_AND_FILTER)>>(14-LOG2_STEPS_X))+((vv&Y_AND_FILTER)>>((14-LOG2_STEPS_X)-LOG2_STEPS_Y));\
-\
-        w=Scan.filter_mul_table[_+0];\
-        color=srcTex[addr];				\
-        r=Scan.color_565_table[NUM_LIGHT_INTENSITIES*2048+w+(color>>11)];\
-        gb=Scan.color_565_table[w+(color&2047)];	\
-\
-        w=Scan.filter_mul_table[_+2];\
-	color=srcTex[addr+1];				\
-        r+=Scan.color_565_table[NUM_LIGHT_INTENSITIES*2048+w+(color>>11)];\
-        gb+=Scan.color_565_table[w+(color&2047)];	\
-\
-        w=Scan.filter_mul_table[_+1];\
-	color=srcTex[addr+(1<<shifter)];		\
-        r+=Scan.color_565_table[NUM_LIGHT_INTENSITIES*2048+w+(color>>11)];\
-        gb+=Scan.color_565_table[w+(color&2047)];	\
-\
-        w=Scan.filter_mul_table[_+3];\
-	color=srcTex[addr+(1<<shifter)+1];		\
-        r+=Scan.color_565_table[NUM_LIGHT_INTENSITIES*2048+w+(color>>11)];\
-        gb+=Scan.color_565_table[w+(color&2047)];	\
-\
-        *_dest++ = (r<<(11-LOG2_NUM_LIGHT_INTENSITIES))|(gb>>LOG2_NUM_LIGHT_INTENSITIES);                \
+#define SCANLOOP							\
+    if ((duu > 0xffff) || (dvv > 0xffff))				\
+      do								\
+      {									\
+        *_dest++ = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
         uu += duu;							\
         vv += dvv;							\
-      } /* fclose(fo) */
+      }									\
+      while (_dest <= _destend);					\
+    else								\
+      do								\
+      {									\
+        unsigned addr = (((vv >> 16)) << shifter) + (uu >> 16);		\
+        unsigned top = *(unsigned *)&srcTex [addr];			\
+        unsigned bot = *(unsigned *)&srcTex [addr + Scan.tw2];		\
+        unsigned c, v = (vv >> 12) & 0x0f;				\
+        c = (top & 0x001f001f);						\
+        unsigned b = (c << 4) + v * ((bot & 0x001f001f) - c);		\
+        /* b == <7:0> <5.4:bl> <7:0> <5.4:br> */			\
+        c = (top & 0x07e007e0);						\
+        unsigned g = c + (int (v * ((bot & 0x07e007e0) - c)) >> 4);	\
+        /* g == <6:0> <6.4:gl> <6:0> <6.4:gr> */			\
+        c = (top & 0xf800f800) >> 8;					\
+        unsigned r = (c << 4) + v * (((bot & 0xf800f800) >> 8) - c);	\
+        /* r == <4:0> <5.7:rl> <4:0> <5.7:rr> */			\
+        unsigned u = (uu >> 12) & 0x0f;					\
+        c = LEFT (b);							\
+        b = ((c << 4) + u * (RIGHT (b) - c) + 0x0080) >> 8;		\
+        c = LEFT (g);							\
+        g = (c + ((u * (RIGHT (g) - c) + 0x0100) >> 4)) & 0x07e0;	\
+        c = LEFT (r);							\
+        r = (((c << 4) + (u * (RIGHT (r) - c)) + 0x0400) & 0xf800);	\
+        *_dest++ = r | g | b;						\
+        uu += duu;							\
+        vv += dvv;							\
+      }									\
+      while (_dest <= _destend);
 
 #define SCANEND \
     do									\
@@ -142,7 +169,184 @@
     while (z_buffer <= lastZbuf)
 #include "scanln.inc"
 
-#endif // NO_draw_scanline_map_filt2_zfil
+#endif // NO_draw_scanline_map_filt2_zfil_565
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_scanline_map_filt2_zfil_555
+
+#define SCANFUNC csScan_16_draw_scanline_map_filt2_zfil_555
+#define SCANMAP
+#define SCANLOOP							\
+    if ((duu > 0xffff) || (dvv > 0xffff))				\
+      do								\
+      {									\
+        *_dest++ = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
+        uu += duu;							\
+        vv += dvv;							\
+      }									\
+      while (_dest <= _destend);					\
+    else								\
+      do								\
+      {									\
+        unsigned addr = (((vv >> 16)) << shifter) + (uu >> 16);		\
+        unsigned top = *(unsigned *)&srcTex [addr];			\
+        unsigned bot = *(unsigned *)&srcTex [addr + Scan.tw2];		\
+        unsigned c, v = (vv >> 12) & 0x0f;				\
+        c = (top & 0x001f001f);						\
+        unsigned b = (c << 4) + v * ((bot & 0x001f001f) - c);		\
+        /* b == <7:0> <5.4:bl> <7:0> <5.4:br> */			\
+        c = (top & 0x03e003e0);						\
+        unsigned g = c + (int (v * ((bot & 0x03e003e0) - c)) >> 4);	\
+        /* g == <7:0> <5.4:gl> <7:0> <5.4:gr> */			\
+        c = (top & 0x7c007c00) >> 8;					\
+        unsigned r = (c << 4) + v * (((bot & 0x7c007c00) >> 8) - c);	\
+        /* r == <4:0> <5.7:rl> <4:0> <5.7:rr> */			\
+        unsigned u = (uu >> 12) & 0x0f;					\
+        c = LEFT (b);							\
+        b = ((c << 4) + u * (RIGHT (b) - c) + 0x0080) >> 8;		\
+        c = LEFT (g);							\
+        g = (c + ((u * (RIGHT (g) - c) + 0x0100) >> 4)) & 0x03e0;	\
+        c = LEFT (r);							\
+        r = (((c << 4) + (u * (RIGHT (r) - c)) + 0x0200) & 0x7c00);	\
+        *_dest++ = r | g | b;						\
+        uu += duu;							\
+        vv += dvv;							\
+      }									\
+      while (_dest <= _destend);
+
+#define SCANEND \
+    do									\
+    {									\
+      *z_buffer++ = izz;						\
+      izz += dzz;							\
+    }									\
+    while (z_buffer <= lastZbuf)
+#include "scanln.inc"
+
+#endif // NO_draw_scanline_map_filt2_zfil_555
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_scanline_map_filt2_zuse_565
+
+#define SCANFUNC csScan_16_draw_scanline_map_filt2_zuse_565
+#define SCANMAP
+#define SCANLOOP							\
+    if ((duu > 0xffff) || (dvv > 0xffff))				\
+      do								\
+      {									\
+        if (izz >= *z_buffer)						\
+        {								\
+          *z_buffer = izz;						\
+          *_dest = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
+        }								\
+        _dest++;							\
+        z_buffer++;							\
+        uu += duu;							\
+        vv += dvv;							\
+        izz += dzz;							\
+      }									\
+      while (_dest <= _destend);					\
+    else								\
+      do								\
+      {									\
+        if (izz >= *z_buffer)						\
+        {								\
+        *z_buffer = izz;						\
+        unsigned addr = (((vv >> 16)) << shifter) + (uu >> 16);		\
+        unsigned top = *(unsigned *)&srcTex [addr];			\
+        unsigned bot = *(unsigned *)&srcTex [addr + Scan.tw2];		\
+        unsigned c, v = (vv >> 12) & 0x0f;				\
+        c = (top & 0x001f001f);						\
+        unsigned b = (c << 4) + v * ((bot & 0x001f001f) - c);		\
+        /* b == <7:0> <5.4:bl> <7:0> <5.4:br> */			\
+        c = (top & 0x07e007e0);						\
+        unsigned g = c + (int (v * ((bot & 0x07e007e0) - c)) >> 4);	\
+        /* g == <6:0> <6.4:gl> <6:0> <6.4:gr> */			\
+        c = (top & 0xf800f800) >> 8;					\
+        unsigned r = (c << 4) + v * (((bot & 0xf800f800) >> 8) - c);	\
+        /* r == <4:0> <5.7:rl> <4:0> <5.7:rr> */			\
+        unsigned u = (uu >> 12) & 0x0f;					\
+        c = LEFT (b);							\
+        b = ((c << 4) + u * (RIGHT (b) - c) + 0x0080) >> 8;		\
+        c = LEFT (g);							\
+        g = (c + ((u * (RIGHT (g) - c) + 0x0100) >> 4)) & 0x07e0;	\
+        c = LEFT (r);							\
+        r = (((c << 4) + (u * (RIGHT (r) - c)) + 0x0400) & 0xf800);	\
+        *_dest = r | g | b;						\
+        }								\
+        _dest++;							\
+        z_buffer++;							\
+        uu += duu;							\
+        vv += dvv;							\
+        izz += dzz;							\
+      }									\
+      while (_dest <= _destend);
+#include "scanln.inc"
+
+#endif // NO_draw_scanline_map_filt2_zuse_565
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_scanline_map_filt2_zuse_555
+
+#define SCANFUNC csScan_16_draw_scanline_map_filt2_zuse_555
+#define SCANMAP
+#define SCANLOOP							\
+    if ((duu > 0xffff) || (dvv > 0xffff))				\
+      do								\
+      {									\
+        if (izz >= *z_buffer)						\
+        {								\
+          *z_buffer = izz;						\
+          *_dest = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
+        }								\
+        _dest++;							\
+        z_buffer++;							\
+        uu += duu;							\
+        vv += dvv;							\
+        izz += dzz;							\
+      }									\
+      while (_dest <= _destend);					\
+    else								\
+      do								\
+      {									\
+        if (izz >= *z_buffer)						\
+        {								\
+        *z_buffer = izz;						\
+        unsigned addr = (((vv >> 16)) << shifter) + (uu >> 16);		\
+        unsigned top = *(unsigned *)&srcTex [addr];			\
+        unsigned bot = *(unsigned *)&srcTex [addr + Scan.tw2];		\
+        unsigned c, v = (vv >> 12) & 0x0f;				\
+        c = (top & 0x001f001f);						\
+        unsigned b = (c << 4) + v * ((bot & 0x001f001f) - c);		\
+        /* b == <7:0> <5.4:bl> <7:0> <5.4:br> */			\
+        c = (top & 0x03e003e0);						\
+        unsigned g = c + (int (v * ((bot & 0x03e003e0) - c)) >> 4);	\
+        /* g == <7:0> <5.4:gl> <7:0> <5.4:gr> */			\
+        c = (top & 0x7c007c00) >> 8;					\
+        unsigned r = (c << 4) + v * (((bot & 0x7c007c00) >> 8) - c);	\
+        /* r == <4:0> <5.7:rl> <4:0> <5.7:rr> */			\
+        unsigned u = (uu >> 12) & 0x0f;					\
+        c = LEFT (b);							\
+        b = ((c << 4) + u * (RIGHT (b) - c) + 0x0080) >> 8;		\
+        c = LEFT (g);							\
+        g = (c + ((u * (RIGHT (g) - c) + 0x0100) >> 4)) & 0x03e0;	\
+        c = LEFT (r);							\
+        r = (((c << 4) + (u * (RIGHT (r) - c)) + 0x0200) & 0x7c00);	\
+        *_dest = r | g | b;						\
+        }								\
+        _dest++;							\
+        z_buffer++;							\
+        uu += duu;							\
+        vv += dvv;							\
+        izz += dzz;							\
+      }									\
+      while (_dest <= _destend);
+#include "scanln.inc"
+
+#endif // NO_draw_scanline_map_filt2_zuse_555
 
 //------------------------------------------------------------------
 

@@ -106,7 +106,6 @@ private:
   struct
   {
     bool dither;
-    bool specular;
     bool bilinearmap;
     bool trilinearmap;
     bool gouraud;

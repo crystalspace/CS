@@ -298,7 +298,6 @@ csGraphics3DGlide3x::csGraphics3DGlide3x(iBase *iParent) :
 
 /*
   rstate_dither = false;
-  rstate_specular = false;
   rstate_bilinearmap = false;
   rstate_trilinearmap = false;
   rstate_gouraud = true;

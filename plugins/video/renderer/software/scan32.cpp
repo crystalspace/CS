@@ -40,11 +40,11 @@
 //------------------------------------------------------------------
 
 #ifdef TOP8BITS_R8G8B8_USED
-#  define FOG_PRE(x) x >> 8
-#  define FOG_POST(x) x << 8
+#  define PIXEL_PREPROC(x) x >> 8
+#  define PIXEL_POSTROC(x) x << 8
 #else
-#  define FOG_PRE(x) x
-#  define FOG_POST(x) x
+#  define PIXEL_PREPROC(x) x
+#  define PIXEL_POSTROC(x) x
 #endif
 
 #ifndef NO_draw_scanline_fog
@@ -83,11 +83,11 @@ fd_done:
       if (fd < EXP_256_SIZE)
       {
         fd = Scan.exp_256 [fd];
-        unsigned pix = FOG_PRE (*_dest);
+        unsigned pix = PIXEL_PREPROC (*_dest);
         register int r = (fd * ((pix & 0x00ff0000) - Scan.FogR) >> 8) + Scan.FogR;
         register int g = (fd * ((pix & 0x0000ff00) - Scan.FogG) >> 8) + Scan.FogG;
         register int b = (fd * ((pix & 0x000000ff) - Scan.FogB) >> 8) + Scan.FogB;
-        *_dest = FOG_POST ((r & 0x00ff0000) | (g & 0x0000ff00) | b);
+        *_dest = PIXEL_POSTROC ((r & 0x00ff0000) | (g & 0x0000ff00) | b);
       }
       else
         *_dest = fog_pix;
@@ -124,11 +124,11 @@ void csScan_32_draw_scanline_fog_view (int xx, unsigned char* d,
       if (fd < EXP_256_SIZE)
       {
         fd = Scan.exp_256 [fd];
-        unsigned pix = FOG_PRE (*_dest);
+        unsigned pix = PIXEL_PREPROC (*_dest);
         register int r = (fd * ((pix & 0x00ff0000) - Scan.FogR) >> 8) + Scan.FogR;
         register int g = (fd * ((pix & 0x0000ff00) - Scan.FogG) >> 8) + Scan.FogG;
         register int b = (fd * ((pix & 0x000000ff) - Scan.FogB) >> 8) + Scan.FogB;
-        *_dest = FOG_POST ((r & 0x00ff0000) | (g & 0x0000ff00) | b);
+        *_dest = PIXEL_POSTROC ((r & 0x00ff0000) | (g & 0x0000ff00) | b);
       }
       else
         *_dest = fog_pix;
@@ -189,6 +189,123 @@ void csScan_32_draw_scanline_fog_view (int xx, unsigned char* d,
 #include "scanln.inc"
 
 #endif // NO_draw_scanline_map_alpha
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_scanline_map_filt2_zfil
+
+/*
+    Strangely enough, but 16 interpolation steps are quite enough
+    even for 32bpp modes... We also use here the technique used in
+    16-bit modes (see scan16.cpp) and to my surprise I solved the
+    puzzle with same 6 multiplies per pixel as in 16-bit modes (!)
+*/
+
+#define SCANFUNC csScan_32_draw_scanline_map_filt2_zfil
+#define SCANMAP
+#define SCANLOOP							\
+    if ((duu > 0xffff) || (dvv > 0xffff))				\
+      do								\
+      {									\
+        *_dest++ = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
+        uu += duu;							\
+        vv += dvv;							\
+      }									\
+      while (_dest <= _destend);					\
+    else								\
+      do								\
+      {									\
+        unsigned addr = (((vv >> 16)) << shifter) + (uu >> 16);		\
+        unsigned pl = PIXEL_PREPROC (srcTex [addr]);			\
+        unsigned pr = PIXEL_PREPROC (srcTex [addr + 1]);		\
+        unsigned c, u = (uu >> 12) & 0x0f;				\
+        c = pl & 0x00ff00ff;						\
+        unsigned rbt = (c << 4) + u * ((pr & 0x00ff00ff) - c);		\
+        c = pl & 0x0000ff00;						\
+        unsigned gt  = (c << 4) + u * ((pr & 0x0000ff00) - c);		\
+        pl = PIXEL_PREPROC (srcTex [addr + Scan.tw2]);			\
+        pr = PIXEL_PREPROC (srcTex [addr + Scan.tw2 + 1]);		\
+        c = pl & 0x00ff00ff;						\
+        unsigned rbb = (c << 4) + u * ((pr & 0x00ff00ff) - c);		\
+        c = pl & 0x0000ff00;						\
+        unsigned gb  = (c << 4) + u * ((pr & 0x0000ff00) - c);		\
+        unsigned v = (vv >> 12) & 0x0f;					\
+        rbb = (((rbt << 4) + v * (rbb - rbt)) >> 8) & 0x00ff00ff;	\
+        gb  = (((gt << 4)  + v * (gb  - gt )) >> 8) & 0x0000ff00;	\
+        *_dest++ = rbb | gb;						\
+        uu += duu;							\
+        vv += dvv;							\
+      }									\
+      while (_dest <= _destend);
+
+#define SCANEND \
+    do									\
+    {									\
+      *z_buffer++ = izz;						\
+      izz += dzz;							\
+    }									\
+    while (z_buffer <= lastZbuf)
+#include "scanln.inc"
+
+#endif // NO_draw_scanline_map_filt2_zfil
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_scanline_map_filt2_zuse
+
+#define SCANFUNC csScan_32_draw_scanline_map_filt2_zuse
+#define SCANMAP
+#define SCANLOOP							\
+    if ((duu > 0xffff) || (dvv > 0xffff))				\
+      do								\
+      {									\
+        if (izz >= *z_buffer)						\
+        {								\
+          *z_buffer = izz;						\
+          *_dest = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
+        }								\
+        _dest++;							\
+        z_buffer++;							\
+        uu += duu;							\
+        vv += dvv;							\
+        izz += dzz;							\
+      }									\
+      while (_dest <= _destend);					\
+    else								\
+      do								\
+      {									\
+        if (izz >= *z_buffer)						\
+        {								\
+        *z_buffer = izz;						\
+        unsigned addr = (((vv >> 16)) << shifter) + (uu >> 16);		\
+        unsigned pl = PIXEL_PREPROC (srcTex [addr]);			\
+        unsigned pr = PIXEL_PREPROC (srcTex [addr + 1]);		\
+        unsigned c, u = (uu >> 12) & 0x0f;				\
+        c = pl & 0x00ff00ff;						\
+        unsigned rbt = (c << 4) + u * ((pr & 0x00ff00ff) - c);		\
+        c = pl & 0x0000ff00;						\
+        unsigned gt  = (c << 4) + u * ((pr & 0x0000ff00) - c);		\
+        pl = PIXEL_PREPROC (srcTex [addr + Scan.tw2]);			\
+        pr = PIXEL_PREPROC (srcTex [addr + Scan.tw2 + 1]);		\
+        c = pl & 0x00ff00ff;						\
+        unsigned rbb = (c << 4) + u * ((pr & 0x00ff00ff) - c);		\
+        c = pl & 0x0000ff00;						\
+        unsigned gb  = (c << 4) + u * ((pr & 0x0000ff00) - c);		\
+        unsigned v = (vv >> 12) & 0x0f;					\
+        rbb = (((rbt << 4) + v * (rbb - rbt)) >> 8) & 0x00ff00ff;	\
+        gb  = (((gt << 4)  + v * (gb  - gt )) >> 8) & 0x0000ff00;	\
+        *_dest = rbb | gb;						\
+        }								\
+        _dest++;							\
+        z_buffer++;							\
+        uu += duu;							\
+        vv += dvv;							\
+        izz += dzz;							\
+      }									\
+      while (_dest <= _destend);
+#include "scanln.inc"
+
+#endif // NO_draw_scanline_map_filt2_zuse
 
 //------------------------------------------------------------------
 
