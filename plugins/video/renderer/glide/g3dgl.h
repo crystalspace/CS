@@ -87,7 +87,7 @@ private:
   bool m_bVRetrace;
 
   /// The current read/write settings for the Z-buffer.
-  long int m_ZBufMode;
+  static long int m_ZBufMode;
 
   /// The current drawing mode (2D/3D)
   int m_nDrawMode;

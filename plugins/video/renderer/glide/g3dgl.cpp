@@ -97,6 +97,7 @@ IMPLEMENT_IBASE_END
 #define GLIDE_FX_VERTSIZE 10
 
 long csGraphics3DGlide::m_vertstrulen =  sizeof(MyGrVertex);
+long csGraphics3DGlide::m_ZBufMode = 0;
 
 csGraphics3DGlide* csGraphics3DGlide::G3D = NULL;
 // Error Message handling
@@ -623,7 +624,9 @@ void csGraphics3DGlide::RenderPolygonSinglePass (MyGrVertex * verts, int num, Te
                              GR_COMBINE_LOCAL_NONE, GR_COMBINE_OTHER_CONSTANT, FXFALSE );
   }
 
-  if (is_transparent)       
+  if (m_ZBufMode & CS_ZBUF_FILLONLY)
+      GlideLib_grAlphaBlendFunction ( GR_BLEND_ZERO, GR_BLEND_ONE, GR_BLEND_ZERO, GR_BLEND_ONE );
+  else  if (is_transparent)       
     GlideLib_grAlphaBlendFunction ( GR_BLEND_SRC_ALPHA, GR_BLEND_ONE_MINUS_SRC_ALPHA, GR_BLEND_ONE, GR_BLEND_ZERO );
   else
     GlideLib_grAlphaBlendFunction ( GR_BLEND_ONE, GR_BLEND_ZERO, GR_BLEND_ONE, GR_BLEND_ZERO );
@@ -675,7 +678,9 @@ void csGraphics3DGlide::RenderPolygonMultiPass (MyGrVertex* verts, int num,
                               GR_COMBINE_LOCAL_NONE, GR_COMBINE_OTHER_CONSTANT, FXFALSE );
   }
 
-  if (is_transparent)
+  if (m_ZBufMode & CS_ZBUF_FILLONLY)
+      GlideLib_grAlphaBlendFunction ( GR_BLEND_ZERO, GR_BLEND_ONE, GR_BLEND_ZERO, GR_BLEND_ONE );
+  else  if (is_transparent)
     GlideLib_grAlphaBlendFunction (GR_BLEND_SRC_ALPHA, GR_BLEND_ONE_MINUS_SRC_ALPHA,
                                    GR_BLEND_ONE, GR_BLEND_ZERO);
   else
@@ -697,9 +702,11 @@ void csGraphics3DGlide::RenderPolygonMultiPass (MyGrVertex* verts, int num,
                               GR_COMBINE_LOCAL_NONE, GR_COMBINE_OTHER_TEXTURE, FXFALSE );
     GlideLib_grAlphaCombine ( GR_COMBINE_FUNCTION_SCALE_OTHER, GR_COMBINE_FACTOR_ONE, 
                               GR_COMBINE_LOCAL_NONE, GR_COMBINE_OTHER_CONSTANT, FXFALSE );
-
-    GlideLib_grAlphaBlendFunction (GR_BLEND_ZERO, GR_BLEND_SRC_COLOR,
-                                   GR_BLEND_ZERO, GR_BLEND_ZERO);
+    if (m_ZBufMode & CS_ZBUF_FILLONLY)
+      GlideLib_grAlphaBlendFunction ( GR_BLEND_ZERO, GR_BLEND_ONE, GR_BLEND_ZERO, GR_BLEND_ONE );
+    else
+      GlideLib_grAlphaBlendFunction (GR_BLEND_ZERO, GR_BLEND_SRC_COLOR,
+                                     GR_BLEND_ZERO, GR_BLEND_ZERO);
     GlideLib_grTexClampMode (light->tmu->tmu_id, GR_TEXTURECLAMP_CLAMP,GR_TEXTURECLAMP_CLAMP);
     GlideLib_grTexSource (light->tmu->tmu_id, light->loadAddress,
                           GR_MIPMAPLEVELMASK_BOTH, &light->info);
