@@ -2443,6 +2443,7 @@ package cspace::csBox3;
 *SetCenter = *cspacec::csBox3_SetCenter;
 *SetSize = *cspacec::csBox3_SetSize;
 *GetSide = *cspacec::csBox3_GetSide;
+*GetAxisPlane = *cspacec::csBox3_GetAxisPlane;
 *GetVisibleSides = *cspacec::csBox3_GetVisibleSides;
 *OtherSide = *cspacec::csBox3_OtherSide;
 *GetEdge = *cspacec::csBox3_GetEdge;
