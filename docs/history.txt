@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+28-Apr-2001
+	- Removed a type->DecRef() in engine.cpp. The mesh object type
+	  plugins can remain in memory. This DecRef() caused crashes
+	  for csdemo.
 27-Apr-2001
 	- Martin did some further work on csparser and csengine.
 	- Philip Wyett added csdemo.cfg to makefile inorder that it is
