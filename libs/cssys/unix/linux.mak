@@ -137,6 +137,11 @@ SRC.SYS_CSSYS = \
   libs/cssys/general/runloop.cpp \
   libs/cssys/general/sysinit.cpp
 
+ifeq ($(THREADS),pthread)
+SRC.SYS_CSSYS += libs/cssys/general/cspthrd.cpp
+LIBS.EXE+=$(LFLAGS.l)pthread
+endif
+
 # The C compiler.
 #CC=gcc -c
 
