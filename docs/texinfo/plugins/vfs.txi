@@ -87,28 +87,29 @@ not been tested.)
 @cindex @sc{vfs} Configuration File
 @cindex @file{vfs.cfg}, @sc{vfs} Configuration File
 
-The main @code{[VFS]} section describes the layout of the ``virtual'' file
-system. Imagine a clean disk drive onto which you start to create directories
-by making links to existing ``real'' directories and archive (@file{.zip})
-files.  An archive is treated exactly like a subdirectory; you even can link
-one ``virtual directory'' to several ``real'' paths and archives; however if
-you write files they will be written to the first directory or archive in
-list.
+The main @samp{VFS.Mount.} section describes the layout of the ``virtual''
+file system. Imagine a clean disk drive onto which you start to create
+directories by making links to existing ``real'' directories and archive
+(@file{.zip}) files.  An archive is treated exactly like a subdirectory; you
+even can link one ``virtual directory'' to several ``real'' paths and
+archives; however if you write files they will be written to the first
+directory or archive in list.
 
-This section contains a list of virtual-to-real path mappings, where the
-``real'' path can represent a list of @dfn{physical} directories and @sc{zip}
-archives.  The path lists should be separated by commas (,), so commas cannot
-be used in directory names.  This should not be much of a restriction, but if
-it is for a particular application, change @samp{VFS_PATH_DIVIDER} macro in
-@file{vfs.cpp}.
+This section contains a list of virtual-to-real path mappings. The local name
+of the keys in the @samp{VFS.Mount.} section define the virtual directory,
+and the values define the real paths, which can represent a list of
+@dfn{physical} directories and @sc{zip} archives.  The path lists should be
+separated by commas (,), so commas cannot be used in directory names. This
+should not be much of a restriction, but if it is for a particular
+application, change @samp{VFS_PATH_DIVIDER} macro in @file{vfs.cpp}.
 
-The @code{[VFS]} section usually makes heavy use of variable data since most
-operating systems have different pathname semantics and syntax.  The ``common
-denominator'' that @sc{vfs} emulates is a Unix-like filesystem.  To include
-the value of a variable in a @sc{vfs} path use the
+The @code{VFS.Mount.} section usually makes heavy use of variable data since
+most operating systems have different pathname semantics and syntax.  The
+``common denominator'' that @sc{vfs} emulates is a Unix-like filesystem.  To
+include the value of a variable in a @sc{vfs} path use the
 @samp{$(@var{variable-name})} construct.  In the case where
 @samp{@var{variable-name}} consists of a single letter, you can omit the
-parenthesese, as in @code{$@var{variable-name}} (for example @samp{$A}).
+parentheses, as in @code{$@var{variable-name}} (for example @samp{$A}).
 
 Variables that are defined in the environment override those defined in this
 file.  For example, the @samp{$HOME} environment variable is set in all
@@ -146,13 +147,18 @@ Additionally, we will add a link to user's home directory (something somewhat
 vaguely defined on non-Unix platforms) so that game can store the user's
 settings into the file @file{~/game.profile}.
 
+Note that in this example many of the options in the real @file{vfs.cfg} are
+omitted. So you should not take this example for your game, because one of the
+libraries or plug-in modules you use may require a mapping that is not listed
+here. This example is only intended to understand the concept:
+
 @example
-[VFS]
 ; The following variables should be defined either in
 ; the environment or in system-dependent sections:
 ;
-; $. - The current directory (or the directory into which the
-;      game has been installed).
+; $. - The current directory.
+; $@@ - The directory into which CS has been installed. This is
+;      detected by SysSystemDriver::GetInstallPath().
 ; $/ - The native path separator character; this value is
 ;      supplied by the VFS manager, so you do not need to define
 ;      it here; you can do so, however, if you really want to.
@@ -164,51 +170,47 @@ settings into the file @file{~/game.profile}.
 ; in $/ as an archive file name and not as a physical
 ; directory.
 
-~ = $(HOME)$/
-level1 = $.$/patches$/level1$/, $.$/cache$/level1.zip,
-  $(CD)$/data$/level1.zip
-level2 = $.$/patches$/level2$/, $.$/cache$/level2.zip,
-  $(CD)$/data$/level2.zip
-level3 = $.$/patches$/level3$/, $.$/cache$/level3.zip,
-  $(CD)$/data$/level3.zip
+VFS.Mount.~ = $(HOME)$/
+VFS.Mount.level1 = $.$/patches$/level1$/, $.$/cache$/level1.zip, $(CD)$/data$/level1.zip
+VFS.Mount.level2 = $.$/patches$/level2$/, $.$/cache$/level2.zip, $(CD)$/data$/level2.zip
+VFS.Mount.level3 = $.$/patches$/level3$/, $.$/cache$/level3.zip, $(CD)$/data$/level3.zip
 
 ; Platform aliases.  Aliases are always read first; VFS
 ; entries specific to each platform override those defined
 ; in the platform alias section.  For example, if your
 ; current platform is Solaris, VFS will look for the value
 ; of a variable first in the environment, then in
-; [VFS.Solaris], and finally in [VFS.Unix] (as specified in
+; VFS.Solaris., and finally in VFS.Unix. (as specified in
 ; section below).
 
-[VFS.Alias]
 ; Unix-style filesystems
-Solaris		= VFS.Unix
-Linux		= VFS.Unix
-BSD		= VFS.Unix
-Irix		= VFS.Unix
-NextStep	= VFS.Unix
-OpenStep	= VFS.Unix
-MacOS/X Server	= VFS.Unix
-BeOS		= VFS.Unix
+VFS.Alias.Solaris         = VFS.Unix
+VFS.Alias.Linux           = VFS.Unix
+VFS.Alias.BSD             = VFS.Unix
+VFS.Alias.Irix            = VFS.Unix
+VFS.Alias.NextStep        = VFS.Unix
+VFS.Alias.OpenStep        = VFS.Unix
+VFS.Alias.MacOS/X Server  = VFS.Unix
+VFS.Alias.BeOS            = VFS.Unix
 
 ; CP/M-style filesystems
-DOS		= VFS.CP/M
-OS/2		= VFS.CP/M
-Win32		= VFS.CP/M
+VFS.Alias.DOS             = VFS.CP/M
+VFS.Alias.OS/2            = VFS.CP/M
+VFS.Alias.Win32           = VFS.CP/M
 
-[VFS.Unix]
-. = .
-.. = ..
-CD = /mnt/cdrom
+; strange key names follow:
+; VFS.Unix.. means key '.' in section VFS.Unix.*
+; VFS.Unix... means key '..' in section VFS.Unix.*
+VFS.Unix.. = .
+VFS.Unix... = ..
+VFS.Unix.CD = /mnt/cdrom
 
-[VFS.CP/M]
-. = .
-.. = ..
-HOME = $(HOMEDIR:$(HOMEPATH:.))
-CD = x:
+VFS.CP/M.. = .
+VFS.CP/M... = ..
+VFS.CP/M.HOME = $(HOMEDIR:$(HOMEPATH:.))
+VFS.CP/M.CD = x:
 
-[VFS.Macintosh]
-. = :
-.. = ::
-HOME =
+VFS.Macintosh.. = 
+VFS.Macintosh... = ..
+VFS.Macintosh.HOME = 
 @end example
