@@ -82,8 +82,8 @@ public:
     const csVector3& newpos);
   virtual void Draw(iIsoRenderView *rview);
   virtual iIsoWorld* GetWorld() const {return world;}
-  virtual void SetSpace(int minx, int minz, float miny = -1.0, 
-    float maxy = +10.0);
+  virtual void SetSpace(int minx, int minz, float miny, 
+    float maxy);
   virtual int GetWidth() const {return width;}
   virtual int GetHeight() const {return height;}
   virtual void GetGridOffset(int& minx, int& miny) const 
