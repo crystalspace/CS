@@ -17,6 +17,12 @@ The history order is reversed so that new features are at the top.
 	  make the source array empty and the destination array the copy
 	  of the source array. This is a very efficient operation (only
 	  moves pointers, not the actual data).
+	- Added csArray<T>::DeleteRange().
+	- csHashMap now grows bucket size dynamically. This seems to give
+	  good results but I limit the growth to about 10000 elements
+	  because beyond that the overhead of growing the buckets becomes
+	  too high and performance drops a lot. Because of this the default
+	  bucket size in hash map has been reduced to 53 elements.
 23-Apr-2003
 	- Removed iPluginManager->GetPluginCount() and GetPlugin() since
 	  those two functions cannot be used in a thread-safe way. The

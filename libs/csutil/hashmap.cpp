@@ -129,10 +129,21 @@ void csHashIterator::DeleteNext ()
 
 //-----------------------------------------------------------------------------
 
+uint32 csHashMap::prime_table[] =
+{
+  53,         97,         193,       389,       769, 
+  1543,       3079,       6151,      12289,     24593,
+  49157,      98317,      196613,    393241,    786433,
+  1572869,    3145739,    6291469,   12582917,  25165843,
+  50331653,   100663319,  201326611, 402653189, 805306457,
+  1610612741, 0
+};
+
 csHashMap::csHashMap (uint32 size)
 {
   NumBuckets = size;
   Buckets.SetLength (size);
+  hash_elements = 0;
 }
 
 csHashMap::~csHashMap ()
@@ -140,22 +151,73 @@ csHashMap::~csHashMap ()
   DeleteAll ();
 }
 
-void csHashMap::Put (csHashKey key, csHashObject object)
+uint32 csHashMap::FindLargerPrime (uint32 num)
 {
-  uint32 idx = key % NumBuckets;
-  if (!Buckets[idx]) Buckets.Put (idx, new csHashBucket ());
+  int i = 0;
+  uint32 p = prime_table[i];
+  while (p)
+  {
+    if (p > num) return p;
+    i++;
+    p = prime_table[i];
+  }
+  return 0;
+}
+
+void csHashMap::ChangeBuckets (uint32 newsize)
+{
+//printf ("Extend from %d to %d (hash_elements=%d)\n", NumBuckets, newsize, hash_elements);
+  Buckets.SetLength (newsize);
+  int i;
+  // Only go up to old size.
+  uint32 old_NumBuckets = NumBuckets;
+  NumBuckets = newsize;
+  for (i = 0 ; i < old_NumBuckets ; i++)
+  {
+    csHashBucket* bucket = Buckets[i];
+    if (!bucket) continue;
+    csHashBucket b;
+    bucket->TransferTo (b);
+    int bucket_len = b.Length ();
+    int j;
+    for (j = 0 ; j < bucket_len ; j++)
+    {
+      csHashElement& el = b[j];
+      uint32 new_idx =  el.key % NumBuckets;
+      PutInternal (new_idx, el.key, el.object);
+    }
+    if (bucket->Length () == 0) Buckets.Put (i, NULL);
+  }
+}
+
+void csHashMap::PutInternal (uint32 idx, csHashKey key, csHashObject object)
+{
   csHashBucket* bucket = Buckets[idx];
+  if (!bucket)
+  {
+    bucket = new csHashBucket ();
+    Buckets.Put (idx, bucket);
+  }
 
   int i = bucket->Push (csHashElement ());
   (*bucket)[i].key = key;
   (*bucket)[i].object = object;
 }
 
+void csHashMap::Put (csHashKey key, csHashObject object)
+{
+  uint32 idx = key % NumBuckets;
+  PutInternal (idx, key, object);
+  hash_elements++;
+  if (NumBuckets < 10000 && hash_elements > NumBuckets*4)
+    ChangeBuckets (FindLargerPrime (NumBuckets*4));
+}
+
 csHashObject csHashMap::Get (csHashKey key) const
 {
   uint32 idx = key % NumBuckets;
-  if (!Buckets[idx]) return NULL;
   csHashBucket* bucket = Buckets[idx];
+  if (!bucket) return NULL;
   int i;
   for (i = 0 ; i < bucket->Length () ; i++)
   {
@@ -168,8 +230,8 @@ csHashObject csHashMap::Get (csHashKey key) const
 void csHashMap::Delete (csHashKey key, csHashObject object)
 {
   uint32 idx = key % NumBuckets;
-  if (!Buckets[idx]) return;
   csHashBucket* bucket = Buckets[idx];
+  if (!bucket) return;
   int i;
   for (i = bucket->Length ()-1 ; i >= 0 ; i--)
   {
@@ -177,6 +239,7 @@ void csHashMap::Delete (csHashKey key, csHashObject object)
     if (element.key == key && element.object == object)
     {
       bucket->DeleteIndex (i);
+      hash_elements--;
       break;
     }
   }
@@ -185,14 +248,17 @@ void csHashMap::Delete (csHashKey key, csHashObject object)
 void csHashMap::DeleteAll (csHashKey key)
 {
   uint32 idx = key % NumBuckets;
-  if (!Buckets[idx]) return;
   csHashBucket* bucket = Buckets[idx];
+  if (!bucket) return;
   uint32 i;
   for (i = bucket->Length () ; i-- > 0 ; )
   {
     csHashElement& element = bucket->Get(i);
     if (element.key == key)
+    {
       bucket->DeleteIndex (i);
+      hash_elements--;
+    }
   }
 }
 
@@ -203,6 +269,7 @@ void csHashMap::DeleteAll ()
   {
     Buckets.Put (b, NULL);
   }
+  hash_elements = 0;
 }
 
 //-----------------------------------------------------------------------------

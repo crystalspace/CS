@@ -89,7 +89,6 @@ private:
   void GotoNextElement ();
 
 public:
-
   /**
    * Constructor for an iterator to iterate over all elements in a hashmap.
    * Note that you should not do changes on the hashmap when you have
@@ -130,8 +129,24 @@ private:
   csHashBucketVector Buckets;
   /// Max size of this vector.
   uint32 NumBuckets;
+  /// Number of elements in hash (to detect when to increase vector size).
+  int hash_elements;
+
+  /// Reorganize the hashmap with a different size of buckets.
+  void ChangeBuckets (uint32 newsize);
+
+  /**
+   * Put an object in the bucket vector.
+   */
+  void PutInternal (uint32 idx, csHashKey key, csHashObject object);
+
+
+  /// Find a prime number bigger then the given input number.
+  static uint32 FindLargerPrime (uint32 num);
 
 public:
+  static uint32 prime_table[];
+
   /**
    * Constructor. The parameter for the constructor
    * is the initial size of the hashtable. The best
@@ -140,9 +155,9 @@ public:
    * 1201, 1559, 3541, 8087, 12263, 25247, 36923,
    * 50119, 70951, 90313, 104707, ...
    * For a bigger list go to www.utm.edu/research/primes.
-   * The map will grow dynamically if needed (@@@ Not implemented yet).
+   * The map will grow dynamically if needed.
    */
-  csHashMap (uint32 size = 211);
+  csHashMap (uint32 size = 53);
 
   /**
    * Destructor. The objects referenced too in this hash
