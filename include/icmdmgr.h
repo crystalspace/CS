@@ -30,9 +30,6 @@ struct iWorld;
 
 SCF_VERSION (iCmdMgr, 0, 0, 1);
 
-/**
- * @@@ Please document me using Doc++!
- */
 struct iCmdMgr: public iBase
 {
   public:
@@ -41,12 +38,9 @@ struct iCmdMgr: public iBase
 };
 
 
-SCF_VERSION (iCMDMGR, 0, 0, 2);
+SCF_VERSION (iCommandManager, 0, 0, 2);
 
-/**
- * @@@ Please document me using Doc++!
- */
-struct iCMDMGR: public iPlugIn
+struct iCommandManager: public iPlugIn
 {
   virtual bool Initialize (iSystem *iSys) = 0;
   virtual bool Open() =0;
@@ -79,7 +73,6 @@ struct iCMDMGR: public iPlugIn
 
   virtual void AddSector(char *name, iSector *world, iSector *sector) = 0;
   virtual void DropSector(iSector *world, iSector *sector) = 0;
-
 };
 
 #endif 

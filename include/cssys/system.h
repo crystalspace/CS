@@ -241,9 +241,9 @@ public:
   /// Network manager
   iNetworkManager* NetMan;
   /// Network User Protocol Layer
-  iPROTO *NetProtocol;
+  iNetSpaceProtocol *NetProtocol;
   /// Network Command Manager
-  iCMDMGR *CmdManager;
+  iCommandManager *CmdManager;
   /// System console
   iConsole *Console;
   /// Authentication method

@@ -139,7 +139,7 @@ struct iNetworkManager : public iPlugIn
   virtual void Broadcast(int csNetPort, int len, const char *msg) =0;
 
   // Glue to NSTP
-  virtual void AssignProtocol(iPROTO *AssignedProtocol) =0;
+  virtual void AssignProtocol(iNetSpaceProtocol *AssignedProtocol) =0;
     
   /// Utility stuff
   virtual int GetLastError () = 0;

@@ -494,8 +494,8 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
   Sound = QUERY_PLUGIN_ID (this, CS_FUNCID_SOUND, iSoundRender);
   NetDrv = QUERY_PLUGIN_ID (this, CS_FUNCID_NETDRV, iNetworkDriver);
   NetMan = QUERY_PLUGIN_ID (this, CS_FUNCID_NETMAN, iNetworkManager);
-  NetProtocol = QUERY_PLUGIN_ID (this, CS_FUNCID_PROTOCOL, iPROTO);
-  CmdManager = QUERY_PLUGIN_ID (this, CS_FUNCID_CMDMGR, iCMDMGR);
+  NetProtocol = QUERY_PLUGIN_ID (this, CS_FUNCID_PROTOCOL, iNetSpaceProtocol);
+  CmdManager = QUERY_PLUGIN_ID (this, CS_FUNCID_CMDMGR, iCommandManager);
   Console = QUERY_PLUGIN_ID (this, CS_FUNCID_CONSOLE, iConsole);
   Auth = QUERY_PLUGIN_ID (this, CS_FUNCID_AUTH, iAuth);
 

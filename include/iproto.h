@@ -1,6 +1,5 @@
 /*
-    Crystal Space 3D engine
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000 by Thomas Riemer <triemer@apt4g.a3nyc.com>
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -41,12 +40,9 @@ struct iProto: public iBase
 };
 
 
-SCF_VERSION (iPROTO, 0, 0, 3);
+SCF_VERSION (iNetSpaceProtocol, 0, 0, 3);
 
-/**
- * @@@ Please document me using Doc++!
- */
-struct iPROTO: public iPlugIn
+struct iNetSpaceProtocol: public iPlugIn
 {
   virtual bool Initialize (iSystem *iSys) = 0;
   virtual bool Open()=0;
@@ -76,7 +72,7 @@ struct iPROTO: public iPlugIn
 
   /// Setup Network Command Manager. - this wires the protocol upwards
   /// For any call backs required.
-  virtual bool AddCmdManager(iCMDMGR *NewCmdManager) = 0;
+  virtual bool AddCmdManager(iCommandManager *NewCmdManager) = 0;
 
   /// Utility stuff
   virtual int GetLastError() = 0;
