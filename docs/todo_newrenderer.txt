@@ -19,3 +19,19 @@ Things that need to be done in new renderer:
 		- bcterr
 		- sprcal3d
 		- stars
+	- Software renderer (partially done).
+	- Working loaders for all new features (partially done).
+	- Fog (can/should be implemented through shaders).
+	- Lightmaps:
+		- Add LM support to renderer (DONE, partially).
+		- Teach thing to use LM on NR (DONE, partially).
+		- Will need some way to distinguish between 'static' and
+		  'dynamic' lights and objects (move vs non-move).
+	- Portals.
+	- Debug lines and everything related to debugging support in g3d.
+	- Correct usage of cullers.
+	- Isometric engine.
+	- Shadows (needs fixing).
+	- Variable system (done, more or less).
+	- Materials (done, more or less).
+	- Pseudo VP with similar functionality as old texture layers.
