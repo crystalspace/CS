@@ -20,6 +20,12 @@ The history order is reversed so that new features are at the top.
 	  application to try it out. Added energy.jpg to standard.zip.
 	- Names of nodes are now also interned. Had to reorganize TinyXML
 	  a bit for that. Saves some memory again.
+	- Added the ability for csStringSet and csStringHash to have an
+	  additional size parameter (just like csHashMap) to control the
+	  initial size of the registry used inside. By default this registry
+	  is 211 long.
+	- Made the string table in the TinyXML parser use 431 entries instead
+	  of 211. Might improve parsing performance a bit.
 11-Mar-2003
 	- Fixed a leak in the prepare textures code of regions. It was
 	  forgetting to reset the image pointer to NULL. This means

@@ -37,7 +37,7 @@ class csStringSet
   csStringID IDCounter;
 public:
   /// Constructor
-  csStringSet ();
+  csStringSet (uint32 size = 211);
   /// Destructor
   ~csStringSet ();
 

@@ -44,7 +44,7 @@ private:
 
 public:
   /// Constructor
-  csStringHash ();
+  csStringHash (uint32 size = 211);
   /// Destructor
   ~csStringHash ();
 

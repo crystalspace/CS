@@ -20,7 +20,7 @@
 #include "csutil/strset.h"
 #include "csutil/util.h"
 
-csStringSet::csStringSet ()
+csStringSet::csStringSet (uint32 size) : Registry (size), reverse_mapping (size)
 {
   IDCounter = 0;
 }

@@ -30,7 +30,7 @@ struct csRegisteredString
   { delete [] String; }
 };
 
-csStringHash::csStringHash ()
+csStringHash::csStringHash (uint32 size) : Registry (size)
 {
 }
 

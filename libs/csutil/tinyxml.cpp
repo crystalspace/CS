@@ -632,7 +632,8 @@ TiDocumentNode* TiXmlElement::Clone() const
 }
 
 
-TiDocument::TiDocument() : TiDocumentNode( TiDocumentNode::DOCUMENT )
+TiDocument::TiDocument() : TiDocumentNode( TiDocumentNode::DOCUMENT ),
+	strings (431)	//701?
 {
 	error = false;
 	//	ignoreWhiteSpace = true;
