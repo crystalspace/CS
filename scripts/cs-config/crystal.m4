@@ -1,4 +1,4 @@
-# AC_PATH_CS
+# AC_PATH_CRYSTAL
 #
 # Checks for Crystal Space paths and libs,
 # This scripts tries first if it can find a cs-config in the actual path
@@ -21,12 +21,11 @@ AC_DEFUN(AC_PATH_CRYSTAL,
 [dnl 
 dnl Get the cflags and libraries from the cs-config script
 dnl
-AC_ARG_WITH(cs-prefix,[  --with-cs-prefix=PFX   Prefix where Crystal Space is installed (optional)],
-        CRYSTAL="$withval", )
-AC_ARG_ENABLE(cstest, [  --disable-cstest       Do not try to compile and run a test Crystal Space program], disable_cstest=yes, )
-dnl AC_ARG_VAR([CRYSTAL],     [Prefix Where Crystal Space is installed])
-dnl ^ doesnt work because too many people still use autoconf 2.13 instead of
-dnl autoconf 2.5x. Damn them. -- Diablo-D3
+AC_ARG_WITH(cs-prefix, AC_HELP_STRING([--with-cs-prefix=PFX],[Prefix where Crystal Space is installed (optional)]), CRYSTAL="$withval", )
+AC_ARG_ENABLE(cstest, AC_HELP_STRING([--disable-cstest],[Do not try to compile and run a test Crystal Space program]), disable_cstest=yes, )
+AC_ARG_VAR([CRYSTAL],     [Prefix Where Crystal Space is installed])
+dnl if you really want to use autoconf 2.13 (not recommended) comment out the
+dnl line above.
 
 dnl try to find an installed cs-config
 
@@ -37,7 +36,8 @@ if test "x$CRYSTAL" != x ; then
       if test -f $CRYSTAL/bin/cs-config ; then
          CSCONF="$CRYSTAL/bin/cs-config"
       else
-         AC_MSG_ERROR(Can't find cs-config in path you provided)
+         AC_MSG_WARN(Can't find cs-config in path you provided)
+	 no_cs=yes
       fi
    fi	
 fi
@@ -53,7 +53,7 @@ if test "x$CRYSTAL" = x ; then
          echo "*** If Crystal Space was installed in PREFIX, make sure PREFIX/bin is in"
          echo "*** your path, or set the CRYSTAL environment variable to the full path"
          echo "*** to cs-config."
-         AC_MSG_ERROR(Can't find cs-config)
+	 no_cs=yes
       fi
    fi
 fi
@@ -62,26 +62,34 @@ fi
 # Well, either we found cs by now, or we caused an error.
 # Now we define stuff, then check if we are running a new enough version
 
-min_cs_version=ifelse([$1], ,0.93,$1)
-AC_MSG_CHECKING(for Crystal Space - version >= $min_cs_version)
-CRYSTAL_CFLAGS=`$CSCONF $csconf_args --cflags $4`
-CRYSTAL_CXXFLAGS=`$CSCONF $csconf_args --cxxflags $4`
-CRYSTAL_LIBS=`$CSCONF $csconf_args --libs $4`
-CRYSTAL_VERSION=`$CSCONF --version $4`
-CRYSTAL_LONGVERSION=`$CSCONF --longversion $4`
+if test x$no_cs = x ; then
+	min_cs_version=ifelse([$1], ,0.93,$1)
+	AC_MSG_CHECKING(for Crystal Space - version >= $min_cs_version)
+	CRYSTAL_CFLAGS=`$CSCONF $csconf_args --cflags $4`
+	CRYSTAL_CXXFLAGS=`$CSCONF $csconf_args --cxxflags $4`
+	CRYSTAL_LIBS=`$CSCONF $csconf_args --libs $4`
+	CRYSTAL_VERSION=`$CSCONF --version $4`
+	CRYSTAL_LONGVERSION=`$CSCONF --longversion $4`
 
-cs_major_version=`$CSCONF $cs_args --version | \
-   sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\1/'`
-cs_minor_version=`$CSCONF $cs_args --version | \
-   sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\2/'`
+	cs_major_version=`$CSCONF $cs_args --version | \
+	   sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\1/'`
+	cs_minor_version=`$CSCONF $cs_args --version | \
+	   sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\2/'`
 
-if test "x$enable_cstest" = "xyes" ; then
+	if test x$CRYSTAL_LIBS = x ; then
+		no_cs=yes
+	fi
+fi
+
+if test x$no_cs != x ; then
+	enable_cstext=no
+fi
+
+if test x$enable_cstest = xyes ; then
    ac_save_CFLAGS="$CFLAGS"
    ac_save_LIBS="$LIBS"
    CFLAGS="$CFLAGS $CRYSTAL_CFLAGS"
    LIBS="$LIBS $CRYSTAL_LIBS"
-
-dnl Godamity-damn *nix sh sucks.
 
 rm -f conf.cstest
 AC_TRY_RUN([
@@ -118,7 +126,7 @@ int main (int argc, char *argv[])
   */
   { FILE *fp = fopen("conf.cstest", "a"); if ( fp ) fclose(fp); }
 
-  /* HP/UX 9 (%@#!) writes to sscanf strings */
+  /* HP/UX 9 writes to sscanf strings */
   tmp_version = my_strdup("$min_cs_version");
   if (sscanf(tmp_version, "%d.%d", &major, &minor) != 3) {
      printf("%s, bad version string\n", "$min_cs_version");
@@ -146,9 +154,9 @@ int main (int argc, char *argv[])
 ],, no_cs=yes,[echo $ac_n "cross compiling; assumed OK... $ac_c"])
        CFLAGS="$ac_save_CFLAGS"
        LIBS="$ac_save_LIBS"
-     fi
+  fi
 
-  if test "x$no_cs" = x ; then
+  if test x$no_cs = x ; then
      AC_MSG_RESULT($CRYSTAL_LONGVERSION)
      ifelse([$2], , :, [$2])     
   else
