@@ -160,6 +160,24 @@ public:
   /// Get the bounding rectangle of the whole lightmap in world space
   bool GetLightmapBounds (csFrustumView *lview, csVector3 *bounds);
 
+  // This is a private structure used while we build the light coverage data
+  struct csCoverageMatrix
+  {
+    // The coverage array. Each float corresponds to a lightmap grid cell
+    // and contains the area of light cell that is covered by light.
+    float *coverage;
+    // The width and height of the coverage array
+    int width, height;
+
+    csCoverageMatrix (int w, int h)
+    { coverage = (float *)calloc ((width = w) * (height = h), sizeof (float)); }
+    ~csCoverageMatrix ()
+    { free (coverage); }
+  };
+
+  /// Get the coverage matrix for the associated lightmap
+  void GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &cm);
+
   //--------------------- iPolygonTexture implementation ---------------------
   DECLARE_IBASE;
   ///

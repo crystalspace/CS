@@ -304,116 +304,53 @@ bool csPolyTexture::GetLightmapBounds (csFrustumView *lview, csVector3 *bounds)
 // polygons.
 //
 
-// This is a private structure used while we build the light coverage data
-struct __light_coverage
-{
-  // The coverage array. Each float corresponds to a lightmap grid cell
-  // and contains the area of light cell that is covered by light.
-  float *coverage;
-  // The width and height of the coverage array
-  int width, height;
-
-  __light_coverage (int w, int h)
-  { coverage = (float *)calloc ((width = w) * (height = h), sizeof (float)); }
-  ~__light_coverage ()
-  { free (coverage); }
-};
-
 static void __add_PutPixel (int x, int y, float area, void *arg)
 {
-  __light_coverage *lc = (__light_coverage *)arg;
-  lc->coverage [lc->width * y + x] += area;
+  csPolyTexture::csCoverageMatrix *cm = (csPolyTexture::csCoverageMatrix *)arg;
+  cm->coverage [cm->width * y + x] += area;
 }
 
 static void __add_DrawBox (int x, int y, int w, int h, void *arg)
 {
-  __light_coverage *lc = (__light_coverage *)arg;
-  int ofs = lc->width * y + x;
-  int delta = lc->width - w;
+  csPolyTexture::csCoverageMatrix *cm = (csPolyTexture::csCoverageMatrix *)arg;
+  int ofs = cm->width * y + x;
+  int delta = cm->width - w;
   for (int yy = h; yy > 0; yy--)
   {
     for (int xx = w; xx > 0; xx--)
-      lc->coverage [ofs++] += 1.0;
+      cm->coverage [ofs++] += 1.0;
     ofs += delta;
   } /* endfor */
 }
 
 static void __sub_PutPixel (int x, int y, float area, void *arg)
 {
-  __light_coverage *lc = (__light_coverage *)arg;
-  lc->coverage [lc->width * y + x] -= area;
+  csPolyTexture::csCoverageMatrix *cm = (csPolyTexture::csCoverageMatrix *)arg;
+  cm->coverage [cm->width * y + x] -= area;
 }
 
 static void __sub_DrawBox (int x, int y, int w, int h, void *arg)
 {
-  __light_coverage *lc = (__light_coverage *)arg;
-  int ofs = lc->width * y + x;
-  int delta = lc->width - w;
+  csPolyTexture::csCoverageMatrix *cm = (csPolyTexture::csCoverageMatrix *)arg;
+  int ofs = cm->width * y + x;
+  int delta = cm->width - w;
   for (int yy = h; yy > 0; yy--)
   {
     for (int xx = w; xx > 0; xx--)
-      lc->coverage [ofs++] -= 1.0;
+      cm->coverage [ofs++] -= 1.0;
     ofs += delta;
   } /* endfor */
 }
 
-void csPolyTexture::FillLightMap (csFrustumView& lview)
+void csPolyTexture::GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &cm)
 {
   if (!lm) return;
-
-  csStatLight *light = (csStatLight *)lview.userdata;
 
   int ww, hh;
   txt_handle->GetMipMapDimensions (0, ww, hh);
 
   csPolyTxtPlane *txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
-  float cosfact = polygon->GetCosinusFactor ();
-  if (cosfact == -1) cosfact = cfg_cosinus_factor;
 
-  // From: T = Mwt * (W - Vwt)
-  // ===>
-  // Mtw * T = W - Vwt
-  // Mtw * T + Vwt = W
-  csMatrix3 m_t2w = txt_pl->m_world2tex.GetInverse ();
-  csVector3 &v_t2w = txt_pl->v_world2tex;
-
-  float inv_ww = 1.0 / ww;
-  float inv_hh = 1.0 / hh;
-
-  unsigned char *mapR;
-  unsigned char *mapG;
-  unsigned char *mapB;
-  csShadowMap *smap = NULL;
-
-  bool hit = false;         // Set to true if there is a hit
-  bool first_time = false;  // Set to true if this is the first pass for the dynamic light
-  bool dyn = light->IsDynamic ();
-
-  if (dyn)
-  {
-    smap = lm->FindShadowMap (light);
-    if (!smap)
-    { smap = lm->NewShadowMap (light, w, h); first_time = true; }
-    else
-      first_time = false;
-    mapR = smap->map;
-    mapG = NULL;
-    mapB = NULL;
-  }
-  else
-  {
-    mapR = lm->GetStaticMap ().GetRed ();
-    mapG = lm->GetStaticMap ().GetGreen ();
-    mapB = lm->GetStaticMap ().GetBlue ();
-  }
-
-  // We will compute the lighting of the entire lightmap, disregarding
-  // polygon bounds. This removes both the "black borders" and "white
-  // borders" problems. However, we should take care not to fill same
-  // lightmap twice, otherwise we'll get very bright lighting for
-  // shared lightmaps.
-  int lmw = lm->rwidth;
-  int lmh = lm->rheight;
   csVector3 &lightpos = lview.light_frustum->GetOrigin ();
 
   // Now allocate the space for the projected lighted polygon
@@ -432,11 +369,8 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
     lf2d [i].y = (v.y * hh - Imin_v) * inv_lightcell_size + 0.5;
   }
 
-  // Create the light coverage array
-  __light_coverage lc (lmw, lmh);
-
   // Now fill the lightmap polygon with light coverage values
-  csAntialiasedPolyFill (lf2d, nvlf, &lc, __add_PutPixel, __add_DrawBox);
+  csAntialiasedPolyFill (lf2d, nvlf, &cm, __add_PutPixel, __add_DrawBox);
 
   // Now subtract all shadow polygons from the coverage matrix.
   // At the same time, add the overlapping shadows to the coverage matrix.
@@ -468,7 +402,7 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
     }
 
     // Now subtract the shadow from the coverage matrix
-    csAntialiasedPolyFill (s2d, nv, &lc, __sub_PutPixel, __sub_DrawBox);
+    csAntialiasedPolyFill (s2d, nv, &cm, __sub_PutPixel, __sub_DrawBox);
 
     // Create a polygon clipper from this shadow polygon
     sfc [i] = new csPolygonClipper (s2d, nv, shadow->IsMirrored (), true);
@@ -485,23 +419,86 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
         continue;
 
       // Now add the common shadow to the coverage matrix
-      csAntialiasedPolyFill (sfi, sfic, &lc, __add_PutPixel, __add_DrawBox);
+      csAntialiasedPolyFill (sfi, sfic, &cm, __add_PutPixel, __add_DrawBox);
     } /* endfor */
   } /* endfor */
 
   // Free all shadow frustums
   for (i = 0; i < nsf; i++)
     delete sfc [i];
+}
+
+void csPolyTexture::FillLightMap (csFrustumView& lview)
+{
+  if (!lm) return;
+
+  // We will compute the lighting of the entire lightmap, disregarding
+  // polygon bounds. This removes both the "black borders" and "white
+  // borders" problems. However, we should take care not to fill same
+  // lightmap twice, otherwise we'll get very bright lighting for
+  // shared lightmaps.
+  int lmw = lm->rwidth;
+  int lmh = lm->rheight;
+  // Create the light coverage array
+  csCoverageMatrix lc (lmw, lmh);
+  // Compute the light coverage for every cell of the lightmap
+  GetCoverageMatrix (lview, lc);
+
+  unsigned char *mapR;
+  unsigned char *mapG;
+  unsigned char *mapB;
+  csShadowMap *smap = NULL;
+
+  int ww, hh;
+  txt_handle->GetMipMapDimensions (0, ww, hh);
+  float inv_ww = 1.0 / ww;
+  float inv_hh = 1.0 / hh;
+
+  bool hit = false;         // Set to true if there is a hit
+  bool first_time = false;  // Set to true if this is the first pass for the dynamic light
+  csStatLight *light = (csStatLight *)lview.userdata;
+  bool dyn = light->IsDynamic ();
+  csVector3 &lightpos = lview.light_frustum->GetOrigin ();
+
+  if (dyn)
+  {
+    smap = lm->FindShadowMap (light);
+    if (!smap)
+    { smap = lm->NewShadowMap (light, w, h); first_time = true; }
+    else
+      first_time = false;
+    mapR = smap->map;
+    mapG = NULL;
+    mapB = NULL;
+  }
+  else
+  {
+    mapR = lm->GetStaticMap ().GetRed ();
+    mapG = lm->GetStaticMap ().GetGreen ();
+    mapB = lm->GetStaticMap ().GetBlue ();
+  }
+
+  // From: T = Mwt * (W - Vwt)
+  // ===>
+  // Mtw * T = W - Vwt
+  // Mtw * T + Vwt = W
+  csPolyTxtPlane *txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
+  csMatrix3 m_t2w = txt_pl->m_world2tex.GetInverse ();
+  csVector3 &v_t2w = txt_pl->v_world2tex;
+
+  // Cosinus fucktor
+  float cosfact = polygon->GetCosinusFactor ();
+  if (cosfact == -1) cosfact = cfg_cosinus_factor;
 
   // Finally, use the light coverage values to compute the actual lighting
   int covaddr = 0;
   float light_r = lview.r * NORMAL_LIGHT_LEVEL;
   float light_g = lview.g * NORMAL_LIGHT_LEVEL;
   float light_b = lview.b * NORMAL_LIGHT_LEVEL;
-  for (i = 0; i < lmh; i++)
+  for (int i = 0; i < lmh; i++)
   {
     int uv = i * lm->GetWidth ();
-    for (j = 0; j < lmw; j++, uv++)
+    for (int j = 0; j < lmw; j++, uv++)
     {
       float lightness = lc.coverage [covaddr++];
       if (lightness < EPSILON)
