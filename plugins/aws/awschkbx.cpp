@@ -150,12 +150,12 @@ void awsCheckBox::OnDraw (csRect /*clip*/)
 
   switch (alignment)
   {
-    case alignLeft:
-      txx = 0;
-      break;
-    case alignRight:
-      txx = Frame ().Width () - txw;
-      break;
+  case alignLeft:
+    txx = 0;
+    break;
+  case alignRight:
+    txx = Frame ().Width () - txw;
+    break;
   }
 
   if (!is_down && tex[0])
