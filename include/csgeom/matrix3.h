@@ -24,10 +24,6 @@
 #error "cssysdef.h must be included in EVERY source file!"
 #endif
 
-#if defined(COMP_VC) && defined(DO_ASM)
-#include "csgeom/vc_asm.inc"
-#endif
-
 #include "csgeom/vector3.h"
 
 class csQuaternion;
@@ -125,11 +121,8 @@ public:
              (m21*m32 - m22*m31), -(m11*m32 - m12*m31),  (m11*m22 - m12*m21) );
     float s = (float)1./(m11*C.m11 + m12*C.m21 + m13*C.m31);
 
-#   ifdef CS_ASM__MATRIX3_MULTSCL
-      CS_ASM__MATRIX3_MULTSCL
-#   else
-      C *= s;
-#   endif
+    C *= s;
+
     return C;
   }
 

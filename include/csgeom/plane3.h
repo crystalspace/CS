@@ -24,10 +24,6 @@
 #error "cssysdef.h must be included in EVERY source file!"
 #endif
 
-#if defined(COMP_VC) && defined(DO_ASM)
-#include "csgeom/vc_asm.inc"
-#endif
-
 #include "csgeom/vector3.h"
 
 /**

@@ -150,26 +150,20 @@ public:
   /// Add another vector to this vector.
   inline csDVector3& operator+= (const csDVector3& v)
   {
-#   ifdef CS_ASM__VECTOR3_PLUSEQ
-      CS_ASM__VECTOR3_PLUSEQ
-#   else
     x += v.x;
     y += v.y;
     z += v.z;
-#   endif
+
     return *this;
   }
 
   /// Subtract another vector from this vector.
   inline csDVector3& operator-= (const csDVector3& v)
   {
-#   ifdef CS_ASM__VECTOR3_MINUSEQ
-      CS_ASM__VECTOR3_MINUSEQ
-#   else
     x -= v.x;
     y -= v.y;
     z -= v.z;
-#   endif
+
     return *this;
   }
 
@@ -298,11 +292,8 @@ public:
              (m21*m32 - m22*m31), -(m11*m32 - m12*m31),  (m11*m22 - m12*m21) );
     double s = (double)1./(m11*C.m11 + m12*C.m21 + m13*C.m31);
 
-#   ifdef CS_ASM__MATRIX3_MULTSCL
-      CS_ASM__MATRIX3_MULTSCL
-#   else
-      C *= s;
-#   endif
+    C *= s;
+
     return C;
   }
 
@@ -515,11 +506,7 @@ public:
   inline static void CalcNormal (csDVector3& norm,     const csDVector3& v1,
                                  const csDVector3& v2, const csDVector3& v3)
   {
-#   ifdef CS_ASM__CALC_PLANE_NORMAL
-      CS_ASM__CALC_PLANE_NORMAL
-#   else
-      norm = (v1-v2)%(v1-v3);
-#   endif
+    norm = (v1-v2)%(v1-v3);
   }
 
   /**

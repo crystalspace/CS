@@ -100,11 +100,7 @@ public:
    */
   inline csVector3 Other2This (const csVector3& v) const
   {
-#   ifdef CS_ASM__TRANSFORM_O2T
-      CS_ASM__TRANSFORM_O2T
-#   else
-      return m_o2t * (v - v_o2t);
-#   endif
+    return m_o2t * (v - v_o2t);
   }
 
   /**

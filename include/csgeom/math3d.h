@@ -24,10 +24,6 @@
 #error "cssysdef.h must be included in EVERY source file!"
 #endif
 
-#if defined(COMP_VC) && defined(DO_ASM)
-#include "csgeom/vc_asm.inc"
-#endif
-
 #include "csgeom/vector3.h"
 #include "csgeom/plane3.h"
 #include "csgeom/plane2.h"
@@ -142,11 +138,7 @@ public:
   inline static void CalcNormal (csVector3& norm,     const csVector3& v1,
                                  const csVector3& v2, const csVector3& v3)
   {
-#   ifdef CS_ASM__CALC_PLANE_NORMAL
-      CS_ASM__CALC_PLANE_NORMAL
-#   else
-      norm = (v1-v2)%(v1-v3);
-#   endif
+    norm = (v1-v2)%(v1-v3);
   }
 
   /**

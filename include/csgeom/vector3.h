@@ -24,10 +24,6 @@
 #error "cssysdef.h must be included in EVERY source file!"
 #endif
 
-#if defined(COMP_VC) && defined(DO_ASM)
-#include "csgeom/vc_asm.inc"
-#endif
-
 #include "csgeom/math3d_d.h"
 
 /**
@@ -179,26 +175,20 @@ public:
   /// Add another vector to this vector.
   inline csVector3& operator+= (const csVector3& v)
   {
-#   ifdef CS_ASM__VECTOR3_PLUSEQ
-      CS_ASM__VECTOR3_PLUSEQ
-#   else
     x += v.x;
     y += v.y;
     z += v.z;
-#   endif
+
     return *this;
   }
 
   /// Subtract another vector from this vector.
   inline csVector3& operator-= (const csVector3& v)
   {
-#   ifdef CS_ASM__VECTOR3_MINUSEQ
-      CS_ASM__VECTOR3_MINUSEQ
-#   else
     x -= v.x;
     y -= v.y;
     z -= v.z;
-#   endif
+
     return *this;
   }
 
