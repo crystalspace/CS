@@ -1759,7 +1759,7 @@ csRef<iStringArray> csVFS::MountRoot (const char *Path)
         real_dir.Truncate(slen - 1);
       real_dir << "$/";
 
-      outv->Push(csStrNew(vfs_dir));
+      outv->Push (vfs_dir);
       Mount(vfs_dir, real_dir);
     }
   }

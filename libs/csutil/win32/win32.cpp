@@ -274,7 +274,7 @@ bool csPlatformStartup(iObjectRegistry* r)
   delete pluginpaths;
 
 
-  csRef<Win32Assistant> a = new Win32Assistant(r);
+  csRef<Win32Assistant> a = csPtr<Win32Assistant> (new Win32Assistant(r));
   bool ok = r->Register (static_cast<iWin32Assistant*>(a), "iWin32Assistant");
   if (ok)
   {
@@ -447,7 +447,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
   if (!appIcon) appIcon = LoadIcon (0, IDI_APPLICATION);
 
   bool bResult = false;
-  HBRUSH backBrush = ::CreateSolidBrush (RGB (0, 0, 0));
+  HBRUSH backBrush = (HBRUSH)::GetStockObject (BLACK_BRUSH);
   if (cswinIsWinNT ())
   {
     WNDCLASSEXW wc;

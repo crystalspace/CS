@@ -64,6 +64,13 @@ chronological order.
 	    - When the new Release_NR and Debug_NR build modes were added,
 	      missed configuration in msvcgen/template7/wscfg.tpi which needed
 	      to be updated to reflect the new modes.
+	- res fixed a stupid leak in win32.cpp.
+	- res changed ::CreateSolidBrush() to ::GetStockObject() in win32.cpp.
+	  Latter has the advantage that the brush doesn't need to be destroyed
+	  with DeleteObject() later.
+	- res fixed a leak in VFS MountRoot(). A string allocated with 
+	  csStrNew() was passed to an scfStringArray, which howeverallocates 
+	  the strings itself.
 3-Feb-2004
 	- Eric Sunshine fixed syntax error in aws.mak introduced yesterday
 	  which manifested when running 'msvcgen' targets.
