@@ -50,11 +50,17 @@ public:
   { x = ix; y = iy; }
 
   /// Set vector to given values.
-  inline void Set (const csVector2& v)
+  inline void Set (csVector2 const& v)
   { x = v.x; y = v.y; }
 
+  /// Set the value of this vector.
+  inline void Set (float const* v) { x = v[0]; y = v[1]; }
+
+  /// Get the value of this vector.
+  inline void Get (float* v) { v[0] = x; v[1] = y; }
+
   /// Return the norm (magnitude) of a 2D vector.
-  static float Norm (const csVector2& v);
+  static float Norm (csVector2 const& v);
 
   /// Return the norm (magnitude) of this vector.
   float Norm () const;

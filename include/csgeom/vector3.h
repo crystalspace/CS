@@ -40,19 +40,12 @@
 class CS_CSGEOM_EXPORT csVector3
 {
 public:
-  union
-  {
-    float f[3];
-    struct
-    {
-      /// The X component of the vector
-      float x;
-      /// The Y component of the vector
-      float y;
-      /// The Z component of the vector
-      float z;
-    };
-  };
+  /// The X component of the vector
+  float x;
+  /// The Y component of the vector
+  float y;
+  /// The Z component of the vector
+  float z;
   
   /**
    * Make a new vector. The vector is not
@@ -225,7 +218,13 @@ public:
   inline void Set (float sx, float sy, float sz) { x = sx; y = sy; z = sz; }
 
   /// Set the value of this vector.
-  inline void Set (const csVector3& v) { x = v.x; y = v.y; z = v.z; }
+  inline void Set (csVector3 const& v) { x = v.x; y = v.y; z = v.z; }
+
+  /// Set the value of this vector.
+  inline void Set (float const* v) { x = v[0]; y = v[1]; z = v[2]; }
+
+  /// Get the value of this vector.
+  inline void Get (float* v) { v[0] = x; v[1] = y; v[2] = z; }
 
   /// Returns the norm of this vector.
   float Norm () const;

@@ -6,6 +6,19 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+28-Jun-2004
+	- Eric Sunshine fixed csApplicationFramework destructor so that it does
+	  not bomb out if csApplicationFramework::Main() was not called.
+	- Eric Sunshine reverted Andrew Robberts' (aarobber) 17-Jun-2004 change
+	  to csVector3 where he added anonymous union and struct around the
+	  data members in order to make it simpler to set and get the vector
+	  components as a float array. Unfortunately, such an anonymous
+	  structure is a non-standard and unportable compiler extension which
+	  is not supported by all compilers used by Crystal Space
+	  clients. Instead, Eric added Set(float const*) and Get(float*)
+	  methods which provide the same functionality without the dangerous
+	  and unportable union/struct. Also added similar accessors to
+	  csVector2 and csVector4.
 27-Jun-2004
 	- res worked around a possible VC7 64bit warning in 
 	  csIntegralHashKeyHandler<>.
@@ -20,8 +33,6 @@ chronological order.
 	- Luca fixed a problem VisualC++6 users have with inner classes,
 	  which by default cannot access to any non-public member 
 	  of the containing class.
-	- Eric Sunshine fixed csApplicationFramework destructor so that it does
-	  not bomb out if csApplicationFramework::Main() was not called.
 26-Jun-2004
 	- Jorrit added a new bugplug command to switch visibility culler of
 	  the current sector. ctrl-shift-1 is assigned to switch to frustvis
@@ -39,8 +50,8 @@ chronological order.
 	  colldet, viscull, or shadow polygon mesh for the selected mesh.
 	  Commands are assigned to ctrl-alt-c, ctrl-alt-v, ctrl-alt-s,
 	  or ctrl-alt-b.
-	- res fixed a few VC7 64bit portatibility warnings and put down comments
-	  like "@@@ FIXME 64bit" at problematic to-be-fixed places.
+	- res fixed a few VC7 64bit portatibility warnings and put down
+	  comments like "@@@ FIXME 64bit" at problematic to-be-fixed places.
 	- res enabled VC7 64bit portatibility warnings for libraries.
 25-Jun-2004
 	- res removed a small but unnecessary condition statement from

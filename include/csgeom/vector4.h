@@ -416,7 +416,13 @@ public:
   inline void Set (float sx, float sy, float sz, float sw) { x = sx; y = sy; z = sz; w = sw; }
 
   /// Set the value of this vector.
-  inline void Set (const csVector4& v) { x = v.x; y = v.y; z = v.z; w = v.w; }
+  inline void Set (csVector4 const& v) { x = v.x; y = v.y; z = v.z; w = v.w; }
+
+  /// Set the value of this vector.
+  inline void Set (float const* v) { x = v[0]; y = v[1]; z = v[2]; w = v[3]; }
+
+  /// Get the value of this vector.
+  inline void Get (float* v) { v[0] = x; v[1] = y; v[2] = z; v[3] = w; }
 
   /// Returns the norm of this vector.
   float Norm () const;
