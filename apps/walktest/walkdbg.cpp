@@ -156,38 +156,6 @@ void select_object (iRenderView* rview, int type, void* entity)
 #endif
 }
 
-// Callback for DrawFunc() to show a 3D map of everything that is visible.
-void draw_map (csRenderView* /*rview*/, int type, void* entity)
-{
-  csWireFrame* wf = Sys->wf->GetWireframe ();
-#if 0
-  if (type == CS_CALLBACK_POLYGON)
-  {
-    csPolygon3D* poly = (csPolygon3D*)entity;
-    int j;
-    csWfPolygon* po = wf->AddPolygon ();
-    po->SetVisColor (wf->GetYellow ());
-    po->SetVertexCount (poly->GetVertices ().GetVertexCount ());
-    for (j = 0 ; j < poly->GetVertices ().GetVertexCount () ; j++)
-      po->SetVertex (j, poly->Vwor (j));
-    po->Prepare ();
-  }
-  else
-#endif
-  if (type == CS_CALLBACK_SECTOR)
-  {
-    csSector* sector = (csSector*)entity;
-    iSector* isector = &(sector->scfiSector);
-    int i;
-    for (i = 0 ; i < isector->GetLights ()->GetCount () ; i++)
-    {
-      csWfVertex* vt = wf->AddVertex (isector->GetLights ()->Get (i)->
-        GetCenter ());
-      vt->SetColor (wf->GetRed ());
-    }
-  }
-}
-
 //------------------------------------------------------------------------
 // Draw debug boxes
 //------------------------------------------------------------------------

@@ -84,12 +84,6 @@ private:
   csRenderContextFrustum* top_frustum;
 
   /**
-   * A callback function. If this is set then no drawing is done.
-   * Instead the callback function is called.
-   */
-  iDrawFuncCallback* callback;
-
-  /**
    * Delete all data on the given render context.
    */
   void DeleteRenderContextData (csRenderContext* rc);
@@ -126,25 +120,6 @@ public:
   void SetOriginalCamera (iCamera* camera);
   /// Get the original camera.
   virtual iCamera* GetOriginalCamera () const { return original_camera; }
-
-  ///
-  virtual void SetCallback (iDrawFuncCallback* cb)
-  {
-    if (cb) cb->IncRef ();
-    if (callback) callback->DecRef ();
-    callback = cb;
-  }
-  ///
-  virtual iDrawFuncCallback* GetCallback ()
-  {
-    return callback;
-  }
-
-  /// Call callback.
-  virtual void CallCallback (int type, void* data)
-  {
-    callback->DrawFunc (this, type, data);
-  }
 
   SCF_DECLARE_IBASE;
 

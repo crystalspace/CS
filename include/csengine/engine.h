@@ -771,16 +771,6 @@ public:
   virtual void Draw (iCamera* c, iClipper2D* clipper);
 
   /**
-   * This function is similar to Draw. It will do all the stuff
-   * that Draw would do except for one important thing: it will
-   * not draw anything. Instead it will call a callback function for
-   * every entity that it was planning to draw. This allows you to show
-   * or draw debugging information (2D egdes for example).
-   */
-  virtual void DrawFunc (iCamera* c, iClipper2D* clipper,
-    iDrawFuncCallback* callback);
-
-  /**
    * Create an iterator to iterate over all static lights of the engine.
    */
   virtual csPtr<iLightIterator> GetLightIterator (iRegion* region = NULL)

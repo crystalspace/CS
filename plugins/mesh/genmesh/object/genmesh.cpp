@@ -996,56 +996,72 @@ void csGenmeshMeshObjectFactory::SetupFactory ()
 #ifdef CS_USE_NEW_RENDERER
 iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
 {
-  if (name == vertex_name) {
-    if (mesh_vertices_dirty_flag) {
+  if (name == vertex_name)
+  {
+    if (mesh_vertices_dirty_flag)
+    {
       vertex_buffer = r3d->GetBufferManager ()->GetBuffer (
         sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC);
-      csVector3* vbuf = (csVector3*)vertex_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+      csVector3* vbuf = (csVector3*)vertex_buffer->Lock (
+      	iRenderBuffer::CS_BUF_LOCK_NORMAL);
       memcpy (vbuf, mesh_vertices, sizeof (csVector3)*num_mesh_vertices);
       vertex_buffer->Release ();
       mesh_vertices_dirty_flag = false;
     }
-	return vertex_buffer;
+    return vertex_buffer;
   }
-  if (name == texel_name) {
-    if (mesh_texels_dirty_flag) {
+  if (name == texel_name)
+  {
+    if (mesh_texels_dirty_flag)
+    {
       texel_buffer = r3d->GetBufferManager ()->GetBuffer (
         sizeof (csVector2)*num_mesh_vertices, CS_BUF_STATIC);
-      csVector2* tbuf = (csVector2*)texel_buffer->Lock (iRenderBuffer::CS_BUF_LOCK_NORMAL);
+      csVector2* tbuf = (csVector2*)texel_buffer->Lock (
+      	iRenderBuffer::CS_BUF_LOCK_NORMAL);
       memcpy (tbuf, mesh_texels, sizeof (csVector2)*num_mesh_vertices);
       texel_buffer->Release ();
       mesh_texels_dirty_flag = false;
     }
     return texel_buffer;
   }
-  if (name == normal_name) {
-    if (mesh_normals_dirty_flag) {
+  if (name == normal_name)
+  {
+    if (mesh_normals_dirty_flag)
+    {
       normal_buffer = r3d->GetBufferManager ()->GetBuffer (
         sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC);
-      csVector3 *nbuf = (csVector3*)normal_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+      csVector3 *nbuf = (csVector3*)normal_buffer->Lock (
+      	iRenderBuffer::CS_BUF_LOCK_NORMAL);
       memcpy (nbuf, mesh_normals, sizeof (csVector3)*num_mesh_vertices);
       normal_buffer->Release ();
       mesh_normals_dirty_flag = false;
     }
     return normal_buffer;
   }
-  if (name == color_name) {
-    if (mesh_colors_dirty_flag) {
+  if (name == color_name)
+  {
+    if (mesh_colors_dirty_flag)
+    {
       color_buffer = r3d->GetBufferManager ()->GetBuffer (
         sizeof (csColor)*num_mesh_vertices, CS_BUF_STATIC);
-      csColor *cbuf = (csColor*)color_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+      csColor *cbuf = (csColor*)color_buffer->Lock (
+      	iRenderBuffer::CS_BUF_LOCK_NORMAL);
       memcpy (cbuf, mesh_colors, sizeof (csColor)*num_mesh_vertices);
       color_buffer->Release();
       mesh_colors_dirty_flag = false;
     }
     return color_buffer;
   }
-  if (name == index_name) {
-    if (mesh_triangle_dirty_flag) {
+  if (name == index_name)
+  {
+    if (mesh_triangle_dirty_flag)
+    {
       index_buffer = r3d->GetBufferManager ()->GetBuffer (
         sizeof (unsigned int)*num_mesh_triangles*3, CS_BUF_INDEX);
-      unsigned int *ibuf = (unsigned int *)index_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
-      for (int i = 0; i < num_mesh_triangles; i ++) {
+      unsigned int *ibuf = (unsigned int *)index_buffer->Lock (
+      	iRenderBuffer::CS_BUF_LOCK_NORMAL);
+      for (int i = 0; i < num_mesh_triangles; i ++)
+      {
         ibuf[i * 3 + 0] = mesh_triangles[i].a;
         ibuf[i * 3 + 1] = mesh_triangles[i].b;
         ibuf[i * 3 + 2] = mesh_triangles[i].c;
@@ -1060,21 +1076,11 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
 
 int csGenmeshMeshObjectFactory::GetComponentCount (csStringID name)
 {
-  if (name == vertex_name) {
-    return 3;
-  }
-  if (name == texel_name) {
-    return 2;
-  }
-  if (name == normal_name) {
-    return 3;
-  }
-  if (name == color_name) {
-    return 4;
-  }
-  if (name == index_name) {
-    return 1;
-  }
+  if (name == vertex_name) return 3;
+  if (name == texel_name) return 2;
+  if (name == normal_name) return 3;
+  if (name == color_name) return 4;
+  if (name == index_name) return 1;
   return NULL;
 }
 #endif

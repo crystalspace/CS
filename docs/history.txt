@@ -1,6 +1,8 @@
 The history order is reversed so that new features are at the top.
 
 20-Jan-2003
+	- Removed the obsolete and non-working iRenderView callback system
+	  and the associated iEngine->DrawFunc().
 	- Eric Sunshine reverted the recent change to the general
 	  csFindLoadLibrary() which caused it to throw away potentially useful
 	  diagnostic information when a plugin failed to load.  Unconditionally

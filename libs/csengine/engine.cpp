@@ -1433,7 +1433,6 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
 
   csRenderView rview (c, view, G3D, G2D);
   StartDraw (c, view, rview);
-  rview.SetCallback (NULL);
 
   // First initialize G3D with the right clipper.
   G3D->SetClipper (view, CS_CLIPPER_TOPLEVEL);  // We are at top-level.
@@ -1450,28 +1449,6 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
     for (int halo = halos.Length () - 1; halo >= 0; halo--)
       if (!halos[halo]->Process (elapsed, *this)) halos.Delete (halo);
   }
-
-  G3D->SetClipper (NULL, CS_CLIPPER_NONE);
-}
-
-void csEngine::DrawFunc (
-  iCamera *c,
-  iClipper2D *view,
-  iDrawFuncCallback *callback)
-{
-  ControlMeshes ();
-
-  csRenderView rview (c, view, G3D, G2D);
-  StartDraw (c, view, rview);
-  rview.SetCallback (callback);
-
-  // First initialize G3D with the right clipper.
-  G3D->SetClipper (view, CS_CLIPPER_TOPLEVEL);  // We are at top-level.
-  G3D->ResetNearPlane ();
-  G3D->SetPerspectiveAspect (c->GetFOV ());
-
-  iSector *s = c->GetSector ();
-  s->Draw (&rview);
 
   G3D->SetClipper (NULL, CS_CLIPPER_NONE);
 }

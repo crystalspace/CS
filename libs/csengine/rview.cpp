@@ -38,8 +38,7 @@ csRenderView::csRenderView () :
   iengine(NULL),
   g3d(NULL),
   g2d(NULL),
-  original_camera(NULL),
-  callback(NULL)
+  original_camera(NULL)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   ctxt = new csRenderContext ();
@@ -52,8 +51,7 @@ csRenderView::csRenderView (iCamera *c) :
   iengine(NULL),
   g3d(NULL),
   g2d(NULL),
-  original_camera(NULL),
-  callback(NULL)
+  original_camera(NULL)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   ctxt = new csRenderContext ();
@@ -72,8 +70,7 @@ csRenderView::csRenderView (
     iengine(NULL),
     g3d(ig3d),
     g2d(ig2d),
-    original_camera(NULL),
-    callback(NULL)
+    original_camera(NULL)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   ctxt = new csRenderContext ();
@@ -93,7 +90,6 @@ csRenderView::csRenderView (
 
 csRenderView::~csRenderView ()
 {
-  if (callback) callback->DecRef ();
   if (top_frustum) top_frustum->DecRef ();
   if (ctxt)
   {

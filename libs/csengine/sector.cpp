@@ -589,38 +589,31 @@ void csSector::Draw (iRenderView *rview)
 
   G3D_FOGMETHOD fogmethod = G3DFOGMETHOD_NONE;
 
-  if (rview->GetCallback ())
+  if (HasFog ())
   {
-    rview->CallCallback (CS_CALLBACK_SECTOR, (void *) &scfiSector);
-  }
-  else
-  {
-    if (HasFog ())
-    {
-      if (
-        (fogmethod = csEngine::current_engine->fogmethod)
+    if (
+      (fogmethod = csEngine::current_engine->fogmethod)
 		== G3DFOGMETHOD_VERTEX)
-      {
-        csFogInfo *fog_info = new csFogInfo ();
-        fog_info->next = rview->GetFirstFogInfo ();
+    {
+      csFogInfo *fog_info = new csFogInfo ();
+      fog_info->next = rview->GetFirstFogInfo ();
 
-        iPolygon3D *ipoly3d = rview->GetPortalPolygon ();
-        if (ipoly3d)
-        {
-          fog_info->incoming_plane = ipoly3d->GetCameraPlane ();
-          fog_info->incoming_plane.Invert ();
-          fog_info->has_incoming_plane = true;
-        }
-        else
-          fog_info->has_incoming_plane = false;
-        fog_info->fog = &GetFog ();
-        fog_info->has_outgoing_plane = true;
-        rview->SetFirstFogInfo (fog_info);
-      }
-      else if (fogmethod != G3DFOGMETHOD_NONE)
+      iPolygon3D *ipoly3d = rview->GetPortalPolygon ();
+      if (ipoly3d)
       {
-        rview->GetGraphics3D ()->OpenFogObject (GetID (), &GetFog ());
+        fog_info->incoming_plane = ipoly3d->GetCameraPlane ();
+        fog_info->incoming_plane.Invert ();
+        fog_info->has_incoming_plane = true;
       }
+      else
+        fog_info->has_incoming_plane = false;
+      fog_info->fog = &GetFog ();
+      fog_info->has_outgoing_plane = true;
+      rview->SetFirstFogInfo (fog_info);
+    }
+    else if (fogmethod != G3DFOGMETHOD_NONE)
+    {
+      rview->GetGraphics3D ()->OpenFogObject (GetID (), &GetFog ());
     }
   }
 
@@ -729,49 +722,37 @@ void csSector::Draw (iRenderView *rview)
     // Tell the engine to try to add this light into the halo queue
     csEngine::current_engine->AddHalo (lights.Get (i)->GetPrivateObject ());
 
-  if (rview->GetCallback ())
+  // Handle the fog, if any
+  if (fogmethod != G3DFOGMETHOD_NONE)
   {
-    rview->CallCallback (CS_CALLBACK_SECTOREXIT, (void *) &scfiSector);
-  }
-  else
-  {
-    // Handle the fog, if any
-    if (fogmethod != G3DFOGMETHOD_NONE)
+    G3DPolygonDFP g3dpoly;
+    if (fogmethod == G3DFOGMETHOD_ZBUFFER)
     {
-      G3DPolygonDFP g3dpoly;
-      if (fogmethod == G3DFOGMETHOD_ZBUFFER)
-      {
-        g3dpoly.num = rview->GetClipper ()->GetVertexCount ();
+      g3dpoly.num = rview->GetClipper ()->GetVertexCount ();
 
-        csVector2 *clipview = rview->GetClipper ()->GetClipPoly ();
-        memcpy (g3dpoly.vertices, clipview, g3dpoly.num * sizeof (csVector2));
-        if (icam->GetSector () == &scfiSector && draw_busy == 0)
-        {
-          // Since there is fog in the current camera sector we simulate
-
-          // this by adding the view plane polygon.
-          rview->GetGraphics3D ()->DrawFogPolygon (
-              GetID (),
-              g3dpoly,
-              CS_FOG_VIEW);
-        }
-        else
-        {
-          // We must add a FRONT fog polygon for the clipper to this sector.
-          rview->GetClipPlane (g3dpoly.normal);
-          g3dpoly.normal.Invert ();
-          rview->GetGraphics3D ()->DrawFogPolygon (
-              GetID (),
-              g3dpoly,
-              CS_FOG_FRONT);
-        }
-      }
-      else if (fogmethod == G3DFOGMETHOD_VERTEX && rview->AddedFogInfo ())
+      csVector2 *clipview = rview->GetClipper ()->GetClipPoly ();
+      memcpy (g3dpoly.vertices, clipview, g3dpoly.num * sizeof (csVector2));
+      if (icam->GetSector () == &scfiSector && draw_busy == 0)
       {
-        csFogInfo *fog_info = rview->GetFirstFogInfo ();
-        rview->SetFirstFogInfo (rview->GetFirstFogInfo ()->next);
-        delete fog_info;
+        // Since there is fog in the current camera sector we simulate
+        // this by adding the view plane polygon.
+        rview->GetGraphics3D ()->DrawFogPolygon (
+              GetID (), g3dpoly, CS_FOG_VIEW);
       }
+      else
+      {
+        // We must add a FRONT fog polygon for the clipper to this sector.
+        rview->GetClipPlane (g3dpoly.normal);
+        g3dpoly.normal.Invert ();
+        rview->GetGraphics3D ()->DrawFogPolygon (
+            GetID (), g3dpoly, CS_FOG_FRONT);
+      }
+    }
+    else if (fogmethod == G3DFOGMETHOD_VERTEX && rview->AddedFogInfo ())
+    {
+      csFogInfo *fog_info = rview->GetFirstFogInfo ();
+      rview->SetFirstFogInfo (rview->GetFirstFogInfo ()->next);
+      delete fog_info;
     }
   }
 
@@ -796,11 +777,6 @@ void csSector::DrawZ (iRenderView* rview)
     iSectorCallback* cb = sector_cb_vector.Get (i);
     cb->Traverse (&scfiSector, rview);
     i--;
-  }
-
-  if (rview->GetCallback ())
-  {
-    rview->CallCallback (CS_CALLBACK_SECTOR, (void *) &scfiSector);
   }
 
   // Mark visible objects.
@@ -866,11 +842,6 @@ void csSector::DrawLight (iRenderView* rview, iLight* light)
   for (i = lights.GetCount () - 1; i >= 0; i--)
     // Tell the engine to try to add this light into the halo queue
     csEngine::current_engine->AddHalo (lights.Get (i)->GetPrivateObject ());
-
-  if (rview->GetCallback ())
-  {
-    rview->CallCallback (CS_CALLBACK_SECTOREXIT, (void *) &scfiSector);
-  }
 
   draw_busy --;
 }

@@ -236,10 +236,6 @@ void csMeshWrapper::Draw (iRenderView *rview)
 void csMeshWrapper::DrawZ (iRenderView* rview)
 {
   iMeshWrapper *meshwrap = &scfiMeshWrapper;
-  if (rview->GetCallback ())
-  {
-    rview->CallCallback (CS_CALLBACK_MESH, (void *) &scfiMeshWrapper);
-  }
 
   int i;
   // Callback are traversed in reverse order so that they can safely
@@ -254,25 +250,18 @@ void csMeshWrapper::DrawZ (iRenderView* rview)
 
   if (meshobj->DrawTest (rview, &movable.scfiMovable))
   {
-    if (rview->GetCallback ())
+    csTicks lt = csEngine::current_engine->GetLastAnimationTime ();
+    if (lt != 0)
     {
-      rview->CallCallback (CS_CALLBACK_VISMESH, (void *) &scfiMeshWrapper);
-    }
-    else
-    {
-      csTicks lt = csEngine::current_engine->GetLastAnimationTime ();
-      if (lt != 0)
+      if (lt != last_anim_time)
       {
-        if (lt != last_anim_time)
-        {
-          meshobj->NextFrame (lt,movable.GetPosition ());
-          last_anim_time = lt;
-        }
+        meshobj->NextFrame (lt,movable.GetPosition ());
+        last_anim_time = lt;
       }
-
-      UpdateDeferedLighting (movable.GetFullPosition ());
-      meshobj->DrawZ (rview, &movable.scfiMovable, zbufMode);
     }
+
+    UpdateDeferedLighting (movable.GetFullPosition ());
+    meshobj->DrawZ (rview, &movable.scfiMovable, zbufMode);
   }
 
   for (i = 0; i < children.GetCount (); i++)
@@ -326,10 +315,6 @@ bool csMeshWrapper::CheckImposterRelevant (iRenderView *rview)
 void csMeshWrapper::DrawIntFull (iRenderView *rview)
 {
   iMeshWrapper *meshwrap = &scfiMeshWrapper;
-  if (rview->GetCallback ())
-  {
-    rview->CallCallback (CS_CALLBACK_MESH, (void *) &scfiMeshWrapper);
-  }
 
   int i;
   // Callback are traversed in reverse order so that they can safely
@@ -344,25 +329,18 @@ void csMeshWrapper::DrawIntFull (iRenderView *rview)
 
   if (meshobj->DrawTest (rview, &movable.scfiMovable))
   {
-    if (rview->GetCallback ())
+    csTicks lt = csEngine::current_engine->GetLastAnimationTime ();
+    if (lt != 0)
     {
-      rview->CallCallback (CS_CALLBACK_VISMESH, (void *) &scfiMeshWrapper);
-    }
-    else
-    {
-      csTicks lt = csEngine::current_engine->GetLastAnimationTime ();
-      if (lt != 0)
+      if (lt != last_anim_time)
       {
-        if (lt != last_anim_time)
-        {
-          meshobj->NextFrame (lt,movable.GetPosition ());
-          last_anim_time = lt;
-        }
+        meshobj->NextFrame (lt,movable.GetPosition ());
+        last_anim_time = lt;
       }
-
-      UpdateDeferedLighting (movable.GetFullPosition ());
-      meshobj->Draw (rview, &movable.scfiMovable, zbufMode);
     }
+
+    UpdateDeferedLighting (movable.GetFullPosition ());
+    meshobj->Draw (rview, &movable.scfiMovable, zbufMode);
   }
 
   for (i = 0; i < children.GetCount (); i++)

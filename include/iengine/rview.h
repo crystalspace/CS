@@ -196,7 +196,7 @@ public:
   int draw_rec_level;
 };
 
-SCF_VERSION (iRenderView, 0, 3, 0);
+SCF_VERSION (iRenderView, 0, 4, 0);
 
 /**
  * This interface represents all information needed to render
@@ -408,20 +408,6 @@ struct iRenderView : public iBase
    * context.
    */
   virtual void DeleteRenderContextData (void* key) = 0;
-
-  /**
-   * Set a callback that will be called instead of drawing something.
-   * This will be used by iEngine::DrawFunc().
-   */
-  virtual void SetCallback (iDrawFuncCallback* cb) = 0;
-  /**
-   * Get the callback.
-   */
-  virtual iDrawFuncCallback* GetCallback () = 0;
-  /**
-   * Call callback.
-   */
-  virtual void CallCallback (int type, void* data) = 0;
 
   /**
    * Get the original camera for this render view. This is

@@ -139,42 +139,7 @@ struct iSharedVariableList;
 #define CS_RENDPRI_FRONT2BACK 2
 /** @} */
 
-/** \name Engine Callback flags
- * Flags for the callbacks called via iEngine::DrawFunc().
- * (type iDrawFuncCallback).
- * @{ */
-/// a sector is being drawn
-#define CS_CALLBACK_SECTOR 1
-/// a sector has been drawn completely
-#define CS_CALLBACK_SECTOREXIT 2
-/// a mesh will be drawn if visible
-#define CS_CALLBACK_MESH 3
-/// the mesh is visible and will be drawn
-#define CS_CALLBACK_VISMESH 4
-/** @} */
-
-SCF_VERSION (iDrawFuncCallback, 0, 0, 1);
-
-/**
- * A callback function for csEngine::DrawFunc().
- */
-struct iDrawFuncCallback : public iBase
-{
-  /**
-   * Before drawing.
-   * The 'type' will be one of the following:
-   * <ul>
-   * <li>#CS_CALLBACK_SECTOR: a sector is being drawn.
-   * <li>#CS_CALLBACK_SECTOREXIT: a sector has been drawn completely.
-   * <li>#CS_CALLBACK_MESH: a mesh will be drawn if visible.
-   * <li>#CS_CALLBACK_VISMESH: the mesh is visible and will be drawn.
-   * </ul>
-   */
-  virtual void DrawFunc (iRenderView* rview, int type, void* entity) = 0;
-};
-
-
-SCF_VERSION (iEngine, 0, 13, 1);
+SCF_VERSION (iEngine, 0, 13, 2);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -661,16 +626,6 @@ struct iEngine : public iBase
    * you switch to another 3D driver.
    */
   virtual void Draw (iCamera* c, iClipper2D* clipper) = 0;
-
-  /**
-   * This function is similar to Draw. It will do all the stuff
-   * that Draw would do except for one important thing: it will
-   * not draw anything. Instead it will call a callback function for
-   * every entity that it was planning to draw. This allows you to show
-   * or draw debugging information (2D edges for example).
-   */
-  virtual void DrawFunc (iCamera* c, iClipper2D* clipper,
-    iDrawFuncCallback* callback) = 0;
 
   /**
    * Set the drawing context. This is a texture handle that is used
