@@ -22,7 +22,6 @@
 #include "cstool/meshobjtmpl.h"
 #include "cstool/rendermeshholder.h"
 #include "imesh/partsys.h"
-#include "ivideo/vbufmgr.h"
 #include "ivideo/rendermesh.h"
 #include "iengine/lightmgr.h"
 #include "csgfx/shadervarcontext.h"
@@ -64,7 +63,7 @@ protected:
   csRef<iLightManager> light_mgr;
 
   bool initialized;
-#ifndef CS_USE_OLD_RENDERER
+
   csRenderMeshHolderSingle rmHolder;
   csRef<csShaderVariableContext> svcontext;
 
@@ -78,10 +77,6 @@ protected:
   csRef<iRenderBuffer> index_buffer;
 
   csWeakRef<iGraphics3D> g3d;
-#else
-  /// The vertex buffer.
-  csRef<iVertexBuffer> vbuf;
-#endif
 
   csTriangle* triangles;
   csVector2* texels;
@@ -186,17 +181,11 @@ public:
   /// Returns 0 since there is no factory for a particle system
   virtual iMeshObjectFactory* GetFactory () const;
 
-  /// quick visibility test
-  virtual bool DrawTest (iRenderView* rview, iMovable* movable,
-  	uint32 frustum_mask);
   virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview, 
     iMovable* movable, uint32 frustum_mask);
 
   /// update lighting info
   void UpdateLighting (const csArray<iLight*>&, iMovable*);
-
-  /// draw this particle system
-  virtual bool Draw (iRenderView*, iMovable*, csZBufMode);
 
   /// calls Update() with the amount of time passed since the previous call
   virtual void NextFrame (csTicks current_time, const csVector3& pos);
@@ -284,15 +273,6 @@ public:
   inline bool GetChangeRotation (float& angle) const
   { if(!change_rotation) return false; angle = anglepersecond; return true; }
 
-#ifdef CS_USE_OLD_RENDERER
-  /// interface to receive state of vertexbuffermanager
-  struct eiVertexBufferManagerClient : public iVertexBufferManagerClient
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csNewParticleSystem);
-    virtual void ManagerClosing ();
-  } scfiVertexBufferManagerClient;
-  friend struct eiVertexBufferManagerClient;
-#endif
 
   struct eiParticleState : public iParticleState
   {

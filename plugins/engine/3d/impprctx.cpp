@@ -67,6 +67,7 @@ bool csImposterProcTex::PrepareAnim ()
 
 void csImposterProcTex::Animate (csTicks CurrentTime)
 {
+  CS_ASSERT_MSG("Cannot remove this", 0);
   // move the camera
   csVector3 Position (-0.5, 0, 3 + sin (CurrentTime / (10*1000.0))*1);
   View->GetCamera ()->Move (Position - View->GetCamera ()
@@ -85,9 +86,9 @@ void csImposterProcTex::Animate (csTicks CurrentTime)
   mesh->FindImposterRectangle (View->GetCamera () );
 
   // This actually draws the mesh on the backbuffer
-  mesh->GetParent()->GetMeshObject()->Draw (View, 
+/*  mesh->GetParent()->GetMeshObject()->Draw (View, 
         &mesh->GetParent()->GetCsMovable().scfiMovable, 
-	mesh->GetParent()->GetZBufMode());
+	mesh->GetParent()->GetZBufMode());*/
   
   // This copies the backbuffer to the iTextureHandle I think.
   g3d->FinishDraw ();

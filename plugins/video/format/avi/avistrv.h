@@ -35,7 +35,6 @@ class csAVIStreamVideo : public iVideoStream
   csRect rc;
   uint fxmode;
   bool bTimeSynced;
-  G3DPolygonDPFX polyfx;
   csImageMemory memimage;
   csAVIFormat::AVIDataChunk *pChunk;
   uint16 nStream;

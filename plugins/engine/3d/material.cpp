@@ -52,9 +52,8 @@ csMaterial::csMaterial (csEngine* engine)
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialEngine);
 
-#ifndef CS_USE_OLD_RENDERER
   csMaterial::engine = engine;
-#endif // CS_USE_OLD_RENDERER
+
 
   nameDiffuseParam = engine->Strings->Request (CS_MATERIAL_VARNAME_DIFFUSE);
   nameAmbientParam = engine->Strings->Request (CS_MATERIAL_VARNAME_AMBIENT);
@@ -75,10 +74,6 @@ csMaterial::csMaterial (csEngine* engine)
   SetAmbient (CS_DEFMAT_AMBIENT);
   SetReflection (CS_DEFMAT_REFLECTION);
   shadersCustomized = false;
-
-#ifdef CS_USE_OLD_RENDERER
-  num_texture_layers = 0;
-#endif
 }
 
 csMaterial::csMaterial (csEngine* engine,
@@ -87,7 +82,6 @@ csMaterial::csMaterial (csEngine* engine,
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialEngine);
 
-#ifndef CS_USE_OLD_RENDERER
   csMaterial::engine = engine;
 
   nameDiffuseParam = engine->Strings->Request (CS_MATERIAL_VARNAME_DIFFUSE);
@@ -95,7 +89,7 @@ csMaterial::csMaterial (csEngine* engine,
   nameReflectParam = engine->Strings->Request (CS_MATERIAL_VARNAME_REFLECTION);
   nameFlatColorParam = engine->Strings->Request (CS_MATERIAL_VARNAME_FLATCOLOR);
   nameDiffuseTexture = engine->Strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
-#endif // CS_USE_OLD_RENDERER
+
 
   SetTextureWrapper (w);
   SetFlatColor (csRGBcolor (255, 255, 255));
@@ -103,10 +97,6 @@ csMaterial::csMaterial (csEngine* engine,
   SetAmbient (CS_DEFMAT_AMBIENT);
   SetReflection (CS_DEFMAT_REFLECTION);
   shadersCustomized = false;
-
-#ifdef CS_USE_OLD_RENDERER
-  num_texture_layers = 0;
-#endif
 }
 
 csMaterial::~csMaterial ()
@@ -115,7 +105,6 @@ csMaterial::~csMaterial ()
   SCF_DESTRUCT_IBASE ();
 }
 
-#ifndef CS_USE_OLD_RENDERER
 csShaderVariable* csMaterial::GetVar (csStringID name, bool create)
 {
   csRef<csShaderVariable> var = GetVariable (name);
@@ -126,45 +115,8 @@ csShaderVariable* csMaterial::GetVar (csStringID name, bool create)
   }
   return var;
 }
-#endif
 
-#ifdef CS_USE_OLD_RENDERER
-csRGBcolor& csMaterial::GetFlatColor ()
-{ 
-  return flat_color; 
-}
-  
-float csMaterial::GetDiffuse () 
-{ 
-  return diffuse; 
-}
 
-void csMaterial::SetDiffuse (float val) 
-{ 
-  diffuse = val; 
-}
-
-float csMaterial::GetAmbient () 
-{ 
-  return ambient; 
-}
-
-void csMaterial::SetAmbient (float val) 
-{ 
-  ambient = val; 
-}
-
-float csMaterial::GetReflection () 
-{ 
-  return reflection; 
-}
-
-void csMaterial::SetReflection (float val) 
-{ 
-  reflection = val; 
-}
-
-#else
 
 csRGBcolor& csMaterial::GetFlatColor ()
 { 
@@ -266,71 +218,31 @@ void csMaterial::SetReflection (float oDiffuse, float oAmbient,
   SetDiffuse (oAmbient);
   SetReflection (oReflection);
 }
-#endif
 
 
 void csMaterial::SetTextureWrapper (iTextureWrapper *tex)
 {
-#ifndef CS_USE_OLD_RENDERER
   SetTextureWrapper (nameDiffuseTexture, tex);
-#else
-  texture = tex;
-#endif
 }
 
 
 iTextureWrapper* csMaterial::GetTextureWrapper (csStringID name)
 {
-#ifndef CS_USE_OLD_RENDERER
   iTextureWrapper* tex;
   GetVar (name)->GetValue (tex);
   return tex;
-  //return texWrappers.Get (name);
-#else
-  if (name == nameDiffuseTexture) return texture;
-  if (name == nameTextureLayer1) return texture_layer_wrappers[0];
-  if (name == nameTextureLayer2) return texture_layer_wrappers[1];
-  if (name == nameTextureLayer3) return texture_layer_wrappers[2];
-  if (name == nameTextureLayer4) return texture_layer_wrappers[3];
-  return 0;
-#endif
 }
-
-#ifndef CS_USE_OLD_RENDERER
 
 void csMaterial::SetTextureWrapper (csStringID name, iTextureWrapper* tex)
 {
   csShaderVariable* var = GetVar (name, true);
   var->SetValue (tex);
-  /*texWrappers.Put (name, tex);
-  texHandles.Put (name, tex ? tex->GetTextureHandle () : 0);*/
 }
 
-#endif
 
-#ifdef CS_USE_OLD_RENDERER
-void csMaterial::AddTextureLayer (
-  iTextureWrapper *txtwrap,
-  uint mode,
-  float uscale,
-  float vscale,
-  float ushift,
-  float vshift)
-{
-  if (num_texture_layers >= 4) return ;
-  texture_layer_wrappers[num_texture_layers] = txtwrap;
-  texture_layers[num_texture_layers].mode = mode;
-  texture_layers[num_texture_layers].uscale = uscale;
-  texture_layers[num_texture_layers].vscale = vscale;
-  texture_layers[num_texture_layers].ushift = ushift;
-  texture_layers[num_texture_layers].vshift = vshift;
-  num_texture_layers++;
-}
-#endif
 
 void csMaterial::SetShader (csStringID type, iShader* shd)
 {
-#ifndef CS_USE_OLD_RENDERER
   if (!shadersCustomized)
   {
     shaders.PutUnique (engine->default_shadertype, 0);
@@ -338,38 +250,22 @@ void csMaterial::SetShader (csStringID type, iShader* shd)
   }
 
   shaders.PutUnique (type, shd);
-#else
-  (void)type;
-  (void)shd;
-#endif
 }
 
 iShader* csMaterial::GetShader(csStringID type)
 {
-#ifndef CS_USE_OLD_RENDERER
   return shaders.Get (type, 0);
-#else
-  return 0;
-#endif
 }
 
 iTextureHandle *csMaterial::GetTexture ()
 {
-#ifdef CS_USE_OLD_RENDERER
-  return texture ? texture->GetTextureHandle () : 0;
-#else
   iTextureWrapper* tex;
   GetVar (nameDiffuseTexture)->GetValue (tex);
   return tex->GetTextureHandle ();
-
-  /*iTextureHandle* texture = texHandles.Get (nameDiffuseTexture);
-  return texture;*/
-#endif
 }
 
 iTextureHandle* csMaterial::GetTexture (csStringID name)
 {
-#ifndef CS_USE_OLD_RENDERER
   iTextureWrapper* tex;
   csShaderVariable* var = GetVar (name);
   if (var)
@@ -377,76 +273,14 @@ iTextureHandle* csMaterial::GetTexture (csStringID name)
     var->GetValue (tex);
     return tex ? tex->GetTextureHandle () : 0;
   }
-  //return texHandles.Get (name);
-#else
-  if (name == nameDiffuseTexture)
-    return texture ? texture->GetTextureHandle () : 0;
-  if (name == nameTextureLayer1) return texture_layers[0].txt_handle;
-  if (name == nameTextureLayer2) return texture_layers[1].txt_handle;
-  if (name == nameTextureLayer3) return texture_layers[2].txt_handle;
-  if (name == nameTextureLayer4) return texture_layers[3].txt_handle;
-#endif
   return 0;
 }
 
-#ifdef CS_USE_OLD_RENDERER
-int csMaterial::GetTextureLayerCount ()
-{
-  return num_texture_layers;
-}
-
-csTextureLayer *csMaterial::GetTextureLayer (int idx)
-{
-  if (idx >= 0 && idx < num_texture_layers)
-  {
-    texture_layers[idx].txt_handle = texture_layer_wrappers[idx]
-    	->GetTextureHandle ();
-    return &texture_layers[idx];
-  }
-  else
-    return 0;
-}
-
-void csMaterial::GetFlatColor (csRGBpixel &oColor, bool useTextureMean)
-{
-  oColor = flat_color;
-  if (texture && useTextureMean)
-  {
-    iTextureHandle *th = texture->GetTextureHandle ();
-    if (th) th->GetMeanColor (oColor.red, oColor.green, oColor.blue);
-  }
-}
-
-
-void csMaterial::SetFlatColor (const csRGBcolor& col)
-{ 
-  flat_color = col; 
-}
-
-void csMaterial::GetReflection (
-  float &oDiffuse,
-  float &oAmbient,
-  float &oReflection)
-{
-  oDiffuse = diffuse;
-  oAmbient = ambient;
-  oReflection = reflection;
-}
-
-void csMaterial::SetReflection (float oDiffuse, float oAmbient,
-  float oReflection)
-{
-  diffuse = oDiffuse;
-  ambient = oAmbient;
-  reflection = oReflection;
-}
-#endif
 
 void csMaterial::Visit ()
 {
-#ifndef CS_USE_OLD_RENDERER
   // @@@ Implement me!!!!!!!!!!
-#else
+#if 0
   if (texture)
   {
     texture->Visit ();
@@ -461,10 +295,9 @@ void csMaterial::Visit ()
 
 bool csMaterial::IsVisitRequired () const
 {
-#ifndef CS_USE_OLD_RENDERER
   // @@@ Implement me!!!!!!!!!!
   return false;
-#else
+#if 0
   if (texture)
   {
     if (texture->IsVisitRequired ()) return true;

@@ -23,22 +23,12 @@
 #include "iengine/movable.h"
 #include "iengine/light.h"
 #include "ivideo/material.h"
-#include "ivideo/vbufmgr.h"
 #include "iutil/objreg.h"
 #include "csqint.h"
 
 SCF_IMPLEMENT_IBASE_EXT (csNewParticleSystem)
-#ifdef CS_USE_OLD_RENDERER
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
-#endif
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iParticleState)
 SCF_IMPLEMENT_IBASE_EXT_END
-
-#ifdef CS_USE_OLD_RENDERER
-SCF_IMPLEMENT_EMBEDDED_IBASE (csNewParticleSystem::eiVertexBufferManagerClient)
-  SCF_IMPLEMENTS_INTERFACE (iVertexBufferManagerClient)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-#endif
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csNewParticleSystem::eiParticleState)
   SCF_IMPLEMENTS_INTERFACE (iParticleState)
@@ -47,9 +37,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csNewParticleSystem::csNewParticleSystem (
 	iEngine *eng, iMeshObjectFactory *fact, int flags) : csMeshObject (eng)
 {
-#ifdef CS_USE_OLD_RENDERER 
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
-#endif
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiParticleState);
   Factory = fact;
   ParticleFlags = flags;
@@ -79,7 +66,6 @@ csNewParticleSystem::csNewParticleSystem (
   alphapersecond = 0.0f;
   alpha_now = 1.0f;
 
-#ifndef CS_USE_OLD_RENDERER 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 
   vertices = 0;
@@ -89,7 +75,6 @@ csNewParticleSystem::csNewParticleSystem (
   mesh.object2camera = csReversibleTransform ();
   mesh.meshtype = CS_MESHTYPE_TRIANGLES;
   meshPtr = &mesh;*/
-#endif
 
   texels = 0;
   triangles = 0;
@@ -104,11 +89,7 @@ csNewParticleSystem::~csNewParticleSystem ()
   delete[] texels;
   delete[] triangles;
   delete[] colors;
-#ifndef CS_USE_OLD_RENDERER 
   delete[] vertices;
-#else
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
-#endif
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiParticleState);
 }
 
@@ -231,7 +212,6 @@ void csNewParticleSystem::SetupObject ()
       *c++ = Color;
     }
 
-#ifndef CS_USE_OLD_RENDERER
     csStringID vertex_name, texel_name, normal_name, color_name, index_name;
     csMeshFactory* mf = (csMeshFactory*)Factory;
     iObjectRegistry* object_reg = mf->GetObjectRegistry ();
@@ -253,11 +233,6 @@ void csNewParticleSystem::SetupObject ()
     texel_buffer = g3d->CreateRenderBuffer (
         sizeof (csVector2)*VertexCount, CS_BUF_DYNAMIC, 
         CS_BUFCOMP_FLOAT, 2);
-#if 0
-    normal_buffer = g3d->CreateRenderBuffer (
-        sizeof (csVector3)*VertexCount, CS_BUF_DYNAMIC,
-        CS_BUFCOMP_FLOAT, 3);
-#endif
     color_buffer = g3d->CreateRenderBuffer (
         sizeof (csColor)*VertexCount, CS_BUF_DYNAMIC,
         CS_BUFCOMP_FLOAT, 3);
@@ -269,15 +244,10 @@ void csNewParticleSystem::SetupObject ()
     sv->SetValue (vertex_buffer);
     sv = svcontext->GetVariableAdd (texel_name);
     sv->SetValue (texel_buffer);
-#if 0
-    sv = svcontext->GetVariableAdd (normal_name);
-    sv->SetValue (normal_buffer);
-#endif
     sv = svcontext->GetVariableAdd (color_name);
     sv->SetValue (color_buffer);
     sv = svcontext->GetVariableAdd (index_name);
     sv->SetValue (index_buffer);
-#endif
   }
 }
 
@@ -345,53 +315,14 @@ void csNewParticleSystem::SetupParticles (
     csVector3 pos = trans.Other2This (PositionArray [i]);
 
     *vertices = pos - x_axis - y_axis;
-#ifdef CS_USE_OLD_RENDERER
-    bbox.AddBoundingVertex (*vertices++);
-#else
     vertices++;
-#endif
     *vertices = pos - x_axis + y_axis;
-#ifdef CS_USE_OLD_RENDERER
-    bbox.AddBoundingVertex (*vertices++);
-#else
     vertices++;
-#endif
     *vertices = pos + x_axis + y_axis;
-#ifdef CS_USE_OLD_RENDERER
-    bbox.AddBoundingVertex (*vertices++);
-#else
     vertices++;
-#endif
     *vertices = pos + x_axis - y_axis;
-#ifdef CS_USE_OLD_RENDERER
-    bbox.AddBoundingVertex (*vertices++);
-#else
     vertices++;
-#endif
   }
-}
-
-bool csNewParticleSystem::DrawTest (iRenderView* rview, iMovable* movable,
-	uint32 frustum_mask)
-{
-  SetupObject ();
-
-  // get the object-to-camera transformation
-  iCamera *camera = rview->GetCamera ();
-  csReversibleTransform trans = camera->GetTransform ();
-  if (!movable->IsFullTransformIdentity ())
-    trans /= movable->GetFullTransform ();
-
-  rview->CalculateClipSettings (frustum_mask, ClipPortal, ClipPlane, ClipZ);
-
-  if (Lighting && light_mgr)
-  {
-    const csArray<iLight*>& relevant_lights = light_mgr
-    	->GetRelevantLights (LogParent, -1, false);
-    UpdateLighting (relevant_lights, movable);
-  }
-
-  return true;
 }
 
 void csNewParticleSystem::UpdateLighting (const csArray<iLight*>& lights,
@@ -422,81 +353,11 @@ void csNewParticleSystem::UpdateLighting (const csArray<iLight*>& lights,
   }
 }
 
-#ifdef CS_USE_OLD_RENDERER
-void csNewParticleSystem::eiVertexBufferManagerClient::ManagerClosing ()
-{
-  scfParent->vbuf = 0;
-}
-#endif
-
-bool csNewParticleSystem::Draw (iRenderView* rview, iMovable* mov,
-	csZBufMode mode)
-{
-#ifdef CS_USE_OLD_RENDERER
-  // some generic setup
-  if (VisCallback) VisCallback->BeforeDrawing (this, rview);
-  iGraphics3D* g3d = rview->GetGraphics3D ();
-  iCamera* camera = rview->GetCamera ();
-  g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
-
-  // Get object space in view coordinates
-  csReversibleTransform objspace = camera->GetTransform ();
-  if (!mov->IsFullTransformIdentity ())
-    objspace /= mov->GetFullTransform ();
-  csReversibleTransform tr_ident;
-  g3d->SetObjectToCamera (&tr_ident);
-
-  // these are the final data chunks for DrawTriangleMesh
-  int VertexCount = ParticleCount * 4;
-  CS_ALLOC_STACK_ARRAY (csVector3, vertices, VertexCount);
-  csBox3 bbox;
-
-  Material->Visit ();
-
-  SetupParticles (objspace, vertices, bbox);
-
-  // set up a vertex buffer
-  iVertexBufferManager *vbufmgr = g3d->GetVertexBufferManager ();
-  if (vbuf == 0)
-  {
-    vbufmgr->AddClient (&scfiVertexBufferManagerClient);
-    vbuf = vbufmgr->CreateBuffer (100);
-  }
-
-  // set up the G3DTriangleMesh
-  G3DTriangleMesh trimesh;
-  trimesh.num_vertices_pool = 1;
-  trimesh.num_triangles = ParticleCount * 2;
-  trimesh.triangles = triangles;
-  trimesh.clip_portal = ClipPortal;
-  trimesh.clip_plane = ClipPlane;
-  trimesh.clip_z_plane = ClipZ;
-  trimesh.use_vertex_color = false;
-  trimesh.do_fog = false;
-  trimesh.do_mirror = false;
-  trimesh.do_morph_texels = false;
-  trimesh.do_morph_colors = false;
-  trimesh.vertex_mode = G3DTriangleMesh::VM_VIEWSPACE;
-  trimesh.mixmode = MixMode;
-  trimesh.morph_factor = 0;
-  trimesh.buffers[0] = vbuf;
-  trimesh.mat_handle = Material->GetMaterialHandle ();
-  trimesh.vertex_fog = 0;
-
-  // draw it!
-  vbufmgr->LockBuffer (vbuf, vertices, texels, colors, VertexCount, 0, bbox);
-  g3d->DrawTriangleMesh (trimesh);
-  vbufmgr->UnlockBuffer (vbuf);
-#endif
-
-  return true;
-}
 
 csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num,
 	iRenderView* rview, 
 	iMovable* movable, uint32 frustum_mask)
 {
-#ifndef CS_USE_OLD_RENDERER
   num = 0;
   SetupObject ();
 
@@ -559,10 +420,6 @@ csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num,
  
   num = 1;
   return &rm;
-#else
-  num = 0;
-  return 0;
-#endif
 }
 
 void csNewParticleSystem::NextFrame (csTicks current, const csVector3&)

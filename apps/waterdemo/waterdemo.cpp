@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2001 by Jorrit Tyberghein
+                  2004 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -55,14 +56,12 @@
 #include "ivideo/graph3d.h"
 #include "iutil/plugin.h"
 #include "imesh/genmesh.h"
-#ifndef CS_USE_OLD_RENDERER
-#  include "ivideo/shader/shader.h"
-#  include "ivideo/rndbuf.h"
-#  include "iengine/renderloop.h"
-#  include "iengine/rendersteps/irenderstep.h"
-#  include "iengine/rendersteps/irsfact.h"
-#  include "iengine/rendersteps/igeneric.h"
-#endif
+#include "ivideo/shader/shader.h"
+#include "ivideo/rndbuf.h"
+#include "iengine/renderloop.h"
+#include "iengine/rendersteps/irenderstep.h"
+#include "iengine/rendersteps/irsfact.h"
+#include "iengine/rendersteps/igeneric.h"
 #include "cstool/csview.h"
 #include "csgfx/csimgvec.h"
 #include "csutil/event.h"
@@ -429,7 +428,6 @@ bool csWaterDemo::Initialize ()
     CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
     "crystalspace.shared.stringset", iStringSet);
 
-#ifndef CS_USE_OLD_RENDERER
   //get a custom renderloop
   csRef<iRenderLoop> rl = engine->GetRenderLoopManager ()->Create ();
   
@@ -467,7 +465,6 @@ bool csWaterDemo::Initialize ()
   csRef<iShaderManager> shmgr (CS_QUERY_REGISTRY(object_reg, iShaderManager));
   csRef<iShaderCompiler> shcom (shmgr->GetCompiler ("XMLShader"));
   shader = shcom->CompileShader (shaderDoc->GetRoot ()->GetNode ("shader"));
-#endif // CS_USE_OLD_RENDERER
 
   // setup the mesh 
   csRef<iMeshObjectType> gType = CS_QUERY_PLUGIN_CLASS(plugin_mgr, 
@@ -506,9 +503,9 @@ bool csWaterDemo::Initialize ()
   
   //setup a material
   csRef<iMaterial> mat = engine->CreateBaseMaterial (0);
-#ifndef CS_USE_OLD_RENDERER
+
   mat->SetShader (strings->Request ("general"), shader);
-#endif
+
   csRef<iMaterialWrapper> matW = engine->GetMaterialList ()->NewMaterial (mat);
   matW->QueryObject ()->SetName ("waterMaterial");
 

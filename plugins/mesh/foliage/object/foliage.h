@@ -295,16 +295,6 @@ public:
     // We don't support making clones.
     return 0;
   }
-  virtual bool DrawTest (iRenderView*, iMovable*, uint32)
-  {
-    // We don't support OR.
-    return false;
-  }
-  virtual bool Draw (iRenderView*, iMovable*, csZBufMode)
-  {
-    // We don't support OR.
-    return false;
-  }
   virtual csRenderMesh** GetRenderMeshes (int &n, iRenderView* rview, 
     iMovable* movable, uint32 frustum_mask);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)

@@ -34,7 +34,7 @@
 	</plugins>
 	<shaders>
 		<shader>
-			<file>/shader/or_lighting.xml</file>
+			<file>/shader/std_lighting.xml</file>
 		</shader>
 		<shader>
 			<file>/shader/light.xml</file>

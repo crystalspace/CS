@@ -507,21 +507,6 @@ public:
   // Drawing
   //----------------------------------------------------------------------
 
-  /**
-   * Test if this thing is visible or not.
-   */
-  bool DrawTest (iRenderView* rview, iMovable* movable, uint32 frustum_mask);
-
-  /**
-   * Draw this thing given a view and transformation.
-   */
-  bool Draw (iRenderView* rview, iMovable* movable, csZBufMode zMode);
-
-  /**
-   * Draw all curves in this thing given a view and transformation.
-   */
-  bool DrawCurves (iRenderView* rview, iMovable* movable, csZBufMode zMode);
-
   csRenderMesh** GetRenderMeshes (int &n, iRenderView* rview, 
     iMovable* movable, uint32 frustum_mask);
 
@@ -790,20 +775,10 @@ public:
     virtual iMeshObjectFactory* GetFactory () const;
     virtual csFlags& GetFlags () { return scfParent->object_flags; }
     virtual csPtr<iMeshObject> Clone () { return 0; }
-    virtual bool DrawTest (iRenderView* rview, iMovable* movable,
-    	uint32 frustum_mask)
-    {
-      return scfParent->DrawTest (rview, movable, frustum_mask);
-    }
     virtual csRenderMesh** GetRenderMeshes (int &n, iRenderView* rview, 
       iMovable* movable, uint32 frustum_mask) 
     { 
       return scfParent->GetRenderMeshes (n, rview, movable, frustum_mask);
-    }
-    virtual bool Draw (iRenderView* rview, iMovable* movable,
-    	csZBufMode zMode)
-    {
-      return scfParent->Draw (rview, movable, zMode);
     }
     virtual void SetVisibleCallback (iMeshObjectDrawCallback* /*cb*/) { }
     virtual iMeshObjectDrawCallback* GetVisibleCallback () const

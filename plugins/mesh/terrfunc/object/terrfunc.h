@@ -30,7 +30,6 @@
 #include "imesh/terrfunc.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "ivideo/vbufmgr.h"
 #include "csqsqrt.h"
 
 struct iEngine;

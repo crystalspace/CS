@@ -380,13 +380,9 @@ public:
    * Does all pre-render calculation.  Determines which LOD children in the 
    * tree should be drawn
    */
-  bool DrawTestQuad (iRenderView* rv, MeshTreeNodeWrapper* node
-	/*csChunkLodTerrainFactory::MeshTreeNode* node*/, float kappa,
+  bool DrawTestQuad (iRenderView* rv, MeshTreeNodeWrapper* node, float kappa,
 	uint32 frustum_mask);
   bool DrawTest (iRenderView* rview, iMovable* movable, uint32 frustum_mask);
-
-  bool Draw (iRenderView*, iMovable*, csZBufMode) 
-  { /* deprecated */ return false; }
 
   /// Returns the mesh, ready for rendering
   virtual csRenderMesh** GetRenderMeshes (int &n, iRenderView* rview,

@@ -536,25 +536,7 @@ public:
   void RemoveHalo (csOpenGLHalo* halo);
   virtual float GetZBuffValue (int, int);
 
-  //=========================================================================
-  // Below this line are all functions that are not yet implemented by
-  // the new renderer or are not going to be implemented ever. In the
-  // last case they will be removed as soon as we permanently switch
-  // to the new renderer. @@@NR@@@
-  //=========================================================================
-  virtual uint32 *GetZBuffAt (int, int) { return 0; }
-  virtual void DrawPolygon (G3DPolygonDP&) { CS_ASSERT (false); }
-  virtual void DrawPolygonDebug (G3DPolygonDP&) { CS_ASSERT (false); }
-  virtual void DrawPolygonFX (G3DPolygonDPFX&) { CS_ASSERT (false); }
-  virtual void DrawTriangleMesh (G3DTriangleMesh&) { CS_ASSERT (false); }
-  virtual void DrawPolygonMesh (G3DPolygonMesh&) { CS_ASSERT (false); }
-  virtual void OpenFogObject (CS_ID, csFog*) { CS_ASSERT (false); }
-  virtual void DrawFogPolygon (CS_ID, G3DPolygonDFP&,int) { CS_ASSERT (false); }
-  virtual void CloseFogObject (CS_ID) { CS_ASSERT (false); }
-  virtual void DumpCache () { }
-  virtual void ClearCache () { }
-  virtual void RemoveFromCache (iRendererLightmap*) { }
-  virtual iVertexBufferManager* GetVertexBufferManager () { return 0; }
+  virtual void RemoveFromCache (iRendererLightmap*) { }  
   virtual bool IsLightmapOK (int, int, int) { return true; }
   //=========================================================================
 

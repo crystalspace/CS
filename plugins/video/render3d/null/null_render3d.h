@@ -154,22 +154,13 @@ public:
   // OR functions, unimplemented
   uint32* GetZBuffAt (int x, int y) { return 0; }
   float GetZBuffValue (int x, int y) { return 0.0; };
-  void DrawPolygon (G3DPolygonDP& poly) { } 
-  void DrawPolygonDebug (G3DPolygonDP& poly) { } 
-  void DrawPolygonFX (G3DPolygonDPFX& poly) { }
-  void DrawTriangleMesh (G3DTriangleMesh& mesh) { }
-  void DrawPolygonMesh (G3DPolygonMesh& mesh) { }
-  void OpenFogObject (CS_ID id, csFog* fog) { }
-  void DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, int fogtype) { }
-  void CloseFogObject (CS_ID id) { }
+
   void OpenPortal (size_t, const csVector2*, const csPlane3&, bool) { }
   void ClosePortal (bool) { }
   iHalo* CreateHalo (float iR, float iG, float iB, unsigned char *iAlpha,
     int iWidth, int iHeight) { return 0; }
-  void DumpCache() { }
-  void ClearCache () { }
+
   void RemoveFromCache (iRendererLightmap* rlm) { }
-  iVertexBufferManager* GetVertexBufferManager () { return 0; }
   bool IsLightmapOK (int lmw, int lmh, int lightCellSize) { return false; }
   csPtr<iPolygonRenderer> CreatePolygonRenderer ();
   void SetWorldToCamera (csReversibleTransform* w2c) { }

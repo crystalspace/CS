@@ -1127,17 +1127,6 @@ void csPolygon3D::Finish (csPolygon3DStatic* spoly)
       lm->Alloc (spoly->polygon_data.tmapping->GetLitOriginalWidth (),
       	spoly->polygon_data.tmapping->GetLitHeight ());
       /*lm->InitColor (128, 128, 128);*/
-
-#ifdef CS_USE_OLD_RENDERER
-      csThingObjectType* thing_type = thing->GetStaticData ()->thing_type;
-      if (!thing_type->G3D->IsLightmapOK (lm->GetWidth(), lm->GetHeight(),
-	lm->lightcell_size))
-      {
-        thing_type->Notify ("Renderer can't handle lightmap "
-         "for polygon '%s'", spoly->GetName());
-        spoly->flags.Set (CS_POLY_LM_REFUSED, CS_POLY_LM_REFUSED);
-      }
-#endif // CS_USE_OLD_RENDERER
     }
   }
 }

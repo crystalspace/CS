@@ -70,20 +70,13 @@ csLight::csLight (
 
   halo = 0;
 
-//#ifdef CS_USE_OLD_RENDERER
   attenuation = CS_ATTN_LINEAR;
   influenceRadius = d;
   influenceRadiusSq = d * d;
   influenceValid = true;
   inv_dist = 1 / d;
-  //CalculateAttenuationVector (attenuation, d, 
-  //  (attenuation == CS_ATTN_LINEAR) ? 1.0f / influenceIntensityFraction : 1.0f);
   attenuationvec = csVector3(0, 1/d, 0); // inverse linear falloff
-/*#else
-  attenuation = CS_ATTN_CLQ;
-  attenuationvec = csVector3(0, 1/d, 0); // inverse linear falloff
-  //attenuationvec = csVector3(1,0,0); //default lightattenuation is kc = 1, kl=0,kq=0
-#endif*/
+
   if (ABS (influenceRadius) < SMALL_EPSILON)
     CalculateInfluenceRadius ();
 }
@@ -150,17 +143,16 @@ const char* csLight::GenerateUniqueID ()
   mf.Write ((char*)&l, 4);
   l = convert_endian ((int32)csQint ((center.z * 1000)+.5));
   mf.Write ((char*)&l, 4);
-//#ifdef CS_USE_OLD_RENDERER
+
   l = convert_endian ((int32)csQint ((influenceRadius * 1000)+.5));
   mf.Write ((char*)&l, 4);
-//#else
+
   l = convert_endian ((int32)csQint ((attenuationvec.x * 1000)+.5));
   mf.Write ((char*)&l, 4);
   l = convert_endian ((int32)csQint ((attenuationvec.y * 1000)+.5));
   mf.Write ((char*)&l, 4);
   l = convert_endian ((int32)csQint ((attenuationvec.z * 1000)+.5));
   mf.Write ((char*)&l, 4);
-//#endif
 
   csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());
 
@@ -310,18 +302,18 @@ void csLight::SetInfluenceRadius (float radius)
   influenceRadius = radius;
   influenceRadiusSq = radius*radius;
   inv_dist = 1.0 / influenceRadius;
-//#ifndef CS_USE_OLD_RENDERER
+
   int oldatt = attenuation;
   CalculateAttenuationVector (attenuation, radius, 
     1.0f / influenceIntensityFraction);
   attenuation = oldatt;
   influenceValid = true;
-//#endif
+
 }
 
 void csLight::CalculateInfluenceRadius ()
 {
-//#ifndef CS_USE_OLD_RENDERER
+
   float y = 0.28*color.red + 0.59*color.green + 0.13*color.blue;
   float radius;
   if (!GetDistanceForBrightness (1 / (y * influenceIntensityFraction), radius))
@@ -330,7 +322,7 @@ void csLight::CalculateInfluenceRadius ()
   influenceRadius = radius;
   influenceRadiusSq = radius*radius;
   inv_dist = 1.0 / influenceRadius;
-//#endif
+
   influenceValid = true;
 }
 

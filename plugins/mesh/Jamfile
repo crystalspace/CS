@@ -7,6 +7,7 @@ SubInclude TOP plugins mesh crossbld ;
 SubInclude TOP plugins mesh emit ;
 SubInclude TOP plugins mesh explo ;
 SubInclude TOP plugins mesh fire ;
+SubInclude TOP plugins mesh foliage ;
 SubInclude TOP plugins mesh fountain ;
 SubInclude TOP plugins mesh genmesh ;
 SubInclude TOP plugins mesh haze ;
@@ -21,17 +22,7 @@ SubInclude TOP plugins mesh spr2d ;
 SubInclude TOP plugins mesh spr3d ;
 SubInclude TOP plugins mesh sprcal3d ;
 SubInclude TOP plugins mesh stars ;
+SubInclude TOP plugins mesh terrain ;
+SubInclude TOP plugins mesh terrain_brute ;
 SubInclude TOP plugins mesh thing ;
 SubInclude TOP plugins mesh protomesh ;
-
-if [ Property build : oldrenderer ] || [ Property build : projgen ]
-{
-  SubInclude TOP plugins mesh terrfunc ;
-}
-
-if ! [ Property build : oldrenderer ] || [ Property build : projgen ]
-{
-  SubInclude TOP plugins mesh terrain ;
-  SubInclude TOP plugins mesh terrain_brute ;
-  SubInclude TOP plugins mesh foliage ;
-}

@@ -257,40 +257,6 @@ public:
    * Get the current camera.
    */
   virtual iCamera* GetCamera () { return ctxt->icamera; }
-
-  /**
-   * @@@OR@@@
-   * Calculate the fog information in the given G3DPolygonDP structure.
-   */
-  virtual void CalculateFogPolygon (G3DPolygonDP& poly);
-  /**
-   * @@@OR@@@
-   * Calculate the fog information in the given G3DPolygonDPFX structure.
-   */
-  virtual void CalculateFogPolygon (G3DPolygonDPFX& poly);
-  /**
-   * @@@OR@@@
-   * Calculate the fog information in the given G3DTriangleMesh
-   * structure. This function assumes the fog array is already preallocated
-   * and the rest of the structure should be filled in.
-   * This function will take care of correctly enabling/disabling fog.
-   */
-  virtual void CalculateFogMesh (const csTransform& tr_o2c,
-    G3DTriangleMesh& mesh);
-
-  /**
-   * @@@OR@@@
-   * Calculate the fog information in the given G3DPolygonMesh
-   * structure. This function assumes the fog array is already preallocated
-   * and the rest of the structure should be filled in.
-   * This function will take care of correctly enabling/disabling fog.
-   */
-
-  virtual void CalculateFogMesh (const csTransform &tr_o2c, 
-    G3DPolygonMesh &mesh);
-
-
-
   /**
    * Test if the given bounding sphere (in world space coordinates)
    * is visibile in this render view. The transformation will

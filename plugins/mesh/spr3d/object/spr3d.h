@@ -45,7 +45,6 @@
 #include "iutil/comp.h"
 #include "iutil/virtclk.h"
 #include "ivideo/graph3d.h"
-#include "ivideo/vbufmgr.h"
 #include "ivideo/rendermesh.h"
 #include "ivideo/rndbuf.h"
 #include "cstool/anonrndbuf.h"
@@ -384,9 +383,7 @@ public:
   csWeakRef<iGraphics3D> g3d;
   csRef<iLightManager> light_mgr;
 
-#ifndef CS_USE_OLD_RENDERER
   csAnonRenderBufferManager *anon_buffers;
-#endif
 
   /**
    * Reference to the engine (optional because sprites can also be
@@ -1220,19 +1217,11 @@ private:
    * Array of colors for the vertices. If not set then this
    * sprite does not have colored vertices.
    */
-#ifndef CS_USE_OLD_RENDERER
   csColor4* vertex_colors;
   /**
    * Base color that will be added to the sprite colors.
    */
   csColor4 base_color;
-#else
-  csColor* vertex_colors;
-  /**
-   * Base color that will be added to the sprite colors.
-   */
-  csColor base_color;
-#endif
 
   /// The parent.
   csSprite3DMeshObjectFactory* factory;
@@ -1291,12 +1280,8 @@ private:
   long cur_movablenr;
 
   // Remembered info between DrawTest and Draw.
-#ifdef CS_USE_OLD_RENDERER
-  G3DTriangleMesh g3dmesh;
-#else
-  csRenderMeshHolderSingle rmHolder;  
 
-#endif // CS_USE_OLD_RENDERER
+  csRenderMeshHolderSingle rmHolder;  
 
   bool initialized;
 
@@ -1308,17 +1293,7 @@ private:
    * of frames. Do we create a vertex buffer for every frame?
    * @@@
    */
-#ifdef CS_USE_OLD_RENDERER
-  iVertexBufferManager* vbufmgr;
-  csRef<iVertexBuffer> vbuf;
-  /// Vertex buffer for tweening.
-  csRef<iVertexBuffer> vbuf_tween;
-  /// Data for vertex buffer (initialize by DrawTest, needed by Draw).
-  csVector3* vbuf_verts, * vbuf_tween_verts;
-  csVector2* vbuf_texels, * vbuf_tween_texels;
-  csColor* vbuf_colors, * vbuf_tween_colors;
-  int vbuf_num_vertices;
-#else
+
   csVector2* final_texcoords;
   csColor4* final_colors;
   csTriangle* final_triangles;
@@ -1342,20 +1317,9 @@ private:
     shadow_verts_name, shadow_norms_name;
   csShaderVariableContext svcontext;
 
-#endif // CS_USE_OLD_RENDERER
-
   /// Setup this object.
   void SetupObject ();
 
-#ifdef CS_USE_OLD_RENDERER
-  /// interface to receive state of vertexbuffermanager
-  struct eiVertexBufferManagerClient : public iVertexBufferManagerClient
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObject);
-    virtual void ManagerClosing ();
-  }scfiVertexBufferManagerClient;
-  friend struct eiVertexBufferManagerClient;
-#endif // CS_USE_OLD_RENDERER
 
 private:
   /**
@@ -1416,12 +1380,10 @@ public:
   void SetMixMode (uint mode)
   {
     MixMode = mode;
-#ifndef CS_USE_OLD_RENDERER
     if (MixMode & CS_FX_ALPHA)
       base_color.alpha = 1.0 - float (MixMode & CS_FX_MASK_ALPHA) / 255.0;
     else
       base_color.alpha = 1.0;
-#endif
   }
 
 
@@ -1697,9 +1659,6 @@ public:
   }
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> Clone () { return 0; }
-  virtual bool DrawTest (iRenderView* rview, iMovable* movable,
-  	uint32 frustum_mask);
-  virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual csRenderMesh **GetRenderMeshes (int &n, iRenderView* rview, 
     iMovable* movable, uint32 frustum_mask);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
@@ -2006,7 +1965,6 @@ public:
   friend struct LODControl;
 
   //------------------ iShaderVariableAccessor implementation ------------
-#ifndef CS_USE_OLD_RENDERER
   class eiShaderVariableAccessor : public iShaderVariableAccessor
   {
   private:
@@ -2033,7 +1991,6 @@ public:
   csRef<eiShaderVariableAccessor> scfiShaderVariableAccessor;
 
   void PreGetShaderVariableValue (csShaderVariable* variable);
-#endif // CS_USE_OLD_RENDERER
 };
 
 /**

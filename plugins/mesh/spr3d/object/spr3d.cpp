@@ -24,7 +24,6 @@
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/randomgen.h"
 #include "ivideo/graph3d.h"
-#include "ivideo/vbufmgr.h"
 #include "iengine/camera.h"
 #include "iengine/rview.h"
 #include "iengine/movable.h"
@@ -50,9 +49,7 @@ CS_IMPLEMENT_PLUGIN
 
 CS_LEAKGUARD_IMPLEMENT(csSprite3DMeshObject);
 CS_LEAKGUARD_IMPLEMENT(csSprite3DMeshObjectFactory);
-#ifndef CS_USE_OLD_RENDERER
 CS_LEAKGUARD_IMPLEMENT(csSprite3DMeshObject::eiShaderVariableAccessor);
-#endif
 
 // Set the default lighting quality.
 // See header file for CS_SPR_LIGHTING_* definitions.
@@ -264,9 +261,7 @@ csSprite3DMeshObjectFactory::~csSprite3DMeshObjectFactory ()
   delete tri_verts;
   delete[] cachename;
   ClearLODListeners ();
-#ifndef CS_USE_OLD_RENDERER
   delete anon_buffers;
-#endif
 
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiSprite3DFactoryState);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiLODControl);
@@ -962,9 +957,6 @@ SCF_IMPLEMENT_IBASE_END
 SCF_IMPLEMENT_IBASE (csSprite3DMeshObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSprite3DState)
-#ifdef CS_USE_OLD_RENDERER
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
-#endif // CS_USE_OLD_RENDERER
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLODControl)
   {
     static scfInterfaceID iPolygonMesh_scfID = (scfInterfaceID)-1;		
@@ -992,15 +984,9 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::PolyMesh)
   SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-#ifdef CS_USE_OLD_RENDERER
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::eiVertexBufferManagerClient)
-  SCF_IMPLEMENTS_INTERFACE (iVertexBufferManagerClient)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-#else
 SCF_IMPLEMENT_IBASE (csSprite3DMeshObject::eiShaderVariableAccessor)
   SCF_IMPLEMENTS_INTERFACE (iShaderVariableAccessor)
 SCF_IMPLEMENT_IBASE_END
-#endif // CS_USE_OLD_RENDERER
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::LODControl)
   SCF_IMPLEMENTS_INTERFACE (iLODControl)
@@ -1012,11 +998,6 @@ CS_IMPLEMENT_STATIC_VAR (Get_tr_verts, spr3d_tr_verts, ())
 /// Static uv array.
 typedef csDirtyAccessArray<csVector2> spr3d_uv_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_uv_verts, spr3d_uv_verts, ())
-/// The list of fog vertices
-#ifdef CS_USE_OLD_RENDERER
-typedef csDirtyAccessArray<G3DFogInfo> spr3d_fog_verts;
-CS_IMPLEMENT_STATIC_VAR (Get_fog_verts, spr3d_fog_verts, ())
-#endif // CS_USE_OLD_RENDERER
 /// The list of object vertices.
 typedef csDirtyAccessArray<csVector3> spr3d_obj_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_obj_verts, spr3d_obj_verts, ())
@@ -1026,9 +1007,6 @@ CS_IMPLEMENT_STATIC_VAR (Get_tween_verts, spr3d_tween_verts, ())
 
 spr3d_tr_verts *tr_verts = 0;
 spr3d_uv_verts *uv_verts = 0;
-#ifdef CS_USE_OLD_RENDERER
-spr3d_fog_verts *fog_verts = 0;
-#endif // CS_USE_OLD_RENDERER
 spr3d_obj_verts *obj_verts = 0;
 spr3d_tween_verts *tween_verts = 0;
 
@@ -1037,9 +1015,6 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSprite3DState);
-#ifdef CS_USE_OLD_RENDERER
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
-#endif // CS_USE_OLD_RENDERER
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLODControl);
   logparent = 0;
   cur_frame = 0;
@@ -1053,18 +1028,12 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
 
   tr_verts = Get_tr_verts ();
   uv_verts = Get_uv_verts ();
-#ifdef CS_USE_OLD_RENDERER
-  fog_verts = Get_fog_verts ();
-#endif // CS_USE_OLD_RENDERER
   obj_verts = Get_obj_verts ();
   tween_verts = Get_tween_verts ();
   GetLODMesh ();
 
   tr_verts->IncRef ();
   uv_verts->IncRef ();
-#ifdef CS_USE_OLD_RENDERER
-  fog_verts->IncRef ();
-#endif // CS_USE_OLD_RENDERER
   obj_verts->IncRef ();
   tween_verts->IncRef ();
 
@@ -1086,24 +1055,13 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   last_action = 0;
   single_step = false;
   frame_increment = 1;
-
-#ifdef CS_USE_OLD_RENDERER
-  vbufmgr = 0;
-#endif // CS_USE_OLD_RENDERER
-
 }
 
 csSprite3DMeshObject::~csSprite3DMeshObject ()
 {
   if (vis_cb) vis_cb->DecRef ();
-#ifdef CS_USE_OLD_RENDERER
-  if (vbufmgr) vbufmgr->RemoveClient (&scfiVertexBufferManagerClient);
-#endif // CS_USE_OLD_RENDERER
   uv_verts->DecRef ();
   tr_verts->DecRef ();
-#ifdef CS_USE_OLD_RENDERER
-  fog_verts->DecRef ();
-#endif // CS_USE_OLD_RENDERER
   obj_verts->DecRef ();
   tween_verts->DecRef ();
 
@@ -1113,9 +1071,6 @@ csSprite3DMeshObject::~csSprite3DMeshObject ()
   
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiSprite3DState);
-#ifdef CS_USE_OLD_RENDERER
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
-#endif // CS_USE_OLD_RENDERER
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiLODControl);
   SCF_DESTRUCT_IBASE ();
 }
@@ -1186,11 +1141,7 @@ void csSprite3DMeshObject::AddVertexColor (int i, const csColor& col)
   if (!vertex_colors)
   {
     int vt = factory->GetVertexCount ();
-#ifndef CS_USE_OLD_RENDERER
     vertex_colors = new csColor4 [vt];
-#else
-    vertex_colors = new csColor [vt];
-#endif
     int j;
     for (j = 0 ; j < factory->GetVertexCount (); j++)
       vertex_colors[j].Set (base_color);
@@ -1276,9 +1227,6 @@ void csSprite3DMeshObject::UpdateWorkTables (int max_size)
   {
     tr_verts->SetLength (max_size);
     uv_verts->SetLength (max_size);
-#ifdef CS_USE_OLD_RENDERER
-    fog_verts->SetLength (max_size);
-#endif // CS_USE_OLD_RENDERER
     obj_verts->SetLength (max_size);
     tween_verts->SetLength (max_size);
   }
@@ -1383,7 +1331,6 @@ void csSprite3DMeshObject::SetupObject ()
   {
     initialized = true;
 
-#ifndef CS_USE_OLD_RENDERER
     csRef<iStringSet> strings = 
       CS_QUERY_REGISTRY_TAG_INTERFACE (factory->object_reg,
       "crystalspace.shared.stringset", iStringSet);
@@ -1405,8 +1352,6 @@ void csSprite3DMeshObject::SetupObject ()
     sv->SetAccessor ((iShaderVariableAccessor*)scfiShaderVariableAccessor);
     sv = svcontext.GetVariableAdd (indices_name);
     sv->SetAccessor ((iShaderVariableAccessor*)scfiShaderVariableAccessor);
-  
-#endif // CS_USE_OLD_RENDERER
 
     InitSprite ();
   }
@@ -1439,284 +1384,11 @@ csSpriteSocket* csSprite3DMeshObject::FindSocket (iMeshWrapper *mesh) const
   return 0;
 }
 
-bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable,
-	uint32 frustum_mask)
-{
-  SetupObject ();
-
-  if (!factory->cstxt)
-  {
-    factory->Report (CS_REPORTER_SEVERITY_ERROR,
-    	"Error! Trying to draw a sprite with no material!");
-    return false;
-  }
-
-#ifdef CS_USE_OLD_RENDERER
-  iGraphics3D* g3d = rview->GetGraphics3D ();
-#endif
-  iCamera* camera = rview->GetCamera ();
-
-  // First create the transformation from object to camera space directly:
-  //   W = Mow * O - Vow;
-  //   C = Mwc * (W - Vwc)
-  // ->
-  //   C = Mwc * (Mow * O - Vow - Vwc)
-  //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
-  csReversibleTransform tr_o2c = camera->GetTransform ();
-  if (!movable->IsFullTransformIdentity ())
-    tr_o2c /= movable->GetFullTransform ();
-
-  int clip_portal, clip_plane, clip_z_plane;
-  rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
-  	clip_z_plane);
-
-  UpdateWorkTables (factory->GetVertexCount());
-
-  CS_ASSERT (cur_action != 0);
-  csSpriteFrame * cframe = cur_action->GetCsFrame (cur_frame);
-
-  // Get next frame for animation tweening.
-  csSpriteFrame * next_frame = cur_action->GetCsNextFrame (cur_frame);
-
-  // First create the transformation from object to camera space directly:
-  //   W = Mow * O - Vow;
-  //   C = Mwc * (W - Vwc)
-  // ->
-  //   C = Mwc * (Mow * O - Vow - Vwc)
-  //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
-
-#ifdef CS_USE_OLD_RENDERER
-  g3d->SetObjectToCamera (&tr_o2c);
-#endif
-
-  bool do_tween = false;
-  if (tween_ratio) do_tween = true;
-
-  int cf_idx = cframe->GetAnmIndex();
-
-  csVector3* real_tween_verts = 0;
-#ifdef CS_USE_OLD_RENDERER
-  csVector3* real_obj_verts = factory->GetVertices (cf_idx);
-#endif
-  if (do_tween)
-  {
-    int nf_idx = next_frame->GetAnmIndex();
-    real_tween_verts = factory->GetVertices (nf_idx);
-  }
-
-  // Calculate the right LOD level for this sprite.
-
-  // Select the appropriate mesh.
-  csTriangleMesh* m;
-  int* emerge_from = 0;
-
-  float fnum = 0.0f;
-
-  // GetLodLevel() is the distance at which you will see full detail
-  float level_of_detail = 1;
-
-  if (IsLodEnabled ())
-  {
-    // reduce LOD based on distance from camera to center of sprite
-    csBox3 obox;
-    GetObjectBoundingBox (obox);
-    csVector3 obj_center = (obox.Min () + obox.Max ()) / 2;
-    csVector3 wor_center;
-    if (movable->IsFullTransformIdentity ())
-      wor_center = obj_center;
-    else
-      wor_center = movable->GetFullTransform ().This2Other (obj_center);
-    csVector3 cam_origin = camera->GetTransform ().GetOrigin ();
-    float wor_sq_dist = csSquaredDist::PointPoint (cam_origin, wor_center);
-    level_of_detail = GetLodLevel (csQsqrt (wor_sq_dist));
-
-    // reduce LOD based on field-of-view
-    float aspect = 2 * (float) tan (camera->GetFOVAngle () * PI / 360);
-    level_of_detail *= aspect;
-
-    if (level_of_detail < 0) level_of_detail = 0;
-    else if (level_of_detail >= 1) level_of_detail = 1;
-  }
-
-  if (level_of_detail < 1)
-  {
-    // We calculate the number of vertices to use for this LOD
-    // level. The integer part will be the number of vertices.
-    // The fractional part will determine how much to morph
-    // between the new vertex and the previous last vertex.
-    fnum = level_of_detail * (factory->GetVertexCount() + 1);
-    num_verts_for_lod = (int)fnum;
-    fnum -= num_verts_for_lod;  // fnum is now the fractional part.
-
-    GenerateSpriteLOD (num_verts_for_lod);
-    emerge_from = factory->GetEmergeFrom ();
-    m = mesh;
-  }
-  else
-  {
-    num_verts_for_lod = factory->GetVertexCount ();
-    m = factory->GetTexelMesh ();
-  }
-
-  if (num_verts_for_lod <= 1) return false;
-
-  int i;
-
-  csVector2* real_uv_verts;
-  // Do vertex morphing if needed.
-  //
-  // @@@ Don't understand this piece of code.
-  //   Why is it checking if the level == 0, and negative?  neg is supposed
-  //    to be off.  zero is a valid on number...???
-  if (level_of_detail <= 0 || level_of_detail >= 1)
-  {
-    real_uv_verts = factory->GetTexels (cf_idx);
-  }
-  else
-  {
-    for (i = 0 ; i < num_verts_for_lod ; i++)
-    {
-      csVector2 uv;
-      if (i < num_verts_for_lod-1)
-      {
-        uv = factory->GetTexel (cf_idx, i);
-      }
-      else
-      {
-        // Morph between the last vertex and the one we morphed from.
-        uv = (1-fnum) * factory->GetTexel (cf_idx, emerge_from[i])
-          + fnum * factory->GetTexel (cf_idx, i);
-      }
-
-      (*uv_verts)[i] = uv;
-    }
-    real_uv_verts = uv_verts->GetArray ();
-  }
-
-  // Setup the structure for DrawTriangleMesh.
-  if (force_otherskin)
-  {
-#ifdef CS_USE_OLD_RENDERER
-    g3dmesh.mat_handle = cstxt->GetMaterialHandle ();
-#endif // CS_USE_OLD_RENDERER
-    cstxt->Visit ();
-  }
-  else
-  {
-#ifdef CS_USE_OLD_RENDERER
-    g3dmesh.mat_handle = factory->cstxt->GetMaterialHandle ();
-#endif // CS_USE_OLD_RENDERER
-    factory->cstxt->Visit ();
-  }
-  if (!vertex_colors) AddVertexColor (0, csColor (0, 0, 0));
-
-#ifdef CS_USE_OLD_RENDERER
-  vbuf_verts = real_obj_verts;
-  vbuf_texels = real_uv_verts;
-  vbuf_colors = vertex_colors;
-  vbuf_num_vertices = num_verts_for_lod;
-
-  // @@@ The priority of the vertex buffer should be a parameter for the sprite.
-  if (!vbuf)
-  {
-    // we need that to remove us from the manager later on. Bad we have no
-    // object registry at hand
-    vbufmgr = g3d->GetVertexBufferManager ();
-    vbuf = vbufmgr->CreateBuffer (1);
-    vbufmgr->AddClient (&scfiVertexBufferManagerClient);
-  }
-
-  g3dmesh.buffers[0] = vbuf;
-  if (do_tween)
-  {
-    vbuf_tween_verts = real_tween_verts;
-    vbuf_tween_texels = real_uv_verts;
-    vbuf_tween_colors = vertex_colors;
-    if (!vbuf_tween)
-      vbuf_tween = vbufmgr->CreateBuffer (0);
-    g3dmesh.buffers[1] = vbuf_tween;
-    g3dmesh.morph_factor = tween_ratio;
-    g3dmesh.num_vertices_pool = 2;
-  }
-  else
-  {
-    vbuf_tween_verts = 0;
-    g3dmesh.morph_factor = 0;
-    g3dmesh.num_vertices_pool = 1;
-  }
-
-  g3dmesh.num_triangles = m->GetTriangleCount ();
-  g3dmesh.triangles = m->GetTriangles ();
-
-  g3dmesh.use_vertex_color = !!vertex_colors;
-  g3dmesh.clip_portal = clip_portal;
-  g3dmesh.clip_plane = clip_plane;
-  g3dmesh.clip_z_plane = clip_z_plane;
-  g3dmesh.do_mirror = camera->IsMirrored ();
-  g3dmesh.do_morph_texels = false;
-  g3dmesh.do_morph_colors = false;
-  g3dmesh.vertex_fog = fog_verts->GetArray ();
-
-  g3dmesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
-  g3dmesh.mixmode = MixMode | (vertex_colors ? 0 : CS_FX_FLAT);
-
-
-#endif // CS_USE_OLD_RENDERER
-
-  if (factory->light_mgr)
-  {
-    const csArray<iLight*>& relevant_lights = factory->light_mgr
-    	->GetRelevantLights (logparent, -1, false);
-    UpdateLighting (relevant_lights, movable);
-  }
-
-  return true;
-}
-
-bool csSprite3DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
-	csZBufMode mode)
-{
-  //@@@if (rview.callback)
-    //rview.callback (&rview, CALLBACK_MESH, (void*)&g3dmesh);
-  //else
-#ifdef CS_USE_OLD_RENDERER
-  iGraphics3D* g3d = rview->GetGraphics3D ();
-  iVertexBufferManager* vbufmgr = g3d->GetVertexBufferManager ();
-
-  CS_ASSERT (!vbuf->IsLocked ());
-  csBox3 bbox;
-  GetObjectBoundingBox (bbox);
-  vbufmgr->LockBuffer (vbuf, vbuf_verts, vbuf_texels,
-  	vbuf_colors, vbuf_num_vertices, 0, bbox);
-  if (vbuf_tween_verts)
-  {
-    CS_ASSERT (!vbuf_tween->IsLocked ());
-    vbufmgr->LockBuffer (vbuf_tween, vbuf_tween_verts,
-    	vbuf_tween_texels, vbuf_tween_colors, vbuf_num_vertices, 0, bbox);
-  }
-
-  g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
-  rview->CalculateFogMesh (g3d->GetObjectToCamera (), g3dmesh);
-  g3d->DrawTriangleMesh (g3dmesh);
-
-  CS_ASSERT (vbuf->IsLocked ());
-  vbufmgr->UnlockBuffer (vbuf);
-  if (vbuf_tween_verts)
-  {
-    CS_ASSERT (vbuf_tween->IsLocked ());
-    vbufmgr->UnlockBuffer (vbuf_tween);
-  }
-#endif // CS_USE_OLD_RENDERER
-
-  if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
-  return true;
-}
 
 csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n,
 	iRenderView* rview, 
 	iMovable* movable, uint32 frustum_mask)
 {
-#ifndef CS_USE_OLD_RENDERER
   SetupObject ();
 
   n = 0;
@@ -1917,10 +1589,6 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n,
   rmesh->meshtype = CS_MESHTYPE_TRIANGLES;
   n = 1;
   return &rmesh;
-#else
-  n = 0;
-  return 0;
-#endif
 }
 
 void csSprite3DMeshObject::InitSprite ()
@@ -2190,11 +1858,7 @@ void csSprite3DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
   {
     int num_texels = factory->GetVertexCount();
     // Reseting all of the vertex_colors to the base color.
-#ifndef CS_USE_OLD_RENDERER
     csColor4 col;
-#else
-    csColor col;
-#endif
     col.Set (base_color);
     if (factory->engine)
     {
@@ -2360,10 +2024,7 @@ void csSprite3DMeshObject::UpdateLightingFast (const csArray<iLight*>& lights,
 		light_color_r * cosinus_light + base_color.red,
                 light_color_g * cosinus_light + base_color.green,
                 light_color_b * cosinus_light + base_color.blue
-#ifndef CS_USE_OLD_RENDERER
-		, base_color.alpha
-#endif
-		);
+		, base_color.alpha);
       }
     }
     else  // The next lights should have the light color added.
@@ -2716,13 +2377,6 @@ csMeshedPolygon* csSprite3DMeshObject::PolyMesh::GetPolygons ()
   return polygons;
 }
 
-#ifdef CS_USE_OLD_RENDERER
-void csSprite3DMeshObject::eiVertexBufferManagerClient::ManagerClosing ()
-{
-  scfParent->vbuf = scfParent->vbuf_tween = 0;
-  scfParent->vbufmgr = 0;
-}
-#else
 
 //iRenderBuffer *csSprite3DMeshObject::GetRenderBuffer (csStringID name)
 void csSprite3DMeshObject::PreGetShaderVariableValue (
@@ -2833,7 +2487,6 @@ void csSprite3DMeshObject::PreGetShaderVariableValue (
   }
 }
 
-#endif // CS_USE_OLD_RENDERER
 
 //----------------------------------------------------------------------
 
@@ -2890,10 +2543,10 @@ csPtr<iMeshObjectFactory> csSprite3DMeshObjectType::NewFactory ()
   cm->object_reg = object_reg;
   cm->vc = vc;
   cm->engine = engine;
-#ifndef CS_USE_OLD_RENDERER
+
   cm->g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   cm->anon_buffers = new csAnonRenderBufferManager (object_reg);
-#endif
+
   cm->light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
   csRef<iMeshObjectFactory> ifact (
   	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));

@@ -47,7 +47,6 @@
 #include "iutil/comp.h"
 #include "iutil/virtclk.h"
 #include "ivideo/graph3d.h"
-#include "ivideo/vbufmgr.h"
 #include "ivideo/rendermesh.h"
 #include "ivideo/rndbuf.h"
 #include "cstool/anonrndbuf.h"
@@ -582,14 +581,7 @@ private:
   csPDelArray<csSpriteCal3DSocket> sockets;
 
 
-#ifdef CS_USE_OLD_RENDERER
-  iVertexBufferManager* vbufmgr;
-  csRef<iVertexBuffer> vbuf;
-//  csArray<G3DTriangleMesh>  mesh;
-//  csArray<bool>             initialized;
-//  csArray<csColor*>         mesh_colors;
-  csArray<G3DTriangleMesh>  *meshes;
-#else
+
   class BaseAccessor : public iShaderVariableAccessor
   {
   protected:
@@ -636,7 +628,7 @@ private:
   csRenderMeshHolderMultiple rmHolder;
   csWeakRef<iGraphics3D> G3D;
   iMovable* currentMovable;
-#endif
+
   uint meshVersion;
   bool arrays_initialized;
   csBox3 object_bbox;
@@ -660,15 +652,8 @@ private:
   int FindAnimCycleNamePos(char const*) const;
   void ClearAnimCyclePos(int pos, float delay);
 
-#ifdef CS_USE_OLD_RENDERER
-  void SetupVertexBuffer (int mesh, int submesh, int num_vertices,
-    int num_triangles, csTriangle *triangles);
-  bool DrawSubmesh (iGraphics3D* g3d, iRenderView* rview, 
-    CalRenderer *pCalRenderer, int mesh, int submesh, 
-    iMaterialWrapper *material);
-#else
   void SetupRenderMeshes ();
-#endif
+
   void InitSubmeshLighting (int mesh, int submesh, CalRenderer *pCalRenderer,
     iMovable* movable);
   void UpdateLightingSubmesh (const csArray<iLight*>& lights, iMovable* movable, 
@@ -778,11 +763,8 @@ public:
   }
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> Clone () { return 0; }
-  virtual bool DrawTest (iRenderView* rview, iMovable* movable,
-  	uint32 frustum_mask);
   virtual csRenderMesh **GetRenderMeshes (int &n, iRenderView* rview,
     iMovable* movable, uint32 frustum_mask);
-  virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
     if (cb) cb->IncRef ();
@@ -1118,16 +1100,6 @@ public:
     }
   } scfiLODControl;
   friend struct LODControl;
-
-#ifdef CS_USE_OLD_RENDERER
-  /// interface to receive state of vertexbuffermanager
-  struct eiVertexBufferManagerClient : public iVertexBufferManagerClient
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csSpriteCal3DMeshObject);
-    virtual void ManagerClosing ();
-  }scfiVertexBufferManagerClient;
-  friend struct eiVertexBufferManagerClient;
-#endif
 
   void GetObjectBoundingBox (csBox3& bbox, int type, csVector3 *verts,int vertCount);
   void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);

@@ -232,9 +232,9 @@ void csGraphicsPipeline::RestoreClipRect ()
   G2D->SetClipRect (OrigClip.xmin, OrigClip.ymin, OrigClip.xmax, OrigClip.ymax);
   ClipRect = OrigClip;
 }
-
+/*
 void csGraphicsPipeline::Polygon3D (G3DPolygonDPFX &poly, uint mode)
-{
+{ 
   if (!BeginDraw (CSDRAW_3DGRAPHICS))
     return;
 
@@ -250,9 +250,11 @@ void csGraphicsPipeline::Polygon3D (G3DPolygonDPFX &poly, uint mode)
   poly.mixmode = mode;
   G3D->DrawPolygonFX (poly);
 }
-
+*/
 void csGraphicsPipeline::ClearZbuffer (int x1, int y1, int x2, int y2)
 {
+  //@@@REIMPLEMENT THIS FOR NR
+  /*
   if (!BeginDraw (CSDRAW_3DGRAPHICS))
     return;
 
@@ -273,7 +275,7 @@ void csGraphicsPipeline::ClearZbuffer (int x1, int y1, int x2, int y2)
   poly.vertices [3].y = y1;
   // Set plane normal to be perpendicular to OZ and very far away
   poly.normal.Set (0, 0, -1.0f, 1e35f);
-  G3D->DrawPolygon (poly);
+  G3D->DrawPolygon (poly);*/
 }
 
 void csGraphicsPipeline::Invalidate (csRect &rect)

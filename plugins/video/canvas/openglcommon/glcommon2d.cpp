@@ -30,7 +30,7 @@
 #include "plugins/video/canvas/openglcommon/glstates.h"
 
 // This header should be moved
-#include "plugins/video/renderer/common/pixfmt.h"
+#include "plugins/video/render3d/common/pixfmt.h"
 
 
 SCF_IMPLEMENT_IBASE_EXT (csGraphics2DGLCommon)
@@ -296,9 +296,8 @@ bool csGraphics2DGLCommon::BeginDraw ()
   }
   else
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-#ifndef CS_USE_OLD_RENDERER
+
   statecache->SetColorMask (true, true, true, true);
-#endif
     
   statecache->Enable_GL_BLEND ();		      
   statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -864,21 +863,13 @@ csGraphics2DGLCommon::csGLPixelFormatPicker::~csGLPixelFormatPicker()
 
 void csGraphics2DGLCommon::csGLPixelFormatPicker::ReadStartValues ()
 {
-#ifdef CS_USE_OLD_RENDERER
-  #define RENDERER_DEPENDENT(vNR, vOR)	(vOR)
-#else
-  #define RENDERER_DEPENDENT(vNR, vOR)	(vNR)
-#endif
-
   currentValues[glpfvColorBits] = parent->Depth;
   currentValues[glpfvAlphaBits] = 
-    parent->config->GetInt ("Video.OpenGL.AlphaBits", 
-    RENDERER_DEPENDENT(8, 0));
+    parent->config->GetInt ("Video.OpenGL.AlphaBits", 8);
   currentValues[glpfvDepthBits] = 
     parent->config->GetInt ("Video.OpenGL.DepthBits", 32);
   currentValues[glpfvStencilBits] = 
-    parent->config->GetInt ("Video.OpenGL.StencilBits", 
-    RENDERER_DEPENDENT(8, 1));
+    parent->config->GetInt ("Video.OpenGL.StencilBits", 8);
   currentValues[glpfvAccumColorBits] = 
     parent->config->GetInt ("Video.OpenGL.AccumColorBits", 0);
   currentValues[glpfvAccumAlphaBits] = 
@@ -886,8 +877,6 @@ void csGraphics2DGLCommon::csGLPixelFormatPicker::ReadStartValues ()
   currentValues[glpfvMultiSamples] = 
     parent->config->GetInt ("Video.OpenGL.MultiSamples", 0);
   currentValid = true;
-
-#undef RENDERER_DEPENDENT
 }
 
 void csGraphics2DGLCommon::csGLPixelFormatPicker::ReadPickerValues ()

@@ -60,9 +60,7 @@ public:
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iLoaderContext* ldr_context, iBase* context);
 
-#ifndef CS_USE_OLD_RENDERER
   bool ParseRenderBuffer(iDocumentNode *node, iNullFactoryState* state);
-#endif
 
   struct eiComponent : public iComponent
   {

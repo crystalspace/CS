@@ -62,15 +62,12 @@ void csBackground::Draw (csComponent &This, int x, int y, int w, int h,
       }
     case csbgGradient:
     {
-      G3DPolygonDPFX poly;
+      //@@@REIMPLEMENT THIS FOR NR
+      /*G3DPolygonDPFX poly;
       poly.use_fog = false;
       poly.num = 4;
-#ifndef CS_USE_OLD_RENDERER
       poly.tex_handle = 0;
-#else
-      poly.mat_handle = 0;
-#endif
-	  int i;
+      int i;
       for (i = 0; i < 4; i++)
       {
         poly.vertices [i].x = (i == 0 || i == 3) ? x : x + w;
@@ -84,7 +81,7 @@ void csBackground::Draw (csComponent &This, int x, int y, int w, int h,
 
       This.app->SetZbufferMode (CS_ZBUF_NONE);
       This.Polygon3D (poly, ((type == csbgGradient) ? 0 : CS_FX_FLAT) |
-        (iAlpha ? (CS_FX_ALPHA | iAlpha) : CS_FX_COPY));
+        (iAlpha ? (CS_FX_ALPHA | iAlpha) : CS_FX_COPY));*/
       break;
     }
   }

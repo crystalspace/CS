@@ -107,13 +107,6 @@ public:
 
   /**
    * See imesh/object.h for specification. The default implementation
-   * does nothing and always returns true.
-   */
-  virtual bool DrawTest (iRenderView* rview, iMovable* movable,
-  	uint32 frustum_mask);
-
-  /**
-   * See imesh/object.h for specification. The default implementation
    * does nothing and always returns 0.
    * @@@ Note: in future it would be better that the default implementation
    * does nothing as this function has to be implemented by mesh objects.
@@ -124,13 +117,6 @@ public:
     num = 0;
     return 0;
   }
-
-  /**
-   * See imesh/object.h for specification. There is no default
-   * implementation for this method.
-   */
-  virtual bool Draw (iRenderView* rview, iMovable* movable,
-  	csZBufMode zbufMode) = 0;
 
   /**
    * See imesh/object.h for specification. This function is handled

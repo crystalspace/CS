@@ -27,7 +27,6 @@
 #include "iengine/engine.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/material.h"
-#include "ivideo/vbufmgr.h"
 #include "iengine/material.h"
 #include "iengine/rview.h"
 #include "ivideo/txtmgr.h"
@@ -48,7 +47,6 @@ SCF_IMPLEMENT_IBASE (csTerrFuncObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iTerrFuncState)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrFuncObject::ObjectModel)

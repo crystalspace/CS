@@ -298,13 +298,11 @@ public:
    */
   float cosinus_factor;
 
-#ifndef CS_USE_OLD_RENDERER
   csWeakRef<iGraphics3D> r3d;
 
   csRefArray<iPolygonRenderer> polyRenderers;
 
   static csStringID texLightmapName;
-#endif
 
 public:
   csThingStatic (iBase* parent, csThingObjectType* thing_type);
@@ -531,10 +529,8 @@ public:
   } scfiObjectModel;
   friend class ObjectModel;
 
-#ifndef CS_USE_OLD_RENDERER
   void FillRenderMeshes (csDirtyAccessArray<csRenderMesh*>& rmeshes,
     const csArray<RepMaterial>& repMaterials, uint mixmode);
-#endif
 
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 };
@@ -602,18 +598,6 @@ private:
   /// Optional array of materials to replace.
   csArray<RepMaterial> replace_materials;
 
-#ifdef CS_USE_OLD_RENDERER
-  /**
-   * @@@OR@@@
-   * If we are a detail object then this will contain a reference to a
-   * polygon buffer for the 3D renderer. This can be used by DrawPolygonMesh.
-   */
-  iPolygonBuffer* polybuf;
-  /**
-   * An array of materials that are used with the polygon buffer.
-   */
-  csArray<iMaterialWrapper*> polybuf_materials;
-#endif
   /**
    * An array of materials that must be visited before use.
    */
@@ -666,13 +650,9 @@ private:
   bool IsLmDirty() { return internalFlags.Check (8); }
   void SetLmDirty (bool b) { internalFlags.SetBool (8, b); }
 
-#ifndef CS_USE_OLD_RENDERER
   csRenderMeshHolderMultiple rmHolder;
 
   void PrepareRenderMeshes (csDirtyAccessArray<csRenderMesh*>& renderMeshes);
-#else
-  int clip_portal, clip_plane, clip_z_plane;
-#endif
 
   // Mixmode for rendering.
   uint mixmode;
@@ -840,20 +820,6 @@ public:
    * Get a write object for a vis culling system.
    */
   iPolygonMesh* GetWriteObject ();
-
-  //----------------------------------------------------------------------
-  // Drawing
-  //----------------------------------------------------------------------
-
-  /**
-   * Test if this thing is visible or not.
-   */
-  bool DrawTest (iRenderView* rview, iMovable* movable, uint32 frustum_mask);
-
-  /**
-   * Draw this thing given a view and transformation.
-   */
-  bool Draw (iRenderView* rview, iMovable* movable, csZBufMode zMode);
 
   //----------------------------------------------------------------------
   // Lighting
@@ -1096,16 +1062,6 @@ public:
     virtual iMeshObjectFactory* GetFactory () const;
     virtual csFlags& GetFlags () { return scfParent->flags; }
     virtual csPtr<iMeshObject> Clone () { return 0; }
-    virtual bool DrawTest (iRenderView* rview, iMovable* movable,
-    	uint32 frustum_mask)
-    {
-      return scfParent->DrawTest (rview, movable, frustum_mask);
-    }
-    virtual bool Draw (iRenderView* rview, iMovable* movable,
-    	csZBufMode zMode)
-    {
-      return scfParent->Draw (rview, movable, zMode);
-    }
     virtual csRenderMesh** GetRenderMeshes (int &n, iRenderView* rview, 
       iMovable* movable, uint32 frustum_mask)
     {

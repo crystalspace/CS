@@ -333,14 +333,7 @@ void csProcFire::Animate (csTicks /*current_time*/)
 	*d++ = palette[col].blue;
 	*d++ = 0xff;
       }
-#ifndef CS_USE_OLD_RENDERER
     tex->GetTextureHandle ()->Blit (0, 0, mat_w,mat_h, blitbuf);
-#else
-    g3d->SetRenderTarget (tex->GetTextureHandle ());
-    if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
-    g2d->Blit (0, 0, mat_w, mat_h, blitbuf);
-    g3d->FinishDraw ();
-#endif
   }
   curimg = newimg;
 #endif

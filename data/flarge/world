@@ -157,9 +157,9 @@
     </variables>
     <shaders>
       <shader><file>/shader/reflect.xml</file></shader>
-      <shader><file>/shader/or_lighting_detail.xml</file></shader>
-      <shader><file>/shader/or_lighting_detail_add.xml</file></shader>
-      <shader><file>/shader/or_lighting_detail_alpha.xml</file></shader>
+      <shader><file>/shader/std_lighting_detail.xml</file></shader>
+      <shader><file>/shader/std_lighting_detail_add.xml</file></shader>
+      <shader><file>/shader/std_lighting_detail_alpha.xml</file></shader>
     </shaders>
     <materials>
         <material name="tree">
@@ -173,7 +173,7 @@
         </material>
         <material name="mosholes">
             <texture>mosholes.gif</texture>
-	    <shader type="OR compatibility">or_lighting_detail</shader>
+	    <shader type="standard">std_lighting_detail</shader>
 	    <shadervar name="tex detail" type="texture">mosaic-detail</shadervar>
 	    <shadervar name="detail texture scale" type="vector2">10,10</shadervar>
         </material>
@@ -190,7 +190,7 @@
                     <tiling />
                 </mixmode>
             </layer>
-	    <shader type="OR compatibility">or_lighting_detail_add</shader>
+	    <shader type="standard">std_lighting_detail_add</shader>
 	    <shadervar name="tex detail" type="texture">spark</shadervar>
 	    <shadervar name="detail texture scale" type="vector2">20,20</shadervar>
         </material>
@@ -210,14 +210,14 @@
                     <tiling />
                 </mixmode>
             </layer>
-	    <shader type="OR compatibility">or_lighting_detail_alpha</shader>
+	    <shader type="standard">std_lighting_detail_alpha</shader>
 	    <shadervar name="tex detail" type="texture">spark</shadervar>
 	    <shadervar name="detail texture scale" type="vector2">10,10</shadervar>
 	    <shadervar name="detail texture color" type="vector4">1,1,1,0.25</shadervar>
         </material>
         <material name="mosaic">
             <texture>mosaic.gif</texture>
-	    <shader type="OR compatibility">or_lighting_detail</shader>
+	    <shader type="standard">std_lighting_detail</shader>
 	    <shadervar name="tex detail" type="texture">mosaic-detail</shadervar>
 	    <shadervar name="detail texture scale" type="vector2">10,10</shadervar>
         </material>
@@ -310,7 +310,7 @@
 	</material>
 	<material name="carReflect">
 	    <texture>window.gif</texture>
-	    <shader type="OR compatibility">reflect</shader>
+	    <shader type="standard">reflect</shader>
 	    <shadervar name="cubemap" type="texture">reflection</shadervar>
 	</material>
     </materials>

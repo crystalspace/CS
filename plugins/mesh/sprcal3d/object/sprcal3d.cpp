@@ -25,7 +25,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/randomgen.h"
 #include "ivideo/graph3d.h"
-#include "ivideo/vbufmgr.h"
 #include "iengine/camera.h"
 #include "iengine/rview.h"
 #include "iengine/movable.h"
@@ -704,9 +703,6 @@ SCF_IMPLEMENT_IBASE (csSpriteCal3DMeshObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLightingInfo)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSpriteCal3DState)
-  #ifdef CS_USE_OLD_RENDERER
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
-  #endif // CS_USE_OLD_RENDERER
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLODControl)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
 SCF_IMPLEMENT_IBASE_END
@@ -722,13 +718,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSpriteCal3DMeshObject::PolyMesh)
   SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-#ifdef CS_USE_OLD_RENDERER
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSpriteCal3DMeshObject::eiVertexBufferManagerClient)
-  SCF_IMPLEMENTS_INTERFACE (iVertexBufferManagerClient)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-#else
-#endif // CS_USE_OLD_RENDERER
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSpriteCal3DMeshObject::LODControl)
   SCF_IMPLEMENTS_INTERFACE (iLODControl)
@@ -749,9 +738,6 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSpriteCal3DState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLODControl);
-#ifdef CS_USE_OLD_RENDERER
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
-#endif
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
 
@@ -772,11 +758,9 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
 //  }
   vertices_allocated = false;
   
-#ifndef CS_USE_OLD_RENDERER
   strings =  CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
     "crystalspace.shared.stringset", iStringSet);
   G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-#endif
 
   // set the material set of the whole model
   vis_cb = 0;
@@ -784,9 +768,9 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
   is_idling = false;
   meshes_colors = 0;
   is_initialized = 0;
-#ifndef CS_USE_OLD_RENDERER
+
   rmeshesSetup = false;
-#endif
+
   meshVersion = 0;
   bboxVersion = (uint)-1;
   default_idle_anim = -1;
@@ -809,22 +793,12 @@ csSpriteCal3DMeshObject::~csSpriteCal3DMeshObject ()
 
   if (arrays_initialized)
   {
-#ifdef CS_USE_OLD_RENDERER
-    delete [] meshes;
-    if (vbuf)
-    {
-      vbufmgr->RemoveClient (&scfiVertexBufferManagerClient);
-    }
-#endif
     delete [] is_initialized;
     delete [] meshes_colors;
   }
 
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
-#ifdef CS_USE_OLD_RENDERER
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
-#endif
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiLODControl);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiSpriteCal3DState);
   SCF_DESTRUCT_IBASE ();
@@ -885,33 +859,6 @@ void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
   }
 }
 
-#ifdef CS_USE_OLD_RENDERER
-void csSpriteCal3DMeshObject::SetupVertexBuffer (int mesh,
-	int submesh, int num_vertices,
-	int num_triangles, csTriangle *triangles)
-{
-  if (!meshes[mesh][submesh].buffers[0])
-  {
-    // @@@ priority should be a parameter.
-    if (!vbuf)
-    {
-      iObjectRegistry* object_reg = ((csSpriteCal3DMeshObjectFactory*)factory)
-	->object_reg;
-      csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
-      vbufmgr = g3d->GetVertexBufferManager ();
-      vbuf = vbufmgr->CreateBuffer (0);
-      vbufmgr->AddClient (&scfiVertexBufferManagerClient);
-    }
-    meshes[mesh][submesh].buffers[0] = vbuf;
-
-    meshes[mesh][submesh].vertex_fog = new G3DFogInfo[num_vertices];
-    meshes[mesh][submesh].num_triangles = num_triangles;
-    meshes[mesh][submesh].triangles = new csTriangle[num_triangles];
-    memcpy (meshes[mesh][submesh].triangles, triangles,
-    	sizeof(csTriangle)*num_triangles);
-  }
-}
-#endif
 
 void csSpriteCal3DMeshObject::GetRadius (csVector3& rad, csVector3& cent)
 {
@@ -1201,19 +1148,12 @@ void csSpriteCal3DMeshObject::SetupObjectSubmesh(int index)
     return;
 
   int submeshes = calModel.getMesh(index)->getSubmeshCount();
-#ifndef CS_USE_OLD_RENDERER
   renderMeshes[index].SetLength (submeshes);
-#endif
+
   for (int j=0; j<submeshes; j++)
   {
     bool flag = false;
     is_initialized[index].Push(flag);
-#ifdef CS_USE_OLD_RENDERER
-    G3DTriangleMesh sample;
-    sample.num_vertices_pool = 1;  // no blending
-    sample.buffers[0]  = 0; // NULL
-    meshes[index].Push(sample);
-#endif
     meshes_colors[index].Push(0);
   }
 }
@@ -1226,14 +1166,9 @@ void csSpriteCal3DMeshObject::SetupObject()
   if (!arrays_initialized)
   {
     arrays_initialized = true;
-#ifdef CS_USE_OLD_RENDERER
-    meshes = new csArray<G3DTriangleMesh> [ meshCount ];
-#endif
     is_initialized = new csArray<bool> [ meshCount ];
     meshes_colors  = new csArray<csColor*> [ meshCount ];
-#ifndef CS_USE_OLD_RENDERER
     renderMeshes.SetLength (meshCount);
-#endif
     
     for (int index=0; index<meshCount; index++)
     {
@@ -1255,20 +1190,8 @@ void csSpriteCal3DMeshObject::SetupObject()
 
 	//	  delete[] meshes[index][j].triangles;
 	//	  delete[] meshes[index][j].vertex_fog;
-#ifdef CS_USE_OLD_RENDERER
-	meshes[index][j].triangles = 0;
-	meshes[index][j].vertex_fog = 0;
-#endif
 
 //	factory->GetObjectBoundingBox(object_bbox);  // initialize object_bbox here
-
-#ifdef CS_USE_OLD_RENDERER
-	meshes[index][j].morph_factor = 0.0f;
-	meshes[index][j].num_vertices_pool = 1;
-	meshes[index][j].do_morph_texels = false;
-	meshes[index][j].do_morph_colors = false;
-	meshes[index][j].vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
-#endif
       }
     }
   }
@@ -1664,71 +1587,10 @@ void csSpriteCal3DMeshObject::PositionChild (iMeshObject* child,
   }
 }
 
-bool csSpriteCal3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable,
-	uint32 frustum_mask)
-{
-  SetupObject ();
-
-  iCamera* camera = rview->GetCamera ();
-
-  // First create the transformation from object to camera space directly:
-  //   W = Mow * O - Vow;
-  //   C = Mwc * (W - Vwc)
-  // ->
-  //   C = Mwc * (Mow * O - Vow - Vwc)
-  //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
-  csReversibleTransform tr_o2c;
-  tr_o2c = camera->GetTransform ();
-  if (!movable->IsFullTransformIdentity ())
-    tr_o2c /= movable->GetFullTransform ();
-
-  //  float scale = factory->GetRenderScale();
-  //  csMatrix3 scale_mat(scale,0,0,0,scale,0,0,0,scale);
-
-  //  tr_o2c *= scale_mat;
-
-  int clip_portal, clip_plane, clip_z_plane;
-  rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
-      clip_z_plane);
-
-#ifdef CS_USE_OLD_RENDERER
-  iGraphics3D* g3d = rview->GetGraphics3D ();
-  g3d->SetObjectToCamera (&tr_o2c);
-  int meshCount;
-  meshCount = calModel.getRenderer()->getMeshCount();
-  for (int i=0; i<meshCount; i++)
-  {
-    if (!calModel.getMesh(i))
-      continue;
-    for (int j=0; j<calModel.getMesh(i)->getSubmeshCount(); j++)
-    {
-      meshes[i][j].clip_portal = clip_portal;
-      meshes[i][j].clip_plane = clip_plane;
-      meshes[i][j].clip_z_plane = clip_z_plane;
-      meshes[i][j].do_mirror = camera->IsMirrored ();
-    }
-  }
-#endif
-
-// This is now done at rendertime each frame.
-//  if (factory->light_mgr)
-//  {
-//    const csArray<iLight*>& relevant_lights = factory->light_mgr
-//    	->GetRelevantLights (logparent, -1, false);
-//    UpdateLighting (relevant_lights, movable);
-//  }
-
-  return true;
-}
-
 csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n, 
 	iRenderView* rview,
 	iMovable* movable, uint32 frustum_mask)
 {
-#ifdef CS_USE_OLD_RENDERER
-  n = 0;
-  return 0;
-#else
   SetupObject ();
 
   iCamera* camera = rview->GetCamera ();
@@ -1791,70 +1653,8 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
 
   /*n = allRenderMeshes.Length();
   return allRenderMeshes.GetArray();*/
-#endif
 }
 
-#ifdef CS_USE_OLD_RENDERER
-bool csSpriteCal3DMeshObject::DrawSubmesh (iGraphics3D* g3d,
-					   iRenderView* rview,
-					   CalRenderer *pCalRenderer,
-					   int mesh, 
-					   int submesh,
-					   iMaterialWrapper *material)
-{
-  // get the transformed vertices of the submesh
-  static float meshVertices[30000][3];
-  int vertexCount;
-  vertexCount = pCalRenderer->getVertices(&meshVertices[0][0]);
-
-  GetObjectBoundingBox (object_bbox, 0, (csVector3 *)meshVertices,vertexCount);
-
-  // get the texture coordinates of the submesh
-  // (only for the first map as example, others can be accessed in the
-  // same way though)
-  static float meshTextureCoordinates[30000][2];
-  int textureCoordinateCount;
-  textureCoordinateCount = pCalRenderer->getTextureCoordinates(
-  	0, &meshTextureCoordinates[0][0]);
-
-  // get the stored texture identifier
-  // (only for the first map as example, others can be accessed in the same
-  // way though)
-  //    iMaterialWrapper *material;
-  //    material = (iMaterialWrapper *)pCalRenderer->getMapUserData(0);
-
-  // get the faces of the submesh
-  static int meshFaces[50000][3];
-  int faceCount;
-  faceCount = pCalRenderer->getFaces(&meshFaces[0][0]);
-
-  SetupVertexBuffer (mesh, submesh, vertexCount, faceCount,
-  	(csTriangle *)meshFaces);
-  if (material) material->Visit ();
-
-  meshes[mesh][submesh].mat_handle = (material)?material->GetMaterialHandle():0;
-  meshes[mesh][submesh].use_vertex_color = true;
-  meshes[mesh][submesh].mixmode = /* MixMode  | */ CS_FX_COPY;
-  meshes[mesh][submesh].vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
-
-  CS_ASSERT (!vbuf->IsLocked ());
-
-  vbufmgr->LockBuffer (vbuf,
-    (csVector3 *)meshVertices,
-    (csVector2 *)meshTextureCoordinates,
-    meshes_colors[mesh][submesh],
-    vertexCount,
-    0, object_bbox);
-
-  rview->CalculateFogMesh (g3d->GetObjectToCamera (), meshes[mesh][submesh]);
-  g3d->DrawTriangleMesh (meshes[mesh][submesh]);
-
-  vbufmgr->UnlockBuffer (vbuf);
-  return true;
-}
-#endif
-
-#ifndef CS_USE_OLD_RENDERER
 void csSpriteCal3DMeshObject::SetupRenderMeshes ()
 {
   if (rmeshesSetup)
@@ -1897,63 +1697,6 @@ void csSpriteCal3DMeshObject::SetupRenderMeshes ()
 
   rmeshesSetup = true;
 }
-#endif
-
-bool csSpriteCal3DMeshObject::Draw (iRenderView* rview, iMovable* movable,
-				    csZBufMode mode)
-{
-#ifdef CS_USE_OLD_RENDERER
-  if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
-
-  iGraphics3D* g3d = rview->GetGraphics3D ();
-
-  CalRenderer *pCalRenderer;
-  pCalRenderer = calModel.getRenderer();
-
-  // begin the rendering loop
-  if(!pCalRenderer->beginRendering())
-  {
-    return false;
-  }
-
-  UpdateLighting (movable, pCalRenderer);
-
-  // Prepare for rendering.
-  g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
-
-
-  int meshCount;
-  meshCount = pCalRenderer->getMeshCount();
-
-  // loop through all meshes of the model
-  int meshId;
-  for(meshId = 0; meshId < meshCount ; meshId++)
-  {
-    // get the number of submeshes
-    int submeshCount;
-    submeshCount = pCalRenderer->getSubmeshCount(meshId);
-
-    // loop through all submeshes of the mesh
-    int submeshId;
-    for(submeshId = 0; submeshId < submeshCount; submeshId++)
-    {
-      // select mesh and submesh for further data access
-      if(pCalRenderer->selectMeshSubmesh(meshId, submeshId))
-      {
-	iMaterialWrapper *mat = (iMaterialWrapper *)calModel.getVectorMesh()[
-		meshId]->getSubmesh(submeshId)->getCoreMaterialId();
-	DrawSubmesh(g3d,rview,pCalRenderer,meshId,submeshId,mat);
-      }
-    }
-  }
-
-  pCalRenderer->endRendering();
-
-  return true;
-#else
-  return false;
-#endif
-}
 
 bool csSpriteCal3DMeshObject::Advance (csTicks current_time)
 {
@@ -1986,17 +1729,6 @@ csMeshedPolygon* csSpriteCal3DMeshObject::PolyMesh::GetPolygons ()
 {
   return 0;
 }
-
-#ifdef CS_USE_OLD_RENDERER
-void csSpriteCal3DMeshObject::eiVertexBufferManagerClient::ManagerClosing ()
-{
-  if (scfParent->vbuf)
-  {
-    scfParent->vbuf = 0;
-    scfParent->vbufmgr = 0;
-  }
-}
-#endif
 
 int csSpriteCal3DMeshObject::GetAnimCount()
 {
@@ -2351,38 +2083,6 @@ bool csSpriteCal3DMeshObject::DetachCoreMesh(const char *meshname)
 
 bool csSpriteCal3DMeshObject::DetachCoreMesh (int mesh_id)
 {
-#ifdef CS_USE_OLD_RENDERER
-  if (!calModel.detachMesh(mesh_id))
-    return false;
-
-  // Now that the submesh is removed from the model, we must
-  // remove all the CS rendering structures as well.
-  size_t i;
-  for (i=0; i<attached_ids.Length(); i++)
-  {
-    if (attached_ids[i] == mesh_id)
-    {
-      meshes[i].DeleteAll();
-      is_initialized[i].DeleteAll();
-      meshes_colors[i].DeleteAll();
-
-      size_t j;
-      for (j=i+1; j<attached_ids.Length(); j++)
-      {
-        meshes[j-1] = meshes[j];
-        is_initialized[j-1] = is_initialized[j];
-        meshes_colors[j-1]  = meshes_colors[j];
-      }
-      meshes[j-1].DeleteAll();
-      is_initialized[j-1].DeleteAll();
-      meshes_colors[j-1].DeleteAll();
-
-      attached_ids.DeleteIndex(i);
-      vertices_allocated = false;
-      break;
-    }
-  }
-#endif
   return true;
 }
 
@@ -2460,14 +2160,10 @@ bool csSpriteCal3DMeshObject::SetMaterial(const char *mesh_name,
       for (j=0; j<mesh->getSubmeshCount(); j++)
       {
         mesh->getSubmesh(j)->setCoreMaterialId((int)mat);
-#ifndef CS_USE_OLD_RENDERER
         csRenderMesh *rm = &renderMeshes[attached_ids[i]][j];
         rm->material = mat;
-#endif
       }
-#ifndef CS_USE_OLD_RENDERER
       rmHolder.Clear();
-#endif
       return true;
     }
   }
@@ -2487,7 +2183,6 @@ float csSpriteCal3DMeshObject::GetTimeFactor()
 
 //----------------------------------------------------------------------
 
-#ifndef CS_USE_OLD_RENDERER
 SCF_IMPLEMENT_IBASE(csSpriteCal3DMeshObject::BaseAccessor)
 SCF_IMPLEMENT_IBASE_END
 
@@ -2592,7 +2287,6 @@ void csSpriteCal3DMeshObject::BaseAccessor::PreGetValue (
   //variable->SetValue (meshobj->GetRenderBuffer (mesh, submesh,
   //  variable->Name));
 }
-#endif
 
 //----------------------------------------------------------------------
 
@@ -2647,10 +2341,8 @@ csPtr<iMeshObjectFactory> csSpriteCal3DMeshObjectType::NewFactory ()
     this, object_reg);
   cm->vc = vc;
   cm->engine = engine;
-#ifndef CS_USE_OLD_RENDERER
   cm->g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   //cm->anon_buffers = new csAnonRenderBufferManager (object_reg);
-#endif
   csRef<iMeshObjectFactory> ifact (
     SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
   cm->DecRef ();

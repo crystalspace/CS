@@ -51,7 +51,6 @@
 #include "csutil/timer.h"
 #include "csutil/weakref.h"
 #include "ivideo/txtmgr.h"
-#include "ivideo/vbufmgr.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "iengine/shadcast.h"
@@ -189,9 +188,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csThingStatic::ObjectModel)
   SCF_IMPLEMENTS_INTERFACE(iObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-#ifndef CS_USE_OLD_RENDERER
 csStringID csThingStatic::texLightmapName = csInvalidStringID;
-#endif
 
 csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
 	last_range (0, -1),
@@ -221,7 +218,6 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
   logparent = 0;
   thingmesh_type = thing_type;
 
-#ifndef CS_USE_OLD_RENDERER
   r3d = CS_QUERY_REGISTRY (thing_type->object_reg, iGraphics3D);
 
   if ((texLightmapName == csInvalidStringID))
@@ -232,7 +228,6 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
 
     texLightmapName = strings->Request ("tex lightmap");
   }
-#endif
 }
 
 csThingStatic::~csThingStatic ()
@@ -1057,7 +1052,6 @@ void csThingStatic::GetRadius (csVector3 &rad, csVector3 &cent)
   cent = b.GetCenter ();
 }
 
-#ifndef CS_USE_OLD_RENDERER
 void csThingStatic::FillRenderMeshes (
 	csDirtyAccessArray<csRenderMesh*>& rmeshes,
 	const csArray<RepMaterial>& repMaterials,
@@ -1121,9 +1115,7 @@ void csThingStatic::FillRenderMeshes (
 
     rmeshes.Push (rm);
   }
-
 }
-#endif // CS_USE_OLD_RENDERER
 
 int csThingStatic::FindPolygonByName (const char* name)
 {
@@ -1588,9 +1580,6 @@ csThing::csThing (iBase *parent, csThingStatic* static_data) :
 
   static_data_nr = 0xfffffffd;	// (static_nr of csThingStatic is init to -1)
 
-#ifdef CS_USE_OLD_RENDERER
-  polybuf = 0;
-#endif // CS_USE_OLD_RENDERER
   current_visnr = 1;
 
   SetLmDirty (true);
@@ -1598,10 +1587,6 @@ csThing::csThing (iBase *parent, csThingStatic* static_data) :
 
 csThing::~csThing ()
 {
-#ifdef CS_USE_OLD_RENDERER
-  if (polybuf) polybuf->DecRef ();
-#endif // CS_USE_OLD_RENDERER
-
   ClearLMs ();
 
   if (wor_verts != static_data->obj_verts)
@@ -1668,10 +1653,6 @@ char* csThing::GenerateCacheName ()
 
 void csThing::MarkLightmapsDirty ()
 {
-#ifdef CS_USE_OLD_RENDERER
-  if (polybuf)
-    polybuf->MarkLightmapsDirty ();
-#endif // CS_USE_OLD_RENDERER
   SetLmDirty (true);
   light_version++;
 }
@@ -1845,16 +1826,7 @@ void csThing::Prepare ()
       if (cached_movable) movablenr = cached_movable->GetUpdateNumber ()-1;
       else movablenr--;
 
-#ifdef CS_USE_OLD_RENDERER
-      if (polybuf)
-      {
-	polybuf->DecRef ();
-	polybuf = 0;
-      }
-      polybuf_materials.DeleteAll ();
-#else
       rmHolder.Clear();
-#endif // CS_USE_OLD_RENDERER
 
       materials_to_visit.DeleteAll ();
 
@@ -1885,16 +1857,7 @@ void csThing::Prepare ()
   if (cached_movable) movablenr = cached_movable->GetUpdateNumber ()-1;
   else movablenr--;
 
-#ifdef CS_USE_OLD_RENDERER
-  if (polybuf)
-  {
-    polybuf->DecRef ();
-    polybuf = 0;
-  }
-  polybuf_materials.DeleteAll ();
-#else
   rmHolder.Clear();
-#endif // CS_USE_OLD_RENDERER
 
   materials_to_visit.DeleteAll ();
 
@@ -2000,14 +1963,6 @@ const csPlane3& csThing::GetPolygonWorldPlaneNoCheck (int polygon_idx) const
 
 void csThing::InvalidateThing ()
 {
-#ifdef CS_USE_OLD_RENDERER
-  if (polybuf)
-  {
-    polybuf->DecRef ();
-    polybuf = 0;
-  }
-  polybuf_materials.DeleteAll ();
-#endif // CS_USE_OLD_RENDERER
   materials_to_visit.DeleteAll ();
 
   SetPrepared (false);
@@ -2058,326 +2013,21 @@ struct MatPol
   csPolygon3D *poly;
 };
 
-#ifdef CS_USE_OLD_RENDERER
-static int ComparePointer (iMaterialWrapper* const& item1,
-			   iMaterialWrapper* const& item2)
-{
-  if (item1 < item2) return -1;
-  if (item1 > item2) return 1;
-  return 0;
-}
-#endif
-
-#ifndef __USE_MATERIALS_REPLACEMENT__
-
 void csThing::PreparePolygonBuffer ()
 {
-#ifdef CS_USE_OLD_RENDERER
-  if (polybuf) return;
-
-  struct csPolyLMCoords
-  {
-    float u1, v1, u2, v2;
-  };
-
-  iVertexBufferManager *vbufmgr = static_data->thing_type->G3D->
-    GetVertexBufferManager ();
-  polybuf = vbufmgr->CreatePolygonBuffer ();
-
-  csDirtyAccessArray<int> verts;
-
-  polybuf->SetVertexArray (static_data->obj_verts, static_data->num_vertices);
-
-  polybuf_materials.DeleteAll ();
-  materials_to_visit.DeleteAll ();
-  polybuf_materials.SetCapacity (
-  	litPolys.Length () + unlitPolys.Length ());
-
-  size_t i;
-  for (i = 0; i < litPolys.Length (); i++)
-  {
-    int mi = polybuf->GetMaterialCount ();
-    polybuf_materials.Push (litPolys[i]->material);
-    if (litPolys[i]->material->IsVisitRequired ())
-      materials_to_visit.Push (litPolys[i]->material);
-    polybuf->AddMaterial (litPolys[i]->material->GetMaterialHandle ());
-    size_t j;
-    for (j = 0; j < litPolys[i]->polys.Length (); j++)
-    {
-      verts.DeleteAll ();
-
-      csPolygon3D *poly = litPolys[i]->polys[j];
-      csPolygon3DStatic *spoly = poly->GetStaticPoly ();
-      csPolyTextureMapping *tmapping = spoly->GetTextureMapping ();
-
-      int v;
-      for (v = 0; v < spoly->GetVertexCount (); v++)
-      {
-	const int vnum = spoly->GetVertexIndices ()[v];
-	verts.Push (vnum);
-      }
-
-      polybuf->AddPolygon (spoly->GetVertexCount (), verts.GetArray (), 
-	tmapping, spoly->GetObjectPlane (), 
-	mi, litPolys[i]->lightmaps[j]);
-    }
-  }
-
-  for (i = 0; i < unlitPolys.Length (); i++)
-  {
-    int mi = polybuf->GetMaterialCount ();
-    polybuf_materials.Push (unlitPolys[i]->material);
-    if (unlitPolys[i]->material->IsVisitRequired ())
-      materials_to_visit.Push (unlitPolys[i]->material);
-    polybuf->AddMaterial (unlitPolys[i]->material->GetMaterialHandle ());
-    size_t j;
-    for (j = 0; j < unlitPolys[i]->polys.Length (); j++)
-    {
-      verts.DeleteAll ();
-
-      csPolygon3D *poly = unlitPolys[i]->polys[j];
-      csPolygon3DStatic *spoly = poly->GetStaticPoly ();
-      csPolyTextureMapping *tmapping = spoly->GetTextureMapping ();
-
-      int v;
-      for (v = 0; v < spoly->GetVertexCount (); v++)
-      {
-	const int vnum = spoly->GetVertexIndices ()[v];
-	verts.Push (vnum);
-      }
-
-      polybuf->AddPolygon (spoly->GetVertexCount (), verts.GetArray (), 
-	tmapping, spoly->GetObjectPlane (), 
-	mi, 0);
-    }
-  }
-
-  // Optimize the array of materials to visit.
-  materials_to_visit.Sort (ComparePointer);	// Sort on pointer.
-  i = 0;
-  int ni = 0;
-  iMaterialWrapper* prev = 0;
-  for (i = 0 ; i < materials_to_visit.Length () ; i++)
-  {
-    if (materials_to_visit[i] != prev)
-    {
-      prev = materials_to_visit[i];
-      materials_to_visit[ni++] = prev;
-    }
-  }
-  materials_to_visit.Truncate (ni);
-
-
-  polybuf->Prepare ();
-#endif // CS_USE_OLD_RENDERER
 }
-
-#else // if __USE_MATERIALS_REPLACEMENT__
-
-void csThing::PreparePolygonBuffer ()
-{
-#ifdef CS_USE_OLD_RENDERER
-  //
-  //If 'polybuf' is null, create it.
-  if (!polybuf)
-  {    
-    struct csPolyLMCoords
-    {
-      float u1, v1, u2, v2;
-    };
-    
-    iVertexBufferManager *vbufmgr = static_data->thing_type->G3D->
-      GetVertexBufferManager ();
-    polybuf = vbufmgr->CreatePolygonBuffer ();
-    
-    csDirtyAccessArray<int> verts;
-    
-    polybuf->SetVertexArray (static_data->obj_verts, static_data->num_vertices);
-    
-    polybuf_materials.DeleteAll ();
-    materials_to_visit.DeleteAll ();
-    polybuf_materials.SetCapacity (
-      litPolys.Length () + unlitPolys.Length ());
-    
-    int i;
-    for (i = 0; i < litPolys.Length (); i++)
-    {
-      int mi = polybuf->GetMaterialCount ();
-      csRef<iMaterialWrapper> l_mat = FindRealMaterial (litPolys[i]->material);
-      if (l_mat == 0)
-        l_mat = litPolys[i]->material;
-      polybuf_materials.Push (l_mat);
-      if (l_mat->IsVisitRequired ())
-        materials_to_visit.Push (l_mat);
-      polybuf->AddMaterial (l_mat->GetMaterialHandle ());
-      
-      int j;
-      for (j = 0; j < litPolys[i]->polys.Length (); j++)
-      {
-        verts.DeleteAll ();
-        
-        csPolygon3D *poly = litPolys[i]->polys[j];
-        csPolygon3DStatic *spoly = poly->GetStaticPoly ();
-        csPolyTextureMapping *tmapping = spoly->GetTextureMapping ();
-        
-        int v;
-        for (v = 0; v < spoly->GetVertexCount (); v++)
-        {
-          const int vnum = spoly->GetVertexIndices ()[v];
-          verts.Push (vnum);
-        }
-        
-        polybuf->AddPolygon (spoly->GetVertexCount (), verts.GetArray (), 
-          tmapping, spoly->GetObjectPlane (), 
-          mi, litPolys[i]->lightmaps[j]);
-      }
-    }
-    
-    for (i = 0; i < unlitPolys.Length (); i++)
-    {
-      int mi = polybuf->GetMaterialCount ();
-      csRef<iMaterialWrapper> l_mat = FindRealMaterial (unlitPolys[i]->material);
-      if (l_mat == 0)
-        l_mat = unlitPolys[i]->material;
-      polybuf_materials.Push (l_mat);
-      if (l_mat->IsVisitRequired ())
-        materials_to_visit.Push (l_mat);
-      polybuf->AddMaterial (l_mat->GetMaterialHandle ());
-      int j;
-      for (j = 0; j < unlitPolys[i]->polys.Length (); j++)
-      {
-        verts.DeleteAll ();
-        
-        csPolygon3D *poly = unlitPolys[i]->polys[j];
-        csPolygon3DStatic *spoly = poly->GetStaticPoly ();
-        csPolyTextureMapping *tmapping = spoly->GetTextureMapping ();
-        
-        int v;
-        for (v = 0; v < spoly->GetVertexCount (); v++)
-        {
-          const int vnum = spoly->GetVertexIndices ()[v];
-          verts.Push (vnum);
-        }
-        
-        polybuf->AddPolygon (spoly->GetVertexCount (), verts.GetArray (), 
-          tmapping, spoly->GetObjectPlane (), 
-          mi, 0);
-      }//for
-    }//for
-
-    //
-    //
-    replaceMaterialChanged = false;
-  }//if
-  //
-  //If the 'polybuf' has not been recreated, then we check
-  //if the replace_materials array has been modified. In this case
-  //the updating of the materials in the 'polybuf' structure it's needed.
-  else if (replaceMaterialChanged)
-  {
-    int i;
-    for (i = 0; i < static_data->litPolys.Length (); i++)
-    {
-      csRef<iMaterialWrapper> l_mW1 = static_data->litPolys.Get (i)->material;
-      csRef<iMaterialWrapper> l_mW2 = FindRealMaterial (l_mW1);
-      if (l_mW2 != 0)
-      {
-        polybuf->SetMaterial (i, l_mW2->GetMaterialHandle ());
-      }//if
-      else
-      {
-        polybuf->SetMaterial (i, l_mW1->GetMaterialHandle ());
-      }//else
-    }//for
-
-    for (i = 0; i < static_data->unlitPolys.Length (); i++)
-    {
-      csRef<iMaterialWrapper> l_mW1 = static_data->unlitPolys.Get (i)->material;
-      csRef<iMaterialWrapper> l_mW2 = FindRealMaterial (l_mW1);
-      if (l_mW2 != 0)
-      {
-        polybuf->SetMaterial (i, l_mW2->GetMaterialHandle ());
-      }//if
-      else
-      {
-        polybuf->SetMaterial (i, l_mW1->GetMaterialHandle ());
-      }//else
-    }//for
-
-    replaceMaterialChanged = false;
-    replace_materials.ShrinkBestFit();
-  }//else if
-
-  //
-  // Optimize the array of materials to visit.
-  materials_to_visit.Sort (ComparePointer);	// Sort on pointer.
-  int i = 0;
-  int ni = 0;
-  iMaterialWrapper* prev = 0;
-  for (i = 0 ; i < materials_to_visit.Length () ; i++)
-  {
-    if (materials_to_visit[i] != prev)
-    {
-      prev = materials_to_visit[i];
-      materials_to_visit[ni++] = prev;
-    }
-  }
-  materials_to_visit.Truncate (ni);
-
-
-  polybuf->Prepare ();
-#endif // CS_USE_OLD_RENDERER
-}
-
-#endif // if __USE_MATERIALS_REPLACEMENT__
 
 void csThing::DrawPolygonArrayDPM (
   iRenderView *rview,
   iMovable *movable,
   csZBufMode zMode)
 {
-#ifdef CS_USE_OLD_RENDERER
-  PreparePolygonBuffer ();
 
-  iCamera *icam = rview->GetCamera ();
-  csReversibleTransform tr_o2c = icam->GetTransform ();
-  if (!movable->IsFullTransformIdentity ())
-    tr_o2c /= movable->GetFullTransform ();
-
-  G3DPolygonMesh mesh;
-  mesh.clip_portal = clip_portal;
-  mesh.clip_plane = clip_plane;
-  mesh.clip_z_plane = clip_z_plane;
-  rview->GetGraphics3D ()->SetObjectToCamera (&tr_o2c);
-  rview->GetGraphics3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zMode);
-
-  mesh.polybuf = polybuf;
-  size_t i;
-  for (i = 0 ; i < materials_to_visit.Length () ; i++)
-  {
-    materials_to_visit[i]->Visit ();
-  }
-
-  mesh.do_fog = false;
-  mesh.do_mirror = icam->IsMirrored ();
-  mesh.vertex_mode = G3DPolygonMesh::VM_WORLDSPACE;
-  mesh.vertex_fog = 0;
-  mesh.mixmode = mixmode;
-
-  rview->CalculateFogMesh (tr_o2c,mesh);
-  rview->GetGraphics3D ()->DrawPolygonMesh (mesh);
-#endif
 }
 
 void csThing::InvalidateMaterialHandles ()
 {
-#ifdef CS_USE_OLD_RENDERER
-  size_t i;
-  for (i = 0; i < polybuf_materials.Length (); i++)
-  {
-    polybuf->SetMaterial (i, polybuf_materials[i]->GetMaterialHandle ());
-  }
-#endif
+
 }
 
 // @@@ We need a better algorithm here. We should try
@@ -2595,35 +2245,6 @@ void PolyMeshHelper::ForceCleanup ()
   num_poly = -1;
 }
 
-//-------------------------------------------------------------------------
-
-bool csThing::DrawTest (iRenderView *rview, iMovable *movable,
-	uint32 frustum_mask)
-{
-  Prepare ();
-
-  //@@@ Ok?
-  cached_movable = movable;
-  WorUpdate ();
-
-#ifdef CS_USE_OLD_RENDERER
-  rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
-  	clip_z_plane);
-#endif
-
-  return true;
-}
-
-bool csThing::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
-{
-  PrepareLMs ();
-  UpdateDirtyLMs ();
-
-  DrawPolygonArrayDPM (rview, movable, zMode);
-
-  return true;                                  // @@@@ RETURN correct vis info
-}
-
 //----------------------------------------------------------------------
 
 void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
@@ -2809,8 +2430,6 @@ void csThing::PrepareLighting ()
   PrepareLMs ();
 }
 
-#ifndef CS_USE_OLD_RENDERER
-
 void csThing::PrepareRenderMeshes (
   csDirtyAccessArray<csRenderMesh*>& renderMeshes)
 {
@@ -2843,30 +2462,20 @@ void csThing::PrepareRenderMeshes (
 
 }
 
-#endif
-
 void csThing::PrepareForUse ()
 {
-#ifdef __USE_MATERIALS_REPLACEMENT__
-  Prepare ();
-  ClearLMs ();
-  PrepareLMs ();
-  PreparePolygonBuffer ();
-#else // __USE_MATERIALS_REPLACEMENT__
   Prepare ();
   PreparePolygonBuffer ();
   PrepareLMs ();
 
   UpdateDirtyLMs ();
-#endif // __USE_MATERIALS_REPLACEMENT__
-#ifndef CS_USE_OLD_RENDERER
+
   csDirtyAccessArray<csRenderMesh*>& renderMeshes =
     rmHolder.GetUnusedMeshes (0);
   if (renderMeshes.Length() == 0)
   {
     PrepareRenderMeshes (renderMeshes);
   }
-#endif
 }
 
 #define DO_TIMING 0
@@ -2878,7 +2487,6 @@ void csThing::PrepareForUse ()
 csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview, 
                                          iMovable* movable, uint32 frustum_mask)
 {
-#ifndef CS_USE_OLD_RENDERER
 
 #if DO_TIMING
 struct timeval tv1, tv2, tv3, tv4, tv5, tv6;
@@ -2981,9 +2589,6 @@ tv5.tv_usec-tv4.tv_usec, tv6.tv_usec-tv5.tv_usec, tv6.tv_usec - tv1.tv_usec);
 #endif
 
   return renderMeshes.GetArray ();
-#else
-  return 0;
-#endif
 }
 
 void csThing::PrepareLMs ()

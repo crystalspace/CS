@@ -29,7 +29,6 @@
 #include "iutil/comp.h"
 #include "csgeom/objmodel.h"
 #include "ivideo/graph3d.h"
-#include "ivideo/vbufmgr.h"
 #include "igeom/polymesh.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/rendermesh.h"
@@ -43,7 +42,6 @@ struct iObjectRegistry;
 struct iEngine;
 class csBallMeshObjectFactory;
 class csColor;
-class G3DFogInfo;
 
 /**
  * Ball version of mesh object.
@@ -79,7 +77,6 @@ private:
   csBox3 object_bbox;
   csFlags flags;
 
-#ifndef CS_USE_OLD_RENDERER
   unsigned int* ball_indices;
   int ball_triangles;
   
@@ -101,11 +98,6 @@ private:
   csRef<csShaderVariableContext> svcontext;
   csStringID vertex_name, texel_name, normal_name, color_name, index_name;
 
-#else
-  csRef<iVertexBuffer> vbuf;
-  iVertexBufferManager* vbufmgr;
-  G3DTriangleMesh top_mesh;
-#endif
   /**
    * Camera space bounding box is cached here.
    * GetCameraBoundingBox() will check the current camera number from the
@@ -126,25 +118,10 @@ private:
    */
   void SetupObject ();
 
-#ifndef CS_USE_OLD_RENDERER
+
   /// Generate a mesh with a sphere.
   void GenerateSphere (int num_circle);
-#else
-  /// Generate a mesh with a sphere.
-  void GenerateSphere (int num_circle, G3DTriangleMesh& mesh,
-    csVector3*& normals);
 
-  /// retrieve a vertexbuffer from the manager if not done already
-  void SetupVertexBuffer ();
-
-  /// interface to receive state of vertexbuffermanager
-  struct eiVertexBufferManagerClient : public iVertexBufferManagerClient
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csBallMeshObject);
-    virtual void ManagerClosing ();
-  }scfiVertexBufferManagerClient;
-  friend struct eiVertexBufferManagerClient;
-#endif
 public:
   /// Constructor.
   csBallMeshObject (iMeshObjectFactory* factory);
@@ -250,10 +227,7 @@ public:
   virtual csRenderMesh **GetRenderMeshes (int &num, iRenderView* rview, 
     iMovable* movable, uint32 frustum_mask);
 
-#ifdef CS_USE_OLD_RENDERER
-  int GetTriangleCount () { SetupObject(); return top_mesh.num_triangles; }
-  csTriangle* GetTriangles () { SetupObject (); return top_mesh.triangles; }
-#else
+
   int GetTriangleCount () { SetupObject(); return ball_triangles; }
   csTriangle* GetTriangles ()
   {
@@ -263,7 +237,7 @@ public:
 
   iRenderBuffer *GetRenderBuffer (csStringID name);
   void UpdateBufferSV();
-#endif
+
 
   //----------------------- iMeshObject implementation ------------------------
   SCF_DECLARE_IBASE;
@@ -271,9 +245,6 @@ public:
   virtual iMeshObjectFactory* GetFactory () const { return factory; }
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> Clone () { return 0; }
-  virtual bool DrawTest (iRenderView* rview, iMovable* movable,
-  	uint32 frustum_mask);
-  virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
     if (cb) cb->IncRef ();
@@ -425,11 +396,7 @@ public:
     }
     virtual csTriangle* GetTriangles ()
     {
-#ifndef CS_USE_OLD_RENDERER
       return (csTriangle*)(ball->ball_indices);
-#else
-      return ball->top_mesh.triangles;
-#endif
     }
     virtual void Lock () { }
     virtual void Unlock () { }

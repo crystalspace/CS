@@ -36,7 +36,6 @@
 #include "iutil/comp.h"
 #include "iutil/virtclk.h"
 #include "ivideo/graph3d.h"
-#include "ivideo/vbufmgr.h"
 #include "csgeom/objmodel.h"
 #include "igeom/polymesh.h"
 #include "iengine/shadcast.h"
@@ -60,7 +59,6 @@ class csGenmeshMeshObjectType;
 class csGenmeshMeshObject;
 class csColor;
 class csPolygonMesh;
-class G3DFogInfo;
 class csBSPTree;
 
 /**
@@ -87,7 +85,7 @@ public:
 class csGenmeshMeshObject : public iMeshObject
 {
 private:
-#ifndef CS_USE_OLD_RENDERER
+
   csRenderMeshHolderSingle rmHolder;
   csShaderVariableContext* svcontext;
   csWeakRef<iGraphics3D> g3d;
@@ -105,7 +103,7 @@ private:
 
   csRef<iRenderBuffer> color_buffer;
   iMovable* lighting_movable;
-#endif
+
   csGenmeshMeshObjectFactory* factory;
   iBase* logparent;
   csRef<iMaterialWrapper> material;
@@ -260,9 +258,6 @@ public:
   }
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> Clone () { return 0; }
-  virtual bool DrawTest (iRenderView* rview, iMovable* movable,
-  	uint32 frustum_mask);
-  virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual csRenderMesh** GetRenderMeshes (int &n, iRenderView* rview, 
     iMovable* movable, uint32 frustum_mask);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
@@ -449,7 +444,6 @@ public:
   friend struct PolyMesh;
 
   //------------------ iShaderVariableAccessor implementation ------------
-#ifndef CS_USE_OLD_RENDERER
   class eiShaderVariableAccessor : public iShaderVariableAccessor
   {
   public:
@@ -474,7 +468,7 @@ public:
   friend class eiShaderVariableAccessor;
 
   void PreGetShaderVariableValue (csShaderVariable* variable);
-#endif // CS_USE_OLD_RENDERER
+
 };
 
 /**
@@ -483,11 +477,6 @@ public:
 class csGenmeshMeshObjectFactory : public iMeshObjectFactory
 {
 private:
-#ifdef CS_USE_OLD_RENDERER
-  csRef<iVertexBuffer> vbuf;
-  iVertexBufferManager* vbufmgr;
-  G3DTriangleMesh top_mesh;
-#endif
   csRef<iMaterialWrapper> material;
   csVector3* mesh_vertices;
   csVector2* mesh_texels;
@@ -505,7 +494,6 @@ private:
   bool mesh_triangle_dirty_flag;
   bool mesh_tangents_dirty_flag;
 
-#ifndef CS_USE_OLD_RENDERER
   csTriangle* mesh_triangles;
   int num_mesh_triangles;
 
@@ -522,7 +510,6 @@ private:
   
   csAnonRenderBufferManager anon_buffers;
   csArray<csStringID> anon_buffer_names;
-#endif
 
   uint default_mixmode;
   bool default_lighting;
@@ -550,11 +537,6 @@ private:
   /// Calculate bounding box and radius.
   void CalculateBBoxRadius ();
 
-#ifdef CS_USE_OLD_RENDERER
-  /// Retrieve a vertexbuffer from the manager if not done already.
-  void SetupVertexBuffer ();
-#endif
-
   /**
    * Compress vertices. This is for CalculateNormals().
    */
@@ -569,16 +551,6 @@ private:
    * Setup this factory. This function will check if setup is needed.
    */
   void SetupFactory ();
-
-#ifdef CS_USE_OLD_RENDERER
-  /// interface to receive state of vertexbuffermanager
-  struct eiVertexBufferManagerClient : public iVertexBufferManagerClient
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
-    virtual void ManagerClosing ();
-  }scfiVertexBufferManagerClient;
-  friend struct eiVertexBufferManagerClient;
-#endif
 
 public:
   CS_LEAKGUARD_DECLARE (csGenmeshMeshObjectFactory);
@@ -636,13 +608,10 @@ public:
   }
 
   void SetTriangleCount (int n);
-#ifdef CS_USE_OLD_RENDERER
-  int GetTriangleCount () const { return top_mesh.num_triangles; }
-  csTriangle* GetTriangles () { SetupFactory (); return top_mesh.triangles; }
-#else
+
   int GetTriangleCount () const { return num_mesh_triangles; }
   csTriangle* GetTriangles () { SetupFactory (); return mesh_triangles; }
-#endif
+
   void Invalidate ();
   void CalculateNormals ();
   void GenerateBox (const csBox3& box);
@@ -658,13 +627,11 @@ public:
   	int component, int value);
   bool SetRenderBuffer (const char *name, float *value);
   bool SetRenderBuffer (const char *name, int *value);
-#ifndef CS_USE_OLD_RENDERER
   /**
    * Get the string ID's for the anonymous buffers
    */
   const csArray<csStringID> &GetAnonymousNames ()
   { return anon_buffer_names; }
-#endif
 
   const csBox3& GetObjectBoundingBox ();
   const csVector3& GetRadius ();
@@ -673,23 +640,6 @@ public:
    * Calculate polygons for iPolygonMesh.
    */
   csMeshedPolygon* GetPolygons ();
-#ifdef CS_USE_OLD_RENDERER
-  iVertexBufferManager* GetVertexBufferManager ()
-  {
-    SetupFactory ();
-    return vbufmgr;
-  }
-  iVertexBuffer* GetVertexBuffer ()
-  {
-    SetupFactory ();
-    return vbuf;
-  }
-  G3DTriangleMesh& GetMesh ()
-  {
-    SetupFactory ();
-    return top_mesh;
-  }
-#endif
 
   void SetMixMode (uint mode)
   {
@@ -973,7 +923,6 @@ public:
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 
   //------------------ iShaderVariableAccessor implementation ------------
-#ifndef CS_USE_OLD_RENDERER
   class eiShaderVariableAccessor : public iShaderVariableAccessor
   {
   public:
@@ -998,7 +947,6 @@ public:
   friend class eiShaderVariableAccessor;
 
   void PreGetShaderVariableValue (csShaderVariable* variable);
-#endif // CS_USE_OLD_RENDERER
 };
 
 /**

@@ -65,7 +65,6 @@ protected:
 
   uvAnimationControl* uvani;
 
-#ifndef CS_USE_OLD_RENDERER
   class eiShaderVariableAccessor : public iShaderVariableAccessor
   {
   private:
@@ -104,7 +103,6 @@ protected:
   bool colors_dirty;
   csRef<iRenderBuffer> index_buffer;
   size_t indicesSize;
-#endif
 
 private:
   csRef<iMeshObjectFactory> ifactory;
@@ -174,8 +172,6 @@ public:
   virtual iMeshObjectFactory* GetFactory () const { return ifactory; }
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> Clone () { return 0; }
-  virtual bool DrawTest (iRenderView* rview, iMovable* movable,
-  	uint32 frustum_mask);
   csRenderMesh **GetRenderMeshes (int &n, iRenderView* rview, 
     iMovable* movable, uint32 frustum_mask, csVector3 offset);
   virtual csRenderMesh **GetRenderMeshes (int &n, iRenderView* rview, 
@@ -183,7 +179,6 @@ public:
   {
     return GetRenderMeshes (n, rview, movable, frustum_mask, csVector3 (0.0f));
   }
-  virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
     if (cb) cb->IncRef ();
@@ -300,8 +295,6 @@ public:
       scfParent->MixMode = mode;
     }
     virtual void Rotate (float angle);
-    virtual void Draw (iRenderView* rview,
-    	const csReversibleTransform& transform, csZBufMode mode);
     virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview, 
       iMovable* movable, uint32 frustum_mask);
     virtual void UpdateLighting (const csArray<iLight*>& lights,
@@ -347,9 +340,6 @@ private:
   csFlags flags;
 
 public:
-  /// Polygon.
-  G3DPolygonDPFX g3dpolyfx;
-
   CS_LEAKGUARD_DECLARE (csSprite2DMeshObjectFactory);
 
   csRef<iLightManager> light_mgr;

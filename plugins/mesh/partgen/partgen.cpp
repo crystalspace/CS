@@ -93,7 +93,6 @@ csParticleSystem::csParticleSystem (iObjectRegistry* object_reg,
   engine = eng;	// We don't want to keep a reference.
   light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
 
-#ifndef CS_USE_OLD_RENDERER 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 
   vertices = 0;
@@ -102,16 +101,13 @@ csParticleSystem::csParticleSystem (iObjectRegistry* object_reg,
   part_sides = 0;
 
   svcontext.AttachNew (new csShaderVariableContext);
-#endif
 }
 
 csParticleSystem::~csParticleSystem()
 {
-#ifndef CS_USE_OLD_RENDERER 
   delete[] vertices;
   delete[] texels;
   delete[] colors;
-#endif
 
   if (vis_cb) vis_cb->DecRef ();
   RemoveParticles ();
@@ -122,17 +118,14 @@ csParticleSystem::~csParticleSystem()
 
 void csParticleSystem::SetupObject ()
 {
-#ifndef CS_USE_OLD_RENDERER
   if (!initialized)
   {
     part_sides = 0;
   }
-#endif
 }
 
 void csParticleSystem::SetupBuffers (size_t part_sides)
 {
-#ifndef CS_USE_OLD_RENDERER
   if (csParticleSystem::part_sides == part_sides) return;
   csParticleSystem::part_sides = part_sides;
 
@@ -161,11 +154,6 @@ void csParticleSystem::SetupBuffers (size_t part_sides)
   texel_buffer = g3d->CreateRenderBuffer (
         sizeof (csVector2)*VertexCount, CS_BUF_DYNAMIC, 
         CS_BUFCOMP_FLOAT, 2);
-#if 0
-  normal_buffer = g3d->CreateRenderBuffer (
-        sizeof (csVector3)*VertexCount, CS_BUF_DYNAMIC,
-        CS_BUFCOMP_FLOAT, 3);
-#endif
   color_buffer = g3d->CreateRenderBuffer (
         sizeof (csColor)*VertexCount, CS_BUF_DYNAMIC,
         CS_BUFCOMP_FLOAT, 3);
@@ -195,15 +183,10 @@ void csParticleSystem::SetupBuffers (size_t part_sides)
   sv->SetValue (vertex_buffer);
   sv = svcontext->GetVariableAdd (texel_name);
   sv->SetValue (texel_buffer);
-#if 0
-  sv = svcontext->GetVariableAdd (normal_name);
-  sv->SetValue (normal_buffer);
-#endif
   sv = svcontext->GetVariableAdd (color_name);
   sv->SetValue (color_buffer);
   sv = svcontext->GetVariableAdd (index_name);
   sv->SetValue (index_buffer);
-#endif
 }
 
 void csParticleSystem::RemoveParticles ()
@@ -348,7 +331,7 @@ void csParticleSystem::Update (csTicks elapsed_time)
     Rotate (anglepersecond * elapsed_seconds);
 }
 
-bool csParticleSystem::DrawTest (iRenderView*, iMovable* movable, uint32)
+bool csParticleSystem::PreGetRenderMeshes (iRenderView*, iMovable* movable, uint32)
 {
   SetupObject ();
 
@@ -366,8 +349,7 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
 						  iMovable* movable,
 						  uint32 frustum_mask)
 {
-#ifndef CS_USE_OLD_RENDERER
-  if ((sprite2ds.Length() == 0) || !DrawTest (rview, movable, frustum_mask))
+  if ((sprite2ds.Length() == 0) || !PreGetRenderMeshes (rview, movable, frustum_mask))
   {
     n = 0;
     return 0;
@@ -442,21 +424,6 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
 
   n = 1;
   return &rm;
-#else
-  n = 0;
-  return 0;
-#endif
-}
-
-bool csParticleSystem::Draw (iRenderView* rview, iMovable* movable,
-	csZBufMode mode)
-{
-  if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
-  csReversibleTransform trans = movable->GetFullTransform ();
-  size_t i;
-  for (i = 0 ; i < particles.Length() ; i++)
-    GetParticle (i)->Draw (rview, trans, mode);
-  return true;
 }
 
 void csParticleSystem::UpdateLighting (const csArray<iLight*>& lights,

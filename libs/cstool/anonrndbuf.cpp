@@ -18,7 +18,6 @@
 
 #include "cssysdef.h"
 
-#ifndef CS_USE_OLD_RENDERER
 
 #include "cstool/anonrndbuf.h"
 #include "ivideo/graph3d.h"
@@ -170,5 +169,3 @@ bool csAnonRenderBufferManager::SetRenderBuffer (const char *name, int *value, i
   return true;
 }
 
-
-#endif // CS_USE_OLD_RENDERER

@@ -124,25 +124,6 @@ struct iMeshObject : public iBase
   virtual csPtr<iMeshObject> Clone () = 0;
 
   /**
-   * First part of Draw. The engine will call this DrawTest() before
-   * calling Draw() so DrawTest() can (if needed) remember computationally
-   * expensive data. If DrawTest() returns false the engine will not
-   * call Draw().
-   */
-  virtual bool DrawTest (iRenderView* rview, iMovable* movable,
-  	uint32 frustum_mask) = 0;
-
-  /**
-   * Draw this mesh object. Returns false if not visible.
-   * If this function returns true it does not mean that the object
-   * is invisible. It just means that this MeshObject thinks that the
-   * object was probably visible. DrawTest() will be called before
-   * this function.
-   */
-  virtual bool Draw (iRenderView* rview, iMovable* movable,
-  	csZBufMode zbufMode) = 0;
-
-  /**
    * Returns the set of render meshes.
    * The frustum_mask is given by the culler and contains a mask with
    * all relevant planes for the given object. These planes correspond

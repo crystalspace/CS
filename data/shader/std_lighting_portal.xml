@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<shader type="xmlshader" name="std_lighting_portal">
+  <!--
+<technique priority="150">
+  <pass>
+      <buffer name="vertices" destination="position" />
+      <buffer name="colors" destination="primary color" />
+      <buffer name="texture coordinates" destination="texture coordinate 0" />
+      <texture name="tex diffuse" destination="unit 0" />
+  </pass>
+</technique>
+-->
+  <technique priority="100">
+    <pass>
+      <mixmode>
+        <alpha />
+      </mixmode>
+      <buffer name="vertices" destination="position" />
+      <buffer name="colors" destination="primary color" />
+      <texture name="standardtex fog" destination="unit 0" />
+      <vp plugin="glfixed">
+        <fixedvp>
+          <texgen type="fog" layer="0" />
+          <constantcolor layer="0" type="shadervar">fog color</constantcolor>
+        </fixedvp>
+      </vp>
+      <fp plugin="glfixed">
+        <fixedfp>
+          <layer>
+            <colorsource num="0" source="constant color" modifier="color" />
+            <coloroperation operation="replace" />
+            <alphasource num="0" source="texture" modifier="alpha" />
+            <alphaoperation operation="replace" />
+          </layer>
+        </fixedfp>
+      </fp>
+    </pass>
+  </technique>
+</shader>

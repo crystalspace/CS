@@ -2333,22 +2333,6 @@ AS_IF([test $enable_leak_guard = yes],
     [CS_HEADER_PROPERTY([CS_USE_LEAK_GUARD])])
 
 
-
-#------------------------------------------------------------------------------
-# Determine whether the old renderer should be activated.
-#------------------------------------------------------------------------------
-AC_MSG_CHECKING([whether to use old renderer])
-AC_ARG_ENABLE([old-renderer], [AC_HELP_STRING([--enable-old-renderer],
-    [enable use of legacy renderer architecture (default NO)])],
-    [], [enable_old_renderer=no])
-AC_MSG_RESULT([$enable_old_renderer])
-CS_EMIT_BUILD_PROPERTY([USE_OLD_RENDERER], [$enable_old_renderer])
-AS_IF([test $enable_old_renderer = yes], 
-  [CS_HEADER_PROPERTY([CS_USE_OLD_RENDERER])
-  CS_EMIT_BUILD_PROPERTY([SWIG.FLAGS], [-DCS_USE_OLD_RENDERER], [+])])
-
-
-
 #------------------------------------------------------------------------------
 # Determine whether link libraries should be static or shared.
 #------------------------------------------------------------------------------

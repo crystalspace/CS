@@ -46,19 +46,16 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csProtoMeshObject::ProtoMeshState)
   SCF_IMPLEMENTS_INTERFACE (iProtoMeshState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-#ifndef CS_USE_OLD_RENDERER
 SCF_IMPLEMENT_IBASE (csProtoMeshObject::ShaderVariableAccessor)
   SCF_IMPLEMENTS_INTERFACE (iShaderVariableAccessor)
 SCF_IMPLEMENT_IBASE_END
-#endif
 
 csProtoMeshObject::csProtoMeshObject (csProtoMeshObjectFactory* factory)
 {
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiProtoMeshState);
-#ifndef CS_USE_OLD_RENDERER
+
   scfiShaderVariableAccessor = new ShaderVariableAccessor (this);
-#endif
 
   csProtoMeshObject::factory = factory;
   logparent = 0;
@@ -81,9 +78,8 @@ csProtoMeshObject::csProtoMeshObject (csProtoMeshObjectFactory* factory)
 
 csProtoMeshObject::~csProtoMeshObject ()
 {
-#ifndef CS_USE_OLD_RENDERER
   scfiShaderVariableAccessor->DecRef ();
-#endif
+
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiProtoMeshState);
   SCF_DESTRUCT_IBASE ();
 }
@@ -96,7 +92,6 @@ bool csProtoMeshObject::SetMaterialWrapper (iMaterialWrapper* mat)
 
 void csProtoMeshObject::SetupShaderVariableContext ()
 {
-#ifndef CS_USE_OLD_RENDERER
   if (svcontext == 0)
     svcontext.AttachNew (new csShaderVariableContext ());
   csShaderVariable* sv;
@@ -136,7 +131,6 @@ void csProtoMeshObject::SetupShaderVariableContext ()
   // base color to the static colors in the factory.
   sv = svcontext->GetVariableAdd (csProtoMeshObjectFactory::color_name);
   sv->SetAccessor (scfiShaderVariableAccessor);
-#endif
 }
   
 void csProtoMeshObject::SetupObject ()
@@ -160,7 +154,6 @@ csRenderMesh** csProtoMeshObject::GetRenderMeshes (
 {
   n = 0;
 
-#ifndef CS_USE_OLD_RENDERER
   if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
   SetupObject ();
@@ -218,9 +211,6 @@ csRenderMesh** csProtoMeshObject::GetRenderMeshes (
  
   n = 1;
   return &meshPtr;
-#else
-  return 0;
-#endif
 }
 
 bool csProtoMeshObject::HitBeamOutline (const csVector3& start,
@@ -290,7 +280,6 @@ iObjectModel* csProtoMeshObject::GetObjectModel ()
   return factory->GetObjectModel ();
 }
 
-#ifndef CS_USE_OLD_RENDERER
 void csProtoMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
 {
   if (var->Name == csProtoMeshObjectFactory::color_name)
@@ -318,7 +307,6 @@ void csProtoMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
     return;
   }
 }
-#endif
 
 //----------------------------------------------------------------------
 
@@ -336,11 +324,10 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csProtoMeshObjectFactory::ObjectModel)
   SCF_IMPLEMENTS_INTERFACE (iObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-#ifndef CS_USE_OLD_RENDERER
 SCF_IMPLEMENT_IBASE (csProtoMeshObjectFactory::ShaderVariableAccessor)
   SCF_IMPLEMENTS_INTERFACE (iShaderVariableAccessor)
 SCF_IMPLEMENT_IBASE_END
-#endif
+
 
 csStringID csProtoMeshObjectFactory::vertex_name = csInvalidStringID;
 csStringID csProtoMeshObjectFactory::texel_name = csInvalidStringID;
@@ -354,9 +341,9 @@ csProtoMeshObjectFactory::csProtoMeshObjectFactory (iMeshObjectType *pParent,
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiProtoFactoryState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-#ifndef CS_USE_OLD_RENDERER
+
   scfiShaderVariableAccessor = new ShaderVariableAccessor (this);
-#endif
+
   csProtoMeshObjectFactory::object_reg = object_reg;
 
   scfiPolygonMesh.SetFactory (this);
@@ -374,7 +361,7 @@ csProtoMeshObjectFactory::csProtoMeshObjectFactory (iMeshObjectType *pParent,
   polygons = 0;
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-#ifndef CS_USE_OLD_RENDERER
+
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
     "crystalspace.shared.stringset", iStringSet);
 
@@ -395,14 +382,12 @@ csProtoMeshObjectFactory::csProtoMeshObjectFactory (iMeshObjectType *pParent,
   mesh_texels_dirty_flag = true;
   mesh_normals_dirty_flag = true;
   mesh_triangle_dirty_flag = true;
-#endif
 }
 
 csProtoMeshObjectFactory::~csProtoMeshObjectFactory ()
 {
-#ifndef CS_USE_OLD_RENDERER
   scfiShaderVariableAccessor->DecRef ();
-#endif
+
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiProtoFactoryState);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_DESTRUCT_IBASE ();
@@ -450,13 +435,10 @@ void csProtoMeshObjectFactory::SetupFactory ()
   {
     initialized = true;
     object_bbox_valid = false;
-#ifndef CS_USE_OLD_RENDERER
     PrepareBuffers ();
-#endif
   }
 }
 
-#ifndef CS_USE_OLD_RENDERER
 void csProtoMeshObjectFactory::PreGetShaderVariableValue (
   csShaderVariable* var)
 {
@@ -480,27 +462,22 @@ void csProtoMeshObjectFactory::PreGetShaderVariableValue (
   }
 }
 
-#endif
-
-
 void csProtoMeshObjectFactory::Invalidate ()
 {
   object_bbox_valid = false;
   delete[] polygons;
   polygons = 0;
 
-#ifndef CS_USE_OLD_RENDERER
   mesh_vertices_dirty_flag = true;
   mesh_texels_dirty_flag = true;
   mesh_normals_dirty_flag = true;
   mesh_triangle_dirty_flag = true;
-#endif
+
   color_nr++;
 
   scfiObjectModel.ShapeChanged ();
 }
 
-#ifndef CS_USE_OLD_RENDERER
 void csProtoMeshObjectFactory::PrepareBuffers ()
 {
   if (mesh_vertices_dirty_flag)
@@ -539,7 +516,6 @@ void csProtoMeshObjectFactory::PrepareBuffers ()
     	sizeof(unsigned int)*PROTO_TRIS*3);
   }
 }
-#endif
 
 SCF_IMPLEMENT_IBASE (csProtoMeshObjectFactory::PolyMesh)
   SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)

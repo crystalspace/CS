@@ -574,25 +574,6 @@ float csHazeMeshObject::GetScreenBoundingBox (long cameranr,
 }
 
 
-bool csHazeMeshObject::DrawTest (iRenderView* rview, iMovable* movable,
-	uint32 frustum_mask)
-{
-  SetupObject ();
-
-  if (layers.Length () <= 0) return false;
-
-  //iGraphics3D* g3d = rview->GetGraphics3D ();
-  iCamera* camera = rview->GetCamera ();
-
-  csReversibleTransform tr_o2c = camera->GetTransform ();
-  if (!movable->IsFullTransformIdentity ())
-    tr_o2c /= movable->GetFullTransform ();
-  //int clip_portal, clip_plane, clip_z_plane;
-  //rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
-  	//clip_z_plane);
-
-  return true;
-}
 
 CS_IMPLEMENT_STATIC_VAR(GetTempVertices, csDirtyAccessArray<csVector3>, ());
 CS_IMPLEMENT_STATIC_VAR(GetTempTexels, csDirtyAccessArray<csVector2>, ());
@@ -838,129 +819,6 @@ csRenderMesh** csHazeMeshObject::GetRenderMeshes (int &n, iRenderView* rview,
 }
 
 
-#define INTERPOLATE1_S(var) \
-  g3dpoly->var [i] = inpoly_##var [vt]+ \
-    t * (inpoly_##var [vt2]- inpoly_##var [vt]);
-
-#define INTERPOLATE1(var,component) \
-  g3dpoly->var [i].component = inpoly_##var [vt].component + \
-    t * (inpoly_##var [vt2].component - inpoly_##var [vt].component);
-
-#define INTERPOLATE_S(var) \
-{ \
-  float v1 = inpoly_##var [edge_from [0]]+ \
-    t1 * (inpoly_##var [edge_to [0]]- inpoly_##var [edge_from [0]]); \
-  float v2 = inpoly_##var [edge_from [1]]+ \
-    t2 * (inpoly_##var [edge_to [1]]- inpoly_##var [edge_from [1]]); \
-  g3dpoly->var [i]= v1 + t * (v2 - v1); \
-}
-#define INTERPOLATE(var,component) \
-{ \
-  float v1 = inpoly_##var [edge_from [0]].component + \
-    t1 * (inpoly_##var [edge_to [0]].component - inpoly_##var [edge_from [0]].component); \
-  float v2 = inpoly_##var [edge_from [1]].component + \
-    t2 * (inpoly_##var [edge_to [1]].component - inpoly_##var [edge_from [1]].component); \
-  g3dpoly->var [i].component = v1 + t * (v2 - v1); \
-}
-
-#ifdef CS_USE_OLD_RENDERER
-static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
-  csVector2* clipped_verts, int num_vertices, csVertexStatus* clipped_vtstats,
-  int orig_num_vertices, bool gouraud)
-{
-  // first we copy the first texture coordinates to a local buffer
-  // to avoid that they are overwritten when interpolating.
-  CS_ALLOC_STACK_ARRAY (csVector2, inpoly_vertices, orig_num_vertices);
-  CS_ALLOC_STACK_ARRAY (csVector2, inpoly_texels, orig_num_vertices);
-  CS_ALLOC_STACK_ARRAY (csColor, inpoly_colors, orig_num_vertices);
-  CS_ALLOC_STACK_ARRAY (float, inpoly_z, orig_num_vertices);
-  int i;
-  memcpy (inpoly_vertices, g3dpoly->vertices,
-  	orig_num_vertices*sizeof (csVector2));
-  memcpy (inpoly_texels, g3dpoly->texels, orig_num_vertices*sizeof (csVector2));
-  memcpy (inpoly_colors, g3dpoly->colors, orig_num_vertices*sizeof (csColor));
-  memcpy (inpoly_z, g3dpoly->z, orig_num_vertices*sizeof (float));
-
-  int vt, vt2;
-  float t;
-  for (i = 0; i < num_vertices; i++)
-  {
-    g3dpoly->vertices [i] = clipped_verts [i];
-    switch (clipped_vtstats[i].Type)
-    {
-      case CS_VERTEX_ORIGINAL:
-        vt = clipped_vtstats[i].Vertex;
-        g3dpoly->z [i] = inpoly_z [vt];
-        g3dpoly->texels [i] = inpoly_texels [vt];
-	if (gouraud)
-          g3dpoly->colors [i] = inpoly_colors [vt];
-	break;
-      case CS_VERTEX_ONEDGE:
-        vt = clipped_vtstats[i].Vertex;
-	vt2 = vt + 1; if (vt2 >= orig_num_vertices) vt2 = 0;
-	t = clipped_vtstats [i].Pos;
-	INTERPOLATE1_S (z);
-	INTERPOLATE1 (texels,x);
-	INTERPOLATE1 (texels,y);
-	if (gouraud)
-	{
-	  INTERPOLATE1 (colors,red);
-	  INTERPOLATE1 (colors,green);
-	  INTERPOLATE1 (colors,blue);
-	}
-	break;
-      case CS_VERTEX_INSIDE:
-        float x = clipped_verts [i].x;
-        float y = clipped_verts [i].y;
-        int edge_from [2], edge_to [2];
-	int edge = 0;
-	int j, j1;
-	j1 = orig_num_vertices - 1;
-	for (j = 0; j < orig_num_vertices; j++)
-	{
-          if ((y >= inpoly_vertices [j].y && y <= inpoly_vertices [j1].y) ||
-	      (y <= inpoly_vertices [j].y && y >= inpoly_vertices [j1].y))
-	  {
-	    edge_from [edge] = j;
-	    edge_to [edge] = j1;
-	    edge++;
-	    if (edge >= 2) break;
-	  }
-	  j1 = j;
-	}
-	if (edge == 1)
-	{
-	  // Safety if we only found one edge.
-	  edge_from [1] = edge_from [0];
-	  edge_to [1] = edge_to [0];
-	}
-	csVector2& A = inpoly_vertices [edge_from [0]];
-	csVector2& B = inpoly_vertices [edge_to [0]];
-	csVector2& C = inpoly_vertices [edge_from [1]];
-	csVector2& D = inpoly_vertices [edge_to [1]];
-	float t1 = (y - A.y) / (B.y - A.y);
-	float t2 = (y - C.y) / (D.y - C.y);
-	float x1 = A.x + t1 * (B.x - A.x);
-	float x2 = C.x + t2 * (D.x - C.x);
-	t = (x - x1) / (x2 - x1);
-	INTERPOLATE_S (z);
-	INTERPOLATE (texels,x);
-	INTERPOLATE (texels,y);
-	if (gouraud)
-	{
-	  INTERPOLATE (colors,red);
-	  INTERPOLATE (colors,green);
-	  INTERPOLATE (colors,blue);
-	}
-	break;
-    }
-  }
-}
-#endif
-
-#undef INTERPOLATE
-#undef INTERPOLATE1
-
 void csHazeMeshObject::ComputeHullOutline(iHazeHull *hull, float layer_scale,
   const csVector3& campos, csReversibleTransform& tr_o2c, float fov, float shx,
   float shy, int &layer_num, int *& layer_poly, csVector3 *& layer_pts,
@@ -975,20 +833,16 @@ void csHazeMeshObject::ComputeHullOutline(iHazeHull *hull, float layer_scale,
   //printf("has outline of size %d: ", layer_num);
   if(layer_num <= 0) return;
   layer_pts = new csVector3[layer_num];
-#ifndef CS_USE_OLD_RENDERER
   *cam_pts = new csVector3[layer_num];
-#endif
+
   for(i=0; i<layer_num; i++)
   {
     //printf(" %d", layer_poly[i]);
     csVector3 objpos;
     hull->GetVertex(objpos, layer_poly[i] );
-#ifndef CS_USE_OLD_RENDERER
+
     ProjectO2S(tr_o2c, fov, shx, shy, objpos, layer_pts[i],
       &((*cam_pts)[i]));
-#else
-    ProjectO2S(tr_o2c, fov, shx, shy, objpos, layer_pts[i], 0);
-#endif
   }
   //printf("\n");
   // get hull 0 uv values
@@ -1008,202 +862,6 @@ void csHazeMeshObject::ComputeHullOutline(iHazeHull *hull, float layer_scale,
   }
 }
 
-bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
-	csZBufMode mode)
-{
-  int i;
-  if (!material)
-  {
-    printf ("INTERNAL ERROR: haze used without material!\n");
-    return false;
-  }
-  iMaterialHandle* mat = material->GetMaterialHandle ();
-  if (!mat)
-  {
-    printf ("INTERNAL ERROR: haze used without valid material handle!\n");
-    return false;
-  }
-  if(layers.Length() <= 0) return false;
-
-  if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
-
-  //printf("drawing\n");
-
-  /// prepare to transform the points
-  iGraphics3D* g3d = rview->GetGraphics3D ();
-  iCamera* camera = rview->GetCamera ();
-  csVector3 campos = camera->GetTransform().GetOrigin();
-  if (!movable->IsFullTransformIdentity ())
-    campos = movable->GetFullTransform() * campos;
-  float fov = camera->GetFOV ();
-  float shx = camera->GetShiftX ();
-  float shy = camera->GetShiftY ();
-  /// obj to camera space
-  csReversibleTransform tr_o2c = camera->GetTransform ();
-  if (!movable->IsFullTransformIdentity ())
-    tr_o2c /= movable->GetFullTransform ();
-
-  // Prepare for rendering.
-  g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
-  material->Visit ();
-
-  // project origin to screenspace
-  csVector2 center(0.5, 0.5);
-  csVector3 scr_orig;
-  ProjectO2S(tr_o2c, fov, shx, shy, origin, scr_orig, 0);
-
-  // get hull 0 outline in screenspace
-  iHazeHull *hull = layers[0]->hull;
-  float layer_scale = layers[0]->scale;
-  int layer_num = 0;
-  int *layer_poly = 0;
-  csVector3* layer_pts = 0;
-  csVector2* layer_uvs = 0;
-  ComputeHullOutline(hull, layer_scale, campos, tr_o2c, fov, shx, shy,
-    layer_num, layer_poly, layer_pts, 0, layer_uvs);
-  if(layer_num <= 0) return false;
-
-  // additional test if origin inside the outline
-  csVector2* incheck = new csVector2[layer_num];
-  for(i=0; i<layer_num; i++)
-  {
-    incheck[i].x = layer_pts[layer_num-1 - i].x;
-    incheck[i].y = layer_pts[layer_num-1 - i].y;
-  }
-  csVector2 checkpt( scr_orig.x, scr_orig.y );
-  if(!csPoly2D::In(incheck, layer_num, checkpt))
-  {
-    // origin not inside outline.
-    delete[] incheck;
-    delete[] layer_poly;
-    delete[] layer_pts;
-    delete[] layer_uvs;
-    return false;
-  }
-  delete[] incheck;
-
-  // draw triangles from orig to layer 0
-  csVector3 tri_pts[3];
-  csVector2 tri_uvs[3];
-  tri_pts[0] = scr_orig;
-  tri_uvs[0] = center;
-  for(i=0; i<layer_num; i++)
-  {
-    int nexti = (i+1)%layer_num;
-    tri_pts[2] = layer_pts[i];
-    tri_pts[1] = layer_pts[nexti];
-    tri_uvs[2] = layer_uvs[i];
-    tri_uvs[1] = layer_uvs[nexti];
-    //printf("drawing a polygon\n");
-    //DrawPoly(rview, g3d, mat, 3, tri_pts, tri_uvs);
-    float quality = 0.90f;
-    int maxdepth = 10;
-    DrawPolyAdapt(rview, g3d, mat, 3, tri_pts, tri_uvs, layer_scale,
-      quality, 0, maxdepth);
-
-#if 0
-    // debug drawing of the outline
-    iGraphics2D *g2d = g3d->GetDriver2D();
-    int m2dy = g2d->GetHeight();
-    g2d->DrawLine(scr_orig.x, m2dy-scr_orig.y, scr_orig.x+1,
-      m2dy-scr_orig.y+1, -1);
-    // only outline
-    //g2d->DrawLine( layer_pts[i].x, layer_pts[i].y,
-      //layer_pts[nexti].x, layer_pts[nexti].y, -1);
-    // show direction of lines (from black to white)
-    float midx = (layer_pts[i].x + layer_pts[nexti].x)*0.5;
-    float midy = (layer_pts[i].y + layer_pts[nexti].y)*0.5;
-    g2d->DrawLine( layer_pts[i].x, m2dy-layer_pts[i].y, midx, m2dy-midy, 0);
-    g2d->DrawLine( midx, m2dy-midy, layer_pts[nexti].x,
-      m2dy-layer_pts[nexti].y, -1);
-#endif
-  }
-
-
-#if 0 // draw multiple hulls
-  int  curlay;
-  for(curlay = 1; curlay < layers.Length(); curlay++)
-  {
-    // get hull [curlay] outline in screenspace
-    iHazeHull *hull2 = layers[curlay]->hull;
-    float layer_scale2 = layers[curlay]->scale;
-    int layer_num2 = 0;
-    int *layer_poly2 = 0;
-    csVector3* layer_pts2 = 0;
-    csVector2* layer_uvs2 = 0;
-    ComputeHullOutline(hull2, layer_scale2, campos, tr_o2c, fov, shx, shy,
-      layer_num2, layer_poly2, layer_pts2, layer_uvs2);
-    if(layer_num2 <= 0)
-    {
-      delete[] layer_poly;
-      delete[] layer_pts;
-      delete[] layer_uvs;
-      return true;
-    }
-
-#if 1
-    for(i=0; i<layer_num2; i++)
-    {
-      int nexti = (i+1)%layer_num;
-      iGraphics2D *g2d = g3d->GetDriver2D();
-      int m2dy = g2d->GetHeight();
-      float midx = (layer_pts2[i].x + layer_pts2[nexti].x)*0.5;
-      float midy = (layer_pts2[i].y + layer_pts2[nexti].y)*0.5;
-      g2d->DrawLine( layer_pts2[i].x, m2dy-layer_pts2[i].y, midx, m2dy-midy, 0);
-      g2d->DrawLine( midx, m2dy-midy, layer_pts2[nexti].x,
-        m2dy-layer_pts2[nexti].y, -1);
-    }
-#endif
-
-    /// got  this outline, draw between hull to hull2
-    if(layer_num != layer_num2) {
-      printf("haze: outlines differ for hull %d,%d!\n", layer_num, layer_num2);
-      /*
-      delete[] layer_poly;
-      delete[] layer_pts;
-      delete[] layer_uvs;
-      delete[] layer_poly2;
-      delete[] layer_pts2;
-      delete[] layer_uvs2;
-      return true;
-      */
-    }
-    /// draw
-    for(i=0; i<layer_num; i++)
-    {
-      int ni = (i+1)%layer_num;
-      tri_pts[0] = layer_pts[i];
-      tri_uvs[0] = layer_uvs[i];
-      tri_pts[1] = layer_pts[ni];
-      tri_uvs[1] = layer_uvs[ni];
-      tri_pts[2] = layer_pts2[ni];
-      tri_uvs[2] = layer_uvs2[ni];
-      DrawPoly(rview, g3d, mat, 3, tri_pts, tri_uvs);
-      tri_pts[0] = layer_pts[i];
-      tri_uvs[0] = layer_uvs[i];
-      tri_pts[1] = layer_pts2[ni];
-      tri_uvs[1] = layer_uvs2[ni];
-      tri_pts[2] = layer_pts2[i];
-      tri_uvs[2] = layer_uvs2[i];
-      DrawPoly(rview, g3d, mat, 3, tri_pts, tri_uvs);
-    }
-
-    /// get ready for the next hull
-    hull = hull2;
-    layer_scale = layer_scale2;
-    layer_num = layer_num2;
-    delete[] layer_poly; layer_poly = layer_poly2;
-    delete[] layer_pts; layer_pts = layer_pts2;
-    delete[] layer_uvs; layer_uvs = layer_uvs2;
-  }
-#endif // draw multiple hulls
-
-  delete[] layer_poly;
-  delete[] layer_pts;
-  delete[] layer_uvs;
-
-  return true;
-}
 
 
 void csHazeMeshObject::DrawPolyAdapt(iRenderView *rview, iGraphics3D *g3d,
@@ -1259,9 +917,7 @@ void csHazeMeshObject::ProjectO2S(csReversibleTransform& tr_o2c, float fov,
   float shiftx, float shifty, const csVector3& objpos, csVector3& scrpos, 
   csVector3* campos)
 {
-#ifndef CS_USE_OLD_RENDERER
   *campos =
-#endif
   scrpos = tr_o2c * objpos;  // to camera space
   scrpos.z = 1. / scrpos.z; // = iz
   float inv_z = fov * scrpos.z; // = iz
@@ -1272,45 +928,7 @@ void csHazeMeshObject::ProjectO2S(csReversibleTransform& tr_o2c, float fov,
 void csHazeMeshObject::DrawPoly(iRenderView *rview, iGraphics3D *g3d,
   iMaterialHandle *mat, int num, const csVector3* pts, const csVector2* uvs)
 {
-#ifdef CS_USE_OLD_RENDERER
-  g3dpolyfx.use_fog = false;
-  g3dpolyfx.num = num;
-  g3dpolyfx.mat_handle = mat;
-  g3dpolyfx.mat_handle->GetTexture ()->GetMeanColor (g3dpolyfx.flat_color_r,
-    g3dpolyfx.flat_color_g, g3dpolyfx.flat_color_b);
 
-  CS_ALLOC_STACK_ARRAY (csVector2, poly2d, num);
-  csVector2 clipped_poly2d[MAX_OUTPUT_VERTICES];
-  csVertexStatus clipped_vtstats[MAX_OUTPUT_VERTICES];
-
-  int i;
-  for(i = 0; i < num; i++)
-  {
-    poly2d[i].x = pts[i].x;
-    poly2d[i].y = pts[i].y;
-    g3dpolyfx.vertices [i].x = pts[i].x;
-    g3dpolyfx.vertices [i].y = pts[i].y;
-    g3dpolyfx.z [i] = pts[i].z;
-    g3dpolyfx.colors [i].red = 1.0;
-    g3dpolyfx.colors [i].green = 1.0;
-    g3dpolyfx.colors [i].blue = 1.0;
-    g3dpolyfx.texels [i] = uvs [i];
-  }
-
-  int num_clipped_verts;
-  uint8 clip_result = rview->GetClipper ()->Clip (poly2d, num,
-    clipped_poly2d, num_clipped_verts, clipped_vtstats);
-  if (clip_result == CS_CLIP_OUTSIDE) return;
-  g3dpolyfx.num = num_clipped_verts;
-
-  if (clip_result != CS_CLIP_INSIDE)
-    PreparePolygonFX2 (&g3dpolyfx, clipped_poly2d, num_clipped_verts,
-    	clipped_vtstats, num, false); // no gouraud interpol, no true);
-
-  rview->CalculateFogPolygon (g3dpolyfx);
-  g3dpolyfx.mixmode = MixMode; // | CS_FX_GOURAUD;
-  g3d->DrawPolygonFX (g3dpolyfx);
-#endif
 }
 
 void csHazeMeshObject::GetObjectBoundingBox (csBox3& retbbox, int /*type*/)

@@ -116,16 +116,12 @@ bool csLoader::ParseTextureList (iLoaderContext* ldr_context,
 	        return false;
         break;
       case XMLTOKEN_CUBEMAP:
-#ifndef CS_USE_OLD_RENDERER
         if (!ParseCubemap (ldr_context, child))
           return false;
-#endif
         break;
       case XMLTOKEN_TEXTURE3D:
-#ifndef CS_USE_OLD_RENDERER
         if (!ParseTexture3D (ldr_context, child))
           return false;
-#endif // CS_USE_OLD_RENDERER
         break;
       default:
         SyntaxService->ReportBadToken (child);
@@ -481,22 +477,15 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   float diffuse = CS_DEFMAT_DIFFUSE;
   float ambient = CS_DEFMAT_AMBIENT;
   float reflection = CS_DEFMAT_REFLECTION;
-#ifdef CS_USE_OLD_RENDERER
-  int num_txt_layer = 0;
-  iTextureWrapper* txt_layers[4];
-  csTextureLayer layers[4];
-#endif
+
   
-#ifndef CS_USE_OLD_RENDERER
   bool shaders_mentioned = false;	// If true there were shaders.
   csArray<csStringID> shadertypes;
-  //csArray<iShader*> shaders;
   csArray<iShader*> shaders;
   csRefArray<csShaderVariable> shadervars;
 
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
     object_reg, "crystalspace.shared.stringset", iStringSet);
-#endif // CS_USE_OLD_RENDERER
 
   csRefArray<iDocumentNode> key_nodes;
 
@@ -547,80 +536,8 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
         break;
       case XMLTOKEN_LAYER:
         // @@@ TODO: add shortcut to support NR!
-#ifdef CS_USE_OLD_RENDERER
-	{
-	  if (num_txt_layer >= 4)
-	  {
-	    SyntaxService->ReportError (
-	      "crystalspace.maploader.parse.material",
-	      child, "Only four texture layers supported!");
-	    return 0;
-	  }
-	  txt_layers[num_txt_layer] = 0;
-	  layers[num_txt_layer].txt_handle = 0;
-	  layers[num_txt_layer].uscale = 1;
-	  layers[num_txt_layer].vscale = 1;
-	  layers[num_txt_layer].ushift = 0;
-	  layers[num_txt_layer].vshift = 0;
-          layers[num_txt_layer].mode = CS_FX_ADD | CS_FX_TILING;
-	  csRef<iDocumentNodeIterator> layer_it = child->GetNodes ();
-	  while (layer_it->HasNext ())
-	  {
-	    csRef<iDocumentNode> layer_child = layer_it->Next ();
-	    if (layer_child->GetType () != CS_NODE_ELEMENT) continue;
-	    const char* layer_value = layer_child->GetValue ();
-	    csStringID layer_id = xmltokens.Request (layer_value);
-	    switch (layer_id)
-	    {
-	      case XMLTOKEN_TEXTURE:
-		{
-		  const char* txtname = layer_child->GetContentsValue ();
-		  iTextureWrapper* texh;
-		  if (ldr_context->GetRegion ()
-		  	&& ldr_context->CurrentRegionOnly ())
-		    texh = ldr_context->GetRegion ()->FindTexture (txtname);
-		  else
-                    texh = Engine->GetTextureList ()->FindByName (txtname);
-                  if (texh)
-                    txt_layers[num_txt_layer] = texh;
-                  else
-                  {
-		    SyntaxService->ReportError (
-			"crystalspace.maploader.parse.material",
-		    	child, "Cannot find texture `%s' for material `%s'!",
-			txtname, matname);
-		    return 0;
-                  }
-		}
-		break;
-	      case XMLTOKEN_SCALE:
-		layers[num_txt_layer].uscale = layer_child
-				->GetAttributeValueAsFloat ("u");
-		layers[num_txt_layer].vscale = layer_child
-				->GetAttributeValueAsFloat ("v");
-	        break;
-	      case XMLTOKEN_SHIFT:
-		layers[num_txt_layer].ushift = layer_child
-				->GetAttributeValueAsFloat ("u");
-		layers[num_txt_layer].vshift = layer_child
-				->GetAttributeValueAsFloat ("v");
-	        break;
-	      case XMLTOKEN_MIXMODE:
-		if (!SyntaxService->ParseMixmode (layer_child,
-		    layers[num_txt_layer].mode))
-		  return 0;
-	        break;
-	      default:
-	        SyntaxService->ReportBadToken (layer_child);
-		return 0;
-	    }
-	  }
-	  num_txt_layer++;
-	}
-#endif
         break;
       case XMLTOKEN_SHADER:
-#ifndef CS_USE_OLD_RENDERER
         {
 	  shaders_mentioned = true;
           csRef<iShaderManager> shaderMgr = CS_QUERY_REGISTRY (object_reg,
@@ -652,10 +569,8 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
 	  //csRef<iShaderWrapper> wrapper = shaderMgr->CreateWrapper (shader);
 	  shaders.Push (shader);
         }
-#endif //CS_USE_OLD_RENDERER
         break;
       case XMLTOKEN_SHADERVAR:
-#ifndef CS_USE_OLD_RENDERER
         {
           csRef<iShaderManager> shaderMgr = CS_QUERY_REGISTRY (object_reg,
             iShaderManager);
@@ -679,7 +594,6 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
           }
           shadervars.Push (var);
         }
-#endif //CS_USE_OLD_RENDERER
         break;
       default:
 	SyntaxService->ReportBadToken (child);
@@ -687,12 +601,8 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
     }
   }
 
-#ifndef CS_USE_OLD_RENDERER
   csRef<iMaterial> material = Engine->CreateBaseMaterial (texh);
-#else
-  csRef<iMaterial> material = Engine->CreateBaseMaterial (texh,
-  	num_txt_layer, txt_layers, layers);
-#endif
+
   if (col_set)
     material->SetFlatColor (col);
   material->SetReflection (diffuse, ambient, reflection);
@@ -714,13 +624,12 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   }
   
   size_t i;
-#ifndef CS_USE_OLD_RENDERER
   for (i=0; i<shaders.Length (); i++)
     //if (shaders[i]->Prepare ())
       material->SetShader (shadertypes[i], shaders[i]);
   for (i=0; i<shadervars.Length (); i++)
     material->AddVariable (shadervars[i]);
-#endif // CS_USE_OLD_RENDERER
+
   // dereference material since mat already incremented it
 
   for (i = 0 ; i < key_nodes.Length () ; i++)
@@ -742,7 +651,6 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   return mat;
 }
 
-#ifndef CS_USE_OLD_RENDERER
 /// Parse a Cubemap texture definition and add the texture to the engine
 iTextureWrapper* csLoader::ParseCubemap (iLoaderContext* ldr_context,
     iDocumentNode* node)
@@ -947,4 +855,3 @@ iTextureWrapper* csLoader::ParseTexture3D (iLoaderContext* ldr_context,
 
   return itexwrap;
 }
-#endif // CS_USE_OLD_RENDERER

@@ -29,7 +29,6 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "ivideo/graph3d.h"
-#include "ivideo/vbufmgr.h"
 
 struct iMaterialWrapper;
 struct iObjectRegistry;
@@ -76,8 +75,6 @@ public:
   }
   virtual csFlags& GetFlags () { return object_flags; }
   virtual csPtr<iMeshObject> Clone () { return 0; }
-  virtual bool DrawTest (iRenderView* rview, iMovable* movable, uint32);
-  virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
     if (cb) cb->IncRef ();

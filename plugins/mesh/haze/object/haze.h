@@ -200,9 +200,6 @@ private:
   uint32 current_features;
   csFlags flags;
 
-  /// Polygon.
-  G3DPolygonDPFX g3dpolyfx;
-
   /// bbox in object space
   csBox3 bbox;
   /**
@@ -308,14 +305,11 @@ public:
   virtual iMeshObjectFactory* GetFactory () const { return ifactory; }
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> Clone () { return 0; }
-  virtual bool DrawTest (iRenderView* rview, iMovable* movable,
-  	uint32 frustum_mask);
   void GenGeometryAdapt (iRenderView *rview, iGraphics3D *g3d, 
     int num_sides, csVector3* scrpts, csVector3* campts, csVector2* uvs,
     float layer_scale, float quality, int depth, int maxdepth);
   virtual csRenderMesh **GetRenderMeshes (int &n, iRenderView*, 
     iMovable*, uint32);
-  virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
     if (cb) cb->IncRef ();

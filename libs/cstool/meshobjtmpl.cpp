@@ -53,11 +53,6 @@ void csMeshObject::WantToDie ()
   }
 }
 
-bool csMeshObject::DrawTest (iRenderView*, iMovable*, uint32)
-{
-  return true;
-}
-
 void csMeshObject::SetVisibleCallback (iMeshObjectDrawCallback* cb)
 {
   VisCallback = cb;

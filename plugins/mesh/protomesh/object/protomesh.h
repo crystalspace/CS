@@ -42,7 +42,6 @@ struct iObjectRegistry;
 class csProtoMeshObject : public iMeshObject
 {
 private:
-#ifndef CS_USE_OLD_RENDERER
   // The render mesh holder is used by GetRenderMeshes() to supply
   // render meshes that can be returned by that function.
   csRenderMeshHolderSingle rmHolder;
@@ -56,7 +55,6 @@ private:
   // the color buffer here. But we will use the basic colors
   // from the factory.
   csRef<iRenderBuffer> color_buffer;
-#endif
 
   // Setup the 'svcontext' to get the buffers and accessors
   // for all types of data we need.
@@ -123,16 +121,6 @@ public:
   {
     // We don't support making clones.
     return 0;
-  }
-  virtual bool DrawTest (iRenderView*, iMovable*, uint32)
-  {
-    // We don't support OR.
-    return false;
-  }
-  virtual bool Draw (iRenderView*, iMovable*, csZBufMode)
-  {
-    // We don't support OR.
-    return false;
   }
   virtual csRenderMesh** GetRenderMeshes (int &n, iRenderView* rview, 
     iMovable* movable, uint32 frustum_mask);
@@ -217,7 +205,6 @@ public:
   friend class ProtoMeshState;
 
   //------------------ iShaderVariableAccessor implementation ------------
-#ifndef CS_USE_OLD_RENDERER
   class ShaderVariableAccessor : public iShaderVariableAccessor
   {
   private:
@@ -242,7 +229,6 @@ public:
   friend class ShaderVariableAccessor;
 
   void PreGetShaderVariableValue (csShaderVariable* variable);
-#endif // CS_USE_OLD_RENDERER
 };
 
 /**
@@ -276,7 +262,6 @@ private:
   bool initialized;
   csWeakRef<iGraphics3D> g3d;
 
-#ifndef CS_USE_OLD_RENDERER
   // Buffers for the renderers.
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
@@ -286,7 +271,6 @@ private:
   // Prepare the buffers (check if they are dirty).
   // Mesh objects will call this before rendering.
   void PrepareBuffers ();
-#endif
 
   // Bounding box/sphere.
   csVector3 radius;
@@ -440,7 +424,6 @@ public:
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 
   //------------------ iShaderVariableAccessor implementation ------------
-#ifndef CS_USE_OLD_RENDERER
   class ShaderVariableAccessor : public iShaderVariableAccessor
   {
   public:
@@ -463,7 +446,6 @@ public:
   friend class ShaderVariableAccessor;
 
   void PreGetShaderVariableValue (csShaderVariable* variable);
-#endif // CS_USE_OLD_RENDERER
 };
 
 /**

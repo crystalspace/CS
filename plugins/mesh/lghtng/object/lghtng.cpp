@@ -108,25 +108,6 @@ void csLightningMeshObject::SetupObject ()
   }
 }
 
-
-bool csLightningMeshObject::DrawTest (iRenderView* rview, iMovable* movable,
-	uint32 frustum_mask)
-{
-  return GenMesh->DrawTest (rview, movable, frustum_mask);
-}
-
-bool csLightningMeshObject::Draw (iRenderView* rview, iMovable* movable,
-	csZBufMode mode)
-{ 
-  csReversibleTransform &camtr = rview->GetCamera ()->GetTransform ();
-  csReversibleTransform &sprtr = movable->GetTransform ();
-  sprtr.LookAt(directional, camtr.GetOrigin () - sprtr.GetOrigin ());  
-  
-  movable->UpdateMove ();
-
-  return GenMesh->Draw (rview, movable, mode);  
-}
-
 csRenderMesh** csLightningMeshObject::GetRenderMeshes (int &n, 
 						       iRenderView* rview, 
 						       iMovable* movable, 

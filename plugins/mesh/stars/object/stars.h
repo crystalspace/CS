@@ -129,11 +129,8 @@ public:
   virtual iMeshObjectFactory* GetFactory () const { return factory; }
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> Clone () { return 0; }
-  virtual bool DrawTest (iRenderView* rview, iMovable* movable,
-  	uint32 frustum_mask);
   virtual csRenderMesh **GetRenderMeshes (int &n, iRenderView*,
     iMovable*, uint32) { n = 0; return 0; }
-  virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
     if (cb) cb->IncRef ();

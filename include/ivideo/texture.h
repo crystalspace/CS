@@ -1,5 +1,6 @@
 /*
     Copyright (C) 1998, 2000 by Jorrit Tyberghein
+                        2004 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -100,7 +101,7 @@ struct iTextureHandle : public iBase
          CS_TEXTURE_CUBE_POS_Y, CS_TEXTURE_CUBE_NEG_Y,
          CS_TEXTURE_CUBE_POS_Z, CS_TEXTURE_CUBE_NEG_Z };
 
-#ifndef CS_USE_OLD_RENDERER
+
   /**
    * Get the dimensions for a given mipmap level (0 to 3).
    * If the texture was registered just for 2D usage, mipmap levels above
@@ -141,7 +142,6 @@ struct iTextureHandle : public iBase
    */
   virtual void Blit (int x, int y, int width, int height,
     unsigned char const* data) = 0;
-#endif // CS_USE_OLD_RENDERER
 
   /**
    * Get the original image name at the given depth. Use depths above 0

@@ -272,7 +272,7 @@ private:
   iBase* logparent;
   csTerrainFactory* pFactory;
   csRef<iMeshObjectDrawCallback> vis_cb;
-  iVertexBufferManager *vbufmgr;
+  
   float lod_lcoeff;
   float lod_qcoeff;
   float block_maxsize;
@@ -407,9 +407,6 @@ public:
 
   SCF_DECLARE_IBASE;
   ///--------------------- iMeshObject implementation ---------------------
-
-  virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode)
-    { return false; }
 
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> Clone () { return 0; }

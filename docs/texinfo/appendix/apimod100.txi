@@ -705,3 +705,97 @@ if (ev->Retrieve(@dots{}) == csEventErrNone)
   @dots{}
 @}
 @end example
+
+@subheading Old renderer architecture removed
+The old rendering architecture, togheter with the old renderer plugins are now
+removed. Togheter with this a few plugins, applications, classes and methods
+have been deprecated because they either isn't needed, or makes no sense to have
+for the new rendering architecture.
+
+At the same time a few things in the new renderer (now the only renderer) also
+have changed.
+
+@subsubheading Removed plugins
+@itemize @bullet
+@item
+terrfunc (@code{crystalspace.mesh.object.terrfunc})
+@item
+gl3d (@file{plugins/video/renderer/opengl})
+@item
+soft3d (@file{plugins/video/renderer/software})
+@item
+null3d (@file{plugins/video/renderer/null})
+@end itemize
+
+@subsubheading Removed application
+The perftest application have been removed, as it is no longer have any purpose.
+For the future the csbench application should be extended to provide more 
+information.
+
+@subsubheading Removed and renamed files
+Following additional files have been removed or renamed
+
+@itemize @bullet
+@item
+@file{include/ivideo/vbufmgr.h} @result{} Removed
+@item
+@file{data/shader/or_lighting*.xml} @result{} @file{data/shader/std_lighting*.xml}
+@end itemize
+
+@subsubheading Removed methods and classes
+Within the @code{iGraphics3D} interface and its implementations the following
+methods have been removed.
+@itemize @bullet
+@item
+@code{GetZBuffAt ()}
+@item
+@code{DrawPolygonDebug ()}
+@item
+@code{DrawPolygonFX ()}
+@item
+@code{DrawTriangleMesh ()}
+@item
+@code{DrawPolygonMesh ()}
+@item
+@code{OpenFogObject ()}
+@item
+@code{DrawFogPolygon ()}
+@item
+@code{CloseFogObject ()}
+@item
+@code{DumpCache ()}
+@item
+@code{ClearCache ()}
+@item
+@code{GetVertexBufferManager ()}
+@end itemize
+
+From @code{iRenderView} following fog-related methods have been removed.
+Fog is now calculated within the renderer.
+@itemize @bullet
+@item
+@code{CalculateFogPolygon ()}
+@item
+@code{CalculateFogMesh ()}
+@end itemize
+
+The old methods used for rendering (@code{Draw ()} and @code{DrawTest ()})
+have been removed from @code{iMeshObject} and @code{iParticle}
+
+Apart from these methods, the following classes/structs have been removed
+or relocalized from public headers into plugin-private headers.
+@itemize @bullet
+@item
+@code{G3DFogInfo}
+@item
+@code{G3DPolygonDPFX}
+@item
+@code{G3DPolygonDFP}
+@item
+@code{G3DPolygonDP}
+@item
+@code{G3DPolygonDPF}
+@item
+@code{G3DTriangleMesh}
+@item
+@code{G3DPolygonMesh}

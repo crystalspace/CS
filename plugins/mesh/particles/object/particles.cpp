@@ -402,12 +402,6 @@ void csParticlesObject::SetParticleRadius (float rad)
   }
 }
 
-bool csParticlesObject::DrawTest (iRenderView*, iMovable*,
-	uint32)
-{
-  return true;
-}
-
 void csParticlesObject::PreGetShaderVariableValue (csShaderVariable* var)
 {
   var->SetValue(GetRenderBuffer(var->Name));

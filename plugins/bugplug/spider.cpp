@@ -49,15 +49,6 @@ csSpider::~csSpider ()
   SCF_DESTRUCT_IBASE ();
 }
 
-bool csSpider::DrawTest (iRenderView* rview, iMovable*, uint32)
-{
-  if (!camera)
-  {
-    camera = rview->GetCamera ();
-  }
-  return false;
-}
-
 csRenderMesh** csSpider::GetRenderMeshes (int& n, iRenderView* rview, 
     iMovable* movable, uint32)
 { 

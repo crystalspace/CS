@@ -272,7 +272,6 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
 
 bool csSaver::SaveMaterials(iDocumentNode *parent)
 {
-#ifndef CS_USE_OLD_RENDERER
   csRef<iStringSet> stringset =
     CS_QUERY_REGISTRY_TAG_INTERFACE(object_reg, 
     "crystalspace.shared.stringset", iStringSet);
@@ -282,9 +281,8 @@ bool csSaver::SaveMaterials(iDocumentNode *parent)
   csStringID matambiID = stringset->Request("mat ambient");
   csStringID matreflID = stringset->Request("mat reflection");
   csStringID matflatcolID = stringset->Request("mat flatcolor");
-  csStringID orlightID = stringset->Request("or_lighting");
-  csStringID orcompatID = stringset->Request("OR compatibility");
-#endif
+  csStringID orlightID = stringset->Request("std_lighting");
+  csStringID orcompatID = stringset->Request("standard");
 
   csRef<iDocumentNode> current = CreateNode(parent, "materials");
   iMaterialList *matList=engine->GetMaterialList();
@@ -334,43 +332,6 @@ bool csSaver::SaveMaterials(iDocumentNode *parent)
     if (reflection && reflection != CS_DEFMAT_REFLECTION)
       CreateNode (child, "reflection")->CreateNodeBefore (CS_NODE_TEXT)->
         SetValueAsFloat (reflection);
-
-#ifdef CS_USE_OLD_RENDERER
-    int layerCount = mat->GetTextureLayerCount();
-    for(int i = 0; i < layerCount; i++)
-    {
-      csRef<iDocumentNode> layerItem = CreateNode(child, "layer");
-
-      iTextureWrapper* layerTexWrap = matEngine->GetTextureWrapper(i);
-      if(layerTexWrap)
-      {
-        const char* texname = layerTexWrap->QueryObject()->GetName();
-        if (texname && *texname)
-          CreateValueNode(layerItem, "texture", texname);
-      }
-
-      csTextureLayer* texLayer = mat->GetTextureLayer(i);
-      if (texLayer->uscale!=1.0f || texLayer->vscale!=1.0f)
-      {
-        csRef<iDocumentNode> scaleItem = CreateNode(layerItem, "scale");
-        scaleItem->SetAttributeAsFloat("u", texLayer->uscale);
-        scaleItem->SetAttributeAsFloat("v", texLayer->vscale);
-      }
-      if (texLayer->ushift != 0.0f || texLayer->vshift != 0.0f)
-      {
-        csRef<iDocumentNode> shiftItem = CreateNode(layerItem, "shift");
-        shiftItem->SetValue("shift");
-        shiftItem->SetAttributeAsFloat("u", texLayer->ushift);
-        shiftItem->SetAttributeAsFloat("v", texLayer->vshift);
-      }
-
-      if (texLayer->mode != (CS_FX_ADD|CS_FX_TILING)
-      {
-        csRef<iDocumentNode> mixmodeItem = CreateNode (layerItem, "mixmode");
-        synldr->WriteMixmode (mixmodeItem, texLayer->mode, false);
-      }
-    }
-#else
 
     csHash<csRef<iShader>, csStringID> shaders = mat->GetShaders();
     csHash<csRef<iShader>, csStringID>::GlobalIterator shaderIter = 
@@ -500,15 +461,13 @@ bool csSaver::SaveMaterials(iDocumentNode *parent)
       }
 
     }
-
-#endif
   }
   return true;
 }
 
 bool csSaver::SaveShaders (iDocumentNode *parent)
 {
-#ifndef CS_USE_OLD_RENDERER
+
   csRef<iDocumentNode> shadersNode = CreateNode(parent, "shaders");
   csRef<iShaderManager> shaderMgr = 
     CS_QUERY_REGISTRY (object_reg, iShaderManager);
@@ -528,7 +487,7 @@ bool csSaver::SaveShaders (iDocumentNode *parent)
         ->CreateNodeBefore(CS_NODE_TEXT)->SetValue(shaderfile);
     }
   }
-#endif
+
   return true;
 }
 
@@ -736,7 +695,6 @@ bool csSaver::SaveSectors(iDocumentNode *parent)
     const char* name = sector->QueryObject()->GetName();
     if (name && *name) sectorNode->SetAttribute("name", name);
     
-#ifndef CS_USE_OLD_RENDERER
     iRenderLoop* renderloop = sector->GetRenderLoop ();
     if (renderloop)
     {
@@ -745,7 +703,6 @@ bool csSaver::SaveSectors(iDocumentNode *parent)
         CreateNode(sectorNode, "renderloop")
           ->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(loopName);
     }
-#endif
 
     // TBD: cullerp, polymesh, node
 
@@ -1074,13 +1031,11 @@ bool csSaver::SaveSettings (iDocumentNode* node)
   engine->GetAmbientLight(c);
   synldr->WriteColor(ambientNode, &c);
 
-#ifndef CS_USE_OLD_RENDERER
   iRenderLoop* renderloop = engine->GetCurrentDefaultRenderloop();
   const char* loopName = engine->GetRenderLoopManager()->GetName(renderloop);
   if (strcmp (loopName, CS_DEFAULT_RENDERLOOP_NAME))
     CreateNode(settingsNode, "renderloop")
       ->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(loopName);
-#endif
 
   return true;
 }

@@ -59,13 +59,14 @@
   poly.var [j].component = v1 + t * (v2 - v1); \
 }
 
-void csComponent::Polygon3D (G3DPolygonDPFX &poly, uint mode)
+//@@@REIMPLEMENT THIS FOR NR
+/*void csComponent::Polygon3D (G3DPolygonDPFX &poly, uint mode)
 {
  /* Do clipping as follows: create a minimal rectangle which fits the polygon,
   * clip the rectangle against children & parents, then clip the poly against
   * all resulting rectangles.
   */
-  cswsRectVector rect (8, 4);
+ /* cswsRectVector rect (8, 4);
   int x = csQint (poly.vertices[0].x), y = csQint (poly.vertices[0].y);
   int p;
   csRect *lb = new csRect (x, y, x, y);
@@ -199,7 +200,7 @@ void csComponent::Polygon3D (G3DPolygonDPFX &poly, uint mode)
 
     app->pplPolygon3D (poly, mode);
   }
-}
+}*/
 
 void csComponent::ClearZbuffer (int x1, int y1, int x2, int y2)
 {

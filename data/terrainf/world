@@ -115,7 +115,7 @@
         </step>
         <!-- draws geometry -->
         <step plugin="crystalspace.renderloop.step.generic">
-          <shadertype>OR compatibility</shadertype>
+          <shadertype>standard</shadertype>
           <zoffset>no</zoffset>
           <zuse />
         </step>

@@ -58,6 +58,266 @@ struct iConfigFile;
   float red, green, blue;
 };*/
 
+
+//===========================================================================
+// Not for new renderer! @@@NR@@@
+// The stuff below is either to be ported to new renderer or else
+// it will be removed.
+//===========================================================================
+
+#define CS_FOG_FRONT  0
+#define CS_FOG_BACK   1
+#define CS_FOG_VIEW   2
+
+//======================================================================
+// For vertex based fog the following defines are used:
+#define CS_FOGTABLE_SIZE 64
+
+// Each texel in the fog table holds the fog alpha value at a certain
+// (distance*density).  The median distance parameter determines the
+// (distance*density) value represented by the texel at the center of
+// the fog table.  The fog calculation is:
+// alpha = 1.0 - exp( -(density*distance) / CS_FOGTABLE_MEDIANDISTANCE)
+#define CS_FOGTABLE_MEDIANDISTANCE 10.0f
+#define CS_FOGTABLE_MAXDISTANCE (CS_FOGTABLE_MEDIANDISTANCE * 2.0f)
+#define CS_FOGTABLE_DISTANCESCALE (1.0f / CS_FOGTABLE_MAXDISTANCE)
+
+// Fog (distance*density) is mapped to a texture coordinate and then
+// clamped.  This determines the clamp value.  Some drivers don't
+// like clamping textures so we must do it ourself
+#define CS_FOGTABLE_CLAMPVALUE 0.85f
+#define CS_FOG_MAXVALUE (CS_FOGTABLE_MAXDISTANCE * CS_FOGTABLE_CLAMPVALUE)
+//======================================================================
+
+/// Extra information for vertex fogging.
+class G3DFogInfo
+{
+public:
+  /// Color.
+  float r, g, b;
+  /**
+  * Intensity (== density * thickness).
+  * The second intensity value is always 0 and is put there
+  * to make it easier for 3D implementations to just use the
+  * two values below as a coordinate in a texture of 64*1.
+  */
+  float intensity;
+  float intensity2;
+};
+
+/// Information about a texture plane.
+class G3DCam2TextureTransform
+{
+public:
+  /// Transformation from camera space to texture space.
+  csMatrix3* m_cam2tex;
+  /// Transformation from camera space to texture space.
+  csVector3* v_cam2tex;
+};
+
+/// Structure containing all info needed by DrawPolygonFX (DPFX)
+struct G3DPolygonDPFX
+{
+  /// Current number of vertices.
+  int num;
+  /// Vertices that form the polygon.
+  csVector2 vertices[100];
+  /// 1/z for every vertex.
+  float z[100];
+  /// Texels per vertex.
+  csVector2 texels[100];
+  /// Lighting info per vertex.
+  csColor colors[100];
+
+  /// Extra optional fog information.
+  G3DFogInfo fog_info[100];
+  /// Use fog info?
+  bool use_fog;
+
+  iTextureHandle* tex_handle;
+
+  /// Mixmode to use. If CS_FX_COPY then no mixmode is used.
+  uint mixmode;
+
+  //@{
+  /// Use this color for drawing (if txt_handle == 0) instead of a material.
+  uint8 flat_color_r;
+  uint8 flat_color_g;
+  uint8 flat_color_b;
+  //@}
+
+  // A dummy constructor to appease NextStep compiler which otherwise
+  // complains that it is unable to create this object.  This happens when
+  // a subcomponent such as csVector2 has a constructor.
+  G3DPolygonDPFX() {}
+};
+
+/// Structure containing all info needed by DrawFogPolygon (DFP)
+struct G3DPolygonDFP
+{
+  /// Current number of vertices.
+  int num;
+  /// Vertices that form the polygon.
+  csVector2 vertices[100];
+
+  /// The plane equation in camera space of this polygon.
+  csPlane3 normal;
+};
+
+/// Structure containing all info needed by DrawPolygon (DP)
+struct G3DPolygonDP : public G3DPolygonDFP
+{
+  /// Extra optional fog information.
+  G3DFogInfo fog_info[100];
+  /// Use fog info?
+  bool use_fog;
+
+  /// The material handle as returned by iTextureManager.
+  iMaterialHandle* mat_handle;
+
+  /// Transformation matrices for the texture. @@@ BAD NAME
+  G3DCam2TextureTransform cam2tex;
+
+  /// Handle to lighted textures (texture + lightmap)
+  csPolyTextureMapping* texmap;
+  iRendererLightmap* rlm;
+
+  /// Draw fullbright?
+  bool do_fullbright;
+
+  /// Mixmode to use. If CS_FX_COPY then no mixmode is used.
+  uint mixmode;
+
+  /// Z value (in camera space) of vertex[0].
+  float z_value;
+
+  iTextureHandle* txt_handle;
+};
+
+/// Structure containing all info needed by DrawPolygonFlat (DPF)
+typedef G3DPolygonDP G3DPolygonDPF;
+
+/**
+* Structure containing all info needed by DrawTriangeMesh.
+* This function is capable of:<br>
+* <ul>
+* <li>Object2camera transformation and perspective.
+* <li>Linear interpolation between two sets of vertices.
+* <li>Clipping.
+* <li>Whatever else DrawPolygonFX can do.
+* </ul>
+* To disable the use of one of the components, set it to 0.
+*/
+struct G3DTriangleMesh
+{
+  enum
+  {
+    /// Maximum number of vertex pool, used for vertex weighting/morphing.
+    MAX_VERTEXPOOL = 2
+  };
+
+  /// Number of vertex sets, if > 1, morphing will be applied.
+  int num_vertices_pool;
+
+  /// Number of triangles.
+  int num_triangles;
+  /// Pointer to array of triangles.
+  csTriangle* triangles;
+
+  /// Clip to portal? One of CS_CLIP_???.
+  int clip_portal;
+  /// Clip to near plane? One of CS_CLIP_???.
+  int clip_plane;
+  /// Clip to z plane? One of CS_CLIP_???.
+  int clip_z_plane;
+
+  /// Use precalculated vertex color?
+  bool use_vertex_color;
+
+  /// Apply fogging?
+  bool do_fog;
+  /// Consider triangle vertices in anti-clockwise order if true.
+  bool do_mirror;
+  /// If morphing is applied then morph texels too if true.
+  bool do_morph_texels;
+  /// If morphing is applied then morph vertex colors too if true.
+  bool do_morph_colors;
+
+  /// Types of vertices supplied.
+  enum VertexMode
+  {
+    /// Must apply transformation and perspective.
+    VM_WORLDSPACE,
+    /// Must apply perspective.
+    VM_VIEWSPACE
+  };
+
+  /// Type of vertices supplied.
+  VertexMode vertex_mode;
+
+  /// DrawPolygonFX flag.
+  uint mixmode;
+  float morph_factor;
+  /**
+  * Vertex buffers. Note that all vertex buffers used here MUST
+  * have the same number of vertices.
+  */
+  iMaterialHandle* mat_handle;
+  /// Information for fogging the vertices.
+  G3DFogInfo* vertex_fog;
+
+  // TODO : store information required for lighting calculation
+};
+
+/**
+* Structure containing all info needed by DrawPolygonMesh.
+* In theory this function is capable of:<br>
+* <ul>
+* <li>Object2camera transformation and perspective.
+* <li>Clipping.
+* <li>Whatever else DrawPolygon can do.
+* </ul>
+* To disable the use of one of the components, set it to 0.
+*/
+struct G3DPolygonMesh
+{
+  /// Polygon buffer.
+  iPolygonBuffer* polybuf;
+
+  // Apply fogging?
+  bool do_fog;
+
+  /// Mixmode.
+  uint mixmode;
+
+  /// Clip to portal? One of CS_CLIP_???.
+  int clip_portal;
+  /// Clip to near plane? One of CS_CLIP_???.
+  int clip_plane;
+  /// Clip to z plane? One of CS_CLIP_???.
+  int clip_z_plane;
+
+  /// Consider polygon vertices in anti-clockwise order if true.
+  bool do_mirror;
+
+  /// Types of vertices supplied.
+  enum VertexMode
+  {
+    /// Must apply transformation and perspective.
+    VM_WORLDSPACE,
+    /// Must apply perspective.
+    VM_VIEWSPACE
+  };
+
+  /// Type of vertices supplied.
+  VertexMode vertex_mode;
+
+  /// Information for fogging the vertices.
+  G3DFogInfo* vertex_fog;
+};
+
+
+
 /// Information about a texture plane.
 class G3DTexturePlane
 {
@@ -520,8 +780,6 @@ public:
   { return texman; }
 
   /// Get the vertex buffer manager.
-  /*virtual iVertexBufferManager* GetVertexBufferManager ()
-  { return vbufmgr; }*/
 
   virtual void SetRenderTarget (iTextureHandle* handle, bool persistent);
   virtual iTextureHandle* GetRenderTarget () const { return render_target; }
@@ -745,7 +1003,6 @@ public:
   virtual void CloseFogObject (CS_ID) { CS_ASSERT (false); }
   virtual iHalo *CreateHalo (float, float, float,
     unsigned char *, int, int) { return 0; }
-  virtual iVertexBufferManager* GetVertexBufferManager () { return 0; }
   virtual bool IsLightmapOK (int, int, int) { return true; }
   //=========================================================================
 

@@ -90,6 +90,7 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
 
   bTimeSynced = false;
   fxmode = CS_FX_COPY;
+/*
   polyfx.num = 4;
   polyfx.use_fog = false;
   polyfx.texels[0].x = 0;
@@ -107,7 +108,7 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
     polyfx.colors[i].blue = 1;
     polyfx.z[i] = 1;
   }
-
+*/
   pMaterial = 0;
   return LoadCodec (pInitData, nInitDataLen, pFormatEx, nFormatEx);
 }
@@ -153,14 +154,14 @@ bool csAVIStreamVideo::SetRect (int x, int y, int w, int h)
   int height = pG3D->GetHeight ()-1;
 
   rc.Set (x, y, x+w, y+h);
-  polyfx.vertices[0].x = x;
+/*  polyfx.vertices[0].x = x;
   polyfx.vertices[0].y = height - y;
   polyfx.vertices[1].x = x+w;
   polyfx.vertices[1].y = height - y;
   polyfx.vertices[2].x = x+w;
   polyfx.vertices[2].y = height - (y+h);
   polyfx.vertices[3].x = x;
-  polyfx.vertices[3].y = height - (y+h);
+  polyfx.vertices[3].y = height - (y+h);*/
 
   memimage.Rescale (w, h);
   return true;

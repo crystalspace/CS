@@ -662,6 +662,7 @@ bool csMeshWrapper::CheckImposterRelevant (iRenderView *rview)
 
 void csMeshWrapper::DrawIntFull (iRenderView *rview, uint32 frustum_mask)
 {
+  CS_ASSERT_MSG("Cannot remove this", 0);
   iMeshWrapper *meshwrap = &scfiMeshWrapper;
 
   int i;
@@ -675,7 +676,7 @@ void csMeshWrapper::DrawIntFull (iRenderView *rview, uint32 frustum_mask)
     i--;
   }
 
-  if (meshobj->DrawTest (rview, &movable.scfiMovable, frustum_mask))
+/*  if (meshobj->DrawTest (rview, &movable.scfiMovable, frustum_mask))
   {
     csTicks lt = csEngine::current_engine->GetLastAnimationTime ();
     if (lt != 0)
@@ -695,8 +696,8 @@ void csMeshWrapper::DrawIntFull (iRenderView *rview, uint32 frustum_mask)
       }
     }
 
-    meshobj->Draw (rview, &movable.scfiMovable, zbufMode);
-  }
+    //meshobj->Draw (rview, &movable.scfiMovable, zbufMode);
+  }*/
 
 #if 0
   if (static_lod)

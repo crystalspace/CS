@@ -37,7 +37,7 @@ extern WalkTest* Sys;
 
 void DrawZbuffer ()
 {
-#ifdef CS_USE_OLD_RENDERER
+#if 0 //OR_REMOVAL
   int y, x;
   for (y = 0; y < FRAME_HEIGHT; y++)
   {
@@ -165,7 +165,7 @@ void DrawDebugBoxSide (iCamera* cam, bool do3d,
     	const csVector3& v3, const csColor& c3,
     	const csVector3& v4, const csColor& c4)
 {
-#ifdef CS_USE_OLD_RENDERER
+#if 0 //OR_REMOVAL
   G3DPolygonDPFX poly;
   csVector3 v;
   csVector2 persp;

@@ -45,9 +45,8 @@
 
 #include "ivaria/bugplug.h"
 
-#ifndef CS_USE_OLD_RENDERER
 #include "ivideo/rendermesh.h"
-#endif
+
 
 // Configuration variable: number of allowed reflections for static lighting.
 int csSector:: cfg_reflections = 1;
@@ -283,7 +282,6 @@ public:
   {
     SCF_CONSTRUCT_IBASE(0);
     privMeshlist = 0;
-    sector = 0;
   }
 
   virtual ~csSectorVisibleMeshCallback()
@@ -295,12 +293,6 @@ public:
   void Setup (csRenderMeshList *meshlist, iRenderView *rview)
   {
     privMeshlist = meshlist;
-    csSectorVisibleMeshCallback::rview = rview;
-  }
-  // OR version
-  void Setup (csSector* sector, iRenderView *rview)
-  {
-    csSectorVisibleMeshCallback::sector = sector;
     csSectorVisibleMeshCallback::rview = rview;
   }
 
@@ -331,7 +323,6 @@ public:
         MarkMeshAndChildrenVisible (meshes[i], frustum_mask);
     }
 
-#ifndef CS_USE_OLD_RENDERER
     int num;
     csRenderMesh** meshes = cmesh->GetRenderMeshes (num, rview, 
       &(cmesh->GetCsMovable ()).scfiMovable, frustum_mask);
@@ -348,18 +339,13 @@ public:
       privMeshlist->AddRenderMeshes (meshes, num, cmesh->GetRenderPriority (),
 	  cmesh->GetZBufMode (), box);
     }
-#else
-    sector->GetRenderQueues ().AddVisible (cmesh, frustum_mask);
-#endif
   }
 
   virtual void ObjectVisible (iVisibilityObject* visobj, iMeshWrapper *mesh,
   	uint32 frustum_mask)
   {
-#ifndef CS_USE_OLD_RENDERER
     if (privMeshlist == 0)
       return;
-#endif
 
     csMeshWrapper* cmesh = ((csMeshWrapper::MeshWrapper*)mesh)
     	->GetCsMeshWrapper ();
@@ -367,7 +353,6 @@ public:
   }
 
 private:
-  csSector* sector;	// OR only
   csRenderMeshList *privMeshlist;	// NR only
   iRenderView *rview;
 };
@@ -632,9 +617,6 @@ iSector *csSector::FollowSegment (
 
 void csSector::PrepareDraw (iRenderView *rview)
 {
-#ifdef CS_USE_OLD_RENDERER
-  draw_busy++;
-#endif
 
   if (csEngine::current_engine->bugplug)
     csEngine::current_engine->bugplug->AddCounter ("Sector Count", 1);
@@ -792,164 +774,9 @@ void csSector::PrepareDraw (iRenderView *rview)
  */
 void csSector::Draw (iRenderView *rview)
 {
-#ifdef CS_USE_OLD_RENDERER
-  csRenderView* csrview = (csRenderView*)rview;
-  csrview->SetupClipPlanes ();
-
-  PrepareDraw (rview);
-  iCamera *icam = rview->GetCamera ();
-  size_t i;
-
-  G3D_FOGMETHOD fogmethod = G3DFOGMETHOD_NONE;
-
-  if (HasFog ())
-  {
-    fogmethod = csEngine::current_engine->fogmethod;
-    if (fogmethod == G3DFOGMETHOD_VERTEX)
-    {
-      csFogInfo *fog_info = new csFogInfo ();
-      fog_info->next = csrview->GetFirstFogInfo ();
-
-      iPortal* last_portal = rview->GetLastPortal ();
-      if (last_portal)
-      {
-        last_portal->ComputeCameraPlane (icam->GetTransform (),
-		  fog_info->incoming_plane);
-        fog_info->incoming_plane.Invert ();
-        fog_info->has_incoming_plane = true;
-      }
-      else
-      {
-        fog_info->has_incoming_plane = false;
-      }
-      fog_info->fog = &GetFog ();
-      fog_info->has_outgoing_plane = true;
-      csrview->SetFirstFogInfo (fog_info);
-    }
-    else if (fogmethod != G3DFOGMETHOD_NONE)
-    {
-      rview->GetGraphics3D ()->OpenFogObject (GetID (), &GetFog ());
-    }
-  }
-
-  if (csrview->AddedFogInfo ())
-    csrview->GetFirstFogInfo ()->has_outgoing_plane = false;
-
-  /*
-   * Draw meshes.
-   * To correctly support meshes in multiple sectors we only draw a
-   * mesh if the mesh is not in the sector we came from. If the
-   * mesh is also present in the previous sector then we will still
-   * draw it in any of the following cases:
-   *    - the previous sector has fog
-   *    - the portal we just came through has alpha transparency
-   *    - the portal is a portal on a thing (i.e. a floating portal)
-   *    - the portal does space warping
-   * In those cases we draw the mesh anyway. @@@ Note that we should
-   * draw it clipped (in 3D) to the portal polygon. This is currently not
-   * done.
-   */
-
-  if (meshes.GetCount () > 0)
-  {
-    // Mark visible objects.
-    current_visnr++;
-    RenderQueues.ClearVisible ();
-    GetVisMeshCb ()->Setup (this, rview);
-    culler->VisTest (rview, GetVisMeshCb ());
-    //uint32 current_visnr = culler->GetCurrentVisibilityNumber ();
-
-    // get a pointer to the previous sector
-    iSector *prev_sector = rview->GetPreviousSector ();
-
-    // look if meshes from the previous sector should be drawn
-    bool draw_prev_sector = false;
-
-    if (prev_sector)
-    {
-      iPortal* portal = rview->GetLastPortal ();
-      draw_prev_sector = prev_sector->HasFog () ||
-        portal->GetFlags ().Check (CS_PORTAL_WARP | CS_PORTAL_CLIPSTRADDLING);
-    }
-
-    // First sort everything based on render priority and return
-    // a big list of visible objects. This will use the visibility
-    // information calculated by VisTest() above.
-    csArrayMeshMask objects;
-    objects.SetCapacity (meshes.GetCount ());
-    RenderQueues.SortAll (objects, rview);
-
-    // Draw the objects.
-    for (i = 0 ; i < objects.Length () ; i++)
-    {
-      csMeshWithMask& mesh_with_mask = objects[i];
-      csMeshWrapper* sp = mesh_with_mask.mesh;
-      if (!prev_sector ||
-          sp->GetMovable ()->GetSectors ()->Find (prev_sector) == -1)
-      {
-        // Mesh is not in the previous sector or there is no previous
-        // sector.
-        sp->Draw (rview, mesh_with_mask.frustum_mask);
-      }
-      else if (draw_prev_sector)
-      {
-        // @@@ Here we should draw clipped to the portal.
-        sp->Draw (rview, mesh_with_mask.frustum_mask);
-      }
-    }
-  }
-
-  // queue all halos in this sector to be drawn.
-  i = lights.GetCount ();
-  while (i > 0)
-  {
-    i--;
-    // Tell the engine to try to add this light into the halo queue
-    csEngine::current_engine->AddHalo (
-      csEngine::current_engine->current_camera,  
-      lights.Get (i)->GetPrivateObject ());
-  }
-
-  // Handle the fog, if any
-  if (fogmethod != G3DFOGMETHOD_NONE)
-  {
-    G3DPolygonDFP g3dpoly;
-    if (fogmethod == G3DFOGMETHOD_ZBUFFER)
-    {
-      g3dpoly.num = rview->GetClipper ()->GetVertexCount ();
-
-      csVector2 *clipview = rview->GetClipper ()->GetClipPoly ();
-      memcpy (g3dpoly.vertices, clipview, g3dpoly.num * sizeof (csVector2));
-      if (icam->GetSector () == &scfiSector && draw_busy == 0)
-      {
-        // Since there is fog in the current camera sector we simulate
-        // this by adding the view plane polygon.
-        rview->GetGraphics3D ()->DrawFogPolygon (
-              GetID (), g3dpoly, CS_FOG_VIEW);
-      }
-      else
-      {
-        // We must add a FRONT fog polygon for the clipper to this sector.
-        csrview->GetClipPlane (g3dpoly.normal);
-        g3dpoly.normal.Invert ();
-        rview->GetGraphics3D ()->DrawFogPolygon (
-            GetID (), g3dpoly, CS_FOG_FRONT);
-      }
-    }
-    else if (fogmethod == G3DFOGMETHOD_VERTEX && csrview->AddedFogInfo ())
-    {
-      csFogInfo *fog_info = csrview->GetFirstFogInfo ();
-      csrview->SetFirstFogInfo (csrview->GetFirstFogInfo ()->next);
-      delete fog_info;
-    }
-  }
-
-  draw_busy--;
-#else
   iRenderLoop* rl = renderloop;
   if (!rl) rl = engine->GetCurrentDefaultRenderloop ();
   rl->Draw (rview, (iSector*)&scfiSector);
-#endif // CS_USE_OLD_RENDERER
 }
 
 void csSector::CheckFrustum (iFrustumView *lview)

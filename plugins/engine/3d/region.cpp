@@ -222,7 +222,6 @@ void csRegion::DeleteAll ()
     }
   }
 
-#ifndef CS_USE_OLD_RENDERER
   csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY (
   	csEngine::current_engine->object_reg, iShaderManager);
   if (shmgr)
@@ -239,7 +238,6 @@ void csRegion::DeleteAll ()
         copy[i] = 0;
       }
     }
-#endif
 
   for (i = 0; i < copy.Length (); i++)
   {

@@ -25,7 +25,6 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/material.h"
-#include "ivideo/vbufmgr.h"
 #include "iengine/material.h"
 #include "iengine/camera.h"
 #include "igeom/clip2d.h"
@@ -96,11 +95,6 @@ csNullmeshMeshObject::~csNullmeshMeshObject ()
   SCF_DESTRUCT_IBASE ();
 }
 
-bool csNullmeshMeshObject::DrawTest (iRenderView*, iMovable*, uint32)
-{
-  return true;
-}
-
 void csNullmeshMeshObject::SetRadius (float radius)
 {
   csNullmeshMeshObject::radius = radius;
@@ -113,13 +107,6 @@ void csNullmeshMeshObject::SetBoundingBox (const csBox3& box)
   csNullmeshMeshObject::box = box;
   radius = csQsqrt (csSquaredDist::PointPoint (box.Max (), box.Min ())) / 2.0;
   scfiObjectModel.ShapeChanged ();
-}
-
-bool csNullmeshMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
-	csZBufMode /*mode*/)
-{
-  if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
-  return true;
 }
 
 void csNullmeshMeshObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2000 by Norman Krmer
+              (C) 2004 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -188,7 +189,7 @@ void csFancyConsole::Draw3D (csRect *oArea)
   bool btext, bgour;
   int i;
   long int zBuf;
-  G3DPolygonDPFX poly;
+  csSimpleRenderMesh mesh;
   if (!border_computed)
   {
     // determine what space left to draw the actual console
@@ -212,7 +213,8 @@ void csFancyConsole::Draw3D (csRect *oArea)
 
   G3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_NONE);
 
-  int height = G3D->GetHeight () - 1;
+  int height = G3D->GetHeight ();
+  int width = G3D->GetWidth ();
 
   // first draw the background
   // do we draw gouraud/flat or with texture ?
@@ -225,84 +227,100 @@ void csFancyConsole::Draw3D (csRect *oArea)
   size.ymin +=  bordersize.ymin - deco.p2ty - deco.ty;
   size.ymax += -bordersize.ymax + deco.p2by + deco.by;
 
-  poly.num = 4;
-  poly.vertices [0].x = size.xmin;
-  poly.vertices [0].y = height - size.ymin;
-  poly.vertices [1].x = size.xmax;
-  poly.vertices [1].y = height - size.ymin;
-  poly.vertices [2].x = size.xmax;
-  poly.vertices [2].y = height - size.ymax;
-  poly.vertices [3].x = size.xmin;
-  poly.vertices [3].y = height - size.ymax;
-  poly.use_fog = false;
+  float hw = float (G3D->GetWidth () / 2);
+  float hh = float (G3D->GetHeight () / 2);
+  float asp = hw / hh;
+
+  static uint indices[4] = {0, 1, 2, 3};
+  csVector3 vertices[4];
+  csVector2 texels[4];
+  csVector4 colors[4];
+
+  vertices[0].Set (size.xmin, size.ymin, 0);
+  vertices[1].Set (size.xmax,  size.ymin, 0);
+  vertices[2].Set (size.xmax,  size.ymax, 0);
+  vertices[3].Set (size.xmin, size.ymax, 0);
+
 
   float u_stretch = 1.0, v_stretch = 1.0;
 
-  if (!with_color && !deco.bgnd.do_stretch)
+  /*if (!with_color && !deco.bgnd.do_stretch)
   {
     int w, h;
     deco.bgnd.mat->GetTexture ()->GetMipMapDimensions (0, w, h);
     u_stretch = ((float)(size.xmax - size.xmin)) / ((float)w);
     v_stretch = ((float)(size.ymax - size.ymin)) / ((float)h);
-  }
+  }*/
 
-  poly.texels [0].x = 0;
-  poly.texels [0].y = 0;
-  poly.texels [1].x = u_stretch;
-  poly.texels [1].y = 0;
-  poly.texels [2].x = u_stretch;
-  poly.texels [2].y = v_stretch;
-  poly.texels [3].x = 0;
-  poly.texels [3].y = v_stretch;
+  texels [0].x = 0;
+  texels [0].y = 0;
+  texels [1].x = u_stretch;
+  texels [1].y = 0;
+  texels [2].x = u_stretch;
+  texels [2].y = v_stretch;
+  texels [3].x = 0;
+  texels [3].y = v_stretch;
 
-  for (i = 0; i < poly.num; i++)
+  float alpha = 1;
+  if (deco.bgnd.do_alpha)
   {
-    poly.colors [i].red = ((float)deco.bgnd.kr) * (1 / 255.0);
-    poly.colors [i].green = ((float)deco.bgnd.kg) * (1 / 255.0);
-    poly.colors [i].blue = ((float)deco.bgnd.kb) * (1 / 255.0);
-    poly.z [i] = 1;
+    alpha = deco.bgnd.alpha;
+    mesh.mixmode = CS_FX_COPY | CS_FX_FLAT;
+    mesh.alphaType.autoAlphaMode = false;
+    mesh.alphaType.alphaType = csAlphaMode::alphaSmooth;
   }
+  else
+  {
+    mesh.mixmode = CS_FX_COPY | CS_FX_FLAT;
+  }
+  
 
-#ifdef CS_USE_OLD_RENDERER
-  poly.mat_handle = deco.bgnd.mat;
-#else
-  poly.tex_handle = deco.bgnd.mat->GetTexture();
-#endif
-  if (with_color)
-    G3D->SetRenderState (G3DRENDERSTATE_TEXTUREMAPPINGENABLE, false);
+  for (i = 0; i < 4; i++)
+  {
+    colors [i].x = ((float)deco.bgnd.kr) * (1 / 255.0);
+    colors [i].y = ((float)deco.bgnd.kg) * (1 / 255.0);
+    colors [i].z = ((float)deco.bgnd.kb) * (1 / 255.0);
+    colors [i].w = 1; //rescale to correct
+  }
+  
+  mesh.vertices = vertices;
+  mesh.texcoords = texels;
+  mesh.indices = indices;
+  mesh.indexCount = 4;
+  mesh.vertexCount = 4;
 
-  float alpha = deco.bgnd.do_alpha ? deco.bgnd.alpha : 0.0;
+  if (!with_color)
+    mesh.texture = deco.bgnd.mat->GetTexture();
+  else 
+    mesh.colors = colors;
 
-  poly.mixmode = CS_FX_SETALPHA (alpha) |
-    CS_FX_COPY | (with_color && deco.bgnd.do_keycolor ? 0 : CS_FX_FLAT);
-  G3D->DrawPolygonFX (poly);
-
-  if (with_color)
-    G3D->SetRenderState (G3DRENDERSTATE_TEXTUREMAPPINGENABLE, true);
+  mesh.meshtype = CS_MESHTYPE_QUADS;
+  
+  G3D->DrawSimpleMesh (mesh, csSimpleMeshScreenspace);
 
   // draw the top left decoration
-  DrawBorder (outersize.xmin, height-outersize.ymin, bordersize.xmin,
+  DrawBorder (outersize.xmin, outersize.ymin, bordersize.xmin,
     bordersize.ymin, deco.border[0], 0);
   // draw the top decoration
-  DrawBorder (p2size.xmin-deco.p2lx, height-outersize.ymin,
+  DrawBorder (p2size.xmin-deco.p2lx, outersize.ymin,
     p2size.Width()+deco.p2lx+deco.p2rx, bordersize.ymin,  deco.border[1], 1);
   // draw the top right decoration
-  DrawBorder (p2size.xmax, height-outersize.ymin, bordersize.xmax,
+  DrawBorder (p2size.xmax, outersize.ymin, bordersize.xmax,
     bordersize.ymin, deco.border[2], 0);
   // draw the right decoration
-  DrawBorder (p2size.xmax, height-p2size.ymin+deco.p2ty, bordersize.xmax,
+  DrawBorder (p2size.xmax, p2size.ymin-deco.p2ty, bordersize.xmax,
     p2size.Height()+deco.p2by+deco.p2ty, deco.border[3], 2);
   // draw the bottom right decoration
-  DrawBorder (p2size.xmax, height-p2size.ymax, bordersize.xmax,
-    bordersize.ymax, deco.border[4], 0);
+  DrawBorder (p2size.xmax, p2size.ymax, bordersize.xmax,
+      bordersize.ymax, deco.border[4], 0);
   // draw the bottom decoration
-  DrawBorder (p2size.xmin-deco.p2lx, height-p2size.ymax,
+  DrawBorder (p2size.xmin-deco.p2lx, p2size.ymax,
     p2size.Width()+deco.p2lx+deco.p2rx, bordersize.ymax, deco.border[5], 3);
   // draw the bottom left decoration
-  DrawBorder (outersize.xmin, height-p2size.ymax, bordersize.xmin,
+  DrawBorder (outersize.xmin, p2size.ymax, bordersize.xmin,
     bordersize.ymax, deco.border[6], 0);
   // draw the left decoration
-  DrawBorder (outersize.xmin, height-p2size.ymin+deco.p2ty, bordersize.xmin,
+  DrawBorder (outersize.xmin, p2size.ymin-deco.p2ty, bordersize.xmin,
     p2size.Height()+deco.p2by+deco.p2ty, deco.border[7], 4);
 
   G3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zBuf);
@@ -318,7 +336,11 @@ void csFancyConsole::DrawBorder (int x, int y, int width, int height,
 {
   if (border.mat)
   {
-    G3DPolygonDPFX poly;
+    csSimpleRenderMesh mesh;
+    static uint indices[4] = {0, 1, 2, 3};
+    csVector3 vertices[4];
+    csVector2 texels[4];
+    csVector4 colors[4];
     int i;
 
     float u_stretch = 1.0, v_stretch = 1.0;
@@ -337,7 +359,7 @@ void csFancyConsole::DrawBorder (int x, int y, int width, int height,
         w = width;
         break;
       case 3:
-        y -= MAX (0, height - h);
+        y += MAX (0, height - h);
         height = MIN (h, height);
         h = height;
         break;
@@ -353,47 +375,59 @@ void csFancyConsole::DrawBorder (int x, int y, int width, int height,
       v_stretch = ((float)height) / ((float)h);
     }
 
-    poly.num = 4;
-    poly.use_fog = false;
-    poly.texels [0].x = 0;
-    poly.texels [0].y = 0;
-    poly.texels [1].x = u_stretch;
-    poly.texels [1].y = 0;
-    poly.texels [2].x = u_stretch;
-    poly.texels [2].y = v_stretch;
-    poly.texels [3].x = 0;
-    poly.texels [3].y = v_stretch;
+    texels [0].x = 0;
+    texels [0].y = 0;
+    texels [1].x = u_stretch;
+    texels [1].y = 0;
+    texels [2].x = u_stretch;
+    texels [2].y = v_stretch;
+    texels [3].x = 0;
+    texels [3].y = v_stretch;
 
-    poly.vertices [0].x = x;
-    poly.vertices [0].y = y;
-    poly.vertices [1].x = x + width ;
-    poly.vertices [1].y = y;
-    poly.vertices [2].x = x + width;
-    poly.vertices [2].y = y - height;
-    poly.vertices [3].x = x;
-    poly.vertices [3].y = y - height;
+    vertices [0].x = x;
+    vertices [0].y = y;
+    vertices [0].z = 0;
+    vertices [1].x = x + width ;
+    vertices [1].y = y;
+    vertices [1].z = 0;
+    vertices [2].x = x + width;
+    vertices [2].y = y + height;
+    vertices [2].z = 0;
+    vertices [3].x = x;
+    vertices [3].y = y + height;
+    vertices [3].z = 0;
+
+    float alpha = 1;
+
+    if (border.do_alpha)
+    {
+      alpha = deco.bgnd.alpha;
+      mesh.alphaType.autoAlphaMode = false;
+      mesh.alphaType.alphaType = csAlphaMode::alphaSmooth;
+    }
+    
 
     for (i = 0; i < 4; i++)
     {
-      poly.vertices [i].x -= border.offx;
-      poly.vertices [i].y += border.offy;
-      poly.z [i] = 1;
-      poly.colors [i].red = 1;
-      poly.colors [i].green = 1;
-      poly.colors [i].blue = 1;
+      vertices [i].x -= border.offx;
+      vertices [i].y += border.offy;
+      colors [i].x = 1;
+      colors [i].y = 1;
+      colors [i].z = 1;
+      colors [i].w = alpha;
     }
 
-  #ifdef CS_USE_OLD_RENDERER
-    poly.mat_handle = border.mat;
-  #else
-    poly.tex_handle = border.mat->GetTexture();
-  #endif
+    mesh.texture = border.mat->GetTexture();
+    mesh.mixmode = CS_FX_COPY | CS_FX_FLAT;
+    
+    mesh.vertices = vertices;
+    mesh.texcoords = texels;
+    mesh.indices = indices;
+    mesh.indexCount = 4;
+    mesh.vertexCount = 4;
+    mesh.meshtype = CS_MESHTYPE_QUADS;
 
-    float alpha = border.do_alpha ? border.alpha : 0.0;
-
-    poly.mixmode = CS_FX_SETALPHA (alpha) 
-      | (border.do_keycolor ? 0 : CS_FX_FLAT);
-    G3D->DrawPolygonFX (poly);
+    G3D->DrawSimpleMesh (mesh, csSimpleMeshScreenspace);
   }
 }
 

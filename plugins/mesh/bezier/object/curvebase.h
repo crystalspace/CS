@@ -29,7 +29,6 @@
 #include "imesh/bezier.h"
 #include "iengine/material.h"
 #include "ivideo/graph3d.h"
-#include "ivideo/vbufmgr.h"
 
 
 class csBezierMesh;
@@ -140,23 +139,6 @@ private:
    */
   csVector3* uv2Normal;
 
-  /// Vertex buffer.
-#ifdef CS_USE_OLD_RENDERER
-  csRef<iVertexBuffer> vbuf;
-  iVertexBufferManager* vbufmgr;
-
-  /// retrieve a vertexbuffer from the manager if not done already
-  void SetupVertexBuffer ();
-
-  /// interface to receive state of vertexbuffermanager
-  struct eiVertexBufferManagerClient : public iVertexBufferManagerClient
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csCurve);
-    virtual void ManagerClosing ();
-  }scfiVertexBufferManagerClient;
-  friend struct eiVertexBufferManagerClient;
-#endif // CS_USE_OLD_RENDERER
-
 
 public:
   /// The polygon set parent.
@@ -177,16 +159,6 @@ public:
   csCurve (csBezierMeshObjectType* thing_type);
   /// Destructor
   virtual ~csCurve ();
-
-  /// Get the vertex buffer for this curve.
-  iVertexBuffer* GetVertexBuffer () const
-  {
-#ifdef CS_USE_OLD_RENDERER
-    return vbuf;
-#else
-    return 0;
-#endif // CS_USE_OLD_RENDERER
-  }
 
   /// Return the material handle for this curve
   inline iMaterialHandle* GetMaterialHandle () const;

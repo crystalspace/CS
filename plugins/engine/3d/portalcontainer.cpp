@@ -125,7 +125,7 @@ csPortalContainer::csPortalContainer (iEngine* engine, iObjectRegistry *object_r
   scfiPolygonMeshLOD.SetPortalContainer (this);
 
   shader_man = CS_QUERY_REGISTRY (object_reg, iShaderManager);
-  fog_shader = shader_man->GetShader ("or_lighting_portal");
+  fog_shader = shader_man->GetShader ("std_lighting_portal");
 }
 
 csPortalContainer::~csPortalContainer ()
@@ -699,82 +699,6 @@ bool csPortalContainer::DoPerspective (
   return true;
 }
 
-#ifdef CS_USE_OLD_RENDERER
-static void FillZBuf (
-  const csPoly2D& poly,
-  iRenderView *rview,
-  float polyz,
-  const csPlane3& camera_plane)
-{
-  rview->GetGraphics3D ()->SetRenderState (
-      G3DRENDERSTATE_ZBUFFERMODE,
-      CS_ZBUF_FILLONLY);
-
-  iCamera *icam = rview->GetCamera ();
-
-  static G3DPolygonDP g3dpoly;
-  g3dpoly.mixmode = CS_FX_COPY;
-  int num_vertices = poly.GetVertexCount ();
-  g3dpoly.num = num_vertices;
-
-  // We are going to use DrawPolygon.
-  int i;
-  if (icam->IsMirrored ())
-  {
-    for (i = 0; i < num_vertices; i++)
-    {
-      g3dpoly.vertices[num_vertices - i - 1].x = poly[i].x;
-      g3dpoly.vertices[num_vertices - i - 1].y = poly[i].y;
-    }
-  }
-  else
-  {
-    memcpy (g3dpoly.vertices, poly.GetVertices (),
-    	num_vertices * sizeof (csVector2));
-  }
-
-  g3dpoly.z_value = polyz;
-  g3dpoly.normal = camera_plane;
-
-  rview->GetGraphics3D ()->DrawPolygon (g3dpoly);
-}
-
-static void AddFogPolygon (
-  const csPoly2D& poly,
-  iGraphics3D *g3d,
-  const csPlane3& camera_plane,
-  bool mirror,
-  CS_ID id,
-  int fogtype)
-{
-  int i;
-
-  static G3DPolygonDFP g3dpoly;
-  memset (&g3dpoly, 0, sizeof (g3dpoly));
-  int num_vertices = poly.GetVertexCount ();
-  g3dpoly.num = num_vertices;
-  if (mirror)
-  {
-    for (i = 0; i < num_vertices; i++)
-    {
-      g3dpoly.vertices[num_vertices - i - 1].x = poly[i].x;
-      g3dpoly.vertices[num_vertices - i - 1].y = poly[i].y;
-    }
-  }
-  else
-  {
-    memcpy (g3dpoly.vertices, poly.GetVertices (),
-    	num_vertices * sizeof (csVector2));
-  }
-
-  //g3dpoly.polygon = GetIPolygon3DFromcsPolygon3D(poly); //DPQFIX
-  g3dpoly.normal = camera_plane;
-
-  g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_NONE);
-  g3d->DrawFogPolygon (id, g3dpoly, fogtype);
-}
-#endif
-
 void csPortalContainer::DrawOnePortal (
   csPortal* po,
   const csPoly2D& poly,
@@ -783,16 +707,7 @@ void csPortalContainer::DrawOnePortal (
   const csPlane3& camera_plane)
 {
   iGraphics3D* g3d = rview->GetGraphics3D ();
-#ifdef CS_USE_OLD_RENDERER
-  csRenderView* csrview = (csRenderView*)rview;
-  if (csrview->AddedFogInfo ())
-  {
-    // If fog info was added then we are dealing with vertex fog and
-    // the current sector has fog. This means we have to complete the
-    // fog_info structure with the plane of the current polygon.
-    csrview->GetFirstFogInfo ()->outgoing_plane = camera_plane;
-  }
-#endif
+
   // is_this_fog is true if this sector is fogged.
   bool is_this_fog = rview->GetThisSector ()->HasFog ();
 
@@ -814,25 +729,8 @@ void csPortalContainer::DrawOnePortal (
   // the maximum number that a sector is drawn (for mirrors).
   if (po->Draw (poly, movtrans, rview, keep_plane))
   {
-#ifdef CS_USE_OLD_RENDERER
-    if (is_this_fog)
-    {
-      AddFogPolygon (poly, g3d,
-          keep_plane,
-          rview->GetCamera ()->IsMirrored (),
-          rview->GetThisSector ()->QueryObject ()->GetID (),
-          CS_FOG_BACK);
-    }
-
-    // Here we z-fill the portal contents to make sure that sprites
-    // that are drawn outside of this portal cannot accidently cross
-    // into the others sector space (we cannot trust the Z-buffer here).
-    if (po->flags.Check (CS_PORTAL_ZFILL))
-      FillZBuf (poly, rview, keep_camera_z, keep_plane);
-#endif
   }
 
-#ifndef CS_USE_OLD_RENDERER
   if (is_this_fog && fog_shader)
   {
     csSimpleRenderMesh mesh;
@@ -862,7 +760,6 @@ void csPortalContainer::DrawOnePortal (
     mesh.z_buf_mode = CS_ZBUF_TEST;
     g3d->DrawSimpleMesh (mesh);
   }
-#endif
 
   // Make sure to close the portal again.
   bool use_zfill_portal = po->flags.Check (CS_PORTAL_ZFILL);
@@ -926,6 +823,7 @@ bool csPortalContainer::ExtraVisTest (iRenderView* rview,
 bool csPortalContainer::DrawTest (iRenderView* rview, iMovable*,
 	uint32)
 {
+  CS_ASSERT_MSG("Cannot remove this", 0);
   csReversibleTransform tr_o2c;
   csVector3 camera_origin;
   return ExtraVisTest (rview, tr_o2c, camera_origin);

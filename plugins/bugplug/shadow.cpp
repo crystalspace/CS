@@ -53,17 +53,6 @@ csShadow::~csShadow ()
   SCF_DESTRUCT_IBASE ();
 }
 
-bool csShadow::DrawTest (iRenderView* rview, iMovable*, uint32)
-{
-  return true;
-}
-
-bool csShadow::Draw (iRenderView* rview, iMovable*, csZBufMode)
-{
-  keep_camera = rview->GetOriginalCamera ();
-  return true;
-}
-
 csRenderMesh** csShadow::GetRenderMeshes (int& n, iRenderView* rview,
     iMovable*, uint32)
 {

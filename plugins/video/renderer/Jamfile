@@ -1,8 +1,0 @@
-SubDir TOP plugins video renderer ;
-
-# Jam rules are order-sensitive; Library targets must appear before Plugin.
-SubInclude TOP plugins video renderer common ;
-
-SubInclude TOP plugins video renderer null ;
-SubInclude TOP plugins video renderer opengl ;
-SubInclude TOP plugins video renderer software ;

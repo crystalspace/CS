@@ -649,45 +649,6 @@ static int compareparticle(const void* p1, const void* p2)
   return 0;
 }
 
-bool csEmitMeshObject::Draw (iRenderView* rview, iMovable* movable,
-        csZBufMode mode)
-{
-  static csCompPartArray *cpa = GetStaticCompPartArray ();
-
-  // detect if back to front is needed.
-  // or if containerbox is used
-  if(MixMode & CS_FX_ADD && !has_container_box)
-    return csParticleSystem::Draw(rview, movable, mode);
-
-  // draw back to front
-  if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
-
-  // sort
-  size_t i;
-  csReversibleTransform trans = movable->GetFullTransform ();
-  csReversibleTransform tr_o2c = rview->GetCamera()->GetTransform() / trans;
-  cpa->SetLength(number);
-  size_t num_cpa_now = 0;
-  for (i = 0 ; i < number ; i++)
-  {
-    if(!has_container_box || (
-      container_min.x < part_pos[i].x && part_pos[i].x < container_max.x && 
-      container_min.y < part_pos[i].y && part_pos[i].y < container_max.y && 
-      container_min.z < part_pos[i].z && part_pos[i].z < container_max.z))
-    {
-      (*cpa)[num_cpa_now].z = (tr_o2c * part_pos[i]).z;
-      (*cpa)[num_cpa_now].part = GetParticle(i);
-      num_cpa_now++;
-    }
-  }
-  qsort(cpa->GetArray(), num_cpa_now, sizeof( struct csEmitCompPart ),
-    compareparticle);
-  
-  for (i = 0 ; i < num_cpa_now ; i++)
-    (*cpa)[i].part->Draw (rview, trans, mode);
-
-  return true;
-}
 
 csEmitMeshObject::csEmitMeshObject (iObjectRegistry* object_reg,
   iMeshObjectFactory* factory)

@@ -163,7 +163,8 @@ private:
   void RestoreClipRect();
 
   /// Draw a 3D polygon using DrawPolygonFX
-  void Polygon3D (G3DPolygonDPFX &poly, uint mode);
+  //@@@REIMPLEMENT THIS FOR NR
+  //void Polygon3D (G3DPolygonDPFX &poly, uint mode);
 
   /// Clip a line against a rectangle and return true if its clipped out
   bool ClipLine (float &x1, float &y1, float &x2, float &y2,

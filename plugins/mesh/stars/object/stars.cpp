@@ -88,12 +88,6 @@ void csStarsMeshObject::SetupObject ()
   }
 }
 
-bool csStarsMeshObject::DrawTest (iRenderView*, iMovable*, uint32)
-{
-  SetupObject ();
-  return true;
-}
-
 static void Perspective (const csVector3& v, csVector3& p, float fov,
     	float sx, float sy)
 {
@@ -213,61 +207,6 @@ void csStarsMeshObject::DrawStarBox (iRenderView* rview,
   }
   //printf("drawn is %d\n", drawn);
 
-}
-
-bool csStarsMeshObject::Draw (iRenderView* rview, iMovable* movable,
-	csZBufMode zbufmode)
-{
-  if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
-
-  iCamera* camera = rview->GetCamera ();
-  csReversibleTransform tr_o2c = camera->GetTransform ();
-  csVector3 origin;
-  if (movable->IsFullTransformIdentity ())
-  {
-    origin = camera->GetTransform().GetOrigin();
-  }
-  else
-  {
-    csReversibleTransform movtrans = movable->GetFullTransform ();
-    tr_o2c /= movtrans;
-    origin = movtrans.GetInverse () * camera->GetTransform().GetOrigin();
-  }
-
-  if(max_dist <= 0.0) return false; // protect against divide by zero
-  srand (seed);
-
-  /// walk in boxes around origin
-  /// snap boxes to a grid
-  const float gridsize = 20;
-  csVector3 boxsize = box.Max() - box.Min();
-  int nr_x = csQint(gridsize * max_dist / boxsize.x)+1;
-  int nr_y = csQint(gridsize * max_dist / boxsize.y)+1;
-  int nr_z = csQint(gridsize * max_dist / boxsize.z)+1;
-  csVector3 starboxsize( boxsize.x / gridsize, boxsize.y / gridsize,
-    boxsize.z / gridsize );
-  csVector3 starmin = box.Min();
-  starmin.x += csQint((origin.x-box.Min().x)/starboxsize.x)*starboxsize.x;
-  starmin.y += csQint((origin.y-box.Min().y)/starboxsize.y)*starboxsize.y;
-  starmin.z += csQint((origin.z-box.Min().z)/starboxsize.z)*starboxsize.z;
-  csBox3 starbox(starmin, starmin+starboxsize);
-  csBox3 passbox;
-
-  for(int x = -nr_x; x<=nr_x; x++)
-   for(int y = -nr_y; y<=nr_y; y++)
-    for(int z = -nr_z; z<=nr_z; z++)
-    {
-      csVector3 offset(x*starboxsize.x,y*starboxsize.y,z*starboxsize.z);
-      passbox.Set(starbox.Min()+offset, starbox.Max()+offset);
-      DrawStarBox (rview, tr_o2c, zbufmode, passbox, origin);
-    }
-
-  /// before exiting, set the seed to be pretty random again
-  static unsigned int funkyrand = 0;
-  if(funkyrand==0) funkyrand = (unsigned int) time(0);
-  srand(funkyrand++);
-
-  return true;
 }
 
 void csStarsMeshObject::GetObjectBoundingBox (csBox3& b, int /*type*/)

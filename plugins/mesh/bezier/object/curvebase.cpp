@@ -25,7 +25,6 @@
 #include "lightpool.h"
 #include "csgeom/frustum.h"
 #include "ivideo/graph3d.h"
-#include "ivideo/vbufmgr.h"
 #include "iengine/light.h"
 #include "iengine/engine.h"
 #include "iengine/shadows.h"
@@ -138,20 +137,12 @@ void csCurveTesselated::UpdateColors (csCurveLightMap *LightMap)
 // --- csCurve ---------------------------------------------------------------
 SCF_IMPLEMENT_IBASE_EXT(csCurve)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iCurve)
-#ifdef CS_USE_OLD_RENDERER
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iVertexBufferManagerClient)
-#endif // CS_USE_OLD_RENDERER
 SCF_IMPLEMENT_IBASE_EXT_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csCurve::Curve)
   SCF_IMPLEMENTS_INTERFACE(iCurve)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-#ifdef CS_USE_OLD_RENDERER
-SCF_IMPLEMENT_EMBEDDED_IBASE (csCurve::eiVertexBufferManagerClient)
-  SCF_IMPLEMENTS_INTERFACE(iVertexBufferManagerClient)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-#endif // CS_USE_OLD_RENDERER
 
 csCurve::csCurve (csBezierMeshObjectType* thing_type) :
   csObject(),
@@ -164,16 +155,8 @@ csCurve::csCurve (csBezierMeshObjectType* thing_type) :
   LightmapUpToDate(false)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCurve);
-#ifdef CS_USE_OLD_RENDERER
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
-#endif // CS_USE_OLD_RENDERER
 
   csCurve::thing_type = thing_type;
-
-#ifdef CS_USE_OLD_RENDERER
-  vbufmgr = 0;
-  SetupVertexBuffer ();
-#endif // CS_USE_OLD_RENDERER
 
   // Call to make sure csBezier2 is properly initialized.
   csBezier2::Initialize ();
@@ -189,29 +172,10 @@ csCurve::~csCurve ()
   delete LightMap;
   delete[] uv2World;
   delete[] uv2Normal;
-#ifdef CS_USE_OLD_RENDERER
-  if (vbufmgr) vbufmgr->RemoveClient (&scfiVertexBufferManagerClient);
-#endif // CS_USE_OLD_RENDERER
 
-#ifdef CS_USE_OLD_RENDERER
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
-#endif // CS_USE_OLD_RENDERER
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiCurve);
 }
 
-#ifdef CS_USE_OLD_RENDERER
-void csCurve::SetupVertexBuffer ()
-{
-  if (!vbuf)
-  {
-    vbufmgr = thing_type->G3D->GetVertexBufferManager ();
-
-    // @@@ priority should be a parameter.
-    vbuf = vbufmgr->CreateBuffer (2);
-    vbufmgr->AddClient (&scfiVertexBufferManagerClient);
-  }
-}
-#endif // CS_USE_OLD_RENDERER
 
 void csCurve::SetMaterial (iMaterialWrapper *m)
 {
@@ -859,16 +823,6 @@ void csCurve::HardTransform (const csReversibleTransform &/*trans*/ )
   if (uv2World) CalcUVBuffers ();
 }
 
-#ifdef CS_USE_OLD_RENDERER
-void csCurve::eiVertexBufferManagerClient::ManagerClosing ()
-{
-  if (scfParent->vbuf)
-  {
-    scfParent->vbuf = 0;
-    scfParent->vbufmgr = 0;
-  }
-}
-#endif // CS_USE_OLD_RENDERER
 
 // --- code for Bezier curves follows ----------------------------------------
 

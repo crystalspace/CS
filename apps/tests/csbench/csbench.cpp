@@ -537,7 +537,7 @@ void CsBench::PerformTests ()
   }
 
   view->GetCamera ()->SetSector (room_single);
-  PerformShaderTest ("/shader/or_lighting.xml", "OR compatibility", 0, 0);
+  PerformShaderTest ("/shader/std_lighting.xml", "standard", 0, 0);
 
   iRenderLoopManager* rlmgr = engine->GetRenderLoopManager ();
   csRef<iRenderLoop> loop = rlmgr->Load ("/shader/std_rloop_diffuse.xml");

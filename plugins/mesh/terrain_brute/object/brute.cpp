@@ -1154,7 +1154,6 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
   region = ((csTerrainFactory*)pFactory)->samplerRegion;
   rootblock = 0;
   vis_cb = 0;
-  vbufmgr = 0;
     
   block_res = 32;
 

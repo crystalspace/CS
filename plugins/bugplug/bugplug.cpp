@@ -1049,15 +1049,15 @@ bool csBugPlug::EatKey (iEvent& event)
         ToggleG3DState (G3DRENDERSTATE_TRANSPARENCYENABLE, "transp mode");
         break;
       case DEBUGCMD_CACHECLEAR:
-        if (G3D)
+        /*if (G3D)
 	{
 	  G3D->ClearCache ();
           Report (CS_REPORTER_SEVERITY_NOTIFY,
 	    "BugPlug cleared the texture cache.");
-	}
+	}*/
         break;
       case DEBUGCMD_CACHEDUMP:
-        if (G3D) G3D->DumpCache ();
+        //if (G3D) G3D->DumpCache ();
         break;
       case DEBUGCMD_MIPMAP:
         {

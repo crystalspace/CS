@@ -60,13 +60,7 @@ struct iParticle : public iBase
   virtual void SetMixMode (uint mode) = 0;
   /// Rotate the particle is some particle dependent manner, in radians.
   virtual void Rotate (float angle) = 0;
-  /**
-   * Draw this particle. The given transform is the transform of the
-   * parent particle system. The position of this particle should be
-   * relative to that transform.
-   */
-  virtual void Draw (iRenderView* rview, const csReversibleTransform& transform,
-  	csZBufMode zbufMode) = 0;
+
   /**
    * Light this particle.
    * The given transform is the transform of the parent particle system.

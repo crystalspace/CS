@@ -102,7 +102,6 @@ protected:
 
   csRenderMeshHolderSingle rmHolder;
 
-#ifndef CS_USE_OLD_RENDERER
   csRef<csShaderVariableContext> svcontext;
   size_t VertexCount;
   size_t TriangleCount;
@@ -117,7 +116,6 @@ protected:
   csRef<iRenderBuffer> index_buffer;
 
   csRef<iGraphics3D> g3d;
-#endif
 
   /// Setup the buffers for the particles.
   void SetupBuffers (size_t part_sides);
@@ -286,11 +284,10 @@ public:
   virtual iMeshObjectFactory* GetFactory () const { return factory; }
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> Clone () { return 0; }
-  virtual bool DrawTest (iRenderView* rview, iMovable* movable,
+  virtual bool PreGetRenderMeshes (iRenderView* rview, iMovable* movable,
   	uint32 frustum_mask);
   virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview,
     iMovable* movable, uint32 frustum_mask);
-  virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
     if (cb) cb->IncRef ();

@@ -444,8 +444,9 @@ public:
   //--- 3D drawing ---//
 
   /// Draw a 3D polygon
-  void pplPolygon3D (G3DPolygonDPFX &poly, uint mode)
-  { GfxPpl.Polygon3D (poly, mode); }
+  //@@@REIMPLEMENT THIS FOR NR
+  /*void pplPolygon3D (G3DPolygonDPFX &poly, uint mode)
+  { GfxPpl.Polygon3D (poly, mode); }*/
 
   /// Clear the Z-buffer in the given area
   void pplClearZbuffer (int x1, int y1, int x2, int y2)

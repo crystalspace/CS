@@ -44,31 +44,12 @@ private:
 
   /// flat shading color
   csRGBcolor flat_color;
-#ifdef CS_USE_OLD_RENDERER
-  /// the texture of the material (can be 0)
-  csRef<iTextureWrapper> texture;
-  /// Number of texture layers (currently maximum 4).
-  int num_texture_layers;
-  /// Optional texture layer.
-  csTextureLayer texture_layers[4];
-  /// Texture wrappers for texture layers.
-  csRef<iTextureWrapper> texture_layer_wrappers[4];
-
-  /// The diffuse reflection value of the material
-  float diffuse;
-  /// The ambient lighting of the material
-  float ambient;
-  /// The reflectiveness of the material
-  float reflection;
-#endif
 
   /// Shader associated with material
   csHash<csRef<iShader>, csStringID> shaders;
   csEngine* engine;
-
-#ifndef CS_USE_OLD_RENDERER
   csShaderVariable* GetVar (csStringID name, bool create = false);
-#endif
+
 
   static csStringID nameDiffuseParam;
   static csStringID nameAmbientParam;
@@ -88,9 +69,9 @@ public:
 
   /**
    * @@@ Slight hack: when the engine creates a material, it implicitly sets
-   * the "OR compatibility" shader. When later a shader is set and 
-   * shadersCustomized is false, the "OR compatibility" shader will be set to
-   * 0. This is done so users can "unset" the OR compar shader.
+   * the "standard" shader. When later a shader is set and 
+   * shadersCustomized is false, the "standard" shader will be set to
+   * 0. This is done so users can "unset" the standard shader.
    */
   bool shadersCustomized;
 
@@ -127,27 +108,18 @@ public:
   /// Set reflection of the material
   void SetReflection (float val);
 
-#ifndef CS_USE_OLD_RENDERER
   /// Get the base diffuse texture (if none 0 is returned)
   iTextureWrapper* GetTextureWrapper ()
   {
     return GetTextureWrapper (nameDiffuseTexture);
   }
-#else
-  /// Get the base diffuse texture (if none 0 is returned)
-  iTextureWrapper* GetTextureWrapper () const { return texture; }
-#endif
+
   /// Set the base diffuse texture (pass 0 to set no texture)
   void SetTextureWrapper (iTextureWrapper* tex);
 
-#ifdef CS_USE_OLD_RENDERER
-  /// Add a texture layer (currently only one supported).
-  void AddTextureLayer (iTextureWrapper* txtwrap, uint mode,
-        float uscale, float vscale, float ushift, float vshift);
-#else
   /// Set a texture (pass 0 to set no texture)
   void SetTextureWrapper (csStringID name, iTextureWrapper* tex);
-#endif
+
   /// Get a texture (if none 0 is returned)
   iTextureWrapper* GetTextureWrapper (csStringID name);
 
@@ -168,17 +140,12 @@ public:
    * Get a texture from the material.
    */
   virtual iTextureHandle *GetTexture (csStringID name);
-#ifdef CS_USE_OLD_RENDERER
-  /// Get num texture layers.
-  virtual int GetTextureLayerCount ();
-  /// Get a texture layer.
-  virtual csTextureLayer* GetTextureLayer (int idx);
-#else
+
   /// Get num texture layers. OR only.
   virtual int GetTextureLayerCount () { return 0; }
   /// Get a texture layer. OR only.
   virtual csTextureLayer* GetTextureLayer (int) { return 0; }
-#endif
+
   /// Get flat color.
   virtual void GetFlatColor (csRGBpixel &oColor, bool useTextureMean = true);
   /// Set the flat shading color

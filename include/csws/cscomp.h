@@ -822,7 +822,8 @@ public:
   { ClearZbuffer (0, 0, bound.Width (), bound.Height ()); }
 
   /// Draw a 3D polygon
-  void Polygon3D (G3DPolygonDPFX &poly, uint mode);
+  //@@@REIMPLEMENT THIS FOR NR
+  //void Polygon3D (G3DPolygonDPFX &poly, uint mode);
 
   ///-------------------------------------- Utility drawing functions ----------
 

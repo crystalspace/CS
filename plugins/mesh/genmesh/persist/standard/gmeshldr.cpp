@@ -151,7 +151,6 @@ bool csGeneralFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-#ifndef CS_USE_OLD_RENDERER
 
 bool csGeneralFactoryLoader::ParseRenderBuffer(iDocumentNode *node,
 	iGeneralFactoryState* state)
@@ -293,7 +292,6 @@ bool csGeneralFactoryLoader::ParseRenderBuffer(iDocumentNode *node,
   
   return true;
 }
-#endif // CS_USE_OLD_RENDERER
 
 csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	iLoaderContext* ldr_context, iBase* /* context */)
@@ -418,9 +416,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	}
 	break;
       case XMLTOKEN_RENDERBUFFER:
-#ifndef CS_USE_OLD_RENDERER
         ParseRenderBuffer(child, state);
-#endif
         break;
       case XMLTOKEN_T:
 	{

@@ -944,7 +944,6 @@ bool csEngine::Initialize (iObjectRegistry *object_reg)
   csConfigAccess cfg (object_reg, "/config/engine.cfg");
   ReadConfig (cfg);
 
-#ifndef CS_USE_OLD_RENDERER
   // Set up the RL manager.
   renderLoopManager = new csRenderLoopManager (this);
 
@@ -963,7 +962,6 @@ bool csEngine::Initialize (iObjectRegistry *object_reg)
 
   // Register it.
   renderLoopManager->Register (CS_DEFAULT_RENDERLOOP_NAME, defaultRenderLoop);
-#endif
 
   csLightManager* light_mgr = new csLightManager ();
   object_reg->Register (light_mgr, "iLightManager");
@@ -986,11 +984,6 @@ bool csEngine::HandleEvent (iEvent &Event)
 	    Strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
 	      object_reg, "crystalspace.shared.stringset", iStringSet);
 
-#ifdef CS_USE_OLD_RENDERER
-            const csGraphics3DCaps *caps = G3D->GetCaps ();
-            fogmethod = caps->fog;
-            MaxAspectRatio = caps->MaxAspectRatio;
-#else
             MaxAspectRatio = 4096;
 	    ShaderManager = CS_QUERY_REGISTRY(object_reg, iShaderManager);
 	    if (!ShaderManager)
@@ -1004,7 +997,7 @@ bool csEngine::HandleEvent (iEvent &Event)
 	      object_reg->Register (ShaderManager, "iShaderManager");
 	    }
 
-            // Load a default shader for OR compatibility
+            // Load a default shader
             csRef<iDocumentSystem> docsys (
               CS_QUERY_REGISTRY(object_reg, iDocumentSystem));
             if (!docsys.IsValid())
@@ -1014,7 +1007,7 @@ bool csEngine::HandleEvent (iEvent &Event)
             csRef<iShaderCompiler> shcom (ShaderManager->
               GetCompiler ("XMLShader"));
 
-	    char const* shaderPath = "/shader/or_lighting.xml";
+	    char const* shaderPath = "/shader/std_lighting.xml";
             csRef<iFile> shaderFile = VFS->Open (shaderPath, VFS_FILE_READ);
 	    if (shaderFile.IsValid())
 	      shaderDoc->Parse (shaderFile, true);
@@ -1024,10 +1017,10 @@ bool csEngine::HandleEvent (iEvent &Event)
             default_shader = shcom->CompileShader (shaderDoc->GetRoot ()->
               GetNode ("shader"));
             ShaderManager->RegisterShader (default_shader);
-            default_shadertype = Strings->Request ("OR compatibility");
+            default_shadertype = Strings->Request ("standard");
 
             shaderDoc = docsys->CreateDocument ();
-            shaderPath = "/shader/or_lighting_portal.xml";
+            shaderPath = "/shader/std_lighting_portal.xml";
             shaderFile = VFS->Open (shaderPath, VFS_FILE_READ);
             if (shaderFile.IsValid())
               shaderDoc->Parse (shaderFile, true);
@@ -1038,15 +1031,11 @@ bool csEngine::HandleEvent (iEvent &Event)
               GetNode ("shader"));
             ShaderManager->RegisterShader (portal_shader);
 
-#endif // CS_USE_OLD_RENDERER
             frame_width = G3D->GetWidth ();
             frame_height = G3D->GetHeight ();
           }
           else
           {
-#ifdef CS_USE_OLD_RENDERER
-            fogmethod = G3DFOGMETHOD_NONE;
-#endif // CS_USE_OLD_RENDERER
             MaxAspectRatio = 4096;
             frame_width = 640;
             frame_height = 480;
@@ -1111,9 +1100,6 @@ iMeshObjectType* csEngine::GetThingType ()
 void csEngine::DeleteAll ()
 {
   nextframe_pending = 0;
-#ifdef CS_USE_OLD_RENDERER
-  if (G3D) G3D->ClearCache ();
-#endif // CS_USE_OLD_RENDERER
   halos.DeleteAll ();
   collections.DeleteAll ();
 
@@ -1258,11 +1244,9 @@ void csEngine::ResetWorldSpecificSettings()
   	default_ambient_red / 255.0f,
 	default_ambient_green / 255.0f, 
         default_ambient_blue / 255.0f));
-#ifndef CS_USE_OLD_RENDERER
   iRenderLoop* defaultRL = renderLoopManager->Retrieve 
     (CS_DEFAULT_RENDERLOOP_NAME);
   SetCurrentDefaultRenderloop (defaultRL);
-#endif
 }
 
 void csEngine::PrepareTextures ()
@@ -1302,13 +1286,6 @@ bool csEngine::Prepare (iProgressMeter *meter)
   PrepareTextures ();
   PrepareMeshes ();
 
-#ifdef CS_USE_OLD_RENDERER
-  G3D->ClearCache ();
-#else
-  /*csRef<iShaderManager> shadermgr = 
-    CS_QUERY_REGISTRY(object_reg, iShaderManager);
-  shadermgr->PrepareShaders ();*/
-#endif // CS_USE_OLD_RENDERER
 
   // Prepare lightmaps if we have any sectors
   if (sectors.GetCount ()) ShineLights (0, meter);
@@ -1320,9 +1297,6 @@ bool csEngine::Prepare (iProgressMeter *meter)
 
 void csEngine::ForceRelight (iRegion* region, iProgressMeter *meter)
 {
-#ifdef CS_USE_OLD_RENDERER
-  G3D->ClearCache ();
-#endif // CS_USE_OLD_RENDERER
   int old_lightcache_mode = lightcache_mode;
   lightcache_mode &= ~CS_ENGINE_CACHE_READ;
   lightcache_mode &= ~CS_ENGINE_CACHE_NOUPDATE;
@@ -1332,10 +1306,6 @@ void csEngine::ForceRelight (iRegion* region, iProgressMeter *meter)
 
 void csEngine::ForceRelight (iLight* light, iRegion* region)
 {
-#ifdef CS_USE_OLD_RENDERER
-  G3D->ClearCache ();
-#endif // CS_USE_OLD_RENDERER
-
   int sn;
   int num_meshes = meshes.GetCount ();
 
@@ -1380,9 +1350,6 @@ void csEngine::ForceRelight (iLight* light, iRegion* region)
 
 void csEngine::RemoveLight (iLight* light)
 {
-#ifdef CS_USE_OLD_RENDERER
-  G3D->ClearCache ();
-#endif // CS_USE_OLD_RENDERER
 
   int sn;
   int num_meshes = meshes.GetCount ();
@@ -1801,7 +1768,6 @@ iEngineSequenceManager* csEngine::GetEngineSequenceManager ()
 
 void csEngine::PrecacheMesh (iMeshWrapper* s, iRenderView* rview)
 {
-#ifndef CS_USE_OLD_RENDERER
   int num;
   if (s->GetMeshObject ())
     s->GetMeshObject ()->GetRenderMeshes (num, rview,
@@ -1810,7 +1776,6 @@ void csEngine::PrecacheMesh (iMeshWrapper* s, iRenderView* rview)
   int i;
   for (i = 0 ; i < children->GetCount () ; i++)
     PrecacheMesh (children->Get (i), rview);
-#endif
 }
 
 void csEngine::PrecacheDraw (iRegion* region)
@@ -1899,7 +1864,6 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
   G3D->SetPerspectiveAspect (c->GetFOV ());
 
   iSector *s = c->GetSector ();
-#ifndef CS_USE_OLD_RENDERER
   if (s) 
   {
     csReversibleTransform camTransR = c->GetTransform();
@@ -1908,9 +1872,6 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
     if (!rl) rl = defaultRenderLoop;
     rl->Draw (&rview, s);
   }
-#else
-  if (s) s->Draw (&rview);
-#endif	// CS_USE_OLD_RENDERER
 
   // draw all halos on the screen
   if (halos.Length () > 0)
@@ -1924,7 +1885,7 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
 }
 
 
-#ifndef CS_USE_OLD_RENDERER
+
 csPtr<iRenderLoop> csEngine::CreateDefaultRenderLoop ()
 {
   csRef<iRenderLoop> loop = renderLoopManager->Create ();
@@ -1947,7 +1908,7 @@ csPtr<iRenderLoop> csEngine::CreateDefaultRenderLoop ()
     loop->AddStep (step);
     genStep = SCF_QUERY_INTERFACE (step, iGenericRenderStep);
   
-    genStep->SetShaderType ("OR compatibility");
+    genStep->SetShaderType ("standard");
     genStep->SetZBufMode (CS_ZBUF_MESH);
     genStep->SetZOffset (false);
     genStep->SetPortalTraversal (true);
@@ -1958,15 +1919,12 @@ csPtr<iRenderLoop> csEngine::CreateDefaultRenderLoop ()
   return csPtr<iRenderLoop> (loop);
 }
 
-#endif
 
 void csEngine::LoadDefaultRenderLoop (const char* fileName)
 {
-#ifndef CS_USE_OLD_RENDERER
   csRef<iRenderLoop> newDefault = renderLoopManager->Load (fileName);
   if (newDefault != 0)
     defaultRenderLoop = newDefault;
-#endif
 }
 
 void csEngine::AddHalo (iCamera* camera, csLight *Light)
@@ -2901,10 +2859,9 @@ iMaterialWrapper *csEngine::CreateMaterial (
   iMaterialWrapper *wrapper = materials->NewMaterial (mat);
   wrapper->QueryObject ()->SetName (iName);
 
-#ifndef CS_USE_OLD_RENDERER
   mat->SetShader (default_shadertype, default_shader);
   mat->shadersCustomized = false;
-#endif // CS_USE_OLD_RENDERER
+
   mat->DecRef ();
 
   return wrapper;
@@ -2949,10 +2906,9 @@ csPtr<iMaterial> csEngine::CreateBaseMaterial (iTextureWrapper *txt)
 
   csRef<iMaterial> imat (SCF_QUERY_INTERFACE (mat, iMaterial));
 
-#ifndef CS_USE_OLD_RENDERER
   mat->SetShader (default_shadertype, default_shader);
   mat->shadersCustomized = false;
-#endif // CS_USE_OLD_RENDERER
+
   mat->DecRef ();
 
   return csPtr<iMaterial> (imat);
@@ -2967,26 +2923,12 @@ csPtr<iMaterial> csEngine::CreateBaseMaterial (
   csMaterial *mat = new csMaterial (this);
   if (txt) mat->SetTextureWrapper (txt);
 
-#ifdef CS_USE_OLD_RENDERER
-  int i;
-  for (i = 0; i < num_layers; i++)
-  {
-    mat->AddTextureLayer (
-        wrappers[i],
-        layers[i].mode,
-        layers[i].uscale,
-        layers[i].vscale,
-        layers[i].ushift,
-        layers[i].vshift);
-  }
-#endif
 
   csRef<iMaterial> imat (SCF_QUERY_INTERFACE (mat, iMaterial));
 
-#ifndef CS_USE_OLD_RENDERER
   mat->SetShader (default_shadertype, default_shader);
   mat->shadersCustomized = false;
-#endif // CS_USE_OLD_RENDERER
+
   mat->DecRef ();
 
   return csPtr<iMaterial> (imat);
@@ -3185,7 +3127,6 @@ iTextureWrapper* EngineLoaderContext::FindNamedTexture (const char* name,
 
 iShader* EngineLoaderContext::FindShader (const char* name)
 {
-#ifndef CS_USE_OLD_RENDERER
   if (!curRegOnly || !region)
     return csEngine::current_engine->ShaderManager->GetShader (name);
 
@@ -3199,7 +3140,7 @@ iShader* EngineLoaderContext::FindShader (const char* name)
     	&& !strcmp (name, s->QueryObject ()->GetName ()))
       return s;
   }
-#endif
+
   return 0;
 }
 
