@@ -29,7 +29,6 @@
 #include "igraph3d.h"
 
 //------------------------------------------------------ The System driver ---//
-void usleep(unsigned int useconds);
 
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
