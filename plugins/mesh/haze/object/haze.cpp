@@ -804,7 +804,7 @@ csRenderMesh** csHazeMeshObject::GetRenderMeshes (int &n, iRenderView* rview,
   rm->do_mirror = camera->IsMirrored ();
 
   rm->variablecontext->GetVariableAdd (string_object2world)->
-    SetValue (movable->GetFullTransform ());
+    SetValue (camera->GetTransform ());
 
   rm->indexend = (uint)GetTempIndices()->Length();
 
