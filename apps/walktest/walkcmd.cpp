@@ -591,8 +591,10 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     char txtname[100];
     int cnt = 0;
-    int num;
-    float speed;
+    /* speed and num must be preset to prevent compiler warnings
+     * on some systems. */
+    int num = 0;
+    float speed = 0;
     if (arg) cnt = ScanStr (arg, "%s,%d,%f", txtname, &num, &speed);
     extern void add_particles_rain (csSector* sector, char* txtname,
     	int num, float speed);
@@ -606,8 +608,10 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     char txtname[100];
     int cnt = 0;
-    int num;
-    float speed;
+    /* speed and num must be preset to prevent compiler warnings
+     * on some systems. */
+    int num = 0;
+    float speed = 0;
     if (arg) cnt = ScanStr (arg, "%s,%d,%f", txtname, &num, &speed);
     extern void add_particles_snow (csSector* sector, char* txtname,
     	int num, float speed);
