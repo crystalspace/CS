@@ -2,14 +2,14 @@
 # to build the shadermgr plug-in.
 
 # Driver description
-DESCRIPTION.shadermgr = Crystal Space Shadermanager plug-in
+DESCRIPTION.shadermgr = Shader manager
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make shadermgr      Make the $(DESCRIPTION.shadermgr)$"
+  $(NEWLINE)echo $"  make shadermgr    Make the $(DESCRIPTION.shadermgr)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

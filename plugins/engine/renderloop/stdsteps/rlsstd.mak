@@ -1,11 +1,11 @@
-DESCRIPTION.rendstep_std = Crystal Space standard render loop steps
+DESCRIPTION.rendstep_std = Standard render loop steps
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Plugin
 PLUGINHELP += \
-  $(NEWLINE)@echo $"  make rendstep_std       Make the $(DESCRIPTION.rendstep_std)$"
+  $(NEWLINE)@echo $"  make rendstep_std Make the $(DESCRIPTION.rendstep_std)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -51,7 +51,7 @@ INC.RENDSTEP_STD = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RENDSTEP_STD)/*.h \
 SRC.RENDSTEP_STD = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RENDSTEP_STD)/*.cpp \
   plugins/engine/renderloop/common/*.cpp))
 OBJ.RENDSTEP_STD = $(addprefix $(OUT.RENDSTEP_STD)/,$(notdir $(SRC.RENDSTEP_STD:.cpp=$O)))
-DEP.RENDSTEP_STD = CSGFX CSTOOL CSUTIL CSGEOM
+DEP.RENDSTEP_STD = CSGFX CSGEOM CSTOOL CSUTIL
 
 OUTDIRS += $(OUT.RENDSTEP_STD)
 

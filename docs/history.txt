@@ -37,6 +37,8 @@ chronological order.
 	- Jorrit marked the old metaball and metagen plugins with the
 	  PRE_REMOVE_METABALL tag so that they can be revived more easily.
 	- Eric Sunshine added a makefile for `partedit'.
+	- Eric Sunshine fixed the `make help' formatting for a number of
+	  targets.
 19-Oct-2003
 	- res fixed a bug in the OR polygon buffers: when two polygons 
 	  subsequently passed into AddPolygon() would have different lightmaps,

@@ -1,11 +1,12 @@
-DESCRIPTION.rendloop_loader = Crystal Space render loop loader
+DESCRIPTION.rendloop_loader = Render loop loader
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Plugin
 PLUGINHELP += \
-  $(NEWLINE)@echo $"  make rendloop_loader Make the $(DESCRIPTION.rendloop_loader)$"
+  $(NEWLINE)echo $"  make rendloop_loader$" \
+  $(NEWLINE)echo $"                    Make the $(DESCRIPTION.rendloop_loader)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

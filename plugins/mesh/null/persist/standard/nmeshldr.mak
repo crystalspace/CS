@@ -4,7 +4,7 @@ DESCRIPTION.nullmeshldr = Null mesh object loader
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make nullmeshldr  Make the $(DESCRIPTION.mullmeshldr)$"
+  $(NEWLINE)echo $"  make nullmeshldr  Make the $(DESCRIPTION.nullmeshldr)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#

@@ -9,7 +9,8 @@ ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make movierecorderMake the $(DESCRIPTION.movierecorder)$"
+  $(NEWLINE)echo $"  make movierecorder$" \
+  $(NEWLINE)echo $"                    Make the $(DESCRIPTION.movierecorder)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

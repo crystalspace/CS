@@ -1,15 +1,17 @@
 # This is a subinclude file used to define the rules needed
-# to build the a shaderpgrogram plugin for fixed function pipeline -- glshader_fixed
+# to build the a shaderpgrogram plugin for fixed function
+# pipeline -- glshader_fixed
 
 # Driver description
-DESCRIPTION.glshader_fixed = Crystal Space Render3d Shaderplugin for fixed function pipeline
+DESCRIPTION.glshader_fixed = Shader for fixed function pipeline
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
 DRIVERHELP += \
-  $(NEWLINE)echo $"  make glshader_fixed   Make the $(DESCRIPTION.glshader_fixed)$"
+  $(NEWLINE)echo $"  make glshader_fixed$" \
+  $(NEWLINE)echo $"                    Make the $(DESCRIPTION.glshader_fixed)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -51,7 +53,7 @@ SRC.GLSHADER_FIXED = \
   $(wildcard $(addprefix $(SRCDIR)/,\
   plugins/video/render3d/shaderplugins/glshader_fixed/*.cpp))
 OBJ.GLSHADER_FIXED = $(addprefix $(OUT)/,$(notdir $(SRC.GLSHADER_FIXED:.cpp=$O)))
-DEP.GLSHADER_FIXED = CSGEOM CSUTIL CSUTIL CSGFX
+DEP.GLSHADER_FIXED = CSGFX CSGEOM CSUTIL
 CFG.GLSHADER_FIXED =
 
 TO_INSTALL.CONFIG += $(CFG.GLSHADER_FIXED)

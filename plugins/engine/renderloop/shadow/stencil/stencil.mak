@@ -2,14 +2,15 @@
 # to build the rendstep_stencil plug-in.
 
 # Driver description
-DESCRIPTION.rendstep_stencil = Crystal Space Stencil Shadow renderstep plugin
+DESCRIPTION.rendstep_stencil = Stencil shadow render step
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make rendstep_stencil      Make the $(DESCRIPTION.rendstep_stencil)$"
+  $(NEWLINE)echo $"  make rendstep_stencil$" \
+  $(NEWLINE)echo $"                    Make the $(DESCRIPTION.rendstep_stencil)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -49,7 +50,7 @@ SRC.RENDSTEP_STENCIL = $(wildcard $(addprefix $(SRCDIR)/, \
    $(DIR.RENDSTEP_STENCIL)/shadow/stencil/*.cpp \
   plugins/engine/renderloop/common/*.cpp))
 OBJ.RENDSTEP_STENCIL = $(addprefix $(OUT)/,$(notdir $(SRC.RENDSTEP_STENCIL:.cpp=$O)))
-DEP.RENDSTEP_STENCIL = CSTOOL CSGEOM CSUTIL CSUTIL
+DEP.RENDSTEP_STENCIL = CSTOOL CSGEOM CSUTIL
 
 TO_INSTALL.CONFIG += $(CFG.RENDSTEP_STENCIL)
 

@@ -2,14 +2,14 @@
 # to build the a shaderpgrogram plugin for GLARB-vp -- glshader_arb
 
 # Driver description
-DESCRIPTION.glshader_arb = Crystal Space Render3d Shaderplugin for ARB_vp
+DESCRIPTION.glshader_arb = Shader for ARB_vp
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
 DRIVERHELP += \
-  $(NEWLINE)echo $"  make glshader_arb   Make the $(DESCRIPTION.glshader_arb)$"
+  $(NEWLINE)echo $"  make glshader_arb Make the $(DESCRIPTION.glshader_arb)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -51,7 +51,7 @@ SRC.GLSHADER_ARB = \
   $(wildcard $(addprefix $(SRCDIR)/, \
   plugins/video/render3d/shaderplugins/glshader_arb/*.cpp))
 OBJ.GLSHADER_ARB = $(addprefix $(OUT)/,$(notdir $(SRC.GLSHADER_ARB:.cpp=$O)))
-DEP.GLSHADER_ARB = CSGEOM CSUTIL CSUTIL CSGFX
+DEP.GLSHADER_ARB = CSGFX CSGEOM CSUTIL
 CFG.GLSHADER_ARB =
 
 TO_INSTALL.CONFIG += $(CFG.GLSHADER_ARB)
