@@ -46,6 +46,22 @@ public:
 
   /// Get the first original key string with the given key number.
   const char* GetKey (csHashKey key) const;
+  
+  /// Get the element with the given key string.
+  csHashObject Get (const char* key) const;
+
+  /**
+   * Get an object from this map. Returns 0 if object
+   * is not there. If there are multiple elements with
+   * the same key then a random one will be returned.
+   * Use an iterator to iterate over all elements with
+   * the same key.
+   */
+  csHashObject Get (csHashKey key) const
+  { return csHashMap::Get (key); }
+
+    /// Delete the element with the given key string.
+  void Delete (const char* key, csHashObject object);
 };
 
 /// A csHashIterator that knows about csHashMapReversible's reverse hash.

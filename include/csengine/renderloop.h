@@ -26,10 +26,14 @@
 
 #ifdef CS_NR_ALTERNATE_RENDERLOOP
 
+#include "csutil/hashmapr.h"
+#include "csutil/refarr.h"
 #include "iengine/renderloop.h"
-#include "csengine/engine.h"
 #include "iutil/strset.h"
+#include "ivideo/render3d.h"
+#include "ivideo/shader/shader.h"
 
+class csEngine;
 class csRenderView;
 class csRenderLoop;
 
@@ -83,6 +87,26 @@ public:
 
   void StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview);
   virtual void Draw (iCamera* c, iClipper2D* clipper);
+};
+
+class csRenderLoopManager : public iRenderLoopManager
+{
+  csHashMapReversible loops;
+  csStringSet strings;
+
+  csEngine* engine;
+public:
+  SCF_DECLARE_IBASE;
+
+  csRenderLoopManager(csEngine* engine);
+  virtual ~csRenderLoopManager();
+
+  virtual csPtr<iRenderLoop> Create ();
+  
+  virtual bool Register (const char* name, iRenderLoop* loop);
+  virtual iRenderLoop* Retrieve (const char* name);
+  virtual const char* GetName (iRenderLoop* loop);
+  virtual bool Unregister (iRenderLoop* loop);
 };
 
 #endif

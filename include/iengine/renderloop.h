@@ -69,7 +69,7 @@ struct iRenderLoopManager : public iBase
    * Create a new render loop.
    * \remark This render loop is "unnamed". To name it, use Register().
    */
-  virtual iRenderLoop* Create () = 0;
+  virtual csPtr<iRenderLoop> Create () = 0;
   
   /**
    * Associate a name with a renderloop.

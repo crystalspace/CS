@@ -53,6 +53,12 @@ The history order is reversed so that new features are at the top.
 	  when the caller's reference to the event goes out of scope, the
 	  event will be removed from the queue and returned to the pool.
 	  This problem was evident in the network manager.
+	- res added Get() and Delete() methods to csHashMapReversible that 
+	  work on a key string.
+	- res added a "render loop manager" to the engine.
+	- res fixed some "csFooIterator::Next: recursive on all control paths, 
+	  function will cause runtime stack overflow" warnings on MSVC.
+	- res removed iSectorRenderMeshList::GetVisible().
 3-June-2003
 	- Philipp Aumayr fixed the fancycon bug, where the borders
 	  were visibile in SW but not in GL mode. (wrong mixmode at line

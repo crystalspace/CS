@@ -39,6 +39,10 @@
 #include "iengine/campos.h"
 #include "iutil/dbghelp.h"
 #include "ivideo/graph3d.h"
+#if defined(CS_USE_NEW_RENDERER)
+#include "iengine/renderloop.h"
+#include "csengine/renderloop.h"
+#endif
 
 class csPoly2DPool;
 //class csRadiosity;
@@ -69,7 +73,6 @@ struct iVirtualClock;
 struct iCacheManager;
 struct iString;
 struct iEngineSequenceManager;
-struct iRenderLoop;
 struct iConfigFile;
 
 /**
@@ -347,7 +350,9 @@ public:
 
 #if defined(CS_USE_NEW_RENDERER) && defined(CS_NR_ALTERNATE_RENDERLOOP)
   /// Default render loop
-  csRef<iRenderLoop> DefaultRenderLoop;
+  csRef<iRenderLoop> defaultRenderLoop;
+  /// Render loop manager
+  csRenderLoopManager* renderLoopManager;
 #endif
 
   /// Option variable: force lightmap recalculation?
@@ -1015,6 +1020,15 @@ public:
   /// Return the current drawing context.
   virtual iTextureHandle *GetContext () const;
 
+#ifdef CS_USE_NEW_RENDERER
+  // ======================================================================
+  // Render loop stuff
+  // ======================================================================
+  
+  virtual iRenderLoopManager* GetRenderLoopManager ();
+  virtual iRenderLoop* GetCurrentDefaultRenderloop ();
+  virtual bool SetCurrentDefaultRenderloop (iRenderLoop* loop);
+#endif
 private:
   /// Resizes frame width and height dependent data members
   void Resize ();

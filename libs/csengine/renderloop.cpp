@@ -36,7 +36,7 @@ void csEngine::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
 
 void csEngine::Draw (iCamera *c, iClipper2D *view)
 {
-  DefaultRenderLoop->Draw (c, view);
+  defaultRenderLoop->Draw (c, view);
 }
 
 //---------------------------------------------------------------------------
@@ -165,20 +165,24 @@ void csGenericRenderStep::Perform (csRenderView* rview, iSector* sector)
   r3d->SetZMode (zmode);
 
   iSectorRenderMeshList* meshes = sector->GetRenderMeshes ();
-  CS_ALLOC_STACK_ARRAY (csRenderMesh*, sameShaderMeshes, meshes->GetCount());
+  int meshnum = meshes->GetCount();
+  CS_ALLOC_STACK_ARRAY (csRenderMesh*, sameShaderMeshes, meshnum);
   int numSSM = 0;
   iShader* shader = 0;
   iLightList* lights = sector->GetLights();
 
-  int i = 0;
+  int i;
 
-  while (true)
+  for (i = 0; i < meshnum; i++)
   {
     iMeshWrapper* mw;
     iVisibilityObject* visobj;
     csRenderMesh* mesh;
+    bool visible;
     // @@@Objects outside the light's influence radius are 'lit' as well!
-    if (!meshes->GetVisible (i, mw, visobj, mesh)) break;
+    //if (!meshes->GetVisible (i, mw, visobj, mesh)) break;
+    meshes->Get (i, mw, visobj, mesh, &visible);
+    if (!visible) continue;
     /*
     @@@!!! That should of course NOT be necessary,
     but otherwise there's some corruption (at least w/ genmesh).
@@ -311,6 +315,63 @@ void csRenderLoop::Draw (iCamera *c, iClipper2D *view)
   engine->G3D->SetClipper (0, CS_CLIPPER_NONE);
 
   //csSleep (1000);
+}
+
+//---------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE(csRenderLoopManager)
+  SCF_IMPLEMENTS_INTERFACE(iRenderLoopManager)
+SCF_IMPLEMENT_IBASE_END
+
+csRenderLoopManager::csRenderLoopManager(csEngine* engine)
+{
+  SCF_CONSTRUCT_IBASE (0);
+
+  csRenderLoopManager::engine = engine;
+}
+
+csRenderLoopManager::~csRenderLoopManager()
+{
+  csGlobalHashIteratorReversible it (&loops);
+  while (it.HasNext())
+  {
+    iRenderLoop* loop = (iRenderLoop*)it.Next();
+    loop->DecRef ();
+  }
+}
+
+csPtr<iRenderLoop> csRenderLoopManager::Create ()
+{
+  csRenderLoop* loop = new csRenderLoop (engine);
+  return csPtr<iRenderLoop> (loop);
+}
+  
+bool csRenderLoopManager::Register (const char* name, iRenderLoop* loop)
+{
+  const char* myName = strings.Request (strings.Request (name));
+  if (loops.Get (myName) != 0) return false;
+  loop->IncRef();
+  loops.Put (myName, (csHashObject)loop);
+  return true;
+}
+ 
+iRenderLoop* csRenderLoopManager::Retrieve (const char* name)
+{
+  return (iRenderLoop*)(loops.Get (name));
+}
+
+const char* csRenderLoopManager::GetName (iRenderLoop* loop)
+{
+  return loops.GetKey ((csHashObject)loop);
+}
+
+bool csRenderLoopManager::Unregister (iRenderLoop* loop)
+{
+  const char* key;
+  if ((key = loops.GetKey ((csHashObject)loop)) == 0) return false;
+  loop->DecRef();
+  loops.Delete (key, (csHashObject)loop);
+  return false;
 }
 
 #endif

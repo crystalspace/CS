@@ -20,10 +20,6 @@
 #include "qint.h"
 #include "csutil/scf.h"
 #include "ivaria/pmeter.h"
-#ifdef CS_USE_NEW_RENDERER
-#include "iengine/renderloop.h"
-#include "csengine/renderloop.h"
-#endif
 #include "csengine/engine.h"
 #include "csengine/halo.h"
 #include "csengine/camera.h"
@@ -721,6 +717,9 @@ csEngine::~csEngine ()
   delete materials;
   delete textures;
   delete shared_variables;
+#if defined(CS_USE_NEW_RENDERER) && defined(CS_NR_ALTERNATE_RENDERLOOP)
+  delete renderLoopManager;
+#endif
 }
 
 bool csEngine::Initialize (iObjectRegistry *object_reg)
@@ -769,7 +768,10 @@ bool csEngine::Initialize (iObjectRegistry *object_reg)
   ReadConfig (cfg);
 
 #if defined(CS_USE_NEW_RENDERER) && defined(CS_NR_ALTERNATE_RENDERLOOP)
-  DefaultRenderLoop.AttachNew (new csRenderLoop (this));
+  renderLoopManager = new csRenderLoopManager (this);
+  defaultRenderLoop = renderLoopManager->Create ();
+  renderLoopManager->Register (CS_DEFAULT_RENDERLOOP_NAME, 
+    defaultRenderLoop);
 #endif
 
   return true;
@@ -3193,3 +3195,27 @@ bool csEngine::DebugCommand (const char* cmd)
 }
 
 //-------------------End-Multi-Context-Support--------------------------------
+
+#ifdef CS_USE_NEW_RENDERER
+// ======================================================================
+// Render loop stuff
+// ======================================================================
+  
+iRenderLoopManager* csEngine::GetRenderLoopManager ()
+{
+  return renderLoopManager;
+}
+
+iRenderLoop* csEngine::GetCurrentDefaultRenderloop ()
+{
+  return defaultRenderLoop;
+}
+
+bool csEngine::SetCurrentDefaultRenderloop (iRenderLoop* loop)
+{
+  if (loop == 0) return false;
+  defaultRenderLoop = loop;
+  return true;
+}
+
+#endif

@@ -111,6 +111,8 @@ class csRenderMeshList : public iSectorRenderMeshList
     csTicks lastFrame;
     // for what view?
     iRenderView* lastView;
+    // potentially visible?
+    bool potvis;
 
     csMWitem()
     {
@@ -179,14 +181,8 @@ public:
 
   virtual int GetCount ();
   virtual void Get (int index, 
-    iMeshWrapper*& mw, 
-    iVisibilityObject*& visobj,
-    csRenderMesh*& rm);
-  virtual bool GetVisible (int& index, 
-    iMeshWrapper*& mw, 
-    iVisibilityObject*& visobj,
-    csRenderMesh*& rm);
-  virtual void PrioritySort ();
+    iMeshWrapper*& mw, iVisibilityObject*& visobj, csRenderMesh*& rm,
+    bool* visible);
 };
 #endif
 

@@ -279,11 +279,8 @@ void csRenderMeshList::CheckVisibility (csRMLitem* item)
   {
     item->mwi->lastFrame = currentFrame;
     item->mwi->lastView = currentView;
-    if (!item->mw->GetMeshObject()->DrawTest (currentView, 
-      item->mw->GetMovable()))
-    {
-      item->visobj->SetVisibilityNumber (currentVisNr - 1);
-    }
+    item->mwi->potvis = item->mw->GetMeshObject()->DrawTest (currentView, 
+      item->mw->GetMovable());
   }
 }
 
@@ -447,87 +444,38 @@ int csRenderMeshList::GetCount ()
 void csRenderMeshList::Get (int index, 
 			    iMeshWrapper*& mw, 
 			    iVisibilityObject*& visobj,
-			    csRenderMesh*& rm)
+			    csRenderMesh*& rm,
+			    bool* visible)
 {
   csRMLitem& item = rendermeshes[index];
+
+  long RP = item.mw->GetRenderPriority();
+  if (!checkedRPs.Get (RP))
+  {
+    checkedRPs.Set (RP);
+
+    RPsorting[RP] = sector->engine->GetRenderPrioritySorting (RP);
+    // does it need sorting?
+    if (RPsorting[RP] != CS_RENDPRI_NONE)
+    {
+      currentRP = RP;
+      // do it.
+      SortRP (index, rendermeshes.Length() - 1,
+	(RPsorting[RP] == CS_RENDPRI_FRONT2BACK) ? 1 : -1);
+      // This might be another item now.
+      item = rendermeshes[index]; 
+    }
+
+    // @@@ do CS_ENTITY_CAMERA stuff
+  }
+  
+  // have we already checked visibility?
+  CheckVisibility (&item);
+
   mw = item.mw;
   visobj = item.visobj;
   rm = item.rm;
-}
-
-bool csRenderMeshList::GetVisible (int& index, 
-				   iMeshWrapper*& mw, 
-				   iVisibilityObject*& visobj,
-				   csRenderMesh*& rm)
-{
-  csRMLitem* item;
-
-  do
-  {
-    if (index >= rendermeshes.Length()) return false;
-
-    // check if whether we already encountered this RP.
-    item = &(rendermeshes[index]);
-    long RP = item->mw->GetRenderPriority();
-    if (!checkedRPs.Get (RP))
-    {
-      checkedRPs.Set (RP);
-
-      RPsorting[RP] = sector->engine->GetRenderPrioritySorting (RP);
-      // does it need sorting?
-      if (RPsorting[RP] != CS_RENDPRI_NONE)
-      {
-	currentRP = RP;
-	// do it.
-        SortRP (index, rendermeshes.Length() - 1,
-	  (RPsorting[RP] == CS_RENDPRI_FRONT2BACK) ? 1 : -1);
-	// This might be another item now.
-	item = &(rendermeshes[index]); 
-	 // we memcpy() above, so the pointer hasn't changed
-      }
-
-      // @@@ do CS_ENTITY_CAMERA stuff
-    }
-    
-    // have we already checked visibility?
-    CheckVisibility (item);
-
-    index++;
-  }
-  while (item->visobj->GetVisibilityNumber() < currentVisNr);
-
-  mw = item->mw;
-  visobj = item->visobj;
-  rm = item->rm;
-  
-  return true;
-}
-
-void csRenderMeshList::PrioritySort ()
-{
-  int i;
-
-  for (i = 0; i < rendermeshes.Length(); i++)
-  {
-    csRMLitem* item = &rendermeshes[i];
-    long RP = item->mw->GetRenderPriority();
-    if (!checkedRPs.Get (RP))
-    {
-      checkedRPs.Set (RP);
-
-      int order = sector->engine->GetRenderPrioritySorting (RP);
-      // does it need sorting?
-      if (order != CS_RENDPRI_NONE)
-      {
-	currentRP = RP;
-	// do it.
-	SortRP (i, rendermeshes.Length() - 1,
-	  (order == CS_RENDPRI_FRONT2BACK) ? 1 : -1);
-      }
-
-      // @@@ do CS_ENTITY_CAMERA stuff
-    }
-  }
+  if (visible) *visible = item.mwi->potvis;
 }
 
 #endif

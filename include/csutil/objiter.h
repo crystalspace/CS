@@ -34,13 +34,14 @@
   class NAME : public csTypedObjectIterator				\
   {									\
   protected:								\
-    virtual void GetRequestedInterface (scfInterfaceID &id, int &ver) const	\
+    virtual void GetRequestedInterface (scfInterfaceID &id,		\
+      int &ver) const							\
     { id = INTERFACE##_scfGetID (); ver = INTERFACE##_VERSION; }	\
   public:								\
     inline NAME (iObject *Parent) : csTypedObjectIterator (Parent)	\
-      { }						\
+      { }								\
     inline INTERFACE *Next ()						\
-      { return (INTERFACE*)(iBase*)Next (); }		\
+      { return (INTERFACE*)(iBase*)csTypedObjectIterator::Next (); }	\
   };
 
 /**

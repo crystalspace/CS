@@ -79,6 +79,8 @@ struct iRegionList;
 struct iLoaderContext;
 struct iCacheManager;
 struct iSharedVariableList;
+struct iRenderLoopManager;
+struct iRenderLoop;
 
 /** \name GetNearbyLights() flags
  * @{ */
@@ -812,6 +814,39 @@ struct iEngine : public iBase
    * the object before the next frame.
    */
   virtual void WantToDie (iMeshWrapper* mesh) = 0;
+  
+#ifdef CS_USE_NEW_RENDERER
+  // ======================================================================
+  // Render loop stuff
+  // ======================================================================
+  
+  /**
+   * Retrieve the render loop manager.
+   */
+  virtual iRenderLoopManager* GetRenderLoopManager () = 0;
+  
+  /**
+   * Returns the current render loop.
+   * \remark This will the loop that is set to be the current default
+   *  with SetCurrentDefaultRenderloop(). This doesn't have to be the engine's
+   *  default render loop (note the difference between the "current" and 
+   *  "default" render loop - former one is the loop used currently for 
+   *  drawing, latter one is a default loop created at engine initialization 
+   *  time.) To retrieve the default loop, use 
+   * \code
+   *  GetRenderLoopManager()->Retrieve (#CS_DEFAULT_RENDERLOOP_NAME);
+   * \endcode
+   */
+  virtual iRenderLoop* GetCurrentDefaultRenderloop () = 0;
+
+  /**
+   * Set the current render loop.
+   * \param loop The loop to be made the current render loop.
+   * \return Whether the change was successful (a value of 0 for \p will 
+   *   let the method fail.)
+   */
+  virtual bool SetCurrentDefaultRenderloop (iRenderLoop* loop) = 0;
+#endif
 };
 
 /** @} */

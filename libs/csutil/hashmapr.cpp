@@ -52,6 +52,22 @@ const char* csHashMapReversible::GetKey (csHashKey key) const
   return (char *) HalfReverse->Get (key);
 }
 
+csHashObject csHashMapReversible::Get (const char* key) const
+{
+  csHashKey keynum = csHashCompute (key);
+  return csHashMap::Get (keynum);
+}
+
+void csHashMapReversible::Delete (const char* key, csHashObject object)
+{
+  csHashKey keynum = csHashCompute (key);
+  const char* myKey = (const char*)HalfReverse->Get (keynum);
+  if (myKey == 0) return; 
+  csHashMap::Delete (keynum, object);
+  HalfReverse->Delete (keynum, (csHashObject)myKey);
+  Reverse->Delete ((csHashKey)object, (csHashObject)myKey);
+}
+
 //----------------------------------------------------------------------------
 
 csHashIteratorReversible::csHashIteratorReversible (csHashMapReversible *r,
