@@ -17,6 +17,8 @@ chronological order.
 	- res corrected the normal map swizzling in the 
 	  splatting_scattering_base shader. It didn't flip the (source) Y 
 	  coordinate.
+	- Eric Sunshine added several missing #includes to
+	  csplugincommon/renderstep/parserenderstep.h.
 23-Feb-2005
 	- res moved the code from the various "common" libraries into a
 	  library "csplugincommon" (and libraries with Win32, OpenGL and

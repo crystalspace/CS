@@ -24,6 +24,11 @@
 #include "csutil/strhash.h"
 #include "csutil/weakref.h"
 #include "csutil/leakguard.h"
+#include "iengine/rendersteps/icontainer.h"
+#include "iengine/rendersteps/irenderstep.h"
+#include "imap/services.h"
+#include "iutil/document.h"
+#include "iutil/objreg.h"
 #include "iutil/plugin.h"
 
 class CS_CSPLUGINCOMMON_EXPORT csRenderStepParser
