@@ -107,7 +107,7 @@ CFLAGS.GENERAL=$(NEXT.CFLAGS.GENERAL) $(NEXT.ARCH_FLAGS) \
   -ObjC++ -fno-common -pipe
 
 # Flags for the compiler which are used when optimizing.
-CFLAGS.optimize=-O4 -finline-functions
+CFLAGS.optimize=$(NEXT.CFLAGS.OPTIMIZE)
 
 # Flags for the compiler which are used when debugging.
 CFLAGS.debug=-g $(NEXT.CFLAGS.DEBUG)

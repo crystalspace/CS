@@ -46,6 +46,7 @@ NEXT.ARCHS=i386 ppc
 NEXT.SOURCE_DIRS=macosxs openstep
 NEXT.INCLUDE_DIRS=-FAppKit -FFoundation
 NEXT.CFLAGS.GENERAL=-Wmost
+NEXT.CFLAGS.OPTIMIZE=-O4 -finline-functions
 NEXT.CFLAGS.DEBUG=-finline-functions -O
 NEXT.CFLAGS.DLL=
 NEXT.LIBS=
