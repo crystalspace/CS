@@ -14,6 +14,7 @@ class csConfigFile : public iConfigFileNew
 public:
   DECLARE_IBASE;
 
+  csConfigFile (iBase *pBase);
   /// Create a new configuration object from the given file.
   csConfigFile(const char *Filename = NULL, iVFS *vfs = NULL);
   /// Delete this configuration.
