@@ -484,11 +484,11 @@ public:
    * for use by main render process later, relative to
    * the specified Point Of View.
    */
-  void CreateImposter(csReversibleTransform& pov)
+  void CreateImposter(csReversibleTransform& /*pov*/)
   { /* implement later */ }
 
   /// Determine if imposter or true rendering will be used
-  bool WouldUseImposter(csReversibleTransform& pov)
+  bool WouldUseImposter(csReversibleTransform& /*pov*/)
   { /* implement later */ return false; }
   
   //--------------------- SCF stuff follows ------------------------------//
