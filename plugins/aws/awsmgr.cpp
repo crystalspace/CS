@@ -15,7 +15,6 @@
 #include "aws.h"
 #include "awsprefs.h"
 #include "awsfparm.h"
-#include "awsclip.h"
 #include "ivideo/txtmgr.h"
 #include "iengine/engine.h"
 #include "iutil/eventh.h"
