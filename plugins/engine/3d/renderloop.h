@@ -80,7 +80,7 @@ public:
   /**
    * Load a renderloop from VFS file named \p file.
    */
-  csPtr<iRenderLoop> Load (const char* fileName);
+  virtual csPtr<iRenderLoop> Load (const char* fileName);
 };
 
 #endif

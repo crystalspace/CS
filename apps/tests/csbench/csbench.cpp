@@ -130,7 +130,8 @@ bool CsBench::CreateGeometry ()
         "Error loading 'stone4' texture!");
     return false;
   }
-  if (!loader->LoadTexture ("stone_normal", "/lib/std/stone2DOT3.png", CS_TEXTURE_3D,
+  if (!loader->LoadTexture ("stone_normal", "/lib/std/stone2DOT3.png",
+  	CS_TEXTURE_3D,
     0, false, false))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -348,6 +349,7 @@ void CsBench::BenchMark (const char* name, const char* description)
   	(const char*)buf->GetData (), buf->GetSize ());
 
   vfs->Sync ();
+  fflush (stdout);
 }
 
 iShaderManager* CsBench::GetShaderManager ()
@@ -445,36 +447,7 @@ void CsBench::PerformTests ()
 		  "OR compatibility", 0, 0);
 
   iRenderLoopManager* rlmgr = engine->GetRenderLoopManager ();
-  csRef<iRenderLoop> loop = rlmgr->Create ();
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
-	iPluginManager);
-  csRef<iRenderStepType> genType = CS_LOAD_PLUGIN (plugin_mgr,
-	"crystalspace.renderloop.step.generic.type", iRenderStepType);
-  csRef<iRenderStepType> lightType = CS_LOAD_PLUGIN (plugin_mgr,
-	"crystalspace.renderloop.step.lightiter.type", iRenderStepType);
-  csRef<iRenderStepFactory> genFact = genType->NewFactory ();
-  csRef<iRenderStepFactory> lightFact = lightType->NewFactory ();
-  csRef<iRenderStep> step;
-  csRef<iGenericRenderStep> genStep;
-  step = genFact->Create ();
-  loop->AddStep (step);
-  genStep = SCF_QUERY_INTERFACE (step, iGenericRenderStep);
-  genStep->SetShaderType ("ambient");
-  genStep->SetZBufMode (CS_ZBUF_MESH);
-  genStep->SetZOffset (true);
-  genStep->SetPortalTraversal (true);
-  step = lightFact->Create ();
-  loop->AddStep (step);
-  csRef<iRenderStepContainer> contStep = SCF_QUERY_INTERFACE (step,
-	iRenderStepContainer);
-  step = genFact->Create ();
-  contStep->AddStep (step);
-  genStep = SCF_QUERY_INTERFACE (step, iGenericRenderStep);
-  genStep->SetShaderType ("diffuse");
-  genStep->SetZBufMode (CS_ZBUF_MESH);
-  genStep->SetZOffset (false);
-  genStep->SetPortalTraversal (false);
-  engine->GetRenderLoopManager ()->Register ("bump", loop);
+  csRef<iRenderLoop> loop = rlmgr->Load ("/shader/std_rloop_diffuse.xml");
   engine->SetCurrentDefaultRenderloop (loop);
 
   PerformShaderTest ("/shader/light_bumpmap.xml", "light_bumpmap",

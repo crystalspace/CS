@@ -56,7 +56,7 @@ struct iRenderLoop : public iRenderStepContainer
   virtual void Draw (iRenderView *rview, iSector *s) = 0;
 };
 
-SCF_VERSION (iRenderLoopManager, 0, 0, 2);
+SCF_VERSION (iRenderLoopManager, 0, 0, 3);
 
 /**
  * Render loop manager.
@@ -101,6 +101,12 @@ struct iRenderLoopManager : public iBase
    * \return Whether the association was successfully removed.
    */
   virtual bool Unregister (iRenderLoop* loop) = 0;
+  /**
+   * Load a renderloop from VFS file. This file should be a renderloop
+   * XML file with <params> as the root.
+   * \param fileName is the VFS path.
+   */
+  virtual csPtr<iRenderLoop> Load (const char* fileName) = 0;
 };
  
 /**@}*/

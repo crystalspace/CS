@@ -13,6 +13,9 @@ chronological order.
 	  csApplicationFramework and csBaseEventHandler.  The skeleton even
 	  properly instructs SCF to also scan for CEL plugins if the user chose
 	  to enable CEL support.
+	- Jorrit added iRenderLoopManager->Load(). The function was already in
+	  csRenderLoopManager but not in the interface.
+	- Jorrit changed csbench to use the new function.
 21-Jun-2004
 	- Jorrit attempted to add new tests to csbench to try out a shader
 	  with various techniques. Not sure if it works correctly yet though.
