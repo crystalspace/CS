@@ -7,6 +7,14 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine applied a patch to ensocket plugin from Frank Michler
 	  <Michler@students.uni-marburg.de> fixing a problem where the return
 	  value from accept() was being misinterpreted.
+	- Eric Sunshine fixed the following bugs in
+	  csNetworkSocket2::SetSocketBlock() in ensocket plugin:
+	    - On Unix, was ignoring the blocking flag and always setting the
+	      socket to non-blocking.
+	    - On Unix, was erroneously sending O_NONBLOCK to setsockopt() as
+	      though it was a socket-option.
+	    - On Windows, was erroneously sending the error constant
+	      WSAEWOULDBLOCK to setsockopt() as though it was a socket-option.
 4-Deb-2003
 	- Eric Sunshine disabled the experimental
 	  PTHREAD_MUTEX_HAS_RECURSIVE_NP feature since the configure test

@@ -1,5 +1,5 @@
 /*
-    ENSOCKET Plugin
+    ensocket plugin
     Copyright (C) 2002 by Erik Namtvedt
 
     This library is free software; you can redistribute it and/or
@@ -16,8 +16,8 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#include "cssysdef.h"
 
+#include "cssysdef.h"
 #include "cssys/sockets.h"
 
 #ifdef OS_WIN32
@@ -40,22 +40,20 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csNetworkDriver2::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csNetworkDriver2::csNetworkDriver2 (iBase *parent) 
+csNetworkDriver2::csNetworkDriver2 (iBase *parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-
   last_error = CS_NET_DRIVER_NOERROR;
 
 #ifdef OS_WIN32
   WSADATA Data;
-  
-  if (WSAStartup(MAKEWORD(1,0),&Data) != 0) 
+  if (WSAStartup(MAKEWORD(1,0),&Data) != 0)
     last_error = CS_NET_DRIVER_NOERROR;
 #endif
 }
 
-csNetworkDriver2::~csNetworkDriver2() 
+csNetworkDriver2::~csNetworkDriver2()
 {
   last_error = CS_NET_DRIVER_NOERROR;
 
@@ -70,17 +68,17 @@ int csNetworkDriver2::LastError()
   return last_error;
 }
 
-iNetworkSocket2 *csNetworkDriver2::CreateSocket (int socket_type) 
+iNetworkSocket2 *csNetworkDriver2::CreateSocket (int socket_type)
 {
   int proto_type = -1;
 
   last_error = CS_NET_DRIVER_UNSUPPORTED_SOCKET_TYPE;
- 
-  if (socket_type == CS_NET_SOCKET_TYPE_TCP) 
+
+  if (socket_type == CS_NET_SOCKET_TYPE_TCP)
   {
     last_error = CS_NET_DRIVER_NOERROR;
     proto_type = SOCK_STREAM;
- 
+
     iNetworkSocket2 *tmpSocket = new csNetworkSocket2 (this, proto_type);
     return tmpSocket;
   }
@@ -99,56 +97,56 @@ SCF_IMPLEMENT_IBASE (csNetworkSocket2)
   SCF_IMPLEMENTS_INTERFACE (iNetworkSocket2)
 SCF_IMPLEMENT_IBASE_END
 
-csNetworkSocket2::csNetworkSocket2 (iBase *parent, int socket_type) 
+csNetworkSocket2::csNetworkSocket2 (iBase *parent, int socket_type)
 {
   SCF_CONSTRUCT_IBASE (parent);
   proto_type = -1;
   last_error = CS_NET_SOCKET_NOERROR;
   buffer_size = -1;
   read_buffer = (char *)malloc(1);
- 
+
   if (socket_type == SOCK_DGRAM)
   {
     socketfd = socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
-    if (socketfd != (SOCKET)socket_error) 
+    if (socketfd != (SOCKET)socket_error)
     {
 	proto_type = SOCK_DGRAM;
     }
     else
     {
-      last_error = CS_NET_SOCKET_CANNOT_CREATE;	
+      last_error = CS_NET_SOCKET_CANNOT_CREATE;
     }
-  } 
-  if (socket_type == SOCK_STREAM) 
+  }
+  if (socket_type == SOCK_STREAM)
   {
     socketfd = socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
-    if (socketfd != (SOCKET)socket_error) 
+    if (socketfd != (SOCKET)socket_error)
     {
         proto_type = SOCK_STREAM;
-    } 
+    }
     else
     {
       last_error = CS_NET_SOCKET_CANNOT_CREATE;
     }
   }
-  
+
   socket_ready = true;
   connected = false;
   blocking = true;
-  
+
   fd_list[0] = socketfd;
-  
+
   FD_ZERO(&fd_maskset);
   FD_SET(fd_list[0],&fd_maskset);
 
   if (proto_type == -1)
-    last_error = CS_NET_SOCKET_UNSUPPORTED_SOCKET_TYPE; 
+    last_error = CS_NET_SOCKET_UNSUPPORTED_SOCKET_TYPE;
 }
 
 csNetworkSocket2::~csNetworkSocket2 ()
 {
   if (read_buffer) free(read_buffer);
-  
+
   last_error = CS_NET_SOCKET_NOERROR;
 }
 
@@ -160,106 +158,73 @@ int csNetworkSocket2::LastError ()
 int csNetworkSocket2::LastOSError ()
 {
 #ifdef OS_WIN32
-	return GetLastError();
+  return GetLastError();
 #else
-	return errno;
+  return errno;
 #endif
 }
 
-int csNetworkSocket2::Close() 
+int csNetworkSocket2::Close()
 {
   connected = false;
   FD_ZERO(&fd_maskset);
   closesocket(socketfd);
-
   return CS_NET_SOCKET_NOERROR;
 }
 
-int csNetworkSocket2::Disconnect() 
+int csNetworkSocket2::Disconnect()
 {
   Close();
-
   return CS_NET_SOCKET_NOERROR;
 }
-	
-int csNetworkSocket2::SetSocketBlock (bool block) 
+
+int csNetworkSocket2::SetSocketBlock (bool block)
 {
-  if (socketfd) 
+  if (socketfd)
   {
-    const char flag = (block ? 0x00 : 0xff);
+    blocking = block;
     unsigned long arg = (block ? 0 : 1);
-
-    if (block) 
-    {
-      arg = 0;
-      blocking = true;
-    }
-    else
-    {
-      arg = 1;
-      blocking = false;
-    }
-	
-#ifdef OS_WIN32
     IOCTL(socketfd, FIONBIO, &arg);
-    // WIN32 doesn't support fcntl
-    //fcntl(socketfd,F_SETFL,O_NONBLOCK);
-    if (setsockopt(socketfd, SOL_SOCKET, WSAEWOULDBLOCK, &flag,sizeof(flag)) == 0) 
-      return CS_NET_SOCKET_NOERROR;
-    else
-      return CS_NET_SOCKET_CANNOT_SETBLOCK;
-
-#else
-//    IOCTL(socketfd,O_NONBLOCK,&arg);
-    IOCTL(socketfd, FIONBIO, &arg);
-    fcntl(socketfd,F_SETFL,O_NONBLOCK);
-    if (setsockopt(socketfd, SOL_SOCKET, O_NONBLOCK, &flag,sizeof(flag)) == 0)
-      return CS_NET_SOCKET_NOERROR;
-    else
-      return CS_NET_SOCKET_CANNOT_SETBLOCK;
-
-#endif
+    return CS_NET_SOCKET_NOERROR;
   }
   else
   {
     return CS_NET_SOCKET_NOTCONNECTED;
   }
-
-  return CS_NET_SOCKET_NOERROR;
 }
 
-int csNetworkSocket2::SetSocketReuse (bool reuse) 
+int csNetworkSocket2::SetSocketReuse (bool reuse)
 {
-  if (socketfd) 
+  if (socketfd)
   {
     const char flag = (reuse ? 0x00 : 0xff);
     if (setsockopt(socketfd, SOL_SOCKET, SO_REUSEADDR, &flag,sizeof(flag)) == 0)
       return CS_NET_SOCKET_NOERROR;
     else
       return CS_NET_SOCKET_CANNOT_SETREUSE;
-  } 
-  else 
+  }
+  else
   {
     return CS_NET_SOCKET_NOTCONNECTED;
   }
 }
 
-int csNetworkSocket2::WaitForConnection (int source, int port, int que) 
+int csNetworkSocket2::WaitForConnection (int source, int port, int que)
 {
   local_addr.sin_family = AF_INET;
   local_addr.sin_port = htons(port);
   local_addr.sin_addr.s_addr = source;
   memset(&(local_addr.sin_zero),0,8);
 
-  if (bind(socketfd,(struct sockaddr *)&local_addr,sizeof(struct sockaddr)) == socket_error) 
+  if (bind(socketfd, (struct sockaddr*)&local_addr, sizeof(struct sockaddr)) == socket_error)
   {
     return CS_NET_SOCKET_CANNOT_BIND;
   }
-  if (listen(socketfd,que) == socket_error) 
+  if (listen(socketfd,que) == socket_error)
   {
     return CS_NET_SOCKET_CANNOT_LISTEN;
   }
-  if (!blocking) 
+  if (!blocking)
   {
     fd_list[0] = socketfd;
     FD_ZERO(&fd_maskset);
@@ -281,9 +246,8 @@ int csNetworkSocket2::set (SOCKET socket_fd, bool bConnected, struct sockaddr_in
   return CS_NET_SOCKET_NOERROR;
 }
 
-int csNetworkSocket2::SELECT (int fds, fd_set *readfds, fd_set *writefds, fd_set *expectfds) 
+int csNetworkSocket2::SELECT (int fds, fd_set *readfds, fd_set *writefds, fd_set *expectfds)
 {
-  
   struct timeval to;
   to.tv_sec = 0;
   to.tv_usec = 0;
@@ -291,7 +255,6 @@ int csNetworkSocket2::SELECT (int fds, fd_set *readfds, fd_set *writefds, fd_set
   last_error = CS_NET_SOCKET_NOERROR;
 
   int result = select(fds,readfds,writefds,expectfds,&to);
-
   if (result == socket_error)
   {
     last_error = CS_NET_SOCKET_CANNOT_SELECT;
@@ -301,17 +264,15 @@ int csNetworkSocket2::SELECT (int fds, fd_set *readfds, fd_set *writefds, fd_set
   return result;
 }
 
-char *csNetworkSocket2::RemoteName() 
+char *csNetworkSocket2::RemoteName()
 {
   last_error = CS_NET_SOCKET_NOERROR;
-
   return inet_ntoa(local_addr.sin_addr);
 }
 
 int csNetworkSocket2::IOCTL (SOCKET socketfd, long cmd, u_long *argp)
 {
- int result; 
-
+ int result;
  last_error = CS_NET_SOCKET_NOERROR;
 
 #ifdef OS_WIN32
@@ -328,33 +289,31 @@ int csNetworkSocket2::IOCTL (SOCKET socketfd, long cmd, u_long *argp)
  return result;
 }
 
-iNetworkSocket2* csNetworkSocket2::Accept() 
+iNetworkSocket2* csNetworkSocket2::Accept()
 {
   last_error = CS_NET_SOCKET_NOERROR;
 
-  if (proto_type == SOCK_DGRAM) 
+  if (proto_type == SOCK_DGRAM)
   {
-	last_error = CS_NET_SOCKET_UNSUPPORTED_SOCKET_TYPE;
+    last_error = CS_NET_SOCKET_UNSUPPORTED_SOCKET_TYPE;
     return 0;
   }
 
-  if (!blocking) 
+  if (!blocking)
   {
     FD_ZERO(&fd_maskset);
     fd_list[0] = socketfd;
     FD_SET(fd_list[0],&fd_maskset);
     if (SELECT(FD_SETSIZE,&fd_maskset,0,0) != 1)
     {
-	  last_error = CS_NET_SOCKET_NODATA;
-	  return 0; 
+      last_error = CS_NET_SOCKET_NODATA;
+      return 0;
     }
   }
 
-  //if (FD_ISSET(fd_list[0],&fd_maskset)) {
   sin_size = sizeof(struct sockaddr_in);
-  
   SOCKET socket_fd = accept(socketfd,(struct sockaddr *)&remote_addr,&sin_size);
-  
+
   if (socket_fd == -1)
   {
     last_error = CS_NET_SOCKET_CANNOT_ACCEPT;
@@ -364,106 +323,91 @@ iNetworkSocket2* csNetworkSocket2::Accept()
   tmpSocket->socketfd = socket_fd;
   tmpSocket->connected = true;
   memcpy(&tmpSocket->local_addr,&remote_addr,sizeof(struct sockaddr_in));
-  /*
-  printf("connection from %s\n",inet_ntoa(remote_addr.sin_addr));
-  */
 
-  if (!blocking) 
+  if (!blocking)
   {
     fd_list[0] = socketfd;
     FD_ZERO(&fd_maskset);
     FD_SET(fd_list[0],&fd_maskset);
   }
-  
+
   return tmpSocket;
 }
 
-int csNetworkSocket2::Recv (char *buff, size_t size) 
+int csNetworkSocket2::Recv (char *buff, size_t size)
 {
-  if ((connected) || (proto_type == SOCK_DGRAM)) 
+  if (connected || proto_type == SOCK_DGRAM)
   {
     int result = CS_NET_SOCKET_NOERROR;
-    
     last_error = CS_NET_SOCKET_NOERROR;
 
-    if (proto_type == SOCK_STREAM) 
+    if (proto_type == SOCK_STREAM)
     {
-      if (!blocking) 
+      if (!blocking)
       {
         FD_ZERO(&fd_maskset);
         fd_list[0] = socketfd;
         FD_SET(fd_list[0],&fd_maskset);
         if (SELECT(FD_SETSIZE,&fd_maskset,0,0) != 1)
-        { 
+        {
           last_error = CS_NET_SOCKET_NODATA;
           return -1;
         }
 
-        if (FD_ISSET(socketfd,&fd_maskset)) 
+        if (FD_ISSET(socketfd,&fd_maskset))
         {
           result = recv(socketfd,buff,1,0);
-          /*
-          if (result > 0) printf("%c",buff[0]);
-          */
-
           if (result == 0)
           {
-            // disconnected
+            // Disconnected.
             last_error = CS_NET_SOCKET_NOTCONNECTED;
             connected = false;
           }
         }
-
-        return result;      
-      } 
-      else 
+        return result;
+      }
+      else
       {
         result = recv(socketfd,buff,size,0);
-      
         if (result != 1)
         {
           last_error = CS_NET_SOCKET_NOTCONNECTED;
           connected = false;
         }
       }
-      if (result > 0) 
+      if (result > 0)
         buff[result] = 0;
-
       return result;
-    } 
+    }
     else // stream socket
     {
       addr_len = sizeof(struct sockaddr);
-      
       if (!blocking)
       {
         FD_ZERO(&fd_maskset);
         FD_SET(fd_list[0],&fd_maskset);
         if (SELECT(FD_SETSIZE,&fd_maskset,0,0) != 1) return 0;
-        if (FD_ISSET(fd_list[0],&fd_maskset)) 
+        if (FD_ISSET(fd_list[0],&fd_maskset))
         {
           result = recvfrom(socketfd,buff,size,0,(struct sockaddr *)&local_addr,&addr_len);
           if (result == socket_error)
             last_error = CS_NET_SOCKET_NOTCONNECTED;
         }
-      } 
+      }
       else
       {
         result = recvfrom(socketfd,buff,size,0,(struct sockaddr *)&local_addr,&addr_len);
         if (result == socket_error)
           last_error = CS_NET_SOCKET_NOTCONNECTED;
-
       }
       buff[result] = 0;
     }
-    
     return result;
   }
-
   return 0;
 }
 
-int csNetworkSocket2::ReadLine (char *buff, size_t size ) 
+int csNetworkSocket2::ReadLine (char *buff, size_t size)
 {
   char inbuff[2];
   last_error = CS_NET_SOCKET_NOERROR;
@@ -474,7 +418,7 @@ int csNetworkSocket2::ReadLine (char *buff, size_t size )
     return 0;
   }
 
-  if ((connected) || (proto_type == SOCK_DGRAM)) 
+  if ((connected) || (proto_type == SOCK_DGRAM))
   {
     if (!blocking)
     {
@@ -486,7 +430,6 @@ int csNetworkSocket2::ReadLine (char *buff, size_t size )
       }
 
       int result = Recv(inbuff,1);
-      
       if (result == 0)
       {
         last_error = CS_NET_SOCKET_NOTCONNECTED;
@@ -497,9 +440,8 @@ int csNetworkSocket2::ReadLine (char *buff, size_t size )
       if (result  == 1)
       {
         inbuff[1] = 0;
-
         if (inbuff[0] == '\r')
-        {	
+        {
           last_error = CS_NET_SOCKET_NOERROR;
 
           strcpy(buff,read_buffer);
@@ -535,7 +477,6 @@ int csNetworkSocket2::ReadLine (char *buff, size_t size )
           buffer_size = -1;
           return strlen(buff);
         }
-    		
         return 0;
       }
     }
@@ -545,9 +486,9 @@ int csNetworkSocket2::ReadLine (char *buff, size_t size )
       read_buffer = (char *)realloc(read_buffer,size * sizeof(char));
       memset(read_buffer,0,size);
 
-      while (strlen(inbuff) <= size) 
+      while (strlen(inbuff) <= size)
       {
-        if (Recv(inbuff,1) == 1) 
+        if (Recv(inbuff,1) == 1)
         {
           inbuff[1] = 0;
 
@@ -555,7 +496,7 @@ int csNetworkSocket2::ReadLine (char *buff, size_t size )
           if (inbuff[0] == '\n') break;
           if (inbuff[0] == '\0') break;
           strcat(read_buffer,inbuff);
-        } 
+        }
         else
         {
           break;
@@ -576,7 +517,7 @@ int csNetworkSocket2::ReadLine (char *buff, size_t size )
   return strlen(buff);
 }
 
-int csNetworkSocket2::Send (char *buff, size_t size) 
+int csNetworkSocket2::Send (char *buff, size_t size)
 {
   int result = CS_NET_SOCKET_NOERROR;
 
@@ -585,23 +526,23 @@ int csNetworkSocket2::Send (char *buff, size_t size)
     last_error = CS_NET_SOCKET_NOTCONNECTED;
     return 0;
   }
-  
+
   last_error = CS_NET_SOCKET_NOERROR;
 
   addr_len = sizeof(struct sockaddr);
-  if (connected) 
+  if (connected)
   {
-    if (proto_type == SOCK_DGRAM) 
+    if (proto_type == SOCK_DGRAM)
     {
       result = sendto(socketfd,buff,size,0,(struct sockaddr *)&remote_addr,sizeof(struct sockaddr));
-    } 
+    }
     else
     {
       result = send(socketfd,buff,size,0);
     }
   }
 
-  if (result == socket_error) 
+  if (result == socket_error)
   {
     last_error = CS_NET_SOCKET_NOTCONNECTED;
   }
@@ -614,7 +555,7 @@ int csNetworkSocket2::Connect (char *host, int port)
   last_error = CS_NET_SOCKET_NOERROR;
 
   host_ent = gethostbyname(host);
-  if (host_ent == NULL) 
+  if (host_ent == NULL)
   {
     last_error = CS_NET_SOCKET_CANNOT_RESOLVE;
     return CS_NET_SOCKET_CANNOT_RESOLVE;
@@ -623,10 +564,10 @@ int csNetworkSocket2::Connect (char *host, int port)
   remote_addr.sin_port = htons(port);
   remote_addr.sin_addr = *((struct in_addr *)host_ent->h_addr);
   memset(&(remote_addr.sin_zero),0,8);
-  
-  if (proto_type == SOCK_STREAM) 
+
+  if (proto_type == SOCK_STREAM)
   {
-    if (connect(socketfd,(struct sockaddr *)&remote_addr,sizeof(struct sockaddr)) == -1) 
+    if (connect(socketfd,(struct sockaddr *)&remote_addr,sizeof(struct sockaddr)) == -1)
     {
       last_error = CS_NET_SOCKET_CANNOT_CONNECT;
       return CS_NET_SOCKET_CANNOT_CONNECT;
@@ -637,14 +578,13 @@ int csNetworkSocket2::Connect (char *host, int port)
   fd_list[0] = socketfd;
   FD_ZERO(&fd_maskset);
   FD_SET(fd_list[0],&fd_maskset);
-  
+
   return CS_NET_SOCKET_NOERROR;
 }
 
-bool csNetworkSocket2::IsConnected() 
+bool csNetworkSocket2::IsConnected()
 {
   last_error = CS_NET_SOCKET_NOERROR;
-
   return connected;
 }
 
