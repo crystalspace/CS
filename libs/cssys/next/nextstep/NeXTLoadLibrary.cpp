@@ -228,11 +228,11 @@ static NeXTSymbolTable& shared_symbol_table()
 //-----------------------------------------------------------------------------
 // native_lookup
 //-----------------------------------------------------------------------------
-static PROC native_lookup( char const* symbol, bool required = true )
+static PROC native_lookup( char const* symbol )
     {
     unsigned long address = 0;
     NXStream* stream = NXOpenFile( 1, NX_WRITEONLY );
-    if (rld_lookup( stream, symbol, &address ) == 0 && required)
+    if (rld_lookup( stream, symbol, &address ) == 0)
 	NXPrintf( stream, "Symbol undefined: %s\n", symbol );
     NXClose( stream );
     return (PROC)address;
@@ -262,7 +262,7 @@ static void register_standard_symbols( CS_HLIBRARY handle )
     for (int i = 0; i < STANDARD_SYMBOLS_COUNT; i++)
 	{
 	char const* const symbol = STANDARD_SYMBOLS[i];
-	PROC const address = native_lookup( symbol, false );
+	PROC const address = native_lookup( symbol );
 	if (address != 0)
 	    {
 	    table.add( handle, symbol, address );
