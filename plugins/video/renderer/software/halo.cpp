@@ -199,9 +199,12 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
   }
   else
   {
-    Scan.FogR = QRound (R * ((1 << pfmt.RedBits) - 1)) << (pfmt.RedShift - pixel_adjust);
-    Scan.FogG = QRound (G * ((1 << pfmt.GreenBits) - 1)) << (pfmt.GreenShift - pixel_adjust);
-    Scan.FogB = QRound (B * ((1 << pfmt.BlueBits) - 1)) << (pfmt.BlueShift - pixel_adjust);
+    Scan.FogR = QRound (R * ((1 << pfmt.RedBits  ) - 1))
+      << (pfmt.RedShift - pixel_adjust);
+    Scan.FogG = QRound (G * ((1 << pfmt.GreenBits) - 1))
+      << (pfmt.GreenShift - pixel_adjust);
+    Scan.FogB = QRound (B * ((1 << pfmt.BlueBits ) - 1))
+      << (pfmt.BlueShift - pixel_adjust);
 
     // halo intensity (0..255)
     Scan.FogDensity = QRound (iIntensity * 255);
@@ -234,18 +237,16 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
       break;
     case 4:
     {
+      unsigned int rs = pfmt.RedShift - pixel_adjust;
+      unsigned int gs = pfmt.GreenShift - pixel_adjust;
+      ULong r = Scan.FogR, g = Scan.FogG, b = Scan.FogB;
+      Scan.FogR = (rs == 16) ? r : (gs == 16) ? g : b;
+      Scan.FogG = (rs ==  8) ? r : (gs ==  8) ? g : b;
+      Scan.FogB = (rs ==  0) ? r : (gs ==  0) ? g : b;
       if (clamp)
         dscan = halo_dscan_32_c;
       else
         dscan = halo_dscan_32;
-      unsigned int rs = pfmt.RedShift - pixel_adjust;
-      unsigned int gs = pfmt.GreenShift - pixel_adjust;
-      unsigned int r = (rs == 16) ? Scan.FogR : (gs == 16) ? Scan.FogG : Scan.FogB;
-      unsigned int g = (rs ==  8) ? Scan.FogR : (gs ==  8) ? Scan.FogG : Scan.FogB;
-      unsigned int b = (rs ==  0) ? Scan.FogR : (gs ==  0) ? Scan.FogG : Scan.FogB;
-      Scan.FogR = r >> pixel_adjust;
-      Scan.FogG = g >> pixel_adjust;
-      Scan.FogB = b >> pixel_adjust;
       break;
     }
     default:
