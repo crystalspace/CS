@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Jan-2005
+	- Jorrit continued work on the PVS. The PVS kdtree should now be
+	  working (not tested).
 20-Jan-2005
 	- res made the following changes:
 	    - Let the GL renderer always clear the stencil buffer in 

@@ -78,6 +78,68 @@ void csStaticPVSNode::ResetTimestamps ()
   }
 }
 
+void csStaticPVSNode::Front2Back (const csVector3& pos,
+	csPVSTreeVisitFunc* func,
+  	void* userdata, uint32 cur_timestamp, uint32 frustum_mask)
+{
+  if (!func (this, userdata, cur_timestamp, frustum_mask))
+    return;
+  if (child1)
+  {
+    // There are children.
+    if (pos[axis] <= where)
+    {
+      child1->Front2Back (pos, func, userdata, cur_timestamp, frustum_mask);
+      CS_ASSERT (child2 != 0);
+      child2->Front2Back (pos, func, userdata, cur_timestamp, frustum_mask);
+    }
+    else
+    {
+      child2->Front2Back (pos, func, userdata, cur_timestamp, frustum_mask);
+      CS_ASSERT (child1 != 0);
+      child1->Front2Back (pos, func, userdata, cur_timestamp, frustum_mask);
+    }
+  }
+}
+
+void csStaticPVSNode::TraverseRandom (csPVSTreeVisitFunc* func,
+  	void* userdata, uint32 cur_timestamp, uint32 frustum_mask)
+{
+  if (!func (this, userdata, cur_timestamp, frustum_mask))
+    return;
+  if (child1)
+  {
+    // There are children.
+    child1->TraverseRandom (func, userdata, cur_timestamp, frustum_mask);
+    CS_ASSERT (child2 != 0);
+    child2->TraverseRandom (func, userdata, cur_timestamp, frustum_mask);
+  }
+}
+
+void csStaticPVSNode::AddObject (const csBox3& bbox,
+	csPVSVisObjectWrapper* object)
+{
+  if (!child1)
+  {
+    // We are a leaf.
+    objects.Push (object);
+    object->parent_nodes.Push (this);
+    return;
+  }
+
+  float mi, ma;
+  switch (axis)
+  {
+    case 0: mi = bbox.MinX (); ma = bbox.MaxX (); break;
+    case 1: mi = bbox.MinY (); ma = bbox.MaxY (); break;
+    case 2: mi = bbox.MinZ (); ma = bbox.MaxZ (); break;
+  }
+  if (ma >= where)
+    child2->AddObject (bbox, object);
+  if (mi <= where)
+    child1->AddObject (bbox, object);
+}
+
 //-------------------------------------------------------------------------
 
 uint32 csStaticPVSTree::global_timestamp = 1;
@@ -267,15 +329,46 @@ const char* csStaticPVSTree::ReadPVS (iDataBuffer* buf)
 void csStaticPVSTree::AddObject (const csBox3& bbox,
 	csPVSVisObjectWrapper* object)
 {
+  root->AddObject (bbox, object);
 }
 
 void csStaticPVSTree::RemoveObject (csPVSVisObjectWrapper* object)
 {
+  size_t i;
+  csArray<csStaticPVSNode*>& parent_nodes = object->parent_nodes;
+  for (i = 0 ; i < parent_nodes.Length () ; i++)
+  {
+    // @@@ Use a hash set for objects?
+    parent_nodes[i]->objects.Delete (object);
+  }
+  parent_nodes.DeleteAll ();
 }
 
 void csStaticPVSTree::MoveObject (csPVSVisObjectWrapper* object,
 	const csBox3& bbox)
 {
+  csArray<csStaticPVSNode*>& parent_nodes = object->parent_nodes;
+  if (parent_nodes.Length () == 0)
+  {
+    // Object is not in tree. Add it.
+    AddObject (bbox, object);
+    return;
+  }
+  if (parent_nodes.Length () == 1)
+  {
+    // Special case. Object is only in one leaf. Check if we're
+    // still there.
+    if (parent_nodes[0]->node_bbox.Contains (bbox))
+      return;	// Yes, nothing to do.
+    // We no longer fit in that leaf.
+    parent_nodes[0]->objects.Delete (object);
+    parent_nodes.DeleteAll ();
+    AddObject (bbox, object);
+    return;
+  }
+  // General case.
+  RemoveObject (object);
+  AddObject (bbox, object);
 }
 
 void csStaticPVSTree::ResetTimestamps ()
@@ -305,10 +398,14 @@ void csStaticPVSTree::Front2Back (const csVector3& pos,
 	csPVSTreeVisitFunc* func,
   	void* userdata, uint32 frustum_mask)
 {
+  NewTraversal ();
+  root->Front2Back (pos, func, userdata, global_timestamp, frustum_mask);
 }
 
 void csStaticPVSTree::TraverseRandom (csPVSTreeVisitFunc* func,
   	void* userdata, uint32 frustum_mask)
 {
+  NewTraversal ();
+  root->TraverseRandom (func, userdata, global_timestamp, frustum_mask);
 }
 

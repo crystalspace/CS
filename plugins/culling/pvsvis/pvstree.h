@@ -27,11 +27,17 @@ class csPVSVisObjectWrapper;
 
 #define KDTREE_MAX 100000.
 
+class csStaticPVSNode;
+
+typedef bool (csPVSTreeVisitFunc)(csStaticPVSNode* treenode, void* userdata,
+	uint32 timestamp, uint32& frustum_mask);
+
 /**
  * A node in the KDTree for PVS.
  */
-struct csStaticPVSNode
+class csStaticPVSNode
 {
+public:
   csBox3 node_bbox;
   int axis;
   float where;
@@ -40,9 +46,10 @@ struct csStaticPVSNode
   // Array of invisible nodes as seen from this node.
   csArray<csStaticPVSNode*> invisible_nodes;
 
-  // Array of objects in this node.
+  // Array of objects in this node. @@@ Use a hashset?
   csArray<csPVSVisObjectWrapper*> objects;
 
+public:
   csStaticPVSNode ();
   ~csStaticPVSNode ();
 
@@ -62,10 +69,29 @@ struct csStaticPVSNode
    * Reset timestamps of all objects in this treenode.
    */
   void ResetTimestamps ();
+
+  /**
+   * Front to back node traversal.
+   */
+  void Front2Back (const csVector3& pos, csPVSTreeVisitFunc* func,
+  	void* userdata, uint32 cur_timestamp, uint32 frustum_mask);
+
+  /**
+   * Random traversal.
+   */
+  void TraverseRandom (csPVSTreeVisitFunc* func,
+  	void* userdata, uint32 cur_timestamp, uint32 frustum_mask);
+
+  /**
+   * Add a dynamic object to the tree.
+   */
+  void AddObject (const csBox3& bbox, csPVSVisObjectWrapper* object);
+  /**
+   * Move a dynamic object in the tree.
+   */
+  void MoveObject (csPVSVisObjectWrapper* object, const csBox3& bbox);
 };
 
-typedef bool (csPVSTreeVisitFunc)(csStaticPVSNode* treenode, void* userdata,
-	uint32 timestamp, uint32& frustum_mask);
 /**
  * A Static KDTree for PVS.
  */
