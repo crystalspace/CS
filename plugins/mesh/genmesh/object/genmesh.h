@@ -86,14 +86,15 @@ private:
   {
     csGenmeshShadowCacheEntry () 
     {
-      lightID = -1;
+      memset (lightID, 0xff, sizeof (lightID));
       lightPos = csVector3(0,0,0);
       shadow_index_buffer = NULL;
       edge_start = 0;
       index_range = 0;
     }
 
-    uint32 lightID;
+    char lightID[16];
+    uint32 lightNr;
     csVector3 lightPos;
     csRef<iRenderBuffer> shadow_index_buffer;
     int edge_start, index_range;
@@ -691,7 +692,14 @@ public:
   //------------------ iPolygonMesh interface implementation ----------------//
   struct PolyMesh : public iPolygonMesh
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
+  private:
+    csGenmeshMeshObjectFactory* factory;
+  public:
+    //SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
+    SCF_DECLARE_IBASE;
+
+    void SetFactory (csGenmeshMeshObjectFactory* Factory)
+    { factory = Factory; }
 
     virtual int GetVertexCount ();
     virtual csVector3* GetVertices ();
@@ -703,7 +711,8 @@ public:
     virtual uint32 GetChangeNumber() const { return 0; }
 
     PolyMesh () { }
-    virtual ~PolyMesh () { }
+    virtual ~PolyMesh () 
+    { SCF_CONSTRUCT_IBASE (NULL); }
   } scfiPolygonMesh;
   friend struct PolyMesh;
 

@@ -634,22 +634,30 @@ public:
   //------------------ iPolygonMesh interface implementation ----------------//
   struct PolyMesh : public iPolygonMesh
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObjectFactory);
+  private:
+    csSprite3DMeshObjectFactory* factory;
+  public:
+    SCF_DECLARE_IBASE;
+
+    void SetFactory (csSprite3DMeshObjectFactory* Factory)
+    {
+      factory = Factory;
+    }
 
     /// Get the number of vertices for this mesh.
     virtual int GetVertexCount ()
     {
-      return scfParent->GetVertexCount ();
+      return factory->GetVertexCount ();
     }
     /// Get the pointer to the array of vertices.
     virtual csVector3* GetVertices ()
     {
-      return scfParent->GetVertices (0);
+      return factory->GetVertices (0);
     }
     /// Get the number of polygons for this mesh.
     virtual int GetPolygonCount ()
     {
-      return scfParent->GetTriangleCount ();
+      return factory->GetTriangleCount ();
     }
 
     /// Get the pointer to the array of polygons.
@@ -661,7 +669,9 @@ public:
     virtual bool IsDeformable () const { return false;  }
     virtual uint32 GetChangeNumber() const { return 0; }
 
-    PolyMesh () : polygons (NULL) { }
+    PolyMesh () : polygons (NULL) {
+      SCF_CONSTRUCT_IBASE (NULL);
+    }
     virtual ~PolyMesh () { Cleanup (); }
 
     csMeshedPolygon* polygons;

@@ -202,7 +202,20 @@ SCF_IMPLEMENT_IBASE (csSprite3DMeshObjectFactory)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSprite3DFactoryState)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLODControl)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
+  {
+    static scfInterfaceID iPolygonMesh_scfID = (scfInterfaceID)-1;		
+    if (iPolygonMesh_scfID == (scfInterfaceID)-1)				
+      iPolygonMesh_scfID = iSCF::SCF->GetInterfaceID ("iPolygonMesh");		
+    if (iInterfaceID == iPolygonMesh_scfID &&				
+      scfCompatibleVersion (iVersion, iPolygonMesh_VERSION))		
+    {
+      printf ("Deprecated feature use: iPolygonMesh queried from Sprite3d "
+	"factory; use iObjectModel->GetPolygonMeshColldet() instead.\n");
+      iPolygonMesh* Object = scfiObjectModel.GetPolygonMeshColldet();
+      (Object)->IncRef ();						
+      return STATIC_CAST(iPolygonMesh*, Object);				
+    }
+  }
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObjectFactory::Sprite3DFactoryState)
@@ -215,10 +228,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObjectFactory::ObjectModel)
   SCF_IMPLEMENTS_INTERFACE (iObjectModel)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObjectFactory::PolyMesh)
-  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 void csSprite3DMeshObjectFactory::Report (int severity, const char* msg, ...)
@@ -245,6 +254,7 @@ csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iBase *pParent) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
 
+  scfiPolygonMesh.SetFactory (this);
   scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
   scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
   scfiObjectModel.SetPolygonMeshViscull (NULL);
@@ -893,7 +903,7 @@ csMeshedPolygon* csSprite3DMeshObjectFactory::PolyMesh::GetPolygons ()
 {
   if (!polygons)
   {
-    csTriangle* triangles = scfParent->GetTriangles ();
+    csTriangle* triangles = factory->GetTriangles ();
     polygons = new csMeshedPolygon [GetPolygonCount ()];
     int i;
     for (i = 0 ; i < GetPolygonCount () ; i++)
@@ -904,6 +914,12 @@ csMeshedPolygon* csSprite3DMeshObjectFactory::PolyMesh::GetPolygons ()
   }
   return polygons;
 }
+
+//=============================================================================
+
+SCF_IMPLEMENT_IBASE (csSprite3DMeshObjectFactory::PolyMesh)
+  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
+SCF_IMPLEMENT_IBASE_END
 
 //=============================================================================
 

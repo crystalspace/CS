@@ -177,3 +177,37 @@ Use @code{void*}, @code{const void*} and @code{usigned int} instead.
 @code{csHashIterator} can no longer iterate over all objects. To do that
 you need to use @code{csGlobalHashIterator}.
 
+@subheading Procedural textures
+
+Instead of only built-in types, procedural textures have been moved into 
+plugins. That means that the @code{<type>} token now works the same way
+as the @code{<plugin>} token for meshes. That is, either specify a full
+class ID (e.g. @code{crystalspace.proctex.loader.fire}), or a shortcut
+specified in the @code{<plugins>} token of the world. To simulate the
+old @code{<type>} behaviour, paste the following lines into a map's 
+@code{<plugin>} section:
+
+@example
+<plugin name="dots">crystalspace.proctex.loader.dots</plugin>
+<plugin name="fire">crystalspace.proctex.loader.fire</plugin>
+<plugin name="water">crystalspace.proctex.loader.water</plugin>
+<plugin name="plasma">crystalspace.proctex.loader.plasma</plugin>
+@end example
+
+This requires that you move the @code{<plugin>} block in front of the 
+@code{<textures>} block, as otherwise the shortcuts won't be recognised.
+
+The behaviour of procedural textures also differs as a material of the same
+name was created along with the texture; this isn't the case any more, you
+have to create a material which uses the procedural texture manually.
+
+@subheading Mesh factories and iPolygonMesh
+
+Some mesh factories used to support the querying of the @code{iPolygonMesh}
+interface (e.g. Thing, Sprite3D). Although this may still work in some cases,
+doing so is discouraged, and this feature is subject to be dropped without 
+further notice. Instead, if you want the polygon mesh of a factory, query for
+the @code{iObjectModel} interface instead and use one of the
+@code{GetPolygonMeshXXX()} methods, depending on what you need (the interface
+query returned the collision detection mesh.)
+

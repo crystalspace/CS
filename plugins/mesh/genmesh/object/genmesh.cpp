@@ -803,7 +803,7 @@ bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* movable,
   bool regenerateShadowvolume = true;
 
   csVector3 lightpos = light->GetCenter () * movable->GetFullTransform ();
-  uint32 lightID = light->GetLightNumber ();
+  const char* lightID = light->GetLightID ();
   
   csGenmeshShadowCacheEntry* shadowCacheEntry = NULL;
 
@@ -811,9 +811,9 @@ bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* movable,
   for (i = 0; i < shadowCache.Length (); i++)
   {
     shadowCacheEntry = (csGenmeshShadowCacheEntry*) shadowCache.Get (i);
-    if (shadowCacheEntry->lightID == lightID )
+    if (memcmp (shadowCacheEntry->lightID, lightID, 16) == 0)
     {
-      if ( (shadowCacheEntry->lightPos - lightpos).SquaredNorm () < 0.02 ) //make configurable
+      if ((shadowCacheEntry->lightPos - lightpos).SquaredNorm () < 0.02 ) //make configurable
       {
         // no need to regenerate them
         regenerateShadowvolume = false;
@@ -937,7 +937,7 @@ bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* movable,
     {
       //add a new entry if we don't have any
       shadowCacheEntry = new csGenmeshShadowCacheEntry ();
-      shadowCacheEntry->lightID = lightID;
+      memcpy (shadowCacheEntry->lightID, lightID, 16);
       shadowCacheEntry->lightPos = lightpos;
       shadowCache.Push (shadowCacheEntry);
     }
@@ -1018,7 +1018,6 @@ bool csGenmeshMeshObject::DrawLight (iRenderView* rview, iMovable* movable,
   color.red *= (matcolor.red/255);
   color.green *= (matcolor.green/255);
   color.blue *= (matcolor.blue/255);
-
 
   //set this to be lightcolor * diffuse material
   r3d->SetLightParameter (0, CS_LIGHTPARAM_DIFFUSE,
@@ -1209,7 +1208,20 @@ iObjectModel* csGenmeshMeshObject::GetObjectModel ()
 SCF_IMPLEMENT_IBASE (csGenmeshMeshObjectFactory)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
+  {
+    static scfInterfaceID iPolygonMesh_scfID = (scfInterfaceID)-1;		
+    if (iPolygonMesh_scfID == (scfInterfaceID)-1)				
+      iPolygonMesh_scfID = iSCF::SCF->GetInterfaceID ("iPolygonMesh");		
+    if (iInterfaceID == iPolygonMesh_scfID &&				
+      scfCompatibleVersion (iVersion, iPolygonMesh_VERSION))		
+    {
+      printf ("Deprecated feature use: iPolygonMesh queried from GenMesh "
+	"factory; use iObjectModel->GetPolygonMeshColldet() instead.\n");
+      iPolygonMesh* Object = scfiObjectModel.GetPolygonMeshColldet();
+      (Object)->IncRef ();						
+      return STATIC_CAST(iPolygonMesh*, Object);				
+    }
+  }
 #ifdef CS_USE_NEW_RENDERER
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iStreamSource)
 #endif
@@ -1233,10 +1245,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObjectFactory::ObjectModel)
   SCF_IMPLEMENTS_INTERFACE (iObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObjectFactory::PolyMesh)
-  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 #ifndef CS_USE_NEW_RENDERER
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObjectFactory::
 	eiVertexBufferManagerClient)
@@ -1253,12 +1261,12 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
 #endif
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiGeneralFactoryState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
 #ifndef CS_USE_NEW_RENDERER 
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
 #endif
   csGenmeshMeshObjectFactory::object_reg = object_reg;
 
+  scfiPolygonMesh.SetFactory (this);
   scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
   scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
   scfiObjectModel.SetPolygonMeshViscull (NULL);
@@ -2300,24 +2308,28 @@ void csGenmeshMeshObjectFactory::Invalidate ()
 #endif
 }
 
+SCF_IMPLEMENT_IBASE (csGenmeshMeshObjectFactory::PolyMesh)
+  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
+SCF_IMPLEMENT_IBASE_END
+
 int csGenmeshMeshObjectFactory::PolyMesh::GetVertexCount ()
 {
-  return scfParent->GetVertexCount ();
+  return factory->GetVertexCount ();
 }
 
 csVector3* csGenmeshMeshObjectFactory::PolyMesh::GetVertices ()
 {
-  return scfParent->GetVertices ();
+  return factory->GetVertices ();
 }
 
 int csGenmeshMeshObjectFactory::PolyMesh::GetPolygonCount ()
 {
-  return scfParent->GetTriangleCount ();
+  return factory->GetTriangleCount ();
 }
 
 csMeshedPolygon* csGenmeshMeshObjectFactory::PolyMesh::GetPolygons ()
 {
-  return scfParent->GetPolygons ();
+  return factory->GetPolygons ();
 }
 
 void csGenmeshMeshObjectFactory::HardTransform (

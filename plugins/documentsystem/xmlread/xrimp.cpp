@@ -377,6 +377,7 @@ csXmlReadDocument::csXmlReadDocument (csXmlReadDocumentSystem* sys)
   SCF_CONSTRUCT_IBASE (NULL);
   csXmlReadDocument::sys = sys;	// Increase ref.
   pool = NULL;
+  root = NULL;
 }
 
 csXmlReadDocument::~csXmlReadDocument ()
@@ -394,31 +395,27 @@ csXmlReadDocument::~csXmlReadDocument ()
 void csXmlReadDocument::Clear ()
 {
   if (!root) return;
-  TrDocument* doc = (TrDocument*)(((csXmlReadNode*)(iDocumentNode*)root)
-  	->GetTiNode ());
-  delete doc;
-  root = 0;
+  delete root;
+  root = NULL;
 }
 
 csRef<iDocumentNode> csXmlReadDocument::CreateRoot (char* buf)
 {
   Clear ();
-  TrDocument* doc = new TrDocument (buf);
-  root = csPtr<iDocumentNode> (Alloc (doc, false));
-  return root;
+  root = new TrDocument (buf);
+  return csPtr<iDocumentNode> (Alloc (root, false));
 }
 
 csRef<iDocumentNode> csXmlReadDocument::CreateRoot ()
 {
   Clear ();
-  TrDocument* doc = new TrDocument ();
-  root = csPtr<iDocumentNode> (Alloc (doc, false));
-  return root;
+  root = new TrDocument ();
+  return csPtr<iDocumentNode> (Alloc (root, false));
 }
 
 csRef<iDocumentNode> csXmlReadDocument::GetRoot ()
 {
-  return root;
+  return csPtr<iDocumentNode> (Alloc (root, false));
 }
 
 const char* csXmlReadDocument::Parse (iFile* file)
@@ -457,22 +454,18 @@ const char* csXmlReadDocument::Parse (iString* str)
 const char* csXmlReadDocument::Parse (const char* buf)
 {
   CreateRoot (csStrNew (buf));
-  TrDocument* doc = (TrDocument*)(((csXmlReadNode*)(iDocumentNode*)root)
-  	->GetTiNode ());
-  doc->Parse (doc, doc->input_data);
-  if (doc->Error ())
-    return doc->ErrorDesc ();
+  root->Parse (root, root->input_data);
+  if (root->Error ())
+    return root->ErrorDesc ();
   return NULL;
 }
 
 const char* csXmlReadDocument::ParseInPlace (char* buf)
 {
   CreateRoot (buf);
-  TrDocument* doc = (TrDocument*)(((csXmlReadNode*)(iDocumentNode*)root)
-  	->GetTiNode ());
-  doc->Parse (doc, doc->input_data);
-  if (doc->Error ())
-    return doc->ErrorDesc ();
+  root->Parse (root, root->input_data);
+  if (root->Error ())
+    return root->ErrorDesc ();
   return NULL;
 }
 

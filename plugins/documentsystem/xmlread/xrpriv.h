@@ -194,7 +194,7 @@ public:
 class csXmlReadDocument : public iDocument
 {
 private:
-  csRef<iDocumentNode> root;
+  TrDocument* root;
   // We keep a reference to 'sys' to avoid it being cleaned up too early.
   csRef<csXmlReadDocumentSystem> sys;
 

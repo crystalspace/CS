@@ -114,8 +114,8 @@ SCF_IMPLEMENT_IBASE(csThingStatic)
       scfCompatibleVersion (iVersion, iPolygonMesh_VERSION))		
     {
 #ifdef CS_DEBUG
-      printf ("Deprecated feature use: iPolygonMesh queried from Thing; "
-	"use iObjectModel->GetPolygonMeshColldet() instead.\n");
+      printf ("Deprecated feature use: iPolygonMesh queried from Thing "
+	"factory; use iObjectModel->GetPolygonMeshColldet() instead.\n");
 #endif
       iPolygonMesh* Object = scfiObjectModel.GetPolygonMeshColldet();
       (Object)->IncRef ();						
