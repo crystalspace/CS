@@ -1276,7 +1276,8 @@ void csGraphics3DGlide2x::StartPolygonFX (iTextureHandle *handle,  UInt mode)
   {
     // makes color 0 ( BLACK ) transparent
     GlideLib_grChromakeyMode (GR_CHROMAKEY_ENABLE);
-    GlideLib_grChromakeyValue (0xff000000);
+    handle->GetTransparent ( r, g, b );
+    GlideLib_grChromakeyValue (0xff << 24 | r << 16 | g << 8 | b );
   }
   
   // if we draw a flat shaded polygon we gonna use the mean color
