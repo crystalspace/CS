@@ -14,6 +14,8 @@ chronological order.
 	  values (by name) to a key value pair. GetValue()/SetValue() are
 	  still supported and will set the 'value' value. Also extended the
 	  map loader for this new feature.
+	- res updated the "External Libs" manual page for the new cs-win32libs
+	  release.
 15-May-2004
 	- Eric Sunshine added implementation of FReverse rule to 2.4 section of
 	  jamcompatibility.jam since it is missing in Jam 2.4 but is needed by
