@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Sep-2003
+	- Jorrit fixed the static lod documentation which forgot to mention
+	  that you had to add the children to the parent too.
 25-Sep-2003
 	- Jorrit removed iCamera->GetHit(). This function is only a very
 	  thin wrapper on top of iSector->HitBeamPortals() so it is not
@@ -39,7 +42,7 @@ chronological order.
 	- res removed the 'privateGetVariable()' stuff from shader manager.
 	- DeSigna removed incorrect information about iEventQueue's name in 
 	  the object registry from ievq's doxygen comments.
-	- Keith Fulton added functions to Set the spr3d action by index instead
+	- Keith Fulton added functions to set the spr3d action by index instead
 	  of having to use action name strings.
 24-Sep-2003
 	- Jorrit finished implemented basic drawing of portals in

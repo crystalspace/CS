@@ -164,9 +164,11 @@ section:
   lodctrl->SetLOD (m, a);
 
   csRef<iMeshWrapper> loddy_lowdetail = @dots{}
+  loddy_mesh->GetChildren ()->Add (loddy_lowdetail);
   loddy_mesh->AddMeshToStaticLOD (0, loddy_lowdetail);
   @dots{}
   csRef<iMeshWrapper> loddy_meddetail = @dots{}
+  loddy_mesh->GetChildren ()->Add (loddy_meddetail);
   loddy_mesh->AddMeshToStaticLOD (1, loddy_meddetail);
   @dots{}
 @end example
