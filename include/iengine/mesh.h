@@ -238,7 +238,7 @@ struct iMeshWrapper : public iBase
   virtual void AddChild (iMeshWrapper* child) = 0;
 };
 
-SCF_VERSION (iMeshFactoryWrapper, 0, 0, 3);
+SCF_VERSION (iMeshFactoryWrapper, 0, 0, 4);
 
 /**
  * This interface corresponds to the object in the engine
@@ -254,6 +254,16 @@ struct iMeshFactoryWrapper : public iBase
   virtual iMeshObjectFactory* GetMeshObjectFactory () = 0;
   /// Set the mesh object factory.
   virtual void SetMeshObjectFactory (iMeshObjectFactory* fact) = 0;
+  /**
+   * Do a hard transform of this factory.
+   * This transformation and the original coordinates are not
+   * remembered but the object space coordinates are directly
+   * computed (world space coordinates are set to the object space
+   * coordinates by this routine). Note that some implementations
+   * of mesh objects will not change the orientation of the object but
+   * only the position.
+   */
+  virtual void HardTransform (const csReversibleTransform& t) = 0;
 };
 
 #endif // __IENGINE_MESH_H__

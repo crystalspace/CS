@@ -187,6 +187,8 @@ void Demo::SetupFactories ()
   LoadFactory ("photonTorpedo", "/data/demo/objects/photon",
   	"crystalspace.mesh.object.sprite.2d",
 	"crystalspace.mesh.loader.factory.sprite.2d");
+  fact = engine->FindMeshFactory ("th_ship");
+  fact->HardTransform (csTransform (csXRotMatrix3 (-M_PI/2), csVector3 (0)));
 }
 
 void Demo::LoadMaterial (const char* matname, const char* filename)
@@ -563,8 +565,8 @@ void Demo::SetupObjects ()
   s3d = QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
   s3d->SetBaseColor (csColor (.15, .15, .15));
   s3d->DecRef ();
-  tail = LoadObject ("ShuttleTail",
-  	"/data/demo/objects/shuttletail",
+  tail = LoadObject ("ShuttleTail2",
+  	"/data/demo/objects/shuttletail2",
   	"crystalspace.mesh.object.fire",
 	"crystalspace.mesh.loader.fire",
 	NULL, csVector3 (0));
@@ -893,7 +895,7 @@ void Demo::NextFrame ()
     {
       float r = np->GetTimeValue (map_selpoint);
       np->Calculate (r);
-      debug_time = start + total * r;
+      debug_time = cs_time (start + total * r);
     }
     else
       debug_time = 0;	// Not possible!

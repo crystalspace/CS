@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+5-May-2001
+	- Added HardTransform() to iMeshFactoryWrapper and
+	  csMeshFactoryWrapper.
+	- Received a new shuttle from Thomas Hieber. It is now used
+	  as the main shuttle in the demo.
+	- Made softer transitions in the demo between camera switches.
 4-May-2001
 	- Philip Wyett fixed the signed/unsigned warnings in the
 	  sequence manager.

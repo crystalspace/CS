@@ -445,3 +445,9 @@ csMeshWrapper* csMeshFactoryWrapper::NewMeshObject (csObject* parent)
   return meshObj;
 }
 
+void csMeshFactoryWrapper::HardTransform (const csReversibleTransform& t)
+{
+  meshFact->HardTransform (t);
+}
+
+
