@@ -67,7 +67,7 @@ public:
 	DECLARE_IBASE;
 
 protected:
-	CWindowPtr			mMainWindow;
+	WindowPtr			mMainWindow;
 	GDHandle			mMainGDevice;
 	CTabHandle			mColorTable;
 	GWorldPtr			mOffscreen;

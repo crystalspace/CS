@@ -269,21 +269,22 @@ int _unlink(const char *path)
 int unlink(const char *path)
 #endif
 {
-	FileParam		pb;
 	OSErr			err = noErr;
-	Byte			new_path[ FILENAME_MAX + 1 ];
+	char			new_path[ FILENAME_MAX + 1 ];
+	FSSpec			theFileSpec;
 
 	if ( path ) {
 		/* convert the into a mac path */
-		FixupFilePath( path, (char *)&new_path[1] );
+		FixupFilePath( path, &new_path[1] );
 		/* convert the c string into a pascal string */
-		new_path[0] = strlen( (char *)&new_path[1] );
+		new_path[0] = strlen( &new_path[1] );
 
-		pb.ioNamePtr = new_path;
-		pb.ioVRefNum = 0;
-		pb.ioFVersNum = 0;
-
-		err = PBDeleteSync((ParmBlkPtr) &pb);
+		/* convert the path into a file spec */
+		err = FSMakeFSSpec( 0, 0, (Byte *)new_path, &theFileSpec );
+		if ( err == noErr ) {
+			/* delete the file */
+			err = FSpDelete( &theFileSpec );
+		}
 
 		if (err != noErr)
 			errno = err;
@@ -303,21 +304,22 @@ int _rmdir(const char *path)
 int rmdir(const char *path)
 #endif
 {
-	FileParam		pb;
 	OSErr			err = noErr;
-	Byte			new_path[ FILENAME_MAX + 1 ];
+	char			new_path[ FILENAME_MAX + 1 ];
+	FSSpec			theFileSpec;
 
 	if ( path ) {
 		/* convert the into a mac path */
-		FixupFilePath( path, (char *)&new_path[1] );
+		FixupFilePath( path, &new_path[1] );
 		/* convert the c string into a pascal string */
-		new_path[0] = strlen((char *) &new_path[1] );
+		new_path[0] = strlen( &new_path[1] );
 
-		pb.ioNamePtr = new_path;
-		pb.ioVRefNum = 0;
-		pb.ioFVersNum = 0;
-
-		err = PBDeleteSync((ParmBlkPtr) &pb);
+		/* convert the path into a file spec */
+		err = FSMakeFSSpec( 0, 0, (Byte *)new_path, &theFileSpec );
+		if ( err == noErr ) {
+			/* delete the file */
+			err = FSpDelete( &theFileSpec );
+		}
 
 		if (err != noErr)
 			errno = err;

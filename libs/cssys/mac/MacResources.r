@@ -546,3 +546,11 @@ resource 'STR#' (1025, purgeable) {
 	/* [9] */ "Fatal Error in Driver2D.shlb"
 	}
 };
+
+#ifdef TARGET_API_MAC_CARBON
+#if TARGET_API_MAC_CARBON
+data 'carb' (0) {		/* Length: $4 = 4 bytes */
+	/*    00: */ $"0000 0000"
+};
+#endif
+#endif

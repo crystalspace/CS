@@ -237,10 +237,12 @@ SysSystemDriver::~SysSystemDriver()
         AppleEventHandlerUPP = NULL;
     }
 
+#if USE_INPUTSPROCKETS
     if ( mInputSprocketsAvailable ) {
         ISpStop();
         ISpShutdown();
     }
+#endif
 
     if (EventOutlet)
         EventOutlet->DecRef ();
@@ -386,19 +388,23 @@ void SysSystemDriver::NextFrame ()
         SetEventMask( everyEvent );
 #endif
 
+#if USE_INPUTSPROCKETS
         if (mInputSprocketsAvailable)
         {
             ISpResume ();
             mInputSprocketsRunning = true;
         }
+#endif
     }
 
 #if SCAN_KEYBOARD
     ScanKeyboard ();
 #endif
 
+#if USE_INPUTSPROCKETS
     if (mInputSprocketsAvailable && mInputSprocketsRunning)
         ISpTickle ();
+#endif
 
     /*
      *  Get the next event in the queue.
@@ -663,6 +669,7 @@ void SysSystemDriver::HandleMenuSelection( const short menuNum, const short item
 
     if (menuNum == kFileMenuID) {
         if (itemNum == 1) {
+#if USE_INPUTSPROCKETS
             if ( mInputSprocketsAvailable ) {
                 bool wasRunning = false;
                 OSStatus theStatus;
@@ -680,6 +687,7 @@ void SysSystemDriver::HandleMenuSelection( const short menuNum, const short item
                     ISpResume();
                 }
             }
+#endif
         } else if (itemNum == CountMenuItems( GetMenuHandle(menuNum) )) {
             // We'll assume that the quit is the last item in the File menu.
             ExitLoop = true;
@@ -1091,18 +1099,20 @@ void SysSystemDriver::HandleOSEvent( EventRecord *theEvent, iMacGraphics* piG2D 
         }
     } else if (osEvtFlag == suspendResumeMessage) {
         if (theEvent->message & resumeFlag) {
+#if USE_INPUTSPROCKETS
             if ( mInputSprocketsAvailable ) {
                 ISpResume();
-#if USE_INPUTSPROCKETS
                 ISpElement_Flush( gInputElements[0] );
-#endif
                 mInputSprocketsRunning = true;
             }
+#endif
         } else {
+#if USE_INPUTSPROCKETS
             if ( mInputSprocketsAvailable ) {
                 ISpSuspend();
                 mInputSprocketsRunning = false;
             }
+#endif
             ::HiliteMenu(0);                // Unhighlight menu titles
         }
     }
@@ -1120,7 +1130,11 @@ void SysSystemDriver::HandleHLEvent( EventRecord *theEvent )
  *
  *      Callback for handling Apple Events
  */
+#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
 static OSErr AppleEventHandler( AppleEvent *event, AppleEvent *reply, long refCon )
+#else
+static pascal OSErr AppleEventHandler( const AppleEvent *event, AppleEvent *reply, unsigned long refCon )
+#endif
 {
 #pragma unused( reply, refCon )
 
@@ -1163,7 +1177,7 @@ static OSErr GetPath( FSSpec theFSSpec, char *theString )
  *  HandleAppleEvent
  *
  */
-OSErr SysSystemDriver::HandleAppleEvent( AppleEvent *theEvent )
+OSErr SysSystemDriver::HandleAppleEvent( const AppleEvent *theEvent )
     {
     DescType    eventClass;
     DescType    eventID;
