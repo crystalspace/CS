@@ -133,15 +133,10 @@ public:
    *   locking within the same thread is not supported, and will probably
    *   deadlock.
    * \return The new mutex.
-   * \remarks Recursive mutexes are <b>not</b> compatible with conditions and
-   *   must not be used with #csCondition.
-   * <p>
    * \remarks On Windows, mutexes always exhibit recursive semantics, however,
    *   for best portability, you should still choose an appropriate value for
-   *   #recursive. This is especially important since csCondition::Wait()
-   *   expects a non-recursive mutex.  On other platforms, such as Linux,
-   *   non-recursive threads may be the default since they are can be
-   *   implemented more efficiently.
+   *   \a recursive.  On other platforms, such as Linux, non-recursive threads
+   *   may be the default since they are can be implemented more efficiently.
    */
   static csRef<csMutex> Create (bool recursive = false);
 
@@ -230,7 +225,7 @@ public:
 class CS_CSUTIL_EXPORT csCondition : public csRefCount
 {
 public:
-  /// Create a semaphore with specific condition attributes.
+  /// Create a condition  with specific attributes.
   static csRef<csCondition> Create (uint32 conditionAttributes = 0);
 
   /**
@@ -246,12 +241,13 @@ public:
   /**
    * Wait for some change of condition.  Suspends the calling thread until some
    * other thread invokes Signal() to notify a change of condition.
-   * \param mutex The mutex to associate with this condition. The mutex must
-   *   <b>not</b> be recursive.  The caller must already hold a lock on the
-   *   mutex before calling Wait(), and all threads waiting on the condition
-   *   must be using the same mutex.  When called, Wait() releases the caller's
-   *   lock on the mutex and suspends the caller's thread.  Upon return from
-   *   Wait(), the caller's lock on the mutex is restored.
+   * \param mutex The mutex to associate with this condition. The caller must
+   *   already hold a lock on the mutex before calling Wait(), and all threads
+   *   waiting on the condition must be using the same mutex. The mutex must
+   *   <b>not</b> be locked recursively within the same thread. When called,
+   *   Wait() releases the caller's lock on the mutex and suspends the caller's
+   *   thread. Upon return from Wait(), the caller's lock on the mutex is
+   *   restored.
    * \param timeout The amount of time in milliseconds to wait for the the
    *   condition's state to change. If zero, the default, then it waits for a
    *   state change without timing-out.  If non-zero, and the indicated time
@@ -259,12 +255,13 @@ public:
    * \return Returns true if the caller was wakened normally.  Returns false if
    *   the wait timed out, or if invoked with a recursive mutex, which is an
    *   invalid invocation style.
-   * \remarks The reason that the mutex must be non-recursive is because the
-   *   implicit unlock performed by Wait() <em>must</em> actually release the
-   *   mutex in order for other threads to be able to satisfy the
-   *   condition. With recursive mutexes, there is no guarantee that unlocking
-   *   the mutex actually releases it since it might have been locked multiple
-   *   times within the same thread.
+   * \remarks The reason that the mutex must not be locked recursively is
+   *   because the implicit unlock performed by Wait() <em>must</em> actually
+   *   release the mutex in order for other threads to be able to satisfy the
+   *   condition. With recursively locked mutexes, there is no guarantee that
+   *   the one implicit unlock operation performed by Wait() will actually
+   *   release the mutex since it might have been locked multiple times within
+   *   the same thread.
    */
   virtual bool Wait (csMutex* mutex, csTicks timeout = 0) = 0;
 

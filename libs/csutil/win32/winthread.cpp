@@ -205,23 +205,11 @@ void csWinCondition::Signal (bool /*WakeAll*/)
 
 bool csWinCondition::Wait (csMutex* mutex, csTicks timeout)
 {
-  bool ok = false;
-  if (!mutex->IsRecursive())
-  {
-    // @@@ FIXME: SignalObjectAndWait() is only available in WinNT 4.0 and
-    // above so we use the potentially dangerous version below
-    if (mutex->Release () && LockWait (timeout==0?INFINITE:(DWORD)timeout))
-      ok = mutex->LockWait ();
-  }
-  else
-  {
-    lasterr = csStrNew("csCondition::Wait() ERROR: Incorrectly invoked with "
-      "recursive mutex; conditions and recursive mutexes are mutually "
-      "exclusive");
-    // This is a programming error, so emit diagnostic unconditionally.
-    csPrintfErr("%s\n", lasterr);
-  }
-  return ok;
+  // @@@ FIXME: SignalObjectAndWait() is only available in WinNT 4.0 and
+  // above so we use the potentially dangerous version below.
+  if (mutex->Release () && LockWait (timeout==0?INFINITE:(DWORD)timeout))
+    return mutex->LockWait ();
+  return false;
 }
 
 bool csWinCondition::LockWait (DWORD nMilliSec)

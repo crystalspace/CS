@@ -280,48 +280,37 @@ void csPosixCondition::Signal (bool WakeAll)
 bool csPosixCondition::Wait (csMutex* mutex, csTicks timeout)
 {
   int rc = 0;
-  if (!mutex->IsRecursive())
+  if (timeout > 0)
   {
-    if (timeout > 0)
+    struct timeval now;
+    struct timezone tz;
+    struct timespec to;
+    gettimeofday (&now, &tz);
+    to.tv_sec = now.tv_sec + (timeout / 1000);
+    to.tv_nsec = (now.tv_usec + (timeout % 1000) * 1000) * 1000;
+    rc = pthread_cond_timedwait (&cond, &((csPosixMutex*)mutex)->mutex, &to);
+    switch (rc)
     {
-      struct timeval now;
-      struct timezone tz;
-      struct timespec to;
-      gettimeofday (&now, &tz);
-      to.tv_sec = now.tv_sec + (timeout / 1000);
-      to.tv_nsec = (now.tv_usec + (timeout % 1000) * 1000) * 1000;
-      rc = pthread_cond_timedwait (&cond, &((csPosixMutex*)mutex)->mutex, &to);
-      switch (rc)
-      {
-      case ETIMEDOUT:
-	lasterr = "Timeout";
-	return false; 
-      case EINTR:
-	lasterr = "Wait interrupted";
-	break;
-      case EINVAL:
-	lasterr = "Invalid argument (timeout, mutex, or condition)";
-	break;
-      case 0:
-	lasterr = 0;
-	break;
-      default:
-	lasterr = "Unknown error while timed waiting for condition";
-	break;
-      }
+    case ETIMEDOUT:
+      lasterr = "Timeout";
+      return false; 
+    case EINTR:
+      lasterr = "Wait interrupted";
+      break;
+    case EINVAL:
+      lasterr = "Invalid argument (timeout, mutex, or condition)";
+      break;
+    case 0:
+      lasterr = 0;
+      break;
+    default:
+      lasterr = "Unknown error while timed waiting for condition";
+      break;
     }
-    else
-      pthread_cond_wait (&cond, &((csPosixMutex*)mutex)->mutex);
-    CS_SHOW_ERROR;
   }
   else
-  {
-    rc = -1;
-    lasterr = "csCondition::Wait() ERROR: Incorrectly invoked with recursive "
-      "mutex; conditions and recursive mutexes are mutually exclusive\n";
-    // This is a programming error, so emit diagnostic unconditionally.
-    csPrintfErr("%s\n", lasterr);
-  }
+    pthread_cond_wait (&cond, &((csPosixMutex*)mutex)->mutex);
+  CS_SHOW_ERROR;
   return rc == 0;
 }
 

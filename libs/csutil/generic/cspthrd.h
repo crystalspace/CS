@@ -87,7 +87,7 @@ public:
   virtual bool LockTry  ();
   virtual bool Release  ();
   virtual char const* GetLastError () const;
-  virtual bool IsRecursive() const ;
+  virtual bool IsRecursive () const;
 
 protected:
   friend class csMutex;
