@@ -819,6 +819,19 @@ public:
 
   bool SetMaterial(const char *mesh_name,iMaterialWrapper *mat);
 
+  float GetAnimationTime()
+  {
+    return calModel.getMixer()->getAnimationTime();
+  }
+  float GetAnimationDuration()
+  {
+    return calModel.getMixer()->getAnimationDuration();
+  }
+  void SetAnimationTime(float animationTime)
+  {
+    calModel.getMixer()->setAnimationTime(animationTime);
+  }
+
   struct SpriteCal3DState : public iSpriteCal3DState
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSpriteCal3DMeshObject);
@@ -949,6 +962,18 @@ public:
     virtual float GetTimeFactor()
     {
         return scfParent->GetTimeFactor();
+    }
+    virtual float GetAnimationTime()
+    {
+      return scfParent->GetAnimationTime();
+    }
+    virtual float GetAnimationDuration()
+    {
+      return scfParent->GetAnimationDuration();
+    }
+    virtual void SetAnimationTime(float animationTime)
+    {
+      return scfParent->SetAnimationTime(animationTime);
     }
 
   } scfiSpriteCal3DState;

@@ -42,6 +42,10 @@ awsCmdButton::awsCmdButton ()
 
 awsCmdButton::~awsCmdButton ()
 {
+  if (caption != 0)
+  {
+    caption->DecRef();
+  }
 }
 
 const char *awsCmdButton::Type ()
@@ -72,6 +76,11 @@ bool awsCmdButton::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   pm->GetInt (settings, "Toggle", switch_style);
   pm->GetInt (settings, "IconAlign", icon_align);
   pm->GetString (settings, "Caption", caption);
+
+  if (caption != 0)
+  {
+    caption->IncRef();
+  }
 
   is_switch = switch_style;
 

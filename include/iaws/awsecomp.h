@@ -91,35 +91,7 @@ public:
   virtual bool Create (iAws *m, iAwsComponent *parent,
   	iAwsComponentNode *settings)
   {
-    SetID (settings->Name());
-    SetParent (parent);
-      
-    // set ourself up by querying the settings 
-    if (!Setup (m, settings)) return false;
-      
-    // if we are a top-level component link in to the top-level list
-    if (Parent () == 0)
-    {
-      // Link into the current hierarchy, at the top.
-      if (m->GetTopComponent () == 0)
-      {
-        m->SetTopComponent (this);
-      }
-      else
-      {
-        LinkAbove (m->GetTopComponent ());
-        m->SetTopComponent (this);
-      }
-    }
-      
-    // unless you have set the non client flag by this point 
-    // you get added to the parent's layout
-    if (~Flags() & AWSF_CMP_NON_CLIENT && Parent() && Parent()->Layout())
-      Parent()->Layout()->AddComponent(this, settings);
-      
-    if (Parent())
-      Parent()->AddChild(this);
-    return true;
+    return comp->Create(m, parent, settings);
   }
     
   /// Sets up component
@@ -132,39 +104,7 @@ public:
    */
   virtual bool HandleEvent(iEvent& Event)
   {
-    switch (Event.Type)
-    {
-      case csevMouseMove:
-        return OnMouseMove (Event.Mouse.Button, Event.Mouse.x, Event.Mouse.y);
-      case csevMouseUp:
-        return OnMouseUp (Event.Mouse.Button, Event.Mouse.x, Event.Mouse.y);
-      case csevMouseDown:
-        return OnMouseDown (Event.Mouse.Button, Event.Mouse.x, Event.Mouse.y);
-      case csevMouseClick:
-        return OnMouseClick (Event.Mouse.Button, Event.Mouse.x, Event.Mouse.y);
-      case csevMouseEnter:
-        return OnMouseEnter ();
-      case csevMouseExit:
-        return OnMouseExit ();
-      case csevKeyboard:
-        {
-	  if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
-	  {
-	    csKeyEventData eventData;
-	    csKeyEventHelper::GetEventData (&Event, eventData);
-	    return OnKeyboard (eventData);
-	  }
-	  else
-	    return false;
-	}
-      case csevGainFocus:
-        return OnGainFocus ();
-      case csevLostFocus:
-        return OnLostFocus ();
-      case csevFrameStart:
-        return OnFrame ();
-    }
-    return false;
+    return comp->HandleEvent(Event);
   }
  
   /**
@@ -520,45 +460,13 @@ public:
   virtual void Unlink()
   { comp->Unlink(); }
 
-  /// Links a component into the hierarchy as a sibling above 'other'.
-  virtual void LinkAbove(iAwsComponent* other)
-  {
-    // We must do this manually. If we instead called comp->LinkAbove(), it
-    // would incorrectly link 'comp' into the component list rather than this
-    // wrapper instance, which means that methods, such as
-    // awsManager::RecursiveDrawChildren(), would invoke methods in 'comp'
-    // (such as comp->OnDraw()) rather than the overriden methods in this
-    // wrapper.
-    if (other)
-    {
-      iAwsComponent* above = other->ComponentAbove();
-      comp->SetComponentAbove(above);
-      comp->SetComponentBelow(other);
-      other->SetComponentAbove(this);
-      if (above)
-	above->SetComponentBelow(this);
-    }
-  }
+  /// Links a component into the hierarchy as a sibling below comp
+  void LinkBelow (iAwsComponent *c)
+  { comp->LinkBelow(c); }
 
-  /// Links a component into the hierarchy as a sibling below 'other'.
-  virtual void LinkBelow(iAwsComponent* other)
-  {
-    // We must do this manually. If we instead called comp->LinkBelow(), it
-    // would incorrectly link 'comp' into the component list rather than this
-    // wrapper instance, which means that methods, such as
-    // awsManager::RecursiveDrawChildren(), would invoke methods in 'comp'
-    // (such as comp->OnDraw()) rather than the overriden methods in this
-    // wrapper.
-    if (other)
-    {
-      iAwsComponent* below = other->ComponentBelow();
-      comp->SetComponentAbove(other);
-      comp->SetComponentBelow(below);
-      other->SetComponentBelow(this);
-      if (below)
-	below->SetComponentAbove(this);
-    }
-  }
+  /// Links a component into the hierarchy as a sibling above comp
+  void LinkAbove (iAwsComponent *c)
+  { comp->LinkAbove(c); }
 
   /// Sets the top child
   virtual void SetTopChild(iAwsComponent* child)

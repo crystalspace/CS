@@ -143,9 +143,9 @@ void awsManager::SetPrefMgr (iAwsPrefManager *pmgr)
   prefmgr = pmgr;
 }
 
-iAwsComponent *awsManager::CreateEmbeddableComponent ()
+iAwsComponent *awsManager::CreateEmbeddableComponent (iAwsComponent *forComponent)
 {
-  return new awsComponent ();
+  return new awsComponent (forComponent);
 }
 
 void awsManager::RegisterComponentFactory (
@@ -935,6 +935,8 @@ void awsManager::CreateChildrenFromDef (
 
           // Process all subcomponents of this component.
           CreateChildrenFromDef (wmgr, comp, comp_node);
+
+          comp->DecRef();
       }
     }
     else if (key->Type () == KEY_CONNECTIONMAP)
@@ -1151,11 +1153,30 @@ bool awsManager::HandleEvent (iEvent &Event)
         return keyb_focus->HandleEvent (Event);
     }
     break;
+
+  case csevBroadcast:
+    if (Event.Command.Code == cscmdPreProcess)
+    {
+      DispatchEventRecursively(GetTopComponent(), Event);
+    }
+    break;
   }
 
   return false;
 }
 
+void awsManager::DispatchEventRecursively(iAwsComponent *c, iEvent &ev)
+{
+  while (c != 0)
+  {
+    if (!c->isHidden())
+    {
+      c->HandleEvent(ev);
+      DispatchEventRecursively(c->GetTopChild(), ev);
+    }
+    c = c->ComponentBelow();
+  }
+}
 
 iAwsComponent* awsManager::FindCommonParent(iAwsComponent* cmp1, iAwsComponent* cmp2)
 {
@@ -1425,4 +1446,16 @@ void awsManager::ClearFlag (unsigned int _flags)
 unsigned int awsManager::GetFlags ()
 {
   return flags;
+}
+
+void awsManager::ComponentDestroyed(iAwsComponent *comp)
+{
+  if (mouse_in == comp)
+  {
+    mouse_in = 0;
+  }
+  if (keyb_focus == comp)
+  {
+    keyb_focus = 0;
+  }
 }

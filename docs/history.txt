@@ -16,6 +16,25 @@ chronological order.
 	  the rescue.)
 	- Vincent Knecht updated cs.spec:  Added %files entries for .inc and
 	  .fun files in include/csutil/
+	- Eric Sunshined applied patch from Bedrich Zaba <frogbride@seznam.cz>
+	  (plus minor cleanup by Eric) which addresses the following issues:
+	    - Added iSpriteCal3DState::GetAnimationTime(),
+	      GetAnimationDuration(), and SetAnimationTime().
+	    - Fixed bug: csSpriteCal3DMeshObject destructor failed to remove
+	      the vertex buffer manager client it had registered (when
+	      configured for old renderer).
+	    - Fixed bug: awsCmdButton was mismanaging the reference count of
+	      its `caption' member.
+	    - Modified AWS manager to be able to destroy (and hide) AWS
+	      components without crashing or leaking resources.
+	    - Modified AWS component class to be able to catch more events
+	      (such as "draw" and "preprocess").
+	    - Fixed serious bugs with embedded components when awsComponent was
+	      acting as a proxy for awsEmbeddedComponent.  It failed to invoke
+	      methods of the wrapping object, and also was linking itself
+	      rather than the wrapping object into the component chain.  The
+	      bugs rendered awsEmbeddedComponent technology fairly inoperative
+	      except in the simplest cases.
 30-May-2004
 	- Jorrit fixed the lightning plugin so that it correctly gets the
 	  bounding box and radius from the genmesh.

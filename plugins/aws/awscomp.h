@@ -107,10 +107,26 @@ protected:
 
   /// Focusable flag.
   bool focusable;
+
+  /**
+   * Most of the time "self" points at 'this', which is the component itself,
+   * however, when we are acting as the proxy for an awsEmbeddedComponent, then
+   * "self" points at the awsEmbeddedComponent which is wrapping us.  This
+   * gives us a reference back to the "real" component to which we can forward
+   * method invocations which must be handled by the wrapping component.
+   */
+  iAwsComponent* self;
 public:
   SCF_DECLARE_IBASE;
 
+  /// Constructor for normal components implemented within this plugin.
   awsComponent ();
+
+  /**
+   * Constructor for awsEmbeddedComponent subclasses; the argument is a pointer
+   * to the object for which we are to act as a proxy.
+   */
+  awsComponent (iAwsComponent* wrapper);
   virtual ~awsComponent ();
 
   /// Registers a slot for a signal.

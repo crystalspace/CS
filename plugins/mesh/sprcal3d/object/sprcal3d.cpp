@@ -735,6 +735,10 @@ csSpriteCal3DMeshObject::~csSpriteCal3DMeshObject ()
   {
 #ifndef CS_USE_NEW_RENDERER
     delete [] meshes;
+    if (vbuf)
+    {
+      vbufmgr->RemoveClient (&scfiVertexBufferManagerClient);
+    }
 #endif
     delete [] is_initialized;
     delete [] meshes_colors;

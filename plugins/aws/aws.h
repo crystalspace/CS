@@ -329,7 +329,7 @@ public:
   virtual iAwsComponent *CreateWindowFrom (const char *defname);
 
   /// Creates a new embeddable component.
-  virtual iAwsComponent *CreateEmbeddableComponent ();
+  virtual iAwsComponent *CreateEmbeddableComponent (iAwsComponent *forComponent);
 
   /// Creates a new parameter list.
   virtual iAwsParmList *CreateParmList ();
@@ -424,6 +424,12 @@ public:
     virtual bool HandleEvent (iEvent &) { return false; }
   }
   *scfiEventHandler;
+
+  /// Dispatch event to the component and all its children.
+  static void DispatchEventRecursively(iAwsComponent *c, iEvent &ev);
+
+  /// Notify the manager about component destruction.
+  virtual void ComponentDestroyed(iAwsComponent *comp);
 };
 
 #endif // __CS_AWS_H__

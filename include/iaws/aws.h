@@ -231,7 +231,7 @@ struct iAwsKeyContainer : public iAwsKey
 
 SCF_VERSION(iAwsComponentNode, 0, 0, 1);
 
-/// Document me!@@@
+/// @@@Document me!
 struct iAwsComponentNode : public iAwsKeyContainer
 {
   /// So that we can find out what sort of component type this should be
@@ -243,7 +243,7 @@ struct iAwsComponentNode : public iAwsKeyContainer
  * \addtogroup aws
  * @{ */
 
-SCF_VERSION (iAws, 0, 2, 3);
+SCF_VERSION (iAws, 0, 2, 4);
 
 /// Interface for the window manager.
 struct iAws : public iBase
@@ -355,15 +355,8 @@ public:
   /// Get the current context
   virtual iAwsCanvas* GetCanvas()=0;
 
-  /// Create a default canvas, covering the whole screen
-  //virtual iAwsCanvas *CreateDefaultCanvas(iEngine* engine, iTextureManager* txtmgr)=0;
-
-  /// Create a default canvas, just a single proctex
-  //virtual iAwsCanvas *CreateDefaultCanvas(iEngine* engine, iTextureManager* txtmgr,
-  //  int width, int height, const char *name)=0;
-
   /// Create a canvas that uses custom graphics devices
-  //virtual iAwsCanvas *CreateCustomCanvas(iGraphics2D *g2d, iGraphics3D *g3d)=0;
+  //virtual iAwsCanvas *CreateCustomCanvas(iGraphics2D*, iGraphics3D*)=0;
 
   /// Get the iGraphics2D interface so that components can use it.
   virtual iGraphics2D *G2D()=0;
@@ -375,7 +368,7 @@ public:
   virtual iAwsComponent *CreateWindowFrom(const char* defname)=0;
 
   /// Creates a new embeddable component
-  virtual iAwsComponent *CreateEmbeddableComponent()=0;
+  virtual iAwsComponent *CreateEmbeddableComponent(iAwsComponent *covercomp)=0;
 
   /// Creates a new parameter list
   virtual iAwsParmList *CreateParmList()=0;
@@ -426,6 +419,9 @@ public:
   	
   /// Checks if the specified component is currently going through a transition
   virtual bool ComponentIsInTransition(iAwsComponent *win)=0;
+
+  /// Notify the manager about component destruction.
+  virtual void ComponentDestroyed(iAwsComponent *comp)=0;
 };
 
 SCF_VERSION (iAwsPrefManager, 0, 0, 3);
@@ -485,7 +481,7 @@ public:
   virtual bool GetInt(iAwsComponentNode *node, const char* name, int &val)=0;
 
   /// Get the float value from a given component node
-  virtual bool GetFloat(iAwsComponentNode *node, const char* name, float &val)=0;
+  virtual bool GetFloat(iAwsComponentNode *, const char* name, float &val)=0;
 
   /// Get the a rect from a given component node
   virtual bool GetRect(iAwsComponentNode *node, const char* name,
@@ -759,7 +755,10 @@ struct iAwsComponent : public iAwsSource
   /// Executes a scriptable action
   virtual bool Execute(const char* action, iAwsParmList* parmlist = 0) = 0;
 
-  /// Invalidation routine: allow the component to be redrawn when you call this
+  /**
+   * Invalidation routine: allow the component to be redrawn when you call
+   * this.
+   */
   virtual void Invalidate()=0;
 
   /// Invalidation routine: allow component to be redrawn, but only part of it
@@ -1120,9 +1119,6 @@ struct iAwsConnectionNodeFactory : public iBase
    virtual awsConnectionNode* GetThisNode () = 0;
 };
 
-
-
 /* @} */
 
 #endif // __CS_IAWS_AWS_H__
-

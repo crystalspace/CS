@@ -133,7 +133,8 @@ struct iSpriteCal3DFactoryState : public iBase
    *   The model will randomly choose a time between min and max.
    * @idle_pct For anims of type action, if the model is idling it will
    *   randomly choose among these based on the idle_pct weights specified
-   *   here. This param should total 100 across all anims for the model if used.
+   *   here.  This param should total 100 across all anims for the model if
+   *   used.
    * @lock This specifies whether the animation is to be locked on last frame
    *   or not. If not locked, the action will return to the base keyframe when
    *   complete.  If locked, the action will stay in the final keyframe
@@ -187,7 +188,7 @@ struct iSpriteCal3DFactoryState : public iBase
   virtual int AddMorphAnimation(const char *name) = 0;
   
   /**
-   * This adds a mesh and one of it's morph target to the given morph animation.
+   * This adds a mesh and one of its morph target to the given morph animation.
    *
    * @param morphanimation_index The index of the morph animation.
    * @param mesh_index The index of the mesh.
@@ -277,8 +278,7 @@ struct iSpriteCal3DFactoryState : public iBase
   virtual iSpriteCal3DSocket* GetSocket (int f) const = 0;
 };
 
-SCF_VERSION (iSpriteCal3DState, 0, 0, 1);
-
+SCF_VERSION (iSpriteCal3DState, 0, 0, 2);
 
 /**
  * This interface describes the API for changing the Cal3D sprite 
@@ -385,10 +385,10 @@ struct iSpriteCal3DState : public iBase
                              float delayOut) = 0;
 
   /**
-   * This function searches all actions specified as type TRAVEL, and uses their
-   * preferred velocities to create a set of blended animations which will
-   * equate in velocity to the specified parm "vel".  The calling program is
-   * still responsible for actually moving the sprite.
+   * This function searches all actions specified as type TRAVEL, and uses
+   * their preferred velocities to create a set of blended animations which
+   * will equate in velocity to the specified parm "vel".  The calling program
+   * is still responsible for actually moving the sprite.
    */
   virtual bool SetVelocity(float vel,csRandomGen *rng=0) = 0;
 
@@ -407,8 +407,8 @@ struct iSpriteCal3DState : public iBase
   /**
    * This attaches a mesh with the specified calCoreModel id to the instance of
    * the model.  It is expected this function is only called by the mesh object
-   * itself under normal circumstances.  Callers should normally refer to meshes
-   * by name to prevent behavior changes when xml order is updated.
+   * itself under normal circumstances.  Callers should normally refer to
+   * meshes by name to prevent behavior changes when xml order is updated.
    * iMatWrap is the iMaterialWrapper to be used in rendering.
    */
   virtual bool AttachCoreMesh(int mesh_id,int iMatWrap) = 0;
@@ -422,8 +422,8 @@ struct iSpriteCal3DState : public iBase
   /**
    * This detaches a mesh with the specified calCoreModel id to the instance of
    * the model.  It is expected this function is only called by the mesh object
-   * itself under normal circumstances.  Callers should normally refer to meshes
-   * by name to prevent behavior changes when xml order is updated.
+   * itself under normal circumstances.  Callers should normally refer to
+   * meshes by name to prevent behavior changes when xml order is updated.
    */
   virtual bool DetachCoreMesh(int mesh_id) = 0;
 
@@ -453,7 +453,7 @@ struct iSpriteCal3DState : public iBase
   virtual iSpriteCal3DSocket* FindSocket (iMeshWrapper *mesh) const = 0;
 
   /// find a named socket into the sprite.
-  virtual iSpriteCal3DSocket* FindSocket (const char * name) const = 0;
+  virtual iSpriteCal3DSocket* FindSocket (const char* name) const = 0;
 
   /// Change the material on a named submesh.  Returns true if successful.
   virtual bool SetMaterial(const char *mesh_name,iMaterialWrapper *mat) = 0;
@@ -463,6 +463,15 @@ struct iSpriteCal3DState : public iBase
 
   /// Return the current time factor of the model.
   virtual float GetTimeFactor() = 0;
+
+  /// Return current animation time.
+  virtual float GetAnimationTime() = 0;
+
+  /// Return whole animation duration.
+  virtual float GetAnimationDuration() = 0;
+
+  /// Set current animation time.
+  virtual void SetAnimationTime(float animationTime) = 0;
 };
 
 #endif// __CS_IMESH_SPRITECAL3D_H__
