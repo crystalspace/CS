@@ -202,8 +202,6 @@ void debug_dump ()
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  ScanStr("",""); // Force linker to include this since soft3d requires it.
-
   srand (time (NULL));
 
   // Create our main class.

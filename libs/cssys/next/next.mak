@@ -76,7 +76,10 @@ DLL=.dylib
 NEED_SOCKET_LIB=no
 
 # Extra libraries needed on this system.
-LIBS.EXE=$(NEXT.LIBS)
+LIBS.EXE=
+
+# Extra libraries needed only for executables (not plug-ins)
+LIBS.EXE.PLATFORM=$(NEXT.LIBS)
 
 # Where can the Zlib library be found on this system?
 Z_LIBS=$(LFLAGS.L)libs/zlib $(LFLAGS.l)z
@@ -120,7 +123,10 @@ LFLAGS.debug=-g
 LFLAGS.profile=-pg
 
 # Flags for the linker which are used when building a graphical executable.
-LFLAGS.EXE= $(NEXT.LFLAGS.EXE)
+LFLAGS.EXE=$(NEXT.LFLAGS.EXE)
+
+# Flags for the linker which are used when building a console executable.
+LFLAGS.CONSOLE.EXE=$(NEXT.LFLAGS.EXE)
 
 # Flags for the linker which are used when building a shared library.
 LFLAGS.DLL= $(NEXT.LFLAGS.DLL)
@@ -145,6 +151,9 @@ LINK=cc
 AR=libtool
 ARFLAGS=-static -o
 
+# The stripper :-)
+STRIP=strip
+
 # Extra parameters for 'sed' which are used for doing 'make depend'.
 SYS_SED_DEPEND=-e "s/\.cpp\.o \:/\.o\:/g"
 
@@ -152,16 +161,6 @@ SYS_SED_DEPEND=-e "s/\.cpp\.o \:/\.o\:/g"
 OUTSUFX.yes=
 
 endif # ifeq ($(MAKESECTION),defines)
-
-#-------------------------------------------------------------- postdefines ---#
-ifeq ($(MAKESECTION),postdefines)
-
-# Other platforms link all $(LIBS) into DLL, but doing so breaks DLLs on
-# NeXT, so a custom link statement is required.
-DO.SHARED.PLUGIN  = $(LINK) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(LFLAGS)
-DO.SHARED.LIBRARY = $(LINK) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(LFLAGS)
-
-endif # ifeq ($(MAKESECTION),postdefines)
 
 #--------------------------------------------------------------- confighelp ---#
 ifeq ($(MAKESECTION),confighelp)
