@@ -151,12 +151,10 @@ csVector3 csIsoView::GetViewScroll() const
 
 void csIsoView::PreCalc()
 {
-  csVector3 topleft, topright, botleft, botright;
-  csVector2 botleft2(rect.xmin, rect.ymin);
+  csVector3 topleft, topright, botright;
   csVector2 topright2(rect.xmax, rect.ymax);
   csVector2 topleft2(rect.xmin, rect.ymax);
   csVector2 botright2(rect.xmax, rect.ymin);
-  S2W(botleft2, botleft);
   S2W(topleft2, topleft);
   S2W(botright2, botright);
   S2W(topright2, topright);

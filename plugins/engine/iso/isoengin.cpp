@@ -109,6 +109,7 @@ csIsoEngine::~csIsoEngine ()
     scfiEventHandler->DecRef ();
   }
   materials.scfiMaterialList.RemoveAll ();
+  meshfactories.scfiMeshFactoryList.RemoveAll();
   if (g3d) g3d->DecRef();
 }
 
