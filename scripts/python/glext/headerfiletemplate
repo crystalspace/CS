@@ -115,8 +115,7 @@
 #endif
 
 #define EXTMGR_FUNC_INIT(nameNC, nameUC) \
-      if (!init) nameNC = 0; \
-      else \
+      if (init) \
       { \
         funcTest = ((nameNC = (cs##nameUC) gl->GetProcAddress (#nameNC)) != 0); \
         if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", \
@@ -145,7 +144,23 @@
         Report (msgExtInitFail, exttype, ext); \
       } 
 
-struct csGLExtensionManager
+struct csGLExtensionFunctions
+{
+public:
+%Functions%
+// end of functions
+};
+
+struct csGLExtensionFlags
+{
+public:
+%ExtFlagsDetected%
+protected:
+%ExtFlagsTested%
+};
+
+struct csGLExtensionManager : public csGLExtensionFunctions,
+			      public csGLExtensionFlags
 {
 private:
   iObjectRegistry* object_reg;
@@ -210,14 +225,6 @@ public:
   }
   
   void Close () { }
-  
-%Functions%
-
-  // end of functions
-  
-%ExtFlagsDetected%
-private:
-%ExtFlagsTested%
 public:
   void Reset ()
   {
@@ -226,10 +233,12 @@ public:
     extstrWGL = 0;
 #endif
 
-%InitFlags%
+    memset ((csGLExtensionFunctions*)this, 0, 
+      sizeof (csGLExtensionFunctions));
+    memset ((csGLExtensionFlags*)this, 0, sizeof (csGLExtensionFlags));
   }
   
-  csGLExtensionManager () : object_reg (0)
+  csGLExtensionManager () : object_reg (0), gl (0)
   {
     msgExtRetrieveFail = "Failed to retrieve %%s";
     msgExtFoundAndUsed = "%%s Extension '%%s' found and used.";

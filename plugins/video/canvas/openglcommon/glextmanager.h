@@ -7815,6 +7815,20 @@ typedef GLvoid (csAPIENTRY* csGLGETBUFFERPARAMETERIVARB) (GLenum target, GLenum 
 typedef GLvoid (csAPIENTRY* csGLSTENCILOPSEPARATEATI) (GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass);
 typedef GLvoid (csAPIENTRY* csGLSTENCILFUNCSEPARATEATI) (GLenum frontfunc, GLenum backfunc, GLint ref, GLuint mask);
 
+// GL_ARB_texture_non_power_of_two
+
+
+// GL_ARB_point_sprite
+#ifndef GL_POINT_SPRITE_ARB
+#define GL_POINT_SPRITE_ARB                                          0x8861
+#endif
+
+#ifndef GL_COORD_REPLACE_ARB
+#define GL_COORD_REPLACE_ARB                                         0x8862
+#endif
+
+
+
 
 
 // end of definitions
@@ -7826,10 +7840,9 @@ typedef GLvoid (csAPIENTRY* csGLSTENCILFUNCSEPARATEATI) (GLenum frontfunc, GLenu
 #endif
 
 #define EXTMGR_FUNC_INIT(nameNC, nameUC) \
-      if (!init) nameNC = 0; \
-      else \
+      if (init) \
       { \
-        funcTest = ((nameNC = (cs##nameUC)gl->GetProcAddress (#nameNC)) != 0); \
+        funcTest = ((nameNC = (cs##nameUC) gl->GetProcAddress (#nameNC)) != 0); \
         if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", \
           REPORT_MISSING_ENTRIES)) \
         { \
@@ -7856,72 +7869,9 @@ typedef GLvoid (csAPIENTRY* csGLSTENCILFUNCSEPARATEATI) (GLenum frontfunc, GLenu
         Report (msgExtInitFail, exttype, ext); \
       } 
 
-struct csGLExtensionManager
+struct csGLExtensionFunctions
 {
-private:
-  iObjectRegistry* object_reg;
-  csConfigAccess config;
-  iOpenGLInterface* gl;
-  
-  const char* extstrGL;
-  const char* msgExtRetrieveFail;
-  const char* msgExtFoundAndUsed;
-  const char* msgExtFoundAndNotUsed;
-  const char* msgExtInitFail;
-  const char* msgExtNotFound;
-#ifdef __WIN32__
-  const char* extstrWGL;
-  
-  void SetupWGLextStr (HDC hDC)
-  {
-    if (extstrWGL != 0) return;
-  
-    if (!tested_CS_WGL_ARB_extensions_string) InitWGL_ARB_extensions_string (hDC);
-    if (CS_WGL_ARB_extensions_string)
-    {
-      extstrWGL = wglGetExtensionsStringARB (hDC);
-    }
-    else
-    {
-      extstrWGL = extstrGL;
-    }
-  }
-#endif
-
-  void Report (const char* msg, ...)
-  {
-    va_list arg;
-    va_start (arg, msg);
-    csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
-    if (rep)
-      rep->ReportV (CS_REPORTER_SEVERITY_NOTIFY,
-         "crystalspace.canvas.opengl.extmgr", msg, arg);
-    else
-    {
-      csPrintfV (msg, arg);
-      csPrintf ("\n");
-    }
-    va_end (arg);
-  }
-
 public:
-  void Initialize (iObjectRegistry* object_reg, iGraphics2D* g2d)
-  {
-    csGLExtensionManager::object_reg = object_reg;
-    gl = csRef<iOpenGLInterface>
-      (SCF_QUERY_INTERFACE (g2d, iOpenGLInterface));
-    // Low priority so canvas/renderer cfgs may override the settings
-    config.AddConfig (object_reg, "/config/glext.cfg", true,
-      iConfigManager::ConfigPriorityPlugin - 1);
-}
-  
-  void Open () 
-  { 
-    extstrGL = (const char*)glGetString (GL_EXTENSIONS);
-  }
-  
-  void Close () { }
-  
   // GL_version_1_2
   #ifndef GLDRAWRANGEELEMENTS_DECL
   #define GLDRAWRANGEELEMENTS_DECL
@@ -11943,10 +11893,17 @@ public:
   #endif
 
 
+  // GL_ARB_texture_non_power_of_two
+
+  // GL_ARB_point_sprite
 
 
-  // end of functions
-  
+// end of functions
+};
+
+struct csGLExtensionFlags
+{
+public:
   bool CS_GL_version_1_2;
   bool CS_GL_version_1_3;
   bool CS_GL_ARB_imaging;
@@ -12097,8 +12054,10 @@ public:
   bool CS_GL_NV_vertex_program2;
   bool CS_GL_ARB_vertex_buffer_object;
   bool CS_GL_ATI_separate_stencil;
+  bool CS_GL_ARB_texture_non_power_of_two;
+  bool CS_GL_ARB_point_sprite;
 
-private:
+protected:
   bool tested_CS_GL_version_1_2;
   bool tested_CS_GL_version_1_3;
   bool tested_CS_GL_ARB_imaging;
@@ -12249,7 +12208,77 @@ private:
   bool tested_CS_GL_NV_vertex_program2;
   bool tested_CS_GL_ARB_vertex_buffer_object;
   bool tested_CS_GL_ATI_separate_stencil;
+  bool tested_CS_GL_ARB_texture_non_power_of_two;
+  bool tested_CS_GL_ARB_point_sprite;
 
+};
+
+struct csGLExtensionManager : public csGLExtensionFunctions,
+			      public csGLExtensionFlags
+{
+private:
+  iObjectRegistry* object_reg;
+  csConfigAccess config;
+  iOpenGLInterface* gl;
+  
+  const char* extstrGL;
+  const char* msgExtRetrieveFail;
+  const char* msgExtFoundAndUsed;
+  const char* msgExtFoundAndNotUsed;
+  const char* msgExtInitFail;
+  const char* msgExtNotFound;
+#ifdef __WIN32__
+  const char* extstrWGL;
+  
+  void SetupWGLextStr (HDC hDC)
+  {
+    if (extstrWGL != 0) return;
+  
+    if (!tested_CS_WGL_ARB_extensions_string) InitWGL_ARB_extensions_string (hDC);
+    if (CS_WGL_ARB_extensions_string)
+    {
+      extstrWGL = wglGetExtensionsStringARB (hDC);
+    }
+    else
+    {
+      extstrWGL = extstrGL;
+    }
+  }
+#endif
+
+  void Report (const char* msg, ...)
+  {
+    va_list arg;
+    va_start (arg, msg);
+    csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
+    if (rep)
+      rep->ReportV (CS_REPORTER_SEVERITY_NOTIFY,
+         "crystalspace.canvas.opengl.extmgr", msg, arg);
+    else
+    {
+      csPrintfV (msg, arg);
+      csPrintf ("\n");
+    }
+    va_end (arg);
+  }
+
+public:
+  void Initialize (iObjectRegistry* object_reg, iGraphics2D* g2d)
+  {
+    csGLExtensionManager::object_reg = object_reg;
+    gl = csRef<iOpenGLInterface>
+      (SCF_QUERY_INTERFACE (g2d, iOpenGLInterface));
+    // Low priority so canvas/renderer cfgs may override the settings
+    config.AddConfig (object_reg, "/config/glext.cfg", true,
+      iConfigManager::ConfigPriorityPlugin - 1);
+}
+  
+  void Open () 
+  { 
+    extstrGL = (const char*)glGetString (GL_EXTENSIONS);
+  }
+  
+  void Close () { }
 public:
   void Reset ()
   {
@@ -12258,310 +12287,12 @@ public:
     extstrWGL = 0;
 #endif
 
-    CS_GL_version_1_2 = false;
-    tested_CS_GL_version_1_2 = false;
-    CS_GL_version_1_3 = false;
-    tested_CS_GL_version_1_3 = false;
-    CS_GL_ARB_imaging = false;
-    tested_CS_GL_ARB_imaging = false;
-    CS_GL_ARB_multitexture = false;
-    tested_CS_GL_ARB_multitexture = false;
-    CS_GL_ARB_transpose_matrix = false;
-    tested_CS_GL_ARB_transpose_matrix = false;
-    CS_GL_ARB_multisample = false;
-    tested_CS_GL_ARB_multisample = false;
-    CS_GL_ARB_texture_env_add = false;
-    tested_CS_GL_ARB_texture_env_add = false;
-    CS_WGL_ARB_extensions_string = false;
-    tested_CS_WGL_ARB_extensions_string = false;
-    CS_WGL_ARB_buffer_region = false;
-    tested_CS_WGL_ARB_buffer_region = false;
-    CS_GL_ARB_texture_cube_map = false;
-    tested_CS_GL_ARB_texture_cube_map = false;
-    CS_GL_ARB_depth_texture = false;
-    tested_CS_GL_ARB_depth_texture = false;
-    CS_GL_ARB_point_parameters = false;
-    tested_CS_GL_ARB_point_parameters = false;
-    CS_GL_ARB_shadow = false;
-    tested_CS_GL_ARB_shadow = false;
-    CS_GL_ARB_shadow_ambient = false;
-    tested_CS_GL_ARB_shadow_ambient = false;
-    CS_GL_ARB_texture_border_clamp = false;
-    tested_CS_GL_ARB_texture_border_clamp = false;
-    CS_GL_ARB_texture_compression = false;
-    tested_CS_GL_ARB_texture_compression = false;
-    CS_GL_ARB_texture_env_combine = false;
-    tested_CS_GL_ARB_texture_env_combine = false;
-    CS_GL_ARB_texture_env_crossbar = false;
-    tested_CS_GL_ARB_texture_env_crossbar = false;
-    CS_GL_ARB_texture_env_dot3 = false;
-    tested_CS_GL_ARB_texture_env_dot3 = false;
-    CS_GL_ARB_texture_mirrored_repeat = false;
-    tested_CS_GL_ARB_texture_mirrored_repeat = false;
-    CS_GL_ARB_vertex_blend = false;
-    tested_CS_GL_ARB_vertex_blend = false;
-    CS_GL_ARB_vertex_program = false;
-    tested_CS_GL_ARB_vertex_program = false;
-    CS_GL_ARB_window_pos = false;
-    tested_CS_GL_ARB_window_pos = false;
-    CS_GL_EXT_422_pixels = false;
-    tested_CS_GL_EXT_422_pixels = false;
-    CS_GL_EXT_abgr = false;
-    tested_CS_GL_EXT_abgr = false;
-    CS_GL_EXT_bgra = false;
-    tested_CS_GL_EXT_bgra = false;
-    CS_GL_EXT_blend_color = false;
-    tested_CS_GL_EXT_blend_color = false;
-    CS_GL_EXT_blend_func_separate = false;
-    tested_CS_GL_EXT_blend_func_separate = false;
-    CS_GL_EXT_blend_logic_op = false;
-    tested_CS_GL_EXT_blend_logic_op = false;
-    CS_GL_EXT_blend_minmax = false;
-    tested_CS_GL_EXT_blend_minmax = false;
-    CS_GL_EXT_blend_subtract = false;
-    tested_CS_GL_EXT_blend_subtract = false;
-    CS_GL_EXT_clip_volume_hint = false;
-    tested_CS_GL_EXT_clip_volume_hint = false;
-    CS_GL_EXT_color_subtable = false;
-    tested_CS_GL_EXT_color_subtable = false;
-    CS_GL_EXT_compiled_vertex_array = false;
-    tested_CS_GL_EXT_compiled_vertex_array = false;
-    CS_GL_EXT_convolution = false;
-    tested_CS_GL_EXT_convolution = false;
-    CS_GL_EXT_fog_coord = false;
-    tested_CS_GL_EXT_fog_coord = false;
-    CS_GL_EXT_histogram = false;
-    tested_CS_GL_EXT_histogram = false;
-    CS_GL_EXT_multi_draw_arrays = false;
-    tested_CS_GL_EXT_multi_draw_arrays = false;
-    CS_GL_EXT_packed_pixels = false;
-    tested_CS_GL_EXT_packed_pixels = false;
-    CS_GL_EXT_paletted_texture = false;
-    tested_CS_GL_EXT_paletted_texture = false;
-    CS_GL_EXT_point_parameters = false;
-    tested_CS_GL_EXT_point_parameters = false;
-    CS_GL_EXT_polygon_offset = false;
-    tested_CS_GL_EXT_polygon_offset = false;
-    CS_GL_EXT_secondary_color = false;
-    tested_CS_GL_EXT_secondary_color = false;
-    CS_GL_EXT_separate_specular_color = false;
-    tested_CS_GL_EXT_separate_specular_color = false;
-    CS_GL_EXT_shadow_funcs = false;
-    tested_CS_GL_EXT_shadow_funcs = false;
-    CS_GL_EXT_shared_texture_palette = false;
-    tested_CS_GL_EXT_shared_texture_palette = false;
-    CS_GL_EXT_stencil_two_side = false;
-    tested_CS_GL_EXT_stencil_two_side = false;
-    CS_GL_EXT_stencil_wrap = false;
-    tested_CS_GL_EXT_stencil_wrap = false;
-    CS_GL_EXT_subtexture = false;
-    tested_CS_GL_EXT_subtexture = false;
-    CS_GL_EXT_texture3D = false;
-    tested_CS_GL_EXT_texture3D = false;
-    CS_GL_EXT_texture_compression_s3tc = false;
-    tested_CS_GL_EXT_texture_compression_s3tc = false;
-    CS_GL_EXT_texture_env_add = false;
-    tested_CS_GL_EXT_texture_env_add = false;
-    CS_GL_EXT_texture_env_combine = false;
-    tested_CS_GL_EXT_texture_env_combine = false;
-    CS_GL_EXT_texture_env_dot3 = false;
-    tested_CS_GL_EXT_texture_env_dot3 = false;
-    CS_GL_EXT_texture_filter_anisotropic = false;
-    tested_CS_GL_EXT_texture_filter_anisotropic = false;
-    CS_GL_EXT_texture_lod_bias = false;
-    tested_CS_GL_EXT_texture_lod_bias = false;
-    CS_GL_EXT_texture_object = false;
-    tested_CS_GL_EXT_texture_object = false;
-    CS_GL_EXT_vertex_array = false;
-    tested_CS_GL_EXT_vertex_array = false;
-    CS_GL_EXT_vertex_shader = false;
-    tested_CS_GL_EXT_vertex_shader = false;
-    CS_GL_EXT_vertex_weighting = false;
-    tested_CS_GL_EXT_vertex_weighting = false;
-    CS_GL_HP_occlusion_test = false;
-    tested_CS_GL_HP_occlusion_test = false;
-    CS_GL_NV_blend_square = false;
-    tested_CS_GL_NV_blend_square = false;
-    CS_GL_NV_copy_depth_to_color = false;
-    tested_CS_GL_NV_copy_depth_to_color = false;
-    CS_GL_NV_depth_clamp = false;
-    tested_CS_GL_NV_depth_clamp = false;
-    CS_GL_NV_evaluators = false;
-    tested_CS_GL_NV_evaluators = false;
-    CS_GL_NV_fence = false;
-    tested_CS_GL_NV_fence = false;
-    CS_GL_NV_fog_distance = false;
-    tested_CS_GL_NV_fog_distance = false;
-    CS_GL_NV_light_max_exponent = false;
-    tested_CS_GL_NV_light_max_exponent = false;
-    CS_GL_NV_multisample_filter_hint = false;
-    tested_CS_GL_NV_multisample_filter_hint = false;
-    CS_GL_NV_occlusion_query = false;
-    tested_CS_GL_NV_occlusion_query = false;
-    CS_GL_NV_packed_depth_stencil = false;
-    tested_CS_GL_NV_packed_depth_stencil = false;
-    CS_GL_NV_point_sprite = false;
-    tested_CS_GL_NV_point_sprite = false;
-    CS_GL_NV_register_combiners = false;
-    tested_CS_GL_NV_register_combiners = false;
-    CS_GL_NV_register_combiners2 = false;
-    tested_CS_GL_NV_register_combiners2 = false;
-    CS_GL_NV_texgen_emboss = false;
-    tested_CS_GL_NV_texgen_emboss = false;
-    CS_GL_NV_texgen_reflection = false;
-    tested_CS_GL_NV_texgen_reflection = false;
-    CS_GL_NV_texture_compression_vtc = false;
-    tested_CS_GL_NV_texture_compression_vtc = false;
-    CS_GL_NV_texture_env_combine4 = false;
-    tested_CS_GL_NV_texture_env_combine4 = false;
-    CS_GL_NV_texture_rectangle = false;
-    tested_CS_GL_NV_texture_rectangle = false;
-    CS_GL_NV_texture_shader = false;
-    tested_CS_GL_NV_texture_shader = false;
-    CS_GL_NV_texture_shader2 = false;
-    tested_CS_GL_NV_texture_shader2 = false;
-    CS_GL_NV_texture_shader3 = false;
-    tested_CS_GL_NV_texture_shader3 = false;
-    CS_GL_NV_vertex_array_range = false;
-    tested_CS_GL_NV_vertex_array_range = false;
-    CS_GL_NV_vertex_array_range2 = false;
-    tested_CS_GL_NV_vertex_array_range2 = false;
-    CS_GL_NV_vertex_program = false;
-    tested_CS_GL_NV_vertex_program = false;
-    CS_GL_NV_vertex_program1_1 = false;
-    tested_CS_GL_NV_vertex_program1_1 = false;
-    CS_GL_ATI_element_array = false;
-    tested_CS_GL_ATI_element_array = false;
-    CS_GL_ATI_envmap_bumpmap = false;
-    tested_CS_GL_ATI_envmap_bumpmap = false;
-    CS_GL_ATI_fragment_shader = false;
-    tested_CS_GL_ATI_fragment_shader = false;
-    CS_GL_ATI_pn_triangles = false;
-    tested_CS_GL_ATI_pn_triangles = false;
-    CS_GL_ATI_texture_mirror_once = false;
-    tested_CS_GL_ATI_texture_mirror_once = false;
-    CS_GL_ATI_vertex_array_object = false;
-    tested_CS_GL_ATI_vertex_array_object = false;
-    CS_GL_ATI_vertex_attrib_array_object = false;
-    tested_CS_GL_ATI_vertex_attrib_array_object = false;
-    CS_GL_ATI_vertex_streams = false;
-    tested_CS_GL_ATI_vertex_streams = false;
-    CS_WGL_I3D_image_buffer = false;
-    tested_CS_WGL_I3D_image_buffer = false;
-    CS_WGL_I3D_swap_frame_lock = false;
-    tested_CS_WGL_I3D_swap_frame_lock = false;
-    CS_WGL_I3D_swap_frame_usage = false;
-    tested_CS_WGL_I3D_swap_frame_usage = false;
-    CS_GL_3DFX_texture_compression_FXT1 = false;
-    tested_CS_GL_3DFX_texture_compression_FXT1 = false;
-    CS_GL_IBM_cull_vertex = false;
-    tested_CS_GL_IBM_cull_vertex = false;
-    CS_GL_IBM_multimode_draw_arrays = false;
-    tested_CS_GL_IBM_multimode_draw_arrays = false;
-    CS_GL_IBM_raster_pos_clip = false;
-    tested_CS_GL_IBM_raster_pos_clip = false;
-    CS_GL_IBM_texture_mirrored_repeat = false;
-    tested_CS_GL_IBM_texture_mirrored_repeat = false;
-    CS_GL_IBM_vertex_array_lists = false;
-    tested_CS_GL_IBM_vertex_array_lists = false;
-    CS_GL_MESA_resize_buffers = false;
-    tested_CS_GL_MESA_resize_buffers = false;
-    CS_GL_MESA_window_pos = false;
-    tested_CS_GL_MESA_window_pos = false;
-    CS_GL_OML_interlace = false;
-    tested_CS_GL_OML_interlace = false;
-    CS_GL_OML_resample = false;
-    tested_CS_GL_OML_resample = false;
-    CS_GL_OML_subsample = false;
-    tested_CS_GL_OML_subsample = false;
-    CS_GL_SGIS_generate_mipmap = false;
-    tested_CS_GL_SGIS_generate_mipmap = false;
-    CS_GL_SGIS_multisample = false;
-    tested_CS_GL_SGIS_multisample = false;
-    CS_GL_SGIS_pixel_texture = false;
-    tested_CS_GL_SGIS_pixel_texture = false;
-    CS_GL_SGIS_texture_border_clamp = false;
-    tested_CS_GL_SGIS_texture_border_clamp = false;
-    CS_GL_SGIS_texture_color_mask = false;
-    tested_CS_GL_SGIS_texture_color_mask = false;
-    CS_GL_SGIS_texture_edge_clamp = false;
-    tested_CS_GL_SGIS_texture_edge_clamp = false;
-    CS_GL_SGIS_texture_lod = false;
-    tested_CS_GL_SGIS_texture_lod = false;
-    CS_GL_SGIS_depth_texture = false;
-    tested_CS_GL_SGIS_depth_texture = false;
-    CS_GL_SGIX_fog_offset = false;
-    tested_CS_GL_SGIX_fog_offset = false;
-    CS_GL_SGIX_interlace = false;
-    tested_CS_GL_SGIX_interlace = false;
-    CS_GL_SGIX_shadow_ambient = false;
-    tested_CS_GL_SGIX_shadow_ambient = false;
-    CS_GL_SGI_color_matrix = false;
-    tested_CS_GL_SGI_color_matrix = false;
-    CS_GL_SGI_color_table = false;
-    tested_CS_GL_SGI_color_table = false;
-    CS_GL_SGI_texture_color_table = false;
-    tested_CS_GL_SGI_texture_color_table = false;
-    CS_GL_SUN_vertex = false;
-    tested_CS_GL_SUN_vertex = false;
-    CS_GL_ARB_fragment_program = false;
-    tested_CS_GL_ARB_fragment_program = false;
-    CS_GL_ATI_text_fragment_shader = false;
-    tested_CS_GL_ATI_text_fragment_shader = false;
-    CS_GL_APPLE_client_storage = false;
-    tested_CS_GL_APPLE_client_storage = false;
-    CS_GL_APPLE_element_array = false;
-    tested_CS_GL_APPLE_element_array = false;
-    CS_GL_APPLE_fence = false;
-    tested_CS_GL_APPLE_fence = false;
-    CS_GL_APPLE_vertex_array_object = false;
-    tested_CS_GL_APPLE_vertex_array_object = false;
-    CS_GL_APPLE_vertex_array_range = false;
-    tested_CS_GL_APPLE_vertex_array_range = false;
-    CS_WGL_ARB_pixel_format = false;
-    tested_CS_WGL_ARB_pixel_format = false;
-    CS_WGL_ARB_make_current_read = false;
-    tested_CS_WGL_ARB_make_current_read = false;
-    CS_WGL_ARB_pbuffer = false;
-    tested_CS_WGL_ARB_pbuffer = false;
-    CS_WGL_EXT_swap_control = false;
-    tested_CS_WGL_EXT_swap_control = false;
-    CS_WGL_ARB_render_texture = false;
-    tested_CS_WGL_ARB_render_texture = false;
-    CS_WGL_EXT_extensions_string = false;
-    tested_CS_WGL_EXT_extensions_string = false;
-    CS_WGL_EXT_make_current_read = false;
-    tested_CS_WGL_EXT_make_current_read = false;
-    CS_WGL_EXT_pbuffer = false;
-    tested_CS_WGL_EXT_pbuffer = false;
-    CS_WGL_EXT_pixel_format = false;
-    tested_CS_WGL_EXT_pixel_format = false;
-    CS_WGL_I3D_digital_video_control = false;
-    tested_CS_WGL_I3D_digital_video_control = false;
-    CS_WGL_I3D_gamma = false;
-    tested_CS_WGL_I3D_gamma = false;
-    CS_WGL_I3D_genlock = false;
-    tested_CS_WGL_I3D_genlock = false;
-    CS_GL_ARB_matrix_palette = false;
-    tested_CS_GL_ARB_matrix_palette = false;
-    CS_GL_NV_element_array = false;
-    tested_CS_GL_NV_element_array = false;
-    CS_GL_NV_float_buffer = false;
-    tested_CS_GL_NV_float_buffer = false;
-    CS_GL_NV_fragment_program = false;
-    tested_CS_GL_NV_fragment_program = false;
-    CS_GL_NV_primitive_restart = false;
-    tested_CS_GL_NV_primitive_restart = false;
-    CS_GL_NV_vertex_program2 = false;
-    tested_CS_GL_NV_vertex_program2 = false;
-    CS_GL_ARB_vertex_buffer_object = false;
-    tested_CS_GL_ARB_vertex_buffer_object = false;
-    CS_GL_ATI_separate_stencil = false;
-    tested_CS_GL_ATI_separate_stencil = false;
-
+    memset ((csGLExtensionFunctions*)this, 0, 
+      sizeof (csGLExtensionFunctions));
+    memset ((csGLExtensionFlags*)this, 0, sizeof (csGLExtensionFlags));
   }
   
-  csGLExtensionManager () : object_reg (0)
+  csGLExtensionManager () : object_reg (0), gl (0)
   {
     msgExtRetrieveFail = "Failed to retrieve %s";
     msgExtFoundAndUsed = "%s Extension '%s' found and used.";
@@ -12586,10 +12317,10 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_version_1_2;
     allclear = true;
-    EXTMGR_FUNC_INIT(glDrawRangeElements, GLDRAWRANGEELEMENTS);
-    EXTMGR_FUNC_INIT(glTexImage3D, GLTEXIMAGE3D);
-    EXTMGR_FUNC_INIT(glTexSubImage3D, GLTEXSUBIMAGE3D);
-    EXTMGR_FUNC_INIT(glCopyTexSubImage3D, GLCOPYTEXSUBIMAGE3D);
+      EXTMGR_FUNC_INIT(glDrawRangeElements, GLDRAWRANGEELEMENTS);
+      EXTMGR_FUNC_INIT(glTexImage3D, GLTEXIMAGE3D);
+      EXTMGR_FUNC_INIT(glTexSubImage3D, GLTEXSUBIMAGE3D);
+      EXTMGR_FUNC_INIT(glCopyTexSubImage3D, GLCOPYTEXSUBIMAGE3D);
 
     if (init)
     {
@@ -12615,52 +12346,52 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_version_1_3;
     allclear = true;
-    EXTMGR_FUNC_INIT(glActiveTexture, GLACTIVETEXTURE);
-    EXTMGR_FUNC_INIT(glClientActiveTexture, GLCLIENTACTIVETEXTURE);
-    EXTMGR_FUNC_INIT(glMultiTexCoord1d, GLMULTITEXCOORD1D);
-    EXTMGR_FUNC_INIT(glMultiTexCoord1dv, GLMULTITEXCOORD1DV);
-    EXTMGR_FUNC_INIT(glMultiTexCoord1f, GLMULTITEXCOORD1F);
-    EXTMGR_FUNC_INIT(glMultiTexCoord1fv, GLMULTITEXCOORD1FV);
-    EXTMGR_FUNC_INIT(glMultiTexCoord1i, GLMULTITEXCOORD1I);
-    EXTMGR_FUNC_INIT(glMultiTexCoord1iv, GLMULTITEXCOORD1IV);
-    EXTMGR_FUNC_INIT(glMultiTexCoord1s, GLMULTITEXCOORD1S);
-    EXTMGR_FUNC_INIT(glMultiTexCoord1sv, GLMULTITEXCOORD1SV);
-    EXTMGR_FUNC_INIT(glMultiTexCoord2d, GLMULTITEXCOORD2D);
-    EXTMGR_FUNC_INIT(glMultiTexCoord2dv, GLMULTITEXCOORD2DV);
-    EXTMGR_FUNC_INIT(glMultiTexCoord2f, GLMULTITEXCOORD2F);
-    EXTMGR_FUNC_INIT(glMultiTexCoord2fv, GLMULTITEXCOORD2FV);
-    EXTMGR_FUNC_INIT(glMultiTexCoord2i, GLMULTITEXCOORD2I);
-    EXTMGR_FUNC_INIT(glMultiTexCoord2iv, GLMULTITEXCOORD2IV);
-    EXTMGR_FUNC_INIT(glMultiTexCoord2s, GLMULTITEXCOORD2S);
-    EXTMGR_FUNC_INIT(glMultiTexCoord2sv, GLMULTITEXCOORD2SV);
-    EXTMGR_FUNC_INIT(glMultiTexCoord3d, GLMULTITEXCOORD3D);
-    EXTMGR_FUNC_INIT(glMultiTexCoord3dv, GLMULTITEXCOORD3DV);
-    EXTMGR_FUNC_INIT(glMultiTexCoord3f, GLMULTITEXCOORD3F);
-    EXTMGR_FUNC_INIT(glMultiTexCoord3fv, GLMULTITEXCOORD3FV);
-    EXTMGR_FUNC_INIT(glMultiTexCoord3i, GLMULTITEXCOORD3I);
-    EXTMGR_FUNC_INIT(glMultiTexCoord3iv, GLMULTITEXCOORD3IV);
-    EXTMGR_FUNC_INIT(glMultiTexCoord3s, GLMULTITEXCOORD3S);
-    EXTMGR_FUNC_INIT(glMultiTexCoord3sv, GLMULTITEXCOORD3SV);
-    EXTMGR_FUNC_INIT(glMultiTexCoord4d, GLMULTITEXCOORD4D);
-    EXTMGR_FUNC_INIT(glMultiTexCoord4dv, GLMULTITEXCOORD4DV);
-    EXTMGR_FUNC_INIT(glMultiTexCoord4f, GLMULTITEXCOORD4F);
-    EXTMGR_FUNC_INIT(glMultiTexCoord4fv, GLMULTITEXCOORD4FV);
-    EXTMGR_FUNC_INIT(glMultiTexCoord4i, GLMULTITEXCOORD4I);
-    EXTMGR_FUNC_INIT(glMultiTexCoord4iv, GLMULTITEXCOORD4IV);
-    EXTMGR_FUNC_INIT(glMultiTexCoord4s, GLMULTITEXCOORD4S);
-    EXTMGR_FUNC_INIT(glMultiTexCoord4sv, GLMULTITEXCOORD4SV);
-    EXTMGR_FUNC_INIT(glLoadTransposeMatrixf, GLLOADTRANSPOSEMATRIXF);
-    EXTMGR_FUNC_INIT(glLoadTransposeMatrixd, GLLOADTRANSPOSEMATRIXD);
-    EXTMGR_FUNC_INIT(glMultTransposeMatrixf, GLMULTTRANSPOSEMATRIXF);
-    EXTMGR_FUNC_INIT(glMultTransposeMatrixd, GLMULTTRANSPOSEMATRIXD);
-    EXTMGR_FUNC_INIT(glSampleCoverage, GLSAMPLECOVERAGE);
-    EXTMGR_FUNC_INIT(glCompressedTexImage3D, GLCOMPRESSEDTEXIMAGE3D);
-    EXTMGR_FUNC_INIT(glCompressedTexImage2D, GLCOMPRESSEDTEXIMAGE2D);
-    EXTMGR_FUNC_INIT(glCompressedTexImage1D, GLCOMPRESSEDTEXIMAGE1D);
-    EXTMGR_FUNC_INIT(glCompressedTexSubImage3D, GLCOMPRESSEDTEXSUBIMAGE3D);
-    EXTMGR_FUNC_INIT(glCompressedTexSubImage2D, GLCOMPRESSEDTEXSUBIMAGE2D);
-    EXTMGR_FUNC_INIT(glCompressedTexSubImage1D, GLCOMPRESSEDTEXSUBIMAGE1D);
-    EXTMGR_FUNC_INIT(glGetCompressedTexImage, GLGETCOMPRESSEDTEXIMAGE);
+      EXTMGR_FUNC_INIT(glActiveTexture, GLACTIVETEXTURE);
+      EXTMGR_FUNC_INIT(glClientActiveTexture, GLCLIENTACTIVETEXTURE);
+      EXTMGR_FUNC_INIT(glMultiTexCoord1d, GLMULTITEXCOORD1D);
+      EXTMGR_FUNC_INIT(glMultiTexCoord1dv, GLMULTITEXCOORD1DV);
+      EXTMGR_FUNC_INIT(glMultiTexCoord1f, GLMULTITEXCOORD1F);
+      EXTMGR_FUNC_INIT(glMultiTexCoord1fv, GLMULTITEXCOORD1FV);
+      EXTMGR_FUNC_INIT(glMultiTexCoord1i, GLMULTITEXCOORD1I);
+      EXTMGR_FUNC_INIT(glMultiTexCoord1iv, GLMULTITEXCOORD1IV);
+      EXTMGR_FUNC_INIT(glMultiTexCoord1s, GLMULTITEXCOORD1S);
+      EXTMGR_FUNC_INIT(glMultiTexCoord1sv, GLMULTITEXCOORD1SV);
+      EXTMGR_FUNC_INIT(glMultiTexCoord2d, GLMULTITEXCOORD2D);
+      EXTMGR_FUNC_INIT(glMultiTexCoord2dv, GLMULTITEXCOORD2DV);
+      EXTMGR_FUNC_INIT(glMultiTexCoord2f, GLMULTITEXCOORD2F);
+      EXTMGR_FUNC_INIT(glMultiTexCoord2fv, GLMULTITEXCOORD2FV);
+      EXTMGR_FUNC_INIT(glMultiTexCoord2i, GLMULTITEXCOORD2I);
+      EXTMGR_FUNC_INIT(glMultiTexCoord2iv, GLMULTITEXCOORD2IV);
+      EXTMGR_FUNC_INIT(glMultiTexCoord2s, GLMULTITEXCOORD2S);
+      EXTMGR_FUNC_INIT(glMultiTexCoord2sv, GLMULTITEXCOORD2SV);
+      EXTMGR_FUNC_INIT(glMultiTexCoord3d, GLMULTITEXCOORD3D);
+      EXTMGR_FUNC_INIT(glMultiTexCoord3dv, GLMULTITEXCOORD3DV);
+      EXTMGR_FUNC_INIT(glMultiTexCoord3f, GLMULTITEXCOORD3F);
+      EXTMGR_FUNC_INIT(glMultiTexCoord3fv, GLMULTITEXCOORD3FV);
+      EXTMGR_FUNC_INIT(glMultiTexCoord3i, GLMULTITEXCOORD3I);
+      EXTMGR_FUNC_INIT(glMultiTexCoord3iv, GLMULTITEXCOORD3IV);
+      EXTMGR_FUNC_INIT(glMultiTexCoord3s, GLMULTITEXCOORD3S);
+      EXTMGR_FUNC_INIT(glMultiTexCoord3sv, GLMULTITEXCOORD3SV);
+      EXTMGR_FUNC_INIT(glMultiTexCoord4d, GLMULTITEXCOORD4D);
+      EXTMGR_FUNC_INIT(glMultiTexCoord4dv, GLMULTITEXCOORD4DV);
+      EXTMGR_FUNC_INIT(glMultiTexCoord4f, GLMULTITEXCOORD4F);
+      EXTMGR_FUNC_INIT(glMultiTexCoord4fv, GLMULTITEXCOORD4FV);
+      EXTMGR_FUNC_INIT(glMultiTexCoord4i, GLMULTITEXCOORD4I);
+      EXTMGR_FUNC_INIT(glMultiTexCoord4iv, GLMULTITEXCOORD4IV);
+      EXTMGR_FUNC_INIT(glMultiTexCoord4s, GLMULTITEXCOORD4S);
+      EXTMGR_FUNC_INIT(glMultiTexCoord4sv, GLMULTITEXCOORD4SV);
+      EXTMGR_FUNC_INIT(glLoadTransposeMatrixf, GLLOADTRANSPOSEMATRIXF);
+      EXTMGR_FUNC_INIT(glLoadTransposeMatrixd, GLLOADTRANSPOSEMATRIXD);
+      EXTMGR_FUNC_INIT(glMultTransposeMatrixf, GLMULTTRANSPOSEMATRIXF);
+      EXTMGR_FUNC_INIT(glMultTransposeMatrixd, GLMULTTRANSPOSEMATRIXD);
+      EXTMGR_FUNC_INIT(glSampleCoverage, GLSAMPLECOVERAGE);
+      EXTMGR_FUNC_INIT(glCompressedTexImage3D, GLCOMPRESSEDTEXIMAGE3D);
+      EXTMGR_FUNC_INIT(glCompressedTexImage2D, GLCOMPRESSEDTEXIMAGE2D);
+      EXTMGR_FUNC_INIT(glCompressedTexImage1D, GLCOMPRESSEDTEXIMAGE1D);
+      EXTMGR_FUNC_INIT(glCompressedTexSubImage3D, GLCOMPRESSEDTEXSUBIMAGE3D);
+      EXTMGR_FUNC_INIT(glCompressedTexSubImage2D, GLCOMPRESSEDTEXSUBIMAGE2D);
+      EXTMGR_FUNC_INIT(glCompressedTexSubImage1D, GLCOMPRESSEDTEXSUBIMAGE1D);
+      EXTMGR_FUNC_INIT(glGetCompressedTexImage, GLGETCOMPRESSEDTEXIMAGE);
 
     if (init)
     {
@@ -12686,40 +12417,40 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_ARB_imaging;
     allclear = true;
-    EXTMGR_FUNC_INIT(glColorTable, GLCOLORTABLE);
-    EXTMGR_FUNC_INIT(glColorTableParameterfv, GLCOLORTABLEPARAMETERFV);
-    EXTMGR_FUNC_INIT(glColorTableParameteriv, GLCOLORTABLEPARAMETERIV);
-    EXTMGR_FUNC_INIT(glCopyColorTable, GLCOPYCOLORTABLE);
-    EXTMGR_FUNC_INIT(glGetColorTable, GLGETCOLORTABLE);
-    EXTMGR_FUNC_INIT(glGetColorTableParameterfv, GLGETCOLORTABLEPARAMETERFV);
-    EXTMGR_FUNC_INIT(glGetColorTableParameteriv, GLGETCOLORTABLEPARAMETERIV);
-    EXTMGR_FUNC_INIT(glColorSubTable, GLCOLORSUBTABLE);
-    EXTMGR_FUNC_INIT(glCopyColorSubTable, GLCOPYCOLORSUBTABLE);
-    EXTMGR_FUNC_INIT(glConvolutionFilter1D, GLCONVOLUTIONFILTER1D);
-    EXTMGR_FUNC_INIT(glConvolutionFilter2D, GLCONVOLUTIONFILTER2D);
-    EXTMGR_FUNC_INIT(glConvolutionParameterf, GLCONVOLUTIONPARAMETERF);
-    EXTMGR_FUNC_INIT(glConvolutionParameterfv, GLCONVOLUTIONPARAMETERFV);
-    EXTMGR_FUNC_INIT(glConvolutionParameteri, GLCONVOLUTIONPARAMETERI);
-    EXTMGR_FUNC_INIT(glConvolutionParameteriv, GLCONVOLUTIONPARAMETERIV);
-    EXTMGR_FUNC_INIT(glCopyConvolutionFilter1D, GLCOPYCONVOLUTIONFILTER1D);
-    EXTMGR_FUNC_INIT(glCopyConvolutionFilter2D, GLCOPYCONVOLUTIONFILTER2D);
-    EXTMGR_FUNC_INIT(glGetConvolutionFilter, GLGETCONVOLUTIONFILTER);
-    EXTMGR_FUNC_INIT(glGetConvolutionParameterfv, GLGETCONVOLUTIONPARAMETERFV);
-    EXTMGR_FUNC_INIT(glGetConvolutionParameteriv, GLGETCONVOLUTIONPARAMETERIV);
-    EXTMGR_FUNC_INIT(glGetSeparableFilter, GLGETSEPARABLEFILTER);
-    EXTMGR_FUNC_INIT(glSeparableFilter2D, GLSEPARABLEFILTER2D);
-    EXTMGR_FUNC_INIT(glGetHistogram, GLGETHISTOGRAM);
-    EXTMGR_FUNC_INIT(glGetHistogramParameterfv, GLGETHISTOGRAMPARAMETERFV);
-    EXTMGR_FUNC_INIT(glGetHistogramParameteriv, GLGETHISTOGRAMPARAMETERIV);
-    EXTMGR_FUNC_INIT(glGetMinmax, GLGETMINMAX);
-    EXTMGR_FUNC_INIT(glGetMinmaxParameterfv, GLGETMINMAXPARAMETERFV);
-    EXTMGR_FUNC_INIT(glGetMinmaxParameteriv, GLGETMINMAXPARAMETERIV);
-    EXTMGR_FUNC_INIT(glHistogram, GLHISTOGRAM);
-    EXTMGR_FUNC_INIT(glMinmax, GLMINMAX);
-    EXTMGR_FUNC_INIT(glResetHistogram, GLRESETHISTOGRAM);
-    EXTMGR_FUNC_INIT(glResetMinmax, GLRESETMINMAX);
-    EXTMGR_FUNC_INIT(glBlendColor, GLBLENDCOLOR);
-    EXTMGR_FUNC_INIT(glBlendEquation, GLBLENDEQUATION);
+      EXTMGR_FUNC_INIT(glColorTable, GLCOLORTABLE);
+      EXTMGR_FUNC_INIT(glColorTableParameterfv, GLCOLORTABLEPARAMETERFV);
+      EXTMGR_FUNC_INIT(glColorTableParameteriv, GLCOLORTABLEPARAMETERIV);
+      EXTMGR_FUNC_INIT(glCopyColorTable, GLCOPYCOLORTABLE);
+      EXTMGR_FUNC_INIT(glGetColorTable, GLGETCOLORTABLE);
+      EXTMGR_FUNC_INIT(glGetColorTableParameterfv, GLGETCOLORTABLEPARAMETERFV);
+      EXTMGR_FUNC_INIT(glGetColorTableParameteriv, GLGETCOLORTABLEPARAMETERIV);
+      EXTMGR_FUNC_INIT(glColorSubTable, GLCOLORSUBTABLE);
+      EXTMGR_FUNC_INIT(glCopyColorSubTable, GLCOPYCOLORSUBTABLE);
+      EXTMGR_FUNC_INIT(glConvolutionFilter1D, GLCONVOLUTIONFILTER1D);
+      EXTMGR_FUNC_INIT(glConvolutionFilter2D, GLCONVOLUTIONFILTER2D);
+      EXTMGR_FUNC_INIT(glConvolutionParameterf, GLCONVOLUTIONPARAMETERF);
+      EXTMGR_FUNC_INIT(glConvolutionParameterfv, GLCONVOLUTIONPARAMETERFV);
+      EXTMGR_FUNC_INIT(glConvolutionParameteri, GLCONVOLUTIONPARAMETERI);
+      EXTMGR_FUNC_INIT(glConvolutionParameteriv, GLCONVOLUTIONPARAMETERIV);
+      EXTMGR_FUNC_INIT(glCopyConvolutionFilter1D, GLCOPYCONVOLUTIONFILTER1D);
+      EXTMGR_FUNC_INIT(glCopyConvolutionFilter2D, GLCOPYCONVOLUTIONFILTER2D);
+      EXTMGR_FUNC_INIT(glGetConvolutionFilter, GLGETCONVOLUTIONFILTER);
+      EXTMGR_FUNC_INIT(glGetConvolutionParameterfv, GLGETCONVOLUTIONPARAMETERFV);
+      EXTMGR_FUNC_INIT(glGetConvolutionParameteriv, GLGETCONVOLUTIONPARAMETERIV);
+      EXTMGR_FUNC_INIT(glGetSeparableFilter, GLGETSEPARABLEFILTER);
+      EXTMGR_FUNC_INIT(glSeparableFilter2D, GLSEPARABLEFILTER2D);
+      EXTMGR_FUNC_INIT(glGetHistogram, GLGETHISTOGRAM);
+      EXTMGR_FUNC_INIT(glGetHistogramParameterfv, GLGETHISTOGRAMPARAMETERFV);
+      EXTMGR_FUNC_INIT(glGetHistogramParameteriv, GLGETHISTOGRAMPARAMETERIV);
+      EXTMGR_FUNC_INIT(glGetMinmax, GLGETMINMAX);
+      EXTMGR_FUNC_INIT(glGetMinmaxParameterfv, GLGETMINMAXPARAMETERFV);
+      EXTMGR_FUNC_INIT(glGetMinmaxParameteriv, GLGETMINMAXPARAMETERIV);
+      EXTMGR_FUNC_INIT(glHistogram, GLHISTOGRAM);
+      EXTMGR_FUNC_INIT(glMinmax, GLMINMAX);
+      EXTMGR_FUNC_INIT(glResetHistogram, GLRESETHISTOGRAM);
+      EXTMGR_FUNC_INIT(glResetMinmax, GLRESETMINMAX);
+      EXTMGR_FUNC_INIT(glBlendColor, GLBLENDCOLOR);
+      EXTMGR_FUNC_INIT(glBlendEquation, GLBLENDEQUATION);
 
     if (init)
     {
@@ -12745,40 +12476,40 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_ARB_multitexture;
     allclear = true;
-    EXTMGR_FUNC_INIT(glActiveTextureARB, GLACTIVETEXTUREARB);
-    EXTMGR_FUNC_INIT(glClientActiveTextureARB, GLCLIENTACTIVETEXTUREARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord1dARB, GLMULTITEXCOORD1DARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord1dvARB, GLMULTITEXCOORD1DVARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord1fARB, GLMULTITEXCOORD1FARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord1fvARB, GLMULTITEXCOORD1FVARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord1iARB, GLMULTITEXCOORD1IARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord1ivARB, GLMULTITEXCOORD1IVARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord1sARB, GLMULTITEXCOORD1SARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord1svARB, GLMULTITEXCOORD1SVARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord2dARB, GLMULTITEXCOORD2DARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord2dvARB, GLMULTITEXCOORD2DVARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord2fARB, GLMULTITEXCOORD2FARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord2fvARB, GLMULTITEXCOORD2FVARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord2iARB, GLMULTITEXCOORD2IARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord2ivARB, GLMULTITEXCOORD2IVARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord2sARB, GLMULTITEXCOORD2SARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord2svARB, GLMULTITEXCOORD2SVARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord3dARB, GLMULTITEXCOORD3DARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord3dvARB, GLMULTITEXCOORD3DVARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord3fARB, GLMULTITEXCOORD3FARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord3fvARB, GLMULTITEXCOORD3FVARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord3iARB, GLMULTITEXCOORD3IARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord3ivARB, GLMULTITEXCOORD3IVARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord3sARB, GLMULTITEXCOORD3SARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord3svARB, GLMULTITEXCOORD3SVARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord4dARB, GLMULTITEXCOORD4DARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord4dvARB, GLMULTITEXCOORD4DVARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord4fARB, GLMULTITEXCOORD4FARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord4fvARB, GLMULTITEXCOORD4FVARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord4iARB, GLMULTITEXCOORD4IARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord4ivARB, GLMULTITEXCOORD4IVARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord4sARB, GLMULTITEXCOORD4SARB);
-    EXTMGR_FUNC_INIT(glMultiTexCoord4svARB, GLMULTITEXCOORD4SVARB);
+      EXTMGR_FUNC_INIT(glActiveTextureARB, GLACTIVETEXTUREARB);
+      EXTMGR_FUNC_INIT(glClientActiveTextureARB, GLCLIENTACTIVETEXTUREARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord1dARB, GLMULTITEXCOORD1DARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord1dvARB, GLMULTITEXCOORD1DVARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord1fARB, GLMULTITEXCOORD1FARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord1fvARB, GLMULTITEXCOORD1FVARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord1iARB, GLMULTITEXCOORD1IARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord1ivARB, GLMULTITEXCOORD1IVARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord1sARB, GLMULTITEXCOORD1SARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord1svARB, GLMULTITEXCOORD1SVARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord2dARB, GLMULTITEXCOORD2DARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord2dvARB, GLMULTITEXCOORD2DVARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord2fARB, GLMULTITEXCOORD2FARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord2fvARB, GLMULTITEXCOORD2FVARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord2iARB, GLMULTITEXCOORD2IARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord2ivARB, GLMULTITEXCOORD2IVARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord2sARB, GLMULTITEXCOORD2SARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord2svARB, GLMULTITEXCOORD2SVARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord3dARB, GLMULTITEXCOORD3DARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord3dvARB, GLMULTITEXCOORD3DVARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord3fARB, GLMULTITEXCOORD3FARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord3fvARB, GLMULTITEXCOORD3FVARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord3iARB, GLMULTITEXCOORD3IARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord3ivARB, GLMULTITEXCOORD3IVARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord3sARB, GLMULTITEXCOORD3SARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord3svARB, GLMULTITEXCOORD3SVARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord4dARB, GLMULTITEXCOORD4DARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord4dvARB, GLMULTITEXCOORD4DVARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord4fARB, GLMULTITEXCOORD4FARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord4fvARB, GLMULTITEXCOORD4FVARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord4iARB, GLMULTITEXCOORD4IARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord4ivARB, GLMULTITEXCOORD4IVARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord4sARB, GLMULTITEXCOORD4SARB);
+      EXTMGR_FUNC_INIT(glMultiTexCoord4svARB, GLMULTITEXCOORD4SVARB);
 
     if (init)
     {
@@ -12804,10 +12535,10 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_ARB_transpose_matrix;
     allclear = true;
-    EXTMGR_FUNC_INIT(glLoadTransposeMatrixfARB, GLLOADTRANSPOSEMATRIXFARB);
-    EXTMGR_FUNC_INIT(glLoadTransposeMatrixdARB, GLLOADTRANSPOSEMATRIXDARB);
-    EXTMGR_FUNC_INIT(glMultTransposeMatrixfARB, GLMULTTRANSPOSEMATRIXFARB);
-    EXTMGR_FUNC_INIT(glMultTransposeMatrixdARB, GLMULTTRANSPOSEMATRIXDARB);
+      EXTMGR_FUNC_INIT(glLoadTransposeMatrixfARB, GLLOADTRANSPOSEMATRIXFARB);
+      EXTMGR_FUNC_INIT(glLoadTransposeMatrixdARB, GLLOADTRANSPOSEMATRIXDARB);
+      EXTMGR_FUNC_INIT(glMultTransposeMatrixfARB, GLMULTTRANSPOSEMATRIXFARB);
+      EXTMGR_FUNC_INIT(glMultTransposeMatrixdARB, GLMULTTRANSPOSEMATRIXDARB);
 
     if (init)
     {
@@ -12833,7 +12564,7 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_ARB_multisample;
     allclear = true;
-    EXTMGR_FUNC_INIT(glSampleCoverageARB, GLSAMPLECOVERAGEARB);
+      EXTMGR_FUNC_INIT(glSampleCoverageARB, GLSAMPLECOVERAGEARB);
 
     if (init)
     {
@@ -12857,10 +12588,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_ARB_texture_env_add)
-    {
-      allclear = true;
+    bool init = CS_GL_ARB_texture_env_add;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_texture_env_add)
     }
     else
@@ -12884,7 +12616,7 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_WGL_ARB_extensions_string;
     allclear = true;
-    EXTMGR_FUNC_INIT(wglGetExtensionsStringARB, WGLGETEXTENSIONSSTRINGARB);
+      EXTMGR_FUNC_INIT(wglGetExtensionsStringARB, WGLGETEXTENSIONSSTRINGARB);
 
     if (init)
     {
@@ -12913,10 +12645,10 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_WGL_ARB_buffer_region;
     allclear = true;
-    EXTMGR_FUNC_INIT(wglCreateBufferRegionARB, WGLCREATEBUFFERREGIONARB);
-    EXTMGR_FUNC_INIT(wglDeleteBufferRegionARB, WGLDELETEBUFFERREGIONARB);
-    EXTMGR_FUNC_INIT(wglSaveBufferRegionARB, WGLSAVEBUFFERREGIONARB);
-    EXTMGR_FUNC_INIT(wglRestoreBufferRegionARB, WGLRESTOREBUFFERREGIONARB);
+      EXTMGR_FUNC_INIT(wglCreateBufferRegionARB, WGLCREATEBUFFERREGIONARB);
+      EXTMGR_FUNC_INIT(wglDeleteBufferRegionARB, WGLDELETEBUFFERREGIONARB);
+      EXTMGR_FUNC_INIT(wglSaveBufferRegionARB, WGLSAVEBUFFERREGIONARB);
+      EXTMGR_FUNC_INIT(wglRestoreBufferRegionARB, WGLRESTOREBUFFERREGIONARB);
 
     if (init)
     {
@@ -12941,10 +12673,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_ARB_texture_cube_map)
-    {
-      allclear = true;
+    bool init = CS_GL_ARB_texture_cube_map;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_texture_cube_map)
     }
     else
@@ -12965,10 +12698,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_ARB_depth_texture)
-    {
-      allclear = true;
+    bool init = CS_GL_ARB_depth_texture;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_depth_texture)
     }
     else
@@ -12991,8 +12725,8 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_ARB_point_parameters;
     allclear = true;
-    EXTMGR_FUNC_INIT(glPointParameterfARB, GLPOINTPARAMETERFARB);
-    EXTMGR_FUNC_INIT(glPointParameterfvARB, GLPOINTPARAMETERFVARB);
+      EXTMGR_FUNC_INIT(glPointParameterfARB, GLPOINTPARAMETERFARB);
+      EXTMGR_FUNC_INIT(glPointParameterfvARB, GLPOINTPARAMETERFVARB);
 
     if (init)
     {
@@ -13016,10 +12750,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_ARB_shadow)
-    {
-      allclear = true;
+    bool init = CS_GL_ARB_shadow;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_shadow)
     }
     else
@@ -13040,10 +12775,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_ARB_shadow_ambient)
-    {
-      allclear = true;
+    bool init = CS_GL_ARB_shadow_ambient;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_shadow_ambient)
     }
     else
@@ -13064,10 +12800,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_ARB_texture_border_clamp)
-    {
-      allclear = true;
+    bool init = CS_GL_ARB_texture_border_clamp;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_texture_border_clamp)
     }
     else
@@ -13090,13 +12827,13 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_ARB_texture_compression;
     allclear = true;
-    EXTMGR_FUNC_INIT(glCompressedTexImage3DARB, GLCOMPRESSEDTEXIMAGE3DARB);
-    EXTMGR_FUNC_INIT(glCompressedTexImage2DARB, GLCOMPRESSEDTEXIMAGE2DARB);
-    EXTMGR_FUNC_INIT(glCompressedTexImage1DARB, GLCOMPRESSEDTEXIMAGE1DARB);
-    EXTMGR_FUNC_INIT(glCompressedTexSubImage3DARB, GLCOMPRESSEDTEXSUBIMAGE3DARB);
-    EXTMGR_FUNC_INIT(glCompressedTexSubImage2DARB, GLCOMPRESSEDTEXSUBIMAGE2DARB);
-    EXTMGR_FUNC_INIT(glCompressedTexSubImage1DARB, GLCOMPRESSEDTEXSUBIMAGE1DARB);
-    EXTMGR_FUNC_INIT(glGetCompressedTexImageARB, GLGETCOMPRESSEDTEXIMAGEARB);
+      EXTMGR_FUNC_INIT(glCompressedTexImage3DARB, GLCOMPRESSEDTEXIMAGE3DARB);
+      EXTMGR_FUNC_INIT(glCompressedTexImage2DARB, GLCOMPRESSEDTEXIMAGE2DARB);
+      EXTMGR_FUNC_INIT(glCompressedTexImage1DARB, GLCOMPRESSEDTEXIMAGE1DARB);
+      EXTMGR_FUNC_INIT(glCompressedTexSubImage3DARB, GLCOMPRESSEDTEXSUBIMAGE3DARB);
+      EXTMGR_FUNC_INIT(glCompressedTexSubImage2DARB, GLCOMPRESSEDTEXSUBIMAGE2DARB);
+      EXTMGR_FUNC_INIT(glCompressedTexSubImage1DARB, GLCOMPRESSEDTEXSUBIMAGE1DARB);
+      EXTMGR_FUNC_INIT(glGetCompressedTexImageARB, GLGETCOMPRESSEDTEXIMAGEARB);
 
     if (init)
     {
@@ -13120,10 +12857,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_ARB_texture_env_combine)
-    {
-      allclear = true;
+    bool init = CS_GL_ARB_texture_env_combine;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_texture_env_combine)
     }
     else
@@ -13144,10 +12882,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_ARB_texture_env_crossbar)
-    {
-      allclear = true;
+    bool init = CS_GL_ARB_texture_env_crossbar;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_texture_env_crossbar)
     }
     else
@@ -13168,10 +12907,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_ARB_texture_env_dot3)
-    {
-      allclear = true;
+    bool init = CS_GL_ARB_texture_env_dot3;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_texture_env_dot3)
     }
     else
@@ -13192,10 +12932,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_ARB_texture_mirrored_repeat)
-    {
-      allclear = true;
+    bool init = CS_GL_ARB_texture_mirrored_repeat;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_texture_mirrored_repeat)
     }
     else
@@ -13218,19 +12959,19 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_ARB_vertex_blend;
     allclear = true;
-    EXTMGR_FUNC_INIT(glWeightbvARB, GLWEIGHTBVARB);
-    EXTMGR_FUNC_INIT(glWeightsvARB, GLWEIGHTSVARB);
-    EXTMGR_FUNC_INIT(glWeightivARB, GLWEIGHTIVARB);
-    EXTMGR_FUNC_INIT(glWeightfvARB, GLWEIGHTFVARB);
-    EXTMGR_FUNC_INIT(glWeightdvARB, GLWEIGHTDVARB);
-    EXTMGR_FUNC_INIT(glWeightvARB, GLWEIGHTVARB);
-    EXTMGR_FUNC_INIT(glWeightubvARB, GLWEIGHTUBVARB);
-    EXTMGR_FUNC_INIT(glWeightusvARB, GLWEIGHTUSVARB);
-    EXTMGR_FUNC_INIT(glWeightuivARB, GLWEIGHTUIVARB);
-    EXTMGR_FUNC_INIT(glWeightPointerARB, GLWEIGHTPOINTERARB);
-    EXTMGR_FUNC_INIT(glVertexBlendARB, GLVERTEXBLENDARB);
+      EXTMGR_FUNC_INIT(glWeightbvARB, GLWEIGHTBVARB);
+      EXTMGR_FUNC_INIT(glWeightsvARB, GLWEIGHTSVARB);
+      EXTMGR_FUNC_INIT(glWeightivARB, GLWEIGHTIVARB);
+      EXTMGR_FUNC_INIT(glWeightfvARB, GLWEIGHTFVARB);
+      EXTMGR_FUNC_INIT(glWeightdvARB, GLWEIGHTDVARB);
+      EXTMGR_FUNC_INIT(glWeightvARB, GLWEIGHTVARB);
+      EXTMGR_FUNC_INIT(glWeightubvARB, GLWEIGHTUBVARB);
+      EXTMGR_FUNC_INIT(glWeightusvARB, GLWEIGHTUSVARB);
+      EXTMGR_FUNC_INIT(glWeightuivARB, GLWEIGHTUIVARB);
+      EXTMGR_FUNC_INIT(glWeightPointerARB, GLWEIGHTPOINTERARB);
+      EXTMGR_FUNC_INIT(glVertexBlendARB, GLVERTEXBLENDARB);
 
-    if (!init)
+    if (init)
     {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_vertex_blend)
     }
@@ -13254,68 +12995,68 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_ARB_vertex_program;
     allclear = true;
-    EXTMGR_FUNC_INIT(glVertexAttrib1sARB, GLVERTEXATTRIB1SARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib1fARB, GLVERTEXATTRIB1FARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib1dARB, GLVERTEXATTRIB1DARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib2sARB, GLVERTEXATTRIB2SARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib2fARB, GLVERTEXATTRIB2FARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib2dARB, GLVERTEXATTRIB2DARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib3sARB, GLVERTEXATTRIB3SARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib3fARB, GLVERTEXATTRIB3FARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib3dARB, GLVERTEXATTRIB3DARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib4sARB, GLVERTEXATTRIB4SARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib4fARB, GLVERTEXATTRIB4FARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib4dARB, GLVERTEXATTRIB4DARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib4NubARB, GLVERTEXATTRIB4NUBARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib1svARB, GLVERTEXATTRIB1SVARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib1fvARB, GLVERTEXATTRIB1FVARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib1dvARB, GLVERTEXATTRIB1DVARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib2svARB, GLVERTEXATTRIB2SVARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib2fvARB, GLVERTEXATTRIB2FVARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib2dvARB, GLVERTEXATTRIB2DVARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib3svARB, GLVERTEXATTRIB3SVARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib3fvARB, GLVERTEXATTRIB3FVARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib3dvARB, GLVERTEXATTRIB3DVARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib4bvARB, GLVERTEXATTRIB4BVARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib4svARB, GLVERTEXATTRIB4SVARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib4ivARB, GLVERTEXATTRIB4IVARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib4ubvARB, GLVERTEXATTRIB4UBVARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib4usvARB, GLVERTEXATTRIB4USVARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib4uivARB, GLVERTEXATTRIB4UIVARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib4fvARB, GLVERTEXATTRIB4FVARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib4dvARB, GLVERTEXATTRIB4DVARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib4NbvARB, GLVERTEXATTRIB4NBVARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib4NsvARB, GLVERTEXATTRIB4NSVARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib4NivARB, GLVERTEXATTRIB4NIVARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib4NubvARB, GLVERTEXATTRIB4NUBVARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib4NusvARB, GLVERTEXATTRIB4NUSVARB);
-    EXTMGR_FUNC_INIT(glVertexAttrib4NuivARB, GLVERTEXATTRIB4NUIVARB);
-    EXTMGR_FUNC_INIT(glVertexAttribPointerARB, GLVERTEXATTRIBPOINTERARB);
-    EXTMGR_FUNC_INIT(glEnableVertexAttribArrayARB, GLENABLEVERTEXATTRIBARRAYARB);
-    EXTMGR_FUNC_INIT(glDisableVertexAttribArrayARB, GLDISABLEVERTEXATTRIBARRAYARB);
-    EXTMGR_FUNC_INIT(glProgramStringARB, GLPROGRAMSTRINGARB);
-    EXTMGR_FUNC_INIT(glBindProgramARB, GLBINDPROGRAMARB);
-    EXTMGR_FUNC_INIT(glDeleteProgramsARB, GLDELETEPROGRAMSARB);
-    EXTMGR_FUNC_INIT(glGenProgramsARB, GLGENPROGRAMSARB);
-    EXTMGR_FUNC_INIT(glProgramEnvParameter4dARB, GLPROGRAMENVPARAMETER4DARB);
-    EXTMGR_FUNC_INIT(glProgramEnvParameter4dvARB, GLPROGRAMENVPARAMETER4DVARB);
-    EXTMGR_FUNC_INIT(glProgramEnvParameter4fARB, GLPROGRAMENVPARAMETER4FARB);
-    EXTMGR_FUNC_INIT(glProgramEnvParameter4fvARB, GLPROGRAMENVPARAMETER4FVARB);
-    EXTMGR_FUNC_INIT(glProgramLocalParameter4dARB, GLPROGRAMLOCALPARAMETER4DARB);
-    EXTMGR_FUNC_INIT(glProgramLocalParameter4dvARB, GLPROGRAMLOCALPARAMETER4DVARB);
-    EXTMGR_FUNC_INIT(glProgramLocalParameter4fARB, GLPROGRAMLOCALPARAMETER4FARB);
-    EXTMGR_FUNC_INIT(glProgramLocalParameter4fvARB, GLPROGRAMLOCALPARAMETER4FVARB);
-    EXTMGR_FUNC_INIT(glGetProgramEnvParameterdvARB, GLGETPROGRAMENVPARAMETERDVARB);
-    EXTMGR_FUNC_INIT(glGetProgramEnvParameterfvARB, GLGETPROGRAMENVPARAMETERFVARB);
-    EXTMGR_FUNC_INIT(glGetProgramLocalParameterdvARB, GLGETPROGRAMLOCALPARAMETERDVARB);
-    EXTMGR_FUNC_INIT(glGetProgramLocalParameterfvARB, GLGETPROGRAMLOCALPARAMETERFVARB);
-    EXTMGR_FUNC_INIT(glGetProgramivARB, GLGETPROGRAMIVARB);
-    EXTMGR_FUNC_INIT(glGetProgramStringARB, GLGETPROGRAMSTRINGARB);
-    EXTMGR_FUNC_INIT(glGetVertexAttribdvARB, GLGETVERTEXATTRIBDVARB);
-    EXTMGR_FUNC_INIT(glGetVertexAttribfvARB, GLGETVERTEXATTRIBFVARB);
-    EXTMGR_FUNC_INIT(glGetVertexAttribivARB, GLGETVERTEXATTRIBIVARB);
-    EXTMGR_FUNC_INIT(glGetVertexAttribPointervARB, GLGETVERTEXATTRIBPOINTERVARB);
-    EXTMGR_FUNC_INIT(glIsProgramARB, GLISPROGRAMARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib1sARB, GLVERTEXATTRIB1SARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib1fARB, GLVERTEXATTRIB1FARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib1dARB, GLVERTEXATTRIB1DARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib2sARB, GLVERTEXATTRIB2SARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib2fARB, GLVERTEXATTRIB2FARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib2dARB, GLVERTEXATTRIB2DARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib3sARB, GLVERTEXATTRIB3SARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib3fARB, GLVERTEXATTRIB3FARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib3dARB, GLVERTEXATTRIB3DARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib4sARB, GLVERTEXATTRIB4SARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib4fARB, GLVERTEXATTRIB4FARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib4dARB, GLVERTEXATTRIB4DARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib4NubARB, GLVERTEXATTRIB4NUBARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib1svARB, GLVERTEXATTRIB1SVARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib1fvARB, GLVERTEXATTRIB1FVARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib1dvARB, GLVERTEXATTRIB1DVARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib2svARB, GLVERTEXATTRIB2SVARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib2fvARB, GLVERTEXATTRIB2FVARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib2dvARB, GLVERTEXATTRIB2DVARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib3svARB, GLVERTEXATTRIB3SVARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib3fvARB, GLVERTEXATTRIB3FVARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib3dvARB, GLVERTEXATTRIB3DVARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib4bvARB, GLVERTEXATTRIB4BVARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib4svARB, GLVERTEXATTRIB4SVARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib4ivARB, GLVERTEXATTRIB4IVARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib4ubvARB, GLVERTEXATTRIB4UBVARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib4usvARB, GLVERTEXATTRIB4USVARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib4uivARB, GLVERTEXATTRIB4UIVARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib4fvARB, GLVERTEXATTRIB4FVARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib4dvARB, GLVERTEXATTRIB4DVARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib4NbvARB, GLVERTEXATTRIB4NBVARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib4NsvARB, GLVERTEXATTRIB4NSVARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib4NivARB, GLVERTEXATTRIB4NIVARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib4NubvARB, GLVERTEXATTRIB4NUBVARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib4NusvARB, GLVERTEXATTRIB4NUSVARB);
+      EXTMGR_FUNC_INIT(glVertexAttrib4NuivARB, GLVERTEXATTRIB4NUIVARB);
+      EXTMGR_FUNC_INIT(glVertexAttribPointerARB, GLVERTEXATTRIBPOINTERARB);
+      EXTMGR_FUNC_INIT(glEnableVertexAttribArrayARB, GLENABLEVERTEXATTRIBARRAYARB);
+      EXTMGR_FUNC_INIT(glDisableVertexAttribArrayARB, GLDISABLEVERTEXATTRIBARRAYARB);
+      EXTMGR_FUNC_INIT(glProgramStringARB, GLPROGRAMSTRINGARB);
+      EXTMGR_FUNC_INIT(glBindProgramARB, GLBINDPROGRAMARB);
+      EXTMGR_FUNC_INIT(glDeleteProgramsARB, GLDELETEPROGRAMSARB);
+      EXTMGR_FUNC_INIT(glGenProgramsARB, GLGENPROGRAMSARB);
+      EXTMGR_FUNC_INIT(glProgramEnvParameter4dARB, GLPROGRAMENVPARAMETER4DARB);
+      EXTMGR_FUNC_INIT(glProgramEnvParameter4dvARB, GLPROGRAMENVPARAMETER4DVARB);
+      EXTMGR_FUNC_INIT(glProgramEnvParameter4fARB, GLPROGRAMENVPARAMETER4FARB);
+      EXTMGR_FUNC_INIT(glProgramEnvParameter4fvARB, GLPROGRAMENVPARAMETER4FVARB);
+      EXTMGR_FUNC_INIT(glProgramLocalParameter4dARB, GLPROGRAMLOCALPARAMETER4DARB);
+      EXTMGR_FUNC_INIT(glProgramLocalParameter4dvARB, GLPROGRAMLOCALPARAMETER4DVARB);
+      EXTMGR_FUNC_INIT(glProgramLocalParameter4fARB, GLPROGRAMLOCALPARAMETER4FARB);
+      EXTMGR_FUNC_INIT(glProgramLocalParameter4fvARB, GLPROGRAMLOCALPARAMETER4FVARB);
+      EXTMGR_FUNC_INIT(glGetProgramEnvParameterdvARB, GLGETPROGRAMENVPARAMETERDVARB);
+      EXTMGR_FUNC_INIT(glGetProgramEnvParameterfvARB, GLGETPROGRAMENVPARAMETERFVARB);
+      EXTMGR_FUNC_INIT(glGetProgramLocalParameterdvARB, GLGETPROGRAMLOCALPARAMETERDVARB);
+      EXTMGR_FUNC_INIT(glGetProgramLocalParameterfvARB, GLGETPROGRAMLOCALPARAMETERFVARB);
+      EXTMGR_FUNC_INIT(glGetProgramivARB, GLGETPROGRAMIVARB);
+      EXTMGR_FUNC_INIT(glGetProgramStringARB, GLGETPROGRAMSTRINGARB);
+      EXTMGR_FUNC_INIT(glGetVertexAttribdvARB, GLGETVERTEXATTRIBDVARB);
+      EXTMGR_FUNC_INIT(glGetVertexAttribfvARB, GLGETVERTEXATTRIBFVARB);
+      EXTMGR_FUNC_INIT(glGetVertexAttribivARB, GLGETVERTEXATTRIBIVARB);
+      EXTMGR_FUNC_INIT(glGetVertexAttribPointervARB, GLGETVERTEXATTRIBPOINTERVARB);
+      EXTMGR_FUNC_INIT(glIsProgramARB, GLISPROGRAMARB);
 
     if (init)
     {
@@ -13341,22 +13082,22 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_ARB_window_pos;
     allclear = true;
-    EXTMGR_FUNC_INIT(glWindowPos2dARB, GLWINDOWPOS2DARB);
-    EXTMGR_FUNC_INIT(glWindowPos2fARB, GLWINDOWPOS2FARB);
-    EXTMGR_FUNC_INIT(glWindowPos2iARB, GLWINDOWPOS2IARB);
-    EXTMGR_FUNC_INIT(glWindowPos2sARB, GLWINDOWPOS2SARB);
-    EXTMGR_FUNC_INIT(glWindowPos2dvARB, GLWINDOWPOS2DVARB);
-    EXTMGR_FUNC_INIT(glWindowPos2fvARB, GLWINDOWPOS2FVARB);
-    EXTMGR_FUNC_INIT(glWindowPos2ivARB, GLWINDOWPOS2IVARB);
-    EXTMGR_FUNC_INIT(glWindowPos2svARB, GLWINDOWPOS2SVARB);
-    EXTMGR_FUNC_INIT(glWindowPos3dARB, GLWINDOWPOS3DARB);
-    EXTMGR_FUNC_INIT(glWindowPos3fARB, GLWINDOWPOS3FARB);
-    EXTMGR_FUNC_INIT(glWindowPos3iARB, GLWINDOWPOS3IARB);
-    EXTMGR_FUNC_INIT(glWindowPos3sARB, GLWINDOWPOS3SARB);
-    EXTMGR_FUNC_INIT(glWindowPos3dvARB, GLWINDOWPOS3DVARB);
-    EXTMGR_FUNC_INIT(glWindowPos3fvARB, GLWINDOWPOS3FVARB);
-    EXTMGR_FUNC_INIT(glWindowPos3ivARB, GLWINDOWPOS3IVARB);
-    EXTMGR_FUNC_INIT(glWindowPos3svARB, GLWINDOWPOS3SVARB);
+      EXTMGR_FUNC_INIT(glWindowPos2dARB, GLWINDOWPOS2DARB);
+      EXTMGR_FUNC_INIT(glWindowPos2fARB, GLWINDOWPOS2FARB);
+      EXTMGR_FUNC_INIT(glWindowPos2iARB, GLWINDOWPOS2IARB);
+      EXTMGR_FUNC_INIT(glWindowPos2sARB, GLWINDOWPOS2SARB);
+      EXTMGR_FUNC_INIT(glWindowPos2dvARB, GLWINDOWPOS2DVARB);
+      EXTMGR_FUNC_INIT(glWindowPos2fvARB, GLWINDOWPOS2FVARB);
+      EXTMGR_FUNC_INIT(glWindowPos2ivARB, GLWINDOWPOS2IVARB);
+      EXTMGR_FUNC_INIT(glWindowPos2svARB, GLWINDOWPOS2SVARB);
+      EXTMGR_FUNC_INIT(glWindowPos3dARB, GLWINDOWPOS3DARB);
+      EXTMGR_FUNC_INIT(glWindowPos3fARB, GLWINDOWPOS3FARB);
+      EXTMGR_FUNC_INIT(glWindowPos3iARB, GLWINDOWPOS3IARB);
+      EXTMGR_FUNC_INIT(glWindowPos3sARB, GLWINDOWPOS3SARB);
+      EXTMGR_FUNC_INIT(glWindowPos3dvARB, GLWINDOWPOS3DVARB);
+      EXTMGR_FUNC_INIT(glWindowPos3fvARB, GLWINDOWPOS3FVARB);
+      EXTMGR_FUNC_INIT(glWindowPos3ivARB, GLWINDOWPOS3IVARB);
+      EXTMGR_FUNC_INIT(glWindowPos3svARB, GLWINDOWPOS3SVARB);
 
     if (init)
     {
@@ -13380,10 +13121,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_EXT_422_pixels)
-    {
-      allclear = true;
+    bool init = CS_GL_EXT_422_pixels;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_422_pixels)
     }
     else
@@ -13404,10 +13146,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_EXT_abgr)
-    {
-      allclear = true;
+    bool init = CS_GL_EXT_abgr;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_abgr)
     }
     else
@@ -13428,10 +13171,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_EXT_bgra)
-    {
-      allclear = true;
+    bool init = CS_GL_EXT_bgra;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_bgra)
     }
     else
@@ -13454,7 +13198,7 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_EXT_blend_color;
     allclear = true;
-    EXTMGR_FUNC_INIT(glBlendColorEXT, GLBLENDCOLOREXT);
+      EXTMGR_FUNC_INIT(glBlendColorEXT, GLBLENDCOLOREXT);
 
     if (init)
     {
@@ -13480,7 +13224,7 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_EXT_blend_func_separate;
     allclear = true;
-    EXTMGR_FUNC_INIT(glBlendFuncSeparateEXT, GLBLENDFUNCSEPARATEEXT);
+      EXTMGR_FUNC_INIT(glBlendFuncSeparateEXT, GLBLENDFUNCSEPARATEEXT);
 
     if (init)
     {
@@ -13504,10 +13248,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_EXT_blend_logic_op)
-    {
-      allclear = true;
+    bool init = CS_GL_EXT_blend_logic_op;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_blend_logic_op)
     }
     else
@@ -13530,7 +13275,7 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_EXT_blend_minmax;
     allclear = true;
-    EXTMGR_FUNC_INIT(glBlendEquationEXT, GLBLENDEQUATIONEXT);
+      EXTMGR_FUNC_INIT(glBlendEquationEXT, GLBLENDEQUATIONEXT);
 
     if (init)
     {
@@ -13554,10 +13299,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_EXT_blend_subtract)
-    {
-      allclear = true;
+    bool init = CS_GL_EXT_blend_subtract;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_blend_subtract)
     }
     else
@@ -13578,10 +13324,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_EXT_clip_volume_hint)
-    {
-      allclear = true;
+    bool init = CS_GL_EXT_clip_volume_hint;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_clip_volume_hint)
     }
     else
@@ -13604,8 +13351,8 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_EXT_color_subtable;
     allclear = true;
-    EXTMGR_FUNC_INIT(glColorSubTableEXT, GLCOLORSUBTABLEEXT);
-    EXTMGR_FUNC_INIT(glCopyColorSubTableEXT, GLCOPYCOLORSUBTABLEEXT);
+      EXTMGR_FUNC_INIT(glColorSubTableEXT, GLCOLORSUBTABLEEXT);
+      EXTMGR_FUNC_INIT(glCopyColorSubTableEXT, GLCOPYCOLORSUBTABLEEXT);
 
     if (init)
     {
@@ -13631,8 +13378,8 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_EXT_compiled_vertex_array;
     allclear = true;
-    EXTMGR_FUNC_INIT(glLockArraysEXT, GLLOCKARRAYSEXT);
-    EXTMGR_FUNC_INIT(glUnlockArraysEXT, GLUNLOCKARRAYSEXT);
+      EXTMGR_FUNC_INIT(glLockArraysEXT, GLLOCKARRAYSEXT);
+      EXTMGR_FUNC_INIT(glUnlockArraysEXT, GLUNLOCKARRAYSEXT);
 
     if (init)
     {
@@ -13658,19 +13405,19 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_EXT_convolution;
     allclear = true;
-    EXTMGR_FUNC_INIT(glConvolutionFilter1DEXT, GLCONVOLUTIONFILTER1DEXT);
-    EXTMGR_FUNC_INIT(glConvolutionFilter2DEXT, GLCONVOLUTIONFILTER2DEXT);
-    EXTMGR_FUNC_INIT(glCopyConvolutionFilter1DEXT, GLCOPYCONVOLUTIONFILTER1DEXT);
-    EXTMGR_FUNC_INIT(glCopyConvolutionFilter2DEXT, GLCOPYCONVOLUTIONFILTER2DEXT);
-    EXTMGR_FUNC_INIT(glGetConvolutionFilterEXT, GLGETCONVOLUTIONFILTEREXT);
-    EXTMGR_FUNC_INIT(glSeparableFilter2DEXT, GLSEPARABLEFILTER2DEXT);
-    EXTMGR_FUNC_INIT(glGetSeparableFilterEXT, GLGETSEPARABLEFILTEREXT);
-    EXTMGR_FUNC_INIT(glConvolutionParameteriEXT, GLCONVOLUTIONPARAMETERIEXT);
-    EXTMGR_FUNC_INIT(glConvolutionParameterivEXT, GLCONVOLUTIONPARAMETERIVEXT);
-    EXTMGR_FUNC_INIT(glConvolutionParameterfEXT, GLCONVOLUTIONPARAMETERFEXT);
-    EXTMGR_FUNC_INIT(glConvolutionParameterfvEXT, GLCONVOLUTIONPARAMETERFVEXT);
-    EXTMGR_FUNC_INIT(glGetConvolutionParameterivEXT, GLGETCONVOLUTIONPARAMETERIVEXT);
-    EXTMGR_FUNC_INIT(glGetConvolutionParameterfvEXT, GLGETCONVOLUTIONPARAMETERFVEXT);
+      EXTMGR_FUNC_INIT(glConvolutionFilter1DEXT, GLCONVOLUTIONFILTER1DEXT);
+      EXTMGR_FUNC_INIT(glConvolutionFilter2DEXT, GLCONVOLUTIONFILTER2DEXT);
+      EXTMGR_FUNC_INIT(glCopyConvolutionFilter1DEXT, GLCOPYCONVOLUTIONFILTER1DEXT);
+      EXTMGR_FUNC_INIT(glCopyConvolutionFilter2DEXT, GLCOPYCONVOLUTIONFILTER2DEXT);
+      EXTMGR_FUNC_INIT(glGetConvolutionFilterEXT, GLGETCONVOLUTIONFILTEREXT);
+      EXTMGR_FUNC_INIT(glSeparableFilter2DEXT, GLSEPARABLEFILTER2DEXT);
+      EXTMGR_FUNC_INIT(glGetSeparableFilterEXT, GLGETSEPARABLEFILTEREXT);
+      EXTMGR_FUNC_INIT(glConvolutionParameteriEXT, GLCONVOLUTIONPARAMETERIEXT);
+      EXTMGR_FUNC_INIT(glConvolutionParameterivEXT, GLCONVOLUTIONPARAMETERIVEXT);
+      EXTMGR_FUNC_INIT(glConvolutionParameterfEXT, GLCONVOLUTIONPARAMETERFEXT);
+      EXTMGR_FUNC_INIT(glConvolutionParameterfvEXT, GLCONVOLUTIONPARAMETERFVEXT);
+      EXTMGR_FUNC_INIT(glGetConvolutionParameterivEXT, GLGETCONVOLUTIONPARAMETERIVEXT);
+      EXTMGR_FUNC_INIT(glGetConvolutionParameterfvEXT, GLGETCONVOLUTIONPARAMETERFVEXT);
 
     if (init)
     {
@@ -13696,11 +13443,11 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_EXT_fog_coord;
     allclear = true;
-    EXTMGR_FUNC_INIT(glFogCoordfEXfloat, GLFOGCOORDFEXFLOAT);
-    EXTMGR_FUNC_INIT(glFogCoorddEXdouble, GLFOGCOORDDEXDOUBLE);
-    EXTMGR_FUNC_INIT(glFogCoordfvEXfloat, GLFOGCOORDFVEXFLOAT);
-    EXTMGR_FUNC_INIT(glFogCoorddvEXdouble, GLFOGCOORDDVEXDOUBLE);
-    EXTMGR_FUNC_INIT(glFogCoordPointerEXT, GLFOGCOORDPOINTEREXT);
+      EXTMGR_FUNC_INIT(glFogCoordfEXfloat, GLFOGCOORDFEXFLOAT);
+      EXTMGR_FUNC_INIT(glFogCoorddEXdouble, GLFOGCOORDDEXDOUBLE);
+      EXTMGR_FUNC_INIT(glFogCoordfvEXfloat, GLFOGCOORDFVEXFLOAT);
+      EXTMGR_FUNC_INIT(glFogCoorddvEXdouble, GLFOGCOORDDVEXDOUBLE);
+      EXTMGR_FUNC_INIT(glFogCoordPointerEXT, GLFOGCOORDPOINTEREXT);
 
     if (init)
     {
@@ -13726,16 +13473,16 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_EXT_histogram;
     allclear = true;
-    EXTMGR_FUNC_INIT(glHistogramEXT, GLHISTOGRAMEXT);
-    EXTMGR_FUNC_INIT(glResetHistogramEXT, GLRESETHISTOGRAMEXT);
-    EXTMGR_FUNC_INIT(glGetHistogramEXT, GLGETHISTOGRAMEXT);
-    EXTMGR_FUNC_INIT(glGetHistogramParameterivEXT, GLGETHISTOGRAMPARAMETERIVEXT);
-    EXTMGR_FUNC_INIT(glGetHistogramParameterfvEXT, GLGETHISTOGRAMPARAMETERFVEXT);
-    EXTMGR_FUNC_INIT(glMinmaxEXT, GLMINMAXEXT);
-    EXTMGR_FUNC_INIT(glResetMinmaxEXT, GLRESETMINMAXEXT);
-    EXTMGR_FUNC_INIT(glGetMinmaxEXT, GLGETMINMAXEXT);
-    EXTMGR_FUNC_INIT(glGetMinmaxParameterivEXT, GLGETMINMAXPARAMETERIVEXT);
-    EXTMGR_FUNC_INIT(glGetMinmaxParameterfvEXT, GLGETMINMAXPARAMETERFVEXT);
+      EXTMGR_FUNC_INIT(glHistogramEXT, GLHISTOGRAMEXT);
+      EXTMGR_FUNC_INIT(glResetHistogramEXT, GLRESETHISTOGRAMEXT);
+      EXTMGR_FUNC_INIT(glGetHistogramEXT, GLGETHISTOGRAMEXT);
+      EXTMGR_FUNC_INIT(glGetHistogramParameterivEXT, GLGETHISTOGRAMPARAMETERIVEXT);
+      EXTMGR_FUNC_INIT(glGetHistogramParameterfvEXT, GLGETHISTOGRAMPARAMETERFVEXT);
+      EXTMGR_FUNC_INIT(glMinmaxEXT, GLMINMAXEXT);
+      EXTMGR_FUNC_INIT(glResetMinmaxEXT, GLRESETMINMAXEXT);
+      EXTMGR_FUNC_INIT(glGetMinmaxEXT, GLGETMINMAXEXT);
+      EXTMGR_FUNC_INIT(glGetMinmaxParameterivEXT, GLGETMINMAXPARAMETERIVEXT);
+      EXTMGR_FUNC_INIT(glGetMinmaxParameterfvEXT, GLGETMINMAXPARAMETERFVEXT);
 
     if (init)
     {
@@ -13761,8 +13508,8 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_EXT_multi_draw_arrays;
     allclear = true;
-    EXTMGR_FUNC_INIT(glMultiDrawArraysEXT, GLMULTIDRAWARRAYSEXT);
-    EXTMGR_FUNC_INIT(glMultiDrawElementsEXT, GLMULTIDRAWELEMENTSEXT);
+      EXTMGR_FUNC_INIT(glMultiDrawArraysEXT, GLMULTIDRAWARRAYSEXT);
+      EXTMGR_FUNC_INIT(glMultiDrawElementsEXT, GLMULTIDRAWELEMENTSEXT);
 
     if (init)
     {
@@ -13786,10 +13533,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_EXT_packed_pixels)
-    {
-      allclear = true;
+    bool init = CS_GL_EXT_packed_pixels;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_packed_pixels)
     }
     else
@@ -13812,11 +13560,11 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_EXT_paletted_texture;
     allclear = true;
-    EXTMGR_FUNC_INIT(glColorTableEXT, GLCOLORTABLEEXT);
-    EXTMGR_FUNC_INIT(glColorSubTableEXT, GLCOLORSUBTABLEEXT);
-    EXTMGR_FUNC_INIT(glGetColorTableEXT, GLGETCOLORTABLEEXT);
-    EXTMGR_FUNC_INIT(glGetColorTableParameterivEXT, GLGETCOLORTABLEPARAMETERIVEXT);
-    EXTMGR_FUNC_INIT(glGetColorTableParameterfvEXT, GLGETCOLORTABLEPARAMETERFVEXT);
+      EXTMGR_FUNC_INIT(glColorTableEXT, GLCOLORTABLEEXT);
+      EXTMGR_FUNC_INIT(glColorSubTableEXT, GLCOLORSUBTABLEEXT);
+      EXTMGR_FUNC_INIT(glGetColorTableEXT, GLGETCOLORTABLEEXT);
+      EXTMGR_FUNC_INIT(glGetColorTableParameterivEXT, GLGETCOLORTABLEPARAMETERIVEXT);
+      EXTMGR_FUNC_INIT(glGetColorTableParameterfvEXT, GLGETCOLORTABLEPARAMETERFVEXT);
 
     if (init)
     {
@@ -13842,8 +13590,8 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_EXT_point_parameters;
     allclear = true;
-    EXTMGR_FUNC_INIT(glPointParameterfEXT, GLPOINTPARAMETERFEXT);
-    EXTMGR_FUNC_INIT(glPointParameterfvEXT, GLPOINTPARAMETERFVEXT);
+      EXTMGR_FUNC_INIT(glPointParameterfEXT, GLPOINTPARAMETERFEXT);
+      EXTMGR_FUNC_INIT(glPointParameterfvEXT, GLPOINTPARAMETERFVEXT);
 
     if (init)
     {
@@ -13869,7 +13617,7 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_EXT_polygon_offset;
     allclear = true;
-    EXTMGR_FUNC_INIT(glPolygonOffsetEXT, GLPOLYGONOFFSETEXT);
+      EXTMGR_FUNC_INIT(glPolygonOffsetEXT, GLPOLYGONOFFSETEXT);
 
     if (init)
     {
@@ -13895,23 +13643,23 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_EXT_secondary_color;
     allclear = true;
-    EXTMGR_FUNC_INIT(glSecondaryColor3bEXT, GLSECONDARYCOLOR3BEXT);
-    EXTMGR_FUNC_INIT(glSecondaryColor3sEXT, GLSECONDARYCOLOR3SEXT);
-    EXTMGR_FUNC_INIT(glSecondaryColor3iEXT, GLSECONDARYCOLOR3IEXT);
-    EXTMGR_FUNC_INIT(glSecondaryColor3fEXT, GLSECONDARYCOLOR3FEXT);
-    EXTMGR_FUNC_INIT(glSecondaryColor3dEXT, GLSECONDARYCOLOR3DEXT);
-    EXTMGR_FUNC_INIT(glSecondaryColor3ubEXT, GLSECONDARYCOLOR3UBEXT);
-    EXTMGR_FUNC_INIT(glSecondaryColor3usEXT, GLSECONDARYCOLOR3USEXT);
-    EXTMGR_FUNC_INIT(glSecondaryColor3uiEXT, GLSECONDARYCOLOR3UIEXT);
-    EXTMGR_FUNC_INIT(glSecondaryColor3bvEXT, GLSECONDARYCOLOR3BVEXT);
-    EXTMGR_FUNC_INIT(glSecondaryColor3svEXT, GLSECONDARYCOLOR3SVEXT);
-    EXTMGR_FUNC_INIT(glSecondaryColor3ivEXT, GLSECONDARYCOLOR3IVEXT);
-    EXTMGR_FUNC_INIT(glSecondaryColor3fvEXT, GLSECONDARYCOLOR3FVEXT);
-    EXTMGR_FUNC_INIT(glSecondaryColor3dvEXT, GLSECONDARYCOLOR3DVEXT);
-    EXTMGR_FUNC_INIT(glSecondaryColor3ubvEXT, GLSECONDARYCOLOR3UBVEXT);
-    EXTMGR_FUNC_INIT(glSecondaryColor3usvEXT, GLSECONDARYCOLOR3USVEXT);
-    EXTMGR_FUNC_INIT(glSecondaryColor3uivEXT, GLSECONDARYCOLOR3UIVEXT);
-    EXTMGR_FUNC_INIT(glSecondaryColorPointerEXT, GLSECONDARYCOLORPOINTEREXT);
+      EXTMGR_FUNC_INIT(glSecondaryColor3bEXT, GLSECONDARYCOLOR3BEXT);
+      EXTMGR_FUNC_INIT(glSecondaryColor3sEXT, GLSECONDARYCOLOR3SEXT);
+      EXTMGR_FUNC_INIT(glSecondaryColor3iEXT, GLSECONDARYCOLOR3IEXT);
+      EXTMGR_FUNC_INIT(glSecondaryColor3fEXT, GLSECONDARYCOLOR3FEXT);
+      EXTMGR_FUNC_INIT(glSecondaryColor3dEXT, GLSECONDARYCOLOR3DEXT);
+      EXTMGR_FUNC_INIT(glSecondaryColor3ubEXT, GLSECONDARYCOLOR3UBEXT);
+      EXTMGR_FUNC_INIT(glSecondaryColor3usEXT, GLSECONDARYCOLOR3USEXT);
+      EXTMGR_FUNC_INIT(glSecondaryColor3uiEXT, GLSECONDARYCOLOR3UIEXT);
+      EXTMGR_FUNC_INIT(glSecondaryColor3bvEXT, GLSECONDARYCOLOR3BVEXT);
+      EXTMGR_FUNC_INIT(glSecondaryColor3svEXT, GLSECONDARYCOLOR3SVEXT);
+      EXTMGR_FUNC_INIT(glSecondaryColor3ivEXT, GLSECONDARYCOLOR3IVEXT);
+      EXTMGR_FUNC_INIT(glSecondaryColor3fvEXT, GLSECONDARYCOLOR3FVEXT);
+      EXTMGR_FUNC_INIT(glSecondaryColor3dvEXT, GLSECONDARYCOLOR3DVEXT);
+      EXTMGR_FUNC_INIT(glSecondaryColor3ubvEXT, GLSECONDARYCOLOR3UBVEXT);
+      EXTMGR_FUNC_INIT(glSecondaryColor3usvEXT, GLSECONDARYCOLOR3USVEXT);
+      EXTMGR_FUNC_INIT(glSecondaryColor3uivEXT, GLSECONDARYCOLOR3UIVEXT);
+      EXTMGR_FUNC_INIT(glSecondaryColorPointerEXT, GLSECONDARYCOLORPOINTEREXT);
 
     if (init)
     {
@@ -13935,10 +13683,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_EXT_separate_specular_color)
-    {
-      allclear = true;
+    bool init = CS_GL_EXT_separate_specular_color;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_separate_specular_color)
     }
     else
@@ -13959,10 +13708,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_EXT_shadow_funcs)
-    {
-      allclear = true;
+    bool init = CS_GL_EXT_shadow_funcs;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_shadow_funcs)
     }
     else
@@ -13983,10 +13733,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_EXT_shared_texture_palette)
-    {
-      allclear = true;
+    bool init = CS_GL_EXT_shared_texture_palette;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_shared_texture_palette)
     }
     else
@@ -14009,7 +13760,7 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_EXT_stencil_two_side;
     allclear = true;
-    EXTMGR_FUNC_INIT(glActiveStencilFaceEXT, GLACTIVESTENCILFACEEXT);
+      EXTMGR_FUNC_INIT(glActiveStencilFaceEXT, GLACTIVESTENCILFACEEXT);
 
     if (init)
     {
@@ -14033,10 +13784,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_EXT_stencil_wrap)
-    {
-      allclear = true;
+    bool init = CS_GL_EXT_stencil_wrap;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_stencil_wrap)
     }
     else
@@ -14059,9 +13811,9 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_EXT_subtexture;
     allclear = true;
-    EXTMGR_FUNC_INIT(glTexSubImage1DEXT, GLTEXSUBIMAGE1DEXT);
-    EXTMGR_FUNC_INIT(glTexSubImage2DEXT, GLTEXSUBIMAGE2DEXT);
-    EXTMGR_FUNC_INIT(glTexSubImage3DEXT, GLTEXSUBIMAGE3DEXT);
+      EXTMGR_FUNC_INIT(glTexSubImage1DEXT, GLTEXSUBIMAGE1DEXT);
+      EXTMGR_FUNC_INIT(glTexSubImage2DEXT, GLTEXSUBIMAGE2DEXT);
+      EXTMGR_FUNC_INIT(glTexSubImage3DEXT, GLTEXSUBIMAGE3DEXT);
 
     if (init)
     {
@@ -14087,7 +13839,7 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_EXT_texture3D;
     allclear = true;
-    EXTMGR_FUNC_INIT(glTexImage3DEXT, GLTEXIMAGE3DEXT);
+      EXTMGR_FUNC_INIT(glTexImage3DEXT, GLTEXIMAGE3DEXT);
 
     if (init)
     {
@@ -14111,10 +13863,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_EXT_texture_compression_s3tc)
-    {
-      allclear = true;
+    bool init = CS_GL_EXT_texture_compression_s3tc;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_texture_compression_s3tc)
     }
     else
@@ -14135,10 +13888,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_EXT_texture_env_add)
-    {
-      allclear = true;
+    bool init = CS_GL_EXT_texture_env_add;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_texture_env_add)
     }
     else
@@ -14159,10 +13913,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_EXT_texture_env_combine)
-    {
-      allclear = true;
+    bool init = CS_GL_EXT_texture_env_combine;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_texture_env_combine)
     }
     else
@@ -14183,10 +13938,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_EXT_texture_env_dot3)
-    {
-      allclear = true;
+    bool init = CS_GL_EXT_texture_env_dot3;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_texture_env_dot3)
     }
     else
@@ -14207,10 +13963,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_EXT_texture_filter_anisotropic)
-    {
-      allclear = true;
+    bool init = CS_GL_EXT_texture_filter_anisotropic;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_texture_filter_anisotropic)
     }
     else
@@ -14231,10 +13988,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_EXT_texture_lod_bias)
-    {
-      allclear = true;
+    bool init = CS_GL_EXT_texture_lod_bias;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_texture_lod_bias)
     }
     else
@@ -14257,12 +14015,12 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_EXT_texture_object;
     allclear = true;
-    EXTMGR_FUNC_INIT(glGenTexturesEXT, GLGENTEXTURESEXT);
-    EXTMGR_FUNC_INIT(glDeleteTexturesEXT, GLDELETETEXTURESEXT);
-    EXTMGR_FUNC_INIT(glBindTextureEXT, GLBINDTEXTUREEXT);
-    EXTMGR_FUNC_INIT(glPrioritizeTexturesEXT, GLPRIORITIZETEXTURESEXT);
-    EXTMGR_FUNC_INIT(glAreTexturesResidentEXT, GLARETEXTURESRESIDENTEXT);
-    EXTMGR_FUNC_INIT(glIsTextureEXT, GLISTEXTUREEXT);
+      EXTMGR_FUNC_INIT(glGenTexturesEXT, GLGENTEXTURESEXT);
+      EXTMGR_FUNC_INIT(glDeleteTexturesEXT, GLDELETETEXTURESEXT);
+      EXTMGR_FUNC_INIT(glBindTextureEXT, GLBINDTEXTUREEXT);
+      EXTMGR_FUNC_INIT(glPrioritizeTexturesEXT, GLPRIORITIZETEXTURESEXT);
+      EXTMGR_FUNC_INIT(glAreTexturesResidentEXT, GLARETEXTURESRESIDENTEXT);
+      EXTMGR_FUNC_INIT(glIsTextureEXT, GLISTEXTUREEXT);
 
     if (init)
     {
@@ -14288,15 +14046,15 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_EXT_vertex_array;
     allclear = true;
-    EXTMGR_FUNC_INIT(glArrayElementEXT, GLARRAYELEMENTEXT);
-    EXTMGR_FUNC_INIT(glDrawArraysEXT, GLDRAWARRAYSEXT);
-    EXTMGR_FUNC_INIT(glVertexPointerEXT, GLVERTEXPOINTEREXT);
-    EXTMGR_FUNC_INIT(glNormalPointerEXT, GLNORMALPOINTEREXT);
-    EXTMGR_FUNC_INIT(glColorPointerEXT, GLCOLORPOINTEREXT);
-    EXTMGR_FUNC_INIT(glIndexPointerEXT, GLINDEXPOINTEREXT);
-    EXTMGR_FUNC_INIT(glTexCoordPointerEXT, GLTEXCOORDPOINTEREXT);
-    EXTMGR_FUNC_INIT(glEdgeFlagPointerEXT, GLEDGEFLAGPOINTEREXT);
-    EXTMGR_FUNC_INIT(glGetPointervEXT, GLGETPOINTERVEXT);
+      EXTMGR_FUNC_INIT(glArrayElementEXT, GLARRAYELEMENTEXT);
+      EXTMGR_FUNC_INIT(glDrawArraysEXT, GLDRAWARRAYSEXT);
+      EXTMGR_FUNC_INIT(glVertexPointerEXT, GLVERTEXPOINTEREXT);
+      EXTMGR_FUNC_INIT(glNormalPointerEXT, GLNORMALPOINTEREXT);
+      EXTMGR_FUNC_INIT(glColorPointerEXT, GLCOLORPOINTEREXT);
+      EXTMGR_FUNC_INIT(glIndexPointerEXT, GLINDEXPOINTEREXT);
+      EXTMGR_FUNC_INIT(glTexCoordPointerEXT, GLTEXCOORDPOINTEREXT);
+      EXTMGR_FUNC_INIT(glEdgeFlagPointerEXT, GLEDGEFLAGPOINTEREXT);
+      EXTMGR_FUNC_INIT(glGetPointervEXT, GLGETPOINTERVEXT);
 
     if (init)
     {
@@ -14322,48 +14080,48 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_EXT_vertex_shader;
     allclear = true;
-    EXTMGR_FUNC_INIT(glBeginVertexShaderEXT, GLBEGINVERTEXSHADEREXT);
-    EXTMGR_FUNC_INIT(glEndVertexShaderEXT, GLENDVERTEXSHADEREXT);
-    EXTMGR_FUNC_INIT(glBindVertexShaderEXT, GLBINDVERTEXSHADEREXT);
-    EXTMGR_FUNC_INIT(glGenVertexShadersEXT, GLGENVERTEXSHADERSEXT);
-    EXTMGR_FUNC_INIT(glDeleteVertexShaderEXT, GLDELETEVERTEXSHADEREXT);
-    EXTMGR_FUNC_INIT(glShaderOp1EXT, GLSHADEROP1EXT);
-    EXTMGR_FUNC_INIT(glShaderOp2EXT, GLSHADEROP2EXT);
-    EXTMGR_FUNC_INIT(glShaderOp3EXT, GLSHADEROP3EXT);
-    EXTMGR_FUNC_INIT(glSwizzleEXT, GLSWIZZLEEXT);
-    EXTMGR_FUNC_INIT(glWriteMaskEXT, GLWRITEMASKEXT);
-    EXTMGR_FUNC_INIT(glInsertComponentEXT, GLINSERTCOMPONENTEXT);
-    EXTMGR_FUNC_INIT(glExtractComponentEXT, GLEXTRACTCOMPONENTEXT);
-    EXTMGR_FUNC_INIT(glGenSymbolsEXT, GLGENSYMBOLSEXT);
-    EXTMGR_FUNC_INIT(glSetInvariantEXT, GLSETINVARIANTEXT);
-    EXTMGR_FUNC_INIT(glSetLocalConstantEXT, GLSETLOCALCONSTANTEXT);
-    EXTMGR_FUNC_INIT(glVariantbvEXT, GLVARIANTBVEXT);
-    EXTMGR_FUNC_INIT(glVariantsvEXT, GLVARIANTSVEXT);
-    EXTMGR_FUNC_INIT(glVariantivEXT, GLVARIANTIVEXT);
-    EXTMGR_FUNC_INIT(glVariantfvEXT, GLVARIANTFVEXT);
-    EXTMGR_FUNC_INIT(glVariantdvEXT, GLVARIANTDVEXT);
-    EXTMGR_FUNC_INIT(glVariantubvEXT, GLVARIANTUBVEXT);
-    EXTMGR_FUNC_INIT(glVariantusvEXT, GLVARIANTUSVEXT);
-    EXTMGR_FUNC_INIT(glVariantuivEXT, GLVARIANTUIVEXT);
-    EXTMGR_FUNC_INIT(glVariantPointerEXT, GLVARIANTPOINTEREXT);
-    EXTMGR_FUNC_INIT(glEnableVariantClientStateEXT, GLENABLEVARIANTCLIENTSTATEEXT);
-    EXTMGR_FUNC_INIT(glDisableVariantClientStateEXT, GLDISABLEVARIANTCLIENTSTATEEXT);
-    EXTMGR_FUNC_INIT(glBindLightParameterEXT, GLBINDLIGHTPARAMETEREXT);
-    EXTMGR_FUNC_INIT(glBindMaterialParameterEXT, GLBINDMATERIALPARAMETEREXT);
-    EXTMGR_FUNC_INIT(glBindTexGenParameterEXT, GLBINDTEXGENPARAMETEREXT);
-    EXTMGR_FUNC_INIT(glBindTextureUnitParameterEXT, GLBINDTEXTUREUNITPARAMETEREXT);
-    EXTMGR_FUNC_INIT(glBindParameterEXT, GLBINDPARAMETEREXT);
-    EXTMGR_FUNC_INIT(glIsVariantEnabledEXT, GLISVARIANTENABLEDEXT);
-    EXTMGR_FUNC_INIT(glGetVariantBooleanvEXT, GLGETVARIANTBOOLEANVEXT);
-    EXTMGR_FUNC_INIT(glGetVariantIntegervEXT, GLGETVARIANTINTEGERVEXT);
-    EXTMGR_FUNC_INIT(glGetVariantFloatvEXT, GLGETVARIANTFLOATVEXT);
-    EXTMGR_FUNC_INIT(glGetVariantPointervEXT, GLGETVARIANTPOINTERVEXT);
-    EXTMGR_FUNC_INIT(glGetInvariantBooleanvEXT, GLGETINVARIANTBOOLEANVEXT);
-    EXTMGR_FUNC_INIT(glGetInvariantIntegervEXT, GLGETINVARIANTINTEGERVEXT);
-    EXTMGR_FUNC_INIT(glGetInvariantFloatvEXT, GLGETINVARIANTFLOATVEXT);
-    EXTMGR_FUNC_INIT(glGetLocalConstantBooleanvEXT, GLGETLOCALCONSTANTBOOLEANVEXT);
-    EXTMGR_FUNC_INIT(glGetLocalConstantIntegervEXT, GLGETLOCALCONSTANTINTEGERVEXT);
-    EXTMGR_FUNC_INIT(glGetLocalConstantFloatvEXT, GLGETLOCALCONSTANTFLOATVEXT);
+      EXTMGR_FUNC_INIT(glBeginVertexShaderEXT, GLBEGINVERTEXSHADEREXT);
+      EXTMGR_FUNC_INIT(glEndVertexShaderEXT, GLENDVERTEXSHADEREXT);
+      EXTMGR_FUNC_INIT(glBindVertexShaderEXT, GLBINDVERTEXSHADEREXT);
+      EXTMGR_FUNC_INIT(glGenVertexShadersEXT, GLGENVERTEXSHADERSEXT);
+      EXTMGR_FUNC_INIT(glDeleteVertexShaderEXT, GLDELETEVERTEXSHADEREXT);
+      EXTMGR_FUNC_INIT(glShaderOp1EXT, GLSHADEROP1EXT);
+      EXTMGR_FUNC_INIT(glShaderOp2EXT, GLSHADEROP2EXT);
+      EXTMGR_FUNC_INIT(glShaderOp3EXT, GLSHADEROP3EXT);
+      EXTMGR_FUNC_INIT(glSwizzleEXT, GLSWIZZLEEXT);
+      EXTMGR_FUNC_INIT(glWriteMaskEXT, GLWRITEMASKEXT);
+      EXTMGR_FUNC_INIT(glInsertComponentEXT, GLINSERTCOMPONENTEXT);
+      EXTMGR_FUNC_INIT(glExtractComponentEXT, GLEXTRACTCOMPONENTEXT);
+      EXTMGR_FUNC_INIT(glGenSymbolsEXT, GLGENSYMBOLSEXT);
+      EXTMGR_FUNC_INIT(glSetInvariantEXT, GLSETINVARIANTEXT);
+      EXTMGR_FUNC_INIT(glSetLocalConstantEXT, GLSETLOCALCONSTANTEXT);
+      EXTMGR_FUNC_INIT(glVariantbvEXT, GLVARIANTBVEXT);
+      EXTMGR_FUNC_INIT(glVariantsvEXT, GLVARIANTSVEXT);
+      EXTMGR_FUNC_INIT(glVariantivEXT, GLVARIANTIVEXT);
+      EXTMGR_FUNC_INIT(glVariantfvEXT, GLVARIANTFVEXT);
+      EXTMGR_FUNC_INIT(glVariantdvEXT, GLVARIANTDVEXT);
+      EXTMGR_FUNC_INIT(glVariantubvEXT, GLVARIANTUBVEXT);
+      EXTMGR_FUNC_INIT(glVariantusvEXT, GLVARIANTUSVEXT);
+      EXTMGR_FUNC_INIT(glVariantuivEXT, GLVARIANTUIVEXT);
+      EXTMGR_FUNC_INIT(glVariantPointerEXT, GLVARIANTPOINTEREXT);
+      EXTMGR_FUNC_INIT(glEnableVariantClientStateEXT, GLENABLEVARIANTCLIENTSTATEEXT);
+      EXTMGR_FUNC_INIT(glDisableVariantClientStateEXT, GLDISABLEVARIANTCLIENTSTATEEXT);
+      EXTMGR_FUNC_INIT(glBindLightParameterEXT, GLBINDLIGHTPARAMETEREXT);
+      EXTMGR_FUNC_INIT(glBindMaterialParameterEXT, GLBINDMATERIALPARAMETEREXT);
+      EXTMGR_FUNC_INIT(glBindTexGenParameterEXT, GLBINDTEXGENPARAMETEREXT);
+      EXTMGR_FUNC_INIT(glBindTextureUnitParameterEXT, GLBINDTEXTUREUNITPARAMETEREXT);
+      EXTMGR_FUNC_INIT(glBindParameterEXT, GLBINDPARAMETEREXT);
+      EXTMGR_FUNC_INIT(glIsVariantEnabledEXT, GLISVARIANTENABLEDEXT);
+      EXTMGR_FUNC_INIT(glGetVariantBooleanvEXT, GLGETVARIANTBOOLEANVEXT);
+      EXTMGR_FUNC_INIT(glGetVariantIntegervEXT, GLGETVARIANTINTEGERVEXT);
+      EXTMGR_FUNC_INIT(glGetVariantFloatvEXT, GLGETVARIANTFLOATVEXT);
+      EXTMGR_FUNC_INIT(glGetVariantPointervEXT, GLGETVARIANTPOINTERVEXT);
+      EXTMGR_FUNC_INIT(glGetInvariantBooleanvEXT, GLGETINVARIANTBOOLEANVEXT);
+      EXTMGR_FUNC_INIT(glGetInvariantIntegervEXT, GLGETINVARIANTINTEGERVEXT);
+      EXTMGR_FUNC_INIT(glGetInvariantFloatvEXT, GLGETINVARIANTFLOATVEXT);
+      EXTMGR_FUNC_INIT(glGetLocalConstantBooleanvEXT, GLGETLOCALCONSTANTBOOLEANVEXT);
+      EXTMGR_FUNC_INIT(glGetLocalConstantIntegervEXT, GLGETLOCALCONSTANTINTEGERVEXT);
+      EXTMGR_FUNC_INIT(glGetLocalConstantFloatvEXT, GLGETLOCALCONSTANTFLOATVEXT);
 
     if (init)
     {
@@ -14389,9 +14147,9 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_EXT_vertex_weighting;
     allclear = true;
-    EXTMGR_FUNC_INIT(glVertexWeightfEXT, GLVERTEXWEIGHTFEXT);
-    EXTMGR_FUNC_INIT(glVertexWeightfvEXT, GLVERTEXWEIGHTFVEXT);
-    EXTMGR_FUNC_INIT(glVertexWeightPointerEXT, GLVERTEXWEIGHTPOINTEREXT);
+      EXTMGR_FUNC_INIT(glVertexWeightfEXT, GLVERTEXWEIGHTFEXT);
+      EXTMGR_FUNC_INIT(glVertexWeightfvEXT, GLVERTEXWEIGHTFVEXT);
+      EXTMGR_FUNC_INIT(glVertexWeightPointerEXT, GLVERTEXWEIGHTPOINTEREXT);
 
     if (init)
     {
@@ -14415,10 +14173,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_HP_occlusion_test)
-    {
-      allclear = true;
+    bool init = CS_GL_HP_occlusion_test;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_HP_occlusion_test)
     }
     else
@@ -14439,10 +14198,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_NV_blend_square)
-    {
-      allclear = true;
+    bool init = CS_GL_NV_blend_square;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_NV_blend_square)
     }
     else
@@ -14463,10 +14223,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_NV_copy_depth_to_color)
-    {
-      allclear = true;
+    bool init = CS_GL_NV_copy_depth_to_color;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_NV_copy_depth_to_color)
     }
     else
@@ -14487,10 +14248,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_NV_depth_clamp)
-    {
-      allclear = true;
+    bool init = CS_GL_NV_depth_clamp;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_NV_depth_clamp)
     }
     else
@@ -14513,15 +14275,15 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_NV_evaluators;
     allclear = true;
-    EXTMGR_FUNC_INIT(glMapControlPointsNV, GLMAPCONTROLPOINTSNV);
-    EXTMGR_FUNC_INIT(glMapParameterivNV, GLMAPPARAMETERIVNV);
-    EXTMGR_FUNC_INIT(glMapParameterfvNV, GLMAPPARAMETERFVNV);
-    EXTMGR_FUNC_INIT(glGetMapControlPointsNV, GLGETMAPCONTROLPOINTSNV);
-    EXTMGR_FUNC_INIT(glGetMapParameterivNV, GLGETMAPPARAMETERIVNV);
-    EXTMGR_FUNC_INIT(glGetMapParameterfvNV, GLGETMAPPARAMETERFVNV);
-    EXTMGR_FUNC_INIT(glGetMapAttribParameterivNV, GLGETMAPATTRIBPARAMETERIVNV);
-    EXTMGR_FUNC_INIT(glGetMapAttribParameterfvNV, GLGETMAPATTRIBPARAMETERFVNV);
-    EXTMGR_FUNC_INIT(glEvalMapsNV, GLEVALMAPSNV);
+      EXTMGR_FUNC_INIT(glMapControlPointsNV, GLMAPCONTROLPOINTSNV);
+      EXTMGR_FUNC_INIT(glMapParameterivNV, GLMAPPARAMETERIVNV);
+      EXTMGR_FUNC_INIT(glMapParameterfvNV, GLMAPPARAMETERFVNV);
+      EXTMGR_FUNC_INIT(glGetMapControlPointsNV, GLGETMAPCONTROLPOINTSNV);
+      EXTMGR_FUNC_INIT(glGetMapParameterivNV, GLGETMAPPARAMETERIVNV);
+      EXTMGR_FUNC_INIT(glGetMapParameterfvNV, GLGETMAPPARAMETERFVNV);
+      EXTMGR_FUNC_INIT(glGetMapAttribParameterivNV, GLGETMAPATTRIBPARAMETERIVNV);
+      EXTMGR_FUNC_INIT(glGetMapAttribParameterfvNV, GLGETMAPATTRIBPARAMETERFVNV);
+      EXTMGR_FUNC_INIT(glEvalMapsNV, GLEVALMAPSNV);
 
     if (init)
     {
@@ -14547,13 +14309,13 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_NV_fence;
     allclear = true;
-    EXTMGR_FUNC_INIT(glGenFencesNV, GLGENFENCESNV);
-    EXTMGR_FUNC_INIT(glDeleteFencesNV, GLDELETEFENCESNV);
-    EXTMGR_FUNC_INIT(glSetFenceNV, GLSETFENCENV);
-    EXTMGR_FUNC_INIT(glTestFenceNV, GLTESTFENCENV);
-    EXTMGR_FUNC_INIT(glFinishFenceNV, GLFINISHFENCENV);
-    EXTMGR_FUNC_INIT(glIsFenceNV, GLISFENCENV);
-    EXTMGR_FUNC_INIT(glGetFenceivNV, GLGETFENCEIVNV);
+      EXTMGR_FUNC_INIT(glGenFencesNV, GLGENFENCESNV);
+      EXTMGR_FUNC_INIT(glDeleteFencesNV, GLDELETEFENCESNV);
+      EXTMGR_FUNC_INIT(glSetFenceNV, GLSETFENCENV);
+      EXTMGR_FUNC_INIT(glTestFenceNV, GLTESTFENCENV);
+      EXTMGR_FUNC_INIT(glFinishFenceNV, GLFINISHFENCENV);
+      EXTMGR_FUNC_INIT(glIsFenceNV, GLISFENCENV);
+      EXTMGR_FUNC_INIT(glGetFenceivNV, GLGETFENCEIVNV);
 
     if (init)
     {
@@ -14577,10 +14339,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_NV_fog_distance)
-    {
-      allclear = true;
+    bool init = CS_GL_NV_fog_distance;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_NV_fog_distance)
     }
     else
@@ -14601,10 +14364,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_NV_light_max_exponent)
-    {
-      allclear = true;
+    bool init = CS_GL_NV_light_max_exponent;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_NV_light_max_exponent)
     }
     else
@@ -14625,10 +14389,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_NV_multisample_filter_hint)
-    {
-      allclear = true;
+    bool init = CS_GL_NV_multisample_filter_hint;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_NV_multisample_filter_hint)
     }
     else
@@ -14651,13 +14416,13 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_NV_occlusion_query;
     allclear = true;
-    EXTMGR_FUNC_INIT(glGenOcclusionQueriesNV, GLGENOCCLUSIONQUERIESNV);
-    EXTMGR_FUNC_INIT(glDeleteOcclusionQueriesNV, GLDELETEOCCLUSIONQUERIESNV);
-    EXTMGR_FUNC_INIT(glIsOcclusionQueryNV, GLISOCCLUSIONQUERYNV);
-    EXTMGR_FUNC_INIT(glBeginOcclusionQueryNV, GLBEGINOCCLUSIONQUERYNV);
-    EXTMGR_FUNC_INIT(glEndOcclusionQueryNV, GLENDOCCLUSIONQUERYNV);
-    EXTMGR_FUNC_INIT(glGetOcclusionQueryivNV, GLGETOCCLUSIONQUERYIVNV);
-    EXTMGR_FUNC_INIT(glGetOcclusionQueryuivNV, GLGETOCCLUSIONQUERYUIVNV);
+      EXTMGR_FUNC_INIT(glGenOcclusionQueriesNV, GLGENOCCLUSIONQUERIESNV);
+      EXTMGR_FUNC_INIT(glDeleteOcclusionQueriesNV, GLDELETEOCCLUSIONQUERIESNV);
+      EXTMGR_FUNC_INIT(glIsOcclusionQueryNV, GLISOCCLUSIONQUERYNV);
+      EXTMGR_FUNC_INIT(glBeginOcclusionQueryNV, GLBEGINOCCLUSIONQUERYNV);
+      EXTMGR_FUNC_INIT(glEndOcclusionQueryNV, GLENDOCCLUSIONQUERYNV);
+      EXTMGR_FUNC_INIT(glGetOcclusionQueryivNV, GLGETOCCLUSIONQUERYIVNV);
+      EXTMGR_FUNC_INIT(glGetOcclusionQueryuivNV, GLGETOCCLUSIONQUERYUIVNV);
 
     if (init)
     {
@@ -14681,10 +14446,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_NV_packed_depth_stencil)
-    {
-      allclear = true;
+    bool init = CS_GL_NV_packed_depth_stencil;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_NV_packed_depth_stencil)
     }
     else
@@ -14707,8 +14473,8 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_NV_point_sprite;
     allclear = true;
-    EXTMGR_FUNC_INIT(glPointParameteriNV, GLPOINTPARAMETERINV);
-    EXTMGR_FUNC_INIT(glPointParameterivNV, GLPOINTPARAMETERIVNV);
+      EXTMGR_FUNC_INIT(glPointParameteriNV, GLPOINTPARAMETERINV);
+      EXTMGR_FUNC_INIT(glPointParameterivNV, GLPOINTPARAMETERIVNV);
 
     if (init)
     {
@@ -14734,19 +14500,19 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_NV_register_combiners;
     allclear = true;
-    EXTMGR_FUNC_INIT(glCombinerParameterfvNV, GLCOMBINERPARAMETERFVNV);
-    EXTMGR_FUNC_INIT(glCombinerParameterivNV, GLCOMBINERPARAMETERIVNV);
-    EXTMGR_FUNC_INIT(glCombinerParameterfNV, GLCOMBINERPARAMETERFNV);
-    EXTMGR_FUNC_INIT(glCombinerParameteriNV, GLCOMBINERPARAMETERINV);
-    EXTMGR_FUNC_INIT(glCombinerInputNV, GLCOMBINERINPUTNV);
-    EXTMGR_FUNC_INIT(glCombinerOutputNV, GLCOMBINEROUTPUTNV);
-    EXTMGR_FUNC_INIT(glFinalCombinerInputNV, GLFINALCOMBINERINPUTNV);
-    EXTMGR_FUNC_INIT(glGetCombinerInputParameterfvNV, GLGETCOMBINERINPUTPARAMETERFVNV);
-    EXTMGR_FUNC_INIT(glGetCombinerInputParameterivNV, GLGETCOMBINERINPUTPARAMETERIVNV);
-    EXTMGR_FUNC_INIT(glGetCombinerOutputParameterfvNV, GLGETCOMBINEROUTPUTPARAMETERFVNV);
-    EXTMGR_FUNC_INIT(glGetCombinerOutputParameterivNV, GLGETCOMBINEROUTPUTPARAMETERIVNV);
-    EXTMGR_FUNC_INIT(glGetFinalCombinerInputParameterfvNV, GLGETFINALCOMBINERINPUTPARAMETERFVNV);
-    EXTMGR_FUNC_INIT(glGetFinalCombinerInputParameterivNV, GLGETFINALCOMBINERINPUTPARAMETERIVNV);
+      EXTMGR_FUNC_INIT(glCombinerParameterfvNV, GLCOMBINERPARAMETERFVNV);
+      EXTMGR_FUNC_INIT(glCombinerParameterivNV, GLCOMBINERPARAMETERIVNV);
+      EXTMGR_FUNC_INIT(glCombinerParameterfNV, GLCOMBINERPARAMETERFNV);
+      EXTMGR_FUNC_INIT(glCombinerParameteriNV, GLCOMBINERPARAMETERINV);
+      EXTMGR_FUNC_INIT(glCombinerInputNV, GLCOMBINERINPUTNV);
+      EXTMGR_FUNC_INIT(glCombinerOutputNV, GLCOMBINEROUTPUTNV);
+      EXTMGR_FUNC_INIT(glFinalCombinerInputNV, GLFINALCOMBINERINPUTNV);
+      EXTMGR_FUNC_INIT(glGetCombinerInputParameterfvNV, GLGETCOMBINERINPUTPARAMETERFVNV);
+      EXTMGR_FUNC_INIT(glGetCombinerInputParameterivNV, GLGETCOMBINERINPUTPARAMETERIVNV);
+      EXTMGR_FUNC_INIT(glGetCombinerOutputParameterfvNV, GLGETCOMBINEROUTPUTPARAMETERFVNV);
+      EXTMGR_FUNC_INIT(glGetCombinerOutputParameterivNV, GLGETCOMBINEROUTPUTPARAMETERIVNV);
+      EXTMGR_FUNC_INIT(glGetFinalCombinerInputParameterfvNV, GLGETFINALCOMBINERINPUTPARAMETERFVNV);
+      EXTMGR_FUNC_INIT(glGetFinalCombinerInputParameterivNV, GLGETFINALCOMBINERINPUTPARAMETERIVNV);
 
     if (init)
     {
@@ -14772,8 +14538,8 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_NV_register_combiners2;
     allclear = true;
-    EXTMGR_FUNC_INIT(glCombinerStageParameterfvNV, GLCOMBINERSTAGEPARAMETERFVNV);
-    EXTMGR_FUNC_INIT(glGetCombinerStageParameterfvNV, GLGETCOMBINERSTAGEPARAMETERFVNV);
+      EXTMGR_FUNC_INIT(glCombinerStageParameterfvNV, GLCOMBINERSTAGEPARAMETERFVNV);
+      EXTMGR_FUNC_INIT(glGetCombinerStageParameterfvNV, GLGETCOMBINERSTAGEPARAMETERFVNV);
 
     if (init)
     {
@@ -14797,10 +14563,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_NV_texgen_emboss)
-    {
-      allclear = true;
+    bool init = CS_GL_NV_texgen_emboss;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_NV_texgen_emboss)
     }
     else
@@ -14821,10 +14588,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_NV_texgen_reflection)
-    {
-      allclear = true;
+    bool init = CS_GL_NV_texgen_reflection;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_NV_texgen_reflection)
     }
     else
@@ -14845,10 +14613,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_NV_texture_compression_vtc)
-    {
-      allclear = true;
+    bool init = CS_GL_NV_texture_compression_vtc;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_NV_texture_compression_vtc)
     }
     else
@@ -14869,10 +14638,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_NV_texture_env_combine4)
-    {
-      allclear = true;
+    bool init = CS_GL_NV_texture_env_combine4;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_NV_texture_env_combine4)
     }
     else
@@ -14893,10 +14663,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_NV_texture_rectangle)
-    {
-      allclear = true;
+    bool init = CS_GL_NV_texture_rectangle;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_NV_texture_rectangle)
     }
     else
@@ -14917,10 +14688,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_NV_texture_shader)
-    {
-      allclear = true;
+    bool init = CS_GL_NV_texture_shader;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_NV_texture_shader)
     }
     else
@@ -14941,10 +14713,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_NV_texture_shader2)
-    {
-      allclear = true;
+    bool init = CS_GL_NV_texture_shader2;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_NV_texture_shader2)
     }
     else
@@ -14965,10 +14738,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_NV_texture_shader3)
-    {
-      allclear = true;
+    bool init = CS_GL_NV_texture_shader3;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_NV_texture_shader3)
     }
     else
@@ -14991,10 +14765,10 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_NV_vertex_array_range;
     allclear = true;
-    EXTMGR_FUNC_INIT(glVertexArrayRangeNV, GLVERTEXARRAYRANGENV);
-    EXTMGR_FUNC_INIT(glFlushVertexArrayRangeNV, GLFLUSHVERTEXARRAYRANGENV);
-    EXTMGR_FUNC_INIT(wglAllocateMemoryNV, WGLALLOCATEMEMORYNV);
-    EXTMGR_FUNC_INIT(wglFreeMemoryNV, WGLFREEMEMORYNV);
+      EXTMGR_FUNC_INIT(glVertexArrayRangeNV, GLVERTEXARRAYRANGENV);
+      EXTMGR_FUNC_INIT(glFlushVertexArrayRangeNV, GLFLUSHVERTEXARRAYRANGENV);
+      EXTMGR_FUNC_INIT(wglAllocateMemoryNV, WGLALLOCATEMEMORYNV);
+      EXTMGR_FUNC_INIT(wglFreeMemoryNV, WGLFREEMEMORYNV);
 
     if (init)
     {
@@ -15018,10 +14792,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_NV_vertex_array_range2)
-    {
-      allclear = true;
+    bool init = CS_GL_NV_vertex_array_range2;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_NV_vertex_array_range2)
     }
     else
@@ -15044,68 +14819,68 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_NV_vertex_program;
     allclear = true;
-    EXTMGR_FUNC_INIT(glBindProgramNV, GLBINDPROGRAMNV);
-    EXTMGR_FUNC_INIT(glDeleteProgramsNV, GLDELETEPROGRAMSNV);
-    EXTMGR_FUNC_INIT(glExecuteProgramNV, GLEXECUTEPROGRAMNV);
-    EXTMGR_FUNC_INIT(glGenProgramsNV, GLGENPROGRAMSNV);
-    EXTMGR_FUNC_INIT(glAreProgramsResidentNV, GLAREPROGRAMSRESIDENTNV);
-    EXTMGR_FUNC_INIT(glRequestResidentProgramsNV, GLREQUESTRESIDENTPROGRAMSNV);
-    EXTMGR_FUNC_INIT(glGetProgramParameterfvNV, GLGETPROGRAMPARAMETERFVNV);
-    EXTMGR_FUNC_INIT(glGetProgramParameterdvNV, GLGETPROGRAMPARAMETERDVNV);
-    EXTMGR_FUNC_INIT(glGetProgramivNV, GLGETPROGRAMIVNV);
-    EXTMGR_FUNC_INIT(glGetProgramStringNV, GLGETPROGRAMSTRINGNV);
-    EXTMGR_FUNC_INIT(glGetTrackMatrixivNV, GLGETTRACKMATRIXIVNV);
-    EXTMGR_FUNC_INIT(glGetVertexAttribdvNV, GLGETVERTEXATTRIBDVNV);
-    EXTMGR_FUNC_INIT(glGetVertexAttribfvNV, GLGETVERTEXATTRIBFVNV);
-    EXTMGR_FUNC_INIT(glGetVertexAttribivNV, GLGETVERTEXATTRIBIVNV);
-    EXTMGR_FUNC_INIT(glGetVertexAttribPointervNV, GLGETVERTEXATTRIBPOINTERVNV);
-    EXTMGR_FUNC_INIT(glIsProgramNV, GLISPROGRAMNV);
-    EXTMGR_FUNC_INIT(glLoadProgramNV, GLLOADPROGRAMNV);
-    EXTMGR_FUNC_INIT(glProgramParameter4fNV, GLPROGRAMPARAMETER4FNV);
-    EXTMGR_FUNC_INIT(glProgramParameter4fvNV, GLPROGRAMPARAMETER4FVNV);
-    EXTMGR_FUNC_INIT(glProgramParameters4dvNV, GLPROGRAMPARAMETERS4DVNV);
-    EXTMGR_FUNC_INIT(glProgramParameters4fvNV, GLPROGRAMPARAMETERS4FVNV);
-    EXTMGR_FUNC_INIT(glTrackMatrixNV, GLTRACKMATRIXNV);
-    EXTMGR_FUNC_INIT(glVertexAttribPointerNV, GLVERTEXATTRIBPOINTERNV);
-    EXTMGR_FUNC_INIT(glVertexAttrib1sNV, GLVERTEXATTRIB1SNV);
-    EXTMGR_FUNC_INIT(glVertexAttrib1fNV, GLVERTEXATTRIB1FNV);
-    EXTMGR_FUNC_INIT(glVertexAttrib1dNV, GLVERTEXATTRIB1DNV);
-    EXTMGR_FUNC_INIT(glVertexAttrib2sNV, GLVERTEXATTRIB2SNV);
-    EXTMGR_FUNC_INIT(glVertexAttrib2fNV, GLVERTEXATTRIB2FNV);
-    EXTMGR_FUNC_INIT(glVertexAttrib2dNV, GLVERTEXATTRIB2DNV);
-    EXTMGR_FUNC_INIT(glVertexAttrib3sNV, GLVERTEXATTRIB3SNV);
-    EXTMGR_FUNC_INIT(glVertexAttrib3fNV, GLVERTEXATTRIB3FNV);
-    EXTMGR_FUNC_INIT(glVertexAttrib3dNV, GLVERTEXATTRIB3DNV);
-    EXTMGR_FUNC_INIT(glVertexAttrib4sNV, GLVERTEXATTRIB4SNV);
-    EXTMGR_FUNC_INIT(glVertexAttrib4fNV, GLVERTEXATTRIB4FNV);
-    EXTMGR_FUNC_INIT(glVertexAttrib4dNV, GLVERTEXATTRIB4DNV);
-    EXTMGR_FUNC_INIT(glVertexAttrib4ubNV, GLVERTEXATTRIB4UBNV);
-    EXTMGR_FUNC_INIT(glVertexAttrib1svNV, GLVERTEXATTRIB1SVNV);
-    EXTMGR_FUNC_INIT(glVertexAttrib1fvNV, GLVERTEXATTRIB1FVNV);
-    EXTMGR_FUNC_INIT(glVertexAttrib1dvNV, GLVERTEXATTRIB1DVNV);
-    EXTMGR_FUNC_INIT(glVertexAttrib2svNV, GLVERTEXATTRIB2SVNV);
-    EXTMGR_FUNC_INIT(glVertexAttrib2fvNV, GLVERTEXATTRIB2FVNV);
-    EXTMGR_FUNC_INIT(glVertexAttrib2dvNV, GLVERTEXATTRIB2DVNV);
-    EXTMGR_FUNC_INIT(glVertexAttrib3svNV, GLVERTEXATTRIB3SVNV);
-    EXTMGR_FUNC_INIT(glVertexAttrib3fvNV, GLVERTEXATTRIB3FVNV);
-    EXTMGR_FUNC_INIT(glVertexAttrib3dvNV, GLVERTEXATTRIB3DVNV);
-    EXTMGR_FUNC_INIT(glVertexAttrib4svNV, GLVERTEXATTRIB4SVNV);
-    EXTMGR_FUNC_INIT(glVertexAttrib4fvNV, GLVERTEXATTRIB4FVNV);
-    EXTMGR_FUNC_INIT(glVertexAttrib4dvNV, GLVERTEXATTRIB4DVNV);
-    EXTMGR_FUNC_INIT(glVertexAttrib4ubvNV, GLVERTEXATTRIB4UBVNV);
-    EXTMGR_FUNC_INIT(glVertexAttribs1svNV, GLVERTEXATTRIBS1SVNV);
-    EXTMGR_FUNC_INIT(glVertexAttribs1fvNV, GLVERTEXATTRIBS1FVNV);
-    EXTMGR_FUNC_INIT(glVertexAttribs1dvNV, GLVERTEXATTRIBS1DVNV);
-    EXTMGR_FUNC_INIT(glVertexAttribs2svNV, GLVERTEXATTRIBS2SVNV);
-    EXTMGR_FUNC_INIT(glVertexAttribs2fvNV, GLVERTEXATTRIBS2FVNV);
-    EXTMGR_FUNC_INIT(glVertexAttribs2dvNV, GLVERTEXATTRIBS2DVNV);
-    EXTMGR_FUNC_INIT(glVertexAttribs3svNV, GLVERTEXATTRIBS3SVNV);
-    EXTMGR_FUNC_INIT(glVertexAttribs3fvNV, GLVERTEXATTRIBS3FVNV);
-    EXTMGR_FUNC_INIT(glVertexAttribs3dvNV, GLVERTEXATTRIBS3DVNV);
-    EXTMGR_FUNC_INIT(glVertexAttribs4svNV, GLVERTEXATTRIBS4SVNV);
-    EXTMGR_FUNC_INIT(glVertexAttribs4fvNV, GLVERTEXATTRIBS4FVNV);
-    EXTMGR_FUNC_INIT(glVertexAttribs4dvNV, GLVERTEXATTRIBS4DVNV);
-    EXTMGR_FUNC_INIT(glVertexAttribs4ubvNV, GLVERTEXATTRIBS4UBVNV);
+      EXTMGR_FUNC_INIT(glBindProgramNV, GLBINDPROGRAMNV);
+      EXTMGR_FUNC_INIT(glDeleteProgramsNV, GLDELETEPROGRAMSNV);
+      EXTMGR_FUNC_INIT(glExecuteProgramNV, GLEXECUTEPROGRAMNV);
+      EXTMGR_FUNC_INIT(glGenProgramsNV, GLGENPROGRAMSNV);
+      EXTMGR_FUNC_INIT(glAreProgramsResidentNV, GLAREPROGRAMSRESIDENTNV);
+      EXTMGR_FUNC_INIT(glRequestResidentProgramsNV, GLREQUESTRESIDENTPROGRAMSNV);
+      EXTMGR_FUNC_INIT(glGetProgramParameterfvNV, GLGETPROGRAMPARAMETERFVNV);
+      EXTMGR_FUNC_INIT(glGetProgramParameterdvNV, GLGETPROGRAMPARAMETERDVNV);
+      EXTMGR_FUNC_INIT(glGetProgramivNV, GLGETPROGRAMIVNV);
+      EXTMGR_FUNC_INIT(glGetProgramStringNV, GLGETPROGRAMSTRINGNV);
+      EXTMGR_FUNC_INIT(glGetTrackMatrixivNV, GLGETTRACKMATRIXIVNV);
+      EXTMGR_FUNC_INIT(glGetVertexAttribdvNV, GLGETVERTEXATTRIBDVNV);
+      EXTMGR_FUNC_INIT(glGetVertexAttribfvNV, GLGETVERTEXATTRIBFVNV);
+      EXTMGR_FUNC_INIT(glGetVertexAttribivNV, GLGETVERTEXATTRIBIVNV);
+      EXTMGR_FUNC_INIT(glGetVertexAttribPointervNV, GLGETVERTEXATTRIBPOINTERVNV);
+      EXTMGR_FUNC_INIT(glIsProgramNV, GLISPROGRAMNV);
+      EXTMGR_FUNC_INIT(glLoadProgramNV, GLLOADPROGRAMNV);
+      EXTMGR_FUNC_INIT(glProgramParameter4fNV, GLPROGRAMPARAMETER4FNV);
+      EXTMGR_FUNC_INIT(glProgramParameter4fvNV, GLPROGRAMPARAMETER4FVNV);
+      EXTMGR_FUNC_INIT(glProgramParameters4dvNV, GLPROGRAMPARAMETERS4DVNV);
+      EXTMGR_FUNC_INIT(glProgramParameters4fvNV, GLPROGRAMPARAMETERS4FVNV);
+      EXTMGR_FUNC_INIT(glTrackMatrixNV, GLTRACKMATRIXNV);
+      EXTMGR_FUNC_INIT(glVertexAttribPointerNV, GLVERTEXATTRIBPOINTERNV);
+      EXTMGR_FUNC_INIT(glVertexAttrib1sNV, GLVERTEXATTRIB1SNV);
+      EXTMGR_FUNC_INIT(glVertexAttrib1fNV, GLVERTEXATTRIB1FNV);
+      EXTMGR_FUNC_INIT(glVertexAttrib1dNV, GLVERTEXATTRIB1DNV);
+      EXTMGR_FUNC_INIT(glVertexAttrib2sNV, GLVERTEXATTRIB2SNV);
+      EXTMGR_FUNC_INIT(glVertexAttrib2fNV, GLVERTEXATTRIB2FNV);
+      EXTMGR_FUNC_INIT(glVertexAttrib2dNV, GLVERTEXATTRIB2DNV);
+      EXTMGR_FUNC_INIT(glVertexAttrib3sNV, GLVERTEXATTRIB3SNV);
+      EXTMGR_FUNC_INIT(glVertexAttrib3fNV, GLVERTEXATTRIB3FNV);
+      EXTMGR_FUNC_INIT(glVertexAttrib3dNV, GLVERTEXATTRIB3DNV);
+      EXTMGR_FUNC_INIT(glVertexAttrib4sNV, GLVERTEXATTRIB4SNV);
+      EXTMGR_FUNC_INIT(glVertexAttrib4fNV, GLVERTEXATTRIB4FNV);
+      EXTMGR_FUNC_INIT(glVertexAttrib4dNV, GLVERTEXATTRIB4DNV);
+      EXTMGR_FUNC_INIT(glVertexAttrib4ubNV, GLVERTEXATTRIB4UBNV);
+      EXTMGR_FUNC_INIT(glVertexAttrib1svNV, GLVERTEXATTRIB1SVNV);
+      EXTMGR_FUNC_INIT(glVertexAttrib1fvNV, GLVERTEXATTRIB1FVNV);
+      EXTMGR_FUNC_INIT(glVertexAttrib1dvNV, GLVERTEXATTRIB1DVNV);
+      EXTMGR_FUNC_INIT(glVertexAttrib2svNV, GLVERTEXATTRIB2SVNV);
+      EXTMGR_FUNC_INIT(glVertexAttrib2fvNV, GLVERTEXATTRIB2FVNV);
+      EXTMGR_FUNC_INIT(glVertexAttrib2dvNV, GLVERTEXATTRIB2DVNV);
+      EXTMGR_FUNC_INIT(glVertexAttrib3svNV, GLVERTEXATTRIB3SVNV);
+      EXTMGR_FUNC_INIT(glVertexAttrib3fvNV, GLVERTEXATTRIB3FVNV);
+      EXTMGR_FUNC_INIT(glVertexAttrib3dvNV, GLVERTEXATTRIB3DVNV);
+      EXTMGR_FUNC_INIT(glVertexAttrib4svNV, GLVERTEXATTRIB4SVNV);
+      EXTMGR_FUNC_INIT(glVertexAttrib4fvNV, GLVERTEXATTRIB4FVNV);
+      EXTMGR_FUNC_INIT(glVertexAttrib4dvNV, GLVERTEXATTRIB4DVNV);
+      EXTMGR_FUNC_INIT(glVertexAttrib4ubvNV, GLVERTEXATTRIB4UBVNV);
+      EXTMGR_FUNC_INIT(glVertexAttribs1svNV, GLVERTEXATTRIBS1SVNV);
+      EXTMGR_FUNC_INIT(glVertexAttribs1fvNV, GLVERTEXATTRIBS1FVNV);
+      EXTMGR_FUNC_INIT(glVertexAttribs1dvNV, GLVERTEXATTRIBS1DVNV);
+      EXTMGR_FUNC_INIT(glVertexAttribs2svNV, GLVERTEXATTRIBS2SVNV);
+      EXTMGR_FUNC_INIT(glVertexAttribs2fvNV, GLVERTEXATTRIBS2FVNV);
+      EXTMGR_FUNC_INIT(glVertexAttribs2dvNV, GLVERTEXATTRIBS2DVNV);
+      EXTMGR_FUNC_INIT(glVertexAttribs3svNV, GLVERTEXATTRIBS3SVNV);
+      EXTMGR_FUNC_INIT(glVertexAttribs3fvNV, GLVERTEXATTRIBS3FVNV);
+      EXTMGR_FUNC_INIT(glVertexAttribs3dvNV, GLVERTEXATTRIBS3DVNV);
+      EXTMGR_FUNC_INIT(glVertexAttribs4svNV, GLVERTEXATTRIBS4SVNV);
+      EXTMGR_FUNC_INIT(glVertexAttribs4fvNV, GLVERTEXATTRIBS4FVNV);
+      EXTMGR_FUNC_INIT(glVertexAttribs4dvNV, GLVERTEXATTRIBS4DVNV);
+      EXTMGR_FUNC_INIT(glVertexAttribs4ubvNV, GLVERTEXATTRIBS4UBVNV);
 
     if (init)
     {
@@ -15129,10 +14904,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_NV_vertex_program1_1)
-    {
-      allclear = true;
+    bool init = CS_GL_NV_vertex_program1_1;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_NV_vertex_program1_1)
     }
     else
@@ -15155,9 +14931,9 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_ATI_element_array;
     allclear = true;
-    EXTMGR_FUNC_INIT(glElementPointerATI, GLELEMENTPOINTERATI);
-    EXTMGR_FUNC_INIT(glDrawElementArrayATI, GLDRAWELEMENTARRAYATI);
-    EXTMGR_FUNC_INIT(glDrawRangeElementArrayATI, GLDRAWRANGEELEMENTARRAYATI);
+      EXTMGR_FUNC_INIT(glElementPointerATI, GLELEMENTPOINTERATI);
+      EXTMGR_FUNC_INIT(glDrawElementArrayATI, GLDRAWELEMENTARRAYATI);
+      EXTMGR_FUNC_INIT(glDrawRangeElementArrayATI, GLDRAWRANGEELEMENTARRAYATI);
 
     if (init)
     {
@@ -15183,10 +14959,10 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_ATI_envmap_bumpmap;
     allclear = true;
-    EXTMGR_FUNC_INIT(glTexBumpParameterivATI, GLTEXBUMPPARAMETERIVATI);
-    EXTMGR_FUNC_INIT(glTexBumpParameterfvATI, GLTEXBUMPPARAMETERFVATI);
-    EXTMGR_FUNC_INIT(glGetTexBumpParameterivATI, GLGETTEXBUMPPARAMETERIVATI);
-    EXTMGR_FUNC_INIT(glGetTexBumpParameterfvATI, GLGETTEXBUMPPARAMETERFVATI);
+      EXTMGR_FUNC_INIT(glTexBumpParameterivATI, GLTEXBUMPPARAMETERIVATI);
+      EXTMGR_FUNC_INIT(glTexBumpParameterfvATI, GLTEXBUMPPARAMETERFVATI);
+      EXTMGR_FUNC_INIT(glGetTexBumpParameterivATI, GLGETTEXBUMPPARAMETERIVATI);
+      EXTMGR_FUNC_INIT(glGetTexBumpParameterfvATI, GLGETTEXBUMPPARAMETERFVATI);
 
     if (init)
     {
@@ -15212,20 +14988,20 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_ATI_fragment_shader;
     allclear = true;
-    EXTMGR_FUNC_INIT(glGenFragmentShadersATI, GLGENFRAGMENTSHADERSATI);
-    EXTMGR_FUNC_INIT(glBindFragmentShaderATI, GLBINDFRAGMENTSHADERATI);
-    EXTMGR_FUNC_INIT(glDeleteFragmentShaderATI, GLDELETEFRAGMENTSHADERATI);
-    EXTMGR_FUNC_INIT(glBeginFragmentShaderATI, GLBEGINFRAGMENTSHADERATI);
-    EXTMGR_FUNC_INIT(glEndFragmentShaderATI, GLENDFRAGMENTSHADERATI);
-    EXTMGR_FUNC_INIT(glPassTexCoordATI, GLPASSTEXCOORDATI);
-    EXTMGR_FUNC_INIT(glSampleMapATI, GLSAMPLEMAPATI);
-    EXTMGR_FUNC_INIT(glColorFragmentOp1ATI, GLCOLORFRAGMENTOP1ATI);
-    EXTMGR_FUNC_INIT(glColorFragmentOp2ATI, GLCOLORFRAGMENTOP2ATI);
-    EXTMGR_FUNC_INIT(glColorFragmentOp3ATI, GLCOLORFRAGMENTOP3ATI);
-    EXTMGR_FUNC_INIT(glAlphaFragmentOp1ATI, GLALPHAFRAGMENTOP1ATI);
-    EXTMGR_FUNC_INIT(glAlphaFragmentOp2ATI, GLALPHAFRAGMENTOP2ATI);
-    EXTMGR_FUNC_INIT(glAlphaFragmentOp3ATI, GLALPHAFRAGMENTOP3ATI);
-    EXTMGR_FUNC_INIT(glSetFragmentShaderConstantATI, GLSETFRAGMENTSHADERCONSTANTATI);
+      EXTMGR_FUNC_INIT(glGenFragmentShadersATI, GLGENFRAGMENTSHADERSATI);
+      EXTMGR_FUNC_INIT(glBindFragmentShaderATI, GLBINDFRAGMENTSHADERATI);
+      EXTMGR_FUNC_INIT(glDeleteFragmentShaderATI, GLDELETEFRAGMENTSHADERATI);
+      EXTMGR_FUNC_INIT(glBeginFragmentShaderATI, GLBEGINFRAGMENTSHADERATI);
+      EXTMGR_FUNC_INIT(glEndFragmentShaderATI, GLENDFRAGMENTSHADERATI);
+      EXTMGR_FUNC_INIT(glPassTexCoordATI, GLPASSTEXCOORDATI);
+      EXTMGR_FUNC_INIT(glSampleMapATI, GLSAMPLEMAPATI);
+      EXTMGR_FUNC_INIT(glColorFragmentOp1ATI, GLCOLORFRAGMENTOP1ATI);
+      EXTMGR_FUNC_INIT(glColorFragmentOp2ATI, GLCOLORFRAGMENTOP2ATI);
+      EXTMGR_FUNC_INIT(glColorFragmentOp3ATI, GLCOLORFRAGMENTOP3ATI);
+      EXTMGR_FUNC_INIT(glAlphaFragmentOp1ATI, GLALPHAFRAGMENTOP1ATI);
+      EXTMGR_FUNC_INIT(glAlphaFragmentOp2ATI, GLALPHAFRAGMENTOP2ATI);
+      EXTMGR_FUNC_INIT(glAlphaFragmentOp3ATI, GLALPHAFRAGMENTOP3ATI);
+      EXTMGR_FUNC_INIT(glSetFragmentShaderConstantATI, GLSETFRAGMENTSHADERCONSTANTATI);
 
     if (init)
     {
@@ -15251,8 +15027,8 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_ATI_pn_triangles;
     allclear = true;
-    EXTMGR_FUNC_INIT(glPNTrianglesiATI, GLPNTRIANGLESIATI);
-    EXTMGR_FUNC_INIT(glPNTrianglesfATI, GLPNTRIANGLESFATI);
+      EXTMGR_FUNC_INIT(glPNTrianglesiATI, GLPNTRIANGLESIATI);
+      EXTMGR_FUNC_INIT(glPNTrianglesfATI, GLPNTRIANGLESFATI);
 
     if (init)
     {
@@ -15276,10 +15052,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_ATI_texture_mirror_once)
-    {
-      allclear = true;
+    bool init = CS_GL_ATI_texture_mirror_once;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ATI_texture_mirror_once)
     }
     else
@@ -15302,18 +15079,18 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_ATI_vertex_array_object;
     allclear = true;
-    EXTMGR_FUNC_INIT(glNewObjectBufferATI, GLNEWOBJECTBUFFERATI);
-    EXTMGR_FUNC_INIT(glIsObjectBufferATI, GLISOBJECTBUFFERATI);
-    EXTMGR_FUNC_INIT(glUpdateObjectBufferATI, GLUPDATEOBJECTBUFFERATI);
-    EXTMGR_FUNC_INIT(glGetObjectBufferfvATI, GLGETOBJECTBUFFERFVATI);
-    EXTMGR_FUNC_INIT(glGetObjectBufferivATI, GLGETOBJECTBUFFERIVATI);
-    EXTMGR_FUNC_INIT(glFreeObjectBufferATI, GLFREEOBJECTBUFFERATI);
-    EXTMGR_FUNC_INIT(glArrayObjectATI, GLARRAYOBJECTATI);
-    EXTMGR_FUNC_INIT(glGetArrayObjectfvATI, GLGETARRAYOBJECTFVATI);
-    EXTMGR_FUNC_INIT(glGetArrayObjectivATI, GLGETARRAYOBJECTIVATI);
-    EXTMGR_FUNC_INIT(glVariantArrayObjectATI, GLVARIANTARRAYOBJECTATI);
-    EXTMGR_FUNC_INIT(glGetVariantArrayObjectfvATI, GLGETVARIANTARRAYOBJECTFVATI);
-    EXTMGR_FUNC_INIT(glGetVariantArrayObjectivATI, GLGETVARIANTARRAYOBJECTIVATI);
+      EXTMGR_FUNC_INIT(glNewObjectBufferATI, GLNEWOBJECTBUFFERATI);
+      EXTMGR_FUNC_INIT(glIsObjectBufferATI, GLISOBJECTBUFFERATI);
+      EXTMGR_FUNC_INIT(glUpdateObjectBufferATI, GLUPDATEOBJECTBUFFERATI);
+      EXTMGR_FUNC_INIT(glGetObjectBufferfvATI, GLGETOBJECTBUFFERFVATI);
+      EXTMGR_FUNC_INIT(glGetObjectBufferivATI, GLGETOBJECTBUFFERIVATI);
+      EXTMGR_FUNC_INIT(glFreeObjectBufferATI, GLFREEOBJECTBUFFERATI);
+      EXTMGR_FUNC_INIT(glArrayObjectATI, GLARRAYOBJECTATI);
+      EXTMGR_FUNC_INIT(glGetArrayObjectfvATI, GLGETARRAYOBJECTFVATI);
+      EXTMGR_FUNC_INIT(glGetArrayObjectivATI, GLGETARRAYOBJECTIVATI);
+      EXTMGR_FUNC_INIT(glVariantArrayObjectATI, GLVARIANTARRAYOBJECTATI);
+      EXTMGR_FUNC_INIT(glGetVariantArrayObjectfvATI, GLGETVARIANTARRAYOBJECTFVATI);
+      EXTMGR_FUNC_INIT(glGetVariantArrayObjectivATI, GLGETVARIANTARRAYOBJECTIVATI);
 
     if (init)
     {
@@ -15339,9 +15116,9 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_ATI_vertex_attrib_array_object;
     allclear = true;
-    EXTMGR_FUNC_INIT(glVertexAttribArrayObjectATI, GLVERTEXATTRIBARRAYOBJECTATI);
-    EXTMGR_FUNC_INIT(glGetVertexAttribArrayObjectfvATI, GLGETVERTEXATTRIBARRAYOBJECTFVATI);
-    EXTMGR_FUNC_INIT(glGetVertexAttribArrayObjectivATI, GLGETVERTEXATTRIBARRAYOBJECTIVATI);
+      EXTMGR_FUNC_INIT(glVertexAttribArrayObjectATI, GLVERTEXATTRIBARRAYOBJECTATI);
+      EXTMGR_FUNC_INIT(glGetVertexAttribArrayObjectfvATI, GLGETVERTEXATTRIBARRAYOBJECTFVATI);
+      EXTMGR_FUNC_INIT(glGetVertexAttribArrayObjectivATI, GLGETVERTEXATTRIBARRAYOBJECTIVATI);
 
     if (init)
     {
@@ -15367,51 +15144,51 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_ATI_vertex_streams;
     allclear = true;
-    EXTMGR_FUNC_INIT(glVertexStream1s, GLVERTEXSTREAM1S);
-    EXTMGR_FUNC_INIT(glVertexStream1i, GLVERTEXSTREAM1I);
-    EXTMGR_FUNC_INIT(glVertexStream1f, GLVERTEXSTREAM1F);
-    EXTMGR_FUNC_INIT(glVertexStream1d, GLVERTEXSTREAM1D);
-    EXTMGR_FUNC_INIT(glVertexStream1sv, GLVERTEXSTREAM1SV);
-    EXTMGR_FUNC_INIT(glVertexStream1iv, GLVERTEXSTREAM1IV);
-    EXTMGR_FUNC_INIT(glVertexStream1fv, GLVERTEXSTREAM1FV);
-    EXTMGR_FUNC_INIT(glVertexStream1dv, GLVERTEXSTREAM1DV);
-    EXTMGR_FUNC_INIT(glVertexStream2s, GLVERTEXSTREAM2S);
-    EXTMGR_FUNC_INIT(glVertexStream2i, GLVERTEXSTREAM2I);
-    EXTMGR_FUNC_INIT(glVertexStream2f, GLVERTEXSTREAM2F);
-    EXTMGR_FUNC_INIT(glVertexStream2d, GLVERTEXSTREAM2D);
-    EXTMGR_FUNC_INIT(glVertexStream2sv, GLVERTEXSTREAM2SV);
-    EXTMGR_FUNC_INIT(glVertexStream2iv, GLVERTEXSTREAM2IV);
-    EXTMGR_FUNC_INIT(glVertexStream2fv, GLVERTEXSTREAM2FV);
-    EXTMGR_FUNC_INIT(glVertexStream2dv, GLVERTEXSTREAM2DV);
-    EXTMGR_FUNC_INIT(glVertexStream3s, GLVERTEXSTREAM3S);
-    EXTMGR_FUNC_INIT(glVertexStream3i, GLVERTEXSTREAM3I);
-    EXTMGR_FUNC_INIT(glVertexStream3f, GLVERTEXSTREAM3F);
-    EXTMGR_FUNC_INIT(glVertexStream3d, GLVERTEXSTREAM3D);
-    EXTMGR_FUNC_INIT(glVertexStream3sv, GLVERTEXSTREAM3SV);
-    EXTMGR_FUNC_INIT(glVertexStream3iv, GLVERTEXSTREAM3IV);
-    EXTMGR_FUNC_INIT(glVertexStream3fv, GLVERTEXSTREAM3FV);
-    EXTMGR_FUNC_INIT(glVertexStream3dv, GLVERTEXSTREAM3DV);
-    EXTMGR_FUNC_INIT(glVertexStream4s, GLVERTEXSTREAM4S);
-    EXTMGR_FUNC_INIT(glVertexStream4i, GLVERTEXSTREAM4I);
-    EXTMGR_FUNC_INIT(glVertexStream4f, GLVERTEXSTREAM4F);
-    EXTMGR_FUNC_INIT(glVertexStream4d, GLVERTEXSTREAM4D);
-    EXTMGR_FUNC_INIT(glVertexStream4sv, GLVERTEXSTREAM4SV);
-    EXTMGR_FUNC_INIT(glVertexStream4iv, GLVERTEXSTREAM4IV);
-    EXTMGR_FUNC_INIT(glVertexStream4fv, GLVERTEXSTREAM4FV);
-    EXTMGR_FUNC_INIT(glVertexStream4dv, GLVERTEXSTREAM4DV);
-    EXTMGR_FUNC_INIT(glNormalStream3b, GLNORMALSTREAM3B);
-    EXTMGR_FUNC_INIT(glNormalStream3s, GLNORMALSTREAM3S);
-    EXTMGR_FUNC_INIT(glNormalStream3i, GLNORMALSTREAM3I);
-    EXTMGR_FUNC_INIT(glNormalStream3f, GLNORMALSTREAM3F);
-    EXTMGR_FUNC_INIT(glNormalStream3d, GLNORMALSTREAM3D);
-    EXTMGR_FUNC_INIT(glNormalStream3bv, GLNORMALSTREAM3BV);
-    EXTMGR_FUNC_INIT(glNormalStream3sv, GLNORMALSTREAM3SV);
-    EXTMGR_FUNC_INIT(glNormalStream3iv, GLNORMALSTREAM3IV);
-    EXTMGR_FUNC_INIT(glNormalStream3fv, GLNORMALSTREAM3FV);
-    EXTMGR_FUNC_INIT(glNormalStream3dv, GLNORMALSTREAM3DV);
-    EXTMGR_FUNC_INIT(glClientActiveVertexStream, GLCLIENTACTIVEVERTEXSTREAM);
-    EXTMGR_FUNC_INIT(glVertexBlendEnvi, GLVERTEXBLENDENVI);
-    EXTMGR_FUNC_INIT(glVertexBlendEnvf, GLVERTEXBLENDENVF);
+      EXTMGR_FUNC_INIT(glVertexStream1s, GLVERTEXSTREAM1S);
+      EXTMGR_FUNC_INIT(glVertexStream1i, GLVERTEXSTREAM1I);
+      EXTMGR_FUNC_INIT(glVertexStream1f, GLVERTEXSTREAM1F);
+      EXTMGR_FUNC_INIT(glVertexStream1d, GLVERTEXSTREAM1D);
+      EXTMGR_FUNC_INIT(glVertexStream1sv, GLVERTEXSTREAM1SV);
+      EXTMGR_FUNC_INIT(glVertexStream1iv, GLVERTEXSTREAM1IV);
+      EXTMGR_FUNC_INIT(glVertexStream1fv, GLVERTEXSTREAM1FV);
+      EXTMGR_FUNC_INIT(glVertexStream1dv, GLVERTEXSTREAM1DV);
+      EXTMGR_FUNC_INIT(glVertexStream2s, GLVERTEXSTREAM2S);
+      EXTMGR_FUNC_INIT(glVertexStream2i, GLVERTEXSTREAM2I);
+      EXTMGR_FUNC_INIT(glVertexStream2f, GLVERTEXSTREAM2F);
+      EXTMGR_FUNC_INIT(glVertexStream2d, GLVERTEXSTREAM2D);
+      EXTMGR_FUNC_INIT(glVertexStream2sv, GLVERTEXSTREAM2SV);
+      EXTMGR_FUNC_INIT(glVertexStream2iv, GLVERTEXSTREAM2IV);
+      EXTMGR_FUNC_INIT(glVertexStream2fv, GLVERTEXSTREAM2FV);
+      EXTMGR_FUNC_INIT(glVertexStream2dv, GLVERTEXSTREAM2DV);
+      EXTMGR_FUNC_INIT(glVertexStream3s, GLVERTEXSTREAM3S);
+      EXTMGR_FUNC_INIT(glVertexStream3i, GLVERTEXSTREAM3I);
+      EXTMGR_FUNC_INIT(glVertexStream3f, GLVERTEXSTREAM3F);
+      EXTMGR_FUNC_INIT(glVertexStream3d, GLVERTEXSTREAM3D);
+      EXTMGR_FUNC_INIT(glVertexStream3sv, GLVERTEXSTREAM3SV);
+      EXTMGR_FUNC_INIT(glVertexStream3iv, GLVERTEXSTREAM3IV);
+      EXTMGR_FUNC_INIT(glVertexStream3fv, GLVERTEXSTREAM3FV);
+      EXTMGR_FUNC_INIT(glVertexStream3dv, GLVERTEXSTREAM3DV);
+      EXTMGR_FUNC_INIT(glVertexStream4s, GLVERTEXSTREAM4S);
+      EXTMGR_FUNC_INIT(glVertexStream4i, GLVERTEXSTREAM4I);
+      EXTMGR_FUNC_INIT(glVertexStream4f, GLVERTEXSTREAM4F);
+      EXTMGR_FUNC_INIT(glVertexStream4d, GLVERTEXSTREAM4D);
+      EXTMGR_FUNC_INIT(glVertexStream4sv, GLVERTEXSTREAM4SV);
+      EXTMGR_FUNC_INIT(glVertexStream4iv, GLVERTEXSTREAM4IV);
+      EXTMGR_FUNC_INIT(glVertexStream4fv, GLVERTEXSTREAM4FV);
+      EXTMGR_FUNC_INIT(glVertexStream4dv, GLVERTEXSTREAM4DV);
+      EXTMGR_FUNC_INIT(glNormalStream3b, GLNORMALSTREAM3B);
+      EXTMGR_FUNC_INIT(glNormalStream3s, GLNORMALSTREAM3S);
+      EXTMGR_FUNC_INIT(glNormalStream3i, GLNORMALSTREAM3I);
+      EXTMGR_FUNC_INIT(glNormalStream3f, GLNORMALSTREAM3F);
+      EXTMGR_FUNC_INIT(glNormalStream3d, GLNORMALSTREAM3D);
+      EXTMGR_FUNC_INIT(glNormalStream3bv, GLNORMALSTREAM3BV);
+      EXTMGR_FUNC_INIT(glNormalStream3sv, GLNORMALSTREAM3SV);
+      EXTMGR_FUNC_INIT(glNormalStream3iv, GLNORMALSTREAM3IV);
+      EXTMGR_FUNC_INIT(glNormalStream3fv, GLNORMALSTREAM3FV);
+      EXTMGR_FUNC_INIT(glNormalStream3dv, GLNORMALSTREAM3DV);
+      EXTMGR_FUNC_INIT(glClientActiveVertexStream, GLCLIENTACTIVEVERTEXSTREAM);
+      EXTMGR_FUNC_INIT(glVertexBlendEnvi, GLVERTEXBLENDENVI);
+      EXTMGR_FUNC_INIT(glVertexBlendEnvf, GLVERTEXBLENDENVF);
 
     if (init)
     {
@@ -15439,10 +15216,10 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_WGL_I3D_image_buffer;
     allclear = true;
-    EXTMGR_FUNC_INIT(wglCreateImageBufferI3D, WGLCREATEIMAGEBUFFERI3D);
-    EXTMGR_FUNC_INIT(wglDestroyImageBufferI3D, WGLDESTROYIMAGEBUFFERI3D);
-    EXTMGR_FUNC_INIT(wglAssociateImageBufferEventsI3D, WGLASSOCIATEIMAGEBUFFEREVENTSI3D);
-    EXTMGR_FUNC_INIT(wglReleaseImageBufferEventsI3D, WGLRELEASEIMAGEBUFFEREVENTSI3D);
+      EXTMGR_FUNC_INIT(wglCreateImageBufferI3D, WGLCREATEIMAGEBUFFERI3D);
+      EXTMGR_FUNC_INIT(wglDestroyImageBufferI3D, WGLDESTROYIMAGEBUFFERI3D);
+      EXTMGR_FUNC_INIT(wglAssociateImageBufferEventsI3D, WGLASSOCIATEIMAGEBUFFEREVENTSI3D);
+      EXTMGR_FUNC_INIT(wglReleaseImageBufferEventsI3D, WGLRELEASEIMAGEBUFFEREVENTSI3D);
 
     if (init)
     {
@@ -15471,10 +15248,10 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_WGL_I3D_swap_frame_lock;
     allclear = true;
-    EXTMGR_FUNC_INIT(wglEnableFrameLockI3D, WGLENABLEFRAMELOCKI3D);
-    EXTMGR_FUNC_INIT(wglDisableFrameLockI3D, WGLDISABLEFRAMELOCKI3D);
-    EXTMGR_FUNC_INIT(wglIsEnabledFrameLockI3D, WGLISENABLEDFRAMELOCKI3D);
-    EXTMGR_FUNC_INIT(wglQueryFrameLockMasterI3D, WGLQUERYFRAMELOCKMASTERI3D);
+      EXTMGR_FUNC_INIT(wglEnableFrameLockI3D, WGLENABLEFRAMELOCKI3D);
+      EXTMGR_FUNC_INIT(wglDisableFrameLockI3D, WGLDISABLEFRAMELOCKI3D);
+      EXTMGR_FUNC_INIT(wglIsEnabledFrameLockI3D, WGLISENABLEDFRAMELOCKI3D);
+      EXTMGR_FUNC_INIT(wglQueryFrameLockMasterI3D, WGLQUERYFRAMELOCKMASTERI3D);
 
     if (init)
     {
@@ -15503,10 +15280,10 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_WGL_I3D_swap_frame_usage;
     allclear = true;
-    EXTMGR_FUNC_INIT(wglGetFrameUsageI3D, WGLGETFRAMEUSAGEI3D);
-    EXTMGR_FUNC_INIT(wglBeginFrameTrackingI3D, WGLBEGINFRAMETRACKINGI3D);
-    EXTMGR_FUNC_INIT(wglEndFrameTrackingI3D, WGLENDFRAMETRACKINGI3D);
-    EXTMGR_FUNC_INIT(wglQueryFrameTrackingI3D, WGLQUERYFRAMETRACKINGI3D);
+      EXTMGR_FUNC_INIT(wglGetFrameUsageI3D, WGLGETFRAMEUSAGEI3D);
+      EXTMGR_FUNC_INIT(wglBeginFrameTrackingI3D, WGLBEGINFRAMETRACKINGI3D);
+      EXTMGR_FUNC_INIT(wglEndFrameTrackingI3D, WGLENDFRAMETRACKINGI3D);
+      EXTMGR_FUNC_INIT(wglQueryFrameTrackingI3D, WGLQUERYFRAMETRACKINGI3D);
 
     if (init)
     {
@@ -15531,10 +15308,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_3DFX_texture_compression_FXT1)
-    {
-      allclear = true;
+    bool init = CS_GL_3DFX_texture_compression_FXT1;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_3DFX_texture_compression_FXT1)
     }
     else
@@ -15555,10 +15333,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_IBM_cull_vertex)
-    {
-      allclear = true;
+    bool init = CS_GL_IBM_cull_vertex;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_IBM_cull_vertex)
     }
     else
@@ -15581,8 +15360,8 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_IBM_multimode_draw_arrays;
     allclear = true;
-    EXTMGR_FUNC_INIT(glMultiModeDrawArraysIBM, GLMULTIMODEDRAWARRAYSIBM);
-    EXTMGR_FUNC_INIT(glMultiModeDrawElementsIBM, GLMULTIMODEDRAWELEMENTSIBM);
+      EXTMGR_FUNC_INIT(glMultiModeDrawArraysIBM, GLMULTIMODEDRAWARRAYSIBM);
+      EXTMGR_FUNC_INIT(glMultiModeDrawElementsIBM, GLMULTIMODEDRAWELEMENTSIBM);
 
     if (init)
     {
@@ -15606,10 +15385,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_IBM_raster_pos_clip)
-    {
-      allclear = true;
+    bool init = CS_GL_IBM_raster_pos_clip;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_IBM_raster_pos_clip)
     }
     else
@@ -15630,10 +15410,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_IBM_texture_mirrored_repeat)
-    {
-      allclear = true;
+    bool init = CS_GL_IBM_texture_mirrored_repeat;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_IBM_texture_mirrored_repeat)
     }
     else
@@ -15656,13 +15437,13 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_IBM_vertex_array_lists;
     allclear = true;
-    EXTMGR_FUNC_INIT(glColorPointerListIBM, GLCOLORPOINTERLISTIBM);
-    EXTMGR_FUNC_INIT(glSecondaryColorPointerListIBM, GLSECONDARYCOLORPOINTERLISTIBM);
-    EXTMGR_FUNC_INIT(glEdgeFlagPointerListIBM, GLEDGEFLAGPOINTERLISTIBM);
-    EXTMGR_FUNC_INIT(glFogCoordPointerListIBM, GLFOGCOORDPOINTERLISTIBM);
-    EXTMGR_FUNC_INIT(glNormalPointerListIBM, GLNORMALPOINTERLISTIBM);
-    EXTMGR_FUNC_INIT(glTexCoordPointerListIBM, GLTEXCOORDPOINTERLISTIBM);
-    EXTMGR_FUNC_INIT(glVertexPointerListIBM, GLVERTEXPOINTERLISTIBM);
+      EXTMGR_FUNC_INIT(glColorPointerListIBM, GLCOLORPOINTERLISTIBM);
+      EXTMGR_FUNC_INIT(glSecondaryColorPointerListIBM, GLSECONDARYCOLORPOINTERLISTIBM);
+      EXTMGR_FUNC_INIT(glEdgeFlagPointerListIBM, GLEDGEFLAGPOINTERLISTIBM);
+      EXTMGR_FUNC_INIT(glFogCoordPointerListIBM, GLFOGCOORDPOINTERLISTIBM);
+      EXTMGR_FUNC_INIT(glNormalPointerListIBM, GLNORMALPOINTERLISTIBM);
+      EXTMGR_FUNC_INIT(glTexCoordPointerListIBM, GLTEXCOORDPOINTERLISTIBM);
+      EXTMGR_FUNC_INIT(glVertexPointerListIBM, GLVERTEXPOINTERLISTIBM);
 
     if (init)
     {
@@ -15688,7 +15469,7 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_MESA_resize_buffers;
     allclear = true;
-    EXTMGR_FUNC_INIT(glResizeBuffersMESA, GLRESIZEBUFFERSMESA);
+      EXTMGR_FUNC_INIT(glResizeBuffersMESA, GLRESIZEBUFFERSMESA);
 
     if (init)
     {
@@ -15714,30 +15495,30 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_MESA_window_pos;
     allclear = true;
-    EXTMGR_FUNC_INIT(glWindowPos2dMESA, GLWINDOWPOS2DMESA);
-    EXTMGR_FUNC_INIT(glWindowPos2fMESA, GLWINDOWPOS2FMESA);
-    EXTMGR_FUNC_INIT(glWindowPos2iMESA, GLWINDOWPOS2IMESA);
-    EXTMGR_FUNC_INIT(glWindowPos2sMESA, GLWINDOWPOS2SMESA);
-    EXTMGR_FUNC_INIT(glWindowPos2ivMESA, GLWINDOWPOS2IVMESA);
-    EXTMGR_FUNC_INIT(glWindowPos2svMESA, GLWINDOWPOS2SVMESA);
-    EXTMGR_FUNC_INIT(glWindowPos2fvMESA, GLWINDOWPOS2FVMESA);
-    EXTMGR_FUNC_INIT(glWindowPos2dvMESA, GLWINDOWPOS2DVMESA);
-    EXTMGR_FUNC_INIT(glWindowPos3iMESA, GLWINDOWPOS3IMESA);
-    EXTMGR_FUNC_INIT(glWindowPos3sMESA, GLWINDOWPOS3SMESA);
-    EXTMGR_FUNC_INIT(glWindowPos3fMESA, GLWINDOWPOS3FMESA);
-    EXTMGR_FUNC_INIT(glWindowPos3dMESA, GLWINDOWPOS3DMESA);
-    EXTMGR_FUNC_INIT(glWindowPos3ivMESA, GLWINDOWPOS3IVMESA);
-    EXTMGR_FUNC_INIT(glWindowPos3svMESA, GLWINDOWPOS3SVMESA);
-    EXTMGR_FUNC_INIT(glWindowPos3fvMESA, GLWINDOWPOS3FVMESA);
-    EXTMGR_FUNC_INIT(glWindowPos3dvMESA, GLWINDOWPOS3DVMESA);
-    EXTMGR_FUNC_INIT(glWindowPos4iMESA, GLWINDOWPOS4IMESA);
-    EXTMGR_FUNC_INIT(glWindowPos4sMESA, GLWINDOWPOS4SMESA);
-    EXTMGR_FUNC_INIT(glWindowPos4fMESA, GLWINDOWPOS4FMESA);
-    EXTMGR_FUNC_INIT(glWindowPos4dMESA, GLWINDOWPOS4DMESA);
-    EXTMGR_FUNC_INIT(glWindowPos4ivMESA, GLWINDOWPOS4IVMESA);
-    EXTMGR_FUNC_INIT(glWindowPos4svMESA, GLWINDOWPOS4SVMESA);
-    EXTMGR_FUNC_INIT(glWindowPos4fvMESA, GLWINDOWPOS4FVMESA);
-    EXTMGR_FUNC_INIT(glWindowPos4dvMESA, GLWINDOWPOS4DVMESA);
+      EXTMGR_FUNC_INIT(glWindowPos2dMESA, GLWINDOWPOS2DMESA);
+      EXTMGR_FUNC_INIT(glWindowPos2fMESA, GLWINDOWPOS2FMESA);
+      EXTMGR_FUNC_INIT(glWindowPos2iMESA, GLWINDOWPOS2IMESA);
+      EXTMGR_FUNC_INIT(glWindowPos2sMESA, GLWINDOWPOS2SMESA);
+      EXTMGR_FUNC_INIT(glWindowPos2ivMESA, GLWINDOWPOS2IVMESA);
+      EXTMGR_FUNC_INIT(glWindowPos2svMESA, GLWINDOWPOS2SVMESA);
+      EXTMGR_FUNC_INIT(glWindowPos2fvMESA, GLWINDOWPOS2FVMESA);
+      EXTMGR_FUNC_INIT(glWindowPos2dvMESA, GLWINDOWPOS2DVMESA);
+      EXTMGR_FUNC_INIT(glWindowPos3iMESA, GLWINDOWPOS3IMESA);
+      EXTMGR_FUNC_INIT(glWindowPos3sMESA, GLWINDOWPOS3SMESA);
+      EXTMGR_FUNC_INIT(glWindowPos3fMESA, GLWINDOWPOS3FMESA);
+      EXTMGR_FUNC_INIT(glWindowPos3dMESA, GLWINDOWPOS3DMESA);
+      EXTMGR_FUNC_INIT(glWindowPos3ivMESA, GLWINDOWPOS3IVMESA);
+      EXTMGR_FUNC_INIT(glWindowPos3svMESA, GLWINDOWPOS3SVMESA);
+      EXTMGR_FUNC_INIT(glWindowPos3fvMESA, GLWINDOWPOS3FVMESA);
+      EXTMGR_FUNC_INIT(glWindowPos3dvMESA, GLWINDOWPOS3DVMESA);
+      EXTMGR_FUNC_INIT(glWindowPos4iMESA, GLWINDOWPOS4IMESA);
+      EXTMGR_FUNC_INIT(glWindowPos4sMESA, GLWINDOWPOS4SMESA);
+      EXTMGR_FUNC_INIT(glWindowPos4fMESA, GLWINDOWPOS4FMESA);
+      EXTMGR_FUNC_INIT(glWindowPos4dMESA, GLWINDOWPOS4DMESA);
+      EXTMGR_FUNC_INIT(glWindowPos4ivMESA, GLWINDOWPOS4IVMESA);
+      EXTMGR_FUNC_INIT(glWindowPos4svMESA, GLWINDOWPOS4SVMESA);
+      EXTMGR_FUNC_INIT(glWindowPos4fvMESA, GLWINDOWPOS4FVMESA);
+      EXTMGR_FUNC_INIT(glWindowPos4dvMESA, GLWINDOWPOS4DVMESA);
 
     if (init)
     {
@@ -15761,10 +15542,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_OML_interlace)
-    {
-      allclear = true;
+    bool init = CS_GL_OML_interlace;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_OML_interlace)
     }
     else
@@ -15785,10 +15567,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_OML_resample)
-    {
-      allclear = true;
+    bool init = CS_GL_OML_resample;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_OML_resample)
     }
     else
@@ -15809,10 +15592,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_OML_subsample)
-    {
-      allclear = true;
+    bool init = CS_GL_OML_subsample;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_OML_subsample)
     }
     else
@@ -15833,10 +15617,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_SGIS_generate_mipmap)
-    {
-      allclear = true;
+    bool init = CS_GL_SGIS_generate_mipmap;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_SGIS_generate_mipmap)
     }
     else
@@ -15859,8 +15644,8 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_SGIS_multisample;
     allclear = true;
-    EXTMGR_FUNC_INIT(glSampleMaskSGIS, GLSAMPLEMASKSGIS);
-    EXTMGR_FUNC_INIT(glSamplePatternSGIS, GLSAMPLEPATTERNSGIS);
+      EXTMGR_FUNC_INIT(glSampleMaskSGIS, GLSAMPLEMASKSGIS);
+      EXTMGR_FUNC_INIT(glSamplePatternSGIS, GLSAMPLEPATTERNSGIS);
 
     if (init)
     {
@@ -15886,10 +15671,10 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_SGIS_pixel_texture;
     allclear = true;
-    EXTMGR_FUNC_INIT(glPixelTexGenParameteriSGIS, GLPIXELTEXGENPARAMETERISGIS);
-    EXTMGR_FUNC_INIT(glPixelTexGenParameterfSGIS, GLPIXELTEXGENPARAMETERFSGIS);
-    EXTMGR_FUNC_INIT(glGetPixelTexGenParameterivSGIS, GLGETPIXELTEXGENPARAMETERIVSGIS);
-    EXTMGR_FUNC_INIT(glGetPixelTexGenParameterfvSGIS, GLGETPIXELTEXGENPARAMETERFVSGIS);
+      EXTMGR_FUNC_INIT(glPixelTexGenParameteriSGIS, GLPIXELTEXGENPARAMETERISGIS);
+      EXTMGR_FUNC_INIT(glPixelTexGenParameterfSGIS, GLPIXELTEXGENPARAMETERFSGIS);
+      EXTMGR_FUNC_INIT(glGetPixelTexGenParameterivSGIS, GLGETPIXELTEXGENPARAMETERIVSGIS);
+      EXTMGR_FUNC_INIT(glGetPixelTexGenParameterfvSGIS, GLGETPIXELTEXGENPARAMETERFVSGIS);
 
     if (init)
     {
@@ -15913,10 +15698,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_SGIS_texture_border_clamp)
-    {
-      allclear = true;
+    bool init = CS_GL_SGIS_texture_border_clamp;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_SGIS_texture_border_clamp)
     }
     else
@@ -15939,7 +15725,7 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_SGIS_texture_color_mask;
     allclear = true;
-    EXTMGR_FUNC_INIT(glTextureColorMaskSGIS, GLTEXTURECOLORMASKSGIS);
+      EXTMGR_FUNC_INIT(glTextureColorMaskSGIS, GLTEXTURECOLORMASKSGIS);
 
     if (init)
     {
@@ -15963,10 +15749,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_SGIS_texture_edge_clamp)
-    {
-      allclear = true;
+    bool init = CS_GL_SGIS_texture_edge_clamp;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_SGIS_texture_edge_clamp)
     }
     else
@@ -15987,10 +15774,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_SGIS_texture_lod)
-    {
-      allclear = true;
+    bool init = CS_GL_SGIS_texture_lod;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_SGIS_texture_lod)
     }
     else
@@ -16011,10 +15799,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_SGIS_depth_texture)
-    {
-      allclear = true;
+    bool init = CS_GL_SGIS_depth_texture;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_SGIS_depth_texture)
     }
     else
@@ -16035,10 +15824,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_SGIX_fog_offset)
-    {
-      allclear = true;
+    bool init = CS_GL_SGIX_fog_offset;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_SGIX_fog_offset)
     }
     else
@@ -16059,10 +15849,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_SGIX_interlace)
-    {
-      allclear = true;
+    bool init = CS_GL_SGIX_interlace;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_SGIX_interlace)
     }
     else
@@ -16083,10 +15874,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_SGIX_shadow_ambient)
-    {
-      allclear = true;
+    bool init = CS_GL_SGIX_shadow_ambient;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_SGIX_shadow_ambient)
     }
     else
@@ -16107,10 +15899,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_SGI_color_matrix)
-    {
-      allclear = true;
+    bool init = CS_GL_SGI_color_matrix;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_SGI_color_matrix)
     }
     else
@@ -16133,13 +15926,13 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_SGI_color_table;
     allclear = true;
-    EXTMGR_FUNC_INIT(glColorTableSGI, GLCOLORTABLESGI);
-    EXTMGR_FUNC_INIT(glCopyColorTableSGI, GLCOPYCOLORTABLESGI);
-    EXTMGR_FUNC_INIT(glColorTableParameterivSGI, GLCOLORTABLEPARAMETERIVSGI);
-    EXTMGR_FUNC_INIT(glColorTableParameterfvSGI, GLCOLORTABLEPARAMETERFVSGI);
-    EXTMGR_FUNC_INIT(glGetColorTableSGI, GLGETCOLORTABLESGI);
-    EXTMGR_FUNC_INIT(glGetColorTableParameterivSGI, GLGETCOLORTABLEPARAMETERIVSGI);
-    EXTMGR_FUNC_INIT(glGetColorTableParameterfvSGI, GLGETCOLORTABLEPARAMETERFVSGI);
+      EXTMGR_FUNC_INIT(glColorTableSGI, GLCOLORTABLESGI);
+      EXTMGR_FUNC_INIT(glCopyColorTableSGI, GLCOPYCOLORTABLESGI);
+      EXTMGR_FUNC_INIT(glColorTableParameterivSGI, GLCOLORTABLEPARAMETERIVSGI);
+      EXTMGR_FUNC_INIT(glColorTableParameterfvSGI, GLCOLORTABLEPARAMETERFVSGI);
+      EXTMGR_FUNC_INIT(glGetColorTableSGI, GLGETCOLORTABLESGI);
+      EXTMGR_FUNC_INIT(glGetColorTableParameterivSGI, GLGETCOLORTABLEPARAMETERIVSGI);
+      EXTMGR_FUNC_INIT(glGetColorTableParameterfvSGI, GLGETCOLORTABLEPARAMETERFVSGI);
 
     if (init)
     {
@@ -16163,10 +15956,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_SGI_texture_color_table)
-    {
-      allclear = true;
+    bool init = CS_GL_SGI_texture_color_table;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_SGI_texture_color_table)
     }
     else
@@ -16189,46 +15983,46 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_SUN_vertex;
     allclear = true;
-    EXTMGR_FUNC_INIT(glColor4ubVertex2fSUN, GLCOLOR4UBVERTEX2FSUN);
-    EXTMGR_FUNC_INIT(glColor4ubVertex2fvSUN, GLCOLOR4UBVERTEX2FVSUN);
-    EXTMGR_FUNC_INIT(glColor4ubVertex3fSUN, GLCOLOR4UBVERTEX3FSUN);
-    EXTMGR_FUNC_INIT(glColor4ubVertex3fvSUN, GLCOLOR4UBVERTEX3FVSUN);
-    EXTMGR_FUNC_INIT(glColor3fVertex3fSUN, GLCOLOR3FVERTEX3FSUN);
-    EXTMGR_FUNC_INIT(glColor3fVertex3fvSUN, GLCOLOR3FVERTEX3FVSUN);
-    EXTMGR_FUNC_INIT(glNormal3fVertex3fSUN, GLNORMAL3FVERTEX3FSUN);
-    EXTMGR_FUNC_INIT(glNormal3fVertex3fvSUN, GLNORMAL3FVERTEX3FVSUN);
-    EXTMGR_FUNC_INIT(glColor4fNormal3fVertex3fSUN, GLCOLOR4FNORMAL3FVERTEX3FSUN);
-    EXTMGR_FUNC_INIT(glColor4fNormal3fVertex3fvSUN, GLCOLOR4FNORMAL3FVERTEX3FVSUN);
-    EXTMGR_FUNC_INIT(glTexCoord2fVertex3fSUN, GLTEXCOORD2FVERTEX3FSUN);
-    EXTMGR_FUNC_INIT(glTexCoord2fVertex3fvSUN, GLTEXCOORD2FVERTEX3FVSUN);
-    EXTMGR_FUNC_INIT(glTexCoord4fVertex4fSUN, GLTEXCOORD4FVERTEX4FSUN);
-    EXTMGR_FUNC_INIT(glTexCoord4fVertex4fvSUN, GLTEXCOORD4FVERTEX4FVSUN);
-    EXTMGR_FUNC_INIT(glTexCoord2fColor4ubVertex3fSUN, GLTEXCOORD2FCOLOR4UBVERTEX3FSUN);
-    EXTMGR_FUNC_INIT(glTexCoord2fColor4ubVertex3fvSUN, GLTEXCOORD2FCOLOR4UBVERTEX3FVSUN);
-    EXTMGR_FUNC_INIT(glTexCoord2fColor3fVertex3fSUN, GLTEXCOORD2FCOLOR3FVERTEX3FSUN);
-    EXTMGR_FUNC_INIT(glTexCoord2fColor3fVertex3fvSUN, GLTEXCOORD2FCOLOR3FVERTEX3FVSUN);
-    EXTMGR_FUNC_INIT(glTexCoord2fNormal3fVertex3fSUN, GLTEXCOORD2FNORMAL3FVERTEX3FSUN);
-    EXTMGR_FUNC_INIT(glTexCoord2fNormal3fVertex3fvSUN, GLTEXCOORD2FNORMAL3FVERTEX3FVSUN);
-    EXTMGR_FUNC_INIT(glTexCoord2fColor4fNormal3fVertex3fSUN, GLTEXCOORD2FCOLOR4FNORMAL3FVERTEX3FSUN);
-    EXTMGR_FUNC_INIT(glTexCoord2fColor4fNormal3fVertex3fvSUN, GLTEXCOORD2FCOLOR4FNORMAL3FVERTEX3FVSUN);
-    EXTMGR_FUNC_INIT(glTexCoord4fColor4fNormal3fVertex4fSUN, GLTEXCOORD4FCOLOR4FNORMAL3FVERTEX4FSUN);
-    EXTMGR_FUNC_INIT(glTexCoord4fColor4fNormal3fVertex4fvSUN, GLTEXCOORD4FCOLOR4FNORMAL3FVERTEX4FVSUN);
-    EXTMGR_FUNC_INIT(glReplacementCodeuiVertex3fSUN, GLREPLACEMENTCODEUIVERTEX3FSUN);
-    EXTMGR_FUNC_INIT(glReplacementCodeuiVertex3fvSUN, GLREPLACEMENTCODEUIVERTEX3FVSUN);
-    EXTMGR_FUNC_INIT(glReplacementCodeuiColor4ubVertex3fSUN, GLREPLACEMENTCODEUICOLOR4UBVERTEX3FSUN);
-    EXTMGR_FUNC_INIT(glReplacementCodeuiColor4ubVertex3fvSUN, GLREPLACEMENTCODEUICOLOR4UBVERTEX3FVSUN);
-    EXTMGR_FUNC_INIT(glReplacementCodeuiColor3fVertex3fSUN, GLREPLACEMENTCODEUICOLOR3FVERTEX3FSUN);
-    EXTMGR_FUNC_INIT(glReplacementCodeuiColor3fVertex3fvSUN, GLREPLACEMENTCODEUICOLOR3FVERTEX3FVSUN);
-    EXTMGR_FUNC_INIT(glReplacementCodeuiNormal3fVertex3fSUN, GLREPLACEMENTCODEUINORMAL3FVERTEX3FSUN);
-    EXTMGR_FUNC_INIT(glReplacementCodeuiNormal3fVertex3fvSUN, GLREPLACEMENTCODEUINORMAL3FVERTEX3FVSUN);
-    EXTMGR_FUNC_INIT(glReplacementCodeuiColor4fNormal3fVertex3fSUN, GLREPLACEMENTCODEUICOLOR4FNORMAL3FVERTEX3FSUN);
-    EXTMGR_FUNC_INIT(glReplacementCodeuiColor4fNormal3fVertex3fvSUN, GLREPLACEMENTCODEUICOLOR4FNORMAL3FVERTEX3FVSUN);
-    EXTMGR_FUNC_INIT(glReplacementCodeuiTexCoord2fVertex3fSUN, GLREPLACEMENTCODEUITEXCOORD2FVERTEX3FSUN);
-    EXTMGR_FUNC_INIT(glReplacementCodeuiTexCoord2fVertex3fvSUN, GLREPLACEMENTCODEUITEXCOORD2FVERTEX3FVSUN);
-    EXTMGR_FUNC_INIT(glReplacementCodeuiTexCoord2fNormal3fVertex3fSUN, GLREPLACEMENTCODEUITEXCOORD2FNORMAL3FVERTEX3FSUN);
-    EXTMGR_FUNC_INIT(glReplacementCodeuiTexCoord2fNormal3fVertex3fvSUN, GLREPLACEMENTCODEUITEXCOORD2FNORMAL3FVERTEX3FVSUN);
-    EXTMGR_FUNC_INIT(glReplacementCodeuiTexCoord2fColor4fNormal3fVertex3fSUN, GLREPLACEMENTCODEUITEXCOORD2FCOLOR4FNORMAL3FVERTEX3FSUN);
-    EXTMGR_FUNC_INIT(glReplacementCodeuiTexCoord2fColor4fNormal3fVertex3fvSUN, GLREPLACEMENTCODEUITEXCOORD2FCOLOR4FNORMAL3FVERTEX3FVSUN);
+      EXTMGR_FUNC_INIT(glColor4ubVertex2fSUN, GLCOLOR4UBVERTEX2FSUN);
+      EXTMGR_FUNC_INIT(glColor4ubVertex2fvSUN, GLCOLOR4UBVERTEX2FVSUN);
+      EXTMGR_FUNC_INIT(glColor4ubVertex3fSUN, GLCOLOR4UBVERTEX3FSUN);
+      EXTMGR_FUNC_INIT(glColor4ubVertex3fvSUN, GLCOLOR4UBVERTEX3FVSUN);
+      EXTMGR_FUNC_INIT(glColor3fVertex3fSUN, GLCOLOR3FVERTEX3FSUN);
+      EXTMGR_FUNC_INIT(glColor3fVertex3fvSUN, GLCOLOR3FVERTEX3FVSUN);
+      EXTMGR_FUNC_INIT(glNormal3fVertex3fSUN, GLNORMAL3FVERTEX3FSUN);
+      EXTMGR_FUNC_INIT(glNormal3fVertex3fvSUN, GLNORMAL3FVERTEX3FVSUN);
+      EXTMGR_FUNC_INIT(glColor4fNormal3fVertex3fSUN, GLCOLOR4FNORMAL3FVERTEX3FSUN);
+      EXTMGR_FUNC_INIT(glColor4fNormal3fVertex3fvSUN, GLCOLOR4FNORMAL3FVERTEX3FVSUN);
+      EXTMGR_FUNC_INIT(glTexCoord2fVertex3fSUN, GLTEXCOORD2FVERTEX3FSUN);
+      EXTMGR_FUNC_INIT(glTexCoord2fVertex3fvSUN, GLTEXCOORD2FVERTEX3FVSUN);
+      EXTMGR_FUNC_INIT(glTexCoord4fVertex4fSUN, GLTEXCOORD4FVERTEX4FSUN);
+      EXTMGR_FUNC_INIT(glTexCoord4fVertex4fvSUN, GLTEXCOORD4FVERTEX4FVSUN);
+      EXTMGR_FUNC_INIT(glTexCoord2fColor4ubVertex3fSUN, GLTEXCOORD2FCOLOR4UBVERTEX3FSUN);
+      EXTMGR_FUNC_INIT(glTexCoord2fColor4ubVertex3fvSUN, GLTEXCOORD2FCOLOR4UBVERTEX3FVSUN);
+      EXTMGR_FUNC_INIT(glTexCoord2fColor3fVertex3fSUN, GLTEXCOORD2FCOLOR3FVERTEX3FSUN);
+      EXTMGR_FUNC_INIT(glTexCoord2fColor3fVertex3fvSUN, GLTEXCOORD2FCOLOR3FVERTEX3FVSUN);
+      EXTMGR_FUNC_INIT(glTexCoord2fNormal3fVertex3fSUN, GLTEXCOORD2FNORMAL3FVERTEX3FSUN);
+      EXTMGR_FUNC_INIT(glTexCoord2fNormal3fVertex3fvSUN, GLTEXCOORD2FNORMAL3FVERTEX3FVSUN);
+      EXTMGR_FUNC_INIT(glTexCoord2fColor4fNormal3fVertex3fSUN, GLTEXCOORD2FCOLOR4FNORMAL3FVERTEX3FSUN);
+      EXTMGR_FUNC_INIT(glTexCoord2fColor4fNormal3fVertex3fvSUN, GLTEXCOORD2FCOLOR4FNORMAL3FVERTEX3FVSUN);
+      EXTMGR_FUNC_INIT(glTexCoord4fColor4fNormal3fVertex4fSUN, GLTEXCOORD4FCOLOR4FNORMAL3FVERTEX4FSUN);
+      EXTMGR_FUNC_INIT(glTexCoord4fColor4fNormal3fVertex4fvSUN, GLTEXCOORD4FCOLOR4FNORMAL3FVERTEX4FVSUN);
+      EXTMGR_FUNC_INIT(glReplacementCodeuiVertex3fSUN, GLREPLACEMENTCODEUIVERTEX3FSUN);
+      EXTMGR_FUNC_INIT(glReplacementCodeuiVertex3fvSUN, GLREPLACEMENTCODEUIVERTEX3FVSUN);
+      EXTMGR_FUNC_INIT(glReplacementCodeuiColor4ubVertex3fSUN, GLREPLACEMENTCODEUICOLOR4UBVERTEX3FSUN);
+      EXTMGR_FUNC_INIT(glReplacementCodeuiColor4ubVertex3fvSUN, GLREPLACEMENTCODEUICOLOR4UBVERTEX3FVSUN);
+      EXTMGR_FUNC_INIT(glReplacementCodeuiColor3fVertex3fSUN, GLREPLACEMENTCODEUICOLOR3FVERTEX3FSUN);
+      EXTMGR_FUNC_INIT(glReplacementCodeuiColor3fVertex3fvSUN, GLREPLACEMENTCODEUICOLOR3FVERTEX3FVSUN);
+      EXTMGR_FUNC_INIT(glReplacementCodeuiNormal3fVertex3fSUN, GLREPLACEMENTCODEUINORMAL3FVERTEX3FSUN);
+      EXTMGR_FUNC_INIT(glReplacementCodeuiNormal3fVertex3fvSUN, GLREPLACEMENTCODEUINORMAL3FVERTEX3FVSUN);
+      EXTMGR_FUNC_INIT(glReplacementCodeuiColor4fNormal3fVertex3fSUN, GLREPLACEMENTCODEUICOLOR4FNORMAL3FVERTEX3FSUN);
+      EXTMGR_FUNC_INIT(glReplacementCodeuiColor4fNormal3fVertex3fvSUN, GLREPLACEMENTCODEUICOLOR4FNORMAL3FVERTEX3FVSUN);
+      EXTMGR_FUNC_INIT(glReplacementCodeuiTexCoord2fVertex3fSUN, GLREPLACEMENTCODEUITEXCOORD2FVERTEX3FSUN);
+      EXTMGR_FUNC_INIT(glReplacementCodeuiTexCoord2fVertex3fvSUN, GLREPLACEMENTCODEUITEXCOORD2FVERTEX3FVSUN);
+      EXTMGR_FUNC_INIT(glReplacementCodeuiTexCoord2fNormal3fVertex3fSUN, GLREPLACEMENTCODEUITEXCOORD2FNORMAL3FVERTEX3FSUN);
+      EXTMGR_FUNC_INIT(glReplacementCodeuiTexCoord2fNormal3fVertex3fvSUN, GLREPLACEMENTCODEUITEXCOORD2FNORMAL3FVERTEX3FVSUN);
+      EXTMGR_FUNC_INIT(glReplacementCodeuiTexCoord2fColor4fNormal3fVertex3fSUN, GLREPLACEMENTCODEUITEXCOORD2FCOLOR4FNORMAL3FVERTEX3FSUN);
+      EXTMGR_FUNC_INIT(glReplacementCodeuiTexCoord2fColor4fNormal3fVertex3fvSUN, GLREPLACEMENTCODEUITEXCOORD2FCOLOR4FNORMAL3FVERTEX3FVSUN);
 
     if (init)
     {
@@ -16254,25 +16048,25 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_ARB_fragment_program;
     allclear = true;
-    EXTMGR_FUNC_INIT(glProgramStringARB, GLPROGRAMSTRINGARB);
-    EXTMGR_FUNC_INIT(glBindProgramARB, GLBINDPROGRAMARB);
-    EXTMGR_FUNC_INIT(glDeleteProgramsARB, GLDELETEPROGRAMSARB);
-    EXTMGR_FUNC_INIT(glGenProgramsARB, GLGENPROGRAMSARB);
-    EXTMGR_FUNC_INIT(glProgramEnvParameter4dARB, GLPROGRAMENVPARAMETER4DARB);
-    EXTMGR_FUNC_INIT(glProgramEnvParameter4dvARB, GLPROGRAMENVPARAMETER4DVARB);
-    EXTMGR_FUNC_INIT(glProgramEnvParameter4fARB, GLPROGRAMENVPARAMETER4FARB);
-    EXTMGR_FUNC_INIT(glProgramEnvParameter4fvARB, GLPROGRAMENVPARAMETER4FVARB);
-    EXTMGR_FUNC_INIT(glProgramLocalParameter4dARB, GLPROGRAMLOCALPARAMETER4DARB);
-    EXTMGR_FUNC_INIT(glProgramLocalParameter4dvARB, GLPROGRAMLOCALPARAMETER4DVARB);
-    EXTMGR_FUNC_INIT(glProgramLocalParameter4fARB, GLPROGRAMLOCALPARAMETER4FARB);
-    EXTMGR_FUNC_INIT(glProgramLocalParameter4fvARB, GLPROGRAMLOCALPARAMETER4FVARB);
-    EXTMGR_FUNC_INIT(glGetProgramEnvParameterdvARB, GLGETPROGRAMENVPARAMETERDVARB);
-    EXTMGR_FUNC_INIT(glGetProgramEnvParameterfvARB, GLGETPROGRAMENVPARAMETERFVARB);
-    EXTMGR_FUNC_INIT(glGetProgramLocalParameterdvARB, GLGETPROGRAMLOCALPARAMETERDVARB);
-    EXTMGR_FUNC_INIT(glGetProgramLocalParameterfvARB, GLGETPROGRAMLOCALPARAMETERFVARB);
-    EXTMGR_FUNC_INIT(glGetProgramivARB, GLGETPROGRAMIVARB);
-    EXTMGR_FUNC_INIT(glGetProgramStringARB, GLGETPROGRAMSTRINGARB);
-    EXTMGR_FUNC_INIT(glIsProgramARB, GLISPROGRAMARB);
+      EXTMGR_FUNC_INIT(glProgramStringARB, GLPROGRAMSTRINGARB);
+      EXTMGR_FUNC_INIT(glBindProgramARB, GLBINDPROGRAMARB);
+      EXTMGR_FUNC_INIT(glDeleteProgramsARB, GLDELETEPROGRAMSARB);
+      EXTMGR_FUNC_INIT(glGenProgramsARB, GLGENPROGRAMSARB);
+      EXTMGR_FUNC_INIT(glProgramEnvParameter4dARB, GLPROGRAMENVPARAMETER4DARB);
+      EXTMGR_FUNC_INIT(glProgramEnvParameter4dvARB, GLPROGRAMENVPARAMETER4DVARB);
+      EXTMGR_FUNC_INIT(glProgramEnvParameter4fARB, GLPROGRAMENVPARAMETER4FARB);
+      EXTMGR_FUNC_INIT(glProgramEnvParameter4fvARB, GLPROGRAMENVPARAMETER4FVARB);
+      EXTMGR_FUNC_INIT(glProgramLocalParameter4dARB, GLPROGRAMLOCALPARAMETER4DARB);
+      EXTMGR_FUNC_INIT(glProgramLocalParameter4dvARB, GLPROGRAMLOCALPARAMETER4DVARB);
+      EXTMGR_FUNC_INIT(glProgramLocalParameter4fARB, GLPROGRAMLOCALPARAMETER4FARB);
+      EXTMGR_FUNC_INIT(glProgramLocalParameter4fvARB, GLPROGRAMLOCALPARAMETER4FVARB);
+      EXTMGR_FUNC_INIT(glGetProgramEnvParameterdvARB, GLGETPROGRAMENVPARAMETERDVARB);
+      EXTMGR_FUNC_INIT(glGetProgramEnvParameterfvARB, GLGETPROGRAMENVPARAMETERFVARB);
+      EXTMGR_FUNC_INIT(glGetProgramLocalParameterdvARB, GLGETPROGRAMLOCALPARAMETERDVARB);
+      EXTMGR_FUNC_INIT(glGetProgramLocalParameterfvARB, GLGETPROGRAMLOCALPARAMETERFVARB);
+      EXTMGR_FUNC_INIT(glGetProgramivARB, GLGETPROGRAMIVARB);
+      EXTMGR_FUNC_INIT(glGetProgramStringARB, GLGETPROGRAMSTRINGARB);
+      EXTMGR_FUNC_INIT(glIsProgramARB, GLISPROGRAMARB);
 
     if (init)
     {
@@ -16296,10 +16090,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_ATI_text_fragment_shader)
-    {
-      allclear = true;
+    bool init = CS_GL_ATI_text_fragment_shader;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ATI_text_fragment_shader)
     }
     else
@@ -16320,10 +16115,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_APPLE_client_storage)
-    {
-      allclear = true;
+    bool init = CS_GL_APPLE_client_storage;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_APPLE_client_storage)
     }
     else
@@ -16346,11 +16142,11 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_APPLE_element_array;
     allclear = true;
-    EXTMGR_FUNC_INIT(glElementPointerAPPLE, GLELEMENTPOINTERAPPLE);
-    EXTMGR_FUNC_INIT(glDrawElementArrayAPPLE, GLDRAWELEMENTARRAYAPPLE);
-    EXTMGR_FUNC_INIT(glDrawRangeElementArrayAPPLE, GLDRAWRANGEELEMENTARRAYAPPLE);
-    EXTMGR_FUNC_INIT(glMultiDrawElementArrayAPPLE, GLMULTIDRAWELEMENTARRAYAPPLE);
-    EXTMGR_FUNC_INIT(glMultiDrawRangeElementArrayAPPLE, GLMULTIDRAWRANGEELEMENTARRAYAPPLE);
+      EXTMGR_FUNC_INIT(glElementPointerAPPLE, GLELEMENTPOINTERAPPLE);
+      EXTMGR_FUNC_INIT(glDrawElementArrayAPPLE, GLDRAWELEMENTARRAYAPPLE);
+      EXTMGR_FUNC_INIT(glDrawRangeElementArrayAPPLE, GLDRAWRANGEELEMENTARRAYAPPLE);
+      EXTMGR_FUNC_INIT(glMultiDrawElementArrayAPPLE, GLMULTIDRAWELEMENTARRAYAPPLE);
+      EXTMGR_FUNC_INIT(glMultiDrawRangeElementArrayAPPLE, GLMULTIDRAWRANGEELEMENTARRAYAPPLE);
 
     if (init)
     {
@@ -16376,14 +16172,14 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_APPLE_fence;
     allclear = true;
-    EXTMGR_FUNC_INIT(glGenFencesAPPLE, GLGENFENCESAPPLE);
-    EXTMGR_FUNC_INIT(glDeleteFencesAPPLE, GLDELETEFENCESAPPLE);
-    EXTMGR_FUNC_INIT(glSetFenceAPPLE, GLSETFENCEAPPLE);
-    EXTMGR_FUNC_INIT(glIsFenceAPPLE, GLISFENCEAPPLE);
-    EXTMGR_FUNC_INIT(glTestFenceAPPLE, GLTESTFENCEAPPLE);
-    EXTMGR_FUNC_INIT(glFinishFenceAPPLE, GLFINISHFENCEAPPLE);
-    EXTMGR_FUNC_INIT(glTestObjectAPPLE, GLTESTOBJECTAPPLE);
-    EXTMGR_FUNC_INIT(glFinishObjectAPPLE, GLFINISHOBJECTAPPLE);
+      EXTMGR_FUNC_INIT(glGenFencesAPPLE, GLGENFENCESAPPLE);
+      EXTMGR_FUNC_INIT(glDeleteFencesAPPLE, GLDELETEFENCESAPPLE);
+      EXTMGR_FUNC_INIT(glSetFenceAPPLE, GLSETFENCEAPPLE);
+      EXTMGR_FUNC_INIT(glIsFenceAPPLE, GLISFENCEAPPLE);
+      EXTMGR_FUNC_INIT(glTestFenceAPPLE, GLTESTFENCEAPPLE);
+      EXTMGR_FUNC_INIT(glFinishFenceAPPLE, GLFINISHFENCEAPPLE);
+      EXTMGR_FUNC_INIT(glTestObjectAPPLE, GLTESTOBJECTAPPLE);
+      EXTMGR_FUNC_INIT(glFinishObjectAPPLE, GLFINISHOBJECTAPPLE);
 
     if (init)
     {
@@ -16409,10 +16205,10 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_APPLE_vertex_array_object;
     allclear = true;
-    EXTMGR_FUNC_INIT(glBindVertexArrayAPPLE, GLBINDVERTEXARRAYAPPLE);
-    EXTMGR_FUNC_INIT(glDeleteVertexArraysAPPLE, GLDELETEVERTEXARRAYSAPPLE);
-    EXTMGR_FUNC_INIT(glGenVertexArraysAPPLE, GLGENVERTEXARRAYSAPPLE);
-    EXTMGR_FUNC_INIT(glIsVertexArrayAPPLE, GLISVERTEXARRAYAPPLE);
+      EXTMGR_FUNC_INIT(glBindVertexArrayAPPLE, GLBINDVERTEXARRAYAPPLE);
+      EXTMGR_FUNC_INIT(glDeleteVertexArraysAPPLE, GLDELETEVERTEXARRAYSAPPLE);
+      EXTMGR_FUNC_INIT(glGenVertexArraysAPPLE, GLGENVERTEXARRAYSAPPLE);
+      EXTMGR_FUNC_INIT(glIsVertexArrayAPPLE, GLISVERTEXARRAYAPPLE);
 
     if (init)
     {
@@ -16438,9 +16234,9 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_APPLE_vertex_array_range;
     allclear = true;
-    EXTMGR_FUNC_INIT(glVertexArrayRangeAPPLE, GLVERTEXARRAYRANGEAPPLE);
-    EXTMGR_FUNC_INIT(glFlushVertexArrayRangeAPPLE, GLFLUSHVERTEXARRAYRANGEAPPLE);
-    EXTMGR_FUNC_INIT(glVertexArrayParameteriAPPLE, GLVERTEXARRAYPARAMETERIAPPLE);
+      EXTMGR_FUNC_INIT(glVertexArrayRangeAPPLE, GLVERTEXARRAYRANGEAPPLE);
+      EXTMGR_FUNC_INIT(glFlushVertexArrayRangeAPPLE, GLFLUSHVERTEXARRAYRANGEAPPLE);
+      EXTMGR_FUNC_INIT(glVertexArrayParameteriAPPLE, GLVERTEXARRAYPARAMETERIAPPLE);
 
     if (init)
     {
@@ -16468,9 +16264,9 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_WGL_ARB_pixel_format;
     allclear = true;
-    EXTMGR_FUNC_INIT(wglGetPixelFormatAttribivARB, WGLGETPIXELFORMATATTRIBIVARB);
-    EXTMGR_FUNC_INIT(wglGetPixelFormatAttribfvARB, WGLGETPIXELFORMATATTRIBFVARB);
-    EXTMGR_FUNC_INIT(wglChoosePixelFormatARB, WGLCHOOSEPIXELFORMATARB);
+      EXTMGR_FUNC_INIT(wglGetPixelFormatAttribivARB, WGLGETPIXELFORMATATTRIBIVARB);
+      EXTMGR_FUNC_INIT(wglGetPixelFormatAttribfvARB, WGLGETPIXELFORMATATTRIBFVARB);
+      EXTMGR_FUNC_INIT(wglChoosePixelFormatARB, WGLCHOOSEPIXELFORMATARB);
 
     if (init)
     {
@@ -16499,8 +16295,8 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_WGL_ARB_make_current_read;
     allclear = true;
-    EXTMGR_FUNC_INIT(wglMakeContextCurrentARB, WGLMAKECONTEXTCURRENTARB);
-    EXTMGR_FUNC_INIT(wglGetCurrentReadDCARB, WGLGETCURRENTREADDCARB);
+      EXTMGR_FUNC_INIT(wglMakeContextCurrentARB, WGLMAKECONTEXTCURRENTARB);
+      EXTMGR_FUNC_INIT(wglGetCurrentReadDCARB, WGLGETCURRENTREADDCARB);
 
     if (init)
     {
@@ -16529,11 +16325,11 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_WGL_ARB_pbuffer;
     allclear = true;
-    EXTMGR_FUNC_INIT(wglCreatePbufferARB, WGLCREATEPBUFFERARB);
-    EXTMGR_FUNC_INIT(wglGetPbufferDCARB, WGLGETPBUFFERDCARB);
-    EXTMGR_FUNC_INIT(wglReleasePbufferDCARB, WGLRELEASEPBUFFERDCARB);
-    EXTMGR_FUNC_INIT(wglDestroyPbufferARB, WGLDESTROYPBUFFERARB);
-    EXTMGR_FUNC_INIT(wglQueryPbufferARB, WGLQUERYPBUFFERARB);
+      EXTMGR_FUNC_INIT(wglCreatePbufferARB, WGLCREATEPBUFFERARB);
+      EXTMGR_FUNC_INIT(wglGetPbufferDCARB, WGLGETPBUFFERDCARB);
+      EXTMGR_FUNC_INIT(wglReleasePbufferDCARB, WGLRELEASEPBUFFERDCARB);
+      EXTMGR_FUNC_INIT(wglDestroyPbufferARB, WGLDESTROYPBUFFERARB);
+      EXTMGR_FUNC_INIT(wglQueryPbufferARB, WGLQUERYPBUFFERARB);
 
     if (init)
     {
@@ -16562,8 +16358,8 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_WGL_EXT_swap_control;
     allclear = true;
-    EXTMGR_FUNC_INIT(wglSwapIntervalEXT, WGLSWAPINTERVALEXT);
-    EXTMGR_FUNC_INIT(wglGetSwapIntervalEXT, WGLGETSWAPINTERVALEXT);
+      EXTMGR_FUNC_INIT(wglSwapIntervalEXT, WGLSWAPINTERVALEXT);
+      EXTMGR_FUNC_INIT(wglGetSwapIntervalEXT, WGLGETSWAPINTERVALEXT);
 
     if (init)
     {
@@ -16592,9 +16388,9 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_WGL_ARB_render_texture;
     allclear = true;
-    EXTMGR_FUNC_INIT(wglBindTexImageARB, WGLBINDTEXIMAGEARB);
-    EXTMGR_FUNC_INIT(wglReleaseTexImageARB, WGLRELEASETEXIMAGEARB);
-    EXTMGR_FUNC_INIT(wglSetPbufferAttribARB, WGLSETPBUFFERATTRIBARB);
+      EXTMGR_FUNC_INIT(wglBindTexImageARB, WGLBINDTEXIMAGEARB);
+      EXTMGR_FUNC_INIT(wglReleaseTexImageARB, WGLRELEASETEXIMAGEARB);
+      EXTMGR_FUNC_INIT(wglSetPbufferAttribARB, WGLSETPBUFFERATTRIBARB);
 
     if (init)
     {
@@ -16623,7 +16419,7 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_WGL_EXT_extensions_string;
     allclear = true;
-    EXTMGR_FUNC_INIT(wglGetExtensionsStringEXT, WGLGETEXTENSIONSSTRINGEXT);
+      EXTMGR_FUNC_INIT(wglGetExtensionsStringEXT, WGLGETEXTENSIONSSTRINGEXT);
 
     if (init)
     {
@@ -16652,8 +16448,8 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_WGL_EXT_make_current_read;
     allclear = true;
-    EXTMGR_FUNC_INIT(wglMakeContextCurrentEXT, WGLMAKECONTEXTCURRENTEXT);
-    EXTMGR_FUNC_INIT(wglGetCurrentReadDCEXT, WGLGETCURRENTREADDCEXT);
+      EXTMGR_FUNC_INIT(wglMakeContextCurrentEXT, WGLMAKECONTEXTCURRENTEXT);
+      EXTMGR_FUNC_INIT(wglGetCurrentReadDCEXT, WGLGETCURRENTREADDCEXT);
 
     if (init)
     {
@@ -16682,11 +16478,11 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_WGL_EXT_pbuffer;
     allclear = true;
-    EXTMGR_FUNC_INIT(wglCreatePbufferEXT, WGLCREATEPBUFFEREXT);
-    EXTMGR_FUNC_INIT(wglGetPbufferDCEXT, WGLGETPBUFFERDCEXT);
-    EXTMGR_FUNC_INIT(wglReleasePbufferDCEXT, WGLRELEASEPBUFFERDCEXT);
-    EXTMGR_FUNC_INIT(wglDestroyPbufferEXT, WGLDESTROYPBUFFEREXT);
-    EXTMGR_FUNC_INIT(wglQueryPbufferEXT, WGLQUERYPBUFFEREXT);
+      EXTMGR_FUNC_INIT(wglCreatePbufferEXT, WGLCREATEPBUFFEREXT);
+      EXTMGR_FUNC_INIT(wglGetPbufferDCEXT, WGLGETPBUFFERDCEXT);
+      EXTMGR_FUNC_INIT(wglReleasePbufferDCEXT, WGLRELEASEPBUFFERDCEXT);
+      EXTMGR_FUNC_INIT(wglDestroyPbufferEXT, WGLDESTROYPBUFFEREXT);
+      EXTMGR_FUNC_INIT(wglQueryPbufferEXT, WGLQUERYPBUFFEREXT);
 
     if (init)
     {
@@ -16715,9 +16511,9 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_WGL_EXT_pixel_format;
     allclear = true;
-    EXTMGR_FUNC_INIT(wglGetPixelFormatAttribivEXT, WGLGETPIXELFORMATATTRIBIVEXT);
-    EXTMGR_FUNC_INIT(wglGetPixelFormatAttribfvEXT, WGLGETPIXELFORMATATTRIBFVEXT);
-    EXTMGR_FUNC_INIT(wglChoosePixelFormatEXT, WGLCHOOSEPIXELFORMATEXT);
+      EXTMGR_FUNC_INIT(wglGetPixelFormatAttribivEXT, WGLGETPIXELFORMATATTRIBIVEXT);
+      EXTMGR_FUNC_INIT(wglGetPixelFormatAttribfvEXT, WGLGETPIXELFORMATATTRIBFVEXT);
+      EXTMGR_FUNC_INIT(wglChoosePixelFormatEXT, WGLCHOOSEPIXELFORMATEXT);
 
     if (init)
     {
@@ -16746,8 +16542,8 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_WGL_I3D_digital_video_control;
     allclear = true;
-    EXTMGR_FUNC_INIT(wglGetDigitalVideoParametersI3D, WGLGETDIGITALVIDEOPARAMETERSI3D);
-    EXTMGR_FUNC_INIT(wglSetDigitalVideoParametersI3D, WGLSETDIGITALVIDEOPARAMETERSI3D);
+      EXTMGR_FUNC_INIT(wglGetDigitalVideoParametersI3D, WGLGETDIGITALVIDEOPARAMETERSI3D);
+      EXTMGR_FUNC_INIT(wglSetDigitalVideoParametersI3D, WGLSETDIGITALVIDEOPARAMETERSI3D);
 
     if (init)
     {
@@ -16776,10 +16572,10 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_WGL_I3D_gamma;
     allclear = true;
-    EXTMGR_FUNC_INIT(wglGetGammaTableParametersI3D, WGLGETGAMMATABLEPARAMETERSI3D);
-    EXTMGR_FUNC_INIT(wglSetGammaTableParametersI3D, WGLSETGAMMATABLEPARAMETERSI3D);
-    EXTMGR_FUNC_INIT(wglGetGammaTableI3D, WGLGETGAMMATABLEI3D);
-    EXTMGR_FUNC_INIT(wglSetGammaTableI3D, WGLSETGAMMATABLEI3D);
+      EXTMGR_FUNC_INIT(wglGetGammaTableParametersI3D, WGLGETGAMMATABLEPARAMETERSI3D);
+      EXTMGR_FUNC_INIT(wglSetGammaTableParametersI3D, WGLSETGAMMATABLEPARAMETERSI3D);
+      EXTMGR_FUNC_INIT(wglGetGammaTableI3D, WGLGETGAMMATABLEI3D);
+      EXTMGR_FUNC_INIT(wglSetGammaTableI3D, WGLSETGAMMATABLEI3D);
 
     if (init)
     {
@@ -16808,18 +16604,18 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_WGL_I3D_genlock;
     allclear = true;
-    EXTMGR_FUNC_INIT(wglEnableGenlockI3D, WGLENABLEGENLOCKI3D);
-    EXTMGR_FUNC_INIT(wglDisableGenlockI3D, WGLDISABLEGENLOCKI3D);
-    EXTMGR_FUNC_INIT(wglIsEnabledGenlockI3D, WGLISENABLEDGENLOCKI3D);
-    EXTMGR_FUNC_INIT(wglGenlockSourceI3D, WGLGENLOCKSOURCEI3D);
-    EXTMGR_FUNC_INIT(wglGetGenlockSourceI3D, WGLGETGENLOCKSOURCEI3D);
-    EXTMGR_FUNC_INIT(wglGenlockSourceEdgeI3D, WGLGENLOCKSOURCEEDGEI3D);
-    EXTMGR_FUNC_INIT(wglGetGenlockSourceEdgeI3D, WGLGETGENLOCKSOURCEEDGEI3D);
-    EXTMGR_FUNC_INIT(wglGenlockSampleRateI3D, WGLGENLOCKSAMPLERATEI3D);
-    EXTMGR_FUNC_INIT(wglGetGenlockSampleRateI3D, WGLGETGENLOCKSAMPLERATEI3D);
-    EXTMGR_FUNC_INIT(wglGenlockSourceDelayI3D, WGLGENLOCKSOURCEDELAYI3D);
-    EXTMGR_FUNC_INIT(wglGetGenlockSourceDelayI3D, WGLGETGENLOCKSOURCEDELAYI3D);
-    EXTMGR_FUNC_INIT(wglQueryGenlockMaxSourceDelayI3D, WGLQUERYGENLOCKMAXSOURCEDELAYI3D);
+      EXTMGR_FUNC_INIT(wglEnableGenlockI3D, WGLENABLEGENLOCKI3D);
+      EXTMGR_FUNC_INIT(wglDisableGenlockI3D, WGLDISABLEGENLOCKI3D);
+      EXTMGR_FUNC_INIT(wglIsEnabledGenlockI3D, WGLISENABLEDGENLOCKI3D);
+      EXTMGR_FUNC_INIT(wglGenlockSourceI3D, WGLGENLOCKSOURCEI3D);
+      EXTMGR_FUNC_INIT(wglGetGenlockSourceI3D, WGLGETGENLOCKSOURCEI3D);
+      EXTMGR_FUNC_INIT(wglGenlockSourceEdgeI3D, WGLGENLOCKSOURCEEDGEI3D);
+      EXTMGR_FUNC_INIT(wglGetGenlockSourceEdgeI3D, WGLGETGENLOCKSOURCEEDGEI3D);
+      EXTMGR_FUNC_INIT(wglGenlockSampleRateI3D, WGLGENLOCKSAMPLERATEI3D);
+      EXTMGR_FUNC_INIT(wglGetGenlockSampleRateI3D, WGLGETGENLOCKSAMPLERATEI3D);
+      EXTMGR_FUNC_INIT(wglGenlockSourceDelayI3D, WGLGENLOCKSOURCEDELAYI3D);
+      EXTMGR_FUNC_INIT(wglGetGenlockSourceDelayI3D, WGLGETGENLOCKSOURCEDELAYI3D);
+      EXTMGR_FUNC_INIT(wglQueryGenlockMaxSourceDelayI3D, WGLQUERYGENLOCKMAXSOURCEDELAYI3D);
 
     if (init)
     {
@@ -16846,11 +16642,11 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_ARB_matrix_palette;
     allclear = true;
-    EXTMGR_FUNC_INIT(glCurrentPaletteMatrixARB, GLCURRENTPALETTEMATRIXARB);
-    EXTMGR_FUNC_INIT(glMatrixIndexubvARB, GLMATRIXINDEXUBVARB);
-    EXTMGR_FUNC_INIT(glMatrixIndexusvARB, GLMATRIXINDEXUSVARB);
-    EXTMGR_FUNC_INIT(glMatrixIndexuivARB, GLMATRIXINDEXUIVARB);
-    EXTMGR_FUNC_INIT(glMatrixIndexPointerARB, GLMATRIXINDEXPOINTERARB);
+      EXTMGR_FUNC_INIT(glCurrentPaletteMatrixARB, GLCURRENTPALETTEMATRIXARB);
+      EXTMGR_FUNC_INIT(glMatrixIndexubvARB, GLMATRIXINDEXUBVARB);
+      EXTMGR_FUNC_INIT(glMatrixIndexusvARB, GLMATRIXINDEXUSVARB);
+      EXTMGR_FUNC_INIT(glMatrixIndexuivARB, GLMATRIXINDEXUIVARB);
+      EXTMGR_FUNC_INIT(glMatrixIndexPointerARB, GLMATRIXINDEXPOINTERARB);
 
     if (init)
     {
@@ -16876,11 +16672,11 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_NV_element_array;
     allclear = true;
-    EXTMGR_FUNC_INIT(glElementPointerNV, GLELEMENTPOINTERNV);
-    EXTMGR_FUNC_INIT(glDrawElementArrayNV, GLDRAWELEMENTARRAYNV);
-    EXTMGR_FUNC_INIT(glDrawRangeElementArrayNV, GLDRAWRANGEELEMENTARRAYNV);
-    EXTMGR_FUNC_INIT(glMultiDrawElementArrayNV, GLMULTIDRAWELEMENTARRAYNV);
-    EXTMGR_FUNC_INIT(glMultiDrawRangeElementArrayNV, GLMULTIDRAWRANGEELEMENTARRAYNV);
+      EXTMGR_FUNC_INIT(glElementPointerNV, GLELEMENTPOINTERNV);
+      EXTMGR_FUNC_INIT(glDrawElementArrayNV, GLDRAWELEMENTARRAYNV);
+      EXTMGR_FUNC_INIT(glDrawRangeElementArrayNV, GLDRAWRANGEELEMENTARRAYNV);
+      EXTMGR_FUNC_INIT(glMultiDrawElementArrayNV, GLMULTIDRAWELEMENTARRAYNV);
+      EXTMGR_FUNC_INIT(glMultiDrawRangeElementArrayNV, GLMULTIDRAWRANGEELEMENTARRAYNV);
 
     if (init)
     {
@@ -16904,10 +16700,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_NV_float_buffer)
-    {
-      allclear = true;
+    bool init = CS_GL_NV_float_buffer;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_NV_float_buffer)
     }
     else
@@ -16930,16 +16727,16 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_NV_fragment_program;
     allclear = true;
-    EXTMGR_FUNC_INIT(glProgramNamedParameter4fNV, GLPROGRAMNAMEDPARAMETER4FNV);
-    EXTMGR_FUNC_INIT(glProgramNamedParameter4dNV, GLPROGRAMNAMEDPARAMETER4DNV);
-    EXTMGR_FUNC_INIT(glGetProgramNamedParameterfvNV, GLGETPROGRAMNAMEDPARAMETERFVNV);
-    EXTMGR_FUNC_INIT(glGetProgramNamedParameterdvNV, GLGETPROGRAMNAMEDPARAMETERDVNV);
-    EXTMGR_FUNC_INIT(glProgramLocalParameter4dARB, GLPROGRAMLOCALPARAMETER4DARB);
-    EXTMGR_FUNC_INIT(glProgramLocalParameter4dvARB, GLPROGRAMLOCALPARAMETER4DVARB);
-    EXTMGR_FUNC_INIT(glProgramLocalParameter4fARB, GLPROGRAMLOCALPARAMETER4FARB);
-    EXTMGR_FUNC_INIT(glProgramLocalParameter4fvARB, GLPROGRAMLOCALPARAMETER4FVARB);
-    EXTMGR_FUNC_INIT(glGetProgramLocalParameterdvARB, GLGETPROGRAMLOCALPARAMETERDVARB);
-    EXTMGR_FUNC_INIT(glGetProgramLocalParameterfvARB, GLGETPROGRAMLOCALPARAMETERFVARB);
+      EXTMGR_FUNC_INIT(glProgramNamedParameter4fNV, GLPROGRAMNAMEDPARAMETER4FNV);
+      EXTMGR_FUNC_INIT(glProgramNamedParameter4dNV, GLPROGRAMNAMEDPARAMETER4DNV);
+      EXTMGR_FUNC_INIT(glGetProgramNamedParameterfvNV, GLGETPROGRAMNAMEDPARAMETERFVNV);
+      EXTMGR_FUNC_INIT(glGetProgramNamedParameterdvNV, GLGETPROGRAMNAMEDPARAMETERDVNV);
+      EXTMGR_FUNC_INIT(glProgramLocalParameter4dARB, GLPROGRAMLOCALPARAMETER4DARB);
+      EXTMGR_FUNC_INIT(glProgramLocalParameter4dvARB, GLPROGRAMLOCALPARAMETER4DVARB);
+      EXTMGR_FUNC_INIT(glProgramLocalParameter4fARB, GLPROGRAMLOCALPARAMETER4FARB);
+      EXTMGR_FUNC_INIT(glProgramLocalParameter4fvARB, GLPROGRAMLOCALPARAMETER4FVARB);
+      EXTMGR_FUNC_INIT(glGetProgramLocalParameterdvARB, GLGETPROGRAMLOCALPARAMETERDVARB);
+      EXTMGR_FUNC_INIT(glGetProgramLocalParameterfvARB, GLGETPROGRAMLOCALPARAMETERFVARB);
 
     if (init)
     {
@@ -16965,8 +16762,8 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_NV_primitive_restart;
     allclear = true;
-    EXTMGR_FUNC_INIT(glPrimitiveRestartNV, GLPRIMITIVERESTARTNV);
-    EXTMGR_FUNC_INIT(glPrimitiveRestartIndexNV, GLPRIMITIVERESTARTINDEXNV);
+      EXTMGR_FUNC_INIT(glPrimitiveRestartNV, GLPRIMITIVERESTARTNV);
+      EXTMGR_FUNC_INIT(glPrimitiveRestartIndexNV, GLPRIMITIVERESTARTINDEXNV);
 
     if (init)
     {
@@ -16990,10 +16787,11 @@ public:
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_NV_vertex_program2)
-    {
-      allclear = true;
+    bool init = CS_GL_NV_vertex_program2;
+    allclear = true;
 
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_NV_vertex_program2)
     }
     else
@@ -17016,17 +16814,17 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_ARB_vertex_buffer_object;
     allclear = true;
-    EXTMGR_FUNC_INIT(glBindBufferARB, GLBINDBUFFERARB);
-    EXTMGR_FUNC_INIT(glDeleteBuffersARB, GLDELETEBUFFERSARB);
-    EXTMGR_FUNC_INIT(glGenBuffersARB, GLGENBUFFERSARB);
-    EXTMGR_FUNC_INIT(glBufferDataARB, GLBUFFERDATAARB);
-    EXTMGR_FUNC_INIT(glBufferSubDataARB, GLBUFFERSUBDATAARB);
-    EXTMGR_FUNC_INIT(glMapBufferARB, GLMAPBUFFERARB);
-    EXTMGR_FUNC_INIT(glUnmapBufferARB, GLUNMAPBUFFERARB);
-    EXTMGR_FUNC_INIT(glIsBufferARB, GLISBUFFERARB);
-    EXTMGR_FUNC_INIT(glGetBufferSubDataARB, GLGETBUFFERSUBDATAARB);
-    EXTMGR_FUNC_INIT(glGetBufferPointervARB, GLGETBUFFERPOINTERVARB);
-    EXTMGR_FUNC_INIT(glGetBufferParameterivARB, GLGETBUFFERPARAMETERIVARB);
+      EXTMGR_FUNC_INIT(glBindBufferARB, GLBINDBUFFERARB);
+      EXTMGR_FUNC_INIT(glDeleteBuffersARB, GLDELETEBUFFERSARB);
+      EXTMGR_FUNC_INIT(glGenBuffersARB, GLGENBUFFERSARB);
+      EXTMGR_FUNC_INIT(glBufferDataARB, GLBUFFERDATAARB);
+      EXTMGR_FUNC_INIT(glBufferSubDataARB, GLBUFFERSUBDATAARB);
+      EXTMGR_FUNC_INIT(glMapBufferARB, GLMAPBUFFERARB);
+      EXTMGR_FUNC_INIT(glUnmapBufferARB, GLUNMAPBUFFERARB);
+      EXTMGR_FUNC_INIT(glIsBufferARB, GLISBUFFERARB);
+      EXTMGR_FUNC_INIT(glGetBufferSubDataARB, GLGETBUFFERSUBDATAARB);
+      EXTMGR_FUNC_INIT(glGetBufferPointervARB, GLGETBUFFERPOINTERVARB);
+      EXTMGR_FUNC_INIT(glGetBufferParameterivARB, GLGETBUFFERPARAMETERIVARB);
 
     if (init)
     {
@@ -17052,12 +16850,62 @@ public:
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_GL_ATI_separate_stencil;
     allclear = true;
-    EXTMGR_FUNC_INIT(glStencilOpSeparateATI, GLSTENCILOPSEPARATEATI);
-    EXTMGR_FUNC_INIT(glStencilFuncSeparateATI, GLSTENCILFUNCSEPARATEATI);
+      EXTMGR_FUNC_INIT(glStencilOpSeparateATI, GLSTENCILOPSEPARATEATI);
+      EXTMGR_FUNC_INIT(glStencilFuncSeparateATI, GLSTENCILFUNCSEPARATEATI);
 
     if (init)
     {
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ATI_separate_stencil)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  void InitGL_ARB_texture_non_power_of_two ()
+  {
+    if (tested_CS_GL_ARB_texture_non_power_of_two) return;
+    tested_CS_GL_ARB_texture_non_power_of_two = true;
+    const char* ext = "GL_ARB_texture_non_power_of_two";
+    char cfgkey[26 + 31 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_texture_non_power_of_two = (strstr (extstrGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_texture_non_power_of_two;
+    allclear = true;
+
+    if (init)
+    {
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_texture_non_power_of_two)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  void InitGL_ARB_point_sprite ()
+  {
+    if (tested_CS_GL_ARB_point_sprite) return;
+    tested_CS_GL_ARB_point_sprite = true;
+    const char* ext = "GL_ARB_point_sprite";
+    char cfgkey[26 + 19 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_point_sprite = (strstr (extstrGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_point_sprite;
+    allclear = true;
+
+    if (init)
+    {
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_point_sprite)
     }
     else
     {

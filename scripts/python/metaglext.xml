@@ -5769,4 +5769,9 @@
       <arg name="mask" type="GLuint" const="false" pointer="false" />
     </function>
   </extension>
+  <extension name="GL_ARB_texture_non_power_of_two" type="GL" />
+  <extension name="GL_ARB_point_sprite" type="GL">
+    <token name="GL_POINT_SPRITE_ARB" value="0x8861" />
+    <token name="GL_COORD_REPLACE_ARB" value="0x8862" />
+  </extension>
 </extensionlist>
