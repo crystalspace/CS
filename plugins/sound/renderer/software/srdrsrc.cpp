@@ -287,21 +287,52 @@ void csSoundSourceSoftware::AddToBufferStatic(void *mem, long size)
                 (SoundRender->isStereo() ? 2 : 1);
   long NumSamples = size / OutBPS;
 
-  while (1) {
-    long Num = NumSamples;
+  if (snd->IsStatic ())
+    while (1) 
+    {
+      long Num = NumSamples;
 
-    if (SoundPos + Num > snd->GetStaticSampleCount())
-      Num = snd->GetStaticSampleCount() - SoundPos;
-    unsigned char *Input = (unsigned char*)snd->GetStaticData();
+      if (SoundPos + Num > snd->GetStaticSampleCount())
+	Num = snd->GetStaticSampleCount() - SoundPos;
+      unsigned char *Input = (unsigned char*)snd->GetStaticData();
 
-    WriteBuffer(Input + SoundPos * InBPS, mem, Num);
-    SoundPos += Num;
+      WriteBuffer(Input + SoundPos * InBPS, mem, Num);
+      SoundPos += Num;
+      
+      NumSamples -= Num;
+      mem = ((unsigned char *)mem) + Num * OutBPS;
+      
+      if (NumSamples == 0) break;
+      if (!(PlayMethod & SOUND_LOOP)) break;
+      Restart();
+    }
+  else // streamed sound
+  {
+    long wait = 0;
+    while (1) 
+    {
+      long Num = NumSamples;
 
-    NumSamples -= Num;
-    mem = ((unsigned char *)mem) + Num * OutBPS;
+      void *Buffer = snd->ReadStreamed (Num);
+      if (Num)
+      {
+	WriteBuffer(Buffer, mem, Num);
+	NumSamples -= Num;
+	mem = ((unsigned char *)mem) + Num * OutBPS;
+      }
+      if (NumSamples == 0) break;
+      if (!(PlayMethod & SOUND_LOOP)) break;
 
-    if (NumSamples == 0) break;
-    if (!(PlayMethod & SOUND_LOOP)) break;
-    Restart();
+      if (Num == 0)
+      {
+	if (wait == 0)
+	{
+	  Restart();
+	  wait++;
+	}
+	else
+	  break;
+      }
+    }
   }
 }
