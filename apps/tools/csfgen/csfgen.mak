@@ -39,9 +39,9 @@ LIB.CSFGEN = $(foreach d,$(DEP.CSFGEN),$($d.LIB))
 
 TO_INSTALL.EXE += $(CSFGEN.EXE)
 
-#MSVC.DSP += CSFGEN
-#DSP.CSFGEN.NAME = csfgen
-#DSP.CSFGEN.TYPE = appcon
+MSVC.DSP += CSFGEN
+DSP.CSFGEN.NAME = csfgen
+DSP.CSFGEN.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

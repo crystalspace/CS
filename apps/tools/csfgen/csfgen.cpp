@@ -25,6 +25,8 @@
 
 CS_IMPLEMENT_APPLICATION
 
+csSystemDriver* System;
+
 char *programversion = "0.0.1";
 char *programname;
 
