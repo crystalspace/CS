@@ -2407,7 +2407,7 @@ void Blocks::StartNewGame ()
     if (!strncmp (cube->QueryObject ()->GetName (), "cube", 4))
     {
       ml->Remove (cube);
-      cube->DecRef ();
+      //cube->DecRef ();
     }
     else
       i++;
