@@ -1,4 +1,5 @@
 @c -*-texinfo-*-
 @importssss{build,platform,win32,msvc,msvc.txi}
 @importssss{build,platform,win32,win32gcc,win32gcc.txi}
+@importssss{build,platform,win32,cygwin,cygwin.txi}
 

@@ -20,6 +20,7 @@ will find a reference to it from within the instructions in this section.
 * Unix::
 * MSVC:: Windows using Microsoft Visual C++
 * MinGW:: Windows using MinGW
+* Cygwin:: Windows using Cygwin
 * NeXT:: MacOS/X, MacOS/X Server 1.0, OpenStep, NextStep
 * OS2:: @sc{os}/2
 * BeOS:: @sc{b}e@sc{os}

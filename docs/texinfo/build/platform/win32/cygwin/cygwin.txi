@@ -1,0 +1,3 @@
+@c -*-texinfo-*-
+@node Cygwin, NeXT, MinGW, Platform Instructions
+@subsection Windows using Cygwin
