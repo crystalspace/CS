@@ -416,10 +416,16 @@ public:
   /// An iterator class for the set.
   class Iterator : public csHash<T, T, KeyHandler>::Iterator
   {
+  protected:
+    Iterator () {}
+  public:
   };
   /// An iterator class for the set.
   class GlobalIterator : public csHash<T, T, KeyHandler>::GlobalIterator
   {
+  protected:
+    GlobalIterator () {}
+  public:
   };
 
   /**
