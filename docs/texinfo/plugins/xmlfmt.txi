@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
-@node XML File Format, Old Map File Format, csParser, csParser
-@subsection Format of Map File (XML)
+@node XML File Format, MeshObject, csParser, Plug-In Drivers
+@section Format of Map File (XML)
 @cindex Format of Map File
 @cindex Map File Format
 @cindex XML
@@ -79,6 +79,19 @@ highest level you have sectors. In every sector the actual objects reside
 Finally there is the action section. In this section sequences and
 triggers are used to define interactions and other special actions on
 objects and other objects in the world.
+
+@menu
+* XML Init Section:: Initalization Section
+* XML World Element Section:: World Element Section
+* XML World Definition Section:: World Definition Section
+* XML Action Section:: Action Section
+* Old Map File Format:: Old Format of Map File
+@end menu
+
+@node XML Init Section, XML World Element Section, XML File Format, XML File Format
+@subsection Initalization Section
+
+This section describes the initialization section.
 
 @subsubheading Texture Specification Section
 @cindex textures Specification (Map File)
@@ -229,3 +242,691 @@ spr3d, and spr3dfact plugins:
     <plugin name="spr3d">crystalspace.mesh.loader.sprite.3d</plugin>
 </plugins>
 @end example
+
+@subsubheading Settings Section
+@cindex settings (Map File)
+
+In the settings section there are a few configuration options that you can
+specify. Here is a complete settings example:
+
+@example
+<settings>
+  <clearzbuf />
+  <clearscreen />
+  <lightmapcellsize>16</lightmapcellsize>
+  <maxlightmapsize horizontal="256" vertical="256" />
+  <ambient red=".1" green=".1" blue=".1" />
+</settings>
+@end example
+
+By default Crystal Space does not clear the z-buffer not the screen every
+frame. For the z-buffer it depends on objects to fill the z-buffer. In a
+typical Crystal Space world every sector would have an outer hull (either
+a skybox or else the walls of the room) which would use @samp{zfill} mode
+so that the z-buffer is updated but not read. Objects in the room can then
+use @samp{zuse}. If you don't want this (i.e. you want to use @samp{zuse}
+for all objects) then you can use @samp{clearzbuf}. Similar for
+@samp{clearscreen}.
+
+The lightmap cellsize defines how many texels (pixels on a texture) there
+are in every lumel (lightmap value). For example, if the lightmap cellsize
+is 16 (default) then for every 16x16 texels there will be one lumel.
+
+The maximum lightmap size is usually 256x256. You can change this value
+here but this usually doesn't make much sense.
+
+In addition to the lighting information given by all lights in the system,
+every object will also get ambient lighting. Ambient lighting is global to
+the engine (at least static ambient lighting). You can set the ambient
+for a level in the settings block. Default ambient is 0.078 for all color
+components.
+
+@subsubheading Start Location Section
+@cindex start location (Map File)
+
+A map file can contain zero or more start locations for the camera. How
+these start locations are interpreted is up to the application. Typically
+there is one start location that has no name and which is considered the
+default. But you can have multiple start locations and refer to them by
+name in your application. Here is an example:
+
+@example
+    <start>
+        <sector>room</sector>
+        <position x="0" y="0" z="0" />
+    </start>
+    <start name="alternate">
+        <sector>other_room</sector>
+        <position x="0" y="0" z="0" />
+	<up x="0" y="-1" z="0" />
+	<forward x="0" y="0" z="-1" />
+	<farplane a="0" b="0" c="1" d="100" />
+    </start>
+@end example
+
+If there is no start location then by convention many applications assume
+that the default start is in sector called @samp{room} at location
+@samp{0,0,0}.
+
+The first example above is easy. It just defines the same starting location
+as specifying nothing would have done.
+
+The second example is more complicated. It defines a start location called
+@samp{alternate}. The up-vector is specified as @samp{0,-1,0} which is just
+the reverse of the default @samp{0,1,0}. This means that the camera will
+be upside down. The forward vector is @samp{0,0,-1} which means that
+the camera will be looking to the negative z axis. By default the camera
+looks in the positive z direction.
+
+The last @samp{farplane} option is interesting. It indicates that all
+geometry beyond @code{z=100} will be clipped away. You can use this if
+you want to speed up rendering and you know that objects further away than
+the specified distance are not interesting or you use fog that would have
+made them invisible anyway. Note that fog alone doesn't do that. By default
+there is no farplane. If you use the farplane option it is usually recommended
+to let the engine clear the z-buffer every frame (see the @samp{settings}
+section above) because you can no longer depend on geometry to do it for you
+if it is culled away.
+
+@subsubheading Library Specification Section
+@cindex libraries (Map File)
+
+It is possible to define libraries that contain objects like mesh factories,
+textures, materials, and so on and then include those libraries in your
+map files. Creating a library file is very easy. It is basically the same
+as creating a map file but instead of @code{<world>} you would use
+@code{<library>}. To use a library you can simply put the following in
+your map file:
+
+@example
+<library>/mygamedata/library</library>
+@end example
+
+@subsubheading Keys
+@cindex keys (Map File)
+
+Crystal Space has a system with which you can attach user data to almost
+all Crystal Space objects. This user data has a name and a value (string
+based) and in code you can query for those name/value pairs. Crystal Space
+itself doesn't use this. It only stores the information.
+
+When you specify name/value pairs in the world section itself you are
+essentially adding information to the engine class. Here is an example:
+
+@example
+<key name="spawn_monster" value="ghost,mainhall,10,1,12" />
+<key name="spawn_monster" value="goblin,corridor,15,3,10" />
+@end example
+
+@node XML World Element Section, XML World Definition Section, XML Init Section, XML File Format
+@subsection World Element Section
+
+This section describes the world element section.
+
+@subsubheading Addon Section
+@cindex addons (Map File)
+@cindex @code{iLoaderPlugin}
+
+Addons are loader plugins that can be used to extend the loading
+capabilities. Like keys, addons can also be loaded from almost any
+Crystal Space object. The difference is that the loaded information
+is not automatically attached to the object. Instead the object in which
+the addon is called is given as a @emph{context} to the addon loader
+so that it can choose to do with it whatever it wants. For example, you
+could make an addon plugin for your own game that sets up a physics
+object for a mesh object. To do that you would have to create a plugin
+that implements the @code{iLoaderPlugin} interface. In the plugin
+implementation you can examine the context and based on that create some
+information that you can attach to that context (if it is a mesh object
+for example). The addon plugin will also get an @sc{xml} node that it
+can parse for additional parameters.
+
+Crystal Space itself currently defines two addon loaders itself. The
+first one is useful for defining bezier templates that you can later use
+in a bezier curve. The second one is useful for creating named texture
+planes that can be used to define texture mapping for a number of polygons
+that are all on the same plane. Here is an example of both:
+
+@example
+<addon>
+    <plugin>crystalspace.mesh.loader.thing.bezier</plugin>
+    <params>
+        <name>b1</name>
+        <material>mosaic</material>
+        <v>0</v>
+        <v>1</v>
+        <v>2</v>
+        <v>8</v>
+        <v>9</v>
+        <v>10</v>
+        <v>16</v>
+        <v>17</v>
+        <v>18</v>
+    </params>
+</addon>
+
+<addon>
+    <plugin>crystalspace.mesh.loader.thing.plane</plugin>
+    <params>
+        <name>floor_plane</name>
+        <orig x="-20" y="-1" z="20" />
+        <first x="-19" y="-1" z="20" />
+        <firstlen>5</firstlen>
+        <second x="-20" y="-1" z="19" />
+        <secondlen>5</secondlen>
+    </params>
+</addon>
+@end example
+
+I will only explain the second example here as bezier curves are likely
+to change in the not-too-distant future. Important in both examples is
+that the part inside the @samp{params} block is parsed by the addon itself.
+It is also possible to specify the parameters of a plugin in another
+@sc{xml} file in which case you can use @samp{paramsfile}.
+
+The plane addon that is used above defines a horizontal texture plane at
+location @emph{y} equal to @samp{-1}. The dimension of the texture on
+that plane will be 5x5 units. This means that in the space of a 5x5 unit
+block the texture will be shown exactly one time. If the polygons are bigger
+then that then tiling will be used. When you define @samp{thing} mesh objects
+you can use this plane if the polygon happens to be at @emph{y} equal to
+@samp{-1}.
+
+@subsubheading Mesh Factory Section
+@cindex mesh factories (Map File)
+
+In a map file you can define zero or more mesh factories. A mesh factory
+itself is not an object that you can see. It only defines a blue-print
+for creating mesh objects later. How a mesh factory and mesh object
+interact depends on the specific type of mesh object. For some types
+factories are required but for others you can just define the object
+directly as a mesh object (@pxref{MeshObject}).
+
+Here is an example mesh factory:
+
+@example
+<meshfact name="square">
+    <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+    <params>
+        <numvt>4</numvt>
+        <numtri>4</numtri>
+        <v x="-2" y="0" z="-2" u="0" v="0" />
+        <v x="2" y="0" z="-2" u="1" v="0" />
+        <v x="2" y="0" z="2" u="1" v="1" />
+        <v x="-2" y="0" z="2" u="0" v="1" />
+        <t v1="3" v2="0" v3="1" />
+        <t v1="1" v2="2" v3="3" />
+        <t v1="1" v2="0" v3="3" />
+        <t v1="3" v2="2" v3="1" />
+        <autonormals />
+    </params>
+</meshfact>
+@end example
+
+In the example above we use the @samp{genmesh} factory loader plugin.
+Everything inside the @samp{params} block is specific to that loader. If
+you use other loaders you will need other stuff in there.
+It is also possible to specify the parameters of a plugin in another
+@sc{xml} file in which case you can use @samp{paramsfile}. The use
+of @samp{paramsfile} is required if the other file is binary or not
+@sc{xml}.
+
+The example above defines a factory called @samp{square}. When you later
+define mesh objects you can create them from that factory. In case of
+@samp{genmesh} which is used here you must use factories.
+
+Mesh factories can contain keys and addons.
+
+@node XML World Definition Section, XML Action Section, XML World Element Section, XML File Format
+@subsection World Definition Section
+
+This section describes the world definition section.
+
+@subsubheading Sector Section
+@cindex sectors (Map File)
+
+A map file usually contains at least one sector. A sector is an infinite
+area of space which you can populate with mesh objects and lights. Using
+portals you can connect different sectors.
+
+Note that while a sector is in fact infinite, in practice it is usually
+bounded by some geometry. For an outside level there is usually
+a sky box or sky dome which marks the outermost geometry. In case of indoor
+type levels there are usually sector walls.
+
+Here is an example sector:
+
+@example
+<sector name="room">
+  <meshobj name="walls">
+    <plugin>crystalspace.mesh.loader.thing</plugin>
+    <zfill />
+    <params>
+      <v x="-10" y="-1" z="10"/> <v x="10" y="-1" z="10"/>
+      <v x="-10" y="-1" z="-10"/> <v x="10" y="-1" z="-10"/>
+      <v x="-10" y="4" z="10"/> <v x="10" y="4" z="10"/>
+      <v x="-10" y="4" z="-10"/> <v x="10" y="4" z="-10"/>
+      <material>wood</material>
+      <texlen>4</texlen>
+      <p name="up">
+	<v>6</v> <v>7</v> <v>5</v> <v>4</v>
+      </p>
+      <p name="down">
+	<v>3</v> <v>2</v> <v>0</v> <v>1</v>
+      </p>
+      <p name="back">
+	<v>7</v> <v>6</v> <v>2</v> <v>3</v>
+      </p>
+      <p name="front">
+	<v>4</v> <v>5</v> <v>1</v> <v>0</v>
+      </p>
+      <p name="left">
+	<v>6</v> <v>4</v> <v>0</v> <v>2</v>
+      </p>
+      <p name="right">
+	<v>5</v> <v>7</v> <v>3</v> <v>1</v>
+      </p>
+    </params>
+  </meshobj>
+  <light>
+    <center x="0" y="3" z="0"/>
+    <radius>40</radius>
+    <color red="1" green="1" blue="1"/>
+  </light>
+</sector>
+@end example
+
+In the above example we create a sector called @samp{room} which contains
+one mesh object (the outer walls of the sector) and one light. Any type
+of mesh object can be placed in a sector. In this example we use the
+@samp{thing} mesh object.
+
+There are some other things you can specify in a sector. By default a
+sector will use the @samp{frustvis} visibility culler. This visibility culler
+will only do frustum culling. For small sectors (i.e. a small number of
+objects) this is usually sufficient. If you have a large sector with lots
+of objects then you should probably use @samp{dynavis} instead. Like this:
+
+@example
+<cullerp>crystalspace.culling.dynavis</cullerp>
+@end example
+
+In addition to using @samp{meshobj} for specifying mesh objects in a sector
+there are also some other techniques that you can use.
+
+@itemize
+@item
+@samp{meshref}: with @samp{meshref} you can directly create a mesh object
+from a factory. This sounds similar to @samp{meshobj} but the main difference
+is that you can create hierarchical mesh objects from hierarchical mesh
+factories with this. The disadvantage is that it is not possible to supply
+mesh object specific parameters to the created mesh objects (i.e. you cannot
+supply a @samp{params} or @samp{paramsfile} with @samp{meshref}).
+
+@item
+@samp{meshlib:} normally a library contains mesh factories. But it is possible
+to define mesh objects in libraries too. These mesh objects will be placed
+in the engine but not in any sector. To actually link such an object to
+a sector you have to use @samp{meshlib} then. It is possible to supply
+additional parameters using @samp{params} or @samp{paramsfile} with
+@samp{meshlib}. These will be used in addition to the parameters already
+supplied to the mesh object as defined in the library. Note that once you
+added an object to a sector using @samp{meshlib} you cannot add it to other
+sectors. This technique is not an alternative for using mesh factories.
+@end itemize
+
+A sector can also contain fog like this:
+
+@example
+<fog red=".5" green=".5" blue=".5" density=".01" />
+@end example
+
+Finally a sector can contain nodes. A node represents something that has
+a position. In addition a node can contain keys and addons. Crystal Space
+itself doesn't use nodes but an application using Crystal Space can use
+them for whatever purpose it needs. Here is an example:
+
+@example
+<node name="monster">
+    <position x="10" y="3" z="12" />
+    <key name="spawn" value="100" />
+</node>
+@end example
+
+Sectors can contain keys and addons.
+
+@subsubheading Region Specification
+@cindex regions (Map File)
+
+With regions it is possible to group related objects (like textures,
+materials, mesh objects, mesh factories, sectors, @dots{}).
+Regions are not a geometrical concept. It is possible to define a region which
+contains all wall geometry and a region which contains all moving geometry.
+Usually though, regions represent some area in the world. You can use
+regions to dynamically load/unload parts of the world. This is useful
+if you have really big worlds that don't fit in memory at once.
+
+Usually when you use regions for dynamic loading you would probably
+seperate the map files for every region. But in some cases it might
+be useful to switch the region in the map file itself. This can be done
+by placing the @samp{region} keyword in the @code{<world>} section:
+
+@example
+<region>BlaRegion</region>
+@dots{}
+<sector name=@dots{}>
+  @dots{}
+</sector>
+@dots{}
+<region>OtherRegion</region>
+@end example
+
+@subsubheading Collection Specification
+@cindex collections (Map File)
+
+A collection is similar to a region in some respects but the purpose
+is different. Basically a collection is a collection of some other
+objects which you want to tie together for some reason (other than
+dynamic loading). For example, using them in a scripting setup.
+
+Here is an example collection:
+
+@example
+<collection name="carCol">
+    <meshobj>car</meshobj>
+    <meshobj>tire1</meshobj>
+    <meshobj>tire2</meshobj>
+    <meshobj>tire3</meshobj>
+    <meshobj>tire4</meshobj>
+    <light>lightname</light>
+</collection>
+@end example
+
+Collections can also contain keys.
+
+@node XML Action Section, Old Map File Format, XML World Definition Section, XML File Format
+@subsection Action Section
+
+This section describes the action section.
+
+@subsubheading Sequences and Triggers
+@cindex sequences (Map File)
+@cindex triggers (Map File)
+
+With the sequences and triggers section you can define actions and
+interactions on objects in your map file. These sections are used to drive
+the engine sequence manager (@emph{internal note:} add link when documentation
+on that plugin is available).
+
+A sequence represents a small script with commands that operate on objects
+in the world. A trigger represents a series of conditions which will cause
+the sequence to be executed. The important thing of the sequence manager
+is that it is very time based. Operations don't all execute at once but
+at specific times relative to the start of the sequence. Note that all times
+in the sequence manager are specified in milli-seconds.
+
+The easiest way to explain what you can do with the engine sequence
+manager is with a few examples:
+
+@example
+<sequences>
+    <sequence name="animlight">
+        <fadelight light="l1" red="0" green="0" blue="0" duration="1000" />
+        <delay time="1000" />
+        <fadelight light="l1" red="1" green="1" blue="1" duration="1000" />
+        <delay time="1000" />
+        <fadelight light="l1" red="1" green="0" blue="0" duration="1000" />
+        <delay time="1000" />
+        <fadelight light="l1" red="0" green="1" blue="0" duration="1000" />
+        <delay time="1000" />
+        <fadelight light="l1" red="0" green="0" blue="1" duration="1000" />
+        <delay time="1000" />
+        <enable trigger="animlight" />
+    </sequence>
+</sequences>
+<triggers>
+    <trigger name="animlight">
+	<sectorvis sector="large" />
+	<fire sequence="animlight" />
+    </trigger>
+</triggers>
+@end example
+
+In this example there is a trigger called @samp{animlight} that fires as
+soon as the sector named @samp{large} is visible. Here is what happens
+as soon as the condition of the trigger (in this case @samp{sectorvis})
+is true:
+
+@enumerate 0
+@item
+First the firing of the trigger will cause the trigger itself to be
+disabled. This is to avoid the trigger firing again next frame.
+@item
+Then the @samp{animlight} sequence will be executed. What this basically
+means is that all operations of that sequence are scheduled in the engine
+sequence manager at the appropriate times relative to the current time.
+The @samp{delay} operation in the sequence is responsible for tagging
+every operation with the specified time. So in this particular example six
+operations will be scheduled: five @samp{fadelight} operations (of which
+one is scheduled to execute immediatelly) and one @samp{enable} operation.
+@item
+The first operation that is executed is @samp{fadelight}. This operation
+will fade the light color of the light named @samp{l1} from whatever
+color it has now to black. @samp{l1} must be a pseudo-dynamic light for
+this to work.
+@item
+One second later (due to the @samp{delay}) the second @samp{fadelight}
+gets executed. And so on.
+@item
+Finally the @samp{enable} operation will execute which means that the
+@samp{animlight} trigger is enabled again. If the @samp{large} sector
+is still visible this will cause the trigger to fire immediatelly again.
+@end enumerate
+
+It is important to note that the @samp{duration} parameter that is given
+in some of the operations does NOT imply that the next operation will
+execute after that operation has finished. The @samp{duration} parameter
+has no effect on the internal relative time that is maintained for the
+sequence operations. To influence that you must use @samp{delay}.
+
+If you want to use the same sequence for different lights you can
+use parameters like in the following example:
+
+@example
+<sequences>
+    <sequence name="animlight">
+	<args>
+	    <arg name="l" />
+	    <arg name="trig" />
+	</args>
+        <fadelight light_par="l" red="0" green="0" blue="0" duration="1000" />
+        <delay time="1000" />
+        <fadelight light_par="l" red="1" green="1" blue="1" duration="1000" />
+        <delay time="1000" />
+        <fadelight light_par="l" red="1" green="0" blue="0" duration="1000" />
+        <delay time="1000" />
+        <fadelight light_par="l" red="0" green="1" blue="0" duration="1000" />
+        <delay time="1000" />
+        <fadelight light_par="l" red="0" green="0" blue="1" duration="1000" />
+        <delay time="1000" />
+        <enable trigger_par="trig" />
+    </sequence>
+</sequences>
+<triggers>
+    <trigger name="animlight_l1">
+	<sectorvis sector="large" />
+	<fire sequence="animlight">
+	    <light name="l" light="l1" />
+	    <light name="trig" light="animlight_l1" />
+	</fire>
+    </trigger>
+    <trigger name="animlight_l2">
+	<sectorvis sector="large" />
+	<fire sequence="animlight">
+	    <light name="l" light="l2" />
+	    <light name="trig" light="animlight_l2" />
+	</fire>
+    </trigger>
+</triggers>
+@end example
+
+Here you see how the same sequence (@samp{animlight}) is used by
+two different triggers for two different lights. It is not only the
+light that has to be given as a parameter but also the trigger that
+needs to be enabled again. That's why two parameters are used.
+
+A lot more is possible here. I will give a short summary of all commands
+(that are not operations) that are supported in sequences here:
+
+@itemize
+@item
+@samp{args}: use this to enumerate all arguments to this sequence. You
+only have to specify the name of the arguments here.
+
+@item
+@samp{delay}: increase the relative time for following operations. The
+relative time starts at 0 in the beginning of the sequence. Using @samp{delay}
+you can increase relative time. If you don't use @samp{delay} between two
+consecutive operations then they will execute at the same time. You can
+use @samp{delay} with the @samp{time} parameter in which case a constant
+amount will be added. Or you can use @samp{delay} with the @samp{min} and
+@samp{max} parameters in which case a random amount between the two given
+values will be added. This amount is truely random in the sense that it will
+be reevaluated every time the sequence fires.
+
+@end itemize
+
+Here is a list of all operations that you can use in a sequence. Note that
+every operation is tagged with a relative time (relative to the start
+of the sequence). If you want to use a parameter for an operation that
+uses an argument to the sequence then you have to add @samp{_par} to the
+parameter name like this: @samp{light_par}.
+
+@itemize
+@item
+@samp{run}: this operation will run the given sequence. Parameter is
+@samp{sequence}.
+
+@item
+@samp{move}: move the specified object from the current position to the
+specified position in the given time (duration). Parameters are
+@samp{mesh}, @samp{duration}, @samp{x}, @samp{y}, and @samp{z}.
+
+@item
+@samp{rotate}: rotate the specified object from the current orientation
+to the new orientation in the given time (duration). Parameters are
+@samp{mesh} and @samp{duration}. As children you can specify rotation
+matrix and vector using @samp{rotx}, @samp{roty}, @samp{rotz}, and
+@samp{v}.
+
+@item
+@samp{material}: change the material on some object. Parameters are
+@samp{mesh}, @samp{material}, and optionally a @samp{polygon} parameter
+if you only want to change the material for one polygon.
+
+@item
+@samp{fadecolor}: fade the color of a mesh from the current value to the
+new value. This only works on some types of meshes. Parameters are
+@samp{mesh}, @samp{red}, @samp{green}, @samp{blue}, and @samp{duration}.
+
+@item
+@samp{setcolor}: set the color of a mesh. This only works on some types of
+meshes. Parameters are @samp{mesh}, @samp{red}, @samp{green}, and @samp{blue}.
+
+@item
+@samp{fadelight}: fade the color of a light from the current value to the
+new value. Parameters are
+@samp{light}, @samp{red}, @samp{green}, @samp{blue}, and @samp{duration}.
+
+@item
+@samp{setlight}: set the color of a light.
+Parameters are @samp{light}, @samp{red}, @samp{green}, and @samp{blue}.
+
+@item
+@samp{fadeambient}: fade the color of a dynamic ambient from the current value
+to the new value. Parameters are
+@samp{sector}, @samp{red}, @samp{green}, @samp{blue}, and @samp{duration}.
+
+@item
+@samp{setambient}: set the color of dynamic ambient.
+Parameters are @samp{sector}, @samp{red}, @samp{green}, and @samp{blue}.
+
+@item
+@samp{fadefog}: fade the color and density of fog from the current value
+to the new value. Parameters are
+@samp{sector}, @samp{red}, @samp{green}, @samp{blue}, @samp{density},
+and @samp{duration}.
+
+@item
+@samp{setfog}: set the color and density of fog.
+Parameters are @samp{sector}, @samp{red}, @samp{green}, @samp{blue},
+and @samp{density}.
+
+@item
+@samp{enable}: enable the given trigger. Parameter is @samp{trigger}.
+
+@item
+@samp{disable}: disable the given trigger. Parameter is @samp{trigger}.
+
+@item
+@samp{check}: enable checking of trigger state every @samp{delay} milliseconds
+(or disable if 0). Use this in combination with @samp{test} below. Parameters
+are @samp{trigger} and @samp{delay}.
+
+@item
+@samp{test}: test the stated of the given trigger and execute the right
+sequence depending on the result. For this to work you should use @samp{check}
+to enable testing of the trigger at regular times. Parameters are
+@samp{trigger}, @samp{truesequence}, and @samp{falsesequence}. Both
+@samp{truesequence} and @samp{falsesequence} are optional. Warning! This
+operation does not cause the current sequence to stop. All operations that
+follow this test operation will still execute at their dedicated times
+regardless of the outcome of this test!
+
+@end itemize
+
+Here is a list of all conditions that are supported in a trigger:
+
+@itemize
+@item
+@samp{onclick}: true when the given mesh is clicked on. Parameter is
+@samp{mesh}.
+
+@item
+@samp{lightvalue}: true when the given light has a color which satisfies
+some condition. Parameters are @samp{light}, @samp{operator}, @samp{red},
+@samp{green}, and @samp{blue}. @samp{operator} can be @samp{less}
+or @samp{greater}.
+
+@item
+@samp{manual}: for manual trigger (from application code). No parameters.
+
+@item
+@samp{sectorvis}: true when the sector is visible. Parameter is @samp{sector}.
+There are also some optional children that this trigger supports:
+@itemize
+@item
+@samp{insideonly}: only trigger when camera is inside the sector as opposed
+to the sector being visible.
+@item
+@samp{box}: only trigger if camera is in box. This has two children:
+a @samp{min} and a @samp{max} vector.
+@item
+@samp{sphere}: only trigger if camera is in the sphere. Parameters are
+@samp{x}, @samp{y}, @samp{z}, and @samp{radius}.
+@end itemize
+
+@item
+@samp{fire}: this is not a trigger. It just indicates the sequence
+that will be executed when the trigger is valid. Parameters are @samp{sequence}
+and @samp{delay} (optional). In addition you can also specify parameters
+for the called sequence.
+
+@item
+@samp{disable}: normally a trigger is enabled by default. With this keyword
+you can disable the trigger initially and let some other sequence (or the
+application) enable the trigger.
+
+@end itemize
+
+

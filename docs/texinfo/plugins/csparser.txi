@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node csParser, MeshObject, csEngine, Plug-In Drivers
+@node csParser, XML File Format, csEngine, Plug-In Drivers
 @section The Map File Parser (@code{csParser})
 @cindex Map File Parser
 @cindex csParser
@@ -8,8 +8,6 @@ This section will describe the map file parser. Currently
 there is only a section describing the format of the map files.
 
 @menu
-* XML File Format:: Format of Map File (XML)
-* Old Map File Format:: Old Format of Map File
 @end menu
 
 @imports{plugins,xmlfmt.txi}

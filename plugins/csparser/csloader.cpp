@@ -1225,6 +1225,15 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	    return false;
 	}
         break;
+      case XMLTOKEN_KEY:
+        {
+          iKeyValuePair* kvp = ParseKey (child, stemp->QueryObject());
+	  if (kvp)
+	    kvp->DecRef ();
+	  else
+	    return false;
+        }
+        break;
       case XMLTOKEN_ADDON:
 	if (!LoadAddOn (child, stemp))
 	  return false;
@@ -2357,6 +2366,15 @@ iCollection* csLoader::ParseCollection (iDocumentNode* node)
 		"crystalspace.maploader.parse.collection",
          	child, "'addon' not yet supported in collection!");
 	return NULL;
+      case XMLTOKEN_KEY:
+	{
+          iKeyValuePair* kvp = ParseKey (child, collection->QueryObject ());
+          if (kvp)
+	    kvp->DecRef ();
+	  else
+	    return NULL;
+	}
+        break;
       case XMLTOKEN_MESHOBJ:
 #if 0
 	SyntaxService->ReportError (

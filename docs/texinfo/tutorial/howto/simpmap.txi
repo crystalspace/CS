@@ -35,24 +35,24 @@ Here is the map:
         <v x="-10" y="4" z="-10"/> <v x="10" y="4" z="-10"/>
 	<material>wood</material>
         <texlen>4</texlen>
-        <polygon name="up">
+        <p name="up">
 	  <v>6</v> <v>7</v> <v>5</v> <v>4</v>
-	</polygon>
-        <polygon name="down">
+	</p>
+        <p name="down">
 	  <v>3</v> <v>2</v> <v>0</v> <v>1</v>
-	</polygon>
-        <polygon name="back">
+	</p>
+        <p name="back">
 	  <v>7</v> <v>6</v> <v>2</v> <v>3</v>
-	</polygon>
-        <polygon name="front">
+	</p>
+        <p name="front">
 	  <v>4</v> <v>5</v> <v>1</v> <v>0</v>
-	</polygon>
-        <polygon name="left">
+	</p>
+        <p name="left">
 	  <v>6</v> <v>4</v> <v>0</v> <v>2</v>
-	</polygon>
-        <polygon name="right">
+	</p>
+        <p name="right">
 	  <v>5</v> <v>7</v> <v>3</v> <v>1</v>
-	</polygon>
+	</p>
       </params>
     </meshobj>
     <light>
@@ -88,8 +88,8 @@ loader which loads generic polygon based objects. We call this plugin
 @samp{thing}.
 
 In this simple example we only have one sector in the world called @samp{room}.
-If you need multiple sectors you can use multiple @samp{SECTOR} statements.
-In the room sector we have one mesh object (@samp{MESHOBJ}) and one light
+If you need multiple sectors you can use multiple @samp{sector} statements.
+In the room sector we have one mesh object (@samp{meshobj}) and one light
 (@samp{light}).
 
 When defining mesh objects there are several things to keep in mind. Aside
@@ -97,7 +97,7 @@ from the geometry which is handled by the mesh object plugin, the engine
 also keeps track of some stuff. Important to know is that everything inside
 the @samp{params} block is given to the plugin loader. So the engine doesn't
 know about that. Everything that is outside @samp{params} is handled by
-the engine itself. The first thing that has to be said in the @samp{MESHOBJ}
+the engine itself. The first thing that has to be said in the @samp{meshobj}
 block is which plugin is going to be used for loading this object. In this
 case we use the @samp{thing} plugin. Then we tell the engine that we would
 like to use @samp{ZFILL} mode for rendering this object. This means that
@@ -113,10 +113,10 @@ following here is only relevant for @samp{thing} mesh objects.
 First we define all vertices that we are going to use in this mesh object.
 In this case we use eight vertices for the eight corners of the room that
 we are creating. Then we say that all following polygons will use the
-@samp{wood} material. The @samp{TEXLEN} command is a bit more complicated
+@samp{wood} material. The @samp{texlen} command is a bit more complicated
 to explain. Basically if we had a polygon that was 4x4 units big, then
-a texture using @samp{TEXLEN(4)} would be tiled exactly one time on that
-polygon. So the @samp{TEXLEN} command directly specifies the texture density
+a texture using @samp{texlen(4)} would be tiled exactly one time on that
+polygon. So the @samp{texlen} command directly specifies the texture density
 or the amount of times a texture is tiled. For more information about this
 see @pxref{Texture Mapping}.
 

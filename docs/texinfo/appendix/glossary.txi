@@ -18,6 +18,10 @@ It is often used for actors. The word 'Sprite' may be confusing because a
 3D Sprite is really a full 3D object. 3D Sprites support skeletal and
 frame based animation.
 
+@item Ambient (lighting)
+Ambient lighting is a constant amount of lighting that is added to all other
+lighting.
+
 @item Camera Space
 Before viewing objects and rooms are transformed from world to camera space.
 This means that the position of the camera is set at (0,0,0); the positive z
@@ -50,6 +54,11 @@ volume on which a texture is applied in a fuzzy way.
 @item Light-Map Space
 Two-dimensional (l,m) coordinate-system corresponding to some point on a
 light-map.  Light-map space is closely related to texture space.
+
+@item Lumel
+A lumel is a pixel on a lightmap. A lumel corresponds with one light
+value (red, green, blue) and represents the lighting values of a block of
+texels on the original texture. Usually this block is 16x16 big.
 
 @item Material
 A material represents how some object or polygon looks. In the most common
@@ -120,6 +129,15 @@ has a full 3D renderer associated with it you can even use the 3D
 engine to render on a texture. Procedural textures can be used on
 all objects in Crystal Space that can use textures.
 
+@item Region
+A region in Crystal Space is a collection of objects (textures, materials,
+mesh objects, mesh factories, sectors, @dots{}).
+Regions are not a geometrical concept. It is possible to define a region which
+contains all wall geometry and a region which contains all moving geometry.
+Usually though, regions represent some area in the world. You can use
+regions to dynamically load/unload parts of the world. This is useful
+if you have really big worlds that don't fit in memory at once.
+
 @item Reporter
 The reporter is a plugin in Crystal Space that listens to messages.
 It supports the notion of errors, warnings, and notification messages.
@@ -151,6 +169,12 @@ which will represent the geometry of the sector. A common mesh object is
 the thing mesh object which is usually used to put walls around a sector
 (that way the sector represents a room). Other mesh objects like 3d sprites
 can be used for actors.
+
+@item Texel
+A texel is a pixel on a texture. For example, an 128x128 texture has
+128x128 texels. On screen this may result in more or fewer pixels depending
+on how far away the object is on which the texture is used and also on how
+the texture is scaled on the object.
 
 @item Texture Space
 Two-dimensional (u,v) coordinate-system corresponding to some point on a
