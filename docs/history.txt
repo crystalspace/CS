@@ -89,7 +89,8 @@ chronological order.
 	- Wouter fixed some more SCF_DESTRUCT_IBASE typos in the sndmod
 	  loader, linux joystick and iff loader. Also unbalanced ()'s 
 	  in cssaver.
-
+	- Luca fixed some compilation errors for VC6 in the method 
+	  void csSequenceManager::Clear ().
 6-Nov-2003
 	- res bumped the version of the iGraphics2D interface and updated some
 	  Doxygen comments in include/graph2d.h (basically, the differences
