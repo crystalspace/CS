@@ -465,11 +465,11 @@ void csWorld::ShineLights ()
   
   int sn = 0;
   int num_sectors = sectors.Length ();
-  csProgressPulse pulse;
   csProgressMeter meter;
-  meter.SetTotal (num_sectors);
-
+  csProgressPulse pulse;
   CsPrintf (MSG_INITIALIZATION, "Initializing lightmaps (%d sectors total):\n  ", num_sectors);
+
+  meter.SetTotal (num_sectors);
   for (sn = 0; sn < num_sectors ; sn++)
   {
     csSector* s = (csSector*)sectors [sn];
@@ -477,8 +477,8 @@ void csWorld::ShineLights ()
     meter.Step();
   }
 
-  meter.Reset();
-  CsPrintf(MSG_INITIALIZATION, "\nShining lights:\n  ");
+  meter.SetTotal (num_sectors);
+  CsPrintf(MSG_INITIALIZATION, "\nShining lights (%d sectors total):\n  ", num_sectors);
   for (sn = 0; sn < num_sectors ; sn++)
   {
     csSector* s = (csSector*)sectors[sn];
@@ -491,25 +491,19 @@ void csWorld::ShineLights ()
   // and remap all lightmaps.
   if (csPolygon3D::do_lightmap_highqual && csPolygon3D::do_force_recalc)
   {
-    meter.Reset();
     CsPrintf(MSG_INITIALIZATION, "\nScaling lightmaps:\n  ");
     csPolygon3D::def_mipmap_size *= 2;
-    csSector* prev_sector = NULL;
+    meter.SetTotal (polygon_count);
     pit->Restart ();
     while ((p = pit->Fetch ()) != NULL)
     {
       p->ScaleLightMaps ();
-      csSector* this_sector = p->GetSector();
-      if (this_sector != prev_sector)
-      {
-        prev_sector = this_sector;
-        meter.Step();
-      }
+      meter.Step();
     }
   }
 
-  meter.Reset();
-  CsPrintf(MSG_INITIALIZATION, "\nCaching lightmaps:\n  ");
+  meter.SetTotal (num_sectors);
+  CsPrintf(MSG_INITIALIZATION, "\nCaching lightmaps (%d sectors total):\n  ", num_sectors);
   for (sn = 0; sn < num_sectors ; sn++)
   {
     csSector* s = (csSector*)sectors[sn];
