@@ -48,7 +48,7 @@ PYTH_CXXFLAGS="$(PYTHON.CFLAGS[1])"
 PYTH_DEPS=""
 
 if test -z "$1"; then
-    echo "Do not invoke directly; it is a sub-component of cs-config."
+    echo "Do not invoke this sub-component of cs-config directly."
     exit 1
 fi
 
