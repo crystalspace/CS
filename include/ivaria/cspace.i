@@ -428,6 +428,7 @@ TYPEMAP_OUT_csWrapPtr
 #define CS_GNUC_PRINTF(format_idx, arg_idx)
 #define CS_GNUC_SCANF(format_idx, arg_idx)
 #define CS_DECLARE_STATIC_CLASSVAR(a, b, c)
+#define CS_SPECIALIZE_TEMPLATE template<>
 
 // Inclusion of CS headers.
 // The sequence of %include-ing the CS headers can be crucial!
@@ -451,7 +452,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "csutil/cmdhelp.h"
 %include "csutil/strset.h"
 
-%ignore iString::operator const char *;
+%ignore iString::operator char const*() const;
 %include "iutil/string.h"
 
 %ignore csString::Append (short);

@@ -373,7 +373,7 @@ typedef struct _csKeyModifiers
   ((1 << CSKEY_MODIFIERTYPE_SHIFT) - 1))  
 
 /// Construct a key code for the Shift modifier key number \a n.
-#define CSKEY_SHIFT_NUM(n)		CSKEY_MODIFIER(csKeyModifierTypeShift, n)
+#define CSKEY_SHIFT_NUM(n)		CSKEY_MODIFIER(csKeyModifierTypeShift,n)
 /// Lowest code of the Shift modifier keys
 #define CSKEY_SHIFT_FIRST		CSKEY_SHIFT_NUM(0)
 /// Highest code of the Shift modifier keys
@@ -387,7 +387,7 @@ typedef struct _csKeyModifiers
 #define CSKEY_SHIFT			CSKEY_SHIFT_NUM(csKeyModifierNumAny)
 
 /// Construct a key code for the Ctrl modifier key number \a n.
-#define CSKEY_CTRL_NUM(n)		CSKEY_MODIFIER(csKeyModifierTypeCtrl, n)
+#define CSKEY_CTRL_NUM(n)		CSKEY_MODIFIER(csKeyModifierTypeCtrl,n)
 /// Lowest code of the Ctrl modifier keys
 #define CSKEY_CTRL_FIRST		CSKEY_CTRL_NUM(0)
 /// Highest code of the Ctrl modifier keys
@@ -401,7 +401,7 @@ typedef struct _csKeyModifiers
 #define CSKEY_CTRL			CSKEY_CTRL_NUM(csKeyModifierNumAny)
 
 /// Construct a key code for the Alt modifier key number \a n.
-#define CSKEY_ALT_NUM(n)		CSKEY_MODIFIER(csKeyModifierTypeAlt, n)
+#define CSKEY_ALT_NUM(n)		CSKEY_MODIFIER(csKeyModifierTypeAlt,n)
 /// Lowest code of the Alt modifier keys
 #define CSKEY_ALT_FIRST			CSKEY_ALT_NUM(0)
 /// Highest code of the Alt modifier keys
@@ -417,7 +417,7 @@ typedef struct _csKeyModifiers
 /// Bit that is set if a key is from the keypad.
 #define CSKEY_PAD_FLAG			0x4000
 /// Helper macro to construct a keypade key code.
-#define CSKEY_PAD_KEY(code)		CSKEY_SPECIAL(code | CSKEY_PAD_FLAG)
+#define CSKEY_PAD_KEY(code) CSKEY_SPECIAL((unsigned int)code | CSKEY_PAD_FLAG)
 
 /// Helper macro to test whether a key code identifies a keypad key.
 #define CSKEY_IS_PAD_KEY(rawCode)	((rawCode & CSKEY_PAD_FLAG) != 0)
@@ -465,14 +465,14 @@ typedef struct _csKeyModifiers
  * NumLock key.
  * Both a modifier and a keypad key.
  */
-#define CSKEY_PADNUM			\
-  CSKEY_MODIFIER(csKeyModifierTypeNumLock, csKeyModifierNumAny) | CSKEY_PAD_FLAG
+#define CSKEY_PADNUM \
+  CSKEY_MODIFIER(csKeyModifierTypeNumLock,csKeyModifierNumAny) | CSKEY_PAD_FLAG
 /// CapsLock key
-#define CSKEY_CAPSLOCK			\
-  CSKEY_MODIFIER(csKeyModifierTypeCapsLock, csKeyModifierNumAny)
+#define CSKEY_CAPSLOCK \
+  CSKEY_MODIFIER(csKeyModifierTypeCapsLock,csKeyModifierNumAny)
 /// ScrollLock key
-#define CSKEY_SCROLLLOCK		\
-  CSKEY_MODIFIER(csKeyModifierTypeScrollLock, csKeyModifierNumAny)
+#define CSKEY_SCROLLLOCK \
+  CSKEY_MODIFIER(csKeyModifierTypeScrollLock,csKeyModifierNumAny)
 
 /// Character types
 enum csKeyCharType

@@ -44,6 +44,14 @@ chronological order.
 	  dllwrap during plugin creation instead of "gcc -shared" when invoked
 	  with "jam -sUSE_DLLWRAP=yes myplugin".  Perhaps this change will
 	  allow Jorrit to debug plugin modules in gdb with Mingw.
+	- Eric Sunshine fixed the following errors reported by Swig when
+	  processing cspace.i (some of which were emitted many, many times):
+	    - scf.h: Syntax error in input.
+	    - scf.h: Warning(503): Can't wrap class scfInterface<iFoo> unless
+	      renamed to a valid identifier.
+	    - evdefs.h: Warning(305): Bad constant value (ignored).
+	    - string.h: Warning(503): Can't wrap 'operator char const*' unless
+	      renamed to a valid identifier.
 3-Nov-2003
 	- Chris Matuszewski added some explicit type casts to stop msvc6 from
 	  emitting warning messages in csgfx/rgbpixel.h and shadervar.h.
