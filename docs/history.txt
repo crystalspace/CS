@@ -25,6 +25,7 @@ chronological order.
 	- res fixed a leak in cswinGetErrorMessage().
 	- res added some error reporting to the Win32 callstack code and other 
 	  various improvements.
+	- res fixed leaks in chunklod.
 27-Sep-2004
 	- dfryer changed "unsigned int" to size_t in
 	  csXMLShaderTech::ActivatePass().  Prototype used size_t; size_t is

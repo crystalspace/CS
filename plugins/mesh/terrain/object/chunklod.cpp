@@ -1135,14 +1135,14 @@ bool csChunkLodTerrainObject::SetMaterialMap (const csArray<char>& data,
     }
 
     csRef<iTextureHandle> hdl = mgr->RegisterTexture (alpha, CS_TEXTURE_2D);
-    csRef<csShaderVariable> var = 
-      new csShaderVariable (strings->Request ("splat alpha map"));
+    csRef<csShaderVariable> var;
+    var.AttachNew (new csShaderVariable (strings->Request ("splat alpha map")));
     var->SetType (csShaderVariable::TEXTURE);
     var->SetValue (hdl);
     palette[i]->GetMaterial()->AddVariable (var);
 
-    csRef<csShaderVariable> lod_var = 
-      new csShaderVariable (strings->Request ("texture lod distance"));
+    csRef<csShaderVariable> lod_var;
+    lod_var.AttachNew (new csShaderVariable (strings->Request ("texture lod distance")));
     lod_var->SetType (csShaderVariable::VECTOR3);
     lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
     matwrap->GetMaterial()->AddVariable (lod_var);
