@@ -143,7 +143,9 @@
 
 #endif
 
+#ifndef __CYGWIN32__
 #include <excpt.h>
+#endif
 #include <stdarg.h>
 #include <windef.h>
 #include <winbase.h>
