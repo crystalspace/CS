@@ -106,6 +106,31 @@ The history order is reversed so that new features are at the top.
 	    - Removed the `i' prefix from the names of the AWS files in
 	      CS/include/ivaria and merged them into aws.h.
 	    - Repaired a couple minor makefile defects.
+	- Martin Geisse changed the way the ID numbers for
+	  QUERY_INTERFACE_FAST are stored. There is now an inline wrapper
+	  function around each ID variable, DECLARE_FAST_INTERFACE.
+	  This has two advantages: Firstly, it requires much less code (just
+	  one macro per interface compared to three). Secondly, as inline
+	  functions are local to their compilation unit, there are no more
+	  problems with duplicate symbols (as it was the case with global
+	  variables).
+	- Martin Geisse changed the incorrect usage of IMPLEMENT_IBASE to
+	  IMPLEMENT_IBASE_EXT in two cases.
+	- Robert Bate updated the Mac project files for the new BugPlug
+	  plugin and also updated all project files to the new directory
+	  structure and added targets for emit, metaball, and stars mesh
+	  objects.
+	- Robert also did a fix to the emit particle system.
+	- Christopher Nelson added interface includes for AWS in ivaria.
+	- Christopher also made some modifications to AWS so that it can be
+	  a plugin. Still doesn't load properly.
+	- Norman Kramer fixed g2dtest so that it works again. To fix this he
+	  made the G2D variable in csSystemDriver protected. This is a
+	  temporary solution.
+	- Norman also fixed some include paths in some of the files of
+	  the 3D sprite mesh plugin.
+	- Philip Wyett updated the software renderer project file for VC
+	  after Eric changed the NASM settings.
 10-Jun-2001
 	- Norman Kramer did the following:
 	    - Blocks now decrefs its queried soundwrapper, releases/stops the
