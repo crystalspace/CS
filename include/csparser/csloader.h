@@ -40,6 +40,7 @@ class csSpriteTemplate;
 class csSprite3D;
 class csKeyValuePair;
 class csMapNode;
+class csFrame;
 
 /**
  * The loader for Crystal Space worlds.
@@ -144,6 +145,20 @@ class csLoader
 
   /// World from a memory buffer
   static bool LoadWorld (char* buf);
+
+  /// Load the sprite template from the world file.
+  static bool LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTextureList* textures);
+
+  /**
+   * Load the sprite from the world file.
+   */
+  static bool LoadSprite (csSprite3D* spr, csWorld* w, char* buf, csTextureList* textures);
+
+  /**
+   * Get a sprite template frame from a frame number
+   * or an action name and a frame number
+   */
+  static csFrame* LoadFrame (csSpriteTemplate* stemp, char* buf);
 
 public:
   /// Load file into a world.

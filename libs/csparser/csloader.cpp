@@ -143,6 +143,9 @@ TOKEN_DEF_START
   TOKEN_DEF (LIMB)
   TOKEN_DEF (MATRIX)
   TOKEN_DEF (MAX_TEXTURES)
+  TOKEN_DEF (MERGE_NORMALS)
+  TOKEN_DEF (MERGE_TEXELS)
+  TOKEN_DEF (MERGE_VERTICES)
   TOKEN_DEF (MIPMAP)
   TOKEN_DEF (MIRROR)
   TOKEN_DEF (MOVE)
@@ -4311,6 +4314,9 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
     TOKEN_TABLE (TEXNR)
     TOKEN_TABLE (FRAME)
     TOKEN_TABLE (ACTION)
+    TOKEN_TABLE (MERGE_NORMALS)
+    TOKEN_TABLE (MERGE_TEXELS)
+    TOKEN_TABLE (MERGE_VERTICES)
     TOKEN_TABLE (TRIANGLE)
     TOKEN_TABLE (SKELETON)
     TOKEN_TABLE (FILE)
@@ -4461,8 +4467,41 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
 	  csCrossBuild_SpriteTemplateFactory builder;
 	  builder.CrossBuild (stemp, *filedata);
 	  CHK (delete filedata);
-	}
-	break;
+        }
+        break;
+
+      case TOKEN_MERGE_NORMALS:
+        {
+          csFrame* frame = LoadFrame (stemp, params);
+          CsPrintf (MSG_INITIALIZATION, "MERGE_NORMALS: ");
+          int new_vertex_count = stemp->MergeNormals (frame);
+          CsPrintf (MSG_INITIALIZATION, "%d unique vertices found.\n",
+            new_vertex_count);
+        }
+        break;
+
+      case TOKEN_MERGE_TEXELS:
+        {
+          int do_merge;
+          ScanStr (params, "%b", &do_merge);
+          if (do_merge)
+          {
+            int same_count = stemp->MergeTexels ();
+            CsPrintf (MSG_INITIALIZATION,
+            "MERGE_TEXELS: Deleted %d redundant texel maps.\n",
+              same_count);
+          }
+        }
+        break;
+
+      case TOKEN_MERGE_VERTICES:
+        {
+          csFrame* frame = LoadFrame (stemp, params);
+          int new_vertex_count = stemp->MergeVertices (frame);
+          CsPrintf (MSG_INITIALIZATION, "MERGE_VERTICES: %d unique vertices found.\n",
+            new_vertex_count);
+        }
+        break;
     }
   }
   if (cmd == PARSERR_TOKENNOTFOUND)
@@ -4474,6 +4513,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
 
   stemp->GenerateLOD ();
   stemp->ComputeBoundingBox ();
+
   return true;
 }
 
@@ -4573,6 +4613,51 @@ bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
 
   spr->InitSprite ();
   return true;
+}
+
+csFrame* csLoader::LoadFrame (csSpriteTemplate* stemp, char* buf)
+{
+  TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (ACTION)
+    TOKEN_TABLE (FRAME)
+  TOKEN_TABLE_END
+
+  long cmd;
+  char* name;
+  char* params;
+  char action[255];
+  bool action_specified = false;
+  int frame = 0;
+
+  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
+    switch (cmd)
+    {
+      case TOKEN_ACTION:
+        ScanStr (params, "%s", action);
+        action_specified = true;
+        break;
+      case TOKEN_FRAME:
+        ScanStr (params, "%d", &frame);
+        break;
+    }
+  }
+  if (cmd == PARSERR_TOKENNOTFOUND)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while getting a frame!\n",
+      csGetLastOffender ());
+    fatal_exit (0, false);
+  }
+
+  if (action_specified)
+    return (stemp->FindAction(action))->GetFrame(frame);
+  else
+    return stemp->GetFrame(frame);
 }
 
 //---------------------------------------------------------------------------

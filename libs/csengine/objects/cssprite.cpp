@@ -317,23 +317,51 @@ csSpriteAction* csSpriteTemplate::FindAction (const char *n)
   return NULL;
 }
 
-void csSpriteTemplate::MergeVertices (const char * action, int frame)
+int csSpriteTemplate::MergeVertices (csFrame * frame)
 {
-  (void)action;
-  (void)frame;
   // Minimize the number of 3D coordinates:
 
   // create an array of ints which maps old vertex indices to new ones
+  int* new_vertices = new int [num_vertices];
+  if (new_vertices == NULL) return num_vertices;
+  int* old_vertices = new int [num_vertices];
+  if (old_vertices == NULL) return num_vertices;
+
   // map the first new vertex to the first old vertex
+  new_vertices[0] = 0;
+
   // set the new vertex counter to one
+  int new_vertex_count = 1;
 
   // FOR each old vertex
-  //   FOR each new vertex
-  //     IF the vertices have the same coordinates
-  //        map this new vertex to this old vertex
-  //        next old vertex
-  //   map this old vertex to a new new vertex
-  //   increment the new vertex counter
+  for (int old_vertex=1; old_vertex<num_vertices; old_vertex++)
+  {
+    bool unique = true;
+
+    // FOR each new vertex
+    for (int new_vertex=0; new_vertex<new_vertex_count; new_vertex++)
+    {
+      // IF the vertices have the same coordinates
+      if (frame->GetVertex(old_vertex) == frame->GetVertex(new_vertices[new_vertex]))
+      {
+        //  map this new vertex to this old vertex
+        old_vertices[new_vertex] = new_vertex;
+
+        //  next old vertex
+        unique = false;
+        break;
+      }
+    }
+    if (unique)
+    {
+      // map this old vertex to a new new vertex
+      new_vertices[new_vertex_count] = old_vertex;
+      old_vertices[old_vertex] = new_vertex_count;
+
+      // increment the new vertex counter
+      new_vertex_count++;
+    }
+  }
 
   // At this point we can compare the old vertex count to the new one
 
@@ -351,25 +379,58 @@ void csSpriteTemplate::MergeVertices (const char * action, int frame)
   //   replace the old vertex array with the new one
 
   // Create a new anim_mesh with indices to new vertex array
+
+  delete [] new_vertices;
+  delete [] old_vertices;
+
+  return new_vertex_count;
 }
 
-void csSpriteTemplate::MergeNormals (const char * action, int frame)
+int csSpriteTemplate::MergeNormals (csFrame * frame)
 {
-  (void)action;
-  (void)frame;
   // Combine normals of adjacent vertices based on one special frame:
 
   // create an array of ints which maps old vertex indices to new ones
+  int* new_vertices = new int [num_vertices];
+  if (new_vertices == NULL) return num_vertices;
+  int* old_vertices = new int [num_vertices];
+  if (old_vertices == NULL) return num_vertices;
+
   // map the first new vertex to the first old vertex
+  new_vertices[0] = 0;
+
   // set the new vertex counter to one
+  int new_vertex_count = 1;
 
   // FOR each old vertex
-  //   FOR each new vertex
-  //     IF the vertices have the same coordinates
-  //        map this new vertex to this old vertex
-  //        next old vertex
-  //   map this old vertex to a new new vertex
-  //   increment the new vertex counter
+  for (int old_vertex=1; old_vertex<num_vertices; old_vertex++)
+  {
+    bool unique = true;
+
+    // FOR each new vertex
+    for (int new_vertex=0; new_vertex<new_vertex_count; new_vertex++)
+    {
+      // IF the vertices have the same coordinates
+      if (frame->GetVertex(old_vertex) == frame->GetVertex(new_vertices[new_vertex]))
+      {
+        //  map this new vertex to this old vertex
+        old_vertices[new_vertex] = new_vertex;
+
+        //  next old vertex
+        unique = false;
+        break;
+      }
+    }
+    if (unique)
+    {
+      // map this old vertex to a new new vertex
+      new_vertices[new_vertex_count] = old_vertex;
+      old_vertices[old_vertex] = new_vertex_count;
+
+      // increment the new vertex counter
+      new_vertex_count++;
+    }
+  }
 
   // At this point we can compare the old normals count to the new one
 
@@ -390,6 +451,10 @@ void csSpriteTemplate::MergeNormals (const char * action, int frame)
   //   replace the old normals array with the new one
 
   // Create a new norm_mesh with indices to new vertex array
+
+  delete [] new_vertices;
+
+  return new_vertex_count;
 }
 
 int csSpriteTemplate::MergeTexels ()
@@ -453,15 +518,6 @@ int csSpriteTemplate::MergeTexels ()
       unique_texel_map_count ++;
     }
   }
-
-/*
-  // now you can compare the frame count to the unique texel map count
-  System->Printf (MSG_INITIALIZATION, "Merged %d/%d texel maps, saving %d bytes.\n",
-    frames.Length() - unique_texel_map_count, frames.Length(),
-    // Multiply the difference by the size of a texel and the number of texels
-    // to determine the number of bytes saved.
-    (frames.Length() - unique_texel_map_count) * num_vertices * sizeof(csVector2));
-*/
 
   delete[] unique_texel_maps;
 

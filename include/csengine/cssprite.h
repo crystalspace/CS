@@ -308,13 +308,21 @@ public:
    * Reduces the size of animation frames.
    * Speeds up interpolation and skeletal animation.
    */
-  void MergeVertices (const char * action, int frame);
+  int MergeVertices (csFrame * frame);
+  int MergeVertices (char * action, int frame)
+    {return MergeVertices (FindAction(action)->GetFrame(frame));}
+  int MergeVertices (int frame)
+    {return MergeVertices (GetFrame(frame));}
 
   /**
    * Combine normals of adjacent vertices based on one special frame.
    * Eliminates unwanted gouraud shading "seams".
    */
-  void MergeNormals (const char * action, int frame);
+  int MergeNormals (csFrame * frame);
+  int MergeNormals (char * action, int frame)
+    {return MergeNormals (FindAction(action)->GetFrame(frame));}
+  int MergeNormals (int frame)
+    {return MergeNormals (GetFrame(frame));}
 
   /**
    * Merge identical texel frames
