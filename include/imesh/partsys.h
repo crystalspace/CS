@@ -41,6 +41,8 @@ struct iParticleState : public iBase
   virtual UInt GetMixMode () = 0;
   /// Set particle color.
   virtual void SetColor (const csColor& color) = 0;
+  /// Get particle color.
+  virtual const csColor& GetColor () const = 0;
   /// Set change color.
   virtual void SetChangeColor (const csColor& color) = 0;
   /// Unset change color.

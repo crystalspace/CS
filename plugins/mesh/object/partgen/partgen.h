@@ -259,6 +259,10 @@ public:
       scfParent->color = color;
       scfParent->SetupColor ();
     }
+    virtual const csColor& GetColor () const
+    {
+      return scfParent->color;
+    }
     virtual void SetChangeColor (const csColor& color)
     {
       scfParent->SetChangeColor (color);
