@@ -368,7 +368,7 @@ csParSysExplosion :: csParSysExplosion(csObject* theParent, int number_p,
   explight = NULL;
   scale_particles = false;
   /// add particles
-  bbox.Set(center);
+  bbox.AddBoundingVertex(center);
   for(i=0; i<number_p; i++)
   {
     AppendRegularSprite(nr_sides, part_radius, txt, lighted_particles);
@@ -376,8 +376,8 @@ csParSysExplosion :: csParSysExplosion(csObject* theParent, int number_p,
     GetParticle(i)->SetPosition (pos);
     part_speed[i] = push + spread_speed * GetRandomDirection();
     part_accel[i] = (pos - center) * spread_accel * GetRandomDirection();
-    bbox.AddVertexSmart(pos+csVector3(part_radius, part_radius, part_radius));
-    bbox.AddVertexSmart(pos-csVector3(part_radius, part_radius, part_radius));
+    bbox.AddBoundingVertexSmart(pos+csVector3(part_radius, part_radius, part_radius));
+    bbox.AddBoundingVertexSmart(pos-csVector3(part_radius, part_radius, part_radius));
   }
   startbox = bbox;
   radiusnow = 1.0;

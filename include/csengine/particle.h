@@ -294,7 +294,7 @@ protected:
   bool scale_particles;
   time_t fade_particles;
   /// starting bbox.
-  bbox startbox;
+  csBox3 startbox;
   float radiusnow;
 
 public:
