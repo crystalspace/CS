@@ -219,7 +219,7 @@ bool csVideoPreferences::Setup (iObjectRegistry* object_reg)
       "Couldn't load AWS plugin!");
     return false;
   }
-  object_reg->Register (aws, "iAws");                                            
+  object_reg->Register (aws, "iAws");
   exit_loop = false;
 
   // Open the main system. This will open all the previously loaded plug-ins.
@@ -255,7 +255,7 @@ bool csVideoPreferences::SetupWindow ()
   aws->GetSinkMgr ()->RegisterSink ("VidPrefsSink", sink);
 
   // now load preferences
-  if (!aws->GetPrefMgr()->Load ("/temp/vidprefs.def"))
+  if (!aws->GetPrefMgr()->Load ("/varia/vidprefs.def"))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
       "crystalspace.tools.vidprefs",
@@ -328,4 +328,3 @@ void csVideoPreferences::SetOpenGL (void* vp, iAwsSource* source)
   csVideoPreferences* vidprefs = (csVideoPreferences*)vp;
   vidprefs->SetOpenGLL (source);
 }
-

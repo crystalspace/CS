@@ -1071,14 +1071,16 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "coordsave"))
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-    	"Saved camera location in /temp/walktest.cam");
-    SaveCamera (Sys->myVFS, "/temp/walktest.cam");
+    	"Saving camera to /tmp/walktest.cam");
+    SaveCamera (Sys->myVFS, "/tmp/walktest.cam");
   }
   else if (!strcasecmp (cmd, "coordload"))
   {
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-    	"Loading camera location from /temp/walktest.cam");
-    LoadCamera (Sys->myVFS, "/temp/walktest.cam");
+    char const* s = "/tmp/walktest.cam"; // User-writable location.
+    if (!Sys->myVFS->Exists(s))
+      s = "/varia/walktest.cam";         // Potentially read-only.
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading camera from %s", s);
+    LoadCamera (Sys->myVFS, s);
   }
   else if (!strcasecmp (cmd, "plugins"))
   {
@@ -1357,11 +1359,11 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg)
     {
       char buf[255];
-      sprintf (buf, "/this/%s.rec", arg);
+      sprintf (buf, "/tmp/%s.rec", arg);
       SaveRecording (Sys->myVFS, buf);
     }
     else
-      SaveRecording (Sys->myVFS, "/this/record");
+      SaveRecording (Sys->myVFS, "/tmp/record");
   }
   else if (!strcasecmp (cmd, "loadrec"))
   {
@@ -1373,12 +1375,12 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg)
     {
       char buf[255];
-      sprintf (buf, "/this/%s.rec", arg);
+      sprintf (buf, "/tmp/%s.rec", arg);
       LoadRecording (Sys->myVFS, buf);
       Sys->recorded_perf_stats_name = csStrNew (arg);
     }
     else
-      LoadRecording (Sys->myVFS, "/this/record");
+      LoadRecording (Sys->myVFS, "/tmp/record");
   }
   else if (!strcasecmp (cmd, "clrrec"))
   {
@@ -1439,7 +1441,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 	  strcpy(name, option);
 	}
 	char buf[255];
-	sprintf (buf, "/this/%s.rps", name);
+	sprintf (buf, "/tmp/%s.rps", name);
 	Sys->recorded_perf_stats->SetOutputFile (buf, summary);
 	if (Sys->recorded_perf_stats_name)
 	  Sys->recorded_perf_stats->SetName (Sys->recorded_perf_stats_name);

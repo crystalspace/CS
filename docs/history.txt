@@ -10,6 +10,22 @@ chronological order.
 	- Eric Sunshine fixed CS/data/Jamfile so that it no longer tries to
 	  install the non-existent unifont.csf file.  (Bug reported by Frank
 	  Richter.)
+	- Eric Sunshine made the following changes:
+	    - Relocated AWS resources (.def files) to CS/data/aws from
+	      CS/data/temp.
+	    - Renamed the VFS volume /temp to /varia in order to avoid
+	      confusion with the like-named VFS volume /tmp, which is intended
+	      to be user-writable, whereas /varia potentially will be read-only
+	      since it represents ${prefix}/etc/crystal/varia.
+	    - Walktest now tries to read and write the camera file using the
+	      VFS volume /tmp rather than /varia (nee /temp) since /tmp is more
+	      likely to be writable by the user.  If, at load time, it fails to
+	      find a camera in /tmp, then it will fallback to /varia.
+	    - Fixed partedit so that it no longer looks for its resources using
+	      the unreliable /this directory.  Now looks in /varia.
+	    - Fixed several applications and plugins to use more sensible VFS
+	      directories (depending upon context) instead of using the
+	      unreliable /this.
 9-Feb-2004
 	- Eric Sunshine fixed bug in csKeyValuePair where it was incorrectly
 	  invoking SCF_CONSTRUCT_IBASE() even though it should not have been

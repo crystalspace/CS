@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2001 by Jorrit Tyberghein
+    Copyright (C) 2003 by Andrew Mann
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -60,8 +60,6 @@
 #include "partedit.h"
 
 CS_IMPLEMENT_APPLICATION
-
-//-----------------------------------------------------------------------------
 
 // The global pointer to PartEdit
 PartEdit *System;
@@ -194,7 +192,6 @@ void PartEdit::SetupFrame ()
       update=true;
     }
 
-
     if (s->AttractorStateChanged())
     {
       AttractorState *atstate;
@@ -203,7 +200,6 @@ void PartEdit::SetupFrame ()
       s->ClearAttractorStateChanged();
       update=true;
     }
-
 
     filestr=s->GetGraphicFile();
     if (filestr.Length()>0 && current_graphic != filestr.GetData())
@@ -227,7 +223,6 @@ void PartEdit::SetupFrame ()
       s->ClearLoadSaveStateChanged();
     }
   }
- 
 }
 
 void PartEdit::FinishFrame ()
@@ -238,7 +233,6 @@ void PartEdit::FinishFrame ()
 
 bool PartEdit::HandleEvent (iEvent& ev)
 {
-
   if ((ev.Type == csevKeyboard) && 
     (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown) &&
     (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
@@ -258,7 +252,6 @@ bool PartEdit::HandleEvent (iEvent& ev)
 
 bool PartEdit::EventHandler (iEvent& ev)
 {
-
   if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
   {
     System->SetupFrame ();
@@ -274,9 +267,6 @@ bool PartEdit::EventHandler (iEvent& ev)
     return System ? System->HandleEvent (ev) : false;
   }
 }
-
-
-
 
 bool PartEdit::InitEmitterList(EmitterList *elist)
 {
@@ -362,7 +352,6 @@ bool PartEdit::UpdateGen3D(EmitterList *elist,Emitter3DState *emitter_state)
   elist->cylindertangent->SetContent(emitter_state->cylindertangent_start,emitter_state->cylindertangent_end,
                     emitter_state->cylindertangent_min,emitter_state->cylindertangent_max);
 
-
   if (!different_emitter)
   {
     // One last way that we may have to use a different emitter - if we need to create a new mix.
@@ -382,10 +371,8 @@ bool PartEdit::UpdateGen3D(EmitterList *elist,Emitter3DState *emitter_state)
 
       if (removed)
         different_emitter=true;
-
     }
   }
-
 
   // Now, if we're using a different emitter, we need to reset some things
   if (different_emitter)
@@ -492,12 +479,8 @@ bool PartEdit::UpdateGen3D(EmitterList *elist,Emitter3DState *emitter_state)
   return different_emitter;
 }
 
-
-
-
 bool PartEdit::RecreateParticleSystem()
 {
-  
   printf("Attempting to load texture file '%s'\n",current_graphic.GetData());
 
   // Unload old texture here?
@@ -537,7 +520,6 @@ bool PartEdit::RecreateParticleSystem()
 
   mw = engine->CreateMeshWrapper(mesh, "emit", room,csVector3 (0, 5, 0));
 
-
   if (state_emitter.alpha_blend)
   {
     mw->SetRenderPriority(4);
@@ -549,7 +531,6 @@ bool PartEdit::RecreateParticleSystem()
   }
 
   engine->Prepare ();
-
   return true;
 }
 
@@ -649,7 +630,6 @@ void PartEdit::SaveEmitter3DStateRecursive(Emitter3DState *emitter_state,Emitter
     }
 }
 
-
 void PartEdit::SaveEmitter3DStateToFile(Emitter3DState *emitter_state)
 {
   // We start out with no clear emitter to use
@@ -669,14 +649,11 @@ void PartEdit::SaveEmitter3DStateToFile(Emitter3DState *emitter_state)
   if (use_emitter==EMITTER_NONE)
     use_emitter=EMITTER_POINT;
 
-
   SaveEmitter3DStateRecursive(emitter_state,use_emitter);
-
 }
 
 bool PartEdit::SaveEmitterToFile()
 {
-
   printf("<!--PartEdit Emitter save BEGINS here-->\n\n");
 
   printf("<!--Paste the entries from this section into the plugins section in your map file-->\n");
@@ -696,7 +673,6 @@ bool PartEdit::SaveEmitterToFile()
 
   printf("<!--Paste the entries from this section into your map file-->\n");
   printf("<meshfact name=\"emitFact\"><plugin>emitFact</plugin><params /></meshfact>\n\n");
-
 
   printf("<!--Paste the entries from this section beneath a sector in your map file-->\n");
   printf("<!--Be sure to adjust the x,y,z values in the move section to position the effect in your world-->\n");
@@ -755,8 +731,6 @@ bool PartEdit::SaveEmitterToFile()
   printf("    </params>\n");
   printf("</meshobj>\n");
   printf("<!--PartEdit Emitter save ENDS here-->\n\n");
-
-
   return true;
 }
 
@@ -808,7 +782,6 @@ bool PartEdit::UpdateParticleSystem()
       emitState->SetFieldAccelEmit(NULL);
   }
 
-
   if (force_emitter_setup || state_emitter_new.particle_count != state_emitter.particle_count)
     emitState->SetParticleCount(state_emitter_new.particle_count);
   if (force_emitter_setup || state_emitter_new.lighting != state_emitter.lighting)
@@ -842,8 +815,6 @@ bool PartEdit::UpdateParticleSystem()
 
   memcpy(&state_emitter,&state_emitter_new,sizeof(state_emitter));
   force_emitter_setup=false;
-
-
   return true;
 }
 
@@ -911,7 +882,6 @@ bool PartEdit::Initialize ()
     return false;
   }
 
-
   loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (loader == 0)
   {
@@ -962,7 +932,6 @@ bool PartEdit::Initialize ()
   iNativeWindow* nw = g2d->GetNativeWindow ();
   if (nw) nw->SetTitle ("Particle System Editor");
   
-
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!csInitializer::OpenApplication (object_reg))
   {
@@ -975,8 +944,6 @@ bool PartEdit::Initialize ()
   PluginManager = CS_QUERY_REGISTRY(object_reg, iPluginManager);
   if (!PluginManager)
     return "No iPluginManager plugin!";
-
-
 
   // First disable the lighting cache. Our app is PartEdit enough
   // not to need this.
@@ -1047,9 +1014,7 @@ bool PartEdit::Initialize ()
 
   current_graphic="/lib/std/cslogo2.png";
 
-
   RecreateParticleSystem();
-
 
   view = csPtr<iView> (new csView (engine, g3d));
   view->GetCamera ()->SetSector (room);
@@ -1063,29 +1028,21 @@ bool PartEdit::Initialize ()
 
   // Setup sink.  
   s  = new awsSink();
-  iAwsSink    *sink =aws->GetSinkMgr()->CreateSink(s);
+  iAwsSink* sink =aws->GetSinkMgr()->CreateSink(s);
 
   s->SetSink(sink);
   s->SetWindowManager(aws);
   s->SetVFS(vfs);
 
-
-
   aws->GetSinkMgr()->RegisterSink("parteditSink", sink);
 
-
-  
-
-
   // now load preferences
-  if (!aws->GetPrefMgr()->Load("/this/data/temp/partedit.def"))
+  if (!aws->GetPrefMgr()->Load("/varia/partedit.def"))
     csReport(object_reg,CS_REPORTER_SEVERITY_ERROR,
 	       "crystalspace.application.partedit",
 	       "couldn't load skin definition file!");
 
   aws->GetPrefMgr()->SelectDefaultSkin("Normal Windows");
-
-
 
   iAwsWindow *iawswindow_SectionSelection = aws->CreateWindowFrom("SectionSelection");
   if (iawswindow_SectionSelection) iawswindow_SectionSelection->Show();
@@ -1117,9 +1074,6 @@ bool PartEdit::Initialize ()
 
   iAwsWindow *iawswindow_FreeScroll = aws->CreateWindowFrom("FreeScroll");
   if (iawswindow_FreeScroll) iawswindow_FreeScroll->Show();
-
-
-
 
   s->SetGraphicCWD("/lib/std/");
   s->SetGraphicFilter("");
@@ -1156,5 +1110,3 @@ int main (int argc, char* argv[])
   csInitializer::DestroyApplication (object_reg);
   return 0;
 }
-
-

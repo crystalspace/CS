@@ -68,7 +68,4 @@ window "PrefsWindow"
       signalCmdButtonClicked -> VidPrefsSink::OpenGL
     }
   }
-
 }
-
-

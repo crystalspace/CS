@@ -398,9 +398,6 @@ bool csWaterDemo::Initialize ()
     return false;
   }
 
-
-  //loader->LoadMapFile("/this/data/test.xml", false);
-
   csRef<iSector> room = engine->CreateSector ("room");
 
   view = csPtr<iView> (new csView (engine, r3d));

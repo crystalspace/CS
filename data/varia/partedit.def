@@ -1,16 +1,16 @@
 skin "Normal Windows"
 {
   Texture: 		"/aws/texture.png"
-  HighlightColor: 		230,230,230
-  ShadowColor:    		60,60,60
-  FillColor:      		200,200,200
-  TextDisabledColor:		128,128,0
-  TextForeColor:		0,0,0
-  TextBackColor:        	255,255,255
-  ButtonTextColor:		0,0,192
-  ChartBarColor:		255,0,0
-  ActiveTitleBarColor1:        	0,0,128
-  ActiveTitleBarColor2:        	200,200,255
+  HighlightColor: 	230,230,230
+  ShadowColor:    	60,60,60
+  FillColor:      	200,200,200
+  TextDisabledColor:	128,128,0
+  TextForeColor:	0,0,0
+  TextBackColor:        255,255,255
+  ButtonTextColor:	0,0,192
+  ChartBarColor:	255,0,0
+  ActiveTitleBarColor1: 0,0,128
+  ActiveTitleBarColor2: 200,200,255
   OverlayTextureAlpha:	128
   ScrollBarHeight:	16
   ScrollBarWidth:	16
@@ -56,7 +56,6 @@ window "SectionSelection"
 	
   component "SectionList" is "List Box"
   {
-	  
     Frame: (0,0) - (138,108)
     Highlight: "/aws/lbhi.png"
     Columns: 1
@@ -86,18 +85,18 @@ window "LoadSaveNotAvailable"
   
   component "LoadSaveNALabel1" is "Label"
   {
-	Frame: (0,0) - (338,12)
-	Caption: "The Load/Save Menu is not yet available."
+    Frame: (0,0) - (338,12)
+    Caption: "The Load/Save Menu is not yet available."
   }
   component "LoadSaveNALabel2" is "Label"
   {
-	Frame: (0,14) - (338,26)
-	Caption: "If you are running in debug mode, the save state of the"
+    Frame: (0,14) - (338,26)
+    Caption: "If you are running in debug mode, the save state of the"
   }
   component "LoadSaveNALabel3" is "Label"
   {
-	Frame: (0,28) - (338,40)
-	Caption: "current system has been dumped to the console."
+    Frame: (0,28) - (338,40)
+    Caption: "current system has been dumped to the console."
   }
 }
 
@@ -115,13 +114,10 @@ window "AgingNotAvailable"
   
   component "AgingNALabel1" is "Label"
   {
-	Frame: (0,0) - (288,12)
-	Caption: "The Aging Moments Menu is not yet available."
+    Frame: (0,0) - (288,12)
+    Caption: "The Aging Moments Menu is not yet available."
   }
 }
-
-
-
 
 window "GraphicSelection"
 {
@@ -137,13 +133,13 @@ window "GraphicSelection"
   
   component "GraphicFilterLabel" is "Label"
   {
-	Frame: (0,0) - (138,12)
-	Caption: "Filename Filter:"
+    Frame: (0,0) - (138,12)
+    Caption: "Filename Filter:"
   }
 	
   component "GraphicFilter" is "Text Box"
   {
-	Frame: (0,14) - (138,26)
+    Frame: (0,14) - (138,26)
     Style: tbfsNormal
 
     connect 
@@ -153,11 +149,9 @@ window "GraphicSelection"
     }
   }
 	
-	
   component "GraphicFileSelection" is "List Box"
   {
-  
-	Frame: (0,28) - (138,333)
+    Frame: (0,28) - (138,333)
     Style: lbfsSunken
     Highlight: "/aws/lbhi.png"
     Columns: 1
@@ -167,8 +161,8 @@ window "GraphicSelection"
 
     connect
     {
-		signalComponentCreated -> parteditSink::RegisterGraphicFileList
-		signalListBoxSelectionChanged -> parteditSink::GraphicFileSelected
+      signalComponentCreated -> parteditSink::RegisterGraphicFileList
+      signalListBoxSelectionChanged -> parteditSink::GraphicFileSelected
     }
   }	
 }
@@ -188,13 +182,13 @@ window "EmitterState"
   
   component "PartCtLabel" is "Label"
   {
-	Frame: (0,0) - (120,12)
-	Caption: "Particle Count:"
+    Frame: (0,0) - (120,12)
+    Caption: "Particle Count:"
   }
 	
   component "ParticleCount" is "Text Box"
   {
-	Frame: (122,0) - (188,12)
+    Frame: (122,0) - (188,12)
     Style: tbfsNormal
 
     connect 
@@ -206,13 +200,13 @@ window "EmitterState"
 
   component "PartTmLabel" is "Label"
   {
-	Frame: (0,16) - (120,28)
-	Caption: "Max Particle Age:"
+    Frame: (0,16) - (120,28)
+    Caption: "Max Particle Age:"
   }
 	
   component "ParticleMaxAge" is "Text Box"
   {
-	Frame: (122,16) - (188,28)
+    Frame: (122,16) - (188,28)
     Style: tbfsNormal
 
     connect 
@@ -224,30 +218,28 @@ window "EmitterState"
 
   component "Lighting" is "Check Box"
   {
-	Frame: (0,30) - (75,42)
-	Align: cbAlignLeft
-	Caption: "Lighting"
+    Frame: (0,30) - (75,42)
+    Align: cbAlignLeft
+    Caption: "Lighting"
 
-	connect
-	{
+    connect
+    {
       signalComponentCreated -> parteditSink::RegisterLighting
       signalCheckBoxClicked-> parteditSink::SetLighting
     }
-
   }
   
   component "AlphaBlend" is "Check Box"
   {
-	Frame: (80,30) - (195,42)
-	Align: cbAlignLeft
-	Caption: "Transparency"
+    Frame: (80,30) - (195,42)
+    Align: cbAlignLeft
+    Caption: "Transparency"
 
-	connect
-	{
+    connect
+    {
       signalComponentCreated -> parteditSink::RegisterAlphaBlend
       signalCheckBoxClicked-> parteditSink::SetAlphaBlend
     }
-
   }
   
   component "ParticleTypeGroup" is "Group Frame"

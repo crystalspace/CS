@@ -2,19 +2,16 @@
 @node AWS Quick Start, AWS Signals, AWS, AWS
 @subsection Quick Start
 
-In order to startup and use @sc{aws}, currently, the following tasks need to be
-accomplished:
+In order to startup and use @sc{aws}, the following tasks must be performed.
 
 @enumerate
 @item
 Load the @sc{aws} plugin.
 
 @example
-aws = CS_LOAD_PLUGIN(plugin_mgr,
+csRef<iAws> aws = CS_LOAD_PLUGIN(plugin_mgr,
   "crystalspace.window.alternatemanager", iAws);
 @end example
-
-Where @code{aws} is type @code{iAws*} (or @code{csRef<iAws>}).
 
 @item
 Setup the @sc{aws} canvas.
@@ -24,6 +21,7 @@ awsCanvas = aws->SetupCanvas (0, myG2D, myG3D);
 @c Needed? aws->SetFlag (AWSF_AlwaysRedrawWindows);
 @end example
 
+@noindent
 Where @code{myG2D} and @code{myG3D} are your @code{iGraphics2D} and 
 @code{iGraphics3D} cavas objects, respectively.
 
@@ -31,8 +29,12 @@ Where @code{myG2D} and @code{myG3D} are your @code{iGraphics2D} and
 Load definition files.
 
 @example
-aws->GetPrefMgr()->Load("./data/temp/awstest.def");
+aws->GetPrefMgr()->Load("/aws/awstest.def");
 @end example
+
+@noindent
+Substitute the @sc{vfs} path of your own definition file in place of the path
+shown in the example.
 
 @item
 Select a default skin that @emph{all} windows will use.
@@ -45,15 +47,16 @@ aws->GetPrefMgr()->SelectDefaultSkin("Normal Windows");
 Create and display your windows.
 
 @example
-iAwsWindow *test1 = aws->CreateWindowFrom("Splash");
-iAwsWindow *test2 = aws->CreateWindowFrom("Another");
+csRef<iAwsWindow> test1 = aws->CreateWindowFrom("Splash");
+csRef<iAwsWindow> test2 = aws->CreateWindowFrom("Another");
 if (test1) test1->Show();
 if (test2) test2->Show();
 @end example
 
 @item
-And finally you have to make sure it actually prints the output to the screen.
-So in your programs main drawing loop you input code similar to this:
+Finally, you have to make sure it actually renders to the display.
+So, in your program's main drawing loop you might use code similar to this:
+
 @example
 // Start drawing 2D graphics.
 if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS))
@@ -68,9 +71,9 @@ aws->Print (myG3D, 64);
 @end enumerate
 
 That's all there is to it.  @sc{aws} is designed to be easy to use.  Of course,
-this brief look does not illustrate how to get user input, from components in
-the windows, nor does it illustrate how to do anything other than display your
-windows.  However, the windows created here are full-fledged windows with all
-the controls listed in the definition that you've created.  For more advanced
-topics, read about signals (@pxref{AWS Signals}) and custom components
-(@pxref{AWS Custom Components}).
+this brief examination does not illustrate how to get user input from
+components in the windows, nor does it illustrate how to do anything other than
+display your windows.  However, the windows created here are full-fledged
+windows with all the controls listed in the definition that you've created.
+For more advanced topics, read about signals (@pxref{AWS Signals}) and custom
+components (@pxref{AWS Custom Components}).

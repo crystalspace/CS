@@ -304,7 +304,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   (void) new CustomComponentFactory(aws);
 
   // now load preferences
-  if (!aws->GetPrefMgr()->Load("/temp/awstest.def"))
+  if (!aws->GetPrefMgr()->Load("/aws/awstest.def"))
       Report(CS_REPORTER_SEVERITY_ERROR, "couldn't load definition file!");
   aws->GetPrefMgr()->SelectDefaultSkin("Normal Windows");
 

@@ -339,8 +339,8 @@ csSubRect2* csSubRect2::Alloc (int w, int h, const AllocInfo& ai, csRect& r)
     splitX = allocedRect.xmax;
     splitY = allocedRect.ymax;
 
-    if (((ai.allocPos == ALLOC_RIGHT) && (r.Height () <= allocedRect.Height ())) ||
-	((ai.allocPos == ALLOC_BELOW) && (r.Width  () <= allocedRect.Width  ())))
+    if ((ai.allocPos == ALLOC_RIGHT && r.Height() <= allocedRect.Height()) ||
+	(ai.allocPos == ALLOC_BELOW && r.Width () <= allocedRect.Width ()))
     {
       DecideBestSplit (rect, splitX, splitY, splitType);
     }
@@ -597,12 +597,12 @@ void csSubRectangles2::Dump ()
   int i;
   for (i = 0; i < 256; i++)
   {
-    pal[i].red =   
-      QInt ((((i & 0x01) << 2) + ((i & 0x08) >> 2) + ((i & 0x40) >> 6)) * (255.0f / 7.0f));
-    pal[i].green =   
-      QInt ((((i & 0x02) << 1) + ((i & 0x10) >> 3) + ((i & 0x80) >> 7)) * (255.0f / 7.0f));
-    pal[i].blue =   
-      QInt ((((i & 0x04) >> 1) + ((i & 0x20) >> 5)) * (255.0f / 3.0f));
+    pal[i].red = QInt ((((i & 0x01) << 2) + ((i & 0x08) >> 2) +
+      ((i & 0x40) >> 6)) * (255.0f / 7.0f));
+    pal[i].green = QInt ((((i & 0x02) << 1) + ((i & 0x10) >> 3) +
+      ((i & 0x80) >> 7)) * (255.0f / 7.0f));
+    pal[i].blue = QInt ((((i & 0x04) >> 1) + ((i & 0x20) >> 5)) *
+      (255.0f / 3.0f));
   }
 
   int w = region.Width (), h = region.Height ();
@@ -659,7 +659,7 @@ void csSubRectangles2::Dump ()
   {
     csRef<iDataBuffer> buf = imgsaver->Save (img, "image/png");
     csString outfn;
-    outfn.Format ("/temp/csSubRectangles2_dump_%.8x_r.png", (uint)this);
+    outfn.Format ("/tmp/csSubRectangles2_dump_%.8x_r.png", (uint)this);
     if (vfs->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
     {
       csReport (iSCF::SCF->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
@@ -674,7 +674,7 @@ void csSubRectangles2::Dump ()
     }
 
     buf = imgsaver->Save (img2, "image/png");
-    outfn.Format ("/temp/csSubRectangles2_dump_%.8x_ar.png", (uint)this);
+    outfn.Format ("/tmp/csSubRectangles2_dump_%.8x_ar.png", (uint)this);
     if (vfs->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
     {
       csReport (iSCF::SCF->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
@@ -689,7 +689,7 @@ void csSubRectangles2::Dump ()
     }
 
     buf = imgsaver->Save (img3, "image/png");
-    outfn.Format ("/temp/csSubRectangles2_dump_%.8x_ov.png", (uint)this);
+    outfn.Format ("/tmp/csSubRectangles2_dump_%.8x_ov.png", (uint)this);
     if (vfs->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
     {
       csReport (iSCF::SCF->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
@@ -705,4 +705,3 @@ void csSubRectangles2::Dump ()
   }
 #endif
 }
-

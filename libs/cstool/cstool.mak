@@ -34,6 +34,7 @@ OBJ.CSTOOL = $(addprefix $(OUT)/,$(notdir $(SRC.CSTOOL:.cpp=$O)))
 CFG.CSTOOL = $(SRCDIR)/data/config/system.cfg
 
 TO_INSTALL.CONFIG += $(CFG.CSTOOL)
+TO_INSTALL.DATA += $(SRCDIR)/data/varia/vidprefs.def
 TO_INSTALL.STATIC_LIBS += $(CSTOOL.LIB)
 
 MSVC.DSP += CSTOOL

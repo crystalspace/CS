@@ -270,7 +270,7 @@ void csBugPlug::SetupPlugin ()
     "/config/bugplug.key"));
 
   captureFormat = csStrNew (config->GetStr ("Bugplug.Capture.FilenameFormat",
-    "/this/cryst000.png"));
+    "/tmp/cryst000.png"));
   // since this string is passed to format later,
   // replace all '%' with '%%'
   {

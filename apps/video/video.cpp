@@ -264,7 +264,7 @@ bool Video::Initialize (int argc, const char* const argv[],
     if (pVFS)
     {
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Opening the video file.");
-      csRef<iFile> pFile (pVFS->Open ("/this/data/video.avi", VFS_FILE_READ));
+      csRef<iFile> pFile (pVFS->Open ("/this/video.avi", VFS_FILE_READ));
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Scanning the video file.");
       if (pFile && pVideoFormat->Load (pFile))
       {

@@ -309,12 +309,12 @@ Enable/disable display of coordinate at runtime.  Note that enabling the
 coordinates display automatically disables the statistics display.
 
 @item coordsave [@key{Shift C}]
-Save the current sector and location in @file{/temp/walktest.cam}.
+Save the current sector and location in @sc{vfs} file @file{/tmp/walktest.cam}.
 
 @item coordload [@key{c}]
-Restore the saved position from @file{/temp/walktest.cam}.  Note that the
-position will always be restored but the orientation of the camera will only be
-restored if @samp{move3d} is set.
+Restore the saved position from @sc{vfs} file @file{/tmp/walktest.cam}.  Note
+that the position will always be restored but the orientation of the camera
+will only be restored if @samp{move3d} is set.
 
 @item exec name
 Run a script, one line per frame. The name must be a @sc{vfs} path.
@@ -614,11 +614,11 @@ with performance statistics, not a recording of motion.
 Clear current recording.
 
 @item saverec file
-Save recording as @file{/this/file.rec}, default @file{/this/record}.  It is
+Save recording as @file{/tmp/file.rec}, default @file{/tmp/record}.  It is
 only sensible play back a recording in the same or nearly identical map.
 
 @item loadrec file
-Load recording from @file{/this/file.rec}, default @file{/this/record}.
+Load recording from @file{/tmp/file.rec}, default @file{/tmp/record}.
 
 @item recsubperf str - record subperformance
 Once a recording has begun this command is used to record the statistics of a
@@ -748,7 +748,7 @@ n frames, default 100.
 @item play filename
 If a filename is given, This outputs summary statistics for the demo played to
 @file{file.rps}.  The @file{.rps} extension stands for Recorded Performance
-Statistics Default @file{/this.rps}
+Statistics Default @file{/tmp.rps}
 
 @item play res, x, filename 
 The @var{res} option stands for resolution and tells WalkTest to record

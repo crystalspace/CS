@@ -263,7 +263,7 @@ private:
   const char* captureMIME;
   /// image saver options for the screenshot file
   const char* captureOptions;
-  /// format of the screenshot filename (e.g. "/this/cryst%03d.png")
+  /// format of the screenshot filename (e.g. "/tmp/cryst%03d.png")
   char* captureFormat;
   int captureFormatNumberMax;
   /**

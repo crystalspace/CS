@@ -75,7 +75,8 @@ DEP.AWS = CSTOOL CSGFX CSGEOM CSUTIL
 
 OUTDIRS += $(OUT.AWS) $(AWS.DERIVED.DIR)
 
-TO_INSTALL.DATA += $(SRCDIR)/data/awsdef.zip
+TO_INSTALL.DATA += \
+  $(SRCDIR)/data/awsdef.zip $(wildcard $(SRCDIR)/data/aws/*.def)
 
 MSVC.DSP += AWS
 DSP.AWS.NAME = aws

@@ -328,16 +328,16 @@ memory then a the new camera movements will be appended.
 Clear a recording.
 
 @item loadrec @var{file}
-Load a recording from @sc{vfs} path @file{/this/@var{file}} where @var{file}
+Load a recording from @sc{vfs} path @file{/tmp/@var{file}} where @var{file}
 is the argument specified with the @samp{loadrec} command.  If @var{file} is
-not specified, then it looks for a file named @file{/this/record}.  Note that
+not specified, then it looks for a file named @file{/tmp/record}.  Note that
 a recording is only valid when played in the same (or @emph{very} similar)
 world.
 
 @item saverec @var{file}
-Save a recording to @sc{vfs} path @file{/this/@var{file}} where @var{file} is
+Save a recording to @sc{vfs} path @file{/tmp/@var{file}} where @var{file} is
 the argument specified with the @samp{saverec} command.  If @var{file} is not
-specified then the recording is saved with the name @file{/this/record}.
+specified then the recording is saved with the name @file{/tmp/record}.
 
 @item play
 Play a recording loaded with @samp{loadrec} (if there is one).  Note that a

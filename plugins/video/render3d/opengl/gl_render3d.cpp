@@ -2198,7 +2198,7 @@ bool csGLGraphics3D::DebugCommand (const char* cmdstr)
     if (txtmgr)
     {
       const char* dir = 
-	((param != 0) && (*param != 0)) ? param : "/temp/slmdump/";
+	((param != 0) && (*param != 0)) ? param : "/tmp/slmdump/";
       txtmgr->DumpSuperLightmaps (vfs, imgsaver, dir);
     }
 

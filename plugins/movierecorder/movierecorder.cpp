@@ -177,7 +177,7 @@ void csMovieRecorder::SetupPlugin()
 
   // Filename formatting code ripped from Bugplug's screenshotter
   captureFormat = csStrNew (config->GetStr ("MovieRecorder.Capture.FilenameFormat",
-    "/this/crystal000.nuv"));
+    "/tmp/crystal000.nuv"));
   // since this string is passed to format later,
   // replace all '%' with '%%'
   {
