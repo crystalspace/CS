@@ -39,7 +39,7 @@ else
 endif
 
 INC.AWS = $(wildcard plugins/aws/*.h) $(wildcard include/iaws/*.h)
-SRC.AWS = $(filter-out plugins/aws/sllex.cpp plugins/aws/slp.cpp, \
+SRC.AWS = $(filter-out plugins/aws/skinlex.cpp plugins/aws/skinpars.cpp, \
   $(wildcard plugins/aws/*.cpp))				  \
   plugins/aws/skinlex.cpp plugins/aws/skinpars.cpp
 OBJ.AWS = $(addprefix $(OUT)/,$(notdir $(SRC.AWS:.cpp=$O)))
