@@ -106,3 +106,17 @@ void csStringHash::Clear ()
   Registry.DeleteAll ();
 }
 
+csStringHashIterator::csStringHashIterator (csStringHash* hash)
+{
+  hashIt = new csHashIterator (&hash->Registry);
+}
+
+bool csStringHashIterator::HasNext ()
+{
+  return hashIt->HasNext();
+}
+
+csStringID csStringHashIterator::Next ()
+{
+  return ((csRegisteredString*)hashIt->Next())->ID;
+}

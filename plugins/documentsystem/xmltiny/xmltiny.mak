@@ -1,0 +1,82 @@
+#------------------------------------------------------------------------------
+# Binary document system submakefile
+#------------------------------------------------------------------------------
+DESCRIPTION.xmltiny = Crystal Space TinyXML document system
+
+#------------------------------------------------------------- rootdefines ---#
+ifeq ($(MAKESECTION),rootdefines)
+
+PLUGINHELP += \
+  $(NEWLINE)echo $"  make xmltiny     Make the $(DESCRIPTION.xmltiny)$"
+
+endif # ifeq ($(MAKESECTION),rootdefines)
+#------------------------------------------------------------- roottargets ---#
+ifeq ($(MAKESECTION),roottargets)
+
+.PHONY: xmltiny xmltinyclean
+all plugins: xmltiny
+
+xmltiny:
+	$(MAKE_TARGET) MAKE_DLL=yes
+xmltinyclean:
+	$(MAKE_CLEAN)
+
+endif # ifeq ($(MAKESECTION),roottargets)
+#------------------------------------------------------------- postdefines ---#
+ifeq ($(MAKESECTION),postdefines)
+
+ifeq ($(USE_PLUGINS),yes)
+  XMLTINY = $(OUTDLL)/xmltiny$(DLL)
+  LIB.XMLTINY = $(foreach d,$(DEP.XMLTINY),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(XMLTINY)
+else
+  XMLTINY = $(OUT)/$(LIB_PREFIX)xmltiny$(LIB)
+  DEP.EXE += $(XMLTINY)
+  SCF.STATIC += xmltiny
+  TO_INSTALL.STATIC_LIBS += $(XMLTINY)
+endif
+
+DIR.XMLTINY = plugins/documentsystem/xmltiny
+OUT.XMLTINY = $(OUT)/$(DIR.XMLTINY)
+INC.XMLTINY = $(wildcard $(DIR.XMLTINY)/*.h)
+SRC.XMLTINY = $(wildcard $(DIR.XMLTINY)/*.cpp)
+OBJ.XMLTINY = $(addprefix $(OUT.XMLTINY)/,$(notdir $(SRC.XMLTINY:.cpp=$O)))
+DEP.XMLTINY = CSUTIL CSTOOL CSSYS CSUTIL
+
+MSVC.DSP += XMLTINY
+DSP.XMLTINY.NAME = xmltiny
+DSP.XMLTINY.TYPE = plugin
+
+endif # ifeq ($(MAKESECTION),postdefines)
+#----------------------------------------------------------------- targets ---#
+ifeq ($(MAKESECTION),targets)
+
+.PHONY: xmltiny xmltinyclean xmltinycleandep
+xmltiny: $(OUTDLL) $(OUT.XMLTINY) $(XMLTINY)
+
+$(OUT.XMLTINY)/%$O: $(DIR.XMLTINY)/%.cpp $(OUT.XMLTINY)
+	$(DO.COMPILE.CPP)
+
+$(XMLTINY): $(OBJ.XMLTINY) $(LIB.XMLTINY)
+	$(DO.PLUGIN)
+
+$(OUT.XMLTINY): 
+	$(MKDIRS)
+
+clean: xmltinyclean
+xmltinyclean:
+	-$(RM) $(XMLTINY) $(OBJ.XMLTINY)
+
+cleandep: xmltinycleandep
+xmltinycleandep:
+	-$(RM) $(OUT.XMLTINY)/xmltiny.dep
+
+ifdef DO_DEPEND
+dep: $(OUT.XMLTINY) $(OUT.XMLTINY)/xmltiny.dep
+$(OUT.XMLTINY)/xmltiny.dep: $(SRC.XMLTINY)
+	$(DO.DEPEND)
+else
+-include $(OUT.XMLTINY)/xmltiny.dep
+endif
+
+endif # ifeq ($(MAKESECTION),targets)

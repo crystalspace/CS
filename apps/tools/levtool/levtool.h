@@ -254,6 +254,7 @@ public:
   csVector thing_plugins;
 
   void ReportError (const char* description, ...);
+  void Report (int severity, const char* description, ...);
 
   /**
    * This is this appears to be a valid XML world file.

@@ -33,6 +33,35 @@ typedef uint32 csStringID;
 /// this ID is the 'invalid' value
 csStringID const csInvalidStringID = ~0;
 
+class csStringHash;
+
+/**
+ * An iterator to iterate over elements in a csStringHash.
+ * When you have an open iterator you should not alter the
+ * string hash that this object iterates over. 
+ */
+class csStringHashIterator
+{
+  friend class csStringHash;
+
+private:
+  csHashIterator* hashIt;
+
+public:
+
+  /**
+   * Constructor for an iterator to iterate over all elements in a hashmap.
+   * Note that you should not do changes on the hashmap when you have
+   * open iterators.
+   */
+  csStringHashIterator (csStringHash* hash);
+
+  /// Is there a next element in this iterator?
+  bool HasNext ();
+  /// Get the next element.
+  csStringID Next ();
+};
+
 /**
  * The string hash is a hash of strings, all with different content. Each
  * string has an ID number.
@@ -40,6 +69,8 @@ csStringID const csInvalidStringID = ~0;
 class csStringHash
 {
 private:
+  friend class csStringHashIterator;
+  
   csHashMap Registry;
 
 public:

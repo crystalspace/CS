@@ -1,0 +1,5 @@
+.scfVersion = 1
+; Binary document system
+crystalspace.documentsystem.binary = bindoc
+; Crystal Space TinyXML document system
+crystalspace.documentsystem.tinyxml = xmltiny

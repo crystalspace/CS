@@ -26,6 +26,18 @@ The history order is reversed so that new features are at the top.
 	- Jonathan Tarbox adding in the initial event system update
 	- Eric Sunshine corrected a couple package names in cygwin.txi as
 	  reported by Ian Walker.
+	- res made the following changes:
+	    * added iterators for csStringHash and csStringSet.
+	    * added some sorting functions to csRefArray.
+	    * enhanced levtool so iDocumentSystem plugins can be specified for
+	      reading or writing world files.
+	    * changed levtool to just write from input to output docsys if one
+	      of those and no other operation is specified.
+	    * levtool reports times for some actions.
+	    * levtool used to make backups even on operations which did not 
+	      modify a world.
+	    * added a simple TinyXML wrapping document system plugin.
+	    * added a binary document system plugin.
 13-Mar-2003
 	- Received some documentation fixes with regards to 3D sprites
 	  from Simon Posnjak <simon.posnjak@siol.net>.

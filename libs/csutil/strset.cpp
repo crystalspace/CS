@@ -56,3 +56,18 @@ void csStringSet::Clear ()
   reverse_mapping.DeleteAll ();
 }
 
+csStringSetIterator::csStringSetIterator (csStringSet* hash)
+{
+  hashIt = new csStringHashIterator (&hash->Registry);
+}
+
+bool csStringSetIterator::HasNext ()
+{
+  return hashIt->HasNext();
+}
+
+csStringID csStringSetIterator::Next ()
+{
+  return hashIt->Next();
+}
+

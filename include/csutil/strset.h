@@ -24,6 +24,35 @@
 /**\file
  */
  
+class csStringSet;
+
+/**
+ * An iterator to iterate over elements in a csStringSet.
+ * When you have an open iterator you should not alter the
+ * string set that this object iterates over. 
+ */
+class csStringSetIterator
+{
+  friend class csStringSet;
+
+private:
+  csStringHashIterator* hashIt;
+
+public:
+
+  /**
+   * Constructor for an iterator to iterate over all elements in a hashmap.
+   * Note that you should not do changes on the hashmap when you have
+   * open iterators.
+   */
+  csStringSetIterator (csStringSet* hash);
+
+  /// Is there a next element in this iterator?
+  bool HasNext ();
+  /// Get the next element.
+  csStringID Next ();
+};
+
 /**
  * The string set is a list of strings, all with different content. Each
  * string has an ID number. The most important operation is to request a
@@ -32,6 +61,8 @@
  */
 class csStringSet
 {
+  friend class csStringSetIterator;
+
   csStringHash Registry;
   csHashMap reverse_mapping;	// Mapping from ID to string.
   csStringID IDCounter;

@@ -26,6 +26,7 @@
 #include "csutil/xmltiny.h"
 #include "csutil/csstring.h"
 #include "iutil/objreg.h"
+#include "iutil/plugin.h"
 #include "iutil/vfs.h"
 #include "iutil/cmdline.h"
 #include "iutil/document.h"
@@ -51,6 +52,7 @@ CS_IMPLEMENT_APPLICATION
 #define OP_FLAGCLEAR 10
 #define OP_FLAGGOOD 11
 #define OP_FLAGBAD 12
+#define OP_TRANSLATE 13
 
 //-----------------------------------------------------------------------------
 
@@ -59,6 +61,15 @@ void LevTool::ReportError (const char* description, ...)
   va_list arg;
   va_start (arg, description);
   csReportV (object_reg, CS_REPORTER_SEVERITY_ERROR,
+  	"crystalspace.apps.levtool", description, arg);
+  va_end (arg);
+}
+
+void LevTool::Report (int severity, const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+  csReportV (object_reg, severity,
   	"crystalspace.apps.levtool", description, arg);
   va_end (arg);
 }
@@ -1417,8 +1428,13 @@ void LevTool::Main ()
 {
   cmdline = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
   vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+  csRef<iPluginManager> plugin_mgr = 
+    CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   int op = OP_HELP;
+
+  if (cmdline->GetOption ("inds") || cmdline->GetOption ("outds"))
+    op = OP_TRANSLATE;
 
   if (cmdline->GetOption ("dynavis")) op = OP_DYNAVIS;
   if (cmdline->GetOption ("list")) op = OP_LIST;
@@ -1478,13 +1494,15 @@ void LevTool::Main ()
     printf ("              -maxsize=<percent>: maximum object size (default 3%%).\n");
     printf ("              -minpoly=<number>: minimum number of polygons (default 6).\n");
     printf ("              -maxpoly=<number>: maximum number of polygons (default 1000000000).\n");
+    printf ("  -inds=<plugin>: Documents system plugin for reading world.\n");
+    printf ("  -outds=<plugin>: Documents system plugin for writing world.\n");
     exit (0);
   }
 
   int minsize, maxsize;
   int minpoly, maxpoly;
   switch (op)
-  {
+  {      
     case OP_FLAGGOOD:
       minsize = 10;
       maxsize = 120;
@@ -1516,10 +1534,55 @@ void LevTool::Main ()
     if (maxpoly_arg != NULL) sscanf (maxpoly_arg, "%d", &maxpoly);
   }
 
+  csRef<iDocumentSystem> inputDS;
+  csRef<iDocumentSystem> outputDS;
+  {
+    const char *inds = cmdline->GetOption ("inds");
+    if (inds)
+    {
+/*      inputDS = csPtr<iDocumentSystem> (CS_LOAD_PLUGIN (plugin_mgr,
+	inds, iDocumentSystem));
+      if (!inputDS)*/
+      {
+        inputDS = csPtr<iDocumentSystem> (CS_LOAD_PLUGIN (plugin_mgr,
+	  csString().Format ("crystalspace.documentsystem.%s", inds),
+	  iDocumentSystem));
+      }
+      if (!inputDS)
+      {
+	Report (CS_REPORTER_SEVERITY_ERROR,
+	  "Unable to load input document system '%s'!",
+	  inds);
+        return;
+      }
+    }
+
+    const char *outds = cmdline->GetOption ("outds");
+    if (outds)
+    {
+/*      outputDS = csPtr<iDocumentSystem> (CS_LOAD_PLUGIN (plugin_mgr,
+	outds, iDocumentSystem));
+      if (!outputDS)*/
+      {
+	outputDS = csPtr<iDocumentSystem> (CS_LOAD_PLUGIN (plugin_mgr,
+	  csString().Format ("crystalspace.documentsystem.%s", outds),
+	  iDocumentSystem));
+      }
+      if (!outputDS)
+      {
+	Report (CS_REPORTER_SEVERITY_ERROR,
+	  "Unable to load output document system '%s'!",
+	  outds);
+        return;
+      }
+    }
+  }
+
   const char* val = cmdline->GetName ();
   if (!val)
   {
-    ReportError ("Please give VFS world file name or name of the zip archive!");
+    ReportError ("Please give VFS world file name or name of the zip archive! "
+      "Use 'levtool -help' to get a list of possible options.");
     return;
   }
 
@@ -1542,22 +1605,60 @@ void LevTool::Main ()
   }
 
   // Make backup.
-  vfs->WriteFile (filename+".bak", **buf, buf->GetSize ());
+  switch (op)
+  {
+    case OP_LIST:  
+    case OP_ANALYZE: 
+    case OP_ANALYZEP: 
+    case OP_VALIDATE: 
+      break;
+    default:
+      vfs->WriteFile (filename+".bak", **buf, buf->GetSize ());
+      break;
+  }
 
-  csRef<iDocumentSystem> xml (csPtr<iDocumentSystem> (
-  	new csTinyDocumentSystem ()));
+  csRef<iDocumentSystem> xml;
+  if (inputDS)
+  {
+    xml = inputDS;
+  }
+  else
+  {
+    xml = (csPtr<iDocumentSystem> (
+      new csTinyDocumentSystem ()));
+  }
   csRef<iDocument> doc = xml->CreateDocument ();
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Parsing...");
+  csTicks parse_start = csGetTicks();
   const char* error = doc->Parse (buf);
+  csTicks parse_end = csGetTicks();
+  buf = NULL;
   if (error != NULL)
   {
     ReportError ("Error parsing XML: %s!", error);
     return;
+  }
+  else
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY, " time taken: %f s",
+      (float)(parse_end - parse_start) / (float)1000);
   }
 
   //---------------------------------------------------------------
 
   if (!TestValidXML (doc))
     return;
+
+  csRef<iDocumentSystem> newsys;
+  if (outputDS)
+  {
+    newsys = outputDS;
+  }
+  else
+  {
+    newsys = (csPtr<iDocumentSystem> (
+      new csTinyDocumentSystem ()));
+  }
 
   csRef<iDocumentNode> root = doc->GetRoot ();
   csRef<iDocumentNode> worldnode = root->GetNode ("world");
@@ -1566,21 +1667,39 @@ void LevTool::Main ()
   {
     case OP_VALIDATE:
       {
+	Report (CS_REPORTER_SEVERITY_NOTIFY, "Analyzing...");
+	csTicks analyze_start = csGetTicks();
 	AnalyzePluginSection (doc);
 	FindAllThings (doc);
+	csTicks analyze_end = csGetTicks();
+	Report (CS_REPORTER_SEVERITY_NOTIFY, " time taken: %f s",
+	  (float)(analyze_end - analyze_start) / (float)1000);
+
+	Report (CS_REPORTER_SEVERITY_NOTIFY, "Validating...");
+	csTicks validate_start = csGetTicks();
 	ValidateContents ();
+	csTicks validate_end = csGetTicks();
+	Report (CS_REPORTER_SEVERITY_NOTIFY, " time taken: %f s",
+	  (float)(validate_end - validate_start) / (float)1000);
       }
       break;
 
     case OP_LIST:
       {
+	Report (CS_REPORTER_SEVERITY_NOTIFY, "Analyzing...");
+	csTicks analyze_start = csGetTicks();
 	AnalyzePluginSection (doc);
+	csTicks analyze_end = csGetTicks();
+	Report (CS_REPORTER_SEVERITY_NOTIFY, " time taken: %f s",
+	  (float)(analyze_end - analyze_start) / (float)1000);
         ListContents (doc->GetRoot ());
       }
       break;
 
     case OP_ANALYZE:
       {
+	Report (CS_REPORTER_SEVERITY_NOTIFY, "Analyzing...");
+	csTicks analyze_start = csGetTicks();
 	AnalyzePluginSection (doc);
 	FindAllThings (doc);
 	csBox3 global_bbox;
@@ -1592,6 +1711,9 @@ void LevTool::Main ()
 	  th->CreateBoundingBox ();
 	  global_bbox += th->GetBoundingBox ();
 	}
+	csTicks analyze_end = csGetTicks();
+	Report (CS_REPORTER_SEVERITY_NOTIFY, " time taken: %f s",
+	  (float)(analyze_end - analyze_start) / (float)1000);
 	printf ("Global bounding box: (%g,%g,%g) - (%g,%g,%g)\n",
 		global_bbox.MinX (), global_bbox.MinY (), global_bbox.MinZ (),
 		global_bbox.MaxX (), global_bbox.MaxY (), global_bbox.MaxZ ());
@@ -1692,7 +1814,7 @@ void LevTool::Main ()
       {
 	AnalyzePluginSection (doc);
 	FindAllThings (doc);
-	csRef<iDocument> newdoc = xml->CreateDocument ();
+	csRef<iDocument> newdoc = newsys->CreateDocument ();
 
 	int i;
 	for (i = 0 ; i < things.Length () ; i++)
@@ -1716,7 +1838,7 @@ void LevTool::Main ()
       {
 	AnalyzePluginSection (doc);
 	FindAllThings (doc);
-	csRef<iDocument> newdoc = xml->CreateDocument ();
+	csRef<iDocument> newdoc = newsys->CreateDocument ();
 
 	int i;
 	for (i = 0 ; i < things.Length () ; i++)
@@ -1743,7 +1865,7 @@ void LevTool::Main ()
       {
 	AnalyzePluginSection (doc);
 	FindAllThings (doc);
-	csRef<iDocument> newdoc = xml->CreateDocument ();
+	csRef<iDocument> newdoc = newsys->CreateDocument ();
 
 	csBox3 global_bbox;
 	global_bbox.StartBoundingBox ();
@@ -1793,7 +1915,7 @@ void LevTool::Main ()
       {
 	AnalyzePluginSection (doc);
 	FindAllThings (doc);
-	csRef<iDocument> newdoc = xml->CreateDocument ();
+	csRef<iDocument> newdoc = newsys->CreateDocument ();
 
 	csBox3 global_bbox;
 	global_bbox.StartBoundingBox ();
@@ -1842,7 +1964,7 @@ void LevTool::Main ()
       {
 	AnalyzePluginSection (doc);
 	FindAllThings (doc);
-	csRef<iDocument> newdoc = xml->CreateDocument ();
+	csRef<iDocument> newdoc = newsys->CreateDocument ();
 
 	csBox3 global_bbox;
 	global_bbox.StartBoundingBox ();
@@ -1894,7 +2016,7 @@ void LevTool::Main ()
       {
 	AnalyzePluginSection (doc);
 	FindAllThings (doc);
-	csRef<iDocument> newdoc = xml->CreateDocument ();
+	csRef<iDocument> newdoc = newsys->CreateDocument ();
 
 	csBox3 global_bbox;
 	global_bbox.StartBoundingBox ();
@@ -1921,6 +2043,40 @@ void LevTool::Main ()
 	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
 	  return;
 	}
+      }
+      break;
+
+    case OP_TRANSLATE:
+      {
+	Report (CS_REPORTER_SEVERITY_NOTIFY, "Cloning...");
+	csTicks cloning_start = csGetTicks();
+	csRef<iDocumentNode> root = doc->GetRoot ();
+	csRef<iDocument> newdoc = newsys->CreateDocument ();
+	csRef<iDocumentNode> newroot = newdoc->CreateRoot ();
+	CloneNode (root, newroot);
+	csTicks cloning_end = csGetTicks();
+	Report (CS_REPORTER_SEVERITY_NOTIFY, " time taken: %f s",
+	  (float)(cloning_end - cloning_start) / (float)1000);
+	root = NULL;
+	doc = NULL;
+	Report (CS_REPORTER_SEVERITY_NOTIFY, "Writing...");
+	csTicks writing_start = csGetTicks();
+        error = newdoc->Write (vfs, filename);
+	csTicks writing_end = csGetTicks();
+	if (error != NULL)
+	{
+	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
+	  return;
+	}
+	else
+	{
+	  Report (CS_REPORTER_SEVERITY_NOTIFY, " time taken: %f s",
+	    (float)(writing_end - writing_start) / (float)1000);
+	}
+	newroot = NULL;
+	newdoc = NULL;
+	Report (CS_REPORTER_SEVERITY_NOTIFY, "Updating VFS...");
+	vfs->Sync();
       }
       break;
   }

@@ -33,6 +33,9 @@ private:
   csRef<T>* root;
 
 public:
+  typedef int ArrayCompareFunction (T* item1, T* item2);
+  typedef int ArrayCompareKeyFunction (T* item, void* key);
+  
   /**
    * Initialize object to hold initially 'ilimit' elements, and increase
    * storage by 'ithreshold' each time the upper bound is exceeded.
@@ -230,6 +233,116 @@ public:
     else
      return false;
   }
+
+  /**
+   * Find an element based on some key.
+   */
+  int FindSortedKey (void* key, ArrayCompareKeyFunction* comparekey) const
+  {
+    int l = 0, r = Length () - 1;
+    while (l <= r)
+    {
+      int m = (l + r) / 2;
+      int cmp = comparekey (root [m], key);
+
+      if (cmp == 0)
+        return m;
+      else if (cmp < 0)
+        l = m + 1;
+      else
+        r = m - 1;
+    }
+    return -1;
+  }
+
+  /**
+   * Insert an element at a sorted position.
+   * Assumes array is already sorted.
+   */
+  int InsertSorted (T* item, ArrayCompareFunction* compare)
+  {
+    int m = 0, l = 0, r = Length () - 1;
+    while (l <= r)
+    {
+      m = (l + r) / 2;
+      int cmp = compare (root [m], item);
+
+      if (cmp == 0)
+      {
+        Insert (++m, item);
+        return m;
+      }
+      else if (cmp < 0)
+        l = m + 1;
+      else
+        r = m - 1;
+    }
+    if (r == m)
+      m++;
+    Insert (m, item);
+    return m;
+  }
+
+  /// Same but for all elements
+  void QuickSort (ArrayCompareFunction* compare)
+  {
+    if (count > 0)
+      QuickSort (0, count - 1, compare);
+  }
+  
+  /// Partially sort the array
+  void QuickSort (int Left, int Right, ArrayCompareFunction* compare)
+  {
+  recurse:
+    int i = Left, j = Right;
+    int x = (Left + Right) / 2;
+    do
+    {
+      while ((i != x) && (compare (root[i], root[x]) < 0))
+	i++;
+      while ((j != x) && (compare (root[j], root[x]) > 0))
+	j--;
+      if (i < j)
+      {
+	csRef<T> swap;
+	swap = root[i];
+	root[i] = root[j];
+	root[j] = swap;
+	if (x == i)
+	  x = j;
+	else if (x == j)
+	  x = i;
+      }
+      if (i <= j)
+      {
+	i++;
+	if (j > Left)
+	  j--;
+      }
+    } while (i <= j);
+
+    if (j - Left < Right - i)
+    {
+      if (Left < j)
+	QuickSort (Left, j, compare);
+      if (i < Right)
+      {
+	Left = i;
+	goto recurse;
+      }
+    }
+    else
+    {
+      if (i < Right)
+	QuickSort (i, Right, compare);
+      if (Left < j)
+      {
+	Right = j;
+	goto recurse;
+      }
+    }
+  }
+  
 };
 
 #endif // __CS_REFARR_H__
