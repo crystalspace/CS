@@ -55,7 +55,6 @@ class csPDelArray : public csArray<T*, csPDelArrayElementHandler<T*> >
 private:
   csPDelArray (const csPDelArray&) {}
   csPDelArray& operator= (const csPDelArray&) {}
-  csPDelArray Section (int, int) const {}
 
 public:
   /**

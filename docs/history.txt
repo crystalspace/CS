@@ -22,6 +22,10 @@ chronological order.
 	      Now, by default, it compares via strcmp(), though this can be
 	      overriden by the caller.
 	- Jorrit started work on static lod. Not functional yet.
+	- Jorrit removed Section() out of the private part of csPDelArray.
+	  As Eric points out, csArray::Section() is perfectly safe for
+	  csPDelArray because it returns a csArray and not another
+	  csPDelArray.
 9-Aug-2003
         - Philip Wyett moved int j out of 'for' loop within
           csSpriteCal3DMeshObject::DetachCoreMesh () and fixed compile error.
