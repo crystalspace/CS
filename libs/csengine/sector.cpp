@@ -242,7 +242,8 @@ iPolygon3D *csSector::HitBeam (
   iPolygon3D *p = IntersectSegment (start, end, isect);
   if (p)
   {
-    iPortal *po = p->GetPortal ();
+    iPolygon3DStatic* ps = p->GetStaticData ();
+    iPortal *po = ps->GetPortal ();
     if (po)
     {
       draw_busy++;
@@ -386,7 +387,8 @@ csSector *csSector::FollowSegment (
 
   if (p)
   {
-    po = p->GetPortal ();
+    iPolygon3DStatic* ps = p->GetStaticData ();
+    po = ps->GetPortal ();
     if (po)
     {
       po->CompleteSector (NULL);
@@ -699,10 +701,10 @@ void csSector::Draw (iRenderView *rview)
 
     if (prev_sector)
     {
+      iPolygon3DStatic* st = rview->GetPortalPolygon ()->GetStaticData ();
       draw_prev_sector = prev_sector->HasFog () ||
-        rview->GetPortalPolygon ()->IsTransparent () ||
-        rview->GetPortalPolygon ()->GetPortal ()->GetFlags ().Check (
-            CS_PORTAL_WARP);
+        st->IsTransparent () ||
+        st->GetPortal ()->GetFlags ().Check (CS_PORTAL_WARP);
     }
 
     // First sort everything based on render priority and return

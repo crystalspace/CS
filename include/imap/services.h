@@ -32,7 +32,7 @@ class csVector2;
 class csVector;
 class csColor;
 class csBox3;
-struct iPolygon3D;
+struct iPolygon3DStatic;
 struct iEngine;
 struct iSector;
 struct iMaterialWrapper;
@@ -188,7 +188,7 @@ struct iSyntaxService : public iBase
    * flags: contains all flags found in the description.
    */
   virtual  bool ParsePortal (iDocumentNode* node, iLoaderContext* ldr_context,
-		  	   iPolygon3D* poly3d,
+		  	   iPolygon3DStatic* poly3d,
 		  	   csVector &flags, bool &mirror,
   			   bool& warp, int& msv,
 			   csMatrix3 &m, csVector3 &before,
@@ -200,7 +200,7 @@ struct iSyntaxService : public iBase
    */
   virtual bool ParsePoly3d (iDocumentNode* node,
    			    iLoaderContext* ldr_context,
-  			    iEngine* engine, iPolygon3D* poly3d,
+  			    iEngine* engine, iPolygon3DStatic* poly3d,
 			    float default_texlen,
 			    iThingState* thing_state, int vt_offset) = 0;
 

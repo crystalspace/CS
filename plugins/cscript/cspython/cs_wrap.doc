@@ -519,24 +519,16 @@ GetMeanLighting(r,g,b)
 
 GetSize()
 
-1.25.  class iPolygon3D
------------------------
-
-GetLightMap()
+1.25.  class iPolygon3DStatic
+-----------------------------
 
 GetMaterialHandle()
 
 SetMaterial(material)
-        PolygonTexture *GetTexture ();
-        TextureHandle *GetTextureHandle ();
-        
+
 GetVertexCount()
 
 GetVertex(idx)
-
-GetVertexW(idx)
-
-GetVertexC(idx)
 
 CreateVertexByIndex(idx)
 
@@ -552,7 +544,16 @@ SetPlane(iName)
 
 SetTextureSpace(v_orig,v1,len1)
 
-1.26.  class iImage
+1.26.  class iPolygon3D
+-----------------------
+
+GetLightMap()
+
+GetVertexW(idx)
+
+GetVertexC(idx)
+
+1.27.  class iImage
 -------------------
 
 GetImageData()
@@ -583,7 +584,7 @@ Clone()
 
 Crop(x,y,width,height)
 
-1.27.  class iTextureManager
+1.28.  class iTextureManager
 ----------------------------
 
 RegisterTexture(image,flags)
@@ -596,7 +597,7 @@ SetVerbose(vb)
 
 GetTextureFormat()
 
-1.28.  class iPolygonTexture
+1.29.  class iPolygonTexture
 ----------------------------
 
 GetMaterialHandle()
@@ -626,10 +627,10 @@ GetCacheData(idx)
 
 SetCacheData(idx,d)
 
-1.29.  class iCameraPosition
+1.30.  class iCameraPosition
 ----------------------------
 
-1.30.  class iSectorList
+1.31.  class iSectorList
 ------------------------
 
 GetCount()
@@ -642,17 +643,17 @@ Remove(sec)
 
 FindByName(name)
 
-1.31.  class iMaterialList
+1.32.  class iMaterialList
 --------------------------
 
 FindByName(name)
 
-1.32.  class iTextureList
+1.33.  class iTextureList
 -------------------------
 
 FindByName(name)
 
-1.33.  class iEngine
+1.34.  class iEngine
 --------------------
 
 GetTextureFormat()
@@ -671,7 +672,7 @@ GetMaterialList()
 
 GetTextureList()
 
-1.34.  class iObjectRegistry
+1.35.  class iObjectRegistry
 ----------------------------
 
 Query_iEngine()

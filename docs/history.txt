@@ -9,6 +9,10 @@ The history order is reversed so that new features are at the top.
 	  polygon. iPolygonTexture uses that now instead of the direct
 	  values. This should improve efficiency a bit as well as there
 	  are less virtual function calls needed now.
+	- Split iPolygon3D into iPolygon3D and iPolygon3DStatic. The static
+	  part contains all information that is static and could be in
+	  a factory. Several functions (like iThingState->CreatePolygon)
+	  will now return an iPolygon3DStatic instead of an iPolygon3D.
 18-Mar-2003
 	- Added two entries to the faq about scaled objects.
 	- Some Doxygen improvements on iMovable and iMeshWrapper.

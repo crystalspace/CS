@@ -27,6 +27,7 @@ class csVector3;
 class csMatrix3;
 struct iSector;
 struct iPolygon3D;
+struct iPolygon3DStatic;
 struct iPortal;
 struct iGraphics3D;
 struct iFrustumView;
@@ -59,7 +60,7 @@ struct csFog;
 #define CS_THING_MOVE_OFTEN 1
 #define CS_THING_MOVE_OCCASIONAL 2
 
-SCF_VERSION (iThingState, 0, 5, 0);
+SCF_VERSION (iThingState, 0, 6, 0);
 
 /**
  * This is the state interface to access the internals of a thing
@@ -86,10 +87,14 @@ struct iThingState : public iBase
   virtual int GetPolygonCount () = 0;
   /// Get a polygon from set by his index.
   virtual iPolygon3D *GetPolygon (int idx) = 0;
+  /// Get a polygon from set by his index.
+  virtual iPolygon3DStatic *GetPolygonStatic (int idx) = 0;
   /// Get a polygon from set by name.
   virtual iPolygon3D *GetPolygon (const char* name) = 0;
+  /// Get a polygon from set by name.
+  virtual iPolygon3DStatic *GetPolygonStatic (const char* name) = 0;
   /// Create a new polygon and return a pointer to it.
-  virtual iPolygon3D *CreatePolygon (const char *iName = NULL) = 0;
+  virtual iPolygon3DStatic *CreatePolygon (const char *iName = NULL) = 0;
   /// Find the index for a polygon. Returns -1 if polygon cannot be found.
   virtual int FindPolygonIndex (iPolygon3D* polygon) const = 0;
   /// Delete a polygon given an index.

@@ -72,7 +72,7 @@ int FindIntersection(csCollisionPair& cd,csVector3 line[2])
 
 void WalkTest::CreateColliders ()
 {
-  iPolygon3D *p;
+  iPolygon3DStatic *p;
   csRef<iPolygonMesh> mesh;
   csRef<iPluginManager> plugin_mgr (
   	CS_QUERY_REGISTRY (object_reg, iPluginManager));

@@ -179,7 +179,7 @@ bool TerrBigTut::Initialize ()
 
   csRef<iThingState> walls_state (
   	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState));
-  iPolygon3D* p;
+  iPolygon3DStatic* p;
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
   p->CreateVertex (csVector3 (-128, 0, 128));

@@ -286,7 +286,7 @@ struct iSector : public iBase
 
 struct iThingState : public iBase
 {
-  iPolygon3D* CreatePolygon (const char* name);
+  iPolygon3DStatic* CreatePolygon (const char* name);
 };
 
 struct iMeshObject : public iBase
@@ -318,17 +318,12 @@ struct iLightMap : public iBase
   virtual long GetSize () = 0;
 };
 
-struct iPolygon3D : public iBase
+struct iPolygon3DStatic : public iBase
 {
-  iLightMap *GetLightMap ();
   iMaterialHandle *GetMaterialHandle ();
   void SetMaterial (iMaterialWrapper* material);
-//iPolygonTexture *GetTexture ();
-//iTextureHandle *GetTextureHandle ();
   int GetVertexCount ();
   const csVector3 &GetVertex (int idx) const;
-  const csVector3 &GetVertexW (int idx) const;
-  const csVector3 &GetVertexC (int idx) const;
   %name(CreateVertexByIndex) int CreateVertex (int idx);
   int CreateVertex (const csVector3 &iVertex);
   int GetAlpha ();
@@ -337,6 +332,13 @@ struct iPolygon3D : public iBase
     const csMatrix3 &iMatrix);
   bool SetPlane (const char *iName);
   void SetTextureSpace (csVector3& v_orig, csVector3& v1, float len1);
+};
+
+struct iPolygon3D : public iBase
+{
+  iLightMap *GetLightMap ();
+  const csVector3 &GetVertexW (int idx) const;
+  const csVector3 &GetVertexC (int idx) const;
 };
 
 struct iImage : public iBase

@@ -1264,7 +1264,7 @@ static csPtr<iMeshWrapper> CreateMeshWrapper (const char* name)
 }
 
 static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
-    	iMaterialWrapper* tm, iPolygon3D*& portalPoly)
+    	iMaterialWrapper* tm, iPolygon3DStatic*& portalPoly)
 {
   csRef<iMeshWrapper> thing (CreateMeshWrapper (name));
   csRef<iThingState> thing_state (SCF_QUERY_INTERFACE (thing->GetMeshObject (),
@@ -1275,7 +1275,7 @@ static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
   float border = 0.3; // width of border around the portal
 
   // bottom
-  iPolygon3D* p;
+  iPolygon3DStatic* p;
   p = thing_state->CreatePolygon ();
   p->SetMaterial (tm);
   p->GetFlags ().Reset (CS_POLY_COLLDET);
@@ -1473,7 +1473,7 @@ void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
   iMaterialWrapper* tm = Sys->Engine->GetMaterialList ()->
   	FindByName ("portal");
 
-  iPolygon3D* portalPoly;
+  iPolygon3DStatic* portalPoly;
   csRef<iMeshWrapper> thing (
   	CreatePortalThing ("portalTo", room, tm, portalPoly));
 
@@ -1515,7 +1515,7 @@ void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
       // Only if the region did not already exist do we create a portal
       // back. So even if multiple portals go to the region we only have
       // one portal back.
-      iPolygon3D* portalPolyBack;
+      iPolygon3DStatic* portalPolyBack;
       csRef<iMeshWrapper> thingBack (CreatePortalThing ("portalFrom",
 	  	start_sector, tm, portalPolyBack));
       thingBack->GetMovable ()->SetPosition (topos + csVector3 (0, Sys->cfg_legs_offset, -.1));

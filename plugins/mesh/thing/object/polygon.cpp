@@ -120,6 +120,7 @@ void csPolyTexLightMap::NewTxtPlane (csThingObjectType* thing_type)
 
 //---------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE(csPolygon3D)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPolygon3DStatic)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPolygon3D)
 SCF_IMPLEMENT_IBASE_END
 
@@ -127,11 +128,16 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csPolygon3D::eiPolygon3D)
   SCF_IMPLEMENTS_INTERFACE(iPolygon3D)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_EMBEDDED_IBASE (csPolygon3D::eiPolygon3DStatic)
+  SCF_IMPLEMENTS_INTERFACE(iPolygon3DStatic)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 csPolygon3D::csPolygon3D (iMaterialWrapper *material) : vertices(4)
 {
   VectorArray = GetStaticVectorArray();
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3DStatic);
   DG_TYPE ((csObject *)this, "csPolygon3D");
   thing = NULL;
 
@@ -217,7 +223,7 @@ void csPolygon3D::EnableTextureMapping (bool enable)
   }
 }
 
-void csPolygon3D::CopyTextureType (iPolygon3D *ipt)
+void csPolygon3D::CopyTextureType (iPolygon3DStatic *ipt)
 {
   csPolygon3D *pt = ipt->GetPrivateObject ();
   EnableTextureMapping (pt->IsTextureMappingEnabled ());
@@ -331,7 +337,7 @@ iMaterialHandle *csPolygon3D::GetMaterialHandle ()
   return material ? material->GetMaterialHandle () : NULL;
 }
 
-void csPolygon3D::eiPolygon3D::SetTextureSpace (iPolyTxtPlane *plane)
+void csPolygon3D::eiPolygon3DStatic::SetTextureSpace (iPolyTxtPlane *plane)
 {
   scfParent->SetTextureSpace (plane->GetPrivateObject ());
 }
@@ -341,14 +347,19 @@ iThingState *csPolygon3D::eiPolygon3D::GetParent ()
   return &(scfParent->GetParent ()->scfiThingState);
 }
 
-void csPolygon3D::eiPolygon3D::CreatePlane (
+iThingState *csPolygon3D::eiPolygon3DStatic::GetParent ()
+{
+  return &(scfParent->GetParent ()->scfiThingState);
+}
+
+void csPolygon3D::eiPolygon3DStatic::CreatePlane (
   const csVector3 &iOrigin,
   const csMatrix3 &iMatrix)
 {
   scfParent->SetTextureSpace (iMatrix, iOrigin);
 }
 
-bool csPolygon3D::eiPolygon3D::SetPlane (const char *iName)
+bool csPolygon3D::eiPolygon3DStatic::SetPlane (const char *iName)
 {
   iPolyTxtPlane *ppl = scfParent->thing->thing_type->FindPolyTxtPlane (iName);
   if (!ppl) return false;

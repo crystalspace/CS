@@ -267,7 +267,7 @@ public:
       if (polygonpar)
         polygon = SCF_QUERY_INTERFACE (polygonpar->GetValue (params),
 		iPolygon3D);
-      polygon->SetMaterial (material);
+      polygon->GetStaticData ()->SetMaterial (material);
       if (polygonpar)
         polygon = NULL;
     }

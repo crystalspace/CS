@@ -402,7 +402,7 @@ Nag to Jorrit about this feature if you want it.");
 
       case XMLTOKEN_P:
         {
-	  iPolygon3D* poly3d = thing_state->CreatePolygon (
+	  iPolygon3DStatic* poly3d = thing_state->CreatePolygon (
 			  child->GetAttributeValue ("name"));
 	  if (info.default_material)
 	    poly3d->SetMaterial (info.default_material);

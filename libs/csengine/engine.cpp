@@ -2081,24 +2081,25 @@ void csEngine::GetNearbyObjectList (iSector* sector,
           for (j = 0 ; j < pc ; j++)
           {
             iPolygon3D* pp = st->GetPortalPolygon (j);
+	    iPolygon3DStatic* pps = pp->GetStaticData ();
             const csPlane3& wor_plane = pp->GetWorldPlane ();
             // Can we see the portal?
             if (wor_plane.Classify (pos) < -0.001)
             {
               csVector3 poly[100];	//@@@ HARDCODE
               int k;
-              for (k = 0 ; k < pp->GetVertexCount () ; k++)
+              for (k = 0 ; k < pps->GetVertexCount () ; k++)
               {
                 poly[k] = pp->GetVertexW (k);
               }
               float sqdist_portal = csSquaredDist::PointPoly (
-                    pos, poly, pp->GetVertexCount (),
+                    pos, poly, pps->GetVertexCount (),
                     wor_plane);
               if (sqdist_portal <= radius * radius)
               {
                 // Also handle objects in the destination sector unless
                 // it is a warping sector.
-                iPortal* portal = pp->GetPortal ();
+                iPortal* portal = pps->GetPortal ();
                 portal->CompleteSector (NULL);
                 CS_ASSERT (portal != NULL);
                 if (sector != portal->GetSector () && portal->GetSector ()

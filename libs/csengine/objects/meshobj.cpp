@@ -468,7 +468,7 @@ void csMeshWrapper::PlaceMesh ()
               // can use that to calculate the point on the portal plane.
               csVector3 testpoint = sphere.GetCenter () + pl.Normal () * qsqrt (
                   sqdist);
-              if (portal_poly->PointOnPolygon (testpoint))
+              if (portal_poly->GetStaticData ()->PointOnPolygon (testpoint))
                 movable_sectors->Add (dest_sector);
             }
           }

@@ -61,12 +61,12 @@ class csColor;
 #define CS_POLY_VISCULL	0x00000004
 
 
-SCF_VERSION (iPolygon3D, 0, 3, 0);
+SCF_VERSION (iPolygon3DStatic, 0, 0, 1);
 
 /**
- * This is the interface to 3D polygons.
+ * This is the interface to the static part of a 3D polygon.
  */
-struct iPolygon3D : public iBase
+struct iPolygon3DStatic : public iBase
 {
   /// @@@ UGLY! Used by engine to retrieve internal object structure
   virtual csPolygon3D *GetPrivateObject () = 0;
@@ -81,10 +81,6 @@ struct iPolygon3D : public iBase
    * The reference counter on iThingState is NOT incremented.
    */
   virtual iThingState *GetParent () = 0;
-  /// Get the lightmap associated with this polygon
-  virtual iLightMap *GetLightMap () = 0;
-  /// Get the handle to the polygon texture object
-  virtual iPolygonTexture *GetTexture () = 0;
   /// Get the material handle for the texture manager.
   virtual iMaterialHandle *GetMaterialHandle () = 0;
   /**
@@ -104,10 +100,6 @@ struct iPolygon3D : public iBase
   virtual int* GetVertexIndices () = 0;
   /// Get the given polygon vertex coordinates in object space
   virtual const csVector3 &GetVertex (int idx) const = 0;
-  /// Get the given polygon vertex coordinates in world space
-  virtual const csVector3 &GetVertexW (int idx) const = 0;
-  /// Get the given polygon vertex coordinates in camera space
-  virtual const csVector3 &GetVertexC (int idx) const = 0;
   /// Create a polygon vertex given his index in parent polygon set
   virtual int CreateVertex (int idx) = 0;
   /// Create a polygon vertex and add it to parent object
@@ -206,15 +198,10 @@ struct iPolygon3D : public iBase
    * (this will not copy the actual material that is used, just the
    * information on how to apply that material to the polygon).
    */
-  virtual void CopyTextureType (iPolygon3D* other_polygon) = 0;
+  virtual void CopyTextureType (iPolygon3DStatic* other_polygon) = 0;
 
-  /// Get world space plane.
-  virtual const csPlane3& GetWorldPlane () = 0;
   /// Get object space plane.
   virtual const csPlane3& GetObjectPlane () = 0;
-  /// Compute the camera plane based on the camera transform.
-  virtual void ComputeCameraPlane (const csReversibleTransform& t,
-  	csPlane3& pl) = 0;
 
   /**
    * Return true if this polygon or the texture it uses is transparent.
@@ -230,7 +217,7 @@ struct iPolygon3D : public iBase
 
   /**
    * Intersect object-space segment with this polygon. Return
-   * true if it intersects and the intersection point in world coordinates.
+   * true if it intersects and the intersection point in object coordinates.
    */
   virtual bool IntersectSegment (const csVector3& start, const csVector3& end,
                           csVector3& isect, float* pr = NULL) = 0;
@@ -269,6 +256,43 @@ struct iPolygon3D : public iBase
    * Test happens in object space.
    */
   virtual bool PointOnPolygon (const csVector3& v) = 0;
+};
+
+SCF_VERSION (iPolygon3D, 0, 3, 0);
+
+/**
+ * This is the interface to dynamic part of a 3D polygon.
+ */
+struct iPolygon3D : public iBase
+{
+  /// @@@ UGLY! Used by engine to retrieve internal object structure
+  virtual csPolygon3D *GetPrivateObject () = 0;
+
+  /**
+   * Get the thing (container) that this polygon belongs to.
+   * The reference counter on iThingState is NOT incremented.
+   */
+  virtual iThingState *GetParent () = 0;
+  /// Get the lightmap associated with this polygon
+  virtual iLightMap *GetLightMap () = 0;
+  /// Get the handle to the polygon texture object
+  virtual iPolygonTexture *GetTexture () = 0;
+
+  /**
+   * Get the static polygon.
+   */
+  virtual iPolygon3DStatic* GetStaticData () const = 0;
+
+  /// Get the given polygon vertex coordinates in world space
+  virtual const csVector3 &GetVertexW (int idx) const = 0;
+  /// Get the given polygon vertex coordinates in camera space
+  virtual const csVector3 &GetVertexC (int idx) const = 0;
+
+  /// Get world space plane.
+  virtual const csPlane3& GetWorldPlane () = 0;
+  /// Compute the camera plane based on the camera transform.
+  virtual void ComputeCameraPlane (const csReversibleTransform& t,
+  	csPlane3& pl) = 0;
 };
 
 /**

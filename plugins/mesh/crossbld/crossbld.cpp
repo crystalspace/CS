@@ -113,7 +113,7 @@ bool csCrossBuilder::BuildThing (iModelDataObject *Object, iThingState *tgt,
       it->Next ();
       continue;
     }
-    iPolygon3D *ThingPoly = tgt->CreatePolygon ();
+    iPolygon3DStatic *ThingPoly = tgt->CreatePolygon ();
 
     // copy vertices
     for (i=0; i<Polygon->GetVertexCount (); i++)

@@ -2749,7 +2749,7 @@ void csThing::MergeTemplate (
 
   for (i = 0; i < tpl->GetPolygonCount (); i++)
   {
-    iPolygon3D *pt = tpl->GetPolygon (i);
+    iPolygon3DStatic *pt = tpl->GetPolygonStatic (i);
     csPolygon3D *p;
     iMaterialWrapper *mat = pt->GetMaterial ();
     p = NewPolygon (mat);
@@ -2845,6 +2845,13 @@ iPolygon3D *csThing::ThingState::GetPolygon (int idx)
   return &(p->scfiPolygon3D);
 }
 
+iPolygon3DStatic *csThing::ThingState::GetPolygonStatic (int idx)
+{
+  csPolygon3D *p = scfParent->GetPolygon3D (idx);
+  if (!p) return NULL;
+  return &(p->scfiPolygon3DStatic);
+}
+
 iPolygon3D *csThing::ThingState::GetPolygon (const char *name)
 {
   csPolygon3D *p = scfParent->GetPolygon3D (name);
@@ -2852,14 +2859,19 @@ iPolygon3D *csThing::ThingState::GetPolygon (const char *name)
   return &(p->scfiPolygon3D);
 }
 
-iPolygon3D *csThing::ThingState::CreatePolygon (const char *iName)
+iPolygon3DStatic *csThing::ThingState::GetPolygonStatic (const char *name)
+{
+  csPolygon3D *p = scfParent->GetPolygon3D (name);
+  if (!p) return NULL;
+  return &(p->scfiPolygon3DStatic);
+}
+
+iPolygon3DStatic *csThing::ThingState::CreatePolygon (const char *iName)
 {
   csPolygon3D *p = new csPolygon3D ((iMaterialWrapper *)NULL);
   if (iName) p->SetName (iName);
   scfParent->AddPolygon (p);
-
-  csRef<iPolygon3D> ip (SCF_QUERY_INTERFACE (p, iPolygon3D));
-  return ip;	// DecRef is ok here.
+  return &(p->scfiPolygon3DStatic);
 }
 
 int csThing::ThingState::GetPortalCount () const

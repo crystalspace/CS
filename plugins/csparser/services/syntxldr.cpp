@@ -218,7 +218,7 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csTextSyntaxService::OptimizePolygon (iPolygon3D *p)
+void csTextSyntaxService::OptimizePolygon (iPolygon3DStatic *p)
 {
   if (!p->GetPortal () || p->GetAlpha () || !p->IsTextureMappingEnabled () ||
   	p->GetMixMode () != 0)
@@ -760,7 +760,7 @@ bool csTextSyntaxService::ParseTextureMapping (
 
 bool csTextSyntaxService::ParsePortal (
 	iDocumentNode* node, iLoaderContext* ldr_context,
-	iPolygon3D* poly3d,
+	iPolygon3DStatic* poly3d,
 	csVector &flags, bool &mirror, bool &warp, int& msv,
 	csMatrix3 &m, csVector3 &before, csVector3 &after)
 {
@@ -836,7 +836,7 @@ bool csTextSyntaxService::ParsePortal (
 bool csTextSyntaxService::ParsePoly3d (
         iDocumentNode* node,
 	iLoaderContext* ldr_context,
-	iEngine* , iPolygon3D* poly3d,
+	iEngine* , iPolygon3DStatic* poly3d,
 	float default_texlen,
 	iThingState* thing_state, int vt_offset)
 {
@@ -1188,7 +1188,7 @@ bool csTextSyntaxService::ParsePoly3d (
 
   if (do_mirror)
     poly3d->GetPortal ()->SetWarp (csTransform::GetReflect (
-    	poly3d->GetWorldPlane () ));
+    	poly3d->GetObjectPlane () ));
 
   OptimizePolygon (poly3d);
 

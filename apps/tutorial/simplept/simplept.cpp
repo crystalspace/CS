@@ -62,7 +62,7 @@ CS_IMPLEMENT_APPLICATION
 void Simple::CreatePolygon (iThingState *th, int v1, int v2, int v3, int v4,
   iMaterialWrapper *mat)
 {
-  iPolygon3D* p = th->CreatePolygon ();
+  iPolygon3DStatic* p = th->CreatePolygon ();
   p->SetMaterial (mat);
   p->CreateVertex (v1);
   p->CreateVertex (v2);

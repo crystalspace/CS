@@ -63,7 +63,7 @@ void InfiniteMaze::create_one_side (iThingState* walls_state, char* pname,
   else if (dy) { sx = sz = .9; sy = 0; }
   else { sx = sy = .9; sz = 0; }
 
-  iPolygon3D* p;
+  iPolygon3DStatic* p;
   p = walls_state->CreatePolygon (pname);
   p->SetMaterial (tm);
   p->CreateVertex (csVector3 (cx+sx*x1, cy+sy*y1, cz+sz*z1));
@@ -189,8 +189,8 @@ void InfiniteMaze::connect_infinite (int x1, int y1, int z1, int x2, int y2, int
   else
     if (x1 < x2) { p1 = "e"; p2 = "w"; }
     else { p1 = "w"; p2 = "e"; }
-  iPolygon3D* po1 = s1->walls_state->GetPolygon (p1);
-  iPolygon3D* po2 = s2->walls_state->GetPolygon (p2);
+  iPolygon3DStatic* po1 = s1->walls_state->GetPolygonStatic (p1);
+  iPolygon3DStatic* po2 = s2->walls_state->GetPolygonStatic (p2);
   if (create_portal1) po1->CreatePortal (s2->sector);
   po2->CreatePortal (s1->sector);
 }
@@ -304,7 +304,7 @@ void InfiniteMaze::create_loose_portal (int x1, int y1, int z1,
     if (x1 < x2) p1 = "e";
     else p1 = "w";
   InfRoomData* s = (InfRoomData*)(infinite_world->Get (x1, y1, z1));
-  iPolygon3D* po = s->walls_state->GetPolygon (p1);
+  iPolygon3DStatic* po = s->walls_state->GetPolygonStatic (p1);
   iPortal* portal = po->CreateNullPortal ();
   InfPortalCS* prt = new InfPortalCS ();
   prt->x1 = x1; prt->y1 = y1; prt->z1 = z1;

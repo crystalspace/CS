@@ -944,8 +944,10 @@ public:
 
     virtual int GetPolygonCount () { return scfParent->polygons.Length (); }
     virtual iPolygon3D *GetPolygon (int idx);
+    virtual iPolygon3DStatic *GetPolygonStatic (int idx);
     virtual iPolygon3D *GetPolygon (const char* name);
-    virtual iPolygon3D *CreatePolygon (const char *iName);
+    virtual iPolygon3DStatic *GetPolygonStatic (const char* name);
+    virtual iPolygon3DStatic *CreatePolygon (const char *iName);
     virtual int FindPolygonIndex (iPolygon3D* polygon) const
     { return scfParent->FindPolygonIndex (polygon); }
     virtual void RemovePolygon (int idx)

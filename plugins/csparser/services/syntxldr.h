@@ -27,7 +27,7 @@
 #include "csutil/strhash.h"
 
 struct iObjectRegistry;
-struct iPolygon3D;
+struct iPolygon3DStatic;
 struct iThingState;
 struct iEngine;
 struct iSector;
@@ -52,7 +52,7 @@ protected:
   csRef<iReporter> reporter;
   csStringHash xmltokens;
 
-  void OptimizePolygon (iPolygon3D *p);
+  void OptimizePolygon (iPolygon3DStatic *p);
 
   void ReportV (const char* msgid, int severity, 
 	iDocumentNode* errornode, const char* msg, va_list arg);
@@ -102,14 +102,14 @@ public:
 			     int &idx3, csVector2 &uv3,
 			     char *plane, const char *polyname);
   virtual  bool ParsePortal (iDocumentNode* node, iLoaderContext* ldr_context,
-		  	   iPolygon3D* poly_3d,
+		  	   iPolygon3DStatic* poly_3d,
 		  	   csVector &flags, bool &mirror,
   			   bool& warp, int& msv,
 			   csMatrix3 &m, csVector3 &before,
 			   csVector3 &after);
   virtual bool ParsePoly3d (iDocumentNode* node,
    			    iLoaderContext* ldr_context,
-  			    iEngine* engine, iPolygon3D* poly3d,
+  			    iEngine* engine, iPolygon3DStatic* poly3d,
 			    float default_texlen,
 			    iThingState* thing_state, int vt_offset);
 

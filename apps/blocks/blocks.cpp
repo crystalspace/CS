@@ -479,11 +479,11 @@ csMatrix3 Blocks::create_rotate_z (float angle)
   return rotate_z;
 }
 
-iPolygon3D* add_polygon_template (iThingState* tmpl,
+iPolygon3DStatic* add_polygon_template (iThingState* tmpl,
 	char* name, iMaterialWrapper* material,
 	int vt0, int vt1, int vt2, int vt3 = -1)
 {
-  iPolygon3D* p;
+  iPolygon3DStatic* p;
   p = tmpl->CreatePolygon ();
   p->SetMaterial (material);
   p->SetName (name);
@@ -549,43 +549,43 @@ void Blocks::add_pillar_template ()
   thing_state->CreateVertex (csVector3 (dim, ZONE_HEIGHT*CUBE_DIM, -dim));
   thing_state->CreateVertex (csVector3 (-dim, ZONE_HEIGHT*CUBE_DIM, -dim));
 
-  iPolygon3D* p;
+  iPolygon3DStatic* p;
   csVector3 norm;
   csMatrix3 tx_matrix;
   csVector3 tx_vector;
 
   p = add_polygon_template (thing_state, "d", pillar_mat, 3, 2, 1, 0);
-  norm = p->GetWorldPlane ().Normal ();
+  norm = p->GetObjectPlane ().Normal ();
   csTextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	thing_state->GetVertex (0), thing_state->GetVertex (1), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
   p = add_polygon_template (thing_state, "b", pillar_mat, 0, 1, 5, 4);
-  norm = p->GetWorldPlane ().Normal ();
+  norm = p->GetObjectPlane ().Normal ();
   csTextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	thing_state->GetVertex (0), thing_state->GetVertex (1), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
   p = add_polygon_template (thing_state, "t", pillar_mat, 4, 5, 6, 7);
-  norm = p->GetWorldPlane ().Normal ();
+  norm = p->GetObjectPlane ().Normal ();
   csTextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	thing_state->GetVertex (4), thing_state->GetVertex (5), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
   p = add_polygon_template (thing_state, "f", pillar_mat, 7, 6, 2, 3);
-  norm = p->GetWorldPlane ().Normal ();
+  norm = p->GetObjectPlane ().Normal ();
   csTextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	thing_state->GetVertex (7), thing_state->GetVertex (6), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
   p = add_polygon_template (thing_state, "l", pillar_mat, 4, 7, 3, 0);
-  norm = p->GetWorldPlane ().Normal ();
+  norm = p->GetObjectPlane ().Normal ();
   csTextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	thing_state->GetVertex (7), thing_state->GetVertex (3), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
   p = add_polygon_template (thing_state, "r", pillar_mat, 6, 5, 1, 2);
-  norm = p->GetWorldPlane ().Normal ();
+  norm = p->GetObjectPlane ().Normal ();
   csTextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	thing_state->GetVertex (6), thing_state->GetVertex (5), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
@@ -602,13 +602,13 @@ void Blocks::add_vrast_template ()
   thing_state->CreateVertex (csVector3 (-dim, ZONE_HEIGHT*CUBE_DIM, dim));
   thing_state->CreateVertex (csVector3 (dim, ZONE_HEIGHT*CUBE_DIM, dim));
 
-  iPolygon3D* p;
+  iPolygon3DStatic* p;
   csVector3 norm;
   csMatrix3 tx_matrix;
   csVector3 tx_vector;
 
   p = add_polygon_template (thing_state, "f", raster_mat, 0, 1, 3, 2);
-  norm = p->GetWorldPlane ().Normal ();
+  norm = p->GetObjectPlane ().Normal ();
   csTextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	thing_state->GetVertex (0), thing_state->GetVertex (1), 1,
 	norm.x, norm.y, norm.z);
@@ -616,7 +616,7 @@ void Blocks::add_vrast_template ()
 
 #if 0
   p = add_polygon_template (thing_state, "b", raster_mat, 2, 3, 1, 0);
-  norm = p->GetWorldPlane ().Normal ();
+  norm = p->GetObjectPlane ().Normal ();
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	thing_state->GetVertex (0), thing_state->GetVertex (1), 1,
 	norm.x, norm.y, norm.z);
@@ -640,13 +640,13 @@ void Blocks::add_hrast_template ()
   thing_state->CreateVertex (csVector3 (((float)ZONE_DIM/2.)*CUBE_DIM,
   	.02, dim));
 
-  iPolygon3D* p;
+  iPolygon3DStatic* p;
   csVector3 norm;
   csMatrix3 tx_matrix;
   csVector3 tx_vector;
 
   p = add_polygon_template (thing_state, "f", raster_mat, 0, 1, 3, 2);
-  norm = p->GetWorldPlane ().Normal ();
+  norm = p->GetObjectPlane ().Normal ();
   csTextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	thing_state->GetVertex (0), thing_state->GetVertex (1), 1,
 	norm.x, norm.y, norm.z);
@@ -654,7 +654,7 @@ void Blocks::add_hrast_template ()
 
 #if 0
   p = add_polygon_template (thing_state, "b", raster_mat, 2, 3, 1, 0);
-  norm = p->GetWorldPlane ().Normal ();
+  norm = p->GetObjectPlane ().Normal ();
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	thing_state->GetVertex (0), thing_state->GetVertex (1), 1,
 	norm.x, norm.y, norm.z);
@@ -1938,7 +1938,7 @@ void Blocks::CreateMenuEntry (const char* mat, int menu_nr)
   thing_state->CreateVertex (csVector3 (1, -.25, 0));
   thing_state->CreateVertex (csVector3 (-1, -.25, 0));
 
-  iPolygon3D* p;
+  iPolygon3DStatic* p;
 
   p = thing_state->CreatePolygon ();
   p->SetMaterial (tm_front);
@@ -1982,7 +1982,7 @@ csRef<iMeshWrapper> Blocks::CreateMenuArrow (bool left)
   thing_state->CreateVertex (csVector3 (rearx, .25, 0));
   thing_state->CreateVertex (csVector3 (rearx, -.25, 0));
 
-  iPolygon3D* p;
+  iPolygon3DStatic* p;
 
   p = thing_state->CreatePolygon ();
   p->SetMaterial (tm_front);
@@ -2105,7 +2105,7 @@ void Blocks::InitGameRoom ()
   csRef<iThingState> walls_state (SCF_QUERY_INTERFACE (walls->GetMeshObject (),
   	iThingState));
   Sys->set_cube_room (room);
-  iPolygon3D* p;
+  iPolygon3DStatic* p;
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
   p->CreateVertex (csVector3 (-5, 0, 5));
@@ -2205,7 +2205,7 @@ void Blocks::InitDemoRoom ()
   csRef<iThingState> walls_state (SCF_QUERY_INTERFACE (walls->GetMeshObject (),
   	iThingState));
 
-  iPolygon3D* p;
+  iPolygon3DStatic* p;
   p = walls_state->CreatePolygon ();
   p->SetMaterial (demo_tm);
   p->CreateVertex (csVector3 (-50, 50, 50));

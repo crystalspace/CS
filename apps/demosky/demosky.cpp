@@ -113,7 +113,7 @@ void Cleanup ()
   csInitializer::DestroyApplication (object_reg);
 }
 
-void DemoSky::SetTexSpace(csProcSkyTexture *skytex, iPolygon3D *poly,
+void DemoSky::SetTexSpace(csProcSkyTexture *skytex, iPolygon3DStatic *poly,
   int size, const csVector3& orig, const csVector3& upt, float ulen,
   const csVector3& vpt, float vlen)
 {
@@ -277,7 +277,7 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
   csRef<iThingState> walls_state (SCF_QUERY_INTERFACE (walls->GetMeshObject (),
   	iThingState));
-  iPolygon3D* p;
+  iPolygon3DStatic* p;
   p = walls_state->CreatePolygon ();
   p->SetMaterial (imatd);
   float size = 500.0; /// size of the skybox -- around 0,0,0 for now.

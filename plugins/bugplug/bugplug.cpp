@@ -500,7 +500,7 @@ void csBugPlug::MouseButton3 (iCamera* camera)
   const char* poly_name;
   if (poly)
   {
-    poly_name = poly->GetName ();
+    poly_name = poly->GetStaticData ()->GetName ();
     Dump (poly);
   }
   else
@@ -1850,13 +1850,14 @@ void csBugPlug::Dump (iCamera* c)
 
 void csBugPlug::Dump (iPolygon3D* poly)
 {
-  const char* poly_name = poly->GetName ();
+  iPolygon3DStatic* ps = poly->GetStaticData ();
+  const char* poly_name = ps->GetName ();
   if (!poly_name) poly_name = "<noname>";
   Report (CS_REPORTER_SEVERITY_DEBUG, "Polygon '%s'",
   	poly_name);
-  int nv = poly->GetVertexCount ();
+  int nv = ps->GetVertexCount ();
   int i;
-  int* idx = poly->GetVertexIndices ();
+  int* idx = ps->GetVertexIndices ();
   char buf[256];
   sprintf (buf, "  Vertices: ");
   for (i = 0 ; i < nv ; i++)

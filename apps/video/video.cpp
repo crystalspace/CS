@@ -233,7 +233,7 @@ bool Video::Initialize (int argc, const char* const argv[],
 	   b3 ( 5, 0, -5),
 	   b4 (-5, 0, -5);
 
-  iPolygon3D* p = walls->CreatePolygon ("back");
+  iPolygon3DStatic* p = walls->CreatePolygon ("back");
   p->SetMaterial (iMW);
   p->CreateVertex (b4);
   p->CreateVertex (b3);

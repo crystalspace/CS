@@ -94,3 +94,8 @@ should now become:
 So the @code{QueryObject()} function has been removed. Polygons can still
 have names though. Added @code{SetName()} and @code{GetName()} for that.
 
+@code{iPolygon3D} has been split in @code{iPolygon3D} and
+@code{iPolygon3DStatic}. The static version contains all static data that
+can be put in a factory. Several functions like
+@code{iThingState->CreatePolygon()} will now return @code{iPolygon3DStatic}.
+

@@ -915,7 +915,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
 	  csScanStr (kp->GetValue (), "%s,%d,%f,%f",
 	  	polyname, &xyz, &max_angle, &speed);
 
-	  iPolygon3D* p = thing->GetPolygon (polyname);
+	  iPolygon3DStatic* p = thing->GetPolygonStatic (polyname);
 	  if (!p)
 	  {
 	    Sys->Report (CS_REPORTER_SEVERITY_WARNING,
@@ -1182,7 +1182,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (p)
     {
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Action polygon '%s'", p->GetName ());
+      	"Action polygon '%s'", p->GetStaticData ()->GetName ());
       printf ("ACTION\n");
       //Sys->ActivateObject ((csObject*)(ob->QueryObject ()));
     }
