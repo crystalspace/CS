@@ -65,7 +65,7 @@
 #undef GetCurrentTime
 #undef DeleteFile
 
-#ifdef _DEBUG
+#if defined(_DEBUG) || defined(CS_DEBUG)
   #include <assert.h>
   #define ASSERT(expression) assert(expression)
   #define VERIFY_SUCCESS(expression) assert(SUCCEEDED(expression))
@@ -82,6 +82,7 @@
     #define malloc(size) 	_malloc_dbg ((size), _NORMAL_BLOCK, __FILE__, __LINE__)
     #define free(ptr) 		_free_dbg ((ptr), _NORMAL_BLOCK)
     #define realloc(ptr, size) 	_realloc_dbg ((ptr), (size), _NORMAL_BLOCK, __FILE__, __LINE__)
+    #define calloc(num, size)	_calloc_dbg ((num), (size), _NORMAL_BLOCK, __FILE__, __LINE__)
   #endif
 
 #else
