@@ -73,7 +73,7 @@ int ScanStr (const char* in, const char* format, ...)
 	}
         case 'b':
 	{
-	  int* a = va_arg (arg, int*);
+	  bool* a = va_arg (arg, bool*);
 	  in += strspn (in, CS_WHITE);
 	  const char* in2 = in + strspn (in,
 	    "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
