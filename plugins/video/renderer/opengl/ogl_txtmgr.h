@@ -159,8 +159,6 @@ class csGLRendererLightmap : public iRendererLightmap
 
   /// Texture coordinates (in pixels)
   csRect rect;
-  /// Texture coordinates ([0;1])
-  float u1, v1, u2, v2;
   /// The SLM this lightmap is a part of.
   csRef<csGLSuperLightmap> slm;
   /// Raw lightmap data.
@@ -170,6 +168,7 @@ class csGLRendererLightmap : public iRendererLightmap
   bool mean_calculated;
   /// Mean light of this LM
   float mean_r, mean_g, mean_b;
+
 public:
   SCF_DECLARE_IBASE;
 

@@ -1020,7 +1020,7 @@ void csGLRendererLightmap::GetSLMCoords (int& left, int& top,
   left = rect.xmin; top  = rect.ymin;
   width = rect.Width (); height = rect.Height ();
 }
-    
+
 void csGLRendererLightmap::SetData (csRGBpixel* data)
 {
   slm->CreateTexture ();

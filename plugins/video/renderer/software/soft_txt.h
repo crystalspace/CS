@@ -205,7 +205,6 @@ class csSoftRendererLightmap : public iRendererLightmap
   friend class csTextureCacheSoftware;
 
   csRect rect;
-  float u1, v1, u2, v2;
   csRef<csSoftSuperLightmap> slm;
 
   csRGBpixel* data;

@@ -51,6 +51,9 @@ chronological order.
 	  ShrinkBestFit() on the various arrays that are used during setup of
 	  a thing. These arrays are typically not modified after they are
 	  created so it is best that they have exactly the size that they need.
+	- Jorrit removed 16 bytes from every lightmapped polygon by removing
+	  unneeded fields from csGLRendererLightmap (in the GL renderer).
+	  Also for software renderer.
 18-Feb-2004
 	- Jorrit added the ability to specify defaults for mesh object types
 	  in the map loader. Here is an example to demonstrate how this works:
