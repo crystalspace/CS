@@ -1,6 +1,50 @@
 The history order has been reversed so that new features are at the top.
 
 6-Aug-2000
+	- Samuel Humphreys did the following:
+           - Added a new plugin called perfstat, and updated walktest so
+	     that it could 'benefit' from its functionality. Perfstat is 
+	     basically a nested statistics gatherer which can print out 
+	     formatted results to a file. It also prints out system info 
+	     as the header. This is meant to be a tool mostly to test the 
+             drivers. The nested bit means it will also gather 
+	     seperate statistics for a configurable 'subsection' of the 
+             main section it is gathering statistics for.
+	     Walktest has a max of three nested perfstats with the
+             recsubperf command (see below).
+           - Chages to walktest:  
+  	    - Perfstat now takes care of fps calculations according 
+              to user specifiable resolution. Defaults to 10 frames per 
+	      update.
+            - The demo playing and recording now pauses when you switch 
+	      to console
+            - Suitable commands are now recorded too, like fire missile, 
+	      addskel addlight etc. A couple of macros are defined in 
+	      walkcmd.cpp as a convenience.
+	    - Modified commands:
+	       loadrec <file> can take an optional name argument to specify a 
+	               <file>.rec to use as its demo file, otherwise it 
+		       defaults to 'record' as before.
+	        saverec <file> can take an optional name argument to specify
+                       a <file>.rec to save to.
+	        play   has optional arguments, otherwise works as before.
+	        play <file> This outputs summary statistics for the demo 
+                       played to <file>.rps (Recorded Performance Statistics).
+	        play res, x, <file> The 'res'(olution) option tells perfstat 
+		        to record statistics every 'x' frames and output 
+                        to <file>.rps
+	        play break, x  The break option when compiled in debug mode
+                        will trip off a signal trap on the 'x'th frame. 
+                        Useful once you take note of the frame number of 
+                        something interesting in a <file>.rps
+            - New command:
+	        recsubperf <name> Once a recording has begun this command 
+                        is used to record the statistics of a subsection 
+                        of the demo and is reported as such in the outputted 
+                        <file>.rps when played back. To finish the subsection
+                        call the command again without an argument.
+			Stands for 'rec(ord)sub(section)perf(ormance)'
+           
 	- Jorrit committed the engine plugin which he forgot to do
 	  some time ago. Now simplep should really work.
 	- Wouter Wijngaards did the following changes:
@@ -41,7 +85,7 @@ The history order has been reversed so that new features are at the top.
 	  - Beginnings of a make install option. Xfree86 (fullscreen
 	    extension) is detected now for unix.
 	- Samuel Humphreys did the following:
-	  - simple.cpp: two Nothing events were emitted each frame, now
+	  - system.cpp: two Nothing events were emitted each frame, now
 	    only one.
 	  - light.cpp : an unitialised data member, caused walktest to
 	    crash with 'dellights'.

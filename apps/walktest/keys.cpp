@@ -665,13 +665,11 @@ bool WalkTest::HandleEvent (csEvent &Event)
     {
       if (Event.Command.Code == cscmdContextResize)
       {
-	int w = G2D->GetWidth();
-	int h = G2D->GetHeight();
-	view->GetCamera ()->SetPerspectiveCenter (w/2, h/2);
+	FRAME_WIDTH = G2D->GetWidth();
+	FRAME_HEIGHT = G2D->GetHeight();
+	view->GetCamera ()->SetPerspectiveCenter (FRAME_WIDTH/2, FRAME_HEIGHT/2);
 	if (wf)
-	  wf->GetCamera ()->SetPerspectiveCenter (w/2, h/2);
-	Sys->FrameWidth = w;
-	Sys->FrameHeight = h;
+	  wf->GetCamera ()->SetPerspectiveCenter (FRAME_WIDTH/2, FRAME_HEIGHT/2);
 	break;
       }
     }

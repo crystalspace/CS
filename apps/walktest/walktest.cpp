@@ -71,6 +71,8 @@
 #include "iimage.h"
 #include "icollide.h"
 
+#include "iperstat.h"
+
 #if defined(OS_DOS) || defined(OS_WIN32) || defined (OS_OS2)
 #  include <io.h>
 #elif defined(OS_UNIX)
@@ -136,6 +138,10 @@ WalkTest::WalkTest () :
   move_forward = false;
   cfg_draw_octree = 0;
   cfg_recording = -1;
+  recorded_perf_stats_name = NULL;
+  recorded_perf_stats = NULL;
+  recorded_cmd = NULL;
+  recorded_arg = NULL;
   cfg_playrecording = -1;
   cfg_debug_check_frustum = 0;
 
@@ -169,6 +175,8 @@ WalkTest::~WalkTest ()
   delete cslogo;
   delete plbody;
   delete pllegs;
+  delete [] recorded_perf_stats_name;
+  perf_stats->DecRef ();
   if (World) World->DecRef ();
 }
 
@@ -260,14 +268,35 @@ void WalkTest::Help ()
 }
 
 //-----------------------------------------------------------------------------
+extern bool CommandHandler (const char *cmd, const char *arg);
 
 void WalkTest::NextFrame ()
 {
+  time_t elapsed_time, current_time;
+  GetElapsedTime (elapsed_time, current_time);
   // The following will fetch all events from queue and handle them
   SysSystemDriver::NextFrame ();
 
-  time_t elapsed_time, current_time;
-  GetElapsedTime (elapsed_time, current_time);
+  timeFPS = perf_stats->GetFPS ();
+
+  if (!Console || !Console->GetVisible ())
+  {
+    // If the console was turned off last frame no stats have been accumulated
+    // as it was paused so we return here and loop again.
+    if (perf_stats->Pause (false))
+      return;
+    // Emit recorded commands directly to the CommandHandler
+    if (cfg_playrecording > 0 &&
+	recording.Length () > 0)
+    {
+      csRecordedCamera* reccam = (csRecordedCamera*)recording[cfg_playrecording];
+      if (reccam->cmd)
+	CommandHandler(reccam->cmd, reccam->arg);
+    }
+  }
+  else
+    // The console has been turned on so we pause the stats plugin.
+    perf_stats->Pause (true);
 
   MoveSystems (elapsed_time, current_time);
   PrepareFrame (elapsed_time, current_time);
@@ -706,32 +735,53 @@ void WalkTest::DrawFrameMap ()
 
 void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
 {
-  if (cfg_recording >= 0)
+  if (!Console || !Console->GetVisible ())
   {
-    // @@@ Memory leak!
-    csRecordedCamera* reccam = new csRecordedCamera ();
-    csCamera* c = view->GetCamera ();
-    const csMatrix3& m = c->GetO2T ();
-    const csVector3& v = c->GetOrigin ();
-    reccam->mat = m;
-    reccam->vec = v;
-    reccam->mirror = c->IsMirrored ();
-    reccam->sector = c->GetSector ();
-    reccam->angle = Sys->angle;
-    recording.Push ((void*)reccam);
+    if (cfg_recording >= 0)
+    {
+      // @@@ Memory leak!
+      csRecordedCamera* reccam = new csRecordedCamera ();
+      csCamera* c = view->GetCamera ();
+      const csMatrix3& m = c->GetO2T ();
+      const csVector3& v = c->GetOrigin ();
+      reccam->mat = m;
+      reccam->vec = v;
+      reccam->mirror = c->IsMirrored ();
+      reccam->sector = c->GetSector ();
+      reccam->angle = Sys->angle;
+      reccam->cmd = recorded_cmd;
+      reccam->arg = recorded_arg;
+      recorded_cmd = recorded_arg = NULL;
+      recording.Push ((void*)reccam);
+    }
+    if (cfg_playrecording >= 0 && recording.Length () > 0)
+    {
+      csRecordedCamera* reccam = (csRecordedCamera*)recording[cfg_playrecording];
+      cfg_playrecording++;
+      if (cfg_playrecording >= recording.Length ()) 
+      {
+	if (cfg_playloop)
+	  cfg_playrecording = 0;
+	else
+	{
+	  // A performance measuring demo has finished..stop and write to
+	  // file
+	  cfg_playrecording = -1;
+	  perf_stats->FinishSubsection ();
+	  recorded_perf_stats = NULL;
+	  Sys->Printf (MSG_CONSOLE, "Demo '%s' finished\n", 
+		       recorded_perf_stats_name);
+	}
+      }
+      csCamera* c = view->GetCamera ();
+      Sys->angle = reccam->angle;
+      c->SetSector (reccam->sector);
+      c->SetMirrored (reccam->mirror);
+      c->SetO2T (reccam->mat);
+      c->SetOrigin (reccam->vec);
+    }
   }
-  if (cfg_playrecording >= 0 && recording.Length () > 0)
-  {
-    csRecordedCamera* reccam = (csRecordedCamera*)recording[cfg_playrecording];
-    cfg_playrecording++;
-    if (cfg_playrecording >= recording.Length ()) cfg_playrecording = 0;
-    csCamera* c = view->GetCamera ();
-    Sys->angle = reccam->angle;
-    c->SetSector (reccam->sector);
-    c->SetMirrored (reccam->mirror);
-    c->SetO2T (reccam->mat);
-    c->SetOrigin (reccam->vec);
-  }
+
 
   (void)elapsed_time; (void)current_time;
 
@@ -855,19 +905,6 @@ void WalkTest::PrepareFrame (time_t elapsed_time, time_t current_time)
 
   }
 #endif
-
-  if (cnt <= 0)
-  {
-    time_t time1 = Time ();
-    if (time0 != (time_t)-1)
-    {
-      if (time1 != time0)
-        timeFPS = 10000.0f / (float)(time1 - time0);
-    }
-    cnt = 10;
-    time0 = Time ();
-  }
-  cnt--;
 }
 
 void perf_test (int num)
@@ -1122,6 +1159,11 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     return false;
   }
   world = World->GetCsWorld ();
+
+  // performance statistics module, also takes care of fps
+  perf_stats = QUERY_PLUGIN (this, iPerfStats);
+  if (!perf_stats)
+    return false;
 
   // csView is a view encapsulating both a camera and a clipper.
   // You don't have to use csView as you can do the same by

@@ -32,10 +32,6 @@ SRC.WALKTEST = $(wildcard apps/walktest/*.cpp) \
   apps/support/static.cpp apps/support/command.cpp
 OBJ.WALKTEST = $(addprefix $(OUT),$(notdir $(SRC.WALKTEST:.cpp=$O)))
 DESCRIPTION.$(WALKTEST.EXE) = $(DESCRIPTION.walk)
-TO_INSTALL.EXE += $(WALKTEST.EXE)
-TO_INSTALL.CONFIG += data/config/cryst.cfg data/config/autoexec.cfg \
-  data/config/perf.scr
-#TO_INSTALL.DATA += data/flarge.zip #copy a level too
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

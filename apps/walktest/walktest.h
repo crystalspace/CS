@@ -45,6 +45,8 @@ class HugeRoom;
 class csPolygonSet;
 struct iCollideSystem;
 
+struct iPerfStats;
+
 // Several map modes.
 #define MAP_OFF 0
 #define MAP_OVERLAY 1
@@ -70,6 +72,10 @@ struct csRecordedCamera
   csVector3 angle;
   bool mirror;
   csSector* sector;
+  char *cmd;
+  char *arg;
+  ~csRecordedCamera ()
+  { delete [] cmd; delete [] arg; }
 };
 
 /**
@@ -138,11 +144,21 @@ public:
   /// A vector that is used to temporarily store references to busy entities.
   csVector busy_vector;
 
+  iPerfStats *perf_stats;
   // Various configuration values for collision detection.
   /// If >= 0 then we're recording. The value is the current frame entry.
   int cfg_recording;
+  /// While recording, commands and arguments associated with current camera 
+  /// position are temporarily stored here.
+  char *recorded_cmd;
+  char *recorded_arg;
+  char *recorded_perf_stats_name;
+  iPerfStats *recorded_perf_stats;
+
   /// If >= 0 then we're playing a recording.
   int cfg_playrecording;
+  /// If true the demo recording loops.
+  bool cfg_playloop;
   /// Initial speed of jumping.
   float cfg_jumpspeed;
   /// Walk acceleration.

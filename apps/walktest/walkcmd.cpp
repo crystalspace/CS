@@ -45,6 +45,7 @@
 #include "csengine/particle.h"
 #include "csutil/scanstr.h"
 #include "csutil/csstring.h"
+#include "csutil/util.h"
 #include "csparser/impexp.h"
 #include "csobject/dataobj.h"
 #include "cssfxldr/common/snddata.h"
@@ -59,6 +60,8 @@
 #include "igraph3d.h"
 #include "igraph2d.h"
 #include "ivfs.h"
+
+#include "iperstat.h"
 
 extern WalkTest* Sys;
 
@@ -106,6 +109,28 @@ void SaveRecording (iVFS* vfs, const char* fName)
       	1+strlen (reccam->sector->GetName ()));
     }
     prev_sector = reccam->sector;
+    if (reccam->cmd)
+    {
+      len = strlen (reccam->cmd);
+      cf->Write ((char*)&len, 1);
+      cf->Write (reccam->cmd, 1+strlen(reccam->cmd));
+    }
+    else
+    {
+      len = 100;
+      cf->Write ((char*)&len, 1);
+    }
+    if (reccam->arg)
+    {
+      len = strlen (reccam->arg);
+      cf->Write ((char*)&len, 1);
+      cf->Write (reccam->arg, 1+strlen(reccam->arg));
+    }
+    else
+    {
+      len = 100;
+      cf->Write ((char*)&len, 1);
+    }
   }
   cf->DecRef ();
 }
@@ -115,6 +140,7 @@ void LoadRecording (iVFS* vfs, const char* fName)
 {
   iFile* cf;
   cf = vfs->Open (fName, VFS_FILE_READ);
+  if (!cf) return;
   Sys->recording.DeleteAll ();
   Sys->recording.SetLength (0);
   long l;
@@ -158,6 +184,27 @@ void LoadRecording (iVFS* vfs, const char* fName)
     }
     reccam->sector = s;
     prev_sector = s;
+
+    cf->Read ((char*)&len, 1);
+    if (len == 100)
+    {
+      reccam->cmd = NULL;
+    }
+    else
+    {
+      reccam->cmd = new char[len+1];
+      cf->Read (reccam->cmd, 1+len);
+    }
+    cf->Read ((char*)&len, 1);
+    if (len == 100)
+    {
+      reccam->arg = NULL;
+    }
+    else
+    {
+      reccam->arg = new char[len+1];
+      cf->Read (reccam->arg, 1+len);
+    }
     Sys->recording.Push ((void*)reccam);
   }
   cf->DecRef ();
@@ -427,6 +474,26 @@ float safe_atof (const char* arg)
 }
 
 //--//--//--//--//--//--//--//--//--//--//-- Handle our additional commands --//
+
+// Command recording
+#define RECORD_ARGS(CMD, ARG) \
+if (Sys->cfg_recording >= 0)                        \
+{                                                   \
+  Sys->recorded_cmd = new char[strlen(CMD)+1];      \
+  strcpy (Sys->recorded_cmd, CMD);                  \
+  if (ARG)                                          \
+  {                                                 \
+    Sys->recorded_arg = new char[strlen(ARG)+1];    \
+    strcpy (Sys->recorded_arg, ARG);                \
+  }                                                 \
+}
+#define RECORD_CMD(CMD) \
+if (Sys->cfg_recording >= 0)                        \
+{                                                   \
+  Sys->recorded_cmd = new char[strlen(CMD)+1];      \
+  strcpy (Sys->recorded_cmd, CMD);                  \
+}
+
 bool CommandHandler (const char *cmd, const char *arg)
 {
   if (!strcasecmp (cmd, "help"))
@@ -486,11 +553,31 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "saverec"))
   {
-    SaveRecording (Sys->VFS, "/this/record");
+    if (arg)
+    {
+      char buf[255];
+      sprintf (buf, "/this/%s.rec", arg);
+      SaveRecording (Sys->VFS, buf);
+    }
+    else
+      SaveRecording (Sys->VFS, "/this/record");
   }
   else if (!strcasecmp (cmd, "loadrec"))
   {
-    LoadRecording (Sys->VFS, "/this/record");
+    if (Sys->recorded_perf_stats)
+      Sys->perf_stats->FinishSubsection ();
+    Sys->recorded_perf_stats = NULL;
+    delete [] Sys->recorded_perf_stats_name;
+    Sys->recorded_perf_stats_name = NULL;
+    if (arg)
+    {
+      char buf[255];
+      sprintf (buf, "/this/%s.rec", arg);
+      LoadRecording (Sys->VFS, buf);
+      Sys->recorded_perf_stats_name = strnew (arg);
+    }
+    else
+      LoadRecording (Sys->VFS, "/this/record");
   }
   else if (!strcasecmp (cmd, "clrrec"))
   {
@@ -504,11 +591,14 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->cfg_playrecording = -1;
       Sys->cfg_recording = 0;
       Sys->Printf (MSG_CONSOLE, "Start recording camera movement...\n");
+      Sys->recorded_perf_stats = Sys->perf_stats->StartNewSubsection (NULL);
     }
     else
     {
       Sys->cfg_recording = -1;
       Sys->Printf (MSG_CONSOLE, "Stop recording.\n");
+      Sys->perf_stats->FinishSubsection ();
+      Sys->recorded_perf_stats = NULL;
     }
   }
   else if (!strcasecmp (cmd, "play"))
@@ -518,12 +608,67 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->cfg_recording = -1;
       Sys->cfg_playrecording = 0;
       Sys->Printf (MSG_CONSOLE, "Start playing back camera movement...\n");
+      Sys->cfg_playloop = true;
+      if (arg)
+      {
+	bool summary = true;
+	char name[50], option[50];
+	int resolution = 0;
+	ScanStr (arg, "%s,%d,%s", option, &resolution, name);
+	Sys->recorded_perf_stats = Sys->perf_stats->StartNewSubsection (name);
+	if (!strcasecmp (option, "res") && (resolution >= 1))
+	{
+	  Sys->perf_stats->SetResolution (resolution);
+	  summary = false;
+	}
+	else if (!strcasecmp (option, "break") && (resolution >= 1))
+	{
+	  Sys->recorded_perf_stats->DebugSetBreak (resolution);
+	  return true;
+	}
+	else
+	  name = option;
+	char buf[255];
+	sprintf (buf, "/this/%s.rps", name);
+	Sys->recorded_perf_stats->SetOutputFile (buf, summary);
+	if (Sys->recorded_perf_stats_name)
+	  Sys->recorded_perf_stats->SetName (Sys->recorded_perf_stats_name);
+	Sys->recorded_perf_stats->DebugSetBreak (-1);
+	Sys->cfg_playloop = false;
+      }
     }
     else
     {
       Sys->cfg_playrecording = -1;
       Sys->Printf (MSG_CONSOLE, "Stop playback.\n");
+      Sys->perf_stats->FinishSubsection ();
+      Sys->recorded_perf_stats = NULL;
     }
+  }
+  else if (!strcasecmp (cmd, "recsubperf"))
+  {
+    RECORD_ARGS (cmd, arg);
+    if (Sys->recorded_perf_stats)
+    {
+      if (!Sys->recorded_perf_stats->IsSubsection ())
+      {
+	if (!arg)
+	  Sys->Printf (MSG_CONSOLE, "Error: Expecting name of subsection.\n");
+	else
+	{
+	  Sys->recorded_perf_stats->StartNewSubsection (arg);
+	  Sys->Printf (MSG_CONSOLE, "Performance subsection '%s'\n",arg);
+	}
+      }
+      else
+      {
+	Sys->Printf (MSG_CONSOLE, "Finished performance subsection.\n");
+	Sys->recorded_perf_stats->PrintSubsectionStats (MSG_CONSOLE);
+	Sys->recorded_perf_stats->FinishSubsection ();
+      }
+    }
+    else
+      Sys->Printf (MSG_CONSOLE, "Error: Option valid only when recording.\n");
   }
   else if (!strcasecmp (cmd, "dumpvis"))
   {
@@ -878,6 +1023,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "fire"))
   {
+    RECORD_CMD (cmd);
     extern void fire_missile ();
     fire_missile ();
   }
@@ -917,6 +1063,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "flame"))
   {
+    RECORD_ARGS (cmd, arg);
     char txtname[100];
     int cnt = 0;
     int num = 0;
@@ -931,6 +1078,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "fountain"))
   {
+    RECORD_ARGS (cmd, arg);
     char txtname[100];
     int cnt = 0;
     int num = 0;
@@ -1010,9 +1158,11 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "addskel"))
   {
-    int depth, width;
+    RECORD_ARGS (cmd, arg);
+    int depth = 0, width = 0;
     if (arg) ScanStr (arg, "%d,%d", &depth, &width);
-    else { depth = 3; width = 3; }
+    if (depth < 1) depth = 3; 
+    if (width < 1) width = 3;
     extern void add_skeleton_tree (csSector* where, csVector3 const& pos,
     	int depth, int width);
     add_skeleton_tree (Sys->view->GetCamera ()->GetSector (),
@@ -1020,6 +1170,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "addghost"))
   {
+    RECORD_ARGS (cmd, arg);
     int depth, width;
     if (arg) ScanStr (arg, "%d,%d", &depth, &width);
     else { depth = 5; width = 8; }
@@ -1030,6 +1181,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "addbot"))
   {
+    RECORD_ARGS (cmd, arg);
     float radius = 0;
     if (arg) ScanStr (arg, "%f", &radius);
     extern void add_bot (float size, csSector* where, csVector3 const& pos,
@@ -1044,6 +1196,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "clrlights"))
   {
+    RECORD_CMD (cmd);
     csLightIt* lit = Sys->view->GetWorld ()->NewLightIterator ();
     csLight* l;
     while ((l = lit->Fetch ()) != NULL)
@@ -1066,6 +1219,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "addlight"))
   {
+    RECORD_ARGS (cmd, arg);
     csVector3 dir (0,0,0);
     csVector3 pos = Sys->view->GetCamera ()->Camera2World (dir);
     csDynLight* dyn;
@@ -1105,6 +1259,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "dellights"))
   {
+    RECORD_CMD (cmd);
     csDynLight* dyn;
     while ((dyn = Sys->view->GetWorld ()->GetFirstDynLight ()) != NULL)
     {
@@ -1170,3 +1325,5 @@ bool CommandHandler (const char *cmd, const char *arg)
   return true;
 }
 
+#undef RECORD_CMD
+#undef RECORD_ARGS
