@@ -99,7 +99,7 @@ int csMessageBox (csComponent *iParent, char *iTitle, char *iMessage, int iFlags
     {
       char *name = va_arg (arg, char *);
       int coord [4];
-      for (int i = 0; i < 4; i++)
+      for (i = 0; i < 4; i++)
         coord [i] = va_arg (arg, int);
       img = NewBitmap (iParent->app, name, coord [0], coord [1], coord [2], coord [3]);
       break;
