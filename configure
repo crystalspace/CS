@@ -2332,7 +2332,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 cs_makefile_text="${cs_makefile_text}CC = $CC -c
 "
-cs_jamconfig_text="${cs_jamconfig_text}CMD.CC = \"$CC\" ;
+cs_jamconfig_text="${cs_jamconfig_text}CMD.CC ?= \"$CC\" ;
 "
 
 ac_ext=cc
@@ -2657,13 +2657,13 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 cs_makefile_text="${cs_makefile_text}CXX = $CXX -c
 "
-cs_jamconfig_text="${cs_jamconfig_text}CMD.C++ = \"$CXX\" ;
+cs_jamconfig_text="${cs_jamconfig_text}CMD.C++ ?= \"$CXX\" ;
 "
 
 # C++ compiler is used as linker.
 cs_makefile_text="${cs_makefile_text}LINK = $CXX
 "
-cs_jamconfig_text="${cs_jamconfig_text}CMD.LINK = \"\$(CMD.C++)\" ;
+cs_jamconfig_text="${cs_jamconfig_text}CMD.LINK ?= \"\$(CMD.C++)\" ;
 "
 
 if test $ac_compiler_gnu = yes; then
@@ -2675,7 +2675,7 @@ fi
 
 cs_makefile_text="${cs_makefile_text}COMP = $cs_compiler_name
 "
-cs_jamconfig_text="${cs_jamconfig_text}COMPILER.TYPE = \"$cs_compiler_name\" ;
+cs_jamconfig_text="${cs_jamconfig_text}COMPILER.TYPE ?= \"$cs_compiler_name\" ;
 "
 cs_header_text="${cs_header_text}#define CS_COMPILER_NAME \"$cs_compiler_name\"
 "
@@ -2723,7 +2723,7 @@ done
 if test -n "$FLEXBIN"; then
   cs_makefile_text="${cs_makefile_text}FLEXBIN = $FLEXBIN
 "
-    cs_jamconfig_text="${cs_jamconfig_text}CMD.FLEX = \"$FLEXBIN\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.FLEX ?= \"$FLEXBIN\" ;
 "
 fi
 
@@ -2771,7 +2771,7 @@ done
 if test -n "$BISONBIN"; then
   cs_makefile_text="${cs_makefile_text}BISONBIN = $BISONBIN
 "
-    cs_jamconfig_text="${cs_jamconfig_text}CMD.BISON = \"$BISONBIN\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.BISON ?= \"$BISONBIN\" ;
 "
 fi
 
@@ -2819,7 +2819,7 @@ done
 if test -n "$DOXYGEN"; then
   cs_makefile_text="${cs_makefile_text}CMD.DOXYGEN = $DOXYGEN
 "
-    cs_jamconfig_text="${cs_jamconfig_text}CMD.DOXYGEN = \"$DOXYGEN\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.DOXYGEN ?= \"$DOXYGEN\" ;
 "
 fi
 
@@ -2867,7 +2867,7 @@ done
 if test -n "$TEXI2DVI"; then
   cs_makefile_text="${cs_makefile_text}CMD.TEXI2DVI = $TEXI2DVI
 "
-    cs_jamconfig_text="${cs_jamconfig_text}CMD.TEXI2DVI = \"$TEXI2DVI\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.TEXI2DVI ?= \"$TEXI2DVI\" ;
 "
 fi
 
@@ -2915,7 +2915,7 @@ done
 if test -n "$TEXI2PDF"; then
   cs_makefile_text="${cs_makefile_text}CMD.TEXI2PDF = $TEXI2PDF
 "
-    cs_jamconfig_text="${cs_jamconfig_text}CMD.TEXI2PDF = \"$TEXI2PDF\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.TEXI2PDF ?= \"$TEXI2PDF\" ;
 "
 fi
 
@@ -2963,7 +2963,7 @@ done
 if test -n "$INSTALL"; then
   cs_makefile_text="${cs_makefile_text}CMD.INSTALL = $INSTALL
 "
-    cs_jamconfig_text="${cs_jamconfig_text}CMD.INSTALL = \"$INSTALL\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.INSTALL ?= \"$INSTALL\" ;
 "
 fi
 
@@ -3051,7 +3051,7 @@ fi
 if test -n "$RANLIB"; then
   cs_makefile_text="${cs_makefile_text}CMD.RANLIB = $RANLIB
 "
-    cs_jamconfig_text="${cs_jamconfig_text}CMD.RANLIB = \"$RANLIB\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.RANLIB ?= \"$RANLIB\" ;
 "
 fi
 
@@ -3099,7 +3099,7 @@ done
 if test -n "$SWIGBIN"; then
   cs_makefile_text="${cs_makefile_text}SWIGBIN = $SWIGBIN
 "
-    cs_jamconfig_text="${cs_jamconfig_text}CMD.SWIG = \"$SWIGBIN\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.SWIG ?= \"$SWIGBIN\" ;
 "
 fi
 
@@ -3147,7 +3147,7 @@ done
 if test -n "$LUASWIGBIN"; then
   cs_makefile_text="${cs_makefile_text}LUASWIGBIN = $LUASWIGBIN
 "
-    cs_jamconfig_text="${cs_jamconfig_text}CMD.LUASWIG = \"$LUASWIGBIN\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.LUASWIG ?= \"$LUASWIGBIN\" ;
 "
 fi
 
@@ -3282,7 +3282,7 @@ echo "$as_me:$LINENO: result: $cs_cv_shell_mkdir" >&5
 echo "${ECHO_T}$cs_cv_shell_mkdir" >&6
 cs_makefile_text="${cs_makefile_text}CMD.MKDIR = $cs_cv_shell_mkdir
 "
-    cs_jamconfig_text="${cs_jamconfig_text}CMD.MKDIR = \"$cs_cv_shell_mkdir\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.MKDIR ?= \"$cs_cv_shell_mkdir\" ;
 "
 
 echo "$as_me:$LINENO: checking how to create a directory tree" >&5
@@ -3303,7 +3303,7 @@ echo "${ECHO_T}$cs_cv_shell_mkdir_p" >&6
 if test "${cs_cv_shell_mkdir_p+set}" = set; then
   cs_makefile_text="${cs_makefile_text}CMD.MKDIRS = $cs_cv_shell_mkdir_p
 "
-    cs_jamconfig_text="${cs_jamconfig_text}CMD.MKDIRS = \"$cs_cv_shell_mkdir_p\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.MKDIRS ?= \"$cs_cv_shell_mkdir_p\" ;
 "
 else
   { { echo "$as_me:$LINENO: error: do not know how to create a directory tree" >&5
@@ -3381,11 +3381,11 @@ echo "${ECHO_T}$cs_cv_prog_nasm_ok" >&6
     if test $cs_cv_prog_nasm_ok = yes; then
   cs_makefile_text="${cs_makefile_text}NASM.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}NASM.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}NASM.AVAILABLE ?= \"yes\" ;
 "
 	cs_makefile_text="${cs_makefile_text}NASM.BIN = $NASM
 "
-    cs_jamconfig_text="${cs_jamconfig_text}CMD.NASM = \"$NASM\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.NASM ?= \"$NASM\" ;
 "
 	cs_header_text="${cs_header_text}#define DO_NASM
 "
@@ -3525,15 +3525,15 @@ done
 if test -n "$PERL"; then
   cs_makefile_text="${cs_makefile_text}PERL5.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}PERL5.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PERL5.AVAILABLE ?= \"yes\" ;
 "
     cs_makefile_text="${cs_makefile_text}PERL5 = $PERL
 "
-    cs_jamconfig_text="${cs_jamconfig_text}PERL5 = \"$PERL\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PERL5 ?= \"$PERL\" ;
 "
     cs_makefile_text="${cs_makefile_text}PERL = $PERL
 "
-    cs_jamconfig_text="${cs_jamconfig_text}PERL = \"$PERL\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PERL ?= \"$PERL\" ;
 "
 
     echo "$as_me:$LINENO: checking for perl ExtUtils::Embed module" >&5
@@ -3557,7 +3557,7 @@ echo "${ECHO_T}$cs_cv_perl_mod_embed" >&6
     if test $cs_cv_perl_mod_embed = yes; then
   cs_makefile_text="${cs_makefile_text}PERL5.EXTUTILS.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}PERL5.EXTUTILS.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PERL5.EXTUTILS.AVAILABLE ?= \"yes\" ;
 "
 
 	echo "$as_me:$LINENO: checking for perl DynaLoader module" >&5
@@ -3581,7 +3581,7 @@ echo "${ECHO_T}$cs_cv_perl_mod_dynaloader" >&6
 	if test $cs_cv_perl_mod_dynaloader = yes; then
   cs_makefile_text="${cs_makefile_text}PERL5.EXTUTILS.DYNALOADER = DynaLoader
 "
-    cs_jamconfig_text="${cs_jamconfig_text}PERL5.EXTUTILS.DYNALOADER = \"DynaLoader\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PERL5.EXTUTILS.DYNALOADER ?= \"DynaLoader\" ;
 "
 fi
 
@@ -3651,19 +3651,19 @@ fi
     if test -n "$cs_cv_perl_cflags$cs_cv_perl_lflags"; then
   cs_makefile_text="${cs_makefile_text}PERL5.SDK.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}PERL5.SDK.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PERL5.SDK.AVAILABLE ?= \"yes\" ;
 "
 	if test -n "$cs_cv_perl_cflags"; then
   cs_makefile_text="${cs_makefile_text}PERL5.CFLAGS = $cs_cv_perl_cflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}PERL5.CFLAGS = \"$cs_cv_perl_cflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PERL5.CFLAGS ?= \"$cs_cv_perl_cflags\" ;
 "
 fi
 
 	if test -n "$cs_cv_perl_lflags"; then
   cs_makefile_text="${cs_makefile_text}PERL5.LFLAGS = $cs_cv_perl_lflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}PERL5.LFLAGS = \"$cs_cv_perl_lflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PERL5.LFLAGS ?= \"$cs_cv_perl_lflags\" ;
 "
 fi
 
@@ -4227,21 +4227,21 @@ fi
   if test "$cs_cv_python" = yes; then
   cs_makefile_text="${cs_makefile_text}PYTHON.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}PYTHON.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PYTHON.AVAILABLE ?= \"yes\" ;
 "
 	cs_result_cflags=`echo x$cs_cv_python_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_result_lflags=`echo x$cs_cv_python_lflags $cs_cv_python_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	if test -n "$cs_result_cflags"; then
   cs_makefile_text="${cs_makefile_text}PYTHON.CFLAGS = $cs_result_cflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}PYTHON.CFLAGS = \"$cs_result_cflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PYTHON.CFLAGS ?= \"$cs_result_cflags\" ;
 "
 fi
 
 	if test -n "$cs_result_lflags"; then
   cs_makefile_text="${cs_makefile_text}PYTHON.LFLAGS = $cs_result_lflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}PYTHON.LFLAGS = \"$cs_result_lflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PYTHON.LFLAGS ?= \"$cs_result_lflags\" ;
 "
 fi
 
@@ -7578,21 +7578,21 @@ fi
   if test "$cs_cv_sys_pthread" = yes; then
   cs_makefile_text="${cs_makefile_text}PTHREAD.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.AVAILABLE ?= \"yes\" ;
 "
 	cs_result_cflags=`echo x$cs_cv_sys_pthread_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_result_lflags=`echo x$cs_cv_sys_pthread_lflags $cs_cv_sys_pthread_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	if test -n "$cs_result_cflags"; then
   cs_makefile_text="${cs_makefile_text}PTHREAD.CFLAGS = $cs_result_cflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.CFLAGS = \"$cs_result_cflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.CFLAGS ?= \"$cs_result_cflags\" ;
 "
 fi
 
 	if test -n "$cs_result_lflags"; then
   cs_makefile_text="${cs_makefile_text}PTHREAD.LFLAGS = $cs_result_lflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.LFLAGS = \"$cs_result_lflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.LFLAGS ?= \"$cs_result_lflags\" ;
 "
 fi
 
@@ -9202,7 +9202,7 @@ fi
 if test "$no_x" != yes; then
   cs_makefile_text="${cs_makefile_text}X11.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}X11.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}X11.AVAILABLE ?= \"yes\" ;
 "
     cs_makefile_text="${cs_makefile_text}X_CFLAGS = $X_CFLAGS
 "
@@ -9212,9 +9212,9 @@ if test "$no_x" != yes; then
 "
     cs_makefile_text="${cs_makefile_text}X_EXTRA_LIBS = $X_EXTRA_LIBS
 "
-    cs_jamconfig_text="${cs_jamconfig_text}X11.CFLAGS = \"$X_CFLAGS\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}X11.CFLAGS ?= \"$X_CFLAGS\" ;
 "
-    cs_jamconfig_text="${cs_jamconfig_text}X11.LFLAGS = \"\$(X_PRE_LIBS) \$(X_LIBS) -lXext -lX11 \$(X_EXTRA_LIBS)\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}X11.LFLAGS ?= \"\$(X_PRE_LIBS) \$(X_LIBS) -lXext -lX11 \$(X_EXTRA_LIBS)\" ;
 "
 
 
@@ -9641,9 +9641,9 @@ fi
     if test "$cs_cv_libXxf86vm" = yes; then
   cs_makefile_text="${cs_makefile_text}USE_XFREE86VM = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}XFREE86VM.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}XFREE86VM.AVAILABLE ?= \"yes\" ;
 "
-	cs_jamconfig_text="${cs_jamconfig_text}XFREE86VM.LFLAGS = \"\$(X_PRE_LIBS) \$(X_LIBS) -lXxf86vm -lXext -lX11 	    \$(X_EXTRA_LIBS)\" ;
+	cs_jamconfig_text="${cs_jamconfig_text}XFREE86VM.LFLAGS ?= \"\$(X_PRE_LIBS) \$(X_LIBS) -lXxf86vm -lXext -lX11 	    \$(X_EXTRA_LIBS)\" ;
 "
 else
   :
@@ -10385,21 +10385,21 @@ fi
   if test "$cs_cv_libgl" = yes; then
   cs_makefile_text="${cs_makefile_text}GL.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}GL.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}GL.AVAILABLE ?= \"yes\" ;
 "
 	cs_result_cflags=`echo x$cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_result_lflags=`echo x$cs_cv_libgl_lflags $cs_cv_libgl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	if test -n "$cs_result_cflags"; then
   cs_makefile_text="${cs_makefile_text}GL.CFLAGS = $cs_result_cflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}GL.CFLAGS = \"$cs_result_cflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}GL.CFLAGS ?= \"$cs_result_cflags\" ;
 "
 fi
 
 	if test -n "$cs_result_lflags"; then
   cs_makefile_text="${cs_makefile_text}GL.LFLAGS = $cs_result_lflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}GL.LFLAGS = \"$cs_result_lflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}GL.LFLAGS ?= \"$cs_result_lflags\" ;
 "
 fi
 
@@ -10735,21 +10735,21 @@ fi
   if test "$cs_cv_libglu" = yes; then
   cs_makefile_text="${cs_makefile_text}GLU.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}GLU.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}GLU.AVAILABLE ?= \"yes\" ;
 "
 	cs_result_cflags=`echo x$cs_cv_libglu_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_result_lflags=`echo x$cs_cv_libglu_lflags $cs_cv_libglu_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	if test -n "$cs_result_cflags"; then
   cs_makefile_text="${cs_makefile_text}GLU.CFLAGS = $cs_result_cflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}GLU.CFLAGS = \"$cs_result_cflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}GLU.CFLAGS ?= \"$cs_result_cflags\" ;
 "
 fi
 
 	if test -n "$cs_result_lflags"; then
   cs_makefile_text="${cs_makefile_text}GLU.LFLAGS = $cs_result_lflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}GLU.LFLAGS = \"$cs_result_lflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}GLU.LFLAGS ?= \"$cs_result_lflags\" ;
 "
 fi
 
@@ -11082,21 +11082,21 @@ fi
   if test "$cs_cv_libglut" = yes; then
   cs_makefile_text="${cs_makefile_text}GLUT.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}GLUT.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}GLUT.AVAILABLE ?= \"yes\" ;
 "
 	cs_result_cflags=`echo x$cs_cv_libglut_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_result_lflags=`echo x$cs_cv_libglut_lflags $cs_cv_libglut_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	if test -n "$cs_result_cflags"; then
   cs_makefile_text="${cs_makefile_text}GLUT.CFLAGS = $cs_result_cflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}GLUT.CFLAGS = \"$cs_result_cflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}GLUT.CFLAGS ?= \"$cs_result_cflags\" ;
 "
 fi
 
 	if test -n "$cs_result_lflags"; then
   cs_makefile_text="${cs_makefile_text}GLUT.LFLAGS = $cs_result_lflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}GLUT.LFLAGS = \"$cs_result_lflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}GLUT.LFLAGS ?= \"$cs_result_lflags\" ;
 "
 fi
 
@@ -11397,21 +11397,21 @@ fi
   if test "$cs_cv_libglx" = yes; then
   cs_makefile_text="${cs_makefile_text}GLX.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}GLX.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}GLX.AVAILABLE ?= \"yes\" ;
 "
 	cs_result_cflags=`echo x$cs_cv_libglx_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_result_lflags=`echo x$cs_cv_libglx_lflags $cs_cv_libglx_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	if test -n "$cs_result_cflags"; then
   cs_makefile_text="${cs_makefile_text}GLX.CFLAGS = $cs_result_cflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}GLX.CFLAGS = \"$cs_result_cflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}GLX.CFLAGS ?= \"$cs_result_cflags\" ;
 "
 fi
 
 	if test -n "$cs_result_lflags"; then
   cs_makefile_text="${cs_makefile_text}GLX.LFLAGS = $cs_result_lflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}GLX.LFLAGS = \"$cs_result_lflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}GLX.LFLAGS ?= \"$cs_result_lflags\" ;
 "
 fi
 
@@ -12144,21 +12144,21 @@ fi
   if test "$cs_cv_libz" = yes; then
   cs_makefile_text="${cs_makefile_text}ZLIB.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}ZLIB.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}ZLIB.AVAILABLE ?= \"yes\" ;
 "
 	cs_result_cflags=`echo x$cs_cv_libz_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_result_lflags=`echo x$cs_cv_libz_lflags $cs_cv_libz_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	if test -n "$cs_result_cflags"; then
   cs_makefile_text="${cs_makefile_text}ZLIB.CFLAGS = $cs_result_cflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}ZLIB.CFLAGS = \"$cs_result_cflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}ZLIB.CFLAGS ?= \"$cs_result_cflags\" ;
 "
 fi
 
 	if test -n "$cs_result_lflags"; then
   cs_makefile_text="${cs_makefile_text}ZLIB.LFLAGS = $cs_result_lflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}ZLIB.LFLAGS = \"$cs_result_lflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}ZLIB.LFLAGS ?= \"$cs_result_lflags\" ;
 "
 fi
 
@@ -12597,21 +12597,21 @@ fi
   if test "$cs_cv_libpng" = yes; then
   cs_makefile_text="${cs_makefile_text}PNG.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}PNG.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PNG.AVAILABLE ?= \"yes\" ;
 "
 	cs_result_cflags=`echo x$cs_cv_libpng_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_result_lflags=`echo x$cs_cv_libpng_lflags $cs_cv_libpng_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	if test -n "$cs_result_cflags"; then
   cs_makefile_text="${cs_makefile_text}PNG.CFLAGS = $cs_result_cflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}PNG.CFLAGS = \"$cs_result_cflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PNG.CFLAGS ?= \"$cs_result_cflags\" ;
 "
 fi
 
 	if test -n "$cs_result_lflags"; then
   cs_makefile_text="${cs_makefile_text}PNG.LFLAGS = $cs_result_lflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}PNG.LFLAGS = \"$cs_result_lflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PNG.LFLAGS ?= \"$cs_result_lflags\" ;
 "
 fi
 
@@ -13051,21 +13051,21 @@ fi
   if test "$cs_cv_libjpeg" = yes; then
   cs_makefile_text="${cs_makefile_text}JPEG.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}JPEG.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}JPEG.AVAILABLE ?= \"yes\" ;
 "
 	cs_result_cflags=`echo x$cs_cv_libjpeg_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_result_lflags=`echo x$cs_cv_libjpeg_lflags $cs_cv_libjpeg_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	if test -n "$cs_result_cflags"; then
   cs_makefile_text="${cs_makefile_text}JPEG.CFLAGS = $cs_result_cflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}JPEG.CFLAGS = \"$cs_result_cflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}JPEG.CFLAGS ?= \"$cs_result_cflags\" ;
 "
 fi
 
 	if test -n "$cs_result_lflags"; then
   cs_makefile_text="${cs_makefile_text}JPEG.LFLAGS = $cs_result_lflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}JPEG.LFLAGS = \"$cs_result_lflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}JPEG.LFLAGS ?= \"$cs_result_lflags\" ;
 "
 fi
 
@@ -13500,21 +13500,21 @@ fi
   if test "$cs_cv_libmng" = yes; then
   cs_makefile_text="${cs_makefile_text}MNG.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}MNG.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}MNG.AVAILABLE ?= \"yes\" ;
 "
 	cs_result_cflags=`echo x$cs_cv_libmng_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_result_lflags=`echo x$cs_cv_libmng_lflags $cs_cv_libmng_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	if test -n "$cs_result_cflags"; then
   cs_makefile_text="${cs_makefile_text}MNG.CFLAGS = $cs_result_cflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}MNG.CFLAGS = \"$cs_result_cflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}MNG.CFLAGS ?= \"$cs_result_cflags\" ;
 "
 fi
 
 	if test -n "$cs_result_lflags"; then
   cs_makefile_text="${cs_makefile_text}MNG.LFLAGS = $cs_result_lflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}MNG.LFLAGS = \"$cs_result_lflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}MNG.LFLAGS ?= \"$cs_result_lflags\" ;
 "
 fi
 
@@ -13950,21 +13950,21 @@ fi
   if test "$cs_cv_libmikmod" = yes; then
   cs_makefile_text="${cs_makefile_text}MIKMOD.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}MIKMOD.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}MIKMOD.AVAILABLE ?= \"yes\" ;
 "
 	cs_result_cflags=`echo x$cs_cv_libmikmod_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_result_lflags=`echo x$cs_cv_libmikmod_lflags $cs_cv_libmikmod_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	if test -n "$cs_result_cflags"; then
   cs_makefile_text="${cs_makefile_text}MIKMOD.CFLAGS = $cs_result_cflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}MIKMOD.CFLAGS = \"$cs_result_cflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}MIKMOD.CFLAGS ?= \"$cs_result_cflags\" ;
 "
 fi
 
 	if test -n "$cs_result_lflags"; then
   cs_makefile_text="${cs_makefile_text}MIKMOD.LFLAGS = $cs_result_lflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}MIKMOD.LFLAGS = \"$cs_result_lflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}MIKMOD.LFLAGS ?= \"$cs_result_lflags\" ;
 "
 fi
 
@@ -14399,21 +14399,21 @@ fi
   if test "$cs_cv_libogg" = yes; then
   cs_makefile_text="${cs_makefile_text}OGG.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}OGG.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}OGG.AVAILABLE ?= \"yes\" ;
 "
 	cs_result_cflags=`echo x$cs_cv_libogg_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_result_lflags=`echo x$cs_cv_libogg_lflags $cs_cv_libogg_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	if test -n "$cs_result_cflags"; then
   cs_makefile_text="${cs_makefile_text}OGG.CFLAGS = $cs_result_cflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}OGG.CFLAGS = \"$cs_result_cflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}OGG.CFLAGS ?= \"$cs_result_cflags\" ;
 "
 fi
 
 	if test -n "$cs_result_lflags"; then
   cs_makefile_text="${cs_makefile_text}OGG.LFLAGS = $cs_result_lflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}OGG.LFLAGS = \"$cs_result_lflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}OGG.LFLAGS ?= \"$cs_result_lflags\" ;
 "
 fi
 
@@ -14842,21 +14842,21 @@ fi
   if test "$cs_cv_libvorbis" = yes; then
   cs_makefile_text="${cs_makefile_text}VORBIS.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}VORBIS.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}VORBIS.AVAILABLE ?= \"yes\" ;
 "
 	cs_result_cflags=`echo x$cs_cv_libvorbis_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_result_lflags=`echo x$cs_cv_libvorbis_lflags $cs_cv_libvorbis_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	if test -n "$cs_result_cflags"; then
   cs_makefile_text="${cs_makefile_text}VORBIS.CFLAGS = $cs_result_cflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}VORBIS.CFLAGS = \"$cs_result_cflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}VORBIS.CFLAGS ?= \"$cs_result_cflags\" ;
 "
 fi
 
 	if test -n "$cs_result_lflags"; then
   cs_makefile_text="${cs_makefile_text}VORBIS.LFLAGS = $cs_result_lflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}VORBIS.LFLAGS = \"$cs_result_lflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}VORBIS.LFLAGS ?= \"$cs_result_lflags\" ;
 "
 fi
 
@@ -15291,21 +15291,21 @@ fi
   if test "$cs_cv_libvorbisfile" = yes; then
   cs_makefile_text="${cs_makefile_text}VORBISFILE.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}VORBISFILE.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}VORBISFILE.AVAILABLE ?= \"yes\" ;
 "
 	cs_result_cflags=`echo x$cs_cv_libvorbisfile_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_result_lflags=`echo x$cs_cv_libvorbisfile_lflags $cs_cv_libvorbisfile_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	if test -n "$cs_result_cflags"; then
   cs_makefile_text="${cs_makefile_text}VORBISFILE.CFLAGS = $cs_result_cflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}VORBISFILE.CFLAGS = \"$cs_result_cflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}VORBISFILE.CFLAGS ?= \"$cs_result_cflags\" ;
 "
 fi
 
 	if test -n "$cs_result_lflags"; then
   cs_makefile_text="${cs_makefile_text}VORBISFILE.LFLAGS = $cs_result_lflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}VORBISFILE.LFLAGS = \"$cs_result_lflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}VORBISFILE.LFLAGS ?= \"$cs_result_lflags\" ;
 "
 fi
 
@@ -16029,21 +16029,21 @@ fi
   if test "$cs_cv_lib3ds" = yes; then
   cs_makefile_text="${cs_makefile_text}3DS.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}3DS.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}3DS.AVAILABLE ?= \"yes\" ;
 "
 	cs_result_cflags=`echo x$cs_cv_lib3ds_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_result_lflags=`echo x$cs_cv_lib3ds_lflags $cs_cv_lib3ds_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	if test -n "$cs_result_cflags"; then
   cs_makefile_text="${cs_makefile_text}3DS.CFLAGS = $cs_result_cflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}3DS.CFLAGS = \"$cs_result_cflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}3DS.CFLAGS ?= \"$cs_result_cflags\" ;
 "
 fi
 
 	if test -n "$cs_result_lflags"; then
   cs_makefile_text="${cs_makefile_text}3DS.LFLAGS = $cs_result_lflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}3DS.LFLAGS = \"$cs_result_lflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}3DS.LFLAGS ?= \"$cs_result_lflags\" ;
 "
 fi
 
@@ -16771,21 +16771,21 @@ fi
   if test "$cs_cv_libode" = yes; then
   cs_makefile_text="${cs_makefile_text}ODE.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}ODE.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}ODE.AVAILABLE ?= \"yes\" ;
 "
 	cs_result_cflags=`echo x$cs_cv_libode_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_result_lflags=`echo x$cs_cv_libode_lflags $cs_cv_libode_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	if test -n "$cs_result_cflags"; then
   cs_makefile_text="${cs_makefile_text}ODE.CFLAGS = $cs_result_cflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}ODE.CFLAGS = \"$cs_result_cflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}ODE.CFLAGS ?= \"$cs_result_cflags\" ;
 "
 fi
 
 	if test -n "$cs_result_lflags"; then
   cs_makefile_text="${cs_makefile_text}ODE.LFLAGS = $cs_result_lflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}ODE.LFLAGS = \"$cs_result_lflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}ODE.LFLAGS ?= \"$cs_result_lflags\" ;
 "
 fi
 
@@ -17114,21 +17114,21 @@ fi
   if test "$cs_cv_libopenal" = yes; then
   cs_makefile_text="${cs_makefile_text}OPENAL.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}OPENAL.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}OPENAL.AVAILABLE ?= \"yes\" ;
 "
 	cs_result_cflags=`echo x$cs_cv_libopenal_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_result_lflags=`echo x$cs_cv_libopenal_lflags $cs_cv_libopenal_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	if test -n "$cs_result_cflags"; then
   cs_makefile_text="${cs_makefile_text}OPENAL.CFLAGS = $cs_result_cflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}OPENAL.CFLAGS = \"$cs_result_cflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}OPENAL.CFLAGS ?= \"$cs_result_cflags\" ;
 "
 fi
 
 	if test -n "$cs_result_lflags"; then
   cs_makefile_text="${cs_makefile_text}OPENAL.LFLAGS = $cs_result_lflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}OPENAL.LFLAGS = \"$cs_result_lflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}OPENAL.LFLAGS ?= \"$cs_result_lflags\" ;
 "
 fi
 
@@ -17335,15 +17335,15 @@ if test x$no_ft = x ; then
 echo "${ECHO_T}yes" >&6
    cs_makefile_text="${cs_makefile_text}FT2.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}FT2.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}FT2.AVAILABLE ?= \"yes\" ;
 "
     cs_makefile_text="${cs_makefile_text}FT2.LFLAGS = $FT2_LIBS
 "
-    cs_jamconfig_text="${cs_jamconfig_text}FT2.LFLAGS = \"$FT2_LIBS\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}FT2.LFLAGS ?= \"$FT2_LIBS\" ;
 "
     cs_makefile_text="${cs_makefile_text}FT2.CFLAGS = $FT2_CFLAGS
 "
-    cs_jamconfig_text="${cs_jamconfig_text}FT2.CFLAGS = \"$FT2_CFLAGS\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}FT2.CFLAGS ?= \"$FT2_CFLAGS\" ;
 "
 else
    echo "$as_me:$LINENO: result: no" >&5
@@ -17962,21 +17962,21 @@ fi
   if test "$cs_cv_libvga" = yes; then
   cs_makefile_text="${cs_makefile_text}SVGA.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}SVGA.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}SVGA.AVAILABLE ?= \"yes\" ;
 "
 	cs_result_cflags=`echo x$cs_cv_libvga_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_result_lflags=`echo x$cs_cv_libvga_lflags $cs_cv_libvga_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	if test -n "$cs_result_cflags"; then
   cs_makefile_text="${cs_makefile_text}SVGA.CFLAGS = $cs_result_cflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}SVGA.CFLAGS = \"$cs_result_cflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}SVGA.CFLAGS ?= \"$cs_result_cflags\" ;
 "
 fi
 
 	if test -n "$cs_result_lflags"; then
   cs_makefile_text="${cs_makefile_text}SVGA.LFLAGS = $cs_result_lflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}SVGA.LFLAGS = \"$cs_result_lflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}SVGA.LFLAGS ?= \"$cs_result_lflags\" ;
 "
 fi
 
@@ -18411,21 +18411,21 @@ fi
   if test "$cs_cv_libcal3d" = yes; then
   cs_makefile_text="${cs_makefile_text}CAL3D.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}CAL3D.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CAL3D.AVAILABLE ?= \"yes\" ;
 "
 	cs_result_cflags=`echo x$cs_cv_libcal3d_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_result_lflags=`echo x$cs_cv_libcal3d_lflags $cs_cv_libcal3d_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	if test -n "$cs_result_cflags"; then
   cs_makefile_text="${cs_makefile_text}CAL3D.CFLAGS = $cs_result_cflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}CAL3D.CFLAGS = \"$cs_result_cflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CAL3D.CFLAGS ?= \"$cs_result_cflags\" ;
 "
 fi
 
 	if test -n "$cs_result_lflags"; then
   cs_makefile_text="${cs_makefile_text}CAL3D.LFLAGS = $cs_result_lflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}CAL3D.LFLAGS = \"$cs_result_lflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CAL3D.LFLAGS ?= \"$cs_result_lflags\" ;
 "
 fi
 
@@ -18523,13 +18523,13 @@ echo "${ECHO_T}no (assume MacOS/X)" >&6
 "
 	cs_makefile_text="${cs_makefile_text}MACOSX.PLUGIN_DIR = components
 "
-    cs_jamconfig_text="${cs_jamconfig_text}MACOSX.PLUGIN_DIR = \"components\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}MACOSX.PLUGIN_DIR ?= \"components\" ;
 "
 	cs_header_text="${cs_header_text}#define OS_MACOSX_PLUGIN_EXT \".csplugin\"
 "
 	cs_makefile_text="${cs_makefile_text}MACOSX.PLUGIN_EXT = .csplugin
 "
-    cs_jamconfig_text="${cs_jamconfig_text}MACOSX.PLUGIN_EXT = \".csplugin\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}MACOSX.PLUGIN_EXT ?= \".csplugin\" ;
 "
 	cs_header_text="${cs_header_text}#define CS_24BIT_PIXEL_LAYOUT \"CS_24BIT_PIXEL_ARGB\"
 "
@@ -18545,7 +18545,7 @@ echo "$as_me:$LINENO: result: $cs_cv_prog_objc" >&5
 echo "${ECHO_T}$cs_cv_prog_objc" >&6
 	cs_makefile_text="${cs_makefile_text}OBJC = $cs_cv_prog_objc -c
 "
-	cs_jamconfig_text="${cs_jamconfig_text}CMD.OCC = \"$cs_cv_prog_objc\" ;
+	cs_jamconfig_text="${cs_jamconfig_text}CMD.OCC ?= \"$cs_cv_prog_objc\" ;
 "
 	echo "$as_me:$LINENO: checking for Objective-C++ compiler" >&5
 echo $ECHO_N "checking for Objective-C++ compiler... $ECHO_C" >&6
@@ -18558,7 +18558,7 @@ echo "$as_me:$LINENO: result: $cs_cv_prog_objcxx" >&5
 echo "${ECHO_T}$cs_cv_prog_objcxx" >&6
 	cs_makefile_text="${cs_makefile_text}OBJCXX = $cs_cv_prog_objcxx -c
 "
-	cs_jamconfig_text="${cs_jamconfig_text}CMD.OC++ = \"$cs_cv_prog_objcxx\" ;
+	cs_jamconfig_text="${cs_jamconfig_text}CMD.OC++ ?= \"$cs_cv_prog_objcxx\" ;
 "
 fi
 
@@ -18597,7 +18597,7 @@ cs_makefile_text="${cs_makefile_text}TARGET_MAKEFILE = $cs_host_makefile
 "
 cs_makefile_text="${cs_makefile_text}OS = $cs_host_os_normalized_uc
 "
-cs_jamconfig_text="${cs_jamconfig_text}TARGET.OS = \"$cs_host_os_normalized_uc\" ;
+cs_jamconfig_text="${cs_jamconfig_text}TARGET.OS ?= \"$cs_host_os_normalized_uc\" ;
 "
 cs_header_text="${cs_header_text}#define CS_PLATFORM_NAME \"$cs_host_os_normalized\"
 "
@@ -18626,7 +18626,7 @@ cs_header_text="${cs_header_text}#define CS_PLATFORM_NAME \"$cs_host_os_normaliz
     cs_host_cpu_normalized="`echo "$cs_host_cpu" | $as_tr_cpp`"
 cs_makefile_text="${cs_makefile_text}PROC = $cs_host_cpu_normalized
 "
-    cs_jamconfig_text="${cs_jamconfig_text}TARGET.PROCESSOR = \"$cs_host_cpu_normalized\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}TARGET.PROCESSOR ?= \"$cs_host_cpu_normalized\" ;
 "
 cs_header_text="${cs_header_text}#define PROC_$cs_host_cpu_normalized
 "
@@ -19776,7 +19776,7 @@ fi
 if test $cs_cv_header_soundcard_h = yes; then
   cs_makefile_text="${cs_makefile_text}OSS.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}OSS.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}OSS.AVAILABLE ?= \"yes\" ;
 "
 fi
 
@@ -20322,21 +20322,21 @@ fi
   if test "$cs_cv_sys_socket" = yes; then
   cs_makefile_text="${cs_makefile_text}SOCKET.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}SOCKET.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}SOCKET.AVAILABLE ?= \"yes\" ;
 "
 	cs_result_cflags=`echo x$cs_cv_sys_socket_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_result_lflags=`echo x$cs_cv_sys_socket_lflags $cs_cv_sys_socket_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	if test -n "$cs_result_cflags"; then
   cs_makefile_text="${cs_makefile_text}SOCKET.CFLAGS = $cs_result_cflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}SOCKET.CFLAGS = \"$cs_result_cflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}SOCKET.CFLAGS ?= \"$cs_result_cflags\" ;
 "
 fi
 
 	if test -n "$cs_result_lflags"; then
   cs_makefile_text="${cs_makefile_text}SOCKET.LFLAGS = $cs_result_lflags
 "
-    cs_jamconfig_text="${cs_jamconfig_text}SOCKET.LFLAGS = \"$cs_result_lflags\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}SOCKET.LFLAGS ?= \"$cs_result_lflags\" ;
 "
 fi
 
@@ -21139,7 +21139,7 @@ echo "${ECHO_T}$enable_linux_joystick" >&6
 if test "$enable_linux_joystick" != no; then
   cs_makefile_text="${cs_makefile_text}LINUXJOYSTICK.AVAILABLE = yes
 "
-    cs_jamconfig_text="${cs_jamconfig_text}LINUXJOYSTICK.AVAILABLE = \"yes\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}LINUXJOYSTICK.AVAILABLE ?= \"yes\" ;
 "
 fi
 
@@ -21192,7 +21192,7 @@ echo "$as_me:$LINENO: result: $cs_build_mode" >&5
 echo "${ECHO_T}$cs_build_mode" >&6
 cs_makefile_text="${cs_makefile_text}MODE = $cs_build_mode
 "
-    cs_jamconfig_text="${cs_jamconfig_text}MODE = \"$cs_build_mode\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}MODE ?= \"$cs_build_mode\" ;
 "
 
 
@@ -21213,7 +21213,7 @@ echo "$as_me:$LINENO: result: $enable_plugins" >&5
 echo "${ECHO_T}$enable_plugins" >&6
 cs_makefile_text="${cs_makefile_text}USE_PLUGINS = $enable_plugins
 "
-    cs_jamconfig_text="${cs_jamconfig_text}USE_PLUGINS = \"$enable_plugins\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}USE_PLUGINS ?= \"$enable_plugins\" ;
 "
 if test $enable_plugins != yes; then
   cs_header_text="${cs_header_text}#define CS_STATIC_LINKED
@@ -21290,16 +21290,16 @@ if test $exec_prefix = NONE; then
 fi
 
 
-cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.PREFIX = \"$prefix\" ;
+cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.PREFIX ?= \"$prefix\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.EXEC_PREFIX = \"$exec_prefix\" ;
+cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.EXEC_PREFIX ?= \"$exec_prefix\" ;
 "
 
 # Hack: Unfortunately, values of the other directories often contain references
 # to prefix and exec_prefix in lowercase, thus we duplicate the above values.
-cs_jamconfig_text="${cs_jamconfig_text}prefix = \"\$(INSTALLDIR.PREFIX)\" ;
+cs_jamconfig_text="${cs_jamconfig_text}prefix ?= \"\$(INSTALLDIR.PREFIX)\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}exec_prefix = \"\$(INSTALLDIR.EXEC_PREFIX)\" ;
+cs_jamconfig_text="${cs_jamconfig_text}exec_prefix ?= \"\$(INSTALLDIR.EXEC_PREFIX)\" ;
 "
 
 # Hack: Mutilate Autoconf's default paths.
@@ -21320,35 +21320,35 @@ fi
 mapdir="$datadir/maps" ;
 plugindir="$libdir/$PACKAGE_NAME" ;
 
-cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.APPLICATION = \"$bindir\" ;
+cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.APPLICATION ?= \"$bindir\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.SBIN = \"$sbindir\" ;
+cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.SBIN ?= \"$sbindir\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.LIBEXEC = \"$libexecdir\" ;
+cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.LIBEXEC ?= \"$libexecdir\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.DATA = \"$datadir\" ;
+cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.DATA ?= \"$datadir\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.MAP = \"$mapdir\" ;
+cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.MAP ?= \"$mapdir\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.CONFIG = \"$sysconfdir\" ;
+cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.CONFIG ?= \"$sysconfdir\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.SHAREDSTATE = \"$sharedstatedir\" ;
+cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.SHAREDSTATE ?= \"$sharedstatedir\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.LOCALSTATE = \"$localstatedir\" ;
+cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.LOCALSTATE ?= \"$localstatedir\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.PLUGIN = \"$plugindir\" ;
+cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.PLUGIN ?= \"$plugindir\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.DOC = \"$docdir\" ;
+cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.DOC ?= \"$docdir\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.LIBRARY = \"$libdir\" ;
+cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.LIBRARY ?= \"$libdir\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.INCLUDE = \"$includedir\" ;
+cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.INCLUDE ?= \"$includedir\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.OLDINCLUDE = \"$oldincludedir\" ;
+cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.OLDINCLUDE ?= \"$oldincludedir\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.INFO = \"$infodir\" ;
+cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.INFO ?= \"$infodir\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.MAN = \"$mandir\" ;
+cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.MAN ?= \"$mandir\" ;
 "
 
 
@@ -21413,17 +21413,17 @@ cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM += \$(CXXFLAGS.SYSTEM)
 #------------------------------------------------------------------------------
 # Boilerplate: Jamconfig
 #------------------------------------------------------------------------------
-cs_jamconfig_text="${cs_jamconfig_text}PACKAGE.NAME = \"$PACKAGE_NAME\" ;
+cs_jamconfig_text="${cs_jamconfig_text}PACKAGE.NAME ?= \"$PACKAGE_NAME\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}PACKAGE.VERSION = \"$PACKAGE_VERSION\" ;
+cs_jamconfig_text="${cs_jamconfig_text}PACKAGE.VERSION ?= \"$PACKAGE_VERSION\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}PACKAGE.STRING = \"$PACKAGE_STRING\" ;
+cs_jamconfig_text="${cs_jamconfig_text}PACKAGE.STRING ?= \"$PACKAGE_STRING\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}PACKAGE.BUGREPORT = \"$PACKAGE_BUGREPORT\" ;
+cs_jamconfig_text="${cs_jamconfig_text}PACKAGE.BUGREPORT ?= \"$PACKAGE_BUGREPORT\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}JAMCONFIG_READ = \"yes\" ;
+cs_jamconfig_text="${cs_jamconfig_text}JAMCONFIG_READ ?= \"yes\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}CONFIGURE_INVOCATION = \"$0 $ac_configure_args\" ;
+cs_jamconfig_text="${cs_jamconfig_text}CONFIGURE_INVOCATION ?= \"$0 $ac_configure_args\" ;
 "
 
 

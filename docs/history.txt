@@ -7,6 +7,9 @@ The history order is reversed so that new features are at the top.
 	- Philip Wyett fixed clean of 'CS' root dir for 'jam distclean'
 	  after recent configure merge/changes.
 	    - Eliminated DO_ASM redefinition in jam build.
+	- Matze changed autoconf script to use ?= instead of = in Jamconfig.
+	  This allows to override values on the jam commandline.
+	  (Example: jam -sMODE=optimize)
 11-Apr-2003
 	- Fixed a problem with portals in combination with <hardmove>
 	  and HardTransform(). The problem was that the sector and portal
