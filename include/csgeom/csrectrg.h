@@ -74,6 +74,8 @@ public:
   void Include(csRect &rect);
   /// Exclude a rect from this region; may cause splitting. NOTE: broken!!! 
   void Exclude(csRect &rect);
+  /// Clips everything in the region to the borders given.
+  void ClipTo(csRect &clip);
 
   /// Returns the number of rectangles in this region
   int Count() { return region_count; }
