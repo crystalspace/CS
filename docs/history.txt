@@ -72,6 +72,7 @@ chronological order.
 	  it manually via iGraphics2D.  He also added iImage cursor support to
 	  the software X-windows canvas (however, it presently converts colored
 	  cursors to black and white).
+	- Eric Sunshine eliminated compilation warnings in some canvases.
 10-Dec-2003
 	- Eric Sunshine fixed bug in unix.mak where it was incorrectly
 	  exporting the hard-coded "-ldl -lm" to cs-config's --libs option even

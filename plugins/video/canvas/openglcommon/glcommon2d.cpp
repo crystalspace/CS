@@ -444,7 +444,6 @@ void csGraphics2DGLCommon::Blit (int x, int y, int w, int h,
 {
   int orig_x = x;
   int orig_y = y;
-  int orig_w = w;
   if ((x > ClipX2) || (y > ClipY2))
     return;
   if (x < ClipX1)

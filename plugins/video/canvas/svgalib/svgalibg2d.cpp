@@ -60,7 +60,7 @@ static unsigned char mouseptr_pixmap_orig[] =
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 };
 
-static unsigned short ScanCodeToChar[128] =
+static unsigned int ScanCodeToChar[128] =
 {
   CSKEY_ESC,27,       '1',      '2',      '3',      '4',      '5',      '6',    // 00..07
   '7',      '8',      '9',      '0',      '-',      '=',      '\b',     '\t',   // 08..0F
@@ -349,7 +349,7 @@ bool csGraphics2DSVGALib::HandleEvent (iEvent &/*Event*/)
 */
   for (unsigned int scancode = 0; scancode < 128; scancode++)
   {
-    int key = ScanCodeToChar [scancode];
+    unsigned int key = ScanCodeToChar [scancode];
     bool down = key ? keyboard_keypressed (scancode) : false;
     if (down != keydown [scancode])
     {
