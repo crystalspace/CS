@@ -21,7 +21,7 @@ INSTALL_LOG=$(INSTALL_DIR)/install.log
 
 # the $(INSTALL_DIR)/include dir is done later
 $(INSTALL_DIR) $(INSTALL_DIR)/data $(INSTALL_DIR)/bin $(INSTALL_DIR)/lib \
-$(INSTALL_DIR)/docs $(INSTALL_DIR)/data/config:
+$(INSTALL_DIR)/data/config:
 	$(MKDIR)
 
 # list the install.log in the install.log to be deleted.
