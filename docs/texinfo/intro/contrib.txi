@@ -559,8 +559,14 @@ Mattias provided a patch with a cleaner handling of the X11 visual and window
 creation.
 
 @item
+Javier Santos (@email{jsantos@@infonegocio.com})
+
+Javier contributed the XML/Schema for the CS world file format.
+
+@item
 Matze Braun (@email{matze@@braunis.di})
-Matze  did various changes, fixes
+
+Matze did various changes, fixes
 and enhancements to @sc{cs} (too many to list). Some of the more important
 ones are: cs-config scripting facility, documentation annotation system,
 several bug fixes, enhancements and fixes to Map2CS, new null canvas for the
