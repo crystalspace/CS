@@ -66,56 +66,56 @@ bool CMapFile::Read(const char* filename, const char* configfile)
 
   bool inBrush = false;
 
-  char Buff[1000], Key[1000], Value[1000];
+  csString Buff, Key, Value;
   while (preParser.GetNextToken(Buff))
   {
     if (strcmp(Buff, "{")==0) 
+    {
+      //new entity//
+      while (preParser.GetNextToken(Buff)) 
+      {	
+	if (strcmp(Buff, "}")==0) 
 	{
-	  //new entity//
-	  while (preParser.GetNextToken(Buff)) 
-	  {	
-	    if (strcmp(Buff, "}")==0) 
-		{
-		  //end of entity or brush//
-		  if (inBrush)
-			  inBrush = false;
-		  else
-              break;
-		} 
-		else if (strcmp(Buff, "{")==0) 
-		{
-          //Beginning of brush//
-		  inBrush = true;
-		}
-		else if (strcmp(Buff, "{")==0)
-		{
-		  //Info in a brush//
-		}
-		else
-		{
-		  //Key Pair//
-		  strcpy(Key, Buff);
-		  if (strcmp(Key, "archive")==0) 
-		  {
-            if (!preParser.GetNextToken(Buff))
-            {
-              preParser.ReportError("Format error. Keys and values for entities must"
-                             "always come in pairs. Found no match for key \"%s\"",
-                             Key);
-              return false;
-            }
-			strcpy(Value, Buff);
-			m_TextureManager.LoadArchive(Value);
-		  }
-		}
+	  //end of entity or brush//
+	  if (inBrush)
+	    inBrush = false;
+	  else
+	    break;
+	} 
+	else if (strcmp(Buff, "{")==0) 
+	{
+	  //Beginning of brush//
+	  inBrush = true;
+	}
+	else if (strcmp(Buff, "{")==0)
+	{
+	  //Info in a brush//
+	}
+	else
+	{
+	  //Key Pair//
+	  Key.Replace (Buff);
+	  if (strcmp(Key, "archive")==0) 
+	  {
+	    if (!preParser.GetNextToken (Buff))
+	    {
+	      preParser.ReportError("Format error. Keys and values for entities must"
+			    "always come in pairs. Found no match for key \"%s\"",
+			    Key.GetData());
+	      return false;
+	    }
+	    Value.Replace (Buff);
+	    m_TextureManager.LoadArchive (Value);
 	  }
 	}
+      }
+    }
   }
 
   CMapParser parser;
   if (!parser.Open(filename)) return false;
 
-  char Buffer[1000];
+  csString Buffer;
 
   while (parser.GetNextToken(Buffer))
   {
@@ -125,7 +125,7 @@ bool CMapFile::Read(const char* filename, const char* configfile)
       CMapEntity* pEntity = new CMapEntity;
       if (!pEntity->Read(&parser, this))
       {
-        break;
+        return false;
       }
       m_Entities.Push(pEntity);
       m_NumBrushes += pEntity->GetNumBrushes();
@@ -133,7 +133,7 @@ bool CMapFile::Read(const char* filename, const char* configfile)
     else
     {
       parser.ReportError("Format error! Expected an entity, that starts with \"{\" "
-                         "but found \"%s\"", Buffer);
+                         "but found \"%s\"", Buffer.GetData());
       return false;
     }
   }

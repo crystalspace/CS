@@ -90,8 +90,8 @@ CMapBrush::~CMapBrush()
 
 bool CMapBrush::Read(CMapParser* pParser, CMapFile* pMap)
 {
-  char Buffer[1000];
-  char TextureName[1000];
+  csString Buffer;
+  csString TextureName;
   bool finished = false;
   m_Line = pParser->GetCurrentLine();
 
@@ -110,7 +110,7 @@ bool CMapBrush::Read(CMapParser* pParser, CMapFile* pMap)
       if (strcmp(Buffer, "(") != 0)
       {
         pParser->ReportError("Format error. Expected either \"(\" or \"}\""
-                             ", Found\"%s\"", Buffer);
+                             ", Found\"%s\"", Buffer.GetData());
         return false;
       }
 
@@ -137,7 +137,7 @@ bool CMapBrush::Read(CMapParser* pParser, CMapFile* pMap)
 
       //Get the name of the Texture
       if (!pParser->GetTextToken(Buffer)) return false;
-      strcpy(TextureName, Buffer);
+      TextureName.Replace (Buffer);
 
       //Get Texture coordinates:
 
@@ -232,7 +232,8 @@ bool CMapBrush::Read(CMapParser* pParser, CMapFile* pMap)
             unsigned int val;
             if (sscanf(Buffer, "%ud%c", &val, &cDummy)!=1)
             {
-              pParser->ReportError("Invalid Numeric format. Expected int, found \"%s\"", Buffer);
+              pParser->ReportError("Invalid Numeric format. Expected int, found \"%s\"", 
+		Buffer.GetData());
               return false;
             }
             if (!pParser->GetSafeToken(Buffer)) return false;

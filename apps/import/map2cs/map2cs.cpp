@@ -117,7 +117,8 @@ int appMain (iObjectRegistry* object_reg, int argc, char *argv[])
 
   CMapFile Map;
   printf("Reading map '%s'...\n", mapfile);
-  Map.Read(mapfile, configfile);
+  if (!Map.Read(mapfile, configfile))
+    return 2;
 
   Map.CreatePolygons();
   printf("Generating data for world '%s'...\n", worldfile);

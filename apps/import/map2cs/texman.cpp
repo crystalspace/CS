@@ -100,7 +100,7 @@ void CTextureManager::LoadTextureArchives(CMapFile* pMap)
 
 }
 
-void CTextureManager::LoadArchive(char* filename)
+void CTextureManager::LoadArchive (const char* filename)
 {
 
   /******************************

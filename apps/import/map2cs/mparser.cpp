@@ -29,7 +29,6 @@ CMapParser::CMapParser()
   m_Eof = false;
   m_CurrentLine = 0;
   memset(m_NextChars, 0, sizeof(m_NextChars));
-  memset(m_NextToken, 0, sizeof(m_NextToken));
 }
 
 CMapParser::~CMapParser()
@@ -57,9 +56,9 @@ bool CMapParser::Open(const char* filename)
     GetNextChar(); //Ensure m_NextChars is inited;
   }
 
-  if (!ReadNextToken(m_NextToken, sizeof(m_NextToken)))
+  if (!ReadNextToken (m_NextToken))
   {
-    m_NextToken[0] = 0;
+    m_NextToken.Clear();
   }
 
   return true;
@@ -95,9 +94,10 @@ bool CMapParser::GetNextChar()
   }
 }
 
-bool CMapParser::SkipWhitespace()
+bool CMapParser::SkipWhitespace ()
 {
-  while (m_NextChars[0] <= ' ')
+  char ch;
+  while ((ch = m_NextChars[0]) <= ' ')
   {
     if (!GetNextChar())
     {
@@ -119,28 +119,30 @@ bool CMapParser::SkipToNextLine()
   return true;
 }
 
-bool CMapParser::GetNextToken(char* str)
+bool CMapParser::GetNextToken (csString& str)
 {
-  strcpy(str, m_NextToken);
-  if (m_NextToken[0] == 0) return false;
-  ReadNextToken(m_NextToken, sizeof(m_NextToken));
+  str.Replace (m_NextToken);
+  if (m_NextToken.IsEmpty() && !emptinessHack) return false;
+  ReadNextToken (m_NextToken);
   return true;
 }
 
-bool CMapParser::PeekNextToken(char* str)
+bool CMapParser::PeekNextToken (csString& str)
 {
-  strcpy(str, m_NextToken);
-  if (m_NextToken[0] == 0) return false;
+  str.Replace (m_NextToken);
+  if (m_NextToken.IsEmpty() && !emptinessHack) return false;
   return true;
 }
 
-bool CMapParser::ReadNextToken(char* str, int maxlen)
+bool CMapParser::ReadNextToken (csString& str)
 {
-  char *strStart = str;
+  //char *strStart = str;
 
-  *str = 0; //clear the string first
+  //*str = 0; 
+  str.Clear(); //clear the string first
+  emptinessHack = false;
 
-  if (!SkipWhitespace()) return false;
+  if (!SkipWhitespace ()) return false;
 
   //Check for Comments, that start by "//" and end at the end of the line
   if (m_NextChars[0] == '/' && m_NextChars[1] == '/')
@@ -163,8 +165,8 @@ bool CMapParser::ReadNextToken(char* str, int maxlen)
       if (!GetNextChar())    return false;
       if (!SkipToNextLine()) return false;
       if (!SkipWhitespace()) return false;
-      strcpy(str, "//TX1");
-      str[4] = Num;
+      str.Replace ("//TX1");
+      str.SetAt (4, Num);
       return true;
     }
 
@@ -174,7 +176,7 @@ bool CMapParser::ReadNextToken(char* str, int maxlen)
     if (!SkipWhitespace()) return false;
 
     //Call recursively, to eliminate multiple commented lines.
-    return ReadNextToken(str, maxlen-(str-strStart));
+    return ReadNextToken (str);
   }
 
   //Quoted strings are returned directly
@@ -185,7 +187,7 @@ bool CMapParser::ReadNextToken(char* str, int maxlen)
       //drop the '\"' character
       if (!GetNextChar())
       {
-        *str = 0;     //Terminate the string anyway
+        //*str = 0;     //Terminate the string anyway
         return false; //if we fail now, the token is not complete!
       }
 
@@ -194,11 +196,13 @@ bool CMapParser::ReadNextToken(char* str, int maxlen)
         //The end of the string has been reached
 
         GetNextChar(); //remove the end of string token (We dont care for success here!)
-        *str = 0;
+	emptinessHack = str.IsEmpty();
+        //*str = 0;
         return true;
       }
-      *str++ = m_NextChars[0];
-    } while (str<(strStart+maxlen));
+      //*str++ = m_NextChars[0];
+      str << m_NextChars[0];
+    } while(1); //while (str<(strStart+maxlen));
   }
 
   // Check for special single character tokens
@@ -213,8 +217,9 @@ bool CMapParser::ReadNextToken(char* str, int maxlen)
     //to be accepted. (otherwise there are problems with special texture names)
     if (m_NextChars[1] < ' ')
     {
-      *str++ = m_NextChars[0];
-      *str   = 0;
+      //*str++ = m_NextChars[0];
+      //*str   = 0;
+      str << m_NextChars[0];
       GetNextChar(); //Remove this token (We don't care for success here!)
       return true;
     }
@@ -223,12 +228,13 @@ bool CMapParser::ReadNextToken(char* str, int maxlen)
   //parse a regular word
   do
   {
-    *str++ = m_NextChars[0];
+    //*str++ = m_NextChars[0];
+    str << m_NextChars[0];
     if (!GetNextChar())
     {
       //if there are no more characters, we claim the token
       //ended here in a regular way.
-      *str = 0;
+      //*str = 0;
       return true;
     }
 
@@ -242,9 +248,10 @@ bool CMapParser::ReadNextToken(char* str, int maxlen)
     {
       break;
     }
-  } while (str<(strStart+maxlen));
+  } while (1); //(str<(strStart+maxlen));
 
-  if (str>=(strStart+maxlen)) {
+  /*if (str>=(strStart+maxlen)) 
+  {
     char tokenBegin[16];
 
     strncpy(tokenBegin, strStart, sizeof(tokenBegin)-1);
@@ -254,13 +261,13 @@ bool CMapParser::ReadNextToken(char* str, int maxlen)
     return false;
   }
 
-  *str = 0;
+  *str = 0;*/
   return true;
 }
 
 bool CMapParser::GetIntToken  (int& val)
 {
-  char Buffer[1000];
+  csString Buffer;
   if (!GetNextToken(Buffer))
   {
     ReportError("Unexpected end of file. (expected an int number)");
@@ -269,7 +276,8 @@ bool CMapParser::GetIntToken  (int& val)
   char dummy;
   if (sscanf(Buffer, "%d%c", &val, &dummy)!=1)
   {
-    ReportError("Invalid Numeric format. Expected int, found \"%s\"", Buffer);
+    ReportError("Invalid Numeric format. Expected int, found \"%s\"", 
+      Buffer.GetData());
     return false;
   }
   return true;
@@ -277,7 +285,7 @@ bool CMapParser::GetIntToken  (int& val)
 
 bool CMapParser::GetFloatToken(double& val)
 {
-  char Buffer[1000];
+  csString Buffer;
   if (!GetNextToken(Buffer))
   {
     ReportError("Unexpected end of file. (expected a double number)");
@@ -286,7 +294,8 @@ bool CMapParser::GetFloatToken(double& val)
   char dummy;
   if (sscanf(Buffer, "%lf%c", &val, &dummy)!=1)
   {
-    ReportError("Invalid Numeric format. Expected double, found \"%s\"", Buffer);
+    ReportError("Invalid Numeric format. Expected double, found \"%s\"", 
+      Buffer.GetData());
     return false;
   }
   return true;
@@ -294,7 +303,7 @@ bool CMapParser::GetFloatToken(double& val)
 
 bool CMapParser::ExpectToken(const char* ExpectedToken)
 {
-  char Buffer[1000];
+  csString Buffer;
   if (!GetNextToken(Buffer))
   {
     ReportError("Unexpected end of file. (expected \"%s\")", ExpectedToken);
@@ -303,13 +312,13 @@ bool CMapParser::ExpectToken(const char* ExpectedToken)
   if (strcmp(Buffer, ExpectedToken) != 0)
   {
     ReportError("Unexpected Token found. Expected \"%s\", found \"%s\"",
-                ExpectedToken, Buffer);
+                ExpectedToken, Buffer.GetData());
     return false;
   }
   return true;
 }
 
-bool CMapParser::GetTextToken (char*  text)
+bool CMapParser::GetTextToken (csString& text)
 {
   if (!GetNextToken(text))
   {
@@ -319,7 +328,7 @@ bool CMapParser::GetTextToken (char*  text)
   return true;
 }
 
-bool CMapParser::GetSafeToken (char* str)
+bool CMapParser::GetSafeToken (csString& str)
 {
   if (!GetNextToken(str))
   {
@@ -329,23 +338,12 @@ bool CMapParser::GetSafeToken (char* str)
   return true;
 }
 
-void CMapParser::ReportError(const char* message,
-                             const char* info1,
-                             const char* info2)
+void CMapParser::ReportError(const char* message, ...)
 {
-  char Msg1[1000], Msg2[1000];
-  if (info1 && info2)
-  {
-    sprintf(Msg1, message, info1, info2);
-  }
-  else if (info1)
-  {
-    sprintf(Msg1, message, info1);
-  }
-  else
-  {
-    sprintf(Msg1, message);
-  }
-  sprintf(Msg2, "Error in line %d: %s\n", m_CurrentLine, Msg1);
-  printf(Msg2);
+  printf("Error in line %d: ", m_CurrentLine);
+  va_list args;
+  va_start (args, message);
+  vprintf (message, args);
+  va_end (args);
+  printf("\n");
 }

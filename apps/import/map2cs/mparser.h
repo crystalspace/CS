@@ -30,11 +30,6 @@
 const int ReadAhead = 10;
 
 /**
-  * Defines the maximum length of a token.
-  */
-const int MaxTokenLen = 300;
-
-/**
   * This class will parse the map file. It will translate the ASCII
   * stream into Tokens, and will also keep track of the current
   * line numbers.
@@ -81,7 +76,7 @@ public:
     * (because of end of file), an error message is displayed, and
     * false is being returned
     */
-  bool GetTextToken (char*  text);
+  bool GetTextToken (csString& str);
 
   /**
     * Returns the next token. If there is no next token.
@@ -90,7 +85,7 @@ public:
     * It is about the same code as GetTextToken, but the error
     * message is more general, and will not mention "text".
     */
-  bool GetSafeToken (char* str);
+  bool GetSafeToken (csString& str);
 
   /**
     * Gets the next token and compares it with the expected token.
@@ -109,9 +104,7 @@ public:
     * class from this class, which will display a csMessageBox,
     * while a console application will just do a printf.
     */
-  virtual void ReportError(const char* message,
-                           const char* info1=0,
-                           const char* info2=0);
+  virtual void ReportError (const char* message, ...);
 
 
   /**
@@ -120,7 +113,7 @@ public:
     * return false, otherwise it will return true.
     * This method will not generate any error messages by itself!
     */
-  bool GetNextToken(char* str);
+  bool GetNextToken(csString& str);
 
   /**
     * Peeks at the Next token from in the file. If there is no next
@@ -130,7 +123,7 @@ public:
     * This method can be called without changing the state of the
     * parser!
     */
-  bool PeekNextToken(char* str);
+  bool PeekNextToken(csString& str);
 
   /**
     * Return the number of the line, that is currently being processed.
@@ -141,7 +134,7 @@ protected:
   /**
     * Reads the next token directly from the imputfile
     */
-  bool ReadNextToken(char* str, int maxlen);
+  bool ReadNextToken (csString& str);
 
   /**
     * Gets the next character into the m_NextChars array. If there
@@ -154,7 +147,7 @@ protected:
     * Skips all whitespace (characters smaller or equal than ' '
     * in the current input stream)
     */
-  bool  SkipWhitespace();
+  bool  SkipWhitespace ();
 
   /**
     * Skips any character till the next line has started.
@@ -172,7 +165,13 @@ protected:
     * Here is the next token stored, so one can use PeekNextToken to take
     * a look at it, without causing problems.
     */
-  char m_NextToken[MaxTokenLen];
+  csString m_NextToken;
+  /*
+    @@@ Hack: an empty m_NextToken signals the end of the file. However,
+    under certain circumstances an empty token is perfectly valid
+    (specifically, if specified via ""). Allow those.
+   */
+  bool emptinessHack;
 
   /**
     * True, if the file has ended. (Note, that there may still be

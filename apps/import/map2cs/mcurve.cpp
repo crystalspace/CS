@@ -49,7 +49,7 @@ CMapCurve::~CMapCurve()
 
 bool CMapCurve::Read(CMapParser* pParser, CMapFile* pMap)
 {
-  char   Buffer[1000];
+  csString Buffer;
   int    iDummy;
 
   m_Line = pParser->GetCurrentLine();
@@ -62,7 +62,8 @@ bool CMapCurve::Read(CMapParser* pParser, CMapFile* pMap)
 
   if (!m_pTexture)
   {
-    pParser->ReportError("Texture \"%s\" not found!", Buffer);
+    pParser->ReportError("Texture \"%s\" not found!", 
+      Buffer.GetData());
     return false;
   }
 

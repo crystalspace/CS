@@ -294,15 +294,16 @@ bool CIWorld::PrepareData(const char* filename, CMapFile* pMap)
   for (int i = 0; i < maxEnt; i++) 
   {
     CMapEntity*	curEnt = pMap->GetEntity(i);
-	double curScale;
 
-	if (strcmp(curEnt->GetValueOfKey("classname"), "worldspawn")==0) {
-	  curScale = curEnt->GetNumValueOfKey("world_scale");
-
-	  if (curScale != 0.0)
-	    m_ScaleFactor = curScale;
-
-	}
+    const char* classname = curEnt->GetValueOfKey("classname");
+    if ((classname != 0) && (strcmp(classname, "worldspawn") == 0))
+    {
+      if (curEnt->GetValueOfKey ("world_scale", 0) != 0)
+      {
+	m_ScaleFactor = curEnt->GetNumValueOfKey ("world_scale");
+	break;
+      }
+    }
   }
 
   BuildTexturelist();

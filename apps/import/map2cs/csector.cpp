@@ -149,17 +149,23 @@ bool CCSSector::Write(csRef<iDocumentNode> node, CIWorld* pIWorld)
   if (m_IsDefaultsector && 
     !worldspawn->GetBoolValueOfKey ("skyportalsonly", false))
   {
-    DocNode meshobj = CreateNode (sector, "meshobj");
-    meshobj->SetAttribute ("name", "_defaultsky");
+    bool hasSky = worldspawn->GetValueOfKey("skybox") || 
+      worldspawn->GetValueOfKey("skydome");
 
-    CreateNode (meshobj, "plugin", "thing");
-    CreateNode (meshobj, "zfill");
-    CreateNode (meshobj, "priority", "sky");
-    CreateNode (meshobj, "camera");
+    if (hasSky)
+    {
+      DocNode meshobj = CreateNode (sector, "meshobj");
+      meshobj->SetAttribute ("name", "_defaultsky");
 
-    DocNode params = CreateNode (meshobj, "params");
+      CreateNode (meshobj, "plugin", "thing");
+      CreateNode (meshobj, "zfill");
+      CreateNode (meshobj, "priority", "sky");
+      CreateNode (meshobj, "camera");
 
-    pWorld->WriteSky (params);
+      DocNode params = CreateNode (meshobj, "params");
+
+      pWorld->WriteSky (params);
+    }
   }
 
   {

@@ -48,7 +48,7 @@ public:
   void LoadTextureArchives(CMapFile* pMap);
 
   /// Load all the texture archive files, that are specified in the config file.
-  void LoadArchive(char* filename);
+  void LoadArchive (const char* filename);
 
   /// Find the required Texture, and return a pointer to it.
   CTextureFile* GetTexture(const char* TextureName);

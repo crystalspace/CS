@@ -57,13 +57,16 @@ CMapEntity::~CMapEntity()
 
 bool CMapEntity::Read(CMapParser* pParser, CMapFile* pMap)
 {
-  char Buffer[1000];
-  char Key   [1000];
+  csString Buffer;
+  csString Key;
   bool finished = false;
+  int bufferLine, bufferLine2;
 
   while (!finished)
   {
+    bufferLine = pParser->GetCurrentLine();
     if (!pParser->GetSafeToken(Buffer)) return false;
+    bufferLine2 = pParser->GetCurrentLine();
     if (strcmp(Buffer, "{") == 0)
     {
       //This entity contains some brushes or curves!
@@ -86,7 +89,7 @@ bool CMapEntity::Read(CMapParser* pParser, CMapFile* pMap)
       else
       {
         pParser->ReportError("Format error! Expected either \"(\" or \"patchDef2\""
-                             ", Found\"%s\"", Buffer);
+                             ", Found\"%s\"", Buffer.GetData());
         return false;
       }
     }
@@ -99,12 +102,12 @@ bool CMapEntity::Read(CMapParser* pParser, CMapFile* pMap)
     else
     {
       //Now this seems to be a key/ value pair
-      strcpy(Key, Buffer);
-      if (!pParser->GetNextToken(Buffer))
+      Key.Replace (Buffer);
+      if ((bufferLine != bufferLine2) || !pParser->GetNextToken(Buffer))
       {
         pParser->ReportError("Format error. Keys and values for entities must"
                              "always come in pairs. Found no match for key \"%s\"",
-                             Key);
+                             Key.GetData());
         return false;
       }
       AddKeyValuePair(Key, Buffer);
@@ -118,7 +121,7 @@ void CMapEntity::AddKeyValuePair(const char* Key, const char* Value)
   m_Keymap.Push(new CMapKeyValuePair(Key, Value));
 }
 
-const char* CMapEntity::GetValueOfKey(const char* key, const char* defaultvalue)
+const char* CMapEntity::GetValueOfKey (const char* key, const char* defaultvalue)
 {
   int i, NumKeys = m_Keymap.Length();
   for (i=0; i<NumKeys; i++)
