@@ -86,7 +86,7 @@ class csRefHashKeyHandler
 public:
   static uint32 ComputeHash (const csRef<T>& key)
   {
-    return (uint32)((T*)key);
+    return (intptr_t) ((T*)key);
   }
 
   static bool CompareKeys (const csRef<T>& key1, const csRef<T>& key2)
