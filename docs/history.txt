@@ -4,6 +4,11 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 27-May-2003
+	- Boyan made the following:
+	    - Fixed kyboard focusing component bug in AWS 
+	    - Added awsWindow::Show() and awsWindow::Hide() in AWS. 
+	    - This features allows triger these events in .def file (using signalWindowShown 
+	      and signalWindowHidden) 
 	- Philip Wyett added *.pyd (Python DLL's) and *.csplugin to the
           CS root directory .cvsignore file.
 	- Philip Wyett Corrected MSVC 6 docs build requirement of minimum Python
