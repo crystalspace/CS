@@ -29,6 +29,8 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
+vpath %.cpp plugins/video/render3d/shaderplugins/glshader_arb
+
 ifneq (,$(strip $(LIBS.OPENGL.SYSTEM)))
   LIB.GLSHADER_ARB.LOCAL += $(LIBS.OPENGL.SYSTEM)
 else
