@@ -61,6 +61,10 @@ chronological order.
 	- Eric Sunshine fixed problem in Recurse rule in helper.jam where it
 	  was using 'rule' as a variable name. This confused Jam 2.4 since
 	  'rule' is also a keyword.
+	- Jorrit fixed a big booboo in the clipper enhancements he did
+	  yesterday on chunklod. The results of the BoxFrustum() routine
+	  were interpreted wrong which causes them to cause unneeded
+	  clipping.
 20-Apr-2004
 	- Jorrit added 'camera_origin' to csRenderMesh. The meshes will
 	  fill this field with the origin of that mesh in camera space. This
