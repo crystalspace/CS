@@ -757,7 +757,7 @@ void csGraphics3DGlide2x::ClearBufferUnderTop ()
    grConstantColorValue ( 0xffff0000 ); 
    G3DZBufMode mode=m_ZBufMode;
 
-   m_ZBufMode=0;
+   m_ZBufMode = CS_ZBUF_NONE;
    grDepthMask ( FXTRUE );
    grDepthBufferFunction ( GR_CMP_NOTEQUAL );
    grDepthBufferMode ( GR_DEPTHBUFFER_WBUFFER_COMPARE_TO_BIAS );
@@ -1049,7 +1049,7 @@ void csGraphics3DGlide2x::DrawPolygon (G3DPolygonDP& poly)
   float J1, J2, J3, K1, K2, K3;
   float M, N, O;
   float x,y,ooz,z,u,v,lu,lv;
-  int i,j;
+  int i;
 
   // set up the geometry.
 #ifdef DO_HW_UVZ
@@ -1084,6 +1084,10 @@ void csGraphics3DGlide2x::DrawPolygon (G3DPolygonDP& poly)
       m_dpverts[i].b = 255;
     }
   }
+
+#ifdef DO_HW_UVZ
+  int j;
+#endif
 
   for(i=0;i < poly.num;i++)
   {
