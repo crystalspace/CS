@@ -222,7 +222,7 @@ public:
   void GetCameraBoundingBox (const csTransform& obj2cam, csBox3& cbox);
 
   /**
-   * Get a bounding box in screen space.
+   * Get a bounding box in screen space and camera space.
    * This function will use GetCameraBoundingBox().
    * It will fill in the boundingBox with the X and Y locations
    * of the curve.  Returns the max Z location of the curve,
@@ -231,7 +231,7 @@ public:
    * not valid.
    */
   float GetScreenBoundingBox (const csTransform& obj2cam,
-  	iCamera* camera, csBox2& boundingBox);
+  	iCamera* camera, csBox3& cameraBox, csBox2& boundingBox);
 
   /**
    * Lighting support. If IsLightable returns true, PosInSpace and Normal should

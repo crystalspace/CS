@@ -20,13 +20,13 @@
 #define __CS_DTMESH_H__
 
 #include "ivideo/graph3d.h"
-class csClipper;
+struct iClipper2D;
 
 void DefaultDrawTriangleMesh (
   G3DTriangleMesh& mesh,
   iGraphics3D* g3d,
   csReversibleTransform& o2c,
-  csClipper* clipper,
+  iClipper2D* clipper, int cliptype,
   float aspect,
   int width2,
   int height2);

@@ -1,5 +1,66 @@
 The history order is reversed so that new features are at the top.
 
+3-May-2001
+	- Martin Geisse removed a few warnings in stars and OpenGL.
+	- Changed the do_clip parameter in G3DTriangleMesh to clip_portal
+	  and clip_plane.
+	  There are two kinds of clipping: portal clipping (clipping to the
+	  boundaries of the last portal we went through) and portalplane
+	  clipping (clipping to the plane of the portal itself). Both are
+	  handled seperatelly.
+	  There are three cases for both portal clipping as portalplane
+	  clipping (these are set in the fields clip_portal and clip_plane):
+	  	- No clipping required (CS_CLIP_NOT): in this case the
+		  engine is sure that the mesh will not need any clipping.
+		- Clipping needed (CS_CLIP_NEEDED): in this case the
+		  engine thinks that clipping may be needed. Depending on
+		  the type of clipper (see later) this clipping is optional
+		  or not.
+		- Clipping for toplevel (CS_CLIP_TOPLEVEL): in this case the
+		  engine knows that no clipping is needed to the current
+		  clipper but clipping may be needed for the toplevel
+		  clipper (or Z=SMALL_Z plane if used for plane clipping).
+	  The engine will give a clipper to G3D. There are three cases:
+	  	- Optional clipper (CS_CLIPPER_OPTIONAL): the clipper is
+		  optional. This means that the z-buffer contents can
+		  be trusted to clip the object. But a renderer for which
+		  overdraw is slow can choose to do a lazy clip or exact
+		  clip if it wants.
+		- Toplevel clipper (CS_CLIPPER_TOPLEVEL): the clipper is
+		  the toplevel clipper (i.e. the outermost portal, usually
+		  close to the size of the window or screen). In this
+		  case clipping is required but the renderer may have
+		  some special ways to do this (like initializing the
+		  Z-buffer around the borders of the portal).
+		- Required clipper (CS_CLIPPER_REQUIRED): in this case the
+		  clipper MUST be used (if CS_CLIP_NEEDED is set in the
+		  mesh) and clipping must be exact (i.e. triangles may
+		  not overlap the clip area).
+	- Did the following changes to iGraphics3D:
+	    - Changed SetClipper() and GetClipper() to work with iClipper2D.
+	      This avoids a copy of the clipper.
+	    - Added 'cliptype' parameter to SetClipper() which will be
+	      one of the flags CS_CLIPPER_?
+	    - Added GetClipType() function.
+	    - Added SetNearPlane(), GetNearPlane(), ResetNearPlane(), and
+	      HasNearPlane() to set the near clipping plane.
+	- Fixed all 3D renderers except glide and Direct3D. These are now
+	  totally outdated. Note that the handling in the renderers is not
+	  yet smart. This is the framework. Now I need to do some work
+	  to use the framework for very efficient mesh handling.
+	- Changed the engine to call SetClipper() and SetNearPlane() every
+	  time we go through a portal and at init time. This is much faster
+	  than letting every single mesh object do this.
+	- Changed csRenderView and iRenderView::ClipBBox() to return the
+	  right clip_portal and clip_plane flags depending on the given
+	  bounding boxes (screen and camera space).
+	- Extended csCurve::GetScreenBoundingBox() so that it also returns
+	  the camera bounding box.
+	- Fixed all mesh and terrain plugins to use the new system when
+	  talking to DrawTriangleMesh.
+	- Changed terrfunc terrain plugin to be more clever about clipping
+	  now. This also means that the bug with disappearing polygons
+	  in front of the camera is now completely gone (touch wood!).
 2-May-2001
 	- Fixed the color bug in OpenGL DrawTriangleMesh with multi-
 	  texturing.

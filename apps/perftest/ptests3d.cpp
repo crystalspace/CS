@@ -309,7 +309,8 @@ void MeshTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
   mesh.num_triangles = NUM_MULTIPOLTEST*NUM_MULTIPOLTEST;
   mesh.triangles = new csTriangle [mesh.num_triangles];
   mesh.use_vertex_color = false;
-  mesh.do_clip = false;
+  mesh.clip_portal = CS_CLIP_NOT;
+  mesh.clip_plane = CS_CLIP_NOT;
   mesh.do_fog = false;
   mesh.do_mirror = false;
   mesh.do_morph_texels = false;
@@ -358,6 +359,7 @@ void MeshTester::Draw (iGraphics3D* g3d)
   draw++;
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_FILL);
   //g3d->SetObjectToCamera ();
+  g3d->SetClipper (NULL, CS_CLIPPER_NONE);
   g3d->SetPerspectiveAspect (1);//g3d->GetHeight ());
   g3d->DrawTriangleMesh (mesh);
 }

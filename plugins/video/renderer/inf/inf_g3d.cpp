@@ -168,6 +168,7 @@ void csGraphics3DInfinite::Close()
 
   G2D->Close ();
   width = height = -1;
+  if (clipper) { clipper->DecRef (); clipper = NULL; }
 }
 
 void csGraphics3DInfinite::SetDimensions (int nwidth, int nheight)
@@ -185,25 +186,13 @@ void csGraphics3DInfinite::SetPerspectiveCenter (int x, int y)
   height2 = y;
 }
 
-void csGraphics3DInfinite::SetClipper (csVector2* vertices, int num_vertices)
+void csGraphics3DInfinite::SetClipper (iClipper2D* clip, int cliptype)
 {
-  delete clipper;
-  clipper = NULL;
-  if (!vertices) return;
-  // @@@ This could be better! We are using a general polygon clipper
-  // even in cases where a box clipper would be better. We should
-  // have a special SetBoxClipper call in iGraphics3D.
-  clipper = new csPolygonClipper (vertices, num_vertices, false, true);
-}
-
-void csGraphics3DInfinite::GetClipper (csVector2* vertices, int& num_vertices)
-{
-  if (!clipper) { num_vertices = 0; return; }
-  num_vertices = clipper->GetNumVertices ();
-  csVector2* clip_verts = clipper->GetClipPoly ();
-  int i;
-  for (i = 0 ; i < num_vertices ; i++)
-    vertices[i] = clip_verts[i];
+  if (clip) clip->IncRef ();
+  if (clipper) clipper->DecRef ();
+  clipper = clip;
+  if (!clipper) cliptype = CS_CLIPPER_NONE;
+  csGraphics3DInfinite::cliptype = cliptype;
 }
 
 long csGraphics3DInfinite::GetAccurateTime ()
@@ -275,7 +264,7 @@ void csGraphics3DInfinite::DrawTriangleMesh (G3DTriangleMesh& mesh)
   else
   {
     in_mesh = true;
-    DefaultDrawTriangleMesh (mesh, this, o2c, clipper, aspect, width2, height2);
+    DefaultDrawTriangleMesh (mesh, this, o2c, clipper, cliptype, aspect, width2, height2);
     in_mesh = false;
   }
 }

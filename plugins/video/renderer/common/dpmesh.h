@@ -20,13 +20,13 @@
 #define __CS_DPMESH_H__
 
 #include "ivideo/graph3d.h"
-class csClipper;
+struct iClipper2D;
 
 void DefaultDrawPolygonMesh (
   G3DPolygonMesh& mesh,
   iGraphics3D* g3d,
   csReversibleTransform& o2c,
-  csClipper* clipper,
+  iClipper2D* clipper,
   float aspect,
   float inv_aspect,
   int width2,

@@ -557,16 +557,6 @@ const csReversibleTransform& csOpenGLProcSoftware::GetObjectToCamera ()
   return g3d->GetObjectToCamera (); 
 }
 
-void csOpenGLProcSoftware::SetClipper (csVector2* vertices, int num_vertices)
-{ 
-  g3d->SetClipper (vertices, num_vertices);
-}
-
-void csOpenGLProcSoftware::GetClipper (csVector2* vertices, int& num_vertices)
-{ 
-  g3d->GetClipper (vertices, num_vertices);
-}
-
 // Here we return the main opengl texture manager as all textures are originally
 // registered here.
 iTextureManager *csOpenGLProcSoftware::GetTextureManager ()

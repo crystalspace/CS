@@ -140,10 +140,10 @@ private:
 
   /**
    * Test if this bounding box is visible in the given clipper.
-   * If visible 'do_clip' will be set to true if clipping is needed.
+   * Computed flags are for DrawTriangleMesh.
    */
-  bool BBoxVisible (const csBox3& bbox, iCamera* camera,
-	iClipper2D* clipper, bool& do_clip);
+  bool BBoxVisible (const csBox3& bbox, iRenderView* rview, iCamera* camera,
+	int& clip_portal, int& clip_plane);
 
 public:
   /// Constructor.

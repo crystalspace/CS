@@ -161,6 +161,7 @@ void csGraphics3DLine::Close()
   if ((width == height) && (width == -1))
     return;
 
+  if (clipper) { clipper->DecRef (); clipper = NULL; }
   G2D->Close ();
   width = height = -1;
 }
@@ -179,25 +180,13 @@ void csGraphics3DLine::SetPerspectiveCenter (int x, int y)
   height2 = y;
 }
 
-void csGraphics3DLine::SetClipper (csVector2* vertices, int num_vertices)
+void csGraphics3DLine::SetClipper (iClipper2D* clip, int cliptype)
 {
-  delete clipper;
-  clipper = NULL;
-  if (!vertices) return;
-  // @@@ This could be better! We are using a general polygon clipper
-  // even in cases where a box clipper would be better. We should
-  // have a special SetBoxClipper call in iGraphics3D.
-  clipper = new csPolygonClipper (vertices, num_vertices, false, true);
-}
-
-void csGraphics3DLine::GetClipper (csVector2* vertices, int& num_vertices)
-{
-  if (!clipper) { num_vertices = 0; return; }
-  num_vertices = clipper->GetNumVertices ();
-  csVector2* clip_verts = clipper->GetClipPoly ();
-  int i;
-  for (i = 0 ; i < num_vertices ; i++)
-    vertices[i] = clip_verts[i];
+  if (clip) clip->IncRef ();
+  if (clipper) clipper->DecRef ();
+  clipper = clip;
+  if (!clipper) cliptype = CS_CLIPPER_NONE;
+  csGraphics3DLine::cliptype = cliptype;
 }
 
 bool csGraphics3DLine::BeginDraw (int DrawFlags)

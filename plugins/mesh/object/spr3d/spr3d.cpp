@@ -873,8 +873,9 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   if (GetScreenBoundingBox (camera->GetCameraNumber (),
   	movable->GetUpdateNumber (), fov, shiftx, shifty,
   	tr_o2c, bbox, bbox3) < 0) return false;	// Not visible.
-  bool do_clip;
-  if (rview->ClipBBox (bbox, bbox3, do_clip) == false) return false;
+  int clip_portal, clip_plane;
+  if (rview->ClipBBox (bbox, bbox3, clip_portal, clip_plane) == false)
+    return false;
  
   UpdateWorkTables (factory->GetNumTexels());
   
@@ -899,7 +900,6 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   //   C = Mwc * (Mow * O - Vow - Vwc)
   //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
   g3d->SetObjectToCamera (&tr_o2c);
-  g3d->SetClipper (rview->GetClipper ()->GetClipPoly (), rview->GetClipper ()->GetNumVertices ());
   // @@@ This should only be done when aspect changes...
   g3d->SetPerspectiveAspect (fov);
 
@@ -1048,7 +1048,8 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   g3dmesh.triangles = m->GetTriangles ();
 
   g3dmesh.use_vertex_color = !!vertex_colors;
-  g3dmesh.do_clip = do_clip;
+  g3dmesh.clip_portal = clip_portal;
+  g3dmesh.clip_plane = clip_plane;
   g3dmesh.do_mirror = camera->IsMirrored ();
   g3dmesh.do_morph_texels = false;
   g3dmesh.do_morph_colors = false;

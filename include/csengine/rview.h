@@ -283,12 +283,12 @@ public:
   	G3DTriangleMesh& mesh);
   /**
    * Check if the screen bounding box of an object is visible in
-   * this render view. If true is returned (visible) then do_clip
-   * will be set to true or false depending on wether or not clipping
-   * is wanted. This function also does far plane clipping.
+   * this render view. If true is returned (visible) then clip_plane
+   * and clip_portal will be set to the right value depending on wether or
+   * not clipping is wanted. This function also does far plane clipping.
    */
   virtual bool ClipBBox (const csBox2& sbox, const csBox3& cbox,
-      	bool& do_clip);
+      	int& clip_portal, int& clip_plane);
 
   /**
    * Get current sector.

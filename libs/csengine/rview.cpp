@@ -436,7 +436,7 @@ void csRenderView::CalculateFogMesh (const csTransform& tr_o2c, G3DTriangleMesh&
 }
 
 bool csRenderView::ClipBBox (const csBox2& sbox, const csBox3& cbox,
-    bool& do_clip)
+    int& clip_portal, int& clip_plane)
 {
   // Test against far plane if needed.
   csPlane3 far_plane;
@@ -446,19 +446,54 @@ bool csRenderView::ClipBBox (const csBox2& sbox, const csBox3& cbox,
     // object if no point of the camera_bounding box is closer than the D
     // part of the farplane.
     if (cbox.SquaredOriginDist () > far_plane.D ()*far_plane.D ())
-       return false;	
+      return false;	
   }
   
-  // Test if we need and should clip to the current portal.
+  // Test if there is a chance we must clip to current portal.
+  int i;
   int box_class;
   box_class = ctxt->iview->ClassifyBox (sbox);
   if (box_class == -1) return false; // Not visible.
-  do_clip = false;
-  if (ctxt->do_clip_plane || ctxt->do_clip_frustum)
-  {
-    if (box_class == 0) do_clip = true;
-  }
+  if (box_class == 0) clip_portal = CS_CLIP_NEEDED;
+  else clip_portal = CS_CLIP_NOT;
 
+  // Test if there is a chance we must clip to current plane.
+  // In addition test if we are fully behind the view plane.
+  clip_plane = CS_CLIP_NOT;
+  if (ctxt->do_clip_plane)
+  {
+    int cnt = 0;
+    int cntz = 0;
+    for (i = 0 ; i < 8 ; i++)
+    {
+      csVector3 c = cbox.GetCorner (i);
+      if (c.z < SMALL_D)
+      {
+	cntz++;
+	cnt++;
+      }
+      // @@@ TEST IF THIS IS THE RIGHT TEST!!!
+      else if (ctxt->clip_plane.Classify (c) < 0)
+	cnt++;
+    }
+    if (cnt == 8 || cntz == 8) return false;	// Object not visible.
+    if (cnt > 0) clip_plane = CS_CLIP_NEEDED;
+    else if (cntz > 0) clip_plane = CS_CLIP_TOPLEVEL;
+  }
+  else
+  {
+    // If we have no clip plane we still test against the view plane.
+    int cntz = 0;
+    for (i = 0 ; i < 8 ; i++)
+    {
+      csVector3 c = cbox.GetCorner (i);
+      if (c.z < SMALL_D)
+	cntz++;
+    }
+    if (cntz == 8) return false;	// Object not visible.
+    if (cntz > 0) clip_plane = CS_CLIP_TOPLEVEL;
+  }
+ 
   // If we don't need to clip to the current portal then we
   // test if we need to clip to the top-level portal.
   // Top-level clipping is always required unless we are totally
@@ -466,10 +501,10 @@ bool csRenderView::ClipBBox (const csBox2& sbox, const csBox3& cbox,
   // IF it is decided that we need to clip here then we still
   // clip to the inner portal. We have to do clipping anyway so
   // why not do it to the smallest possible clip area.
-  if (!do_clip)
+  if ((!ctxt->do_clip_frustum) || clip_portal != CS_CLIP_NEEDED)
   {
     box_class = iengine->GetTopLevelClipper ()->ClassifyBox (sbox);
-    if (box_class == 0) do_clip = true;
+    if (box_class == 0) clip_portal = CS_CLIP_TOPLEVEL;
   }
 
   return true;

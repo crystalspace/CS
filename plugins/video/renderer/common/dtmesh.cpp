@@ -195,7 +195,7 @@ static DECLARE_GROWING_ARRAY (color_verts, csColor);
 
 static void DrawTriangle (
 	iGraphics3D* g3d,
-	csClipper* clipper,
+	iClipper2D* clipper,
 	G3DTriangleMesh& mesh,
 	G3DPolygonDPFX& poly,
 	const csVector2& pa, const csVector2& pb, const csVector2& pc,
@@ -203,7 +203,8 @@ static void DrawTriangle (
 	float* z_verts,
 	csVector2* uv_verts,
 	csColor* colors,
-	G3DFogInfo* fog)
+	G3DFogInfo* fog,
+	bool do_clip)
 {
   // The triangle in question
   csVector2 triangle[3];
@@ -237,7 +238,7 @@ static void DrawTriangle (
   // orientation of the triangle vertices. It works just as well in
   // mirrored mode.
   int rescount = 0;
-  if (mesh.do_clip && clipper)
+  if (do_clip)
   {
     clip_result = clipper->Clip (triangle, 3, clipped_triangle, rescount,
 		  clipped_vtstats);
@@ -281,7 +282,7 @@ static void DrawTriangle (
 }
 
 void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
-  csReversibleTransform& o2c, csClipper* clipper, float aspect,
+  csReversibleTransform& o2c, iClipper2D* clipper, int cliptype, float aspect,
   int width2, int height2)
 {
   int i;
@@ -394,6 +395,8 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
       poly.flat_color_g, poly.flat_color_b);
 
   poly.use_fog = mesh.do_fog;
+  bool do_clip = false;
+  if (clipper && mesh.clip_portal >= CS_CLIP_NEEDED) do_clip = true;
 
   g3d->StartPolygonFX (mesh.mat_handle, mesh.fxmode);
 
@@ -422,7 +425,7 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
       int trivert [3] = { a, b, c };
       DrawTriangle (g3d, clipper, mesh, poly,
       	persp[a], persp[b], persp[c], trivert,
-	z_verts.GetArray (), work_uv_verts, work_col, mesh.vertex_fog);
+	z_verts.GetArray (), work_uv_verts, work_col, mesh.vertex_fog, do_clip);
     }
     else if (cnt_vis == 1)
     {
@@ -522,7 +525,7 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
       int trivert [3] = { 0, 1, 2 };
       DrawTriangle (g3d, clipper, mesh, poly,
       	pa, pb, pc, trivert,
-	zv, uv, work_col ? col : NULL, fog);
+	zv, uv, work_col ? col : NULL, fog, do_clip);
     }
     else
     {
@@ -602,11 +605,11 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
       int trivert1[3] = { 0, 1, 2 };
       DrawTriangle (g3d, clipper, mesh, poly,
       	pa, pb, pc, trivert1,
-	zv, uv, work_col ? col : NULL, fog);
+	zv, uv, work_col ? col : NULL, fog, do_clip);
       int trivert2[3] = { 0, 2, 3 };
       DrawTriangle (g3d, clipper, mesh, poly,
       	pa, pc, pd, trivert2,
-	zv, uv, work_col ? col : NULL, fog);
+	zv, uv, work_col ? col : NULL, fog, do_clip);
     }
 
   }

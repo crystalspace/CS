@@ -415,7 +415,6 @@ void csDDGTerrainObject::Draw (iRenderView* rview, bool use_z_buf)
   iClipper2D* pClipper = rview->GetClipper ();
   // RDS NOTE: check in cube, it's done a little different
   pG3D->SetObjectToCamera( &RevTrans );
-  pG3D->SetClipper (pClipper->GetClipPoly (), pClipper->GetNumVertices ());
   // @@@ This should only be done when aspect changes...
   pG3D->SetPerspectiveAspect( pCamera->GetFOV() );
   pG3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
@@ -463,9 +462,10 @@ void csDDGTerrainObject::Draw (iRenderView* rview, bool use_z_buf)
       g3dmesh.triangles = (csTriangle *) &(vbuf->ibuf[s*3]);
       // Enable clipping for blocks that are not entirely within the
       // view frustrum.
-      g3dmesh.do_clip =
+      g3dmesh.clip_portal =
 		mesh->getBinTree (i)->treeVis () != ddgIN ||
 	        mesh->getBinTree (i+1)->treeVis () != ddgIN;
+      g3dmesh.clip_plane = g3dmesh.clip_portal;	// @@@ NOT GOOD!
 
       // @@@ This is not the good way to do this as it is slow.
       // The lighting information must be recalculated only when needed.

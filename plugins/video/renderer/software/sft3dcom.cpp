@@ -224,6 +224,8 @@ csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon () :
   texman = NULL;
 
   clipper = NULL;
+  cliptype = CS_CLIPPER_NONE;
+  do_near_plane = false;
 
 #ifdef DO_MMX
   do_mmx = true;
@@ -267,6 +269,7 @@ csGraphics3DSoftwareCommon::~csGraphics3DSoftwareCommon ()
   Close ();
   if (G2D) G2D->DecRef ();
   if (partner) partner->DecRef ();
+  if (clipper) { clipper->DecRef (); clipper = NULL; cliptype = CS_CLIPPER_NONE; }
 }
 
 void csGraphics3DSoftwareCommon::NewInitialize ()
@@ -1173,7 +1176,7 @@ void csGraphics3DSoftwareCommon::Close ()
   }
 
   delete tcache; tcache = NULL;
-  delete clipper; clipper = NULL;
+  if (clipper) { clipper->DecRef (); clipper = NULL; cliptype = CS_CLIPPER_NONE; }
   delete texman; texman = NULL;
 
   delete [] z_buffer; z_buffer = NULL;
@@ -1216,25 +1219,13 @@ void csGraphics3DSoftwareCommon::SetDimensions (int nwidth, int nheight)
   line_table = new UByte* [height+1];
 }
 
-void csGraphics3DSoftwareCommon::SetClipper (csVector2* vertices, int num_vertices)
+void csGraphics3DSoftwareCommon::SetClipper (iClipper2D* clip, int cliptype)
 {
-  delete clipper;
-  clipper = NULL;
-  if (!vertices) return;
-  // @@@ This could be better! We are using a general polygon clipper
-  // even in cases where a box clipper would be better. We should
-  // have a special SetBoxClipper call in iGraphics3D.
-  clipper = new csPolygonClipper (vertices, num_vertices, false, true);
-}
-
-void csGraphics3DSoftwareCommon::GetClipper (csVector2* vertices, int& num_vertices)
-{
-  if (!clipper) { num_vertices = 0; return; }
-  num_vertices = clipper->GetNumVertices ();
-  csVector2* clip_verts = clipper->GetClipPoly ();
-  int i;
-  for (i = 0 ; i < num_vertices ; i++)
-    vertices[i] = clip_verts[i];
+  if (clip) clip->IncRef ();
+  if (clipper) clipper->DecRef ();
+  clipper = clip;
+  if (!clipper) cliptype = CS_CLIPPER_NONE;
+  csGraphics3DSoftwareCommon::cliptype = cliptype;
 }
 
 bool csGraphics3DSoftwareCommon::BeginDraw (int DrawFlags)

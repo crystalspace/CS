@@ -37,6 +37,7 @@ struct iPolygonTexture;
 struct iTextureManager;
 struct iTextureHandle;
 struct iMaterialHandle;
+struct iClipper2D;
 struct iHalo;
 struct csRGBpixel;
 struct csPixelFormat;
@@ -275,8 +276,55 @@ struct csTriangle
 };
 
 /**
+ * Type of clipper (for iGraphics3D::SetClipper()).
+ * There is no clipper.
+ */
+#define CS_CLIPPER_NONE -1
+
+/**
+ * Type of clipper (for iGraphics3D::SetClipper()).
+ * Clipper is optional.
+ */
+#define CS_CLIPPER_OPTIONAL 0
+
+/**
+ * Type of clipper (for iGraphics3D::SetClipper()).
+ * Clipper is top-level.
+ */
+#define CS_CLIPPER_TOPLEVEL 1
+
+/**
+ * Type of clipper (for iGraphics3D::SetClipper()).
+ * Clipper is required.
+ */
+#define CS_CLIPPER_REQUIRED 2
+
+
+/**
+ * Clipping requirement for DrawTriangleMesh.
+ * No clipping required.
+ */
+#define CS_CLIP_NOT 0
+
+/**
+ * Clipping requirement for DrawTriangleMesh.
+ * Clipping may be needed. Depending on the type of the clipper
+ * (one of the CS_CLIPPER_??? flags) the renderer has to clip or
+ * not.
+ */
+#define CS_CLIP_NEEDED 1
+
+/**
+ * Clipping requirement for DrawTriangleMesh.
+ * Clipping is not needed for the current clipper but it might
+ * be needed for the toplevel clipper. If used for 'clip_plane' then
+ * this means we have to clip to Z=SMALL_Z.
+ */
+#define CS_CLIP_TOPLEVEL 2
+
+/**
  * Structure containing all info needed by DrawTriangeMesh.
- * In theory this function is capable of:<br>
+ * This function is capable of:<br>
  * <ul>
  * <li>Object2camera transformation and perspective.
  * <li>Linear interpolation between two sets of vertices.
@@ -303,10 +351,14 @@ struct G3DTriangleMesh
   /// Pointer to array of triangles.
   csTriangle* triangles;
 
+  /// Clip to portal? One of CS_CLIP_???.
+  int clip_portal;
+  /// Clip to near plane? One of CS_CLIP_???.
+  int clip_plane;
+
   /// Use precalculated vertex color?
   bool use_vertex_color;
-  /// Do clipping tests?
-  bool do_clip;
+  
   /// Apply fogging?
   bool do_fog;
   /// Consider triangle vertices in anti-clockwise order if true.
@@ -437,7 +489,7 @@ struct csFog
   float blue;
 };
 
-SCF_VERSION (iGraphics3D, 4, 0, 2);
+SCF_VERSION (iGraphics3D, 4, 1, 2);
 
 /**
  * This is the standard 3D graphics interface.
@@ -501,17 +553,42 @@ struct iGraphics3D : public iPlugIn
   virtual const csReversibleTransform& GetObjectToCamera () = 0;
 
   /**
-   * Set optional clipper to use. If vertices == null
+   * Set optional clipper to use. If clipper == null
    * then there is no clipper.
    * Currently only used by DrawTriangleMesh.
    */
-  virtual void SetClipper (csVector2* vertices, int num_vertices) = 0;
+  virtual void SetClipper (iClipper2D* clipper, int cliptype) = 0;
 
   /**
-   * Get clipper that was used. Make sure you have at least place for
-   * 64 vertices.
+   * Get clipper that was used.
    */
-  virtual void GetClipper (csVector2* vertices, int& num_vertices) = 0;
+  virtual iClipper2D* GetClipper () = 0;
+
+  /**
+   * Return type of clipper.
+   */
+  virtual int GetClipType () = 0;
+
+  /**
+   * Set near clip plane.
+   * Currently only used by DrawTriangleMesh.
+   */
+  virtual void SetNearPlane (const csPlane3& pl) = 0;
+
+  /**
+   * Reset near clip plane (i.e. disable it).
+   */
+  virtual void ResetNearPlane () = 0;
+
+  /**
+   * Get near clip plane.
+   */
+  virtual const csPlane3& GetNearPlane () = 0;
+
+  /**
+   * Return true if we have a near plane.
+   */
+  virtual bool HasNearPlane () = 0;
 
   /// Debugging only: get a pointer to Z-buffer at some location
   virtual uint32 *GetZBuffAt (int x, int y) = 0;

@@ -964,29 +964,53 @@ static void Perspective (const csVector3& v, csVector2& p, float fov,
 }
 
 bool csTerrFuncObject::BBoxVisible (const csBox3& bbox,
-    	iCamera* camera, iClipper2D* clipper, bool& do_clip)
+    	iRenderView* rview, iCamera* camera,
+	int& clip_portal, int& clip_plane)
 {
-  int i;
   csReversibleTransform& camtrans = camera->GetTransform ();
   float fov = camera->GetFOV ();
-  float shiftx = camera->GetShiftX ();
-  float shifty = camera->GetShiftY ();
-  int in = 0;
-  csVector2 p;
-  for (i = 0 ; i < 8 ; i++)
+  float sx = camera->GetShiftX ();
+  float sy = camera->GetShiftY ();
+
+  // first compute camera and screen space bounding boxes.
+  csBox3 cbox;
+  cbox.StartBoundingBox (camtrans * bbox.GetCorner (0));
+  cbox.AddBoundingVertexSmart (camtrans * bbox.GetCorner (1));
+  cbox.AddBoundingVertexSmart (camtrans * bbox.GetCorner (2));
+  cbox.AddBoundingVertexSmart (camtrans * bbox.GetCorner (3));
+  cbox.AddBoundingVertexSmart (camtrans * bbox.GetCorner (4));
+  cbox.AddBoundingVertexSmart (camtrans * bbox.GetCorner (5));
+  cbox.AddBoundingVertexSmart (camtrans * bbox.GetCorner (6));
+  cbox.AddBoundingVertexSmart (camtrans * bbox.GetCorner (7));
+
+  // if the entire bounding box is behind the camera, we're done.
+  if ((cbox.MinZ () < 0) && (cbox.MaxZ () < 0))
+    return false;
+
+  // Transform from camera to screen space.
+  csBox2 sbox;
+  if (cbox.MinZ () <= 0)
   {
-    csVector3 v = bbox.GetCorner (i);
-    v = camtrans * v;
-    if (v.z >= .001)
-    {
-      Perspective (v, p, fov, shiftx, shifty);
-      in += int (clipper->IsInside (p));
-    }
+    // Bbox is very close to camera.
+    // Just return a maximum bounding box.
+    sbox.Set (-10000, -10000, 10000, 10000);
   }
-  if (in == 0) return false;
-  if (in == 8) { do_clip = false; return true; }
-  do_clip = true;
-  return true;
+  else
+  {
+    csVector2 oneCorner;
+    Perspective (cbox.Max (), oneCorner, fov, sx, sy);
+    sbox.StartBoundingBox (oneCorner);
+    csVector3 v (cbox.MinX (), cbox.MinY (), cbox.MaxZ ());
+    Perspective (v, oneCorner, fov, sx, sy);
+    sbox.AddBoundingVertexSmart (oneCorner);
+    Perspective (cbox.Min (), oneCorner, fov, sx, sy);
+    sbox.AddBoundingVertexSmart (oneCorner);
+    v.Set (cbox.MaxX (), cbox.MaxY (), cbox.MinZ ());
+    Perspective (v, oneCorner, fov, sx, sy);
+    sbox.AddBoundingVertexSmart (oneCorner);
+  }
+
+  return rview->ClipBBox (sbox, cbox, clip_portal, clip_plane);
 }
 
 void csTerrFuncObject::Draw (iRenderView* rview, bool use_z_buf)
@@ -997,9 +1021,7 @@ void csTerrFuncObject::Draw (iRenderView* rview, bool use_z_buf)
 
   csReversibleTransform& camtrans = pCamera->GetTransform ();
   const csVector3& origin = camtrans.GetOrigin ();
-  iClipper2D* pClipper = rview->GetClipper ();
   pG3D->SetObjectToCamera (&camtrans);
-  pG3D->SetClipper (pClipper->GetClipPoly (), pClipper->GetNumVertices ());
   pG3D->SetPerspectiveAspect (pCamera->GetFOV ());
   pG3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
       use_z_buf ? CS_ZBUF_USE : CS_ZBUF_FILL);
@@ -1011,8 +1033,8 @@ void csTerrFuncObject::Draw (iRenderView* rview, bool use_z_buf)
     for (bx = 0 ; bx < blockx ; bx++, blidx++)
     {
       csTerrBlock& block = blocks[blidx];
-      bool do_clip;
-      if (BBoxVisible (block.bbox, pCamera, pClipper, do_clip))
+      int clip_portal, clip_plane;
+      if (BBoxVisible (block.bbox, rview, pCamera, clip_portal, clip_plane))
       {
         csVector3& bc = block.center;
         int lod = 0;
@@ -1026,9 +1048,8 @@ void csTerrFuncObject::Draw (iRenderView* rview, bool use_z_buf)
         if (!m->mat_handle)
           m->mat_handle = block.material->GetMaterialHandle ();
         m->do_mirror = pCamera->IsMirrored ();
-        //@@@ It would be good to do proper handling of this
-	//flag in the 3D renderer.
-        m->do_clip = do_clip;
+	m->clip_portal = clip_portal;
+	m->clip_plane = clip_plane;
         pG3D->DrawTriangleMesh (*m);
       }
     }

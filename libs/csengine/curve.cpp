@@ -204,11 +204,9 @@ static void Perspective (const csVector3& v, csVector2& p,
 }
 
 float csCurve::GetScreenBoundingBox (const csTransform& obj2cam,
-	iCamera* camera,
-	csBox2& boundingBox)
+	iCamera* camera, csBox3& cbox, csBox2& boundingBox)
 {
   csVector2   oneCorner;
-  csBox3      cbox;
 
   float aspect = camera->GetFOV ();
   float shift_x = camera->GetShiftX ();

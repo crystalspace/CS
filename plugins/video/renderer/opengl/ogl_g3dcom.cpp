@@ -182,6 +182,7 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon ():
   // default extension state is for all extensions to be OFF
   ARB_multitexture = false;
   clipper = NULL;
+  cliptype = CS_CLIPPER_NONE;
 
   // see note above
   tr_verts.IncRef ();
@@ -481,6 +482,7 @@ void csGraphics3DOGLCommon::Close ()
   delete txtmgr; txtmgr = NULL;
   delete texture_cache; texture_cache = NULL;
   delete lightmap_cache; lightmap_cache = NULL;
+  if (clipper) { clipper->DecRef (); clipper = NULL; cliptype = CS_CLIPPER_NONE; }
 
   if (m_fogtexturehandle)
   {
@@ -502,17 +504,15 @@ void csGraphics3DOGLCommon::SetDimensions (int width, int height)
   csGraphics3DOGLCommon::height2 = height / 2;
 }
 
-void csGraphics3DOGLCommon::SetClipper (csVector2* vertices, int num_vertices)
+void csGraphics3DOGLCommon::SetClipper (iClipper2D* clip, int cliptype)
 {
-  delete clipper;
-  clipper = NULL;
-  if (!vertices) return;
-  // @@@ This could be better! We are using a general polygon clipper
-  // even in cases where a box clipper would be better. We should
-  // have a special SetBoxClipper call in iGraphics3D.
-  clipper = new csPolygonClipper (vertices, num_vertices, false, true);
+  if (clip) clip->IncRef ();
+  if (clipper) clipper->DecRef ();
+  clipper = clip;
+  if (!clipper) cliptype = CS_CLIPPER_NONE;
+  csGraphics3DOGLCommon::cliptype = cliptype;
 #if USE_STENCIL
-  if (true)
+  if (clipper && true/*use_clipper*/)
   {
     // First set up the stencil area.
     glEnable (GL_STENCIL_TEST);
@@ -535,16 +535,6 @@ void csGraphics3DOGLCommon::SetClipper (csVector2* vertices, int num_vertices)
     glDisable (GL_STENCIL_TEST);
   }
 #endif
-}
-
-void csGraphics3DOGLCommon::GetClipper (csVector2* vertices, int& num_vertices)
-{
-  if (!clipper) { num_vertices = 0; return; }
-  num_vertices = clipper->GetNumVertices ();
-  csVector2* clip_verts = clipper->GetClipPoly ();
-  int i;
-  for (i = 0 ; i < num_vertices ; i++)
-    vertices[i] = clip_verts[i];
 }
 
 bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
@@ -1423,7 +1413,15 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
   // fallback to "default" implementation if something comes up that we can't
   // handle.  This includes software clipping.
-  if (mesh.do_clip && clipper)
+  // @@@ We can do this smarter: keep track of toplevel portal for example.
+  bool want_clipping = false;
+  if (mesh.clip_portal != CS_CLIP_NOT &&
+      (mesh.clip_portal == CS_CLIP_NEEDED && cliptype != CS_CLIPPER_OPTIONAL))
+    want_clipping = true;
+  // @@@ Temporary.
+  if (mesh.clip_plane == CS_CLIP_NEEDED)
+    want_clipping = true;
+  if (want_clipping)
   {
 #if USE_STENCIL
     if (true)
@@ -1436,7 +1434,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 #else
   
     // If we have no stencil buffer then we just use the default version.
-    DefaultDrawTriangleMesh (mesh, this, o2c, clipper, aspect,
+    DefaultDrawTriangleMesh (mesh, this, o2c, clipper, cliptype, aspect,
     	width2, height2);
     return;
 #endif
@@ -1779,7 +1777,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   glPopMatrix ();
 
 #if USE_STENCIL
-  if (mesh.do_clip && clipper)
+  if (want_clipping)
   {
     if (true)
     {

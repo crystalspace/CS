@@ -715,8 +715,6 @@ void csThing::DrawPolygonArrayDPM (csPolygonInt** /*polygon*/, int /*num*/,
 
   csReversibleTransform tr_o2c = icam->GetTransform ();
   d->GetGraphics3D ()->SetObjectToCamera (&tr_o2c);
-  d->GetGraphics3D ()->SetClipper (d->GetClipper ()->GetClipPoly (),
-  	d->GetClipper ()->GetNumVertices ());
   // @@@ This should only be done when aspect changes...
   d->GetGraphics3D ()->SetPerspectiveAspect (icam->GetFOV ());
   d->GetGraphics3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zMode);
@@ -1327,8 +1325,6 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
   csReversibleTransform obj_cam = camtrans;
   if (can_move) obj_cam /= movtrans;
   rview->GetGraphics3D ()->SetObjectToCamera (&obj_cam);
-  rview->GetGraphics3D ()->SetClipper (rview->GetClipper ()->GetClipPoly (),
-  	rview->GetClipper ()->GetNumVertices ());
   rview->GetGraphics3D ()->SetPerspectiveAspect (icam->GetFOV ());
   rview->GetGraphics3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zMode);
 
@@ -1347,39 +1343,14 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
   {
     c = curves.Get (i);
 
-    // Test visibility of entire curve by clipping bounding box against clipper.
-    // There are three possibilities:
-    //	1. box is not visible -> curve is not visible.
-    //	2. box is entirely visible -> curve is visible and need not be clipped.
-    //	3. box is partially visible -> curve is visible and needs to be clipped
-    //	   if rview has do_clip_plane set to true.
-    csBox2 bbox;
-    if (c->GetScreenBoundingBox (obj_cam, icam, bbox) < 0)
+    // First get a bounding box in camera space.
+    csBox3 cbox;
+    csBox2 sbox;
+    if (c->GetScreenBoundingBox (obj_cam, icam, cbox, sbox) < 0)
       continue;	// Not visible.
-    // Test if we need and should clip to the current portal.
-    int box_class;
-    box_class = rview->GetClipper ()->ClassifyBox (bbox);
-    if (box_class == -1) continue; // Not visible.
-
-    bool do_clip = false;
-    csPlane3 clip_plane;
-    if (rview->GetClipPlane (clip_plane) || rview->IsClipperRequired ())
-    {
-      if (box_class == 0) do_clip = true;
-    }
-
-    // If we don't need to clip to the current portal then we
-    // test if we need to clip to the top-level portal.
-    // Top-level clipping is always required unless we are totally
-    // within the top-level frustum.
-    // IF it is decided that we need to clip here then we still
-    // clip to the inner portal. We have to do clipping anyway so
-    // why not do it to the smallest possible clip area.
-    if (!do_clip)
-    {
-      box_class = csEngine::current_engine->top_clipper->ClassifyBox (bbox);
-      if (box_class == 0) do_clip = true;
-    }
+    int clip_portal, clip_plane;
+    if (!rview->ClipBBox (sbox, cbox, clip_portal, clip_plane))
+      continue;	// Not visible.
 
     // If we have a dirty lightmap recombine the curves and the shadow maps.
     bool updated_lm = c->RecalculateDynamicLights ();
@@ -1405,7 +1376,8 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
     mesh.vertex_colors[0] = tess->GetColors ();
     mesh.num_triangles = tess->GetNumTriangles ();
     mesh.triangles = tess->GetTriangles ();
-    mesh.do_clip = do_clip;
+    mesh.clip_portal = clip_portal;
+    mesh.clip_plane = clip_plane;
     mesh.vertex_fog = fog_verts.GetArray ();
     bool gouraud = !!c->lightmap;
     mesh.fxmode = CS_FX_COPY | (gouraud ? CS_FX_GOURAUD : 0);

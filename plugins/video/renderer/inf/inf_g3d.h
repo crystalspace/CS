@@ -58,8 +58,16 @@ class csGraphics3DInfinite : public iGraphics3D
 
   /// Current transformation from world to camera.
   csReversibleTransform o2c;
+ 
   /// Current 2D clipper.
-  csClipper* clipper;
+  iClipper2D* clipper;
+  /// Clipper type.
+  int cliptype;
+  /// Current near plane.
+  csPlane3 near_plane;
+  /// Is near plane used?
+  bool do_near_plane;
+
   /// Current aspect ratio for perspective correction.
   float aspect;
   /// Current inverse aspect ratio for perspective correction.
@@ -233,10 +241,34 @@ public:
   {
     return o2c;
   }
+ 
   /// Set optional clipper.
-  virtual void SetClipper (csVector2* vertices, int num_vertices);
+  virtual void SetClipper (iClipper2D* clipper, int cliptype);
   /// Get clipper.
-  virtual void GetClipper (csVector2* vertices, int& num_vertices);
+  virtual iClipper2D* GetClipper ()
+  {
+    return clipper;
+  }
+  /// Get cliptype.
+  virtual int GetClipType () { return cliptype; }
+
+  /// Set near clip plane.
+  virtual void SetNearPlane (const csPlane3& pl)
+  {
+    do_near_plane = true;
+    near_plane = pl;
+  }
+
+  /// Reset near clip plane (i.e. disable it).
+  virtual void ResetNearPlane () { do_near_plane = false; }
+
+  /// Get near clip plane.
+  virtual const csPlane3& GetNearPlane () { return near_plane; }
+
+  /// Return true if we have near plane.
+  virtual bool HasNearPlane () { return do_near_plane; }
+
+
   /// Draw a triangle mesh.
   virtual void DrawTriangleMesh (G3DTriangleMesh& mesh);
 

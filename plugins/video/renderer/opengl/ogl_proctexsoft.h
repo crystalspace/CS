@@ -136,8 +136,25 @@ class csOpenGLProcSoftware : public iGraphics3D
   virtual float GetPerspectiveAspect ();
   virtual void SetObjectToCamera (csReversibleTransform* o2c);
   virtual const csReversibleTransform& GetObjectToCamera ();
-  virtual void SetClipper (csVector2* vertices, int num_vertices);
-  virtual void GetClipper (csVector2* vertices, int& num_vertices);
+  virtual void SetClipper (iClipper2D* clipper, int cliptype)
+  {
+    g3d->SetClipper (clipper, cliptype);
+  }
+  virtual iClipper2D* GetClipper () { return g3d->GetClipper (); }
+  virtual int GetClipType () { return g3d->GetClipType (); }
+  virtual void SetNearPlane (const csPlane3& pl)
+  {
+    g3d->SetNearPlane (pl);
+  }
+  virtual void ResetNearPlane ()
+  {
+    g3d->ResetNearPlane ();
+  }
+  virtual const csPlane3& GetNearPlane ()
+  {
+    return g3d->GetNearPlane ();
+  }
+  virtual bool HasNearPlane () { return g3d->HasNearPlane (); }
   virtual iGraphics2D *GetDriver2D ();
   virtual iTextureManager *GetTextureManager ();
   virtual iHalo *CreateHalo (float iR, float iG, float iB, 

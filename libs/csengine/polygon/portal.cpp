@@ -194,6 +194,24 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
   rview->GetClipPlane ().Invert ();
   if (flags.Check (CS_PORTAL_CLIPDEST)) rview->UseClipPlane (true);
 
+  // When going through a portal we first remember the old clipper
+  // and clip plane (if any). Then we set a new one. Later we restore.
+  iGraphics3D* G3D = rview->GetGraphics3D ();
+  iClipper2D* old_clipper = G3D->GetClipper ();
+  if (old_clipper) old_clipper->IncRef ();
+  int old_cliptype = G3D->GetClipType ();
+  G3D->SetClipper (rview->GetClipper (),
+      	rview->IsClipperRequired ()
+		? CS_CLIPPER_REQUIRED
+		: CS_CLIPPER_OPTIONAL);
+  csPlane3 old_near_plane = G3D->GetNearPlane ();
+  bool old_do_near_plane = G3D->HasNearPlane ();
+  csPlane3 cp;
+  if (rview->GetClipPlane (cp))
+    G3D->SetNearPlane (cp);
+  else
+    G3D->ResetNearPlane ();
+  
   if (flags.Check (CS_PORTAL_WARP))
   {
     iCamera* inewcam = rview->CreateNewCamera ();
@@ -206,7 +224,16 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
   }
   else
     sector->Draw (rview);
+
   rview->RestoreRenderContext (old_ctxt);
+
+  // Now restore our G3D clipper and plane.
+  G3D->SetClipper (old_clipper, old_cliptype);
+  if (old_clipper) old_clipper->DecRef ();
+  if (old_do_near_plane)
+    G3D->SetNearPlane (old_near_plane);
+  else
+    G3D->ResetNearPlane ();
 
   return true;
 }

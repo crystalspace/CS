@@ -53,6 +53,8 @@ class csGraphics3DNull : public iGraphics3D
   int width2;
   /// Opt: height divided by 2.
   int height2;
+  /// Dummy near plane.
+  csPlane3 near_plane;
 
   /// Current aspect ratio for perspective correction.
   float aspect;
@@ -203,10 +205,27 @@ public:
   /// Get world to camera transformation.
   virtual const csReversibleTransform& GetObjectToCamera ()
   { return o2c; }
+ 
   /// Set optional clipper.
-  virtual void SetClipper (csVector2* vertices, int num_vertices);
-  /// Get optional clipper.
-  virtual void GetClipper (csVector2* vertices, int& num_vertices);
+  virtual void SetClipper (iClipper2D*, int) { }
+  /// Get clipper.
+  virtual iClipper2D* GetClipper () { return NULL; }
+  /// Get cliptype.
+  virtual int GetClipType () { return CS_CLIPPER_NONE; }
+
+  /// Set near clip plane.
+  virtual void SetNearPlane (const csPlane3&) { }
+
+  /// Reset near clip plane (i.e. disable it).
+  virtual void ResetNearPlane () { }
+
+  /// Get near clip plane.
+  virtual const csPlane3& GetNearPlane () { return near_plane; }
+
+  /// Return true if we have near plane.
+  virtual bool HasNearPlane () { return false; }
+
+
   /// Draw a triangle mesh.
   virtual void DrawTriangleMesh (G3DTriangleMesh& /*mesh*/)
   { }
