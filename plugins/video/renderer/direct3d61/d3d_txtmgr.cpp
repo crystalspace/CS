@@ -163,9 +163,11 @@ csTextureMMDirect3D::csTextureMMDirect3D (iImage* image, int flags,
   int w = image->GetWidth ();
   int h = image->GetHeight ();
 
+asm("int $3");
   G3D->AdjustToOptimalTextureSize(w,h);
 
   // this is a NOP if size do not change
+asm("int $3");
   image->Rescale (w, h);
 }
 
@@ -174,7 +176,6 @@ csTextureMMDirect3D::~csTextureMMDirect3D()
   delete m_pTexture2d;
 }
 
-
 csTexture *csTextureMMDirect3D::NewTexture (iImage *Image)
 {
   return new csTextureDirect3D (this, Image, G3D, false);
@@ -182,7 +183,12 @@ csTexture *csTextureMMDirect3D::NewTexture (iImage *Image)
 
 void csTextureMMDirect3D::ComputeMeanColor ()
 {
+asm("int $3");
   int pixels = image->GetWidth () * image->GetHeight ();
+
+printf ("w = %d  h = %d  image = %p\n", image->GetWidth (), image->GetHeight (), image);
+_sleep (500);
+
   RGBPixel *src = (RGBPixel *)image->GetImageData ();
   unsigned r = 0, g = 0, b = 0;
   for (int count = pixels; count; count--)
@@ -192,9 +198,14 @@ void csTextureMMDirect3D::ComputeMeanColor ()
     g += pix.green;
     b += pix.blue;
   }
-  mean_color.red   = r / pixels;
-  mean_color.green = g / pixels;
-  mean_color.blue  = b / pixels;
+  if (pixels)
+  {
+    mean_color.red   = r / pixels;
+    mean_color.green = g / pixels;
+    mean_color.blue  = b / pixels;
+  }
+  else
+    mean_color = RGBPixel (0, 0, 0);
 }
 
 void csTextureMMDirect3D::CreateMipmaps ()
@@ -208,13 +219,9 @@ void csTextureMMDirect3D::CreateMipmaps ()
   delete m_pTexture2d;
 
   if (flags & CS_TEXTURE_2D)
-  {
     m_pTexture2d = new csTextureDirect3D(this, image, G3D, true);
-  }
   else
-  {
     m_pTexture2d = NULL;
-  }
 
   RGBPixel *tc = transp ? &transp_color : (RGBPixel *)NULL;
 
@@ -244,11 +251,9 @@ void csTextureMMDirect3D::CreateMipmaps ()
 
 //---------------------------------------------------------------------------
 
-csTextureManagerDirect3D::csTextureManagerDirect3D (iSystem*                 iSys,
-                                                    iGraphics2D*             iG2D, 
-                                                    csIniFile*               config, 
-                                                    csGraphics3DDirect3DDx6* iG3D) 
-  : csTextureManager (iSys, iG2D)
+csTextureManagerDirect3D::csTextureManagerDirect3D (iSystem *iSys,
+  iGraphics2D *iG2D, csIniFile *config, csGraphics3DDirect3DDx6 *iG3D) :
+  csTextureManager (iSys, iG2D)
 {
   m_pG2D = iG2D;
   m_pG3D = iG3D;
