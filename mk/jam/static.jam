@@ -32,6 +32,7 @@ rule BuildStaticFile
 ##  LinkStaticPlugins target : plugins
 rule LinkStaticPlugins
 {
+  # link with static plugins
   LinkWith $(<) : $(>)_static ;
 
   # construct flags
