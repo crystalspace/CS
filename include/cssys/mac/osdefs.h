@@ -19,6 +19,7 @@ int access (const char *path, int mode);
 #define SOFTWARE_2D_DRIVER	"crystalspace.graphics2d.mac"
 #define OPENGL_2D_DRIVER	"crystalspace.graphics2d.defaultgl"
 #define GLIDE_2D_DRIVER		"crystalspace.graphics3d.glide.2x"
+#define RAVE_2D_DRIVER		"crystalspace.graphics3d.rave"
 
 // Sound driver
 #define SOUND_DRIVER            "crystalspace.sound.driver.mac"
@@ -46,6 +47,9 @@ int access (const char *path, int mode);
 #define kFatalErrorInOpenGL3D		7
 #define kFatalErrorOutOfMemory		8
 #define kFatalErrorInDriver2D		9
+#define kFatalErrorInRave2D			10
+#define kFatalErrorInRave3D			11
+#define kFatalErrorCantStartRave	12
 #endif
 
 #endif // OSDEFS_H
