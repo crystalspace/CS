@@ -1,5 +1,22 @@
 The history order is reversed so that new features are at the top.
 
+30-Aug-2002
+	- Fixed several memory leaks in the odedynamics plugin. It had the
+	  following problems:
+	      - collidesys wasn't initialized so calling DecRef() on that
+	        could cause crashes.
+	      - CreateSystem() required DecRef() later but CreateBody() and
+	        similar didn't. Now all require DecRef() and have been changed
+		to return csPtr (also CreateGroup() and CreateLink()).
+	      - Bodies and links had a reference (increased) to dynamics
+	        system. And dynamics system had a reference to bodies and
+		links. This is circular and prevents cleanup.
+	  Note that these changes mean that the ODE dynamics plugin now
+	  actually tries to clean up properly. Unfortunatelly this triggers
+	  a crash while trying to delete an internal object of ODE itself.
+	  Needs more investigation.
+	- Fixed a bad bug in csPlatformStartup() for windows. In some cases
+	  (for example when CRYSTAL is not set) this code would loop forever.
 29-Aug-2002
 	- Added csPtr class. This is a simple encapsulator of normal
 	  pointers. The only place where this should be used is when

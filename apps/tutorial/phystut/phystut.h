@@ -50,8 +50,8 @@ private:
   iSector* room;
   iView* view;
 
-	iDynamics* dyn;
-  iDynamicSystem* dynSys;
+  csRef<iDynamics> dyn;
+  csRef<iDynamicSystem> dynSys;
   iMeshFactoryWrapper* boxFact;
   iMeshFactoryWrapper* ballFact;
 

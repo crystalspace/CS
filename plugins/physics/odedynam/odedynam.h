@@ -102,10 +102,10 @@ public:
 
   static int GetGeomClassNum() { return geomclassnum; }
 
-  iDynamicSystem* CreateSystem ();
-  void RemoveSystem (iDynamicSystem* system);
+  virtual csPtr<iDynamicSystem> CreateSystem ();
+  virtual void RemoveSystem (iDynamicSystem* system);
 
-  void Step (float stepsize);
+  virtual void Step (float stepsize);
 
   static void NearCallback (void *data, dGeomID o1, dGeomID o2);
   static int CollideMeshMesh (dGeomID mesh1, dGeomID mesh2, int flags,
@@ -169,21 +169,21 @@ public:
   dSpaceID GetSpaceID() { return spaceID; }
   iCollideSystem* GetCollideSystem() { return collidesys; }
 
-  void SetGravity (const csVector3& v);
-  const csVector3 GetGravity () const;
+  virtual void SetGravity (const csVector3& v);
+  virtual const csVector3 GetGravity () const;
 
-  void Step (float stepsize);
+  virtual void Step (float stepsize);
 
-  iRigidBody* CreateBody ();
-  void RemoveBody (iRigidBody* body);
+  virtual csPtr<iRigidBody> CreateBody ();
+  virtual void RemoveBody (iRigidBody* body);
 
-  iBodyGroup* CreateGroup ();
-  void RemoveGroup (iBodyGroup *group);
+  virtual csPtr<iBodyGroup> CreateGroup ();
+  virtual void RemoveGroup (iBodyGroup *group);
 
-  iJoint* CreateJoint ();
-  void RemoveJoint (iJoint* joint);
+  virtual csPtr<iJoint> CreateJoint ();
+  virtual void RemoveJoint (iJoint* joint);
 
-  iDynamicsMoveCallback* GetDefaultMoveCallback () { return move_cb; }
+  virtual iDynamicsMoveCallback* GetDefaultMoveCallback () { return move_cb; }
 };
 
 /**

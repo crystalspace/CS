@@ -70,18 +70,10 @@ Simple::Simple ()
   kbd = NULL;
   vc = NULL;
   view = NULL;
-  dyn = NULL;
-  dynSys = NULL;
 }
 
 Simple::~Simple ()
 {
-  if (dyn) {
-    if (dynSys) {
-      dyn->RemoveSystem (dynSys);
-    }
-    dyn->DecRef ();
-  }
   if (boxFact) boxFact->DecRef ();
   if (ballFact) ballFact->DecRef ();
   if (vc) vc->DecRef ();
@@ -472,7 +464,7 @@ iRigidBody* Simple::CreateBox (void)
   mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
 
   // Create a body and attach the mesh.
-  iRigidBody* rb = dynSys->CreateBody ();
+  csRef<iRigidBody> rb = dynSys->CreateBody ();
   rb->SetProperties (1, csVector3 (0), csMatrix3 ());
   rb->SetPosition (tc.GetOrigin ());
   rb->AttachMesh (mesh);
@@ -515,7 +507,7 @@ iRigidBody* Simple::CreateSphere (void)
 
 
   // Create a body and attach the mesh.
-  iRigidBody* rb = dynSys->CreateBody ();
+  csRef<iRigidBody> rb = dynSys->CreateBody ();
   rb->SetProperties (radius.Norm()/2, csVector3 (0), csMatrix3 ());
   rb->SetPosition (tc.GetOrigin ());
   rb->AttachMesh (mesh);
@@ -542,7 +534,7 @@ iJoint* Simple::CreateJointed (void)
    rb2->GetOrientation () * csVector3 (.5, 0, 0));
 
   // Create a joint and attach bodies.
-  iJoint* joint = dynSys->CreateJoint ();
+  csRef<iJoint> joint = dynSys->CreateJoint ();
   joint->Attach (rb1, rb2);
 
   // Constrain translation.
@@ -562,7 +554,7 @@ iRigidBody* Simple::CreateRoomSolids (const csVector3& center,
  const csVector3& radius, float thickness)
 {
   // Create a body for the room.
-  iRigidBody* rb = dynSys->CreateBody ();
+  csRef<iRigidBody> rb = dynSys->CreateBody ();
   rb->SetMoveCallback(NULL);
   rb->SetPosition (center);
   rb->MakeStatic ();

@@ -91,7 +91,6 @@ csODEDynamics::csODEDynamics (iBase* parent)
 
 csODEDynamics::~csODEDynamics ()
 {
-  systems.DeleteAll();
 }
 
 bool csODEDynamics::Initialize (iObjectRegistry* object_reg)
@@ -101,12 +100,12 @@ bool csODEDynamics::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iDynamicSystem* csODEDynamics::CreateSystem ()
+csPtr<iDynamicSystem> csODEDynamics::CreateSystem ()
 {
   csODEDynamicSystem* system = new csODEDynamicSystem ();
   iDynamicSystem* isystem = SCF_QUERY_INTERFACE (system, iDynamicSystem);
   systems.Push (isystem);
-  return isystem;
+  return csPtr<iDynamicSystem> (isystem);
 }
 
 void csODEDynamics::RemoveSystem (iDynamicSystem* system)
@@ -579,6 +578,7 @@ csODEDynamicSystem::csODEDynamicSystem ()
   SCF_CONSTRUCT_IBASE (NULL);
 
   //TODO: QUERY for collidesys
+  collidesys = NULL;
 
   worldID = dWorldCreate ();
   spaceID = dHashSpaceCreate ();
@@ -594,12 +594,13 @@ csODEDynamicSystem::~csODEDynamicSystem ()
   if (move_cb) move_cb->DecRef ();
 }
 
-iRigidBody* csODEDynamicSystem::CreateBody ()
+csPtr<iRigidBody> csODEDynamicSystem::CreateBody ()
 {
   csODERigidBody* body = new csODERigidBody (this);
   bodies.Push (body);
   body->SetMoveCallback(move_cb);
-  return (iRigidBody*)body;
+  body->IncRef ();
+  return csPtr<iRigidBody> (body);
 }
 
 void csODEDynamicSystem::RemoveBody (iRigidBody* body)
@@ -607,11 +608,12 @@ void csODEDynamicSystem::RemoveBody (iRigidBody* body)
   bodies.Delete (body, true);
 }
 
-iBodyGroup *csODEDynamicSystem::CreateGroup ()
+csPtr<iBodyGroup> csODEDynamicSystem::CreateGroup ()
 {
   csODEBodyGroup* group = new csODEBodyGroup (this);
   groups.Push (group);
-  return group;
+  group->IncRef ();
+  return csPtr<iBodyGroup> (group);
 }
 
 void csODEDynamicSystem::RemoveGroup (iBodyGroup *group)
@@ -619,11 +621,12 @@ void csODEDynamicSystem::RemoveGroup (iBodyGroup *group)
   bodies.Delete (group); 
 }
 
-iJoint* csODEDynamicSystem::CreateJoint ()
+csPtr<iJoint> csODEDynamicSystem::CreateJoint ()
 {
   csODEJoint* joint = new csODEJoint (this);
   joints.Push (joint);
-  return (iJoint*)joint;
+  joint->IncRef ();
+  return csPtr<iJoint> (joint);
 }
 
 void csODEDynamicSystem::RemoveJoint (iJoint *joint)
@@ -685,7 +688,6 @@ csODERigidBody::csODERigidBody (csODEDynamicSystem* sys)
   SCF_CONSTRUCT_IBASE (NULL);
 
   dynsys = sys;
-  SCF_INC_REF (dynsys);
 
   bodyID = dBodyCreate (dynsys->GetWorldID());
   dBodySetData (bodyID, this);
@@ -704,7 +706,6 @@ csODERigidBody::~csODERigidBody ()
 {
   if (move_cb) move_cb->DecRef ();
   if (coll_cb) coll_cb->DecRef ();
-  SCF_DEC_REF (dynsys);
   dBodyDestroy (bodyID);
 }
 
@@ -721,7 +722,8 @@ bool csODERigidBody::MakeStatic ()
 
 bool csODERigidBody::MakeDynamic ()
 {
-  if (statjoint != 0) {
+  if (statjoint != 0)
+  {
     dJointDestroy (statjoint);
     dBodySetGravityMode (bodyID, 1);
   }
@@ -730,7 +732,8 @@ bool csODERigidBody::MakeDynamic ()
 
 void csODERigidBody::SetGroup(iBodyGroup *group)
 {
-  if (collision_group) {
+  if (collision_group)
+  {
     collision_group->RemoveBody (this);
   }
   collision_group = group;
@@ -1147,12 +1150,10 @@ csODEJoint::csODEJoint (csODEDynamicSystem *sys)
   rotConstraint[2] = 1;
 
   dynsys = sys;
-  SCF_INC_REF(dynsys);
 }
 
 csODEJoint::~csODEJoint ()
 {
-  SCF_DEC_REF (dynsys);
   if (jointID) { dJointDestroy (jointID); }
 }
 

@@ -36,7 +36,7 @@ struct iDynamicsCollisionCallback;
 struct iJoint;
 struct iPolygonMesh;
 
-SCF_VERSION (iDynamics, 0, 0, 1);
+SCF_VERSION (iDynamics, 0, 0, 2);
 
 /**
  * This is the interface for the actual plugin.
@@ -45,7 +45,7 @@ SCF_VERSION (iDynamics, 0, 0, 1);
 struct iDynamics : public iBase
 {
   /// Create a rigid body and add it to the simulation
-  virtual iDynamicSystem* CreateSystem () = 0;
+  virtual csPtr<iDynamicSystem> CreateSystem () = 0;
 
   /// Create a rigid body and add it to the simulation
   virtual void RemoveSystem (iDynamicSystem* system) = 0;
@@ -73,19 +73,19 @@ struct iDynamicSystem : public iBase
   virtual void Step (float stepsize) = 0;
 
   /// Create a rigid body and add it to the simulation
-  virtual iRigidBody* CreateBody () = 0;
+  virtual csPtr<iRigidBody> CreateBody () = 0;
 
   /// Create a rigid body and add it to the simulation
   virtual void RemoveBody( iRigidBody* body ) = 0;
 
   /// Create a body group.  Bodies in a group don't collide with each other
-  virtual iBodyGroup* CreateGroup () = 0;
+  virtual csPtr<iBodyGroup> CreateGroup () = 0;
 
   /// Remove a group from a simulation.  Those bodies now collide
   virtual void RemoveGroup (iBodyGroup* group) = 0;
 
   /// Create a joint and add it to the simulation
-  virtual iJoint* CreateJoint () = 0;
+  virtual csPtr<iJoint> CreateJoint () = 0;
 
   /// Remove a joint from the simulation
   virtual void RemoveJoint (iJoint* joint) = 0;

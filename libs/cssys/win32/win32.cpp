@@ -477,7 +477,7 @@ bool csPlatformStartup(iObjectRegistry* r)
       // found it
       gotpath = true;
     }
-    ppos = strstr (ppos, installDir);
+    ppos = *ppos ? strstr (ppos+1, installDir) : NULL;
   }
   if (!gotpath)
   {
