@@ -1190,11 +1190,13 @@ typedef csCovTreeNode<csCovTreeNode4> csCovTreeNode5;
 
 static void calc_size ()
 {
+#if defined(JORRIT_DEBUG)
 printf ("1: %lu (%dx%d)\n", (unsigned long)sizeof(csCovTreeNode1), csCovTreeNode1::GetPixelSize (), csCovTreeNode1::GetPixelSize ());
 printf ("2: %lu (%dx%d)\n", (unsigned long)sizeof(csCovTreeNode2), csCovTreeNode2::GetPixelSize (), csCovTreeNode2::GetPixelSize ());
 printf ("3: %lu (%dx%d)\n", (unsigned long)sizeof(csCovTreeNode3), csCovTreeNode3::GetPixelSize (), csCovTreeNode3::GetPixelSize ());
 printf ("4: %lu (%dx%d)\n", (unsigned long)sizeof(csCovTreeNode4), csCovTreeNode4::GetPixelSize (), csCovTreeNode4::GetPixelSize ());
 printf ("5: %lu (%dx%d)\n", (unsigned long)sizeof(csCovTreeNode5), csCovTreeNode5::GetPixelSize (), csCovTreeNode5::GetPixelSize ());
+#endif
 }
 
 csCoverageMaskTree::csCoverageMaskTree (csCovMaskLUT* lut, const csBox& box)

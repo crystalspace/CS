@@ -255,6 +255,7 @@ csWorld::~csWorld ()
 
 bool csWorld::Initialize (iSystem* sys)
 {
+#if defined(JORRIT_DEBUG)
 printf ("csPolygon3D %ld\n", (long)sizeof (csPolygon3D));
 printf ("csPolyPlane %ld\n", (long)sizeof (csPolyPlane));
 printf ("csPolyTxtPlane %ld\n", (long)sizeof (csPolyTxtPlane));
@@ -263,6 +264,7 @@ printf ("csPolygonSet %ld\n", (long)sizeof (csPolygonSet));
 printf ("csLightMapped %ld\n", (long)sizeof (csLightMapped));
 printf ("csGouraudShaded %ld\n", (long)sizeof (csGouraudShaded));
 printf ("csLightMap %ld\n", (long)sizeof (csLightMap));
+#endif
 
   System = sys;
 
