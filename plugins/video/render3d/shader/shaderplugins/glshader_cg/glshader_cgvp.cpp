@@ -24,7 +24,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "csutil/scfstr.h"
-#include "csutil/csmd5.h"
+#include "csutil/stringreader.h"
 #include "csgeom/vector3.h"
 #include "csutil/xmltiny.h"
 
@@ -40,16 +40,246 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "glshader_cgvp.h"
 #include "glshader_cg.h"
 
+void csShaderGLCGVP::Activate()
+{
+  if (override.IsValid())
+  {
+    override->Activate();
+    return;
+  }
+
+  csShaderGLCGCommon::Activate();
+
+  if (nvTrackMatrices)
+  {
+    for(int i = 0; i < matrixtrackers.Length(); ++i)
+    {
+      const matrixtrackerentry& mt = matrixtrackers[i];
+
+      shaderPlug->ext->glTrackMatrixNV (GL_VERTEX_PROGRAM_NV,
+	mt.nvAddress, mt.nvMatrix, mt.nvTransform);
+
+      /*cgGLSetStateMatrixParameter (
+	matrixtrackers[i].parameter, 
+	matrixtrackers[i].matrix, 
+	matrixtrackers[i].modifier);*/
+    }
+  }
+}
+
+void csShaderGLCGVP::Deactivate()
+{
+  if (override.IsValid())
+  {
+    override->Deactivate();
+    return;
+  }
+
+  csShaderGLCGCommon::Deactivate();
+}
+
+void csShaderGLCGVP::SetupState (csRenderMesh* mesh,
+  const csShaderVarStack &stacks)
+{
+  if (override.IsValid())
+  {
+    override->SetupState (mesh, stacks);
+    return;
+  } 
+
+  csShaderGLCGCommon::SetupState (mesh, stacks);
+}
+
+void csShaderGLCGVP::ResetState()
+{
+  if (override.IsValid())
+  {
+    override->ResetState ();
+    return;
+  } 
+  csShaderGLCGCommon::ResetState();
+}
+
+static const char* GetToken (const char* str, const char* separators,
+			     size_t& len)
+{
+  if (!str) return 0;
+  while (strchr (separators, *str) != 0) str++;
+
+  size_t charNum = strcspn (str, separators);
+  len = charNum;
+  return str;
+}
+
+static bool TokenEquals (const char* token, size_t tokenLen, const char* cmp)
+{
+  return (tokenLen == strlen (cmp)) && (strncmp (token, cmp, tokenLen) == 0);
+}
+
 bool csShaderGLCGVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 {
-  shaderPlug->Open ();
-
   csRef<iDataBuffer> programBuffer = GetProgramData();
   if (!programBuffer.IsValid())
     return false;
   csString programStr;
   programStr.Append ((char*)programBuffer->GetData(), programBuffer->GetSize());
 
-  return DefaultLoadProgram (programStr, CG_GL_VERTEX, staticContexts);
+  if (!DefaultLoadProgram (programStr, CG_GL_VERTEX, staticContexts))
+    return false;
+
+  CGprofile progProf = cgGetProgramProfile (program);
+  if (progProf == CG_PROFILE_ARBVP1)
+  {
+    if (!shaderPlug->arbplg)
+      return false;
+
+    // Change the ARB VP to use state.matrix.... built-ins for ModelView etc.
+    const char* compiledProgram = cgGetProgramString (program, 
+      CG_COMPILED_PROGRAM);
+        
+    csStringReader reader (compiledProgram);
+    csString newProgram;
+
+    csArray<const char*> remap;
+
+    csString line;
+    while (reader.GetLine (line))
+    {
+      size_t tokenLen;
+      const char* token = GetToken (line, " ", tokenLen);
+      if (!token) continue;
+
+      do
+      {
+	if (TokenEquals (token, tokenLen, "#var"))
+	{
+	  token = GetToken (token + tokenLen, " ", tokenLen);
+	  if (!token || (!TokenEquals (token, tokenLen, "float4x4")))
+	    break;
+	  size_t varLen;
+	  const char* varName = GetToken (token + tokenLen, " ", varLen);
+	  if (!varName) break;
+
+	  token = GetToken (varName + varLen, " ", tokenLen);
+	  if (!token || (!TokenEquals (token, tokenLen, ":")))
+	    break;
+	  token = GetToken (token + tokenLen, " ", tokenLen);
+	  if (!token || (!TokenEquals (token, tokenLen, ":")))
+	    break;
+	  token = GetToken (token + tokenLen, " ", tokenLen);
+	  if (!token) break;
+
+	  int varIndex;
+	  if (sscanf (token, "c[%d], 4", &varIndex) != 1)
+	    break;
+
+	#define REMAP(name, to)						    \
+	  if (TokenEquals (varName, varLen, name))			    \
+	    remap.GetExtend (varIndex) = to;				    \
+	  else
+	#define REMAP_VARIANTS(name, to)				    \
+	  REMAP(name ## "IT", to ## ".invtrans")			    \
+	  REMAP(name ## "T", to ## ".transpose")			    \
+	  REMAP(name ## "I", to ## ".inverse")				    \
+	  REMAP(name, to)
+	#define MATRIX_MAP(name, nvMatrix, arbMatrix)			    \
+	  REMAP_VARIANTS (# name, arbMatrix)
+	#include "cgvp_matrixmap.inc"
+	  { /* last else */ }
+	#undef REMAP
+	#undef REMAP_VARIANTS
+	}
+	else if (TokenEquals (token, tokenLen, "PARAM"))
+	{
+	  size_t varLen;
+	  const char* varName = GetToken (token + tokenLen, " ", varLen);
+	  if (!varName) break;
+
+	  int varIndex;
+	  if (sscanf (varName, "c%d[4]", &varIndex) != 1)
+	    break;
+	  
+	  if ((varIndex >= remap.Length()) || (remap[varIndex] == 0)) break;
+
+	  line.Format ("PARAM c%d[4] = { %s };", varIndex, remap[varIndex]);
+	}
+      }
+      while (0);
+
+      newProgram << line << '\n';
+    }
+
+    override = shaderPlug->arbplg->CreateProgram ("vp");
+    if (!override)
+      return false;
+
+    csArray<csShaderVarMapping> mappings;
+
+    for (int i = 0; i < variablemap.Length (); i++)
+    {
+      // Get the Cg parameter
+      CGparameter parameter = (CGparameter)variablemap[i].userPtr;
+      // Check if it's found, and just skip it if not.
+      // Make sure it's a C-register
+      CGresource resource = cgGetParameterResource (parameter);
+      if (resource == CG_C)
+      {
+        // Get the register number, and create a mapping
+        char regnum[20];
+        sprintf (regnum, "register %lu", cgGetParameterResourceIndex (parameter));
+        mappings.Push (csShaderVarMapping (variablemap[i].name, regnum));
+      }
+    }
+    variablemap.DeleteAll();
+
+    if (!override->Load (newProgram, mappings))
+      return false;
+
+    return override->Compile (staticContexts);
+  }
+  else
+  {
+    CGparameter param = cgGetFirstLeafParameter (program, CG_PROGRAM);
+    while (param)
+    {
+      const char* pname = cgGetParameterName (param);
+    #define TRACKERENTRY(Matrix, Modifier)		  \
+      matrixtrackerentry map;				  \
+      map.nvMatrix = Matrix;				  \
+      map.nvTransform = Modifier;			  \
+      map.nvAddress = cgGetParameterResource (param);	  \
+      matrixtrackers.Push (map);
+    #define NAMEDTRACKERENTRY(Name, Matrix, Modifier)	  \
+      if (!strcmp (pname, Name))			  \
+      {							  \
+	TRACKERENTRY (Matrix, Modifier)			  \
+      }							  \
+      else
+    #define NAMEDENTRIES(Basename, Matrix)		  \
+      NAMEDTRACKERENTRY (Basename, Matrix,		  \
+	GL_IDENTITY_NV)					  \
+      NAMEDTRACKERENTRY (Basename ## "I", Matrix,	  \
+	GL_INVERSE_NV)					  \
+      NAMEDTRACKERENTRY (Basename ## "T", Matrix,	  \
+	GL_TRANSPOSE_NV)				  \
+      NAMEDTRACKERENTRY (Basename ## "IT", Matrix,	  \
+	GL_INVERSE_TRANSPOSE_NV)			  
+
+    #define MATRIX_MAP(name, nvMatrix, arbMatrix)	  \
+      NAMEDENTRIES (# name, nvMatrix)
+    #include "cgvp_matrixmap.inc"
+      { /* last else */ }
+
+    #undef NAMEDENTRIES
+    #undef NAMEDTRACKERENTRY
+    #undef TRACKERENTRY
+
+      param = cgGetNextLeafParameter (param);
+    }
+
+    nvTrackMatrices = true;
+  }
+
+  return true;
 }
 

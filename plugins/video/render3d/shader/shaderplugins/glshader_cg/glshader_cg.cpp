@@ -34,8 +34,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/graph2d.h"
 #include "ivideo/shader/shader.h"
 
-#include "video/canvas/openglcommon/glextmanager.h"
-
 #include "glshader_cgvp.h"
 #include "glshader_cgfp.h"
 
@@ -68,6 +66,7 @@ csGLShader_CG::csGLShader_CG(iBase* parent)
 
   enable = false;
   isOpen = false;
+  ext = 0;
 }
 
 csGLShader_CG::~csGLShader_CG()
@@ -100,6 +99,8 @@ void csGLShader_CG::ErrorCallback ()
 ////////////////////////////////////////////////////////////////////
 bool csGLShader_CG::SupportType(const char* type)
 {
+  if (!Open())
+    return false;
   if (!enable)
     return false;
   if( strcasecmp(type, "vp") == 0)
@@ -111,6 +112,8 @@ bool csGLShader_CG::SupportType(const char* type)
 
 csPtr<iShaderProgram> csGLShader_CG::CreateProgram(const char* type)
 {
+  if (!Open())
+    return false;
   if( strcasecmp(type, "vp") == 0)
     return csPtr<iShaderProgram>(new csShaderGLCGVP(this));
   else if( strcasecmp(type, "fp") == 0)
@@ -118,11 +121,11 @@ csPtr<iShaderProgram> csGLShader_CG::CreateProgram(const char* type)
   else return 0;
 }
 
-void csGLShader_CG::Open()
+bool csGLShader_CG::Open()
 {
-  if (isOpen) return;
+  if (isOpen) return true;
   if(!object_reg)
-    return;
+    return false;
 
   csRef<iGraphics3D> r = CS_QUERY_REGISTRY(object_reg,iGraphics3D);
   csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r,
@@ -133,10 +136,14 @@ void csGLShader_CG::Open()
 	f->QueryClassID ()) == 0)
     enable = true;
   else
-    return;
+    return false;
 
-  csGLExtensionManager *ext;
   r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
+  if (ext == 0)
+  {
+    enable = false;
+    return false;
+  }
 
   bool route = false;
   csRef<iConfigManager> config (CS_QUERY_REGISTRY (object_reg, iConfigManager));
@@ -162,12 +169,13 @@ void csGLShader_CG::Open()
       "Routing Cg fragment programs to Pixel Shader plugin %s (default).", 
       route ? "ON" : "OFF");
   }
+  ext->InitGL_ARB_vertex_program ();
+  ext->InitGL_NV_vertex_program ();
 
+  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
+    iPluginManager);
   if (route)
   {
-    csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
-      iPluginManager);
-
     psplg = CS_QUERY_PLUGIN_CLASS(plugin_mgr, 
       "crystalspace.graphics3d.shader.glps1", iShaderProgramPlugin);
     if(!psplg)
@@ -184,7 +192,23 @@ void csGLShader_CG::Open()
     }
   }
 
+  arbplg = CS_QUERY_PLUGIN_CLASS(plugin_mgr, 
+    "crystalspace.graphics3d.shader.glarb", iShaderProgramPlugin);
+  if(!arbplg)
+  {
+    arbplg = CS_LOAD_PLUGIN(plugin_mgr, 
+      "crystalspace.graphics3d.shader.glarb", iShaderProgramPlugin);
+    if (!arbplg)
+    {
+      csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+	"crystalspace.graphics3d.shader.glcg",
+	"Could not find crystalspace.graphics3d.shader.glarb. ARB Cg profile "
+	"support unavailable.");
+    }
+  }
+
   isOpen = true;
+  return true;
 }
 
 ////////////////////////////////////////////////////////////////////

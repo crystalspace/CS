@@ -24,6 +24,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "../../common/shaderplugin.h"
 #include "ivideo/shader/shader.h"
 
+#include "video/canvas/openglcommon/glextmanager.h"
+
 #include <Cg/cg.h>
 #include <Cg/cgGL.h>
 
@@ -38,6 +40,8 @@ public:
   static csRef<iObjectRegistry> object_reg; // @@@ Should use STATIC macros
   static CGcontext context;
   csRef<iShaderProgramPlugin> psplg;
+  csRef<iShaderProgramPlugin> arbplg;
+  csGLExtensionManager* ext;
 
   SCF_DECLARE_IBASE;
   
@@ -53,7 +57,7 @@ public:
 
   virtual bool SupportType(const char* type);
 
-  virtual void Open();
+  bool Open();
 
 
   ////////////////////////////////////////////////////////////////////

@@ -18,6 +18,10 @@ chronological order.
 	- Jorrit also added iGeneralFactoryState->SetBack2Front() and
 	  IsBack2Front() for this functionality. Still doesn't do anything
 	  yet.
+	- res augmented Cg VPs to modify the compiled ARB VP to use the 
+	  built-in GL state matrices for the ModelView etc. matrices resp.
+	  use glTrackMatrixNV() for nVidia VPs.
+	- res added the ability to load ARB VPs from raw text.
 2-Apr-2004
 	- res made the following changes:
 	    - Replaced the CS_SHADERVAR_STACK #define with a csShaderVarStack

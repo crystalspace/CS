@@ -19,6 +19,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "cssysdef.h"
 
+#include "csutil/databuf.h"
 #include "csutil/hashmap.h"
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
@@ -109,11 +110,13 @@ bool csShaderGLAVP::LoadProgramStringToGL ()
   if(!ext->CS_GL_ARB_vertex_program)
     return false;
 
-  //step to first !!
-  csRef<iDataBuffer> data = GetProgramData();
+  csRef<iDataBuffer> data = programBuffer;
+  if (!data)
+    data = GetProgramData();
   if (!data)
     return false;
 
+  //step to first !!
   const char* programstring = (char*)data->GetData ();
   int stringlen = data->GetSize ();
 
@@ -193,6 +196,20 @@ bool csShaderGLAVP::Load (iDocumentNode* program)
       if (!ParseCommon (child))
 	return false;
     }
+  }
+
+  return true;
+}
+
+bool csShaderGLAVP::Load (const char* program, 
+			  csArray<csShaderVarMapping> &mappings)
+{
+  programBuffer.AttachNew (new csDataBuffer (csStrNew (program),
+    strlen (program)));
+
+  for (int i = 0; i < mappings.Length(); i++)
+  {
+    variablemap.Push (VariableMapEntry (mappings[i]));
   }
 
   return true;

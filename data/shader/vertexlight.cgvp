@@ -19,25 +19,34 @@ struct vertex2fragment {
 };
 
 vertex2fragment main (app2vertex IN,
-	/*uniform float4x4 ModelView,
-	uniform float4x4 WorldViewInv : IT_MV_MATRIX,
-	uniform float4x4 WorldViewProj : MVP_MATRIX,*/
+	uniform float4x4 ModelView,		
+	  /* The CG plugin automatically binds the right matrices if the params
+	     are named appropriately.
+	     
+	     Currently supported base names:
+	       ModelView
+	       ModelViewProj
+	       Proj
+	     Currently supported suffixes:
+	       T - transpose, I - inverse, IT - inverse transposed
+	     */
+	uniform float4x4 ModelViewIT,	
+	uniform float4x4 ModelViewProj,
 	uniform float4 LightPos,
 	uniform float4 Attenuation,
 	uniform float3 LightColor)
 {
 	vertex2fragment OUT;
 
-	float3 eyeNormal = normalize (mul (glstate.matrix.invtrans.modelview[0], 
-	  IN.Normal).xyz);
-	float3 eyeVertex = mul (/*ModelView*/glstate.matrix.modelview[0], IN.Position).xyz;
+	float3 eyeNormal = normalize (mul (ModelViewIT, IN.Normal).xyz);
+	float3 eyeVertex = mul (ModelView, IN.Position).xyz;
 
 	float3 vertToLight = LightPos.xyz - eyeVertex;
 	float d = length (vertToLight);
 	float3 attParams = float3 (1.0f, d, d*d);
 	vertToLight *= rsqrt (d);
       
-	OUT.Hposition = mul (glstate.matrix.mvp, IN.Position);
+	OUT.Hposition = mul (ModelViewProj, IN.Position);
 	OUT.TexCoord = IN.TexCoord;
 	OUT.Color.rgb = LightColor * dot (eyeNormal, vertToLight) * dot (attParams,
 	  Attenuation);

@@ -62,18 +62,7 @@ csShaderGLCGCommon::~csShaderGLCGCommon ()
 
 void csShaderGLCGCommon::Activate()
 {
-  int i;
-
   cgGLEnableProfile (cgGetProgramProfile (program));
-
-  for(i = 0; i < matrixtrackers.Length(); ++i)
-  {
-    cgGLSetStateMatrixParameter (
-      matrixtrackers[i].parameter, 
-      matrixtrackers[i].matrix, 
-      matrixtrackers[i].modifier);
-  }
-
   cgGLBindProgram (program);
 }
 
@@ -203,123 +192,7 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
     i++;
   }
 
-#if 0
-  CGparameter param = cgGetFirstLeafParameter (program, CG_PROGRAM);
-  while (param)
-  {
-    const char* pname = cgGetParameterName (param);
-    if (!strcmp (pname, "ModelView"))
-    {
-      matrixtrackerentry map;
-      map.matrix = CG_GL_MODELVIEW_MATRIX;
-      map.modifier = CG_GL_MATRIX_IDENTITY;
-      map.parameter = param;
-      matrixtrackers.Push (map);
-    }
-    /*const char* binding = cgGetParameterSemantic (param);
-    if (binding != 0)
-    {
-      if (!strcmp (binding, "MV_MATRIX"))
-      {
-	matrixtrackerentry map;
-	map.matrix = CG_GL_MODELVIEW_MATRIX;
-	map.modifier = CG_GL_MATRIX_IDENTITY;
-	map.parameter = param;
-	matrixtrackers.Push (map);
-      }
-      else if (!strcmp (binding, "I_MV_MATRIX"))
-      {
-	matrixtrackerentry map;
-	map.matrix = CG_GL_MODELVIEW_MATRIX;
-	map.modifier = CG_GL_MATRIX_INVERSE;
-	map.parameter = param;
-	matrixtrackers.Push (map);
-      }
-      else if (!strcmp (binding, "T_MV_MATRIX"))
-      {
-	matrixtrackerentry map;
-	map.matrix = CG_GL_MODELVIEW_MATRIX;
-	map.modifier = CG_GL_MATRIX_TRANSPOSE;
-	map.parameter = param;
-	matrixtrackers.Push (map);
-      }
-      else if (!strcmp (binding, "IT_MV_MATRIX"))
-      {
-	matrixtrackerentry map;
-	map.matrix = CG_GL_MODELVIEW_MATRIX;
-	map.modifier = CG_GL_MATRIX_INVERSE_TRANSPOSE;
-	map.parameter = param;
-	matrixtrackers.Push (map);
-      }
-      else if (!strcmp (binding, "MVP_MATRIX"))
-      {
-	matrixtrackerentry map;
-	map.matrix = CG_GL_MODELVIEW_PROJECTION_MATRIX;
-	map.modifier = CG_GL_MATRIX_IDENTITY;
-	map.parameter = param;
-	matrixtrackers.Push (map);
-      }
-      else if (!strcmp (binding, "I_MVP_MATRIX"))
-      {
-	matrixtrackerentry map;
-	map.matrix = CG_GL_MODELVIEW_PROJECTION_MATRIX;
-	map.modifier = CG_GL_MATRIX_INVERSE;
-	map.parameter = param;
-	matrixtrackers.Push (map);
-      }
-      else if (!strcmp (binding, "T_MVP_MATRIX"))
-      {
-	matrixtrackerentry map;
-	map.matrix = CG_GL_MODELVIEW_PROJECTION_MATRIX;
-	map.modifier = CG_GL_MATRIX_TRANSPOSE;
-	map.parameter = param;
-	matrixtrackers.Push (map);
-      }
-      else if (!strcmp (binding, "IT_MVP_MATRIX"))
-      {
-	matrixtrackerentry map;
-	map.matrix = CG_GL_MODELVIEW_PROJECTION_MATRIX;
-	map.modifier = CG_GL_MATRIX_INVERSE_TRANSPOSE;
-	map.parameter = param;
-	matrixtrackers.Push (map);
-      }
-      else if (!strcmp (binding, "P_MATRIX"))
-      {
-	matrixtrackerentry map;
-	map.matrix = CG_GL_PROJECTION_MATRIX;
-	map.modifier = CG_GL_MATRIX_IDENTITY;
-	map.parameter = param;
-	matrixtrackers.Push (map);
-      }
-      else if (!strcmp (binding, "I_P_MATRIX"))
-      {
-	matrixtrackerentry map;
-	map.matrix = CG_GL_PROJECTION_MATRIX;
-	map.modifier = CG_GL_MATRIX_INVERSE;
-	map.parameter = param;
-	matrixtrackers.Push (map);
-      }
-      else if (!strcmp (binding, "T_P_MATRIX"))
-      {
-	matrixtrackerentry map;
-	map.matrix = CG_GL_PROJECTION_MATRIX;
-	map.modifier = CG_GL_MATRIX_TRANSPOSE;
-	map.parameter = param;
-	matrixtrackers.Push (map);
-      }
-      else if (!strcmp (binding, "IT_P_MATRIX"))
-      {
-	matrixtrackerentry map;
-	map.matrix = CG_GL_PROJECTION_MATRIX;
-	map.modifier = CG_GL_MATRIX_INVERSE_TRANSPOSE;
-	map.parameter = param;
-	matrixtrackers.Push (map);
-      }
-    }*/
-
-    param = cgGetNextLeafParameter (param);
-  }
-#endif
+  variablemap.ShrinkBestFit();
 
   return true;
 }

@@ -40,15 +40,6 @@ protected:
 #include "cstool/tokenlist.h"
 #undef CS_TOKEN_ITEM_FILE
 
-  struct matrixtrackerentry
-  {
-    CGGLenum matrix;
-    CGGLenum modifier;
-    CGparameter parameter;
-  };
-
-  csArray<matrixtrackerentry> matrixtrackers;
-
   csGLShader_CG* shaderPlug;
 
   CGprogram program;

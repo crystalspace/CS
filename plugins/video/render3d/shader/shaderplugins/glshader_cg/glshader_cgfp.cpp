@@ -85,8 +85,6 @@ void csShaderGLCGFP::ResetState()
 
 bool csShaderGLCGFP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 {
-  shaderPlug->Open ();
-
   csRef<iDataBuffer> programBuffer = GetProgramData();
   if (!programBuffer.IsValid())
     return false;
@@ -100,7 +98,7 @@ bool csShaderGLCGFP::Compile(csArray<iShaderVariableContext*> &staticContexts)
   if (shaderPlug->psplg)
   {
     program = cgCreateProgram (shaderPlug->context, CG_SOURCE,
-      programStr, CG_PROFILE_PS_1_3, entrypoint, 0);
+      programStr, CG_PROFILE_PS_1_3, entrypoint ? entrypoint : "main", 0);
 
     if (!program)
       return false;

@@ -33,9 +33,32 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 class csShaderGLCGVP : public csShaderGLCGCommon
 {
+  struct matrixtrackerentry
+  {
+    GLenum nvMatrix;
+    GLenum nvTransform;
+    GLuint nvAddress;
+  };
+
+  bool nvTrackMatrices;
+  csArray<matrixtrackerentry> matrixtrackers;
+  csRef<iShaderProgram> override;
 public:
   csShaderGLCGVP (csGLShader_CG* shaderPlug) : 
     csShaderGLCGCommon (shaderPlug) { }
+
+  /// Sets this program to be the one used when rendering
+  virtual void Activate ();
+
+  /// Deactivate program so that it's not used in next rendering
+  virtual void Deactivate();
+
+  /// Setup states needed for proper operation of the shader
+  virtual void SetupState (csRenderMesh* mesh,
+    const csShaderVarStack &stacks);
+
+  /// Reset states to original
+  virtual void ResetState ();
 
   /// Compile a program
   virtual bool Compile(csArray<iShaderVariableContext*> &staticContexts);

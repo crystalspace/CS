@@ -36,6 +36,7 @@ private:
   GLuint program_num;
 
   bool validProgram;
+  csRef<iDataBuffer> programBuffer;
 
   void Report (int severity, const char* msg, ...);
 public:
@@ -79,8 +80,8 @@ public:
   virtual bool Load(iDocumentNode* node);
 
   /// Loads from raw text
-  virtual bool Load (const char* program, csArray<csShaderVarMapping> &mappings)
-  { return false; }
+  virtual bool Load (const char* program, 
+    csArray<csShaderVarMapping> &mappings);
 
   /// Compile a program
   virtual bool Compile(csArray<iShaderVariableContext*> &staticContexts);
