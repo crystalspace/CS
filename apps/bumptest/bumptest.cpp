@@ -135,10 +135,12 @@ bool BumpTest::InitProcDemo ()
   p->CreateVertex (csVector3 (-dx, -dy, -dz) + csVector3(-2.5,0,0));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 1.0);
   csVector3 overdist(0,0,-0.01); // to move slightly in front
+
+#if 1
   /// the bumpoverlay
   // this does not work - the texture is flat shaded too.
   p = thing_state->CreatePolygon ();
-  p->SetTextureType(POLYTXT_FLAT);
+  p->SetTextureType(POLYTXT_LIGHTMAP);
   //p->SetLightingMode(false);
   p->GetFlags().Set(CS_POLY_LIGHTING, 0); // the overlay is not lit
   p->SetMaterial (imatBump);
@@ -146,15 +148,16 @@ bool BumpTest::InitProcDemo ()
   p->CreateVertex (csVector3 (+dx, +dy, -dz)+overdist);
   p->CreateVertex (csVector3 (+dx, -dy, -dz)+overdist);
   p->CreateVertex (csVector3 (-dx, -dy, -dz)+overdist);
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), .5);
-  const char *conv[] = {"POLYTXT_NONE", "POLYTXT_FLAT", "POLYTXT_GOURAUD",
-    "POLYTXT_LIGHTMAP"};
-  printf("PolyTexType = %s\n", conv[p->GetTextureType()]);
-  printf("MaterialWrap = %x  Handle %x\n", (int)imatBump, (int)imatBump->GetMaterialHandle());
+  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 1.0);
+  //const char *conv[] = {"POLYTXT_NONE", "POLYTXT_FLAT", "POLYTXT_GOURAUD",
+    //"POLYTXT_LIGHTMAP"};
+  //printf("PolyTexType = %s\n", conv[p->GetTextureType()]);
+  //printf("MaterialWrap = %x  Handle %x\n", (int)imatBump, (int)imatBump->GetMaterialHandle());
   iPolyTexType *ipn = p->GetPolyTexType();
   if(!ipn) printf("No PolyTexNone info!\n");
   else ipn->SetMixMode(CS_FX_MULTIPLY2);
-  if(ipn) ipn->SetMixMode(CS_FX_COPY);
+  //if(ipn) ipn->SetMixMode(CS_FX_COPY);
+#endif
 
   ////// copy of bumps for debug
   p = thing_state->CreatePolygon ();
