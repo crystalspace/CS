@@ -120,7 +120,7 @@ void csGraphics2D::Close ()
 
 void csGraphics2D::complete_pixel_format ()
 {
-  long s;
+  unsigned long s;
   pfmt.RedShift = 0;   s = pfmt.RedMask;   while (s && !(s&1)) { pfmt.RedShift++; s >>= 1; }
   pfmt.GreenShift = 0; s = pfmt.GreenMask; while (s && !(s&1)) { pfmt.GreenShift++; s >>= 1; }
   pfmt.BlueShift = 0;  s = pfmt.BlueMask;  while (s && !(s&1)) { pfmt.BlueShift++; s >>= 1; }
