@@ -4281,8 +4281,8 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
     }
   }
 
-  if (influenceOverride)
-    l->SetCutoffDistance (influenceRadius);
+  if (influenceOverride) l->SetCutoffDistance (influenceRadius);
+  else l->SetCutoffDistance (dist);
 
   // Move the key-value pairs from 'Keys' to the light object
   l->QueryObject ()->ObjAddChildren (&Keys);

@@ -110,8 +110,6 @@ public:
   void GetPerspectiveCenter (int& x, int& y) const { x = cx, y = cy; }
   void SetPerspectiveAspect (float aspect) { a = aspect; }
   float GetPerspectiveAspect () const { return a; }
-  void SetObjectToCamera (csReversibleTransform* o2c) { other2cam = *o2c; }
-  const csReversibleTransform& GetObjectToCamera () { return other2cam; }
   void SetRenderTarget (iTextureHandle* handle, bool persistent = false);
   iTextureHandle* GetRenderTarget () const;
   bool BeginDraw (int DrawFlags);
@@ -165,7 +163,6 @@ public:
     int iWidth, int iHeight) { return 0; }
 
   void RemoveFromCache (iRendererLightmap* rlm) { }
-  bool IsLightmapOK (int lmw, int lmh, int lightCellSize) { return false; }
   csPtr<iPolygonRenderer> CreatePolygonRenderer ();
   void SetWorldToCamera (const csReversibleTransform& w2c) { }
   void DrawSimpleMesh (const csSimpleRenderMesh& mesh, uint flags = 0) { }

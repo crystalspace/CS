@@ -432,6 +432,11 @@ bool csStencil2ShadowStep::Initialize (iObjectRegistry* objreg)
     Report (CS_REPORTER_SEVERITY_NOTIFY, 
       "Renderer does not support stencil shadows");
   }
+
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
+    "crystalspace.shared.stringset", iStringSet);
+  string_object2world = strings->Request ("object2world transform");
+
   return true;
 }
 
@@ -590,23 +595,14 @@ void csStencil2ShadowStep::DrawShadow(iRenderView *rview, int method, csStencil2
 {
   if (!cache_entry->MeshCastsShadow() || !cache_entry->ShadowCaps()) return;
 
-  iCamera* camera = rview->GetCamera ();
-
-  // First create the transformation from object to camera space directly:
-  //   W = Mow * O - Vow;
-  //   C = Mwc * (W - Vwc)
-  // ->
-  //   C = Mwc * (Mow * O - Vow - Vwc)
-  //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
-
-  csReversibleTransform tr_o2c = camera->GetTransform ();
-  if (!mesh->GetMovable()->IsFullTransformIdentity ())
-    tr_o2c /= mesh->GetMovable()->GetFullTransform ();
+  iCamera* camera = rview->GetCamera ();  
 
   iGraphics3D* g3d = rview->GetGraphics3D ();
 
   csRenderMesh rmesh;
-  rmesh.object2camera = tr_o2c;
+  rmesh.variablecontext.AttachNew (new csShaderVariableContext);
+  rmesh.variablecontext->GetVariableAdd (string_object2world)->SetValue (
+    mesh->GetMovable()->GetFullTransform ());
   rmesh.z_buf_mode = CS_ZBUF_TEST;
   rmesh.material = 0;
   rmesh.buffers = cache_entry->bufferHolder;
@@ -624,6 +620,7 @@ void csStencil2ShadowStep::DrawShadow(iRenderView *rview, int method, csStencil2
 
   stacks.Empty ();
   shmgr->PushVariables (stacks);
+  g3d->SetWorldToCamera (camera->GetTransform ());
   shader->SetupPass (shaderTicket, &rmesh, rmesh, stacks);
 
   switch (method)

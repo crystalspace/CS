@@ -126,6 +126,10 @@ csPortalContainer::csPortalContainer (iEngine* engine, iObjectRegistry *object_r
 
   shader_man = CS_QUERY_REGISTRY (object_reg, iShaderManager);
   fog_shader = shader_man->GetShader ("std_lighting_portal");
+
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
+    "crystalspace.shared.stringset", iStringSet);
+  string_object2world = strings->Request ("object2world transform");
 }
 
 csPortalContainer::~csPortalContainer ()
@@ -147,10 +151,16 @@ csRenderMesh** csPortalContainer::GetRenderMeshes (int& num,
   csRenderMesh*& meshPtr = rmHolder.GetUnusedMesh (rmCreated,
     rview->GetCurrentFrameNumber ());
 
+  csReversibleTransform &o2wt = meshwrapper->GetCsMovable ().GetFullTransform ();
+
   meshPtr->portal = this;
   meshPtr->material = 0;
-  meshPtr->object2camera = tr_o2c;
-  meshPtr->camera_origin = camera_origin;
+  meshPtr->worldspace_origin = o2wt.GetOrigin ();
+  if (rmCreated)
+  {
+    meshPtr->variablecontext.AttachNew (new csShaderVariableContext);
+  }
+  meshPtr->variablecontext->GetVariableAdd (string_object2world)->SetValue (o2wt);
   num = 1;
   return &meshPtr;
 }
@@ -743,7 +753,7 @@ void csPortalContainer::DrawOnePortal (
     mesh.texcoords = 0;
     mesh.texture = 0;
     mesh.colors = 0;
-    mesh.object2camera = rview->GetCamera ()->GetTransform ();
+    //mesh.object2camera = rview->GetCamera ()->GetTransform ();
     mesh.alphaType.alphaType = csAlphaMode::alphaSmooth;
     mesh.alphaType.autoAlphaMode = false;
     mesh.shader = fog_shader;

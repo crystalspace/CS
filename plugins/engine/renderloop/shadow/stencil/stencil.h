@@ -122,6 +122,7 @@ private:
   csWeakRef<iGraphics3D> g3d;
   csWeakRef<iShaderManager> shmgr;
   csRef<csStencilShadowType> type;
+  csStringID string_object2world;
 
   bool enableShadows;
   csRefArray<iLightRenderStep> steps;

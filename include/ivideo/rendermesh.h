@@ -139,12 +139,6 @@ struct csCoreRenderMesh
   unsigned int indexend;
   /** @} */
 
-  /// Transform to use for this mesh (object->camera)
-  csReversibleTransform object2camera;
-
-  /// Camera transform
-  csOrthoTransform *camera_transform;
-
   //iMaterialHandle* mathandle;
   // @@@ FIXME: SW needs it
   /// Material used for this mesh
@@ -184,9 +178,6 @@ struct csRenderMesh : public csCoreRenderMesh, public csRenderMeshModes
    * to determine whether a rendermesh is currently in use.
    */
   uint lastFrame;
-
-  /// Camera coordinate of the local 0,0,0 point of the object.
-  csVector3 camera_origin;
 
   /// Worldspace origin of the mesh
   csVector3 worldspace_origin;

@@ -440,6 +440,10 @@ bool csStencilShadowStep::Initialize (iObjectRegistry* objreg)
     Report (CS_REPORTER_SEVERITY_NOTIFY, 
       "Renderer does not support stencil shadows");
   }
+
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
+    "crystalspace.shared.stringset", iStringSet);
+  string_object2world = strings->Request ("object2world transform");
   return true;
 }
 
@@ -460,15 +464,6 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
 
   //float s, e;
   iCamera* camera = rview->GetCamera ();
-  // First create the transformation from object to camera space directly:
-  //   W = Mow * O - Vow;
-  //   C = Mwc * (W - Vwc)
-  // ->
-  //   C = Mwc * (Mow * O - Vow - Vwc)
-  //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
-  csReversibleTransform tr_o2c = camera->GetTransform ();
-  if (!mesh->GetMovable()->IsFullTransformIdentity ())
-    tr_o2c /= mesh->GetMovable()->GetFullTransform ();
 
   iGraphics3D* g3d = rview->GetGraphics3D ();
 
@@ -480,8 +475,9 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
   	edge_start);
 
   csRenderMesh rmesh;
-  rmesh.object2camera = tr_o2c;
-  //rmesh.transform = &tr_o2c;
+  rmesh.variablecontext.AttachNew (new csShaderVariableContext);
+  rmesh.variablecontext->GetVariableAdd (string_object2world)->SetValue (
+    mesh->GetMovable()->GetFullTransform ());
   rmesh.z_buf_mode = CS_ZBUF_TEST;
   //rmesh.mixmode = shader->GetMixmodeOverride (); //CS_FX_COPY;
   rmesh.material = 0;
@@ -489,6 +485,7 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
   rmesh.meshtype = CS_MESHTYPE_TRIANGLES;
 
   csRenderMeshModes modes (rmesh);
+  g3d->SetWorldToCamera (camera->GetTransform ());
   // probably shouldn't need to check this in general
   // but just in case, no need to draw if no edges are drawn
   if (edge_start < index_range) 
@@ -499,6 +496,7 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
     shadowCacheEntry->UpdateBuffers ();
     shmgr->PushVariables (stacks);
     shader->SetupPass (shaderTicket, &rmesh, modes, stacks);
+    rmesh.variablecontext->PushVariables (stacks);
     if (shadowCacheEntry->ShadowCaps())
     {
       rmesh.indexstart = 0;
@@ -521,6 +519,7 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
       g3d->DrawMesh (&rmesh, rmesh, stacks);
     }
     shader->TeardownPass (shaderTicket);
+    rmesh.variablecontext->PopVariables (stacks);
     shmgr->PopVariables (stacks);
   }
 }

@@ -15,6 +15,9 @@ chronological order.
 	- res fixed a stupid condition reversion in cssynldr.
 	- res fixed a 0 string passed to iFont->GetDimensions() by bugplug.
 	- res fixed a syntax error in reflect.xml.
+	- Marten made some general cleanup.
+	- Marten fixed DrawSimpleMesh after yesterdays changes.
+	- Marten fixed the approximate mesh z-sorting.
 28-Mar-2005
 	- Marten changed how transforms are sent from meshobjects to the
 	  renderer.

@@ -564,7 +564,12 @@ csRenderMesh** csParticlesObject::GetRenderMeshes (int& n, iRenderView* rview,
 
   if (vertnum>0) 
   {
-    radius = csQsqrt (new_radius);
+    new_radius = csQsqrt (new_radius);
+    if (new_radius>radius)
+    {
+      radius = new_radius;
+      scfiObjectModel.ShapeChanged ();
+    }
     running = true;
   }
   else
@@ -576,6 +581,8 @@ csRenderMesh** csParticlesObject::GetRenderMeshes (int& n, iRenderView* rview,
   int clip_portal, clip_plane, clip_z_plane;
   rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
   	clip_z_plane);
+
+  tr_o2c = cam->GetTransform () / o2wt;
 
   if (!point_sprites)
   {

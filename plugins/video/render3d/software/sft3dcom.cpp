@@ -4408,20 +4408,22 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
 
   if (flags & csSimpleMeshScreenspace)
   {
-    // @@@ Could be optimized by letting DrawMesh() do this special transform.
+    csReversibleTransform camtrans;
+
     const float vwf = (float)(width);
     const float vhf = (float)(height);
 
-    rmesh.object2camera.SetO2T (
-    csMatrix3 (1.0f, 0.0f, 0.0f,
-                0.0f, -1.0f, 0.0f,
-                0.0f, 0.0f, 1.0f));
-    rmesh.object2camera.SetO2TTranslation (csVector3 (
-    vwf / 2.0f, vhf / 2.0f, -aspect));
-    rmesh.object2camera *= mesh.object2camera;
+    camtrans.SetO2T (
+      csMatrix3 (1.0f, 0.0f, 0.0f,
+      0.0f, -1.0f, 0.0f,
+      0.0f, 0.0f, 1.0f));
+    camtrans.SetO2TTranslation (csVector3 (
+      vwf / 2.0f, vhf / 2.0f, -aspect));
+
+    SetWorldToCamera (camtrans);
   }
-  else
-    rmesh.object2camera = mesh.object2camera;
+
+  scrapContext.GetVariableAdd (string_object2world)->SetValue (mesh.object2world);
 
   csShaderVarStack stacks;
   shadermgr->PushVariables (stacks);
@@ -4509,36 +4511,6 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
   {
     slm = (csSoftSuperLightmap*)((csSoftwareTextureHandle*)lmh->GetCacheData());
   }
-
-  /*uint32 *indices = (uint32*)indexbuf->Lock (CS_BUF_LOCK_NORMAL);
-
-  //do_lighting = false;
-  bool lazyclip = false;
-
-  //SetObjectToCamera (&mesh->object2camera);
-  z_buf_mode = CS_ZBUF_USE;
-
-  const unsigned int numBuffers =
-    sizeof (activebuffers) / sizeof (iRenderBuffer*);
-  void* locks[numBuffers];
-  for (i=0; i<numBuffers; ++i)
-  {
-    if (activebuffers[i] != 0)
-      locks[i] = activebuffers[i]->Lock (CS_BUF_LOCK_NORMAL);
-    else
-      locks[i] = 0;
-  }
-
-  uint32 *indices = (uint32*)indexbuf->Lock (CS_BUF_LOCK_NORMAL);
-  csVector3* f1 = (csVector3*)locks[CS_VATTRIB_POSITION - 
-    CS_VATTRIB_SPECIFIC_FIRST];
-
-  // Transform
-  csDirtyAccessArray<csVector3> camVerts;
-  for (i = 0; i < (mesh->indexend - mesh->indexstart); i++)
-  {
-    camVerts.Push (o2c.Other2This (f1[i]));
-  }*/
 
   /*
     - perspective
@@ -4698,31 +4670,19 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
 
   csReversibleTransform object2world;
 
-  if (string_object2world>=(csStringID)stacks.Length () 
-    || stacks[string_object2world].Length () == 0)
-    object2world = mesh->object2camera.GetInverse ()*w2c;
-  else
-    stacks[string_object2world].Top ()->GetValue (object2world);
+  CS_ASSERT (string_object2world<(csStringID)stacks.Length () 
+    && stacks[string_object2world].Length () > 0);
+  
+  stacks[string_object2world].Top ()->GetValue (object2world);
 
   csReversibleTransform object2camera = w2c / object2world;
 
   //do_lighting = false;
   bool lazyclip = false;
 
-  //SetObjectToCamera (&mesh->object2camera);
   //z_buf_mode = CS_ZBUF_USE;
   z_buf_mode = modes.z_buf_mode;
 
-
-
-/*#if CS_DEBUG
-  // Check if the vertex buffers are locked.
-  CS_ASSERT (mesh.buffers[0]->IsLocked ());
-  if (mesh.num_vertices_pool > 1)
-  {
-    CS_ASSERT (mesh.buffers[1]->IsLocked ());
-  }
-#endif*/
 
   // @@@ Currently we don't implement multi-texture
   // in the generic implementation. This is a todo...

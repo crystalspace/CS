@@ -123,7 +123,7 @@ private:
   csWeakRef<iGraphics3D> g3d;
   csWeakRef<iShaderManager> shmgr;
   csRef<csStencil2ShadowType> type;
-
+  csStringID string_object2world;
 
 
   bool enableShadows;

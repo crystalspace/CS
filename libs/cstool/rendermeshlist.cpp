@@ -25,10 +25,12 @@
 #include "csutil/ref.h"
 #include "cstool/rendermeshlist.h"
 
-
+#include "iengine/camera.h"
 #include "iengine/engine.h"
+#include "iengine/rview.h"
 #include "ivideo/rendermesh.h"
 
+csVector3 csRenderMeshList::sort_CameraPosition;
 
 csRenderMeshList::csRenderMeshList (iEngine* engine)
 {
@@ -119,10 +121,11 @@ int csRenderMeshList::SortMeshBack2Front(meshListEntry const& me1,
   const csRenderMesh* m1 = me1.rm;
   const csRenderMesh* m2 = me2.rm;
 
-  float z1 = m1->camera_origin.z;
-  float z2 = m2->camera_origin.z;
-  if (z1 < z2) return 1;
-  else if (z1 > z2) return -1;
+  float distSQ1 = (m1->worldspace_origin - sort_CameraPosition).SquaredNorm ();
+  float distSQ2 = (m2->worldspace_origin - sort_CameraPosition).SquaredNorm ();
+
+  if (distSQ1 < distSQ2) return 1;
+  else if (distSQ1 > distSQ2) return -1;
   return SortMeshMaterial (me1, me2);
 }
 
@@ -136,7 +139,7 @@ int csRenderMeshList::SortMeshFront2Back(meshListEntry const& me1,
   // Since we only need one component ('z') we can do it a bit more optimal.
   // @@@ Even more optimal would be to do the calculation in the mesh
   // itself and put the 'z' in the csRenderMesh structure.
-  const csReversibleTransform& t1 = m1->object2camera;
+  /*const csReversibleTransform& t1 = m1->object2camera;
   const csReversibleTransform& t2 = m2->object2camera;
   const csMatrix3& t1m = t1.GetO2T ();
   const csMatrix3& t2m = t2.GetO2T ();
@@ -146,11 +149,16 @@ int csRenderMeshList::SortMeshFront2Back(meshListEntry const& me1,
   float z2 = - t2m.m31*t2v.x - t2m.m32*t2v.y - t2m.m33*t2v.z;
 
   if (z1 < z2) return -1;
-  else if (z1 > z2) return 1;
+  else if (z1 > z2) return 1;*/
+  float distSQ1 = (m1->worldspace_origin - sort_CameraPosition).SquaredNorm ();
+  float distSQ2 = (m2->worldspace_origin - sort_CameraPosition).SquaredNorm ();
+
+  if (distSQ1 < distSQ2) return -1;
+  else if (distSQ1 > distSQ2) return 1;
   return SortMeshMaterial (me1, me2);
 }
 
-size_t csRenderMeshList::SortMeshLists ()
+size_t csRenderMeshList::SortMeshLists (iRenderView* rview )
 {
   size_t numObjects = 0;
   csPDelArray < renderMeshListInfo >::Iterator it = renderList.GetIterator ();
@@ -162,10 +170,12 @@ size_t csRenderMeshList::SortMeshLists ()
 
     if (listEnt->sortingOption == CS_RENDPRI_BACK2FRONT)
     {
+      sort_CameraPosition = rview->GetCamera ()->GetTransform ().GetOrigin ();
       listEnt->meshList.Sort (SortMeshBack2Front);
     }
     else if (listEnt->sortingOption == CS_RENDPRI_FRONT2BACK)
     {
+      sort_CameraPosition = rview->GetCamera ()->GetTransform ().GetOrigin ();
       listEnt->meshList.Sort (SortMeshFront2Back);
     }
     else

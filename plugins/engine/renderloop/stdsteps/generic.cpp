@@ -166,8 +166,6 @@ csGenericRenderStep::csGenericRenderStep (
   portalTraversal = false;
   zmode = CS_ZBUF_USE;
   currentSettings = false;
-  o2c_matrix_name = strings->Request ("object2camera matrix");
-  o2c_vector_name = strings->Request ("object2camera vector");
   fogplane_name = strings->Request ("fogplane");
   fogdensity_name = strings->Request ("fog density");
   fogcolor_name = strings->Request ("fog color");
@@ -210,12 +208,6 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
       if (meshContext->IsEmpty())
 	meshContext = 0;
       if ((!portalTraversal) && mesh->portal != 0) continue;
-      csShaderVariable *sv;
-      
-      sv = shadervars.Top ().GetVariable (o2c_matrix_name);
-      sv->SetValue (mesh->object2camera.GetO2T ());
-      sv = shadervars.Top ().GetVariable (o2c_vector_name);
-      sv->SetValue (mesh->object2camera.GetO2TTranslation ());
 
       if ((mesh->material->GetMaterial () != material)
 	|| (meshContext != lastMeshContext))
@@ -373,7 +365,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   iGraphics3D* g3d = rview->GetGraphics3D();
 
   csRenderMeshList* meshlist = sector->GetVisibleMeshes (rview);
-  size_t num = meshlist->SortMeshLists ();
+  size_t num = meshlist->SortMeshLists (rview);
   visible_meshes.SetLength (visible_meshes_index+num);
   imeshes_scratch.SetLength (num);
   mesh_svc.SetLength (visible_meshes_index+num);

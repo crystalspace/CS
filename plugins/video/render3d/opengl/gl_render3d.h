@@ -437,15 +437,6 @@ public:
   virtual csZBufMode GetZMode ()
   { return current_zmode; }
   
-  /// Set object to view transform
-  //void SetObjectToCameraInternal (const csReversibleTransform& wvmatrix);
-
-  virtual void SetObjectToCamera (csReversibleTransform*)
-  {
-    CS_ASSERT (false);	// Don't use with NR!
-  }
-  virtual const csReversibleTransform& GetObjectToCamera ();
-
   virtual void SetWorldToCamera (const csReversibleTransform& w2c);
 
   /// Set the current render target (0 for screen).
@@ -569,7 +560,6 @@ public:
   virtual float GetZBuffValue (int, int);
 
   virtual void RemoveFromCache (iRendererLightmap*) { }  
-  virtual bool IsLightmapOK (int, int, int) { return true; }
   //=========================================================================
 
 

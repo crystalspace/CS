@@ -216,23 +216,10 @@ void csGLGraphics3D::DisableStencilClipping ()
 
 void csGLGraphics3D::SetGlOrtho (bool inverted)
 {
-  /// @@@ Why was this here in the first place? /Anders Stenberg
-  /*if (render_target)
-  {
-    if (inverted)
-      glOrtho (0., (GLdouble) viewwidth,
-      (GLdouble) (viewheight), 0., -1.0, 10.0);
-    else
-      glOrtho (0., (GLdouble) viewwidth, 0.,
-      (GLdouble) (viewheight), -1.0, 10.0);
-  }
+  if (inverted)
+    glOrtho (0., (GLdouble) viewwidth, (GLdouble) viewheight, 0., -1.0, 10.0);
   else
-  {*/
-    if (inverted)
-      glOrtho (0., (GLdouble) viewwidth, (GLdouble) viewheight, 0., -1.0, 10.0);
-    else
-      glOrtho (0., (GLdouble) viewwidth, 0., (GLdouble) viewheight, -1.0, 10.0);
-  //}
+    glOrtho (0., (GLdouble) viewwidth, 0., (GLdouble) viewheight, -1.0, 10.0);
 }
 
 csZBufMode csGLGraphics3D::GetZModePass2 (csZBufMode mode)
@@ -1343,27 +1330,6 @@ void csGLGraphics3D::Print (csRect const* area)
   G2D->Print (area);
 }
 
-const csReversibleTransform& csGLGraphics3D::GetObjectToCamera()
-{
-  return other2cam;
-}
-
-/*void csGLGraphics3D::SetObjectToCameraInternal (
-	const csReversibleTransform& object2cam)
-{
-  const csMatrix3 &orientation1 = object2camera.GetO2T();
-  const csVector3 &translation1 = object2camera.GetO2TTranslation();
-  const csMatrix3 &orientation2 = object2cam.GetO2T();
-  const csVector3 &translation2 = object2cam.GetO2TTranslation();
-  if (translation1 == translation2 &&
-      orientation1.Col1 () == orientation2.Col1 () &&
-      orientation1.Col2 () == orientation2.Col2 () &&
-      orientation1.Col3 () == orientation2.Col3 ())
-    return;
-  object2camera = object2cam;
-  ApplyObjectToCamera ();
-}*/
-
 void csGLGraphics3D::DrawLine (const csVector3 & v1, const csVector3 & v2,
 	float fov, int color)
 {
@@ -1837,14 +1803,12 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 		num_tri);
   if (debug_inhibit_draw) return;
 
-//  SetObjectToCameraInternal (mymesh->object2camera);
   csReversibleTransform o2w;
 
-  if (string_object2world>=(csStringID)stacks.Length () 
-      || stacks[string_object2world].Length () == 0)
-    o2w = mymesh->object2camera.GetInverse ()*world2camera;
-  else
-    stacks[string_object2world].Top ()->GetValue (o2w);
+  CS_ASSERT (string_object2world<(csStringID)stacks.Length () 
+      && stacks[string_object2world].Length () > 0);
+    
+  stacks[string_object2world].Top ()->GetValue (o2w);
   
 
   float matrix[16];
@@ -2623,30 +2587,31 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
 
   if (flags & csSimpleMeshScreenspace)
   {
+    csReversibleTransform camtrans;
     if (current_drawflags & CSDRAW_2DGRAPHICS)
     {
-      rmesh.object2camera.SetO2T (
+      camtrans.SetO2T (
         csMatrix3 (1.0f, 0.0f, 0.0f,
                    0.0f, -1.0f, 0.0f,
                    0.0f, 0.0f, 1.0f));
-      rmesh.object2camera.SetO2TTranslation (csVector3 (0, viewheight, 0));
+      camtrans.SetO2TTranslation (csVector3 (0, viewheight, 0));
     } 
     else 
-      {
+    {
       const float vwf = (float)(viewwidth);
       const float vhf = (float)(viewheight);
 
-      rmesh.object2camera.SetO2T (
+      camtrans.SetO2T (
       csMatrix3 (1.0f, 0.0f, 0.0f,
                  0.0f, -1.0f, 0.0f,
                  0.0f, 0.0f, 1.0f));
-      rmesh.object2camera.SetO2TTranslation (csVector3 (
+      camtrans.SetO2TTranslation (csVector3 (
       vwf / 2.0f, vhf / 2.0f, -aspect));
     }
-    rmesh.object2camera *= mesh.object2camera;
+    SetWorldToCamera (camtrans);
   }
-  else
-    rmesh.object2camera = mesh.object2camera;
+  
+  scrapContext.GetVariableAdd (string_object2world)->SetValue (mesh.object2world);
 
   csShaderVarStack stacks;
   shadermgr->PushVariables (stacks);

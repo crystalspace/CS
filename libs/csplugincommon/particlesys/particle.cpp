@@ -396,7 +396,7 @@ csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num,
   rm->indexend = TriangleCount * 3;
   rm->material = Material;
   CS_ASSERT (Material != 0);
-  rm->camera_origin = movable->GetFullPosition ();
+  rm->worldspace_origin = movable->GetFullPosition ();
   rm->variablecontext->GetVariableAdd (string_object2world)->SetValue (camera->GetTransform ());
  
   num = 1;

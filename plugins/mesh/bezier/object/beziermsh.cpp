@@ -866,9 +866,7 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
   // combining object to world and world to camera.
   csReversibleTransform obj_cam = camtrans;
   obj_cam /= movtrans;
-  //rview->GetGraphics3D ()->SetObjectToCamera (&obj_cam);
-  //rview->GetGraphics3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zMode);
-
+ 
   int clip_portal, clip_plane, clip_z_plane;
   rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
       clip_z_plane);

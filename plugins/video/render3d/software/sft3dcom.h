@@ -727,20 +727,10 @@ public:
   {
     return aspect;
   }
-  /// Set object to camera transformation.
-  virtual void SetObjectToCamera (csReversibleTransform* o2c)
-  {
-    this->o2c = *o2c;
-  }
   virtual void SetWorldToCamera (const csReversibleTransform& w2c)
   {
     this->w2c = w2c;
     shadermgr->GetVariableAdd (string_world2camera)->SetValue (w2c);
-  }
-  /// Get object to camera transformation.
-  virtual const csReversibleTransform& GetObjectToCamera ()
-  {
-    return o2c;
   }
   /// Set optional clipper.
   virtual void SetClipper (iClipper2D* clipper, int cliptype);
@@ -1014,7 +1004,6 @@ public:
   //=========================================================================
   virtual iHalo *CreateHalo (float, float, float,
     unsigned char *, int, int) { return 0; }
-  virtual bool IsLightmapOK (int, int, int) { return true; }
   //=========================================================================
 
   struct eiComponent : public iComponent

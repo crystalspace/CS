@@ -32,6 +32,7 @@ struct iEngine;
 struct iObjectRegistry;
 struct csRenderMesh;
 struct iMeshWrapper;
+struct iRenderView;
 
 /**
  * This class is used when we need to store, sort and then render a list of
@@ -62,7 +63,7 @@ public:
    * Sort the list of meshes by render priority and within every render
    * priority. Return number of total meshes.
    */
-  size_t SortMeshLists ();
+  size_t SortMeshLists (iRenderView *rview);
 
   /**
    * After sorting the meshes fetch them with this function.
@@ -104,6 +105,7 @@ private:
   static int SortMeshMaterial (meshListEntry const& me1, meshListEntry const& me2);
   static int SortMeshBack2Front (meshListEntry const& me1, meshListEntry const& me2);
   static int SortMeshFront2Back (meshListEntry const& me1, meshListEntry const& me2);
+  static csVector3 sort_CameraPosition;
 };
 
 #endif //__CS_RENDERMESHLIST_H__

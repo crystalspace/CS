@@ -520,12 +520,12 @@ struct csSimpleRenderMesh
   /**
    * (Optional) Transform to apply to the mesh.
    * \remark This transform is initialized to an identity transform.
-   *  This effectively means that geometry is drawn in eye space.
+   *  This effectively means that geometry is drawn in world space.
    *  To draw in screen space, supply the \a csSimpleMeshScreenspace
    *  flag to DrawSimpleMesh(). For anything else supply an appropriate
    *  transformation.
    */
-  csReversibleTransform object2camera;
+  csReversibleTransform object2world;
 
   csSimpleRenderMesh () : texcoords(0), colors(0), texture (0), shader (0), 
     dynDomain (0), z_buf_mode (CS_ZBUF_NONE), mixmode (CS_FX_COPY)
@@ -607,18 +607,7 @@ struct iGraphics3D : public iBase
 
   /// Get aspect ratio.
   virtual float GetPerspectiveAspect () const = 0;
-
-  /**
-   * Set object to camera transformation (currently only used by
-   * DrawTriangleMesh and DrawPolygonMesh).
-   */
-  virtual void SetObjectToCamera (csReversibleTransform* o2c) = 0;
-
-  /**
-   * Get object to camera transformation.
-   */
-  virtual const csReversibleTransform& GetObjectToCamera () = 0;
-  
+ 
   /**
    * Set the target of rendering. If this is 0 then the target will
    * be the main screen. Otherwise it is a texture. After calling
@@ -653,6 +642,29 @@ struct iGraphics3D : public iBase
    */
   virtual void Print (csRect const* area) = 0;
 
+  /// Drawroutine. Only way to draw stuff
+  virtual void DrawMesh (const csCoreRenderMesh* mymesh,
+                         const csRenderMeshModes& modes,
+                         const csArray< csArray<csShaderVariable*> > &stacks) = 0;
+  /**
+  * Draw a csSimpleRenderMesh on the screen.
+  * Simple render meshes are intended for cases where setting up
+  * a render mesh and juggling with render buffers would be too much
+  * effort - e.g. when you want to draw a single polygon on the screen.
+  * <p>
+  * DrawSimpleMesh () hides the complexity of csRenderMesh, it cares
+  * about setting up render buffers, activating the texture etc.
+  * Note that you can still provide shaders and shader variables, but those
+  * are optional.
+  * \param mesh The mesh to draw.
+  * \param flags Drawing flags, a combination of csSimpleMeshFlags values.
+  * \remark This operation can also be called from 2D mode. In this case,
+  *  the csSimpleMeshScreenspace flag should be specified. If this is not the
+  *  case, you are responsible for the mess that is likely created.
+  */
+  virtual void DrawSimpleMesh (const csSimpleRenderMesh& mesh,
+    uint flags = 0) = 0;
+
   /**
    * Draw a pixmap using a rectangle from given texture.
    * The sx,sy(sw,sh) rectangle defines the screen rectangle within
@@ -678,6 +690,32 @@ struct iGraphics3D : public iBase
     float fov, int color) = 0;
 
   /**
+  * Activate the buffers in the default buffer holder.
+  */
+  virtual bool ActivateBuffers (csRenderBufferHolder* holder, 
+    csRenderBufferName mapping[CS_VATTRIB_SPECIFIC_LAST+1]) = 0;
+
+  /**
+  * Activate all given buffers.
+  */
+  virtual bool ActivateBuffers (csVertexAttrib *attribs,
+    iRenderBuffer **buffers, unsigned int count) = 0;
+
+  /**
+  * Deactivate all given buffers.
+  * If attribs is 0, all buffers are deactivated;
+  */
+  virtual void DeactivateBuffers (csVertexAttrib *attribs, unsigned int count) = 0;
+
+  /**
+  * Activate or deactivate all given textures depending on the value
+  * of 'textures' for that unit (i.e. deactivate if 0).
+  */
+  virtual void SetTextureState (int* units, iTextureHandle** textures,
+    int count) = 0;
+
+
+  /**
    * Set optional clipper to use. If clipper == null
    * then there is no clipper.
    * Currently only used by DrawTriangleMesh.
@@ -696,7 +734,6 @@ struct iGraphics3D : public iBase
 
   /**
    * Set near clip plane.
-   * Currently only used by DrawTriangleMesh.
    */
   virtual void SetNearPlane (const csPlane3& pl) = 0;
 
@@ -726,44 +763,7 @@ struct iGraphics3D : public iBase
    * support that option.
    */
   virtual bool SetOption (const char*, const char*) = 0;
-
-  /**
-   * Activate the buffers in the default buffer holder.
-   */
-  virtual bool ActivateBuffers (csRenderBufferHolder* holder, 
-    csRenderBufferName mapping[CS_VATTRIB_SPECIFIC_LAST+1]) = 0;
-
-  /**
-   * Activate all given buffers.
-   */
-  virtual bool ActivateBuffers (csVertexAttrib *attribs,
-    iRenderBuffer **buffers, unsigned int count) = 0;
-
-  /**
-   * Deactivate all given buffers.
-   * If attribs is 0, all buffers are deactivated;
-   */
-   virtual void DeactivateBuffers (csVertexAttrib *attribs, unsigned int count) = 0;
-
-  /**
-   * Activate or deactivate all given buffers depending on the value of
-   * 'buffers' for that index.
-   */
-/*  virtual void SetBufferState (csVertexAttrib* attribs,
-  	iRenderBuffer** buffers, int count) = 0;*/
-
-  /**
-   * Activate or deactivate all given textures depending on the value
-   * of 'textures' for that unit (i.e. deactivate if 0).
-   */
-  virtual void SetTextureState (int* units, iTextureHandle** textures,
-  	int count) = 0;
-
-  /// Drawroutine. Only way to draw stuff
-  virtual void DrawMesh (const csCoreRenderMesh* mymesh,
-    const csRenderMeshModes& modes,
-    const csArray< csArray<csShaderVariable*> > &stacks) = 0;
-
+  
   /// Set the masking of color and/or alpha values to framebuffer
   virtual void SetWriteMask (bool red, bool green, bool blue, bool alpha) = 0;
 
@@ -773,6 +773,9 @@ struct iGraphics3D : public iBase
 
   /// Set the z buffer write/test mode
   virtual void SetZMode (csZBufMode mode) = 0;
+
+  /// Get the z buffer write/test mode
+  virtual csZBufMode GetZMode () = 0;
 
   /// Enables offsetting of Z values
   virtual void EnableZOffset () = 0;
@@ -814,17 +817,6 @@ struct iGraphics3D : public iBase
    * (csPolygon3D destructor will do that).
    */
   virtual void RemoveFromCache (iRendererLightmap* rlm) = 0;
-
-  //=========================================================================
-  // Here ends the zone of unimplemented methods.
-  //=========================================================================
-
-  /**
-   * Check if renderer can handle a lightmap.
-   * Returns true if it can, false if not.
-   */
-  virtual bool IsLightmapOK (int lmw, int lmh, 
-    int lightCellSize) = 0;
     
   virtual csPtr<iPolygonRenderer> CreatePolygonRenderer () = 0;
 
@@ -833,28 +825,6 @@ struct iGraphics3D : public iBase
    * This affects rendering in DrawMesh and DrawSimpleMesh.
    */
   virtual void SetWorldToCamera (const csReversibleTransform& w2c) = 0;
-
-  /**
-   * Draw a csSimpleRenderMesh on the screen.
-   * Simple render meshes are intended for cases where setting up
-   * a render mesh and juggling with render buffers would be too much
-   * effort - e.g. when you want to draw a single polygon on the screen.
-   * <p>
-   * DrawSimpleMesh () hides the complexity of csRenderMesh, it cares
-   * about setting up render buffers, activating the texture etc.
-   * Note that you can still provide shaders and shader variables, but those
-   * are optional.
-   * \param mesh The mesh to draw.
-   * \param flags Drawing flags, a combination of csSimpleMeshFlags values.
-   * \remark This operation can also be called from 2D mode. In this case,
-   *  the csSimpleMeshScreenspace flag should be specified. If this is not the
-   *  case, you are responsible for the mess that is likely created.
-   */
-  virtual void DrawSimpleMesh (const csSimpleRenderMesh& mesh,
-    uint flags = 0) = 0;
-
-  /// Get the z buffer write/test mode
-  virtual csZBufMode GetZMode () = 0;
 };
 
 /** @} */
