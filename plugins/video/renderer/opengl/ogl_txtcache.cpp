@@ -472,90 +472,8 @@ void OpenGLLightmapCache::Load(csGLCacheData *d)
   int lmrealwidth = lightmap_info->GetRealWidth ();
   int lmrealheight = lightmap_info->GetRealHeight ();
 
-//lmheight = floor(pow(2.0, ceil(log(lmheight)/log(2.0)) ) );
-//lmwidth = floor(pow(2.0, ceil(log(lmwidth)/log(2.0)) ) );
-
-#if NEW_LM_FORMAT
   unsigned char *map_data = lightmap_info->GetMapData ();
-#else
-  unsigned char *red_data = lightmap_info->GetMap (0);
-  unsigned char *green_data = lightmap_info->GetMap (1);
-  unsigned char *blue_data = lightmap_info->GetMap (2);
-#endif
-
-#if NEW_LM_FORMAT
   unsigned char* lm_data = map_data;
-#else
-  // @@@ Note @@@
-  // The lightmap data used by Crystal Space is in another format
-  // then the lightmap data needed by OpenGL. Maybe we should consider
-  // switching Crystal Space to this format as it is more standard?
-  // For the software renderer this would be almost no problem and
-  // it would make the hardware renderers faster as the following
-  // conversion would not be needed anymore.
-  unsigned char *lm_data = new unsigned char[lmwidth*lmheight*4];
-  unsigned char *walkdata = lm_data;
-  unsigned char *last_data = walkdata+(lmwidth*lmheight*4);
-  while (walkdata < last_data)
-  {
-    *walkdata++ = *red_data++;
-    *walkdata++ = *green_data++;
-    *walkdata++ = *blue_data++;
-    *walkdata++ = NORMAL_LIGHT_LEVEL;
-  }
-#endif
-
-#if 0
-  // Because our actual lightmap is a smaller lightmap in a larger
-  // po2 texture we can have problems when using GL_LINEAR for
-  // the GL_TEXTURE_MAG_FILTER and GL_TEXTURE_MIN_FILTER.
-  // We still have to copy the last row and column of the lightmap
-  // to just outside the original lightmap boundaries.
-  // Otherwise we get a random colored border. Because we use
-  // GL_REPEAT the problem is even worse. In that case we also have to
-  // copy the first row and column to the last row and column in
-  // the po2 lightmap texture.
-  int i;
-  if (lmwidth != lmrealwidth)
-  {
-    // Point to last real column.
-    unsigned char* lastrealcol = lm_data+(lmrealwidth-1)*4;
-    // Copy to next column.
-    for (i = 0 ; i < lmheight ; i++)
-    {
-      lastrealcol[4] = lastrealcol[0];
-      lastrealcol[5] = lastrealcol[1];
-      lastrealcol[6] = lastrealcol[2];
-      lastrealcol += lmwidth*4;
-    }
-
-    // Point to last physical column.
-    unsigned char* lastcol = lm_data+(lmwidth-1)*4;
-    unsigned char* firstcol = lm_data;
-    // Copy first column to last.
-    for (i = 0 ; i < lmheight ; i++)
-    {
-      lastcol[0] = firstcol[0];
-      lastcol[1] = firstcol[1];
-      lastcol[2] = firstcol[2];
-      lastcol += lmwidth*4;
-      firstcol += lmwidth*4;
-    }
-  }
-  if (lmheight != lmrealheight)
-  {
-    // Point to last real row.
-    unsigned char* lastrealrow = lm_data+lmwidth*(lmrealheight-1)*4;
-    // Copy to next row.
-    for (i = 0 ; i < lmwidth*4 ; i++) lastrealrow[i+lmwidth*4] = lastrealrow[i];
-
-    // Point to last physical row.
-    unsigned char* lastrow = lm_data+lmwidth*(lmheight-1)*4;
-    unsigned char* firstrow = lm_data;
-    // Copy first row to last.
-    for (i = 0 ; i < lmwidth*4 ; i++) lastrow[i] = firstrow[i];
-  }
-#endif
 
   GLuint lightmaphandle;
   glGenTextures (1, &lightmaphandle);
@@ -573,12 +491,9 @@ void OpenGLLightmapCache::Load(csGLCacheData *d)
   errtest = glGetError();
   if (errtest != GL_NO_ERROR)
   {
-    //SysPrintf (MSG_DEBUG_0,"openGL error string: %s\n",gluErrorString(errtest) );
+    //SysPrintf (MSG_DEBUG_0,"openGL error string: %s\n",
+    	//gluErrorString(errtest) );
   }
-
-#if !NEW_LM_FORMAT
-  delete [] lm_data;
-#endif
 
 /*
     CsPrintf(MSG_DEBUG_0,"caching lightmap in handle %d\n", lightmaphandle);

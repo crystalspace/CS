@@ -97,14 +97,6 @@ public:
 
   /// Get data.
   unsigned char* GetMap () { return map; }
-#if !NEW_LM_FORMAT
-  /// Get red map.
-  unsigned char* GetRed () { return map; }
-  /// Get green map.
-  unsigned char* GetGreen () { return map+max_sizeRGB; }
-  /// Get blue map.
-  unsigned char* GetBlue () { return map+(max_sizeRGB<<1); }
-#endif
 
   /// Set color maps.
   void SetMap (unsigned char* m) { map = m; }
@@ -114,22 +106,14 @@ public:
   {
     max_sizeRGB = size;
     delete [] map;
-#if NEW_LM_FORMAT
     map = new unsigned char [size*4];
-#else
-    map = new unsigned char [size*3];
-#endif
   }
 
   ///
   void Copy (csRGBLightMap& other, int size)
   {
     Clear ();
-#if NEW_LM_FORMAT
     if (other.map) { Alloc (size); memcpy (map, other.map, size*4); }
-#else
-    if (other.map) { Alloc (size); memcpy (map, other.map, size*3); }
-#endif
   }
 };
 
@@ -308,11 +292,7 @@ public:
   //------------------------ iLightMap implementation ------------------------
   DECLARE_IBASE;
   ///
-#if NEW_LM_FORMAT
   virtual unsigned char *GetMapData ();
-#else
-  virtual unsigned char *GetMap (int nMap);
-#endif
   ///
   virtual int GetWidth ()
   { return lwidth; }

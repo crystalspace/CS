@@ -82,13 +82,7 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 
   iLightMap *lm = pt->GetLightMap ();
   int lm_w = lm->GetWidth ();
-#if NEW_LM_FORMAT
   UByte *lm_data = lm->GetMapData ();
-#else
-  UByte *lm_R = lm->GetMap (0);
-  UByte *lm_G = lm->GetMap (1);
-  UByte *lm_B = lm->GetMap (2);
-#endif
 
   void *dst = ct->get_bitmap ();
   ULong *old_lm = (ULong *)ct->get_lightmap ();
@@ -138,13 +132,12 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 
   int src = min_lu + min_lv * lm_w;
   int src_dlu = lm_w - (max_lu - min_lu);
+  int lmlm_w = lm_w << 2;
   for (int lv = min_lv; lv < max_lv; lv++)
   {
     for (int lu = min_lu; lu < max_lu; lu++)
     {
-#if NEW_LM_FORMAT
       int lmsrc = src << 2;
-      int lmlm_w = lm_w << 2;
 #define GET(map, col)				\
       UByte col##00, col##10, col##01, col##11;	\
       col##00 = map [lmsrc];			\
@@ -160,23 +153,6 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
       // have not yet found out why and how to fix it.
       GET ((lm_data+2), b);
 #undef GET
-#else
-#define GET(map, col)				\
-      UByte col##00, col##10, col##01, col##11;	\
-      col##00 = map [src];			\
-      col##10 = map [src + 1];			\
-      col##01 = map [src + lm_w];		\
-      col##11 = map [src + lm_w + 1];
-
-      GET (lm_R, r);
-      GET (lm_G, g);
-      // @@@ The following statement causes an access slightly
-      // beyond the bounds of the lm_B array in some cases.
-      // I discovered this with a memory debugger. However I
-      // have not yet found out why and how to fix it.
-      GET (lm_B, b);
-#undef GET
-#endif
 
       // this is somewhat tricky but in practice it works well
 #if 0

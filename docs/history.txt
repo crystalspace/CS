@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+18-May-2001
+	- Since the new lightmap format seems to work well I removed the
+	  optional support for the old format.
 17-May-2001
 	- Fixed Blocks so it compiles again.
 	- Did an experimental optimization. CS will now keep the lightmap
@@ -11,7 +14,7 @@ The history order is reversed so that new features are at the top.
 	  up which is especially visible if there are dynamic lights and
 	  you are moving a lot (and there are lots of lightmaps). Otherwise
 	  it will not give a slow-down.
-	  The new format can be turned of by setting NEW_LM_FORMAT to 0
+	  The new format can be turned off by setting NEW_LM_FORMAT to 0
 	  in iengine/lightmap.h.
 	  WARNING! Lightmaps will have to be relalculated (-relight).
 	- Removed a bunch of code in OpenGL lightmap handling which used
@@ -26,6 +29,8 @@ The history order is reversed so that new features are at the top.
 	  define their own custom operator `new' overloads.  The extensive
 	  debug facility can now be disabled on a platform-by-platform basis
 	  and is now disabled, by default, on BeOS.
+	- Thomas Hieber did a little bit more work on map2cs. It now starts
+	  to look ok but walktest still crashes on it.
 16-May-2001
 	- Philip Wyett did a quick update to eliminate 3000 compiler warnings.
 	  Pragma'ed C4291 out, for time being, will come back to this.

@@ -21,12 +21,6 @@
 
 #include "csutil/scf.h"
 
-// @@@ This is a temporary define to mark a transition in lightmap
-// format. The old format is rrrrrrrrrrrrrrrrgggggggggggggggbbbbbbbbbbbbbbbb.
-// The new format will be rgb0rgb0rgb0rgb0rgb0. The latter format is better
-// for hardware. Though it uses a little more memory.
-#define NEW_LM_FORMAT 1
-
 SCF_VERSION (iLightMap, 0, 0, 2);
 
 /**
@@ -37,13 +31,8 @@ SCF_VERSION (iLightMap, 0, 0, 2);
  */
 struct iLightMap : public iBase
 {
-#if NEW_LM_FORMAT
   /// Get light map data (format rgb0rgb0rgb0...).
   virtual unsigned char *GetMapData () = 0;
-#else
-  /// Get light map by index; 0 - red, 1 - green, 2 - blue
-  virtual unsigned char *GetMap (int nMap) = 0;
-#endif
   /// Get lightmap width (could be adjusted to power of two)
   virtual int GetWidth () = 0;
   /// Get lightmap height (could be adjusted to power of two)

@@ -739,13 +739,7 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
   // Compute the light coverage for every cell of the lightmap
   GetCoverageMatrix (lview, lc);
 
-#if NEW_LM_FORMAT
   unsigned char *map;
-#else
-  unsigned char *mapR;
-  unsigned char *mapG;
-  unsigned char *mapB;
-#endif
   csShadowMap *smap = NULL;
 
   int ww, hh;
@@ -770,23 +764,11 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
     }
     else
       first_time = false;
-#if NEW_LM_FORMAT
     map = smap->map;
-#else
-    mapR = smap->map;
-    mapG = NULL;
-    mapB = NULL;
-#endif
   }
   else
   {
-#if NEW_LM_FORMAT
     map = lm->GetStaticMap ().GetMap ();
-#else
-    mapR = lm->GetStaticMap ().GetRed ();
-    mapG = lm->GetStaticMap ().GetGreen ();
-    mapB = lm->GetStaticMap ().GetBlue ();
-#endif
   }
 
   // From: T = Mwt * (W - Vwt)
@@ -810,7 +792,8 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
   for (int i = 0; i < lmh; i++)
   {
     int uv = i * lm->GetWidth ();
-    for (int j = 0; j < lmw; j++, uv++)
+    int lmuv = uv << 2;
+    for (int j = 0; j < lmw; j++, uv++, lmuv += 4)
     {
       float lightness = lc.coverage [covaddr++];
       if (lightness < EPSILON)
@@ -819,7 +802,8 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
       int ru = j << lightcell_shift;
       int rv = i << lightcell_shift;
 
-      csVector3 v (float (ru + Imin_u) * inv_ww, float (rv + Imin_v) * inv_hh, 0);
+      csVector3 v (float (ru + Imin_u) * inv_ww, float (rv + Imin_v) * inv_hh,
+      	0);
       v = v_t2w + m_t2w * v;
 
       float d = csSquaredDist::PointPoint (lightpos, v);
@@ -841,32 +825,17 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
 
       if (dyn)
       {
-#if NEW_LM_FORMAT
         l = map [uv] + QRound (NORMAL_LIGHT_LEVEL * lightness * brightness);
         map [uv] = l < 255 ? l : 255;
-#else
-        l = mapR [uv] + QRound (NORMAL_LIGHT_LEVEL * lightness * brightness);
-        mapR [uv] = l < 255 ? l : 255;
-#endif
       }
       else
       {
-#if NEW_LM_FORMAT
-	int lmuv = uv << 2;
         l = map [lmuv] + QRound (light_r * lightness * brightness);
         map [lmuv] = l < 255 ? l : 255;
         l = map [lmuv+1] + QRound (light_g * lightness * brightness);
         map [lmuv+1] = l < 255 ? l : 255;
         l = map [lmuv+2] + QRound (light_b * lightness * brightness);
         map [lmuv+2] = l < 255 ? l : 255;
-#else
-        l = mapR [uv] + QRound (light_r * lightness * brightness);
-        mapR [uv] = l < 255 ? l : 255;
-        l = mapG [uv] + QRound (light_g * lightness * brightness);
-        mapG [uv] = l < 255 ? l : 255;
-        l = mapB [uv] + QRound (light_b * lightness * brightness);
-        mapB [uv] = l < 255 ? l : 255;
-#endif
       } /* endif */
     } /* endfor */
   } /* endfor */
@@ -906,13 +875,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
 
   csRGBLightMap& remap = lm->GetRealMap ();
   csDynLight* light = (csDynLight*)(lp->GetLight ());
-#if NEW_LM_FORMAT
   unsigned char* map = remap.GetMap ();
-#else
-  unsigned char* mapR = remap.GetRed ();
-  unsigned char* mapG = remap.GetGreen ();
-  unsigned char* mapB = remap.GetBlue ();
-#endif
 
   int i;
   float miny = 1000000, maxy = -1000000;
@@ -1094,24 +1057,16 @@ b:      if (scanL2 == MinIndex) goto finish;
 
 	  float brightness = cosinus * light->GetBrightnessAtDistance (d);
 
-#if NEW_LM_FORMAT
 	  int lmuv = uv << 2;
-#endif
 	  if (color.red > 0)
 	  {
 	    l1 = QRound (color.red * brightness);
 	    if (l1)
 	    {
 	      CS_ASSERT (uv >= 0 && uv < remap.GetMaxSize ());
-#if NEW_LM_FORMAT
 	      l1 += map[lmuv];
 	      if (l1 > 255) l1 = 255;
 	      map[lmuv] = l1;
-#else
-	      l1 += mapR[uv];
-	      if (l1 > 255) l1 = 255;
-	      mapR[uv] = l1;
-#endif
 	    }
 	  }
 	  if (color.green > 0)
@@ -1120,15 +1075,9 @@ b:      if (scanL2 == MinIndex) goto finish;
 	    if (l2)
 	    {
 	      CS_ASSERT (uv >= 0 && uv < remap.GetMaxSize ());
-#if NEW_LM_FORMAT
 	      l2 += map[lmuv+1];
 	      if (l2 > 255) l2 = 255;
 	      map[lmuv+1] = l2;
-#else
-	      l2 += mapG[uv];
-	      if (l2 > 255) l2 = 255;
-	      mapG[uv] = l2;
-#endif
 	    }
 	  }
 	  if (color.blue > 0)
@@ -1137,15 +1086,9 @@ b:      if (scanL2 == MinIndex) goto finish;
 	    if (l3)
 	    {
 	      CS_ASSERT (uv >= 0 && uv < remap.GetMaxSize ());
-#if NEW_LM_FORMAT
 	      l3 += map[lmuv+2];
 	      if (l3 > 255) l3 = 255;
 	      map[lmuv+2] = l3;
-#else
-	      l3 += mapB[uv];
-	      if (l3 > 255) l3 = 255;
-	      mapB[uv] = l3;
-#endif
 	    }
 	  }
         }

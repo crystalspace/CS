@@ -148,7 +148,6 @@ void csLightMap::Alloc (int w, int h, int r, int g, int b)
   static_lm.Alloc (lm_size);
   real_lm.Alloc (lm_size);
 
-#if NEW_LM_FORMAT
   UByte* map = static_lm.GetMap ();
   int i;
   ULong v;
@@ -162,14 +161,6 @@ void csLightMap::Alloc (int w, int h, int r, int g, int b)
   {
     *m++ = v;
   }
-#else
-  UByte *mr = static_lm.GetRed ();
-  memset (mr, r, lm_size);
-  UByte *mg = static_lm.GetGreen ();
-  memset (mg, g, lm_size);
-  UByte *mb = static_lm.GetBlue ();
-  memset (mb, b, lm_size);
-#endif
 }
 
 void csLightMap::CopyLightMap (csLightMap* source)
@@ -303,13 +294,8 @@ bool csLightMap::ReadFromCache (int w, int h,
   static_lm.Clear ();
 
   static_lm.Alloc (lm_size);
-#if NEW_LM_FORMAT
   memcpy (static_lm.GetMap (), d, lm_size * 4);
   d += lm_size * 4;
-#else
-  memcpy (static_lm.GetMap (), d, lm_size * 3);
-  d += lm_size * 3;
-#endif
 
   data->DecRef ();
 
@@ -376,15 +362,8 @@ void csLightMap::Cache (csPolygon3D* poly, csCurve* curve, csEngine* engine)
   }
   ps.lm_size = convert_endian (lm_size);
   ps.lm_cnt = 0;
-#if NEW_LM_FORMAT
   ps.lm_cnt = 111;	// Dummy!
   ps.lm_cnt = convert_endian (ps.lm_cnt);
-#else
-  if (static_lm.GetRed ()) ps.lm_cnt++;
-  if (static_lm.GetGreen ()) ps.lm_cnt++;
-  if (static_lm.GetBlue ()) ps.lm_cnt++;
-  ps.lm_cnt = convert_endian (ps.lm_cnt);
-#endif
 
   //-------------------------------
   // Write the normal lightmap data.
@@ -400,13 +379,7 @@ void csLightMap::Cache (csPolygon3D* poly, csCurve* curve, csEngine* engine)
   l = ps.lm_size; cf->Write ((char*)&l, sizeof (l));
   l = ps.lm_cnt;  cf->Write ((char*)&l, sizeof (l));
 
-#if NEW_LM_FORMAT
   if (static_lm.GetMap ()) cf->Write ((char*)static_lm.GetMap (), lm_size*4);
-#else
-  if (static_lm.GetRed ()) cf->Write ((char*)static_lm.GetRed (), lm_size);
-  if (static_lm.GetGreen ()) cf->Write ((char*)static_lm.GetGreen (), lm_size);
-  if (static_lm.GetBlue ()) cf->Write ((char*)static_lm.GetBlue (), lm_size);
-#endif
 
   // close the file
   cf->DecRef ();
@@ -448,7 +421,6 @@ void csLightMap::Cache (csPolygon3D* poly, csCurve* curve, csEngine* engine)
   }
 }
 
-#if NEW_LM_FORMAT
 bool csLightMap::UpdateRealLightMap ()
 {
   if (!dyn_dirty) return false;
@@ -507,69 +479,7 @@ bool csLightMap::UpdateRealLightMap ()
 
   return true;
 }
-#else
-bool csLightMap::UpdateRealLightMap ()
-{
-  if (!dyn_dirty) return false;
 
-  dyn_dirty = false;
-
-  //---
-  // First copy the static lightmap to the real lightmap.
-  // Remember the real lightmap first so that we can see if
-  // there were any changes.
-  //---
-
-  memcpy (real_lm.GetMap (), static_lm.GetMap (), 3 * lm_size);
-
-  //---
-  // Then add all pseudo-dynamic lights.
-  //---
-  csLight* light;
-  unsigned char* mapR, * mapG, * mapB;
-  float red, green, blue;
-  unsigned char* p, * last_p;
-  int l, s;
-
-  if (first_smap)
-  {
-    csShadowMap* smap = first_smap;
-
-    // Color mode.
-    do
-    {
-      mapR = real_lm.GetRed ();
-      mapG = real_lm.GetGreen ();
-      mapB = real_lm.GetBlue ();
-      light = smap->light;
-      red = light->GetColor ().red;
-      green = light->GetColor ().green;
-      blue = light->GetColor ().blue;
-      csLight::CorrectForNocolor (&red, &green, &blue);
-      p = smap->map;
-      last_p = p+lm_size;
-      do
-      {
-        s = *p++;
-        l = *mapR + QRound (red * s);
-        *mapR++ = l < 255 ? l : 255;
-        l = *mapG + QRound (green * s);
-        *mapG++ = l < 255 ? l : 255;
-        l = *mapB + QRound (blue * s);
-        *mapB++ = l < 255 ? l : 255;
-      }
-      while (p < last_p);
-
-      smap = smap->next;
-    }
-    while (smap);
-  }
-
-  return true;
-}
-#endif
-
-#if NEW_LM_FORMAT
 void csLightMap::ConvertToMixingMode ()
 {
   int i;
@@ -590,52 +500,7 @@ void csLightMap::ConvertToMixingMode ()
   mean_color.green = meg/lm_size;
   mean_color.blue  = meb/lm_size;
 }
-#else
-void csLightMap::ConvertToMixingMode ()
-{
-  int i;
-  int mer, meg, meb;
-  mer = 0;
-  meg = 0;
-  meb = 0;
-  unsigned char* mr, * mg, * mb;
-  mr = static_lm.GetRed ();
-  mg = static_lm.GetGreen ();
-  mb = static_lm.GetBlue ();
-  for (i = 0 ; i < lm_size ; i++)
-  {
-    mer += mr[i];
-    meg += mg[i];
-    meb += mb[i];
-  }
-  mean_color.red   = mer/lm_size;
-  mean_color.green = meg/lm_size;
-  mean_color.blue  = meb/lm_size;
 
-  //@@@
-  //if (Textures::mixing == MIX_TRUE_RGB) return;
-  //else convert_to_mixing_mode (static_lm.mapR, static_lm.mapG, static_lm.mapB, lm_size);
-}
-#endif
-
-#if 0
-void csLightMap::ConvertToMixingMode (unsigned char* mr, unsigned char* mg,
-				       unsigned char* mb, int sz)
-{
-  if (!mr || !mg || !mb) return; // If we have a dynamic light there is no conversion needed
-
-  while (sz > 0)
-  {
-    csLight::CorrectForNocolor (mr, mg, mb);
-    mr++;
-    mg++;
-    mb++;
-    sz--;
-  }
-}
-#endif
-
-#if NEW_LM_FORMAT
 // Only works for expanding a map.
 static void ResizeMap2 (unsigned char* old_map, int oldw, int oldh,
 		 unsigned char* new_map, int neww, int /*newh*/)
@@ -644,7 +509,6 @@ static void ResizeMap2 (unsigned char* old_map, int oldw, int oldh,
   for (row = 0 ; row < oldh ; row++)
     memcpy (new_map+neww*row*4, old_map+oldw*row*4, oldw*4);
 }
-#endif
 
 // Only works for expanding a map.
 static void ResizeMap (unsigned char* old_map, int oldw, int oldh,
@@ -680,22 +544,10 @@ void csLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
  
   // Allocate new data and transform old to new.
   static_lm.Alloc (lm_size);
-#if NEW_LM_FORMAT
   ResizeMap2 (o_stat.GetMap (), oldw, oldh, static_lm.GetMap (), lwidth, lheight);
-#else
-  ResizeMap (o_stat.GetRed (), oldw, oldh, static_lm.GetRed (), lwidth, lheight);
-  ResizeMap (o_stat.GetGreen (), oldw, oldh, static_lm.GetGreen (), lwidth, lheight);
-  ResizeMap (o_stat.GetBlue (), oldw, oldh, static_lm.GetBlue (), lwidth, lheight);
-#endif
 
   real_lm.Alloc (lm_size);
-#if NEW_LM_FORMAT
   ResizeMap2 (o_real.GetMap (), oldw, oldh, real_lm.GetMap (), lwidth, lheight);
-#else
-  ResizeMap (o_real.GetRed (), oldw, oldh, real_lm.GetRed (), lwidth, lheight);
-  ResizeMap (o_real.GetGreen (), oldw, oldh, real_lm.GetGreen (), lwidth, lheight);
-  ResizeMap (o_real.GetBlue (), oldw, oldh, real_lm.GetBlue (), lwidth, lheight);
-#endif
 
   // Convert all shadowmaps.
   csShadowMap* smap = first_smap;
@@ -709,27 +561,8 @@ void csLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
   }
 }
 
-#if NEW_LM_FORMAT
 unsigned char *csLightMap::GetMapData ()
 {
   return GetRealMap ().GetMap ();
 }
-#else
-unsigned char *csLightMap::GetMap (int nMap)
-{
-  switch (nMap)
-  {
-    case 0:
-      return GetRealMap ().GetRed ();
-      break;
-    case 1:
-      return GetRealMap ().GetGreen ();
-      break;
-    case 2:
-      return GetRealMap ().GetBlue ();
-      break;
-  }
-  return NULL;
-}
-#endif
 
