@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSSPR2D_H__
-#define __CSSPR2D_H__
+#ifndef __CSPIXMAP_H__
+#define __CSPIXMAP_H__
 
 #include "igraph2d.h"
 #include "itexture.h"
@@ -82,4 +82,4 @@ public:
   { return hTex; }
 };
 
-#endif // __CSSPR2D_H__
+#endif // __CSPIXMAP_H__
