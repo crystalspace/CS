@@ -31,7 +31,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/physics/odedynam
 
-LIB.EXTERNAL.odedynam = -lode
+LIB.EXTERNAL.odedynam = $(ODE.LFLAGS)
 
 ifeq ($(USE_PLUGINS),yes)
   odedynam = $(OUTDLL)/odedynam$(DLL)

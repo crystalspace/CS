@@ -1245,7 +1245,7 @@ CS_CHECK_LIB_WITH([mikmod],
 
 #-----------------------------------------------------------------------------
 # Check for libogg.  In addition to the standard installed locations, we
-# also search CS/libs/libmikmod*.
+# also search CS/libs/libogg*.
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([ogg],
     [AC_LANG_PROGRAM(
@@ -1253,6 +1253,30 @@ CS_CHECK_LIB_WITH([ogg],
 	[/*some test would be nice here...*/])],
     [libs/libogg*], [],                                                         
     [CS_MAKEFILE_BUILD_RESULT([cs_cv_libogg], [OGG])])
+
+#-----------------------------------------------------------------------------
+# Check for lib3ds.  In addition to the standard installed locations, we
+# also search CS/libs/lib3ds*.
+#------------------------------------------------------------------------------
+CS_CHECK_LIB_WITH([3ds],
+    [AC_LANG_PROGRAM(
+	[#include <lib3ds/file.h>],
+	[/*some test would be nice here...*/])],
+    [libs/lib3ds*], [],                                                         
+    [CS_MAKEFILE_BUILD_RESULT([cs_cv_lib3ds], [3DS])])
+
+#-----------------------------------------------------------------------------
+# Check for libode.  In addition to the standard installed locations, we
+# also search CS/libs/libode*.
+#------------------------------------------------------------------------------
+CS_CHECK_LIB_WITH([ode],
+    [AC_LANG_PROGRAM(
+	[#include <ode/ode.h>],
+	[/*some test would be nice here...*/])],
+    [libs/libode*], [],                                                         
+    [CS_MAKEFILE_BUILD_RESULT([cs_cv_libode], [ODE])])
+
+
 
 #------------------------------------------------------------------------------
 # For Mingw, test if we need to link explicitly with libmingwex.a.  Older

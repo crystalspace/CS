@@ -122,7 +122,9 @@ PLUGINS.DYNAMIC += mesh/impexp/mdl
 PLUGINS.DYNAMIC += mesh/impexp/obj
 PLUGINS.DYNAMIC += mesh/impexp/pov
 PLUGINS.DYNAMIC += mesh/impexp/spr
-#PLUGINS.DYNAMIC += mesh/impexp/3ds
+ifeq ($(3DS.AVAILABLE),yes)
+PLUGINS.DYNAMIC += mesh/impexp/3ds
+endif
 PLUGINS.DYNAMIC += font/server/fontplex
 #PLUGINS.DYNAMIC += font/server/freefnt2
 PLUGINS.DYNAMIC += aws
@@ -133,7 +135,9 @@ ifeq ($(MIKMOD.AVAILABLE),yes)
 PLUGINS.DYNAMIC += sound/loader/mod
 endif
 #PLUGINS.DYNAMIC += sound/renderer/openal
-#PLUGINS.DYNAMIC += physics/odedynam
+ifeq ($(ODE.AVAILABLE),yes)
+PLUGINS.DYNAMIC += physics/odedynam
+endif
 #PLUGINS.DYNAMIC += physics/loader
 #PLUGINS.DYNAMIC += device/joystick/linux
 #PLUGINS.DYNAMIC += video/render3d/opengl

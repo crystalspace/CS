@@ -53,7 +53,7 @@ ifeq ($(MAKESECTION),targets)
 ie3ds: $(OUTDIRS) $(IE3DS)
 
 $(IE3DS): $(OBJ.IE3DS) $(LIB.IE3DS)
-	$(DO.PLUGIN) -l3ds
+	$(DO.PLUGIN) $(3DS.LFLAGS)
 
 clean: ie3dsclean
 ie3dsclean:
