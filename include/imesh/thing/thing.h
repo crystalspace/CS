@@ -114,11 +114,11 @@ struct iThingState : public iBase
   /// Query number of vertices in set
   virtual int GetVertexCount () = 0;
   /// Get the given vertex coordinates in object space
-  virtual csVector3 &GetVertex (int idx) = 0;
+  virtual const csVector3 &GetVertex (int idx) const = 0;
   /// Get the given vertex coordinates in world space
-  virtual csVector3 &GetVertexW (int idx) = 0;
+  virtual const csVector3 &GetVertexW (int idx) const = 0;
   /// Get the given vertex coordinates in camera space
-  virtual csVector3 &GetVertexC (int idx) = 0;
+  virtual const csVector3 &GetVertexC (int idx) const = 0;
   /// Create a vertex given his object-space coords and return his index
   virtual int CreateVertex (const csVector3 &iVertex) = 0;
   /**

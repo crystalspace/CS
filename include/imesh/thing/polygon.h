@@ -87,11 +87,11 @@ struct iPolygon3D : public iBase
   /// Get the vertex indices array.
   virtual int* GetVertexIndices () = 0;
   /// Get the given polygon vertex coordinates in object space
-  virtual csVector3 &GetVertex (int idx) = 0;
+  virtual const csVector3 &GetVertex (int idx) const = 0;
   /// Get the given polygon vertex coordinates in world space
-  virtual csVector3 &GetVertexW (int idx) = 0;
+  virtual const csVector3 &GetVertexW (int idx) const = 0;
   /// Get the given polygon vertex coordinates in camera space
-  virtual csVector3 &GetVertexC (int idx) = 0;
+  virtual const csVector3 &GetVertexC (int idx) const = 0;
   /// Create a polygon vertex given his index in parent polygon set
   virtual int CreateVertex (int idx) = 0;
   /// Create a polygon vertex and add it to parent object

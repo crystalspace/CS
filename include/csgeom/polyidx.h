@@ -64,6 +64,11 @@ public:
   int* GetVertexIndices () { return vertices_idx; }
 
   /**
+   * Get the array with all vertex indices.
+   */
+  const int* GetVertexIndices () const { return vertices_idx; }
+
+  /**
    * Get the specified vertex index.
    */
   int GetVertex (int i)  const

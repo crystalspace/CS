@@ -782,7 +782,7 @@ public:
    * This index is translated to the index in the parent container and
    * a reference to the vertex in world-space is returned.
    */
-  csVector3& Vwor (int idx)
+  const csVector3& Vwor (int idx) const
   { return thing->Vwor (vertices.GetVertexIndices ()[idx]); }
 
   /**
@@ -790,7 +790,7 @@ public:
    * This index is translated to the index in the parent container and
    * a reference to the vertex in object-space is returned.
    */
-  csVector3& Vobj (int idx)
+  const csVector3& Vobj (int idx) const
   { return thing->Vobj (vertices.GetVertexIndices ()[idx]); }
 
   /**
@@ -798,7 +798,7 @@ public:
    * This index is translated to the index in the parent container and
    * a reference to the vertex in camera-space is returned.
    */
-  csVector3& Vcam (int idx)
+  const csVector3& Vcam (int idx) const
   { return thing->Vcam (vertices.GetVertexIndices ()[idx]); }
 
   /**
@@ -1302,11 +1302,11 @@ public:
     { return scfParent->vertices.GetVertexCount (); }
     virtual int* GetVertexIndices ()
     { return scfParent->vertices.GetVertexIndices (); }
-    virtual csVector3 &GetVertex (int idx)
+    virtual const csVector3 &GetVertex (int idx) const
     { return scfParent->Vobj (idx); }
-    virtual csVector3 &GetVertexW (int idx)
+    virtual const csVector3 &GetVertexW (int idx) const
     { return scfParent->Vwor (idx); }
-    virtual csVector3 &GetVertexC (int idx)
+    virtual const csVector3 &GetVertexC (int idx) const
     { return scfParent->Vcam (idx); }
     virtual int CreateVertex (int idx)
     { return scfParent->AddVertex (idx); }

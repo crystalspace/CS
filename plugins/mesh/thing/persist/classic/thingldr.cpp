@@ -90,9 +90,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ORIG)
   CS_TOKEN_DEF (PART)
   CS_TOKEN_DEF (PLANE)
-  CS_TOKEN_DEF (XPLANE)
-  CS_TOKEN_DEF (YPLANE)
-  CS_TOKEN_DEF (ZPLANE)
   CS_TOKEN_DEF (POLYGON)
   CS_TOKEN_DEF (PORTAL)
   CS_TOKEN_DEF (P)
@@ -121,6 +118,8 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (VERTICES)
   CS_TOKEN_DEF (VVEC)
   CS_TOKEN_DEF (VISTREE)
+  CS_TOKEN_DEF (VBLOCK)
+  CS_TOKEN_DEF (VROOM)
   CS_TOKEN_DEF (W)
   CS_TOKEN_DEF (WARP)
   CS_TOKEN_DEF (ZFILL)
@@ -436,10 +435,8 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
     CS_TOKEN_TABLE (ALPHA)
     CS_TOKEN_TABLE (COSFACT)
     CS_TOKEN_TABLE (MIXMODE)
+    CS_TOKEN_TABLE (LEN)
     CS_TOKEN_TABLE (PLANE)
-    CS_TOKEN_TABLE (XPLANE)
-    CS_TOKEN_TABLE (YPLANE)
-    CS_TOKEN_TABLE (ZPLANE)
     CS_TOKEN_TABLE (V)
   CS_TOKEN_TABLE_END
 
@@ -486,6 +483,8 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
     poly3d->SetMaterial (default_material);
 
   iMaterialWrapper* mat = NULL;
+  iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
+  	iThingEnvironment);
 
   bool tx_uv_given = false;
   int tx_uv_i1 = 0;
@@ -499,9 +498,6 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
   csVector3 tx_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
   float tx1_len = default_texlen, tx2_len = default_texlen;
   float tx_len = default_texlen;
-  char xplane_name[100]; xplane_name[0] = 0;
-  char yplane_name[100]; yplane_name[0] = 0;
-  char zplane_name[100]; zplane_name[0] = 0;
 
   csMatrix3 tx_matrix;
   csVector3 tx_vector (0, 0, 0);
@@ -520,6 +516,7 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
     if (!params)
     {
       printf ("Expected parameters instead of '%s'!\n", buf);
+      te->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -532,6 +529,7 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
         if (mat == NULL)
         {
           printf ("Couldn't find material named '%s'!\n", str);
+          te->DecRef ();
           return NULL;
         }
         poly3d->SetMaterial (mat);
@@ -585,6 +583,7 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
     	    if (!params2)
     	    {
       	      printf ("Expected parameters instead of '%s'!\n", params);
+              te->DecRef ();
       	      return NULL;
     	    }
             switch (cmd)
@@ -621,48 +620,23 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
             poly3d->GetPortal ()->SetWarp (m_w, v_w_before, v_w_after);
         }
         break;
-      case CS_TOKEN_XPLANE:
-	tx_uv_given = false;
-        tx_len = 0;
-	plane_name[0] = 0;
-	xplane_name[0] = 0;
-	yplane_name[0] = 0;
-	zplane_name[0] = 0;
-	strcpy (xplane_name, params);
-	break;
-      case CS_TOKEN_YPLANE:
-	tx_uv_given = false;
-        tx_len = 0;
-	plane_name[0] = 0;
-	xplane_name[0] = 0;
-	yplane_name[0] = 0;
-	zplane_name[0] = 0;
-	strcpy (yplane_name, params);
-	break;
-      case CS_TOKEN_ZPLANE:
-	tx_uv_given = false;
-        tx_len = 0;
-	plane_name[0] = 0;
-	xplane_name[0] = 0;
-	yplane_name[0] = 0;
-	zplane_name[0] = 0;
-	strcpy (zplane_name, params);
-	break;
       case CS_TOKEN_PLANE:
 	tx_uv_given = false;
-	xplane_name[0] = 0;
-	yplane_name[0] = 0;
-	zplane_name[0] = 0;
         csScanStr (params, "%s", str);
         strcpy (plane_name, str);
         tx_len = 0;
         break;
+      case CS_TOKEN_LEN:
+	tx_uv_given = false;
+	csScanStr (params, "%f", &tx_len);
+	break;
       case CS_TOKEN_TEXTURE:
         while ((cmd = csGetObject(&params, tex_commands, &name, &params2)) > 0)
         {
     	  if (!params2)
     	  {
       	    printf ("Expected parameters instead of '%s'!\n", params);
+            te->DecRef ();
       	    return NULL;
 	  }
           switch (cmd)
@@ -716,9 +690,6 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
               break;
             case CS_TOKEN_PLANE:
 	      tx_uv_given = false;
-	      xplane_name[0] = 0;
-	      yplane_name[0] = 0;
-	      zplane_name[0] = 0;
               csScanStr (params2, "%s", str);
               strcpy (plane_name, str);
               tx_len = 0;
@@ -760,14 +731,71 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
       case CS_TOKEN_V:
       case CS_TOKEN_VERTICES:
         {
-          int list[100], num;
-          csScanStr (params, "%D", list, &num);
-          for (i = 0 ; i < num ; i++)
+	  char* p = params;
+	  while (*p && *p == ' ') p++;
+	  if (*p < '0' || *p > '9')
 	  {
-	    if (list[i] == list[(i-1+num)%num])
-	      printf ("Duplicate vertex-index found in polygon! Ignored...\n");
+	    // We have a special vertex selection depending on
+	    // a VBLOCK or VROOM command previously generated.
+	    int vtidx;
+	    if (*(p+1) == ',')
+	    {
+	      csScanStr (p+2, "%d", &vtidx);
+	      vtidx += vt_offset;
+	    }
 	    else
-	      poly3d->CreateVertex (list[i]+vt_offset);
+	      vtidx = thing_state->GetVertexCount ()-8;
+	    switch (*p)
+	    {
+	      case 'w':
+	        poly3d->CreateVertex (vtidx+6);
+	        poly3d->CreateVertex (vtidx+4);
+	        poly3d->CreateVertex (vtidx+0);
+	        poly3d->CreateVertex (vtidx+2);
+		break;
+	      case 'e':
+	        poly3d->CreateVertex (vtidx+5);
+	        poly3d->CreateVertex (vtidx+7);
+	        poly3d->CreateVertex (vtidx+3);
+	        poly3d->CreateVertex (vtidx+1);
+		break;
+	      case 'n':
+	        poly3d->CreateVertex (vtidx+7);
+	        poly3d->CreateVertex (vtidx+6);
+	        poly3d->CreateVertex (vtidx+2);
+	        poly3d->CreateVertex (vtidx+3);
+		break;
+	      case 's':
+	        poly3d->CreateVertex (vtidx+4);
+	        poly3d->CreateVertex (vtidx+5);
+	        poly3d->CreateVertex (vtidx+1);
+	        poly3d->CreateVertex (vtidx+0);
+		break;
+	      case 'u':
+	        poly3d->CreateVertex (vtidx+6);
+	        poly3d->CreateVertex (vtidx+7);
+	        poly3d->CreateVertex (vtidx+5);
+	        poly3d->CreateVertex (vtidx+4);
+		break;
+	      case 'd':
+	        poly3d->CreateVertex (vtidx+0);
+	        poly3d->CreateVertex (vtidx+1);
+	        poly3d->CreateVertex (vtidx+3);
+	        poly3d->CreateVertex (vtidx+2);
+		break;
+	    }
+	  }
+	  else
+	  {
+            int list[100], num;
+            csScanStr (params, "%D", list, &num);
+            for (i = 0 ; i < num ; i++)
+	    {
+	      if (list[i] == list[(i-1+num)%num])
+	        printf ("Duplicate vertex-index found! Ignored...\n");
+	      else
+	        poly3d->CreateVertex (list[i]+vt_offset);
+	    }
 	  }
         }
         break;
@@ -858,6 +886,7 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
   {
     printf ("Token '%s' not found while parsing a polygon!\n",
       csGetLastOffender ());
+    te->DecRef ();
     return NULL;
   }
 
@@ -865,6 +894,7 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
   {
     printf ("Polygon in line %d contains just %d vertices!\n",
       csGetParserLine (), poly3d->GetVertexCount ());
+    te->DecRef ();
     return NULL;
   }
 
@@ -881,6 +911,7 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
 	poly3d->GetVertex (tx_uv_i3), tx_uv3);
   }
   else if (tx1_given)
+  {
     if (tx2_given)
     {
       if (!tx1_len)
@@ -899,92 +930,87 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
         printf ("Bad texture specification for PLANE '%s'\n", name);
       else poly3d->SetTextureSpace (tx_orig, tx1, tx1_len, tx2, tx2_len);
     }
-  else
-  {
-    if (!tx1_len)
+    else
     {
-      printf ("Bad texture specification for POLYGON '%s'\n", polyname);
-      tx1_len = 1;
+      if (!tx1_len)
+      {
+        printf ("Bad texture specification for POLYGON '%s'\n", polyname);
+        tx1_len = 1;
+      }
+      if ((tx1-tx_orig) < SMALL_EPSILON)
+        printf ("Bad texture specification for PLANE '%s'\n", name);
+      else poly3d->SetTextureSpace (tx_orig, tx1, tx1_len);
     }
-    if ((tx1-tx_orig) < SMALL_EPSILON)
-      printf ("Bad texture specification for PLANE '%s'\n", name);
-    else poly3d->SetTextureSpace (tx_orig, tx1, tx1_len);
-  }
-  else if (xplane_name[0])
-  {
-    iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
-  	iThingEnvironment);
-    char buf[200];
-    sprintf (buf, "__X_%s__", xplane_name);
-    iPolyTxtPlane* pl = te->FindPolyTxtPlane (buf);
-    if (!pl)
-    {
-      float x, dens;
-      csScanStr (xplane_name, "%f,%f", &x, &dens);
-      pl = te->CreatePolyTxtPlane ();
-      pl->QueryObject()->SetName (buf);
-      pl->SetTextureSpace (csVector3 (x, 0, 0), csVector3 (x, 0, 1), dens,
-      	csVector3 (x, 1, 0), dens);
-    }
-    poly3d->SetTextureSpace (pl);
-    te->DecRef ();
-  }
-  else if (yplane_name[0])
-  {
-    iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
-  	iThingEnvironment);
-    char buf[200];
-    sprintf (buf, "__Y_%s__", yplane_name);
-    iPolyTxtPlane* pl = te->FindPolyTxtPlane (buf);
-    if (!pl)
-    {
-      float y, dens;
-      csScanStr (yplane_name, "%f,%f", &y, &dens);
-      pl = te->CreatePolyTxtPlane ();
-      pl->QueryObject()->SetName (buf);
-      pl->SetTextureSpace (csVector3 (0, y, 0), csVector3 (1, y, 0), dens,
-      	csVector3 (0, y, 1), dens);
-    }
-    poly3d->SetTextureSpace (pl);
-    te->DecRef ();
-  }
-  else if (zplane_name[0])
-  {
-    iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
-  	iThingEnvironment);
-    char buf[200];
-    sprintf (buf, "__Z_%s__", zplane_name);
-    iPolyTxtPlane* pl = te->FindPolyTxtPlane (buf);
-    if (!pl)
-    {
-      float z, dens;
-      csScanStr (zplane_name, "%f,%f", &z, &dens);
-      pl = te->CreatePolyTxtPlane ();
-      pl->QueryObject()->SetName (buf);
-      pl->SetTextureSpace (csVector3 (0, 0, z), csVector3 (1, 0, z), dens,
-      	csVector3 (0, 1, z), dens);
-    }
-    poly3d->SetTextureSpace (pl);
-    te->DecRef ();
   }
   else if (plane_name[0])
   {
-    iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
-  	iThingEnvironment);
     iPolyTxtPlane* pl = te->FindPolyTxtPlane (plane_name);
     if (!pl)
     {
       printf ("Can't find plane '%s' for polygon '%s'\n", plane_name, polyname);
     }
     poly3d->SetTextureSpace (pl);
-    te->DecRef ();
   }
   else if (tx_len)
   {
-    // If a length is given (with 'LEN') we will take the first two vertices
-    // and calculate the texture orientation from them (with the given
-    // length).
-    poly3d->SetTextureSpace (poly3d->GetVertex (0), poly3d->GetVertex (1),
+    // If a length is given (with 'LEN') we will first see if the polygon
+    // is coplanar with the X, Y, or Z plane. In that case we will use
+    // a standard plane. Otherwise we will just create a plane specific
+    // for this case given the first two vertices.
+    int i;
+    bool same_x = true, same_y = true, same_z = true;
+    const csVector3& v = poly3d->GetVertex (0);
+    for (i = 1 ; i < poly3d->GetVertexCount () ; i++)
+    {
+      const csVector3& v2 = poly3d->GetVertex (i);
+      if (same_x && ABS (v.x-v2.x) >= SMALL_EPSILON) same_x = false;
+      if (same_y && ABS (v.y-v2.y) >= SMALL_EPSILON) same_y = false;
+      if (same_z && ABS (v.z-v2.z) >= SMALL_EPSILON) same_z = false;
+    }
+    if (same_x)
+    {
+      char buf[200];
+      sprintf (buf, "__X_%g,%g__", v.x, tx_len);
+      iPolyTxtPlane* pl = te->FindPolyTxtPlane (buf);
+      if (!pl)
+      {
+        pl = te->CreatePolyTxtPlane ();
+        pl->QueryObject()->SetName (buf);
+        pl->SetTextureSpace (csVector3 (v.x, 0, 0), csVector3 (v.x, 0, 1),
+	  tx_len, csVector3 (v.x, 1, 0), tx_len);
+      }
+      poly3d->SetTextureSpace (pl);
+    }
+    else if (same_y)
+    {
+      char buf[200];
+      sprintf (buf, "__Y_%g,%g__", v.y, tx_len);
+      iPolyTxtPlane* pl = te->FindPolyTxtPlane (buf);
+      if (!pl)
+      {
+        pl = te->CreatePolyTxtPlane ();
+        pl->QueryObject()->SetName (buf);
+        pl->SetTextureSpace (csVector3 (0, v.y, 0), csVector3 (1, v.y, 0),
+	  tx_len, csVector3 (0, v.y, 1), tx_len);
+      }
+      poly3d->SetTextureSpace (pl);
+    }
+    else if (same_z)
+    {
+      char buf[200];
+      sprintf (buf, "__Z_%g,%g__", v.z, tx_len);
+      iPolyTxtPlane* pl = te->FindPolyTxtPlane (buf);
+      if (!pl)
+      {
+        pl = te->CreatePolyTxtPlane ();
+        pl->QueryObject()->SetName (buf);
+        pl->SetTextureSpace (csVector3 (0, 0, v.z), csVector3 (1, 0, v.z),
+	  tx_len, csVector3 (0, 1, v.z), tx_len);
+      }
+      poly3d->SetTextureSpace (pl);
+    }
+    else
+      poly3d->SetTextureSpace (poly3d->GetVertex (0), poly3d->GetVertex (1),
     	tx_len);
   }
   else
@@ -1014,6 +1040,7 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
 
   OptimizePolygon (poly3d);
 
+  te->DecRef ();
   return poly3d;
 }
 
@@ -1022,6 +1049,8 @@ static bool load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
 	iThingState* thing_state, char* buf, int vt_offset, bool isParent)
 {
   CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (VBLOCK)
+    CS_TOKEN_TABLE (VROOM)
     CS_TOKEN_TABLE (VERTEX)
     CS_TOKEN_TABLE (CIRCLE)
     CS_TOKEN_TABLE (POLYGON)
@@ -1214,6 +1243,41 @@ Nag to Jorrit about this feature if you want it.\n");
         }
 #endif
         break;
+
+      case CS_TOKEN_VROOM:
+        {
+	  float minx, miny, minz, maxx, maxy, maxz;
+	  csScanStr (params, "%f,%f,%f,%f,%f,%f",
+	    &minx, &miny, &minz,
+	    &maxx, &maxy, &maxz);
+          thing_state->CreateVertex (csVector3 (maxx, maxy, maxz));
+          thing_state->CreateVertex (csVector3 (minx, maxy, maxz));
+          thing_state->CreateVertex (csVector3 (maxx, maxy, minz));
+          thing_state->CreateVertex (csVector3 (minx, maxy, minz));
+          thing_state->CreateVertex (csVector3 (maxx, miny, maxz));
+          thing_state->CreateVertex (csVector3 (minx, miny, maxz));
+          thing_state->CreateVertex (csVector3 (maxx, miny, minz));
+          thing_state->CreateVertex (csVector3 (minx, miny, minz));
+	}
+	break;
+
+      case CS_TOKEN_VBLOCK:
+        {
+	  float minx, miny, minz, maxx, maxy, maxz;
+	  csScanStr (params, "%f,%f,%f,%f,%f,%f",
+	    &minx, &miny, &minz,
+	    &maxx, &maxy, &maxz);
+          thing_state->CreateVertex (csVector3 (minx, miny, minz));
+          thing_state->CreateVertex (csVector3 (maxx, miny, minz));
+          thing_state->CreateVertex (csVector3 (minx, miny, maxz));
+          thing_state->CreateVertex (csVector3 (maxx, miny, maxz));
+          thing_state->CreateVertex (csVector3 (minx, maxy, minz));
+          thing_state->CreateVertex (csVector3 (maxx, maxy, minz));
+          thing_state->CreateVertex (csVector3 (minx, maxy, maxz));
+          thing_state->CreateVertex (csVector3 (maxx, maxy, maxz));
+	}
+	break;
+
       case CS_TOKEN_P:
       case CS_TOKEN_POLYGON:
         {

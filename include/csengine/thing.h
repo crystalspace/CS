@@ -426,21 +426,21 @@ public:
   void CompressVertices ();
 
   /// Return the object space vector for the vertex.
-  csVector3& Vobj (int idx) { return obj_verts[idx]; }
+  const csVector3& Vobj (int idx) const { return obj_verts[idx]; }
 
   /**
    * Return the world space vector for the vertex.
    * Make sure you recently called WorUpdate(). Otherwise it is
    * possible that this coordinate will not be valid.
    */
-  csVector3& Vwor (int idx) { return wor_verts[idx]; }
+  const csVector3& Vwor (int idx) const { return wor_verts[idx]; }
 
   /**
    * Return the camera space vector for the vertex.
    * Make sure you recently called UpdateTransformation(). Otherwise it is
    * possible that this coordinate will not be valid.
    */
-  csVector3& Vcam (int idx) { return cam_verts[idx]; }
+  const csVector3& Vcam (int idx) const { return cam_verts[idx]; }
 
   /// Return the number of vertices.
   int GetVertexCount () { return num_vertices; }
@@ -891,9 +891,12 @@ public:
     virtual iPortal* GetPortal (int idx);
     virtual iPolygon3D* GetPortalPolygon (int idx);
     virtual int GetVertexCount () { return scfParent->num_vertices; }
-    virtual csVector3 &GetVertex (int i) { return scfParent->obj_verts[i]; }
-    virtual csVector3 &GetVertexW (int i) { return scfParent->wor_verts[i]; }
-    virtual csVector3 &GetVertexC (int i) { return scfParent->cam_verts[i]; }
+    virtual const csVector3 &GetVertex (int i) const
+    { return scfParent->obj_verts[i]; }
+    virtual const csVector3 &GetVertexW (int i) const
+    { return scfParent->wor_verts[i]; }
+    virtual const csVector3 &GetVertexC (int i) const
+    { return scfParent->cam_verts[i]; }
     virtual int CreateVertex (const csVector3 &iVertex)
     { return scfParent->AddVertex (iVertex.x, iVertex.y, iVertex.z); }
     virtual void CheckFrustum (iFrustumView* fview, iMovable* movable)
