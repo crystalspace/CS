@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+25-May-2001
+	- Eric Sunshine removed a win32gcc-specific shell-related test case
+	  from CS/Makefile in order to avoid polluting this otherwise
+	  platform-independent resource with platform-specific specializations.
+	  Instead, moved the win32gcc-specific test case to the new file
+	  CS/bin/win32conf.mak.
 24-May-2001
 	- Eric Sunshine fixed several problems in lexan.mak.
 	- Eric Sunshine eliminated compilation warning from csobject.cpp about
