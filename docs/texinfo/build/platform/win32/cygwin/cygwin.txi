@@ -198,15 +198,15 @@ must.  At the command prompt enter the following command and hit return.
 mkdir lib
 @end example
 
-Next we set the configuration for the Cygwin platform.  Open the file
-@file{config/user-settings} in your favourite editor and change the following
-line from.
+Next, it is necessary to update the configuration for the Cygwin platform.
+Open the file @file{config/user-settings} in your favorite editor and change
+the following line from:
 
 @example
 PLATFORM=unix-gcc
 @end example
 
-to
+to:
 
 @example
 PLATFORM=cygwin

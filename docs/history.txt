@@ -4,6 +4,12 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed documentation booboo (<texture> was used instead
 	  of <texmap>) in thing.txi which was reported by Oroszi Balazs
 	  <oroszib@vpg.sulinet.hu>.
+	- Eric Sunshine repaired some poor wording in csutil.txi.
+	- Eric Sunshine rewrote the "Typed Arrays" section in csutil.txi.  In
+	  addition to other changes, it now provides much clearer warning about
+	  which classes are preferred, and which should be avoided.
+	- Eric Sunshine eliminated `hbox' warnings from the Texinfo files
+	  reported by TeX.
 10-Feb-2003
 	- Philip Wyett removed duplicate CS_REPORTER_SEVERITY_DEBUG, which
 	  caused perftest to output results twice.
