@@ -49,12 +49,13 @@ void ddgVector3::normal( const ddgVector3* v[9])
 {
 	register int k;
 	ddgVector3 n, d[8];
-	// These eight vectors are located as follows:
-	//     0 1 2
-	//      \|/
-	//     7-8-3
-	//      /|\
-	//     6 5 4
+	/* These eight vectors are located as follows:
+	     0 1 2
+	      \|/
+	     7-8-3
+	      /|\
+	     6 5 4
+	*/
 
 	// Now calculate the normals for every point on the grid
 	for (k = 0; k < 8; k++)
