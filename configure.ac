@@ -164,19 +164,24 @@ AC_CHECK_PROGS([MAKE], [gnumake gmake make])
 
 
 #------------------------------------------------------------------------------
-# The cslibs package is a convenience archive made available to Windows users
-# of Crystal Space.  It contains common libraries, headers, and tools usable by
-# MSVC, Mingw/MSYS, and Cygwin users.
+# The cs-win32libs package is a convenience archive made available to Windows
+# users of Crystal Space.  It contains common libraries, headers, and tools
+# (such as zlib, libjpeg, cal3d, etc.) usable by MSVC, Mingw/MSYS, and Cygwin
+# users.  It saves users the bother of having to install these packages
+# manually one at a time.
 #------------------------------------------------------------------------------
 AC_CHECK_TOOLS([CSLIBS_CONFIG], [cslibs-config])
 AS_IF([test $ac_compiler_gnu = yes],
-    [cs_cv_csconfig_compileflag="--compiler gcc-`$CXX -dumpversion`"])
+    [cs_cv_cslibs_compiler="--compiler gcc-`$CXX -dumpversion`"])
 AC_CACHE_CHECK([for cslibs package], [cs_cv_cslibs],
     [AS_IF([test -n "$CSLIBS_CONFIG"],
 	[cs_cv_cslibs=yes
-	cs_cv_cslibs_cflags=`AC_RUN_LOG([$CSLIBS_CONFIG --cflags $cs_cv_csconfig_compileflag])`
-	cs_cv_cslibs_lflags=`AC_RUN_LOG([$CSLIBS_CONFIG --lflags $cs_cv_csconfig_compileflag])`
-	cs_cv_cslibs_binpath=`AC_RUN_LOG([$CSLIBS_CONFIG --binpath $cs_cv_csconfig_compileflag])`],
+	cs_cv_cslibs_cflags=`
+	    AC_RUN_LOG([$CSLIBS_CONFIG --cflags $cs_cv_cslibs_compiler])`
+	cs_cv_cslibs_lflags=`
+	    AC_RUN_LOG([$CSLIBS_CONFIG --lflags $cs_cv_cslibs_compiler])`
+	cs_cv_cslibs_binpath=`
+	    AC_RUN_LOG([$CSLIBS_CONFIG --binpath $cs_cv_cslibs_compiler])`],
 	[cs_cv_cslibs=no])])
 AS_IF([test $cs_cv_cslibs = yes],
     [CFLAGS="$CFLAGS $cs_cv_cslibs_cflags"
