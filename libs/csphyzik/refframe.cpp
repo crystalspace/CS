@@ -23,9 +23,10 @@
 #endif
 #include "csphyzik/refframe.h"
 
-
-ctReferenceFrame::ctReferenceFrame( coord px, coord py, coord pz, ctangle ppitch, ctangle proll, ctangle pyaw, ctReferenceFrame *ref ) : 
-	offset( px, py, pz )
+ctReferenceFrame::ctReferenceFrame 
+  ( coord px, coord py, coord pz, ctangle ppitch, ctangle proll, ctangle pyaw, 
+    ctReferenceFrame *ref ) 
+  : offset ( px, py, pz )
 {
   //!me what the hell is this.  Who writes this stuff?
   (void) ref;
@@ -35,37 +36,39 @@ ctReferenceFrame::ctReferenceFrame( coord px, coord py, coord pz, ctangle ppitch
   (void) px;
   (void) py;
   (void) pz;
-	reference_count = 0;
-	is_universe_frame = false;
+  reference_count = 0;
+  is_universe_frame = false;
 //	parent_frame = ref ? ref : &universe();
 }
 
-ctReferenceFrame& ctReferenceFrame::universe()
+ctReferenceFrame& ctReferenceFrame::universe ()
 { 
-	static ctReferenceFrame basis;
-	static bool initialized = false;
-	if (!initialized) {
-		initialized = true;
-		basis.is_universe_frame = true; 
-	}
-	return basis;
+  static ctReferenceFrame basis;
+  static bool initialized = false;
+  if (!initialized) 
+  {
+    initialized = true;
+    basis.is_universe_frame = true; 
+  }
+  return basis;
 } 
 
-ctDeltaReferenceFrame::ctDeltaReferenceFrame() : 
-	v(0), w(0) 
+ctDeltaReferenceFrame::ctDeltaReferenceFrame () 
+  : v(0), w(0)
 {
-	reference_count = 0; is_universe_frame = false; 
+	reference_count = 0; is_universe_frame = false;
 }
 
-ctDeltaReferenceFrame& ctDeltaReferenceFrame::universe()
-{ 
-	static ctDeltaReferenceFrame basis;
-	static bool initialized = false;
-	if (!initialized) {
-		initialized = true;
-		basis.is_universe_frame = true; 
-	}
-	return basis;
+ctDeltaReferenceFrame& ctDeltaReferenceFrame::universe ()
+{
+  static ctDeltaReferenceFrame basis;
+  static bool initialized = false;
+  if (!initialized) 
+  {
+    initialized = true;
+    basis.is_universe_frame = true;
+  }
+  return basis;
 } 
 
 // calculate tranform from world coords to this coords by going from

@@ -26,28 +26,27 @@
 #include "csphyzik/phyzent.h"
 #include "csphyzik/debug.h"
 
-ctEntity::ctEntity()
+ctEntity::ctEntity ()
 {
   state_offset = -1;
   solver = NULL;
   flags = 0;
 }
 
-ctEntity::~ctEntity()
+ctEntity::~ctEntity ()
 {
-  if( solver )
+  if ( solver )
     delete solver;
 }
 
 // pass control to solver
-void ctEntity::solve( real t )
+void ctEntity::solve ( real t )
 {
-  if( solver ){
-    solver->solve( t );
-  }
+  if ( solver )
+    solver->solve ( t );
 }
 
-void ctEntity::apply_given_F( ctForce& /*frc*/ )
+void ctEntity::apply_given_F ( ctForce& /*frc*/ )
 {
   // notin
 }

@@ -30,18 +30,20 @@
 
 /********** PHYSICAL ENTITY ****************/
 
-ctPhysicalEntity::ctPhysicalEntity() : 
- RF( ctReferenceFrame::universe() ), dRF(ctDeltaReferenceFrame::universe()), F(0), T(0)
+ctPhysicalEntity::ctPhysicalEntity() 
+  :  RF( ctReferenceFrame::universe() ), 
+     dRF(ctDeltaReferenceFrame::universe()), F(0), T(0)
 {
   RF.add_ref( RF );
   dRF.add_ref( dRF );
 }
 
-ctPhysicalEntity::ctPhysicalEntity( ctReferenceFrame &ref, ctDeltaReferenceFrame &dref  ) :
-  RF( ref ), dRF( dref ), F(0), T(0)
+ctPhysicalEntity::ctPhysicalEntity ( ctReferenceFrame &ref, 
+				     ctDeltaReferenceFrame &dref  ) 
+  : RF( ref ), dRF( dref ), F(0), T(0)
 {
-  RF.add_ref( RF );
-  dRF.add_ref( dRF );
+  RF.add_ref ( RF );
+  dRF.add_ref ( dRF );
 }
 
 ctPhysicalEntity::~ctPhysicalEntity()
@@ -50,19 +52,19 @@ ctPhysicalEntity::~ctPhysicalEntity()
 }
 
 
-void ctPhysicalEntity::apply_given_F( ctForce& /*frc*/ )
+void ctPhysicalEntity::apply_given_F ( ctForce& /*frc*/ )
 {
   // notin
 }
 
 //!me make sure it's the right direction.. should be counter-clockwise in RHS
-void ctPhysicalEntity::rotate_around_line( ctVector3 &paxis, real ptheta )
+void ctPhysicalEntity::rotate_around_line ( ctVector3 &paxis, real ptheta )
 {
   ctMatrix3 new_T;
   
-  R_from_vector_and_angle( paxis, -ptheta, new_T );
+  R_from_vector_and_angle ( paxis, -ptheta, new_T );
 //  RF.set_T(new_T*RF.get_T());  //!me is this right?
-  RF.set_R(new_T*RF.get_R());  //!me is this right?
+  RF.set_R(new_T*RF.get_R ());  //!me is this right?
 
 }
 
@@ -93,7 +95,7 @@ int ctPhysicalEntity::set_state( real *state_array )
 }
 
 // add change in state vector over time to state buffer parameter.
-int ctPhysicalEntity::set_delta_state( real *state_array )
+int ctPhysicalEntity::set_delta_state ( real *state_array )
 {
   ctMatrix3 M;
 
@@ -123,7 +125,7 @@ int ctPhysicalEntity::set_delta_state( real *state_array )
 }
 
 // download state from buffer into this entity
-int ctPhysicalEntity::get_state( const real *state_array )
+int ctPhysicalEntity::get_state ( const real *state_array )
 {
   ctVector3 o;
   ctMatrix3 M;
@@ -143,54 +145,58 @@ int ctPhysicalEntity::get_state( const real *state_array )
   M[2][2] = *state_array++;
 
   //!me probably don't need to do it every frame
-  M.orthonormalize();
+  M.orthonormalize ();
 
-  RF.set_offset( o );
-  RF.set_R( M );
-  return ctPhysicalEntity::get_state_size();
+  RF.set_offset ( o );
+  RF.set_R ( M );
+  return ctPhysicalEntity::get_state_size ();
 }
 
 
-void ctPhysicalEntity::set_v( const ctVector3 &pv )
+void ctPhysicalEntity::set_v ( const ctVector3 &pv )
 {
-
   dRF.v = pv; 
 }
 
-void ctPhysicalEntity::set_angular_v( const ctVector3 &pw )
+void ctPhysicalEntity::set_angular_v ( const ctVector3 &pw )
 { 
   dRF.w = pw; 
 }
 
 
-void ctPhysicalEntity::apply_impulse( ctVector3 /*jx*/, ctVector3 jv )
+void ctPhysicalEntity::apply_impulse ( ctVector3 /*jx*/, ctVector3 jv )
 {
   set_v( dRF.v + jv );
 }
 
 //************ ctDynamicEntity
 
-ctDynamicEntity::ctDynamicEntity()
+ctDynamicEntity::ctDynamicEntity ()
 {
   m = 10;
-  solver = new ctSimpleDynamicsSolver( *this );
+  solver = new ctSimpleDynamicsSolver ( *this );
 }
 
-ctDynamicEntity::ctDynamicEntity( ctReferenceFrame &ref, ctDeltaReferenceFrame &dref ) : ctPhysicalEntity( ref, dref )
+ctDynamicEntity::ctDynamicEntity ( ctReferenceFrame &ref, 
+				   ctDeltaReferenceFrame &dref ) 
+  : ctPhysicalEntity ( ref, dref )
 {
   m = 10;
-  solver = new ctSimpleDynamicsSolver( *this );
+  solver = new ctSimpleDynamicsSolver ( *this );
 }
 
-ctDynamicEntity::~ctDynamicEntity()
+ctDynamicEntity::~ctDynamicEntity ()
 {
 }
 
-void ctDynamicEntity::apply_given_F( ctForce &frc )
+void ctDynamicEntity::apply_given_F ( ctForce &frc )
 {
   frc.apply_F( *this );
 }
 
 
-void ctDynamicEntity::set_m( real pm ){ m = pm; }
+void ctDynamicEntity::set_m ( real pm )
+{ 
+  m = pm; 
+}
 

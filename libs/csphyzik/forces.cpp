@@ -138,14 +138,14 @@ ctVector3 ctSpringF::apply_F( ctDynamicEntity &pe )
 	if ( &pe == b1 )
 	{ 
 	  b1->sum_force(f);
-	  d = a1 - r1->get_world_offset();
-	  b1->sum_torque( d % f );
+	  d = a1 - r1->get_world_offset ();
+	  b1->sum_torque ( d % f );
 	}
-	else if( &pe == b2 && b2 != NULL )
+	else if ( &pe == b2 && b2 != NULL )
 	{
-	  b2->sum_force(f);
-	  d = a2 - r2->get_world_offset();
-	  b2->sum_torque( d % f );
+	  b2->sum_force (f);
+	  d = a2 - r2->get_world_offset ();
+	  b2->sum_torque ( d % f );
 	}
 	return f;			
       }
@@ -160,11 +160,11 @@ ctVector3 ctSpringF::apply_F( ctDynamicEntity &pe )
 // right now an object passing too close to the discontinuity will get accelerated
 // way fast and energy will NOT be conserved.  This could be fixed using R-K 
 // method with adaptive step-sizing or some happy horse-shit like that.
-ctVector3 ctGravityWell::apply_F( ctDynamicEntity &moon )
+ctVector3 ctGravityWell::apply_F ( ctDynamicEntity &moon )
 {
   double g_force;
   ctVector3 r_vec;
-  ctVector3 total_f( 0.0,0.0,0.0 );
+  ctVector3 total_f ( 0.0,0.0,0.0 );
   ctVector3 planet_x;
   ctVector3 moon_x;
   double r_len2;
@@ -191,7 +191,7 @@ ctVector3 ctGravityWell::apply_F( ctDynamicEntity &moon )
       moon.sum_force ( r_vec ); 
       total_f += r_vec;
     }
-    planet = body_vector.get_next();
+    planet = body_vector.get_next ();
   }	
   return total_f;
 }

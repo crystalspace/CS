@@ -28,12 +28,12 @@
 
 //!me this code is really lame!  rewrite it sometime.  Probably better iterative
 
-void ctInverseKinematics::solve( real t )
+void ctInverseKinematics::solve ( real t )
 {
-ctVector3 nutnhoney;
+  ctVector3 nutnhoney;
 
-	solve_IK( t, goal, nutnhoney );
-	ab.update_links();
+  solve_IK ( t, goal, nutnhoney );
+  ab.update_links ();
 }
 
 /*
@@ -53,70 +53,74 @@ ctInverseKinematics *out_link_solver;
 }
 */
 
-void ctInverseKinematics::solve_IK( real t, ctVector3 &the_goal, ctVector3 &end_effector )
+void ctInverseKinematics::solve_IK ( real t, 
+				     ctVector3 &the_goal, ctVector3 &end_effector )
 {
-ctArticulatedBody *out_link;
-ctInverseKinematics *out_link_solver;
+  ctArticulatedBody *out_link;
+  ctInverseKinematics *out_link_solver;
 
-	// compute joint angles useing Cyclical Descent Algorithm
-	// compute angles from link n...1  ( 0 is base )
-	out_link = ab.outboard_links.get_first();
-	if( out_link ){
-		out_link_solver = (ctInverseKinematics *)out_link->solver;
-		out_link_solver->solve_IK( t, the_goal, end_effector );
+  // compute joint angles useing Cyclical Descent Algorithm
+  // compute angles from link n...1  ( 0 is base )
+  out_link = ab.outboard_links.get_first();
+  if ( out_link )
+  {
+    out_link_solver = (ctInverseKinematics *)out_link->solver;
+    out_link_solver->solve_IK( t, the_goal, end_effector );
 
-		// wind back up stack computing angle from tip to base
-		out_link_solver->compute_joint_angle( t, the_goal, end_effector );
-	}else{  
-		// reached the end of the chain
-		if( ab.handle ){
-			ctVector3 ef = ab.handle->get_org_world();  //!me change to tip
-			end_effector[0] = ef[0];
-			end_effector[1] = ef[1];
-			end_effector[2] = ef[2];
-		}
-	}
+    // wind back up stack computing angle from tip to base
+    out_link_solver->compute_joint_angle( t, the_goal, end_effector );
+  }
+  else
+  {  
+    // reached the end of the chain
+    if ( ab.handle )
+    {
+      ctVector3 ef = ab.handle->get_org_world();  //!me change to tip
+      end_effector[0] = ef[0];
+      end_effector[1] = ef[1];
+      end_effector[2] = ef[2];
+    }
+  }
 }
 
-void ctInverseKinematics::compute_joint_angle( real t, ctVector3 &the_goal, ctVector3 &end_effector )
+void ctInverseKinematics::compute_joint_angle ( real t, 
+				    ctVector3 &the_goal, ctVector3 &end_effector )
 {
-ctJoint *joint_in;
-ctVector3 joint_to_goal;
-ctVector3 joint_to_end;
-ctVector3 joint_world;
-real angle_to_goal;
-ctMatrix3 dR;
+  ctJoint *joint_in;
+  ctVector3 joint_to_goal;
+  ctVector3 joint_to_end;
+  ctVector3 joint_world;
+  real angle_to_goal;
+  ctMatrix3 dR;
 
-	joint_in = ab.inboard_joint;
+  joint_in = ab.inboard_joint;
 
-	if( joint_in == NULL )
-		return; //!me log error
+  if ( joint_in == NULL )
+    return; //!me log error
 
-	joint_world = joint_in->outboard_offset * -1.0;
-	ab.handle->v_this_to_world( joint_world );
+  joint_world = joint_in->outboard_offset * -1.0;
+  ab.handle->v_this_to_world( joint_world );
 
-	joint_to_end = end_effector - joint_world;
-	joint_to_goal = the_goal - joint_world;
+  joint_to_end = end_effector - joint_world;
+  joint_to_goal = the_goal - joint_world;
 	
-	angle_to_goal = angle_diff( joint_to_goal, joint_to_end );
+  angle_to_goal = angle_diff( joint_to_goal, joint_to_end );
 
-	if( t > MIN_REAL ){
-		angle_to_goal = angle_to_goal/t;
-	}else{
-		angle_to_goal = angle_to_goal/(MIN_REAL * 10.0);
-	}
+  if ( t > MIN_REAL )
+    angle_to_goal = angle_to_goal/t;
+  else
+    angle_to_goal = angle_to_goal/(MIN_REAL * 10.0);
 
-	//!me change to some kinda member variable
-	if( angle_to_goal > max_qv ){
-		angle_to_goal = max_qv;
-	}else if( angle_to_goal < -max_qv ){
-		angle_to_goal = -max_qv;
-	}
+  //!me change to some kinda member variable
+  if ( angle_to_goal > max_qv )
+    angle_to_goal = max_qv;
+  else if ( angle_to_goal < -max_qv )
+    angle_to_goal = -max_qv;
 
-	joint_in->qv = angle_to_goal;
+  joint_in->qv = angle_to_goal;
 
-	R_from_vector_and_angle( ab.handle->get_v_this_to_world(joint_in->joint_axis), angle_to_goal*t, dR );
-	end_effector = dR*end_effector;
-
+  R_from_vector_and_angle ( ab.handle->get_v_this_to_world(joint_in->joint_axis),
+			    angle_to_goal*t, dR );
+  end_effector = dR*end_effector;
 }
 

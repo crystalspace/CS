@@ -29,33 +29,33 @@
 ctForce::ctForce() :
   direction(0), origin(0), RF( ctReferenceFrame::universe() )
 {
-	RF.add_ref( RF );
-	magnitude = 1.0;
+  RF.add_ref( RF );
+  magnitude = 1.0;
 }
 
-ctForce::ctForce( ctReferenceFrame &ref ) :
+ctForce::ctForce ( ctReferenceFrame &ref ) :
   direction(0), origin(0), RF( ref )
 {
-	RF.add_ref( RF );
+  RF.add_ref( RF );
 }
 
-ctForce::~ctForce()
+ctForce::~ctForce ()
 {
-	RF.remove_ref( RF );
+  RF.remove_ref( RF );
 }
 
 
-ctNBodyForce::ctNBodyForce()
+ctNBodyForce::ctNBodyForce ()
 {
 
 }
 
-ctNBodyForce::ctNBodyForce( ctReferenceFrame &ref ) 
+ctNBodyForce::ctNBodyForce ( ctReferenceFrame &ref ) 
   : ctForce( ref )
 {
 }
 
-ctNBodyForce::~ctNBodyForce()
+ctNBodyForce::~ctNBodyForce ()
 {
   ctPhysicalEntity *pe;
 	

@@ -33,27 +33,28 @@
 
 static ctWorld *gcurrent_world = NULL;
 
-static void __ctworld_dydt(real t, const real y[], real dy[]) {
-  gcurrent_world->dydt_eval(t, y, dy);
+static void __ctworld_dydt(real t, const real y[], real dy[]) 
+{
+  gcurrent_world->dydt_eval (t, y, dy);
 }
 
-void ctWorld::dydt_eval(real t, const real y[], real dy[] )
+void ctWorld::dydt_eval (real t, const real y[], real dy[] )
 {
   //  assert_goto( gcurrent_world != NULL, "current world NULL in dydt\n",
   //               ASSERTFAIL );
   
-  gcurrent_world->calc_delta_state( t, y, dy ); 
+  gcurrent_world->calc_delta_state ( t, y, dy ); 
 
   //ASSERTFAIL:
 }
 
-ctWorld::ctWorld()
+ctWorld::ctWorld ()
 {
-  ctArticulatedBody::set_joint_friction( DEFAULT_JOINT_FRICTION );
+  ctArticulatedBody::set_joint_friction ( DEFAULT_JOINT_FRICTION );
 
   fsm_state = CTWS_NORMAL;
   // default
-  ode_to_math = new OdeRungaKutta4();
+  ode_to_math = new OdeRungaKutta4 ();
 
   max_state_size = DEFAULT_INIT_MAX_STATE_SIZE;
   y0 = new real[max_state_size];
@@ -75,7 +76,7 @@ ctWorld::~ctWorld()
   delete [] y_save;
 }
 
-void ctWorld::calc_delta_state( real t, const real y[], real dy[] ) 
+void ctWorld::calc_delta_state ( real t, const real y[], real dy[] ) 
 {
   // move data from y array into all entities in this world
   reintegrate_state ( y );
@@ -88,23 +89,22 @@ void ctWorld::calc_delta_state( real t, const real y[], real dy[] )
 
   // load all delta step data from bodies into ydot
   load_delta_state ( dy );
-
 }
 
 // zero out force accumulator and other transient variables
-void ctWorld::init_state()
+void ctWorld::init_state ()
 {
   ctEntity *pe;
 
-  pe = body_list.get_first();
-  while( pe ){
-    pe->init_state();
-    pe = body_list.get_next();
+  pe = body_list.get_first ();
+  while ( pe )
+  {
+    pe->init_state ();
+    pe = body_list.get_next ();
   }
-
 }
 
-void ctWorld::resize_state_vector( long new_size )
+void ctWorld::resize_state_vector ( long new_size )
 {
   delete [] y0;
   delete [] y1;
@@ -118,19 +118,19 @@ void ctWorld::resize_state_vector( long new_size )
 void ctWorld::register_catastrophe_manager ( ctCatastropheManager *pcm )
 {
   if ( pcm != NULL )
-    catastrophe_list.add_link( pcm );
+    catastrophe_list.add_link ( pcm );
 }
  
 // calculate new positions of world objects after time dt
-errorcode ctWorld::do_time_step( real t0, real t1 )
+errorcode ctWorld::do_time_step ( real t0, real t1 )
 {
   long arr_size = 0;
-  ctEntity *pe = body_list.get_first();
+  ctEntity *pe = body_list.get_first ();
 
   while ( pe )
   {
     arr_size += pe->get_state_size ();
-    pe = body_list.get_next();
+    pe = body_list.get_next ();
   }
 
   gcurrent_world = this;
@@ -170,12 +170,11 @@ errorcode ctWorld::do_time_step( real t0, real t1 )
   }
   
   return WORLD_NOERR;
-
 }
 
-void fcn_set_no_rewind( ctEntity *ppe )
+void fcn_set_no_rewind ( ctEntity *ppe )
 {
-  ppe->set_rewind(false);
+  ppe->set_rewind (false);
 }
 
 // using sloooooooow but accurate collision detection.  ( collision = catastrophe )
@@ -183,7 +182,7 @@ void fcn_set_no_rewind( ctEntity *ppe )
 // - use eulers method or mid-point for ODE just during CD
 // - only evolve objects related to colliding objects when searching for c-time
 // - don't forget to handle 'tunneling' problem as well.
-errorcode ctWorld::evolve( real t1, real t2 )
+errorcode ctWorld::evolve ( real t1, real t2 )
 {
   real ta, tb;
   ctCatastropheManager *cat;
@@ -191,21 +190,22 @@ errorcode ctWorld::evolve( real t1, real t2 )
   ctLinkList<ctCatastropheManager> *recent_cat = new ctLinkList<ctCatastropheManager>();
   ctLinkList<ctCatastropheManager> *swap_cat;
 
-  long loops = max_time_subdivisions;  //make sure we don't go into an infinite loop
+  //make sure we don't go into an infinite loop
+  long loops = max_time_subdivisions; 
 
   ta = t1;
   tb = t2;
   real max_cat_dist, this_cat_dist;
   bool is_unhandled_catastrophe = false;
   bool simul_check_done = false;
-//!me no rewind option is probably a bad idea...
+  //!me no rewind option is probably a bad idea...
 #ifdef __CT_NOREWINDENABLED__
   apply_function_to_body_list ( fcn_set_no_rewind );
 #endif
 
   while ( ta < t2 && loops-- > 0)
   {
-    do_time_step( ta, tb );
+    do_time_step ( ta, tb );
 
     max_cat_dist = 0;
     this_slice_cat->remove_all ();
@@ -253,7 +253,7 @@ errorcode ctWorld::evolve( real t1, real t2 )
       real last_ta = ta;
 
       // we have found a time close to when catastrpohe happened
-      if( ( tb - ta ) <= TIME_EPSILON )
+      if ( ( tb - ta ) <= TIME_EPSILON )
       {  
         // resolve all catastrophes that occurred at this approx point in time.
         cat = recent_cat->get_first ();
@@ -272,7 +272,7 @@ errorcode ctWorld::evolve( real t1, real t2 )
       {
         ta = tb;
         tb += (tb - last_ta)*0.5;
-        if( tb > t2 )
+        if ( tb > t2 )
           tb = t2;
       }
     }
@@ -289,7 +289,7 @@ errorcode ctWorld::evolve( real t1, real t2 )
   {
     // evolve to the end of our time-slice
     tb = t2;
-    do_time_step( ta, tb );
+    do_time_step ( ta, tb );
     // should check for catastrophes
     this_slice_cat->remove_all ();
     cat = catastrophe_list.get_first ();
@@ -305,12 +305,12 @@ errorcode ctWorld::evolve( real t1, real t2 )
     // resolve all catastrophes that occured, 
     // not caring about getting the proper time-resolution.
     cat = this_slice_cat->get_first ();
-    while( cat )
+    while ( cat )
     {
-      cat->handle_catastrophe();
-      cat = this_slice_cat->get_next();
+      cat->handle_catastrophe ();
+      cat = this_slice_cat->get_next ();
     }
-    this_slice_cat->remove_all();
+    this_slice_cat->remove_all ();
     was_catastrophe_last_frame = is_unhandled_catastrophe;
     is_unhandled_catastrophe = false;
   }
@@ -321,11 +321,11 @@ errorcode ctWorld::evolve( real t1, real t2 )
   return WORLD_NOERR;
 }
 
-errorcode ctWorld::rewind( real /*t1*/, real t2 )
+errorcode ctWorld::rewind ( real /*t1*/, real t2 )
 {
   fsm_state = CTWS_REWOUND;
   rewound_from = t2;
-  reintegrate_state( y_save );
+  reintegrate_state ( y_save );
   return WORLD_NOERR;
 }
 
@@ -345,26 +345,26 @@ void ctWorld::solve ( real t )
   // Solve for forces affecting contents of world.  The order matters.
 
   // First apply all environmental forces of this world to bodies
-  frc = enviro_force_list.get_first();
+  frc = enviro_force_list.get_first ();
   while ( frc )
   {
-    pe = body_list.get_first();
-    while( pe )
+    pe = body_list.get_first ();
+    while ( pe )
     {
       if ( !(fsm_state == CTWS_REWOUND && (pe->flags & CTF_NOREWIND)) )
-        pe->apply_given_F( *frc );
+        pe->apply_given_F ( *frc );
       pe = body_list.get_next ();
     }
 
     frc = enviro_force_list.get_next ();
   }
 
-  pe = body_list.get_first();
+  pe = body_list.get_first ();
   while ( pe )
   {
     if ( !(fsm_state == CTWS_REWOUND && (pe->flags & CTF_NOREWIND)) )
-      pe->solve(t);
-    pe = body_list.get_next();
+      pe->solve (t);
+    pe = body_list.get_next ();
   }
 
 }
@@ -376,8 +376,8 @@ void ctWorld::load_state ( real *state_array )
   ctEntity *pe;
   long state_size;
 
-  pe = body_list.get_first();
-  while( pe )
+  pe = body_list.get_first ();
+  while ( pe )
   {
     if ( fsm_state == CTWS_REWOUND && (pe->flags & CTF_NOREWIND) )
       state_size = pe->get_state_size ();
@@ -385,7 +385,7 @@ void ctWorld::load_state ( real *state_array )
       state_size = pe->set_state ( state_array );
    
     state_array += state_size;
-    pe = body_list.get_next();
+    pe = body_list.get_next ();
   }
 }
 
@@ -395,37 +395,37 @@ void ctWorld::reintegrate_state ( const real *state_array )
   ctEntity *pe;
   long state_size;
 
-  pe = body_list.get_first();
+  pe = body_list.get_first ();
   while ( pe )
   {
     if ( fsm_state == CTWS_REWOUND && (pe->flags & CTF_NOREWIND) )
-      state_size = pe->get_state_size();
+      state_size = pe->get_state_size ();
     else
     {
-      state_size = pe->get_state( state_array );
+      state_size = pe->get_state ( state_array );
       state_array += state_size;
     }
-    pe = body_list.get_next();
+    pe = body_list.get_next ();
   }
 }
 
 
-void ctWorld::load_delta_state( real *state_array )
+void ctWorld::load_delta_state ( real *state_array )
 {
   ctEntity *pe;
   long state_size;
 
-  pe = body_list.get_first();
+  pe = body_list.get_first ();
   while ( pe )
   {
     if ( fsm_state == CTWS_REWOUND && (pe->flags & CTF_NOREWIND) )
-      state_size = pe->get_state_size();
+      state_size = pe->get_state_size ();
     else
     {
-      state_size = pe->set_delta_state( state_array );
+      state_size = pe->set_delta_state ( state_array );
       state_array += state_size;
     }
-    pe = body_list.get_next();
+    pe = body_list.get_next ();
   }
 }
 
@@ -433,8 +433,8 @@ void ctWorld::load_delta_state( real *state_array )
 // add an entity to this world
 errorcode ctWorld::add_entity ( ctEntity *pe )
 {
-  if (pe->get_state_offset() < 0)
-    pe->set_state_offset(state_alloc(pe->get_state_size()));
+  if (pe->get_state_offset () < 0)
+    pe->set_state_offset (state_alloc(pe->get_state_size()));
 
   if ( pe )
   {
@@ -443,7 +443,6 @@ errorcode ctWorld::add_entity ( ctEntity *pe )
   }
   else
     return WORLD_ERR_NULLPARAMETER;
-  
 }
 
 
@@ -461,11 +460,11 @@ errorcode ctWorld::add_enviro_force ( ctForce *f )
 errorcode ctWorld::delete_entity ( ctEntity *pb )
 {
   if (pb->get_state_offset() >= 0)
-    state_free(pb->get_state_offset());
+    state_free(pb->get_state_offset ());
 
   if ( pb )
   {
-    body_list.delete_link( pb );
+    body_list.delete_link ( pb );
     return WORLD_NOERR;
   }
   else
@@ -478,34 +477,34 @@ void ctWorld::apply_function_to_body_list ( void(*fcn)( ctEntity *ppe ) )
 {
   ctEntity *pe;
 
-  pe = body_list.get_first();
-  while( pe )
+  pe = body_list.get_first ();
+  while ( pe )
   {
-    fcn( pe );
-    pe = body_list.get_next();
+    fcn ( pe );
+    pe = body_list.get_next ();
   } 
 }
 
 
 // return the relative velocity between up to two bodies at a point in world space
-ctVector3 ctWorld::get_relative_v ( ctPhysicalEntity *body_a, ctPhysicalEntity *body_b, 
-				    const ctVector3 &the_p )
+ctVector3 ctWorld::get_relative_v 
+  ( ctPhysicalEntity *body_a, ctPhysicalEntity *body_b, const ctVector3 &the_p )
 {
-  if( (!body_a) && (!body_b) )
-    return ctVector3(0,0,0);	
+  if ( (!body_a) && (!body_b) )
+    return ctVector3 (0,0,0);	
 
   ctVector3 v_rel;
   ctVector3 body_x = body_a->get_pos ();
   ctVector3 ra = the_p - body_x;
 
-  ctVector3 ra_v = body_a->get_angular_v()%ra + body_a->get_v();
+  ctVector3 ra_v = body_a->get_angular_v ()%ra + body_a->get_v ();
 
   if ( body_b == NULL )
     v_rel = ra_v;
   else
   {
     ctVector3 rb = the_p - body_b->get_pos ();
-    ctVector3 rb_v = body_b->get_angular_v()%rb + body_b->get_v();
+    ctVector3 rb_v = body_b->get_angular_v () % rb + body_b->get_v ();
     v_rel = (ra_v - rb_v);
   }
 
@@ -591,7 +590,7 @@ void ctWorld::resolve_collision ( ctCollidingContact *cont )
       ma_inv = 1.0/ma_inv;
       rota = n * ((imp_I_inv*( ra%n ) )%ra);  
 
-      if( bb == NULL )
+      if ( bb == NULL )
       {
         // hit some kind of immovable object
         mb_inv = 0;
@@ -656,50 +655,52 @@ void ctWorld::resolve_collision ( ctCollidingContact *cont )
     cont = cont->next;
   }
 */
-
 }
-
-
-
-
 
 // alloc stuff
 
 // Remove block matching "offset" from the used_blocks list and return it
-AllocNode *ctWorld::sa_make_unused(int offset) {
-  AllocNode *node = (AllocNode*) used_blocks.GetFirstItem();
-  while(node) {
-    if(node->offset == offset) {
-      used_blocks.RemoveItem();
+AllocNode *ctWorld::sa_make_unused(int offset) 
+{
+  AllocNode *node = (AllocNode*) used_blocks.GetFirstItem ();
+  while (node) 
+  {
+    if (node->offset == offset) 
+    {
+      used_blocks.RemoveItem ();
       return node;
     }
-    node = (AllocNode*) used_blocks.GetNextItem();
-    if(node == (AllocNode*)used_blocks.PeekFirstItem()) node = NULL;
+    node = (AllocNode*) used_blocks.GetNextItem ();
+    if (node == (AllocNode*)used_blocks.PeekFirstItem ()) node = NULL;
   }
   return NULL;  //  Couldn't find block
 }
 
 // Add block to the used_blocks list, inserted in its proper location
-bool ctWorld::sa_make_used(AllocNode *block) {
-  AllocNode *index = (AllocNode*)used_blocks.GetFirstItem();
-  if(!index || index->offset > block->offset) {
+bool ctWorld::sa_make_used(AllocNode *block) 
+{
+  AllocNode *index = (AllocNode*) used_blocks.GetFirstItem ();
+  if (!index || index->offset > block->offset) 
     return used_blocks.AddItem((void*)block);
-  }
-  while(index) {
-    if(index->offset > block->offset) {
-      used_blocks.GetPrevItem();
-      return used_blocks.AddCurrentItem((void*)block);
+
+  while (index) 
+  {
+    if (index->offset > block->offset) 
+    {
+      used_blocks.GetPrevItem ();
+      return used_blocks.AddCurrentItem ( (void*)block );
     }
-    index = (AllocNode*)used_blocks.GetNextItem();
-    if(index == (AllocNode*)used_blocks.PeekFirstItem()) index = NULL;
+    index = (AllocNode*)used_blocks.GetNextItem ();
+    if (index == (AllocNode*)used_blocks.PeekFirstItem ()) 
+      index = NULL;
   }
 
   // Assert that we're back at the beginning -- csDLinkList is circular
-  assert(!index);
+  assert (!index);
 
   // Add elt to end of list
-  used_blocks.GetPrevItem(); // Back to end of list
-  return used_blocks.AddCurrentItem((void*)block);
+  used_blocks.GetPrevItem (); // Back to end of list
+  return used_blocks.AddCurrentItem ((void*)block);
   return false;
 }
 
@@ -745,7 +746,7 @@ int ctWorld::state_alloc (int size)
   }
 
   // Grab first block of size blocksize and make it used, not free
-  index = (AllocNode*)free_blocks.GetFirstItem();
+  index = (AllocNode*)free_blocks.GetFirstItem ();
   while (index) 
   {
     if ( index->size == blocksize ) 

@@ -24,14 +24,14 @@
 #include "csphyzik/phyzent.h"
 #include "csphyzik/solver.h"
 
-void ctSimpleDynamicsSolver::solve( real /*t*/ )
+void ctSimpleDynamicsSolver::solve ( real /*t*/ )
 {
-ctForce *fp;
+  ctForce *fp;
 
-	fp = de.forces.get_first();
-	while( fp ){
-		fp->apply_F( de );
-		fp = de.forces.get_next();
-	}
-
+  fp = de.forces.get_first ();
+  while ( fp )
+  {
+    fp->apply_F ( de );
+    fp = de.forces.get_next ();
+  }
 }

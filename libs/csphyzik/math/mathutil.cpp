@@ -31,24 +31,23 @@
 // not conviced it doesn't have discontinuity...
 // the un-simplified formula was really strange and they didn't really
 // explain it.  Kind of looked like it could have come from quaternion theory.
-void R_from_vector_and_angle( ctVector3 pvec, real theta, ctMatrix3 &pR )
+void R_from_vector_and_angle ( ctVector3 pvec, real theta, ctMatrix3 &pR )
 {
-    double  angleRad = theta,
-	    c = cos(angleRad),
-	    s = sin(angleRad),
-	    t = 1.0 - c;
+  double  angleRad = theta,
+                 c = cos (angleRad),
+                 s = sin (angleRad),
+                 t = 1.0 - c;
 
-    pvec = pvec/pvec.Norm();
-    pR.set(t * pvec[0] * pvec[0] + c,
-		     t * pvec[0] * pvec[1] - s * pvec[2],
-		     t * pvec[0] * pvec[2] + s * pvec[1],
-		t * pvec[0] * pvec[1] + s * pvec[2],
-		     t * pvec[1] * pvec[1] + c,
-		     t * pvec[1] * pvec[2] - s * pvec[0],
-		t * pvec[0] * pvec[1] - s * pvec[1],
-		     t * pvec[1] * pvec[2] + s * pvec[0],
-		     t * pvec[2] * pvec[2] + c);
-
+  pvec = pvec/pvec.Norm();
+  pR.set ( t * pvec[0] * pvec[0] + c,
+	   t * pvec[0] * pvec[1] - s * pvec[2],
+	   t * pvec[0] * pvec[2] + s * pvec[1],
+	   t * pvec[0] * pvec[1] + s * pvec[2],
+	   t * pvec[1] * pvec[1] + c,
+	   t * pvec[1] * pvec[2] - s * pvec[0],
+	   t * pvec[0] * pvec[1] - s * pvec[1],
+	   t * pvec[1] * pvec[2] + s * pvec[0],
+	   t * pvec[2] * pvec[2] + c );
 }
 
 
@@ -131,50 +130,48 @@ ctMatrix3 TRot;
 */
 
 // use dot product to find the angle between two vectors
-real angle_diff( ctVector3 v1, ctVector3 v2 )
+real angle_diff ( ctVector3 v1, ctVector3 v2 )
 {
-real angle_abs;
-ctVector3 vxross;
+  real angle_abs;
+  ctVector3 vxross;
 
-	v1.Normalize();
-	v2.Normalize();
+  v1.Normalize ();
+  v2.Normalize ();
 	
-	vxross = v2 % v1;
+  vxross = v2 % v1;
 
-	angle_abs = acos( v1*v2 );
+  angle_abs = acos( v1*v2 );
 
-	angle_abs *= sign( mu_max( 3, vxross[0], vxross[1], vxross[2] ) );
+  angle_abs *= sign( mu_max( 3, vxross[0], vxross[1], vxross[2] ) );
 	
-	return angle_abs;
+  return angle_abs;
 }
 
-real sign( real pwhat )
+real sign ( real pwhat )
 {
-	if( pwhat >= 0 ){
-		return 1.0;
-	}else{
-		return -1.0;
-	}
-
+  if ( pwhat >= 0 )
+    return 1.0;
+  else
+    return -1.0;
 }
 
-real mu_max( int pnum, ... )
+real mu_max ( int pnum, ... )
 {
-va_list parg;
-real next_real;
-real max_so_far = 0.0;
+  va_list parg;
+  real next_real;
+  real max_so_far = 0.0;
 
-	va_start( parg, pnum );
+  va_start ( parg, pnum );
 	
-	while( pnum ){
-		next_real = va_arg( parg, real );
-		if( fabs(next_real) > fabs(max_so_far) ){
-			max_so_far = next_real;
-		}
-		pnum--;
-	}
+  while ( pnum )
+  {
+    next_real = va_arg( parg, real );
+    if ( fabs(next_real) > fabs(max_so_far) )
+      max_so_far = next_real;
+    pnum--;
+  }
 
-	va_end( parg );
+  va_end( parg );
 
-	return max_so_far;
+  return max_so_far;
 }

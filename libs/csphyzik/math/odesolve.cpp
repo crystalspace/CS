@@ -25,7 +25,7 @@
 static const real ONE_OVER_SIX = 1.0/6.0;
 static const real ONE_OVER_THREE = 1.0/3.0;
 
-OdeSolver::OdeSolver()
+OdeSolver::OdeSolver ()
 {
   state_size = 0;
 
@@ -35,7 +35,7 @@ OdeSolver::OdeSolver()
 
 
 // clean up
-OdeSolver::~OdeSolver()
+OdeSolver::~OdeSolver ()
 {
   if (dy) delete [] dy;
   if (Iy) delete [] Iy;
@@ -43,7 +43,7 @@ OdeSolver::~OdeSolver()
 
 
 // reallocate memory for all work variables
-void OdeSolver::ode_realloc(int new_size)
+void OdeSolver::ode_realloc (int new_size)
 {
   if (dy) delete [] dy;
   if (Iy) delete [] Iy;
@@ -52,8 +52,8 @@ void OdeSolver::ode_realloc(int new_size)
 
   dy = new real[state_size];
   Iy = new real[state_size];
-  assert(dy);
-  assert(Iy);
+  assert (dy);
+  assert (Iy);
 }
 
 
@@ -61,18 +61,18 @@ void OdeSolver::ode_realloc(int new_size)
 //*   Runga-Kutta
 //*****************************
 
-OdeRungaKutta4::OdeRungaKutta4()
+OdeRungaKutta4::OdeRungaKutta4 ()
 {
   k1 = NULL;
   k2 = NULL;
   k3 = NULL;
   k4 = NULL;
 
-  ode_realloc(ODE_INITIAL_STATE_SIZE);
+  ode_realloc (ODE_INITIAL_STATE_SIZE);
 }
 
 // clean up
-OdeRungaKutta4::~OdeRungaKutta4()
+OdeRungaKutta4::~OdeRungaKutta4 ()
 {
   if (k1) delete [] k1;
   if (k2) delete [] k2;
@@ -80,9 +80,10 @@ OdeRungaKutta4::~OdeRungaKutta4()
   if (k4) delete [] k4;
 }
 
-// compute a step.  current state in t0, state after time step t0 -> t1 is put in y1
+// Compute a step. Current state in t0, state after time step t0 -> t1 is put in y1
 // fourth order runga-kutta
-void OdeRungaKutta4::calc_step(real y0[], real y1[], unsigned int len, real t0, real t1, dydt_function dydt)
+void OdeRungaKutta4::calc_step (real y0[], real y1[], 
+			   unsigned int len, real t0, real t1, dydt_function dydt)
 {
   unsigned int i;
   // reallocate if necessary
@@ -93,41 +94,36 @@ void OdeRungaKutta4::calc_step(real y0[], real y1[], unsigned int len, real t0, 
   real h_2 = h * 0.5;
 
   dydt(t0, y0, dy );
-  for (i = 0; i < len; i++) {    // first iteration
-    k1[i] = h*dy[i];
-  }
+  for (i = 0; i < len; i++) 
+    k1[i] = h*dy[i];  // first iteration
 
-  for (i = 0; i < len; i++) {
+  for (i = 0; i < len; i++)
     Iy[i] = y0[i] + k1[i] * 0.5;
-  }
 
   dydt(t0 + h_2, Iy, dy);
-  for (i = 0; i < len; i++) {    // second iteration
-    k2[i] = h*dy[i];
-  }
+  for (i = 0; i < len; i++)
+    k2[i] = h*dy[i];  // second iteration
 
-  for (i = 0; i < len; i++) {
+  for (i = 0; i < len; i++)
     Iy[i] = y0[i] + k2[i] * 0.5;
-  }
 
   dydt(t0 + h_2, Iy, dy );
-  for (i = 0; i < len; i++) {    // third iteration
-    k3[i] = h*dy[i];
-  }
+  for (i = 0; i < len; i++)
+    k3[i] = h*dy[i]; // third iteration
 
-  for (i = 0; i < len; i++) {
+  for (i = 0; i < len; i++)
     Iy[i] = y0[i] + k3[i];
-  }
 
   dydt(t0 + h, Iy, dy );
-  for (i = 0; i < len; i++) {    // fourth iteration
-    k4[i] = h*dy[i];
-  }
+  for (i = 0; i < len; i++)   
+    k4[i] = h*dy[i]; // fourth iteration
 
-  for (i = 0; i < len; i++) {
-    y1[i] = y0[i] + (k1[i] * ONE_OVER_SIX) + (k2[i] * ONE_OVER_THREE)
-                    + (k3[i] * ONE_OVER_THREE) + (k4[i] * ONE_OVER_SIX);
-  }
+  for (i = 0; i < len; i++)
+    y1[i] = y0[i] + (k1[i] * ONE_OVER_SIX) + 
+                    (k2[i] * ONE_OVER_THREE) + 
+                    (k3[i] * ONE_OVER_THREE) + 
+                    (k4[i] * ONE_OVER_SIX);
+ 
 }
 
 // reallocate memory for all work variables
@@ -155,7 +151,8 @@ OdeEuler::OdeEuler()
   ode_realloc(ODE_INITIAL_STATE_SIZE);
 }
 
-void OdeEuler::calc_step(real y0[], real y1[], unsigned int len, real t0, real t1, dydt_function dydt)
+void OdeEuler::calc_step (real y0[], real y1[], 
+			  unsigned int len, real t0, real t1, dydt_function dydt)
 {
   unsigned int i;
   // reallocate if necessary
@@ -166,9 +163,8 @@ void OdeEuler::calc_step(real y0[], real y1[], unsigned int len, real t0, real t
 
   dydt(t0, y0, dy );
  
-  for (i = 0; i < len; i++) {
+  for (i = 0; i < len; i++)
     y1[i] = y0[i] + dy[i] * h;
-  }
 }
 
 // mid-point
@@ -184,7 +180,8 @@ OdeMidPoint::OdeMidPoint()
 //    x + dt/2*k1 -> take step of size dt/2 from x. AddRB( k2, k1, dt/2,  
 //      f()         -> eval F and T at stepped ( t + dt/2, x + dt/2*k1 ) postion  
 // y' = y + dt*k2   -> take step of size dt from x
-void OdeMidPoint::calc_step(real y0[], real y1[], unsigned int len, real t0, real t1, dydt_function dydt)
+void OdeMidPoint::calc_step (real y0[], real y1[], 
+			   unsigned int len, real t0, real t1, dydt_function dydt)
 {
   unsigned int i;
   // reallocate if necessary
@@ -194,13 +191,12 @@ void OdeMidPoint::calc_step(real y0[], real y1[], unsigned int len, real t0, rea
   real h = (t1 - t0) * 0.5;
 
   dydt(t0, y0, dy );
-  for (i = 0; i < len; i++) {    // first iteration
-    Iy[i] = y0[i] + dy[i] * h;
-  }
+  for (i = 0; i < len; i++)
+    Iy[i] = y0[i] + dy[i] * h;  // first iteration
+
   dydt(t0 + h, Iy, dy );
   
   h *= 2.0;
-  for (i = 0; i < len; i++) {
+  for (i = 0; i < len; i++)
     y1[i] = y0[i] + dy[i] * h;
-  }
 }
