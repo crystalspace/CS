@@ -14,8 +14,9 @@ chronological order.
 	      Application, Library, Plugin, or MsvcGenWorkspace rule.
 	    - MsvcGenConfig can be used to set any of the new variables which
 	      control the prefix assigned to project names based upon the raw
-	      target name.  Any of the following variables can be set by the
-	      client:
+	      target name.  These apply to all project and workspace names not
+	      overriden by MsvcGenName.  Any of the following variables can be
+	      set by the client:
 		MSVC.PREFIX.appcon    (default "app")
 		MSVC.PREFIX.appgui    (default "app")
 		MSVC.PREFIX.group     (default "grp")
