@@ -930,7 +930,7 @@ endproc
 ;   int xx, unsigned char *d, unsigned long *z_buf,
 ;   float inv_z, float u_div_z, float v_div_z
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
-proc		csScan_16_draw_scanline_fog_555,52,ebx,esi,edi,ebp
+proc		csScan_16_draw_scanline_fog_555,36,ebx,esi,edi,ebp
 		targ	%$width		; int
 		targ	%$dest		; unsigned char *
 		targ	%$zbuff		; unsigned long *
@@ -947,10 +947,6 @@ proc		csScan_16_draw_scanline_fog_555,52,ebx,esi,edi,ebp
 		tloc	%$fogr		; FogR
 		tloc	%$fogg		; FogG
 		tloc	%$fogb		; FogB
-		tloc	%$fogr8		; FogR << 8
-		tloc	%$fogg8		; FogG << 8
-		tloc	%$fogb8		; FogB << 8
-		tloc	%$pix		; *dest
 
 ; if (xx <= 0) return;
 		mov	eax,%$width
@@ -983,22 +979,16 @@ proc		csScan_16_draw_scanline_fog_555,52,ebx,esi,edi,ebp
 		mov	ecx,FogG					; 9
 		mov	edx,FogB					; 10
 		mov	%$fogr,eax					; 10
-		shl	eax,8						; 11
 		mov	%$fogg,ecx					; 11
-		shl	ecx,8						; 12
-		mov	%$fogb,edx					; 12
-		shl	edx,8						; 13
-		mov	%$fogr8,eax					; 13
-		mov	%$fogg8,ecx					; 14
-		mov	%$fogb8,edx					; 14
+		mov	%$fogb,edx					; 11
 
 ; EAX	/	  ESI	izz
 ; EBX	fd	  EDI	dest
 ; ECX	/	  EBP	zbuff
 ; EDX   /
-		mov	esi,%$izz					; 15
-		mov	ebp,%$zbuff					; 15
-		xor	ebx,ebx
+		mov	esi,%$izz					; 12
+		mov	ebp,%$zbuff					; 12
+		xor	ebx,ebx						; 13
 %$fogloop:
 ; if (izz >= 0x1000000)
 		mov	eax,[ebp]					; 0
@@ -1051,44 +1041,42 @@ proc		csScan_16_draw_scanline_fog_555,52,ebx,esi,edi,ebp
 			mov	edx,%$fogpix				; 18
 ; if (fd < EXP_256_SIZE)
 			cmp	eax,EXP_256_SIZE			; 18
+			mov	%$izz,esi		; save izz	; 19
 			if	l,short
+%$$get_fd:
 ; fd = tables.exp_256 [fd];
-%$$get_fd:			mov	bl,[ecx+eax]			; 0
-; r = (fd * ((*_dest & 0x7c00) - Scan.FogR) >> 8) + Scan.FogR;
-				mov	dx,[edi]			; 0
-				mov	ecx,%$fogr			; 0
-				mov	%$pix,edx			; 1
-				and	edx,0x7c00			; 1
-				sub	edx,ecx				; 2
-				mov	eax,%$fogr8			; 2
-				imul	edx,ebx				; 3(9)
-				mov	%$izz,esi			; 3
-				add	eax,edx				; 12
-				mov	edx,%$pix			; 12
-				and	eax,0x7c0000			; 13
-; g = (fd * ((*_dest & 0x03e0) - Scan.FogG) >> 8) + Scan.FogG;
-				mov	ecx,%$fogg			; 13
-				and	edx,0x03e0			; 14
-				mov	esi,%$fogg8			; 14
-				sub	edx,ecx				; 15
-				imul	edx,ebx				; 16(9)
-				add	esi,edx				; 25
-				mov	edx,%$pix			; 25
-				and	esi,0x03e000			; 26 (np)
-				add	eax,esi				; 27
+				mov	dx,[edi]	; get pixel	; 0
+				mov	bl,[ecx+eax]			; 0
+; r = (fd * ((*_dest & 0xf800) - Scan.FogR) >> 8) + Scan.FogR;
+				mov	esi,edx		; p		; 1
+				mov	eax,%$fogr	; r		; 1
+				and	edx,0x7c00	; p & f800	; 2
+				sub	edx,eax		; - r		; 3
+				imul	edx,ebx		; * fd		; 4(9)
+				mov	ecx,%$fogg	; g		; 4
+				shr	edx,8		; >> 8		; 13
+				add	eax,edx		; + r		; 14
+				mov	edx,esi		; p		; 14
+				and	eax,0x7c00	; r & f800	; 15
+; g = (fd * ((*_dest & 0x07e0) - Scan.FogG) >> 8) + Scan.FogG;
+				and	edx,0x03e0	; p & 7e0	; 15
+				sub	edx,ecx		; - g		; 16
+				and	esi,0x001f	; p & 1f	; 16
+				imul	edx,ebx		; * fd		; 17(9)
+				shr	edx,8		; >> 8		; 26
+				add	ecx,edx		; + g		; 27
+				mov	edx,%$fogb	; b		; 27
+				and	ecx,0x03e0	; & 7e0		; 28
 ; b = (fd * ((*_dest & 0x001f) - Scan.FogB) >> 8) + Scan.FogB;
-				mov	ecx,%$fogb			; 27
-				and	edx,0x001f			; 28
-				mov	esi,%$fogb8			; 28
-				sub	edx,ecx				; 29
-				imul	edx,ebx				; 30(9)
-				add	edx,esi				; 39 (np)
-				and	edx,0x001f00			; 40 (np)
-				add	edx,eax				; 41 (np)
-				shr	edx,8				; 42
-				mov	esi,%$izz			; 42
+				sub	esi,edx		; - b		; 28
+				or	eax,ecx		; r | g		; 29
+				imul	esi,ebx		; * fd		; 29(9)
+				shr	esi,8		; >> 8		; 38
+				add	edx,esi		; + b		; 38
+				mov	esi,%$izz	; restore izz	; 39
+				or	edx,eax		; r | g | b	; 40
 			endif
-			mov	[edi],dx
+			mov    [edi],dx
 		endif
 
 		add	edi,2			; _dest++;
@@ -1107,7 +1095,7 @@ endproc
 ;   int xx, unsigned char *d, unsigned long *z_buf,
 ;   float inv_z, float u_div_z, float v_div_z
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
-proc		csScan_16_draw_scanline_fog_565,52,ebx,esi,edi,ebp
+proc		csScan_16_draw_scanline_fog_565,36,ebx,esi,edi,ebp
 		targ	%$width		; int
 		targ	%$dest		; unsigned char *
 		targ	%$zbuff		; unsigned long *
@@ -1124,10 +1112,6 @@ proc		csScan_16_draw_scanline_fog_565,52,ebx,esi,edi,ebp
 		tloc	%$fogr		; FogR
 		tloc	%$fogg		; FogG
 		tloc	%$fogb		; FogB
-		tloc	%$fogr8		; FogR << 8
-		tloc	%$fogg8		; FogG << 8
-		tloc	%$fogb8		; FogB << 8
-		tloc	%$pix		; *dest
 
 ; if (xx <= 0) return;
 		mov	eax,%$width
@@ -1160,22 +1144,16 @@ proc		csScan_16_draw_scanline_fog_565,52,ebx,esi,edi,ebp
 		mov	ecx,FogG					; 9
 		mov	edx,FogB					; 10
 		mov	%$fogr,eax					; 10
-		shl	eax,8						; 11
 		mov	%$fogg,ecx					; 11
-		shl	ecx,8						; 12
-		mov	%$fogb,edx					; 12
-		shl	edx,8						; 13
-		mov	%$fogr8,eax					; 13
-		mov	%$fogg8,ecx					; 14
-		mov	%$fogb8,edx					; 14
+		mov	%$fogb,edx					; 11
 
 ; EAX	/	  ESI	izz
 ; EBX	fd	  EDI	dest
 ; ECX	/	  EBP	zbuff
 ; EDX   /
-		mov	esi,%$izz					; 15
-		mov	ebp,%$zbuff					; 15
-		xor	ebx,ebx
+		mov	esi,%$izz					; 12
+		mov	ebp,%$zbuff					; 12
+		xor	ebx,ebx						; 13
 %$fogloop:
 ; if (izz >= 0x1000000)
 		mov	eax,[ebp]					; 0
@@ -1228,44 +1206,42 @@ proc		csScan_16_draw_scanline_fog_565,52,ebx,esi,edi,ebp
 			mov	edx,%$fogpix				; 18
 ; if (fd < EXP_256_SIZE)
 			cmp	eax,EXP_256_SIZE			; 18
+			mov	%$izz,esi		; save izz	; 19
 			if	l,short
+%$$get_fd:
 ; fd = tables.exp_256 [fd];
-%$$get_fd:			mov	bl,[ecx+eax]			; 0
+				mov	dx,[edi]	; get pixel	; 0
+				mov	bl,[ecx+eax]			; 0
 ; r = (fd * ((*_dest & 0xf800) - Scan.FogR) >> 8) + Scan.FogR;
-				mov	dx,[edi]			; 0
-				mov	ecx,%$fogr			; 0
-				mov	%$pix,edx			; 1
-				and	edx,0xf800			; 1
-				sub	edx,ecx				; 2
-				mov	eax,%$fogr8			; 2
-				imul	edx,ebx				; 3(9)
-				mov	%$izz,esi			; 3
-				add	eax,edx				; 12
-				mov	edx,%$pix			; 12
-				and	eax,0xf80000			; 13
+				mov	esi,edx		; p		; 1
+				mov	eax,%$fogr	; r		; 1
+				and	edx,0xf800	; p & f800	; 2
+				sub	edx,eax		; - r		; 3
+				imul	edx,ebx		; * fd		; 4(9)
+				mov	ecx,%$fogg	; g		; 4
+				shr	edx,8		; >> 8		; 13
+				add	eax,edx		; + r		; 14
+				mov	edx,esi		; p		; 14
+				and	eax,0xf800	; r & f800	; 15
 ; g = (fd * ((*_dest & 0x07e0) - Scan.FogG) >> 8) + Scan.FogG;
-				mov	ecx,%$fogg			; 13
-				and	edx,0x07e0			; 14
-				mov	esi,%$fogg8			; 14
-				sub	edx,ecx				; 15
-				imul	edx,ebx				; 16(9)
-				add	esi,edx				; 25
-				mov	edx,%$pix			; 25
-				and	esi,0x07e000			; 26 (np)
-				add	eax,esi				; 27
+				and	edx,0x07e0	; p & 7e0	; 15
+				sub	edx,ecx		; - g		; 16
+				and	esi,0x001f	; p & 1f	; 16
+				imul	edx,ebx		; * fd		; 17(9)
+				shr	edx,8		; >> 8		; 26
+				add	ecx,edx		; + g		; 27
+				mov	edx,%$fogb	; b		; 27
+				and	ecx,0x07e0	; & 7e0		; 28
 ; b = (fd * ((*_dest & 0x001f) - Scan.FogB) >> 8) + Scan.FogB;
-				mov	ecx,%$fogb			; 27
-				and	edx,0x001f			; 28
-				mov	esi,%$fogb8			; 28
-				sub	edx,ecx				; 29
-				imul	edx,ebx				; 30(9)
-				add	edx,esi				; 39 (np)
-				and	edx,0x001f00			; 40 (np)
-				add	edx,eax				; 41 (np)
-				shr	edx,8				; 42
-				mov	esi,%$izz			; 42
+				sub	esi,edx		; - b		; 28
+				or	eax,ecx		; r | g		; 29
+				imul	esi,ebx		; * fd		; 29(9)
+				shr	esi,8		; >> 8		; 38
+				add	edx,esi		; + b		; 38
+				mov	esi,%$izz	; restore izz	; 39
+				or	edx,eax		; r | g | b	; 40
 			endif
-			mov	[edi],dx
+			mov    [edi],dx
 		endif
 
 		add	edi,2			; _dest++;
@@ -1355,39 +1331,37 @@ proc		csScan_16_draw_scanline_fog_view_555,40,ebx,esi,edi,ebp
 ; if (fd < EXP_256_SIZE)
 			cmp	eax,EXP_256_SIZE			; 16
 			if	l,short
+%$$get_fd:
 ; fd = tables.exp_256 [fd];
-%$$get_fd:			mov	bl,[ecx+eax]			; 0
-; r = (fd * ((*_dest & 0x7c00) - Scan.FogR) >> 8) + Scan.FogR;
-				mov	dx,[edi]			; 0
-				mov	ecx,%$fogr			; 0
-				mov	%$pix,edx			; 1
-				and	edx,0x7c00			; 1
-				sub	edx,ecx				; 2
-				mov	eax,%$fogr8			; 2
-				imul	edx,ebx				; 3(9) (np)
-				add	eax,edx				; 12
-				mov	edx,%$pix			; 12
-				and	eax,0x7c0000			; 13
-; g = (fd * ((*_dest & 0x03e0) - Scan.FogG) >> 8) + Scan.FogG;
-				mov	ecx,%$fogg			; 14
-				and	edx,0x03e0			; 15
-				mov	esi,%$fogg8			; 15
-				sub	edx,ecx				; 16
-				imul	edx,ebx				; 17(9)
-				add	esi,edx				; 26
-				mov	edx,%$pix			; 26
-				and	esi,0x03e000			; 27 (np)
-				add	eax,esi				; 28
+				mov	dx,[edi]	; get pixel	; 0
+				mov	bl,[ecx+eax]			; 0
+; r = (fd * ((*_dest & 0xf800) - Scan.FogR) >> 8) + Scan.FogR;
+				mov	esi,edx		; p		; 1
+				mov	eax,%$fogr	; r		; 1
+				and	edx,0x7c00	; p & f800	; 2
+				sub	edx,eax		; - r		; 3
+				imul	edx,ebx		; * fd		; 4(9)
+				mov	ecx,%$fogg	; g		; 4
+				shr	edx,8		; >> 8		; 13
+				add	eax,edx		; + r		; 14
+				mov	edx,esi		; p		; 14
+				and	eax,0x7c00	; r & f800	; 15
+; g = (fd * ((*_dest & 0x07e0) - Scan.FogG) >> 8) + Scan.FogG;
+				and	edx,0x03e0	; p & 7e0	; 15
+				sub	edx,ecx		; - g		; 16
+				and	esi,0x001f	; p & 1f	; 16
+				imul	edx,ebx		; * fd		; 17(9)
+				shr	edx,8		; >> 8		; 26
+				add	ecx,edx		; + g		; 27
+				mov	edx,%$fogb	; b		; 27
+				and	ecx,0x03e0	; & 7e0		; 28
 ; b = (fd * ((*_dest & 0x001f) - Scan.FogB) >> 8) + Scan.FogB;
-				mov	ecx,%$fogb			; 28
-				and	edx,0x001f			; 29
-				mov	esi,%$fogb8			; 29
-				sub	edx,ecx				; 30
-				imul	edx,ebx				; 31(9)
-				add	edx,esi				; 40 (np)
-				and	edx,0x001f00			; 41 (np)
-				add	edx,eax				; 42 (np)
-				shr	edx,8				; 43
+				sub	esi,edx		; - b		; 28
+				or	eax,ecx		; r | g		; 29
+				imul	esi,ebx		; * fd		; 29(9)
+				shr	esi,8		; >> 8		; 38
+				add	edx,esi		; + b		; 38
+				or	edx,eax		; r | g | b	; 39
 			endif
 			mov	[edi],dx
 		endif
@@ -1476,39 +1450,37 @@ proc		csScan_16_draw_scanline_fog_view_565,40,ebx,esi,edi,ebp
 ; if (fd < EXP_256_SIZE)
 			cmp	eax,EXP_256_SIZE			; 16
 			if	l,short
+%$$get_fd:
 ; fd = tables.exp_256 [fd];
-%$$get_fd:			mov	bl,[ecx+eax]			; 0
+				mov	dx,[edi]	; get pixel	; 0
+				mov	bl,[ecx+eax]			; 0
 ; r = (fd * ((*_dest & 0xf800) - Scan.FogR) >> 8) + Scan.FogR;
-				mov	dx,[edi]			; 0
-				mov	ecx,%$fogr			; 0
-				mov	%$pix,edx			; 1
-				and	edx,0xf800			; 1
-				sub	edx,ecx				; 2
-				mov	eax,%$fogr8			; 2
-				imul	edx,ebx				; 3(9) (np)
-				add	eax,edx				; 12
-				mov	edx,%$pix			; 12
-				and	eax,0xf80000			; 13
+				mov	esi,edx		; p		; 1
+				mov	eax,%$fogr	; r		; 1
+				and	edx,0xf800	; p & f800	; 2
+				sub	edx,eax		; - r		; 3
+				imul	edx,ebx		; * fd		; 4(9)
+				mov	ecx,%$fogg	; g		; 4
+				shr	edx,8		; >> 8		; 13
+				add	eax,edx		; + r		; 14
+				mov	edx,esi		; p		; 14
+				and	eax,0xf800	; r & f800	; 15
 ; g = (fd * ((*_dest & 0x07e0) - Scan.FogG) >> 8) + Scan.FogG;
-				mov	ecx,%$fogg			; 14
-				and	edx,0x07e0			; 15
-				mov	esi,%$fogg8			; 15
-				sub	edx,ecx				; 16
-				imul	edx,ebx				; 17(9)
-				add	esi,edx				; 26
-				mov	edx,%$pix			; 26
-				and	esi,0x07e000			; 27 (np)
-				add	eax,esi				; 28
+				and	edx,0x07e0	; p & 7e0	; 15
+				sub	edx,ecx		; - g		; 16
+				and	esi,0x001f	; p & 1f	; 16
+				imul	edx,ebx		; * fd		; 17(9)
+				shr	edx,8		; >> 8		; 26
+				add	ecx,edx		; + g		; 27
+				mov	edx,%$fogb	; b		; 27
+				and	ecx,0x07e0	; & 7e0		; 28
 ; b = (fd * ((*_dest & 0x001f) - Scan.FogB) >> 8) + Scan.FogB;
-				mov	ecx,%$fogb			; 28
-				and	edx,0x001f			; 29
-				mov	esi,%$fogb8			; 29
-				sub	edx,ecx				; 30
-				imul	edx,ebx				; 31(9)
-				add	edx,esi				; 40 (np)
-				and	edx,0x001f00			; 41 (np)
-				add	edx,eax				; 42 (np)
-				shr	edx,8				; 43
+				sub	esi,edx		; - b		; 28
+				or	eax,ecx		; r | g		; 29
+				imul	esi,ebx		; * fd		; 29(9)
+				shr	esi,8		; >> 8		; 38
+				add	edx,esi		; + b		; 38
+				or	edx,eax		; r | g | b	; 39
 			endif
 			mov	[edi],dx
 		endif
