@@ -763,7 +763,7 @@ AC_CACHE_CHECK([for Python SDK], [cs_cv_python_sdk],
 	    cs_cv_python_base_lflags=CS_TRIM([$cs_cv_python_base_lflags])
 	    cs_cv_python_base_libs=CS_TRIM([$cs_cv_python_base_libs])
 	    cs_cv_python_sdk=yes])
-	
+
 	# Not Python 2.x; try Python 1.x.
 	AS_IF([test $cs_cv_python_sdk != yes],
 	    [cs_python_paths=`AC_RUN_LOG([$PYTHON -c \
@@ -812,7 +812,7 @@ for p in sys.path: print p'])`
 	    cs_pylibc=`AC_RUN_LOG(
 		[grep '^LIBC[[ 	]]*=' $cs_python_makefile | \
 		    sed 's/LIBC[[ 	]]*=//'])`])
-    
+
 	# Construct CFLAGS and LFLAGS
 	AS_IF([test -n "$cs_python_lib_dir"],
 	    [cs_cv_python_base=`AS_BASENAME([$cs_python_lib_dir])`
@@ -827,7 +827,7 @@ for p in sys.path: print p'])`
 		cs_cv_python_base_lflags="-L$cs_python_lib_dir
 		    -L$cs_python_lib_dir/config"
 		cs_cv_python_base_libs="$cs_pylibs $cs_pylibm $cs_pylibc"
-    
+
 		cs_cv_python_base_cflags=CS_TRIM([$cs_cv_python_base_cflags])
 		cs_cv_python_base_lflags=CS_TRIM([$cs_cv_python_base_lflags])
 		cs_cv_python_base_libs=CS_TRIM([$cs_cv_python_base_libs])
@@ -1034,7 +1034,7 @@ AS_IF([test -d /usr/local/include],
 
     AS_IF([test $cs_cv_prog_cxx_local_include = yes],
 	[CS_MAKEFILE_PROPERTY([CFLAGS.SYSTEM], [-I/usr/local/include], [+])])])
-		
+
 
 
 #------------------------------------------------------------------------------
@@ -1275,7 +1275,7 @@ CS_CHECK_LIB_WITH([ogg],
     [AC_LANG_PROGRAM(
 	[#include <ogg/ogg.h>],
 	[ogg_sync_state state; ogg_sync_init(&state);])],
-    [libs/libogg*], [],                                                         
+    [libs/libogg*], [],
     [CS_MAKEFILE_BUILD_RESULT([cs_cv_libogg], [OGG])])
 AS_IF([test "$cs_cv_libogg" = yes],
     [CS_CHECK_LIB_WITH([vorbis],
@@ -1313,7 +1313,7 @@ AC_DEFUN([CS_CHECK_LIB3DS],
 	[AC_LANG_PROGRAM(
 	    [#include <lib3ds/file.h>],
 	    [lib3ds_file_new();])],
-	[libs/lib3ds*], [],                                                         
+	[libs/lib3ds*], [],
 	[CS_MAKEFILE_BUILD_RESULT([cs_cv_lib3ds], [3DS])], [],
 	[], [], [$cs_3ds_libs_test])])
 
