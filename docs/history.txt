@@ -46,6 +46,8 @@ chronological order.
         - res removed plugins/engine/renderloop/stdsteps/lightiter.pp.
           This file was a leftover from some debugging times ago which must
           have made it's way to CVS by accident.
+	- Jorrit fixed the stencil shadow plugin to also use GetTriangles()
+	  now.
 7-Sep-2003
 	- Jorrit performed a lot of changes to unify the new and old
 	  renderer branches:

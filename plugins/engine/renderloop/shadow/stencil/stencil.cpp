@@ -289,20 +289,15 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
 
   csVector3 *verts = mesh->GetVertices ();
 
-  int new_triangle_count = 0;
+  int new_triangle_count = mesh->GetTriangleCount ();
+  csTriangle* triangles = mesh->GetTriangles ();
   int i;
-  for (i = 0; i < mesh->GetPolygonCount(); i ++) 
-  {
-    /* count triangles assume fan style */
-    new_triangle_count += mesh->GetPolygons()[i].num_vertices - 2;
-  }
-
   /* significant change, need to realloc vertex arrays */
   if (mesh->GetVertexCount () != vertex_count || 
       new_triangle_count != triangle_count)
   {
     vertex_count = mesh->GetVertexCount ();
-	triangle_count = new_triangle_count;
+    triangle_count = new_triangle_count;
 
     shadow_vertex_buffer = parent->g3d->CreateRenderBuffer (
        sizeof (csVector3)*new_triangle_count*3, CS_BUF_STATIC,
@@ -323,46 +318,34 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
     edge_normals.SetLength(new_triangle_count*3);
     edge_midpoints.SetLength(new_triangle_count*3);
 
-    for (int i = 0; i < mesh->GetPolygonCount(); i ++)
+    for (int i = 0; i < new_triangle_count; i ++)
     {
-      csMeshedPolygon *poly = &mesh->GetPolygons()[i];
-      /*
-      csVector3 ab = verts[poly->vertices[1]] -
-                     verts[poly->vertices[0]];
-      csVector3 bc = verts[poly->vertices[2]] -
-                     verts[poly->vertices[1]];
-      csVector3 normal = ab % bc;
-      */
-
+      const csTriangle& poly = triangles[i];
       EdgeInfo *e = &edge_array[NextEdge ++];
-      e->a = mesh->GetVertices()[poly->vertices[0]];
-      e->b = mesh->GetVertices()[poly->vertices[1]];
+      e->a = verts[poly.a];
+      e->b = verts[poly.b];
       e->ind_a = TriIndex + 0;
       e->ind_b = TriIndex + 1;
       // e->norm = normal;
       HandleEdge (e, edge_stack);
 
-      /* if the polygon is just a triangle this happens once
-         and the net result is that each edge is handled explicitly */
-      for (int j = 2; j < poly->num_vertices; j ++) 
-      {
-        EdgeInfo *e = &edge_array[NextEdge ++];
-        e->a = mesh->GetVertices()[poly->vertices[j-1]];
-        e->b = mesh->GetVertices()[poly->vertices[j]];
-        e->ind_a = TriIndex + 1;
-        e->ind_b = TriIndex + 2;
-        // e->norm = normal;
-    	HandleEdge (e, edge_stack);
-        TriIndex += 3;
-      }
-
       e = &edge_array[NextEdge ++];
-      e->a = mesh->GetVertices()[poly->vertices[poly->num_vertices-1]];
-      e->b = mesh->GetVertices()[poly->vertices[0]];
-      e->ind_a = TriIndex - 1; /* TriIndex + 2 from previous triangle */
-      e->ind_b = TriIndex - 3; /* TriIndex + 0 from previous taiangle */
+      e->a = verts[poly.b];
+      e->b = verts[poly.c];
+      e->ind_a = TriIndex + 1;
+      e->ind_b = TriIndex + 2;
       // e->norm = normal;
       HandleEdge (e, edge_stack);
+
+      e = &edge_array[NextEdge ++];
+      e->a = verts[poly.c];
+      e->b = verts[poly.a];
+      e->ind_a = TriIndex + 2;
+      e->ind_b = TriIndex + 0;
+      // e->norm = normal;
+      HandleEdge (e, edge_stack);
+
+      TriIndex += 3;
     }
   }
 
@@ -371,28 +354,23 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
   csVector3 *n = (csVector3*)shadow_normal_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
   int ind = 0;
-  for (i = 0; i < mesh->GetPolygonCount(); i ++) 
+  for (i = 0; i < new_triangle_count; i ++) 
   {
-    csMeshedPolygon *poly = &mesh->GetPolygons()[i];
-    csVector3 ab = verts[poly->vertices[1]] -
-                   verts[poly->vertices[0]];
-    csVector3 bc = verts[poly->vertices[2]] -
-                   verts[poly->vertices[1]];
+    csTriangle& poly = triangles[i];
+    csVector3 ab = verts[poly.b] - verts[poly.a];
+    csVector3 bc = verts[poly.c] - verts[poly.b];
     csVector3 normal = ab % bc;
-
-    for (int j = 2; j < poly->num_vertices; j ++)
-    {
-      v[ind] = verts[poly->vertices[0]];
-      face_normals[ind++] = normal;
-      v[ind] = verts[poly->vertices[j-1]];
-      face_normals[ind++] = normal;
-      v[ind] = verts[poly->vertices[j]];
-      face_normals[ind++] = normal;
-    }
+    v[ind] = verts[poly.a];
+    face_normals[ind++] = normal;
+    v[ind] = verts[poly.b];
+    face_normals[ind++] = normal;
+    v[ind] = verts[poly.c];
+    face_normals[ind++] = normal;
   }
   memcpy (n, &face_normals[0], sizeof (csVector3) * new_triangle_count * 3);
 
-  for (i = 0; i < triangle_count * 3; i ++) {
+  for (i = 0; i < triangle_count * 3; i ++)
+  {
     edge_normals[i] = face_normals[edge_indices[i * 3]];
   }
 
