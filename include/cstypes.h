@@ -118,7 +118,12 @@ typedef int64_t int64;
 /// Used for uniquely generated id numbers XXX: remove this sometime
 typedef uint32 CS_ID;
 
-/// Time in milli (1/1000) seconds XXX: should be moved to sysfunc.h
+/**
+ * A time value measured in milliseconds (1/1000 of a second).  Ticks do not
+ * represent wall clock time or any other Epoch-based time.  Instead, ticks are
+ * useful only for measuring differences between points on a timeline, or for
+ * specifying intervals.
+ */
 typedef unsigned int csTicks;
 
 /**\name Shortcuts for normal C types
