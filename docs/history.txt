@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Dec-2003
+	- Eric Sunshine fixed bug in unix.mak where it was incorrectly
+	  exporting the hard-coded "-ldl -lm" to cs-config's --libs option even
+	  if the target platform did not supply those libraries.  Furthermore,
+	  it was adding these flags to the normal CS build as an accidental and
+	  incorrect side-effect (even when the target did not supply those
+	  libraries).
 8-Dec-2003
 	- Jorrit added a disabled optimization in the OpenGL canvas to Blit().
 	  It is disabled because it makes procedural textures upside down.

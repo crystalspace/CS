@@ -45,7 +45,7 @@ include $(SRCDIR)/mk/unix.mak
 
 # Extra libraries needed on this system.
 # <cs-config>
-LIBS.EXE.PLATFORM += $(LFLAGS.l)dl $(LFLAGS.l)m
+LIBS.EXE.PLATFORM +=
 # </cs-config>
 
 # Indicate where special include files can be found.
