@@ -119,7 +119,7 @@ public:
 
 
 struct G3DPolygonDPFX;
-class csVertexStatus;
+struct csVertexStatus;
 
 /**
  * Prepare a filled in G3DPolygonDPFX structure for drawing via
