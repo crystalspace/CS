@@ -474,7 +474,9 @@ AS_IF([test -n "$PERL" && test "$with_perl" != no],
 		    $PERL -e '<STDIN> =~ m/\x27(.*)\x27/; print $1'])`
 		cs_cv_perl_lflags="${cs_cv_perl_lflags} ${cs_perl_lflags_tmp}
 		    -L${cs_perl_core}"])])
+	cs_cv_perl_cflags=CS_PATH_NORMALIZE([$cs_cv_perl_cflags])
 	cs_cv_perl_cflags=CS_TRIM([$cs_cv_perl_cflags])
+	cs_cv_perl_lflags=CS_PATH_NORMALIZE([$cs_cv_perl_lflags])
 	cs_cv_perl_lflags=CS_TRIM([$cs_cv_perl_lflags])])
 
     AS_IF([test -n "$cs_cv_perl_cflags$cs_cv_perl_lflags"],
@@ -545,9 +547,6 @@ AS_IF([test "$with_python" != no],
 		    print (distutils.sysconfig.get_config_var("LIBS") or "")+ \
 			" " + (distutils.sysconfig.get_config_var("SYSLIBS") \
 			or "")'])`
-		cs_cv_pybase_cflags=CS_TRIM([$cs_cv_pybase_cflags])
-		cs_cv_pybase_lflags=CS_TRIM([$cs_cv_pybase_lflags])
-		cs_cv_pybase_libs=CS_TRIM([$cs_cv_pybase_libs])
 		cs_cv_python_sdk=yes])
     
 	    # Not Python 2.x; try Python 1.x.
@@ -613,11 +612,7 @@ for p in sys.path: print p'])`
 		    cs_cv_pybase_lflags="-L$cs_pylib_dir
 			-L$cs_pylib_dir/config"
 		    cs_cv_pybase_libs="$cs_pylibs $cs_pylibm $cs_pylibc"
-    
-		    cs_cv_pybase_cflags=CS_TRIM([$cs_cv_pybase_cflags])
-		    cs_cv_pybase_lflags=CS_TRIM([$cs_cv_pybase_lflags])
-		    cs_cv_pybase_libs=CS_TRIM([$cs_cv_pybase_libs])
-		    cs_cv_python_sdk=yes])])])])
+    		    cs_cv_python_sdk=yes])])])])
     
     # Check if Python SDK is usable.  Some distributions (such as the one
     # shipped with MacOS/X Jaguar which is missing the static link library) are
@@ -625,6 +620,12 @@ for p in sys.path: print p'])`
     # decorations (for example, "libpython2.2.a"), however some Windows
     # libraries lack the decimal point (for example, "libpython22.a" or
     # "python22.lib"), so we must check for both variations.
+    cs_cv_pybase_cflags=CS_PATH_NORMALIZE([$cs_cv_pybase_cflags])
+    cs_cv_pybase_cflags=CS_TRIM([$cs_cv_pybase_cflags])
+    cs_cv_pybase_lflags=CS_PATH_NORMALIZE([$cs_cv_pybase_lflags])
+    cs_cv_pybase_lflags=CS_TRIM([$cs_cv_pybase_lflags])
+    cs_cv_pybase_libs=CS_PATH_NORMALIZE([$cs_cv_pybase_libs])
+    cs_cv_pybase_libs=CS_TRIM([$cs_cv_pybase_libs])
     AS_IF([test $cs_cv_python_sdk = yes],
 	[cs_pylib1="-l$cs_cv_pybase"
 	cs_pylib2=`echo "-l$cs_cv_pybase" | sed 's/\.//g'`

@@ -26,6 +26,14 @@ chronological order.
 	  since MSVC6 seems incapable of groking the hyphen in the name.  Issue
 	  reported by Luca Cappa (groton); debugged by Fritz Elfert
 	  <fritz.elfert@millenux.com>.
+	- Eric Sunshine added CS_PATH_NORMALIZE() macro to new path.m4.  This
+	  macro normalizes a pathname by transliterating Windows/DOS
+	  backslashes to forward slashes.
+	- Eric Sunshine augmented configure.ac so that it invokes
+	  CS_PATH_NORMALIZE() on the CFLAGS, LFLAGS, and LIBS resulting from
+	  the Perl and Python checks.  This should help to prevent build
+	  problems on MSYS/Mingw and Cygwin since the backslashes tended to get
+	  interpreted as escapes at inappropriate times.
 14-Feb-2004
 	- Norman Kraemer added an ALSA sound driver.  It can be used if you
 	  disabled OSS emulation in your ALSA configuration.

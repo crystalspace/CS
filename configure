@@ -5809,7 +5809,9 @@ fi
 
 fi
 
+	cs_cv_perl_cflags=`echo x$cs_cv_perl_cflags | tr '\\\\' '/' | sed 's/^x//'`
 	cs_cv_perl_cflags=`echo x$cs_cv_perl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_perl_lflags=`echo x$cs_cv_perl_lflags | tr '\\\\' '/' | sed 's/^x//'`
 	cs_cv_perl_lflags=`echo x$cs_cv_perl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 fi
 
@@ -6331,9 +6333,6 @@ else
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }`
-		cs_cv_pybase_cflags=`echo x$cs_cv_pybase_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-		cs_cv_pybase_lflags=`echo x$cs_cv_pybase_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-		cs_cv_pybase_libs=`echo x$cs_cv_pybase_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 		cs_cv_python_sdk=yes
 fi
 
@@ -6470,11 +6469,7 @@ fi
 		    cs_cv_pybase_lflags="-L$cs_pylib_dir
 			-L$cs_pylib_dir/config"
 		    cs_cv_pybase_libs="$cs_pylibs $cs_pylibm $cs_pylibc"
-
-		    cs_cv_pybase_cflags=`echo x$cs_cv_pybase_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-		    cs_cv_pybase_lflags=`echo x$cs_cv_pybase_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-		    cs_cv_pybase_libs=`echo x$cs_cv_pybase_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-		    cs_cv_python_sdk=yes
+    		    cs_cv_python_sdk=yes
 fi
 
 fi
@@ -6491,6 +6486,12 @@ echo "${ECHO_T}$cs_cv_python_sdk" >&6
     # decorations (for example, "libpython2.2.a"), however some Windows
     # libraries lack the decimal point (for example, "libpython22.a" or
     # "python22.lib"), so we must check for both variations.
+    cs_cv_pybase_cflags=`echo x$cs_cv_pybase_cflags | tr '\\\\' '/' | sed 's/^x//'`
+    cs_cv_pybase_cflags=`echo x$cs_cv_pybase_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    cs_cv_pybase_lflags=`echo x$cs_cv_pybase_lflags | tr '\\\\' '/' | sed 's/^x//'`
+    cs_cv_pybase_lflags=`echo x$cs_cv_pybase_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    cs_cv_pybase_libs=`echo x$cs_cv_pybase_libs | tr '\\\\' '/' | sed 's/^x//'`
+    cs_cv_pybase_libs=`echo x$cs_cv_pybase_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test $cs_cv_python_sdk = yes; then
   cs_pylib1="-l$cs_cv_pybase"
 	cs_pylib2=`echo "-l$cs_cv_pybase" | sed 's/\.//g'`
