@@ -184,7 +184,9 @@ csdoc/index.html: $(CSDOC) newdoc/html/docxxbanner.html
 doc: csdoc/index.html pics
 
 PDFLATEX=pdflatex -interaction=nonstopmode
-PDF_FILES=csgeom.pdf csengine.pdf csobject.pdf
+CLASS_PDF_FILES=csgeom.pdf csengine.pdf csobject.pdf
+PDF_FILES=cs-tut.pdf cs-inst.pdf cs-thry.pdf cs-def.pdf
+TEXT_FILES=cs-tut.txt cs-inst.txt cs-thry.txt cs-def.txt
 
 VPATH=newdoc
 
@@ -193,11 +195,6 @@ html/index.html: $(wildcard newdoc/*.tex)
 	python bin/mshelp.py crystal
 
 html: doc html/index.html pics
-
-cs-help-html.zip: html/index.html
-	zip -9 -rp cs-help-html.zip csdoc html pics crystal.hh*
-
-zips: cs-help-html.zip
 
 %.pdf: %.tex
 	$(PDFLATEX) $<
@@ -208,11 +205,33 @@ zips: cs-help-html.zip
 %.pdf: %.ttx
 	$(PDFLATEX) $<
 
-classpdf: $(PDF_FILES)
+classpdf: $(CLASS_PDF_FILES)
 
-pdf: cs-tut.pdf cs-inst.pdf cs-thry.pdf classpdf
+pdf: $(PDF_FILES) classpdf
 
 pdfbook: crystal.pdf classpdf
+
+%.txt: %.pdf
+	pdftotext $<
+
+text: $(TEXT_FILES)
+
+cs-help-html.zip: html/index.html
+	zip -9 -rp cs-help-html.zip csdoc html pics crystal.hh*
+
+cs-help-pdf.zip: pdf
+	zip -9 cs-help-pdf.zip $(PDF_FILES) $(CLASS_PDF_FILES)
+
+cs-help-book.zip: pdfbook
+	zip -9 cs-help-book.zip crystal.pdf $(CLASS_PDF_FILES)
+
+cs-help-txt.zip: text
+	zip -9 cs-help-text.zip $(TEXT_FILES)
+
+doczips: cs-help-html.zip cs-help-pdf.zip cs-help-book.zip cs-help-txt.zip
+
+#lacheck: $(PDF_FILES) $(CLASS_PDF_FILES) crystal.pdf
+#	lacheck 
 
 cleandoc:
 	rm -f *.aux
@@ -228,11 +247,6 @@ cleandoc:
 	rm -f crystal.hhc
 	rm -f crystal.hhk
 	rm -f crystal.hhp
-
-%.txt: %.tex
-	detex $< > $(*F).txt
-
-detex: cs-tut.txt cs-inst.txt csgeom.txt csengine.txt csobject.txt
 
 $(OUT)static$O: static.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.STATIC_SCF)

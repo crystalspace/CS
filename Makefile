@@ -6,7 +6,7 @@
 
 .PHONY: help banner showplatforms showconfig platforms all doc api depend \
   configure clean cleanlib cleandep distclean libs plugins drivers drivers2d \
-  drivers3d snddrivers netdrivers html zips
+  drivers3d snddrivers netdrivers html doczips text lacheck
 
 # The following two symbols are intended to be used in "echo" commands
 # config.mak can override them depending on configured system requirements
@@ -63,7 +63,7 @@ help: banner showconfig pluginhelp libhelp apphelp pseudohelp
 depend:
 	@$(MAKE) --no-print-directory -f mk/cs.mak $@ DO_DEPEND=yes
 
-doc api pdf cleandoc html detex zips clean cleanlib cleandep distclean:
+doc api pdf cleandoc html text doczips lacheck clean cleanlib cleandep distclean:
 	@$(MAKE) --no-print-directory -f mk/cs.mak $@
 
 unknown:
