@@ -48,6 +48,7 @@
 #include "csgeom/fastsqrt.h"
 #include "csgeom/polypool.h"
 #include "csinput/csevent.h"
+#include "csgfxldr/csimage.h"
 #include "csutil/util.h"
 #include "csutil/halogen.h"
 #include "iimage.h"
@@ -214,6 +215,7 @@ csWorld::csWorld (iBase *iParent) : csObject (), start_vec (0, 0, 0)
   current_camera = NULL;
   current_world = this;
   use_pvs = false;
+  Library = NULL;
  
   if (!covtree_lut)
   {
@@ -267,14 +269,10 @@ bool csWorld::Initialize (iSystem* sys)
   (System = sys)->IncRef ();
 
   if (!(G3D = QUERY_PLUGIN (sys, iGraphics3D)))
-  {
     return false;
-  }
 
   if (!(VFS = QUERY_PLUGIN (sys, iVFS)))
-  {
     return false;
-  }
 
   // Tell system driver that we want to handle broadcast events
   if (!System->CallOnEvents (this, CSMASK_Broadcast))
@@ -357,6 +355,10 @@ void csWorld::Clear ()
   CHK (delete lightpatch_pool);
   CHK (lightpatch_pool = new csLightPatchPool ());
   use_pvs = false;
+
+  // Clear all object libraries
+  Library = NULL;
+  Libraries.DeleteAll ();
 }
 
 void csWorld::EnableLightingCache (bool en)
@@ -420,27 +422,12 @@ void csWorld::EnableCovtree (bool en)
 
 csSpriteTemplate* csWorld::GetSpriteTemplate (const char* name)
 {
-  int sn = sprite_templates.Length ();
-  while (sn > 0)
-  {
-    sn--;
-    csSpriteTemplate* s = (csSpriteTemplate*)sprite_templates[sn];
-    if (!strcmp (name, s->GetName ())) return s;
-  }
-
-  return NULL;
+  return (csSpriteTemplate *)sprite_templates.FindByName (name);
 }
 
 csThingTemplate* csWorld::GetThingTemplate (const char* name)
 {
-  int tn = thing_templates.Length ();
-  while (tn > 0)
-  {
-    tn--;
-    csThingTemplate* s = (csThingTemplate*)thing_templates[tn];
-    if (!strcmp (name, s->GetName ())) return s;
-  }
-  return NULL;
+  return (csThingTemplate *)thing_templates.FindByName (name);
 }
 
 csSector* csWorld::NewSector ()
@@ -1373,4 +1360,108 @@ int csWorld::GetTextureFormat ()
 {
   iTextureManager* txtmgr = G3D->GetTextureManager ();
   return txtmgr->GetTextureFormat ();
+}
+
+void csWorld::SelectLibrary (const char *iName)
+{
+  Library = Libraries.FindByName (iName);
+  if (!Library)
+  {
+    Library = new csObjectNoDel ();
+    Library->SetName (iName);
+    Libraries.Push (Library);
+  }
+}
+
+bool csWorld::DeleteLibrary (const char *iName)
+{
+  csObject *lib = Libraries.FindByName (iName);
+  if (!lib) return false;
+
+#define DELETE_ALL_OBJECTS(vector,type)				\
+  for (csObjIterator iter = lib->GetIterator (type::Type);	\
+       !iter.IsFinished (); ++iter)				\
+  {								\
+    type &x = (type&)*iter;					\
+    int idx = vector.Find (&x);					\
+    if (idx >= 0) vector.Delete (idx);				\
+  }
+
+  DELETE_ALL_OBJECTS (collections, csCollection)
+  DELETE_ALL_OBJECTS (sprites, csSprite)
+  DELETE_ALL_OBJECTS (sprite_templates, csSpriteTemplate)
+  DELETE_ALL_OBJECTS (thing_templates, csThingTemplate)
+  DELETE_ALL_OBJECTS (sectors, csSector)
+  DELETE_ALL_OBJECTS ((*textures), csTextureHandle)
+
+#undef DELETE_ALL_OBJECTS
+#define DELETE_ALL_OBJECTS(vector,type)				\
+  for (csObjIterator iter = lib->GetIterator (type::Type);	\
+       !iter.IsFinished (); ++iter)				\
+  {								\
+    type &x = (type&)*iter;					\
+    int idx = vector.Find (&x);					\
+    if (idx >= 0) { x.DecRef (); vector [idx] = 0; }		\
+  }
+
+  DELETE_ALL_OBJECTS (planes, csPolyTxtPlane)
+
+/*
+@@todo: move all dynamic lights to a vector
+  while (first_dyn_lights)
+  {
+    csDynLight *dyn = first_dyn_lights->GetNext ();
+    CHK (delete first_dyn_lights);
+    first_dyn_lights = dyn;
+  }
+*/
+
+  return true;
+}
+
+void csWorld::DeleteAll ()
+{
+  Clear ();
+}
+
+bool csWorld::RegisterTexture (const char *iName, const char *iFileName,
+  csColor *iTransp, int iFlags)
+{
+  // First of all, load the image file
+  size_t size;
+  char *data = VFS->ReadFile (iFileName, size);
+  if (!data || !size)
+  {
+    CsPrintf (MSG_WARNING, "Cannot read image file \"%s\" from VFS\n",
+      iFileName);
+    return false;
+  }
+
+  iImage *ifile = csImageLoader::Load ((UByte *)data, size,
+    CS_IMGFMT_TRUECOLOR);// GetTextureFormat ());
+  CHK (delete [] data);
+
+  if (!ifile)
+  {
+    CsPrintf (MSG_WARNING, "Unknown image file format: \"%s\"\n", iFileName);
+    return false;
+  }
+
+  char *xname = VFS->ExpandPath (iFileName);
+  ifile->SetName (xname);
+  delete [] xname;
+
+  // Okay, now create the respective texture handle object
+  csTextureHandle *tex = GetTextures ()->NewTexture (ifile);
+  tex->flags = iFlags;
+  tex->SetName (iName);
+
+  // dereference image pointer since tex already incremented it
+  ifile->DecRef ();
+
+  if (iTransp)
+    tex->SetTransparent (QInt (iTransp->red * 255.2),
+      QInt (iTransp->green * 255.2), QInt (iTransp->blue * 255.2));
+
+  return true;
 }

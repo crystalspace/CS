@@ -21,11 +21,11 @@
 #define __FAKERTTI_H_
 
 /**
- * Pseudo-RTTI, to avoid using "normal" rtti which is a serious size overhead.
- * We need rtti only for a few objects and a limited set of functions only.
- * Because of this we provide a fake RTTI system that does everything we need;
- * it is suggested to compile the engine without RTTI to create much smaller
- * executables.<p>
+ * Pseudo-RTTI, to avoid using "normal" rtti which is a noticeable yet
+ * unneeded size overhead. We need rtti only for a few objects and a limited
+ * set of functions only. Because of this we provide a fake RTTI system that
+ * does everything we need; it is suggested to compile the engine without
+ * RTTI to create smaller executables.<p>
  * The most noticeable limitation is that it does not support multiple
  * inheritance for objects with fake RTTI. You still can derive classes from
  * multiple parents, but you should take care to not derive a class from more

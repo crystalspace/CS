@@ -39,7 +39,7 @@
  */ 
 class csObject : public csBase
 {
-private:
+protected:
   friend class csObjIterator;
   /// Each object have a unique ID associated with it
   CS_ID csid;
@@ -98,6 +98,19 @@ public:
   void ObjRemove (csObject *obj);
 
   CSOBJTYPE;
+};
+
+/**
+ * A small modification to csObject that does not delete the
+ * contained children objects in the destructor
+ */
+class csObjectNoDel : public csObject
+{
+public:
+  /// Create the object
+  csObjectNoDel () : csObject () {}
+  /// Free the memory allocated for children but do not delete them
+  virtual ~csObjectNoDel ();
 };
 
 #endif // __CSOBJ_H__

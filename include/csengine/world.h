@@ -256,6 +256,10 @@ public:
   bool NeedPO2Maps;
   // Maximum texture aspect ratio
   int MaxAspectRatio;
+  // A pointer to current object library
+  csObject *Library;
+  // The list of all object libraries currently loaded
+  csNamedObjVector Libraries;
 
 private:
   /// Texture and color information object.
@@ -663,6 +667,21 @@ public:
 
   /// Query the format to load textures (usually this depends on texture manager)
   virtual int GetTextureFormat ();
+
+  /**
+   * Create or select a new object library (name can be NULL for world).
+   * All new objects will be marked as belonging to this library.
+   * You can then delete a whole library at once, for example.
+   */
+  virtual void SelectLibrary (const char *iName);
+  /// Delete a whole library (all objects that are part of library)
+  virtual bool DeleteLibrary (const char *iName);
+  /// Clear the entire world (delete all libraries)
+  virtual void DeleteAll ();
+
+  /// Register a texture to be loaded during Prepare()
+  virtual bool RegisterTexture (const char *iName, const char *iFileName,
+    csColor *iTransp, int iFlags);
 
   //--------------------- iConfig interface implementation --------------------
 

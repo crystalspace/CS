@@ -26,7 +26,9 @@ csObject *csNamedObjVector::FindByName (const char* name)
   for (int i = Length () - 1; i >= 0; i--)
   {
     csObject *o = (csObject *)Get (i);
-    if (!strcmp (o->GetName (), name))
+    if (name == o->GetName ()
+     || (name && o->GetName ()
+      && !strcmp (o->GetName (), name)))
       return o;
   }
   return NULL;
@@ -35,11 +37,13 @@ csObject *csNamedObjVector::FindByName (const char* name)
 int csNamedObjVector::Compare (csSome Item1, csSome Item2, int Mode) const
 {
   (void)Mode;
-  return strcmp (((csObject *)Item1)->GetName (), ((csObject *)Item2)->GetName ());
+  return (((csObject *)Item1)->GetName () == ((csObject *)Item2)->GetName ()) ? 0
+       : strcmp (((csObject *)Item1)->GetName (), ((csObject *)Item2)->GetName ());
 }
 
 int csNamedObjVector::CompareKey (csSome Item, csConstSome Key, int Mode) const
 {
   (void)Mode;
-  return strcmp (((csObject *)Item)->GetName (), (char *)Key);
+  return (((csObject *)Item)->GetName () == (char *)Key) ? 0
+       : strcmp (((csObject *)Item)->GetName (), (char *)Key);
 }

@@ -67,11 +67,11 @@ public:
   bool FindName(const char* name);
 
   /// Check if we have any children of requested type
-  bool IsNull () const {return IsFinished();}
+  bool IsNull () const { return IsFinished (); }
   /// Get the object we are pointing at
-  csObject& operator* () const {return *GetObj();}
+  csObject& operator* () const { return *GetObj (); }
   /// Move forward
-  csObjIterator& operator++ () {Next(); return *this;}
+  csObjIterator& operator++ () { Next (); return *this; }
 };
 
 #endif // __OBJITER_H__

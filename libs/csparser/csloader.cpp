@@ -4005,6 +4005,8 @@ bool csLoader::LoadWorld (char* buf)
     long cmd;
     char* params;
 
+    World->SelectLibrary (name);
+
     while ((cmd = csGetObject (&data, commands, &name, &params)) > 0)
     {
       if (!params)
@@ -4240,6 +4242,8 @@ bool csLoader::LoadLibrary (char* buf)
 
     long cmd;
     char* params;
+
+    World->SelectLibrary (name);
 
     while ((cmd = csGetObject (&data, commands, &name, &params)) > 0)
     {

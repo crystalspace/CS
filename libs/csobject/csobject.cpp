@@ -97,6 +97,15 @@ csObject::~csObject ()
   delete [] Name;
 }
 
+csObjectNoDel::~csObjectNoDel ()
+{
+  if (children)
+  {
+    free (children);
+    children = NULL;
+  }
+}
+
 csObject *csObject::GetChild (const csIdType& iType) const
 {
   if (!children)
@@ -146,23 +155,23 @@ void csObject::ObjRemove (csObject *obj)
 
 csObjIterator::csObjIterator (const csIdType &iType, const csObject &iObject)
 {
-  Reset(iType, iObject);
+  Reset (iType, iObject);
 }
 
-void csObjIterator::Reset(const csIdType &iType, const csObject &iObject)
+void csObjIterator::Reset (const csIdType &iType, const csObject &iObject)
 {
   Type = &iType;
   Container = iObject.children;
   Index = -1;
-  Next();
+  Next ();
 }
 
-csObject* csObjIterator::GetObj() const
+csObject* csObjIterator::GetObj () const
 {
   return Container ? Container->obj [Index] : NULL;
 }
 
-void csObjIterator::Next()
+void csObjIterator::Next ()
 {
   if (Container)
   {
@@ -180,10 +189,11 @@ void csObjIterator::Next()
 
 bool csObjIterator::FindName(const char* name)
 {
-  while (!IsFinished())
+  while (!IsFinished ())
   {
-    if (strcmp(GetObj()->GetName(), name)==0) return true;
-    Next();
+    if (strcmp (GetObj ()->GetName (), name) == 0)
+      return true;
+    Next ();
   }
   return false;
 }

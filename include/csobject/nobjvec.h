@@ -45,6 +45,10 @@ public:
 
   /// Compare object's name with a string
   virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
+
+  /// Override Get() to avoid casting to csObject
+  csObject *Get (int idx) const
+  { return (csObject *)csVector::Get (idx); }
 };
 
 #endif // __NOBJVEC_H__

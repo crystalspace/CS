@@ -31,9 +31,6 @@ SCF_VERSION (iLoader, 0, 0, 1);
  */
 struct iLoader : public iPlugIn
 {
-  /// This is the same as calling World->Clear ()
-  virtual void ClearAll () = 0;
-
   /**
    * Load the given file (from VFS) into engine.
    * This does not clear anything that could be already
