@@ -95,7 +95,7 @@ chronological order.
 	- Eric Sunshine fixed bugs in the recently added va_copy() and
 	  __va_copy() checks in configure.ac, and the recently modified
 	  MAXPATHLEN check where the literal "no" was being added to CFLAGS for
-	  the duration of the checks if the "-ansi -pedantic" check failed.
+	  the scope of those checks if the "-ansi -pedantic" check had failed.
 	- Eric Sunshine refactored the new va_copy()/__va_copy() checks in
 	  configure.ac in order to simplify maintenance.
 	- Eric Sunshine made the -shared check in configure.ac and compiler.m4
