@@ -64,7 +64,7 @@ void csRenderQueueSet::RemoveUnknownPriority (iMeshWrapper *mesh)
     if (Queues [i]) {
       int n = Queues [i]->Find (mesh);
       if (n != -1) {
-        Queues.Delete (n);
+        Queues [i]->Delete (n);
 	return;
       }
     }

@@ -97,8 +97,9 @@ private:
 public:
   csSectorMeshList ();
   void SetSector (csSector* sec) { sector = sec; }
-  virtual void AddMesh (iMeshWrapper* mesh);
-  virtual void RemoveMesh (iMeshWrapper* mesh);
+
+  virtual bool PrepareItem (csSome item);
+  virtual bool FreeItem (csSome item);
 };
 
 
@@ -215,21 +216,23 @@ public:
   }
 
   /**
-   * Add a mesh to this sector and register it to the culler.
+   * Prepare a mesh for rendering. This function is called for all meshes that
+   * are added to the sector.
    */
-  void AddMesh (csMeshWrapper* mesh);
+  void PrepareMesh (iMeshWrapper* mesh);
 
   /**
-   * Unlink a mesh from this sector and remove it from the culler.
+   * Unprepare a mesh. This function is called for all meshes that
+   * are removed from the sector.
    */
-  void UnlinkMesh (csMeshWrapper* mesh);
+  void UnprepareMesh (iMeshWrapper* mesh);
 
   /**
    * Relink a mesh from this sector. This is mainly useful if
    * characterics of the mesh changed (like render priority) so
    * that the sector needs to know this.
    */
-  void RelinkMesh (csMeshWrapper* mesh);
+  void RelinkMesh (iMeshWrapper* mesh);
 
   //----------------------------------------------------------------------
   // Light manipulation functions

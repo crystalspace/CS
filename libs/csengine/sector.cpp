@@ -118,16 +118,22 @@ csSectorMeshList::csSectorMeshList ()
   sector = NULL;
 }
 
-void csSectorMeshList::AddMesh (iMeshWrapper* mesh)
+bool csSectorMeshList::PrepareItem (csSome item)
 {
   CS_ASSERT (sector != NULL);
-  sector->AddMesh (mesh->GetPrivateObject ());
+
+  csMeshList::PrepareItem (item);
+  sector->PrepareMesh ((iMeshWrapper*)item);
+  return true;
 }
 
-void csSectorMeshList::RemoveMesh (iMeshWrapper* mesh)
+bool csSectorMeshList::FreeItem (csSome item)
 {
   CS_ASSERT (sector != NULL);
-  sector->UnlinkMesh (mesh->GetPrivateObject ());
+
+  sector->UnprepareMesh ((iMeshWrapper*)item);
+  csMeshList::FreeItem (item);
+  return true;
 }
 
 //---------------------------------------------------------------------------
@@ -188,45 +194,37 @@ void csSector::CleanupReferences ()
 
 //----------------------------------------------------------------------
 
-void csSector::AddMesh (csMeshWrapper* mesh)
+void csSector::PrepareMesh (iMeshWrapper* mesh)
 {
-  meshes.Push (&(mesh->scfiMeshWrapper));
-
-  RenderQueues.Add (&(mesh->scfiMeshWrapper));
+  RenderQueues.Add (mesh);
 
   if (culler)
   {
     iVisibilityObject* vo = SCF_QUERY_INTERFACE_FAST (mesh, iVisibilityObject);
-    vo->DecRef ();
     culler->RegisterVisObject (vo);
+    vo->DecRef ();
   }
 }
 
-void csSector::UnlinkMesh (csMeshWrapper* mesh)
+void csSector::UnprepareMesh (iMeshWrapper* mesh)
 {
-  RenderQueues.Remove (&(mesh->scfiMeshWrapper));
+  RenderQueues.Remove (mesh);
 
-  int idx = meshes.Find (&(mesh->scfiMeshWrapper));
-  if (idx != -1)
+  if (culler)
   {
-    meshes.Delete (idx);
-    if (culler)
-    {
-      iVisibilityObject* vo = SCF_QUERY_INTERFACE_FAST (mesh,
-      	iVisibilityObject);
-      vo->DecRef ();
-      culler->UnregisterVisObject (vo);
-    }
+    iVisibilityObject* vo = SCF_QUERY_INTERFACE_FAST (mesh, iVisibilityObject);
+    culler->UnregisterVisObject (vo);
+    vo->DecRef ();
   }
 }
 
-void csSector::RelinkMesh (csMeshWrapper* mesh)
+void csSector::RelinkMesh (iMeshWrapper* mesh)
 {
   // @@@ this function would be a lot faster of the previous
   // priority was known!
 
-  RenderQueues.RemoveUnknownPriority (&(mesh->scfiMeshWrapper));
-  RenderQueues.Add (&(mesh->scfiMeshWrapper));
+  RenderQueues.RemoveUnknownPriority (mesh);
+  RenderQueues.Add (mesh);
 }
 
 //----------------------------------------------------------------------

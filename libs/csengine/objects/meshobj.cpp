@@ -155,7 +155,7 @@ void csMeshWrapper::MoveToSector (csSector* s)
   // Only add this mesh to a sector if the parent is the engine.
   // Otherwise we have a hierarchical object and in that case
   // the parent object controls this.
-  if (!Parent) s->AddMesh (this);
+  if (!Parent) s->GetMeshes ()->Add (&scfiMeshWrapper);
 }
 
 void csMeshWrapper::RemoveFromSectors ()
@@ -183,7 +183,7 @@ void csMeshWrapper::SetRenderPriority (long rp)
   for (i = 0 ; i < sectors->GetCount () ; i++)
   {
     iSector* ss = sectors->Get (i);
-    if (ss) ss->GetPrivateObject ()->RelinkMesh (this);
+    if (ss) ss->GetPrivateObject ()->RelinkMesh (&scfiMeshWrapper);
   }
 }
 
