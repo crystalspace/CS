@@ -20,6 +20,8 @@
 #ifndef _LOADINFO_H_
 #define _LOADINFO_H_
 
+#include "csgeom/transfrm.h"
+
 class csMaterialHandle;
 class CLights;
 class csWorld;
@@ -33,11 +35,14 @@ public:
   CLights* default_lightx;
   bool use_tex_set;
   char* tex_set_name;
+  csReversibleTransform hard_trans;
+  bool do_hard_trans;
   
   ///
-  PSLoadInfo () : default_material(NULL),
-   default_texlen(1), default_lightx(NULL),
-   use_tex_set(false), tex_set_name(NULL) {}
+  PSLoadInfo () : default_material (NULL),
+   default_texlen (1), default_lightx (NULL),
+   use_tex_set (false), tex_set_name (NULL),
+   do_hard_trans (false) {}
 
   void SetTextureSet (const char* name)
   {

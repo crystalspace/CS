@@ -71,6 +71,11 @@ public:
   void ObjectToWorld (const csReversibleTransform& obj);
 
   /**
+   * Hard transform of this plane.
+   */
+  void HardTransform (const csReversibleTransform& obj);
+
+  /**
    * Transform this plane from world space to camera space using
    * the given transform. The resulting transform is put in m_cam2tex
    * and v_cam2tex.

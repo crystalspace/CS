@@ -354,6 +354,21 @@ void csPolygonSet::AddCurve (csCurve* curve)
   curves.Push (curve);
 }
 
+void csPolygonSet::HardTransform (const csReversibleTransform& t)
+{
+  int i;
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    obj_verts[i] = t.This2Other (obj_verts[i]);
+    wor_verts[i] = obj_verts[i];
+  }
+  for (i = 0 ; i < polygons.Length () ; i++)
+  {
+    csPolygon3D* p = GetPolygon3D (i);
+    p->HardTransform (t);
+  }
+}
+
 csPolygon3D* csPolygonSet::IntersectSegment (const csVector3& start, 
   const csVector3& end, csVector3& isect, float* pr)
 {

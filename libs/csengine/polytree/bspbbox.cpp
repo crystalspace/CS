@@ -806,6 +806,9 @@ void csPolyTreeBBox::Update (const csBox3& object_bbox, const csTransform& o2w,
   csVector3Array& va = GetVertices ();
   va.MakeEmpty ();
 
+  // Clear the polygons from the base stub.
+  base_stub->Initialize ();
+
   // Add the eight corner points of the bounding box to the container.
   // Transform from object to world space here.
   world_bbox.StartBoundingBox ();

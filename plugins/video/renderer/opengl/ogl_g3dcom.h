@@ -45,44 +45,54 @@ class csClipper;
 class csGraphics3DOGLCommon : public iGraphics3D
 {
 private:
-  // set proper GL flags based on ZBufMode.  This is usually
-  // utilized just before a polygon is drawn; it is not
-  // done when the Z-buffer mode is set in SetRenderState because
-  // other routines may modify the GL flags between a call
-  // to SetRenderState and the call to the polygon
-  // drawing routine
+  /**
+   * set proper GL flags based on ZBufMode.  This is usually
+   * utilized just before a polygon is drawn; it is not
+   * done when the Z-buffer mode is set in SetRenderState because
+   * other routines may modify the GL flags between a call
+   * to SetRenderState and the call to the polygon
+   * drawing routine
+   */
   void SetGLZBufferFlags();
 
-  /// Pointer to a member function that tries to draw the polygon in a quick
-  /// optimized manner.  If this function succeeds in drawing the polygon,
-  /// it should return true thus bypassing the normal polygon drawing code
-  /// altogether.  If the function cannot draw the polygon for whatever
-  /// reason (typically it is because the polygon has certain layers or
-  /// attributes that cannot be drawn in an optimized manner) the function
-  /// should return false, meaning that the default generalized polygon
-  /// drawing code should draw the polygon instead.
+  /**
+   * Pointer to a member function that tries to draw the polygon in a quick
+   * optimized manner.  If this function succeeds in drawing the polygon,
+   * it should return true thus bypassing the normal polygon drawing code
+   * altogether.  If the function cannot draw the polygon for whatever
+   * reason (typically it is because the polygon has certain layers or
+   * attributes that cannot be drawn in an optimized manner) the function
+   * should return false, meaning that the default generalized polygon
+   * drawing code should draw the polygon instead.
+   */
   bool (csGraphics3DOGLCommon::*ShortcutDrawPolygon)(G3DPolygonDP &poly);
 
-  /// This shortcut routine gets called by
-  /// StartPolygonFX before normal FX setup occurs.  If the shortcut routine
-  /// determines that it can draw the upcoming series of polygons in an
-  /// optimized manner, it should set up properly and return true.  If it
-  /// cannot, it should return false and let the standard DrawPolygonFX
-  /// perform setup.  In any case, the value returned by the StartPolygonFX
-  /// must be matched in subsequent calls to DrawPolygonFX; that is, if
-  /// a StartPolygonFX call returns 'true', then calls to DrawPolygonFX and
-  /// FinishPolygonFX must also return 'true' until the next time StartPolygonFX
-  /// is called.
+  /**
+   * This shortcut routine gets called by
+   * StartPolygonFX before normal FX setup occurs.  If the shortcut routine
+   * determines that it can draw the upcoming series of polygons in an
+   * optimized manner, it should set up properly and return true.  If it
+   * cannot, it should return false and let the standard DrawPolygonFX
+   * perform setup.  In any case, the value returned by the StartPolygonFX
+   * must be matched in subsequent calls to DrawPolygonFX; that is, if
+   * a StartPolygonFX call returns 'true', then calls to DrawPolygonFX and
+   * FinishPolygonFX must also return 'true' until the next time StartPolygonFX
+   * is called.
+   */
   bool (csGraphics3DOGLCommon::*ShortcutStartPolygonFX)(iMaterialHandle *handle,UInt mode);
 
-  /// Shortcut tried before executing standard DrawPolygonFX code.  The
-  /// value returned by this must match the most recent return value of
-  /// ShortcutStartPolygonFX(); see comments for that member.
+  /**
+   * Shortcut tried before executing standard DrawPolygonFX code.  The
+   * value returned by this must match the most recent return value of
+   * ShortcutStartPolygonFX(); see comments for that member.
+   */
   bool (csGraphics3DOGLCommon::*ShortcutDrawPolygonFX)(G3DPolygonDPFX &poly);
 
-  /// Shortcut tried before executing standard FinishPolygonFX code.
-  /// The value returned by this must match the most recent return value of
-  /// ShortcutStartPolygonFX(); see comments for that member.
+  /**
+   * Shortcut tried before executing standard FinishPolygonFX code.
+   * The value returned by this must match the most recent return value of
+   * ShortcutStartPolygonFX(); see comments for that member.
+   */
   bool (csGraphics3DOGLCommon::*ShortcutFinishPolygonFX)();
 
   // Some common shortcut functions that may or may not apply, depending
@@ -92,12 +102,14 @@ private:
 
 protected:
 
-  /// handle of a local 1D alpha-blend texture; this texture holds an
-  /// exponential alpha curve from 0 to 1.  Using this texture, you
-  /// can convert from a linear texture coordinate of 0-1 to an
-  /// exponential alpha-blend curve.  Such a mapping is useful for
-  /// drawing exponential fog polygons.  A value of 0 means the handle
-  /// is unallocated
+  /**
+   * handle of a local 1D alpha-blend texture; this texture holds an
+   * exponential alpha curve from 0 to 1.  Using this texture, you
+   * can convert from a linear texture coordinate of 0-1 to an
+   * exponential alpha-blend curve.  Such a mapping is useful for
+   * drawing exponential fog polygons.  A value of 0 means the handle
+   * is unallocated
+   */
   GLuint m_fogtexturehandle;
 
   /// Z Buffer mode to use while rendering next polygon.
@@ -153,23 +165,25 @@ protected:
   struct
   {
     /**
-    * Current settings of the user configurable blend parameters for
-    * lightmaps.  Certain settings work better on certain cards
-    */
+     * Current settings of the user configurable blend parameters for
+     * lightmaps.  Certain settings work better on certain cards
+     */
     GLenum m_lightmap_src_blend;
     GLenum m_lightmap_dst_blend;
     
-    /// Option variable: do multitexturing?  This value is zero if multitexturing
-    /// is not available.  If multitexturing is available, this value holds
-    /// the number of textures that can be mixed together in one pass.
+    /**
+     * Option variable: do multitexturing?  This value is zero if multitexturing
+     * is not available.  If multitexturing is available, this value holds
+     * the number of textures that can be mixed together in one pass.
+     */
     int do_multitexture_level;
     
     /**
-    * Brighten rendered textures in an extra pass.
-    * This slows down rendering (we should use multi-texturing)
-    * but is simulates 2*SRC*DST on cards that only support SRC*DST.
-    * At least it seems to do this on a RIVA 128.
-    */
+     * Brighten rendered textures in an extra pass.
+     * This slows down rendering (we should use multi-texturing)
+     * but is simulates 2*SRC*DST on cards that only support SRC*DST.
+     * At least it seems to do this on a RIVA 128.
+     */
     bool do_extra_bright;
   } m_config_options;
 
@@ -410,20 +424,32 @@ public:
   virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy,
     int sw, int sh, int tx, int ty, int tw, int th);
 
-  /// If supported, this function will attempt to query the OpenGL driver
-  /// to see what extensions it supports so that other parts of the renderer
-  /// can use appropriate extensions where possible.
-  void DetectExtensions();
+  /**
+   * If supported, this function will attempt to query the OpenGL driver
+   * to see what extensions it supports so that other parts of the renderer
+   * can use appropriate extensions where possible.
+   */
+  void DetectExtensions ();
 
-  /// Draw a fully-featured polygon assuming one has an OpenGL renderer
-  /// that supports ARB_multitexture
-  bool DrawPolygonMultiTexture(G3DPolygonDP &poly);
+  /**
+   * Draw a fully-featured polygon assuming one has an OpenGL renderer
+   * that supports ARB_multitexture
+   */
+  bool DrawPolygonMultiTexture (G3DPolygonDP &poly);
 
-  /// Draw a fully-featured polygon assuming one has an OpenGL renderer
-  /// that only has a single texture unit.
-  void DrawPolygonSingleTexture(G3DPolygonDP &poly);
+  /**
+   * Draw a fully-featured polygon assuming one has an OpenGL renderer
+   * that only has a single texture unit.
+   */
+  void DrawPolygonSingleTexture (G3DPolygonDP &poly);
 
-  //Extension flags
+  /**
+   * Draw a polygon but only do z-fill. Do not actually render
+   * anything.
+   */
+  void DrawPolygonZFill (G3DPolygonDP &poly);
+
+  // Extension flags
   bool ARB_multitexture;
 
  protected:

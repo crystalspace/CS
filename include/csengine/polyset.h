@@ -383,6 +383,15 @@ public:
     cam_verts = cam_verts_set.GetVertexArray ()->GetVertices ();
   }
 
+  /**
+   * Do a hard transform of the object vertices.
+   * This transformation and the original coordinates are not
+   * remembered but the object space coordinates are directly
+   * computed (world space coordinates are set to the object space
+   * coordinates by this routine).
+   */
+  void HardTransform (const csReversibleTransform& t);
+
   /// Get the array of camera vertices.
   csVector3* GetCameraVertices ()
   {

@@ -586,6 +586,18 @@ void csPolygon3D::ObjectToWorld (const csReversibleTransform& t)
   if (portal) portal->ObjectToWorld (t);
 }
 
+void csPolygon3D::HardTransform (const csReversibleTransform& t)
+{
+  csPlane3 new_plane;
+  t.This2Other (plane->GetObjectPlane (), Vwor (0), new_plane);
+  plane->GetObjectPlane () = new_plane;
+  plane->GetWorldPlane () = new_plane;
+
+  csLightMapped* lmi = GetLightMapInfo ();
+  if (lmi) lmi->GetTxtPlane ()->HardTransform (t);
+  if (portal) portal->HardTransform (t);
+}
+
 #define TEXW(t)	((t)->w_orig)
 #define TEXH(t)	((t)->h)
 

@@ -1,5 +1,45 @@
 The history order has been reversed so that new features are at the top.
 
+14-Aug-2000
+	- Moved call to GetElapsedTime in walktest after the call
+	  to SysSystemDriver::NextFrame(). Otherwise the current time
+	  would not be valid the first time.
+	- Fixed aspect ratio for terrain engine.
+	- Initialization of terrain engine uses correct display dimensions.
+	- Increased far clipping plane of terrain engine to prevent
+	  far away terrain polygons from disappearing too soon.
+	- Decreased near clipping plane of terrain engine. This doesn't
+	  completely fix near triangle disappearing though.
+	- Added csPolygonSet::HardTransform(). With this function you can
+	  do a hard transform of the object space coordinates of a thing
+	  or sector. This function will also transform the object and
+	  world space planes of all polygons in the thing or sector.
+	  The easiest way to think about HardTransform is that it does
+	  an ObjectToWorld transform and then freezes the resulting world
+	  space coordinates so that they become the new object space
+	  coordinates.
+	- Added csPolyTxtPlane, csPortal, and csPolygon3D::HardTransform()
+  	  to do the hard transform of the polygon plane, lightmap info, and
+	  portal plane.
+	- Added support for new HARDMOVE keyword in loader. This is similar
+	  to MOVE that was already supported for THING but it does a hard
+	  move instead.
+	- Added support for FILLONLY zbuffer mode in OpenGL renderer
+	  (for DrawPolygon).
+	- With the above changes the terrain engine and indoor engine are
+	  now better integrated. It is now possible to add sprites and
+	  buildings (things) to a sector with terrain. There is no visibility
+	  culling done yet so this is still one thing that remains to be done.
+	  The terrain also isn't lit yet so you'll get no shadows from the
+	  objects that are on it. Other than that and a few small bugs in
+	  the rendering of the terrain itself it works reasonably well.
+	- Implemented support for fog in terrain engine.
+13-Aug-2000
+	- Fixed a big memory leak in dynamic objects in polygon trees
+	  (i.e. sprites in a STATBSP level). Whenever a sprite moved
+	  it would add six polygons to the bounding box. This ever growing
+	  bounding box would eat up memory and cause enourmous slowdowns
+	  for moving sprites in the end.
 12-Aug-2000
 	- Martin Geisse added some missing error output in WalkTest.
 	- Martin also added a missing dependency entry in the MSVC

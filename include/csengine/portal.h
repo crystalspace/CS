@@ -94,6 +94,11 @@ public:
   void ObjectToWorld (const csReversibleTransform& t);
 
   /**
+   * Hard transform the warp matrix.
+   */
+  void HardTransform (const csReversibleTransform& t);
+
+  /**
    * Set the warping transformation for this portal in object space and world space.
    */
   void SetWarp (const csTransform& t);

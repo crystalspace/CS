@@ -276,10 +276,11 @@ extern bool CommandHandler (const char *cmd, const char *arg);
 
 void WalkTest::NextFrame ()
 {
-  cs_time elapsed_time, current_time;
-  GetElapsedTime (elapsed_time, current_time);
   // The following will fetch all events from queue and handle them
   SysSystemDriver::NextFrame ();
+
+  cs_time elapsed_time, current_time;
+  GetElapsedTime (elapsed_time, current_time);
 
   timeFPS = perf_stats->GetFPS ();
 

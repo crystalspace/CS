@@ -1019,6 +1019,14 @@ public:
   void ObjectToWorld (const csReversibleTransform& t);
 
   /**
+   * Hard transform the plane of this polygon and also the
+   * portal and lightmap info. This is similar to ObjectToWorld
+   * but it does a hard transform of the object space planes
+   * instead of keeping a transformation.
+   */
+  void HardTransform (const csReversibleTransform& t);
+
+  /**
    * Clip this camera space polygon to the given plane. 'plane' can be NULL
    * in which case no clipping happens.<p>
    *

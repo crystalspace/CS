@@ -51,6 +51,12 @@ void csPortal::ObjectToWorld (const csReversibleTransform& t)
     warp_wor = t.GetInverse () * warp_obj * t;
 }
 
+void csPortal::HardTransform (const csReversibleTransform& t)
+{
+  ObjectToWorld (t);
+  warp_obj = warp_wor;
+}
+
 void csPortal::SetWarp (const csTransform& t)
 {
   flags.Set (CS_PORTAL_WARP);

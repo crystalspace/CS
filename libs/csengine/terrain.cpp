@@ -21,6 +21,7 @@
 #include "csengine/pol2d.h"
 #include "csengine/texture.h"
 #include "csengine/material.h"
+#include "csengine/world.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/polyclip.h"
@@ -72,24 +73,27 @@ bool csTerrain::Initialize (const void* heightMapFile, unsigned long size)
 
   mesh = new ddgTBinMesh (heightMap);
   context = new ddgContext ();
-  context->control( &control );
-  context->clipbox()->min.set(0,0,0.6);
-  context->clipbox()->max.set(640, 480, 200);
+  context->control (&control);
+  context->clipbox ()->min.set (0, 0, 0.1);
+  int fw = csWorld::current_world->G3D->GetWidth ();
+  int fh = csWorld::current_world->G3D->GetHeight ();
+  context->clipbox()->max.set (fw, fh, 1000);
 
   vbuf = new ddgVArray ();
 
   mesh->init (context);
 
-  vbuf->size((mesh->absMaxDetail()*3*11)/10);
-  vbuf->renderMode(true,false,false);
+  vbuf->size ((mesh->absMaxDetail()*3*11)/10);
+  vbuf->renderMode (true, false, false);
   vbuf->init ();
   vbuf->reset ();
 
   // We are going to get texture coords from the terrain engine
   // ranging from 0 to rows and 0 to cols.
   // CS wants them to range from 0 to 1.
-  _pos = csVector3(0,0,0);
-  _size = csVector3(heightMap->cols(),mesh->wheight(mesh->absMaxHeight()),heightMap->rows());
+  _pos = csVector3 (0,0,0);
+  _size = csVector3 (heightMap->cols(),
+      mesh->wheight (mesh->absMaxHeight ()), heightMap->rows ());
 
   // This is  code that allocates the texture array for the terrain.
   _materialMap = new csMaterialHandle* [GetNumMaterials ()];
@@ -101,7 +105,7 @@ bool csTerrain::Initialize (const void* heightMapFile, unsigned long size)
 /// Vertices cached.
 unsigned int	_MRUvertex[_MRUsize];
 /// Buffer indexes corresponding to those vertices.
-int				_MRUindex[_MRUsize];
+int		_MRUindex[_MRUsize];
 /// Position of last entry added into the cache.
 unsigned int	_MRUcursor;
 /// Number or items currently in the cache.
@@ -114,7 +118,7 @@ static int lut[24] = {0,1,2,3,4,5,6,7,8,9,10,11,0,1,2,3,4,5,6,7,8,9,10,11};
  *  Retrieve info for a single triangle.
  *  Returns true if triangle should be rendered at all.
  */
-bool csTerrain::drawTriangle( ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf )
+bool csTerrain::drawTriangle (ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf)
 {
   if ( !bt->visible(tvc))
     return ddgFailure;
@@ -131,39 +135,38 @@ bool csTerrain::drawTriangle( ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf )
   int i, j;
   for (i = 0; i < 3; i++)
   {
-	bufindex[i] = ddgInvalidBufferIndex;
-	j = _MRUsize+_MRUcursor;
-	unsigned int end = j - _MRUinuse;
-	// See if the current entry is in the MRUCache.
-	while (j > end)
-	{
-		ddgAssert(j>=0 && j < _MRUsize*2);
-		if (_MRUvertex[lut[j]] == tv[i])
-		{
-			bufindex[i] = _MRUindex[lut[j]];
-			break;
-		}
-		j--;
-	}
-	if (ddgInvalidBufferIndex == bufindex[i])
-	{
-		// We could just call.
-		bt->vertex(tv[i],&p[i]);
-		bt->textureC(tv[i],&(t[i]));
-		// Push the vertex.
-		bufindex[i] = vbuf->pushVT(&p[i],&t[i]);
-		if (_MRUinuse < _MRUsize)
-			_MRUinuse++;
+    bufindex[i] = ddgInvalidBufferIndex;
+    j = _MRUsize+_MRUcursor;
+    unsigned int end = j - _MRUinuse;
+    // See if the current entry is in the MRUCache.
+    while (j > (int)end)
+    {
+      ddgAssert(j>=0 && j < _MRUsize*2);
+      if (_MRUvertex[lut[j]] == tv[i])
+      {
+        bufindex[i] = _MRUindex[lut[j]];
+        break;
+      }
+      j--;
+    }
+    if (ddgInvalidBufferIndex == bufindex[i])
+    {
+      // We could just call.
+      bt->vertex(tv[i],&p[i]);
+      bt->textureC(tv[i],&(t[i]));
+      // Push the vertex.
+      bufindex[i] = vbuf->pushVT(&p[i],&t[i]);
+      if (_MRUinuse < _MRUsize) _MRUinuse++;
 
-		if (_MRUcursor==_MRUsize-1)
-			_MRUcursor = 0;
-		else
-			_MRUcursor++;
+      if (_MRUcursor==_MRUsize-1)
+	_MRUcursor = 0;
+      else
+	_MRUcursor++;
 
-		// Record that these vertices are in the buffer.
-		_MRUindex[_MRUcursor] = bufindex[i];
-		_MRUvertex[_MRUcursor] = tv[i];
-	}
+      // Record that these vertices are in the buffer.
+      _MRUindex[_MRUcursor] = bufindex[i];
+      _MRUvertex[_MRUcursor] = tv[i];
+    }
   }
 
   // Record that these vertices are in the buffer.
@@ -172,7 +175,9 @@ bool csTerrain::drawTriangle( ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf )
   return ddgSuccess;
 }
 
-void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
+static DECLARE_GROWING_ARRAY (fog_verts, G3DFogInfo);
+
+void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
 {
   bool modified = true;
   // Get matrices in OpenGL form
@@ -189,92 +194,92 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   // matrix.
 
   // Position of camera.
-  const csVector3& translation = rview.GetO2TTranslation();
-  ddgVector3 p(translation.x, translation.y, translation.z);
+  const csVector3& translation = rview.GetO2TTranslation ();
+  ddgVector3 p (translation.x, translation.y, translation.z);
 
   // Compute the camera's foward facing vector in world space.
   const csVector3 cforward (0,0,-1);
   const csVector3 wforward = rview.This2OtherRelative (cforward);
-  ddgVector3 f(wforward.x,wforward.y,wforward.z);
-  f.normalize();
+  ddgVector3 f (wforward.x,wforward.y,wforward.z);
+  f.normalize ();
   // Compute the camera's up facing vector in world space.
   const csVector3 cup (0,1,0);
   const csVector3 wup = rview.This2OtherRelative (cup);
-  ddgVector3 u(wup.x,wup.y,wup.z);
-  u.normalize();
+  ddgVector3 u (wup.x,wup.y,wup.z);
+  u.normalize ();
   // Compute the camera's right facing vector in world space.
   const csVector3 cright (-1,0,0);
   const csVector3 wright = rview.This2OtherRelative (cright);
-  ddgVector3 r(wright.x,wright.y,wright.z);
-  r.normalize();
+  ddgVector3 r (wright.x,wright.y,wright.z);
+  r.normalize ();
  
   // Update the DDG context object.
   ddgControl *control = context->control();
-  control->position (p.v[0],p.v[1],p.v[2]);
-  context->forward(&f);
+  control->position (p.v[0], p.v[1], p.v[2]);
+  context->forward (&f);
   context->up (&u);
   context->right (&r);
 
   // Get the FOV in angles.
   context->fov (rview.GetFOVAngle ());
-  // TODO: JORRIT IS THIS RIGHT?
-  context->aspect (640.0/480.0 /*rview.GetInvFOV ()*/);
+  context->aspect (float (rview.g3d->GetWidth ()) / (float)rview.g3d->GetHeight ());
 
   // Construct some clipping planes.
-  context->extractPlanes(context->frustrum());
+  context->extractPlanes (context->frustrum ());
 
   // Optimize the mesh w.r.t. the current viewing location.
-  modified = mesh->calculate(context);
+  modified = mesh->calculate (context);
 
   // If our orientation has changed, reload the buffer.
   if (modified)
   {
-    vbuf->reset();
+    vbuf->reset ();
     // Update the vertex buffers.
-    while (i < mesh->getBinTreeNo())
+    while (i < mesh->getBinTreeNo ())
     {
-      if ((bt = mesh->getBinTree(i)))
+      if ((bt = mesh->getBinTree (i)))
       {
-		unsigned int v = 0;
-		n = 0;
+	unsigned int v = 0;
+	n = 0;
 
-		if (bt && bt->treeVis() != ddgOUT)
-		{
-			/// Position of last entry added into the cache.
-			_MRUcursor = _MRUsize-1;
-			/// Number or items currently in the cache.
-			_MRUinuse = 0;
-			// Find 1st triangle in the mesh.
-			ddgTriIndex tindex = bt->firstInMesh();
-			ddgTriIndex end = 0;
-			n = vbuf->num();
-			do 
-			{
- 			  if (drawTriangle(bt, tindex, vbuf) == ddgSuccess)
-			    v++;
-			  tindex = bt->nextInMesh(tindex, &end);
-			}
-			while (end);
-
-			n = vbuf->num() - n;
-		}
-		bt->visTriangle(v);
-		bt->uniqueVertex(n);
+	if (bt && bt->treeVis () != ddgOUT)
+	{
+	  // Position of last entry added into the cache.
+	  _MRUcursor = _MRUsize-1;
+	  // Number or items currently in the cache.
+	  _MRUinuse = 0;
+	  // Find 1st triangle in the mesh.
+	  ddgTriIndex tindex = bt->firstInMesh ();
+	  ddgTriIndex end = 0;
+	  n = vbuf->num();
+	  do 
+	  {
+ 	    if (drawTriangle(bt, tindex, vbuf) == ddgSuccess)
+	      v++;
+	    tindex = bt->nextInMesh (tindex, &end);
 	  }
-      i++;
-  }
-  // Ugly hack to help software renderer, reindex the triangles per block.
-  i = 0;
-  unsigned int j;
-  s = 0;
+	  while (end);
 
-  n = 0, nd = 0;
-  while (i < mesh->getBinTreeNo())
+	  n = vbuf->num() - n;
+	}
+	bt->visTriangle (v);
+	bt->uniqueVertex (n);
+      }
+      i++;
+    }
+
+    // Ugly hack to help software renderer, reindex the triangles per block.
+    i = 0;
+    unsigned int j;
+    s = 0;
+
+    n = 0, nd = 0;
+    while (i < mesh->getBinTreeNo ())
     {
-      d = mesh->getBinTree(i)->visTriangle() + mesh->getBinTree(i+1)->visTriangle();
+      d = mesh->getBinTree (i)->visTriangle () + mesh->getBinTree (i+1)->visTriangle ();
       if (d > 0)
       {
-		nd = mesh->getBinTree(i)->uniqueVertex() + mesh->getBinTree(i+1)->uniqueVertex();
+	nd = mesh->getBinTree (i)->uniqueVertex () + mesh->getBinTree (i+1)->uniqueVertex ();
         for (j = s*3; j < 3*(s+d); j++)
           vbuf->ibuf[j] -= n;
         s += d;
@@ -289,7 +294,8 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   rview.g3d->SetClipper (rview.view->GetClipPoly (), rview.view->GetNumVertices ());
   // @@@ This should only be done when aspect changes...
   rview.g3d->SetPerspectiveAspect (rview.GetFOV ());
-  rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_USE);
+  rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
+      use_z_buf ? CS_ZBUF_USE : CS_ZBUF_FILL);
 
   // Setup the structure for DrawTriangleMesh.
   static G3DTriangleMesh g3dmesh;
@@ -304,7 +310,6 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
     g3dmesh.do_mirror = rview.IsMirrored ();
     g3dmesh.do_morph_texels = false;
     g3dmesh.do_morph_colors = false;
-    g3dmesh.vertex_fog = NULL;
     g3dmesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
     g3dmesh.fxmode = 0;//CS_FX_GOURAUD;
     init = true;
@@ -331,8 +336,15 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
       g3dmesh.num_triangles = d; // number of triangles
       g3dmesh.triangles = (csTriangle *) &(vbuf->ibuf[s*3]);	// pointer to array of csTriangle for all triangles
       // Enable clipping for blocks that are not entirely within the view frustrum.
-      g3dmesh.do_clip = mesh->getBinTree(i)->treeVis() == ddgIN
-	      && mesh->getBinTree(i+1)->treeVis() == ddgIN ? false : true;
+      g3dmesh.do_clip =
+		mesh->getBinTree(i)->treeVis() != ddgIN ||
+	        mesh->getBinTree(i+1)->treeVis() != ddgIN;
+      if (nd > (unsigned int)fog_verts.Limit ()) fog_verts.SetLimit (nd);
+      g3dmesh.vertex_fog = fog_verts.GetArray ();
+
+      extern void CalculateFogMesh (csRenderView* rview, csTransform* tr_o2c,
+	    G3DTriangleMesh& mesh);
+      CalculateFogMesh (&rview, &rview, g3dmesh);
 
       if (rview.callback)
         rview.callback (&rview, CALLBACK_MESH, (void*)&g3dmesh);
@@ -340,7 +352,7 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
         rview.g3d->DrawTriangleMesh (g3dmesh);
       // Increment the starting offset by the number of triangles that were in this block.
       s += d;
-	  n += nd;
+      n += nd;
     }
     i = i+2;
   }

@@ -154,6 +154,7 @@ TOKEN_DEF_START
   TOKEN_DEF (FRAME)
   TOKEN_DEF (GOURAUD)
   TOKEN_DEF (HALO)
+  TOKEN_DEF (HARDMOVE)
   TOKEN_DEF (HEIGHT)
   TOKEN_DEF (IDENTITY)
   TOKEN_DEF (KEY)
@@ -1178,7 +1179,13 @@ csMapNode* csLoader::load_node (char* name, char* buf, csSector* sec)
 csPolygonSet& csLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info,
   int cmd, char* name, char* params)
 {
+  TOKEN_TABLE_START (tok_matvec)
+    TOKEN_TABLE (MATRIX)
+    TOKEN_TABLE (V)
+  TOKEN_TABLE_END
+
   char str[255];
+  char* xname;
   switch (cmd)
   {
     case TOKEN_VERTEX:
@@ -1228,6 +1235,39 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info,
 	  ps.AddPolygon (poly3d);
 	  csLoaderStat::polygons_loaded++;
 	}
+      }
+      break;
+
+    case TOKEN_HARDMOVE:
+      {
+        char* params2;
+        while ((cmd=csGetObject(&params, tok_matvec, &xname, &params2)) > 0)
+        {
+    	  if (!params2)
+    	  {
+      	    CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
+      	    fatal_exit (0, false);
+    	  }
+          switch (cmd)
+          {
+            case TOKEN_MATRIX:
+            {
+              csMatrix3 m;
+              load_matrix (params2, m);
+              info.hard_trans.SetT2O (m);
+	      info.do_hard_trans = true;
+              break;
+            }
+            case TOKEN_V:
+            {
+              csVector3 v;
+              load_vector (params2, v);
+              info.hard_trans.SetOrigin (v);
+	      info.do_hard_trans = true;
+              break;
+            }
+          }
+        }
       }
       break;
 
@@ -1581,6 +1621,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec)
     TOKEN_TABLE (DETAIL)
     TOKEN_TABLE (CONVEX)
     TOKEN_TABLE (MOVE)
+    TOKEN_TABLE (HARDMOVE)
     TOKEN_TABLE (TEMPLATE)
     TOKEN_TABLE (KEY)
     TOKEN_TABLE (CAMERA)
@@ -1691,6 +1732,9 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec)
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a thing!\n", csGetLastOffender ());
     fatal_exit (0, false);
   }
+
+  if (info.do_hard_trans)
+    thing->HardTransform (info.hard_trans);
 
   thing->SetTransform (obj);
   if (!(flags & CS_LOADER_NOCOMPRESS))
@@ -4029,6 +4073,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
     TOKEN_TABLE (RAIN)
     TOKEN_TABLE (SNOW)
     TOKEN_TABLE (FIRE)
+    TOKEN_TABLE (HARDMOVE)
   TOKEN_TABLE_END
 
   char* name;
@@ -4127,6 +4172,9 @@ csSector* csLoader::load_sector (char* secname, char* buf)
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a sector!\n", csGetLastOffender ());
     fatal_exit (0, false);
   }
+
+  if (info.do_hard_trans)
+    sector->HardTransform (info.hard_trans);
 
   if (!(flags & CS_LOADER_NOCOMPRESS))
     sector->CompressVertices ();

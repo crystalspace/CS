@@ -568,9 +568,11 @@ void Dumper::dump_stubs_node (csObjectStub* stub, char* name, int level)
 {
   while (stub)
   {
-    CsPrintf (MSG_DEBUG_0, "%s %s this=%08lx obj=%08lx node=%08lx\n",
+    CsPrintf (MSG_DEBUG_0, "%s %s this=%08lx obj=%08lx node=%08lx ref=%d ",
     	spaces (level), name,
-    	stub, stub->object, stub->node);
+    	stub, stub->object, stub->node, stub->ref_count);
+    csPolygonStub* ps = (csPolygonStub*)stub;
+    CsPrintf (MSG_DEBUG_0, "numpol=%d\n", ps->GetNumPolygons ());
     if (stub->next_tree && stub->next_tree->prev_tree != stub)
       CsPrintf (MSG_DEBUG_0, "%s !!! next_tree link broken !!!\n", spaces (level));
     if (stub->prev_tree && stub->prev_tree->next_tree != stub)
@@ -597,9 +599,11 @@ void Dumper::dump_stubs_obj (csObjectStub* stub, char* name, int level)
 {
   while (stub)
   {
-    CsPrintf (MSG_DEBUG_0, "%s %s this=%08lx obj=%08lx node=%08lx\n",
+    CsPrintf (MSG_DEBUG_0, "%s %s this=%08lx obj=%08lx node=%08lx ref=%d ",
     	spaces (level), name,
-    	stub, stub->object, stub->node);
+    	stub, stub->object, stub->node, stub->ref_count);
+    csPolygonStub* ps = (csPolygonStub*)stub;
+    CsPrintf (MSG_DEBUG_0, "numpol=%d\n", ps->GetNumPolygons ());
     if (stub->next_tree && stub->next_tree->prev_tree != stub)
       CsPrintf (MSG_DEBUG_0, "%s !!! next_tree link broken !!!\n", spaces (level));
     if (stub->prev_tree && stub->prev_tree->next_tree != stub)

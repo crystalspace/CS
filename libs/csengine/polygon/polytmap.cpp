@@ -167,4 +167,12 @@ void csPolyTxtPlane::ObjectToWorld (
   v_world2tex = obj.This2Other (v_obj2tex);
 }
 
+void csPolyTxtPlane::HardTransform (
+	const csReversibleTransform& obj)
+{
+  ObjectToWorld (obj);
+  m_obj2tex = m_world2tex;
+  v_obj2tex = v_world2tex;
+}
+
 //---------------------------------------------------------------------------

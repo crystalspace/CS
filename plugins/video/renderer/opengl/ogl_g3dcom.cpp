@@ -1032,6 +1032,93 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   }
 }
 
+void csGraphics3DOGLCommon::DrawPolygonZFill (G3DPolygonDP & poly)
+{
+  if (poly.num < 3)
+    return;
+
+  int i;
+
+  // count 'real' number of vertices
+  int num_vertices = 1;
+  for (i = 1; i < poly.num; i++)
+  {
+    if ((ABS (poly.vertices[i].sx - poly.vertices[i - 1].sx)
+	 + ABS (poly.vertices[i].sy - poly.vertices[i - 1].sy))
+	 	> VERTEX_NEAR_THRESHOLD)
+      num_vertices++;
+  }
+  // if this is a 'degenerate' polygon, skip it
+  if (num_vertices < 3)
+    return;
+
+  // Get the plane normal of the polygon. Using this we can calculate
+  // '1/z' at every screen space point.
+  float Ac, Bc, Cc, Dc, inv_Dc;
+  Ac = poly.normal.A ();
+  Bc = poly.normal.B ();
+  Cc = poly.normal.C ();
+  Dc = poly.normal.D ();
+
+  float M, N, O;
+  float inv_aspect = poly.inv_aspect;
+  if (ABS (Dc) < SMALL_D)
+  {
+    // The Dc component of the plane normal is too small. This means
+    // that  the plane of the polygon is almost perpendicular to the 
+    // eye of the viewer. In this case, nothing much can be seen of 
+    // the plane anyway so we just take one value for the entire 
+    // polygon.
+    M = 0;
+    N = 0;
+    // For O choose the transformed z value of one vertex.
+    // That way Z buffering should at least work.
+    O = 1 / poly.z_value;
+  }
+  else
+  {
+    inv_Dc = 1 / Dc;
+    M = -Ac * inv_Dc * inv_aspect;
+    N = -Bc * inv_Dc * inv_aspect;
+    O = -Cc * inv_Dc;
+  }
+
+  glDisable (GL_TEXTURE_2D);
+  glShadeModel (GL_FLAT);
+  SetGLZBufferFlags ();
+  glBlendFunc (GL_ZERO, GL_ONE);
+  glEnable (GL_BLEND);
+
+  // First copy all data in an array so that we can minimize
+  // the amount of code that goes between glBegin/glEnd. This
+  // is from an OpenGL high-performance FAQ.
+  // @@@ HARDCODED LIMIT OF 64 VERTICES!
+  static GLfloat glverts[4*64];
+  int vtidx = 0;
+  float sx, sy, sz, one_over_sz;
+  for (i = 0; i < poly.num; i++)
+  {
+    sx = poly.vertices[i].sx - width2;
+    sy = poly.vertices[i].sy - height2;
+    one_over_sz = M * sx + N * sy + O;
+    sz = 1.0 / one_over_sz;
+    glverts[vtidx++] = poly.vertices[i].sx * sz;
+    glverts[vtidx++] = poly.vertices[i].sy * sz;
+    glverts[vtidx++] = -1.0;
+    glverts[vtidx++] = sz;
+  }
+
+  GLfloat* p_glverts;
+  p_glverts = glverts;
+
+  glBegin (GL_TRIANGLE_FAN);
+  for (i = 0 ; i < poly.num ; i++)
+  {
+    glVertex4fv (p_glverts); p_glverts += 4;
+  }
+  glEnd ();
+}
+
 void csGraphics3DOGLCommon::DrawPolygonDebug (G3DPolygonDP &/* poly */ )
 {
 }
@@ -1283,7 +1370,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   {
     tr_verts.SetLimit (mesh.num_vertices);
     uv_verts.SetLimit (mesh.num_vertices);
-    rgba_verts.SetLimit(mesh.num_vertices*4);
+    rgba_verts.SetLimit (mesh.num_vertices*4);
     color_verts.SetLimit (mesh.num_vertices);
     fog_intensities.SetLimit (mesh.num_vertices);
     fog_color_verts.SetLimit (mesh.num_vertices);
@@ -1446,7 +1533,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
   if (m_gouraud && work_colors)
   {
-    glEnableClientState(GL_COLOR_ARRAY);
+    glEnableClientState (GL_COLOR_ARRAY);
     
     // special hack for transparent meshes
     if (mesh.fxmode & CS_FX_ALPHA)
@@ -1458,11 +1545,11 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
         rgba_verts[k++] = work_colors[i].blue;
 	rgba_verts[k++] = m_alpha;
       }
-      glColorPointer(4, GL_FLOAT, 0, &rgba_verts[0]);
+      glColorPointer (4, GL_FLOAT, 0, &rgba_verts[0]);
     }
     else
     {
-      glColorPointer(3, GL_FLOAT, 0, & work_colors[0]);
+      glColorPointer (3, GL_FLOAT, 0, & work_colors[0]);
     }
   }
   else
@@ -1480,11 +1567,11 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     glColor4f (flat_r, flat_g, flat_b, m_alpha);
   }
   
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  glVertexPointer(3, GL_FLOAT, 0, & work_verts[0]);
-  glTexCoordPointer(2, GL_FLOAT, 0, & work_uv_verts[0]);
-  glDrawElements(GL_TRIANGLES, mesh.num_triangles*3 , GL_UNSIGNED_INT, & triangles[0]);
+  glEnableClientState (GL_VERTEX_ARRAY);
+  glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+  glVertexPointer (3, GL_FLOAT, 0, & work_verts[0]);
+  glTexCoordPointer (2, GL_FLOAT, 0, & work_uv_verts[0]);
+  glDrawElements (GL_TRIANGLES, mesh.num_triangles*3 , GL_UNSIGNED_INT, & triangles[0]);
 
   // If there is vertex fog then we apply that last.
   if (mesh.do_fog)
@@ -1523,18 +1610,18 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
   if (m_gouraud && work_colors)
   {
-    glDisableClientState(GL_COLOR_ARRAY);
+    glDisableClientState (GL_COLOR_ARRAY);
   }
 
-  glDisableClientState(GL_VERTEX_ARRAY);
-  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+  glDisableClientState (GL_VERTEX_ARRAY);
+  glDisableClientState (GL_TEXTURE_COORD_ARRAY);
 
   FinishPolygonFX ();
 
-  glMatrixMode(GL_MODELVIEW);
-  glPopMatrix();
-  glMatrixMode(GL_PROJECTION);
-  glPopMatrix();
+  glMatrixMode (GL_MODELVIEW);
+  glPopMatrix ();
+  glMatrixMode (GL_PROJECTION);
+  glPopMatrix ();
 }
 
 
@@ -1707,26 +1794,27 @@ void csGraphics3DOGLCommon::SetGLZBufferFlags ()
 {
   switch (z_buf_mode)
   {
-  case CS_ZBUF_NONE:
-    glDisable (GL_DEPTH_TEST);
-    break;
-  case CS_ZBUF_FILL:
-    glEnable (GL_DEPTH_TEST);
-    glDepthFunc (GL_ALWAYS);
-    glDepthMask (GL_TRUE);
-    break;
-  case CS_ZBUF_TEST:
-    glEnable (GL_DEPTH_TEST);
-    glDepthFunc (GL_GREATER);
-    glDepthMask (GL_FALSE);
-    break;
-  case CS_ZBUF_USE:
-    glEnable (GL_DEPTH_TEST);
-    glDepthFunc (GL_GREATER);
-    glDepthMask (GL_TRUE);
-    break;
-  default:
-    break;
+    case CS_ZBUF_NONE:
+      glDisable (GL_DEPTH_TEST);
+      break;
+    case CS_ZBUF_FILL:
+    case CS_ZBUF_FILLONLY:
+      glEnable (GL_DEPTH_TEST);
+      glDepthFunc (GL_ALWAYS);
+      glDepthMask (GL_TRUE);
+      break;
+    case CS_ZBUF_TEST:
+      glEnable (GL_DEPTH_TEST);
+      glDepthFunc (GL_GREATER);
+      glDepthMask (GL_FALSE);
+      break;
+    case CS_ZBUF_USE:
+      glEnable (GL_DEPTH_TEST);
+      glDepthFunc (GL_GREATER);
+      glDepthMask (GL_TRUE);
+      break;
+    default:
+      break;
   }
 }
 
@@ -1946,6 +2034,12 @@ float csGraphics3DOGLCommon::GetZBuffValue (int x, int y)
 
 void csGraphics3DOGLCommon::DrawPolygon (G3DPolygonDP & poly)
 {
+  if (z_buf_mode == CS_ZBUF_FILLONLY)
+  {
+    DrawPolygonZFill (poly);
+    return;
+  }
+
 #if USE_EXTENSIONS
   if (ARB_multitexture)
   {
