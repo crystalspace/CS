@@ -488,22 +488,21 @@ bool csArchive::WriteZipArchive ()
       else
       {
         this_file = (ArchiveEntry *) FindName (this_name);
-        if (this_file)
-        {
-          delete [] this_name;
-          if (this_file->info.csize != lfh.csize)
-            goto temp_failed;   /* Broken archive */
-          this_file->ReadExtraField (file, lfh.extra_field_length);
-          bytes_to_skip = 0;
-          bytes_to_copy = lfh.csize;
-          if (!this_file->WriteLFH (temp))
-            goto temp_failed;   /* Write error */
-        }
-        else
+        delete [] this_name;
+
+        if (!this_file)
         {
           DEBUG_BREAK;
           goto skip_file;       /* hmm... strange. */
         }
+
+        if (this_file->info.csize != lfh.csize)
+          goto temp_failed;   /* Broken archive */
+        this_file->ReadExtraField (file, lfh.extra_field_length);
+        bytes_to_skip = 0;
+        bytes_to_copy = lfh.csize;
+        if (!this_file->WriteLFH (temp))
+          goto temp_failed;   /* Write error */
       }
     }
     else if (memcmp (buff, hdr_central, sizeof (hdr_central)) == 0)
