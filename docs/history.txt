@@ -48,6 +48,8 @@ chronological order.
 	  how priority-based system works.  Added missing material.  Clarified
 	  existing material.  Added section detailing MacOS/X-specific storgage
 	  of user-specific settings via NSUserDefaults.
+	- Eric Sunshine fixed some transpositional borkness in xmlfmt.txi, as
+	  well as some other minor formatting issues.
 13-Oct-2003
 	- Eric Sunshine eliminated several compilation warnings from Walktest.
 	- Jorrit fixed phystut for the latest polygon changes.

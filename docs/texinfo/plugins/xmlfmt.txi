@@ -8,16 +8,14 @@
 This section describes the the Crystal Space map, which uses @sc{xml}, and is a
 companion to the @sc{xml} schema file residing at:
 
-There is also a HOWTO on loading a map file (@pxref{HOWTO Level Loading})
-and a HOWTO with a simple map example (@pxref{HOWTO Simple Map Example}).
-
 @noindent
-@code{CS/scripts/xml/cs_world.xsd}
+@file{CS/scripts/xml/cs_world.xsd}
 
 This document is not yet complete but it should give you sufficient information
 to get started.  For the format of the mesh object loaders you should look at
-the appropriate mesh object documentation (@pxref{MeshObject}).  Also consult
-the @sc{howto} for a simple map file (@pxref{HOWTO Simple Map Example}).
+the appropriate mesh object documentation (@pxref{MeshObject}).  There is also
+a @sc{howto} on loading a map file (@pxref{HOWTO Level Loading}) and a
+@sc{howto} with a simple map example (@pxref{HOWTO Simple Map Example}).
 
 The Crystal Space engine, itself, does not care about the external format of
 world data, nor does it care about how that information was obtained.  It is
@@ -30,6 +28,14 @@ many possibilities.
 The map file syntax described in this section, however, is that which is
 understood by the standard map file loader which accompanies Crystal Space.
 It deals strictly with plain-text @sc{xml}-format files.
+
+@menu
+* XML Init Section:: Initalization Section
+* XML World Element Section:: World Element Section
+* XML World Definition Section:: World Definition Section
+* XML Action Section:: Action Section
+* Old Map File Format:: Old Format of Map File
+@end menu
 
 @subsubheading Basic Structure
 
@@ -81,14 +87,6 @@ highest level you have sectors. In every sector the actual objects reside
 Finally there is the action section. In this section sequences and
 triggers are used to define interactions and other special actions on
 objects and other objects in the world.
-
-@menu
-* XML Init Section:: Initalization Section
-* XML World Element Section:: World Element Section
-* XML World Definition Section:: World Definition Section
-* XML Action Section:: Action Section
-* Old Map File Format:: Old Format of Map File
-@end menu
 
 @node XML Init Section, XML World Element Section, XML File Format, XML File Format
 @subsection Initalization Section
@@ -188,12 +186,12 @@ since the entire effect/shader system is still work in progress.
 @subsubheading Sounds Section
 @cindex sounds (Map File)
 
-Todo.
+@@@@@@Todo.
 
 @subsubheading Variable Section
 @cindex variables (Map File)
 
-Todo.
+@@@@@@Todo.
 
 @subsubheading Render Priority Section
 @cindex render priorities (Map File)
@@ -290,8 +288,8 @@ the engine (at least static ambient lighting). You can set the ambient
 for a level in the settings block. Default ambient is 0.078 for all color
 components.
 
-With @samp{fastmesh} you can control at which point CS will use
-@code{CS_THING_FASTMESH} for a thing. This is a faster routine (in principle)
+With @samp{fastmesh} you can control at which point Crystal Space will use
+@samp{CS_THING_FASTMESH} for a thing. This is a faster routine (in principle)
 but at this moment it only seems to pay off for objects with a high
 number of polygons. The default is 500.
 
@@ -305,17 +303,17 @@ default. But you can have multiple start locations and refer to them by
 name in your application. Here is an example:
 
 @example
-    <start>
-        <sector>room</sector>
-        <position x="0" y="0" z="0" />
-    </start>
-    <start name="alternate">
-        <sector>other_room</sector>
-        <position x="0" y="0" z="0" />
-        <up x="0" y="-1" z="0" />
-        <forward x="0" y="0" z="-1" />
-        <farplane a="0" b="0" c="1" d="100" />
-    </start>
+<start>
+    <sector>room</sector>
+    <position x="0" y="0" z="0" />
+</start>
+<start name="alternate">
+    <sector>other_room</sector>
+    <position x="0" y="0" z="0" />
+    <up x="0" y="-1" z="0" />
+    <forward x="0" y="0" z="-1" />
+    <farplane a="0" b="0" c="1" d="100" />
+</start>
 @end example
 
 If there is no start location then by convention many applications assume
@@ -333,7 +331,7 @@ the camera will be looking to the negative z axis. By default the camera
 looks in the positive z direction.
 
 The last @samp{farplane} option is interesting. It indicates that all
-geometry beyond @code{z=100} will be clipped away. You can use this if
+geometry beyond @samp{z=100} will be clipped away. You can use this if
 you want to speed up rendering and you know that objects further away than
 the specified distance are not interesting or you use fog that would have
 made them invisible anyway. Note that fog alone doesn't do that. By default
@@ -389,7 +387,7 @@ the addon is called is given as a @emph{context} to the addon loader
 so that it can choose to do with it whatever it wants. For example, you
 could make an addon plugin for your own game that sets up a physics
 object for a mesh object. To do that you would have to create a plugin
-that implements the @code{iLoaderPlugin} interface. In the plugin
+that implements the @samp{iLoaderPlugin} interface. In the plugin
 implementation you can examine the context and based on that create some
 information that you can attach to that context (if it is a mesh object
 for example). The addon plugin will also get an @sc{xml} node that it
@@ -656,4 +654,3 @@ This section describes the action section.
 With the sequences and triggers section you can define actions and
 interactions on objects in your map file. These sections are used to drive
 the engine sequence manager (@pxref{Sequence Manager}).
-
