@@ -23,6 +23,16 @@ chronological order.
 	  outside bounds which wasn't used).
 	  Additionally, the freefnt2 plugin sometimes did a new[0], which
 	  is bad as well, changed it to allocate at least 1 byte.
+15-Nov-2003
+	- Jorrit fixed various significant bugs in Dynavis related to the
+	  depth buffer. The bug had to do with the fact that a tile is now
+	  64 wide while all coverage buffer routines assumed it was only
+	  32 wide. This caused the depth buffer to be wrongly updated
+	  which in turn could cause culling errors (very rare) but more
+	  also reduced culling efficiency a lot. With this bug fixed framerate
+	  goes up one or two fps again.
+	- Jorrit removed the ability in Dynavis to use tiles of 64 high.
+	  This only complicates matters and it wasn't working well anyway.
 14-Nov-2003
 	- Jorrit did the following Dynavis changes:
 	    - Removed the write queue optimization for kdtree nodes again as

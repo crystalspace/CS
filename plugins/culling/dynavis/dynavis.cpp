@@ -916,6 +916,7 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
   	outline_info.outline_verts,
   	outline_info.outline_edges, outline_info.num_outline_edges,
 	do_cull_outline_splatting);
+  (void)rc;
 # ifdef CS_DEBUG
   if (do_state_dump)
   {

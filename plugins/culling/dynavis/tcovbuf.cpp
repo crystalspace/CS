@@ -47,12 +47,12 @@ void csCoverageTile::MakePrecalcTables ()
   int i, j;
   for (i = 0 ; i < NUM_TILEROW ; i++)
   {
-    precalc_start_lines[i].Empty ();
+    precalc_start_lines[i] = 0;
     for (j = 0 ; j <= i ; j++)
-      precalc_start_lines[i].XorBit (j);
-    precalc_end_lines[i].Empty ();
+      precalc_start_lines[i] ^= 1 << j;
+    precalc_end_lines[i] = 0;
     for (j = i ; j < NUM_TILEROW ; j++)
-      precalc_end_lines[i].XorBit (j);
+      precalc_end_lines[i] ^= 1 << j;
   }
 }
 
@@ -139,7 +139,7 @@ void csCoverageTile::PerformOperations ()
     if (op.op == OP_FULLVLINE)
     {
       CS_ASSERT (op.x1 >= 0 && op.x1 <= (NUM_TILECOL<<16));
-      coverage_cache[op.x1 >> 16].Invert ();
+      coverage_cache[op.x1>>16] = ~coverage_cache[op.x1>>16];
     }
     else if (op.op == OP_VLINE)
     {
@@ -157,7 +157,7 @@ void csCoverageTile::PerformOperations ()
       csTileCol& cc = coverage_cache[op.x1 >> 16];
       cc ^= start;
       cc ^= end;
-      cc.Invert ();
+      cc = ~cc;
     }
     else // OP_LINE
     {
@@ -179,7 +179,8 @@ void csCoverageTile::PerformOperations ()
 	CS_ASSERT ((x>>16) >= 0);
 	CS_ASSERT ((x>>16) < NUM_TILECOL);
 	csTileCol& cc = coverage_cache[x >> 16];
-	cc.XorBit (y);
+	// @@@ Optimize by keeping 1<<y and shifting it...
+	cc ^= 1 << y;
         x += dx;
         y++;
         dy--;
@@ -204,13 +205,9 @@ void csCoverageTile::PerformOperationsOnlyFValue (csTileCol& fvalue)
   for (i = 0 ; i < num_operations ; i++)
   {
     csLineOperation& op = operations[i];
-    if (op.op == OP_FULLVLINE)
-    {
-      // We have a full line (from top to bottom). In this case
-      // we simply invert the fvalue.
-      fvalue.Invert ();
-    }
-    else
+    // If we have a full line (from top to bottom) we can
+    // simply invert the fvalue.
+    if (op.op != OP_FULLVLINE)
     {
       // We can ignore the x value of the line here. So VLINE and
       // LINE are equivalent in this case.
@@ -226,8 +223,8 @@ void csCoverageTile::PerformOperationsOnlyFValue (csTileCol& fvalue)
       // Xor the line with the fvalue. This happens in three stages:
       fvalue ^= start;
       fvalue ^= end;
-      fvalue.Invert ();
     }
+    fvalue = ~fvalue;
   }
 }
 
@@ -257,28 +254,20 @@ void csCoverageTile::FlushForEmptyConstFValue (csTileCol& fvalue,
   }
   // Since the tile is empty we can set tile_full to true if fvalue is
   // full.
-  tile_full = fvalue.IsFull ();
+  tile_full = fvalue == (uint32)~0;
 
   // Now do the depth update. Here we will use fvalue to detect where
   // to update depth because we know every column is set to that.
-  if (fvalue.CheckByte0 ())
-    depth[0] = depth[1] = depth[2] = depth[3] = maxdepth;
-  if (fvalue.CheckByte1 ())
-    depth[4] = depth[5] = depth[6] = depth[7] = maxdepth;
-  if (fvalue.CheckByte2 ())
-    depth[8] = depth[9] = depth[10] = depth[11] = maxdepth;
-  if (fvalue.CheckByte3 ())
-    depth[12] = depth[13] = depth[14] = depth[15] = maxdepth;
-#if NUM_TILEROW==64
-  if (fvalue.CheckByte4 ())
-    depth[16] = depth[17] = depth[18] = depth[19] = maxdepth;
-  if (fvalue.CheckByte5 ())
-    depth[20] = depth[21] = depth[22] = depth[23] = maxdepth;
-  if (fvalue.CheckByte6 ())
-    depth[24] = depth[25] = depth[26] = depth[27] = maxdepth;
-  if (fvalue.CheckByte7 ())
-    depth[28] = depth[29] = depth[30] = depth[31] = maxdepth;
-#endif
+  float* ldepth = depth;
+  csTileCol test;
+  test = fvalue;
+  while (test)
+  {
+    if (test & 0xff)
+    { i = NUM_DEPTHCOL; while (i > 0) { *ldepth++ = maxdepth; i--; } }
+    else ldepth += NUM_DEPTHCOL;
+    test >>= 8;
+  }
 
   // Tile was empty before so we can simply set min and max depth
   // to the input depth.
@@ -307,8 +296,7 @@ void csCoverageTile::FlushNoDepthConstFValue (csTileCol& fvalue, float maxdepth,
   // 'fulltest' will be used to test if the resulting tile is full.
   // We will initialize it to full and then and it with every column. If
   // 'fulltest' is still full after the loop then we know the tile is full.
-  csTileCol fulltest;
-  fulltest.Full ();
+  csTileCol fulltest = ~0;
 
   if (modified)
   {
@@ -322,63 +310,49 @@ void csCoverageTile::FlushNoDepthConstFValue (csTileCol& fvalue, float maxdepth,
   }
   else
   {
-    // 'test' is a work variable used through the loop.
-    csTileCol test;
+    // In this case we have to test if the coverage buffer is modified.
 
     // 'mods' is used to test if our 'fvalue' mask modifies the
     // coverage buffer anywhere.
-    csTileCol mods;
-    mods.Empty ();
+    csTileCol mods = 0;
 
     for (i = 0 ; i < NUM_TILECOL ; i++)
     {
-      test = fvalue;
-      test.AndInverted (*c);
-      mods |= test;
+      mods |= fvalue & ~*c;
       *c |= fvalue;
       fulltest &= *c;
       c++;
     }
-    if (!mods.IsEmpty ())
+    if (mods)
       modified = true;
   }
 
-  // Check for full coverage.
+  // Check for full coverage of 8x8 blocks. If we have full coverage
+  // of such a block we can improve the depth value of that block (i.e.
+  // make it lower). Since we have a constant fvalue in this routine we
+  // can use fvalue to test coverage of all horizontal blocks in a row.
   csTileCol test;
-  test = fvalue;
-  test.Invert ();
+  test = ~fvalue;
   bool recheck_depth = false;
-  if (!test.CheckByte0 ())
+  float* ldepth = depth;
+  int j = 4;
+  while (j > 0)
   {
-    if (maxdepth < depth[0]) { depth[0] = maxdepth; recheck_depth = true; }
-    if (maxdepth < depth[1]) { depth[1] = maxdepth; recheck_depth = true; }
-    if (maxdepth < depth[2]) { depth[2] = maxdepth; recheck_depth = true; }
-    if (maxdepth < depth[3]) { depth[3] = maxdepth; recheck_depth = true; }
+    if (!(test & 0xff))
+    {
+      i = NUM_DEPTHCOL;
+      while (i > 0)
+      {
+        if (maxdepth < *ldepth) { *ldepth = maxdepth; recheck_depth = true; }
+        ldepth++;
+        i--;
+      }
+    }
+    else ldepth += NUM_DEPTHCOL;
+    test >>= 8;
+    j--;
   }
-  if (!test.CheckByte1 ())
-  {
-    if (maxdepth < depth[4]) { depth[4] = maxdepth; recheck_depth = true; }
-    if (maxdepth < depth[5]) { depth[5] = maxdepth; recheck_depth = true; }
-    if (maxdepth < depth[6]) { depth[6] = maxdepth; recheck_depth = true; }
-    if (maxdepth < depth[7]) { depth[7] = maxdepth; recheck_depth = true; }
-  }
-  if (!test.CheckByte2 ())
-  {
-    if (maxdepth < depth[8]) { depth[8] = maxdepth; recheck_depth = true; }
-    if (maxdepth < depth[9]) { depth[9] = maxdepth; recheck_depth = true; }
-    if (maxdepth < depth[10]) { depth[10] = maxdepth; recheck_depth = true; }
-    if (maxdepth < depth[11]) { depth[11] = maxdepth; recheck_depth = true; }
-  }
-  if (!test.CheckByte3 ())
-  {
-    if (maxdepth < depth[12]) { depth[12] = maxdepth; recheck_depth = true; }
-    if (maxdepth < depth[13]) { depth[13] = maxdepth; recheck_depth = true; }
-    if (maxdepth < depth[14]) { depth[14] = maxdepth; recheck_depth = true; }
-    if (maxdepth < depth[15]) { depth[15] = maxdepth; recheck_depth = true; }
-  }
-#if NUM_TILEROW==64
-  @@@ TODO
-#endif
+
   if (recheck_depth)
   {
     modified = true;
@@ -388,8 +362,8 @@ void csCoverageTile::FlushNoDepthConstFValue (csTileCol& fvalue, float maxdepth,
       if (depth[i] < tile_min_depth) tile_min_depth = depth[i];
       else if (depth[i] > tile_max_depth) tile_max_depth = depth[i];
   }
-  
-  tile_full = fulltest.IsFull ();
+
+  tile_full = fulltest == (uint32)~0;
 }
 
 void csCoverageTile::FlushGeneralConstFValue (csTileCol& fvalue, float maxdepth,
@@ -403,27 +377,21 @@ void csCoverageTile::FlushGeneralConstFValue (csTileCol& fvalue, float maxdepth,
   // 'fulltest' will be used to test if the resulting tile is full.
   // We will initialize it to full and then and it with every column. If
   // 'fulltest' is still full after the loop then we know the tile is full.
-  csTileCol fulltest;
-  fulltest.Full ();
+  csTileCol fulltest = ~0;
 
   csTileCol* c = coverage;      
   // For every 8 columns...
   for (i = 0 ; i < (NUM_TILECOL/8) ; i++)
   {
-    // 'test' is a work variable used through the loop.
-    csTileCol test;
     // 'mods' is used to test if our 'fvalue' mask modifies the
     // coverage buffer anywhere. Only where 'mods' is true do we have
     // to update depth later.
-    csTileCol mods;
-    mods.Empty ();
+    csTileCol mods = 0;
 
     int j = 8;
     while (j > 0)
     {
-      test = fvalue;
-      test.AndInverted (*c);
-      mods |= test;
+      mods |= fvalue & ~*c;
       *c |= fvalue;
       fulltest &= *c;
       c++;
@@ -432,92 +400,46 @@ void csCoverageTile::FlushGeneralConstFValue (csTileCol& fvalue, float maxdepth,
 
     // If 'mods' is not empty we test individual bytes of 'mods' to
     // see which depth values we have to update.
-    if (!mods.IsEmpty ())
+    if (mods)
     {
       modified = true;
       float* ldepth = &depth[i];
-      {
-        float& d = ldepth[0];
-        if (mods.CheckByte0 ())
-	  if (maxdepth > d) d = maxdepth;
-      }
-      {
-        float& d = ldepth[4];
-        if (mods.CheckByte1 ())
-	  if (maxdepth > d) d = maxdepth;
-      }
-      {
-        float& d = ldepth[8];
-        if (mods.CheckByte2 ())
-	  if (maxdepth > d) d = maxdepth;
-      }
-      {
-        float& d = ldepth[12];
-        if (mods.CheckByte3 ())
-	  if (maxdepth > d) d = maxdepth;
-      }
-#if NUM_TILEROW==64
-      {
-        float& d = ldepth[16];
-        if (mods.CheckByte4 ())
-	  if (maxdepth > d) d = maxdepth;
-      }
-      {
-        float& d = ldepth[20];
-        if (mods.CheckByte5 ())
-	  if (maxdepth > d) d = maxdepth;
-      }
-      {
-        float& d = ldepth[24];
-        if (mods.CheckByte6 ())
-	  if (maxdepth > d) d = maxdepth;
-      }
-      {
-        float& d = ldepth[28];
-        if (mods.CheckByte7 ())
-	  if (maxdepth > d) d = maxdepth;
-      }
-#endif
+      if (mods & 0xff) if (maxdepth > *ldepth) *ldepth = maxdepth;
+      ldepth += NUM_DEPTHCOL;
+      if (mods & 0xff00) if (maxdepth > *ldepth) *ldepth = maxdepth;
+      ldepth += NUM_DEPTHCOL;
+      if (mods & 0xff0000) if (maxdepth > *ldepth) *ldepth = maxdepth;
+      ldepth += NUM_DEPTHCOL;
+      if (mods & 0xff000000) if (maxdepth > *ldepth) *ldepth = maxdepth;
     }
   }
 
-  tile_full = fulltest.IsFull ();
+  tile_full = fulltest == (uint32)~0;
 
-  // Check for full coverage.
+  // Check for full coverage of 8x8 blocks. If we have full coverage
+  // of such a block we can improve the depth value of that block (i.e.
+  // make it lower). Since we have a constant fvalue in this routine we
+  // can use fvalue to test coverage of all horizontal blocks in a row.
   csTileCol test;
-  test = fvalue;
-  test.Invert ();
-  if (!test.CheckByte0 ())
+  test = ~fvalue;
+  float* ldepth = depth;
+  int j = 4;
+  while (j > 0)
   {
-    if (maxdepth < depth[0]) { depth[0] = maxdepth; modified = true; }
-    if (maxdepth < depth[1]) { depth[1] = maxdepth; modified = true; }
-    if (maxdepth < depth[2]) { depth[2] = maxdepth; modified = true; }
-    if (maxdepth < depth[3]) { depth[3] = maxdepth; modified = true; }
+    if (!(test & 0xff))
+    {
+      i = NUM_DEPTHCOL;
+      while (i > 0)
+      {
+        if (maxdepth < *ldepth) { *ldepth = maxdepth; modified = true; }
+        ldepth++;
+        i--;
+      }
+    }
+    else ldepth += NUM_DEPTHCOL;
+    test >>= 8;
+    j--;
   }
-  if (!test.CheckByte1 ())
-  {
-    if (maxdepth < depth[4]) { depth[4] = maxdepth; modified = true; }
-    if (maxdepth < depth[5]) { depth[5] = maxdepth; modified = true; }
-    if (maxdepth < depth[6]) { depth[6] = maxdepth; modified = true; }
-    if (maxdepth < depth[7]) { depth[7] = maxdepth; modified = true; }
-  }
-  if (!test.CheckByte2 ())
-  {
-    if (maxdepth < depth[8]) { depth[8] = maxdepth; modified = true; }
-    if (maxdepth < depth[9]) { depth[9] = maxdepth; modified = true; }
-    if (maxdepth < depth[10]) { depth[10] = maxdepth; modified = true; }
-    if (maxdepth < depth[11]) { depth[11] = maxdepth; modified = true; }
-  }
-  if (!test.CheckByte3 ())
-  {
-    if (maxdepth < depth[12]) { depth[12] = maxdepth; modified = true; }
-    if (maxdepth < depth[13]) { depth[13] = maxdepth; modified = true; }
-    if (maxdepth < depth[14]) { depth[14] = maxdepth; modified = true; }
-    if (maxdepth < depth[15]) { depth[15] = maxdepth; modified = true; }
-  }
-#if NUM_TILEROW==64
-  @@@ TODO
-#endif
 
   if (maxdepth < tile_min_depth || maxdepth > tile_max_depth)
   {
@@ -552,21 +474,18 @@ void csCoverageTile::FlushForEmpty (csTileCol& fvalue, float maxdepth,
   // 'fulltest' will be used to test if the resulting tile is full.
   // We will initialize it to full and then and it with every column. If
   // 'fulltest' is still full after the loop then we know the tile is full.
-  csTileCol fulltest;
-  fulltest.Full ();
+  csTileCol fulltest = ~0;
+  //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
   // Now do the depth update. Here we will use the coverage (instead of
   // coverage_cache which is used in the general case) to see where we
   // need to update the depth buffer.
   for (i = 0 ; i < (NUM_TILECOL/8) ; i++)
   {
-    float* ldepth = &depth[i];
-
     // 'mods' is used to test if our 'fvalue' mask modifies the
     // coverage buffer anywhere. Only where 'mods' is true do we have
     // to update depth later.
-    csTileCol mods;
-    mods.Empty ();
+    csTileCol mods = 0;
 
     int j = 8;
     while (j > 0)
@@ -580,23 +499,21 @@ void csCoverageTile::FlushForEmpty (csTileCol& fvalue, float maxdepth,
       j--;
     }
 
-    if (!mods.IsEmpty ())
+    if (mods)
     {
       modified = true;
-      if (mods.CheckByte0 ()) ldepth[0] = maxdepth;
-      if (mods.CheckByte1 ()) ldepth[4] = maxdepth;
-      if (mods.CheckByte2 ()) ldepth[8] = maxdepth;
-      if (mods.CheckByte3 ()) ldepth[12] = maxdepth;
-#if NUM_TILEROW==64
-      if (mods.CheckByte4 ()) ldepth[16] = maxdepth;
-      if (mods.CheckByte5 ()) ldepth[20] = maxdepth;
-      if (mods.CheckByte6 ()) ldepth[24] = maxdepth;
-      if (mods.CheckByte7 ()) ldepth[28] = maxdepth;
-#endif
+      float* ldepth = &depth[i];
+      if (mods & 0xff) *ldepth = maxdepth;
+      ldepth += NUM_DEPTHCOL;
+      if (mods & 0xff00) *ldepth = maxdepth;
+      ldepth += NUM_DEPTHCOL;
+      if (mods & 0xff0000) *ldepth = maxdepth;
+      ldepth += NUM_DEPTHCOL;
+      if (mods & 0xff000000) *ldepth = maxdepth;
     }
   }
 
-  tile_full = fulltest.IsFull ();
+  tile_full = fulltest == (uint32)~0;
 
   tile_min_depth = maxdepth;
   tile_max_depth = maxdepth;
@@ -644,8 +561,7 @@ void csCoverageTile::FlushForFull (csTileCol& fvalue, float maxdepth,
     // 'fullcover' is used to detect if we fully cover some 8x8 block.
     // In that case we can reduce max depth instead of increasing it
     // (potentially improving culling efficiency).
-    csTileCol fullcover;
-    fullcover.Full ();
+    csTileCol fullcover = ~0;
 
     int j = 8;
     while (j > 0)
@@ -657,27 +573,21 @@ void csCoverageTile::FlushForFull (csTileCol& fvalue, float maxdepth,
     }
     // If 'fullcover' is not empty we test individual bytes to
     // see which depth values we have to update.
-    if (!fullcover.IsEmpty ())
+    if (fullcover)
     {
-      fullcover.Invert ();
-      if (!fullcover.CheckByte0 ())
-	if (maxdepth < depth[0]) { depth[0] = maxdepth; modified = true; }
-      if (!fullcover.CheckByte1 ())
-	if (maxdepth < depth[4]) { depth[4] = maxdepth; modified = true; }
-      if (!fullcover.CheckByte2 ())
-	if (maxdepth < depth[8]) { depth[8] = maxdepth; modified = true; }
-      if (!fullcover.CheckByte3 ())
-	if (maxdepth < depth[12]) { depth[12] = maxdepth; modified = true; }
-#if NUM_TILEROW==64
-      if (!fullcover.CheckByte4 ())
-	if (maxdepth < depth[16]) { depth[16] = maxdepth; modified = true; }
-      if (!fullcover.CheckByte5 ())
-	if (maxdepth < depth[20]) { depth[20] = maxdepth; modified = true; }
-      if (!fullcover.CheckByte6 ())
-	if (maxdepth < depth[24]) { depth[24] = maxdepth; modified = true; }
-      if (!fullcover.CheckByte7 ())
-	if (maxdepth < depth[28]) { depth[28] = maxdepth; modified = true; }
-#endif
+      float* ldepth = &depth[i];
+      fullcover = ~fullcover;
+      if (!(fullcover & 0xff))
+	if (maxdepth < *ldepth) { *ldepth = maxdepth; modified = true; }
+      ldepth += NUM_DEPTHCOL;
+      if (!(fullcover & 0xff00))
+	if (maxdepth < *ldepth) { *ldepth = maxdepth; modified = true; }
+      ldepth += NUM_DEPTHCOL;
+      if (!(fullcover & 0xff0000))
+	if (maxdepth < *ldepth) { *ldepth = maxdepth; modified = true; }
+      ldepth += NUM_DEPTHCOL;
+      if (!(fullcover & 0xff000000))
+	if (maxdepth < *ldepth) { *ldepth = maxdepth; modified = true; }
     }
   }
 
@@ -710,8 +620,7 @@ void csCoverageTile::FlushNoDepth (csTileCol& fvalue, float maxdepth,
   // 'fulltest' will be used to test if the resulting tile is full.
   // We will initialize it to full and then and it with every column. If
   // 'fulltest' is still full after the loop then we know the tile is full.
-  csTileCol fulltest;
-  fulltest.Full ();
+  csTileCol fulltest = ~0;
 
   csTileCol* cc = coverage_cache;
   csTileCol* c = coverage;
@@ -728,29 +637,24 @@ void csCoverageTile::FlushNoDepth (csTileCol& fvalue, float maxdepth,
   }
   else
   {
-    // 'test' is a work variable used through the loop.
-    csTileCol test;
     // 'mods' is used to test if our 'fvalue' mask modifies the
     // coverage buffer anywhere. Only where 'mods' is true do we have
     // to update depth later.
-    csTileCol mods;
-    mods.Empty ();
+    csTileCol mods = 0;
     for (i = 0 ; i < NUM_TILECOL ; i++)
     {
       fvalue ^= *cc;
-      test = fvalue;
-      test.AndInverted (*c);
-      mods |= test;
+      mods |= fvalue & ~*c;
       *c |= fvalue;
       fulltest &= *c;
       cc++;
       c++;
     }
-    if (!mods.IsEmpty ())
+    if (mods)
       modified = true;
   }
 
-  tile_full = fulltest.IsFull ();
+  tile_full = fulltest == (uint32)~0;
 }
 
 void csCoverageTile::FlushGeneral (csTileCol& fvalue, float maxdepth,
@@ -778,32 +682,25 @@ void csCoverageTile::FlushGeneral (csTileCol& fvalue, float maxdepth,
   // 'fulltest' will be used to test if the resulting tile is full.
   // We will initialize it to full and then and it with every column. If
   // 'fulltest' is still full after the loop then we know the tile is full.
-  csTileCol fulltest;
-  fulltest.Full ();
+  csTileCol fulltest = ~0;
 
   // For every 8 columns...
   for (i = 0 ; i < (NUM_TILECOL/8) ; i++)
   {
-    // 'test' is a work variable used through the loop.
-    csTileCol test;
     // 'mods' is used to test if our coverage cache modifies the
     // coverage buffer anywhere. Only where 'mods' is true do we have
     // to update depth later.
-    csTileCol mods;
-    mods.Empty ();
+    csTileCol mods = 0;
     // 'fullcover' is used to detect if we fully cover some 8x8 block.
     // In that case we can reduce max depth instead of increasing it
     // (potentially improving culling efficiency).
-    csTileCol fullcover;
-    fullcover.Full ();
+    csTileCol fullcover = ~0;
 
     int j = 8;
     while (j > 0)
     {
       fvalue ^= *cc;
-      test = fvalue;
-      test.AndInverted (*c);
-      mods |= test;
+      mods |= fvalue & ~*c;
       fullcover &= fvalue;
       *c |= fvalue;
       fulltest &= *c;
@@ -814,89 +711,28 @@ void csCoverageTile::FlushGeneral (csTileCol& fvalue, float maxdepth,
     // If 'mods' is not empty we test individual bytes of 'mods' to
     // see which depth values we have to update.
     // @@@ check on fullcover even if mods is empty!!!
-    if (!mods.IsEmpty ())
+    if (mods)
     {
       modified = true;
-      fullcover.Invert ();
+      fullcover = ~fullcover;
       float* ldepth = &depth[i];
+      int j = 4;
+      for (;;)
       {
-        float& d = ldepth[0];
-        if (!fullcover.CheckByte0 ())
-	{
-	  if (maxdepth < d) d = maxdepth;
-        }
-        else if (mods.CheckByte0 ())
-	  if (maxdepth > d) d = maxdepth;
+        if (!(fullcover & 0xff))
+        { if (maxdepth < *ldepth) *ldepth = maxdepth; }
+        else if (mods & 0xff)
+	  if (maxdepth > *ldepth) *ldepth = maxdepth;
+	j--;
+	if (j == 0) break;
+        ldepth += NUM_DEPTHCOL;
+	fullcover >>= 8;
+	mods >>= 8;
       }
-      {
-        float& d = ldepth[4];
-        if (!fullcover.CheckByte1 ())
-	{
-	  if (maxdepth < d) d = maxdepth;
-        }
-        else if (mods.CheckByte1 ())
-	  if (maxdepth > d) d = maxdepth;
-      }
-      {
-        float& d = ldepth[8];
-        if (!fullcover.CheckByte2 ())
-	{
-	  if (maxdepth < d) d = maxdepth;
-        }
-        else if (mods.CheckByte2 ())
-	  if (maxdepth > d) d = maxdepth;
-      }
-      {
-        float& d = ldepth[12];
-        if (!fullcover.CheckByte3 ())
-	{
-	  if (maxdepth < d) d = maxdepth;
-        }
-        else if (mods.CheckByte3 ())
-	  if (maxdepth > d) d = maxdepth;
-      }
-#if NUM_TILEROW==64
-      {
-        float& d = ldepth[16];
-        if (!fullcover.CheckByte4 ())
-	{
-	  if (maxdepth < d) d = maxdepth;
-        }
-        else if (mods.CheckByte4 ())
-	  if (maxdepth > d) d = maxdepth;
-      }
-      {
-        float& d = ldepth[20];
-        if (!fullcover.CheckByte5 ())
-	{
-	  if (maxdepth < d) d = maxdepth;
-        }
-        else if (mods.CheckByte5 ())
-	  if (maxdepth > d) d = maxdepth;
-      }
-      {
-        float& d = ldepth[24];
-        if (!fullcover.CheckByte6 ())
-	{
-	  if (maxdepth < d) d = maxdepth;
-        }
-        else if (mods.CheckByte6 ())
-	  if (maxdepth > d) d = maxdepth;
-      }
-      {
-        float& d = ldepth[28];
-        if (!fullcover.CheckByte7 ())
-	{
-	  if (maxdepth < d) d = maxdepth;
-        }
-        else if (mods.CheckByte7 ())
-	  if (maxdepth > d) d = maxdepth;
-      }
-#endif
     }
   }
 
-  tile_full = fulltest.IsFull ();
+  tile_full = fulltest == (uint32)~0;
 
   tile_min_depth = depth[0];
   tile_max_depth = depth[0];
@@ -911,7 +747,7 @@ void csCoverageTile::Flush (csTileCol& fvalue, float maxdepth, bool& modified)
   {
     // If there are no operations in this tile then there are three
     // special cases we can handle here.
-    if (fvalue.IsFull ())
+    if (fvalue == (uint32)~0)
     {
       // fvalue is full which means that the tile will be completely filled.
       int i;
@@ -963,7 +799,7 @@ void csCoverageTile::Flush (csTileCol& fvalue, float maxdepth, bool& modified)
       }
       return;
     }
-    else if (fvalue.IsEmpty ())
+    else if (fvalue == 0)
     {
       // fvalue is empty which means that there is nothing to do here.
       return;
@@ -1042,8 +878,7 @@ bool csCoverageTile::TestDepthFlushGeneral (csTileCol& fvalue, float mindepth)
     // 'mods' is used to test if our 'fvalue' mask modifies the
     // coverage buffer anywhere. Only where 'mods' is true do we have
     // to test depth later.
-    csTileCol mods;
-    mods.Empty ();
+    csTileCol mods = 0;
 
     int j = 8;
     while (j > 0)
@@ -1055,18 +890,13 @@ bool csCoverageTile::TestDepthFlushGeneral (csTileCol& fvalue, float mindepth)
     }
 
     float* ldepth = &depth[i];
-    if (!mods.IsEmpty ())
+    if (mods)
     {
-      if (mods.CheckByte0 () && mindepth <= ldepth[0]) return true;
-      if (mods.CheckByte1 () && mindepth <= ldepth[4]) return true;
-      if (mods.CheckByte2 () && mindepth <= ldepth[8]) return true;
-      if (mods.CheckByte3 () && mindepth <= ldepth[12]) return true;
-#if NUM_TILEROW==64
-      if (mods.CheckByte4 () && mindepth <= ldepth[16]) return true;
-      if (mods.CheckByte5 () && mindepth <= ldepth[20]) return true;
-      if (mods.CheckByte6 () && mindepth <= ldepth[24]) return true;
-      if (mods.CheckByte7 () && mindepth <= ldepth[28]) return true;
-#endif
+    //@@@ FIX ME! NOT CORRECT!
+      if ((mods & 0xff) && mindepth <= ldepth[0]) return true;
+      if ((mods & 0xff00) && mindepth <= ldepth[4]) return true;
+      if ((mods & 0xff0000) && mindepth <= ldepth[8]) return true;
+      if ((mods & 0xff000000) && mindepth <= ldepth[12]) return true;
     }
   }
   return false;
@@ -1074,7 +904,7 @@ bool csCoverageTile::TestDepthFlushGeneral (csTileCol& fvalue, float mindepth)
 
 bool csCoverageTile::TestDepthFlush (csTileCol& fvalue, float mindepth)
 {
-  if (num_operations == 0 && fvalue.IsEmpty ())
+  if (num_operations == 0 && fvalue == 0)
   {
     // If there are no operations and fvalue is empty then it is not
     // possible for the polygon to become visible in this tile.
@@ -1123,14 +953,10 @@ bool csCoverageTile::TestCoverageFlushGeneral (csTileCol& fvalue,
   csTileCol* cc = coverage_cache;
   csTileCol* c = coverage;      
 
-  // 'test' is a work variable used through the loop.
-  csTileCol test;
   for (i = 0 ; i < NUM_TILECOL ; i++)
   {
     fvalue ^= *cc;
-    test = fvalue;
-    test.AndInverted (*c);
-    if (!test.IsEmpty ())
+    if (fvalue & ~*c)
       return true;		// We modify coverage buffer so we are visible!
     cc++;
     c++;
@@ -1143,13 +969,13 @@ bool csCoverageTile::TestCoverageFlush (csTileCol& fvalue, float mindepth,
 {
   if (num_operations == 0)
   {
-    if (fvalue.IsEmpty ())
+    if (fvalue == 0)
     {
       // If there are no operations and fvalue is empty then it is not
       // possible for the polygon to become visible in this tile.
       return false;
     }
-    else if (fvalue.IsFull ())
+    else if (fvalue == (uint32)~0)
     {
       // If there are no operations and fvalue is full then visibility
       // depends fully on the 'full' state of the tile. In that case
@@ -1207,7 +1033,7 @@ bool csCoverageTile::TestCoverageRect (int start, int end, float testdepth,
     csTileCol* c = coverage+start;
     for (i = start ; i <= end ; i++)
     {
-      if (!c->IsFull ())
+      if (*c != (uint32)~0)
         return true;
       c++;
     }
@@ -1238,7 +1064,7 @@ bool csCoverageTile::TestCoverageRect (const csTileCol& vermask,
     csTileCol* c = coverage+start;
     for (i = start ; i <= end ; i++)
     {
-      if (vermask.TestInvertedMask (*c))
+      if (vermask & ~*c)
         return true;
       c++;
     }
@@ -1267,16 +1093,13 @@ bool csCoverageTile::TestDepthRect (int start, int end, float testdepth)
     // the corresponding depth value is relevant (i.e. testdepth < the
     // depth in the depth value). Only where the mask is true do we have
     // to check the coverage_cache.
-    if (testdepth < ld[0]) return true;
-    if (testdepth < ld[4]) return true;
-    if (testdepth < ld[8]) return true;
-    if (testdepth < ld[12]) return true;
-#if NUM_TILEROW==64
-    if (testdepth < ld[16]) return true;
-    if (testdepth < ld[20]) return true;
-    if (testdepth < ld[24]) return true;
-    if (testdepth < ld[28]) return true;
-#endif
+    if (testdepth < *ld) return true;
+    ld += NUM_DEPTHCOL;
+    if (testdepth < *ld) return true;
+    ld += NUM_DEPTHCOL;
+    if (testdepth < *ld) return true;
+    ld += NUM_DEPTHCOL;
+    if (testdepth < *ld) return true;
   }
   return false;
 }
@@ -1290,16 +1113,10 @@ bool csCoverageTile::TestDepthRect (const csTileCol& vermask,
   // of this tile then this rectangle cannot be visible.
   if (testdepth > tile_max_depth) return false;
 
-  int b0 = vermask.CheckByte0 ();
-  int b1 = vermask.CheckByte1 ();
-  int b2 = vermask.CheckByte2 ();
-  int b3 = vermask.CheckByte3 ();
-#if NUM_TILEROW==64
-  int b4 = vermask.CheckByte4 ();
-  int b5 = vermask.CheckByte5 ();
-  int b6 = vermask.CheckByte6 ();
-  int b7 = vermask.CheckByte7 ();
-#endif
+  int b0 = vermask & 0xff;
+  int b1 = vermask & 0xff00;
+  int b2 = vermask & 0xff0000;
+  int b3 = vermask & 0xff000000;
 
   // Test depth where appropriate.
   for (i = (start>>3) ; i <= (end>>3) ; i++)
@@ -1309,16 +1126,13 @@ bool csCoverageTile::TestDepthRect (const csTileCol& vermask,
     // the corresponding depth value is relevant (i.e. testdepth < the
     // depth in the depth value). Only where the mask is true do we have
     // to check the coverage_cache.
-    if (b0 && testdepth < ld[0]) return true;
-    if (b1 && testdepth < ld[4]) return true;
-    if (b2 && testdepth < ld[8]) return true;
-    if (b3 && testdepth < ld[12]) return true;
-#if NUM_TILEROW==64
-    if (b4 && testdepth < ld[16]) return true;
-    if (b5 && testdepth < ld[20]) return true;
-    if (b6 && testdepth < ld[24]) return true;
-    if (b7 && testdepth < ld[28]) return true;
-#endif
+    if (b0 && testdepth < *ld) return true;
+    ld += NUM_DEPTHCOL;
+    if (b1 && testdepth < *ld) return true;
+    ld += NUM_DEPTHCOL;
+    if (b2 && testdepth < *ld) return true;
+    ld += NUM_DEPTHCOL;
+    if (b3 && testdepth < *ld) return true;
   }
   return false;
 }
@@ -1349,7 +1163,7 @@ bool csCoverageTile::TestPoint (int x, int y, float testdepth)
   }
 
   const csTileCol& c = coverage[x];
-  return !c.TestBit (y);
+  return !(c & (1<<y));
 }
 
 csPtr<iString> csCoverageTile::Debug_Dump ()
@@ -1361,6 +1175,7 @@ csPtr<iString> csCoverageTile::Debug_Dump ()
   ss.Format ("full=%d queue_empty=%d\n",
   	tile_full, queue_tile_empty);
   str.Append (ss);
+  // @@@ FIXME
   ss.Format ("  d %g,%g,%g,%g\n", depth[0], depth[1], depth[2], depth[3]);
   str.Append (ss);
   ss.Format ("  d %g,%g,%g,%g\n", depth[4], depth[5], depth[6], depth[7]);
@@ -1410,7 +1225,7 @@ csPtr<iString> csCoverageTile::Debug_Dump ()
     for (j = 0 ; j < NUM_TILECOL ; j++)
     {
       const csTileCol& c = coverage[j];
-      str.Append (c.TestBit (i) ? "#" : ".");
+      str.Append ((c & (1<<i)) ? "#" : ".");
     }
     ss.Format (" %d\n", i);
     str.Append (ss);
@@ -1434,7 +1249,7 @@ csPtr<iString> csCoverageTile::Debug_Dump_Cache ()
     for (j = 0 ; j < NUM_TILECOL ; j++)
     {
       const csTileCol& c = coverage_cache[j];
-      str.Append (c.TestBit (i) ? "#" : ".");
+      str.Append ((c & (1<<i)) ? "#" : ".");
     }
     ss.Format (" %d\n", i);
     str.Append (ss);
@@ -2266,8 +2081,7 @@ bool csTiledCoverageBuffer::TestPolygon (csVector2* verts, int num_verts,
   bool do_depth_test = false;
   for (ty = startrow ; ty <= endrow ; ty++)
   {
-    csTileCol fvalue;
-    fvalue.Empty ();
+    csTileCol fvalue = 0;
     csCoverageTile* tile = GetTile (dirty_left[ty], ty);
     int dr = dirty_right[ty];
     if (dr >= (width_po2 >> SHIFT_TILECOL))
@@ -2303,8 +2117,7 @@ bool csTiledCoverageBuffer::TestPolygon (csVector2* verts, int num_verts,
   rc = false;
   for (ty = startrow ; ty <= endrow ; ty++)
   {
-    csTileCol fvalue;
-    fvalue.Empty ();
+    csTileCol fvalue = 0;
     csCoverageTile* tile = GetTile (dirty_left[ty], ty);
     int dr = dirty_right[ty];
     if (dr >= (width_po2 >> SHIFT_TILECOL))
@@ -2340,8 +2153,7 @@ bool csTiledCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
   bool modified = false;
   for (ty = startrow ; ty <= endrow ; ty++)
   {
-    csTileCol fvalue;
-    fvalue.Empty ();
+    csTileCol fvalue = 0;
     csCoverageTile* tile = GetTile (dirty_left[ty], ty);
     int dr = dirty_right[ty];
     if (dr >= (width_po2 >> SHIFT_TILECOL))
@@ -2377,8 +2189,7 @@ bool csTiledCoverageBuffer::InsertOutline (
   bool modified = false;
   for (ty = startrow ; ty <= endrow ; ty++)
   {
-    csTileCol fvalue;
-    fvalue.Empty ();
+    csTileCol fvalue = 0;
     csCoverageTile* tile = GetTile (dirty_left[ty], ty);
     int dr = dirty_right[ty];
     if (dr >= (width_po2 >> SHIFT_TILECOL))
@@ -2448,7 +2259,7 @@ bool csTiledCoverageBuffer::TestRectangle (const csTestRectData& data,
   for (ty = data.startrow ; ty <= data.endrow ; ty++)
   {
     bool do_vermask = false;
-    vermask.Full ();
+    vermask = ~0;
     if (ty == data.startrow && (data.bbox.miny & (NUM_TILEROW-1)) != 0)
     {
       vermask = csCoverageTile::precalc_end_lines[
@@ -2505,7 +2316,7 @@ bool csTiledCoverageBuffer::TestRectangle (const csTestRectData& data,
   for (ty = data.startrow ; ty <= data.endrow ; ty++)
   {
     bool do_vermask = false;
-    vermask.Full ();
+    vermask = ~0;
     if (ty == data.startrow && (data.bbox.miny & (NUM_TILEROW-1)) != 0)
     {
       vermask = csCoverageTile::precalc_end_lines[
@@ -2738,7 +2549,7 @@ csPtr<iString> csTiledCoverageBuffer::Debug_Dump ()
 	  if (!tile->queue_tile_empty)
 	    for (i = 0 ; i < 8 ; i++)
 	      for (j = 0 ; j < 8 ; j++)
-	        cnt += tile->coverage[x*8+i].TestBit (y*8+j);
+	        cnt += !!(tile->coverage[x*8+i] & (1 << (y*8+j)));
 	  char c;
 	  if (cnt == 64) c = '#';
 	  else if (cnt > 54) c = '*';
@@ -2780,7 +2591,7 @@ void csTiledCoverageBuffer::Debug_Dump (iGraphics3D* g3d, int /*zoom*/)
 	      if (tile->queue_tile_empty)
 	        val = false;
 	      else
-	        val = tile->coverage[x*8+i].TestBit (y*8+j);
+	        val = !!(tile->coverage[x*8+i] & (1 << (y*8+j)));
 	      if (val)
 	      {
 	        int c = 255-int (depth);
@@ -2795,13 +2606,6 @@ void csTiledCoverageBuffer::Debug_Dump (iGraphics3D* g3d, int /*zoom*/)
     }
   }
 }
-
-#if 0
-static float rnd (int totrange, int leftpad, int rightpad)
-{
-  return float (((rand () >> 4) % (totrange-leftpad-rightpad)) + leftpad);
-}
-#endif
 
 #define COV_ASSERT(test,msg) \
   if (!(test)) \
