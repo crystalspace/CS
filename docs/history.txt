@@ -19,6 +19,20 @@ chronological order.
 	- Jorrit added a test standalone portal to flarge (in comments for now).
 	- Jorrit fixed a bug in csSector::HitBeam(). It wasn't correctly
 	  using GetFullTransform().
+	- Eric Sunshine upgraded a bunch of outdated information in the
+	  reference-counting HOWTO in the user manual, and added lot of
+	  important information which was missing.
+	- Eric Sunshine heavily revised the SCF chapter of the user manual.  It
+	  was extremely outdated.  Also documented all of the features of the
+	  revised SCF implementation, such as .csplugin meta-files and
+	  automatic plugin discovery.
+	- Eric Sunshine update apimod98.txi to reflect all of the major SCF
+	  changes for version 0.98.
+	- Eric Sunshine finished updating the user manual to reflect all of the
+	  recent SCF changes.
+	- Eric Sunshine fixed formatting problems in msvc7proj.txi, and
+	  eliminated TeX warnings.
+	- Eric Sunshine repaired some mark-up problems in sequence.txi.
 	- Jorrit changed the api of the following functions:
 	    - iThingState->IntersectSegment() and
 	      iThingFactoryState->IntersectSegment() now return polygon index
@@ -34,20 +48,10 @@ chronological order.
 	      instead of a pointer.
 	    - iPortal->HitBeam() is renamed to HitBeamPortals() and now
 	      returns a mesh and polygon index.
-	- Eric Sunshine upgraded a bunch of outdated information in the
-	  reference-counting HOWTO in the user manual, and added lot of
-	  important information which was missing.
-	- Eric Sunshine heavily revised the SCF chapter of the user manual.  It
-	  was extremely outdated.  Also documented all of the features of the
-	  revised SCF implementation, such as .csplugin meta-files and
-	  automatic plugin discovery.
-	- Eric Sunshine update apimod98.txi to reflect all of the major SCF
-	  changes for version 0.98.
-	- Eric Sunshine finished updating the user manual to reflect all of the
-	  recent SCF changes.
-	- Eric Sunshine fixed formatting problems in msvc7proj.txi, and
-	  eliminated TeX warnings.
-	- Eric Sunshine repaired some mark-up problems in sequence.txi.
+	- Eric Sunshine eliminated a slew of compilation warnings from
+	  rgbpixel.h reported by MSVC regarding implicit conversion from int to
+	  unsigned char.  Also eliminated extremely dangerous code which
+	  assumed 32-bit architecture.
 23-Sep-2003
 	- Jorrit changed the default display depth in video.cfg from 16
 	  to 32. On 3D cards, CS performs awfully bad with 16-bit displays
