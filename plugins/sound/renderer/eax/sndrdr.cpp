@@ -73,7 +73,7 @@ bool csSoundRenderEAX::Initialize(iObjectRegistry *r)
   object_reg = r;
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  csRef<iEventQueue> q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
   {
     q->RegisterListener (scfiEventHandler,
@@ -91,7 +91,7 @@ csSoundRenderEAX::~csSoundRenderEAX()
 {
   if (scfiEventHandler)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+    csRef<iEventQueue> q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
     if (q != 0)
     {
       q->RemoveListener (scfiEventHandler);
@@ -104,7 +104,7 @@ csSoundRenderEAX::~csSoundRenderEAX()
 
 bool csSoundRenderEAX::Open()
 {
-  iReporter* reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (reporter)
     reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
   	"crystalspace.sound.eax",
@@ -163,7 +163,7 @@ bool csSoundRenderEAX::Open()
     	"  Volume: %g\n", GetVolume());
 
   csTicks et, ct;
-  iVirtualClock* vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  csRef<iVirtualClock> vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   et = vc->GetElapsedTicks ();
   ct = vc->GetCurrentTicks ();
   vc->DecRef ();
@@ -239,7 +239,7 @@ void csSoundRenderEAX::Update()
 {
   int i;
   csTicks et, ct;
-  iVirtualClock* vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  csRef<iVirtualClock> vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   et = vc->GetElapsedTicks ();
   ct = vc->GetCurrentTicks ();
   vc->DecRef ();

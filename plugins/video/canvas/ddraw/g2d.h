@@ -75,7 +75,7 @@ protected:
 
   HDC hdc;
 
-  iWin32Assistant* m_piWin32Assistant;
+  csRef<iWin32Assistant> m_piWin32Assistant;
 
   // Old window procedure (the one in win32.cpp)
   WNDPROC m_OldWndProc;

@@ -120,14 +120,14 @@ static bool Convert (const char *fontfile)
   if (opt.verbose)
     printf ("Loading font %s, size = %d\n", fontfile, opt.fontsize);
 
-  iFontServer *fs = CS_QUERY_REGISTRY (object_reg, iFontServer);
+  csRef<iFontServer> fs = CS_QUERY_REGISTRY (object_reg, iFontServer);
   if (!fs)
   {
     printf ("Font server plugin has not been loaded.\n");
     return false;
   }
 
-  iFont *font = fs->LoadFont (fontfile);
+  csRef<iFont> font = fs->LoadFont (fontfile);
   if (font == NULL)
   {
     printf ("Cannot load font file %s\n", fontfile);

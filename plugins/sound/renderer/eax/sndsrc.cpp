@@ -73,7 +73,7 @@ void csSoundSourceEAX::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (Renderer->object_reg,
+  csRef<iReporter> rep = CS_QUERY_REGISTRY (Renderer->object_reg,
   	iReporter);
   if (rep)
   {

@@ -35,7 +35,7 @@ struct iGraphics3D;
 struct iGraphics2D;
 struct iMaterialWrapper;
 struct iMeshObject;
-struct ClothIntegrator;
+class ClothIntegrator;
 
   /////////////////////////////////////////////////////////////////////////////////
  //-------------csStuffObject declaration --------------------------------------//
@@ -193,7 +193,7 @@ SCF_DECLARE_IBASE;
   /// Are manual colors enabled?
   virtual bool IsManualColors () const { return false; };
 } scfiGeneralMeshState;
-  friend class eiGeneralMeshState;
+  friend struct eiGeneralMeshState;
 };
 
 

@@ -69,7 +69,7 @@ bool csSoundListenerEAX::Initialize(csSoundRenderEAX *srdr) {
   dsbd.dwBufferBytes = 0;
   dsbd.lpwfxFormat = NULL;
 
-  iReporter* reporter = CS_QUERY_REGISTRY (Renderer->object_reg, iReporter); ;
+  csRef<iReporter> reporter = CS_QUERY_REGISTRY (Renderer->object_reg, iReporter); ;
 
   HRESULT r;
   r = Renderer->AudioRenderer->CreateSoundBuffer(&dsbd, &PrimaryBuffer, NULL);

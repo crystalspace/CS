@@ -84,7 +84,7 @@ void csGraphics2DDDraw3::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
   {
     rep->ReportV (severity, "crystalspace.canvas.ddraw", msg, arg);
@@ -113,7 +113,7 @@ bool csGraphics2DDDraw3::Initialize (iObjectRegistry *object_reg)
     exit(1);
   }
 
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (object_reg,
 						   iCommandLineParser);
   m_bHardwareCursor = config->GetBool ("Video.SystemMouseCursor", true);
   if (cmdline->GetOption ("sysmouse")) m_bHardwareCursor = true;

@@ -214,7 +214,7 @@ public:
   int defaultSize;
   iObjectRegistry *object_reg;
   csConfigAccess ftconfig;
-  iVFS *VFS;
+  csRef<iVFS> VFS;
   const char *fontset;
   bool freetype_inited;
 
