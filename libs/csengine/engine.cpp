@@ -2349,7 +2349,6 @@ int csEngine::GetNearbyLights (
   int max_num_lights)
 {
   int i;
-  float sqdist;
 
   if (!light_array)
   {
@@ -2400,7 +2399,6 @@ int csEngine::GetNearbyLights (
   int max_num_lights)
 {
   int i;
-  float sqdist;
 
   if (!light_array)
   {

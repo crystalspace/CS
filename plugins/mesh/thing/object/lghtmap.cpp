@@ -193,7 +193,6 @@ const char* csLightMap::ReadFromCache (
   PolySave ps, pswanted;
   LightHeader lh;
   LightSave ls;
-  iLight *light;
   int i;
 
   csThing* parent = poly->GetParent ();

@@ -43,6 +43,7 @@ chronological order.
 	- Eric Sunshine performed some Texinfo markup corrections in simple.txi
 	  and apimod98.txi, and eliminated TeX underfull hbox complaint from
 	  apimod98.txi.
+	- Jorrit removed a few warnings here and there.
 15-Jan-2004
 	- Peter Amstutz changed the keyboard movement in the "simple" tutorials
 	  (along with the associated texinfo documentation) to follow more

@@ -3514,9 +3514,10 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 
   csVector3 attenvec (0, 0, 0);
   float distbright = 1;
-//#ifdef CS_USE_NEW_RENDERER
+#ifdef CS_USE_NEW_RENDERER
   float influenceRadius = 0;
   bool influenceOverride = false;
+#endif
 /*  int attenuation = CS_ATTN_CLQ;
 #else*/
   int attenuation = CS_ATTN_LINEAR;
