@@ -2457,6 +2457,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
 	}
 	else
 	{
+	  // @@@ Handle regions correctly here???
           iMeshFactoryWrapper* t = Engine->GetMeshFactories ()
 	  	->FindByName (child->GetContentsValue ());
           if (!t)
@@ -2603,6 +2604,30 @@ bool csLoader::LoadPolyMeshInSector (iLoaderContext* ldr_context,
   return true;
 }
 
+bool csLoader::HandleMeshObjectPluginResult (iBase* mo, iDocumentNode* child,
+	iMeshWrapper* mesh)
+{
+  csRef<iMeshObject> mo2 = SCF_QUERY_INTERFACE (mo, iMeshObject);
+  if (!mo2)
+  {
+    SyntaxService->ReportError (
+      "crystalspace.maploader.parse.mesh",
+      child, "Returned object does not implement iMeshObject!");
+    return false;
+  }
+  mesh->SetMeshObject (mo2);
+  mo2->SetLogicalParent (mesh);
+  if (mo2->GetFactory () && mo2->GetFactory ()->GetLogicalParent ())
+  {
+    iBase* lp = mo2->GetFactory ()->GetLogicalParent ();
+    csRef<iMeshFactoryWrapper> mfw = SCF_QUERY_INTERFACE (lp,
+	      	iMeshFactoryWrapper);
+    if (mfw)
+      mesh->SetFactory (mfw);
+  }
+  return true;
+}
+
 bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	iMeshWrapper* mesh, iMeshWrapper* parent, iDocumentNode* node)
 {
@@ -2725,34 +2750,93 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	else
 	{
 	  csRef<iBase> mo = plug->Parse (child, ldr_context, mesh);
-          if (mo)
-          {
-	    csRef<iMeshObject> mo2 (SCF_QUERY_INTERFACE (mo, iMeshObject));
-	    if (!mo2)
-	    {
-              SyntaxService->ReportError (
-	        "crystalspace.maploader.parse.mesh",
-		child, "Returned object does not implement iMeshObject!");
-	      goto error;
-	    }
-	    mesh->SetMeshObject (mo2);
-	    mo2->SetLogicalParent (mesh);
-	    if (mo2->GetFactory () && mo2->GetFactory ()->GetLogicalParent ())
-	    {
-	      iBase* lp = mo2->GetFactory ()->GetLogicalParent ();
-	      csRef<iMeshFactoryWrapper> mfw (SCF_QUERY_INTERFACE (lp,
-	      	iMeshFactoryWrapper));
-	      if (mfw)
-	        mesh->SetFactory (mfw);
-	    }
-          }
-          else
-          {
-	    // Error is reported by plug->Parse().
-	    goto error;
-          }
+          if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh))
+	    goto error;	// Error already reported.
 	}
         break;
+      case XMLTOKEN_FILE:
+        {
+	  const char* fname = child->GetContentsValue ();
+	  if (!fname)
+	  {
+            SyntaxService->ReportError (
+	      "crystalspace.maploader.parse.loadingfile",
+	      child, "Specify a VFS filename with 'file'!");
+	    goto error;
+	  }
+          csRef<iFile> buf = VFS->Open (fname, VFS_FILE_READ);
+	  if (!buf)
+	  {
+            SyntaxService->ReportError (
+	      "crystalspace.maploader.parse.loadingfile",
+	      child, "Error opening file '%s'!", fname);
+	    goto error;
+	  }
+	  csRef<iDocument> doc;
+	  bool er = TestXml (fname, buf, doc);
+	  if (!er)
+	  {
+            SyntaxService->ReportError (
+	      "crystalspace.maploader.parse.loadingfile",
+	      child, "'%s' is not an XML file!", fname);
+	    goto error;
+	  }
+	  csRef<iDocumentNode> paramsnode = doc->GetRoot ()->GetNode ("params");
+	  if (paramsnode)
+	  {
+	    if (!plug && !binplug)
+	    {
+	      SyntaxService->ReportError (
+		"crystalspace.maploader.load.plugin",
+		child, "Could not load plugin for mesh '%s'!",
+		mesh->QueryObject ()->GetName ());
+	      goto error;
+	    }
+	    csRef<iBase> mo;
+	    if (plug)
+	      mo = plug->Parse (paramsnode, ldr_context, mesh);
+	    else
+	    {
+	      csRef<iDataBuffer> dbuf = VFS->ReadFile (fname);
+	      mo = binplug->Parse ((void*)(dbuf->GetUint8 ()),
+	  	  ldr_context, mesh);
+	    }
+            if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh))
+	      goto error;	// Error already reported.
+	    break;
+	  }
+	  csRef<iDocumentNode> meshobjnode = doc->GetRoot ()->GetNode (
+	  	"meshobj");
+	  if (meshobjnode)
+	  {
+	    if (!LoadMeshObject (ldr_context, mesh, parent, meshobjnode))
+	      goto error;
+	    break;
+	  }
+	  csRef<iDocumentNode> meshfactnode = doc->GetRoot ()->GetNode (
+	  	"meshfact");
+	  if (meshfactnode)
+	  {
+	    // @@@ Handle regions correctly here???
+            csRef<iMeshFactoryWrapper> t = Engine->GetMeshFactories ()
+	  	->FindByName (meshfactnode->GetContentsValue ());
+	    if (!t)
+	    {
+              t = Engine->CreateMeshFactory (meshfactnode->GetContentsValue ());
+	      if (!t || !LoadMeshObjectFactory (ldr_context, t, 0,
+	      	meshfactnode))
+	      {
+	        // Error is already reported.
+	        goto error;
+	      }
+	      else
+	      {
+	        AddToRegion (ldr_context, t->QueryObject ());
+	      }
+	    }
+	  }
+	}
+	break;
       case XMLTOKEN_PARAMSFILE:
 	if (!plug && !binplug)
 	{
@@ -2789,33 +2873,8 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	    mo = binplug->Parse ((void*)(dbuf->GetUint8 ()),
 	  	ldr_context, mesh);
 	  }
-          if (mo)
-          {
-	    csRef<iMeshObject> mo2 (SCF_QUERY_INTERFACE (mo, iMeshObject));
-	    if (!mo2)
-	    {
-              SyntaxService->ReportError (
-	        "crystalspace.maploader.parse.mesh",
-		child, "Returned object does not implement iMeshObject!");
-	      goto error;
-	    }
-	    mesh->SetMeshObject (mo2);
-	    mo2->SetLogicalParent (mesh);
-	    if (mo2->GetFactory () && mo2->GetFactory ()->GetLogicalParent ())
-	    {
-	      iBase* lp = mo2->GetFactory ()->GetLogicalParent ();
-	      csRef<iMeshFactoryWrapper> mfw (SCF_QUERY_INTERFACE (lp,
-	      	iMeshFactoryWrapper));
-	      if (mfw)
-	        mesh->SetFactory (mfw);
-	    }
-          }
-          else
-          {
-	    // Error is reported by plug->Parse ().
-	    goto error;
-          }
-
+          if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh))
+	    goto error;	// Error already reported.
         }
         break;
 

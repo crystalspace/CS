@@ -24,6 +24,18 @@ chronological order.
 	      <addon plugin="pluginname...">
 	        ...
 	      </addon>
+	- Jorrit added processing of the <file> keyword for mesh objects in
+	  map files. If you use <file> it will try to open the given file
+	  and parse it. There are three possibilities:
+	    - The file starts with <params>: in this case it is equivalent
+	      to using the old <paramsfile> keyword.
+	    - The file starts with <meshobj>: in this case it will load
+	      the mesh object parameters from that file. After processing
+	      <file> it will continue with the meshobject statements in the
+	      parent node.
+	    - The file starts with <meshfact>: in this case it will load
+	      the factory (if not already loaded with that name) and do
+	      nothing else. After that you can use <params> like usual.
 18-Nov-2003
 	- Keith committed a new version of the Max level export scripts.
 	  This version supports ThingFactories and instances now.  Also

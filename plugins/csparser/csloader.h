@@ -665,6 +665,12 @@ private:
   	iBase* context, const char* fname);
 
   /**
+   * Handle the result of a mesh object plugin loader.
+   */
+  bool HandleMeshObjectPluginResult (iBase* mo, iDocumentNode* child,
+	iMeshWrapper* mesh);
+
+  /**
    * Add the given object to the region in the context (if there is
    * such a region).
    */
