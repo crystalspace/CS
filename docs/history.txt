@@ -13,6 +13,10 @@ chronological order.
 	  loop plugin. The following construct is not valid with that compiler:
 	    for (int i = ...)
 	    for (int i = ...)
+	- Eric Sunshine updated MSVC build instructions in the manual so that
+	  they state explicitly that the "Release" or "Debug" build modes must
+	  be used when building wkstypical, and that "Release_NR" and
+	  "Debug_NR" must be avoided.
 18-Mar-2004
 	- Anders Stenberg changed the terraformer interface a bit (made Sample
 	  functions return pointers to data instead of filling out supplied

@@ -186,12 +186,16 @@ have the OpenGL @sc{sdk} installed, or @file{plgcspython} if you do not have
 the Python @sc{sdk} installed.
 
 @item
-Make @samp{grpall} your active project.  This is done by right clicking on it
-and then clicking on @emph{Set as Active Project}.
+Make @samp{grpall-typical} your active project.  This is done by right clicking
+on it and then clicking on @emph{Set as Active Project}.
 
 @item
 From the file menu select @emph{Build->Rebuild All} or alternatively hit your
-@kbd{@key{F7}} key.
+@kbd{@key{F7}} key.  @strong{Note} that you must build the project using the
+@emph{Release} or @emph{Debug} build modes.  Do @strong{not} use the
+special-purpose @emph{Release_NR}, @emph{Debug_NR}, or @emph{ExtensiveMemDebug}
+build modes (which are reserved for specific developmental activities on
+Crystal Space itself).
 
 @item
 After a while the compilation should finish without error.  The signal for a
@@ -199,9 +203,9 @@ successful build will be come in the form of the something similar to the
 following:
 
 @example
------------- Configuration: grpall - Win32 Debug ------------
+-------- Configuration: grpall-typical - Win32 Debug --------
 
-grpall.lib - 0 error(s), 0 warning(s)
+grpall-typical.lib - 0 error(s), 0 warning(s)
 @end example
 @end enumerate
 

@@ -148,7 +148,11 @@ anything doesn't work, see the Win32 @sc{faq}, @ref{MSVC7 FAQ}.
 Load @file{CS\mk\visualc7\wkstypical.sln}.
 
 @item
-From the file menu select @emph{Build->Build Solution}.
+From the file menu select @emph{Build->Build Solution}.  @strong{Note} that you
+must build the project using the @emph{Release} or @emph{Debug} build modes.
+Do @strong{not} use the special-purpose @emph{Release_NR}, @emph{Debug_NR}, or
+@emph{ExtensiveMemDebug} build modes (which are reserved for specific
+developmental activities on Crystal Space itself).
 
 @item
 After a while the compilation should finish.  The signal for a
