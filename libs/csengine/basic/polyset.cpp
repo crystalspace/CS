@@ -100,7 +100,7 @@ csPolygonSet::~csPolygonSet ()
   if (polygons)
   {
     for (int i = 0 ; i < num_polygon ; i++)
-      CHKB (delete polygons [i]);
+      CHKB (delete (csPolygon3D*)polygons [i]);
     CHK (delete [] polygons);
   }
 
@@ -579,6 +579,42 @@ bool ClipToPlane (csPlane* plane, csVector3*& p_in, int p_in_num,
 }
 #endif
 
+// @@@ We need a more clever algorithm here. We should try
+// to recognize convex sub-parts of a polygonset and return
+// convex shadow frustrums for those. This will significantly
+// reduce the number of shadow frustrums. There are basicly
+// two ways to do this:
+//	- Split object into convex sub-parts in 3D.
+//	- Split object into convex sub-parts in 2D.
+// The first way is probably best because it is more efficient
+// at runtime (important if we plan to use dynamic shadows for things)
+// and also more correct in that a convex 3D object has no internal
+// shadowing while a convex outline may have no correspondance to internal
+// shadows.
+csFrustrumList* csPolygonSet::GetShadows (csVector3& origin)
+{
+  CHK (csFrustrumList* list = new csFrustrumList ());
+  csShadowFrustrum* frust;
+  int i, j;
+  csPolygon3D* p;
+  bool cw = true; //@@@ Use mirroring parameter here!
+  for (i = 0 ; i < num_polygon ; i++)
+  {
+    p = (csPolygon3D*)polygons[i];
+    if (p->GetPlane ()->VisibleFromPoint (origin) != cw) continue;
+    CHK (frust = new csShadowFrustrum (origin));
+    list->AddFirst (frust);
+    csPlane pl = p->GetPlane ()->GetWorldPlane ();
+    pl.DD -= origin * pl.norm;
+    pl.Invert ();
+    frust->SetBackPlane (pl);
+    frust->polygon = p;
+    for (j = 0 ; j < p->GetNumVertices () ; j++)
+      frust->AddVertex (p->Vcam (j));
+  }
+  return list;
+}
+
 //---------------------------------------------------------------------------------------------------------
 /*
  * Ken Clarkson wrote this.  Copyright (c) 1996 by AT&T..
@@ -735,7 +771,7 @@ csVector2* csPolygonSet::IntersectCameraZPlane (float z,csVector2 *clipper,
 	head->data.x=x_;
 	head->data.y=y_;
 
-	head->next=new point_list;
+	CHK (head->next=new point_list);
 	head=head->next;
       }
     }
@@ -749,13 +785,13 @@ csVector2* csPolygonSet::IntersectCameraZPlane (float z,csVector2 *clipper,
 
     prev=head;
     head=head->next;
-    if (prev!=&list) delete prev;
+    if (prev!=&list) { CHK (delete prev); }
   }
 
-  if (i) delete[] head;
+  if (i) { CHK (delete[] head); }
 
   num_vertices = find_chull (num_pts, data, final_data);
-  if (num_pts) delete data;
+  if (num_pts) { CHK (delete data); }
 
   return final_data;
 }

@@ -39,6 +39,7 @@ class csBspTree;
 class Dumper;
 class csRenderView;
 class csCurve;
+class csFrustrumList;
 interface IPolygonSet;
 
 /**
@@ -392,6 +393,15 @@ public:
    * Return the sector that this polygonset belongs to.
    */
   csSector* GetSector () { return sector; }
+
+  /**
+   * Return a list of shadow frustrums which extend from
+   * this polygon set. The origin is the position of the light.
+   * Note that this function uses camera space coordinates and
+   * thus assumes that this polygon set is transformed to the
+   * origin of the light.
+   */
+  csFrustrumList* GetShadows (csVector3& origin);
 
   /**
    * Return true if this has fog.
