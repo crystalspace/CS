@@ -57,12 +57,9 @@ CS_CHECK_HOST
 CS_PATH_CRYSTAL(0.96,,
   AC_MSG_ERROR([
 *** Crystal Space couldn't be found. The latest version is always avaiable
-*** from http://crystal.linuxgames.com.
-***
-*** be also sure that you've either installed CS or set the CRYSTAL var right.
-*** You also have to compile the cs-config script in CS. Do this with the
-*** following command in your CS dir:
-***     make csconf]), csgeom csgfx csutil cstool cssys)
+*** from http://crystal.sourceforge.net
+*** Be also sure that you've either installed CS or set the CRYSTAL var right.
+]), csgeom csgfx csutil cstool cssys)
                                                                                 
 #----------------------------------------------------------------------------
 # Package configuration switches
