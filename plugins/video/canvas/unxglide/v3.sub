@@ -53,7 +53,8 @@ SRC.GLIDX2D3 = plugins/video/canvas/unxglide/glidex2d.cpp \
   plugins/video/canvas/common/x11comm.cpp \
   plugins/video/canvas/common/x11-keys.cpp \
   $(SRC.COMMON.DRV2D)
-OBJ.GLIDX2D3 = $(addprefix $(OUT),$(notdir $(SRC.GLIDX2D3:.cpp=$O)))
+TMP.GLIDX2D3 = $(wordlist 3,$(words $(SRC.GLIDX2D3)), $(SRC.GLIDX2D3))
+OBJ.GLIDX2D3 = $(addprefix $(OUT),$(notdir $(TMP.GLIDX2D3:.cpp=$O))) $(OUT)glidx2d3$O $(OUT)glide3common2d$O
 DEP.GLIDX2D3 = CSUTIL CSSYS
 
 endif # ifeq ($(MAKESECTION),postdefines)
