@@ -17,6 +17,8 @@ The history order is reversed so that new features are at the top.
 	  plane tests. Unfortunatelly it appears that this optimization has
 	  never worked properly. Fixed now so frustvis and dynavis should
 	  now be a little faster.
+	- Marten Svanfeldt fixed the light/shadow culling using the new version
+	  of VisTest.
 26-Feb-2003
 	- Christian Bayle added some missing dependancy to enable to compile
   	  libs as shared
