@@ -549,17 +549,12 @@ void csOctree::MarkVisibleFromPVS (const csVector3& pos)
   // The polygons from the pvs are only marked visible
   // when we actually traverse to an octree node.
   csOctreeVisible* ovis = pvs.GetFirst ();
-printf ("==============\n");
   while (ovis)
   {
-printf ("Mark node visible.\n");
     ovis->GetOctreeNode ()->MarkVisible ();
     csPolygonArrayNoFree& pol = ovis->GetPolygons ();
     for (j = 0 ; j < pol.Length () ; j++)
-    {
-printf ("  Mark polygon %d visible.\n", j);
       pol.Get (j)->MarkVisible ();
-    }
     ovis = pvs.GetNext (ovis);
   }
 }
@@ -625,7 +620,6 @@ void csOctree::AddToPVS (csPVS& pvs, csOctreeNode* node)
   if (!node) return;
   if (!node->IsVisible ()) return;
 
-printf ("  Add\n");
   csOctreeVisible* ovis = pvs.Add ();
   ovis->SetOctreeNode (node);
 
@@ -633,7 +627,6 @@ printf ("  Add\n");
   {
     csBspTree* bsp = node->GetMiniBsp ();
     bsp->AddToPVS (&ovis->GetPolygons ());
-printf ("  Bsp Add\n");
   }
 
   int i;
@@ -667,8 +660,8 @@ printf ("*"); fflush (stdout);
   // test the PVS in principle.
   const csVector3& bmin = leaf->GetMinCorner ();
   const csVector3& bmax = leaf->GetMaxCorner ();
-  //csVector3 steps = (bmax-bmin)/2.;
-  csVector3 steps = (bmax-bmin);//@@@
+  csVector3 steps = (bmax-bmin)/2.;
+  //csVector3 steps = (bmax-bmin);//@@@
   csVector3 pos;
   PVSBuildData pvsdata;
   pvsdata.center = pos;
@@ -690,7 +683,6 @@ printf ("*"); fflush (stdout);
   // we will fetch them all and put them in the PVS for this leaf.
   csPVS& pvs = leaf->GetPVS ();
   pvs.Clear ();
-  printf ("=========AddToPVS\n");
   AddToPVS (pvs, (csOctreeNode*)root);
 }
 

@@ -1243,15 +1243,16 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
         mipmap = 2;
       else
         mipmap = 3;
-
-      // If mipmap is too small, use the level that is still visible ...
-      int shf_u = tex->GetShiftU () - mipmap;
-      if (shf_u < 0) mipmap += shf_u;
-      if (mipmap < 0) mipmap = 0;
     }
   }
   else
     mipmap = rstate_mipmap - 1;
+
+  // If mipmap is too small, use the level that is still visible ...
+  int shf_u = tex->GetShiftU () - mipmap;
+  if (shf_u < 0) mipmap += shf_u;
+  if (mipmap < 0) mipmap = 0;
+
   if (mipmap)
   {
     int duv = (1 << mipmap);

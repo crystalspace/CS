@@ -569,8 +569,15 @@ void csPolygon3D::ObjectToWorld (const csReversibleTransform& t)
 #define TEXW(t)	((t)->w_orig)
 #define TEXH(t)	((t)->h)
 
-#define LMW(t)	(((t)->w_orig + lightcell_size - 1) >> lightcell_shift)
-#define LMH(t)	(((t)->h + lightcell_size - 1) >> lightcell_shift)
+// @@@ The first two defines here are the ones we actually need.
+// For some reason this causes black borders on lightmaps. The bug
+// is probably somewhere in csPolyTexture::FillLightMap(). Until
+// we find that bug we're going to use the old way to calculate
+// lm size.
+//#define LMW(t)	(((t)->w_orig + lightcell_size - 1) >> lightcell_shift)
+//#define LMH(t)	(((t)->h + lightcell_size - 1) >> lightcell_shift)
+#define LMW(t)	(((t)->w_orig / lightcell_size)+1)
+#define LMH(t)	(((t)->h / lightcell_size)+1)
 
 void csPolygon3D::Finish ()
 {

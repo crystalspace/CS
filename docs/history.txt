@@ -19,6 +19,23 @@ Short-term cleanups that need to be done:
 	  maps. Halos do work now.
 	- Seth Galbraith probably fixed a bug in the loading of MDL
 	  models to sprites.
+	- Fixed bug with lightmap black borders in levels like dmburg
+	  or other STATBSP levels. The bug fix is actually a small
+	  reversion to the old code which is not that good but for the
+	  moment is is visually more pleasing at least.
+	- Fixed bug with manual mipmap selection setting which could
+	  cause crashes for very small polygons.
+	- Further work on PVS. It is starting to work better now.
+	  I managed to find a bad bug caused by multiple inheritance :-(
+	- Added csPolygonArrayNoFree which is similar to csPolygonArray
+	  but doesn't free the polygon (used by PVS). Note that
+	  csPolygonArray (and all other subclasses of csVector) also
+	  don't free the polygons automatically!!! This is a bug in the
+	  code. The problem is that a destructor of a class will not
+	  call the virtual functions of that class but of the superclass.
+	  So the DeleteAll() in the destructor will simply use the
+	  original FreeItem() causing nothing to be freed. This is a big
+	  memory leak right now which we will fix shortly.
 1-Mar-2000
 	- Norman Kramer did some further code cleanup and preparing for
 	  alphamap handling (halos) in glide driver.

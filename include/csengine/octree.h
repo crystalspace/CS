@@ -44,21 +44,6 @@ class Dumper;
 #define OCTREE_BBB 7
 
 /**
- * Subclass of csPolygonArray that doesn't delete
- * the polygons but only maintains the pointers.
- */
-class csPolygonArrayNoFree : public csPolygonArray
-{
-public:
-  /// Create the polygon array object
-  csPolygonArrayNoFree (int iLimit, int iDelta)
-  	: csPolygonArray (iLimit, iDelta) { }
-
-  /// Delete a particular array element
-  virtual bool FreeItem (csSome /*Item*/) { return true; }
-};
-
-/**
  * A visibility info node for one octree node.
  * This node represents a visible octree node and possibly
  * all visible polygons (if the node is a leaf).

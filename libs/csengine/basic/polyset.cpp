@@ -533,7 +533,6 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
       if (pvs && !p->IsVisible ())
       {
         // Polygon is not visible because of PVS.
-	printf (".");
         continue;
       }
 

@@ -549,7 +549,7 @@ void csBspTree::AddToPVS (csBspNode* node, csPolygonArrayNoFree* polygons)
   {
     if (node->polygons.GetPolygon (i)->GetType () != 1) continue;
     csPolygon3D* p = (csPolygon3D*)(node->polygons.GetPolygon (i));
-    if (p->IsVisible ()) polygons->Push (p);
+    if (p->IsVisible ()) polygons->Push ((csPolygonInt*)p);
   }
   AddToPVS (node->front, polygons);
   AddToPVS (node->back, polygons);

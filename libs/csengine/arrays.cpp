@@ -68,6 +68,18 @@ csPolygon3D *csPolygonArray::Get (int iIndex) const
   return (csPolygon3D *)(csPolygonInt *)csVector::Get (iIndex);
 }
 
+int csPolygonArrayNoFree::CompareKey (csSome Item, csConstSome Key, int Mode) const
+{
+  (void) Mode;
+  const char *name = ((csPolygon3D *)(csPolygonInt *)Item)->GetName ();
+  return name ? strcmp (name, (char *)Key) : -1;
+}
+
+csPolygon3D *csPolygonArrayNoFree::Get (int iIndex) const
+{
+  return (csPolygon3D *)(csPolygonInt *)csVector::Get (iIndex);
+}
+
 //----------------------------------------------- csPolygonTemplateArray -----//
 
 csPolygonTemplateArray::~csPolygonTemplateArray ()
