@@ -22,6 +22,18 @@ The history order is reversed so that new features are at the top.
 	  matter of fine detail.
 	- Started working on visibility algorithm in terrain engine. Does
 	  not work yet.
+	- Wouter Wijngaards added data/stdtex.zip to the files to install.
+	- Martin Geisse did another major SCF change:
+	    - QueryInterface() now takes the interface ID number as the
+	      parameter, not the interface name. The IMPLEMENT_IBASE code
+	      should already become faster by this.
+	    - Added another macro, QUERY_INTERFACE_FAST, that takes the
+	      ID number as parameter instead of the name.
+	- Martin Geisse also fixed a bug in the hashmap iterator code.
+	- Norman Kramer fixed a compile error in scf.h: static scfId_ ->
+	  static uint32 scfId_ also initialized to 0 since its an uint32.
+	  I just submit that fix since nothing compiled on linux without it,
+	  dont know if everything will now work, but at least it compiles.
 28-May-2001
 	- Fixed all the plugins makefiles so that they now have an additional
 	  CSUTIL in their link line. This satisfies one-pass linkers after
