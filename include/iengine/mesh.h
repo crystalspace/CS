@@ -191,7 +191,7 @@ struct iMeshWrapper : public iBase
   virtual csFlags& GetFlags () = 0;
 };
 
-SCF_VERSION (iMeshFactoryWrapper, 0, 0, 2);
+SCF_VERSION (iMeshFactoryWrapper, 0, 0, 3);
 
 /**
  * This interface corresponds to the object in the engine
@@ -205,6 +205,8 @@ struct iMeshFactoryWrapper : public iBase
   virtual iObject *QueryObject() = 0;
   /// Get the iMeshObjectFactory.
   virtual iMeshObjectFactory* GetMeshObjectFactory () = 0;
+  /// Set the mesh object factory.
+  virtual void SetMeshObjectFactory (iMeshObjectFactory* fact) = 0;
 };
 
 #endif // __IENGINE_MESH_H__

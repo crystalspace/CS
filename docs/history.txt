@@ -3,6 +3,7 @@ The history order has been reversed so that new features are at the top.
 20-Apr-2001
 	- Moved all flags from csMeshWrapper to iMeshWrapper.
 	  Also added GetFlags() to iMeshWrapper.
+	- Added SetMeshObjectFactory() to iMeshFactoryWrapper.
 19-Apr-2001
 	- Martin Geisse did further work on csparser.
 	- Martin also rewrote the DECLARE_TYPED_VECTOR macro to be really

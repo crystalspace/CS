@@ -447,6 +447,10 @@ public:
     {
       return scfParent->GetMeshObjectFactory ();
     }
+    virtual void SetMeshObjectFactory (iMeshObjectFactory* fact)
+    {
+      scfParent->SetMeshObjectFactory (fact);
+    }
     virtual iObject *QueryObject()
     {
       return scfParent;
