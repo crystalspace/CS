@@ -184,7 +184,7 @@ csString &csString::RTrim()
     for (i = Size - 1; i >= 0; i--)
       if (!isspace (Data[i]))
         break;
-    if (i < Size - 1)
+    if (i < int(Size - 1))
       Truncate(i + 1);
   }
   return *this;
@@ -235,7 +235,7 @@ csString &csString::Format(const char *format, ...)
   {
     rc = cs_vsnprintf(Data, MaxSize, format, args);
     // Buffer was big enough for entire string?
-    if (rc >= 0 && rc < MaxSize)
+    if (rc >= 0 && rc < (int)MaxSize)
       break;
     // Some vsnprintf()s return -1 on failure, others return desired capacity.
     if (rc >= 0)
