@@ -65,9 +65,14 @@ csHashKey csHashComputeEvent (iEvent* const ev)
   {
     case csevKeyboard:
       {
-	utf32_char codeRaw = 0;
-	ev->Retrieve ("keyCodeRaw", codeRaw);
-	return CSMASK_Keyboard | (codeRaw << 8);
+	utf32_char codeRaw = csKeyEventHelper::GetRawCode(ev);
+	uint32 modifiers = csKeyEventHelper::GetModifiersBits(ev);	
+	// Since none of the other event types we're looking for
+	// will set the CSMASK_Keyboard bit, we can cram the modifer
+	// bits in the space between the event bit and the key
+	// code bits
+	return CSMASK_Keyboard | (modifiers << (csevKeyboard+1)) 
+		| (codeRaw << (csevKeyboard+csKeyModifierTypeLast+1));
       }
 
     case csevMouseMove:
