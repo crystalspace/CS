@@ -24,6 +24,8 @@
 #include "ifontsrv.h"
 #include "csutil/csvector.h"
 
+struct iSystem;
+
 struct csFontDef
 {
   char *Name;
