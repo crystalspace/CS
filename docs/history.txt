@@ -1,6 +1,13 @@
 The history order has been reversed so that new features are at the top.
 
 5-Mar-2001
+	- Thomas Hieber did the following to the gamecore plugin:
+	    - Added to scf.cfg.
+	    - Added test application (csgamtst) for the plugin (not working
+	      yet).
+	    - Some minor adjustments to make the plugin loadable.
+	    - Added project file for gamecore test application.
+	    - Work on the gamecore plugin itself.
 	- Removed the old and obsolete pvs code. It wasn't working anyway
 	  and when I revive it I'm going to totally rewrite it.
 	- Also removed a lot of functions that were only used by PVS.
