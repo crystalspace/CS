@@ -800,10 +800,10 @@ const char *VfsNode::GetValue (csVFS *Parent, const char *VarName)
 
   // check for OS-specific predefined variables
 #ifdef CS_SYSDEF_VFS_CHECK_VAR
-  CS_SYSDEF_VFS_CHECK_VAR (VarName)
-#endif
+  CS_SYSDEF_VFS_CHECK_VAR (VarName);
   if (value)
     return value;
+#endif
 
   static char path_separator [] = {VFS_PATH_SEPARATOR, 0};
   if (strcmp (VarName, path_separator) == 0)	// Path separator variable?

@@ -21,9 +21,6 @@
 // note: the order is not quite CS standard... However, if changed you'll
 // get a couple of compile errors, mostly due to conflicts in some #defines 
 // and __declspec()s
-#include <stdio.h>
-#include <memory.h>
-
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "cssys/sysfunc.h"
@@ -33,14 +30,21 @@
 
 extern "C"
 {
+#define jpeg_boolean boolean
 #if defined (OS_WIN32)
 #if !defined (COMP_GCC) // Avoid defining "boolean" in libjpeg headers
-#  define HAVE_BOOLEAN
+#  define HAVE_BOOLEAN	// we need int booleans, not Windows unsigned char bools
+#  define boolean int
+#  undef jpeg_boolean 
+#  define jpeg_boolean int
 #endif
 #endif
 #define JDCT_DEFAULT JDCT_FLOAT	// use floating-point for decompression
 #include <jpeglib.h>
 #include <jerror.h>
+#if defined (OS_WIN32)
+#undef boolean
+#endif
 }
 
 #define MNG_NO_CMS
@@ -158,7 +162,7 @@ mng_ptr MNG_DECL cb_alloc (mng_size_t iLen)
 /// memory free callback for libmng
 void MNG_DECL cb_free (mng_ptr iPtr, mng_size_t iLen)
 {
-  delete iPtr;
+  delete[] (uint8*)iPtr;
   (void)iLen;     // Kill compiler warning
 }
 
@@ -256,7 +260,7 @@ static void init_destination (j_compress_ptr cinfo)
   dest->pub.free_in_buffer = my_dst_mgr::buf_len;
 }
 
-static boolean empty_output_buffer (j_compress_ptr cinfo)
+static jpeg_boolean empty_output_buffer (j_compress_ptr cinfo)
 {
   my_dst_mgr *dest = (my_dst_mgr*)cinfo->dest;
 

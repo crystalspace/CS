@@ -197,21 +197,22 @@ UnMemoryMapFile(mmioInfo *platform)
 // @@@ provide HOME(DIR) ??? ("My Docs" maybe?)
 #ifdef CS_SYSDEF_VFS_PROVIDE_CHECK_VAR
 
-char* __WindowsDirectory()
+inline char* __VfsCheckVar(const char* VarName)
 {
   static char lpWindowsDirectory[MAX_PATH+1] = {'\0'};
 
   if (!*lpWindowsDirectory) {
     GetWindowsDirectoryA(lpWindowsDirectory, MAX_PATH);
   }
-
-  return lpWindowsDirectory;
+  
+  if (!stricmp(VarName, "systemroot"))
+    return lpWindowsDirectory;
+  
+  return NULL;
 }
 
 #define CS_SYSDEF_VFS_CHECK_VAR(VarName) \
-  if (!stricmp(VarName, "systemroot")) { \
-    value = __WindowsDirectory(); \
-  }
+  value = __VfsCheckVar(VarName)
 #endif
 
 // COMP_GCC has generic opendir(), readdir(), closedir()
@@ -312,6 +313,7 @@ char* __WindowsDirectory()
 // This also replaces the older 'better_memcpy',which was also not as
 // efficient as it could be ergo...heres a better solution.
 #ifdef COMP_VC
+#include <memory.h>
 #define memcpy fast_mem_copy
 static inline void* fast_mem_copy (void *dest, const void *src, int count)
 {
