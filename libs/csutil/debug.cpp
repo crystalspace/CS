@@ -366,8 +366,8 @@ void csDebuggingGraph::RemoveParent (iObjectRegistry* object_reg,
   csDebugGraph* dg = SetupDebugGraph (object_reg);
   csDGEL* p_el = dg->FindEl (parent);
   csDGEL* c_el = dg->FindEl (child);
-  CS_ASSERT (p_el != NULL);
-  CS_ASSERT (c_el != NULL);
+  if (!p_el) return;
+  if (!c_el) return;
   c_el->RemoveParent (p_el);
 }
 
@@ -381,8 +381,8 @@ void csDebuggingGraph::RemoveChild (iObjectRegistry* object_reg,
   csDebugGraph* dg = SetupDebugGraph (object_reg);
   csDGEL* p_el = dg->FindEl (parent);
   csDGEL* c_el = dg->FindEl (child);
-  CS_ASSERT (p_el != NULL);
-  CS_ASSERT (c_el != NULL);
+  if (!p_el) return;
+  if (!c_el) return;
   p_el->RemoveChild (c_el);
 }
 
