@@ -44,6 +44,17 @@ chronological order.
 	  and apimod98.txi, and eliminated TeX underfull hbox complaint from
 	  apimod98.txi.
 	- Jorrit removed a few warnings here and there.
+	- Eric Sunshine fixed a bug in csSocketListener where it failed to
+	  initialize its mcast_in member.  This addresses but #873491, however,
+	  this is only the tip of the iceberg since UDP support in cssocket is
+	  fundamentally and fatally flawed in almost every way possible.
+	  Fixing it will be a major, major undertaking, and will require either
+	  implementing a proper, complete, and comprehensive
+	  connection-oriented emulation (rather than the broken, incomplete,
+	  and highly buggy emulation currently implemented), and by eliminating
+	  the conceptual flaw that UDP sockets are always non-blocking; or by
+	  revising the API to support connection-oriented, connectionless, and
+	  multicast modes.
 15-Jan-2004
 	- Peter Amstutz changed the keyboard movement in the "simple" tutorials
 	  (along with the associated texinfo documentation) to follow more

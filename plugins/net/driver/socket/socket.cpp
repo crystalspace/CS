@@ -336,6 +336,8 @@ csSocketListener::csSocketListener(iBase* p, csNetworkSocket s,
   addr_in.sin_addr.s_addr = htonl(INADDR_ANY);
   addr_in.sin_port = htons(port);
 
+  memset (&mcast_in, 0, sizeof(mcast_in))
+
   bool ok = false;
   if (bind(Socket, (struct sockaddr*)&addr_in, sizeof(addr_in)) == -1)
     LastError = CS_NET_ERR_CANNOT_BIND;
