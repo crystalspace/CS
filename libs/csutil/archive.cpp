@@ -151,18 +151,18 @@ void csArchive::ReadZipDirectory (FILE *infile)
               return;           /* Broken zipfile? */
             buff[cdfh.filename_length] = 0;
 
-            if ((buff[cdfh.filename_length - 1] != '/')
-             && (buff[cdfh.filename_length - 1] != PATH_SEPARATOR))
-            {
-              ArchiveEntry *curentry = InsertEntry (buff, cdfh);
-              if (!curentry->ReadExtraField (infile, cdfh.extra_field_length)
-               || !curentry->ReadFileComment (infile, cdfh.file_comment_length))
-                return;         /* Broken zipfile? */
-            } else
+            if ((buff[cdfh.filename_length - 1] == '/')
+             || (buff[cdfh.filename_length - 1] == PATH_SEPARATOR))
             {
               if (fseek (infile, cdfh.extra_field_length + cdfh.file_comment_length, SEEK_CUR))
                 return;         /* Broken zipfile? */
+              continue;
             } /* endif */
+
+            ArchiveEntry *curentry = InsertEntry (buff, cdfh);
+            if (!curentry->ReadExtraField (infile, cdfh.extra_field_length)
+             || !curentry->ReadFileComment (infile, cdfh.file_comment_length))
+              return;         /* Broken zipfile? */
           } /* endfor */
         } /* endif */
     } /* endif */
@@ -480,7 +480,7 @@ bool csArchive::WriteZipArchive ()
 
       if (IsDeleted (this_name))
       {
-    skip_file:
+skip_entry:
         bytes_to_skip = lfh.extra_field_length + lfh.csize;
         bytes_to_copy = 0;
         delete [] this_name;
@@ -488,14 +488,18 @@ bool csArchive::WriteZipArchive ()
       else
       {
         this_file = (ArchiveEntry *) FindName (this_name);
-        delete [] this_name;
 
         if (!this_file)
-        {
-          DEBUG_BREAK;
-          goto skip_file;       /* hmm... strange. */
-        }
+          /* This means we found a entry in archive which is not
+           * present in our `dir' array: this means either the ZIP
+           * file has changed after we read the ZIP directory,
+           * or this is a `pure directory' entry (which we ignore
+           * during reading). In any case, just copy it unchanged
+           * into the output file.
+           */
+          goto skip_entry;
 
+        delete [] this_name;
         if (this_file->info.csize != lfh.csize)
           goto temp_failed;   /* Broken archive */
         this_file->ReadExtraField (file, lfh.extra_field_length);
