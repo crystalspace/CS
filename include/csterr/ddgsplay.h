@@ -58,15 +58,10 @@ public:
 	{
 		if (_key < sk._key) return -1;
 		if (_key > sk._key) return 1;
-#if (defined(OS_SOLARIS))
 		if (_ti._tree < sk._ti._tree) return -1;
 		if (_ti._tree > sk._ti._tree) return 1;
 		if (_ti._index < sk._ti._index) return -1;
 		if (_ti._index > sk._ti._index) return 1;
-#else
-		if (_value < sk._value) return -1;
-		if (_value > sk._value) return 1;
-#endif
 		// They are equal.
 		return 0; 
 	}
