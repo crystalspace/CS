@@ -106,7 +106,7 @@
       <conditions fulfill="all">
 	<regexp string="platform" pattern="Unix" />
 	<regexp string="renderer" pattern="Rage128" />
-	<regexp string="glversion" pattern="1.2 Mesa 5.0" />
+	<regexp string="glversion" pattern="1.2" />
       </conditions>
       <applicable>
 	<usecfg>preferclipplane</usecfg>
