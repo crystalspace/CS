@@ -13,6 +13,10 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 6-Jan-2000
+	- Thomas Hieber added iterators for nodes and keys.
+	  Added simplified access to keys and node by name and classname.
+	  Added "FindName", Added methods with more intuitive names (in
+	  csobject library). (The old ones are still there...)
 	- Eric Sunshine added Append(char) to csString.  He also added a
 	  constructor which accepts a (char).
 	- Michael Dale Long fixed several bugs in makefile.py.
