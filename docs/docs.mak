@@ -132,6 +132,9 @@ OUT.DOC.PS      = $(OUT.DOC)/ps
 OUT.DOC.PDF     = $(OUT.DOC)/pdf
 OUT.DOC.INFO    = $(OUT.DOC)/info
 
+# DVI log file
+DOC.DVI.LOG = $(OUT.DOC.DVI)/$(addsuffix .log,$(basename $(CSMANUAL_FILE)))
+
 # List of potential image types understood by Texinfo's @image{} directive.
 DOC.IMAGE.EXTS = png jpg gif eps txt
 
@@ -291,12 +294,11 @@ htmldoc: \
 # Rule to perform actual DVI conversion of $(CSMANUAL_FILE).
 do-dvidoc:
 	$(CP) $(CSMANUAL_DIR)/texinfo.tex $(OUT.DOC.DVI)
-	$(CD) $(OUT.DOC.DVI); $(TEXI2DVI) --batch -V -I '.' -I `pwd` \
+	$(CD) $(OUT.DOC.DVI); $(TEXI2DVI) --batch --quiet -I '.' -I `pwd` \
 	-I `$(CD) $(OUT.DOC.UNDO)/$(CSMANUAL_DIR); $(PWD)` $(CSMANUAL_FILE)
 	$(MV) $(OUT.DOC.DVI)/$(addsuffix .dvi,$(basename $(CSMANUAL_FILE))) \
 	$(OUT.DOC.DVI)/cs.dvi
 	$(RM) $(OUT.DOC.DVI)/texinfo.tex
-	#--quiet 
 
 # Rule to generate DVI format output.  Target images are retained since
 # generated DVI file references them.
@@ -308,6 +310,9 @@ dvidoc: \
   $(OUT.DOC.DVI)/eps.IMAGES \
   do-dvidoc \
   $(OUT.DOC.DVI).ZAPSOURCE
+	@echo $"$"
+	@echo $">>> Check $(DOC.DVI.LOG) for warnings about formatting problems.$"
+	@echo $"$"
 
 # Rule to perform actual PS conversion from DVI file.
 do-psdoc:
@@ -321,6 +326,9 @@ psdoc: \
   $(OUT.DOC.PS) \
   dvidoc \
   do-psdoc
+	@echo $"$"
+	@echo $">>> Check $(DOC.DVI.LOG) for warnings about formatting problems.$"
+	@echo $"$"
 
 # Rule to perform actual PDF conversion from PS file.
 do-pdfdoc:
@@ -332,6 +340,9 @@ pdfdoc: \
   $(OUT.DOC.PDF) \
   psdoc \
   do-pdfdoc
+	@echo $"$"
+	@echo $">>> Check $(DOC.DVI.LOG) for warnings about formatting problems.$"
+	@echo $"$"
 
 # Rule to perform actual Info conversion of $(CSMANUAL_FILE).
 do-infodoc:
