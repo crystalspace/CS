@@ -157,10 +157,10 @@ SRC.SYS_CSSYS_EXE=libs/cssys/win32/exeentry.cpp
 SRC.SYS_CSSYS_DLL=libs/cssys/win32/dllentry.cpp
 
 # The C compiler for Mingw/GCC
-CC=gcc
+CC=gcc -c
 
 # The C++ compiler for Mingw
-CXX=c++
+CXX=c++ -c
 
 # The linker for Mingw/G++
 LINK=c++
