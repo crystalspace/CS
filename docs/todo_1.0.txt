@@ -108,7 +108,7 @@ Bugs to fix:
 	     Also this may require a big change in the software renderer...
 	     Rather complicated bug. But an important one to fix.
 	     [Bug 405964]
-	[V]  Problem with keycolor + zbuffer:
+	[**] Problem with keycolor + zbuffer:
 	     When a texture with keycolor transparency is rendered the
 	     software and hardware renderers currently behave differently.
 	     With software the z-buffer is only updated at those positions
