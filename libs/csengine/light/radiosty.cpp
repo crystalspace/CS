@@ -1281,7 +1281,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   //if(visibility <= SMALL_EPSILON) return;
 
   // prepare dest lumel info
-  shoot_dest->Lumel2World(dest_lumel, float(rx)+0.5, float(ry)+0.5);
+  shoot_dest->Lumel2World(dest_lumel, rx, ry);
 
   // compute formfactors.
   csVector3 path = dest_lumel - src_lumel;
