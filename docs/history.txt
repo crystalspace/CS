@@ -34,6 +34,9 @@ chronological order.
 	  argument to 'test' binary operator if pthread was absent.
 	- Eric Sunshine made Jam test and usage in configure.ac more tolerant
 	  of whitepsace in Jam path.
+	- Eric Sunshine worked around BoostJam incompatibility triggered by the
+	  Jamrules files synthesized by jamtemplate.  It was invoking FDefines
+	  before jamcompatibility.jam emulated this rule for BoostJam.
 16-May-2004
         - Philip Wyett eliminated gcc compiler warnings in simpleformer.cpp.
         - Andrew Craig enhanced viewmesh by letting the user select a mesh 

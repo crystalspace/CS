@@ -7,7 +7,11 @@ if ! $(JAMCONFIG_READ)
     EXIT "Could not locate configuration. Please run 'configure' first." ;
 }
 
-# Set up compiler flags
+# Set up compiler flags.
+# Unfortunately, we can not use FDefines here since Boost Jam does not have it,
+# and we have # not yet included mk/jam/build.jam which provides an emulation
+# layer for # Boost.  We can not include build.jam earlier because these flags
+# need to be # defined before build.jam is included.  :-(
 COMPILER.CFLAGS = -Wall -Wno-unknown-pragmas ;
 COMPILER.CFLAGS.optimize = -O3 -fomit-frame-pointer -ffast-math ;
 COMPILER.CFLAGS.debug = -g3 [ FDefines CS_DEBUG ] ;
