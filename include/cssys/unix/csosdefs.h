@@ -36,6 +36,8 @@ extern char* get_software_2d_driver ();
 // The 2D graphics driver used by Glide renderer
 #define GLIDE_2D_DRIVER	"crystalspace.graphics2d.glidex"
 
+// The 2D graphics driver used by Glide renderer Version 3
+#define GLIDE_2D_DRIVER_V3	"crystalspace.graphics2d.glidex.3"
 // The sound driver
 #define SOUND_DRIVER "crystalspace.sound.driver.oss"
 
