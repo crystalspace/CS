@@ -1,6 +1,31 @@
 The history order has been reversed so that new features are at the top.
 
+24-Oct-2000
+	- Philip Wyett eliminated a compiler warning in
+	  csFlowLayout::SuggestSize().
+	- Andrew Zabolotny did the following change:
+	    Made the csArchive::Write() method a lot faster in the case
+	    you did not specify the max file size when you opened the
+	    file for writing by the following means:
+		- The buffer size is increased in 1K blocks rather than
+		  adding just the size of appended block. This means the
+		  memory will be allocated just once per many calls (in the
+		  case you're writing in small chunks) rather than doing
+		  one memory allocation per call (which is VERY slow).
+		- Using realloc() instead of new[] and memcpy() which also
+		  should increase the speed a lot on platforms with properly
+		  implemented realloc().
+	    Now writing files into archives in small chunks (e.g. PVS)
+	    should work a lot faster (same speed as csMemFile).
+23-Oct-2000
+	- Norman Kramer added various layout managers for CSWS.
+	- Norman Kramer added an example for the layoutmanager to cswstest.
 20-Oct-2000
+	- Andrew Zabolotny reverted his previous change to vfs.mak. Instead
+	  he has fixed win32gcc.mak. DO.SHARED.PLUGIN should contain
+	  a reference to $(LIBS). This was not the case for win32gcc.
+	- Andrew also fixed the dependency file name from "waveout.dep" to
+	  "wos.dep".
 	- Set minimum canvas size for X to 32x32 instead of 320x200.
 	- Eric Sunshine made the following changes to the installation target:
 	    - csengine.mak is no longer responsible for vfs.cfg and scf.cfg.
