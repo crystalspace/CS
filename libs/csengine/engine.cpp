@@ -2619,6 +2619,7 @@ public:
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name);
   virtual iMeshWrapper* FindMeshObject (const char* name);
   virtual iTextureWrapper* FindTexture (const char* name);
+  virtual iLight* FindLight(const char *name);
 };
 
 SCF_IMPLEMENT_IBASE(EngineLoaderContext);
@@ -2660,6 +2661,21 @@ iMeshWrapper* EngineLoaderContext::FindMeshObject (const char* name)
 iTextureWrapper* EngineLoaderContext::FindTexture (const char* name)
 {
   return Engine->FindTexture (name, region);
+}
+
+iLight* EngineLoaderContext::FindLight(const char *name)
+{
+  // This function is necessary because Engine::FindLight returns iStatLight
+  // and not iLight.
+  csRef<iLightIterator> li = Engine->GetLightIterator(region);
+  iLight *light;
+
+  while ((light = li->Fetch ()) != NULL)
+  {
+      if (!strcmp (light->GetPrivateObject ()->GetName (),name))
+	  return light;
+  }
+  return NULL;
 }
 
 //------------------------------------------------------------------------
