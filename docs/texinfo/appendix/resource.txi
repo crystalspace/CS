@@ -1,0 +1,48 @@
+@c -*-texinfo-*-
+@node Resources
+@appendix Resources
+@cindex Resources
+
+@table @emph
+@item Books
+@itemize @bullet
+@item
+Real-Time Rendering, by Tomas Mšller and Eric Haines, 512 pages,
+from A.K. Peters Ltd., $49.95, ISBN 1-56881-101-2.
+@uref{http://www.realtimerendering.com/}
+@end itemize
+
+@item IRC
+@itemize @bullet
+@item
+Server: irc.linux.com 6667 @*
+Channel: #CrystalSpace
+@end itemize
+
+@item Web
+@itemize @bullet
+@item
+Crystal Space Homepage: @uref{http://crystal.linuxgames.com/} 
+
+@item
+Crystal Space Bug Reporting: @uref{http://xeryon.dyndns.org/crystal/bugzilla/}
+
+@item
+Crystal Clear Homepage: @uref{http://php.indiana.edu/~mdlong/crystalclear}
+
+@item
+Python Homepage: @uref{http://www.python.org/} 
+@end itemize
+
+@item Online Research Papers
+@itemize @bullet
+@item
+Ned Greene's Coverage Mask SigGraph 96 Paper:
+@uref{http://www.grafix3d.tzo.com/papers/cgiinterface.html?operation=viewpage&format=j&quality=70&color=y&resolution=100&antialiased=2&document=337&page=1}
+
+@item
+Coverage Mask in Software Renderer:
+@uref{http://www.dgp.utoronto.ca/~jrmeredi/RenderDude/Docs/Cameras.html#PART3_4}
+@end itemize
+@end table
+
