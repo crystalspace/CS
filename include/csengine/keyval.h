@@ -1,8 +1,6 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 200 by Thomas Hieber
     
-    Key Value container written by Thomas Hieber
-  
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either

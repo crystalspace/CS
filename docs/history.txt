@@ -3,6 +3,13 @@ The history order has been reversed so that new features are at the top.
 25-Mar-2001
 	- Eric Sunshine reverted a change to csconin.cpp by Philip Wyett since
 	  Philip's change was incorrect.  Eric applied the correct fix instead.
+	- Eric Sunshine applied a patch to csNodeIterator which was sent to the
+	  mailing list by Malcolm Peacock <malcolm@mpeacock.demon.co.uk> on
+	  August 13, 2000.  This patch fixes a problem where the csNodeIterator
+	  bug was always one element out-of-step with the actual underlying
+	  csObject iterator.  The symptom of the bug was that
+	  csNodeIterator::IsFinished() reported the end of iteration one
+	  element too early.
 24-Mar-2001
 	- Eric Sunshine made the following changes to the project:
 	    - Repaired an ultra nasty bug in csSystemDriver::LoadPlugIn().

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 2000 by Thomas Heiber
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -96,7 +96,7 @@ csMapNode::~csMapNode ()
 csMapNode* csMapNode::GetNode (csSector *pSector, const char* name,
   const char* classname)
 {
-  for (csNodeIterator Iter (pSector, classname); !Iter.IsFinished (); Iter.Next ())
+  for (csNodeIterator Iter(pSector,classname); !Iter.IsFinished(); Iter.Next())
   {
     csMapNode *pNode = Iter.GetNode ();
     if (strcmp (pNode->GetName (), name) == 0)
@@ -114,11 +114,7 @@ csNodeIterator::csNodeIterator (const csSector* pSector, const char* classname)
 {
   SkipWrongClassname ();
   if (!m_Iterator.IsFinished ())
-  {
     m_pCurrentNode = (csMapNode *)m_Iterator.GetObj ();
-    m_Iterator.Next ();
-    SkipWrongClassname ();
-  }
 }
   
 csNodeIterator::~csNodeIterator ()
@@ -133,11 +129,7 @@ void csNodeIterator::Reset (const csSector *pSector, const char *classname)
   if (m_Iterator.IsFinished ())
     m_pCurrentNode = NULL;
   else
-  {
     m_pCurrentNode = (csMapNode *)m_Iterator.GetObj ();
-    m_Iterator.Next ();
-    SkipWrongClassname ();
-  }
 }
 
 csMapNode *csNodeIterator::GetNode ()
@@ -147,9 +139,12 @@ csMapNode *csNodeIterator::GetNode ()
 
 void csNodeIterator::Next ()
 {
-  m_pCurrentNode = (csMapNode *)m_Iterator.GetObj ();
   m_Iterator.Next ();
   SkipWrongClassname ();
+  if (m_Iterator.IsFinished ())
+    m_pCurrentNode = NULL;
+  else
+    m_pCurrentNode = (csMapNode *)m_Iterator.GetObj ();
 }
 
 bool csNodeIterator::IsFinished () const
