@@ -68,8 +68,8 @@ float csEffectDefinition::GetVariableFloat(int variableID)
   if ( (variableID < 0 ) || (variableID > variables.Length() ) )
     return 0.0f;
 
-  if ( ((efvariable*)variables[variableID])->type == CS_EFVARIABLETYPE_FLOAT )
-    return ((efvariable*)variables[variableID])->float_value;
+  if ( (variables[variableID])->type == CS_EFVARIABLETYPE_FLOAT )
+    return (variables[variableID])->float_value;
   else
     return 0.0f;
 }
@@ -79,8 +79,8 @@ csEffectVector4 csEffectDefinition::GetVariableVector4(int variableID)
   if ( (variableID < 0 ) || (variableID > variables.Length() ) )
     return csEffectVector4();
 
-  if ( ((efvariable*)variables[variableID])->type == CS_EFVARIABLETYPE_VECTOR4 )
-    return ((efvariable*)variables[variableID])->vector_value;
+  if ( (variables[variableID])->type == CS_EFVARIABLETYPE_VECTOR4 )
+    return (variables[variableID])->vector_value;
   else
     return csEffectVector4();
 }
@@ -90,12 +90,12 @@ void csEffectDefinition::SetVariableFloat(int variableID, float value)
   if ( (variableID < 0 ) || (variableID > variables.Length() ) )
     return;
 
-  if ( ((efvariable*)variables[variableID])->type == CS_EFVARIABLETYPE_FLOAT )
-    ((efvariable*)variables[variableID])->float_value = value;
-  else if ( ((efvariable*)variables[variableID])->type == CS_EFVARIABLETYPE_UNDEFINED )
+  if ( (variables[variableID])->type == CS_EFVARIABLETYPE_FLOAT )
+    (variables[variableID])->float_value = value;
+  else if ( (variables[variableID])->type == CS_EFVARIABLETYPE_UNDEFINED )
   {
-    ((efvariable*)variables[variableID])->float_value = value;
-    ((efvariable*)variables[variableID])->type = CS_EFVARIABLETYPE_FLOAT;
+    (variables[variableID])->float_value = value;
+    (variables[variableID])->type = CS_EFVARIABLETYPE_FLOAT;
   }
 }
 
@@ -104,12 +104,12 @@ void csEffectDefinition::SetVariableVector4(int variableID, csEffectVector4 valu
   if ( (variableID < 0 ) || (variableID > variables.Length() ) )
   return;
 
-  if ( ((efvariable*)variables[variableID])->type == CS_EFVARIABLETYPE_VECTOR4 )
-    ((efvariable*)variables[variableID])->vector_value = value;
-  else if ( ((efvariable*)variables[variableID])->type == CS_EFVARIABLETYPE_UNDEFINED )
+  if ( (variables[variableID])->type == CS_EFVARIABLETYPE_VECTOR4 )
+    (variables[variableID])->vector_value = value;
+  else if ( (variables[variableID])->type == CS_EFVARIABLETYPE_UNDEFINED )
   {
-    ((efvariable*)variables[variableID])->vector_value = value;
-    ((efvariable*)variables[variableID])->type = CS_EFVARIABLETYPE_VECTOR4;
+    (variables[variableID])->vector_value = value;
+    (variables[variableID])->type = CS_EFVARIABLETYPE_VECTOR4;
   }
 }
 
@@ -119,11 +119,11 @@ int csEffectDefinition::GetTopmostVariableID(int id)
     return -1;
 
   int curid = id;
-  int parent = ((efvariable*)variables[curid])->point_to;
+  int parent = (variables[curid])->point_to;
   while (parent >= 0)
   {
     curid = parent;
-    parent = ((efvariable*)variables[curid])->point_to;
+    parent = (variables[curid])->point_to;
   }
   return curid;
 }
@@ -132,9 +132,9 @@ int csEffectDefinition::GetVariableID(csStringID string, bool create )
 {
   for (int i = 0; i<variables.Length();i++)
   {
-    if ( ((efvariable*)variables[i])->id ==  string )
+    if ( (variables[i])->id ==  string )
     {
-      if( ((efvariable*)variables[i])->point_to >= 0 )
+      if( (variables[i])->point_to >= 0 )
         return GetTopmostVariableID( i );
       else
         return i;
@@ -150,15 +150,15 @@ int csEffectDefinition::GetVariableID(csStringID string, bool create )
     return -1;
 }
 
-csBasicVector csEffectDefinition::GetAllVariableNames()
-{
-  return variables;
-}
+//csBasicVector& csEffectDefinition::GetAllVariableNames()
+//{
+  //return variables;
+//}
 
 char csEffectDefinition::GetVariableType(int variableID)
 {
   if ( (variableID < 0 ) || (variableID > variables.Length() ) )
     return CS_EFVARIABLETYPE_UNDEFINED;
 
-  return ((efvariable*)variables[variableID])->type;
+  return (variables[variableID])->type;
 }

@@ -425,7 +425,6 @@ public:
   {
   private:
     csRef<iObjectRegistry> object_reg;
-    csBasicVector pluginlist;
   public:
     SCF_DECLARE_EMBEDDED_IBASE(csGLRender3D);
     eiShaderRenderInterface();

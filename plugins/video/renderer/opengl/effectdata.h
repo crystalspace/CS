@@ -21,7 +21,7 @@
 #define __CS_EFFECTDATA_H__
 
 #include "csutil/scf.h"
-#include "csutil/csvector.h"
+#include "csutil/parray.h"
 
 ///OpenGL specific effectdata stored per layer
 SCF_VERSION(csOpenGlEffectLayerData, 0, 0, 1);
@@ -136,7 +136,7 @@ public:
   GLuint vertex_program;
 
   //vertex program constants
-  csBasicVector vertex_constants;
+  csPDelArray<csOpenGlVPConstant> vertex_constants;
 
   SCF_DECLARE_IBASE;
 
@@ -157,11 +157,6 @@ public:
 
   virtual ~csOpenGlEffectPassData()
   {
-    csOpenGlVPConstant* v;
-    while( (v = (csOpenGlVPConstant* )vertex_constants.Pop()) != 0)
-    {
-      delete v;
-    }
   }
 };
 

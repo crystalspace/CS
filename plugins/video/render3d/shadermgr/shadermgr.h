@@ -27,6 +27,7 @@
 #include "csutil/csstring.h"
 #include "csutil/util.h"
 #include "csutil/symtable.h"
+#include "csutil/parray.h"
 
 #include "iutil/event.h"
 #include "iutil/eventh.h"
@@ -221,7 +222,9 @@ class csShader : public iShader
 private:
   csRef<iObjectRegistry> objectreg;
   csHashMap* variables;
-  csBasicVector* techniques;
+  // @@@ Strongly reconsider this. The code is using both 'delete'
+  // and DecRef() on the objects inside. NOT good!
+  csArray<iShaderTechnique*>* techniques;
   csShaderManager* parent;
   char* name;
 
@@ -323,7 +326,9 @@ class csShaderTechnique : public iShaderTechnique
 {
 private:
   int priority;
-  csBasicVector* passes;
+  // @@@ Strongly reconsider this. The code is using both 'delete'
+  // and DecRef() on the objects inside. NOT good!
+  csArray<iShaderPass*>* passes;
   csShader* parent;
   csRef<iObjectRegistry> objectreg;
 

@@ -435,7 +435,7 @@ void csShaderGLMTEX::Activate(iShaderPass* current, csRenderMesh* mesh)
 {
   for(int i = 0; i < MIN(maxlayers, texlayers.Length()); ++i)
   {
-    mtexlayer* layer = (mtexlayer*) texlayers.Get(i);
+    mtexlayer* layer = texlayers.Get(i);
     ext->glActiveTextureARB(GL_TEXTURE0_ARB + i);
     ext->glClientActiveTextureARB(GL_TEXTURE0_ARB + i);
 

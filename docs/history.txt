@@ -69,6 +69,21 @@ chronological order.
 	      csPDelArray<csRecordedCamera>.
 	    - Replaced 'busy_entities' in walktest with csArray<csWalkEntity*>.
 	    - Replaced 'busy_vector' in walktest with csArray<csWalkEntity*>.
+	- Jorrit replaced various occurances of csBasicVector:
+	    - Replaced 'texlayers' in csShaderGLMTEX with csArray<mtexlayer*>.
+	    - Replaced 'techniques' in csShader with csArray<iShaderTechnique*>.
+	    - Removed unused 'pluginlist' in
+	      csGLRender3D::eiShaderRenderInterface.
+	    - Replaced 'vertex_constants' in csOpenGlEffectPassData with
+	      csPDelArray<csOpenGlVPConstant>.
+	    - Replaced 'variables' in csEffectDefinition with
+	      csArray<efvariable*>.
+	- Jorrit Completely removed iEffectDefinition->GetAllVariableNames()
+	  since it can not work because it returns private data that
+	  the caller is not able to interprete. It wasn't used anyway.
+	- Jorrit marked several places in the new renderer (around the
+	  vectors that were replaced) with @@@ to indicated bad memory
+	  management (possible memory leaks). Please investigate.
 1-Aug-2003
 	- Jorrit changed csPDelArray::Sort() to use a new
 	  csArraySortCompareFunction typedef instead of csArrayCompareFunction.

@@ -57,7 +57,7 @@ class csEffectDefinition : public iEffectDefinition
 private:
   csRefArray<iEffectTechnique> techniques;
   char* techniquename;
-  csBasicVector variables;
+  csArray<efvariable*> variables;
 
   int GetTopmostVariableID(int id);
 
@@ -89,7 +89,8 @@ public:
   void SetVariableVector4( int variableID, csEffectVector4 value );
 
   int GetVariableID(csStringID string, bool create = true);
-  csBasicVector GetAllVariableNames();
+  //@@@
+  //csArray<efvariable*>& GetAllVariableNames();
 };
 
 #endif // __CS_EFFECTDEFINITION_H__

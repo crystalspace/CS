@@ -69,7 +69,7 @@ struct iEffectDefinition : public iBase
   /// Get/create variable
   virtual int GetVariableID(uint32 string, bool create = true) = 0;
   /// Get all variable stringnames (used when creatingthem)
-  virtual csBasicVector GetAllVariableNames() = 0; 
+  //virtual csBasicVector GetAllVariableNames() = 0; 
 };
 
 /** @} */

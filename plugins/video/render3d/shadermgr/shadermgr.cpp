@@ -217,7 +217,7 @@ csShader::csShader(csShaderManager* owner, iObjectRegistry* reg)
   SCF_CONSTRUCT_IBASE( 0 );
   this->name = 0;
   variables = new csHashMap();
-  techniques = new csBasicVector();
+  techniques = new csArray<csShaderTechnique*>();
   parent = owner;
   objectreg = reg;
 
@@ -229,7 +229,7 @@ csShader::csShader(const char* name, csShaderManager* owner, iObjectRegistry* re
   SCF_CONSTRUCT_IBASE( 0 );
   csShader::name = 0;
   variables = new csHashMap();
-  techniques = new csBasicVector();
+  techniques = new csArray<csShaderTechnique*>();
   parent = owner;
   objectreg = reg;
   SetName(name);
@@ -265,7 +265,7 @@ bool csShader::IsValid() const
   //is valid if there are at least one valid technique
   for(int i = 0; i < techniques->Length(); ++i)
   {
-    iShaderTechnique* t = (iShaderTechnique*) techniques->Get(i);
+    iShaderTechnique* t = techniques->Get(i);
     if(t->IsValid())
       return true;
   }
@@ -307,7 +307,7 @@ iShaderTechnique* csShader::GetTechnique(int technique)
 {
   if( technique >= techniques->Length()) return 0;
 
-  return (iShaderTechnique*)techniques->Get(technique);
+  return techniques->Get(technique);
 }
 
 iShaderTechnique* csShader::GetBestTechnique()
@@ -318,10 +318,10 @@ iShaderTechnique* csShader::GetBestTechnique()
 
   for (i = 0; i < techniques->Length(); ++i)
   {
-    if( ((iShaderTechnique*)techniques->Get(i))->IsValid() &&
-        ((iShaderTechnique*)techniques->Get(i))->GetPriority() > maxpriority)
+    if( techniques->Get(i)->IsValid() &&
+        techniques->Get(i)->GetPriority() > maxpriority)
     {
-      tech = ((iShaderTechnique*)techniques->Get(i));
+      tech = techniques->Get(i);
       maxpriority = tech->GetPriority();
     }
   }
@@ -456,7 +456,7 @@ bool csShader::Prepare()
   for(i = 0; i < techniques->Length(); ++i)
   {
     primap[i].technique = i;
-    primap[i].priority = ((iShaderTechnique*)techniques->Get(i))->GetPriority();
+    primap[i].priority = techniques->Get(i)->GetPriority();
   }
 
   if (techniques->Length()>1)
@@ -465,11 +465,11 @@ bool csShader::Prepare()
   bool isPrep = false;
   int prepNr;
 
-  csBasicVector* newTArr = new csBasicVector;
+  csArray<iShaderTechnique*>* newTArr = new csArray<iShaderTechnique*>;
 
   for(i = 0; i < techniques->Length() && !isPrep; ++i)
   {
-    iShaderTechnique* t = (iShaderTechnique*)techniques->Get(primap[i].technique);
+    iShaderTechnique* t = techniques->Get(primap[i].technique);
     if ( t->Prepare() )
     {
       t->IncRef();
@@ -479,8 +479,9 @@ bool csShader::Prepare()
   
   while(techniques->Length() > 0)
   {
-    ((iShaderTechnique*)techniques->Pop())->DecRef();
+    (techniques->Pop())->DecRef();
   }
+  delete techniques;
 
   techniques = newTArr;
 
@@ -877,7 +878,7 @@ bool csShaderPass::Prepare()
 csShaderTechnique::csShaderTechnique(csShader* owner, iObjectRegistry* reg)
 {
   SCF_CONSTRUCT_IBASE( 0 );
-  passes = new csBasicVector();
+  passes = new csArray<iShaderPass*>();
   parent = owner;
   objectreg = reg;
 
@@ -907,7 +908,7 @@ iShaderPass* csShaderTechnique::GetPass(int pass)
 {
   if( pass >= passes->Length()) return 0;
 
-  return (iShaderPass*)passes->Get(pass);
+  return passes->Get(pass);
 }
 
 bool csShaderTechnique::IsValid() const
@@ -916,7 +917,7 @@ bool csShaderTechnique::IsValid() const
   //returns true if all passes are valid
   for(int i = 0; i < passes->Length(); ++i)
   {
-    iShaderPass* p = (iShaderPass*)passes->Get(i);
+    iShaderPass* p = passes->Get(i);
     valid = p->IsValid();
   }
   
@@ -1017,7 +1018,7 @@ bool csShaderTechnique::Prepare()
 {
   for(int i = 0; i < passes->Length(); ++i)
   {
-    iShaderPass* p = (iShaderPass*)passes->Get(i);
+    iShaderPass* p = passes->Get(i);
     if(!p->Prepare())
       return false;
   }

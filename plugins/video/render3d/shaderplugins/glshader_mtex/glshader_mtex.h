@@ -22,6 +22,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "ivideo/shader/shader.h"
 #include "imap/services.h"
+#include "csutil/array.h"
 
 class csGLRender3D;
 
@@ -167,7 +168,9 @@ private:
   };
 
   //array of mtexlayers
-  csBasicVector texlayers;
+  // @@@: Consider using csPDelArray as there is no cleanup
+  // of the mtexlayer instances here!
+  csArray<mtexlayer*> texlayers;
 
   //maximum number of layers
   int maxlayers;
