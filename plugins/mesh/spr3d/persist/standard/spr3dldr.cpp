@@ -71,26 +71,6 @@ enum
   XMLTOKEN_V
 };
 
-static void ReportError (iReporter* reporter, const char* id,
-	const char* description, ...)
-{
-  va_list arg;
-  va_start (arg, description);
-
-  if (reporter)
-  {
-    reporter->ReportV (CS_REPORTER_SEVERITY_ERROR, id, description, arg);
-  }
-  else
-  {
-    char buf[1024];
-    vsprintf (buf, description, arg);
-    csPrintf ("Error ID: %s\n", id);
-    csPrintf ("Description: %s\n", buf);
-  }
-  va_end (arg);
-}
-
 SCF_IMPLEMENT_IBASE (csSprite3DFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)

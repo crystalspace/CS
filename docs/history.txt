@@ -64,7 +64,8 @@ The history order is reversed so that new features are at the top.
 	  CTextureFile::SetOriginalData() where a static csRef resulted in
 	  "undefined reference to `atexit'" error on some platforms.
 	- Eric Sunshine eliminated compilation warnings in prsseq.cpp.
-	- Eric Sunshine eliminated unused function from syntxldr.cpp.
+	- Eric Sunshine eliminated unused functions from syntxldr.cpp,
+	  gmeshldr.cpp, spr2dldr.cpp, spr3dldr.cpp, thingldr.cpp.
 	- Eric Sunshine eliminated an enormous number of compilation warnings
 	  from the cloth plugin.
 23-Sep-2002
