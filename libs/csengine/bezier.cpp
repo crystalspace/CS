@@ -44,6 +44,8 @@ double csBezier2:: bernsteinMap[LUT_SIZE];
 double csBezier2:: bernsteinDuMap[LUT_SIZE];
 double csBezier2:: bernsteinDvMap[LUT_SIZE];
 
+bool csBezier2::initialized = false;
+
 /// Evaulate the bernstien polynomial defined by the given j & k at u & v
 double csBezier2::BernsteinAt (double u, int j, double v, int k)
 {
@@ -96,8 +98,10 @@ double csBezier2::BernsteinDvAt (double u, int j, double v, int k)
   return bincoeff[j] * bincoeff[k] * pow (u, j) * pow (1 - u, 2 - j) * (left - right);
 }
 
-csBezier2::csBezier2 ()
+void csBezier2::Initialize ()
 {
+  if (initialized) return;
+  initialized = true;
   int res;
   int index = 0;
   for (res = 1; res <= 9; res++)

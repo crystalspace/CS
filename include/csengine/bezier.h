@@ -72,11 +72,12 @@ private:
   static double bernsteinMap[LUT_SIZE];
   static double bernsteinDuMap[LUT_SIZE];
   static double bernsteinDvMap[LUT_SIZE];
+  static bool initialized;
 
 public:
 
-  /// Constructor
-  csBezier2();
+  /// Initialize.
+  static void Initialize ();
 
   /// Evaulate the bernstien polynomial defined by the given j & k at u & v
   static double BernsteinAt(double u, int j, double v, int k);

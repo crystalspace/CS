@@ -30,8 +30,6 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/vbufmgr.h"
 
-CS_IMPLEMENT_STATIC_VAR(GetBezierCache,csBezier2,())
-
 struct csCoverageMatrix
 {
   // Each float corresponds to a lightmap grid cell and contains
@@ -167,7 +165,7 @@ csCurve::csCurve (csCurveTemplate *parent_tmpl) :
   SetupVertexBuffer ();
 
   // Call to make sure csBezier2 is properly initialized.
-  GetBezierCache ();
+  csBezier2::Initialize ();
 }
 
 csCurve::~csCurve ()
