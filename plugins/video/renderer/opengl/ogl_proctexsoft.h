@@ -261,6 +261,9 @@ class csOpenGLProcSoftware2D : public iGraphics2D
   virtual void SetFontID (int FontID)
   { g2d->SetFontID (FontID); }
 
+  virtual int LoadFont (const char *Name, const char *File)
+  { return g2d->LoadFont(Name, File); }
+
   virtual bool SetFontSize (int FontSize)
   { return g2d->SetFontSize (FontSize); }
 

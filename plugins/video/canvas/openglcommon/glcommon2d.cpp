@@ -276,6 +276,15 @@ void csGraphics2DGLCommon::Write (int x, int y, int fg, int bg, const char *text
   LocalFontServer->Write (x, Height - 1 - y, text, Font);
 }
 
+int csGraphics2DGLCommon::LoadFont(const char *Name, const char *File)
+{
+  int fontid = FontServer->LoadFont(Name, File);
+  if(fontid == -1) return -1;
+  /// also prepare font for rendering in an opengl friendly manner
+  LocalFontServer->AddFont(fontid);
+  return fontid;
+}
+
 // This variable is usually NULL except when doing a screen shot:
 // in this case it is a temporarily allocated buffer for glReadPixels ()
 static UByte *screen_shot = NULL;

@@ -205,6 +205,9 @@ public:
   virtual void SetFontID (int FontID)
   { Font = FontID; }
 
+  /// Load font with name from given file, returns fontid or -1
+  virtual int LoadFont(const char *Name, const char *File);
+
   /// Gets the font size.
   virtual int GetFontSize ();
   

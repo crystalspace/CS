@@ -191,6 +191,9 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
 
   virtual void SetFontID (int FontID);
 
+  virtual int LoadFont (const char *name, const char *file)
+  { return g2d->LoadFont(name, file); }
+
   virtual bool SetFontSize (int FontSize)
   { return g2d->SetFontSize (FontSize); }
 

@@ -266,6 +266,9 @@ struct iGraphics2D : public iPlugIn
   /// Sets the type of the font.
   virtual void SetFontID (int FontID) = 0;
 
+  /// Load font with name from given file, returns fontid or -1
+  virtual int LoadFont(const char *Name, const char *File) = 0;
+
   /// Set font size, return true on success
   virtual bool SetFontSize (int FontSize) = 0;
 

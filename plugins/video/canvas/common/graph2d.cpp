@@ -535,6 +535,12 @@ int csGraphics2D::GetTextHeight (int Font)
   return FontServer->GetMaximumHeight (Font);
 }
 
+int csGraphics2D::LoadFont(const char *Name, const char *File)
+{
+  /// default implementation that calls fontserver to do the work
+  return FontServer->LoadFont(Name, File);
+}
+
 int csGraphics2D::GetFontSize ()
 {
   long s;

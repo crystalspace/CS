@@ -109,6 +109,9 @@ public:
   /// Write a text string into the back buffer
   virtual void Write (int x, int y, int fg, int bg, const char *text);
 
+  /// Load a font
+  virtual int LoadFont(const char *Name, const char *File);
+
   /**
    * Get address of video RAM at given x,y coordinates.
    * The OpenGL version of this function just returns NULL
