@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+5-Nov-2002
+	- Keith Fulton submitted a small fix for csFont length measurement
+	  which was using the same width for all characters even in
+	  proportional fonts.
 4-Nov-2002
 	- Significantly optimized walking around in walktest in sectors
 	  with a huge number of objects. Walktest was doing QUERY_INTERFACE
