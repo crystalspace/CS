@@ -43,9 +43,7 @@ private:
   }
   void DestroyElement (int n)
   {
-    // Jorrrit: commented out the line below because gcc 2.96 doesn't
-    // accept it. I don't know with what to replace it though.
-    //(root + n)->~T::T();
+    (root + n)->~T();
   }
 
   // Set array length.  NOTE: Do not make this public since it does not
