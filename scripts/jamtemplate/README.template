@@ -42,8 +42,8 @@ in the #PROJECTNAME#/msvc directory.
 2.1.1 Building
 
  1. Go to the top-level directory in the project tree.
- 2.  Run "./configure", possibly with some options, if you wish.  You can see a
-    list of possible options by invoking configure with the "--help".
+ 2. Run "./configure", possibly with some options, if you wish.  You can see a
+    list of available options by invoking configure with the "--help" option.
  3. Run "jam".
 
 2.1.2 Installing
