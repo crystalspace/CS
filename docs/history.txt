@@ -19,6 +19,9 @@ chronological order.
 	  changes (probably the recent work on the font caching machinery).
 	- Troy in odedynam.cpp removed call to dGeomSetBody in 
 	  AttachColliderPlane to prevent 'non-placeable geom' error.
+	- Eric Sunshine fixed csutil/symtable.cpp so that it compiles under
+	  gcc 2.95.  Problem was that 'values.Push(s ? s->Val : 0)' was
+	  considered ambiguous.  Reported by Michael Herder.
 16-Aug-2003
 	- Jorrit added more features with references to parts of the
 	  documentation.

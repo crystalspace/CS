@@ -168,7 +168,10 @@ csArray<csShaderVariable *> csSymbolTable::GetSymbols
   for (int i = 0; i < names.Length (); i++)
   {
     Symbol *s = (Symbol *) Hash.Get (names[i]);
-    values.Push (s ? s->Val : 0);
+    if (s != 0)
+      values.Push (s->Val);
+    else
+      values.Push (0);
   }
   return values;
 }
