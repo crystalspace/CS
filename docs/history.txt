@@ -8,6 +8,16 @@ The history order is reversed so that new features are at the top.
 	  support. There is now a new LAYER keyword in the definition
 	  of a MATERIAL. In LAYER you can specify the texture, scale, shift,
 	  and mixmode to use for that texture layer.
+	- Fixed iso plugin for latest material changes.
+	- Wouter Wijngaards added CS_FX_TILING to the bumptest bump layer.
+	  It works perfectly nice in software now!
+	- Wouter Wijngaards added small fix to demo.
+	  if(elapsed_time == 0) return;  from NextFrame().
+	  This avoids (almost 99%) of the jerkyness I experienced in
+	  opengl mode. The reason was that high framerates and bad timer
+	  caused 0 elapsed time, and a redraw of exactly the same frame,
+	  filling up queues inside my bad driver, and causing a tug when
+	  real work needed to be done.
 30-Apr-2001
 	- Philip Wyett fixed csVector3 up (); so that you/camera
 	  is the right way up in ptlab. :-)
