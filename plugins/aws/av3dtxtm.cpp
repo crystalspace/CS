@@ -20,7 +20,7 @@
 #include <stdarg.h>
 
 #include "cssysdef.h"
-#include "txtmgr.h"
+#include "av3dtxtm.h"
 #include "csutil/util.h"
 #include "csutil/debug.h"
 #include "qint.h"

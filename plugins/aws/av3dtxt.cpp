@@ -20,7 +20,7 @@
 #include <stdarg.h>
 
 #include "cssysdef.h"
-#include "null_txt.h"
+#include "av3dtxt.h"
 #include "csgfx/inv_cmap.h"
 #include "csgfx/quantize.h"
 #include "csutil/scanstr.h"

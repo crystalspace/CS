@@ -24,7 +24,7 @@
 #include "csutil/typedvec.h"
 #include "ivideo/graph3d.h"
 #include "csgeom/transfrm.h"
-#include "null_txt.h"
+#include "av3dtxt.h"
 
 /// Handle to our procedural texture, which the user can have us draw on.
 class awsSimpleCanvas : public csProcTexture

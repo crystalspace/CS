@@ -218,8 +218,8 @@ iAwsCanvas *
 awsManager::CreateDefaultCanvas(iEngine* engine, iTextureManager* txtmgr) 
 {
   iAwsCanvas *canvas = new awsMultiProctexCanvas(
-    engine->GetContext()->GetDriver2D()->GetWidth(), 
-    engine->GetContext()->GetDriver2D()->GetHeight(), 
+    640, //engine->GetContext()->GetDriver2D()->GetWidth(), 
+    480, //engine->GetContext()->GetDriver2D()->GetHeight(), 
     object_reg, engine, txtmgr);
   SCF_INC_REF(canvas);
 
