@@ -1,5 +1,23 @@
 The history order is reversed so that new features are at the top.
 
+19-Nov-2001
+	- Added iEngine::RemoveObject() which is a conveniance function to
+	  'remove' a CS object from the engine. This will not clear the
+	  object but it will remove all references to that object that the
+	  engine itself keeps. This function works for: iSector, iCollection,
+	  iMeshWrapper, iMeshFactoryWrapper, iCameraPosition, iDynLight,
+	  iMaterialWrapper, and iTextureWrapper. In addition this function
+	  also knows about iCurveTemplate and iPolyTxtPlane from the thing
+	  environment and will be able to clean those up too.
+	  This function will also remove the object from the region it may be
+	  in.
+	- Made csMaterial::SetTextureWrapper() safer by first
+	  incrementing the new texture before decrementing the old one.
+	  Did the same for csMaterialWrapper::SetMaterial() and
+	  csMaterialWrapper::SetMaterialHandle(). Also did the same
+	  for csTextureWrapper::SetTextureHandle().
+	- Fixed a memory leak with textures. The texture which is associated
+	  with a material had one ref too many.
 17-Nov-2001
 	- Added some additional DG_DESCRIBE0 statements to some
 	  constructors of engine objects in order to be able to do

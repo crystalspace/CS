@@ -776,6 +776,8 @@ public:
   virtual iObjectIterator* GetNearbyObjects (iSector* sector,
     const csVector3& pos, float radius);
 
+  virtual bool RemoveObject (iBase* object);
+
   /**
    * Add a halo attached to given light to the engine.
    */

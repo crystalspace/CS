@@ -45,7 +45,6 @@ csTextureWrapper::csTextureWrapper (iImage* Image) :
   (image = Image)->IncRef ();
   UpdateKeyColorFromImage ();
 
-  // @@@ ?????
   csEngine::current_engine->AddToCurrentRegion (this);
 }
 
@@ -67,7 +66,6 @@ csTextureWrapper::csTextureWrapper (iTextureHandle *ith) :
   }
   UpdateKeyColorFromHandle ();
 
-  // @@@ ?????
   csEngine::current_engine->AddToCurrentRegion (this);
 }
 
@@ -83,7 +81,6 @@ csTextureWrapper::csTextureWrapper (csTextureWrapper &t) :
 
   UpdateKeyColorFromImage ();
 
-  // @@@ ?????
   csEngine::current_engine->AddToCurrentRegion (this);
 }
 
@@ -99,9 +96,8 @@ csTextureWrapper::~csTextureWrapper ()
 
 void csTextureWrapper::SetImageFile (iImage *Image)
 {
-  Image->IncRef ();
-  if (image)
-    image->DecRef ();
+  if (Image) Image->IncRef ();
+  if (image) image->DecRef ();
   image = Image;
 
   UpdateKeyColorFromImage ();
@@ -109,13 +105,11 @@ void csTextureWrapper::SetImageFile (iImage *Image)
 
 void csTextureWrapper::SetTextureHandle (iTextureHandle *tex)
 {
-  if (image)
-    image->DecRef ();
-  if (handle)
-    handle->DecRef ();
+  if (image) { image->DecRef (); image = NULL; }
+  if (tex) tex->DecRef ();
+  if (handle) handle->DecRef ();
+  handle = tex;
 
-  image = NULL;
-  (handle = tex)->IncRef ();
   flags = handle->GetFlags ();
   UpdateKeyColorFromHandle ();
 }
@@ -140,7 +134,10 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
 
   // release old handle
   if (handle)
+  {
     handle->DecRef ();
+    handle = NULL;
+  }
 
   // Now we check the size of the loaded image. Having an image, that
   // is not a power of two will result in strange errors while

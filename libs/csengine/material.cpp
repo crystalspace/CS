@@ -66,11 +66,9 @@ csMaterial::~csMaterial ()
 
 void csMaterial::SetTextureWrapper (iTextureWrapper *tex)
 {
-  if (texture)
-    texture->DecRef();
+  if (tex) tex->IncRef ();
+  if (texture) texture->DecRef();
   texture = tex;
-  if (texture)
-    texture->IncRef();
 }
 
 void csMaterial::AddTextureLayer (iTextureWrapper* txtwrap, UInt mode,
@@ -146,7 +144,6 @@ csMaterialWrapper::csMaterialWrapper (iMaterial* m) :
   material = m;
   material->IncRef ();
 
-  // @@@ ??????
   csEngine::current_engine->AddToCurrentRegion (this);
 }
 
@@ -159,7 +156,6 @@ csMaterialWrapper::csMaterialWrapper (iMaterialHandle *ith) :
   handle = ith;
   handle->IncRef ();
 
-  // @@@ ??????
   csEngine::current_engine->AddToCurrentRegion (this);
 }
 
@@ -173,7 +169,6 @@ csMaterialWrapper::csMaterialWrapper (csMaterialWrapper &w) : csObject (w)
   handle = w.handle;
   handle->IncRef ();
 
-  // @@@ ??????
   csEngine::current_engine->AddToCurrentRegion (this);
 }
 
@@ -187,22 +182,17 @@ csMaterialWrapper::~csMaterialWrapper ()
 
 void csMaterialWrapper::SetMaterial (iMaterial *m)
 {
-  if (material)
-    material->DecRef ();
+  if (m) m->IncRef ();
+  if (material) material->DecRef ();
   material = m;
-  material->IncRef ();
 }
 
 void csMaterialWrapper::SetMaterialHandle (iMaterialHandle *m)
 {
-  if (material)
-    material->DecRef ();
-  if (handle)
-    handle->DecRef ();
-
-  material = NULL;
+  if (m) m->IncRef ();
+  if (material) { material->DecRef (); material = NULL; }
+  if (handle) handle->DecRef ();
   handle = m;
-  handle->IncRef ();
 }
 
 void csMaterialWrapper::Register (iTextureManager *txtmgr)

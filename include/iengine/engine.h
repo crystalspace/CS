@@ -147,7 +147,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 6, 3);
+SCF_VERSION (iEngine, 0, 6, 4);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -459,6 +459,24 @@ struct iEngine : public iBase
   virtual iObjectIterator* GetNearbyObjects (iSector* sector,
     const csVector3& pos, float radius) = 0;
 
+  /**
+   * Conveniance function to 'remove' a CS object from the engine.
+   * This will not clear the object but it will remove all references
+   * to that object that the engine itself keeps. This function works
+   * for: iSector, iCollection, iMeshWrapper, iMeshFactoryWrapper,
+   * iCameraPosition, iDynLight, iMaterialWrapper, and iTextureWrapper.
+   * In addition this function also knows about iCurveTemplate and
+   * iPolyTxtPlane from the thing environment and will be able to clean
+   * those up too. Note that the object is only removed if the resulting
+   * ref count will become zero. So basically this function only releases
+   * the references that the engine holds.
+   * <p>
+   * This function returns true if the engine recognized the object as
+   * one on which it can operate.
+   * <p>
+   * This function will also remove the object from the region it may be in.
+   */
+  virtual bool RemoveObject (iBase* object) = 0;
 };
 
 #endif // __IENGINE_ENGINE_H__

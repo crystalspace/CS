@@ -62,6 +62,8 @@
 #include "iutil/virtclk.h"
 #include "imap/reader.h"
 #include "imesh/lighting.h"
+#include "imesh/thing/polytmap.h"
+#include "imesh/thing/curve.h"
 #include "ivaria/reporter.h"
 #include "iutil/plugin.h"
 
@@ -1868,7 +1870,8 @@ void csEngine::AddToCurrentRegion (csObject* obj)
   }
 }
 
-iTextureWrapper* csEngine::CreateTexture (const char *iName, const char *iFileName,
+iTextureWrapper* csEngine::CreateTexture (const char *iName,
+	const char *iFileName,
   csColor *iTransp, int iFlags)
 {
   if (!ImageLoader)
@@ -2207,6 +2210,118 @@ iMeshWrapper* csEngine::CreateMeshWrapper (const char* name)
   if (name) meshwrap->SetName (name);
   GetMeshes ()->Add (&(meshwrap->scfiMeshWrapper));
   return &meshwrap->scfiMeshWrapper;
+}
+
+bool csEngine::RemoveObject (iBase* object)
+{
+  {
+    iSector* sector = SCF_QUERY_INTERFACE_FAST (object, iSector);
+    if (sector)
+    {
+      if (region) region->QueryObject ()->ObjRemove (sector->QueryObject ());
+      sectors.scfiSectorList.Remove (sector);
+      sector->DecRef ();
+      return true;
+    }
+  }
+  {
+    iCameraPosition* cp = SCF_QUERY_INTERFACE_FAST (object, iCameraPosition);
+    if (cp)
+    {
+      if (region) region->QueryObject ()->ObjRemove (cp->QueryObject ());
+      camera_positions.scfiCameraPositionList.Remove (cp);
+      cp->DecRef ();
+      return true;
+    }
+  }
+  {
+    iDynLight* dl = SCF_QUERY_INTERFACE_FAST (object, iDynLight);
+    if (dl)
+    {
+      if (region) region->QueryObject ()->ObjRemove (dl->QueryObject ());
+      RemoveDynLight (dl);
+      dl->DecRef ();
+      return true;
+    }
+  }
+  {
+    iCollection* col = SCF_QUERY_INTERFACE_FAST (object, iCollection);
+    if (col)
+    {
+      if (region) region->QueryObject ()->ObjRemove (col->QueryObject ());
+      collections.scfiCollectionList.Remove (col);
+      col->DecRef ();
+      return true;
+    }
+  }
+  {
+    iTextureWrapper* txt = SCF_QUERY_INTERFACE_FAST (object, iTextureWrapper);
+    if (txt)
+    {
+      if (region) region->QueryObject ()->ObjRemove (txt->QueryObject ());
+      GetTextureList ()->Remove (txt);
+      txt->DecRef ();
+      return true;
+    }
+  }
+  {
+    iMaterialWrapper* mat = SCF_QUERY_INTERFACE_FAST (object, iMaterialWrapper);
+    if (mat)
+    {
+      if (region) region->QueryObject ()->ObjRemove (mat->QueryObject ());
+      GetMaterialList ()->Remove (mat);
+      mat->DecRef ();
+      return true;
+    }
+  }
+  {
+    iMeshFactoryWrapper* factwrap = SCF_QUERY_INTERFACE_FAST (object,
+  	iMeshFactoryWrapper);
+    if (factwrap)
+    {
+      if (region) region->QueryObject ()->ObjRemove (factwrap->QueryObject ());
+      mesh_factories.scfiMeshFactoryList.Remove (factwrap);
+      factwrap->DecRef ();
+      return true;
+    }
+  }
+  {
+    iMeshWrapper* meshwrap = SCF_QUERY_INTERFACE_FAST (object, iMeshWrapper);
+    if (meshwrap)
+    {
+      if (region) region->QueryObject ()->ObjRemove (meshwrap->QueryObject ());
+      meshes.scfiMeshList.Remove (meshwrap);
+      meshwrap->DecRef ();
+      return true;
+    }
+  }
+  {
+    iPolyTxtPlane* ptp = SCF_QUERY_INTERFACE_FAST (object, iPolyTxtPlane);
+    if (ptp)
+    {
+      if (region) region->QueryObject ()->ObjRemove (ptp->QueryObject ());
+      iThingEnvironment* te = SCF_QUERY_INTERFACE (GetThingType (),
+    	  iThingEnvironment);
+      te->RemovePolyTxtPlane (ptp);
+      te->DecRef ();
+      ptp->DecRef ();
+      return true;
+    }
+  }
+  {
+    iCurveTemplate* ct = SCF_QUERY_INTERFACE_FAST (object, iCurveTemplate);
+    if (ct)
+    {
+      if (region) region->QueryObject ()->ObjRemove (ct->QueryObject ());
+      iThingEnvironment* te = SCF_QUERY_INTERFACE (GetThingType (),
+    	  iThingEnvironment);
+      te->RemoveCurveTemplate (ct);
+      te->DecRef ();
+      ct->DecRef ();
+      return true;
+    }
+  }
+  return false;
 }
 
 //----------------Begin-Multi-Context-Support------------------------------
