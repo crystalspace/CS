@@ -19,6 +19,7 @@
 *****************************************************************************/
 #include "awscomp.h"
 #include "awsitmv.h"
+#include "awsscr.h"
 
 /// Knows how to draw items that have several properties.
 struct awsListItem
@@ -150,7 +151,7 @@ class awsListBox : public awsComponent
 
    /// Image of radio button type item (marked)
    iTextureHandle *tree_grpf;
-
+   
   //////////////////////////////////////////
 
    /// Flags for frame style.
@@ -182,7 +183,22 @@ class awsListBox : public awsComponent
 
    /// Currently selected row
    awsListRow *sel;
+               
+private:
+   ///////////////////////////// Actions
 
+   /// Action dispatcher
+   awsActionDispatcher actions;
+
+   /// Inserts an item
+   static void InsertItem(void *owner, iAwsParmList &parmlist);
+
+   /// Deletes an item
+   static void DeleteItem(void *owner, iAwsParmList &parmlist);
+
+   /// Inserts an item
+   static void GetSelectedItem(void *owner, iAwsParmList &parmlist);
+   
 protected:
    /// Used, but shouldn't be (remnant of radio-button code)
    void ClearGroup();

@@ -40,5 +40,8 @@ awsListRowVector::CompareKey (csSome Item, csConstSome Key, int Mode) const
 {
   awsListRow *r1 = (awsListRow *)Item;
 
-  return r1->cols[sortcol].text->Compare((iString *)Key);
+  if (r1->cols[sortcol].text)
+    return r1->cols[sortcol].text->Compare((iString *)Key);
+  else
+    return -1;
 }
