@@ -10,6 +10,7 @@ The history order is reversed so that new features are at the top.
 	  This mostly affected the LIGHTING() flag in several of the mesh
 	  object loaders.
 	- Enabled stencil buffer for Windows OpenGL canvas.
+	- Enabled stencil buffer for X OpenGL canvas.
 	- Experimented a bit with the stencil buffer for clipping and
 	  DrawTriangleMesh. Not enabled by default yet since I have to
 	  experiment with it.
