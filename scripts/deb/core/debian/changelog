@@ -1,3 +1,10 @@
+crystalspace (0.96-20030205-5) unstable; urgency=low
+
+  * Recompile against libvorbis0a (Closes: bug#185600)
+  * Compile static libs without -fPIC (Closes: bug#183778)
+
+ -- Christian Bayle <bayle@debian.org>  Fri, 28 Mar 2003 17:06:30 +0100
+
 crystalspace (0.96-20030205-4) unstable; urgency=low
 
   * Hope to fix the remaining mixture of PIC and non PIC for build on hppa 
