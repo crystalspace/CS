@@ -25,6 +25,7 @@
 // @@@ needs checking
 //	skydome(string) : "Skydome texture"
 //	skydomeradius(integer) : "Skydome radius (default 800)" : 800
+
 	skybox(string) : "Skybox texture"
 	skyboxsize(integer) : "Skybox size (the lenght of a side, default 1600)" : 1600
 	dynavis(choices) : "Activate Dynavis" : 0 =
@@ -43,7 +44,12 @@
 	libraries(string) : "Libraries to include"
 	usermaterials(string) : "User-defined materials"
 	usertextures(string) : "User-defined textures"
-	renderloopname(string) : "Render loop name" = "*default"
+	renderloopname(string) : "Render loop name" : "*default"
+	skyportalsonly(choices) : "Show sky only through portals" : 0 =
+	[
+		1 : "Yes"
+		0 : "No"
+	]
 ]
 
 

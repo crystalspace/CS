@@ -187,7 +187,7 @@ CTextureFile* CTextureManager::GetTexture(const char* TextureName)
       pTexture->SetTexturename(InternalName);
       if (pTexture->IsVisible() && pTexture->IsStored())
       {
-	printf("Warning: texture '%s'('%s') is missing.\n"
+	printf ("Warning: texture '%s'('%s') is missing.\n"
 	  "         Using '%s' instead!\n",  TextureName, InternalName, 
 	  defaultname);
       }

@@ -200,7 +200,6 @@ bool CCSWorld::Write(csRef<iDocumentNode> root, CMapFile* pMap, const char * /*s
     sky->SetAttribute ("name", "sky");
     CreateNode (sky, "level", "1");
     CreateNode (sky, "sort", "NONE");
-    CreateNode (sky, "camera");
 
     DocNode mirror = CreateNode (renderpriorities, "priority");
     mirror->SetAttribute ("name", "mirror");

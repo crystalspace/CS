@@ -140,11 +140,28 @@ bool CCSSector::Write(csRef<iDocumentNode> node, CIWorld* pIWorld)
     CreateNode (sector, "cullerp", "crystalspace.culling.dynavis");
   }
 
-/*  if (m_IsDefaultsector && pWorld->NeedSkysector())
+  /*if (m_IsDefaultsector && pWorld->NeedSkysector())
   {
     pWorld->WriteSky(node);
   }
   else*/
+
+  if (m_IsDefaultsector && 
+    !worldspawn->GetBoolValueOfKey ("skyportalsonly", false))
+  {
+    DocNode meshobj = CreateNode (sector, "meshobj");
+    meshobj->SetAttribute ("name", "_defaultsky");
+
+    CreateNode (meshobj, "plugin", "thing");
+    CreateNode (meshobj, "zfill");
+    CreateNode (meshobj, "priority", "sky");
+    CreateNode (meshobj, "camera");
+
+    DocNode params = CreateNode (meshobj, "params");
+
+    pWorld->WriteSky (params);
+  }
+
   {
     if (m_Portals.Length() > 0)
     {
