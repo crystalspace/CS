@@ -60,24 +60,24 @@ converter::~converter()
 
 }
 
-converter::set_infile_name(char *sysinfile)
+void converter::set_infile_name(char *sysinfile)
 {
 
 }
 
-converter::set_outfile_name(char *outfile)
+void converter::set_outfile_name(char *outfile)
 {
 
 }
 
-converter::set_reverse_normals ( int yseno )
+void converter::set_reverse_normals ( int yseno )
 {
 
 }
 
 
 
-converter::ProcessConfig (csIniFile* config )
+void converter::ProcessConfig (csIniFile* config )
 {
 
 

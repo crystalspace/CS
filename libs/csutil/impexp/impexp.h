@@ -43,7 +43,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <def.h>
+#include "def.h"
 
 
 #if _MSC_VER > 1000
@@ -129,13 +129,13 @@ public:
 	converter();
 	virtual ~converter();
 	int                comline ( char *command );
-	ivcon( char* filename );  // reads in filename
+	int ivcon( char* filename );  // reads in filename
 
-	ProcessConfig ( csIniFile* config );
+	void ProcessConfig ( csIniFile* config );
 
-	set_outfile_name( char* outfile);
-	set_infile_name(char* infile );
-	set_reverse_normals( int yesno );
+	void set_outfile_name( char* outfile);
+	void set_infile_name(char* infile );
+	void set_reverse_normals( int yesno );
 
 bool convert(char* infile);
 	
