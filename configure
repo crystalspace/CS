@@ -870,7 +870,7 @@ Optional Features:
                           Pentium-specific code will not run on an Intel 486)
   --disable-freetypetest  Do not try to compile and run
                           a test FreeType program
-  --enable-qsqrt          enable qsqrt optimisation (sometimes triggers
+  --disable-qsqrt         disable qsqrt optimisation (sometimes triggers
                           compiler bugs) (default NO)
   --enable-linux-joystick enable Linux joystick support (default NO)
   --enable-optimize       build with optimizations enabled (default YES); same
@@ -19324,11 +19324,13 @@ fi
 # Check whether --enable-qsqrt or --disable-qsqrt was given.
 if test "${enable_qsqrt+set}" = set; then
   enableval="$enable_qsqrt"
-  cs_enable_qsqrt="yes"
+  enable_qsqrt=$enableval
+else
+  enable_qsqrt="yes"
 fi;
 
-cs_cv_cxx_qsqrt_ok="no"
-if test "$cs_enable_qsqrt" = "yes" ; then
+
+if test "$enable_qsqrt" = "yes" ; then
 
 
     if test $ac_compiler_gnu = yes; then
@@ -19472,10 +19474,12 @@ else
   cs_cv_cxx_qsqrt_ok=no
 fi
 
+else
+  cs_cv_cxx_qsqrt_ok="no"
 fi
 
 
-if test $cs_cv_cxx_qsqrt_ok = no; then
+if test "$cs_cv_cxx_qsqrt_ok" = "no"; then
   cs_header_text="${cs_header_text}#define CS_NO_QSQRT
 "
 fi

@@ -1799,15 +1799,17 @@ AC_DEFUN([CS_CHECK_QSQRT],
 	[cs_cv_cxx_qsqrt_ok=no])])
 
 AC_ARG_ENABLE([qsqrt],
-    [AC_HELP_STRING([--enable-qsqrt],
-      [enable qsqrt optimisation (sometimes triggers compiler bugs) (default NO)])],
-    [cs_enable_qsqrt="yes"], [])
+    [AC_HELP_STRING([--disable-qsqrt],
+      [disable qsqrt optimisation (sometimes triggers compiler bugs) (default
+	NO)])],
+    [enable_qsqrt=$enableval], [enable_qsqrt="yes"])
 
-cs_cv_cxx_qsqrt_ok="no"
-AS_IF([test "$cs_enable_qsqrt" = "yes" ],
-    [CS_CHECK_QSQRT])
 
-AS_IF([test $cs_cv_cxx_qsqrt_ok = no], [CS_HEADER_PROPERTY([CS_NO_QSQRT])])
+AS_IF([test "$enable_qsqrt" = "yes" ],
+    [CS_CHECK_QSQRT],
+    [cs_cv_cxx_qsqrt_ok="no"])
+
+AS_IF([test "$cs_cv_cxx_qsqrt_ok" = "no"], [CS_HEADER_PROPERTY([CS_NO_QSQRT])])
 
 #------------------------------------------------------------------------------
 # Check if a compiler bug discovered in gcc 2.96 (RedHat and other unstable
