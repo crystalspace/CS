@@ -1138,6 +1138,7 @@ void csTerrFuncObject::Draw (iRenderView* rview, bool use_z_buf)
         m->do_mirror = pCamera->IsMirrored ();
 	m->clip_portal = clip_portal;
 	m->clip_plane = clip_plane;
+	rview->CalculateFogMesh (camtrans, *m);
         pG3D->DrawTriangleMesh (*m);
       }
     }

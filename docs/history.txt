@@ -31,6 +31,7 @@ The history order is reversed so that new features are at the top.
 	  To avoid this delay you can copy the three lines that are
 	  put on screen after this performance test to data/config/opengl.cfg.
 	  The lines are the one with Video.OpenGL.Clip*.
+	- Added missing support for fog in terrfunc terrain engine.
 8-May-2001
 	- Martin Geisse did some changes in the RTTI macros:
 	    - Extended object interfaces now use DECLARE_OBJECT_INTERFACE,
