@@ -26,6 +26,8 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine got the BeOS port up and running again following
 	  Andrew's "Big Change".
 	- Martin Geisse submitted more updates to the Texinfo documents.
+	- Alex Pfaffe changed the far-clipping plane in the OpenGL renderer
+	  from 10 to 150.
 25-Feb-2000
 	- Fixed software texture cache so that it again allocates the
 	  texture cache based on number of pixels instead of bytes.
