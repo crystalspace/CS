@@ -178,6 +178,37 @@ enum csZBufMode
 
 /** @} */
 
+/**\name Shadow states
+ * @{ */
+
+/**
+ * Clear stencil
+ */
+#define CS_SHADOW_VOLUME_BEGIN 1
+
+/**
+ * Setup for pass 1
+ */
+#define CS_SHADOW_VOLUME_PASS1 2
+
+/**
+ * Setup for pass 2
+ */
+#define CS_SHADOW_VOLUME_PASS2 3
+
+/**
+ * Setup for shadow masking
+ */
+#define CS_SHADOW_VOLUME_USE 4
+
+/**
+ * Restore states
+ */
+#define CS_SHADOW_VOLUME_FINISH 5
+
+/** @} */
+
+
 
 /**
  * A triangle. Note that this structure is only valid if used
@@ -301,6 +332,9 @@ struct iRender3D : public iBase
 
   /// Disables offsetting of Z values
   virtual void DisableZOffset () = 0;
+
+  /// Controls shadow drawing
+  virtual void SetShadowState (int state) = 0;
 
   /// Draw a line
   virtual void DrawLine(const csVector3 & v1,

@@ -709,8 +709,13 @@ void csSector::Draw (iRenderView *rview)
     {
       r3d->SetObjectToCamera (&rview->GetCamera ()->GetTransform ());
       r3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION, alllights.Get (i)->GetCenter ());
+      r3d->DisableColorWrite ();
+      r3d->SetShadowState (CS_SHADOW_VOLUME_BEGIN);
       DrawShadow (rview, alllights.Get (i));
+      r3d->EnableColorWrite ();
+      r3d->SetShadowState (CS_SHADOW_VOLUME_USE);
       DrawLight (rview, alllights.Get(i));
+      r3d->SetShadowState (CS_SHADOW_VOLUME_FINISH);
     }
 
 #endif

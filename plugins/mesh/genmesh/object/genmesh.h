@@ -404,11 +404,13 @@ private:
   csColor* mesh_colors;
   int num_mesh_vertices;
 #ifdef CS_USE_NEW_RENDERER
+  csVector3* mesh_tri_normals;
   csTriangle* mesh_triangles;
   int num_mesh_triangles;
 
   bool mesh_vertices_dirty_flag;
   bool mesh_texels_dirty_flag;
+  bool mesh_tri_normals_dirty_flag;
   bool mesh_normals_dirty_flag;
   bool mesh_colors_dirty_flag;
   bool mesh_triangle_dirty_flag;
@@ -418,10 +420,11 @@ private:
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
   csRef<iRenderBuffer> normal_buffer;
+  csRef<iRenderBuffer> trinormal_buffer;
   csRef<iRenderBuffer> color_buffer;
   csRef<iRenderBuffer> index_buffer;
 
-  csStringID vertex_name, texel_name, normal_name, color_name, index_name;
+  csStringID vertex_name, texel_name, normal_name, trinormal_name, color_name, index_name;
 #endif
 
   csVector3 radius;
@@ -469,6 +472,7 @@ public:
   iBase* logparent;
 
   iEngine* engine;
+  csRef<iMaterialWrapper> shadowmat;
 
   /// Constructor.
   csGenmeshMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);

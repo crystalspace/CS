@@ -3,7 +3,7 @@
 <declare name="color" type="vector3" default="0,1,0.4"/>
 <variablemap variable="multiplyer" register="5"/>
 <variablemap variable="STANDARD_TIME" register="0"/>
-<streammap stream="texture coordinates" attribute="10"/>
+<!--<streammap stream="texture coordinates" attribute="10"/>-->
 <program>
 <![CDATA[
 !!ARBvp1.0
@@ -23,7 +23,7 @@ PARAM testvector = { 0, 0.5, 0, 1 };
 # Per vertex inputs
 ATTRIB iPos		= vertex.position;
 ATTRIB iCol0	= vertex.color;
-ATTRIB iTex0	= vertex.attrib[10];
+ATTRIB iTex0	= vertex.texcoord[0];
 ATTRIB iNorm	= vertex.normal;
 # Outputs
 OUTPUT oPos		= result.position;

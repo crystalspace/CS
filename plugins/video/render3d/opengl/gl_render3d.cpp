@@ -112,6 +112,8 @@ csGLRender3D::csGLRender3D (iBase *parent)
 
   render_target = NULL;
 
+  current_shadow_state = 0;
+
   //@@@ Test default. Will have to be autodetected later.
   clip_optional[0] = CS_GL_CLIP_PLANES;
   clip_optional[1] = CS_GL_CLIP_STENCIL;
@@ -968,7 +970,11 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
                 mymesh->clip_z_plane);
 
   SetZMode (mymesh->z_buf_mode);
-  SetMirrorMode (mymesh->do_mirror);
+
+  if (current_shadow_state == CS_SHADOW_VOLUME_PASS1)
+    SetMirrorMode (!mymesh->do_mirror);
+  else
+    SetMirrorMode (mymesh->do_mirror);
 
   csMaterialHandle* mathandle = 
     (csMaterialHandle*)(mymesh->GetMaterialHandle ());
@@ -1167,6 +1173,41 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
     statecache->DisableState (GL_STENCIL_TEST);
   }
 }
+
+void csGLRender3D::SetShadowState (int state)
+{
+  switch (state)
+  {
+  case CS_SHADOW_VOLUME_BEGIN:
+    current_shadow_state = CS_SHADOW_VOLUME_BEGIN;
+    glClearStencil (0);
+    glClear (GL_STENCIL_BUFFER_BIT);
+    statecache->EnableState (GL_STENCIL_TEST);
+    glStencilFunc (GL_ALWAYS, 0, 127);
+    glPolygonOffset (-0.1, -4); 
+    statecache->EnableState (GL_POLYGON_OFFSET_FILL);
+    break;
+  case CS_SHADOW_VOLUME_PASS1:
+    current_shadow_state = CS_SHADOW_VOLUME_PASS1;
+    glStencilOp (GL_KEEP, GL_INCR, GL_KEEP);
+    break;
+  case CS_SHADOW_VOLUME_PASS2:
+    current_shadow_state = CS_SHADOW_VOLUME_PASS2;
+    glStencilOp (GL_KEEP, GL_DECR, GL_KEEP);
+    break;
+  case CS_SHADOW_VOLUME_USE:
+    current_shadow_state = CS_SHADOW_VOLUME_USE;
+    statecache->DisableState (GL_POLYGON_OFFSET_FILL);
+    glStencilFunc (GL_EQUAL, 0, 127);
+    glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
+    break;
+  case CS_SHADOW_VOLUME_FINISH:
+    statecache->DisableState  (GL_STENCIL_TEST);
+    current_shadow_state = 0;
+    break;
+  }
+}
+
 
 void csGLRender3D::SetClipper (iClipper2D* clipper, int cliptype)
 {

@@ -684,6 +684,27 @@ bool csGenmeshMeshObject::DrawZ (iRenderView* rview, iMovable* /*movable*/,
 bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* /*movable*/,
 	csZBufMode mode)
 {
+  csRef<iMaterialWrapper> mater = factory->shadowmat;
+
+  iRender3D* r3d = rview->GetGraphics3D ();
+
+  mater->Visit ();
+
+  // Prepare for rendering.
+  mesh.z_buf_mode = CS_ZBUF_TEST;
+  mesh.mixmode = CS_FX_COPY;
+
+  mesh.SetIndexRange (0, factory->GetTriangleCount () * 12);
+  mesh.SetMaterialHandle (mater->GetMaterialHandle ());
+  csRef<iStreamSource> stream = SCF_QUERY_INTERFACE (factory, iStreamSource);
+  mesh.SetStreamSource (stream);
+  mesh.SetType (csRenderMesh::MESHTYPE_TRIANGLES);
+
+  r3d->SetShadowState (CS_SHADOW_VOLUME_PASS1);
+  r3d->DrawMesh (&mesh);
+  r3d->SetShadowState (CS_SHADOW_VOLUME_PASS2);
+  r3d->DrawMesh (&mesh);
+
   return true;
 }
 
@@ -722,7 +743,6 @@ bool csGenmeshMeshObject::DrawLight (iRenderView* rview, iMovable* /*movable*/,
   return true;
 }
 #endif // CS_USE_NEW_RENDERER
-
 
 void csGenmeshMeshObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
 {
@@ -866,6 +886,7 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
 #else
   num_mesh_triangles = 0;
   mesh_triangles = NULL;
+  mesh_tri_normals = NULL;
 #endif
   num_mesh_vertices = 0;
   mesh_vertices = NULL;
@@ -880,26 +901,32 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
 #ifdef CS_USE_NEW_RENDERER
   vertex_buffer = NULL;
   normal_buffer = NULL;
+  trinormal_buffer = NULL;
   texel_buffer = NULL;
   color_buffer = NULL;
   index_buffer = NULL;
 
   r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
+
   vertex_name = r3d->GetStringContainer ()->Request ("vertices");
   texel_name = r3d->GetStringContainer ()->Request ("texture coordinates");
   normal_name = r3d->GetStringContainer ()->Request ("normals");
+  trinormal_name = r3d->GetStringContainer ()->Request ("shadow normals");
   color_name = r3d->GetStringContainer ()->Request ("colors");
   index_name = r3d->GetStringContainer ()->Request ("indices");
 
   mesh_vertices_dirty_flag = false;
   mesh_texels_dirty_flag = false;
   mesh_normals_dirty_flag = false;
+  mesh_tri_normals_dirty_flag = false;
   mesh_colors_dirty_flag = false;
   mesh_triangle_dirty_flag = false;
 #endif
 
   csRef<iEngine> eng = CS_QUERY_REGISTRY (object_reg, iEngine);
   engine = eng;	// We don't want a circular reference!
+
+  shadowmat = engine->FindMaterial ("shadow extruder");
 }
 
 csGenmeshMeshObjectFactory::~csGenmeshMeshObjectFactory ()
@@ -996,116 +1023,270 @@ void csGenmeshMeshObjectFactory::SetupFactory ()
 #ifdef CS_USE_NEW_RENDERER
 iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
 {
+  csRef<iRender3D> r3d (CS_QUERY_REGISTRY (object_reg, iRender3D));
   if (name == vertex_name)
   {
+#ifndef CS_USE_SHADOW_VOLUMES
     if (mesh_vertices_dirty_flag)
     {
       vertex_buffer = r3d->GetBufferManager ()->GetBuffer (
         sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC);
-      csVector3* vbuf = (csVector3*)vertex_buffer->Lock(
-        iRenderBuffer::CS_BUF_LOCK_NORMAL);
-      if (vbuf)
-        memcpy (vbuf, mesh_vertices, sizeof (csVector3)*num_mesh_vertices);
-
+      csVector3* vbuf = (csVector3*)vertex_buffer->Lock (
+      	iRenderBuffer::CS_BUF_LOCK_NORMAL);
+      memcpy (vbuf, mesh_vertices, sizeof (csVector3)*num_mesh_vertices);
+#else
+    if (mesh_vertices_dirty_flag || mesh_triangle_dirty_flag) {
+      vertex_buffer = r3d->GetBufferManager ()->GetBuffer (
+        sizeof (csVector3)*num_mesh_triangles*3, CS_BUF_STATIC);
+      csVector3* vbuf = (csVector3*)vertex_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+      int vbuf_index = 0;
+      for (int i = 0; i < num_mesh_triangles; i ++) {
+        vbuf[vbuf_index++] = mesh_vertices[mesh_triangles[i].a];
+        vbuf[vbuf_index++] = mesh_vertices[mesh_triangles[i].b];
+        vbuf[vbuf_index++] = mesh_vertices[mesh_triangles[i].c];
+      }
+#endif
       vertex_buffer->Release ();
       mesh_vertices_dirty_flag = false;
     }
-    if ( !vertex_buffer) return NULL;
-    if ( vertex_buffer->IsDiscarded() )
-    {
-      csVector3* vbuf = (csVector3*)vertex_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
-      if(vbuf)
-        memcpy(vbuf, mesh_vertices, sizeof (csVector3)*num_mesh_vertices);
-      vertex_buffer->Release ();
-    }
-    vertex_buffer->CanDiscard(false);
     return vertex_buffer;
   }
   if (name == texel_name)
   {
+#ifndef CS_USE_SHADOW_VOLUMES
     if (mesh_texels_dirty_flag)
     {
       texel_buffer = r3d->GetBufferManager ()->GetBuffer (
         sizeof (csVector2)*num_mesh_vertices, CS_BUF_STATIC);
       csVector2* tbuf = (csVector2*)texel_buffer->Lock (
       	iRenderBuffer::CS_BUF_LOCK_NORMAL);
-      if(tbuf)
-        memcpy (tbuf, mesh_texels, sizeof (csVector2)*num_mesh_vertices);
+      memcpy (tbuf, mesh_texels, sizeof (csVector2)*num_mesh_vertices);
+#else
+    if (mesh_texels_dirty_flag || mesh_triangle_dirty_flag) {
+      texel_buffer = r3d->GetBufferManager ()->GetBuffer (
+        sizeof (csVector2)*num_mesh_triangles*3, CS_BUF_STATIC);
+      csVector2* tbuf = (csVector2*)texel_buffer->Lock (iRenderBuffer::CS_BUF_LOCK_NORMAL);
+      int tbuf_index = 0;
+      for (int i = 0; i < num_mesh_triangles; i ++) {
+        tbuf[tbuf_index++] = mesh_texels[mesh_triangles[i].a];
+        tbuf[tbuf_index++] = mesh_texels[mesh_triangles[i].b];
+        tbuf[tbuf_index++] = mesh_texels[mesh_triangles[i].c];
+      }
+#endif
       texel_buffer->Release ();
       mesh_texels_dirty_flag = false;
     }
-    if ( !texel_buffer) return NULL;
-    if ( texel_buffer->IsDiscarded() )
-    {
-      csVector2* tbuf = (csVector2*)texel_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
-      if(tbuf)
-        memcpy(tbuf, mesh_vertices, sizeof (csVector2)*num_mesh_vertices);
-      texel_buffer->Release ();
-    }
-    texel_buffer->CanDiscard(false);
     return texel_buffer;
   }
   if (name == normal_name)
   {
+#ifndef CS_USE_SHADOW_VOLUMES
     if (mesh_normals_dirty_flag)
     {
       normal_buffer = r3d->GetBufferManager ()->GetBuffer (
         sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC);
       csVector3 *nbuf = (csVector3*)normal_buffer->Lock (
       	iRenderBuffer::CS_BUF_LOCK_NORMAL);
-      if(nbuf)
-        memcpy (nbuf, mesh_normals, sizeof (csVector3)*num_mesh_vertices);
+      memcpy (nbuf, mesh_normals, sizeof (csVector3)*num_mesh_vertices);
+#else
+    if (mesh_normals_dirty_flag || mesh_triangle_dirty_flag) {
+      normal_buffer = r3d->GetBufferManager ()->GetBuffer (
+        sizeof (csVector3)*num_mesh_triangles*3, CS_BUF_STATIC);
+      csVector3 *nbuf = (csVector3*)normal_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+      int nbuf_index = 0;
+      for (int i = 0; i < num_mesh_triangles; i ++) {
+        nbuf[nbuf_index++] = mesh_normals[mesh_triangles[i].a];
+        nbuf[nbuf_index++] = mesh_normals[mesh_triangles[i].b];
+        nbuf[nbuf_index++] = mesh_normals[mesh_triangles[i].c];
+      }
+#endif
       normal_buffer->Release ();
       mesh_normals_dirty_flag = false;
     }
-    if ( !normal_buffer) return NULL;
-    if ( normal_buffer->IsDiscarded() )
-    {
-      csVector3* nbuf = (csVector3*)normal_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
-      if(nbuf)
-        memcpy(nbuf, mesh_vertices, sizeof (csVector3)*num_mesh_vertices);
-      normal_buffer->Release ();
-    }
-    normal_buffer->CanDiscard(false);
     return normal_buffer;
+  }
+  if (name == trinormal_name) {
+    if (mesh_tri_normals_dirty_flag || mesh_triangle_dirty_flag) {
+      trinormal_buffer = r3d->GetBufferManager ()->GetBuffer (
+        sizeof (csVector3)*num_mesh_triangles*3, CS_BUF_STATIC);
+      csVector3 *tbuf = (csVector3*)trinormal_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+      int tbuf_index = 0;
+      for (int i = 0; i < num_mesh_triangles; i ++) {
+        tbuf[tbuf_index++] = mesh_tri_normals[i];
+        tbuf[tbuf_index++] = mesh_tri_normals[i];
+        tbuf[tbuf_index++] = mesh_tri_normals[i];
+      }
+      trinormal_buffer->Release ();
+      mesh_tri_normals_dirty_flag = false;
+    }
+    return trinormal_buffer;
   }
   if (name == color_name)
   {
+#ifndef CS_USE_SHADOW_VOLUMES
     if (mesh_colors_dirty_flag)
     {
       color_buffer = r3d->GetBufferManager ()->GetBuffer (
         sizeof (csColor)*num_mesh_vertices, CS_BUF_STATIC);
       csColor *cbuf = (csColor*)color_buffer->Lock (
       	iRenderBuffer::CS_BUF_LOCK_NORMAL);
-      if(cbuf)
-        memcpy (cbuf, mesh_colors, sizeof (csColor)*num_mesh_vertices);
+      memcpy (cbuf, mesh_colors, sizeof (csColor)*num_mesh_vertices);
+#else
+    if (mesh_colors_dirty_flag || mesh_triangle_dirty_flag) {
+      color_buffer = r3d->GetBufferManager ()->GetBuffer (
+        sizeof (csColor)*num_mesh_triangles*3, CS_BUF_STATIC);
+      csColor *cbuf = (csColor*)color_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+      int cbuf_index = 0;
+      for (int i = 0; i < num_mesh_triangles; i ++) {
+        cbuf[cbuf_index ++] = mesh_colors[mesh_triangles[i].a];
+        cbuf[cbuf_index ++] = mesh_colors[mesh_triangles[i].b];
+        cbuf[cbuf_index ++] = mesh_colors[mesh_triangles[i].c];
+      }
+#endif
       color_buffer->Release();
       mesh_colors_dirty_flag = false;
     }
-    if ( !color_buffer) return NULL;
-    if ( color_buffer->IsDiscarded() )
-    {
-      csColor* cbuf = (csColor*)color_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
-      if(cbuf)
-        memcpy(cbuf, mesh_vertices, sizeof (csColor)*num_mesh_vertices);
-      color_buffer->Release ();
-    }
-    color_buffer->CanDiscard(false);
     return color_buffer;
   }
   if (name == index_name)
   {
     if (mesh_triangle_dirty_flag)
     {
+#ifndef CS_USE_SHADOW_VOLUMES
       index_buffer = r3d->GetBufferManager ()->GetBuffer (
         sizeof (unsigned int)*num_mesh_triangles*3, CS_BUF_INDEX);
-      unsigned int *ibuf = (unsigned int *)index_buffer->Lock (
-      	iRenderBuffer::CS_BUF_LOCK_NORMAL);
-      for (int i = 0; i < num_mesh_triangles; i ++)
+#else
+      index_buffer = r3d->GetBufferManager ()->GetBuffer (
+        sizeof (unsigned int)*num_mesh_triangles*12, CS_BUF_INDEX);
+#endif
+      unsigned int *ibuf = (unsigned int *)index_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+
+#ifdef CS_USE_SHADOW_VOLUMES
+      struct Edge {
+		csVector3 a, b;
+        int ind_a, ind_b;
+      };
+      csBasicVector EdgeStack;
+      int QuadsIndex = num_mesh_triangles * 3;
+	  int TriIndex = 0;
+#endif
+      for (int i = 0; i < num_mesh_triangles; i ++) 
       {
+#ifndef CS_USE_SHADOW_VOLUMES
         ibuf[i * 3 + 0] = mesh_triangles[i].a;
         ibuf[i * 3 + 1] = mesh_triangles[i].b;
         ibuf[i * 3 + 2] = mesh_triangles[i].c;
+#else 
+        ibuf[i * 3 + 0] = TriIndex ++;
+        ibuf[i * 3 + 1] = TriIndex ++;
+        ibuf[i * 3 + 2] = TriIndex ++;
+        bool found_a = false, found_b = false, found_c = false;
+        for (int j = EdgeStack.Length()-1; j >= 0; j --) {
+          Edge *e = (Edge *)EdgeStack[j];
+          if (!found_a) {
+            if (e->a == mesh_vertices[mesh_triangles[i].a] && 
+                e->b == mesh_vertices[mesh_triangles[i].b]) {
+              ibuf[QuadsIndex ++] = e->ind_a;
+              ibuf[QuadsIndex ++] = TriIndex - 3;
+              ibuf[QuadsIndex ++] = TriIndex - 2;
+              ibuf[QuadsIndex ++] = TriIndex - 2;
+              ibuf[QuadsIndex ++] = e->ind_b;
+              ibuf[QuadsIndex ++] = e->ind_a;
+              EdgeStack.Delete (j);
+              found_a = true;
+              continue;
+            }
+            if (e->a == mesh_vertices[mesh_triangles[i].b] &&
+                e->b == mesh_vertices[mesh_triangles[i].a]) {
+              ibuf[QuadsIndex ++] = e->ind_a, 
+              ibuf[QuadsIndex ++] = TriIndex - 2;
+              ibuf[QuadsIndex ++] = TriIndex - 3;
+              ibuf[QuadsIndex ++] = TriIndex - 3;
+              ibuf[QuadsIndex ++] = e->ind_b;
+              ibuf[QuadsIndex ++] = e->ind_a;
+              EdgeStack.Delete (j);
+              found_a = true;
+              continue;
+            }
+          }
+          if (!found_b) {
+            if (e->a == mesh_vertices[mesh_triangles[i].b] && 
+                e->b == mesh_vertices[mesh_triangles[i].c]) {
+              ibuf[QuadsIndex ++] = e->ind_a;
+              ibuf[QuadsIndex ++] = TriIndex - 2;
+              ibuf[QuadsIndex ++] = TriIndex - 1;
+              ibuf[QuadsIndex ++] = TriIndex - 1; 
+              ibuf[QuadsIndex ++] = e->ind_a; 
+              ibuf[QuadsIndex ++] = e->ind_b;
+              EdgeStack.Delete (j);
+              found_b = true;
+              continue;
+            }
+            if (e->a == mesh_vertices[mesh_triangles[i].c] &&
+                e->b == mesh_vertices[mesh_triangles[i].b]) {
+              ibuf[QuadsIndex ++] = e->ind_a; 
+              ibuf[QuadsIndex ++] = TriIndex - 1; 
+              ibuf[QuadsIndex ++] = TriIndex - 2;
+              ibuf[QuadsIndex ++] = TriIndex - 2;
+              ibuf[QuadsIndex ++] = e->ind_b; 
+              ibuf[QuadsIndex ++] = e->ind_a;
+              EdgeStack.Delete (j);
+              found_b = true;
+              continue;
+            }
+          }
+          if (!found_c) {
+            if (e->a == mesh_vertices[mesh_triangles[i].c] && 
+                e->b == mesh_vertices[mesh_triangles[i].a]) {
+              ibuf[QuadsIndex ++] = e->ind_a; 
+              ibuf[QuadsIndex ++] = TriIndex - 1; 
+              ibuf[QuadsIndex ++] = TriIndex - 3;
+              ibuf[QuadsIndex ++] = TriIndex - 3; 
+              ibuf[QuadsIndex ++] = e->ind_b; 
+              ibuf[QuadsIndex ++] = e->ind_a;
+              EdgeStack.Delete (j);
+              found_c = true;
+              continue;
+            }
+            if (e->a == mesh_vertices[mesh_triangles[i].a] &&
+                e->b == mesh_vertices[mesh_triangles[i].c]) {
+              ibuf[QuadsIndex ++] = e->ind_a; 
+              ibuf[QuadsIndex ++] = TriIndex - 3;
+              ibuf[QuadsIndex ++] = TriIndex - 1;
+              ibuf[QuadsIndex ++] = TriIndex - 1; 
+              ibuf[QuadsIndex ++] = e->ind_b; 
+              ibuf[QuadsIndex ++] = e->ind_a;
+              EdgeStack.Delete (j);
+              found_c = true;
+              continue;
+            }
+          }
+        }
+        if (!found_a) {
+          Edge *a = new Edge;
+	  a->a = mesh_vertices[mesh_triangles[i].a];
+	  a->b = mesh_vertices[mesh_triangles[i].b];
+          a->ind_a = TriIndex - 3;
+          a->ind_b = TriIndex - 2;
+          EdgeStack.Push (a);
+        }
+        if (!found_b) {
+          Edge *b = new Edge;
+          b->a = mesh_vertices[mesh_triangles[i].b];
+	  b->b = mesh_vertices[mesh_triangles[i].c];
+          b->ind_a = TriIndex - 2;
+          b->ind_b = TriIndex - 1;
+          EdgeStack.Push (b);
+        }
+        if (!found_c) {
+          Edge *c = new Edge;
+	  c->a = mesh_vertices[mesh_triangles[i].c];
+	  c->b = mesh_vertices[mesh_triangles[i].a];
+          c->ind_a = TriIndex - 1;
+          c->ind_b = TriIndex - 3;
+          EdgeStack.Push (c);
+        }
+#endif
       }
       index_buffer->Release ();
       mesh_triangle_dirty_flag = false;
@@ -1120,9 +1301,10 @@ int csGenmeshMeshObjectFactory::GetComponentCount (csStringID name)
   if (name == vertex_name) return 3;
   if (name == texel_name) return 2;
   if (name == normal_name) return 3;
+  if (name == trinormal_name) return 3;
   if (name == color_name) return 4;
   if (name == index_name) return 1;
-  return NULL;
+  return 0;
 }
 #endif
 
@@ -1321,7 +1503,10 @@ void csGenmeshMeshObjectFactory::CalculateNormals ()
   csGenTriangleVertices* tri_verts = new csGenTriangleVertices (tri_mesh,
   	new_verts, new_num_verts);
 
-  csVector3 * tri_normals = new csVector3[num_triangles];
+  if (mesh_tri_normals)
+    delete [] mesh_tri_normals;
+  mesh_tri_normals = new csVector3[num_triangles];
+  mesh_tri_normals_dirty_flag = true;
 
   // Calculate triangle normals.
   // Get the cross-product of 2 edges of the triangle and normalize it.
@@ -1329,10 +1514,10 @@ void csGenmeshMeshObjectFactory::CalculateNormals ()
   {
     csVector3 ab = new_verts [tris[i].b] - new_verts [tris[i].a];
     csVector3 bc = new_verts [tris[i].c] - new_verts [tris[i].b];
-    tri_normals [i] = ab % bc;
-    float norm = tri_normals[i].Norm ();
+    mesh_tri_normals [i] = ab % bc;
+    float norm = mesh_tri_normals[i].Norm ();
     if (norm)
-      tri_normals[i] /= norm;
+      mesh_tri_normals[i] /= norm;
   }
 
   csVector3* new_normals = mesh_normals;
@@ -1348,7 +1533,7 @@ void csGenmeshMeshObjectFactory::CalculateNormals ()
       csVector3 &n = new_normals[i];
       n.Set (0,0,0);
       for (j = 0; j < vt.num_con_triangles; j++)
-        n += tri_normals [vt.con_triangles[j]];
+        n += mesh_tri_normals [vt.con_triangles[j]];
       float norm = n.Norm ();
       if (norm)
         n /= norm;
@@ -1361,7 +1546,6 @@ void csGenmeshMeshObjectFactory::CalculateNormals ()
     }
   }
 
-  delete[] tri_normals;
   delete tri_verts;
   delete tri_mesh;
 

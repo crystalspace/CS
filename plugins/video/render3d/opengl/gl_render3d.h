@@ -94,8 +94,9 @@ private:
   csGLExtensionManager ext;
   csGLTextureCache *txtcache;
   csGLTextureManager *txtmgr;
-  
+
   int current_drawflags;
+  int current_shadow_state;
   csZBufMode current_zmode;
 
   int asp_center_x, asp_center_y;
@@ -307,6 +308,9 @@ public:
   /// Disables offsetting of Z values
   virtual void DisableZOffset ()
     { statecache->DisableState (GL_POLYGON_OFFSET_FILL); }
+
+  /// Controls shadow drawing
+  virtual void SetShadowState (int state);
 
   /// Draw a line
   virtual void DrawLine(const csVector3 & v1,

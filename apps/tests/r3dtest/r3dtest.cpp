@@ -281,10 +281,14 @@ bool R3DTest::Initialize ()
     return false;
   }
 
+  csRef<iMaterial> shadow (engine->CreateBaseMaterial (NULL));
+  csRef<iMaterialWrapper> mat = engine->GetMaterialList ()->NewMaterial (shadow);
+  mat->QueryObject ()->SetName ("shadow extruder");
+
   // Change this path to something /Anders Stenberg
   vfs->Mount ("/lev/testrender", "testrender.zip");
   vfs->ChDir ("/lev/testrender");
-  loader->LoadMapFile ("world", true);
+  loader->LoadMapFile ("world", false);
 
   csRef<iSector> room = engine->FindSector ("room");
 
@@ -293,8 +297,6 @@ bool R3DTest::Initialize ()
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, 0));
   csRef<iGraphics2D> g2d = r3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
-
-  engine->Prepare ();
 
   r3d->GetDriver2D ()->SetMouseCursor( csmcNone );
 
@@ -325,8 +327,33 @@ bool R3DTest::Initialize ()
           engine->GetMaterialList ()->Get (i)->GetMaterial ()->SetShader(shader);
       }
     }
+
+    shader = shmgr->CreateShader();
+    if(shader)
+    {
+      csRef<iShaderTechnique> tech (shader->CreateTechnique());
+      if(tech)
+      {
+        tech->SetPriority(100);
+        csRef<iShaderPass> pass (tech->CreatePass());
+        if(pass)
+        {
+          csRef<iShaderProgram> vp (shmgr->CreateShaderProgram("gl_arb_vp"));
+          csRef<iDataBuffer> mybuff(vfs->ReadFile("/shader/shadowextrude.avp"));
+          vp->Load(mybuff);
+          pass->SetVertexProgram(vp);
+        }
+      }
+      if(shader->Prepare())
+      {
+        engine->FindMaterial ("shadow extruder")->GetMaterial ()->SetShader(shader);
+      }
+    }
   }
+
 #endif // CS_USE_NEW_RENDERER
+
+  engine->Prepare ();
 
   hasfocus = true;
   int w = r3d->GetDriver2D ()->GetWidth()/2;
