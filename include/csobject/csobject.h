@@ -67,7 +67,7 @@ public:
 
   /// Set object name
   void SetName (const char *iName)
-  { delete [] Name; Name = strnew (iName); }
+  { delete [] Name; Name = new char[strlen (iName)+1]; strcpy (Name, iName); }
 
   /// Query object name
   const char *GetName () const
