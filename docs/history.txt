@@ -28,11 +28,26 @@ Short-term cleanups that need to be done:
 	  the system rely on the fact that csString is COM-patible, so it is
 	  not yet possible to actually disable COM in csString without
 	  breaking anything.)
+	- Fixes to css from Brandon Ehle.
+	- Brandon also added the start for cspython.
+	- Seth Galbraith addded a new way to align textures on polygons.
+	  You can use vertex indices in ORIG, FIRST, and SECOND instead
+	  of x,y,z coordinates. Note that this is NOT done for templates
+	  yet.
+	- Robert Bate fixed Mac port for recent changes.
+	- Fixed a bug in polygon splitters. It could happen that polygons
+	  were split to degenerate polygons (with only one or two vertices).
+	  This caused problems with lighting and even crashes.
 25-Oct-1999
 	- CrystalClear updates from Michael Dale Long.
 	- FINALLY fixed the bug in the quadcube!!! Lighting shadow
 	  frustrum culling finally works well. There were actually two
 	  unrelated bugs.
+	- Changes to Map2CS from Thomas Hieber. He added additional
+	  checks for degenerated polygons and moved all math from float
+	  to double.
+	- Andrew Zabolotny added an updated SCF header and documentation
+	  file to reflect some large improvements.
 24-Oct-1999
 	- Fixes and modifications to landscape engine from Alex Pfaffe.
 	  Landscape engine is closer to working now.

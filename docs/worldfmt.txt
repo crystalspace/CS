@@ -53,6 +53,7 @@ points upwards and the x-axis points to the right.
   <v> ::= <number>
   <vector-2d> ::= <x> ',' <z>
   <vector-3d> ::= <x> ',' <y> ',' <z>
+  <vertex-idx> ::= <integer>
   <coordinate> ::= <vector-3d>
   <coordinate-2d> ::= <vector-2d>
   <texture-coordinate> ::= <u> ',' <v>
@@ -138,9 +139,9 @@ Various basic objects:
 -----------------------------------------------------------------------------
 Various components:
 
-  <plane-orig> ::= 'ORIG' '(' <vector-3d> ')'
-  <plane-first> ::= 'FIRST' '(' <vector-3d> ')'
-  <plane-second> ::= 'SECOND' '(' <vector-3d> ')'
+  <plane-orig> ::= 'ORIG' '(' <vector-3d> | <vertex-idx> ')'
+  <plane-first> ::= 'FIRST' '(' <vector-3d> | <vertex-idx> ')'
+  <plane-second> ::= 'SECOND' '(' <vector-3d> | <vertex-idx> ')'
   <plane-first-len> ::= 'FIRST_LEN' '(' <texture-length> ')'
   <plane-second-len> ::= 'SECOND_LEN' '(' <texture-length> ')'
   <uv-shift> ::= 'UV_SHIFT' '(' <texture-coordinate> ')'
