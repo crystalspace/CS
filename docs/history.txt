@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+10-Jul-2001
+	- Eric Sunshine eliminated a couple compilation warnings from
+	  curve.cpp.
 9-Jul-2001
 	- Added csThing::IntersectSegmentFull() which does the same
 	  thing as IntersectSegment() except that the latter doesn't (anymore)
