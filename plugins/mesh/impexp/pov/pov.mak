@@ -51,7 +51,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: povie povieclean
 povie: $(OUTDIRS) $(POVIE)
 
-$(FOUNT): $(OBJ.POVIE) $(LIB.POVIE)
+$(POVIE): $(OBJ.POVIE) $(LIB.POVIE)
 	$(DO.PLUGIN)
 
 clean: povieclean

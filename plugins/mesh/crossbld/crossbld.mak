@@ -51,7 +51,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: crossbld crossbldclean
 crossbld: $(OUTDIRS) $(CROSSBLD)
 
-$(FOUNT): $(OBJ.CROSSBLD) $(LIB.CROSSBLD)
+$(CROSSBLD): $(OBJ.CROSSBLD) $(LIB.CROSSBLD)
 	$(DO.PLUGIN)
 
 clean: crossbldclean
