@@ -399,8 +399,8 @@ AC_CACHE_CHECK([for python SDK], [cs_cv_python_sdk],
 		    "-L"+distutils.sysconfig.get_python_lib(0,1)+"/config"'])`
 	    cs_cv_python_base_libs=`AC_RUN_LOG([$PYTHON -c \
 		'import distutils.sysconfig ; \
-		print distutils.sysconfig.get_config_var("LIBS") + " " + \
-		distutils.sysconfig.get_config_var("SYSLIBS")'])`
+		print (distutils.sysconfig.get_config_var("LIBS") or "") + " " + \
+		(distutils.sysconfig.get_config_var("SYSLIBS") or "")'])`
 	    cs_cv_python_base_cflags=CS_TRIM([$cs_cv_python_base_cflags])
 	    cs_cv_python_base_lflags=CS_TRIM([$cs_cv_python_base_lflags])
 	    cs_cv_python_base_libs=CS_TRIM([$cs_cv_python_base_libs])
