@@ -22,11 +22,14 @@
 #include "sysdef.h"
 #include "cscom/com.h"
 #include "css/cssint.h"
-#include "css/interfaces.h"
+#include "css/intrface.h"
 
 #ifdef OS_WIN32
 #define STATIC_EXTENSION ".lib"
 #define SHARED_EXTENSION ".dll"
+#else
+#define STATIC_EXTENSION ".a"
+#define SHARED_EXTENSION ".so"
 #endif
 
 //***** Huge define mess that shouldn't change (i.e. do not read after this point, skip to end of file)
