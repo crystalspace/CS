@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Platform Details, Makefile How-To, Internals, Internals
+@node Platform Details, Threads in CS, Internals, Internals
 @section Platform-Specific Details
 @cindex Platform-Specific Details
 @cindex Details, Platform-Specific

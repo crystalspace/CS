@@ -24,6 +24,21 @@ chronological order.
 	- Eric Sunshine performed Texinfo mark-up correction and cleanup in new
 	  material added to engine/internal.txi.  Also cleaned up the grammar
 	  and performed some re-writing to make the discussion more idiomatic.
+	- Eric Sunshine removed the difficult-to-maintain, legacy, GNU
+	  make-based build system. However, in order to avoid alienating users
+	  by forcing them to download, install, and use Jam, the CS configure
+	  script now performs these additional tasks:
+	    - If Jam is not installed, then it is built automatically on behalf
+	      of the user from a local copy of the Jam source
+	      (CS/apps/tools/jam) and deposited into the root of the build
+	      directory.
+	    - A makefile is synthesized which responds to all of the top-level
+	      targets to which the Jam build system responds. The makefile
+	      simply forwards these requests over to Jam with appropriate Jam
+	      options to simulate 'make' output and behavior as closely as
+	      possible.
+	  These changes make it possible for users to continue using 'make'
+	  without ever having to know or care about Jam.
 1-May-2004
 	- Jorrit added a new data/terrainf/world which is a variant of
 	  data/terrain/world that uses the fixed shaders. Keep in mind that you

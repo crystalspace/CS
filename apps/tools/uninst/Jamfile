@@ -1,7 +1,0 @@
-SubDir TOP apps tools uninst ;
-
-if ! [ Property build : projgen ]
-{
-Description uninst : "Uninstall program" ;
-Application uninst : [ Wildcard *.cpp *.h ] : console ;
-}

@@ -18,10 +18,15 @@
 #
 #============================================================================
 
-# enable if you want debug messages
+# Enable if you want debug messages.
 JAM_DEBUG ?= 1 ;
 
 jamrulesdir = $(TOP)/mk/jam ;
+
+# This needs to be included before _and_ after all other includes since it
+# optionally overrides built-in rules to glean information about targets being
+# defined.
+include $(jamrulesdir)/dump.jam ;
 
 include $(jamrulesdir)/jamcompatibility.jam ;
 include $(jamrulesdir)/subdir.jam ;
@@ -65,8 +70,11 @@ case * :
   include $(jamrulesdir)/unix.jam ;
 }
 
-# leave msvcgen as last element because it overrides some of the earlier
-# defined rules (it needs to be after the OS-specific rules as well because
-# it overrides some Win32 rules)
+# This needs to be included after all others because it overrides some of the
+# earlier defined rules when enabled. It even overrides Win32 rules, so it
+# needs to be after platform-specific includes, as well.
 include $(jamrulesdir)/msvcgen.jam ;
 
+# This needs to included be before _and_ after all other includes since it
+# optionally overrides rules defined earlier.
+include $(jamrulesdir)/dump.jam ;

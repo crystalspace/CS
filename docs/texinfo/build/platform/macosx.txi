@@ -5,8 +5,8 @@
 @cindex MacOS/X
 
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.  Copyright
-@copyright{} 1999, 2000, 2001, 2002, 2003 by Eric Sunshine.  Last updated
-14 October 2003.}
+@copyright{} 1999, 2000, 2001, 2002, 2003, 2004 by Eric Sunshine.  Last updated
+30 April 2004.}
 
 Crystal Space was ported to MacOS/X by Eric Sunshine.  If you have questions or
 comments about this port, please contact Eric Sunshine at
@@ -213,12 +213,6 @@ For example, to build all plug-in modules, you could invoke this command:
 make -k plugins  # @r{Builds all plug-in modules.}
 @end example
 
-You can build a subset of plugin modules, known as ``drivers'' as follows:
-
-@example
-make -k drivers  # @r{Builds necessary video, audio, network drivers}
-@end example
-
 To build only the WalkTest application and the plug-in modules which it most
 commonly requires use the following target:
 
@@ -253,14 +247,6 @@ explained above.  Installation can be performed with the following command:
 
 @example
 make install
-@end example
-
-If you intended, but forgot, to change the installation location when you
-configured the makefiles, you can still override the default at installation
-time.  For example:
-
-@example
-make install INSTALL_DIR=/Library/CrystalSpace
 @end example
 
 @node MacOS/X Running Programs, , MacOS/X Building, MacOS/X

@@ -23,10 +23,13 @@ RegisterCompileGroups sounddrivers soundloaders imageloaders netdrivers
 # Create some clean targets
 CleanDir clean : out ;
 
-Clean distclean : Jamconfig Jamfile jambuild jam$(SUFEXE) Makefile
+Clean distclean : Jamconfig Jamfile
+		  cache.mak config.mak Makefile
 		  config.log config.status config.status.lineno
 		  config.cache configure.lineno
-		  include/volatile.h ;
+		  include/volatile.h
+		  [ Wildcard *.scf ]
+		  [ Wildcard *.cex ] ;
 CleanDir distclean : autom4te.cache ;
 Depends distclean : clean ;
 Help distclean : "Remove configuration information and built targets" ;

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Threads in CS, , Makefile How-To, Internals
+@node Threads in CS, , Platform Details, Internals
 @section Threads in Crystal Space
 @cindex Threads
 

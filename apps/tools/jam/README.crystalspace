@@ -1,0 +1,16 @@
+This is a patch for Jam 2.5rc3 by Frank Richter <resqu@gmx.ch> (with a minor
+addition to "Jamfile" by Eric Sunshine <sunshine@sunshineco.com> which allows
+the bootstrap to work correctly when Jam is building itself).  It was created
+for the Crystal Space cs-win32libs support package, but is not specific to that
+package, and can be used for any project.  This custom version of Jam is
+suitable for use with MSYS/Mingw and Cygwin.  It differs from the official
+distribution in the following ways:
+
+- Invokes commands via the Bourne shell (/bin/sh) rather than cmd.exe.
+- Is dependent upon neither cygwin1.dll nor msys-1.0.dll.
+
+Build from an MSYS or Cygwin shell prompt using the following command:
+
+  make CC=gcc CFLAGS=-DMSYS
+
+The complete patch can be found in the file jam-2.5rc3-frankricther.patch.
