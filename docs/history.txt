@@ -15,6 +15,8 @@ chronological order.
 	- Jorrit added the ability to have multiple selected meshes in bugplug.
 	  ctrl-alt-m will now accept a regexp pattern which will be used to
 	  match all meshes in the current sector.
+	- Jorrit fixed a bug in HitBeamObject/HitBeamOutline of bruteblock
+	  plugin. Now it appears to work correctly.
 26-Jun-2004
 	- Jorrit added a new bugplug command to switch visibility culler of
 	  the current sector. ctrl-shift-1 is assigned to switch to frustvis

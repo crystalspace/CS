@@ -1201,6 +1201,7 @@ bool csTerrainObject::HitBeam (csTerrBlock* block,
     if (pr) *pr = qsqrt (dist * itot_dist);
     if (dist >= tot_dist)
       return false;
+    return true;
   }
   else
   {
