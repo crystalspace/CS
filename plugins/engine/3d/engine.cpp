@@ -341,6 +341,8 @@ iCollection *csCollectionList::CollectionList::FindByName (
 void csEngineMeshList::FreeMesh (iMeshWrapper* mesh)
 {
   mesh->GetMovable ()->ClearSectors ();
+  iMeshWrapper* p = mesh->GetParentContainer ();
+  if (p) p->GetChildren ()->Remove (mesh);
   csMeshList::FreeMesh (mesh);
 }
 
