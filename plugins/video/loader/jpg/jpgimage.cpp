@@ -198,10 +198,10 @@ static void jpeg_buffer_dest (j_compress_ptr cinfo, jpg_datastore *ds)
   dest->ds = ds;
 }
 
-csPtr<iImage> csJPGImageIO::Load (uint8* iBuffer, size_t iSize, int iFormat)
+csPtr<iImage> csJPGImageIO::Load (iDataBuffer* buf, int iFormat)
 {
   ImageJpgFile* i = new ImageJpgFile (iFormat, object_reg);
-  if (i && !i->Load (iBuffer, iSize))
+  if (i && !i->Load (buf->GetUint8(), buf->GetSize()))
   {
     delete i;
     return 0;

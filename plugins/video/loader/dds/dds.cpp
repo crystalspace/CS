@@ -27,9 +27,6 @@
 namespace dds
 {
 
-#define MakeFourCC(c1, c2, c3, c4) \
-  ((uint32) c1 | ((uint32) c2<<8) | ((uint32) c3<<16) | ((uint32) c4<<24))
-
 Loader::Loader ()
   : source(0), sourcelen(0), header(0), lasterror(0)
 {
@@ -52,7 +49,7 @@ void Loader::SetSource (void* buffer, size_t bufferlen)
 bool Loader::IsDDS ()
 {
   uint32 magic = csLittleEndianLong( *((uint32*) source));
-  if (magic != MakeFourCC ('D','D','S',' '))
+  if (magic != Magic)
     return false;
 
   if (!ReadHeader ())

@@ -112,10 +112,10 @@ const csImageIOFileFormatDescriptions& csPNGImageIO::GetDescription ()
   return formats;
 }
 
-csPtr<iImage> csPNGImageIO::Load (uint8* iBuffer, size_t iSize, int iFormat)
+csPtr<iImage> csPNGImageIO::Load (iDataBuffer* buf, int iFormat)
 {
   ImagePngFile* i = new ImagePngFile (iFormat);
-  if (i && !i->Load (iBuffer, iSize))
+  if (i && !i->Load (buf->GetUint8(), buf->GetSize()))
   {
     delete i;
     return 0;

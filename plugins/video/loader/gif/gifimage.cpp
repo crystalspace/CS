@@ -62,10 +62,10 @@ const csImageIOFileFormatDescriptions& csGIFImageIO::GetDescription ()
   return formats;
 }
 
-csPtr<iImage> csGIFImageIO::Load (uint8* iBuffer, size_t iSize, int iFormat)
+csPtr<iImage> csGIFImageIO::Load (iDataBuffer* buf, int iFormat)
 {
   ImageGifFile* i = new ImageGifFile (iFormat);
-  if (i && !i->Load (iBuffer, iSize))
+  if (i && !i->Load (buf->GetUint8(), buf->GetSize()))
   {
     delete i;
     return 0;

@@ -67,8 +67,7 @@ csPtr<iImage> csLoader::LoadImage (const char* fname, int Format)
   }
 
   // we don't use csRef because we need to return an Increfed object later
-  csRef<iImage> image (
-    ImageLoader->Load (buf->GetUint8 (), buf->GetSize (), Format));
+  csRef<iImage> image (ImageLoader->Load (buf, Format));
   if (!image)
   {
     ReportWarning (

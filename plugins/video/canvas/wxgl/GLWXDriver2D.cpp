@@ -45,6 +45,7 @@
 
 #ifdef WIN32
 #include "csutil/win32/win32.h"
+#include "csutil/win32/wintools.h"
 #endif
 
 #include "GLWXDriver2D.h"
@@ -115,6 +116,15 @@ wxWindow* csGraphics2DWX::GetWindow()
   return theCanvas;
 }
 
+void* csGraphics2DWX::GetProcAddress (const char *funcname)
+{
+#ifdef WIN32
+  return wglGetProcAddress (funcname);
+#else
+  return 0;
+#endif
+}
+
 csGraphics2DWX::~csGraphics2DWX ()
 {
   Close ();  
@@ -177,6 +187,34 @@ bool csGraphics2DWX::Open()
 
   if(theCanvas == 0) Report(CS_REPORTER_SEVERITY_ERROR, "Failed creating GL Canvas!");
   theCanvas->Show(true);
+
+#ifdef WIN32
+  {
+    HDC hDC = (HDC)theCanvas->GetHDC();
+    PIXELFORMATDESCRIPTOR pfd;
+    if (DescribePixelFormat (hDC, ::GetPixelFormat (hDC), 
+      sizeof(PIXELFORMATDESCRIPTOR), &pfd) == 0)
+    {
+      DWORD error = GetLastError();
+      char* msg = cswinGetErrorMessage (error);
+      Report (CS_REPORTER_SEVERITY_ERROR,
+	"DescribePixelFormat failed: %s [%ul]",
+	msg, error);
+      delete[] msg;
+    }
+    else
+    {
+      currentFormat[glpfvColorBits] = pfd.cColorBits;
+      currentFormat[glpfvAlphaBits] = pfd.cAlphaBits;
+      currentFormat[glpfvDepthBits] = pfd.cDepthBits;
+      currentFormat[glpfvStencilBits] = pfd.cStencilBits;
+      currentFormat[glpfvAccumColorBits] = pfd.cAccumBits;
+      currentFormat[glpfvAccumAlphaBits] = pfd.cAccumAlphaBits;
+
+      Depth = pfd.cColorBits; 
+    }
+  }
+#endif
 
   // Open your graphic interface
   if (!csGraphics2DGLCommon::Open ())

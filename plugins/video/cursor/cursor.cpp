@@ -134,7 +134,7 @@ bool csCursor::ParseConfigFile (iConfigFile* ini)
       // **** operator+ for csString didn't work so used ugly method
       const char *img =
         ini->GetStr (csString(prefix).Append(name).Append(".image"));
-      csRef<iDataBuffer> buf = VFS->ReadFile (img);
+      csRef<iDataBuffer> buf = VFS->ReadFile (img, false);
       if (!buf)
       {
         csReport (reg, CS_REPORTER_SEVERITY_WARNING, CURSOR_SCF_NAME,
@@ -144,8 +144,7 @@ bool csCursor::ParseConfigFile (iConfigFile* ini)
         ignorelist.Push (name);
         continue;
       }
-      csRef<iImage> image = io->Load (buf->GetUint8(), buf->GetSize(),
-	CS_IMGFMT_ANY | CS_IMGFMT_ALPHA);
+      csRef<iImage> image = io->Load (buf, CS_IMGFMT_ANY | CS_IMGFMT_ALPHA);
       if (!image)
       {
         csReport (reg, CS_REPORTER_SEVERITY_WARNING, CURSOR_SCF_NAME,

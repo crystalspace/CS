@@ -101,10 +101,10 @@ void csModelDataTexture::LoadImage (iVFS *vfs, iImageIO *io, int Format)
   if (!FileName) return;
   Image = 0;
 
-  csRef<iDataBuffer> dbuf (vfs->ReadFile (FileName));
+  csRef<iDataBuffer> dbuf (vfs->ReadFile (FileName, false));
   if (!dbuf) return;
 
-  Image = io->Load (dbuf->GetUint8 (), dbuf->GetSize (), Format);
+  Image = io->Load (dbuf, Format);
 }
 
 void csModelDataTexture::Register (iTextureList *tl)

@@ -207,8 +207,7 @@ csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node,
 
     if (data)
     {
-      Image = imageio->Load (data->GetUint8(), data->GetSize(), 
-	Engine->GetTextureFormat());
+      Image = imageio->Load (data, Engine->GetTextureFormat());
     }
     do_cache = !Image.IsValid();
   }

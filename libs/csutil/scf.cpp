@@ -295,6 +295,8 @@ public:
   virtual const char *QueryDependencies ();
   /// Query class ID
   virtual const char *QueryClassID();
+  /// Query library module name.
+  virtual const char *QueryModuleName ();
 };
 
 /// This class holds a number of scfFactory structures
@@ -428,14 +430,21 @@ void scfFactory::DecRef ()
 #endif
 }
 
-void scfFactory::AddRefOwner (iBase**)
+void scfFactory::AddRefOwner (iBase** ref_owner)
 {
-  // @@@ TODO
+  if (!scfWeakRefOwners)						
+    scfWeakRefOwners = new csArray<iBase**> (0, 4);			
+  scfWeakRefOwners->InsertSorted (ref_owner);				
 }
 
-void scfFactory::RemoveRefOwner (iBase**)
+void scfFactory::RemoveRefOwner (iBase** ref_owner)
 {
-  // @@@ TODO
+  if (!scfWeakRefOwners)						
+    return;
+  size_t index = scfWeakRefOwners->FindSortedKey (			
+    csArrayCmp<iBase**, iBase**> (ref_owner)); 				
+  if (index != csArrayItemNotFound) scfWeakRefOwners->DeleteIndex (	
+    index); 								
 }
 
 int scfFactory::GetRefCount ()
@@ -484,6 +493,13 @@ const char *scfFactory::QueryDependencies ()
 const char *scfFactory::QueryClassID ()
 {
   return ClassID;
+}
+
+const char *scfFactory::QueryModuleName ()
+{
+  const char* libname = 
+    LibraryName != csInvalidStringID ? libraryNames->Request(LibraryName) : 0; 
+  return libname;
 }
 
 //------------------------------------ Implementation of csSCF functions ----//

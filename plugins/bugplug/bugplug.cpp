@@ -780,6 +780,32 @@ void csBugPlug::CaptureScreen ()
   }
 }
 
+void csBugPlug::ListLoadedPlugins ()
+{
+  csRef<iPluginManager> plugmgr = CS_QUERY_REGISTRY (object_reg, 
+    iPluginManager);
+  csRef<iPluginIterator> plugiter (plugmgr->GetPlugins ());
+
+  csSet<const char*, csConstCharHashKeyHandler> printedPlugins;
+  Report (CS_REPORTER_SEVERITY_NOTIFY, 
+    "Loaded plugins:");
+  while (plugiter->HasNext())
+  {
+    csRef<iFactory> plugFact = SCF_QUERY_INTERFACE (plugiter->Next (),
+      iFactory);
+    if (plugFact.IsValid())
+    {
+      const char* libname = plugFact->QueryModuleName();
+      if ((libname != 0) && (!printedPlugins.In (libname)))
+      {
+	printedPlugins.AddNoTest (libname);
+	Report (CS_REPORTER_SEVERITY_NOTIFY, 
+	  "  %s", libname);
+      }
+    }
+  }
+}
+
 bool csBugPlug::EatKey (iEvent& event)
 {
   int type = csKeyEventHelper::GetEventType (&event);
@@ -1531,6 +1557,9 @@ bool csBugPlug::EatKey (iEvent& event)
 	    "BugPlug %s shadow debugging.",
 	    do_shadow_debug ? "enabled" : "disabled");*/
         break;
+      case DEBUGCMD_LISTPLUGINS:
+	ListLoadedPlugins();
+	break;
     }
     process_next_key = false;
   }
@@ -2093,6 +2122,7 @@ int csBugPlug::GetCommandCode (const char* cmdstr, char* args)
   if (!strcmp (cmd, "mesh_yplus"))	return DEBUGCMD_MESH_YPLUS;
   if (!strcmp (cmd, "mesh_zmin"))	return DEBUGCMD_MESH_ZMIN;
   if (!strcmp (cmd, "mesh_zplus"))	return DEBUGCMD_MESH_ZPLUS;
+  if (!strcmp (cmd, "listplugins"))	return DEBUGCMD_LISTPLUGINS;
 
   return DEBUGCMD_UNKNOWN;
 }

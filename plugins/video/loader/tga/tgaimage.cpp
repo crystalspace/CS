@@ -146,10 +146,10 @@ const csImageIOFileFormatDescriptions& csTGAImageIO::GetDescription ()
   return formats;
 }
 
-csPtr<iImage> csTGAImageIO::Load (uint8* iBuffer, size_t iSize, int iFormat)
+csPtr<iImage> csTGAImageIO::Load (iDataBuffer* buf, int iFormat)
 {
   ImageTgaFile* i = new ImageTgaFile (iFormat);
-  if (i && !i->Load (iBuffer, iSize))
+  if (i && !i->Load (buf->GetUint8(), buf->GetSize()))
   {
      delete i ;
     return 0;

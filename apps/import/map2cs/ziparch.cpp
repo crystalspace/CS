@@ -26,6 +26,7 @@
 #include "zipfile.h"
 
 #include "igraphic/imageio.h"
+#include "csutil/databuf.h"
 
 CZipArchive::CZipArchive()
 {
@@ -72,8 +73,10 @@ CTextureFile* CZipArchive::ExtractTexture(const char* texturename, const char* t
     pTexture->SetFilename    (texfilename);
     pTexture->SetOriginalData(TextureData.GetData(), TextureData.GetSize());
 
-    csRef<iImage> img (ImageLoader->Load ((uint8*)TextureData.GetData(), TextureData.GetSize(), 
-      CS_IMGFMT_ANY));
+    csRef<iDataBuffer> buf;
+    buf.AttachNew (new csDataBuffer (TextureData.GetData(), 
+      TextureData.GetSize(), false));
+    csRef<iImage> img (ImageLoader->Load (buf, CS_IMGFMT_ANY));
     if (img)
     {
       pTexture->SetOriginalSize (img->GetWidth(), img->GetHeight());

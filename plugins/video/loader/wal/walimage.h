@@ -40,7 +40,7 @@ class csWALImageIO : public iImageIO
   virtual ~csWALImageIO ();
 
   virtual const csImageIOFileFormatDescriptions& GetDescription ();
-  virtual csPtr<iImage> Load (uint8* iBuffer, size_t iSize, int iFormat);
+  virtual csPtr<iImage> Load (iDataBuffer* buf, int iFormat);
   virtual void SetDithering (bool iEnable);
   virtual csPtr<iDataBuffer> Save (iImage *image, const char *mime = 0,
     const char* extraoptions = 0);

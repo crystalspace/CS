@@ -78,13 +78,13 @@ public:
   virtual void SetParent(wxWindow* wx);
   virtual wxWindow* GetWindow();
 
+  void *GetProcAddress (const char *funcname);
+
   struct eiOpenGLInterface : public iOpenGLInterface
   {
     SCF_DECLARE_EMBEDDED_IBASE (csGraphics2DWX);
     virtual void *GetProcAddress (const char *funcname)
-      {
-        return (void*)0;
-      }
+    { return scfParent->GetProcAddress (funcname); }
   } scfiOpenGLInterface;
 };
 

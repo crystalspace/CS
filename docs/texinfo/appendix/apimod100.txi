@@ -948,3 +948,8 @@ was not implemented anywhere. In addition to that the constants
 @code{CS_BBOX_NORMAL}, @code{CS_BBOX_ACCURATE}, and @code{CS_BBOX_MAX}
 are also removed.
 
+@subheading @code{iImageIO::Load()} Parameter Change
+
+@code{iImageIO::Load()} now requires the image source data in an 
+@samp{iDataBuffer} object, instead of separate @samp{buffer} and @samp{size}
+parameters.

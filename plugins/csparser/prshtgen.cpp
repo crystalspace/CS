@@ -458,8 +458,7 @@ bool csLoader::ParseHeightgen (iLoaderContext* ldr_context, iDocumentNode* node)
             }
             if(data && imageio)
             {
-              img = imageio->Load ((uint8*)data->GetData(),
-                  data->GetSize(), Engine->GetTextureFormat());
+              img = imageio->Load (data, Engine->GetTextureFormat());
             }
           }
 

@@ -306,9 +306,8 @@ void HeightMapGen::Start ()
   	"HeightMapGen.MaterialMapInput", "");
   csRef<iImage> materialmap_img;
   {
-    csRef<iDataBuffer> buf = VFS->ReadFile (materialmap_input);
-    materialmap_img = imageio->Load (buf->GetUint8 (), buf->GetSize (),
-    	CS_IMGFMT_PALETTED8);
+    csRef<iDataBuffer> buf = VFS->ReadFile (materialmap_input, false);
+    materialmap_img = imageio->Load (buf, CS_IMGFMT_PALETTED8);
   }
 
   //csRef<csImageMemory> materialmap_img;
@@ -325,7 +324,7 @@ void HeightMapGen::Start ()
 
   for (i = 0 ; i < num_texture_layers ; i++)
   {
-    csRef<iDataBuffer> buf = VFS->ReadFile (txt_layers[i].texture_file);
+    csRef<iDataBuffer> buf = VFS->ReadFile (txt_layers[i].texture_file, false);
     if (!buf)
     {
       csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -333,8 +332,7 @@ void HeightMapGen::Start ()
 	"Failed to read texture file '%s'!", txt_layers[i].texture_file.GetData());
       return;
     }
-    txt_layers[i].image = imageio->Load (buf->GetUint8 (), buf->GetSize (),
-    	CS_IMGFMT_TRUECOLOR);
+    txt_layers[i].image = imageio->Load (buf, CS_IMGFMT_TRUECOLOR);
     csRGBpixel* img = (csRGBpixel*)(txt_layers[i].image->GetImageData ());
     int w = txt_layers[i].image->GetWidth ();
     int h = txt_layers[i].image->GetHeight ();

@@ -2789,16 +2789,14 @@ iTextureWrapper *csEngine::CreateTexture (
   if (!ImageLoader) return 0;
 
   // First of all, load the image file
-  csRef<iDataBuffer> data = VFS->ReadFile (iFileName);
+  csRef<iDataBuffer> data = VFS->ReadFile (iFileName, false);
   if (!data || !data->GetSize ())
   {
     Warn ("Cannot read image file \"%s\" from VFS.", iFileName);
     return 0;
   }
 
-  csRef<iImage> ifile (ImageLoader->Load (
-      data->GetUint8 (),
-      data->GetSize (),
+  csRef<iImage> ifile (ImageLoader->Load (data,
       G3D->GetTextureManager ()->GetTextureFormat ()));
       //CS_IMGFMT_TRUECOLOR));
 

@@ -132,8 +132,7 @@ void csMultiplexImageIO::SetDithering (bool iEnable)
     list[i]->SetDithering (global_dither);
 }
 
-csPtr<iImage> csMultiplexImageIO::Load (uint8* iBuffer, size_t iSize, 
-					int iFormat)
+csPtr<iImage> csMultiplexImageIO::Load (iDataBuffer* buf, int iFormat)
 {
   bool consecutive = false; // set to true if we searched the list completely.
   do
@@ -144,7 +143,7 @@ csPtr<iImage> csMultiplexImageIO::Load (uint8* iBuffer, size_t iSize,
       //  hence it goes from list.Length()-1 to 0
     {
       csRef<iImageIO> pIO = (iImageIO*)list.Get(i);
-      csRef<iImage> img (pIO->Load(iBuffer, iSize, iFormat));
+      csRef<iImage> img (pIO->Load(buf, iFormat));
       if (img)
       {
 	/*

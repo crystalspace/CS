@@ -203,11 +203,11 @@ void PicView::LoadNextImage (int idx, int step)
   if (cur_idx < 0) cur_idx = files->Length ()-1;
   if ((size_t)cur_idx >= files->Length ()) cur_idx = 0;
 
-  csRef<iDataBuffer> buf (vfs->ReadFile (files->Get (cur_idx)));
+  csRef<iDataBuffer> buf (vfs->ReadFile (files->Get (cur_idx), false));
   if (!buf) return;
-
-  csRef<iImage> ifile (imgloader->Load (buf->GetUint8 (), 
-    buf->GetSize (), txtmgr->GetTextureFormat ()));
+		
+  csRef<iImage> ifile (imgloader->Load (buf, 
+    txtmgr->GetTextureFormat ()));
   if (!ifile) return;
 
   delete pic;

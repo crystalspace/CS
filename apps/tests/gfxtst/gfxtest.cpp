@@ -28,6 +28,7 @@
 #include "csqsqrt.h"
 #include "cstool/initapp.h"
 #include "csutil/cfgfile.h"
+#include "csutil/databuf.h"
 #include "csutil/cmdhelp.h"
 #include "csutil/getopt.h"
 #include "csutil/util.h"
@@ -257,7 +258,7 @@ static bool process_file (const char *fname)
   if (opt.verbose)
     printf ("Reading %ld bytes from file\n", (long)fsize);
 
-  uint8 *buffer = new uint8 [fsize];
+  char* buffer = new char[fsize];
   if (fread (buffer, 1, fsize, f) < fsize)
   {
     printf ("%s: unexpected EOF while reading file %s\n", programname, fname);
@@ -275,8 +276,10 @@ static bool process_file (const char *fname)
   else
     fmt = CS_IMGFMT_ANY;
 
+  csRef<iDataBuffer> buf;
+  buf.AttachNew (new csDataBuffer (buffer, fsize, false));
   csRef<iImage> ifile (
-  	ImageLoader->Load (buffer, fsize, fmt | CS_IMGFMT_ALPHA));
+  	ImageLoader->Load (buf, fmt | CS_IMGFMT_ALPHA));
   delete [] buffer;
   if (!ifile)
   {

@@ -123,6 +123,11 @@ struct Header
   uint32 reserved001;
 };
 
+#define MakeFourCC(c1, c2, c3, c4) \
+  ((uint32) c1 | ((uint32) c2<<8) | ((uint32) c3<<16) | ((uint32) c4<<24))
+
+const uint32 Magic = MakeFourCC ('D','D','S',' ');
+
 class Loader
 {
 public:

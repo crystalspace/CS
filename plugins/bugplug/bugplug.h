@@ -146,6 +146,7 @@ class csShadow;
 #define DEBUGCMD_MESH_ZMIN	1062	// Move mesh
 #define DEBUGCMD_MESH_ZPLUS	1063	// Move mesh
 #define DEBUGCMD_SAVEMAP	1064	// SaveMap
+#define DEBUGCMD_LISTPLUGINS	1065	// List all loaded plugins
 
 // For showing of polygon meshes.
 #define BUGPLUG_POLYMESH_NO	0
@@ -341,6 +342,8 @@ private:
   void SwitchCuller (iSector* sector, const char* culler);
   /// Select the named mesh if possible.
   void SelectMesh (iSector* sector, const char* meshname);
+
+  void ListLoadedPlugins ();
 
   //------------------------------------------------------------------
 

@@ -340,16 +340,14 @@ void G2DTestSystemDriver::SetupFrame ()
 	      if (testFile.IsValid ())
 	      {
 		csRef<iDataBuffer> fileData = testFile->GetAllData ();
-		blitTestImage = iio->Load (fileData->GetUint8 (), 
-		  fileData->GetSize (), CS_IMGFMT_TRUECOLOR 
+		blitTestImage = iio->Load (fileData, CS_IMGFMT_TRUECOLOR 
 		  | CS_IMGFMT_ALPHA);
 	      }
 	      testFile = vfs->Open ("/lib/std/cslogo2.png", VFS_FILE_READ);
 	      if (testFile.IsValid ())
 	      {
 		csRef<iDataBuffer> fileData = testFile->GetAllData ();
-		alphaBlitImage = iio->Load (fileData->GetUint8 (),
-		  fileData->GetSize (), CS_IMGFMT_TRUECOLOR |
+		alphaBlitImage = iio->Load (fileData, CS_IMGFMT_TRUECOLOR |
 		  CS_IMGFMT_ALPHA);
 	      }
 	    }

@@ -169,10 +169,10 @@ const csImageIOFileFormatDescriptions& csBMPImageIO::GetDescription ()
   return formats;
 }
 
-csPtr<iImage> csBMPImageIO::Load (uint8* iBuffer, size_t iSize, int iFormat)
+csPtr<iImage> csBMPImageIO::Load (iDataBuffer* buf, int iFormat)
 {
   ImageBMPFile* i = new ImageBMPFile (iFormat);
-  if (i && !i->Load (iBuffer, iSize))
+  if (i && !i->Load (buf->GetUint8(), buf->GetSize()))
   {
     delete i;
     return 0;

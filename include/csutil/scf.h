@@ -253,7 +253,7 @@ void Class::AddRefOwner (iBase** ref_owner)				\
 void Class::RemoveRefOwner (iBase** ref_owner)				\
 {									\
   if (!scfWeakRefOwners)						\
-    scfWeakRefOwners = new csArray<iBase**> (0, 4);			\
+    return;								\
   size_t index = scfWeakRefOwners->FindSortedKey (			\
     csArrayCmp<iBase**, iBase**> (ref_owner)); 				\
   if (index != csArrayItemNotFound) scfWeakRefOwners->DeleteIndex (	\
@@ -706,6 +706,8 @@ struct iFactory : public iBase
   virtual const char *QueryDependencies () = 0;
   /// Query class ID
   virtual const char *QueryClassID () = 0;
+  /// Query library module name.
+  virtual const char *QueryModuleName () = 0;
 };
 
 //----------------------------------------------- Client-side functions -----//
@@ -1083,7 +1085,7 @@ struct iSCF : public iBase
   virtual bool RegisterPlugin (const char* path) = 0;
 };
 
-SCF_VERSION (iFactory, 0, 0, 1);
+SCF_VERSION (iFactory, 0, 0, 2);
 SCF_VERSION (iBase, 0, 1, 0);
 SCF_VERSION (iSCF, 0, 2, 1);
 

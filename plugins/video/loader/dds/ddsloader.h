@@ -39,7 +39,7 @@ public:
   virtual ~csDDSImageIO ();
 
   virtual const csImageIOFileFormatDescriptions& GetDescription ();
-  virtual csPtr<iImage> Load (uint8* buffer, size_t size, int format);
+  virtual csPtr<iImage> Load (iDataBuffer* buf, int format);
   virtual void SetDithering (bool dithering);
   virtual csPtr<iDataBuffer> Save (iImage* image, const char* mime,
 				   const char* options);

@@ -149,7 +149,7 @@ iTextureHandle *awsTextureManager::GetTexturebyID (
   int Format = txtmgr->GetTextureFormat ();
 
   csRef<iImage> ifile;
-  csRef<iDataBuffer> buf (vfs->ReadFile (filename));
+  csRef<iDataBuffer> buf (vfs->ReadFile (filename, false));
 
   if (buf == 0 || buf->GetSize () == 0)
   {
@@ -163,7 +163,7 @@ iTextureHandle *awsTextureManager::GetTexturebyID (
     return 0;
   }
 
-  ifile = loader->Load (buf->GetUint8 (), buf->GetSize (), Format);
+  ifile = loader->Load (buf, Format);
 
   if (!ifile)
   {

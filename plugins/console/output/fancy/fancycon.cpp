@@ -514,20 +514,12 @@ void csFancyConsole::PrepPix (iConfigFile *ini, const char *sect,
 
   if (strlen (pix))
   {
-    size_t len = 0;
-    char *data = 0;
-    csRef<iFile> F (VFS->Open (pix, VFS_FILE_READ));
-    if (F)
-    {
-      len = F->GetSize ();
-      data = new char [len];
-      if (data) len = F->Read (data, len);
-    }
-    if (len)
+    csRef<iDataBuffer> Fbuf = VFS->ReadFile (pix, false);
+    if (Fbuf)
     {
       iTextureManager *tm = G3D->GetTextureManager ();
       csRef<iImage> image (
-        ImageLoader->Load ((uint8 *)data, len, tm->GetTextureFormat ()));
+        ImageLoader->Load (Fbuf, tm->GetTextureFormat ()));
       if (image)
       {
 	csRef<iTextureHandle> txt (
@@ -555,7 +547,6 @@ void csFancyConsole::PrepPix (iConfigFile *ini, const char *sect,
         Keyname.Clear() << "FancyConsole." << sect << ".do_stretch";
 	border.do_stretch = ini->GetBool (Keyname, false);
       }
-      delete [] data;
     }
     else
       Report (CS_REPORTER_SEVERITY_WARNING, "Could not read %s", pix);

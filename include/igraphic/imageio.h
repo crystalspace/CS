@@ -33,7 +33,7 @@
 #include "igraphic/image.h"
 #include "iutil/databuff.h"
 
-SCF_VERSION (iImageIO, 1, 0, 0);
+SCF_VERSION (iImageIO, 1, 0, 1);
 
 /** \internal
  * Format can be read.
@@ -74,7 +74,7 @@ struct iImageIO : public iBase
 
   /**
    * Load an image from a buffer.<p>
-   * This routine will read from the buffer buf of length size, try to
+   * This routine will read from the buffer buf , try to
    * recognize the type of image contained within, and return an csImageFile
    * of the appropriate type.  Returns a pointer to the iImage on
    * success, or 0 on failure. The bits that fit the CS_IMGFMT_MASK
@@ -83,7 +83,7 @@ struct iImageIO : public iBase
    * are optional: if the image does not contain alpha mask, the GetFormat()
    * method of the image will return a value without that bit set.
    */
-  virtual csPtr<iImage> Load (uint8* iBuffer, size_t iSize, int iFormat) = 0;
+  virtual csPtr<iImage> Load (iDataBuffer* buf, int iFormat) = 0;
 
   /**
    * Set global image dithering option.<p>

@@ -90,12 +90,12 @@ const csImageIOFileFormatDescriptions& csWALImageIO::GetDescription ()
   return formats;
 }
 
-csPtr<iImage> csWALImageIO::Load (uint8* iBuffer, size_t iSize, int iFormat)
+csPtr<iImage> csWALImageIO::Load (iDataBuffer* buf, int iFormat)
 {
-  if (iSize < sizeof(WALHeader))
+  if (buf->GetSize() < sizeof(WALHeader))
     return 0;
   ImageWALFile* i = new ImageWALFile (iFormat);
-  if (i && !i->Load (iBuffer, iSize))
+  if (i && !i->Load (buf->GetUint8(), buf->GetSize()))
   {
     delete i;
     return 0;

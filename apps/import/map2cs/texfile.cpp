@@ -27,6 +27,7 @@
 #include "iutil/comp.h"
 #include "igraphic/imageio.h"
 #include "iutil/vfs.h"
+#include "csutil/databuf.h"
 
 static const char* InvisibleTextures[] =
 {
@@ -87,7 +88,9 @@ void CTextureFile::SetOriginalData(char* Data, int Size)
   m_OriginalData.SetData(Data, Size);
   if (Data && Size && ImageLoader)
   {
-    csRef<iImage> ifile (ImageLoader->Load ((uint8 *) Data, Size, CS_IMGFMT_TRUECOLOR));
+    csRef<iDataBuffer> buf;
+    buf.AttachNew (new csDataBuffer (Data, Size, false));
+    csRef<iImage> ifile (ImageLoader->Load (buf, CS_IMGFMT_TRUECOLOR));
     if (ifile)
     {
       m_OriginalWidth  = ifile->GetWidth();

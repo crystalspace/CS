@@ -9,6 +9,13 @@ chronological order.
 23-Jan-2005
 	- Eric Sunshine applied a boundary-condition fix from Andrew Mann for
 	  the timspec::tv_nsec overflow check in csPosixCondition::Wait().
+	- res changed iImageIO::Load() to take an iDataBuffer and not separate
+	  buffer and size parameters.
+	- res improved the wxgl canvas on Win32; now supports GetProcAddress()
+	  and retrieves the current display format.
+	- res added iFactory::QueryModuleName().
+	- res added a command to bugplug to list the currently loaded plugin
+	  modules.
 22-Jan-2005
 	- res made the following changes:
 	    - Silenced some compiler warnings on VC2005.

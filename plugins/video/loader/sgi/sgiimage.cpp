@@ -63,10 +63,10 @@ const csImageIOFileFormatDescriptions& csSGIImageIO::GetDescription ()
   return formats;
 }
 
-csPtr<iImage> csSGIImageIO::Load (uint8* iBuffer, size_t iSize, int iFormat)
+csPtr<iImage> csSGIImageIO::Load (iDataBuffer* buf, int iFormat)
 {
   ImageSGIFile* i = new ImageSGIFile (iFormat);
-  if (i && !i->Load (iBuffer, iSize))
+  if (i && !i->Load (buf->GetUint8(), buf->GetSize()))
   {
     delete i;
     return 0;
