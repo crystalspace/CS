@@ -17,6 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "cssysdef.h"
+
 extern "C"
 {
 #define Byte z_Byte     /* Kludge to avoid conflicting typedef in zconf.h */
@@ -25,7 +27,6 @@ extern "C"
 #include <png.h>
 }
 
-#include "cssysdef.h"
 #include "csgfxldr/pngsave.h"
 #include "csgfxldr/rgbpixel.h"
 
