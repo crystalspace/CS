@@ -293,6 +293,8 @@
 
   <xsl:template name="get_classname">
     <xsl:choose>
+      <xsl:when test="property[name='toolTip' and string-length(comment)>0]">
+        <xsl:text>"</xsl:text><xsl:value-of select="property[name='toolTip']/comment"/><xsl:text>"</xsl:text></xsl:when>
       <xsl:when test="class='QTabWidget'">"Notebook"</xsl:when>
       <xsl:when test="class='QWidget' and ../class='QTabWidget'">"Notebook Page"</xsl:when>
       <xsl:when test="class='QPushButton'">"Command Button"</xsl:when>
