@@ -12,6 +12,10 @@ The history order is reversed so that new features are at the top.
 	- Jorrit fixed an initialization bug in IntersectSegment() of
 	  Dynavis and Frustvis which could cause errors in those routines
 	  in some cases.
+	- Jorrit fixed a big bug in IntersectSegment of both Dynavis and
+	  Frustvis. This bug would cause very bad inaccuracies with hitting
+	  objects. This bug also caused the missiles in walktest to miss the
+	  walls often.
 23-May-2003
 	- Jorrit fixed a bug with 3D sprites. If the factory was
 	  HardTransformed() the shape indicator was not changed.

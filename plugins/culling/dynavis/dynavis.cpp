@@ -1552,7 +1552,7 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode, void* userdata,
   {
     csBox3 b (node_bbox.Min ()-data->seg.Start (),
     	      node_bbox.Max ()-data->seg.Start ());
-    if (b.SquaredOriginDist () > data->sqdist) return false;
+    if (b.SquaredOriginMaxDist () > data->sqdist) return false;
   }
 
   // In the first part of this test we are going to test if the
