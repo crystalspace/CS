@@ -20,6 +20,7 @@
 #include "demo.h"
 #include "demoseq.h"
 #include "csutil/cscolor.h"
+#include "csutil/cmdhelp.h"
 #include "csgeom/path.h"
 #include "cstool/csfxscr.h"
 #include "cstool/csview.h"
@@ -54,6 +55,7 @@
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
+#include "iutil/virtclk.h"
 #include "iutil/csinput.h"
 #include "igraphic/imageio.h"
 #include "ivaria/reporter.h"
@@ -71,7 +73,7 @@ void Demo::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (System->object_reg, iReporter);
   if (rep)
     rep->ReportV (severity, "crystalspace.application.demo", msg, arg);
   else
@@ -128,7 +130,9 @@ Demo::~Demo ()
 void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
-  delete System;
+  iObjectRegistry* object_reg = System->object_reg;
+  delete System; System = NULL;
+  csInitializer::DestroyApplication (object_reg);
 }
 
 iMeshWrapper* Demo::LoadObject (const char* objname, const char* filename,
@@ -837,25 +841,64 @@ void Demo::SetupObjects ()
   
 }
 
+static bool DemoEventHandler (iEvent& ev)
+{
+  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
+  {
+    System->SetupFrame ();
+    return true;
+  }
+  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
+  {
+    System->FinishFrame ();
+    return true;
+  }
+  else
+  {
+    return System ? System->DemoHandleEvent (ev) : false;
+  }
+}
+
 bool Demo::Initialize (int argc, const char* const argv[],
   const char *iConfigName)
 {
-  if (!superclass::Initialize (argc, argv, iConfigName))
-    return false;
+  object_reg = csInitializer::CreateEnvironment ();
+  if (!object_reg) return false;
 
-  iObjectRegistry* object_reg = GetObjectRegistry ();
-
-  if (!csInitializeApplication (object_reg))
+  if (!csInitializer::RequestPlugins (object_reg, iConfigName, argc, argv,
+	CS_REQUEST_END))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "couldn't initialize app! (some plugins missing?)");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't initialize app!");
     return false;
   }
 
-  kbd = CS_QUERY_REGISTRY(object_reg, iKeyboardDriver);
+  if (!csInitializer::Initialize (object_reg))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't initialize app!");
+    return false;
+  }
+
+  if (!csInitializer::SetupEventHandler (object_reg, DemoEventHandler))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't initialize event handler!");
+    return false;
+  }
+
+  // Check for commandline help.
+  if (csCommandLineHelper::CheckHelp (object_reg))
+  {
+    csCommandLineHelper::Help (object_reg);
+    exit (0);
+  }
+
+  // The virtual clock.
+  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+
+  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
   if (!kbd)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No keyboard driver!");
-    abort ();
+    return false;
   }
   kbd->IncRef();
 
@@ -870,15 +913,44 @@ bool Demo::Initialize (int argc, const char* const argv[],
     abort ();
   }
   object_reg->Register (engine);
-  QUERY_PLUG_ID (myG3D, CS_FUNCID_VIDEO, iGraphics3D, "No iGraphics3D plugin !");
-  QUERY_PLUG (myG2D, iGraphics2D, "No iGraphics2D plugin !");
-  QUERY_PLUG_ID (myVFS, CS_FUNCID_VFS, iVFS, "No iVFS plugin !");
-  QUERY_PLUG_ID (myConsole, CS_FUNCID_CONSOLE, iConsoleOutput, "No iConsoleOutput plugin !");
+  engine->IncRef ();
+
+  myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  if (!myG3D)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "No 3D driver!");
+    return false;
+  }
+  myG3D->IncRef ();
+
+  myG2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
+  if (!myG2D)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "No 2D driver!");
+    return false;
+  }
+  myG2D->IncRef ();
+
+  myVFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  if (!myVFS)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "No VFS!");
+    return false;
+  }
+  myVFS->IncRef ();
+
+  myConsole = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
+  if (!myConsole)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "No console!");
+    return false;
+  }
+  myConsole->IncRef ();
 
   // Open the main system. This will open all the previously loaded plug-ins.
   iNativeWindow* nw = myG2D->GetNativeWindow ();
   if (nw) nw->SetTitle ("The Crystal Space Demo.");
-  if (!Open ())
+  if (!csInitializer::OpenApplication (object_reg))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
     Cleanup ();
@@ -1008,11 +1080,11 @@ void Demo::ShowError (const char* msg, ...)
   message_timer = csGetTicks () + 1500;
 }
 
-void Demo::NextFrame ()
+void Demo::SetupFrame ()
 {
-  superclass::NextFrame ();
   csTicks elapsed_time, current_time;
-  GetElapsedTime (elapsed_time, current_time);
+  elapsed_time = vc->GetElapsedTicks ();
+  current_time = vc->GetCurrentTicks ();
 
   // since no time has passed, the animated screen image stays the same.
   // avoid drawing this, it will only fill up queues and cause jerky
@@ -1130,10 +1202,11 @@ void Demo::NextFrame ()
     GfxWrite (10, 10, col_black, message_error ? col_red : col_white, message);
     if (current_time > message_timer) message[0] = 0;
   }
+}
 
-  // Drawing code ends here.
+void Demo::FinishFrame ()
+{
   myG3D->FinishDraw ();
-  // Print the final output.
   myG3D->Print (NULL);
 }
 
@@ -1201,15 +1274,13 @@ void Demo::DrawEditInfo ()
   }
 }
 
-bool Demo::HandleEvent (iEvent &Event)
+bool Demo::DemoHandleEvent (iEvent &Event)
 {
-  if (superclass::HandleEvent (Event))
-    return true;
-
   if (Event.Type == csevKeyDown)
   {
     csTicks elapsed_time, current_time;
-    GetElapsedTime (elapsed_time, current_time);
+    elapsed_time = vc->GetElapsedTicks ();
+    current_time = vc->GetCurrentTicks ();
     bool shift = (Event.Key.Modifiers & CSMASK_SHIFT) != 0;
     bool alt = (Event.Key.Modifiers & CSMASK_ALT) != 0;
     bool ctrl = (Event.Key.Modifiers & CSMASK_CTRL) != 0;
@@ -1744,7 +1815,7 @@ bool Demo::HandleEvent (iEvent &Event)
       //==============================
       if (Event.Key.Code == CSKEY_ESC)
       {
-	iEventQueue* q = CS_QUERY_REGISTRY (GetObjectRegistry (), iEventQueue);
+	iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
 	if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
         return true;
       }
@@ -1845,7 +1916,7 @@ int main (int argc, char* argv[])
   }
  
   // Main loop.
-  System->Loop ();
+  csInitializer::MainLoop (System->object_reg);
 
   // Cleanup.
   Cleanup ();

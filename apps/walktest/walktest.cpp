@@ -1110,8 +1110,9 @@ void Cleanup ()
   csPrintf ("Cleaning up...\n");
   free_keymap ();
   Sys->EndEngine ();
+  iObjectRegistry* object_reg = Sys->object_reg;
   delete Sys; Sys = NULL;
-  csInitializer::DestroyApplication ();
+  csInitializer::DestroyApplication (object_reg);
 }
 
 void start_console ()
@@ -1264,25 +1265,16 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   if (!object_reg) return false;
 
   if (!csInitializer::RequestPlugins (object_reg, iConfigName, argc, argv,
-  	CS_PLUGIN_NONE))
+  	CS_REQUEST_REPORTER,
+  	CS_REQUEST_REPORTERLISTENER,
+  	CS_REQUEST_END
+	))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Failed to initialize!");
     return false;
   }
 
   if (!csInitializer::Initialize (object_reg))
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Failed to initialize!");
-    return false;
-  }
-
-  if (!csInitializer::LoadReporter (object_reg, true))
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Failed to initialize!");
-    return false;
-  }
-
-  if (!csInitializer::SetupObjectRegistry (object_reg))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Failed to initialize!");
     return false;

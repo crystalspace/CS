@@ -23,6 +23,7 @@
 #include "cstool/initapp.h"
 #include "csutil/cscolor.h"
 #include "csutil/cmdline.h"
+#include "csutil/cmdhelp.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/natwin.h"
@@ -40,13 +41,16 @@
 #include "iengine/light.h"
 #include "iengine/statlght.h"
 #include "iengine/material.h"
+#include "igraphic/imageio.h"
 #include "imesh/object.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/virtclk.h"
 #include "ivaria/reporter.h"
+#include "ivaria/stdrep.h"
 #include "isys/plugin.h"
 
 #define SET_BIT(var,mask,state) \
@@ -55,10 +59,6 @@
 CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
-
-// The global system driver
-SysSystemDriver *System;
-
 
 ceEngineView::ceEngineView (csComponent *iParent, iEngine *Engine,
   	iSector *Start, const csVector3& start_pos, iGraphics3D *G3D)
@@ -554,58 +554,72 @@ CSWS_SKIN_DECLARE_DEFAULT (DefaultSkin);
 
 int main (int argc, char* argv[])
 {
-  SysSystemDriver *Sys = new SysSystemDriver;
-  System = Sys;
+  iObjectRegistry* object_reg = csInitializer::CreateEnvironment ();
+  if (!object_reg) return -1;
+
   srand (time (NULL));
 
-  iObjectRegistry* object_reg = System->GetObjectRegistry ();
+  if (!csInitializer::RequestPlugins (object_reg, NULL, argc, argv,
+  	CS_REQUEST_VFS,
+	CS_REQUEST_SOFTWARE3D,
+	CS_REQUEST_ENGINE,
+	CS_REQUEST_FONTSERVER,
+	CS_REQUEST_IMAGELOADER,
+	CS_REQUEST_LEVELLOADER,
+	CS_REQUEST_REPORTER,
+	CS_REQUEST_REPORTERLISTENER,
+	CS_REQUEST_END))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.cswseng",
+	"Can't initialize system!");
+    return -1;
+  }
+
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
   cmdline->AddOption ("mode", "800x600");
-  System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
-  System->RequestPlugin ("crystalspace.font.server.default:FontServer");
-  System->RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");
-  System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
-  System->RequestPlugin ("crystalspace.engine.3d:Engine");
-  System->RequestPlugin ("crystalspace.level.loader:LevelLoader");
 
-  if (!System->Initialize (argc, argv, NULL))
+  if (!csInitializer::Initialize (object_reg))
   {
-    printf ("System not initialized !\n");
-    delete System;
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.cswseng",
+	"Can't initialize system!");
     return -1;
-  }    
-  if (!csInitializeApplication (object_reg))
+  }
+
+  // Check for commandline help.
+  if (csCommandLineHelper::CheckHelp (object_reg))
   {
-    printf ("couldn't init app! (plugins missing?)\n");
-    delete System;
-    return -1;
+    csCommandLineHelper::Help (object_reg);
+    exit (0);
   }
 
   iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   iNativeWindow* nw = g3d->GetDriver2D ()->GetNativeWindow ();
   if (nw) nw->SetTitle ("Crystal Space Example: CSWS And Engine");
 
-  if (!System->Open ())
+  if (!csInitializer::OpenApplication (object_reg))
   {
-    printf ("Could not open system !\n");
-    delete System;
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.cswseng",
+	"Can't open system!");
     return -1;
   }
+
   // Create our main class.
-  
   ceCswsEngineApp *theApp = new ceCswsEngineApp (object_reg, DefaultSkin);
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
   if (theApp->Initialize ())
-    System->Loop ();
+    csInitializer::MainLoop (object_reg);
   else
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.cswseng", "Error initializing system!");
 
   delete theApp;
+  csInitializer::DestroyApplication (object_reg);
   
-  delete System;
   return 0;
 }

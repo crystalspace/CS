@@ -37,6 +37,7 @@
 #include "ivideo/txtmgr.h"
 #include "ivaria/conout.h"
 #include "ivaria/reporter.h"
+#include "ivaria/stdrep.h"
 #include "imesh/object.h"
 #include "imesh/cube.h"
 #include "imesh/ball.h"
@@ -119,8 +120,9 @@ void BumpTest::Report (int severity, const char* msg, ...)
 void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
-  delete System;
-  csInitializer::DestroyApplication ();
+  iObjectRegistry* object_reg = System->object_reg;
+  delete System; System = NULL;
+  csInitializer::DestroyApplication (object_reg);
 }
 
 bool BumpTest::InitProcDemo ()
@@ -287,25 +289,15 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   if (!object_reg) return false;
 
   if (!csInitializer::RequestPlugins (object_reg, iConfigName, argc, argv,
-  	CS_PLUGIN_NONE))
+  	CS_REQUEST_REPORTER,
+  	CS_REQUEST_REPORTERLISTENER,
+  	CS_REQUEST_END))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Initialization error!");
     return false;
   }
 
   if (!csInitializer::Initialize (object_reg))
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Initialization error!");
-    return false;
-  }
-
-  if (!csInitializer::LoadReporter (object_reg, true))
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Initialization error!");
-    return false;
-  }
-
-  if (!csInitializer::SetupObjectRegistry (object_reg))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Initialization error!");
     return false;

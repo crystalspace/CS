@@ -19,7 +19,6 @@
 
 #define CS_SYSDEF_PROVIDE_PATH
 #include "cssysdef.h"
-#include "cssys/sysdriv.h"
 #include "csws/csws.h"
 #include "csver.h"
 #include "ivideo/fontserv.h"
@@ -28,6 +27,7 @@
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include "cstool/initapp.h"
+#include "csutil/cmdhelp.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -1008,21 +1008,37 @@ CSWS_SKIN_DECLARE_DEFAULT (DefaultSkin);
  */
 int main (int argc, char* argv[])
 {
-  SysSystemDriver *System = new SysSystemDriver;
+  iObjectRegistry* object_reg = csInitializer::CreateEnvironment ();
+  if (!object_reg) return -1;
 
-  if (!System->Initialize (argc, argv, "/config/cswstest.cfg"))
-    return -1;
-  iObjectRegistry* object_reg = System->GetObjectRegistry ();
-  
-  if (!csInitializeApplication (object_reg))
+  if (!csInitializer::RequestPlugins (object_reg,
+  		"/config/cswstest.cfg", argc, argv,
+	CS_REQUEST_END))
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "main", "couldn't init app! (perhaps some plugins are missing?");
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.cswstest",
+	"Can't initialize!");
     return -1;
   }
 
-  if (!System->Open ())
+  if (!csInitializer::Initialize (object_reg))
   {
-    delete System;
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.cswstest",
+	"Can't initialize!");
+    return -1;
+  }
+
+  // Check for commandline help.
+  if (csCommandLineHelper::CheckHelp (object_reg))
+  {
+    csCommandLineHelper::Help (object_reg);
+    exit (0);
+  }
+
+  if (!csInitializer::OpenApplication (object_reg))
+  {
+    csInitializer::DestroyApplication (object_reg);
     return -1;
   }
 
@@ -1039,9 +1055,10 @@ int main (int argc, char* argv[])
   csWsTest *app = new csWsTest (object_reg, DefaultSkin);
 
   if (app->Initialize ())
-    System->Loop ();
+    csInitializer::MainLoop (object_reg);
 
   delete app;
-  delete System;
+  csInitializer::DestroyApplication (object_reg);
   return 0;
 }
+

@@ -1,5 +1,58 @@
 The history order is reversed so that new features are at the top.
 
+5-Oct-2001
+	- Removed csInitializer::SetupObjectRegistry(). Instead
+	  csInitializer::Initialize() will now setup the object registry
+	  will all known objects.
+	- Removed csInitializer::LoadReporter(). Instead load the
+	  reporter and reporter listener using csInitializer::RequestPlugins().
+	  Added CS_PLUGIN_REPORTER and CS_PLUGIN_REPORTERLISTENER for that
+	  purpose.
+	- Significantly changed the syntax of csInitializer::RequestPlugins().
+	  Instead of a bitmask for requesting additional plugins the
+	  function now accepts a var-arg list for all needed plugins. For
+	  every plugin you need, you must give the name (like
+	  "crystalspace.graphics3d.software"), the SCF ID of the
+	  interface implemented by that plugin and the version number of
+	  that interface. To make this easier there is a macro
+	  CS_REQUEST_PLUGIN which works as follows:
+	    CS_REQUEST_PLUGIN("crystalspace.graphics3d.software", iGraphics3D)
+	  To make things even easier there are even defines for a few standard
+	  plugins:
+	      - CS_REQUEST_VFS
+	      - CS_REQUEST_FONTSERVER
+	      - CS_REQUEST_IMAGELOADER
+	      - CS_REQUEST_SOFTWARE3D
+	      - CS_REQUEST_OPENGL3D
+	      - CS_REQUEST_ENGINE
+	      - CS_REQUEST_LEVELLOADER
+	      - CS_REQUEST_REPORTER
+	      - CS_REQUEST_REPORTERLISTENER
+	      - CS_REQUEST_CONSOLEOUT
+	  You need to end the list with CS_REQUEST_END. The simple1
+	  tutorial contains an example of this.
+	  NOTE! For a very short period it is actually required to
+	  also included the FuncID in the name of the plugin (similar to
+	  what you used to give with System->RequestPlugin() in the past).
+	  The above defines already do that so if you use them you're safe.
+	  Otherwise you have to keep in mind that this FuncID will have to
+	  be removed in the near future.
+	- Changed all apps using the new system to the above modifications.
+	- Converted the demo app to use the new csInitializer system.
+	- Added iObjectRegistry* parameter to
+	  csInitializer::DestroyApplication(). DestroyApplication() will now
+	  also remove the registered iEventHandler (with
+	  csInitializer::SetupEventHandler()) from the event queue.
+	- When an application does CS_QUERY_REGISTRY() to obtain the pointer
+	  to some plugin it also has to do IncRef() on that pointer to
+	  indicate to the system that it is using that pointer. At destruction
+	  time a DecRef() should happen. A few apps (demo and blocks) where
+	  not following that system so I fixed them (reminder: unlike
+	  CS_QUERY_PLUGIN, CS_QUERY_REGISTRY does NOT increase the reference
+	  on the returned pointer).
+	- Converted cswseng application to use the new csInitializer system.
+	- Converted cswstest application to use the new csInitializer system.
+	- Converted picview application to use the new csInitializer system.
 4-Oct-2001
 	- Removed support for old and obsolete 'debug_level' in system
 	  driver.

@@ -21,7 +21,6 @@
 
 #include <stdarg.h>
 #include "csws/csws.h"
-#include "cssys/sysdriv.h"
 #include "csutil/csvector.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
@@ -33,6 +32,10 @@ struct iSector;
 struct iView;
 struct iEngine;
 struct iVFS;
+struct iGraphics3D;
+struct iGraphics2D;
+struct iVirtualClock;
+struct iObjectRegistry;
 
 enum
 {

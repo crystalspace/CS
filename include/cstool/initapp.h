@@ -31,14 +31,30 @@ struct iCommandLineParser;
 struct iConfigManager;
 
 // Defines to select what plugins you want to have.
-#define CS_PLUGIN_NONE 0
-#define CS_PLUGIN_3D 1
-#define CS_PLUGIN_ENGINE 2
-#define CS_PLUGIN_LEVELLOADER 4
-#define CS_PLUGIN_IMAGELOADER 8
-#define CS_PLUGIN_FONTSERVER 16
-#define CS_PLUGIN_DEFAULT (CS_PLUGIN_3D|CS_PLUGIN_ENGINE|CS_PLUGIN_FONTSERVER)
-#define CS_PLUGIN_ALL (~0)
+#define CS_REQUEST_PLUGIN(Name,Interface)	\
+  Name, iSCF::SCF->GetInterfaceID (#Interface), VERSION_##Interface
+#define CS_REQUEST_END \
+  NULL
+#define CS_REQUEST_VFS \
+  CS_REQUEST_PLUGIN("crystalspace.kernel.vfs:VFS", iVFS)
+#define CS_REQUEST_FONTSERVER \
+  CS_REQUEST_PLUGIN("crystalspace.font.server.default:FontServer", iFontServer)
+#define CS_REQUEST_IMAGELOADER \
+  CS_REQUEST_PLUGIN("crystalspace.graphic.image.io.multiplex:ImageLoader", iImageIO)
+#define CS_REQUEST_SOFTWARE3D \
+  CS_REQUEST_PLUGIN("crystalspace.graphics3d.software:VideoDriver", iGraphics3D)
+#define CS_REQUEST_OPENGL3D \
+  CS_REQUEST_PLUGIN("crystalspace.graphics3d.opengl:VideoDriver", iGraphics3D)
+#define CS_REQUEST_ENGINE \
+  CS_REQUEST_PLUGIN("crystalspace.engine.3d:Engine", iEngine)
+#define CS_REQUEST_LEVELLOADER \
+  CS_REQUEST_PLUGIN("crystalspace.level.loader:LevelLoader", iLoader)
+#define CS_REQUEST_REPORTER \
+  CS_REQUEST_PLUGIN("crystalspace.utilities.reporter:Reporter", iReporter)
+#define CS_REQUEST_REPORTERLISTENER \
+  CS_REQUEST_PLUGIN("crystalspace.utilities.stdrep:StdRep", iStandardReporterListener)
+#define CS_REQUEST_CONSOLEOUT \
+  CS_REQUEST_PLUGIN("crystalspace.console.output.simple:Console.Output", iConsoleOutput)
 
 /**
  * Function to handle events for apps.
@@ -137,28 +153,21 @@ public:
    * Request a few widely used standard plugins and also read
    * the config file/command line for potential other plugins.
    * This routine must be called before Initialize().
+   * <p>
+   * The variable arguments should contain three entries for every
+   * plugin you want to load: name, scfID, and version. To make this
+   * easier it is recommended you use one of the CS_REQUEST_xxx macros
+   * above. <b>WARNING</b> Make sure to end the list with CS_REQUEST_END!
    */
   static bool RequestPlugins (iObjectRegistry* object_reg,
 	const char* config_name,
 	int argc, const char* const argv[],
-	unsigned long want_plugins = CS_PLUGIN_DEFAULT);
+	...);
 
   /**
    * Really initialize the application. This will initialize all loaded
-   * plugins.
-   */
-  static bool Initialize (iObjectRegistry* object_reg);
-
-  /**
-   * Optionally load the reporter and the reporter listener.
-   */
-  static bool LoadReporter (iObjectRegistry* object_reg,
-	bool use_reporter_listener = true);
-
-  /**
-   * Initialize the registry with all common plugins. The following
-   * plugins are queried from the plugin manager and added as default
-   * plugins (with NULL tag) to the object registry:
+   * plugins and also put the following known objects in the object
+   * registry with NULL tag (if present):
    * <ul>
    * <li>iVFS
    * <li>iGraphics3D
@@ -171,10 +180,8 @@ public:
    * <li>iReporter
    * <li>iStandardReporterListener
    * </ul>
-   * Note that the plugin manager (iPluginManager) is already put
-   * in the object registry earlier.
    */
-  static bool SetupObjectRegistry (iObjectRegistry* object_reg);
+  static bool Initialize (iObjectRegistry* object_reg);
 
   /**
    * Send the cscmdOpen command to all loaded plugins.
@@ -214,7 +221,7 @@ public:
   /**
    * Destroy the application.
    */
-  static void DestroyApplication ();
+  static void DestroyApplication (iObjectRegistry* object_reg);
 };
 
 

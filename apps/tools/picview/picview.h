@@ -21,7 +21,6 @@
 
 #include <stdarg.h>
 #include "csws/csws.h"
-#include "cssys/sysdriv.h"
 #include "csutil/csvector.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
@@ -34,6 +33,8 @@ class csButton;
 struct iVFS;
 struct iStrVector;
 struct iImageIO;
+struct iObjectRegistry;
+struct iGraphics3D;
 
 enum
 {

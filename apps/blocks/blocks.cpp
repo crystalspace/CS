@@ -3160,9 +3160,9 @@ void Blocks::TerminateConnection()
 void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
-  delete Sys;
-  Sys = NULL;
-  csInitializer::DestroyApplication ();
+  iObjectRegistry* object_reg = Sys->object_reg;
+  delete Sys; Sys = NULL;
+  csInitializer::DestroyApplication (object_reg);
 }
 
 //----------------------------------------------------------------------------
@@ -3178,19 +3178,13 @@ int main (int argc, char* argv[])
   Sys->object_reg = object_reg;
 
   if (!csInitializer::RequestPlugins (object_reg, "/config/blocks.cfg",
-  	argc, argv, 0))
+  	argc, argv, CS_REQUEST_END))
   {
     Sys->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
     return -1;
   }
 
   if (!csInitializer::Initialize (object_reg))
-  {
-    Sys->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
-    return -1;
-  }
-
-  if (!csInitializer::SetupObjectRegistry (object_reg))
   {
     Sys->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
     return -1;
@@ -3221,12 +3215,15 @@ int main (int argc, char* argv[])
     Sys->Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
     return -1;
   }
+  Sys->myG3D->IncRef ();
+
   Sys->myG2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
   if (!Sys->myG2D)
   {
     Sys->Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics2D plugin!");
     return -1;
   }
+  Sys->myG2D->IncRef ();
 
   // Open the main system. This will open all the previously loaded plug-ins.
   iNativeWindow* nw = Gfx2D->GetNativeWindow ();
@@ -3248,6 +3245,7 @@ int main (int argc, char* argv[])
     Sys->Report (CS_REPORTER_SEVERITY_ERROR, "No engine plugin!");
     return -1;
   }
+  Sys->engine->IncRef ();
 
   Sys->thing_type = Sys->engine->GetThingType ();
 
@@ -3265,6 +3263,7 @@ int main (int argc, char* argv[])
     Sys->Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
     return -1;
   }
+  Sys->LevelLoader->IncRef ();
 
   // Some settings.
   Gfx3D->SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE, (long)false);

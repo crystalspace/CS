@@ -54,7 +54,7 @@ DemoSequenceManager::DemoSequenceManager (Demo* demo)
 {
   DemoSequenceManager::demo = demo;
   demoseq = this;
-  iObjectRegistry* object_reg = demo->GetObjectRegistry ();
+  iObjectRegistry* object_reg = demo->object_reg;
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   seqmgr = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.utilities.sequence",
   	"Sequence", iSequenceManager);

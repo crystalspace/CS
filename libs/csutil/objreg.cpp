@@ -60,7 +60,7 @@ bool csObjectRegistry::Register (iBase* obj, char const* tag)
     registry.Push(obj);
     tags.Push(tag ? csStrNew(tag) : 0);
     return true;
-    }
+  }
   return false;
 }
 
@@ -68,7 +68,7 @@ void csObjectRegistry::Unregister (iBase* obj, char const* tag)
 {
   if (!clearing)
   {
-	int i;
+    int i;
     for (i = registry.Length() - 1; i >= 0; i--)
     {
       iBase* b = (iBase*)registry[i];

@@ -20,7 +20,6 @@
 #define DEMO_H
 
 #include <stdarg.h>
-#include "cssys/sysdriv.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 
@@ -34,13 +33,17 @@ struct iImageLoader;
 struct iLoaderPlugin;
 struct iMeshWrapper;
 struct iConsoleOutput;
+struct iVirtualClock;
+struct iObjectRegistry;
+struct iGraphics3D;
+struct iGraphics2D;
+struct iVFS;
+struct iEvent;
 class DemoSequenceManager;
 class csTransform;
 
-class Demo : public SysSystemDriver
+class Demo
 {
-  typedef SysSystemDriver superclass;
-
 public:
   iEngine* engine;
   iSector* room;
@@ -49,7 +52,9 @@ public:
   iGraphics2D *myG2D;
   iVFS *myVFS;
   iKeyboardDriver* kbd;
-  iConsoleOutput *myConsole;
+  iConsoleOutput* myConsole;
+  iObjectRegistry* object_reg;
+  iVirtualClock* vc;
 
   DemoSequenceManager* seqmgr;
   iFont* font;
@@ -77,10 +82,11 @@ public:
 
   void Report (int severity, const char* msg, ...);
 
-  virtual bool Initialize (int argc, const char* const argv[],
+  bool Initialize (int argc, const char* const argv[],
     const char *iConfigName);
-  virtual void NextFrame ();
-  virtual bool HandleEvent (iEvent &Event);
+  void SetupFrame ();
+  void FinishFrame ();
+  bool DemoHandleEvent (iEvent &Event);
 
   void ShowMessage (const char* msg, ...);
   void ShowError (const char* msg, ...);

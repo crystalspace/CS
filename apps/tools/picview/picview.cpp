@@ -23,6 +23,7 @@
 #include "cstool/initapp.h"
 #include "csutil/cscolor.h"
 #include "csutil/cmdline.h"
+#include "csutil/cmdhelp.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/natwin.h"
@@ -45,10 +46,6 @@
 CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
-
-// The global system driver
-SysSystemDriver *System;
-
 
 ceImageView::ceImageView (csComponent *iParent, iGraphics3D *G3D)
   	: csComponent (iParent)
@@ -317,40 +314,52 @@ CSWS_SKIN_DECLARE_DEFAULT (DefaultSkin);
 
 int main (int argc, char* argv[])
 {
-  SysSystemDriver *Sys = new SysSystemDriver;
-  System = Sys;
-  srand (time (NULL));
+  iObjectRegistry* object_reg = csInitializer::CreateEnvironment ();
+  if (!object_reg) return false;
 
-  iObjectRegistry* object_reg = System->GetObjectRegistry ();
+  if (!csInitializer::RequestPlugins (object_reg, NULL, argc, argv,
+  	CS_REQUEST_VFS,
+	CS_REQUEST_SOFTWARE3D,
+	CS_REQUEST_FONTSERVER,
+	CS_REQUEST_IMAGELOADER,
+	CS_REQUEST_END))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.picview",
+	"Can't initialize system!");
+    return -1;
+  }
+
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
   cmdline->AddOption ("mode", "1024x768");
-  System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
-  System->RequestPlugin ("crystalspace.font.server.default:FontServer");
-  System->RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");
-  System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
-
-  if (!System->Initialize (argc, argv, NULL))
+  
+  if (!csInitializer::Initialize (object_reg))
   {
-    printf ("System not initialized !\n");
-    delete System;
-    return -1;
-  }    
-  if (!csInitializeApplication (object_reg))
-  {
-    printf ("couldn't init app! (plugins missing?)\n");
-    delete System;
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.picview",
+	"Can't initialize system!");
     return -1;
   }
+
+  // Check for commandline help.
+  if (csCommandLineHelper::CheckHelp (object_reg))
+  {
+    csCommandLineHelper::Help (object_reg);
+    exit (0);
+  }
+
+  srand (time (NULL));
 
   iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   iNativeWindow* nw = g3d->GetDriver2D ()->GetNativeWindow ();
   if (nw) nw->SetTitle ("Crystal Space Picture Viewer");
 
-  if (!System->Open ())
+  if (!csInitializer::OpenApplication (object_reg))
   {
-    printf ("Could not open system !\n");
-    delete System;
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.picview",
+	"Can't initialize system!");
     return -1;
   }
   // Create our main class.
@@ -360,13 +369,12 @@ int main (int argc, char* argv[])
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
   if (theApp->Initialize ())
-    System->Loop ();
+    csInitializer::MainLoop (object_reg);
   else
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.picview", "Error initializing system!");
 
   delete theApp;
-  
-  delete System;
+  csInitializer::DestroyApplication (object_reg);
   return 0;
 }

@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "isys/vfs.h"
 #include "csutil/cscolor.h"
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
@@ -43,8 +44,11 @@
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
+#include "ivideo/fontserv.h"
+#include "igraphic/imageio.h"
 #include "imap/parser.h"
 #include "ivaria/reporter.h"
+#include "ivaria/stdrep.h"
 #include "csutil/cmdhelp.h"
 
 CS_IMPLEMENT_APPLICATION
@@ -75,8 +79,9 @@ Simple::~Simple ()
 void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
+  iObjectRegistry* object_reg = simple->object_reg;
   delete simple; simple = NULL;
-  csInitializer::DestroyApplication ();
+  csInitializer::DestroyApplication (object_reg);
 }
 
 static bool SimpleEventHandler (iEvent& ev)
@@ -104,7 +109,15 @@ bool Simple::Initialize (int argc, const char* const argv[],
   if (!object_reg) return false;
 
   if (!csInitializer::RequestPlugins (object_reg, iConfigName, argc, argv,
-  	CS_PLUGIN_ALL))
+  	CS_REQUEST_VFS,
+	CS_REQUEST_SOFTWARE3D,
+	CS_REQUEST_ENGINE,
+	CS_REQUEST_FONTSERVER,
+	CS_REQUEST_IMAGELOADER,
+	CS_REQUEST_LEVELLOADER,
+	CS_REQUEST_REPORTER,
+	CS_REQUEST_REPORTERLISTENER,
+	CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simple1",
@@ -117,22 +130,6 @@ bool Simple::Initialize (int argc, const char* const argv[],
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simple1",
 	"Can't start application!");
-    return false;
-  }
-
-  if (!csInitializer::LoadReporter (object_reg, true))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
-	"Can't initialize reporter!");
-    return false;
-  }
-
-  if (!csInitializer::SetupObjectRegistry (object_reg))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
-	"Can't initialize registry!");
     return false;
   }
 

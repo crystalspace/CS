@@ -45,6 +45,7 @@ static SysSystemDriver* global_sys = NULL;
 static char* global_config_name = NULL;
 static int global_argc = 0;
 static const char* const * global_argv = 0;
+static iEventHandler* installed_event_handler = NULL;
 
 iObjectRegistry* csInitializer::CreateEnvironment ()
 {
@@ -101,109 +102,35 @@ iObjectRegistry* csInitializer::CreateObjectRegistry ()
 bool csInitializer::RequestPlugins (iObjectRegistry* /*object_reg*/,
 	const char* config_name,
 	int argc, const char* const argv[],
-	unsigned long want_plugins)
+	...)
 {
   if (config_name) global_config_name = csStrNew (config_name);
   else global_config_name = NULL;
   global_argc = argc;
   global_argv = argv;
 
-  global_sys->RequestPlugin ("crystalspace.kernel.vfs:VFS");
-  if (want_plugins & CS_PLUGIN_FONTSERVER)
-    global_sys->RequestPlugin ("crystalspace.font.server.default:FontServer");
-  if (want_plugins & CS_PLUGIN_IMAGELOADER)
-    global_sys->RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");
-  if (want_plugins & CS_PLUGIN_3D)
-    global_sys->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
-  if (want_plugins & CS_PLUGIN_ENGINE)
-    global_sys->RequestPlugin ("crystalspace.engine.3d:Engine");
-  if (want_plugins & CS_PLUGIN_LEVELLOADER)
-    global_sys->RequestPlugin ("crystalspace.level.loader:LevelLoader");
+  va_list arg;
+  va_start (arg, argv);
+  char* plugName = va_arg (arg, char*);
+  while (plugName != NULL)
+  {
+    int scfId = va_arg (arg, scfInterfaceID);
+    int version = va_arg (arg, int);
+    // scfId and version are unused for now.
+    global_sys->RequestPlugin (plugName);
+    plugName = va_arg (arg, char*);
+  }
+  va_end (arg);
   return true;
 }
 
 bool csInitializer::Initialize (iObjectRegistry* object_reg)
 {
-  return global_sys->Initialize (global_argc, global_argv,
+  bool rc = global_sys->Initialize (global_argc, global_argv,
     global_config_name);
-}
+  if (!rc) return false;
 
-bool csInitializer::SetupEventHandler (iObjectRegistry* object_reg,
-	iEventHandler* evhdlr, unsigned int eventmask)
-{
-  iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-  if (q)
-  {
-    q->RegisterListener (evhdlr, eventmask);
-    return true;
-  }
-  else return false;
-}
-
-class csAppEventHandler : public iEventHandler
-{
-private:
-  csEventHandlerFunc* evhdlr;
-
-public:
-  csAppEventHandler (csEventHandlerFunc* evhdlr)
-  {
-    SCF_CONSTRUCT_IBASE (NULL);
-    csAppEventHandler::evhdlr = evhdlr;
-  }
-  SCF_DECLARE_IBASE;
-  virtual bool HandleEvent (iEvent& ev)
-  {
-    return evhdlr (ev);
-  }
-};
-
-SCF_IMPLEMENT_IBASE (csAppEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-
-bool csInitializer::SetupEventHandler (iObjectRegistry* object_reg,
-	csEventHandlerFunc* evhdlr_func)
-{
-  csAppEventHandler* evhdlr = new csAppEventHandler (evhdlr_func);
-  return SetupEventHandler (object_reg, evhdlr, CSMASK_Broadcast |
-  	CSMASK_MouseUp | CSMASK_MouseDown | CSMASK_MouseMove |
-	CSMASK_KeyDown | CSMASK_KeyUp | CSMASK_MouseClick |
-	CSMASK_MouseDoubleClick | CSMASK_JoystickMove |
-	CSMASK_JoystickDown | CSMASK_JoystickUp | CSMASK_Nothing);
-}
-
-bool csInitializer::LoadReporter (iObjectRegistry* object_reg,
-	bool use_reporter_listener)
-{
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  iReporter* reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER,
-  	iReporter);
-  if (!reporter)
-  {
-    reporter = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.utilities.reporter",
-    	CS_FUNCID_REPORTER, iReporter);
-    if (!reporter)
-      return false;
-  }
-  if (use_reporter_listener)
-  {
-    iStandardReporterListener* stdrep = CS_QUERY_PLUGIN (plugin_mgr,
-  	iStandardReporterListener);
-    if (!stdrep)
-    {
-      stdrep = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.utilities.stdrep",
-    	"StdRep", iStandardReporterListener);
-      if (!stdrep)
-        return false;
-    }
-  }
-  return true;
-}
-
-bool csInitializer::SetupObjectRegistry (iObjectRegistry* object_reg)
-{
+  // Setup the object registry.
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   iGraphics3D* g3d = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO,
@@ -288,6 +215,53 @@ bool csInitializer::SetupObjectRegistry (iObjectRegistry* object_reg)
   return true;
 }
 
+bool csInitializer::SetupEventHandler (iObjectRegistry* object_reg,
+	iEventHandler* evhdlr, unsigned int eventmask)
+{
+  iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  if (q)
+  {
+    q->RegisterListener (evhdlr, eventmask);
+    installed_event_handler = evhdlr;
+    return true;
+  }
+  else return false;
+}
+
+class csAppEventHandler : public iEventHandler
+{
+private:
+  csEventHandlerFunc* evhdlr;
+
+public:
+  csAppEventHandler (csEventHandlerFunc* evhdlr)
+  {
+    SCF_CONSTRUCT_IBASE (NULL);
+    csAppEventHandler::evhdlr = evhdlr;
+  }
+  SCF_DECLARE_IBASE;
+  virtual bool HandleEvent (iEvent& ev)
+  {
+    return evhdlr (ev);
+  }
+};
+
+SCF_IMPLEMENT_IBASE (csAppEventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+SCF_IMPLEMENT_IBASE_END
+
+
+bool csInitializer::SetupEventHandler (iObjectRegistry* object_reg,
+	csEventHandlerFunc* evhdlr_func)
+{
+  csAppEventHandler* evhdlr = new csAppEventHandler (evhdlr_func);
+  return SetupEventHandler (object_reg, evhdlr, CSMASK_Broadcast |
+  	CSMASK_MouseUp | CSMASK_MouseDown | CSMASK_MouseMove |
+	CSMASK_KeyDown | CSMASK_KeyUp | CSMASK_MouseClick |
+	CSMASK_MouseDoubleClick | CSMASK_JoystickMove |
+	CSMASK_JoystickDown | CSMASK_JoystickUp | CSMASK_Nothing);
+}
+
 bool csInitializer::OpenApplication (iObjectRegistry* object_reg)
 {
   return global_sys->Open ();
@@ -298,8 +272,13 @@ void csInitializer::CloseApplication (iObjectRegistry* object_reg)
   global_sys->Close ();
 }
 
-void csInitializer::DestroyApplication ()
+void csInitializer::DestroyApplication (iObjectRegistry* object_reg)
 {
+  if (installed_event_handler)
+  {
+    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    q->RemoveListener (installed_event_handler);
+  }
   delete global_sys;
 }
 
