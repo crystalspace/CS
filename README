@@ -1,0 +1,42 @@
+Crystal Space 3D SDK
+http://www.crystalspace3d.org/
+
+Crystal Space is a free, open source, portable, modular, and extensible 3D
+software development kit (SDK) written in C++. It is suitable for creation of
+3D games and other 3D visualization applications.  It supports true six degrees
+of freedom, colored lighting, lightmapped and stencil based lighting, shader
+support (CG, vertex programs, fragment programs, etc.), mipmapping, portals,
+mirrors, alpha transparency, reflective surfaces, 3D sprites with skeletal
+animation, procedural textures, particle systems, volumetric fog, hierarchical
+transformations, physics, bindings for Java, Perl, and Python, and many
+additional features.  Crystal Space runs on Unix platforms (including
+GNU/Linux), Microsoft Windows, and MacOS/X.
+
+Crystal Space falls under the GNU Lesser General Public License (LGPL).  A copy
+of of the LGPL can be found in the file LICENSE alongside this README.  This
+license allows you to use Crystal Space as a library in your products, even
+commercial products, but modifications to the library or derivative works
+incorporating parts of the library must be made freely available to everyone,
+under the LGPL's terms.
+
+The extensive Crystal Space manual features build instructions, tutorials,
+HOWTO's, and numerous conceptual and technical discussions.  To build Crystal
+Space, consult the instructions in the "Building and Installing" chapter. The
+manual can be found in the source tree at CS/docs/html/manual/index.html, or
+online at:
+
+http://www.crystalspace3d.org/docs/online/manual/
+
+A full API reference manual for Crystal Space is available in the source tree
+at CS/docs/html/api/index.html, or online at:
+
+http://www.crystalspace3d.org/docs/online/api/
+
+Additional useful information can be found at the Crystal Space "Community" web
+site, which features tutorials, user-contributed documentation, advice, and
+references to free resources:
+
+http://community.crystalspace3d.org/
+
+The latest changes to the project are detailed in CS/docs/history.txt.  Older
+changes are detailed in CS/docs/history.old.

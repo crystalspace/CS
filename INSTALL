@@ -1,0 +1,68 @@
+Crystal Space 3D SDK
+http://www.crystalspace3d.org/
+
+Complete instructions for building and installing Crystal Space are available
+in the "Building and Installing" chapter of the Crystal Space manual, which can
+be found in the source tree at CS/docs/html/manual/index.html, or online at:
+
+http://www.crystalspace3d.org/docs/online/manual/
+
+It is strongly recommended that you consult the much more detailed build
+instructions in the manual, particularly if you are using Microsoft
+Windows. If, however, you are especially impatient, see the quick-start
+instructions below.
+
+
+Unix-like Platforms (including MacOS/X and GNU/Linux)
+===================
+
+Crystal Space is built and installed in the same fashion as most other open
+source projects using the following idiom:
+
+% ./configure
+% make
+% sudo make install
+
+
+Microsoft Windows
+=================
+
+Download and install the cs-win32libs support package. This is a convenience
+package containing many of the 3rd-party supporting libraries utilized by
+Crystal Space, and which are commonly already installed on Unix platforms, but
+not on Microsoft Windows.
+
+ftp://sunsite.dk/projects/crystal/support/win32/cs-win32libs-x.xxry_yyy.exe
+
+You will find versions of cs-win32libs for the stable release of Crystal Space,
+as well as for the bleeding-edge developer version of Crystal Space.  Download
+the package which has a version number (the `x.xx' in the example) which
+corresponds to the version number of the Crystal Space package which you are
+using.
+
+
+MSVC / Visual-C++
+-----------------
+
+For MSVC7, open the CS\mk\msvc\wkstypical.sln solution file.  From the "Build"
+menu, invoke "Build Solution".
+
+For MSVC6, open the CS\mk\msvc\wkstypical.dsw workspace. Make `grpall-typical'
+the active project. This is done by right clicking on `grpall-typical' and then
+clicking "Set as Active Project". From the "Build" menu invoke "Rebuild All".
+
+
+MinGW and Cygwin
+----------------
+
+MinGW users should also install the MSYS adjunct package (available from
+http://www.mingw.org/), which provides a handy Unix-like shell environment and
+other useful command-line utilities.
+
+For MingW and Cygwin, after installing cs-win32libs (described above), open a
+shell window, and then perform the typical Unix idiom for building and
+installing:
+
+% ./configure
+% make
+% make install

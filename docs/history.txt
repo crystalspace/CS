@@ -7,11 +7,16 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 31-Mar-2005
-	- Marten fixed a few more places where a temporary return object was 
+	- Marten fixed a few more places where a temporary return object was
 	  assigned to a reference.
-        - Anders Reggestad fixed so that TinyXml only save white spaces in
-          the text element it is reading, not including the prev tag if 
-          tags are inserted into a text element.
+        - Anders Reggestad fixed so that TinyXml only save white spaces in the
+	  text element it is reading, not including the prev tag if tags are
+	  inserted into a text element.
+	- Eric Sunshine added README, INSTALL, and LICENSE files to the root
+	  CS/ directory in order to be consistent with other open source
+	  projects, and because people expect to find these files at the root
+	  of the source tree. (Very likely, many people failed to find the
+	  README.html which was buried in the CS/docs directory.)
 30-Mar-2005
 	- Marten fixed a bug in haze-mesh.
 	- Eric Sunshine performed another round of size_t-related cleanups.

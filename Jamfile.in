@@ -22,6 +22,9 @@ Help distclean : "Remove configuration information and built targets" ;
 Clean maintainerclean : aclocal.m4 configure configure.scan ;
 Depends maintainerclean : distclean ;
 
+# Installation of top-level resources.
+InstallDoc README LICENSE ;
+
 # In order to avoid alienating users by forcing them to install and use Jam,
 # the CS configure script synthesizes a makefile which implements all of
 # top-level user-visible targets provided by the Jam system; and which simply
