@@ -2,7 +2,7 @@
 //=============================================================================
 //
 //    Virtual-Directory Listing & Pretty-Printing Script
-//    Copyright (C) 2000 by Eric Sunshine <sunshine@sunshineco.com>
+//    Copyright (C) 2000,2002 by Eric Sunshine <sunshine@sunshineco.com>
 //
 //    This program is free software; you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
@@ -100,11 +100,11 @@
 // "Configuration Options" section below.
 //
 // spoofdir.php was written by Eric Sunshine <sunshine@sunshineco.com> on
-// September 3, 2000, and is Copyright (C)2000 by Eric Sunshine.
+// September 3, 2000, and is Copyright (C)2000,2002 by Eric Sunshine.
 //-----------------------------------------------------------------------------
 
 $prog_name = 'spoofdir.php';
-$prog_version = '1.3';
+$prog_version = '4';
 $author_name = 'Eric Sunshine';
 $author_email = 'sunshine@sunshineco.com';
 
@@ -248,7 +248,7 @@ if (file_exists($globalconfig))
 if (count($dirlist) == 0)
     $dirlist[] = '.';
 
-$copyright = "Copyright &copy;2000 by $author_name " .
+$copyright = "Copyright &copy;2000,2002 by $author_name " .
     "&lt;<a href=\"mailto:$author_email\">" .
     "<font color=\"$banner_linkcolor\">$author_email</font></a>&gt;";
 
@@ -396,26 +396,6 @@ function redirect($uri)
 //-----------------------------------------------------------------------------
 // Send a file to the client's browser using appropriate content-type,
 // disposition, etc.
-//-----------------------------------------------------------------------------
-function send_file($path)
-{
-    $name = basename($path);
-    $type = find_mimetype($name);
-    $disposition = find_disposition($type);
-    header("Content-Disposition: $disposition; filename=$name");
-    header("Content-Type: $type; file=$name");
-    header('Content-Length: ' . filesize($path));
-    if (!is_cacheable($type))
-    {
-	header('Pragma: no-cache');
-	header('Expires: 0');
-    }
-    readfile($path);
-    exit();
-}
-
-//-----------------------------------------------------------------------------
-// Send an index-like file (such as index.html) to the client's browser.
 //
 // NOTE: Unfortunately, PHP files must be handled specially.  A simple
 // re-direct will not execute the file.  Instead, the PHP file is loaded into
@@ -423,16 +403,29 @@ function send_file($path)
 // the script might cause name clashes, among other problems.  A better
 // solution is needed.
 //-----------------------------------------------------------------------------
-function send_indexfile($path, $file)
+function send_file($path)
 {
-    if (!eregi('\.php[0-9]?$', $file))
-	send_file("$path/$file"); // Never returns.
+    if (!eregi('\.php[0-9]?$', $path))
+    {
+	$name = basename($path);
+	$type = find_mimetype($name);
+        $disposition = find_disposition($type);
+        header("Content-Disposition: $disposition; filename=$name");
+        header("Content-Type: $type; file=$name");
+        header('Content-Length: ' . filesize($path));
+        if (!is_cacheable($type))
+        {
+	    header('Pragma: no-cache');
+	    header('Expires: 0');
+        }
+        readfile($path);
+    }
     else
     {
-	chdir($path);
-	include($file);
-	exit();
+	chdir(dirname($path));
+	include(basename($path));
     }
+    exit();
 }
 
 //-----------------------------------------------------------------------------
@@ -540,7 +533,7 @@ function list_directory($display_name, $path)
 	if (is_indexfile($entry))
 	{
 	    closedir($handle);
-	    send_indexfile($path, $entry); // Never returns
+	    send_file("$path/$entry"); // Never returns
 	}
 	elseif ($entry != '..' && $entry != '.' && !is_ignored($entry))
 	{
