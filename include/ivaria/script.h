@@ -32,14 +32,16 @@ SCF_VERSION (iScriptObject, 0, 0, 1);
  * Several functions here take a variable-length argument list with a
  * printf-style format string supporting all the argument types supported by
  * printf, except width and precision specifiers, as they have no meaning here.
- * In the case of "%p" (pointer), it can be proceeded in the format string by
- * the type name of the object being pointed to. The "%O" (captial letter `O')
- * format specifier works like "%p", signifies an iScriptObject.
+ * The type specifier "%p" signifies an iScriptObject. Remember to explicitly
+ * cast your csRef<iScriptObject>'s to plain pointers or get an error.
  */
 struct iScriptObject : public iBase
 {
-  /// Get the type name of the object.
-  virtual const char* GetType () const = 0;
+  /**
+   * Returns a boolean specifying whether or not the object is derived from
+   * the given type.
+   */
+  virtual bool IsType (const char *) const = 0;
 
   /**
    * Call a method in the object, with no return value.
@@ -82,14 +84,6 @@ struct iScriptObject : public iBase
     CS_GNUC_PRINTF(4, 5) = 0;
 
   /**
-   * Call a method in the object, with pointer return value.
-   * Returns false if the subroutine named does not exist.
-   * Format is a printf-style format string for the arguments.
-   */
-  virtual bool Call (const char *name, void **ret, const char *fmt, ...)
-    CS_GNUC_PRINTF(4, 5) = 0;
-
-  /**
    * Call a method in the object, with object return value.
    * Returns false if the subroutine named does not exist.
    * Format is a printf-style format string for the arguments.
@@ -112,10 +106,6 @@ struct iScriptObject : public iBase
   /// Set the value of a string variable in the script interpreter.
   /// Returns false if the named property does not exist.
   virtual bool Set (const char *name, char *data) = 0;
-
-  /// Set the value of a pointer variable in the script interpreter.
-  /// Returns false if the named property does not exist.
-  virtual bool Set (const char *name, void *data, const char *type) = 0;
 
   /// Set the value of an object variable in the script interpreter.
   /// Returns false if the named property does not exist.
@@ -140,10 +130,6 @@ struct iScriptObject : public iBase
   /// Get the value of a string variable in the script interpreter.
   /// Returns false if the named property does not exist.
   virtual bool Get (const char *name, char **data) const = 0;
-
-  /// Get the value of a pointer variable in the script interpreter.
-  /// Returns false if the named property does not exist.
-  virtual bool Get (const char *name, void **data, const char *type) const = 0;
 
   /// Get the value of an object variable in the script interpreter.
   /// Returns false if the named variable does not exist.
@@ -223,14 +209,6 @@ struct iScript : public iBase
     CS_GNUC_PRINTF(4, 5) = 0;
 
   /**
-   * Call a subroutine in the script, with pointer return value.
-   * Returns false if the subroutine named does not exist.
-   * Format is a printf-style format string for the arguments.
-   */
-  virtual bool Call (const char *name, void **ret, const char *fmt, ...)
-    CS_GNUC_PRINTF(4, 5) = 0;
-
-  /**
    * Call a subroutine in the script, with object return value.
    * Returns false if the subroutine named does not exist.
    * Format is a printf-style format string for the arguments.
@@ -258,9 +236,6 @@ struct iScript : public iBase
   /// Set the value of a string variable in the script interpreter.
   virtual bool Store (const char *name, char *data) = 0;
 
-  /// Set the value of a pointer variable in the script interpreter.
-  virtual bool Store (const char *name, void *data, const char *type) = 0;
-
   /// Set the value of an object variable in the script interpreter.
   virtual bool Store (const char *name, iScriptObject *data) = 0;
 
@@ -282,11 +257,6 @@ struct iScript : public iBase
   /// Get the value of a string variable in the script interpreter.
   /// Returns false if the named variable does not exist.
   virtual bool Retrieve (const char *name, char **data) const = 0;
-
-  /// Get the value of a pointer variable in the script interpreter.
-  /// Returns false if the named variable does not exist, or is the wrong type.
-  virtual bool Retrieve (const char *name, void **data,
-    const char *type) const = 0;
 
   /// Get the value of an object variable in the script interpreter.
   /// Returns false if the named variable does not exist.

@@ -178,10 +178,6 @@ SV* csPerl5::CallV (const char *name, const char *fmt, va_list va, SV *self)
     break;
 
     case 'p':
-    XPUSHs (sv_2mortal (newSViv ((IV) va_arg (va, void *))));
-    break;
-
-    case 'O':
     XPUSHs (Query (va_arg (va, iScriptObject *))->self);
     break;
 
@@ -282,19 +278,17 @@ SCF_IMPLEMENT_IBASE (csPerl5::Object)
   SCF_IMPLEMENTS_INTERFACE (Object)
 SCF_IMPLEMENT_IBASE_END
 
-csPerl5::Object::Object (const csPerl5 *p, const char *t, SV *s)
-: parent ((csPerl5 *) p), type (strdup (t)),
-  stash (gv_stashpv (t, FALSE)), my_perl (parent->my_perl), self (s)
+csPerl5::Object::Object (const csPerl5 *p, SV *s)
+: parent ((csPerl5 *) p), my_perl (parent->my_perl), self (s)
 {
   SCF_CONSTRUCT_IBASE (parent);
 
-  if (! stash) parent->reporter->Report (CS_REPORTER_SEVERITY_WARNING,
-    "crystalspace.script.perl5.object", "No such package named '%s'", type);
+  SvREFCNT_inc (self);
 }
 
 csPerl5::Object::~Object ()
 {
-  free (type);
+  SvREFCNT_dec (self);
 }
 
 csPerl5::Object* csPerl5::Query (iScriptObject *obj) const
@@ -315,7 +309,7 @@ csPtr<iScriptObject> csPerl5::NewObject
   va_end (va);
 
   if (sv)
-    return csPtr<iScriptObject> (new Object (this, type, sv));
+    return csPtr<iScriptObject> (new Object (this, sv));
   else
     return 0;
 }

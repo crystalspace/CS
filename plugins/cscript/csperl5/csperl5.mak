@@ -66,6 +66,8 @@ SWIG.PERL5.DOC = $(SRCDIR)/scripts/perl5/cs_wrap.doc
 CEX.CSPERL5 = perl5.cex
 CIN.CSPERL5 = plugins/cscript/csperl5/perl5.cin
 
+PERL5.CFLAGS += -Wno-unused
+
 MSVC.DSP += MSCSPERL5
 DSP.MSCSPERL5.NAME = csperl5
 DSP.MSCSPERL5.TYPE = plugin

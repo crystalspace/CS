@@ -55,8 +55,8 @@
 %rename(__or_ass__)	*::operator|=;
 %rename(__xor_ass__)	*::operator^=;
 
-//%rename(and)		*::operator&&;
-//%rename(or)		*::operator||;
+%rename(__land__)	*::operator&&;
+%rename(__lor__)	*::operator||;
 
 #if 0
   %extend T
@@ -126,19 +126,14 @@
         '*{}'	=> '__gv__',
         '&{}'	=> '__cv__',
 
-        '<>'	=> '__iter__');
+        '<>'	=> '__iter__'
+      );
+
+      *and = *__land__;
+      *or = *__lor__;
     %}
   }
-#endif
-
-#undef GET_GLOBAL_SCRIPT_INT_VARIABLE
-%define GET_GLOBAL_SCRIPT_INT_VARIABLE(var, name)
-  %{
-    SV *_sv = get_sv (name, 0);
-    if (_sv) var = SvIV (_sv);
-    else var = -1;
-  %}
-%enddef
+#endif // 0
 
 %typemap(in) int8
 {
@@ -154,7 +149,7 @@
   {
     rf->IncRef ();
     SV *rv = newSVsv (& PL_sv_undef);
-    sv_setref_pv (rv, pT, (void *) (cT *) rf);
+    sv_setref_iv (rv, pT, (int) (cT *) rf);
     $result = rv;
   }
   else
@@ -225,7 +220,7 @@
   {
     base_type *item = new base_type (to_item ptr[i]);
     SV *o = newSVsv (& PL_sv_undef);
-    SvREFCNT_dec (sv_setref_pv (o, #base_type, (void *) item));
+    SvREFCNT_dec (sv_setref_iv (o, #base_type, (int) item));
     av_push (av, o);
     SvREFCNT_dec (o);
   }
@@ -285,7 +280,7 @@
       delete [] ptr;
       return;
     }
-    base_type *p = (base_type *) SvPVX (o);
+    base_type *p = (base_type *) SvIV (o);
     SvREFCNT_dec (o);
     ptr [i] = to_item p;
   }

@@ -17,6 +17,42 @@ The history order is reversed so that new features are at the top.
 	  call, and not implicitly in DrawMesh. A csBasicVector in the 
 	  shadermanager has been replaced with csRefArray too. 
 	  (Might have introduced bugs with reference counts.)
+	- Oktal overhauled the Perl Swig interface files, including:
+	  - Recovered the csWrapPtr usage stuff that got misplaced during
+	    Rene's reshuffling of the Python interface.
+	  - Added operator overloading for logical and and or (although no
+	    operators yet work because they depend on the existance of a
+	    %perl5code directive in Swig.)
+	  - Storing pointers as IV's (int) instead of PV's (string pointer)
+	    in line with Swig's behaviour.
+	  - Added a cspace::AUTOLOAD subroutine (called by Perl when a
+	    non-existant object method is called) to give the module's objects
+	    accessor methods for their properties, just like most other Perl
+	    modules.
+	  - Changed to proper argument handling for native Perl C functions;
+	    now using the XS macros from Perl's API.
+	  - Some big code blocks containing errors had been commented out;
+	    fixed the errors and uncommented them. These include bindings for
+	    collision detection, hashmaps and requesting plugins.
+	  - Added -Wno-unused to PERL5.CFLAGS to avoid loads of warnings
+	    in Swig-generated code.
+	  - Added wrappings for iString and csString. The one for csString is
+	    commented out until work can be done to fix it.
+	- Oktal made the following changes to the Perl scripting plugin:
+	  - Got rid of the functions for manipuating void* pointers within
+	    the scripting language since that is difficult in Perl, and
+	    shouldn't be neccessary (use iScriptObject instead.) Now the
+	    type specifier for iScriptObject's in the format strings is %p
+	    instead of %O, we also get rid of some warnings in GCC.
+	  - Replaced the GetType() function which returns the type of an
+	    iScriptObject with an IsType() function which takes a string
+	    parameter, `type,' and returns true if the object is that type,
+	    or is derived from an object of that type, since that is easier
+	    to do in Perl and probably other languages.
+	  - Added reference counting of the internal Perl variables.
+	  - Added #undef free and malloc since Perl headers #define those.
+	  - Added tests for the new iScript methods to perl5test.
+	  
 31-May-2003
 	- Oktal fixed an error in the Perl plugin that only appeared with
 	  certain versions of Perl, to do with their funny macros.

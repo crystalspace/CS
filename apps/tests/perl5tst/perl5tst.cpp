@@ -31,11 +31,6 @@ CS_IMPLEMENT_APPLICATION
 
 iObjectRegistry *objreg;
 
-char testscript[] =
-"  $text = 'Jorrit does hail from all places';\n"
-"  $v = new cspace::csVector3 (4, 2, 0);\n"
-"  print join (' ', (split (' ', $text)) [$v->{x}, $v->{y}, $v->{z}]);\n";
-
 int main (int argc, char *argv[])
 {
   objreg = csInitializer::CreateEnvironment (argc, argv);
@@ -70,28 +65,38 @@ int main (int argc, char *argv[])
       return 3;
     }
 
-    bool script_ok = script->Initialize (objreg);
-    if (! script_ok)
-    {
-      fprintf (stderr, "Failed to initialize perl5 plugin!\n");
-      return 4;
-    }
-
     bool module_ok = script->LoadModule ("cspace");
     if (! module_ok)
     {
       fprintf (stderr, "Failed to load perl5 cspace module!\n");
-      return 5;
+      return 4;
     }
 
     csInitializer::OpenApplication (objreg);
 
-    printf ("\nRunning perl script:\n%s\n", testscript);
-    script->RunText (testscript);
-    printf ("\n\nTest script finished.\n\n");
+    char *text = "Hello, world!";
+    printf ("Testing Store:\n");
+    script->Store ("text", text);
+    printf ("text = %s\n", text);
+
+    printf ("Testing Retrieve:\n");
+    script->Retrieve ("text", & text);
+    printf ("text = %s\n", text);
+
+    printf ("Testing NewObject:\n");
+    csRef<iScriptObject> obj
+      = script->NewObject ("cspace::csVector3", "%f%f%f", 1.0f, 2.0f, 3.0f);
+    printf ("new csVector3 (1.0f, 2.0f, 3.0f)\n");
+
+    printf ("Testing Get:\n");
+    float x, y, z;
+    printf ("csVector3 = (%f, %f, %f)\n", x, y, z);
+    obj->Get ("x", x);
+    obj->Get ("y", y);
+    obj->Get ("z", z);
+    printf ("csVector3 = (%f, %f, %f)\n", x, y, z);
   }
 
   csInitializer::DestroyApplication (objreg);
   return 0;
 }
-

@@ -18,6 +18,30 @@
 
 #ifdef SWIGPERL5
 
+%native(AUTOLOAD) AutoLoad;
+%{
+  void AutoLoad (pTHXo_ CV *thisfunc)
+  {
+    dXSARGS;
+    dTARG;
+    SV *self = ST (0);
+    char *prop = SvPV_nolen (ST (1));
+    SV *val = ST (2);
+
+    if (! (SvROK (self) && SvTYPE (self) == SVt_PVHV))
+      croak ("No such class method %s in class %s", prop, SvPV_nolen (self));
+
+    HV *obj = (HV *) SvRV (self);
+    SV **valp = hv_fetch (obj, prop, 0, val ? 1 : 0);
+
+    if (! valp)
+      croak ("No such instance method %s in object", prop);
+
+    if (val) sv_setsv (* valp, val);
+    XSRETURN_SV (* valp);
+  }
+%}
+
 %{
   static const int csInitializer_SetupEventHandler_DefaultMask
     = CSMASK_Nothing
@@ -59,240 +83,305 @@
 
 %native(csInitializer_SetupEventHandler) pl_csInitializer_SetupEventHandler;
 %{
-void pl_csInitializer_SetupEventHandler (pTHXo_ CV *thisfunc)
-{
-  AV *argv = get_av ("_", 1);
-  SV *reg_ref = av_shift (argv);
-  SV *func_rv = av_shift (argv);
-  SV *mask_sv = av_shift (argv);
-  if (! SvTRUE (reg_ref) || ! SvTRUE (func_rv))
+  void pl_csInitializer_SetupEventHandler (pTHXo_ CV *thisfunc)
   {
-    croak ("SetupEventHandler needs at least 2 arguments");
-    SvREFCNT_dec (reg_ref);
-    SvREFCNT_dec (func_rv);
-    return;
-  }
-  unsigned int mask;
-  if (! SvTRUE (mask_sv))
-  {
-    mask = SvUV (mask_sv);
-    SvREFCNT (mask_sv);
-  }
-  else
-    mask = csInitializer_SetupEventHandler_DefaultMask;
+    dXSARGS;
+    dTARG;
+    SV *reg_ref = ST (0);
+    SV *func_rv = ST (1);
+    SV *mask_sv = ST (2);
+    if (! (reg_ref && func_rv))
+      croak ("SetupEventHandler needs at least 2 arguments");
 
-  SV *reg_obj = SvRV (reg_ref);
-  SvREFCNT_dec (reg_ref);
-  if (! sv_isa (reg_obj, "cspace::iObjectRegistry"))
-  {
-    croak ("SetupEventHandler argument 1 must be iObjectRegistry");
-    SvREFCNT_dec (reg_obj);
-    SvREFCNT_dec (func_rv);
-    return;
+    unsigned int mask;
+    if (mask_sv)
+      mask = SvUV (mask_sv);
+    else
+      mask = csInitializer_SetupEventHandler_DefaultMask;
+
+    SV *reg_obj = SvRV (reg_ref);
+    if (! sv_isa (reg_obj, "cspace::iObjectRegistry"))
+      croak ("SetupEventHandler argument 1 must be iObjectRegistry");
+    iObjectRegistry *reg = (iObjectRegistry *) SvIV (reg_obj);
+
+    SV *func = SvRV (func_rv);
+    pl_csInitializer_EventHandler = func;
+
+    bool ok = csInitializer::SetupEventHandler
+      (reg, csInitializer_EventHandler, mask);
+    XSRETURN_IV (ok ? 1 : 0);
   }
-  iObjectRegistry *reg = (iObjectRegistry *) SvIV (reg_obj);
-  SvREFCNT_dec (reg_obj);
-
-  SV *func = SvRV (func_rv);
-  SvREFCNT_inc (func);
-  pl_csInitializer_EventHandler = func;
-  SvREFCNT_dec (func_rv);
-
-  bool ok = csInitializer::SetupEventHandler
-    (reg, csInitializer_EventHandler, mask);
-  SV *ret = get_sv ("_", 1);
-  sv_setiv (ret, ok ? 1 : 0);
-}
 %}
 
 %native(csInitializer_RequestPlugins) _csInitializer_RequestPlugins;
 %{
-void _csInitializer_RequestPlugins (pTHXo_ CV *thisfunc)
-{
-  AV *argv = get_av ("_", 1);
-  SV *reg_ref = av_shift (argv);
-  SV *reg_obj = SvRV (reg_ref);
-  SvREFCNT_dec (reg_ref);
-  if (! sv_isa (reg_obj, "cspace::iObjectRegistry"))
+  void _csInitializer_RequestPlugins (pTHXo_ CV *thisfunc)
   {
-    croak ("RequestPlugins argument 1 must be iObjectRegistry");
+    dXSARGS;
+    dTARG;
+    SV *reg_ref = ST (0);
+    SV *reg_obj = SvRV (reg_ref);
+    if (! sv_isa (reg_obj, "cspace::iObjectRegistry"))
+      croak ("RequestPlugins argument 1 must be iObjectRegistry");
+
+    iObjectRegistry *reg = (iObjectRegistry *) SvIV (reg_obj);
     SvREFCNT_dec (reg_obj);
-    return;
-  }
-  iObjectRegistry *reg = (iObjectRegistry *) SvIV (reg_obj);
-  SvREFCNT_dec (reg_obj);
 
-  bool ok;
-  while (true)
+    for (int ok = 1, arg = 1; ok; arg += 4)
+    {
+      SV *plug_sv = ST (arg);
+      SV *iface_sv = ST (arg + 1);
+      SV *scfid_sv = ST (arg + 2);
+      SV *ver_sv = ST (arg + 3);
+
+      const char *plug = SvPV_nolen (plug_sv);
+      const char *iface = SvPV_nolen (iface_sv);
+      int scfid = SvIV (scfid_sv);
+      int ver = SvIV (ver_sv);
+
+      bool ok1 = csInitializer::RequestPlugins
+        (reg, plug, iface, scfid, ver, 0);
+      if (! ok1) ok = false;
+    }
+
+    XSRETURN_IV (ok ? 1 : 0);
+  }
+%}
+
+%{
+  int scfGetVersion (const char *iface)
   {
-    if (! SvTRUE (reg_ref)) break;
-    SV *plug_sv = av_shift (argv);
-    SV *iface_sv = av_shift (argv);
-    SV *scfid_sv = av_shift (argv);
-    SV *ver_sv = av_shift (argv);
+    char *var = (char *) malloc (strlen (iface) + 9);
+    strcpy (var, iface);
+    strcat (var, "_VERSION");
 
-    const char *plug = SvPV_nolen (plug_sv);
-    const char *iface = SvPV_nolen (iface_sv);
-    int scfid = SvIV (scfid_sv);
-    int ver = SvIV (ver_sv);
+    SV *sv = get_sv (var, 0);
 
-    SvREFCNT_dec (plug_sv);
-    SvREFCNT_dec (iface_sv);
-    SvREFCNT_dec (ver_sv);
-    SvREFCNT_dec (scfid_sv);
+    free (var);
 
-    bool ok1 = csInitializer::RequestPlugins
-      (reg, plug, iface, scfid, ver, 0);
-    if (! ok1) ok = false;
+    if (sv) return SvIV (sv);
+    else return -1;
   }
-
-  SV *ret = get_sv ("_", 1);
-  sv_setiv (ret, ok /*? 1 : 0*/);
-}
 %}
 
 %inline %{
-  csWrapPtr _CS_QUERY_REGISTRY (iObjectRegistry *reg, const char *iface,
-    int iface_ver)
+  #undef CS_QUERY_REGISTRY
+  #undef CS_QUERY_REGISTRY_TAG_INTERFACE
+  #undef SCF_QUERY_INTERFACE
+  #undef SCF_QUERY_INTERFACE_SAFE
+  #undef CS_QUERY_PLUGIN_CLASS
+  #undef CS_LOAD_PLUGIN
+  #undef CS_GET_CHILD_OBJECT
+  #undef CS_GET_NAMED_CHILD_OBJECT
+  #undef CS_GET_FIRST_NAMED_CHILD_OBJECT
+
+  csWrapPtr CS_QUERY_REGISTRY (iObjectRegistry *reg, const char *iface)
   {
     return csWrapPtr (iface, reg->Get
-      (iface, iSCF::SCF->GetInterfaceID (iface), iface_ver));
+      (iface, iSCF::SCF->GetInterfaceID (iface), scfGetVersion (iface)));
   }
-
-  csWrapPtr _CS_QUERY_REGISTRY_TAG_INTERFACE (iObjectRegistry *reg,
-    const char *tag, const char *iface, int iface_ver)
+  csWrapPtr CS_QUERY_REGISTRY_TAG_INTERFACE (iObjectRegistry *reg,
+    const char *tag, const char *iface)
   {
     return csWrapPtr (iface, reg->Get
-      (tag, iSCF::SCF->GetInterfaceID (iface), iface_ver));
+      (tag, iSCF::SCF->GetInterfaceID (iface), scfGetVersion (iface)));
   }
-
-  csWrapPtr _SCF_QUERY_INTERFACE (iBase *obj, const char *iface, int iface_ver)
+  csWrapPtr SCF_QUERY_INTERFACE (iBase *obj, const char *iface)
   {
     return csWrapPtr (iface, (iBase *) obj->QueryInterface
-      (iSCF::SCF->GetInterfaceID (iface), iface_ver));
+      (iSCF::SCF->GetInterfaceID (iface), scfGetVersion (iface)));
   }
-
-  csWrapPtr _SCF_QUERY_INTERFACE_SAFE (iBase *obj, const char *iface,
-    int iface_ver)
+  csWrapPtr SCF_QUERY_INTERFACE_SAFE (iBase *obj, const char *iface)
   {
     return csWrapPtr (iface, (iBase *) iBase::QueryInterfaceSafe
-      (obj, iSCF::SCF->GetInterfaceID (iface), iface_ver));
+      (obj, iSCF::SCF->GetInterfaceID (iface), scfGetVersion (iface)));
   }
-
-  csWrapPtr _CS_QUERY_PLUGIN_CLASS (iPluginManager *obj, const char *id,
-    const char *iface, int iface_ver)
+  csWrapPtr CS_QUERY_PLUGIN_CLASS (iPluginManager *obj, const char *id,
+    const char *iface)
   {
-    return csWrapPtr (iface, obj->QueryPlugin (id, iface, iface_ver));
+    return csWrapPtr (iface, obj->QueryPlugin
+      (id, iface, scfGetVersion (iface)));
   }
-
-  csWrapPtr _CS_LOAD_PLUGIN (iPluginManager *obj, const char *id,
-    const char *iface, int iface_ver)
+  csWrapPtr CS_LOAD_PLUGIN (iPluginManager *obj, const char *id,
+    const char *iface)
   {
-    return csWrapPtr (iface, obj->LoadPlugin (id, iface, iface_ver));
+    return csWrapPtr (iface, obj->LoadPlugin
+      (id, iface, scfGetVersion (iface)));
   }
-
-  csWrapPtr _CS_GET_CHILD_OBJECT (iObject *obj, const char *iface,
-    int iface_ver)
+  csWrapPtr CS_GET_CHILD_OBJECT (iObject *obj, const char *iface)
   {
     return csWrapPtr (iface, (iBase *) obj->GetChild
-      (iSCF::SCF->GetInterfaceID (iface), iface_ver));
+      (iSCF::SCF->GetInterfaceID (iface), scfGetVersion (iface)));
   }
-
-  csWrapPtr _CS_GET_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
-    int iface_ver, const char *name)
+  csWrapPtr CS_GET_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
+    const char *name)
   {
     return csWrapPtr (iface, (iBase *) obj->GetChild
-      (iSCF::SCF->GetInterfaceID (iface), iface_ver, name));
+      (iSCF::SCF->GetInterfaceID (iface), scfGetVersion (iface), name));
   }
-
-  csWrapPtr _CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
-    int iface_ver, const char *name)
+  csWrapPtr CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
+    const char *name)
   {
     return csWrapPtr (iface, (iBase *) obj->GetChild
-      (iSCF::SCF->GetInterfaceID (iface), iface_ver, name, true));
+      (iSCF::SCF->GetInterfaceID (iface), scfGetVersion (iface), name, true));
   }
 %}
 
-#if 0
-%perl5code %{
-sub CS_REQUEST_VFS
-  { CS_REQUEST_PLUGIN ('crystalspace.kernel.vfs', iVFS) }
-
-sub CS_REQUEST_FONTSERVER
-  { CS_REQUEST_PLUGIN ('crystalspace.font.server.default', iFontServer) }
-
-sub CS_REQUEST_IMAGELOADER
-  { CS_REQUEST_PLUGIN ('crystalspace.graphic.image.io.multiplex', iImageIO) }
-
-sub CS_REQUEST_NULL3D
-  { CS_REQUEST_PLUGIN ('crystalspace.graphics3d.null', iGraphics3D) }
-
-sub CS_REQUEST_SOFTWARE3D
-  { CS_REQUEST_PLUGIN ('crystalspace.graphics3d.software', iGraphics3D) }
-
-sub CS_REQUEST_OPENGL3D
-  { CS_REQUEST_PLUGIN ('crystalspace.graphics3d.opengl', iGraphics3D) }
-
-sub CS_REQUEST_ENGINE
-  { CS_REQUEST_PLUGIN ('crystalspace.engine.3d', iEngine) }
-
-sub CS_REQUEST_LEVELLOADER
-  { CS_REQUEST_PLUGIN ('crystalspace.level.loader', iLoader) }
-
-sub CS_REQUEST_LEVELSAVER
-  { CS_REQUEST_PLUGIN ('crystalspace.level.saver', iSaver) }
-
-sub CS_REQUEST_REPORTER
-  { CS_REQUEST_PLUGIN ('crystalspace.utilities.reporter', iReporter) }
-
-sub CS_REQUEST_REPORTERLISTENER
-  { CS_REQUEST_PLUGIN ('crystalspace.utilities.stdrep', iStandardReporterListener) }
-
-sub CS_REQUEST_CONSOLEOUT
-  { CS_REQUEST_PLUGIN ('crystalspace.console.output.simple', iConsoleOutput) }
+%{
+  void csRequestPlugin (char *iface, int &idnum, int &ver)
+  {
+    idnum = iSCF::SCF->GetInterfaceID (iface);
+    ver = scfGetVersion (iface);
+  }
 %}
-#endif // 0
 
-#if 0
-%extend iCollideSystem
-{
-  %native(GetCollisionPairs) _GetCollisionPairs;
-  %{
+%apply char * OUTPUT { char *& __scfid__ };
+%apply char * OUTPUT { char *& __iface__ };
+%apply char * INOUT { char *& __Iscfid__ };
+%apply char * INOUT { char *& __Iiface__ };
+%apply int * OUTPUT { int & __idnum__ };
+%apply int * OUTPUT { int & __ver__ };
+
+%inline %{
+  #undef CS_REQUEST_PLUGIN
+  #undef CS_REQUEST_VFS
+  #undef CS_REQUEST_FONTSERVER
+  #undef CS_REQUEST_IMAGELOADER
+  #undef CS_REQUEST_NULL3D
+  #undef CS_REQUEST_SOFTWARE3D
+  #undef CS_REQUEST_OPENGL3D
+  #undef CS_REQUEST_ENGINE
+  #undef CS_REQUEST_LEVELLOADER
+  #undef CS_REQUEST_LEVELSAVER
+  #undef CS_REQUEST_REPORTER
+  #undef CS_REQUEST_REPORTERLISTENER
+  #undef CS_REQUEST_CONSOLEOUT
+
+  void CS_REQUEST_PLUGIN
+    (char *& __Iscfid__, char *& __Iiface__, int & __idnum__, int & __ver__)
+  {
+    __idnum__ = iSCF::SCF->GetInterfaceID (__Iiface__);
+    __ver__ = scfGetVersion (__Iiface__);
+    csRequestPlugin (__Iiface__, __idnum__, __ver__);
+  }
+  void CS_REQUEST_VFS
+    (char *& __scfid__, char *& __iface__, int & __idnum__, int & __ver__)
+  {
+    __scfid__ = "crystalspace.kernel.vfs";
+    __iface__ = "iVFS";
+    csRequestPlugin (__iface__, __idnum__, __ver__);
+  }
+  void CS_REQUEST_FONTSERVER
+    (char *& __scfid__, char *& __iface__, int & __idnum__, int & __ver__)
+  {
+    __scfid__ = "crystalspace.font.server.default";
+    __iface__ = "iFontServer";
+    csRequestPlugin (__iface__, __idnum__, __ver__);
+  }
+  void CS_REQUEST_IMAGELOADER
+    (char *& __scfid__, char *& __iface__, int & __idnum__, int & __ver__)
+  {
+    __scfid__ = "crystalspace.graphic.image.io.multiplex";
+    __iface__ = "iImageIO";
+    csRequestPlugin (__iface__, __idnum__, __ver__);
+  }
+  void CS_REQUEST_NULL3D
+    (char *& __scfid__, char *& __iface__, int & __idnum__, int & __ver__)
+  {
+    __scfid__ = "crystalspace.graphics3d.null";
+    __iface__ = "iGraphics3D";
+    csRequestPlugin (__iface__, __idnum__, __ver__);
+  }
+  void CS_REQUEST_SOFTWARE3D
+    (char *& __scfid__, char *& __iface__, int & __idnum__, int & __ver__)
+  {
+    __scfid__ = "crystalspace.graphics3d.software";
+    __iface__ = "iGraphics3D";
+    csRequestPlugin (__iface__, __idnum__, __ver__);
+  }
+  void CS_REQUEST_OPENGL3D
+    (char *& __scfid__, char *& __iface__, int & __idnum__, int & __ver__)
+  {
+    __scfid__ = "crystalspace.graphics3d.opengl";
+    __iface__ = "iGraphics3D";
+    csRequestPlugin (__iface__, __idnum__, __ver__);
+  }
+  void CS_REQUEST_ENGINE
+    (char *& __scfid__, char *& __iface__, int & __idnum__, int & __ver__)
+  {
+    __scfid__ = "crystalspace.engine.3d";
+    __iface__ = "iEngine";
+    csRequestPlugin (__iface__, __idnum__, __ver__);
+  }
+  void CS_REQUEST_LEVELLOADER
+    (char *& __scfid__, char *& __iface__, int & __idnum__, int & __ver__)
+  {
+    __scfid__ = "crystalspace.level.loader";
+    __iface__ = "iLoader";
+    csRequestPlugin (__iface__, __idnum__, __ver__);
+  }
+  void CS_REQUEST_LEVELSAVER
+    (char *& __scfid__, char *& __iface__, int & __idnum__, int & __ver__)
+  {
+    __scfid__ = "crystalspace.level.saver";
+    __iface__ = "iSaver";
+    csRequestPlugin (__iface__, __idnum__, __ver__);
+  }
+  void CS_REQUEST_REPORTER
+    (char *& __scfid__, char *& __iface__, int & __idnum__, int & __ver__)
+  {
+    __scfid__ = "crystalspace.utilities.reporter";
+    __iface__ = "iReporter";
+    csRequestPlugin (__iface__, __idnum__, __ver__);
+  }
+  void CS_REQUEST_REPORTERLISTENER
+    (char *& __scfid__, char *& __iface__, int & __idnum__, int & __ver__)
+  {
+    __scfid__ = "crystalspace.utilities.stdrep";
+    __iface__ = "iStandardReporterListener";
+    csRequestPlugin (__iface__, __idnum__, __ver__);
+  }
+  void CS_REQUEST_CONSOLEOUT
+    (char *& __scfid__, char *& __iface__, int & __idnum__, int & __ver__)
+  {
+    __scfid__ = "crystalspace.console.output.simple";
+    __iface__ = "iConsoleOutput";
+    csRequestPlugin (__iface__, __idnum__, __ver__);
+  }
+%}
+
+%native(iCollideSystem_GetCollisionPairs) _GetCollisionPairs;
+%{
   void _GetCollisionPairs (pTHXo_ CV *thisfunc)
   {
-    AV *argv = get_av ("_", 1);
-    SV *sys_ref = av_shift (argv);
-
-    if (! SvTRUE (sys_ref))
-    {
+    dXSARGS;
+    dTARG;
+    SV *sys_ref = ST (0);
+    if (! sys_ref)
       croak("No self parameter passed to GetCollisionPairs");
-      return;
-    }
 
-    SV *sys_obj = SvRV (sys_ref));
-    SvREFCNT_dec (sys_ref);
+    SV *sys_obj = SvRV (sys_ref);
     if (! sv_isa (sys_obj, "cspace::iCollideSystem"))
-    {
       croak("Self parameter of GetCollisionPairs must be an iCollideSystem");
-      return;
-    }
 
-    iCollideSystem *sys = (iCollideSystem *) SvPV_nolen (sys_obj);
+    iCollideSystem *sys = (iCollideSystem *) SvIV (sys_obj);
 
+    csCollisionPair *pairs = sys->GetCollisionPairs ();
     int num = sys->GetCollisionPairCount ();
     AV *av = newAV ();
     for (int i = 0; i < num; i++)
-      av_push (av, sys->GetCollisionPairs () + i);
+    {
+      SV *rv = newSViv (0);
+      sv_setref_iv (rv, "cspace::csCollisionPair", (int) pairs++);
+      av_push (av, rv);
+      SvREFCNT_dec (rv);
+    }
 
     SV *rv = newRV ((SV *) av);
-    HvREFCNT_dec (av);
-    SV *ret = get_sv ("_", 1);
-    sv_setsv (ret, rv);
-    SvREFCNT_dec (rv);
+    SvREFCNT_dec ((SV *) av);
+    XSRETURN_SV (rv);
   }
-  %}
-}
-#endif // 0
+%}
 
 %apply float * OUTPUT { float & __v1__ };
 %apply float * OUTPUT { float & __v2__ };
@@ -329,8 +418,7 @@ sub CS_REQUEST_CONSOLEOUT
   }
 }
 
-#if 0
-%{
+%inline %{
   #undef CS_VEC_FORWARD
   #undef CS_VEC_BACKWARD
   #undef CS_VEC_RIGHT
@@ -343,20 +431,68 @@ sub CS_REQUEST_CONSOLEOUT
   #undef CS_VEC_TILT_LEFT
   #undef CS_VEC_TILT_UP
   #undef CS_VEC_TILT_DOWN
+
+  const csVector3& CS_VEC_FORWARD()
+  {
+    static const csVector3 v ( 0,  0,  1);
+    return v;
+  }
+  const csVector3& CS_VEC_BACKWARD()
+  {
+    static const csVector3 v ( 0,  0, -1);
+    return v;
+  }
+  const csVector3& CS_VEC_RIGHT()
+  {
+    static const csVector3 v ( 1,  0,  0);
+    return v;
+  }
+  const csVector3& CS_VEC_LEFT()
+  {
+    static const csVector3 v (-1,  0,  0);
+    return v;
+  }
+  const csVector3& CS_VEC_UP()
+  {
+    static const csVector3 v ( 0,  1,  0);
+    return v;
+  }
+  const csVector3& CS_VEC_DOWN()
+  {
+    static const csVector3 v ( 0, -1,  0);
+    return v;
+  }
+  const csVector3& CS_VEC_ROT_RIGHT()
+  {
+    static const csVector3 v ( 0,  1,  0);
+    return v;
+  }
+  const csVector3& CS_VEC_ROT_LEFT()
+  {
+    static const csVector3 v ( 0, -1,  0);
+    return v;
+  }
+  const csVector3& CS_VEC_TILT_RIGHT()
+  {
+    static const csVector3 v ( 0,  0, -1);
+    return v;
+  }
+  const csVector3& CS_VEC_TILT_LEFT()
+  {
+    static const csVector3 v ( 0,  0,  1);
+    return v;
+  }
+  const csVector3& CS_VEC_TILT_UP()
+  {
+    static const csVector3 v (-1,  0,  0);
+    return v;
+  }
+  const csVector3& CS_VEC_TILT_DOWN()
+  {
+    static const csVector3 v ( 1,  0,  0);
+    return v;
+  }
 %}
-csVector3 CS_VEC_FORWARD()	{ return csVector3 ( 0,  0,  1); }
-csVector3 CS_VEC_BACKWARD()	{ return csVector3 ( 0,  0, -1); }
-csVector3 CS_VEC_RIGHT()	{ return csVector3 ( 1,  0,  0); }
-csVector3 CS_VEC_LEFT()		{ return csVector3 (-1,  0,  0); }
-csVector3 CS_VEC_UP()		{ return csVector3 ( 0,  1,  0); }
-csVector3 CS_VEC_DOWN()		{ return csVector3 ( 0, -1,  0); }
-csVector3 CS_VEC_ROT_RIGHT()	{ return csVector3 ( 0,  1,  0); }
-csVector3 CS_VEC_ROT_LEFT()	{ return csVector3 ( 0, -1,  0); }
-csVector3 CS_VEC_TILT_RIGHT()	{ return csVector3 ( 0,  0, -1); }
-csVector3 CS_VEC_TILT_LEFT()	{ return csVector3 ( 0,  0,  1); }
-csVector3 CS_VEC_TILT_UP()	{ return csVector3 (-1,  0,  0); }
-csVector3 CS_VEC_TILT_DOWN()	{ return csVector3 ( 1,  0,  0); }
-#endif // 0
 
 TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
 
@@ -482,50 +618,37 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
   }
 }
 
-#if 0
-%extend csHashMapReversible
-{
-  %native(__hv__) ___hv__;
-  %{
+%native(csHashMapReversible___hv__) ___hv__;
+%{
   void ___hv__ (pTHXo_ CV *thisfunc)
   {
-    AV *argv = get_av ("_", 1);
-    SV *hm_ref = av_shift (argv);
-    if (! SvTRUE (hm_ref))
-    {
+    dXSARGS;
+    dTARG;
+    SV *hm_ref = ST (0);
+    if (! hm_ref)
       croak("Malformed \%{} request of csHashMapReversible");
-      return;
-    }
 
-    SV *hm_obj = SvRV (hm_ref));
-    SvREFCNT_dec (hm_ref);
+    SV *hm_obj = SvRV (hm_ref);
     if (! sv_isa (hm_obj, "cspace::csHashMapReversible"))
-    {
       croak("Erroneous \%{} request of non-csHashMapReversible");
-      return;
-    }
 
-    csHashMapReversible *hm = (csHashMapReversible *) SvPV_nolen (hm_obj);
+    csHashMapReversible *hm = (csHashMapReversible *) SvIV (hm_obj);
   
-    csHashIteratorReversible (hm);
+    csGlobalHashIteratorReversible iter (hm);
     HV *hv = newHV ();
     void *value;
-    while ((value = iter->Next ()))
+    while ((value = iter.Next ()))
     {
-      const char *key = iter->GetKey ();
+      const char *key = iter.GetKey ();
  
       SV *sv = newSViv ((int) value);
-      hv_store (hv, key, strlen (key), sv);
+      hv_store (hv, key, strlen (key), sv, 0);
       SvREFCNT_dec (sv);
     }
-    RV *rv = newRV ((SV *) hv);
-    HvREFCNT_dec (hv);
-    SV *ret = get_sv ("_", 1);
-    sv_setsv (ret, rv);
-    SvREFCNT_dec (rv);
+    SV *rv = newRV ((SV *) hv);
+    SvREFCNT_dec ((SV *) hv);
+    XSRETURN_SV (rv);
   }
-  %}
-}
-#endif // 0
+%}
 
 #endif // SWIGPERL5
