@@ -8,17 +8,17 @@ This section contains guidelines and instructions for writing documentation
 for the Crystal Space project.  Read this section if you are interested in
 contributing to the documentation project.
 
-@emph{FIXME}: This section is very lacking of content.
-
 These guidelines deal with subdivision of the documentation into files, into
 chapters and sections, and with node placing and linking.  To understand this
 document, you should know that 'chapters' is the general division of a Texinfo
-file into several parts, and 'sections' is the next subdivision.  ToC means
-'Table of Contents'.  'folder' and 'directory' means the same.
+file into several parts, and 'sections' is the next subdivision.  @sc{ToC}
+means ``Table of Contents''.  ``folder'' and ``directory'' have the expected
+meaning.
 
 Please follow these guidelines when writing documentation for Crystal Space.
 
 @subsubheading General
+
 Write documentation using the Texinfo mark-up language. You can get more
 information at @uref{www.texinfo.org}.
 
@@ -30,96 +30,132 @@ make any changes.
 To make writing the documentation easier, @samp{@@node} and @samp{@@menu}
 directives in the Texinfo sources can be repaired, which means that the
 links to the previous, next and top nodes are generated automatically. So you
-can write the following line, and these links are generated:
+can safely write the following line, ommitting the various links which the
+@samp{@@node} directive normally requires:
 
 @example
 @@node MySection
 @@section MySection
 @end example
-This is also done automatically in the @sc{cvs} repository.
+
+The repair occurs automatically within the @sc{cvs} repository on a daily
+basis.  You can also repair the files manually if you use the @sc{gnu} makefile
+system by invoking the following command:
+
+@example
+make repairdoc
+@end example
 
 @subsubheading Conversion and Maintenance via Makefile Targets
+
 If you are using the @sc{gnu} makefile system, you can use the following
 makefile targets to convert the Texinfo documents to different formats.
-The output will be placed in @file{CS/out/docs/}.
+The output will be placed in subdirectories of @file{CS/out/docs/}.
 
 @table @code
-@item devapi
-Create developer @sc{api} reference via Doxygen.
+@item make pubapi
+Create public @sc{api} reference via Doxygen.  This is the reference manual
+for people using Crystal Space in their own projects.  It only documents
+public classes and functions.
 
-@item pubapi
-Create public @sc{api} reference via Doxygen
+@item make devapi
+Create developer @sc{api} reference via Doxygen.  This is the reference
+manual for people actually working on Crystal Space itself.  It documents all
+classes and functions.
 
-@item htmldoc
-Convert to @sc{html} format.
+@item make htmldoc
+Convert the user's manual to @sc{html} format.
 
-@item dvidoc
-Convert to @sc{dvi} format.
+@item make dvidoc
+Convert the user's manual to @sc{dvi} format.
 
-@item psdoc
-Convert to @emph{PostScript} format.
+@item make psdoc
+Convert the user's manual to @emph{PostScript} format.
 
-@item pdfdoc
-Convert to @sc{pdf} format.
+@item make pdfdoc
+Convert the user's manual to @sc{pdf} format.
 
-@item infodoc
-Convert to @emph{Info} format.
+@item make infodoc
+Convert the user's manual to @emph{Info} format.
 
-@item cleandoc
+@item make repairdoc
+Repair all @samp{@@node} and @samp{@@menu} directives in the Texinfo sources.
+
+@item make cleandoc
 Delete all converted documents.
-
-@item repairdoc
-Repair all node and menu directives in the Texinfo sources.
 @end table
 
 @subsubheading Manual Conversion
-Manual conversion to @sc{html} happens with the perl script @file{texi2html}.
-This script is already included in the Crystal Space package. You can run the
-script with the following line (assuming you are in @file{CS/docs/texinfo}):
+
+Manual conversion to @sc{html} is done with the Perl script @file{texi2html}.
+This script is already included in the Crystal Space package in the
+@file{CS/bin} directory.  If you are using the @sc{gnu} make system, then you
+can run the script by invoking the @samp{htmldoc} makefile target.
+
 @example
-perl ..\..\bin\texi2html -init_file ..\support\texi2html.init
-  -prefix cs -subdir ../html cs-unix.txi
+make htmldoc
 @end example
-The @samp{subdir} option controls where the output files are placed. Replace
+
+If you do not use the @sc{gnu} makefile system, then you can run the script
+manually with the following line.  This example assumes that your current
+working directory is @file{CS/}.
+
+@example
+mkdir out
+mkdir out/docs
+mkdir out/docs/html
+cd docs/texinfo
+perl ../../bin/texi2html -init_file \
+  ../support/texi2html.init -prefix cs \
+  -subdir ../../out/docs/html cs-unix.txi
+@end example
+
+The @samp{-subdir} option controls where the output files are placed.  Replace
 @file{cs-unix.txi} by @file{cs-dos.txi} or @file{cs-mac.txi} for
-@sc{dos}/Windows or Macintosh systems.
-@end itemize
+Windows/@sc{dos} or Macintosh systems, respectively.
 
 @subsubheading Directory Structure
-The @file{docs/texinfo} directory contains:
+
+The @file{CS/docs/texinfo} directory contains:
+
 @itemize @bullet
 @item
-A table-of-contents file named @file{cs.txi}.
+A table-of-contents file named @file{cs.txi}.  This is the platform-independent
+root of the entire documentation hierarchy.
 
 @item
-System-dependent configuration files, like @file{macdef.txi},
-@file{unixdef.txi}, etc.
+Platform-dependent configuration files, such as @file{unixdef.txi},
+@file{macdef.txi}, etc.
 
 @item
-System-dependent wrapper files, like @file{cs-mac.txi}, @file{cs-unix.txi},
-etc. These are the root files for the whole documentation. They import the
-system-dependent configration and the ToC file.
+Platform-dependent wrapper files, such as @file{cs-unix.txi},
+@file{cs-mac.txi}, etc.  These are the platform-specific root files for the
+entire documentation hierarchy.  They import the platform-dependent
+configration (i.e. @file{unixdef.txi} and then the @sc{ToC} file
+@file{cs.txi}.
 
 @item
-Other configuration files, like @file{version.txi}, @file{cpyright.txi}, ...,
+Other configuration files, like @file{version.txi}, @file{cpyright.txi}, etc.,
 and helper files for conversion to other formats, like @file{texinfo.tex}.
 
 @item
 One subdirectory for each chapter. Each chapter directory contains at least
 one file called @file{chapter.txi}, which is the root import file for this
-chapter. So the ToC file will only include @file{chapter.txi}, which then
+chapter. The @sc{ToC} file will only include @file{chapter.txi}, which then
 includes one file in this directory for every section.
 
-If one section in a chapter is too big for a single file, this section is
-split into several files by subsections. These files are again put into a
-subdirectory. There is currently no general guideline how this is done,
-like a main @file{section.txi} in this subdirectory.
+If one section in a chapter is too big for a single file, this section is split
+into several files by subsections.  These files are again often placed into a
+subdirectory.
 @end itemize
 
-@subsubheading Format Conventions
+@subsubheading Formatting Conventions
+
+Here are some general formatting convensions.
+
 @itemize @bullet
 @item
-Please restrict the names of documentation files to eight characters with a
+Restrict the names of documentation files to eight characters with a
 file extension of no more than three characters.  This allows @sc{dos} users
 to access the documentation by respecting @sc{dos}'s 8.3 limitation.
 
@@ -128,21 +164,24 @@ When creating @code{@@itemize} lists, one blank line should separate each
 @code{@@item} except for short lists of items with short descriptions.
 
 @item
-Do not indent the text of each item within @code{@@itemize} or
+Do not indent the text of items within @code{@@itemize} or
 @code{@@table} blocks.  Allow the formatting tools to perform the indentation
 automatically. This also applies to @code{@@example} blocks, but here you
 may indent sub-blocks. For example, you may want to create a block like this:
 
 @example
-int Increase(int n)
-@{
+@@example
+int Increment(int n)
+@@@{
   return n + 1;
-@}
+@@@}
+@@end example
 @end example
-Then you may of course indent the @samp{return} line, but not the other lines.
+
+Then you may, of course, indent the @samp{return} line, but not the other
+lines.
 
 @item
 Attempt to keep the content of Texinfo source files under 80-columns in width
 if possible.  This is a general guidelines rather than a hard rule.
 @end itemize
-
