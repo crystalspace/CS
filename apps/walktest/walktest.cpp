@@ -53,7 +53,6 @@
 #include "igraph3d.h"
 #include "itxtmgr.h"
 #include "isndrdr.h"
-#include "iscript.h"
 
 #if defined(OS_DOS) || defined(OS_WIN32) || defined (OS_OS2)
 #  include <io.h>
@@ -1004,7 +1003,6 @@ void WalkTest::PrepareFrame (time_t elapsed_time, time_t current_time)
 	// However, we need to do it once to make sure that we are standing
 	// on solid ground. So we first set 'check_once' to true to enable
 	// one more test.
-
 	if (check_once == false) { check_once = true; DoGravity (pos, vel); }
       }
       else { check_once = false; DoGravity (pos, vel); }
@@ -1016,7 +1014,7 @@ void WalkTest::PrepareFrame (time_t elapsed_time, time_t current_time)
       angle += angle_velocity;
     }
   }
-  
+
 #if 0
   if (do_cd && csBeing::init)
   {
@@ -1386,59 +1384,57 @@ bool WalkTest::Initialize (int argc, char *argv[], const char *iConfigName)
   }
   else
   {
-  Printf (MSG_INITIALIZATION, "Simple Crystal Space Python Application version 0.1.\n");
-  iTextureManager* txtmgr = G3D->GetTextureManager ();
-  txtmgr->SetVerbose (true);
+    // Load from a world file.
+    Printf (MSG_INITIALIZATION, "Loading world '%s'...\n", world_dir);
+    if (!VFS->ChDir (world_dir))
+    {
+      Printf (MSG_FATAL_ERROR, "The directory on VFS for world file does not exist!\n");
+      return false;
+    }
 
-  // First disable the lighting cache. Our app is simple enough
-  // not to need this.
-  world->EnableLightingCache (false);
+    // Load the world from the file.
+    if (!csLoader::LoadWorldFile (world, layer, "world"))
+    {
+      Printf (MSG_FATAL_ERROR, "Loading of world failed!\n");
+      return false;
+    }
 
-  // Create our world.
-  Printf (MSG_INITIALIZATION, "Creating world!...\n");
+    // Load the "standard" library
+    csLoader::LoadLibraryFile (world, "/lib/std/library");
 
-  csTextureHandle* tm = csLoader::LoadTexture (world, "stone", "/lib/std/stone4.gif");
+    // Find the Crystal Space logo and set the renderer Flag to for_2d, to allow
+    // the use in the 2D part.
+    csTextureList *texlist = world->GetTextures ();
+    csTextureHandle *texh = texlist->GetTextureMM ("cslogo.gif");
+    if (texh)
+    {
+      texh->for_2d = true;
+      texh->for_3d = false;
+    }
 
-  iScript* is = CREATE_INSTANCE("crystalspace.script.python", iScript);
-  is->Initialize(this);
-  is->RunText("import sys");
-  is->RunText("sys.path.append('./scripts/');");
-  is->RunText("import cshelper");
+    // Prepare the world. This will calculate all lighting and
+    // prepare the lightmaps for the 3D rasterizer.
+    world->Prepare ();
 
-  if(!is->RunText("import unrmap")) {
-  	Printf (MSG_FATAL_ERROR, "Failed to import unrmap\n");
-    return 0;
-  }
-    
-//TODO Python HACK
-	csSector *room=world->NewSector();
-  view = new csView (world, G3D);
-  view->SetSector(room);
-  view->GetCamera()->SetPosition (csVector3(0, 0, 0));
-  view->SetRectangle (2, 2, FrameWidth - 4, FrameHeight - 4);
+    // Create a 2D sprite for the Logo.
+    if (texh)
+    {
+      int w, h;
+      iTextureHandle* phTex = texh->GetTextureHandle();
+      phTex->GetBitmapDimensions (w,h);
+      CHK (cslogo = new csSprite2D (phTex, 0, 0, w, h));
+    }
 
-	is->Store("csTextureHandle *", "unrmap.tmptr", tm);
-	is->Store("csSector *", "unrmap.roomptr", room);
-//	is->Store("csView *", "unrmap.viewptr", view);
-
-  if(!is->RunText("unrmap.Load('data/entry')"))
-    return 0;
-
-//	is->DecRef();
-
-	room->CompressVertices();
-
-  csStatLight* light;
-  light = new csStatLight (0, 0, 0, 10, 1, 0, 0, false);
-  room->AddLight(light);
-  light = new csStatLight (127, 127, 127, 100, 0, 0, 1, false);
-  room->AddLight (light);
-	
-  world->Prepare ();
-
-	Dumper::dump(world);
-
-  Printf (MSG_INITIALIZATION, "--------------------------------------\n");
+    // Look for the start sector in this world.
+    char* strt = (char*)(world->start_sector ? world->start_sector : "room");
+    room = (csSector*)world->sectors.FindByName (strt);
+    if (!room)
+    {
+      Printf (MSG_FATAL_ERROR,
+          "World file does not contain a room called '%s' which is used\nas a starting point!\n",
+	  strt);
+      return false;
+    }
   }
 
   // Initialize collision detection system (even if disabled so that we can enable it later).
@@ -1472,8 +1468,8 @@ bool WalkTest::Initialize (int argc, char *argv[], const char *iConfigName)
   System->Console->Clear ();
 
   // Initialize our 3D view.
-//  view->SetSector (room);
-//  view->GetCamera ()->SetPosition (world->start_vec);
+  view->SetSector (room);
+  view->GetCamera ()->SetPosition (world->start_vec);
   // We use the width and height from the 3D renderer because this
   // can be different from the frame size (rendering in less res than
   // real window for example).
