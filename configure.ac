@@ -1741,13 +1741,26 @@ AC_CHECK_HEADER([stdint.h],
     [cs_cv_header_stdint_h=yes], [cs_cv_header_stdint_h=no])
 
 AS_IF([test $cs_cv_header_stdint_h = yes],
-    [CS_CHECK_BUILD([if INT64_C is available], [cs_cv_c_int64],
+    [CS_HEADER_PROPERTY([CS_HAS_STDINT_H])
+    CS_CHECK_BUILD([if INT64_C is available], [cs_cv_c_int64],
         [AC_LANG_PROGRAM(
             [[#define __STDC_CONSTANT_MACROS
             #define __STDC_LIMIT_MACROS
             #include <stdint.h>]],
             [(void)INT64_C(0x100000000)])],
-        [], [C++], [CS_HEADER_PROPERTY([CS_HAS_STDINT_H])])])
+        [], [C++], [CS_HEADER_PROPERTY([CS_HAS_INT64_C])])])
+
+
+
+#------------------------------------------------------------------------------
+# Check if intptr_t and uintptr_t are available.
+#------------------------------------------------------------------------------
+AC_CHECK_HEADER([stdint.h])
+AC_CHECK_TYPE([intptr_t], [CS_HEADER_PROPERTY([CS_HAS_INTPTR_T])], [],
+    [[#include <stddef.h>
+    #ifdef HAVE_STDINT_H
+    #include <stdint.h>
+    #endif]])
 
 
 

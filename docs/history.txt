@@ -6,6 +6,21 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+27-Aug-2004
+	- Eric Sunshine added intptr_t / uintptr_t check to configure.ac.  If
+	  the types are available, CS_HAS_INTPTR_T is defined in csconfig.h.
+	- Eric Sunshine augmented cstype.h so that it fakes up intptr_t and
+	  uintptr_t if CS_HAS_INTPTR_T is not defined, or if MSVC headers do
+	  not provide these types.
+	- Eric Sunshine changed the way configure.ac and cstypes.h treat
+	  CS_HAS_STDINT_H. Previously, configure.ac would emit this control
+	  macro only if <stdint.h> was present _and_ the INT64_C() macro was
+	  also available. Now, CS_HAS_STDINT_H is independent of INT64_C()
+	  availability and depends only upon presence of <stdint.h>. The new
+	  control macro CS_HAS_INT64_C now instead indicates availability of
+	  the INT64_C() facility.
+	- Eric Sunshine retired the obsolete CS_BUILTIN_SIZED_TYPES control
+	  macro.
 26-Aug-2004
 	- res changed the TinyXML unknown element writer to write the value
 	  not verbatim but inside pointy brackets (a tag like "<?foo ?>" in a 
@@ -21,7 +36,8 @@ chronological order.
 	- Jorrit additionally implemented caching for the LOD tables.
 	  Also recalculated if -recalc is given.
 	- Jorrit added lots of leak guards again.
-	- dfryer fixed the atan2f-faking macro
+	- dfryer fixed the atan2f()-faking macro; it was not accepting the
+	  correct number of arguments.
 24-Aug-2004
 	- Jorrit fixed a bug in Dynavis where it would try to use the
 	  hint_goodoccluder flag before setting the value of that.
@@ -1277,7 +1293,7 @@ chronological order.
 18-Jun-2004
 	- Eric Sunshine added a bunch of missing 'const' directives to csSpline
 	  and its subclasses.
-	- Eric Sunshined fixed bug in csGetPluginPaths()
+	- Eric Sunshine fixed bug in csGetPluginPaths()
 	  (csutil/generic/pluginpaths.cpp).  "jam install" places plugin
 	  modules in $prefix/lib/crystal, but csGetPluginPaths() was never
 	  referencing that location, so SCF would not find those installed
@@ -1761,7 +1777,7 @@ chronological order.
 	  the rescue.)
 	- Vincent Knecht updated cs.spec:  Added %files entries for .inc and
 	  .fun files in include/csutil/
-	- Eric Sunshined applied patch from Bedrich Zaba <frogbride@seznam.cz>
+	- Eric Sunshine applied patch from Bedrich Zaba <frogbride@seznam.cz>
 	  (plus minor cleanup by Eric) which addresses the following issues:
 	    - Added iSpriteCal3DState::GetAnimationTime(),
 	      GetAnimationDuration(), and SetAnimationTime().
@@ -6815,7 +6831,7 @@ chronological order.
 	  directory instaead of the source directory and added a rule to copy
 	  the generated files.
 	- Marten made some more fixes to portals.
-	- Eric Sunshined applied a patch from Randall Foreman
+	- Eric Sunshine applied a patch from Randall Foreman
 	  <eidpers@comcast.net> to allow AWS to be built with the Borland C++
 	  compiler.  Specifically, Borland did not like class-scoped 'static
 	  const int's being used in array declarations or 'case' statements.

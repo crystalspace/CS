@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2004 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -31,14 +31,23 @@
 #include "csplatform.h"
 #include <float.h>
 
-/**\name Specific sized types.
- * The following types should be used whenever you need a variable of
- * a specific size (in bits).  If these types are already defined by system
- * headers for a particular platform, then define CS_BUILTIN_SIZED_TYPES to
- * avoid duplicate type definition here.
- * @{ */
-#if !defined(CS_BUILTIN_SIZED_TYPES)
+#if defined(CS_HAS_STDINT_H)
+#ifndef __STDC_CONSTANT_MACROS
+#define __STDC_CONSTANT_MACROS
+#endif
+#ifndef __STDC_LIMIT_MACROS
+#define __STDC_LIMIT_MACROS
+#endif
+#include <stdint.h>
+#endif
 
+/**\name Specific sized types.
+ * These types should be used ONLY when you need a variable of an explicit
+ * number of bits.  For all other cases, you should use normal char, short,
+ * int, long, etc., types since they are treated as "natural" types and will
+ * generally have better performance characteristics than the explicitly-sized
+ * types. Use the explicitly-sized types sparingly.
+ * @{ */
 
 #ifndef CS_HAS_STDINT_H
 /// unsigned 8-bit integer (0..255)
@@ -53,25 +62,12 @@ typedef short int16;
 typedef unsigned int uint32;
 /// signed 32-bit integer (-2 147 483 648..2 147 483 647)
 typedef int int32;
-#ifdef CS_COMPILER_GCC
+#if defined(CS_COMPILER_GCC)
 /// unsigned 64-bit integer
 typedef unsigned long long uint64;
 /// signed 64-bit integer
 typedef long long int64;
-/**\def CONST_INT64
- * Specify a 64 bit integer constant.
- * Different compilers differ in 64-bit wide number specification. Use this
- * macro to automatically use the appropriate way.
- */
-#define CONST_INT64(x) x ## LL
-/**\def CONST_UINT64
- * Specify 64 bit unsigned integer constant.
- * Different compilers differ in 64-bit wide number specification. Use this
- * macro to automatically use the appropriate way.
- */
-#define CONST_UINT64(x) x ## ULL
-#else
-# if defined(CS_COMPILER_MSVC) || defined(CS_COMPILER_BCC) || defined(__BORLANDC__)
+#elif defined(CS_COMPILER_MSVC) || defined(CS_COMPILER_BCC)
 /// unsigned 64 bit integer
 typedef unsigned __int64 uint64;
 /// signed 64 bit integer
@@ -80,20 +76,12 @@ typedef __int64 int64;
 #define CONST_INT64(x) x##i64
 /// specify 64 bit unsigned integer constant
 #define CONST_UINT64(x) x##ui64
-# else
-#  warning NO definition for 64 bit integers defined for your compiler
-# endif
-#endif // end of #ifdef CS_COMPILER_GCC
-
 #else
-// We're happy and can simply use stdint.h.
-#ifndef __STDC_CONSTANT_MACROS
-#define __STDC_CONSTANT_MACROS
-#endif
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-#include <stdint.h>
+#warning Do not know how to declare 64-bit integers
+#endif // CS_COMPILER_GCC
+
+#else // CS_HAS_STDINT_H
+
 typedef uint8_t uint8;
 typedef int8_t int8;
 typedef uint16_t uint16;
@@ -102,11 +90,53 @@ typedef uint32_t uint32;
 typedef int32_t int32;
 typedef uint64_t uint64;
 typedef int64_t int64;
-#define CONST_INT64(x) INT64_C(x)
-#define CONST_UINT64(x) UINT64_C(x)
 #endif
 
-#endif // end of #if !defined(CS_BUILTIN_SIZED_TYPES)
+#ifdef CS_HAS_INT64_C
+
+/**\def CONST_INT64
+ * Specify a 64 bit integer constant.
+ * Compilers differ in 64-bit wide number specification. Employ this
+ * macro to use the appropriate mechanism automatically.
+ */
+#define CONST_INT64(x) INT64_C(x)
+
+/**\def CONST_UINT64
+ * Specify 64 bit unsigned integer constant.
+ * Compilers differ in 64-bit wide number specification. Employ this
+ * macro to use the appropriate mechanism automatically.
+ */
+#define CONST_UINT64(x) UINT64_C(x)
+
+#else // CS_HAS_INT64_C
+
+#if defined(CS_COMPILER_GCC)
+#define CONST_INT64(x)  x ## LL
+#define CONST_UINT64(x) x ## ULL
+#elif defined(CS_COMPILER_MSVC) || defined(CS_COMPILER_BCC)
+#define CONST_INT64(x)  x##i64
+#define CONST_UINT64(x) x##ui64
+#else
+#warning Do not know how to contruct 64-bit integer constants
+#endif // CS_COMPILER_GCC
+
+#endif // CS_HAS_INT64_C
+
+// Provide intptr_t and uintptr_t. If the configure script determined that
+// these types exist in the standard headers, then just employ those types.
+// For MSVC, where the configure script is not used, check <stddef.h>, which is
+// one of several headers which may provide these types. We can tell if
+// <stddef.h> provided the types by checking if _INTPTR_T_DEFINED has been
+// #defined; newer versions of MSVC will provide them; older ones will not.  If
+// all else fails, then we fake up these types on our own.
+#include <stddef.h>
+#if !defined(CS_HAS_INTPTR_T) && !defined(_INTPTR_T_DEFINED)
+typedef int intptr_t;
+typedef unsigned int uintptr_t;
+#define _INTPTR_T_DEFINED
+#define _UINTPTR_T_DEFINED
+#endif
+
 /** @} */
 
 /// Used for uniquely generated id numbers XXX: remove this sometime
