@@ -27,7 +27,10 @@
  
 #include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
-#include "cs2d/macglide2/xg2d.h"
+#include "cs2d/glide2common/iglide2d.h"
+#include "cs2d/glide2common/glide2common2d.h"
+// whats that ?
+//#include "cs2d/macglide2/xg2d.h"
 
 #if defined(DISP_X11)
   #define XK_MISCELLANY 1
@@ -35,7 +38,7 @@
   #include <X11/keysymdef.h>
 #endif           
 
-class csGraphics2DGlideCommon : public csGraphics2D
+class csGraphicsGlide2x : public csGraphics2DGlideCommon
 {
 #if defined(DISP_X11)
 private:
@@ -55,18 +58,6 @@ public:
   virtual bool Open (const char *Title);
   virtual void Close ();
   
-  virtual void Print (csRect *area = NULL);
-  
-  virtual void SetRGB(int i, int r, int g, int b);
- 
-  virtual bool BeginDraw(/*int Flag = (CSDRAW_2DGRAPHICS | CSDRAW_2DGRAPHICS_WRITE)*/);
-  virtual void FinishDraw();
-
-  virtual void SetTMUPalette(int tmu);
-  
-  int GraphicsReady;
-  static int Depth;
-
   ///------------------ iGraphics2DGlide2x implementation ------------------
 #if defined(OS_WIN32)
   ///
@@ -80,11 +71,6 @@ protected:
 #if defined(OS_WIN32)
   HWND m_hWnd;
 #endif
-  bool bPalettized;
-  bool bPaletteChanged;
-  int glDrawMode;
-  GrLfbInfo_t lfbInfo;
-  bool locked;
 };
 
 #endif // G3D_GLIDE_H

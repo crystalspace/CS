@@ -27,28 +27,16 @@
  
 #include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
-#include "cs2d/winglide2/xg2d.h"
+// whats that ?
+//#include "cs2d/winglide2/xg2d.h"
 #include "cs2d/glide2common2d/iglide2d.h"
-
-#if defined(DISP_X11)
-  #define XK_MISCELLANY 1
-  #include <X11/Xlib.h>
-  #include <X11/keysymdef.h>
-#endif           
+#include "cs2d/glide2common2d/glide2common2d.h"
 
 class csGraphics2DGlide2x : public csGraphics2DGlideCommon
 {
   friend class csGraphics3DGlide;
   friend class csGraphics2DGlide2x;
   
-#if defined(DISP_X11)
-private:
-  Display* dpy;
-  int screen_num;
-  int display_width, display_height;
-  Window window;
-  GC gc;                 
-#endif
 public:
   csGraphics2DGlide2x(iBase *iParent);
   virtual ~csGraphics2DGlide2x(void);
@@ -58,35 +46,10 @@ public:
 
   bool Initialize (iSystem *pSystem);
   
-  virtual void Print (csRect *area = NULL);
-  
-  virtual void SetRGB(int i, int r, int g, int b);
- 
-  virtual bool BeginDraw(/*int Flag = (CSDRAW_2DGRAPHICS | CSDRAW_2DGRAPHICS_WRITE)*/);
-  virtual void FinishDraw();
-
-  virtual void SetTMUPalette(int tmu);
-  
-  int GraphicsReady;
-  static int Depth;
-
-#if defined(OS_WIN32)
-  ///
   virtual HWND GethWnd ();
-#endif
-#if defined (OS_LINUX)
-  virtual Display *GetDisplay ();
-#endif    
   
 protected:
-#if defined(OS_WIN32)
   HWND m_hWnd;
-#endif
-  bool bPalettized;
-  bool bPaletteChanged;
-  int glDrawMode;
-  GrLfbInfo_t lfbInfo;
-  bool locked;
 };
 
 #endif // G3D_GLIDE_H

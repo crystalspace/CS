@@ -50,8 +50,6 @@ EXPORT_CLASS_TABLE (glide2)
     "Glide v2 2D graphics driver for Crystal Space")
 EXPORT_CLASS_TABLE_END
 
-int csGraphics2DGlide2x::Depth=16;
-
 /////The 2D Graphics Driver//////////////
 
 #if defined(OS_WIN32)
@@ -101,15 +99,14 @@ static void RestoreFPCW(WORD wSave)
 
 #endif // OS_LINUX                             
 
-csGraphics2DGlide2x::csGraphics2DGlide2x(iBase *iParent) : csGraphics2D ()
+csGraphics2DGlide2x::csGraphics2DGlide2x(iBase *iParent) : csGraphics2DGlideCommon ()
 {
   CONSTRUCT_IBASE (iParent);
-  locked = false;
 }
 
 bool csGraphics2DGlide2x::Initialize (iSystem *pSystem)
 {
-  if (!csGraphics2D::Initialize (pSystem))
+  if (!csGraphics2DGlideCommon::Initialize (pSystem))
     return false;
 
   // make a window for rush or banshee ?
@@ -145,11 +142,6 @@ bool csGraphics2DGlide2x::Initialize (iSystem *pSystem)
   //CsPrintf (MSG_INITIALIZATION, "(using X windows system for input)\n");
 #endif // OS_LINUX              
 
-  Depth=16;
-	
-  _DrawPixel = DrawPixel16;   _WriteChar = WriteChar16;
-  _GetPixelAt = GetPixelAt16; _DrawSprite = DrawSprite16;
-    
   // calculate CS's pixel format structure. 565
   pfmt.PixelBytes = 2;
   pfmt.PalEntries = 0;
@@ -174,7 +166,7 @@ csGraphics2DGlide2x::~csGraphics2DGlide2x(void)
 
 bool csGraphics2DGlide2x::Open(const char *Title)
 {
-  if (!csGraphics2D::Open (Title))
+  if (!csGraphics2DGlideCommon::Open (Title))
 		return false;
 	
 	
@@ -226,107 +218,12 @@ bool csGraphics2DGlide2x::Open(const char *Title)
           }
 #endif // OS_LINUX  
 	
-	bPalettized = false;
-	
-	bPaletteChanged = false;
-	
   return true;
 }
 
 void csGraphics2DGlide2x::Close(void)
 {
-	csGraphics2D::Close ();
-}
-
-void csGraphics2DGlide2x::Print (csRect *area)
-{
-}
-
-#define GR_DRAWBUFFER GR_BUFFER_FRONTBUFFER
-
-bool csGraphics2DGlide2x::BeginDraw(/*int Flag*/)
-{
-  csGraphics2D::BeginDraw ();
-  if (FrameBufferLocked != 1)
-    return true;
-
-	FxBool bret;
-	lfbInfo.size=sizeof(GrLfbInfo_t);
-/*	switch(Flag&(CSDRAW_2DGRAPHICS_READ|CSDRAW_2DGRAPHICS_WRITE))
-	{
-	case CSDRAW_2DGRAPHICS_READ:
-		glDrawMode=GR_LFB_READ_ONLY;
-		break;
-	case CSDRAW_2DGRAPHICS_WRITE:
-		glDrawMode=GR_LFB_WRITE_ONLY;
-		break;
-	default:
-		return false;
-	}
-*/
-  glDrawMode=GR_LFB_WRITE_ONLY;
-    
-  if(locked)
-    FinishDraw();
-
-	bret=GlideLib_grLfbLock(glDrawMode|GR_LFB_IDLE,
-		GR_DRAWBUFFER,
-		GR_LFBWRITEMODE_565,
-		GR_ORIGIN_ANY,
-		FXFALSE,
-		&lfbInfo);
-	if(bret)
-	{
-		Memory=(unsigned char*)lfbInfo.lfbPtr;
-		if(lfbInfo.origin==GR_ORIGIN_UPPER_LEFT)
-		{
-			for(int i = 0; i < Height; i++)
-				LineAddress [i] = i * lfbInfo.strideInBytes;
-		}
-		else
-		{
-			int omi = Height-1;
-			for(int i = 0; i < Height; i++)
-				LineAddress [i] = (omi--) * lfbInfo.strideInBytes;
-		}
-    locked=true;
-	}
-	return bret;
-}
-
-void csGraphics2DGlide2x::FinishDraw ()
-{
-  csGraphics2D::FinishDraw ();
-  if (FrameBufferLocked)
-    return;
-
-  Memory=NULL;
-  for(int i = 0; i < Height; i++)
-		LineAddress [i] = 0;
-	if(locked)
-    GlideLib_grLfbUnlock(glDrawMode,GR_DRAWBUFFER);
-  locked = false;
-}
-
-void csGraphics2DGlide2x::SetRGB(int i, int r, int g, int b)
-{
-	csGraphics2D::SetRGB (i, r, g, b);
-	bPaletteChanged = true;
-  SetTMUPalette(0);
-}
-
-void csGraphics2DGlide2x::SetTMUPalette(int tmu)
-{
-  GuTexPalette p;
-  RGBpaletteEntry pal;
-  
-  for(int i=0; i<256; i++)
-  {
-    pal = Palette[i];
-    p.data[i]=0xFF<<24 | pal.red<<16 | pal.green<<8 | pal.blue;
-  }
-  
-  GlideLib_grTexDownloadTable(tmu, GR_TEXTABLE_PALETTE, &p);		
+	csGraphics2DGlideCommon::Close ();
 }
 
 #if defined(OS_WIN32)

@@ -27,8 +27,10 @@
  
 #include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
-#include "cs2d/winglide3/xg2d.h"
+// whats that ?
+//#include "cs2d/winglide3/xg2d.h"
 #include "cs2d/glide2common2d/iglide2d.h"
+#include "cs2d/glide2common2d/glide2common2d.h"
 
 class csGraphics2DGlide3x : public csGraphics2DGlideCommon
 {
@@ -40,28 +42,12 @@ public:
   virtual void Close ();
   
   bool Initialize (iSystem *pSystem);
-  virtual void Print (csRect *area = NULL);
-  
-  virtual void SetRGB(int i, int r, int g, int b);
- 
-  virtual bool BeginDraw(/*int Flag = (CSDRAW_2DGRAPHICS | CSDRAW_2DGRAPHICS_WRITE)*/);
-  virtual void FinishDraw();
-#if defined(OS_WIN32)
+
   virtual long GethWnd(unsigned long *hwnd);
-#endif
-  virtual void SetTMUPalette(int tmu);
-  int GraphicsReady;
-  static int Depth;
   
 protected:
-#if defined(OS_WIN32)
   HWND m_hWnd;
-#endif
-  bool bPalettized;
-  bool bPaletteChanged;
-  int glDrawMode;
-  GrLfbInfo_t lfbInfo;
-  bool locked;
+
 };
 
 #endif // G3D_GLIDE_H

@@ -29,9 +29,7 @@
 
 #include "sysdef.h"
 #include "csutil/scf.h"
-#if defined(OS_WIN32)
 #include "cssys/win32/win32itf.h"
-#endif
 #include "isystem.h"
 
 extern void sys_fatalerror(char *str, HRESULT hRes = S_OK);
@@ -52,8 +50,6 @@ EXPORT_CLASS_TABLE_END
 int csGraphics2DGlide3x::Depth=16;
 
 /////The 2D Graphics Driver//////////////
-
-#if defined(OS_WIN32)
 
 HINSTANCE gb_hInstance;
 int gb_nCmdShow;
@@ -87,31 +83,25 @@ static void RestoreFPCW(WORD wSave)
     __asm fldcw wSave
 } 
 
-#endif
-
-csGraphics2DGlide3x::csGraphics2DGlide3x (iBase *iParent) : csGraphics2D ()
+csGraphics2DGlide3x::csGraphics2DGlide3x (iBase *iParent) : csGraphics2DGlideCommon ()
 {
   CONSTRUCT_IBASE (iParent);
   m_hWnd = NULL;
-  locked = false;
 }
 
 csGraphics2DGlide3x::~csGraphics2DGlide3x ()
 {
   GraphicsReady = 0;
   Close ();
-#if defined(OS_WIN32)
   RestoreFPCW (wOldCW);
-#endif
 }
 
 bool csGraphics2DGlide3x::Initialize (iSystem *pSystem)
 {
-  if (!csGraphics2D::Initialize (pSystem))
+  if (!csGraphics2DGlideCommon::Initialize (pSystem))
     return false;
 
   // make a window for rush or banshee ?
-#if defined(OS_WIN32)
   iWin32SystemDriver* piW32Sys = NULL;
  
   // QI for iWin32SystemDriver //
@@ -126,13 +116,6 @@ bool csGraphics2DGlide3x::Initialize (iSystem *pSystem)
 
   MungeFPCW(&wOldCW);
 
-#endif
-	
-  Depth=16;
-	
-  _DrawPixel = DrawPixel16;   _WriteChar = WriteChar16;
-  _GetPixelAt = GetPixelAt16; _DrawSprite = DrawSprite16;
-    
   // calculate CS's pixel format structure. 565
   pfmt.PixelBytes = 2;
   pfmt.PalEntries = 0;
@@ -147,11 +130,9 @@ bool csGraphics2DGlide3x::Initialize (iSystem *pSystem)
 
 bool csGraphics2DGlide3x::Open(const char *Title)
 {
-  if (!csGraphics2D::Open (Title))
+  if (!csGraphics2DGlideCommon::Open (Title))
 		return false;
 	
-	
-#if defined(OS_WIN32)
 	// create the window.
   DWORD exStyle = 0;
   DWORD style = WS_POPUP;
@@ -175,97 +156,15 @@ bool csGraphics2DGlide3x::Open(const char *Title)
 
   // hwnd is window handler used by banshee/rush card
 //	grSstControlMode(GR_CONTROL_ACTIVATE);
-#endif
-	
-	
-	bPalettized = false;
-	
-	bPaletteChanged = false;
 	
   return true;
 }
 
 void csGraphics2DGlide3x::Close(void)
 {
-	csGraphics2D::Close ();
+	csGraphics2DGlideCommon::Close ();
 }
 
-void csGraphics2DGlide3x::Print (csRect *area)
-{
-}
-
-#define GR_DRAWBUFFER GR_BUFFER_FRONTBUFFER
-
-bool csGraphics2DGlide3x::BeginDraw(/*int Flag*/)
-{
-  csGraphics2D::BeginDraw ();
-  if (FrameBufferLocked != 1)
-    return true;
-
-	FxBool bret;
-	lfbInfo.size=sizeof(GrLfbInfo_t);
-/*	switch(Flag&(CSDRAW_2DGRAPHICS_READ|CSDRAW_2DGRAPHICS_WRITE))
-	{
-	case CSDRAW_2DGRAPHICS_READ:
-		glDrawMode=GR_LFB_READ_ONLY;
-		break;
-	case CSDRAW_2DGRAPHICS_WRITE:
-		glDrawMode=GR_LFB_WRITE_ONLY;
-		break;
-	default:
-		return false;
-	}
-*/
-  glDrawMode=GR_LFB_WRITE_ONLY;
-    
-  if(locked)
-    FinishDraw();
-
-	bret=grLfbLock(glDrawMode|GR_LFB_IDLE,
-		GR_DRAWBUFFER,
-		GR_LFBWRITEMODE_565,
-		GR_ORIGIN_ANY,
-		FXFALSE,
-		&lfbInfo);
-	if(bret)
-	{
-		Memory=(unsigned char*)lfbInfo.lfbPtr;
-		if(lfbInfo.origin==GR_ORIGIN_UPPER_LEFT)
-		{
-			for(int i = 0; i < Height; i++)
-				LineAddress [i] = i * lfbInfo.strideInBytes;
-		}
-		else
-		{
-			int omi = Height-1;
-			for(int i = 0; i < Height; i++)
-				LineAddress [i] = (omi--) * lfbInfo.strideInBytes;
-		}
-    locked=true;
-	}
-	return bret;
-}
-
-void csGraphics2DGlide3x::FinishDraw ()
-{
-  csGraphics2D::FinishDraw ();
-  if (FrameBufferLocked)
-    return;
-
-  Memory=NULL;
-  for (int i = 0; i < Height; i++)
-    LineAddress [i] = 0;
-  if (locked)
-    grLfbUnlock (glDrawMode,GR_DRAWBUFFER);
-  locked = false;
-}
-
-void csGraphics2DGlide3x::SetRGB(int i, int r, int g, int b)
-{
-	csGraphics2D::SetRGB (i, r, g, b);
-	bPaletteChanged = true;
-  SetTMUPalette(0);
-}
 
 long csGraphics2DGlide3x::GethWnd(unsigned long *hwnd)
 {
@@ -273,23 +172,7 @@ long csGraphics2DGlide3x::GethWnd(unsigned long *hwnd)
   return S_OK;
 }
 
-void csGraphics2DGlide3x::SetTMUPalette(int tmu)
-{
-  GuTexPalette p;
-  RGBpaletteEntry pal;
-  
-  for(int i=0; i<256; i++)
-  {
-    pal = Palette[i];
-    p.data[i]=0xFF<<24 | pal.red<<16 | pal.green<<8 | pal.blue;
-  }
-  
-  grTexDownloadTable(GR_TEXTABLE_PALETTE, &p);
-}
-
-#if defined(OS_WIN32)
 HWND csGraphics2DGlide3x::GethWnd ()
 {
   return m_hWnd;
 }
-#endif
