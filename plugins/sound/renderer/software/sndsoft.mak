@@ -26,7 +26,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/sound/renderer/software
+vpath %.cpp plugins/sound/renderer/software plugins/sound/renderer/common
 
 # COMP_GCC Linker assumes static libs have extension '.a'.  Mingw/Cygwin both
 # use libdsound.a (static lib) as the place from which to get MS DirectSound.

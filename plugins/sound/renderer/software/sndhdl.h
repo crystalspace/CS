@@ -29,7 +29,7 @@ public:
   csSoundRenderSoftware *SoundRender;
 
   csSoundHandleSoftware(csSoundRenderSoftware *srdr, iSoundData *snd);
-  ~csSoundHandleSoftware();
+  virtual ~csSoundHandleSoftware();
 
   void Unregister();
   virtual void vUpdate(void *buf, long NumSamples);
