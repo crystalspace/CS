@@ -62,6 +62,7 @@
  * <panos@alumni.cs.colorado.edu> for xinetd.
  */
 
+#include "cssysdef.h"
 // This MUST go before the ctype includes!
 #ifdef WIN32
 #define _CTYPE_DISABLE_MACROS
