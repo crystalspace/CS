@@ -198,6 +198,8 @@ SysSystemDriver::SysSystemDriver()
 }
 
 
+static iMacGraphics* piG2D = NULL;
+
 SysSystemDriver::~SysSystemDriver()
 {
     /*
@@ -218,6 +220,11 @@ SysSystemDriver::~SysSystemDriver()
 
     if (EventOutlet)
         EventOutlet->DecRef ();
+
+    if ( piG2D ) {
+        piG2D->DecRef();
+        piG2D = NULL;
+    }
 }
 
 
@@ -241,7 +248,6 @@ static void NLtoCR( UInt8 *theString )
 void SysSystemDriver::Alert(const char* s)
 {
     Str255  theMessage;
-    iMacGraphics* piG2D = NULL;
 
     if ( G2D )
         piG2D = QUERY_INTERFACE(G2D, iMacGraphics);
@@ -257,8 +263,6 @@ void SysSystemDriver::Alert(const char* s)
 
     if ( piG2D ) {
         piG2D->ActivateDisplayContext();
-        piG2D->DecRef();
-        piG2D = NULL;
     }
 }
 
@@ -266,7 +270,6 @@ void SysSystemDriver::Alert(const char* s)
 void SysSystemDriver::Warn(const char* s)
 {
     Str255  theMessage;
-    iMacGraphics* piG2D = NULL;
 
     if ( G2D )
         piG2D = QUERY_INTERFACE(G2D, iMacGraphics);
@@ -282,8 +285,6 @@ void SysSystemDriver::Warn(const char* s)
 
     if ( piG2D ) {
         piG2D->ActivateDisplayContext();
-        piG2D->DecRef();
-        piG2D = NULL;
     }
 }
 
@@ -342,18 +343,13 @@ bool SysSystemDriver::Initialize (int argc, const char* const argv[], const char
 
 void SysSystemDriver::NextFrame ()
 {
-    static iMacGraphics* piG2D = NULL;
     static bool driverNeedsEvent = false;
     EventRecord anEvent;
 
-	csSystemDriver::NextFrame();
+    csSystemDriver::NextFrame();
 
     if (!piG2D)
     {
-        // UGLY: should do this somewhere in other place
-        // doing it this way will leave one unreleased reference
-        // to our 2D graphics driver ....
-
         piG2D = QUERY_INTERFACE (G2D, iMacGraphics);
 
         if (piG2D)
