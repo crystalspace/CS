@@ -30,11 +30,11 @@ SCF_IMPLEMENT_IBASE_END
 static size_t cs_ogg_read (void *ptr, size_t size, size_t nmemb, void *datasource)
 {
   csOggSoundData::datastore *ds = (csOggSoundData::datastore*)datasource;
-  size_t br = MIN (size*nmemb, ds->length-ds->pos);
+  size_t br = MIN (size*nmemb, ds->length - ds->pos);
 
   memcpy (ptr, ds->data+ds->pos, br);
 
-  ds->pos +=br;
+  ds->pos += br;
   return br;
 }
 
@@ -48,11 +48,11 @@ static int cs_ogg_seek (void *datasource, int64_t offset, int whence)
   else if (whence == SEEK_CUR)
     np = ds->pos + offset;
   else if (whence == SEEK_END)
-    np = ds->length + offset;
+    np = ds->length + offset - 1;
   else
     return -1;
 
-  if (np > ds->length)
+  if (np >= ds->length)
     return -1;
 
   ds->pos = np;
@@ -92,7 +92,7 @@ csOggSoundData::csOggSoundData (iBase *parent, uint8 *data, size_t len)
   ds = new datastore (data, len, true);
   ogg_ok = false;
   buf = NULL;
-  len = 0;
+  this->len = 0;
   current_section = 0;
   fmt.Bits = 16;
   fmt.Channels = 2;
@@ -102,7 +102,7 @@ csOggSoundData::csOggSoundData (iBase *parent, uint8 *data, size_t len)
 csOggSoundData::~csOggSoundData ()
 {
   ov_clear (&vf);
-  delete [] buf;
+  free(buf);
   delete ds;
 }
 
@@ -124,6 +124,7 @@ bool csOggSoundData::IsOgg (void *Buffer, size_t len)
 {
   datastore *dd = new datastore ((uint8*)Buffer, len, false);
   OggVorbis_File f;
+  memset (&f, 0, sizeof(OggVorbis_File));
   bool ok = ov_open_callbacks(dd, &f, NULL, 0, *(ov_callbacks*)GetCallbacks ()) == 0;
   ov_clear (&f);
   delete dd;
@@ -159,15 +160,15 @@ void *csOggSoundData::ReadStreamed(long &NumSamples)
 {
   if (ogg_ok)
   {
-    long buffersize = NumSamples * (fmt.Bits >> 3) * fmt.Channels;
+    size_t buffersize = NumSamples * (fmt.Bits >> 3) * fmt.Channels;
 
     if (buffersize > len)
     {
       buf = (uint8*) realloc (buf, buffersize);
       len = buffersize;
     }
-
-    long bytes_read = ov_read (&vf, (char*)buf, buffersize, endian,
+  
+    size_t bytes_read = ov_read (&vf, (char*)buf, buffersize, endian,
 			       fmt.Bits>>3, 1, &current_section);
 
     NumSamples = bytes_read / ((fmt.Bits >> 3) * fmt.Channels);
@@ -202,7 +203,8 @@ public:
   {
     csOggSoundData *sd=NULL;
     if (csOggSoundData::IsOgg (Buffer, Size))
-      sd = new csOggSoundData ((iBase*)this, (uint8*)Buffer, Size);
+      sd = new csOggSoundData ((iBase*)this, (uint8*)Buffer, (size_t) Size);
+
     return csPtr<iSoundData> (sd);
   }
 };

@@ -48,7 +48,11 @@ class csOggSoundData : public iSoundData
       pos=0; length = l;
       bOwn = own;
     }
-    ~datastore(){ if (bOwn) free(data);}
+    ~datastore()
+    {
+      if (bOwn)
+        delete[] data;
+    }
   };
 
 
@@ -70,7 +74,7 @@ class csOggSoundData : public iSoundData
   csSoundFormat fmt;
   bool ogg_ok;
   uint8 *buf;
-  long len;
+  size_t len;
 
  public:
   SCF_DECLARE_IBASE;
