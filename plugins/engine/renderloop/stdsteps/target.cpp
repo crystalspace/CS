@@ -106,7 +106,7 @@ csPtr<iBase> csTargetRSLoader::Parse (iDocumentNode* node,
 	      "crystalspace.renderloop.step.rendertarget",
 	      CS_REPORTER_SEVERITY_WARNING, child,
 	      "Bogus width %d", width);
-	    return false;
+	    return 0;
 	  }
 	  int height = child->GetAttributeValueAsInt ("height");
 	  if (height <= 0)
@@ -115,7 +115,7 @@ csPtr<iBase> csTargetRSLoader::Parse (iDocumentNode* node,
 	      "crystalspace.renderloop.step.rendertarget",
 	      CS_REPORTER_SEVERITY_WARNING, child,
 	      "Bogus height %d", height);
-	    return false;
+	    return 0;
 	  }
 	  step->SetCreate (width, height);
 	}
@@ -125,7 +125,7 @@ csPtr<iBase> csTargetRSLoader::Parse (iDocumentNode* node,
 	  bool p;
 	  if (!synldr->ParseBool (child, p, false))
 	  {
-	    return false;
+	    return 0;
 	  }
 	  step->SetPersistent (p);
 	}

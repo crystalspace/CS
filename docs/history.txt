@@ -27,6 +27,9 @@ chronological order.
 	- Eric Sunshine fixed bug in cs-config/Jamfile (and install.jam) where
 	  the install target did not know how to build cs-config if it did not
 	  already exist at installation time.
+	- Eric Sunshine fixed bugs in glshader_cg and renderloop/stdsteps where
+	  they were returning boolean values from methods declared as returning
+	  csPtr<>.
 10-Apr-2004
 	- Jorrit fixed a bug in spr3d with new renderer. It would try to
 	  tween vertices also for skeletal animation. That would cause

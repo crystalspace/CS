@@ -113,19 +113,19 @@ bool csGLShader_CG::SupportType(const char* type)
 csPtr<iShaderProgram> csGLShader_CG::CreateProgram(const char* type)
 {
   if (!Open())
-    return false;
-  if( strcasecmp(type, "vp") == 0)
+    return 0;
+  if (strcasecmp(type, "vp") == 0)
     return csPtr<iShaderProgram>(new csShaderGLCGVP(this));
-  else if( strcasecmp(type, "fp") == 0)
+  else if (strcasecmp(type, "fp") == 0)
     return csPtr<iShaderProgram>(new csShaderGLCGFP(this));
-  else return 0;
+  else
+    return 0;
 }
 
 bool csGLShader_CG::Open()
 {
   if (isOpen) return true;
-  if(!object_reg)
-    return false;
+  if (!object_reg) return false;
 
   csRef<iGraphics3D> r = CS_QUERY_REGISTRY(object_reg,iGraphics3D);
   csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r,
@@ -146,7 +146,7 @@ bool csGLShader_CG::Open()
   }
 
   bool route = false;
-  csRef<iConfigManager> config (CS_QUERY_REGISTRY (object_reg, iConfigManager));
+  csRef<iConfigManager> config(CS_QUERY_REGISTRY (object_reg, iConfigManager));
   if (config->KeyExists ("Video.OpenGL.Shader.Cg.PSRouting"))
   {
     route = config->GetBool ("Video.OpenGL.Shader.Cg.PSRouting");
@@ -219,4 +219,3 @@ bool csGLShader_CG::Initialize(iObjectRegistry* reg)
   object_reg = reg;
   return true;
 }
-
