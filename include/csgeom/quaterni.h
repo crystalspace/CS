@@ -21,59 +21,76 @@
 
 #include "csgeom/math3d.h"
 
-class csQuaternion{
- public:
-  csQuaternion(){ init( 0, 0, 0, 0 ); }
-  csQuaternion( double theR, double theX=0.0, double theY=0.0, double theZ=0.0 )
-    { init( theR, theX, theY, theZ ); }
-  csQuaternion( const csQuaternion& q){ init( q.r, q.x, q.y, q.z ); }
-  csQuaternion( const csVector3& q){ init( 0, q.x, q.y, q.z ); }
+/**
+ * Class for a quaternion.
+ */
+class csQuaternion
+{
+public:
+  /// Construct a 0,0,0,0 quaternion.
+  csQuaternion () { init (0, 0, 0, 0 ); }
+  /// Construct a quaternion with the given parameters.
+  csQuaternion (double theR, double theX=0.0, double theY=0.0, double theZ=0.0)
+  { init (theR, theX, theY, theZ ); }
+  /// Copy constructor.
+  csQuaternion (const csQuaternion& q) { init (q.r, q.x, q.y, q.z); }
+  /// Construct quaternion from a vector.
+  csQuaternion (const csVector3& q) { init (0, q.x, q.y, q.z); }
   
-  inline friend csQuaternion operator +( const csQuaternion& q1, const csQuaternion& q2 )
-    { return csQuaternion( q1.r + q2.r, q1.x + q2.x, q1.y + q2.y, q1.z + q2.z ); }
-  inline friend csQuaternion operator -( const csQuaternion& q1, const csQuaternion& q2 )
-    { return csQuaternion( q1.r - q2.r, q1.x - q2.x, q1.y - q2.y, q1.z - q2.z ); }
-  inline friend csQuaternion operator *( const csQuaternion& q1, const csQuaternion& q2 )
-    { return csQuaternion( q1.r*q2.r -  q1.x*q2.x - q1.y*q2.y - q1.z*q2.z,
-			   q1.y*q2.z -  q1.z*q2.y + q1.r*q2.x + q1.x*q2.r,
-			   q1.z*q2.x -  q1.x*q2.z + q1.r*q2.y + q1.y*q2.r,
-			   q1.x*q2.y -  q1.y*q2.x + q1.r*q2.z + q1.z*q2.r ); }
+  ///
+  inline friend csQuaternion operator+ (const csQuaternion& q1, const csQuaternion& q2)
+  { return csQuaternion (q1.r + q2.r, q1.x + q2.x, q1.y + q2.y, q1.z + q2.z ); }
+  ///
+  inline friend csQuaternion operator- (const csQuaternion& q1, const csQuaternion& q2)
+  { return csQuaternion (q1.r - q2.r, q1.x - q2.x, q1.y - q2.y, q1.z - q2.z ); }
+  ///
+  inline friend csQuaternion operator* (const csQuaternion& q1, const csQuaternion& q2)
+  { return csQuaternion (q1.r*q2.r -  q1.x*q2.x - q1.y*q2.y - q1.z*q2.z,
+			 q1.y*q2.z -  q1.z*q2.y + q1.r*q2.x + q1.x*q2.r,
+			 q1.z*q2.x -  q1.x*q2.z + q1.r*q2.y + q1.y*q2.r,
+			 q1.x*q2.y -  q1.y*q2.x + q1.r*q2.z + q1.z*q2.r); }
 
-  csQuaternion& operator *=( const csQuaternion& q2 )
-    { init( r*q2.r -  x*q2.x - y*q2.y - z*q2.z,
-	    y*q2.z -  z*q2.y + r*q2.x + x*q2.r,
-	    z*q2.x -  x*q2.z + r*q2.y + y*q2.r,
-	    x*q2.y -  y*q2.x + r*q2.z + z*q2.r ); 
+  ///
+  csQuaternion& operator*= (const csQuaternion& q2)
+  {
+    init (r*q2.r -  x*q2.x - y*q2.y - z*q2.z,
+	  y*q2.z -  z*q2.y + r*q2.x + x*q2.r,
+	  z*q2.x -  x*q2.z + r*q2.y + y*q2.r,
+	  x*q2.y -  y*q2.x + r*q2.z + z*q2.r); 
     return *this;
-    }
+  }
   
 
-  void conjugate(){ init( r, -x, -y, -z ); }
+  ///
+  void Conjugate () { Init (r, -x, -y, -z); }
 
-  // prepare a rotation quaternion, we do a rotation around vec by an angle of "angle"
-  // note that vec needs to be a normalized vector ( we don't check this )
-  void prepRotation( double angle, csVector3 vec )
-    { 
-      double theSin = sin( angle/2 ); 
-      init( cos( angle/2 ), vec.x*theSin, vec.y*theSin, vec.z*theSin ); 
-    }
-
-  // rotated = q * vec * qConj
-  csVector3 rotate( csVector3 vec )
-    { 
-      csQuaternion p( vec );
-      csQuaternion qConj( r, -x, -y, -z ); 
-
-      p = *this * p;
-      p *= qConj;
-      return csVector3( p.x, p.y, p.z );
+  /**
+   * Prepare a rotation quaternion, we do a rotation around vec by
+   * an angle of "angle". Note that vec needs to be a normalized
+   * vector ( we don't check this ).
+   */
+  void PrepRotation (double angle, csVector3 vec)
+  { 
+    double theSin = sin (angle/2);
+    Init (cos (angle/2), vec.x*theSin, vec.y*theSin, vec.z*theSin);
   }
 
-  inline void init( double theR, double theX, double theY, double theZ )
-    { r = theR; x = theX; y = theY; z = theZ; } 
+  /// rotated = q * vec * qConj.
+  csVector3 Rotate (csVector3 vec)
+  { 
+    csQuaternion p (vec);
+    csQuaternion qConj (r, -x, -y, -z);
+
+    p = *this * p;
+    p *= qConj;
+    return csVector3 (p.x, p.y, p.z);
+  }
+
+  ///
+  inline void Init (double theR, double theX, double theY, double theZ)
+  { r = theR; x = theX; y = theY; z = theZ; } 
 
   double r,x,y,z;
-
 };
 
 #endif

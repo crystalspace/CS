@@ -12,6 +12,9 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+16-Jan-2000
+	- Norman Kramer added a new quaternion library to csgeom.
+	- Noah L. Gibbs did some further work on the csPhyzik library.
 15-Jan-2000
 	- Fundamental change to the polygon tree class structure (i.e.
 	  BSP and octrees). csPolygonParentInt no longer exists. Instead
@@ -26,6 +29,8 @@ Short-term cleanups that need to be done:
 	- Removed debugging code which was accidently left in the
 	  c-buffer/coverage mask tree culling. This could cause a significant
 	  drop in performance.
+	- Thomas Hieber did some fixes on csgame. He reenabled proper
+	  keyboard handling.
 14-Jan-2000
 	- Noah L. Gibbs (angelbob) modified and test phyztest to work with
 	  his changes of the csPhyzik inheritance hierarchy.
