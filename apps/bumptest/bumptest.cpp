@@ -319,7 +319,7 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
     abort ();
   }
 
-  myG3D = QUERY_PLUGIN (this, iGraphics3D);
+  myG3D = QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
   if (!myG3D)
   {
     Printf (MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
