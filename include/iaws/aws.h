@@ -33,6 +33,7 @@ struct iAwsComponent;
 struct iAwsPrefManager;
 struct iAwsSinkManager;
 struct iAwsCanvas;
+struct iAwsKeyFactory;
 
 class  awsWindow;
 class  awsComponent;
@@ -260,6 +261,9 @@ public:
 
   /** Allows a component to retrieve the value of a constant, or the parser as well. */
   virtual int  GetConstantValue(char *name)=0;
+
+  /** Creates a new key factory */
+  virtual iAwsKeyFactory *CreateKeyFactory()=0;
 };
 
 
@@ -505,6 +509,31 @@ struct iAwsComponentFactory : public iBase
 
   /// Registers constants for the parser so that we can construct right.
   virtual void RegisterConstant(char *name, int value)=0;
+};
+
+
+SCF_VERSION (iAwsKeyFactory, 0, 0, 1);
+
+struct iAwsKeyFactory : public iBase
+{
+   /// Initializes the factory , name is the name of this component, component type is it's type.
+   virtual void Initialize(iString *name, iString *component_type)=0;
+   /// Adds this factory's base to the window manager IF the base is a window
+   virtual void AddToWindowList(iAwsPrefManager *pm)=0;
+   /// Adds the given factory's base in as a child of this factory.
+   virtual void AddFactory(iAwsKeyFactory *factory)=0;
+   /// Add an integer key
+   virtual void AddIntKey(iString *name, int v)=0;
+   /// Add a string key
+   virtual void AddStringKey(iString *name, iString *v)=0;
+   /// Add a rect key
+   virtual void AddRectKey(iString *name, csRect v)=0;
+   /// Add an RGB key
+   virtual void AddRGBKey(iString *name, unsigned char r, unsigned char g, unsigned char b)=0;
+   /// Add a point key
+   virtual void AddPointKey(iString *name, csPoint v)=0;
+   /// Add a connection key
+   virtual void AddConnectionKey(iString *name, iAwsSink *s, unsigned long t, unsigned long sig)=0;
 };
 
 #endif // __IAWS_AWS_H__
