@@ -1691,31 +1691,111 @@ void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts, int nu
   }
 }
 
+#define SMALL_D 0.01
+void CalculateFogPolygon (csRenderView* rview, G3DPolygonDP& poly)
+{
+  if (!rview->fog_info || poly.num < 3) { poly.use_fog = false; return; }
+  poly.use_fog = true;
+
+  // Get the plane normal of the polygon. Using this we can calculate
+  // '1/z' at every screen space point.
+  float inv_aspect = poly.inv_aspect;
+  float Ac, Bc, Cc, Dc, inv_Dc;
+  Ac = poly.normal.A;
+  Bc = poly.normal.B;
+  Cc = poly.normal.C;
+  Dc = poly.normal.D;
+
+  float M, N, O;
+  if (ABS (Dc) < SMALL_D) Dc = -SMALL_D;
+  if (ABS (Dc) < SMALL_D)
+  {
+    // The Dc component of the plane normal is too small. This means that
+    // the plane of the polygon is almost perpendicular to the eye of the
+    // viewer. In this case, nothing much can be seen of the plane anyway
+    // so we just take one value for the entire polygon.
+    M = 0;
+    N = 0;
+    // For O choose the transformed z value of one vertex.
+    // That way Z buffering should at least work.
+    O = 1/poly.z_value;
+  }
+  else
+  {
+    inv_Dc = 1/Dc;
+    M = -Ac*inv_Dc*inv_aspect;
+    N = -Bc*inv_Dc*inv_aspect;
+    O = -Cc*inv_Dc;
+  }
+
+  int i;
+  for (i = 0 ; i < poly.num ; i++)
+  {
+    // Calculate the original 3D coordinate again (camera space).
+    csVector3 v;
+    v.z = 1. / (M * (poly.vertices[i].sx - csWorld::shift_x) + N * (poly.vertices[i].sy - csWorld::shift_y) + O);
+    v.x = (poly.vertices[i].sx - csWorld::shift_x) * v.z * inv_aspect;
+    v.y = (poly.vertices[i].sy - csWorld::shift_y) * v.z * inv_aspect;
+
+    // Initialize fog vertex.
+    poly.fog_info[i].r = 0;
+    poly.fog_info[i].g = 0;
+    poly.fog_info[i].b = 0;
+    poly.fog_info[i].density = 0;
+    poly.fog_info[i].thickness = 0;
+
+    // Consider a ray between (0,0,0) and v and calculate the thickness of every
+    // fogged sector in between.
+    csFogInfo* fog_info = rview->fog_info;
+    while (fog_info)
+    {
+      csVector3 isect;
+      float dist1, dist2;
+      // @@@ Plane() is too general. For more efficiency we should use a
+      // more specific function.
+      if (fog_info->has_incoming_plane)
+        csIntersect3::Plane (csVector3 (0, 0, 0), v, fog_info->incoming_plane, isect, dist1);
+      else
+        dist1 = 0;
+      csIntersect3::Plane (csVector3 (0, 0, 0), v, fog_info->outgoing_plane, isect, dist2);
+      // @@@ The following updates are not correct. We should use better formulas
+      // to combine several differently colored layers of fog (and different densities).
+      poly.fog_info[i].thickness += ABS (dist2-dist1);
+      poly.fog_info[i].r = fog_info->fog->red;
+      poly.fog_info[i].g = fog_info->fog->green;
+      poly.fog_info[i].b = fog_info->fog->blue;
+      poly.fog_info[i].density = fog_info->fog->density;
+      fog_info = fog_info->next;
+    }
+  }
+}
+
 //---------------------------------------------------------------------------
 
-void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* plane, bool mirror,
+void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly, csPolyPlane* plane,
 	bool use_z_buf)
 {
   int i;
   bool debug = false;
+  bool mirror = rview->IsMirrored ();
 
   if (use_z_buf)
   {
-    g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, true);
-    g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
+    rview->g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, true);
+    rview->g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
   }
   else
   {
-    g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, false);
-    g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
+    rview->g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, false);
+    rview->g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
   }
 
   if (poly->GetUVCoords () || poly->CheckFlags (CS_POLY_FLATSHADING))
   {
-    G3DPolygonDPFX g3dpoly;
+    static G3DPolygonDPFX g3dpoly;
     csVector2 orig_triangle[3];
 
-    memset (&g3dpoly, 0, sizeof (g3dpoly));
+    //memset (&g3dpoly, 0, sizeof (g3dpoly));
     g3dpoly.num = num_vertices;
     g3dpoly.txt_handle = poly->GetTextureHandle ();
     g3dpoly.inv_aspect = csCamera::inv_aspect;
@@ -1770,15 +1850,15 @@ void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* 
       g3dpoly.vertices[2].b = po_colors[2].blue;
     }
     PreparePolygonFX (&g3dpoly, vertices, num_vertices, orig_triangle, po_colors != NULL);
-    g3d->StartPolygonFX (g3dpoly.txt_handle, FX_Copy, 0.0f, po_colors != NULL);
-    g3d->DrawPolygonFX (g3dpoly);
-    g3d->FinishPolygonFX ();
+    rview->g3d->StartPolygonFX (g3dpoly.txt_handle, FX_Copy, 0.0f, po_colors != NULL);
+    rview->g3d->DrawPolygonFX (g3dpoly);
+    rview->g3d->FinishPolygonFX ();
   }
   else
   {
-    G3DPolygonDP g3dpoly;
+    static G3DPolygonDP g3dpoly;
 
-    memset (&g3dpoly, 0, sizeof (g3dpoly));
+    //memset (&g3dpoly, 0, sizeof (g3dpoly));
     g3dpoly.num = num_vertices;
     g3dpoly.txt_handle = poly->GetTextureHandle ();
     g3dpoly.inv_aspect = csCamera::inv_aspect;
@@ -1818,14 +1898,17 @@ void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* 
     g3dpoly.normal.D = Dc;
 
     if (debug)
-      g3d->DrawPolygonDebug (g3dpoly);
+      rview->g3d->DrawPolygonDebug (g3dpoly);
     else
-      if (FAILED (g3d->DrawPolygon (g3dpoly)))
+    {
+      CalculateFogPolygon (rview, g3dpoly);
+      if (FAILED (rview->g3d->DrawPolygon (g3dpoly)))
       {
         CsPrintf (MSG_STDOUT, "Drawing polygon '%s/%s' failed!\n",
                   csNameObject::GetName(*((csSector*)poly->GetParent ())),
                   csNameObject::GetName(*poly));
       }
+    }
   }
 }
 
@@ -1833,7 +1916,7 @@ void csPolygon2D::AddFogPolygon (IGraphics3D* g3d, csPolygon3D* /*poly*/, csPoly
 {
   int i;
 
-  G3DPolygonAFP g3dpoly;
+  static G3DPolygonAFP g3dpoly;
   memset(&g3dpoly, 0, sizeof(g3dpoly));
   g3dpoly.num = num_vertices;
   g3dpoly.inv_aspect = csCamera::inv_aspect;

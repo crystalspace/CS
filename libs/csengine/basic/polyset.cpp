@@ -451,6 +451,14 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num, csRenderVi
         d->callback (d, CALLBACK_POLYGON2D, (void*)&csPolygon2D::clipped);
       }
 
+      if (d->added_fog_info)
+      {
+        // If fog info was added then we are dealing with vertex fog and
+	// the current sector has fog. This means we have to complete the
+	// fog_info structure with the plane of the current polygon.
+	d->fog_info->outgoing_plane = p->GetPlane ()->GetCameraPlane ();
+      }
+
       Stats::polygons_drawn++;
 
       po = p->GetPortal ();
@@ -488,15 +496,13 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num, csRenderVi
 	  if (!d->callback)
 	  {
 	    if (filtered)
-	      keep_clipped->DrawFilled (d->g3d, p, keep_plane, d->IsMirrored (),
-		  use_z_buf);
+	      keep_clipped->DrawFilled (d, p, keep_plane, use_z_buf);
 	    if (is_this_fog) keep_clipped->AddFogPolygon (d->g3d, p, keep_plane, d->IsMirrored (),
 		  sector->GetID (), CS_FOG_BACK);
 	  }
         }
         else if (!d->callback)
-	  csPolygon2D::clipped.DrawFilled (d->g3d, p, p->GetPlane (), d->IsMirrored (),
-		use_z_buf);
+	  csPolygon2D::clipped.DrawFilled (d, p, p->GetPlane (), use_z_buf);
               
         // Cleanup.
         if (keep_clipped)
@@ -506,8 +512,7 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num, csRenderVi
         }
       }
       else if (!d->callback)
-        csPolygon2D::clipped.DrawFilled (d->g3d, p, p->GetPlane (), d->IsMirrored (),
-      	  use_z_buf);
+        csPolygon2D::clipped.DrawFilled (d, p, p->GetPlane (), use_z_buf);
     }
   }
 }

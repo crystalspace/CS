@@ -99,6 +99,7 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
 
   csRenderView new_rview = rview;
   new_rview.view = &new_view;
+  new_rview.added_fog_info = false;
   new_rview.portal_polygon = portal_polygon;
   new_rview.clip_plane = portal_polygon->GetPlane ()->GetCameraPlane();
   new_rview.clip_plane.Invert ();

@@ -304,8 +304,26 @@ void csSector::Draw (csRenderView& rview)
   }
   else if (HasFog ())
   {
-    rview.g3d->OpenFogObject (GetID (), &GetFog ());
     rview.g3d->GetFogMode (fogmethod);
+    if (fogmethod == G3DFOGMETHOD_VERTEX)
+    {
+      CHK (csFogInfo* fog_info = new csFogInfo ());
+      fog_info->next = rview.fog_info;
+      if (rview.portal_polygon)
+      {
+        fog_info->incoming_plane = rview.portal_polygon->GetPlane ()->GetCameraPlane ();
+        fog_info->incoming_plane.Invert ();
+	fog_info->has_incoming_plane = true;
+      }
+      else fog_info->has_incoming_plane = false;
+      fog_info->fog = &GetFog ();
+      rview.fog_info = fog_info;
+      rview.added_fog_info = true;
+    }
+    else if (fogmethod != G3DFOGMETHOD_NONE)
+    {
+      rview.g3d->OpenFogObject (GetID (), &GetFog ());
+    }
   }
 
   if (bsp)
@@ -486,7 +504,7 @@ void csSector::Draw (csRenderView& rview)
     }
   }
 
-  if (!rview.callback && HasFog ())
+  if (fogmethod != G3DFOGMETHOD_NONE)
   {
     G3DPolygonAFP g3dpoly;
     int i;
@@ -527,7 +545,7 @@ void csSector::Draw (csRenderView& rview)
         rview.g3d->AddFogPolygon (GetID (), g3dpoly, CS_FOG_FRONT);
       }
     }
-    else
+    else if (fogmethod == G3DFOGMETHOD_PLANES)
     {
 #     define FOG_PLANE_DIST 1.0                 //@@@SHOULD BE CONFIGURATION VALUE!
       // the following uses 'z-gradation'.
@@ -584,6 +602,12 @@ void csSector::Draw (csRenderView& rview)
       CHK (delete [] clipper);
       GetFog().density = real_fog_density;
       rview.g3d->CloseFogObject (GetID ());
+    }
+    else if (fogmethod == G3DFOGMETHOD_VERTEX && rview.added_fog_info)
+    {
+      csFogInfo* fog_info = rview.fog_info;
+      rview.fog_info = rview.fog_info->next;
+      CHK (delete fog_info);
     }
   }
 
