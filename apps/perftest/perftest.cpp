@@ -50,7 +50,7 @@ iMaterialHandle* PerfTest::LoadMaterial (char* file)
   iTextureManager* txtmgr = G3D->GetTextureManager ();
   iImage* image;
   iDataBuffer *buf = VFS->ReadFile (file);
-  if (!buf || !data->GetSize ())
+  if (!buf || !buf->GetSize ())
   {
     Printf (MSG_FATAL_ERROR, "Error loading texture '%s'!\n", file);
     exit (-1);
