@@ -15,6 +15,8 @@ Short-term cleanups that need to be done:
 14-Feb-2000
 	- Fixed a bug in highscore handling of Blocks.
 	- Fixed rotation center of a few shapes in Blocks.
+	- Added highscore GUI for Blocks.
+	- Current level is remembered in blocks.cfg.
 13-Feb-2000
 	- Eric Sunshine performed a fairly extensive overhaul of csIniFile.
 	  Except for the lowest level I/O functionality, most methods have

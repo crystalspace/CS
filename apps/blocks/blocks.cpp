@@ -20,16 +20,11 @@
   TODO:
     Make nice startup screen with moving blocks as demo.
     Better textures.
-    Add highscore list.
-    Add 'nightmare' level.
     'pause' should temporarily remove visible blocks (or fog area).
-    Solve rotation problem by defining main axis or something.
-      Or else look at bounding box and rotate that (even/odd).
     Mark game-over height so that you can see it.
     Improve 'Game Over' screen!
     Cleanup of several 'Screens' in Blocks (code cleanup).
     Psuedo-AI module to play automatically.
-    Extra score if all blocks are removed.
  */
 
 #define SYSDEF_ACCESS
@@ -719,6 +714,13 @@ void Blocks::StartNewShape ()
   else x = y = 3;
   z = ZONE_HEIGHT-3;
   num_cubes = 0;
+  int difficulty = 0;
+  switch (diff_level)
+  {
+    case 0: difficulty = NUM_EASY_SHAPE; break;
+    case 1: difficulty = NUM_MEDIUM_SHAPE; break;
+    case 2: difficulty = NUM_HARD_SHAPE; break;
+  }
 
 again:
   shift_rotate.Set (0, 0, 0);
@@ -991,6 +993,29 @@ void Blocks::HandleCameraMovement ()
   view->GetCamera ()->LookAt (view_origin-pos, cam_move_up);
 }
 
+void Blocks::HandleGameOverKey (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/)
+{
+  if (strchr ("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ", key))
+  {
+    if (hs_pos >= 20) return;
+    hs_name[hs_pos++] = key;
+    hs_name[hs_pos] = 0;
+  }
+  else if (key == CSKEY_ENTER)
+  {
+    highscores[diff_level][zone_dim-3].RegisterScore (hs_name, score);
+    WriteConfig ();
+    enter_highscore = false;
+  }
+  else if (key == CSKEY_BACKSPACE)
+  {
+    if (hs_pos <= 0) return;
+    hs_pos--;
+    hs_name[hs_pos] = 0;
+  }
+}
+
+
 void Blocks::HandleGameKey (int key, bool shift, bool alt, bool ctrl)
 {
   if (key_viewleft.Match (key, shift, alt, ctrl))
@@ -1078,6 +1103,14 @@ void Blocks::HandleGameKey (int key, bool shift, bool alt, bool ctrl)
   }
 }
 
+void Blocks::HandleHighscoresKey (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/)
+{
+  if (key == CSKEY_ESC)
+  {
+    screen = SCREEN_STARTUP;
+  }
+}
+
 void Blocks::HandleKeyConfigKey (int key, bool shift, bool alt, bool ctrl)
 {
   if (waiting_for_key)
@@ -1136,6 +1169,10 @@ void Blocks::HandleDemoKey (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/
     case CSKEY_ENTER:
       switch (idx_menus[cur_menu])
       {
+        case MENU_HIGHSCORES:
+	  screen = SCREEN_HIGHSCORES;
+	  initscreen = true;
+	  break;
         case MENU_KEYCONFIG:
 	  screen = SCREEN_KEYCONFIG;
 	  initscreen = true;
@@ -1172,19 +1209,22 @@ void Blocks::HandleDemoKey (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/
 	  InitMainMenu ();
 	  break;
 	case MENU_NOVICE:
-          difficulty = NUM_EASY_SHAPE;
+          diff_level = 0;
 	  screen = SCREEN_GAME;
 	  initscreen = true;
+	  WriteConfig ();
 	  break;
         case MENU_AVERAGE:
-          difficulty = NUM_MEDIUM_SHAPE;
+          diff_level = 1;
 	  screen = SCREEN_GAME;
 	  initscreen = true;
+	  WriteConfig ();
 	  break;
         case MENU_EXPERT:
-          difficulty = NUM_HARD_SHAPE;
+          diff_level = 2;
 	  screen = SCREEN_GAME;
 	  initscreen = true;
+	  WriteConfig ();
 	  break;
 	case MENU_QUIT:
 	  System->Shutdown = true;
@@ -1198,9 +1238,13 @@ void Blocks::HandleKey (int key, bool shift, bool alt, bool ctrl)
 {
   if (screen == SCREEN_KEYCONFIG)
     HandleKeyConfigKey (key, shift, alt, ctrl);
+  else if (screen == SCREEN_HIGHSCORES)
+    HandleHighscoresKey (key, shift, alt, ctrl);
   else if (screen == SCREEN_STARTUP)
     HandleDemoKey (key, shift, alt, ctrl);
-  else // GAME and GAMEOVER
+  else if (screen == SCREEN_GAMEOVER && enter_highscore)
+    HandleGameOverKey (key, shift, alt, ctrl);
+  else
     HandleGameKey (key, shift, alt, ctrl);
 }
 
@@ -1277,15 +1321,12 @@ void Blocks::freeze_shape ()
     // name according to it's position.
     cube_info[i].thing->SetName (cubename); 
     ChangeThingTexture (cube_info[i].thing, GetTextureForHeight (z));
-    if (z >= GAMEOVER_HEIGHT)
+    if (screen != SCREEN_GAMEOVER && z >= GAMEOVER_HEIGHT)
     {
       screen = SCREEN_GAMEOVER;
-      int level;
-      if (difficulty == NUM_EASY_SHAPE) level = 0;
-      else if (difficulty == NUM_MEDIUM_SHAPE) level = 1;
-      else level = 2;
-      highscores[level][zone_dim-3].RegisterScore ("me", score);
-      WriteConfig ();
+      enter_highscore = highscores[diff_level][zone_dim-3].CheckScore (score);
+      hs_pos = 0;
+      hs_name[0] = 0;
     }
   }
 }
@@ -1366,6 +1407,7 @@ bool Blocks::check_new_shape_rotation (const csMatrix3& rot)
 
 void Blocks::updateScore (void)
 {
+  if (screen == SCREEN_GAMEOVER) return;
   int increase = 0;
   int i;
 	
@@ -1580,10 +1622,10 @@ void Blocks::InitTextures ()
   Sys->set_cube_f4_texture (
     csLoader::LoadTexture (Sys->world, "cubef4", "cubef4.gif"));
 
-  csLoader::LoadTexture (Sys->world, "menu_back", "back.gif");
   csLoader::LoadTexture (Sys->world, "menu_novice", "novice.gif");
   csLoader::LoadTexture (Sys->world, "menu_average", "average.gif");
   csLoader::LoadTexture (Sys->world, "menu_expert", "expert.gif");
+  csLoader::LoadTexture (Sys->world, "menu_high", "high.gif");
   csLoader::LoadTexture (Sys->world, "menu_quit", "quit.gif");
   csLoader::LoadTexture (Sys->world, "menu_3x3", "p3x3.gif");
   csLoader::LoadTexture (Sys->world, "menu_4x4", "p4x4.gif");
@@ -1621,7 +1663,6 @@ void Blocks::DrawMenu (float menu_transition, int old_menu, int new_menu)
 
 void Blocks::CreateMenuEntry (const char* txt, int menu_nr)
 {
-  csTextureHandle* tm_back = world->GetTextures ()->GetTextureMM ("menu_back");
   csTextureHandle* tm_front = world->GetTextures ()->GetTextureMM (txt);
   csThing* thing = new csThing ();
 
@@ -1645,20 +1686,6 @@ void Blocks::CreateMenuEntry (const char* txt, int menu_nr)
   p->AddVertex (1);
   p->AddVertex (2);
   p->AddVertex (3);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-  set_uv (p, 1, 0, 1, 1, 0, 1);
-
-  p = thing->NewPolygon (tm_back);
-  p->AddVertex (3);
-  p->AddVertex (1);
-  p->AddVertex (0);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-  set_uv (p, 0, 0, 1, 0, 0, 1);
-
-  p = thing->NewPolygon (tm_back);
-  p->AddVertex (3);
-  p->AddVertex (2);
-  p->AddVertex (1);
   p->SetTextureSpace (tx_matrix, tx_vector);
   set_uv (p, 1, 0, 1, 1, 0, 1);
 
@@ -1826,8 +1853,8 @@ void Blocks::InitDemoRoom ()
   CreateMenuEntry ("menu_novice", MENU_NOVICE);
   CreateMenuEntry ("menu_average", MENU_AVERAGE);
   CreateMenuEntry ("menu_expert", MENU_EXPERT);
-  CreateMenuEntry ("menu_back", MENU_HIGHSCORES);
-  CreateMenuEntry ("menu_back", MENU_SETUP);
+  CreateMenuEntry ("menu_high", MENU_HIGHSCORES);
+  CreateMenuEntry ("menu_high", MENU_SETUP);	// Unused!
   CreateMenuEntry ("menu_quit", MENU_QUIT);
   CreateMenuEntry ("menu_3x3", MENU_3X3);
   CreateMenuEntry ("menu_4x4", MENU_4X4);
@@ -1882,9 +1909,10 @@ void Blocks::InitMainMenu ()
   AddMenuItem (MENU_EXPERT);
   AddMenuItem (MENU_BOARDSIZE);
   AddMenuItem (MENU_KEYCONFIG);
+  AddMenuItem (MENU_HIGHSCORES);
   AddMenuItem (MENU_QUIT);
 
-  cur_menu = 0;
+  cur_menu = diff_level;
   DrawMenu (cur_menu);
 }
 
@@ -1930,7 +1958,7 @@ void Blocks::checkForPlane ()
       for (y=0 ; y<zone_dim ; y++)
       {
 	// If one cube is missing we don't have a plane.
-	if (!get_cube (x,y,z)) { plane_hit = false; break; }
+	if (!get_cube (x, y, z)) { plane_hit = false; break; }
       }
     if (plane_hit)
     {
@@ -1943,6 +1971,16 @@ void Blocks::checkForPlane ()
       updateScore ();
     }
   }
+}
+
+bool Blocks::CheckEmptyPlayArea ()
+{
+  int x, y, z;
+  for (z = 0 ; z < ZONE_HEIGHT ; z++)
+    for (x = 0 ; x < zone_dim ; x++)
+      for (y = 0 ; y < zone_dim ; y++)
+        if (get_cube (x, y, z)) return false;
+  return true;
 }
 
 void Blocks::removePlane (int z)
@@ -1979,6 +2017,10 @@ void Blocks::HandleTransition (time_t elapsed_time)
   }
   if (!transition)
   {
+    if (CheckEmptyPlayArea ())
+    {
+      score += 10;
+    }
     move_down_todo = 0;
     StartNewShape ();
   }
@@ -2088,6 +2130,31 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
     return;
   }
 
+  if (screen == SCREEN_HIGHSCORES)
+  {
+    if (initscreen) { initscreen = false; }
+    if (!Gfx3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
+    Gfx2D->Clear (0);
+    int i;
+    HighScore& hs = highscores[diff_level][zone_dim-3];
+    for (i = 0 ; i < 10 ; i++)
+    {
+      if (hs.Get (i) >= 0)
+      {
+        if (hs.GetName (i))
+          Gfx2D->Write (10, 10+i*12, white, black, hs.GetName (i));
+        else
+          Gfx2D->Write (10, 10+i*12, white, black, "?");
+	char scorebuf[30];
+	sprintf (scorebuf, "%d", hs.Get (i));
+        Gfx2D->Write (200, 10+i*12, white, black, scorebuf);
+      }
+    }
+    Gfx3D->FinishDraw ();
+    Gfx3D->Print (NULL);
+    return;
+  }
+
   if (initscreen) StartNewGame ();
 
   // This is where Blocks stuff really happens.
@@ -2106,7 +2173,25 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
   // Game over!
   if (screen == SCREEN_GAMEOVER)
   {
-    Gfx2D->Write (10, Sys->FrameHeight/2, white, black, "GAME OVER!");
+    float elapsed = (float)elapsed_time/1000.;
+    static float time_left = 0;
+    if (elapsed > time_left) elapsed = time_left;
+    time_left -= elapsed;
+    if (time_left <= 0) time_left = 1;
+
+    int y = Sys->FrameHeight/2;
+    int x = (Sys->FrameWidth-300)/2;
+    Gfx2D->DrawBox (x, y, 300, 12, black);
+    Gfx2D->Write (x+10, y+2, white, black, "GAME OVER!");
+    if (enter_highscore)
+    {
+      Gfx2D->DrawBox (x, y+12, 300, 24, black);
+      Gfx2D->Write (x+10, y+12+2, white, black, "Enter name for highscores:");
+      char name[21];
+      strcpy (name, hs_name);
+      if (time_left < .5) strcat (name, "_");
+      Gfx2D->Write (x+10, y+24+2, white, black, name);
+    }
   }
 
   // Drawing code ends here
@@ -2268,6 +2353,7 @@ void Blocks::ReadConfig ()
   NamedKey (keys.GetStr ("Keys", "ZOOMIN", "ins"), key_zoomin);
   NamedKey (keys.GetStr ("Keys", "ZOOMOUT", "pgup"), key_zoomout);
   zone_dim = keys.GetInt ("Game", "PLAYSIZE", 5);
+  diff_level = keys.GetInt ("Game", "LEVEL", 0);
   int level, size, i;
   for (level = 0 ; level <= 2 ; level++)
     for (size = 3 ; size <= 6 ; size++)
@@ -2306,6 +2392,7 @@ void Blocks::WriteConfig ()
   keys.SetStr ("Keys", "ZOOMIN", KeyName (key_zoomin));
   keys.SetStr ("Keys", "ZOOMOUT", KeyName (key_zoomout));
   keys.SetInt ("Game", "PLAYSIZE", zone_dim);
+  keys.SetInt ("Game", "LEVEL", diff_level);
   int level, size, i;
   for (level = 0 ; level <= 2 ; level++)
     for (size = 3 ; size <= 6 ; size++)

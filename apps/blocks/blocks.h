@@ -131,6 +131,7 @@ enum BlShapeType
 #define SCREEN_GAME 2
 #define SCREEN_KEYCONFIG 3
 #define SCREEN_GAMEOVER 4
+#define SCREEN_HIGHSCORES 5
 
 struct CubeInfo
 {
@@ -226,6 +227,10 @@ private:
   // Second dimension is play size (0=3x3, 1=4x4, 2=5x5, 3=6x6).
   HighScore highscores[3][4];
   int score;
+  // If true then we want the player to enter his name for the highscores.
+  bool enter_highscore;
+  char hs_name[20];
+  int hs_pos;
 
   // For the menu.
   csThing* menus[MAX_MENUS];
@@ -332,7 +337,7 @@ private:
   int screen;
 
   // Difficulty setting.
-  int difficulty;
+  int diff_level;
 
   /* NOTE: by a plane we mean if a certain height level is full of cubes.
      It's the analogue of a line in tetris games (2d) */
@@ -409,8 +414,10 @@ public:
   virtual bool HandleEvent (csEvent &Event);
   void HandleKey (int key, bool shift, bool alt, bool ctrl);
   void HandleGameKey (int key, bool shift, bool alt, bool ctrl);
+  void HandleGameOverKey (int key, bool shift, bool alt, bool ctrl);
   void HandleDemoKey (int key, bool shift, bool alt, bool ctrl);
   void HandleKeyConfigKey (int key, bool shift, bool alt, bool ctrl);
+  void HandleHighscoresKey (int key, bool shift, bool alt, bool ctrl);
 
   // Creating cubes and other geometry.
   csThing* create_cube_thing (float dx, float dy, float dz,
@@ -495,6 +502,9 @@ public:
 
   // Checks to see if a plane was formed.
   void checkForPlane ();
+
+  // Check if the play area is empty.
+  bool CheckEmptyPlayArea ();
 
   // Remove some plane.
   void removePlane (int z);
