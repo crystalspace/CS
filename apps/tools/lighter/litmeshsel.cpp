@@ -19,6 +19,28 @@
 #include "cssysdef.h"
 #include "litmeshsel.h"
 
+bool litMeshSelectAnd::SelectMesh (iMeshWrapper* mesh)
+{
+  size_t i;
+  for (i = 0 ; i < a.Length () ; i++)
+  {
+    bool rc = a[i]->SelectMesh (mesh);
+    if (!rc) return false;
+  }
+  return true;
+}
+
+bool litMeshSelectOr::SelectMesh (iMeshWrapper* mesh)
+{
+  size_t i;
+  for (i = 0 ; i < a.Length () ; i++)
+  {
+    bool rc = a[i]->SelectMesh (mesh);
+    if (rc) return true;
+  }
+  return false;
+}
+
 bool litMeshSelectByType::SelectMesh (iMeshWrapper* mesh)
 {
   iMeshObjectFactory* factory = mesh->GetMeshObject ()->GetFactory ();

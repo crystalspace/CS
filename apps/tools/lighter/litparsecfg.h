@@ -43,6 +43,8 @@ private:
 #define CS_TOKEN_ITEM_FILE "apps/tools/lighter/lighter.tok"
 #include "cstool/tokenlist.h"
 
+  bool ParseMulti (iDocumentNode* multi_node,
+	litMeshSelectChildren* meshsel);
   bool ParseMeshSelect (iDocumentNode* meshsel_node,
   	csRef<litMeshSelect>& meshsel);
   bool ParseLighter (iDocumentNode* lighter_node,

@@ -22,6 +22,7 @@
 #include <stdarg.h>
 #include <csutil/util.h>
 #include <csutil/ref.h>
+#include <csutil/refarr.h>
 #include <csutil/refcount.h>
 #include <csutil/flags.h>
 #include "csutil/regexp.h"
@@ -49,7 +50,7 @@ public:
 /**
  * Select a mesh based on name.
  */
-class litMeshSelectByName
+class litMeshSelectByName : public litMeshSelect
 {
 private:
   char* name;
@@ -72,7 +73,7 @@ public:
 /**
  * Select a mesh based on regexp on name.
  */
-class litMeshSelectByNameRE
+class litMeshSelectByNameRE : public litMeshSelect
 {
 private:
   csRegExpMatcher matcher;
@@ -89,16 +90,16 @@ public:
 /**
  * Select a mesh based on mesh wrapper flags.
  */
-class litMeshSelectByMWFlags
+class litMeshSelectByMWFlags : public litMeshSelect
 {
 private:
   uint32 value, mask;
 
 public:
-  litMeshSelectByMWFlags (uint32 value, uint32 mask)
+  litMeshSelectByMWFlags (uint32 mask, uint32 value)
   {
-    litMeshSelectByMWFlags::value = value;
     litMeshSelectByMWFlags::mask = mask;
+    litMeshSelectByMWFlags::value = value;
   }
   virtual ~litMeshSelectByMWFlags () { }
   virtual bool SelectMesh (iMeshWrapper* mesh)
@@ -110,16 +111,16 @@ public:
 /**
  * Select a mesh based on mesh object flags.
  */
-class litMeshSelectByMOFlags
+class litMeshSelectByMOFlags : public litMeshSelect
 {
 private:
   uint32 value, mask;
 
 public:
-  litMeshSelectByMOFlags (uint32 value, uint32 mask)
+  litMeshSelectByMOFlags (uint32 mask, uint32 value)
   {
-    litMeshSelectByMOFlags::value = value;
     litMeshSelectByMOFlags::mask = mask;
+    litMeshSelectByMOFlags::value = value;
   }
   virtual ~litMeshSelectByMOFlags () { }
   virtual bool SelectMesh (iMeshWrapper* mesh)
@@ -131,7 +132,7 @@ public:
 /**
  * Select a mesh based on mesh type.
  */
-class litMeshSelectByType
+class litMeshSelectByType : public litMeshSelect
 {
 private:
   char* type;
@@ -149,57 +150,49 @@ public:
 };
 
 /**
- * Logical and of two other mesh selectors.
+ * Mesh selector that can hold children (other mesh
+ * selectors).
  */
-class litMeshSelectAnd
+class litMeshSelectChildren : public litMeshSelect
 {
-private:
-  csRef<litMeshSelect> a;
-  csRef<litMeshSelect> b;
+protected:
+  csRefArray<litMeshSelect> a;
 
 public:
-  litMeshSelectAnd (litMeshSelect* a, litMeshSelect* b)
+  litMeshSelectChildren () { }
+  virtual ~litMeshSelectChildren () { }
+  void AddMeshSelect (litMeshSelect* ms)
   {
-    litMeshSelectAnd::a = a;
-    litMeshSelectAnd::b = b;
+    a.Push (ms);
   }
+};
+
+/**
+ * Logical and of two other mesh selectors.
+ */
+class litMeshSelectAnd : public litMeshSelectChildren
+{
+public:
+  litMeshSelectAnd () { }
   virtual ~litMeshSelectAnd () { }
-  virtual bool SelectMesh (iMeshWrapper* mesh)
-  {
-    bool rc = a->SelectMesh (mesh);
-    if (!rc) return false;
-    return b->SelectMesh (mesh);
-  }
+  virtual bool SelectMesh (iMeshWrapper* mesh);
 };
 
 /**
  * Logical or of two other mesh selectors.
  */
-class litMeshSelectOr
+class litMeshSelectOr : public litMeshSelectChildren
 {
-private:
-  csRef<litMeshSelect> a;
-  csRef<litMeshSelect> b;
-
 public:
-  litMeshSelectOr (litMeshSelect* a, litMeshSelect* b)
-  {
-    litMeshSelectOr::a = a;
-    litMeshSelectOr::b = b;
-  }
+  litMeshSelectOr () { }
   virtual ~litMeshSelectOr () { }
-  virtual bool SelectMesh (iMeshWrapper* mesh)
-  {
-    bool rc = a->SelectMesh (mesh);
-    if (rc) return true;
-    return b->SelectMesh (mesh);
-  }
+  virtual bool SelectMesh (iMeshWrapper* mesh);
 };
 
 /**
  * Logical not of other mesh selector.
  */
-class litMeshSelectNot
+class litMeshSelectNot : public litMeshSelect
 {
 private:
   csRef<litMeshSelect> a;
@@ -219,7 +212,7 @@ public:
 /**
  * Select everything.
  */
-class litMeshSelectAll
+class litMeshSelectAll : public litMeshSelect
 {
 public:
   litMeshSelectAll () { }

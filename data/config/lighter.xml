@@ -2,10 +2,8 @@
   <select_casters>
     <and>
       <all />
-      <and>
-        <staticpos />
-        <staticshape />
-      </and>
+      <staticpos />
+      <staticshape />
     </and>
   </select_casters>
   <select_receivers>

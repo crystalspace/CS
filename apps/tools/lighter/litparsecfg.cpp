@@ -29,9 +29,81 @@ litConfigParser::litConfigParser (Lighter* lighter, iObjectRegistry* object_reg)
   init_token_table (xmltokens);
 }
 
-bool litConfigParser::ParseMeshSelect (iDocumentNode* meshsel_node,
-  	csRef<litMeshSelect>& meshsel)
+bool litConfigParser::ParseMulti (iDocumentNode* multi_node,
+    litMeshSelectChildren* meshsel)
 {
+  csRef<iDocumentNodeIterator> it = multi_node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    csRef<litMeshSelect> a;
+    if (!ParseMeshSelect (child, a))
+      return false;
+    meshsel->AddMeshSelect (a);
+  }
+  return true;
+}
+
+bool litConfigParser::ParseMeshSelect (iDocumentNode* meshsel_node,
+    csRef<litMeshSelect>& meshsel)
+{
+  csRef<iDocumentNodeIterator> it = meshsel_node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_AND:
+	meshsel.AttachNew (new litMeshSelectAnd ());
+	if (!ParseMulti (child, (litMeshSelectChildren*)(litMeshSelect*)meshsel))
+	  return false;
+	return true;
+      case XMLTOKEN_OR:
+	meshsel.AttachNew (new litMeshSelectOr ());
+	if (!ParseMulti (child, (litMeshSelectChildren*)(litMeshSelect*)meshsel))
+	  return false;
+	return true;
+      case XMLTOKEN_NOT:
+	{
+	  csRef<litMeshSelect> a;
+	  if (!ParseMeshSelect (child, a))
+	    return false;
+	  meshsel.AttachNew (new litMeshSelectNot (a));
+	}
+	return true;
+      case XMLTOKEN_ALL:
+	meshsel.AttachNew (new litMeshSelectAll ());
+	return true;
+      case XMLTOKEN_STATICPOS:
+	meshsel.AttachNew (new litMeshSelectByMOFlags (CS_MESH_STATICPOS,
+	      CS_MESH_STATICPOS));
+	return true;
+      case XMLTOKEN_STATICSHAPE:
+	meshsel.AttachNew (new litMeshSelectByMOFlags (CS_MESH_STATICSHAPE,
+	      CS_MESH_STATICSHAPE));
+	return true;
+      case XMLTOKEN_STATIC:
+	meshsel.AttachNew (new litMeshSelectByMOFlags (
+	      CS_MESH_STATICSHAPE|CS_MESH_STATICPOS,
+	      CS_MESH_STATICSHAPE|CS_MESH_STATICPOS));
+	return true;
+      case XMLTOKEN_NAME:
+	meshsel.AttachNew (new litMeshSelectByName (child->GetContentsValue ()));
+	return true;
+      case XMLTOKEN_REGEXP:
+	meshsel.AttachNew (new litMeshSelectByNameRE (child->GetContentsValue ()));
+	return true;
+      case XMLTOKEN_TYPE:
+	meshsel.AttachNew (new litMeshSelectByType (child->GetContentsValue ()));
+	return true;
+      default:
+        return lighter->Report ("Unknown token <%s> in mesh selector!", value);
+    }
+  }
   return true;
 }
 
