@@ -13,6 +13,14 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+10-Aug-1999
+	- Eric Sunshine fixed a bug in MetaDemo.  It was not parsing its
+	  command line arguments correctly.  Instead of explicitly looking for
+	  a texture name argument, it implicitly assumed that the first
+	  argument was always the texture name, even in cases where it was
+	  some other perfectly valid string such as -driver or -simdepth.
+	- Eric Sunshine patched 'makedep' (which Andrew added) so that it
+	  compiles on NextStep.
 8-Aug-1999
 	- Continued work on new csTransformationManager class. It is now fully
 	  functional and the old NewTransformation()/RestoreTransformation()
