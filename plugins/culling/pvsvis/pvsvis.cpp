@@ -29,7 +29,6 @@
 #include "csgeom/obb.h"
 #include "csgeom/segment.h"
 #include "csgeom/sphere.h"
-#include "csgeom/kdtree.h"
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
 #include "csutil/flags.h"
@@ -149,7 +148,6 @@ csPVSVis::csPVSVis (iBase *iParent)
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   object_reg = 0;
-  kdtree = 0;
   current_vistest_nr = 1;
   vistest_objects_inuse = false;
   updating = false;
@@ -165,10 +163,9 @@ csPVSVis::~csPVSVis ()
 		      (iObjectModelListener*)visobj_wrap);
     iMovable* movable = visobj->GetMovable ();
     movable->RemoveListener ((iMovableListener*)visobj_wrap);
-    kdtree->RemoveObject (visobj_wrap->child);
+    pvstree.RemoveObject (visobj_wrap);
     visobj->DecRef ();
   }
-  delete kdtree;
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_DESTRUCT_IBASE ();
 }
@@ -176,8 +173,6 @@ csPVSVis::~csPVSVis ()
 bool csPVSVis::Initialize (iObjectRegistry *object_reg)
 {
   csPVSVis::object_reg = object_reg;
-
-  delete kdtree;
 
   csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
   if (g3d)
@@ -192,7 +187,7 @@ bool csPVSVis::Initialize (iObjectRegistry *object_reg)
     scr_height = 480;
   }
 
-  kdtree = new csKDTree ();
+  pvstree.Clear ();
 
   return true;
 }
@@ -246,7 +241,7 @@ void csPVSVis::RegisterVisObject (iVisibilityObject* visobj)
 
   csBox3 bbox;
   CalculateVisObjBBox (visobj, bbox);
-  visobj_wrap->child = kdtree->AddObject (bbox, (void*)visobj_wrap);
+  pvstree.AddObject (bbox, visobj_wrap);
   kdtree_box += bbox;
 
   iMeshWrapper* mesh = visobj->GetMeshWrapper ();
@@ -279,7 +274,7 @@ void csPVSVis::UnregisterVisObject (iVisibilityObject* visobj)
 		  (iMovableListener*)visobj_wrap);
       visobj->GetObjectModel ()->RemoveListener (
 		  (iObjectModelListener*)visobj_wrap);
-      kdtree->RemoveObject (visobj_wrap->child);
+      pvstree.RemoveObject (visobj_wrap);
       visobj->DecRef ();
 #ifdef CS_DEBUG
       // To easily recognize that the vis wrapper has been deleted:
@@ -320,7 +315,7 @@ void csPVSVis::UpdateObject (csPVSVisObjectWrapper* visobj_wrap)
   iMovable* movable = visobj->GetMovable ();
   csBox3 bbox;
   CalculateVisObjBBox (visobj, bbox);
-  kdtree->MoveObject (visobj_wrap->child, bbox);
+  pvstree.MoveObject (visobj_wrap, bbox);
   kdtree_box += bbox;
   visobj_wrap->shape_number = visobj->GetObjectModel ()->GetShapeNumber ();
   visobj_wrap->update_number = movable->GetUpdateNumber ();
@@ -335,7 +330,7 @@ struct PVSTest_Front2BackData
   iVisibilityCullerListener* viscallback;
 };
 
-int csPVSVis::TestNodeVisibility (csKDTree* treenode,
+int csPVSVis::TestNodeVisibility (csStaticPVSNode* treenode,
 	PVSTest_Front2BackData* data, uint32& frustum_mask)
 {
   csBox3 node_bbox = treenode->GetNodeBBox ();
@@ -362,7 +357,7 @@ bool csPVSVis::TestObjectVisibility (csPVSVisObjectWrapper* obj,
   if (obj->mesh && obj->mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH))
     return false;
 
-  const csBox3& obj_bbox = obj->child->GetBBox ();
+  const csBox3& obj_bbox = obj->obj_bbox;
   if (obj_bbox.Contains (data->pos))
   {
     data->viscallback->ObjectVisible (obj->visobj, obj->mesh, frustum_mask);
@@ -383,33 +378,31 @@ bool csPVSVis::TestObjectVisibility (csPVSVisObjectWrapper* obj,
 
 //======== VisTest =========================================================
 
-static void CallVisibilityCallbacksForSubtree (csKDTree* treenode,
+static void CallVisibilityCallbacksForSubtree (csStaticPVSNode* treenode,
 	PVSTest_Front2BackData* data, uint32 cur_timestamp)
 {
-  int num_objects = treenode->GetObjectCount ();
-  csKDTreeChild** objects = treenode->GetObjects ();
+  const csArray<csPVSVisObjectWrapper*>& objects = treenode->objects;
+  int num_objects = objects.Length ();
   int i;
   for (i = 0 ; i < num_objects ; i++)
   {
     if (objects[i]->timestamp != cur_timestamp)
     {
       objects[i]->timestamp = cur_timestamp;
-      csPVSVisObjectWrapper* visobj_wrap = (csPVSVisObjectWrapper*)
-      	objects[i]->GetObject ();
-      iMeshWrapper* mesh = visobj_wrap->mesh;
+      iMeshWrapper* mesh = objects[i]->mesh;
       if (!(mesh && mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH)))
-        data->viscallback->ObjectVisible (visobj_wrap->visobj, mesh, 0);
+        data->viscallback->ObjectVisible (objects[i]->visobj, mesh, 0);
     }
   }
 
-  csKDTree* child1 = treenode->GetChild1 ();
+  csStaticPVSNode* child1 = treenode->child1;
   if (child1) CallVisibilityCallbacksForSubtree (child1, data, cur_timestamp);
-  csKDTree* child2 = treenode->GetChild2 ();
+  csStaticPVSNode* child2 = treenode->child2;
   if (child2) CallVisibilityCallbacksForSubtree (child2, data, cur_timestamp);
 
 }
 
-void csPVSVis::PVSTest_Traverse (csKDTree* treenode,
+void csPVSVis::PVSTest_Traverse (csStaticPVSNode* treenode,
 	PVSTest_Front2BackData* data,
 	uint32 cur_timestamp, uint32 frustum_mask)
 {
@@ -431,27 +424,22 @@ void csPVSVis::PVSTest_Traverse (csKDTree* treenode,
     return;
   }
 
-  treenode->Distribute ();
+  const csArray<csPVSVisObjectWrapper*>& objects = treenode->objects;
+  int num_objects = objects.Length ();
 
-  int num_objects;
-  csKDTreeChild** objects;
-  num_objects = treenode->GetObjectCount ();
-  objects = treenode->GetObjects ();
   int i;
   for (i = 0 ; i < num_objects ; i++)
   {
     if (objects[i]->timestamp != cur_timestamp)
     {
       objects[i]->timestamp = cur_timestamp;
-      csPVSVisObjectWrapper* visobj_wrap = (csPVSVisObjectWrapper*)
-      	objects[i]->GetObject ();
-      TestObjectVisibility (visobj_wrap, data, frustum_mask);
+      TestObjectVisibility (objects[i], data, frustum_mask);
     }
   }
 
-  csKDTree* child1 = treenode->GetChild1 ();
+  csStaticPVSNode* child1 = treenode->child1;
   if (child1) PVSTest_Traverse (child1, data, cur_timestamp, frustum_mask);
-  csKDTree* child2 = treenode->GetChild2 ();
+  csStaticPVSNode* child2 = treenode->child2;
   if (child2) PVSTest_Traverse (child2, data, cur_timestamp, frustum_mask);
 
   return;
@@ -483,7 +471,8 @@ bool csPVSVis::VisTest (iRenderView* rview,
   data.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
   data.rview = rview;
   data.viscallback = viscallback;
-  PVSTest_Traverse (kdtree, &data, kdtree->NewTraversal (), frustum_mask);
+  PVSTest_Traverse (pvstree.GetRealRootNode (), &data, pvstree.NewTraversal (),
+  	frustum_mask);
 
   return true;
 }
@@ -505,7 +494,7 @@ struct PVSTestPlanes_Front2BackData
   iVisibilityCullerListener* viscallback;
 };
 
-static bool PVSTestPlanes_Front2Back (csKDTree* treenode,
+static bool PVSTestPlanes_Front2Back (csStaticPVSNode* treenode,
 	void* userdata, uint32 cur_timestamp, uint32& frustum_mask)
 {
   PVSTestPlanes_Front2BackData* data
@@ -523,33 +512,27 @@ static bool PVSTestPlanes_Front2Back (csKDTree* treenode,
 
   frustum_mask = new_mask;
 
-  treenode->Distribute ();
-
-  int num_objects;
-  csKDTreeChild** objects;
-  num_objects = treenode->GetObjectCount ();
-  objects = treenode->GetObjects ();
+  const csArray<csPVSVisObjectWrapper*>& objects = treenode->objects;
+  int num_objects = objects.Length ();
   int i;
   for (i = 0 ; i < num_objects ; i++)
   {
     if (objects[i]->timestamp != cur_timestamp)
     {
       objects[i]->timestamp = cur_timestamp;
-      csPVSVisObjectWrapper* visobj_wrap = (csPVSVisObjectWrapper*)
-      	objects[i]->GetObject ();
-      const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
+      const csBox3& obj_bbox = objects[i]->obj_bbox;
       uint32 new_mask2;
       if (csIntersect3::BoxFrustum (obj_bbox, data->frustum,
 		frustum_mask, new_mask2))
       {
 	if (data->viscallback)
 	{
-	  data->viscallback->ObjectVisible (visobj_wrap->visobj, 
-	      visobj_wrap->mesh, new_mask2);
+	  data->viscallback->ObjectVisible (objects[i]->visobj, 
+	      objects[i]->mesh, new_mask2);
 	}
 	else
 	{
-	  data->vistest_objects->Push (visobj_wrap->visobj);
+	  data->vistest_objects->Push (objects[i]->visobj);
 	}
       }
     }
@@ -584,7 +567,7 @@ csPtr<iVisibilityObjectIterator> csPVSVis::VisTest (csPlane3* planes,
   data.viscallback = 0;
   uint32 frustum_mask = (1 << num_planes)-1;
 
-  kdtree->TraverseRandom (PVSTestPlanes_Front2Back,
+  pvstree.TraverseRandom (PVSTestPlanes_Front2Back,
   	(void*)&data, frustum_mask);
 
   csPVSVisObjIt* vobjit = new csPVSVisObjIt (v,
@@ -604,7 +587,7 @@ void csPVSVis::VisTest (csPlane3* planes,
   data.viscallback = viscallback;
   uint32 frustum_mask = (1 << num_planes)-1;
 
-  kdtree->TraverseRandom (PVSTestPlanes_Front2Back,
+  pvstree.TraverseRandom (PVSTestPlanes_Front2Back,
   	(void*)&data, frustum_mask);
 }
 
@@ -617,7 +600,7 @@ struct PVSTestBox_Front2BackData
   csArray<iVisibilityObject*>* vistest_objects;
 };
 
-static bool PVSTestBox_Front2Back (csKDTree* treenode, void* userdata,
+static bool PVSTestBox_Front2Back (csStaticPVSNode* treenode, void* userdata,
 	uint32 cur_timestamp, uint32&)
 {
   PVSTestBox_Front2BackData* data = (PVSTestBox_Front2BackData*)userdata;
@@ -631,12 +614,8 @@ static bool PVSTestBox_Front2Back (csKDTree* treenode, void* userdata,
     return false;
   }
 
-  treenode->Distribute ();
-
-  int num_objects;
-  csKDTreeChild** objects;
-  num_objects = treenode->GetObjectCount ();
-  objects = treenode->GetObjects ();
+  const csArray<csPVSVisObjectWrapper*>& objects = treenode->objects;
+  int num_objects = objects.Length ();
 
   int i;
   for (i = 0 ; i < num_objects ; i++)
@@ -644,14 +623,12 @@ static bool PVSTestBox_Front2Back (csKDTree* treenode, void* userdata,
     if (objects[i]->timestamp != cur_timestamp)
     {
       objects[i]->timestamp = cur_timestamp;
-      csPVSVisObjectWrapper* visobj_wrap = (csPVSVisObjectWrapper*)
-      	objects[i]->GetObject ();
 
       // Test the bounding box of the object.
-      const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
+      const csBox3& obj_bbox = objects[i]->obj_bbox;
       if (obj_bbox.TestIntersect (data->box))
       {
-	data->vistest_objects->Push (visobj_wrap->visobj);
+	data->vistest_objects->Push (objects[i]->visobj);
       }
     }
   }
@@ -681,7 +658,7 @@ csPtr<iVisibilityObjectIterator> csPVSVis::VisTest (const csBox3& box)
   data.current_vistest_nr = current_vistest_nr;
   data.box = box;
   data.vistest_objects = v;
-  kdtree->Front2Back (box.GetCenter (), PVSTestBox_Front2Back, (void*)&data,
+  pvstree.Front2Back (box.GetCenter (), PVSTestBox_Front2Back, (void*)&data,
   	0);
 
   csPVSVisObjIt* vobjit = new csPVSVisObjIt (v,
@@ -701,7 +678,7 @@ struct PVSTestSphere_Front2BackData
   iVisibilityCullerListener* viscallback;
 };
 
-static bool PVSTestSphere_Front2Back (csKDTree* treenode,
+static bool PVSTestSphere_Front2Back (csStaticPVSNode* treenode,
 	void* userdata, uint32 cur_timestamp, uint32&)
 {
   PVSTestSphere_Front2BackData* data =
@@ -716,12 +693,8 @@ static bool PVSTestSphere_Front2Back (csKDTree* treenode,
     return false;
   }
 
-  treenode->Distribute ();
-
-  int num_objects;
-  csKDTreeChild** objects;
-  num_objects = treenode->GetObjectCount ();
-  objects = treenode->GetObjects ();
+  const csArray<csPVSVisObjectWrapper*>& objects = treenode->objects;
+  int num_objects = objects.Length ();
 
   int i;
   for (i = 0 ; i < num_objects ; i++)
@@ -729,21 +702,19 @@ static bool PVSTestSphere_Front2Back (csKDTree* treenode,
     if (objects[i]->timestamp != cur_timestamp)
     {
       objects[i]->timestamp = cur_timestamp;
-      csPVSVisObjectWrapper* visobj_wrap = (csPVSVisObjectWrapper*)
-      	objects[i]->GetObject ();
 
       // Test the bounding box of the object.
-      const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
+      const csBox3& obj_bbox = objects[i]->obj_bbox;
       if (csIntersect3::BoxSphere (obj_bbox, data->pos, data->sqradius))
       {
 	if (data->viscallback)
 	{
 	  data->viscallback->ObjectVisible (
-	    visobj_wrap->visobj, visobj_wrap->mesh, 0xff);
+	    objects[i]->visobj, objects[i]->mesh, 0xff);
 	}
 	else
 	{
-	  data->vistest_objects->Push (visobj_wrap->visobj);
+	  data->vistest_objects->Push (objects[i]->visobj);
 	}
       }
     }
@@ -776,7 +747,7 @@ csPtr<iVisibilityObjectIterator> csPVSVis::VisTest (const csSphere& sphere)
   data.sqradius = sphere.GetRadius () * sphere.GetRadius ();
   data.vistest_objects = v;
   data.viscallback = 0;
-  kdtree->Front2Back (data.pos, PVSTestSphere_Front2Back, (void*)&data,
+  pvstree.Front2Back (data.pos, PVSTestSphere_Front2Back, (void*)&data,
   	0);
 
   csPVSVisObjIt* vobjit = new csPVSVisObjIt (v,
@@ -795,7 +766,7 @@ void csPVSVis::VisTest (const csSphere& sphere,
   data.pos = sphere.GetCenter ();
   data.sqradius = sphere.GetRadius () * sphere.GetRadius ();
   data.viscallback = viscallback;
-  kdtree->Front2Back (data.pos, PVSTestSphere_Front2Back, (void*)&data,
+  pvstree.Front2Back (data.pos, PVSTestSphere_Front2Back, (void*)&data,
   	0);
 }
 
@@ -813,7 +784,7 @@ struct IntersectSegment_Front2BackData
   bool accurate;
 };
 
-static bool IntersectSegmentSloppy_Front2Back (csKDTree* treenode,
+static bool IntersectSegmentSloppy_Front2Back (csStaticPVSNode* treenode,
 	void* userdata, uint32 cur_timestamp, uint32&)
 {
   IntersectSegment_Front2BackData* data
@@ -830,12 +801,8 @@ static bool IntersectSegmentSloppy_Front2Back (csKDTree* treenode,
     return false;
   }
 
-  treenode->Distribute ();
-
-  int num_objects;
-  csKDTreeChild** objects;
-  num_objects = treenode->GetObjectCount ();
-  objects = treenode->GetObjects ();
+  const csArray<csPVSVisObjectWrapper*>& objects = treenode->objects;
+  int num_objects = objects.Length ();
 
   int i;
   for (i = 0 ; i < num_objects ; i++)
@@ -843,25 +810,23 @@ static bool IntersectSegmentSloppy_Front2Back (csKDTree* treenode,
     if (objects[i]->timestamp != cur_timestamp)
     {
       objects[i]->timestamp = cur_timestamp;
-      csPVSVisObjectWrapper* visobj_wrap = (csPVSVisObjectWrapper*)
-      	objects[i]->GetObject ();
 
       // First test the bounding box of the object.
-      const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
+      const csBox3& obj_bbox = objects[i]->obj_bbox;
 
       if (csIntersect3::BoxSegment (obj_bbox, data->seg, box_isect) != -1)
       {
         // This object is possibly intersected by this beam.
-	if (visobj_wrap->mesh)
-	  if (!visobj_wrap->mesh->GetFlags ().Check (CS_ENTITY_NOHITBEAM))
-	    data->vector->Push (visobj_wrap->visobj);
+	if (objects[i]->mesh)
+	  if (!objects[i]->mesh->GetFlags ().Check (CS_ENTITY_NOHITBEAM))
+	    data->vector->Push (objects[i]->visobj);
       }
     }
   }
   return true;
 }
 
-static bool IntersectSegment_Front2Back (csKDTree* treenode,
+static bool IntersectSegment_Front2Back (csStaticPVSNode* treenode,
 	void* userdata, uint32 cur_timestamp, uint32&)
 {
   IntersectSegment_Front2BackData* data
@@ -889,12 +854,8 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode,
     return false;
   }
 
-  treenode->Distribute ();
-
-  int num_objects;
-  csKDTreeChild** objects;
-  num_objects = treenode->GetObjectCount ();
-  objects = treenode->GetObjects ();
+  const csArray<csPVSVisObjectWrapper*>& objects = treenode->objects;
+  int num_objects = objects.Length ();
 
   int i;
   for (i = 0 ; i < num_objects ; i++)
@@ -902,23 +863,21 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode,
     if (objects[i]->timestamp != cur_timestamp)
     {
       objects[i]->timestamp = cur_timestamp;
-      csPVSVisObjectWrapper* visobj_wrap = (csPVSVisObjectWrapper*)
-      	objects[i]->GetObject ();
 
       // First test the bounding box of the object.
-      const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
+      const csBox3& obj_bbox = objects[i]->obj_bbox;
 
       if (csIntersect3::BoxSegment (obj_bbox, data->seg, box_isect) != -1)
       {
         // This object is possibly intersected by this beam.
-	if (visobj_wrap->mesh)
+	if (objects[i]->mesh)
 	{
-	  if (!visobj_wrap->mesh->GetFlags ().Check (CS_ENTITY_NOHITBEAM))
+	  if (!objects[i]->mesh->GetFlags ().Check (CS_ENTITY_NOHITBEAM))
 	  {
 	    // Transform our vector to object space.
 	    csVector3 obj_start;
 	    csVector3 obj_end;
-	    iMovable* movable = visobj_wrap->visobj->GetMovable ();
+	    iMovable* movable = objects[i]->visobj->GetMovable ();
 	    bool identity = movable->IsFullTransformIdentity ();
 	    csReversibleTransform movtrans;
 	    if (identity)
@@ -938,16 +897,16 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode,
 	    bool rc;
 	    int pidx = -1;
 	    if (data->accurate)
-	      rc = visobj_wrap->mesh->GetMeshObject ()->HitBeamObject (
+	      rc = objects[i]->mesh->GetMeshObject ()->HitBeamObject (
 	    	  obj_start, obj_end, obj_isect, &r, &pidx);
 	    else
-	      rc = visobj_wrap->mesh->GetMeshObject ()->HitBeamOutline (
+	      rc = objects[i]->mesh->GetMeshObject ()->HitBeamOutline (
 	    	  obj_start, obj_end, obj_isect, &r);
 	    if (rc)
 	    {
 	      if (data->vector)
 	      {
-		data->vector->Push (visobj_wrap->visobj);
+		data->vector->Push (objects[i]->visobj);
 	      }
 	      else if (r < data->r)
 	      {
@@ -959,7 +918,7 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode,
 		  data->isect = movtrans.This2Other (obj_isect);
 		data->sqdist = csSquaredDist::PointPoint (
 			data->seg.Start (), data->isect);
-		data->mesh = visobj_wrap->mesh;
+		data->mesh = objects[i]->mesh;
 	      }
 	    }
 	  }
@@ -986,7 +945,7 @@ bool csPVSVis::IntersectSegment (const csVector3& start,
   data.vector = 0;
   data.accurate = accurate;
   data.isect = 0;
-  kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data, 0);
+  pvstree.Front2Back (start, IntersectSegment_Front2Back, (void*)&data, 0);
 
   if (p_mesh) *p_mesh = data.mesh;
   if (pr) *pr = data.r;
@@ -1009,7 +968,7 @@ csPtr<iVisibilityObjectIterator> csPVSVis::IntersectSegment (
   data.polygon_idx = -1;
   data.vector = new csArray<iVisibilityObject*> ();
   data.accurate = accurate;
-  kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data, 0);
+  pvstree.Front2Back (start, IntersectSegment_Front2Back, (void*)&data, 0);
 
   csPVSVisObjIt* vobjit = new csPVSVisObjIt (data.vector, 0);
   return csPtr<iVisibilityObjectIterator> (vobjit);
@@ -1023,7 +982,7 @@ csPtr<iVisibilityObjectIterator> csPVSVis::IntersectSegmentSloppy (
   IntersectSegment_Front2BackData data;
   data.seg.Set (start, end);
   data.vector = new csArray<iVisibilityObject*> ();
-  kdtree->Front2Back (start, IntersectSegmentSloppy_Front2Back,
+  pvstree.Front2Back (start, IntersectSegmentSloppy_Front2Back,
   	(void*)&data, 0);
 
   csPVSVisObjIt* vobjit = new csPVSVisObjIt (data.vector, 0);
@@ -1058,7 +1017,7 @@ static int compare_shadobj (const void* el1, const void* el2)
   return 0;
 }
 
-static bool CastShadows_Front2Back (csKDTree* treenode, void* userdata,
+static bool CastShadows_Front2Back (csStaticPVSNode* treenode, void* userdata,
 	uint32 cur_timestamp, uint32& planes_mask)
 {
   CastShadows_Front2BackData* data = (CastShadows_Front2BackData*)userdata;
@@ -1086,12 +1045,8 @@ static bool CastShadows_Front2Back (csKDTree* treenode, void* userdata,
     planes_mask = out_mask;
   }
 
-  treenode->Distribute ();
-
-  int num_objects;
-  csKDTreeChild** objects;
-  num_objects = treenode->GetObjectCount ();
-  objects = treenode->GetObjects ();
+  const csArray<csPVSVisObjectWrapper*>& objects = treenode->objects;
+  int num_objects = objects.Length ();
 
   int i;
   for (i = 0 ; i < num_objects ; i++)
@@ -1099,30 +1054,28 @@ static bool CastShadows_Front2Back (csKDTree* treenode, void* userdata,
     if (objects[i]->timestamp != cur_timestamp)
     {
       objects[i]->timestamp = cur_timestamp;
-      csPVSVisObjectWrapper* visobj_wrap = (csPVSVisObjectWrapper*)
-      	objects[i]->GetObject ();
-      const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
+      const csBox3& obj_bbox = objects[i]->obj_bbox;
       csBox3 b (obj_bbox.Min ()-center, obj_bbox.Max ()-center);
       if (b.SquaredOriginDist () > sqrad)
 	continue;
 
-      if (visobj_wrap->caster && fview->ThingShadowsEnabled () &&
-            fview->CheckShadowMask (visobj_wrap->mesh->GetFlags ().Get ()))
+      if (objects[i]->caster && fview->ThingShadowsEnabled () &&
+            fview->CheckShadowMask (objects[i]->mesh->GetFlags ().Get ()))
       {
         data->shadobjs[data->num_shadobjs].sqdist = b.SquaredOriginDist ();
-	data->shadobjs[data->num_shadobjs].caster = visobj_wrap->caster;
+	data->shadobjs[data->num_shadobjs].caster = objects[i]->caster;
 	data->shadobjs[data->num_shadobjs].mesh = 0;
 	data->shadobjs[data->num_shadobjs].movable =
-		visobj_wrap->visobj->GetMovable ();
+		objects[i]->visobj->GetMovable ();
 	data->num_shadobjs++;
       }
-      if (fview->CheckProcessMask (visobj_wrap->mesh->GetFlags ().Get ()))
+      if (fview->CheckProcessMask (objects[i]->mesh->GetFlags ().Get ()))
       {
         data->shadobjs[data->num_shadobjs].sqdist = b.SquaredOriginMaxDist ();
-	data->shadobjs[data->num_shadobjs].mesh = visobj_wrap->mesh;
+	data->shadobjs[data->num_shadobjs].mesh = objects[i]->mesh;
 	data->shadobjs[data->num_shadobjs].caster = 0;
 	data->shadobjs[data->num_shadobjs].movable =
-		visobj_wrap->visobj->GetMovable ();
+		objects[i]->visobj->GetMovable ();
 	data->num_shadobjs++;
       }
     }
@@ -1187,7 +1140,7 @@ void csPVSVis::CastShadows (iFrustumView* fview)
     data.planes[i] = *(lf->GetBackPlane ());
   }
 
-  kdtree->Front2Back (center, CastShadows_Front2Back, (void*)&data,
+  pvstree.Front2Back (center, CastShadows_Front2Back, (void*)&data,
   	planes_mask);
 
   // Now sort the list of shadow objects on radius.

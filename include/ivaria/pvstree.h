@@ -54,21 +54,16 @@ struct iStaticPVSTree : public iBase
   virtual void Clear () = 0;
 
   /**
-   * Create a root node for the tree with the given box.
+   * Create a root node for the tree.
    * The returned void* is the representation of that root node.
    * Calling this function automatically calls Clear().
    */
-  virtual void* CreateRootNode (const csBox3& box) = 0;
+  virtual void* CreateRootNode () = 0;
 
   /**
    * Return the root node.
    */
   virtual void* GetRootNode () = 0;
-
-  /**
-   * Return the root box.
-   */
-  virtual const csBox3& GetRootBox () const = 0;
 
   /**
    * Split a give node along the given axis (x=0, y=1, z=2) and

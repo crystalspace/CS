@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Jan-2005
+	- Jorrit worked further on the PVS visibility culler.
 10-Jan-2005
 	- Jorrit fixed traversal of movable listeners so that it uses a
 	  size_t loop instead of one based on int. This should be the same

@@ -210,7 +210,7 @@ private:
   	void* userdata, uint32 cur_timestamp, uint32 frustum_mask);
 
   /**
-   * Traverse the tree from front to back. Every node of the
+   * Traverse the tree in undefined order. Every node of the
    * tree will be encountered. Returns false if traversal should stop.
    * The mask parameter is optionally used for frustum checking.
    * Front2Back will pass it to the tree nodes.

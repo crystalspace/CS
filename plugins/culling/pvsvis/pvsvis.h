@@ -35,13 +35,11 @@
 #include "imesh/thing.h"
 #include "pvstree.h"
 
-class csKDTree;
-class csKDTreeChild;
 class csPVSVis;
 struct iPolygonMesh;
 struct iMovable;
 struct iMeshWrapper;
-struct iThingState;
+struct csStaticPVSNode;
 
 struct PVSTest_Front2BackData;
 
@@ -54,9 +52,11 @@ class csPVSVisObjectWrapper : public iObjectModelListener,
 public:
   csPVSVis* pvsvis;
   iVisibilityObject* visobj;
-  csKDTreeChild* child;
+  csArray<csStaticPVSNode*> parent_nodes;
+  csBox3 obj_bbox;
   long update_number;	// Last used update_number from movable.
   long shape_number;	// Last used shape_number from model.
+  uint32 timestamp;	// Used for traversal.
 
   // Optional data for shadows. Both fields can be 0.
   csRef<iMeshWrapper> mesh;
@@ -94,7 +94,6 @@ public:
 
 private:
   iObjectRegistry *object_reg;
-  csKDTree* kdtree;
   // Ever growing box of all objects that were ever in the tree.
   // This puts an upper limit of all boxes in the kdtree itself because
   // those go off to infinity.
@@ -121,7 +120,7 @@ private:
   void CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox);
 
   // Traverse the kdtree for frustum culling.
-  void PVSTest_Traverse (csKDTree* treenode,
+  void PVSTest_Traverse (csStaticPVSNode* treenode,
 	PVSTest_Front2BackData* data,
 	uint32 cur_timestamp, uint32 frustum_mask);
 
@@ -139,7 +138,7 @@ public:
   // 1 if visible normally, or 0 if not visible.
   // This function will also modify the frustum_mask in 'data'. So
   // take care to restore this later if you recurse down.
-  int TestNodeVisibility (csKDTree* treenode,
+  int TestNodeVisibility (csStaticPVSNode* treenode,
   	PVSTest_Front2BackData* data, uint32& frustum_mask);
 
   // Test visibility for the given object. Returns true if visible.

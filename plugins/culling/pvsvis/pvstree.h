@@ -23,11 +23,16 @@
 #include "csgeom/box.h"
 #include "ivaria/pvstree.h"
 
+class csPVSVisObjectWrapper;
+
+#define KDTREE_MAX 100000.
+
 /**
  * A node in the KDTree for PVS.
  */
 struct csStaticPVSNode
 {
+  csBox3 node_bbox;
   int axis;
   float where;
   csStaticPVSNode* child1, * child2;
@@ -35,20 +40,45 @@ struct csStaticPVSNode
   // Array of invisible nodes as seen from this node.
   csArray<csStaticPVSNode*> invisible_nodes;
 
+  // Array of objects in this node.
+  csArray<csPVSVisObjectWrapper*> objects;
+
   csStaticPVSNode ();
   ~csStaticPVSNode ();
+
+  /**
+   * Return the bounding box of the node itself (does not always contain
+   * all children since children are not split by the tree).
+   */
+  const csBox3& GetNodeBBox () const { return node_bbox; }
+
+  /**
+   * Set the box of this node and propagate it further down the tree
+   * by splitting the box along the split axis.
+   */
+  void PropagateBBox (const csBox3& box);
+
+  /**
+   * Reset timestamps of all objects in this treenode.
+   */
+  void ResetTimestamps ();
 };
 
+typedef bool (csPVSTreeVisitFunc)(csStaticPVSNode* treenode, void* userdata,
+	uint32 timestamp, uint32& frustum_mask);
 /**
  * A Static KDTree for PVS.
  */
 class csStaticPVSTree : public iStaticPVSTree
 {
 private:
-  csBox3 root_box;
   csStaticPVSNode* root;	// @@@ TODO: allocator for tree!
   // 'id' is the index, the pointer to the node is the contents.
   csArray<csStaticPVSNode*> nodes_by_id;
+
+  // Current timestamp we are using for Front2Back(). Objects that
+  // have the same timestamp are already visited during Front2Back().
+  static uint32 global_timestamp;
 
   // Create a node and assign an id to it.
   csStaticPVSNode* CreateNode ();
@@ -66,12 +96,58 @@ public:
   csStaticPVSTree ();
   virtual ~csStaticPVSTree ();
 
+  /**
+   * Add a dynamic object to the tree.
+   */
+  void AddObject (const csBox3& bbox, csPVSVisObjectWrapper* object);
+  /**
+   * Remove a dynamic object.
+   */
+  void RemoveObject (csPVSVisObjectWrapper* object);
+  /**
+   * Move a dynamic object in the tree.
+   */
+  void MoveObject (csPVSVisObjectWrapper* object, const csBox3& bbox);
+
+  /**
+   * Reset timestamps of all objects in this treenode.
+   */
+  void ResetTimestamps ();
+
+  /**
+   * Start a new traversal. This will basically make a new
+   * timestamp and return it. You can then use that timestamp
+   * to check if objects have been visited already. This function
+   * is automatically called by Front2Back() but it can be useful
+   * to call this if you plan to do a manual traversal of the tree.
+   */
+  uint32 NewTraversal ();
+
+  /**
+   * Traverse the tree from front to back. Every node of the
+   * tree will be encountered. Returns false if traversal should stop.
+   * The mask parameter is optionally used for frustum checking.
+   * Front2Back will pass it to the tree nodes.
+   */
+  void Front2Back (const csVector3& pos, csPVSTreeVisitFunc* func,
+  	void* userdata, uint32 frustum_mask);
+
+  /**
+   * Traverse the tree randomly. Every node of the
+   * tree will be encountered. Returns false if traversal should stop.
+   * The mask parameter is optionally used for frustum checking.
+   * Front2Back will pass it to the tree nodes.
+   */
+  void TraverseRandom (csPVSTreeVisitFunc* func,
+  	void* userdata, uint32 frustum_mask);
+
+  virtual csStaticPVSNode* GetRealRootNode () { return root; }
+
   SCF_DECLARE_IBASE;
 
   virtual void Clear ();
-  virtual void* CreateRootNode (const csBox3& box);
-  virtual void* GetRootNode () { return 0; }
-  virtual const csBox3& GetRootBox () const { return root_box; }
+  virtual void* CreateRootNode ();
+  virtual void* GetRootNode () { return root; }
   virtual void SplitNode (void* parent, int axis, float where,
   	void*& child1, void*& child2);
   virtual void* GetFirstChild (void* parent) const

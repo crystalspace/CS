@@ -21,6 +21,7 @@
 #include "csutil/databuf.h"
 #include "csutil/csendian.h"
 #include "pvstree.h"
+#include "pvsvis.h"
 
 //-------------------------------------------------------------------------
 
@@ -35,7 +36,51 @@ csStaticPVSNode::~csStaticPVSNode ()
   delete child2;
 }
 
+void csStaticPVSNode::PropagateBBox (const csBox3& box)
+{
+  node_bbox = box;
+  if (child1 == 0 && child2 == 0) return;
+  csBox3 box1, box2;
+  switch (axis)
+  {
+    case 0:
+      box1.Set (box.MinX (), box.MinY (), box.MinZ (),
+      		where,       box.MaxY (), box.MaxZ ());
+      box2.Set (where,       box.MinY (), box.MinZ (),
+      		box.MaxX (), box.MaxY (), box.MaxZ ());
+      break;
+    case 1:
+      box1.Set (box.MinX (), box.MinY (), box.MinZ (),
+      		box.MaxX (), where,       box.MaxZ ());
+      box2.Set (box.MinX (), where,       box.MinZ (),
+      		box.MaxX (), box.MaxY (), box.MaxZ ());
+      break;
+    case 2:
+      box1.Set (box.MinX (), box.MinY (), box.MinZ (),
+      		box.MaxX (), box.MaxY (), where);
+      box2.Set (box.MinX (), box.MinY (), where,
+      		box.MaxX (), box.MaxY (), box.MaxZ ());
+      break;
+  }
+  if (child1) child1->PropagateBBox (box1);
+  if (child2) child2->PropagateBBox (box2);
+}
+
+void csStaticPVSNode::ResetTimestamps ()
+{
+  size_t i;
+  for (i = 0 ; i < objects.Length () ; i++)
+    objects[i]->timestamp = 0;
+  if (child1)
+  {
+    child1->ResetTimestamps ();
+    child2->ResetTimestamps ();
+  }
+}
+
 //-------------------------------------------------------------------------
+
+uint32 csStaticPVSTree::global_timestamp = 1;
 
 SCF_IMPLEMENT_IBASE (csStaticPVSTree)
   SCF_IMPLEMENTS_INTERFACE (iStaticPVSTree)
@@ -83,11 +128,13 @@ csStaticPVSNode* csStaticPVSTree::CheckOrCreateNode (uint32 id)
   return node;
 }
 
-void* csStaticPVSTree::CreateRootNode (const csBox3& box)
+void* csStaticPVSTree::CreateRootNode ()
 {
   Clear ();
-  root_box = box;
   root = CreateNode ();
+  root->node_bbox.Set (-KDTREE_MAX, -KDTREE_MAX,
+  	-KDTREE_MAX, KDTREE_MAX,
+	KDTREE_MAX, KDTREE_MAX);
   return (void*)root;
 }
 
@@ -157,12 +204,6 @@ csPtr<iDataBuffer> csStaticPVSTree::WriteOut ()
   *data++ = 'V';
   *data++ = 'S';
   *data++ = '1';
-  csSetLittleEndianFloat32 (data, root_box.MinX ()); data += 4;
-  csSetLittleEndianFloat32 (data, root_box.MinY ()); data += 4;
-  csSetLittleEndianFloat32 (data, root_box.MinZ ()); data += 4;
-  csSetLittleEndianFloat32 (data, root_box.MaxX ()); data += 4;
-  csSetLittleEndianFloat32 (data, root_box.MaxY ()); data += 4;
-  csSetLittleEndianFloat32 (data, root_box.MaxZ ()); data += 4;
   WriteOut (data, root);
 
   return buf;
@@ -213,15 +254,61 @@ const char* csStaticPVSTree::ReadPVS (iDataBuffer* buf)
   if (*data++ != '1')
     return "File marker invalid! Could be wrong version of PVS file!";
 
-  csVector3 minv, maxv;
-  minv.x = csGetLittleEndianFloat32 (data); data += 4;
-  minv.y = csGetLittleEndianFloat32 (data); data += 4;
-  minv.z = csGetLittleEndianFloat32 (data); data += 4;
-  maxv.x = csGetLittleEndianFloat32 (data); data += 4;
-  maxv.y = csGetLittleEndianFloat32 (data); data += 4;
-  maxv.z = csGetLittleEndianFloat32 (data); data += 4;
-  root_box.Set (minv, maxv);
+  const char* err = ReadPVS (data, root);
+  if (err) return err;
 
-  return ReadPVS (data, root);
+  csBox3 root_box (-KDTREE_MAX, -KDTREE_MAX,
+  	-KDTREE_MAX, KDTREE_MAX,
+	KDTREE_MAX, KDTREE_MAX);
+  root->PropagateBBox (root_box);
+  return 0;
+}
+
+void csStaticPVSTree::AddObject (const csBox3& bbox,
+	csPVSVisObjectWrapper* object)
+{
+}
+
+void csStaticPVSTree::RemoveObject (csPVSVisObjectWrapper* object)
+{
+}
+
+void csStaticPVSTree::MoveObject (csPVSVisObjectWrapper* object,
+	const csBox3& bbox)
+{
+}
+
+void csStaticPVSTree::ResetTimestamps ()
+{
+  root->ResetTimestamps ();
+}
+
+uint32 csStaticPVSTree::NewTraversal ()
+{
+  if (global_timestamp > 4000000000u)
+  {
+    // For safety reasons we will reset all timestamps to 0
+    // for all objects in the tree and also set the global
+    // timestamp to 1 again. This should be very rare (every
+    // 4000000000 calls of Front2Back :-)
+    ResetTimestamps ();
+    global_timestamp = 1;
+  }
+  else
+  {
+    global_timestamp++;
+  }
+  return global_timestamp;
+}
+
+void csStaticPVSTree::Front2Back (const csVector3& pos,
+	csPVSTreeVisitFunc* func,
+  	void* userdata, uint32 frustum_mask)
+{
+}
+
+void csStaticPVSTree::TraverseRandom (csPVSTreeVisitFunc* func,
+  	void* userdata, uint32 frustum_mask)
+{
 }
 
