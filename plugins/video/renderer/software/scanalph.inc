@@ -110,7 +110,8 @@
 #  define SCANMAP
 #  define TEXCOORDS
 #  define A_SRCADDR	((vv >> 16) << shifter) + (uu >> 16)
-#  define A_ASRCADDR    ((uu >> 16) & ander_w) + ((vv >> shifter_h) & ander_h)
+#  define A_ASRCADDR    (((uu >> 16) + a_uofs) & ander_w) + \
+			 (((vv >> shifter_h) + a_vofs) & ander_h)
 #else
 #  define A_SRCADDR	((uu >> 16) & ander_w) + ((vv >> shifter_h) & ander_h)
 #  define A_ASRCADDR    srcaddr
@@ -154,6 +155,10 @@ void A_SCANFUNC (void *dest, int len, uint32 *zbuff,
 {
   A_PIXTYPE *_dest = (A_PIXTYPE *)dest;
   A_PIXTYPE *_destend = _dest + len;
+#ifdef A_MAP
+  int a_uofs = Scan.amap_uofs;
+  int a_vofs = Scan.amap_vofs;
+#endif
   while (_dest < _destend)
   {
 #if defined (A_ZUSE)

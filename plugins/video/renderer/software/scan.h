@@ -117,6 +117,10 @@ struct csScanSetup
   int tw2fp;
   /// Texture height in 16:16 fixed-point format - 1
   int th2fp;
+  /// the difference of U-coordinates between cached texture and alpha map
+  int amap_uofs;
+  /// the difference of V-coordinates between cached texture and alpha map
+  int amap_vofs;
 
   /// The unlighted texture bitmap.
   unsigned char *bitmap;

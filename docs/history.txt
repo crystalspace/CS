@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+27-Feb-2003
+	- res fixed the "shifted alpha map" bug in the software renderer.
 26-Feb-2003
 	- Eric Sunshine made the following changes to the configure script:
 	    - Fixed bug: The utility variable cs_optimize_flags was being
