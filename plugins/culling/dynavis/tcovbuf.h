@@ -132,6 +132,9 @@ public:
     tile_full = false;
   }
 
+#define INIT_MIN_DEPTH     999999999.0
+#define INIT_MIN_DEPTH_CMP 999900000.0
+
   /**
    * Really make the tile empty (as opposed to just marking it as
    * empty with queue_tile_empty).
@@ -141,7 +144,7 @@ public:
     tile_full = false; queue_tile_empty = false;
     memset (coverage, 0, sizeof (csBits64)*32);
     memset (depth, 0, sizeof (float)*32);
-    tile_min_depth = 999999999.0;
+    tile_min_depth = INIT_MIN_DEPTH;
     tile_max_depth = 0;
     blocks_full = 0;
     blocks_partial = 0;

@@ -232,131 +232,158 @@ void csCoverageTile::Flush (csBits64& fvalue, float maxdepth)
   {
     FlushOperations ();
 
-    // Now perform the XOR sweep and OR with main coverage buffer.
-    // fvalue will be the modified from left to right and will be
-    // OR-ed with the main buffer. In the mean time the coverage_cache
-    // buffer contents will be modified to be true wherever the
-    // coverage_cache actually modified the coverage buffer.
-    tile_full = true;	// Assume full for now.
-    csBits64* cc = coverage_cache;
-    csBits64* c = coverage;
-    for (i = 0 ; i < 32 ; i++)
+    if (tile_min_depth < INIT_MIN_DEPTH_CMP && maxdepth <= tile_min_depth)
     {
-      fvalue ^= *cc;
-      *cc = fvalue;
-      cc->AndInverted (*c);
-      *c |= fvalue;
-      if (tile_full && !c->IsFull ())
-        tile_full = false;
-      cc++;
-      c++;
-    }
+      // If our new depth is smaller than the minimum depth
+      // of this tile then we can do a more optimal routine since
+      // we don't have to check the depth buffer.
 
-//@@@ Special cases for tile_empty and tile_full???
-    // Now do the depth update. Here we will use the coverage_cache
-    // to see where we need to update the depth buffer. The coverage_cache
-    // will now contain true wherever the coverage buffer was modified.
-    bool recheck_min_depth = false;
-    for (i = 0 ; i < 4 ; i++)
-    {
-      float* ldepth = &depth[i];
-      int idx = i << 3;
-      int j = 1;
-      csBits64 mods = coverage_cache[idx];
-      while (j < 8)
+      // Now perform the XOR sweep and OR with main coverage buffer.
+      // fvalue will be the modified from left to right and will be
+      // OR-ed with the main buffer.
+      tile_full = true;	// Assume full for now.
+      csBits64* cc = coverage_cache;
+      csBits64* c = coverage;
+      for (i = 0 ; i < 32 ; i++)
       {
-        mods |= coverage_cache[idx++];
-	j++;
-      }
-      if (!mods.IsEmpty ())
-      {
-        if (mods.CheckByte0 ())
-        {
-          float& d = ldepth[0];
-	  if (maxdepth > d)
-	  {
-	    d = maxdepth;
-	    if (d > tile_max_depth) tile_max_depth = d;
-	    recheck_min_depth = true;
-	  }
-        }
-        if (mods.CheckByte1 ())
-        {
-          float& d = ldepth[4];
-	  if (maxdepth > d)
-	  {
-	    d = maxdepth;
-	    if (d > tile_max_depth) tile_max_depth = d;
-	    recheck_min_depth = true;
-	  }
-        }
-        if (mods.CheckByte2 ())
-        {
-          float& d = ldepth[8];
-	  if (maxdepth > d)
-	  {
-	    d = maxdepth;
-	    if (d > tile_max_depth) tile_max_depth = d;
-	    recheck_min_depth = true;
-	  }
-        }
-        if (mods.CheckByte3 ())
-        {
-          float& d = ldepth[12];
-	  if (maxdepth > d)
-	  {
-	    d = maxdepth;
-	    if (d > tile_max_depth) tile_max_depth = d;
-	    recheck_min_depth = true;
-	  }
-        }
-        if (mods.CheckByte4 ())
-        {
-          float& d = ldepth[16];
-	  if (maxdepth > d)
-	  {
-	    d = maxdepth;
-	    if (d > tile_max_depth) tile_max_depth = d;
-	    recheck_min_depth = true;
-	  }
-        }
-        if (mods.CheckByte5 ())
-        {
-          float& d = ldepth[20];
-	  if (maxdepth > d)
-	  {
-	    d = maxdepth;
-	    if (d > tile_max_depth) tile_max_depth = d;
-	    recheck_min_depth = true;
-	  }
-        }
-        if (mods.CheckByte6 ())
-        {
-          float& d = ldepth[24];
-	  if (maxdepth > d)
-	  {
-	    d = maxdepth;
-	    if (d > tile_max_depth) tile_max_depth = d;
-	    recheck_min_depth = true;
-	  }
-        }
-        if (mods.CheckByte7 ())
-        {
-          float& d = ldepth[28];
-	  if (maxdepth > d)
-	  {
-	    d = maxdepth;
-	    if (d > tile_max_depth) tile_max_depth = d;
-	    recheck_min_depth = true;
-	  }
-        }
+        fvalue ^= *cc;
+        *c |= fvalue;
+        if (tile_full && !c->IsFull ())
+          tile_full = false;
+        cc++;
+        c++;
       }
     }
-    if (recheck_min_depth)
+    else
     {
-      tile_min_depth = depth[0];
-      for (i = 1 ; i < 32 ; i++)
-        if (depth[i] < tile_min_depth) tile_min_depth = depth[i];
+      // The general case. It is possible we have to update the
+      // depth buffer.
+
+      // Now perform the XOR sweep and OR with main coverage buffer.
+      // fvalue will be the modified from left to right and will be
+      // OR-ed with the main buffer. In the mean time the coverage_cache
+      // buffer contents will be modified to be true wherever the
+      // coverage_cache actually modified the coverage buffer.
+      tile_full = true;	// Assume full for now.
+      csBits64* cc = coverage_cache;
+      csBits64* c = coverage;
+      for (i = 0 ; i < 32 ; i++)
+      {
+        fvalue ^= *cc;
+        *cc = fvalue;
+        cc->AndInverted (*c);
+        *c |= fvalue;
+        if (tile_full && !c->IsFull ())
+          tile_full = false;
+        cc++;
+        c++;
+      }
+
+      // Now do the depth update. Here we will use the coverage_cache
+      // to see where we need to update the depth buffer. The coverage_cache
+      // will now contain true wherever the coverage buffer was modified.
+      bool recheck_min_depth = false;
+      for (i = 0 ; i < 4 ; i++)
+      {
+        float* ldepth = &depth[i];
+        int idx = i << 3;
+        int j = 1;
+        csBits64 mods = coverage_cache[idx];
+        while (j < 8)
+        {
+          mods |= coverage_cache[idx++];
+	  j++;
+        }
+        if (!mods.IsEmpty ())
+        {
+          if (mods.CheckByte0 ())
+          {
+            float& d = ldepth[0];
+	    if (maxdepth > d)
+	    {
+	      d = maxdepth;
+	      if (d > tile_max_depth) tile_max_depth = d;
+	      recheck_min_depth = true;
+	    }
+          }
+          if (mods.CheckByte1 ())
+          {
+            float& d = ldepth[4];
+	    if (maxdepth > d)
+	    {
+	      d = maxdepth;
+	      if (d > tile_max_depth) tile_max_depth = d;
+	      recheck_min_depth = true;
+	    }
+          }
+          if (mods.CheckByte2 ())
+          {
+            float& d = ldepth[8];
+	    if (maxdepth > d)
+	    {
+	      d = maxdepth;
+	      if (d > tile_max_depth) tile_max_depth = d;
+	      recheck_min_depth = true;
+	    }
+          }
+          if (mods.CheckByte3 ())
+          {
+            float& d = ldepth[12];
+	    if (maxdepth > d)
+	    {
+	      d = maxdepth;
+	      if (d > tile_max_depth) tile_max_depth = d;
+	      recheck_min_depth = true;
+	    }
+          }
+          if (mods.CheckByte4 ())
+          {
+            float& d = ldepth[16];
+	    if (maxdepth > d)
+	    {
+	      d = maxdepth;
+	      if (d > tile_max_depth) tile_max_depth = d;
+	      recheck_min_depth = true;
+	    }
+          }
+          if (mods.CheckByte5 ())
+          {
+            float& d = ldepth[20];
+	    if (maxdepth > d)
+	    {
+	      d = maxdepth;
+	      if (d > tile_max_depth) tile_max_depth = d;
+	      recheck_min_depth = true;
+	    }
+          }
+          if (mods.CheckByte6 ())
+          {
+            float& d = ldepth[24];
+	    if (maxdepth > d)
+	    {
+	      d = maxdepth;
+	      if (d > tile_max_depth) tile_max_depth = d;
+	      recheck_min_depth = true;
+	    }
+          }
+          if (mods.CheckByte7 ())
+          {
+            float& d = ldepth[28];
+	    if (maxdepth > d)
+	    {
+	      d = maxdepth;
+	      if (d > tile_max_depth) tile_max_depth = d;
+	      recheck_min_depth = true;
+	    }
+          }
+        }
+      }
+      if (recheck_min_depth)
+      {
+        tile_min_depth = depth[0];
+        for (i = 1 ; i < 32 ; i++)
+          if (depth[i] < tile_min_depth) tile_min_depth = depth[i];
+      }
     }
   }
 }

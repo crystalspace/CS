@@ -34,3 +34,7 @@
 
 - 3 Bit coverage flush.
 
+- Test function in Dynavis to get a list of all objects that
+  touch some bounding box or sphere. This can then be used to
+  optimize collision detection.
+
