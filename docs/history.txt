@@ -17,6 +17,8 @@ chronological order.
 	  old OpenGL renderer. This means that the effect system is not
 	  essentially removed (it will be really removed when the old OpenGL
 	  renderer is removed).
+	- res fixed csProcTexture to unregister itself form the proctex
+	  event handler upon destruction. 
 3-Feb-2004
 	- Eric Sunshine fixed syntax error in aws.mak introduced yesterday
 	  which manifested when running 'msvcgen' targets.

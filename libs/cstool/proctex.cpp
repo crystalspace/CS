@@ -72,6 +72,10 @@ public:
   {
     textures.Add (txt);
   }
+  void PopTexture (csProcTexture* txt)
+  {
+    textures.Delete (txt);
+  }
 };
 
 SCF_IMPLEMENT_IBASE (ProcEventHandler)
@@ -140,6 +144,9 @@ csProcTexture::csProcTexture ()
 
 csProcTexture::~csProcTexture ()
 {
+  if (proceh != 0)
+    ((ProcEventHandler*)(iEventHandler*)(proceh))->PopTexture (this);
+
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiProcTexture);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
 }
