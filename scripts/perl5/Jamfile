@@ -1,6 +1,6 @@
 SubDir TOP scripts perl5 ;
 
-PERL5_DATAFILES = [ Wildcard *.pm ] ;
+PERL5_DATAFILES = [ Wildcard *.pm *.pl ] ;
 
 # cspace.pm is the responsibility of csperl5/Jamfile.
 PERL5_DATAFILES = [ Filter $(PERL5_DATAFILES) : cspace.pm ] ;

@@ -92,10 +92,10 @@ PERL5.CFLAGS += \
 OUTDIRS += $(CSPERL5.DERIVED) $(SWIG.PERL5.INSTALLDIR)
 
 ifeq (,$(CMD.SWIG))
-TO_INSTALL.SCRIPTS += $(wildcard $(SWIG.PERL5.DIR)/*.pm)
+TO_INSTALL.SCRIPTS += $(wildcard $(addprefix $(SWIG.PERL5.DIR)/*.,pm pl))
 else
-TO_INSTALL.SCRIPTS += \
-  $(filter-out $(SWIG.PERL5.PM),$(wildcard $(SWIG.PERL5.DIR)/*.pm))
+TO_INSTALL.SCRIPTS += $(filter-out $(SWIG.PERL5.PM),\
+  $(wildcard $(addprefix $(SWIG.PERL5.DIR)/*.,pm pl)))
 endif
 
 #MSVC.DSP += MSCSPERL5

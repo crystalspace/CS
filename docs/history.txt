@@ -11,6 +11,9 @@ chronological order.
 	  csDVector4 where it was accessing 'x' component of wrong vector.
 	  Reported by Bernd Waibel <waebbl@gmx.dew>. Also fixed some incorrect
 	  Doxygen comments.
+	- Eric Sunshine augmented csperl5.mak and scripts/perl5/Jamfile so that
+	  they also install *.pl files from scripts/perl5, rather than only
+	  installing *.pm files.
 25-Apr-2004
 	- Jorrit changed the way render priorities work in the engine. The
 	  RenderQueues field no longer contains all meshes for all render
