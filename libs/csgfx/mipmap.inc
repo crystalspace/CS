@@ -204,70 +204,111 @@ static void MIPMAP_NAME (unsigned w, unsigned h, csRGBpixel *src, csRGBpixel *ds
   }
 #endif
 
-  // Loop through all rows of output image
-  for (y = 0; y < nh; y++)
-  {
 #if MIPMAP_LEVEL == 0
+
 # define MIPMAP_PROCESS(d1,d2,d3)					\
-    {									\
-      ACCUMULATE_PIXEL (src1 [d1], 1);					\
-      ACCUMULATE_PIXEL (src1 [d2], 2);					\
-      ACCUMULATE_PIXEL (src1 [d3], 1);					\
-      ACCUMULATE_PIXEL (src2 [d1], 2);					\
-      ACCUMULATE_PIXEL (src2 [d2], 4);					\
-      ACCUMULATE_PIXEL (src2 [d3], 2);					\
-      ACCUMULATE_PIXEL (src3 [d1], 1);					\
-      ACCUMULATE_PIXEL (src3 [d2], 2);					\
-      ACCUMULATE_PIXEL (src3 [d3], 1);					\
-    }
+      {									\
+        ACCUMULATE_PIXEL (src1 [d1], 1);					\
+        ACCUMULATE_PIXEL (src1 [d2], 2);					\
+        ACCUMULATE_PIXEL (src1 [d3], 1);					\
+        ACCUMULATE_PIXEL (src2 [d1], 2);					\
+        ACCUMULATE_PIXEL (src2 [d2], 4);					\
+        ACCUMULATE_PIXEL (src2 [d3], 2);					\
+        ACCUMULATE_PIXEL (src3 [d1], 1);					\
+        ACCUMULATE_PIXEL (src3 [d2], 2);					\
+        ACCUMULATE_PIXEL (src3 [d3], 1);					\
+      }
 
-    // Precompute a pointer to previous row and to next row
-    MIPMAP_PIXTYPE * src1 = (y == 0) ? srcmax : (MIPMAP_PIXTYPE *)src - w;
-    MIPMAP_PIXTYPE * src2 = (MIPMAP_PIXTYPE *)src;
-    MIPMAP_PIXTYPE * src3 = (y == nh - 1) ? srcorg : (MIPMAP_PIXTYPE *)src + w;
-#endif
-
-    for (x = 0; x <= w1; x += MIPMAP_STEP)
+  if (w1 == 0) // special case: width == 1
+  {
+    for (y = 0; y < nh; y++)
     {
+      // Precompute a pointer to previous row and to next row
+      MIPMAP_PIXTYPE * src1 = (y == 0) ? srcmax : (MIPMAP_PIXTYPE *)src - w;
+      MIPMAP_PIXTYPE * src2 = (MIPMAP_PIXTYPE *)src;
+      MIPMAP_PIXTYPE * src3 = (y == nh - 1) ? srcorg : (MIPMAP_PIXTYPE *)src + w;
 #ifndef MIPMAP_ALPHA
       unsigned rb = 0, ga = 0;
 # ifdef MIPMAP_TRANSPARENT
-	  unsigned transcnt = 0;
+      unsigned transcnt = 0;
 # endif
 #else
       unsigned a = 0;
 #endif
-
-#if MIPMAP_LEVEL == 0
-	  // Process first and last column separately since they wrap around
+		
 # ifdef MIPMAP_TRANSPARENT
+      // transparent and non-transparent areas should be the same 
+	  // on src and dst
 	  if (MIPMAP_ISKEY(src2[0]))
 	  {
 	    *(uint32 *)dst++ = MIPMAP_RGB(src2[0]);
-		src1++; src2++; src3++;
-		continue;
+	    src += MIPMAP_STEP;
+	    continue;
 	  }
 # endif
-	  if (x == 0)
-	  {
-		MIPMAP_PROCESS (w1, 0, 1);
-	  } 
-	  else if (x == w1)
-	  {
-		MIPMAP_PROCESS (-1, 0, -w1);
-	  }
-	  else
-	  {
-        MIPMAP_PROCESS (-1, 0, 1);
-      }
-	  src1++; src2++; src3++;
-#elif MIPMAP_LEVEL == 1
-      ACCUMULATE_2X2 (x);
+	  MIPMAP_PROCESS (0, 0, 0);
+      MIPMAP_OUTPUT;
+      src += MIPMAP_STEP;
+    }
+  }
+  else
+#endif
+  {
+    // Loop through all rows of output image
+    for (y = 0; y < nh; y++)
+    {
+#if MIPMAP_LEVEL == 0
+      // Precompute a pointer to previous row and to next row
+      MIPMAP_PIXTYPE * src1 = (y == 0) ? srcmax : (MIPMAP_PIXTYPE *)src - w;
+      MIPMAP_PIXTYPE * src2 = (MIPMAP_PIXTYPE *)src;
+      MIPMAP_PIXTYPE * src3 = (y == nh - 1) ? srcorg : (MIPMAP_PIXTYPE *)src + w;
 #endif
 
-      MIPMAP_OUTPUT;
+      for (x = 0; x <= w1; x += MIPMAP_STEP)
+      {
+#ifndef MIPMAP_ALPHA
+        unsigned rb = 0, ga = 0;
+# ifdef MIPMAP_TRANSPARENT
+    	unsigned transcnt = 0;
+# endif
+#else
+        unsigned a = 0;
+#endif
+
+#if MIPMAP_LEVEL == 0
+
+# ifdef MIPMAP_TRANSPARENT
+		// transparent and non-transparent areas should be the same 
+		// on src and dst
+	    if (MIPMAP_ISKEY(src2[0]))
+	    {
+	      *(uint32 *)dst++ = MIPMAP_RGB(src2[0]);
+		  src1++; src2++; src3++;
+		  continue;
+	    }
+# endif
+	    // Process first and last column separately since they wrap around
+	    if (x == 0)
+	    {
+		  MIPMAP_PROCESS (w1, 0, 1);
+	    } 
+	    else if (x == w1)
+	    {
+		  MIPMAP_PROCESS (-1, 0, -w1);
+	    }
+	    else
+	    {
+          MIPMAP_PROCESS (-1, 0, 1);
+        }
+	    src1++; src2++; src3++;
+#elif MIPMAP_LEVEL == 1
+        ACCUMULATE_2X2 (x);
+#endif
+
+        MIPMAP_OUTPUT;
+      }
+      src += w * MIPMAP_STEP;
     }
-    src += w * MIPMAP_STEP;
   }
 }
 
