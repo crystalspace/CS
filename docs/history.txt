@@ -80,6 +80,9 @@ chronological order.
 	- Eric Sunshine fixed xwindow.mak to use DO.PLUGIN.PREAMBLE, CORE,
 	  POSTAMBLE, rather than simply DO.PLUGIN.  This is necesary since it
 	  utilizes additional build flags.
+	- Jorrit reverted a call to Prepare() in FillRenderMeshes() (thing
+	  mesh plugin). This breaks the thing mesh for smoothed things (with
+	  new renderer enabled) but it fixes it for all the rest :-)
 	- Anders Stenberg now added the csplugin, jam and makefiles for new 
 	  software renderer, which were forgotten last time.
 28-Aug-2003

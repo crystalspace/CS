@@ -1187,7 +1187,6 @@ void csThingStatic::FillRenderMeshes (
 	csDirtyAccessArray<csRenderMesh*>& rmeshes,
 	const csArray<RepMaterial>& repMaterials)
 {
-  Prepare ();
   csHashMap material_polys;
   csHashSet materials;
 
