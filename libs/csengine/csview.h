@@ -75,6 +75,9 @@ public:
   void Draw ();
   /// Set sector for the current camera.
   void SetSector (csSector *sector);
+
+  /// Return the clipper.
+  csClipper* GetClipper () { return clipper; }
 };
 
 #endif //  CSVIEW_H
