@@ -23,7 +23,7 @@ interface IPolygonTexture;
 interface IPolygonSet : public IUnknown
 {
   ///
-  STDMETHOD (GetName) (char** szName);
+  STDMETHOD (GetName) (const char** szName);
 
   DECLARE_IUNKNOWN ()
 };
@@ -39,7 +39,7 @@ struct ComcsVector3
 interface IPolygon3D : public IUnknown
 {
   ///
-  STDMETHOD (GetName) (char** szName);
+  STDMETHOD (GetName) (const char** szName);
   ///
   STDMETHOD (GetParent) (IPolygonSet** retval);
   ///
