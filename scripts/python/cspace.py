@@ -1202,8 +1202,10 @@ class csMath3(_object):
     if _newclass:Between = staticmethod(_cspace.csMath3_Between)
     __swig_getmethods__["SetMinMax"] = lambda x: _cspace.csMath3_SetMinMax
     if _newclass:SetMinMax = staticmethod(_cspace.csMath3_SetMinMax)
-    __swig_getmethods__["Area3"] = lambda x: _cspace.csMath3_Area3
-    if _newclass:Area3 = staticmethod(_cspace.csMath3_Area3)
+    __swig_getmethods__["DoubleArea3"] = lambda x: _cspace.csMath3_DoubleArea3
+    if _newclass:DoubleArea3 = staticmethod(_cspace.csMath3_DoubleArea3)
+    __swig_getmethods__["Direction3"] = lambda x: _cspace.csMath3_Direction3
+    if _newclass:Direction3 = staticmethod(_cspace.csMath3_Direction3)
     __swig_getmethods__["CalcNormal"] = lambda x: _cspace.csMath3_CalcNormal
     if _newclass:CalcNormal = staticmethod(_cspace.csMath3_CalcNormal)
     __swig_getmethods__["CalcNormal"] = lambda x: _cspace.csMath3_CalcNormal
@@ -1245,7 +1247,9 @@ csMath3_Between = _cspace.csMath3_Between
 
 csMath3_SetMinMax = _cspace.csMath3_SetMinMax
 
-csMath3_Area3 = _cspace.csMath3_Area3
+csMath3_DoubleArea3 = _cspace.csMath3_DoubleArea3
+
+csMath3_Direction3 = _cspace.csMath3_Direction3
 
 csMath3_CalcNormal = _cspace.csMath3_CalcNormal
 
@@ -1494,7 +1498,7 @@ class csPoly3D(_object):
     __swig_getmethods__["ComputePlane"] = lambda x: _cspace.csPoly3D_ComputePlane
     if _newclass:ComputePlane = staticmethod(_cspace.csPoly3D_ComputePlane)
     def ComputePlane(*args): return _cspace.csPoly3D_ComputePlane(*args)
-    def GetSignedArea(*args): return _cspace.csPoly3D_GetSignedArea(*args)
+    def GetArea(*args): return _cspace.csPoly3D_GetArea(*args)
     def GetCenter(*args): return _cspace.csPoly3D_GetCenter(*args)
     def __getitem__(*args): return _cspace.csPoly3D___getitem__(*args)
     def __setitem__ (self, i, v):
