@@ -100,7 +100,7 @@ csShadowBlock::csShadowBlock (uint32 region, int max_shadows, int delta) :
 csShadowBlock::~csShadowBlock ()
 {
   DeleteShadows ();
-  SCF_DESTRUCT_IBASE (0);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csShadowBlock::IntAddShadow (csShadowFrustum* csf)
@@ -261,7 +261,7 @@ csShadowBlockList::csShadowBlockList () :
 csShadowBlockList::~csShadowBlockList ()
 {
   DeleteAllShadows ();
-  SCF_DESTRUCT_IBASE (0);
+  SCF_DESTRUCT_IBASE ();
 }
 
 iShadowBlock *csShadowBlockList::NewShadowBlock (
@@ -317,7 +317,7 @@ csShadowIterator::csShadowIterator (
 
 csShadowIterator::~csShadowIterator()
 {
-  SCF_DESTRUCT_IBASE (0);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csShadowIterator::Reset ()
