@@ -748,6 +748,7 @@ bool csODERigidBody::MakeStatic ()
   {
     statjoint = dJointCreateFixed (dynsys->GetWorldID(), 0);
     dJointAttach (statjoint, bodyID, 0);
+    dJointSetFixed(statjoint);
     dBodySetGravityMode (bodyID, 0);
   }
   return true;
@@ -759,6 +760,7 @@ bool csODERigidBody::MakeDynamic ()
   {
     dJointDestroy (statjoint);
     dBodySetGravityMode (bodyID, 1);
+    statjoint = 0;
   }
   return true;
 }
@@ -973,12 +975,13 @@ bool csODERigidBody::AttachColliderPlane (const csPlane3& plane,
 
 void csODERigidBody::SetPosition (const csVector3& pos)
 {
-  dBodySetPosition (bodyID, pos.x, pos.y, pos.z);
+    dGeomSetPosition (groupID, pos.x, pos.y, pos.z);
+    if (statjoint != 0) dJointSetFixed(statjoint);
 }
 
 const csVector3 csODERigidBody::GetPosition () const
 {
-  const dReal* pos = dBodyGetPosition (bodyID);
+  const dReal* pos = dGeomGetPosition (bodyID);
   return csVector3 (pos[0], pos[1], pos[2]);
 }
 
