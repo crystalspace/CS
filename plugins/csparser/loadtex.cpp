@@ -173,7 +173,7 @@ SCF_IMPLEMENT_IBASE(TextureLoaderContext);
   SCF_IMPLEMENTS_INTERFACE(iTextureLoaderContext);
 SCF_IMPLEMENT_IBASE_END;
 
-TextureLoaderContext::TextureLoaderContext ()
+TextureLoaderContext::TextureLoaderContext (const char* texname)
 {
   SCF_CONSTRUCT_IBASE (0);
 
@@ -185,6 +185,8 @@ TextureLoaderContext::TextureLoaderContext ()
 
   has_size = false;
   width = height = 128;
+
+  TextureLoaderContext::texname = texname;
 }
 
 TextureLoaderContext::~TextureLoaderContext ()
@@ -238,6 +240,11 @@ bool TextureLoaderContext::HasSize ()
 void TextureLoaderContext::GetSize (int& w, int& h)
 {
   w = width; h = height;
+}
+
+const char* TextureLoaderContext::GetName ()
+{
+  return texname;
 }
 
 //----------------------------------------------------------------------------

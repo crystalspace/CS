@@ -55,6 +55,9 @@ chronological order.
 	  outside a sphere.
 	- res changed the generic renderstep to not draw meshes that are 
 	  outside the influence of the light passed in.
+	- res added a method to iTextureLoaderContext to retrieve the name of
+	  the texture to be loaded.
+	- res un-inverted the <mipmap> texture flag parse logic.
 27-Mar-2004
 	- Anders Stenberg did the following NR changes:
 	    - Added the possibility to route Cg programs through

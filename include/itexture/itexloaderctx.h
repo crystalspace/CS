@@ -32,7 +32,7 @@
 
 struct iImage;
 
-SCF_VERSION (iTextureLoaderContext, 0, 0, 1);
+SCF_VERSION (iTextureLoaderContext, 0, 0, 2);
 
 /**
  * Interface passed to a texture loader, holding some common texture 
@@ -54,6 +54,9 @@ struct iTextureLoaderContext : public iBase
   virtual bool HasSize () = 0;
   /// Get the size
   virtual void GetSize (int& w, int& h) = 0;
+  
+  /// Get the texture's name
+  virtual const char* GetName () = 0;
 };
 
 /** @} */

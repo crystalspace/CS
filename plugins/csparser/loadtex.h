@@ -37,10 +37,11 @@ class TextureLoaderContext : public iTextureLoaderContext
   csRef<iImage> image;
   bool has_size;
   int width, height;
+  const char* texname;
 public:
   SCF_DECLARE_IBASE;
 
-  TextureLoaderContext ();
+  TextureLoaderContext (const char* texname);
   virtual ~TextureLoaderContext ();
 
   void SetFlags (int Flags);
@@ -54,6 +55,8 @@ public:
   void SetSize (int w, int h);
   virtual bool HasSize ();
   virtual void GetSize (int& w, int& h);
+
+  virtual const char* GetName ();
 };
 
 /// Base texture loader pseudo-plugin

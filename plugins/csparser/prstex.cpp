@@ -159,7 +159,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
   bool do_transp = false;
   bool keep_image = false;
   bool always_animate = false;
-  TextureLoaderContext context;
+  TextureLoaderContext context (txtname);
   csRef<iDocumentNode> ParamsNode;
   char* type = 0;
 
@@ -217,7 +217,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	  bool mm;
 	  if (!SyntaxService->ParseBool (child, mm, true))
 	    goto error;
-          if (mm)
+          if (!mm)
 	    context.SetFlags (context.GetFlags() | CS_TEXTURE_NOMIPMAPS);
           else
 	    context.SetFlags (context.GetFlags() & ~CS_TEXTURE_NOMIPMAPS);
