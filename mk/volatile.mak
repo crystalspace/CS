@@ -31,6 +31,9 @@ endif
 ifeq ($(DO_FAKE_BOOL),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_FAKE_BOOL$">>volatile.tmp
 endif
+ifeq ($(CS_BUILTIN_SIZED_TYPES),yes)
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_BUILTIN_SIZED_TYPES$">>volatile.tmp
+endif
 ifeq ($(DO_FAKE_SOCKLEN_T),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_FAKE_SOCKLEN_T$">>volatile.tmp
 endif

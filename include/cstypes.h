@@ -56,13 +56,17 @@ typedef unsigned long CS_ID;    // Used for uniquely generated id numbers
 
 //-----------------------------------------------------------------------------
 // The following types should be used whenever you need a variable of
-// a specific size (in bits).
+// a specific size (in bits).  If these types are already defined by system
+// headers for a particular platform, then define CS_BUILTIN_SIZED_TYPES to
+// avoid duplicate type definition here.
 //-----------------------------------------------------------------------------
+#if !defined(CS_BUILTIN_SIZED_TYPES)
 typedef unsigned char uint8;
 typedef char int8;
 typedef unsigned short uint16;
 typedef short int16;
 typedef unsigned int uint32;
 typedef int int32;
+#endif
 
 #endif // __CS_CSTYPES_H__

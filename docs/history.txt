@@ -14,6 +14,12 @@ The history order has been reversed so that new features are at the top.
 	  both sprites and templates.
 	- csPolygonSet::GetBoundingBox() will now try to create the bounding
 	  box if it doesn't exist.
+	- Eric Sunshine made the definition of the explicitly sized types
+	  int8, uint8, int16, uint16, int32, and uint32 optional in
+	  cstypes.h.  Definition of these types is now controlled by makefile
+	  and C-preprocessor variables named CS_BUILTIN_SIZED_TYPES.  This
+	  change was necessary in order to support BeOS since the BeOS system
+	  headers already define these types.
 21-Jun-2000
 	- Norman Kramer added new SetViewArea for gridviews to retsrict the
 	  area they can show.
