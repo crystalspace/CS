@@ -163,7 +163,6 @@ bool csGraphics2DDDraw6::Open (const char *Title)
 
   Memory = NULL;
   m_hWndPalette = NULL;
-  m_bDoubleBuffer = FullScreen;
 
   if (InitSurfaces () != DD_OK)
     return false;
