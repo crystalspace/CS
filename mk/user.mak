@@ -20,6 +20,10 @@
 
 PLUGINS += filesys/vfs
 PLUGINS += video/renderer/software
+PLUGINS += video/loader/mplex
+PLUGINS += video/loader/gif
+PLUGINS += video/loader/png
+PLUGINS += video/loader/jpg
 PLUGINS += font/server/csfont 
 PLUGINS += console/output/simple
 PLUGINS += console/input/standard
@@ -45,6 +49,10 @@ PLUGINS.DYNAMIC += engine
 PLUGINS.DYNAMIC += iso
 PLUGINS.DYNAMIC += sequence
 PLUGINS.DYNAMIC += video/renderer/line video/renderer/null video/renderer/inf
+PLUGINS.DYNAMIC += video/loader/bmp
+PLUGINS.DYNAMIC += video/loader/tga
+PLUGINS.DYNAMIC += video/loader/sgi
+PLUGINS.DYNAMIC += video/loader/wal
 PLUGINS.DYNAMIC += net/driver/socket
 PLUGINS.DYNAMIC += sound/loader
 PLUGINS.DYNAMIC += console/output/standard
@@ -56,14 +64,6 @@ PLUGINS.DYNAMIC += font/server/fontplex
 PLUGINS.DYNAMIC += metaball
 PLUGINS.DYNAMIC += motion
 #PLUGINS.DYNAMIC += csgame/gamecore
-PLUGINS.DYNAMIC += video/loader/bmp
-PLUGINS.DYNAMIC += video/loader/gif
-PLUGINS.DYNAMIC += video/loader/tga
-PLUGINS.DYNAMIC += video/loader/sgi
-PLUGINS.DYNAMIC += video/loader/wal
-PLUGINS.DYNAMIC += video/loader/png
-PLUGINS.DYNAMIC += video/loader/jpg
-PLUGINS.DYNAMIC += video/loader/mplex
 
 #-----------------------------------------------------------------------------
 # Static Settings            *** TAKE NOTE ***
@@ -110,7 +110,7 @@ DO_BMP=yes
 # If 'yes' include support for TGA graphic files (not required currently).
 DO_TGA=yes
 
-# If 'yes' include support for JPG graphic files (not required currently).
+# If 'yes' include support for JPG graphic files.
 DO_JPG=yes
 
 # If 'yes' include support for WAL graphic files (not required currently).
