@@ -229,29 +229,27 @@ void Scan32::draw_scanline_fog (int xx, unsigned char* d,
 
   do
   {
-    int dens_dist = tables.exp_table_2[fog_dens / *(z_buf) - fog_dens / izz];
-    int r = (*_dest) >> 16;
-    int g = ((*_dest) >> 8) & 0xff;
-    int b = (*_dest) & 0xff;
-
-    //05/02/1999 Thomas Hieber: added range checking for mul_table. Otherwise I got frequent crashes
-    if (dens_dist<0)
+    if (izz < *z_buf)
     {
-      dens_dist=0;
+      _dest++;
+      izz+=dzz;
+      z_buf++;
     }
-
-    if (dens_dist>(256*512)) 
+    else
     {
-      dens_dist=256*512;
+      int dens_dist = tables.exp_table_2[fog_dens / *(z_buf) - fog_dens / izz];
+      int r = (*_dest) >> 16;
+      int g = ((*_dest) >> 8) & 0xff;
+      int b = (*_dest) & 0xff;
+
+      r += tables.mul_table[dens_dist+fog_r - r];
+      g += tables.mul_table[dens_dist+fog_g - g];
+      b += tables.mul_table[dens_dist+fog_b - b];
+
+      *_dest++ = (r<<16) | (g<<8) | b;
+      z_buf++;
+      izz += dzz;
     }
-
-    r += tables.mul_table[dens_dist+fog_r - r];
-    g += tables.mul_table[dens_dist+fog_g - g];
-    b += tables.mul_table[dens_dist+fog_b - b];
-
-    *_dest++ = (r<<16) | (g<<8) | b;
-    z_buf++;
-    izz += dzz;
   }
   while (_dest <= _destend);
 }
@@ -282,17 +280,6 @@ void Scan32::draw_scanline_fog_view (int xx, unsigned char* d,
     int r = (*_dest) >> 16;
     int g = ((*_dest) >> 8) & 0xff;
     int b = (*_dest) & 0xff;
-
-    //05/02/1999 Thomas Hieber: added range checking for mul_table. Otherwise I got frequent crashes
-    if (dens_dist<0)
-    {
-      dens_dist=0;
-    }
-
-    if (dens_dist>(256*512)) 
-    {
-      dens_dist=256*512;
-    }
 
     r += tables.mul_table[dens_dist+fog_r - r];
     g += tables.mul_table[dens_dist+fog_g - g];
@@ -335,17 +322,6 @@ void Scan32::draw_scanline_fog_plane (int xx, unsigned char* d,
     int r = (*_dest) >> 16;
     int g = ((*_dest) >> 8) & 0xff;
     int b = (*_dest) & 0xff;
-
-    //05/02/1999 Thomas Hieber: added range checking for mul_table. Otherwise I got frequent crashes
-    if (dens_dist<0)
-    {
-      dens_dist=0;
-    }
-
-    if (dens_dist>(256*512)) 
-    {
-      dens_dist=256*512;
-    }
 
     r += tables.mul_table[dens_dist+fog_r - r];
     g += tables.mul_table[dens_dist+fog_g - g];
