@@ -87,27 +87,27 @@ void InternalScanPluginDir (iStringArray*& messages,
 	  
 	  plugins->Push (csStrNew (scffilepath));
         }
-	else
+      }
+      else
+      {
+	if (recursive && (strcmp (de->d_name, ".") != 0)
+	  && (strcmp (de->d_name, "..") != 0))
 	{
-	  if (recursive && (strcmp (de->d_name, ".") != 0)
-	    && (strcmp (de->d_name, "..") != 0))
-	  {
-	    iStringArray* subdirMessages = 0;
-	    
-	    csString scffilepath;
-	    scffilepath << dir << PATH_SEPARATOR << de->d_name;
+	  iStringArray* subdirMessages = 0;
 	  
-	    InternalScanPluginDir (subdirMessages, scffilepath,
-	      plugins, recursive);
-  
-	    if (subdirMessages != 0)
+	  csString scffilepath;
+	  scffilepath << dir << PATH_SEPARATOR << de->d_name;
+	
+	  InternalScanPluginDir (subdirMessages, scffilepath,
+	    plugins, recursive);
+
+	  if (subdirMessages != 0)
+	  {
+	    for (int i = 0; i < subdirMessages->Length(); i++)
 	    {
-	      for (int i = 0; i < subdirMessages->Length(); i++)
-	      {
-		AppendStrVecString (messages, subdirMessages->Get (i));
-	      }
-	      subdirMessages->DecRef();
+	      AppendStrVecString (messages, subdirMessages->Get (i));
 	    }
+	    subdirMessages->DecRef();
 	  }
 	}
       }
