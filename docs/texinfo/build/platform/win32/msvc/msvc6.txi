@@ -44,9 +44,6 @@ The latest version of thie archive can be downloaded from:
 @code{msvc_libs_0.95dev002.zip}
 @end iftex
 
-@noindent
-@uref{ftp://62.188.48.183/support/win32/msvc_libs_0.95dev002.zip}
-
 Once you have downloaded the msvc_libs package, extract it too your @file{CS\}
 root directory.
 
@@ -77,7 +74,7 @@ obtained from:
 @uref{http://www.msdn.microsoft.com/directx}
 
 If you are unable to accomplish the 100+Mb (For the full @sc{sdk}) or 43Mb (For
-the VisualC only parts of the @sc{sdk}) download of the DirectX 8a @sc{sdk}
+the VisualC only parts of the @sc{sdk}) download of the DirectX 8.1b @sc{sdk}
 from the link above.  You can obtain cut down older versions (6 & 7 with no
 documents or example code) of the DirectX @sc{sdk}'s from the following
 website:
@@ -163,10 +160,10 @@ suggested and supported version can be obtained via the link below.
 For Visual C++ 6:
 
 @ifnottex
-@uref{http://www.philipwyett.dsl.pipex.com/crystal_space/msvc/downloads/bfwizard-1.6.zip}
+@uref{ftp://sunsite.dk/projects/crystal/support/msvc/bison_flex/bfwizard-1.6.zip}
 @end ifnottex
 @iftex
-@code{http://www.philipwyett.dsl.pipex.com/crystal_space/msvc/downloads/}@*
+@code{ftp://sunsite.dk/projects/crystal/support/msvc/bison_flex/}@*
 @code{bfwizard-1.6.zip}
 @end iftex
 

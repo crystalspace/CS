@@ -43,15 +43,6 @@ The latest version of this archive can be downloaded from:
 @code{msvc7_libs_0.95dev001.zip}
 @end iftex
 
-@noindent
-@ifnottex
-@uref{ftp://62.188.48.183/support/win32/msvc7/msvc7_libs_0.95dev001.zip}
-@end ifnottex
-@iftex
-@code{ftp://62.188.48.183/support/win32/msvc7/}@*
-@code{msvc7_libs_0.95dev001.zip}
-@end iftex
-
 Once you have downloaded the msvc_libs package, extract it too your @file{CS\}
 root directory.
 
@@ -62,8 +53,8 @@ requires you must have at least some form of the DirectX Software Development
 Kit (@sc{sdk}) on your system.
 
 Visual C++ 7 comes with the minimum DirectX @sc{sdk} 8.1 pre-release files
-in-order to build Crystal Space. However, I advize you download the final
-8.1 version to guarentee complete compliance.
+in-order to build Crystal Space. However, my advice is you download the final
+8.1b version to guarentee complete compliance.
 
 To enable you to build Crystal Space to it optimum @sc{d3d} support, you must
 download the latest DirectX Software Development Kit (@sc{sdk}), which can be
@@ -106,13 +97,13 @@ require you re-generate @emph{sllex.cpp, slparse.cpp, slparse.cpp.h and slparse.
 If you need todo this will require you have Bison and Flex on your system. The
 suggested and supported version can be obtained via the link below.
 
-For Visual C++ 6:
+For Visual C++ 7:
 
 @ifnottex
-@uref{http://www.philipwyett.dsl.pipex.com/crystal_space/msvc/downloads/bfwizard-1.6.zip}
+@uref{ftp://sunsite.dk/projects/crystal/support/msvc/bison_flex/bfwizard-1.6.zip}
 @end ifnottex
 @iftex
-@code{http://www.philipwyett.dsl.pipex.com/crystal_space/msvc/downloads/}@*
+@code{ftp://sunsite.dk/projects/crystal/support/msvc/bison_flex/}@*
 @code{bfwizard-1.6.zip}
 @end iftex
 
