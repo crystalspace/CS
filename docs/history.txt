@@ -7,8 +7,12 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 25-Mar-2005
-	- Wouter Wijngaards changed csBitArrayHashKeyHandler::ComputeHash()
-	  in bitarray.h, int to size_t to remove signed/unsigned warning.
+	- Wouter Wijngaards 
+	  - changed csBitArrayHashKeyHandler::ComputeHash in bitarray.h, 
+	    int to size_t to remove signed/unsigned warning.
+	  - made size a size_t in map2cs AddFile.
+	  - added %ignore in csspace.i for csStringBase::operator[].
+	  - changed strnicmp in csShaderGLCGVP::Compile to csStrNCaseCmp.
 	- Jorrit fixed a problem in syntax services where there were too
 	  few parameters to csReport.
 	- res fixed a the std_foo shaders for the recent xmlshader changes.

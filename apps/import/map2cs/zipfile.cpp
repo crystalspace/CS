@@ -35,7 +35,7 @@ bool CZipFile::AddFile(const char* originalname, const char* zipname)
 
   //Check the size of the file.
   fseek(fd, 0, SEEK_END); //Seek to end of file
-  int size = ftell(fd);   //Check current position
+  size_t size = ftell(fd);   //Check current position
   fseek(fd, 0, SEEK_SET); //Seek to beginning of file
 
   void* file = NewFile(zipname, size);

@@ -237,7 +237,7 @@ bool csShaderGLCGVP::Compile (csArray<iShaderVariableContext*> &staticContexts)
 	      }
 	    }
 	  }
-	  else if (strnicmp (semantic, "state.matrix.", 13) == 0)
+	  else if (csStrNCaseCmp (semantic, "state.matrix.", 13) == 0)
 	  {
 	    // Semantics binding in Cg
 	    varSemantics.Put (varStr, 

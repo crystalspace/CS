@@ -572,6 +572,8 @@ TYPEMAP_OUT_csWrapPtr
 #endif // CS_MINI_SWIG
 
 %ignore csStringBase;
+%ignore csStringBase::operator [] (size_t);
+%ignore csStringBase::operator [] (size_t) const;
 %ignore csStringFast;
 %ignore csString::csString (size_t);
 %ignore csString::csString (char);
