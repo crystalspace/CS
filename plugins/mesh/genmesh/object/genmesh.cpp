@@ -617,7 +617,7 @@ void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
     if (!do_shadow_rec || li->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_PSEUDO)
     {
       li->AddAffectedLightingInfo (&scfiLightingInfo);
-      if (!li->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_PSEUDO)
+      if (li->GetDynamicType () != CS_LIGHT_DYNAMICTYPE_PSEUDO)
         affecting_lights.Add (li);
     }
   }

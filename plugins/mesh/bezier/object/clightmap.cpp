@@ -191,7 +191,6 @@ const char* csCurveLightMap::ReadFromCache (
   PolySave ps, pswanted;
   LightHeader lh;
   LightSave ls;
-  iLight *light;
   int i;
 
   csBezierMesh* parent;
