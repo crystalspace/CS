@@ -75,19 +75,12 @@ public:
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
   } scfiComponent;
-  struct EventHandler : public iEventHandler
+
+  struct eiEventHandler : public iEventHandler
   {
-  private:
-    csSoundRenderDS3D* parent;
-  public:
-    EventHandler (csSoundRenderDS3D* parent)
-    {
-      SCF_CONSTRUCT_IBASE (NULL);
-      EventHandler::parent = parent;
-    }
-    SCF_DECLARE_IBASE;
-    virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
-  } * scfiEventHandler;
+    SCF_DECLARE_EMBEDDED_IBASE(csSoundRenderDS3D);
+    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
+  } scfiEventHandler;
 };
 
 #endif // __CS_SNDRDR_H__
