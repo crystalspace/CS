@@ -26,8 +26,9 @@
 #undef  SOFTWARE_2D_DRIVER
 #define SOFTWARE_2D_DRIVER "crystalspace.graphics2d.next"
 
-// Tell software texture mapper that top 8 bits in RGBA pixel sometimes are used
+// Tell software texture mapper that top 8 bits in RGBA pixel may be used.
 #define TOP8BITS_R8G8B8_USED
+
 
 //-----------------------------------------------------------------------------
 // NeXT does not know about wchar_t, so fake one up for the COM system.
@@ -108,5 +109,15 @@ static inline char* getcwd( char* p, size_t size )
 #undef SYSDEF_ALLOCA
 #define	alloca(x) __builtin_alloca(x)
 #endif // SYSDEF_ALLOCA
+
+
+//-----------------------------------------------------------------------------
+// NeXT does not supply getopt_long() (I can't get the GNU version to compile.)
+//-----------------------------------------------------------------------------
+#ifdef SYSDEF_GETOPT
+#undef SYSDEF_GETOPT
+#  define CS_NO_GETOPT_LONG
+#  include <libc.h>
+#endif // SYSDEF_GETOPT
 
 #endif // __NeXT_osdefs_h
