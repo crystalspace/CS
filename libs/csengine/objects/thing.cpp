@@ -4246,12 +4246,14 @@ iCurve *csThing::ThingState::GetCurve (int idx) const
 iPolygon3D *csThing::ThingState::GetPolygon (int idx)
 {
   csPolygon3D *p = scfParent->GetPolygon3D (idx);
+  if (!p) return NULL;
   return &(p->scfiPolygon3D);
 }
 
 iPolygon3D *csThing::ThingState::GetPolygon (const char *name)
 {
   csPolygon3D *p = scfParent->GetPolygon3D (name);
+  if (!p) return NULL;
   return &(p->scfiPolygon3D);
 }
 

@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+27-Oct-2002
+	- Fixed a few bugs in iThingState->GetPolygon() as reported
+	  by Groton.
 20-Oct-2002
 	- Removed some old palette code from the software texture manager.
 	- iGraphics2D->FindRGB() now works again in palette mode.
