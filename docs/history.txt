@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+14-Feb-2002
+	- Fixed new gridbag constraints in AWS so that it is an enum
+	  (static const int is not legal in C++) and also renamed
+	  the constants so that they start with GBS_... Several of the
+	  constants were defined in windows include files (i.e. RELATIVE
+	  in wingdi.h).
 13-Feb-2002
 	- Added new tutorial app in apps/tutorial/awstut. This is a small
 	  AWS using application that demonstrates how to open and use
@@ -18,6 +24,7 @@ The history order is reversed so that new features are at the top.
           through space warping portal bug
 	- Fixed several cases in AWS where SCF implementations were not
 	  calling SCF_CONSTRUCT_IBASE() from the constructor. This is BAD.
+	- Fixed a memory leak in aws on the font server.
 12-Feb-2002
 	- Matt Reda moved the event-handling code in the OSX canvases 
 	  from the delegate to a new NSView-derived class.  The old code 

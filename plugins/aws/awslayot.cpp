@@ -9,6 +9,7 @@ const int awsGridBagLayout::MAXGRIDSIZE = 512;
 const int awsGridBagLayout::MINSIZE = 1;
 const int awsGridBagLayout::PREFERREDSIZE = 2;
 
+/*
 const int awsGridBagConstraints::RELATIVE = -1;
 const int awsGridBagConstraints::REMAINDER = 0;
 const int awsGridBagConstraints::NONE = 0;
@@ -24,6 +25,7 @@ const int awsGridBagConstraints::SOUTH = 15;
 const int awsGridBagConstraints::SOUTHWEST = 16;
 const int awsGridBagConstraints::WEST = 17;
 const int awsGridBagConstraints::NORTHWEST = 18;
+*/
 
 const int MAXINT = 0xeffffff;
 
@@ -36,14 +38,14 @@ max(int i, int j)
 /////////////////////////////////////////////////////////////////////////////////
 
 awsGridBagConstraints::awsGridBagConstraints():
-	gridx(RELATIVE),
-    gridy(RELATIVE),
+	gridx(GBS_RELATIVE),
+    gridy(GBS_RELATIVE),
     gridwidth(1),
     gridheight(1),
     weightx(0),
     weighty(0),
-    anchor(CENTER),
-    fill(NONE),
+    anchor(GBS_CENTER),
+    fill(GBS_NONE),
 	insets(0, 0, 0, 0),
     ipadx(0),
     ipady(0)
@@ -714,8 +716,8 @@ awsGridBagLayout::AdjustForGravity(awsGridBagConstraints *constraints, csRect r)
     r.ymax -= constraints->insets.ymax;
 
     diffx = 0;
-    if ((constraints->fill != awsGridBagConstraints::HORIZONTAL &&
-	 constraints->fill != awsGridBagConstraints::BOTH)
+    if ((constraints->fill != awsGridBagConstraints::GBS_HORIZONTAL &&
+	 constraints->fill != awsGridBagConstraints::GBS_BOTH)
 	&& (r.Width() > (constraints->minWidth + constraints->ipadx))) 
     {
       diffx = r.Width() - (constraints->minWidth + constraints->ipadx);
@@ -723,8 +725,8 @@ awsGridBagLayout::AdjustForGravity(awsGridBagConstraints *constraints, csRect r)
     }
 
     diffy = 0;
-    if ((constraints->fill != awsGridBagConstraints::VERTICAL &&
-	 constraints->fill != awsGridBagConstraints::BOTH)
+    if ((constraints->fill != awsGridBagConstraints::GBS_VERTICAL &&
+	 constraints->fill != awsGridBagConstraints::GBS_BOTH)
 	&& (r.Height() > (constraints->minHeight + constraints->ipady))) 
     {
       diffy = r.Height() - (constraints->minHeight + constraints->ipady);
@@ -732,31 +734,31 @@ awsGridBagLayout::AdjustForGravity(awsGridBagConstraints *constraints, csRect r)
     }
 
     switch (constraints->anchor) {
-    case awsGridBagConstraints::CENTER:
+    case awsGridBagConstraints::GBS_CENTER:
       r.Move(diffx/2, diffx/2);
       break;
-    case awsGridBagConstraints::NORTH:
+    case awsGridBagConstraints::GBS_NORTH:
       r.Move(diffx/2, 0);
       break;
-    case awsGridBagConstraints::NORTHEAST:
+    case awsGridBagConstraints::GBS_NORTHEAST:
       r.Move(diffx,0);
       break;
-    case awsGridBagConstraints::EAST:
+    case awsGridBagConstraints::GBS_EAST:
       r.Move(diffx, diffy/2);
       break;
-    case awsGridBagConstraints::SOUTHEAST:
+    case awsGridBagConstraints::GBS_SOUTHEAST:
       r.Move(diffx, diffy);
       break;
-    case awsGridBagConstraints::SOUTH:
+    case awsGridBagConstraints::GBS_SOUTH:
       r.Move(diffx/2, diffy);
       break;
-    case awsGridBagConstraints::SOUTHWEST:
+    case awsGridBagConstraints::GBS_SOUTHWEST:
       r.Move(0, diffy);
       break;
-    case awsGridBagConstraints::WEST:
+    case awsGridBagConstraints::GBS_WEST:
       r.Move(0,diffy/2);
       break;
-    case awsGridBagConstraints::NORTHWEST:
+    case awsGridBagConstraints::GBS_NORTHWEST:
       break;
     default:
       break;

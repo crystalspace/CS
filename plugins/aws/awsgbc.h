@@ -3,82 +3,71 @@
 
 struct awsGridBagConstraints
 {
-  static const int RELATIVE;
-  
-   /**
+  enum
+  {
+    GBS_RELATIVE = -1,
+    /**
      * Specify that this component is the 
      * last component in its column or row. 
      */
-  static const int REMAINDER;
-
-   /**
+    GBS_REMAINDER = 0,
+    /**
      * Do not resize the component. 
      */
-  static const int NONE;
-
-   /**
+    GBS_NONE = 0,
+    /**
      * Resize the component both horizontally and vertically. 
      */
-  static const int BOTH;
-
-   /**
+    GBS_BOTH = 1,
+    /**
      * Resize the component horizontally but not vertically. 
      */
-  static const int HORIZONTAL;
-
-   /**
+    GBS_HORIZONTAL = 2,
+    /**
      * Resize the component vertically but not horizontally. 
      */
-  static const int VERTICAL;
-
-   /**
-    * Put the component in the center of its display area.
-    */
-  static const int CENTER;
-
-   /**
+    GBS_VERTICAL = 3,
+    /**
+     * Put the component in the center of its display area.
+     */
+    GBS_CENTER = 10,
+    /**
      * Put the component at the top of its display area,
      * centered horizontally. 
      */
-  static const int NORTH;
-
+    GBS_NORTH = 11,
     /**
      * Put the component at the top-right corner of its display area. 
      */
-  static const int NORTHEAST;
-
+    GBS_NORTHEAST = 12,
     /**
      * Put the component on the right side of its display area, 
      * centered vertically.
      */
-  static const int EAST;
-
+    GBS_EAST = 13,
     /**
      * Put the component at the bottom-right corner of its display area. 
      */
-  static const int SOUTHEAST;
-
+    GBS_SOUTHEAST = 14,
     /**
      * Put the component at the bottom of its display area, centered 
      * horizontally. 
      */
-  static const int SOUTH;
-
-   /**
+    GBS_SOUTH = 15,
+    /**
      * Put the component at the bottom-left corner of its display area. 
      */
-  static const int SOUTHWEST;
-
+    GBS_SOUTHWEST = 16,
     /**
      * Put the component on the left side of its display area, 
      * centered vertically.
      */
-  static const int WEST;
-
-   /**
+    GBS_WEST = 17,
+    /**
      * Put the component at the top-left corner of its display area. 
      */
-  static const int NORTHWEST;
+    GBS_NORTHWEST = 18
+  };
 
    /**
      * Specifies the cell at the left of the component's display area, 
