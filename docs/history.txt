@@ -55,6 +55,8 @@ The history order is reversed so that new features are at the top.
 	  when csSocketDriver::NewListener() is invoked for a non-reliable
 	  connection.  Problem was that it was invoking listen() which is
 	  illegal for datagram sockets.
+	- Eric Sunshine fixed sed invocation in CS/mk/autoconf/jam/csbuild.m4
+	  which failed to work with some older sed implementations.
 10-Apr-2003
 	- Fixed a compile error in binary XML reader. I wonder if people
 	  compile after changing something...

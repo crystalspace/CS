@@ -21264,7 +21264,7 @@ echo "$as_me: include/volatile.h is unchanged" >&6;}
                 rm -f include/volatile.h
                 mv $tmp/tcache include/volatile.h
             fi ;;
-    Jamconfig ) echo $ECHO_N "$cs_jamconfig_text$ECHO_C" | sed -e's/\${\([a-zA-Z_]\+\)}/$(\1)/g' -e's/\\/\\\\/g' > $tmp/tcache
+    Jamconfig ) echo $ECHO_N "$cs_jamconfig_text$ECHO_C" | sed 's/\${\([a-zA-Z_]\+\)}/$(\1)/g;s/\\/\\\\/g' > $tmp/tcache
             if diff Jamconfig $tmp/tcache >/dev/null 2>&1; then
                 { echo "$as_me:$LINENO: Jamconfig is unchanged" >&5
 echo "$as_me: Jamconfig is unchanged" >&6;}
