@@ -158,7 +158,6 @@
 #include "iutil/eventh.h"
 #include "iutil/eventq.h"
 #include "iutil/object.h"
-#include "iutil/objref.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
 #include "iutil/string.h"

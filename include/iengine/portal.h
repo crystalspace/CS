@@ -20,7 +20,6 @@
 #define __CS_ENGINE_PORTAL_H__
 
 #include "csutil/scf.h"
-#include "iutil/objref.h"
 
 class csReversibleTransform;
 class csPlane3;
@@ -114,7 +113,7 @@ SCF_VERSION (iPortal, 0, 3, 0);
  * how exactly the geometry behind portal is to be handled and
  * so on.
  */
-struct iPortal : public iReference
+struct iPortal : public iBase
 {
   /// Get the iObject for this portal.
   virtual iObject *QueryObject () = 0;

@@ -34,7 +34,6 @@ SCF_IMPLEMENT_IBASE_EXT_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csPortal::Portal)
   SCF_IMPLEMENTS_INTERFACE(iPortal)
-  SCF_IMPLEMENTS_INTERFACE(iReference)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csPortal::csPortal (csPolygon3DStatic* parent)
@@ -77,28 +76,6 @@ csPortal* csPortal::Clone ()
   return clone;
 }
 
-iReferencedObject *csPortal::GetReferencedObject () const
-{
-  if (!sector) return 0;
-  csRef<iReferencedObject> ref = SCF_QUERY_INTERFACE (sector,
-    iReferencedObject);
-  return ref; // DecRef is ok.
-}
-
-void csPortal::SetReferencedObject (iReferencedObject *b)
-{
-  if (b == 0)
-  {
-    SetSector (0);
-  }
-  else
-  {
-    csRef<iSector> s (SCF_QUERY_INTERFACE (b, iSector));
-    CS_ASSERT (s != 0);
-    SetSector (s);
-  }
-}
-
 iSector *csPortal::GetSector () const
 {
   return sector;
@@ -106,29 +83,7 @@ iSector *csPortal::GetSector () const
 
 void csPortal::SetSector (iSector *s)
 {
-  if (sector != s)
-  {
-    if (sector)
-    {
-      // First unlink from the previous sector.
-      csRef<iReferencedObject> refobj (SCF_QUERY_INTERFACE (
-          sector,
-          iReferencedObject));
-      CS_ASSERT (refobj != 0);
-      refobj->RemoveReference (&scfiPortal);
-    }
-
-    sector = s;
-    if (sector)
-    {
-      // Link to the new sector.
-      csRef<iReferencedObject> refobj (SCF_QUERY_INTERFACE (
-          sector,
-          iReferencedObject));
-      CS_ASSERT (refobj != 0);
-      refobj->AddReference (&scfiPortal);
-    }
-  }
+  sector = s;
 }
 
 csFlags &csPortal::GetFlags ()

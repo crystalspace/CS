@@ -23,6 +23,7 @@
 #include "csutil/flags.h"
 #include "csutil/csobject.h"
 #include "csutil/refarr.h"
+#include "csutil/weakref.h"
 #include "iengine/portal.h"
 
 class csPolygon2D;
@@ -41,8 +42,12 @@ struct iPolygon3D;
 class csPortal : public csObject
 {
 private:
-  /// The sector that this portal points to.
-  iSector* sector;
+  /**
+   * The sector that this portal points to.
+   * This is a weak reference so that we can safely remove the sector
+   * in which case 'sector' here will automatically be set to 0.
+   */
+  csWeakRef<iSector> sector;
   /// The parent polygon.
   csPolygon3DStatic* parent;
 
@@ -88,12 +93,6 @@ public:
   }
 
   //---- misc. manipulation functions ---------------------------------------
-
-  /// For iReference.
-  iReferencedObject* GetReferencedObject () const;
-
-  /// For iReference.
-  void SetReferencedObject (iReferencedObject* b);
 
   /// Return the sector that this portal points too.
   iSector* GetSector () const;
@@ -274,10 +273,6 @@ public:
   struct Portal : public iPortal
   {
     SCF_DECLARE_EMBEDDED_IBASE (csPortal);
-    virtual iReferencedObject* GetReferencedObject () const
-    { return scfParent->GetReferencedObject (); }
-    virtual void SetReferencedObject (iReferencedObject* b)
-    { scfParent->SetReferencedObject (b); }
     virtual iObject *QueryObject () { return scfParent; }
     virtual iSector* GetSector () const { return scfParent->GetSector (); }
     virtual void SetSector (iSector* s) { scfParent->SetSector (s); }

@@ -111,7 +111,6 @@ void csSectorMeshList::FreeItem (iMeshWrapper* item)
 
 //---------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE_EXT(csSector)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iReferencedObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iSector)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iVisibilityCullerListener)
   SCF_IMPLEMENTS_INTERFACE (csSector);
@@ -125,15 +124,9 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csSector::eiSector)
   SCF_IMPLEMENTS_INTERFACE(iSector)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSector::ReferencedObject)
-  SCF_IMPLEMENTS_INTERFACE(iReferencedObject)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csSector::csSector (csEngine *engine) :
-  csObject()
+csSector::csSector (csEngine *engine) : csObject()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSector);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiReferencedObject);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityCullerListener);
   DG_TYPE (this, "csSector");
   csSector::engine = engine;
@@ -150,25 +143,8 @@ csSector::csSector (csEngine *engine) :
 
 csSector::~csSector ()
 {
-  // The references to this sector MUST be cleaned up before this
-  // sector is destructed.
-  CS_ASSERT (references.Length () == 0);
-
+  SCF_DESTRUCT_IBASE ();
   lights.RemoveAll ();
-}
-
-void csSector::CleanupReferences ()
-{
-  while (references.Length () > 0)
-  {
-    iReference *ref = references[references.Length () - 1];
-#ifdef CS_DEBUG
-    // Sanity check.
-    iReferencedObject *refobj = ref->GetReferencedObject ();
-    CS_ASSERT (refobj == &scfiReferencedObject);
-#endif
-    ref->SetReferencedObject (0);
-  }
 }
 
 //----------------------------------------------------------------------
@@ -983,46 +959,17 @@ void csSector::UnregisterLeavingPortal (iPortal* portal)
 
 //---------------------------------------------------------------------------
 
-void csSector::ReferencedObject::AddReference (iReference *ref)
-{
-  scfParent->references.Push (ref);
-}
-
-void csSector::ReferencedObject::RemoveReference (iReference *ref)
-{
-  int i;
-
-  // We scan backwards because we know that the code to remove all
-  // refs to a sector will also scan backwards. So this is more efficient.
-  for (i = scfParent->references.Length () - 1; i >= 0; i--)
-  {
-    iReference *r = scfParent->references[i];
-    if (r == ref)
-    {
-      scfParent->references.DeleteIndex (i);
-      return ;
-    }
-  }
-
-  // Hopefully we never come here.
-  CS_ASSERT (false);
-}
-
 SCF_IMPLEMENT_IBASE(csSectorList)
   SCF_IMPLEMENTS_INTERFACE(iSectorList)
 SCF_IMPLEMENT_IBASE_END
 
-csSectorList::csSectorList (bool cr)
+csSectorList::csSectorList ()
 {
   SCF_CONSTRUCT_IBASE (0);
-
-  CleanupReferences = cr;
 }
 
 void csSectorList::FreeItem (iSector* item)
 {
-  if (CleanupReferences)
-    item->GetPrivateObject ()->CleanupReferences ();
 }
 
 int csSectorList::Add (iSector *obj)

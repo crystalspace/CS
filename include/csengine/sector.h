@@ -26,7 +26,6 @@
 #include "csutil/cscolor.h"
 #include "csutil/array.h"
 #include "csutil/hash.h"
-#include "iutil/objref.h"
 #include "csengine/light.h"
 #include "csengine/meshobj.h"
 #include "csengine/rdrprior.h"
@@ -132,11 +131,6 @@ private:
   csRenderQueueSet RenderQueues;
 
   /**
-   * List of references (portals?) to this sector.
-   */
-  csArray<iReference*> references;
-
-  /**
    * List of sector callbacks.
    */
   csRefArray<iSectorCallback> sector_cb_vector;
@@ -210,12 +204,6 @@ public:
    * Construct a sector. This sector will be completely empty.
    */
   csSector (csEngine*);
-
-  /**
-   * This function MUST be called before the sector is deleted in order
-   * to make sure that all references to the sector are cleaned up.
-   */
-  void CleanupReferences ();
 
   //----------------------------------------------------------------------
   // Mesh manipulation functions
@@ -480,15 +468,6 @@ public:
   void RegisterLeavingPortal (iPortal* portal);
   void UnregisterLeavingPortal (iPortal* portal);
 
-  //-------------------- iReferencedObject interface --------------------------
-  struct ReferencedObject : public iReferencedObject
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csSector);
-    virtual void AddReference (iReference* ref);
-    virtual void RemoveReference (iReference* ref);
-  } scfiReferencedObject;
-  friend struct ReferencedObject;
-
   //--------------------- iVisibilityCullerListner interface ------------------
   struct eiVisibilityCullerListener : public iVisibilityCullerListener
   {
@@ -606,10 +585,9 @@ private:
 
 public:
   SCF_DECLARE_IBASE;
-  bool CleanupReferences;
 
   /// constructor
-  csSectorList (bool CleanupReferences);
+  csSectorList ();
   /// destructor
   virtual ~csSectorList () { RemoveAll (); }
 
