@@ -273,9 +273,9 @@ int OpenGLLightmapCache::super_lm_size = DEFAULT_SUPER_LM_SIZE;
 OpenGLLightmapCache::OpenGLLightmapCache (csGraphics3DOGLCommon* g3d)
 {
   suplm = new csSuperLightMap [super_lm_num];
-  cur_lm = 0;
   initialized = false;
   OpenGLLightmapCache::g3d = g3d;
+  global_timestamp = 0;
 }
 
 OpenGLLightmapCache::~OpenGLLightmapCache ()
@@ -337,7 +337,6 @@ void OpenGLLightmapCache::Setup ()
 
 void OpenGLLightmapCache::Clear ()
 {
-  cur_lm = 0;
   int i;
   for (i = 0 ; i < super_lm_num ; i++)
   {
@@ -366,10 +365,13 @@ int OpenGLLightmapCache::FindFreeSuperLightmap()
 void OpenGLLightmapCache::Cache (csTrianglesPerSuperLightmap* s, bool dirty,
   bool* modified)
 {
+  // Mark current super lightmap with timestamp.
+  s->timestamp = global_timestamp;
+
   Setup ();
   *modified = false;
-  //First: Try to find a free superlightmap
-  //Check if the superLightmap is already in the cache
+  // First: Try to find a free superlightmap
+  // Check if the superLightmap is already in the cache.
 
   csRect* rectangleArray = s->rectangles.GetArray();
   const csRefArray<iPolygonTexture>& lmArray = s->lightmaps;
@@ -416,12 +418,32 @@ void OpenGLLightmapCache::Cache (csTrianglesPerSuperLightmap* s, bool dirty,
 //printf ("s=%p NOT in cache! index=%d\n", s, index); fflush (stdout);
   if (index < 0)
   {
-    // Clear one lightmap
-    // Temporaly i will clear the following lightmap (it would be nice to
-    // implement a LRU algorithm here)
-    cur_lm = (cur_lm + 1) % super_lm_num;
-    suplm[cur_lm].Clear ();
-    index = cur_lm;
+    // Clear one lightmap.
+    // We look for the super lightmap slot with the lowest cost in
+    // combination with how long ago it was used.
+    int best_cost_idx = -1;
+    int best_cost = 1000000000;
+    int i;
+    for (i = 0 ; i < super_lm_num ; i++)
+    {
+      csTrianglesPerSuperLightmap* slm = suplm[i].cacheData->source;
+      int cost = slm->CalculateCost ();
+
+      // Last time we used this super lightmap (in number of frames).
+      // If it was 500 frames ago that we used this super lightmap
+      // then we will decrease the cost a lot.
+      uint32 dt = global_timestamp-slm->timestamp;
+      if (dt > 500) cost >>= 2;
+      else if (dt > 25) cost >>= 1;
+
+      if (cost < best_cost)
+      {
+        best_cost = cost;
+	best_cost_idx = i;
+      }
+    }
+    suplm[best_cost_idx].Clear ();
+    index = best_cost_idx;
   }
   //Fill the superLightmap
   suplm[index].cacheData = new csSLMCacheData ();
@@ -431,7 +453,6 @@ void OpenGLLightmapCache::Cache (csTrianglesPerSuperLightmap* s, bool dirty,
   csSLMCacheData* superLMData = (csSLMCacheData*) suplm[index].cacheData;
   GLuint SLMHandle;
   superLMData->Handle = SLMHandle = suplm[index].Handle;
-  s->slId = index;
   csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, SLMHandle);
 #if 0
       char buf[256*256*4];

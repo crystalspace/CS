@@ -104,9 +104,6 @@ public:
 
   csGrowingArray<csRect> rectangles;
 
-  // SuperLightmap Id.
-  int slId;
-
   csSubRectangles* region;
 
   int numTriangles;
@@ -124,9 +121,17 @@ public:
   // Cache for the combined super lightmaps.
   uint8* suplm_data;
   int suplm_width, suplm_height;
-
   // Calculate the combined super lightmap cache.
   void CalculateSuplmData ();
+
+  // Cost of this super lightmap. A high number means that
+  // this super lightmap requires a lot of work to update. This number
+  // is related to the number of lightmaps in it and the total area.
+  int cost;
+  int CalculateCost ();
+
+  // Timestamp indicating when this super lightmap was last used.
+  uint32 timestamp;
 };
 
 /**
@@ -151,13 +156,8 @@ public:
   // Dirty due dynamic lights, needs recalculating.
   bool dirty;
 
-  // FirstTime says if it's the first time that the superlightmap
-  // is cached.
-  bool firstTime;
-
   // Marks as dirty.
   void MarkLightmapsDirty () { dirty = true; }
-
   // Clear the dirty state.
   void ClearLightmapsDirty() { dirty = false; }
   // Gets the dirty state.
@@ -183,8 +183,7 @@ private:
    * Add a single vertex to the given suplm.
    * Returns vertex index.
    */
-  int AddSingleVertexLM (csTrianglesPerSuperLightmap* triSuperLM,
-	int* verts, int i, const csVector2& uvLightmap, int& cur_vt_idx);
+  int AddSingleVertexLM (const csVector2& uvLightmap, int& cur_vt_idx);
 
 public:
   // SuperLightMap list.
@@ -211,7 +210,7 @@ protected:
   csGrowingArray<csTriangle> orig_triangles;
 
   csTrianglesPerSuperLightmap* SearchFittingSuperLightmap (
-    iPolygonTexture* poly_texture, csRect& rect, int num_vertices);
+    iPolygonTexture* poly_texture, csRect& rect);
 
   csTrianglesPerSuperLightmap* unlitPolysSL;
 
@@ -282,7 +281,6 @@ public:
 
   /// Given a polygon triangulize it and adds it to the polygon buffer
   void AddTriangles (csTrianglesPerMaterial* pol,
-    csTrianglesPerSuperLightmap* triSuperLM,
     int* verts, int num_vertices, const csMatrix3& m_obj2tex,
     const csVector3& v_obj2tex,iPolygonTexture* poly_texture, int mat_index,
     int cur_vt_idx);

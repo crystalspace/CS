@@ -163,6 +163,8 @@ public:
   static int super_lm_num;
   /// Size of static lightmaps.
   static int super_lm_size;
+  /// Global timestamp for super lightmaps.
+  uint32 global_timestamp;
 
   // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
   // This OpenGL texture handle is temporary for the version of
@@ -176,8 +178,6 @@ private:
 
   /// A number of super-lightmaps to contain all other lightmaps.
   csSuperLightMap* suplm;
-  /// Current super lightmap.
-  int cur_lm;
   /// If true then setup is ok.
   bool initialized;
 

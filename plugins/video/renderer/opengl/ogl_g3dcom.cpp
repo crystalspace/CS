@@ -1339,6 +1339,9 @@ bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
 
   if (DrawMode & CSDRAW_3DGRAPHICS)
   {
+    // For super lightmap caching.
+    lightmap_cache->global_timestamp++;
+
     FlushDrawPolygon ();
   }
 
