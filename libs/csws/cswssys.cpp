@@ -95,7 +95,7 @@ bool appSystemDriver::Initialize (int argc, char *argv[], IConfig *config)
   for (r = 0; r < 8; r++)
     for (g = 0; g < 8; g++)
       for (b = 0; b < 4; b++)
-        txtmgr->ReserveColor (r * 32, g * 32, b * 64, true);
+        txtmgr->ReserveColor (r * 32, g * 32, b * 64);
 
   // Setup application palette etc
   application->SetWorld (world);
