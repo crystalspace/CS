@@ -238,59 +238,58 @@ void SaveCamera (iVFS* vfs, const char *fName)
 
 bool LoadCamera (iVFS* vfs, const char *fName)
 {
-  if (!vfs->Exists (fName))
-  {
+  bool ok = true;
+#define IFFAIL(x) if (ok && !(ok = (x)))
+  IFFAIL (vfs->Exists (fName))
     Sys->Report (CS_REPORTER_SEVERITY_ERROR,
-    	"Could not open coordinate file '%s'!", fName);
-    return false;
-  }
-
-  iDataBuffer *data = vfs->ReadFile(fName);
-  if (!data)
-  {
+		 "Could not open camera file '%s'!", fName);
+  iDataBuffer *data = 0;
+  IFFAIL (data = vfs->ReadFile(fName))
     Sys->Report (CS_REPORTER_SEVERITY_ERROR,
-    	"Could not read coordinate file '%s'!", fName);
-    return false;
-  }
-
+		 "Could not read camera file '%s'!", fName);
   csMatrix3 m;
-  csVector3 v;
+  csVector3 v, angle;
   int imirror = false;
-  char* sector_name = new char [data->GetSize ()];
-
-  csScanStr (**data,
-    "%f %f %f\n"
-    "%f %f %f\n"
-    "%f %f %f\n"
-    "%f %f %f\n"
-    "%S\n"
-    "%d\n"
-    "%f %f %f",
-    &v.x, &v.y, &v.z,
-    &m.m11, &m.m12, &m.m13,
-    &m.m21, &m.m22, &m.m23,
-    &m.m31, &m.m32, &m.m33,
-    sector_name,
-    &imirror,
-    &Sys->angle.x, &Sys->angle.y, &Sys->angle.z);
-
-  iSector* s = Sys->Engine->GetSectors ()->FindByName (sector_name);
-  delete[] sector_name;
-  data->DecRef ();
-  if (!s)
-  {
+  char* sector_name = 0;
+  if (ok)
+    sector_name = new char [data->GetSize ()];
+  
+  IFFAIL (17 == csScanStr (**data,
+			   "%f %f %f\n"
+			   "%f %f %f\n"
+			   "%f %f %f\n"
+			   "%f %f %f\n"
+			   "%S\n"
+			   "%d\n"
+			   "%f %f %f",
+			   &v.x, &v.y, &v.z,
+			   &m.m11, &m.m12, &m.m13,
+			   &m.m21, &m.m22, &m.m23,
+			   &m.m31, &m.m32, &m.m33,
+			   sector_name,
+			   &imirror,
+			   &angle.x, &angle.y, &angle.z))
     Sys->Report (CS_REPORTER_SEVERITY_ERROR,
-    	"Sector `%s' in coordinate file does not "
-      "exist in this map!", sector_name);
-    return false;
+		 "Wrong format for camera file '%s'", fName);
+  iSector* s = 0;
+  IFFAIL (s = Sys->Engine->GetSectors ()->FindByName (sector_name))
+    Sys->Report (CS_REPORTER_SEVERITY_ERROR,
+		 "Sector `%s' in coordinate file does not "
+		 "exist in this map!", sector_name);
+  if (ok)
+  {
+    iCamera *c = Sys->view->GetCamera ();
+    c->SetSector (s);
+    c->SetMirrored ((bool)imirror);
+    c->GetTransform ().SetO2T (m);
+    c->GetTransform ().SetOrigin (v);
+    Sys->angle = angle;
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Camera loaded");
   }
-
-  iCamera *c = Sys->view->GetCamera ();
-  c->SetSector (s);
-  c->SetMirrored ((bool)imirror);
-  c->GetTransform ().SetO2T (m);
-  c->GetTransform ().SetOrigin (v);
+  SCF_DEC_REF (data);
+  delete[] sector_name;
   return true;
+#undef IFFAIL
 }
 
 void move_mesh (iMeshWrapper* sprite, iSector* where, csVector3 const& pos)
@@ -1143,7 +1142,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "coordload"))
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-    	"Loaded camera location from /temp/walktest.cam");
+    	"Loading camera location from /temp/walktest.cam");
     LoadCamera (Sys->myVFS, "/temp/walktest.cam");
   }
   else if (!strcasecmp (cmd, "plugins"))
