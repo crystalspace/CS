@@ -288,6 +288,54 @@ int csLightIterRenderStep::GetStepCount ()
   return steps.Length();
 }
 
+csPtr<iTextureHandle> csLightIterRenderStep::GetAttenuationTexture (
+  int attnType)
+{
+  if (!attTex.IsValid())
+  {
+  #define CS_ATTTABLE_SIZE	  128
+  #define CS_HALF_ATTTABLE_SIZE	  ((float)CS_ATTTABLE_SIZE/2.0f)
+
+    csRGBpixel *attenuationdata = 
+      new csRGBpixel[CS_ATTTABLE_SIZE * CS_ATTTABLE_SIZE * 4];
+    csRGBpixel* data = attenuationdata;
+    for (int y=0; y < CS_ATTTABLE_SIZE; y++)
+    {
+      for (int x=0; x < CS_ATTTABLE_SIZE; x++)
+      {
+	float yv = 3.0f * ((y + 0.5f)/CS_HALF_ATTTABLE_SIZE - 1.0f);
+	float xv = 3.0f * ((x + 0.5f)/CS_HALF_ATTTABLE_SIZE - 1.0f);
+	float i = exp (-0.7 * (xv*xv + yv*yv));
+	unsigned char v = i>1.0f ? 255 : QInt (i*255.99f);
+	(data++)->Set (v, v, v, v);
+      }
+    }
+
+    csRef<iImage> img = csPtr<iImage> (new csImageMemory (
+      CS_ATTTABLE_SIZE, CS_ATTTABLE_SIZE, attenuationdata, true, 
+      CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
+    csRef<iImageVector> imgvec = csPtr<iImageVector> (new csImageVector ());
+    imgvec->AddImage (img);
+    attTex = g3d->GetTextureManager()->RegisterTexture (
+	imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
+	iTextureHandle::CS_TEX_IMG_2D);
+    attTex->Prepare();
+  }
+  return csPtr<iTextureHandle> (attTex);
+}
+
+csPtr<iTextureHandle> csLightIterRenderStep::GetAttenuationTexture (
+  const csVector3& attnVec)
+{
+  if (attnVec.z != 0)
+    return GetAttenuationTexture (CS_ATTN_REALISTIC);
+  else if (attnVec.y != 0)
+    return GetAttenuationTexture (CS_ATTN_INVERSE);
+  else 
+    return GetAttenuationTexture (CS_ATTN_NONE);
+}
+
+
 //---------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE(csLightIterRenderStep::LightSVAccessor)					
@@ -330,7 +378,6 @@ void csLightIterRenderStep::LightSVAccessor::OnSectorChange (iLight* light,
 void csLightIterRenderStep::LightSVAccessor::OnRadiusChange (iLight* light, 
   float newradius)
 {
-  needUpdate = true;
 }
 
 void csLightIterRenderStep::LightSVAccessor::OnDestroy (iLight* light)
@@ -343,6 +390,7 @@ void csLightIterRenderStep::LightSVAccessor::OnAttenuationChange (
   iLight* light, int newatt)
 {
   needUpdate = true;
+  attnType = newatt;
 }
 
 void csLightIterRenderStep::LightSVAccessor::PreGetValue (
@@ -350,39 +398,16 @@ void csLightIterRenderStep::LightSVAccessor::PreGetValue (
 {
   if (needUpdate)
   {
-    CreateTexture ();
+    //CreateTexture ();
+    if (attnType == CS_ATTN_CLQ)
+    {
+      const csVector3& attnVec = light->GetAttenuationVector ();
+      attTex = parent->GetAttenuationTexture (attnVec);
+    }
+    else
+      attTex = parent->GetAttenuationTexture (attnType);
+
     needUpdate = false;
   }
   variable->SetValue (attTex);
-}
-
-void csLightIterRenderStep::LightSVAccessor::CreateTexture ()
-{
-#define CS_ATTTABLE_SIZE	  128
-#define CS_HALF_ATTTABLE_SIZE	  ((float)CS_ATTTABLE_SIZE/2.0f)
-
-  csRGBpixel *attenuationdata = 
-    new csRGBpixel[CS_ATTTABLE_SIZE * CS_ATTTABLE_SIZE * 4];
-  csRGBpixel* data = attenuationdata;
-  for (int y=0; y < CS_ATTTABLE_SIZE; y++)
-  {
-    for (int x=0; x < CS_ATTTABLE_SIZE; x++)
-    {
-      float yv = 3.0f * ((y + 0.5f)/CS_HALF_ATTTABLE_SIZE - 1.0f);
-      float xv = 3.0f * ((x + 0.5f)/CS_HALF_ATTTABLE_SIZE - 1.0f);
-      float i = exp (-0.7 * (xv*xv + yv*yv));
-      unsigned char v = i>1.0f ? 255 : QInt (i*255.99f);
-      (data++)->Set (v, v, v, v);
-    }
-  }
-
-  csRef<iImage> img = csPtr<iImage> (new csImageMemory (
-    CS_ATTTABLE_SIZE, CS_ATTTABLE_SIZE, attenuationdata, true, 
-    CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
-  csRef<iImageVector> imgvec = csPtr<iImageVector> (new csImageVector ());
-  imgvec->AddImage (img);
-  attTex = parent->g3d->GetTextureManager()->RegisterTexture (
-      imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
-      iTextureHandle::CS_TEX_IMG_2D);
-  attTex->Prepare();
 }

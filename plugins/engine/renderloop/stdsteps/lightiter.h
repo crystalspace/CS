@@ -91,10 +91,9 @@ private:
     csLightIterRenderStep* parent;
 
     csRef<iTextureHandle> attTex;
+    int attnType;
 
     bool needUpdate;
-
-    void CreateTexture ();
   public:
     SCF_DECLARE_IBASE;
 
@@ -110,8 +109,10 @@ private:
 
     virtual void PreGetValue (csShaderVariable *variable);
   };
+  friend class LightSVAccessor;
 
   csHash<LightSVAccessor*, iLight*> knownLights;
+  csRef<iTextureHandle> attTex;
 
   LightSVAccessor* GetLightAccessor (iLight* light);
 public:
@@ -128,6 +129,9 @@ public:
 
   virtual int AddStep (iRenderStep* step);
   virtual int GetStepCount ();
+
+  csPtr<iTextureHandle> GetAttenuationTexture (int attnType);
+  csPtr<iTextureHandle> GetAttenuationTexture (const csVector3& attnVec);
 };
 
 

@@ -38,5 +38,5 @@ public:
    *  location for temp files.
    */
   static const char* WriteMinidump (
-    PMINIDUMP_EXCEPTION_INFORMATION except = 0);
+    PMINIDUMP_EXCEPTION_INFORMATION except = 0, bool dumpHeap = false);
 };

@@ -43,8 +43,8 @@ protected:
   csGLShader_CG* shaderPlug;
 
   CGprogram program;
-  const char* cg_profile;
-  const char* entrypoint;
+  char* cg_profile;
+  char* entrypoint;
 
   bool validProgram;
 

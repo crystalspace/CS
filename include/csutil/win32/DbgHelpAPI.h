@@ -318,6 +318,70 @@ enum MINIDUMP_TYPE
   MiniDumpWithPrivateReadWriteMemory	  = 0x0200
 };
 
+enum MINIDUMP_STREAM_TYPE
+{
+  UnusedStream		   = 0, 
+  ReservedStream0	   = 1, 
+  ReservedStream1	   = 2, 
+  ThreadListStream	   = 3, 
+  ModuleListStream	   = 4, 
+  MemoryListStream	   = 5, 
+  ExceptionStream	   = 6, 
+  SystemInfoStream	   = 7, 
+  ThreadExListStream	   = 8, 
+  Memory64ListStream	   = 9, 
+  CommentStreamA	   = 10, 
+  CommentStreamW	   = 11, 
+  HandleDataStream	   = 12, 
+  FunctionTableStream	   = 13, 
+  UnloadedModuleListStream = 14, 
+  MiscInfoStream	   = 15, 
+  LastReservedStream = 0xffff
+};
+
+struct MINIDUMP_LOCATION_DESCRIPTOR 
+{  
+  uint32 DataSize;  
+  uint32 Rva;
+};
+
+struct MINIDUMP_MEMORY_DESCRIPTOR 
+{  
+  uint64 StartOfMemoryRange;  
+  MINIDUMP_LOCATION_DESCRIPTOR Memory;
+};
+typedef MINIDUMP_MEMORY_DESCRIPTOR* PMINIDUMP_MEMORY_DESCRIPTOR;
+
+struct MINIDUMP_MEMORY_LIST 
+{  
+  ULONG32 NumberOfMemoryRanges;  
+  /*MINIDUMP_MEMORY_DESCRIPTOR MemoryRanges[];*/
+};
+typedef MINIDUMP_MEMORY_LIST* PMINIDUMP_MEMORY_LIST;
+
+struct MINIDUMP_HEADER 
+{
+  ULONG32 Signature;
+  ULONG32 Version;
+  ULONG32 NumberOfStreams;
+  uint32 StreamDirectoryRva;
+  ULONG32 CheckSum;
+  union 
+  {
+    ULONG32 Reserved;
+    ULONG32 TimeDateStamp;
+  };
+  uint64 Flags;
+};
+typedef MINIDUMP_HEADER* PMINIDUMP_HEADER;
+
+struct MINIDUMP_DIRECTORY 
+{
+  ULONG32 StreamType;
+  MINIDUMP_LOCATION_DESCRIPTOR Location;
+};
+typedef MINIDUMP_DIRECTORY* PMINIDUMP_DIRECTORY;
+
 #define CS_API_NAME		DbgHelp
 #define CS_API_FUNCTIONS	"csutil/win32/DbgHelpAPI.fun"
 

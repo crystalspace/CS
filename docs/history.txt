@@ -87,6 +87,11 @@ chronological order.
 	    - Simplified and clarified the implementation of install.mak to
 	      some extent by introducing re-usable macros which do much of the
 	      difficult or dirty work.
+	- res augmented the win32 minidump facility to optionally include the
+	  heap in the dump.
+	- res slightly changed the way lightiter creates the attenuation 
+	  texture.
+	- res made some VC6 compile fixes.
 7-Apr-2004
 	- res added a small helper class to create minidumps on Win32.
 	- res augmented the Win32 assistant to allow user-defined exception
