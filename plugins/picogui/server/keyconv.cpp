@@ -31,7 +31,13 @@ int csPGKeyConverter::Codes [CSKEY_LAST - CSKEY_FIRST + 1];
 
 void csPGKeyConverter::Construct ()
 {
-  #define CHAR(CS, PG) Chars[CS] = (PG);
+  #ifdef CHAR
+  #undef CHAR
+  #endif
+  #ifdef CODE
+  #undef CODE
+  #endif
+  #define CHAR(CS, PG) Chars[(int) CS] = (PG);
   #define CODE(CS, PG) Codes[(CS) - CSKEY_FIRST] = (PG);
     #include "../keyconv.i"
   #undef CHAR
