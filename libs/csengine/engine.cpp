@@ -1398,7 +1398,7 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
       Report ("Time taken: %.4f seconds.", (float)(stop - start) / 1000.);
   }
 
-  if (do_relight)
+  if (do_relight && (lightcache_mode & CS_ENGINE_CACHE_WRITE))
   {
     Report ("Caching lighting (%d meshes).", num_meshes);
     if (meter)
@@ -1420,7 +1420,8 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
       iLightingInfo* linfo = s->GetLightingInfo ();
       if (linfo)
       {
-        if (do_relight) linfo->WriteToCache (cm);
+	if (do_relight && (lightcache_mode & CS_ENGINE_CACHE_WRITE))
+          linfo->WriteToCache (cm);
         linfo->PrepareLighting ();
       }
     }
@@ -1430,9 +1431,12 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
 
   csThing::current_light_frame_number++;
 
-  if (do_relight) Report ("Updating VFS....");
-  if (!VFS->Sync()) Warn ("Error updating lighttable cache!");
-  if (do_relight) Report ("DONE!");
+  if (do_relight && (lightcache_mode & CS_ENGINE_CACHE_WRITE))
+  {
+    Report ("Updating VFS....");
+    if (!VFS->Sync()) Warn ("Error updating lighttable cache!");
+    Report ("DONE!");
+  }
 }
 
 void csEngine::InvalidateLightmaps ()

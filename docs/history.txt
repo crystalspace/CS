@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+3-Dec-2002
+	- Fixed a bug in the engine where it would try to cache lightmaps
+	  even if CS_ENGINE_CACHE_WRITE was not set (but if
+	  CS_ENGINE_CACHE_NOUPDATE was not set).
 2-Dec-2002
 	- Moved the dynamic ambient functions from iThingState to
 	  iLightingInfo. That means dynamic ambient can now also be used
