@@ -64,7 +64,7 @@ Control the FOV (Field Of Vision) of the display in angles (degrees).
 
 @item cosfact
 Control the cosinus factor (default 0) used for lighting. For details,
-@xref{Config Lighting}.
+@xref{Config Engine}.
 
 @item p_alpha
 Change the alpha transparency for a selected portal. You can select a

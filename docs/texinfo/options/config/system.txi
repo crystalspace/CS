@@ -1,0 +1,89 @@
+@node Config System
+@subsection System Configuration
+@cindex Configuration, System
+
+This section describes how the system driver can be configured with the
+config file.
+
+All these options belong in the main config file for your application, for
+example @file{CS/data/config/cryst.cfg}.
+
+The most important part of the system configuration is the list of plug-in
+modules to load. A plug-in module is loaded with the following line:
+@example
+System.PlugIns.FuncID = PlugInName
+@end example
+@samp{System.PlugIns.} is obligatory and tells the system to load a plug-in
+now. The @samp{FuncID} (functionality identifier) defines the purpose the
+plug-in is used for. For example the functionality identifier
+@samp{VideoDriver} means that this plug-in is used for graphics output.
+@samp{VideoDriver} is one of the standardized identifiers; that's why all
+applications use this identifier to look for the module for graphics output.
+See below for a list of all standardized identifiers. Note that it is not
+possible to load more than one module with the same functionality identifier.
+
+Finally, @samp{PlugInName} determines which plug-in to load. It is the name
+of the plug-in under which it is known in the @sc{scf} registry. You can see
+a list of all plug-in modules in @file{CS/scf.cfg}. The plug-in you load here
+must be made for the purpose you try to use it for. For example, if you
+load the sound driver with the @samp{VideoDriver} functionality identifier,
+the application will not see the module at all and complain that you didn't
+load a graphics driver.
+
+Note that some modules depend on others. If module A depends on module B,
+then you must first load B, then A. If you don't do this then module A will
+usually fail to initialize.
+
+Here is an example of a line from the config file:
+@example
+System.PlugIns.VideoDriver = crystalspace.graphics3d.opengl
+@end example
+This line loads the module @samp{crystalspace.graphics3d.opengl} (the OpenGL
+graphics driver) and assigns it to the functionality identifier
+@samp{VideoDriver} (graphics output).
+
+Some functionality identifiers are standardized. This is useful whenever one
+module depends on another one. For example, the engine depends on the video
+driver. When the engine wants to access the video driver, it has to know the
+driver's functionality identifier. Currently this identifier is always
+@samp{VideoDriver}. In the future it will probably be possible to tell the
+engine which identifier to use, so the standardized identifiers will not be
+required anymore. The following identifiers are standardized:
+
+@table @code
+@item VFS
+The virtual file system. There is only one possible VFS plug-in, called
+@samp{crystalspace.kernel.vfs}.
+
+@item VideoDriver
+This loads the graphics driver. Possible values are:
+@table @code
+@item crystalspace.graphics3d.software
+Uses the system-specific 2D rasterizer to perform 3D graphics operations on
+the basis of drawing single pixels.
+
+@item crystalspace.graphics3d.software.offscreen
+This is a variant of the software renderer that renders to a buffer in memory,
+not to the screen.
+
+@item crystalspace.graphics3d.opengl
+Uses OpenGL for 3D output, and by this takes advantage of hardware
+acceleration. Requires installed OpenGL run-time libraries.
+
+@item crystalspace.graphics3d.direct3d.dx61
+Similar to the above. Requires installed DirectX 6.1 or higher run-time
+libraries.
+
+@item crystalspace.graphics3d.glide.2
+Uses Glide 2 for 3D output. Requires Glide 2 run-time libraries.
+
+@item crystalspace.graphics3d.glide.3
+Uses Glide 3 for 3D output. Requires Glide 3 run-time libraries.
+
+@item crystalspace.graphics3d.line
+This is a variant of the software renderer.
+@end table
+
+@item
+
+@end table

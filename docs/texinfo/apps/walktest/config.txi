@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @node Walktest Configuration, , Console, Walktest
-@subsection Keyboard Configuration
+@subsection Configuration File
 @cindex Walktest Configuration
 @cindex Configuration, Walktest
 
@@ -14,74 +14,80 @@ Options which are specific to Walktest and which may be specified in the
 configuration file are:
 
 @table @code
-@item [World] worldfile=<file>
+@item Walktest.Settings.WorldFile = <file>
 Select the map file to be loaded at startup.
 
-@item [Walktest] FPS=<yesno>
+@item Walktest.Settings.WorldZipType = <extension>
+The extension to use for archive files. This is required because Walktest
+tries to automatically mount unmounted world archives. Defaults to @samp{zip}.
+
+@item Walktest.Settings.FPS = <yes/no>
 Enable/disable the FPS counter (default is @samp{yes}). You can disable the
 FPS counter (frames per second) with this option. The FPS counter can also
 be enabled/disabled with the @code{-fps}/@code{-nofps} commandline options.
 
-@item [WalkTest] STATS=<yesno>
+@item Walktest.Settings.Stats = <yes/no>
 Enable/disable the statistics counter (default is @samp{no}). The
 statistics counter can also be enabled/disabled with the
 @code{-stats}/@code{-nostats} commandline options.
 
-@item [WalkTest] COLLDET=<yesno>
-Enable/disable the collision detection code which is based on the RAPID
-library. It is enabled by default (@samp{yes}) and can also be controled
-with the @code{-colldet}/@code{-nocolldet} commandline options or the
-@samp{colldet} console command.
-
-@item [WalkTest] DEBUG=<yesno>
+@item Walktest.Settings.Debug = <yesno>
 This option is off by default. With it you can enable debugging
 information. When this is on, there will be more information kept in
 @file{debug.txt} after a crash. Note that this feature only works on
 systems that can catch a crash (currently only Unix).
 
-@item [CD] JUMPSPEED=<value> (default 0.08)
+@item Walktest.Settings.CollDet = <yes/no>
+Enable/disable the collision detection code which is based on the RAPID
+library. It is enabled by default (@samp{yes}) and can also be controled
+with the @code{-colldet}/@code{-nocolldet} commandline options or the
+@samp{colldet} console command.
+
+@item Walktest.Settings.CollDetPlugIn = <plugin name>
+Set the plug-in module that is used for collision detection.
+
+@item Walktest.CollDet.JumpSpeed = <value> (default 0.08)
 Initial speed used to jump upwards.
 
-@item [CD] WALKACCELERATE=<value> (default 0.007)
+@item Walktest.CollDet.WalkAccelerate = <value> (default 0.01)
 Acceleration value for walking and strafing.
 
-@item [CD] WALKMAXSPEED=<value> (default 0.1)
+@item Walktest.CollDet.WalkMaxSpeed = <value> (default 0.05)
 Maximum speed for walking and strafing.
 
-@item [CD] WALKBRAKE=<value> (default 0.014)
+@item Walktest.CollDet.WalkBrake = <value> (default 0.02)
 Brake deceleration for walking and strafing.
 
-@item [CD] ROTATEACCELERATE=<value> (default 0.005)
+@item Walktest.CollDet.RotateAccelerate = <value> (default 0.005)
 Acceleration value for rotation.
 
-@item [CD] ROTATEMAXSPEED=<value> (default 0.03)
+@item Walktest.CollDet.RotateMaxSpeed = <value> (default 0.02)
 Maximum speed for rotation.
 
-@item [CD] ROTATEBRAKE=<value> (default 0.015)
+@item Walktest.CollDet.RotateBrake = <value> (default 0.01)
 Brake deceleration for rotation.
 
-@item [CD] LOOKACCELERATE=<value> (default 0.028)
+@item Walktest.CollDet.LookAccelerate = <value> (default 0.02)
 Acceleration value for looking up/down.
 
-@item [CD] BODYHEIGHT=<value> (default 1.4)
+@item Walktest.CollDet.BodyHeight = <value> (default 1)
 Height of the body.
 
-@item [CD] BODYWIDTH=<value> (default 0.5)
+@item Walktest.CollDet.BodyWidth = <value> (default 0.4)
 Width of the body.
 
-@item [CD] BODYDEPTH=<value> (default 0.5)
+@item Walktest.CollDet.BodyDepth = <value> (default 0.3)
 Depth of the body.
 
-@item [CD] EYEOFFSET=<value> (default -0.7)
+@item Walktest.CollDet.EyeOffset = <value> (default -0.7)
 Offset of the eye.
 
-@item [CD] LEGSWIDTH=<value> (default 0.4)
+@item Walktest.CollDet.LegsWidth = <value> (default 0.3)
 Width of the legs.
 
-@item [CD] LEGSDEPTH=<value> (default 0.4)
+@item Walktest.CollDet.LegsDepth = <value> (default 0.2)
 Depth of the legs.
 
-@item [CD] LEGSOFFSET=<value> (default -1.1)
+@item Walktest.CollDet.LegsOffset = <value> (default -1.5)
 Offset of the legs.
-
 @end table

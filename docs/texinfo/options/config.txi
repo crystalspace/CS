@@ -4,18 +4,56 @@
 @cindex Configuration File
 
 Most applications have an accompanying configuration file which describes
-configuration options particular to that application.  In other cases, a
-configuration file may be specific to a particular plug-in module or device
-driver.  Configuration files are named with the file extension @file{.cfg}
-and are typically located within the virtual directory @file{/config/} which
-is most usually mounted at the physical location @file{CS/data/config}.
+configuration options particular to that application. Similarly, most
+plug-in modules have have their config file. Configuration files are named
+with the file extension @file{.cfg} and are typically located within the
+virtual directory @file{/config/} which is most usually mounted at the
+physical location @file{CS/data/config}.
+
+@ignore
+This paragraph belongs to the config manager system which is not yet
+integrated with CS.
+
+When you run an application, all configuration files (those from the plug-in
+modules and the application-specific file) are combined to one big database
+of options. When this happens, options from the application-specific config
+file override options from the plug-in specific config files. Thus you can
+set any option in your application's config file to override options from the
+plug-in config files. When you change the configuration from within your
+application, the changes are always applied to the application-specific file.
+@end ignore
+
+The format of these files is simple. They consist of a number of @dfn{keys},
+each of which consists of a name, a value and an optional comment. Key names
+contain dots to create some kind of hierarchy, similar to a file system:
+@samp{Video.OpenGL.EnableDither}. This should be interpreted at the key
+@samp{EnableDither} in the sub-section @samp{OpenGL.}, which resides in
+section @samp{Video.} (note that the dots are part of the section names).
+
+The file itself looks like this:
+@example
+; This is the comment for Section.Keyname
+Section.Keyname = Value
+; Comments may be
+; several lines long
+; The option 'Section.TestOption' has no comment attached to it
+Video.OpenGL.EnableDither = true
+Section.TestOption = false
+; Comments at the end of the file do not belong to any config key. When a
+; config file is loaded and saved again later this end-of-file comment is put
+; back at the end of the config file.
+@end example
 
 @menu
-* Config Common:: Common Configuration Options
-* Config Soft3D TextureManager:: @code{[TextureManager]} section
-* Config SoundDriver:: @code{[SoundDriver]} section
+* Config System:: System Configuration
+* Config Graphics:: Graphics Configuration
+* Config Engine:: Engine Configuration
+* Config Sound:: Sound Configuration
+* Config Console:: Console Configuration
 @end menu
 
-@importss{options,config,common.txi}
-@importss{options,config,soft3d.txi}
-@importss{options,config,sndsoft.txi}
+@importss{options,config,system.txi}
+@importss{options,config,graphics.txi}
+@importss{options,config,engine.txi}
+@importss{options,config,sound.txi}
+@importss{options,config,console.txi}

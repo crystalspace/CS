@@ -1,26 +1,34 @@
-@c -*-texinfo-*-
-@node Config VideoDriver, Config Lighting, Config World, Config Common
-@subsubsection @code{[VideoDriver]} section
+@node Config Graphics
+@subsection Graphics Configuration
+@cindex Configuration, Graphics
+
+This section describes the configuration keys used by the graphics drivers.
+Note that most drivers also accept some additional options that are not
+listed here. These options are specific to single drivers. You can have a
+look at the config files for these drivers to find out which options exist.
+
+All these options belong in the main config file for your application, for
+example @file{CS/data/config/cryst.cfg}.
 
 @table @code
-@item Width=<width>
+@item Video.ScreenWidth = <width>
 The default width of the display. What the real default is is system
 dependent but often it is 320. The width and height can also be set with
 the @code{-mode} commandline option.
 
-@item Height=<height>
+@item Video.ScreenHeight = <height>
 The default height of the display. What the real default is is system
 dependent but often it is 200. The width and height can also be set with
 the @code{-mode} commandline option.
 
-@item Depth=<depth>
+@item Video.ScreenDepth = <depth>
 This option is for all ports of Crystal Space where it is possible to control
 the depth of the display from within Crystal Space itself (currently
 @sc{svgalib}, Windows (fullscreen), @sc{ggi}, @sc{os/2}, and @sc{djgpp} (with
 Allegro) support this option).  Use 8, 15, or 16 here (default is 8).  Note
-that 15 is not supported by the Windows version.  Note that the Windows version
-ignores the given depth if it is running in windowed mode.  Note also that
-there is also an equivalent commandline option -depth.
+that 15 is not supported by the Windows version.  Note that the Windows
+version ignores the given depth if it is running in windowed mode. Note also
+that there is also an equivalent commandline option -depth.
 
 Special note for the X11 version: normally the X11 version will also
 ignore the @code{-depth} commandline option as it will open a window to
@@ -29,7 +37,7 @@ it will simulate the given depth as well as possible. This is useful for
 debugging purposes (to see on an 8-bit display if a feature works in 16-bit
 mode as well without having to restart your server).
 
-@item XSHM=<yesno>
+@item Video.XSHM = <yes/no>
 This option is only for Crystal Space on the X window system. This option
 is @samp{yes} by default if enabled in the makefile (normally this is the
 case). This option enables the shared memory extension which makes Crystal
@@ -39,22 +47,22 @@ manually disable this option by setting it to @samp{no}. The shared memory
 extension can also be enabled/disabled with the @code{-shm}/@code{-noshm}
 commandline options.
 
-@item FullScreen=<yesno>
-This option is only for the Windows and @sc{os/2} versions of Crystal Space and
-is @samp{yes} by default.  It is used to set the Crystal Space window to
+@item Video.FullScreen = <yes/no>
+This option is only for the Windows and @sc{os/2} versions of Crystal Space
+and is @samp{yes} by default.  It is used to set the Crystal Space window to
 fullscreen.
 
-@item WINDOWX=<windowx>
+@item Video.WindowX = <windowx>
 For @sc{os/2} only.  Window X position relative to bottom-left corner
 (percentage of total screen size).
 
-@item WINDOWY=<windowy>
+@item Video.WindowY = <windowy>
 For @sc{os/2} only.  Window Y position relative to bottom-left corner
 (percentage of total screen size).
 
-@item WINDOWWIDTH=<width>
+@item Video.WindowW = <width>
 For @sc{os/2} only. Absolute window size (without frame and titlebar).
 
-@item WINDOWHEIGHT=<height>
+@item Video.WindowH = <height>
 For @sc{os/2} only. Absolute window size (without frame and titlebar).
 @end table

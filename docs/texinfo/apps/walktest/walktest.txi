@@ -13,7 +13,7 @@ it is not the best example in clean coding.
 @menu
 * Walktest Keyboard:: Keyboard Interface
 * Console:: The Console
-* Walktest Configuration:: Keyboard Configuration
+* Walktest Configuration:: Configuration File
 @end menu
 
 @importss{apps,walktest,keys.txi}

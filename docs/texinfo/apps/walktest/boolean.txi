@@ -37,14 +37,14 @@ if the program crashes provided your system can catch crashes).
 
 @item stats
 Enable/disable statistics display. Corresponds to
-@code{-stats}/@code{-nostats} commandline options and @samp{STATS}
-configuration option.  Note that enabling the statistics counter automatically
-disables the display of the coordinates.
+@code{-stats}/@code{-nostats} commandline options and
+@samp{Walktest.Settings.Stats} configuration option. Note that enabling the
+statistics counter automatically disables the display of the coordinates.
 
 @item fps
 Enable/disable @sc{fps} display (frames per second).  Corresponds to
-@code{-fps}/@code{-nofps} commandline options and @sc{fps} configuration
-option.
+@code{-fps}/@code{-nofps} commandline options and @samp{Walktest.Settings.FPS}
+configuration option.
 
 @item transp
 Enable/disable transparent/filtered/alpha drawing.
@@ -80,12 +80,14 @@ Toggle the display of things on/off (default on).
 
 @item ilace
 Toggle interlace on/off.  See the video driver configuration section for
-information about the @samp{INTERLACING} option.  @xref{Config VideoDriver}.
+information about the @samp{Video.Software.Interlacing} option in the config
+file for the software renderer, @file{CS/data/config/soft3d.cfg}.
 
 @item mmx
-Toggle @sc{mmx} support on/off.  This command corresponds with the @sc{mmx}
-configuration file option.  @xref{Config VideoDriver}.  Note that this command
-is only useful if you have a @sc{mmx} capable processor.
+Toggle @sc{mmx} support on/off.  This command corresponds with the
+@samp{Video.Software.MMX} option in the software graphics config file
+(@file{CS/data/config/soft3d.cfg}).  @xref{Config Graphics}.  Note that this
+command is only useful if you have a @sc{mmx} capable processor.
 
 @item zbuf
 For debugging. When enabled this will show an alternate view where far away
@@ -156,8 +158,8 @@ debugging.
 Change quality setting of sprite lighting.  If yes every vertex will be lit
 according to the correct distance with the light.  If no then the distances
 for all vertices are calculated to the center of the sprite.  Default is
-@samp{no}.  This option can also be set with the @samp{SPRITE_HIGHQUAL} option
-in the configuration file.
+@samp{no}.  This option can also be set with the
+@samp{Engine.Lighting.SpriteQuality} option in the configuration file.
 
 @item palette
 Toggle on/off displaying the palette on top of everything (just below the
