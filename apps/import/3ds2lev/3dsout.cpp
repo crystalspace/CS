@@ -248,6 +248,7 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
     // get the number of faces in the current mesh
     int numFaces = p3dsMesh->faces;
     Lib3dsFace *pCurFace = p3dsMesh->faceL;
+    Lib3dsTexel *pTexelList = p3dsMesh->texelL;
 
     // output faces
     for (i=0; i<numFaces; i++)
@@ -267,16 +268,15 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
 	             numMesh, i, pCurFace->points[0],
 		     pCurFace->points[1], pCurFace->points[2],
 	             lighting ? "" : " LIGHTING (no)");
-        Lib3dsTexel *pCurTexel = p3dsMesh->texelL;
-	if (pCurTexel)
+	if (pTexelList)
 	{
-          Lib3dsTexel *mapV0 = (Lib3dsTexel*)pCurTexel[pCurFace->points[0]];
+          Lib3dsTexel *mapV0 = (Lib3dsTexel*)pTexelList[pCurFace->points[0]];
 	  float u0 = mapV0[0][0];
 	  float v0 = mapV0[0][1];
-          Lib3dsTexel *mapV1 = (Lib3dsTexel*)pCurTexel[pCurFace->points[1]];
+          Lib3dsTexel *mapV1 = (Lib3dsTexel*)pTexelList[pCurFace->points[1]];
 	  float u1 = mapV1[0][0];
 	  float v1 = mapV1[0][1];
-          Lib3dsTexel *mapV2 = (Lib3dsTexel*)pCurTexel[pCurFace->points[2]];
+          Lib3dsTexel *mapV2 = (Lib3dsTexel*)pTexelList[pCurFace->points[2]];
 	  float u2 = mapV2[0][0];
 	  float v2 = mapV2[0][1];
           fprintf (o, "          TEXTURE (UV (0,%g,%g,1,%g,%g,2,%g,%g))\n",
