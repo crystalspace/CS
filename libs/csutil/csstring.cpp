@@ -144,16 +144,13 @@ csString &csString::Append (const char *iStr, size_t iCount)
     return *this;
   if (iCount == (size_t)-1)
     iCount = strlen (iStr);
-  if (iCount == 0)
-  {
-    // make sure string is correctly terminated
-    Data[Size]='\0';
-    return *this;
-  }
 
   size_t const NewSize = Size + iCount;
   SetCapacity (NewSize);
-  memcpy (Data + Size, iStr, iCount);
+  
+  if (iCount > 0)
+      memcpy (Data + Size, iStr, iCount);
+
   Size = NewSize;
   Data [Size] = '\0';
   return *this;
