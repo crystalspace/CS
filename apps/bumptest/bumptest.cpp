@@ -232,7 +232,9 @@ bool BumpTest::InitProcDemo ()
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), .5);
   */
 
+#if 0
   iSector* iroom = QUERY_INTERFACE (room, iSector);
+#endif
   iMeshWrapper* thing_wrap = engine->CreateMeshObject ("Bumpy");
   thing_obj->DecRef ();
 
@@ -411,10 +413,12 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
 
   walls_state->DecRef ();
 
+#if 0
   LevelLoader->LoadTexture ("flare_center", "/lib/std/snow.jpg");
   iMaterialWrapper* fmc = engine->FindMaterial ("flare_center");
   LevelLoader->LoadTexture ("flare_spark", "/lib/std/spark.png");
   iMaterialWrapper* fms = engine->FindMaterial ("flare_spark");
+#endif
 
   /*
   csStatLight* light;

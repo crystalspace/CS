@@ -16,6 +16,8 @@ The history order is reversed so that new features are at the top.
 	  inf_g3d.cpp regarding mismatch of printf() format directive and
 	  incoming argument.  The warnings were caused by different definitions
 	  of cs_time on various platforms.
+	- Eric Sunshine eliminated several compilation warnings in bmptest.cpp
+	  regarding unused variables.
 23-May-2001
 	- Added 'virtual' before the csView destructor and also fixed a
 	  warning in the csView constructor.
