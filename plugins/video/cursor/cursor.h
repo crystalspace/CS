@@ -1,4 +1,6 @@
 /*
+    Copyright (C)2003 by Neil Mosafi
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
     License as published by the Free Software Foundation; either
@@ -24,6 +26,7 @@
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
 #include "iutil/event.h"
+#include "csutil/csstring.h"
 #include "csutil/hash.h"
 #include "csutil/hashhandlers.h"
 #include "cstool/cspixmap.h"
@@ -38,8 +41,8 @@ struct iImageIO;
  * This class implements the iCursor interface and handles custom
  * pixmap cursors. Any number of cursors can be set and easily
  * switched between. You need to set a keycolor for your cursor and you can
- * optionally set alpha and foregound and background colors for monochrome
- * cursor systems
+ * optionally set transparency and foregound and background colors for
+ * monochrome cursor systems
  */
 class csCursor : public iCursor
 {
@@ -50,7 +53,7 @@ private:
     csPixmap *pixmap;
     csRef<iImage> image;
     csPoint hotspot;
-    uint8 alpha;
+    uint8 transparency;
     csRGBcolor keycolor, fg, bg;
 
     CursorInfo () : pixmap(0), image(0) {}
@@ -65,7 +68,7 @@ private:
   csHash<CursorInfo *, csStrKey, csConstCharHashKeyHandler> cursors;
   
   /// The currently selected cursor
-  const char *current;
+  csString current;
 
   /// Is the plugin is active (e.g. has Setup() has been called)
   bool isActive;
@@ -99,21 +102,21 @@ public:
   virtual ~csCursor ();
 
   /// Sets up cursors for display on the graphics context
-  virtual bool Setup (iGraphics3D *ig3d, bool forceEmulation);
+  virtual bool Setup (iGraphics3D *ig3d, bool ForceEmulation);
 
   /// Load cursors from a config file in VFS
   virtual bool ParseConfigFile (const char *iFile);
 
   /// Adds or replaces a cursor based on the name
   virtual void SetCursor (const char *name, iImage *image, csRGBcolor key,
-                          csPoint hotspot, uint8 alpha,
+                          csPoint hotspot, uint8 transparency,
                           csRGBcolor fg, csRGBcolor bg);
   /// Sets the hotspot (center) of a cursor
-  virtual void SetHotspot (const char *name, csPoint hotspot);
-  /// Sets alpha transparency of cursor
-  virtual void SetAlpha (const char *name, uint8 alpha);
+  virtual void SetHotSpot (const char *name, csPoint hotspot);
+  /// Sets transparency transparency of cursor
+  virtual void SetTransparency (const char *name, uint8 transparency);
   /// Set the key colour of a cursor
-  virtual void SetKeyColor (const char *name, csRGBcolor col);
+  virtual void SetKeyColor (const char *name, csRGBcolor);
   /**
    * Set the foreground and background colors to be used if the OS only
    * only supports monochrome cursors
@@ -121,11 +124,11 @@ public:
   virtual void SetColor (const char *name, csRGBcolor fg, csRGBcolor bg);
 
   /// Get cursor image of the specified cursor
-  virtual const csRef<iImage> GetCursorImage (const char *name) const;
+  virtual csRef<iImage> GetCursorImage (const char *name) const;
   /// Get the hotspot (center) of the specified cursor on the pixmap.
-  virtual csPoint GetHotspot (const char *name) const;
-  /// Get the alpha transparency of the specified cursor.  
-  virtual uint8 GetAlpha (const char *name) const;
+  virtual csPoint GetHotSpot (const char *name) const;
+  /// Get the transparency transparency of the specified cursor.  
+  virtual uint8 GetTransparency (const char *name) const;
   /// Get key colour of the specified cursor.
   virtual csRGBcolor GetKeyColor (const char *name) const;
   /**

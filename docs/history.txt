@@ -19,6 +19,15 @@ chronological order.
 	- Anders Stenberg fixed a bug in windows threading, where a
 	  semaphore "LockWait" would return instantly due to wrong
 	  usage of the timeout value.
+	- Eric Sunshine upgraded the iCursor documentation and interface so
+	  that it uses the term "transparency" rather than "alpha" (since
+	  "alpha" was misleading), and also indicates the range of transparency
+	  values and their meanings.  Also cleaned up some other anomalies in
+	  the interface.
+	- Eric Sunshine fixed a potential crasher in
+	  csRenderMeshHolderMultiple::GetUnusedMeshes() where it blindly
+	  accessed element zero of the renderMeshes[] array without checking if
+	  the array contained any elements.
 22-Mar-2004
 	- Anders Stenberg fixed several places where mesh objects would
 	  return "false" from GetRenderMeshes (which is supposed to return

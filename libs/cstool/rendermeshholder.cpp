@@ -97,7 +97,6 @@ csRenderMeshHolderMultiple::GetUnusedMeshes()
     for(int i = 0; i < rmHolderList.Length(); i++)
     {
       rmH = rmHolderList[i];
-      csRenderMesh *m = rmH->renderMeshes[0];
       if ((rmH->renderMeshes.Length() == 0) || !rmH->renderMeshes[0]->inUse)
       {
         rmHolderListIndex = i;

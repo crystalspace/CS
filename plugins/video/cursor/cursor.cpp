@@ -1,4 +1,6 @@
 /*
+    Copyright (C)2003 by Neil Mosafi
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
     License as published by the Free Software Foundation; either
@@ -50,15 +52,12 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 // String to define our SCF name - only used when reporting 
 static const char * const CURSOR_SCF_NAME = "crystalspace.graphic.cursor";
 
-csCursor::csCursor (iBase *parent)
+csCursor::csCursor (iBase *parent) :
+  reg(0), isActive(false), useOS(false), checkedOSsupport(false)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
-
-  isActive = false;
-  checkedOSsupport = false;
-  useOS = false;
 }
 
 csCursor::~csCursor ()
@@ -74,15 +73,15 @@ bool csCursor::Initialize (iObjectRegistry *objreg)
 {
   reg = objreg;
 
+  // Get image IO
+  io = CS_QUERY_REGISTRY (reg, iImageIO);
+  if (!io) return false;
+
   // Get event queue
   eventq = CS_QUERY_REGISTRY (reg, iEventQueue);
   if (!eventq) return false;
   eventq->RegisterListener (&scfiEventHandler, 
                             CSMASK_Mouse | CSMASK_FrameProcess);
-
-  // Get image IO
-  io = CS_QUERY_REGISTRY (reg, iImageIO);
-  if (!io) return false;
 
   return true;
 }
@@ -94,7 +93,6 @@ bool csCursor::ParseConfigFile (const char *iFile)
       return false;
 
   csConfigAccess ini (reg, iFile);
-  //csRef<iConfigManager> ini (CS_QUERY_REGISTRY (reg, iConfigManager));
 
   const char *dir = ini->GetStr ("CursorSystem.General.Directory");
 
@@ -150,7 +148,7 @@ bool csCursor::ParseConfigFile (const char *iFile)
       {
         csReport (reg, CS_REPORTER_SEVERITY_WARNING, CURSOR_SCF_NAME,
                   "Could not open cursor file %s, ignoring cursor %s",
-              img, name.GetData());
+                  img, name.GetData());
         
         ignorelist.Push (name);
         continue;
@@ -161,7 +159,7 @@ bool csCursor::ParseConfigFile (const char *iFile)
       {
         csReport (reg, CS_REPORTER_SEVERITY_WARNING, CURSOR_SCF_NAME,
                   "Could not create cs image for cursor %s, ignoring",
-              name.GetData());
+                  name.GetData());
         
         ignorelist.Push(name);
         continue;
@@ -169,7 +167,7 @@ bool csCursor::ParseConfigFile (const char *iFile)
 
       // Key color
       sscanf (ini->GetStr (csString(prefix).Append(name).Append(".keycolor")),
-          "%d,%d,%d", &x, &y, &z);
+        "%d,%d,%d", &x, &y, &z);
       csRGBcolor keycolor (x, y, z);
 
       // Hotspot
@@ -178,8 +176,8 @@ bool csCursor::ParseConfigFile (const char *iFile)
       csPoint hotspot (x, y);
 
       // Alpha
-      uint8 alpha =
-        ini->GetInt (csString(prefix).Append(name).Append(".alpha"), 0);
+      uint8 transparency =
+        ini->GetInt (csString(prefix).Append(name).Append(".transparency"), 0);
 
       // Foreground default
       sscanf (ini->GetStr (csString(prefix).Append(name).Append(".mono_fg"),
@@ -192,7 +190,7 @@ bool csCursor::ParseConfigFile (const char *iFile)
       csRGBcolor bg (x, y, z);
 
       // Create the cursor
-      SetCursor (name, image, keycolor, hotspot, alpha, fg, bg);
+      SetCursor (name, image, keycolor, hotspot, transparency, fg, bg);
     }
   }
     
@@ -213,7 +211,7 @@ bool csCursor::HandleEvent (iEvent &ev)
   {
     if (ev.Type == csevBroadcast && ev.Command.Code == cscmdPostProcess)
     {
-      CursorInfo* ci = cursors.Get (current, 0);
+      CursorInfo* ci = cursors.Get (current.GetData(), 0);
       if (!ci)
         return false;
 
@@ -222,7 +220,8 @@ bool csCursor::HandleEvent (iEvent &ev)
       csRef<iMouseDriver> mouse = CS_QUERY_REGISTRY (reg, iMouseDriver);
 
       ci->pixmap->Draw (g3d, mouse->GetLastX() - ci->hotspot.x, 
-                             mouse->GetLastY() - ci->hotspot.y, ci->alpha);
+                             mouse->GetLastY() - ci->hotspot.y,
+			     ci->transparency);
       return false;
     }
   }
@@ -259,7 +258,8 @@ bool csCursor::Setup (iGraphics3D *ig3d, bool forceEmulation)
   }
 
   // We set up so let's become active
-  return (isActive = true);
+  isActive = true;
+  return true;
 }
 
 // Switches to named cursor
@@ -294,19 +294,18 @@ bool csCursor::SwitchCursor (const char *name)
                                   ci->hotspot.y, ci->fg, ci->bg);
 
   current = name;
-
   return true;
 }
 
 // Uses a hashmap to store named cursors
 void csCursor::SetCursor (const char *name, iImage *image, csRGBcolor key,
-                          csPoint hotspot, uint8 alpha, 
+                          csPoint hotspot, uint8 transparency, 
                           csRGBcolor fg, csRGBcolor bg)
 {
   // Set up structure
   CursorInfo *ci = new CursorInfo;
   ci->image = image;
-  ci->alpha = alpha;
+  ci->transparency = transparency;
   ci->keycolor = key;
   ci->hotspot = hotspot;
   ci->fg = fg;
@@ -347,23 +346,23 @@ void csCursor::SetCursor (const char *name, iImage *image, csRGBcolor key,
   cursors.Put (name, ci);
 }
 
-void csCursor::SetHotspot (const char *name, csPoint hotspot)
+void csCursor::SetHotSpot (const char *name, csPoint hotspot)
 {
   CursorInfo *ci = cursors.Get (name, 0);
   if (ci)
   {
-    SetCursor (name, ci->image, ci->keycolor, hotspot, ci->alpha, 
+    SetCursor (name, ci->image, ci->keycolor, hotspot, ci->transparency, 
                ci->fg, ci->bg);
     delete ci;
   }
 }
 
-void csCursor::SetAlpha (const char *name, uint8 alpha)
+void csCursor::SetTransparency (const char *name, uint8 transparency)
 {
   CursorInfo *ci = cursors.Get (name, 0);
   if (ci)
   {
-    SetCursor (name, ci->image, ci->keycolor, ci->hotspot, alpha,
+    SetCursor (name, ci->image, ci->keycolor, ci->hotspot, transparency,
                ci->fg, ci->bg);
     delete ci;
   }
@@ -374,7 +373,8 @@ void csCursor::SetKeyColor (const char *name, csRGBcolor color)
   CursorInfo *ci = cursors.Get (name, 0);
   if (ci)
   {
-    SetCursor (name, ci->image, color, ci->hotspot, ci->alpha, ci->fg, ci->bg);
+    SetCursor (name, ci->image, color, ci->hotspot, ci->transparency,
+      ci->fg, ci->bg);
     delete ci;
   }
 }
@@ -384,13 +384,13 @@ void csCursor::SetColor (const char *name, csRGBcolor fg, csRGBcolor bg)
   CursorInfo *ci = cursors.Get (name, 0);
   if (ci)
   {
-    SetCursor (name, ci->image, ci->keycolor, ci->hotspot, ci->alpha,
+    SetCursor (name, ci->image, ci->keycolor, ci->hotspot, ci->transparency,
                fg, bg);
     delete ci;
   }
 } 
 
-const csRef<iImage> csCursor::GetCursorImage (const char *name) const
+csRef<iImage> csCursor::GetCursorImage (const char *name) const
 {
   CursorInfo *ci = cursors.Get (name, 0);
   if (ci) return ci->image;
@@ -398,7 +398,7 @@ const csRef<iImage> csCursor::GetCursorImage (const char *name) const
   return 0;
 }
 
-csPoint csCursor::GetHotspot (const char *name) const
+csPoint csCursor::GetHotSpot (const char *name) const
 {
   CursorInfo *ci = cursors.Get (name, 0);
   if (ci) return ci->hotspot;
@@ -406,10 +406,10 @@ csPoint csCursor::GetHotspot (const char *name) const
   return csPoint (0,0);
 }
 
-uint8 csCursor::GetAlpha (const char *name) const
+uint8 csCursor::GetTransparency (const char *name) const
 {
   CursorInfo *ci = cursors.Get (name, 0);
-  if (ci) return ci->alpha;
+  if (ci) return ci->transparency;
 
   return 0;
 }
