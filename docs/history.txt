@@ -5,6 +5,21 @@ The history order is reversed so that new features are at the top.
 	  sector, position upward vector and forward vector.
 	- Philip Wyett fixed Michaels change by adding missing 'const' from
 	  GetSector().
+	- Wouter Wijngaards did the following:
+	  Fixed the shell detection on win32gcc. It was broken.
+	  Both Erics and Philips changes were not correct :-). Though I
+	  like the new win32conf.mak in bin, this file is used instead of
+	  the Makefile still. 
+	    - Copied some settings from the main Makefile so the same
+	      conditions are applied in the win32conf.mak. 
+	    - In win32conf.mak >> is used instead of >. 
+	    - Removed the $" from the testecho in win32conf.bat
+	    - The cat conftest.1 and cat conftest.2 statements I have left
+	      removed. They seem unneccesary now. If later, some glitches
+	      arise (probably due to weirdness in cmd.exe), these statements
+	      may need to return in order to fix.
+	  Detecting the difference between cmd.exe and some fancy shell is a
+	  matter of fine detail.
 28-May-2001
 	- Fixed all the plugins makefiles so that they now have an additional
 	  CSUTIL in their link line. This satisfies one-pass linkers after
