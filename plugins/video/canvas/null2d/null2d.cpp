@@ -79,6 +79,7 @@ bool csGraphics2DNull::BeginDraw()
 
 void csGraphics2DNull::FinishDraw()
 {
+    csGraphics2D::FinishDraw();
 }
 
 void csGraphics2DNull::Print(csRect*)

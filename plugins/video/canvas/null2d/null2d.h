@@ -43,6 +43,36 @@ public:
 
   virtual bool SetMousePosition (int , int );
   virtual bool SetMouseCursor (csMouseCursorID iShape);
+
+  /// Clear backbuffer
+  virtual void Clear (int )
+  { }
+  /// Clear all video pages
+  virtual void ClearAll (int)
+  { }
+
+  /// Same but exposed through iGraphics2D interface
+  virtual void DrawPixel (int , int , int )
+  { }
+  virtual void DrawPixels (csPixelCoord* , int , int )
+  { }
+  /// Blit a memory block. The format of the image is RGBA in bytes. Row by row.
+  virtual void Blit (int , int , int , int ,unsigned char* )
+  { }
+  /// Draw a line
+  virtual void DrawLine (float , float , float , float , int )
+  { }
+  /// Draw a box of given width and height
+  virtual void DrawBox (int , int , int , int , int )
+  { }
+ 
+  virtual void Write (iFont*, int, int, int, int, const char*)
+  { }
+  virtual void WriteBaseline (iFont* , int, int, int, int, const char*)
+  { }
+
+  virtual unsigned char* GetPixelAt (int, int)
+  { return NULL; }
 };
 
 #endif // __CS_NULL2D_H__
