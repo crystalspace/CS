@@ -24,16 +24,28 @@
 struct iModelData;
 struct iDataBuffer;
 
+struct csModelConverterFormat
+{
+  /// Name of this format
+  char *Name;
+  /// Can this format be loaded ?
+  bool CanLoad;
+  /// Can this format be saved ?
+  bool CanSave;
+
+  // information about supported features of the loader may be added here.
+  // A is supported only if the format *and* the loader support it,
+  // unsupported otherwise.
+};
+
 SCF_VERSION (iModelConverter, 0, 0, 1);
 
 struct iModelConverter : public iBase
 {
   /// Return the number of supported formats
-  virtual int GetFormatCount () = 0;
+  virtual int GetFormatCount () const = 0;
   /// Return the description of a supported format
-  virtual const char *GetFormat (int idx) = 0;
-  /// Check whether the given format is supported
-  virtual bool SupportsFormat (const char *Format) = 0;
+  virtual const csModelConverterFormat *GetFormat (int idx) const = 0;
 
   /// Read a model file
   virtual iModelData* Load (UByte* Buffer, ULong Size) = 0;

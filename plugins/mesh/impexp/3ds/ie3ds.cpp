@@ -43,9 +43,6 @@
 #include "lib3ds/node.h"
 #include "lib3ds/vector.h"
 
-#define NUM_FORMATS 1
-#define SUPPORTED_FORMATS "3ds"
-
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE( csModelConverter3ds )
@@ -125,41 +122,32 @@ csModelConverter3ds::csModelConverter3ds( iBase *pBase )
 {
   SCF_CONSTRUCT_IBASE( pBase );
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugin);
+
+  FormatInfo.Name = "3ds";
+  FormatInfo.CanLoad = true;
+  FormatInfo.CanSave = false;
 }
 
 csModelConverter3ds::~csModelConverter3ds ()
 {
-
-  delete supportedFormats;
 }
 
 bool csModelConverter3ds::Initialize( iObjectRegistry * )
 {
-  supportedFormats = new char( strlen( SUPPORTED_FORMATS ) );
-  strcpy( supportedFormats, SUPPORTED_FORMATS );
-
   return true;
 }
 
-int csModelConverter3ds::GetFormatCount()
+int csModelConverter3ds::GetFormatCount() const
 {
-  return NUM_FORMATS;
+  return 1;
 }
 
-const char *csModelConverter3ds::GetFormat( int idx )
+const csModelConverterFormat *csModelConverter3ds::GetFormat( int idx ) const
 {
   if( idx == 0 )
-    return supportedFormats;
+    return &FormatInfo;
   else
     return NULL;
-}
-
-bool csModelConverter3ds::SupportsFormat( const char *formatExt )
-{
-  if( strcmp( supportedFormats, formatExt ) )
-    return true;
-  else
-    return false;
 }
 
 iModelData *csModelConverter3ds::Load( UByte* buffer, ULong size )

@@ -36,6 +36,7 @@
 #include "cstool/keyval.h"
 #include "cstool/collider.h"
 #include "cstool/cspixmap.h"
+#include "cstool/mdltool.h"
 #include "qint.h"
 #include "isound/handle.h"
 #include "isound/source.h"
@@ -44,6 +45,9 @@
 #include "isound/renderer.h"
 #include "isound/wrapper.h"
 #include "imesh/skeleton.h"
+#include "imesh/mdlconv.h"
+#include "imesh/mdldata.h"
+#include "imesh/crossbld.h"
 #include "iengine/skelbone.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
@@ -304,25 +308,46 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
 
   // read in the model file
   converter * filedata = new converter;
-  if (filedata->ivcon (filename, true, false, NULL, Sys->myVFS) == ERROR)
-  {
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+  if (filedata->ivcon (filename, true, false, NULL, Sys->myVFS) != ERROR) {
+    // convert data from the 'filedata' structure into a CS sprite template
+    csCrossBuild_SpriteTemplateFactory builder (Sys->object_reg);
+    iMeshObjectFactory *result = (iMeshObjectFactory *)builder.CrossBuild (*filedata);
+
+    // Add this sprite template to the engine.
+    iSprite3DFactoryState* fstate = SCF_QUERY_INTERFACE (result, iSprite3DFactoryState);
+    fstate->SetMaterialWrapper (Sys->Engine->FindMaterial (txtname));
+    fstate->DecRef ();
+    Sys->Engine->CreateMeshFactory (result, templatename);
+  } else {
+    iDataBuffer *buf = Sys->myVFS->ReadFile (filename);
+    if (!buf)
+    {
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
     	"There was an error reading the data!");
-    delete filedata;
-    return;
+      delete filedata;
+      return;
+    }
+
+    iModelData *Model = Sys->ModelConverter->Load (buf->GetUint8 (), buf->GetSize ());
+    buf->DecRef ();
+    if (!Model)
+    {
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"There was an error reading the data!");
+      delete filedata;
+      return;
+    }
+
+    csModelDataTools::SplitObjectsByMaterial (Model);
+    csModelDataTools::MergeObjects (Model, false);
+    iMeshFactoryWrapper *wrap =
+      Sys->CrossBuilder->BuildSpriteFactoryHierarchy (Model, Sys->Engine,
+      Sys->Engine->FindMaterial (txtname));
+    Model->DecRef ();
+    wrap->QueryObject ()->SetName (templatename);
   }
 
-  // convert data from the 'filedata' structure into a CS sprite template
-  csCrossBuild_SpriteTemplateFactory builder (Sys->object_reg);
-  iMeshObjectFactory *result = (iMeshObjectFactory *)builder.CrossBuild (*filedata);
   delete filedata;
-
-  // Add this sprite template to the engine.
-  iSprite3DFactoryState* fstate = SCF_QUERY_INTERFACE (result, iSprite3DFactoryState);
-  fstate->SetMaterialWrapper (Sys->Engine->FindMaterial (txtname));
-  fstate->DecRef ();
-
-  Sys->Engine->CreateMeshFactory (result, templatename);
 }
 
 iMeshWrapper* add_meshobj (char* tname, char* sname, iSector* where,

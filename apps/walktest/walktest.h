@@ -57,6 +57,8 @@ struct iPolygon3D;
 struct iView;
 struct iSoundRender;
 struct iMotionManager;
+struct iModelConverter;
+struct iCrossBuilder;
 
 // type information
 
@@ -283,6 +285,9 @@ public:
   iEngine *Engine;
   /// The level loader
   iLoader *LevelLoader;
+  /// The model importer and crossbuilder
+  iModelConverter *ModelConverter;
+  iCrossBuilder *CrossBuilder;
   ///
   iGraphics2D *myG2D;
   iGraphics3D *myG3D;

@@ -30,14 +30,14 @@
 #define MY_CLASSNAME	"crystalspace.modelconverter.multiplexer"
 
 CS_DECLARE_TYPED_VECTOR_NODELETE (csModelConverterVector, iModelConverter);
-CS_DECLARE_TYPED_VECTOR_NODELETE (csStringVector, csString);
+CS_DECLARE_TYPED_VECTOR_NODELETE (csModelConverterFormatVector, const csModelConverterFormat);
 
 class csModelConverterMultiplexer : iModelConverter
 {
 public:
   SCF_DECLARE_IBASE;
   csModelConverterVector Converters;
-  csStringVector Formats;
+  csModelConverterFormatVector Formats;
 
   /// constructor
   csModelConverterMultiplexer (iBase *p);
@@ -46,9 +46,8 @@ public:
   virtual ~csModelConverterMultiplexer ();
 
   bool Initialize (iObjectRegistry *object_reg);
-  virtual int GetFormatCount ();
-  virtual const char *GetFormat (int idx);
-  virtual bool SupportsFormat (const char *Format);
+  virtual int GetFormatCount () const;
+  virtual const csModelConverterFormat *GetFormat (int idx) const;
   virtual iModelData *Load (UByte* Buffer, ULong Size);
   virtual iDataBuffer *Save (iModelData*, const char *Format);
 
@@ -86,11 +85,7 @@ csModelConverterMultiplexer::csModelConverterMultiplexer (iBase *p)
 
 csModelConverterMultiplexer::~csModelConverterMultiplexer ()
 {
-  while (Formats.Length () > 0)
-  {
-    csString *str = Formats.Pop ();
-    delete str;
-  }
+  // don't delete the elements of the 'formats' vector. We don't own them!
 
   while (Converters.Length () > 0)
   {
@@ -122,28 +117,20 @@ bool csModelConverterMultiplexer::Initialize (iObjectRegistry *object_reg)
   {
     iModelConverter *mconv = Converters.Get(i);
     for (int j=0; j<mconv->GetFormatCount (); j++)
-      Formats.Push (new csString (mconv->GetFormat (j)));
+      Formats.Push (mconv->GetFormat (j));
   }
 
   return true;
 }
 
-int csModelConverterMultiplexer::GetFormatCount ()
+int csModelConverterMultiplexer::GetFormatCount () const
 {
   return Formats.Length ();
 }
 
-const char *csModelConverterMultiplexer::GetFormat (int idx)
+const csModelConverterFormat *csModelConverterMultiplexer::GetFormat (int idx) const
 {
-  return Formats.Get (idx)->GetData ();
-}
-
-bool csModelConverterMultiplexer::SupportsFormat (const char *Format)
-{
-  for (int i=0; i<Formats.Length (); i++)
-    if (!strcmp(Formats.Get(i)->GetData (), Format))
-      return true;
-  return false;
+  return Formats.Get (idx);
 }
 
 iModelData *csModelConverterMultiplexer::Load (UByte* Buffer, ULong Size)
@@ -156,7 +143,7 @@ iModelData *csModelConverterMultiplexer::Load (UByte* Buffer, ULong Size)
   return NULL;
 }
 
-iDataBuffer *csModelConverterMultiplexer::Save (iModelData*mdl, const char *Format)
+iDataBuffer *csModelConverterMultiplexer::Save (iModelData *mdl, const char *Format)
 {
   for (int i=0; i<Converters.Length (); i++)
   {
@@ -165,4 +152,3 @@ iDataBuffer *csModelConverterMultiplexer::Save (iModelData*mdl, const char *Form
   }
   return NULL;
 }
-

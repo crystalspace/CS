@@ -28,8 +28,7 @@ class csModelConverter3ds : iModelConverter
 private:
   iObjectRegistry *object_reg;
   iModelData *pModelData;
-
-  char *supportedFormats;
+  csModelConverterFormat FormatInfo;
 
 //  bool LoadCameraData( iCamera *pCSCamera, Lib3dsCamera *p3dsCamera );
 //  bool LoadLightData( iLight *pCSight, Lib3dsLight *p3dsLight );
@@ -48,9 +47,8 @@ public:
   ~csModelConverter3ds();
 
   bool Initialize( iObjectRegistry *object_reg );
-  virtual int GetFormatCount();
-  virtual const char *GetFormat( int idx );
-  virtual bool SupportsFormat( const char *Format );
+  virtual int GetFormatCount() const;
+  virtual const csModelConverterFormat *GetFormat( int idx ) const;
   virtual iModelData *Load( UByte* Buffer, ULong size );
   virtual iDataBuffer *Save( iModelData*, const char *format );
 

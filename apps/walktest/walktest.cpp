@@ -65,6 +65,8 @@
 #include "isound/wrapper.h"
 #include "imesh/terrfunc.h"
 #include "imesh/object.h"
+#include "imesh/mdlconv.h"
+#include "imesh/crossbld.h"
 #include "iengine/movable.h"
 #include "iengine/campos.h"
 
@@ -112,6 +114,8 @@ WalkTest::WalkTest () :
   cslogo = NULL;
   Engine = NULL;
   LevelLoader = NULL;
+  ModelConverter = NULL;
+  CrossBuilder = NULL;
   anim_sky = NULL;
   anim_dirlight = NULL;
   anim_dynlight = NULL;
@@ -1270,14 +1274,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   cfg_legs_depth = cfg->GetFloat ("Walktest.CollDet.LegsDepth", 0.4);
   cfg_legs_offset = cfg->GetFloat ("Walktest.CollDet.LegsOffset", -1.1);
 
-  //--- create the converter class for testing
-  ImportExport = new converter();
-  // process import/export files from config and print log for testing
-  ImportExport->ProcessConfig (cfg);
-  // free memory - delete this if you want to use the data in the buffer
-  delete ImportExport;
-  //--- end converter test
-
 #ifdef CS_DEBUG
   // enable all kinds of useful FPU exceptions on a x86
   // note that we can't do it above since at least on OS/2 each dynamic
@@ -1323,6 +1319,22 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   if (!LevelLoader)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No level loader plugin!");
+    return false;
+  }
+
+  // Find the model converter plugin
+  ModelConverter = CS_QUERY_PLUGIN (plugin_mgr, iModelConverter);
+  if (!ModelConverter)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "No model converter plugin!");
+    return false;
+  }
+
+  // Find the model crossbuilder plugin
+  CrossBuilder = CS_QUERY_PLUGIN (plugin_mgr, iCrossBuilder);
+  if (!CrossBuilder)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "No model crossbuilder plugin!");
     return false;
   }
 
