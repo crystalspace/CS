@@ -41,7 +41,6 @@ Crystal Space supports.
 * MeshObject Haze:: Haze Mesh Object
 * MeshObject TerrFunc:: Terrain Mesh Object
 * MeshObject Thing:: Thing Mesh Object
-* MeshObject Metaball:: Metaball Mesh Object
 @end menu
 
 @importss{plugins,meshobj,concepts.txi}
