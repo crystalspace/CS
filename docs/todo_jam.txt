@@ -1,0 +1,45 @@
+This is a list of things which should be solved in the jam based buildsystem.
+
+H - High Prioriy (important showstopper)
+M - Medium Priority
+L - Low Priority (only minor function loss)
+W - Wishlist (the build also works without this feature)
+
+[L] Improve hanlding of rc files on win32. jam should now about them and you
+    should be able to specify them like normal source files. (Caveats:
+    mingw/cygwin only allow 1 rc file per plugin/application, creating a
+    correct version resource file is hard when doing it purely in jam, but I
+    don't want to rely on external shell scripts)
+[H] external projects on win32 and macosx shouldn't fail. The problem here is
+    that the shell scripts in libs/cssys/win32 and libs/cssys/macosx aren't
+    there in external projects. Should we collect scripts which are used by
+    the build system or should we try to avoid these in the jambuild (these 2
+    scripts can probably be solved by improving the jamrules)
+[L] MacOSX rules should be aware of the struture of an application wrapper
+    instead of using external shell scripts for generating them. Probably we
+    also want some rules to add additional stuff into the application wrappers.
+[L] rework static plugin linking: This should not be a mode, and the
+    intelligence should not be globally put into the Application and Plugin
+    rules. Rather the Plugin rules should create a 2nd target where they
+    compile into a static library instead of a dynamic plugin. For linking
+    static application you should have to use a 2nd rule where you have to
+    specify which plugins you want to have linked into the application.
+[W] Create templates for some IDEs. Generating a template for kdevelop3.x is
+    very easy in theory but not possible at the moment, because kdevelop is only
+    able to handle make as build tool. I already filled a featurerequest
+    in the kdevelop bugtracker.
+[W] It would be nice to have the configure files regenerated and execute if the
+    configure.ac file has changed. Unfortunately it is not possible to force jam
+    to reread it's config files, so this isn't 100% possible...
+[H] The jobber scripts on sourceforge should use the Jamrules.
+[H] The msvc generation rules aren't tested on msvc yet.
+[M] Try if there's a way to create some suitable msvc templates for external
+    proejcts, so that we autogenrate msvc-makefiles there too.
+[L] Rework the provided m4 scripts to provide functionality like CS_CHECK_HOST
+    and INITJAMFILE. Would be also nice to extract more of the detection scripts
+    in CS (perl, python, nasm, problematic cflags?)
+[M] Finish the tool for extracting the documentation from the rules files.
+[M] Write some documentation and a Tutorial? (Maybe we could just link to the
+    text in the RoboRun project...). Another interesting topic would be
+    integrating Crystal Space with other build systems like automake or ant.
+
