@@ -169,6 +169,8 @@ private:
   csRefArray<csODEBodyGroup> groups;
   csRefArray<csODEJoint> joints;
 
+  csGeomList geoms;
+
 public:
   SCF_DECLARE_IBASE_EXT (csObject);
 
@@ -299,7 +301,7 @@ class csODERigidBody : public csObject
 private:
   dBodyID bodyID;
   dSpaceID groupID;
-  csGeomList ids;
+  csGeomList geoms;
   dJointID statjoint;
 
   /* these must be ptrs to avoid circular referencing */

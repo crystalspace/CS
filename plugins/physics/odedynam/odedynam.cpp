@@ -73,6 +73,8 @@ SCF_IMPLEMENT_IBASE_END
 SCF_IMPLEMENT_FACTORY (csODEDynamics)
 
 
+void DestroyGeoms( csGeomList & geoms );
+
 
 int csODEDynamics::geomclassnum = 0;
 dJointGroupID csODEDynamics::contactjoints = dJointGroupCreate (0);
@@ -698,7 +700,10 @@ csODEDynamicSystem::csODEDynamicSystem ()
 
 csODEDynamicSystem::~csODEDynamicSystem ()
 {
-  /* must delete all these before deleting the actual world */
+  // destroy all static collider geoms
+  DestroyGeoms (geoms);
+
+  // must delete all these before deleting the actual world
   joints.DeleteAll ();
   groups.DeleteAll ();
   bodies.DeleteAll ();
@@ -781,9 +786,10 @@ bool csODEDynamicSystem::AttachColliderMesh (iMeshWrapper* mesh,
   	const csOrthoTransform& trans, float friction, float elasticity, float softness)
 {
   dGeomID id = dCreateGeom (csODEDynamics::GetGeomClassNum());
+  geoms.Push(id);
+
   MeshInfo *gdata = (MeshInfo*)dGeomGetClassData (id);
   gdata->mesh = mesh;
-  // @@@ Jorrit: BIG MEMORY LEAK
   gdata->tree = new csPolygonTree ();
   iPolygonMesh* p = mesh->GetMeshObject()->GetObjectModel()
   	->GetPolygonMeshColldet();
@@ -811,7 +817,7 @@ bool csODEDynamicSystem::AttachColliderMesh (iMeshWrapper* mesh,
 bool csODEDynamicSystem::AttachColliderCylinder (float length, float radius,
   	const csOrthoTransform& trans, float friction, float elasticity, float softness)
 {
-  dGeomID id = dCreateCCylinder (spaceID, radius, length);
+  dGeomID id = dCreateCCylinder (spaceID, radius, length);  
 
   dMatrix3 mat;
   mat[0] = trans.GetO2T().m11; mat[1] = trans.GetO2T().m12; mat[2] = trans.GetO2T().m13; mat[3] = 0;
@@ -935,10 +941,38 @@ csODERigidBody::csODERigidBody (csODEDynamicSystem* sys)
 
 csODERigidBody::~csODERigidBody ()
 {
+
+  DestroyGeoms (geoms);
+
   if (move_cb) move_cb->DecRef ();
   if (coll_cb) coll_cb->DecRef ();
   dBodyDestroy (bodyID);
 }
+
+
+void DestroyGeoms( csGeomList & geoms )
+{
+  dGeomID tempID;
+  int i=0;
+
+  for (;i < geoms.Length(); i++)
+  {
+    tempID = geoms[i];
+    if (dGeomGetClass (geoms[i]) == dGeomTransformClass)
+      tempID = dGeomTransformGetGeom (geoms[i]);
+
+    if( dGeomGetClass (tempID) == csODEDynamics::GetGeomClassNum() )
+    {
+      MeshInfo *gdata = (MeshInfo*)dGeomGetClassData (tempID);
+      delete gdata->tree;
+    }
+
+    //for transform geoms, only need to destroy the container,
+    //they've been set herein to destroy their contained geom
+    dGeomDestroy (geoms[i]);
+  }
+}
+
 
 bool csODERigidBody::MakeStatic ()
 {
@@ -980,12 +1014,12 @@ bool csODERigidBody::AttachColliderMesh (iMeshWrapper *mesh,
   dMassSetZero (&m);
 
   dGeomID id = dCreateGeomTransform (0);
+  geoms.Push(id);
   dGeomTransformSetCleanup (id, 1);
 
   dGeomID gid = dCreateGeom (csODEDynamics::GetGeomClassNum());
   MeshInfo *gdata = (MeshInfo*)dGeomGetClassData (gid);
   gdata->mesh = mesh;
-  // @@@ Jorrit: BIG MEMORY LEAK
   gdata->tree = new csPolygonTree ();
   iPolygonMesh* p = mesh->GetMeshObject()->GetObjectModel()
   	->GetPolygonMeshColldet();
@@ -1037,6 +1071,7 @@ bool csODERigidBody::AttachColliderCylinder (float length, float radius,
 
   dGeomID id = dCreateGeomTransform (0);
   dGeomTransformSetCleanup (id, 1);
+  geoms.Push(id);
 
   dGeomID gid = dCreateCCylinder (0, radius, length);
   dGeomTransformSetGeom (id, gid);
@@ -1085,6 +1120,7 @@ bool csODERigidBody::AttachColliderBox (const csVector3 &size,
 
   dGeomID id = dCreateGeomTransform (0);
   dGeomTransformSetCleanup (id, 1);
+  geoms.Push(id);
 
   dGeomID gid = dCreateBox (0, size.x, size.y, size.z);
   dGeomTransformSetGeom (id, gid);
@@ -1132,6 +1168,7 @@ bool csODERigidBody::AttachColliderSphere (float radius, const csVector3 &offset
 
   dGeomID id = dCreateGeomTransform (0);
   dGeomTransformSetCleanup (id, 1);
+  geoms.Push(id);
 
   dGeomID gid = dCreateSphere (0, radius);
   dGeomTransformSetGeom (id, gid);
