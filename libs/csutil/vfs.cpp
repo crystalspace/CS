@@ -65,7 +65,7 @@ public:
   // write a block of data
   virtual size_t Write (const char *Data, size_t DataSize);
   // check for EOF
-  virtual bool EOF ();
+  virtual bool AtEOF ();
   /// Query current file pointer
   virtual size_t GetPos ();
   /// Clear file error after queriyng status
@@ -103,7 +103,7 @@ public:
   // write a block of data
   virtual size_t Write (const char *Data, size_t DataSize);
   // check for EOF
-  virtual bool EOF ();
+  virtual bool AtEOF ();
   /// Query current file pointer
   virtual size_t GetPos ();
 
@@ -234,7 +234,7 @@ public:
 };
 
 // The global archive cache
-VfsArchiveCache ArchiveCache;
+static VfsArchiveCache ArchiveCache;
 
 // --------------------------------------------------------------- csFile --- //
 
@@ -455,7 +455,7 @@ size_t DiskFile::Write (const char *Data, size_t DataSize)
   return rc;
 }
 
-bool DiskFile::EOF ()
+bool DiskFile::AtEOF ()
 {
   return feof (file);
 }
@@ -537,7 +537,7 @@ size_t ArchiveFile::Write (const char *Data, size_t DataSize)
   return DataSize;
 }
 
-bool ArchiveFile::EOF ()
+bool ArchiveFile::AtEOF ()
 {
   if (data)
     return fpos + 1 >= Size;
@@ -1130,7 +1130,7 @@ bool csVFS::ChDir (const char *Path)
 bool csVFS::Exists (const char *Path) const
 {
   if (!Path)
-    return NULL;
+    return false;
 
   VfsNode *node;
   char suffix [VFS_MAX_PATH_LEN + 1];
