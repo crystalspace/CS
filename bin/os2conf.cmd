@@ -127,7 +127,7 @@
     say "SHELL = "SHELL;
   end;
 
-  if (pos("CMD", translate(SHELL)) > 0) then
+  if (SHELL = "") | (pos("CMD", translate(SHELL)) > 0) then
   do
     say '" ='
     say '| = ³'
