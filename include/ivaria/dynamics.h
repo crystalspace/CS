@@ -173,6 +173,8 @@ struct iRigidBody : public iBase
 	float elasticity) = 0;
   virtual bool AttachColliderSphere (float radius, const csVector3 &offset,
   	float friction, float density, float elasticity) = 0;
+  virtual bool AttachColliderPlane (const csPlane3 &plane, float friction,
+    float density, float elasticity) = 0;
 
   /// Set the position
   virtual void SetPosition (const csVector3& trans) = 0;

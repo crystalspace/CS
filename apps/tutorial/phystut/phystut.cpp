@@ -419,7 +419,7 @@ bool Simple::Initialize ()
 
   dynSys->SetGravity (csVector3 (0,-7,0));
 
-  CreateRoomSolids (csVector3 (0), csVector3 (5), 1);
+  CreateWalls (csVector3 (5));
 
   return true;
 }
@@ -517,50 +517,27 @@ iJoint* Simple::CreateJointed (void)
   return joint;
 }
 
-iRigidBody* Simple::CreateRoomSolids (const csVector3& center,
- const csVector3& radius, float thickness)
+iRigidBody* Simple::CreateWalls (const csVector3& radius)
 {
   // Create a body for the room.
   csRef<iRigidBody> rb = dynSys->CreateBody ();
   rb->SetMoveCallback(NULL);
-  rb->SetPosition (center);
+  rb->SetPosition (csVector3 (0));
   rb->MakeStatic ();
 
-  const csMatrix3 tm;
-  const csVector3 tv (0);
-  csOrthoTransform t (tm, tv);
-
-  // Attach colliders with offsets.
-
-  // down
-  t.SetOrigin (center + csVector3 (0, -radius.y - thickness/2, 0));
-  rb->AttachColliderBox (
-   csVector3 (radius.x*2, thickness, radius.z*2), t, 1, 1000, 0);
-
-  // up
-  t.SetOrigin (center + csVector3 (0, radius.y + thickness/2, 0));
-  rb->AttachColliderBox (
-   csVector3 (radius.x*2, thickness, radius.z*2), t, 1, 1000, 0);
-
-  // forward
-  t.SetOrigin (center + csVector3 (0, 0, radius.z + thickness/2));
-  rb->AttachColliderBox (
-   csVector3 (radius.x*2, radius.y*2, thickness), t, 1, 1000, 0);
-
-  // right
-  t.SetOrigin (center + csVector3 (radius.x + thickness/2, 0, 0));
-  rb->AttachColliderBox (
-   csVector3 (thickness, radius.y*2, radius.z*2), t, 1, 1000, 0);
-
   // left
-  t.SetOrigin (center + csVector3 (-radius.x - thickness/2, 0, 0));
-  rb->AttachColliderBox (
-   csVector3 (thickness, radius.y*2, radius.z*2), t, 1, 1000, 0);
-
+  rb->AttachColliderPlane (csPlane3 (1,0,0, radius.x), 1, 0, 0);
+  // right
+  rb->AttachColliderPlane (csPlane3 (-1,0,0, radius.x), 1, 0, 0);
+  // floor
+  rb->AttachColliderPlane (csPlane3 (0,1,0, radius.y), 1, 0, 0);
+  // ceiling
+  rb->AttachColliderPlane (csPlane3 (0,-1,0, radius.y), 1, 0, 0);
+  // forward
+  rb->AttachColliderPlane (csPlane3 (0,0,-1, radius.z), 1, 0, 0);
   // back
-  t.SetOrigin (center + csVector3 (0, 0, -radius.z - thickness/2));
-  rb->AttachColliderBox (
-   csVector3 (radius.x*2, radius.y*2, thickness), t, 1, 1000, 0);
+  rb->AttachColliderPlane (csPlane3 (0,0,1, radius.z), 1, 0, 0);
+
 
   return rb;
 }

@@ -64,7 +64,7 @@ private:
   iRigidBody* CreateBox (void);
   iRigidBody* CreateSphere (void);
   iJoint* CreateJointed (void);
-  iRigidBody* CreateRoomSolids (const csVector3& center, const csVector3& radius, float thickness);
+  iRigidBody* CreateWalls (const csVector3& radius);
 
 public:
   Simple (iObjectRegistry *obj);

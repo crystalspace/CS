@@ -256,6 +256,9 @@ public:
 	float elasticity);
   bool AttachColliderSphere (float radius, const csVector3 &offset,
   	float friction, float density, float elasticity);
+  /// ODE planes are globally transformed, immobile, infinitely dense
+  bool AttachColliderPlane (const csPlane3 &plane, float friction,
+    float density, float elasticity);
 
   void SetPosition (const csVector3& trans);
   const csVector3 GetPosition () const;
