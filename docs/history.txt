@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Nov-2004
+	- Eric Sunshine updated cspace.i to take csPoly2D decomposition into
+	  account.
 13-Nov-2004
 	- res made the memtracker also work in optimize builds.
 	- res fixed memtracker compilation with MSVC.
