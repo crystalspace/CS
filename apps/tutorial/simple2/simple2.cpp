@@ -167,7 +167,7 @@ bool Simple::Initialize ()
   }
 
   // The virtual clock.
-  vc.Assign (CS_QUERY_REGISTRY (object_reg, iVirtualClock));
+  vc.Take (CS_QUERY_REGISTRY (object_reg, iVirtualClock));
   if (vc == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -177,7 +177,7 @@ bool Simple::Initialize ()
   }
 
   // Find the pointer to engine plugin
-  engine.Assign (CS_QUERY_REGISTRY (object_reg, iEngine));
+  engine.Take (CS_QUERY_REGISTRY (object_reg, iEngine));
   if (engine == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -186,7 +186,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  loader.Assign (CS_QUERY_REGISTRY (object_reg, iLoader));
+  loader.Take (CS_QUERY_REGISTRY (object_reg, iLoader));
   if (loader == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -195,7 +195,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  g3d.Assign (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
+  g3d.Take (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
   if (g3d == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -204,7 +204,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  kbd.Assign (CS_QUERY_REGISTRY (object_reg, iKeyboardDriver));
+  kbd.Take (CS_QUERY_REGISTRY (object_reg, iKeyboardDriver));
   if (kbd == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -291,21 +291,21 @@ bool Simple::Initialize ()
   csRef<iStatLight> light;
   iLightList* ll = room->GetLights ();
 
-  light.Assign (engine->CreateLight (NULL, csVector3 (-3, 5, 0), 10,
+  light.Take (engine->CreateLight (NULL, csVector3 (-3, 5, 0), 10,
   	csColor (1, 0, 0), false));
   ll->Add (light->QueryLight ());
 
-  light.Assign (engine->CreateLight (NULL, csVector3 (3, 5,  0), 10,
+  light.Take (engine->CreateLight (NULL, csVector3 (3, 5,  0), 10,
   	csColor (0, 0, 1), false));
   ll->Add (light->QueryLight ());
 
-  light.Assign (engine->CreateLight (NULL, csVector3 (0, 5, -3), 10,
+  light.Take (engine->CreateLight (NULL, csVector3 (0, 5, -3), 10,
   	csColor (0, 1, 0), false));
   ll->Add (light->QueryLight ());
 
   engine->Prepare ();
 
-  view.Assign (new csView (engine, g3d));
+  view.Take (new csView (engine, g3d));
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
   iGraphics2D* g2d = g3d->GetDriver2D ();

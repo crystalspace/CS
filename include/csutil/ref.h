@@ -79,19 +79,34 @@ public:
   }
 
   /**
-   * Assign a raw object reference to this smart pointer.  If
-   * transfer_ownership is true, then it assumes that object's IncRef() method
-   * has already been called on behalf of the smart pointer.  Otherwise a new
-   * reference is created via IncRef().
+   * Assign a raw object reference to this smart pointer.  
+   * This function assumes that the object's IncRef() method
+   * has already been called on behalf of the smart pointer.
    */
-  void Assign (T* newobj, bool transfer_ownership = true)
+  void Take (T* newobj)
   {
-    T* oldobj = obj;
-    obj = newobj;
-    if (obj && !transfer_ownership)
-      obj->IncRef();
-    if (oldobj)
-      oldobj->DecRef();
+    if (obj != newobj)
+    {
+      if (obj)
+	obj->DecRef ();
+      obj = newobj;
+    }
+  }
+
+  /**
+   * Assign a raw object reference to this smart pointer.
+   * This function calls the object's IncRef method.
+   */
+  void Assign (T* newobj)
+  {
+    if (obj != newobj)
+    {
+      if (obj)
+	obj->DecRef ();
+      obj = newobj;
+      if (obj)
+	obj->IncRef ();
+    }
   }
 
   /**
