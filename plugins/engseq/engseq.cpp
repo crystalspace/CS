@@ -1300,7 +1300,6 @@ void csSequenceTrigger::ClearConditions ()
 
 void csSequenceTrigger::Trigger ()
 {
-    Fire();
 }
 
 void csSequenceTrigger::FireSequence (csTicks delay, iSequenceWrapper* seq)
@@ -1381,6 +1380,12 @@ void csSequenceTrigger::Fire ()
       enable_onetest = false;
     }
   }
+}
+
+void csSequenceTrigger::ForceFire (bool now)
+{
+  eseqmgr->GetSequenceManager ()->RunSequence (now ? 0 : fire_delay,
+    	  fire_sequence->GetSequence (), params);
 }
 
 /**
@@ -1619,15 +1624,16 @@ iSequenceTrigger* csEngineSequenceManager::FindTriggerByName (
   return NULL;
 }
 
-bool csEngineSequenceManager::FireTriggerByName (const char *name) const
+bool csEngineSequenceManager::FireTriggerByName (const char *name,
+	bool now) const
 {
-    iSequenceTrigger *trig = FindTriggerByName(name);
-    if (trig)
-    {
-	trig->Trigger();
-	return true;
-    }
-    return false;
+  iSequenceTrigger *trig = FindTriggerByName(name);
+  if (trig)
+  {
+    trig->ForceFire (now);
+    return true;
+  }
+  return false;
 }
 
 csPtr<iSequenceWrapper> csEngineSequenceManager::CreateSequence (
@@ -1675,13 +1681,13 @@ iSequenceWrapper* csEngineSequenceManager::FindSequenceByName (
 bool csEngineSequenceManager::RunSequenceByName (
         const char *name,int delay) const
 {
-    iSequenceWrapper *seq = FindSequenceByName(name);
-    if (seq)
-    {
-      seqmgr->RunSequence (delay, seq->GetSequence (), NULL);
-      return true;
-    }
-    return false;
+  iSequenceWrapper *seq = FindSequenceByName(name);
+  if (seq)
+  {
+    seqmgr->RunSequence (delay, seq->GetSequence (), NULL);
+    return true;
+  }
+  return false;
 }
 
 void csEngineSequenceManager::FireTimedOperation (csTicks delta,

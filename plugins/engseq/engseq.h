@@ -377,6 +377,7 @@ public:
   }
 
   void Fire ();
+  void ForceFire (bool now);
 
   SCF_DECLARE_IBASE_EXT (csObject);
 
@@ -453,6 +454,10 @@ public:
     virtual bool CheckState ()
     {
       return scfParent->CheckState ();
+    }
+    virtual void ForceFire (bool now = false)
+    {
+      scfParent->ForceFire (now);
     }
   } scfiSequenceTrigger;
   friend struct SequenceTrigger;
@@ -543,7 +548,7 @@ public:
   virtual int GetTriggerCount () const;
   virtual iSequenceTrigger* GetTrigger (int idx) const;
   virtual iSequenceTrigger* FindTriggerByName (const char* name) const;
-  virtual bool FireTriggerByName (const char *name) const;
+  virtual bool FireTriggerByName (const char *name, bool now = false) const;
   virtual csPtr<iSequenceWrapper> CreateSequence (const char* name);
   virtual void RemoveSequence (iSequenceWrapper* seq);
   virtual void RemoveSequences ();

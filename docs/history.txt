@@ -14,6 +14,15 @@ The history order is reversed so that new features are at the top.
 	  and triggering triggers defined in the world file.  Also added
 	  lightning effect to "large" room in flarge, activated with ctrl-L
 	  to demo/test this feature.
+	- Removed the call to 'Fire()' from Trigger() in the engine sequence
+	  manager. That's not needed. Additionally fixed FireTriggerByName()
+	  so it works correctly now. To do that I added
+	  iSequenceTrigger::ForceFire() which forces a trigger to be fired
+	  no matter what conditions are true. This is the best way to
+	  fire the sequence as the trigger holds the parameters required
+	  by some sequences.
+	- Added 'now' parameter to FireTriggerByName() (engine sequence
+	  manager).
 9-Dec-2002
 	- Fixed a bug in Dynavis where it would consider polygons as possible
 	  occluders even if Z very close to 0. This could cause bad overflow.

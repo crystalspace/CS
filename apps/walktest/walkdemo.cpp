@@ -1112,20 +1112,19 @@ void HandleDynLight (iDynLight* dyn)
   }
 }
 
-void show_lightning()
+void show_lightning ()
 {
-    csRef<iEngineSequenceManager> seqmgr(CS_QUERY_REGISTRY (Sys->object_reg,
+  csRef<iEngineSequenceManager> seqmgr(CS_QUERY_REGISTRY (Sys->object_reg,
   	iEngineSequenceManager));
-
-    if (seqmgr)
-    {
-	seqmgr->RunSequenceByName("seq_lightning",0);
-    }
-    else
-    {
-	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+  if (seqmgr)
+  {
+    seqmgr->RunSequenceByName ("seq_lightning", 0);
+  }
+  else
+  {
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
     	             "Could not find engine sequence manager!");
-    }
+  }
 }
 
 void fire_missile ()

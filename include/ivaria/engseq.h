@@ -304,7 +304,7 @@ struct iSequenceWrapper : public iBase
 		  iSequence* falseSequence) = 0;
 };
 
-SCF_VERSION (iSequenceTrigger, 0, 0, 2);
+SCF_VERSION (iSequenceTrigger, 0, 0, 3);
 
 /**
  * A sequence trigger. When all conditions in a trigger are
@@ -409,6 +409,23 @@ struct iSequenceTrigger : public iBase
    * can retest the conditions.
    */
   virtual bool CheckState () = 0;
+
+  /**
+   * Force the sequence of this trigger to be fired right now.
+   * Note that this will even fire if the trigger is disabled and
+   * conditions are completely ignored.
+   * <p>
+   * Also calling ForceFire() will NOT cause the trigger to become disabled
+   * (as opposed to when a trigger normally fires). So if you want to make
+   * sure the trigger does not accidently fire again right after firing it
+   * you should disable the trigger (and possibly let the sequence enable
+   * it again).
+   * <p>
+   * Note that ForceFire() still respects the fire delay with which the
+   * sequence was registered. If you use 'now' == true then this delay
+   * will be ignored and the sequence will be started immediatelly.
+   */
+  virtual void ForceFire (bool now = false) = 0;
 };
 
 SCF_VERSION (iSequenceTimedOperation, 0, 0, 1);
@@ -430,7 +447,7 @@ struct iSequenceTimedOperation : public iBase
   virtual void Do (float time, iBase* params) = 0;
 };
 
-SCF_VERSION (iEngineSequenceManager, 0, 0, 2);
+SCF_VERSION (iEngineSequenceManager, 0, 0, 3);
 
 /**
  * Sequence manager specifically designed for working on
@@ -495,8 +512,11 @@ struct iEngineSequenceManager : public iBase
 
   /**
    * Fire a trigger manually, specifying the name.
+   * This will call ForceFire() on the trigger (if one is found). If
+   * now == false then the usual delay will be respected. Otherwise
+   * the sequence will be run immediatelly without the default delay.
    */
-  virtual bool FireTriggerByName (const char *name) const = 0;
+  virtual bool FireTriggerByName (const char *name, bool now = false) const = 0;
 
   //-----------------------------------------------------------------------
 
