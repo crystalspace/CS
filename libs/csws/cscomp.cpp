@@ -23,7 +23,7 @@
 #define SYSDEF_ALLOCA
 #define SYSDEF_CASE
 #include "cssysdef.h"
-#include "csengine/cspixmap.h"
+#include "csfx/cspixmap.h"
 #include "cssys/csinput.h"
 #include "qint.h"
 #include "igraph2d.h"

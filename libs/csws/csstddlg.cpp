@@ -261,10 +261,10 @@ cspFileDialog::cspFileDialog (csComponent *iParent)
   {
     // If images are not loaded, load them
     if (!fdspr [0])
-      fdspr [0] = new csPixmap (app->GetTexture (
+      fdspr [0] = new csSimplePixmap (app->GetTexture (
         FILEDLG_TEXTURE_NAME), 0, 0, 16, 13);
     if (!fdspr [1])
-      fdspr [1] = new csPixmap (app->GetTexture (
+      fdspr [1] = new csSimplePixmap (app->GetTexture (
         FILEDLG_TEXTURE_NAME), 16, 0, 16, 13);
   } /* endif */
 }

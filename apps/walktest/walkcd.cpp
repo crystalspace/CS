@@ -38,12 +38,12 @@
 #include "csengine/engine.h"
 #include "csengine/keyval.h"
 #include "csengine/collider.h"
-#include "csengine/cspixmap.h"
 #include "csengine/cssprite.h"
 #include "csengine/terrain.h"
 #include "csparser/impexp.h"
 #include "csutil/csrect.h"
 #include "csobject/dataobj.h"
+#include "csfx/cspixmap.h"
 #include "icollide.h"
 
 extern WalkTest *Sys;

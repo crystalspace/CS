@@ -105,9 +105,9 @@ void csDefaultWindowSkin::SetButtBitmap (csButton *button, const char *id)
 
   int tx,ty,tw,th;
   ParseConfigBitmap (button->app, Skin->Prefix, "Window", id_n, tx, ty, tw, th);
-  csPixmap *bmpn = new csPixmap (ButtonTex, tx, ty, tw, th);
+  csPixmap *bmpn = new csSimplePixmap (ButtonTex, tx, ty, tw, th);
   ParseConfigBitmap (button->app, Skin->Prefix, "Window", id_p, tx, ty, tw, th);
-  csPixmap *bmpp = new csPixmap (ButtonTex, tx, ty, tw, th);
+  csPixmap *bmpp = new csSimplePixmap (ButtonTex, tx, ty, tw, th);
   button->SetBitmap (bmpn, bmpp);
 }
 

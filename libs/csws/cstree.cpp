@@ -540,7 +540,7 @@ csTreeBox::csTreeBox (csComponent *iParent, int iStyle,
     {
       int tx,ty,tw,th;
       ParseConfigBitmap (app, app->skin->Prefix, "Dialog", pixnam [i], tx, ty, tw, th);
-      treepix [i] = new csPixmap (tex, tx, ty, tw, th);
+      treepix [i] = new csSimplePixmap (tex, tx, ty, tw, th);
     }
   }
   treeref++;

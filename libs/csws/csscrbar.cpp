@@ -59,9 +59,9 @@ csScrollBar::csScrollBar (csComponent *iParent, csScrollBarFrameStyle iFrameStyl
     // Load arrow and scroller images
     iTextureHandle *scrolltex = app->GetTexture (SCROLLBAR_TEXTURE_NAME);
     for (int i = 0; i < 12; i++)
-      sprarrows [i] = new csPixmap (scrolltex, i * 9, 0, 9, 9);
-    sprscroller [0] = new csPixmap (scrolltex, 12 * 9 + 0, 0, 7, 8);
-    sprscroller [1] = new csPixmap (scrolltex, 12 * 9 + 7, 0, 8, 7);
+      sprarrows [i] = new csSimplePixmap (scrolltex, i * 9, 0, 9, 9);
+    sprscroller [0] = new csSimplePixmap (scrolltex, 12 * 9 + 0, 0, 7, 8);
+    sprscroller [1] = new csSimplePixmap (scrolltex, 12 * 9 + 7, 0, 8, 7);
   } /* endif */
 
   TrackScroller = false;

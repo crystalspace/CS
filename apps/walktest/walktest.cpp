@@ -46,7 +46,6 @@
 #include "csengine/engine.h"
 #include "csengine/covtree.h"
 #include "csengine/solidbsp.h"
-#include "csengine/cspixmap.h"
 #include "csengine/terrain.h"
 #include "csengine/cssprite.h"
 #include "csparser/impexp.h"
@@ -58,6 +57,7 @@
 #include "csgfxldr/pngsave.h"
 #include "csparser/snddatao.h"
 #include "cssys/system.h"
+#include "csfx/cspixmap.h"
 #include "version.h"
 #include "qint.h"
 #include "icfgnew.h"
@@ -1113,7 +1113,7 @@ void WalkTest::Create2DSprites(void)
     if (phTex)
     {
       phTex->GetMipMapDimensions (0, w, h);
-      cslogo = new csPixmap (phTex, 0, 0, w, h);
+      cslogo = new csSimplePixmap (phTex, 0, 0, w, h);
     }
   }
 }

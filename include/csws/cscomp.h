@@ -23,7 +23,7 @@
 #include "csutil/csbase.h"
 #include "csutil/csrect.h"
 #include "csutil/csobjvec.h"
-#include "csengine/cspixmap.h"
+#include "csfx/cspixmap.h"
 #include "cswspal.h"
 #include "igraph2d.h"
 #include "ifontsrv.h"

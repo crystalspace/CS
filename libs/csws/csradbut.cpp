@@ -46,10 +46,10 @@ void csRadioButton::SetButtBitmap (char *id_n, char *id_p)
 {
   int tx,ty,tw,th;
   ParseConfigBitmap (app, app->skin->Prefix, "Dialog", id_n, tx, ty, tw, th);
-  csPixmap *bmpn = new csPixmap (app->GetTexture (
+  csPixmap *bmpn = new csSimplePixmap (app->GetTexture (
     RADIOBUT_TEXTURE_NAME), tx, ty, tw, th);
   ParseConfigBitmap (app, app->skin->Prefix, "Dialog", id_p, tx, ty, tw, th);
-  csPixmap *bmpp = new csPixmap (app->GetTexture (
+  csPixmap *bmpp = new csSimplePixmap (app->GetTexture (
     RADIOBUT_TEXTURE_NAME), tx, ty, tw, th);
   SetBitmap (bmpn, bmpp);
 }

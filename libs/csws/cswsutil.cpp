@@ -195,7 +195,7 @@ csPixmap *NewBitmap (csApp *app, char *texturename, int tx, int ty,
   iTextureHandle *tex = app->GetTexture (texturename);
   csPixmap *spr;
   if (tex)
-    spr = new csPixmap (tex, tx, ty, tw, th);
+    spr = new csSimplePixmap (tex, tx, ty, tw, th);
   else
     spr = NULL;
 

@@ -164,7 +164,7 @@ csNotebook::csNotebook (csComponent *iParent, int iStyle) : csComponent (iParent
     {
       int tx,ty,tw,th;
       ParseConfigBitmap (app, app->skin->Prefix, "Dialog", NotebookButton [i], tx, ty, tw, th);
-      sprites [i] = new csPixmap (tex, tx, ty, tw, th);
+      sprites [i] = new csSimplePixmap (tex, tx, ty, tw, th);
     }
   } /* endif */
 

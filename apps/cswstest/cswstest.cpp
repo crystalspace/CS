@@ -513,8 +513,8 @@ void csWsTest::TreeDialog ()
   iTextureHandle *tex = GetTexture ("csws::FileDialog");
   if (tex)
   {
-    csPixmap *pix1 = new csPixmap (tex,  0, 0, 16, 13);
-    csPixmap *pix2 = new csPixmap (tex, 16, 0, 16, 13);
+    csPixmap *pix1 = new csSimplePixmap (tex,  0, 0, 16, 13);
+    csPixmap *pix2 = new csSimplePixmap (tex, 16, 0, 16, 13);
     i1->SetBitmap (pix1, pix2, true);
   }
 
@@ -789,7 +789,7 @@ void csWsTest::NotebookDialog ()
 
   page = new csDialog (nb);
   iTextureHandle *tex = GetTexture ("csws::FileDialog");
-  nb->AddPrimaryTab (page, new csPixmap (tex, 16, 0, 16, 13),
+  nb->AddPrimaryTab (page, new csSimplePixmap (tex, 16, 0, 16, 13),
     true, "Page four");
 }
 

@@ -22,7 +22,7 @@
 
 #include "csutil/csbase.h"
 #include "csutil/csrect.h"
-#include "csengine/cspixmap.h"
+#include "csfx/cspixmap.h"
 #include "igraph2d.h"
 
 class csMouse;

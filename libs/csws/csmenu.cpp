@@ -83,10 +83,10 @@ void csMenuItem::Init ()
   {
     // If  'checked' and 'submenu' images are not loaded, load them
     if (!sprchecked)
-      sprchecked = new csPixmap (app->GetTexture (
+      sprchecked = new csSimplePixmap (app->GetTexture (
         MENU_TEXTURE_NAME), 0, 0, 9, 9);
     if (!sprsubmenu)
-      sprsubmenu = new csPixmap (app->GetTexture (
+      sprsubmenu = new csSimplePixmap (app->GetTexture (
         MENU_TEXTURE_NAME), 9, 0, 9, 9);
   } /* endif */
 }
