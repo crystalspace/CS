@@ -10,6 +10,7 @@ chronological order.
         - Philip Wyett changed instances of NULL for 0 in sprcal3d plugins.
             - Added 3ds2lev and makedep to CS/ root .cvsignore.
             - Changed instances of NULL to 0 in fullquad.cpp.
+	- Jorrit added another initializer to csArray copy constructor.
 7-Aug-2003
 	- Jorrit did the following array related changes:
 	    - Added Put() to csArray.
