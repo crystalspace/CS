@@ -46,7 +46,7 @@ bool csGraphics2DGlideCommon::locked=false;
 csGraphics2DGlideCommon::csGraphics2DGlideCommon (iBase *iParent) :
   csGraphics2D ()
 {
-  CONSTRUCT_IBASE (iParent);
+  CONSTRUCT_IBASE (NULL);
 //  LocalFontServer = NULL;
 //  texture_cache = NULL;
   SetVRetrace( false );

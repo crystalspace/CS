@@ -375,7 +375,7 @@ void csTextureManagerGlide::Prepare ()
   for (i = 0 ; i < textures.Length () ; i++)
   {
     csTextureMMGlide* txt = (csTextureMMGlide*)textures[i];
-    if (txt->for_3d ()) txt->alloc_mipmaps (this);
+    /*if (txt->for_3d ())*/ txt->alloc_mipmaps (this);
     if (txt->for_2d ()) txt->alloc_2dtexture (this);
   }
 

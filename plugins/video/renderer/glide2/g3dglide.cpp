@@ -382,7 +382,7 @@ csGraphics3DGlide2x::csGraphics3DGlide2x(iBase* iParent) :
 
   m_piSystem = NULL;
   config = new csIniFile ("glide2x.cfg");
-
+  m_pCamera = NULL;
   // default
   m_Caps.ColorModel = G3DCOLORMODEL_RGB;
   m_Caps.CanClip = false;
@@ -417,15 +417,17 @@ csGraphics3DGlide2x::~csGraphics3DGlide2x()
   if (m_pTextureCache)
     CHKB (delete m_pTextureCache);
   if (m_pLightmapCache)
-    CHKB (m_pLightmapCache);
+    CHKB (delete m_pLightmapCache);
   if (config)
     CHKB (delete config);
+  if (txtmgr)
+    CHKB (delete txtmgr);
   if (m_pCamera)
     m_pCamera->DecRef ();
   if (m_piG2D)
     m_piG2D->DecRef ();
-  if (m_piSystem)
-    m_piSystem->DecRef ();
+//  if (m_piSystem)
+//    m_piSystem->DecRef ();
 }
 
 bool csGraphics3DGlide2x::Initialize (iSystem *iSys)

@@ -43,7 +43,7 @@ struct iGraphics2DGlide : public iBase
   /// Query the display handle
   virtual Display *GetDisplay () = 0;
 #endif
-  virtual void SetVRetrace( bool wait4vretrace );
+  virtual void SetVRetrace( bool wait4vretrace )=0;
 };
 
 #endif // __IGLIDE2D_H__
