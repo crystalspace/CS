@@ -415,7 +415,7 @@ bool csGraphics3DOpenGL::BeginDraw (int DrawFlags)
 
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
-    glOrtho (0., (GLdouble) width, 0., (GLdouble) height, -1.0, 150.0);
+    glOrtho (0., (GLdouble) width, 0., (GLdouble) height, -1.0, 10.0);
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity ();
     glColor3f (1., 0., 0.);
