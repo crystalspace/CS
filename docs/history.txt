@@ -42,8 +42,8 @@ chronological order.
 	    $(CEL)/libs
 	- Eric Sunshine updated jamtemplate/Jamfile-src.template so that it
 	  performs a wildcard for all of the common source and header
-	  extensions (C, C++, Objective-C), rather than searching only for
-	  *.cpp and *.h.
+	  extensions (C, C++, Objective-C, Objective-C++), rather than
+	  searching only for *.cpp and *.h.
 	- Vincent Knecht updated rpm.txi manual page: --with newrenderer
 	  switch has changed to --with oldrenderer.
 	- Eric Sunshine augmented the `lcms' test in configure.ac so that it
