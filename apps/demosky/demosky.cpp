@@ -107,7 +107,8 @@ void Cleanup ()
   csInitializer::DestroyApplication (object_reg);
 }
 
-void DemoSky::SetTexSpace(csProcSkyTexture *skytex, iPolygon3DStatic *poly,
+void DemoSky::SetTexSpace(csProcSkyTexture *skytex,
+  iThingFactoryState *walls_state,
   int size, const csVector3& orig, const csVector3& upt, float ulen,
   const csVector3& vpt, float vlen)
 {
@@ -126,7 +127,8 @@ void DemoSky::SetTexSpace(csProcSkyTexture *skytex, iPolygon3DStatic *poly,
   texv += vvector / float(size);
   texulen += ulen * 2.0f / float(size);
   texvlen += vlen * 2.0f / float(size);
-  poly->SetTextureSpace (texorig, texu, texulen, texv, -texvlen);
+  walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST,
+  	texorig, texu, texulen, texv, -texvlen);
   skytex->SetTextureSpace(texorig, texu-texorig, texv-texorig);
 }
 
@@ -272,74 +274,75 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   csRef<iThingState> ws =
   	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
   csRef<iThingFactoryState> walls_state = ws->GetFactory ();
-  iPolygon3DStatic* p;
-  p = walls_state->CreatePolygon ();
-  p->SetMaterial (imatd);
+
+  int p;
   float size = 500.0; /// size of the skybox -- around 0,0,0 for now.
   float simi = size; //*255./256.; /// sizeminor
-  p->CreateVertex (csVector3 (-size, -simi, size));
-  p->CreateVertex (csVector3 (size, -simi, size));
-  p->CreateVertex (csVector3 (size, -simi, -size));
-  p->CreateVertex (csVector3 (-size, -simi, -size));
+  p = walls_state->AddQuad (
+  	csVector3 (-size, -simi, size),
+  	csVector3 (size, -simi, size),
+  	csVector3 (size, -simi, -size),
+  	csVector3 (-size, -simi, -size));
+  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, imatd);
+  SetTexSpace (sky_d, walls_state, 256, walls_state->GetPolygonVertex  (p, 0),
+  	walls_state->GetPolygonVertex  (p, 1), 2.0f * size,
+	walls_state->GetPolygonVertex (p, 3), 2.0f * size);
+  walls_state->GetPolygonFlags (p).Set(CS_POLY_LIGHTING, 0);
 
-  SetTexSpace (sky_d, p, 256, p->GetVertex  (0), p->GetVertex  (1),
-    2.0f * size, p->GetVertex (3), 2.0f * size);
-  p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
+  p = walls_state->AddQuad (
+  	csVector3 (-size, simi, -size),
+  	csVector3 (size, simi, -size),
+	csVector3 (size, simi, size),
+	csVector3 (-size, simi, size));
+  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, imatu);
+  SetTexSpace (sky_u, walls_state, 256, walls_state->GetPolygonVertex  (p, 0),
+  	walls_state->GetPolygonVertex  (p, 1), 2.0f * size,
+	walls_state->GetPolygonVertex (p, 3), 2.0f * size);
+  walls_state->GetPolygonFlags (p).Set(CS_POLY_LIGHTING, 0);
 
-  p = walls_state->CreatePolygon ();
-  p->SetMaterial (imatu);
-  p->CreateVertex (csVector3 (-size, simi, -size));
-  p->CreateVertex (csVector3 (size, simi, -size));
-  p->CreateVertex (csVector3 (size, simi, size));
-  p->CreateVertex (csVector3 (-size, simi, size));
+  p = walls_state->AddQuad (
+  	csVector3 (-size, size, simi),
+  	csVector3 (size, size, simi),
+	csVector3 (size, -size, simi),
+	csVector3 (-size, -size, simi));
+  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, imatf);
+  SetTexSpace (sky_f, walls_state, 256, walls_state->GetPolygonVertex  (p, 0),
+  	walls_state->GetPolygonVertex  (p, 1), 2.0f * size,
+	walls_state->GetPolygonVertex (p, 3), 2.0f * size);
+  walls_state->GetPolygonFlags (p).Set(CS_POLY_LIGHTING, 0);
 
-  SetTexSpace (sky_u, p, 256, p->GetVertex  (0), p->GetVertex  (1),
-    2.0f * size, p->GetVertex (3), 2.0f * size);
-  p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
+  p = walls_state->AddQuad (
+  	csVector3 (simi, size, size),
+  	csVector3 (simi, size, -size),
+	csVector3 (simi, -size, -size),
+	csVector3 (simi, -size, size));
+  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, imatr);
+  SetTexSpace (sky_r, walls_state, 256, walls_state->GetPolygonVertex  (p, 0),
+  	walls_state->GetPolygonVertex  (p, 1), 2.0f * size,
+	walls_state->GetPolygonVertex (p, 3), 2.0f * size);
+  walls_state->GetPolygonFlags (p).Set(CS_POLY_LIGHTING, 0);
 
-  p = walls_state->CreatePolygon ();
-  p->SetMaterial (imatf);
-  p->CreateVertex (csVector3 (-size, size, simi));
-  p->CreateVertex (csVector3 (size, size, simi));
-  p->CreateVertex (csVector3 (size, -size, simi));
-  p->CreateVertex (csVector3 (-size, -size, simi));
+  p = walls_state->AddQuad (
+  	csVector3 (-simi, size, -size),
+  	csVector3 (-simi, size, size),
+	csVector3 (-simi, -size, size),
+	csVector3 (-simi, -size, -size));
+  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, imatl);
+  SetTexSpace (sky_l, walls_state, 256, walls_state->GetPolygonVertex  (p, 0),
+  	walls_state->GetPolygonVertex  (p, 1), 2.0f * size,
+	walls_state->GetPolygonVertex (p, 3), 2.0f * size);
+  walls_state->GetPolygonFlags (p).Set(CS_POLY_LIGHTING, 0);
 
-  SetTexSpace (sky_f, p, 256, p->GetVertex  (0), p->GetVertex  (1),
-    2.0f * size, p->GetVertex (3), 2.0f * size);
-  p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
-
-  p = walls_state->CreatePolygon ();
-  p->SetMaterial (imatr);
-  p->CreateVertex (csVector3 (simi, size, size));
-  p->CreateVertex (csVector3 (simi, size, -size));
-  p->CreateVertex (csVector3 (simi, -size, -size));
-  p->CreateVertex (csVector3 (simi, -size, size));
-
-  SetTexSpace (sky_r, p, 256, p->GetVertex  (0), p->GetVertex  (1),
-    2.0f * size, p->GetVertex (3), 2.0f * size);
-  p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
-
-  p = walls_state->CreatePolygon ();
-  p->SetMaterial (imatl);
-  p->CreateVertex (csVector3 (-simi, size, -size));
-  p->CreateVertex (csVector3 (-simi, size, size));
-  p->CreateVertex (csVector3 (-simi, -size, size));
-  p->CreateVertex (csVector3 (-simi, -size, -size));
-
-  SetTexSpace (sky_l, p, 256, p->GetVertex  (0), p->GetVertex  (1),
-	       2.0f * size, p->GetVertex (3), 2.0f * size);
-  p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
-
-  p = walls_state->CreatePolygon ();
-  p->SetMaterial (imatb);
-  p->CreateVertex (csVector3 (size, size, -simi));
-  p->CreateVertex (csVector3 (-size, size, -simi));
-  p->CreateVertex (csVector3 (-size, -size, -simi));
-  p->CreateVertex (csVector3 (size, -size, -simi));
-
-  SetTexSpace (sky_b, p, 256, p->GetVertex  (0), p->GetVertex  (1),
-	       2.0f * size, p->GetVertex (3), 2.0f * size);
-  p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
+  p = walls_state->AddQuad (
+  	csVector3 (size, size, -simi),
+  	csVector3 (-size, size, -simi),
+	csVector3 (-size, -size, -simi),
+	csVector3 (size, -size, -simi));
+  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, imatb);
+  SetTexSpace (sky_b, walls_state, 256, walls_state->GetPolygonVertex  (p, 0),
+  	walls_state->GetPolygonVertex  (p, 1), 2.0f * size,
+	walls_state->GetPolygonVertex (p, 3), 2.0f * size);
+  walls_state->GetPolygonFlags (p).Set(CS_POLY_LIGHTING, 0);
 
   LevelLoader->LoadTexture ("seagull", "/lib/std/seagull.gif");
   iMaterialWrapper *sg = engine->GetMaterialList ()->FindByName("seagull");

@@ -1,6 +1,5 @@
 SubDir TOP apps ;
 
-SubInclude TOP apps bumptest ;
 SubInclude TOP apps cswstest ;
 SubInclude TOP apps demo ;
 SubInclude TOP apps demosky2 ;

@@ -31,7 +31,7 @@ struct iView;
 struct iEngine;
 struct iDynLight;
 struct iMaterialWrapper;
-struct iPolygon3DStatic;
+struct iThingFactoryState;
 struct iFont;
 struct iMeshWrapper;
 struct iMaterialWrapper;
@@ -71,7 +71,8 @@ private:
    * given orig,u,ulen,v,vlen,  so that you get no ugly
    * edges (connecting to other polygons
    */
-  void SetTexSpace(csProcSkyTexture *skytex, iPolygon3DStatic *poly, int size,
+  void SetTexSpace(csProcSkyTexture *skytex, iThingFactoryState *walls_state,
+    int size,
     const csVector3& orig, const csVector3& upt, float ulen,
     const csVector3& vpt, float vlen);
 

@@ -190,6 +190,15 @@ public:
   /// Smooth flag
   bool smoothed;
 
+  /// Last used range.
+  csPolygonRange last_range;
+  /**
+   * Function to calculate real start and end polygon indices based
+   * on last_range and the given input range.
+   */
+  void GetRealRange (const csPolygonRange& requested_range, int& start,
+  	int& end);
+
   /// Bounding box in object space.
   csBox3 obj_bbox;
 
@@ -397,8 +406,8 @@ public:
   virtual const csVector3* GetVertices () const
   { return obj_verts; }
 
-  /// Add a polygon to this thing.
-  void AddPolygon (csPolygon3DStatic* spoly);
+  /// Add a polygon to this thing and return index.
+  int AddPolygon (csPolygon3DStatic* spoly);
 
   /**
    * Intersect object-space segment with polygons of this set. Return
@@ -433,6 +442,54 @@ public:
     
   virtual float GetCosinusFactor () const { return cosinus_factor; }
   virtual void SetCosinusFactor (float c) { cosinus_factor = c; }
+
+  virtual int FindPolygonByName (const char* name);
+  virtual int AddEmptyPolygon ();
+  virtual int AddTriangle (const csVector3& v1, const csVector3& v2,
+  	const csVector3& v3);
+  virtual int AddQuad (const csVector3& v1, const csVector3& v2,
+  	const csVector3& v3, const csVector3& v4);
+  virtual int AddPolygon (csVector3* vertices, int num);
+  virtual int AddPolygon (int num, ...);
+  virtual int AddOutsideBox (const csVector3& bmin, const csVector3& bmax);
+  virtual int AddInsideBox (const csVector3& bmin, const csVector3& bmax);
+  virtual void SetPolygonName (const csPolygonRange& range,
+  	const char* name);
+  virtual const char* GetPolygonName (int polygon_idx);
+  virtual void SetPolygonMaterial (const csPolygonRange& range,
+  	iMaterialWrapper* material);
+  virtual iMaterialWrapper* GetPolygonMaterial (int polygon_idx);
+  virtual void AddPolygonVertex (const csPolygonRange& range,
+  	const csVector3& vt);
+  virtual void AddPolygonVertex (const csPolygonRange& range, int vt);
+  virtual int GetPolygonVertexCount (int polygon_idx);
+  virtual const csVector3& GetPolygonVertex (int polygon_idx, int vertex_idx);
+  virtual void SetPolygonTextureMapping (const csPolygonRange& range,
+  	const csMatrix3& m, const csVector3& v);
+  virtual void SetPolygonTextureMapping (const csPolygonRange& range,
+  	const csVector2& uv1, const csVector2& uv2, const csVector2& uv3);
+  virtual void SetPolygonTextureMapping (const csPolygonRange& range,
+  	const csVector3& p1, const csVector2& uv1,
+  	const csVector3& p2, const csVector2& uv2,
+  	const csVector3& p3, const csVector2& uv3);
+  virtual void SetPolygonTextureMapping (const csPolygonRange& range,
+  	const csVector3& v_orig, const csVector3& v1, float len1);
+  virtual void SetPolygonTextureMapping (const csPolygonRange& range,
+  	const csVector3& v_orig,
+	const csVector3& v1, float len1,
+	const csVector3& v2, float len2);
+  virtual void SetPolygonTextureMapping (const csPolygonRange& range,
+  	float len1);
+  virtual void GetPolygonTextureMapping (int polygon_idx,
+  	csMatrix3& m, csVector3& v);
+  virtual void SetTextureMappingEnabled (const csPolygonRange& range,
+  	bool enabled);
+  virtual bool IsPolygonTextureMappingEnabled (int polygon_idx) const;
+  virtual void SetPolygonFlags (const csPolygonRange& range, uint32 flags);
+  virtual void ResetPolygonFlags (const csPolygonRange& range, uint32 flags);
+  virtual csFlags& GetPolygonFlags (int polygon_idx);
+  virtual const csPlane3& GetPolygonObjectPlane (int polygon_idx);
+  virtual bool IsPolygonTransparent (int polygon_idx);
 
   //-------------------- iMeshObjectFactory interface implementation ---------
 
@@ -889,6 +946,11 @@ public:
     return mixmode;
   }
 
+  const csPlane3& GetPolygonWorldPlane (int polygon_idx);
+  iMaterialWrapper* GetPolygonMaterial (int polygon_idx);
+  void SetPolygonMaterial (const csPolygonRange& range,
+  	iMaterialWrapper* material);
+
   SCF_DECLARE_IBASE;
 
   //------------------------- iThingState interface -------------------------
@@ -945,6 +1007,19 @@ public:
     virtual uint GetMixMode () const
     {
       return scfParent->GetMixMode ();
+    }
+    virtual const csPlane3& GetPolygonWorldPlane (int polygon_idx)
+    {
+      return scfParent->GetPolygonWorldPlane (polygon_idx);
+    }
+    virtual iMaterialWrapper* GetPolygonMaterial (int polygon_idx)
+    {
+      return scfParent->GetPolygonMaterial (polygon_idx);
+    }
+    virtual void SetPolygonMaterial (const csPolygonRange& range,
+  	iMaterialWrapper* material)
+    {
+      scfParent->SetPolygonMaterial (range, material);
     }
   } scfiThingState;
   friend struct ThingState;

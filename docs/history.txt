@@ -6,6 +6,53 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-oct-2003
+	- Jorrit added the following new functions to iThingFactoryState:
+	    - FindPolygonByName (const char*)
+	    - AddEmptyPolygon ()
+	    - AddTriangle (csVector3, csVector3, csVector3)
+	    - AddQuad (csVector3, csVector3, csVector3, csVector3)
+	    - AddPolygon (csVector3*, int)
+	    - AddPolygon (int, ...)
+	    - AddOutsideBox (csVector3, csVector3)
+	    - AddInsideBox (csVector3, csVector3)
+	    - SetPolygonName (csPolygonRange, const char*)
+	    - GetPolygonName (int)
+	    - SetPolygonMaterial (csPolygonRange, iMaterialWrapper*)
+	    - GetPolygonMaterial (int)
+	    - AddPolygonVertex (csPolygonRange, csVector3)
+	    - AddPolygonVertex (csPolygonRange, int)
+	    - GetPolygonVertexCount (int)
+	    - GetPolygonVertex (int, int)
+	    - SetPolygonTextureMapping (csPolygonRange, csMatrix3, csVector3)
+	    - SetPolygonTextureMapping (csPolygonRange, csVector2, csVector2, csVector2)
+	    - SetPolygonTextureMapping (csPolygonRange, csVector3, csVector2, csVector3,
+	    	csVector2, csVector3, csVector2)
+	    - SetPolygonTextureMapping (csPolygonRange, csVector3, csVector3, float)
+	    - SetPolygonTextureMapping (csPolygonRange, csVector3, csVector3, float,
+	    	csVector3, float)
+	    - SetPolygonTextureMapping (csPolygonRange, float)
+	    - GetPolygonTextureMapping (int, csMatrix3, csVector3)
+	    - SetTextureMappingEnabled (csPolygonRange, bool)
+	    - IsPolygonTextureMappingEnabled (int)
+	    - SetPolygonFlags (csPolygonRange, uint32)
+	    - ResetPolygonFlags (csPolygonRange, uint32)
+	    - GetPolygonFlags (int)
+	    - GetPolygonObjectPlane (int)
+	    - IsPolygonTransparent (int)
+	  and the following new functions to iThingState:
+	    - GetPolygonWorldPlane (int)
+	    - GetPolygonMaterial (int)
+	    - SetPolygonMaterial (csPolygonRange, iMaterialWrapper*)
+	  The idea is to eventually get rid of the iPolygon3DStatic and iPolygon3D
+	  interfaces. To do that we have to provide alternative ways to create polygons.
+	  We attempted to make an API that is as flexible as the old one but a lot easier
+	  to use. For example, in simple1 we could replace about 44 lines with 3 using the
+	  new API.
+	- Jorrit removed the bumptest app since this way to do bumpmapping is obsolete
+	  when the new renderer is ready.
+	- Jorrit converted all applications to use the new thing API. As a consequence
+	  none of the applications use the iPolygon3D or iPolygon3DStatic interfaces now.
 8-Oct-2003
 	- Jorrit fixed keycolor rendering in the old OpenGL renderer in case
 	  DrawPolygonMesh was used (fastmesh).

@@ -53,7 +53,6 @@ struct iMaterialHandle;
 struct iLoader;
 struct iMeshWrapper;
 struct iLight;
-struct iPolygon3D;
 struct iView;
 struct iSoundRender;
 struct iMotionManager;
@@ -325,7 +324,7 @@ public:
   /// The selected light.
   iLight* selected_light;
   /// The selected polygon.
-  iPolygon3D* selected_polygon;
+  int selected_polygon;
 
   /// Debug box 1.
   csBox3 debug_box1;

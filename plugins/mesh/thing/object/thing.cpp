@@ -138,6 +138,7 @@ csStringID csThingStatic::binormal_name = csInvalidStringID;*/
 #endif
 
 csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
+	last_range (0, -1),
 	static_polygons (32, 64),
 	scfiPolygonMesh (0),
 	scfiPolygonMeshCD (CS_POLY_COLLDET),
@@ -796,13 +797,14 @@ iPolygon3DStatic *csThingStatic::GetPolygon (const char* name)
   return idx >= 0 ? &(static_polygons.Get (idx)->scfiPolygon3DStatic) : 0;
 }
 
-void csThingStatic::AddPolygon (csPolygon3DStatic* spoly)
+int csThingStatic::AddPolygon (csPolygon3DStatic* spoly)
 {
   spoly->SetParent (this);
   spoly->EnableTextureMapping (true);
-  static_polygons.Push (spoly);
+  int idx = static_polygons.Push (spoly);
   scfiObjectModel.ShapeChanged ();
   UnprepareLMLayout ();
+  return idx;
 }
 
 iPolygon3DStatic *csThingStatic::CreatePolygon (const char *name)
@@ -1179,6 +1181,362 @@ void csThingStatic::FillRenderMeshes (
   binormal_buffer->Release ();*/
 }
 #endif // CS_USE_NEW_RENDERER
+
+int csThingStatic::FindPolygonByName (const char* name)
+{
+  return static_polygons.FindKey ((void*)name, static_polygons.CompareKey);
+}
+
+void csThingStatic::GetRealRange (const csPolygonRange& requested_range,
+	int& start, int& end)
+{
+  if (requested_range.start == -1)
+  {
+    start = last_range.start;
+    end = last_range.end;
+    CS_ASSERT (end != -1);
+    return;
+  }
+  start = requested_range.start;
+  end = requested_range.end;
+  if (start < 0) start = 0;
+  if (end >= static_polygons.Length ())
+    end = static_polygons.Length ()-1;
+}
+
+int csThingStatic::AddEmptyPolygon ()
+{
+  csPolygon3DStatic* sp = thing_type->blk_polygon3dstatic.Alloc ();
+  int idx = AddPolygon (sp);
+  last_range.Set (idx);
+  return idx;
+}
+
+int csThingStatic::AddTriangle (const csVector3& v1, const csVector3& v2,
+  	const csVector3& v3)
+{
+  int idx = AddEmptyPolygon ();
+  csPolygon3DStatic* sp = static_polygons[idx];
+  sp->AddVertex (v1);
+  sp->AddVertex (v2);
+  sp->AddVertex (v3);
+  last_range.Set (idx);
+  sp->SetTextureSpace (v1, v2, 1);
+  return idx;
+}
+
+int csThingStatic::AddQuad (const csVector3& v1, const csVector3& v2,
+  	const csVector3& v3, const csVector3& v4)
+{
+  int idx = AddEmptyPolygon ();
+  csPolygon3DStatic* sp = static_polygons[idx];
+  sp->AddVertex (v1);
+  sp->AddVertex (v2);
+  sp->AddVertex (v3);
+  sp->AddVertex (v4);
+  last_range.Set (idx);
+  sp->SetTextureSpace (v1, v2, 1);
+  return idx;
+}
+
+int csThingStatic::AddPolygon (csVector3* vertices, int num)
+{
+  int idx = AddEmptyPolygon ();
+  csPolygon3DStatic* sp = static_polygons[idx];
+  int i;
+  for (i = 0 ; i < num ; i++)
+  {
+    sp->AddVertex (vertices[i]);
+  }
+  last_range.Set (idx);
+  sp->SetTextureSpace (vertices[0], vertices[1], 1);
+  return idx;
+}
+
+int csThingStatic::AddPolygon (int num, ...)
+{
+  int idx = AddEmptyPolygon ();
+  csPolygon3DStatic* sp = static_polygons[idx];
+  va_list arg;
+  va_start (arg, num);
+  int i;
+  for (i = 0 ; i < num ; i++)
+  {
+    int v = va_arg (arg, int);
+    sp->AddVertex (v);
+  }
+  va_end (arg);
+  last_range.Set (idx);
+  sp->SetTextureSpace (sp->Vobj (0), sp->Vobj (1), 1);
+  return idx;
+}
+
+int csThingStatic::AddOutsideBox (const csVector3& bmin, const csVector3& bmax)
+{
+  csBox3 box (bmin, bmax);
+  int firstidx = AddQuad (
+  	box.GetCorner (CS_BOX_CORNER_xYz),
+  	box.GetCorner (CS_BOX_CORNER_XYz),
+  	box.GetCorner (CS_BOX_CORNER_Xyz),
+  	box.GetCorner (CS_BOX_CORNER_xyz));
+  AddQuad (
+  	box.GetCorner (CS_BOX_CORNER_XYz),
+  	box.GetCorner (CS_BOX_CORNER_XYZ),
+  	box.GetCorner (CS_BOX_CORNER_XyZ),
+  	box.GetCorner (CS_BOX_CORNER_Xyz));
+  AddQuad (
+  	box.GetCorner (CS_BOX_CORNER_XYZ),
+  	box.GetCorner (CS_BOX_CORNER_xYZ),
+  	box.GetCorner (CS_BOX_CORNER_xyZ),
+  	box.GetCorner (CS_BOX_CORNER_XyZ));
+  AddQuad (
+  	box.GetCorner (CS_BOX_CORNER_xYZ),
+  	box.GetCorner (CS_BOX_CORNER_xYz),
+  	box.GetCorner (CS_BOX_CORNER_xyz),
+  	box.GetCorner (CS_BOX_CORNER_xyZ));
+  AddQuad (
+  	box.GetCorner (CS_BOX_CORNER_xyz),
+  	box.GetCorner (CS_BOX_CORNER_Xyz),
+  	box.GetCorner (CS_BOX_CORNER_XyZ),
+  	box.GetCorner (CS_BOX_CORNER_xyZ));
+  AddQuad (
+  	box.GetCorner (CS_BOX_CORNER_xYZ),
+  	box.GetCorner (CS_BOX_CORNER_XYZ),
+  	box.GetCorner (CS_BOX_CORNER_XYz),
+  	box.GetCorner (CS_BOX_CORNER_xYz));
+
+  last_range.Set (firstidx, firstidx+5);
+  return firstidx;
+}
+
+int csThingStatic::AddInsideBox (const csVector3& bmin, const csVector3& bmax)
+{
+  csBox3 box (bmin, bmax);
+  int firstidx = AddQuad (
+  	box.GetCorner (CS_BOX_CORNER_xyz),
+  	box.GetCorner (CS_BOX_CORNER_Xyz),
+  	box.GetCorner (CS_BOX_CORNER_XYz),
+  	box.GetCorner (CS_BOX_CORNER_xYz));
+  AddQuad (
+  	box.GetCorner (CS_BOX_CORNER_Xyz),
+  	box.GetCorner (CS_BOX_CORNER_XyZ),
+  	box.GetCorner (CS_BOX_CORNER_XYZ),
+  	box.GetCorner (CS_BOX_CORNER_XYz));
+  AddQuad (
+  	box.GetCorner (CS_BOX_CORNER_XyZ),
+  	box.GetCorner (CS_BOX_CORNER_xyZ),
+  	box.GetCorner (CS_BOX_CORNER_xYZ),
+  	box.GetCorner (CS_BOX_CORNER_XYZ));
+  AddQuad (
+  	box.GetCorner (CS_BOX_CORNER_xyZ),
+  	box.GetCorner (CS_BOX_CORNER_xyz),
+  	box.GetCorner (CS_BOX_CORNER_xYz),
+  	box.GetCorner (CS_BOX_CORNER_xYZ));
+  AddQuad (
+  	box.GetCorner (CS_BOX_CORNER_xyZ),
+  	box.GetCorner (CS_BOX_CORNER_XyZ),
+  	box.GetCorner (CS_BOX_CORNER_Xyz),
+  	box.GetCorner (CS_BOX_CORNER_xyz));
+  AddQuad (
+  	box.GetCorner (CS_BOX_CORNER_xYz),
+  	box.GetCorner (CS_BOX_CORNER_XYz),
+  	box.GetCorner (CS_BOX_CORNER_XYZ),
+  	box.GetCorner (CS_BOX_CORNER_xYZ));
+
+  last_range.Set (firstidx, firstidx+5);
+  return firstidx;
+}
+
+void csThingStatic::SetPolygonName (const csPolygonRange& range,
+  	const char* name)
+{
+  int i, start, end;
+  GetRealRange (range, start, end);
+  for (i = start ; i <= end ; i++)
+    static_polygons[i]->SetName (name);
+}
+
+const char* csThingStatic::GetPolygonName (int polygon_idx)
+{
+  return static_polygons[polygon_idx]->GetName ();
+}
+
+void csThingStatic::SetPolygonMaterial (const csPolygonRange& range,
+  	iMaterialWrapper* material)
+{
+  int i, start, end;
+  GetRealRange (range, start, end);
+  for (i = start ; i <= end ; i++)
+    static_polygons[i]->SetMaterial (material);
+}
+
+iMaterialWrapper* csThingStatic::GetPolygonMaterial (int polygon_idx)
+{
+  return static_polygons[polygon_idx]->GetMaterialWrapper ();
+}
+
+void csThingStatic::AddPolygonVertex (const csPolygonRange& range,
+  	const csVector3& vt)
+{
+  int i, start, end;
+  GetRealRange (range, start, end);
+  for (i = start ; i <= end ; i++)
+    static_polygons[i]->AddVertex (vt);
+}
+
+void csThingStatic::AddPolygonVertex (const csPolygonRange& range, int vt)
+{
+  int i, start, end;
+  GetRealRange (range, start, end);
+  for (i = start ; i <= end ; i++)
+    static_polygons[i]->AddVertex (vt);
+}
+
+int csThingStatic::GetPolygonVertexCount (int polygon_idx)
+{
+  return static_polygons[polygon_idx]->GetVertexCount ();
+}
+
+const csVector3& csThingStatic::GetPolygonVertex (int polygon_idx, int vertex_idx)
+{
+  return static_polygons[polygon_idx]->Vobj (vertex_idx);
+}
+
+void csThingStatic::SetPolygonTextureMapping (const csPolygonRange& range,
+  	const csMatrix3& m, const csVector3& v)
+{
+  int i, start, end;
+  GetRealRange (range, start, end);
+  for (i = start ; i <= end ; i++)
+    static_polygons[i]->SetTextureSpace (m, v);
+}
+
+void csThingStatic::SetPolygonTextureMapping (const csPolygonRange& range,
+  	const csVector2& uv1, const csVector2& uv2, const csVector2& uv3)
+{
+  int i, start, end;
+  GetRealRange (range, start, end);
+  for (i = start ; i <= end ; i++)
+  {
+    csPolygon3DStatic* sp = static_polygons[i];
+    sp->SetTextureSpace (
+    	sp->Vobj (0), uv1,
+    	sp->Vobj (1), uv2,
+    	sp->Vobj (2), uv3);
+  }
+}
+
+void csThingStatic::SetPolygonTextureMapping (const csPolygonRange& range,
+  	const csVector3& p1, const csVector2& uv1,
+  	const csVector3& p2, const csVector2& uv2,
+  	const csVector3& p3, const csVector2& uv3)
+{
+  int i, start, end;
+  GetRealRange (range, start, end);
+  for (i = start ; i <= end ; i++)
+  {
+    csPolygon3DStatic* sp = static_polygons[i];
+    sp->SetTextureSpace (p1, uv1, p2, uv2, p3, uv3);
+  }
+}
+
+void csThingStatic::SetPolygonTextureMapping (const csPolygonRange& range,
+  	const csVector3& v_orig, const csVector3& v1, float len1)
+{
+  int i, start, end;
+  GetRealRange (range, start, end);
+  for (i = start ; i <= end ; i++)
+  {
+    csPolygon3DStatic* sp = static_polygons[i];
+    sp->SetTextureSpace (v_orig, v1, len1);
+  }
+}
+
+void csThingStatic::SetPolygonTextureMapping (const csPolygonRange& range, float len1)
+{
+  int i, start, end;
+  GetRealRange (range, start, end);
+  for (i = start ; i <= end ; i++)
+  {
+    csPolygon3DStatic* sp = static_polygons[i];
+    sp->SetTextureSpace (sp->Vobj (0), sp->Vobj (1), len1);
+  }
+}
+
+void csThingStatic::SetPolygonTextureMapping (const csPolygonRange& range,
+  	const csVector3& v_orig,
+	const csVector3& v1, float len1,
+	const csVector3& v2, float len2)
+{
+  int i, start, end;
+  GetRealRange (range, start, end);
+  for (i = start ; i <= end ; i++)
+  {
+    csPolygon3DStatic* sp = static_polygons[i];
+    sp->SetTextureSpace (v_orig, v1, len1, v2, len2);
+  }
+}
+
+void csThingStatic::GetPolygonTextureMapping (int polygon_idx,
+  	csMatrix3& m, csVector3& v)
+{
+  static_polygons[polygon_idx]->GetTextureSpace (m, v);
+}
+
+void csThingStatic::SetTextureMappingEnabled (const csPolygonRange& range,
+  	bool enabled)
+{
+  int i, start, end;
+  GetRealRange (range, start, end);
+  for (i = start ; i <= end ; i++)
+  {
+    csPolygon3DStatic* sp = static_polygons[i];
+    sp->EnableTextureMapping (enabled);
+  }
+}
+
+bool csThingStatic::IsPolygonTextureMappingEnabled (int polygon_idx) const
+{
+  return static_polygons[polygon_idx]->IsTextureMappingEnabled ();
+}
+
+void csThingStatic::SetPolygonFlags (const csPolygonRange& range, uint32 flags)
+{
+  int i, start, end;
+  GetRealRange (range, start, end);
+  for (i = start ; i <= end ; i++)
+  {
+    csPolygon3DStatic* sp = static_polygons[i];
+    sp->flags.Set (flags);
+  }
+}
+
+void csThingStatic::ResetPolygonFlags (const csPolygonRange& range, uint32 flags)
+{
+  int i, start, end;
+  GetRealRange (range, start, end);
+  for (i = start ; i <= end ; i++)
+  {
+    csPolygon3DStatic* sp = static_polygons[i];
+    sp->flags.Reset (flags);
+  }
+}
+
+csFlags& csThingStatic::GetPolygonFlags (int polygon_idx)
+{
+  return static_polygons[polygon_idx]->flags;
+}
+
+const csPlane3& csThingStatic::GetPolygonObjectPlane (int polygon_idx)
+{
+  return static_polygons[polygon_idx]->GetObjectPlane ();
+}
+
+bool csThingStatic::IsPolygonTransparent (int polygon_idx)
+{
+  return static_polygons[polygon_idx]->IsTransparent ();
+}
+
 
 //----------------------------------------------------------------------------
 
@@ -1566,6 +1924,33 @@ csPolygon3D *csThing::GetPolygon3D (const char *name)
 {
   int idx = polygons.FindKey ((void*)name, polygons.CompareKey);
   return idx >= 0 ? polygons.Get (idx) : 0;
+}
+
+const csPlane3& csThing::GetPolygonWorldPlane (int polygon_idx)
+{
+  return polygons[polygon_idx]->GetWorldPlane ();
+}
+
+iMaterialWrapper* csThing::GetPolygonMaterial (int polygon_idx)
+{
+  return polygons[polygon_idx]->GetMaterial ();
+}
+
+void csThing::SetPolygonMaterial (const csPolygonRange& range,
+  	iMaterialWrapper* material)
+{
+  int start, end;
+  start = range.start;
+  end = range.end;
+  CS_ASSERT (start != -1);
+  CS_ASSERT (end != -1);
+  if (start < 0) start = 0;
+  if (end >= polygons.Length ()) end = polygons.Length ()-1;
+  int i;
+  for (i = start ; i <= end ; i++)
+  {
+    polygons[i]->SetMaterial (material);
+  }
 }
 
 int csThing::FindPolygonIndex (iPolygon3D *polygon) const

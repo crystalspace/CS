@@ -35,6 +35,49 @@ struct iMaterialList;
 struct iMovable;
 
 /**
+ * A range structure for specifing polygon ranges.
+ */
+struct csPolygonRange
+{
+  int start, end;
+  csPolygonRange (int start, int end)
+  {
+    csPolygonRange::start = start;
+    csPolygonRange::end = end;
+  }
+  void Set (int start, int end)
+  {
+    csPolygonRange::start = start;
+    csPolygonRange::end = end;
+  }
+  void Set (int idx)
+  {
+    csPolygonRange::start = idx;
+    csPolygonRange::end = idx;
+  }
+};
+
+/** \name Polygon ranges
+ * @{ */
+/**
+ * A general range of polygons (inclusive).
+ */
+#define CS_POLYRANGE(s1,s2) csPolygonRange (s1, s2)
+/**
+ * A single polygon.
+ */
+#define CS_POLYRANGE_SINGLE(idx) csPolygonRange (idx, idx)
+/**
+ * The last created polygon or series of polygons (in case it was a box).
+ */
+#define CS_POLYRANGE_LAST csPolygonRange (-1, -1)
+/**
+ * All polygons.
+ */
+#define CS_POLYRANGE_ALL csPolygonRange (0, 2000000000)
+/** @} */
+
+/**
  * If CS_THING_FASTMESH is set then this thing will be drawn using
  * the faster DrawPolygonMesh.
  */
@@ -56,7 +99,7 @@ struct iMovable;
 #define CS_THING_MOVE_OCCASIONAL 2
 
 
-SCF_VERSION (iThingFactoryState, 0, 1, 0);
+SCF_VERSION (iThingFactoryState, 0, 2, 0);
 
 /**
  * This is the state interface to access the internals of a thing
@@ -79,18 +122,286 @@ struct iThingFactoryState : public iBase
 
   /// Query number of polygons in this thing.
   virtual int GetPolygonCount () = 0;
-  /// Get a polygon from set by his index.
+  /// Get a polygon from set by his index. @@@ DEPRECATED
   virtual iPolygon3DStatic *GetPolygon (int idx) = 0;
-  /// Get a polygon from set by name.
+  /// Get a polygon from set by name. @@@ DEPRECATED
   virtual iPolygon3DStatic *GetPolygon (const char* name) = 0;
-  /// Create a new polygon and return a pointer to it.
+  /// Create a new polygon and return a pointer to it. @@@ DEPRECATED
   virtual iPolygon3DStatic *CreatePolygon (const char *iName = 0) = 0;
-  /// Find the index for a polygon. Returns -1 if polygon cannot be found.
+  /// Find the index for a polygon. Returns -1 if polygon cannot be found. @@@ DEPRECATED
   virtual int FindPolygonIndex (iPolygon3DStatic* polygon) const = 0;
   /// Delete a polygon given an index.
   virtual void RemovePolygon (int idx) = 0;
   /// Delete all polygons.
   virtual void RemovePolygons () = 0;
+
+  /// Find a polygon index with a name.
+  virtual int FindPolygonByName (const char* name) = 0;
+
+  /**
+   * Add an empty polygon.
+   * \return the index of the created polygon.
+   */
+  virtual int AddEmptyPolygon () = 0;
+
+  /**
+   * Add a triangle.
+   * <p>
+   * By default the texture mapping is set so that the texture
+   * is aligned on the u-axis with the 'v1'-'v2' vector and the scale is set so that
+   * the texture tiles once for every unit (i.e. if you have the vertices v1 and v2
+   * are 5 units seperated from each other then the texture will repeat exactly five
+   * times between v1 and v2).
+   * \return the index of the created polygon.
+   */
+  virtual int AddTriangle (const csVector3& v1, const csVector3& v2,
+  	const csVector3& v3) = 0;
+  /**
+   * Add a quad. Note that quads are the most optimal kind of polygon
+   * for a thing so you should try to use these as much as possible.
+   * <p>
+   * By default the texture mapping is set so that the texture
+   * is aligned on the u-axis with the 'v1'-'v2' vector and the scale is set so that
+   * the texture tiles once for every unit (i.e. if you have the vertices v1 and v2
+   * are 5 units seperated from each other then the texture will repeat exactly five
+   * times between v1 and v2).
+   * \return the index of the created polygon.
+   */
+  virtual int AddQuad (const csVector3& v1, const csVector3& v2,
+  	const csVector3& v3, const csVector3& v4) = 0;
+
+  /**
+   * Add a general polygon.
+   * <p>
+   * By default the texture mapping is set so that the texture
+   * is aligned on the u-axis with the 'v1'-'v2' vector and the scale is set so that
+   * the texture tiles once for every unit (i.e. if you have the vertices v1 and v2
+   * are 5 units seperated from each other then the texture will repeat exactly five
+   * times between v1 and v2).
+   * \return the index of the created polygon.
+   */
+  virtual int AddPolygon (csVector3* vertices, int num) = 0;
+
+  /**
+   * Add a general polygon using vertex indices.
+   * <p>
+   * By default the texture mapping is set so that the texture
+   * is aligned on the u-axis with the 'v1'-'v2' vector and the scale is set so that
+   * the texture tiles once for every unit (i.e. if you have the vertices v1 and v2
+   * are 5 units seperated from each other then the texture will repeat exactly five
+   * times between v1 and v2).
+   * \return the index of the created polygon.
+   */
+  virtual int AddPolygon (int num, ...) = 0;
+
+  /**
+   * Add a box that can be seen from the outside. This will add six polygons.
+   * <p>
+   * By default the texture mapping is set so that the texture
+   * is aligned on the u-axis with the 'v1'-'v2' vector and the scale is set so that
+   * the texture tiles once for every unit (i.e. if you have the vertices v1 and v2
+   * are 5 units seperated from each other then the texture will repeat exactly five
+   * times between v1 and v2).
+   * \return the index of the first created polygon.
+   */
+  virtual int AddOutsideBox (const csVector3& bmin, const csVector3& bmax) = 0;
+
+  /**
+   * Add a box that can be seen from the inside. This will add six polygons.
+   * <p>
+   * By default the texture mapping is set so that the texture
+   * is aligned on the u-axis with the 'v1'-'v2' vector and the scale is set so that
+   * the texture tiles once for every unit (i.e. if you have the vertices v1 and v2
+   * are 5 units seperated from each other then the texture will repeat exactly five
+   * times between v1 and v2).
+   * \return the index of the first created polygon.
+   */
+  virtual int AddInsideBox (const csVector3& bmin, const csVector3& bmax) = 0;
+
+  /**
+   * Set the name of all polygons in the given range.
+   * \param range is one of the #CS_POLYRANGE defines to specify a polygon
+   * range.
+   */
+  virtual void SetPolygonName (const csPolygonRange& range,
+  	const char* name) = 0;
+
+  /**
+   * Get the name of the specified polygon.
+   */
+  virtual const char* GetPolygonName (int polygon_idx) = 0;
+
+  /**
+   * Set the material of all polygons in the given range.
+   * \param range is one of the #CS_POLYRANGE defines to specify a polygon
+   * range.
+   */
+  virtual void SetPolygonMaterial (const csPolygonRange& range,
+  	iMaterialWrapper* material) = 0;
+
+  /**
+   * Get the material for the specified polygon.
+   */
+  virtual iMaterialWrapper* GetPolygonMaterial (int polygon_idx) = 0;
+
+  /**
+   * Add a vertex to all polygons in the given range.
+   * \param range is one of the #CS_POLYRANGE defines to specify a polygon
+   * range.
+   */
+  virtual void AddPolygonVertex (const csPolygonRange& range,
+  	const csVector3& vt) = 0;
+
+  /**
+   * Add a vertex index to all polygons in the given range.
+   * \param range is one of the #CS_POLYRANGE defines to specify a polygon
+   * range.
+   */
+  virtual void AddPolygonVertex (const csPolygonRange& range, int vt) = 0;
+
+  /**
+   * Get number of vertices for polygon.
+   */
+  virtual int GetPolygonVertexCount (int polygon_idx) = 0;
+
+  /**
+   * Get a vertex from a polygon.
+   */
+  virtual const csVector3& GetPolygonVertex (int polygon_idx, int vertex_idx) = 0;
+
+  /**
+   * Set texture mapping of all polygons in the given range to use the
+   * transform.
+   * This function is usually not used by application code as it is complicated
+   * to specify texture mapping like this. It is recommended to use one
+   * of the other texture mapping routines.
+   * \param range is one of the #CS_POLYRANGE defines to specify a polygon
+   * range.
+   */
+  virtual void SetPolygonTextureMapping (const csPolygonRange& range,
+  	const csMatrix3& m, const csVector3& v) = 0;
+
+  /**
+   * Set texture mapping of all polygons in the given range to use the
+   * given uv coordinates for the first three vertices of every polygon.
+   * \param range is one of the #CS_POLYRANGE defines to specify a polygon
+   * range.
+   */
+  virtual void SetPolygonTextureMapping (const csPolygonRange& range,
+  	const csVector2& uv1, const csVector2& uv2, const csVector2& uv3) = 0;
+
+  /**
+   * Set texture mapping of all polygons in the given range to use the
+   * given uv coordinates for the specified three vertices of every polygon.
+   * Note that this function is only useful for polygon ranges that are on
+   * the same plane.
+   * \param range is one of the #CS_POLYRANGE defines to specify a polygon
+   * range.
+   */
+  virtual void SetPolygonTextureMapping (const csPolygonRange& range,
+  	const csVector3& p1, const csVector2& uv1,
+  	const csVector3& p2, const csVector2& uv2,
+  	const csVector3& p3, const csVector2& uv3) = 0;
+
+  /**
+   * Set texture mapping of all polygons in the given range to use the
+   * texture mapping as specified by two vertices on the polygon. The
+   * first vertex is seen as the origin and the second as the u-axis of the
+   * texture space coordinate system. The v-axis is calculated on the plane
+   * of the polygons and orthogonal to the given u-axis. The length of the
+   * u-axis and the v-axis is given as the 'len1' parameter.
+   * <p>
+   * For example, if 'len1' is equal to 2 this means that texture will be
+   * tiled exactly two times between vertex 'v_orig' and 'v1'.
+   * \param range is one of the #CS_POLYRANGE defines to specify a polygon
+   * range.
+   */
+  virtual void SetPolygonTextureMapping (const csPolygonRange& range,
+  	const csVector3& v_orig, const csVector3& v1, float len1) = 0;
+
+  /**
+   * Set texture mapping of all polygons in the given range to use the
+   * texture mapping as specified by two vertices on the polygon. The
+   * first vertex is seen as the origin, the second as the u-axis of the
+   * texture space coordinate system, and the third as the v-axis.
+   * The length of the u-axis and the v-axis is given with the 'len1' and
+   * 'len2' parameters.
+   * <p>
+   * For example, if 'len1' is equal to 2 this means that texture will be
+   * tiled exactly two times between vertex 'v_orig' and 'v1'.
+   * \param range is one of the #CS_POLYRANGE defines to specify a polygon
+   * range.
+   */
+  virtual void SetPolygonTextureMapping (const csPolygonRange& range,
+  	const csVector3& v_orig,
+	const csVector3& v1, float len1,
+	const csVector3& v2, float len2) = 0;
+
+  /**
+   * Set texture mapping of all polygons in the given range to use the
+   * texture mapping as specified by the two first vertices on the polygon. The
+   * first vertex is seen as the origin and the second as the u-axis of the
+   * texture space coordinate system. The v-axis is calculated on the plane
+   * of the polygons and orthogonal to the given u-axis. The length of the
+   * u-axis and the v-axis is given as the 'len1' parameter.
+   * <p>
+   * For example, if 'len1' is equal to 2 this means that texture will be
+   * tiled exactly two times between the two first vertices.
+   * \param range is one of the #CS_POLYRANGE defines to specify a polygon
+   * range.
+   */
+  virtual void SetPolygonTextureMapping (const csPolygonRange& range,
+  	float len1) = 0;
+
+  /**
+   * Get the texture space information for the specified polygon.
+   */
+  virtual void GetPolygonTextureMapping (int polygon_idx,
+  	csMatrix3& m, csVector3& v) = 0;
+
+  /**
+   * Disable or enable texture mapping for the range of polygons.
+   * \param range is one of the #CS_POLYRANGE defines to specify a polygon
+   * range.
+   */
+  virtual void SetTextureMappingEnabled (const csPolygonRange& range,
+  	bool enabled) = 0;
+
+  /**
+   * Check if texture mapping is enabled for the specified polygon.
+   */
+  virtual bool IsPolygonTextureMappingEnabled (int polygon_idx) const = 0;
+
+  /**
+   * Set the given flags to all polygons in the range.
+   * \param range is one of the #CS_POLYRANGE defines to specify a polygon
+   * range.
+   */
+  virtual void SetPolygonFlags (const csPolygonRange& range, uint32 flags) = 0;
+
+  /**
+   * Reset the given flags to all polygons in the range.
+   * \param range is one of the #CS_POLYRANGE defines to specify a polygon
+   * range.
+   */
+  virtual void ResetPolygonFlags (const csPolygonRange& range, uint32 flags) = 0;
+
+  /**
+   * Get the flags of the specified polygon.
+   */
+  virtual csFlags& GetPolygonFlags (int polygon_idx) = 0;
+
+  /**
+   * Get object space plane of the specified polygon.
+   */
+  virtual const csPlane3& GetPolygonObjectPlane (int polygon_idx) = 0;
+
+  /**
+   * Return true if this polygon or the texture it uses is transparent.
+   */
+  virtual bool IsPolygonTransparent (int polygon_idx) = 0;
+
+
 
   /// Query number of vertices in set
   virtual int GetVertexCount () const = 0;
@@ -147,7 +458,7 @@ struct iThingFactoryState : public iBase
   virtual void SetCosinusFactor (float cosfact) = 0;
 };
 
-SCF_VERSION (iThingState, 0, 6, 2);
+SCF_VERSION (iThingState, 0, 7, 0);
 
 /**
  * This is the state interface to access the internals of a thing
@@ -243,6 +554,27 @@ struct iThingState : public iBase
   virtual void SetMixMode (uint mode) = 0;
   /// Get mix mode.
   virtual uint GetMixMode () const = 0;
+
+  /**
+   * Get world space plane of the specified polygon.
+   */
+  virtual const csPlane3& GetPolygonWorldPlane (int polygon_idx) = 0;
+
+  /**
+   * Get the material for the specified polygon.
+   */
+  virtual iMaterialWrapper* GetPolygonMaterial (int polygon_idx) = 0;
+
+  /**
+   * Set the material of all polygons in the given range.
+   * Set the material of all polygons in the given range.
+   * This material must have the same size as the material given in the factory!
+   * If 0 then the factory material will be used.
+   * \param range is one of the #CS_POLYRANGE defines to specify a polygon
+   * range. Note that it is not allowed to use #CS_POLYRANGE_LAST here!
+   */
+  virtual void SetPolygonMaterial (const csPolygonRange& range,
+  	iMaterialWrapper* material) = 0;
 };
 
 SCF_VERSION (iThingEnvironment, 0, 3, 0);

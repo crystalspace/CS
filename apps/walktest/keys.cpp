@@ -624,18 +624,14 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
   {
     csRef<iThingState> ps = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
     	iThingState);
-    iPolygon3D* p = ps->GetPolygon (sel);
-    if (Sys->selected_polygon == p)
-      Sys->selected_polygon = 0;
-    else
-      Sys->selected_polygon = p;
+    Sys->selected_polygon = sel;
 
     iMeshObject* obj = mesh->GetMeshObject ();
     csRef<iObject> psobj = SCF_QUERY_INTERFACE (obj->GetLogicalParent (),
     	iObject);
     Sys->Report (CS_REPORTER_SEVERITY_DEBUG, "Hit polygon '%s/%s'",
     	psobj ? psobj->GetName () : "<null>",
-	p->GetStaticData ()->GetName ());
+	ps->GetFactory ()->GetPolygonName (sel));
     //Dumper::dump (sel);
   }
 

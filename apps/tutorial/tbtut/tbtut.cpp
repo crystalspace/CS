@@ -180,54 +180,10 @@ bool TerrBigTut::Initialize ()
   csRef<iThingState> ws =
   	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
   csRef<iThingFactoryState> walls_state = ws->GetFactory ();
-  iPolygon3DStatic* p;
-  p = walls_state->CreatePolygon ();
-  p->SetMaterial (tm);
-  p->CreateVertex (csVector3 (-128, 0, 128));
-  p->CreateVertex (csVector3 (128, 0, 128));
-  p->CreateVertex (csVector3 (128, 0, -128));
-  p->CreateVertex (csVector3 (-128, 0, -128));
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
-
-  p = walls_state->CreatePolygon ();
-  p->SetMaterial (tm);
-  p->CreateVertex (csVector3 (-128, 100, -128));
-  p->CreateVertex (csVector3 (128, 100, -128));
-  p->CreateVertex (csVector3 (128, 100, 128));
-  p->CreateVertex (csVector3 (-128, 100, 128));
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
-
-  p = walls_state->CreatePolygon ();
-  p->SetMaterial (tm);
-  p->CreateVertex (csVector3 (-128, 100, 128));
-  p->CreateVertex (csVector3 (128, 100, 128));
-  p->CreateVertex (csVector3 (128, 0, 128));
-  p->CreateVertex (csVector3 (-128, 0, 128));
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
-
-  p = walls_state->CreatePolygon ();
-  p->SetMaterial (tm);
-  p->CreateVertex (csVector3 (128, 100, 128));
-  p->CreateVertex (csVector3 (128, 100, -128));
-  p->CreateVertex (csVector3 (128, 0, -128));
-  p->CreateVertex (csVector3 (128, 0, 128));
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
-
-  p = walls_state->CreatePolygon ();
-  p->SetMaterial (tm);
-  p->CreateVertex (csVector3 (-128, 100, -128));
-  p->CreateVertex (csVector3 (-128, 100, 128));
-  p->CreateVertex (csVector3 (-128, 0, 128));
-  p->CreateVertex (csVector3 (-128, 0, -128));
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
-
-  p = walls_state->CreatePolygon ();
-  p->SetMaterial (tm);
-  p->CreateVertex (csVector3 (128, 100, -128));
-  p->CreateVertex (csVector3 (-128, 100, -128));
-  p->CreateVertex (csVector3 (-128, 0, -128));
-  p->CreateVertex (csVector3 (128, 0, -128));
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
+  walls_state->AddInsideBox (csVector3 (-128, 0, -128),
+  	csVector3 (128, 100, 128));
+  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
+  walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
 
   csRef<iMeshFactoryWrapper> factory;
   factory = engine->CreateMeshFactory ("crystalspace.mesh.object.terrbig",

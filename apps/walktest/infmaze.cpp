@@ -65,14 +65,13 @@ void InfiniteMaze::create_one_side (iThingFactoryState* walls_state,
   else if (dy) { sx = sz = .9; sy = 0; }
   else { sx = sy = .9; sz = 0; }
 
-  iPolygon3DStatic* p;
-  p = walls_state->CreatePolygon (pname);
-  p->SetMaterial (tm);
-  p->CreateVertex (csVector3 (cx+sx*x1, cy+sy*y1, cz+sz*z1));
-  p->CreateVertex (csVector3 (cx+sx*x2, cy+sy*y2, cz+sz*z2));
-  p->CreateVertex (csVector3 (cx+sx*x3, cy+sy*y3, cz+sz*z3));
-  p->CreateVertex (csVector3 (cx+sx*x4, cy+sy*y4, cz+sz*z4));
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 1);
+  walls_state->AddQuad (
+    csVector3 (cx+sx*x1, cy+sy*y1, cz+sz*z1),
+    csVector3 (cx+sx*x2, cy+sy*y2, cz+sz*z2),
+    csVector3 (cx+sx*x3, cy+sy*y3, cz+sz*z3),
+    csVector3 (cx+sx*x4, cy+sy*y4, cz+sz*z4));
+  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
+  walls_state->SetPolygonName (CS_POLYRANGE_LAST, pname);
 
   float nx1 = x1+dx, ny1 = y1+dy, nz1 = z1+dz;
   float nx2 = x2+dx, ny2 = y2+dy, nz2 = z2+dz;
@@ -80,37 +79,31 @@ void InfiniteMaze::create_one_side (iThingFactoryState* walls_state,
   float nx4 = x4+dx, ny4 = y4+dy, nz4 = z4+dz;
   float ncx = cx+dx, ncy = cy+dy, ncz = cz+dz;
 
-  p = walls_state->CreatePolygon ();
-  p->SetMaterial (tm2);
-  p->CreateVertex (csVector3 (cx+sx*x2, cy+sy*y2, cz+sz*z2));
-  p->CreateVertex (csVector3 (cx+sx*x1, cy+sy*y1, cz+sz*z1));
-  p->CreateVertex (csVector3 (ncx+sx*nx1, ncy+sy*ny1, ncz+sz*nz1));
-  p->CreateVertex (csVector3 (ncx+sx*nx2, ncy+sy*ny2, ncz+sz*nz2));
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 1);
+  int first = walls_state->AddQuad (
+    csVector3 (cx+sx*x2, cy+sy*y2, cz+sz*z2),
+    csVector3 (cx+sx*x1, cy+sy*y1, cz+sz*z1),
+    csVector3 (ncx+sx*nx1, ncy+sy*ny1, ncz+sz*nz1),
+    csVector3 (ncx+sx*nx2, ncy+sy*ny2, ncz+sz*nz2));
 
-  p = walls_state->CreatePolygon ();
-  p->SetMaterial (tm2);
-  p->CreateVertex (csVector3 (cx+sx*x3, cy+sy*y3, cz+sz*z3));
-  p->CreateVertex (csVector3 (cx+sx*x2, cy+sy*y2, cz+sz*z2));
-  p->CreateVertex (csVector3 (ncx+sx*nx2, ncy+sy*ny2, ncz+sz*nz2));
-  p->CreateVertex (csVector3 (ncx+sx*nx3, ncy+sy*ny3, ncz+sz*nz3));
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 1);
+  walls_state->AddQuad (
+    csVector3 (cx+sx*x3, cy+sy*y3, cz+sz*z3),
+    csVector3 (cx+sx*x2, cy+sy*y2, cz+sz*z2),
+    csVector3 (ncx+sx*nx2, ncy+sy*ny2, ncz+sz*nz2),
+    csVector3 (ncx+sx*nx3, ncy+sy*ny3, ncz+sz*nz3));
 
-  p = walls_state->CreatePolygon ();
-  p->SetMaterial (tm2);
-  p->CreateVertex (csVector3 (cx+sx*x4, cy+sy*y4, cz+sz*z4));
-  p->CreateVertex (csVector3 (cx+sx*x3, cy+sy*y3, cz+sz*z3));
-  p->CreateVertex (csVector3 (ncx+sx*nx3, ncy+sy*ny3, ncz+sz*nz3));
-  p->CreateVertex (csVector3 (ncx+sx*nx4, ncy+sy*ny4, ncz+sz*nz4));
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 1);
+  walls_state->AddQuad (
+    csVector3 (cx+sx*x4, cy+sy*y4, cz+sz*z4),
+    csVector3 (cx+sx*x3, cy+sy*y3, cz+sz*z3),
+    csVector3 (ncx+sx*nx3, ncy+sy*ny3, ncz+sz*nz3),
+    csVector3 (ncx+sx*nx4, ncy+sy*ny4, ncz+sz*nz4));
 
-  p = walls_state->CreatePolygon ();
-  p->SetMaterial (tm2);
-  p->CreateVertex (csVector3 (cx+sx*x1, cy+sy*y1, cz+sz*z1));
-  p->CreateVertex (csVector3 (cx+sx*x4, cy+sy*y4, cz+sz*z4));
-  p->CreateVertex (csVector3 (ncx+sx*nx4, ncy+sy*ny4, ncz+sz*nz4));
-  p->CreateVertex (csVector3 (ncx+sx*nx1, ncy+sy*ny1, ncz+sz*nz1));
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 1);
+  int last = walls_state->AddQuad (
+    csVector3 (cx+sx*x1, cy+sy*y1, cz+sz*z1),
+    csVector3 (cx+sx*x4, cy+sy*y4, cz+sz*z4),
+    csVector3 (ncx+sx*nx4, ncy+sy*ny4, ncz+sz*nz4),
+    csVector3 (ncx+sx*nx1, ncy+sy*ny1, ncz+sz*nz1));
+
+  walls_state->SetPolygonMaterial (CS_POLYRANGE (first, last), tm2);
 }
 
 float rand1 (float max)
@@ -193,9 +186,9 @@ void InfiniteMaze::connect_infinite (int x1, int y1, int z1, int x2, int y2,
   else
     if (x1 < x2) { p1 = "e"; p2 = "w"; }
     else { p1 = "w"; p2 = "e"; }
-  iPolygon3DStatic* po1 = s1->walls_fact_state->GetPolygon (p1);
-  iPolygon3DStatic* po2 = s2->walls_fact_state->GetPolygon (p2);
   //@@@@@@@@@
+  //iPolygon3DStatic* po1 = s1->walls_fact_state->GetPolygon (p1);
+  //iPolygon3DStatic* po2 = s2->walls_fact_state->GetPolygon (p2);
   //if (create_portal1) po1->CreatePortal (s2->sector);
   //po2->CreatePortal (s1->sector);
 }
@@ -309,8 +302,8 @@ void InfiniteMaze::create_loose_portal (int x1, int y1, int z1,
     if (x1 < x2) p1 = "e";
     else p1 = "w";
   InfRoomData* s = (InfRoomData*)(infinite_world->Get (x1, y1, z1));
-  iPolygon3DStatic* po = s->walls_fact_state->GetPolygon (p1);
   //@@@@@@@@@@@@
+  //iPolygon3DStatic* po = s->walls_fact_state->GetPolygon (p1);
   //iPortal* portal = po->CreateNullPortal ();
   InfPortalCS* prt = new InfPortalCS ();
   prt->x1 = x1; prt->y1 = y1; prt->z1 = z1;

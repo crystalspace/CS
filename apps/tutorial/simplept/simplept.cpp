@@ -62,13 +62,9 @@ CS_IMPLEMENT_APPLICATION
 void Simple::CreatePolygon (iThingFactoryState *th,
 	int v1, int v2, int v3, int v4, iMaterialWrapper *mat)
 {
-  iPolygon3DStatic* p = th->CreatePolygon ();
-  p->SetMaterial (mat);
-  p->CreateVertex (v1);
-  p->CreateVertex (v2);
-  p->CreateVertex (v3);
-  p->CreateVertex (v4);
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 6);
+  th->AddPolygon (4, v1, v2, v3, v4);
+  th->SetPolygonMaterial (CS_POLYRANGE_LAST, mat);
+  th->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 6);
 }
 
 static float frand (float range)

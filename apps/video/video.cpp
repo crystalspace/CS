@@ -224,63 +224,9 @@ bool Video::Initialize (int argc, const char* const argv[],
   	SCF_QUERY_INTERFACE (wallmesh->GetMeshObject (), iThingState);
   csRef<iThingFactoryState> walls = ws->GetFactory ();
 
-  csVector3
-	   f1 (-5, 20, 5),
-	   f2 ( 5, 20, 5),
-	   f3 ( 5, 0, 5),
-	   f4 (-5, 0, 5),
-	   b1 (-5, 20, -5),
-	   b2 ( 5, 20, -5),
-	   b3 ( 5, 0, -5),
-	   b4 (-5, 0, -5);
-
-  iPolygon3DStatic* p = walls->CreatePolygon ("back");
-  p->SetMaterial (iMW);
-  p->CreateVertex (b4);
-  p->CreateVertex (b3);
-  p->CreateVertex (b2);
-  p->CreateVertex (b1);
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
-
-  p = walls->CreatePolygon ("front");
-  p->SetMaterial (iMW);
-  p->CreateVertex (f1);
-  p->CreateVertex (f2);
-  p->CreateVertex (f3);
-  p->CreateVertex (f4);
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
-
-  p = walls->CreatePolygon ("top");
-  p->SetMaterial (iMW);
-  p->CreateVertex (b1);
-  p->CreateVertex (b2);
-  p->CreateVertex (f2);
-  p->CreateVertex (f1);
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
-
-  p = walls->CreatePolygon ("right");
-  p->SetMaterial (iMW);
-  p->CreateVertex (f2);
-  p->CreateVertex (b2);
-  p->CreateVertex (b3);
-  p->CreateVertex (f3);
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
-
-  p = walls->CreatePolygon ("left");
-  p->SetMaterial (iMW);
-  p->CreateVertex (f1);
-  p->CreateVertex (f4);
-  p->CreateVertex (b4);
-  p->CreateVertex (b1);
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
-
-  p = walls->CreatePolygon ("bottom");
-  p->SetMaterial (iMW);
-  p->CreateVertex (f4);
-  p->CreateVertex (f3);
-  p->CreateVertex (b3);
-  p->CreateVertex (b4);
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
+  walls->AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
+  walls->SetPolygonMaterial (CS_POLYRANGE_LAST, iMW);
+  walls->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
 
   csRef<iStatLight> light;
   iLightList* ll = room->GetLights ();
