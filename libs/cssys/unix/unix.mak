@@ -97,6 +97,7 @@ SRC.SYS_CSSYS= $(wildcard $(SRCDIR)/libs/cssys/unix/*.cpp) \
   $(SRCDIR)/libs/cssys/general/sysinit.cpp \
   $(SRCDIR)/libs/cssys/general/platformconfig.cpp \
   $(SRCDIR)/libs/cssys/general/scanplugins.cpp \
+  $(SRCDIR)/libs/cssys/general/csprocessorcap.cpp \
   $(CSTHREAD.SRC)
 INC.SYS_CSSYS = $(wildcard $(SRCDIR)/libs/cssys/unix/*.h) $(CSTHREAD.INC)
 

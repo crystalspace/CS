@@ -6,13 +6,13 @@ case WIN32 :
   SearchSubdir win32 ;
   SearchSubdir general ; 
   SYSFILES = [ Wildcard win32 : *.cpp *.h ] 
-		findlib.cpp getopt.cpp printf.cpp runloop.cpp sysinit.cpp ;
+		findlib.cpp getopt.cpp printf.cpp runloop.cpp sysinit.cpp csprocessorcap.cpp ;
 case MACOS_X :
   SearchSubdir macosx ;
   SearchSubdir general ;
   SYSFILES = [ Wildcard macosx : *.cpp *.m *.mm *.h ] 
 		findlib.cpp getopt.cpp printf.cpp sysroot.cpp cspthrd.cpp 
-		cspthrd.h scanplugins.cpp ;
+		cspthrd.h scanplugins.cpp csprocessorcap.cpp ;
   InstallConfig macosx.cfg ;
 case * :		# posix/unix/linux mode
   SearchSubdir unix ;
@@ -20,7 +20,7 @@ case * :		# posix/unix/linux mode
   SYSFILES = [ Wildcard unix : *.cpp *.h ]
 		sysroot.cpp findlib.cpp getopt.cpp printf.cpp runloop.cpp 
 		sysinit.cpp cspthrd.cpp cspthrd.h platformconfig.cpp 
-		scanplugins.cpp ;
+		scanplugins.cpp csprocessorcap.cpp ;
 }
 
 Library cssys :
