@@ -193,8 +193,9 @@ public:
    *     can be different from the position of the light given by 'light'
    *     itself because we can have space warping).
    * </ul>
+   * Function returns false if there was no light hitting the polygon.
    */
-  void UpdateShadowMap (unsigned char* shadowmap,
+  bool UpdateShadowMap (unsigned char* shadowmap,
 	int lightcell_shift,
 	float shf_u, float shf_v,
 	float mul_u, float mul_v,

@@ -13,6 +13,16 @@ The history order is reversed so that new features are at the top.
 	- Added 'frain' command to walktest to test a rain mesh object
 	  that follows the camera around (as opposed to 'rain' which just
 	  makes a rain mesh object that is in the current sector completely).
+	- Huge optimization with CastShadows implementation of Dynavis
+	  and Frustvis. It now actually looks at the radius of the light.
+	  This has a big impact on speed for recalculation (recalculating
+	  lighting for flarge went from 7.5 to 2.7 seconds) and it also helps
+	  a lot in case pseudo-dynamic lightmaps or genmeshes need to be
+	  updated.
+	- Optimized the creation of pseudo-dynamic lightmaps a bit more.
+	  Now a pseudo-dynamic lightmap will only be created if the light
+	  REALLY affects the polygon and not when it theoretically could
+	  affect it due to distance.
 13-Feb-2003
 	- Added another trivial case to csRect::ClipLine() making it a little
 	  bit safer again.

@@ -840,11 +840,18 @@ void csPolyTexture::UpdateFromShadowBitmap (
 
   if (dyn)
   {
-    csShadowMap *smap = lm->FindShadowMap (light);
-    if (!smap) smap = lm->NewShadowMap (light, w, h);
+    if (!(shadow_bitmap->IsFullyShadowed () || shadow_bitmap->IsFullyUnlit ()))
+    {
+      csShadowMap *smap = lm->FindShadowMap (light);
+      bool created = false;
+      if (!smap)
+      {
+        smap = lm->NewShadowMap (light, w, h);
+	created = true;
+      }
 
-    unsigned char *shadowmap = smap->GetArray ();
-    shadow_bitmap->UpdateShadowMap (
+      unsigned char *shadowmap = smap->GetArray ();
+      bool relevant = shadow_bitmap->UpdateShadowMap (
         shadowmap,
         csLightMap::lightcell_shift,
         Imin_u,
@@ -858,7 +865,18 @@ void csPolyTexture::UpdateFromShadowBitmap (
         polygon,
         cosfact);
     
-    smap->CalcMaxShadow();
+      if (!relevant && created)
+      {
+        // The shadow map is just created but it is not relevant (i.e.
+	// the light really doesn't affect it).
+	// In that case we simply delete it again.
+	lm->DelShadowMap (smap);
+      }
+      else
+      {
+        smap->CalcMaxShadow();
+      }
+    }
   }
   else
   {
@@ -1431,7 +1449,7 @@ void csShadowBitmap::UpdateLightMap (
   }
 }
 
-void csShadowBitmap::UpdateShadowMap (
+bool csShadowBitmap::UpdateShadowMap (
   unsigned char *shadowmap,
   int lightcell_shift,
   float shf_u,
@@ -1445,7 +1463,7 @@ void csShadowBitmap::UpdateShadowMap (
   csPolygon3D* poly,
   float cosfact)
 {
-  if (IsFullyShadowed () || IsFullyUnlit ()) return ;
+  if (IsFullyShadowed () || IsFullyUnlit ()) return false;
 
   bool ful_lit = IsFullyLit ();
   int i, j, act;
@@ -1463,6 +1481,7 @@ void csShadowBitmap::UpdateShadowMap (
   v_rv *= rv_step;
   v_ru *= ru_step;
 
+  bool relevant = false;
   for (i = 0; i < lm_h; i++)
   {
     int uv = base_uv;
@@ -1609,8 +1628,10 @@ void csShadowBitmap::UpdateShadowMap (
       int l = shadowmap[uv] + QRound (
           CS_NORMAL_LIGHT_LEVEL * lightness * brightness);
       shadowmap[uv] = l < 255 ? l : 255;
+      if ((!relevant) && shadowmap[uv] > 0) relevant = true;
     }
   }
+  return relevant;
 }
 
 //------------------------------------------------------------------------------
