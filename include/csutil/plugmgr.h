@@ -107,9 +107,6 @@ private:
     }
   };
 
-  /// Query all options supported by given plugin and place into OptionList
-  void QueryOptions (iComponent *iObject);
-
   /// The object registry.
   iObjectRegistry* object_reg;
 
@@ -148,6 +145,9 @@ public:
   virtual csPtr<iPluginIterator> GetPlugins ();
   /// Unload all plugins from this plugin manager.
   virtual void Clear ();
+
+  /// Query all options supported by given plugin and place into OptionList
+  virtual void QueryOptions (iComponent *iObject);
 };
 
 #endif // __CS_PLUGMGR_H__

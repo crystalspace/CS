@@ -7,6 +7,14 @@ The history order is reversed so that new features are at the top.
 	- Jorrit fixed a bug in the AWS engine view where it would not set the
 	  FOV of the camera based on the height of the frame. This caused the
 	  engine view to look a bit weird.
+	- Jorrit added iPluginManager->QueryOptions() so that it is possible
+	  to do the commandline options later.
+	- Jorrit changed iPluginManager->LoadPlugin() so that it no longer
+	  calls QueryOptions() automatically if the 'init' parameter is false.
+	- Jorrit changed the csPluginLoader so that it only queries commandline
+	  options for all loaded plugins AFTER all plugins are initialized.
+	  This fixes a lot of commandline options (like -ilace, -smaller
+	  for software renderer and -fov for engine).
 3-June-2003
 	- Philipp Aumayr fixed the fancycon bug, where the borders
 	  were visibile in SW but not in GL mode. (wrong mixmode at line

@@ -80,7 +80,11 @@ SCF_VERSION (iPluginManager, 0, 2, 0);
  */
 struct iPluginManager : public iBase
 {
-  /// Load a plugin and (optionally) initialize it.
+  /**
+   * Load a plugin and (optionally) initialize it.
+   * If 'init' is true then the plugin will be initialized and QueryOptions()
+   * will be called.
+   */
   virtual iBase *LoadPlugin (const char *classID,
     const char *iInterface = 0, int iVersion = 0, bool init = true) = 0;
 
@@ -108,6 +112,14 @@ struct iPluginManager : public iBase
   virtual csPtr<iPluginIterator> GetPlugins () = 0;
   /// Unload all plugins from this plugin manager.
   virtual void Clear () = 0;
+
+  /**
+   * Query all options supported by given plugin and place into OptionList.
+   * Normally this is done automatically by LoadPlugin() if 'init' is true.
+   * If 'init' is not true then you can call this function AFTER calling
+   * object->Initialize().
+   */
+  virtual void QueryOptions (iComponent* object) = 0;
 };
 
 /** @} */

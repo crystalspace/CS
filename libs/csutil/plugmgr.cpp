@@ -227,7 +227,7 @@ iBase *csPluginManager::LoadPlugin (const char *classID,
 	  p->DecRef ();
 	}
 
-        QueryOptions (p);
+        if (init) QueryOptions (p);
         return ret;
       }
       else

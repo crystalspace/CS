@@ -374,7 +374,7 @@ bool csPluginLoader::LoadPlugins ()
     }
   }
 
-  // Initialize all plugins
+  // Initialize all plugins.
   for (n = 0; n < PluginList.Length (); n++)
   {
     const csPluginLoadRec& r = PluginList.Get(n);
@@ -383,6 +383,18 @@ bool csPluginLoader::LoadPlugins ()
       csRef<iComponent> comp (SCF_QUERY_INTERFACE (r.plugin, iComponent));
       if (comp)
         comp->Initialize (object_reg);
+    }
+  }
+
+  // Query all commandline options for plugins.
+  for (n = 0; n < PluginList.Length (); n++)
+  {
+    const csPluginLoadRec& r = PluginList.Get(n);
+    if (r.plugin)
+    {
+      csRef<iComponent> comp (SCF_QUERY_INTERFACE (r.plugin, iComponent));
+      if (comp)
+        plugin_mgr->QueryOptions (comp);
     }
   }
 

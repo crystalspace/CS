@@ -270,12 +270,6 @@ public:
   /// Initialize new state from config file
   void NewInitialize ();
 
-  /**
-   * Initialize state from other driver (used when there are multiple contexts
-   * in the system).
-   */
-  void SharedInitialize (csGraphics3DSoftwareCommon *p);
-
   /// Open a canvas.
   virtual bool Open ();
 

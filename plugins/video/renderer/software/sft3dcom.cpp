@@ -336,27 +336,12 @@ bool csGraphics3DSoftwareCommon::HandleEvent (iEvent& Event)
 void csGraphics3DSoftwareCommon::NewInitialize ()
 {
   config.AddConfig(object_reg, "/config/soft3d.cfg");
-  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser));
   do_smaller_rendering = config->GetBool ("Video.Software.Smaller", false);
   mipmap_coef = config->GetFloat ("Video.Software.TextureManager.MipmapCoef", 1.3);
   do_interlaced = config->GetBool ("Video.Software.Interlacing", false) ? 0 : -1;
 
 #ifdef DO_MMX
   do_mmx = config->GetBool ("Video.Software.MMX", true);
-#endif
-}
-
-void csGraphics3DSoftwareCommon::SharedInitialize(csGraphics3DSoftwareCommon *p)
-{
-  // Avoid reading in a config file from the hard-drive
-  partner = p;
-  partner->IncRef ();
-  do_smaller_rendering = p->do_smaller_rendering;
-  mipmap_coef = p->mipmap_coef;
-  do_interlaced = p->do_interlaced;
-#ifdef DO_MMX
-  do_mmx = p->do_mmx;
 #endif
 }
 
