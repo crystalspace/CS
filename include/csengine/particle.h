@@ -23,6 +23,7 @@
 #include "csgeom/vector3.h"
 #include "csobject/csobject.h"
 #include "csutil/cscolor.h"
+#include "iparticl.h"
 
 class csSprite2D;
 class csTextureHandle;
@@ -31,19 +32,15 @@ class csSector;
 class csDynLight;
 
 /**
- * This class represents a particle system. It is a set of 2d sprites.
+ * This class represents a particle system. It is a set of iParticles.
  * Subclasses of this class may be of more interest to users.
  * More specialised particle systems can be found below.
  */
-class csParticleSystem : public csObject
+class csParticleSystem : public csObject, public iParticle
 {
 protected:
-  /// Max particles in current arrays.
-  int max_particles;
-  /// The number of particles in use ( <= max_particles ).
-  int num_particles;
-  /// Array of ptrs to the 2d sprites of the particles.
-  csSprite2D **part_2d;
+  /// iParticle ptrs to the particles.
+  csVector particles;
   /// Self destruct and when.
   bool self_destruct;
   time_t time_to_live; // msec
@@ -54,16 +51,16 @@ protected:
   /// Size change
   bool change_size; float scalepersecond;
   /// Alpha change
-  bool change_alpha; float alphapersecond;
-  /// Rotate sprites, angle in radians.
+  bool change_alpha; float alphapersecond; float alpha_now;
+  /// Rotate particles, angle in radians.
   bool change_rotation; float anglepersecond;
 
 public:
   /**
-   * Make a new system, with maximum number of particles inside it.
+   * Make a new system. 
    * Also adds the particle system to the list of the current world.
    */
-  csParticleSystem (int max_part);
+  csParticleSystem ();
 
   /**
    * Destroy particle system, and all particles.
@@ -73,68 +70,98 @@ public:
    */
   virtual ~csParticleSystem ();
 
-  /// Get the max particles this system can store.
-  int GetMaxParticles () { return max_particles; }
   /// How many particles the system currently has.
-  int GetNumParticles () { return num_particles; }
+  inline int GetNumParticles () { return particles.Length();}
+  /// Get a particle.
+  inline iParticle* GetParticle (int idx) 
+  { return (iParticle*)particles[idx]; }
+
+  /// Add a new particle, increases num_particles. Do a DecRef yourself.
+  inline void AppendParticle (iParticle *part) 
+  {particles.Push(part); part->IncRef();}
+  
+  /** 
+   * Add an rectangle shaped csSprite2d particle. Pass along half w and h.
+   * adds sprite to world list.
+   */
+  void AppendRectSprite (float width, float height, csTextureHandle* txt,
+    bool lighted);
+
+  /** 
+   *Add a csSprite2d n-gon with texture, and given radius.
+   *  adds sprite to world list.
+   */
+  void AppendRegularSprite (int n, float radius, csTextureHandle* txt,
+    bool lighted);
 
   /// Set selfdestruct mode on, and msec to live.
-  void SetSelfDestruct (time_t t) { self_destruct=true; time_to_live = t; };
+  inline void SetSelfDestruct (time_t t) 
+  { self_destruct=true; time_to_live = t; };
   /// system will no longer self destruct
-  void UnSetSelfDestruct () { self_destruct=false; }
+  inline void UnSetSelfDestruct () { self_destruct=false; }
   /// returns whether the system will self destruct
-  bool GetSelfDestruct () { return self_destruct; }
+  inline bool GetSelfDestruct () { return self_destruct; }
   /// if the system will self destruct, returns the time to live in msec.
-  time_t GetTimeToLive () { return time_to_live; }
+  inline time_t GetTimeToLive () { return time_to_live; }
 
   /// Whether this system should be deleted when possible.
-  void SetDelete (bool b) { to_delete = b; }
+  inline void SetDelete (bool b) { to_delete = b; }
   /// Whether this system should be deleted when possible.
-  bool GetDelete () { return to_delete; }
+  inline bool GetDelete () { return to_delete; }
 
-  /// Change color of all sprites, by col per second.
-  void SetChangeColor(const csColor& col) 
+  /// Change color of all particles, by col per second.
+  inline void SetChangeColor(const csColor& col) 
   {change_color = true; colorpersecond = col;}
   /// Stop change of color
-  void UnsetChangeColor() {change_color=false;}
+  inline void UnsetChangeColor() {change_color=false;}
 
-  /// Change size of all sprites, by factor per second.
-  void SetChangeSize(float factor) 
+  /// Change size of all particles, by factor per second.
+  inline void SetChangeSize(float factor) 
   {change_size = true; scalepersecond = factor;}
   /// Stop change of size
-  void UnsetChangeSize() {change_size=false;}
+  inline void UnsetChangeSize() {change_size=false;}
 
-  /// Change alpha of all sprites, by factor per second.
-  void SetChangeAlpha(float factor) 
+  /// Set the alpha of particles.
+  inline void SetAlpha(float alpha) 
+  {alpha_now = alpha; SetMixmode( CS_FX_SETALPHA(alpha) ); }
+  /// Get the probable alpha of the particles
+  inline float GetAlpha() {return alpha_now;}
+  /// Change alpha of all particles, by factor per second.
+  inline void SetChangeAlpha(float factor) 
   {change_alpha = true; alphapersecond = factor;}
   /// Stop change of alpha
-  void UnsetChangeAlpha() {change_alpha=false;}
+  inline void UnsetChangeAlpha() {change_alpha=false;}
 
-  /// Change rotation of all sprites, by angle in radians per second.
-  void SetChangeRotation(float angle) 
+  /// Change rotation of all particles, by angle in radians per second.
+  inline void SetChangeRotation(float angle) 
   {change_rotation = true; anglepersecond = angle;}
   /// Stop change of rotation
-  void UnsetChangeRotation() {change_rotation=false;}
+  inline void UnsetChangeRotation() {change_rotation=false;}
 
-  /// Get a particle sprite.
-  csSprite2D* GetSprite2D (int idx) { return part_2d[idx]; }
-  /// Add a new sprite, increases num_particles.
-  void AppendSprite ();
-  /// Add an rectangle shaped sprite. Pass along half w and h.
-  void AppendRectSprite (float width, float height, csTextureHandle* txt);
-  /// Add a n-gon with texture. with radius.
-  void AppendRegularSprite (int n, float radius, csTextureHandle* txt);
+  /**
+   *  Get an iParticle for this particle system, thus you can add
+   *  the particle system as particle to another particle system,
+   *  making particle systems of particle systems.
+   *  Do not add particle systems to themselves, you'll get infinite loops.
+   */
+  iParticle* GetAsParticle() {return this;}
 
-  /// Set sprite mixmodes, convenience function.
-  void SetMixmodes (UInt mode);
-  /// Set sprite owner, convenience function.
-  void SetOwner (csObject* owner); 
-  /// Set sprite lighting, convenience function.
-  void SetLighting (bool b);
-  /// Set sprite colors, convenience function.
-  void SetColors (const csColor& col);
-  /// Move all sprites to a sector, virtual so subclass can move more.
+  /// Move all particles to a sector, virtual so subclass can move more.
   virtual void MoveToSector (csSector *sector);
+  /// Move all particles to this position
+  virtual void SetPosition(const csVector3& pos);
+  /// Move all particles by given delta.
+  virtual void MovePosition(const csVector3& move);
+  /// Set particle colors, convenience function.
+  virtual void SetColor (const csColor& col);
+  /// Add particle colors, convenience function.
+  virtual void AddColor (const csColor& col);
+  /// Scale all particles.
+  virtual void ScaleBy(float factor);
+  /// Set particle mixmodes, convenience function.
+  virtual void SetMixmode (UInt mode);
+  /// Rotate all particles
+  virtual void Rotate(float angle);
 
   /**
    * Update the state of the particles as time has passed.
@@ -144,6 +171,7 @@ public:
    */
   virtual void Update(time_t elapsed_time);
 
+  DECLARE_IBASE;
   CSOBJTYPE;
 };
 
@@ -169,15 +197,17 @@ public:
   /// Moves the particles depending on their acceleration and speed.
   virtual void Update (time_t elapsed_time);
 
-  /// Get a sprites speed. speeds are in metres/second.
-  csVector3& GetSpeed (int idx) { return part_speed[idx]; }
-  /// Set a sprites speed. speeds are in metres/second.
-  void SetSpeed (int idx, const csVector3& spd) { part_speed[idx] = spd; }
+  /// Get a particles speed. speeds are in metres/second.
+  inline csVector3& GetSpeed (int idx) { return part_speed[idx]; }
+  /// Set a particles speed. speeds are in metres/second.
+  inline void SetSpeed (int idx, const csVector3& spd) 
+  { part_speed[idx] = spd; }
 
-  /// Get a sprites acceleration. accelerations are in metres/second.
-  csVector3& GetAccel (int idx) { return part_accel[idx]; }
-  /// Set a sprites acceleration. accelerations are in metres/second.
-  void SetAccel (int idx, const csVector3& acl) { part_speed[idx] = acl; }
+  /// Get a particles acceleration. accelerations are in metres/second.
+  inline csVector3& GetAccel (int idx) { return part_accel[idx]; }
+  /// Set a particles acceleration. accelerations are in metres/second.
+  inline void SetAccel (int idx, const csVector3& acl) 
+  { part_speed[idx] = acl; }
 
   CSOBJTYPE;
 };
@@ -199,14 +229,14 @@ protected:
   csWorld *light_world;
   csDynLight *explight;
   time_t light_fade;
-  /// scaling of sprites.
-  bool scale_sprites;
-  time_t sprites_fade;
+  /// scaling of particles.
+  bool scale_particles;
+  time_t fade_particles;
 
 public:
   /**
    * Give number of particles and center. 
-   * push is speed added to all sprites (i.e. speed of object being 
+   * push is speed added to all particles (i.e. speed of object being 
    * destroyed for example, or a wind pushing all particles in a direction),
    * give a texture to use as well,
    * nr_sides is the number of sides of every particle polygon.
@@ -215,17 +245,18 @@ public:
    */
   csParSysExplosion (int number_p, const csVector3& explode_center,
   	const csVector3& push, csTextureHandle *txt, int nr_sides = 6,
-	float part_radius = 0.25, float spread_pos = 0.6, 
+	float part_radius = 0.25, bool lighted_particles = false,
+	float spread_pos = 0.6, 
 	float spread_speed = 0.5, float spread_accel = 1.5);
   ///
   virtual ~csParSysExplosion ();
 
   /**
-   * Update and light is flickered as well. sprites will be scaled.
+   * Update and light is flickered as well. particles will be scaled.
    */
   virtual void Update (time_t elapsed_time);
 
-  /// Move sprites and light(if any) to a sector.
+  /// Move particles and light(if any) to a sector.
   virtual void MoveToSector (csSector *sector);
 
   /// Get the center of the explosion.
@@ -241,14 +272,14 @@ public:
   /// Remove the light.
   void RemoveLight ();
 
-  /// Are sprites scaled to nothing at end?
-  bool GetFadeSprites() { return scale_sprites;}
+  /// Are particles scaled to nothing at end?
+  bool GetFadeSprites() { return scale_particles;}
   /**
-   * Set sprites to be scaled to nothing starting at fade_sprite msec 
+   * Set particles to be scaled to nothing starting at fade_particles msec 
    * before self-destruct.
    */
-  void SetFadeSprites(time_t sprite_fade_time) 
-  {scale_sprites=true; sprites_fade = sprite_fade_time; }
+  void SetFadeSprites(time_t fade_time) 
+  {scale_particles=true; fade_particles = fade_time; }
 
   CSOBJTYPE;
 };

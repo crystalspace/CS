@@ -29,19 +29,19 @@
 IMPLEMENT_CSOBJTYPE (csParticleSystem, csObject)
 IMPLEMENT_CSOBJTYPE (csNewtonianParticleSystem, csParticleSystem)
 IMPLEMENT_CSOBJTYPE (csParSysExplosion, csNewtonianParticleSystem)
+IMPLEMENT_IBASE (csParticleSystem)
+  IMPLEMENTS_INTERFACE(iParticle)
+IMPLEMENT_IBASE_END
 
-csParticleSystem :: csParticleSystem(int max_part)
+
+csParticleSystem :: csParticleSystem()
   : csObject()
 {
-  max_particles = max_part;
-  num_particles = 0;
+  CONSTRUCT_IBASE (NULL);
+  particles.SetLength(0);
   self_destruct = false;
   time_to_live = 0;
   to_delete = false;
-  part_2d = new csSprite2D* [max_particles];
-  // for robustness
-  for(int i=0; i<max_particles; i++)
-    part_2d[i] = NULL;
   // add me to the world
   csWorld::current_world->particle_systems.Push(this);
   // defaults
@@ -54,95 +54,101 @@ csParticleSystem :: csParticleSystem(int max_part)
 
 csParticleSystem :: ~csParticleSystem()
 {
-  // first delete all sprites
-  for(int i=0; i<num_particles; i++)
-    if(part_2d[i])
-    {
-      //both lines should do the same.
-      //csWorld::current_world->RemoveSprite(part_2d[i]);
-      delete part_2d[i]; 
-    }
-  delete[] part_2d;
-}
-
-
-void csParticleSystem :: AppendSprite()
-{
-  if(num_particles<max_particles) 
-  {
-    part_2d[num_particles] = new csSprite2D();
-    csWorld::current_world->sprites.Push(part_2d[num_particles]);
-    num_particles ++;
-  }
+  // delete all my particles
+  for(int i=0; i<particles.Length(); i++)
+    if(particles[i])
+      GetParticle(i)->DecRef();
 }
 
 
 void csParticleSystem :: AppendRectSprite(float width, float height, 
-  csTextureHandle *txt)
+  csTextureHandle *txt, bool lighted)
 {
-  if(num_particles>=max_particles) return;
-  part_2d[num_particles] = new csSprite2D();
-  csWorld::current_world->sprites.Push(part_2d[num_particles]);
-  csColoredVertices& vs = part_2d[num_particles]->GetVertices();
+  csSprite2D *part = new csSprite2D();
+  csWorld::current_world->sprites.Push(part);
+  csColoredVertices& vs = part->GetVertices();
   vs.SetLimit(4);
   vs.SetLength(4);
   vs[0].pos.Set(-width,-height); vs[0].u=0.; vs[0].v=0.;
   vs[1].pos.Set(-width,+height); vs[1].u=0.; vs[1].v=1.;
   vs[2].pos.Set(+width,+height); vs[2].u=1.; vs[2].v=1.;
   vs[3].pos.Set(+width,-height); vs[3].u=1.; vs[3].v=0.;
-  for(int i=0; i<vs.Length(); i++)
-    vs[i].color_init.Set(1.0, 1.0, 1.0);
-  part_2d[num_particles]->SetTexture(txt);
-  num_particles++;
+  part->SetLighting( lighted );
+  part->SetColor( csColor(1.0, 1.0, 1.0) );
+  part->SetTexture(txt);
+  AppendParticle(part);
+  part->DecRef(); 
 }
 
 
 void csParticleSystem :: AppendRegularSprite(int n, float radius, 
-  csTextureHandle* txt)
+  csTextureHandle* txt, bool lighted)
 {
-  int idx = num_particles;
-  AppendSprite();
-  part_2d[idx]->CreateRegularVertices(n, true);
-  part_2d[idx]->ScaleBy(radius);
-  part_2d[idx]->SetTexture(txt);
-  csColoredVertices& vs = part_2d[idx]->GetVertices();
-  for(int i=0; i<vs.Length(); i++)
-    vs[i].color_init.Set(1.0, 1.0, 1.0);
+  csSprite2D *part = new csSprite2D();
+  csWorld::current_world->sprites.Push(part);
+  part->CreateRegularVertices(n, true);
+  part->ScaleBy(radius);
+  part->SetTexture(txt);
+  part->SetLighting( lighted );
+  part->SetColor( csColor(1.0, 1.0, 1.0) );
+  AppendParticle(part);
+  part->DecRef(); 
 }
 
 
-void csParticleSystem :: SetMixmodes(UInt mode)
+void csParticleSystem :: SetMixmode(UInt mode)
 {
-  for(int i = 0; i<num_particles; i++)
-    part_2d[i]->SetMixmode(mode);
+  for(int i = 0; i<particles.Length(); i++)
+    GetParticle(i)->SetMixmode(mode);
 }
 
 
-void csParticleSystem :: SetOwner(csObject *owner)
+void csParticleSystem :: SetColor(const csColor& col)
 {
-  for(int i = 0; i<num_particles; i++)
-    part_2d[i]->SetMyOwner(owner);
+  for(int i = 0; i<particles.Length(); i++)
+    GetParticle(i)->SetColor(col);
 }
 
 
-void csParticleSystem :: SetLighting(bool b)
+void csParticleSystem :: AddColor(const csColor& col)
 {
-  for(int i = 0; i<num_particles; i++)
-    part_2d[i]->SetLighting(b);
-}
-
-
-void csParticleSystem :: SetColors(const csColor& col)
-{
-  for(int i = 0; i<num_particles; i++)
-    part_2d[i]->SetColor(col);
+  for(int i = 0; i<particles.Length(); i++)
+    GetParticle(i)->AddColor(col);
 }
 
 
 void csParticleSystem :: MoveToSector(csSector *sector)
 {
-  for(int i = 0; i<num_particles; i++)
-    part_2d[i]->MoveToSector(sector);
+  for(int i = 0; i<particles.Length(); i++)
+    GetParticle(i)->MoveToSector(sector);
+}
+
+
+void csParticleSystem :: SetPosition(const csVector3& pos)
+{
+  for(int i = 0; i<particles.Length(); i++)
+    GetParticle(i)->SetPosition(pos);
+}
+
+
+void csParticleSystem :: MovePosition(const csVector3& move)
+{
+  for(int i = 0; i<particles.Length(); i++)
+    GetParticle(i)->MovePosition(move);
+}
+
+
+void csParticleSystem :: ScaleBy(float factor)
+{
+  for(int i = 0; i<particles.Length(); i++)
+    GetParticle(i)->ScaleBy(factor);
+}
+
+
+void csParticleSystem :: Rotate(float angle)
+{
+  for(int i = 0; i<particles.Length(); i++)
+    GetParticle(i)->Rotate(angle);
 }
 
 
@@ -154,50 +160,32 @@ void csParticleSystem :: Update(time_t elapsed_time)
     {
       to_delete = true;
       time_to_live = 0;
-      /// and calling virtual function can process without crashing
+      /// and a calling virtual function can process without crashing
       return;
     }
     time_to_live -= elapsed_time;
   }
-  int i;
   float elapsed_seconds = ((float)elapsed_time) / 1000.0;
   if(change_color)
-  {
-    csColor change = colorpersecond;
-    change *= elapsed_seconds;
-    for(i=0; i<num_particles; i++)
-      part_2d[i]->AddColor(change);
-    if(num_particles > 0 && !part_2d[0]->HasLighting())
-      SetLighting(false); // to copy color_init towards color in sprite2d.
-  }
+    AddColor(colorpersecond * elapsed_seconds);
   if(change_size)
-  {
-    float sizefactor = pow(scalepersecond, elapsed_seconds);
-    for(i=0; i<num_particles; i++)
-      part_2d[i]->ScaleBy(sizefactor);
-  }
+    ScaleBy(pow(scalepersecond, elapsed_seconds));
   if(change_alpha)
   {
-    float alpnow = 
-      (part_2d[0]->GetMixmode() & CS_FX_MASK_ALPHA) / (float)CS_FX_MASK_ALPHA + 
-      alphapersecond * elapsed_seconds;
-    if(alpnow < 0.0f) alpnow = 0.0f;
-    else if(alpnow > 1.0f) alpnow = 1.0f;
-    SetMixmodes(CS_FX_SETALPHA(alpnow));
+    alpha_now += alphapersecond * elapsed_seconds;
+    if(alpha_now < 0.0f) alpha_now = 0.0f;
+    else if(alpha_now > 1.0f) alpha_now = 1.0f;
+    SetMixmode(CS_FX_SETALPHA(alpha_now));
   }
   if(change_rotation)
-  {
-    float angle = anglepersecond * elapsed_seconds;
-    for(i=0; i<num_particles; i++)
-      part_2d[i]->Rotate(angle);
-  }
+    Rotate(anglepersecond * elapsed_seconds);
 }
 
 
 //-- csNewtonianParticleSystem ------------------------------------------
 
 csNewtonianParticleSystem :: csNewtonianParticleSystem(int max)
-  : csParticleSystem(max)
+  : csParticleSystem()
 {
   // create csVector3's
   part_speed = new csVector3 [max];
@@ -218,13 +206,13 @@ void csNewtonianParticleSystem :: Update(time_t elapsed_time)
   csParticleSystem::Update(elapsed_time);
   // time passed; together with CS 1 unit = 1 meter makes units right.
   float delta_t = elapsed_time / 1000.0; // in seconds
-  for(int i=0; i<num_particles; i++)
+  for(int i=0; i<particles.Length(); i++)
   {
     // notice that the ordering of the lines (1) and (2) makes the
     // resulting newpos = a*dt^2 + v*dt + oldposition (i.e. paraboloid).
     part_speed[i] += part_accel[i] * delta_t; // (1)
     move = part_speed[i] * delta_t; // (2)
-    part_2d[i]->MovePosition (move); 
+    GetParticle(i)->MovePosition (move); 
   }
 }
 
@@ -246,6 +234,7 @@ static csVector3& GetRandomDirection()
 csParSysExplosion :: csParSysExplosion(int number_p, 
     const csVector3& explode_center, const csVector3& push, 
     csTextureHandle *txt, int nr_sides, float part_radius,
+    bool lighted_particles,
     float spread_pos, float spread_speed, float spread_accel)
     : csNewtonianParticleSystem(number_p)
 {
@@ -256,14 +245,13 @@ csParSysExplosion :: csParSysExplosion(int number_p,
   has_light = false;
   light_sector = NULL;
   explight = NULL;
-  scale_sprites = false;
+  scale_particles = false;
   /// add particles
   for(i=0; i<number_p; i++)
   {
-    //AppendRectSprite(0.25, 0.25, txt);
-    AppendRegularSprite(nr_sides, part_radius, txt);
+    AppendRegularSprite(nr_sides, part_radius, txt, lighted_particles);
     pos = center + GetRandomDirection() * spread_pos;
-    part_2d[i]->SetPosition (pos);
+    GetParticle(i)->SetPosition (pos);
     part_speed[i] = push + spread_speed * GetRandomDirection();
     part_accel[i] = (pos - center) * spread_accel * GetRandomDirection();
   }
@@ -279,29 +267,20 @@ csParSysExplosion :: ~csParSysExplosion()
 
 void csParSysExplosion :: Update(time_t elapsed_time)
 {
-  int i;
   csNewtonianParticleSystem::Update(elapsed_time);
 
   // size of particles is exponentially reduced in fade time.
-  if(scale_sprites && self_destruct && time_to_live < sprites_fade )
-  {
-    float scaleamt = 1.0 - (sprites_fade - time_to_live)/((float)sprites_fade);
-    for(i=0; i<num_particles; i++)
-      part_2d[i]->ScaleBy(scaleamt);
-  }
+  if(scale_particles && self_destruct && time_to_live < fade_particles)
+    ScaleBy (1.0 - (fade_particles - time_to_live)/((float)fade_particles));
   if(!has_light) return;
   csColor newcol;
   newcol.red =   1.0 - 0.3*sin(time_to_live/10. + center.x);
   newcol.green = 1.0 - 0.3*sin(time_to_live/15. + center.y);
   newcol.blue =  0.3 + 0.3*sin(time_to_live/10. + center.z);
   if(self_destruct && time_to_live < light_fade)
-  {
-    float fade_amt = 1.0 - (light_fade - time_to_live)/((float)light_fade);
-    newcol *= fade_amt;
-  }
+    newcol *= 1.0 - (light_fade - time_to_live)/((float)light_fade);
   explight->SetColor(newcol);
   explight->Setup();
-
 }
 
 
