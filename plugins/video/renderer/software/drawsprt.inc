@@ -148,9 +148,9 @@ static void DP_NAME (iGraphics2D *G2D, iTextureHandle *hTex,
 	    {
 	      register uint8
 #ifdef DP_PIXFORM_R8G8B8
-	      dstf = (255-alpha[(_tx & bwm)>>16]), srcf = dstf ^ 0xff;
+	      srcf = alpha [(_tx & bwm) >> 16], dstf = 255 - srcf;
 #else
-	      dstf = (31-alpha[(_tx & bwm)>>16]), srcf = dstf ^ 0x1f;
+	      srcf = alpha [(_tx & bwm) >> 16], dstf = 32 - srcf;
 #endif
               ALPHA_MIX (*VRAM, pixel);
 	    }
@@ -162,9 +162,9 @@ static void DP_NAME (iGraphics2D *G2D, iTextureHandle *hTex,
           {
 	    register uint8
 #ifdef DP_PIXFORM_R8G8B8
-	    dstf = (255-alpha[(_tx & bwm)>>16]), srcf = dstf ^ 0xff;
+	    srcf = alpha [(_tx & bwm) >> 16], dstf = 255 - srcf;
 #else
-	    dstf = (31-alpha[(_tx & bwm)>>16]), srcf = dstf ^ 0x1f;
+	    srcf = alpha [(_tx & bwm) >> 16], dstf = 32 - srcf;
 #endif
             ALPHA_MIX (*VRAM, data [(_tx & bwm) >> 16]);
             VRAM++;
@@ -188,9 +188,9 @@ static void DP_NAME (iGraphics2D *G2D, iTextureHandle *hTex,
 	    {
 	      register uint8
 #ifdef DP_PIXFORM_R8G8B8
-	      dstf = (255-alpha[tx>>16]), srcf = dstf ^ 0xff;
+	      srcf = alpha [tx >> 16], dstf = 255 - srcf;
 #else
-	      dstf = (31-alpha[tx>>16]), srcf = dstf ^ 0x1f;
+	      srcf = alpha [tx >> 16], dstf = 32 - srcf;
 #endif
               ALPHA_MIX (*VRAM, pixel);
 	    }
@@ -202,9 +202,9 @@ static void DP_NAME (iGraphics2D *G2D, iTextureHandle *hTex,
           {
 	    register uint8
 #ifdef DP_PIXFORM_R8G8B8
-	    dstf = (255-alpha[tx>>16]), srcf = dstf ^ 0xff;
+	    srcf = alpha [tx >> 16], dstf = 255 - srcf;
 #else
-	    dstf = (31-alpha[tx>>16]), srcf = dstf ^ 0x1f;
+	    srcf = alpha [tx >> 16], dstf = 32 - srcf;
 #endif
             ALPHA_MIX (*VRAM, data [tx >> 16]);
             VRAM++;
@@ -217,9 +217,9 @@ static void DP_NAME (iGraphics2D *G2D, iTextureHandle *hTex,
   {
     register uint8
 #ifdef DP_PIXFORM_R8G8B8
-    dstf = Alpha, srcf = dstf ^ 0xff;
+    dstf = Alpha, srcf = 255 - dstf;
 #else
-    dstf = Alpha >> 3, srcf = dstf ^ 0x1f;
+    dstf = Alpha >> 3, srcf = 32 - dstf;
 #endif
     if (tile)
     {

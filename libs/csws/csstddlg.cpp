@@ -17,6 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <stdarg.h>
+
 #define SYSDEF_PATH
 #define SYSDEF_DIR
 #include "cssysdef.h"
@@ -37,7 +39,7 @@
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//- Message boxes --//--
 
-int csMessageBox (csComponent *iParent, char *iTitle, char *iMessage, int iFlags)
+int csMessageBox (csComponent *iParent, char *iTitle, char *iMessage, int iFlags, ...)
 {
   #define DIST_BITMAPX		8
   #define DIST_BITMAPY		8
@@ -65,7 +67,7 @@ int csMessageBox (csComponent *iParent, char *iTitle, char *iMessage, int iFlags
     { CSMBS_IGNORE, "~Ignore", cscmdIgnore, CSBS_DEFAULTVALUE | CSBS_DISMISS }
   };
 
-  int i;
+  int i, overallheight = 0;
   csWindow *MsgBox = new csWindow (iParent, iTitle,
     CSWS_BUTSYSMENU | CSWS_BUTCLOSE | CSWS_TITLEBAR,
     cswfs3D);
@@ -73,6 +75,9 @@ int csMessageBox (csComponent *iParent, char *iTitle, char *iMessage, int iFlags
 
   csPixmap *img = NULL;
   csStatic *bmp = NULL;
+
+  va_list arg;
+  va_start (arg, iFlags);
   switch (iFlags & CSMBS_TYPEMASK)
   {
     case CSMBS_INFORMATION:
@@ -90,14 +95,30 @@ int csMessageBox (csComponent *iParent, char *iTitle, char *iMessage, int iFlags
     case CSMBS_STOP:
       img = NewBitmap (iParent->app, MSGBOX_TEXTURE, 32*0, 0, 32, 32);
       break;
+    case CSMBS_CUSTOMICON:
+    {
+      char *name = va_arg (arg, char *);
+      int coord [4];
+      for (int i = 0; i < 4; i++)
+        coord [i] = va_arg (arg, int);
+      img = NewBitmap (iParent->app, name, coord [0], coord [1], coord [2], coord [3]);
+      break;
+    }
   } /* endswitch */
+
   if (img)
     bmp = new csStatic (Dialog, img);
 
+  if (iFlags & CSMBS_USEHEIGHT)
+    overallheight = va_arg (arg, int);
+
+  va_end (arg);
+
   // Create static objects for all text lines
   csStatic *L [100];
-  int L_count = 0;
+  int L_count = 0, L_maxw = 0;
   char *MsgStart = iMessage;
+  MsgStart = iMessage;
   for (;;)
   {
     if ((*iMessage == '\n') || (*iMessage == 0))
@@ -114,6 +135,7 @@ int csMessageBox (csComponent *iParent, char *iTitle, char *iMessage, int iFlags
       int w,h;
       L [L_count]->SuggestSize (w, h);
       L [L_count]->SetSize (w, h);
+      if (L_maxw < w) L_maxw = w;
 
       MsgStart = iMessage + 1;
       L_count++;
@@ -155,8 +177,12 @@ int csMessageBox (csComponent *iParent, char *iTitle, char *iMessage, int iFlags
     left = DIST_BITMAPX + img->Width () + DIST_BITMAPTEXT;
   for (i = 0; i < L_count; i++)
   {
-    L [i]->SetPos (left, cy);
-    cy = L [i]->bound.ymax + DIST_TEXTVERT;
+    int deltax = (iFlags & CSMBS_CENTER) ? (L_maxw - L [i]->bound.Width ()) / 2 : 0;
+    L [i]->SetPos (left + deltax, cy);
+    if (iFlags & CSMBS_USEHEIGHT)
+      cy = DIST_TEXTY + (overallheight * (i + 1)) / L_count;
+    else
+      cy = L [i]->bound.ymax + DIST_TEXTVERT;
     if (L [i]->bound.xmax > xmax)
       xmax = L [i]->bound.xmax;
   } /* endfor */

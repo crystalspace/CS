@@ -19,7 +19,7 @@
 #ifndef __QINT_H__
 #define __QINT_H__
 
-#if defined (PROC_INTEL)
+#if defined (CS_IEEE_DOUBLE_FORMAT)
 
 /**
     Quick floating point to integer conversions.
@@ -34,10 +34,10 @@
 
 <pre>
  bit 0        8        16       24       32       40       48       56   sign
-    +--------+--------+--------+--------+--------+--------+--------+-------++
+    +--------+--------+--------+--------+--------+--------+--------+-------|+
     |mmmmmmmm|mmmmmmmm|mmmmmmmm|mmmmmmmm|mmmmmmmm|mmmmmmmm|mmmmeeee|eeeeeees|
-    +--------+--------+--------+--------+--------+--------+--------+------+-+
-    \-------------------------- mantissa ---------------------/\- exponent -/
+    +|-------+--------+--------+--------+--------+--------+---||---+------|-+
+     \------------------------- mantissa ---------------------/\-exponent-/
 </pre>
 
     In the following we'll picture numbers as (s)m^e, e.g. (0)2^1 is the
@@ -112,6 +112,8 @@
 static inline long QInt (double inval)
 {
   double dtemp = FIST_MAGIC_QINT + inval;
+  // Note that on both low-endian (x86) and big-endian (m68k) we have
+  // to shift by two bytes. So no need for an #ifdef.
   long result = *(long *)(((char *)&dtemp) + 2);
   return result < 0 ? (result >> 1) + 1 : result;
 }

@@ -21,6 +21,13 @@
 
 #include "csutil/scf.h"
 
+/// Default material `diffuse' parameter
+#define CS_DEFMAT_DIFFUSE	0.7
+/// Default material `ambient' parameter
+#define CS_DEFMAT_AMBIENT	0.0
+/// Default material `reflection' parameter
+#define CS_DEFMAT_REFLECTION	0.0
+
 struct iTextureHandle;
 struct csRGBpixel;
 

@@ -45,8 +45,10 @@
 #define CSMBS_ERROR		0x00000004
 /// Invalid operation
 #define CSMBS_STOP		0x00000005
+/// Custom bitmap (texture name/x/y/w/h follows last parameter)
+#define CSMBS_CUSTOMICON	0x0000000f
 /// This is the mask used to separate message box style from other flags
-#define CSMBS_TYPEMASK		0x0000000F
+#define CSMBS_TYPEMASK		0x0000000f
 
 /// Message box contains a "OK" button
 #define CSMBS_OK		0x00000010
@@ -65,10 +67,14 @@
 
 /// Message is not program-modal
 #define CSMBS_NONMODAL		0x80000000
+/// Align text vertically so that it occupies given height (given as '...')
+#define CSMBS_USEHEIGHT		0x40000000
+/// Center all text lines
+#define CSMBS_CENTER		0x20000000
 
 /// Display a message box and return ID of pressed button (0 for Esc)
 extern int csMessageBox (csComponent *iParent, char *iTitle, char *iMessage,
-  int iFlags = CSMBS_INFO | CSMBS_OK);
+  int iFlags = CSMBS_INFO | CSMBS_OK, ...);
 
 /// File name entry field in file dialogs
 #define CSWID_FILENAME		0xC509

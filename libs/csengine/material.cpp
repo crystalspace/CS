@@ -32,9 +32,9 @@ csMaterial::csMaterial ()
   // set default state to white flat shaded.
   flat_color.Set (255, 255, 255);
   texture = NULL;
-  diffuse = 0.7;
-  ambient = 0.0;
-  reflection = 0.0;
+  diffuse = CS_DEFMAT_DIFFUSE;
+  ambient = CS_DEFMAT_AMBIENT;
+  reflection = CS_DEFMAT_REFLECTION;
 }
 
 csMaterial::csMaterial (csTextureWrapper *txt)
