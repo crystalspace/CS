@@ -294,7 +294,7 @@ bool csFilenameMatches (const char *fName, const char *fMask)
 /*------------------------------------------------------------------------------
   Byte swap 32 bit data buffer
 ------------------------------------------------------------------------------*/
-void cscsByteSwap32bitBuffer( register unsigned long* place, register unsigned long count )
+void csByteSwap32bitBuffer( register unsigned long* place, register unsigned long count )
 {
   register unsigned long value;
 
@@ -307,7 +307,7 @@ void cscsByteSwap32bitBuffer( register unsigned long* place, register unsigned l
 /*------------------------------------------------------------------------------
 	Byte swap 16 bit data in place.
 ------------------------------------------------------------------------------*/
-void cscsByteSwap16bitBuffer( register unsigned short* place, register unsigned long count )
+void csByteSwap16bitBuffer( register unsigned short* place, register unsigned long count )
 {
   register unsigned short value;
 

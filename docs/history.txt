@@ -5,6 +5,10 @@ The history order is reversed so that new features are at the top.
 	  the PNG plugin.  Also fixed it so that it only attempts to load the
 	  PNG plugin if absolutely required (for instance, to save skins from
 	  Quake1 MDL files), rather than loading it unconditionally.
+	- Eric Sunshine repaired the doubled `cscs' prefix on the following
+	  functions:
+	    cscsByteSwap16bitBuffer()
+	    cscsByteSwap32bitBuffer()
 24-Jun-2001
 	- Eric Sunshine repaired DemoSequenceLoader::LoadPath() so that it no
 	  longer allocates 10,000 element arrays of `float' and 'csVector3' on

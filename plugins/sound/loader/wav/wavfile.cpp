@@ -264,7 +264,7 @@ iSoundData* csSoundLoader_WAV::LoadSound (void* databuf, ULong size) const
   
   #ifdef CS_BIG_ENDIAN // @@@ correct?
   if (fmtchk.bits_per_sample == 16)
-    cscsByteSwap16bitBuffer ( (unsigned short*)data, wavchk.len / 2);
+    csByteSwap16bitBuffer ( (unsigned short*)data, wavchk.len / 2);
   #endif // CS_BIG_ENDIAN
 
   // set up format for csSoundDataRaw

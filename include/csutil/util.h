@@ -99,10 +99,10 @@ static inline unsigned short csByteSwap16bit( const unsigned short value )
 }
 
 /// Byte swap 32 bit data in a buffer
-void cscsByteSwap32bitBuffer( register unsigned long* const place, register unsigned long count );
+void csByteSwap32bitBuffer( register unsigned long* const place, register unsigned long count );
 
 /// Byte swap 16 bit data in a buffer
-void cscsByteSwap16bitBuffer( register unsigned short* const place, register unsigned long count );
+void csByteSwap16bitBuffer( register unsigned short* const place, register unsigned long count );
 
 /// finds the smallest number that is a power of two and is larger or equal to n
 int csFindNearestPowerOf2 (int n);
