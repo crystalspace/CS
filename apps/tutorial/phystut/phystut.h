@@ -20,25 +20,7 @@
 #define __PHYSTUT_H__
 
 #include <stdarg.h>
-#include "csutil/ref.h"
-#include "csgeom/vector3.h"
-#include "iengine/mesh.h"
-
-struct iEngine;
-struct iLoader;
-struct iGraphics3D;
-struct iKeyboardDriver;
-struct iVirtualClock;
-struct iObjectRegistry;
-struct iEvent;
-struct iSector;
-struct iView;
-struct iDynamics;
-struct iDynamicSystem;
-struct iRigidBody;
-struct iJoint;
-struct iMeshFactoryWrapper;
-struct iCollideSystem;
+#include <crystalspace.h>
 
 class Simple
 {

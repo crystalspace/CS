@@ -20,17 +20,7 @@
 #define __SIMPLE1_H__
 
 #include <stdarg.h>
-#include "csutil/ref.h"
-
-struct iEngine;
-struct iLoader;
-struct iGraphics3D;
-struct iKeyboardDriver;
-struct iVirtualClock;
-struct iObjectRegistry;
-struct iEvent;
-struct iSector;
-struct iView;
+#include <crystalspace.h>
 
 class Simple
 {

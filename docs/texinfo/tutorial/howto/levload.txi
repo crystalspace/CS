@@ -59,7 +59,7 @@ lightmaps will be loaded from the cache, ...).
 The include files useful for this section are:
 
 @example
-#include "isys/vfs.h"
-#include "imap/parser.h"
-#include "iengine/engine.h"
+#include <isys/vfs.h>
+#include <imap/parser.h>
+#include <iengine/engine.h>
 @end example

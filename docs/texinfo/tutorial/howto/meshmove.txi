@@ -124,7 +124,7 @@ this to the mesh object itself).
 The include files useful for this section are:
 
 @example
-#include "csgeom/transfrm.h"
-#include "iengine/movable.h"
-#include "iengine/mesh.h"
+#include <csgeom/transfrm.h>
+#include <iengine/movable.h>
+#include <iengine/mesh.h>
 @end example

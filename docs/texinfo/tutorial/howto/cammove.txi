@@ -36,16 +36,16 @@ camera a relative amount. The difference between @code{MoveWorld()} and
 For example, take the following code:
 
 @example
-  iCamera* camera;
-  camera->GetTransform ().Move (csVector3 (0, 0, 1));
+iCamera* camera;
+camera->GetTransform ().Move (csVector3 (0, 0, 1));
 @end example
 
 This will move the camera forward in camera space. This means that the
 camera will walk 'forward' :-) On the other hand:
 
 @example
-  iCamera* camera;
-  camera->GetTransform ().MoveWorld (csVector3 (0, 0, 1));
+iCamera* camera;
+camera->GetTransform ().MoveWorld (csVector3 (0, 0, 1));
 @end example
 
 This will move the camera in the world so that it goes one unit in
@@ -58,11 +58,11 @@ and let it look at @samp{3,5,10}. The up vector of the camera will be
 @samp{0,1,0} (which is default):
 
 @example
-  csVector3 camera_pos (3, 5, 1);
-  csVector3 look_at_pos (3, 5, 10);
-  csVector3 up (0, 1, 0);
-  camera->GetTransform ().Move (camera_pos);
-  camera->GetTransform ().LookAt (camera_pos - look_at_pos, up);
+csVector3 camera_pos (3, 5, 1);
+csVector3 look_at_pos (3, 5, 10);
+csVector3 up (0, 1, 0);
+camera->GetTransform ().Move (camera_pos);
+camera->GetTransform ().LookAt (camera_pos - look_at_pos, up);
 @end example
 
 @subsubheading Include Files
@@ -70,7 +70,6 @@ and let it look at @samp{3,5,10}. The up vector of the camera will be
 The include files useful for this section are:
 
 @example
-  #include "iengine/camera.h"
-  #include "csgeom/transfrm.h"
+#include <iengine/camera.h>
+#include <csgeom/transfrm.h>
 @end example
-

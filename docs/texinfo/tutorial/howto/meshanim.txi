@@ -44,6 +44,6 @@ mesh (default is 8).
 The include files useful for this section are:
 
 @example
-  #include "iengine/mesh.h"
-  #include "iengine/engine.h"
+#include <iengine/mesh.h>
+#include <iengine/engine.h>
 @end example

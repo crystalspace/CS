@@ -85,6 +85,10 @@ chronological order.
 	  checks for the presence of this control macro before trying to
 	  #include <vos/vos/vos.hh>. This allows vosapi.h to work correctly
 	  with <crystalspace.h> and <inetwork.h> even if VOS is not present.
+	- Eric Sunshine changed the tutorials so that, for the sake of
+	  simplicity, they #include only <crystalspace.h>, rather than the bevy
+	  of individual header files which they used to #include, and which
+	  served only to confuse new users.
 13-Sep-2004
 	- Eric Sunshine renamed the following symbols in order to avoid
 	  global namespace pollution:

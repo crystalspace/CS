@@ -110,7 +110,7 @@ if (mydata)
 The include files useful for this section are:
 
 @example
-  #include "iutil/object.h"
-  #include "csutil/csobject.h"
+#include <iutil/object.h>
+#include <csutil/csobject.h>
 @end example
 

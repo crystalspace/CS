@@ -20,17 +20,7 @@
 #define __AWSTUT_H__
 
 #include <stdarg.h>
-#include "csgeom/math2d.h"
-#include "csgeom/math3d.h"
-#include "iaws/aws.h"
-#include "iaws/awscnvs.h"
-
-struct iObjectRegistry;
-struct iVirtualClock;
-struct iEvent;
-struct iGraphics3D;
-struct iGraphics2D;
-struct iAwsSource;
+#include <crystalspace.h>
 
 class AwsTutorial
 {

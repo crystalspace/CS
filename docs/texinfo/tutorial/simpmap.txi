@@ -4,9 +4,9 @@
 @cindex Tutorial, Simple
 @cindex Simple Tutorial
 
-This tutorial continues on tutorial one. Here we will learn how you
-can load a level from a map file instead of creating the geometry
-in the code.
+This tutorial continues on tutorial one. Here we will learn how to
+load a level from a map file instead of creating the geometry
+programmatically.
 
 @menu
 * Simple Base Code:: Minimal Base Code
@@ -17,7 +17,7 @@ in the code.
 @node Simple Base Code, Simple Loading The Map, Tutorial Simple Map, Tutorial Simple Map
 @subsection Minimal Base Code
 
-To start with we first take the code of tutorial one
+To start, we first take the code of tutorial one
 and remove the code that creates geometry and initializes
 the default camera position. In addition we add a new @code{LoadMap()}
 function. This results in the following for @file{simpmap.h}:
@@ -27,17 +27,7 @@ function. This results in the following for @file{simpmap.h}:
 #define __SIMPMAP_H__
 
 #include <stdarg.h>
-#include "csutil/ref.h"
-
-struct iEngine;
-struct iLoader;
-struct iGraphics3D;
-struct iKeyboardDriver;
-struct iVirtualClock;
-struct iObjectRegistry;
-struct iEvent;
-struct iSector;
-struct iView;
+#include <crystalspace.h>
 
 class Simple
 @{
@@ -68,44 +58,10 @@ public:
 #endif // __SIMPMAP_H__
 @end example
 
-Similarly for @file{simple.cpp}:
+Similarly for @file{simpmap.cpp}:
 
 @example
-#include "cssysdef.h"
 #include "simpmap.h"
-#include "cstool/csview.h"
-#include "cstool/initapp.h"
-#include "csutil/cmdhelp.h"
-#include "csutil/cscolor.h"
-#include "csutil/event.h"
-#include "csutil/sysfunc.h"
-#include "iengine/camera.h"
-#include "iengine/campos.h"
-#include "iengine/engine.h"
-#include "iengine/light.h"
-#include "iengine/material.h"
-#include "iengine/mesh.h"
-#include "iengine/movable.h"
-#include "iengine/sector.h"
-#include "iengine/texture.h"
-#include "igraphic/imageio.h"
-#include "imap/parser.h"
-#include "imesh/object.h"
-#include "imesh/thing.h"
-#include "iutil/csinput.h"
-#include "iutil/event.h"
-#include "iutil/eventq.h"
-#include "iutil/objreg.h"
-#include "iutil/vfs.h"
-#include "iutil/virtclk.h"
-#include "ivaria/reporter.h"
-#include "ivaria/stdrep.h"
-#include "ivideo/fontserv.h"
-#include "ivideo/graph2d.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/material.h"
-#include "ivideo/texture.h"
-#include "ivideo/txtmgr.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -178,7 +134,7 @@ bool Simple::HandleEvent (iEvent& ev)
     @{
       csRef<iEventQueue> q(CS_QUERY_REGISTRY(object_reg,iEventQueue));
       if (q)
-	q->GetEventOutlet()->Broadcast (cscmdQuit);
+        q->GetEventOutlet()->Broadcast (cscmdQuit);
       return true;
     @}
   @}
@@ -194,19 +150,19 @@ bool Simple::SimpleEventHandler (iEvent& ev)
 bool Simple::Initialize ()
 @{
   if (!csInitializer::RequestPlugins (object_reg,
-  	CS_REQUEST_VFS,
-	CS_REQUEST_SOFTWARE3D,
-	CS_REQUEST_ENGINE,
-	CS_REQUEST_FONTSERVER,
-	CS_REQUEST_IMAGELOADER,
-	CS_REQUEST_LEVELLOADER,
-	CS_REQUEST_REPORTER,
-	CS_REQUEST_REPORTERLISTENER,
-	CS_REQUEST_END))
+        CS_REQUEST_VFS,
+        CS_REQUEST_SOFTWARE3D,
+        CS_REQUEST_ENGINE,
+        CS_REQUEST_FONTSERVER,
+        CS_REQUEST_IMAGELOADER,
+        CS_REQUEST_LEVELLOADER,
+        CS_REQUEST_REPORTER,
+        CS_REQUEST_REPORTERLISTENER,
+        CS_REQUEST_END))
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple",
-	"Can't initialize plugins!");
+        "crystalspace.application.simple",
+        "Can't initialize plugins!");
     return false;
   @}
 
@@ -214,8 +170,8 @@ bool Simple::Initialize ()
     object_reg, SimpleEventHandler))
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple",
-	"Can't initialize event handler!");
+        "crystalspace.application.simple",
+        "Can't initialize event handler!");
     return false;
   @}
 
@@ -231,8 +187,8 @@ bool Simple::Initialize ()
   if (!vc)
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple",
-	"Can't find the virtual clock!");
+        "crystalspace.application.simple",
+        "Can't find the virtual clock!");
     return false;
   @}
 
@@ -241,8 +197,8 @@ bool Simple::Initialize ()
   if (!engine)
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple",
-	"No iEngine plugin!");
+        "crystalspace.application.simple",
+        "No iEngine plugin!");
     return false;
   @}
 
@@ -250,8 +206,8 @@ bool Simple::Initialize ()
   if (!loader)
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple",
-    	"No iLoader plugin!");
+        "crystalspace.application.simple",
+        "No iLoader plugin!");
     return false;
   @}
 
@@ -259,8 +215,8 @@ bool Simple::Initialize ()
   if (!g3d)
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple",
-    	"No iGraphics3D plugin!");
+        "crystalspace.application.simple",
+        "No iGraphics3D plugin!");
     return false;
   @}
 
@@ -268,8 +224,8 @@ bool Simple::Initialize ()
   if (!kbd)
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple",
-    	"No iKeyboardDriver plugin!");
+        "crystalspace.application.simple",
+        "No iKeyboardDriver plugin!");
     return false;
   @}
 
@@ -278,8 +234,8 @@ bool Simple::Initialize ()
   if (!csInitializer::OpenApplication (object_reg))
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple",
-    	"Error opening system!");
+        "crystalspace.application.simple",
+        "Error opening system!");
     return false;
   @}
 
@@ -318,7 +274,7 @@ int main (int argc, char* argv[])
 One important note in the code above: we removed the following line:
 
 @example
-  engine->SetLightingCacheMode (0);
+engine->SetLightingCacheMode (0);
 @end example
 
 That's because when we are loading from map file we actually want
@@ -412,17 +368,12 @@ that can only read one level, but that's not very flexible) and we
 also don't know where we can safely put our camera. In the map files
 it is possible to specify one or more starting positions. We will
 query the engine for such a starting position and initialize our
-view (camera) to that. This happens with the following code:
-
-First add the following to the include section:
-
-@example
-#include "iengine/campos.h"
-@end example
-
-Then add the following after @code{engine->Prepare()} in @code{LoadMap()}:
+view (camera) to that. This happens with the following code which you should
+add after @code{engine->Prepare()} in @code{LoadMap()}:
 
 @example
+  @dots{}
+
   // Find the starting position in this level.
   csVector3 pos (0, 0, 0);
   if (engine->GetCameraPositions ()->GetCount () > 0)
@@ -441,8 +392,8 @@ Then add the following after @code{engine->Prepare()} in @code{LoadMap()}:
   if (!room)
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple",
-      	"Can't find a valid starting position!");
+        "crystalspace.application.simple",
+        "Can't find a valid starting position!");
     return false;
   @}
   view->GetCamera ()->SetSector (room);
@@ -452,7 +403,7 @@ Then add the following after @code{engine->Prepare()} in @code{LoadMap()}:
 @}
 @end example
 
-First we see how many camera positions there were defined in the
+First, we see how many camera positions there were defined in the
 map by using @code{iEngine::GetCameraPositionCount()}. If this is 0
 then the map didn't define a starting position. In that case we will
 assume there is a sector called 'room' and we will start the camera
@@ -460,4 +411,4 @@ at (0,0,0) in that sector. But otherwise we will use the first
 starting position defined in the map.
 
 This is all. After adding this code this application will now load
-the 'flarge' map and display it so you can run around in this level.
+the @samp{flarge} map and display it so you can run around in this level.

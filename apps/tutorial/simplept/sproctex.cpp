@@ -16,23 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "cssysdef.h"
 #include "simplept.h"
-#include "cstool/csview.h"
-#include "cstool/proctex.h"
-#include "csgfx/memimage.h"
-#include "csutil/cscolor.h"
-#include "iutil/objreg.h"
-
-#include "ivideo/txtmgr.h"
-#include "ivideo/texture.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/graph2d.h"
-#include "imap/parser.h"
-#include "iengine/engine.h"
-#include "iengine/camera.h"
-#include "iengine/sector.h"
-#include "iutil/vfs.h"
 
 csEngineProcTex::csEngineProcTex() : csProcTexture ()
 {

@@ -32,7 +32,7 @@ Here is the @sc{api} definition for our sample plugin:
 #ifndef __GAME_MYAPI_H__
 #define __GAME_MYAPI_H__
 
-#include "csutil/scf.h"
+#include <csutil/scf.h>
 
 class csVector3;
 
@@ -121,9 +121,9 @@ make the plugin implementation. First you define a header called
 #ifndef __GAME_MYPLUG_H__
 #define __GAME_MYPLUG_H__
 
-#include "iutil/comp.h"
-#include "csgeom/vector3.h"
-#include "myapi.h"
+#include <iutil/comp.h>
+#include <csgeom/vector3.h>
+#include <myapi.h>
 
 struct iObjectRegistry;
 
@@ -213,10 +213,10 @@ Now we create the main source file containing the implementation
 of our plugin. Let's call this @file{myplug.cpp}:
 
 @example
-#include "cssysdef.h"
-#include "myplug.h"
-#include "iutil/objreg.h"
-#include "iutil/plugin.h"
+#include <cssysdef.h>
+#include <myplug.h>
+#include <iutil/objreg.h>
+#include <iutil/plugin.h>
 
 CS_IMPLEMENT_PLUGIN
 
@@ -376,7 +376,7 @@ by far the easiest way to get this compiled.
 First include the header defining the @sc{api} of the plugin:
 
 @example
-#include "myapi.h"
+#include <myapi.h>
 @end example
 
 Do @emph{not} include the @file{myplug.h} header file! This is implementation

@@ -56,8 +56,8 @@ that contains all the collected values and attach that to the mesh too.
 The include files useful for this section are:
 
 @example
-  #include "iutil/object.h"
-  #include "csutil/csobject.h"
-  #include "cstool/keyval.h"
+#include <iutil/object.h>
+#include <csutil/csobject.h>
+#include <cstool/keyval.h>
 @end example
 

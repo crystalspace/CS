@@ -37,8 +37,8 @@ iMeshWrapper* ClickedObject (iCamera* camera, int mousex, int mousey)
   // Now do the actual intersection.
   int poly = -1;
   iSector* beamsector = camera->GetSector ();
-  iMeshWrapper* mesh = beamsector->HitBeamPortals (
-  	startbeam, endbeam, intersect, &poly);
+  iMeshWrapper* mesh =
+    beamsector->HitBeamPortals(startbeam, endbeam, intersect, &poly);
   return mesh;
 @}
 @end example
@@ -48,8 +48,8 @@ iMeshWrapper* ClickedObject (iCamera* camera, int mousex, int mousey)
 The include files useful for this section are:
 
 @example
-#include "csgeom/transfrm.h"
-#include "iengine/camera.h"
-#include "iengine/sector.h"
-#include "iengine/mesh.h"
+#include <csgeom/transfrm.h>
+#include <iengine/camera.h>
+#include <iengine/sector.h>
+#include <iengine/mesh.h>
 @end example

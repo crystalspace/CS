@@ -48,41 +48,41 @@ A factory will be created invisibly to support the thing geometry:
 
 @example
 <meshobj name="cube">
-    <plugin>crystalspace.mesh.loader.thing</plugin>
-    <params>
-        <v x="-0.5" y="-0.5" z="-0.5" />
-        <v x="-0.5" y="-0.5" z="0.5" />
-        <v x="-0.5" y="0.5" z="-0.5" />
-        <v x="-0.5" y="0.5" z="0.5" />
-        <v x="0.5" y="-0.5" z="-0.5" />
-        <v x="0.5" y="-0.5" z="0.5" />
-        <v x="0.5" y="0.5" z="-0.5" />
-        <v x="0.5" y="0.5" z="0.5" />
+  <plugin>crystalspace.mesh.loader.thing</plugin>
+  <params>
+    <v x="-0.5" y="-0.5" z="-0.5" />
+    <v x="-0.5" y="-0.5" z="0.5" />
+    <v x="-0.5" y="0.5" z="-0.5" />
+    <v x="-0.5" y="0.5" z="0.5" />
+    <v x="0.5" y="-0.5" z="-0.5" />
+    <v x="0.5" y="-0.5" z="0.5" />
+    <v x="0.5" y="0.5" z="-0.5" />
+    <v x="0.5" y="0.5" z="0.5" />
 
-        <material>upMaterial</material>
-        <p name="up">
-            <v>3</v> <v>7</v> <v>6</v> <v>2</v>
-        </p>
-        <material>otherMaterial</material>
-        <p name="north">
-            <v>1</v> <v>5</v> <v>7</v> <v>3</v>
-        </p>
-        <p name="east">
-            <v>5</v> <v>4</v> <v>6</v> <v>7</v>
-        </p>
-        <p name="south">
-            <v>4</v> <v>0</v> <v>2</v> <v>6</v>
-        </p>
-        <p name="west">
-            <v>0</v> <v>1</v> <v>3</v> <v>2</v>
-        </p>
-        <p name="down">
-            <v>0</v> <v>4</v> <v>5</v> <v>1</v>
-        </p>
-    </params>
-    <move>
-        <v x="1" y="0" z="3" />
-    </move>
+    <material>upMaterial</material>
+    <p name="up">
+      <v>3</v> <v>7</v> <v>6</v> <v>2</v>
+    </p>
+    <material>otherMaterial</material>
+    <p name="north">
+      <v>1</v> <v>5</v> <v>7</v> <v>3</v>
+    </p>
+    <p name="east">
+      <v>5</v> <v>4</v> <v>6</v> <v>7</v>
+    </p>
+    <p name="south">
+      <v>4</v> <v>0</v> <v>2</v> <v>6</v>
+    </p>
+    <p name="west">
+      <v>0</v> <v>1</v> <v>3</v> <v>2</v>
+    </p>
+    <p name="down">
+      <v>0</v> <v>4</v> <v>5</v> <v>1</v>
+    </p>
+  </params>
+  <move>
+    <v x="1" y="0" z="3" />
+  </move>
 </meshobj>
 @end example
 
@@ -97,21 +97,20 @@ Here we create the same thing from code. We use a convenience function in
 the engine to create a thing (@code{CreateThingMesh}).
 
 @example
-  iMaterialWrapper* upMaterial = @dots{}
-  iMaterialWrapper* otherMaterial = @dots{}
-  csRef<iMeshWrapper> walls = engine->CreateThingMesh (room, "cube"));
-  csRef<iThingState> ws =
-  	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
-  csRef<iThingFactoryState> walls_state = ws->GetFactory ();
-  walls_state->AddQuad (
-    csVector3 (-.5, .5, -.5),
-    csVector3 (.5, .5, -.5),
-    csVector3 (.5, .5, .5),
-    csVector3 (-.5, .5, .5));
-  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, upMaterial);
-  walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
-
-  @dots{}
+iMaterialWrapper* upMaterial = @dots{}
+iMaterialWrapper* otherMaterial = @dots{}
+csRef<iMeshWrapper> walls = engine->CreateThingMesh (room, "cube"));
+csRef<iThingState> ws =
+  SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
+csRef<iThingFactoryState> walls_state = ws->GetFactory ();
+walls_state->AddQuad (
+  csVector3 (-.5, .5, -.5),
+  csVector3 (.5, .5, -.5),
+  csVector3 (.5, .5, .5),
+  csVector3 (-.5, .5, .5));
+walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, upMaterial);
+walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
+@dots{}
 @end example
 
 This is only an extract of the example but you can easily see how to create
@@ -122,5 +121,5 @@ additional polygons here.
 The include files useful for this section are:
 
 @example
-#include "imesh/thing.h"
+#include <imesh/thing.h>
 @end example

@@ -20,26 +20,22 @@
 #define __SIMPLEPT_H__
 
 #include <stdarg.h>
-#include "csutil/ref.h"
-#include "cstool/proctex.h"
-#include "csgeom/vector3.h"
+#include <crystalspace.h>
 
-struct iEngine;
-struct iLoader;
-struct iGraphics3D;
-struct iKeyboardDriver;
-struct iSector;
-struct iVFS;
-struct iEvent;
-struct iView;
-struct iTextureHandle;
-struct iObjectRegistry;
-struct iVirtualClock;
-struct iThingFactoryState;
-struct iMaterialWrapper;
-struct iMeshWrapper;
-struct iGeneralFactoryState;
-class csEngineProcTex;
+class csEngineProcTex : public csProcTexture
+{
+private:
+  csRef<iEngine> Engine;
+  csRef<iView> View;
+
+public:
+  csEngineProcTex ();
+  ~csEngineProcTex ();
+
+  bool LoadLevel ();
+  virtual bool PrepareAnim ();
+  virtual void Animate (csTicks current_time);
+};
 
 class Simple
 {
@@ -78,21 +74,6 @@ public:
   bool HandleEvent (iEvent&);
   void SetupFrame ();
   void FinishFrame ();
-};
-
-class csEngineProcTex : public csProcTexture
-{
-private:
-  csRef<iEngine> Engine;
-  csRef<iView> View;
-
-public:
-  csEngineProcTex ();
-  ~csEngineProcTex ();
-
-  bool LoadLevel ();
-  virtual bool PrepareAnim ();
-  virtual void Animate (csTicks current_time);
 };
 
 #endif // __SIMPLEPT_H__

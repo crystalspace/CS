@@ -25,12 +25,12 @@ To specify a pseudo-dynamic light in a map file you use the following
 syntax:
 
 @example
-  <light name="DynLight">
-    <center x="23" y="1" z="5"/>
-    <radius>10</radius>
-    <color red="1" green="0" blue="0"/>
-    <dynamic />
-  <light>
+<light name="DynLight">
+  <center x="23" y="1" z="5"/>
+  <radius>10</radius>
+  <color red="1" green="0" blue="0"/>
+  <dynamic />
+<light>
 @end example
 
 In other words, the syntax is the same as for a normal light except for
@@ -43,9 +43,9 @@ To create a pseudo-dynamic light from within an application you can
 use the following code:
 
 @example
-  csRef<iLight> light = engine->CreateLight ("DynLight",
-  	csVector3 (23, 1, 5), 10, csColor (1, 0, 0), true);
-  sector->GetLights ()->AddLight (light);
+csRef<iLight> light = engine->CreateLight ("DynLight",
+  csVector3 (23, 1, 5), 10, csColor (1, 0, 0), true);
+sector->GetLights ()->AddLight (light);
 @end example
 
 This will create exactly the same light as the one specified above.
@@ -54,7 +54,7 @@ At some point you may want to change the color of the light. You can
 do this with the following code:
 
 @example
-  light->SetColor (csColor (0, 0, 1));
+light->SetColor (csColor (0, 0, 1));
 @end example
 
 This will change the color of the light from red to blue.
@@ -64,8 +64,7 @@ This will change the color of the light from red to blue.
 The include files useful for this section are:
 
 @example
-  #include "iengine/light.h"
-  #include "iengine/sector.h"
-  #include "iengine/engine.h"
+#include <iengine/light.h>
+#include <iengine/sector.h>
+#include <iengine/engine.h>
 @end example
-

@@ -20,19 +20,7 @@
 #define __SIMPCD_H__
 
 #include <stdarg.h>
-
-struct iEngine;
-struct iLoader;
-struct iGraphics3D;
-struct iKeyboardDriver;
-struct iVirtualClock;
-struct iObjectRegistry;
-struct iEvent;
-struct iSector;
-struct iView;
-struct iCollider;
-struct iCollideSystem;
-struct iMeshWrapper;
+#include <crystalspace.h>
 
 class Simple
 {

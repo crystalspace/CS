@@ -104,30 +104,30 @@ This is a quick way to make boxes in a map file.
 Here we create the same genmesh programmatically:
 
 @example
-  // First create the factory:
-  csRef<iMeshFactoryWrapper> fact = engine->CreateMeshFactory (
-    "crystalspace.mesh.object.genmesh", "cubeFact");
-  csRef<iGeneralFactoryState> factstate = SCF_QUERY_INTERFACE (
-    fact->GetMeshObjectFactory (), iGeneralFactoryState);
-  factstate->SetVertexCount (8);
-  factstate->GetVertices ()[0].Set (-0.1, 0.1, 0.1);
-  factstate->GetTexels ()[0].Set (0, 0);
-  factstate->GetVertices ()[1].Set (-0.1, 0.1, -0.1);
-  factstate->GetTexels ()[1].Set (1, 0);
-  @dots{}
-  factstate->SetTriangleCount (12);
-  factstate->GetTriangles ()[0].Set (0, 3, 1);
-  factstate->GetTriangles ()[1].Set (3, 2, 1);
-  @dots{}
-  factstate->CalculateNormals ();
+// First create the factory:
+csRef<iMeshFactoryWrapper> fact = engine->CreateMeshFactory (
+  "crystalspace.mesh.object.genmesh", "cubeFact");
+csRef<iGeneralFactoryState> factstate = SCF_QUERY_INTERFACE (
+  fact->GetMeshObjectFactory (), iGeneralFactoryState);
+factstate->SetVertexCount (8);
+factstate->GetVertices ()[0].Set (-0.1, 0.1, 0.1);
+factstate->GetTexels ()[0].Set (0, 0);
+factstate->GetVertices ()[1].Set (-0.1, 0.1, -0.1);
+factstate->GetTexels ()[1].Set (1, 0);
+@dots{}
+factstate->SetTriangleCount (12);
+factstate->GetTriangles ()[0].Set (0, 3, 1);
+factstate->GetTriangles ()[1].Set (3, 2, 1);
+@dots{}
+factstate->CalculateNormals ();
 
-  // Now create an instance:
-  csRef<iMeshWrapper> mesh =
-    engine->CreateMeshWrapper (fact, "cube");
-  csRef<iGeneralMeshState> meshstate = SCF_QUERY_INTERFACE (
-    mesh->GetMeshObject (), iGeneralMeshState);
-  meshstate->SetMaterialWrapper (myMaterial);
-  @dots{}
+// Now create an instance:
+csRef<iMeshWrapper> mesh =
+  engine->CreateMeshWrapper (fact, "cube");
+csRef<iGeneralMeshState> meshstate = SCF_QUERY_INTERFACE (
+  mesh->GetMeshObject (), iGeneralMeshState);
+meshstate->SetMaterialWrapper (myMaterial);
+@dots{}
 @end example
 
 This will basically create the same cube as in the map file example.
@@ -137,5 +137,5 @@ This will basically create the same cube as in the map file example.
 The include files useful for this section are:
 
 @example
-#include "imesh/genmesh.h"
+#include <imesh/genmesh.h>
 @end example

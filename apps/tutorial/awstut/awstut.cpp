@@ -16,38 +16,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "cssysdef.h"
-#include "csutil/sysfunc.h"
-#include "csutil/cscolor.h"
-#include "csutil/csevent.h"
-#include "csutil/cmdhelp.h"
-#include "csgeom/csrect.h"
-#include "csgeom/csrectrg.h"
-#include "cstool/csfxscr.h"
-#include "cstool/initapp.h"
-#include "csqsqrt.h"
-#include "csutil/event.h"
-
-#include "ivideo/graph3d.h"
-#include "ivideo/graph2d.h"
-#include "ivideo/fontserv.h"
-#include "ivideo/txtmgr.h"
-#include "ivideo/natwin.h"
-#include "igraphic/imageio.h"
-#include "ivaria/reporter.h"
-#include "iutil/eventq.h"
-#include "iutil/virtclk.h"
-#include "iutil/plugin.h"
-#include "iutil/vfs.h"
-
 #include "awstut.h"
-
 
 CS_IMPLEMENT_APPLICATION
 
 // The global system driver
 AwsTutorial *System;
-
 
 //-----------------------------------------------------------------------------
 

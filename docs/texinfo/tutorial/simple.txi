@@ -20,7 +20,9 @@ When you install Crystal Space on your development system (for instance,
 by invoking @samp{make install}), these headers are placed in a location where
 they can be easily accessed when writing new programs based on Crystal Space.
 On Unix systems, for instance, these files usually end up in
-@file{/usr/local/crystal/include}.
+@file{/usr/local/include/crystalspace}. Since it can be difficult to remember
+which header files contain which classes and interfaces, you can instead
+include the convenient catch-all header file @file{crystalspace.h}.
 
 Crystal Space also has a reference manual and @sc{api} documentation.
 The manual is included in @sc{html} form Crystal Space itself and is also
@@ -58,16 +60,7 @@ the application logic. Our @file{simple.h} header looks as follows:
 #define __SIMPLE_H__
 
 #include <stdarg.h>
-
-struct iEngine;
-struct iLoader;
-struct iGraphics3D;
-struct iKeyboardDriver;
-struct iSector;
-struct iView;
-struct iVirtualClock;
-struct iObjectRegistry;
-struct iEvent;
+#include <crystalspace.h>
 
 class Simple
 @{
@@ -109,39 +102,7 @@ to keep references to that.
 In the source file @file{simple.cpp} we place the following:
 
 @example
-#include "cssysdef.h"
-#include "csutil/sysfunc.h"
-#include "iutil/vfs.h"
-#include "csutil/cscolor.h"
-#include "cstool/csview.h"
-#include "cstool/initapp.h"
 #include "simple.h"
-#include "iutil/eventq.h"
-#include "iutil/event.h"
-#include "iutil/objreg.h"
-#include "iutil/csinput.h"
-#include "iutil/virtclk.h"
-#include "iengine/sector.h"
-#include "iengine/engine.h"
-#include "iengine/camera.h"
-#include "iengine/light.h"
-#include "iengine/texture.h"
-#include "iengine/mesh.h"
-#include "iengine/movable.h"
-#include "iengine/material.h"
-#include "imesh/thing.h"
-#include "imesh/object.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/graph2d.h"
-#include "ivideo/texture.h"
-#include "ivideo/material.h"
-#include "ivideo/fontserv.h"
-#include "igraphic/imageio.h"
-#include "imap/parser.h"
-#include "ivaria/reporter.h"
-#include "ivaria/stdrep.h"
-#include "csutil/cmdhelp.h"
-#include "csutil/event.h"
 
 CS_IMPLEMENT_APPLICATION
 

@@ -101,7 +101,7 @@ To set up render priorities from within your application you can use
 the following:
 
 @example
-  engine->RegisterRenderPriority ("wall", 2);
+engine->RegisterRenderPriority ("wall", 2);
 @end example
 
 This will setup a render priority named @samp{wall} with numeric value 2.
@@ -113,20 +113,20 @@ To set the render priority for an object you can use the following
 in a map file:
 
 @example
-  <meshobj name="myObject">
-    <plugin>@dots{}</plugin>
-    <params>
-      @dots{}
-    </params>
-    <priority>object</priority>
-  </meshobj>
+<meshobj name="myObject">
+  <plugin>@dots{}</plugin>
+  <params>
+    @dots{}
+  </params>
+  <priority>object</priority>
+</meshobj>
 @end example
 
 To set the render priority from within the code you can do:
 
 @example
-  iMeshWrapper* mesh;
-  mesh->SetRenderPriority (engine->GetRenderPriority ("object"));
+iMeshWrapper* mesh;
+mesh->SetRenderPriority (engine->GetRenderPriority ("object"));
 @end example
 
 By default objects will be put in the @samp{object} render queue.
@@ -153,14 +153,14 @@ but don't update the Z-buffer.
 To set the Z-buffer mode from a map file you can do the following:
 
 @example
-  <meshobj name="myObject">
-    <plugin>@dots{}</plugin>
-    <params>
-      @dots{}
-    </params>
-    <priority>object</priority>
-    <zuse />
-  </meshobj>
+<meshobj name="myObject">
+  <plugin>@dots{}</plugin>
+  <params>
+    @dots{}
+  </params>
+  <priority>object</priority>
+  <zuse />
+</meshobj>
 @end example
 
 To set the Z-buffer mode from the code you can use the following example:
@@ -219,9 +219,9 @@ in some direction without ever reaching the bounds of the sky.
 The include files useful for this section are:
 
 @example
-  #include "iengine/mesh.h"
-  #include "iengine/sector.h"
-  #include "iengine/engine.h"
-  #include "ivideo/graph3d.h"
+#include <iengine/mesh.h>
+#include <iengine/sector.h>
+#include <iengine/engine.h>
+#include <ivideo/graph3d.h>
 @end example
 

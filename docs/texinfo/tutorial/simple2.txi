@@ -151,14 +151,8 @@ in the next section.
 @cindex Tutorial Simple Creating Mesh
 @cindex Simple Creating Mesh, Tutorial
 
-First we need to add an additional include to the include section:
-
-@example
-#include "imesh/sprite3d.h"
-@end example
-
 To create a mesh just add the following code in
-@code{Simple::Initialize} (before @code{return true} and after
+@code{Simple::Initialize()} (before @samp{return true} and after
 the code we just added to load the mesh factory):
 
 @example
@@ -197,20 +191,21 @@ particular case we use the identity matrix as a transform and scale it with
 five to make the sprite five times bigger.
 After doing movement (either updating the sectors or the position) you
 @emph{must} call @code{movable->UpdateMove()} to change internal data
-structures (i.e. the engine may use this to recalculate visibility information).
+structures (i.e. the engine may use this to recalculate visibility
+information).
 
 @emph{WARNING:} The code above actually scaled the object by giving it
 a transformation matrix which is multiplied with 5. Don't do this in your
 own code. Many subsystems in Crystal Space (like the collision detection
 system, the visibility culling system and the lighting system) don't work
 properly with scaled objects. Instead scale your object using
-@code{HardTransform}.
+@code{HardTransform()}.
 
 If you read the mesh object documentation (see @pxref{MeshObject})
 carefully you will see that in order to control visual attributes
 of mesh objects you will have to get the @emph{state} interface for
 either the object or the factory. In this example we query
-@code{iSprite3DState} from the mesh in order to set the default action.
+@samp{iSprite3DState} from the mesh in order to set the default action.
 An action is a set of frames and is used to control animation. In our
 simple example the sprite has only one frame so there is not much animation
 to see.
@@ -219,24 +214,24 @@ The calls to @code{SetZBufMode()} and @code{SetRenderPriority()} are not
 strictly required since the values set here are default for meshes anyway.
 But the two lines serve as an example on how to set other values for these.
 @code{SetZBufMode()} sets the Z-buffer mode that the engine will use to
-render this object. With @code{CS_ZBUF_USE} this means that the Z-buffer
-will be used fully. Other values are @code{CS_ZBUF_FILL} (only fill the
-Z-buffer), @code{CS_ZBUF_TEST} (only test the Z-buffer), or @code{CS_ZBUF_NONE}
-(ignore the Z-buffer). @code{CS_ZBUF_USE} is a good default for objects
-in a room. @code{CS_ZBUF_FILL} is usually used for the outside walls of
+render this object. With @samp{CS_ZBUF_USE} this means that the Z-buffer
+will be used fully. Other values are @samp{CS_ZBUF_FILL} (only fill the
+Z-buffer), @samp{CS_ZBUF_TEST} (only test the Z-buffer), or @samp{CS_ZBUF_NONE}
+(ignore the Z-buffer). @samp{CS_ZBUF_USE} is a good default for objects
+in a room. @samp{CS_ZBUF_FILL} is usually used for the outside walls of
 a sector.
 
 @code{SetRenderPriority()} controls when this object is rendered in this
-sector. By default there are four render priorities: @samp{sky}, @samp{wall},
-@samp{object}, and @samp{alpha}. Every object can be put in a render
+sector. By default there are four render priorities: @dfn{sky}, @dfn{wall},
+@dfn{object}, and @dfn{alpha}. Every object can be put in a render
 priority queue. Objects in prior render priorities will be rendered before
 objects in later render priorities. In addition some render priority queues
 sort objects internally based on some other criteria. For example, the
 @samp{alpha} render priority will render all objects in that queue
 from back to front. You can create your own additional render queues if
-you want. The default render priority is @samp{object} which you can
+you want. The default render priority is @dfn{object} which you can
 get with the call @code{engine->GetObjectRenderPriority()}. Most objects
-with Z-buffer mode equal to @code{CS_ZBUF_USE} are placed in the
+with Z-buffer mode equal to @samp{CS_ZBUF_USE} are placed in the
 @samp{object} render priority queue.
 
 For more information on render priorities and Z-buffer mode you can look

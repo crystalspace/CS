@@ -29,14 +29,14 @@ csRef<iPluginManager> plugmgr =
 csRef<iConfigManager> config =
   CS_QUERY_REGISTRY (object_reg, iConfigManager);
 const char* p = config->GetStr ("MyGame.Settings.CollDetPlugin",
-  	"crystalspace.collisiondetection.opcode");
+  "crystalspace.collisiondetection.opcode");
 csRef<iCollideSystem> cd_sys =
   CS_LOAD_PLUGIN (plugmgr, p, iCollideSystem);
 if (!cd_sys)
 @{
   csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-	"crystalspace.application.myapp",
-  	"No Collision Detection plugin found!");
+    "crystalspace.application.myapp",
+    "No Collision Detection plugin found!");
   return false;
 @}
 @end example
@@ -61,8 +61,8 @@ for a mesh:
 @example
 csRef<iCollider> MyGame::InitCollider (iMeshWrapper* mesh)
 @{
-  iPolygonMesh* polmesh = mesh->GetMeshObject ()->GetObjectModel ()
-	->GetPolygonMeshColldet ();
+  iPolygonMesh* polmesh =
+    mesh->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet();
   if (polmesh)
   @{
     csRef<iCollider> cd = cd_sys->CreateCollider (polmesh);
@@ -95,8 +95,8 @@ above:
 @example
 bool MyGame::InitCollider (iMeshWrapper* mesh)
 @{
-  iPolygonMesh* polmesh = mesh->GetMeshObject ()->GetObjectModel ()
-	->GetPolygonMeshColldet ();
+  iPolygonMesh* polmesh =
+    mesh->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet();
   if (polmesh)
   @{
     new csColliderWrapper(mesh->QueryObject(), cd_sys, polmesh);
@@ -238,10 +238,10 @@ the object changes.
 The include files useful for this section are:
 
 @example
-#include "iutil/object.h"
-#include "iutil/plugin.h"
-#include "igeom/collider.h"
-#include "igeom/polymesh.h"
-#include "iengine/mesh.h"
-#include "cstool/collider.h"
+#include <iutil/object.h>
+#include <iutil/plugin.h>
+#include <igeom/collider.h>
+#include <igeom/polymesh.h>
+#include <iengine/mesh.h>
+#include <cstool/collider.h>
 @end example

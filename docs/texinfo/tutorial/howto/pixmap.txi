@@ -87,10 +87,10 @@ If needed it will scale so that the pixmap really fits there.
 The include files useful for this section are:
 
 @example
-#include "cstool/cspixmap.h"
-#include "igraphic/image.h"
-#include "igraphic/imageio.h"
-#include "ivideo/texture.h"
-#include "ivideo/txtmgr.h"
-#include "iutil/vfs.h"
+#include <cstool/cspixmap.h>
+#include <igraphic/image.h>
+#include <igraphic/imageio.h>
+#include <ivideo/texture.h>
+#include <ivideo/txtmgr.h>
+#include <iutil/vfs.h>
 @end example
