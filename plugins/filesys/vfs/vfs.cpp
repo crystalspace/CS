@@ -38,6 +38,8 @@
 #include "csutil/databuf.h"
 #include "csutil/csstring.h"
 #include "csutil/parray.h"
+#include "csutil/cmdline.h"
+#include "iutil/objreg.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -1076,7 +1078,7 @@ const char *VfsNode::GetValue (csVFS *Parent, const char *VarName)
 
   iConfigFile *Config = &(Parent->config);
 
-  // Now look in "VFS.Solaris" section, for example
+  // Now look in "VFS.Unix" section, for example
   csString Keyname;
   Keyname << "VFS." CS_PLATFORM_NAME "." << VarName;
   value = Config->GetStr (Keyname, 0);
@@ -1111,6 +1113,12 @@ const char *VfsNode::GetValue (csVFS *Parent, const char *VarName)
     return path_sep;
   }
 
+  if (strcmp (VarName, "*") == 0) // Resource directory?
+    return Parent->appdir;
+    
+  if (strcmp (VarName, "^") == 0) // Application or Cocoa wrapper directory?
+    return Parent->appdir;
+    
   if (strcmp (VarName, "@") == 0) // Installation directory?
     return Parent->basedir;
 
@@ -1448,6 +1456,8 @@ csVFS::csVFS (iBase *iParent) : dirstack (8, 8)
   cnode = 0;
   cnsufx [0] = 0;
   basedir = 0;
+  resdir = 0;
+  appdir = 0;
   CS_ASSERT (!ArchiveCache);
   ArchiveCache = new VfsArchiveCache ();
 
@@ -1459,28 +1469,64 @@ csVFS::~csVFS ()
 {
   delete [] cwd;
   delete [] basedir;
+  delete [] resdir;
+  delete [] appdir;
   CS_ASSERT (ArchiveCache);
   delete ArchiveCache;
   ArchiveCache = 0;
 }
 
+static void add_final_delimiter(csString& s)
+{
+  if (!s.IsEmpty() && s[s.Length() - 1] != PATH_SEPARATOR)
+    s << PATH_SEPARATOR;
+}
+
+static char* alloc_normalized_path(char const* s)
+{
+  char* t = 0;
+  if (s != 0)
+  {
+    csString c(s);
+    add_final_delimiter(c);
+    t = csStrNew(c);
+  }
+  return t;
+}
+
+static bool load_vfs_config(csConfigFile& config, char const* dir)
+{
+  bool ok = false;
+  if (dir != 0)
+  {
+    csString s(dir);
+    add_final_delimiter(s);
+    s << "vfs.cfg";
+    ok = config.Load(s);
+  }
+  return ok;
+}
+
 bool csVFS::Initialize (iObjectRegistry *object_reg)
 {
   csVFS::object_reg = object_reg;
-  char vfsconfigpath [CS_MAXPATHLEN + 1];
 
-  char* confpath = csGetConfigPath ();
-  if(!confpath)
-	return false;
-  strcpy (vfsconfigpath, confpath);
-  size_t len = strlen(vfsconfigpath);
-  vfsconfigpath[len]=PATH_SEPARATOR;
-  vfsconfigpath[len+1]=0;
+  char* confpath = csGetConfigPath();
+  basedir = alloc_normalized_path(confpath);
   delete[] confpath;
 
-  basedir = csStrNew (vfsconfigpath);
-  strcat (vfsconfigpath, "vfs.cfg");
-  config.Load (vfsconfigpath);
+  csRef<iCommandLineParser> cmdline =
+    CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
+  if (cmdline)
+  {
+    resdir = alloc_normalized_path(cmdline->GetResourceDir());
+    appdir = alloc_normalized_path(cmdline->GetAppDir());
+  }
+
+  if (!load_vfs_config(config, resdir) &&
+      !load_vfs_config(config, appdir))
+       load_vfs_config(config, basedir);
+
   return ReadConfig ();
 }
 

@@ -31,6 +31,22 @@ chronological order.
 	  we don't try to create a shadow for a meshobject without polygons.
 	- Eric Sunshine added %include "cstool/csfxscr.h" to cspace.i.  Problem
 	  pointed out by James Thompson.
+	- Eric Sunshine made the following changes to VFS which were very
+	  loosely influenced by a patch submitted by Dariusz Dawidowski
+	  <chfsoft@interia.pl>, but with additional functionality.
+	    - Added vfs.cfg meta-variable $* which expands to the value of
+	      csGetResourceDir().
+	    - Added vfs.cfg meta-variable $^ which expands to the value of
+	      csGetAppDir().
+	    - VFS now attempts to load vfs.cfg from the following locations
+	      (first one wins): resource directory, application directory,
+	      installation directory.  In the past, it only attempted to load
+	      vfs.cfg from the installation directory.
+	  These modifications should be considered interim "helper" changes
+	  until such time when a more complete VFS overhaul can be performed,
+	  as proposed by Gregory Block wherein the monolithic and obnoxious
+	  vfs.cfg is retired in favor of a more dynamic and automatic
+	  configuration mechanism.
 9-oct-2003
 	- Jorrit added the following new functions to iThingFactoryState:
 	    - FindPolygonByName (const char*)

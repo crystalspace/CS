@@ -124,6 +124,11 @@ private:
   char *cwd;
   // The installation directory (the value of $@)
   char *basedir;
+  // Full path of application's resource directory (the value of $*)
+  char *resdir;
+  // Full path of the directory containing the application executable or
+  // the Cocoa application wrapper (the value of $^)
+  char *appdir;
   // Current node
   const VfsNode *cnode;
   // The current directory minus current node (cnode suffix)
@@ -233,10 +238,11 @@ private:
   /// Add a virtual link: real path can contain $(...) macros
   virtual bool AddLink (const char *VirtualPath, const char *RealPath);
 
-  // Find the VFS node corresponding to given virtual path
+  /// Find the VFS node corresponding to given virtual path
   VfsNode *GetNode (const char *Path, char *NodePrefix,
     size_t NodePrefixSize) const;
-  // Common routine for many functions
+
+  /// Common routine for many functions
   bool PreparePath (const char *Path, bool IsDir, VfsNode *&Node,
     char *Suffix, size_t SuffixSize) const;
 };
