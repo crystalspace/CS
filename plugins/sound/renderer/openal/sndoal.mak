@@ -1,5 +1,5 @@
 # Plug-in description
-DESCRIPTION.sndoal = Crystal Space openal sound renderer
+DESCRIPTION.sndoal = Crystal Space OpenAL sound renderer
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -68,6 +68,7 @@ DEP.SNDOAL = CSUTIL CSGEOM CSSYS CSUTIL
 MSVC.DSP += SNDOAL
 DSP.SNDOAL.NAME = sndoal
 DSP.SNDOAL.TYPE = plugin
+DSP.SNDOAL.LIBS = OpenAL32 ALut
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

@@ -214,6 +214,8 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
       g3d->txtmgr->texture_filter_anisotropy);
   }
 
+  glGetError ();
+
   for (int i=0; i < txt_mm->vTex.Length (); i++)
   {
     csTextureOpenGL *togl = txt_mm->vTex[i];

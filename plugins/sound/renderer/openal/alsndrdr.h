@@ -23,6 +23,17 @@
 #include "isound/data.h"
 #include "iutil/comp.h"
 #include "csutil/cfgacc.h"
+#include "iutil/eventh.h"
+
+// Bah. The OpenAL 1.0 SDK for Windows has the headers directly
+// below the Includes directory, and not in an "AL" subdir.
+#ifdef _WIN32_
+  #include <al.h>
+  #include <alut.h>
+#else
+  #include <AL/al.h>
+  #include <AL/alut.h>
+#endif
 
 class csSoundListenerOpenAL;
 class csSoundSourceOpenAL;
@@ -36,6 +47,9 @@ public:
   virtual ~csSoundRenderOpenAL();
 
   bool Initialize (iObjectRegistry *object_reg);
+  bool Open ();
+  void Close ();
+  virtual bool HandleEvent (iEvent &e);
 
   void SetVolume (float vol);
   float GetVolume ();
@@ -62,6 +76,12 @@ public:
     { return scfParent->Initialize(p); }
   } scfiComponent;
 
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSoundRenderOpenAL);
+    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
+  } scfiEventHandler;
+
 private:
   csRef<iObjectRegistry> object_reg;
   csRef<iSoundListener> listener;
@@ -72,6 +92,8 @@ private:
 
   float dist;
   float roll;
+
+  bool al_open;
 };
 
 

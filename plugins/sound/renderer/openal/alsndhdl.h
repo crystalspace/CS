@@ -20,7 +20,6 @@
 #define __SNDHDL_H__
 
 #include "../common/shdl.h"
-#include <AL/al.h>
 
 class csSoundRenderOpenAL;
 class csSoundHandleOpenAL : public csSoundHandle

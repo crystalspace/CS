@@ -20,7 +20,6 @@
 #define __SNDSRC_H__
 
 #include "isound/source.h"
-#include <AL/al.h>
 
 struct iSoundData;
 class csSoundRenderOpenAL;

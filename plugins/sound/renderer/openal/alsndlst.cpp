@@ -21,8 +21,6 @@
 #include "ivaria/reporter.h"
 #include "iutil/objreg.h"
 
-#include <AL/al.h>
-
 #include "alsndrdr.h"
 #include "alsndlst.h"
 

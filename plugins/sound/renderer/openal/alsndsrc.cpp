@@ -19,11 +19,9 @@
 #include "cssysdef.h"
 #include "csutil/scf.h"
 
+#include "alsndrdr.h"
 #include "alsndsrc.h"
 #include "alsndhdl.h"
-#include "alsndrdr.h"
-
-#include <AL/al.h>
 
 SCF_IMPLEMENT_IBASE(csSoundSourceOpenAL)
   SCF_IMPLEMENTS_INTERFACE(iSoundSource)

@@ -20,7 +20,6 @@
 #define __SNDLSTN_H__
 
 #include "../common/slstn.h"
-#include <AL/al.h>
 
 class csSoundRenderOpenAL;
 

@@ -815,8 +815,8 @@ const char *VfsNode::GetValue (csVFS *Parent, const char *VarName)
   // can override them in config file or environment
 
   // check for OS-specific predefined variables
-#ifdef CS_SYSDEF_VFS_CHECK_VAR
-  CS_SYSDEF_VFS_CHECK_VAR (VarName);
+#ifdef CS_PROVIDES_VFS_VARS
+  value = csCheckPlatformVFSVar(VarName);
   if (value)
     return value;
 #endif
