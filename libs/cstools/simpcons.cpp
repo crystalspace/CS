@@ -59,6 +59,7 @@ csSimpleConsole::csSimpleConsole(iBase *base)
 
 csSimpleConsole::csSimpleConsole (csIniFile *iConfig, csSimpleCommand* pc) : command_handler(pc)
 {
+  CONSTRUCT_IBASE(NULL);
   config = iConfig;
   LineMessageMax = config->GetInt ("SimpleConsole", "LINEMAX", 4);
   HistoryMax = config->GetInt ("SimpleConsole", "LINEHISTORY", SIZE_HISTORY);
