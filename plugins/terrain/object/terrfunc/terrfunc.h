@@ -33,21 +33,23 @@ struct iSystem;
 
 class csTerrFuncObject : public iTerrainObject
 {
-private:
-  iSystem* pSystem;
-  iTerrainObjectFactory* pFactory;
-  iMaterialWrapper** materials;
-  int blockx, blocky;
-  int gridx[4], gridy[4];
-  G3DTriangleMesh* trimesh[4];
-  csVector3 topleft;
-  csVector3 scale;
-  csVector3* normals[4];
-  csColor base_color;
+public:
   csTerrainHeightFunction* height_func;
   csTerrainNormalFunction* normal_func;
   void* height_func_data;
   void* normal_func_data;
+  int blockx, blocky;
+  int gridx[4], gridy[4];
+  csVector3 topleft;
+  csVector3 scale;
+
+private:
+  iSystem* pSystem;
+  iTerrainObjectFactory* pFactory;
+  iMaterialWrapper** materials;
+  G3DTriangleMesh* trimesh[4];
+  csVector3* normals[4];
+  csColor base_color;
   // Precomputed centers of blocks for LOD.
   csVector3* block_centers;
   float lod_sqdist1;
@@ -68,6 +70,9 @@ private:
   void SetupObject ();
   void ComputeNormals ();
   void RecomputeLighting (int lod, int bx, int by);
+  void ComputeLODLevel (
+	const G3DTriangleMesh& source, G3DTriangleMesh& dest,
+	float maxcost);
 
 public:
   /// Constructor.

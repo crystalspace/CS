@@ -1,6 +1,10 @@
 The history order has been reversed so that new features are at the top.
 
 13-Apr-2001
+	- Wouter Wijngaards updated the iso engine. The engine now has
+	  colored, dynamic lighting. Shadows are calculated in realtime.
+	- Michael Voase declared spr_write() in impexp.h. csparser now
+	  compiles.
 	- Fixed Philip's fix on the terrain engine. Now it works AND
 	  compiles on VC.
 	- Luca Pancallo extended ASE importer in impexp. Luca also added
@@ -13,6 +17,10 @@ The history order has been reversed so that new features are at the top.
 	  DDG as terrfunc). At this moment the problem seems 95% solved. There
 	  are still situations where polygons disappear when close to the
 	  camera but it is rare now. I will look at this later.
+	- Worked on a better LOD system for new terrain engine. This LOD
+	  system is based on the principle of edge collapsing (but with
+	  a better cost function than the one that is used for sprites).
+	  It isn't finished yet so there is nothing to see at the moment.
 12-Apr-2001
 	- Philip Wyett fixed a couple of function declaration redefinition
 	  compile errors under VC6.

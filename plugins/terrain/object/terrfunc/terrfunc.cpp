@@ -20,6 +20,7 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/polyclip.h"
+#include "csgeom/poly2d.h"
 #include "csgeom/vector3.h"
 #include "csutil/garray.h"
 #include "iengine/camera.h"
@@ -32,6 +33,7 @@
 #include "ivideo/txtmgr.h"
 #include "isys/vfs.h"
 #include "terrfunc.h"
+#include "qint.h"
 
 IMPLEMENT_IBASE (csTerrFuncObject)
   IMPLEMENTS_INTERFACE (iTerrainObject)
@@ -84,9 +86,9 @@ csTerrFuncObject::csTerrFuncObject (iSystem* pSys,
   height_func = TerrFunc;
   normal_func = NULL;
   block_centers = NULL;
-  lod_sqdist1 = 100*100;
-  lod_sqdist2 = 200*200;
-  lod_sqdist3 = 300*300;
+  lod_sqdist1 = 200*200;
+  lod_sqdist2 = 400*400;
+  lod_sqdist3 = 600*600;
 }
 
 csTerrFuncObject::~csTerrFuncObject ()
@@ -124,6 +126,464 @@ void csTerrFuncObject::LoadMaterialGroup (iEngine* engine, const char *pName,
     int newi = bx*blockx + by;
     materials[newi] = mat;
   }
+}
+
+//---------------------------------------------------------------------------
+
+class csTriangleVertices;
+
+/*
+ * The representation of a vertex in a triangle mesh.
+ * This is basicly used as a temporary structure to be able to
+ * calculate the cost of collapsing this vertex more quickly.
+ */
+class csTriangleVertex
+{
+public:
+  // Position of this vertex in 3D space.
+  csVector3 pos;
+  // Function coordinates for this vertex.
+  float dx, dy;
+  // Index of this vertex.
+  int idx;
+  // True if already deleted.
+  bool deleted;
+
+  // Triangles that this vertex is connected to.
+  int* con_triangles;
+  // Number of triangles.
+  int num_con_triangles;
+  int max_con_triangles;
+
+  // Other vertices that this vertex is connected to.
+  int* con_vertices;
+  // Number of vertices.
+  int num_con_vertices;
+  int max_con_vertices;
+
+  // Precalculated minimal cost of collapsing this vertex to some other.
+  float cost;
+  // Vertex to collapse to with minimal cost.
+  int to_vertex;
+
+  csTriangleVertex () : deleted (false), con_triangles (NULL),
+  	num_con_triangles (0), max_con_triangles (0),
+  	con_vertices (NULL), num_con_vertices (0), max_con_vertices (0) { }
+  ~csTriangleVertex () { delete [] con_triangles; delete [] con_vertices; }
+  void AddTriangle (int idx);
+  void AddVertex (int idx);
+  bool DelVertex (int idx);
+  void ReplaceVertex (int old, int replace);
+
+  /*
+   * Calculate the minimal cost of collapsing this vertex to some other.
+   * Also remember which other vertex was selected for collapsing to.
+   */
+  void CalculateCost (csTriangleVertices* vertices, csTerrFuncObject* terrfunc);
+};
+
+/*
+ * A class which holds vertices and connectivity information for a triangle
+ * mesh. This is a general vertices structure but it is mostly useful
+ * for LOD generation since every vertex contains information which
+ * helps selecting the best vertices for collapsing.
+ */
+class csTriangleVertices
+{
+private:
+  csTriangleVertex* vertices;
+  int num_vertices;
+
+public:
+  // Build vertex table for a triangle mesh.
+  csTriangleVertices (const G3DTriangleMesh& mesh,
+  	csTerrFuncObject* terrfunc);
+  ///
+  ~csTriangleVertices ();
+  // Update vertex table for a given set of vertices
+  // (with the same number as at init).
+  void UpdateVertices (csVector3* verts);
+
+  int GetNumVertices () { return num_vertices; }
+  csTriangleVertex& GetVertex (int idx) { return vertices[idx]; }
+
+  void CalculateCost (csTerrFuncObject* terrfunc);
+  int GetMinimalCostVertex ();
+};
+
+void csTriangleVertex::AddTriangle (int idx)
+{
+  int i;
+  for (i = 0 ; i < num_con_triangles ; i++)
+    if (con_triangles[i] == idx) return;
+
+  if (num_con_triangles >= max_con_triangles)
+  {
+    int* new_con_triangles = new int [max_con_triangles+4];
+    if (con_triangles)
+    {
+      memcpy (new_con_triangles, con_triangles, sizeof (int)*max_con_triangles);
+      delete [] con_triangles;
+    }
+    con_triangles = new_con_triangles;
+    max_con_triangles += 4;
+  }
+  con_triangles[num_con_triangles] = idx;
+  num_con_triangles++;
+}
+
+void csTriangleVertex::AddVertex (int idx)
+{
+  int i;
+  for (i = 0 ; i < num_con_vertices ; i++)
+    if (con_vertices[i] == idx) return;
+
+  if (num_con_vertices >= max_con_vertices)
+  {
+    int* new_con_vertices = new int [max_con_vertices+4];
+    if (con_vertices)
+    {
+      memcpy (new_con_vertices, con_vertices, sizeof (int)*max_con_vertices);
+      delete [] con_vertices;
+    }
+    con_vertices = new_con_vertices;
+    max_con_vertices += 4;
+  }
+  con_vertices[num_con_vertices] = idx;
+  num_con_vertices++;
+}
+
+bool csTriangleVertex::DelVertex (int idx)
+{
+  int i;
+  for (i = 0 ; i < num_con_vertices ; i++)
+    if (con_vertices[i] == idx)
+    {
+      if (i != num_con_vertices-1)
+      	memmove (con_vertices+i, con_vertices+i+1,
+		sizeof (int)*(num_con_vertices-i-1));
+      num_con_vertices--;
+      return true;
+    }
+  return false;
+}
+
+void csTriangleVertex::ReplaceVertex (int old, int replace)
+{
+  if (DelVertex (old)) AddVertex (replace);
+}
+
+void csTriangleVertex::CalculateCost (csTriangleVertices* vertices,
+	csTerrFuncObject* terrfunc)
+{
+  int i;
+  to_vertex = -1;
+  float min_dheight = 1000000.;
+  if (deleted)
+  {
+    // If the vertex is deleted we have a very high cost.
+    // The cost is higher than the maximum cost you can get for
+    // a non-deleted vertex. This is to make sure that we get
+    // the last non-deleted vertex at the end of the LOD algorithm.
+    cost = min_dheight+1;
+    return;
+  }
+  if (false)//@@@ TEST FOR CORNER VERTEX)
+  {
+    // If the vertex is on the corner of this mesh block then
+    // we give it a very high cost as well. We cannot allow deletion
+    // of corner vertices.
+    cost = min_dheight+1;
+    return;
+  }
+
+  csVector3 vv = vertices->GetVertex (idx).pos;
+  csVector2 this_pos (vv.x, vv.z);
+  float this_height = vv.y;
+  if (true)//@@@ Vertex not on edge)
+    this_height = terrfunc->height_func (terrfunc->height_func_data,
+  	vertices->GetVertex (idx).dx,
+  	vertices->GetVertex (idx).dy);
+  for (i = 0 ; i < num_con_vertices ; i++)
+  {
+    // Here we calculate what will happen to the height at position
+    // of this vertex to see how high the cost is. Ideally we should
+    // also look at normals here (@@@) but we only consider height for now.
+    // Note that we compare the using the height from the original
+    // function because that is closer to what we want. Using this it is
+    // even possible that going to a new LOD level will increase accuracy :-)
+    // Note that we still compare to the vertex position from the mesh
+    // for vertices on the edge because we want to remain as close as possible
+    // to the previous location instead of the value of the function (so that
+    // we fit better to adjacent meshes with lower LOD).
+
+    // First we need to find out in which triangle we are after the
+    // collapse.
+    int j0, j1, j2;
+    csVector2 v[3];
+    float height[3];
+    j1 = num_con_vertices-2; vv = vertices->GetVertex (con_vertices[j1]).pos;
+    v[1].Set (vv.x, vv.z); height[1] = vv.y;
+    j2 = num_con_vertices-1; vv = vertices->GetVertex (con_vertices[j2]).pos;
+    v[2].Set (vv.x, vv.z); height[2] = vv.y;
+    for (j0 = 0 ; j0 < num_con_vertices ; j0++)
+    {
+      vv = vertices->GetVertex (con_vertices[j0]).pos;
+      v[0].Set (vv.x, vv.z); height[0] = vv.y;
+      // v[0..2] is a triangle. Check if our point is in it (only consider
+      // x and z).
+      if (csPoly2D::In (v, 3, this_pos))
+      {
+	// Found the triangle!
+        break;
+      }
+
+      j2 = j1; v[2] = v[1]; height[2] = height[1];
+      j1 = j0; v[1] = v[0]; height[1] = height[0];
+    }
+
+    // Now we find out what height our original point will have when
+    // rendered in this triangle. This is done with interpolation.
+    // Find the top vertex of the triangle.
+    int top;
+    if (v[0].y < v[1].y)
+      if (v[0].y < v[2].y) top = 0;
+      else top = 2;
+    else if (v[1].y < v[2].y) top = 1;
+    else top = 2;
+    int _vbl, _vbr;
+    if (top <= 0) _vbl = 2; else _vbl = top - 1;
+    if (top >= 2) _vbr = 0; else _vbr = top + 1;
+
+    // Rare special case is when triangle edge on, vertices satisfy
+    //  *--------->x     a == b && (a.y < c.y) && (a.x > c.x)
+    //  |  *a,b          and is clipped at c, where v[0]
+    //  | /              can be either a, b or c. In other words when
+    //  |/               the single vertex is not 'top' and clipped.
+    // /|*c              
+    //  |                The '-= EPSILON' for both left and right 
+    //  y     fig. 2     is fairly arbitrary, this probably needs to be refined.
+    if (v[top] == v[_vbl]) v[_vbl].x -= EPSILON;
+    if (v[top] == v[_vbr]) v[_vbr].x -= EPSILON;
+
+    // Find the original triangle top/left/bottom/right vertices
+    // between which the desired point is located.
+    int vtl = top, vtr = top, vbl = _vbl, vbr = _vbr;
+    float x = this_pos.x;
+    float y = this_pos.y;
+    int ry = QRound (y); 
+    if (ry > QRound (v[vbl].y))
+    {
+      vtl = vbl;
+      if (--vbl < 0) vbl = 2;
+    }
+    else if (ry > QRound (v[vbr].y))
+    {
+      vtr = vbr;
+      if (++vbr > 2) vbr = 0;
+    }
+    // Now interpolate the height.
+    float tL, tR, xL, xR, tX;
+    if (QRound (v[vbl].y) != QRound (v[vtl].y))
+      tL = (y - v[vtl].y) / (v[vbl].y - v[vtl].y);
+    else
+      tL = (x - v[vtl].x) / (v[vbl].x - v[vtl].x);
+    if (QRound (v[vbr].y) != QRound (v[vtr].y))
+      tR = (y - v[vtr].y) / (v[vbr].y - v[vtr].y);
+    else
+      tR = (x - v[vtr].x) / (v[vbr].x - v[vtr].x);
+
+    xL = v[vtl].x + tL * (v[vbl].x - v[vtl].x);
+    xR = v[vtr].x + tR * (v[vbr].x - v[vtr].x);
+    tX = xR - xL;
+    if (tX) tX = (x - xL) / tX;
+
+#   define INTERPOLATE(val,tl,bl,tr,br)	\
+    {					\
+      float vl,vr;				\
+      if (tl != bl)				\
+        vl = tl + (bl - tl) * tL;		\
+      else					\
+        vl = tl;				\
+      if (tr != br)				\
+        vr = tr + (br - tr) * tR;		\
+      else					\
+        vr = tr;				\
+      val = vl + (vr - vl) * tX;		\
+    }
+
+    // Calculate interpolated height.
+    float new_height;
+    INTERPOLATE(new_height, height[vtl], height[vbl], height[vtr], height[vbr]);
+
+    float dheight = ABS (new_height - this_height);
+    if (dheight < min_dheight)
+    {
+      min_dheight = dheight;
+      to_vertex = con_vertices[i];
+    }
+  }
+  cost = min_dheight;
+}
+
+csTriangleVertices::csTriangleVertices (const G3DTriangleMesh& mesh,
+	csTerrFuncObject* terrfunc)
+{
+  vertices = new csTriangleVertex [mesh.num_vertices];
+  num_vertices = mesh.num_vertices;
+
+  // Build connectivity information for all vertices in this mesh.
+  csTriangle* triangles = mesh.triangles;
+  int i, j;
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    vertices[i].pos = mesh.vertices[0][i];
+    csVector3 v = vertices[i].pos - terrfunc->topleft;
+    v.x /= terrfunc->scale.x;
+    v.z /= terrfunc->scale.z;
+    vertices[i].dx = v.x;
+    vertices[i].dy = v.z;
+    vertices[i].idx = i;
+    for (j = 0 ; j < mesh.num_triangles ; j++)
+      if (triangles[j].a == i || triangles[j].b == i || triangles[j].c == i)
+      {
+        vertices[i].AddTriangle (j);
+	if (triangles[j].a != i) vertices[i].AddVertex (triangles[j].a);
+	if (triangles[j].b != i) vertices[i].AddVertex (triangles[j].b);
+	if (triangles[j].c != i) vertices[i].AddVertex (triangles[j].c);
+      }
+  }
+}
+
+csTriangleVertices::~csTriangleVertices ()
+{
+  delete [] vertices;
+}
+
+void csTriangleVertices::UpdateVertices (csVector3* verts)
+{
+  int i;
+  for (i = 0 ; i < num_vertices ; i++)
+    vertices[i].pos = verts[i];
+}
+
+int csTriangleVertices::GetMinimalCostVertex ()
+{
+  int i;
+  int min_idx = -1;
+  float min_cost = 2.+1000000.;
+  for (i = 0 ; i < num_vertices ; i++)
+    if (!vertices[i].deleted && vertices[i].cost < min_cost)
+    {
+      min_idx = i;
+      min_cost = vertices[i].cost;
+    }
+  return min_idx;
+}
+
+void csTriangleVertices::CalculateCost (csTerrFuncObject* terrfunc)
+{
+  int i;
+  for (i = 0 ; i < num_vertices ; i++)
+    vertices[i].CalculateCost (this, terrfunc);
+}
+
+
+//---------------------------------------------------------------------------
+
+void csTerrFuncObject::ComputeLODLevel (
+	const G3DTriangleMesh& source, G3DTriangleMesh& dest,
+	float maxcost)
+{
+  // Here is a short explanation on the algorithm we are using.
+  // Basically we work with edge collapsing. An edge collapse means that
+  // we take some edge and move one vertex of the edge towards the other.
+  // This removes that edges and also removes all triangles that touch with
+  // that edge.
+  //
+  // The main issue with this algorithm is deciding which is the 'best' edge
+  // to collapse first. The best edge collapse is one which causes the least
+  // difference in visual appearance. So the shape will be preserved best.
+  //
+  // To calculate this we use the following algorithm:
+  // When collapsing one vertex to another the vertex that will be removed
+  // has some height and normal value. After collapsing the edge that vertex
+  // will no longer be there so we compute what height and normal will
+  // be used there (from interpolating the heights/normals from the triangle
+  // that is now where the vertex was). If the difference between the original
+  // height/normal and the new interpolated height/normal is large we have
+  // a big cost and so an edge collapse for that vertex is not ideal.
+  //
+  // Because edge collapses at the borders of a mesh are a bit problematic
+  // (i.e. adjacent meshes still have to connect well) and edge collapse
+  // removing a vertex at the edge will get a bigger cost. It is still
+  // possible that the edge collapse will happen but first other alternatives
+  // are considered.
+  // An edge collapse removing a vertex on the corner will get infinite cost
+  // as this is not allowed.
+  //
+  // This function will continue doing edge collapsing until the collapse
+  // with the minimal cost exceeds maxcost.
+
+  int i;
+
+  // Calculate connectivity information.
+  csTriangleVertices* verts = new csTriangleVertices (source, this);
+
+  // First copy the triangles table. While doing the lod we will
+  // modify the triangles in this table.
+  csTriangle* new_triangles = new csTriangle[source.num_triangles];
+  memcpy (new_triangles, source.triangles,
+  	source.num_triangles * sizeof (csTriangle));
+
+  verts->CalculateCost (this);
+  while (true)
+  {
+    int from = verts->GetMinimalCostVertex ();
+    csTriangleVertex& vt_from = verts->GetVertex (from);
+    float cost = vt_from.cost;
+    if (cost > maxcost) break;
+    int to = vt_from.to_vertex;
+    csTriangleVertex& vt_to = verts->GetVertex (to);
+
+    // First update all triangles to replace the 'from' vertex with the
+    // 'to' vertex. This can basically collapse triangles to a flat triangle.
+    // Later we will detect that and delete those degenerated triangles.
+    for (i = 0 ; i < vt_from.num_con_triangles ; i++)
+    {
+      int id = vt_from.con_triangles[i];
+      csTriangle& tr = new_triangles[id];
+      if (tr.a == from) { tr.a = to; vt_to.AddTriangle (id); }
+      if (tr.b == from) { tr.b = to; vt_to.AddTriangle (id); }
+      if (tr.c == from) { tr.c = to; vt_to.AddTriangle (id); }
+    }
+    // Fix connectivity information for the vertices.
+    for (i = 0 ; i < vt_from.num_con_vertices ; i++)
+    {
+      int id = vt_from.con_vertices[i];
+      if (id != to)
+      {
+        verts->GetVertex (id).ReplaceVertex (from, to);
+	vt_to.AddVertex (id);
+      }
+    }
+
+    // Delete the 'from' vertex now.
+    vt_to.DelVertex (from);
+    vt_from.deleted = true;
+
+    // Fix vertex cost information for all relevant vertices.
+    vt_from.CalculateCost (verts, this);
+    vt_to.CalculateCost (verts, this);
+    for (i = 0 ; i < vt_to.num_con_vertices ; i++)
+    {
+      int id = vt_to.con_vertices[i];
+      verts->GetVertex (id).CalculateCost (verts, this);
+    }
+  }
+
+  delete[] new_triangles;
+  delete verts;
 }
 
 void csTerrFuncObject::ComputeNormals ()
@@ -338,7 +798,6 @@ void csTerrFuncObject::Draw (iRenderView* rview, bool use_z_buf)
 
   int bx, by;
   int blidx = 0;
-  csVector3 tl = topleft;
   for (by = 0 ; by < blocky ; by++)
   {
     for (bx = 0 ; bx < blockx ; bx++, blidx++)
