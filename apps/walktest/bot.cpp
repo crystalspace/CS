@@ -17,8 +17,7 @@
 */
 
 #include "cssysdef.h"
-//#include "walktest/walktest.h"
-#include "walktest/bot.h"
+#include "bot.h"
 #include "csengine/sector.h"
 #include "csengine/light.h"
 #include "csengine/world.h"
@@ -45,7 +44,7 @@ Bot::~Bot ()
 
 void Bot::set_bot_move (const csVector3& v)
 {
-  csSprite3D::SetPosition (v);
+  SetPosition (v);
   follow = v;
 }
 
@@ -83,7 +82,7 @@ void Bot::move (time_t elapsed_time)
   csVector3 dir = follow-old_p;
   dir.Normalize ();
   csVector3 new_p = old_p + ((3.*(float)elapsed_time)/1000.)*dir;
-  csSprite3D::SetPosition (new_p);
+  SetPosition (new_p);
 
   s = (csSector*)sectors[0];
   mirror = false;
@@ -102,4 +101,3 @@ void Bot::move (time_t elapsed_time)
     }
   }
 }
-

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef BOT_H
-#define BOT_H
+#ifndef __CS_BOT_H__
+#define __CS_BOT_H__
 
 #include "csgeom/math3d.h"
 #include "csengine/cssprite.h"
@@ -42,28 +42,30 @@ private:
   csSector* f_sector;
 
 public:
-  ///
+  /// Next bot.
   Bot* next;
   /// Optional dynamic light.
   csDynLight* light;
 
 public:
-  ///
+  /// Constructor.
   Bot (csSpriteTemplate* tmpl, csWorld *World);
-
-  ///
+  /// Destructor.
   virtual ~Bot ();
 
-  ///
+  // NextStep compiler botches multiple-inheritence, so we must call correct
+  // implementation manually.
+  virtual void SetPosition(const csVector3& p) { csSprite3D::SetPosition(p); }
+
+  /// Time-base move.
   void move (time_t elapsed_time);
 
-  ///
+  /// Set movement vector.
   void set_bot_move (const csVector3& v);
-  ///
+  /// Set bot's sector.
   void set_bot_sector (csSector* s) { f_sector = s; }
 
   CSOBJTYPE;
 };
 
-#endif
-
+#endif // __CS_BOT_H__
