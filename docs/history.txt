@@ -38,6 +38,8 @@ chronological order.
 	- Jorrit removed all usages of SCF_SET_REF, SCF_DEC_REF, and
 	  SCF_INC_REF and then removed those macros. You should now use
 	  csRef instead.
+	- Eric Sunshine fixed bug in csHash<>::Iterator copy constructor where
+	  it neglected to initialize its `key' member.
 3-Nov-2003
 	- Chris Matuszewski added some explicit type casts to stop msvc6 from
 	  emitting warning messages in csgfx/rgbpixel.h and shadervar.h.

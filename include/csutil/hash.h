@@ -282,15 +282,21 @@ public:
     }
 
   protected:
-    Iterator (const csHash<T, K, KeyHandler>* hash0, const K& key0)
-    : hash (hash0), key (key0), 
-      bucket (KeyHandler::ComputeHash (key) % hash->Modulo),
-      size (hash->Elements[bucket].Length ()) { Reset (); }
+    Iterator (const csHash<T, K, KeyHandler>* hash0, const K& key0) :
+      hash(hash0),
+      key(key0), 
+      bucket(KeyHandler::ComputeHash(key) % hash->Modulo),
+      size(hash->Elements[bucket].Length ())
+      { Reset (); }
 
     friend class csHash<T, K, KeyHandler>;
   public:
-    Iterator (const Iterator &o)
-    : hash (o.hash), bucket (o.bucket), size (o.size), element (o.element) {}
+    Iterator (const Iterator &o) :
+      hash (o.hash),
+      key(o.key),
+      bucket(o.bucket),
+      size(o.size),
+      element(o.element) {}
 
     /// Returns a boolean indicating whether or not the hash has more elements.
     bool HasNext () const
