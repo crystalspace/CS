@@ -1,8 +1,8 @@
 # This is the makefile for Cygwin32 compiler (gcc for Win32)
 
 # Friendly names for building environment
-DESCRIPTION.cygwin = Windows with Cygwin32 GNU C/C++
-DESCRIPTION.OS.cygwin = Win32
+DESCRIPTION.msys = Windows with MinGw / MSYS GNU C/C++
+DESCRIPTION.OS.msys = Win32
 
 # Choose which drivers you want to build/use
 #PLUGINS+= cscript/cspython
