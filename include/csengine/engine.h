@@ -77,7 +77,6 @@ DECLARE_FAST_INTERFACE (iDynLight)
 DECLARE_FAST_INTERFACE (iMaterialHandle)
 DECLARE_FAST_INTERFACE (iTerrainWrapper)
 DECLARE_FAST_INTERFACE (iTerrainFactoryWrapper)
-DECLARE_FAST_INTERFACE (iKeyValuePair)
 DECLARE_FAST_INTERFACE (iMapNode)
 
 DECLARE_FAST_INTERFACE (csPolyTxtPlane)
@@ -1036,8 +1035,6 @@ public:
   /// Create a named camera position object
   virtual iCameraPosition* CreateCameraPosition (const char *iName, const char *iSector,
     const csVector3 &iPos, const csVector3 &iForward, const csVector3 &iUpward);
-  /// Create a key/value pair object
-  virtual bool CreateKey (const char *iName, const char *iValue);
   /// Create a texture plane
   virtual bool CreatePlane (const char *iName, const csVector3 &iOrigin,
     const csMatrix3 &iMatrix);
@@ -1173,8 +1170,6 @@ public:
   /// Create a map node.
   virtual iMapNode* CreateMapNode (const char* name);
   /// Create a key value pair.
-  virtual iKeyValuePair* CreateKeyValuePair (const char* key,
-  	const char* value);
 
   /// Get the number of collections in the engine
   virtual int GetCollectionCount () const;

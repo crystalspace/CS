@@ -1,4 +1,5 @@
 /*
+    Copyright (C) 2001 by Jorrit Tyberghein
     Copyright (C) 2000 by Thomas Hieber
     
     This library is free software; you can redistribute it and/or
@@ -16,53 +17,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __KEYVAL_H__
-#define __KEYVAL_H__
+#ifndef __MAPNODE_H__
+#define __MAPNODE_H__
 
 #include "csgeom/vector3.h"
 #include "csutil/csobject.h"
-#include "iengine/keyval.h"
-
-/**
- * A Key Value pair. This object contains a 'key' string and a 'value' string.
- * The 'key' string is the same as the name of the object as returned from
- * the iObject.
- */
-class csKeyValuePair : public csObject
-{
-public:
-  /// The constructor. Requires both key and value. Data is being copied!
-  csKeyValuePair (const char* Key, const char* Value);
-  /// The destructor as usual
-  virtual ~csKeyValuePair ();
-
-  /// Get the key string of the pair.
-  const char *GetKey () const;
-
-  /// Set the key string of the pair.
-  void SetKey (const char *s);
-
-  /// Get the value string of the pair
-  const char *GetValue () const;
-
-  /// Set the value of a key in an object.
-  void SetValue (const char* value);
-
-  DECLARE_IBASE_EXT (csObject);
-  //----------------------- iKeyValuePair --------------------------
-  struct KeyValuePair : public iKeyValuePair
-  {
-    DECLARE_EMBEDDED_IBASE (csKeyValuePair);
-    virtual iObject *QueryObject() { return scfParent; }
-    virtual const char *GetKey () const { return scfParent->GetKey (); }
-    virtual void SetKey (const char* s) { scfParent->SetKey (s); }
-    virtual const char *GetValue () const { return scfParent->GetValue (); }
-    virtual void SetValue (const char* value) { scfParent->SetValue (value); }
-  } scfiKeyValuePair;
-
-private:
-  char *m_Value;
-};
+#include "iengine/mapnode.h"
 
 /**
  * A node. This is an iObject that is bound to a position and a sector in
@@ -154,4 +114,4 @@ protected:
   iMapNode *CurrentNode;
 };
 
-#endif // __KEYVAL_H__
+#endif // __MAPNODE_H__

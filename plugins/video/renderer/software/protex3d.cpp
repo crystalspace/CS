@@ -25,7 +25,6 @@
 #include "csgfx/memimage.h"
 #include "csgfx/rgbpixel.h"
 #include "ivideo/texture.h"
-#include "iengine/texture.h"
 
 DECLARE_FACTORY (csSoftProcTexture3D)
 

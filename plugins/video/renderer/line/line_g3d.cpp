@@ -27,10 +27,10 @@
 #include "video/renderer/line/line_g3d.h"
 #include "video/renderer/line/line_txt.h"
 #include "iutil/cfgfile.h"
-#include "iengine/polygon.h"
 #include "isys/system.h"
 #include "ivideo/graph2d.h"
-#include "iengine/lightmap.h"
+#include "imesh/thing/polygon.h"	//@@@
+#include "imesh/thing/lightmap.h"	//@@@
 
 #define SysPrintf System->Printf
 

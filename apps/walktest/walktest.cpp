@@ -64,7 +64,7 @@
 #include "isound/renderer.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
-#include "iengine/collider.h"
+#include "ivaria/collider.h"
 #include "iengine/motion.h"
 #include "ivaria/perfstat.h"
 #include "imap/parser.h"
@@ -1111,7 +1111,7 @@ void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
       mesh = QUERY_INTERFACE (tp->GetMeshObject (), iPolygonMesh);
       if (mesh)
       {
-        (void)new csCollider (tp->QueryObject (), collide_system, mesh);
+        (void)new csColliderWrapper (tp->QueryObject (), collide_system, mesh);
         mesh->DecRef ();
       }
     }
@@ -1125,7 +1125,7 @@ void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
     mesh = QUERY_INTERFACE (sp->GetMeshObject (), iPolygonMesh);
     if (mesh)
     {
-      (void)new csCollider (sp->QueryObject (), collide_system, mesh);
+      (void)new csColliderWrapper (sp->QueryObject (), collide_system, mesh);
       mesh->DecRef ();
     }
   }

@@ -23,7 +23,6 @@
 #include "hugeroom.h"
 #include "wentity.h"
 #include "command.h"
-#include "csengine/keyval.h"
 #include "csengine/thing.h"
 #include "csengine/camera.h"
 #include "csengine/octree.h"
@@ -36,7 +35,6 @@
 #include "csengine/light.h"
 #include "csengine/sector.h"
 #include "csengine/radiosty.h"
-#include "csengine/collider.h"
 #include "csutil/scanstr.h"
 #include "csutil/csstring.h"
 #include "csutil/util.h"
@@ -47,6 +45,8 @@
 #include "csgeom/math3d.h"
 #include "cssys/system.h"
 #include "cssys/csendian.h"
+#include "cstool/keyval.h"
+#include "cstool/collider.h"
 #include "cstool/cspixmap.h"
 #include "qint.h"
 #include "isound/handle.h"
@@ -453,7 +453,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
   iObjectIterator *it = src->GetIterator ();
   while (!it->IsFinished ())
   {
-    iKeyValuePair* kp = QUERY_INTERFACE_FAST (it->GetObject (), iKeyValuePair);
+    iKeyValuePair* kp = QUERY_INTERFACE (it->GetObject (), iKeyValuePair);
     if (!kp)
     {
       it->Next ();

@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2000 by Thomas Heiber
+    Copyright (C) 2001 by Jorrit Tyberghein
+    Copyright (C) 2000 by Thomas Hieber
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -17,53 +18,9 @@
 */
 
 #include "cssysdef.h"
-#include "csengine/keyval.h"
-#include "csengine/engine.h"
+#include "csengine/mapnode.h"
 #include "iengine/sector.h"
-
-//---------------------------------------------------------------------------
-
-IMPLEMENT_IBASE_EXT (csKeyValuePair)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iKeyValuePair)
-IMPLEMENT_IBASE_EXT_END
-
-IMPLEMENT_EMBEDDED_IBASE (csKeyValuePair::KeyValuePair)
-  IMPLEMENTS_INTERFACE (iKeyValuePair)
-IMPLEMENT_EMBEDDED_IBASE_END
-
-csKeyValuePair::csKeyValuePair (const char* Key, const char* Value)
-{
-  CONSTRUCT_IBASE (NULL);
-  CONSTRUCT_EMBEDDED_IBASE (scfiKeyValuePair);
-  SetName (Key);
-  m_Value = csStrNew (Value);
-}
-
-csKeyValuePair::~csKeyValuePair ()
-{
-  delete [] m_Value;
-}
-
-const char *csKeyValuePair::GetKey () const
-{
-  return GetName ();
-}
-
-void csKeyValuePair::SetKey (const char *s)
-{
-  SetName (s);
-}
-
-const char *csKeyValuePair::GetValue () const
-{
-  return m_Value;
-}
-
-void csKeyValuePair::SetValue (const char* value)
-{
-  delete[] m_Value;
-  m_Value = csStrNew (value);
-}
+#include "ivaria/keyval.h"
 
 //---------------------------------------------------------------------------
 
@@ -142,7 +99,7 @@ void csNodeIterator::Reset (iSector *pSector, const char *classname)
 
   Iterator = pSector->QueryObject ()->GetIterator ();
   Classname = classname;
-  CurrentNode = QUERY_INTERFACE_FAST (Iterator->GetObject (), iMapNode);
+  CurrentNode = QUERY_INTERFACE (Iterator->GetObject (), iMapNode);
 
   SkipWrongClassname ();
 }
@@ -168,7 +125,7 @@ void csNodeIterator::SkipWrongClassname ()
   if (Classname)
     while (!Iterator->IsFinished ())
     {
-      iKeyValuePair *KeyVal = GET_NAMED_CHILD_OBJECT_FAST
+      iKeyValuePair *KeyVal = GET_NAMED_CHILD_OBJECT
         (CurrentNode->QueryObject (), iKeyValuePair, "classname");
       if (KeyVal)
       {
@@ -187,5 +144,5 @@ void csNodeIterator::NextNode ()
   if (Iterator->IsFinished ())
     CurrentNode = NULL;
   else
-    CurrentNode = QUERY_INTERFACE_FAST (Iterator->GetObject (), iMapNode);
+    CurrentNode = QUERY_INTERFACE (Iterator->GetObject (), iMapNode);
 }

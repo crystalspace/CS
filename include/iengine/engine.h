@@ -128,7 +128,7 @@ struct iKeyValuePair;
 typedef void (csDrawFunc) (iRenderView* rview, int type, void* entity);
 
 
-SCF_VERSION (iEngine, 0, 1, 28);
+SCF_VERSION (iEngine, 0, 1, 29);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -229,8 +229,6 @@ struct iEngine : public iPlugIn
   virtual iCameraPosition* CreateCameraPosition (const char *iName,
 	const char *iSector, const csVector3 &iPos,
 	const csVector3 &iForward, const csVector3 &iUpward) = 0;
-  /// Create a key/value pair object
-  virtual bool CreateKey (const char *iName, const char *iValue) = 0;
   /// Create a texture plane
   virtual bool CreatePlane (const char *iName, const csVector3 &iOrigin,
 	const csMatrix3 &iMatrix) = 0;
@@ -580,9 +578,6 @@ struct iEngine : public iPlugIn
 
   /// Create a map node.
   virtual iMapNode* CreateMapNode (const char* name) = 0;
-  /// Create a key value pair.
-  virtual iKeyValuePair* CreateKeyValuePair (const char* key,
-  	const char* value) = 0;
 };
 
 #endif // __IENGINE_ENGINE_H__

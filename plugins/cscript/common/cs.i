@@ -34,7 +34,7 @@
 #include "iengine/camera.h"
 #include "iengine/campos.h"
 #include "imesh/object.h"
-#include "iengine/thing.h"
+#include "imesh/thing/thing.h"
 #include "csparser/csloader.h"
 #include "plugins/cscript/cspython/cspython.h"
 iSystem* GetSystem()
@@ -269,7 +269,6 @@ struct iEngine : public iPlugIn
   virtual iCameraPosition* CreateCameraPosition (const char *iName, const char *iSector,
     const csVector3 &iPos, const csVector3 &iForward,
     const csVector3 &iUpward) = 0;
-  virtual bool CreateKey (const char *iName, const char *iValue) = 0;
   virtual bool CreatePlane (const char *iName, const csVector3 &iOrigin,
     const csMatrix3 &iMatrix) = 0;
   virtual iSector *CreateSector (const char *iName, bool link = true) = 0;

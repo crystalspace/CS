@@ -129,3 +129,97 @@ In code you can use @code{iEngine::CreateSectorWallsMesh()} like this:
 iMeshWrapper* mesh =
   engine->CreateSectorWallsMesh (sector, "walls");
 @end example
+
+@subheading Global API Changes
+
+GetMiniBspNumVerts  -->  GetMiniBspVertexCount
+GetNumActions  -->  GetActionCount
+GetNumChars  -->  GetCharCount
+GetNumCameraPositions  -->  GetCameraPositionCount
+GetNumPolyTxtPlanes  -->  GetPolyTxtPlaneCount
+GetNumCollections  -->  GetCollectionCount
+GetNumCollisionPairs  -->  GetCollisionPairCount
+GetNumCurveVertices  -->  GetCurveVertexCount
+GetNumCurves  -->  GetCurveCount
+GetNumDimensions  -->  GetDimensionCount
+GetNumEdges  -->  GetEdgeCount
+GetNumElements  -->  GetElementCount
+GetNumFonts  -->  GetFontCount
+GetNumFormats  -->  GetFormatCount
+GetNumFrames  -->  GetFrameCount
+GetNumMaterials  -->  GetMaterialCount
+GetNumMeshFactories  -->  GetMeshFactoryCount
+GetNumMeshObjects  -->  GetMeshObjectCount
+GetNumNormals  -->  GetNormalCount
+GetNumObjects  -->  GetObjectCount
+GetNumPalEntries  -->  GetPalEntryCount
+GetNumPlanes  -->  GetPlaneCount
+GetNumPlugIns  -->  GetPlugInCount
+GetNumPoints  -->  GetPointCount
+GetNumPolygons  -->  GetPolygonCount
+GetNumRepeats  -->  GetRepeatCount
+GetNumShadows  -->  GetShadowCount
+GetNumSpokes  -->  GetSpokeCount
+GetNumTexels  -->  GetTexelCount
+GetNumTextureLayers  -->  GetTextureLayerCount
+GetNumTextures  -->  GetTextureCount
+GetNumTriangles  -->  GetTriangleCount
+GetNumVertices  -->  GetVertexCount
+GetNumberMetaBalls  -->  GetMetaBallCount
+GetNumberParticles  -->  GetParticleCount
+NumVertices  -->  GetVertexCount
+ReportNumberTriangles  -->  ReportTriangleCount
+SetNumEdges  -->  SetEdgeCount
+SetNumPolygons  -->  SetPolygonCount
+SetNumSpokes  -->  SetSpokeCount
+SetNumVertices  -->  SetVertexCount
+SetNumberMetaBalls  -->  SetMetaBallCount
+GetNumberEmitters  -->  GetEmitterCount
+GetNumberAging  -->  GetAgingCount
+SetNumberParticles  -->  SetParticleCount
+GetNumVertsToLight  -->  GetVertexToLightCount
+GetStaticNumSamples  -->  GetStaticSampleCount
+Update_Num  -->  UpdateCount
+SetNumber  -->  SetCount
+
+======= global functions ========
+RndNum  -->  csRndNum
+strnew  -->  csStrNew
+Combinations  -->  csCombinations
+expandname  -->  csExpandName
+splitpath  -->  csSplitPath
+fnamematches  -->  csFilenameMatches
+ScanStr  -->  csScanStr
+iSwap  -->  csSwapInt
+fSwap  -->  csSwapFloat
+fSquare  -->  csSquareFloat
+ByteSwap32bit  -->  csByteSwap32bit
+ByteSwap16bit  -->  csByteSwap16bit
+ByteSwap32bitBuffer  -->  csByteSwap32bitBuffer
+ByteSwap16bitBuffer  -->  csByteSwap16bitBuffer
+FindNearestPowerOf2  -->  csFindNearestPowerOf2
+IsPowerOf2  -->  csIsPowerOf2
+GenerateHalo  -->  csGenerateHalo
+GenerateNova  -->  csGenerateNova
+get_token  -->  csGetToken
+get_token_float  -->  csGetTokenFloat
+get_token_int  -->  csGetTokenInt
+skip_token  -->  csSkipToken
+
+@subheading csfx
+
+csfx is renamed to cstool.
+
+@subheading csCollider
+
+csCollider moved from csengine to cstool and is renamed
+to csColliderWrapper.
+
+@subheading Key/Node System
+
+The Key/Node system moved from csengine to cstool.
+
+@subheading G3D/G2D ... private
+
+These vars are now private in csSystemDriver.
+

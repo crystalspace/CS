@@ -33,7 +33,6 @@
 #include "csengine/light.h"
 #include "csengine/sector.h"
 #include "csengine/thing.h"
-#include "csengine/collider.h"
 #include "csengine/meshobj.h"
 #include "csengine/region.h"
 #include "csutil/scanstr.h"
@@ -43,6 +42,7 @@
 #include "csparser/crossbld.h"
 #include "csgeom/math3d.h"
 #include "cssys/system.h"
+#include "cstool/collider.h"
 #include "cstool/cspixmap.h"
 #include "qint.h"
 #include "isound/handle.h"
@@ -51,7 +51,7 @@
 #include "isound/source.h"
 #include "isound/renderer.h"
 #include "ivideo/graph3d.h"
-#include "iengine/collider.h"
+#include "ivaria/collider.h"
 #include "imesh/partsys.h"
 #include "imesh/fountain.h"
 #include "imesh/explode.h"
@@ -783,7 +783,7 @@ void add_skeleton_ghost (iSector* where, csVector3 const& pos, int maxdepth,
   state->SetMixMode (CS_FX_SETALPHA (0.75));
   iPolygonMesh* mesh = QUERY_INTERFACE (obj, iPolygonMesh);
   iObject* sprobj = QUERY_INTERFACE (spr, iObject);
-  (void)new csCollider (sprobj, Sys->collide_system, mesh);
+  (void)new csColliderWrapper (sprobj, Sys->collide_system, mesh);
   GhostSpriteInfo* gh_info = new GhostSpriteInfo ();
   iObject* iobj = QUERY_INTERFACE (gh_info, iObject);
   sprobj->ObjAdd (iobj);
@@ -798,13 +798,14 @@ void add_skeleton_ghost (iSector* where, csVector3 const& pos, int maxdepth,
 #define MAXSECTORSOCCUPIED  20
 
 extern int FindSectors (csVector3 v, csVector3 d, iSector *s, iSector **sa);
-extern int CollisionDetect (csCollider *c, iSector* sp, csTransform *cdt);
+extern int CollisionDetect (csColliderWrapper *c, iSector* sp, csTransform *cdt);
 extern csCollisionPair our_cd_contact[1000];//=0;
 extern int num_our_cd;
 
 void move_ghost (iMeshWrapper* spr)
 {
-  csCollider* col = csCollider::GetCollider (spr->QueryObject ());
+  csColliderWrapper* col = csColliderWrapper::GetColliderWrapper (
+  	spr->QueryObject ());
   iSector* first_sector = spr->GetMovable ()->GetSector (0);
 
   // Create a transformation 'test' which indicates where the ghost

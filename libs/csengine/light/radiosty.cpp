@@ -37,7 +37,7 @@
 #include "csgeom/frustum.h"
 #include "qsqrt.h"
 #include "igraphic/image.h"
-#include "iengine/lightmap.h"
+#include "imesh/thing/lightmap.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include <math.h>

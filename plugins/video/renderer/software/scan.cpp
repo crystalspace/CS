@@ -24,7 +24,7 @@
 #include "soft_txt.h"
 #include "sft3dcom.h"
 #include "isys/system.h"
-#include "iengine/polygon.h"
+#include "imesh/thing/polygon.h"	//@@@ LOGICALLY NOT FROM MESH OBJECT!
 #include "sttest.h"
 
 /// The only instance of this structure lives here

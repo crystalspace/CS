@@ -20,7 +20,7 @@
 #define __CS_POLYTEXT_H__
 
 #include "csgeom/math3d.h"
-#include "iengine/polygon.h"
+#include "imesh/thing/polygon.h"
 
 class csPolygon3D;
 class Textures;

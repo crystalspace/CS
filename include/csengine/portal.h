@@ -21,7 +21,7 @@
 
 #include "csgeom/transfrm.h"
 #include "csutil/flags.h"
-#include "iengine/portal.h"
+#include "imesh/thing/portal.h"
 
 class csPolygon2D;
 class csPolygon3D;

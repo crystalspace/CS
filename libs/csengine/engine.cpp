@@ -22,7 +22,6 @@
 #include "csengine/halo.h"
 #include "csengine/camera.h"
 #include "csengine/campos.h"
-#include "csengine/keyval.h"
 #include "csengine/light.h"
 #include "csengine/polyplan.h"
 #include "csengine/polytmap.h"
@@ -45,6 +44,7 @@
 #include "csengine/lppool.h"
 #include "csengine/radiosty.h"
 #include "csengine/region.h"
+#include "csengine/mapnode.h"
 #include "csgeom/fastsqrt.h"
 #include "csgeom/polypool.h"
 #include "csgfx/csimage.h"
@@ -1714,14 +1714,6 @@ iCameraPosition *csEngine::CreateCameraPosition (const char *iName, const char *
   return &(cp->scfiCameraPosition);
 }
 
-bool csEngine::CreateKey (const char *iName, const char *iValue)
-{
-  csKeyValuePair *kvp = new csKeyValuePair (iName, iValue);
-  scfiObject.ObjAdd (kvp);
-  kvp->DecRef ();
-  return true;
-}
-
 bool csEngine::CreatePlane (const char *iName, const csVector3 &iOrigin,
   const csMatrix3 &iMatrix)
 {
@@ -2480,15 +2472,6 @@ iMapNode* csEngine::CreateMapNode (const char* name)
   iMapNode* imn = QUERY_INTERFACE (mn, iMapNode);
   imn->DecRef ();
   return imn;
-}
-
-iKeyValuePair* csEngine::CreateKeyValuePair (const char* key,
-  	const char* value)
-{
-  csKeyValuePair* kv = new csKeyValuePair (key, value);
-  iKeyValuePair* ikey = QUERY_INTERFACE (kv, iKeyValuePair);
-  ikey->DecRef ();
-  return ikey;
 }
 
 int csEngine::GetCollectionCount () const

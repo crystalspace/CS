@@ -4,8 +4,8 @@
 // hideously inefficient collision detection/response algorithm
 // just wanted to see some stuff bouncing around for now. 
 #include "csphyzik/ctcat.h"
-#include "csengine/collider.h"
-#include "iengine/collider.h"
+#include "cstool/collider.h"
+#include "ivaria/collider.h"
 #include "isys/system.h"
 
 class csEngine;
@@ -40,7 +40,7 @@ public:
   static void evolve_system ( real t1, real t2, 
 			      ctWorld *time_world, csEngine *space_engine );
 
-  csCollider *col;
+  csColliderWrapper *col;
   csMeshWrapper *sprt;
   ctVector3 prev_pos;
   ctRigidBody *rb;

@@ -26,12 +26,12 @@
 #include "csutil/cscolor.h"
 #include "csutil/csvector.h"
 #include "csutil/garray.h"
-#include "iengine/thing.h"
-#include "iengine/polymesh.h"
+#include "ivaria/polymesh.h"
 #include "iengine/viscull.h"
-#include "imesh/object.h"
 #include "iengine/mesh.h"
 #include "iengine/rview.h"
+#include "imesh/thing/thing.h"
+#include "imesh/object.h"
 
 class csSector;
 class csEngine;

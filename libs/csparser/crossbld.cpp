@@ -33,11 +33,11 @@
 #include "imesh/object.h"
 #include "iengine/engine.h"
 #include "iengine/mesh.h"
-#include "iengine/thing.h"
-#include "iengine/polygon.h"
-#include "iengine/ptextype.h"
 #include "iengine/texture.h"
 #include "igraphic/imageio.h"
+#include "imesh/thing/thing.h"
+#include "imesh/thing/polygon.h"
+#include "imesh/thing/ptextype.h"
 
 // helper function for image loading
 

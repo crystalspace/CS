@@ -25,13 +25,13 @@
 #include "csengine/camera.h"
 #include "csengine/light.h"
 #include "csengine/polygon.h"
-#include "csengine/collider.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/fontserv.h"
 #include "imesh/sprite3d.h"
 #include "imap/parser.h"
+#include "cstool/collider.h"
 
 #include "csphyzik/phyziks.h"
 #include "csgeom/math3d.h"
@@ -304,7 +304,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
 
   csMeshWrapper *mw = room->GetMesh (0);
   iPolygonMesh* mesh = QUERY_INTERFACE (mw->GetMeshObject (), iPolygonMesh);
-  (void)new csCollider(*mw, cdsys, mesh);
+  (void)new csColliderWrapper(*mw, cdsys, mesh);
   mesh->DecRef ();
 
   engine->Prepare ();

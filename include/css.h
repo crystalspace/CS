@@ -43,7 +43,7 @@
 // CS Interfaces
 #ifndef NO_CSINTERFACE
 #include "igraphic/image.h"
-#include "iengine/thing.h"
+#include "imesh/thing/thing.h"
 #include "ivideo/txtmgr.h"
 #include "iengine/view.h"
 #include "ivideo/texture.h"
@@ -59,12 +59,12 @@
 
 // CS Engine
 #ifndef NO_CSENGINE
-#include "csengine/collider.h"
 #include "csengine/csview.h"
 #include "csengine/light.h"
 #include "csengine/sector.h"
 #include "csengine/thing.h"
 #include "csengine/polygon.h"
+#include "cstool/collider.h"
 #endif
 
 // CS Object

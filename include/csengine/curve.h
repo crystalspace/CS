@@ -31,7 +31,7 @@
 #include "csengine/rview.h"
 #include "csutil/csobject.h"
 #include "ivideo/graph3d.h"
-#include "iengine/curve.h"
+#include "imesh/thing/curve.h"
 
 struct iMaterialHandle;
 class csBspContainer;

@@ -38,10 +38,8 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
-#include "iengine/texture.h"
-#include "iengine/polygon.h"
-#include "iengine/camera.h"
-#include "iengine/lightmap.h"
+#include "imesh/thing/polygon.h"
+#include "imesh/thing/lightmap.h"	//@@@
 #include "ivideo/graph2d.h"
 #include "csutil/garray.h"
 #include "csutil/cscolor.h"

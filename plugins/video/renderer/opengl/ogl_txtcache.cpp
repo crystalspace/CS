@@ -27,8 +27,8 @@
 #include "ogl_txtmgr.h"
 #include "ogl_g3dcom.h"
 #include "isys/system.h"
-#include "iengine/lightmap.h"
-#include "iengine/polygon.h"
+#include "imesh/thing/lightmap.h"	//@@@!!!
+#include "imesh/thing/polygon.h"	//@@@!!!
 #include "ivideo/graph3d.h"
 #include "isys/system.h"
 

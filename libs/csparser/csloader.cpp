@@ -28,6 +28,7 @@
 #include "cstool/prfire.h"
 #include "cstool/prplasma.h"
 #include "cstool/prwater.h"
+#include "cstool/keyval.h"
 #include "csgfx/csimage.h"
 #include "csparser/crossbld.h"
 #include "csparser/csloader.h"
@@ -47,15 +48,12 @@
 #include "iengine/terrain.h"
 #include "iengine/collectn.h"
 #include "iengine/sector.h"
-#include "iengine/polygon.h"
-#include "iengine/portal.h"
 #include "iengine/movable.h"
 #include "iengine/halo.h"
 #include "iengine/light.h"
 #include "iengine/statlght.h"
 #include "iengine/mesh.h"
-#include "iengine/thing.h"
-#include "iengine/keyval.h"
+#include "iengine/mapnode.h"
 #include "isound/data.h"
 #include "isound/loader.h"
 #include "isound/renderer.h"
@@ -67,6 +65,9 @@
 #include "isys/system.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
+#include "imesh/thing/polygon.h"
+#include "imesh/thing/portal.h"
+#include "imesh/thing/thing.h"
 
 //---------------------------------------------------------------------------
 
@@ -2889,7 +2890,9 @@ iKeyValuePair* csLoader::ParseKey (char* buf, iObject* pParent)
   char Value[10000]; //Value can potentially grow _very_ large.
   if (csScanStr(buf, "%S,%S", Key, Value) == 2)
   {
-    iKeyValuePair* kvp = Engine->CreateKeyValuePair (Key, Value);
+    csKeyValuePair* cskvp = new csKeyValuePair (Key, Value);
+    iKeyValuePair* kvp = QUERY_INTERFACE (cskvp, iKeyValuePair);
+    kvp->DecRef ();
     if (pParent)
       pParent->ObjAdd (kvp->QueryObject ());
     return kvp;

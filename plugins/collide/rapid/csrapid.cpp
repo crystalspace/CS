@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "csrapid.h"
 #include "rapcol.h"
-#include "iengine/polymesh.h"
+#include "ivaria/polymesh.h"
 
 CS_IMPLEMENT_PLUGIN
 

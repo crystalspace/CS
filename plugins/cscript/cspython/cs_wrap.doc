@@ -162,7 +162,7 @@ DecRef()
 1.2.  class iSCF
 ----------------
 
-scfCreateInstance(iClassID,iInterfaceID,iVersion)
+CreateInstance(iClassID,iInterfaceID,iVersion)
 
 ----------
 
@@ -462,8 +462,6 @@ DeleteAll()
 CreateTexture(iName,iFileName,iTransp,iFlags)
 
 CreateCameraPosition(iName,iSector,iPos,iForward,iUpward)
-
-CreateKey(iName,iValue)
 
 CreatePlane(iName,iOrigin,iMatrix)
 

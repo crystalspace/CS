@@ -22,8 +22,12 @@
 #include "tcache.h"
 #include "soft_g3d.h"
 #include "soft_txt.h"
-#include "iengine/lightmap.h"
 #include "isys/system.h"
+// @@@ The following include needs a cleanup. It is not very good that
+// the 3D rendering is accessing something private from the thing mesh
+// object. Instead a lightmap should be something that is defined in
+// a 3D renderer/csengine aspecific format.
+#include "imesh/thing/lightmap.h"
 
 static int hash_table [384];
 

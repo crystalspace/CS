@@ -29,7 +29,7 @@
 #include "csengine/material.h"
 #include "csengine/light.h"
 #include "csengine/lghtmap.h"
-#include "csengine/collider.h"
+#include "cstool/collider.h"
 #include "csutil/dataobj.h"
 #include "csutil/sparse3d.h"
 
@@ -244,7 +244,7 @@ static bool CompleteSectorCB (iPortal* portal, iBase* context, void* data)
     iPolygonMesh* mesh = QUERY_INTERFACE (ird->walls->GetMeshObject (),
   	iPolygonMesh);
     iObject* io = QUERY_INTERFACE (ird->walls, iObject);
-    (void)new csCollider (io, Sys->collide_system, mesh);
+    (void)new csColliderWrapper (io, Sys->collide_system, mesh);
     io->DecRef ();
     mesh->DecRef ();
 printf ("5\n"); fflush (stdout);

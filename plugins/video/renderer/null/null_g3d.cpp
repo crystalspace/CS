@@ -24,10 +24,10 @@
 #include "null_g3d.h"
 #include "null_txt.h"
 #include "iutil/cfgfile.h"
-#include "iengine/polygon.h"
+#include "imesh/thing/polygon.h"	//@@@
+#include "imesh/thing/lightmap.h"	//@@@
 #include "isys/system.h"
 #include "ivideo/graph2d.h"
-#include "iengine/lightmap.h"
 
 #define SysPrintf System->Printf
 

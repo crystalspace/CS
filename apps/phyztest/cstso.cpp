@@ -4,7 +4,7 @@
 #include "csengine/meshobj.h"
 #include "csengine/sector.h"
 #include "phyztest.h"
-#include "iengine/polymesh.h"
+#include "ivaria/polymesh.h"
 
 extern ctWorld phyz_world;
 extern Phyztest *Sys;
@@ -32,7 +32,7 @@ csRigidSpaceTimeObj::csRigidSpaceTimeObj( iCollideSystem* cdsys, csMeshWrapper *
   sprt = psprt;
   rb = prb;
   iPolygonMesh* mesh = QUERY_INTERFACE ( sprt->GetMeshObject(), iPolygonMesh);
-  col = new csCollider (*sprt, cdsys, mesh);
+  col = new csColliderWrapper (*sprt, cdsys, mesh);
   mesh->DecRef ();
   what_type = ST_RIGID;
 
@@ -93,7 +93,7 @@ void csRigidSpaceTimeObj::update_space()
 
 real csRigidSpaceTimeObj::collision_check()
 {
-  csCollider *coli;
+  csColliderWrapper *coli;
   //csMeshWrapper *sprt;
   csSector* first_sector;
   //csThing* thng;

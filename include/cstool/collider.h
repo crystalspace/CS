@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
     Written by Alex Pfaffe.
 
     This library is free software; you can redistribute it and/or
@@ -31,7 +31,7 @@ struct iCollider;
 struct iObject;
 
 
-SCF_VERSION (csCollider, 0, 0, 2);
+SCF_VERSION (csColliderWrapper, 0, 0, 3);
 
 /**
  * This is a conveniance object that you can use in your own
@@ -41,7 +41,7 @@ SCF_VERSION (csCollider, 0, 0, 2);
  * another manner then this is ok) and the engine will not use
  * this object itself.
  */
-class csCollider : public csObject
+class csColliderWrapper : public csObject
 {
 private:
   iCollideSystem* collide_system;
@@ -49,15 +49,15 @@ private:
 
 public:
   /// Create a collider based on a mesh.
-  csCollider (csObject& parent, iCollideSystem* collide_system,
+  csColliderWrapper (csObject& parent, iCollideSystem* collide_system,
   	iPolygonMesh* mesh);
 
   /// Create a collider based on a mesh.
-  csCollider (iObject* parent, iCollideSystem* collide_system,
+  csColliderWrapper (iObject* parent, iCollideSystem* collide_system,
   	iPolygonMesh* mesh);
 
   /// Destroy the plugin collider object
-  virtual ~csCollider ();
+  virtual ~csColliderWrapper ();
 
   /// Get the collider interface for this object.
   iCollider* GetCollider () { return collider; }
@@ -72,29 +72,35 @@ public:
    * This collider and pOtherCollider must be of comparable subclasses, if
    * not false is returned.
    */
-  bool Collide (csCollider& pOtherCollider,
-                        csTransform* pThisTransform = NULL,
-                        csTransform* pOtherTransform = NULL);
-  /// Similar to Collide for csCollider. Calls GetCollider for otherCollider.
+  bool Collide (csColliderWrapper& pOtherCollider,
+                csTransform* pThisTransform = NULL,
+                csTransform* pOtherTransform = NULL);
+  /**
+   * Similar to Collide for csColliderWrapper. Calls GetColliderWrapper for
+   * otherCollider.
+   */
   bool Collide (csObject& otherObject,
-                        csTransform* pThisTransform = NULL,
-                        csTransform* pOtherTransform = NULL);
-  /// Similar to Collide for csCollider. Calls GetCollider for otherCollider.
+                csTransform* pThisTransform = NULL,
+                csTransform* pOtherTransform = NULL);
+  /**
+   * Similar to Collide for csColliderWrapper. Calls GetColliderWrapper for
+   * otherCollider.
+   */
   bool Collide (iObject* otherObject,
-                        csTransform* pThisTransform = NULL,
-                        csTransform* pOtherTransform = NULL);
+                csTransform* pThisTransform = NULL,
+                csTransform* pOtherTransform = NULL);
 
   /**
-   * If object has a child of type csCollider it is returned. Otherwise 0
-   * is returned.
+   * If object has a child of type csColliderWrapper it is returned.
+   * Otherwise 0 is returned.
    */
-  static csCollider* GetCollider (csObject& object);
+  static csColliderWrapper* GetColliderWrapper (csObject& object);
 
   /**
-   * If object has a child of type csCollider it is returned. Otherwise 0
-   * is returned.
+   * If object has a child of type csColliderWrapper it is returned.
+   * Otherwise 0 is returned.
    */
-  static csCollider* GetCollider (iObject* object);
+  static csColliderWrapper* GetColliderWrapper (iObject* object);
 
   DECLARE_IBASE_EXT (csObject);
 };

@@ -21,7 +21,7 @@
 
 #include "csgeom/transfrm.h"
 #include "csutil/csobject.h"
-#include "iengine/polytmap.h"
+#include "imesh/thing/polytmap.h"
 
 class Dumper;
 

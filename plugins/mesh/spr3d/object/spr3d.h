@@ -30,7 +30,7 @@
 #include "plugins/mesh/spr3d/object/sprtri.h"
 #include "plugins/mesh/spr3d/object/skel3d.h"
 #include "ivideo/graph3d.h"
-#include "iengine/polymesh.h"
+#include "ivaria/polymesh.h"
 #include "imesh/sprite3d.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"

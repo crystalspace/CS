@@ -34,11 +34,11 @@
 #include "iengine/view.h"
 #include "iengine/engine.h"
 #include "iengine/sector.h"
-#include "iengine/polygon.h"
-#include "iengine/thing.h"
 #include "iengine/camera.h"
 #include "iengine/movable.h"
 #include "iengine/material.h"
+#include "imesh/thing/polygon.h"
+#include "imesh/thing/thing.h"
 
 //------------------------------------------------- We need the 3D engine -----
 

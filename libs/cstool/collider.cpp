@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000-2001 by Jorrit Tyberghein
     Written by Daniel Gudbjartsson
 
     This library is free software; you can redistribute it and/or
@@ -18,82 +18,81 @@
 */
 
 #include "cssysdef.h"
-#include "csengine/collider.h"
-#include "iengine/collider.h"
-#include "csengine/engine.h"
+#include "cstool/collider.h"
+#include "ivaria/collider.h"
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_IBASE_EXT (csCollider)
-  IMPLEMENTS_INTERFACE (csCollider)
+IMPLEMENT_IBASE_EXT (csColliderWrapper)
+  IMPLEMENTS_INTERFACE (csColliderWrapper)
 IMPLEMENT_IBASE_EXT_END
 
-csCollider::csCollider (csObject& parent,
+csColliderWrapper::csColliderWrapper (csObject& parent,
 	iCollideSystem* collide_system,
 	iPolygonMesh* mesh)
 {
   parent.ObjAdd (this);
-  csCollider::collide_system = collide_system;
+  csColliderWrapper::collide_system = collide_system;
   collide_system->IncRef ();
   collider = collide_system->CreateCollider (mesh);
 }
 
-csCollider::csCollider (iObject* parent,
+csColliderWrapper::csColliderWrapper (iObject* parent,
 	iCollideSystem* collide_system,
 	iPolygonMesh* mesh)
 {
   parent->ObjAdd (this);
-  csCollider::collide_system = collide_system;
+  csColliderWrapper::collide_system = collide_system;
   collide_system->IncRef ();
   collider = collide_system->CreateCollider (mesh);
 }
 
-csCollider::~csCollider ()
+csColliderWrapper::~csColliderWrapper ()
 {
   collide_system->DecRef ();
   collider->DecRef ();
 }
 
-bool csCollider::Collide (csObject& otherObject,
+bool csColliderWrapper::Collide (csObject& otherObject,
                           csTransform* pThisTransform,
                           csTransform* pOtherTransform) 
 {
-  csCollider *pOtherCollider = GetCollider (otherObject);
+  csColliderWrapper *pOtherCollider = GetColliderWrapper (otherObject);
   if (pOtherCollider)
     return Collide (*pOtherCollider, pThisTransform, pOtherTransform);
   else
     return false;
 }
 
-bool csCollider::Collide (iObject* otherObject,
+bool csColliderWrapper::Collide (iObject* otherObject,
                           csTransform* pThisTransform,
                           csTransform* pOtherTransform) 
 {
-  csCollider *pOtherCollider = GetCollider (otherObject);
+  csColliderWrapper *pOtherCollider = GetColliderWrapper (otherObject);
   if (pOtherCollider)
     return Collide (*pOtherCollider, pThisTransform, pOtherTransform);
   else
     return false;
 }
 
-bool csCollider::Collide (csCollider& otherCollider, 
+bool csColliderWrapper::Collide (csColliderWrapper& otherCollider, 
                           csTransform* pTransform1, 
                           csTransform* pTransform2)
 {
-  csCollider *pCollider2 = &otherCollider;
+  csColliderWrapper *pCollider2 = &otherCollider;
   if (pCollider2 == this) return false;
 
   return collide_system->Collide (collider, pTransform1,
   	pCollider2->collider, pTransform2);
 }
 
-csCollider* csCollider::GetCollider (csObject &object) 
+csColliderWrapper* csColliderWrapper::GetColliderWrapper (csObject &object) 
 {
-  return GET_CHILD_OBJECT_FAST (&object, csCollider);
+  return GET_CHILD_OBJECT (&object, csColliderWrapper);
 }
 
-csCollider* csCollider::GetCollider (iObject* object) 
+csColliderWrapper* csColliderWrapper::GetColliderWrapper (iObject* object) 
 {
-  return GET_CHILD_OBJECT_FAST (object, csCollider);
+  return GET_CHILD_OBJECT (object, csColliderWrapper);
 }
 

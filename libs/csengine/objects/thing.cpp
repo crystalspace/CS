@@ -32,7 +32,6 @@
 #include "csengine/curve.h"
 #include "csengine/texture.h"
 #include "csengine/material.h"
-#include "csengine/keyval.h"
 #include "csengine/meshobj.h"
 #include "csutil/csstring.h"
 #include "csutil/hashmap.h"

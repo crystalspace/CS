@@ -32,9 +32,9 @@
 #include "csengine/polytext.h"
 #include "csengine/octree.h"
 #include "csengine/material.h"
-#include "iengine/polygon.h"
 #include "iengine/sector.h"
-#include "iengine/ptextype.h"
+#include "imesh/thing/polygon.h"
+#include "imesh/thing/ptextype.h"
 
 class csSector;
 class csFrustumView;

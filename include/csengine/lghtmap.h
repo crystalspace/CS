@@ -21,7 +21,7 @@
 
 #include "csutil/scf.h"
 #include "csgfx/rgbpixel.h"
-#include "iengine/lightmap.h"
+#include "imesh/thing/lightmap.h"
 
 class csPolyTexture;
 class csThing;

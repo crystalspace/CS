@@ -34,15 +34,15 @@
 #include "csengine/pol2d.h"
 #include "csengine/sector.h"
 #include "csengine/engine.h"
-#include "csengine/keyval.h"
-#include "csengine/collider.h"
 #include "csengine/meshobj.h"
 #include "csengine/terrobj.h"
 #include "csparser/impexp.h"
 #include "csgeom/csrect.h"
 #include "csutil/dataobj.h"
+#include "cstool/keyval.h"
+#include "cstool/collider.h"
 #include "cstool/cspixmap.h"
-#include "iengine/collider.h"
+#include "ivaria/collider.h"
 
 extern WalkTest *Sys;
 
@@ -128,7 +128,7 @@ void WalkTest::CreateColliders ()
   p->CreateVertex (7); p->CreateVertex (3);
 
   mesh = QUERY_INTERFACE (mesh_obj, iPolygonMesh);
-  body = new csCollider (plbody->QueryObject (), collide_system, mesh);
+  body = new csColliderWrapper (plbody->QueryObject (), collide_system, mesh);
   body_radius = plbody->GetRadius ();
   mesh->DecRef ();
   thing_state->DecRef ();
@@ -180,7 +180,7 @@ void WalkTest::CreateColliders ()
   p->CreateVertex (7); p->CreateVertex (3);
 
   mesh = QUERY_INTERFACE (mesh_obj, iPolygonMesh);
-  legs = new csCollider (pllegs->QueryObject (), collide_system, mesh);
+  legs = new csColliderWrapper (pllegs->QueryObject (), collide_system, mesh);
   legs_radius = pllegs->GetRadius ();
   mesh->DecRef ();
   thing_state->DecRef ();
@@ -213,7 +213,7 @@ int FindSectors (csVector3 v, csVector3 d, iSector *s, iSector **sa)
   return c;
 }
 
-int CollisionDetect (csCollider *c, iSector* sp, csTransform *cdt)
+int CollisionDetect (csColliderWrapper *c, iSector* sp, csTransform *cdt)
 {
   int hit = 0;
   int i;

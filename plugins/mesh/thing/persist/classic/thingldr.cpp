@@ -28,9 +28,12 @@
 #include "iengine/mesh.h"
 #include "iengine/engine.h"
 #include "isys/system.h"
-#include "iengine/thing.h"//@@@ (should be from imesh)
-#include "iengine/polygon.h"//@@@ (should be from imesh)
-#include "iengine/portal.h"	//@@@ (imesh)
+#include "imesh/thing/thing.h"
+#include "imesh/thing/polygon.h"
+#include "imesh/thing/portal.h"
+#include "imesh/thing/polytmap.h"
+#include "imesh/thing/ptextype.h"
+#include "imesh/thing/curve.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
 #include "qint.h"
@@ -39,9 +42,6 @@
 #include "iutil/object.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
-#include "iengine/polytmap.h"
-#include "iengine/ptextype.h"
-#include "iengine/curve.h"
 
 CS_IMPLEMENT_PLUGIN
 

@@ -25,8 +25,8 @@
 #include "csgeom/box.h"
 #include "cssys/sysdriv.h"
 #include "csengine/engine.h"
-#include "csengine/collider.h"
 #include "csengine/light.h"
+#include "cstool/collider.h"
 #include "csutil/cscolor.h"
 #include "walktest/wentity.h"
 #include "iengine/engine.h"
@@ -153,8 +153,8 @@ public:
   csVector3 angle_velocity;
 
   /// Colliders for "legs" and "body". Intersections are handled differently.
-  csCollider *legs;
-  csCollider *body;
+  csColliderWrapper *legs;
+  csColliderWrapper *body;
   csVector3 body_radius, legs_radius;
 
   /// A list with all busy entities.

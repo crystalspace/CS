@@ -19,7 +19,7 @@
 #ifndef _RAPID_H_
 #define _RAPID_H_
 
-#include "iengine/collider.h"
+#include "ivaria/collider.h"
 #include "rapcol.h"
 
 /**

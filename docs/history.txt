@@ -1,5 +1,19 @@
 The history order is reversed so that new features are at the top.
 
+18-Jun-2001
+	- Fixed a bug in the region checking code from the loader.
+	- Renamed csCollider to csColliderWrapper and moved it from csengine
+	  to cstool.
+	- Moved csKeyValuePair from csengine to cstool. csMapNode is still
+	  in csengine though. Renamed the include/source for csMapNode
+	  from keyval.* to mapnode.*.
+	- Also removed csEngine::CreateKey() and CreateKeyValuePair()
+	  (similar for iEngine).
+	- Added include/imesh/thing and moved all thing mesh object includes
+	  from include/iengine to that dir (thing.h, polygon.h, lightmap.h,
+	  polytmap.h, portal.h, ptextype.h, and curve.h).
+	- Moved include/iengine/collider.h and polymesh.h to
+	  include/ivaria.
 17-Jun-2001
 	- Fixed a bug in 'facedown'/'faceup' commands (walktest). Reported
 	  by Thiago Ramon.

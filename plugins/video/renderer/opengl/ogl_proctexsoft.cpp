@@ -26,7 +26,7 @@
 #include "isys/system.h"
 #include "ivideo/sproctxt.h"
 #include "ivideo/txtmgr.h"
-#include "iengine/polygon.h"
+#include "imesh/thing/polygon.h"
 #include "isys/event.h"
 
 IMPLEMENT_IBASE (csOpenGLProcSoftware)

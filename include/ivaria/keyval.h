@@ -49,26 +49,4 @@ struct iKeyValuePair : public iBase
   virtual void SetValue (const char* value) = 0;
 };
 
-SCF_VERSION (iMapNode, 0, 0, 1);
-
-/**
- * A node. This is an iObject that is bound to a position and a sector in
- * the world.
- */
-struct iMapNode : public iBase
-{
-  /// Get the iObject.
-  virtual iObject *QueryObject() = 0;
-
-  /// Set the position of the node
-  virtual void SetPosition (const csVector3& pos) = 0;
-  /// Get the position of the node
-  virtual const csVector3& GetPosition () const = 0;
-
-  /// Set the sector of the node
-  virtual void SetSector (iSector *pSector) = 0;
-  /// Get the sector of the node
-  virtual iSector *GetSector () const = 0;
-};
-
 #endif
