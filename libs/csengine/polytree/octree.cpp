@@ -778,7 +778,7 @@ void csOctree::MarkVisibleFromPVS (const csVector3& pos)
 
 {
 printf ("pos=%f,%f,%f\n", pos.x, pos.y, pos.z);
-csBox3& b = node->GetBox ();
+const csBox3& b = node->GetBox ();
 printf ("b=%f,%f,%f %f,%f,%f\n",
 b.MinX (), b.MinY (), b.MinZ (),
 b.MaxX (), b.MaxY (), b.MaxZ ());
