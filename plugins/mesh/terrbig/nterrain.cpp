@@ -27,79 +27,235 @@
 #include "qsqrt.h"
 #include "nterrain.h"
 
-
 ///////////////////////////// SCF stuff ///////////////////////////////////////////////////////////////////////
-
 CS_IMPLEMENT_PLUGIN
 
-void nTerrain::SetVariance(nBlock &b)
+nTerrainInfo::nTerrainInfo (iObjectRegistry *obj_reg)
 {
-  float low=b.ne;
-  float high=b.ne;
-
-  if (b.nw<low)  low=b.nw;
-  if (b.nw>high) high=b.nw;
-
-  if (b.se<low)  low=b.se;
-  if (b.se>high) high=b.se;
-
-  if (b.sw<low)  low=b.sw;
-  if (b.sw>high) high=b.sw;
-
-  if (b.center<low)  low=b.center;
-  if (b.center>high) high=b.center;
-
-  // Store variance
-  b.variance = high-low;
-  b.midh = low;
+  mesh = new G3DTriangleMesh;
+  mG3D = CS_QUERY_REGISTRY (obj_reg, iGraphics3D);
+  if (mG3D) {
+  // @@@ priority should be a parameter.
+    vbufmgr = mG3D->GetVertexBufferManager ();
+    vbuf = vbufmgr->CreateBuffer (1);
+  }
+  bufcount = 0;
+  triangles = NULL;
+  triangle_count = triangle_size = 0;
+  triangle_parity = true;
+  vertices = NULL;
+  texels = NULL;
+  colors = NULL;
+  vertex_count = vertex_size = 0;
+  parity = 0;
 }
 
-float nTerrain::BuildTreeNode(FILE *f, unsigned int level, 
-	unsigned int parent_index, unsigned int child_num, nRect bounds, 
-	float *heightmap, csVector3 *norms, unsigned int w)
+nTerrainInfo::~nTerrainInfo ()
 {
-  unsigned int my_index = (parent_index<<2) + child_num + NTERRAIN_QUADTREE_ROOT;
-  unsigned int mid = bounds.w>>1;
-  unsigned int cw = mid+1;
-  nBlock b;
-
-  // Get heights.
-  b.ne = heightmap[bounds.x +              (bounds.y * w)];
-  b.nw = heightmap[bounds.x + bounds.w-1 + (bounds.y * w)];
-  b.se = heightmap[bounds.x +              ((bounds.y + bounds.h-1) * w)];
-  b.sw = heightmap[bounds.x + bounds.w-1 + ((bounds.y + bounds.h-1) * w)];
-  b.center = heightmap[bounds.x +  mid  +  ((bounds.y + mid) * w)];
-
-  b.ne_norm = norms[bounds.x +              (bounds.y * w)];
-  b.nw_norm = norms[bounds.x + bounds.w-1 + (bounds.y * w)];
-  b.se_norm = norms[bounds.x +              ((bounds.y + bounds.h-1) * w)];
-  b.sw_norm = norms[bounds.x + bounds.w-1 + ((bounds.y + bounds.h-1) * w)];
-  b.ce_norm = norms[bounds.x +  mid  +  ((bounds.y + mid) * w)];
-
-  // Set the variance for this block (the difference between the highest and lowest points.)
-  SetVariance(b);
-
-  // Expand the quadtree until we get to the max resolution.
-  if (level<max_levels)
-  {
-    float var1 = BuildTreeNode(f, level+1, my_index, 0, nRect(bounds.x,bounds.y,cw,cw), heightmap, norms, w);
-    float var2 = BuildTreeNode(f, level+1, my_index, 1, nRect(bounds.x+mid,bounds.y,cw,cw), heightmap, norms, w);
-    float var3 = BuildTreeNode(f, level+1, my_index, 2, nRect(bounds.x,bounds.y+mid,cw,cw), heightmap, norms, w);
-    float var4 = BuildTreeNode(f, level+1, my_index, 3, nRect(bounds.x+mid,bounds.y+mid,cw,cw), heightmap, norms, w);
-
-    b.variance = (var1 > b.variance) ? var1 : b.variance;
-    b.variance = (var2 > b.variance) ? var2 : b.variance;
-    b.variance = (var3 > b.variance) ? var3 : b.variance;
-    b.variance = (var4 > b.variance) ? var4 : b.variance;
+  delete mesh;
+  if (triangle_count) { delete [] triangles; }
+  if (vertex_count) {
+    delete vertices;
+	delete texels;
+    delete colors;
   }
-  /* midh was set to low */
-  b.midh += b.variance/2.0;
+}
 
+void nTerrainInfo::InitBuffer (const csVector3 &v, const csVector2 &t, const csColor &c, int p)
+{
+  if (vertex_size == 0) {
+    vertices = new csVector3[2];
+    texels = new csVector2[2];
+    colors = new csColor[2];
+    vertex_size = 2;
+  } else if (mG3D) {
+    delete [] mesh->vertex_fog;
+    vbufmgr->UnlockBuffer(vbuf);
+	bufcount ++;
+  }
+  triangle_count = 0;
+  triangle_parity = false;
+  vertex_count = 0;
+  vertices[0] = vertices[1] = v;
+  texels[0] = texels[1] = t;
+  colors[0] = colors[1] = c;
+  vertex_count = 2;
+  parity = p;
+}
+
+void nTerrainInfo::AddVertex (const csVector3 &v, const csVector2 &t, const csColor &c, int p)
+{
+  CS_ASSERT (vertex_size >= 2);
+  if (v == vertices[vertex_count - 1] || v == vertices[vertex_count - 2]) {
+    return;
+  }
+  if (vertex_count+1 >= vertex_size) {
+    ResizeVertices ();
+  }
+  if (p == parity) {
+    vertices[vertex_count] = vertices[vertex_count - 2];
+    texels[vertex_count] = texels[vertex_count - 2];
+    colors[vertex_count] = colors[vertex_count - 2];
+    vertex_count ++;
+    AddTriangle ();
+  }
+  vertices[vertex_count] = v;
+  texels[vertex_count] = t;
+  colors[vertex_count] = c;
+  parity = p;
+  vertex_count ++;
+  AddTriangle ();
+}
+
+void nTerrainInfo::EndBuffer (const csVector3 &v, const csVector2 &t, const csColor &c, iRenderView *rview)
+{
+  if (vertex_count >= vertex_size) {
+    ResizeVertices ();
+  }
+  vertices[vertex_count] = v;
+  texels[vertex_count] = t;
+  colors[vertex_count] = c;
+  vertex_count ++;
+  AddTriangle ();
+
+  if (mG3D) {
+    vbufmgr->LockBuffer(vbuf, vertices, texels, colors, vertex_count, bufcount);
+    mesh->triangles = triangles;
+    mesh->vertex_fog = new G3DFogInfo[vertex_count]; 
+    mesh->buffers[0]=vbuf;
+    mesh->num_triangles = triangle_count;
+    rview->CalculateFogMesh(mG3D->GetObjectToCamera(), *mesh);
+  }
+}
+
+void nTerrainInfo::AddTriangle ()
+{
+  if (triangle_count == triangle_size) {
+    if (triangle_size == 0) {
+      triangle_size = 1;
+      triangles = new csTriangle[triangle_size];
+    } else {
+      triangle_size <<= 1;
+      csTriangle *ttmp = triangles;
+      triangles = new csTriangle[triangle_size];
+      for (int i = 0; i < triangle_count; i++) {
+        triangles[i] = ttmp[i];
+      }
+      delete [] ttmp;
+    }
+  }
+  if (triangle_parity) { // go counter-clockwise
+    triangles[triangle_count++] = csTriangle (vertex_count - 1,
+      vertex_count - 2, vertex_count - 3);
+  } else { // go clockwise
+    triangles[triangle_count++] = csTriangle (vertex_count - 3,
+      vertex_count - 2, vertex_count - 1);
+  }
+  triangle_parity = !triangle_parity;
+}
+
+void nTerrainInfo::ResizeVertices ()
+{
+  CS_ASSERT (vertex_size >= 2);
+  vertex_size <<= 1;
+  csVector3 *vtmp = vertices;
+  csVector2 *ttmp = texels;
+  csColor *ctmp = colors;
+  vertices = new csVector3[vertex_size];
+  texels = new csVector2[vertex_size];
+  colors = new csColor[vertex_size];
+  for (int i = 0; i < vertex_count; i ++) {
+    vertices[i] = vtmp[i];
+    texels[i] = ttmp[i];
+    colors[i] = ctmp[i];
+  }
+  delete [] vtmp;
+  delete [] ttmp;
+  delete [] ctmp;
+}
+
+void nTerrain::VerifyTreeNode(FILE *f, unsigned int level,
+	unsigned int parent, unsigned int my, 
+	unsigned int i, unsigned int j, unsigned int k,
+	nBlock *heightmap)
+{
+  unsigned int my_ind = (j+k)>>1;
+  nBlock *b = &heightmap[my_ind];
+
+  if (level < 2 * max_levels - 1)
+  {
+    unsigned int right_ind = my * 2 + 1;
+    VerifyTreeNode (f, level+1, parent, right_ind, my_ind, i, k, heightmap);
+    if (b->error < heightmap[(i+k)>>1].error) {
+      printf ("INVALID error between heightmap[%d].error = %f and hm[%d].error = %f\n", my_ind, b->error, right_ind, heightmap[right_ind].error);
+    }
+    if (b->radius < heightmap[(i+k)>>1].radius) {
+      printf ("INVALID radius between heightmap[%d].radius = %f and hm[%d].radius = %f\n", my_ind, b->radius, right_ind, heightmap[right_ind].radius);
+    }
+    unsigned int left_ind = my * 2 + 0;
+    VerifyTreeNode(f, level+1, parent, left_ind, my_ind, j, i, heightmap);
+    if (b->error < heightmap[(j+i)>>1].error) {
+      printf ("INVALID error between heightmap[%d].error = %f and hm[%d].error = %f\n", my_ind, b->error, left_ind, heightmap[left_ind].error);
+    }
+    if (b->radius < heightmap[(j+i)>>1].radius) {
+      printf ("INVALID radius between heightmap[%d].radius = %f and hm[%d].radius = %f\n", my_ind, b->radius, left_ind, heightmap[left_ind].radius);
+    }
+  }
+}
+
+void nTerrain::WriteTreeNode(FILE *f, unsigned int level,
+	unsigned int parent, unsigned int my, 
+	unsigned int i, unsigned int j, unsigned int k,
+	nBlock *heightmap)
+{
+  unsigned int my_ind = (j+k)>>1;
+  nBlock *b = &heightmap[my_ind];
+
+  if (level < 2 * max_levels - 1)
+  {
+    unsigned int right_ind = my * 2 + 1;
+    WriteTreeNode (f, level+1, parent, right_ind, my_ind, i, k, heightmap);
+    unsigned int left_ind = my * 2 + 0;
+    WriteTreeNode(f, level+1, parent, left_ind, my_ind, j, i, heightmap);
+  }
   // Store the block in the file.
-  fseek(f, my_index*nBlockLen, SEEK_SET);
-  fwrite(&b, nBlockLen, 1, f);
+  fseek(f, (parent + my)*sizeof(nBlock), SEEK_SET);
+  fwrite(b, sizeof(nBlock), 1, f);
+}
 
-  return b.variance;
+void nTerrain::BuildTree(FILE *f, nBlock *heightmap, unsigned int w)
+{
+  terrain_w = w;
+  max_levels = ilogb(w-1);
+  fseek (f, 0, SEEK_SET);
+  unsigned int SW = (w-1)*w;
+  unsigned int SE = (w-1)+(w-1)*w;
+  unsigned int NE = w-1;
+  unsigned int NW = 0;
+  unsigned int x = w >> 1;
+  unsigned int C = x + x*w;
+
+  fwrite (&heightmap[SW], sizeof (nBlock), 1, f);
+  fwrite (&heightmap[SE], sizeof (nBlock), 1, f);
+  fwrite (&heightmap[NE], sizeof (nBlock), 1, f);
+  fwrite (&heightmap[NW], sizeof (nBlock), 1, f);
+  fwrite (&heightmap[C], sizeof (nBlock), 1, f);
+  unsigned int size = 0;
+  for (unsigned int i = 0, inc = 1; i < 2 * max_levels - 1; i ++, inc *= 2) {
+    size += inc;
+  }
+
+  WriteTreeNode(f, 1, 0 * size + 4, 1, C, SW, SE, heightmap); 
+  WriteTreeNode(f, 1, 1 * size + 4, 1, C, SE, NE, heightmap); 
+  WriteTreeNode(f, 1, 2 * size + 4, 1, C, NE, NW, heightmap); 
+  WriteTreeNode(f, 1, 3 * size + 4, 1, C, NW, SW, heightmap); 
+
+  /*
+  VerifyTreeNode(f, 1, 0 * size + 4, 1, C, SW, SE, heightmap); 
+  VerifyTreeNode(f, 1, 1 * size + 4, 1, C, SE, NE, heightmap); 
+  VerifyTreeNode(f, 1, 2 * size + 4, 1, C, NE, NW, heightmap); 
+  VerifyTreeNode(f, 1, 3 * size + 4, 1, C, NW, SW, heightmap); 
+  */
 }
 
 csColor nTerrain::CalculateLightIntensity (iLight *li, iMovable *m, csVector3 v, csVector3 n)
@@ -131,214 +287,89 @@ csColor nTerrain::CalculateLightIntensity (iLight *li, iMovable *m, csVector3 v,
   return color;
 }
 
-void nTerrain::BufferTreeNode(iMovable *m, nBlock *b, nRect bounds)
+void nTerrain::BufferTreeNode(iMovable *m, int p, nBlock *b)
 {
-  int mid = terrain_w >> 1;
-  csReversibleTransform t = m->GetTransform();
-  int ne = info->vertex_count ++;
-  int nw = info->vertex_count ++;
-  int se = info->vertex_count ++;
-  int sw = info->vertex_count ++;
-  int ce = info->vertex_count ++;
-  info->vertices[ne] = csVector3((bounds.x-mid)*scale.x, 
-                                 b->ne*scale.y, 
-							     (bounds.y-mid)*scale.z) / t;
-  info->vertices[nw] = csVector3((bounds.x+bounds.w-1-mid)*scale.x, 
-                                 b->nw*scale.y, 
-                                 (bounds.y-mid)*scale.z) / t;
-  info->vertices[se] = csVector3((bounds.x-mid)*scale.x,
-                                 b->se*scale.y, 
-                                 (bounds.y+bounds.h-1-mid)*scale.z) / t;
-  info->vertices[sw] = csVector3((bounds.x+bounds.w-1-mid)*scale.x,
-                                 b->sw*scale.y, 
-                                 (bounds.y+bounds.h-1-mid)*scale.z) / t;
-  info->vertices[ce] = csVector3((bounds.x+bounds.h/2.0-mid)*scale.x,
-                                 b->center*scale.y, 
-                                 (bounds.y+bounds.h/2.0-mid)*scale.z) / t; 
-
-  float wid = (float)terrain_w;
-  info->texels[ne] = csVector2(bounds.x/wid, bounds.y/wid);
-  info->texels[nw] = csVector2((bounds.x+bounds.w-1)/wid, bounds.y/wid);
-  info->texels[se] = csVector2(bounds.x/wid, (bounds.y+bounds.h-1)/wid);
-  info->texels[sw] = csVector2((bounds.x+bounds.w-1)/wid, (bounds.y+bounds.h-1)/wid);
-  info->texels[ce] = csVector2((bounds.x+bounds.h/2.0)/wid, (bounds.y+bounds.h/2.0)/wid);
-
-  csColor nec(0,0,0), nwc(0,0,0), sec(0,0,0), swc(0,0,0), centerc(0,0,0);
-
+  csVector3 v = b->pos / m->GetTransform();
+  float mid = terrain_w / 2.0;
+  csVector2 t = csVector2 ((b->pos.x + mid) / (float)terrain_w, 1.0 - (b->pos.z + mid) / (float)terrain_w);
+  csColor c = csColor (1.0, 1.0, 1.0);
   if (info->num_lights > 0) {
+    c = csColor (0.0, 0.0, 0.0);
     for (int i = 0; i < info->num_lights; i ++) {
-      iLight* li = info->light_list[i];
-
-      nec += CalculateLightIntensity (li, m, info->vertices[ne], b->ne_norm);
-      nwc += CalculateLightIntensity (li, m, info->vertices[nw], b->nw_norm);
-      sec += CalculateLightIntensity (li, m, info->vertices[se], b->se_norm);
-      swc += CalculateLightIntensity (li, m, info->vertices[sw], b->sw_norm);
-      centerc += CalculateLightIntensity (li, m, info->vertices[ce], b->ce_norm);
+      iLight *li = info->light_list[i];
+      c += CalculateLightIntensity (li, m, b->pos, b->norm);
     }
-  } else {
-    nec = csColor (1.0, 1.0, 1.0);
-    nwc = csColor (1.0, 1.0, 1.0);
-    sec = csColor (1.0, 1.0, 1.0);
-    swc = csColor (1.0, 1.0, 1.0);
-    centerc = csColor (1.0, 1.0, 1.0);
+    c.Clamp (2., 2., 2.);
   }
-
-  nec.Clamp (2., 2., 2.);
-  nwc.Clamp (2., 2., 2.);
-  sec.Clamp (2., 2., 2.);
-  swc.Clamp (2., 2., 2.);
-  centerc.Clamp (2., 2., 2.);
-
-  info->colors[ne] = (nec);
-  info->colors[nw] = (nwc);
-  info->colors[se] = (sec);
-  info->colors[sw] = (swc);
-  info->colors[ce] = (centerc);
-
-  /** Build triangle stacks, for each block output four triangles.
-   * No need to merge and split because each block is at full resolution,
-   * we have no partial resolution blocks.
-   */
-  info->triq[0/*b->ti*/].triangles[info->triangle_count++] = csTriangle(sw, ce, se);
-  info->triq[0/*b->ti*/].triangles[info->triangle_count++] = csTriangle(nw, ce, sw);
-  info->triq[0/*b->ti*/].triangles[info->triangle_count++] = csTriangle(ne, ce, nw);
-  info->triq[0/*b->ti*/].triangles[info->triangle_count++] = csTriangle(se, ce, ne);
+  info->AddVertex (v, t, c, p);
 }
 
-void nTerrain::ProcessTreeNode(iRenderView *rv, iMovable *m, unsigned int level, unsigned int parent_index, unsigned int child_num, nRect bounds)
+void nTerrain::ProcessTreeNode(iRenderView *rv, float kappa, iMovable *m, unsigned int level, unsigned int parent, unsigned int child, unsigned int branch)
 {
-
-  unsigned int my_index = (parent_index<<2) + child_num + NTERRAIN_QUADTREE_ROOT;
-  int mid = bounds.w>>1;
-  unsigned int cw = mid+1;
-  bool render_this=false;
-  nBlock *b;
-  
-  // Get the block we're currently checking.
-  b=(nBlock *)hm->GetPointer(my_index);
-
-  if (!b) {
-  	return;
-  }
-
-  // Create a bounding sphere.
-  int c = terrain_w >> 1;
-  csVector3 center (bounds.x+mid-c*scale.x, b->midh*scale.y, bounds.y+mid-c*scale.z);
-  csVector3 radius (bounds.w * scale.x, b->variance * scale.y, bounds.h * scale.z);
-  csSphere bs(m->GetTransform().This2Other(center), radius.Norm());
-
-  // Test it for culling, return if it's not visible.
-  if (!rv->TestBSphere(obj2cam, bs)) return;
-
-  // If we are at the bottom level, we HAVE to render this block, so don't bother with the calcs.
-  if (level>=max_levels)
-    render_this=true;
-
-  else
-  {
-    // Get distance from center of block to camera, plus a small epsilon to avoid division by zero.
-    float distance = ((cam-bs.GetCenter()).Norm())+1e-10;
-    // Get the error metric, in this case it's the ratio between variance and distance.
-    float error_metric = b->variance * scale.y / distance;
-
-    if (error_metric<=error_metric_tolerance) {
-      render_this=true;
-    } 
-  }
-
-  // Don't render this block, resolve to the next level.
-  if (!render_this)
-  {
-    ProcessTreeNode(rv, m, level+1, my_index, 0, nRect(bounds.x,bounds.y,cw,cw));
-    ProcessTreeNode(rv, m, level+1, my_index, 1, nRect(bounds.x+mid,bounds.y,cw,cw));
-    ProcessTreeNode(rv, m, level+1, my_index, 2, nRect(bounds.x,bounds.y+mid,cw,cw));
-    ProcessTreeNode(rv, m, level+1, my_index, 3, nRect(bounds.x+mid,bounds.y+mid,cw,cw));
-  }
-  // Render this block to the buffer for later drawing.
-  else
-    BufferTreeNode(m, b, bounds);
-
-}
-
-void nTerrain::BuildTree(FILE *f, float *heightmap, csVector3 *norms, unsigned int w)
-{
-  terrain_w = w-1;
-  max_levels = ilogb(w-1) - 1;
-
-  unsigned int mid = w>>1;
-  unsigned int cw = mid+1;
-  unsigned int x=0, y=0;
-  nBlock b;
-
-  b.ne = heightmap[0];
-  b.nw = heightmap[w-1];
-  b.se = heightmap[(w-1)*w];
-  b.sw = heightmap[w-1 + (w-1) * w];
-  b.center = heightmap[mid + mid * w];
-
-  b.ne_norm = norms[0];
-  b.nw_norm = norms[w-1];
-  b.se_norm = norms[(w-1)*w];
-  b.sw_norm = norms[w-1 + (w-1) * w];
-  b.ce_norm = norms[mid + mid * w];
-
-  SetVariance(b);
-
-  b.midh = w; /* for this first block the w is encoded into midh */
-
-  float var1 = BuildTreeNode(f, 1, 0, 0, nRect(x,y,cw,cw), heightmap, norms, w);
-  float var2 = BuildTreeNode(f, 1, 0, 1, nRect(x+mid,y,cw,cw), heightmap, norms, w);
-  float var3 = BuildTreeNode(f, 1, 0, 2, nRect(x,y+mid,cw,cw), heightmap, norms, w);
-  float var4 = BuildTreeNode(f, 1, 0, 3, nRect(x+mid,y+mid,cw,cw), heightmap, norms, w);
-
-  b.variance = (var1 > b.variance) ? var1 : b.variance;
-  b.variance = (var2 > b.variance) ? var2 : b.variance;
-  b.variance = (var3 > b.variance) ? var3 : b.variance;
-  b.variance = (var4 > b.variance) ? var4 : b.variance;
-
-  fseek (f, 0, SEEK_SET); 
-  fwrite (&b, nBlockLen, 1, f);
+  nBlock b = (nBlock *)hm->GetPointer(child + parent);
+  csSphere bs(b.pos / m->GetTransform(), b.radius);
+  float distance = (rv->GetCamera()->GetTransform().GetOrigin() - (b.pos / m->GetTransform())).SquaredNorm();
+  float error_projection = (b.error / kappa + b.radius);
+  // Squared
+  error_projection *= error_projection;
+  if (rv->TestBSphere (obj2cam, bs) && error_projection > distance) {
+    if (level < 2 * max_levels - 1) {
+      ProcessTreeNode (rv, kappa, m, level + 1, parent, branch, branch * 2 + 0);
+	}
+    BufferTreeNode (m, level & 1, &b);
+    if (level < 2 * max_levels - 1) {
+      ProcessTreeNode (rv, kappa, m, level + 1, parent, branch, branch * 2 + 1);
+	}
+  } 
 }
 
 void nTerrain::AssembleTerrain(iRenderView *rv, iMovable *m, nTerrainInfo *terrinfo)
 {
-  // Clear mesh lists
   info = terrinfo;   
 
-  nBlock *b = (nBlock *)hm->GetPointer(0);
-  if (!b) { return; }
+  nBlock sw = (nBlock *)hm->GetPointer(0);
+  nBlock se = (nBlock *)hm->GetPointer(1);
+  nBlock ne = (nBlock *)hm->GetPointer(2);
+  nBlock nw = (nBlock *)hm->GetPointer(3);
+  nBlock c = (nBlock *)hm->GetPointer(4);
 
-  terrain_w = (unsigned int)b->midh;
-  max_levels = ilogb(terrain_w) - 1;
+  terrain_w = (unsigned int)sw.radius;
+  max_levels = ilogb(terrain_w);
 
-  unsigned int mid = terrain_w>>1;
-  unsigned int cw = mid+1;
-  unsigned int x=0, y=0;
-  
-  csVector3 center (0, b->variance / 2.0 * scale.y, 0);
-  csVector3 radius (terrain_w * scale.x, b->variance * scale.y, terrain_w * scale.z);
-  csSphere bs (m->GetTransform().This2Other(center), radius.Norm());
-  if (!rv->TestBSphere(obj2cam, bs)) return;
-
-  float distance = ((cam-bs.GetCenter()).Norm())+0.0001;
-  float error_metric = b->variance * scale.y / distance;
-
-  if (error_metric <= error_metric_tolerance) 
-  BufferTreeNode (m, b, nRect (0, 0, terrain_w+1, terrain_w+1));
-
-  else {
-
-  // Buffer entire viewable terrain by first doing view culling on the block, then checking for the
-  // error metric.  If the error metric fails, then we need to drop down another level. Begin that
-  // process here.
-  
-  ProcessTreeNode(rv, m, 1, 0, 0, nRect(x,y,cw,cw));
-  ProcessTreeNode(rv, m, 1, 0, 1, nRect(x+mid,y,cw,cw));
-  ProcessTreeNode(rv, m, 1, 0, 2, nRect(x,y+mid,cw,cw));
-  ProcessTreeNode(rv, m, 1, 0, 3, nRect(x+mid,y+mid,cw,cw));
-  
+  unsigned int size = 0;
+  for (unsigned int i = 0, inc = 1; i < 2 * max_levels - 1; i ++, inc *= 2) {
+    size += inc;
   }
+  float kappa = error_metric_tolerance * 
+    // rv->GetCamera()->GetInvFOV() * 2 * tan (rv->GetCamera()->GetFOVAngle() / 180.0 * PI / 2);
+    rv->GetCamera()->GetInvFOV() * rv->GetCamera()->GetFOVAngle() / 180.0 * PI;
 
+  float mid = terrain_w/2.0;
+  info->InitBuffer (sw.pos / m->GetTransform(), 
+    csVector2 ((sw.pos.x + mid)/(float)terrain_w, 1.0 - (sw.pos.z + mid)/(float)terrain_w),
+    csColor (1.0, 1.0, 1.0), 0);
+  ProcessTreeNode (rv, kappa, m, 1, 0 * size + 4, 1, 2);
+  BufferTreeNode (m, 0, &c);
+  ProcessTreeNode (rv, kappa, m, 1, 0 * size + 4, 1, 3);
+
+  BufferTreeNode (m, 1, &se);
+  ProcessTreeNode (rv, kappa, m, 1, 1 * size + 4, 1, 2);
+  BufferTreeNode (m, 0, &c);
+  ProcessTreeNode (rv, kappa, m, 1, 1 * size + 4, 1, 3);
+
+  BufferTreeNode (m, 1, &ne);
+  ProcessTreeNode (rv, kappa, m, 1, 2 * size + 4, 1, 2);
+  BufferTreeNode (m, 0, &c);
+  ProcessTreeNode (rv, kappa, m, 1, 2 * size + 4, 1, 3);
+
+  BufferTreeNode (m, 1, &nw);
+  ProcessTreeNode (rv, kappa, m, 1, 3 * size + 4, 1, 2);
+  BufferTreeNode (m, 0, &c);
+  ProcessTreeNode (rv, kappa, m, 1, 3 * size + 4, 1, 3);
+
+  info->EndBuffer (sw.pos / m->GetTransform(), 
+    csVector2 ((sw.pos.x + mid)/(float)terrain_w, 1.0 - (sw.pos.z + mid)/(float)terrain_w),
+    csColor (1.0, 1.0, 1.0), rv);
 }
 
 void nTerrain::SetMaterialsList(iMaterialWrapper **matlist, unsigned int nMaterials)
@@ -370,7 +401,6 @@ void nTerrain::CreateMaterialMap(iFile *matmap, iImage* /*terrtex*/)
   
   while(index<matmap->GetSize())
   {
-
     // Get some settings
     if ((read=csScanStr(&data[index], "scale: %d", &map_scale))!=-1)
 	index+=read;
@@ -429,27 +459,21 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-csBigTerrainObject::csBigTerrainObject(iObjectRegistry* _obj_reg, iMeshObjectFactory *_pFactory):vbufmgr(0), pFactory(_pFactory), object_reg(_obj_reg), terrain(NULL), nTextures(0) 
+csBigTerrainObject::csBigTerrainObject(iObjectRegistry* _obj_reg, iMeshObjectFactory *_pFactory):pFactory(_pFactory), object_reg(_obj_reg), terrain(NULL), nTextures(0), scale (1,1,1) 
 {
   SCF_CONSTRUCT_IBASE (_pFactory)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTerrBigState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
 
-  info = new nTerrainInfo();
-	
-	terrain = new nTerrain;
+  info = new nTerrainInfo(_obj_reg);
+  terrain = new nTerrain;
 }
 
 csBigTerrainObject::~csBigTerrainObject()
 {
   if (terrain) delete terrain;
-  if (info)    
-  {
-    delete [] info->mesh;
-    delete [] info->triq;
-    delete info;
-  }
+  if (info)    delete info;
 }
 
 bool csBigTerrainObject::LoadHeightMapFile (const char *filename) 
@@ -462,10 +486,9 @@ bool csBigTerrainObject::LoadHeightMapFile (const char *filename)
   return true;
 }
 
-void csBigTerrainObject::SetScaleFactor (const csVector3 &scale)
+void csBigTerrainObject::SetScaleFactor (const csVector3 &s)
 {
-  if (terrain)
-    terrain->SetScaleFactor (scale);
+  scale = s;
 }
 
 void csBigTerrainObject::SetErrorTolerance (float tolerance)
@@ -506,42 +529,72 @@ bool csBigTerrainObject::ConvertImageToMapFile (iFile *input,
   }
   int size = image->GetSize ();
   int width = image->GetWidth ();
-  float *heightmap = new float[size];
+  nBlock *heightmap = new nBlock[size];
   if (image->GetFormat () & CS_IMGFMT_PALETTED8) {
     csRGBpixel *palette = image->GetPalette ();
     uint8 *data = (uint8 *)image->GetImageData ();
     for (int i = 0; i < image->GetSize (); i ++) {
-      heightmap[i] = ((float)palette[data[i]].Intensity()) / 255.0;
+	  heightmap[i].pos.x = (i % width - width/2) * scale.x;
+      heightmap[i].pos.y = ((float)palette[data[i]].Intensity()) / 255.0 * scale.y;
+	  heightmap[i].pos.z = (width/2 - i / width) * scale.z;
+	  heightmap[i].error = 0.0;
+	  heightmap[i].radius = 0.0;
     }
   } else {
     csRGBpixel *data = (csRGBpixel *)image->GetImageData ();
     for (int i = 0; i < image->GetSize (); i ++) {
-      heightmap[i] = ((float)data[i].Intensity()) / 255.0;
+	  heightmap[i].pos.x = (i % width - width/2) * scale.x;
+      heightmap[i].pos.y = ((float)data[i].Intensity()) / 255.0 * scale.y;
+	  heightmap[i].pos.z = (width/2 - i / width) * scale.z;
+	  heightmap[i].error = 0.0;
+	  heightmap[i].radius = 0.0;
     }
   }
-  csVector3 *norms = new csVector3[image->GetSize ()];
-  for  (int i = 0; i < size; i ++) {
-    int ind = i - width;
-    csVector3 curr (0, heightmap[i], 0);
-    csVector3 up = csVector3(0, (ind < 0) ? 0 : heightmap[ind], 1) - curr;
-    ind = i + width;
-    csVector3 dn = csVector3(0, (ind >= image->GetSize ()) ? 0 : heightmap[ind], -1) - curr;
-    ind = i - 1;
-    csVector3 lt = csVector3(-1, 
-        (i%width - ind%width != 1) ? 0 : heightmap[ind], 0) - curr;
-    ind = i + 1;
-    csVector3 rt = csVector3(1, 
-        (ind%width - i%width != 1) ? 0 : heightmap[ind], 0) - curr;
 
-    norms[i] = (up + dn + lt + rt) / 4.0;
-    norms[i].Normalize ();
+  for  (int i = 0; i < size; i ++) {
+    csVector3 up = (i-width < 0) ? 
+	  csVector3(0,0,0) : heightmap[i-width].pos - heightmap[i].pos;
+    csVector3 dn = (i+width >= image->GetSize ()) ?  
+	  csVector3 (0,0,0) : heightmap[i+width].pos - heightmap[i].pos;
+    csVector3 lt = (i%width - (i-1)%width != 1) ? 
+	  csVector3 (0,0,0) : heightmap[i-1].pos - heightmap[i].pos;
+    csVector3 rt = ((i+1)%width - i%width != 1) ? 
+	  csVector3 (0,0,0) : heightmap[i+1].pos - heightmap[i].pos;
+
+    heightmap[i].norm = (up + dn + lt + rt) / 4.0;
+    heightmap[i].norm.Normalize ();
   }
+
+  int a, b, c, s, i, j;
+  for (a = c = 1, b = 2, s = 0; a != width-1; a = c = b, b *= 2, s = width) {
+    for (j = a; j < width-1; j += b) {
+	  for (i = 0; i < width; i += b) {
+	    ComputeLod (heightmap, i, j, 0, a, s, width);
+	    ComputeLod (heightmap, j, i, a, 0, s, width);
+	  }
+	}
+
+    for (j = a; j < width-1; c = -c, j += b) {
+	  for (i = a; i < width-1; c = -c, i += b) {
+	    ComputeLod (heightmap, i, j, a, c, width, width);
+	  }
+	}
+  }
+
+  heightmap[(width-1)*width].error = 0.0;
+  heightmap[(width-1)*width].radius = width;
+  heightmap[width-1+(width-1)*width].error = 0.0;
+  heightmap[width-1+(width-1)*width].radius = width;
+  heightmap[width-1].error = 0.0;
+  heightmap[width-1].radius = width;
+  heightmap[0].error = 0.0;
+  heightmap[0].radius = width;
+
   if (!terrain) {
     terrain = new nTerrain;
   }
-  terrain->BuildTree (hmfp, heightmap, norms, width);
+  terrain->BuildTree (hmfp, heightmap, width);
   delete [] heightmap;
-  delete [] norms;
   fclose (hmfp);
 
   terrain->SetHeightMapFile (hm);
@@ -549,66 +602,41 @@ bool csBigTerrainObject::ConvertImageToMapFile (iFile *input,
   return true;
 }
 
-void 
-csBigTerrainObject::SetupVertexBuffer (csRef<iVertexBuffer> &vbuf1)
+void csBigTerrainObject::ComputeLod (nBlock *heightmap, int i, int j, int di, int dj, int n, int width)
 {
- if (!vbuf1)
- {
-   if (!vbufmgr)
-   {
-     iObjectRegistry* object_reg = ((csBigTerrainObjectFactory*)pFactory)
-     	->object_reg;
-     csRef<iGraphics3D> g3d (
-     	CS_QUERY_REGISTRY (object_reg, iGraphics3D));
-
-     // @@@ priority should be a parameter.
-     vbufmgr = g3d->GetVertexBufferManager ();
-
-     //vbufmgr->AddClient (&scfiVertexBufferManagerClient);
-   }
-   vbuf = vbufmgr->CreateBuffer (1);
- }
+  nBlock *b = &heightmap[i + j * width];
+  nBlock *l = &heightmap[i - di + (j - dj) * width];
+  nBlock *r = &heightmap[i + di + (j + dj) * width];
+  b->error = fabsf (b->pos.y - (l->pos.y + r->pos.y) / 2.0);
+  if (n) {
+    dj = (di + dj) / 2;
+    di -= dj;
+    for (int k = 0; k < 4; k ++) {
+      if ((i > 0 || di >= 0) && (i < (width-1) || di <= 0) &&
+          (j > 0 || dj >= 0) && (j < (width-1) || dj <= 0)) {
+        nBlock *cp = &heightmap[i + di + (j + dj) * width];
+        b->error = (b->error > cp->error) ? b->error : cp->error;
+        float r = (b->pos - cp->pos).Norm() + cp->radius;
+        b->radius = (b->radius > r) ? b->radius : r;
+      }
+      dj += di;
+      di -= dj;
+      dj += di;
+    }
+  }
 }
 
 void csBigTerrainObject::InitMesh (nTerrainInfo *info)
 {
-  int i;
- 
-  if (nTextures) {
- 
-    info->mesh = new G3DTriangleMesh[nTextures];
-    info->triq = new nTerrainInfo::triangle_queue[nTextures];
-	if (terrain) {
-	  unsigned int size = terrain->GetWidth () * terrain->GetWidth();
-	  for (int i = 0; i < nTextures; i ++) {
-	  	info->triq->triangles = new csTriangle[size];
-	  }
-	  info->vertices = new csVector3[size];
-	  info->texels = new csVector2[size];
-	  info->tindexes = new ti_type[size];
-	  info->colors = new csColor[size];
-	} else {
-	  for (int i = 0; i < nTextures; i ++) {
-	  	info->triq->triangles = NULL;
-	  }
-	  info->vertices = NULL;
-	  info->texels = NULL;
-	  info->tindexes = NULL;
-	  info->colors = NULL;
-	}
-    info->num_lights = 0;
-	info->light_list = NULL;
+  info->num_lights = 0;
+  info->light_list = NULL;
 
-    for(i=0; i<nTextures; ++i)
-    {
-      info->mesh[i].morph_factor = 0;
-      info->mesh[i].num_vertices_pool = 1;
-      info->mesh[i].do_morph_texels = false;
-      info->mesh[i].do_morph_colors = false;
-      info->mesh[i].do_fog = false;
-      info->mesh[i].vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
-    }
-  }
+  info->GetMesh()->morph_factor = 0;
+  info->GetMesh()->num_vertices_pool = 1;
+  info->GetMesh()->do_morph_texels = false;
+  info->GetMesh()->do_morph_colors = false;
+  info->GetMesh()->do_fog = false;
+  info->GetMesh()->vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
 }
 
 bool 
@@ -618,25 +646,18 @@ csBigTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
   {
     iCamera* cam = rview->GetCamera ();
 
-	info->triangle_count = 0;
-	info->vertex_count = 0;
     terrain->SetObjectToCamera(cam->GetTransform());
     terrain->SetCameraOrigin(cam->GetTransform().GetOrigin());
     terrain->AssembleTerrain(rview, movable, info);
 
-	int i;
-    for(i=0; i<nTextures; ++i)
-    {
-	  info->mesh[i].do_mirror = rview->GetCamera()->IsMirrored();
-      if (info->num_lights > 0) {
-        info->mesh[i].use_vertex_color = 1;
-        info->mesh[i].mixmode = CS_FX_COPY | CS_FX_GOURAUD;
-      } else {
-        info->mesh[i].use_vertex_color = 0;
-        info->mesh[i].mixmode = 0;
-      }
+    info->GetMesh()->do_mirror = rview->GetCamera()->IsMirrored();
+    if (info->num_lights > 0) {
+      info->GetMesh()->use_vertex_color = 1;
+      info->GetMesh()->mixmode = CS_FX_COPY | CS_FX_GOURAUD;
+    } else {
+      info->GetMesh()->use_vertex_color = 0;
+      info->GetMesh()->mixmode = 0;
     }
-
     return true;
   }
 
@@ -658,9 +679,6 @@ csBigTerrainObject::UpdateLighting (iLight** lis, int num_lights, iMovable*)
 bool 
 csBigTerrainObject::Draw (iRenderView* rview, iMovable*, csZBufMode zbufMode)
 {
-  int i;
-  static int bufcount=0;
-
   iGraphics3D* pG3D = rview->GetGraphics3D ();
   iCamera* pCamera = rview->GetCamera ();
 
@@ -669,48 +687,26 @@ csBigTerrainObject::Draw (iRenderView* rview, iMovable*, csZBufMode zbufMode)
 
   pG3D->SetObjectToCamera (&camtrans);
   pG3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zbufMode );
-
-  SetupVertexBuffer(vbuf);
-
-  bufcount++;
-
-  vbufmgr->LockBuffer(vbuf, 
-	 	      info->vertices, 
-		      info->texels,
-		      info->colors,
-		      info->vertex_count,
-		      bufcount);
-
-  for(i=0; i<nTextures; i++)
-  {
-    info->mesh[i].mat_handle = terrain->GetMaterialsList()[i]->GetMaterialHandle();
-	terrain->GetMaterialsList()[i]->Visit ();
-    info->mesh[i].triangles = info->triq[i].triangles;
-    info->mesh[i].vertex_fog = new G3DFogInfo[info->vertex_count]; 
-    info->mesh[i].buffers[0]=vbuf;
-    info->mesh[i].num_triangles = info->triangle_count;
-    rview->CalculateFogMesh( pG3D->GetObjectToCamera(), info->mesh[i] );
-    pG3D->DrawTriangleMesh(info->mesh[i]);
-    delete[] info->mesh[i].vertex_fog;
-  }
-
-  vbufmgr->UnlockBuffer(vbuf);
-
+  info->GetMesh()->mat_handle = terrain->GetMaterialsList()[0]->GetMaterialHandle();
+  terrain->GetMaterialsList()[0]->Visit ();
+  pG3D->DrawTriangleMesh(*info->GetMesh());
   return true;
 }
 
 void 
 csBigTerrainObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
 {
-		bbox.StartBoundingBox( csVector3( -1000, -1000, -1000 ) );
-		bbox.AddBoundingVertexSmart( csVector3( 1000,  1000,  1000 ) );
+  /* use the radius from the center */
+  bbox.StartBoundingBox( csVector3( -1000, -1000, -1000 ) );
+  bbox.AddBoundingVertexSmart( csVector3( 1000,  1000,  1000 ) );
 }
 
 void 
 csBigTerrainObject::GetRadius (csVector3& rad, csVector3& cent)
 {
-	rad = csVector3( 1000, 1000, 1000 );
-	cent = csVector3( 0, 0, 0 );
+  /* use the radius from the center */
+  rad = csVector3( 1000, 1000, 1000 );
+  cent = csVector3( 0, 0, 0 );
 }
 
 bool 
@@ -728,7 +724,6 @@ csBigTerrainObject::HitBeamObject (const csVector3&, const csVector3&, csVector3
 
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////
 void 
 csBigTerrainObject::SetMaterialsList(iMaterialWrapper **matlist, unsigned int nMaterials)
 {

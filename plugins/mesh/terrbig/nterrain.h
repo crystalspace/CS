@@ -24,8 +24,6 @@ struct iVertexBufferManager;
 struct iImageIO;
 struct iLight;
 
-const int NTERRAIN_QUADTREE_ROOT=1;
-
 /******************************************************************************************
  
    Some design notes and rationalizations.
@@ -35,7 +33,7 @@ const int NTERRAIN_QUADTREE_ROOT=1;
  using generated offsets, or store indexes into it. Since the heightmap needs to be stored 
  at all points anyhow, you could store a height and the variance together, and then just 
  look it up at runtime.  This bothers me, since the variance is different depending on the
- resolution of the block, and I can't see an easy way of resolving coarse-resolution 
+ resolution of the block, and I can't see an easy wao of resolving coarse-resolution 
  variances.  I've decided to trade size for speed, thus the heightmap file is about 33% 
  larger than it absolutely needs to be.  However, nothing that can be stored needs to be 
  computed or looked up, so this should massively increase cache coherency.
@@ -49,132 +47,73 @@ const int NTERRAIN_QUADTREE_ROOT=1;
  ******************************************************************************************/
 
 
-/// Simple rect structure for bounds.
-struct nRect
-{
-  unsigned short x, y, w, h;
-
-  /// Initializes the rect.
-  nRect(unsigned short _x, unsigned short _y, unsigned short _w, unsigned short _h):
-  x(_x), y(_y), w(_w), h(_h) {};
-};
-
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-
-
-/// The length of the nBlock structure
-unsigned const nBlockLen=90;
-
-typedef unsigned short ti_type;
 
 /** This is a terrain block.  X and Y elements are generated dynamically 
  * each run, so they don't need storage. The constant nBlockLen should always be used, 
  * instead of sizeof, as the system may pad the structure. */
 struct nBlock
 {
-  /// Height for vertices
-  float ne, nw, se, sw, center;
-
+  nBlock () {};
+  nBlock (nBlock *b) : pos(b->pos), norm(b->norm), error(b->error), radius(b->radius) {}
+  /// Position of Vertex
+  csVector3 pos;
   /// Normal based on surrounding vertices
-  csVector3 ne_norm, nw_norm, se_norm, sw_norm, ce_norm;
-
-  /// Variance for block
-  float variance;
-
-  /// Middle height of the block
-  float midh;
-
-  /// Texture index
-  ti_type ti;
+  csVector3 norm;
+  /// Error parameter (including children)
+  float error;
+  /// radius of the block (including childreN)
+  float radius;
 };
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-/// Growth factor for buffer for triangles
-const unsigned int TriangleStackGrowBuffer=256;
-
-/// Manages a stack of triangles.  This must be associated with some vertex array.
-class nTriangleStack
+class nTerrainInfo
 {
-  /// Number of triangle spots in buffer.
-  unsigned int buffer_size;
-
-  /// Number of actual triangles.
-  unsigned int count;
-
-  /// Buffer for triangles
-  csTriangle *tribuf;
-
 public:
-  /// Initialize the buffer stuff
-  nTriangleStack():buffer_size(0), count(0), tribuf(NULL) {};
+  nTerrainInfo (iObjectRegistry *obj_reg);
+  ~nTerrainInfo ();
 
-  /// Destroy the buffer 
-  ~nTriangleStack()
-  { if (tribuf) delete [] tribuf; }
+  G3DTriangleMesh *GetMesh () { return mesh; }
 
-  /// Empty the stack
-  void MakeEmpty()
-  { count=0; }
+  /// Starts the buffer with 2 copies of this vertex and sets parity
+  void InitBuffer (const csVector3 &v, const csVector2 &t, const csColor &c, int p);
+  /// Appends the vector, doubles up if parity is == to already stored
+  void AddVertex (const csVector3 &v, const csVector2 &t, const csColor &c, int p);
+  /// Appends a final vector onto the set (ignore parity):
+  void EndBuffer (const csVector3 &v, const csVector2 &t, const csColor &c, iRenderView *rview);
+ 
+private:
+  void AddTriangle ();
+  void ResizeVertices ();
 
-  /// Push a triangle
-  void Push(int i1, int i2, int i3)
-  { 
-    // Grow buffer if it needs it.
-    if (count+1>=buffer_size)
-    {
-      if (tribuf)
-      {
-        csTriangle *temp = new csTriangle[buffer_size+TriangleStackGrowBuffer];
+  csRef<iGraphics3D> mG3D;
 
-        memcpy(temp, tribuf, sizeof(csTriangle) * buffer_size);
-        delete [] tribuf;
+  /// Triangle meshes to draw for blocks - one mesh per texture
+  G3DTriangleMesh *mesh;
 
-        tribuf=temp;
-        buffer_size+=TriangleStackGrowBuffer;
-      }
-      else
-      {
-        tribuf = new csTriangle[TriangleStackGrowBuffer<<1];
-        buffer_size=TriangleStackGrowBuffer<<1;
+  /// Pointer to the vertex buffer manager
+  csRef<iVertexBufferManager> vbufmgr;
+  /// Pointer to vertex buffer for this mesh.
+  csRef<iVertexBuffer> vbuf;
+  /// Buffer Counter;
+  int bufcount;
 
-      }
-    }
+  /// Keep track of tris, verts, tex, indexes, and color
+  csTriangle *triangles;
+  int triangle_count, triangle_size;
+  bool triangle_parity;
 
-    // Push indexes
-    tribuf[count].a=i1;
-    tribuf[count].b=i2;
-    tribuf[count].c=i3;
-    
-    // Increase triangle count
-    ++count;
-  }
-
-};
-
-struct nTerrainInfo
-{
-    /// Triangle meshes to draw for blocks - one mesh per texture
-    G3DTriangleMesh *mesh;
-
-    /// Keep track of tris, verts, tex, indexes, and color
-    struct triangle_queue
-    {
-      csTriangle *triangles;
-    } *triq;
-    int triangle_count;
-
-	int vertex_count;
-    csVector3 *vertices;
-    csVector2 *texels;
-    ti_type *tindexes;
-    csColor *colors;
-	int num_lights;
-    iLight **light_list;
+  csVector3 *vertices;
+  csVector2 *texels;
+  csColor *colors;
+  int vertex_count, vertex_size;
+  int parity;
+public: // TODO Fix this
+  int num_lights;
+  iLight **light_list;
 };
 
 
@@ -220,9 +159,6 @@ class nTerrain
   // Map mode, whether we are looking up stuff in rgb_colors or pal_colors.
   int map_mode;
   
-  /// Scales
-  csVector3 scale;
-  
   /// Calculates the binary logarithm of n
   int ilogb (unsigned n) 
   {
@@ -234,49 +170,43 @@ class nTerrain
     return i;
   }
 
-  /// Sets the variance and radius of a partially filled in block.
-  void SetVariance(nBlock &b);
-
   /// Does the work of tree building, heightmap is the height data (0..1), w is the edge length of the heightmap, which must be square.
-  float BuildTreeNode(FILE *f, unsigned int level, unsigned int parent_index, unsigned int child_num, nRect bounds, float *heightmap, csVector3 *norms, unsigned int w);
+  void VerifyTreeNode(FILE *, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, nBlock *);
+  void WriteTreeNode(FILE *, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, nBlock *);
 
   /// Calculates the insensity and color at a given vertex for a given light
   csColor CalculateLightIntensity (iLight *li, iMovable *m, csVector3 v, csVector3 n);
 
   /// Buffers the node passed into it for later drawing, bounds are needed to generate all the verts.
-  void BufferTreeNode(iMovable *m, nBlock *b, nRect bounds);
+  void BufferTreeNode(iMovable *m, int p, nBlock *b);
 
   /// Processes a node for buffering, checks for visibility and detail levels.
-  void ProcessTreeNode(iRenderView *rv, iMovable *m, unsigned int level, unsigned int parent_index, unsigned int child_num, nRect bounds);
+  void ProcessTreeNode(iRenderView *rv, float kappa, iMovable *m, unsigned int level, unsigned int parent_index, unsigned int child_num, unsigned int branch);
     
 public:
   /// Sets the heightmap file
   void SetHeightMapFile (const char *filename) 
     {
     if (hm) { delete hm; }
-    hm = new csMemoryMappedIO (nBlockLen, (char *)filename);
+    hm = new csMemoryMappedIO (sizeof (nBlock), (char *)filename);
     nBlock *b = (nBlock *)hm->GetPointer(0);
     if (!b) { return; }
-    terrain_w = (unsigned int)b->midh;
+    terrain_w = (unsigned int)b->radius;
     max_levels = ilogb(terrain_w) - 1;
     }
-  /// Sets the scale factor
-  void SetScaleFactor (const csVector3 &s)
-    {
-	  scale = s;
-    }
-  /// Sets the scale factor
+  /// Sets the error tolerance
   void SetErrorTolerance (float tolerance)
     {
 	  error_metric_tolerance = tolerance;
     }
   /// Gets the width (and height) of the heightmap
   unsigned int GetWidth () { return terrain_w; }
+
   /** Builds a full-resolution quadtree terrain mesh object on disk, 
    *  heightmap is the data, w is the width and height (map must be square
    *  and MUST be a power of two + 1, e.g. 129x129, 257x257, 513x513.)
    */
-  void BuildTree(FILE *f, float *heightmap, csVector3 *norms, unsigned int w);
+  void BuildTree(FILE *f, nBlock *heightmap, unsigned int w);
 
   /// Assembles the terrain into the buffer when called by the engine.  
   void AssembleTerrain(iRenderView *rv, iMovable *m, nTerrainInfo *terrinfo);
@@ -309,10 +239,9 @@ public:
   void CreateMaterialMap(iFile *matmap, iImage *terrtex);
 
   nTerrain(csMemoryMappedIO *phm=NULL):max_levels(0), 
-			 /* this is 4 pixel accuracy on 800x600 */
-             error_metric_tolerance(0.00125), 
+             error_metric_tolerance(2), 
 	     info(NULL), hm(phm), materials(NULL), 
-	     map_scale(0), map_mode(0), scale(1,1,1) {}
+	     map_scale(0), map_mode(0) {}
 
   ~nTerrain()
   {
@@ -334,11 +263,7 @@ public:
 class csBigTerrainObject : public iMeshObject
 {
 private:
-  /// Pointer to the vertex buffer manager
-  iVertexBufferManager *vbufmgr;
 
-  /// Pointer to vertex buffer for this mesh.
-  csRef<iVertexBuffer> vbuf;
 
   /// Logical parent
   iBase* logparent;
@@ -361,10 +286,10 @@ private:
   /// Number of textures
   unsigned short nTextures;
 
-protected:
-  /// Creates and sets up a vertex buffer.
-  void SetupVertexBuffer (csRef<iVertexBuffer> &vbuf1);
+  /// scale factor
+  csVector3 scale;
 
+protected:
   /// Initializes a mesh structure
   void InitMesh (nTerrainInfo *info);
 
@@ -442,6 +367,7 @@ public:
   virtual void SetScaleFactor (const csVector3 &scale);
   virtual void SetErrorTolerance (float tolerance);
   virtual bool ConvertImageToMapFile (iFile *input, iImageIO *imageio, const char *hm);
+  virtual void ComputeLod (nBlock *heightmap, int i, int j, int di, int dj, int n, int width);
 
   /// Returns a pointer to the factory that made this.
   virtual iMeshObjectFactory* GetFactory () const { return pFactory; }
