@@ -185,8 +185,8 @@ doc: csdoc/index.html pics
 
 PDFLATEX=pdflatex -interaction=nonstopmode
 CLASS_PDF_FILES=csgeom.pdf csengine.pdf csobject.pdf
-PDF_FILES=cs-tut.pdf cs-inst.pdf cs-thry.pdf cs-def.pdf
-TEXT_FILES=cs-tut.txt cs-inst.txt cs-thry.txt cs-def.txt
+PDF_FILES=cs-tut.pdf cs-inst.pdf cs-thry.pdf cs-def.pdf cs-debu.pdf
+TEXT_FILES=cs-tut.txt cs-inst.txt cs-thry.txt cs-def.txt cs-debu.txt
 
 VPATH=newdoc
 
