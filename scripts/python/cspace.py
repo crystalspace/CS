@@ -1024,12 +1024,14 @@ class csPlane3(_object):
     def B(*args): return _cspace.csPlane3_B(*args)
     def C(*args): return _cspace.csPlane3_C(*args)
     def D(*args): return _cspace.csPlane3_D(*args)
+    def GetNormal(*args): return _cspace.csPlane3_GetNormal(*args)
     def Set(*args): return _cspace.csPlane3_Set(*args)
     __swig_getmethods__["Classify"] = lambda x: _cspace.csPlane3_Classify
     if _newclass:Classify = staticmethod(_cspace.csPlane3_Classify)
     def Distance(*args): return _cspace.csPlane3_Distance(*args)
     def Invert(*args): return _cspace.csPlane3_Invert(*args)
     def Normalize(*args): return _cspace.csPlane3_Normalize(*args)
+    def FindPoint(*args): return _cspace.csPlane3_FindPoint(*args)
     def ClipPolygon(*args): return _cspace.csPlane3_ClipPolygon(*args)
     def __imul__(*args): return _cspace.csPlane3___imul__(*args)
     def __idiv__(*args): return _cspace.csPlane3___idiv__(*args)
@@ -1111,24 +1113,24 @@ class csIntersect2(_object):
     __getattr__ = lambda self, name: _swig_getattr(self, csIntersect2, name)
     def __repr__(self):
         return "<C csIntersect2 instance at %s>" % (self.this,)
-    __swig_getmethods__["IntersectPolygon"] = lambda x: _cspace.csIntersect2_IntersectPolygon
-    if _newclass:IntersectPolygon = staticmethod(_cspace.csIntersect2_IntersectPolygon)
-    __swig_getmethods__["Segments"] = lambda x: _cspace.csIntersect2_Segments
-    if _newclass:Segments = staticmethod(_cspace.csIntersect2_Segments)
+    __swig_getmethods__["PlanePolygon"] = lambda x: _cspace.csIntersect2_PlanePolygon
+    if _newclass:PlanePolygon = staticmethod(_cspace.csIntersect2_PlanePolygon)
+    __swig_getmethods__["SegmentSegment"] = lambda x: _cspace.csIntersect2_SegmentSegment
+    if _newclass:SegmentSegment = staticmethod(_cspace.csIntersect2_SegmentSegment)
     __swig_getmethods__["SegmentLine"] = lambda x: _cspace.csIntersect2_SegmentLine
     if _newclass:SegmentLine = staticmethod(_cspace.csIntersect2_SegmentLine)
-    __swig_getmethods__["Lines"] = lambda x: _cspace.csIntersect2_Lines
-    if _newclass:Lines = staticmethod(_cspace.csIntersect2_Lines)
-    __swig_getmethods__["Plane"] = lambda x: _cspace.csIntersect2_Plane
-    if _newclass:Plane = staticmethod(_cspace.csIntersect2_Plane)
-    __swig_getmethods__["Plane"] = lambda x: _cspace.csIntersect2_Plane
-    if _newclass:Plane = staticmethod(_cspace.csIntersect2_Plane)
-    __swig_getmethods__["PlaneNoTest"] = lambda x: _cspace.csIntersect2_PlaneNoTest
-    if _newclass:PlaneNoTest = staticmethod(_cspace.csIntersect2_PlaneNoTest)
-    __swig_getmethods__["PlaneNoTest"] = lambda x: _cspace.csIntersect2_PlaneNoTest
-    if _newclass:PlaneNoTest = staticmethod(_cspace.csIntersect2_PlaneNoTest)
-    __swig_getmethods__["Planes"] = lambda x: _cspace.csIntersect2_Planes
-    if _newclass:Planes = staticmethod(_cspace.csIntersect2_Planes)
+    __swig_getmethods__["LineLine"] = lambda x: _cspace.csIntersect2_LineLine
+    if _newclass:LineLine = staticmethod(_cspace.csIntersect2_LineLine)
+    __swig_getmethods__["SegmentPlane"] = lambda x: _cspace.csIntersect2_SegmentPlane
+    if _newclass:SegmentPlane = staticmethod(_cspace.csIntersect2_SegmentPlane)
+    __swig_getmethods__["SegmentPlane"] = lambda x: _cspace.csIntersect2_SegmentPlane
+    if _newclass:SegmentPlane = staticmethod(_cspace.csIntersect2_SegmentPlane)
+    __swig_getmethods__["SegmentPlaneNoTest"] = lambda x: _cspace.csIntersect2_SegmentPlaneNoTest
+    if _newclass:SegmentPlaneNoTest = staticmethod(_cspace.csIntersect2_SegmentPlaneNoTest)
+    __swig_getmethods__["SegmentPlaneNoTest"] = lambda x: _cspace.csIntersect2_SegmentPlaneNoTest
+    if _newclass:SegmentPlaneNoTest = staticmethod(_cspace.csIntersect2_SegmentPlaneNoTest)
+    __swig_getmethods__["PlanePlane"] = lambda x: _cspace.csIntersect2_PlanePlane
+    if _newclass:PlanePlane = staticmethod(_cspace.csIntersect2_PlanePlane)
     def __init__(self, *args):
         _swig_setattr(self, csIntersect2, 'this', _cspace.new_csIntersect2(*args))
         _swig_setattr(self, csIntersect2, 'thisown', 1)
@@ -1144,19 +1146,19 @@ class csIntersect2Ptr(csIntersect2):
         _swig_setattr(self, csIntersect2,self.__class__,csIntersect2)
 _cspace.csIntersect2_swigregister(csIntersect2Ptr)
 
-csIntersect2_IntersectPolygon = _cspace.csIntersect2_IntersectPolygon
+csIntersect2_PlanePolygon = _cspace.csIntersect2_PlanePolygon
 
-csIntersect2_Segments = _cspace.csIntersect2_Segments
+csIntersect2_SegmentSegment = _cspace.csIntersect2_SegmentSegment
 
 csIntersect2_SegmentLine = _cspace.csIntersect2_SegmentLine
 
-csIntersect2_Lines = _cspace.csIntersect2_Lines
+csIntersect2_LineLine = _cspace.csIntersect2_LineLine
 
-csIntersect2_Plane = _cspace.csIntersect2_Plane
+csIntersect2_SegmentPlane = _cspace.csIntersect2_SegmentPlane
 
-csIntersect2_PlaneNoTest = _cspace.csIntersect2_PlaneNoTest
+csIntersect2_SegmentPlaneNoTest = _cspace.csIntersect2_SegmentPlaneNoTest
 
-csIntersect2_Planes = _cspace.csIntersect2_Planes
+csIntersect2_PlanePlane = _cspace.csIntersect2_PlanePlane
 
 class csPoly2D(_object):
     __swig_setmethods__ = {}
@@ -1359,22 +1361,22 @@ class csIntersect3(_object):
     __getattr__ = lambda self, name: _swig_getattr(self, csIntersect3, name)
     def __repr__(self):
         return "<C csIntersect3 instance at %s>" % (self.this,)
-    __swig_getmethods__["IntersectPolygon"] = lambda x: _cspace.csIntersect3_IntersectPolygon
-    if _newclass:IntersectPolygon = staticmethod(_cspace.csIntersect3_IntersectPolygon)
-    __swig_getmethods__["IntersectSegment"] = lambda x: _cspace.csIntersect3_IntersectSegment
-    if _newclass:IntersectSegment = staticmethod(_cspace.csIntersect3_IntersectSegment)
-    __swig_getmethods__["IntersectTriangle"] = lambda x: _cspace.csIntersect3_IntersectTriangle
-    if _newclass:IntersectTriangle = staticmethod(_cspace.csIntersect3_IntersectTriangle)
-    __swig_getmethods__["IntersectPolygon"] = lambda x: _cspace.csIntersect3_IntersectPolygon
-    if _newclass:IntersectPolygon = staticmethod(_cspace.csIntersect3_IntersectPolygon)
-    __swig_getmethods__["Planes"] = lambda x: _cspace.csIntersect3_Planes
-    if _newclass:Planes = staticmethod(_cspace.csIntersect3_Planes)
-    __swig_getmethods__["Plane"] = lambda x: _cspace.csIntersect3_Plane
-    if _newclass:Plane = staticmethod(_cspace.csIntersect3_Plane)
-    __swig_getmethods__["Plane"] = lambda x: _cspace.csIntersect3_Plane
-    if _newclass:Plane = staticmethod(_cspace.csIntersect3_Plane)
-    __swig_getmethods__["Planes"] = lambda x: _cspace.csIntersect3_Planes
-    if _newclass:Planes = staticmethod(_cspace.csIntersect3_Planes)
+    __swig_getmethods__["PlanePolygon"] = lambda x: _cspace.csIntersect3_PlanePolygon
+    if _newclass:PlanePolygon = staticmethod(_cspace.csIntersect3_PlanePolygon)
+    __swig_getmethods__["SegmentFrustum"] = lambda x: _cspace.csIntersect3_SegmentFrustum
+    if _newclass:SegmentFrustum = staticmethod(_cspace.csIntersect3_SegmentFrustum)
+    __swig_getmethods__["SegmentTriangle"] = lambda x: _cspace.csIntersect3_SegmentTriangle
+    if _newclass:SegmentTriangle = staticmethod(_cspace.csIntersect3_SegmentTriangle)
+    __swig_getmethods__["SegmentPolygon"] = lambda x: _cspace.csIntersect3_SegmentPolygon
+    if _newclass:SegmentPolygon = staticmethod(_cspace.csIntersect3_SegmentPolygon)
+    __swig_getmethods__["SegmentPlanes"] = lambda x: _cspace.csIntersect3_SegmentPlanes
+    if _newclass:SegmentPlanes = staticmethod(_cspace.csIntersect3_SegmentPlanes)
+    __swig_getmethods__["SegmentPlane"] = lambda x: _cspace.csIntersect3_SegmentPlane
+    if _newclass:SegmentPlane = staticmethod(_cspace.csIntersect3_SegmentPlane)
+    __swig_getmethods__["SegmentPlane"] = lambda x: _cspace.csIntersect3_SegmentPlane
+    if _newclass:SegmentPlane = staticmethod(_cspace.csIntersect3_SegmentPlane)
+    __swig_getmethods__["ThreePlanes"] = lambda x: _cspace.csIntersect3_ThreePlanes
+    if _newclass:ThreePlanes = staticmethod(_cspace.csIntersect3_ThreePlanes)
     __swig_getmethods__["PlaneXPlane"] = lambda x: _cspace.csIntersect3_PlaneXPlane
     if _newclass:PlaneXPlane = staticmethod(_cspace.csIntersect3_PlaneXPlane)
     __swig_getmethods__["PlaneYPlane"] = lambda x: _cspace.csIntersect3_PlaneYPlane
@@ -1383,38 +1385,50 @@ class csIntersect3(_object):
     if _newclass:PlaneZPlane = staticmethod(_cspace.csIntersect3_PlaneZPlane)
     __swig_getmethods__["PlaneAxisPlane"] = lambda x: _cspace.csIntersect3_PlaneAxisPlane
     if _newclass:PlaneAxisPlane = staticmethod(_cspace.csIntersect3_PlaneAxisPlane)
-    __swig_getmethods__["Z0Plane"] = lambda x: _cspace.csIntersect3_Z0Plane
-    if _newclass:Z0Plane = staticmethod(_cspace.csIntersect3_Z0Plane)
-    __swig_getmethods__["Z0Plane"] = lambda x: _cspace.csIntersect3_Z0Plane
-    if _newclass:Z0Plane = staticmethod(_cspace.csIntersect3_Z0Plane)
-    __swig_getmethods__["XPlane"] = lambda x: _cspace.csIntersect3_XPlane
-    if _newclass:XPlane = staticmethod(_cspace.csIntersect3_XPlane)
-    __swig_getmethods__["XPlane"] = lambda x: _cspace.csIntersect3_XPlane
-    if _newclass:XPlane = staticmethod(_cspace.csIntersect3_XPlane)
-    __swig_getmethods__["YPlane"] = lambda x: _cspace.csIntersect3_YPlane
-    if _newclass:YPlane = staticmethod(_cspace.csIntersect3_YPlane)
-    __swig_getmethods__["YPlane"] = lambda x: _cspace.csIntersect3_YPlane
-    if _newclass:YPlane = staticmethod(_cspace.csIntersect3_YPlane)
-    __swig_getmethods__["ZPlane"] = lambda x: _cspace.csIntersect3_ZPlane
-    if _newclass:ZPlane = staticmethod(_cspace.csIntersect3_ZPlane)
-    __swig_getmethods__["ZPlane"] = lambda x: _cspace.csIntersect3_ZPlane
-    if _newclass:ZPlane = staticmethod(_cspace.csIntersect3_ZPlane)
-    __swig_getmethods__["AxisPlane"] = lambda x: _cspace.csIntersect3_AxisPlane
-    if _newclass:AxisPlane = staticmethod(_cspace.csIntersect3_AxisPlane)
-    __swig_getmethods__["XFrustum"] = lambda x: _cspace.csIntersect3_XFrustum
-    if _newclass:XFrustum = staticmethod(_cspace.csIntersect3_XFrustum)
-    __swig_getmethods__["XFrustum"] = lambda x: _cspace.csIntersect3_XFrustum
-    if _newclass:XFrustum = staticmethod(_cspace.csIntersect3_XFrustum)
-    __swig_getmethods__["YFrustum"] = lambda x: _cspace.csIntersect3_YFrustum
-    if _newclass:YFrustum = staticmethod(_cspace.csIntersect3_YFrustum)
-    __swig_getmethods__["YFrustum"] = lambda x: _cspace.csIntersect3_YFrustum
-    if _newclass:YFrustum = staticmethod(_cspace.csIntersect3_YFrustum)
+    __swig_getmethods__["SegmentZ0Plane"] = lambda x: _cspace.csIntersect3_SegmentZ0Plane
+    if _newclass:SegmentZ0Plane = staticmethod(_cspace.csIntersect3_SegmentZ0Plane)
+    __swig_getmethods__["SegmentZ0Plane"] = lambda x: _cspace.csIntersect3_SegmentZ0Plane
+    if _newclass:SegmentZ0Plane = staticmethod(_cspace.csIntersect3_SegmentZ0Plane)
+    __swig_getmethods__["SegmentXPlane"] = lambda x: _cspace.csIntersect3_SegmentXPlane
+    if _newclass:SegmentXPlane = staticmethod(_cspace.csIntersect3_SegmentXPlane)
+    __swig_getmethods__["SegmentXPlane"] = lambda x: _cspace.csIntersect3_SegmentXPlane
+    if _newclass:SegmentXPlane = staticmethod(_cspace.csIntersect3_SegmentXPlane)
+    __swig_getmethods__["SegmentYPlane"] = lambda x: _cspace.csIntersect3_SegmentYPlane
+    if _newclass:SegmentYPlane = staticmethod(_cspace.csIntersect3_SegmentYPlane)
+    __swig_getmethods__["SegmentYPlane"] = lambda x: _cspace.csIntersect3_SegmentYPlane
+    if _newclass:SegmentYPlane = staticmethod(_cspace.csIntersect3_SegmentYPlane)
+    __swig_getmethods__["SegmentZPlane"] = lambda x: _cspace.csIntersect3_SegmentZPlane
+    if _newclass:SegmentZPlane = staticmethod(_cspace.csIntersect3_SegmentZPlane)
+    __swig_getmethods__["SegmentZPlane"] = lambda x: _cspace.csIntersect3_SegmentZPlane
+    if _newclass:SegmentZPlane = staticmethod(_cspace.csIntersect3_SegmentZPlane)
+    __swig_getmethods__["SegmentAxisPlane"] = lambda x: _cspace.csIntersect3_SegmentAxisPlane
+    if _newclass:SegmentAxisPlane = staticmethod(_cspace.csIntersect3_SegmentAxisPlane)
+    __swig_getmethods__["SegmentXFrustum"] = lambda x: _cspace.csIntersect3_SegmentXFrustum
+    if _newclass:SegmentXFrustum = staticmethod(_cspace.csIntersect3_SegmentXFrustum)
+    __swig_getmethods__["SegmentXFrustum"] = lambda x: _cspace.csIntersect3_SegmentXFrustum
+    if _newclass:SegmentXFrustum = staticmethod(_cspace.csIntersect3_SegmentXFrustum)
+    __swig_getmethods__["SegmentYFrustum"] = lambda x: _cspace.csIntersect3_SegmentYFrustum
+    if _newclass:SegmentYFrustum = staticmethod(_cspace.csIntersect3_SegmentYFrustum)
+    __swig_getmethods__["SegmentYFrustum"] = lambda x: _cspace.csIntersect3_SegmentYFrustum
+    if _newclass:SegmentYFrustum = staticmethod(_cspace.csIntersect3_SegmentYFrustum)
     __swig_getmethods__["BoxSegment"] = lambda x: _cspace.csIntersect3_BoxSegment
     if _newclass:BoxSegment = staticmethod(_cspace.csIntersect3_BoxSegment)
     __swig_getmethods__["BoxFrustum"] = lambda x: _cspace.csIntersect3_BoxFrustum
     if _newclass:BoxFrustum = staticmethod(_cspace.csIntersect3_BoxFrustum)
     __swig_getmethods__["BoxSphere"] = lambda x: _cspace.csIntersect3_BoxSphere
     if _newclass:BoxSphere = staticmethod(_cspace.csIntersect3_BoxSphere)
+    __swig_getmethods__["BoxPlane"] = lambda x: _cspace.csIntersect3_BoxPlane
+    if _newclass:BoxPlane = staticmethod(_cspace.csIntersect3_BoxPlane)
+    __swig_getmethods__["BoxPlane"] = lambda x: _cspace.csIntersect3_BoxPlane
+    if _newclass:BoxPlane = staticmethod(_cspace.csIntersect3_BoxPlane)
+    __swig_getmethods__["BoxTriangle"] = lambda x: _cspace.csIntersect3_BoxTriangle
+    if _newclass:BoxTriangle = staticmethod(_cspace.csIntersect3_BoxTriangle)
+    __swig_getmethods__["BoxBox"] = lambda x: _cspace.csIntersect3_BoxBox
+    if _newclass:BoxBox = staticmethod(_cspace.csIntersect3_BoxBox)
+    __swig_getmethods__["FrustumFrustum"] = lambda x: _cspace.csIntersect3_FrustumFrustum
+    if _newclass:FrustumFrustum = staticmethod(_cspace.csIntersect3_FrustumFrustum)
+    __swig_getmethods__["FrustumFrustum"] = lambda x: _cspace.csIntersect3_FrustumFrustum
+    if _newclass:FrustumFrustum = staticmethod(_cspace.csIntersect3_FrustumFrustum)
     def __init__(self, *args):
         _swig_setattr(self, csIntersect3, 'this', _cspace.new_csIntersect3(*args))
         _swig_setattr(self, csIntersect3, 'thisown', 1)
@@ -1430,15 +1444,19 @@ class csIntersect3Ptr(csIntersect3):
         _swig_setattr(self, csIntersect3,self.__class__,csIntersect3)
 _cspace.csIntersect3_swigregister(csIntersect3Ptr)
 
-csIntersect3_IntersectSegment = _cspace.csIntersect3_IntersectSegment
+csIntersect3_PlanePolygon = _cspace.csIntersect3_PlanePolygon
 
-csIntersect3_IntersectTriangle = _cspace.csIntersect3_IntersectTriangle
+csIntersect3_SegmentFrustum = _cspace.csIntersect3_SegmentFrustum
 
-csIntersect3_IntersectPolygon = _cspace.csIntersect3_IntersectPolygon
+csIntersect3_SegmentTriangle = _cspace.csIntersect3_SegmentTriangle
 
-csIntersect3_Plane = _cspace.csIntersect3_Plane
+csIntersect3_SegmentPolygon = _cspace.csIntersect3_SegmentPolygon
 
-csIntersect3_Planes = _cspace.csIntersect3_Planes
+csIntersect3_SegmentPlanes = _cspace.csIntersect3_SegmentPlanes
+
+csIntersect3_SegmentPlane = _cspace.csIntersect3_SegmentPlane
+
+csIntersect3_ThreePlanes = _cspace.csIntersect3_ThreePlanes
 
 csIntersect3_PlaneXPlane = _cspace.csIntersect3_PlaneXPlane
 
@@ -1448,25 +1466,33 @@ csIntersect3_PlaneZPlane = _cspace.csIntersect3_PlaneZPlane
 
 csIntersect3_PlaneAxisPlane = _cspace.csIntersect3_PlaneAxisPlane
 
-csIntersect3_Z0Plane = _cspace.csIntersect3_Z0Plane
+csIntersect3_SegmentZ0Plane = _cspace.csIntersect3_SegmentZ0Plane
 
-csIntersect3_XPlane = _cspace.csIntersect3_XPlane
+csIntersect3_SegmentXPlane = _cspace.csIntersect3_SegmentXPlane
 
-csIntersect3_YPlane = _cspace.csIntersect3_YPlane
+csIntersect3_SegmentYPlane = _cspace.csIntersect3_SegmentYPlane
 
-csIntersect3_ZPlane = _cspace.csIntersect3_ZPlane
+csIntersect3_SegmentZPlane = _cspace.csIntersect3_SegmentZPlane
 
-csIntersect3_AxisPlane = _cspace.csIntersect3_AxisPlane
+csIntersect3_SegmentAxisPlane = _cspace.csIntersect3_SegmentAxisPlane
 
-csIntersect3_XFrustum = _cspace.csIntersect3_XFrustum
+csIntersect3_SegmentXFrustum = _cspace.csIntersect3_SegmentXFrustum
 
-csIntersect3_YFrustum = _cspace.csIntersect3_YFrustum
+csIntersect3_SegmentYFrustum = _cspace.csIntersect3_SegmentYFrustum
 
 csIntersect3_BoxSegment = _cspace.csIntersect3_BoxSegment
 
 csIntersect3_BoxFrustum = _cspace.csIntersect3_BoxFrustum
 
 csIntersect3_BoxSphere = _cspace.csIntersect3_BoxSphere
+
+csIntersect3_BoxPlane = _cspace.csIntersect3_BoxPlane
+
+csIntersect3_BoxTriangle = _cspace.csIntersect3_BoxTriangle
+
+csIntersect3_BoxBox = _cspace.csIntersect3_BoxBox
+
+csIntersect3_FrustumFrustum = _cspace.csIntersect3_FrustumFrustum
 
 class csGeomDebugHelper(iDebugHelper):
     __swig_setmethods__ = {}
@@ -5797,6 +5823,29 @@ class iSpriteCal3DFactoryStatePtr(iSpriteCal3DFactoryState):
         _swig_setattr(self, iSpriteCal3DFactoryState,self.__class__,iSpriteCal3DFactoryState)
 _cspace.iSpriteCal3DFactoryState_swigregister(iSpriteCal3DFactoryStatePtr)
 
+class iAnimTimeUpdateHandler(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iAnimTimeUpdateHandler, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iAnimTimeUpdateHandler, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<C iAnimTimeUpdateHandler instance at %s>" % (self.this,)
+    def UpdatePosition(*args): return _cspace.iAnimTimeUpdateHandler_UpdatePosition(*args)
+    def __del__(self, destroy=_cspace.delete_iAnimTimeUpdateHandler):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+class iAnimTimeUpdateHandlerPtr(iAnimTimeUpdateHandler):
+    def __init__(self, this):
+        _swig_setattr(self, iAnimTimeUpdateHandler, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iAnimTimeUpdateHandler, 'thisown', 0)
+        _swig_setattr(self, iAnimTimeUpdateHandler,self.__class__,iAnimTimeUpdateHandler)
+_cspace.iAnimTimeUpdateHandler_swigregister(iAnimTimeUpdateHandlerPtr)
+
 class iSpriteCal3DState(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -5841,6 +5890,7 @@ class iSpriteCal3DState(iBase):
     def SetAnimationTime(*args): return _cspace.iSpriteCal3DState_SetAnimationTime(*args)
     def GetCal3DModel(*args): return _cspace.iSpriteCal3DState_GetCal3DModel(*args)
     def SetUserData(*args): return _cspace.iSpriteCal3DState_SetUserData(*args)
+    def SetAnimTimeUpdateHandler(*args): return _cspace.iSpriteCal3DState_SetAnimTimeUpdateHandler(*args)
     def __del__(self, destroy=_cspace.delete_iSpriteCal3DState):
         try:
             if self.thisown: destroy(self)
@@ -6294,6 +6344,76 @@ class iThingEnvironmentPtr(iThingEnvironment):
         if not hasattr(self,"thisown"): _swig_setattr(self, iThingEnvironment, 'thisown', 0)
         _swig_setattr(self, iThingEnvironment,self.__class__,iThingEnvironment)
 _cspace.iThingEnvironment_swigregister(iThingEnvironmentPtr)
+
+class iTerrainObjectState(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainObjectState, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainObjectState, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<C iTerrainObjectState instance at %s>" % (self.this,)
+    def SetMaterialPalette(*args): return _cspace.iTerrainObjectState_SetMaterialPalette(*args)
+    def GetMaterialPalette(*args): return _cspace.iTerrainObjectState_GetMaterialPalette(*args)
+    def SetMaterialMap(*args): return _cspace.iTerrainObjectState_SetMaterialMap(*args)
+    def SetLODValue(*args): return _cspace.iTerrainObjectState_SetLODValue(*args)
+    def GetLODValue(*args): return _cspace.iTerrainObjectState_GetLODValue(*args)
+    def SaveState(*args): return _cspace.iTerrainObjectState_SaveState(*args)
+    def RestoreState(*args): return _cspace.iTerrainObjectState_RestoreState(*args)
+    def CollisionDetect(*args): return _cspace.iTerrainObjectState_CollisionDetect(*args)
+    def SetStaticLighting(*args): return _cspace.iTerrainObjectState_SetStaticLighting(*args)
+    def GetStaticLighting(*args): return _cspace.iTerrainObjectState_GetStaticLighting(*args)
+    def SetCastShadows(*args): return _cspace.iTerrainObjectState_SetCastShadows(*args)
+    def GetCastShadows(*args): return _cspace.iTerrainObjectState_GetCastShadows(*args)
+    def __del__(self, destroy=_cspace.delete_iTerrainObjectState):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iTerrainObjectState_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iTerrainObjectState_scfGetVersion)
+
+class iTerrainObjectStatePtr(iTerrainObjectState):
+    def __init__(self, this):
+        _swig_setattr(self, iTerrainObjectState, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iTerrainObjectState, 'thisown', 0)
+        _swig_setattr(self, iTerrainObjectState,self.__class__,iTerrainObjectState)
+_cspace.iTerrainObjectState_swigregister(iTerrainObjectStatePtr)
+
+iTerrainObjectState_scfGetVersion = _cspace.iTerrainObjectState_scfGetVersion
+
+class iTerrainFactoryState(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainFactoryState, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainFactoryState, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<C iTerrainFactoryState instance at %s>" % (self.this,)
+    def SetTerraFormer(*args): return _cspace.iTerrainFactoryState_SetTerraFormer(*args)
+    def GetTerraFormer(*args): return _cspace.iTerrainFactoryState_GetTerraFormer(*args)
+    def SetSamplerRegion(*args): return _cspace.iTerrainFactoryState_SetSamplerRegion(*args)
+    def GetSamplerRegion(*args): return _cspace.iTerrainFactoryState_GetSamplerRegion(*args)
+    def SaveState(*args): return _cspace.iTerrainFactoryState_SaveState(*args)
+    def RestoreState(*args): return _cspace.iTerrainFactoryState_RestoreState(*args)
+    def __del__(self, destroy=_cspace.delete_iTerrainFactoryState):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iTerrainFactoryState_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iTerrainFactoryState_scfGetVersion)
+
+class iTerrainFactoryStatePtr(iTerrainFactoryState):
+    def __init__(self, this):
+        _swig_setattr(self, iTerrainFactoryState, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iTerrainFactoryState, 'thisown', 0)
+        _swig_setattr(self, iTerrainFactoryState,self.__class__,iTerrainFactoryState)
+_cspace.iTerrainFactoryState_swigregister(iTerrainFactoryStatePtr)
+
+iTerrainFactoryState_scfGetVersion = _cspace.iTerrainFactoryState_scfGetVersion
 
 class iLoaderStatus(iBase):
     __swig_setmethods__ = {}
@@ -10859,6 +10979,103 @@ class iScriptPtr(iScript):
 _cspace.iScript_swigregister(iScriptPtr)
 
 iScript_scfGetVersion = _cspace.iScript_scfGetVersion
+
+class iSimpleFormerState(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSimpleFormerState, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSimpleFormerState, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<C iSimpleFormerState instance at %s>" % (self.this,)
+    def SetHeightmap(*args): return _cspace.iSimpleFormerState_SetHeightmap(*args)
+    def SetScale(*args): return _cspace.iSimpleFormerState_SetScale(*args)
+    def SetOffset(*args): return _cspace.iSimpleFormerState_SetOffset(*args)
+    def SetIntegerMap(*args): return _cspace.iSimpleFormerState_SetIntegerMap(*args)
+    def SetFloatMap(*args): return _cspace.iSimpleFormerState_SetFloatMap(*args)
+    def __del__(self, destroy=_cspace.delete_iSimpleFormerState):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSimpleFormerState_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iSimpleFormerState_scfGetVersion)
+
+class iSimpleFormerStatePtr(iSimpleFormerState):
+    def __init__(self, this):
+        _swig_setattr(self, iSimpleFormerState, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iSimpleFormerState, 'thisown', 0)
+        _swig_setattr(self, iSimpleFormerState,self.__class__,iSimpleFormerState)
+_cspace.iSimpleFormerState_swigregister(iSimpleFormerStatePtr)
+
+iSimpleFormerState_scfGetVersion = _cspace.iSimpleFormerState_scfGetVersion
+
+class iTerraFormer(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerraFormer, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iTerraFormer, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<C iTerraFormer instance at %s>" % (self.this,)
+    def GetSampler(*args): return _cspace.iTerraFormer_GetSampler(*args)
+    def SampleFloat(*args): return _cspace.iTerraFormer_SampleFloat(*args)
+    def SampleVector2(*args): return _cspace.iTerraFormer_SampleVector2(*args)
+    def SampleVector3(*args): return _cspace.iTerraFormer_SampleVector3(*args)
+    def SampleInteger(*args): return _cspace.iTerraFormer_SampleInteger(*args)
+    def __del__(self, destroy=_cspace.delete_iTerraFormer):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iTerraFormer_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iTerraFormer_scfGetVersion)
+
+class iTerraFormerPtr(iTerraFormer):
+    def __init__(self, this):
+        _swig_setattr(self, iTerraFormer, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iTerraFormer, 'thisown', 0)
+        _swig_setattr(self, iTerraFormer,self.__class__,iTerraFormer)
+_cspace.iTerraFormer_swigregister(iTerraFormerPtr)
+
+iTerraFormer_scfGetVersion = _cspace.iTerraFormer_scfGetVersion
+
+class iTerraSampler(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerraSampler, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iTerraSampler, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<C iTerraSampler instance at %s>" % (self.this,)
+    def SampleFloat(*args): return _cspace.iTerraSampler_SampleFloat(*args)
+    def SampleVector2(*args): return _cspace.iTerraSampler_SampleVector2(*args)
+    def SampleVector3(*args): return _cspace.iTerraSampler_SampleVector3(*args)
+    def SampleInteger(*args): return _cspace.iTerraSampler_SampleInteger(*args)
+    def GetMaterialPalette(*args): return _cspace.iTerraSampler_GetMaterialPalette(*args)
+    def GetRegion(*args): return _cspace.iTerraSampler_GetRegion(*args)
+    def GetResolution(*args): return _cspace.iTerraSampler_GetResolution(*args)
+    def GetVersion(*args): return _cspace.iTerraSampler_GetVersion(*args)
+    def Cleanup(*args): return _cspace.iTerraSampler_Cleanup(*args)
+    def __del__(self, destroy=_cspace.delete_iTerraSampler):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iTerraSampler_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iTerraSampler_scfGetVersion)
+
+class iTerraSamplerPtr(iTerraSampler):
+    def __init__(self, this):
+        _swig_setattr(self, iTerraSampler, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iTerraSampler, 'thisown', 0)
+        _swig_setattr(self, iTerraSampler,self.__class__,iTerraSampler)
+_cspace.iTerraSampler_swigregister(iTerraSamplerPtr)
+
+iTerraSampler_scfGetVersion = _cspace.iTerraSampler_scfGetVersion
 
 class csObject(iObject):
     __swig_setmethods__ = {}
