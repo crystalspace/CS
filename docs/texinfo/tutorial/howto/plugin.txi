@@ -84,9 +84,9 @@ convention (starting a name with @samp{i}) for @sc{scf} interfaces so that it
 is easy to see that they refer to @sc{scf} interfaces.
 
 We inherit from @samp{iBase} because it is the basis of all @sc{scf}
-interfaces.  All @sc{scf} interfaces need to inherit from @samp{iBase}.  This
-will ensure that we have reference counting (more on that later) and also takes
-care of the other internal @sc{scf} issues.
+interfaces.  All @sc{scf} interfaces must inherit from @samp{iBase} either
+directly or indirectly.  This will ensure that we have reference counting (more
+on that later) and also takes care of the other internal @sc{scf} issues.
 
 In that structure we define two methods: @code{DoSomething()} and
 @code{GetSomething()}. Note that every method is defined as follows:
