@@ -1,4 +1,4 @@
-c -*-texinfo-*-
+@c -*-texinfo-*-
 @node HOWTO CS Project, HOWTO Creating External MSVC 6 Application, HOWTO User Objects in Maps, HOWTO
 @subsection Creating an External Crystal Space Application
 @cindex External Crystal Space Application
