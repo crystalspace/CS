@@ -319,11 +319,9 @@ csSystemDriver::csSystemDriver () : PlugIns (8, 8), EventQueue (),
 
 csSystemDriver::~csSystemDriver ()
 {
-#ifdef CS_DEBUG
-  printf ("System driver is going to shut down now!\n");
-#endif
-
   Close ();
+
+  Printf (MSG_DEBUG_0F, "*** System driver is going to shut down now!\n");
 
   // Free all plugin options (also decrefs their iConfig interfaces)
   OptionList.DeleteAll ();
@@ -354,6 +352,8 @@ csSystemDriver::~csSystemDriver ()
 bool csSystemDriver::Initialize (int argc, const char* const argv[],
   const char *iConfigName)
 {
+  Printf (MSG_DEBUG_0F, "*** Initializing system driver!\n");
+
   // Initialize Shared Class Facility|
   char scfconfigpath [MAXPATHLEN + 1];
 
@@ -524,6 +524,8 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
 
 bool csSystemDriver::Open (const char *Title)
 {
+  Printf (MSG_DEBUG_0F, "*** Opening the drivers now!\n");
+
   if ((G3D && !G3D->Open (Title))
    || (!G3D && G2D && !G2D->Open (Title)))
     return false;
@@ -545,6 +547,8 @@ bool csSystemDriver::Open (const char *Title)
 
 void csSystemDriver::Close ()
 {
+  Printf (MSG_DEBUG_0F, "*** Closing the drivers now!\n");
+
   // Warn all plugins the system is going down
   csEvent Event (GetTime (), csevBroadcast, cscmdSystemClose);
   HandleEvent (Event);
@@ -697,6 +701,10 @@ void csSystemDriver::SetSystemDefaults (iConfigManager *Config)
 
   // Now analyze command line
   const char *val;
+
+  if ((val = GetOptionCL ("debug")))
+    debug_level = atoi(val);
+
   if ((val = GetOptionCL ("mode")))
   {
     int wres, hres;
@@ -788,12 +796,13 @@ void csSystemDriver::Help ()
 
   Printf (MSG_STDOUT, "General options:\n");
   Printf (MSG_STDOUT, "  -help              this help\n");
-  Printf (MSG_STDOUT, "  -mode=<w>x<y>      set resolution (default=%dx%d)\n", FrameWidth, FrameHeight);
+  Printf (MSG_STDOUT, "  -mode=<w>x<h>      set resolution (default=%dx%d)\n", FrameWidth, FrameHeight);
   Printf (MSG_STDOUT, "  -depth=<d>         set depth (default=%d bpp)\n", Depth);
   Printf (MSG_STDOUT, "  -[no]fs            use fullscreen videomode if available (default=%s)\n", FullScreen ? "yes" : "no");
   Printf (MSG_STDOUT, "  -video=<s>         the 3D rendering driver (opengl, glide, software, ...)\n");
   Printf (MSG_STDOUT, "  -canvas=<s>        the 2D canvas driver (asciiart, x2d, ...)\n");
   Printf (MSG_STDOUT, "  -plugin=<s>        load the plugin after all others\n");
+  Printf (MSG_STDOUT, "  -debug=<n>         set debug level (default=%d)\n", debug_level);
 }
 
 void csSystemDriver::Alert (const char* msg)

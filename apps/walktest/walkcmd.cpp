@@ -653,12 +653,12 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "coordsave"))
   {
     Sys->Printf (MSG_CONSOLE, "SAVE COORDS\n");
-    SaveCamera (Sys->VFS, "/this/coord");
+    SaveCamera (Sys->VFS, "/lib/std/coord");
   }
   else if (!strcasecmp (cmd, "coordload"))
   {
     Sys->Printf (MSG_CONSOLE, "LOAD COORDS\n");
-    LoadCamera (Sys->VFS, "/this/coord");
+    LoadCamera (Sys->VFS, "/lib/std/coord");
   }
   else if (!strcasecmp (cmd, "plugins"))
   {

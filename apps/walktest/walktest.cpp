@@ -1370,36 +1370,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
 
   // Load a few sounds.
 #ifdef DO_SOUND
-  //csSoundData* w = csSoundDataObject::GetSound(*engine, "tada.wav");
-  //if (w && Sound) Sound->PlaySound (w);
-
   wMissile_boom = csSoundDataObject::GetSound(*engine, "boom.wav");
   wMissile_whoosh = csSoundDataObject::GetSound(*engine, "whoosh.wav");
-  //For 2D (nonmoveable) background sound, no control, loop
-  csObjIterator sobj = engine->GetIterator (csSoundDataObject::Type);
-  while (!sobj.IsNull ())
-  {
-    //sounds (other than standard) are from a zip specified in map file
-    //SOUNDS section and specified in vfs.cfg in lib/sounds
-    iSoundHandle* wSoundData = ((csSoundDataObject&)(*sobj)).GetSound();
-    if (wSoundData && Sound)
-    {
-      //don't play now if loaded for missile
-      if ( wSoundData == csSoundDataObject::GetSound(*engine, "tada.wav") ||
-	   wSoundData == csSoundDataObject::GetSound(*engine, "boom.wav") ||
-	   wSoundData == csSoundDataObject::GetSound(*engine, "whoosh.wav"))
-      {
-        ///++sobj;
-      }
-      else
-      {
-        wSoundData->Play (true);
-        ///++sobj;
-      }
-    }
-	/// fix of infinite loop if Sound is null
-	++sobj;
-  }
 #endif
 
   Printf (MSG_INITIALIZATION, "--------------------------------------\n");
