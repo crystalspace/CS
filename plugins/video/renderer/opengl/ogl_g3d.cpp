@@ -16,13 +16,14 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
  */
 
+#include "cssysdef.h"
+
 #include <stdarg.h>
 #include <stdio.h>
 
 #include <GL/gl.h>
 #include <GL/glu.h>
 
-#include "cssysdef.h"
 #include "cssys/sysdriv.h"
 #include "qint.h"
 #include "csutil/scf.h"
