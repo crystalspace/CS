@@ -69,9 +69,15 @@ public:
   /// Add another color to this one.
   csColor& operator+= (const csColor& c)
   { red += c.red; green += c.green; blue += c.blue; return *this; }
+  /// Subtract another color to this one.
+  csColor& operator-= (const csColor& c)
+  { red -= c.red; green -= c.green; blue -= c.blue; return *this; }
   /// Add given R,G,B components to color.
   void Add (float r, float g, float b)
   { red += r; green += g; blue += b; }
+  /// Subtract given R,G,B components from color.
+  void Subtract (float r, float g, float b)
+  { red -= r; green -= g; blue -= b; }
 };
 
 /// Multiply a color by a scalar value.
@@ -85,5 +91,8 @@ inline csColor operator* (float f, const csColor& s)
 /// Add two colors.
 inline csColor operator+ (const csColor& s1, const csColor& s2)
 { csColor c (s1); c += s2; return c; }
+/// Subtract two colors.
+inline csColor operator- (const csColor& s1, const csColor& s2)
+{ csColor c (s1); c -= s2; return c; }
 
 #endif // __CSCOLOR_H__

@@ -23,6 +23,10 @@ The history order is reversed so that new features are at the top.
 	- Fixed sector handling in mesh wrapper so that children will now
 	  automatically be moved to the correct sector when the parent is.
 	- Added iEngine::NextFrame() (to complement csEngine::NextFrame()).
+	- Added subtract operations to csColor.
+	- Did many optimizations to the fire particle system by
+	  precalculating a lot.
+	- Martin Geisse did a small bug fix in engine.cpp.
 25-Apr-2001
 	- Philip Wyett cleaned up formatting in ptlab.cfg.
 	- Martin Geisse added an SCF interface for collection (iCollection).

@@ -37,6 +37,15 @@ struct iSector;
 class csFireMeshObject : public csParticleSystem
 {
 protected:
+  static const csColor cols[5];
+  static const float col_age[5];
+  static const float col_dage[5];
+  // The following two colors are precalculated from
+  // cols above, the COL_AGE and COL_DAGE macros and color_scale.
+  // If precalc_valid == false this table has to be recalculated.
+  csColor precalc_add[5], precalc_mul[5];
+  bool precalc_valid;
+
   int amt;
   csVector3 direction;
   csBox3 origin;
@@ -46,6 +55,7 @@ protected:
   csVector3* part_speed;
   float *part_age;
   float total_time;
+  float inv_total_time;
   float time_left; // from previous update
   int next_oldest;
 
@@ -144,6 +154,7 @@ public:
   {
     initialized = false;
     color_scale = colscale;
+    precalc_valid = false;
   }
   /// Get color scale.
   float GetColorScale () const
@@ -153,6 +164,7 @@ public:
   {
     initialized = false;
     total_time = tottime;
+    inv_total_time = 1. / total_time;
   }
   /// Get total time.
   float GetTotalTime () const

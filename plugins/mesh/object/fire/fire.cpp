@@ -39,6 +39,32 @@ IMPLEMENT_EMBEDDED_IBASE (csFireMeshObject::FireState)
   IMPLEMENTS_INTERFACE (iFireState)
 IMPLEMENT_EMBEDDED_IBASE_END
 
+// Aging ratios
+#define COL_AGE0	0.
+#define COL_AGE1	0.05
+#define COL_AGE2	0.2
+#define COL_AGE3	0.5
+#define COL_AGE4	1.0
+// COL_DAGE(x) = 1. / (COL_AGE(x) - COL_AGE(x-1))
+#define COL_DAGE1	(1. / (COL_AGE1-COL_AGE0))
+#define COL_DAGE2	(1. / (COL_AGE2-COL_AGE1))
+#define COL_DAGE3	(1. / (COL_AGE3-COL_AGE2))
+#define COL_DAGE4	(1. / (COL_AGE4-COL_AGE3))
+
+const float csFireMeshObject::col_age[5] =
+{ COL_AGE0, COL_AGE1, COL_AGE2, COL_AGE3, COL_AGE4 };
+const float csFireMeshObject::col_dage[5] =
+{ 0, COL_DAGE1, COL_DAGE2, COL_DAGE3, COL_DAGE4 };
+
+const csColor csFireMeshObject::cols[5] =
+{
+  csColor(1.,1.,1.),
+  csColor(1.,1.,0.),
+  csColor(1.,0.,0.),
+  csColor(0.6,0.6,0.6),
+  csColor(0.1,0.1,0.1)
+};
+
 void csFireMeshObject::SetupObject ()
 {
   if (!initialized)
@@ -93,6 +119,7 @@ csFireMeshObject::csFireMeshObject (iSystem* system, iMeshObjectFactory* factory
   direction.Set (0, 1, 0);
   origin.Set (0,0,0, 0,0,0);
   total_time = 1;
+  inv_total_time = 1. / total_time;
   swirl = 1;
   color_scale = 1;
   number = 40;
@@ -100,6 +127,7 @@ csFireMeshObject::csFireMeshObject (iSystem* system, iMeshObjectFactory* factory
   dynlight = NULL;
   delete_light = false;
   light_engine = NULL;
+  precalc_valid = false;
 }
 
 csFireMeshObject::~csFireMeshObject()
@@ -140,31 +168,29 @@ void csFireMeshObject::MoveAndAge (int i, float delta_t)
   GetParticle (i)->SetPosition (part_pos[i]); 
   part_age[i] += delta_t;
 
-  // set the colour based on the age of the particle
-  //   white->yellow->red->gray->black
-  // col_age: 1.0 means total_time;
-  const float col_age[] = {0., 0.05, 0.2, 0.5, 1.0};
-  const csColor cols[] = {
-    csColor(1.,1.,1.),
-    csColor(1.,1.,0.),
-    csColor(1.,0.,0.),
-    csColor(0.6,0.6,0.6),
-    csColor(0.1,0.1,0.1)
-  };
-  const int nr_colors = 5;
-  csColor col;
-  col = cols[nr_colors-1];
-  float age = part_age[i] / total_time;
-  for (int k=1; k<nr_colors; k++)
+  if (!precalc_valid)
   {
-    if (age >= col_age[k-1] && age < col_age[k])
+    precalc_valid = true;
+    int k;
+    for (k = 1 ; k < 5 ; k++)
     {
-      /// colouring fraction
-      float fr = (age - col_age[k-1]) / (col_age[k] - col_age[k-1]);
-      col = cols[k-1] * (1.0-fr) + cols[k] * fr;
+      precalc_add[k] = color_scale * (cols[k-1]
+      	+ cols[k-1] * col_age[k-1] * col_dage[k]
+    	- cols[k] * col_age[k-1] * col_dage[k]);
+      precalc_mul[k] = color_scale * col_dage[k] * (cols[k] - cols[k-1]);
     }
   }
-  GetParticle (i)->SetColor (col * color_scale);
+
+  float age = part_age[i] * inv_total_time;
+  int k;
+  if (age < COL_AGE1)	   k = 1;
+  else if (age < COL_AGE2) k = 2;
+  else if (age < COL_AGE3) k = 3;
+  else			   k = 4;
+
+  /// colouring fraction
+  csColor col = age * precalc_mul[k] + precalc_add[k];
+  GetParticle (i)->SetColor (col);
 }
 
 
