@@ -40,9 +40,9 @@
 #include "csutil/csmd5.h"
 #include "iengine/mesh.h"
 #include "csutil/csendian.h"
+#include "cstool/rbuflock.h"
 #include "qsqrt.h"
 
-// [res: moved here 'cause I get an "internal compiler error" on msvc7... whyever]
 CS_IMPLEMENT_STATIC_CLASSVAR (csSprite3DMeshObject, mesh, GetLODMesh, csTriangleMesh, ())
 
 CS_IMPLEMENT_PLUGIN
@@ -930,6 +930,8 @@ SCF_IMPLEMENT_IBASE (csSprite3DMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSprite3DState)
 #ifndef CS_USE_NEW_RENDERER
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
+#else
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShaderVariableAccessor)
 #endif // CS_USE_NEW_RENDERER
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLODControl)
   {
@@ -961,6 +963,10 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 #ifndef CS_USE_NEW_RENDERER
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::eiVertexBufferManagerClient)
   SCF_IMPLEMENTS_INTERFACE (iVertexBufferManagerClient)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+#else
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::eiShaderVariableAccessor)
+  SCF_IMPLEMENTS_INTERFACE (iShaderVariableAccessor)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 #endif // CS_USE_NEW_RENDERER
 
@@ -1001,6 +1007,8 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSprite3DState);
 #ifndef CS_USE_NEW_RENDERER
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
+#else
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShaderVariableAccessor);
 #endif // CS_USE_NEW_RENDERER
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLODControl);
   logparent = 0;
@@ -1050,10 +1058,7 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   single_step = false;
   frame_increment = 1;
 
-#ifdef CS_USE_NEW_RENDERER
-  lastMeshPtr = new csRenderMesh;
-  meshes.Push (lastMeshPtr);
-#else
+#ifndef CS_USE_NEW_RENDERER
   vbufmgr = 0;
 #endif // CS_USE_NEW_RENDERER
 
@@ -1082,6 +1087,8 @@ csSprite3DMeshObject::~csSprite3DMeshObject ()
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiSprite3DState);
 #ifndef CS_USE_NEW_RENDERER
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
+#else
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiShaderVariableAccessor);
 #endif // CS_USE_NEW_RENDERER
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiLODControl);
   SCF_DESTRUCT_IBASE ();
@@ -1388,6 +1395,19 @@ void csSprite3DMeshObject::SetupObject ()
     texcoords_name = strings->Request ("texture coordinates");
     colors_name = strings->Request ("colors");
     indices_name = strings->Request ("indices");
+  
+    csShaderVariable* sv;
+    sv = svcontext.GetVariableAdd (vertices_name);
+    sv->SetAccessor (&scfiShaderVariableAccessor);
+    sv = svcontext.GetVariableAdd (normals_name);
+    sv->SetAccessor (&scfiShaderVariableAccessor);
+    sv = svcontext.GetVariableAdd (texcoords_name);
+    sv->SetAccessor (&scfiShaderVariableAccessor);
+    sv = svcontext.GetVariableAdd (colors_name);
+    sv->SetAccessor (&scfiShaderVariableAccessor);
+    sv = svcontext.GetVariableAdd (indices_name);
+    sv->SetAccessor (&scfiShaderVariableAccessor);
+  
 #endif // CS_USE_NEW_RENDERER
 
     InitSprite ();
@@ -1897,28 +1917,13 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n, iRenderView* rview
   int clip_portal, clip_plane, clip_z_plane;
   if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
   	clip_z_plane) == false)
-    return 0;
-
-  //first, check if we have any usable mesh
-  if(lastMeshPtr->inUse == true)
   {
-    lastMeshPtr = 0;
-    //check the list
-    int i;
-    for(i = 0; i<meshes.Length (); i++)
-    {
-      if (meshes[i]->inUse == false){
-        lastMeshPtr = meshes[i];
-        break;
-      }
-    }
-    if (lastMeshPtr == 0)
-    {
-      lastMeshPtr = new csRenderMesh;
-      meshes.Push (lastMeshPtr);
-    }
+    n = 0;
+    return 0;
   }
 
+  bool rmCreated;
+  csRenderMesh*& rmesh = rmHolder.GetUnusedMesh (rmCreated);
 
   UpdateWorkTables (factory->GetVertexCount());
 
@@ -1941,14 +1946,15 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n, iRenderView* rview
 
   int cf_idx = cframe->GetAnmIndex();
 
-  csVector3* real_obj_verts;
-  csVector3* real_tween_verts = 0;
-
   real_obj_verts = factory->GetVertices (cf_idx);
+  factory->ComputeNormals (cframe);
+  real_obj_norms = factory->GetNormals (cf_idx);
   if (do_tween)
   {
     int nf_idx = next_frame->GetAnmIndex();
     real_tween_verts = factory->GetVertices (nf_idx);
+    factory->ComputeNormals (next_frame);
+    real_tween_norms = factory->GetNormals (nf_idx);
   }
 
   // If we have a skeleton then we transform all vertices through
@@ -2057,27 +2063,26 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n, iRenderView* rview
   // Setup the structure for DrawTriangleMesh.
   if (force_otherskin)
   {
-    lastMeshPtr->material = cstxt;
+    rmesh->material = cstxt;
     cstxt->Visit ();
   }
   else
   {
-    lastMeshPtr->material = factory->cstxt;
+    rmesh->material = factory->cstxt;
     factory->cstxt->Visit ();
   }
   if (!vertex_colors) AddVertexColor (0, csColor (0, 0, 0));
 
-  final_verts = verts;
   final_texcoords = real_uv_verts;
   final_colors = vertex_colors;
   final_triangles = m->GetTriangles ();
   final_num_vertices = num_verts_for_lod;
   final_num_triangles = m->GetTriangleCount ();
 
-  lastMeshPtr->clip_portal = clip_portal;
-  lastMeshPtr->clip_plane = clip_plane;
-  lastMeshPtr->clip_z_plane = clip_z_plane;
-  lastMeshPtr->do_mirror = camera->IsMirrored ();
+  rmesh->clip_portal = clip_portal;
+  rmesh->clip_plane = clip_plane;
+  rmesh->clip_z_plane = clip_z_plane;
+  rmesh->do_mirror = camera->IsMirrored ();
 
 
   if (factory->light_mgr)
@@ -2087,34 +2092,26 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n, iRenderView* rview
     UpdateLighting (relevant_lights, movable);
   }
 
-  {
-    csShaderVariable* sv;
-    sv = svcontext.GetVariableAdd (vertices_name);
-    sv->SetValue (GetRenderBuffer (vertices_name));
-    sv = svcontext.GetVariableAdd (normals_name);
-    sv->SetValue (GetRenderBuffer (normals_name));
-    sv = svcontext.GetVariableAdd (texcoords_name);
-    sv->SetValue (GetRenderBuffer (texcoords_name));
-    sv = svcontext.GetVariableAdd (colors_name);
-    sv->SetValue (GetRenderBuffer (colors_name));
-    sv = svcontext.GetVariableAdd (indices_name);
-    sv->SetValue (GetRenderBuffer (indices_name));
-  }
   n = 1;
   if (skeleton_state) 
   {
-    /* set to identify for software skeleton */
-    lastMeshPtr->object2camera = csReversibleTransform ();
+    /* set to identity for software skeleton */
+    rmesh->object2camera = csReversibleTransform ();
   }
-  lastMeshPtr->mixmode = CS_FX_COPY;
-  lastMeshPtr->indexstart = 0;
-  lastMeshPtr->indexend = final_num_triangles * 3;
+  else
+    rmesh->object2camera = tr_o2c;
+  rmesh->mixmode = MixMode;
+  rmesh->indexstart = 0;
+  rmesh->indexend = final_num_triangles * 3;
   
-  lastMeshPtr->variablecontext = &svcontext;
-  lastMeshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
-  lastMeshPtr->inUse = true;
+  if (rmCreated)
+  {
+    rmesh->variablecontext = &svcontext;
+  }
+  rmesh->meshtype = CS_MESHTYPE_TRIANGLES;
+  rmesh->inUse = true;
   n = 1;
-  return &lastMeshPtr;
+  return &rmesh;
 #else
   n = 0;
   return 0;
@@ -2930,8 +2927,12 @@ void csSprite3DMeshObject::eiVertexBufferManagerClient::ManagerClosing ()
   scfParent->vbufmgr = 0;
 }
 #else
-iRenderBuffer *csSprite3DMeshObject::GetRenderBuffer (csStringID name)
+
+//iRenderBuffer *csSprite3DMeshObject::GetRenderBuffer (csStringID name)
+void csSprite3DMeshObject::PreGetShaderVariableValue (
+  csShaderVariable* variable)
 {
+  const csStringID name = variable->GetName();
   if (name == vertices_name)
   {
     if (!vertices)
@@ -2940,10 +2941,24 @@ iRenderBuffer *csSprite3DMeshObject::GetRenderBuffer (csStringID name)
         sizeof (csVector3)*final_num_vertices, CS_BUF_DYNAMIC,
 		CS_BUFCOMP_FLOAT, 3, false);
     }
-    vertices->CopyToBuffer(final_verts, sizeof (csVector3)*final_num_vertices);
-    return vertices;
+    if (tween_ratio > EPSILON)
+    {
+      csRenderBufferLock<csVector3> tweenedVerts (vertices);
+
+      const float oneMinusTween = 1.0f - tween_ratio;
+      for (int n = 0; n < final_num_vertices; n++)
+      {
+	tweenedVerts[n] = real_obj_verts[n] * oneMinusTween +
+	   tween_ratio * real_tween_verts[n];
+      }
+    }
+    else
+      vertices->CopyToBuffer (real_obj_verts, 
+	sizeof (csVector3) * final_num_vertices);
+      //vertices->CopyToBuffer(final_verts, sizeof (csVector3)*final_num_vertices);
+    variable->SetValue (vertices);
   }
-  if (name == normals_name)
+  else if (name == normals_name)
   {
     if (!normals)
     {
@@ -2953,15 +2968,16 @@ iRenderBuffer *csSprite3DMeshObject::GetRenderBuffer (csStringID name)
     }
     /*int tf_idx = cur_action->GetCsFrame (cur_frame)->GetAnmIndex ();
     factory->ComputeNormals (cur_action->GetCsFrame (cur_frame));*/
+#if 0
     csVector3* norm = new csVector3[final_num_vertices];
     memset (norm, 0, sizeof(csVector3)*final_num_vertices);
     int i;
     for (i=0; i<final_num_triangles; i++)
     {
-      csVector3 ab = final_verts [final_triangles[i].b] 
-        - final_verts [final_triangles[i].a];
-      csVector3 bc = final_verts [final_triangles[i].c] 
-        - final_verts [final_triangles[i].b];
+      csVector3 ab = real_obj_verts/*final_verts*/ [final_triangles[i].b] 
+        - real_obj_verts/*final_verts*/ [final_triangles[i].a];
+      csVector3 bc = real_obj_verts/*final_verts*/ [final_triangles[i].c] 
+        - real_obj_verts/*final_verts*/ [final_triangles[i].b];
       csVector3 normal = ab % bc;
       norm[final_triangles[i].a] += normal;
       norm[final_triangles[i].b] += normal;
@@ -2969,9 +2985,24 @@ iRenderBuffer *csSprite3DMeshObject::GetRenderBuffer (csStringID name)
     }
     normals->CopyToBuffer (norm, sizeof (csVector3)*final_num_vertices);
     delete[] norm;
-    return normals;
+#endif
+    if (tween_ratio > EPSILON)
+    {
+      csRenderBufferLock<csVector3> tweenedNorms (normals);
+
+      const float oneMinusTween = 1.0f - tween_ratio;
+      for (int n = 0; n < final_num_vertices; n++)
+      {
+	tweenedNorms[n] = real_obj_norms[n] * oneMinusTween +
+	   tween_ratio * real_tween_norms[n];
+      }
+    }
+    else
+      normals->CopyToBuffer (real_obj_norms, 
+	sizeof (csVector3) * final_num_vertices);
+    variable->SetValue (normals);
   }
-  if (name == texcoords_name)
+  else if (name == texcoords_name)
   {
     if (!texcoords)
     {
@@ -2980,10 +3011,9 @@ iRenderBuffer *csSprite3DMeshObject::GetRenderBuffer (csStringID name)
 		    CS_BUFCOMP_FLOAT, 2, false);
     }
     texcoords->CopyToBuffer (final_texcoords, sizeof (csVector2)*final_num_vertices);
-    texcoords->Release ();
-    return texcoords;
+    variable->SetValue (texcoords);
   }
-  if (name == colors_name)
+  else if (name == colors_name)
   {
     if (!colors)
     {
@@ -2992,9 +3022,9 @@ iRenderBuffer *csSprite3DMeshObject::GetRenderBuffer (csStringID name)
 		    CS_BUFCOMP_FLOAT, 3, false);
     }
     colors->CopyToBuffer (final_colors, sizeof (csColor)*final_num_vertices);
-    return colors;
+    variable->SetValue (colors);
   }
-  if (name == indices_name)
+  else if (name == indices_name)
   {
     if (!indices)
     {
@@ -3003,9 +3033,8 @@ iRenderBuffer *csSprite3DMeshObject::GetRenderBuffer (csStringID name)
 		    CS_BUFCOMP_UNSIGNED_INT, 1, true);
     }
     indices->CopyToBuffer (final_triangles, sizeof (csTriangle)*final_num_triangles);
-    return indices;
+    variable->SetValue (indices);
   }
-  return 0;
 }
 
 #endif // CS_USE_NEW_RENDERER

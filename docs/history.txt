@@ -18,6 +18,10 @@ chronological order.
 	      unregister itself instead of registering.
 	    - Second the portal container registration was broken in case
 	      the portal mesh is a child mesh (which is a very common case).
+	- res fixed spr3d on NR (actually, just the obj2cam transform wasn't 
+	  set). Also slightly changed the way it's drawn, now uses shader var
+	  accessors (instead of setting all the data in GetRenderMeshes()).
+	- res fixed a GCC warning in the PS1 plugin.
 29-Mar-2004
 	- Jorrit changed the NR null3d renderer so it uses the soft canvas
 	  instead of the OpenGL canvas by default.

@@ -441,6 +441,8 @@ bool csPixelShaderParser::ParseProgram (const char *program)
 	  max_registers[CS_PS_REG_TEX] = 6;
 	  max_registers[CS_PS_REG_TEMP] = 6;
 	  break;
+	default:
+	  break;
       }
     }
     else if (isVerInstr)

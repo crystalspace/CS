@@ -48,6 +48,7 @@
 #include "ivideo/rendermesh.h"
 #include "ivideo/rndbuf.h"
 #include "cstool/anonrndbuf.h"
+#include "cstool/rendermeshholder.h"
 #include "ivideo/material.h"
 #include "qint.h"
 #include "csgfx/shadervarcontext.h"
@@ -1295,8 +1296,7 @@ private:
 #ifndef CS_USE_NEW_RENDERER
   G3DTriangleMesh g3dmesh;
 #else
-  csDirtyAccessArray<csRenderMesh*> meshes;
-  csRenderMesh *lastMeshPtr;
+  csRenderMeshHolderSingle rmHolder;  
 
 #endif // CS_USE_NEW_RENDERER
 
@@ -1321,13 +1321,13 @@ private:
   csColor* vbuf_colors, * vbuf_tween_colors;
   int vbuf_num_vertices;
 #else
-  csVector3* final_verts;
   csVector2* final_texcoords;
   csColor* final_colors;
   csTriangle* final_triangles;
-  csTriangle* shadow_triangles;
-  bool shadow_caps;
-  bool use_shadow_ind;
+  csVector3* real_obj_verts;
+  csVector3* real_tween_verts;
+  csVector3* real_obj_norms;
+  csVector3* real_tween_norms;
   
   int final_num_vertices;
   int final_num_triangles;
@@ -1357,8 +1357,6 @@ private:
     virtual void ManagerClosing ();
   }scfiVertexBufferManagerClient;
   friend struct eiVertexBufferManagerClient;
-#else
-  iRenderBuffer *GetRenderBuffer (csStringID name);
 #endif // CS_USE_NEW_RENDERER
 
 private:
@@ -1458,14 +1456,6 @@ public:
   {
     col = base_color;
   }
-
-#ifdef CS_USE_NEW_RENDERER
-  bool AddStream (const char *name, int component_size);
-  bool SetStreamComponent (const char *name, int index, int component, float value);
-  bool SetStreamComponent (const char *name, int index, int component, int value);
-  bool SetStream (const char *name, float *value);
-  bool SetStream (const char *name, int *value);
-#endif
 
   /**
    * Add a color for a vertex.
@@ -2009,6 +1999,22 @@ public:
     }
   } scfiLODControl;
   friend struct LODControl;
+
+  //------------------ iShaderVariableAccessor implementation ------------
+#ifdef CS_USE_NEW_RENDERER
+  class eiShaderVariableAccessor : public iShaderVariableAccessor
+  {
+  public:
+    SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObject);
+    virtual void PreGetValue (csShaderVariable* variable)
+    {
+      scfParent->PreGetShaderVariableValue (variable);
+    }
+  } scfiShaderVariableAccessor;
+  friend class eiShaderVariableAccessor;
+
+  void PreGetShaderVariableValue (csShaderVariable* variable);
+#endif // CS_USE_NEW_RENDERER
 };
 
 /**
