@@ -458,7 +458,6 @@ void csWorld::Draw (IGraphics3D* g3d, csCamera* c, csClipper* view)
 
   //@@@ Make this a flag.
   //EnableCBuffer (true);
-
   if (c_buffer) c_buffer->Initialize ();
 
   csSector* s = c->GetSector ();
