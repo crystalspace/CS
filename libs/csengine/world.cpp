@@ -417,13 +417,8 @@ bool csWorld::Prepare (IGraphics3D* g3d)
     CreateLightMaps (g3d);
   }
 
-#if defined(OS_NEXT)
-// FIXME: NextStep: Multiple Inheritence broken (IID_IHaloRasterizer)
-piHR = 0;
-#else
   if (!SUCCEEDED (g3d->QueryInterface(IID_IHaloRasterizer, (void**)&piHR)))
     piHR = NULL;
-#endif
 
   return true;
 }
@@ -675,12 +670,7 @@ void csWorld::Draw (IGraphics3D* g3d, csCamera* c, csClipper* view)
   IHaloRasterizer* piHR = NULL;
   bool supports_halos;
 
-#if defined(OS_NEXT)
-// FIXME: NextStep: Multiple Inheritence broken (IID_IHaloRasterizer)
-supports_halos = false;
-#else
   supports_halos = g3d->QueryInterface (IID_IHaloRasterizer, (void**)&piHR) == S_OK ? true : false;
-#endif
   
   csHaloInformation* pinfo;
   
