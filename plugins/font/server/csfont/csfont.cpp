@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2000 by Norman Kramer
+    Copyright (C) 2000 by W.C.A. Wijngaards
     original unplugged code and fonts by Andrew Zabolotny
 
     This library is free software; you can redistribute it and/or
