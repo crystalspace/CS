@@ -12,10 +12,32 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+18-Jan-2000
+	- Michael Dale Long did a major update to the csconsole plugin.
+	  iConsole and csConsole are finished for the time being. Updated
+	  csSimpleConsole to be compatible with the new interface. Added
+	  some test cases to cctest for testing the new console code.
+	  Added start of iConsoleInput interface.
+	- Gary Haussmann added change by Fragdance Galore for
+	  transparent-enabled text characters.
+	- Gary also fixed/enabled code for mipmapping in hardware.
+	  There were some problems since CS may not generate enough
+	  mipmaps to "fully populated" the mipmaps, from an OpenGL point
+	  of view.
 17-Jan-2000
 	- Eric Sunshine fixed a couple termination-time crashers in the BeOS
 	  2D drivers which resulted from invalid calls to virtual functions
 	  from within the destructor.
+	- Thomas Hieber added support for different output formats to
+	  Map2CS. The first one is an XML output format created by Petr
+	  Kocmid <pkocmid@atlas.cz>.
+	- Jorrit cleaned up the new quaternion class a bit.
+	- Norman Kramer corrected the cleanup of the quaternion class.
+	- Noah L. Gibbs fixed another serious bug in csPhyzik. Found out
+	  why velocities weren't working on ctPointMass -- fixed it?
+	  Serious error in the way Newtonian points were calculating
+	  derivative. Still looking for that bug in my test-case, though,
+	  so this may still have serious defects.
 16-Jan-2000
 	- Norman Kramer added a new quaternion class to csgeom.
 	- Noah L. Gibbs did some further work on the csPhyzik library.
