@@ -156,7 +156,7 @@ bool csShaderGLAFP::LoadProgramStringToGL (const char* programstring)
     CS_ALLOC_STACK_ARRAY (char, errorStart, strlen (programstring) + 1);
     strcpy (errorStart, programstring);
 
-    const char* start = errorStart + errorpos;
+    char* start = errorStart + errorpos;
     while (start > errorStart)
     {
       if (*(start - 1) == '\n')

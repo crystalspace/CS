@@ -20,14 +20,12 @@
 #define __CS_AWS_TEX_H__
 
 #include "csutil/parray.h"
+#include "igraphic/imageio.h"
+#include "iutil/vfs.h"
+#include "ivideo/texture.h"
+#include "ivideo/txtmgr.h"
 
-struct iString;
 struct iObjectRegistry;
-struct iReporter;
-struct iTextureHandle;
-struct iImageIO;
-struct iVFS;
-struct iImage;
 
 /**
  * This class embeds a normal texture manager, and keeps track of all the

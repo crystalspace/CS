@@ -22,7 +22,7 @@
 
 #include "csutil/scf.h"
 
-#ifndef COMP_VC
+#if !defined(COMP_VC) && !defined(COMP_BC)
 # warning This file is deprecated please use iNetworkSocket
 #endif
 

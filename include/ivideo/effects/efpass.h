@@ -32,8 +32,7 @@
 #include "cstypes.h"
 #include "csutil/ref.h"
 #include "efvector4.h"
-
-struct iEffectLayer;
+#include "ivideo/effects/eflayer.h"
 
 SCF_VERSION (iEffectPass, 0, 0, 1);
 

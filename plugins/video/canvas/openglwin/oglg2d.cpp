@@ -848,11 +848,11 @@ LRESULT CALLBACK csGraphics2DOpenGL::WindowProc (HWND hWnd, UINT message,
   }
   if (IsWindowUnicode (hWnd))
   {
-    return CallWindowProcW (This->m_OldWndProc, hWnd, message, wParam, lParam);
+    return CallWindowProcW ((WNDPROC)This->m_OldWndProc, hWnd, message, wParam, lParam);
   }
   else
   {
-    return CallWindowProcA (This->m_OldWndProc, hWnd, message, wParam, lParam);
+    return CallWindowProcA ((WNDPROC)This->m_OldWndProc, hWnd, message, wParam, lParam);
   }
 }
 

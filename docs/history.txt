@@ -15,6 +15,10 @@ chronological order.
 	- Jorrit fixed a compile error in glrender3d.
 	- Jorrit fixed a few occurances of 'crystalspace.renderer.stringset'
 	  and replaced them with the correct 'crystalspace.shared.stringset'.
+	- Eric Sunshine applied some changes to various headers and sources in
+	  order to pacify Borland C++Builder based upon a list of compiler
+	  diagnostic messages (and very loosely based upon a patch) provided by
+	  Randall Foreman <eidpers@comcast.net>.
 4-Jan-2004
 	- Luca fixed a compilation error for the VC6 compiler.
 	- res added the creation of a global string set to InitApplication().

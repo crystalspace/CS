@@ -30,8 +30,7 @@
 
 #include "csutil/scf.h"
 #include "cstypes.h"
-
-struct iEffectPass;
+#include "ivideo/effects/efpass.h"
 
 /**\name Technique Validation Status
  * @{ */

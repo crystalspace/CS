@@ -48,6 +48,7 @@
 #include "video/canvas/openglcommon/iogl.h"
 #include "video/canvas/openglcommon/glstates.h"
 
+#include "ivideo/effects/efdef.h"
 #include "ivideo/effects/efserver.h"
 #include "ivideo/effects/efclient.h"
 

@@ -20,7 +20,7 @@
 #ifndef __CS_INETWORK_DRIVER2_H__
 #define __CS_INETWORK_DRIVER2_H__
 
-#ifndef COMP_VC
+#if !defined(COMP_VC) && !defined(COMP_BC)
 # warning Use of iNetworkDriver2 is deprecated. Use iNetworkDriver instead.
 #endif
 
