@@ -40,7 +40,7 @@
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 
-CS_IMPLEMENT_PLATFORM_PLUGIN
+CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE(csFancyConsole)
   SCF_IMPLEMENTS_INTERFACE(iConsoleOutput)

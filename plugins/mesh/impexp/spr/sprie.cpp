@@ -71,7 +71,7 @@ SCF_EXPORT_CLASS_TABLE (sprie)
     "SPR Model Converter")
 SCF_EXPORT_CLASS_TABLE_END
 
-CS_IMPLEMENT_PLATFORM_PLUGIN
+CS_IMPLEMENT_PLUGIN
 
 csModelConverterSPR::csModelConverterSPR (iBase *pBase)
 {

@@ -34,7 +34,7 @@
 #include "ivaria/reporter.h"
 #include "video/canvas/common/scancode.h"
 
-CS_IMPLEMENT_PLATFORM_PLUGIN
+CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csXWindow)
 

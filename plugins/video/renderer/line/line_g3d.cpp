@@ -39,7 +39,7 @@
 #include "ivideo/graph2d.h"
 #include "qint.h"
 
-CS_IMPLEMENT_PLATFORM_PLUGIN
+CS_IMPLEMENT_PLUGIN
 
 ///---------------------------------------------------------------------------
 

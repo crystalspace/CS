@@ -30,7 +30,7 @@
 
 #define VFS_CONFIG_FILE	"vfs.cfg"
 
-CS_IMPLEMENT_PLATFORM_APPLICATION
+CS_IMPLEMENT_APPLICATION
 
 static iVFS *VFS;
 static bool ShutDown = false;

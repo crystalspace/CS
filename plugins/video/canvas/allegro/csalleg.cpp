@@ -48,7 +48,7 @@ static unsigned short ScanCodeToChar [128] =
 
 //------------------------------------------------------- csGraphics2DAlleg ---
 
-CS_IMPLEMENT_PLATFORM_PLUGIN
+CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGraphics2DAlleg)
 

@@ -28,7 +28,7 @@
 #include "cssys/win32/win32.h"
 #include "iutil/cmdline.h"
 
-CS_IMPLEMENT_PLATFORM_PLUGIN
+CS_IMPLEMENT_PLUGIN
 
 #ifndef CDS_UPDATEREGISTRY
 #define CDS_UPDATEREGISTRY  0x00000001

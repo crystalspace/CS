@@ -31,7 +31,7 @@
 
 #define CS_LINUX_JOYSTICK_OLD_EVENTS // the values of the first two axis are sent only
 
-CS_IMPLEMENT_PLATFORM_PLUGIN;
+CS_IMPLEMENT_PLUGIN;
 
 SCF_IMPLEMENT_IBASE (csLinuxJoystick)
   SCF_IMPLEMENTS_INTERFACE (iComponent)

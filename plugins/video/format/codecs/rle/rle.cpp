@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "rle.h"
 
-CS_IMPLEMENT_PLATFORM_PLUGIN
+CS_IMPLEMENT_PLUGIN
 
 #define Mono          1  // Monochrome bitmap
 #define _16Color      4  // 16 color bitmap

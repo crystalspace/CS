@@ -27,7 +27,7 @@
 #include "csutil/csvector.h"
 #include "fontplex.h"
 
-CS_IMPLEMENT_PLATFORM_PLUGIN
+CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csFontServerMultiplexor)
   SCF_IMPLEMENTS_INTERFACE (iFontServer)

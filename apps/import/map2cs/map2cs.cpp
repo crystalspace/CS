@@ -30,7 +30,7 @@
 #include "csutil/scf.h"
 #include "csutil/cfgfile.h"
 
-CS_IMPLEMENT_PLATFORM_APPLICATION
+CS_IMPLEMENT_APPLICATION
 
 void PrintSyntax()
 {

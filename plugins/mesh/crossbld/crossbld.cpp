@@ -69,7 +69,7 @@ public:
   } scfiComponent;
 };
 
-CS_IMPLEMENT_PLATFORM_PLUGIN
+CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csCrossBuilder)
   SCF_IMPLEMENTS_INTERFACE (iCrossBuilder)

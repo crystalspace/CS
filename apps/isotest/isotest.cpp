@@ -53,7 +53,7 @@
 #include "iengine/material.h"
 #include "iengine/mesh.h"
 
-CS_IMPLEMENT_PLATFORM_APPLICATION
+CS_IMPLEMENT_APPLICATION
 
 // The global system driver
 IsoTest *System;

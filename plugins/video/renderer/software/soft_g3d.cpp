@@ -31,7 +31,7 @@
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 
-CS_IMPLEMENT_PLATFORM_PLUGIN
+CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGraphics3DSoftware)
 SCF_DECLARE_FACTORY (csSoftProcTexture3D)

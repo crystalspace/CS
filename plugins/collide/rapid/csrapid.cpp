@@ -21,7 +21,7 @@
 #include "rapcol.h"
 #include "ivaria/polymesh.h"
 
-CS_IMPLEMENT_PLATFORM_PLUGIN
+CS_IMPLEMENT_PLUGIN
 
 //----------------------------------------------------------------------
 

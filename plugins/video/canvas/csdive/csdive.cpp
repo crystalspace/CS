@@ -49,7 +49,7 @@ inline void memsetd (void *dest, unsigned int value, size_t count)
 
 //------------------------------------------------------ csGraphics2DOS2DIVE ---
 
-CS_IMPLEMENT_PLATFORM_PLUGIN
+CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGraphics2DOS2DIVE)
 

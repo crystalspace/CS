@@ -28,7 +28,7 @@
 #include "../common/soundraw.h"
 #include "../common/sndload.h"
 
-CS_IMPLEMENT_PLATFORM_PLUGIN
+CS_IMPLEMENT_PLUGIN
 
 // Sun AU file loader
 //  support 8 and 16 bits PCM

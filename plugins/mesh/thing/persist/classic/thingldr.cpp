@@ -50,7 +50,7 @@
 #include "imap/parser.h"
 #include "ivaria/reporter.h"
 
-CS_IMPLEMENT_PLATFORM_PLUGIN
+CS_IMPLEMENT_PLUGIN
 
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (CIRCLE)

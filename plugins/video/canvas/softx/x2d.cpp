@@ -30,7 +30,7 @@
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 
-CS_IMPLEMENT_PLATFORM_PLUGIN
+CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGraphics2DXLib)
 

@@ -43,7 +43,7 @@
 #include <lib3ds/node.h>
 #include <lib3ds/vector.h>
 
-CS_IMPLEMENT_PLATFORM_PLUGIN
+CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE( csModelConverter3ds )
   SCF_IMPLEMENTS_INTERFACE( iModelConverter )

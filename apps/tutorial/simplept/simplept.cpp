@@ -54,7 +54,7 @@
 #include "ivaria/stdrep.h"
 #include "iutil/vfs.h"
 
-CS_IMPLEMENT_PLATFORM_APPLICATION
+CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 

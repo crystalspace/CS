@@ -31,7 +31,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-CS_IMPLEMENT_PLATFORM_PLUGIN
+CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE_EXT (csFireMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iFireState)

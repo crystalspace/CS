@@ -35,7 +35,7 @@
 #include "iutil/objreg.h"
 #include "qsqrt.h"
 
-CS_IMPLEMENT_PLATFORM_PLUGIN
+CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csGenmeshMeshObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)

@@ -36,7 +36,7 @@
 #include "walimage.h"
 #include "walpal.h"
 
-CS_IMPLEMENT_PLATFORM_PLUGIN
+CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csWALImageIO)
   SCF_IMPLEMENTS_INTERFACE (iImageIO)

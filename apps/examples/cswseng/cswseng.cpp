@@ -56,7 +56,7 @@
 #define SET_BIT(var,mask,state) \
   var = (var & ~(mask)) | ((state) ? (mask) : 0);
 
-CS_IMPLEMENT_PLATFORM_APPLICATION
+CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 

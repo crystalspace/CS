@@ -32,7 +32,7 @@
 #include <SDL_mutex.h>
 #include <SDL_thread.h>
 
-CS_IMPLEMENT_PLATFORM_PLUGIN
+CS_IMPLEMENT_PLUGIN
 
 // If you want to enable "drawing thread" functionality. This
 // includes NICE ALPHA mouse cursors for ANY SDL mode.

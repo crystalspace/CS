@@ -2196,7 +2196,7 @@ SCF_EXPORT_CLASS_TABLE (csparser)
     "crystalspace.mesh.crossbuilder, crystalspace.modelconverter.")
 SCF_EXPORT_CLASS_TABLE_END
 
-CS_IMPLEMENT_PLATFORM_PLUGIN
+CS_IMPLEMENT_PLUGIN
 
 csLoader::csLoader (iBase *p)
 {

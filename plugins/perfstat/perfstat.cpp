@@ -35,7 +35,7 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 
-CS_IMPLEMENT_PLATFORM_PLUGIN
+CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csPerfStats)
 

@@ -36,7 +36,7 @@
 #include "csutil/util.h"
 #include "qsqrt.h"
 
-CS_IMPLEMENT_PLATFORM_APPLICATION
+CS_IMPLEMENT_APPLICATION
 
 //-- Gui -------------------------------------------------------------------
 

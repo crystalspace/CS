@@ -33,7 +33,7 @@
  SCF macro section
 =========================================================================*/
 
-CS_IMPLEMENT_PLATFORM_PLUGIN
+CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGraphics3DOpenGL)
 
