@@ -37,7 +37,7 @@
 #include <string.h>
 #include "def.h"
 #include "csutil/inifile.h"
-
+#include "csutil/vfs.h"
 
 #if _MSC_VER > 1000
 #pragma once
@@ -122,8 +122,9 @@ public:
 	virtual ~converter();
 	int      comline ( const char* input_filename,
 	  bool create_output_file, const char* output_filename );
-	int ivcon( const char* input_filename, bool keep_log = true,
-	  bool create_output_file = true, const char* output_filename = NULL );
+	int ivcon ( const char* input_filename, bool keep_log = true,
+	  bool create_output_file = true, const char* output_filename = NULL,
+        csVFS * vfs = NULL );
 
         void ProcessConfig( csIniFile* config );
 	void set_reverse_normals( int yesno );
@@ -181,6 +182,9 @@ int    num_object;
 int    num_texmap;
 int    num_text;
 char   object_name[81];
+
+/// pointer to a Crystal Space Virtual File System object
+csVFS * Vfs;
 
 private:
 

@@ -83,12 +83,14 @@ void converter::set_reverse_normals (int flag)
 
 /******************************************************************************/
 
-int converter::ivcon( const char* input_filename, bool keep_log,
-  bool create_output_file, const char* output_filename ) {
+int converter::ivcon ( const char* input_filename, bool keep_log,
+  bool create_output_file, const char* output_filename, csVFS * vfs) {
 
 /******************************************************************************/
 
   int result;
+
+  Vfs = vfs;
 
   if (keep_log)
     logfile = fopen("ivcon.log","a");
@@ -676,6 +678,18 @@ int converter::data_read ( void ) {
     fprintf ( logfile,  "\n" );
     fprintf ( logfile,  "DATA_READ: Input file has type %s.\n", filein_type );  
   }
+
+/*
+  copy file from VFS into a temporary file.
+*/
+  if (Vfs)
+  {
+    size_t size;
+    char * buf = Vfs->ReadFile (filein_name, size);
+    Vfs->WriteFile ("/this/temp", buf, size);
+    delete buf;
+  }
+
 /* 
   Open the file. 
 */
@@ -683,10 +697,10 @@ int converter::data_read ( void ) {
        (leqi ( filein_type, "MD2" ) == TRUE ) ||
        (leqi ( filein_type, "MDL" ) == TRUE ) )
   {
-    filein = fopen ( filein_name, "rb" );
+    filein = fopen ( Vfs ? "temp" : filein_name, "rb" );
   }
   else {
-    filein = fopen ( filein_name, "r" );
+    filein = fopen ( Vfs ? "temp" : filein_name, "r" );
   }
 
   if ( filein == NULL ) {

@@ -79,6 +79,10 @@ protected:
   };
 
 public:
+
+//  csWorld * world;
+//  void Initialize (csWorld * w) {world = w;}
+
   ///
   static csMatrix3 load_matrix (char* buf);
   ///
