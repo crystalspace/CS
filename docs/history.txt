@@ -53,7 +53,7 @@ chronological order.
 	- Eric Sunshine fixed bug in csSCF::GetPluginMetadata() in which it had
 	  not been properly (fully) updated to deal with csStringID following
 	  the 13-Nov-2004 change to SCF to make the data structures share
-	  library and factory names via csStrSet.  This resulted in
+	  library and factory names via csStringSet.  This resulted in
 	  GetPluginMetadata() sometimes failing to return a valid meta-data
 	  document.
 	- Marten fixed a few issues in NR software renderer:
