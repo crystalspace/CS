@@ -210,6 +210,11 @@ void csMeshWrapper::Draw (iRenderView* rview)
     {
       csOrthoTransform& orig_trans = orig_cam->GetTransform ();
 
+#if 0
+      //csVector3 v = -orig_trans.GetT2OTranslation ();
+      csVector3 v = orig_trans.GetO2TTranslation ();
+      trans.Translate (trans.GetT2O () * v);
+#else
       // First we use the current camera transformation to transform the origin
       // of the camera (0) in camera space to world space. i.e. we get the
       // position of the camera in world space. It is important to realize
@@ -230,6 +235,7 @@ void csMeshWrapper::Draw (iRenderView* rview)
 
       // We use this offset 'v' instead of the original translation.
       trans.SetO2TTranslation (-v);
+#endif
     }
     else
     {

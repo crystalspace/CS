@@ -226,12 +226,12 @@ csTransform operator* (const csTransform& t1, const csReversibleTransform& t2)
   return csTransform (t1.m_o2t*t2.m_o2t, t2.v_o2t + t2.m_t2o*t1.v_o2t);
 }
 
-csReversibleTransform& operator/=(csReversibleTransform& t1,
+csReversibleTransform& operator/= (csReversibleTransform& t1,
                                 const csReversibleTransform& t2)
 {
-  t1.v_o2t = t2.m_o2t*(t1.v_o2t - t2.v_o2t);
+  t1.v_o2t = t2.m_o2t * (t1.v_o2t - t2.v_o2t);
   t1.m_o2t *= t2.m_t2o;
-  t1.m_t2o = t2.m_o2t*t1.m_t2o;
+  t1.m_t2o = t2.m_o2t * t1.m_t2o;
   return t1;
 }
 

@@ -159,12 +159,13 @@ void csPortal::SetWarp (const csTransform& t)
   flags.Set (CS_PORTAL_WARP);
   warp_obj = t;
   csMatrix3 m = warp_obj.GetO2T ();
-  flags.SetBool (CS_PORTAL_MIRROR, ( ( ( m.Col1() % m.Col2() ) * m.Col3() ) < 0 ));
+  flags.SetBool (CS_PORTAL_MIRROR, ((( m.Col1() % m.Col2() ) * m.Col3()) < 0));
 
   warp_wor = warp_obj;
 }
 
-void csPortal::SetWarp (const csMatrix3& m_w, const csVector3& v_w_before, const csVector3& v_w_after)
+void csPortal::SetWarp (const csMatrix3& m_w, const csVector3& v_w_before,
+  const csVector3& v_w_after)
 {
   flags.Set (CS_PORTAL_WARP);
 
@@ -177,7 +178,7 @@ void csPortal::SetWarp (const csMatrix3& m_w, const csVector3& v_w_before, const
   // will equal +1 or -1, depending on whether the transform is
   // mirroring.
   csMatrix3 m = warp_obj.GetO2T ();
-  flags.SetBool (CS_PORTAL_MIRROR, ( ( ( m.Col1() % m.Col2() ) * m.Col3() ) < 0 ));
+  flags.SetBool (CS_PORTAL_MIRROR, ((( m.Col1() % m.Col2() ) * m.Col3()) < 0));
 
   warp_wor = warp_obj;
 }
@@ -189,9 +190,9 @@ const csReversibleTransform& csPortal::GetWarp () const
 
 void csPortal::SetFilter (iTextureHandle* ft)
 {
+  if (ft) ft->IncRef ();
   if (filter_texture) filter_texture->DecRef ();
   filter_texture = ft;
-  if (filter_texture) filter_texture->IncRef ();
 }
 
 iTextureHandle* csPortal::GetTextureFilter () const

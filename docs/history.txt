@@ -23,6 +23,7 @@ he history order is reversed so that new features are at the top.
 	  post-processing step on files generated for online browsing.  In
 	  particular, it now runs a script which sets up the User's Manual and
 	  the API reference to accept user-annotation.
+	- Made csPortal::SetFilter() safer.
 20-Jan-2002
 	- Tobias Brueckner did the following:
 	    - Fixed a potential initialization bug in the GLX OpenGL
