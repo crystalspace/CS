@@ -52,7 +52,8 @@ ifeq ($(PROC),invalid)
 	@echo $"  make win32vc      Prepare for building under and for Win32 using MSVC$"
 	@echo $"  -*- Modifiers -*-$"
 else
-	@echo $"  Configured for $(DESCRIPTION.$(TARGET)) USE_DLL=$(USE_DLL) MODE=$(MODE) $(SYSMODIFIERS)$"
+	@echo $"  Configured for $(DESCRIPTION.$(TARGET)) with the following modifiers:$"
+	@echo $"  USE_DLL=$(USE_DLL) MODE=$(MODE) $(SYSMODIFIERS)$"
 	@echo $"  Other platforms are: linux, solaris, freebsd, beos, os2gcc, os2wcc, djgpp,$"
 	@echo $"  nextstep, openstep, rhapsody, amiga or win32vc with the following modifiers:$"
 endif
@@ -113,6 +114,3 @@ amiga unknown win32vc:
 
 MAKESECTION=roottargets
 include mk/subs.mak
-
-# Export all variables into environment so that submake processes can use them
-.EXPORT_ALL_VARIABLES:
