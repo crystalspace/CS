@@ -33,6 +33,7 @@ public:
   void SetPageSize(int size);
   void SetTopLine(int line);
   void SetCurLine(int line);
+  void DeleteLine(int line);
 
   inline int GetLength() const { return len; }
   inline int GetPageSize() const { return page_size; }

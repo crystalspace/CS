@@ -24,6 +24,7 @@
 #include "csutil/scf.h"
 
 class csRect;
+class csString;
 struct iTextureManager;
 struct iCursor;
 
@@ -55,7 +56,7 @@ enum CursorConst
  * Alpha transparency (not directly supported by 2D driver)
  * Background texture(s) (may not be available during startup)
  */
-SCF_VERSION(iConsole, 0, 0, 2);
+SCF_VERSION(iConsole, 0, 0, 3);
 struct iConsole : public iPlugIn
 {
   /// Show the console   !DEPRECATED!
@@ -65,6 +66,9 @@ struct iConsole : public iPlugIn
 
   /// Print a string to the console
   virtual void PutText(const char *text) = 0;
+
+  /// Return a line from the buffer (-1 = current line)
+  virtual const csString *GetText(int line = -1) const = 0;
 
   /// Update the console on the window.
   virtual void Draw(csRect *rect = NULL) = 0;

@@ -123,9 +123,14 @@ void csConsole::PutText(const char *text)
     case '\b':
       // @@@ Should we handle backspaces to previous lines?  Probably...
       if(cx>0) {
-	// Delete the character before the cursor, and move the cursor back
-	curline = buffer->WriteLine();
-	curline->DeleteAt(--cx);
+	if(cx==1) {
+	  cx = 0;
+	  buffer->DeleteLine(cy);
+	} else {
+	  // Delete the character before the cursor, and move the cursor back
+	  curline = buffer->WriteLine();
+	  curline->DeleteAt(--cx);
+	}
       }
       break;
     case '\t':
@@ -142,6 +147,12 @@ void csConsole::PutText(const char *text)
   // Update cursor X position
   if(curline!=NULL)
     cx = curline->Length();
+}
+
+const csString *csConsole::GetText(int line) const
+{
+  bool dirty;
+  return buffer->GetLine((line==-1) ? buffer->GetCurLine() : line, dirty);
 }
 
 void csConsole::Draw(csRect *area)

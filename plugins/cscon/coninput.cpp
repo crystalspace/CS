@@ -51,16 +51,14 @@ bool csConsoleInput::Initialize(iSystem *system)
 
 bool csConsoleInput::HandleEvent(csEvent &event)
 {
+
   if(event.Type==csevKeyDown) {
     csString *line;
 
     // Printable keys only, please
     if((event.Key.Code < CSKEY_FIRST)&&(event.Key.Code != CSKEY_ESC)) {
 
-      if(piConsole) {
-	csString put((char) event.Key.Code);
-	piConsole->PutText(put.GetData());
-      }
+      bool echo = true;
 
       // Handle special cases
       switch(event.Key.Code) {
@@ -70,18 +68,27 @@ bool csConsoleInput::HandleEvent(csEvent &event)
 	break;
       case CSKEY_BACKSPACE:
 	{
-	  int cx;
+	  int cx, cy;
 	  line = buffer->WriteLine();
 	  /* Backspace will only handle deleting last character if it can't
 	   * retrieve the cursor position from the console!!! */
 	  if(piConsole) {
-	    int cy;
 	    piConsole->GetCursorPos(cx, cy);
-	  } else
+	    const csString *otherline = piConsole->GetText(cy);
+	    // Account for prompts, etc.
+	    if(otherline!=NULL)
+	      cx -= otherline->Length() - line->Length();
+	  } else {
 	    cx = line->Length();
+	    cy = buffer->GetCurLine();
+	  }
 	  // Delete the last character in the current line
-	  if(cx>0)
+	  if(cx>1)
 	    line->DeleteAt(cx-1);
+	  else if (cx==1)
+	    buffer->DeleteLine(cy);
+	  else
+	    echo = false;
 	  break;
 	}
       default:
@@ -90,6 +97,12 @@ bool csConsoleInput::HandleEvent(csEvent &event)
 	line->Append((char) event.Key.Code);
 	break;
       }
+
+      if(piConsole&&echo) {
+	csString put((char) event.Key.Code);
+	piConsole->PutText(put.GetData());
+      }
+
     }
   }
 #ifdef DEBUG

@@ -189,3 +189,23 @@ void csConsoleBuffer::SetCurLine(int line)
   else
     current_line = line;
 }
+
+void csConsoleBuffer::DeleteLine(int line)
+{
+
+  int pos;
+
+  // Mix for disaster?
+  if(line<=display_bottom)
+    pos = display_top + line;
+  else
+    pos = line;
+
+  // Delete the given line
+  delete buffer[pos];
+  buffer[pos] = NULL;
+
+  // Set the dirty flag
+  dirty[pos] = true;
+
+}

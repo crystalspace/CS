@@ -43,6 +43,7 @@ public:
   virtual bool IsActive() const;
   virtual void Clear();
   virtual void PutText(const char *text);
+  virtual const csString *GetText(int line = -1) const;
   virtual void Draw(csRect *rect);
   virtual void SetBufferSize(int lines);
   virtual void CacheColors(iTextureManager *txtmgr);
