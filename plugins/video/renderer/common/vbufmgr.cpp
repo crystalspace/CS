@@ -82,7 +82,7 @@ csVertexBufferManager::~csVertexBufferManager()
 
   /// go through list of registered client and tell 'em we are no longer
   /// available
-  for (int i=0; i < vClients.Length (); i++)
+  for (size_t i=0; i < vClients.Length (); i++)
     vClients[i]->ManagerClosing ();
     
   SCF_DESTRUCT_IBASE();
