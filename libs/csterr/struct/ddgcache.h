@@ -353,7 +353,7 @@ public:
 		if (n->next())
 			return n->next();
 		// Find next bucket with something in it.
-		while (--b > _tail && !_bucket[b] ){}
+		while (--b > (short)_tail && !_bucket[b] ){}
 		return b < 0 ? 0 : _bucket[b];
 	}
 };
