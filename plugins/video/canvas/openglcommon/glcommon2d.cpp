@@ -17,7 +17,6 @@
 */
 
 #include <stdarg.h>
-#include <windows.h>
 
 #include "sysdef.h"
 #include "csutil/scf.h"
