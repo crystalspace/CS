@@ -23,7 +23,7 @@
 #include "tcache.h"
 #include "soft_txt.h"
 #include "sft3dcom.h"
-#include "imesh/thing/polygon.h"	//@@@ LOGICALLY NOT FROM MESH OBJECT!
+#include "imesh/thing/polygon.h"    //@@@ LOGICALLY NOT FROM MESH OBJECT!
 #include "sttest.h"
 
 /// The only instance of this structure lives here
@@ -145,9 +145,9 @@ void csScan_CalcBlendTables (unsigned char *BlendingTable[], int rbits,
       {
         unsigned int dst = (d << add_shft) + add_val;
         // Calculate all the available blendingmodes supported.
-        #define CALC(idx,val)						     \
-        {								     \
-          register unsigned int tmp = val;				     \
+        #define CALC(idx,val)                            \
+        {                                    \
+          register unsigned int tmp = val;                   \
           BlendingTable [idx] [index] = (tmp < max_val) ? tmp : max_val;\
         }
         CALC (BLENDTABLE_ADD,       dst + src);
@@ -176,8 +176,8 @@ void csScan_Finalize ()
 }
 
 void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,
-  /*iPolygonTexture* tex*/csPolyTextureMapping* tmapping, 
-  csPolyLightMapMapping* mapping, csSoftRendererLightmap* rlm, 
+  /*iPolygonTexture* tex*/csPolyTextureMapping* tmapping,
+  csPolyLightMapMapping* mapping, csSoftRendererLightmap* rlm,
   csTextureHandleSoftware* texture,
   csTextureSoftware *untxt)
 {
@@ -195,17 +195,22 @@ void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,
 
   if (g3d->do_lighting)
   {
-    SoftwareCachedTexture *tclt = 
+    SoftwareCachedTexture *tclt =
       rlm ? (SoftwareCachedTexture *)rlm->cacheData[MipMap] : 0;
     if (tclt)
       Scan.bitmap2 = tclt->get_bitmap ();
     else
-      Scan.bitmap2 = 0;	// Not a lighted texture.
+      Scan.bitmap2 = 0; // Not a lighted texture.
   }
   else
     Scan.bitmap2 = 0;
-  Scan.tw2 = mapping->GetWidth () >> MipMap;
-  Scan.th2 = mapping->GetHeight () >> MipMap;
+  if(mapping) {
+      Scan.tw2 = mapping->GetWidth () >> MipMap;
+      Scan.th2 = mapping->GetHeight () >> MipMap;
+  } else {
+      Scan.tw2 = 0;
+      Scan.th2 = 0;
+  }
   Scan.min_u = (tmapping->GetIMinU () >> MipMap) << 16;
   Scan.min_v = (tmapping->GetIMinV () >> MipMap) << 16;
 
@@ -220,7 +225,7 @@ void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,
 }
 
 void csScan_InitDrawFX (csTextureHandleSoftware* texture,
-    	csTextureSoftware *untxt)
+        csTextureSoftware *untxt)
 {
   Scan.shf_w = untxt->get_w_shift ();
   Scan.and_w = untxt->get_w_mask ();
