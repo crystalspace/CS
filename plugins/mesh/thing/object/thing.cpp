@@ -290,14 +290,13 @@ void csThingStatic::PrepareLMLayout ()
       int lmw = (csLightMap::CalcLightMapWidth (lm->GetOriginalWidth ()));
       int lmh = (csLightMap::CalcLightMapHeight (lm->GetHeight ()));
       lp->totalLumels += lmw * lmh;
-//printf ("lmw*lmh=%d\n", lmw*lmh); fflush (stdout);
     }
 
     lp->polys.Push (polyIdx);
   }
 
   /*
-    Presort polys.
+   * Presort polys.
    */
   csArray<csStaticPolyGroup*> polys;
   {
@@ -363,13 +362,17 @@ static int CompareStaticPolys (int const& i1, int const& i2)
 
   int maxdim1, mindim1, maxdim2, mindim2;
 
-  maxdim1 = MAX (csLightMap::CalcLightMapWidth (lm1->GetOriginalWidth ()), 
+  maxdim1 = MAX (
+    csLightMap::CalcLightMapWidth (lm1->GetOriginalWidth ()), 
     csLightMap::CalcLightMapHeight (lm1->GetHeight ()));
-  mindim1 = MIN (csLightMap::CalcLightMapWidth (lm1->GetOriginalWidth ()), 
+  mindim1 = MIN (
+    csLightMap::CalcLightMapWidth (lm1->GetOriginalWidth ()), 
     csLightMap::CalcLightMapHeight (lm1->GetHeight ()));
-  maxdim2 = MAX (csLightMap::CalcLightMapWidth (lm2->GetOriginalWidth ()), 
+  maxdim2 = MAX (
+    csLightMap::CalcLightMapWidth (lm2->GetOriginalWidth ()), 
     csLightMap::CalcLightMapHeight (lm2->GetHeight ()));
-  mindim2 = MIN (csLightMap::CalcLightMapWidth (lm2->GetOriginalWidth ()), 
+  mindim2 = MIN (
+    csLightMap::CalcLightMapWidth (lm2->GetOriginalWidth ()), 
     csLightMap::CalcLightMapHeight (lm2->GetHeight ()));
 
   if (maxdim1 == maxdim2)
@@ -380,11 +383,11 @@ static int CompareStaticPolys (int const& i1, int const& i2)
   return (maxdim1 - maxdim2);
 }
 
-void csThingStatic::DistributePolyLMs (const csStaticPolyGroup& inputPolys,
-				       csPDelArray<csStaticLitPolyGroup>& outputPolys, 
-				       csStaticPolyGroup* rejectedPolys)
+void csThingStatic::DistributePolyLMs (
+	const csStaticPolyGroup& inputPolys,
+	csPDelArray<csStaticLitPolyGroup>& outputPolys, 
+	csStaticPolyGroup* rejectedPolys)
 {
-
   struct internalPolyGroup : public csStaticPolyGroup
   {
     int totalLumels;
@@ -420,8 +423,10 @@ void csThingStatic::DistributePolyLMs (const csStaticPolyGroup& inputPolys,
       continue;
     }
 
-    int lmw = (csLightMap::CalcLightMapWidth (lm->GetOriginalWidth ()) + LM_BORDER);
-    int lmh = (csLightMap::CalcLightMapHeight (lm->GetHeight ()) + LM_BORDER);
+    int lmw = (csLightMap::CalcLightMapWidth (lm->GetOriginalWidth ())
+    	+ LM_BORDER);
+    int lmh = (csLightMap::CalcLightMapHeight (lm->GetHeight ())
+    	+ LM_BORDER);
 
     if ((lmw > thing_type->maxLightmapW) || 
       (lmh > thing_type->maxLightmapH)) 
@@ -443,14 +448,14 @@ void csThingStatic::DistributePolyLMs (const csStaticPolyGroup& inputPolys,
   {
     // Try to fit as much polys as possible into the SLMs.
     int s = 0;
-    while ((s < superLMs.Length ()) && (inputQueues[curQueue].polys.Length () > 0))
+    while ((s<superLMs.Length ()) && (inputQueues[curQueue].polys.Length ()>0))
     {
       StaticSuperLM* slm = superLMs[s];
 
       /*
-	If the number of free lumels is less than the number of lumels in the smallest LM,
-	we can break testing SLMs. SLMs are sorted by free lumels, so subsequent SLMs won't
-	have any more free space.
+       * If the number of free lumels is less than the number of lumels in
+       * the smallest LM, we can break testing SLMs. SLMs are sorted by free
+       * lumels, so subsequent SLMs won't have any more free space.
        */
       if (slm->freeLumels < inputQueues[curQueue].minLMArea)
       {
@@ -474,8 +479,10 @@ void csThingStatic::DistributePolyLMs (const csStaticPolyGroup& inputPolys,
 
 	csPolyLightMapMapping* lm = sp->GetLightMapMapping ();
 
-	int lmw = (csLightMap::CalcLightMapWidth (lm->GetOriginalWidth ()) + LM_BORDER);
-	int lmh = (csLightMap::CalcLightMapHeight (lm->GetHeight ()) + LM_BORDER);
+	int lmw = (csLightMap::CalcLightMapWidth (lm->GetOriginalWidth ())
+		+ LM_BORDER);
+	int lmh = (csLightMap::CalcLightMapHeight (lm->GetHeight ())
+		+ LM_BORDER);
 
 	csRect r;
 	if ((lmw * lmh) <= slm->freeLumels)
@@ -1683,7 +1690,6 @@ void csThing::PreparePolygonBuffer ()
 	verts.Push (vnum);
       }
 
-//printf ("i=%d j=%d lm=%p\n", i, j, litPolys[i]->lightmaps[j]); fflush (stdout);
       polybuf->AddPolygon (spoly->GetVertexCount (), verts.GetArray (), 
 	tmapping, mapping, 
 	spoly->GetObjectPlane (), 
@@ -2313,7 +2319,6 @@ void csThing::PrepareLMs ()
   int i;
   for (i = 0; i < static_data->litPolys.Length(); i++)
   {
-//printf ("PrepareLMs i=%d\n", i); fflush (stdout);
     const csThingStatic::csStaticLitPolyGroup& slpg = 
       *(static_data->litPolys[i]);
 
@@ -2354,7 +2359,6 @@ void csThing::PrepareLMs ()
       int j;
       for (j = 0; j < slpg.polys.Length(); j++)
       {
-//printf ("    PrepareLMs j=%d\n", j); fflush (stdout);
 	csPolygon3D* poly = polygons[slpg.polys[j]];
 
 	lpg->polys.Push (poly);
