@@ -299,7 +299,7 @@ csString &csString::RTrim()
     for (i = Size - 1; i >= 0; i--)
       if (!isspace ((unsigned char)Data[i]))
         break;
-    if (i < int(Size - 1))
+    if (i < Size - 1)
       Truncate(i + 1);
   }
   return *this;
