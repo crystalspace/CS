@@ -54,7 +54,7 @@ public:
 
   /// Setup a pass.
   virtual bool SetupPass(csRenderMesh *mesh,
-    csArray<iShaderVariableContext*> &dynamicDomains);
+    const csArray<iShaderVariableContext*> &dynamicDomains);
 
   /**
   * Tear down current state, and prepare for a new mesh 

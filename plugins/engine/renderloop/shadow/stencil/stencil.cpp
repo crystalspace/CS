@@ -513,6 +513,7 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
     shadowCacheEntry->UpdateBuffers ();
     dynContext.Push(shadowCacheEntry->dynDomain);
     dynContext.Push(shmgr);
+    if (rmesh.dynDomain) dynContext.Insert (0, rmesh.dynDomain);
     shader->SetupPass(&rmesh, dynContext);
     if (shadowCacheEntry->ShadowCaps())
     {

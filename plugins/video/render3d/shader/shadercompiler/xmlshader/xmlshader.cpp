@@ -710,12 +710,10 @@ bool csXMLShader::DeactivatePass ()
 }
 
 bool csXMLShader::SetupPass (csRenderMesh *mesh,
-                             csArray<iShaderVariableContext*> &dynamicDomains)
+	const csArray<iShaderVariableContext*> &dynamicDomains)
 {
   if(currentPass>=passesCount)
     return false;
-
-  if (mesh->dynDomain) dynamicDomains.Insert(0, mesh->dynDomain);
 
   shaderPass *thispass = &passes[currentPass];
 

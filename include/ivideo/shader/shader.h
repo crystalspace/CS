@@ -141,8 +141,8 @@ struct iShader : public iShaderVariableContext
   virtual bool ActivatePass(unsigned int number) = 0;
 
   /// Setup a pass.
-  virtual bool SetupPass(csRenderMesh *mesh,
-    csArray<iShaderVariableContext*> &dynamicDomains) = 0;
+  virtual bool SetupPass (csRenderMesh *mesh,
+    const csArray<iShaderVariableContext*> &dynamicDomains) = 0;
 
   /**
    * Tear down current state, and prepare for a new mesh 

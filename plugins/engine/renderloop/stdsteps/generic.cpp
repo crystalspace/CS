@@ -195,6 +195,7 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
         dynDomain.Push (mesh_material->GetMaterial ());
       }
 
+      if (mesh->dynDomain) dynDomain.Insert (0, mesh->dynDomain);
       shader->SetupPass (mesh, dynDomain);
       g3d->DrawMesh (mesh);
       shader->TeardownPass ();
