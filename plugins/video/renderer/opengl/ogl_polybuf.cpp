@@ -207,7 +207,6 @@ csTrianglesPerSuperLightmap* csTriangleArrayPolygonBuffer::
     SearchFittingSuperLightmap (iPolygonTexture* poly_texture,
                                 csRect& rect,int /*num_vertices*/)
 {
-  int i;
   if (poly_texture == NULL || poly_texture->GetLightMap () == NULL)
   {
     // OK This polygon has no lightmap.

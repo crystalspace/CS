@@ -5427,8 +5427,8 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
 
         const unsigned char * programErrorString=glGetString(GL_PROGRAM_ERROR_STRING_ARB);
 
-        int errorPos;
-	      glGetIntegerv(GL_PROGRAM_ERROR_POSITION_ARB, &errorPos);
+        GLint errorPos;
+	glGetIntegerv(GL_PROGRAM_ERROR_POSITION_ARB, &errorPos);
 
         if(errorPos != -1)
         {
