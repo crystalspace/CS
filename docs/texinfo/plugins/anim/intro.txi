@@ -1,0 +1,38 @@
+@c -*-texinfo-*-
+@node Introduction, Sprite Actions, Animation, Animation
+@subsection Introduction
+
+@emph{Written by Michael Voase,
+@email{mvoase@@midcoast.com.au}.}
+
+Crystal Space provides two basic mechanisms for aniating sprites. The first
+is frame based animation in which a mesh is defined in each frame and used
+in a loop. The second method is skeletal animation where a skeleton is
+defined in the sprite and an interface (@code{iSkeletonBone}). 
+
+For the purpose of this document I will describe frame based animation as 
+an  @emph{action}. This name is coined from the class the implements frame
+animations in sprite3d @code{csSpriteAction2} and has been traditionally
+referred to as an @code{ACTION} in the sprite loader plug in.
+
+Further, I will also refer to skeletal based animation as a @emph{motion}.
+This term is coined from the Motion Manager which provides the facilities
+for automating a skeletal animation sequence. Skeletal animation sequences
+have been traditionally referred to as a @code{MOTION} in the motion loader
+plug in.
+
+This document presumes that you have an operational copy of crystal space.
+For details on obtaining and building crystal space please refer to the
+relevent sections on obtaining (@xref{Where to Get}) and building 
+(@xref{Building}) crystal space.
+
+I also presume that you have a world file that you can edit to try out much
+of what is written here. If you havent then it might be a good idea to look
+for the motion-HOWTO in the data directory for a sample world file. In each
+case I will start with the world file definitions then move to the application
+interfaces to round out the commentary.
+
+Lastly, actions and motions are specific to sprite 3d. There is no exactly
+corresponding interface to thing or ball as yet, for example. So I am also
+presuming you have read to sections prior to this section about sprites, if
+not, then it would be a good idea to do so before delving into this section.

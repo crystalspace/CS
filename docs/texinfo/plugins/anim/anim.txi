@@ -1,0 +1,37 @@
+@c -*-texinfo-*-
+@node Animation, , csPython, Plug-In Drivers
+@section Animation
+@cindex Animation
+
+@emph{Written by Michael Voase,
+@email{mvoase@@midcoast.com.au}.}
+
+After you have created your sprite you are now probably wondering
+what you can do to bring your creation to life? In this section
+we explore the two ways in which you can introduce animation
+sequences to your sprite. We will then round the discussion out
+with a description of how to use the skeletal animtion directly
+from you application.
+
+For the Crystal Space developer, there are currently two options
+for the production and management of sprite animation. The first
+option is frame based animation, referred to as an action, and the
+second is skeletal animation, referred to as a motion. As of
+writing this document, the two are seperate. However, in the
+not too distant future I expect that this situation will change.
+
+@menu
+* Introduction::
+* Sprite Actions::
+* The Sprite Action Interface::
+* Moving On::
+* Canned Sequences::
+* iSkeletonBone::
+@end menu
+
+@importss{plugins,anim,intro.txi}
+@importss{plugins,anim,action.txi}
+@importss{plugins,anim,actionpi.txi}
+@importss{plugins,anim,skeleton.txi}
+@importss{plugins,anim,motion.txi}
+@importss{plugins,anim,skelbone.txi}

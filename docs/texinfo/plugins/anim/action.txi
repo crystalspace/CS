@@ -1,0 +1,153 @@
+@c -*-texinfo-*-
+@node Sprite Actions, The Sprite Action Interface, Introduction, Animation
+@subsection Sprite Actions
+
+@emph{Written by Michael Voase,
+@email{mvoase@@midcoast.com.au}.}
+
+A sprite action is a series of frames which contains the position of each
+vertex in a sprite for a particular time. This means for each frame, a
+complete duplicate of the vertex list must be loaded into the sprite for
+each frame. The positions of the vertices of course will vary, however, the
+number of vertices in each frame must be equal. We will cover why later.
+
+@subsubheading Creating a Sprite in a World File
+
+A sprite in a world file consists of two declaration. The first is the
+declaration for its @emph{factory} the second is a declaration of its 
+@emph{instance} in a given sector. The factory declaration is what we are
+mostly interested in at the moment.
+
+Now if you recall from Mesh Object Concepts @xref{MeshObject Concepts}, the
+factory acts as a database of all the vertices, triangles and texels used
+to define a mesh object. The primary purpose of this is have a signle
+database for each mesh object. So this is where we will be defining our
+sprite with its multiple actions.
+
+The declaration starts with the MESHFACT token, and looks something like:
+
+@example
+MESHFACT 'fact' (
+  PLUGIN(crystalspace.mesh.loader.factory.sprite.3d)
+  PARAMS(
+	MATERIAL(white)
+	FRAME 'first' (
+	  V(0,0,0:0,0) ; 0
+	  V(0,1,0:0,0) ; 1
+	  V(1,0,0:0,0) ; 2
+	  V(0,0,1:0,0) ; 3
+	)
+	FRAME 'second' (
+	  V(0,0,0:0,0)   ; 0
+	  V(0,1.2,0:0,0) ; 1
+	  V(1.2,0,0:0,0) ; 2
+	  V(0,0,1.2:0,0) ; 3
+	)
+	FRAME 'third' (
+	  V(0,0,0:0,0)   ; 0
+	  V(0,1.4,0:0,0) ; 1
+	  V(1.4,0,0:0,0) ; 2
+	  V(0,0,1.4:0,0) ; 3
+	)
+	FRAME 'forth' (
+	  V(0,0,0:0,0)   ; 0
+	  V(0,1.2,0:0,0) ; 1
+	  V(1.2,0,0:0,0) ; 2
+	  V(0,0,1.2:0,0) ; 3
+	)
+
+	TRIANGLE(0,1,2)
+	TRIANGLE(0,3,1)
+	TRIANGLE(0,2,3)
+	TRIANGLE(1,3,2)
+
+	ACTION 'default' (
+	  F('first',200)
+	  F('second',200)
+	  F('third',200)
+	  F('forth',200)
+	)
+  )
+)
+@end example
+
+This example defines a triangular pyramid which grow larger and smaller.
+To put this sprite into action, you also need to declare an instance of
+the sprite in a sector. In your world file ( somewhere inside a @code{SECTOR}
+declaration ), place the following mesh object declaration.
+
+@example
+  MESHOBJ 'test1' (
+	PLUGIN ('crystalspace.mesh.loader.sprite.3d')
+	PARAMS (
+	  FACTORY('fact')
+	  ACTION('default')
+	  TWEEN(false)
+	)
+	MOVE(V(0,0,5.0))
+	PRIORITY('object')
+	ZUSE()
+  )
+@end example
+
+After zipping the world file up with your sprite you should see and active
+sprite five units in front of you.
+
+@subsubheading The Meaning of the Sprite
+
+OK we have an example of a an animation. As you can see from the example,
+the sprite @emph{factory} declaration, the sprite consists of four frames
+each enclosed in the @code{FRAME} keyword. Each frame defines the vertices
+of the pyramid in each frame. The @code{V} token stands for @emph{vertex}.
+You will also note that each frame contains a name. This is important as the
+name is used to reference the frame. This applies to both world files and
+the sprite 3d interface.
+
+After the frames have been defined, a list of triangles is then declared.
+Note that the @code{TRIANGLE} tokens are declared after the frames. Trying
+to define the triangles before the frames will result in an error and will
+be flagged as such. Each @code{TRIANGLE} declaration contains three indecies
+to the defined frame vertices. The index starts at zero and has a maximum
+value equal the number of vertices minus one. During the course of animation
+the triangle lists are applied to the corresponding frame and are then
+sent to the graphics renderer. This is one reason why each frame must
+contain the same number of vertices. Lastly, at the end of the mesh factory
+declaration, there is an @code{ACTION} declared. 
+
+@subsubheading The Action Declaration
+
+The declaration starts with the @code{ACTION} token and is then followed by
+the name of the action. Setting the name is important as this is how you
+will reference the action both in the world file and in the sprite interface.
+Its also a good idea @emph{not} to use the same name twice, as you will prevent
+the second action from being accessed. You can use the same name for an action
+and a frame, as they are stored in different places. In general though,
+never use the same name for two items of the same type, wether it be a mesh
+object, a frame, a motion or whatever.
+
+After the name of the action, we enter into the body of the action where the
+frame @emph{sequences} are defined. Each frame of the sequence starts with
+the @code{F} token ( standing for frame ) and contains the name of the frame
+and the duration that it is valid for. The frame name must be one from the 
+previous list of frames and the duration is in milliseconds. The duration 
+represents how long the frame will be shown for. This sprite contains only
+one action. It can contain many actions. However, in all cases there must be
+at least one action ( usually called @emph{default} ) defined for the sprite.
+
+Lastly to implement this action, the @code{ACTION} keyword is used in the
+mesh object declaration to tell the engine which action to use on this sprite
+instance. If no action is defined in the mesh object then the engine will
+use the first action defined in the factory reguardless of its name.
+
+@subsubheading Tweening and Actions.
+
+You may have noticed that the animation looks somewhat jumpy when viewed.
+This is due to the tweening flag on the sprite @emph{instance} being set
+to false. To enable tweening, set the tweening flag to true ( it is normally
+enabled ). Tweening is a method of producing a smoother animation by
+interpolating the position of the vertices between frame based on a ratio
+of the the time into the frame and the duration of the frame. Enabling
+tweening in an animation involves an additional overhead in calculating
+the interpolated vertices, however, produces a more satisfactory result.
+This is also the second reason why each frame must have the same number
+of vertices.
