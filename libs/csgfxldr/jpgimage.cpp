@@ -239,11 +239,10 @@ bool ImageJpgFile::Load (UByte* iBuffer, ULong iSize)
   // the jpeg lib will write a little further than it is supposed to.
   // (At least on Win32) In theory w*h would be enough!
   int pixelcount = (Width + 1) * (Height + 1);
-  void *NewImage;
   if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
-    CHKB (NewImage = new RGBPixel [pixelcount])
+    CHKB (Image = new RGBPixel [pixelcount])
   else
-    CHKB (NewImage = new UByte [pixelcount]);
+    CHKB (Image = new UByte [pixelcount]);
 
   /* JSAMPLEs per row in output buffer */
   row_stride = cinfo.output_width * cinfo.output_components;
@@ -268,10 +267,10 @@ bool ImageJpgFile::Load (UByte* iBuffer, ULong iSize)
 
     if (cinfo.output_components == 1)
       /* paletted image */
-      memcpy (((UByte *)NewImage) + bufp, buffer [0], row_stride);
+      memcpy (((UByte *)Image) + bufp, buffer [0], row_stride);
     else
     { /* rgb triplets */
-      RGBPixel *out = ((RGBPixel *)NewImage) + bufp;
+      RGBPixel *out = ((RGBPixel *)Image) + bufp;
       for (i = 0; i < (int)cinfo.output_width; i++)
         memcpy (out++, buffer [0] + i * 3, 3);
     }
