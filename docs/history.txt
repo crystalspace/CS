@@ -20,6 +20,9 @@ chronological order.
 	- Eric Sunshine added SCF_DESTRUCT_IBASE() invocations for each of the
 	  corresponding SCF_CONSTRUCT_IBASE() invocations in methods in
 	  CS/include and CS/libs.
+	- Eric Sunshine split Class::scfRemoveRefOwners() implementation in
+	  scf.h out into its own SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS() macro
+	  rather than having it bundled into SCF_IMPLEMENT_IBASE_DECREF().
 4-Nov-2003
 	- Jorrit fixed a bug in Dynavis history culling. In some cases objects
 	  could remain visible for longer then expected because the history

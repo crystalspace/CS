@@ -198,7 +198,15 @@ void Class::DecRef ()							\
     return;								\
   }									\
   scfRefCount--;							\
-}									\
+}
+
+/**
+ * The SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS() macro implements the
+ * scfRemoveRefOwners() method for a class in a C++ source module.  Typically,
+ * this macro is automatically employed by the SCF_IMPLEMENT_IBASE()
+ * convenience macro.
+ */
+#define SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS(Class)			\
 void Class::scfRemoveRefOwners ()					\
 {									\
   if (!scfWeakRefOwners) return;					\
@@ -272,6 +280,7 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
   SCF_IMPLEMENT_IBASE_DECREF(Class)					\
   SCF_IMPLEMENT_IBASE_GETREFCOUNT(Class)				\
   SCF_IMPLEMENT_IBASE_REFOWNER(Class)					\
+  SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS(Class)				\
   SCF_IMPLEMENT_IBASE_QUERY(Class)
 
 /**
