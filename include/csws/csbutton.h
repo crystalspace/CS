@@ -28,12 +28,14 @@
 #define CSBS_SHIFT		0x00000001
 /// Is this the default button?
 #define CSBS_DEFAULT		0x00000002
+/// Never draw a "default button" border
+#define CSBS_NODEFAULTBORDER	0x00000004
 /// Is this button selectable?
-#define CSBS_SELECTABLE		0x00000004
+#define CSBS_SELECTABLE		0x00000008
 /// Do not activate button when clicked by mouse
-#define CSBS_NOMOUSEFOCUS	0x00000008
+#define CSBS_NOMOUSEFOCUS	0x00000010
 /// Do not activate button when activated with keyboard
-#define CSBS_NOKEYBOARDFOCUS	0x00000010
+#define CSBS_NOKEYBOARDFOCUS	0x00000020
 /**
  * Button is a multi-choose button<p>
  * A multi-choose button sends a cscmdButtonDeselect to all its neightbours

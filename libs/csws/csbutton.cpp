@@ -97,7 +97,8 @@ void csButton::Draw ()
     li = CSPAL_BUTTON_LIGHT3D;
   } /* endif */
 
-  DefaultBorder = (parent->GetDefault () == this);
+  DefaultBorder = ((ButtonStyle & CSBS_NODEFAULTBORDER) == 0)
+    && ((parent->GetDefault () == this));
 
   // Draw the frame
   switch (FrameStyle)

@@ -29,12 +29,11 @@
 /// Minimal scroll bar size
 #define CSSB_MINIMAL_SIZE       (2+2+7)
 
-// The scroll button IDs
-#define BUTID_TOPLEFT           1001
-#define BUTID_BOTRIGHT          1002
-// pseudo-button IDs
-#define BUTID_SCROLLTOPLEFT     1003
-#define BUTID_SCROLLBOTRIGHT    1004
+// Scrolling state
+#define SCROLL_UL		1001	// scroll up or left (h/v scrollbars)
+#define SCROLL_DR		1002	// scroll down or right
+#define SCROLL_PAGE_UL		1003	// scroll up or left by pages
+#define SCROLL_PAGE_DR		1004	// scroll down or right by pages
 
 // Period of time to wait before scroll autorepeat
 #define SCROLL_START_INTERVAL   500
@@ -74,13 +73,16 @@ csScrollBar::csScrollBar (csComponent *iParent, csScrollBarFrameStyle iFrameStyl
   TrackScroller = false;
   FrameStyle = iFrameStyle;
   SetPalette (CSPAL_SCROLLBAR);
+
   // create both scroll buttons
   csButtonFrameStyle bfs = (FrameStyle == cssfsThickRect ? csbfsThickRect : csbfsThinRect);
-  CHK (topleft  = new csButton (this, cscmdNothing, CSBS_NOMOUSEFOCUS, bfs));
-  topleft->id = BUTID_TOPLEFT;
-  CHK (botright = new csButton (this, cscmdNothing, CSBS_NOMOUSEFOCUS, bfs));
-  botright->id = BUTID_BOTRIGHT;
-  CHK (scroller = new csButton (this, cscmdNothing, CSBS_NOMOUSEFOCUS, bfs));
+  const int bs = CSBS_NOMOUSEFOCUS | CSBS_NODEFAULTBORDER;
+  CHK (scroller = new csButton (this, cscmdNothing, bs, bfs));
+  CHK (topleft  = new csButton (this, cscmdNothing, bs, bfs));
+  topleft->id = SCROLL_UL;
+  CHK (botright = new csButton (this, cscmdNothing, bs, bfs));
+  botright->id = SCROLL_DR;
+
   // create repeat timer
   CHK (timer = new csTimer (this, SCROLL_REPEAT_INTERVAL));
 }
@@ -123,9 +125,9 @@ void csScrollBar::Draw ()
   int c1 = CSPAL_SCROLLBAR_BACKGROUND;
   int c2 = CSPAL_SCROLLBAR_BACKGROUND;
 
-  if (active_button == BUTID_SCROLLTOPLEFT)
+  if (active_button == SCROLL_PAGE_UL)
     c1 = CSPAL_SCROLLBAR_SELBACKGROUND;
-  else if (active_button == BUTID_SCROLLBOTRIGHT)
+  else if (active_button == SCROLL_PAGE_DR)
     c2 = CSPAL_SCROLLBAR_SELBACKGROUND;
 
   if (IsHorizontal)
@@ -203,9 +205,9 @@ pagescroll:
             cmp = scroller->bound.ymin;
 
         if ((IsHorizontal ? Event.Mouse.x : Event.Mouse.y) <= cmp)
-          active_button = BUTID_SCROLLTOPLEFT;
+          active_button = SCROLL_PAGE_UL;
         else
-          active_button = BUTID_SCROLLBOTRIGHT;
+          active_button = SCROLL_PAGE_DR;
         Invalidate ();
 
         if (app->MouseOwner != this)
@@ -255,13 +257,13 @@ pagescroll:
           timer->Pause (SCROLL_START_INTERVAL);
           // fallback to timer pulse
         case cscmdTimerPulse:
-          if (active_button == BUTID_TOPLEFT)
+          if (active_button == SCROLL_UL)
             SetValue (status.value - status.step);
-          else if (active_button == BUTID_BOTRIGHT)
+          else if (active_button == SCROLL_DR)
             SetValue (status.value + status.step);
-          else if (active_button == BUTID_SCROLLTOPLEFT)
+          else if (active_button == SCROLL_PAGE_UL)
             SetValue (status.value - status.pagestep);
-          else if (active_button == BUTID_SCROLLBOTRIGHT)
+          else if (active_button == SCROLL_PAGE_DR)
             SetValue (status.value + status.pagestep);
           return true;
         case cscmdScrollBarSet:
@@ -281,6 +283,42 @@ pagescroll:
           return true;
       } /* endswitch */
       break;
+    case csevKeyDown:
+      switch (Event.Key.Code)
+      {
+        case CSKEY_UP:
+        case CSKEY_LEFT:
+        case CSKEY_DOWN:
+        case CSKEY_RIGHT:
+          if (Event.Key.ShiftKeys & (CSMASK_ALT | CSMASK_SHIFT))
+            break;
+          if (IsHorizontal != ((Event.Key.Code == CSKEY_LEFT) || (Event.Key.Code == CSKEY_RIGHT)))
+            break;
+          if (!app->MouseOwner)
+          {
+            if (!app->KeyboardOwner)
+              app->CaptureKeyboard (this);
+
+            int delta = (Event.Key.Code == CSKEY_UP) || (Event.Key.Code == CSKEY_LEFT) ? -1 : +1;
+            delta *= (Event.Key.ShiftKeys & CSMASK_CTRL) ? status.pagestep : status.step;
+
+            SetValue (status.value + delta);
+          } /* endif */
+          return true;
+      } /* endswitch */
+    case csevKeyUp:
+      switch (Event.Key.Code)
+      {
+        case CSKEY_UP:
+        case CSKEY_LEFT:
+        case CSKEY_DOWN:
+        case CSKEY_RIGHT:
+          if (IsHorizontal != ((Event.Key.Code == CSKEY_LEFT) || (Event.Key.Code == CSKEY_RIGHT)))
+            break;
+          if (app->KeyboardOwner == this)
+            app->CaptureKeyboard (NULL);
+          return true;
+      } /* endswitch */
   } /* endswitch */
   return csComponent::HandleEvent (Event);
 }
