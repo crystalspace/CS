@@ -95,21 +95,6 @@ csGraphics2DMac::csGraphics2DMac(ISystem* piSystem)
 ----------------------------------------------------------------*/
 csGraphics2DMac::~csGraphics2DMac()
 {
-	if ( mDrawSprocketsEnabled ) {
-		DSpShutdown();
-	} else {
-		if ( mOldDepth ) {
-			GDHandle	theMainDevice;
-			theMainDevice = GetMainDevice();
-			SetDepth( theMainDevice, mOldDepth, (**theMainDevice).gdFlags, 1 );
-			mOldDepth = 0;
-		}
-	}
-
-	if ( mColorTable ) {
-		::DisposeHandle( (Handle)mColorTable );
-		mColorTable = NULL;
-	}
 }
 
 /*----------------------------------------------------------------
@@ -390,7 +375,7 @@ bool csGraphics2DMac::Open(char* Title)
 		// set the color table into the video card
 		::SetGWorld( (CGrafPtr)mMainWindow, NULL );
 		if ( Depth == 8 ) {
-			mMainPalette = ::NewPalette( 256, mColorTable, /* pmExplicit + */ pmTolerant, 0x2000 );
+			mMainPalette = ::NewPalette( 256, mColorTable, pmTolerant, 0x2000 );
 			::SetPalette( (WindowPtr)mMainWindow, mMainPalette, true );
 			mPaletteChanged = true;
 		} else {
@@ -441,18 +426,31 @@ void csGraphics2DMac::Close(void)
 			
 			mDisplayContext = NULL;
 		}
+		DSpShutdown();
 	} else {
 		if ( mOffscreen ) {
-			::DisposeGWorld( mOffscreen );
+			DisposeGWorld( mOffscreen );
 			mOffscreen = NULL;
 		}
 
 		if ( mMainWindow ) {
-			::DisposeWindow( (WindowPtr)mMainWindow );
+			DisposeWindow( (WindowPtr)mMainWindow );
 			mMainWindow = NULL;
 		}
 
 		::RestoreDeviceClut( NULL );
+
+		if ( mOldDepth ) {
+			GDHandle	theMainDevice;
+			theMainDevice = ::GetMainDevice();
+			SetDepth( theMainDevice, mOldDepth, (**theMainDevice).gdFlags, 1 );
+			mOldDepth = 0;
+		}
+	}
+
+	if ( mColorTable ) {
+		DisposeHandle( (Handle)mColorTable );
+		mColorTable = NULL;
 	}
 
 	csGraphics2D::Close();
@@ -477,19 +475,9 @@ void csGraphics2DMac::SetRGB(int i, int r, int g, int b)
 	if ( mDrawSprocketsEnabled ) {
 		DSpContext_SetCLUTEntries( mDisplayContext,  &theColor, i, i );
 	} else {
-		if ( mDoubleBuffering ) {
-			theCTable = (**(mOffscreen->portPixMap)).pmTable;
-			(*theCTable)->ctTable[i].value = i;
-			(*theCTable)->ctTable[i].rgb = theColor.rgb;
-		} else {
-			theCTable = (**(mMainWindow->portPixMap)).pmTable;
-			(*theCTable)->ctTable[i].value = i;
-			(*theCTable)->ctTable[i].rgb = theColor.rgb;
-		}
-
-		if ( mMainPalette ) {
-			SetEntryColor( mMainPalette, i, &theColor.rgb );
-		}
+		(*mColorTable)->ctTable[i].value = i;
+		(*mColorTable)->ctTable[i].rgb = theColor.rgb;
+		CTabChanged( mColorTable );
 	}
 	mPaletteChanged = true;
 }
@@ -885,25 +873,21 @@ void csGraphics2DMac::HandleEvent( EventRecord *inEvent, bool *outEventWasProces
 
 void csGraphics2DMac::SetColorPalette( void )
 {
-	CTabHandle	theCTable;
-
 	if ( ! mDrawSprocketsEnabled ) {
 		/*
 		 *	If the palette has changed, make sure the offscreen gworld
 		 *	(if there is one)and the window are correctly set up.
 		 */
 		if ( mPaletteChanged ) {
+			::SelectWindow( (WindowPtr)mMainWindow );
+
 			::GetGWorld( &mSavedPort, &mSavedGDHandle );
 
-			if ( mDoubleBuffering ) {
-				theCTable = (**(mOffscreen->portPixMap)).pmTable;
-			} else {
-				theCTable = (**(mMainWindow->portPixMap)).pmTable;
-			}
-
-			CTabChanged( theCTable );
-
 			::SetGWorld( (GWorldPtr)mMainWindow, NULL );
+
+			if ( mMainPalette ) {
+				CTab2Palette( mColorTable, mMainPalette, pmTolerant, 0x2000 );
+			}
 			::ActivatePalette( (WindowPtr)mMainWindow );
 
 			mPaletteChanged = false;
