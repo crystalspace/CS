@@ -52,6 +52,11 @@ chronological order.
 	- Eric Sunshine fixed a memory leak in bfdplugins.cpp where it was
 	  duplicating a string before passing it to iStringArray::Push() and
 	  then leaking the clone.
+	- Duhprey did the following to physics:
+	    - Added a per-frame callback so the input can be checked after each
+	      physics frame
+	    - fixed a bug with somehow deleting the line that saves created
+	      systems. (weird)
 2-Sep-2003
 	- Philip Wyett re-applied Eric Sunshine's Cygwin __argc/__argv fix in
           win32.cpp, which was overwritten by the old version by another
