@@ -64,6 +64,7 @@ void csTerrainQuad::Build (int depth)
 
 /// smallest value for horizon
 #define MININF -99999999.0
+#define MAXINF -MININF
 
 void csTerrainQuad::InitHorizon(float *horizon, int horsize)
 {
@@ -79,10 +80,10 @@ int csTerrainQuad::GetHorIndex(const csVector3& campos, float x, float z,
   float diffx = x - campos.x;
   float diffz = z - campos.z;
 
-  double atn = PI/2.;
+  double atn = M_PI_2; // pi/2
   if(diffz != 0.0) atn = atan(diffx / diffz);
-  // scale from -PI/2..PI/2 to 0..horsize
-  atn += PI/2.;
+  // scale from -PI/2..PI/2 to 0..horsize-1
+  atn += M_PI_2;
   atn *= float(horsize-1)/PI;
   int idx = QInt(atn);
   CS_ASSERT(idx >= 0 && idx < horsize);
@@ -117,13 +118,17 @@ void csTerrainQuad::ComputeExtent(const csVector3& campos, const csBox3& bbox,
       right = idx[i];
   }
   /// the resulting span should be less than half the horizon
-  CS_ASSERT ((right - left)%horsize <= horsize/2);
+  /// (putting % in an assert gives warnings)
+  int spansize = (right - left);
+  spansize %= horsize;
+  CS_ASSERT (spansize <= horsize/2);
 }
 
 void csTerrainQuad::ComputeMinMaxDY(const csVector3& campos, const csBox3& bbox,
     float &mindy, float &maxdy)
 {
   /// idea is this:
+  /// dy (change of y) is the deltay / deltadistance.
   /// maximum dy, is the max_height / minimumdistance
   /// minimum dy, is the min_height / maximumdistance
 
@@ -149,19 +154,45 @@ void csTerrainQuad::ComputeMinMaxDY(const csVector3& campos, const csBox3& bbox,
     else if(sqdist[i] > maxdist) maxdist = sqdist[i];
   }
 
-  if(maxdist == 0.0) 
-  {
-    if(min_height < 0) mindy = MININF; 
-    else mindy = -MININF; 
-  }
-  else mindy = min_height / qsqrt(maxdist);
+  /// use difference between camera.y and min,maxheight
+  /// to get min and max height change
+  float minh = min_height - campos.y;
+  float maxh = max_height - campos.y;
 
-  if(mindist == 0.0) 
+  /// divide by distance, correctly using infinite if divbyzero.
+  /// like this:
+  /// if divbyzero, use infinity with the same sign.
+  /// see if negative values occur, distances get swapped in that case
+
+  if(minh < 0.0) 
   {
-    if(max_height < 0) maxdy = MININF; 
-    else maxdy = -MININF; 
+    /// below zero, smallest height at minimal distance is the steepest down
+    if(mindist == 0.0) mindy = MININF;
+    else mindy = minh / qsqrt(mindist);
   }
-  else maxdy = max_height / qsqrt(mindist);
+  else 
+  {
+    /// above zero, the smallest height at maximal distance is the smallest 
+    /// upslope
+    if(maxdist == 0.0) mindy = MAXINF;
+    else mindy = minh / qsqrt(maxdist);
+  }
+
+  if(maxh < 0.0) 
+  {
+    /// below zero, biggest height at maximal distance is the least downslope
+    if(maxdist == 0.0) maxdy = MININF;
+    else maxdy = maxh / qsqrt(maxdist);
+  }
+  else 
+  {
+    /// above zero, the biggest height at minimum distance is steepest upslope
+    if(mindist == 0.0) maxdy = MAXINF;
+    else maxdy = maxh / qsqrt(mindist);
+  }
+
+  /// we've been trying to do this all along here.
+  CS_ASSERT( mindy <= maxdy );
 }
 
 bool csTerrainQuad::CheckIfAbove(float* horizon, int horsize, int left, 
@@ -196,20 +227,29 @@ void csTerrainQuad::ComputeVisibility(const csVector3& campos,
 {
   // compute visibility for this node
 
-  // start and end angles for projected bounding box on horizon
-  int left, right;
-  ComputeExtent(campos, bbox, horsize, left, right);
-
   // compute min and max dy values.
   float mindy, maxdy;
   ComputeMinMaxDY(campos, bbox, mindy, maxdy);
 
-  // determine visibility
+  // start and end angles for projected bounding box on horizon
+  int left = 0, right = 0;
+  // visibility
   bool vis = false;
-  if(bbox.Contains(campos)) vis = true;
+  // if camera is 'in' this node (disregarding height), vis always true
+  if(  (bbox.MinX() <= campos.x) && (campos.x <= bbox.MaxX())
+    && (bbox.MinZ() <= campos.z) && (campos.z <= bbox.MaxZ()) )
+  {
+    // node spans the entire horizon
+    left = 0;
+    right = horsize-1;
+    vis = true;
+  }
   else {
+    // see which piece of the horizon is spanned by the bbox
+    ComputeExtent(campos, bbox, horsize, left, right);
+
     // check min and max dy against the horizon
-    // if the max is bigger than any value -> the node is visible
+    // if the max is bigger than any value -> the node could be visible
     vis = CheckIfAbove(horizon, horsize, left, right, maxdy);
   }
 
@@ -241,7 +281,7 @@ void csTerrainQuad::ComputeVisibility(const csVector3& campos,
   const int fronttoback[4][4] = {
     {0,1,2,3},
     {1,0,3,2},
-    {2,0,3,1},
+    {2,3,0,1},
     {3,1,2,0}
   };
   csBox3 cbox[4];
