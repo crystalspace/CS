@@ -1325,7 +1325,7 @@ void csComponent::ClipChild (cswsRectVector &rect, csComponent *child)
       dX = child->bound.xmin;
       dY = child->bound.ymin;
     }
-	int i;
+    int i;
     for (i = (int)rect.Length () - 1; i >= 0; i--)
       ((csRect *)rect[i])->Move (-dX, -dY);
 

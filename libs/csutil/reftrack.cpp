@@ -143,9 +143,10 @@ void csRefTracker::MatchIncRef (void* object, int refCount, void* tag)
 
   RefInfo& refInfo = GetObjRefInfo (object);
   bool foundAction = false;
-  size_t i;
-  for (i = refInfo.actions.Length() - 1; i >= 0; i--)
+  size_t i = refInfo.actions.Length ();
+  while (i > 0)
   {
+    i--;
     if (refInfo.actions[i].refCount == refCount)
     {
       if (refInfo.actions[i].tag == 0)
@@ -173,9 +174,10 @@ void csRefTracker::MatchDecRef (void* object, int refCount, void* tag)
 
   RefInfo& refInfo = GetObjRefInfo (object);
   bool foundAction = false;
-  size_t i;
-  for (i = refInfo.actions.Length() - 1; i >= 0; i--)
+  size_t i = refInfo.actions.Length ();
+  while (i > 0)
   {
+    i--;
     if (refInfo.actions[i].refCount == refCount)
     {
       if (refInfo.actions[i].tag == 0)

@@ -675,7 +675,8 @@ void RTjpeg_dctY(uint8 *idata, int16 *odata, int rskip)
 
   idataptr = idata;
   wsptr = RTjpeg_ws;
-  for (ctr = 7; ctr >= 0; ctr--) {
+  for (ctr = 7; ctr >= 0; ctr--)
+  {
     tmp0 = idataptr[0] + idataptr[7];
     tmp7 = idataptr[0] - idataptr[7];
     tmp1 = idataptr[1] + idataptr[6];
@@ -720,7 +721,8 @@ void RTjpeg_dctY(uint8 *idata, int16 *odata, int rskip)
 
   wsptr = RTjpeg_ws;
   odataptr=odata;
-  for (ctr = 7; ctr >= 0; ctr--) {
+  for (ctr = 7; ctr >= 0; ctr--)
+  {
     tmp0 = wsptr[0] + wsptr[56];
     tmp7 = wsptr[0] - wsptr[56];
     tmp1 = wsptr[8] + wsptr[48];

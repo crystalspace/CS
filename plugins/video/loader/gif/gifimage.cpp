@@ -415,7 +415,7 @@ int ImageGifFile::decode_gif (uint8* iBuffer, long iSize, int* Prefix,
       // Now we put the data out to the image buffer.
       // It's been stacked LIFO, so deal with it that way...
 
-	  int j;
+      int j;
       for (j = OutCount - 1; j >= 0; j--)
       {
         *optr = OutCode [j];

@@ -256,9 +256,10 @@ public:
 
   void CheckUp ()
   {
-    size_t i;
-    for (i = array.Length (); i-- > 0;)
+    size_t i = array.Length ();
+    while (i > 0)
     {
+      i--;
       VfsArchive *a = array.Get (i);
       if (a->CheckUp ())
         array.DeleteIndex (i);
@@ -1747,7 +1748,9 @@ csRef<iStringArray> csVFS::MountRoot (const char *Path)
   if (Path != 0)
   {
     csRef<iStringArray> roots = csFindSystemRoots();
-    for (size_t i = 0, n = roots->Length(); i < n; i++)
+    size_t i;
+    size_t n = roots->Length ();
+    for (i = 0 ; i < n ; i++)
     {
       char const* t = roots->Get(i);
       csString s(t);

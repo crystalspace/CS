@@ -788,8 +788,10 @@ void awsNotebookButtonBar::DoLayout ()
 
   ResizeTo(r);
 
-  for (i=first-1; i >=0 ; i--)
+  i = first;
+  while (i > 0)
   {
+    i--;
     awsNotebookButton *btn = vTabs.Get (i)->button;
     csRect br =  btn->Frame ();
     btn->Hide ();

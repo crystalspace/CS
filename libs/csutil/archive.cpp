@@ -477,7 +477,7 @@ void *csArchive::NewFile (const char *name, size_t size, bool pack)
   else
   {
     f = CreateArchiveEntry(name, size, pack);
-  lazy.Push (f);
+    lazy.Push (f);
   }
   return (void *)f;
 }
@@ -741,12 +741,13 @@ bool csArchive::WriteCentralDirectory (FILE *temp)
 void csArchive::UpdateDirectory ()
 {
   /* Update archive directory: remove deleted entries first */
-  size_t n;
-  for (n = dir.Length (); n > 0; n--)
+  size_t n = dir.Length ();
+  while (n > 0)
   {
-    ArchiveEntry *e = dir.Get (n - 1);
+    n--;
+    ArchiveEntry *e = dir.Get (n);
     if (IsDeleted (e->filename))
-      dir.DeleteIndex (n - 1);
+      dir.DeleteIndex (n);
   }
   del.DeleteAll ();
 

@@ -210,9 +210,10 @@ void csComponent::ClearZbuffer (int x1, int y1, int x2, int y2)
   rect.Push (lb);
   FastClip (rect);
 
-  size_t i;
-  for (i = rect.Length () - 1; i >= 0; i--)
+  size_t i = rect.Length ();
+  while (i > 0)
   {
+    i--;
     csRect *cur = (csRect *)rect[i];
     app->pplClearZbuffer (cur->xmin, cur->ymin, cur->xmax, cur->ymax);
   }
