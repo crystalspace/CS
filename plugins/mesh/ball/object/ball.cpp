@@ -892,7 +892,7 @@ void csBallMeshObject::PaintSky(float time, float **dayvert, float **nightvert,
   csColor skyatsun;
   GetGradientColor(applyvert, 0.0, skyatsun);
   apparent += skyatsun;
-  for(int i=0; i<num_ball_vertices; i++)
+  for(i=0; i<num_ball_vertices; i++)
     if(ball_vertices[i].y < shift.y)
       ball_colors[i] = apparent;
 
