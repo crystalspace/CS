@@ -276,9 +276,6 @@ public:
 	csChunkLodTerrainFactory::MeshTreeNode* node, float kappa);
   bool DrawTest (iRenderView* rview, iMovable* movable);
 
-  /// Updates the lighting on the terrain
-  void UpdateLighting (iLight** lights, int num_lights, iMovable* movable);
-  
   bool Draw (iRenderView*, iMovable*, csZBufMode) 
   { /* deprecated */ return false; }
 

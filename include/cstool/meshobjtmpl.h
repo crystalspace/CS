@@ -106,13 +106,6 @@ public:
   }
 
   /**
-   * See imesh/object.h for specification. The default implementation
-   * does nothing.
-   */
-  virtual void UpdateLighting (iLight** lights, int num_lights,
-      	iMovable* movable);
-
-  /**
    * See imesh/object.h for specification. There is no default
    * implementation for this method.
    */

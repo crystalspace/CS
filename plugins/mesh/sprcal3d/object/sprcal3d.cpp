@@ -194,6 +194,8 @@ csSpriteCal3DMeshObjectFactory::csSpriteCal3DMeshObjectFactory (
     color_name = strings->Request ("colors");
     index_name = strings->Request ("indices");
   }
+
+  light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
 }
 
 csSpriteCal3DMeshObjectFactory::~csSpriteCal3DMeshObjectFactory ()
@@ -850,11 +852,9 @@ void csSpriteCal3DMeshObject::LightDisconnect (iLight* light)
   lighting_dirty = true;
 }
 
-void csSpriteCal3DMeshObject::UpdateLighting (iLight** lights, int num_lights,
+void csSpriteCal3DMeshObject::UpdateLighting (const csArray<iLight>& lights,
 					      iMovable* movable)
 {
-  SetupObject ();
-
   CalRenderer *pCalRenderer;
   pCalRenderer = calModel.getRenderer();
 
@@ -867,6 +867,7 @@ void csSpriteCal3DMeshObject::UpdateLighting (iLight** lights, int num_lights,
   int meshCount;
   meshCount = pCalRenderer->getMeshCount();
 
+  int num_lights = lights.Length ();
   for (int l = 0; l < num_lights; l++)
   {
     affecting_lights.Add (lights[l]);
@@ -1310,6 +1311,14 @@ void csSpriteCal3DMeshObject::PositionChild (iMeshObject* child,csTicks current_
 bool csSpriteCal3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
   SetupObject ();
+
+  if (factory->light_mgr)
+  {
+    const csArray<iLight*>& relevant_lights = factory->light_mgr
+    	->GetRelevantLights (logparent);
+    UpdateLighting (relevant_lights, movable);
+  }
+
   iGraphics3D* g3d = rview->GetGraphics3D ();
   iCamera* camera = rview->GetCamera ();
 

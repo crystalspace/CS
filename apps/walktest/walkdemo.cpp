@@ -1255,7 +1255,6 @@ void light_statics ()
         if (!strcmp (name, "__skelghost__")) move_ghost (sp);
       }
     }
-    sp->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   }
 #endif
 }

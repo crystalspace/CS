@@ -54,10 +54,6 @@ private:
   /// recalc static lighting?
   bool recalc_staticlight;
 
-  /// prealloced array to store iLight*s in.
-  iLight **fakelights;
-  int num_fakelights;
-
 public:
   SCF_DECLARE_IBASE;
 
@@ -137,7 +133,7 @@ public:
   virtual void UnRegisterDynamicLight(iIsoLight *light);
   virtual iIsoCell* GetGridCell(int x, int y) { return GetCell(x,y); }
   virtual const csBox3& GetBox() const {return box;}
-  virtual void GetFakeLights(const csVector3& pos, iLight **& lights, int& num);
+  virtual void GetFakeLights (const csVector3& pos, csArray<iLight*>& lights);
 };
 
 

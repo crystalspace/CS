@@ -38,6 +38,7 @@
 #include "iengine/material.h"
 #include "iengine/lod.h"
 #include "iengine/sharevar.h"
+#include "iengine/lightmgr.h"
 #include "iutil/config.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -377,6 +378,7 @@ public:
   iVirtualClock* vc;
 
   csRef<iGraphics3D> g3d;
+  csRef<iLightManager> light_mgr;
 
 #ifdef CS_USE_NEW_RENDERER
   csAnonRenderBufferManager *anon_buffers;
@@ -1355,25 +1357,30 @@ private:
 
 private:
   /**
+   * Update the lighting on this sprite.
+   */
+  void UpdateLighting (const csArray<iLight*>& lights, iMovable* movable);
+
+  /**
    * High quality version of UpdateLighting() which recalculates
    * the distance between the light and every vertex.
    * This version can use tweening of the normals and vertices
    */
-  void UpdateLightingHQ (iLight** lights, int num_lights, iMovable* movable);
+  void UpdateLightingHQ (const csArray<iLight*>& lights, iMovable* movable);
 
   /**
    * Low quality version of UpdateLighting() which only
    * calculates the distance once (from the center of the sprite.)
    * This method can use tweening of the normals.
    */
-  void UpdateLightingLQ (iLight** lights, int num_lights, iMovable* movable);
+  void UpdateLightingLQ (const csArray<iLight*>& lights, iMovable* movable);
 
   /**
    * Low quality Fast version of UpdateLighting() which only
    * calculates the distance once (from the center of the sprite.)
    * This version can NOT use any tweening.
    */
-  void UpdateLightingFast (iLight** lights, int num_lights, iMovable* movable);
+  void UpdateLightingFast (const csArray<iLight*>& lights, iMovable* movable);
 
   /**
    * A fairly fast :P totally inaccurate(usually) lighting method.
@@ -1689,8 +1696,6 @@ public:
     return ifact;	// DecRef is ok here.
   }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
-  virtual void UpdateLighting (iLight** lights, int num_lights,
-      	iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual csRenderMesh **GetRenderMeshes (int &n);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)

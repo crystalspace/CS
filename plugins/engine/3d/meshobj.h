@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000-2001 by Jorrit Tyberghein
+    Copyright (C) 2000-2004 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -185,12 +185,6 @@ protected:
    */
   long render_priority;
 
-  /// Defered lighting. If > 0 then we have defered lighting.
-  int defered_num_lights;
-
-  /// Flags to use for defered lighting.
-  int defered_lighting_flags;
-
   /// For NR: Cached value from DrawTest
   bool draw_test;
   /// For NR: Cached light test
@@ -245,14 +239,20 @@ private:
 
   /// Flag indicating whether this mesh should try to imposter or not.
   bool imposter_active;
-
   /// Imposter Threshold Range.
   csRef<iSharedVariable> min_imposter_distance;
-
   /// Imposter Redo Threshold angle change.
   csRef<iSharedVariable> imposter_rotation_tolerance;
-
   csImposterMesh *imposter_mesh;
+
+  /**
+   * Array of lights affecting this mesh object. This is calculated
+   * by the csLightManager class.
+   */
+  csDirtyAccessArray<iLight*> relevant_lights;
+  bool relevant_lights_valid;
+  int relevant_lights_max;
+  csFlags relevant_lights_flags;
 
 public:
   /// Set of flags
@@ -261,9 +261,6 @@ public:
   csFlags culler_flags;
 
 protected:
-  /// Update defered lighting.
-  void UpdateDeferedLighting (const csBox3& box);
-
   /// Clear this object from all sector portal lists.
   void ClearFromSectorPortalLists ();
 
@@ -299,9 +296,7 @@ protected:
 
 public:
   /// Constructor.
-  csMeshWrapper (iMeshWrapper* theParent, iMeshObject* meshobj);
-  /// Constructor.
-  csMeshWrapper (iMeshWrapper* theParent);
+  csMeshWrapper (iMeshWrapper* theParent, iMeshObject* meshobj = 0);
 
   /**
   * During rendering a child mesh can ask its parent if it should
@@ -418,23 +413,16 @@ public:
     return draw_cb_vector.Get (idx);
   }
 
-  /**
-   * Light object according to the given array of lights (i.e.
-   * fill the vertex color array).
-   */
-  void UpdateLighting (iLight** lights, int num_lights);
+  void SetLightingUpdate (int flags, int num_lights);
 
   /**
-   * Update lighting as soon as the object becomes visible.
-   * This will call engine->GetNearestLights with the supplied
-   * parameters.
+   * Get the array of relevant lights for this object.
    */
-  void DeferUpdateLighting (int flags, int num_lights);
+  const csArray<iLight*>& GetRelevantLights ();
 
   /**
    * Draw this mesh object given a camera transformation.
    * If needed the skeleton state will first be updated.
-   * Optionally update lighting if needed (DeferUpdateLighting()).
    */
   void Draw (iRenderView* rview);
 
@@ -528,7 +516,6 @@ public:
   /**
    * Draw this mesh object given a camera transformation, non-impostered.
    * If needed the skeleton state will first be updated.
-   * Optionally update lighting if needed (DeferUpdateLighting()).
    */
   void DrawIntFull (iRenderView* rview);
 
@@ -652,14 +639,6 @@ public:
     virtual void SetFactory (iMeshFactoryWrapper* m)
     {
       scfParent->SetFactory (m);
-    }
-    virtual void DeferUpdateLighting (int flags, int num_lights)
-    {
-      scfParent->DeferUpdateLighting (flags, num_lights);
-    }
-    virtual void UpdateLighting (iLight** lights, int num_lights)
-    {
-      scfParent->UpdateLighting (lights, num_lights);
     }
     virtual iMovable* GetMovable () const
     {
@@ -803,6 +782,10 @@ public:
     virtual bool GetDrawAfterShadow ()
     {
       return scfParent->GetDrawAfterShadow ();
+    }
+    virtual void SetLightingUpdate (int flags, int num_lights)
+    {
+      scfParent->SetLightingUpdate (flags, num_lights);
     }
     csMeshWrapper* GetCsMeshWrapper () const
     { 

@@ -1091,8 +1091,6 @@ public:
     {
       return scfParent->DrawTest (rview, movable);
     }
-    virtual void UpdateLighting (iLight** /*lights*/, int /*num_lights*/,
-      	iMovable* /*movable*/) { }
     virtual bool Draw (iRenderView* rview, iMovable* movable,
     	csZBufMode zMode)
     {

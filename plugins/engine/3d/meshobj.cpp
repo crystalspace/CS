@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000-2001 by Jorrit Tyberghein
+    Copyright (C) 2000-2004 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -73,8 +73,6 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent, iMeshObject *meshobj) :
 
   render_priority = csEngine::current_engine->GetObjectRenderPriority ();
 
-  defered_num_lights = 0;
-  defered_lighting_flags = 0;
   last_anim_time = 0;
 
   csMeshWrapper::meshobj = meshobj;
@@ -91,44 +89,10 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent, iMeshObject *meshobj) :
   imposter_mesh = 0;
   cast_hardware_shadow = true;
   draw_after_fancy_stuff = false;
-}
 
-csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent) :
-  csObject ()
-{
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshWrapper);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiImposter);
-  DG_TYPE (this, "csMeshWrapper");
-
-  movable.scfParent = (iBase*)(csObject*)this;
-  visnr = 0;
-  cached_lod_visnr = ~0;
-  wor_bbox_movablenr = -1;
-  movable.SetMeshWrapper (this);
-  Parent = theParent;
-  if (Parent)
-  {
-    csParent = ((csMeshWrapper::MeshWrapper*)Parent)->scfParent;
-    movable.SetParent (Parent->GetMovable ());
-  }
-  else
-  {
-    csParent = 0;
-  }
-
-  render_priority = csEngine::current_engine->GetObjectRenderPriority ();
-
-  defered_num_lights = 0;
-  defered_lighting_flags = 0;
-  last_anim_time = 0;
-  imposter_active = false;
-  imposter_mesh = 0;
-
-  factory = 0;
-  zbufMode = CS_ZBUF_USE;
-  children.SetMesh (this);
-  cast_hardware_shadow = true;
-  draw_after_fancy_stuff = false;
+  relevant_lights_valid = false;
+  relevant_lights_max = 8;
+  relevant_lights_flags.Set (CS_LIGHTINGUPDATE_SORTRELEVANCE);
 }
 
 void csMeshWrapper::SetParentContainer (iMeshWrapper* newParent)
@@ -243,34 +207,35 @@ void csMeshWrapper::SetRenderPriority (long rp)
   }
 }
 
-/// The list of lights that hit the mesh
-typedef csDirtyAccessArray<iLight*> engine3d_LightWorkTable;
-CS_IMPLEMENT_STATIC_VAR (GetStaticLightWorkTable, engine3d_LightWorkTable,())
-
-void csMeshWrapper::UpdateDeferedLighting (const csBox3 &box)
+void csMeshWrapper::SetLightingUpdate (int flags, int num_lights)
 {
-  static engine3d_LightWorkTable &light_worktable = *GetStaticLightWorkTable ();
+  relevant_lights_flags.SetAll (flags);
+  relevant_lights_max = num_lights;
+}
+
+const csArray<iLight*>& csMeshWrapper::GetRelevantLights ()
+{
+  // @@@ Temporary implementation. In future we should use
+  // flags and counters to check if updating is really needed.
+  relevant_lights.Empty ();
   const iSectorList *movable_sectors = movable.GetSectors ();
-  if (defered_num_lights && movable_sectors->GetCount () > 0)
+  if (movable_sectors->GetCount () > 0)
   {
-    if (defered_num_lights > light_worktable.Length ())
-      light_worktable.SetLength (defered_num_lights);
+    csBox3 box;
+    GetFullBBox (box);
+
+    if (relevant_lights_max > relevant_lights.Length ())
+      relevant_lights.SetLength (relevant_lights_max);
 
     iSector *sect = movable_sectors->Get (0);
     int num_lights = csEngine::current_iengine->GetNearbyLights (
         sect,
         box,
-        defered_lighting_flags,
-        light_worktable.GetArray (),
-        defered_num_lights);
-    UpdateLighting (light_worktable.GetArray (), num_lights);
+        relevant_lights.GetArray (),
+        relevant_lights_max);
+    relevant_lights.SetLength (num_lights);
   }
-}
-
-void csMeshWrapper::DeferUpdateLighting (int flags, int num_lights)
-{
-  defered_num_lights = num_lights;
-  defered_lighting_flags = flags;
+  return relevant_lights;
 }
 
 void csMeshWrapper::Draw (iRenderView *rview)
@@ -310,7 +275,6 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n)
 
     csTicks lt = csEngine::current_engine->GetLastAnimationTime ();
     meshobj->NextFrame (lt,movable.GetPosition ());
-    UpdateDeferedLighting (movable.GetFullPosition ());
     return meshobj->GetRenderMeshes (n);
 /*  }
   return 0;*/
@@ -476,9 +440,6 @@ void csMeshWrapper::DrawIntFull (iRenderView *rview)
       }
     }
 
-    csBox3 bbox;
-    GetFullBBox (bbox);
-    UpdateDeferedLighting (bbox);
     meshobj->Draw (rview, &movable.scfiMovable, zbufMode);
   }
 
@@ -526,21 +487,6 @@ void csMeshWrapper::SetImposterActive (bool flag)
   {
     imposter_mesh = new csImposterMesh (this);
     imposter_mesh->SetImposterReady (false);
-  }
-}
-
-void csMeshWrapper::UpdateLighting (iLight **lights, int num_lights)
-{
-  defered_num_lights = 0;
-
-  //if (num_lights <= 0) return;
-  meshobj->UpdateLighting (lights, num_lights, &movable.scfiMovable);
-
-  int i;
-  for (i = 0; i < children.GetCount (); i++)
-  {
-    iMeshWrapper *spr = children.Get (i);
-    spr->UpdateLighting (lights, num_lights);
   }
 }
 

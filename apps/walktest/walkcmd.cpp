@@ -399,7 +399,6 @@ void GenerateThing (iObjectRegistry* object_reg,
     thingWrapper->HardTransform(t2);
     thingWrapper->GetMovable()->SetSector(sector);
     thingWrapper->GetMovable()->UpdateMove();
-    thingWrapper->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   }
 }
 
@@ -463,7 +462,6 @@ iMeshWrapper* GenerateSprite(const char* tname, char* sname, iSector* where,
   csRef<iMeshWrapper> spr (Sys->Engine->CreateMeshWrapper (tmpl, sname));
   spr->GetMovable()->SetPosition(where, pos);
   spr->GetMovable ()->UpdateMove ();
-  spr->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   return spr;
 }
 
@@ -485,7 +483,6 @@ iMeshWrapper* add_meshobj (const char* tname, char* sname, iSector* where,
   spr->GetMovable ()->SetTransform (m);
   spr->GetMovable ()->UpdateMove ();
 
-  spr->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   return spr;
 }
 

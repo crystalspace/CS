@@ -93,6 +93,18 @@ class csFlags;
 #define CS_ENTITY_NOLIGHTING 32
 /** @} */
 
+/** \name SetLightingUpdate flags
+ * @{ */
+
+/**
+ * This is a flag for iMeshWrapper->SetLightingUpdate(). If this
+ * flag is set then only the 'N' most relevant lights will be returned
+ * to the object. If not set then 'N' random lights will be returned.
+ */
+#define CS_LIGHTINGUPDATE_SORTRELEVANCE 1
+
+/** @} */
+
 SCF_VERSION (iMeshDrawCallback, 0, 0, 1);
 
 /**
@@ -174,28 +186,16 @@ struct iMeshWrapper : public iBase
   virtual void SetFactory (iMeshFactoryWrapper* factory) = 0;
 
   /**
-   * Update lighting as soon as the object becomes visible.
-   * This will call engine->GetNearestLights with the supplied
-   * parameters. Note that this function doesn't work on thing
-   * mesh objects as they use another lighting system. Also some genmesh
-   * objects can optionally also use the other lighting system in which
-   * case DeferUpdateLighting() will do nothing.
+   * Control how lighting updates should take place.
+   * 'num_lights' is the number of lights that will be given to the
+   * mesh object at maximum (default is 8). 'flags' can be equal
+   * to #CS_LIGHTINGUPDATE_SORTRELEVANCE (default on) or 0.
+   * Note that this function has no effect on thing
+   * mesh objects as they use another lighting system (lightmaps).
+   * Also some genmesh objects can optionally also use the other lighting
+   * system in which nothing will happen either.
    */
-  virtual void DeferUpdateLighting (int flags, int num_lights) = 0;
-
-  /**
-   * Light object according to the given array of lights (i.e.
-   * fill the vertex color array).
-   * No shadow calculation will be done. This is assumed to have
-   * been done earlier. This is a primitive lighting process
-   * based on the lights which hit one point of the sprite (usually
-   * the center). More elaborate lighting systems are possible
-   * but this will do for now.
-   * <p>
-   * This function is usually not called by applications. It is better
-   * to call DeferUpdateLighting() instead.
-   */
-  virtual void UpdateLighting (iLight** lights, int num_lights) = 0;
+  virtual void SetLightingUpdate (int flags, int num_lights) = 0;
 
   /**
    * Get the movable instance for this object.

@@ -33,6 +33,7 @@
 #include "igeom/polymesh.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/rendermesh.h"
+#include "iengine/lightmgr.h"
 #include "csgfx/shadervarcontext.h"
 
 struct iMaterialWrapper;
@@ -146,6 +147,8 @@ public:
 
   /// Destructor.
   virtual ~csBallMeshObject ();
+
+  void UpdateLighting (const csArray<iLight*>& lights, iMovable* movable);
 
   /// Get the bounding box in transformed space.
   void GetTransformedBoundingBox (long cameranr, long movablenr,
@@ -262,8 +265,6 @@ public:
 
   virtual iMeshObjectFactory* GetFactory () const { return factory; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
-  virtual void UpdateLighting (iLight** lights, int num_lights,
-      	iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
@@ -445,6 +446,7 @@ public:
   iObjectRegistry* object_reg;
   iBase* logparent;
   iEngine* engine;
+  csRef<iLightManager> light_mgr;
 
   /// Constructor.
   csBallMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);

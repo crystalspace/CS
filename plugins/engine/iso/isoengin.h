@@ -25,11 +25,12 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/csobject.h"
+#include "iengine/lightmgr.h"
 
 /**
  * This class implements the isometric engine.
 */
-class csIsoEngine : public iIsoEngine
+class csIsoEngine : public iIsoEngine, public iLightManager
 {
 private:
   /// the system
@@ -87,6 +88,9 @@ public:
     }
     virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
   } * scfiEventHandler;
+
+  //----- iLightManager ------------------------------------------------
+  virtual const csArray<iLight*>& GetRelevantLights (iBase* logObject);
 
   //----- iIsoEngine ---------------------------------------------------
   virtual iObjectRegistry* GetObjectRegistry() const {return object_reg;}

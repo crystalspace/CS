@@ -178,8 +178,6 @@ void SetupWorld ()
   ball->GetMovable ().SetTransform (m);
   ball->GetMovable ().SetPosition (csVector3 (-3, 5, -3));
   ball->GetMovable ().UpdateMove ();
-  ball->DeferUpdateLighting (
-    CS_NLIGHT_STATIC | CS_NLIGHT_DYNAMIC, 10);
   @dots{}
 @}
 @end example

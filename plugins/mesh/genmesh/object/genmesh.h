@@ -38,6 +38,7 @@
 #include "igeom/polymesh.h"
 #include "iengine/shadcast.h"
 #include "iengine/light.h"
+#include "iengine/lightmgr.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/rendermesh.h"
 #include "cstool/anonrndbuf.h"
@@ -168,6 +169,8 @@ private:
    * Update lighting using the iLightingInfo system.
    */
   void UpdateLighting2 (iMovable* movable);
+
+  void UpdateLighting (const csArray<iLight*>& lights, iMovable* movable);
 public:
   /// Constructor.
   csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory);
@@ -214,8 +217,6 @@ public:
     return (iMeshObjectFactory*)factory;
   }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
-  virtual void UpdateLighting (iLight** lights, int num_lights,
-      	iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual csRenderMesh** GetRenderMeshes (int &n);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
@@ -421,6 +422,7 @@ private:
   csColor* mesh_colors;
   int num_mesh_vertices;
   csVector3* mesh_tri_normals;
+
 #ifdef CS_USE_NEW_RENDERER
   csTriangle* mesh_triangles;
   int num_mesh_triangles;
@@ -492,6 +494,7 @@ public:
   iObjectRegistry* object_reg;
   iBase* logparent;
   csGenmeshMeshObjectType* genmesh_type;
+  csRef<iLightManager> light_mgr;
 
   iEngine* engine;
 

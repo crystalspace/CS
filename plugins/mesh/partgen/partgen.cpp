@@ -87,6 +87,7 @@ csParticleSystem::csParticleSystem (iObjectRegistry* object_reg,
   current_features = 0;
   csRef<iEngine> eng = CS_QUERY_REGISTRY (object_reg, iEngine);
   engine = eng;	// We don't want to keep a reference.
+  light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
 }
 
 csParticleSystem::~csParticleSystem()
@@ -242,6 +243,14 @@ void csParticleSystem::Update (csTicks elapsed_time)
 bool csParticleSystem::DrawTest (iRenderView* rview, iMovable* movable)
 {
   SetupObject ();
+
+  if (light_mgr)
+  {
+    const csArray<iLight*>& relevant_lights = light_mgr
+    	->GetRelevantLights (logparent);
+    UpdateLighting (relevant_lights, movable);
+  }
+
   // Based and copied this code on csSprite3DMeshObject's
   //   DrawTest, GetScreenBoundingBox, GetTransformedBoundingBox
 
@@ -310,14 +319,14 @@ bool csParticleSystem::Draw (iRenderView* rview, iMovable* movable,
   return true;
 }
 
-void csParticleSystem::UpdateLighting (iLight** lights, int num_lights,
+void csParticleSystem::UpdateLighting (const csArray<iLight*>& lights,
     iMovable* movable)
 {
   SetupObject ();
   csReversibleTransform trans = movable->GetFullTransform ();
   int i;
   for (i = 0 ; i < particles.Length () ; i++)
-    GetParticle (i)->UpdateLighting (lights, num_lights, trans);
+    GetParticle (i)->UpdateLighting (lights, trans);
 }
 
 //---------------------------------------------------------------------

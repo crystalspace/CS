@@ -40,8 +40,6 @@ csIsoGrid::csIsoGrid (iBase *iParent, iIsoWorld *world, int w, int h)
   box.Set(0,-9999,0, height,+9999,width);
   groundmap = new csIsoGroundMap(this, 1, 1);
   recalc_staticlight = true;
-  fakelights = 0;
-  num_fakelights = 0;
 }
 
 csIsoGrid::~csIsoGrid ()
@@ -52,7 +50,6 @@ csIsoGrid::~csIsoGrid ()
 
   delete[] grid;
   delete groundmap;
-  delete[] fakelights;
   SCF_DESTRUCT_IBASE();
 }
 
@@ -265,12 +262,6 @@ void csIsoGrid::Draw(iIsoRenderView *rview)
     int l;
     for(l=0; l<dynamiclights.Length(); l++)
       dynamiclights[l]->ShineGrid();
-    // reset fakelight array
-    if(fakelights)
-    {
-      delete[] fakelights; fakelights = 0;
-      num_fakelights = 0;
-    }
   }
 }
 
@@ -456,20 +447,10 @@ void csIsoGrid::UnRegisterDynamicLight(iIsoLight *light)
   dynamiclights.Delete (light);
 }
 
-void csIsoGrid::GetFakeLights(const csVector3& pos, iLight **& flights,
-  int& num)
+void csIsoGrid::GetFakeLights (const csVector3& pos, csArray<iLight*>& flights)
 {
-  if(!fakelights)
-  {
-    // make an array 'big enough'
-    num_fakelights = lights.Length () + dynamiclights.Length ();
-    fakelights = new iLight* [ num_fakelights ];
-  }
-  flights = fakelights;
-  CS_ASSERT (num_fakelights == lights.Length () + dynamiclights.Length ());
-
+  flights.Empty ();
   // fill the current array
-  num = 0;
   int l;
 
   int visx = QInt( (pos.z - float(mingridx) )*groundmap->GetMultX());
@@ -478,12 +459,12 @@ void csIsoGrid::GetFakeLights(const csVector3& pos, iLight **& flights,
   for(l=0; l<lights.Length(); l++)
   {
     if(lights[l]->GetVis(visx, visy) > 0.0 )
-      flights[num++] = lights[l]->GetFakeLight();
+      flights.Push (lights[l]->GetFakeLight());
   }
   for(l=0; l<dynamiclights.Length(); l++)
   {
     if(dynamiclights[l]->GetVis(visx, visy) > 0.0 )
-      flights[num++] = dynamiclights[l]->GetFakeLight();
+      flights.Push (dynamiclights[l]->GetFakeLight());
   }
 
 }

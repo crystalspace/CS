@@ -534,7 +534,6 @@ bool csWaterDemo::Initialize ()
   gMeshW->GetMovable ()->SetTransform (m);
   gMeshW->GetMovable ()->SetPosition (csVector3(0,-5,0));
   gMeshW->GetMovable ()->UpdateMove ();
-  gMeshW->DeferUpdateLighting (CS_NLIGHT_STATIC | CS_NLIGHT_DYNAMIC, 10);
   
   //setup a material
   csRef<iMaterial> mat = engine->CreateBaseMaterial (0);

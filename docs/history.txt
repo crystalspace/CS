@@ -10,6 +10,40 @@ chronological order.
 	- res augmented csThing::InitializeDefault() to unprepare the thing
 	  when the 'clear' flag is set.
 	- res added a sanity check to csThingObjectType::Initialize().
+	- Jorrit removed an obsolete constructor from csMeshWrapper.
+	- Jorrit did the following lighting related changes:
+	    - Added iLightManager. This interface must be implemented by an
+	      engine (and registered to the "iLightManager" tag in the object
+	      registered) and mesh objects can then use this light manager to
+	      find out which lights affect them. In the end this will replace
+	      the DeferUpdateLighting() system.
+	    - Removed iMeshObject->UpdateLighting(). Mesh objects now have
+	      to use the light manager to request the lights they need (if
+	      any). All mesh objects have been modified to reflect this.
+	    - Changed iParticle->UpdateLighting() to use a csArray instead
+	      of an iLight**.
+	    - Added a temporary implementation of GetRelevantLights() in
+	      csMeshWrapper. This implementation works exactly like
+	      UpdateDeferedLighting() used to do in the past. This means
+	      the current system is just as efficient as the old one.
+	      In future we need to update this so that the array of
+	      lights doesn't have to be recalculated if nothing has changed.
+	      Also we need to sort lights on relevance so we can return
+	      the most relevant lights to the object.
+	    - Completely removed the obsolete DeferUpdateLighting() call.
+	    - Replaced this with a SetLightingUpdate() call. Using this
+	      call the application can control what lights should be
+	      returned to the mesh object upon calling GetRelevantLights()
+	      and in what order. With this function you can control the
+	      number of lights that should be used for lighting the object
+	      and also what kind of relevance sorting should be used (not
+	      implemented yet).
+	    - Changed iso engine to call SetLogicalParent() on the mesh
+	      objects so that the iIsoMeshSprite is set on the mesh.
+	    - Iso engine also implements iLightManager now so that mesh
+	      lighting works the same as in the 3D engine.
+	    - Removed the obsolete flag parameter on iEngine->GetNearbyLights().
+	    - Updated the documentation for these changes.
 	- Eric Sunshine fixed bug in msvcgen.mak introduced on 28-Jan-2004
 	  (during csutil/cssys merge) where it neglected to ensure that
 	  $(OUTBASE)/mk/msvcgen existed before trying to create subdirectories

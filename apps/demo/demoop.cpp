@@ -160,7 +160,6 @@ void SetupMeshOp::Do (csTicks /*dt*/, iBase*)
     movable->SetSector (sector);
     movable->SetPosition (pos);
     movable->UpdateMove ();
-    mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   }
 }
 
@@ -181,7 +180,6 @@ void ShowMeshOp::Do (csTicks /*dt*/, iBase*)
   if (mesh)
   {
     mesh->GetFlags ().Reset (CS_ENTITY_INVISIBLE);
-    mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   }
 }
 

@@ -58,11 +58,6 @@ bool csMeshObject::DrawTest (iRenderView*, iMovable*)
   return true;
 }
 
-void csMeshObject::UpdateLighting (iLight**, int, iMovable*)
-{
-}
-
-
 void csMeshObject::SetVisibleCallback (iMeshObjectDrawCallback* cb)
 {
   VisCallback = cb;

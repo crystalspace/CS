@@ -94,13 +94,6 @@ bool csStarsMeshObject::DrawTest (iRenderView*, iMovable*)
   return true;
 }
 
-void csStarsMeshObject::UpdateLighting (iLight**, int,
-    iMovable*)
-{
-  SetupObject ();
-  return;
-}
-
 static void Perspective (const csVector3& v, csVector3& p, float fov,
     	float sx, float sy)
 {

@@ -1633,11 +1633,6 @@ bool csBCTerrObject::DrawTest (iRenderView*, iMovable*)
   return true;
 }
 
-void csBCTerrObject::UpdateLighting (iLight** /*lights*/, int /*num_lights*/,
-               iMovable*)
-{
-}
-
 /*
  * todo:
  * make 2 separate for loops

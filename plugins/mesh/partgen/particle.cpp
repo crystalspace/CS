@@ -64,9 +64,11 @@ csNewParticleSystem::csNewParticleSystem (
   MixMode = CS_FX_COPY;
   Lighting = true;
   LitColors = 0;
-#ifdef CS_USE_NEW_RENDERER 
   csMeshFactory* mf = (csMeshFactory*)fact;
   iObjectRegistry* object_reg = mf->GetObjectRegistry ();
+  light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
+
+#ifdef CS_USE_NEW_RENDERER 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 
   initialized = false;
@@ -227,6 +229,13 @@ bool csNewParticleSystem::DrawTest (iRenderView* rview, iMovable* movable)
 {
   SetupObject ();
 
+  if (light_mgr)
+  {
+    const csArray<iLight*>& relevant_lights = light_mgr
+    	->GetRelevantLights (LogParent);
+    UpdateLighting (relevant_lights, movable);
+  }
+
   // get the object-to-camera transformation
   iCamera *camera = rview->GetCamera ();
   csReversibleTransform trans = camera->GetTransform ();
@@ -364,7 +373,7 @@ bool csNewParticleSystem::DrawTest (iRenderView* rview, iMovable* movable)
   return true;
 }
 
-void csNewParticleSystem::UpdateLighting (iLight** lights, int num,
+void csNewParticleSystem::UpdateLighting (const csArray<iLight*>& lights,
   iMovable* movable)
 {
   if (!Lighting) return;
@@ -376,6 +385,7 @@ void csNewParticleSystem::UpdateLighting (iLight** lights, int num,
       ColorArray [i] : Color;
     csVector3 wpos = transform.This2Other (PositionArray [i]);
 
+    int num = lights.Length ();
     for (int j=0; j<num; j++)
     {
       float d = (wpos - lights [j]->GetCenter ()).Norm ();

@@ -971,10 +971,6 @@ bool csChunkLodTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
   return true;
 }
 
-void csChunkLodTerrainObject::UpdateLighting (iLight**, int, iMovable*)
-{
-}
-
 csRenderMesh** csChunkLodTerrainObject::GetRenderMeshes (int &n)
 {
   int i;

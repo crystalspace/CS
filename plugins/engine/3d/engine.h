@@ -750,11 +750,11 @@ public:
 
   /// Get all nearby lights.
   virtual int GetNearbyLights (iSector* sector, const csVector3& pos,
-  	uint32 flags, iLight** lights, int max_num_lights);
+  	iLight** lights, int max_num_lights);
 
   /// Get all nearby lights.
   virtual int GetNearbyLights (iSector* sector, const csBox3& box,
-  	uint32 flags, iLight** lights, int max_num_lights);
+  	iLight** lights, int max_num_lights);
 
   virtual csPtr<iSectorIterator> GetNearbySectors (iSector* sector,
   	const csVector3& pos, float radius);

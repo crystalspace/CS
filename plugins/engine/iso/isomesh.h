@@ -31,7 +31,8 @@ struct iMaterialWrapper;
 struct iMeshFactoryWrapper;
 struct iMeshFactoryList;
 
-class csIsoMeshSprite : public iIsoMeshSprite {
+class csIsoMeshSprite : public iIsoMeshSprite
+{
 private:
   /// the grid this sprite lives in
   iIsoGrid *grid;
@@ -50,6 +51,9 @@ private:
   /// zbuf mode for the mesh
   csZBufMode zbufmode;
 
+  /// List of relevant lights.
+  csArray<iLight*> relevant_lights;
+
 public:
   CS_DECLARE_STATIC_CLASSVAR (pos, GetVertexPosition, csVector3)
 
@@ -60,6 +64,8 @@ public:
   csIsoMeshSprite(iBase *iParent);
   ///
   virtual ~csIsoMeshSprite();
+
+  const csArray<iLight*>& GetRelevantLights ();
 
   //-------- iIsoSprite ---------------------------------------------
   virtual int GetVertexCount() const;

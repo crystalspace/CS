@@ -2158,8 +2158,6 @@ void csBugPlug::DebugSectorBox (const csBox3& box, float r, float g, float b,
   // can do this.
   mw->SetZBufMode (CS_ZBUF_USE);
   mw->SetRenderPriority (Engine->GetObjectRenderPriority ());
-
-  //mw->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
 }
 
 void csBugPlug::DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
@@ -2213,8 +2211,6 @@ void csBugPlug::DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
 
   mw->SetZBufMode (CS_ZBUF_TEST);
   mw->SetRenderPriority (Engine->GetAlphaRenderPriority ());
-
-  //mw->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
 }
 
 void csBugPlug::SwitchDebugSector (const csReversibleTransform& trans)

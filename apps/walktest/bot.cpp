@@ -92,10 +92,6 @@ void Bot::move (csTicks elapsed_time)
   if (s)
   {
     mesh->GetMovable()->SetSector (s);
-    iLight* lights[2];
-    int num_lights = engine->GetNearbyLights (s, new_p,
-        CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
-    mesh->UpdateLighting (lights, num_lights);
     if (light)
     {
       if (s != light->GetSector ())

@@ -167,7 +167,6 @@ bool Simple::CreateGenMesh (iMaterialWrapper* mat)
   state->SetManualColors (false);
   genmesh->SetZBufMode (CS_ZBUF_FILL);
   genmesh->SetRenderPriority (engine->GetWallRenderPriority ());
-  genmesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
 
   int tot_angle_table_size = (genmesh_resolution+1) * (genmesh_resolution+1);
   angle_table = new float [tot_angle_table_size];
@@ -204,7 +203,6 @@ void Simple::AnimateGenMesh (csTicks elapsed)
       idx++;
     }
   }
-  genmesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
 }
 
 //-----------------------------------------------------------------------------

@@ -329,8 +329,6 @@ bool PathTut::Initialize (int argc, const char* const argv[])
   sprite->SetZBufMode (CS_ZBUF_USE);
   sprite->SetRenderPriority (engine->GetObjectRenderPriority ());
 
-  sprite->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
-  
   return true;
 }
 
@@ -349,7 +347,6 @@ void PathTut::Animate (csTicks elapsedTime)
     sprite->GetMovable()->SetPosition (pos);
     sprite->GetMovable()->GetTransform ().LookAt (forward.Unit(), up.Unit());
     sprite->GetMovable()->UpdateMove ();
-    sprite->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   }
   else
   {

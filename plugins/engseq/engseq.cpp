@@ -749,7 +749,6 @@ public:
     trans.Translate (offset);
     mesh->GetMovable ()->SetTransform (trans);
     mesh->GetMovable ()->UpdateMove ();
-    mesh->DeferUpdateLighting (CS_NLIGHT_STATIC | CS_NLIGHT_DYNAMIC, 10);
   }
 };
 
@@ -860,7 +859,6 @@ public:
     csVector3 new_pos = start_pos + time * offset;
     mesh->GetMovable ()->GetTransform ().SetOrigin (new_pos);
     mesh->GetMovable ()->UpdateMove ();
-    mesh->DeferUpdateLighting (CS_NLIGHT_STATIC | CS_NLIGHT_DYNAMIC, 10);
   }
 };
 

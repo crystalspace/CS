@@ -277,9 +277,6 @@ void csStuffObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
 iMeshObjectFactory* csStuffObject::GetFactory () const
 { return factory; }
  
-void csStuffObject::UpdateLighting (iLight **,int, iMovable *) 
-{ SetupMesh(); }
- 
 void csStuffObject::SetVisibleCallback(iMeshObjectDrawCallback *cb) 
 { vis_cb=cb; }
  

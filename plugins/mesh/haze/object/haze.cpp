@@ -596,19 +596,6 @@ bool csHazeMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   return true;
 }
 
-void csHazeMeshObject::UpdateLighting (iLight** /*lights*/, int /*num_lights*/,
-    const csVector3& /*pos*/)
-{
-  SetupObject ();
-}
-
-void csHazeMeshObject::UpdateLighting (iLight** lights, int num_lights,
-    iMovable* movable)
-{
-  csVector3 pos = movable->GetFullPosition ();
-  UpdateLighting (lights, num_lights, pos);
-}
-
 #define INTERPOLATE1_S(var) \
   g3dpoly->var [i] = inpoly_##var [vt]+ \
     t * (inpoly_##var [vt2]- inpoly_##var [vt]);

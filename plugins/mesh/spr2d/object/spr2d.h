@@ -32,6 +32,7 @@
 #include "iutil/config.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iengine/lightmgr.h"
 #include "spr2duv.h"
 
 struct iMaterialWrapper;
@@ -90,7 +91,9 @@ private:
   void SetupObject ();
 
   /// Update lighting given a position.
-  void UpdateLighting (iLight** lights, int num_lights, const csVector3& pos);
+  void UpdateLighting (const csArray<iLight*>& lights, const csVector3& pos);
+  void UpdateLighting (const csArray<iLight*>& lights,
+      	iMovable* movable);
 
   /// Check the start vector and recalculate the LookAt matrix if changed.
   void CheckBeam (const csVector3& start, const csVector3& plane,
@@ -122,8 +125,6 @@ public:
   virtual iMeshObjectFactory* GetFactory () const { return ifactory; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual csRenderMesh **GetRenderMeshes (int &n) { n = 0; return 0; }
-  virtual void UpdateLighting (iLight** lights, int num_lights,
-      	iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
@@ -241,7 +242,7 @@ public:
     virtual void Rotate (float angle);
     virtual void Draw (iRenderView* rview,
     	const csReversibleTransform& transform, csZBufMode mode);
-    virtual void UpdateLighting (iLight** lights, int num_lights,
+    virtual void UpdateLighting (const csArray<iLight*>& lights,
 	const csReversibleTransform& transform);
   } scfiParticle;
   friend class Particle;
@@ -281,9 +282,11 @@ public:
   /// Polygon.
   G3DPolygonDPFX g3dpolyfx;
 
+  csRef<iLightManager> light_mgr;
+
 public:
   /// Constructor.
-  csSprite2DMeshObjectFactory (iBase *pParent);
+  csSprite2DMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csSprite2DMeshObjectFactory ();
@@ -368,6 +371,9 @@ public:
 class csSprite2DMeshObjectType : public iMeshObjectType
 {
 public:
+  iObjectRegistry* object_reg;
+
+public:
   SCF_DECLARE_IBASE;
 
   /// Constructor.
@@ -380,7 +386,11 @@ public:
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSprite2DMeshObjectType);
-    virtual bool Initialize (iObjectRegistry*) { return true; }
+    virtual bool Initialize (iObjectRegistry* object_reg)
+    {
+      scfParent->object_reg = object_reg;
+      return true;
+    }
   } scfiComponent;
 };
 

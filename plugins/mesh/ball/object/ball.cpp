@@ -732,6 +732,15 @@ void csBallMeshObject::SetupVertexBuffer ()
 bool csBallMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
   SetupObject ();
+
+  if (((csBallMeshObjectFactory*)factory)->light_mgr)
+  {
+    const csArray<iLight*>& relevant_lights
+    	= ((csBallMeshObjectFactory*)factory)->light_mgr
+    	->GetRelevantLights (logparent);
+    UpdateLighting (relevant_lights, movable);
+  }
+
   iCamera* camera = rview->GetCamera ();
 
   // First create the transformation from object to camera space directly:
@@ -775,11 +784,9 @@ bool csBallMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   return true;
 }
 
-void csBallMeshObject::UpdateLighting (iLight** lights, int num_lights,
+void csBallMeshObject::UpdateLighting (const csArray<iLight*>& lights,
     iMovable* movable)
 {
-  SetupObject ();
-
   int i, l;
   csColor* colors = ball_colors;
 
@@ -808,6 +815,7 @@ void csBallMeshObject::UpdateLighting (iLight** lights, int num_lights,
   // the object center in world coordinates. "0" because the object
   // center in object space is obviously at (0,0,0).
   csColor color;
+  int num_lights = lights.Length ();
   for (l = 0 ; l < num_lights ; l++)
   {
     iLight* li = lights[l];
@@ -816,7 +824,9 @@ void csBallMeshObject::UpdateLighting (iLight** lights, int num_lights,
     csVector3 obj_light_pos = trans.Other2This (wor_light_pos);
     float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, 0);
     if (obj_sq_dist >= li->GetInfluenceRadiusSq ()) continue;
-    float in_obj_dist = (obj_sq_dist >= SMALL_EPSILON)?qisqrt (obj_sq_dist):1.0f;
+    float in_obj_dist = (obj_sq_dist >= SMALL_EPSILON)
+    	? qisqrt (obj_sq_dist)
+	: 1.0f;
 
     csColor light_color = li->GetColor () * (256.0f / CS_NORMAL_LIGHT_LEVEL)
       * li->GetBrightnessAtDistance (qsqrt (obj_sq_dist));
@@ -1269,6 +1279,7 @@ csBallMeshObjectFactory::csBallMeshObjectFactory (iBase *pParent,
   logparent = 0;
   csRef<iEngine> eng = CS_QUERY_REGISTRY (object_reg, iEngine);
   engine = eng;	// We don't want a circular reference.
+  light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
 }
 
 csBallMeshObjectFactory::~csBallMeshObjectFactory ()

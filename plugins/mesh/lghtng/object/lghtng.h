@@ -66,11 +66,6 @@ class csLightningMeshObject : public iMeshObject
   
   void SetupObject ();
 
-  /// Update lighting given a position.
-  void UpdateLighting (iLight** lights, int num_lights, const csVector3& pos)
-  {
-  }
-
   /// Get the bounding box in transformed space.
   void GetTransformedBoundingBox (long cameranr, long movablenr,
       const csReversibleTransform& trans, csBox3& cbox);
@@ -91,10 +86,6 @@ public:
   virtual iMeshObjectFactory* GetFactory () const { return ifactory; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual csRenderMesh **GetRenderMeshes (int &n) { n = 0; return 0; }
-  virtual void UpdateLighting (iLight** lights, int num_lights,
-      	iMovable* movable)
-  {
-  }
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {

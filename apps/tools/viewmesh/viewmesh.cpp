@@ -386,7 +386,6 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 	  {
 	    csComponent *item = menu->GetItem (ev.Command.Code);
 	    cal3dstate->AttachCoreMesh( item->GetText () );
-	    sprite->DeferUpdateLighting(CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
             menu->SetCheck(ev.Command.Code, true);
 	  }
 	}
@@ -457,7 +456,6 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 		csVector3 (0, 10, 0));
 	    sprite->GetChildren()->Add( meshwrap );
 	    socket->SetMeshWrapper( meshwrap );
-	    sprite->DeferUpdateLighting(CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
 	  }
 	}
       }
@@ -569,8 +567,6 @@ bool ViewMesh::LoadSprite(const char *filename, float scale)
       }
     }
   }
-
-  sprite->DeferUpdateLighting (CS_NLIGHT_DYNAMIC|CS_NLIGHT_STATIC, 10);
 
   // try to get center of the sprite
   csBox3 box;

@@ -539,10 +539,15 @@ void csGenmeshMeshObject::SetupObject ()
 
 bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
-#ifndef CS_USE_NEW_RENDERER
   SetupObject ();
   CheckLitColors ();
-#endif
+
+  if (factory->light_mgr)
+  {
+    const csArray<iLight*>& relevant_lights = factory->light_mgr
+    	->GetRelevantLights (logparent);
+    UpdateLighting (relevant_lights, movable);
+  }
 
   iCamera* camera = rview->GetCamera ();
 
@@ -849,12 +854,9 @@ void csGenmeshMeshObject::UpdateLighting2 (iMovable* movable)
 #endif
 }
 
-void csGenmeshMeshObject::UpdateLighting (iLight** lights, int num_lights,
+void csGenmeshMeshObject::UpdateLighting (const csArray<iLight*>& lights,
     iMovable* movable)
 {
-  SetupObject ();
-  CheckLitColors ();
-
   if (do_manual_colors) return;
   if (do_shadow_rec) return;
 
@@ -885,6 +887,7 @@ void csGenmeshMeshObject::UpdateLighting (iLight** lights, int num_lights,
   csReversibleTransform trans = movable->GetFullTransform ();
   // the object center in world coordinates. "0" because the object
   // center in object space is obviously at (0,0,0).
+  int num_lights = lights.Length ();
   for (l = 0 ; l < num_lights ; l++)
   {
     iLight* li = lights[l];
@@ -1236,6 +1239,8 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
 #endif
   material = 0;
   polygons = 0;
+  light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
+
 #ifdef CS_USE_NEW_RENDERER
   vertex_buffer = 0;
   normal_buffer = 0;

@@ -132,7 +132,6 @@ void Simple::SetupFrame ()
     rot1_direction = -rot1_direction;
     rot2_direction = -rot2_direction;
   }
-  parent_sprite->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
 
   iCamera* c = view->GetCamera();
   if (kbd->GetKeyState (CSKEY_RIGHT))
@@ -402,7 +401,6 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
   spstate = SCF_QUERY_INTERFACE (parent_sprite->GetMeshObject (),
   	iSprite3DState);
   spstate->SetAction ("default");
-  parent_sprite->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   parent_sprite->GetMovable ()->Transform (csZRotMatrix3 (PI/2.));
   parent_sprite->GetMovable ()->UpdateMove ();
 

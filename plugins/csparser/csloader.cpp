@@ -2694,7 +2694,6 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	    goto error;
 	  }
 	  sp->QueryObject ()->SetName (child->GetAttributeValue ("name"));
-	  sp->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
           mesh->GetChildren ()->Add (sp);
 	  sp->DecRef ();
         }
@@ -2712,7 +2711,6 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	  {
 	    AddToRegion (ldr_context, sp->QueryObject ());
 	  }
-	  sp->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
           mesh->GetChildren ()->Add (sp);
         }
         break;
@@ -4211,7 +4209,6 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	    goto error;
 	  }
 	  mesh->QueryObject ()->SetName (meshname);
-	  mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
           mesh->GetMovable ()->SetSector (sector);
 	  mesh->GetMovable ()->UpdateMove ();
 	  Engine->GetMeshes ()->Add (mesh);
@@ -4265,7 +4262,6 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	  {
 	    AddToRegion (ldr_context, mesh->QueryObject ());
 	  }
-	  mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
           mesh->GetMovable ()->SetSector (sector);
 	  mesh->GetMovable ()->UpdateMove ();
         }
@@ -4303,7 +4299,6 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	    // Error is already reported.
 	    goto error;
 	  }
-	  mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
           mesh->GetMovable ()->SetSector (sector);
 	  mesh->GetMovable ()->UpdateMove ();
         }

@@ -1419,6 +1419,13 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
   SetupObject ();
 
+  if (factory->light_mgr)
+  {
+    const csArray<iLight*>& relevant_lights = factory->light_mgr
+    	->GetRelevantLights (logparent);
+    UpdateLighting (relevant_lights, movable);
+  }
+
   if (!factory->cstxt)
   {
     factory->Report (CS_REPORTER_SEVERITY_ERROR,
@@ -2158,11 +2165,9 @@ csVector3* csSprite3DMeshObject::GetObjectVerts (csSpriteFrame* fr)
     return obj_verts->GetArray ();
 }
 
-void csSprite3DMeshObject::UpdateLighting (iLight** lights, int num_lights,
+void csSprite3DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
 	iMovable* movable)
 {
-  SetupObject ();
-
   // Make sure that the color array is initialized.
   AddVertexColor (0, csColor (0, 0, 0));
 
@@ -2205,9 +2210,9 @@ void csSprite3DMeshObject::UpdateLighting (iLight** lights, int num_lights,
 
   switch (GetLightingQuality())
   {
-    case CS_SPR_LIGHTING_HQ:   UpdateLightingHQ   (lights, num_lights, movable); break;
-    case CS_SPR_LIGHTING_LQ:   UpdateLightingLQ   (lights, num_lights, movable); break;
-    case CS_SPR_LIGHTING_FAST: UpdateLightingFast (lights, num_lights, movable); break;
+    case CS_SPR_LIGHTING_HQ:   UpdateLightingHQ   (lights, movable); break;
+    case CS_SPR_LIGHTING_LQ:   UpdateLightingLQ   (lights, movable); break;
+    case CS_SPR_LIGHTING_FAST: UpdateLightingFast (lights, movable); break;
     case CS_SPR_LIGHTING_RANDOM: UpdateLightingRandom (); break;
   }
 
@@ -2240,17 +2245,14 @@ void csSprite3DMeshObject::UpdateLightingRandom ()
   }
 }
 
-
-
-
-void csSprite3DMeshObject::UpdateLightingFast (iLight** lights, int num_lights,
+void csSprite3DMeshObject::UpdateLightingFast (const csArray<iLight*>& lights,
 	iMovable* movable)
 {
   int light_num, j;
 
   float cosinus;
   //int num_texels = factory->GetVertexCount();
-  int num_texels = GetVertexToLightCount();
+  int num_texels = GetVertexToLightCount ();
 
   float light_bright_wor_dist;
 
@@ -2291,9 +2293,11 @@ void csSprite3DMeshObject::UpdateLightingFast (iLight** lights, int num_lights,
   float amb_b = b / 128.0;
 #endif
 
+  int num_lights = lights.Length ();
   for (light_num = 0 ; light_num < num_lights ; light_num++)
   {
-    light_color = lights [light_num]->GetColor () * (256. / CS_NORMAL_LIGHT_LEVEL);
+    light_color = lights [light_num]->GetColor ()
+    	* (256. / CS_NORMAL_LIGHT_LEVEL);
     sq_light_radius = lights [light_num]->GetInfluenceRadiusSq ();
 
     // Compute light position in object coordinates
@@ -2311,7 +2315,8 @@ void csSprite3DMeshObject::UpdateLightingFast (iLight** lights, int num_lights,
     float wor_dist = qsqrt (wor_sq_dist);
 
     csVector3 obj_light_dir = (obj_light_pos - obj_center);
-    light_bright_wor_dist = lights[light_num]->GetBrightnessAtDistance (wor_dist);
+    light_bright_wor_dist = lights[light_num]->GetBrightnessAtDistance (
+    	wor_dist);
 
     color = light_color;
 
@@ -2339,7 +2344,8 @@ void csSprite3DMeshObject::UpdateLightingFast (iLight** lights, int num_lights,
       for (j = 0 ; j < num_texels ; j++)
       {
         // this obj_dist is not the obj_dist, see NOTE above.
-        cosinus = (obj_light_dir * factory->GetNormal (tf_idx, j)) * inv_obj_dist;
+        cosinus = (obj_light_dir * factory->GetNormal (tf_idx, j))
+		* inv_obj_dist;
         cosinus_light = (cosinus * light_bright_wor_dist);
         vertex_colors[j].Set(light_color_r * cosinus_light + base_color.red,
                              light_color_g * cosinus_light + base_color.green,
@@ -2351,7 +2357,8 @@ void csSprite3DMeshObject::UpdateLightingFast (iLight** lights, int num_lights,
       for (j = 0 ; j < num_texels ; j++)
       {
         // this obj_dist is not the obj_dist, see NOTE above.
-        cosinus = (obj_light_dir * factory->GetNormal (tf_idx, j)) * inv_obj_dist;
+        cosinus = (obj_light_dir * factory->GetNormal (tf_idx, j))
+		* inv_obj_dist;
         cosinus_light = (cosinus * light_bright_wor_dist);
         vertex_colors[j].Add(light_color_r * cosinus_light,
                              light_color_g * cosinus_light,
@@ -2361,8 +2368,7 @@ void csSprite3DMeshObject::UpdateLightingFast (iLight** lights, int num_lights,
   } // end of light loop.
 }
 
-
-void csSprite3DMeshObject::UpdateLightingLQ (iLight** lights, int num_lights,
+void csSprite3DMeshObject::UpdateLightingLQ (const csArray<iLight*>& lights,
 	iMovable* movable)
 {
   int i, j;
@@ -2391,6 +2397,7 @@ void csSprite3DMeshObject::UpdateLightingLQ (iLight** lights, int num_lights,
   }
   csColor color;
 
+  int num_lights = lights.Length ();
   for (i = 0 ; i < num_lights ; i++)
   {
     // Compute light position in object coordinates
@@ -2413,15 +2420,17 @@ void csSprite3DMeshObject::UpdateLightingLQ (iLight** lights, int num_lights,
 
     csVector3 obj_light_dir = (obj_light_pos - obj_center);
 
-    csColor light_color = lights[i]->GetColor () * (256. / CS_NORMAL_LIGHT_LEVEL)
-      * lights[i]->GetBrightnessAtDistance (qsqrt (wor_sq_dist));
+    csColor light_color = lights[i]->GetColor ()
+    	* (256. / CS_NORMAL_LIGHT_LEVEL)
+	* lights[i]->GetBrightnessAtDistance (qsqrt (wor_sq_dist));
 
     for (j = 0 ; j < num_texels ; j++)
     {
       csVector3 normal = factory->GetNormal (tf_idx, j);
       if (tween_ratio)
       {
-        normal = remainder * normal + tween_ratio * factory->GetNormal (nf_idx, j);
+        normal = remainder * normal + tween_ratio * factory->GetNormal (
+		nf_idx, j);
 	float norm = normal.Norm ();
 	if (ABS (norm) > SMALL_EPSILON)
           normal /= norm;
@@ -2442,7 +2451,7 @@ void csSprite3DMeshObject::UpdateLightingLQ (iLight** lights, int num_lights,
   }
 }
 
-void csSprite3DMeshObject::UpdateLightingHQ (iLight** lights, int num_lights,
+void csSprite3DMeshObject::UpdateLightingHQ (const csArray<iLight*>& lights,
 	iMovable* movable)
 {
   int i, j;
@@ -2473,9 +2482,11 @@ void csSprite3DMeshObject::UpdateLightingHQ (iLight** lights, int num_lights,
   csColor color;
 
   csReversibleTransform movtrans = movable->GetFullTransform ();
+  int num_lights = lights.Length ();
   for (i = 0 ; i < num_lights ; i++)
   {
-    csColor light_color = lights [i]->GetColor () * (256. / CS_NORMAL_LIGHT_LEVEL);
+    csColor light_color = lights [i]->GetColor ()
+    	* (256. / CS_NORMAL_LIGHT_LEVEL);
     float sq_light_radius = lights [i]->GetInfluenceRadiusSq ();
 
     // Compute light position in object coordinates
@@ -2576,7 +2587,8 @@ bool csSprite3DMeshObject::HitBeamObject (const csVector3& start,
   return true;
 }
 
-void csSprite3DMeshObject::PositionChild (iMeshObject* child,csTicks current_time)
+void csSprite3DMeshObject::PositionChild (iMeshObject* child,
+	csTicks current_time)
 {
   iSpriteSocket* socket = 0;
   int i;
@@ -2591,7 +2603,7 @@ void csSprite3DMeshObject::PositionChild (iMeshObject* child,csTicks current_tim
       }
     }
   }
-  if(socket)
+  if (socket)
   {
     csVector3 new_pos = last_pos;
     OldNextFrame (current_time, new_pos, single_step, !loopaction);
@@ -2844,6 +2856,7 @@ csPtr<iMeshObjectFactory> csSprite3DMeshObjectType::NewFactory ()
   cm->g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   cm->anon_buffers = new csAnonRenderBufferManager (object_reg);
 #endif
+  cm->light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
   csRef<iMeshObjectFactory> ifact (
   	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
   cm->DecRef ();

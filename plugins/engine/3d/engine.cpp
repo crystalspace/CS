@@ -37,6 +37,7 @@
 #include "plugins/engine/3d/radiosty.h"
 #include "plugins/engine/3d/objwatch.h"
 #include "plugins/engine/3d/portalcontainer.h"
+#include "plugins/engine/3d/lightmgr.h"
 #include "iengine/portal.h"
 #include "csgeom/fastsqrt.h"
 #include "csgeom/sphere.h"
@@ -855,7 +856,7 @@ bool csEngine::Initialize (iObjectRegistry *object_reg)
   // Tell event queue that we want to handle broadcast events
   if (!scfiEventHandler) scfiEventHandler = new EventHandler (this);
 
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+  csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   if (q)
     q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
 
@@ -882,6 +883,10 @@ bool csEngine::Initialize (iObjectRegistry *object_reg)
   // Register it.
   renderLoopManager->Register (CS_DEFAULT_RENDERLOOP_NAME, defaultRenderLoop);
 #endif
+
+  csLightManager* light_mgr = new csLightManager ();
+  object_reg->Register (light_mgr, "iLightManager");
+  light_mgr->DecRef ();
 
   return true;
 }
@@ -2341,7 +2346,6 @@ static bool FindLightBox_Front2Back (csKDTree* treenode,
 int csEngine::GetNearbyLights (
   iSector *sector,
   const csVector3 &pos,
-  uint32 flags,
   iLight **lights,
   int max_num_lights)
 {
@@ -2356,13 +2360,9 @@ int csEngine::GetNearbyLights (
 
   light_array->Reset ();
 
-  // Add all dynamic and static lights.
-  //@@@ Ignore flags? if ((flags & CS_NLIGHT_STATIC) || (flags & CS_NLIGHT_DYNAMIC))
-  {
-    csKDTree* kdtree = sector->GetPrivateObject ()->GetLightKDTree ();
-    csVector3 position = pos;
-    kdtree->Front2Back (pos, FindLightPos_Front2Back, &position, 0);
-  }
+  csKDTree* kdtree = sector->GetPrivateObject ()->GetLightKDTree ();
+  csVector3 position = pos;
+  kdtree->Front2Back (pos, FindLightPos_Front2Back, &position, 0);
 
   if (light_array->num_lights <= max_num_lights)
   {
@@ -2391,7 +2391,6 @@ int csEngine::GetNearbyLights (
 int csEngine::GetNearbyLights (
   iSector *sector,
   const csBox3 &box,
-  uint32 flags,
   iLight **lights,
   int max_num_lights)
 {
@@ -2406,13 +2405,9 @@ int csEngine::GetNearbyLights (
 
   light_array->Reset ();
 
-  // Add all lights to the array.
-  //@@@ Ignore flags? if (flags & CS_NLIGHT_STATIC)
-  {
-    csKDTree* kdtree = sector->GetPrivateObject ()->GetLightKDTree ();
-    csBox3 bbox = box;
-    kdtree->Front2Back (box.Min (), FindLightBox_Front2Back, &bbox, 0);
-  }
+  csKDTree* kdtree = sector->GetPrivateObject ()->GetLightKDTree ();
+  csBox3 bbox = box;
+  kdtree->Front2Back (box.Min (), FindLightBox_Front2Back, &bbox, 0);
 
   if (light_array->num_lights <= max_num_lights)
   {

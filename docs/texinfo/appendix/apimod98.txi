@@ -6,6 +6,22 @@
 This section documents the major changes between versions 0.96 and 0.98 of
 Crystal Space.
 
+@subheading Lighting Changes
+@cindex @code{DeferUpdateLighting}
+@cindex @code{UpdateLighting}
+@cindex @code{SetLightingUpdate}
+@cindex @code{GetNearbyLights}
+
+The functions @code{iMeshWrapper::DeferUpdateLighting()} and
+@code{iMeshWrapper::UpdateLighting()} have been removed. Instead there
+is a new function @code{iMeshWrapper::SetLightingUpdate()} with which you
+can have the same control. The big difference is that you don't have to
+call this function every time a light or object moves. This is all updated
+automatically now.
+
+Also removed the @code{CS_NLIGHT_} flags. @code{iEngine::GetNearbyLights()}
+has been modified so that the flags parameter is gone.
+
 @subheading Bezier Curve Changes
 @cindex Bezier Curve Changes
 @cindex @code{iCurveTemplate}

@@ -91,7 +91,6 @@ public:
 
   virtual iMeshObjectFactory* GetFactory () const { return 0; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
-  virtual void UpdateLighting (iLight**, int, iMovable*) { }
   virtual bool Draw (iRenderView*, iMovable*, csZBufMode) { return false; }
   virtual csRenderMesh** GetRenderMeshes (int& n) { n = 0; return 0; }
   virtual void SetVisibleCallback (iMeshObjectDrawCallback*) { }

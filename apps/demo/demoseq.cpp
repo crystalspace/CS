@@ -296,7 +296,6 @@ void DemoSequenceManager::ControlPaths (iCamera* camera, csTicks elapsed_time)
         movable->SetSector (newsector);
       movable->GetTransform ().LookAt (forward.Unit (), up.Unit ());
       movable->UpdateMove ();
-      pfm->mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
     }
     else
     {
@@ -356,7 +355,6 @@ void DemoSequenceManager::DebugPositionObjects (iCamera* camera,
         movable->SetPosition (pos);
         movable->GetTransform ().LookAt (forward.Unit (), up.Unit ());
         movable->UpdateMove ();
-        pfm->mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
       }
       else
       {

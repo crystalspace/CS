@@ -23,6 +23,7 @@
 #include "imesh/partsys.h"
 #include "ivideo/vbufmgr.h"
 #include "ivideo/rendermesh.h"
+#include "iengine/lightmgr.h"
 #include "csgfx/shadervarcontext.h"
 
 /**
@@ -72,6 +73,7 @@ class csNewParticleSystem : public csMeshObject
 protected:
   /// the mesh factory (should be an empty frame)
   iMeshObjectFactory *Factory;
+  csRef<iLightManager> light_mgr;
 
 #ifdef CS_USE_NEW_RENDERER
   bool initialized;
@@ -194,7 +196,7 @@ public:
   virtual csRenderMesh** GetRenderMeshes (int& n);
 
   /// update lighting info
-  void UpdateLighting (iLight**, int, iMovable*);
+  void UpdateLighting (const csArray<iLight*>&, iMovable*);
 
   /// draw this particle system
   virtual bool Draw (iRenderView*, iMovable*, csZBufMode);

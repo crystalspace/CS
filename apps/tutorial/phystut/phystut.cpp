@@ -402,7 +402,6 @@ bool Simple::Initialize ()
 
   // Create the avatar.
   avatar = engine->CreateMeshWrapper (boxFact, "box", room);
-  avatar->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
 
   // Create a body and attach the mesh.
   avatarbody = dynSys->CreateBody ();
@@ -428,7 +427,6 @@ iRigidBody* Simple::CreateBox (void)
 
   // Create the mesh.
   csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (boxFact, "box", room));
-  mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
 
   // Create a body and attach the mesh.
   csRef<iRigidBody> rb = dynSys->CreateBody ();
@@ -458,7 +456,6 @@ iRigidBody* Simple::CreateSphere (void)
 
   // Create the mesh.
   csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (ballFact, "ball", room));
-  mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
 
   iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
 

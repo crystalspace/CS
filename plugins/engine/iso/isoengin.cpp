@@ -47,6 +47,7 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csIsoEngine)
   SCF_IMPLEMENTS_INTERFACE (iIsoEngine)
+  SCF_IMPLEMENTS_INTERFACE (iLightManager)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
@@ -110,7 +111,15 @@ bool csIsoEngine::Initialize (iObjectRegistry* p)
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
     q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
+  object_reg->Register ((iLightManager*)this, "iLightManager");
   return true;
+}
+
+const csArray<iLight*>& csIsoEngine::GetRelevantLights (iBase* logObject)
+{
+  iIsoMeshSprite* m = (iIsoMeshSprite*)logObject;
+  csIsoMeshSprite* cm = (csIsoMeshSprite*)m;
+  return cm->GetRelevantLights ();
 }
 
 bool csIsoEngine::HandleEvent (iEvent& Event)
@@ -166,22 +175,22 @@ bool csIsoEngine::HandleEvent (iEvent& Event)
 
 iIsoWorld* csIsoEngine::CreateWorld()
 {
-  return new csIsoWorld(this);
+  return new csIsoWorld((iIsoEngine*)this);
 }
 
 iIsoView* csIsoEngine::CreateView(iIsoWorld *world)
 {
-  return new csIsoView(this, this, world);
+  return new csIsoView((iIsoEngine*)this, (iIsoEngine*)this, world);
 }
 
 iIsoSprite* csIsoEngine::CreateSprite()
 {
-  return new csIsoSprite(this);
+  return new csIsoSprite((iIsoEngine*)this);
 }
 
 iIsoMeshSprite* csIsoEngine::CreateMeshSprite()
 {
-  return new csIsoMeshSprite(this);
+  return new csIsoMeshSprite((iIsoEngine*)this);
 }
 
 int csIsoEngine::GetBeginDrawFlags () const
@@ -192,7 +201,7 @@ int csIsoEngine::GetBeginDrawFlags () const
 iIsoSprite* csIsoEngine::CreateFloorSprite(const csVector3& pos, float w,
       float h)
 {
-  iIsoSprite *spr = new csIsoSprite(this);
+  iIsoSprite *spr = new csIsoSprite((iIsoEngine*)this);
   spr->AddVertex(csVector3(0,0,0), 0, 0);
   spr->AddVertex(csVector3(0, 0, w), 1, 0);
   spr->AddVertex(csVector3(h, 0, w), 1, 1);
@@ -204,7 +213,7 @@ iIsoSprite* csIsoEngine::CreateFloorSprite(const csVector3& pos, float w,
 iIsoSprite* csIsoEngine::CreateFrontSprite(const csVector3& pos, float w,
       float h)
 {
-  iIsoSprite *spr = new csIsoSprite(this);
+  iIsoSprite *spr = new csIsoSprite((iIsoEngine*)this);
   float hw = w * 0.25;
   spr->AddVertex(csVector3(-hw, 0,-hw), 0, 0);
   spr->AddVertex(csVector3(-hw, h, -hw), 1, 0);
@@ -217,7 +226,7 @@ iIsoSprite* csIsoEngine::CreateFrontSprite(const csVector3& pos, float w,
 iIsoSprite* csIsoEngine::CreateZWallSprite(const csVector3& pos, float w,
   float h)
 {
-  iIsoSprite *spr = new csIsoSprite(this);
+  iIsoSprite *spr = new csIsoSprite((iIsoEngine*)this);
   spr->AddVertex(csVector3(0, 0, 0), 0, 0);
   spr->AddVertex(csVector3(0, h, 0), 1, 0);
   spr->AddVertex(csVector3(0, h, w), 1, 1);
@@ -229,7 +238,7 @@ iIsoSprite* csIsoEngine::CreateZWallSprite(const csVector3& pos, float w,
 iIsoSprite* csIsoEngine::CreateXWallSprite(const csVector3& pos, float w,
   float h)
 {
-  iIsoSprite *spr = new csIsoSprite(this);
+  iIsoSprite *spr = new csIsoSprite((iIsoEngine*)this);
   spr->AddVertex(csVector3(0, 0, 0), 0, 0);
   spr->AddVertex(csVector3(0, h, 0), 1, 0);
   spr->AddVertex(csVector3(w, h, 0), 1, 1);
@@ -240,7 +249,7 @@ iIsoSprite* csIsoEngine::CreateXWallSprite(const csVector3& pos, float w,
 
 iIsoLight* csIsoEngine::CreateLight()
 {
-  return new csIsoLight(this);
+  return new csIsoLight((iIsoEngine*)this);
 }
 
 iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,

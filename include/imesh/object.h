@@ -68,28 +68,16 @@ struct iMeshObject : public iBase
    * First part of Draw. The engine will call this DrawTest() before
    * calling Draw() so DrawTest() can (if needed) remember computationally
    * expensive data. If DrawTest() returns false the engine will not
-   * call Draw(). Possibly UpdateLighting() will be called in between
-   * DrawTest() and Draw().
+   * call Draw().
    */
   virtual bool DrawTest (iRenderView* rview, iMovable* movable) = 0;
-
-  // For NR:
-  /// The following enable/disable shadow caps for stencil shadow rendering
-  // virtual void EnableShadowCaps () = 0;
-  // virtual void DisableShadowCaps () = 0;
-
-  /**
-   * Update lighting for the object on the given position.
-   */
-  virtual void UpdateLighting (iLight** lights, int num_lights,
-      	iMovable* movable) = 0;
 
   /**
    * Draw this mesh object. Returns false if not visible.
    * If this function returns true it does not mean that the object
    * is invisible. It just means that this MeshObject thinks that the
    * object was probably visible. DrawTest() will be called before
-   * this function (possibly with an UpdateLighting() in between.
+   * this function.
    */
   virtual bool Draw (iRenderView* rview, iMovable* movable,
   	csZBufMode zbufMode) = 0;

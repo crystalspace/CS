@@ -117,11 +117,6 @@ void csNullmeshMeshObject::SetBoundingBox (const csBox3& box)
   scfiObjectModel.ShapeChanged ();
 }
 
-void csNullmeshMeshObject::UpdateLighting (iLight**, int, iMovable*)
-{
-  return;
-}
-
 bool csNullmeshMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 	csZBufMode /*mode*/)
 {

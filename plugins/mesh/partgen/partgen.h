@@ -29,6 +29,7 @@
 #include "imesh/object.h"
 #include "imesh/partsys.h"
 #include "imesh/particle.h"
+#include "iengine/lightmgr.h"
 
 struct iMeshObjectFactory;
 struct iMaterialWrapper;
@@ -49,6 +50,7 @@ protected:
   iMeshObjectFactory* factory;
   iBase* logparent;
   iEngine* engine;
+  csRef<iLightManager> light_mgr;
   /// Object space radius.
   csVector3 radius;
   /// iParticle ptrs to the particles.
@@ -108,6 +110,8 @@ public:
    * Destroy particle system, and all particles.
    */
   virtual ~csParticleSystem ();
+
+  void UpdateLighting (const csArray<iLight*>& lights, iMovable* movable);
 
   /// How many particles the system currently has.
   inline int GetNumParticles () const { return particles.Length();}
@@ -227,8 +231,6 @@ public:
   virtual iMeshObjectFactory* GetFactory () const { return factory; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual csRenderMesh** GetRenderMeshes (int& n) { n = 0; return 0; }
-  virtual void UpdateLighting (iLight** lights, int num_lights,
-      	iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {

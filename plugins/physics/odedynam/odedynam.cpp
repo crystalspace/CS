@@ -2215,7 +2215,6 @@ void csODEDefaultMoveCallback::Execute (iMeshWrapper* mesh,
   mesh->GetMovable ()->SetPosition (t.GetOrigin ());
   mesh->GetMovable ()->GetTransform ().SetT2O (t.GetO2T ());
   mesh->GetMovable ()->UpdateMove ();
-  mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
 }
 
 void csODEDefaultMoveCallback::Execute (iSkeletonBone* bone,

@@ -220,8 +220,8 @@ struct iIsoGrid : public iBase
   /// unregister a dynamic light with this grid
   virtual void UnRegisterDynamicLight(iIsoLight *light) = 0;
   /// get a list of fake iLight interfaces for a spot on the grid
-  virtual void GetFakeLights(const csVector3& pos, iLight **& flights,
-    int& num) = 0;
+  virtual void GetFakeLights (const csVector3& pos,
+  	csArray<iLight*>& flights) = 0;
 
   /// Add a sprite to this grid
   virtual void AddSprite(iIsoSprite *sprite) = 0;

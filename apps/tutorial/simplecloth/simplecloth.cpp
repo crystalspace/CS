@@ -332,7 +332,6 @@ bool Simple::Initialize ()
   
   
 
-  //sprite->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   return true;
 }
 

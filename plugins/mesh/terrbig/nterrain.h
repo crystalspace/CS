@@ -14,6 +14,7 @@
 #include "iutil/comp.h"
 #include "ivideo/graph3d.h"
 #include "iengine/rview.h"
+#include "iengine/lightmgr.h"
 #include "imesh/terrbig.h"
 #include <string.h>
 #include <stdio.h>
@@ -279,6 +280,8 @@ private:
   /// Visible call-back
   csRef<iMeshObjectDrawCallback> vis_cb;
 
+  csRef<iLightManager> light_mgr;
+
   /// Pointer to terrain object
   nTerrain *terrain;
 
@@ -366,7 +369,7 @@ public:
   virtual csRenderMesh** GetRenderMeshes (int& n) { n = 0; return 0; }
 
   /// Update lighting on the terrain.
-  virtual void UpdateLighting (iLight** lights, int num_lights, iMovable* movable);
+  void UpdateLighting (const csArray<iLight*>& lights, iMovable* movable);
 
   /// Draw the terrain.
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode zbufMode);

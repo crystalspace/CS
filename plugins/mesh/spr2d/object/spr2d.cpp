@@ -31,6 +31,7 @@
 #include "igeom/clip2d.h"
 #include "iengine/engine.h"
 #include "iengine/light.h"
+#include "iutil/objreg.h"
 #include "qsqrt.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -116,6 +117,13 @@ bool csSprite2DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
   SetupObject ();
 
+  if (factory->light_mgr)
+  {
+    const csArray<iLight*>& relevant_lights = factory->light_mgr
+    	->GetRelevantLights (logparent);
+    UpdateLighting (relevant_lights, movable);
+  }
+
   // Camera transformation for the single 'position' vector.
   cam = rview->GetCamera ()->GetTransform ().Other2This (
   	movable->GetFullPosition ());
@@ -123,10 +131,9 @@ bool csSprite2DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   return true;
 }
 
-void csSprite2DMeshObject::UpdateLighting (iLight** lights, int num_lights,
+void csSprite2DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
     const csVector3& pos)
 {
-  SetupObject ();
   if (!lighting) return;
   csColor color (0, 0, 0);
 
@@ -140,6 +147,7 @@ void csSprite2DMeshObject::UpdateLighting (iLight** lights, int num_lights,
   //}
 
   int i;
+  int num_lights = lights.Length ();
   for (i = 0; i < num_lights; i++)
   {
     csColor light_color = lights[i]->GetColor () * (256. / CS_NORMAL_LIGHT_LEVEL);
@@ -162,12 +170,12 @@ void csSprite2DMeshObject::UpdateLighting (iLight** lights, int num_lights,
   }
 }
 
-void csSprite2DMeshObject::UpdateLighting (iLight** lights, int num_lights,
+void csSprite2DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
     iMovable* movable)
 {
   if (!lighting) return;
   csVector3 pos = movable->GetFullPosition ();
-  UpdateLighting (lights, num_lights, pos);
+  UpdateLighting (lights, pos);
 }
 
 #define INTERPOLATE1_S(var) \
@@ -420,11 +428,11 @@ void csSprite2DMeshObject::NextFrame (csTicks current_time, const csVector3& /*p
     uvani->Advance (current_time);
 }
 
-void csSprite2DMeshObject::Particle::UpdateLighting (iLight** lights,
-    int num_lights, const csReversibleTransform& transform)
+void csSprite2DMeshObject::Particle::UpdateLighting (const csArray<iLight*>& lights,
+    const csReversibleTransform& transform)
 {
   csVector3 new_pos = transform.This2Other (part_pos);
-  scfParent->UpdateLighting (lights, num_lights, new_pos);
+  scfParent->UpdateLighting (lights, new_pos);
 }
 
 void csSprite2DMeshObject::Particle::Draw (iRenderView* rview,
@@ -705,7 +713,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObjectFactory::Sprite2DFactoryState)
   SCF_IMPLEMENTS_INTERFACE (iSprite2DFactoryState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csSprite2DMeshObjectFactory::csSprite2DMeshObjectFactory (iBase *pParent)
+csSprite2DMeshObjectFactory::csSprite2DMeshObjectFactory (iBase *pParent,
+	iObjectRegistry* object_reg)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSprite2DFactoryState);
@@ -713,6 +722,7 @@ csSprite2DMeshObjectFactory::csSprite2DMeshObjectFactory (iBase *pParent)
   MixMode = 0;
   lighting = true;
   logparent = 0;
+  light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
 }
 
 csSprite2DMeshObjectFactory::~csSprite2DMeshObjectFactory ()
@@ -757,9 +767,10 @@ csSprite2DMeshObjectType::~csSprite2DMeshObjectType ()
 
 csPtr<iMeshObjectFactory> csSprite2DMeshObjectType::NewFactory ()
 {
-  csSprite2DMeshObjectFactory* cm = new csSprite2DMeshObjectFactory (this);
-  csRef<iMeshObjectFactory> ifact (
-  	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
+  csSprite2DMeshObjectFactory* cm = new csSprite2DMeshObjectFactory (this,
+  	object_reg);
+  csRef<iMeshObjectFactory> ifact =
+  	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   cm->DecRef ();
   return csPtr<iMeshObjectFactory> (ifact);
 }

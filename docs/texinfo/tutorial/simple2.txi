@@ -177,7 +177,6 @@ bool Simple::Initialize ()
   spstate->SetAction ("default");
   sprite->SetZBufMode (CS_ZBUF_USE);
   sprite->SetRenderPriority (engine->GetObjectRenderPriority ());
-  sprite->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
 
   return true;
 @}
@@ -241,13 +240,6 @@ with Z-buffer mode equal to @code{CS_ZBUF_USE} are placed in the
 
 For more information on render priorities and Z-buffer mode you can look
 at the HOWTO on this subject (@pxref{HOWTO Render Priorities}).
-
-The last call to @code{DeferUpdateLighting} is interesting. If you don't
-call this then the sprite will be black. This call tells the engine
-to update lighting on this sprite as soon as it is being rendered. You
-need to call this function again when lights move or when the object
-itself moves. Note that this function is not very expensive. It will only
-recalculate lighting when the object is really visible.
 
 This concludes the second Simple tutorial.
 You can now go on to the next tutorial (@pxref{Tutorial Simple Map})) to learn

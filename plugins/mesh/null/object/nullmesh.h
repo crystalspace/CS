@@ -72,8 +72,6 @@ public:
     return (iMeshObjectFactory*)factory;
   }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
-  virtual void UpdateLighting (iLight** lights, int num_lights,
-      	iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {

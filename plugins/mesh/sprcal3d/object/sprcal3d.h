@@ -37,6 +37,7 @@
 #include "imesh/lighting.h"
 #include "iengine/material.h"
 #include "iengine/light.h"
+#include "iengine/lightmgr.h"
 #include "iengine/lod.h"
 #include "iutil/config.h"
 #include "iutil/eventh.h"
@@ -164,6 +165,7 @@ public:
   iVirtualClock* vc;
 
   csRef<iGraphics3D> g3d;
+  csRef<iLightManager> light_mgr;
 
   /**
    * Reference to the engine (optional because sprites can also be
@@ -569,6 +571,8 @@ private:
   void UpdateLightingSubmesh (iLight* lights, iMovable* movable, 
     CalRenderer *pCalRenderer, int mesh, int submesh);
   void UpdateLighting (iMovable* movable, CalRenderer *pCalRenderer);
+  void UpdateLighting (const csArray<iLight>& lights,
+      iMovable* movable);
 
 public:
   SCF_DECLARE_IBASE;
@@ -669,8 +673,6 @@ public:
   }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual csRenderMesh **GetRenderMeshes (int &n);
-  virtual void UpdateLighting (iLight** lights, int num_lights,
-      iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {

@@ -304,17 +304,6 @@ them with @code{HardTransform}.
 function then the visibility culler doesn't know the object has moved.
 
 @item
-@strong{Q}: Why isn't my object lit correctly (all black) and why doesn't
-lighting update when I move it?
-
-@strong{A}: Keep in mind that things don't automatically update their
-static lightmaps as that is expensive. But for dynamic lighting and other
-mesh objects you can dynamically let the object be lit. But in order to
-actually make this work you need to call @code{DeferUpdateLighting()}
-on the object when it is first created, when lights in the vicinity move,
-or when the object itself moves.  @xref{HOWTO Mesh LightAnim}.
-
-@item
 @strong{Q}: I'm trying to move some things around but this doesn't appear
 to work right.
 

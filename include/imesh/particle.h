@@ -20,6 +20,8 @@
 #define __CS_IMESH_PARTICLE_H__
 
 #include "csutil/scf.h"
+#include "csutil/array.h"
+
 class csColor;
 class csVector3;
 class csReversibleTransform;
@@ -69,7 +71,7 @@ struct iParticle : public iBase
    * The given transform is the transform of the parent particle system.
    * The position of this particle should be relative to that transform.
    */
-  virtual void UpdateLighting (iLight** lights, int num_lights,
+  virtual void UpdateLighting (const csArray<iLight*>& lights,
       const csReversibleTransform& transform) = 0;
 };
 

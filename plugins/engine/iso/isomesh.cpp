@@ -369,6 +369,13 @@ void csIsoMeshSprite::SetMeshObject(iMeshObject *mesh)
   if(mesh) mesh->IncRef();
   if(csIsoMeshSprite::mesh) csIsoMeshSprite::mesh->DecRef();
   csIsoMeshSprite::mesh = mesh;
+  if (mesh) mesh->SetLogicalParent (this);
+}
+
+const csArray<iLight*>& csIsoMeshSprite::GetRelevantLights ()
+{
+  grid->GetFakeLights (position, relevant_lights);
+  return relevant_lights;
 }
 
 void csIsoMeshSprite::Draw(iIsoRenderView *rview)
@@ -419,15 +426,9 @@ void csIsoMeshSprite::Draw(iIsoRenderView *rview)
   csIsoFakeRenderView *fakerview = new csIsoFakeRenderView();
   fakerview->SetIsoData(rview, fakecam);
 
-  if(mesh->DrawTest(fakerview, movable))
+  if (mesh->DrawTest (fakerview, movable))
   {
-    //printf("mesh draw()\n");
-    /// UpdateLighting ....
-    iLight **lights = 0;
-    int numlights = 0;
-    grid->GetFakeLights(position, lights, numlights);
-    mesh->UpdateLighting(lights, numlights, movable);
-    if(mesh->Draw(fakerview, movable, zbufmode))
+    if (mesh->Draw (fakerview, movable, zbufmode))
     {
       //printf("mesh prob vis\n");
       /// was probably visible

@@ -405,10 +405,6 @@ bool csParticlesObject::DrawTest (iRenderView* rview, iMovable* movable)
   return true;
 }
 
-void csParticlesObject::UpdateLighting (iLight**, int, iMovable*)
-{
-}
-
 void csParticlesObject::PreGetShaderVariableValue (csShaderVariable* var)
 {
   var->SetValue(GetRenderBuffer(var->Name));

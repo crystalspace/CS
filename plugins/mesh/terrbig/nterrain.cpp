@@ -528,6 +528,7 @@ csBigTerrainObject::csBigTerrainObject(iObjectRegistry* _obj_reg, iMeshObjectFac
 
   info = new nTerrainInfo(_obj_reg);
   terrain = new nTerrain;
+  light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
 }
 
 csBigTerrainObject::~csBigTerrainObject()
@@ -754,6 +755,13 @@ void csBigTerrainObject::InitMesh (nTerrainInfo *info)
 
 bool csBigTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
+  if (light_mgr)
+  {
+    const csArray<iLight*>& relevant_lights = light_mgr
+    	->GetRelevantLights (logparent);
+    UpdateLighting (relevant_lights, movable);
+  }
+
   if (terrain)
   {
     iCamera* cam = rview->GetCamera ();
@@ -796,15 +804,18 @@ bool csBigTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
   return false;
 }
 
-void csBigTerrainObject::UpdateLighting (iLight** lis, int num_lights, iMovable*)
+void csBigTerrainObject::UpdateLighting (const csArray<iLight*>& lis, iMovable*)
 {
   if (info->light_list)
   {
     delete [] info->light_list;
   }
+  int num_lights = lis.Length ();
   info->num_lights = num_lights;
   info->light_list = new iLight*[num_lights];
-  memcpy (info->light_list, lis, sizeof (iLight *) * num_lights);
+  int i;
+  for (i = 0 ; i < num_lights ; i++)
+    info->light_list[i] = lis[i];
 }
 
 bool csBigTerrainObject::Draw (iRenderView* rview, iMovable* m, csZBufMode zbufMode)

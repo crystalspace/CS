@@ -1803,13 +1803,6 @@ bool csTerrFuncObject::DrawTest (iRenderView*, iMovable*)
   return true;
 }
 
-void csTerrFuncObject::UpdateLighting (iLight**, int,
-      	iMovable*)
-{
-  // @@@ Can we do something more sensible here?
-  return;
-}
-
 void csTerrFuncObject::QuadDivDraw (iRenderView* rview, csZBufMode zbufMode)
 {
   qd_framenum++;
