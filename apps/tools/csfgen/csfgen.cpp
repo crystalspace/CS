@@ -21,11 +21,13 @@
 #define CS_SYSDEF_PROVIDE_GETOPT
 #include "cssysdef.h"
 #include "cstool/initapp.h"
+#include "csutil/util.h"
 #include "ivideo/fontserv.h"
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "isys/plugin.h"
+#include "isys/vfs.h"
 
 CS_IMPLEMENT_APPLICATION
 
