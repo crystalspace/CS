@@ -154,29 +154,6 @@ bool csGraphics2DGlideX::Open(const char *Title)
        FocusChangeMask | PointerMotionMask | ButtonPressMask | ButtonReleaseMask;
   XChangeWindowAttributes (dpy, window, CWEventMask, &attr);
 
-  // Create mouse cursors
-  XColor Black;
-  memset (&Black, 0, sizeof (Black));
-  EmptyPixmap = XCreatePixmap (dpy, window, 1, 1, 1);
-  EmptyMouseCursor = XCreatePixmapCursor (dpy, EmptyPixmap, EmptyPixmap,
-    &Black, &Black, 0, 0);
-  MouseCursor [csmcArrow] = XCreateFontCursor (dpy, XC_left_ptr);
-//MouseCursor [csmcLens] = XCreateFontCursor (dpy, 
-  MouseCursor [csmcCross] = XCreateFontCursor (dpy, 33/*XC_crosshair*/);
-  MouseCursor [csmcPen] = XCreateFontCursor (dpy, XC_hand2/*XC_pencil*/);
-  MouseCursor [csmcMove] = XCreateFontCursor (dpy, XC_fleur);
-  /// Diagonal (\) resizing cursor
-//MouseCursor [csmcSizeNWSE] = XCreateFontCursor (dpy, 
-  /// Diagonal (/) resizing cursor
-//MouseCursor [csmcSizeNESW] = XCreateFontCursor (dpy, 
-  /// Vertical sizing cursor
-  MouseCursor [csmcSizeNS] = XCreateFontCursor (dpy, XC_sb_v_double_arrow);
-  /// Horizontal sizing cursor
-  MouseCursor [csmcSizeEW] = XCreateFontCursor (dpy, XC_sb_h_double_arrow);
-  /// Invalid operation cursor
-//MouseCursor [csmcStop] = XCreateFontCursor (dpy, XC_pirate);
-  /// Wait (longplay operation) cursor
-  MouseCursor [csmcWait] = XCreateFontCursor (dpy, XC_watch);
 
   // Wait for expose event (why not ?)
   XEvent event;
@@ -188,6 +165,30 @@ bool csGraphics2DGlideX::Open(const char *Title)
 
   if (m_DoGlideInWindow)
   {
+    memset( MouseCursor, 0, sizeof(MouseCursor) );
+    // Create mouse cursors
+    XColor Black;
+    memset (&Black, 0, sizeof (Black));
+    EmptyPixmap = XCreatePixmap (dpy, window, 1, 1, 1);
+    EmptyMouseCursor = XCreatePixmapCursor (dpy, EmptyPixmap, EmptyPixmap,
+      &Black, &Black, 0, 0);
+    MouseCursor [csmcArrow] = XCreateFontCursor (dpy, XC_left_ptr);
+    //MouseCursor [csmcLens] = XCreateFontCursor (dpy, 
+    MouseCursor [csmcCross] = XCreateFontCursor (dpy, 33/*XC_crosshair*/);
+    MouseCursor [csmcPen] = XCreateFontCursor (dpy, XC_hand2/*XC_pencil*/);
+    MouseCursor [csmcMove] = XCreateFontCursor (dpy, XC_fleur);
+    /// Diagonal (\) resizing cursor
+    //MouseCursor [csmcSizeNWSE] = XCreateFontCursor (dpy, 
+    /// Diagonal (/) resizing cursor
+    //MouseCursor [csmcSizeNESW] = XCreateFontCursor (dpy, 
+    /// Vertical sizing cursor
+    MouseCursor [csmcSizeNS] = XCreateFontCursor (dpy, XC_sb_v_double_arrow);
+    /// Horizontal sizing cursor
+    MouseCursor [csmcSizeEW] = XCreateFontCursor (dpy, XC_sb_h_double_arrow);
+    /// Invalid operation cursor
+    //MouseCursor [csmcStop] = XCreateFontCursor (dpy, XC_pirate);
+    /// Wait (longplay operation) cursor
+    MouseCursor [csmcWait] = XCreateFontCursor (dpy, XC_watch);
     // Create backing store
     if (!xim)
     {
@@ -230,18 +231,20 @@ bool csGraphics2DGlideX::Open(const char *Title)
 
 void csGraphics2DGlideX::Close(void)
 {
-  if (EmptyMouseCursor)
-  {
-    XFreeCursor (dpy, EmptyMouseCursor);
-    EmptyMouseCursor = 0;
-    XFreePixmap (dpy, EmptyPixmap);
-    EmptyPixmap = 0;
-  }
-  for (int i = sizeof (MouseCursor) / sizeof (Cursor) - 1; i >= 0; i--)
-  {
-    if (MouseCursor [i])
-      XFreeCursor (dpy, MouseCursor [i]);
-    MouseCursor [i] = None;
+  if (m_DoGlideInWindow){
+    if (EmptyMouseCursor)
+    {
+      XFreeCursor (dpy, EmptyMouseCursor);
+      EmptyMouseCursor = 0;
+      XFreePixmap (dpy, EmptyPixmap);
+      EmptyPixmap = 0;
+    }
+    for (int i = sizeof (MouseCursor) / sizeof (Cursor) - 1; i >= 0; i--)
+    {
+      if (MouseCursor [i])
+        XFreeCursor (dpy, MouseCursor [i]);
+      MouseCursor [i] = None;
+    }
   }
   if (window)
   {
