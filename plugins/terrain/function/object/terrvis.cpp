@@ -72,49 +72,51 @@ void csTerrainQuad::InitHorizon(float *horizon, int horsize)
     horizon[i] = MININF;
 }
 
-int csTerrainQuad::GetHorIndex(const csVector3& campos, float x, float z, 
-  int horsize)
+static bool horidx_table_ok = false;
+static int horidx_table[259];
+static void BuildHorIndexTable (int horsize)
 {
-#if 0
-  x -= campos.x;
-  z -= campos.z;
-  float len = qsqrt (x*x + z*z);
-  float cosinus = x / len;
-  int idx = QInt (acos (cosinus) * float (horsize-1) / (M_PI*2.));
-  if (idx == 0) return idx;
-  if (z < 0) idx = horsize-idx;
-#else
-  x -= campos.x;
-  z -= campos.z;
-  float len = qsqrt (x*x + z*z);
+  if (horidx_table_ok) return;
+  horidx_table_ok = true;
+
   // circle is split into horsize parts, each of size k (of 2*PI total)
   // the x-axis is right in the middle of parts 0 and horsize/2
   // thus precision around z==0 is not so important
   float k = 2.0*PI / float(horsize);
-  float cosinus = x / len;
-  if (cosinus < -1) cosinus = -1;
-  else if (cosinus > 1) cosinus = 1;
-  float invcos = acos(cosinus);
-  if(invcos < k*0.5) return 0;
-  if(invcos > PI - k*0.5) return horsize/2;
-  int idx = QInt( (invcos + k*0.5)/k );
-  if(z < 0) idx = horsize - idx;
-//printf ("cosinus=%g invcos=%g len=%g idx=%d x=%g z=%g\n", cosinus, invcos, len, idx, x, z); fflush (stdout);
-#endif
-#if 0
-  /// @@@ could make a table to lookup the angle from x/z
-  /// instead of atan
-  float diffx = x - campos.x;
-  float diffz = z - campos.z;
+  int i;
+  for (i = -127 ; i <= 127 ; i++)
+  {
+    float cosinus = float (i)/127.0;
+    if (cosinus < -1) cosinus = -1;
+    else if (cosinus > 1) cosinus = 1;
+    float invcos = acos(cosinus);
+    int idx;
+    if (invcos < k*0.5) idx = 0;
+    else if (invcos > PI - k*0.5) idx = horsize/2;
+    else idx = QInt ((invcos + k*0.5)/k);
+    horidx_table[i+128] = idx;
+    CS_ASSERT (idx >= 0 && idx < horsize);
+  }
+  // Important: the values at -128 and 128 are boundary
+  // values to prevent overflow. They are set to the same
+  // values as -127 and 127.
+  horidx_table[-128] = horidx_table[-127];
+  horidx_table[128] = horidx_table[127];
+}
 
-  double atn = M_PI_2; // pi/2
-  if(diffz != 0.0) atn = atan(diffx / diffz);
-  // scale from -PI/2..PI/2 to 0..horsize-1
-  atn += M_PI_2;
-  atn *= float(horsize-1)/PI;
-  int idx = QInt(atn);
-#endif
-  CS_ASSERT(idx >= 0 && idx < horsize);
+int csTerrainQuad::GetHorIndex(const csVector3& campos, float x, float z, 
+  int horsize)
+{
+  BuildHorIndexTable (horsize);
+
+  x -= campos.x;
+  z -= campos.z;
+  float invlen = qisqrt (x*x + z*z);
+  float cosinus = x * invlen;
+  int icos = QInt (cosinus * 127.0);
+  CS_ASSERT (icos >= -128 && icos <= 128);
+  int idx = horidx_table[icos+128];
+  if (z < 0 && idx) idx = horsize - idx;
   return idx;
 }
 
@@ -148,9 +150,9 @@ void csTerrainQuad::ComputeExtent(const csVector3& campos, const csBox3& bbox,
       else
         right = idx[i];
     }
-    // the resulting span should be less than half the horizon
-    // @@@ DEBUG
-    if(! ((right - left + horsize)%horsize <= (horsize/2+1)))
+    // The resulting span should be less than half the horizon.
+    // If not then we retry again but with another starting position.
+    if (! ((right - left + horsize)%horsize <= (horsize/2+1)))
     {
       sidx++;
 //printf ("idx[0]=%d idx[1]=%d idx[2]=%d idx[3]=%d\n", idx[0], idx[1], idx[2], idx[3]);
