@@ -376,8 +376,3 @@ IMPLEMENT_IBASE(funConsole)
 IMPLEMENT_IBASE_END
 
 IMPLEMENT_FACTORY(funConsole)
-
-EXPORT_CLASS_TABLE (funcon)
-  EXPORT_CLASS (funConsole, "crystalspace.console.xstdout",
-		"Funky Console Plugin")
-EXPORT_CLASS_TABLE_END

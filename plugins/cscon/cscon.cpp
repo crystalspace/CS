@@ -523,10 +523,13 @@ IMPLEMENT_IBASE_END
 
 IMPLEMENT_FACTORY(csConsole)
 DECLARE_FACTORY(csConsoleInput)
+DECLARE_FACTORY(funConsole)
 
 EXPORT_CLASS_TABLE (cscon)
   EXPORT_CLASS (csConsole, "crystalspace.console.stdout",
 		"Standard Console Plugin")
   EXPORT_CLASS (csConsoleInput, "crystalspace.console.stdin",
 		"Standard Console Input Plugin")
+  EXPORT_CLASS (funConsole, "crystalspace.console.xstdout",
+		"Funky Console Plugin")
 EXPORT_CLASS_TABLE_END
