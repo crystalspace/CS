@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp apps/tutorial/phys
 
 PHYS.EXE = phys$(EXE)
-INC.PHYS = $(wildcard apps/tutorial/phys/*.h)
-SRC.PHYS = $(wildcard apps/tutorial/phys/*.cpp)
+INC.PHYS = $(wildcard apps/tutorial/phystut/*.h)
+SRC.PHYS = $(wildcard apps/tutorial/phystut/*.cpp)
 OBJ.PHYS = $(addprefix $(OUT),$(notdir $(SRC.PHYS:.cpp=$O)))
 DEP.PHYS = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.PHYS = $(foreach d,$(DEP.PHYS),$($d.LIB))
