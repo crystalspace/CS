@@ -66,7 +66,20 @@ bool SysSystemDriver::GetInstallPath (char *oInstallPath, size_t iBufferSize)
       strncpy (oInstallPath, "", iBufferSize);
       return true;
     }
-    // default.
+    // default install place
+    if (!access ("/usr/local/crystal/scf.cfg", F_OK))
+    {
+      strncpy (oInstallPath, "/usr/local/crystal/", iBufferSize);
+      return true;
+    }
+    // debian install place
+    if (!access ("/usr/lib/crystalspace/scf.cfg", F_OK))
+    {
+      strncpy (oInstallPath, "/usr/lib/crystalspace/", iBufferSize);
+      return true;
+    }
+    /// no install location can be found
+    Printf(MSG_FATAL_ERROR, "Fatal: No Crystal Space install detected.\n");
     strncpy (oInstallPath, "/usr/local/crystal/", iBufferSize);
     return true;
   }
