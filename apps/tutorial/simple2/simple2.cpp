@@ -109,7 +109,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   if (!loader)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simple2",
     	"No iLoader plugin!");
     exit (1);
   }
@@ -119,7 +119,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   if (!g3d)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simple2",
     	"No iGraphics3D plugin!");
     exit (1);
   }
@@ -129,7 +129,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   if (!kbd)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simple2",
     	"No iKeyboardDriver plugin!");
     exit (1);
   }
@@ -139,7 +139,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   if (!Open ())
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simple2",
     	"Error opening system!");
     Cleanup ();
     exit (1);
@@ -153,7 +153,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   txtmgr->ResetPalette ();
 
   csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simple2",
   	"Simple Crystal Space Application version 0.1.");
 
   // First disable the lighting cache. Our app is simple enough
@@ -162,13 +162,13 @@ bool Simple::Initialize (int argc, const char* const argv[],
 
   // Create our world.
   csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simple2",
   	"Creating world!...");
 
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simple2",
     	"Error loading 'stone4' texture!");
     Cleanup ();
     exit (1);
@@ -248,7 +248,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
 
   engine->Prepare ();
   csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simple2",
   	"Created.");
 
   view = new csView (engine, g3d);
@@ -265,7 +265,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   if (txt == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simple2",
     	"Error loading texture!");
     Cleanup ();
     exit (1);
@@ -282,7 +282,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   if (imeshfact == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simple2",
     	"Error loading mesh object factory!");
     Cleanup ();
     exit (1);
@@ -382,7 +382,7 @@ int main (int argc, char* argv[])
   if (!System->Initialize (argc, argv, NULL))
   {
     csReport (System->GetObjectRegistry (), CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simple2",
     	"Error initializing system!");
     Cleanup ();
     exit (1);
