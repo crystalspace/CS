@@ -76,7 +76,7 @@ void csParticleSystem :: AppendRectSprite(float width, float height,
   part->SetLighting( lighted );
   part->SetColor( csColor(1.0, 1.0, 1.0) );
   part->SetTexture(txt);
-  AppendParticle(part);
+  AppendParticle(QUERY_INTERFACE(part, iParticle));
   part->DecRef(); 
 }
 
@@ -91,7 +91,7 @@ void csParticleSystem :: AppendRegularSprite(int n, float radius,
   part->SetTexture(txt);
   part->SetLighting( lighted );
   part->SetColor( csColor(1.0, 1.0, 1.0) );
-  AppendParticle(part);
+  AppendParticle(QUERY_INTERFACE(part, iParticle));
   part->DecRef(); 
 }
 

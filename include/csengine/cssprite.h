@@ -313,7 +313,7 @@ typedef void (csSpriteCallback2) (csSprite3D* spr, csRenderView* rview, csObject
 /**
  * The base class for all types of sprites.
  */
-class csSprite : public csObject, public iParticle
+class csSprite : public csObject, public iBase
 {
   friend class Dumper;
 
@@ -445,10 +445,10 @@ public:
   virtual void DeferUpdateLighting (int flags, int num_lights);
 
   /// Sets the mode that is used, when drawing that sprite.
-  void SetMixmode (UInt m) { MixMode = m; }
+  virtual void SetMixmode (UInt m) { MixMode = m; }
 
   /// Gets the mode that is used, when drawing that sprite.
-  UInt GetMixmode () { return MixMode; }
+  virtual UInt GetMixmode () { return MixMode; }
 
   /**
    * Set a callback which is called just before the sprite is drawn.
@@ -475,7 +475,7 @@ public:
   csSpriteCallback2* GetDrawCallback2 () { return draw_callback2; }
 
   /// Move this sprite to one sector (conveniance function).
-  void MoveToSector (csSector* s);
+  virtual void MoveToSector (csSector* s);
 
   /// Remove this sprite from all sectors it is in (but not from the world).
   void RemoveFromSectors ();
@@ -515,26 +515,48 @@ public:
    */
   virtual void Draw (csRenderView& rview) = 0;
 
-  /**
-   * Get the location of the sprite.
-   */
+  /// Get the location of the sprite.
   virtual const csVector3& GetPosition () const = 0;
-
-  CSOBJTYPE;
-
-  //------------------------- iParticle implementation -----------------------//
-  DECLARE_IBASE;
 
   /**
    * Relative move of this sprite.
    * Note that this does not check if the sector is left.
    */
-//virtual void MovePosition (const csVector3& delta) = 0;
+  virtual void MovePosition (const csVector3& delta) = 0;
 
-  /**
-   * Move this sprite to some location.
-   */
-//virtual void SetPosition (const csVector3& location) = 0;
+  /// Move this sprite to some location.
+  virtual void SetPosition (const csVector3& location) = 0;
+
+  /// Set the color of this sprite.
+  virtual void SetColor(const csColor&) = 0;
+
+  /// Add color to the color of the sprite.
+  virtual void AddColor(const csColor& col) = 0;
+
+  /// Scale sprite by this factor. 
+  virtual void ScaleBy(float factor) = 0;
+
+  /// Rotate sprite in some manner (as defined by subclass), in radians.
+  virtual void Rotate(float angle) = 0;
+
+  //------------------------- iParticle implementation -----------------------//
+  struct Particle : public iParticle
+  {
+    DECLARE_EMBEDDED_IBASE (csSprite);
+    virtual void MoveToSector(csSector*);
+    virtual void SetPosition(const csVector3&);
+    virtual void MovePosition(const csVector3&);
+    virtual void SetColor(const csColor&);
+    virtual void AddColor(const csColor&);
+    virtual void ScaleBy(float factor);
+    virtual void SetMixmode(UInt mode);
+    virtual void Rotate(float angle);
+    virtual void Draw(csRenderView&);
+    virtual void UpdateLighting(csLight**, int num_lights);
+    virtual void DeferUpdateLighting(int flags, int num_lights);
+  } scfiParticle;
+  DECLARE_IBASE;
+  CSOBJTYPE;
 };
 
 

@@ -151,7 +151,7 @@ public:
    *  making particle systems of particle systems.
    *  Do not add particle systems to themselves, you'll get infinite loops.
    */
-  iParticle* GetAsParticle() {return this;}
+  iParticle* GetAsParticle() { return QUERY_INTERFACE(this, iParticle); }
 
   /// Move all particles to a sector, virtual so subclass can move more.
   virtual void MoveToSector (csSector *sector);

@@ -39,6 +39,10 @@ The history order has been reversed so that new features are at the top.
 	  (intro/contrib.txi).  This involved adding contributors to each
 	  document which appeared in only one or the other document, and in
 	  some cases neither.
+	- Eric Sunshine repaired the particle system so that it once again
+	  works on NextStep.  Recent changes to the class hierarchy managed to
+	  trigger a NextStep multiple-inheritance compiler bug which caused
+	  particle systems to crash.
 17-Jun-2000
 	- Fundamental change in how the particle systems work.
 	  A particle system now also inherits from csSprite and

@@ -356,12 +356,18 @@ csSpriteAction* csSpriteTemplate::FindAction (const char *n)
 
 IMPLEMENT_CSOBJTYPE (csSprite, csObject)
 IMPLEMENT_IBASE (csSprite)
-  IMPLEMENTS_INTERFACE(iParticle)
+  IMPLEMENTS_INTERFACE (iBase)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iParticle)
 IMPLEMENT_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE (csSprite::Particle)
+  IMPLEMENTS_INTERFACE (iParticle)
+IMPLEMENT_EMBEDDED_IBASE_END
 
 csSprite::csSprite (csObject* theParent) : csObject ()
 {
   CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiParticle);
   dynamiclights = NULL;
   MixMode = CS_FX_COPY;
   defered_num_lights = 0;
@@ -469,6 +475,28 @@ void csSprite::AddDynamicLight (csLightHitsSprite* lp)
   lp->sprite = this;
 }
 
+void csSprite::Particle::MoveToSector(csSector* s)
+  { scfParent->MoveToSector(s); }
+void csSprite::Particle::SetPosition(const csVector3& v)
+  { scfParent->SetPosition(v); }
+void csSprite::Particle::MovePosition(const csVector3& v)
+  { scfParent->MovePosition(v); }
+void csSprite::Particle::SetColor(const csColor& c)
+  { scfParent->SetColor(c); }
+void csSprite::Particle::AddColor(const csColor& c)
+  { scfParent->AddColor(c); }
+void csSprite::Particle::ScaleBy(float factor)
+  { scfParent->ScaleBy(factor); }
+void csSprite::Particle::SetMixmode(UInt mode)
+  { scfParent->SetMixmode(mode); }
+void csSprite::Particle::Rotate(float angle)
+  { scfParent->Rotate(angle); }
+void csSprite::Particle::Draw(csRenderView& v)
+  { scfParent->Draw(v); }
+void csSprite::Particle::UpdateLighting(csLight** lights, int num_lights)
+  { scfParent->UpdateLighting(lights, num_lights); }
+void csSprite::Particle::DeferUpdateLighting(int flags, int num_lights)
+  { scfParent->DeferUpdateLighting(flags, num_lights); }
 
 //=============================================================================
 
