@@ -58,6 +58,7 @@
 #include "csutil/stringarray.h"
 #include "csutil/util.h"
 #include "csgfx/rgbpixel.h"
+#include "csgfx/memimage.h"
 #include "qsqrt.h"
 
 #include "ivideo/effects/efserver.h"
@@ -1475,26 +1476,51 @@ void csGraphics3DOGLCommon::FinishDraw ()
       }
       // Texture is in tha cache, update texture directly.
       statecache->SetTexture (GL_TEXTURE_2D, tex_data->Handle);
-      // Texture was not used as a render target before.
-      // Make some necessary adjustments.
-      if (!tex_mm->was_render_target)
+      /*
+        Texture has a keycolor - so we need to deal specially with it
+	to make sure the keycolor gets transparent.
+       */
+      if (tex_mm->GetTransp ())
       {
-	if (!(tex_mm->GetFlags() & CS_TEXTURE_NOMIPMAPS))
-	{
-	  if (SGIS_generate_mipmap)
-	  {
-	    glTexParameteri (GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
-	  }
-	  else
-	  {
-	    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-		texture_cache->GetBilinearMapping() ? GL_LINEAR : GL_NEAREST);
-	  }
-	}
 	tex_mm->was_render_target = true;
+	if (tex_mm->GetImage() == 0)
+	  tex_mm->GetImage().AttachNew (new csImageMemory (
+	  txt_w, txt_h, CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
+
+	void* imgdata = tex_mm->GetImage()->GetImageData ();
+	glReadPixels (1, height-txt_h, txt_w, txt_h, GL_RGBA, GL_UNSIGNED_BYTE, imgdata);
+
+	/*
+	  @@@ Optimize a bit. E.g. the texture shouldn't be uncached and cached again
+	  every time.
+	 */
+	tex_mm->UpdateTexture ();
+	tex_mm->InitTexture (txtmgr, G2D->GetPixelFormat ());
+	texture_cache->Cache (tex_mm);
       }
-      glCopyTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA8, 1, height-txt_h,
+      else
+      {
+	// Texture was not used as a render target before.
+	// Make some necessary adjustments.
+	if (!tex_mm->was_render_target)
+	{
+	  if (!(tex_mm->GetFlags() & CS_TEXTURE_NOMIPMAPS))
+	  {
+	    if (SGIS_generate_mipmap)
+	    {
+	      glTexParameteri (GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+	    }
+	    else
+	    {
+	      glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+		  texture_cache->GetBilinearMapping() ? GL_LINEAR : GL_NEAREST);
+	    }
+	  }
+	  tex_mm->was_render_target = true;
+	}
+	glCopyTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA8, 1, height-txt_h,
       	  txt_w, txt_h, 0);
+      }
     }
   }
   render_target = 0;

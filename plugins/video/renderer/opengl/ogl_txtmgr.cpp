@@ -294,8 +294,10 @@ bool csTextureHandleOpenGL::transform (iImage *Image, csTextureOpenGL *tex)
       }
   }
 
-  if (csTextureManagerOpenGL::glformats[formatidx].compressedFormat != 0
-    && tex->Compressable ())
+  // No TC for render targets.
+  if (!was_render_target && 
+    csTextureManagerOpenGL::glformats[formatidx].compressedFormat != 0 && 
+    tex->Compressable ())
   {
     GLuint t;
     glGenTextures (1, &t);
@@ -614,7 +616,8 @@ void csTextureHandleOpenGL::PrepareKeycolor ()
     // By default, every csRGBpixel initializes its alpha component to
     // 255. Thus, we should just drop to zero alpha for transparent
     // pixels, if any.
-    if (transp_color.eq (*_src)) _src->alpha = 0;
+    //if (transp_color.eq (*_src)) _src->alpha = 0;
+    _src->alpha = transp_color.eq (*_src) ? 0 : 255;
     _src++;
   }
 

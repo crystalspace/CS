@@ -79,6 +79,9 @@ protected:
   void PrepareKeycolor ();
 
 public:
+  csRef<iImage>& GetImage () { return image; }
+  bool& GetTransp () { return transp; }
+
   /// Retains original size of image before any readjustment
   int orig_width, orig_height;
   /// A pointer to the 3D driver object

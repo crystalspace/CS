@@ -11,6 +11,12 @@ chronological order.
 	  instead of 10 to find the best split location. Also the cost is
 	  now calculated based on a measure that looks more at number of
 	  cut objects as opposed to balanced tree.
+	- res changed the fire proctex to set an alpha of 255 on the output
+	  image, instead of 0.
+	- res removed the superflouos 'texture' parameter from 
+	  csGLStateCache::GetTexture().
+	- res fixed the GL renderer to properly deal with keycolored 
+	  procedural textures.
 4-Nov-2003
 	- Jorrit fixed a bug in Dynavis history culling. In some cases objects
 	  could remain visible for longer then expected because the history

@@ -334,7 +334,7 @@ void csProcFire::Animate (csTicks /*current_time*/)
 	*d++ = palette[col].red;
 	*d++ = palette[col].green;
 	*d++ = palette[col].blue;
-	*d++ = 0;
+	*d++ = 0xff;
       }
     g2d->Blit (0, 0, mat_w, mat_h, blitbuf);
     g3d->FinishDraw ();

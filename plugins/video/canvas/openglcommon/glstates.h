@@ -198,7 +198,7 @@ public:
       glBindTexture (target, texture);
     }
   }
-  GLuint GetTexture( GLenum target, GLuint texture, int layer = 0 )
+  GLuint GetTexture( GLenum target, int layer = 0 )
   {
     return boundtexture[layer];
   }

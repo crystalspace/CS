@@ -51,6 +51,9 @@ void OpenGLTextureCache::Unload (csTxtCacheData *d)
   else
     head = d->next;
 
+  if (csGraphics3DOGLCommon::statecache->GetTexture (GL_TEXTURE_2D) == 
+    d->Handle)
+    csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, 0);
   glDeleteTextures (1, &d->Handle);
   d->Handle = 0;
 
