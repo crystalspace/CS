@@ -1,8 +1,8 @@
-crystalspace (0.96-20030119) unstable; urgency=low
+crystalspace (0.96-20030205) unstable; urgency=low
 
-  * New upstream version
+  * New upstream version from R0_96 branch
 
- -- Christian Bayle <bayle@debian.org>  Sun, 19 Jan 2003 12:54:54 +0100
+ -- Christian Bayle <bayle@debian.org>  Wed,  5 Feb 2003 23:16:25 +0100
 
 crystalspace (0.94-20020502-4) unstable; urgency=low
 

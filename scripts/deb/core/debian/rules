@@ -10,7 +10,20 @@
 #export DH_VERBOSE=1
 
 # This is the debhelper compatability version to use.
-export DH_COMPAT=3
+export DH_COMPAT=4
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+
+CFLAGS = -Wall -g
+
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+	CFLAGS += -O0
+else
+	CFLAGS += -O2
+endif
+ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
+	INSTALL_PROGRAM += -s
+endif
 
 configure: configure-stamp
 configure-stamp:
@@ -18,24 +31,22 @@ configure-stamp:
 	# Add here commands to configure the package.
 	# Activate all plugins
 	# @@@ FIXME: This does not handle plugins protected by ifeq/ifneq.
-	perl -pi -e "s/^#PLUGINS/PLUGINS/" $(CURDIR)/CS/mk/user.mak
+#	perl -pi -e "s/^#PLUGINS/PLUGINS/" $(CURDIR)/CS/mk/user.mak
 	# Temp remove of render3d renderers
-	perl -pi -e "s/^PLUGINS(.*render3.*$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
+	#perl -pi -e "s/^PLUGINS(.*render3.*$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
 	# Temp? remove of cslua
-	perl -pi -e "s/^PLUGINS(.*cslua.*$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
+#	perl -pi -e "s/^PLUGINS(.*cslua.*$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
 	# Temp? remove of openal
 	#perl -pi -e "s/^PLUGINS(.*openal.*$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
-	cd CS; ./configure --disable-cpu-specific-instructions
+	# --disable-qsqrt was added for a gcc3.2 bug
+	cd CS; ./configure --prefix=/usr --disable-cpu-specific-instructions --disable-qsqrt
 	# Force -fPIC as compiling/linking option
-	##perl -pi -e "s/(CC.*)/\1 -fPIC/" $(CURDIR)/CS/config.mak
-	##perl -pi -e "s/(CXX.*)/\1 -fPIC/" $(CURDIR)/CS/config.mak
-	##perl -pi -e "s/(LINK.*)/\1 -fPIC/" $(CURDIR)/CS/config.mak
 	echo "CFLAGS.SYSTEM += -fPIC"  >> $(CURDIR)/CS/config.mak 
 	echo "LFLAGS.EXE += -fPIC"  >> $(CURDIR)/CS/config.mak 
 	echo "LFLAGS.DLL += -fPIC"  >> $(CURDIR)/CS/config.mak 
 
 	# Install as much as possible
-	perl -pi -e "s/#TO_INSTALL/TO_INSTALL/" $(CURDIR)/CS/cache.mak
+#	perl -pi -e "s/#TO_INSTALL/TO_INSTALL/" $(CURDIR)/CS/cache.mak
 	# Activating scripts
 	chmod +x $(CURDIR)/debian/createmenus
 	chmod +x $(CURDIR)/debian/addmissing
@@ -45,44 +56,62 @@ configure-stamp:
 
 	touch configure-stamp
 
-build: configure-stamp build-stamp
-build-stamp:
-	dh_testdir
+#Architecture
+build: build-arch build-indep
+
+build-arch: build-arch-stamp
+build-arch-stamp: configure-stamp
 
 	# Add here commands to compile the package.
 	cd CS; $(MAKE) all
 	# should be something like this $(MAKE) all USE_SHARED_LIBS=yes
+	# if compile fails with gcc3.2 edit CS/include/volatile.h with #define CS_NO_QSQRT
 
-	touch build-stamp
+build-indep: build-indep-stamp
+build-indep-stamp: configure-stamp
+
+	# Add here commands to compile the indep part of the package.
+	#$(MAKE) doc
 
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp configure-stamp
+	rm -f build-arch-stamp build-indep-stamp configure-stamp
 
 	# Add here commands to clean up after the build process.
 	-cd $(CURDIR)/CS; $(MAKE) distclean
 
 	dh_clean
 
-#DEVBIN=3ds2lev map2cs mdl2spr \
-#	csfedit csfgen cslight picview scfreg viewmesh vsh \
-#	cs-config
-	
 DEVBIN=map2cs mdl2spr scfreg vsh cs-config
 
-install: DH_OPTIONS=
-install: build 
+install: install-indep install-arch
+install-indep:
+	
 	dh_testdir
 	dh_testroot
-	dh_clean -k
-	dh_installdirs
+	dh_clean -k -i
+	dh_installdirs -i
+
+	# Add here commands to install the indep part of the package into
+	# debian/<package>-doc.
+	#INSTALLDOC#
+	mkdir $(CURDIR)/debian/tmp
+	cd CS; $(MAKE) SUBMAKEFILES=mk/install.mak INSTALL_DIR=$(CURDIR)/debian/tmp/usr/lib/crystalspace install 
+
+	dh_movefiles -i
+
+install-arch:
+	dh_testdir
+	dh_testroot
+	dh_clean -k -a
+	dh_installdirs -a
 
 	# Add here commands to install the package into debian/crystalspace.
 	mkdir -p $(CURDIR)/debian/tmp/usr/lib/crystalspace
 	cd CS; $(MAKE) install INSTALL_DIR=$(CURDIR)/debian/tmp/usr/lib/crystalspace
 	# Let's fix some things
-	$(CURDIR)/debian/addmissing $(CURDIR)
+#	$(CURDIR)/debian/addmissing $(CURDIR)
 
 	find $(CURDIR)/debian/tmp/usr/lib/crystalspace/include -type f \
 		-exec chmod 644 {} \;
@@ -112,15 +141,15 @@ install: build
 		$(CURDIR)/debian/tmp/usr/games
 
 	# renaming zoo because of name conflict with /usr/bin/zoo
-	mv $(CURDIR)/debian/tmp/usr/games/zoo \
-		$(CURDIR)/debian/tmp/usr/games/cszoo
+#	mv $(CURDIR)/debian/tmp/usr/games/zoo \
+#		$(CURDIR)/debian/tmp/usr/games/cszoo
 
 	# includes in /usr/include/crystalspace
 	mkdir -p $(CURDIR)/debian/tmp/usr/include
 	mv $(CURDIR)/debian/tmp/usr/lib/crystalspace/include \
 		$(CURDIR)/debian/tmp/usr/include/crystalspace
 
-	dh_movefiles
+	dh_movefiles -a
 
 	# Adding home made xpm
 	cp $(CURDIR)/xpm/*.xpm \
@@ -145,63 +174,44 @@ man: $(subst .sgml,, $(wildcard $(CURDIR)/debian/man/*.sgml*))
 	@echo "Creating $(notdir $@)"
 	@docbook-to-man $< > $@
 
-# Build architecture-independent files here.
-# Pass -i to all debhelper commands in this target to reduce clutter.
-binary-indep: build install
-	dh_testdir -i
-	dh_testroot -i
-#	dh_installdebconf -i
-	dh_installdocs -i
-	dh_installexamples -i
-	dh_installmenu -i
-#	dh_installlogrotate -i
-#	dh_installemacsen -i
-#	dh_installpam -i
-#	dh_installmime -i
-#	dh_installinit -i
-	dh_installcron -i
-#	dh_installman -i
-	dh_installinfo -i
-#	dh_undocumented -i
-	dh_installchangelogs  -i
-	dh_link -i
-	dh_compress -i
-	dh_fixperms -i
-	dh_installdeb -i
-#	dh_perl -i
-	dh_gencontrol -i
-	dh_md5sums -i
-	dh_builddeb -i
-
-# Build architecture-dependent files here.
-binary-arch: build install
-	dh_testdir 
-	dh_testroot 
-#	dh_installdebconf 
-	dh_installdocs 
-	dh_installexamples 
-	dh_installmenu 
-#	dh_installlogrotate 
+# Must not depend on anything. This is to be called by
+# binary-arch/binary-multi
+# in another 'make' thread.
+binary-common:
+	dh_testdir
+	dh_testroot
+#	dh_installdebconf	
+	dh_installdocs
+	dh_installexamples
+	dh_installmenu
 #	dh_installemacsen
-#	dh_installpam 
-#	dh_installmime 
+#	dh_installpam
 #	dh_installinit
-#	dh_installcron
-	dh_installman
+	dh_installcron
+#	dh_installmanpages
 	dh_installinfo
 #	dh_undocumented
 	dh_installchangelogs 
-	dh_strip 
 	dh_link
-	dh_compress
-	dh_fixperms 
-	dh_makeshlibs 
-	dh_installdeb 
+	dh_strip
+	dh_compress 
+	dh_fixperms
+	# You may want to make some executables suid here.
+	dh_suidregister
+	dh_makeshlibs
+	dh_installdeb
 #	dh_perl
 	dh_shlibdeps -l$(CURDIR)/debian/usr/lib/crystalspace/lib
 	dh_gencontrol
-	dh_md5sums 
-	dh_builddeb 
+	dh_md5sums
+	dh_builddeb
+# Build architecture independant packages using the common target.
+binary-indep: build-indep install-indep
+	$(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
 
-binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install configure
+# Build architecture dependant packages using the common target.
+binary-arch: build-arch install-arch
+	$(MAKE) -f debian/rules DH_OPTIONS=-a binary-common
+
+binary: binary-arch binary-indep
+.PHONY: build clean binary-indep binary-arch binary install install-indep install-arch configure
