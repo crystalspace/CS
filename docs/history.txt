@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+17-Jul-2001
+	- Worked around an internal compiler error (for MingW compiler) in
+	  recent changes to crossbld.cpp by completely rearranging the
+	  routine. I have no idea what caused the internal error but the
+	  code is now even a little more readable :-) In addition added
+	  a missing poly->DecRef().
 16-Jul-2001
 	- Cleaned up new lighting system and CheckFrustum() a little more.
 	- Added iLightingProcessInfo interface. A callback for a null-portal
@@ -26,6 +32,23 @@ The history order is reversed so that new features are at the top.
 	  again.
 	- Removed warning in CS_DECLARE_TYPED_VECTOR_NODELETE.
 	- Removed a few warnings in engine and WalkTest.
+	- Martin Geisse made the following changes:
+	    - Added a note to the comment of
+	      iSprite3DFactoryState::AddVertices() about the fact that at
+	      least one frame has to exist.
+	    - Changed the model data representation for converted models.
+	      Normals, colors and texture coordinates are now stored together
+	      with vertex positions in iModelDataVertices, but in separate
+	      lists (i.e. there may be different numbers of vertices and
+	      normals, for example). Polygons now use one index for each list
+	      per vertex.
+	    - Added sprite factory building to the crossbuilder plugin.
+	      This is not yet tested completely and there are still some
+	      problems.
+	- Wouter Wijngaards did various fixes to iso engine:
+	    - Fixed potential bug in GetCell for grids.
+	    - Cells can now be emptied correctly.
+	    - Fixed a bug which caused empty grids to crash lighting.
 15-Jul-2001
 	- New lighting system starts to work good enough so that I
 	  now removed the old system. There are still a few small problems

@@ -141,6 +141,48 @@ bool csCrossBuilder::BuildThing (iModelData *Data, iThingState *tgt,
 
 CS_DECLARE_TYPED_VECTOR_NODELETE (csModelFrameVector, iModelDataVertices);
 CS_DECLARE_TYPED_VECTOR_NODELETE (csSpriteFrameVector, iSpriteFrame);
+TYPEDEF_GROWING_ARRAY (csIntArray, int);
+
+static void BuildVertexArray (iModelDataPolygon* poly,
+	csIntArray& SpriteVertices,
+	csIntArray& SpriteNormals,
+	csIntArray& SpriteTexels,
+	csIntArray& PolyVertices)
+{
+  // build the vertex array
+  PolyVertices.SetLength (0);
+  int i, j;
+  for (i=0; i<poly->GetVertexCount (); i++)
+  {
+    int SpriteVertexIndex = -1;
+    int PolyVertex = poly->GetVertex (i);
+    int PolyNormal = poly->GetNormal (i);
+    int PolyTexel = poly->GetTexel (i);
+
+    for (j=0; j<SpriteVertices.Length (); j++)
+    {
+      int SpriteVertex = SpriteVertices [j];
+      int SpriteNormal = SpriteNormals [j];
+      int SpriteTexel = SpriteTexels [j];
+
+      if (SpriteVertex == PolyVertex &&
+	  SpriteNormal == PolyNormal &&
+	  SpriteTexel == PolyTexel)
+      {
+	SpriteVertexIndex = i;
+	break;
+      }
+    }
+    if (SpriteVertexIndex == -1)
+    {
+      SpriteVertexIndex = SpriteVertices.Length ();
+      SpriteTexels.Push (PolyTexel);
+      SpriteNormals.Push (PolyNormal);
+      SpriteVertices.Push (PolyVertex);
+    }
+    PolyVertices.Push (SpriteVertexIndex);
+  }
+}
 
 bool csCrossBuilder::BuildSpriteFactory (iModelData *Data,
 	iSprite3DFactoryState *tgt) const
@@ -161,7 +203,8 @@ bool csCrossBuilder::BuildSpriteFactory (iModelData *Data,
   it1 = Object->QueryObject ()->GetIterator ();
   while (!it1->IsFinished ())
   {
-    iModelDataAction *ac = SCF_QUERY_INTERFACE_FAST (it1->GetObject (), iModelDataAction);
+    iModelDataAction *ac = SCF_QUERY_INTERFACE_FAST (it1->GetObject (),
+    	iModelDataAction);
     if (ac)
     {
       for (i=0; i<ac->GetFrameCount (); i++)
@@ -185,19 +228,19 @@ bool csCrossBuilder::BuildSpriteFactory (iModelData *Data,
   if (Frames.Length () == 0)
   {
     iModelDataVertices *BaseVertices = Object->GetDefaultVertices ();
-    if (!BaseVertices) return NULL;
+    if (!BaseVertices) return false;
     Frames.Push (BaseVertices);
   }
 
   //--- building stage -------------------------------------------------------
 
-  /* These lists are filles up with (sprite vertex) to (model data vertex),
+  /* These lists are filled up with (sprite vertex) to (model data vertex),
    * (model data normal) and (model data texel) mappings. This means that
    * they are indexed by the sprite vertex and must be of the same size.
    */
-  DECLARE_GROWING_ARRAY (SpriteVertices, int);
-  DECLARE_GROWING_ARRAY (SpriteNormals, int);
-  DECLARE_GROWING_ARRAY (SpriteTexels, int);
+  csIntArray SpriteVertices;
+  csIntArray SpriteNormals;
+  csIntArray SpriteTexels;
 
   // copy polygon data (split polygons into triangles)
   it1 = Object->QueryObject ()->GetIterator ();
@@ -208,38 +251,9 @@ bool csCrossBuilder::BuildSpriteFactory (iModelData *Data,
     if (poly)
     {
       // build the vertex array
-      DECLARE_GROWING_ARRAY (PolyVertices, int);
-
-      for (i=0; i<poly->GetVertexCount (); i++)
-      {
-        int PolyVertex = poly->GetVertex (i);
-        int PolyNormal = poly->GetNormal (i);
-        int PolyTexel = poly->GetTexel (i);
-        int SpriteVertexIndex = -1;
-
-	for (j=0; j<SpriteVertices.Length (); j++)
-	{
-	  int SpriteVertex = SpriteVertices [j];
-	  int SpriteNormal = SpriteNormals [j];
-	  int SpriteTexel = SpriteTexels [j];
-
-	  if (SpriteVertex == PolyVertex &&
-	      SpriteNormal == PolyNormal &&
-	      SpriteTexel == PolyTexel)
-	  {
-	    SpriteVertexIndex = i;
-	    break;
-	  }
-	}
-	if (SpriteVertexIndex == -1)
-	{
-	  SpriteVertexIndex = SpriteVertices.Length ();
-	  SpriteVertices.Push (PolyVertex);
-	  SpriteNormals.Push (PolyNormal);
-	  SpriteTexels.Push (PolyTexel);
-	}
-	PolyVertices.Push (SpriteVertexIndex);
-      }
+      csIntArray PolyVertices;
+      BuildVertexArray (poly,
+	SpriteVertices, SpriteNormals, SpriteTexels, PolyVertices);
 
       // split the polygon into triangles and copy them
       for (i=2; i<PolyVertices.Length (); i++)
@@ -248,6 +262,8 @@ bool csCrossBuilder::BuildSpriteFactory (iModelData *Data,
       // store the material if we don't have any yet
       if (!Material && poly->GetMaterial ())
         Material = poly->GetMaterial ()->GetMaterialWrapper ();
+
+      poly->DecRef ();
     }
     it1->Next ();
   }
