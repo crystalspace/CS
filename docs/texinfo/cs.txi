@@ -4,6 +4,10 @@
 @import{version.txi}
 @settitle Crystal Space
 @setchapternewpage odd
+@tex
+\global\hbadness = 8000
+\global\tolerance = 8000
+@end tex
 @finalout
 @c %**end of header
 
