@@ -654,7 +654,7 @@ AS_IF([test -n "$NASM"],
 # would like to eliminate this in the future and just use the stock version
 # rather than the specially augumented one.
 #------------------------------------------------------------------------------
-AC_PATH_PROG([MAKEDEP], [makedep], [], [$PATH:.])
+AC_CHECK_PROGS([MAKEDEP], [makedep])
 AS_IF([test -n "$MAKEDEP"],
     [AC_CACHE_CHECK([for makedep extensions], [cs_cv_prog_makedep_ok],
 	[cs_makedep_ver=`makedep -V | sed -e "s/.*Version *//" 2>/dev/null`
@@ -874,6 +874,17 @@ CS_MAKEFILE_BUILD_FLAGS([how to enable compilation warnings],
 
 
 #------------------------------------------------------------------------------
+# Check how to make compiler treat warnings as errors.
+#------------------------------------------------------------------------------
+AC_CACHE_CHECK([how to treat warnings as errors],
+    [cs_cv_prog_cxx_enable_errors],
+    [CS_BUILD_IFELSE([], [CS_CREATE_TUPLE([-Werror])], [C++],
+	[cs_cv_prog_cxx_enable_errors=$cs_build_cflags],
+	[cs_cv_prog_cxx_enable_errors=no])])
+
+
+
+#------------------------------------------------------------------------------
 # Check if warnings about unknown #pragmas can be disabled.  (MSVC and Borland
 # use a number of pragmas not understood by GCC, for instance.)
 #------------------------------------------------------------------------------
@@ -1014,6 +1025,29 @@ CS_MAKEFILE_BUILD_FLAGS([if $CXX recognizes -ggdb], [cs_cv_prog_cxx_debug_gdb],
 AS_IF([test $cs_cv_prog_cxx_debug_gdb != no],
     [CS_MAKEFILE_PROPERTY([LFLAGS.debug], [$cs_cv_prog_cxx_debug_gdb], [+])])
 
+
+
+#------------------------------------------------------------------------------
+# Check if compiler complains about adding /usr/local/include to the header
+# search path.  If not, add this to the search path since not all compilers
+# search there by default.  Some compiler, on the other hand, complain if it is
+# already in the built-in search path, and the complaint is an annoyance.
+#------------------------------------------------------------------------------
+AS_IF([test $cs_cv_prog_cxx_enable_warnings != no && \
+    test $cs_cv_prog_cxx_enable_errors != no],
+    [AC_CACHE_CHECK([checking if -I/usr/local/include is usable],
+	[cs_cv_prog_cxx_local_include],
+	[CS_BUILD_IFELSE([],
+	    [CS_CREATE_TUPLE([-I/usr/local/include \
+		$cs_cv_prog_cxx_enable_warnings \
+		$cs_cv_prog_cxx_enable_errors],[],[])], [C++],
+		[cs_cv_prog_cxx_local_include=yes],
+		[cs_cv_prog_cxx_local_include=no])])],
+    [cs_cv_prog_cxx_local_include=yes])
+
+AS_IF([test $cs_cv_prog_cxx_local_include = yes],
+    [CS_MAKEFILE_PROPERTY([CFLAGS.SYSTEM], [-I/usr/local/include], [+])])
+		
 
 
 #------------------------------------------------------------------------------
@@ -1714,6 +1748,7 @@ CS_HEADER_OUTPUT([include/volatile.h])
 CS_MAKEFILE_OUTPUT([config.mak])
 AC_CONFIG_FILES([Makefile])
 AS_IF([test $enable_makefile_cache = yes],
-    [AC_CONFIG_COMMANDS([cache.mak], [${MAKE} recache], [MAKE=${MAKE-make}])])
+    [AC_CONFIG_COMMANDS([cache.mak],
+	[rm -f cache.mak ; ${MAKE} recache], [MAKE=${MAKE-make}])])
 
 AC_OUTPUT

@@ -10,6 +10,19 @@ The history order is reversed so that new features are at the top.
 	  configuration mechanism ("make platform") will continue to exist in
 	  parallel with the new mechanism for a short time as a fallback in
 	  case some problems are detected with the new mechanism.
+	- Eric Sunshine made the following changes to the configure script:
+	    - Added work around to OpenGL check for Jorrit's bizarre hybrid
+	      installation on Windows where he has mismatched headers.
+	    - Worked around issue reported by Wouter with g++ 3.2 where
+	      compiler complained about extra -I/usr/local/include flag
+	      (something about order of system search path order being
+	      changed).
+	    - No longer refreshes makefile cache twice if the cache already
+	      existed prior to run of configure (and if config.mak changed).
+	    - No longer tries to be smart about locating makedep in the CS
+	      directory.  This caused problems because the path was not
+	      properly recorded and would fail if the user did not have "." in
+	      PATH.
 5-Jan-2002
 	- Applied a patch from Rene Jager (renej.frog@yucom.be) which does
 	  the following:

@@ -74,8 +74,7 @@ ifndef CFLAGS.INCLUDE
 endif
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL = $(CFLAGS.I)/usr/local/include \
-  $(CFLAGS.SYSTEM) $(CSTHREAD.CFLAGS)
+CFLAGS.GENERAL = $(CFLAGS.SYSTEM) $(CSTHREAD.CFLAGS)
 
 # Flags for the compiler which are used when optimizing.
 ifndef CFLAGS.optimize
