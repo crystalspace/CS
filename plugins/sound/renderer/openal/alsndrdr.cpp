@@ -193,7 +193,7 @@ void csSoundRenderOpenAL::Close()
   {
     src = (csSoundSourceOpenAL*)ActiveSources.Get(0);
     src->Stop();
-    ActiveSources.Delete(0);
+    ActiveSources.DeleteIndex (0);
   }
   mutex_ActiveSources->Release();
 
@@ -204,7 +204,7 @@ void csSoundRenderOpenAL::Close()
   {
     hdl = (csSoundHandleOpenAL *)SoundHandles.Get(0);
     hdl->StopStream();
-    SoundHandles.Delete(0);
+    SoundHandles.DeleteIndex (0);
   }
   mutex_SoundHandles->Release();
 

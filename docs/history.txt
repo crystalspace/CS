@@ -9,6 +9,9 @@ chronological order.
 30-Oct-2003
 	- Jorrit performed some additional minor optimizations to Dynavis
 	  TestObjectVisibility.
+	- res fixed a lock-up in the OpenAL plugin: a Delete() was errorneously
+	  used instead of DeleteRange() in a loop, causing it to go round and 
+	  round infinitely.
 29-Oct-2003
 	- Eric Sunshine added a test to configure.ac which checks if the C++
 	  compiler recognizes the new explicit template specialization syntax
