@@ -1087,7 +1087,6 @@ void csSpriteCal3DMeshObject::UpdateLighting (iMovable* movable,
   {
     const csArray<iLight*>& relevant_lights = factory->light_mgr
       ->GetRelevantLights (logparent, -1, false);
-    size_t num_lights = relevant_lights.Length ();
     
     // loop through all meshes of the model 
     int meshId;
