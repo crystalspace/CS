@@ -13,6 +13,9 @@ chronological order.
 	  comment in autogen.sh.
 	- Eric Sunshine fixed bug in CS/docs/doxygen/Jamfile where it failed to
 	  mention doxygen.css in the argument list for the Doxygen rule.
+	- Eric Sunshine relocated the HTML-specific ScanDocDirs rule from
+	  CS/docs/Jamfile to CS/docs/html/Jamfile, and also renamed it to
+	  InstallHTMLDocs to better reflect its function.
 17-Apr-2004
 	- Aren Blondahl updated map2cs to have newly optimized render priority
 	  on entities ('priority' tag in the .map) and fixed map2cs to support

@@ -1,29 +1,5 @@
 SubDir TOP docs ;
 
-rule ScanDocDirs
-{
-    local dir = [ ConcatDirs $(SUBDIR) $(<) ] ;
-    local i ;
-    local docfiles ;
-    local files = [ GLOB $(dir) : * ] ;
-
-    for i in $(files) {
-        switch $(i:S) {
-            case .html : docfiles += $(i) ;
-            case .jpg  : docfiles += $(i) ;
-            case .jpeg : docfiles += $(i) ;
-            case .png  : docfiles += $(i) ;
-            case .gif  : docfiles += $(i) ;
-            case .css  : docfiles += $(i) ;
-            case .  :
-            case .. :
-            case *  :
-                ScanDocDirs $(<) $(i:BS) : $(2) ;
-        }
-    }
-    InstallDoc $(docfiles) : $(2) $(<) ;
-}
-
 InstallDoc history.txt history.old README.html ;
 
 SubInclude TOP docs texinfo ;
