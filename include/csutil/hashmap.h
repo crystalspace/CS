@@ -41,45 +41,10 @@ struct csHashElement
   csHashObject object;
 };
 
-/**
- * Subclass of csVector that will hold csHashElement
- * instances and can clean them up.
- */
-class csHashBucket : public csVector
-{
-public:
-  virtual ~csHashBucket ()
-  {
-    DeleteAll ();
-  }
-
-  virtual bool FreeItem (csSome Item)
-  {
-    csHashElement* el = (csHashElement*)Item;
-    delete el;
-    return true;
-  }
-};
-
-/**
- * Subclass of csVector to contain other csVectors and make
- * sure they are cleaned up.
- */
-class csVectorVector : public csVector
-{
-public:
-  virtual ~csVectorVector ()
-  {
-    DeleteAll ();
-  }
-
-  virtual bool FreeItem (csSome Item)
-  {
-    csVector* vec = (csVector*)Item;
-    delete vec;
-    return true;
-  }
-};
+/// a vector of csHashElements
+DECLARE_TYPED_VECTOR (csHashBucket, csHashElement);
+/// a vector of csHashBuckets
+DECLARE_TYPED_VECTOR (csHashBucketVector, csHashBucket);
 
 /**
  * An iterator to iterate over elements in the hashmap.
@@ -142,10 +107,10 @@ class csHashMap
   friend class csHashIterator;
 
 private:
-  /// A hashmap is implemented as a csVector of csVectors.
-  csVectorVector buckets;
+  /// the list of buckets
+  csHashBucketVector Buckets;
   /// Max size of this vector.
-  uint32 max_size;
+  uint32 NumBuckets;
 
 public:
   /**
