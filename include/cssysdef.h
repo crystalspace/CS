@@ -59,19 +59,6 @@
     #define CS_SYSDEF_PROVIDE_GETOPT
       For getopt() and GNU getopt_long()
 
-    #define CS_SYSDEF_PROVIDE_SOCKETS
-      For TCP/IP sockets definitions.  Specifically, should define the
-      following macros, constants, typedefs, and prototypes:
-	inet_addr(), gethostbyname(), ntohl(), etc.
-	socket(), listen(), bind(), etc. -- the standard socket functions
-	csNetworkSocket -- typedef or macro for socket descriptor type
-	struct sockaddr -- standard socket address type (and cousins)
-	socklen_t -- typedef or macro
-	CS_NET_SOCKET_INVALID -- value representing invalid socket
-	CS_CLOSESOCKET -- name of function to close a socket
-	CS_IOCTLSOCKET -- name of "ioctl" function for sockets
-	CS_GETSOCKETERROR -- name of function or variable for socket error code
-	
     #define CS_SYSDEF_PROVIDE_SELECT
       Includes definitions required for select(), FD_* macros, and
       struct timeval.
@@ -237,32 +224,8 @@
 #endif
 
 #ifdef CS_SYSDEF_PROVIDE_SOCKETS
-#  include <sys/types.h>
-#  include <sys/socket.h>
-#  if defined (OS_UNIX)
-#    include <unistd.h>
-#    define BSD_COMP 1
-#    include <sys/ioctl.h>
-#    if !defined (OS_SOLARIS) && !defined (OS_BE)
-#      include <arpa/inet.h>
-#      include <sys/time.h>
-#    endif
-#  endif
-#  include <netinet/in.h>
-#  include <netdb.h>
-#  if !defined (CS_IOCTLSOCKET)
-#    define CS_IOCTLSOCKET ioctl
-#  endif
-#  if !defined (CS_CLOSESOCKET)
-#    define CS_CLOSESOCKET close
-#  endif
-#  if !defined (CS_GETSOCKETERROR)
-#    define CS_GETSOCKETERROR errno
-#  endif
-   typedef unsigned int csNetworkSocket;
-#  if !defined (CS_NET_SOCKET_INVALID)
-#    define CS_NET_SOCKET_INVALID ((csNetworkSocket)~0)
-#  endif
+#warning CS_SYSDEF_PROVIDE_SOCKETS is deprecated, include cssys/sockets.h instead
+#include "cssys/sockets.h"
 #endif
 
 #ifdef CS_SYSDEF_PROVIDE_SELECT
