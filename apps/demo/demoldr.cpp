@@ -440,13 +440,6 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	buf->DecRef ();
 	return np;
       }
-      case CS_TOKEN_SECTOR:
-      {
-	char sname[255];
-	csScanStr (params, "%s", sname);
-	np->SetStartSector (sname);
-        break;
-      }
       case CS_TOKEN_NUM:
       {
         if (seq != 0)
