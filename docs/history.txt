@@ -12,6 +12,10 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine removed some errant DecRef() invocations from the
 	  "pixmap" how-to which were pointed out by Jacob€Gostylo
 	  <jgostylo@users.sourceforge.net>.
+	- Eric Sunshine upgraded glrender.mak and gl_render3d.mak so that they
+	  store their build files in distinct subdirectories of $(OUT).  This
+	  works around conflicts caused by both modules having source files of
+	  the same name.
 5-Jul-2003
         - Boyan removed circular reference between ds3d render and listener
           which prevent to unload ds3d plugin.

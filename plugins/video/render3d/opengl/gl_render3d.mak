@@ -42,15 +42,20 @@ else
   TO_INSTALL.STATIC_LIBS += $(GLRENDER3D)
 endif
 
-INF.GLRENDER3D = $(SRCDIR)/plugins/video/render3d/opengl/glrender3d.csplugin
-INC.GLRENDER3D = $(wildcard $(addprefix $(SRCDIR)/, \
-  plugins/video/render3d/opengl/*.h plugins/video/render3d/common/txtmgr.h))
-SRC.GLRENDER3D = $(wildcard $(addprefix $(SRCDIR)/, \
-  plugins/video/render3d/opengl/*.cpp plugins/video/render3d/common/txtmgr.cpp))
-OBJ.GLRENDER3D = $(addprefix $(OUT)/,$(notdir $(SRC.GLRENDER3D:.cpp=$O)))
+DIR.GLRENDER3D = plugins/video/render3d/opengl
+OUT.GLRENDER3D = $(OUT)/$(DIR.GLRENDER3D)
+INF.GLRENDER3D = $(SRCDIR)/$(DIR.GLRENDER3D)/glrender3d.csplugin
+INC.GLRENDER3D = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.GLRENDER3D)/*.h \
+  plugins/video/render3d/common/txtmgr.h))
+SRC.GLRENDER3D = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.GLRENDER3D)/*.cpp \
+  plugins/video/render3d/common/txtmgr.cpp))
+OBJ.GLRENDER3D = \
+  $(addprefix $(DIR.GLRENDER3D)/,$(notdir $(SRC.GLRENDER3D:.cpp=$O)))
 DEP.GLRENDER3D = CSGEOM CSUTIL CSSYS CSUTIL CSGFX
 CFG.GLRENDER3D = $(addprefix $(SRCDIR)/, \
   data/config/render3d/render3d.cfg data/config/render3d/opengl.cfg)
+
+OUTDIRS += $(OUT.GLRENDER3D)
 
 TO_INSTALL.CONFIG += $(CFG.GLRENDER3D)
 
@@ -66,13 +71,11 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: glrender3d glrender3dclean
-
-clean: glrender3dclean
+.PHONY: glrender3d glrender3dclean glrender3dcleandep
 
 glrender3d: $(OUTDIRS) $(GLRENDER3D)
 
-$(OUT)/%$O: $(SRCDIR)/plugins/video/render3d/opengl/%.cpp
+$(OUT.GLRENDER3D)/%$O: $(SRCDIR)/$(DIR.GLRENDER3D)/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT) $(GL.CFLAGS)
 
 $(GLRENDER3D): $(OBJ.GLRENDER3D) $(LIB.GLRENDER3D)
@@ -80,17 +83,23 @@ $(GLRENDER3D): $(OBJ.GLRENDER3D) $(LIB.GLRENDER3D)
 	$(DO.PLUGIN.CORE) $(LIB.GLRENDER3D.LFLAGS) \
 	$(DO.PLUGIN.POSTAMBLE)
 
+clean: glrender3dclean
 glrender3dclean:
-	-$(RMDIR) $(GLRENDER3D) $(OBJ.GLRENDER3D) $(OUTDLL)/$(notdir $(INF.GLRENDER3D))
+	-$(RMDIR) $(GLRENDER3D) $(OBJ.GLRENDER3D) \
+	$(OUTDLL)/$(notdir $(INF.GLRENDER3D))
+
+cleandep: glrender3dcleandep
+glrender3dcleandep:
+	-$(RM) $(OUT.GLRENDER3D)/glrender3d.dep
 
 ifdef DO_DEPEND
-dep: $(OUTOS)/glrender3d.dep
-$(OUTOS)/glrender3d.dep: $(SRC.GLRENDER3D)
-	$(DO.DEP1) \
+dep: $(OUT.GLRENDER3D) $(OUT.GLRENDER3D)/glrender3d.dep
+$(OUT.GLRENDER3D)/glrender3d.dep: $(SRC.GLRENDER3D)
+	$(DO.DEPEND1) \
 	-DGL_VERSION_1_1 $(CFLAGS.PIXEL_LAYOUT) $(GL.CFLAGS) \
-	$(DO.DEP2)
+	$(DO.DEPEND2)
 else
--include $(OUTOS)/glrender3d.dep
+-include $(OUT.GLRENDER3D)/glrender3d.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
