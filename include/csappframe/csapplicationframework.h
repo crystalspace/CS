@@ -27,9 +27,11 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  * \addtogroup appframe
  * @{ */
 
-#include <cstool/initapp.h>
-#include <iutil/objreg.h>
-#include <ivaria/reporter.h>
+#include "csextern.h"
+
+#include "cstool/initapp.h"
+#include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 
 /**
 * Application framework class.
@@ -87,6 +89,14 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *
 *   return true;
 * }
+* 
+* CS_IMPLEMENT_APPLICATION
+* 
+* int main (int argc, char* argv[]) 
+* {
+*   return csApplicationFramework::Main (argc, argv);
+* }
+* 
 * \endcode
 * \par
 * This class is derived from csInitializer for convenience, allowing
@@ -95,7 +105,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 * \par
 * This class is not related to csApp or other classes related to the CSWS.
 */
-class csApplicationFramework : public csInitializer
+class CS_CSAPPFRAME_EXPORT csApplicationFramework : public csInitializer
 {
 private:
   /**
@@ -328,6 +338,11 @@ public:
       m_ApplicationStringName,
       description);
   }
+  
+  /**
+   * Starts up the application framework, to be called from main().
+   */
+  int Main (int argc, char* argv[]);
 };
 
 /** @} */

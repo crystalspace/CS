@@ -17,10 +17,11 @@
 */
 
 
-#include <cssysdef.h>
-#include <iutil/event.h>
-#include <iutil/eventq.h>
-#include <csappframe/csapplicationframework.h>
+#include "cssysdef.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
+#include "csutil/cmdhelp.h"
+#include "csappframe/csapplicationframework.h"
 
 // Static 
 iObjectRegistry*  csApplicationFramework::mp_object_reg            = 0;
@@ -88,4 +89,32 @@ void csApplicationFramework::Quit (void)
     exit (2);
   }
 
+}
+
+int csApplicationFramework::Main (int argc, char* argv[])
+{
+  int iReturn = 0;
+
+  if ( ! csApplicationFramework::Initialize (argc, argv) )
+  {
+    iReturn = 1;
+  }
+  else if ( 0 == csApplicationFramework::GetObjectRegistry () )
+  {
+    iReturn = 1;
+  }
+  // TODO: We may want to provide a way for the developer to disable
+  // automatic help checking, but I can't think of a reason to do so.
+  else if (csCommandLineHelper::CheckHelp (
+  	csApplicationFramework::GetObjectRegistry ()))
+  {
+    csCommandLineHelper::Help (csApplicationFramework::GetObjectRegistry ());
+  }
+  else if ( ! csApplicationFramework::Start () )
+  {
+    iReturn = 2;
+  }
+
+	csApplicationFramework::End ();
+  return iReturn;
 }
