@@ -266,6 +266,7 @@ $mimetype['js'     ] = 'application/x-javascript';
 $mimetype['kar'    ] = 'audio/midi';
 $mimetype['latex'  ] = 'application/x-latex';
 $mimetype['lha'    ] = 'application/octet-stream';
+$mimetype['log'    ] = 'text/plain';
 $mimetype['lzh'    ] = 'application/octet-stream';
 $mimetype['m3u'    ] = 'audio/x-mpegurl';
 $mimetype['man'    ] = 'application/x-troff-man';
