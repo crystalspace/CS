@@ -22,7 +22,7 @@
 
 #include "csutil/scf.h"
 #include "iutil/event.h"
-struct iPlugin;
+struct iEventHandler;
 class csEventOutlet;
 
 class csEventCord : public iEventCord
@@ -37,7 +37,7 @@ protected:
   // Linked list of plugins
   struct PluginData
   {
-    iPlugin *plugin;
+    iEventHandler *plugin;
     int priority;
     PluginData *next;
   };
@@ -63,11 +63,11 @@ public:
   /// Create an event cord for a given category/subcategory
   csEventCord(int category, int subcategory);
 
-  /// Insert a plugin into the event cord
-  virtual int Insert(iPlugin*, int priority);
+  /// Insert an event handler into the event cord
+  virtual int Insert(iEventHandler*, int priority);
 
-  /// Remove a plugin from the event cord
-  virtual void Remove(iPlugin*);
+  /// Remove an event handler from the event cord
+  virtual void Remove(iEventHandler*);
 
   /// Get whether events are passed to the system event queue
   virtual bool GetPass() const { return pass; }

@@ -22,7 +22,8 @@
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
 #include "iutil/event.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "ivideo/xwindow.h"
 
 #define XK_MISCELLANY 1
@@ -153,13 +154,12 @@ public:
   virtual iFont *GetFont (int iIndex)
   { (void)iIndex; return font.xfont ? &font : (iFont*)NULL; }
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csLineX2DFontServer);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 };
 
 #endif // __LINEX2D_H__

@@ -21,7 +21,8 @@
 
 #include "csgfx/csimage.h"
 #include "igraphic/imageio.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/databuff.h"
 #include "csutil/csvector.h"
 
@@ -45,12 +46,11 @@ class csTGAImageIO : public iImageIO
   virtual iDataBuffer *Save (iImage *image, const char *mime = NULL); 
   virtual iDataBuffer *Save (iImage *image, iImageIO::FileFormatDescription *format = NULL);
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csTGAImageIO);
     virtual bool Initialize (iObjectRegistry*) { return true; }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 };
 
 /**

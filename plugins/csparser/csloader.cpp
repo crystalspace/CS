@@ -54,8 +54,10 @@
 #include "isound/loader.h"
 #include "isound/renderer.h"
 #include "isys/vfs.h"
-#include "isys/system.h"
 #include "isys/plugin.h"
+#include "isys/system.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/objreg.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/portal.h"
@@ -1702,11 +1704,11 @@ iMeshWrapper * csLoader::LoadMeshObject (const char* fname)
 
 SCF_IMPLEMENT_IBASE(csLoader);
   SCF_IMPLEMENTS_INTERFACE(iLoader);
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugin);
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent);
 SCF_IMPLEMENT_IBASE_END;
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csLoader::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csLoader::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY(csLoader);
@@ -1726,7 +1728,7 @@ CS_IMPLEMENT_PLUGIN
 csLoader::csLoader(iBase *p)
 {
   SCF_CONSTRUCT_IBASE(p);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 
   object_reg = NULL;
   VFS = NULL;

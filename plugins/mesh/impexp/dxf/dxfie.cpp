@@ -17,7 +17,8 @@
 */
 
 #include "cssysdef.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/objreg.h"
 #include "imesh/mdlconv.h"
 #include "cstool/mdldata.h"
@@ -42,23 +43,23 @@ public:
   virtual iModelData *Load( UByte* Buffer, ULong size );
   virtual iDataBuffer *Save( iModelData*, const char *format );
 
-  struct Plugin : public iPlugin
+  struct Component : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE (csModelConverterDXF);
     virtual bool Initialize (iObjectRegistry *object_reg)
     { 
       return scfParent->Initialize (object_reg);
     }
-  } scfiPlugin;
+  } scfiComponent;
 };
 
 SCF_IMPLEMENT_IBASE (csModelConverterDXF)
   SCF_IMPLEMENTS_INTERFACE (iModelConverter)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csModelConverterDXF::Plugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csModelConverterDXF::Component)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csModelConverterDXF)
@@ -74,7 +75,7 @@ CS_IMPLEMENT_PLUGIN
 csModelConverterDXF::csModelConverterDXF (iBase *pBase)
 {
   SCF_CONSTRUCT_IBASE (pBase);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
 
   FormatInfo.Name = "dxf";
   FormatInfo.CanLoad = false;

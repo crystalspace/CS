@@ -38,11 +38,13 @@
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
 #include "imesh/object.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/event.h"
 #include "iutil/objreg.h"
 #include "iutil/csinput.h"
 #include "ivaria/reporter.h"
+#include "isys/plugin.h"
 
 //------------------------------------------------- We need the 3D engine -----
 

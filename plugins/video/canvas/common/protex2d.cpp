@@ -21,10 +21,12 @@
 #include "protex2d.h"
 #include "csgeom/csrect.h"
 #include "isys/system.h"
+#include "isys/plugin.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 
 csProcTextureSoft2D::csProcTextureSoft2D (iObjectRegistry *r)
 	: csGraphics2D (NULL)

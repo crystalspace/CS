@@ -38,8 +38,10 @@
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/ptextype.h"
 #include "isys/system.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/objreg.h"
+#include "isys/plugin.h"
 
 // helper function for image loading
 

@@ -19,9 +19,12 @@
 #include "cssysdef.h"
 #include "isound/data.h"
 #include "isound/loader.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "isys/system.h"
 #include "isys/plugin.h"
+#include "iutil/event.h"
+#include "iutil/comp.h"
 #include "iutil/strvec.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
@@ -51,13 +54,12 @@ public:
   // Load a sound file from the raw data.
   virtual iSoundData *LoadSound(void *Data, unsigned long Size) const;
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundLoaderMultiplexer);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 };
 
 SCF_IMPLEMENT_FACTORY(csSoundLoaderMultiplexer);
@@ -69,17 +71,17 @@ SCF_EXPORT_CLASS_TABLE_END;
 
 SCF_IMPLEMENT_IBASE(csSoundLoaderMultiplexer)
   SCF_IMPLEMENTS_INTERFACE(iSoundLoader)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
 SCF_IMPLEMENT_IBASE_END;
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSoundLoaderMultiplexer::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSoundLoaderMultiplexer::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSoundLoaderMultiplexer::csSoundLoaderMultiplexer(iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE(iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSoundLoaderMultiplexer::~csSoundLoaderMultiplexer()

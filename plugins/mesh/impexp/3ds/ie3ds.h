@@ -52,14 +52,14 @@ public:
   virtual iModelData *Load( UByte* Buffer, ULong size );
   virtual iDataBuffer *Save( iModelData*, const char *format );
 
-  struct Plugin : public iPlugin
+  struct Component : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE( csModelConverter3ds );
     virtual bool Initialize (iObjectRegistry *object_reg)
     { 
       return scfParent->Initialize (object_reg);
     }
-  } scfiPlugin;
+  } scfiComponent;
 };
 
 #endif // __CS_IE3DS_H__

@@ -34,7 +34,8 @@
 #include "csws/cswsutil.h"
 #include "csws/csskin.h"
 #include "csws/cswsaux.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "isys/system.h"
 #include "isys/vfs.h"
 #include "ivideo/txtmgr.h"
@@ -44,11 +45,13 @@
 #include "iutil/csinput.h"
 #include "igraphic/imageio.h"
 #include "ivaria/reporter.h"
+#include "isys/plugin.h"
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//- csAppPlugin //--
 
 SCF_IMPLEMENT_IBASE (csApp::csAppPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 csApp::csAppPlugin::csAppPlugin (csApp *iParent)

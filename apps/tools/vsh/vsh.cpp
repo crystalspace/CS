@@ -22,6 +22,8 @@
 #include "cssys/sysdriv.h"
 #include "isys/vfs.h"
 #include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/strvec.h"
 #include "iutil/objreg.h"
 #include <ctype.h>

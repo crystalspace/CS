@@ -37,11 +37,13 @@
 #include "imesh/object.h"
 #include "imesh/particle.h"
 #include "ivaria/reporter.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/objreg.h"
 #include "csutil/cscolor.h"
 #include "csgeom/path.h"
 #include "cstool/csfxscr.h"
+#include "isys/plugin.h"
 
 //-----------------------------------------------------------------------------
 

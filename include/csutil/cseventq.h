@@ -47,7 +47,7 @@ class csEventQueue : public iEventQueue
 private:
   struct Listener
   {
-    iPlugin* object;
+    iEventHandler* object;
     unsigned int trigger;
   };
   CS_TYPEDEF_GROWING_ARRAY(ListenerVector, Listener);
@@ -101,7 +101,7 @@ private:
   // Unlock the queue
   inline void Unlock() { SpinLock--; }
   // Find a particular listener index; return -1 if listener is not registered.
-  int FindListener(iPlugin*) const;
+  int FindListener(iEventHandler*) const;
   // Notify listeners of CSMASK_Nothing.
   void Notify(iEvent&) const;
 
@@ -119,11 +119,11 @@ public:
   virtual void Dispatch(iEvent&);
 
   /// Register a listener for specific events.
-  virtual void RegisterListener(iPlugin*, unsigned int trigger);
+  virtual void RegisterListener(iEventHandler*, unsigned int trigger);
   /// Unregister a listener.
-  virtual void RemoveListener(iPlugin*);
+  virtual void RemoveListener(iEventHandler*);
   /// Change a listener's trigger.
-  virtual void ChangeListenerTrigger(iPlugin*, unsigned int trigger);
+  virtual void ChangeListenerTrigger(iEventHandler*, unsigned int trigger);
 
   /// Register an event plug and return a new outlet.
   virtual iEventOutlet* CreateEventOutlet(iEventPlug*);

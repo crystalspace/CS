@@ -31,7 +31,8 @@
 #include "csutil/scf.h"
 #include "csutil/bitset.h"
 #include "iutil/csinput.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 struct iEvent;
 struct iEventQueue;
 struct iObjectRegistry;
@@ -49,12 +50,11 @@ protected:
   virtual void LostFocus() = 0;
   virtual void Post(iEvent*);
 private:
-  struct FocusListener : public iPlugin
+  struct FocusListener : public iEventHandler
   {
     csInputDriver* Parent;
     SCF_DECLARE_IBASE;
     FocusListener() { SCF_CONSTRUCT_IBASE(0); }
-    virtual bool Initialize(iObjectRegistry*) { return true;}
     virtual bool HandleEvent(iEvent&);
   };
   friend struct FocusListener;

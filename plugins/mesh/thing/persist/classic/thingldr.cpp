@@ -28,6 +28,7 @@
 #include "iengine/mesh.h"
 #include "iengine/engine.h"
 #include "isys/system.h"
+#include "isys/plugin.h"
 #include "imesh/thing/thing.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/portal.h"
@@ -43,7 +44,8 @@
 #include "ivideo/material.h"
 #include "iengine/material.h"
 #include "iutil/objreg.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -123,56 +125,56 @@ CS_TOKEN_DEF_END
 
 SCF_IMPLEMENT_IBASE (csThingLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csThingLoader::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csThingLoader::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csThingSaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csThingSaver::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csThingSaver::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csPlaneLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csPlaneLoader::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csPlaneLoader::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csPlaneSaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csPlaneSaver::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csPlaneSaver::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csBezierLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csBezierLoader::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csBezierLoader::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csBezierSaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csBezierSaver::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csBezierSaver::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csThingLoader)
@@ -208,7 +210,7 @@ SCF_EXPORT_CLASS_TABLE_END
 csThingLoader::csThingLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csThingLoader::~csThingLoader ()
@@ -1198,7 +1200,7 @@ iBase* csThingLoader::Parse (const char* string, iEngine* engine,
 csThingSaver::csThingSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csThingSaver::~csThingSaver ()
@@ -1229,7 +1231,7 @@ void csThingSaver::WriteDown (iBase* /*obj*/, iStrVector *str,
 csPlaneLoader::csPlaneLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csPlaneLoader::~csPlaneLoader ()
@@ -1367,7 +1369,7 @@ iBase* csPlaneLoader::Parse (const char* string, iEngine* engine,
 csPlaneSaver::csPlaneSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csPlaneSaver::~csPlaneSaver ()
@@ -1391,7 +1393,7 @@ void csPlaneSaver::WriteDown (iBase* /*obj*/, iStrVector* /*str*/,
 csBezierLoader::csBezierLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csBezierLoader::~csBezierLoader ()
@@ -1478,7 +1480,7 @@ iBase* csBezierLoader::Parse (const char* string, iEngine* engine,
 csBezierSaver::csBezierSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csBezierSaver::~csBezierSaver ()

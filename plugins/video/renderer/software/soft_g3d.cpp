@@ -24,6 +24,8 @@
 #include "protex3d.h"
 #include "isys/system.h"
 #include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "ivideo/graph2d.h"
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"

@@ -19,7 +19,8 @@
 #ifndef __CS_REPORTER_H__
 #define __CS_REPORTER_H__
 
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "csutil/scf.h"
 #include "csutil/csvector.h"
 #include "ivaria/reporter.h"
@@ -69,13 +70,12 @@ public:
   virtual void RemoveReporterListener (iReporterListener* listener);
   virtual bool FindReporterListener (iReporterListener* listener);
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE (csReporter);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize (p); }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 };
 
 #endif // __CS_REPORTER_H__

@@ -22,7 +22,8 @@
 
 #include "imap/reader.h"
 #include "imap/writer.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 
 struct iEngine;
 struct iPluginManager;
@@ -51,14 +52,13 @@ public:
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csFountainFactoryLoader);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize (p); }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
-  friend struct eiPlugin;
+  } scfiComponent;
+  friend struct eiComponent;
 };
 
 /**
@@ -84,14 +84,13 @@ public:
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csFountainFactorySaver);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize (p); }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
-  friend struct eiPlugin;
+  } scfiComponent;
+  friend struct eiComponent;
 };
 
 
@@ -118,14 +117,13 @@ public:
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csFountainLoader);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize (p); }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
-  friend struct eiPlugin;
+  } scfiComponent;
+  friend struct eiComponent;
 };
 
 /**
@@ -151,14 +149,13 @@ public:
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csFountainSaver);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize (p); }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
-  friend struct eiPlugin;
+  } scfiComponent;
+  friend struct eiComponent;
 };
 
 #endif // _FOUNTLDR_H_

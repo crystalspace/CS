@@ -20,7 +20,8 @@
 #define _RAPID_H_
 
 #include "ivaria/collider.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "rapcol.h"
 
 /**
@@ -108,12 +109,11 @@ public:
     return csRAPIDCollider::GetFirstHit ();
   }
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csRapidCollideSystem);
     virtual bool Initialize (iObjectRegistry*) { return true; }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 };
 
 #endif // _RAPID_H_

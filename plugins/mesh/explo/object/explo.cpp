@@ -194,11 +194,11 @@ iMeshObject* csExploMeshObjectFactory::NewInstance ()
 
 SCF_IMPLEMENT_IBASE (csExploMeshObjectType)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csExploMeshObjectType::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csExploMeshObjectType::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csExploMeshObjectType)
@@ -212,7 +212,7 @@ SCF_EXPORT_CLASS_TABLE_END
 csExploMeshObjectType::csExploMeshObjectType (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csExploMeshObjectType::~csExploMeshObjectType ()

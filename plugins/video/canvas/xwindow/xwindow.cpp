@@ -25,6 +25,7 @@
 #include "csutil/cfgacc.h"
 #include "csutil/scf.h"
 #include "isys/system.h"
+#include "isys/plugin.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/cmdline.h"
 #include "iutil/event.h"
@@ -45,11 +46,16 @@ SCF_EXPORT_CLASS_TABLE_END
 SCF_IMPLEMENT_IBASE(csXWindow)
   SCF_IMPLEMENTS_INTERFACE(iXWindow)
   SCF_IMPLEMENTS_INTERFACE (iEventPlug)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csXWindow::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csXWindow::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csXWindow::eiEventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 #define CS_XEXT_XF86VM_SCF_ID "crystalspace.window.x.extf86vm"
@@ -58,7 +64,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csXWindow::csXWindow (iBase* parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
 
   EmptyMouseCursor = 0;
   memset (&MouseCursor, 0, sizeof (MouseCursor));
@@ -320,7 +327,7 @@ bool csXWindow::Open ()
   // Tell event queue to call us on every frame
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
-    q->RegisterListener (&scfiPlugin, CSMASK_Nothing);
+    q->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
 
   if (xf86vm)
   {

@@ -27,6 +27,7 @@
 #include "iengine/mesh.h"
 #include "iengine/engine.h"
 #include "isys/system.h"
+#include "isys/plugin.h"
 #include "imesh/partsys.h"
 #include "imesh/fountain.h"
 #include "ivideo/graph3d.h"
@@ -36,7 +37,8 @@
 #include "iutil/object.h"
 #include "iengine/material.h"
 #include "iutil/objreg.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -68,38 +70,38 @@ CS_TOKEN_DEF_END
 
 SCF_IMPLEMENT_IBASE (csFountainFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csFountainFactoryLoader::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csFountainFactoryLoader::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csFountainFactorySaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csFountainFactorySaver::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csFountainFactorySaver::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csFountainLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csFountainLoader::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csFountainLoader::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csFountainSaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csFountainSaver::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csFountainSaver::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csFountainFactoryLoader)
@@ -123,7 +125,7 @@ SCF_EXPORT_CLASS_TABLE_END
 csFountainFactoryLoader::csFountainFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csFountainFactoryLoader::~csFountainFactoryLoader ()
@@ -158,7 +160,7 @@ iBase* csFountainFactoryLoader::Parse (const char* /*string*/,
 csFountainFactorySaver::csFountainFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csFountainFactorySaver::~csFountainFactorySaver ()
@@ -205,7 +207,7 @@ void csFountainFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
 csFountainLoader::csFountainLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csFountainLoader::~csFountainLoader ()
@@ -442,7 +444,7 @@ iBase* csFountainLoader::Parse (const char* string, iEngine* engine,
 csFountainSaver::csFountainSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csFountainSaver::~csFountainSaver ()

@@ -251,17 +251,20 @@ self.data
 
 csImageArea(sx,sy,sw,sh)
 
-1.8.  class iPlugin
--------------------
+1.8.  class iComponent
+----------------------
 
 Initialize(object_reg)
 
+1.9.  class iEventHandler
+-------------------------
+
 HandleEvent(iEvent *)
 
-1.9.  class iTextureWrapper
----------------------------
+1.10.  class iTextureWrapper
+----------------------------
 
-1.10.  class iTextureHandle
+1.11.  class iTextureHandle
 ---------------------------
 
 GetMipMapDimensions(mipmap,mw,mh)
@@ -274,7 +277,7 @@ SetCacheData(d)
 
 GetPrivateObject()
 
-1.11.  class iMaterialHandle
+1.12.  class iMaterialHandle
 ----------------------------
 
 GetTexture()
@@ -285,12 +288,12 @@ GetReflection(oDiffuse,oAmbient,oReflection)
 
 Prepare()
 
-1.12.  class iMaterialWrapper
+1.13.  class iMaterialWrapper
 -----------------------------
 
 GetMaterialHandle()
 
-1.13.  class iFont
+1.14.  class iFont
 ------------------
 
 SetSize(iSize)
@@ -307,7 +310,7 @@ GetDimensions(text,oW,oH)
 
 GetLength(text,maxwidth)
 
-1.14.  class iFontServer
+1.15.  class iFontServer
 ------------------------
 
 LoadFont(filename)
@@ -316,7 +319,7 @@ GetFontCount()
 
 GetFont(iIndex)
 
-1.15.  class iGraphics2D
+1.16.  class iGraphics2D
 ------------------------
 
 Open()
@@ -393,7 +396,7 @@ CreateOffScreenCanvas(width,height,buffer,alone_hint,ipfmt,palette,pal_size)
 
 AllowResize(iAllow)
 
-1.16.  class iHalo
+1.17.  class iHalo
 ------------------
 
 GetWidth()
@@ -406,7 +409,7 @@ GetColor(oR,oG,oB)
 
 Draw(x,y,w,h,iIntensity,iVertices,iVertCount)
 
-1.17.  class iGraphics3D
+1.18.  class iGraphics3D
 ------------------------
 
 Open()
@@ -470,32 +473,32 @@ CreateHalo(iR,iG,iB,iAlpha,iWidth,iHeight)
 
 DrawPixmap(hTex,sx,sy,sw,sh,tx,ty,tw,th)
 
-1.18.  class iCamera
+1.19.  class iCamera
 --------------------
 
 GetFOV()
 
 GetInvFOV()
 
-1.19.  class iSector
+1.20.  class iSector
 --------------------
 
-1.20.  class iThingState
+1.21.  class iThingState
 ------------------------
 
 CreatePolygon(name)
 
-1.21.  class iMeshObject
+1.22.  class iMeshObject
 ------------------------
 
 Query_iThingState()
 
-1.22.  class iMeshWrapper
+1.23.  class iMeshWrapper
 -------------------------
 
 GetMeshObject()
 
-1.23.  class iLightMap
+1.24.  class iLightMap
 ----------------------
 
 GetMapData()
@@ -516,7 +519,7 @@ GetMeanLighting(r,g,b)
 
 GetSize()
 
-1.24.  class iPolygon3D
+1.25.  class iPolygon3D
 -----------------------
 
 GetLightMap()
@@ -549,7 +552,7 @@ SetPlane(iName)
 
 SetTextureSpace(v_orig,v1,len1)
 
-1.25.  class iImage
+1.26.  class iImage
 -------------------
 
 GetImageData()
@@ -580,7 +583,7 @@ Clone()
 
 Crop(x,y,width,height)
 
-1.26.  class iTextureManager
+1.27.  class iTextureManager
 ----------------------------
 
 RegisterTexture(image,flags)
@@ -601,7 +604,7 @@ SetVerbose(vb)
 
 GetTextureFormat()
 
-1.27.  class iPolygonTexture
+1.28.  class iPolygonTexture
 ----------------------------
 
 GetMaterialHandle()
@@ -641,10 +644,10 @@ GetCacheData(idx)
 
 SetCacheData(idx,d)
 
-1.28.  class iCameraPosition
+1.29.  class iCameraPosition
 ----------------------------
 
-1.29.  class iSectorList
+1.30.  class iSectorList
 ------------------------
 
 GetSectorCount()
@@ -657,7 +660,7 @@ RemoveSector(sec)
 
 FindByName(name)
 
-1.30.  class iEngine
+1.31.  class iEngine
 --------------------
 
 GetTextureFormat()
@@ -678,7 +681,7 @@ CreateSectorWallsMesh(sector,name)
 
 GetSectors()
 
-1.31.  class iObjectRegistry
+1.32.  class iObjectRegistry
 ----------------------------
 
 Query_iEngine()

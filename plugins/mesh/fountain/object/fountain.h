@@ -24,7 +24,8 @@
 #include "csutil/cscolor.h"
 #include "plugins/mesh/partgen/partgen.h"
 #include "imesh/fountain.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 
 struct iMaterialWrapper;
 
@@ -304,14 +305,13 @@ public:
     return ALL_FEATURES;
   }
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csFountainMeshObjectType);
     virtual bool Initialize (iObjectRegistry* p)
     { scfParent->object_reg = p; return true; }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
-  friend struct eiPlugin;
+  } scfiComponent;
+  friend struct eiComponent;
 };
 
 

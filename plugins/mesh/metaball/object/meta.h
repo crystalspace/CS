@@ -27,7 +27,8 @@
 #include "csgeom/tesselat.h"
 #include "imesh/object.h"
 #include "imesh/metaball.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 
 #define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING|CS_OBJECT_FEATURE_ANIMATION)
 
@@ -249,15 +250,14 @@ public:
     return true;
   }
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMetaBallType);
     virtual bool Initialize (iObjectRegistry* object_reg)
     {
       return scfParent->Initialize (object_reg);
     }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 };
 
 #endif // __META_H__

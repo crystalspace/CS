@@ -19,9 +19,11 @@
 #include "cssysdef.h"
 #include "imgplex.h"
 #include "isys/system.h"
+#include "isys/plugin.h"
 #include "iutil/strvec.h"
 #include "csgfx/csimage.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 
@@ -31,11 +33,11 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE(csMultiplexImageIO);
   SCF_IMPLEMENTS_INTERFACE(iImageIO);
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugin);
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent);
 SCF_IMPLEMENT_IBASE_END;
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csMultiplexImageIO::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMultiplexImageIO::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY(csMultiplexImageIO);
@@ -48,7 +50,7 @@ SCF_EXPORT_CLASS_TABLE_END
 csMultiplexImageIO::csMultiplexImageIO (iBase *pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csMultiplexImageIO::~csMultiplexImageIO ()

@@ -33,7 +33,8 @@
 #include "csutil/cseventq.h"
 #include "csutil/csstrvec.h"
 #include "csutil/cfgacc.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/event.h"
 
 class csSkin;
@@ -95,8 +96,8 @@ protected:
   /// Are we inbetween StartFrame() and FinishFrame()?
   bool InFrame;
 
-  /// The iPlugin interface
-  class csAppPlugin : public iPlugin
+  /// The iComponent interface
+  class csAppPlugin : public iComponent, public iEventHandler
   {
     SCF_DECLARE_IBASE;
     /// The parent application
@@ -107,7 +108,6 @@ protected:
 
     /// Initialize the application plugin (called by system driver)
     virtual bool Initialize (iObjectRegistry *object_reg);
-
     /// Handle a event and return true if processed; called by system driver
     virtual bool HandleEvent (iEvent &Event);
   } *scfiPlugin;

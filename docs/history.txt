@@ -36,6 +36,18 @@ The history order is reversed so that new features are at the top.
 	  in the system driver with this implementation.
 	- Made CS_QUERY_REGISTRY variants safe by putting brackets around
 	  the first argument.
+	- Split iPlugin interface into iComponent and iEventHandler and
+	  removed iPlugin interface. iComponent now contains the Initialize()
+	  function and iEventHandler contains HandleEvent. The idea is
+	  that event handling is a seperate concept from plugins so
+	  HandleEvent does not belong in iPlugin. In addition the notion
+	  of initializing is not plugin specific either so it also doesn't
+	  belong to iPlugin. This means there is actually nothing left
+	  in iPlugin so it is removed :-)
+	  To change code to work with this you basically have to replace
+	  iPlugin with iComponent. If you also need events (i.e. you used
+	  HandleEvent) then you have to additionally create a new
+	  embedded iEventHandler interface object.
 	- Eric Sunshine added a dummy constructor to G3DPolygonDPFX to pacify
 	  the NextStep compiler which complained that it wasn't able to
 	  instantiate the object.  This problem cropped up when the

@@ -39,10 +39,12 @@
 #include "IMacGraphics.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
+#include "isys/plugin.h"
 
 #if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
 #define SetQDGlobalsRandomSeed( n ) ( qd.randSeed = n )

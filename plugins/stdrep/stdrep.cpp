@@ -24,7 +24,8 @@
 #include "csutil/util.h"
 #include "stdrep.h"
 #include "isys/system.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/objreg.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
@@ -42,12 +43,12 @@ SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE (csReporterListener)
   SCF_IMPLEMENTS_INTERFACE (iStandardReporterListener)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iReporterListener)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csReporterListener::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csReporterListener::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csReporterListener::ReporterListener)
@@ -57,7 +58,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csReporterListener::csReporterListener (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiReporterListener);
   object_reg = NULL;
   console = NULL;

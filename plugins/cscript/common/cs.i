@@ -32,6 +32,8 @@
 
 #include "isys/system.h"
 #include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/event.h"
 #include "iutil/objreg.h"
 #include "iengine/camera.h"
@@ -108,9 +110,13 @@ struct csImageArea
 };
 
 //***** Interfaces
-struct iPlugin:public iBase
+struct iComponent:public iBase
 {
   bool Initialize(iObjectRegistry *object_reg);
+};
+
+struct iEventHandler:public iBase
+{
   bool HandleEvent(iEvent&);
 };
 

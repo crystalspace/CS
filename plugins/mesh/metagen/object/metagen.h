@@ -29,7 +29,8 @@
 #include "csgeom/tesselat.h"
 #include "imesh/object.h"
 #include "imesh/metagen.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "csutil/typedvec.h"
 #include "csutil/cscolor.h"
 
@@ -349,12 +350,11 @@ public:
     return ALL_FEATURES;
   }
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMetaGenType);
     virtual bool Initialize (iObjectRegistry*) { return true; }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 };
 
 #endif // __METAGEN_H__

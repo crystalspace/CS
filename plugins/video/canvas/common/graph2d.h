@@ -25,9 +25,11 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/fontserv.h"
 #include "ivideo/natwin.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/config.h"
 #include "csutil/cfgacc.h"
+#include "isys/plugin.h"
 
 struct iObjectRegistry;
 struct iPluginManager;
@@ -277,13 +279,17 @@ public:
    */
   virtual bool SetMouseCursor (csMouseCursorID iShape);
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csGraphics2D);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
+  } scfiComponent;
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csGraphics2D);
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiPlugin;
+  } scfiEventHandler;
 
 protected:
   /**

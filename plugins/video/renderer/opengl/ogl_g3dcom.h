@@ -40,6 +40,8 @@
 #include "csgeom/poly3d.h"
 #include "ogl_txtmgr.h"
 #include "ivideo/graph3d.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "isys/plugin.h"
 
 struct iGraphics2D;
@@ -500,7 +502,7 @@ public:
 
   void Report (int severity, const char* msg, ...);
 
-  /// Initialization for iPlugin.  Sets System pointer.
+  /// Initialization for iComponent.  Sets System pointer.
   virtual bool Initialize (iObjectRegistry*);
   /**
    * Open or close our interface.
@@ -753,13 +755,17 @@ public:
   // Extension flags
   bool ARB_multitexture;
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DOGLCommon);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
+  } scfiComponent;
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DOGLCommon);
     virtual bool HandleEvent (iEvent& ev) { return scfParent->HandleEvent (ev); }
-  } scfiPlugin;
+  } scfiEventHandler;
 };
 
 #endif // __OGL3DCOM_H__

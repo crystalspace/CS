@@ -24,8 +24,10 @@
 #include "csver.h"
 #include "perfstat.h"
 #include "iengine/engine.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "isys/system.h"
+#include "isys/plugin.h"
 #include "isys/vfs.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
@@ -45,17 +47,23 @@ SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE (csPerfStats)
   SCF_IMPLEMENTS_INTERFACE (iPerfStats)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csPerfStats::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csPerfStats::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csPerfStats::eiEventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csPerfStats::csPerfStats (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
   Engine = NULL;
   file_name = NULL;
   statlog_section = NULL;
@@ -86,7 +94,7 @@ bool csPerfStats::Initialize (iObjectRegistry *object_reg)
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   if (q != 0)
-    q->RegisterListener (&scfiPlugin, CSMASK_Nothing);
+    q->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
   sub_section = super_section = NULL;
   // default resolution
   resolution = 500;

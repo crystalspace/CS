@@ -38,10 +38,12 @@
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "imesh/object.h"
 #include "iengine/mesh.h"
 #include "ivaria/reporter.h"
+#include "isys/plugin.h"
 
 extern WalkTest* Sys;
 

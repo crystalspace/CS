@@ -20,7 +20,8 @@
 #define __CS_SOFT_G3D_H__
 
 #include "iutil/config.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "sft3dcom.h"
 
 /// Software 3D renderer
@@ -32,7 +33,7 @@ public:
   csGraphics3DSoftware (iBase*);
   /// Destructor
   virtual ~csGraphics3DSoftware ();
-  /// Initialize iPlugin.
+  /// Initialize iComponent.
   virtual bool Initialize (iObjectRegistry*);
   /// Open a canvas.
   virtual bool Open ();

@@ -36,7 +36,8 @@
 #include "csutil/prfxcfg.h"
 #include "csutil/util.h"
 #include "iutil/eventq.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "isys/vfs.h"
 #include "ivaria/conout.h"
 #include "inetwork/driver.h"
@@ -65,7 +66,7 @@ void csSystemDriver::ReportSys (int severity, const char* msg, ...)
 
 //------------------------------------------------------ csPlugin class -----//
 
-csSystemDriver::csPlugin::csPlugin (iPlugin *iObject, const char *iClassID,
+csSystemDriver::csPlugin::csPlugin (iComponent *iObject, const char *iClassID,
   const char *iFuncID)
 {
   Plugin = iObject;
@@ -288,15 +289,20 @@ bool csPluginList::RecurseSort (csSystemDriver *iSys, int row, char *order,
 SCF_IMPLEMENT_IBASE (csSystemDriver)
   SCF_IMPLEMENTS_INTERFACE (iSystem)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPluginManager)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSystemDriver::PluginManager)
   SCF_IMPLEMENTS_INTERFACE (iPluginManager)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSystemDriver::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSystemDriver::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSystemDriver::eiEventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSystemDriver::csSystemDriver () :
@@ -304,7 +310,8 @@ csSystemDriver::csSystemDriver () :
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPluginManager);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
 
   debug_level = 0;
   Shutdown = false;
@@ -362,7 +369,7 @@ csSystemDriver::~csSystemDriver ()
 
   // Free all plugins.
   for (int i = 0; i < Plugins.Length(); i++)
-      UnloadPlugin((iPlugin *)Plugins.Get(i));
+      UnloadPlugin((iComponent *)Plugins.Get(i));
      
   if (EventQueue != 0)
     EventQueue->DecRef();
@@ -547,7 +554,7 @@ bool csSystemDriver::Open ()
   // Start listening for events.  This class is interested in cscmdQuit, but
   // subclasses may be interested in any event, so listen for all types except
   // for the special one which sends cscmdPreProcess/cscmdPostProcess.
-  EventQueue->RegisterListener(&scfiPlugin, ~CSMASK_Nothing);
+  EventQueue->RegisterListener(&scfiEventHandler, ~CSMASK_Nothing);
 
   // Now pass the open event to all plugins
   csEvent Event (csGetTicks (), csevBroadcast, cscmdSystemOpen);
@@ -565,7 +572,7 @@ void csSystemDriver::Close ()
   EventQueue->Dispatch (Event);
 
   // Stop listening for events.
-  EventQueue->RemoveListener(&scfiPlugin);
+  EventQueue->RemoveListener(&scfiEventHandler);
 }
 
 void csSystemDriver::NextFrame ()
@@ -673,7 +680,12 @@ void csSystemDriver::Help ()
       Help (Config);
       Config->DecRef ();
     }
-    plugin->Plugin->HandleEvent (HelpEvent);
+    iEventHandler* evhdlr = SCF_QUERY_INTERFACE (plugin->Plugin, iEventHandler);
+    if (evhdlr)
+    {
+      evhdlr->HandleEvent (HelpEvent);
+      evhdlr->DecRef ();
+    }
   }
 
   //@@@???
@@ -686,7 +698,7 @@ void csSystemDriver::Help ()
 "  -debug=<n>         set debug level (default=%d)\n", debug_level);
 }
 
-void csSystemDriver::QueryOptions (iPlugin *iObject)
+void csSystemDriver::QueryOptions (iComponent *iObject)
 {
   iCommandLineParser* CommandLine = CS_QUERY_REGISTRY (&object_reg,
   	iCommandLineParser);
@@ -762,7 +774,7 @@ void csSystemDriver::RequestPlugin (const char *iPluginName)
 iBase *csSystemDriver::LoadPlugin (const char *iClassID, const char *iFuncID,
   const char *iInterface, int iVersion)
 {
-  iPlugin *p = SCF_CREATE_INSTANCE (iClassID, iPlugin);
+  iComponent *p = SCF_CREATE_INSTANCE (iClassID, iComponent);
   if (!p)
     ReportSys (CS_REPORTER_SEVERITY_WARNING,
     	"WARNING: could not load plugin `%s'\n", iClassID);
@@ -791,7 +803,7 @@ iBase *csSystemDriver::LoadPlugin (const char *iClassID, const char *iFuncID,
 }
 
 bool csSystemDriver::RegisterPlugin (const char *iClassID,
-  const char *iFuncID, iPlugin *iObject)
+  const char *iFuncID, iComponent *iObject)
 {
   int index = Plugins.Push (new csPlugin (iObject, iClassID, iFuncID));
   if (iObject->Initialize (&object_reg))
@@ -863,7 +875,7 @@ iBase *csSystemDriver::QueryPlugin (const char* iClassID, const char *iFuncID,
   return NULL;
 }
 
-bool csSystemDriver::UnloadPlugin (iPlugin *iObject)
+bool csSystemDriver::UnloadPlugin (iComponent *iObject)
 {
   int idx = Plugins.FindKey (iObject);
   if (idx < 0)

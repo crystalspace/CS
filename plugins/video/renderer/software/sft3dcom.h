@@ -28,7 +28,8 @@
 #include "csutil/cfgacc.h"
 #include "scan.h"
 #include "ivideo/halo.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 
@@ -261,7 +262,8 @@ public:
   virtual ~csGraphics3DSoftwareCommon ();
 
   /**
-   * Initialization method required by iPlugin interface.  Sets System pointer.
+   * Initialization method required by iComponent interface.
+   * Sets System pointer.
    */
   virtual bool Initialize (iObjectRegistry*);
 
@@ -475,16 +477,20 @@ public:
   virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw,
     int sh, int tx, int ty, int tw, int th, uint8 Alpha);
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DSoftwareCommon);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
+  } scfiComponent;
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DSoftwareCommon);
     virtual bool HandleEvent (iEvent& ev)
     {
       return scfParent->HandleEvent (ev);
     }
-  } scfiPlugin;
+  } scfiEventHandler;
 };
 
 #endif // __SFT3DCOM_H__

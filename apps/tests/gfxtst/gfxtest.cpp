@@ -29,8 +29,10 @@
 #include "iutil/databuff.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "igraphic/imageio.h"
+#include "isys/plugin.h"
 
 #include <string.h>
 

@@ -18,8 +18,10 @@
 
 #include "cssysdef.h"
 #include "csutil/cfgacc.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "isys/vfs.h"
+#include "isys/plugin.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/objreg.h"
 

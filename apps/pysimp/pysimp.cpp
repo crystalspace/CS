@@ -34,11 +34,13 @@
 #include "ivideo/txtmgr.h"
 #include "ivaria/script.h"
 #include "imap/parser.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/event.h"
 #include "iutil/objreg.h"
 #include "iutil/csinput.h"
 #include "ivaria/reporter.h"
+#include "isys/plugin.h"
 
 //------------------------------------------------- We need the 3D engine -----
 

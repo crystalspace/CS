@@ -23,7 +23,8 @@
 #include "mapstd.h"
 #include "texfile.h"
 #include "zipfile.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "igraphic/imageio.h"
 
 static const char* InvisibleTextures[] = 
@@ -85,7 +86,7 @@ void CTextureFile::SetOriginalData(char* Data, int Size)
     ImageLoader = SCF_CREATE_INSTANCE("crystalspace.graphic.image.io.multiplex", iImageIO);
     if (ImageLoader)
     {
-      iPlugin *Plugin = SCF_QUERY_INTERFACE (ImageLoader, iPlugin);
+      iComponent *Plugin = SCF_QUERY_INTERFACE (ImageLoader, iComponent);
       if (!Plugin || !Plugin->Initialize(NULL))
       {
         ImageLoader->DecRef();

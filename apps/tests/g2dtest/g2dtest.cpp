@@ -32,6 +32,8 @@
 
 #include "isys/vfs.h"
 #include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/fontserv.h"
 #include "iutil/cmdline.h"
@@ -123,7 +125,7 @@ G2DTestSystemDriver::G2DTestSystemDriver () : SysSystemDriver ()
   font = NULL;
   pfmt_init = false;
 
-  iEventQueue* q = CS_QUERY_REGISTRY(&object_reg, iEventQueue);
+  iEventQueue* q = CS_QUERY_REGISTRY(GetObjectRegistry (), iEventQueue);
   if (q != 0)
   {
     EventOutlet = q->GetEventOutlet();

@@ -28,7 +28,8 @@
 #include "imesh/particle.h"
 #include "ivideo/graph3d.h"
 #include "iutil/config.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "spr2duv.h"
 
 #define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING|CS_OBJECT_FEATURE_ANIMATION)
@@ -353,12 +354,11 @@ public:
     return ALL_FEATURES;
   }
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSprite2DMeshObjectType);
     virtual bool Initialize (iObjectRegistry*) { return true; }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 };
 
 #endif // _SPR2D_H_

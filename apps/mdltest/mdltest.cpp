@@ -49,9 +49,11 @@
 #include "iutil/objreg.h"
 #include "iutil/csinput.h"
 #include "csutil/csstring.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "igraphic/imageio.h"
 #include "ivaria/reporter.h"
+#include "isys/plugin.h"
 
 CS_IMPLEMENT_APPLICATION
 

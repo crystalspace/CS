@@ -23,7 +23,8 @@
 
 #include "cssysdef.h"
 #include "isound/loader.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "../common/soundraw.h"
 #include "../common/sndload.h"
 
@@ -38,28 +39,27 @@ class csSoundLoader_AU : public iSoundLoader
 public:
   SCF_DECLARE_IBASE;
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundLoader_AU);
     virtual bool Initialize (iObjectRegistry*) { return true; }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 
   csSoundLoader_AU(iBase *p)
   {
     SCF_CONSTRUCT_IBASE(p);
-    SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+    SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   }
   virtual iSoundData *LoadSound(void *Buffer, unsigned long Size) const;
 };
 
 SCF_IMPLEMENT_IBASE(csSoundLoader_AU)
   SCF_IMPLEMENTS_INTERFACE(iSoundLoader)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
 SCF_IMPLEMENT_IBASE_END;
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSoundLoader_AU::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSoundLoader_AU::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY(csSoundLoader_AU);

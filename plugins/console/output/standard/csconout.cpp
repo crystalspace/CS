@@ -27,6 +27,7 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "isys/system.h"
+#include "isys/plugin.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/fontserv.h"
 #include "csutil/csevent.h"
@@ -34,17 +35,23 @@
 #include "csutil/csstring.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE(csConsoleOutput)
   SCF_IMPLEMENTS_INTERFACE(iConsoleOutput)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csConsoleOutput::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csConsoleOutput::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csConsoleOutput::eiEventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csConsoleOutput)
@@ -57,7 +64,8 @@ SCF_EXPORT_CLASS_TABLE_END
 csConsoleOutput::csConsoleOutput (iBase *base)
 {
   SCF_CONSTRUCT_IBASE (base);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
   fg_rgb.Set (255, 255, 255);	// Foreground defaults to white
   bg_rgb.Set (0, 0, 0);		// Background defaults to black
   transparent = false;		// Default to no transparency
@@ -113,7 +121,7 @@ bool csConsoleOutput::Initialize (iObjectRegistry *object_reg)
   // We want to see broadcast events
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
-    q->RegisterListener (&scfiPlugin, CSMASK_Broadcast);
+    q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
   return true;
 }
 

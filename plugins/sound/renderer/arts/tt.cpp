@@ -8,6 +8,8 @@
 #include "iutil/objreg.h"
 #include "isys/vfs.h"
 #include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "isound/data.h"
 #include "isound/loader.h"
 #include "isound/renderer.h"

@@ -22,34 +22,7 @@
 
 #include "csutil/scf.h"
 
-struct iObjectRegistry;
-struct iEvent;
-
-SCF_VERSION (iPlugin, 0, 0, 2);
-
-/**
- * This is the general plug-in interface for CS.
- * All plug-ins must implement this interface.
- * During Initialize() call plug-in should do all initialization stuff,
- * such as registering with the system driver and so on.
- */
-struct iPlugin : public iBase
-{
-  /// Initialize the plugin, and return success status
-  virtual bool Initialize (iObjectRegistry *object_reg) = 0;
-  /**
-   * This is plugin's event handler. Plugin should register first
-   * with an event queue, using iEventQueue::RegisterListener() method,
-   * before he'll receive any events. The handler should return true
-   * if the event has been handled indeed (and thus to not pass it further).
-   * The default implementation of HandleEvent does nothing.
-   * NOTE: do NOT return true unless you really handled the event
-   * and want the event to not be passed further for processing by
-   * other plugins.
-   */
-  virtual bool HandleEvent (iEvent &/*Event*/)
-  { return false; }
-};
+struct iComponent;
 
 /*
  * Plugins have an additional characteristic called "functionality ID".
@@ -124,7 +97,7 @@ struct iPlugin : public iBase
  * NULL is returned. NULL is also returned if the plugin with respective
  * functionality is simply not found. If you need the plugin with given
  * functionality identifier no matter which interface it implements, ask
- * for some basic interface, say iBase or iPlugin.
+ * for some basic interface, say iBase or iComponent.
  */
 #define CS_QUERY_PLUGIN_ID(Object,FuncID,Interface)			\
   (Interface*)((Object)->QueryPlugin (FuncID, #Interface, VERSION_##Interface))
@@ -137,7 +110,7 @@ struct iPlugin : public iBase
  * returned if the plugin with respective functionality is simply not
  * found. If you need the plugin with given functionality identifier no
  * matter which interface it implements, ask for some basic interface,
- * say iBase or iPlugin.
+ * say iBase or iComponent.
  */
 #define CS_QUERY_PLUGIN_CLASS(Object,ClassID,FuncID,Interface)		\
   (Interface *)((Object)->QueryPlugin					\
@@ -179,10 +152,10 @@ struct iPluginManager : public iBase
   virtual iBase *QueryPlugin (const char* iClassID, const char *iFuncID,
   	const char *iInterface, int iVersion) = 0;
   /// Remove a plugin from system driver's plugin list.
-  virtual bool UnloadPlugin (iPlugin *iObject) = 0;
-  /// Register a object that implements the iPlugin interface as a plugin.
+  virtual bool UnloadPlugin (iComponent *iObject) = 0;
+  /// Register a object that implements the iComponent interface as a plugin.
   virtual bool RegisterPlugin (const char *iClassID, const char *iFuncID,
-    iPlugin *iObject) = 0;
+    iComponent *iObject) = 0;
   /// Get the number of loaded plugins in the plugin manager.
   virtual int GetPluginCount () = 0;
   /// Get the specified plugin from the plugin manager.

@@ -17,7 +17,8 @@
 */
 
 #include "cssysdef.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/objreg.h"
 #include "imesh/mdlconv.h"
 #include "cstool/mdldata.h"
@@ -45,23 +46,23 @@ public:
   virtual iModelData *Load( UByte* Buffer, ULong size );
   virtual iDataBuffer *Save( iModelData*, const char *format );
 
-  struct Plugin : public iPlugin
+  struct Component : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE (csModelConverterPOV);
     virtual bool Initialize (iObjectRegistry *object_reg)
     { 
       return scfParent->Initialize (object_reg);
     }
-  } scfiPlugin;
+  } scfiComponent;
 };
 
 SCF_IMPLEMENT_IBASE (csModelConverterPOV)
   SCF_IMPLEMENTS_INTERFACE (iModelConverter)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csModelConverterPOV::Plugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csModelConverterPOV::Component)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csModelConverterPOV)
@@ -83,7 +84,7 @@ CS_DECLARE_OBJECT_ITERATOR (csModelDataPolygonIterator, iModelDataPolygon);
 csModelConverterPOV::csModelConverterPOV (iBase *pBase)
 {
   SCF_CONSTRUCT_IBASE (pBase);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
 
   FormatInfo.Name = "pov";
   FormatInfo.CanLoad = false;

@@ -59,11 +59,16 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE(csSocketDriver)
   SCF_IMPLEMENTS_INTERFACE(iNetworkDriver)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSocketDriver::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSocketDriver::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSocketDriver::eiEventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 
@@ -214,7 +219,8 @@ csNetworkSocket csSocketListener::csSocket::GetSocket() const
 csSocketDriver::csSocketDriver(iBase* p) : LastError(CS_NET_ERR_NO_ERROR)
 {
   SCF_CONSTRUCT_IBASE(p);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
 }
 csSocketDriver::~csSocketDriver() {}
 void csSocketDriver::ClearError() { LastError = CS_NET_ERR_NO_ERROR; }
@@ -231,12 +237,13 @@ void csSocketDriver::Close()
   PlatformDriverStop();
 }
 
-bool csSocketDriver::eiPlugin::Initialize(iObjectRegistry* object_reg)
+bool csSocketDriver::eiComponent::Initialize(iObjectRegistry* object_reg)
 {
   scfParent->object_reg = object_reg;
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
-    q->RegisterListener(this, CSMASK_Command | CSMASK_Broadcast);
+    q->RegisterListener(&(scfParent->scfiEventHandler),
+    	CSMASK_Command | CSMASK_Broadcast);
   return true;
 }
 
@@ -375,7 +382,7 @@ bool csSocketDriver::PlatformDriverStop()
 
 #endif
 
-bool csSocketDriver::eiPlugin::HandleEvent (iEvent &e)
+bool csSocketDriver::eiEventHandler::HandleEvent (iEvent &e)
 {
   if (e.Type == csevCommand || e.Type == csevBroadcast)
   {

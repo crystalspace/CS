@@ -21,7 +21,8 @@
 
 #include "csutil/scf.h"
 #include "csgeom/box.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "ivideo/graph3d.h"
 
 struct iMeshObject;

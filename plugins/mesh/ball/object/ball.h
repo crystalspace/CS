@@ -25,7 +25,8 @@
 #include "imesh/object.h"
 #include "imesh/ball.h"
 #include "ivideo/graph3d.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 
 struct iMaterialWrapper;
 struct iVertexBuffer;
@@ -332,15 +333,14 @@ public:
     return true;
   }
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csBallMeshObjectType);
     virtual bool Initialize (iObjectRegistry* object_reg)
     {
       return scfParent->Initialize (object_reg);
     }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 };
 
 #endif // _BALL_H_

@@ -23,7 +23,8 @@
 #define __FONTPLEX_H__
 
 #include "ivideo/fontserv.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "csutil/csvector.h"
 
 /**
@@ -85,13 +86,12 @@ public:
    */
   virtual iFont *GetFont (int iIndex);
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csFontServerMultiplexor);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 };
 
 #endif // __FONTPLEX_H__

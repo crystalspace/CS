@@ -24,6 +24,8 @@
 #include "csutil/cfgacc.h"
 #include "isys/system.h"
 #include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "iutil/cfgfile.h"

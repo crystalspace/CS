@@ -25,7 +25,8 @@
 
 #include "csutil/scf.h"
 #include "isound/driver.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "isys/system.h"
 
 class csSoundDriverMac : public iSoundDriver
@@ -60,13 +61,12 @@ public:
  
   void SndDoubleBackProc(SndChannelPtr, SndDoubleBufferPtr);
   
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundDriverMac);
     virtual bool Initialize (iObjectRegistry* p)
     { scfParent->object_reg = p; return true; }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 
  private:
   SndDoubleBufferHeader	mSoundDBHeader;

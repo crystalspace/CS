@@ -19,11 +19,13 @@
 #ifndef __CS_BUGPLUG_H__
 #define __CS_BUGPLUG_H__
 
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "csutil/scf.h"
 #include "csutil/util.h"
 #include "csutil/csvector.h"
 #include "ivideo/graph3d.h"
+#include "isys/plugin.h"
 
 struct iObjectRegistry;
 struct iEngine;
@@ -109,7 +111,7 @@ struct csKeyMap
  * Debugger plugin. Loading this plugin is sufficient to get debugging
  * functionality in your application.
  */
-class csBugPlug : public iPlugin
+class csBugPlug : public iComponent, public iEventHandler
 {
 private:
   iObjectRegistry *object_reg;

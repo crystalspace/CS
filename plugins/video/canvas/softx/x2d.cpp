@@ -23,6 +23,7 @@
 #include "csgeom/csrect.h"
 #include "csutil/cfgacc.h"
 #include "isys/system.h"
+#include "isys/plugin.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/cmdline.h"
 #include "iutil/eventq.h"
@@ -131,7 +132,7 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
   if (q != 0)
   {
     // Tell event queue to call us on broadcast messages
-    q->RegisterListener (&scfiPlugin, CSMASK_Broadcast);
+    q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
     // Create the event outlet
     EventOutlet = q->CreateEventOutlet (this);
   }

@@ -21,7 +21,8 @@
 
 #include "csgfx/csimage.h"
 #include "igraphic/imageio.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/databuff.h"
 #include "csutil/csvector.h"
 #include "csutil/cfgacc.h"
@@ -51,13 +52,12 @@ class csMultiplexImageIO : public iImageIO
   virtual iDataBuffer *Save (iImage *image, const char *mime = NULL); 
   virtual iDataBuffer *Save (iImage *image, iImageIO::FileFormatDescription *format = NULL);
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMultiplexImageIO);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 };
 
 #endif // __IMGMULTIPLEX_H__

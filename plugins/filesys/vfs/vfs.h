@@ -23,7 +23,8 @@
 #include "csutil/cfgfile.h"
 #include "csutil/csstrvec.h"
 #include "isys/vfs.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 
 class VfsNode;
 struct iConfigFile;
@@ -204,13 +205,12 @@ public:
    */
   virtual iDataBuffer *GetRealPath (const char *FileName);
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csVFS);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 
 private:
   /// Same as ExpandPath() but with less overhead

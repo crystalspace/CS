@@ -31,7 +31,8 @@
 #include "iutil/event.h"
 #include "iutil/objreg.h"
 #include "iutil/csinput.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/txtmgr.h"
@@ -44,6 +45,7 @@
 #include "csgeom/math3d.h"
 #include "csengine/meshobj.h"
 #include "cstso.h"
+#include "isys/plugin.h"
 
 // PHYZTEST DEMO
 // hit del key to create a swinging chain

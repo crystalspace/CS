@@ -22,7 +22,8 @@
 
 #include "ivaria/conin.h"
 #include "ivaria/conout.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "csutil/csstrvec.h"
 
 /**
@@ -101,14 +102,19 @@ public:
   /// Set the prompt string
   virtual void SetPrompt (const char *iPrompt);
 
-  // Implement iPlugin interface.
-  struct eiPlugin : public iPlugin
+  // Implement iComponent interface.
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csConsoleInput);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
+  } scfiComponent;
+  // Implement iEventHandler interface.
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csConsoleInput);
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiPlugin;
+  } scfiEventHandler;
 
   // Implement iConsoleWatcher interface.
   struct eiConsoleWatcher : public iConsoleWatcher

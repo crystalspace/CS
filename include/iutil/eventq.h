@@ -25,17 +25,17 @@ struct iEvent;
 struct iEventCord;
 struct iEventOutlet;
 struct iEventPlug;
-struct iPlugin;
+struct iEventHandler;
 
 SCF_VERSION(iEventQueue, 0, 0, 1);
 
 /**
  * This interface represents a general event queue.<p>
  * Events may be posted to the queue by various sources.  Listeners
- * (implementing iPlugin) can register to receive notification when various
- * events are processed.  Typically, one instance of this object is available
- * from the shared-object registry (iObjectRegistry) under the name
- * "crystalspace.event.queue".
+ * (implementing iEventHandler) can register to receive notification when
+ * various events are processed.  Typically, one instance of this object is
+ * available from the shared-object registry (iObjectRegistry) under the
+ * name "crystalspace.event.queue".
  */
 struct iEventQueue : public iBase
 {
@@ -51,8 +51,8 @@ struct iEventQueue : public iBase
   /**
    * Dispatch a single event from the queue.  This is normally called by
    * Process() once for each event in the queue.  Events are dispatched to the
-   * appropriate listeners (implementors of iPlugin) which have been registered
-   * via RegisterListener().
+   * appropriate listeners (implementors of iEventHandler) which have been
+   * registered via RegisterListener().
    */
   virtual void Dispatch(iEvent&) = 0;
 
@@ -69,18 +69,18 @@ struct iEventQueue : public iBase
    * cscmdPreProcess before event dispatching, and cscmdPostProcess after event
    * dispatching.
    */
-  virtual void RegisterListener(iPlugin*, unsigned int trigger) = 0;
+  virtual void RegisterListener(iEventHandler*, unsigned int trigger) = 0;
 
   /**
    * Unregister a listener.
    */
-  virtual void RemoveListener(iPlugin*) = 0;
+  virtual void RemoveListener(iEventHandler*) = 0;
 
   /**
    * Change a listener's trigger.  See RegisterListener() for a discussion of
    * the trigger.
    */
-  virtual void ChangeListenerTrigger(iPlugin*, unsigned int trigger) = 0;
+  virtual void ChangeListenerTrigger(iEventHandler*, unsigned int trigger) = 0;
 
   /**
    * Register an event plug and return a new outlet.  Any module which

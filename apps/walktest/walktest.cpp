@@ -63,7 +63,8 @@
 #include "iutil/event.h"
 #include "iutil/objreg.h"
 #include "iutil/csinput.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "isound/wrapper.h"
 #include "imesh/terrfunc.h"
 #include "imesh/object.h"
@@ -71,6 +72,7 @@
 #include "imesh/crossbld.h"
 #include "iengine/movable.h"
 #include "iengine/campos.h"
+#include "isys/plugin.h"
 
 #include "csengine/wirefrm.h"
 #include "csengine/cbuffer.h"

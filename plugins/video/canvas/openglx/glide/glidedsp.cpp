@@ -21,7 +21,8 @@
 #include "csutil/scf.h"
 #include "glidedsp.h"
 #include "../iogldisp.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "isys/system.h"
 
 SCF_IMPLEMENT_FACTORY(csOpenGLGlideDisp)
@@ -31,7 +32,8 @@ SCF_EXPORT_CLASS_TABLE(oglglide)
 SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE(csOpenGLGlideDisp)
-  SCF_IMPLEMENTS_INTERFACE(iPlugin)
+  SCF_IMPLEMENTS_INTERFACE(iComponent)
+  SCF_IMPLEMENTS_INTERFACE(iEventHandler)
   SCF_IMPLEMENTS_INTERFACE(iOpenGLDisp)
 SCF_IMPLEMENT_IBASE_END
 

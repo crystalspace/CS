@@ -19,7 +19,8 @@
 #ifndef __CS_STDREP_H__
 #define __CS_STDREP_H__
 
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "csutil/scf.h"
 #include "ivaria/stdrep.h"
 #include "ivaria/reporter.h"
@@ -69,13 +70,12 @@ public:
   bool Report (iReporter* reporter, int severity, const char* msgId,
   	const char* description);
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE (csReporterListener);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize (p); }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 
   struct ReporterListener : public iReporterListener
   {

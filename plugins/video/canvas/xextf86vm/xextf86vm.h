@@ -21,7 +21,8 @@
 #define __XESTF86VM_H__
 #include <stdarg.h>
 #include "csutil/scf.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "ivideo/xextf86vm.h"
 #include "ivideo/graph2d.h"
 
@@ -93,13 +94,12 @@ public:
   virtual void GetDimensions (int &w, int &h)
     { w = width; h = height; }
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csXExtF86VM);
     virtual bool Initialize (iObjectRegistry *o) 
     { return scfParent->Initialize(o); }
-    virtual bool HandleEvent (iEvent& ) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 
 };
 

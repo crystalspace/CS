@@ -30,6 +30,7 @@
 #include "spider.h"
 #include "shadow.h"
 #include "isys/system.h"
+#include "isys/plugin.h"
 #include "isys/vfs.h"
 #include "iutil/event.h"
 #include "ivideo/graph3d.h"
@@ -48,7 +49,8 @@
 #include "iengine/terrain.h"
 #include "iengine/movable.h"
 #include "iengine/camera.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "qint.h"
@@ -63,7 +65,8 @@ SCF_EXPORT_CLASS_TABLE (bugplug)
 SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE (csBugPlug)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 void csBugPlug::Report (int severity, const char* msg, ...)

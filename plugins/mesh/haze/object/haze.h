@@ -28,7 +28,8 @@
 #include "imesh/particle.h"
 #include "ivideo/graph3d.h"
 #include "iutil/config.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 
 struct iMaterialWrapper;
 struct iCamera;
@@ -491,12 +492,11 @@ public:
     return 0;
   }
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csHazeMeshObjectType);
     virtual bool Initialize (iObjectRegistry*) { return true; }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 };
 
 #endif // _HAZE_H_

@@ -19,10 +19,12 @@
 #include "cssysdef.h"
 #include "avistrv.h"
 #include "isys/system.h"
+#include "isys/plugin.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "ivideo/txtmgr.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include <ctype.h>

@@ -18,7 +18,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
 #include "ivaria/aws.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "csgeom/csrect.h"
 #include "cstool/proctex.h"
 #include "ivideo/graph2d.h"
@@ -208,14 +209,18 @@ public:
  
   //////////////////////////////////////
 
-  // Implement iPlugin interface.
-  struct eiPlugin : public iPlugin
+  // Implement iComponent interface.
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(awsManager);
     virtual bool Initialize(iObjectRegistry* p)
     { return scfParent->Initialize(p); }
+  } scfiComponent;
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(awsManager);
     virtual bool HandleEvent(iEvent&)   { return false; }
-  } scfiPlugin;
+  } scfiEventHandler;
 };
  
 #endif

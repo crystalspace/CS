@@ -23,7 +23,8 @@
 
 #include "isound/data.h"
 #include "isound/renderer.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "csutil/csvector.h"
 #include "csutil/cfgacc.h"
 #include "dsound.h"
@@ -68,13 +69,17 @@ public:
   csConfigAccess Config;
   csTicks LastTime;
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundRenderDS3D);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
+  } scfiComponent;
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSoundRenderDS3D);
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiPlugin;
+  } scfiEventHandler;
 };
 
 #endif // __CS_SNDRDR_H__

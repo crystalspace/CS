@@ -21,7 +21,8 @@
 #define __IENGINE_TERRAIN_H__
 
 #include "csutil/scf.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 
 class csTerrainWrapper;
 struct iLight;

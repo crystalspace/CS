@@ -42,6 +42,8 @@
 #include "iengine/texture.h"
 #include "iengine/shadcast.h"
 #include "isys/vfs.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iengine/rview.h"
 #include "iengine/fview.h"
 #include "qint.h"
@@ -2888,11 +2890,11 @@ iMeshObject* csThing::MeshObjectFactory::NewInstance ()
 
 SCF_IMPLEMENT_IBASE (csThingObjectType)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csThingObjectType::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csThingObjectType::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csThingObjectType)
@@ -2905,7 +2907,7 @@ SCF_EXPORT_CLASS_TABLE_END
 csThingObjectType::csThingObjectType (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csThingObjectType::~csThingObjectType ()

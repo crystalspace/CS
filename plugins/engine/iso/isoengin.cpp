@@ -26,8 +26,10 @@
 #include "isospr.h"
 #include "isoview.h"
 #include "isoworld.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "isys/system.h"
+#include "isys/plugin.h"
 #include "isys/vfs.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/evdefs.h"
@@ -44,13 +46,18 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csIsoEngine)
   SCF_IMPLEMENTS_INTERFACE (iIsoEngine)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csIsoEngine)
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csIsoEngine::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csIsoEngine::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csIsoEngine::eiEventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_EXPORT_CLASS_TABLE (iso)
@@ -77,7 +84,8 @@ void csIsoEngine::Report (int severity, const char* msg, ...)
 csIsoEngine::csIsoEngine (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
   object_reg = NULL;
   g2d = NULL;
   g3d = NULL;
@@ -99,7 +107,7 @@ bool csIsoEngine::Initialize (iObjectRegistry* p)
   // Tell system driver that we want to handle broadcast events
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
-    q->RegisterListener (&scfiPlugin, CSMASK_Broadcast);
+    q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
   return true;
 }
 

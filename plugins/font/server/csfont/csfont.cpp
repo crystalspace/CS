@@ -21,11 +21,13 @@
 #include "cssysdef.h"
 #include "csfont.h"
 #include "isys/vfs.h"
+#include "isys/plugin.h"
 #include "isys/system.h"
 #include "csutil/util.h"
 #include "csutil/csvector.h"
 #include "iutil/objreg.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "ivaria/reporter.h"
 
 #include "police.fnt"
@@ -58,11 +60,11 @@ int const FontListCount = sizeof (FontList) / sizeof (csFontDef);
 
 SCF_IMPLEMENT_IBASE (csDefaultFontServer)
   SCF_IMPLEMENTS_INTERFACE (iFontServer)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csDefaultFontServer::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csDefaultFontServer::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csDefaultFontServer)
@@ -75,7 +77,7 @@ SCF_EXPORT_CLASS_TABLE_END
 csDefaultFontServer::csDefaultFontServer (iBase *pParent) : object_reg(0)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csDefaultFontServer::~csDefaultFontServer()
@@ -424,7 +426,7 @@ bool csDefaultFont::RemoveDeleteCallback (iFontDeleteNotify* func)
   return false;
 }
 
-bool csDefaultFontServer::eiPlugin::Initialize (iObjectRegistry* p)
+bool csDefaultFontServer::eiComponent::Initialize (iObjectRegistry* p)
 {
   scfParent->object_reg = p;
   scfParent->plugin_mgr = CS_QUERY_REGISTRY (scfParent->object_reg,

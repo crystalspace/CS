@@ -40,8 +40,10 @@
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
 #include "iutil/objreg.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "ivaria/reporter.h"
+#include "isys/plugin.h"
 
 #define SET_BIT(var,mask,state) \
   var = (var & ~(mask)) | ((state) ? (mask) : 0);

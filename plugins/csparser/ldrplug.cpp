@@ -62,7 +62,7 @@ bool csLoader::csLoadedPluginVector::FreeItem (csSome Item)
   {
     if (plugin_mgr)
     {
-      iPlugin* p = SCF_QUERY_INTERFACE(rec->Plugin, iPlugin);
+      iComponent* p = SCF_QUERY_INTERFACE(rec->Plugin, iComponent);
       if (p)
       {
         plugin_mgr->UnloadPlugin(p);

@@ -20,7 +20,8 @@
 #define __CS_CSLEX_H__
 
 #include "ivaria/lexan.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "csutil/csdllist.h"
 #include "csutil/csstring.h"
 
@@ -243,13 +244,12 @@ public:
   virtual unsigned int Match();
 
   // Implement iPlugin interface.
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csLexicalAnalyzer);
     virtual bool Initialize(iObjectRegistry* p)
     { return scfParent->Initialize(p); }
-    virtual bool HandleEvent(iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 };
 
 #endif // __CS_CSLEX_H__

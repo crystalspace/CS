@@ -21,7 +21,8 @@
 #define __CSPYTHON_H__
 
 #include "ivaria/script.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "isys/system.h"
 #include "csutil/csinput.h"
 #include "csutil/csvector.h"
@@ -46,14 +47,13 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  // Implement iPlugin interface.
-  struct eiPlugin : public iPlugin
+  // Implement iComponent interface.
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csLua);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 };
 #endif
 

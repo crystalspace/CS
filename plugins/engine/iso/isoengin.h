@@ -21,7 +21,8 @@
 
 #include "ivaria/iso.h"
 #include "isomater.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "csutil/csvector.h"
 #include "csutil/csobject.h"
 
@@ -130,13 +131,17 @@ public:
   /// Intercept events
   virtual bool HandleEvent (iEvent& e);
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csIsoEngine);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
+  } scfiComponent;
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csIsoEngine);
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiPlugin;
+  } scfiEventHandler;
 
   //----- iIsoEngine ---------------------------------------------------
   virtual iObjectRegistry* GetObjectRegistry() const {return object_reg;}

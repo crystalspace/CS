@@ -49,13 +49,15 @@
 #include "imesh/surf.h"
 #include "imesh/object.h"
 #include "imap/reader.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/event.h"
 #include "iutil/objreg.h"
 #include "iutil/csinput.h"
 #include "igraphic/imageio.h"
 #include "ivaria/reporter.h"
 #include "qsqrt.h"
+#include "isys/plugin.h"
 
 CS_IMPLEMENT_APPLICATION
 

@@ -33,7 +33,8 @@
 #include "imesh/thing/thing.h"
 #include "imesh/object.h"
 #include "imesh/lighting.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 
 class csSector;
 class csEngine;
@@ -1137,13 +1138,12 @@ public:
     return ALL_FEATURES;
   }
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csThingObjectType);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 };
 
 #endif // __CS_THING_H__

@@ -20,7 +20,8 @@
 #define _CSAVI_H_
 
 #include "ivideo/codec.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "isys/vfs.h"
 #include "csutil/csvector.h"
 #include "cssys/csendian.h"
@@ -330,12 +331,11 @@ class csAVIFormat : public iStreamFormat
   virtual bool Load (iFile *pVideoData);
   virtual void Unload ();
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csAVIFormat);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 };
 #endif

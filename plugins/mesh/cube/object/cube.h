@@ -26,7 +26,8 @@
 #include "imesh/cube.h"
 #include "ivideo/graph3d.h"
 #include "iutil/config.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 
 struct iMaterialWrapper;
 struct iObjectRegistry;
@@ -269,16 +270,15 @@ public:
   } scfiConfig;
   friend struct csCubeConfig;
 
-  //------------------- iPlugin interface implementation -------------------
-  struct eiPlugin : public iPlugin
+  //------------------- iComponent interface implementation -------------------
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csCubeMeshObjectType);
     virtual bool Initialize (iObjectRegistry* object_reg)
     {
       return scfParent->Initialize (object_reg);
     }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 };
 
 #endif // _CUBE_H_

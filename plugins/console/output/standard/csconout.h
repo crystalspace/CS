@@ -20,7 +20,8 @@
 #define __CSCONOUT_H__
 
 #include "ivaria/conout.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "csgeom/csrect.h"
 #include "csgfx/rgbpixel.h"
 
@@ -154,14 +155,19 @@ public:
   /// Implement simple extension commands.
   virtual bool PerformExtensionV (const char *iCommand, va_list);
 
-  // Implement iPlugin interface.
-  struct eiPlugin : public iPlugin
+  // Implement iComponent interface.
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csConsoleOutput);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
+  } scfiComponent;
+  // Implement iEventHandler interface.
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csConsoleOutput);
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiPlugin;
+  } scfiEventHandler;
 
 private:
   void GetPosition (int &x, int &y, int &width, int &height) const;

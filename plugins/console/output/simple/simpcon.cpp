@@ -34,6 +34,8 @@
 #include "ivaria/reporter.h"
 #include "isys/system.h"
 #include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/evdefs.h"
 #include "iutil/eventq.h"
 #include "iutil/cfgmgr.h"
@@ -45,11 +47,16 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csSimpleConsole)
   SCF_IMPLEMENTS_INTERFACE (iConsoleOutput)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSimpleConsole::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSimpleConsole::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSimpleConsole::eiEventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csSimpleConsole)
@@ -63,7 +70,8 @@ SCF_EXPORT_CLASS_TABLE_END
 csSimpleConsole::csSimpleConsole (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
   LineMessage = NULL;
   Line = NULL;
   LinesChanged = NULL;
@@ -155,7 +163,7 @@ bool csSimpleConsole::Initialize (iObjectRegistry *object_reg)
   // We want to see broadcast events
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
-    q->RegisterListener (&scfiPlugin, CSMASK_Broadcast);
+    q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
 
   return true;
 }

@@ -1,9 +1,11 @@
 #include "cssysdef.h"
+#include "isys/plugin.h"
 #include "aws.h"
 #include "awsprefs.h"
 #include "ivideo/txtmgr.h"
 #include "iengine/engine.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include <stdio.h>
@@ -14,7 +16,8 @@ awsManager::awsManager(iBase *p):prefmgr(NULL),
                UsingDefaultContext(false), DefaultContextInitialized(false)
 {
   SCF_CONSTRUCT_IBASE (p);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
 
   canvas.DisableAutoUpdate();
 }

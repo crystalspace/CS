@@ -19,7 +19,8 @@
 #include "cssysdef.h"
 #include "cstool/initapp.h"
 #include "isys/system.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/objreg.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
@@ -29,6 +30,7 @@
 #include "ivaria/conout.h"
 #include "isys/vfs.h"
 #include "imap/parser.h"
+#include "isys/plugin.h"
 
 bool csInitializeApplication (iObjectRegistry* object_reg, bool use_reporter,
 	bool use_reporter_listener)

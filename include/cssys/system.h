@@ -30,6 +30,8 @@
 #include "isys/system.h"
 #include "isys/vfs.h"
 #include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/config.h"
 #include "iutil/objreg.h"
 
@@ -64,12 +66,12 @@ private:
   {
   public:
     // The plugin itself
-    iPlugin *Plugin;
+    iComponent *Plugin;
     // The class ID of the plugin, and their functionality ID
     char *ClassID, *FuncID;
 
     // Construct the object that represents a plugin
-    csPlugin (iPlugin *iObject, const char *iClassID, const char *iFuncID);
+    csPlugin (iComponent *iObject, const char *iClassID, const char *iFuncID);
     // Free storage
     virtual ~csPlugin ();
   };
@@ -129,7 +131,7 @@ private:
   };
 
   // Query all options supported by given plugin and place into OptionList
-  void QueryOptions (iPlugin *iObject);
+  void QueryOptions (iComponent *iObject);
 
   // Elapsed time between last two frames and absolute time in milliseconds
   csTicks ElapsedTime, CurrentTime;
@@ -231,10 +233,10 @@ private:
   iBase *QueryPlugin (const char* iClassID, const char *iFuncID,
   	const char *iInterface, int iVersion);
   /// Remove a plugin from system driver's plugin list.
-  bool UnloadPlugin (iPlugin *iObject);
-  /// Register a object that implements the iPlugin interface as a plugin.
+  bool UnloadPlugin (iComponent *iObject);
+  /// Register a object that implements the iComponent interface as a plugin.
   bool RegisterPlugin (const char *iClassID, const char *iFuncID,
-  	iPlugin *iObject);
+  	iComponent *iObject);
   /// Get the number of loaded plugins in the plugin manager.
   int GetPluginCount ();
   /// Get the specified plugin from the plugin manager.
@@ -301,12 +303,12 @@ public:
     {
       return scfParent->QueryPlugin (iClassID, iFuncID, iInterface, iVersion);
     }
-    virtual bool UnloadPlugin (iPlugin *iObject)
+    virtual bool UnloadPlugin (iComponent *iObject)
     {
       return scfParent->UnloadPlugin (iObject);
     }
     virtual bool RegisterPlugin (const char *iClassID, const char *iFuncID,
-          iPlugin *iObject)
+          iComponent *iObject)
     {
       return scfParent->RegisterPlugin (iClassID, iFuncID, iObject);
     }
@@ -323,12 +325,16 @@ public:
 
   //------------------------------------------------------------------
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSystemDriver);
     virtual bool Initialize (iObjectRegistry*) { return true; }
+  } scfiComponent;
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSystemDriver);
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiPlugin;
+  } scfiEventHandler;
 };
 
 /// CS version of printf

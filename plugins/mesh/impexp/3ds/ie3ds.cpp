@@ -29,7 +29,8 @@
 #include "cstool/mdldata.h"
 #include "imesh/mdldata.h"
 #include "isys/system.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/databuff.h"
 
 #include "ie3ds.h"
@@ -47,11 +48,16 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE( csModelConverter3ds )
   SCF_IMPLEMENTS_INTERFACE( iModelConverter )
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE( iPlugin )
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE( iComponent )
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE( iEventHandler )
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE( csModelConverter3ds::Plugin )
-  SCF_IMPLEMENTS_INTERFACE( iPlugin )
+  SCF_IMPLEMENTS_INTERFACE( iComponent )
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_FACTORY( csModelConverter3ds )
+  SCF_IMPLEMENTS_INTERFACE( iComponent )
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY( csModelConverter3ds )
@@ -121,7 +127,8 @@ static int DataWriteFunc( void *self, const Lib3dsByte *buffer, int size )
 csModelConverter3ds::csModelConverter3ds( iBase *pBase )
 {
   SCF_CONSTRUCT_IBASE( pBase );
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
 
   FormatInfo.Name = "3ds";
   FormatInfo.CanLoad = true;

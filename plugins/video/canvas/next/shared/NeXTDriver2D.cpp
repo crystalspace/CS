@@ -76,7 +76,7 @@ bool NeXTDriver2D::Initialize(iObjectRegistry* r)
     assistant->IncRef();
     iEventQueue* q = CS_QUERY_REGISTRY(r, iEventQueue);
     if (q != 0)
-      q->RegisterListener(&scfiPlugin, CSMASK_Broadcast);
+      q->RegisterListener(&scfiEventHandler, CSMASK_Broadcast);
     controller = NeXTDelegate2D_new(this);
     ok = init_driver(get_desired_depth());
   }

@@ -21,7 +21,8 @@
 #define __IVARIA_CONOUT_H__
 
 #include <stdarg.h>
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 
 class csRect;
 struct iConsoleOutput;

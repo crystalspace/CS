@@ -25,24 +25,31 @@
 #include "qint.h"
 #include "scrshot.h"
 #include "isys/system.h"
+#include "isys/plugin.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 
 SCF_IMPLEMENT_IBASE(csGraphics2D)
   SCF_IMPLEMENTS_INTERFACE(iGraphics2D)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iConfig)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iNativeWindowManager)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iNativeWindow)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2D::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2D::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2D::eiEventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2D::CanvasConfig)
@@ -60,7 +67,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csGraphics2D::csGraphics2D (iBase* parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiNativeWindow);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiNativeWindowManager);
@@ -121,7 +129,7 @@ bool csGraphics2D::Initialize (iObjectRegistry* r)
 
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
-    q->RegisterListener (&scfiPlugin, CSMASK_Broadcast);
+    q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
 
   return true;
 }

@@ -25,7 +25,8 @@
 #include "imesh/object.h"
 #include "imesh/surf.h"
 #include "ivideo/graph3d.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 
 #define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING)
 
@@ -319,15 +320,14 @@ public:
     return true;
   }
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSurfMeshObjectType);
     virtual bool Initialize (iObjectRegistry* object_reg)
     {
       return scfParent->Initialize (object_reg);
     }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 };
 
 #endif // _SURF_H_

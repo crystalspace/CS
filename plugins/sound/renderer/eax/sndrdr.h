@@ -23,7 +23,8 @@
 
 #include "isound/data.h"
 #include "isound/renderer.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "csutil/csvector.h"
 #include "csutil/cfgacc.h"
 #include <dsound.h>
@@ -60,12 +61,16 @@ public:
 
   const char *GetError(HRESULT result);
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundRenderEAX);
     virtual bool Initialize (iObjectRegistry* p) { return scfParent->Initialize(p); }
+  } scfiComponent;
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSoundRenderEAX);
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiPlugin;
+  } scfiEventHandler;
 
 
   LPDIRECTSOUND AudioRenderer;

@@ -21,7 +21,8 @@
 
 #include "isound/renderer.h"
 #include "isound/listener.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "artshndl.h"
 #include "csutil/csvector.h"
 
@@ -131,13 +132,12 @@ public:
   virtual csSoundEnvironment GetEnvironment ()
   {return environment;}
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csArtsRenderer);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 };
 
 #endif

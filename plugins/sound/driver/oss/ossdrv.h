@@ -24,7 +24,8 @@
 
 #include "csutil/scf.h"
 #include "isound/driver.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 
 #include <sys/types.h>
 #include <sys/ipc.h>
@@ -88,14 +89,13 @@ public:
   int GetFrequency();
   bool IsHandleVoidSound();
   
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundDriverOSS);
     virtual bool Initialize (iObjectRegistry* p)
     { scfParent->object_reg = p; return true; }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
-  friend struct eiPlugin;
+  } scfiComponent;
+  friend struct eiComponent;
 
 private:
   // used to setup timer when background=true (not currently used)

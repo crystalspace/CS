@@ -20,7 +20,8 @@
 #define _TERRFLDR_H_
 
 #include "imap/reader.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 
 struct iEngine;
 struct iPluginManager;
@@ -48,14 +49,13 @@ public:
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csTerrFuncFactoryLoader);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize (p); }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
-  friend struct eiPlugin;
+  } scfiComponent;
+  friend struct eiComponent;
 };
 
 /**
@@ -80,14 +80,13 @@ public:
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csTerrFuncLoader);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize (p); }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
-  friend struct eiPlugin;
+  } scfiComponent;
+  friend struct eiComponent;
 };
 
 #endif // _TERRFLDR_H_

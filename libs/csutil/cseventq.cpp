@@ -22,6 +22,7 @@
 #include <stddef.h>
 #include "cssysdef.h"
 #include "csutil/cseventq.h"
+#include "iutil/eventh.h"
 #include "cssys/system.h" // @@@ For csGetTicks(); remove later.
 
 SCF_IMPLEMENT_IBASE (csEventQueue)
@@ -163,7 +164,7 @@ void csEventQueue::Dispatch(iEvent& e)
   }
 }
 
-int csEventQueue::FindListener(iPlugin* listener) const
+int csEventQueue::FindListener(iEventHandler* listener) const
 {
   for (int i = Listeners.Length() - 1; i >= 0; i--)
   {
@@ -174,7 +175,7 @@ int csEventQueue::FindListener(iPlugin* listener) const
   return -1;
 }
 
-void csEventQueue::RegisterListener(iPlugin* listener, unsigned int trigger)
+void csEventQueue::RegisterListener(iEventHandler* listener, unsigned int trigger)
 {
   int const n = FindListener(listener);
   if (n >= 0)
@@ -187,7 +188,7 @@ void csEventQueue::RegisterListener(iPlugin* listener, unsigned int trigger)
   }
 }
 
-void csEventQueue::RemoveListener(iPlugin* listener)
+void csEventQueue::RemoveListener(iEventHandler* listener)
 {
   int const n = FindListener(listener);
   if (n >= 0)
@@ -197,7 +198,7 @@ void csEventQueue::RemoveListener(iPlugin* listener)
   }
 }
 
-void csEventQueue::ChangeListenerTrigger(iPlugin* l, unsigned int trigger)
+void csEventQueue::ChangeListenerTrigger(iEventHandler* l, unsigned int trigger)
 {
   int const n = FindListener(l);
   if (n >= 0)

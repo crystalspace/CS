@@ -22,6 +22,8 @@
 #include "csutil/util.h"
 #include "csutil/csvector.h"
 #include "ivaria/perfstat.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "isys/plugin.h"
 
 struct iObjectRegistry;
@@ -195,13 +197,17 @@ protected:
   virtual void DebugSetBreak (int frame_num)
   { break_frame = frame_num; }
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csPerfStats);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
+  } scfiComponent;
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csPerfStats);
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiPlugin;
+  } scfiEventHandler;
 };
 
 #endif // __CS_PERFSTAT_H__

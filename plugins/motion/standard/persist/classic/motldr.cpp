@@ -20,8 +20,10 @@
 #include "motldr.h"
 #include "iengine/motion.h"
 #include "isys/system.h"
-#include "isys/vfs.h"
 #include "isys/plugin.h"
+#include "isys/vfs.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/databuff.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
@@ -61,20 +63,20 @@ CS_TOKEN_DEF_END
 
 SCF_IMPLEMENT_IBASE (csMotionLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csMotionLoader::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMotionLoader::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csMotionSaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csMotionSaver::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMotionSaver::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csMotionLoader)
@@ -90,7 +92,7 @@ SCF_EXPORT_CLASS_TABLE_END
 csMotionLoader::csMotionLoader(iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   object_reg=NULL;
 }
 
@@ -485,7 +487,7 @@ CS_TOKEN_TABLE_END
 csMotionSaver::csMotionSaver( iBase* base )
 {
   SCF_CONSTRUCT_IBASE (base);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csMotionSaver::~csMotionSaver()

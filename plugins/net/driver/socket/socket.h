@@ -21,7 +21,8 @@
 #define __CS_SOCKET_H__
 
 #include "inetwork/socket.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 
 class csSocketEndPoint
 {
@@ -119,13 +120,18 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSocketDriver);
     virtual bool Initialize (iObjectRegistry*);
+  } scfiComponent;
+  friend struct eiComponent;
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSocketDriver);
     virtual bool HandleEvent (iEvent&);
-  } scfiPlugin;
-  friend struct eiPlugin;
+  } scfiEventHandler;
+  friend struct eiEventHandler;
 };
 
 #endif // __CS_SOCKET_H__

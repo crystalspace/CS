@@ -24,7 +24,8 @@
 #include "csutil/scf.h"
 #include "csutil/cfgacc.h"
 #include "isound/driver.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "isys/system.h"
 
 class csSoundDriverWaveOut : public iSoundDriver
@@ -37,7 +38,7 @@ public:
 
   void Report (int severity, const char* msg, ...);
 
-  // Implementation of interface for iPlugin
+  // Implementation of interface for iComponent
   virtual bool Initialize (iObjectRegistry *object_reg);
   virtual bool HandleEvent (iEvent &e);
   virtual bool Open(iSoundRender*, int frequency, bool bit16, bool stereo);
@@ -52,13 +53,17 @@ public:
 
   const char *GetMMError(MMRESULT code);
 	
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundDriverWaveOut);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
+  } scfiComponent;
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSoundDriverWaveOut);
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiPlugin;
+  } scfiEventHandler;
 
 protected:
   // system driver

@@ -23,7 +23,8 @@
 #define __XESTSHM_H__
 #include <stdarg.h>
 #include "csutil/scf.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "ivideo/xextshm.h"
 #include "ivideo/graph2d.h"
 
@@ -66,13 +67,12 @@ public:
   virtual void DestroyMemory ();
   virtual void Print (Window window, GC gc, csRect *area);
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csXExtSHM);
     virtual bool Initialize (iObjectRegistry *o) 
     { return scfParent->Initialize(o); }
-    virtual bool HandleEvent (iEvent& ) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 
 };
 

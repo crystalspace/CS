@@ -29,7 +29,8 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/halo.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "video/renderer/common/polybuf.h"
 
 class csReversibleTransform;
@@ -257,13 +258,17 @@ public:
   virtual void DrawPixmap (iTextureHandle*, int, int, int, int, int, int,
     int, int, uint8);
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DNull);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
+  } scfiComponent;
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DNull);
     virtual bool HandleEvent (iEvent& ev) { return scfParent->HandleEvent (ev); }
-  } scfiPlugin;
+  } scfiEventHandler;
 };
 
 #endif // __NULL_G3D_H__

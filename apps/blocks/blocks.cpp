@@ -39,6 +39,8 @@
 
 #include "isys/vfs.h"
 #include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/event.h"
 #include "iutil/object.h"

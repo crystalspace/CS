@@ -27,12 +27,14 @@
 #include "ivideo/txtmgr.h"
 #include "ivideo/material.h"
 #include "isys/vfs.h"
+#include "isys/plugin.h"
 #include "csgeom/csrect.h"
 #include "csutil/csstring.h"
 #include "csutil/cfgacc.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
@@ -41,11 +43,16 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE(csFancyConsole)
   SCF_IMPLEMENTS_INTERFACE(iConsoleOutput)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csFancyConsole::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE(iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csFancyConsole::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE(iComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csFancyConsole::eiEventHandler)
+  SCF_IMPLEMENTS_INTERFACE(iEventHandler)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY(csFancyConsole)
@@ -76,7 +83,8 @@ csFancyConsole::csFancyConsole (iBase *p) :
   pix_loaded(false), system_ready(false), auto_update(true), visible(true)
 {
   SCF_CONSTRUCT_IBASE (p);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
 }
 
 csFancyConsole::~csFancyConsole ()
@@ -120,7 +128,7 @@ bool csFancyConsole::Initialize (iObjectRegistry *object_reg)
   // Tell event queue that we want to handle broadcast events
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
-    q->RegisterListener (&scfiPlugin, CSMASK_Broadcast);
+    q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
 
   int x, y, w, h;
   base->PerformExtension("GetPos", &x, &y, &w, &h);

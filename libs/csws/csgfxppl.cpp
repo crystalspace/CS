@@ -25,10 +25,12 @@
 #include "csutil/util.h"
 #include "iutil/objreg.h"
 #include "isys/system.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"
+#include "isys/plugin.h"
 
 #define INCLUDE_MIN_POINT(x, y)						\
 {									\

@@ -25,7 +25,8 @@
 #include "imesh/object.h"
 #include "imesh/stars.h"
 #include "ivideo/graph3d.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 
 #define ALL_FEATURES (0)
 
@@ -249,12 +250,11 @@ public:
     return ALL_FEATURES;
   }
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csStarsMeshObjectType);
     virtual bool Initialize (iObjectRegistry*) { return true; }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 };
 
 #endif // _STARS_H_

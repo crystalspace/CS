@@ -28,7 +28,8 @@
 #include "csengine/meshobj.h"
 #include "csutil/csobject.h"
 #include "ivideo/graph3d.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "isys/system.h"
 #include "iengine/engine.h"
 #include "iutil/config.h"
@@ -943,7 +944,7 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  //--------------------- iPlugin interface implementation --------------------
+  //------------------ iComponent interface implementation --------------------
 
   /**
    * Initialize the engine. This is automatically called by system driver
@@ -955,13 +956,17 @@ public:
   /// We need to handle some events
   virtual bool HandleEvent (iEvent &Event);
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csEngine);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
+  } scfiComponent;
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csEngine);
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiPlugin;
+  } scfiEventHandler;
 
   //--------------------- iEngine interface implementation --------------------
 

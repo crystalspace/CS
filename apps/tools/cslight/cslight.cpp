@@ -32,7 +32,8 @@
 #include "imap/parser.h"
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "ivaria/reporter.h"
 
 CS_IMPLEMENT_APPLICATION

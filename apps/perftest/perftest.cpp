@@ -33,8 +33,10 @@
 #include "iutil/cmdline.h"
 #include "iutil/event.h"
 #include "iutil/objreg.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "ivaria/reporter.h"
+#include "isys/plugin.h"
 
 CS_IMPLEMENT_APPLICATION
 

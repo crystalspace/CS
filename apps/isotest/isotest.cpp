@@ -36,12 +36,14 @@
 #include "imesh/particle.h"
 #include "imesh/partsys.h"
 #include "imesh/fountain.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/event.h"
 #include "iutil/objreg.h"
 #include "iutil/csinput.h"
 #include "ivaria/reporter.h"
 #include "genmaze.h"
+#include "isys/plugin.h"
 
 CS_IMPLEMENT_APPLICATION
 

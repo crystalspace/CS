@@ -27,8 +27,10 @@
 #include "csgeom/polyclip.h"
 #include "imesh/thing/lightmap.h"	//@@@
 #include "imesh/thing/polygon.h"	//@@@
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "isys/system.h"
+#include "isys/plugin.h"
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
 #include "iutil/event.h"
@@ -66,12 +68,17 @@ SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE (csGraphics3DLine)
   SCF_IMPLEMENTS_INTERFACE (iGraphics3D)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DLine::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DLine::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DLine::eiEventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DLine::eiLineConfig)
@@ -81,7 +88,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csGraphics3DLine::csGraphics3DLine (iBase *iParent) : G2D (NULL)
 {
   SCF_CONSTRUCT_IBASE (iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
 
   clipper = NULL;
@@ -132,7 +140,7 @@ bool csGraphics3DLine::Initialize (iObjectRegistry *r)
 
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
-    q->RegisterListener (&scfiPlugin, CSMASK_Broadcast);
+    q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
 
   return true;
 }

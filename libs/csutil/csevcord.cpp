@@ -20,7 +20,7 @@
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "csutil/csevcord.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
 
 SCF_IMPLEMENT_IBASE(csEventCord)
   SCF_IMPLEMENTS_INTERFACE(iEventCord)
@@ -35,7 +35,7 @@ csEventCord::csEventCord(int cat, int subcat) :
   SpinLock = 0;
 }
 
-int csEventCord::Insert(iPlugin *plugin, int priority)
+int csEventCord::Insert(iEventHandler *plugin, int priority)
 {
   Lock ();
   // Increment the plugin reference count
@@ -83,7 +83,7 @@ int csEventCord::Insert(iPlugin *plugin, int priority)
   return retval;
 }
 
-void csEventCord::Remove (iPlugin *plugin)
+void csEventCord::Remove (iEventHandler *plugin)
 {
   Lock ();
   PluginData *last = NULL, *curr = plugins;

@@ -24,6 +24,7 @@
 #include "ivideo/graph3d.h"
 #include "igraphic/image.h"
 #include "isys/system.h"
+#include "isys/plugin.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/material.h"
 
@@ -32,7 +33,8 @@
 #include "iengine/material.h"
 #include "iengine/engine.h"
 #include "iutil/objreg.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 
 #include "cstool/proctex.h"
 

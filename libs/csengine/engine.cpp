@@ -55,7 +55,8 @@
 #include "ivideo/txtmgr.h"
 #include "ivideo/graph3d.h"
 #include "iutil/event.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/databuff.h"
 #include "iutil/eventq.h"
@@ -63,6 +64,7 @@
 #include "imap/reader.h"
 #include "imesh/lighting.h"
 #include "ivaria/reporter.h"
+#include "isys/plugin.h"
 
 //---------------------------------------------------------------------------
 
@@ -419,13 +421,18 @@ bool csEngine::do_rad_debug = false;
 
 SCF_IMPLEMENT_IBASE (csEngine)
   SCF_IMPLEMENTS_INTERFACE (iEngine)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csEngine::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csEngine::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csEngine::eiEventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csEngine::iObjectInterface)
@@ -446,7 +453,8 @@ SCF_EXPORT_CLASS_TABLE_END
 csEngine::csEngine (iBase *iParent) : sectors (true), camera_positions (16, 16)
 {
   SCF_CONSTRUCT_IBASE (iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
   engine_mode = CS_ENGINE_AUTODETECT;
@@ -554,7 +562,7 @@ bool csEngine::Initialize (iObjectRegistry* object_reg)
   // Tell event queue that we want to handle broadcast events
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
-    q->RegisterListener (&scfiPlugin, CSMASK_Broadcast);
+    q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
   
   csConfigAccess cfg (object_reg, "/config/engine.cfg");
   ReadConfig (cfg);

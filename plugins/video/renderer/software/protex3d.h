@@ -21,7 +21,8 @@
 
 #include "sft3dcom.h"
 #include "ivideo/sproctxt.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 
 class csTextureHandleSoftware;
 class csTextureCacheSoftware;

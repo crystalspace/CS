@@ -17,7 +17,8 @@
 */
 
 #include "cssysdef.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/object.h"
 #include "imesh/crossbld.h"
 #include "imesh/mdldata.h"
@@ -59,24 +60,24 @@ public:
   virtual iMeshFactoryWrapper *BuildSpriteFactoryHierarchy (iModelData *Scene,
 	iEngine *Engine, iMaterialWrapper *DefaultMaterial) const;
 
-  class Plugin : public iPlugin
+  class Component : public iComponent
   {
   public:
     SCF_DECLARE_EMBEDDED_IBASE (csCrossBuilder);
     virtual bool Initialize (iObjectRegistry *)
     { return true; }
-  } scfiPlugin;
+  } scfiComponent;
 };
 
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csCrossBuilder)
   SCF_IMPLEMENTS_INTERFACE (iCrossBuilder)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csCrossBuilder::Plugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csCrossBuilder::Component)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csCrossBuilder)
@@ -89,7 +90,7 @@ SCF_EXPORT_CLASS_TABLE_END
 csCrossBuilder::csCrossBuilder (iBase *parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
 }
 
 bool csCrossBuilder::BuildThing (iModelDataObject *Object, iThingState *tgt,

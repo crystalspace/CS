@@ -22,8 +22,10 @@
 #define __CSFONT_H__
 
 #include "ivideo/fontserv.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "csutil/typedvec.h"
+#include "isys/plugin.h"
 
 struct iObjectRegistry;
 struct iPluginManager;
@@ -159,13 +161,12 @@ public:
   /// This function is called by iFont objects when they are destroyed
   void NotifyDelete (csDefaultFont *font);
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csDefaultFontServer);
     virtual bool Initialize(iObjectRegistry* p);
-    virtual bool HandleEvent(iEvent&) { return false; }
-  } scfiPlugin;
-  friend struct eiPlugin;
+  } scfiComponent;
+  friend struct eiComponent;
 };
 
 #endif // __CSFONT_H__

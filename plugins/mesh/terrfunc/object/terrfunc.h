@@ -25,7 +25,8 @@
 #include "iengine/mesh.h"
 #include "imesh/object.h"
 #include "imesh/terrfunc.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 
 struct iEngine;
 struct iMaterialWrapper;
@@ -674,14 +675,13 @@ public:
   /// get supported object features
   virtual uint32 GetFeatures () const;
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csTerrFuncObjectType);
     virtual bool Initialize (iObjectRegistry* p)
     { scfParent->object_reg = p; return true; }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
-  friend struct eiPlugin;
+  } scfiComponent;
+  friend struct eiComponent;
 };
 
 #endif // __CS_TERRFUNC_H__

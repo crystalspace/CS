@@ -21,10 +21,12 @@
 #define __CS_CSLOADER_H__
 
 #include "imap/parser.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "csutil/csvector.h"
 #include "csutil/util.h"
 #include "csgeom/quaterni.h"
+#include "isys/plugin.h"
 
 class csGenerateImageTexture;
 class csGenerateImageValue;
@@ -290,13 +292,12 @@ public:
   virtual iMeshFactoryWrapper* LoadMeshObjectFactory (const char* fname);
   virtual iMeshWrapper* LoadMeshObject (const char* fname);
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csLoader);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 };
 
 #endif // __CS_CSLOADER_H__

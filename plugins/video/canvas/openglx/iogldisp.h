@@ -20,7 +20,7 @@
 #define __IOGLDISP_H__
 
 #include "csutil/scf.h"
-#include "isys/plugin.h"
+#include "iutil/comp.h"
 
 SCF_VERSION (iOpenGLDisp, 0, 0, 1);
 
@@ -30,7 +30,7 @@ SCF_VERSION (iOpenGLDisp, 0, 0, 1);
  * This merely breaks down to initialization and shutdown stuff ( like grShutdown for Glide )
  */
  
-struct iOpenGLDisp : public iPlugin
+struct iOpenGLDisp : public iComponent
 {
   virtual bool open() = 0;
   virtual bool close() = 0;

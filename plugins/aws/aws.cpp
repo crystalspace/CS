@@ -10,15 +10,20 @@ SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE (awsManager)
   SCF_IMPLEMENTS_INTERFACE (iAws)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (awsManager::eiPlugin)                                                               
-   SCF_IMPLEMENTS_INTERFACE (iPlugin)                                                                              
-SCF_IMPLEMENT_EMBEDDED_IBASE_END                                                                                  
-                                                                                                               
-SCF_IMPLEMENT_FACTORY (awsManager)                                                                                
-SCF_IMPLEMENT_FACTORY (awsPrefManager)                                                                                
+SCF_IMPLEMENT_EMBEDDED_IBASE (awsManager::eiComponent)
+   SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (awsManager::eiEventHandler)
+   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_FACTORY (awsManager)
+SCF_IMPLEMENT_FACTORY (awsPrefManager)
 
 SCF_EXPORT_CLASS_TABLE (aws)                                                                                      
   SCF_EXPORT_CLASS (awsManager, "crystalspace.window.alternatemanager", "Crystal Space alternate window manager") 

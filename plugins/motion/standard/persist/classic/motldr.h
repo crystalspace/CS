@@ -21,7 +21,8 @@
 
 #include "imap/reader.h"
 #include "imap/writer.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 
 struct iEngine;
 struct iObjectRegistry;
@@ -56,13 +57,12 @@ public:
 
   void Report (int severity, const char* msg, ...);
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMotionLoader);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 };
 
 class csMotionSaver : public iSaverPlugin
@@ -77,14 +77,13 @@ public:
   virtual ~csMotionSaver ();
   virtual void WriteDown ( iBase *obj, iStrVector *string, iEngine *engine );
   
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMotionSaver);
     virtual bool Initialize (iObjectRegistry* p)
     { scfParent->object_reg = p; return true; }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
-  friend struct eiPlugin;
+  } scfiComponent;
+  friend struct eiComponent;
 };
 
 #endif

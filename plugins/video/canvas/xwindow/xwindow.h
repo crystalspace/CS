@@ -23,7 +23,8 @@
 #define __XWINDOW_H__
 #include <stdarg.h>
 #include "csutil/scf.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "iutil/event.h"
 #include "ivideo/xwindow.h"
 #include "ivideo/xextf86vm.h"
@@ -129,13 +130,17 @@ public:
   virtual bool SetMousePosition (int x, int y);
   virtual bool SetMouseCursor (csMouseCursorID iShape);
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csXWindow);
     virtual bool Initialize (iObjectRegistry *o) 
     { return scfParent->Initialize(o); }
+  } scfiComponent;
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csXWindow);
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiPlugin;
+  } scfiEventHandler;
 
   //------------------------ iEventPlug interface ---------------------------//
 

@@ -27,7 +27,8 @@
 #include "csutil/cfgacc.h"
 #include "isound/data.h"
 #include "isound/renderer.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 
 struct iSoundDriver;
 struct iConfigFile;
@@ -45,7 +46,7 @@ public:
   csSoundRenderSoftware(iBase *piBase);
   virtual ~csSoundRenderSoftware();
 	
-  // implementation of iPlugin
+  // implementation of iComponent
   virtual bool Initialize (iObjectRegistry *object_reg);
 
   // implementation of iSoundRender
@@ -106,13 +107,17 @@ public:
   // previous time the sound handles were updated
   csTicks LastTime;
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundRenderSoftware);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
+  } scfiComponent;
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSoundRenderSoftware);
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiPlugin;
+  } scfiEventHandler;
 };
 
 #endif // __CS_SRDRCOM_H__

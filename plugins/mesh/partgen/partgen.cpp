@@ -29,6 +29,8 @@
 #include "iengine/camera.h"
 #include "isys/system.h"
 #include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "imesh/sprite2d.h"
 #include "iengine/movable.h"
 #include "iutil/objreg.h"

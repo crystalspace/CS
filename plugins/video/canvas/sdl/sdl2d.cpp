@@ -382,7 +382,7 @@ bool csGraphics2DSDL::Open()
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
   {
-    q->RegisterListener (&scfiPlugin, CSMASK_Nothing);
+    q->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
     if (!EventOutlet)
       EventOutlet = q->CreateEventOutlet (this);
   }

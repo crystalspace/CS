@@ -23,8 +23,10 @@
 #include "csutil/cfgacc.h"
 #include "csutil/csstring.h"
 #include "csutil/scf.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "isys/system.h"
+#include "isys/plugin.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/cmdline.h"
 #include "iutil/eventq.h"
@@ -49,11 +51,16 @@ SCF_IMPLEMENT_IBASE_EXT_END
 
 SCF_IMPLEMENT_IBASE (csLineX2DFontServer)
   SCF_IMPLEMENTS_INTERFACE (iFontServer)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csLineX2DFontServer::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csLineX2DFontServer::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csLineX2DFontServer::eiEventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 #define XWIN_SCF_ID "crystalspace.window.x"
@@ -98,7 +105,8 @@ bool csGraphics2DLineXLib::Initialize (iObjectRegistry *object_reg)
   screen_num = xwin->GetScreen ();
 
   // Do a trick: unload the system font server since its useless for us
-  iPlugin *fs = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_FONTSERVER, iPlugin);
+  iComponent *fs = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_FONTSERVER,
+  	iComponent);
   if (fs)
   {
     plugin_mgr->UnloadPlugin (fs);
@@ -116,7 +124,7 @@ bool csGraphics2DLineXLib::Initialize (iObjectRegistry *object_reg)
   if (q != 0)
   {
     // Tell event queue to call us on broadcast events
-    q->RegisterListener (&scfiPlugin, CSMASK_Broadcast);
+    q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
     // Create the event outlet
     EventOutlet = q->CreateEventOutlet (this);
   }
@@ -521,7 +529,8 @@ int csLineX2DFontServer::csLineX2DFont::GetLength (const char *text, int maxwidt
 csLineX2DFontServer::csLineX2DFontServer (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
   font.xfont = NULL;
 }
 

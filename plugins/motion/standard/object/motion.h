@@ -20,7 +20,8 @@
 #define __MOTION_H__
 
 #include "iengine/motion.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "csutil/typedvec.h"
 #include "csgeom/quaterni.h"
 #include "csgeom/matrix3.h"
@@ -227,13 +228,12 @@ public:
   bool UpdateAppliedMotion(csAppliedMotion *am, csTicks elapsedtime);
   void CompileMotion( csAppliedMotion *motion );
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMotionManager);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 };
 
 iSkeletonBone *csFindBone( iSkeletonBone *bone, unsigned int hash );

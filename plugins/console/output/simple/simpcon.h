@@ -21,7 +21,8 @@
 #define __SIMPCON_H__
 
 #include "ivaria/conout.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "ivideo/fontserv.h"
 
 class csRect;
@@ -216,14 +217,19 @@ public:
   virtual bool PerformExtensionV (const char *iCommand, va_list args)
   { (void)iCommand; (void)args; return false; }
 
-  // Implement iPlugin interface.
-  struct eiPlugin : public iPlugin
+  // Implement iComponent interface.
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSimpleConsole);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
+  } scfiComponent;
+  // Implement iEventHandler interface.
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSimpleConsole);
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiPlugin;
+  } scfiEventHandler;
 
 private:
   /// Time left until messages will scroll up

@@ -21,7 +21,8 @@
 
 #include "ivideo/fontserv.h"
 #include "isys/system.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "csutil/csvector.h"
 #include "csutil/util.h"
 #include "csutil/cfgacc.h"
@@ -223,13 +224,12 @@ public:
    */
   virtual iFont *GetFont (int iIndex);
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csFreeTypeServer);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
+  } scfiComponent;
 };
 
 #endif // __CS_FREEFONT_H__

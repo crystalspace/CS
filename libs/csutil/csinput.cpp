@@ -41,7 +41,7 @@ char ShiftedKey [128-32] =
 //--//--//--//--//--//--//--//--//--//--//--//--//--/> Input driver <--//--//--
 
 SCF_IMPLEMENT_IBASE (csInputDriver::FocusListener)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 csInputDriver::csInputDriver(iObjectRegistry* r) : Registry(r), Queue(0)

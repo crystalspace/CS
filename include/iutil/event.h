@@ -23,7 +23,7 @@
 #include "iutil/evdefs.h"
 #include "csutil/scf.h"
 
-struct iPlugin;
+struct iEventHandler;
 
 SCF_VERSION (iEvent, 0, 0, 1);
 
@@ -265,26 +265,26 @@ SCF_VERSION (iEventCord, 0, 0, 2);
 
 /**
  * The iEventCord is an interface provided by an event queue to
- * any plugins wanting to receive some subclasses of events ASAP
+ * any event handlers wanting to receive some subclasses of events ASAP
  * in a specified priority, bypassing the queue itself.
  * Events may also optionally be sent to the normal event queue itself
- * if none of the plugins in the cord handle the event.
+ * if none of the event handlers in the cord handle the event.
  */
 struct iEventCord
 {
   /**
-   * Insert a plugin into the cord.  The priority defines when it will receive
-   * the event with respect to other registered plugins.  Plugins with the same
-   * priority are handled in a first-come first-served fashion.  This is
-   * significant since returning true from HandleEvent() will stop further
-   * event processing.
+   * Insert an event handler into the cord.  The priority defines when it
+   * will receive the event with respect to other registered event handlers.
+   * Event handlers with the same priority are handled in a first-come
+   * first-served fashion.  This is significant since returning true from
+   * HandleEvent() will stop further event processing.
    */
-  virtual int Insert (iPlugin*, int priority) = 0;
+  virtual int Insert (iEventHandler*, int priority) = 0;
 
   /**
-   * Remove a plugin from the cord.
+   * Remove an event handler from the cord.
    */
-  virtual void Remove (iPlugin*) = 0;
+  virtual void Remove (iEventHandler*) = 0;
 
   /**
    * Returns true if events are passed on to the owning event queue if all

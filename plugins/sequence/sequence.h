@@ -22,7 +22,8 @@
 #include "csutil/util.h"
 #include "csutil/csvector.h"
 #include "ivaria/sequence.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 
 struct iObjectRegistry;
 
@@ -191,13 +192,17 @@ public:
   virtual iSequence* NewSequence ();
   virtual void RunSequence (csTicks time, iSequence* sequence);
 
-  struct eiPlugin : public iPlugin
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSequenceManager);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
+  } scfiComponent;
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSequenceManager);
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiPlugin;
+  } scfiEventHandler;
 };
 
 #endif // __CS_SEQUENCE_H__

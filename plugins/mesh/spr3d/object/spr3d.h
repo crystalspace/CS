@@ -36,7 +36,8 @@
 #include "iengine/material.h"
 #include "imesh/object.h"
 #include "iutil/config.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 
 #define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING|CS_OBJECT_FEATURE_ANIMATION)
 
@@ -1400,15 +1401,14 @@ public:
   } scfiConfig;
   friend struct csSprite3DConfig;
 
-  //--------------------- iPlugin interface implementation
-  struct eiPlugin : public iPlugin
+  //--------------------- iComponent interface implementation
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSprite3DMeshObjectType);
     virtual bool Initialize (iObjectRegistry* p)
     { scfParent->object_reg = p; return true; }
-    virtual bool HandleEvent (iEvent&) { return false; }
-  } scfiPlugin;
-  friend struct eiPlugin;
+  } scfiComponent;
+  friend struct eiComponent;
 };
 
 #endif // __CS_SPR3D_H__

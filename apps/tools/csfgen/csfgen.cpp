@@ -24,6 +24,8 @@
 #include "cstool/initapp.h"
 #include "ivideo/fontserv.h"
 #include "iutil/objreg.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "isys/plugin.h"
 
 CS_IMPLEMENT_APPLICATION

@@ -1,7 +1,9 @@
 
 #include "cssysdef.h"
-#include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "isys/vfs.h"
+#include "isys/plugin.h"
 #include "ivaria/reporter.h"
 #include "igraphic/imageio.h"
 #include "igraphic/image.h"

@@ -708,11 +708,11 @@ iMeshObject* csSprite2DMeshObjectFactory::NewInstance ()
 
 SCF_IMPLEMENT_IBASE (csSprite2DMeshObjectType)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObjectType::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObjectType::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csSprite2DMeshObjectType)
@@ -725,7 +725,7 @@ SCF_EXPORT_CLASS_TABLE_END
 csSprite2DMeshObjectType::csSprite2DMeshObjectType (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSprite2DMeshObjectType::~csSprite2DMeshObjectType ()

@@ -40,6 +40,8 @@
 #include "ivaria/reporter.h"
 #include "isys/system.h"
 #include "isys/plugin.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
@@ -112,11 +114,16 @@ static CS_DECLARE_GROWING_ARRAY_REF (clipped_fog, G3DFogInfo);
 
 SCF_IMPLEMENT_IBASE(csGraphics3DOGLCommon)
   SCF_IMPLEMENTS_INTERFACE(iGraphics3D)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DOGLCommon::eiPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DOGLCommon::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DOGLCommon::eiEventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csGraphics3DOGLCommon* csGraphics3DOGLCommon::ogl_g3d = NULL;
@@ -125,7 +132,8 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
   G2D (NULL), object_reg (NULL)
 {
   SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
 
   ogl_g3d = this;
   texture_cache = NULL;
@@ -224,7 +232,7 @@ bool csGraphics3DOGLCommon::Initialize (iObjectRegistry* p)
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
-    q->RegisterListener (&scfiPlugin, CSMASK_Broadcast);
+    q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
   return true;
 }
 
