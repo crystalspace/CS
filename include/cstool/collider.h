@@ -42,6 +42,11 @@ SCF_VERSION (csColliderWrapper, 0, 0, 3);
  * is optional (if you can assign your iCollider's to entities in
  * another manner then this is ok) and the engine will not use
  * this object itself.
+ * <p>
+ * Important! After creating an instance of this object you should
+ * actually DecRef() the pointer because csColliderWrapper will automatically
+ * attach itself to the given object. You can use
+ * csColliderWrapper::GetCollider() later to get the collider again.
  */
 class csColliderWrapper : public csObject
 {

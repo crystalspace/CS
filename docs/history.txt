@@ -3,6 +3,9 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+12-Jun-2003
+	- Jorrit clarified a comment with csColliderWrapper telling people that
+	  you must DecRef() the new collider wrapper after creating it.
 11-Jun-2003
 	- Eric Sunshine removed an invocation of class_scfFinalize() from
 	  SCF_REGISTER_STATIC_CLASS() which should have been removed yesterday
