@@ -32,6 +32,7 @@
 #include "csutil/nobjvec.h"
 #include "csgeom/math3d.h"
 #include "csgeom/transfrm.h"
+#include "csgeom/tri.h"
 
 typedef bool (csASEInterpreter) (class csModelConverterASE *conv, csDataStream &in,
   const char *Token);
