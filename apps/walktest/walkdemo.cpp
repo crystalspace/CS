@@ -56,6 +56,8 @@
 #include "igraph3d.h"
 #include "csengine/rapid.h"
 
+extern WalkTest* Sys;
+
 
 void RandomColor (float& r, float& g, float& b)
 {

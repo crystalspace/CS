@@ -47,6 +47,8 @@
 #define Gfx3D System->G3D
 #define Gfx2D System->G2D
 
+extern WalkTest* Sys;
+
 //-----------------------------------------------------------------------------
 
 void DrawZbuffer ()

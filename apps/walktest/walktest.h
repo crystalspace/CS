@@ -208,6 +208,9 @@ public:
   ///
   void PrepareFrame (time_t elapsed_time, time_t current_time);
 
+  /// Move bots, particle systems, players, etc. for each frame.
+  virtual void MoveSystems (time_t elapsed_time, time_t current_time);
+
   /**
    * Draw all things related to debugging (mostly edge drawing).
    * Must be called with G3D set in 2D mode.
@@ -224,13 +227,22 @@ public:
   /**
    * Draw everything for the console.
    */
-  void DrawFrameConsole ();
+  virtual void DrawFrameConsole ();
 
   /**
    * Draw everything for a frame. This includes 3D graphics
    * and everything related to 2D drawing as well (console, debugging, ...).
    */
-  void DrawFrame (time_t elapsed_time, time_t current_time);
+  virtual void DrawFrame (time_t elapsed_time, time_t current_time);
+  /// Draws 3D objects to screen
+  virtual void DrawFrame3D (int drawflags, time_t current_time);
+  /// Draws 2D objects to screen
+  virtual void DrawFrame2D (void);
+
+  /// Load all the graphics libraries needed
+  virtual void LoadLibraryData(void);
+  virtual void Inititalize2DTextures(void);
+  virtual void Create2DSprites(void);
 
   ///
   virtual bool HandleEvent (csEvent &Event);
@@ -289,43 +301,13 @@ public:
   ///
   void eatkeypress (int status, int key, bool shift, bool alt, bool ctrl);
 
-  /**
-   * The following "MyApp" functions give the application designer hooks
-   * into WalkTest so that new functionality may be added without modifing
-   * WalkTest itself.
-   */
-
-  /// Load any standard libraries here.
-  virtual void MyAppInitialize1(void) { }
-  /// Load any standard textures here.
-  virtual void MyAppInitialize2(void) { }
-  /// Load any 2D sprites.
-  virtual void MyAppInitialize3(void) { }
-  /// Do any remaining initializations here.
-  virtual void MyAppInitialize4(void) { }
-  /// Called at the end of WalkTest's constructor.
-  virtual void MyAppConstructor(void) { }
-  /// Called at the beginning of WalkTest's destructor.
-  virtual void MyAppDestructor1(void) { }
-  /// Called at the end of WalkTest's destructor.
-  virtual void MyAppDestructor2(void) { }
-  /// Draw the first 2D sprites within this function call.
-  virtual void MyAppDrawFrame1(void) { }
-  /// Draw the last 2D sprites within this function call.
-  virtual void MyAppDrawFrame2(void) { }
-  /// Near the beginning of NextFrame
-  virtual void MyAppNextFrame1(time_t elapsed_time, time_t current_time) { (void)elapsed_time; (void)current_time;}
-  /// Near the end of NextFrame
-  virtual void MyAppNextFrame2(time_t elapsed_time, time_t current_time) { (void)elapsed_time; (void)current_time;}
-  virtual void MyAppShowHelp(void) { }
-  virtual bool MyAppCommandHandler(const char *cmd, const char *arg) { (void)cmd; (void)arg; return false; }
-  virtual bool MyAppMouseClick1Handler(csEvent &Event) { (void)Event; return false; }
-  virtual bool MyAppMouseClick2Handler(csEvent &Event) { (void)Event; return false; }
-  virtual bool MyAppMouseClick3Handler(csEvent &Event) { (void)Event; return false; }
+  /// Handle mouse click events
+  virtual void MouseClick1Handler(csEvent &Event);
+  virtual void MouseClick2Handler(csEvent &Event);
+  virtual void MouseClick3Handler(csEvent &Event);
 };
 
 extern csVector2 coord_check_vector;
-extern WalkTest* Sys;
 
 #define FRAME_WIDTH Sys->FrameWidth
 #define FRAME_HEIGHT Sys->FrameHeight

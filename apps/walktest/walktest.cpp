@@ -142,12 +142,10 @@ WalkTest::WalkTest () :
 //pl=new PhysicsLibrary;
 
   timeFPS = 0.0;
-  MyAppConstructor();   // provided so app developer can initialize
 }
 
 WalkTest::~WalkTest ()
 {
-  MyAppDestructor1();   // provided so app developer can delete as needed
   if (collide_system) collide_system->DecRef ();
   delete wf;
   delete [] auto_script;
@@ -159,7 +157,6 @@ WalkTest::~WalkTest ()
   delete plbody;
   delete pllegs;
   if (World) World->DecRef ();
-  MyAppDestructor2();   // provided so app developer can delete as needed
 }
 
 void WalkTest::SetSystemDefaults (csIniFile *Config)
@@ -255,8 +252,21 @@ void WalkTest::NextFrame (time_t elapsed_time, time_t current_time)
 {
   // The following will fetch all events from queue and handle them
   SysSystemDriver::NextFrame (elapsed_time, current_time);
+  MoveSystems (elapsed_time, current_time);
+  PrepareFrame (elapsed_time, current_time);
+  DrawFrame (elapsed_time, current_time);
 
-  MyAppNextFrame1(elapsed_time, current_time);
+  // Execute one line from the script.
+  if (!busy_perf_test)
+  {
+    char buf[256];
+    if (Command::get_script_line (buf, 255)) Command::perform_line (buf);
+  }
+}
+
+
+void WalkTest::MoveSystems (time_t elapsed_time, time_t current_time)
+{
   Sys->world->UpdateParticleSystems (elapsed_time);
 
   // Record the first time this routine is called.
@@ -273,9 +283,9 @@ void WalkTest::NextFrame (time_t elapsed_time, time_t current_time)
     if (current_time > next_bot_at)
     {
       extern void add_bot (float size, csSector* where, csVector3 const& pos,
-	float dyn_radius);
-      add_bot (2, view->GetCamera ()->GetSector (),
-        view->GetCamera ()->GetOrigin (), 0);
+	                        float dyn_radius);
+      add_bot (2, view->GetCamera ()->GetSector (), 
+               view->GetCamera ()->GetOrigin (), 0);
       next_bot_at = current_time+1000*10;
     }
   }
@@ -287,11 +297,16 @@ void WalkTest::NextFrame (time_t elapsed_time, time_t current_time)
     alt = GetKeyState (CSKEY_ALT);
     ctrl = GetKeyState (CSKEY_CTRL);
     shift = GetKeyState (CSKEY_SHIFT);
-    if (ctrl) speed = .5;
-    if (shift) speed = 2;
+    if (ctrl) 
+      speed = .5;
+    if (shift) 
+      speed = 2;
 
     /// Act as usual...
-    strafe (0,1); look (0,1); step (0,1); rotate (0,1);
+    strafe (0,1); 
+    look (0,1); 
+    step (0,1); 
+    rotate (0,1);
 
     if (Sys->Sound)
     {
@@ -313,19 +328,10 @@ void WalkTest::NextFrame (time_t elapsed_time, time_t current_time)
   extern void move_bots (time_t);
   move_bots (elapsed_time);
 
-  if (move_forward) step (1, 0);
-
-  MyAppNextFrame2(elapsed_time, current_time);
-  PrepareFrame (elapsed_time, current_time);
-  DrawFrame (elapsed_time, current_time);
-
-  // Execute one line from the script.
-  if (!busy_perf_test)
-  {
-    char buf[256];
-    if (Command::get_script_line (buf, 255)) Command::perform_line (buf);
-  }
+  if (move_forward) 
+    step (1, 0);
 }
+
 
 //-----------------------------------------------------------------------------
 
@@ -494,6 +500,55 @@ void WalkTest::DrawFrameConsole ()
   }
 }
 
+
+void WalkTest::DrawFrame3D (int drawflags, time_t current_time)
+{
+  // Tell Gfx3D we're going to display 3D things
+  if (!Gfx3D->BeginDraw (drawflags | CSDRAW_3DGRAPHICS))
+    return;
+
+  // Advance sprite frames
+  Sys->world->AdvanceSpriteFrames (current_time);
+
+  // Apply lighting BEFORE the very first frame
+  csDynLight* dyn = Sys->world->GetFirstDynLight ();
+  while (dyn)
+  {
+    extern void HandleDynLight (csDynLight*);
+    csDynLight* dn = dyn->GetNext ();
+    if (dyn->GetChild (csDataObject::Type)) HandleDynLight (dyn);
+    dyn = dn;
+  }
+  // Apply lighting to all sprites
+  light_statics ();
+
+  //------------
+  // Here comes the main call to the engine. view->Draw() actually
+  // takes the current camera and starts rendering.
+  //------------
+  if (map_mode != MAP_ON && !do_covtree_dump)
+    view->Draw ();
+
+  // no need to clear screen anymore
+  drawflags = 0;
+}
+
+
+void WalkTest::DrawFrame2D (void)
+{
+  if (cslogo)
+  {
+    unsigned w = cslogo->Width()  * FRAME_WIDTH  / 640;
+    unsigned h = cslogo->Height() * FRAME_HEIGHT / 480;
+    cslogo->Draw (Gfx3D, FRAME_WIDTH - 2 - (w * 151) / 256 , 2, w, h);
+  }
+
+  // White-board for debugging purposes.
+  if (do_covtree_dump)
+    DrawFrameExtraDebug ();
+}
+
+
 void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
 {
   (void)elapsed_time; (void)current_time;
@@ -508,36 +563,9 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
   }
 
   if (!System->Console->IsActive ()
-   || ((csSimpleConsole*)(System->Console))->IsTransparent ())
+    || ((csSimpleConsole*)(System->Console))->IsTransparent ())
   {
-    // Tell Gfx3D we're going to display 3D things
-    if (!Gfx3D->BeginDraw (drawflags | CSDRAW_3DGRAPHICS))
-      return;
-
-    // Advance sprite frames
-    Sys->world->AdvanceSpriteFrames (current_time);
-
-    // Apply lighting BEFORE the very first frame
-    csDynLight* dyn = Sys->world->GetFirstDynLight ();
-    while (dyn)
-    {
-      extern void HandleDynLight (csDynLight*);
-      csDynLight* dn = dyn->GetNext ();
-      if (dyn->GetChild (csDataObject::Type)) HandleDynLight (dyn);
-      dyn = dn;
-    }
-    // Apply lighting to all sprites
-    light_statics ();
-
-    //------------
-    // Here comes the main call to the engine. view->Draw() actually
-    // takes the current camera and starts rendering.
-    //------------
-    if (map_mode != MAP_ON && !do_covtree_dump)
-      view->Draw ();
-
-    // no need to clear screen anymore
-    drawflags = 0;
+    DrawFrame3D(drawflags, current_time);
   }
 
   // Start drawing 2D graphics
@@ -561,20 +589,7 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
   csSimpleConsole* scon = (csSimpleConsole*)System->Console;
   if (!scon->IsActive ())
   {
-    MyAppDrawFrame1();
-
-    if (cslogo)
-    {
-      unsigned w = cslogo->Width()  * FRAME_WIDTH  / 640;
-      unsigned h = cslogo->Height() * FRAME_HEIGHT / 480;
-      cslogo->Draw (Gfx3D, FRAME_WIDTH - 2 - (w * 151) / 256 , 2, w, h);
-    }
-
-   MyAppDrawFrame2();
-
-    // White-board for debugging purposes.
-    if (do_covtree_dump)
-      DrawFrameExtraDebug ();
+    DrawFrame2D();
   }
 
   // Drawing code ends here
@@ -839,6 +854,47 @@ void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
 }
 
 
+void WalkTest::LoadLibraryData(void)
+{
+  // Load the "standard" library
+  csLoader::LoadLibraryFile (world, "/lib/std/library");
+}
+
+
+void WalkTest::Inititalize2DTextures(void)
+{
+  csTextureHandle *texh;
+  csTextureList *texlist = world->GetTextures ();
+
+  // Find the Crystal Space logo and set the renderer Flag to for_2d, to allow
+  // the use in the 2D part.
+  texh = texlist->FindByName ("cslogo.gif");
+  if (texh) 
+    texh->flags = CS_TEXTURE_2D;
+}
+
+
+void WalkTest::Create2DSprites(void)
+{
+  int w, h;
+  csTextureHandle *texh;
+  iTextureHandle* phTex;
+  csTextureList *texlist = world->GetTextures ();
+
+  // Create a 2D sprite for the Logo.
+  texh = texlist->FindByName ("cslogo.gif");
+  if (texh)
+  {
+    phTex = texh->GetTextureHandle();
+    if (phTex)
+    {
+      phTex->GetMipMapDimensions (0, w, h);
+      cslogo = new csPixmap (phTex, 0, 0, w, h);
+    }
+  }
+}
+
+
 bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConfigName)
 {
   if (!SysSystemDriver::Initialize (argc, argv, iConfigName))
@@ -1041,6 +1097,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
       return false;
     }
 
+
     // Load the world from the file.
     if (!csLoader::LoadWorldFile (world, layer, "world"))
     {
@@ -1048,32 +1105,14 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
       return false;
     }
 
-    // Load the "standard" library
-    csLoader::LoadLibraryFile (world, "/lib/std/library");
-    MyAppInitialize1();
-
-    // Find the Crystal Space logo and set the renderer Flag to for_2d, to allow
-    // the use in the 2D part.
-    csTextureList *texlist = world->GetTextures ();
-    csTextureHandle *texh = texlist->FindByName ("cslogo.gif");
-    if (texh) texh->flags = CS_TEXTURE_2D;
-
-    MyAppInitialize2();
+    LoadLibraryData();
+    Inititalize2DTextures();
 
     // Prepare the world. This will calculate all lighting and
     // prepare the lightmaps for the 3D rasterizer.
     world->Prepare ();
 
-    // Create a 2D sprite for the Logo.
-    if (texh)
-    {
-      int w, h;
-      iTextureHandle* phTex = texh->GetTextureHandle();
-      phTex->GetMipMapDimensions (0, w, h);
-      cslogo = new csPixmap (phTex, 0, 0, w, h);
-    }
-
-    MyAppInitialize3();
+    Create2DSprites();
 
     // Look for the start sector in this world.
     csCameraPosition *cp = (csCameraPosition *)world->camera_positions.FindByName ("Start");
@@ -1160,9 +1199,19 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   int h3d = Gfx3D->GetHeight ();
   view->SetRectangle (2, 2, w3d - 4, h3d - 4);
 
-  MyAppInitialize4();
   return true;
 }
+
+
+#if 1
+// moved this out of main() to make it easier for app developer
+// to override
+void CreateSystem(void)
+{
+  // Create the system driver object
+  Sys = new WalkTest ();
+}
+#endif
 
 
 /*---------------------------------------------------------------------*
@@ -1173,8 +1222,8 @@ int main (int argc, char* argv[])
   // Initialize the random number generator
   srand (time (NULL));
 
-  // Create the system driver object
-  Sys = new WalkTest ();
+  extern void CreateSystem(void);
+  CreateSystem();
 
   // Initialize the main system. This will load all needed plugins
   // (3D, 2D, network, sound, ..., engine) and initialize them.

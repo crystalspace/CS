@@ -52,6 +52,8 @@
 #include "igraph3d.h"
 #include "csengine/rapid.h"
 
+extern WalkTest* Sys;
+
 csKeyMap* mapping = NULL;
 
 csSprite3D *FindNextClosestSprite(csSprite3D *baseSprite, csCamera *camera, csVector2 *screenCoord);
@@ -593,6 +595,67 @@ void WalkTest::eatkeypress (int status, int key, bool shift, bool alt, bool ctrl
   }
 }
 
+
+// left mouse button
+void WalkTest::MouseClick1Handler(csEvent &Event)  
+{
+  (void)Event;
+  move_forward = true;
+}
+
+// middle mouse button
+void WalkTest::MouseClick2Handler(csEvent &Event)
+{
+  csVector3 v;
+  v.z = System->G3D->GetZBuffValue(Event.Mouse.x, Event.Mouse.y);
+  v.x = (Event.Mouse.x-FRAME_WIDTH/2) * v.z / view->GetCamera ()->GetFOV ();
+  v.y = (FRAME_HEIGHT-1-Event.Mouse.y-FRAME_HEIGHT/2) * v.z / view->GetCamera ()->GetFOV ();
+  csVector3 vw = view->GetCamera ()->Camera2World (v);
+
+  Sys->Printf (MSG_CONSOLE, "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n", v.x, v.y, v.z, vw.x, vw.y, vw.z);
+  Sys->Printf (MSG_DEBUG_0, "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n", v.x, v.y, v.z, vw.x, vw.y, vw.z);
+
+  csSector* sector = view->GetCamera ()->GetSector ();
+  csVector3 origin = view->GetCamera ()->GetW2CTranslation ();
+  csVector3 isect;
+  csPolygon3D* sel = sector->HitBeam (origin, origin + (vw-origin) * 10, isect);
+  if (sel)
+  {
+    if (Sys->selected_polygon == sel) 
+      Sys->selected_polygon = NULL;
+    else 
+      Sys->selected_polygon = sel;
+
+    csPolygonSet* ps = (csPolygonSet*)(sel->GetParent ());
+    Sys->Printf (MSG_DEBUG_0, "Hit polygon '%s/%s'\n", ps->GetName (), sel->GetName ());
+    Dumper::dump (sel);
+  }
+
+  extern csVector2 coord_check_vector;
+  coord_check_vector.x = Event.Mouse.x;
+  coord_check_vector.y = FRAME_HEIGHT-Event.Mouse.y;
+  extern bool check_light;
+  extern void select_object (csRenderView* rview, int type, void* entity);
+  check_light = true;
+  view->GetWorld ()->DrawFunc (view->GetCamera (), view->GetClipper (), select_object);
+}
+
+// right mouse button
+void WalkTest::MouseClick3Handler(csEvent &Event)  
+{
+  csVector2   screenPoint;
+  csSprite3D *closestSprite;
+
+  screenPoint.x = Event.Mouse.x;
+  screenPoint.y = Event.Mouse.y;
+  closestSprite = FindNextClosestSprite(NULL, view->GetCamera(), &screenPoint);
+  if (closestSprite)
+    Sys->Printf (MSG_CONSOLE, "Selected sprite %s\n", closestSprite->GetName ());
+  else
+    Sys->Printf (MSG_CONSOLE, "No sprite selected!\n");
+}
+
+
 bool WalkTest::HandleEvent (csEvent &Event)
 {
   // First pass the event to all plugins
@@ -614,67 +677,16 @@ bool WalkTest::HandleEvent (csEvent &Event)
         (Event.Key.Modifiers & CSMASK_CTRL) != 0);
       break;
     case csevMouseDown:
-       {
+      {
       if (Event.Mouse.Button == 1)
-      {
-        if (!MyAppMouseClick1Handler(Event))
-        move_forward = true;
-         }
-      else if (Event.Mouse.Button == 3)
-      {
-        if (!MyAppMouseClick3Handler(Event))
-        {
-        csVector2   screenPoint;
-        csSprite3D *closestSprite;
-
-        screenPoint.x = Event.Mouse.x;
-        screenPoint.y = Event.Mouse.y;
-        closestSprite = FindNextClosestSprite(NULL, view->GetCamera(), &screenPoint);
-        if (closestSprite)
-          Sys->Printf (MSG_CONSOLE, "Selected sprite %s\n", closestSprite->GetName ());
-        else
-          Sys->Printf (MSG_CONSOLE, "No sprite selected!\n");
-           }
-      }
+        MouseClick1Handler(Event);
       else if (Event.Mouse.Button == 2)
-      {
-        if (!MyAppMouseClick2Handler(Event))
-        {
-        csVector3 v;
-        v.z = System->G3D->GetZBuffValue(Event.Mouse.x, Event.Mouse.y);
-        v.x = (Event.Mouse.x-FRAME_WIDTH/2) * v.z / view->GetCamera ()->GetFOV ();
-        v.y = (FRAME_HEIGHT-1-Event.Mouse.y-FRAME_HEIGHT/2) * v.z / view->GetCamera ()->GetFOV ();
-        csVector3 vw = view->GetCamera ()->Camera2World (v);
-
-        Sys->Printf (MSG_CONSOLE, "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n", v.x, v.y, v.z, vw.x, vw.y, vw.z);
-        Sys->Printf (MSG_DEBUG_0, "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n", v.x, v.y, v.z, vw.x, vw.y, vw.z);
-
-	csSector* sector = view->GetCamera ()->GetSector ();
-	csVector3 origin = view->GetCamera ()->GetW2CTranslation ();
-	csVector3 isect;
-	csPolygon3D* sel = sector->HitBeam (origin, origin + (vw-origin) * 10, isect);
-	if (sel)
-	{
-          if (Sys->selected_polygon == sel) Sys->selected_polygon = NULL;
-          else Sys->selected_polygon = sel;
-          csPolygonSet* ps = (csPolygonSet*)(sel->GetParent ());
-          Sys->Printf (MSG_DEBUG_0, "Hit polygon '%s/%s'\n",
-            ps->GetName (), sel->GetName ());
-	  Dumper::dump (sel);
-	}
-
-        extern csVector2 coord_check_vector;
-        coord_check_vector.x = Event.Mouse.x;
-        coord_check_vector.y = FRAME_HEIGHT-Event.Mouse.y;
-        extern bool check_light;
-        extern void select_object (csRenderView* rview, int type, void* entity);
-        check_light = true;
-	view->GetWorld ()->DrawFunc (view->GetCamera (), view->GetClipper (),
-		select_object);
-      }
-         }
+        MouseClick2Handler(Event);
+      else if (Event.Mouse.Button == 3)
+        MouseClick3Handler(Event);
       break;
-     }
+      }
+
     case csevMouseMove:
       // additional command by Leslie Saputra -> freelook mode.
       {
