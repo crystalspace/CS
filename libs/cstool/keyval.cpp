@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "cstool/keyval.h"
+#include "csutil/scfstringarray.h"
 
 //---------------------------------------------------------------------------
 
@@ -80,3 +81,14 @@ void csKeyValuePair::SetValue (const char* vname, const char* value)
   }
 }
 
+csRef<iStringArray> csKeyValuePair::GetValueNames () const
+{
+  csRef<iStringArray> ret;
+  ret.AttachNew (new scfStringArray ());
+  csSet<csStrKey, csConstCharHashKeyHandler>::GlobalIterator it = names.GetIterator ();
+  while (it.HasNext ())
+  {
+    ret->Push (it.Next ());
+  }
+  return ret;
+}

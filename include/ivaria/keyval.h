@@ -20,7 +20,6 @@
 #define __CS_IVARIA_KEYVAL_H__
 
 #include "csutil/scf.h"
-#include "csutil/array.h"
 
 struct iObject;
 struct iSector;
@@ -76,6 +75,11 @@ struct iKeyValuePair : public iBase
    * is the same as calling 'SetValue ("value", value)'.
    */
   virtual void SetValue (const char* value) = 0;
+
+  /**
+   * Get a list of the names of values in the pair.
+   */
+  virtual csRef<iStringArray> GetValueNames () const = 0;
 };
 
 #endif // __CS_IVARIA_KEYVAL_H__

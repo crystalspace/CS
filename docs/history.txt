@@ -14,6 +14,10 @@ chronological order.
 	  it used the above GetValueNames(). It will have to be rewritten
 	  once we have another way to iterate over all values in a key value
 	  pair.
+	- Squee forgot to use the proper arrays (again). Added GetValueNames()
+	  back into iKeyValuePair using the proper iStringArray and re-enabled
+	  WriteKey() in the syntax service.
+	- Squee changed GetShades() in csGradientShades to return a reference.
 02-Dec-2004
 	- Eric Sunshine fixed the various extension checks in glextmanager.h so
 	  that they won't crash if glGetString(GL_EXTENSIONS) and/or

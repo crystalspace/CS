@@ -130,7 +130,7 @@ public:
     float end = 1.0f) const;
 
   /// Get the array of shades
-  csArray<csGradientShade> GetShades () const { return shades; }
+  csArray<csGradientShade>& GetShades () { return shades; }
 };
 
 

@@ -44,6 +44,7 @@
 #include "imesh/object.h"
 #include "iutil/object.h"
 #include "iutil/plugin.h"
+#include "iutil/stringarray.h"
 #include "ivaria/reporter.h"
 #include "imap/parser.h"
 #include "imap/ldrctxt.h"
@@ -1087,16 +1088,13 @@ bool csTextSyntaxService::ParseKey (iDocumentNode *node, iKeyValuePair* &keyvalu
 
 bool csTextSyntaxService::WriteKey (iDocumentNode *node, iKeyValuePair *keyvalue)
 {
-#if 0
   node->SetAttribute ("name", keyvalue->GetKey ());
-  csArray<const char*> vnames = keyvalue->GetValueNames ();
-  csArray<const char*>::Iterator it = vnames.GetIterator ();
-  while (it.HasNext ())
+  csRef<iStringArray> vnames = keyvalue->GetValueNames ();
+  for (size_t i=0; i<vnames->Length (); i++)
   {
-    const char* name = it.Next ();
+    const char* name = vnames->Get (i);
     node->SetAttribute (name, keyvalue->GetValue (name));
   }
-#endif
   return true;
 }
 
