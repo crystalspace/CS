@@ -782,48 +782,55 @@ bool SysSystemDriver::GetInstallPath (char *oInstallPath, size_t iBufferSize)
   // 3. default.
 
   /// Try the registry .. tentative code I cannot compile this...
-  HKEY m_pKey = _T("SOFTWARE\\CrystalSpace"));
   char * pValueName = "installpath";
   DWORD dwType;
   DWORD bufSize = iBufferSize;
+  HKEY m_pKey;
+  LONG result;
 
-  LONG result = RegQueryValueEx(
+  result = RegCreateKey(HKEY_LOCAL_MACHINE, "Software\\CrystalSpace", &m_pKey);
+  if (result == ERROR_SUCCESS) {
+
+    result = RegQueryValueEx(
       m_pKey, 
       pValueName, 
       0,
       &dwType,
-      oInstallPath,
+      (unsigned char *)oInstallPath,
       &bufSize);
  
-  if (ERROR_SUCCESS == result
-  {
-    goto got_value;
+    if (ERROR_SUCCESS == result) {
+      goto got_value;
+    }
   }
 
   // registry didn't work.
   // try env variable.
-  char *path = getenv ("CRYSTAL");
-  if (path && *path)
   {
-    strncpy(oInstallPath, path, iBufferSize);
-    goto got_value;
+    char *path = getenv ("CRYSTAL");
+    if (path && *path)
+    {
+      strncpy(oInstallPath, path, iBufferSize);
+      goto got_value;
+    }
   }
+
   // no env. variable. take the default
-  // which is C:\Program Files\Crystal\
+  // which is C:\Program Files\Crystal\ 
   strncpy(oInstallPath, "C:\\Program Files\\Crystal\\", iBufferSize);
 
 got_value:
   // got the value in oInstallPath, check for ending '/' or '\'.
   int len = strlen(oInstallPath);
   if(len == 0) return false;
-  if( oInstallPath[len-1] == '/' || oInstallPath[len-1] == '\' )
+  if( oInstallPath[len-1] == '/' || oInstallPath[len-1] == '\\' )
     return true;
   if(len+1 >= (int)iBufferSize)
   {
     strncpy(oInstallPath, "", iBufferSize); //make empty if possible
     return false;
   }
-  oInstallPath[len] = '\';
+  oInstallPath[len] = '\\';
   oInstallPath[len+1] = 0;
   return true;
 }
