@@ -6,6 +6,8 @@ The history order is reversed so that new features are at the top.
 	- Added the ability to actually use the colon for specifying
 	  non-standard tag names in RequestPlugins. You can now do:
 	      CS_REQUEST_PLUGIN ("pluginname:alternative_tag", iWhatever)
+        - Matze fixed python makefile
+	- Matze added python.cex that makes cs-config output python settings
 27-Dec-2001
 	- Added a new csStringSet::Request() which can return the string
 	  based on the ID (i.e. exactly the opposite of the old Request()
