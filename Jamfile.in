@@ -69,6 +69,7 @@ if [ Property build : standalone ]
 {
   CleanDir distclean : include ;
 
+  BUILDTOP-SET = true ; # Avoid Jam 2.4 warning of missing BUILDTOP/Jamrules.
   SubDir BUILDTOP include ;
   Recurse InstallHeader : .h ;
   SubDir TOP ;
