@@ -552,7 +552,7 @@ Markus Korth (@email{mkorth@@military.de})
 Markus fixed a bug with @file{unixconf.sh}.
 
 @item
-Michael Voase (@email{mvoase@midcoast.com.au})
+Michael Voase (@email{mvoase@@midcoast.com.au})
 
 Michael did various things in CS: changes to walktest, a lot of work on mesh
 objects (hitbeam, bounding boxes, @dots{}), lots of bug fixes, a lot of work
