@@ -518,8 +518,9 @@ iRigidBody* Simple::CreateWalls (const csVector3& radius)
   	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
   csRef<iThingFactoryState> walls_state = ws->GetFactory ();
 
-  for(int i = 0; i < walls_state->GetPolygonCount(); i++) {
-      rb->AttachColliderPlane(walls_state->GetPolygon(i)->GetObjectPlane(), 10, 0, 0);
+  for(int i = 0; i < walls_state->GetPolygonCount(); i++)
+  {
+      rb->AttachColliderPlane(walls_state->GetPolygonObjectPlane(i), 10, 0, 0);
   }
 
   return rb;
