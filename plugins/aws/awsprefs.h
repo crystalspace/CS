@@ -488,6 +488,9 @@ public:
 
     /** Allows a component to retrieve the value of a constant, or the parser as well. */
     virtual int  GetConstantValue(char *name);
+
+    /** Creates a new key factory */
+    virtual iAwsKeyFactory *CreateKeyFactory();
     
 };
  

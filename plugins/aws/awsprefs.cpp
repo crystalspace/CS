@@ -13,6 +13,7 @@
 #include "awsprefs.h"
 #include "awstex.h"
 #include "awsadler.h"
+#include "awskcfct.h"
  
 extern int awsparse(void *prefscont);
 
@@ -558,4 +559,10 @@ awsPrefManager::ConstantExists(char *name)
   }
 
   return false;
+}
+
+iAwsKeyFactory *
+awsPrefManager::CreateKeyFactory()
+{
+  return new awsKeyFactory();
 }

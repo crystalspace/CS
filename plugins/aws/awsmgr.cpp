@@ -1,3 +1,11 @@
+/******************************************************************************************
+ * Notes:
+ *    1. The redraw process still does not properly support clipping.  This should be revisted
+ *  when we figure out why the clipping mechanisms in the sofware and opengl don't work like one
+ *  would expect.
+ *
+ */  
+
 #include "cssysdef.h"
 #include "iutil/plugin.h"
 #include "aws.h"
@@ -40,11 +48,11 @@ awsManager::awsComponentFactoryMap::~awsComponentFactoryMap ()
 }
 
 awsManager::awsManager(iBase *p):prefmgr(NULL), sinkmgr(NULL),
-               updatestore_dirty(true), 
-               top(NULL), mouse_in(NULL), keyb_focus(NULL),
-               mouse_captured(false),
-               ptG2D(NULL), ptG3D(NULL), object_reg(NULL), 
-               canvas(NULL), flags(0)
+updatestore_dirty(true), 
+top(NULL), mouse_in(NULL), keyb_focus(NULL),
+mouse_captured(false),
+ptG2D(NULL), ptG3D(NULL), object_reg(NULL), 
+canvas(NULL), flags(0)
 {
   SCF_CONSTRUCT_IBASE (p);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
@@ -66,43 +74,42 @@ awsManager::~awsManager()
 
 bool 
 awsManager::Initialize(iObjectRegistry *object_reg)
-{   
+{
   awsManager::object_reg = object_reg;
-    
-  if (DEBUG_MANAGER) printf("aws-debug: getting preference manager.\n");  
+
+  if (DEBUG_MANAGER) printf("aws-debug: getting preference manager.\n");
   prefmgr =  SCF_CREATE_INSTANCE ("crystalspace.window.preferencemanager", iAwsPrefManager);
 
-  if (DEBUG_MANAGER) printf("aws-debug: getting sink manager.\n");  
+  if (DEBUG_MANAGER) printf("aws-debug: getting sink manager.\n");
   sinkmgr =  SCF_CREATE_INSTANCE ("crystalspace.window.sinkmanager", iAwsSinkManager);
-  
+
   if (!prefmgr)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.aws",
-        "AWS could not create an instance of the default PREFERENCE manager. This is a serious error.");
+              "AWS could not create an instance of the default PREFERENCE manager. This is a serious error.");
     return false;
-  }
-  else
+  } else
   {
     if (DEBUG_MANAGER) printf("aws-debug: initing and setting the internal preference manager.\n");
-    
+
     prefmgr->SetWindowMgr(this);
     if (!prefmgr->Setup(object_reg))
-	return false;
+      return false;
   }
 
   if (!sinkmgr)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.aws",
-        "AWS could not create an instance of the default SINK manager. This is a serious error.");
+              "AWS could not create an instance of the default SINK manager. This is a serious error.");
     return false;
   }
 
   if (DEBUG_MANAGER) printf("aws-debug: registering common components.\n");
 
   RegisterCommonComponents();
-  
+
   if (DEBUG_MANAGER) printf("aws-debug: left aws initialize.\n");
- 
+
   return true;
 }
 
@@ -117,25 +124,24 @@ awsManager::GetSinkMgr()
 {
   return sinkmgr;
 }
- 
+
 void
 awsManager::SetPrefMgr(iAwsPrefManager *pmgr)
 {
-   if (prefmgr && pmgr)
-   {
-      prefmgr->DecRef();
-      pmgr->IncRef();
+  if (prefmgr && pmgr)
+  {
+    prefmgr->DecRef();
+    pmgr->IncRef();
 
-      prefmgr=pmgr;
-   }
-   else if (pmgr)
-   {
-      pmgr->IncRef();
-      prefmgr=pmgr;
-   }
+    prefmgr=pmgr;
+  } else if (pmgr)
+  {
+    pmgr->IncRef();
+    prefmgr=pmgr;
+  }
 }
 
- 
+
 iAwsComponent *
 awsManager::CreateEmbeddableComponent()
 {
@@ -145,14 +151,14 @@ awsManager::CreateEmbeddableComponent()
 void
 awsManager::RegisterComponentFactory(awsComponentFactory *factory, char *name)
 {
-   awsComponentFactoryMap *cfm = new awsComponentFactoryMap;
+  awsComponentFactoryMap *cfm = new awsComponentFactoryMap;
 
-   factory->IncRef();
+  factory->IncRef();
 
-   cfm->factory= factory;
-   cfm->id=prefmgr->NameToId(name);
+  cfm->factory= factory;
+  cfm->id=prefmgr->NameToId(name);
 
-   component_factories.AddItem(cfm);
+  component_factories.AddItem(cfm);
 }
 
 awsComponentFactory *
@@ -160,53 +166,57 @@ awsManager::FindComponentFactory(char *name)
 {
   void *p = component_factories.GetFirstItem();
   unsigned long id = prefmgr->NameToId(name);
-  
+
   do 
   {
     awsComponentFactoryMap *cfm = (awsComponentFactoryMap *)p;
-    
+
     if (cfm->id == id)
       return cfm->factory;
-      
+
     p = component_factories.GetNextItem();
-  } while(p!=component_factories.PeekFirstItem());
-  
+  } while (p!=component_factories.PeekFirstItem());
+
   return NULL;
 }
 
 iAwsWindow *
 awsManager::GetTopWindow()
-{ return top; }
-    
+{
+  return top;
+}
+
 void 
 awsManager::SetTopWindow(iAwsWindow *_top)
-{ top = _top; }
+{
+  top = _top;
+}
 
 void 
 awsManager::SetCanvas(iAwsCanvas *newCanvas)
 {
-   if (newCanvas)
-   {
-      if (canvas) canvas->DecRef();
-      canvas = newCanvas;
-      canvas->IncRef();
+  if (newCanvas)
+  {
+    if (canvas) canvas->DecRef();
+    canvas = newCanvas;
+    canvas->IncRef();
 
-      ptG2D = canvas->G2D();
-      ptG3D = canvas->G3D();
-       
-      ptG2D->DoubleBuffer(false);
-      ptG3D->BeginDraw(CSDRAW_2DGRAPHICS);
-      ptG2D->Clear(ptG3D->GetTextureManager()->FindRGB(255,0,255));
-      ptG3D->FinishDraw();
-      ptG3D->Print(NULL);
+    ptG2D = canvas->G2D();
+    ptG3D = canvas->G3D();
 
-      prefmgr->SetTextureManager(ptG3D->GetTextureManager());
-      prefmgr->SetFontServer(ptG2D->GetFontServer());
+    ptG2D->DoubleBuffer(false);
+    /*ptG3D->BeginDraw(CSDRAW_2DGRAPHICS);
+    ptG2D->Clear(ptG3D->GetTextureManager()->FindRGB(255,0,255));
+    ptG3D->FinishDraw();
+    ptG3D->Print(NULL);*/
 
-      frame.Set(0,0,ptG2D->GetWidth(), ptG2D->GetHeight());
-       
-      Mark(frame);
-   }
+    prefmgr->SetTextureManager(ptG3D->GetTextureManager());
+    prefmgr->SetFontServer(ptG2D->GetFontServer());
+
+    frame.Set(0,0,ptG2D->GetWidth()-1, ptG2D->GetHeight()-1);
+
+    Mark(frame);
+  }
 }
 
 iAwsCanvas* 
@@ -220,9 +230,9 @@ iAwsCanvas *
 awsManager::CreateDefaultCanvas(iEngine* engine, iTextureManager* txtmgr) 
 {
   iAwsCanvas *canvas = new awsMultiProctexCanvas(
-    engine->GetContext()->GetDriver2D()->GetWidth(), 
-    engine->GetContext()->GetDriver2D()->GetHeight(), 
-    object_reg, engine, txtmgr);
+                                                engine->GetContext()->GetDriver2D()->GetWidth(), 
+                                                engine->GetContext()->GetDriver2D()->GetHeight(), 
+                                                object_reg, engine, txtmgr);
   SCF_INC_REF(canvas);
 
   return canvas;
@@ -230,10 +240,10 @@ awsManager::CreateDefaultCanvas(iEngine* engine, iTextureManager* txtmgr)
 
 iAwsCanvas *
 awsManager::CreateDefaultCanvas(iEngine* engine, iTextureManager* txtmgr, int width, 
-		    int height, const char *name) 
+                                int height, const char *name) 
 {
   iAwsCanvas *canvas = new awsSingleProctexCanvas(
-    width, height, object_reg, engine, txtmgr, name);
+                                                 width, height, object_reg, engine, txtmgr, name);
   SCF_INC_REF(canvas);
 
   return canvas;
@@ -285,35 +295,35 @@ bool
 awsManager::WindowIsDirty(iAwsWindow *win)
 {
   int i;
-   
-  for(i=0; i<dirty.Count(); ++i)
+
+  for (i=0; i<dirty.Count(); ++i)
     if (win->Overlaps(dirty.RectAt(i))) return true;
-  
+
   return false;
 }
 
 void 
 awsManager::UpdateStore()
 {
- if (updatestore_dirty)
+  if (updatestore_dirty)
   {
- 
-   iAwsWindow *curwin=top;
-   
-   updatestore.makeEmpty();
 
-   // Get all frames into the store.
-   while(curwin)
-   {
+    iAwsWindow *curwin=top;
+
+    updatestore.makeEmpty();
+
+    // Get all frames into the store.
+    while (curwin)
+    {
       if (!curwin->isHidden())
       {
         csRect r(curwin->Frame());
         updatestore.Include(r);
-      } 
+      }
       curwin = curwin->WindowBelow();
-   }
+    }
 
-   updatestore_dirty=false;
+    updatestore_dirty=false;
 
   }
 }
@@ -327,25 +337,24 @@ awsManager::Print(iGraphics3D *g3d, uint8 Alpha)
   csRect clip(0,0,g3d->GetWidth()-1,g3d->GetHeight()-1);
 
   updatestore.ClipTo(clip);
-  
+
   // Merge erase areas if we have to do both. Otherwise, just update normally.
   if (erase.Count() > 0)
   {
-    for(i=0; i<updatestore.Count(); ++i)
+    for (i=0; i<updatestore.Count(); ++i)
       erase.Include(updatestore.RectAt(i));
-  
-    for(i=0; i<erase.Count(); ++i)
+
+    for (i=0; i<erase.Count(); ++i)
     {
       csRect r(erase.RectAt(i));
       canvas->Show(&r, g3d, Alpha);
     }
 
     erase.makeEmpty();
-  }
-  else
+  } else
   {
 
-    for(i=0; i<updatestore.Count(); ++i)
+    for (i=0; i<updatestore.Count(); ++i)
     {
       csRect r(updatestore.RectAt(i));
       canvas->Show(&r, g3d, Alpha);   
@@ -370,206 +379,185 @@ awsManager::Print(iGraphics3D *g3d, uint8 Alpha)
 void       
 awsManager::Redraw()
 {
-   static unsigned redraw_tag = 1;
-   static csRect bounds(0,0,proctex_width,proctex_height);
-   int    erasefill = GetPrefMgr()->GetColor(AC_TRANSPARENT);
-   int    i;
-        
+  static unsigned redraw_tag = 1;
+  static csRect bounds(frame);
+  int    erasefill = GetPrefMgr()->GetColor(AC_TRANSPARENT);
+  int    i;
 
-   redraw_tag++;
 
-   csRect clip(0,0,ptG2D->GetWidth()-1, ptG2D->GetHeight()-1);
-   
-   ptG3D->BeginDraw(CSDRAW_2DGRAPHICS);
-   ptG2D->SetClipRect(0,0,ptG2D->GetWidth()-1, ptG2D->GetHeight()-1);
-      
-   //if (redraw_tag%2) ptG2D->DrawBox( 0,  0,25, 25, GetPrefMgr()->GetColor(AC_SHADOW));
-   //else              ptG2D->DrawBox( 0,  0,25, 25, GetPrefMgr()->GetColor(AC_HIGHLIGHT));
-       
-   // check to see if there is anything to redraw.
-   if (dirty.Count() == 0 && !(flags & AWSF_AlwaysRedrawWindows)) 
-      return;
-   else
-   {
-     dirty.ClipTo(clip);
-     erase.ClipTo(clip);
-   }
-   
-   /******* The following code is only executed if there is something to redraw *************/
-     
-   iAwsWindow *curwin=top, *oldwin = 0;
-   
-   // check to see if any part of this window needs redrawn, or if the always draw flag is set
-   while(curwin)
-   {
-      if ((!curwin->isHidden()) && (WindowIsDirty(curwin) || (flags & AWSF_AlwaysRedrawWindows)))         
-      {
-        curwin->SetRedrawTag(redraw_tag);
-        if (flags & AWSF_AlwaysRedrawWindows) Mark(curwin->Frame());
-      }
+  redraw_tag++;
 
-      oldwin=curwin;
-      curwin = curwin->WindowBelow();
-   }
+  csRect clip(frame);
 
-   /*  At this point in time, oldwin points to the bottom most window.  That means that we take curwin, set it
-    * equal to oldwin, and then follow the chain up to the top, redrawing on the way.  This makes sure that we 
-    * only redraw each window once.
-    */
-   
-   curwin=oldwin;
-   while(curwin)
-   {
-     if (DEBUG_MANAGER)
-     {
+  ptG3D->BeginDraw(CSDRAW_2DGRAPHICS);
+  ptG2D->SetClipRect(0,0,ptG2D->GetWidth()-1, ptG2D->GetHeight()-1);
+  
+  // check to see if there is anything to redraw.
+  if (dirty.Count() == 0 && !(flags & AWSF_AlwaysRedrawWindows))
+    return;
+  else
+  {
+    dirty.ClipTo(clip);
+    erase.ClipTo(clip);
+  }
+
+  /******* The following code is only executed if there is something to redraw *************/
+
+  iAwsWindow *curwin=top, *oldwin = 0;
+
+  // check to see if any part of this window needs redrawn, or if the always draw flag is set
+  while (curwin)
+  {
+    if ((!curwin->isHidden()) && (WindowIsDirty(curwin) || (flags & AWSF_AlwaysRedrawWindows)))
+    {
+      curwin->SetRedrawTag(redraw_tag);
+      if (flags & AWSF_AlwaysRedrawWindows) Mark(curwin->Frame());
+    }
+
+    oldwin=curwin;
+    curwin = curwin->WindowBelow();
+  }
+
+  /*  At this point in time, oldwin points to the bottom most window.  That means that we take curwin, set it
+   * equal to oldwin, and then follow the chain up to the top, redrawing on the way.  This makes sure that we 
+   * only redraw each window once.
+   */
+
+  curwin=oldwin;
+  while (curwin)
+  {
+    if (DEBUG_MANAGER)
+    {
       printf("aws-debug: consider window: %p\n", curwin); 
       printf("aws-debug: redraw tag: %d/%d\n", curwin->RedrawTag(), redraw_tag);
-     }
+    }
 
-      if (redraw_tag == curwin->RedrawTag()) 
-      { 
-        if (DEBUG_MANAGER) printf("aws-debug: window is dirty, redraw.\n");
+    if (redraw_tag == curwin->RedrawTag())
+    {
+      if (DEBUG_MANAGER) printf("aws-debug: window is dirty, redraw.\n");
 
-        // Setup our dirty gathering rect.
-        csRect cr, crf;
-        cr.MakeEmpty();
-                  
-        for(i=0; i<dirty.Count(); ++i)
-        {
-          csRect dr(dirty.RectAt(i));
+      // Setup our dirty gathering rect.
+      csRect cr, crf;
+      cr.MakeEmpty();
 
-          if(DEBUG_MANAGER) printf("aws-debug: consider rect:%d of %d\n", i, dirty.Count()); 
-          
+      for (i=0; i<dirty.Count(); ++i)
+      {
+        csRect dr(dirty.RectAt(i));
 
-          // Find out if we need to erase.
-         /* if (!UsingDefaultContext)
-          {
-            csRect lo(dr);
-            lo.Subtract(curwin->Frame());
+        if (DEBUG_MANAGER) printf("aws-debug: consider rect:%d of %d\n", i, dirty.Count());
+        
+        if (dr.Intersects(curwin->Frame()))
+          cr.Union(dr);
 
-            if (!lo.IsEmpty())            
-              ptG2D->DrawBox(dr.xmin-1, dr.ymin-1, dr.xmax+1, dr.ymax+1, erasefill);
-          }*/
-          
-          if (dr.Intersects(curwin->Frame()))
-            cr.Union(dr);
-                
-        } // end gather all dirty rects that touch this window.
+      } // end gather all dirty rects that touch this window.
 
-        // Get the intersection between the window and the clip rect.
+      // Get the intersection between the window and the clip rect.
 
-        RedrawWindow(curwin, cr);
+      RedrawWindow(curwin, cr);
 
-      } // end if this window is dirty
+    } // end if this window is dirty
 
-      curwin=curwin->WindowAbove();
+    curwin=curwin->WindowAbove();
 
-   } // end iterate all windows
+  } // end iterate all windows
+
+  //int i;
+
+  // Debug code: draw boxes around dirty regions
+  /*for(i=0; i<dirty.Count(); ++i)
+  {
+         csRect dr(dirty.RectAt(i));
+         ptG2D->DrawLine(dr.xmin, dr.ymin, dr.xmax, dr.ymin, GetPrefMgr()->GetColor(AC_WHITE));
+         ptG2D->DrawLine(dr.xmin, dr.ymin, dr.xmin, dr.ymax, GetPrefMgr()->GetColor(AC_WHITE));
+         ptG2D->DrawLine(dr.xmin, dr.ymax, dr.xmax, dr.ymax, GetPrefMgr()->GetColor(AC_WHITE));
+         ptG2D->DrawLine(dr.xmax, dr.ymin, dr.xmax, dr.ymax, GetPrefMgr()->GetColor(AC_WHITE));
+  }*/
+
+  // This draws all of the erasure areas.
+  if (flags & AWSF_AlwaysEraseWindows)
+  {
+    awsClipper clipper(ptG3D, ptG2D);
+    clipper.SetClipRect(clip);
+
+    for (i=0; i<dirty.Count(); ++i)
+      erase.Exclude(dirty.RectAt(i));
+
+    for (i=0; i<erase.Count(); ++i)
+    {
+      csRect r(erase.RectAt(i));
+      clipper.DrawBox(r.xmin, r.ymin, r.Width(), r.Height(),erasefill);
+    }       
+  }
+
+  // Clear clipping bounds when done.
+  ptG2D->SetClipRect(0,0,ptG2D->GetWidth(), ptG2D->GetHeight());
+
+  // This only needs to happen when drawing to the default context.
+  ptG3D->FinishDraw ();
   
-   //int i;
+  // Reset the dirty region
+  dirty.makeEmpty();
 
-   // Debug code: draw boxes around dirty regions
-   /*for(i=0; i<dirty.Count(); ++i)
-   {
-          csRect dr(dirty.RectAt(i));
-          ptG2D->DrawLine(dr.xmin, dr.ymin, dr.xmax, dr.ymin, GetPrefMgr()->GetColor(AC_WHITE));
-          ptG2D->DrawLine(dr.xmin, dr.ymin, dr.xmin, dr.ymax, GetPrefMgr()->GetColor(AC_WHITE));
-          ptG2D->DrawLine(dr.xmin, dr.ymax, dr.xmax, dr.ymax, GetPrefMgr()->GetColor(AC_WHITE));
-          ptG2D->DrawLine(dr.xmax, dr.ymin, dr.xmax, dr.ymax, GetPrefMgr()->GetColor(AC_WHITE));
-   }*/
-   
-   // This draws all of the erasure areas.
-   if (flags & AWSF_AlwaysEraseWindows)
-   {     
-     awsClipper clipper(ptG3D, ptG2D);
-     clipper.SetClipRect(clip);
-
-     for(i=0; i<dirty.Count(); ++i)
-       erase.Exclude(dirty.RectAt(i));
-
-     for(i=0; i<erase.Count(); ++i)
-     {
-       csRect r(erase.RectAt(i));
-       clipper.DrawBox(r.xmin, r.ymin, r.Width(), r.Height(),erasefill);
-     }       
-   }
-
-   // Clear clipping bounds when done.
-   ptG2D->SetClipRect(0,0,ptG2D->GetWidth(), ptG2D->GetHeight());
-
-   // This only needs to happen when drawing to the default context.
-   ptG3D->FinishDraw ();
-
-   //ptG3D->Print(&bounds);
-
-     //UpdateStore();
-
-     //for(i=0; i<updatestore.Count(); ++i)
-       //ptG3D->Print(&(updatestore.RectAt(i)));
-
-   // Reset the dirty region
-   dirty.makeEmpty();
-
-   // done with the redraw!
+  // done with the redraw!
 }
 
 void
 awsManager::RedrawWindow(iAwsWindow *win, csRect &dirtyarea)
 {
-     if (DEBUG_MANAGER) printf("aws-debug: start drawing window.\n");
+  if (DEBUG_MANAGER) printf("aws-debug: start drawing window.\n");
 
-     /// See if this window intersects with this dirty area
-     if (!dirtyarea.Intersects(win->Frame()))
-       return;
+  /// See if this window intersects with this dirty area
+  if (!dirtyarea.Intersects(win->Frame()))
+    return;
 
-     /// Draw the window first.
-     //csRect clip(win->Frame());
+  /// Draw the window first.
+  //csRect clip(win->Frame());
 
-     /// Clip the window to it's intersection with the dirty rectangle
-     //clip.Intersect(csRect(0,0,G2D()->GetWidth(), G2D()->GetHeight()));
-     //ptG2D->SetClipRect(clip.xmin, clip.ymin, clip.xmax, clip.ymax);
+  /// Clip the window to it's intersection with the dirty rectangle
+  //clip.Intersect(csRect(0,0,G2D()->GetWidth(), G2D()->GetHeight()));
+  //ptG2D->SetClipRect(clip.xmin, clip.ymin, clip.xmax, clip.ymax);
 
-     /// Tell the window to draw
-     win->OnDraw(win->Frame());
+  /// Tell the window to draw
+  win->OnDraw(win->Frame());
 
-     /// Now draw all of it's children
-     RecursiveDrawChildren(win, dirtyarea);
+  /// Now draw all of it's children
+  RecursiveDrawChildren(win, dirtyarea);
 
-     if (DEBUG_MANAGER) printf("aws-debug: finished drawing window.\n");
+  if (DEBUG_MANAGER) printf("aws-debug: finished drawing window.\n");
 }
 
 void
 awsManager::RecursiveDrawChildren(iAwsComponent *cmp, csRect &dirtyarea)
 {
-   int i; 
-   iAwsComponent *child;
+  int i; 
+  iAwsComponent *child;
 
-   if (DEBUG_MANAGER) printf("aws-debug: start drawing children.\n");
+  if (DEBUG_MANAGER) printf("aws-debug: start drawing children.\n");
 
-   for(i=0; i<cmp->GetChildCount(); ++i)
-   {
-     child = cmp->GetChildAt(i);
+  for (i=0; i<cmp->GetChildCount(); ++i)
+  {
+    child = cmp->GetChildAt(i);
 
-     if (DEBUG_MANAGER) printf("aws-debug: entered draw children loop for %p.\n", child);
+    if (DEBUG_MANAGER) printf("aws-debug: entered draw children loop for %p.\n", child);
 
-     // Check to see if this component even needs redrawing.
-     //if (!dirtyarea.Intersects(child->Frame()))
-       //continue;                                            
+    // Check to see if this component even needs redrawing.
+    //if (!dirtyarea.Intersects(child->Frame()))
+    //continue;                                            
 
-     csRect clip(child->Frame());
-     clip.Intersect(dirtyarea);
-     //ptG2D->SetClipRect(clip.xmin, clip.ymin, clip.xmax, clip.ymax);
+    csRect clip(child->Frame());
+    clip.Intersect(dirtyarea);
+    //ptG2D->SetClipRect(clip.xmin, clip.ymin, clip.xmax, clip.ymax);
 
-     // Draw the child
-     child->OnDraw(clip);
+    // Draw the child
+    child->OnDraw(clip);
 
-     // If it has children, draw them
-     if (child->HasChildren())
-       RecursiveDrawChildren(child, dirtyarea);
-     
-   } // End for
+    // If it has children, draw them
+    if (child->HasChildren())
+      RecursiveDrawChildren(child, dirtyarea);
 
-   if (DEBUG_MANAGER) printf("aws-debug: finished drawing children.\n");
+  } // End for
+
+  if (DEBUG_MANAGER) printf("aws-debug: finished drawing children.\n");
 
 }
 
@@ -582,53 +570,53 @@ awsManager::CreateParmList()
 iAwsWindow *
 awsManager::CreateWindowFrom(char *defname)
 {
-   if (DEBUG_MANAGER) printf("aws-debug: Searching for window def \"%s\"\n", defname);
-   
-   // Find the window definition
-   awsComponentNode *winnode = GetPrefMgr()->FindWindowDef(defname);
-   
-   if (DEBUG_MANAGER) printf("aws-debug: Window definition was %s\n", (winnode ? "found." : "not found."));
-   
-   // If we couldn't find it, abort
-   if (winnode==NULL) return NULL;
-   
-   // Create a new window
-   iAwsWindow *win = new awsWindow();
+  if (DEBUG_MANAGER) printf("aws-debug: Searching for window def \"%s\"\n", defname);
 
-   // Setup the name of the window
-   win->SetID(winnode->Name());
-   
-   // Tell the window to set itself up
-   win->Setup(this, winnode);
-   
-   /* Now recurse through all of the child nodes, creating them and setting them
-   up.  Nodes are created via their factory functions.  If a factory cannot be 
-   found, then that node and all of it's children are ignored. */
-   
-   CreateChildrenFromDef(this, win, win, winnode);
-     
-   return win;
+  // Find the window definition
+  awsComponentNode *winnode = GetPrefMgr()->FindWindowDef(defname);
+
+  if (DEBUG_MANAGER) printf("aws-debug: Window definition was %s\n", (winnode ? "found." : "not found."));
+
+  // If we couldn't find it, abort
+  if (winnode==NULL) return NULL;
+
+  // Create a new window
+  iAwsWindow *win = new awsWindow();
+
+  // Setup the name of the window
+  win->SetID(winnode->Name());
+
+  // Tell the window to set itself up
+  win->Setup(this, winnode);
+
+  /* Now recurse through all of the child nodes, creating them and setting them
+  up.  Nodes are created via their factory functions.  If a factory cannot be 
+  found, then that node and all of it's children are ignored. */
+
+  CreateChildrenFromDef(this, win, win, winnode);
+
+  return win;
 }
 
 void
 awsManager::CreateChildrenFromDef(iAws *wmgr, iAwsWindow *win, iAwsComponent *parent, awsComponentNode *settings)
 {
   int i;
-  for(i=0; i<settings->GetLength(); ++i)
+  for (i=0; i<settings->GetLength(); ++i)
   {
     awsKey *key = settings->GetItemAt(i); 
 
     if (key==NULL) continue;
-    
+
     if (key->Type() == KEY_COMPONENT)
     {
       awsComponentNode *comp_node = (awsComponentNode *)key;
       awsComponentFactory *factory = FindComponentFactory(comp_node->ComponentTypeName()->GetData());
-      
+
       // If we have a factory for this component, then create it and set it up.
       if (factory)
       {
-	iAwsComponent *comp = factory->Create();
+        iAwsComponent *comp = factory->Create();
 
         // Setup the name of the component
         comp->SetID(comp_node->Name());
@@ -636,28 +624,27 @@ awsManager::CreateChildrenFromDef(iAws *wmgr, iAwsWindow *win, iAwsComponent *pa
         // Setup window and parent of component
         comp->SetWindow(win);
         comp->SetParent(parent);
-       		
-	// Prepare the component, and add it into it's parent
-	comp->Setup(wmgr, comp_node);
-	parent->AddChild(comp);
-	
-	// Process all subcomponents of this component.
-	CreateChildrenFromDef(wmgr, win, comp, comp_node);
+
+        // Prepare the component, and add it into it's parent
+        comp->Setup(wmgr, comp_node);
+        parent->AddChild(comp);
+
+        // Process all subcomponents of this component.
+        CreateChildrenFromDef(wmgr, win, comp, comp_node);
       }
-      
-    }
-    else if (key->Type() == KEY_CONNECTIONMAP)
+
+    } else if (key->Type() == KEY_CONNECTIONMAP)
     {
       int j;
       awsConnectionNode *conmap = (awsConnectionNode *)key;
       awsSlot *slot = new awsSlot();
-      
-      for(j=0; j<conmap->GetLength(); ++j)
+
+      for (j=0; j<conmap->GetLength(); ++j)
       {
         awsConnectionKey *con = (awsConnectionKey *)conmap->GetItemAt(j);
 
         slot->Connect(parent, con->Signal(), con->Sink(), con->Trigger());
-        
+
       } // end for count of connections
 
       //  Now that we've processed the connection map, we use a trick and send out
@@ -667,10 +654,10 @@ awsManager::CreateChildrenFromDef(iAws *wmgr, iAwsWindow *win, iAwsComponent *pa
       parent->Broadcast(0xefffffff);
 
     } // end else
-      
+
   } // end for count of keys
-  
-  
+
+
 }
 
 void
@@ -689,9 +676,9 @@ awsManager::ReleaseMouse()
 bool 
 awsManager::HandleEvent(iEvent& Event)
 {
-  
+
   // Find out what kind of event it is
-  switch(Event.Type)
+  switch (Event.Type)
   {
   case csevMouseMove:
   case csevMouseUp:
@@ -702,14 +689,14 @@ awsManager::HandleEvent(iEvent& Event)
     if (GetTopWindow())
     {
       // If the mouse is locked into the top window, keep it there
-      if (mouse_captured) 
+      if (mouse_captured)
       {
         if (RecursiveBroadcastToChildren(GetTopWindow(), Event)) return true;
         else return GetTopWindow()->HandleEvent(Event);
-        
+
         break;
       } // end mouse captured
-      
+
       // If the top window still contains the mouse, it stays on top
       if (!GetTopWindow()->isHidden() && GetTopWindow()->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
       {
@@ -719,13 +706,13 @@ awsManager::HandleEvent(iEvent& Event)
       else
       {
         // Find the window that DOES contain the mouse.
-      
+
         iAwsWindow *win=GetTopWindow();
-      
+
         // Skip the top 'cause we already checked it.
         if (win) win=win->WindowBelow();
 
-        while(win)
+        while (win)
         {
           // If the window contains the mouse, it becomes new top.
           if (!win->isHidden() && win->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
@@ -733,28 +720,27 @@ awsManager::HandleEvent(iEvent& Event)
             win->Raise();
             if (RecursiveBroadcastToChildren(win, Event)) return true;
             else return win->HandleEvent(Event);
-          }
-          else
+          } else
             win = win->WindowBelow();
         } // end while iterating windows
       } // end else check all other windows
     } // end if there is a top window
 
-  break;
+    break;
 
   case csevKeyDown:
-   // if (GetTopWindow()) 
-   // {
-   //   if (RecursiveBroadcastToChildren(GetTopWindow(), Event)) return true;
-   //   else return GetTopWindow()->HandleEvent(Event);
-   // }
+    // if (GetTopWindow()) 
+    // {
+    //   if (RecursiveBroadcastToChildren(GetTopWindow(), Event)) return true;
+    //   else return GetTopWindow()->HandleEvent(Event);
+    // }
 
-   if (keyb_focus)
-     keyb_focus->HandleEvent(Event);
+    if (keyb_focus)
+      keyb_focus->HandleEvent(Event);
 
-  break;
+    break;
   }
-    
+
   return false;
 }
 
@@ -764,20 +750,20 @@ awsManager::RecursiveBroadcastToChildren(iAwsComponent *cmp, iEvent &Event)
   int i;
   iAwsComponent *child;
 
-  for(i=0; i<cmp->GetChildCount(); ++i)
-   {
+  for (i=0; i<cmp->GetChildCount(); ++i)
+  {
 
     child = cmp->GetChildAt(i);
 
     // If it has children, broadcast to them (depth-first recursion)
-    if (child->HasChildren()) 
+    if (child->HasChildren())
       if (RecursiveBroadcastToChildren(child, Event))
         return true;
 
     if (CheckFocus(child, Event))
       return true;
-   
-   } // End for
+
+  } // End for
 
   return false;
 
@@ -785,70 +771,70 @@ awsManager::RecursiveBroadcastToChildren(iAwsComponent *cmp, iEvent &Event)
 
 bool
 awsManager::CheckFocus(iAwsComponent *cmp, iEvent &Event)
-{   
-    switch(Event.Type)
+{
+  switch (Event.Type)
+  {
+  case csevMouseMove:
+  case csevMouseUp:
+  case csevMouseDown:
+  case csevMouseClick:
+
+    // Only give to child if it contains the mouse.
+    if (cmp->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
     {
-      case csevMouseMove:
-      case csevMouseUp:
-      case csevMouseDown:
-      case csevMouseClick:
 
-        // Only give to child if it contains the mouse.
-        if (cmp->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
+      if (mouse_in != cmp)
+      {
+        // Create a new event for MouseExit and MouseEnter
+        uchar et = Event.Type;
+
+        if (mouse_in)
         {
+          Event.Type = csevMouseExit;
+          mouse_in->HandleEvent(Event);
+        }
 
-          if (mouse_in != cmp)
+        mouse_in=cmp;
+        Event.Type = csevMouseEnter;
+        mouse_in->HandleEvent(Event);
+
+        Event.Type = et;
+      }
+
+      if (Event.Type == csevMouseDown)
+      {
+        if (keyb_focus != cmp)
+        {
+          // Create a new event for MouseExit and MouseEnter
+          uchar et = Event.Type;
+
+          if (keyb_focus)
           {
-            // Create a new event for MouseExit and MouseEnter
-            uchar et = Event.Type;
-
-            if (mouse_in)
-            {
-              Event.Type = csevMouseExit;
-              mouse_in->HandleEvent(Event);
-            }
-
-            mouse_in=cmp;
-            Event.Type = csevMouseEnter;
-            mouse_in->HandleEvent(Event);
-
-            Event.Type = et;
+            Event.Type = csevLostFocus;
+            keyb_focus->HandleEvent(Event);
           }
 
-          if (Event.Type == csevMouseDown)
-          {
-            if (keyb_focus != cmp)
-            {
-              // Create a new event for MouseExit and MouseEnter
-              uchar et = Event.Type;
+          keyb_focus=cmp;
+          Event.Type = csevGainFocus;
+          keyb_focus->HandleEvent(Event);
 
-              if (keyb_focus)
-              {
-                Event.Type = csevLostFocus;
-                keyb_focus->HandleEvent(Event);
-              }
+          Event.Type = et;
+        }
+      }
 
-              keyb_focus=cmp;
-              Event.Type = csevGainFocus;
-              keyb_focus->HandleEvent(Event);
-
-              Event.Type = et;
-            }
-          }
-
-          return cmp->HandleEvent(Event);
-        } 
-      break;
+      return cmp->HandleEvent(Event);
+    }
+    break;
 
 
-      case csevKeyDown:
-        
-        if (cmp->HandleEvent(Event)) return true;
-              
-      break;
-    }  // End switch
+  case csevKeyDown:
 
-    return false;
+    if (cmp->HandleEvent(Event)) return true;
+
+    break;
+  }  // End switch
+
+  return false;
 }
 
 void 
@@ -879,21 +865,31 @@ awsManager::RegisterCommonComponents()
 
 iGraphics2D *
 awsManager::G2D() 
-{ return ptG2D; }
+{
+  return ptG2D;
+}
 
 iGraphics3D *
 awsManager::G3D() 
-{ return ptG3D; }
+{
+  return ptG3D;
+}
 
 void 
 awsManager::SetFlag(unsigned int _flags)
-{ flags |= _flags; }
+{
+  flags |= _flags;
+}
 
 void 
 awsManager::ClearFlag(unsigned int _flags)
-{ flags &= (~_flags); }
- 
+{
+  flags &= (~_flags);
+}
+
 unsigned int 
 awsManager::GetFlags()
-{ return flags; }
-    
+{
+  return flags;
+}
+

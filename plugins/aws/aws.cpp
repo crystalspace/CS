@@ -3,8 +3,13 @@
 #include "awsprefs.h"
 #include "awsslot.h"
 #include "awscscr.h"
+#include "awskcfct.h"
 
 CS_IMPLEMENT_PLUGIN
+
+SCF_IMPLEMENT_IBASE (awsKeyFactory)
+  SCF_IMPLEMENTS_INTERFACE (iAwsKeyFactory)
+SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE (awsScreenCanvas)
   SCF_IMPLEMENTS_INTERFACE (iAwsCanvas)
