@@ -67,7 +67,7 @@ files.  You can download @code{libpng} from:
 
 @noindent
 @uref{ftp://ftp.uu.net/graphics/png/src}@code{/libpng-?????.tar.gz}@*
-(as of this writing the current latest version is @file{libpng-1.0.2.tar.gz})
+(as of this writing the current latest version is @file{libpng-1.0.12.tar.gz})
 
 After downloading you must put the contents of that package in
 @file{CS/libs/libpng}. It is possible to put the library somewhere else as well
