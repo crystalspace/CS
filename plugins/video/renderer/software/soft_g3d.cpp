@@ -1171,7 +1171,7 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
   csTexture *txt_unl = tex_mm->get_texture (mipmap);
 
   /// Check if polygon has a lightmap (i.e. if it is lighted)
-  bool has_lightmap = tex->GetLightMap ();
+  bool has_lightmap = (tex->GetLightMap () != NULL);
 
   // Initialize our static drawing information and cache
   // the texture in the texture cache (if this is not already the case).
