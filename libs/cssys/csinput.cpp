@@ -27,26 +27,26 @@
 // This array defines first 32..128 character codes with SHIFT key applied
 char ShiftedKey [128-32] =
 {
-  ' ', '!', '"', '#', '$', '%', '&', '"', '(', ')', '*', '+', '<', '_', '>', '?',
-  ')', '!', '@', '#', '$', '%', '^', '&', '*', '(', ':', ':', '<', '+', '>', '?',
-  '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
-  'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '{', '|', '}', '^', '_',
-  '~', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
-  'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '{', '|', '}', '~', 127
+' ', '!', '"', '#', '$', '%', '&', '"', '(', ')', '*', '+', '<', '_', '>', '?',
+')', '!', '@', '#', '$', '%', '^', '&', '*', '(', ':', ':', '<', '+', '>', '?',
+'@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '{', '|', '}', '^', '_',
+'~', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '{', '|', '}', '~', 127
 };
 
 // And this one performs backward conversion
 char UnshiftedKey [128-32] =
 {
-  ' ', '1', '\'','3', '4', '5', '7', '\'','9', '0', '8', '=', ',', '-', '.', '/',
-  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ';', ';', ',', '=', '.', '/',
-  '2', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
-  'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '[', '\\',']', '6', '-',
-  '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
-  'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '[', '\\',']', '`', 127
+' ', '1', '\'','3', '4', '5', '7', '\'','9', '0', '8', '=', ',', '-', '.', '/',
+'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ';', ';', ',', '=', '.', '/',
+'2', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '[', '\\',']', '6', '-',
+'`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '[', '\\',']', '`', 127
 };
 
-//--//--//--//--//--//--//--//--//--//--//--//--//--/> Keyboard driver <--//--//
+//--//--//--//--//--//--//--//--//--//--//--//--//--/> Keyboard driver <--//--/
 
 csKeyboardDriver::csKeyboardDriver (csSystemDriver *system) :
   KeyState (256 + (CSKEY_LAST - CSKEY_FIRST + 1))
@@ -106,7 +106,7 @@ bool csKeyboardDriver::GetKeyState (int key)
   return KeyState [idx];
 }
 
-//--//--//--//--//--//--//--//--//--//--//--//--//--//--> Mouse driver <--//--//
+//--//--//--//--//--//--//--//--//--//--//--//--//--//--> Mouse driver <--//--/
 
 time_t csMouseDriver::DoubleClickTime;
 size_t csMouseDriver::DoubleClickDist;
@@ -120,7 +120,7 @@ csMouseDriver::csMouseDriver (csSystemDriver *system)
 
 void csMouseDriver::Reset ()
 {
-  for (int i = 0; i < MAX_MOUSE_BUTTONS; i++)
+  for (int i = 0; i < CS_MAX_MOUSE_BUTTONS; i++)
     if (Button[i])
       do_button (i + 1, false, LastX, LastY);
   LastClickButton = -1;
@@ -131,7 +131,7 @@ void csMouseDriver::do_button (int button, bool down, int x, int y)
   if (x != LastX || y != LastY)
     do_motion (x, y);
 
-  if (button == 0 || button >= MAX_MOUSE_BUTTONS)
+  if (button == 0 || button >= CS_MAX_MOUSE_BUTTONS)
     return;
 
   int smask = (System->GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
@@ -182,7 +182,7 @@ void csMouseDriver::SetDoubleClickTime (int iTime, size_t iDist)
   DoubleClickDist = iDist;
 }
 
-//--//--//--//--//--//--//--//--//--//--//--//--//--/> Joystick driver <--//--//
+//--//--//--//--//--//--//--//--//--//--//--//--//--/> Joystick driver <--//--/
 
 csJoystickDriver::csJoystickDriver (csSystemDriver *system)
 {
@@ -194,21 +194,22 @@ csJoystickDriver::csJoystickDriver (csSystemDriver *system)
 
 void csJoystickDriver::Reset ()
 {
-  for (int i = 0; i < MAX_JOYSTICK_COUNT; i++)
-    for (int j = 0; j < MAX_JOYSTICK_BUTTONS; j++)
+  for (int i = 0; i < CS_MAX_JOYSTICK_COUNT; i++)
+    for (int j = 0; j < CS_MAX_JOYSTICK_BUTTONS; j++)
       if (Button [i][j])
         do_button (i + 1, j + 1, false, LastX [i], LastY [i]);
 }
 
-void csJoystickDriver::do_button (int number, int button, bool down, int x, int y)
+void csJoystickDriver::do_button (int number, int button, bool down,
+  int x, int y)
 {
-  if (number <= 0 && number > MAX_JOYSTICK_COUNT)
+  if (number <= 0 && number > CS_MAX_JOYSTICK_COUNT)
     return;
 
   if (x != LastX [number - 1] || y != LastY [number - 1])
     do_motion (number, x, y);
 
-  if (button <= 0 || button > MAX_JOYSTICK_BUTTONS)
+  if (button <= 0 || button > CS_MAX_JOYSTICK_BUTTONS)
     return;
 
   int smask = (System->GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
@@ -222,7 +223,7 @@ void csJoystickDriver::do_button (int number, int button, bool down, int x, int 
 
 void csJoystickDriver::do_motion (int number, int x, int y)
 {
-  if (number <= 0 && number > MAX_JOYSTICK_COUNT)
+  if (number <= 0 && number > CS_MAX_JOYSTICK_COUNT)
     return;
 
   if (x != LastX [number - 1] || y != LastY [number - 1])

@@ -34,11 +34,11 @@
 #include "cssys/cseventq.h"
 
 /// Maximal number of mouse buttons supported
-#define MAX_MOUSE_BUTTONS	10
+#define CS_MAX_MOUSE_BUTTONS	10
 /// Maximal number of joysticks supported
-#define MAX_JOYSTICK_COUNT	2
+#define CS_MAX_JOYSTICK_COUNT	2
 /// Maximal number of joystick buttons supported
-#define MAX_JOYSTICK_BUTTONS	10
+#define CS_MAX_JOYSTICK_BUTTONS	10
 
 class csSystemDriver;
 
@@ -104,7 +104,7 @@ class csMouseDriver
   /// Last mouse position
   int LastX, LastY;
   /// Mouse buttons state
-  bool Button [MAX_MOUSE_BUTTONS];
+  bool Button [CS_MAX_MOUSE_BUTTONS];
   /// Mouse double click max interval in 1/1000 seconds
   static time_t DoubleClickTime;
   /// Mouse double click max distance
@@ -130,7 +130,7 @@ public:
   /// Query the last known mouse button state
   bool GetLastButton (int button)
   {
-    return (button > 0 && button <= MAX_MOUSE_BUTTONS) ?
+    return (button > 0 && button <= CS_MAX_MOUSE_BUTTONS) ?
       Button [button - 1] : false;
   }
 
@@ -150,9 +150,9 @@ class csJoystickDriver
   /// The system driver
   csSystemDriver *System;
   /// Joystick button states
-  bool Button [MAX_JOYSTICK_COUNT][MAX_JOYSTICK_BUTTONS];
+  bool Button [CS_MAX_JOYSTICK_COUNT][CS_MAX_JOYSTICK_BUTTONS];
   /// Joystick axis positions
-  int LastX [MAX_JOYSTICK_COUNT], LastY [MAX_JOYSTICK_COUNT];
+  int LastX [CS_MAX_JOYSTICK_COUNT], LastY [CS_MAX_JOYSTICK_COUNT];
 
 public:
   /// Initialize joystick interface
@@ -171,8 +171,8 @@ public:
   /// Query the last known joystick button state
   bool GetLastButton (int number, int button)
   {
-    return (number > 0 && number <= MAX_JOYSTICK_COUNT
-         && button > 0 && button <= MAX_JOYSTICK_BUTTONS) ?
+    return (number > 0 && number <= CS_MAX_JOYSTICK_COUNT
+         && button > 0 && button <= CS_MAX_JOYSTICK_BUTTONS) ?
             Button [number - 1] [button - 1] : false;
   }
 
