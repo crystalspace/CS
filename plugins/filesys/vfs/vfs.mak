@@ -52,6 +52,7 @@ TO_INSTALL.ROOT += $(CFG.VFS)
 MSVC.DSP += VFS
 DSP.VFS.NAME = vfs
 DSP.VFS.TYPE = plugin
+DSP.VFS.LIBS = zlib
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

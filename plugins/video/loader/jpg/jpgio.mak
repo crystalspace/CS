@@ -52,6 +52,7 @@ DEP.JPGIMG = CSUTIL CSSYS CSGFX CSUTIL
 MSVC.DSP += JPGIMG
 DSP.JPGIMG.NAME = csjpgimg
 DSP.JPGIMG.TYPE = plugin
+DSP.JPGIMG.LIBS = libjpeg
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
