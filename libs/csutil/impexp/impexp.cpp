@@ -48,7 +48,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-converter::converter()
+converter::converter() : frame_builder(NULL)
 {
 // for now to remove warnings
 	revnorm = false;
@@ -57,7 +57,21 @@ converter::converter()
 
 converter::~converter()
 {
+  if (frame_builder)
+    CHK (delete frame_builder);
+}
 
+int converter::set_animation_frame(int frame_number)
+{
+  // no frame management? then there are no frames!
+  if (frame_builder == NULL)
+  {
+    return 0;
+  }
+
+  // use the frame_builder to set a frame, and figure out the
+  // biggest frame number
+  return frame_builder->SetFrame(frame_number);
 }
 
 void converter::set_infile_name(char* /*sysinfile*/)
@@ -740,6 +754,9 @@ int converter::data_read ( void ) {
   }
   else if ( leqi ( filein_type, "VLA" ) == TRUE ) {
     ierror = vla_read ( filein );
+  }
+  else if ( leqi ( filein_type, "MD2" ) == TRUE) {
+    ierror = md2_read ( filein );
   }
   else {
     fprintf ( logfile,  "\n" );
@@ -2267,6 +2284,19 @@ int converter::leqi ( char* string1, char* string2 ) {
     } 
   }
   return TRUE;
+}
+
+//
+// frame manipulator methods
+//
+
+csConverter_FrameManipulator::csConverter_FrameManipulator(converter *target)
+ : m_data_target(target)
+{
+}
+
+csConverter_FrameManipulator::~csConverter_FrameManipulator()
+{
 }
 
 

@@ -23,8 +23,6 @@
 
  
 
-
-
 */
 // converter.h: interface for the converter class.
 //
@@ -119,7 +117,9 @@
 */
 
 
-
+// format readers subclass this in order to provide functionality
+// for changing frames
+class csConverter_FrameManipulator;
 
 
 
@@ -137,6 +137,13 @@ public:
 	void set_infile_name(char* infile );
 	void set_reverse_normals( int yesno );
 
+	// set the current 'frame' of animation; the converter
+	// class will update its coordinate data, object names, etc.
+	// for whatever frame is specified.  Returns the maximum
+	// frame number.  The minimum frame number is 0.
+	// There must always exist at least one frame, frame 0
+	int set_animation_frame(int framenumber);
+
 bool convert(char* infile);
 	
 public:
@@ -151,6 +158,7 @@ char   fileout_name[81];
 float  cor3[3][MAX_COR3];
 float  cor3_normal[3][MAX_COR3];
 float  cor3_rgb[3][MAX_COR3];
+float  cor3_uv[2][MAX_COR3];
 
 int    face[MAX_ORDER][MAX_FACE];
 int    face_flags[MAX_FACE];
@@ -202,6 +210,11 @@ float  pivot[3];
 float  rgbcolor[3][MAX_COLOR];
 char   temp_name[81];
 
+// this member holds the frame data, and knows how to
+// properly set all the converter data members whenever we
+// switch frames.  It also properly frees frame data when destroyed
+csConverter_FrameManipulator *frame_builder;
+
 private:
 
 int                ase_read ( FILE *filein );
@@ -231,6 +244,8 @@ int                iv_read ( FILE *filein );
 int                iv_write ( FILE *fileout );
 int                ivec_max ( int n, int *a );
 int                leqi ( char* string1, char* string2 );
+int		   md2_read ( FILE *filein );
+int		   md2_write ( FILE *fileout );
 void               minmax ( void );
 void               news ( void );
 int                obj_read ( FILE *filein );
@@ -280,6 +295,21 @@ int                vla_write ( FILE *fileout );
 
 };
 
+class csConverter_FrameManipulator
+{
+  public:
+    csConverter_FrameManipulator(converter *target);
+    virtual ~csConverter_FrameManipulator();
+
+    // returns maximum frame number
+    virtual int GetMaxAllowedFrame() const = 0;
+
+    // set the current frame.  return maximum frame number
+    virtual int SetFrame(int setto) = 0;
+
+  protected:
+    converter* m_data_target;
+};
 
 #endif  // !defined(AFX_CONVERTER_H__1B690D4B_0CC0_11D3_8D99_444553540000__INCLUDED_)
 
