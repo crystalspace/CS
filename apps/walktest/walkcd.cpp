@@ -283,11 +283,14 @@ void DoGravity (csVector3& pos, csVector3& vel)
 	hits += terrain->CollisionDetect (&test);
       }
     }
-    if (hits)
-    {
-      new_pos = test.GetOrigin ();
-    }
   }
+
+  // If there were hits with the terrain we update our new position
+  // here. Side note: this could moved outside the loop above because
+  // a compiler bug with gcc 2.7.2 prevented it from working when inside
+  // the loop.
+  if (hits) new_pos = test.GetOrigin ();
+
   if (hits == 0)
   {
     Sys->collide_system->ResetCollisionPairs ();

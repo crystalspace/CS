@@ -1,5 +1,16 @@
 The history order has been reversed so that new features are at the top.
 
+16-Aug-2000
+	- Alex Pfaffe fixed texture coordinate generation in the terrain
+	  engine. This makes the terrain look MUCH nicer.
+	- Worked around a compiler bug in Solaris/gcc 2.7.2 with collision
+	  detection and terrain engine.
+	- Wouter Wijngaards fixed a 'make solaris' bug with detection
+	  of XFree86.
+	- Wyatt Miler fixed a compile error in csSystemDriver header.
+15-Aug-2000
+	- Norman Kramer removed cstools.
+	- Paul Garceau added -fvtable-thunks to cygwin.mak.
 14-Aug-2000
 	- Norman Kramer added sound NULL driver entry.
 	- Norman also made soundloader load on startup.
