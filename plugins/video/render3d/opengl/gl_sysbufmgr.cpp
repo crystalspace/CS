@@ -4,20 +4,20 @@
 #include "csgeom/vector3.h"
 #include "ivideo/rndbuf.h"
 
-#include "gl_softrbufmgr.h"
+#include "gl_sysbufmgr.h"
 
-SCF_IMPLEMENT_IBASE (csSoftRenderBuffer)
+SCF_IMPLEMENT_IBASE (csSysRenderBuffer)
   SCF_IMPLEMENTS_INTERFACE (iRenderBuffer)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_IBASE (csSoftRenderBufferManager)
+SCF_IMPLEMENT_IBASE (csSysRenderBufferManager)
   SCF_IMPLEMENTS_INTERFACE (iRenderBufferManager)
 SCF_IMPLEMENT_IBASE_END
 
 
-csPtr<iRenderBuffer> csSoftRenderBufferManager::GetBuffer(int buffersize, CS_RENDERBUFFER_TYPE location)
+csPtr<iRenderBuffer> csSysRenderBufferManager::GetBuffer(int buffersize, CS_RENDERBUFFER_TYPE location)
 {
-  csSoftRenderBuffer *buffer = new csSoftRenderBuffer (
+  csSysRenderBuffer *buffer = new csSysRenderBuffer (
     new char[buffersize], buffersize, location);
   return csPtr<iRenderBuffer> (buffer);
 }

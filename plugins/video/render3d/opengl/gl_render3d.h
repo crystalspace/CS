@@ -61,6 +61,7 @@ private:
 
   csGLExtensionManager ext;
   
+  int current_drawflags;
 
   float fov;
   int viewwidth, viewheight;

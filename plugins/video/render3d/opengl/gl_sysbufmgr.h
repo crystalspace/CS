@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __GL_SOFTRBUFMGR_H__
-#define __GL_SOFTRBUFMGR_H__
+#ifndef __GL_SYSRBUFMGR_H__
+#define __GL_SYSRBUFMGR_H__
 
 #include "csutil/strhash.h"
 #include "ivideo/rndbuf.h"
@@ -35,7 +35,7 @@ struct iTextureHandle;
  * This is a general buffer to be used by the renderer. It can ONLY be
  * created by the VB manager
  */
-class csSoftRenderBuffer : public iRenderBuffer
+class csSysRenderBuffer : public iRenderBuffer
 {
 private:
   void *buffer;
@@ -45,15 +45,15 @@ public:
   SCF_DECLARE_IBASE;
 
   
-  csSoftRenderBuffer (void *buffer, int size, CS_RENDERBUFFER_TYPE type)
+  csSysRenderBuffer (void *buffer, int size, CS_RENDERBUFFER_TYPE type)
   {
     SCF_CONSTRUCT_IBASE (NULL)
 
-    csSoftRenderBuffer::buffer = buffer;
-    csSoftRenderBuffer::size = size;
-    csSoftRenderBuffer::type = type;
+    csSysRenderBuffer::buffer = buffer;
+    csSysRenderBuffer::size = size;
+    csSysRenderBuffer::type = type;
   }
-  ~csSoftRenderBuffer ()
+  ~csSysRenderBuffer ()
   {
     if (buffer != NULL)
       delete[] buffer;
@@ -79,7 +79,7 @@ public:
   int GetColorLength() { return size/sizeof(csColor); }
 };
 
-class csSoftRenderBufferManager: public iRenderBufferManager
+class csSysRenderBufferManager: public iRenderBufferManager
 {
 public:
   SCF_DECLARE_IBASE;
@@ -94,4 +94,4 @@ public:
   void UnlockBuffer(iRenderBuffer* buffer) {}
 };
 
-#endif //  __GL_SOFTRBUFMGR_H__
+#endif //  __GL_SYSRBUFMGR_H__
