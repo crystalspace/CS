@@ -28,6 +28,10 @@ The history order has been reversed so that new features are at the top.
 	      'goto').
 	    - Downgraded severity level of diagnostic messages from FATAL to
 	      WARNING.
+	- Started work on leafy BSP builder in levtool. This will eventually
+	  be used for PVS.
+	- Fixed a bad bug in lighting. It was doing delete [] data
+	  instead of data->DecRef ().
 5-Oct-2000
 	- Samuel Humphreys fixed particle systems in STATBSP worlds. Their
 	  bsp bounding boxes would otherwise remain uninitialized and so

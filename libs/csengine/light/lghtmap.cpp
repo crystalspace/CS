@@ -339,7 +339,7 @@ bool csLightMap::ReadFromCache (int w, int h, csPolygonSet* owner,
     d += lm_size;
   }
 
-  delete [] data;
+  data->DecRef ();
 
   return true;
 }
