@@ -12,12 +12,23 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+27-Jan-2000
+	- Update to some docs from Wyatt Miler.
 26-Jan-2000
 	- Michael Dale Long added DeleteAt() to csString to delete a range
 	  of characters within a csString.
 	- Michael also updated csConsole backspace handling to use
 	  DeleteAt().
 	- Update to api.tex from Wyatt Miler.
+	- Fixed 'default' mipmapping setting.
+	- Made a new 'line3d' 3D renderer and a linex2d 2D driver. This
+	  is for wireframe rendering.
+	- Simon Boily restored multipass support in the Direct3D 6.1
+	  renderer (more efficient, faster). He also implemented vertex
+	  caching/batching in PolygonFX (roughly 30% speed increase)
+	  it could be tweaked for better performance. He fixed PolygonFX
+	  so that it can do flat/gouraud polygons and he added more
+	  hardware caps checking.
 25-Jan-2000
 	- Major update to the csConsole plugin from Michael Dale Long.
 	  He added csConsoleInput, cursor functionality, implemented
@@ -64,11 +75,11 @@ Short-term cleanups that need to be done:
 	- Andrew also fixed the makefiles so that the define NO_ASSEMBLER
 	  when compiling with MODE != optimize.
 	- Thomas Hieber added some changes to the Direct3D port contribued
-	  by simonb@telisphere.com. He added multitexturing support and
-	  render state caching (more efficient render state changes).
-	  The multipass code has been removed. This will be rewritten
-	  later. So lightmaps will currently not appear on hardware without
-	  multitexturing.
+	  by Simon Boily <simonb@telisphere.com>. He added multitexturing
+	  support and render state caching (more efficient render state
+	  changes). The multipass code has been removed. This will be
+	  rewritten later. So lightmaps will currently not appear on
+	  hardware without multitexturing.
 	- simonb@telisphere.com also fixed the detection code for windowed
 	  mode.
 	- Thomas Hieber adjusted project files for network demo provided
