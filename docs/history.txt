@@ -1,5 +1,12 @@
 The history order is reversed so that new features are at the top.
 
+7-Jun-2002
+	- Added several entries to the faq.
+	- Added new 'analyze_vis' command to Dynavis. This command
+	  will first run a new exact visibility culler (a very slow one)
+	  and compare the results with the visibility testing of Dynavis.
+	  That way the quality of culling (and correctness) can be
+	  calculated. Assigned alt-a to this command in BugPlug.
 6-Jun-2002
 	- Changed 'double' to 'float' in OpenGL renderer texture cache.
 	- Added 'toggle_queue' command to Dynavis. Assigned this command

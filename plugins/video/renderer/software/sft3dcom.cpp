@@ -1610,7 +1610,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
   if (num_vertices < 3)
     return;
 
-  // For debugging: is we reach the maximum number of polygons to draw we simply stop.
+  // For debugging: if we reach the maximum number of polygons to draw we simply stop.
   dbg_current_polygon++;
   if (dbg_current_polygon == dbg_max_polygons_to_draw-1)
     return;
@@ -1911,7 +1911,7 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
   if (num_vertices < 3)
     return;
 
-  // For debugging: is we reach the maximum number of polygons to draw we simply stop.
+  // For debugging: if we reach the maximum number of polygons to draw we simply stop.
   dbg_current_polygon++;
   if (dbg_current_polygon == dbg_max_polygons_to_draw-1)
     return;

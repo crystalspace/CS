@@ -264,5 +264,40 @@ actually make this work you need to call @code{DeferUpdateLighting()}
 on the object when it is first created, when lights in the vicinity move,
 or when the object itself moves. @xref{HOWTO Mesh LightAnim}
 
+@item
+Why isn't my polygon lit correctly? It is simply full bright.
+
+@strong{A}: Both the software and OpenGL renderer have a limitation on
+lightmap size. For the software renderer the limitation is that the
+final resulting lit texture may not exceed 1500000 pixels. To calculate
+the final resulting lit texture size the easiest way is to take the
+texture size that is used on the polygon (i.e. 64x64 for example) and
+calculate how many times the texture is repeated on that polygon. If the
+given texture is repeated four times on the polygon then you basically
+have a total texture of 256x256 which will be fine. For the OpenGL
+renderer the limitation is that a lightmap cannot be bigger than 256x256.
+Note that there will be a lightmap lumel for every 16x16 texels on the
+polygon. To avoid this limitation you basically have four possible
+solutions: (1) split the polygon into smaller polygons, (2) use a smaller
+base texture (this will also reduce size of lightmap/lit texture), (3)
+decrease the number of times the texture is tiled on the polygon, and
+finally (4) use a low-resolution base texture and a high-resolution detail
+texture to add detail (this only works for OpenGL).
+
+@item
+I added lights, and/or moved geometry in my level but they are not correctly
+lit. What did I do wrong?
+
+@strong{A}: Crystal Space does not automatically recalculate lighting.
+To do that you have to use the @samp{-relight} commandline option.
+
+@item
+Every time I start my Crystal Space based application the lights are
+recalculated. How can I avoid that?
+
+@strong{A}: Use the @samp{-relight} commandline option. This will make
+sure the lighting gets recalculated AND cached in the zip file of your
+level.
+
 @end itemize
 

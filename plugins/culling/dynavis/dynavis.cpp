@@ -43,6 +43,7 @@
 #include "kdtree.h"
 #include "covbuf.h"
 #include "wqueue.h"
+#include "exvis.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -391,7 +392,7 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
   csVector2 verts2d[64];
   for (i = 0 ; i < poly_count ; i++, poly++)
   {
-    if (planes[i].Classify (campos_object) <= 0.0)
+    if (planes[i].Classify (campos_object) >= 0.0)
       continue;
 
     int num_verts = poly->num_vertices;
@@ -1173,6 +1174,79 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
     	"Dumped current state.");
     do_state_dump = true;
     return true;
+  }
+  else if (!strcmp (cmd, "analyze_vis"))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
+    	"Analyze visibility status.");
+    csExactCuller* excul = new csExactCuller (scr_width, scr_height);
+    int i;
+    for (i = 0 ; i < visobj_vector.Length () ; i++)
+    {
+      csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
+        visobj_vector[i];
+      iVisibilityObject* visobj = visobj_wrap->visobj;
+      iMovable* movable = visobj->GetMovable ();
+      iPolygonMesh* polymesh = visobj->GetObjectModel ()
+      	->GetSmallerPolygonMesh ();
+      if (polymesh)
+        excul->AddObject (visobj_wrap, polymesh, movable, debug_camera,
+  	  visobj_wrap->model->GetPlanes ());
+    }
+    excul->VisTest ();
+    int tot_vis_exact = 0;
+    int tot_vis_dynavis = 0;
+    int tot_objects = 0;
+    int tot_poly_exact = 0;
+    int tot_poly_dynavis = 0;
+    int tot_poly = 0;
+    for (i = 0 ; i < visobj_vector.Length () ; i++)
+    {
+      csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
+        visobj_vector[i];
+      iPolygonMesh* polymesh = visobj_wrap->visobj->GetObjectModel ()
+      	->GetSmallerPolygonMesh ();
+      if (polymesh)
+      {
+        int vispix, totpix;
+        excul->GetObjectStatus (visobj_wrap, vispix, totpix);
+
+	tot_objects++;
+	tot_poly += polymesh->GetPolygonCount ();
+	if (vispix)
+	{
+	  tot_vis_exact++;
+	  tot_poly_exact += polymesh->GetPolygonCount ();
+	}
+	if (visobj_wrap->reason >= VISIBLE)
+	{
+	  tot_vis_dynavis++;
+	  tot_poly_dynavis += polymesh->GetPolygonCount ();
+	}
+
+        iObject* iobj = SCF_QUERY_INTERFACE (visobj_wrap->visobj, iObject);
+        printf ("  obj(%d,'%s')  vis=%s   vispix=%d totpix=%d      %s\n",
+      	  i,
+	  (iobj && iobj->GetName ()) ? iobj->GetName () : "?",
+	  visobj_wrap->reason == INVISIBLE_PARENT ? "invis parent" :
+	  visobj_wrap->reason == INVISIBLE_FRUSTUM ? "invis frustum" :
+	  visobj_wrap->reason == INVISIBLE_TESTRECT ? "invis testrect" :
+	  visobj_wrap->reason == VISIBLE ? "vis" :
+	  visobj_wrap->reason == VISIBLE_INSIDE ? "vis inside" :
+	  visobj_wrap->reason == VISIBLE_HISTORY ? "vis history" :
+	  "?",
+	  vispix, totpix,
+	  vispix != 0 && visobj_wrap->reason < VISIBLE ? "????!!!!" : "");
+        if (iobj) iobj->DecRef ();
+      }
+    }
+    printf ("Summary: #objects=%d #vis(exact)=%d #vis(dynavis)=%d\n",
+    	tot_objects, tot_vis_exact, tot_vis_dynavis);
+    printf ("Summary: #poly=%d #poly(exact)=%d #poly(dynavis)=%d\n",
+    	tot_poly, tot_poly_exact, tot_poly_dynavis);
+    fflush (stdout);
+
+    delete excul;
   }
   return false;
 }
