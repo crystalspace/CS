@@ -40,6 +40,17 @@ private:
   csSector* sector;
   /// If true we are in a mirrored world.
   bool mirror;
+
+  /**
+   * The following vector is the location of the camera in
+   * unmirrored camera space. If we didn't go through any
+   * mirrors then this will be equal to 0,0,0. However, if the
+   * current camera has passed through some mirrors then this
+   * will be the mirrored position of 0,0,0 through all the
+   * mirrors that we passed.
+   */
+  csVector3 unmirrored_camera_pos;
+
   /**
    * If true then we only check collision with portals and not
    * with other polygons.
@@ -400,6 +411,14 @@ public:
     virtual void SetMirrored (bool m)
     {
       scfParent->SetMirrored (m);
+    }
+    virtual void SetUnmirroredCameraPos (const csVector3& ump)
+    {
+      scfParent->unmirrored_camera_pos = ump;
+    }
+    virtual const csVector3& GetUnmirroredCameraPos () const
+    {
+      return scfParent->unmirrored_camera_pos;
     }
     virtual csPlane3* GetFarPlane () const
     {

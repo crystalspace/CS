@@ -679,9 +679,13 @@ public:
   /// Return true if we have near plane.
   virtual bool HasNearPlane () { return do_near_plane; }
 
-
   /// Draw a triangle mesh.
   virtual void DrawTriangleMesh (G3DTriangleMesh& mesh);
+  /**
+   * Debug version that draws outlines only. Is automatically
+   * called by DrawTriangleMesh if needed.
+   */
+  void DrawTriangleMeshEdges (G3DTriangleMesh& mesh);
 
   /// Draw a polygon mesh.
   virtual void DrawPolygonMesh (G3DPolygonMesh& mesh);

@@ -484,6 +484,20 @@ bool csBallMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
   csReversibleTransform tr_o2c = camera->GetTransform ()
     	* movable->GetFullTransform ().GetInverse ();
+
+#if 1
+  csVector3 radius;
+  csSphere sphere;
+  GetRadius (radius, sphere.GetCenter ());
+  float max_radius = radius.x;
+  if (max_radius < radius.y) max_radius = radius.y;
+  if (max_radius < radius.z) max_radius = radius.z;
+  sphere.SetRadius (max_radius);
+  int clip_portal, clip_plane, clip_z_plane;
+  if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
+  	clip_z_plane) == false)
+    return false;
+#else
   float fov = camera->GetFOV ();
   float shiftx = camera->GetShiftX ();
   float shifty = camera->GetShiftY ();
@@ -504,6 +518,7 @@ bool csBallMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   if (rview->ClipBBox (sbox, cbox, clip_portal, clip_plane,
   	clip_z_plane) == false)
     return false;
+#endif
 
   g3d->SetObjectToCamera (&tr_o2c);
   top_mesh.clip_portal = clip_portal;

@@ -1312,6 +1312,88 @@ void csGraphics3DOGLCommon::Print (csRect * area)
   G2D->Print (area);
 }
 
+void csGraphics3DOGLCommon::DrawTriangleMeshEdges (G3DTriangleMesh& mesh)
+{
+  int i;
+  int color = txtmgr->FindRGB (255, 255, 255);
+  int num_vertices = mesh.buffers[0]->GetVertexCount ();
+
+  //===========
+  // Do vertex tweening and/or transformation to camera space
+  // if any of those are needed. When this is done 'verts' will
+  // point to an array of camera vertices.
+  //===========
+  csVector3* f1 = mesh.buffers[0]->GetVertices ();
+  csVector3* work_verts;
+
+  if (num_vertices > tr_verts.Limit ())
+  {
+    tr_verts.SetLimit (num_vertices);
+    uv_verts.SetLimit (num_vertices);
+    color_verts.SetLimit (num_vertices);
+  }
+
+  if (mesh.num_vertices_pool > 1)
+  {
+    // Vertex morphing.
+    float tr = mesh.morph_factor;
+    float remainder = 1 - tr;
+    csVector3* f2 = mesh.buffers[1]->GetVertices ();
+    for (i = 0 ; i < num_vertices ; i++)
+      tr_verts[i] = tr * f2[i] + remainder * f1[i];
+    work_verts = tr_verts.GetArray ();
+  }
+  else
+  {
+    work_verts = f1;
+  }
+  csTriangle *triangles = mesh.triangles;
+
+  glPushAttrib (GL_ENABLE_BIT|GL_COLOR_BUFFER_BIT|GL_CURRENT_BIT|
+  	GL_DEPTH_BUFFER_BIT);
+  glDisable (GL_DEPTH_TEST);
+  glDisable (GL_BLEND);
+  for (i = 0 ; i < mesh.num_triangles ; i++)
+  {
+    int a = triangles[i].a;
+    int b = triangles[i].b;
+    int c = triangles[i].c;
+    csVector3 va = work_verts[a];
+    csVector3 vb = work_verts[b];
+    csVector3 vc = work_verts[c];
+    if (mesh.vertex_mode == G3DTriangleMesh::VM_VIEWSPACE)
+    {
+      // We have 3D coordinates that are already transformed to camera space
+      // (in 3 floats).
+    }
+    else
+    {
+      // We have 3D coordinates that are not transformed to camera space
+      // (in 3 floats).
+      va = o2c.Other2This (va);
+      vb = o2c.Other2This (vb);
+      vc = o2c.Other2This (vc);
+    }
+    if (va.z < .01 || vb.z < .01 || vc.z < .01) continue;
+    float iz;
+    float x1, y1, x2, y2, x3, y3;
+    iz = aspect / va.z;
+    x1 = va.x * iz + asp_center_x;
+    y1 = height - va.y * iz - asp_center_y;
+    iz = aspect / vb.z;
+    x2 = vb.x * iz + asp_center_x;
+    y2 = height - vb.y * iz - asp_center_y;
+    iz = aspect / vc.z;
+    x3 = vc.x * iz + asp_center_x;
+    y3 = height - vc.y * iz - asp_center_y;
+
+    G2D->DrawLine (x1, y1, x2, y2, color);
+    G2D->DrawLine (x2, y2, x3, y3, color);
+    G2D->DrawLine (x3, y3, x1, y1, color);
+  }
+  glPopAttrib ();
+}
+
 void csGraphics3DOGLCommon::DebugDrawElements (iGraphics2D* g2d,
 	int num_tri3, int* tris,
   	GLfloat* verts, int color, bool coords3d, bool transformed)
@@ -2473,6 +2555,7 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
   // num_planes is the number of planes to test with. If there is no
   // near clipping plane then this will be equal to num_frust.
   int num_planes = num_frust;
+//printf ("transform=%d plane_clipping=%d z_plane_clipping=%d mirror=%d\n", transform, plane_clipping, z_plane_clipping, mirror); fflush (stdout);
   if (plane_clipping)
   {
   //@@@ If mirror???
@@ -2734,6 +2817,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     CS_ASSERT (mesh.buffers[1]->IsLocked ());
   }
 #endif
+
   int num_vertices = mesh.buffers[0]->GetVertexCount ();
 
   FlushDrawPolygon ();
@@ -2920,6 +3004,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   //===========
   // Here we perform lazy or software clipping if needed.
   //===========
+//printf ("how_clip=%c use_lazy_clipping=%d do_plane_clipping=%d do_z_plane_clipping=%d\n", how_clip, use_lazy_clipping, do_plane_clipping, do_z_plane_clipping); fflush (stdout);
   if (how_clip == '0' || use_lazy_clipping
   	|| do_plane_clipping || do_z_plane_clipping)
   {
@@ -3281,12 +3366,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   glMatrixMode (GL_PROJECTION);
   glPopMatrix ();
 
-  if (debug_edges)
-    DebugDrawElements (G2D,
-	num_triangles*3, (int*)triangles, (GLfloat*)& work_verts[0],
-		txtmgr->FindRGB (255, 0, 0), true,
-		mesh.vertex_mode == G3DTriangleMesh::VM_VIEWSPACE);
-
   //===========
   // Disable/cleanup all clipping stuff.
   //===========
@@ -3295,6 +3374,13 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   if (clip_planes_enabled)
     for (i = 0 ; i < frustum.GetVertexCount ()+reserved_planes ; i++)
       glDisable ((GLenum)(GL_CLIP_PLANE0+i));
+
+  if (debug_edges)
+    DrawTriangleMeshEdges (mesh);
+    //DebugDrawElements (G2D,
+	//num_triangles*3, (int*)triangles, (GLfloat*)& work_verts[0],
+		//txtmgr->FindRGB (255, 0, 0), true,
+		//mesh.vertex_mode == G3DTriangleMesh::VM_VIEWSPACE);
 
   SetMirrorMode (false);
 }

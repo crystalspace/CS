@@ -1,5 +1,20 @@
 he history order is reversed so that new features are at the top.
 
+16-Jan-2002
+	- Fixed a bug in iRenderView::ClipBSphere() in combination
+	  with mirroring and a portal that clips geometry.
+	- I discovered that there is a bug when a CAMERA object
+	  (CS_ENTITY_CAMERA keyword, like a sky-box or sky-dome) is
+	  mirrored. The position will then not be correct in the
+	  mirror. To try to solve this bug I extended the iCamera
+	  interface with SetUnmirroredCameraPos(). At this moment
+	  the bug is still not fixed though.
+	- Switched ball plugin to use ClipBSphere instead of ClipBBox.
+	- Implemented slightly better edge drawing capabilities in
+	  OpenGL renderer. This time the real edges of the triangles
+	  are shown instead of what the OpenGL renderer will render
+	  with glDrawElements. This is only for DrawTriangleMesh() at
+	  the moment.
 15-Jan-2002
 	- Changed iIsoEngine::CreateMeshFactory() to return
 	  iMeshFactoryWrapper instead of iMeshObjectFactory.

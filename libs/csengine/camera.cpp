@@ -52,6 +52,7 @@ csCamera::csCamera () : csOrthoTransform()
   fp = NULL;
   cameranr = cur_cameranr++;
   only_portals = true;
+  unmirrored_camera_pos.Set (0, 0, 0);
 }
 
 csCamera::csCamera (csCamera* c) : csOrthoTransform ()
@@ -154,17 +155,26 @@ void csCamera::Correct (int n, float* vals[])
   if (vals[2]!=NULL)
   { 
     if (*vals[0] < *vals[1])
-    { r = *vals[2];  *vals[2] = *vals[0];  *vals[0] = r; }
+    {
+      r = *vals[2];
+      *vals[2] = *vals[0];
+      *vals[0] = r;
+    }
     else
-    { r = *vals[2];  *vals[2] = *vals[1];  *vals[1] = r; }
+    {
+      r = *vals[2];
+      *vals[2] = *vals[1];
+      *vals[1] = r;
+    }
   }
   
   angle = atan2 (*vals[1], *vals[0]);
-  angle = (TWO_PI / n) * QRound(n * angle / TWO_PI);
-  *vals[1] = qsqrt( (*vals[0])*(*vals[0]) + (*vals[1])*(*vals[1]) );
+  angle = (TWO_PI / n) * QRound (n * angle / TWO_PI);
+  *vals[1] = qsqrt ( (*vals[0])*(*vals[0]) + (*vals[1])*(*vals[1]) );
   Correct (n, vals+1);
   r = *vals[1];
-  *vals[0] = r*cos(angle);  *vals[1] = r*sin(angle); 
+  *vals[0] = r*cos (angle);
+  *vals[1] = r*sin (angle); 
   cameranr = cur_cameranr++;
 }
 
@@ -192,5 +202,7 @@ void csCamera::ComputeDefaultAngle (int width)
   float rview_fov = (float)GetDefaultFOV ()/2.;
   float disp_width = (float)width/2.;
   float inv_disp_radius = qisqrt (rview_fov*rview_fov + disp_width*disp_width);
-  default_fov_angle = 2. * acos (disp_width * inv_disp_radius) * (360. / TWO_PI);
+  default_fov_angle = 2. * acos (disp_width * inv_disp_radius)
+  	* (360. / TWO_PI);
 }
+

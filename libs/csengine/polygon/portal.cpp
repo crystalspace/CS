@@ -299,9 +299,21 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
   {
     iCamera* inewcam = rview->CreateNewCamera ();
 
+    csVector3 ump = inewcam->GetUnmirroredCameraPos ();
+//printf ("1: ump=%g,%g,%g\n", ump.x, ump.y, ump.z); fflush (stdout);
+    ump = inewcam->GetTransform ().This2Other (ump);
+//printf ("2: ump=%g,%g,%g\n", ump.x, ump.y, ump.z); fflush (stdout);
+    ump = Warp (ump);
+//printf ("3: ump=%g,%g,%g\n", ump.x, ump.y, ump.z); fflush (stdout);
+
     bool mirror = inewcam->IsMirrored ();
     WarpSpace (inewcam->GetTransform (), mirror);
     inewcam->SetMirrored (mirror);
+
+    ump = inewcam->GetTransform ().Other2This (ump);
+//printf ("4: ump=%g,%g,%g\n", ump.x, ump.y, ump.z); fflush (stdout);
+
+    inewcam->SetUnmirroredCameraPos (ump);
 
     sector->GetPrivateObject ()->Draw (rview);
   }

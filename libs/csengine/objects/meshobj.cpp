@@ -191,9 +191,28 @@ void csMeshWrapper::Draw (iRenderView* rview)
   if (flags.Check (CS_ENTITY_INVISIBLE)) return;
   if (flags.Check (CS_ENTITY_CAMERA))
   {
+    // To render an entity that is centered around the camera
+    // we take the regular camera transform and replace the shift
+    // vector with 0. Except if the camera is mirrored in which case
+    // we do something special (see below).
+
     csOrthoTransform& trans = rview->GetCamera ()->GetTransform ();
     csVector3 old = trans.GetO2TTranslation ();
-    trans.SetO2TTranslation (csVector3 (0));
+
+    //if (rview->GetCamera ()->IsMirrored ())
+    //{
+      // The camera is mirrored. In this case we don't set the translation
+      // of the transform to 0,0,0 but instead to the mirror position of
+      // 0,0,0.
+      const csVector3& ump = rview->GetCamera ()->GetUnmirroredCameraPos ();
+      trans.SetO2TTranslation (ump);
+    //}
+    //else
+    //{
+      //// Normal un-mirrored case.
+      //trans.SetO2TTranslation (csVector3 (0));
+    //}
+
     DrawInt (rview);
     trans.SetO2TTranslation (old);
   }

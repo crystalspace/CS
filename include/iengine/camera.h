@@ -42,7 +42,7 @@ class csVector2;
 struct iSector;
 struct iPolygon3D;
 
-SCF_VERSION (iCamera, 0, 0, 13);
+SCF_VERSION (iCamera, 0, 1, 0);
 
 /**
  * Camera class. This class represents camera objects which can be used to
@@ -168,6 +168,19 @@ struct iCamera : public iBase
   virtual bool IsMirrored () const = 0;
   /// Set mirrored state.
   virtual void SetMirrored (bool m) = 0;
+
+  /**
+   * Set the position of the unmirrored camera.
+   * This vector is the location of the camera in unmirrored camera space.
+   * If we didn't go through any mirrors then this will be equal to 0,0,0.
+   * However, if the current camera has passed through some mirrors then this
+   * will be the mirrored position of 0,0,0 through all the
+   * mirrors that we passed.
+   */
+  virtual void SetUnmirroredCameraPos (const csVector3& ump) = 0;
+
+  /// Get the position of the unmirrored camera.
+  virtual const csVector3& GetUnmirroredCameraPos () const = 0;
 
   /**
    * Check if there is a polygon in front of us in the direction
