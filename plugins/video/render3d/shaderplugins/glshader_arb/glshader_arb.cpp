@@ -34,6 +34,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/shader/shader.h"
 
 #include "../../opengl/glextmanager.h"
+#include "../../opengl/gl_helper.h"
 
 #include "glshader_avp.h"
 
@@ -85,7 +86,7 @@ bool csGLShader_ARB::SupportType(const char* type)
 csPtr<iShaderProgram> csGLShader_ARB::CreateProgram(const char* type)
 {
   if( strcasecmp(type, "gl_arb_vp") == 0)
-    return csPtr<iShaderProgram>(new csShaderGLAVP(object_reg, ext));
+    return csPtr<iShaderProgram>(new csShaderGLAVP(object_reg, ext, varr));
   else
     return NULL;
 }
@@ -99,6 +100,7 @@ void csGLShader_ARB::Open()
   csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r, iShaderRenderInterface);
 
   ext = (csGLExtensionManager*) sri->GetPrivateObject ("ext");
+  varr = (csGLVertexArrayHelper*) sri->GetPrivateObject ("varr");
 }
 
 csPtr<iString> csGLShader_ARB::GetProgramID(const char* programstring)

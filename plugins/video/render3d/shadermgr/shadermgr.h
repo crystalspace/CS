@@ -143,17 +143,30 @@ public:
 class csShader : public iShader
 {
 private:
+  csRef<iObjectRegistry> objectreg;
   csHashMap* variables;
   csBasicVector* techniques;
   csShaderManager* parent;
   char* name;
+
+  //loading related
+  enum
+  {
+    XMLTOKEN_SHADER,
+    XMLTOKEN_TECHNIQUE,
+    XMLTOKEN_DECLARE
+  };
+
+  csStringHash xmltokens;
+  void BuildTokenHash();
+
 public:
   SCF_DECLARE_IBASE;
 
   csShaderManager* GetParent() {return parent;}
 
-  csShader(csShaderManager* owner);
-  csShader(const char* name, csShaderManager* owner);
+  csShader(csShaderManager* owner, iObjectRegistry* reg);
+  csShader(const char* name, csShaderManager* owner, iObjectRegistry* reg);
   virtual ~csShader();
 
   //====================== iShader =====================//
@@ -206,12 +219,23 @@ private:
   int priority;
   csBasicVector* passes;
   csShader* parent;
+  csRef<iObjectRegistry> objectreg;
+
+  //loading related
+  enum
+  {
+    XMLTOKEN_PASS
+  };
+
+  csStringHash xmltokens;
+  void BuildTokenHash();
+
 public:
   SCF_DECLARE_IBASE;
 
   csShader* GetParent() {return parent;}
   
-  csShaderTechnique(csShader* owner);
+  csShaderTechnique(csShader* owner , iObjectRegistry* reg);
   virtual ~csShaderTechnique();
   
 
@@ -252,19 +276,32 @@ class csShaderPass : public iShaderPass
 private:
   csRef<iShaderProgram> vp;
   csRef<iShaderProgram> fp;
-
+  csRef<iObjectRegistry> objectreg;
   csShaderTechnique* parent;
   csHashMap variables;
+
+    //loading related
+  enum
+  {
+    XMLTOKEN_DECLARE,
+    XMLTOKEN_VP,
+    XMLTOKEN_FP
+  };
+
+  csStringHash xmltokens;
+  void BuildTokenHash();
+
 public:
   SCF_DECLARE_IBASE;
 
   iShaderTechnique* GetParent() {return parent;}
 
-  csShaderPass(csShaderTechnique* owner)
+  csShaderPass(csShaderTechnique* owner, iObjectRegistry* reg)
   {
     SCF_CONSTRUCT_IBASE( NULL );
     vp = 0; fp = 0;
     parent = owner;
+    objectreg = reg;
   }
   virtual ~csShaderPass () {}
 

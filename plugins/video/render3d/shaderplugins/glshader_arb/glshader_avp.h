@@ -51,6 +51,7 @@ private:
   };
 
   csGLExtensionManager* ext;
+  csGLVertexArrayHelper* varr;
   csRef<iObjectRegistry> object_reg;
 
   unsigned int program_num;
@@ -69,12 +70,13 @@ private:
 public:
   SCF_DECLARE_IBASE;
 
-  csShaderGLAVP(iObjectRegistry* objreg, csGLExtensionManager* ext)
+  csShaderGLAVP(iObjectRegistry* objreg, csGLExtensionManager* ext, csGLVertexArrayHelper* varr)
   {
     validProgram = true;
     SCF_CONSTRUCT_IBASE (NULL);
     this->object_reg = objreg;
     this->ext = ext;
+    this->varr = varr;
     programstring = NULL;
   }
   virtual ~csShaderGLAVP ()

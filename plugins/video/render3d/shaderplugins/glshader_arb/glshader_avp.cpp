@@ -39,6 +39,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //#include "ivideo/shader/shadervar.h"
 
 #include "../../opengl/glextmanager.h"
+#include "../../opengl/gl_helper.h"
 
 #include "glshader_avp.h"
 
@@ -113,7 +114,7 @@ void csShaderGLAVP::Activate(iShaderPass* current, csRenderMesh* mesh)
     void* ptr = buf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER);
     if (ptr)
     {
-      ext->glVertexAttribPointerARB (e->attribnum, 
+      varr->VertexAttribPointer (e->attribnum, 
         source->GetComponentCount (e->name), GL_FLOAT, false, 0, ptr);
       ext->glEnableVertexAttribArrayARB (e->attribnum);
     }

@@ -23,11 +23,14 @@
 #include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "csutil/strset.h"
-#include "csutil/objreg.h"
 #include "csgeom/vector3.h"
+#include "csutil/objreg.h"
+#include "csutil/scfstr.h"
 #include "csgeom/vector4.h"
 #include "csutil/hashmap.h"
+#include "csutil/xmltiny.h"
 
+#include "iutil/document.h"
 #include "igeom/clip2d.h"
 #include "iutil/vfs.h"
 #include "iutil/eventq.h"
@@ -237,7 +240,7 @@ csPtr<iShader> csShaderManager::CreateShader()
   sprintf(name, "effect%2d", seqnumber);
   seqnumber++;
 
-  csShader* cshader = new csShader(name, this);
+  csShader* cshader = new csShader(name, this, objectreg);
   cshader->IncRef();
 
   shaders->Push(cshader);
@@ -268,23 +271,26 @@ csPtr<iShaderProgram> csShaderManager::CreateShaderProgram(const char* type)
   return NULL;
 }
 
+
 //===================== csShader ====================//
-csShader::csShader(csShaderManager* owner)
+csShader::csShader(csShaderManager* owner, iObjectRegistry* reg)
 {
   SCF_CONSTRUCT_IBASE( NULL );
   this->name = 0;
   variables = new csHashMap();
   techniques = new csBasicVector();
   parent = owner;
+  objectreg = reg;
 }
 
-csShader::csShader(const char* name, csShaderManager* owner)
+csShader::csShader(const char* name, csShaderManager* owner, iObjectRegistry* reg)
 {
   SCF_CONSTRUCT_IBASE( NULL );
   this->name = 0;
   variables = new csHashMap();
   techniques = new csBasicVector();
   parent = owner;
+  objectreg = reg;
   SetName(name);
 }
 
@@ -369,7 +375,7 @@ csBasicVector csShader::GetAllVariableNames()
 //technique-related
 csPtr<iShaderTechnique> csShader::CreateTechnique()
 {
-  iShaderTechnique* mytech = new csShaderTechnique(this);
+  iShaderTechnique* mytech = new csShaderTechnique(this, objectreg);
   mytech->IncRef();
 
   techniques->Push(mytech);
@@ -405,14 +411,89 @@ void csShader::MapStream(int mapid, const char* streamname)
 {
 }
 
+void csShader::BuildTokenHash()
+{
+  xmltokens.Register ("shader", XMLTOKEN_SHADER);
+  xmltokens.Register ("technique", XMLTOKEN_TECHNIQUE);
+  xmltokens.Register ("declare", XMLTOKEN_DECLARE);
+}
+
 bool csShader::Load(iDocumentNode* node)
 {
+  if (!node) 
+    return false;
+
+  BuildTokenHash();
+
+  if(node)
+  {
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while(it->HasNext())
+    {
+      csRef<iDocumentNode> child = it->Next();
+      if(child->GetType() != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch(id)
+      {
+      case XMLTOKEN_TECHNIQUE:
+        {
+          csRef<iShaderTechnique> tech = CreateTechnique();
+          tech->Load(child);
+          techniques->Push(tech);
+        }
+        break;
+      case XMLTOKEN_DECLARE:
+        {
+          //create a new variable
+          csRef<iShaderVariable> var = 
+            parent->CreateVariable (child->GetAttributeValue ("name"));
+          csStringID idtype = xmltokens.Request( child->GetAttributeValue("type") );
+          idtype -= 100;
+          var->SetType( (iShaderVariable::VariableType) idtype);
+          switch(idtype)
+          {
+          case iShaderVariable::INT:
+            var->SetValue( child->GetAttributeValueAsInt("default") );
+            break;
+          case iShaderVariable::VECTOR1:
+            var->SetValue( child->GetAttributeValueAsFloat("default") );
+            break;
+          case iShaderVariable::STRING:
+            var->SetValue(new scfString( child->GetAttributeValue("default")) );
+            break;
+          case iShaderVariable::VECTOR3:
+            const char* def = child->GetAttributeValue("default");
+            csVector3 v;
+            sscanf(def, "%f,%f,%f", &v.x, &v.y, &v.z);
+            var->SetValue( v );
+            break;
+          }
+          // @@@ I'll blame Matze if this is bad :) /Anders Stenberg
+          var->IncRef (); 
+          variables->Put( csHashCompute(var->GetName()), var);
+        }
+        break;
+      
+      }
+    }
+  }
   return false;
 }
 
 bool csShader::Load(iDataBuffer* program)
 {
-  return false;
+  csRef<iDocumentSystem> xml (CS_QUERY_REGISTRY (objectreg, iDocumentSystem));
+  if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
+  csRef<iDocument> doc = xml->CreateDocument ();
+  const char* error = doc->Parse (program);
+  if (error != NULL)
+  { 
+    csReport( objectreg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.render3d.shader.glarb",
+      "XML error '%s'!", error);
+    return false;
+  }
+  return Load(doc->GetRoot()->GetNode("shader"));
 }
 
 
@@ -493,8 +574,105 @@ iShaderVariable* csShaderPass::GetVariable(const char* string)
   return NULL;
 }
 
+void csShaderPass::BuildTokenHash()
+{
+  xmltokens.Register ("declare", XMLTOKEN_DECLARE);
+  xmltokens.Register ("vp", XMLTOKEN_VP);
+  xmltokens.Register ("fp", XMLTOKEN_FP);
+}
+
 bool csShaderPass::Load(iDocumentNode* node)
 {
+    if (!node) 
+    return false;
+
+  BuildTokenHash();
+  csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(objectreg, iShaderManager);
+
+  if(node)
+  {
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while(it->HasNext())
+    {
+      csRef<iDocumentNode> child = it->Next();
+      if(child->GetType() != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch(id)
+      {
+      case XMLTOKEN_VP:
+        {
+          csRef<iShaderProgram> vp = shadermgr->CreateShaderProgram(node->GetAttributeValue("type"));
+          if(vp)
+          {
+            if(node->GetAttribute("file"))
+            {
+              csRef<iVFS> vfs = CS_QUERY_REGISTRY(objectreg, iVFS);
+              //load from file
+              vp->Load( csRef<iDataBuffer>(vfs->ReadFile(node->GetAttributeValue("file"))));
+            }
+            else
+            {
+              vp->Load(node);
+            }
+            SetVertexProgram(vp);
+          }
+        }
+        break;
+      case XMLTOKEN_FP:
+        {
+          csRef<iShaderProgram> fp = shadermgr->CreateShaderProgram(node->GetAttributeValue("type"));
+          if(fp)
+          {
+            if(node->GetAttribute("file"))
+            {
+              csRef<iVFS> vfs = CS_QUERY_REGISTRY(objectreg, iVFS);
+              //load from file
+              fp->Load( csRef<iDataBuffer>(vfs->ReadFile(node->GetAttributeValue("file"))));
+            }
+            else
+            {
+              fp->Load(node);
+            }
+            SetVertexProgram(fp);
+          }
+        }
+        break;
+      case XMLTOKEN_DECLARE:
+        {
+          //create a new variable
+          csRef<iShaderVariable> var = 
+            shadermgr->CreateVariable (child->GetAttributeValue ("name"));
+          csStringID idtype = xmltokens.Request( child->GetAttributeValue("type") );
+          idtype -= 100;
+          var->SetType( (iShaderVariable::VariableType) idtype);
+          switch(idtype)
+          {
+          case iShaderVariable::INT:
+            var->SetValue( child->GetAttributeValueAsInt("default") );
+            break;
+          case iShaderVariable::VECTOR1:
+            var->SetValue( child->GetAttributeValueAsFloat("default") );
+            break;
+          case iShaderVariable::STRING:
+            var->SetValue(new scfString( child->GetAttributeValue("default")) );
+            break;
+          case iShaderVariable::VECTOR3:
+            const char* def = child->GetAttributeValue("default");
+            csVector3 v;
+            sscanf(def, "%f,%f,%f", &v.x, &v.y, &v.z);
+            var->SetValue( v );
+            break;
+          }
+          // @@@ I'll blame Matze if this is bad :) /Anders Stenberg
+          var->IncRef (); 
+          variables.Put( csHashCompute(var->GetName()), var);
+        }
+        break;
+      
+      }
+    }
+  }
   return false;
 }
 
@@ -517,11 +695,12 @@ bool csShaderPass::Prepare()
 }
 
 //================= csShaderTechnique ============//
-csShaderTechnique::csShaderTechnique(csShader* owner)
+csShaderTechnique::csShaderTechnique(csShader* owner, iObjectRegistry* reg)
 {
   SCF_CONSTRUCT_IBASE( NULL );
   passes = new csBasicVector();
   parent = owner;
+  objectreg = reg;
 }
 
 csShaderTechnique::~csShaderTechnique()
@@ -535,7 +714,7 @@ csShaderTechnique::~csShaderTechnique()
 
 csPtr<iShaderPass> csShaderTechnique::CreatePass()
 {
-  iShaderPass* mpass = new csShaderPass(this);
+  iShaderPass* mpass = new csShaderPass(this, objectreg);
   mpass->IncRef();
 
   passes->Push(mpass);
@@ -566,14 +745,46 @@ bool csShaderTechnique::IsValid()
   return valid;
 }
 
+void csShaderTechnique::BuildTokenHash()
+{
+  xmltokens.Register ("pass", XMLTOKEN_PASS);  
+}
+
 bool csShaderTechnique::Load(iDocumentNode* node)
 {
+  if (!node) 
+    return false;
+
+  BuildTokenHash();
+
+  if(node)
+  {
+    priority = node->GetAttributeValueAsInt("priority");
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while(it->HasNext())
+    {
+      csRef<iDocumentNode> child = it->Next();
+      if(child->GetType() != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch(id)
+      {
+      case XMLTOKEN_PASS:
+        {
+          csRef<iShaderPass> pass = CreatePass();
+          pass->Load(child);
+          passes->Push(pass);
+        }
+        break;
+      }
+    }
+  }
   return false;
 }
 
 bool csShaderTechnique::Load(iDataBuffer* program)
 {
-  return false;
+  return false;//don't load a technique from file
 }
 
 bool csShaderTechnique::Prepare()
