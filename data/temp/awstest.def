@@ -39,6 +39,19 @@ window "Another"
   Frame: (200,300)-(500,440)
   Style: wfsNormal
 
+  component "HideWindow" is "Command Button"
+  {
+    Frame: (100, 30) - (170, 50)
+    Style: bfsNormal
+    Caption: "Close"
+
+    connect 
+    {
+      signalCmdButtonClicked -> awsStandardSink::HideWindow
+    }
+  }
+
+
   component "Red" is "Command Button"
   {
     Frame: (20, 30) - (90, 50)
