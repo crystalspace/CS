@@ -130,16 +130,18 @@ public:
    */
   inline void *GetPointer(unsigned int index);
 
+#ifndef CS_HAS_MEMORY_MAPPED_IO
+
 private:
   /// Reads a cache-page in from the disk.
   void CachePage(unsigned int page);
 
-#ifndef CS_HAS_MEMORY_MAPPED_IO
   /// Maps file into memory
   bool MemoryMapFile(mmioInfo *platform, char *filename);
 
   /// Unmaps file from memory
   void UnMemoryMapFile(mmioInfo *platform);
+
 #endif
 
 };
