@@ -23,6 +23,32 @@
 #include "cslayout.h"
 
 /**
+ * This subclass of csLayoutConstraint additionally stores the location
+ * of the attached control.
+ */
+
+class csBorderConstraint : public csLayoutConstraint
+{
+ public:
+  int mAlign;
+ public:
+  /**
+   * use the following values for aligning
+   * 0 ... center
+   * 1 ... left
+   * 2 ... top
+   * 3 ... bottom
+   * 4 ... right
+   */
+  csBorderConstraint (int align): mAlign( align ) {}
+  /// copy constructor
+  csBorderConstraint (const csBorderConstraint &c) :
+    csLayoutConstraint (c.comp)
+    { mAlign = c.mAlign; }
+  virtual csLayoutConstraint *Clone ();
+};
+
+/**
  * Displays upto 5 components. They are located in the north, south,
  * west, east and center of the canvas.
  *
@@ -56,33 +82,7 @@
  * </code>
  * </p>
  */
-
-/**
- * This subclass of csLayoutConstraint additionally stores the location
- * of the attached control.
- */
-
-class csBorderConstraint : public csLayoutConstraint
-{
- public:
-  int mAlign;
- public:
-  /**
-   * use the following values for aligning
-   * 0 ... center
-   * 1 ... left
-   * 2 ... top
-   * 3 ... bottom
-   * 4 ... right
-   */
-  csBorderConstraint (int align): mAlign( align ) {}
-  /// copy constructor
-  csBorderConstraint (const csBorderConstraint &c) :
-    csLayoutConstraint (c.comp)
-    { mAlign = c.mAlign; }
-  virtual csLayoutConstraint *Clone ();
-};
-
+ 
 class csBorderLayout : public csLayout2
 {
  public:

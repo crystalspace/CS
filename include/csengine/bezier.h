@@ -61,6 +61,9 @@
 class csVector3;
 class csVector2;
 
+/**
+ * Bezier curve
+ */
 class csBezier2
 {
 private:
@@ -79,7 +82,7 @@ public:
   /// Initialize.
   static void Initialize ();
 
-  /// Evaulate the bernstien polynomial defined by the given j & k at u & v
+  /// Evaluate the bernstien polynomial defined by the given j & k at u & v
   static double BernsteinAt(double u, int j, double v, int k);
 
   /**
@@ -98,9 +101,9 @@ public:
    * Find the normal at u, v where u, v are integers representing an index
    * to a control point on the curve in the u and v directions respectively at
    * the given resolution
-   *
+   * <pre>
    * Formula:                      /2\/2\
-   * vtx = sum(j=0->2) sum(k=0->2) \j/\k/ u^j(1-u)^(2-j) v^k(1-v)^(2-k)*P_jk
+   * vtx = sum(j=0->2) sum(k=0->2) \j/\k/ u^j(1-u)^(2-j) v^k(1-v)^(2-k)*P_jk</pre>
    */
   static csVector3 GetNormal(double** aControls, int u,
                              int v, int resolution);
@@ -127,7 +130,7 @@ public:
   static csVector2 GetTextureCoord(double** aControls, int u, int v,
                                    int resolution, double *map = NULL);
 
-                            /**
+  /**
    * Find the point at u,v where u and v a the parametric coordinates on the
    * curve
    */

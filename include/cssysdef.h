@@ -246,7 +246,7 @@
        type var [size]
 #  else
 #    define ALLOC_STACK_ARRAY(var,type,size) \
-       type *var = (type *)alloca (size * sizeof (type))
+       type *var = (type *)alloca ((size) * sizeof (type))
 #  endif
 #endif
 

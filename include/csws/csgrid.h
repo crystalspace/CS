@@ -401,7 +401,7 @@ protected:
   void PlaceGadgets ();
 
 private:
-  // Common method for constructors
+  /// Common method for constructors
   void init (csComponent *pParent, csRect &rc, int iStyle, csGridCell *gc);
 
 public:

@@ -24,6 +24,7 @@
 
 struct iObjectRegistry;
 
+/// Helper class for csPluginLoader.
 struct csPluginLoadRec
 {
   char* Tag;
@@ -35,6 +36,7 @@ struct csPluginLoadRec
   { delete [] ClassID; delete [] Tag; }
 };
 
+/// Helper class for csPluginLoader.
 class csPluginList : public csVector
 {
 public:

@@ -115,8 +115,8 @@ extern void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly, csVector2* clipped_poly,
   int num_vertices, csVertexStatus* clipped_vtstats,
   int orig_num_vertices, bool gouraud);
 
-/*
- * An element for the queue.
+/**
+ * An element for the polygon queue.
  */
 struct csQueueElement
 {
@@ -137,13 +137,13 @@ struct csQueueElement
 class csPolygon2DQueue
 {
 private:
-  // The queue.
+  /// The queue.
   csQueueElement* queue;
 
-  // Maximum number of elements in the queue.
+  /// Maximum number of elements in the queue.
   int max_queue;
 
-  // Current number of elements in the queue.
+  /// Current number of elements in the queue.
   int num_queue;
 
 public:

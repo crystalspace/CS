@@ -227,6 +227,7 @@ public:
   //------------------------ iLight interface -----------------------------
   SCF_DECLARE_IBASE_EXT (csObject);
 
+  /// iLight implementation
   struct Light : public iLight
   {
     SCF_DECLARE_EMBEDDED_IBASE (csLight);
@@ -337,6 +338,7 @@ public:
   //------------------------ iStatLight interface -----------------------------
   SCF_DECLARE_IBASE_EXT (csLight);
 
+  /// iStatLight implementation.
   struct eiStaticLight : public iStatLight
   {
     SCF_DECLARE_EMBEDDED_IBASE (csStatLight);
@@ -576,6 +578,7 @@ public:
   //------------------------ iDynLight interface -----------------------------
   SCF_DECLARE_IBASE_EXT (csLight);
 
+  /// iDynLight implementation.
   struct eiDynLight : public iDynLight
   {
     SCF_DECLARE_EMBEDDED_IBASE (csDynLight);
@@ -612,6 +615,7 @@ public:
   /// Find a light by ID
   iLight *FindByID (unsigned long id) const;
 
+  /// iLightList implementation.
   class LightList : public iLightList
   {
     SCF_DECLARE_EMBEDDED_IBASE (csLightList);

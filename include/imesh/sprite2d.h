@@ -26,6 +26,7 @@
 
 struct iMaterialWrapper;
 
+/// A single 2D Sprite vertex.
 struct csSprite2DVertex
 {
   csVector2 pos;

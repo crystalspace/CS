@@ -143,6 +143,7 @@ public:
 
 CS_DECLARE_OBJECT_VECTOR (csRegionListHelper, iRegion);
 
+/// List of 3D engine regions.
 class csRegionList : public csRegionListHelper
 {
 public:

@@ -436,17 +436,20 @@ protected:
   csVector3 minbox;
   /// The bottom-right.
   csVector3 maxbox;
-
+  /// A csBox3 edge.
   struct bEdge
   {
     uint8 v1, v2; // Indices of vertex in bounding box (CS_BOX_CORNER_...)
     uint8 fl, fr; // Indices of left/right faces sharing edge (CS_BOX_SIDE_...)
   };
-  typedef uint8 bFace[4];	// Indices of four clock-wise edges (0..23)
-  // Index by edge number. Edge e and e+1 with e even are opposite edges.
-  // (CS_BOX_EDGE_...)
+  /// Indices of four clock-wise edges (0..23)
+  typedef uint8 bFace[4];	
+  /**
+   * Index by edge number. Edge e and e+1 with e even are opposite edges.
+   * (CS_BOX_EDGE_...) 
+   */
   static bEdge edges[24];
-  // Index by CS_BOX_SIDE_? number.
+  /// Index by CS_BOX_SIDE_? number.
   static bFace faces[6];
 public:
   /// Get the minimum X value of the box

@@ -52,7 +52,7 @@ struct iCollection : public iBase
 };
 
 SCF_VERSION (iCollectionList, 0, 0, 1);
-
+/// iCollection list.
 struct iCollectionList : public iBase
 {
   /// Create a new collection.

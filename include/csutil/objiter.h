@@ -21,10 +21,6 @@
 
 #include "iutil/object.h"
 
-/**
- * Define a typed objectiterator class. This macro assumes that the
- * requested interface is already declared as a fast interface.
- */
 #define CS_DECLARE_OBJECT_ITERATOR(NAME,INTERFACE)			\
   class NAME : public csTypedObjectIterator				\
   {									\
@@ -38,6 +34,11 @@
       { return (INTERFACE*)CurrentTypedObject; }			\
   };
 
+/**
+ * Helper class for CS_DECLARE_OBJECT_ITERATOR defining a typed objectiterator 
+ * class. The macro assumes that the requested interface is already declared as 
+ * a fast interface.
+ */
 class csTypedObjectIterator
 {
 protected:
@@ -48,22 +49,22 @@ protected:
   virtual void GetRequestedInterface (scfInterfaceID &id, int &ver) const = 0;
 
 public:
-  // constructor
+  /// constructor
   csTypedObjectIterator (iObject *Parent);
-  // destructor
+  /// destructor
   virtual ~csTypedObjectIterator ();
 
-  // Move forward
+  /// Move forward
   inline bool Next();
-  // Reset the iterator to the beginning
+  /// Reset the iterator to the beginning
   inline void Reset();
-  // Get the object we are pointing at
+  /// Get the object we are pointing at
   inline iObject *GetObject () const;
-  // Get the parent object
+  /// Get the parent object
   inline iObject *GetParentObj() const;
-  // Check if we have any children of requested type
+  /// Check if we have any children of requested type
   inline bool IsFinished () const;
-  // Find the object with the given name
+  /// Find the object with the given name
   inline bool FindName (const char* name);
 };
 

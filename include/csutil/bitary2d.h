@@ -10,6 +10,7 @@
 
 #include "bitarray.h"
 
+/// A two-dimensional array of bits.
 class csBitArray2D : public csBitArray
 {
    typedef csBitArray super;
@@ -19,10 +20,9 @@ private:
 
 public:
 
-   //
-   // Array proxy (for operator[])
-   //
-   
+   /**
+    * Array proxy (for csBitArray2D::operator[])
+    */
    class ArrayProxy
    {
    private:

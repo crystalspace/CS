@@ -31,6 +31,9 @@ enum csVariantType
   CSVAR_STRING
 };
 
+/**
+ * Variant, means that type of contained data is set at runtime.
+ */
 struct csVariant
 {
 private:
@@ -102,12 +105,16 @@ public:
   csVariantType GetType () const { return type; }
 };
 
+/// Configuration option description.
 struct csOptionDescription
 {
   int id;
-  char* name;		// Short name of this option.
-  char* description;	// Description for this option.
-  csVariantType type;	// Type to use for this option.
+  /// Short name of this option.
+  char* name;		
+  /// Description for this option.
+  char* description;	
+  /// Type to use for this option.
+  csVariantType type;	
 };
 
 SCF_VERSION (iConfig, 1, 0, 0);

@@ -30,11 +30,6 @@
  */
 extern csHashKey csHashComputeEvent (iEvent *ev);
 
-struct csEvBind
-{
-  void *x, *y;
-};
-
 /**
  * Bind an input event to a pointer to a variable,
  * so that that variable will reflect the state of a given key, button or axis.

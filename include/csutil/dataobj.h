@@ -56,6 +56,7 @@ public:
 
   SCF_DECLARE_IBASE_EXT (csObject);
 
+  /// iDataObject implementation.
   struct DataObject : public iDataObject
   {
     SCF_DECLARE_EMBEDDED_IBASE (csDataObject);

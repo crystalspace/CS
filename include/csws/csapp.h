@@ -114,6 +114,7 @@ protected:
     /// Handle a event and return true if processed
     virtual bool HandleEvent (iEvent &Event);
 
+    /// iEventHandler implementation.
     struct eiEventHandler : public iEventHandler
     {
       SCF_DECLARE_EMBEDDED_IBASE(csAppPlugin);

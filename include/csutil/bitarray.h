@@ -11,6 +11,7 @@
 #include <memory.h>
 #include <assert.h>
 
+/// A one-dimensional array of bits, similar to STL bitset.
 class csBitArray
 {
 private:
@@ -27,7 +28,7 @@ private:
    unsigned           mLength;     // Length of mpStore in units of store_type
    unsigned           mNumBits;
 
-   // Get the index and bit offset for a given bit number.
+   /// Get the index and bit offset for a given bit number.
    static unsigned GetIndex(unsigned bit_num)
    {
       return bit_num / cell_size;
@@ -54,7 +55,7 @@ private:
          mpStore = new store_type[mLength];
    }
    
-   // Force overhang bits at the end to 0
+   /// Force overhang bits at the end to 0
    inline void Trim()
    {
       unsigned extra_bits = mNumBits % cell_size;
@@ -64,10 +65,9 @@ private:
 
 public:
 
-   //
-   // Bit proxy (for operator[])
-   //
-   
+   /**
+    * Bit proxy (for csBitArray::operator[])
+    */
    class BitProxy
    {
    private:

@@ -50,6 +50,7 @@ public:
 
   SCF_DECLARE_IBASE_EXT (csObject);
   //----------------------- iKeyValuePair --------------------------
+  /// iKeyValuePair implementation.
   struct KeyValuePair : public iKeyValuePair
   {
     SCF_DECLARE_EMBEDDED_IBASE (csKeyValuePair);

@@ -27,9 +27,9 @@ class csLightHalo;
 class csPolygonInt;
 class csPolygon3D;
 
-/// A dynamic array of csCurve objects
 CS_DECLARE_TYPED_VECTOR_NODELETE (csCurvesArrayHelper, csCurve);
 
+/// A dynamic array of csCurve objects
 class csCurvesArray : public csCurvesArrayHelper {
 public:
   virtual bool FreeItem (csSome item);
@@ -37,9 +37,9 @@ public:
   csCurvesArray (int l=8, int t=8) : csCurvesArrayHelper (l, t) {}
 };
 
-/// A dynamic array of csLightHalo objects
 CS_DECLARE_TYPED_VECTOR_NODELETE (csHaloArrayHelper, csLightHalo);
 
+/// A dynamic array of csLightHalo objects
 class csHaloArray : public csHaloArrayHelper {
 public:
   virtual bool FreeItem (csSome item);

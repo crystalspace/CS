@@ -23,6 +23,7 @@
 
 CS_TYPEDEF_GROWING_ARRAY (csIntArrayHelper, int);
 
+/// Growing array of <code>int</code>s.
 class csIntArray : public csIntArrayHelper
 {
 public:

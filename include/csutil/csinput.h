@@ -97,6 +97,7 @@ public:
   /// Application lost focus.
   virtual void LostFocus() { Reset(); }
 
+  /// iEventHandler implementation
   struct eiEventHandler : public iEventHandler
   {
     SCF_DECLARE_EMBEDDED_IBASE(csKeyboardDriver);
@@ -167,6 +168,7 @@ public:
   /// Application lost focus.
   virtual void LostFocus() { Reset(); }
 
+  /// iEventHandler implementation
   struct eiEventHandler : public iEventHandler
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMouseDriver);
@@ -224,6 +226,7 @@ public:
   /// Application lost focus.
   virtual void LostFocus() { Reset(); }
 
+  /// iEventHandler implementation
   struct eiEventHandler : public iEventHandler
   {
     SCF_DECLARE_EMBEDDED_IBASE (csJoystickDriver);

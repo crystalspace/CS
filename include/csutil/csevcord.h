@@ -25,16 +25,19 @@
 struct iEventHandler;
 class csEventOutlet;
 
+/**
+ * Event cord.
+ */
 class csEventCord : public iEventCord
 {
 protected:
-  // Pass events to the system queue?
+  /// Pass events to the system queue?
   volatile bool pass;
 
-  // The category and subcategory of this events on this cord
+  /// The category and subcategory of this events on this cord
   int category, subcategory;
 
-  // Linked list of plugins
+  /// Linked list of plugins
   struct PluginData
   {
     iEventHandler *plugin;
@@ -42,18 +45,18 @@ protected:
     PluginData *next;
   };
 
-  // The cord itself
+  /// The cord itself
   PluginData *plugins;
 
-  // Protection against multiple threads accessing the same cord
+  /// Protection against multiple threads accessing the same cord
   volatile int SpinLock;
 
-  // Lock the queue for modifications: NESTED CALLS TO LOCK/UNLOCK NOT ALLOWED!
+  /// Lock the queue for modifications: NESTED CALLS TO LOCK/UNLOCK NOT ALLOWED!
   inline void Lock() { while (SpinLock) {} SpinLock++; }
-  // Unlock the queue
+  /// Unlock the queue
   inline void Unlock() { SpinLock--; }
 
-  // iEventOutlet places events into cords.
+  /// iEventOutlet places events into cords.
   friend class csEventOutlet;
   bool Post(iEvent*);
 
@@ -78,7 +81,7 @@ public:
   /// Get the category of this cord.
   virtual int GetCategory() const { return category; }
 
-  // Get the subcategory of this cord.
+  /// Get the subcategory of this cord.
   virtual int GetSubcategory() const { return subcategory; }
 };
 

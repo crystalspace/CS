@@ -469,6 +469,7 @@ public:
 
 CS_DECLARE_OBJECT_VECTOR (csSectorListHelper, iSector);
 
+/// List of 3D engine sectors.
 class csSectorList : public csSectorListHelper
 {
 public:

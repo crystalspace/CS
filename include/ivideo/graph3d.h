@@ -122,7 +122,7 @@ public:
   float intensity2;
 };
 
-///
+/// Information about a texture plane.
 class G3DTexturePlane
 {
 public:
@@ -275,7 +275,7 @@ enum G3D_FOGMETHOD
   G3DFOGMETHOD_VERTEX = 0x02
 };
 
-///
+/// Information about 3d renderer capabilities.
 struct csGraphics3DCaps
 {
   bool CanClip;

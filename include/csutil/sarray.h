@@ -30,60 +30,61 @@
 //--- implementation of the above macro follows ------------------------------
 //----------------------------------------------------------------------------
 
+/// Helper class for CS_DECLARE_STATIC_ARRAY.
 class csStaticArray
 {
 protected:
   void *Map;
   int Size;
 
-  /*
+  /**
    * Remove all elements and copy the contents from another array. If
    * 'DeleteOld' is true then the old contents are deleted.
    */
   void Copy (const csStaticArray *other, bool DeleteOld = true);
-  /*
+  /**
    * Remove all elements and copy the contents from another array. If
    * 'DeleteOld' is true then the old contents are deleted.
    */
   void Copy (void *NewData, int NewSize, bool DeleteOld = true);
-  /*
+  /**
    * Remove all elements (and delete them if 'DeleteOld is true), then
    * use the contents of another array. The other array will lose control
    * over its elements and be cleared to empty.
    */
   inline void TakeOver (csStaticArray *other, bool DeleteOld = true);
-  /*
+  /**
    * Use the given array and size for this array. They are taken over,
    * not copied!
    */
   inline void TakeOver (void *NewData, int NewSize, bool DeleteOld = true);
 
-  // Allocate an array of the given number of elements
+  /// Allocate an array of the given number of elements
   virtual void *AllocateArray (int Size) const = 0;
-  // Delete an array of elements
+  /// Delete an array of elements
   virtual void DeleteArray (void *Array) const = 0;
-  // Copy one array into another one
+  /// Copy one array into another one
   virtual void CopyArray (void *Dest, void *src, int Count) const = 0;
 
 public:
-  // constructor
+  /// constructor
   csStaticArray (int Size = 0);
-  // destructor
+  /// destructor
   virtual ~csStaticArray ();
 
-  // Return the number of elements in the array
+  /// Return the number of elements in the array
   inline int GetSize () const;
-  /*
+  /**
    * Remove all elements from the array. If 'DeleteOld' is true then the
    * elements are also deleted.
    */
   void Clear (bool DeleteOld = true);
-  /*
+  /**
    * Allocate the given number of elements. The old contents are removed,
    * and if 'DeleteOld' is true they are also deleted.
    */
   void Alloc (int s, bool DeleteOld = true);
-  /*
+  /**
    * Change the size of the array but copy the contents.
    */
   void ReAlloc (int s);

@@ -10,6 +10,7 @@
 
 #include "bitarray.h"
 
+/// A one-dimensional array of two-bit entries.
 class csTwoBitArray : private csBitArray
 {
    typedef csBitArray super;
@@ -132,39 +133,39 @@ public:
    // Plain English interface
    //
    
-   // Set all bits to false.
+   /// Set all bits to false.
    void Clear()
    {
       super::Clear();
    }
    
-   // Toggle the bits at position pos.
+   /// Toggle the bits at position pos.
    void FlipBits(unsigned pos) 
    {
       Set(pos, 3 ^ Get(pos));
    }
 
-   // Set the bit at position pos to the given value.
+   /// Set the bit at position pos to the given value.
    void Set(unsigned pos, unsigned val)
    {
       super::Set(2 * pos, val & 1);
       super::Set(2 * pos + 1, (val >> 1) & 1);
    }
 
-   // Returns true iff the bit at position pos is true.
+   /// Returns true iff the bit at position pos is true.
    unsigned Get(unsigned pos) const
    {
       return (unsigned(super::IsBitSet(2 * pos)) |
               (unsigned(super::IsBitSet(2 * pos + 1)) << 1));
    }
 
-   // Returns true iff all bits are false.
+   /// Returns true if all bits are false.
    bool AllZero() const
    {
       return super::AllBitsFalse();
    }
 
-   // Change value of all bits
+   /// Change value of all bits
    csTwoBitArray &FlipAllBits()
    {
       super::FlipAllBits();

@@ -40,6 +40,7 @@ struct csSpinBoxItem
 /// Insert item after all other items
 #define CSSB_ITEM_AFTERALL	999999
 
+/// Spin box upper/lower limits.
 struct csSpinBoxLimits
 {
   int MinValue,MaxValue;
@@ -93,19 +94,19 @@ enum
  */
 class csSpinBox : public csInputLine
 {
-  // Current spin box value
+  /// Current spin box value
   int Value;
-  // The list of allowed values; if list is empty, spin box is numerical
+  /// The list of allowed values; if list is empty, spin box is numerical
   csStrVector Values;
-  // Alternative value limits for numerical content
+  /// Alternative value limits for numerical content
   csSpinBoxLimits NumLimits;
-  // Spin box state
+  /// Spin box state
   int SpinState;
-  // Spin timer
+  /// Spin timer
   csTimer *SpinTimer;
-  // spin box size in pixels
+  /// spin box size in pixels
   int SpinBoxSize;
-  // Number of autorepeats since spin beginning
+  /// Number of autorepeats since spin beginning
   int AutoRepeats;
 
 public:
@@ -140,9 +141,9 @@ public:
   virtual void SetText (const char *iText);
 
 private:
-  // Spin to other value
+  /// Spin to other value
   void Spin (int iDelta);
-  // Spin value depending on spin box state
+  /// Spin value depending on spin box state
   void Spin ();
 };
 

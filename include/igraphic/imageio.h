@@ -34,6 +34,7 @@ SCF_VERSION (iImageIO, 1, 0, 0);
  */
 struct iImageIO : public iBase
 {
+  /// Description for a file format supported by an image loader.
   struct FileFormatDescription
   {
     /// mime type of image, e.g. "image/png"
@@ -71,7 +72,18 @@ struct iImageIO : public iBase
   virtual void SetDithering (bool iEnable) = 0;
 
   /**
-   * Save an image using a prefered format.
+   * Save an image using a prefered format.<p>
+   * <code>extraoptions</code> allows to specify additional output options.
+   * Those options consist of a comma-separated list and can be either 'option' 
+   * or 'option=value'. The available options vary from plugin to plugin, some
+   * common ones are:<p>
+   * <code>compress=#</code> - Set image compression, from 0..100. Higher values 
+   * give smaller files, but at the expense of quality(e.g. JPEG) or 
+   * speed(e.g. PNG).<br>
+   * <code>progressive</code> - Progressive/interlaced encoding.<p>
+   * Examples:<br>
+   * <code>compress=50</code><br>
+   * <code>progressive,compress=30</code>
    */
   virtual iDataBuffer *Save (iImage *image, iImageIO::FileFormatDescription *format,
     const char* extraoptions = NULL) = 0;

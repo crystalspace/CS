@@ -170,7 +170,7 @@ public:
   }
 };
 
-/*
+/**
  * Helper class for vectors that contain 'iBase' objects. It assumes that
  * the contained objects may be cast to 'iBase'. Note that it does not
  * take parameters of type 'iBase'. This way it overrides the methods of

@@ -23,6 +23,133 @@
 #include "cslayout.h"
 
 /**
+ * Subclass of csLayoutConstraint for use with csGridBagLayout.
+ */
+class csGridBagConstraint : public csLayoutConstraint
+{
+public:
+  csGridBagConstraint (csComponent *comp);
+  csGridBagConstraint (const csGridBagConstraint &c);
+  csGridBagConstraint (csComponent *comp, int _gridx, int _gridy,
+		       int _gridwidth, int _gridheight, float _weightx,
+		       float _weighty, int _anchor, int _fill,
+		       csRect _insets, int _ipadx, int _ipady);
+  csLayoutConstraint *Clone ();
+public:
+  /**
+   * gridx set column for next cell to aad:
+   * RELATIVE ... right behind last added
+   * > 0 ... absolute column
+   */
+  int gridx;
+  /**
+   * gridx set row for next cell to aad:
+   * RELATIVE ... same as last added or the next row if last
+   *              gridwidth == REMAINDER
+   * > 0 ... absolute row
+   */
+  int gridy;
+  /**
+   * Set gridwidth to define the number of columns the cell spans.
+   * Set to REMAINDER to be the last cell on a row.
+   */
+  int gridwidth;
+  /**
+   * Set gridheight to define the number of rows the cell spans.
+   * Set to REMAINDER to be the last cell on a column.
+   */
+  int gridheight;
+  /**
+   * weightx defines how much space is added or substracted to a cell if
+   * the layout size changes. Additional space is given columnwise. For this
+   * the largest weightx in a column is determined and used for all cells in
+   * the column.
+   */
+  float weightx;
+  /**
+   * weighty defines how much space is added or substracted to a cell if
+   * the layout size changes. Additional space is given rowwise. For this
+   * the largest weighty in a row is determined and used for all cells in
+   * the row.
+   */
+  float weighty;
+  /**
+   * If you choose to not size the component to fit in a cell you can set the
+   * position of the component in a cell. Use the following values:
+   * CENTER ... center component in the middle of cell
+   * WEST   ... align component left horizontally and center vertically
+   * NORTH  ... center component horizontally and align on top of cell
+   * EAST   ... align component right horizontally and center vertically
+   * SOUTH  ... center component horizontally and align on bottom of cell
+   * to put it in the corner of the cell use the following
+   * NORTHWEST ... upper left corner
+   * NORTHEAST ... upper right corner
+   * SOUTHEAST ... lower right corner
+   * SOUTHWEST ... lower left corner
+   */
+  int anchor;
+  /**
+   * To size the component to fit in cell set fill to BOTH. This will scale
+   * the component vertical and horizontal. Set to HORIZONTAL or VERTICAL to
+   * scale component horizontal and vertical resp.
+   * To disallow scaling at all set to NONE.
+   */
+  int fill;
+  /**
+   * This adds additional space to the component width and height.
+   */
+  csRect insets;
+  /**
+   * ipadx preserves ipadx pixels between component and cell left and right
+   * edges.
+   */
+  int ipadx;
+  /**
+   * ipady preserves ipady pixels between component and cell upper and lower
+   * edges.
+   */
+  int ipady;
+
+#undef RELATIVE
+#undef _LEFT
+#undef _CENTER
+
+  enum GRID_BAG_CONSTANTS
+  {
+    RELATIVE   = -1,
+    REMAINDER  = 0,
+
+    NONE       = 0,
+    BOTH       = 1,
+    HORIZONTAL = 2,
+    VERTICAL   = 3,
+
+    CENTER    = 10,
+    NORTH     = 11,
+    NORTHEAST = 12,
+    EAST      = 13,
+    SOUTHEAST = 14,
+    SOUTH     = 15,
+    SOUTHWEST = 16,
+    WEST      = 17,
+    NORTHWEST = 18
+  };
+
+  /// used internally  (do not use!)
+  enum  GRID_BAG_CONSTANTS_INTERNAL
+  {
+    _LEFT     = 20,
+    _CENTER   = 21,
+    _RIGHT    = 22
+  };
+
+  /// for internal uses
+  bool bSized;
+  /// for internal uses
+  csPoint mPrefCompSize;
+};
+
+/**
  * csGridBagLayout is the most flexible layout class.
  * Here is how it works:
  *
@@ -142,131 +269,7 @@
  * </code>
  * </p>
  */
-
-class csGridBagConstraint : public csLayoutConstraint
-{
-public:
-  csGridBagConstraint (csComponent *comp);
-  csGridBagConstraint (const csGridBagConstraint &c);
-  csGridBagConstraint (csComponent *comp, int _gridx, int _gridy,
-		       int _gridwidth, int _gridheight, float _weightx,
-		       float _weighty, int _anchor, int _fill,
-		       csRect _insets, int _ipadx, int _ipady);
-  csLayoutConstraint *Clone ();
-public:
-  /**
-   * gridx set column for next cell to aad:
-   * RELATIVE ... right behind last added
-   * > 0 ... absolute column
-   */
-  int gridx;
-  /**
-   * gridx set row for next cell to aad:
-   * RELATIVE ... same as last added or the next row if last
-   *              gridwidth == REMAINDER
-   * > 0 ... absolute row
-   */
-  int gridy;
-  /**
-   * Set gridwidth to define the number of columns the cell spans.
-   * Set to REMAINDER to be the last cell on a row.
-   */
-  int gridwidth;
-  /**
-   * Set gridheight to define the number of rows the cell spans.
-   * Set to REMAINDER to be the last cell on a column.
-   */
-  int gridheight;
-  /**
-   * weightx defines how much space is added or substracted to a cell if
-   * the layout size changes. Additional space is given columnwise. For this
-   * the largest weightx in a column is determined and used for all cells in
-   * the column.
-   */
-  float weightx;
-  /**
-   * weighty defines how much space is added or substracted to a cell if
-   * the layout size changes. Additional space is given rowwise. For this
-   * the largest weighty in a row is determined and used for all cells in
-   * the row.
-   */
-  float weighty;
-  /**
-   * If you choose to not size the component to fit in a cell you can set the
-   * position of the component in a cell. Use the following values:
-   * CENTER ... center component in the middle of cell
-   * WEST   ... align component left horizontally and center vertically
-   * NORTH  ... center component horizontally and align on top of cell
-   * EAST   ... align component right horizontally and center vertically
-   * SOUTH  ... center component horizontally and align on bottom of cell
-   * to put it in the corner of the cell use the following
-   * NORTHWEST ... upper left corner
-   * NORTHEAST ... upper right corner
-   * SOUTHEAST ... lower right corner
-   * SOUTHWEST ... lower left corner
-   */
-  int anchor;
-  /**
-   * To size the component to fit in cell set fill to BOTH. This will scale
-   * the component vertical and horizontal. Set to HORIZONTAL or VERTICAL to
-   * scale component horizontal and vertical resp.
-   * To disallow scaling at all set to NONE.
-   */
-  int fill;
-  /**
-   * This adds additional space to the component width and height.
-   */
-  csRect insets;
-  /**
-   * ipadx preserves ipadx pixels between component and cell left and right
-   * edges.
-   */
-  int ipadx;
-  /**
-   * ipady preserves ipady pixels between component and cell upper and lower
-   * edges.
-   */
-  int ipady;
-
-#undef RELATIVE
-#undef _LEFT
-#undef _CENTER
-
-  enum GRID_BAG_CONSTANTS
-  {
-    RELATIVE   = -1,
-    REMAINDER  = 0,
-
-    NONE       = 0,
-    BOTH       = 1,
-    HORIZONTAL = 2,
-    VERTICAL   = 3,
-
-    CENTER    = 10,
-    NORTH     = 11,
-    NORTHEAST = 12,
-    EAST      = 13,
-    SOUTHEAST = 14,
-    SOUTH     = 15,
-    SOUTHWEST = 16,
-    WEST      = 17,
-    NORTHWEST = 18
-  };
-
-  // used interally  (do not use!)
-
-  enum  GRID_BAG_CONSTANTS_INTERNAL
-  {
-    _LEFT     = 20,
-    _CENTER   = 21,
-    _RIGHT    = 22
-  };
-
-  // for internal uses
-  bool bSized;
-  csPoint mPrefCompSize;
-};
-
+ 
 class csGridBagLayout : public csLayout2
 {
   struct CellInfo

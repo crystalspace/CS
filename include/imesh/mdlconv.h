@@ -24,6 +24,9 @@
 struct iModelData;
 struct iDataBuffer;
 
+/**
+ * Structure describing a single format supported by a model converter.
+ */
 struct csModelConverterFormat
 {
   /// Name of this format
@@ -40,6 +43,10 @@ struct csModelConverterFormat
 
 SCF_VERSION (iModelConverter, 0, 0, 1);
 
+/**
+ * Model converter. Used to convert model data from an arbitrary format to
+ * iModelData or vice versa.
+ */
 struct iModelConverter : public iBase
 {
   /// Return the number of supported formats

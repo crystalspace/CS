@@ -38,6 +38,49 @@ public:
   ~csTokenDesc () { delete [] token; }
 };
 
+/**
+ * Token table that is passed to most token-parsing functions.
+ * Created using CS_TOKEN_DEF_START, CS_TOKEN_DEF, CS_TOKEN_DEF_END.<p>
+ * Usage example:
+ * <pre>
+ * CS_TOKEN_DEF_START
+ *   CS_TOKEN_DEF (ORIG)
+ *   CS_TOKEN_DEF (FIRST_LEN)
+ *   CS_TOKEN_DEF (FIRST)
+ *   CS_TOKEN_DEF (SECOND_LEN)
+ *   CS_TOKEN_DEF (SECOND)
+ *   CS_TOKEN_DEF (MATRIX)
+ *   CS_TOKEN_DEF (V)
+ * CS_TOKEN_DEF_END
+ * ...
+ * void some_func ()
+ * {
+ *   CS_TOKEN_TABLE_START (tokens)
+ *     CS_TOKEN_TABLE (ORIG)
+ *     CS_TOKEN_TABLE (FIRST_LEN)
+ *     CS_TOKEN_TABLE (FIRST)
+ *     CS_TOKEN_TABLE (SECOND_LEN)
+ *     CS_TOKEN_TABLE (SECOND)
+ *     CS_TOKEN_TABLE (MATRIX)
+ *     CS_TOKEN_TABLE (V)
+ *   CS_TOKEN_TABLE_END
+ *   ...
+ *   while ((cmd = csGetObject (&buf, tokens, &name, &params)) > 0)
+ *   {
+ *     switch (cmd)
+ *     {
+ *       case CS_TOKEN_ORIG:
+ *         ...
+ *       case CS_TOKEN_FIRST_LEN:
+ *         ...
+ *       case CS_TOKEN_FIRST:
+ *         ...
+ *     }
+ *   }
+ * ...
+ * }
+ * </pre>
+ */
 class csTokenVector : public csVector
 {
 public:
@@ -80,45 +123,7 @@ public:
 };
 
 /**
- * A set of macros for easier building of token tables. Usage example:
- * <pre>
- * CS_TOKEN_DEF_START
- *   CS_TOKEN_DEF (ORIG)
- *   CS_TOKEN_DEF (FIRST_LEN)
- *   CS_TOKEN_DEF (FIRST)
- *   CS_TOKEN_DEF (SECOND_LEN)
- *   CS_TOKEN_DEF (SECOND)
- *   CS_TOKEN_DEF (MATRIX)
- *   CS_TOKEN_DEF (V)
- * CS_TOKEN_DEF_END
- * ...
- * void some_func ()
- * {
- *   CS_TOKEN_TABLE_START (tokens)
- *     CS_TOKEN_TABLE (ORIG)
- *     CS_TOKEN_TABLE (FIRST_LEN)
- *     CS_TOKEN_TABLE (FIRST)
- *     CS_TOKEN_TABLE (SECOND_LEN)
- *     CS_TOKEN_TABLE (SECOND)
- *     CS_TOKEN_TABLE (MATRIX)
- *     CS_TOKEN_TABLE (V)
- *   CS_TOKEN_TABLE_END
- *   ...
- *   while ((cmd = csGetObject (&buf, tokens, &name, &params)) > 0)
- *   {
- *     switch (cmd)
- *     {
- *       case CS_TOKEN_ORIG:
- *         ...
- *       case CS_TOKEN_FIRST_LEN:
- *         ...
- *       case CS_TOKEN_FIRST:
- *         ...
- *     }
- *   }
- * ...
- * }
- * </pre>
+ * A set of macros for easier building of token tables. 
  */
 #define CS_TOKEN_DEF_START		\
   enum					\

@@ -27,6 +27,7 @@ struct iModelData;
 struct iModelDataObject;
 struct iModelDataPolygon;
 
+/// Mapping table, used by csModelDataTools::CopyVerticesMapped().
 struct csModelDataVertexMap
 {
   int VertexCount, NormalCount, ColorCount, TexelCount;

@@ -21,6 +21,18 @@
 #include "iaws/awsparm.h"
 #include "iutil/event.h"
 
+/**
+ * Class used to create new AWS components.<p>
+ * To create component from scratch, you need to subclass from awsEmbeddedComponent
+ * After instantiating from that object, you need to call
+ * Initialize() with a component gotten from
+ * iAWS::CreateEmbeddableComponent().  After writing the code for that
+ * component, you need to subclass from awsEmbeddedComponentFactory.  Do
+ * your constant registrations, etc.  At runtime you simply need to
+ * instantiate the derived factory, which handles registration and creation
+ * for you. The instantiation of the component needs to happen
+ * in the Factory in a function called Create().  
+ */
 class awsEmbeddedComponent : public iAwsComponent
 {
   iAwsComponent *comp;
@@ -287,6 +299,9 @@ public:
 
 };
 
+/**
+ * Factory for custom AWS component. See also awsEmbeddedComponent.
+ */
 class awsEmbeddedComponentFactory : public iAwsComponentFactory
 {
  protected:

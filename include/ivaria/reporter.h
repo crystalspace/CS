@@ -219,7 +219,7 @@ struct iReporter : public iBase
 };
 
 
-/*
+/**
  * Helper class for csReport().  Not all compilers allow a bare `vararg'
  * function to be inlined, but wrapping the function in a class seems to
  * appease such compilers.  The NextStep compiler exhibits this particular

@@ -38,6 +38,7 @@ struct iCacheManager;
 CS_DECLARE_STATIC_ARRAY (csRGBMap, csRGBpixel);
 CS_DECLARE_STATIC_ARRAY (csShadowMapHelper, unsigned char);
 
+/// Shadow map.
 class csShadowMap : public csShadowMapHelper
 {
 public:
