@@ -44,6 +44,8 @@ The history order is reversed so that new features are at the top.
 	    - DECLARE_OBJECT_INTERFACE
 	    - DECLARE_EMBEDDED_OBJECT
 	    - IMPLEMENT_EMBEDDED_OBJECT
+	- Fixed a bug which occured when portals were being split by a bsp
+	  tree.
 16-Jul-2001
 	- Cleaned up new lighting system and CheckFrustum() a little more.
 	- Added iLightingProcessInfo interface. A callback for a null-portal

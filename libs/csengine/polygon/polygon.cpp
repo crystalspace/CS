@@ -362,6 +362,7 @@ csPolygon3D::~csPolygon3D ()
 
 void csPolygon3D::SetParent (csThing* thing)
 {
+  if (thing == csPolygon3D::thing) return;	// Nothing to do.
   if (csPolygon3D::thing && portal)
     csPolygon3D::thing->RemovePortalPolygon (this);
   csPolygon3D::thing = thing;
