@@ -187,6 +187,15 @@ public:
     if (xmin > x) xmin = x; if (xmax < x) xmax = x;
     if (ymin > y) ymin = y; if (ymax < y) ymax = y;
   }
+
+  /// Joins two rects by their minimum and maximum bounds
+  void Join (const csRect &rect);
+
+  /// Expands the whole rect by n units
+  void Outset(int n);
+
+  /// Contracts the whole rect by n units
+  void Inset(int n);
 };
 
 #endif // __CS_RECT_H__
