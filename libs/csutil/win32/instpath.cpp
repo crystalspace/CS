@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
-#include "libs/csutil/win32/shellstuff.h"
+#include "shellstuff.h"
 #include <windows.h>
 #include <shlobj.h>
 #include <winreg.h>
