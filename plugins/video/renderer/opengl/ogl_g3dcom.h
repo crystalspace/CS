@@ -101,6 +101,7 @@ private:
   void Guess_BlendMode(GLenum *src, GLenum *dst);
 
 protected:
+  friend class csOpenGLHalo;
 
   /**
    * handle of a local 1D alpha-blend texture; this texture holds an

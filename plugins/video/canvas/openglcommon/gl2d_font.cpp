@@ -295,9 +295,6 @@ void GLFontCache::Write (iFont *font, int x, int y, const char *text)
   y = y - maxheight;
   if (y >= ClipY2) return;
 
-  GLGlyph *glyphs = gs->glyphs;
-  GLuint hLastTexture = glyphs [*text].hTexture - 1;
-
   glPushMatrix ();
   glTranslatef (x, y, 0);
 
@@ -308,24 +305,27 @@ void GLFontCache::Write (iFont *font, int x, int y, const char *text)
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_EQUAL, 1.0);
 
-  glBegin (GL_QUADS);
-
-  float tx1, tx2, ty1, ty2, x1, x2, y1, y2, x_right;
   float texheight = gs->texheight;
 
-  x1 = 0.0;
+  GLGlyph *glyphs = gs->glyphs;
+  GLuint hLastTexture = glyphs [*text].hTexture - 1;
+
+  float x1 = 0.0;
 
   for (; *text; ++text)
   {
     GLGlyph &glyph = glyphs [*text];
 
-    x_right = x2 = x1 + glyph.width;
+    float x_right, x2 = x_right = x1 + glyph.width;
+    float tx1, tx2, ty1, ty2, y1, y2;
 
     GLuint hTexture = glyph.hTexture;
     if (hTexture != hLastTexture)
     {
+      glEnd ();
       hLastTexture = hTexture;
       glBindTexture (GL_TEXTURE_2D, hTexture);
+      glBegin (GL_QUADS);
     }
     // the texture coordinates must point to the correct character
     // the texture is a strip a wide as a single character and

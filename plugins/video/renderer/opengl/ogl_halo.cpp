@@ -29,132 +29,157 @@
 #include "ogl_g3dcom.h"
 #include "ihalo.h"
 
-class csOpenGLHalo:public iHalo
+class csOpenGLHalo : public iHalo
 {
-  float R,G,B;        //This halos color
-  unsigned char *Alpha;   //The original map
-  int Width,Height,Size;    //Take a wild guess
-  int x_scale,y_scale;    //For scaling between actual size and OpenGL size
-                //This is needed because we want 2^n maps for OpenGL,
-                //alphamap size is arbitrary.
-  GLuint halohandle;      //Our OpenGL texture handle
-  csGraphics3DOGLCommon *G3D;  //
+  /// The halo color
+  float R, G, B;
+  /// The width and height
+  int Width, Height;
+  /// The inverse width and height of the halo
+  float inv_W, inv_H;
+  /// Our OpenGL texture handle
+  GLuint halohandle;
+  /// The OpenGL 3D driver
+  csGraphics3DOGLCommon *G3D;
+
 public:
   DECLARE_IBASE;
 
-  csOpenGLHalo (float iR,float iG,float iB, unsigned char *iAlpha, 
-		int iWidth,int iHeight, csGraphics3DOGLCommon *iG3D);
+  csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha, 
+    int iWidth, int iHeight, csGraphics3DOGLCommon *iG3D);
 
-  virtual ~csOpenGLHalo();
+  virtual ~csOpenGLHalo ();
 
-  virtual int GetWidth(){return Width;};
-  virtual int GetHeight(){return Height;};
+  virtual int GetWidth () { return Width; }
+  virtual int GetHeight () { return Height; }
 
-  virtual void SetColor(float &iR,float &iG,float &iB)
-  {R=iR;G=iG;B=iB;}
+  virtual void SetColor (float &iR, float &iG, float &iB)
+  { R = iR; G = iG; B = iB; }
 
-  virtual void GetColor(float &oR,float &oG,float &oB)
-  { oR=R;oG=G;oB=B;}
+  virtual void GetColor (float &oR, float &oG, float &oB)
+  { oR = R; oG = G; oB = B; }
 
-  virtual void Draw(float x,float y,float w,float h,float iIntensity,csVector2 *iVertices,int iVertCount);
+  virtual void Draw (float x, float y, float w, float h, float iIntensity,
+    csVector2 *iVertices, int iVertCount);
 };
 
-IMPLEMENT_IBASE(csOpenGLHalo)
-  IMPLEMENTS_INTERFACE(iHalo)
+IMPLEMENT_IBASE (csOpenGLHalo)
+  IMPLEMENTS_INTERFACE (iHalo)
 IMPLEMENT_IBASE_END
 
-csOpenGLHalo::csOpenGLHalo(float iR,float iG,float iB,unsigned char *iAlpha,
-               int iWidth,int iHeight,csGraphics3DOGLCommon *iG3D)
+csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
+  int iWidth, int iHeight, csGraphics3DOGLCommon *iG3D)
 {
-  CONSTRUCT_IBASE(NULL);
+  CONSTRUCT_IBASE (NULL);
 
-  //Initialization
-  R=iR;G=iG;B=iB;
-  Width=FindNearestPowerOf2(iWidth);  //OpenGL can only use 2^n sized textures
-  Height=FindNearestPowerOf2(iHeight);
-  Size=Width*Height;
+  // Initialization
+  R = iR; G = iG; B = iB;
+  // OpenGL can only use 2^n sized textures
+  Width = FindNearestPowerOf2 (iWidth);
+  Height = FindNearestPowerOf2 (iHeight);
+  inv_W = 1. / iWidth;
+  inv_H = 1. / iHeight;
 
-  Alpha=new unsigned char [Width*Height];
+  uint8 *Alpha = iAlpha;
+  if ((Width != iWidth) || (Height != iHeight))
+  {
+    // Allocate our copy of the scanline which is power-of-two
+    uint8 *Alpha = new uint8 [Width * Height];
+    for (int i = 0; i < iHeight; i++)
+    {
+      // Copy a scanline from the supplied alphamap
+      memcpy (Alpha + (i * Width), iAlpha + (i * iWidth), iWidth);
+      // Clear the tail of the scanline
+      memset (Alpha + (i * Width) + iWidth, 0, Width - iWidth);
+    }
+  }
 
-  memset(Alpha,0,Width*Height); //Clear both buffers (no garbage)
+  // Create handle
+  glGenTextures (1, &halohandle);
+  // Activate handle
+  glBindTexture (GL_TEXTURE_2D, halohandle);
 
-  for(int i = 0;i<iHeight;i++)
-    memcpy(Alpha+(i*Width),iAlpha+(i*iWidth),iWidth); //Copy the supplied alphamap
-
-  x_scale=int((1.0*iWidth)/Width);   //Calculate the scale between halo size and our texture size
-  y_scale=int((1.0*iHeight)/Height); // (used for drawing)
-
-  glGenTextures(1,&halohandle); //Create handle
-  glBindTexture(GL_TEXTURE_2D,halohandle);  //Activate handle
-
-
-  //Jaddajaddajadda
-  glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
+  // Jaddajaddajadda
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D,0,GL_ALPHA,Width,Height,0,GL_ALPHA,
-    GL_UNSIGNED_BYTE,Alpha);
-	delete []Alpha;
-  (G3D=iG3D)->IncRef();
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexImage2D (GL_TEXTURE_2D, 0, GL_ALPHA, Width, Height, 0, GL_ALPHA,
+    GL_UNSIGNED_BYTE, Alpha);
+
+  if (Alpha != iAlpha)
+    delete [] Alpha;
+  (G3D = iG3D)->IncRef ();
+
+  Width = iWidth;
+  Height = iHeight;
 }
 
-csOpenGLHalo::~csOpenGLHalo()
+csOpenGLHalo::~csOpenGLHalo ()
 {
-  //Kill, crush and destroy
-  glDeleteTextures(1,&halohandle);  //Delete generated OpenGL handle
-  G3D->DecRef();
+  // Kill, crush and destroy
+  // Delete generated OpenGL handle
+  glDeleteTextures (1, &halohandle);
+  G3D->DecRef ();
 }
 
-//Draw the halo. Wasn't that a suprise
-void csOpenGLHalo::Draw(float x,float y,float w,float h,float iIntensity,csVector2 *iVertices,int iVertCount)
+// Draw the halo. Wasn't that a suprise
+void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
+  csVector2 *iVertices, int iVertCount)
 {
   (void) w;
   (void) h;
-  int height=G3D->GetHeight();
+  int swidth = G3D->width;
+  int sheight = G3D->height;
   int i;
-  csVector2 *texcoords=new csVector2[iVertCount];
 
-  //Saw that this was used somewhere else, so it has to be good
-  glPushAttrib (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_TEXTURE_BIT);
-  glDisable(GL_DEPTH_TEST);
-
-  //Simple 'clippping' (more like adjustments) of texture coords
-  for(i=0;i<iVertCount;i++)
+  csVector2 HaloPoly [4];
+  if (!iVertices)
   {
-    texcoords[i].x=(iVertices[i].x-x)/Width;
-    texcoords[i].y=(iVertices[i].y-y)/Height;
-  }
+    iVertCount = 4;
+    iVertices = HaloPoly;
 
-  glBindTexture (GL_TEXTURE_2D, halohandle);    
-  glEnable(GL_TEXTURE_2D);
-  glEnable(GL_BLEND);
+    float x1 = x, y1 = y, x2 = x + w, y2 = y + h;
+    if (x1 < 0) x1 = 0; if (x2 > swidth ) x2 = swidth ;
+    if (y1 < 0) y1 = 0; if (y2 > sheight) y2 = sheight;
+    if ((x1 >= x2) || (y1 >= y2))
+      return;
+
+    HaloPoly [0].Set (x1, y1);
+    HaloPoly [1].Set (x1, y2);
+    HaloPoly [2].Set (x2, y2);
+    HaloPoly [3].Set (x2, y1);
+  };
+
+  glPushMatrix ();
+  glTranslatef (0, 0, 0);
+
+  glDisable (GL_DEPTH_TEST);
+
+  glEnable (GL_BLEND);
+  glEnable (GL_TEXTURE_2D);
   glShadeModel (GL_FLAT);
+  glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+  glBindTexture (GL_TEXTURE_2D, halohandle);    
 
-  //Our usual blending
-  glBlendFunc (GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-  glColor4f(R,G,B, iIntensity);
-  glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+  // Our usual blending
+  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glColor4f (R, G, B, iIntensity);
 
   glBegin (GL_POLYGON);
+  for (i = 0; i < iVertCount; i++)
   {
-    for(i=0;i<iVertCount;i++)
-    {
-      glTexCoord2f(texcoords[i].x,texcoords[i].y);
-      glVertex2f(iVertices[i].x,height-iVertices[i].y-1);
-    }
+    float vx = iVertices [i].x, vy = iVertices [i].y;
+    glTexCoord2f ((vx - x) * inv_W, (vy - y) * inv_H);
+    glVertex2f (vx, sheight - vy);
   }
   glEnd ();
-  glDisable(GL_BLEND);
-  glDisable(GL_TEXTURE_2D);
-  glPopAttrib();
 
-  delete []texcoords; //Ooops. Almost forgot.
+  glDisable (GL_BLEND);
+  glPopMatrix ();
 }
 
 iHalo *csGraphics3DOGLCommon::CreateHalo (float iR, float iG, float iB,
-			      unsigned char *iAlpha,int iWidth,int iHeight)
+  unsigned char *iAlpha, int iWidth, int iHeight)
 {
-  csOpenGLHalo *h=new csOpenGLHalo(iR,iG,iB,iAlpha,iWidth,iHeight,this);
-  return h;
+  return new csOpenGLHalo (iR, iG, iB, iAlpha, iWidth, iHeight, this);
 }
