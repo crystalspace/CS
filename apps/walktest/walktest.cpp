@@ -531,10 +531,10 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
         Gfx2D->Clear (0);
 	covtree->MakeEmpty ();
 	csPolygon2D poly;
-	poly.AddPerspective (csVector3 (-1, -1, 5));
-	poly.AddPerspective (csVector3 (1, -1, 5));
-	poly.AddPerspective (csVector3 (1, 1, 5));
-	poly.AddPerspective (csVector3 (-1, 1, 5));
+	poly.AddPerspective (csVector3 (-3.6, -2, 5));
+	poly.AddPerspective (csVector3 (-1, -2.6, 5));
+	poly.AddPerspective (csVector3 (-1, 0, 5));
+	poly.AddPerspective (csVector3 (-3, 0.3, 5));
 	covtree->InsertPolygon (poly.GetVertices (),
 		poly.GetNumVertices (), poly.GetBoundingBox ());
 	static int level = 0;
@@ -551,6 +551,7 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
 	  if (level > 4) level = 1;
 	}
 	covtree->GfxDump (Gfx2D, level);
+	poly.Draw (Gfx2D, 0xf800);
 	printf ("Dumping level %d\n", level);
       }
     }
