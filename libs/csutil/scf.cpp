@@ -145,17 +145,20 @@ scfSharedLibrary::scfSharedLibrary (const char *lib, const char *core)
 
   RefCount = 0;
   LibraryName = csStrNew (lib);
-  LibraryHandle = csFindLoadLibrary (LibraryName);
   FuncCoreName = csStrNew (core);
+  LibraryHandle = csFindLoadLibrary (LibraryName);
 
-  typedef void (*scfInitFunc)(iSCF*);
-  csString sym;
-  sym << FuncCoreName << "_scfInitialize";
-  scfInitFunc initfunc = (scfInitFunc)csGetLibrarySymbol(LibraryHandle, sym);
-  if (initfunc)
-    initfunc(PrivateSCF);
-  else
-    csPrintLibraryError(sym);
+  if (LibraryHandle != 0)
+  {
+    typedef void (*scfInitFunc)(iSCF*);
+    csString sym;
+    sym << FuncCoreName << "_scfInitialize";
+    scfInitFunc initfunc = (scfInitFunc)csGetLibrarySymbol(LibraryHandle, sym);
+    if (initfunc)
+      initfunc(PrivateSCF);
+    else
+      csPrintLibraryError(sym);
+  }
 }
 
 scfSharedLibrary::~scfSharedLibrary ()
