@@ -2,7 +2,7 @@ SubDir TOP plugins video render3d software ;
 
 Help softrender3d : "Render3D software 3D renderer" ;
 
-if $(CMD.NASM) && $(TARGET.PROCESSOR) = "X86" && ! [ Property build : projgen ]
+if $(CMD.NASM) && $(TARGET.PROCESSOR) = "X86"
 {
   SOFTRENDER3D_ASMFILES = [ Wildcard i386 : *.asm *.cpp *.h ] ;
 }

@@ -19,10 +19,11 @@
 #
 #============================================================================
 
-# boostjam is evil: It is compatible to jam 2.4 but has a version number 3.1, we# try to detect boostjam with the ARGV extension
+# BoostJam is evil: It is compatible to Jam 2.4 but has a version number 3.1,
+# we try to detect BoostJam with the ARGV extension.
 if $(ARGV[0])
 {
-# boostjam hacks
+  # BoostJam hacks.
   JAMVERSION = 2.4 ;
   rule FIncludes
   {
@@ -38,7 +39,8 @@ if $(JAMVERSION) < 2.4
 {
     EXIT "Error: This buildsystem requires jam version 2.4 or later." ;
 }
-# don't confuse users for now...
+
+# Don't bother confusing users just yet...
 #if $(JAMVERSION) = 2.4 & $(JAM_DEBUG)
 #{
 #    echo "Warning: It is recommended to use jam2.5rc3 or later." ;
@@ -55,7 +57,7 @@ if [ Match (csh) : $(SHELL) ]
   SHELL = "/bin/sh" ;
 }
 
-# jam 2.4s SubDir rule had some problems and misses the usefull SUBDIRRULES
+# Jam 2.4's SubDir rule had some problems and misses the useful SUBDIRRULES
 # extension. So we override it here with a better version (from jam 2.5rc3)
 if $(JAMVERSION) = 2.4
 {
@@ -236,7 +238,6 @@ rule SubDir
 	# directory should not hold object files, LOCATE_TARGET can
 	# subsequently be redefined.
 
-#echo SS: $(SUBDIR) ;
 	SEARCH_SOURCE = $(SUBDIR) ;
 	LOCATE_SOURCE = $(ALL_LOCATE_TARGET) $(SUBDIR) ;
 	LOCATE_TARGET = $(ALL_LOCATE_TARGET) $(SUBDIR) ;
@@ -310,7 +311,7 @@ rule SubRules
 }
 
 ## Now we try to fix up the already messed settings
-## XXX We can only hope that jam2.4 users don't try starting jam from
+## XXX We can only hope that Jam 2.4 users don't try starting Jam from
 ## subdirectories
 TOP-SET = true ;
 TOP-UP = ;
@@ -323,4 +324,3 @@ SUBDIR_ROOT = $(TOP-ROOT) ;
 #SubDir TOP ;
 
 } # end if $(JAMVERSION) = 2.4
-

@@ -1,6 +1,6 @@
 SubDir TOP plugins sound driver coreaudio ;
 
-if $(COREAUDIO.AVAILABLE) = "yes" && [ Property build : projgen ] != msvc
+if $(COREAUDIO.AVAILABLE) = "yes"
 {
 Help casnddrv : "Crystal Space MacOS/X CoreAudio sound driver" ;
 Plugin casnddrv : [ Wildcard *.cpp *.h ] ;

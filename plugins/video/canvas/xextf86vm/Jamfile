@@ -1,6 +1,6 @@
 SubDir TOP plugins video canvas xextf86vm ;
 
-if $(XFREE86VM.AVAILABLE) = "yes" && ! [ Property build : projgen ]
+if $(XFREE86VM.AVAILABLE) = "yes"
 {
 Help xext86vm : "Crystal Space X-Extension Video Mode Plugin" ;
 Plugin xext86vm : [ Wildcard *.cpp *.h ] ;

@@ -1,6 +1,6 @@
 SubDir TOP plugins video format codecs divx4 ;
 
-if $(DIVX4.AVAILABLE) = "yes" && ! [ Property build : projgen ]
+if $(DIVX4.AVAILABLE) = "yes"
 {
 Help odivx4 : "Crystal Space DivX4 codec" ;
 Plugin odivx4 : [ Wildcard *.cpp *.h ] ;

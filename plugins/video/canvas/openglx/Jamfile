@@ -1,6 +1,6 @@
 SubDir TOP plugins video canvas openglx ;
 
-if $(GLX.AVAILABLE) = "yes" && ! [ Property build : projgen ]
+if $(GLX.AVAILABLE) = "yes"
 {
 Help glx2d : "Crystal Space GL/X 2D driver" ;
 Plugin glx2d : [ Wildcard *.cpp *.h ] ;

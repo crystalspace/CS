@@ -64,6 +64,32 @@ chronological order.
 	  yesterday on chunklod. The results of the BoxFrustum() routine
 	  were interpreted wrong which causes them to cause unneeded
 	  clipping.
+	- Eric Sunshine made the following changes to the Jam-based msvcgen
+	  mechanism:
+	    - Fixed bug where msvcgen was inserting Unix-style compiler and
+	      linker flags from Jamfile invocations of CFlags and LFlags into
+	      generated project files.
+	    - Enhanced the MsvcGenConfig rule so that it can accept
+	      configuration for the msvcgen process in both the form of an
+	      external file, and in the form of key/value tuples.
+	    - Removed a couple CS-specific configuration options (USE_PLUGINS
+	      and USE_NEW_RENDERER) from the project-agnostic
+	      mk/jam/msvcgen.jam and placed them into the new CS-specific
+	      mk/msvcgen/Jamfile.
+	    - Refined the way modules are selected for project-file generation
+	      candidacy so that it more closely parallels the way modules are
+	      selected for building by the Autoconf configure script.
+	    - The new mk/msvcgen/Jamfile creates a custom Jamconfig.msvcgen
+	      file for the msvcgen process on-the-fly.  This is a hybrid of a
+	      filtered version of the local Jamconfig file and a boilerplate
+	      file containing setting specific to MSVC.  This allows the
+	      msvcgen process to take advantage of local tools (discovered by
+	      the configure script) while still producing project files
+	      suitable for MSVC.
+	    - This set of changes concludes the high-priority work on the
+	      Jam-based msvcgen facility.  The generated project files are now
+	      (finally) compatible with the ones produced by the GNU make-based
+	      msvcgen facility, and are suitable for actual use.
 20-Apr-2004
 	- Jorrit added 'camera_origin' to csRenderMesh. The meshes will
 	  fill this field with the origin of that mesh in camera space. This

@@ -1,7 +1,6 @@
 SubDir TOP plugins video loader jng ;
 
-if ( $(MNG.AVAILABLE) = "yes" && $(JPEG.AVAILABLE) = "yes" ) ||
-  [ Property build : projgen ]
+if $(MNG.AVAILABLE) = "yes" && $(JPEG.AVAILABLE) = "yes"
 {
 Help csjngimg : "Crystal Space jng image loader" ;
 Plugin csjngimg : [ Wildcard *.cpp *.h ] ;

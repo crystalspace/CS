@@ -41,6 +41,7 @@ Depends maintainerclean : distclean ;
 # Plugin targets, thus ordering of these SubInclude invocations is dictated by
 # this limitation.
 SubInclude TOP data ;
+SubInclude TOP mk ;
 SubInclude TOP libs ;
 SubInclude TOP plugins ;
 SubInclude TOP apps ;

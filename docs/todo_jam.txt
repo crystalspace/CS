@@ -7,15 +7,6 @@ L - Low Priority (only minor function loss)
 W - Wishlist (the build also works without this feature)
 * - Completed
 
-[H] msvcgen.jam: Either respect ExternaLibs() or fix all the Jamfiles which
-    require special Windows libraries to invoke MsvcExternalLibrary().  This is
-    necessary for modules such as cssocket and ensocket which require
-    wsock32.lib, for instance.  There are a number of other such modules.  The
-    current monlithic solution of placing this information in
-    CS/mk/msvcgen/msvcgen.jam is ugly, error-prone, and a maintenance headache.
-[H] msvcgen.jam: Eliminate the ugly and monolithic mk/msvcgen/msvcgen.jam. The
-    information in this file should be provided by rule invocations in the
-    various module Jamfiles. (This is directly related to the above item.)
 [H] There are no rules for building the pure Python module yet (only the Python
     plugin works).
 [H] There are no rules for building the pure Perl5 module yet (only the Perl5
@@ -46,19 +37,18 @@ W - Wishlist (the build also works without this feature)
     and INITJAMFILE. Would be also nice to extract more of the detection
     scripts in CS (perl, python, nasm, problematic cflags?)
 
-[L] msvcgen.jam: Overhaul the "configuration" file handling rule so that it
-    associates configuration files with built targets.  This will allow the
-    generated projects to reference configuration files.  Rather than the
-    present InstallConfig rule, we either need a ConfigFile:<target>:<configs>
-    rule, or we should upgrade the Application and Plugin rules to also accept
-    configuration files. (The GNU msvcgen does this.) Note that this is just a
+[L] msvcgen.jam: Consider overhauling the "configuration" file handling rule so
+    that it associates configuration files with built targets.  This will allow
+    the generated projects to reference configuration files.  Rather than the
+    present InstallConfig rule, we might want a ConfigFile:<target>:<configs>
+    rule.  (The GNU make-based msvcgen does this.)  Note that this is just a
     convenience for the user of the project file; the project file itself will
     function correctly without this information.
 [L] msvcgen.jam: Provide a generic Resources() rule which allows specification
     of additional textual resources for inclusion in generated projects.  (The
-    GNU msvcgen does this.)  Note that this is just a convenience for the user
-    of the project file; the project file itself will function correctly
-    without this information.
+    GNU make-based msvcgen does this.)  Note that this is just a convenience
+    for the user of the project file; the project file itself will function
+    correctly without this information.
 [L] msvcgen.jam: When modules reference sources or headers outside of the local
     source directory via some number of ".."'s, these resources appear as
     "../../foo/bar/../../this/module" in the generated project file.

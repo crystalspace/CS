@@ -1,6 +1,6 @@
 SubDir TOP plugins sound driver oss ;
 
-if $(OSS.AVAILABLE) = "yes" && [ Property build : projgen ] != msvc
+if $(OSS.AVAILABLE) = "yes"
 {
 Help ossdrv : "Crystal Space OSS sound driver" ;
 Plugin ossdrv : [ Wildcard *.cpp *.h ] ;

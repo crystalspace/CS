@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh sprcal3d object ;
 
-if $(CAL3D.AVAILABLE) = "yes" || [ Property build : projgen ]
+if $(CAL3D.AVAILABLE) = "yes"
 {
 Help sprcal3d : "Cal3D Sprite mesh object plug-in" ;
 Plugin sprcal3d : [ Wildcard *.cpp *.h ] ;

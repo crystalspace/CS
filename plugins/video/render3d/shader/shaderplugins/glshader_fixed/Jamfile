@@ -1,6 +1,6 @@
 SubDir TOP plugins video render3d shader shaderplugins glshader_fixed ;
 
-if $(GL.AVAILABLE) = "yes" || [ Property build : projgen ]
+if $(GL.AVAILABLE) = "yes"
 {
 Help glshader_fixed : "Render3d Shaderplugin for fixed function pipeline" ;
 Plugin glshader_fixed : [ Wildcard *.cpp *.h ] ;

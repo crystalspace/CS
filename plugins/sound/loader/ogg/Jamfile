@@ -1,6 +1,6 @@
 SubDir TOP plugins sound loader ogg ;
 
-if $(VORBISFILE.AVAILABLE) = "yes" || [ Property build : projgen ]
+if $(VORBISFILE.AVAILABLE) = "yes"
 {
 Help sndogg : "Crystal Space ogg vorbis sound loader" ;
 Plugin sndogg : [ Wildcard *.cpp *.h ] ;

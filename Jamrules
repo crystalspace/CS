@@ -3,7 +3,9 @@ if ! $(BUILDTOP)
 BUILDTOP = . ;
 }
 
-# Include config
+# Include configuration.  The value of JAMCONFIG may be overridden by targets
+# which recursively invoke 'jam' with a custom configuration file.  For
+# instance, this is done with the 'msvcgen' target (see CS/mk/msvcgen/Jamfile).
 JAMCONFIG ?= $(BUILDTOP)/Jamconfig ;
 include $(JAMCONFIG) ;
 if ! $(JAMCONFIG_READ)
@@ -37,10 +39,6 @@ LOCATE.DOCS = $(BUILDTOP)/out/docs ;
 
 # Include CS build rules.
 include $(TOP)/mk/jam/build.jam ;
-
-# Additional msvcgen configuration.
-MsvcGenConfig [ ConcatDirs $(TOP) mk msvcgen msvcgen.jam ] ;
-include [ ConcatDirs $(TOP) mk msvcgen workspaces.jam ] ;
 
 # Project-specific settings.
 if $(TARGET.OS) = MACOS_X

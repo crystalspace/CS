@@ -45,7 +45,6 @@ CFLAGS.TERRBIG = $(CFLAGS.I)plugins/mesh/terrbig
 MSVC.DSP += TERRBIG
 DSP.TERRBIG.NAME = terrbig
 DSP.TERRBIG.TYPE = plugin
-DSP.TERRBIG.CFLAGS = /I "..\..\plugins\mesh\terrbig"
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#

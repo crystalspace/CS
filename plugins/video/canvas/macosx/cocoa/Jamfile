@@ -1,6 +1,6 @@
 SubDir TOP plugins video canvas macosx cocoa ;
 
-if $(TARGET.OS) = "MACOS_X" && [ Property build : projgen ] != msvc
+if $(TARGET.OS) = "MACOS_X"
 {
 Help cocoa2d : "Crystal Space MacOS/X Cocoa 2D driver" ;
 Plugin cocoa2d : [ Wildcard *.cpp *.m *.h ] ;

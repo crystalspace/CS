@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh particles physics ode ;
 
-if $(ODE.AVAILABLE) = "yes" || [ Property build : projgen ]
+if $(ODE.AVAILABLE) = "yes"
 {
 Help partphys_ode : "Particle ODE-based Physics plug-in" ;
 Plugin partphys_ode : [ Wildcard *.cpp *.h ] ;

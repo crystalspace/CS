@@ -1,6 +1,6 @@
 SubDir TOP plugins video canvas openglcommon ;
 
-if $(GL.AVAILABLE) = "yes" || [ Property build : projgen ]
+if $(GL.AVAILABLE) = "yes"
 {
 Library openglcommon : [ Wildcard *.cpp *.h ] : noinstall ;
 CFlags openglcommon : $(GL.CFLAGS) ;

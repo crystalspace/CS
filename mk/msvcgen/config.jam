@@ -1,0 +1,70 @@
+#==============================================================================
+# MSVC-specific configuration for msvcgen
+#
+#    This library is free software; you can redistribute it and/or modify it
+#    under the terms of the GNU Library General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or (at your
+#    option) any later version.
+#
+#    This library is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+#    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library General Public
+#    License for more details.
+#
+#    You should have received a copy of the GNU Library General Public License
+#    along with this library; if not, write to the Free Software Foundation,
+#    Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#==============================================================================
+#------------------------------------------------------------------------------
+# This file contains extra configuration information for the msvcgen process.
+# The most common use of this file is to provide MSVC-specific fallback values
+# for the library checks normally performed by the Crystal Space configure
+# script, and which the various Jamfiles reference via the ExternalLibs rule.
+# Such fallbacks consist of variables named TAG.CFLAGS, TAG.LFLAGS, and
+# TAG.LIBS, where TAG represents the library's identifier emitted by the
+# configure script.  For instance, to provide MSVC-specific fallback values for
+# the FreeType2 library, which the configure script identifies as FT2, you can
+# define variables named FT2.CFLAGS, FT2.LFLAGS, and FT2.LIBS.  You should also
+# set TAG.AVAILABLE variables to "yes" to ensure that the correct Jamfiles are
+# loaded for MSVC and that the correct project targets get created.  For
+# instance, to ensure that the FreeType2 plugin's project file is generated,
+# set FT2.AVAILABLE to "yes".
+#------------------------------------------------------------------------------
+
+3DS.AVAILABLE = yes ;
+3DS.LIBS = lib3ds-120.lib ;
+CAL3D.AVAILABLE = yes ;
+CAL3D.LIBS = cal3d.lib ;
+CG.AVAILABLE = yes ;
+CG.LIBS = cg.lib cgGL.lib ;
+CMD.NASM = ;
+DIRECTX.AVAILABLE = yes ;
+DIRECTX.LIBS = dsound.lib ddraw.lib dinput.lib ;
+FT2.AVAILABLE = yes ;
+FT2.CFLAGS = "/I \"..\\..\\include\\csutil\\win32\\freetype2\"" ;
+FT2.LIBS = freetype2.lib ;
+GL.AVAILABLE = yes ;
+GL.LIBS = opengl32.lib ;
+JPEG.AVAILABLE = yes ;
+JPEG.LIBS = libjpeg.lib ;
+MIKMOD.AVAILABLE = yes ;
+MIKMOD.LIBS = mikmod.lib ;
+MNG.AVAILABLE = yes ;
+MNG.LIBS = libmng.lib ;
+ODE.AVAILABLE = yes ;
+ODE.LIBS = ode.lib ;
+OPENAL.AVAILABLE = yes ;
+OPENAL.LIBS = openal32.lib alut.lib ;
+PNG.AVAILABLE = yes ;
+PNG.LIBS = libpng.lib ;
+PYTHON.CFLAGS = "/D \"SWIG_GLOBAL\"" ;
+SOCKET.AVAILABLE = yes ;
+SOCKET.LIBS = wsock32.lib ;
+USE_NEW_RENDERER = no ;
+VORBISFILE.AVAILABLE = yes ;
+VORBISFILE.LIBS = vorbisfile.lib vorbis.lib ogg.lib ;
+WAVEOUT.AVAILABLE = yes ;
+WAVEOUT.LIBS = winmm.lib ;
+ZLIB.AVAILABLE = yes ;
+ZLIB.LIBS = zlib.lib ;

@@ -1,6 +1,6 @@
 SubDir TOP plugins video canvas sdl ;
 
-if $(SDL.AVAILABLE) = "yes" && ! [ Property build : projgen ]
+if $(SDL.AVAILABLE) = "yes"
 {
 Help sdl2d : "Crystal Space SDL 2D driver" ;
 Plugin sdl2d : [ Wildcard *.cpp *.h ] ;

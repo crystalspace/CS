@@ -1,6 +1,6 @@
 SubDir TOP plugins sound renderer ds3d ;
 
-if $(DIRECTX.AVAILABLE) = "yes" || [ Property build : projgen ] = msvc
+if $(DIRECTX.AVAILABLE) = "yes"
 {
 Help sndds3d : "Crystal Space DirectSound 3D sound renderer" ;
 Plugin sndds3d : [ Wildcard *.cpp *.h ] ;

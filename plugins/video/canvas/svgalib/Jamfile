@@ -1,6 +1,6 @@
 SubDir TOP plugins video canvas svgalib ;
 
-if $(SVGA.AVAILABLE) = "yes" && ! [ Property build : projgen ]
+if $(SVGA.AVAILABLE) = "yes"
 {
 Help svga2d : "Crystal Space SVGAlib 2D driver" ;
 Plugin svga2d : [ Wildcard *.cpp *.h ] ;

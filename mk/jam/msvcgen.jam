@@ -60,16 +60,44 @@ JAM ?= jam ;
 if $(MSVCGEN_SILENT) = yes { JAM += -d0 ; }
 
 ## MsvcGenConfig configfile
-##   Specify an additional configuration file to augment the msvcgen
-##   environment.
+## MsvcGenConfig variable : value
+##   Specify additional configuration information to augment the msvcgen
+##   environment.  If one argument is provided, then it is a file containing
+##   Jam statements providing additional configuration for the msvcgen process.
+##   In the common case, the file will contain a series of simple variable
+##   assignment statements.  If two arguments are provided, then the named
+##   'variable' is set to 'value' for the msvcgen run.  Invocations of the
+##   two-argument form of MsvcGenConfig are cumulative, so variable/value
+##   tuples can be provided incrementally.  It is legal to use both forms of
+##   MsvcGenConfig; they are not mutually exclusive.
 ##
-## @@@ This is likely temporary. It is present for backward compatibiliy while
-## additional configuration information is maintained in a monolithic
-## configuration file, rather than provided to msvcgen via normal rule
-## invocation by module-specific Jamfiles.
+##   The most common reason to invoke this rule is to provide MSVC-specific
+##   fallback values for the library checks typically performed by an Autoconf
+##   configure script, which the Jamfiles reference via the ExternalLibs rule.
+##   Such fallbacks consist of variables named TAG.CFLAGS, TAG.LFLAGS, and
+##   TAG.LIBS, where TAG represents the library's identifier exported by the
+##   configure script.  For instance, to provide MSVC-specific fallback values
+##   for the FreeType2 library, which the configure script might identify as
+##   FT2, you can define variables named FT2.CFLAGS, FT2.LFLAGS, and FT2.LIBS.
+##   The msvcgen process will consult these variables when it encounters
+##   invocations of the ExternalLibs rule, and apply the overrides to the
+##   generated project files.  If yours is a multi-platform project which
+##   conditionally defines Application, Plugin, and Library targets based upon
+##   the platform, then you should also define whatever additional variables or
+##   properties are needed to ensure that your project's Jamfiles invoke the
+##   Application, Plugin, and Library rules for modules suitable for Windows,
+##   and that they do not invoke those rules for modules specific to other
+##   platforms.
 rule MsvcGenConfig
 {
-  MSVCGEN_CONFIG = $(<) ;
+  if $(>)
+  {
+    MSVCGEN_CONFIG_TUPLES += "-s$(<)=$(>)" ;
+  }
+  else
+  {
+    MSVCGEN_CONFIG = $(<) ;
+  }
 }
 
 ## MsvcGenWorkspace name [ : accepts [ : rejects ]]
@@ -93,6 +121,11 @@ rule MsvcGenWorkspace
 }
 
 ## MsvcGenTarget version
+##   Create pseudo-targets for building and removing project files for the
+##   specified version of MSVC.  Also populates the list MSVCGEN_TARGETS with
+##   names of the targets.  Clients which need to perform some pre-processing
+##   prior to the actual msvcgen run may set the targets in this list to depend
+##   upon client-supplied targets.
 rule MsvcGenTarget
 {
   Always msvc$(<)gen ;
@@ -101,6 +134,7 @@ rule MsvcGenTarget
   MsvcGen msvc$(<)gen ;
   Depends msvcgen : msvc$(<)gen ;
   Help msvc$(<)gen : "Create MSVC$(<) project files" : verbatim ;
+  MSVCGEN_TARGETS += msvc$(<)gen ;
   CleanDir msvc$(<)clean :
     [ msvcgen_target_dir $(<) ] [ msvcgen_fragment_dir $(<) ] ;
   Depends msvcclean : msvc$(<)clean ;
@@ -110,8 +144,8 @@ rule MsvcGenTarget
 actions MsvcGen
 {
   $(JAM) -sDO_MSVCGEN=yes -sMSVCGEN_CONFIG=$(MSVCGEN_CONFIG) \
-    -sMSVC_VERSION=$(MSVC_VERSION) -sTARGET.OS=WIN32 -sUSE_PLUGINS=yes \
-    -sUSE_NEW_RENDERER=no msvcgen
+    -sMSVC_VERSION=$(MSVC_VERSION) -sTARGET.OS=WIN32 $(MSVCGEN_CONFIG_TUPLES) \
+    msvcgen
 }
 
 MsvcGenTarget 6 ;
@@ -192,6 +226,7 @@ SetProperty build : projgen_version : $(MSVC_VERSION) ;
 # Override some rules
 
 ## MsvcGenConfig configfile
+## MsvcGenConfig variables : values
 ##   (See documentation above.)
 rule MsvcGenConfig
 {
@@ -458,17 +493,14 @@ rule MsvcExternalLibrary
   LIBRARIES on $($(<)_TARGET) += $(>) ;
 }
 
-rule CFlags
+rule MsvcCFlags
 {
-  if $(>) != ""
-  {
-    CFLAGS on $($(<)_TARGET) += $(>) ;
-  }
+  if $(>) { CFLAGS on $($(<)_TARGET) += $(>) ; }
 }
 
-rule LFlags
+rule MsvcLFlags
 {
-  LFLAGS on $($(<)_TARGET) += $(>) ;
+  if $(>) { LFLAGS on $($(<)_TARGET) += $(>) ; }
 }
 
 rule ExternalLibs
@@ -476,11 +508,17 @@ rule ExternalLibs
   local i ;
   for i in $(>)
   {
-    CFlags $(<) : $($(i).CFLAGS) ;
-    LFlags $(<) : $($(i).LFLAGS) ;
-    MsvcExternalLibrary $(<) : $($(i).MSVCLIBS) ;
+    MsvcCFlags $(<) : $($(i).CFLAGS) ;
+    MsvcLFlags $(<) : $($(i).LFLAGS) ;
+    MsvcExternalLibrary $(<) : $($(i).LIBS) ;
   }
 }
+
+# Normal invocations of these two rules are made using Unix-style flags;
+# possibly determined by an Autoconf configuration script.  Such flags are
+# unsuitable for MSVC, so we ignore them.
+rule CFlags { }
+rule LFlags { }
 
 rule Win32Resource
 {

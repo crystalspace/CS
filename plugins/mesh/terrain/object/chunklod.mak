@@ -45,7 +45,6 @@ CFLAGS.CHUNKLOD = $(CFLAGS.I)plugins/mesh/terrain/object
 MSVC.DSP += CHUNKLOD
 DSP.CHUNKLOD.NAME = chunklod
 DSP.CHUNKLOD.TYPE = plugin
-DSP.CHUNKLOD.CFLAGS = /I "..\..\plugins\mesh\terrain\object"
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#

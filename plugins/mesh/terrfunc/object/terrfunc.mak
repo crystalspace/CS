@@ -45,7 +45,6 @@ CFLAGS.TERRFUNC = $(CFLAGS.I)plugins/mesh/terrfunc/object
 MSVC.DSP += TERRFUNC
 DSP.TERRFUNC.NAME = terrfunc
 DSP.TERRFUNC.TYPE = plugin
-DSP.TERRFUNC.CFLAGS = /I "..\..\plugins\mesh\terrfunc\object"
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#

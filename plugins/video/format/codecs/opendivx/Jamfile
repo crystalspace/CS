@@ -1,6 +1,6 @@
 SubDir TOP plugins video format codecs opendivx ;
 
-if $(OPENDIVX.AVAILABLE) = "yes" && ! [ Property build : projgen ]
+if $(OPENDIVX.AVAILABLE) = "yes"
 {
 Help odivx : "Crystal Space OpenDivX codec" ;
 Plugin odivx : [ Wildcard *.cpp *.h ] ;

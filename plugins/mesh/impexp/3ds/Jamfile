@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh impexp 3ds ;
 
-if $(3DS.AVAILABLE) = "yes" || [ Property build : projgen ]
+if $(3DS.AVAILABLE) = "yes"
 {
 Help ie3ds : "Model Import/Export 3ds plug-in" ;
 Plugin ie3ds : [ Wildcard *.cpp *.h ] ;

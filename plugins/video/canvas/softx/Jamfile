@@ -1,6 +1,6 @@
 SubDir TOP plugins video canvas softx ;
 
-if $(X11.AVAILABLE) = "yes" && ! [ Property build : projgen ]
+if $(X11.AVAILABLE) = "yes"
 {
 Help x2d : "Crystal Space XLib 2D driver" ;
 Plugin x2d : [ Wildcard *.cpp *.h ] ;

@@ -1,6 +1,6 @@
 SubDir TOP plugins video canvas xwindow ;
 
-if $(X11.AVAILABLE) = "yes" && ! [ Property build : projgen ]
+if $(X11.AVAILABLE) = "yes"
 {
 Help xwin : "Crystal Space X Window Plugin" ;
 Plugin xwin : [ Wildcard *.cpp *.h ] ;
