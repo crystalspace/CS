@@ -227,7 +227,8 @@ csGraphics2DOpenGL::csGraphics2DOpenGL(iBase *iParent) :
 
 csGraphics2DOpenGL::~csGraphics2DOpenGL(void)
 {
-  m_piWin32Assistant->DecRef ();
+  if (m_piWin32Assistant)
+    m_piWin32Assistant->DecRef ();
   m_nGraphicsReady=0;
 }
 
@@ -321,6 +322,14 @@ bool csGraphics2DOpenGL::Open()
   if (is_open) return true;
   DEVMODE dmode;
   LONG ti;
+
+  // Ugly hack needed to work around an interference between the 3dfx opengl 
+  // driver on voodoo cards <= 2 and the win32 console window
+  if (GetFullScreen() && config->GetBool("Video.OpenGL.Win32.DisableConsoleWindow", false) ) 
+  {
+    m_piWin32Assistant->DisableConsole();
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "*** Disabled Win32 console window to avoid OpenGL interference.");
+  }
 
   // create the window.
   DWORD exStyle = 0;

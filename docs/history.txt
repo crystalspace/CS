@@ -53,6 +53,40 @@ The history order is reversed so that new features are at the top.
 	  optimization was not correct. However, his code triggered several
 	  optimization ideas which were easy to implement and give a
 	  small (but noticable) speed improvement.
+	- Eric Sunshine made the following repairs to F. Richer's modification
+	  to the OpenGL renderer to detect hardware and use configuration
+	  settings appropriate to that hardware:
+	    - When it loads a hardware-specific configuration file, it assigns
+	      a higher priority to that file than the priority assigned to the
+	      "default" OpenGL settings.  This ensures that the
+	      hardware-specific settings will take precedence over the default
+	      settings, via a supported mechanism (rather than relying upon an
+	      implementation detail of the configuration class).
+	    - Removed the Win32-specific hack which was added to the OpenGL
+	      renderer and moved it to the Win32 OpenGL canvas where it
+	      belongs.  (Please, let's try to keep platform-specific
+	      specializations out of the platform-independent renderers.)
+	    - Merged CS/data/config/opengl/_default.cfg back into
+	      CS/data/config/opengl.cfg.  Since hardware-specific configuration
+	      files are assigned a higher priority than
+	      CS/data/config/opengl.cfg, it is no longer necessary for the
+	      _default.cfg information to reside in a separate file.
+	    - Moved CS/data/config/opengl/3dfx.cfg to
+	      CS/data/config/gl3dfx.cfg.
+	    - Merged the contents of CS/data/config/opengl/opengl.cfg into
+	      CS/data/config/opengl.cfg.  This file contained the
+	      "Video.OpenGL.Config" keys which are used to make
+	      hardware-specific configuration selection.  However, there is no
+	      reason for this information to be in a separate file, so it has
+	      been merged into the generic OpenGL configuration file.
+	    - Eliminated the CS/data/opengl/*.cfg files and subdirectory.
+	      Unfortunately, the makefile's `install' mechanism is not
+	      currently capable of reproducing subdirectories of
+	      CS/data/config.  This directory, and these files are no longer
+	      needed, anyhow, following my changes.
+	    - Eliminated several memory leaks.
+	  Be forewarned that, as usual, my changes to the OpenGL renderer and
+	  canvas are untested since I do not have access to OpenGL hardware.
 8-Nov-2001
 	- Jorge Acereda fixed a leak in ieplex.cpp where the result of a
 	  SCF::QueryClassList() wasn't DecRef()ed.

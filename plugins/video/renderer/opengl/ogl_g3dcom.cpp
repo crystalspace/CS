@@ -50,15 +50,12 @@
 #include "ivideo/graph2d.h"
 #include "csutil/garray.h"
 #include "csutil/cscolor.h"
-#include "csutil/util.h"
+#include "csutil/csstring.h"
 #include "csutil/csstrvec.h"
+#include "csutil/util.h"
 #include "csgfx/rgbpixel.h"
 #include "qsqrt.h"
 #include "video/canvas/openglcommon/iogl.h"
-
-#ifdef WIN32
-#include "cssys/win32/win32.h"
-#endif
 
 #define BYTE_TO_FLOAT(x) ((x) * (1.0 / 255.0))
 
@@ -709,97 +706,74 @@ bool csGraphics3DOGLCommon::NewOpen ()
     return false;
   }
 
-  // Initialize the default method calls
-  DrawPolygonCall = &csGraphics3DOGLCommon::DrawPolygonSingleTexture;
-
-#define _OGLCONFIGS_PREFIX   "Video.OpenGL.Configs"
-#define _OGLCONFIGS_CFGFILE  "config"
+#define OGLCONFIGS_PREFIX "Video.OpenGL.Config."
+#define OGLCONFIGS_SUFFIX ".config"
 
   CS_ASSERT (object_reg != NULL);
-  config.AddConfig(object_reg, "/config/opengl/opengl.cfg");
   
-  const char *sGL_RENDERER = (const char *)glGetString (GL_RENDERER);
-  const char *sGL_VENDOR = (const char *)glGetString (GL_VENDOR);
-  const char *sGL_VERSION = (const char *)glGetString (GL_VERSION);
+  const char *sGL_RENDERER   = (const char *)glGetString (GL_RENDERER);
+  const char *sGL_VENDOR     = (const char *)glGetString (GL_VENDOR);
+  const char *sGL_VERSION    = (const char *)glGetString (GL_VERSION);
   const char *sGL_EXTENSIONS = (const char *)glGetString (GL_EXTENSIONS);
 
-  csStrVector *oglconfigs = new csStrVector ();
+  csStrVector oglconfigs;
   
-  iConfigIterator *it = config->Enumerate (_OGLCONFIGS_PREFIX);
+  iConfigIterator *it = config->Enumerate (OGLCONFIGS_PREFIX);
   while (it->Next ())
   {
-    char *oglconfig = new char [strlen(it->GetKey (true))+1];
-    strcpy(oglconfig, it->GetKey (true)+1);
-    char *dot = strchr(oglconfig, '.');
-    if (dot) *dot = '\0';
+    csString oglconfig;
+    char const* key = it->GetKey(true);
+    char const* dot = strchr(key, '.');
+    if (dot == 0)
+	oglconfig = key;
+    else
+	oglconfig.Append(key, dot - key); // Drop the '.' and all that follows.
 
-    if (oglconfigs->FindKey (oglconfig) == -1)
+    if (oglconfigs.FindKey (oglconfig.GetData()) == -1)
     {
       bool apply = true;
       int count = 0;
-#define CHECK_STRING(str)						  \
-      if (s##str)								  \
-      {									  \
-	char *s_##str =							  \
-	  new char [strlen(_OGLCONFIGS_PREFIX) + 1 + strlen(oglconfig) + 1 + strlen(#str) + 1]; \
-	sprintf(s_##str, _OGLCONFIGS_PREFIX ".%s." #str, oglconfig);		  \
-	if (config->KeyExists(s_##str))					  \
-	{									  \
-	  count++;							  \
-	  apply &= csGlobMatches(s##str, config->GetStr(s_##str));	  \
-	}									  \
-	delete s_##str;							  \
+
+#define CHECK_STRING(str) \
+      if (s##str) \
+      { \
+        csString s_##str; \
+	s_##str << OGLCONFIGS_PREFIX << oglconfig << '.' << #str; \
+	if (config->KeyExists(s_##str.GetData())) \
+	{ \
+	  count++; \
+	  apply &= csGlobMatches(s##str, config->GetStr(s_##str.GetData())); \
+	} \
       } 
 
       CHECK_STRING (GL_VENDOR);
       CHECK_STRING (GL_VERSION);
       CHECK_STRING (GL_RENDERER);
       CHECK_STRING (GL_EXTENSIONS);
-
 #undef CHECK_STRING
 
-      if (apply && (count != 0)) 
+      if (apply && count != 0)
       {
-	char *cfgfkey = new char [strlen(_OGLCONFIGS_PREFIX) + 1 + strlen(oglconfig) + 
-	  1 + strlen(_OGLCONFIGS_CFGFILE) + 1];						  
-	sprintf(cfgfkey, _OGLCONFIGS_PREFIX ".%s." _OGLCONFIGS_CFGFILE, oglconfig);		  
-	const char *cfgfile = config->GetStr(cfgfkey);
-	config.AddConfig(object_reg, cfgfile);
+	csString cfgfkey;
+	cfgfkey << OGLCONFIGS_PREFIX << oglconfig << OGLCONFIGS_SUFFIX;
+	csString cfgfile("/config/");
+	cfgfile << config->GetStr(cfgfkey.GetData());
+	config.AddConfig(object_reg, cfgfile.GetData(),
+	  iConfigManager::ConfigPriorityPlugin + 1);
 	Report (CS_REPORTER_SEVERITY_NOTIFY, "read config for '%s' from %s",
-	  oglconfig, cfgfile);
-	delete cfgfkey;
+	  oglconfig.GetData(), cfgfile.GetData());
       }
-      oglconfigs->Push(oglconfig);
+      oglconfigs.Push(oglconfig.GetData());
     } 
-    else
-    {
-      delete oglconfig;
-    }
   }
-#undef _OGLCONFIGS_PREFIX   
-#undef _OGLCONFIGS_CFGFILE
+  it->DecRef();
 
-  delete oglconfigs;
+#undef OGLCONFIGS_PREFIX   
+#undef OGLCONFIGS_SUFFIX
 
-  config.AddConfig(object_reg, "/config/opengl.cfg");
+  // Initialize the default method calls
+  DrawPolygonCall = &csGraphics3DOGLCommon::DrawPolygonSingleTexture;
 
-#ifdef WIN32
-  // @@@ hack to work around an interference between the 3dfx opengl 
-  // driver on voodoo cards <= 2 and the win32 console window
-  if (G2D->GetFullScreen() && config->GetBool("Video.OpenGL.Win32.DisableConsoleWindow", false) ) 
-  {
-    iWin32Assistant *Win32Assistant = CS_QUERY_REGISTRY (object_reg, iWin32Assistant);
-
-    if (Win32Assistant)
-    {
-      Win32Assistant->DisableConsole();
-      Win32Assistant->DecRef();
-
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "*** disabled win32 console window");
-    }
-  }
-#endif
-  
   vbufmgr = new csPolArrayVertexBufferManager (object_reg);
 
   m_renderstate.dither = config->GetBool ("Video.OpenGL.EnableDither", false);
