@@ -16,6 +16,11 @@ The history order has been reversed so that new features are at the top.
 	  places in the same code.
 	- Paul Garceau modified mingw.mak to fully accomodate Working
 	  Static Library Build.
+	- Fixed a bug in the parser with SKY and SKYDOME commands.
+	- Fixed two bugs in csFrustum::Classify. Fixing these bugs has
+	  the unfortunate side-effect of breaking lighting a bit (not
+	  completely, but shadow calculation has more errors now). But
+	  we will fix those later.
 16-Jul-2000
 	- Samuel Humphreys did the following changes..
             - Added two new procedural textures to dtsimple. This is to complete

@@ -402,13 +402,18 @@ int csFrustum::Classify (csVector3* frustum, int num_frust,
       {
         // If the segment intersects with the frustum plane somewhere
         // between two limiting lines, we have the CS_FRUST_PARTIAL case.
-        csVector3 p = poly [pvp] - (poly [pv] - poly [pvp]) * (prev_d / (d - prev_d));
+        csVector3 p = poly [pvp] - (poly [pv] - poly [pvp])
+		* (prev_d / (d - prev_d));
         // If the vector product between both vectors making the frustum
         // plane and the intersection point between polygon edge and plane
         // have same sign, the intersection point is outside frustum
-        if ((poly [pvp] % p) * (poly [pv] % p) < 0)
+        //@@@ This is the old code but I think this code
+	// should test against the frustum.
+	//--- if ((poly [pvp] % p) * (poly [pv] % p) < 0)
+        if ((v1 % p) * (v2 % p) < 0)
           return CS_FRUST_PARTIAL;
       }
+      prev_d = d;
     }
   }
 
