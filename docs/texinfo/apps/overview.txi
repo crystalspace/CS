@@ -94,11 +94,6 @@ This is a tool to test graphics performance.
 This application tests the physics library for proper operation.
 @xref{csPhyziks}.
 
-@cindex @file{ptlab}
-@cindex Applications, @file{ptlab}
-@item ptlab
-A test application for procedural textures.
-
 @cindex @file{pysimp}
 @cindex Applications, @file{pysimp}
 @item pysimp
