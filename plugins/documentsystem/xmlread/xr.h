@@ -382,8 +382,8 @@ public:
   csArray<TrDocumentAttribute> set;
 
   TrDocumentAttributeSet() : set (0, 4) { }
-  int Find (const char * name) const;
-  int FindExact (const char * reg_name) const;
+  size_t Find (const char * name) const;
+  size_t FindExact (const char * reg_name) const;
 };
 
 
@@ -419,14 +419,14 @@ public:
   TrDocumentAttribute& GetAttributeRegistered (const char * reg_name);
 
   /// Get number of attributes.
-  int GetAttributeCount () const { return attributeSet.set.Length (); }
+  size_t GetAttributeCount () const { return attributeSet.set.Length (); }
   /// Get attribute.
-  const TrDocumentAttribute& GetAttribute (int idx) const
+  const TrDocumentAttribute& GetAttribute (size_t idx) const
   {
     return attributeSet.set[idx];
   }
   /// Get attribute.
-  TrDocumentAttribute& GetAttribute (int idx)
+  TrDocumentAttribute& GetAttribute (size_t idx)
   {
     return attributeSet.set[idx];
   }

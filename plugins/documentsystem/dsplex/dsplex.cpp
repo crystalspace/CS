@@ -77,7 +77,7 @@ csRef<iDocumentNode> csPlexDocument::CreateRoot ()
     }
     else
     {
-      int pi = 0;
+      size_t pi = 0;
       wrappedDS = plexer->LoadNextPlugin (pi);
     }
   }
@@ -105,7 +105,7 @@ const char* csPlexDocument::Parse (iFile* file)
 {
   size_t oldpos = file->GetPos ();
 
-  int pluginnum = 0;
+  size_t pluginnum = 0;
   csRef<iDocumentSystem> DS;
   wrappedDoc = 0;
   lasterr.Clear();
@@ -131,7 +131,7 @@ const char* csPlexDocument::Parse (iFile* file)
 
 const char* csPlexDocument::Parse (iDataBuffer* buf)
 {
-  int pluginnum = 0;
+  size_t pluginnum = 0;
   csRef<iDocumentSystem> DS;
   wrappedDoc = 0;
   lasterr.Clear();
@@ -156,7 +156,7 @@ const char* csPlexDocument::Parse (iDataBuffer* buf)
 
 const char* csPlexDocument::Parse (iString* str)
 {
-  int pluginnum = 0;
+  size_t pluginnum = 0;
   csRef<iDocumentSystem> DS;
   wrappedDoc = 0;
   lasterr.Clear();
@@ -181,7 +181,7 @@ const char* csPlexDocument::Parse (iString* str)
 
 const char* csPlexDocument::Parse (const char* buf)
 {
-  int pluginnum = 0;
+  size_t pluginnum = 0;
   csRef<iDocumentSystem> DS;
   wrappedDoc = 0;
   lasterr.Clear();

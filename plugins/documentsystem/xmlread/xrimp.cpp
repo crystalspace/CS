@@ -65,13 +65,13 @@ csXmlReadAttributeIterator::csXmlReadAttributeIterator (TrDocumentNode* parent)
   csXmlReadAttributeIterator::parent = parent ? parent->ToElement () : 0;
   if (csXmlReadAttributeIterator::parent == 0)
   {
-    current = -1;
+    current = csArrayItemNotFound;
     return;
   }
   count = csXmlReadAttributeIterator::parent->GetAttributeCount ();
   if (!count) 
   {
-    current = -1;
+    current = csArrayItemNotFound;
     return;
   }
   current = 0;
@@ -84,19 +84,19 @@ csXmlReadAttributeIterator::~csXmlReadAttributeIterator()
 
 bool csXmlReadAttributeIterator::HasNext ()
 {
-  return current != -1;
+  return current != csArrayItemNotFound;
 }
 
 csRef<iDocumentAttribute> csXmlReadAttributeIterator::Next ()
 {
   csRef<iDocumentAttribute> attr;
-  if (current != -1)
+  if (current != csArrayItemNotFound)
   {
     attr = csPtr<iDocumentAttribute> (new csXmlReadAttribute (
     	&parent->GetAttribute (current)));
     current++;
     if (current >= count)
-      current = -1;
+      current = csArrayItemNotFound;
   }
   return attr;
 }
@@ -333,8 +333,8 @@ csRef<iDocumentAttributeIterator> csXmlReadNode::GetAttributes ()
 TrDocumentAttribute* csXmlReadNode::GetAttributeInternal (const char* name)
 {
   if (use_contents_value) return 0;
-  int count = node->ToElement ()->GetAttributeCount ();
-  int i;
+  size_t count = node->ToElement ()->GetAttributeCount ();
+  size_t i;
   for (i = 0 ; i < count ; i++)
   {
     TrDocumentAttribute& attrib = node->ToElement ()->GetAttribute (i);

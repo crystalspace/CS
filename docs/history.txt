@@ -7,14 +7,16 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 6-Jul-2004
-    - Reed changed VOSA3DL to load required plugins on demand rather than 
-      assume they were already loaded.
+	- Reed changed VOSA3DL to load required plugins on demand rather than 
+	  assume they were already loaded.
 	- Eric Sunshine fixed bug in jamtemplate/app.cpp.template where it
 	  asked SCF to scan CEL plugin path multiple times.
 	- Eric Sunshine made parsing of MAKEFLAGS in make emulation layer more
 	  robust. It should no longer be fooled by equates, such as
 	  "make FOOBAR=socks all", which previously would have caused it to
 	  think that the user specified -k and -s make options.
+	- res made some size_t and 64 bit warning fixes to the dsplex and
+	  xmlread plugins.
 5-Jul-2004
 	- Jorrit fixed the cs096 in csdemo.
 4-Jul-2004

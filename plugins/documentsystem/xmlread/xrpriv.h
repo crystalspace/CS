@@ -30,8 +30,8 @@ class csXmlReadDocument;
 struct csXmlReadAttributeIterator : public iDocumentAttributeIterator
 {
 private:
-  int current;
-  int count;
+  size_t current;
+  size_t count;
   TrXmlElement* parent;
 
 public:

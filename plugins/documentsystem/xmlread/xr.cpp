@@ -225,9 +225,9 @@ TrXmlElement::~TrXmlElement()
 
 const char * TrXmlElement::Attribute( const char * name )
 {
-  int nodeidx = attributeSet.Find (name);
+  size_t nodeidx = attributeSet.Find (name);
 
-  if (nodeidx != -1)
+  if (nodeidx != csArrayItemNotFound)
     return attributeSet.set[nodeidx].Value ();
 
   return 0;
@@ -251,14 +251,14 @@ const char * TrXmlElement::Attribute( const char * name, int* i )
 TrDocumentAttribute& TrXmlElement::GetAttributeRegistered (
   const char * reg_name)
 {
-  int nodeidx = attributeSet.FindExact (reg_name);
-  if (nodeidx != -1)
+  size_t nodeidx = attributeSet.FindExact (reg_name);
+  if (nodeidx != csArrayItemNotFound)
   {
     return attributeSet.set[nodeidx];
   }
 
   TrDocumentAttribute at;
-  int idx = attributeSet.set.Push (at);
+  size_t idx = attributeSet.set.Push (at);
   attributeSet.set[idx].SetName (reg_name);
   return attributeSet.set[idx];
 }
@@ -305,23 +305,23 @@ TrXmlDeclaration::TrXmlDeclaration( const char * _version,
 }
 
 
-int TrDocumentAttributeSet::Find (const char * name) const
+size_t TrDocumentAttributeSet::Find (const char * name) const
 {
   size_t i;
   for (i = 0 ; i < set.Length () ; i++)
   {
     if (strcmp (set[i].name, name) == 0) return i;
   }
-  return -1;
+  return csArrayItemNotFound;
 }
 
-int TrDocumentAttributeSet::FindExact (const char * reg_name) const
+size_t TrDocumentAttributeSet::FindExact (const char * reg_name) const
 {
   size_t i;
   for (i = 0 ; i < set.Length () ; i++)
   {
     if (set[i].name == reg_name) return i;
   }
-  return -1;
+  return csArrayItemNotFound;
 }
 
