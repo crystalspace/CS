@@ -186,6 +186,8 @@ csThing::csThing (iBase *parent) :
   obj_normals = NULL;
   smoothed = false;
   current_visnr = 1;
+
+  vistest_objects_inuse = false;
 }
 
 csThing::~csThing ()
@@ -3656,18 +3658,26 @@ class csThingVisObjIt : public iVisibilityObjectIterator
 private:
   csVector* vector;
   int position;
+  bool* vistest_objects_inuse;
 
 public:
   SCF_DECLARE_IBASE;
 
-  csThingVisObjIt (csVector* vector)
+  csThingVisObjIt (csVector* vector, bool* vistest_objects_inuse)
   {
     SCF_CONSTRUCT_IBASE (NULL);
     csThingVisObjIt::vector = vector;
+    csThingVisObjIt::vistest_objects_inuse = vistest_objects_inuse;
+    if (vistest_objects_inuse) *vistest_objects_inuse = true;
     Reset ();
   }
   virtual ~csThingVisObjIt ()
   {
+    // If the vistest_objects_inuse pointer is not NULL we set the
+    // bool to false to indicate we're no longer using the base
+    // vector. Otherwise we delete the vector.
+    if (vistest_objects_inuse) *vistest_objects_inuse = false;
+    else delete vector;
   }
 
   virtual bool Next()
@@ -3700,17 +3710,29 @@ public:
   }
 };
 
-//----------------------------------------------------------------------
-
 SCF_IMPLEMENT_IBASE (csThingVisObjIt)
   SCF_IMPLEMENTS_INTERFACE (iVisibilityObjectIterator)
 SCF_IMPLEMENT_IBASE_END
+
+//----------------------------------------------------------------------
 
 csPtr<iVisibilityObjectIterator> csThing::VisTest (const csBox3& box)
 {
   if (!static_tree) return NULL;
   current_visnr++;
-  vistest_objects.DeleteAll ();
+
+  csVector* v;
+  if (vistest_objects_inuse)
+  {
+    // Vector is already in use by another iterator. Allocate a new vector
+    // here.
+    v = new csVector ();
+  }
+  else
+  {
+    v = &vistest_objects;
+    vistest_objects.DeleteAll ();
+  }
 
   // @@@ Very ugly implementation. Should at least try
   // to use the octree!!!
@@ -3725,20 +3747,32 @@ csPtr<iVisibilityObjectIterator> csThing::VisTest (const csBox3& box)
     if (bbox.TestIntersect (box))
     {
       vo->SetVisibilityNumber (current_visnr);
-      vistest_objects.Push (vo);
+      v->Push (vo);
     }
   }
 
-  csRef<iVisibilityObjectIterator> visit = csPtr<iVisibilityObjectIterator> (
-  	(iVisibilityObjectIterator*)(new csThingVisObjIt (&vistest_objects)));
-  return csPtr<iVisibilityObjectIterator> (visit);
+  csThingVisObjIt* vobjit = new csThingVisObjIt (v,
+  	vistest_objects_inuse ? NULL : &vistest_objects_inuse);
+  return csPtr<iVisibilityObjectIterator> (vobjit);
 }
 
 csPtr<iVisibilityObjectIterator> csThing::VisTest (const csSphere& sphere)
 {
   if (!static_tree) return NULL;
   current_visnr++;
-  vistest_objects.DeleteAll ();
+
+  csVector* v;
+  if (vistest_objects_inuse)
+  {
+    // Vector is already in use by another iterator. Allocate a new vector
+    // here.
+    v = new csVector ();
+  }
+  else
+  {
+    v = &vistest_objects;
+    vistest_objects.DeleteAll ();
+  }
 
   // @@@ Very ugly implementation. Should at least try
   // to use the octree!!!
@@ -3755,13 +3789,13 @@ csPtr<iVisibilityObjectIterator> csThing::VisTest (const csSphere& sphere)
     if (csIntersect3::BoxSphere (bbox, pos, sqradius))
     {
       vo->SetVisibilityNumber (current_visnr);
-      vistest_objects.Push (vo);
+      v->Push (vo);
     }
   }
 
-  csRef<iVisibilityObjectIterator> visit = csPtr<iVisibilityObjectIterator> (
-  	(iVisibilityObjectIterator*)(new csThingVisObjIt (&vistest_objects)));
-  return csPtr<iVisibilityObjectIterator> (visit);
+  csThingVisObjIt* vobjit = new csThingVisObjIt (v,
+  	vistest_objects_inuse ? NULL : &vistest_objects_inuse);
+  return csPtr<iVisibilityObjectIterator> (vobjit);
 }
 
 struct CheckFrustData

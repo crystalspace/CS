@@ -76,18 +76,26 @@ class csFrustVisObjIt : public iVisibilityObjectIterator
 private:
   csVector* vector;
   int position;
+  bool* vistest_objects_inuse;
 
 public:
   SCF_DECLARE_IBASE;
 
-  csFrustVisObjIt (csVector* vector)
+  csFrustVisObjIt (csVector* vector, bool* vistest_objects_inuse)
   {
     SCF_CONSTRUCT_IBASE (NULL);
     csFrustVisObjIt::vector = vector;
+    csFrustVisObjIt::vistest_objects_inuse = vistest_objects_inuse;
+    if (vistest_objects_inuse) *vistest_objects_inuse = true;
     Reset ();
   }
   virtual ~csFrustVisObjIt ()
   {
+    // If the vistest_objects_inuse pointer is not NULL we set the
+    // bool to false to indicate we're no longer using the base
+    // vector. Otherwise we delete the vector.
+    if (vistest_objects_inuse) *vistest_objects_inuse = false;
+    else delete vector;
   }
 
   virtual bool Next()
@@ -150,6 +158,7 @@ csFrustumVis::csFrustumVis (iBase *iParent)
   object_reg = NULL;
   kdtree = NULL;
   current_visnr = 1;
+  vistest_objects_inuse = false;
 }
 
 csFrustumVis::~csFrustumVis ()
@@ -500,16 +509,29 @@ static bool FrustTestBox_Front2Back (csSimpleKDTree* treenode, void* userdata,
 csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (const csBox3& box)
 {
   current_visnr++;
-  vistest_objects.DeleteAll ();
+
+  csVector* v;
+  if (vistest_objects_inuse)
+  {
+    // Vector is already in use by another iterator. Allocate a new vector
+    // here.
+    v = new csVector ();
+  }
+  else
+  {
+    v = &vistest_objects;
+    vistest_objects.DeleteAll ();
+  }
+  
   FrustTestBox_Front2BackData data;
   data.current_visnr = current_visnr;
   data.box = box;
-  data.vistest_objects = &vistest_objects;
+  data.vistest_objects = v;
   kdtree->Front2Back (box.GetCenter (), FrustTestBox_Front2Back, (void*)&data);
 
-  csRef<iVisibilityObjectIterator> visit = csPtr<iVisibilityObjectIterator> (
-  	(iVisibilityObjectIterator*)(new csFrustVisObjIt (&vistest_objects)));
-  return csPtr<iVisibilityObjectIterator> (visit);
+  csFrustVisObjIt* vobjit = new csFrustVisObjIt (v,
+  	vistest_objects_inuse ? NULL : &vistest_objects_inuse);
+  return csPtr<iVisibilityObjectIterator> (vobjit);
 }
 
 //======== VisTest sphere ==================================================
@@ -569,17 +591,30 @@ static bool FrustTestSphere_Front2Back (csSimpleKDTree* treenode,
 csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (const csSphere& sphere)
 {
   current_visnr++;
-  vistest_objects.DeleteAll ();
+
+  csVector* v;
+  if (vistest_objects_inuse)
+  {
+    // Vector is already in use by another iterator. Allocate a new vector
+    // here.
+    v = new csVector ();
+  }
+  else
+  {
+    v = &vistest_objects;
+    vistest_objects.DeleteAll ();
+  }
+
   FrustTestSphere_Front2BackData data;
   data.current_visnr = current_visnr;
   data.pos = sphere.GetCenter ();
   data.sqradius = sphere.GetRadius () * sphere.GetRadius ();
-  data.vistest_objects = &vistest_objects;
+  data.vistest_objects = v;
   kdtree->Front2Back (data.pos, FrustTestSphere_Front2Back, (void*)&data);
 
-  csRef<iVisibilityObjectIterator> visit = csPtr<iVisibilityObjectIterator> (
-  	(iVisibilityObjectIterator*)(new csFrustVisObjIt (&vistest_objects)));
-  return csPtr<iVisibilityObjectIterator> (visit);
+  csFrustVisObjIt* vobjit = new csFrustVisObjIt (v,
+  	vistest_objects_inuse ? NULL : &vistest_objects_inuse);
+  return csPtr<iVisibilityObjectIterator> (vobjit);
 }
 
 //======== IntersectSegment ================================================

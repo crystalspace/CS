@@ -86,18 +86,26 @@ class csDynVisObjIt : public iVisibilityObjectIterator
 private:
   csVector* vector;
   int position;
+  bool* vistest_objects_inuse;
 
 public:
   SCF_DECLARE_IBASE;
 
-  csDynVisObjIt (csVector* vector)
+  csDynVisObjIt (csVector* vector, bool* vistest_objects_inuse)
   {
     SCF_CONSTRUCT_IBASE (NULL);
     csDynVisObjIt::vector = vector;
+    csDynVisObjIt::vistest_objects_inuse = vistest_objects_inuse;
+    if (vistest_objects_inuse) *vistest_objects_inuse = true;
     Reset ();
   }
   virtual ~csDynVisObjIt ()
   {
+    // If the vistest_objects_inuse pointer is not NULL we set the
+    // bool to false to indicate we're no longer using the base
+    // vector. Otherwise we delete the vector.
+    if (vistest_objects_inuse) *vistest_objects_inuse = false;
+    else delete vector;
   }
 
   virtual bool Next()
@@ -172,6 +180,7 @@ csDynaVis::csDynaVis (iBase *iParent)
   write_queue = new csWriteQueue ();
   current_visnr = 1;
   history_frame_cnt = 2;
+  vistest_objects_inuse = false;
 
   stats_cnt_vistest = 0;
   stats_total_vistest_time = 0;
@@ -1141,17 +1150,29 @@ static bool VisTestBox_Front2Back (csKDTree* treenode, void* userdata,
 csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (const csBox3& box)
 {
   current_visnr++;
-  vistest_objects.DeleteAll ();
+
+  csVector* v;
+  if (vistest_objects_inuse)
+  {
+    // Vector is already in use by another iterator. Allocate a new vector
+    // here.
+    v = new csVector ();
+  }
+  else
+  {
+    v = &vistest_objects;
+    vistest_objects.DeleteAll ();
+  }
 
   VisTestBox_Front2BackData data;
   data.box = box;
   data.current_visnr = current_visnr;
-  data.vistest_objects = &vistest_objects;
+  data.vistest_objects = v;
   kdtree->Front2Back (box.GetCenter (), VisTestBox_Front2Back, (void*)&data);
 
-  csRef<iVisibilityObjectIterator> visit = csPtr<iVisibilityObjectIterator> (
-  	(iVisibilityObjectIterator*)(new csDynVisObjIt (&vistest_objects)));
-  return csPtr<iVisibilityObjectIterator> (visit);
+  csDynVisObjIt* vobjit = new csDynVisObjIt (v,
+  	vistest_objects_inuse ? NULL : &vistest_objects_inuse);
+  return csPtr<iVisibilityObjectIterator> (vobjit);
 }
 
 //======== VisTest sphere ==================================================
@@ -1210,18 +1231,31 @@ static bool VisTestSphere_Front2Back (csKDTree* treenode, void* userdata,
 csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (const csSphere& sphere)
 {
   current_visnr++;
-  vistest_objects.DeleteAll ();
+
+  csVector* v;
+  if (vistest_objects_inuse)
+  {
+    // Vector is already in use by another iterator. Allocate a new vector
+    // here.
+    v = new csVector ();
+  }
+  else
+  {
+    v = &vistest_objects;
+    vistest_objects.DeleteAll ();
+  }
+
 
   VisTestSphere_Front2BackData data;
   data.current_visnr = current_visnr;
-  data.vistest_objects = &vistest_objects;
+  data.vistest_objects = v;
   data.pos = sphere.GetCenter ();
   data.sqradius = sphere.GetRadius () * sphere.GetRadius ();
   kdtree->Front2Back (data.pos, VisTestSphere_Front2Back, (void*)&data);
 
-  csRef<iVisibilityObjectIterator> visit = csPtr<iVisibilityObjectIterator> (
-  	(iVisibilityObjectIterator*)(new csDynVisObjIt (&vistest_objects)));
-  return csPtr<iVisibilityObjectIterator> (visit);
+  csDynVisObjIt* vobjit = new csDynVisObjIt (v,
+  	vistest_objects_inuse ? NULL : &vistest_objects_inuse);
+  return csPtr<iVisibilityObjectIterator> (vobjit);
 }
 
 //======== IntersectSegment ================================================

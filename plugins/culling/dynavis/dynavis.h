@@ -118,6 +118,7 @@ class csDynaVis : public iVisibilityCuller
 public:
   // List of objects to iterate over (after VisTest()).
   csVector vistest_objects;
+  bool vistest_objects_inuse;	// If true the vector is in use.
 
 private:
   iObjectRegistry *object_reg;

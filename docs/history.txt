@@ -16,6 +16,11 @@ The history order is reversed so that new features are at the top.
 	- Applied another optimization to csSector::IntersectSegment().
 	  This will now only check objects that are in the box defined
 	  by start->end of the segment (if only portals is true).
+	- Fixed a bad bug introcuded by the previous changes in the cullers.
+	  This bug caused CD in walktest to go completely wrong. The reason
+	  for this bug was the iterators for VisTest() were all sharing the
+	  same vector but with different data. This fix does not completely
+	  fix the issue though. Still have to investigate what's wrong.
 3-Nov-2002
 	- Changed DynaVis to use the new movable and object model
 	  listeners. This significantly speeds up rendering and walking
