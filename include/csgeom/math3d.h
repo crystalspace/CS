@@ -40,8 +40,12 @@ public:
   ///
   float z;
 
-  /// Make a new vector, initialized to the zero vector.
-  csVector3 () { x = y = z = 0; }
+  /**
+   * Make a new vector. The vector is not
+   * initialized. This makes the code slightly faster as
+   * csVector3 objects are used a lot.
+   */
+  csVector3 () { }
 
   /// Make a new vector and initialize with the given values.
   csVector3 (float x, float y, float z = 0)
@@ -492,17 +496,23 @@ public:
   }
 
   /**
-   * Check if two planes are close together.
+   * Check if two planes are almost equal.
    * The function returns true iff each component of the plane equation for
    * one plane is within .001 of the corresponding component of the other
    * plane.
    */
-  static bool PlanesClose (const csPlane& p1, const csPlane& p2)
+  static bool PlanesEqual (const csPlane& p1, const csPlane& p2)
   {
     return ( ( p1.norm - p2.norm) < (float).001 ) &&
              (  ABS (p1.DD-p2.DD) < (float).001 );
   }
 
+  /**
+   * Check if two planes are close together.
+   * Two planes are close if there are almost equal OR if
+   * the normalized versions are almost equal.
+   */
+  static bool PlanesClose (const csPlane& p1, const csPlane& p2);
 };
 
 /**
