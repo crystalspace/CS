@@ -820,6 +820,8 @@ AS_IF([test $enable_cpu_specific_optimizations != no],
 	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-mcpu=pentium])
 	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-mpentium -march=i586])
 	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-mpentium])
+	CS_CHECK_CODE_GEN_FLAG([[*[3-9]86]], [-march=i486])
+	CS_CHECK_CODE_GEN_FLAG([[*[3-9]86]], [-mcpu=i486 -march=i486])
 	CS_CHECK_CODE_GEN_FLAG([[*[3-9]86]], [-mcpu=i486])
 	CS_CHECK_CODE_GEN_FLAG([[*[3-9]86]], [-m486])
 	CS_CHECK_CODE_GEN_FLAG([alpha], [-mieee])])
