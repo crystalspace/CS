@@ -41,8 +41,9 @@ if $(USE_NEW_RENDERER) = "yes"
 {
   CompileGroups glrender3d : walkall ;
   CompileGroups shadermgr : walkall ;
-  CompileGroups rendstep_std : walkall ;
   CompileGroups rendloop_loader : walkall ;
+  CompileGroups rendstep_std : walkall ;
+  CompileGroups rendstep_stencil : walkall ;
   CompileGroups glshader_arb : walkall ;
   CompileGroups glshader_fixed : walkall ;
   

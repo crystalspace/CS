@@ -33,6 +33,8 @@ chronological order.
 	- res made the following changes:
 	    - Made some updates to the map2cs tutorial.
 	    - cssys/win32/wintools.h doesn't include <windows.h> any more.
+	- res updated the Jam 'walkall' target to include rendstep_stencil as
+	  well.
 14-Oct-2003
 	- Eric Sunshine fixed typographical error in constant expression in
 	  cssys/general/platformconfig.cpp: S_IWGRPS_IXGRP --> S_IWGRP|S_IXGRP.
