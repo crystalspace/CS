@@ -144,6 +144,10 @@ void NeXTSystemDriver::timer_fired()
 //	    running.  The result is returned as a boolean result in the integer
 //	    variable referenced by the argument.  Returns `true' if the system
 //	    driver variable Shutdown is false.
+//	flushgraphicscontext
+//	    Flush the connection to the current graphics context (the Quartz
+//	    or DPS server, for instance).  This forces the graphics context to
+//	    perform all pending drawing operations.
 //	dispatchevent <void*:event> <void*:view>
 //	    Interpret an AppKit event and post the appropriate csEvent to the
 //	    Crystal Space event queue.  The first argument is a pointer to an
@@ -198,6 +202,8 @@ bool NeXTSystemDriver::SystemExtension( char const* cmd, ... )
 	STR_CASE (continuerunning)
 	    int* flag = AGET(int*);
 	    *flag = continue_running();
+	STR_CASE (flushgraphicscontext)
+	    NeXTDelegate_flush_graphics_context( controller );
 	STR_CASE (dispatchevent)
 	    NeXTEvent const event = AGET(NeXTEvent);
 	    NeXTView  const view  = AGET(NeXTView );

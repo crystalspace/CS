@@ -4,6 +4,19 @@ The history order has been reversed so that new features are at the top.
 	- Norman Kramer cleaned up the unresolved instances for meshes,
 	  loaders and factories.
 	- Norman switched the X11 canvases to iConfigManager.
+	- Eric Sunshine resolved several compilation problems on MacOS/X which
+	  were reported in a series of build-logs sent by Travis McLane
+	  <tmclane@swt.edu>.
+	    - Several AppKit and Foundation headers needed to be imported into
+	      various source files.  In the past, these headers got pulled in
+	      by other system headers which were already being imported, but
+	      this is no longer the case as of MacOS/X.
+	    - NSDPSContext was replaced by NSGraphicsContext.  The code now
+	      conditionally references the correct class depending upon
+	      platform.  Also centralized the graphics context flushing
+	      mechanism into NeXTDelegate.m since it is needed from a couple
+	      different places.  Added a new extension to
+	      NeXTSystemDriver::SystemExtension() named "flushgraphicscontext".
 19-Feb-2001
 	- Norman Kramer changed all csSector::GetNumberXxx() to GetNumXxx().
 	- Martin Geisse modified the system driver to use the config

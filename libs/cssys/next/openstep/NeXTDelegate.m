@@ -21,13 +21,24 @@
 #include "NeXTMenu.h"
 #include "ievdefs.h"
 #include "cssys/next/NeXTSystemDriver.h"
+#include "volatile.h"		// OS_NEXT_OPENSTEP, OS_NEXT_MACOSXS
+#include <stdio.h>
 #import <AppKit/NSApplication.h>
 #import <AppKit/NSCursor.h>
 #import <AppKit/NSEvent.h>
 #import <AppKit/NSMenu.h>
 #import <AppKit/NSView.h>
+#import <Foundation/NSAutoreleasePool.h>
 #import <Foundation/NSFileManager.h>
+#import <Foundation/NSProcessInfo.h>
+#import <Foundation/NSTimer.h>
 #import <Foundation/NSUserDefaults.h>
+
+#if defined(OS_NEXT_OPENSTEP) || defined(OS_NEXT_MACOSXS)
+#import <AppKit/NSDPSContext.h>
+#else
+#import <AppKit/NSGraphicContext.h>
+#endif
 
 typedef void* NeXTDelegateHandle;
 typedef void* NeXTEventHandle;
@@ -234,6 +245,22 @@ ND_PROTO(void,show_mouse)( NeXTDelegateHandle handle )
 
 ND_PROTO(void,hide_mouse)( NeXTDelegateHandle handle )
     { [(NeXTDelegate*)handle hideMouse]; }
+
+
+//-----------------------------------------------------------------------------
+// flushGraphicsContext
+//-----------------------------------------------------------------------------
+- (void)flushGraphicsContext
+    {
+#if defined(OS_NEXT_OPENSTEP) || defined(OS_NEXT_MACOSXS)
+    [[NSDPSContext currentContext] flush];
+#else
+    [[NSGraphicsContext currentContext] flushGraphics];
+#endif
+    }
+
+ND_PROTO(void,flush_graphics_context)( NeXTDelegateHandle handle )
+    { [(NeXTDelegate*)handle flushGraphicsContext]; }
 
 
 //-----------------------------------------------------------------------------
@@ -732,8 +759,8 @@ ND_PROTO(NeXTDelegateHandle,startup)( NeXTSystemDriver handle )
     NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
     [NSApp setDelegate:0];
     [controller showMouse];
+    [controller flushGraphicsContext]; // Flush any pending `showcursor'.
     [controller release];
-    [[NSDPSContext currentContext] flush]; // Flush any pending 'showcursor'.
     [pool release];
     }
 
