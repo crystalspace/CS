@@ -22,16 +22,20 @@
 #include "csgfx/memimage.h"
 #include "csgfx/rgbpixel.h"
 
-iImage* csCreateXORPatternImage(int width, int height, int patsize) {
+iImage* csCreateXORPatternImage(int width, int height, int patsize)
+{
   int x,y;
   iImage *image = new csImageMemory(width, height);
   csRGBpixel *pixel = (csRGBpixel*)image->GetImageData();
 
   if (patsize>8) patsize = 8;
 
-  for (x=0; x<width; x++) {
-    for (y=0; y<width; y++) {
-      pixel->red = pixel->green = pixel->blue = ((x & ((1<<patsize)-1)) ^ (y & ((1<<patsize)-1))) << (8-patsize); 
+  for (x=0; x<width; x++)
+  {
+    for (y=0; y<width; y++)
+    {
+      pixel->red = pixel->green = pixel->blue =
+      	((x & ((1<<patsize)-1)) ^ (y & ((1<<patsize)-1))) << (8-patsize); 
       pixel++;
     }
   }

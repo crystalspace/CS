@@ -28,14 +28,9 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/csgfx
 
-INC.CSGFX = include/csgfx/csimage.h \
-  include/csgfx/quantize.h include/csgfx/inv_cmap.h \
-  include/csgfx/memimage.h include/csgfx/bumpmap.h
-SRC.CSGFX = libs/csgfx/csimage.cpp \
-  libs/csgfx/quantize.cpp libs/csgfx/inv_cmap.cpp \
-  libs/csgfx/memimage.cpp libs/csgfx/bumpmap.cpp
-
 CSGFX.LIB = $(OUT)$(LIB_PREFIX)csgfx$(LIB_SUFFIX)
+INC.CSGFX = $(wildcard include/csgfx/*.h)
+SRC.CSGFX = $(wildcard libs/csgfx/*.cpp)
 OBJ.CSGFX = $(addprefix $(OUT),$(notdir $(SRC.CSGFX:.cpp=$O)))
 
 ifneq ($(USE_PLUGINS),yes)

@@ -4,6 +4,9 @@ The history order is reversed so that new features are at the top.
 	- Fixed software renderer after 'res' broke it.
 	- Fixed csparser after 'res' broke it.
 	- Fixed OpenGL renderer after 'res' broke it.
+	- After fixing the csgfx makefile so that it actually uses all
+	  .cpp files in the dir I reenabled the csCreateXORImage() in
+	  software, OpenGL, and csparser.
 1-Jan-2001
 	- Fixed bug [497461] from sf.net. This bug prevented joystick
 	  button handling to work properly. Reported by J.F. Miller.

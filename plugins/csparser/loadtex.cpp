@@ -67,7 +67,9 @@ iImage* csLoader::LoadImage (const char* name, int Format)
 	      "crystalspace.maploader.parse.image",
     	      "Could not open image file '%s' on VFS!", name);
     //return NULL;
-  } else {
+  }
+  else
+  {
     ifile = ImageLoader->Load (buf->GetUint8 (), buf->GetSize (), Format);
     buf->DecRef ();
 
@@ -82,7 +84,7 @@ iImage* csLoader::LoadImage (const char* name, int Format)
   }
   if (!ifile)
   {
-    //ifile = csCreateXORPatternImage(32, 32, 5);
+    ifile = csCreateXORPatternImage(32, 32, 5);
   } 
   
   iDataBuffer *xname = VFS->ExpandPath (name);
