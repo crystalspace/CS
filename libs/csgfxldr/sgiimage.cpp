@@ -171,7 +171,7 @@ void ImageSGIFile::loadSGITables(UByte *in,ULong *out,int size)
 int ImageSGIFile::decode_rle (UByte *src, ULong length, UByte *dst)
 {
   int size = 0;
-  UByte count;
+  UByte count = 0;
 
   while (length-- && (count = *src++))
   {
