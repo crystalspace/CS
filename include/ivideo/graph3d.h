@@ -252,6 +252,22 @@ enum G3D_FOGMETHOD
   (CS_FX_ALPHA | uint (alpha & CS_FX_MASK_ALPHA))
 /** @} */
 
+struct csAlphaMode
+{
+  enum AlphaType
+  {
+    alphaNone = 1,
+    alphaBinary,
+    alphaSmooth
+  };
+  bool autoAlphaMode;
+  union
+  {
+    AlphaType alphaType;
+    csStringID autoModeTexture;
+  };
+};
+
 /**\name Light parameters
  * @{ */
 /// Position of the light.
@@ -325,7 +341,6 @@ struct csGraphics3DCaps
   bool NeedsPO2Maps;
   int MaxAspectRatio;
 };
-
 
 //===========================================================================
 // Not for new renderer! @@@NR@@@

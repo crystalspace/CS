@@ -171,6 +171,9 @@ public:
   { return false; }
 
   virtual iGraphics2D* GetCanvas () { return 0; }
+
+  virtual csAlphaMode::AlphaType GetAlphaType ()
+  { return csAlphaMode::alphaNone; }
 };
 
 /**

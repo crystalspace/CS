@@ -301,6 +301,27 @@ void csGLGraphics3D::SetMixMode (uint mode)
     statecache->Disable_GL_BLEND ();
 }
 
+void csGLGraphics3D::SetAlphaType (csAlphaMode::AlphaType alphaType)
+{
+  switch (alphaType)
+  {
+    case csAlphaMode::alphaNone:
+      statecache->Disable_GL_BLEND ();
+      statecache->Disable_GL_ALPHA_TEST ();
+      break;
+    case csAlphaMode::alphaBinary:
+      statecache->Disable_GL_BLEND ();
+      statecache->Enable_GL_ALPHA_TEST ();
+      statecache->SetAlphaFunc (GL_GEQUAL, 0.5f);
+      break;
+    case csAlphaMode::alphaSmooth:
+      statecache->Enable_GL_BLEND ();
+      statecache->Disable_GL_ALPHA_TEST ();
+      statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      break;
+  }
+}
+
 void csGLGraphics3D::SetMirrorMode (bool mirror)
 {
   if (mirror)
@@ -1654,7 +1675,10 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
   void* bufData = indexbuf->RenderLock (CS_GLBUF_RENDERLOCK_ELEMENTS);
   if (bufData != (void*)-1)
   {
-    SetMixMode (mymesh->mixmode);
+    if (mymesh->mixmode != CS_FX_COPY)
+      SetMixMode (mymesh->mixmode);
+    else
+      SetAlphaType (mymesh->alphaType);
 
     if (bugplug)
     {
@@ -1664,32 +1688,12 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
     }
 
     glColor4f (1, 1, 1, 1);
-/*    if (mymesh->meshtype == CS_MESHTYPE_POLYGON)
-    {
-      const int indexSize = indexbuf->compcount * indexbuf->compSize;
-      int indexPos = mymesh->indexstart;
-      int p = 0;
-      while (indexPos < mymesh->indexend)
-      {
-        int vc = mymesh->polyNumVerts[p++];
-        glDrawElements (
-          GL_TRIANGLE_FAN,
-          vc,
-          indexbuf->compGLType,
-          ((uint8*)bufData) +
-      	    (indexSize * indexPos));
-        indexPos += vc;
-      }
-    }
-    else*/
-    {
-      glDrawElements (
-        primitivetype,
-        mymesh->indexend - mymesh->indexstart,
-        indexbuf->compGLType,
-        ((uint8*)bufData) +
-      	  (indexbuf->compcount * indexbuf->compSize * mymesh->indexstart));
-    }
+    glDrawElements (
+      primitivetype,
+      mymesh->indexend - mymesh->indexstart,
+      indexbuf->compGLType,
+      ((uint8*)bufData) +
+	(indexbuf->compcount * indexbuf->compSize * mymesh->indexstart));
 
     indexbuf->Release();
   }

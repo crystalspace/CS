@@ -29,6 +29,7 @@
  
 #include "csutil/scf.h"
 #include "cstypes.h"
+#include "ivideo/graph3d.h"
 
 struct iGraphics2D;
 struct iGraphics3D;
@@ -154,6 +155,8 @@ struct iTextureHandle : public iBase
    * the returned canvas.
    */
   virtual iGraphics2D* GetCanvas () = 0;
+
+  virtual csAlphaMode::AlphaType GetAlphaType () = 0;
 };
 
 /** @} */

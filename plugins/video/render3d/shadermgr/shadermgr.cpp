@@ -472,6 +472,44 @@ iRenderBuffer* csShaderPass::clear_buffers[STREAMMAX*2];
 int csShaderPass::units[TEXMAX];
 iTextureHandle* csShaderPass::textures[TEXMAX];
 iTextureHandle* csShaderPass::clear_textures[TEXMAX];
+iTextureHandle* csShaderPass::autoAlphaTex;
+
+csShaderPass::csShaderPass (csShaderTechnique* owner, iObjectRegistry* reg)
+{
+  SCF_CONSTRUCT_IBASE(0);
+  g3d = CS_QUERY_REGISTRY (reg, iGraphics3D);
+  vp = 0; fp = 0;
+  parent = owner;
+  objectreg = reg;
+  mixmode = CS_FX_COPY;
+  int i;
+  for (i=0; i<STREAMMAX; i++)
+  {
+    streammapping[i] = csInvalidStringID;
+    attribs[i*2+0] = (csVertexAttrib)i;
+    attribs[i*2+1] = (csVertexAttrib)(i+100);
+    clear_buffers[i*2+0] = 0;
+    clear_buffers[i*2+1] = 0;
+  }
+  for (i=0; i<TEXMAX; i++)
+  {
+    texmapping[i] = csInvalidStringID;
+    units[i] = i;
+    clear_textures[i] = 0;
+  }
+
+  writemaskRed = true;
+  writemaskGreen = true;
+  writemaskBlue = true;
+  writemaskAlpha = true;
+
+  csRef<iStringSet> strings = 
+    CS_QUERY_REGISTRY_TAG_INTERFACE (objectreg, 
+    "crystalspace.renderer.stringset", iStringSet);
+
+  alphaMode.autoAlphaMode = true;
+  alphaMode.autoModeTexture = strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
+}
 
 void csShaderPass::Activate(csRenderMesh* mesh)
 {
@@ -527,6 +565,15 @@ void csShaderPass::SetupState (csRenderMesh *mesh,
       textures[i] = 0;
   }
 
+  if (autoAlphaTexRef)
+  {
+    csShaderVariable* var = autoAlphaTexRef;
+    if (var)
+      var->GetValue (autoAlphaTex);
+    else
+      autoAlphaTex = 0;
+  }
+
   if (dynamicVars.Length() > 0)
   {
     for(i=0;i<dynamicDomains.Length();i++)
@@ -539,7 +586,11 @@ void csShaderPass::SetupState (csRenderMesh *mesh,
   {
     csShaderVariable* var = dynamicVars.Get (i).shaderVariable;
     if (var)
-      var->GetValue (textures[dynamicVars.Get (i).userData]);
+    {
+      iTextureHandle*& tex = dynamicVars.Get (i).userData >= 0 ?
+	textures[dynamicVars.Get (i).userData] : autoAlphaTex;
+      var->GetValue (tex);
+    }
     dynamicVars.Get (i).shaderVariable = 0;
   }
 
@@ -547,6 +598,17 @@ void csShaderPass::SetupState (csRenderMesh *mesh,
 
   g3d->GetWriteMask (OrigWMRed, OrigWMGreen, OrigWMBlue, OrigWMAlpha);
   g3d->SetWriteMask (writemaskRed, writemaskGreen, writemaskBlue, writemaskAlpha);
+
+  // @@@ Hmm... is it ok to modify the rendermesh?
+  if (alphaMode.autoAlphaMode)
+  {
+    if (autoAlphaTex != 0)
+      mesh->alphaType = autoAlphaTex->GetAlphaType ();
+    else
+      mesh->alphaType = csAlphaMode::alphaNone;
+  }
+  else
+    mesh->alphaType = alphaMode.alphaType;
   
   if (vp) vp->SetupState (mesh,dynamicDomains);
   if (fp) fp->SetupState (mesh,dynamicDomains);
@@ -591,6 +653,7 @@ void csShaderPass::BuildTokenHash()
 {
   xmltokens.Register ("declare", XMLTOKEN_DECLARE);
   xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
+  xmltokens.Register ("alphamode", XMLTOKEN_ALPHAMODE);
   xmltokens.Register ("streammapping", XMLTOKEN_STREAMMAPPING);
   xmltokens.Register ("texturemapping", XMLTOKEN_TEXTUREMAPPING);
   xmltokens.Register ("vp", XMLTOKEN_VP);
@@ -629,190 +692,197 @@ bool csShaderPass::Load (iDocumentNode* node)
       csStringID id = xmltokens.Request (value);
       switch(id)
       {
-      case XMLTOKEN_MIXMODE:
-        {
-          synserv->ParseMixmode (child, mixmode);
-        }
-        break;
-      case XMLTOKEN_STREAMMAPPING:
-        {
-          const char* dest = child->GetAttributeValue ("destination");
-          csVertexAttrib attribute = CS_VATTRIB_0;
-          bool found = false;
-          int i;
-          for (i = 0; i<16; i++)
-          {
-            char str[13];
-            sprintf (str, "attribute %d", i);
-            if (strcmp (str, dest) == 0)
-            {
-              attribute = (csVertexAttrib)(CS_VATTRIB_0 + i);
-              found = true;
-              break;
-            }
-          }
-          if (!found)
-          {
-            if (strcmp (dest, "position") == 0)
-            {
-              attribute = CS_VATTRIB_POSITION;
-              found = true;
-            }
-            else if (strcmp (dest, "normal") == 0)
-            {
-              attribute = CS_VATTRIB_NORMAL;
-              found = true;
-            }
-            else if (strcmp (dest, "color") == 0)
-            {
-              attribute = CS_VATTRIB_COLOR;
-              found = true;
-            }
-            else if (strcmp (dest, "primary color") == 0)
-            {
-              attribute = CS_VATTRIB_PRIMARY_COLOR;
-              found = true;
-            }
-            else if (strcmp (dest, "secondary color") == 0)
-            {
-              attribute = CS_VATTRIB_SECONDARY_COLOR;
-              found = true;
-            }
-            else if (strcmp (dest, "texture coordinate") == 0)
-            {
-              attribute = CS_VATTRIB_TEXCOORD;
-              found = true;
-            }
-            else
-            {
-	      static const char mapName[] = "texture coordinate %d";
-	      char buf[sizeof (mapName)];
-	      
-	      for (int u = 0; u < 8; u++)
+	case XMLTOKEN_MIXMODE:
+	  {
+	    if (!synserv->ParseMixmode (child, mixmode))
+	      return false;
+	  }
+	  break;
+	case XMLTOKEN_ALPHAMODE:
+	  {
+	    if (!synserv->ParseAlphaMode (child, strings, alphaMode));
+	      return false;
+	  }
+	  break;
+	case XMLTOKEN_STREAMMAPPING:
+	  {
+	    const char* dest = child->GetAttributeValue ("destination");
+	    csVertexAttrib attribute = CS_VATTRIB_0;
+	    bool found = false;
+	    int i;
+	    for (i = 0; i<16; i++)
+	    {
+	      char str[13];
+	      sprintf (str, "attribute %d", i);
+	      if (strcmp (str, dest) == 0)
 	      {
-	        sprintf (buf, mapName, u);
-		if (strcmp (dest, buf) == 0)
+		attribute = (csVertexAttrib)(CS_VATTRIB_0 + i);
+		found = true;
+		break;
+	      }
+	    }
+	    if (!found)
+	    {
+	      if (strcmp (dest, "position") == 0)
+	      {
+		attribute = CS_VATTRIB_POSITION;
+		found = true;
+	      }
+	      else if (strcmp (dest, "normal") == 0)
+	      {
+		attribute = CS_VATTRIB_NORMAL;
+		found = true;
+	      }
+	      else if (strcmp (dest, "color") == 0)
+	      {
+		attribute = CS_VATTRIB_COLOR;
+		found = true;
+	      }
+	      else if (strcmp (dest, "primary color") == 0)
+	      {
+		attribute = CS_VATTRIB_PRIMARY_COLOR;
+		found = true;
+	      }
+	      else if (strcmp (dest, "secondary color") == 0)
+	      {
+		attribute = CS_VATTRIB_SECONDARY_COLOR;
+		found = true;
+	      }
+	      else if (strcmp (dest, "texture coordinate") == 0)
+	      {
+		attribute = CS_VATTRIB_TEXCOORD;
+		found = true;
+	      }
+	      else
+	      {
+		static const char mapName[] = "texture coordinate %d";
+		char buf[sizeof (mapName)];
+  	      
+		for (int u = 0; u < 8; u++)
 		{
-		  attribute = (csVertexAttrib)((int)CS_VATTRIB_TEXCOORD0 + u);
-		  found = true;
-		  break;
+		  sprintf (buf, mapName, u);
+		  if (strcmp (dest, buf) == 0)
+		  {
+		    attribute = (csVertexAttrib)((int)CS_VATTRIB_TEXCOORD0 + u);
+		    found = true;
+		    break;
+		  }
 		}
 	      }
-            }
-          }
-          if (found)
-          {
-            AddStreamMapping (
-              strings->Request (child->GetAttributeValue ("stream")),
-              attribute);
-          }
-        }
-        break;
-      case XMLTOKEN_TEXTUREMAPPING:
-        {
-          if (child->GetAttribute ("name"))
-          {
-            AddTextureMapping (strings->Request (
-              child->GetAttributeValue ("name")),
-              child->GetAttributeValueAsInt ("unit"));
-          }
-        }
-        break;
-      case XMLTOKEN_VP:
-        {
-          csRef<iShaderProgram> vp = shadermgr->CreateShaderProgram(child->GetAttributeValue("type"));
-          if(vp)
-          {
-            if(child->GetAttribute("file"))
-            {
-              csRef<iVFS> vfs = CS_QUERY_REGISTRY(objectreg, iVFS);
-              //load from file
-              vp->Load( csRef<iDataBuffer>(vfs->ReadFile(child->GetAttributeValue("file"))));
-            }
-            else
-            {
-              vp->Load(child);
-            }
-            SetVertexProgram(vp);
-          }
-        }
-        break;
-      case XMLTOKEN_FP:
-        {
-          csRef<iShaderProgram> fp = shadermgr->CreateShaderProgram(child->GetAttributeValue("type"));
-          if(fp)
-          {
-            if(child->GetAttribute("file"))
-            {
-              csRef<iVFS> vfs = CS_QUERY_REGISTRY(objectreg, iVFS);
-              //load from file
-              fp->Load( csRef<iDataBuffer>(vfs->ReadFile(child->GetAttributeValue("file"))));
-            }
-            else
-            {
-              fp->Load(child);
-            }
-            SetFragmentProgram(fp);
-          }
-        }
-        break;
-      case XMLTOKEN_DECLARE:
-        {
-          //create a new variable
-          csRef<csShaderVariable> var = 
-            shadermgr->CreateVariable (
-            strings->Request (child->GetAttributeValue ("name")));
+	    }
+	    if (found)
+	    {
+	      AddStreamMapping (
+		strings->Request (child->GetAttributeValue ("stream")),
+		attribute);
+	    }
+	  }
+	  break;
+	case XMLTOKEN_TEXTUREMAPPING:
+	  {
+	    if (child->GetAttribute ("name"))
+	    {
+	      AddTextureMapping (strings->Request (
+		child->GetAttributeValue ("name")),
+		child->GetAttributeValueAsInt ("unit"));
+	    }
+	  }
+	  break;
+	case XMLTOKEN_VP:
+	  {
+	    csRef<iShaderProgram> vp = shadermgr->CreateShaderProgram(child->GetAttributeValue("type"));
+	    if(vp)
+	    {
+	      if(child->GetAttribute("file"))
+	      {
+		csRef<iVFS> vfs = CS_QUERY_REGISTRY(objectreg, iVFS);
+		//load from file
+		vp->Load( csRef<iDataBuffer>(vfs->ReadFile(child->GetAttributeValue("file"))));
+	      }
+	      else
+	      {
+		vp->Load(child);
+	      }
+	      SetVertexProgram(vp);
+	    }
+	  }
+	  break;
+	case XMLTOKEN_FP:
+	  {
+	    csRef<iShaderProgram> fp = shadermgr->CreateShaderProgram(child->GetAttributeValue("type"));
+	    if(fp)
+	    {
+	      if(child->GetAttribute("file"))
+	      {
+		csRef<iVFS> vfs = CS_QUERY_REGISTRY(objectreg, iVFS);
+		//load from file
+		fp->Load( csRef<iDataBuffer>(vfs->ReadFile(child->GetAttributeValue("file"))));
+	      }
+	      else
+	      {
+		fp->Load(child);
+	      }
+	      SetFragmentProgram(fp);
+	    }
+	  }
+	  break;
+	case XMLTOKEN_DECLARE:
+	  {
+	    //create a new variable
+	    csRef<csShaderVariable> var = 
+	      shadermgr->CreateVariable (
+	      strings->Request (child->GetAttributeValue ("name")));
 
-          // @@@ Will leak! Should do proper refcounting.
-          var->IncRef ();
+	    // @@@ Will leak! Should do proper refcounting.
+	    var->IncRef ();
 
-          csStringID idtype = xmltokens.Request( child->GetAttributeValue("type") );
-          idtype -= 100;
-          var->SetType( (csShaderVariable::VariableType) idtype);
-          switch(idtype)
-          {
-          case csShaderVariable::INT:
-            var->SetValue( child->GetAttributeValueAsInt("default") );
-            break;
-          case csShaderVariable::FLOAT:
-            var->SetValue( child->GetAttributeValueAsFloat("default") );
-            break;
-          case csShaderVariable::STRING:
-            var->SetValue(new scfString( child->GetAttributeValue("default")) );
-            break;
-          case csShaderVariable::VECTOR3:
-            const char* def = child->GetAttributeValue("default");
-            csVector3 v;
-            sscanf(def, "%f,%f,%f", &v.x, &v.y, &v.z);
-            var->SetValue( v );
-            break;
-          }
-          AddVariable (var);
-        }
-        break;
-      case XMLTOKEN_WRITEMASK:
-        {
-          if (strcasecmp(child->GetAttributeValue ("r"), "true")==0)
-            writemaskRed = true;
-          else if (strcasecmp(child->GetAttributeValue ("r"), "false")==0)
-            writemaskRed = false;
-          
-          if (strcasecmp(child->GetAttributeValue ("g"), "true")==0)
-            writemaskGreen = true;
-          else if (strcasecmp(child->GetAttributeValue ("g"), "false")==0)
-            writemaskGreen = false;
+	    csStringID idtype = xmltokens.Request( child->GetAttributeValue("type") );
+	    idtype -= 100;
+	    var->SetType( (csShaderVariable::VariableType) idtype);
+	    switch(idtype)
+	    {
+	    case csShaderVariable::INT:
+	      var->SetValue( child->GetAttributeValueAsInt("default") );
+	      break;
+	    case csShaderVariable::FLOAT:
+	      var->SetValue( child->GetAttributeValueAsFloat("default") );
+	      break;
+	    case csShaderVariable::STRING:
+	      var->SetValue(new scfString( child->GetAttributeValue("default")) );
+	      break;
+	    case csShaderVariable::VECTOR3:
+	      const char* def = child->GetAttributeValue("default");
+	      csVector3 v;
+	      sscanf(def, "%f,%f,%f", &v.x, &v.y, &v.z);
+	      var->SetValue( v );
+	      break;
+	    }
+	    AddVariable (var);
+	  }
+	  break;
+	case XMLTOKEN_WRITEMASK:
+	  {
+	    if (strcasecmp(child->GetAttributeValue ("r"), "true")==0)
+	      writemaskRed = true;
+	    else if (strcasecmp(child->GetAttributeValue ("r"), "false")==0)
+	      writemaskRed = false;
+            
+	    if (strcasecmp(child->GetAttributeValue ("g"), "true")==0)
+	      writemaskGreen = true;
+	    else if (strcasecmp(child->GetAttributeValue ("g"), "false")==0)
+	      writemaskGreen = false;
 
-          if (strcasecmp(child->GetAttributeValue ("b"), "true")==0)
-            writemaskBlue = true;
-          else if (strcasecmp(child->GetAttributeValue ("b"), "false")==0)
-            writemaskBlue = false;
+	    if (strcasecmp(child->GetAttributeValue ("b"), "true")==0)
+	      writemaskBlue = true;
+	    else if (strcasecmp(child->GetAttributeValue ("b"), "false")==0)
+	      writemaskBlue = false;
 
-          if (strcasecmp(child->GetAttributeValue ("a"), "true")==0)
-            writemaskAlpha = true;
-          else if (strcasecmp(child->GetAttributeValue ("a"), "false")==0)
-            writemaskAlpha = false;
-        }
-        break;
+	    if (strcasecmp(child->GetAttributeValue ("a"), "true")==0)
+	      writemaskAlpha = true;
+	    else if (strcasecmp(child->GetAttributeValue ("a"), "false")==0)
+	      writemaskAlpha = false;
+	  }
+	  break;
       }
     }
   }
@@ -852,6 +922,24 @@ bool csShaderPass::Prepare()
       prox.Name = texmapping[i];
       prox.userData = i;
       dynamicVars.InsertSorted (prox);
+    }
+  }
+
+  if (alphaMode.autoAlphaMode)
+  {
+    if (alphaMode.autoModeTexture != csInvalidStringID)
+    {
+      var = GetVariable (alphaMode.autoModeTexture);
+      if (!var)
+	var = parent->GetVariableRecursive (texmapping[i]);
+      if (var)
+	autoAlphaTexRef = var;
+      else
+      {
+	prox.Name = alphaMode.autoModeTexture;
+	prox.userData = -1;
+	dynamicVars.InsertSorted (prox);
+      }
     }
   }
 

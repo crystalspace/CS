@@ -152,7 +152,7 @@ void DocConv::Main ()
       }
       if (!outputDS)
       {
-	Report ("Unable to load output document system '%s'!",
+	ReportError ("Unable to load output document system '%s'!",
 	  outds);
         return;
       }

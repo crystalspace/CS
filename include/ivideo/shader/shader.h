@@ -175,7 +175,7 @@ struct iShaderTechnique : public iShaderVariableContext
   virtual bool Prepare() = 0;
 };
 
-SCF_VERSION (iShaderPass, 0,0,1);
+SCF_VERSION (iShaderPass, 0,0,2);
 
 /**
  * Description of a single pass in  a shader
@@ -231,6 +231,8 @@ struct iShaderPass : public iShaderVariableContext
 
   /// Prepares the pass for usage.
   virtual bool Prepare() = 0;
+
+  virtual const csAlphaMode& GetAlphaMode () = 0;
 };
 
 SCF_VERSION (iShaderProgram, 0,0,2);

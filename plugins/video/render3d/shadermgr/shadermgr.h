@@ -354,13 +354,16 @@ private:
   static int units[TEXMAX];
   static iTextureHandle* textures[TEXMAX];
   static iTextureHandle* clear_textures[TEXMAX];	// For quick clearing...
+  static iTextureHandle* autoAlphaTex;
 
   uint mixmode;
+  csAlphaMode alphaMode;
 
   csStringID streammapping[STREAMMAX];
   bool streammappinggeneric[STREAMMAX];
   csStringID texmapping[TEXMAX];
   csRef<csShaderVariable> texmappingRef[TEXMAX];
+  csRef<csShaderVariable> autoAlphaTexRef;
 
 
   //loading related
@@ -368,6 +371,7 @@ private:
   {
     XMLTOKEN_DECLARE,
     XMLTOKEN_MIXMODE,
+    XMLTOKEN_ALPHAMODE,
     XMLTOKEN_STREAMMAPPING,
     XMLTOKEN_TEXTUREMAPPING,
     XMLTOKEN_VP,
@@ -393,36 +397,7 @@ public:
 
   iShaderTechnique* GetParent() {return parent;}
 
-  csShaderPass(csShaderTechnique* owner, iObjectRegistry* reg)
-  {
-    SCF_CONSTRUCT_IBASE(0);
-    g3d = CS_QUERY_REGISTRY (reg, iGraphics3D);
-    vp = 0; fp = 0;
-    parent = owner;
-    objectreg = reg;
-    mixmode = 0;
-    int i;
-    for (i=0; i<STREAMMAX; i++)
-    {
-      streammapping[i] = csInvalidStringID;
-      attribs[i*2+0] = (csVertexAttrib)i;
-      attribs[i*2+1] = (csVertexAttrib)(i+100);
-      clear_buffers[i*2+0] = 0;
-      clear_buffers[i*2+1] = 0;
-    }
-    for (i=0; i<TEXMAX; i++)
-    {
-      texmapping[i] = csInvalidStringID;
-      units[i] = i;
-      clear_textures[i] = 0;
-    }
-
-    writemaskRed = true;
-    writemaskGreen = true;
-    writemaskBlue = true;
-    writemaskAlpha = true;
-
-  }
+  csShaderPass (csShaderTechnique* owner, iObjectRegistry* reg);
   virtual ~csShaderPass ()
   {
     SCF_DESTRUCT_IBASE();
@@ -489,6 +464,9 @@ public:
    * assigned to a material.
    */
   virtual bool Prepare();
+
+  virtual const csAlphaMode& GetAlphaMode ()
+  { return alphaMode;  }
 
   //=================== iShaderVariableContext ================//
   /// Add a variable to this context

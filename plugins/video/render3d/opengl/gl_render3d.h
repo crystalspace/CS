@@ -174,6 +174,7 @@ private:
   { statecache->Disable_GL_POLYGON_OFFSET_FILL (); }
 
   void SetMixMode (uint mode);
+  void SetAlphaType (csAlphaMode::AlphaType alphaType);
 
   void SetMirrorMode (bool mirror);
 

@@ -75,6 +75,8 @@ public:
 			      csGradient& gradient);
   virtual bool ParseShaderParam (iDocumentNode* node,
                                  csShaderVariable* var);
+  virtual bool ParseAlphaMode (iDocumentNode* node, iStringSet* strings,
+    csAlphaMode& alphaMode);
 
   virtual void ReportError (const char* msgid, iDocumentNode* errornode,
 	const char* msg, ...);

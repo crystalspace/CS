@@ -92,19 +92,19 @@ void csRenderMeshList::Empty ()
 int csRenderMeshList::CompareMeshListInfo (void const* item1,
                                            void const* item2)
 {
-  if (0 == item1 && 0 != item2)
+  renderMeshListInfo* it1 = *((renderMeshListInfo**)item1);
+  renderMeshListInfo* it2 = *((renderMeshListInfo**)item2);
+  if (0 == it1 && 0 != it2)
   {
     return 1;
   }
-  else if (0 != item1 && 0 == item2)
+  else if (0 != it1 && 0 == it2)
   {
     return -1;
   }
-  else if (0 != item1 && 0 != item2)
+  else if (0 != it1 && 0 != it2)
   {
     //sort on rp
-    renderMeshListInfo* it1 = (renderMeshListInfo*)item1;
-    renderMeshListInfo* it2 = (renderMeshListInfo*)item2;
     if (it1->renderPriority < it2->renderPriority)
       return -1;
     else if (it1->renderPriority > it2->renderPriority)
@@ -181,8 +181,10 @@ void csRenderMeshList::GetSortedMeshList (
     {
       listEnt->meshList.Sort (SortMeshFront2Back);
     }
-
-    listEnt->meshList.Sort (SortMeshMaterial);
+    else
+    {
+      listEnt->meshList.Sort (SortMeshMaterial);
+    }
 
     numObjects += listEnt->meshList.Length ();
   }

@@ -27,6 +27,17 @@ chronological order.
 	  I've had these for two months and forgot to commit them (I thought
 	  it was done already.)  See Luca Pancallo (Talad on irc), director
 	  of Planeshift project with any questions about these--he wrote them.
+	- res improved support for transparency in NR. An 'alphamode' has been 
+	  added, for selection of what kind of transparency to use: none, 
+	  binary(ie alpha test), smooth blending. It's another member in 
+	  csRenderMesh. On the shader side, it can be set per pass. There's
+	  also an 'auto' mode, where the shader pass selects the alpha mode 
+	  based on a specified texture (i.e. 'binary' mode for keycolored 
+	  textures.)
+	- res fixed a problem in csRenderMeshList::CompareMeshListInfo (),
+	  where the arguments weren't casted correctly.
+	- res fixed a 'double to float conversion' MSVC warning in dynavis.
+	- res fixed a compile error in docconv.
 11-Nov-2003
 	- Eric Sunshine fixed MacOS/X application menu malfunction introduced
 	  on August 1, 2003 when configuration was changed so that OSXDelegate

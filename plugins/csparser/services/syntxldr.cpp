@@ -130,6 +130,10 @@ enum
   XMLTOKEN_RIGHT,
   //XMLTOKEN_COLOR,
   XMLTOKEN_POS,
+
+  XMLTOKEN_AUTO,
+  XMLTOKEN_BINARY,
+  XMLTOKEN_SMOOTH,
 };
 
 csTextSyntaxService::csTextSyntaxService (iBase *parent)
@@ -207,6 +211,12 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("vector3", XMLTOKEN_VECTOR3);
   xmltokens.Register ("vector4", XMLTOKEN_VECTOR4);
   xmltokens.Register ("texture", XMLTOKEN_TEXTURE);
+
+  xmltokens.Register ("none", XMLTOKEN_NONE);
+  xmltokens.Register ("auto", XMLTOKEN_AUTO);
+  xmltokens.Register ("binary", XMLTOKEN_BINARY);
+  xmltokens.Register ("smooth", XMLTOKEN_SMOOTH);
+
   return true;
 }
 
@@ -706,6 +716,96 @@ bool csTextSyntaxService::ParseShaderParam (iDocumentNode* node,
   }
 
   return true;
+}
+
+bool csTextSyntaxService::ParseAlphaMode (iDocumentNode* node, 
+					  iStringSet* strings,
+					  csAlphaMode& alphaMode)
+{
+  CS_ASSERT (strings != 0);
+
+#define ALPHAMODE_WARN					\
+  if (modeSet)						\
+  {							\
+    if (!warned)					\
+    {							\
+      Report ("crystalspace.syntax.alphamode",		\
+        CS_REPORTER_SEVERITY_WARNING,			\
+	child,						\
+	"Multiple alphamodes specified! "		\
+	"Only first one will be used.");		\
+      warned = true;					\
+    }							\
+  }							\
+  else
+  bool warned = false;
+  bool modeSet = false;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_NONE:
+	ALPHAMODE_WARN
+	{
+	  alphaMode.autoAlphaMode = false;
+	  alphaMode.alphaType = csAlphaMode::alphaNone;
+	  modeSet = true;
+	}
+	break;
+      case XMLTOKEN_BINARY:
+	ALPHAMODE_WARN
+	{
+	  alphaMode.autoAlphaMode = false;
+	  alphaMode.alphaType = csAlphaMode::alphaBinary;
+	  modeSet = true;
+	}
+	break;
+      case XMLTOKEN_SMOOTH:
+	ALPHAMODE_WARN
+	{
+	  alphaMode.autoAlphaMode = false;
+	  alphaMode.alphaType = csAlphaMode::alphaSmooth;
+	  modeSet = true;
+	}
+	break;
+      case XMLTOKEN_AUTO:
+	ALPHAMODE_WARN
+	{
+	  const char* def = node->GetAttributeValue("texture");
+
+	  if (!def || (*def == 0))
+	  {
+	    def = CS_MATERIAL_TEXTURE_DIFFUSE;
+	  }
+
+	  alphaMode.autoAlphaMode = true;
+	  alphaMode.autoModeTexture = strings->Request (def);
+	  modeSet = true;
+	}
+	break;
+      default:
+        ReportBadToken (child);
+        return false;
+    }
+  }
+
+  if (!modeSet)
+  {
+    Report ("crystalspace.syntax.alphamode",		
+      CS_REPORTER_SEVERITY_WARNING,			
+      node, "Empty alphamode specification.");		
+    return false;
+  }
+
+  return true;
+
+#undef ALPHAMODE_WARN
 }
 
 

@@ -89,7 +89,7 @@ private:
   /// The transparent color
   csRGBpixel transp_color;
   /// Mean color used when texture mapping is disabled.
-  csRGBpixel mean_color;
+  //csRGBpixel mean_color;
   
   /// used until Prepare() is called
   csRef<iImageVector> images;
@@ -97,7 +97,8 @@ private:
   /// Does color 0 mean "transparent" for this texture?
   bool transp;
 
-  bool has_alpha;
+  //bool has_alpha;
+  csAlphaMode::AlphaType alphaType;
   bool texupdate_needed;
   bool prepared;
 
@@ -138,7 +139,12 @@ public:
   void AdjustSizePo2 ();
   void CreateMipMaps();
   bool FindFormatType();
-
+  void PrepareKeycolor (iImage* image, const csRGBpixel& transp_color,
+    csAlphaMode::AlphaType& alphaType);
+  void ComputeMeanColor (int w, int h, csRGBpixel *src, 
+    const csRGBpixel* transp_color, csRGBpixel& mean_color);
+  void CheckAlpha (int w, int h, csRGBpixel *src, 
+    const csRGBpixel* transp_color, csAlphaMode::AlphaType& alphaType);
 
   SCF_DECLARE_IBASE;
 
@@ -256,6 +262,9 @@ public:
    * the returned canvas.
    */
   virtual iGraphics2D* GetCanvas ();
+
+  virtual csAlphaMode::AlphaType GetAlphaType ()
+  { return alphaType; }
 
   void UpdateTexture ();
 

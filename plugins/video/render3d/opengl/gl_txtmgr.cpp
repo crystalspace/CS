@@ -102,7 +102,7 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target,
   this->target = target;
   G3D = iG3D;
   txtmgr = G3D->txtmgr;
-  has_alpha = false;
+  //has_alpha = false;
   this->sourceFormat = sourceFormat;
   this->bpp = bpp;
   size = 0;
@@ -116,9 +116,15 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target,
   this->flags = flags;
   transp = false;
   transp_color.red = transp_color.green = transp_color.blue = 0;
-  has_alpha = image->GetFormat () & CS_IMGFMT_ALPHA;
+  if (image->GetFormat () & CS_IMGFMT_ALPHA)
+    alphaType = csAlphaMode::alphaSmooth;
+  else if (image->HasKeycolor ())
+    alphaType = csAlphaMode::alphaBinary;
+  else
+    alphaType = csAlphaMode::alphaNone;
+  //has_alpha = image->GetFormat () & CS_IMGFMT_ALPHA;
 
-  mean_color.red = mean_color.green = mean_color.blue = 0;
+  //mean_color.red = mean_color.green = mean_color.blue = 0;
   if (image->HasKeycolor ())
   {
     int r,g,b;
@@ -138,7 +144,7 @@ csGLTextureHandle::csGLTextureHandle (csRef<iImageVector> image,
   this->target = target;
   G3D = iG3D;
   txtmgr = G3D->txtmgr;
-  has_alpha = false;
+  //has_alpha = false;
   this->sourceFormat = sourceFormat;
   this->bpp = bpp;
   size = 0;
@@ -153,7 +159,13 @@ csGLTextureHandle::csGLTextureHandle (csRef<iImageVector> image,
   this->flags = flags;
   transp = false;
   transp_color.red = transp_color.green = transp_color.blue = 0;
-  has_alpha = images->GetImage (0)->GetFormat () & CS_IMGFMT_ALPHA;
+  //has_alpha = images->GetImage (0)->GetFormat () & CS_IMGFMT_ALPHA;
+  if (images->GetImage (0)->GetFormat () & CS_IMGFMT_ALPHA)
+    alphaType = csAlphaMode::alphaSmooth;
+  else if (images->GetImage (0)->HasKeycolor ())
+    alphaType = csAlphaMode::alphaBinary;
+  else
+    alphaType = csAlphaMode::alphaNone;
 
   if (images->GetImage (0)->HasKeycolor ())
   {
@@ -174,7 +186,7 @@ csGLTextureHandle::csGLTextureHandle (int target, GLuint Handle,
   txtmgr = G3D->txtmgr;
   this->target = target;
   csGLTextureHandle::Handle = Handle;
-  has_alpha = false;
+  alphaType = csAlphaMode::alphaNone;
 }
 
 csGLTextureHandle::~csGLTextureHandle()
@@ -215,7 +227,8 @@ int csGLTextureHandle::GetFlags ()
 
 void csGLTextureHandle::SetKeyColor (bool Enable)
 {
-  transp_color.alpha = (uint8) Enable;
+  //transp_color.alpha = (uint8) Enable;
+  transp = Enable;
   texupdate_needed = true;
 }
 
@@ -224,13 +237,14 @@ void csGLTextureHandle::SetKeyColor (uint8 red, uint8 green, uint8 blue)
   transp_color.red = red;
   transp_color.green = green;
   transp_color.blue = blue;
-  transp_color.alpha = 1;
+  //transp_color.alpha = 1;
+  transp = true;
   texupdate_needed = true;
 }
 
 bool csGLTextureHandle::GetKeyColor ()
 {
-  return(transp_color.alpha == 1);
+  return (transp);
 }
 
 bool csGLTextureHandle::FindFormatType ()
@@ -318,93 +332,6 @@ bool csGLTextureHandle::FindFormatType ()
 	for (i=0; csGLTextureManager::glformats[i].targetFormat
 	  != targetFormat; i++);
 	formatidx = i;
-
-	int pixels = images->GetImage (0)->GetWidth ()
-		* images->GetImage (0)->GetHeight ();
-	csRGBpixel *_src = (csRGBpixel *)images->GetImage (0)->GetImageData ();
-
-	while (pixels--)
-	{
-	  // By default, every csRGBpixel initializes its alpha component to
-	  // 255. Thus, we should just drop to zero alpha for transparent
-	  // pixels, if any.
-	  if (transp_color.eq (*_src)) _src->alpha = 0;
-	  _src++;
-	}
-
-	// Now we draw borders inside all keycolored areas.
-	// This removes the halos of keycolor when using bilinear filtering
-	int h, rows, w, cols;
-	h = rows = images->GetImage (0)->GetHeight ();
-	w = images->GetImage (0)->GetWidth();
-	_src = (csRGBpixel *)images->GetImage (0)->GetImageData ();
-	while (rows--)
-	{
-	  cols = w;
-	  while (cols--)
-	  {
-	    if (!_src[(rows*w)+cols].alpha)
-	    {
-	      int n=0, r=0, g=0, b=0, xl, xr, yt, yb;
-	      if (!cols)
-	      {
-		xl = w-1;
-		xr = 1;
-	      }
-	      else if (cols==w-1)
-	      {
-		xl = cols-1;
-		xr = 0;
-	      }
-	      else
-	      {
-		xl = cols-1;
-		xr = cols+1;
-	      }
-
-	      if (!rows)
-	      {
-		yt = h-1;
-		yb = 1;
-	      }
-	      else if (rows==h-1)
-	      {
-		yt = rows-1;
-		yb = 0;
-	      }
-	      else
-	      {
-		yt = rows-1;
-		yb = rows+1;
-	      }
-
-#define CHECK_PIXEL(d) { \
-  if (_src[(d)].alpha) \
-  { \
-    n++; \
-    r+=_src[(d)].red; \
-    g+=_src[(d)].green; \
-    b+=_src[(d)].blue; \
-  } \
-}
-	      CHECK_PIXEL((yt*w)+xl);
-	      CHECK_PIXEL((yt*w)+cols);
-	      CHECK_PIXEL((yt*w)+xr);
-	      CHECK_PIXEL((rows*w)+xl);
-	      CHECK_PIXEL((rows*w)+xr);
-	      CHECK_PIXEL((yb*w)+xl);
-	      CHECK_PIXEL((yb*w)+cols);
-	      CHECK_PIXEL((yb*w)+xr);
-#undef CHECK_PIXEL
-	      if (n)
-	      {
-		_src[(rows*w)+cols].red = r / n;
-		_src[(rows*w)+cols].green = g / n;
-		_src[(rows*w)+cols].blue = b / n;
-	      }
-	    }
-	  }
-	}
       }
     }
 
@@ -509,7 +436,7 @@ void *csGLTextureHandle::GetPrivateObject ()
 
 bool csGLTextureHandle::GetAlphaMap ()
 {
-  return has_alpha;
+  return (alphaType != csAlphaMode::alphaNone);
 }
 
 void csGLTextureHandle::Prepare ()
@@ -523,6 +450,24 @@ void csGLTextureHandle::Prepare ()
   // to be powers of 2.
   AdjustSizePo2 ();
 
+  // Set the alpha of keycolored images to 0.
+  int i;
+  for(i = 0; i < images->Length(); i++)
+  {
+    csAlphaMode::AlphaType newAlphaType = csAlphaMode::alphaNone;
+    if (transp)
+      PrepareKeycolor (images->GetImage (i), transp_color, newAlphaType);
+    else
+      /*
+        Check all alpha values for the actual alpha type.
+       */
+      CheckAlpha  (images->GetImage (i)->GetWidth(), 
+	images->GetImage (i)->GetHeight(), 
+	(csRGBpixel*)images->GetImage (i)->GetImageData (),
+	0, newAlphaType);
+
+    if (newAlphaType > alphaType) alphaType = newAlphaType;
+  }
   // Determine the format and type of the source we gonna tranform the data to.
   FindFormatType ();
   CreateMipMaps ();
@@ -823,6 +768,169 @@ GLuint csGLTextureHandle::GetHandle ()
   }
 }
 
+void csGLTextureHandle::ComputeMeanColor (int w, int h, csRGBpixel *src,
+					  const csRGBpixel* transp_color,
+					  csRGBpixel& mean_color)
+{
+  int pixels = w * h;
+  unsigned r = 0, g = 0, b = 0;
+  CS_ASSERT (pixels > 0);
+  int count = pixels;
+  pixels = 0;
+  while (count--)
+  {
+    const csRGBpixel &pix = *src++;
+    if (!transp_color || !transp_color->eq (pix) || pix.alpha)
+    {
+      r += pix.red;
+      g += pix.green;
+      b += pix.blue;
+      pixels++;
+    }
+  }
+  if (pixels)
+  {
+    mean_color.red   = r / pixels;
+    mean_color.green = g / pixels;
+    mean_color.blue  = b / pixels;
+  }
+  else
+    mean_color.red = mean_color.green = mean_color.blue = 0;
+}
+
+void csGLTextureHandle::CheckAlpha (int w, int h, csRGBpixel *src, 
+				    const csRGBpixel* transp_color, 
+				    csAlphaMode::AlphaType& alphaType)
+{
+  int pixels = w * h;
+  CS_ASSERT (pixels > 0);
+  int count = pixels;
+  pixels = 0;
+  while (count--)
+  {
+    const csRGBpixel &pix = *src++;
+    if (!transp_color || !transp_color->eq (pix) || pix.alpha)
+    {
+      if ((pix.alpha < 255) && (alphaType != csAlphaMode::alphaSmooth))
+	alphaType = csAlphaMode::alphaSmooth;
+      pixels++;
+    }
+    else
+    {
+      if (alphaType == csAlphaMode::alphaNone)
+	alphaType = transp_color ? csAlphaMode::alphaBinary : 
+          csAlphaMode::alphaSmooth;
+    }
+  }
+}
+
+
+void csGLTextureHandle::PrepareKeycolor (iImage* image,
+					 const csRGBpixel& transp_color,
+					 csAlphaMode::AlphaType& alphaType)
+{
+  int pixels = image->GetWidth () * image->GetHeight ();
+  csRGBpixel *_src = (csRGBpixel *)image->GetImageData ();
+
+  while (pixels--)
+  {
+    /*
+      Drop the alpha of the transparent pixels to 0, but leave the alpha
+      of non-keycolored ones as is. Keycolor only makes transparent, but
+      doesn't mean the rest of the image isn't.
+     */
+     if (transp_color.eq (*_src)) _src->alpha = 0;
+    _src++;
+  }
+
+  // Now we draw borders inside all keycolored areas.
+  // This removes the halos of keycolor when using bilinear filtering
+  int h, rows, w, cols;
+  h = rows = image->GetHeight ();
+  w = image->GetWidth();
+  
+  _src = (csRGBpixel *)image->GetImageData ();
+  csRGBpixel mean_color;
+  CheckAlpha (w, h, _src, &transp_color, alphaType);
+  ComputeMeanColor (w, h, _src, &transp_color, mean_color);
+
+  while (rows--)
+  {
+    cols = w;
+    while (cols--)
+    {
+      if (!_src[(rows*w)+cols].alpha)
+      {
+	int n=0, r=0, g=0, b=0, xl, xr, yt, yb;
+	if (!cols)
+	{
+	  xl = w-1;
+	  xr = 1;
+	}
+	else if (cols==w-1)
+	{
+	  xl = cols-1;
+	  xr = 0;
+	}
+	else
+	{
+	  xl = cols-1;
+	  xr = cols+1;
+	}
+
+	if (!rows)
+	{
+	  yt = h-1;
+	  yb = 1;
+	}
+	else if (rows==h-1)
+	{
+	  yt = rows-1;
+	  yb = 0;
+	}
+	else
+	{
+	  yt = rows-1;
+	  yb = rows+1;
+	}
+
+#define CHECK_PIXEL(d) \
+	{ \
+	  if (_src[(d)].alpha) \
+	  { \
+	    n++; \
+	    r += _src[(d)].red; \
+	    g += _src[(d)].green; \
+	    b += _src[(d)].blue; \
+	  } \
+	}
+
+	CHECK_PIXEL((yt*w)+xl);
+	CHECK_PIXEL((yt*w)+cols);
+	CHECK_PIXEL((yt*w)+xr);
+	CHECK_PIXEL((rows*w)+xl);
+	CHECK_PIXEL((rows*w)+xr);
+	CHECK_PIXEL((yb*w)+xl);
+	CHECK_PIXEL((yb*w)+cols);
+	CHECK_PIXEL((yb*w)+xr);
+#undef CHECK_PIXEL
+	if (n)
+	{
+	  _src[(rows*w)+cols].red = r / n;
+	  _src[(rows*w)+cols].green = g / n;
+	  _src[(rows*w)+cols].blue = b / n;
+	}
+	else
+	{
+	  _src[(rows*w)+cols].red = mean_color.red;
+	  _src[(rows*w)+cols].green = mean_color.green;
+	  _src[(rows*w)+cols].blue = mean_color.blue;
+	}
+      }
+    }
+  }
+}
+
 /*
  *New iMaterialHandle Implementation
  *done by Phil Aumayr (phil@rarebyte.com)
@@ -1041,12 +1149,6 @@ void csGLTextureManager::AlterTargetFormat (const char *oldTarget,
         case GL_RGBA:
 	  compressedFormat = GL_COMPRESSED_RGBA_ARB;
 	  break;
-        case GL_RGB5_A1:
-	  if (G3D->ext->CS_GL_EXT_texture_compression_s3tc)
-	    compressedFormat = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
-	  else
-	    compressedFormat = GL_COMPRESSED_RGBA_ARB;
-	  break;
         case GL_ALPHA:
 	  compressedFormat = GL_COMPRESSED_ALPHA_ARB;
 	  break;
@@ -1124,7 +1226,7 @@ csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImageVector *image,
   }
 
   csGLTextureHandle *txt = new csGLTextureHandle (image, flags,
-  	target,pfmt.PixelBytes*8, GL_RGBA, G3D);
+  	target, pfmt.PixelBytes*8, GL_RGBA, G3D);
   textures.Push(txt);
   return csPtr<iTextureHandle> (txt);
 }

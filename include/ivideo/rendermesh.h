@@ -118,9 +118,8 @@ public:
   csReversibleTransform object2camera;
 
   iShaderVariableContext* dynDomain;
-
-  int* polyNumVerts;
-  csPolyTextureMapping** polyTexMaps;
+  
+  csAlphaMode::AlphaType alphaType;
 };
 
 /** @} */
