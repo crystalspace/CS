@@ -39,6 +39,7 @@
 	</pass>
 	<pass>
 	    <mixmode><multiply2 /></mixmode>
+	    <zmode><zmesh2 /></zmode>
 	    <buffer name="vertices" destination="position" />
 	    <buffer name="lightmap coordinates" destination="texture coordinate 0" />
 	    <texture name="tex lightmap" destination="unit 0" />

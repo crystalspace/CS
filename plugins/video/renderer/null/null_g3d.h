@@ -282,6 +282,7 @@ public:
   virtual csPtr<iPolygonRenderer> CreatePolygonRenderer () { return 0; }
   virtual void SetWorldToCamera (csReversibleTransform* wvmatrix) {}
   virtual void DrawSimpleMesh (const csSimpleRenderMesh& mesh) {}
+  virtual csZBufMode GetZMode () { return CS_ZBUF_NONE; }
   //========================================================================
 
   struct eiComponent : public iComponent

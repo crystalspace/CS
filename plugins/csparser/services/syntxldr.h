@@ -48,6 +48,8 @@ protected:
   csRef<iMeshObjectType> thing_type;
   csRef<iReporter> reporter;
   csStringHash xmltokens;
+#define CS_TOKEN_ITEM_FILE "csparser/services/syntxldr.tok"
+#include "cstool/tokenlist.h"
 
   void ReportV (const char* msgid, int severity, 
 	iDocumentNode* errornode, const char* msg, va_list arg);
@@ -77,6 +79,8 @@ public:
                                  csShaderVariable* var);
   virtual bool ParseAlphaMode (iDocumentNode* node, iStringSet* strings,
     csAlphaMode& alphaMode);
+  virtual bool ParseZMode (iDocumentNode* node, csZBufMode& zmode,
+    bool allowZmesh);
 
   virtual void ReportError (const char* msgid, iDocumentNode* errornode,
 	const char* msg, ...);

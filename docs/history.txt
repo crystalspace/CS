@@ -45,6 +45,17 @@ chronological order.
 	  and GLUT.framework, rather than the XFree86 resources.
 	- Steven Geens fixed sprite sockets. They wouldn't work correctly 
 	  if morph targets were used.
+	- res made the following changes:
+	  - Changed the syntax service plugin to use tokenlist.h for it's token
+	    list setup.
+	  - Added a method to parse Z modes to the syntax service plugin.
+	  - Added a zmesh2 zmode. Works similar to zmesh, but with the 
+	    difference that it sets a zmode suitable for passes >= 2 (eg if the
+	    mesh has a zmode of zuse, zmesh2 will result in an effective zmode
+	    of ztest.)
+	  - Shader passes can now override the zmode of the renderer.
+	  - Updated the OR lighting shader to utilize zmesh2 in the 2-pass
+	    technique.
 10-Jan-2004
 	- res added a facility to draw meshes with less render buffer juggling
 	  etc. required from the client.

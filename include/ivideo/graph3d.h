@@ -155,7 +155,16 @@ enum csZBufMode
   /// inverted test
   CS_ZBUF_INVERT   = 0x00000006,
   /// use the z mode of the mesh (NOTE: NOT VALID AS MESH ZMODE)
-  CS_ZBUF_MESH    = 0x00000007
+  CS_ZBUF_MESH     = 0x00000007,
+  /**
+   * Use a z mode depending of the mesh zmode.
+   * The mesh zmode is used a to choose a zmode that makes sure only pixels
+   * that are changed by the mesh zmode can be touched, e.g. if the mesh has a
+   * zmode of "zuse", zmesh2 will resolve to "ztest". This is useful for multi-
+   * pass stuff.
+   * (NOTE: NOT VALID AS MESH ZMODE)
+   */
+  CS_ZBUF_MESH2    = 0x00000008
 };
 
 // @@@ Keep in sync with values below
@@ -670,7 +679,7 @@ struct csSimpleRenderMesh
   };
 };
 
-SCF_VERSION (iGraphics3D, 5, 2, 1);
+SCF_VERSION (iGraphics3D, 5, 2, 2);
 
 /**
  * This is the standard 3D graphics interface.
@@ -1014,6 +1023,10 @@ struct iGraphics3D : public iBase
    * of the vertex buffer manager!
    */
   virtual iVertexBufferManager* GetVertexBufferManager () = 0;
+  
+  //=========================================================================
+  // Here ends the zone of unimplemented methods.
+  //=========================================================================
 
   /**
    * Check if renderer can handle a lightmap.
@@ -1041,6 +1054,9 @@ struct iGraphics3D : public iBase
    * are optional.
    */
   virtual void DrawSimpleMesh (const csSimpleRenderMesh& mesh) = 0;
+
+  /// Get the z buffer write/test mode
+  virtual csZBufMode GetZMode () = 0;
 };
 
 /** @} */

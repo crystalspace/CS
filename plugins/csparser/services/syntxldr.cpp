@@ -70,72 +70,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csTextSyntaxService);
 
-
-enum
-{
-  XMLTOKEN_ROTX = 1,
-  XMLTOKEN_ROTY,
-  XMLTOKEN_ROTZ,
-  XMLTOKEN_SCALE,
-  XMLTOKEN_M11,
-  XMLTOKEN_M12,
-  XMLTOKEN_M13,
-  XMLTOKEN_M21,
-  XMLTOKEN_M22,
-  XMLTOKEN_M23,
-  XMLTOKEN_M31,
-  XMLTOKEN_M32,
-  XMLTOKEN_M33,
-  XMLTOKEN_CLIPSTRADDLING,
-  XMLTOKEN_COPY,
-  XMLTOKEN_MULTIPLY2,
-  XMLTOKEN_MULTIPLY,
-  XMLTOKEN_ADD,
-  XMLTOKEN_DESTALPHAADD,
-  XMLTOKEN_SRCALPHAADD,
-  XMLTOKEN_ALPHA,
-  XMLTOKEN_TRANSPARENT,
-  XMLTOKEN_KEYCOLOR,
-  XMLTOKEN_TILING,
-  XMLTOKEN_NONE,
-  XMLTOKEN_LIGHTMAP,
-  XMLTOKEN_MATERIAL,
-  XMLTOKEN_LIGHTING,
-  XMLTOKEN_PORTAL,
-  XMLTOKEN_WARP,
-  XMLTOKEN_COLOR,
-  XMLTOKEN_COLORS,
-  XMLTOKEN_COLLDET,
-  XMLTOKEN_INTEGER,
-  XMLTOKEN_MAXVISIT,
-  XMLTOKEN_MIXMODE,
-  XMLTOKEN_WV,
-  XMLTOKEN_MATRIX,
-  XMLTOKEN_VISCULL,
-  XMLTOKEN_WW,
-  XMLTOKEN_MIRROR,
-  XMLTOKEN_STATIC,
-  XMLTOKEN_STRING,
-  XMLTOKEN_ZFILL,
-  XMLTOKEN_FLOAT,
-  XMLTOKEN_CLIP,
-  XMLTOKEN_VECTOR2,
-  XMLTOKEN_VECTOR3,
-  XMLTOKEN_VECTOR4,
-  XMLTOKEN_SECTOR,
-  XMLTOKEN_TEXTURE,
-  // gradients
-  XMLTOKEN_SHADE,
-  XMLTOKEN_LEFT,
-  XMLTOKEN_RIGHT,
-  //XMLTOKEN_COLOR,
-  XMLTOKEN_POS,
-
-  XMLTOKEN_AUTO,
-  XMLTOKEN_BINARY,
-  XMLTOKEN_SMOOTH,
-};
-
 csTextSyntaxService::csTextSyntaxService (iBase *parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
@@ -154,68 +88,8 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
 {
   csTextSyntaxService::object_reg = object_reg;
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  xmltokens.Register ("rotx", XMLTOKEN_ROTX);
-  xmltokens.Register ("roty", XMLTOKEN_ROTY);
-  xmltokens.Register ("rotz", XMLTOKEN_ROTZ);
-  xmltokens.Register ("scale", XMLTOKEN_SCALE);
-  xmltokens.Register ("m11", XMLTOKEN_M11);
-  xmltokens.Register ("m12", XMLTOKEN_M12);
-  xmltokens.Register ("m13", XMLTOKEN_M13);
-  xmltokens.Register ("m21", XMLTOKEN_M21);
-  xmltokens.Register ("m22", XMLTOKEN_M22);
-  xmltokens.Register ("m23", XMLTOKEN_M23);
-  xmltokens.Register ("m31", XMLTOKEN_M31);
-  xmltokens.Register ("m32", XMLTOKEN_M32);
-  xmltokens.Register ("m33", XMLTOKEN_M33);
-  xmltokens.Register ("clipstraddling", XMLTOKEN_CLIPSTRADDLING);
-  xmltokens.Register ("copy", XMLTOKEN_COPY);
-  xmltokens.Register ("multiply2", XMLTOKEN_MULTIPLY2);
-  xmltokens.Register ("multiply", XMLTOKEN_MULTIPLY);
-  xmltokens.Register ("add", XMLTOKEN_ADD);
-  xmltokens.Register ("destalphaadd", XMLTOKEN_DESTALPHAADD);
-  xmltokens.Register ("srcalphaadd", XMLTOKEN_SRCALPHAADD);
-  xmltokens.Register ("alpha", XMLTOKEN_ALPHA);
-  xmltokens.Register ("transparent", XMLTOKEN_TRANSPARENT);
-  xmltokens.Register ("keycolor", XMLTOKEN_KEYCOLOR);
-  xmltokens.Register ("tiling", XMLTOKEN_TILING);
-  xmltokens.Register ("none", XMLTOKEN_NONE);
-  xmltokens.Register ("lightmap", XMLTOKEN_LIGHTMAP);
-  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
-  xmltokens.Register ("lighting", XMLTOKEN_LIGHTING);
-  xmltokens.Register ("portal", XMLTOKEN_PORTAL);
-  xmltokens.Register ("warp", XMLTOKEN_WARP);
-  xmltokens.Register ("color", XMLTOKEN_COLOR);
-  xmltokens.Register ("colors", XMLTOKEN_COLORS);
-  xmltokens.Register ("colldet", XMLTOKEN_COLLDET);
-  xmltokens.Register ("maxvisit", XMLTOKEN_MAXVISIT);
-  xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
-  xmltokens.Register ("wv", XMLTOKEN_WV);
-  xmltokens.Register ("matrix", XMLTOKEN_MATRIX);
-  xmltokens.Register ("viscull", XMLTOKEN_VISCULL);
-  xmltokens.Register ("ww", XMLTOKEN_WW);
-  xmltokens.Register ("mirror", XMLTOKEN_MIRROR);
-  xmltokens.Register ("static", XMLTOKEN_STATIC);
-  xmltokens.Register ("zfill", XMLTOKEN_ZFILL);
-  xmltokens.Register ("float", XMLTOKEN_FLOAT);
-  xmltokens.Register ("clip", XMLTOKEN_CLIP);
-  xmltokens.Register ("sector", XMLTOKEN_SECTOR);
-  
-  xmltokens.Register ("shade", XMLTOKEN_SHADE);
-  xmltokens.Register ("left", XMLTOKEN_LEFT);
-  xmltokens.Register ("right", XMLTOKEN_RIGHT);
-  xmltokens.Register ("pos", XMLTOKEN_POS);
 
-  xmltokens.Register ("integer", XMLTOKEN_INTEGER);
-  xmltokens.Register ("string", XMLTOKEN_STRING);
-  xmltokens.Register ("vector2", XMLTOKEN_VECTOR2);
-  xmltokens.Register ("vector3", XMLTOKEN_VECTOR3);
-  xmltokens.Register ("vector4", XMLTOKEN_VECTOR4);
-  xmltokens.Register ("texture", XMLTOKEN_TEXTURE);
-
-  xmltokens.Register ("none", XMLTOKEN_NONE);
-  xmltokens.Register ("auto", XMLTOKEN_AUTO);
-  xmltokens.Register ("binary", XMLTOKEN_BINARY);
-  xmltokens.Register ("smooth", XMLTOKEN_SMOOTH);
+  init_token_table (xmltokens);
 
   return true;
 }
@@ -802,6 +676,42 @@ bool csTextSyntaxService::ParseAlphaMode (iDocumentNode* node,
   return true;
 
 #undef ALPHAMODE_WARN
+}
+
+bool csTextSyntaxService::ParseZMode (iDocumentNode* node, 
+				      csZBufMode& zmode,    
+				      bool allowZmesh)
+{
+  if (node->GetType () != CS_NODE_ELEMENT) return false;
+
+  const char* value = node->GetValue ();
+  csStringID id = xmltokens.Request (value);
+  switch (id)
+  {
+    case XMLTOKEN_ZNONE:
+      zmode = CS_ZBUF_NONE;
+      break;
+    case XMLTOKEN_ZFILL:
+      zmode = CS_ZBUF_FILL;
+      break;
+    case XMLTOKEN_ZTEST:
+      zmode = CS_ZBUF_TEST;
+      break;
+    case XMLTOKEN_ZUSE:
+      zmode = CS_ZBUF_USE;
+      break;
+    case XMLTOKEN_ZMESH:
+      if (!allowZmesh) return false;
+      zmode = CS_ZBUF_MESH;
+      break;
+    case XMLTOKEN_ZMESH2:
+      if (!allowZmesh) return false;
+      zmode = CS_ZBUF_MESH2;
+      break;
+    default:
+      return false;
+  }
+  return true;
 }
 
 

@@ -207,6 +207,7 @@ private:
 
   void CacheTexture(iTextureHandle* itex);
 
+  csZBufMode GetZModePass2 (csZBufMode mode);
 
   iRenderBuffer* vertattrib[16]; // @@@ Hardcoded max number of attributes
   bool vertattribenabled[16]; // @@@ Hardcoded max number of attributes
@@ -315,6 +316,9 @@ public:
   /// Set the z buffer write/test mode
   virtual void SetZMode (csZBufMode mode)
   { SetZMode (mode, false); }
+  
+  virtual csZBufMode GetZMode ()
+  { return current_zmode; }
   
   /// Set object to view transform
   virtual void SetObjectToCamera (csReversibleTransform* wvmatrix);

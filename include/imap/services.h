@@ -42,6 +42,7 @@ struct iLoaderContext;
 struct iDocumentNode;
 struct iString;
 struct iStringSet;
+enum csZBufMode;
 
 /**\name Texture transformation description
  * @{ */
@@ -55,7 +56,7 @@ struct iStringSet;
 #define CSTEX_UV_SHIFT 8 
 /** @} */
 
-SCF_VERSION (iSyntaxService, 1, 3, 2);
+SCF_VERSION (iSyntaxService, 1, 3, 3);
 
 /**
  * This component provides services for other loaders to easily parse
@@ -152,6 +153,18 @@ struct iSyntaxService : public iBase
    */
   virtual bool ParseAlphaMode (iDocumentNode* node, iStringSet* strings,
     csAlphaMode& alphaMode) = 0;
+    
+  /**
+   * Attempt to parse a zmode from \a node.
+   * \a allowZmesh specifies whether ZMESH and ZMESH2 zmodes should be 
+   * saved to \a zmode or rejected, causing the method to fail and return
+   * 'false'.
+   * \remark As z modes usually appear "in between" other document nodes,
+   * this function does not report an error if the token isn't recognized,
+   * but only returns 'false'.
+   */
+  virtual bool ParseZMode (iDocumentNode* node, csZBufMode& zmode,
+    bool allowZmesh = false) = 0;
 };
 
 /** @} */

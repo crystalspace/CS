@@ -310,6 +310,30 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
       }
     }
 
+    csRef<iDocumentNode> nodeZmode = node->GetNode ("zmode");
+    if (nodeZmode != 0)
+    {
+      csRef<iDocumentNode> node;
+      csRef<iDocumentNodeIterator> it;
+      it = nodeZmode->GetNodes ();
+      while (it->HasNext ())
+      {
+	csRef<iDocumentNode> child = it->Next ();
+	if (child->GetType () != CS_NODE_ELEMENT) continue;
+	node = child;
+	break;
+      }
+
+      if (synldr->ParseZMode (node, pass->zMode, true))
+      {
+	pass->overrideZmode = true;
+      }
+      else
+      {
+	synldr->ReportBadToken (node);
+      }
+    }
+
     pass->wmRed = true;
     pass->wmGreen = true;
     pass->wmBlue = true;
@@ -721,7 +745,13 @@ bool csXMLShader::ActivatePass (unsigned int number)
   shaderPass *thispass = &passes[currentPass];
   if(thispass->vp) thispass->vp->Activate ();
   if(thispass->fp) thispass->fp->Activate ();
-                           
+  
+  if (thispass->overrideZmode)
+  {
+    oldZmode = g3d->GetZMode ();
+    g3d->SetZMode (thispass->zMode);
+  }
+
   g3d->GetWriteMask (orig_wmRed, orig_wmGreen, orig_wmBlue, orig_wmAlpha);
   g3d->SetWriteMask (thispass->wmRed, thispass->wmGreen, thispass->wmBlue,
     thispass->wmAlpha);
@@ -747,6 +777,9 @@ bool csXMLShader::DeactivatePass ()
     lastTexturesCount);
   lastTexturesCount=0;
   
+  if (thispass->overrideZmode)
+    g3d->SetZMode (oldZmode);
+
   g3d->SetWriteMask (orig_wmRed, orig_wmGreen, orig_wmBlue, orig_wmAlpha);
 
   return true;

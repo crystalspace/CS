@@ -100,6 +100,8 @@ private:
     //mix and alpha mode
     uint mixMode;
     csAlphaMode alphaMode;
+    csZBufMode zMode;
+    bool overrideZmode;
 
     SCF_DECLARE_IBASE;
 
@@ -107,6 +109,7 @@ private:
     { 
       SCF_CONSTRUCT_IBASE (0);
       mixMode = CS_FX_COPY;
+      overrideZmode = false;
     }
 
     virtual ~shaderPass () 
@@ -180,6 +183,7 @@ private:
 
   //keep this so we can reset in deactivate
   bool orig_wmRed, orig_wmGreen, orig_wmBlue, orig_wmAlpha;
+  csZBufMode oldZmode;
 
   //Array of passes
   shaderPass* passes;

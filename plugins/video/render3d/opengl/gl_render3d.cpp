@@ -207,6 +207,23 @@ void csGLGraphics3D::SetGlOrtho (bool inverted)
   //}
 }
 
+csZBufMode csGLGraphics3D::GetZModePass2 (csZBufMode mode)
+{
+  switch (mode)
+  {
+    case CS_ZBUF_NONE:
+    case CS_ZBUF_TEST:
+    case CS_ZBUF_EQUAL:
+      return mode;
+    case CS_ZBUF_FILL:
+    case CS_ZBUF_FILLONLY:
+    case CS_ZBUF_USE:
+      return CS_ZBUF_EQUAL;
+    default:
+      return CS_ZBUF_NONE;
+  }
+}
+
 void csGLGraphics3D::SetZMode (csZBufMode mode, bool internal)
 {
   if (!internal)
@@ -1646,10 +1663,12 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
       bugplug->AddCounter ("Mesh Count", 1);
     }
 
-    if (current_zmode == CS_ZBUF_MESH)
+    if ((current_zmode == CS_ZBUF_MESH) || (current_zmode == CS_ZBUF_MESH2))
     {
-      CS_ASSERT (mymesh->z_buf_mode != CS_ZBUF_MESH);
-      SetZMode (mymesh->z_buf_mode, true);
+      CS_ASSERT ((mymesh->z_buf_mode != CS_ZBUF_MESH) &&
+	(mymesh->z_buf_mode != CS_ZBUF_MESH2));
+      SetZMode ((current_zmode == CS_ZBUF_MESH2) ? 
+	GetZModePass2 (mymesh->z_buf_mode) : mymesh->z_buf_mode, true);
 /*      if (mymesh->z_buf_mode != CS_ZBUF_MESH)
       {
         SetZMode (mymesh->z_buf_mode, true);
