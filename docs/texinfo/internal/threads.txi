@@ -32,11 +32,12 @@ are safe. The @code{iObjectRegistryIterator} takes a copy of the data
 over which it iterates so it will not even lock.
 
 @item
-The TinyXML and XMLRead parsers are thread safe in the sense that it is ok
-to create and work on seperate documents in seperate threads. However it
-is NOT ok to work on the same document in different threads. Also @sc{vfs}
-itself is not thread safe yet so avoid the @code{iDocument->Parse()} and
-@code{iDocument->Write()} calls that use @code{iFile} and/or @code{iVFS}.
+The TinyXML, XMLRead, and Binary XML parsers are thread safe in the sense
+that it is ok to create and work on seperate documents in seperate threads.
+However it is NOT ok to work on the same document in different threads.
+Also @sc{vfs} itself is not thread safe yet so avoid the
+@code{iDocument->Parse()} and @code{iDocument->Write()} calls that use
+@code{iFile} and/or @code{iVFS}.
 
 @item
 The syntax services plugin is safe for the basic parsing tools (vectors,
@@ -44,9 +45,9 @@ matrices, reporting errors, ...). For polygons and thing related objects
 this hasn't been checked yet.
 
 @item
-The @sc{simpcon} output console is thread-safe provided auto-updating
-is disabled (call @code{iConsoleOutput->AutoUpdate(false)}). Note that
-by default auto-updating is enabled!
+The @sc{simpcon} and @sc{csconout} output consoles are thread-safe provided
+auto-updating is disabled (call @code{iConsoleOutput->AutoUpdate(false)}).
+Note that by default auto-updating is enabled!
 
 @item
 The reporter plugin is fully thread-safe.
@@ -85,10 +86,13 @@ you use thread-safe versions of the following modules in CS:
 @item
 @code{iReporterListener} (the standard reporter listener is ok).
 @item
-@code{iConsoleOutput} (simpcon is ok).
+@code{iConsoleOutput} (simpcon and csconout are ok provided auto-updating is
+disabled).
 @item
 @code{iLoaderContext} (the threaded loader provides a thread-safe version
 of this one).
+@item
+@code{iDocumentSystem} (TinyXML, XMLRead, and BinaryXML are all ok).
 @end itemize
 
 

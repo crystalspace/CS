@@ -37,6 +37,8 @@ The history order is reversed so that new features are at the top.
 	  really thread-safe after the output consoles are thread-safe.
 	- The simpcon output console is now thread-safe provided
 	  auto-updating is disabled! Note that this is enabled by default.
+	- The csconout output console is also thread-safe under the
+	  same restrictions as simpcon.
 17-Apr-2003
 	- Fixed a bug in the common polygon buffer implementation where it
 	  was incrementing the ref count on poly_texture without testing if

@@ -20,6 +20,7 @@
 #define __CS_CSCONOUT_H__
 
 #include "ivaria/conout.h"
+#include "csutil/scopedmutexlock.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csgeom/csrect.h"
@@ -31,6 +32,9 @@ class csConsoleBuffer;
 
 class csConsoleOutput : public iConsoleOutput
 {
+private:
+  csRef<csMutex> mutex;
+
 public:
   SCF_DECLARE_IBASE;
 
