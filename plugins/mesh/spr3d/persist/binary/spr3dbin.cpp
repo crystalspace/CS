@@ -21,7 +21,6 @@
  * These classes Save and Load Sprites with a binary representation
  *
  * TODO: Add support for skeletons
- * TODO: Add support for SMOOTH once it becomes available to these routines
  *
  */
 
@@ -135,6 +134,8 @@ bool csSprite3DBinFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
+const char binsprMagic[4] = {'5','1', '5','0'};
+
 
 /**
  * Loads a csSprite3DBinFactoryLoader
@@ -180,23 +181,26 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
   char* p = (char*)data;
 
   // Read the magic number so we can ID the file
-  char magic[4] = {'5','1', '5','0'};
-  if (memcmp(magic, p, 4) != 0)
+  if (memcmp(binsprMagic, p, 4) != 0)
   {
     ReportError (reporter,
 	"crystalspace.sprite3dbinfactoryloader.setup.objecttype",
 	"Input was not binary sprite data!");
+    return NULL;
   }
   p += 4;
 
   // Read the version number so we can ID the file
-  char ver[2] = {0x01,0x00};
-  if (memcmp(ver, p, 2) != 0)
+  bool has_normals = false;
+  if ( ((uint8)*p != 0x01) || ((uint8)*(p+1) > 0x01) )
   {
     ReportError (reporter,
 	"crystalspace.sprite3dbinfactoryloader.setup.objecttype",
-	"Input was not the expected version. Expected version 1.0!");
+	"Unexpected format version %d.%d!", 
+	(uint8)*p, (uint8)*(p+1));
+    return NULL;
   }
+  has_normals = (uint8)*(p+1) >= 0x01;
   p += 2;
 
 
@@ -231,7 +235,12 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
 
     int anm_idx = fr->GetAnmIndex ();
     int tex_idx = fr->GetTexIndex ();
-    float x, y, z, u, v;
+    float x, y, z, u, v, nx, ny, nz;
+
+    if (!has_normals)
+    {
+      nx = ny = nz = 0.0f;
+    }
 
     // Read the number of vertecies
     int vertex_count = convert_endian(*((int32 *)p));
@@ -245,6 +254,12 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
       z = convert_endian(long2float(*((long *)p))); p += sizeof(float);
       u = convert_endian(long2float(*((long *)p))); p += sizeof(float);
       v = convert_endian(long2float(*((long *)p))); p += sizeof(float);
+      if (has_normals)
+      {
+	nx = convert_endian(long2float(*((long *)p))); p += sizeof(float);
+	ny = convert_endian(long2float(*((long *)p))); p += sizeof(float);
+	nz = convert_endian(long2float(*((long *)p))); p += sizeof(float);
+      }
 
       // check if it's the first frame
       if (spr3dLook->GetFrameCount () == 1)
@@ -261,6 +276,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
       }
       spr3dLook->SetVertex (anm_idx, j, csVector3 (x, y, z));
       spr3dLook->SetTexel  (tex_idx, j, csVector2 (u, v));
+      spr3dLook->SetNormal (anm_idx, i, csVector3 (nx, ny, nz));
     }
 
     if (j < spr3dLook->GetVertexCount ())
@@ -398,11 +414,10 @@ void csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile * file)
     SCF_QUERY_INTERFACE (obj, iSprite3DFactoryState));
 
   // Write a magic number so we can ID the file
-  char magic[4] = {'5','1', '5','0'};
-  file->Write (magic, 4);
+  file->Write (binsprMagic, 4);
 
   // Write a version
-  char ver[2] = {0x01,0x00};
+  char ver[2] = {0x01, 0x01}; // Major, Minor
   file->Write (ver, 2);
 
   // Write out the material... This can easily expanded to multiple
@@ -447,6 +462,12 @@ void csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile * file)
       v = convert_endian(float2long(state->GetTexel(tex_idx, j).x));
       file->Write ((char *)&v, 4);
       v = convert_endian(float2long(state->GetTexel(tex_idx, j).y));
+      file->Write ((char *)&v, 4);
+      v = convert_endian(float2long(state->GetNormal(anm_idx, j).x));
+      file->Write ((char *)&v, 4);
+      v = convert_endian(float2long(state->GetNormal(anm_idx, j).y));
+      file->Write ((char *)&v, 4);
+      v = convert_endian(float2long(state->GetNormal(anm_idx, j).z));
       file->Write ((char *)&v, 4);
     }
   }
@@ -518,6 +539,7 @@ void csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile * file)
     idx = convert_endian((int32)state->GetSocket(i)->GetTriangleIndex());
     file->Write ((char *)&idx, 4);
   }
+  // [res] the following doesn't matter as the normals are saved:
   /// @@@ Cannot retrieve smoothing information.
   /// SMOOTH()
   /// SMOOTH(baseframenr)
