@@ -39,8 +39,7 @@ csProcBump::csProcBump () : csProcTexture()
   mat_h = 256;
   fastdhdx = fastdhdy = NULL;
 
-  texFlags = CS_TEXTURE_3D | CS_TEXTURE_PROC | CS_TEXTURE_NOMIPMAPS
-    ;//| CS_TEXTURE_PROC_ALONE_HINT;
+  texFlags = CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;
 }
 
 csProcBump::csProcBump (iImage *map) : csProcTexture()
@@ -52,8 +51,7 @@ csProcBump::csProcBump (iImage *map) : csProcTexture()
   mat_h = map->GetHeight();
   fastdhdx = fastdhdy = NULL;
 
-  texFlags = CS_TEXTURE_3D | CS_TEXTURE_PROC | CS_TEXTURE_NOMIPMAPS
-    ;//| CS_TEXTURE_PROC_ALONE_HINT;
+  texFlags = CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;
 }
 
 csProcBump::~csProcBump ()
@@ -88,7 +86,7 @@ void csProcBump::MakePalette (int max)
   if (palette) delete[] palette;
   palsize = max;
   palette = new int[palsize];
-  palette[0] = ptTxtMgr->FindRGB(0,0,0);
+  palette[0] = g3d->GetTextureManager ()->FindRGB(0,0,0);
   for (i=0 ; i<palsize ; i++)
     palette[i] = palette[0];
   /// fill the palette
@@ -109,7 +107,7 @@ void csProcBump::MakePalette (int max)
     b = (int) col.blue;
     */
     r = g = b = i;
-    palette[i] = ptTxtMgr->FindRGB (r,g,b);
+    palette[i] = g3d->GetTextureManager ()->FindRGB (r,g,b);
   }
 }
 
@@ -125,7 +123,8 @@ void csProcBump::Recalc(const csVector3& center, const csVector3& normal,
     int numlight, iLight **lights)
 {
   int i, x,y;
-  if (!ptG3D->BeginDraw (CSDRAW_2DGRAPHICS))
+  g3d->SetRenderTarget (tex->GetTextureHandle ());
+  if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS))
     return;
   /// calc diff values
   int w = bumpmap->GetWidth();
@@ -167,10 +166,9 @@ void csProcBump::Recalc(const csVector3& center, const csVector3& normal,
       if(col < 0) col=0;
       else if(col > 255) col=255;
 
-      ptG2D->DrawPixel (x, y, palette[col*palsize/256] );
+      g2d->DrawPixel (x, y, palette[col*palsize/256] );
     }
-  ptG3D->FinishDraw ();
-  ptG3D->Print (NULL);
+  g3d->FinishDraw ();
   delete[] vals;
 }
 
@@ -282,7 +280,8 @@ void csProcBump::RecalcFast(const csVector3& center, const csVector3& normal,
   }
 
   /// draw texture
-  if (!ptG3D->BeginDraw (CSDRAW_2DGRAPHICS))
+  g3d->SetRenderTarget (tex->GetTextureHandle ());
+  if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS))
     return;
   i=0;
   for (y=0; y<mat_h; y++)
@@ -294,10 +293,9 @@ void csProcBump::RecalcFast(const csVector3& center, const csVector3& normal,
       if(col < 0) col=0;
       else if(col > 255) col=255;
       /// palettesize must be 256 (FindRGB(col,col,col) should work too)
-      ptG2D->DrawPixel (x, y, palette[col] );
+      g2d->DrawPixel (x, y, palette[col] );
       i++;
     }
-  ptG3D->FinishDraw ();
-  ptG3D->Print (NULL);
+  g3d->FinishDraw ();
 }
 
