@@ -15,6 +15,14 @@ skin "Normal Windows"
   WindowMinAt:		(46, 6) - (46-11, 6+10)
   WindowZoomAt:		(34, 6) - (34-11, 6+10)
   WindowCloseAt:	(19, 6) - (19-11, 6+10)
+  CheckBoxUp:		"/aws/chkup.png"
+  CheckBoxDn:		"/aws/chkdn.png"
+  CheckBoxOn:		"/aws/chkon.png"
+  CheckBoxOff:		"/aws/chkoff.png"
+  RadioButtonUp:	"/aws/radup.png"
+  RadioButtonDn:	"/aws/raddn.png"
+  RadioButtonOn:	"/aws/radon.png"
+  RadioButtonOff:	"/aws/radoff.png"
 }
 
 skin "Metal Windows"
@@ -112,6 +120,19 @@ window "Another"
     }
   }
 
+  component "Male" is "Radio Button"
+  {
+    Frame: (100, 60) - (170, 70)
+    Caption: "Male"
+  }
+
+  component "Female" is "Radio Button"
+  {
+    Frame: (100, 70) - (170, 81)
+    Caption: "Female"
+    Align: rbAlignRight
+  }
+
 
   component "Red" is "Command Button"
   {
@@ -141,6 +162,7 @@ window "Another"
   {
     Frame: (20, 90) - (90, 110)
     Style: bfsNormal
+    Toggle: Yes
     Caption: "Blue"
 
     connect 
