@@ -365,8 +365,7 @@ void Demo::SetupSector ()
   iMaterialWrapper* ifm3 = engine->FindMaterial ("flare_spark3");
   iMaterialWrapper* ifm4 = engine->FindMaterial ("flare_spark4");
   iMaterialWrapper* ifm5 = engine->FindMaterial ("flare_spark5");
-  flare->AddComponent (0.0, 0.5, 0.5, CS_FX_ADD, ifmc); // pos, w, h, mixmode
-  flare->AddComponent (.01, 1.0, 1.0, CS_FX_ADD, ifm2);
+  flare->AddComponent (0.0, 1.2, 1.2, CS_FX_ADD, ifmc); // pos, w, h, mixmode
   flare->AddComponent (0.3, 0.1, 0.1, CS_FX_ADD, ifm3);
   flare->AddComponent (0.6, 0.4, 0.4, CS_FX_ADD, ifm4);
   flare->AddComponent (0.8, .05, .05, CS_FX_ADD, ifm5);
@@ -376,6 +375,13 @@ void Demo::SetupSector ()
   flare->AddComponent (1.8, 0.1, 0.1, CS_FX_ADD, ifm5);
   flare->AddComponent (2.0, 0.5, 0.5, CS_FX_ADD, ifm2);
   flare->AddComponent (2.1, .15, .15, CS_FX_ADD, ifm3);
+
+  flare->AddComponent (2.5, 0.2, 0.2, CS_FX_ADD, ifm3);
+  flare->AddComponent (2.8, 0.4, 0.4, CS_FX_ADD, ifm4);
+  flare->AddComponent (3.0, 3.0, 3.0, CS_FX_ADD, ifm1);
+  flare->AddComponent (3.1, 0.05, 0.05, CS_FX_ADD, ifm5);
+  flare->AddComponent (3.3, .15, .15, CS_FX_ADD, ifm2);
+
   il->DecRef ();
   room->AddLight (light);
 }
