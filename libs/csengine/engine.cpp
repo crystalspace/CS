@@ -847,7 +847,7 @@ bool csEngine::HandleEvent (iEvent &Event)
 	    }
 
 #ifndef CS_USE_NEW_RENDERER
-            csGraphics3DCaps *caps = G3D->GetCaps ();
+            const csGraphics3DCaps *caps = G3D->GetCaps ();
             fogmethod = caps->fog;
             NeedPO2Maps = caps->NeedsPO2Maps;
             MaxAspectRatio = caps->MaxAspectRatio;
