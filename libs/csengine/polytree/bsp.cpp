@@ -20,7 +20,7 @@
 #include "csengine/polyint.h"
 #include "csengine/treeobj.h"
 #include "csengine/bsp.h"
-#include "csengine/sector.h"
+#include "csengine/thing.h"
 #include "csengine/engine.h"
 #include "csengine/polygon.h"
 #include "isystem.h"
@@ -90,7 +90,7 @@ int csBspNode::CountPolygons ()
 
 //---------------------------------------------------------------------------
 
-csBspTree::csBspTree (csSector* sect, int mode) : csPolygonTree (sect)
+csBspTree::csBspTree (csThing* thing, int mode) : csPolygonTree (thing)
 {
   csBspTree::mode = mode;
 }
@@ -98,11 +98,6 @@ csBspTree::csBspTree (csSector* sect, int mode) : csPolygonTree (sect)
 csBspTree::~csBspTree ()
 {
   Clear ();
-}
-
-void csBspTree::Build ()
-{
-  Build (sector->GetPolygonArray ());
 }
 
 void csBspTree::Build (csPolygonInt** polygons, int num)
@@ -377,10 +372,10 @@ void* csBspTree::Back2Front (csBspNode* node, const csVector3& pos,
     // Front.
     rc = Back2Front (node->back, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
-    rc = func (sector, node->polygons.GetPolygons (),
+    rc = func (thing, node->polygons.GetPolygons (),
     	node->polygons.GetNumPolygons (), node->polygons_on_splitter, data);
     if (rc) return rc;
-    rc = node->TraverseObjects (sector, pos, func, data);
+    rc = node->TraverseObjects (thing, pos, func, data);
     if (rc) return rc;
     rc = Back2Front (node->front, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
@@ -390,10 +385,10 @@ void* csBspTree::Back2Front (csBspNode* node, const csVector3& pos,
     // Back.
     rc = Back2Front (node->front, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
-    rc = func (sector, node->polygons.GetPolygons (),
+    rc = func (thing, node->polygons.GetPolygons (),
     	node->polygons.GetNumPolygons (), node->polygons_on_splitter, data);
     if (rc) return rc;
-    rc = node->TraverseObjects (sector, pos, func, data);
+    rc = node->TraverseObjects (thing, pos, func, data);
     if (rc) return rc;
     rc = Back2Front (node->back, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
@@ -417,10 +412,10 @@ void* csBspTree::Front2Back (csBspNode* node, const csVector3& pos,
     // Front.
     rc = Front2Back (node->front, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
-    rc = func (sector, node->polygons.GetPolygons (),
+    rc = func (thing, node->polygons.GetPolygons (),
     	node->polygons.GetNumPolygons (), node->polygons_on_splitter, data);
     if (rc) return rc;
-    rc = node->TraverseObjects (sector, pos, func, data);
+    rc = node->TraverseObjects (thing, pos, func, data);
     if (rc) return rc;
     rc = Front2Back (node->back, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
@@ -430,10 +425,10 @@ void* csBspTree::Front2Back (csBspNode* node, const csVector3& pos,
     // Back.
     rc = Front2Back (node->back, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
-    rc = func (sector, node->polygons.GetPolygons (),
+    rc = func (thing, node->polygons.GetPolygons (),
     	node->polygons.GetNumPolygons (), node->polygons_on_splitter, data);
     if (rc) return rc;
-    rc = node->TraverseObjects (sector, pos, func, data);
+    rc = node->TraverseObjects (thing, pos, func, data);
     if (rc) return rc;
     rc = Front2Back (node->front, pos, func, data, cullfunc, culldata);
     if (rc) return rc;

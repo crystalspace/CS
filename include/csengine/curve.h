@@ -95,7 +95,7 @@ public:
   bool AreColorsValid () { return colors_valid; }
 };
 
-class csPolygonSet;
+class csThing;
 class csCurveTemplate;
 class csLightPatch;
 class csSector;
@@ -146,7 +146,7 @@ private:
 
 public:
   /// The polygon set parent.
-  csPolygonSet* parent;
+  csThing* parent;
 
   /// This is the lightmap to be placed on the curve.
   csLightMap* lightmap;
@@ -180,8 +180,8 @@ public:
   /// Set the current object to world space transformation
   void SetObject2World (csReversibleTransform* o2w);
   
-  /// Sets the parent polygonSet for this Curve
-  void SetParent (csPolygonSet* p) { parent = p; }
+  /// Sets the parent thing for this Curve
+  void SetParent (csThing* p) { parent = p; }
 
   void MakeDirtyDynamicLights ();
 
@@ -202,7 +202,7 @@ public:
 
   /**
    * set control index for a control point (referring to the controls
-   * in the parent csPolygonSet)
+   * in the parent csThing)
    */
   virtual void SetControlPoint (int index, int control_id) = 0;
 
@@ -248,7 +248,7 @@ public:
   ///
   virtual void Normal (csVector3& vec, double u, double v);
   ///
-  void InitLightMaps (csPolygonSet* owner, csSector* sector,
+  void InitLightMaps (csThing* owner, csSector* sector,
       bool do_cache, int index);
 
   /// Add a lightpatch to this curves list of light patches
@@ -267,7 +267,7 @@ public:
   void CalculateLighting (csFrustumView& lview);
 
   ///
-  void CacheLightMaps (csPolygonSet* owner, int index);
+  void CacheLightMaps (csThing* owner, int index);
   
   CSOBJTYPE;
 };

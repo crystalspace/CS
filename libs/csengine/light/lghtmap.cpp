@@ -202,7 +202,7 @@ struct LightHeader
   long dyn_cnt;		// Number of dynamic maps
 };
 
-void CacheName (char *buf, csPolygonSet *owner, int index, char *suffix)
+void CacheName (char *buf, csThing *owner, int index, char *suffix)
 {
   const char* name = owner->GetName ();
   if (!name)
@@ -219,7 +219,7 @@ void CacheName (char *buf, csPolygonSet *owner, int index, char *suffix)
     sprintf (buf, "lm/%s_%d%s", name ? name : ".", index, suffix);
 }
 
-bool csLightMap::ReadFromCache (int w, int h, csPolygonSet* owner,
+bool csLightMap::ReadFromCache (int w, int h, csThing* owner,
   csObject* obj, bool isPolygon, int index, csEngine* engine)
 {
   char buf[200];
@@ -344,7 +344,7 @@ bool csLightMap::ReadFromCache (int w, int h, csPolygonSet* owner,
   return true;
 }
 
-void csLightMap::Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csEngine* engine)
+void csLightMap::Cache (csThing* owner, csPolygon3D* poly, int index, csEngine* engine)
 {
   (void) engine;
   char buf[200];

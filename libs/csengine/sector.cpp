@@ -60,7 +60,7 @@ bool csSector::do_radiosity = false;
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_CSOBJTYPE (csSector,csPolygonSet);
+IMPLEMENT_CSOBJTYPE (csSector,csPObject);
 
 IMPLEMENT_IBASE_EXT (csSector)
   IMPLEMENTS_EMBEDDED_INTERFACE (iSector)
@@ -70,14 +70,16 @@ IMPLEMENT_EMBEDDED_IBASE (csSector::eiSector)
   IMPLEMENTS_INTERFACE (iSector)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csSector::csSector (csEngine* engine) : csPolygonSet (engine)
+csSector::csSector (csEngine* engine) : csPObject ()
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiSector);
+  csSector::engine = engine;
   beam_busy = 0;
   level_r = level_g = level_b = 0;
-  static_tree = NULL;
   static_thing = NULL;
   engine->AddToCurrentRegion (this);
+  fog.enabled = false;
+  draw_busy = 0;
 }
 
 csSector::~csSector ()
@@ -89,15 +91,12 @@ csSector::~csSector ()
   meshes.DeleteAll ();
   collections.DeleteAll ();
 
-  delete static_tree;
-
   lights.DeleteAll ();
   terrains.DeleteAll ();
 }
 
 void csSector::Prepare (csSector*)
 {
-  csPolygonSet::Prepare (this);
   int i;
   for (i = 0 ; i < things.Length () ; i++)
   {
@@ -117,98 +116,20 @@ void csSector::AddLight (csStatLight* light)
   light->SetSector (this);
 }
 
-void csSector::UseStaticTree (int mode, bool /*octree*/)
+void csSector::UseStaticTree (int mode, bool octree)
 {
-  //mode = BSP_BALANCE_AND_SPLITS;
-
-  delete static_tree; static_tree = NULL;
-
   if (static_thing) return;
-  static_thing = new csThing (engine);
-  static_thing->SetName ("__static__");
-
-  // First copy the vector of things locally.
-  csVector copy_things;
   int i;
   for (i = 0 ; i < things.Length () ; i++)
-    copy_things.Push (things[i]);
-  
-  i = 0;
-  while (i < copy_things.Length ())
   {
-    csThing* sp = (csThing*)copy_things[i];
-    if (!sp->flags.Check (CS_ENTITY_MOVEABLE | CS_ENTITY_DETAIL) && !sp->GetFog ().enabled
-    	&& sp->GetNumCurves () == 0)
+    csThing* th = (csThing*)things[i];
+    if (th->flags.Check (CS_ENTITY_VISTREE))
     {
-      static_thing->Merge (sp);
-      delete sp;
-    }
-    i++;
-  }
-  static_thing->GetMovable ().SetSector (this);
-  static_thing->GetMovable ().UpdateMove ();
-  static_thing->CreateBoundingBox ();
-  engine->things.Push (static_thing);
-
-  csBox3 bbox;
-  static_thing->GetBoundingBox (bbox);
-  static_tree = new csOctree (this, bbox.Min (), bbox.Max (), 150/*15*/, mode);
-
-  csString str ("vis/octree_");
-  str += GetName ();
-  csEngine* w = engine;
-  bool recalc_octree = true;
-  if (!csEngine::do_force_revis && w->VFS->Exists ((const char*)str))
-  {
-    recalc_octree = false;
-    CsPrintf (MSG_INITIALIZATION, "Loading bsp/octree...\n");
-    recalc_octree = !((csOctree*)static_tree)->ReadFromCache (
-    	w->VFS, (const char*)str, static_thing->GetPolygonArray ().GetArray (),
-	static_thing->GetPolygonArray ().Length ());
-    if (recalc_octree)
-    {
-      delete static_tree;
-      static_tree = new csOctree (this, bbox.Min (), bbox.Max (), 150/*15*/, mode);
+      static_thing = th;
+      static_thing->BuildStaticTree (mode, octree);
+      break;//@@@@@@ Only support one static_thing for now!!!
     }
   }
-  if (recalc_octree)
-  {
-    CsPrintf (MSG_INITIALIZATION, "Calculate bsp/octree...\n");
-    static_tree->Build (static_thing->GetPolygonArray ());
-    CsPrintf (MSG_INITIALIZATION, "Caching bsp/octree...\n");
-    ((csOctree*)static_tree)->Cache (w->VFS, (const char*)str);
-  }
-  CsPrintf (MSG_INITIALIZATION, "Compress vertices...\n");
-  static_thing->CompressVertices ();
-  CsPrintf (MSG_INITIALIZATION, "Build vertex tables...\n");
-  ((csOctree*)static_tree)->BuildVertexTables ();
-
-  // Everything for PVS.
-  str = "vis/pvs_";
-  str += GetName ();
-  bool recalc_pvs = true;
-  if ((!csEngine::do_force_revis || csEngine::do_not_force_revis) &&
-  	w->VFS->Exists ((const char*)str))
-  {
-    recalc_pvs = false;
-    CsPrintf (MSG_INITIALIZATION, "Loading PVS...\n");
-    recalc_pvs = !((csOctree*)static_tree)->ReadFromCachePVS (
-    	w->VFS, (const char*)str);;
-  }
-  if (csEngine::do_not_force_revis) recalc_pvs = false;
-  if (recalc_pvs)
-  {
-#   if 0
-    CsPrintf (MSG_INITIALIZATION, "Build PVS...\n");
-    ((csOctree*)static_tree)->BuildPVS (static_thing);
-#   else
-    //CsPrintf (MSG_INITIALIZATION, "Build Dummy PVS...\n");
-    //((csOctree*)static_tree)->SetupDummyPVS ();
-#   endif
-    CsPrintf (MSG_INITIALIZATION, "Caching PVS...\n");
-    ((csOctree*)static_tree)->CachePVS (w->VFS, (const char*)str);
-  }
-  static_tree->Statistics ();
 
   // Loop through all things and update their bounding box in the
   // polygon trees.
@@ -291,12 +212,6 @@ csObject* csSector::HitBeam (const csVector3& start, const csVector3& end,
 void csSector::CreateLightMaps (iGraphics3D* g3d)
 {
   int i;
-  for (i = 0 ; i < polygons.Length () ; i++)
-  {
-    csPolygon3D* p = polygons.Get (i);
-    p->CreateLightMaps (g3d);
-  }
-
   for (i = 0 ; i < things.Length () ; i++)
   {
     csThing* sp = (csThing*)things[i];
@@ -339,7 +254,7 @@ bool IntersectSegmentCull (csPolygonTree* /*tree*/,
   return false;
 }
 
-void* IntersectSegmentTestPol (csSector*,
+void* IntersectSegmentTestPol (csThing*,
 	csPolygonInt** polygon, int num, bool /*same_plane*/, void* data)
 {
   ISectData* idata = (ISectData*)data;
@@ -382,8 +297,9 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
     }
   }
 
-  if (static_tree)
+  if (static_thing)
   {
+    csPolygonTree* static_tree = static_thing->GetStaticTree ();
     // Handle the octree.
     ISectData idata;
     idata.seg.Set (start, end);
@@ -397,13 +313,9 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
     }
   }
 
-  if (best_p)
-  {
-    if (pr) *pr = best_r;
-    return best_p;
-  }
 
-  return csPolygonSet::IntersectSegment (start, end, isect, pr);
+  if (pr) *pr = best_r;
+  return best_p;
 }
 
 csSector* csSector::FollowSegment (csReversibleTransform& t,
@@ -442,41 +354,6 @@ csPolygon3D* csSector::IntersectSphere (csVector3& center, float radius,
   csPolygon3D* p, * min_p = NULL;
   csVector3 hit;
 
-  for (i = 0 ; i < polygons.Length () ; i++)
-  {
-    p = polygons.Get (i);
-    const csPolyPlane* pl = p->GetPlane ();
-    const csPlane3& wpl = pl->GetWorldPlane ();
-    d = wpl.Distance (center);
-    if (d < min_d && csMath3::Visible (center, wpl))
-    {
-      hit = -center;
-      hit -= wpl.GetNormal ();
-      hit *= d;
-      hit += center;
-      if (p->IntersectRay (center, hit))
-      {
-        csPortal* po = p->GetPortal ();
-        if (po)
-        {
-	  if (!po->GetSector ()) po->CompleteSector ();
-	  csSector* dest_sect = po->GetSector ();
-          p = dest_sect->IntersectSphere (center, min_d, &d);
-          if (p)
-          {
-            min_d = d;
-            min_p = p;
-          }
-        }
-        else
-        {
-          min_d = d;
-          min_p = p;
-        }
-      }
-    }
-  }
-
   for (i = 0 ; i < things.Length () ; i++)
   {
     csThing* sp = (csThing*)things[i];
@@ -492,39 +369,6 @@ csPolygon3D* csSector::IntersectSphere (csVector3& center, float radius,
   return min_p;
 }
 
-void* csSector::DrawPolygons (csSector* sector,
-  csPolygonInt** polygon, int num, bool /*same_plane*/, void* data)
-{
-  csRenderView* d = (csRenderView*)data;
-  sector->DrawPolygonArray (polygon, num, d, false);
-  return NULL;
-}
-
-csPolygon2DQueue* poly_queue;
-
-void* csSector::TestQueuePolygons (csSector* sector,
-  csPolygonInt** polygon, int num, bool /*same_plane*/, void* data)
-{
-  csRenderView* d = (csRenderView*)data;
-  return sector->TestQueuePolygonArray (polygon, num, d, poly_queue,
-    d->GetEngine ()->IsPVS ());
-}
-
-void csSector::DrawPolygonsFromQueue (csPolygon2DQueue* queue,
-  csRenderView* rview)
-{
-  csPolygon3D* poly3d;
-  csPolygon2D* poly2d;
-  csPoly2DPool* render_pool = rview->GetEngine ()->render_pol2d_pool;
-  while (queue->Pop (&poly3d, &poly2d))
-  {
-    poly3d->CamUpdate ();
-    poly3d->GetPlane ()->WorldToCamera (*rview, poly3d->Vcam (0));
-    DrawOnePolygon (poly3d, poly2d, rview, false);
-    render_pool->Free (poly2d);
-  }
-}
-
 int compare_z_thing (const void* p1, const void* p2)
 {
   csThing* sp1 = *(csThing**)p1;
@@ -536,181 +380,9 @@ int compare_z_thing (const void* p1, const void* p2)
   return 0;
 }
 
-static int count_cull_node_notvis_behind;
-// static int count_cull_node_vis_cutzplane;
-static int count_cull_node_notvis_cbuffer;
-static int count_cull_node_vis;
-
-// @@@ This routine need to be cleaned up!!! It probably needs to
-// be part of the class.
-
-bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
-	const csVector3& pos, void* data)
-{
-  if (!node) return false;
-  if (node->Type () != NODE_OCTREE) return true;
-
-  int i;
-  csOctree* otree = (csOctree*)tree;
-  csOctreeNode* onode = (csOctreeNode*)node;
-
-  csCBuffer* c_buffer;
-  csQuadTree3D* quad3d;
-  csCoverageMaskTree* covtree;
-  csRenderView* rview = (csRenderView*)data;
-  static csPolygon2D persp;
-  csVector3 array[7];
-  csEngine* w = rview->GetEngine ();
-
-  if (w->IsPVS ())
-  {
-    // Test for PVS.
-    if (!onode->IsVisible ()) return false;
-    else if (w->IsPVSOnly ()) goto is_vis;
-  }
-
-  c_buffer = w->GetCBuffer ();
-  covtree = w->GetCovtree ();
-  quad3d = w->GetQuad3D ();
-  int num_array;
-  otree->GetConvexOutline (onode, pos, array, num_array, rview->UseFarPlane ());
-
-  if (num_array)
-  {
-    int nVert = MIN (6, num_array); // if we use a farplane we could have up to 7 corners, 
-                                    // but the 7th we'll need not here
-    
-    if (quad3d)
-    {
-      csVector3 test_poly[6];
-      
-      for (i = 0 ; i < nVert ; i++)
-        test_poly[i] = array[i]-quad3d->GetCenter ();
-      csBox3 bbox;
-      int rc = quad3d->TestPolygon (test_poly, nVert, bbox);
-      bool visible = (rc != CS_QUAD3D_NOCHANGE);
-      if (!visible) return false;
-      goto is_vis;
-    }
-  
-    csVector3 cam[7];
-    // If all vertices are behind z plane then the node is
-    // not visible. If some vertices are behind z plane then we
-    // need to clip the polygon.
-    // We also test the node against the view frustum here.
-    int num_z_0 = 0;
-    bool left = true, right = true, top = true, bot = true;
-    float lx, rx, ty, by;
-    rview->GetFrustum (lx, rx, ty, by);
-    for (i = 0 ; i < nVert; i++)
-    {
-      cam[i] = rview->Other2This (array[i]);
-      if (cam[i].z < SMALL_EPSILON) num_z_0++;
-      if (left && cam[i].x >= cam[i].z * lx) left = false;
-      if (right && cam[i].x <= cam[i].z * rx) right = false;
-      if (top && cam[i].y >= cam[i].z * ty) top = false;
-      if (bot && cam[i].y <= cam[i].z * by) bot = false;
-    }
-    if (left || right || top || bot) return false;
-
-    if (num_z_0 == nVert)
-    {
-      // Node behind camera.
-      count_cull_node_notvis_behind++;
-      return false;
-    }
-    
-    if (rview->UseFarPlane ())
-    {
-      if (num_array == 7) // we havent transformed the 7th yet
-       cam[6] = rview->Other2This (array[6]);
-      for (i = 0 ; i < num_array ; i++)
-        if (rview->GetFarPlane ()->Classify (cam[i]) > SMALL_EPSILON) 
-	  break;
-      if (i == num_array) return false;
-    }
-    
-    persp.MakeEmpty ();
-    if (num_z_0 == 0)
-    {
-      // No vertices are behind. Just perspective correct.
-      for (i = 0 ; i < nVert ; i++)
-        persp.AddPerspective (cam[i]);
-    }
-    else
-    {
-      // Some vertices are behind. We need to clip.
-      csVector3 isect;
-      int i1 = nVert-1;
-      for (i = 0 ; i < nVert ; i++)
-      {
-        if (cam[i].z < SMALL_EPSILON)
-	{
-	  if (cam[i1].z < SMALL_EPSILON)
-	  {
-	    // Just skip vertex.
-	  }
-	  else
-	  {
-	    // We need to intersect and add intersection point.
-	    csIntersect3::ZPlane (SMALL_EPSILON, cam[i], cam[i1], isect);
-	    persp.AddPerspective (isect);
-	  }
-	}
-	else
-	{
-	  if (cam[i1].z < SMALL_EPSILON)
-	  {
-	    // We need to intersect and add both intersection point and this point.
-	    csIntersect3::ZPlane (SMALL_EPSILON, cam[i], cam[i1], isect);
-	    persp.AddPerspective (isect);
-	  }
-	  // Just perspective correct and add to the 2D polygon.
-	  persp.AddPerspective (cam[i]);
-	}
-        i1 = i;
-      }
-    }
-
-    if (!persp.ClipAgainst (rview->GetView ())) return false;
-
-    // c-buffer test.
-    bool vis;
-    if (covtree)
-      vis = covtree->TestPolygon (persp.GetVertices (),
-	persp.GetNumVertices (), persp.GetBoundingBox ());
-    else
-      vis = c_buffer->TestPolygon (persp.GetVertices (),
-      	persp.GetNumVertices ());
-    if (!vis)
-    {
-      count_cull_node_notvis_cbuffer++;
-      return false;
-    }
-  }
-
-is_vis:
-  count_cull_node_vis++;
-  // If a node is visible we check wether or not it has a minibsp.
-  // If it has a minibsp then we need to transform all vertices used
-  // by that minibsp to camera space.
-  csVector3* cam;
-  int* indices;
-  int num_indices;
-  if (onode->GetMiniBspVerts ())
-  {
-    // Here we get the polygon set as the static thing from the sector itself.
-    csPolygonSet* pset = (csPolygonSet*)(otree->GetSector ()->GetStaticThing ());
-    cam = pset->GetCameraVertices ();
-    indices = onode->GetMiniBspVerts ();
-    num_indices = onode->GetMiniBspNumVerts ();
-    for (i = 0 ; i < num_indices ; i++)
-      cam[indices[i]] = rview->Other2This (pset->Vwor (indices[i]));
-  }
-
-  return true;
-}
-
+// @@@ THE NOTES BELOW ARE MOSTLY OBSOLETE NOW. I DON'T REMOVE THEM
+// BECAUSE THERE IS STILL A GRAIN OF USEFUL INFORMATION IN THEM.
+//
 // Some notes about drawing here. These notes are the start for
 // a rethinking about how rendering objects in one sector actually
 // should happen. Note that the current implementation actually
@@ -828,8 +500,6 @@ is_vis:
 void csSector::Draw (csRenderView& rview)
 {
   draw_busy++;
-  UpdateTransformation (rview);
-  Stats::polygons_considered += polygons.Length ();
   int i;
   rview.SetThisSector (this);
 
@@ -867,7 +537,7 @@ void csSector::Draw (csRenderView& rview)
   for (i = 0 ; i < skies.Length () ; i++)
   {
     csThing* th = (csThing*)skies[i];
-    th->Draw (rview, false);
+    th->Draw (rview);
   }
 
   // In some cases this queue will be filled with all visible
@@ -881,22 +551,20 @@ void csSector::Draw (csRenderView& rview)
   bool use_object_queues = false;
 
   int engine_mode = rview.GetEngine ()->GetEngineMode ();
-  if (engine_mode == CS_ENGINE_FRONT2BACK)
+  if (static_thing)
   {
-    //-----
-    // In this part of the rendering we use the c-buffer or another
-    // 2D/3D visibility culler.
-    //-----
-
-    // @@@ We should make a pool for queues. The number of queues allocated
-    // at the same time is bounded by the recursion through portals. So a
-    // pool would be ideal.
-    if (static_thing)
+    // If this sector has a static polygon tree (octree) there
+    // are three possibilities.
+    if (engine_mode == CS_ENGINE_FRONT2BACK)
     {
       //-----
-      // This sector has a static polygon tree (octree).
+      // In this part of the rendering we use the c-buffer or another
+      // 2D/3D visibility culler.
       //-----
-    
+
+      // @@@ We should make a pool for queues. The number of queues allocated
+      // at the same time is bounded by the recursion through portals. So a
+      // pool would be ideal.
       // Mark all meshes as invisible and clear the camera transformation
       // for their bounding boxes.
       if (meshes.Length () > 0)
@@ -923,34 +591,8 @@ void csSector::Draw (csRenderView& rview)
 	th->VisTestReset ();
       }
 
-      // Using the PVS, mark all sectors and polygons that are visible
-      // from the current node.
-      if (rview.GetEngine ()->IsPVS ())
-      {
-        csOctree* otree = (csOctree*)static_tree;
-	if (rview.GetEngine ()->IsPVSFrozen ())
-	  otree->MarkVisibleFromPVS (rview.GetEngine ()->GetFrozenPosition ());
-	else
-	  otree->MarkVisibleFromPVS (rview.GetOrigin ());
-      }
-
-      // Initialize a queue on which all visible polygons will be pushed.
-      // The octree is traversed front to back but we want to render
-      // back to front. That's one of the reasons for this queue.
-      poly_queue = new csPolygon2DQueue (polygons.Length ()+
-      	static_thing->GetNumPolygons ());
-
-      // Update the transformation for the static tree. This will
-      // not actually transform all vertices from world to camera but
-      // it will make sure that when a node (octree node) is visited,
-      // the transformation will happen at that time.
-      static_thing->UpdateTransformation ();
-
-      // Traverse the tree front to back and push all visible polygons
-      // on the queue. This traversal will also mark all visible
-      // meshes and things. They will be put on a queue later.
-      static_tree->Front2Back (rview.GetOrigin (), &TestQueuePolygons,
-      	&rview, CullOctreeNode, &rview);
+      // Draw and do the visibility testing.
+      static_thing->Draw (rview);
 
       // Fill the mesh and thing queues for all meshes and things
       // that were visible.
@@ -982,47 +624,7 @@ void csSector::Draw (csRenderView& rview)
     }
     else
     {
-      // There is no static thing (i.e. octree) in this sector so
-      // we just make room for the polygons from the sector.
-      poly_queue = new csPolygon2DQueue (polygons.Length ());
-    }
-
-    // Also add/queue the polygons of the current sector (which are expected
-    // to be behind all other polygons from entities inside the sector).
-    csPolygon2DQueue* queue = poly_queue;
-    TestQueuePolygonArray (polygons.GetArray (), polygons.Length (), &rview,
-    	queue, false);
-
-    // Render all polygons that are visible back to front.
-    DrawPolygonsFromQueue (queue, &rview);
-    delete queue;
-  }
-  else if (engine_mode == CS_ENGINE_BACK2FRONT)
-  {
-    //-----
-    // Here we don't use the c-buffer or 2D culler but just render back
-    // to front.
-    //-----
-    DrawPolygons (this, polygons.GetArray (), polygons.Length (), false, &rview);
-    if (static_thing)
-    {
-      static_thing->UpdateTransformation (rview);
-      static_tree->Back2Front (rview.GetOrigin (), &DrawPolygons, (void*)&rview);
-    }
-  }
-  else
-  {
-    //-----
-    // Here we render using the Z-buffer.
-    //-----
-    DrawPolygonArray (polygons.GetArray (), polygons.Length (), &rview, true);
-    if (static_thing)
-    {
-      static_thing->UpdateTransformation (rview);
-      csOctree* otree = (csOctree*)static_tree;
-      csPolygonIntArray& unsplit = otree->GetRoot ()->GetUnsplitPolygons (); 
-      DrawPolygonArray (unsplit.GetPolygons (), unsplit.GetNumPolygons (),
-    	  &rview, true);
+      static_thing->Draw (rview);
     }
   }
 
@@ -1078,7 +680,7 @@ void csSector::Draw (csRenderView& rview)
       {
         csThing* th = sort_list[i];
         if (th->GetFog ().enabled) th->DrawFoggy (rview);
-        else th->Draw (rview, false);
+        else th->Draw (rview);
       }
     }
 
@@ -1119,8 +721,6 @@ void csSector::Draw (csRenderView& rview)
       else
       {
         if (
-	  ((csPolygonSet*)rview.GetPortalPolygon ()->GetParent ())->GetType ()
-	  	== csThing::Type ||
 	  previous_sector->HasFog () ||
 	  rview.GetPortalPolygon ()->IsTransparent () ||
 	  rview.GetPortalPolygon ()->GetPortal ()->flags.Check (CS_PORTAL_WARP))
@@ -1262,7 +862,7 @@ void CompressShadowFrustums (csFrustumList* list)
 static int frust_cnt = 50;
 
 //@@@ Needs to be part of sector?
-void* CheckFrustumPolygonsFB (csSector* sector,
+void* CheckFrustumPolygonsFB (csThing* thing,
   csPolygonInt** polygon, int num, bool /*same_plane*/, void* data)
 {
   csPolygon3D* p;
@@ -1304,11 +904,15 @@ void* CheckFrustumPolygonsFB (csSector* sector,
 	      // The thing is visible and we want things to cast
 	      // shadows. So we add all shadows generated by this
 	      // thing to the shadow list.
-	      if (th != sector->GetStaticThing ())
+	      if (th != thing)
 	      {
-	        shadows = th->GetShadows (sector, center);
-	        lview->shadows.AppendList (shadows);
-	        delete shadows;
+		if ((th->flags.Get () & lview->shadow_thing_mask) == lview->shadow_thing_value)
+		{
+		  csSector* sector = thing->GetMovable ().GetSector (0);
+	          shadows = th->GetShadows (sector, center);
+	          lview->shadows.AppendList (shadows);
+	          delete shadows;
+		}
 	      }
 	    fdata->visible_things.AddNoTest (th);
 	  }
@@ -1442,7 +1046,7 @@ csThing** csSector::GetVisibleThings (csFrustumView& lview, int& num_things)
   csFrustum* lf = lview.light_frustum;
   bool infinite = lf->IsInfinite ();
   csVector3& center = lf->GetOrigin ();
-  csPolygonSetBBox* bbox;
+  csThingBBox* bbox;
   bool vis;
   int i, i1;
   int j;
@@ -1550,14 +1154,6 @@ void csSector::RealCheckFrustum (csFrustumView& lview)
   // the new origin).
   csVector3& center = lview.light_frustum->GetOrigin ();
 
-  // Check if gouraud shading needs to be updated.
-  if (light_frame_number != current_light_frame_number)
-  {
-    light_frame_number = current_light_frame_number;
-    lview.gouraud_color_reset = true;
-  }
-  else lview.gouraud_color_reset = false;
-
   // Data for the polygon traversal routines that are called below.
   CheckFrustData fdata;
   fdata.lview = &lview;
@@ -1568,8 +1164,9 @@ void csSector::RealCheckFrustum (csFrustumView& lview)
 
   // When doing lighting there are two big cases: either we
   // have a static tree (octree) or not.
-  if (static_tree)
+  if (static_thing)
   {
+    csPolygonTree* static_tree = static_thing->GetStaticTree ();
     // If there is a static tree (BSP and/or octree) then we
     // go front to back and add shadows to the list while we are doing
     // that. In future I would like to add some extra culling stage
@@ -1586,8 +1183,6 @@ void csSector::RealCheckFrustum (csFrustumView& lview)
     static_tree->Front2Back (center, CheckFrustumPolygonsFB, (void*)&fdata,
       	CullOctreeNodeLighting, (void*)&lview);
     frust_cnt = 50;
-    CheckFrustumPolygonsFB (this, polygons.GetArray (),
-      polygons.Length (), false, (void*)&fdata);
 
     // Calculate lighting for all things in this sector.
     // The 'visible_things' hashset that is in fdata will contain
@@ -1599,7 +1194,8 @@ void csSector::RealCheckFrustum (csFrustumView& lview)
     {
       sp = (csThing*)(it->Next ());
       if (sp != static_thing)
-        sp->RealCheckFrustum (lview);
+        if ((sp->flags.Get () & lview.process_thing_mask) == lview.process_thing_value)
+          sp->RealCheckFrustum (lview);
     }
   }
   else
@@ -1618,19 +1214,23 @@ void csSector::RealCheckFrustum (csFrustumView& lview)
       for (i = 0 ; i < num_visible_things ; i++)
       {
         sp = visible_things[i];
-        shadows = sp->GetShadows (this, center);
-        lview.shadows.AppendList (shadows);
-        delete shadows;
+	// Only if the thing has the right flags do we consider it for shadows.
+	if ((sp->flags.Get () & lview.shadow_thing_mask) == lview.shadow_thing_value)
+	{
+          shadows = sp->GetShadows (this, center);
+          lview.shadows.AppendList (shadows);
+          delete shadows;
+	}
       }
     }
 
-    // Calculate lighting for all polygons in this sector.
-    CheckFrustumPolygons (this, polygons.GetArray (),
-        polygons.Length (), (void*)&fdata);
-
     // Calculate lighting for all things in the current sector.
     for (i = 0 ; i < num_visible_things ; i++)
-      visible_things[i]->RealCheckFrustum (lview);
+    {
+      sp = visible_things[i];
+      if ((sp->flags.Get () & lview.process_thing_mask) == lview.process_thing_value)
+        sp->RealCheckFrustum (lview);
+    }
       
     delete [] visible_things;
   }
@@ -1654,9 +1254,6 @@ void csSector::RealCheckFrustum (csFrustumView& lview)
 void csSector::InitLightMaps (bool do_cache)
 {
   int i;
-  for (i = 0; i < polygons.Length (); i++)
-    polygons.Get (i)->InitLightMaps (this, do_cache, i);
-
   for (i = 0 ; i < things.Length () ; i++)
   {
     csThing* sp = (csThing*)things[i];
@@ -1672,9 +1269,6 @@ void csSector::InitLightMaps (bool do_cache)
 void csSector::CacheLightMaps ()
 {
   int i;
-  for (i = 0 ; i < polygons.Length (); i++)
-    polygons.Get (i)->CacheLightMaps (this, i);
-
   for (i = 0 ; i < things.Length () ; i++)
   {
     csThing* sp = (csThing*)things[i];
@@ -1755,6 +1349,39 @@ csStatLight* csSector::FindLight (CS_ID id)
     if (l->GetID () == id) return l;
   }
   return NULL;
+}
+
+void csSector::CalculateSectorBBox (csBox3& bbox,
+	bool do_things, bool do_meshes, bool do_terrain)
+{
+  bbox.StartBoundingBox ();
+  int i;
+  if (do_things)
+    for (i = 0 ; i < things.Length () ; i++)
+    {
+      csThing* th = (csThing*)things[i];
+      csThingBBox* pset_bbox = th->GetBoundingBox ();
+      if (pset_bbox)
+      {
+        bbox.AddBoundingVertex (th->Vwor (pset_bbox->i1));
+        bbox.AddBoundingVertex (th->Vwor (pset_bbox->i2));
+        bbox.AddBoundingVertex (th->Vwor (pset_bbox->i3));
+        bbox.AddBoundingVertex (th->Vwor (pset_bbox->i4));
+        bbox.AddBoundingVertex (th->Vwor (pset_bbox->i5));
+        bbox.AddBoundingVertex (th->Vwor (pset_bbox->i6));
+        bbox.AddBoundingVertex (th->Vwor (pset_bbox->i7));
+        bbox.AddBoundingVertex (th->Vwor (pset_bbox->i8));
+      }
+    }
+  if (do_meshes)
+    for (i = 0 ; i < meshes.Length () ; i++)
+    {
+      csMeshWrapper* mesh = (csMeshWrapper*)meshes[i];
+      csBox3 b;
+      mesh->GetTransformedBoundingBox (mesh->GetMovable ().GetTransform (), b);
+      bbox += b;
+    }
+  // @@@ if (do_terrain) not yet supported
 }
 
 //---------------------------------------------------------------------------

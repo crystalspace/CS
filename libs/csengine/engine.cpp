@@ -129,10 +129,9 @@ csPolygon3D* csPolyIt::Fetch ()
       return Fetch ();
     }
   }
-  else if (polygon_idx >= sector->GetNumPolygons ())
+  else
   {
-    // We are not scanning things but we have no more polygons in
-    // this sector. Start scanning things.
+    // Start scanning things.
     polygon_idx = -1;
     thing_idx = 0;
     // Recurse.
@@ -145,9 +144,8 @@ csPolygon3D* csPolyIt::Fetch ()
     return Fetch ();
   }
 
-  return thing_idx != -1 ?
-    ((csThing*)(sector->things[thing_idx]))->GetPolygon3D (polygon_idx) :
-    sector->GetPolygon3D (polygon_idx);
+  return
+    ((csThing*)(sector->things[thing_idx]))->GetPolygon3D (polygon_idx);
 }
 
 csSector* csPolyIt::GetLastSector ()
@@ -221,10 +219,9 @@ csCurve* csCurveIt::Fetch ()
       return Fetch ();
     }
   }
-  else if (curve_idx >= sector->GetNumCurves ())
+  else
   {
-    // We are not scanning things but we have no more polygons in
-    // this sector. Start scanning things.
+    // Start scanning things.
     curve_idx = -1;
     thing_idx = 0;
 
@@ -240,9 +237,8 @@ csCurve* csCurveIt::Fetch ()
     return Fetch ();
   }
 
-  return thing_idx != -1 ?
-    ((csThing*)(sector->things[thing_idx]))->GetCurve (curve_idx) :
-    sector->GetCurve (curve_idx);
+  return
+    ((csThing*)(sector->things[thing_idx]))->GetCurve (curve_idx);
 }
 
 csSector* csCurveIt::GetLastSector ()
@@ -356,6 +352,8 @@ csSector* csSectorIt::Fetch ()
     return sector;
   }
 
+#if 0
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
   // @@@ This function should try to use the octree if available to
   // quickly discard lots of polygons that cannot be close enough.
   while (cur_poly < sector->GetNumPolygons ())
@@ -380,6 +378,7 @@ csSector* csSectorIt::Fetch ()
       }
     }
   }
+#endif
 
   // End search.
   has_ended = true;
@@ -844,9 +843,10 @@ void csEngine::ResolveEngineMode ()
     for (int i = 0 ; i < sectors.Length () ; i++)
     {
       csSector* s = (csSector*)sectors[i];
-      csPolygonTree* ptree = s->GetStaticTree ();
-      if (ptree)
+      csThing* ss = s->GetStaticThing ();
+      if (ss)
       {
+        csPolygonTree* ptree = ss->GetStaticTree ();
         csOctree* otree = (csOctree*)ptree;
 	int num_nodes = otree->GetRoot ()->CountChildren ();
 	if (num_nodes > 30) switch_f2b += 10;
@@ -977,23 +977,6 @@ bool csEngine::Prepare ()
     ShineLights ();
 
   CheckConsistency ();
-
-  long memory = 0;
-  long tree_memory = 0;
-  for (int i = 0 ; i < sectors.Length () ; i++)
-  {
-    csSector* s = (csSector*)sectors[i];
-    memory += Dumper::Memory (s, 0);
-    if (s->GetStaticTree ())
-    {
-      csOctree* otree = (csOctree*)(s->GetStaticTree ());
-      tree_memory += Dumper::Memory (otree, 0);
-    }
-  }
-  CsPrintf (MSG_INITIALIZATION, "World geometry is using %ld bytes.\n", memory);
-  CsPrintf (MSG_INITIALIZATION, "Octree/BSP trees are using %ld bytes.\n", tree_memory);
-  CsPrintf (MSG_INITIALIZATION, "Textures are using %ld texels.\n",
-  	Dumper::TotalTexels (textures));
 
   return true;
 }
@@ -1189,7 +1172,7 @@ void csEngine::ShineLights (csRegion* region)
     meter.Step();
   }
 
-  csPolygonSet::current_light_frame_number++;
+  csThing::current_light_frame_number++;
 
   CsPrintf (MSG_INITIALIZATION, "\nUpdating VFS...\n");
   if (!VFS->Sync ())
@@ -1957,6 +1940,16 @@ csSector* csEngine::CreateCsSector (const char *iName)
   sector->SetName (iName);
   sectors.Push (sector);
   return sector;
+}
+
+csThing* csEngine::CreateSectorWalls (csSector* sector, const char *iName)
+{
+  csThing* thing = new csThing (this);
+  thing->SetName (iName);
+  thing->flags.Set (CS_ENTITY_ZFILL|CS_ENTITY_CONVEX);
+  thing->GetMovable ().SetSector (sector);
+  thing->GetMovable ().UpdateMove ();
+  return thing;
 }
 
 iSector* csEngine::CreateSector (const char *iName)

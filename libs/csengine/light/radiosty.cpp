@@ -30,6 +30,7 @@
 #include "csengine/texture.h"
 #include "csengine/material.h"
 #include "csengine/rview.h"
+#include "csengine/thing.h"
 #include "csgeom/math3d.h"
 #include "csgeom/vector3.h"
 #include "csgeom/frustum.h"
@@ -1113,6 +1114,10 @@ void csRadiosity :: StartFrustum()
   lview->g = 1.0;
   lview->b = 1.0;
   lview->dynamic = false;
+  lview->shadow_thing_mask = CS_ENTITY_NOSHADOWS;
+  lview->shadow_thing_value = 0;
+  lview->process_thing_mask = CS_ENTITY_NOLIGHTING;
+  lview->process_thing_value = 0;
 
   // start from the center of the shooting poly.
   // this will lead to inaccuracy as each lumel of the shooting

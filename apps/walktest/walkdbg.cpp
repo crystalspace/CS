@@ -28,7 +28,6 @@
 #include "csengine/thing.h"
 #include "csengine/wirefrm.h"
 #include "csengine/polytext.h"
-#include "csengine/polyset.h"
 #include "csengine/polygon.h"
 #include "csengine/pol2d.h"
 #include "csengine/sector.h"
@@ -490,7 +489,7 @@ void dump_visible (csRenderView* /*rview*/, int type, void* entity)
     csPolygon3D* poly = (csPolygon3D*)entity;
     const char* name = poly->GetName ();
     if (!name) name = "(NULL)";
-    const char* pname = ((csPolygonSet*)poly->GetParent ())->GetName ();
+    const char* pname = poly->GetParent ()->GetName ();
     if (!pname) pname = "(NULL)";
     Sys->Printf (MSG_DEBUG_0, "%03d%sPolygon '%s/%s' ------\n",
     	dump_visible_indent, indent_spaces, pname, name);
@@ -527,13 +526,6 @@ void dump_visible (csRenderView* /*rview*/, int type, void* entity)
     if (!name) name = "(NULL)";
     Sys->Printf (MSG_DEBUG_0, "%03d%s BEGIN Sector '%s' ------------\n",
     	dump_visible_indent+1, indent_spaces, name);
-    for (i = 0 ; i < sector->GetNumVertices () ; i++)
-    {
-      csVector3& vw = sector->Vwor (i);
-      csVector3& vc = sector->Vcam (i);
-      Sys->Printf (MSG_DEBUG_0, "%03d%s   | %d: wor=(%f,%f,%f) cam=(%f,%f,%f)\n",
-      	dump_visible_indent+1, indent_spaces, i, vw.x, vw.y, vw.z, vc.x, vc.y, vc.z);
-    }
     dump_visible_indent++;
   }
   else if (type == CALLBACK_SECTOREXIT)
@@ -816,8 +808,9 @@ void DrawOctreeBoxes (int draw_level)
 {
   csCamera* cam = Sys->view->GetCamera ();
   csSector* sector = cam->GetSector ();
-  csOctree* tree = (csOctree*)sector->GetStaticTree ();
-  if (!tree) return;
+  csThing* stat = sector->GetStaticThing ();
+  if (!stat) return;
+  csOctree* tree = (csOctree*)stat->GetStaticTree ();
   csOctreeNode* node = tree->GetRoot ();
   DrawOctreeBoxes (node, 0, draw_level);
 }

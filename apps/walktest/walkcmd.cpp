@@ -747,7 +747,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (p)
     {
       CsPrintf (MSG_CONSOLE, "Action polygon '%s' ", p->GetName ());
-      csPolygonSet* ob = (csPolygonSet*)(p->GetParent ());
+      csThing* ob = p->GetParent ();
       CsPrintf (MSG_CONSOLE, "in set '%s'\n", ob->GetName ());
       printf ("ACTION\n");
       Sys->ActivateObject ((csObject*)ob);
@@ -930,9 +930,10 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "db_boxnode1"))
   {
     csSector* room = Sys->view->GetCamera ()->GetSector ();
-    csPolygonTree* tree = room->GetStaticTree ();
-    if (tree)
+    csThing* stat = room->GetStaticThing ();
+    if (stat)
     {
+      csPolygonTree* tree = stat->GetStaticTree ();
       csOctree* otree = (csOctree*)tree;
       csOctreeNode* l = otree->GetLeaf (Sys->view->GetCamera ()->GetOrigin ());
       Sys->debug_box1 = l->GetBox ();
@@ -947,9 +948,10 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "db_boxnode2"))
   {
     csSector* room = Sys->view->GetCamera ()->GetSector ();
-    csPolygonTree* tree = room->GetStaticTree ();
-    if (tree)
+    csThing* stat = room->GetStaticThing ();
+    if (stat)
     {
+      csPolygonTree* tree = stat->GetStaticTree ();
       csOctree* otree = (csOctree*)tree;
       csOctreeNode* l = otree->GetLeaf (Sys->view->GetCamera ()->GetOrigin ());
       Sys->debug_box2 = l->GetBox ();
@@ -964,9 +966,10 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "db_boxvis"))
   {
     csSector* room = Sys->view->GetCamera ()->GetSector ();
-    csPolygonTree* tree = room->GetStaticTree ();
-    if (tree)
+    csThing* stat = room->GetStaticThing ();
+    if (stat)
     {
+      csPolygonTree* tree = stat->GetStaticTree ();
       csOctree* otree = (csOctree*)tree;
       bool vis1 = otree->BoxCanSeeBox (Sys->debug_box1, Sys->debug_box2);
       bool vis2 = otree->BoxCanSeeBox (Sys->debug_box2, Sys->debug_box1);
@@ -984,9 +987,10 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "db_curleaf"))
   {
     csSector* room = Sys->view->GetCamera ()->GetSector ();
-    csPolygonTree* tree = room->GetStaticTree ();
-    if (tree)
+    csThing* stat = room->GetStaticThing ();
+    if (stat)
     {
+      csPolygonTree* tree = stat->GetStaticTree ();
       csOctree* otree = (csOctree*)tree;
       csOctreeNode* l = otree->GetLeaf (Sys->view->GetCamera ()->GetOrigin ());
       const csBox3& b = l->GetBox ();
@@ -1005,9 +1009,10 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "db_dumpstubs"))
   {
     csSector* room = Sys->view->GetCamera ()->GetSector ();
-    csPolygonTree* tree = room->GetStaticTree ();
-    if (tree)
+    csThing* stat = room->GetStaticThing ();
+    if (stat)
     {
+      csPolygonTree* tree = stat->GetStaticTree ();
       csOctree* otree = (csOctree*)tree;
       printf ("1\n");
       Dumper::dump_stubs (otree);
@@ -1023,9 +1028,10 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     extern void CreateSolidThings (csEngine*, csSector*, csOctreeNode*, int);
     csSector* room = Sys->view->GetCamera ()->GetSector ();
-    csPolygonTree* tree = room->GetStaticTree ();
-    if (tree)
+    csThing* stat = room->GetStaticThing ();
+    if (stat)
     {
+      csPolygonTree* tree = stat->GetStaticTree ();
       csOctree* otree = (csOctree*)tree;
       CreateSolidThings (Sys->engine, room, otree->GetRoot (), 0);
     }
@@ -1124,13 +1130,18 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "hi"))
   {
+#if 0
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     csPolygon3D* hi = arg ? Sys->view->GetCamera ()->GetSector ()->GetPolygon3D (arg) : (csPolygon3D*)NULL;
     if (hi) Sys->Printf (MSG_CONSOLE, "Hilighting polygon: '%s'\n", arg);
     else Sys->Printf (MSG_CONSOLE, "Disabled hilighting.\n");
     Sys->selected_polygon = hi;
+#endif
   }
   else if (!strcasecmp (cmd, "p_alpha"))
   {
+#if 0
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     csPolygon3D* hi = Sys->selected_polygon;
     if (hi)
     {
@@ -1143,6 +1154,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       else Sys->Printf (MSG_CONSOLE, "Only for portals!\n");
     }
     else Sys->Printf (MSG_CONSOLE, "No polygon selected!\n");
+#endif
   }
   else if (!strcasecmp (cmd, "s_fog"))
   {
@@ -1190,9 +1202,9 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "debug0"))
   {
     csCamera* c = Sys->view->GetCamera ();
-    if (c->GetSector ()->GetStaticTree ())
+    if (c->GetSector ()->GetStaticThing ())
     {
-      csOctree* octree = (csOctree*)(c->GetSector ()->GetStaticTree ());
+      csOctree* octree = (csOctree*)(c->GetSector ()->GetStaticThing ()->GetStaticTree ());
       Dumper::dump_stubs (octree);
       csNamedObjVector& meshes = Sys->view->GetEngine ()->meshes;
       int i;

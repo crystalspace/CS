@@ -24,7 +24,7 @@
 #include "ilghtmap.h"
 
 class csPolyTexture;
-class csPolygonSet;
+class csThing;
 class csPolygon3D;
 class csLight;
 class csEngine;
@@ -266,13 +266,13 @@ public:
    * Index is the index of the polygon in the containing object. It is used
    * for identifying the lightmap on disk.
    */
-  bool ReadFromCache (int w, int h, csPolygonSet* owner,
+  bool ReadFromCache (int w, int h, csThing* owner,
     csObject* obj, bool isPolygon, int index, csEngine*);
 
   /**
    * Cache the lightmaps in the precalculation area.
    */
-  void Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csEngine*);
+  void Cache (csThing* owner, csPolygon3D* poly, int index, csEngine*);
 
   /**
    * Convert the lightmaps to the correct mixing mode.

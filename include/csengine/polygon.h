@@ -27,7 +27,7 @@
 #include "csgeom/polyidx.h"
 #include "csengine/polyint.h"
 #include "csengine/polyplan.h"
-#include "csengine/polyset.h"
+#include "csengine/thing.h"
 #include "csengine/portal.h"
 #include "csengine/polytext.h"
 #include "csengine/octree.h"
@@ -46,7 +46,7 @@ class csLightMap;
 class csLightPatch;
 class Dumper;
 class csPolyTexture;
-class csPolygonSet;
+class csThing;
 struct iGraphics2D;
 struct iGraphics3D;
 
@@ -454,15 +454,15 @@ class csPolygon3D : public csPolygonInt, public csObject
 
 private:
   /*
-   * A table of indices into the vertices of the parent csPolygonSet
+   * A table of indices into the vertices of the parent csThing
    * (container).
    */
   csPolyIndexed vertices;
 
   /**
-   * The physical parent (thing or sector) of this polygon.
+   * The physical parent of this polygon.
    */
-  csPolygonSet* poly_set;
+  csThing* thing;
 
   /**
    * If not-null, this polygon is a portal.
@@ -649,19 +649,19 @@ public:
   int AddVertex (int v);
 
   /**
-   * Add a vertex to the polygon (and containing csPolygonSet).
+   * Add a vertex to the polygon (and containing thing).
    * Note that it will not check if the vertex is already there.
    * After adding all vertices/polygons you should call
-   * csPolygonSet::CompressVertices() to safe space and gain
+   * CompressVertices() to safe space and gain
    * efficiency.
    */
   int AddVertex (const csVector3& v);
 
   /**
-   * Add a vertex to the polygon (and containing csPolygonSet).
+   * Add a vertex to the polygon (and containing thing).
    * Note that it will not check if the vertex is already there.
    * After adding all vertices/polygons you should call
-   * csPolygonSet::CompressVertices() to safe space and gain
+   * CompressVertices() to safe space and gain
    * efficiency.
    */
   int AddVertex (float x, float y, float z);
@@ -703,14 +703,14 @@ public:
   csPortal* GetPortal () { return portal; }
 
   /**
-   * Set the polygonset (container) that this polygon belongs to.
+   * Set the thing that this polygon belongs to.
    */
-  void SetParent (csPolygonSet* poly_set) { csPolygon3D::poly_set = poly_set; }
+  void SetParent (csThing* thing) { csPolygon3D::thing = thing; }
 
   /**
    * Get the polygonset (container) that this polygons belongs to.
    */
-  csPolygonSet* GetParent () { return poly_set; }
+  csThing* GetParent () { return thing; }
 
   /**
    * Return the plane of this polygon.  This function returns a 3D engine type
@@ -761,7 +761,7 @@ public:
    * a reference to the vertex in world-space is returned.
    */
   csVector3& Vwor (int idx)
-  { return poly_set->Vwor (vertices.GetVertexIndices ()[idx]); }
+  { return thing->Vwor (vertices.GetVertexIndices ()[idx]); }
 
   /**
    * 'idx' is a local index into the vertices table of the polygon.
@@ -769,7 +769,7 @@ public:
    * a reference to the vertex in object-space is returned.
    */
   csVector3& Vobj (int idx)
-  { return poly_set->Vobj (vertices.GetVertexIndices ()[idx]); }
+  { return thing->Vobj (vertices.GetVertexIndices ()[idx]); }
 
   /**
    * 'idx' is a local index into the vertices table of the polygon.
@@ -777,14 +777,14 @@ public:
    * a reference to the vertex in camera-space is returned.
    */
   csVector3& Vcam (int idx)
-  { return poly_set->Vcam (vertices.GetVertexIndices ()[idx]); }
+  { return thing->Vcam (vertices.GetVertexIndices ()[idx]); }
 
   /**
    * Before calling a series of Vcam() you should call
    * CamUpdate() first to make sure that the camera vertex set
    * is up-to-date.
    */
-  void CamUpdate () { poly_set->CamUpdate (); }
+  void CamUpdate () { thing->CamUpdate (); }
 
   /**
    * Set the material for this polygon.
@@ -1012,7 +1012,7 @@ public:
    * Index is the index of this polygon into the containing object. This
    * is used to identify the lightmap data on disk.
    */
-  void InitLightMaps (csPolygonSet* owner, bool do_cache, int index);
+  void InitLightMaps (csThing* owner, bool do_cache, int index);
 
   /**
    * Fill the lightmap of this polygon according to the given light and
@@ -1072,7 +1072,7 @@ public:
    * the calculated lightmap to the level archive. This function does
    * nothing if the cached lightmap was already up-to-date.
    */
-  void CacheLightMaps (csPolygonSet* owner, int index);
+  void CacheLightMaps (csThing* owner, int index);
 
   /**
    * Transform the plane of this polygon from object space to world space.
@@ -1251,9 +1251,8 @@ public:
     virtual void SetName (const char *iName)
     { scfParent->SetName (iName); }
 
-    /// Get the polygonset (container) that this polygons belongs to.
-    virtual iPolygonSet *GetContainer ()
-    { return (iPolygonSet *)scfParent->GetParent (); }
+    /// Get the thing (container) that this polygon belongs to.
+    virtual iThing *GetParent ();
     /// Get the lightmap associated with this polygon
     virtual iLightMap *GetLightMap ()
     {

@@ -984,7 +984,7 @@ void csPolyTreeBBox::Update (const csBox3& world_bbox, csObject* originator)
 
 //---------------------------------------------------------------------------
 
-void* csSphereStub::Visit (csSector* sector, csTreeVisitFunc* func, void* data)
+void* csSphereStub::Visit (csThing* sector, csTreeVisitFunc* func, void* data)
 {
   (void)sector; (void)func; (void)data;
   return NULL;

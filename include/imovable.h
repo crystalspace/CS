@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000-2001 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -27,13 +27,23 @@ class csVector3;
 class csMatrix3;
 class csThing;
 struct iSector;
+struct iMovable;
 
-SCF_VERSION (iMovable, 0, 0, 6);
+#define CS_MOVABLE_DESTROYED 0
+#define CS_MOVABLE_CHANGED 1
+
+/**
+ * This function is called when the movable changes.
+ */
+typedef void (csMovableListener)(iMovable* movable, int action, void* userdata);
+
+
+SCF_VERSION (iMovable, 0, 0, 7);
 
 /**
  * This interface describes a movable entity. It is usually
  * attached to some other geometrical object like a thing or
- * sprite.
+ * mesh object.
  */
 struct iMovable : public iBase
 {
@@ -134,9 +144,22 @@ struct iMovable : public iBase
   virtual void Transform (csMatrix3& matrix) = 0;
 
   /**
+   * Add a listener to this movable. This listener will be called whenever
+   * the movable changes or right before the movable is destroyed.
+   * The given 'action' will be CS_MOVABLE_DESTROYED or CS_MOVABLE_CHANGED.
+   */
+  virtual void AddListener (csMovableListener* listener, void* userdata) = 0;
+
+  /**
+   * Remove a listener from this movable.
+   */
+  virtual void RemoveListener (csMovableListener* listener, void* userdata) = 0;
+
+  /**
    * After all movement has been done you need to
    * call UpdateMove() to make the final changes to the entity
    * that is controlled by this movable. This is very important!
+   * This function is responsible for calling all movement listeners.
    */
   virtual void UpdateMove () = 0;
 };

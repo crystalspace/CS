@@ -25,7 +25,7 @@
 #include "csgeom/box.h"
 #include "csengine/arrays.h"
 
-class csSector;
+class csThing;
 class csPolygonInt;
 class csPolygonTree;
 class csPolygonTreeNode;
@@ -44,7 +44,7 @@ struct iFile;
  * The 'same_plane' bool will be true if all polygons are on the same
  * plane.
  */
-typedef void* (csTreeVisitFunc)(csSector*, csPolygonInt**,
+typedef void* (csTreeVisitFunc)(csThing*, csPolygonInt**,
 	int num, bool same_plane, void*);
 
 /**
@@ -114,7 +114,7 @@ public:
    * Traverse all the polygons in the dynamic objects
    * added to this node.
    */
-  void* TraverseObjects (csSector* sector, const csVector3& pos,
+  void* TraverseObjects (csThing* thing, const csVector3& pos,
   	csTreeVisitFunc* func, void* data);
 };
 
@@ -131,8 +131,8 @@ protected:
   /// The root of the tree.
   csPolygonTreeNode* root;
 
-  /// The parent sector that this tree is made for.
-  csSector* sector;
+  /// The parent thing that this tree is made for.
+  csThing* thing;
 
   /// Clear the nodes.
   void Clear () { delete root; }
@@ -161,20 +161,15 @@ public:
   /**
    * Constructor.
    */
-  csPolygonTree (csSector* sect) : root (NULL), sector (sect) { }
+  csPolygonTree (csThing* th) : root (NULL), thing (th) { }
 
   /**
    * Destructor.
    */
   virtual ~csPolygonTree () { }
 
-  /// Get the sector for this tree.
-  csSector* GetSector () { return sector; }
-
-  /**
-   * Create the tree for the default parent set.
-   */
-  virtual void Build () = 0;
+  /// Get the thing for this tree.
+  csThing* GetThing () { return thing; }
 
   /**
    * Create the tree with a given set of polygons.

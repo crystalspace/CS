@@ -33,7 +33,6 @@ class csPolygon2D;
 class csPolygon3D;
 class csCurve;
 class csThing;
-class csPolygonSet;
 class csPolyTexture;
 class csSector;
 class csEngine;
@@ -85,7 +84,7 @@ public:
   static void dump (csPolyTxtPlane*);
   static void dump (csPolygon2D*, char const* name);
   static void dump (csPolygon3D*);
-  static void dump (csPolygonSet*);
+  static void dump (csThing*);
   static void dump (csPolyTexture*, char const* name);
   static void dump (csSector*);
   static void dump (csEngine*);
@@ -100,17 +99,6 @@ public:
   static void dump (csQuadtree*);
   static void dump_stubs (csOctree*);
   static void dump_stubs (csPolyTreeObject*);
-
-  static long Memory (csCurve*, int verbose_level, csHashSet* done = 0);
-  static long Memory (csPolygon3D*, int verbose_level, csHashSet* done = 0);
-  static long Memory (csPolygonSet*, int verbose_level, csHashSet* done = 0);
-  static long Memory (csThing*, int verbose_level, csHashSet* done = 0);
-  static long Memory (csSector*, int verbose_level, csHashSet* done = 0);
-  static long Memory (csBspNode*, int verbose_level, csHashSet* done = 0);
-  static long Memory (csBspTree*, int verbose_level, csHashSet* done = 0);
-  static long Memory (csOctreeNode*, int verbose_level, csHashSet* done = 0);
-  static long Memory (csOctree*, int verbose_level, csHashSet* done = 0);
-  static long TotalTexels (csTextureList*);
 };
 
 #endif // __CS_DUMPER_H__

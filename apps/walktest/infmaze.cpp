@@ -23,6 +23,7 @@
 #include "csengine/sector.h"
 #include "csengine/portal.h"
 #include "csengine/polygon.h"
+#include "csengine/thing.h"
 #include "csengine/engine.h"
 #include "csengine/texture.h"
 #include "csengine/material.h"
@@ -42,7 +43,7 @@ InfiniteMaze::~InfiniteMaze ()
   if (infinite_world) delete infinite_world;
 }
 
-void InfiniteMaze::create_one_side (csSector* room, char* pname,
+void InfiniteMaze::create_one_side (csThing* walls, char* pname,
 	csMaterialWrapper* tm, csMaterialWrapper* tm2,
 	float x1, float y1, float z1,
 	float x2, float y2, float z2,
@@ -64,7 +65,7 @@ void InfiniteMaze::create_one_side (csSector* room, char* pname,
   else { sx = sy = .9; sz = 0; }
 
   csPolygon3D* p;
-  p = room->NewPolygon (tm);
+  p = walls->NewPolygon (tm);
   p->SetName (pname);
   p->AddVertex (cx+sx*x1, cy+sy*y1, cz+sz*z1);
   p->AddVertex (cx+sx*x2, cy+sy*y2, cz+sz*z2);
@@ -78,28 +79,28 @@ void InfiniteMaze::create_one_side (csSector* room, char* pname,
   float nx4 = x4+dx, ny4 = y4+dy, nz4 = z4+dz;
   float ncx = cx+dx, ncy = cy+dy, ncz = cz+dz;
 
-  p = room->NewPolygon (tm2);
+  p = walls->NewPolygon (tm2);
   p->AddVertex (cx+sx*x2, cy+sy*y2, cz+sz*z2);
   p->AddVertex (cx+sx*x1, cy+sy*y1, cz+sz*z1);
   p->AddVertex (ncx+sx*nx1, ncy+sy*ny1, ncz+sz*nz1);
   p->AddVertex (ncx+sx*nx2, ncy+sy*ny2, ncz+sz*nz2);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 1);
 
-  p = room->NewPolygon (tm2);
+  p = walls->NewPolygon (tm2);
   p->AddVertex (cx+sx*x3, cy+sy*y3, cz+sz*z3);
   p->AddVertex (cx+sx*x2, cy+sy*y2, cz+sz*z2);
   p->AddVertex (ncx+sx*nx2, ncy+sy*ny2, ncz+sz*nz2);
   p->AddVertex (ncx+sx*nx3, ncy+sy*ny3, ncz+sz*nz3);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 1);
 
-  p = room->NewPolygon (tm2);
+  p = walls->NewPolygon (tm2);
   p->AddVertex (cx+sx*x4, cy+sy*y4, cz+sz*z4);
   p->AddVertex (cx+sx*x3, cy+sy*y3, cz+sz*z3);
   p->AddVertex (ncx+sx*nx3, ncy+sy*ny3, ncz+sz*nz3);
   p->AddVertex (ncx+sx*nx4, ncy+sy*ny4, ncz+sz*nz4);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 1);
 
-  p = room->NewPolygon (tm2);
+  p = walls->NewPolygon (tm2);
   p->AddVertex (cx+sx*x1, cy+sy*y1, cz+sz*z1);
   p->AddVertex (cx+sx*x4, cy+sy*y4, cz+sz*z4);
   p->AddVertex (ncx+sx*nx4, ncy+sy*ny4, ncz+sz*nz4);
@@ -124,6 +125,7 @@ InfRoomData* InfiniteMaze::create_six_room (csEngine* engine, int x, int y, int 
   char buf[50];
   sprintf (buf, "r%d_%d_%d", x, y, z);
   csSector* room = engine->CreateCsSector (buf);
+  csThing* walls = engine->CreateSectorWalls (room, "walls");
   float dx, dy, dz;
   dx = 2.0*(float)x;
   dy = 2.0*(float)y;
@@ -132,12 +134,12 @@ InfRoomData* InfiniteMaze::create_six_room (csEngine* engine, int x, int y, int 
   csMaterialWrapper* t2 = engine->GetMaterials ()->FindByName ("txt2");
   float s = 1;
 
-  create_one_side (room, "n", t, t2, dx-s,dy+s,dz+s,  dx+s,dy+s,dz+s,  dx+s,dy-s,dz+s,  dx-s,dy-s,dz+s, 0,0,-.1);
-  create_one_side (room, "e", t, t2, dx+s,dy+s,dz+s,  dx+s,dy+s,dz-s,  dx+s,dy-s,dz-s,  dx+s,dy-s,dz+s, -.1,0,0);
-  create_one_side (room, "w", t, t2, dx-s,dy+s,dz+s,  dx-s,dy-s,dz+s,  dx-s,dy-s,dz-s,  dx-s,dy+s,dz-s, .1,0,0);
-  create_one_side (room, "s", t, t2, dx+s,dy+s,dz-s,  dx-s,dy+s,dz-s,  dx-s,dy-s,dz-s,  dx+s,dy-s,dz-s, 0,0,.1);
-  create_one_side (room, "f", t, t2, dx-s,dy-s,dz+s,  dx+s,dy-s,dz+s,  dx+s,dy-s,dz-s,  dx-s,dy-s,dz-s, 0,.1,0);
-  create_one_side (room, "c", t, t2, dx-s,dy+s,dz-s,  dx+s,dy+s,dz-s,  dx+s,dy+s,dz+s,  dx-s,dy+s,dz+s, 0,-.1,0);
+  create_one_side (walls, "n", t, t2, dx-s,dy+s,dz+s,  dx+s,dy+s,dz+s,  dx+s,dy-s,dz+s,  dx-s,dy-s,dz+s, 0,0,-.1);
+  create_one_side (walls, "e", t, t2, dx+s,dy+s,dz+s,  dx+s,dy+s,dz-s,  dx+s,dy-s,dz-s,  dx+s,dy-s,dz+s, -.1,0,0);
+  create_one_side (walls, "w", t, t2, dx-s,dy+s,dz+s,  dx-s,dy-s,dz+s,  dx-s,dy-s,dz-s,  dx-s,dy+s,dz-s, .1,0,0);
+  create_one_side (walls, "s", t, t2, dx+s,dy+s,dz-s,  dx-s,dy+s,dz-s,  dx-s,dy-s,dz-s,  dx+s,dy-s,dz-s, 0,0,.1);
+  create_one_side (walls, "f", t, t2, dx-s,dy-s,dz+s,  dx+s,dy-s,dz+s,  dx+s,dy-s,dz-s,  dx-s,dy-s,dz-s, 0,.1,0);
+  create_one_side (walls, "c", t, t2, dx-s,dy+s,dz-s,  dx+s,dy+s,dz-s,  dx+s,dy+s,dz+s,  dx-s,dy+s,dz+s, 0,-.1,0);
 
   csStatLight* light = new csStatLight (dx+rand2 (.9*s), dy+rand2 (.9*s), dz+rand2 (.9*s), 1+rand1 (3),
   	rand1 (1), rand1 (1), rand1 (1), false);
@@ -148,9 +150,10 @@ InfRoomData* InfiniteMaze::create_six_room (csEngine* engine, int x, int y, int 
   ird->y = y;
   ird->z = z;
   ird->sector = room;
+  ird->walls = walls;
   infinite_world->set (x, y, z, (void*)ird);
-  csDataObject* irddata = new csDataObject(ird);
-  room->ObjAdd(irddata);
+  csDataObject* irddata = new csDataObject (ird);
+  room->ObjAdd (irddata);
   return ird;
 }
 
@@ -169,8 +172,8 @@ void InfiniteMaze::connect_infinite (int x1, int y1, int z1, int x2, int y2, int
   else
     if (x1 < x2) { p1 = "e"; p2 = "w"; }
     else { p1 = "w"; p2 = "e"; }
-  csPolygon3D* po1 = s1->sector->GetPolygon3D (p1);
-  csPolygon3D* po2 = s2->sector->GetPolygon3D (p2);
+  csPolygon3D* po1 = s1->walls->GetPolygon3D (p1);
+  csPolygon3D* po2 = s2->walls->GetPolygon3D (p2);
   if (create_portal1) po1->SetCSPortal (s2->sector);
   po2->SetCSPortal (s1->sector);
 }
@@ -189,7 +192,7 @@ void InfiniteMaze::create_loose_portal (int x1, int y1, int z1, int x2, int y2, 
     if (x1 < x2) p1 = "e";
     else p1 = "w";
   InfRoomData* s = (InfRoomData*)(infinite_world->get (x1, y1, z1));
-  csPolygon3D* po = s->sector->GetPolygon3D (p1);
+  csPolygon3D* po = s->walls->GetPolygon3D (p1);
   InfPortalCS* prt = new InfPortalCS ();
   po->SetPortal (prt);
   prt->SetSector (NULL);
@@ -233,7 +236,8 @@ void InfPortalCS::CompleteSector ()
 {
   extern WalkTest* Sys;
   InfiniteMaze* infinite_maze = Sys->infinite_maze;
-  csSector* s = infinite_maze->create_six_room (Sys->engine, x2, y2, z2)->sector;
+  InfRoomData* ird = infinite_maze->create_six_room (Sys->engine, x2, y2, z2);
+  csSector* s = ird->sector;
   infinite_maze->connect_infinite (x1, y1, z1, x2, y2, z2, false);
   SetSector (s);
   infinite_maze->random_loose_portals (x2, y2, z2);
@@ -252,8 +256,8 @@ void InfPortalCS::CompleteSector ()
     delete lviews;
     lviews = n;
   }
-  iPolygonMesh* mesh = QUERY_INTERFACE (s, iPolygonMesh);
-  (void)new csCollider (*s, Sys->collide_system, mesh);
+  iPolygonMesh* mesh = QUERY_INTERFACE (ird->walls, iPolygonMesh);
+  (void)new csCollider (*(ird->walls), Sys->collide_system, mesh);
   mesh->DecRef ();
 }
 

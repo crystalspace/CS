@@ -40,6 +40,10 @@ private:
   csReversibleTransform obj;
   /// List of sectors.
   csVector sectors;
+  /// List of listeners to this movable.
+  csVector listeners;
+  /// List of user-data for the listeners.
+  csVector listener_userdata;
 
   /**
    * Parent (for hierachical transformations).
@@ -54,7 +58,7 @@ private:
 
   /**
    * Object on which this movable operates (csThing or
-   * csSprite currently).
+   * csMeshWrapper currently).
    */
   csObject* object;
 
@@ -199,6 +203,18 @@ public:
    */
   void UpdateMove ();
 
+  /**
+   * Add a listener to this movable. This listener will be called whenever
+   * the movable changes or right before the movable is destroyed.
+   * The given 'action' will be CS_MOVABLE_DESTROYED or CS_MOVABLE_CHANGED.
+   */
+  void AddListener (csMovableListener* listener, void* userdata);
+
+  /**
+   * Remove a listener from this movable.
+   */
+  void RemoveListener (csMovableListener* listener, void* userdata);
+
   DECLARE_IBASE;
 
   //------------------------- iMovable interface -------------------------------
@@ -260,6 +276,14 @@ public:
     virtual void Transform (csMatrix3& matrix)
     {
       scfParent->Transform (matrix);
+    }
+    virtual void AddListener (csMovableListener* listener, void* userdata)
+    {
+      scfParent->AddListener (listener, userdata);
+    }
+    virtual void RemoveListener (csMovableListener* listener, void* userdata)
+    {
+      scfParent->RemoveListener (listener, userdata);
     }
     virtual void UpdateMove ()
     {

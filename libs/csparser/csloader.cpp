@@ -105,18 +105,15 @@ int csLoaderStat::sounds_loaded   = 0;
 
 // Define all tokens used through this file
 CS_TOKEN_DEF_START
-  CS_TOKEN_DEF (ACTIVATE)
   CS_TOKEN_DEF (ACTIVE)
   CS_TOKEN_DEF (ADD)
   CS_TOKEN_DEF (ALPHA)
   CS_TOKEN_DEF (AMBIENT)
   CS_TOKEN_DEF (ANIM)
   CS_TOKEN_DEF (ATTENUATION)
+  CS_TOKEN_DEF (BACK2FRONT)
   CS_TOKEN_DEF (BEZIER)
-  CS_TOKEN_DEF (BSP)
   CS_TOKEN_DEF (CAMERA)
-  CS_TOKEN_DEF (CEILING)
-  CS_TOKEN_DEF (CEIL_TEXTURE)
   CS_TOKEN_DEF (CENTER)
   CS_TOKEN_DEF (CIRCLE)
   CS_TOKEN_DEF (CLIP)
@@ -143,10 +140,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (FIRST_LEN)
   CS_TOKEN_DEF (FLAT)
   CS_TOKEN_DEF (FLATCOL)
-  CS_TOKEN_DEF (FLOOR)
-  CS_TOKEN_DEF (FLOOR_CEIL)
-  CS_TOKEN_DEF (FLOOR_HEIGHT)
-  CS_TOKEN_DEF (FLOOR_TEXTURE)
   CS_TOKEN_DEF (FOG)
   CS_TOKEN_DEF (FOR_2D)
   CS_TOKEN_DEF (FOR_3D)
@@ -157,6 +150,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (HEIGHT)
   CS_TOKEN_DEF (HEIGHTMAP)
   CS_TOKEN_DEF (IDENTITY)
+  CS_TOKEN_DEF (INVISIBLE)
   CS_TOKEN_DEF (KEY)
   CS_TOKEN_DEF (KEYCOLOR)
   CS_TOKEN_DEF (LEN)
@@ -164,12 +158,10 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (LIGHT)
   CS_TOKEN_DEF (LIGHTING)
   CS_TOKEN_DEF (LIGHTMAP)
-  CS_TOKEN_DEF (LIGHTX)
   CS_TOKEN_DEF (LINK)
   CS_TOKEN_DEF (MATERIAL)
   CS_TOKEN_DEF (MATERIALS)
   CS_TOKEN_DEF (MATRIX)
-  CS_TOKEN_DEF (MAX_TEXTURES)
   CS_TOKEN_DEF (MESHOBJ)
   CS_TOKEN_DEF (MIPMAP)
   CS_TOKEN_DEF (MIRROR)
@@ -180,8 +172,11 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (MULTIPLY2)
   CS_TOKEN_DEF (NODE)
   CS_TOKEN_DEF (NONE)
+  CS_TOKEN_DEF (NOLIGHTING)
+  CS_TOKEN_DEF (NOSHADOWS)
   CS_TOKEN_DEF (ORIG)
   CS_TOKEN_DEF (PARAMS)
+  CS_TOKEN_DEF (PART)
   CS_TOKEN_DEF (PERSISTENT)
   CS_TOKEN_DEF (PLANE)
   CS_TOKEN_DEF (PLUGIN)
@@ -211,7 +206,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SKYDOME)
   CS_TOKEN_DEF (SOUND)
   CS_TOKEN_DEF (SOUNDS)
-  CS_TOKEN_DEF (SPLIT)
   CS_TOKEN_DEF (START)
   CS_TOKEN_DEF (STATBSP)
   CS_TOKEN_DEF (STATIC)
@@ -223,9 +217,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (TEXNR)
   CS_TOKEN_DEF (TEXTURE)
   CS_TOKEN_DEF (TEXTURES)
-  CS_TOKEN_DEF (TEXTURE_LIGHTING)
-  CS_TOKEN_DEF (TEXTURE_MIPMAP)
-  CS_TOKEN_DEF (TEXTURE_SCALE)
   CS_TOKEN_DEF (MAT_SET)
   CS_TOKEN_DEF (MAT_SET_SELECT)
   CS_TOKEN_DEF (MOTION)
@@ -233,7 +224,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (THING)
   CS_TOKEN_DEF (TRANSFORM)
   CS_TOKEN_DEF (TRANSPARENT)
-  CS_TOKEN_DEF (TRIGGER)
   CS_TOKEN_DEF (TYPE)
   CS_TOKEN_DEF (UV)
   CS_TOKEN_DEF (UVA)
@@ -242,6 +232,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (V)
   CS_TOKEN_DEF (VERTEX)
   CS_TOKEN_DEF (VERTICES)
+  CS_TOKEN_DEF (VISTREE)
   CS_TOKEN_DEF (VVEC)
   CS_TOKEN_DEF (W)
   CS_TOKEN_DEF (WARP)
@@ -532,7 +523,6 @@ csCollection* csLoader::load_collection (char* name, char* buf)
     CS_TOKEN_TABLE (MESHOBJ)
     CS_TOKEN_TABLE (COLLECTION)
     CS_TOKEN_TABLE (LIGHT)
-    CS_TOKEN_TABLE (TRIGGER)
     CS_TOKEN_TABLE (SECTOR)
   CS_TOKEN_TABLE_END
 
@@ -615,10 +605,6 @@ csCollection* csLoader::load_collection (char* name, char* buf)
           }
           collection->AddObject (th);
         }
-        break;
-      case CS_TOKEN_TRIGGER:
-        CsPrintf (MSG_WARNING, "Warning! TRIGGER statement is obsolete"
-                                 " and does not do anything!\n");
         break;
     }
   }
@@ -894,466 +880,10 @@ csMapNode* csLoader::load_node (char* name, char* buf, csSector* sec)
 
 //---------------------------------------------------------------------------
 
-csPolygonSet& csLoader::ps_process (csPolygonSet& ps, csSector* sector,
-    PSLoadInfo& info, int cmd, char* name, char* params)
-{
-  CS_TOKEN_TABLE_START (tok_matvec)
-    CS_TOKEN_TABLE (MATRIX)
-    CS_TOKEN_TABLE (V)
-  CS_TOKEN_TABLE_END
-
-  char str[255];
-  char* xname;
-  switch (cmd)
-  {
-    case CS_TOKEN_VERTEX:
-      {
-        float x, y, z;
-        ScanStr (params, "%f,%f,%f", &x, &y, &z);
-        ps.AddVertex (x, y, z);
-      }
-      break;
-    case CS_TOKEN_CIRCLE:
-      {
-        float x, y, z, rx, ry, rz;
-        int num, dir;
-        ScanStr (params, "%f,%f,%f:%f,%f,%f,%d", &x, &y, &z, &rx, &ry, &rz, &num);
-        if (num < 0) { num = -num; dir = -1; }
-        else dir = 1;
-        for (int i = 0 ; i < num ; i++)
-        {
-          float rad;
-          if (dir == 1) rad = 2.*M_PI*(num-i-1)/(float)num;
-          else rad = 2.*M_PI*i/(float)num;
-
-          float cx = 0, cy = 0, cz = 0;
-          float cc = cos (rad);
-          float ss = sin (rad);
-          if      (ABS (rx) < SMALL_EPSILON) { cx = x; cy = y+cc*ry; cz = z+ss*rz; }
-          else if (ABS (ry) < SMALL_EPSILON) { cy = y; cx = x+cc*rx; cz = z+ss*rz; }
-          else if (ABS (rz) < SMALL_EPSILON) { cz = z; cx = x+cc*rx; cy = y+ss*ry; }
-          ps.AddVertex (cx, cy, cz);
-        }
-      }
-      break;
-    case CS_TOKEN_FOG:
-      {
-        csFog& f = ps.GetFog ();
-        f.enabled = true;
-        ScanStr (params, "%f,%f,%f,%f", &f.red, &f.green, &f.blue, &f.density);
-      }
-      break;
-    case CS_TOKEN_POLYGON:
-      {
-	csPolygon3D* poly3d = load_poly3d (name, params,
-          info.default_material, info.default_texlen, &ps);
-	if (poly3d)
-	{
-	  ps.AddPolygon (poly3d);
-	  csLoaderStat::polygons_loaded++;
-	}
-      }
-      break;
-
-    case CS_TOKEN_HARDMOVE:
-      {
-        char* params2;
-        while ((cmd=csGetObject(&params, tok_matvec, &xname, &params2)) > 0)
-        {
-    	  if (!params2)
-    	  {
-      	    CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
-      	    fatal_exit (0, false);
-    	  }
-          switch (cmd)
-          {
-            case CS_TOKEN_MATRIX:
-            {
-              csMatrix3 m;
-              load_matrix (params2, m);
-              info.hard_trans.SetT2O (m);
-	      info.do_hard_trans = true;
-              break;
-            }
-            case CS_TOKEN_V:
-            {
-              csVector3 v;
-              load_vector (params2, v);
-              info.hard_trans.SetOrigin (v);
-	      info.do_hard_trans = true;
-              break;
-            }
-          }
-        }
-      }
-      break;
-
-    case CS_TOKEN_BEZIER:
-      {
-        csCurveTemplate* ct = load_beziertemplate (name, params,
-	    info.default_material, info.default_texlen,
-	    ps.GetCurveVertices ());
-	Engine->curve_templates.Push (ct);
-	csCurve* p = ct->MakeCurve ();
-	p->SetName (ct->GetName ());
-	p->SetParent (&ps);
-	p->SetSector (sector);
-        if (!ct->GetMaterialWrapper ()) p->SetMaterialWrapper (info.default_material);
-	int j;
-        for (j = 0 ; j < ct->NumVertices () ; j++)
-          p->SetControlPoint (j, ct->GetVertex (j));
-	ps.AddCurve (p);
-      }
-      break;
-
-    case CS_TOKEN_CURVECENTER:
-      {
-        csVector3 c;
-        ScanStr (params, "%f,%f,%f", &c.x, &c.y, &c.z);
-        ps.curves_center = c;
-      }
-      break;
-    case CS_TOKEN_CURVESCALE:
-      ScanStr (params, "%f", &ps.curves_scale);
-      break;
-
-    case CS_TOKEN_CURVECONTROL:
-      {
-        csVector3 v;
-        csVector2 t;
-        ScanStr (params, "%f,%f,%f:%f,%f", &v.x, &v.y, &v.z,&t.x,&t.y);
-        ps.AddCurveVertex (v, t);
-      }
-      break;
-
-    case CS_TOKEN_TEXNR:
-      //@@OBSOLETE, retained for backward compatibility
-    case CS_TOKEN_MATERIAL:
-      ScanStr (params, "%s", str);
-      info.default_material = FindMaterial (str, onlyRegion);
-      if (info.default_material == NULL)
-      {
-        CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
-        fatal_exit (0, true);
-      }
-      break;
-    case CS_TOKEN_TEXLEN:
-      ScanStr (params, "%f", &info.default_texlen);
-      break;
-    case CS_TOKEN_MAT_SET_SELECT:
-      ScanStr(params, "%s", str);
-      info.SetTextureSet( str );
-      info.use_mat_set=true;
-      break;
-    case CS_TOKEN_LIGHTX:
-      CsPrintf (MSG_WARNING, "Warning! LIGHTX statement is obsolete"
-                               " and does not do anything!\n");
-      break;
-    case CS_TOKEN_ACTIVATE:
-      CsPrintf (MSG_WARNING, "Warning! ACTIVATE statement is obsolete"
-                                 " and does not do anything!\n");
-      break;
-    case CS_TOKEN_TRIGGER:
-      CsPrintf (MSG_WARNING, "Warning! TRIGGER statement is obsolete"
-                                 " and does not do anything!\n");
-      break;
-    case CS_TOKEN_BSP:
-      CsPrintf (MSG_FATAL_ERROR,
-        "BSP keyword is no longer supported. Use STATBSP instead after putting\n\
-all non-convex polygons in things.\n");
-      break;
-  }
-  return ps;
-}
-
-//---------------------------------------------------------------------------
-
-csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec,
-    	bool is_template)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (MOVEABLE)
-    CS_TOKEN_TABLE (MOVE)
-    CS_TOKEN_TABLE (TEXTURE_SCALE)
-    CS_TOKEN_TABLE (TEXTURE)
-    CS_TOKEN_TABLE (CEIL_TEXTURE)
-    CS_TOKEN_TABLE (DETAIL)
-    CS_TOKEN_TABLE (DIM)
-    CS_TOKEN_TABLE (HEIGHT)
-    CS_TOKEN_TABLE (FLOOR_HEIGHT)
-    CS_TOKEN_TABLE (FLOOR_CEIL)
-    CS_TOKEN_TABLE (FLOOR_TEXTURE)
-    CS_TOKEN_TABLE (FLOOR)
-    CS_TOKEN_TABLE (CEILING)
-    CS_TOKEN_TABLE (TRIGGER)
-    CS_TOKEN_TABLE (ACTIVATE)
-    CS_TOKEN_TABLE (FOG)
-    CS_TOKEN_TABLE (CONVEX)
-    CS_TOKEN_TABLE (KEY)
-  CS_TOKEN_TABLE_END
-
-  CS_TOKEN_TABLE_START (tok_matvec)
-    CS_TOKEN_TABLE (MATRIX)
-    CS_TOKEN_TABLE (V)
-  CS_TOKEN_TABLE_END
-
-  char* xname;
-
-  csThing* thing = new csThing (Engine, false, is_template);
-  thing->SetName (name);
-
-  csLoaderStat::things_loaded++;
-
-  if (sec) thing->GetMovable ().SetSector (sec);
-  csReversibleTransform obj;
-  csMaterialWrapper* material = NULL;
-  bool is_convex = false;
-  float tscale = 1;
-  int i;
-
-  csVector3 v[8];
-  for (i = 0;  i < 8;  i++)
-    v [i] = csVector3 ((i & 1 ? 1 : -1), (i & 2 ? -1 : 1), (i & 4 ? -1 : 1));
-  float r;
-
-  char str[255];
-  long cmd;
-  char* params;
-
-  while ((cmd = csGetObject (&buf, commands, &xname, &params)) > 0)
-  {
-    if (!params)
-    {
-      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
-    }
-
-    switch (cmd)
-    {
-      case CS_TOKEN_CONVEX:
-        is_convex = true;
-        break;
-      case CS_TOKEN_FOG:
-        {
-          csFog& f = thing->GetFog ();
-          f.enabled = true;
-          ScanStr (params, "%f,%f,%f,%f", &f.red, &f.green, &f.blue, &f.density);
-        }
-        break;
-      case CS_TOKEN_MOVEABLE:
-        thing->flags.Set (CS_ENTITY_MOVEABLE, CS_ENTITY_MOVEABLE);
-        break;
-      case CS_TOKEN_DETAIL:
-        thing->flags.Set (CS_ENTITY_DETAIL, CS_ENTITY_DETAIL);
-        break;
-      case CS_TOKEN_MOVE:
-        {
-          char* params2;
-          obj = csReversibleTransform(); // identity transform
-          while ((cmd = csGetObject (&params, tok_matvec, &xname, &params2)) > 0)
-          {
-    	    if (!params2)
-    	    {
-      	      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
-      	      fatal_exit (0, false);
-    	    }
-            switch (cmd)
-            {
-              case CS_TOKEN_MATRIX:
-              {
-                csMatrix3 m;
-                load_matrix (params2, m);
-                obj.SetT2O (m);
-                break;
-              }
-              case CS_TOKEN_V:
-              {
-                csVector3 v;
-                load_vector (params2, v);
-                obj.SetOrigin (v);
-                break;
-              }
-            }
-          }
-        }
-        break;
-      case CS_TOKEN_TEXTURE: //@@@MAT
-        ScanStr (params, "%s", str);
-        material = FindMaterial (str, onlyRegion);
-        if (material == NULL)
-        {
-          CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
-          fatal_exit (0, true);
-        }
-        break;
-      case CS_TOKEN_TEXTURE_SCALE:
-        ScanStr (params, "%f", &tscale);
-        break;
-      case CS_TOKEN_DIM:
-        {
-          float rx, ry, rz;
-          ScanStr (params, "%f,%f,%f", &rx, &ry, &rz);
-          rx /= 2; ry /= 2; rz /= 2;
-          for (i = 0;  i < 8;  i++)
-           v[i] = csVector3((i&1 ? rx : -rx),(i&2 ? -ry : ry),(i&4 ? -rz : rz));
-        }
-        break;
-      case CS_TOKEN_FLOOR_HEIGHT:
-        ScanStr (params, "%f", &r);
-        v[0].y = r+v[0].y-v[2].y;
-        v[1].y = r+v[1].y-v[3].y;
-        v[4].y = r+v[4].y-v[6].y;
-        v[5].y = r+v[5].y-v[7].y;
-        v[2].y = r;
-        v[3].y = r;
-        v[6].y = r;
-        v[7].y = r;
-        break;
-      case CS_TOKEN_HEIGHT:
-        ScanStr (params, "%f", &r);
-        v[0].y = r+v[2].y;
-        v[1].y = r+v[3].y;
-        v[4].y = r+v[6].y;
-        v[5].y = r+v[7].y;
-        break;
-      case CS_TOKEN_FLOOR_CEIL:
-        ScanStr (params, "(%f,%f) (%f,%f) (%f,%f) (%f,%f)",
-                 &v[2].x, &v[2].z, &v[3].x, &v[3].z,
-                 &v[7].x, &v[7].z, &v[6].x, &v[6].z);
-        v[0] = v[2];
-        v[1] = v[3];
-        v[5] = v[7];
-        v[4] = v[6];
-        break;
-      case CS_TOKEN_FLOOR:
-        ScanStr (params, "(%f,%f,%f) (%f,%f,%f) (%f,%f,%f) (%f,%f,%f)",
-                 &v[2].x, &v[2].y, &v[2].z, &v[3].x, &v[3].y, &v[3].z,
-                 &v[7].x, &v[7].y, &v[7].z, &v[6].x, &v[6].y, &v[6].z);
-        break;
-      case CS_TOKEN_CEILING:
-        ScanStr (params, "(%f,%f,%f) (%f,%f,%f) (%f,%f,%f) (%f,%f,%f)",
-                 &v[0].x, &v[0].y, &v[0].z, &v[1].x, &v[1].y, &v[1].z,
-                 &v[5].x, &v[5].y, &v[5].z, &v[4].x, &v[4].y, &v[4].z);
-        break;
-      case CS_TOKEN_KEY:
-        load_key (params, thing);
-        break;
-      case CS_TOKEN_ACTIVATE:
-        CsPrintf (MSG_WARNING, "Warning! ACTIVATE statement is obsolete"
-                                 " and does not do anything!\n");
-        break;
-      case CS_TOKEN_TRIGGER:
-        CsPrintf (MSG_WARNING, "Warning! TRIGGER statement is obsolete"
-                                 " and does not do anything!\n");
-        break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a sixface!\n", csGetLastOffender ());
-    fatal_exit (0, false);
-  }
-
-  for (i = 0;  i < 8;  i++) thing->AddVertex(v[i]);
-
-  struct Todo
-  {
-    ObName poly;
-    int v1, v2, v3, v4;
-    int tv1, tv2;
-    csMaterialWrapper* material;
-  };
-  Todo todo[100];
-  int done = 0;
-  int todo_end = 0;
-
-  strcpy (todo[todo_end].poly, "north");
-  todo[todo_end].v1 = 0;
-  todo[todo_end].v2 = 1;
-  todo[todo_end].v3 = 3;
-  todo[todo_end].v4 = 2;
-  todo[todo_end].tv1 = 0;
-  todo[todo_end].tv2 = 1;
-  todo[todo_end].material = material;
-  todo_end++;
-
-  strcpy (todo[todo_end].poly, "east");
-  todo[todo_end].v1 = 1;
-  todo[todo_end].v2 = 5;
-  todo[todo_end].v3 = 7;
-  todo[todo_end].v4 = 3;
-  todo[todo_end].tv1 = 1;
-  todo[todo_end].tv2 = 5;
-  todo[todo_end].material = material;
-  todo_end++;
-
-  strcpy (todo[todo_end].poly, "south");
-  todo[todo_end].v1 = 5;
-  todo[todo_end].v2 = 4;
-  todo[todo_end].v3 = 6;
-  todo[todo_end].v4 = 7;
-  todo[todo_end].tv1 = 5;
-  todo[todo_end].tv2 = 4;
-  todo[todo_end].material = material;
-  todo_end++;
-
-  strcpy (todo[todo_end].poly, "west");
-  todo[todo_end].v1 = 4;
-  todo[todo_end].v2 = 0;
-  todo[todo_end].v3 = 2;
-  todo[todo_end].v4 = 6;
-  todo[todo_end].tv1 = 4;
-  todo[todo_end].tv2 = 0;
-  todo[todo_end].material = material;
-  todo_end++;
-
-  strcpy (todo[todo_end].poly, "up");
-  todo[todo_end].v1 = 4;
-  todo[todo_end].v2 = 5;
-  todo[todo_end].v3 = 1;
-  todo[todo_end].v4 = 0;
-  todo[todo_end].tv1 = 4;
-  todo[todo_end].tv2 = 5;
-  todo[todo_end].material = material;
-  todo_end++;
-
-  strcpy (todo[todo_end].poly, "down");
-  todo[todo_end].v1 = 2;
-  todo[todo_end].v2 = 3;
-  todo[todo_end].v3 = 7;
-  todo[todo_end].v4 = 6;
-  todo[todo_end].tv1 = 2;
-  todo[todo_end].tv2 = 3;
-  todo[todo_end].material = material;
-  todo_end++;
-
-  while (done < todo_end)
-  {
-    csPolygon3D *p = thing->NewPolygon (todo[done].material);
-    p->SetName (todo[done].poly);
-    p->AddVertex (todo[done].v4);
-    p->AddVertex (todo[done].v3);
-    p->AddVertex (todo[done].v2);
-    p->AddVertex (todo[done].v1);
-    p->SetTextureSpace (thing->Vobj (todo[done].tv2),
-                          thing->Vobj (todo[done].tv1), tscale);
-    done++;
-  }
-
-  if (is_convex || thing->GetFog ().enabled)
-    thing->flags.Set (CS_ENTITY_CONVEX, CS_ENTITY_CONVEX);
-  thing->GetMovable ().SetTransform (obj);
-
-  if (!(flags & CS_LOADER_NOCOMPRESS))
-    thing->CompressVertices ();
-  if (!(flags & CS_LOADER_NOTRANSFORM))
-    thing->GetMovable ().UpdateMove ();
-
-  return thing;
-}
-
-csThing* csLoader::load_thing (char* name, char* buf, csSector* sec,
-    bool is_sky, bool is_template)
+void csLoader::load_thing_part (csThing* thing, csSector* sec, PSLoadInfo& info,
+	csReversibleTransform& obj,
+	char* name, char* buf, int vt_offset,
+	bool isParent)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (VERTEX)
@@ -1367,10 +897,6 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec,
     CS_TOKEN_TABLE (TEXNR)
     CS_TOKEN_TABLE (MATERIAL)
     CS_TOKEN_TABLE (TEXLEN)
-    CS_TOKEN_TABLE (TRIGGER)
-    CS_TOKEN_TABLE (ACTIVATE)
-    CS_TOKEN_TABLE (LIGHTX)
-    CS_TOKEN_TABLE (BSP)
     CS_TOKEN_TABLE (FOG)
     CS_TOKEN_TABLE (MOVEABLE)
     CS_TOKEN_TABLE (DETAIL)
@@ -1381,6 +907,14 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec,
     CS_TOKEN_TABLE (CLONE)
     CS_TOKEN_TABLE (KEY)
     CS_TOKEN_TABLE (CAMERA)
+    CS_TOKEN_TABLE (ZFILL)
+    CS_TOKEN_TABLE (INVISIBLE)
+    CS_TOKEN_TABLE (BACK2FRONT)
+    CS_TOKEN_TABLE (VISTREE)
+    CS_TOKEN_TABLE (NOSHADOWS)
+    CS_TOKEN_TABLE (NOLIGHTING)
+    CS_TOKEN_TABLE (SKYDOME)
+    CS_TOKEN_TABLE (PART)
   CS_TOKEN_TABLE_END
 
   CS_TOKEN_TABLE_START (tok_matvec)
@@ -1390,18 +924,9 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec,
 
   char* xname;
 
-  csThing* thing = new csThing (Engine, is_sky, is_template);
-  thing->SetName (name);
-
-  csLoaderStat::things_loaded++;
-  PSLoadInfo info;
-  if (sec) thing->GetMovable ().SetSector (sec);
-
-  csReversibleTransform obj;
   long cmd;
   char* params;
   char str[255];
-  bool is_convex = false;
 
   while ((cmd = csGetObject (&buf, commands, &xname, &params)) > 0)
   {
@@ -1412,19 +937,93 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec,
     }
     switch (cmd)
     {
+      case CS_TOKEN_NOLIGHTING:
+        if (!isParent)
+	{
+	  CsPrintf (MSG_FATAL_ERROR, "NOLIGHTING flag only for top-level thing!\n");
+	  fatal_exit (0, false);
+	}
+        else thing->flags.Set (CS_ENTITY_NOLIGHTING);
+        break;
+      case CS_TOKEN_VISTREE:
+        if (!isParent)
+	{
+	  CsPrintf (MSG_FATAL_ERROR, "VISTREE flag only for top-level thing!\n");
+	  fatal_exit (0, false);
+	}
+        else thing->flags.Set (CS_ENTITY_VISTREE);
+        break;
+      case CS_TOKEN_NOSHADOWS:
+        if (!isParent)
+	{
+	  CsPrintf (MSG_FATAL_ERROR, "NOSHADOWS flag only for top-level thing!\n");
+	  fatal_exit (0, false);
+	}
+        else thing->flags.Set (CS_ENTITY_NOSHADOWS);
+        break;
+      case CS_TOKEN_BACK2FRONT:
+        if (!isParent)
+	{
+	  CsPrintf (MSG_FATAL_ERROR, "BACK2FRONT flag only for top-level thing!\n");
+	  fatal_exit (0, false);
+	}
+        else thing->flags.Set (CS_ENTITY_BACK2FRONT);
+        break;
+      case CS_TOKEN_INVISIBLE:
+        if (!isParent)
+	{
+	  CsPrintf (MSG_FATAL_ERROR, "INVISIBLE flag only for top-level thing!\n");
+	  fatal_exit (0, false);
+	}
+        else thing->flags.Set (CS_ENTITY_INVISIBLE);
+        break;
       case CS_TOKEN_MOVEABLE:
-        thing->flags.Set (CS_ENTITY_MOVEABLE, CS_ENTITY_MOVEABLE);
+        if (!isParent)
+	{
+	  CsPrintf (MSG_FATAL_ERROR, "MOVEABLE flag only for top-level thing!\n");
+	  fatal_exit (0, false);
+	}
+        else thing->flags.Set (CS_ENTITY_MOVEABLE);
         break;
       case CS_TOKEN_DETAIL:
-        thing->flags.Set (CS_ENTITY_DETAIL, CS_ENTITY_DETAIL);
+        if (!isParent)
+	{
+	  CsPrintf (MSG_FATAL_ERROR, "DETAIL flag only for top-level thing!\n");
+	  fatal_exit (0, false);
+	}
+        else thing->flags.Set (CS_ENTITY_DETAIL);
         break;
-      case CS_TOKEN_CONVEX:
-        is_convex = true;
+      case CS_TOKEN_ZFILL:
+        if (!isParent)
+	{
+	  CsPrintf (MSG_FATAL_ERROR, "ZFILL flag only for top-level thing!\n");
+	  fatal_exit (0, false);
+	}
+        else thing->flags.Set (CS_ENTITY_ZFILL);
         break;
       case CS_TOKEN_CAMERA:
-        thing->flags.Set (CS_ENTITY_CAMERA, CS_ENTITY_CAMERA);
+        if (!isParent)
+	{
+	  CsPrintf (MSG_FATAL_ERROR, "CAMERA flag only for top-level thing!\n");
+	  fatal_exit (0, false);
+	}
+        else thing->flags.Set (CS_ENTITY_CAMERA);
+        break;
+      case CS_TOKEN_CONVEX:
+        if (!isParent)
+	{
+	  CsPrintf (MSG_FATAL_ERROR, "CONVEX flag only for top-level thing!\n");
+	  fatal_exit (0, false);
+	}
+        else info.is_convex = true;
         break;
       case CS_TOKEN_MOVE:
+        if (!isParent)
+	{
+	  CsPrintf (MSG_FATAL_ERROR, "MOVE statement only for top-level thing!\n");
+	  fatal_exit (0, false);
+	}
+	else
         {
           char* params2;
           while ((cmd=csGetObject(&params, tok_matvec, &xname, &params2)) > 0)
@@ -1455,6 +1054,12 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec,
         }
         break;
       case CS_TOKEN_TEMPLATE:
+        if (!isParent)
+	{
+	  CsPrintf (MSG_FATAL_ERROR, "TEMPLATE statement only for top-level thing!\n");
+	  fatal_exit (0, false);
+	}
+	else
         {
           ScanStr (params, "%s", str);
           csThing* t = (csThing*)Engine->thing_templates.FindByName (str);
@@ -1476,6 +1081,12 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec,
         }
         break;
       case CS_TOKEN_CLONE:
+        if (!isParent)
+	{
+	  CsPrintf (MSG_FATAL_ERROR, "CLONE statement only for top-level thing!\n");
+	  fatal_exit (0, false);
+	}
+	else
         {
           ScanStr (params, "%s", str);
 	  iThing* t = Engine->FindThing (str, onlyRegion);
@@ -1499,8 +1110,163 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec,
       case CS_TOKEN_KEY:
         load_key (params, thing);
         break;
-      default:
-        ps_process (*thing, sec, info, cmd, xname, params);
+      case CS_TOKEN_PART:
+	load_thing_part (thing, sec, info, obj, name, params,
+		thing->GetNumVertices (), false);
+        break;
+      case CS_TOKEN_SKYDOME:
+        skydome_process (*thing, name, params, info.default_material);
+        break;
+      case CS_TOKEN_VERTEX:
+        {
+          float x, y, z;
+          ScanStr (params, "%f,%f,%f", &x, &y, &z);
+          thing->AddVertex (x, y, z);
+        }
+        break;
+      case CS_TOKEN_CIRCLE:
+        {
+          float x, y, z, rx, ry, rz;
+          int num, dir;
+          ScanStr (params, "%f,%f,%f:%f,%f,%f,%d", &x, &y, &z, &rx, &ry, &rz, &num);
+          if (num < 0) { num = -num; dir = -1; }
+          else dir = 1;
+          for (int i = 0 ; i < num ; i++)
+          {
+            float rad;
+            if (dir == 1) rad = 2.*M_PI*(num-i-1)/(float)num;
+            else rad = 2.*M_PI*i/(float)num;
+
+            float cx = 0, cy = 0, cz = 0;
+            float cc = cos (rad);
+            float ss = sin (rad);
+            if      (ABS (rx) < SMALL_EPSILON) { cx = x; cy = y+cc*ry; cz = z+ss*rz; }
+            else if (ABS (ry) < SMALL_EPSILON) { cy = y; cx = x+cc*rx; cz = z+ss*rz; }
+            else if (ABS (rz) < SMALL_EPSILON) { cz = z; cx = x+cc*rx; cy = y+ss*ry; }
+            thing->AddVertex (cx, cy, cz);
+          }
+        }
+        break;
+      case CS_TOKEN_FOG:
+        if (!isParent)
+	{
+	  CsPrintf (MSG_FATAL_ERROR, "FOG statement only for top-level thing!\n");
+	  fatal_exit (0, false);
+	}
+	else
+        {
+          csFog& f = thing->GetFog ();
+          f.enabled = true;
+          ScanStr (params, "%f,%f,%f,%f", &f.red, &f.green, &f.blue, &f.density);
+        }
+        break;
+      case CS_TOKEN_POLYGON:
+        {
+	  csPolygon3D* poly3d = load_poly3d (name, params,
+            info.default_material, info.default_texlen, thing, vt_offset);
+	  if (poly3d)
+	  {
+	    thing->AddPolygon (poly3d);
+	    csLoaderStat::polygons_loaded++;
+	  }
+        }
+        break;
+
+      case CS_TOKEN_HARDMOVE:
+        if (!isParent)
+	{
+	  CsPrintf (MSG_FATAL_ERROR, "HARDMOVE statement only for top-level thing!\n");
+	  fatal_exit (0, false);
+	}
+	else
+        {
+          char* params2;
+          while ((cmd=csGetObject(&params, tok_matvec, &xname, &params2)) > 0)
+          {
+    	    if (!params2)
+    	    {
+      	      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
+      	      fatal_exit (0, false);
+    	    }
+            switch (cmd)
+            {
+              case CS_TOKEN_MATRIX:
+              {
+                csMatrix3 m;
+                load_matrix (params2, m);
+                info.hard_trans.SetT2O (m);
+	        info.do_hard_trans = true;
+                break;
+              }
+              case CS_TOKEN_V:
+              {
+                csVector3 v;
+                load_vector (params2, v);
+                info.hard_trans.SetOrigin (v);
+	        info.do_hard_trans = true;
+                break;
+              }
+            }
+          }
+        }
+        break;
+
+      case CS_TOKEN_BEZIER:
+        {
+          csCurveTemplate* ct = load_beziertemplate (name, params,
+	      info.default_material, info.default_texlen,
+	      thing->GetCurveVertices ());
+	  Engine->curve_templates.Push (ct);
+	  csCurve* p = ct->MakeCurve ();
+	  p->SetName (ct->GetName ());
+	  p->SetParent (thing);
+	  p->SetSector (sec);
+          if (!ct->GetMaterialWrapper ()) p->SetMaterialWrapper (info.default_material);
+	  int j;
+          for (j = 0 ; j < ct->NumVertices () ; j++)
+            p->SetControlPoint (j, ct->GetVertex (j));
+	  thing->AddCurve (p);
+        }
+        break;
+
+      case CS_TOKEN_CURVECENTER:
+        {
+          csVector3 c;
+          ScanStr (params, "%f,%f,%f", &c.x, &c.y, &c.z);
+          thing->curves_center = c;
+        }
+        break;
+      case CS_TOKEN_CURVESCALE:
+        ScanStr (params, "%f", &thing->curves_scale);
+        break;
+
+      case CS_TOKEN_CURVECONTROL:
+        {
+          csVector3 v;
+          csVector2 t;
+          ScanStr (params, "%f,%f,%f:%f,%f", &v.x, &v.y, &v.z,&t.x,&t.y);
+          thing->AddCurveVertex (v, t);
+        }
+        break;
+
+      case CS_TOKEN_TEXNR:
+        //@@OBSOLETE, retained for backward compatibility
+      case CS_TOKEN_MATERIAL:
+        ScanStr (params, "%s", str);
+        info.default_material = FindMaterial (str, onlyRegion);
+        if (info.default_material == NULL)
+        {
+          CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
+          fatal_exit (0, true);
+        }
+        break;
+      case CS_TOKEN_TEXLEN:
+        ScanStr (params, "%f", &info.default_texlen);
+        break;
+      case CS_TOKEN_MAT_SET_SELECT:
+        ScanStr(params, "%s", str);
+        info.SetTextureSet( str );
+        info.use_mat_set=true;
         break;
     }
   }
@@ -1509,6 +1275,20 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec,
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a thing!\n", csGetLastOffender ());
     fatal_exit (0, false);
   }
+}
+
+csThing* csLoader::load_thing (char* name, char* buf, csSector* sec,
+    bool is_sky, bool is_template)
+{
+  csThing* thing = new csThing (Engine, is_sky, is_template);
+  thing->SetName (name);
+
+  csLoaderStat::things_loaded++;
+  PSLoadInfo info;
+  if (sec) thing->GetMovable ().SetSector (sec);
+
+  csReversibleTransform obj;
+  load_thing_part (thing, sec, info, obj, name, buf, 0, true);
 
   if (info.do_hard_trans)
     thing->HardTransform (info.hard_trans);
@@ -1518,19 +1298,17 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec,
     thing->CompressVertices ();
   if (!(flags & CS_LOADER_NOTRANSFORM))
     thing->GetMovable ().UpdateMove ();
-  if (is_convex || thing->GetFog ().enabled)
-    thing->flags.Set (CS_ENTITY_CONVEX, CS_ENTITY_CONVEX);
-
+  if (info.is_convex || thing->GetFog ().enabled)
+    thing->flags.Set (CS_ENTITY_CONVEX);
   return thing;
 }
-
 
 
 //---------------------------------------------------------------------------
 
 csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
   csMaterialWrapper* default_material, float default_texlen,
-  csPolygonSet* parent)
+  csThing* parent, int vt_offset)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (TEXNR)
@@ -1539,7 +1317,6 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
     CS_TOKEN_TABLE (MIPMAP)
     CS_TOKEN_TABLE (PORTAL)
     CS_TOKEN_TABLE (WARP)
-    CS_TOKEN_TABLE (LIGHTX)
     CS_TOKEN_TABLE (TEXTURE)
     CS_TOKEN_TABLE (SHADING)
     CS_TOKEN_TABLE (VERTICES)
@@ -1735,10 +1512,6 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
             poly3d->GetPortal ()->SetWarp (m_w, v_w_before, v_w_after);
         }
         break;
-      case CS_TOKEN_LIGHTX:
-        CsPrintf (MSG_WARNING, "Warning! LIGHTX statement is obsolete"
-                               " and does not do anything!\n");
-        break;
       case CS_TOKEN_TEXTURE:
         while ((cmd = csGetObject (&params, tex_commands, &name, &params2)) > 0)
         {
@@ -1845,7 +1618,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
 	    if (list[i] == list[(i-1+num)%num])
 	      CsPrintf (MSG_WARNING, "Duplicate vertex-index found in polygon! Ignored...\n");
 	    else
-	      poly3d->AddVertex (list[i]);
+	      poly3d->AddVertex (list[i]+vt_offset);
 	  }
         }
         break;
@@ -2394,686 +2167,19 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
 
 //---------------------------------------------------------------------------
 
-#define MAX_ROOM_PORTALS 30
-#define MAX_ROOM_SPLIT 60
-#define MAX_ROOM_COLORS 100
-#define MAX_ROOM_LIGHT 50
-
-struct RPortal
-{
-  ObName poly;
-  ObName sector;
-  bool is_warp;
-  bool do_mirror;
-  bool do_static;
-  csMatrix3 m_warp;
-  csVector3 v_warp_before;
-  csVector3 v_warp_after;
-  int alpha;
-};
-
-struct Split
-{
-  ObName poly;
-  float widA[20];
-  int dir;
-  int cnt;
-};
-
-struct Color
-{
-  Color () { len = 0; }
-  ObName poly;
-  ObName plane;
-  csMaterialWrapper* material;
-  float len;
-};
-
-struct Todo
-{
-  ObName poly;
-  int v1, v2, v3, v4;
-  int tv1, tv2;
-  csMaterialWrapper* material;
-  int col_idx;          // Idx in colors table if there was an override.
-};
-
-void add_to_todo (Todo* todo, int& todo_end, char* poly,
-        int v1, int v2, int v3, int v4, int tv1, int tv2,
-        csMaterialWrapper* material, int col_idx,
-        Color* colors, int num_colors)
-{
-  int i;
-  strcpy (todo[todo_end].poly, poly);
-  todo[todo_end].v1 = v1;
-  todo[todo_end].v2 = v2;
-  todo[todo_end].v3 = v3;
-  todo[todo_end].v4 = v4;
-  todo[todo_end].tv1 = tv1;
-  todo[todo_end].tv2 = tv2;
-  todo[todo_end].material = material;
-  todo[todo_end].col_idx = col_idx;
-  for (i = 0 ; i < num_colors ; i++)
-    if (!strcmp (poly, colors[i].poly))
-    {
-      todo[todo_end].col_idx = i;
-      break;
-    }
-  todo_end++;
-}
-
-void csLoader::load_tex (char** buf, Color* colors, int num_colors, char* name)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (TEXTURE)
-    CS_TOKEN_TABLE (PLANE)
-    CS_TOKEN_TABLE (LEN)
-  CS_TOKEN_TABLE_END
-
-  long cmd;
-  char *params;
-  char str [255];
-
-  strcpy (colors [num_colors].poly, name);
-  colors[num_colors].plane[0] = 0;
-  colors[num_colors].material = NULL;
-  colors[num_colors].len = 0;
-
-  while ((cmd = csGetCommand (buf, commands, &params)) > 0)
-  {
-    switch (cmd)
-    {
-      case CS_TOKEN_TEXTURE://@@@MAT
-        ScanStr (params, "%s", str);
-        colors[num_colors].material = FindMaterial (str, onlyRegion);
-        if (colors[num_colors].material == NULL)
-        {
-          CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
-          fatal_exit (0, true);
-        }
-        break;
-      case CS_TOKEN_PLANE:
-        ScanStr (params, "%s", str);
-        strcpy (colors[num_colors].plane, str);
-        break;
-      case CS_TOKEN_LEN:
-        ScanStr (params, "%f", &colors[num_colors].len);
-        break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a texture specification!\n", csGetLastOffender ());
-    fatal_exit (0, false);
-  }
-}
-
-csSector* csLoader::load_room (char* secname, char* buf)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (MOVE)
-    CS_TOKEN_TABLE (TEXTURE_LIGHTING)
-    CS_TOKEN_TABLE (TEXTURE_MIPMAP)
-    CS_TOKEN_TABLE (TEXTURE_SCALE)
-    CS_TOKEN_TABLE (TEXTURE)
-    CS_TOKEN_TABLE (TEX)
-    CS_TOKEN_TABLE (CEIL_TEXTURE)
-    CS_TOKEN_TABLE (FLOOR_TEXTURE)
-    CS_TOKEN_TABLE (LIGHTX)
-    CS_TOKEN_TABLE (LIGHT)
-    CS_TOKEN_TABLE (DIM)
-    CS_TOKEN_TABLE (HEIGHT)
-    CS_TOKEN_TABLE (FLOOR_HEIGHT)
-    CS_TOKEN_TABLE (FLOOR_CEIL)
-    CS_TOKEN_TABLE (FLOOR)
-    CS_TOKEN_TABLE (CEILING)
-    CS_TOKEN_TABLE (SIXFACE)
-    CS_TOKEN_TABLE (THING)
-    CS_TOKEN_TABLE (SKY)
-    CS_TOKEN_TABLE (PORTAL)
-    CS_TOKEN_TABLE (SPLIT)
-    CS_TOKEN_TABLE (TRIGGER)
-    CS_TOKEN_TABLE (ACTIVATE)
-    CS_TOKEN_TABLE (BSP)
-    CS_TOKEN_TABLE (STATBSP)
-    CS_TOKEN_TABLE (MESHOBJ)
-    CS_TOKEN_TABLE (FOG)
-    CS_TOKEN_TABLE (KEY)
-  CS_TOKEN_TABLE_END
-
-  CS_TOKEN_TABLE_START (portal_commands)
-    CS_TOKEN_TABLE (POLYGON)
-    CS_TOKEN_TABLE (SECTOR)
-    CS_TOKEN_TABLE (ALPHA)
-    CS_TOKEN_TABLE (WARP)
-  CS_TOKEN_TABLE_END
-
-  CS_TOKEN_TABLE_START (mCommands)
-    CS_TOKEN_TABLE (MATRIX)
-    CS_TOKEN_TABLE (V)
-    CS_TOKEN_TABLE (W)
-    CS_TOKEN_TABLE (MIRROR)
-    CS_TOKEN_TABLE (STATIC)
-  CS_TOKEN_TABLE_END
-
-  CS_TOKEN_TABLE_START (tok_matrix)
-    CS_TOKEN_TABLE (MATRIX)
-  CS_TOKEN_TABLE_END
-
-  CS_TOKEN_TABLE_START (tok_vector)
-    CS_TOKEN_TABLE (V)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params, * params2;
-  int i, l;
-  int i1, i2, i3, i4;
-  bool do_stat_bsp = false;
-
-  csSector* sector = new csSector (Engine);
-  sector->SetName (secname);
-
-  sector->SetAmbientColor (csLight::ambient_red, csLight::ambient_green, csLight::ambient_blue);
-
-  csLoaderStat::sectors_loaded++;
-
-  csMatrix3 mm;
-  csVector3 vm (0, 0, 0);
-  csMaterialWrapper* material = NULL;
-  float tscale = 1;
-  int no_lighting = false;
-
-  int num_portals = 0;
-  RPortal portals[MAX_ROOM_PORTALS];
-
-  int num_splits = 0;
-  Split to_split[MAX_ROOM_SPLIT];
-
-  int num_colors = 0;
-  Color colors[MAX_ROOM_COLORS];
-
-  csVector3 v0 (-1,  1,  1);
-  csVector3 v1 ( 1,  1,  1);
-  csVector3 v2 (-1, -1,  1);
-  csVector3 v3 ( 1, -1,  1);
-  csVector3 v4 (-1,  1, -1);
-  csVector3 v5 ( 1,  1, -1);
-  csVector3 v6 (-1, -1, -1);
-  csVector3 v7 ( 1, -1, -1);
-  float r;
-
-  char str[255];
-
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_BSP:
-        CsPrintf (MSG_FATAL_ERROR,
-          "BSP keyword is no longer supported. Use STATBSP instead after putting\n"
-          "all non-convex polygons in things.\n");
-        break;
-      case CS_TOKEN_STATBSP:
-        do_stat_bsp = true;
-        break;
-      case CS_TOKEN_MOVE:
-        {
-          char* params2;
-          csGetObject (&params, tok_matrix, &name, &params2);
-          load_matrix (params2, mm);
-          csGetObject (&params, tok_vector, &name, &params2);
-          load_vector (params2, vm);
-        }
-        break;
-      case CS_TOKEN_TEXTURE:
-        ScanStr (params, "%s", str);
-        material = FindMaterial (str, onlyRegion);
-        if (material == NULL)
-        {
-          CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
-          fatal_exit (0, true);
-        }
-        break;
-      case CS_TOKEN_TEXTURE_LIGHTING:
-        ScanStr (params, "%b", &no_lighting); no_lighting = !no_lighting;
-        break;
-      case CS_TOKEN_TEXTURE_MIPMAP:
-        //@@@ OBSOLETE
-        break;
-      case CS_TOKEN_CEIL_TEXTURE:
-      case CS_TOKEN_FLOOR_TEXTURE:
-        ScanStr (params, "%s", str);
-        colors[num_colors].material = FindMaterial (str, onlyRegion);
-        if (colors[num_colors].material == NULL)
-        {
-          CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
-          fatal_exit (0, true);
-        }
-        strcpy (colors[num_colors].poly,
-                cmd == CS_TOKEN_CEIL_TEXTURE ? "up" : "down");
-        colors[num_colors].plane[0] = 0;
-        if (num_colors >= MAX_ROOM_COLORS)
-        {
-          CsPrintf (MSG_FATAL_ERROR, "OVERFLOW number of colors in room!\n");
-          fatal_exit (0, false);
-        }
-        num_colors++;
-        break;
-      case CS_TOKEN_LIGHTX:
-        CsPrintf (MSG_WARNING, "Warning! LIGHTX statement is obsolete"
-                               " and does not do anything!\n");
-        break;
-      case CS_TOKEN_TEX:
-        load_tex (&params, colors, num_colors, name);
-        num_colors++;
-        break;
-      case CS_TOKEN_TEXTURE_SCALE:
-        ScanStr (params, "%f", &tscale);
-        break;
-      case CS_TOKEN_DIM:
-        {
-          float rx, ry, rz;
-          ScanStr (params, "%f,%f,%f", &rx, &ry, &rz);
-          rx /= 2; ry /= 2; rz /= 2;
-          v0.x = -rx; v0.y =  ry; v0.z =  rz;
-          v1.x =  rx; v1.y =  ry; v1.z =  rz;
-          v2.x = -rx; v2.y = -ry; v2.z =  rz;
-          v3.x =  rx; v3.y = -ry; v3.z =  rz;
-          v4.x = -rx; v4.y =  ry; v4.z = -rz;
-          v5.x =  rx; v5.y =  ry; v5.z = -rz;
-          v6.x = -rx; v6.y = -ry; v6.z = -rz;
-          v7.x =  rx; v7.y = -ry; v7.z = -rz;
-        }
-        break;
-      case CS_TOKEN_FLOOR_HEIGHT:
-        ScanStr (params, "%f", &r);
-        v0.y = r+v0.y-v2.y;
-        v1.y = r+v1.y-v3.y;
-        v4.y = r+v4.y-v6.y;
-        v5.y = r+v5.y-v7.y;
-        v2.y = r;
-        v3.y = r;
-        v6.y = r;
-        v7.y = r;
-        break;
-      case CS_TOKEN_HEIGHT:
-        ScanStr (params, "%f", &r);
-        v0.y = r+v2.y;
-        v1.y = r+v3.y;
-        v4.y = r+v6.y;
-        v5.y = r+v7.y;
-        break;
-      case CS_TOKEN_FLOOR_CEIL:
-        ScanStr (params, "(%f,%f) (%f,%f) (%f,%f) (%f,%f)",
-                 &v2.x, &v2.z, &v3.x, &v3.z, &v7.x, &v7.z, &v6.x, &v6.z);
-        v0 = v2;
-        v1 = v3;
-        v5 = v7;
-        v4 = v6;
-        break;
-      case CS_TOKEN_FLOOR:
-        ScanStr (params, "(%f,%f,%f) (%f,%f,%f) (%f,%f,%f) (%f,%f,%f)",
-                 &v2.x, &v2.y, &v2.z, &v3.x, &v3.y, &v3.z,
-                 &v7.x, &v7.y, &v7.z, &v6.x, &v6.y, &v6.z);
-        break;
-      case CS_TOKEN_CEILING:
-        ScanStr (params, "(%f,%f,%f) (%f,%f,%f) (%f,%f,%f) (%f,%f,%f)",
-                 &v0.x, &v0.y, &v0.z, &v1.x, &v1.y, &v1.z,
-                 &v5.x, &v5.y, &v5.z, &v4.x, &v4.y, &v4.z);
-        break;
-      case CS_TOKEN_LIGHT:
-        sector->AddLight ( load_statlight(name, params) );
-        break;
-      case CS_TOKEN_FOG:
-        {
-          csFog& f = sector->GetFog ();
-          f.enabled = true;
-          ScanStr (params, "%f,%f,%f,%f", &f.red, &f.green, &f.blue, &f.density);
-        }
-        break;
-      case CS_TOKEN_KEY:
-        load_key (params, sector);
-        break;
-      case CS_TOKEN_MESHOBJ:
-        {
-          csMeshWrapper* sp = new csMeshWrapper (Engine);
-          sp->SetName (name);
-          LoadMeshObject (sp, params, sector);
-          Engine->meshes.Push (sp);
-          sp->GetMovable ().SetSector (sector);
-	  sp->GetMovable ().UpdateMove ();
-        }
-        break;
-      case CS_TOKEN_SKY:
-        Engine->skies.Push (load_thing (name, params, sector, true, false));
-        break;
-      case CS_TOKEN_THING:
-        Engine->things.Push (load_thing (name, params, sector, false, false));
-        break;
-      case CS_TOKEN_SIXFACE:
-        Engine->things.Push (load_sixface (name, params, sector, false));
-        break;
-      case CS_TOKEN_PORTAL:
-        {
-          if (num_portals >= MAX_ROOM_PORTALS)
-          {
-            CsPrintf (MSG_FATAL_ERROR,
-                      "OVERFLOW with number of portals in room!\n");
-            fatal_exit (0, false);
-          }
-          portals[num_portals].is_warp = false;
-          portals[num_portals].alpha = 0;
-          while ((cmd = csGetObject (&params, portal_commands, &name, &params2)) > 0)
-          {
-            if (!params2)
-            {
-              CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
-              fatal_exit (0, false);
-            }
-            switch (cmd)
-            {
-              case CS_TOKEN_POLYGON:
-                ScanStr (params2, "%s", portals[num_portals].poly);
-                break;
-              case CS_TOKEN_SECTOR:
-                ScanStr (params2, "%s", portals[num_portals].sector);
-                break;
-              case CS_TOKEN_ALPHA:
-                ScanStr (params2, "%d", &portals[num_portals].alpha);
-                portals[num_portals].alpha = portals[num_portals].alpha * 655 / 256;
-                break;
-              case CS_TOKEN_WARP:
-                {
-                  portals[num_portals].do_static = false;
-                  char* params3;
-                  while ((cmd = csGetObject (&params2, mCommands, &name, &params3)) > 0)
-                  {
-                    if (!params3)
-                    {
-                      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params2);
-                      fatal_exit (0, false);
-                    }
-                    switch (cmd)
-                    {
-                      case CS_TOKEN_MATRIX:
-                        load_matrix (params3, portals[num_portals].m_warp);
-                        portals[num_portals].do_mirror = false;
-                        break;
-                      case CS_TOKEN_V:
-                        load_vector (params3, portals[num_portals].v_warp_before);
-                        portals[num_portals].v_warp_after =
-                          portals[num_portals].v_warp_before;
-                        portals[num_portals].do_mirror = false;
-                        break;
-                      case CS_TOKEN_W:
-                        load_vector (params3, portals[num_portals].v_warp_after);
-                        portals[num_portals].do_mirror = false;
-                        break;
-                      case CS_TOKEN_MIRROR:
-                        portals[num_portals].do_mirror = true;
-                        break;
-                      case CS_TOKEN_STATIC:
-                        portals[num_portals].do_static = true;
-                        break;
-                    }
-                  }
-                  portals[num_portals].is_warp = true;
-                }
-                break;
-            }
-          }
-        }
-        num_portals++;
-        break;
-      case CS_TOKEN_SPLIT:
-        {
-          ScanStr (params, "%s,%s(%F)",
-                   to_split[num_splits].poly, str, to_split[num_splits].widA,
-                   &to_split[num_splits].cnt);
-          if (!strcmp (str, "VER")) to_split[num_splits].dir = 0;
-          else if (!strcmp (str, "HOR")) to_split[num_splits].dir = 1;
-          else
-          {
-            CsPrintf (MSG_FATAL_ERROR,
-                      "Expected 'VER' or 'HOR' in SPLIT statement!\n");
-            fatal_exit (0, false);
-          }
-          if (to_split[num_splits].cnt >= MAX_ROOM_SPLIT)
-          {
-            CsPrintf (MSG_FATAL_ERROR, "OVERFLOW number of splits in room!\n");
-            fatal_exit (0, false);
-          }
-          num_splits++;
-        }
-        break;
-      case CS_TOKEN_ACTIVATE:
-        CsPrintf (MSG_WARNING, "Warning! ACTIVATE statement is obsolete"
-                                 " and does not do anything!\n");
-        break;
-      case CS_TOKEN_TRIGGER:
-        CsPrintf (MSG_WARNING, "Warning! TRIGGER statement is obsolete"
-                                 " and does not do anything!\n");
-        break;
-      default:
-        CsPrintf (MSG_FATAL_ERROR, "Unrecognized token in room '%s'!\n",
-                  sector->GetName ());
-        fatal_exit (0, false);
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a room!\n", csGetLastOffender ());
-    fatal_exit (0, false);
-  }
-
-  csVector3 v, vv;
-  vv = vm + mm * v0; sector->AddVertex (vv);
-  vv = vm + mm * v1; sector->AddVertex (vv);
-  vv = vm + mm * v2; sector->AddVertex (vv);
-  vv = vm + mm * v3; sector->AddVertex (vv);
-  vv = vm + mm * v4; sector->AddVertex (vv);
-  vv = vm + mm * v5; sector->AddVertex (vv);
-  vv = vm + mm * v6; sector->AddVertex (vv);
-  vv = vm + mm * v7; sector->AddVertex (vv);
-
-  csPolygon3D* p;
-
-  Todo todo[100];
-  int done = 0;
-  int todo_end = 0;
-
-  add_to_todo (todo, todo_end, "north", 0, 1, 3, 2, 0, 1,
-               material, -1, colors, num_colors);
-  add_to_todo (todo, todo_end, "east", 1, 5, 7, 3, 1, 5,
-               material, -1, colors, num_colors);
-  add_to_todo (todo, todo_end, "south", 5, 4, 6, 7, 5, 4,
-               material, -1, colors, num_colors);
-  add_to_todo (todo, todo_end, "west", 4, 0, 2, 6, 4, 0,
-               material, -1, colors, num_colors);
-  add_to_todo (todo, todo_end, "up", 4, 5, 1, 0, 4, 5,
-               material, -1, colors, num_colors);
-  add_to_todo (todo, todo_end, "down", 2, 3, 7, 6, 2, 3,
-               material, -1, colors, num_colors);
-
-  int split;
-  while (done < todo_end)
-  {
-    split = false;
-    for (i = 0 ; i < num_splits ; i++)
-      if (!strcmp (todo[done].poly, to_split[i].poly))
-      {
-        split = true;
-        break;
-      }
-
-    if (split)
-    {
-      char pname[255];
-      if (to_split[i].dir)
-      {
-        // Horizontal
-        i1 = todo[done].v1;
-        i2 = todo[done].v2;
-        i3 = todo[done].v3;
-        i4 = todo[done].v4;
-
-        for (l = 0 ; l < to_split[i].cnt ; l++)
-        {
-          csMath3::Between (sector->Vwor (i1), sector->Vwor (i2),
-                            v, -1, to_split[i].widA[l]);
-          sector->AddVertex (v);
-          csMath3::Between (sector->Vwor (i4), sector->Vwor (i3),
-                            v, -1, to_split[i].widA[l]);
-          sector->AddVertex (v);
-
-          sprintf (pname, "%s%c", todo[done].poly, l+'A');
-          add_to_todo(todo, todo_end, pname, i1, sector->GetNumVertices ()-2,
-                      sector->GetNumVertices ()-1, i4, todo[done].tv1,
-                      todo[done].tv2, todo[done].material, todo[done].col_idx,
-                      colors, num_colors);
-          i1 = sector->GetNumVertices () - 2;
-          i4 = sector->GetNumVertices () - 1;
-        }
-
-        sprintf (pname, "%s%c", todo[done].poly, l+'A');
-        add_to_todo (todo, todo_end, pname, i1, i2, i3, i4, todo[done].tv1,
-                     todo[done].tv2, todo[done].material, todo[done].col_idx,
-                     colors, num_colors);
-      }
-      else
-      {
-        // Vertical
-        i1 = todo[done].v1;
-        i2 = todo[done].v2;
-        i3 = todo[done].v3;
-        i4 = todo[done].v4;
-
-        for (l = 0 ; l < to_split[i].cnt ; l++)
-        {
-          csMath3::Between (sector->Vwor (i4), sector->Vwor (i1), v, -1,
-                            to_split[i].widA[l]);
-          sector->AddVertex (v);
-          csMath3::Between (sector->Vwor (i3), sector->Vwor (i2), v, -1,
-                            to_split[i].widA[l]);
-          sector->AddVertex (v);
-
-          sprintf (pname, "%s%d", todo[done].poly, l+1);
-          add_to_todo(todo, todo_end, pname, sector->GetNumVertices () - 2,
-                      sector->GetNumVertices () - 1,
-                      i3, i4, todo[done].tv1, todo[done].tv2,
-                      todo[done].material, todo[done].col_idx,
-                      colors, num_colors);
-          i3 = sector->GetNumVertices () - 1;
-          i4 = sector->GetNumVertices () - 2;
-        }
-
-        sprintf (pname, "%s%d", todo[done].poly, l+1);
-        add_to_todo (todo, todo_end, pname, i1, i2, i3, i4, todo[done].tv1,
-                     todo[done].tv2, todo[done].material, todo[done].col_idx,
-                     colors, num_colors);
-      }
-    }
-    else
-    {
-      float len;
-      int idx = todo[done].col_idx;
-      if (idx == -1 || colors[idx].material == NULL)
-        material = todo[done].material;
-      else material = colors[idx].material;
-
-      p = sector->NewPolygon (material);
-      p->SetName (todo[done].poly);
-      p->AddVertex (todo[done].v1);
-      p->AddVertex (todo[done].v2);
-      p->AddVertex (todo[done].v3);
-      p->AddVertex (todo[done].v4);
-      len = tscale;
-      if (idx != -1 && colors[idx].len) len = colors[idx].len;
-      if (idx == -1 || colors[idx].plane[0] == 0)
-        p->SetTextureSpace (sector->Vwor (todo[done].tv1),
-                              sector->Vwor (todo[done].tv2), len);
-      else
-        p->SetTextureSpace ((csPolyTxtPlane*)Engine->planes.FindByName (colors[idx].plane));
-      p->flags.Set (CS_POLY_LIGHTING, (no_lighting ? 0 : CS_POLY_LIGHTING));
-      OptimizePolygon (p);
-    }
-    done++;
-  }
-
-  csSector* portal;
-
-  for (i = 0 ; i < num_portals ; i++)
-  {
-    p = sector->GetPolygon3D (portals[i].poly);
-    if (!p)
-    {
-      CsPrintf (MSG_FATAL_ERROR, "Error locating polygon '%s' in room '%s'!\n",
-                portals[i].poly, name);
-      fatal_exit (0, false);
-    }
-
-    // This will later be defined correctly
-    portal = new csSector (Engine) ;
-    portal->SetName (portals[i].sector);
-    p->SetCSPortal (portal);
-    csLoaderStat::portals_loaded++;
-    if (portals[i].is_warp)
-    {
-      if (portals[i].do_mirror)
-      {
-        p->SetWarp (csTransform::GetReflect ( *(p->GetPolyPlane ()) ));
-	p->flags.Set (CS_POLY_COLLDET);
-      }
-      else p->SetWarp (portals[i].m_warp, portals[i].v_warp_before,
-                        portals[i].v_warp_after);
-      p->GetPortal ()->flags.SetBool (CS_PORTAL_STATICDEST, portals[i].do_static);
-    }
-    p->SetAlpha (portals [i].alpha);
-  }
-
-  if (!(flags & CS_LOADER_NOCOMPRESS))
-    sector->CompressVertices ();
-  if (!(flags & CS_LOADER_NOBSP))
-    if (do_stat_bsp) sector->UseStaticTree ();
-
-  return sector;
-}
-
 csSector* csLoader::load_sector (char* secname, char* buf)
 {
   CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (VERTEX)
-    CS_TOKEN_TABLE (CIRCLE)
-    CS_TOKEN_TABLE (POLYGON)
-    CS_TOKEN_TABLE (TEXNR)
-    CS_TOKEN_TABLE (MATERIAL)
-    CS_TOKEN_TABLE (TEXLEN)
-    CS_TOKEN_TABLE (TRIGGER)
-    CS_TOKEN_TABLE (ACTIVATE)
-    CS_TOKEN_TABLE (LIGHTX)
     CS_TOKEN_TABLE (FOG)
-    CS_TOKEN_TABLE (BSP)
     CS_TOKEN_TABLE (STATBSP)
     CS_TOKEN_TABLE (THING)
     CS_TOKEN_TABLE (SIXFACE)
     CS_TOKEN_TABLE (LIGHT)
     CS_TOKEN_TABLE (MESHOBJ)
-    CS_TOKEN_TABLE (SKYDOME)
     CS_TOKEN_TABLE (SKY)
     CS_TOKEN_TABLE (TERRAIN)
     CS_TOKEN_TABLE (NODE)
     CS_TOKEN_TABLE (KEY)
-    CS_TOKEN_TABLE (HARDMOVE)
-    CS_TOKEN_TABLE (BEZIER)
-    CS_TOKEN_TABLE (CURVECENTER)
-    CS_TOKEN_TABLE (CURVESCALE)
-    CS_TOKEN_TABLE (CURVECONTROL)
   CS_TOKEN_TABLE_END
 
   char* name;
@@ -3087,8 +2193,6 @@ csSector* csLoader::load_sector (char* secname, char* buf)
   csLoaderStat::sectors_loaded++;
   sector->SetAmbientColor (csLight::ambient_red, csLight::ambient_green, csLight::ambient_blue);
 
-  PSLoadInfo info;
-
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
@@ -3098,9 +2202,6 @@ csSector* csLoader::load_sector (char* secname, char* buf)
     }
     switch (cmd)
     {
-      case CS_TOKEN_SKYDOME:
-        skydome_process (*sector, name, params, info.default_material);
-        break;
       case CS_TOKEN_TERRAIN:
         terrain_process (*sector, name, params);
         break;
@@ -3114,7 +2215,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
         Engine->things.Push (load_thing (name, params, sector, false, false));
         break;
       case CS_TOKEN_SIXFACE:
-        Engine->things.Push (load_sixface (name, params, sector, false));
+        CsPrintf (MSG_WARNING, "Warning! SIXFACE statement is obsolete! Use THING instead!\n");
         break;
       case CS_TOKEN_MESHOBJ:
         {
@@ -3132,14 +2233,18 @@ csSector* csLoader::load_sector (char* secname, char* buf)
       case CS_TOKEN_NODE:
         sector->ObjAdd ( load_node(name, params, sector) );
         break;
+      case CS_TOKEN_FOG:
+        {
+          csFog& f = sector->GetFog ();
+          f.enabled = true;
+          ScanStr (params, "%f,%f,%f,%f", &f.red, &f.green, &f.blue, &f.density);
+        }
+        break;
       case CS_TOKEN_KEY:
       {
         load_key(params, sector);
         break;
       }
-      default:
-        ps_process (*sector, sector, info, cmd, name, params);
-        break;
     }
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
@@ -3148,17 +2253,12 @@ csSector* csLoader::load_sector (char* secname, char* buf)
     fatal_exit (0, false);
   }
 
-  if (info.do_hard_trans)
-    sector->HardTransform (info.hard_trans);
-
-  if (!(flags & CS_LOADER_NOCOMPRESS))
-    sector->CompressVertices ();
   if (!(flags & CS_LOADER_NOBSP))
     if (do_stat_bsp) sector->UseStaticTree ();
   return sector;
 }
 
-void csLoader::skydome_process (csSector& sector, char* name, char* buf,
+void csLoader::skydome_process (csThing& thing, char* name, char* buf,
         csMaterialWrapper* material)
 {
   CS_TOKEN_TABLE_START (commands)
@@ -3252,7 +2352,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
     {
       float angle = j*2.*radius_step * 2.*M_PI/360.;
       if (vert_radius < 0) angle = 2.*M_PI-angle;
-      new_vertices[j] = sector.AddVertex (
+      new_vertices[j] = thing.AddVertex (
                          new_radius * cos (angle),
                          new_height,
                          new_radius * sin (angle));
@@ -3268,7 +2368,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
       sprintf (end_poly_name, "%d_%d_A", i, j);
       csPolygon3D* p = new csPolygon3D (material);
       p->SetName (poly_name);
-      p->SetParent (&sector);
+      p->SetParent (&thing);
       p->flags.Set (CS_POLY_LIGHTING, lighting_flags);
       p->SetCosinusFactor (1);
       p->AddVertex (prev_vertices[j]);
@@ -3282,12 +2382,12 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
       gs->SetUV (2, new_u[j], new_v[j]);
 
       p->SetTextureSpace (t_m, t_v);
-      sector.AddPolygon (p);
+      thing.AddPolygon (p);
       csLoaderStat::polygons_loaded++;
       sprintf (end_poly_name, "%d_%d_B", i, j);
       p = new csPolygon3D (material);
       p->SetName (poly_name);
-      p->SetParent (&sector);
+      p->SetParent (&thing);
       p->flags.Set (CS_POLY_LIGHTING, lighting_flags);
       p->SetCosinusFactor (1);
       p->AddVertex (prev_vertices[j]);
@@ -3300,7 +2400,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
       gs->SetUV (1, prev_u[(j+1)%num], prev_v[(j+1)%num]);
       gs->SetUV (2, new_u[(j+1)%num], new_v[(j+1)%num]);
       p->SetTextureSpace (t_m, t_v);
-      sector.AddPolygon (p);
+      thing.AddPolygon (p);
       csLoaderStat::polygons_loaded++;
     }
 
@@ -3316,7 +2416,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
   }
 
   // Create the top vertex.
-  int top_vertex = sector.AddVertex (0, vert_radius, 0);
+  int top_vertex = thing.AddVertex (0, vert_radius, 0);
   float top_u = .5;
   float top_v = .5;
 
@@ -3328,7 +2428,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
     sprintf (end_poly_name, "%d_%d", num/2, j);
     csPolygon3D* p = new csPolygon3D (material);
     p->SetName (poly_name);
-    p->SetParent (&sector);
+    p->SetParent (&thing);
     p->flags.Set (CS_POLY_LIGHTING, lighting_flags);
     p->SetCosinusFactor (1);
     p->AddVertex (top_vertex);
@@ -3341,7 +2441,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
     gs->SetUV (1, prev_u[j], prev_v[j]);
     gs->SetUV (2, prev_u[(j+1)%num], prev_v[(j+1)%num]);
     p->SetTextureSpace (t_m, t_v);
-    sector.AddPolygon (p);
+    thing.AddPolygon (p);
     csLoaderStat::polygons_loaded++;
   }
 }
@@ -3530,7 +2630,6 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
     CS_TOKEN_TABLE (TEXTURES)
     CS_TOKEN_TABLE (MATERIALS)
     CS_TOKEN_TABLE (MAT_SET)
-    CS_TOKEN_TABLE (LIGHTX)
     CS_TOKEN_TABLE (THING)
     CS_TOKEN_TABLE (SIXFACE)
     CS_TOKEN_TABLE (LIBRARY)
@@ -3611,8 +2710,7 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
             Engine->thing_templates.Push (load_thing (name, params, NULL, false, true));
           break;
         case CS_TOKEN_SIXFACE:
-          if (!Engine->thing_templates.FindByName (name))
-            Engine->thing_templates.Push (load_sixface (name, params, NULL, true));
+          CsPrintf (MSG_WARNING, "Warning! SIXFACE statement is obsolete! Use THING instead!\n");
           break;
         case CS_TOKEN_SECTOR:
           if (!Engine->FindSector (name, onlyRegion))
@@ -3651,13 +2749,7 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
             return false;
           break;
         case CS_TOKEN_ROOM:
-          // Not an object but it is translated to a special sector.
-          if (!Engine->FindSector (name, onlyRegion))
-            Engine->sectors.Push (load_room (name, params));
-          break;
-        case CS_TOKEN_LIGHTX:
-          CsPrintf (MSG_WARNING, "Warning! LIGHTX statement is obsolete"
-                                 " and does not do anything!\n");
+          CsPrintf (MSG_WARNING, "Warning! ROOM statement is obsolete! Use SECTOR instead!\n");
           break;
         case CS_TOKEN_LIBRARY:
           LoadLibraryFile (Engine, name);
@@ -3693,12 +2785,10 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
     if (cur_region && !cur_region->IsInRegion (s))
       continue;
     int st = s->things.Length ();
-    int j = -1;
+    int j = 0;
     while (j < st)
     {
-      csPolygonSet* ps;
-      if (j == -1) ps = s;
-      else ps = (csPolygonSet*)(s->things[j]);
+      csThing* ps = (csThing*)s->things[j];
       j++;
       for (int i=0;  i < ps->GetNumPolygons ();  i++)
       {
@@ -3782,7 +2872,6 @@ bool csLoader::AppendMapFile (csEngine* engine, const char* file,
 bool csLoader::LoadTextures (char* buf)
 {
   CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (MAX_TEXTURES)
     CS_TOKEN_TABLE (TEXTURE)
   CS_TOKEN_TABLE_END
 
@@ -3799,9 +2888,6 @@ bool csLoader::LoadTextures (char* buf)
     }
     switch (cmd)
     {
-      case CS_TOKEN_MAX_TEXTURES:
-        // ignored for backward compatibility
-        break;
       case CS_TOKEN_TEXTURE:
         txt_process (name, params);
         break;

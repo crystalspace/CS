@@ -22,7 +22,7 @@
 #include "csengine/bsp.h"
 #include "csengine/bsp2d.h"
 #include "csengine/treeobj.h"
-#include "csengine/sector.h"
+#include "csengine/thing.h"
 #include "csengine/engine.h"
 #include "csengine/covcube.h"
 #include "csengine/cbufcube.h"
@@ -110,9 +110,9 @@ int csOctreeNode::CountPolygons ()
 
 //---------------------------------------------------------------------------
 
-csOctree::csOctree (csSector* sect, const csVector3& imin_bbox,
+csOctree::csOctree (csThing* thing, const csVector3& imin_bbox,
 	const csVector3& imax_bbox, int ibsp_num, int imode)
-	: csPolygonTree (sect)
+	: csPolygonTree (thing)
 {
   bbox.Set (imin_bbox, imax_bbox);
   bsp_num = ibsp_num;
@@ -122,24 +122,6 @@ csOctree::csOctree (csSector* sect, const csVector3& imin_bbox,
 csOctree::~csOctree ()
 {
   Clear ();
-}
-
-void csOctree::Build ()
-{
-  int i;
-  int num = sector->GetNumPolygons ();
-  csPolygonInt** polygons = new csPolygonInt* [num];
-  for (i = 0 ; i < num ; i++) polygons[i] = sector->GetPolygonInt (i);
-
-  root = new csOctreeNode;
-
-  Build ((csOctreeNode*)root, bbox.Min (), bbox.Max (), polygons, num);
-
-  delete [] polygons;
-
-  Dumper::dump (this);
-
-  CalculateSolidMasks ((csOctreeNode*)root);
 }
 
 void csOctree::Build (csPolygonInt** polygons, int num)
@@ -509,7 +491,7 @@ void csOctree::Build (csOctreeNode* node, const csVector3& bmin,
     // be marked visible because that node contained no bsp tree
     // to be used for marking the visibility stubs.
     csBspTree* bsp;
-    bsp = new csBspTree (sector, mode);
+    bsp = new csBspTree (thing, mode);
     bsp->Build (polygons, num);
     node->SetMiniBsp (bsp);
     node->leaf = true;
@@ -523,7 +505,7 @@ void csOctree::Build (csOctreeNode* node, const csVector3& bmin,
   if (num <= bsp_num)
   {
     csBspTree* bsp;
-    bsp = new csBspTree (sector, mode);
+    bsp = new csBspTree (thing, mode);
     bsp->Build (polygons, num);
     node->SetMiniBsp (bsp);
     node->leaf = true;
@@ -910,7 +892,7 @@ bool csOctree::ReadFromCache (iFile* cf, csOctreeNode* node,
   if (do_minibsp)
   {
     csBspTree* bsp;
-    bsp = new csBspTree (sector, mode);
+    bsp = new csBspTree (thing, mode);
     bool rc = bsp->ReadFromCache (cf, polygons, num);
     node->SetMiniBsp (bsp);
     if (!rc) return false;

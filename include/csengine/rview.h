@@ -621,6 +621,19 @@ public:
   /// Userdata belonging to the callback.
   void* callback_data;
 
+  /**
+   * Mask and value which will be checked against the flags of every
+   * encountered thing to see if it will be included in the shadow
+   * processing.
+   */
+  unsigned int shadow_thing_mask, shadow_thing_value;
+  /**
+   * Mask and value which will be checked against the flags of every
+   * encountered thing to see if CheckFrustum must recursively call
+   * itself for this thing.
+   */
+  unsigned int process_thing_mask, process_thing_value;
+
 public:
   /// Constructor. frustum_id is generated each time a new object is created.
   csFrustumView ();

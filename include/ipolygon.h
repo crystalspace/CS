@@ -23,12 +23,12 @@
 
 struct iMaterialHandle;
 struct iMaterialWrapper;
-struct iPolygonSet;
 struct iPolygon3D;
 struct iPolygonTexture;
 struct iLightMap;
 struct iPortal;
 struct iSector;
+struct iThing;
 
 class csPolygon3D;
 class csVector3;
@@ -41,7 +41,7 @@ class csColor;
  */
 #define CS_POLY_LIGHTING	0x00000001
 
-SCF_VERSION (iPolygon3D, 0, 1, 4);
+SCF_VERSION (iPolygon3D, 0, 1, 5);
 
 /**
  * This is the interface to 3D polygons.
@@ -57,10 +57,10 @@ struct iPolygon3D : public iBase
   virtual void SetName (const char *iName) = 0;
 
   /**
-   * Get the polygonset (container) that this polygons belongs to.
-   * The reference counter on iPolygonSet is NOT incremented.
+   * Get the thing (container) that this polygon belongs to.
+   * The reference counter on iThing is NOT incremented.
    */
-  virtual iPolygonSet *GetContainer () = 0;
+  virtual iThing *GetParent () = 0;
   /// Get the lightmap associated with this polygon
   virtual iLightMap *GetLightMap () = 0;
   /// Get the handle to the polygon texture object

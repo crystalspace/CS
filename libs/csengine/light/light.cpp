@@ -230,6 +230,10 @@ void csStatLight::CalculateLighting ()
   lview.g = GetColor ().green;
   lview.b = GetColor ().blue;
   lview.dynamic = false;
+  lview.shadow_thing_mask = CS_ENTITY_NOSHADOWS;
+  lview.shadow_thing_value = 0;
+  lview.process_thing_mask = CS_ENTITY_NOLIGHTING;
+  lview.process_thing_value = 0;
 
   lview.light_frustum = new csFrustum (center);
   lview.light_frustum->MakeInfinite ();
@@ -253,6 +257,10 @@ void csStatLight::CalculateLighting (csThing* th)
   lview.g = GetColor ().green;
   lview.b = GetColor ().blue;
   lview.dynamic = false;
+  lview.shadow_thing_mask = CS_ENTITY_NOSHADOWS;
+  lview.shadow_thing_value = 0;
+  lview.process_thing_mask = CS_ENTITY_NOLIGHTING;
+  lview.process_thing_value = 0;
 
   lview.light_frustum = new csFrustum (center);
   lview.light_frustum->MakeInfinite ();
@@ -277,6 +285,10 @@ void csStatLight::LightingFunc (csLightingFunc* callback, void* callback_data)
   lview.dynamic = false;
   lview.callback = callback;
   lview.callback_data = callback_data;
+  lview.shadow_thing_mask = CS_ENTITY_NOSHADOWS;
+  lview.shadow_thing_value = 0;
+  lview.process_thing_mask = CS_ENTITY_NOLIGHTING;
+  lview.process_thing_value = 0;
 
   lview.light_frustum = new csFrustum (center);
   lview.light_frustum->MakeInfinite ();
@@ -402,6 +414,10 @@ void csDynLight::Setup ()
   lview.g = GetColor ().green;
   lview.b = GetColor ().blue;
   lview.dynamic = true;
+  lview.shadow_thing_mask = CS_ENTITY_NOSHADOWS;
+  lview.shadow_thing_value = 0;
+  lview.process_thing_mask = CS_ENTITY_NOLIGHTING;
+  lview.process_thing_value = 0;
 
   lview.light_frustum = new csFrustum (center);
   lview.light_frustum->MakeInfinite ();

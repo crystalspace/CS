@@ -70,7 +70,7 @@ void csPolygonTreeNode::LinkStub (csObjectStub* ps)
   ps->node = this;
 }
 
-void* csPolygonTreeNode::TraverseObjects (csSector* sector, 
+void* csPolygonTreeNode::TraverseObjects (csThing* thing, 
 	const csVector3& /*pos*/, csTreeVisitFunc* func, void* data)
 {
   csObjectStub* stub;
@@ -78,7 +78,7 @@ void* csPolygonTreeNode::TraverseObjects (csSector* sector,
   stub = first_stub;
   while (stub)
   {
-    rc = stub->Visit (sector, func, data);
+    rc = stub->Visit (thing, func, data);
     if (rc) return rc;
     stub = stub->next_tree;
   }
@@ -255,7 +255,7 @@ static int CPSortDistance (const void* el1, const void* el2)
   else return 0;
 }
 
-static void* ClassifyPointTraverse (csSector*, csPolygonInt** polygons,
+static void* ClassifyPointTraverse (csThing*, csPolygonInt** polygons,
 	int num, bool same_plane, void* vdata)
 {
   int i, j;

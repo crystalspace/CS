@@ -198,43 +198,44 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   csMaterialWrapper* tm = engine->GetMaterials ()->FindByName ("stone");
 
   room = engine->CreateCsSector ("room");
+  csThing* walls = engine->CreateSectorWalls (room, "walls");
   csPolygon3D* p;
-  p = room->NewPolygon (tm);
+  p = walls->NewPolygon (tm);
   p->AddVertex (-5, -5, 5);//1
   p->AddVertex (5, -5, 5);//2
   p->AddVertex (5, -5, -5);//3
   p->AddVertex (-5, -5, -5);//4
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
-  p = room->NewPolygon (tm);
+  p = walls->NewPolygon (tm);
   p->AddVertex (-5, 5, -5);//5
   p->AddVertex (5, 5, -5);//6
   p->AddVertex (5, 5, 5);//7
   p->AddVertex (-5, 5, 5);//8
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
-  p = room->NewPolygon (tm);
+  p = walls->NewPolygon (tm);
   p->AddVertex (-5, 5, 5);//9
   p->AddVertex (5, 5, 5);//10
   p->AddVertex (5, -5, 5);//11
   p->AddVertex (-5, -5, 5);//12
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
-  p = room->NewPolygon (tm);
+  p = walls->NewPolygon (tm);
   p->AddVertex (5, 5, 5);//13
   p->AddVertex (5, 5, -5);//14
   p->AddVertex (5, -5, -5);//15
   p->AddVertex (5, -5, 5);//16
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
-  p = room->NewPolygon (tm);
+  p = walls->NewPolygon (tm);
   p->AddVertex (-5, 5, -5);//17
   p->AddVertex (-5, 5, 5);//18
   p->AddVertex (-5, -5, 5);//19
   p->AddVertex (-5, -5, -5);//20
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
-  p = room->NewPolygon (tm);
+  p = walls->NewPolygon (tm);
   p->AddVertex (5, 5, -5);//21
   p->AddVertex (-5, 5, -5);//22
   p->AddVertex (-5, -5, -5);//23

@@ -630,7 +630,7 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
     else
       Sys->selected_polygon = sel;
 
-    csPolygonSet* ps = (csPolygonSet*)(sel->GetParent ());
+    csThing* ps = sel->GetParent ();
     Sys->Printf (MSG_DEBUG_0, "Hit polygon '%s/%s'\n", ps->GetName (), sel->GetName ());
     Dumper::dump (sel);
   }

@@ -139,22 +139,6 @@ struct iCamera:public iBase
   float GetInvFOV ();
 };
 
-struct iPolygonSet:public iBase
-{
-  const char *GetName () const;
-  void SetName (const char *iName);
-  void CompressVertices ();
-  int GetPolygonCount ();
-  iPolygon3D *GetPolygon (int idx);
-  iPolygon3D *CreatePolygon (const char *iName);
-  int GetVertexCount ();
-  csVector3 &GetVertex (int idx);
-  csVector3 &GetVertexW (int idx);
-  csVector3 &GetVertexC (int idx);
-  int CreateVertex (csVector3 &iVertex);
-  bool CreateKey (const char *iName, const char *iValue);
-};
-
 struct iSector:public iBase
 {
 public:
@@ -168,7 +152,21 @@ public:
   }
 }
 
-struct iThing:public iPolygonSet {};
+struct iThing:public iBase
+{
+  const char *GetName () const;
+  void SetName (const char *iName);
+  void CompressVertices ();
+  int GetPolygonCount ();
+  iPolygon3D *GetPolygon (int idx);
+  iPolygon3D *CreatePolygon (const char *iName);
+  int GetVertexCount ();
+  csVector3 &GetVertex (int idx);
+  csVector3 &GetVertexW (int idx);
+  csVector3 &GetVertexC (int idx);
+  int CreateVertex (csVector3 &iVertex);
+  bool CreateKey (const char *iName, const char *iValue);
+}
 
 struct iPolygon3D : public iBase
 {

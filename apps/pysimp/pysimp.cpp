@@ -106,7 +106,9 @@ bool PySimple::Initialize (int argc, const char* const argv[],
 
   // Set up our room.
   csSector *room = engine->CreateCsSector ("room");
+  csThing* walls = engine->CreateSectorWalls (room, "walls");
 
+//@@@@@@@@@@@@@@@ PYTHON SCRIPT should create polygons on thing
   // Execute one method defined in pysimp.py
   // This will create the polygons in the room.
   if (!is->RunText ("pysimp.CreateRoom('stone')"))
@@ -114,10 +116,10 @@ bool PySimple::Initialize (int argc, const char* const argv[],
 
   is->DecRef ();
 
-printf ("verts:%d\n", room->GetNumVertices ());
-printf ("poly:%d\n", room->GetNumPolygons ());
+printf ("verts:%d\n", walls->GetNumVertices ());
+printf ("poly:%d\n", walls->GetNumPolygons ());
 
-  room->CompressVertices ();
+  walls->CompressVertices ();
 
   csStatLight* light;
   light = new csStatLight (0, 5, 0, 10, 1, 0, 0, false);

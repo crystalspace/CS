@@ -20,18 +20,17 @@
 #ifndef __CS_CSLOADER_H__
 #define __CS_CSLOADER_H__
 
-#include "csengine/polyset.h"
 #include "csparser/loadinfo.h"
 #include "csutil/csvector.h"
 #include "csgeom/quaterni.h"
 
 struct iImage;
 struct csRGBcolor;
-struct Color;
 struct iMotion;
 struct iMotionAnim;
 struct iSoundData;
 struct iSkeletonLimb;
+struct iPlugIn;
 class csTextureWrapper;
 class csMaterialWrapper;
 class csPolygonTemplate;
@@ -48,7 +47,10 @@ class csMeshWrapper;
 class csParticleSystem;
 class csKeyValuePair;
 class csMapNode;
+class csSector;
 class csFrame;
+class csObject;
+class csPolygon3D;
 
 /**
  * Bit flags for the loader (used in csLoader::SetMode).
@@ -93,23 +95,21 @@ class csLoader
   static csKeyValuePair* load_key (char* buf, csObject* pParent);
   /// Parse a map node definition and return a new object
   static csMapNode* load_node (char* name, char* buf, csSector* sec);
-  /// Default handler for objects derived from polygon set
-  static csPolygonSet& ps_process (csPolygonSet& ps, csSector* sector,
-      PSLoadInfo& info, int cmd, char* name, char* params);
   /// Parse the definition for a skydome and create the corresponding objects
-  static void skydome_process (csSector& sector, char* name, char* buf,
+  static void skydome_process (csThing& thing, char* name, char* buf,
     csMaterialWrapper* material);
   /// Parse the terrain engine's parameters
   static void terrain_process (csSector& sector, char* name, char* buf);
-  /// Load a sixface (i.e. box) definition (obsolete, should not be used)
-  static csThing* load_sixface (char* name, char* buf, csSector* sec, bool is_template);
   /// Parse the definition for a thing and create a thing object
   static csThing* load_thing (char* name, char* buf, csSector*, bool is_sky,
       	bool is_template);
+  static void load_thing_part (csThing* thing, csSector* sec, PSLoadInfo& info,
+	csReversibleTransform& obj, char* name, char* buf, int vt_offset,
+	bool isParent);
   /// Parse a 3D polygon definition and return a new object
   static csPolygon3D* load_poly3d (char* polyname, char* buf,
     csMaterialWrapper* default_material, float default_texlen,
-    csPolygonSet* parent);
+    csThing* parent, int vt_offset);
 
   /// Load a image and return an iImage object
   static iImage* load_image(const char* name);
@@ -122,8 +122,6 @@ class csLoader
     csMaterialWrapper* default_material, float default_texlen,
     csVector3* curve_vertices);
 
-  /// Parse a room definition (obsolete)
-  static csSector* load_room (char* secname, char* buf);
   /// Parse a sector definition and return a new object
   static csSector* load_sector (char* secname, char* buf);
 
@@ -176,9 +174,6 @@ class csLoader
 
   /// Find a material (and create one from texture if possible)
   static csMaterialWrapper* FindMaterial (const char *iName, bool onlyRegion = false);
-
-  /// Load texture definition
-  static void load_tex (char** buf, Color* colors, int num_colors, char* name);
 
   /**
    * If the polygon is a portal and has no special functions,

@@ -119,43 +119,44 @@ bool Video::Initialize (int argc, const char* const argv[],
   csMaterialWrapper* tm = engine->GetMaterials ()->FindByName ("stone");
 
   room = engine->CreateCsSector ("room");
+  csThing* walls = engine->CreateSectorWalls (room, "walls");
   csPolygon3D* p;
-  p = room->NewPolygon (tm);
+  p = walls->NewPolygon (tm);
   p->AddVertex (-5, 0, 5);
   p->AddVertex (5, 0, 5);
   p->AddVertex (5, 0, -5);
   p->AddVertex (-5, 0, -5);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
-  p = room->NewPolygon (tm);
+  p = walls->NewPolygon (tm);
   p->AddVertex (-5, 20, -5);
   p->AddVertex (5, 20, -5);
   p->AddVertex (5, 20, 5);
   p->AddVertex (-5, 20, 5);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
-  p = room->NewPolygon (tm);
+  p = walls->NewPolygon (tm);
   p->AddVertex (-5, 20, 5);
   p->AddVertex (5, 20, 5);
   p->AddVertex (5, 0, 5);
   p->AddVertex (-5, 0, 5);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
-  p = room->NewPolygon (tm);
+  p = walls->NewPolygon (tm);
   p->AddVertex (5, 20, 5);
   p->AddVertex (5, 20, -5);
   p->AddVertex (5, 0, -5);
   p->AddVertex (5, 0, 5);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
-  p = room->NewPolygon (tm);
+  p = walls->NewPolygon (tm);
   p->AddVertex (-5, 20, -5);
   p->AddVertex (-5, 20, 5);
   p->AddVertex (-5, 0, 5);
   p->AddVertex (-5, 0, -5);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
-  p = room->NewPolygon (tm);
+  p = walls->NewPolygon (tm);
   p->AddVertex (5, 20, -5);
   p->AddVertex (-5, 20, -5);
   p->AddVertex (-5, 0, -5);

@@ -31,6 +31,7 @@
 #include "csengine/portal.h"
 #include "csengine/dumper.h"
 #include "csengine/lppool.h"
+#include "csengine/thing.h"
 #include "csutil/garray.h"
 #include "csgeom/matrix2.h"
 #include "qint.h"
@@ -240,7 +241,7 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : csPolygonInt (),
   const char* tname = poly.GetName ();
   if (tname) SetName (tname);
 
-  poly_set = poly.poly_set;
+  thing = poly.thing;
   //sector = poly.sector;
 
   portal = poly.portal;
@@ -454,6 +455,13 @@ iMaterialHandle* csPolygon3D::GetMaterialHandle ()
   return material ? material->GetMaterialHandle () : NULL;
 }
 
+iThing* csPolygon3D::eiPolygon3D::GetParent ()
+{
+  iThing* it = QUERY_INTERFACE (scfParent->GetParent (), iThing);
+  it->DecRef ();
+  return it;
+}
+
 void csPolygon3D::eiPolygon3D::CreatePlane (const csVector3 &iOrigin, const csMatrix3 &iMatrix)
 {
   scfParent->SetTextureSpace (iMatrix, iOrigin);
@@ -592,6 +600,9 @@ void csPolygon3D::Finish (csSector* sector)
   if (uvz) { delete [] uvz; uvz=NULL; }
   isClipped = false;
 #endif
+
+  if (thing->flags.Check (CS_ENTITY_NOLIGHTING))
+    flags.Reset (CS_POLY_LIGHTING);
 
   switch (GetTextureType ())
   {
@@ -865,10 +876,10 @@ void csPolygon3D::AddLightpatch (csLightPatch* lp)
 
 int csPolygon3D::AddVertex (int v)
 {
-  if (v >= poly_set->GetNumVertices ())
+  if (v >= thing->GetNumVertices ())
   {
     CsPrintf (MSG_FATAL_ERROR, "Index number %d is too high for a polygon (max=%d)!\n",
-    	v, poly_set->GetNumVertices ());
+    	v, thing->GetNumVertices ());
     fatal_exit (0, false);
   }
   if (v < 0)
@@ -882,14 +893,14 @@ int csPolygon3D::AddVertex (int v)
 
 int csPolygon3D::AddVertex (const csVector3& v)
 {
-  int i = poly_set->AddVertex (v);
+  int i = thing->AddVertex (v);
   AddVertex (i);
   return i;
 }
 
 int csPolygon3D::AddVertex (float x, float y, float z)
 {
-  int i = poly_set->AddVertex (x, y, z);
+  int i = thing->AddVertex (x, y, z);
   AddVertex (i);
   return i;
 }
@@ -1524,7 +1535,7 @@ bool csPolygon3D::IntersectRayPlane (const csVector3& start, const csVector3& en
   return r >= 0;
 }
 
-void csPolygon3D::InitLightMaps (csPolygonSet* owner, bool do_cache, int index)
+void csPolygon3D::InitLightMaps (csThing* owner, bool do_cache, int index)
 {
   if (orig_poly) return;
   csPolyTexLightMap* lmi = GetLightMapInfo ();
@@ -1935,7 +1946,7 @@ void csPolygon3D::CalculateDelayedLighting (csFrustumView *lview)
   FillLightMap (new_lview);
 }
 
-void csPolygon3D::CacheLightMaps (csPolygonSet* owner, int index)
+void csPolygon3D::CacheLightMaps (csThing* owner, int index)
 {
   if (orig_poly) return;
   csPolyTexLightMap* lmi = GetLightMapInfo ();

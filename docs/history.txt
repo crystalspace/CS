@@ -1,6 +1,53 @@
 The history order has been reversed so that new features are at the top.
 
 18-Feb-2001
+	- Renamed csPolygonSetBBox to csThingBBox.
+	- Moved the octree from csSector to csThing. Added
+	  csThing::BuildStaticTree() to create this tree.
+	- Changed the implementation of csSector::UseStaticTree() so that
+	  it will now call BuildStaticTree() for all things having the
+	  CS_ENTITY_VISTREE flag set. At this moment only one such thing
+	  will be properly handled by csSector (at least what visibility
+	  is concerned). In the past the octree was built for all things
+	  which were then merged into one big thing. Now the tree is
+	  built on one thing alone.
+	- Added new CS_ENTITY_VISTREE flag for csThing which means this
+	  thing will get an octree. Removed CS_ENTITY_NOBSP flag which is
+	  no longer useful now. Added 'VISTREE' flag for loader and
+	  removed 'NOBSP' flag.
+	- csPolygonTree (octree and bsp trees) are now attached to a csThing
+	  instead of a csSector.
+	- Removed support for 'BSP', 'LIGHTX', 'ACTIVATE', 'TRIGGER',
+	  and 'MAX_TEXTURES' statements in the loader. These have been
+	  obsolete for a long time.
+	- Added support for parts in things. In the loader it is now possible
+	  to define a thing which contains parts. This is mainly
+	  useful for the representation of the static thing as you can
+	  then still maintain a logical division of the static thing into
+	  seperate sub-things. Note that at this moment the engine doesn't
+	  keep track of the logical units. It is simply the loader that
+	  allows this syntax. A 'PART' is completely similar to a THING
+	  except that it can only occur as part of another THING or PART
+	  and that it has no engine representation (at the moment). All
+	  part's in a thing are simply merged.
+	- Updated all CS apps to work with all the recent changes.
+	- csThing is now responsible for drawing its own static tree if
+	  it has one.
+	- Started work on iVisibilityCuller and iVisibilityObject. Using these
+	  two SCF interfaces it will be possible to seperate visibility
+	  culling logically and physically from the engine itself.
+	  Objects that implement iVisibilityCuller know how to test visibility
+	  for objects. The visibility culler will work with objects that
+	  implement iVisibilityObject. This will eventually make it
+	  possible to plug in other visibility systems into CS without
+	  changing the engine. This system is not yet working.
+	- Extended iMovable and csMovable with a list of movement listeners.
+	  A movement listener is some other object that is interested
+	  in hearing whenever the movable changes (i.e. the object moves).
+	  This will be used for visibility testing. The visibility culler
+	  will add itself as a listener to the movable of the objects it
+	  wants to test.
+18-Feb-2001
 	- Eric Sunshine eliminated a compilation warning in levtool.cpp on
 	  BeOS.
 	- Eric Sunshine finished the conversion of the Glide 3D driver to the
@@ -35,6 +82,28 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine fixed several Texinfo mark-up errors in the User's
 	  Manual.
 17-Feb-2001
+	- csSector is now properly seperated from csPolygonSet. Sectors
+	  no longer contain polygons.
+	- Added csEngine::CreateSectorWalls() which is a conveniance
+	  function that will create the thing which is supposed to
+	  contain the convex outline of the sector. This function is added
+	  to make it easier to convert old code that adds polygons to the
+	  sector to new code where the same polygons are added to the
+	  'outline thing'.
+	- Added iSector and csSector::CalculateSectorBBox() to calculate the
+	  bounding box of all objects in a sector (mesh objects and things
+	  currently).
+	- Rain and snow console commands in WalkTest now use
+	  CalculateSectorBBox() to calculate the bounding box for the
+	  particle system.
+	- Moved support for SKYDOME command in csloader to the thing
+	  loader instead of the sector loader.
+	- Removed iPolygonSet and put all functionality in iThing.
+	- Removed all the Dumper::Memory() functions. They were incorrect,
+	  difficult to maintain and almost impossible to correctly implement
+	  with all the geometry moving to plugins.
+	- Removed the class csPolygonSet and moved all functionality to
+	  csThing.
 	- Eric Sunshine defined the missing DESCRIPTION.OS.beos variable in
 	  lib/cssys/beos/beos.mak.
 	- Eric Sunshine eliminated a compilation error in cfgfile.cpp on BeOS.
@@ -49,11 +118,41 @@ The history order has been reversed so that new features are at the top.
 	  This caused a bug because the dynamic lighting routine can't handle
 	  this correctly. Rather than fixing this routine (which would make
 	  it slower) I choose to just disable this feature.
-	- The dynamic lighting routine also accounts for space warping portals
-	  now.
+	- The dynamic lighting routine also accounts for space warping
+	  portals now.
+	- Added new flags for things: CS_ENTITY_ZFILL to use Z-fill instead
+	  of Z-buffer for rendering, CS_ENTITY_INVISIBLE to not render at
+	  all, CS_ENTITY_NOSHADOWS for not casting shadows,
+	  CS_ENTITY_NOLIGHTING to disable lighting, CS_ENTITY_NOBSP
+	  to exclude this object from bsp or octrees, and CS_ENTITY_BACK2FRONT
+	  to render this object back to front (together with objects in
+	  the same render order queue).
+	- Removed 'use_z_buf' parameter to csThing::Draw(). This is now
+	  controlled with the CS_ENTITY_ZFILL flag.
+	- Sky objects automatically get the CS_ENTITY_ZFILL flag.
+	- Added support in the thing loader for the flags INVISIBLE, ZFILL,
+	  NOSHADOWS, NOLIGHTING, NOBSP, and BACK2FRONT.
+	- Added 'shadow_thing_mask' and 'shadow_thing_value' to csFrustumView.
+	  Every thing that is processed will be tested against this flag.
+	  If it matches it will be used for shadow generation. Otherwise
+	  not. The lighting routines will set these values so that
+	  only things which have CS_ENTITY_NOSHADOWS NOT set will generate
+	  shadows. This is for csSector::CheckFrustum().
+	- Added 'process_thing_mask' and 'process_thing_value' to
+	  csFrustumView. Every thing that is processed will be tested
+	  against this flag. If it matches CheckFrustum() will recursively
+	  call itself for this thing too. The lighting routines will set
+	  these values so that only things which have CS_ENTITY_NOLIGHTING
+	  NOT set will be further processed.
 	- Removed a lot of the obsolete tokens in csparser.
 	- Fixed a bug in csThing::MergeTemplate(). The function did not
 	  correctly copy the flags from the template to the thing.
+	- Started a VERY fundamental change in the engine. The sector will
+	  no longer inherit from csPolygonSet and will thus no longer be
+	  able to hold polygons. A sector is simply a container of objects.
+	  The outer walls of a sector can be created using a thing object.
+	- Finally removed the very old and ugly obsolete ROOM and SIXFACE
+	  statements from the loader. Old levels will no longer be supported.
 	- Fixed a bug in simple.
 	- Eric Sunshine fixed a couple of problems in
 	  ddgTriangle3::intersectPointTriangle() which were reported by

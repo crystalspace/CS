@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -28,6 +28,7 @@ class WideSparse3D;
 class csSector;
 class csMaterialWrapper;
 class csPolygon3D;
+class csThing;
 
 /**
  * Data for every room in the infinite maze.
@@ -36,6 +37,7 @@ struct InfRoomData
 {
   int x, y, z;
   csSector* sector;
+  csThing* walls;
 };
 
 /**
@@ -55,7 +57,7 @@ public:
 
 
   ///
-  void create_one_side (csSector* room, char* pname,
+  void create_one_side (csThing* walls, char* pname,
 	csMaterialWrapper* tm, csMaterialWrapper* tm2,
 	float x1, float y1, float z1,
 	float x2, float y2, float z2,

@@ -31,7 +31,7 @@ class csPolygonInt;
 class csPolygonIntPool;
 class csPolyTreeObject;
 class csPolygonTreeNode;
-class csSector;
+class csThing;
 class Dumper;
 
 /**
@@ -81,7 +81,7 @@ public:
   csPolyTreeObject* GetObject () { return object; }
 
   /// Visit this stub while traversing the tree (octree or BSP tree).
-  virtual void* Visit (csSector* sector, csTreeVisitFunc* func, void* data) = 0;
+  virtual void* Visit (csThing* thing, csTreeVisitFunc* func, void* data) = 0;
 
   /// Initialize this stub.
   virtual void Initialize () = 0;
@@ -130,9 +130,9 @@ public:
   int GetNumPolygons () { return polygons.GetNumPolygons (); }
 
   /// Visit this stub while traversing the tree (octree or BSP tree).
-  virtual void* Visit (csSector* sector, csTreeVisitFunc* func, void* data)
+  virtual void* Visit (csThing* thing, csTreeVisitFunc* func, void* data)
   {
-    return func (sector, polygons.GetPolygons (), polygons.GetNumPolygons (),
+    return func (thing, polygons.GetPolygons (), polygons.GetNumPolygons (),
     	false, data);
   }
 

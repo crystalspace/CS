@@ -904,6 +904,13 @@ public:
   csSector* CreateCsSector (const char *iName);
 
   /**
+   * Conveniance function to create the thing containing the
+   * convex outline of a sector. The thing will be empty but
+   * it will have CS_ENTITY_ZFILL set.
+   */
+  csThing* CreateSectorWalls (csSector* sector, const char* name);
+
+  /**
    * Add a dynamic light to the engine.
    */
   void AddDynLight (csDynLight* dyn);

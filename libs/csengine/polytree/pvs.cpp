@@ -1135,6 +1135,8 @@ static float randflt ()
 bool csOctree::BoxCanSeeOccludeeSuperSlow (const csBox3& box,
 	const csBox3& occludee_box)
 {
+#if 0
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
   int tries = 0;
   csVector3 box_pos, occludee_pos;
   for (;;)
@@ -1164,6 +1166,7 @@ error:
 printf ("(%f,%f,%f) - (%f,%f,%f)\n", box_pos.x, box_pos.y, box_pos.z,
 occludee_pos.x, occludee_pos.y, occludee_pos.z);
   exit (0);
+#endif
   return true;
 }
 
@@ -1432,6 +1435,8 @@ static bool MarkParentsVisible (csPVS& pvs, csOctreeNode* node)
 
 void csOctree::BuildQADPVS (csOctreeNode* node)
 {
+#if 0
+//@@@@@@@@@@@@@@@@@
   if (!node) return;
 
   if (node->IsLeaf ())
@@ -1488,6 +1493,7 @@ void csOctree::BuildQADPVS (csOctreeNode* node)
     for (i = 0 ; i < 8 ; i++)
       BuildQADPVS ((csOctreeNode*)node->children[i]);
   }
+#endif
 }
 
 static void SplitOptPlane2 (const csPoly3D* np, csPoly3D& inputF, const csPoly3D** npF,

@@ -31,7 +31,6 @@
 #include "csengine/thing.h"
 #include "csengine/wirefrm.h"
 #include "csengine/polytext.h"
-#include "csengine/polyset.h"
 #include "csengine/polygon.h"
 #include "csengine/pol2d.h"
 #include "csengine/sector.h"
@@ -83,7 +82,7 @@ void WalkTest::CreateColliders ()
 {
   csPolygon3D *p;
   iPolygonMesh* mesh;
-  plbody = new csPolygonSet (engine);
+  plbody = new csThing (engine);
   plbody->SetName ("Player's Body");
 
   plbody->AddVertex(-DX_2, OY,    -DZ_2);
@@ -131,7 +130,7 @@ void WalkTest::CreateColliders ()
   body_radius = plbody->GetRadius ();
   mesh->DecRef ();
 
-  pllegs = new csPolygonSet (engine);
+  pllegs = new csThing (engine);
 
   pllegs->AddVertex(-DX_2L, OYL,     -DZ_2L);
   pllegs->AddVertex(-DX_2L, OYL,     DZ_2L);

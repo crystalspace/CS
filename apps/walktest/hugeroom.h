@@ -24,7 +24,6 @@
 class csEngine;
 class csSector;
 class csPolygon3D;
-class csPolygonSet;
 class csPolyTxtPlane;
 class csThing;
 
@@ -95,12 +94,12 @@ private:
 	float xdim, float ydim, float zdim, float angle_y);
 
   ///
-  csPolygon3D* create_polygon (csSector* sector, csPolygonSet* thing,
+  csPolygon3D* create_polygon (csThing* thing,
   	const csVector3& p1, const csVector3& p2, const csVector3& p3,
 	int txt);
 
   ///
-  void create_wall (csSector* sector, csPolygonSet* thing,
+  void create_wall (csThing* thing,
   	const csVector3& p1, const csVector3& p2, const csVector3& p3,
   	const csVector3& p4, int hor_res, int ver_res, int txt);
 

@@ -99,68 +99,35 @@ void add_particles_rain (csSector* sector, char* matname, int num, float speed)
     return;
   }
 
-  csPolygonSetBBox* pset_bbox = sector->GetBoundingBox ();
-  csPolygonSet* pset = sector;
-  if (!pset_bbox)
-  {
-    sector->CreateBoundingBox ();
-    pset_bbox = sector->GetBoundingBox ();
-    if (!pset_bbox)
-    {
-      // If there still is no bbox we calculate one for the static
-      // thing inside.
-      csThing* thing = sector->GetStaticThing ();
-      pset = thing;
-      if (thing)
-      {
-        pset_bbox = thing->GetBoundingBox ();
-	if (!pset_bbox)
-	{
-	  thing->CreateBoundingBox ();
-          pset_bbox = thing->GetBoundingBox ();
-	}
-      }
-    }
-  }
-  if (pset_bbox)
-  {
-    csBox3 bbox;
-    bbox.StartBoundingBox (pset->Vwor (pset_bbox->i1));
-    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i2));
-    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i3));
-    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i4));
-    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i5));
-    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i6));
-    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i7));
-    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i8));
+  csBox3 bbox;
+  sector->CalculateSectorBBox (bbox, true, false, false);
 
-    // @@@ Memory leak on factories!
-    iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.rain",
-      	  "MeshObj", iMeshObjectType);
-    if (!type) type = LOAD_PLUGIN (System, "crystalspace.mesh.object.rain",
-      	  "MeshObj", iMeshObjectType);
-    iMeshObjectFactory* factory = type->NewFactory ();
-    iMeshObject* mesh = factory->NewInstance ();
-    csMeshWrapper* exp = new csMeshWrapper (Sys->view->GetEngine (), mesh);
-    mesh->DecRef ();
-    Sys->view->GetEngine ()->meshes.Push (exp);
-    exp->GetMovable ().SetSector (sector);
-    exp->GetMovable ().UpdateMove ();
+  // @@@ Memory leak on factories!
+  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.rain",
+    	  "MeshObj", iMeshObjectType);
+  if (!type) type = LOAD_PLUGIN (System, "crystalspace.mesh.object.rain",
+    	  "MeshObj", iMeshObjectType);
+  iMeshObjectFactory* factory = type->NewFactory ();
+  iMeshObject* mesh = factory->NewInstance ();
+  csMeshWrapper* exp = new csMeshWrapper (Sys->view->GetEngine (), mesh);
+  mesh->DecRef ();
+  Sys->view->GetEngine ()->meshes.Push (exp);
+  exp->GetMovable ().SetSector (sector);
+  exp->GetMovable ().UpdateMove ();
 
-    iParticleState* partstate = QUERY_INTERFACE (mesh, iParticleState);
-    partstate->SetMaterialWrapper (QUERY_INTERFACE (mat, iMaterialWrapper));
-    partstate->SetMixMode (CS_FX_ADD);
-    partstate->SetColor (csColor (.25,.25,.25));
+  iParticleState* partstate = QUERY_INTERFACE (mesh, iParticleState);
+  partstate->SetMaterialWrapper (QUERY_INTERFACE (mat, iMaterialWrapper));
+  partstate->SetMixMode (CS_FX_ADD);
+  partstate->SetColor (csColor (.25,.25,.25));
 
-    iRainState* rainstate = QUERY_INTERFACE (mesh, iRainState);
-    rainstate->SetNumberParticles (num);
-    rainstate->SetDropSize (.3/50., .3);
-    rainstate->SetLighting (false);
-    rainstate->SetBox (bbox.Min (), bbox.Max ());
-    rainstate->SetFallSpeed (csVector3 (0, -speed, 0));
-    partstate->DecRef ();
-    rainstate->DecRef ();
-  }
+  iRainState* rainstate = QUERY_INTERFACE (mesh, iRainState);
+  rainstate->SetNumberParticles (num);
+  rainstate->SetDropSize (.3/50., .3);
+  rainstate->SetLighting (false);
+  rainstate->SetBox (bbox.Min (), bbox.Max ());
+  rainstate->SetFallSpeed (csVector3 (0, -speed, 0));
+  partstate->DecRef ();
+  rainstate->DecRef ();
 }
 
 //===========================================================================
@@ -177,69 +144,36 @@ void add_particles_snow (csSector* sector, char* matname, int num, float speed)
     return;
   }
 
-  csPolygonSetBBox* pset_bbox = sector->GetBoundingBox ();
-  csPolygonSet* pset = sector;
-  if (!pset_bbox)
-  {
-    sector->CreateBoundingBox ();
-    pset_bbox = sector->GetBoundingBox ();
-    if (!pset_bbox)
-    {
-      // If there still is no bbox we calculate one for the static
-      // thing inside.
-      csThing* thing = sector->GetStaticThing ();
-      pset = thing;
-      if (thing)
-      {
-        pset_bbox = thing->GetBoundingBox ();
-	if (!pset_bbox)
-	{
-	  thing->CreateBoundingBox ();
-          pset_bbox = thing->GetBoundingBox ();
-	}
-      }
-    }
-  }
-  if (pset_bbox)
-  {
-    csBox3 bbox;
-    bbox.StartBoundingBox (pset->Vwor (pset_bbox->i1));
-    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i2));
-    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i3));
-    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i4));
-    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i5));
-    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i6));
-    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i7));
-    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i8));
+  csBox3 bbox;
+  sector->CalculateSectorBBox (bbox, true, false, false);
 
-    // @@@ Memory leak on factories!
-    iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.snow",
-      	  "MeshObj", iMeshObjectType);
-    if (!type) type = LOAD_PLUGIN (System, "crystalspace.mesh.object.snow",
-      	  "MeshObj", iMeshObjectType);
-    iMeshObjectFactory* factory = type->NewFactory ();
-    iMeshObject* mesh = factory->NewInstance ();
-    csMeshWrapper* exp = new csMeshWrapper (Sys->view->GetEngine (), mesh);
-    mesh->DecRef ();
-    Sys->view->GetEngine ()->meshes.Push (exp);
-    exp->GetMovable ().SetSector (sector);
-    exp->GetMovable ().UpdateMove ();
+  // @@@ Memory leak on factories!
+  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.snow",
+    	  "MeshObj", iMeshObjectType);
+  if (!type) type = LOAD_PLUGIN (System, "crystalspace.mesh.object.snow",
+    	  "MeshObj", iMeshObjectType);
+  iMeshObjectFactory* factory = type->NewFactory ();
+  iMeshObject* mesh = factory->NewInstance ();
+  csMeshWrapper* exp = new csMeshWrapper (Sys->view->GetEngine (), mesh);
+  mesh->DecRef ();
+  Sys->view->GetEngine ()->meshes.Push (exp);
+  exp->GetMovable ().SetSector (sector);
+  exp->GetMovable ().UpdateMove ();
 
-    iParticleState* partstate = QUERY_INTERFACE (mesh, iParticleState);
-    partstate->SetMaterialWrapper (QUERY_INTERFACE (mat, iMaterialWrapper));
-    partstate->SetMixMode (CS_FX_ADD);
-    partstate->SetColor (csColor (.25,.25,.25));
+  iParticleState* partstate = QUERY_INTERFACE (mesh, iParticleState);
+  partstate->SetMaterialWrapper (QUERY_INTERFACE (mat, iMaterialWrapper));
+  partstate->SetMixMode (CS_FX_ADD);
+  partstate->SetColor (csColor (.25,.25,.25));
 
-    iSnowState* snowstate = QUERY_INTERFACE (mesh, iSnowState);
-    snowstate->SetNumberParticles (num);
-    snowstate->SetDropSize (.07, .07);
-    snowstate->SetLighting (false);
-    snowstate->SetBox (bbox.Min (), bbox.Max ());
-    snowstate->SetFallSpeed (csVector3 (0, -speed, 0));
-    snowstate->SetSwirl (0.2);
-    partstate->DecRef ();
-    snowstate->DecRef ();
-  }
+  iSnowState* snowstate = QUERY_INTERFACE (mesh, iSnowState);
+  snowstate->SetNumberParticles (num);
+  snowstate->SetDropSize (.07, .07);
+  snowstate->SetLighting (false);
+  snowstate->SetBox (bbox.Min (), bbox.Max ());
+  snowstate->SetFallSpeed (csVector3 (0, -speed, 0));
+  snowstate->SetSwirl (0.2);
+  partstate->DecRef ();
+  snowstate->DecRef ();
 }
 
 //===========================================================================

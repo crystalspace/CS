@@ -42,7 +42,6 @@ class csWireFrameCam;
 class PhysicsLibrary;
 class InfiniteMaze;
 class HugeRoom;
-class csPolygonSet;
 struct iSoundData;
 struct iCollideSystem;
 struct iPerfStats;
@@ -295,7 +294,7 @@ public:
   iCollideSystem* collide_system;
 
   /// Player's body (as a 3D model) and legs
-  csPolygonSet *plbody, *pllegs;
+  csThing *plbody, *pllegs;
 
   /// The console input plugin
   iConsoleInput *ConsoleInput;

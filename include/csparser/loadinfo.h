@@ -33,12 +33,13 @@ public:
   char* mat_set_name;
   csReversibleTransform hard_trans;
   bool do_hard_trans;
+  bool is_convex;
   
   ///
   PSLoadInfo () : default_material (NULL),
    default_texlen (1),
    use_mat_set (false), mat_set_name (NULL),
-   do_hard_trans (false) {}
+   do_hard_trans (false), is_convex (false) {}
 
   void SetTextureSet (const char* name)
   {

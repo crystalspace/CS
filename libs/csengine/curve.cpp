@@ -21,7 +21,6 @@
 #include "qsqrt.h"
 #include "csengine/bezier.h"
 #include "csengine/curve.h"
-#include "csengine/polyset.h"
 #include "csengine/light.h"
 #include "csengine/polytext.h"
 #include "csengine/polygon.h"
@@ -266,7 +265,7 @@ void csCurve::Normal (csVector3& /*vec*/, double /*u*/, double /*v*/)
 // #define CURVE_LM_SIZE 32
 #define CURVE_LM_SIZE (8 - 2) /*this is the real value - 2*/
 
-void csCurve::InitLightMaps (csPolygonSet* owner, csSector* sector,
+void csCurve::InitLightMaps (csThing* owner, csSector* sector,
     	bool do_cache, int index)
 {
   if (!IsLightable ()) return;
@@ -682,7 +681,7 @@ void csCurve::SetObject2World (csReversibleTransform* o2w)
   }
 }
 
-void csCurve::CacheLightMaps (csPolygonSet* owner, int index)
+void csCurve::CacheLightMaps (csThing* owner, int index)
 {
   if (!lightmap) return;
   if (!lightmap_up_to_date)

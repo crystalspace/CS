@@ -21,6 +21,7 @@
 #include "csengine/meshobj.h"
 #include "csengine/light.h"
 #include "csengine/engine.h"
+#include "csengine/thing.h"
 #include "igraph3d.h"
 
 IMPLEMENT_CSOBJTYPE (csMeshWrapper, csPObject)
@@ -125,8 +126,8 @@ void csMeshWrapper::UpdateInPolygonTrees ()
   csVector& sects = movable.GetSectors ();
   for (i = 0 ; i < sects.Length () ; i++)
   {
-    tree = ((csSector*)sects[i])->GetStaticTree ();
-    if (tree) break;
+    csThing* stat = ((csSector*)sects[i])->GetStaticThing ();
+    if (stat) { tree = stat->GetStaticTree (); break; }
   }
   if (!tree) return;
 
@@ -142,9 +143,10 @@ void csMeshWrapper::UpdateInPolygonTrees ()
   // Here we need to insert in trees where this mesh lives.
   for (i = 0 ; i < sects.Length () ; i++)
   {
-    tree = ((csSector*)sects[i])->GetStaticTree ();
-    if (tree)
+    csThing* stat = ((csSector*)sects[i])->GetStaticThing ();
+    if (stat)
     {
+      tree = stat->GetStaticTree ();
       // Temporarily increase reference to prevent free.
       bbox.GetBaseStub ()->IncRef ();
       tree->AddObject (&bbox);

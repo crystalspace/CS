@@ -71,7 +71,7 @@ HugeRoom::HugeRoom ()
   seed = 1654594509;
 }
 
-void HugeRoom::create_wall (csSector* sector, csPolygonSet* thing,
+void HugeRoom::create_wall (csThing* thing,
 	const csVector3& p1, const csVector3& p2, const csVector3& p3,
 	const csVector3& p4, int hor_res, int ver_res, int txt)
 {
@@ -88,12 +88,12 @@ void HugeRoom::create_wall (csSector* sector, csPolygonSet* thing,
       csVector3 v2 = v12b + ((float)j/(float)ver_res) * (v43b-v12b);
       csVector3 v3 = v12b + ((float)(j+1)/(float)ver_res) * (v43b-v12b);
       csVector3 v4 = v12a + ((float)(j+1)/(float)ver_res) * (v43a-v12a);
-      p = create_polygon (sector, thing, v1, v2, v3, txt);
-      create_polygon (sector, thing, v1, v3, v4, txt);
+      p = create_polygon (thing, v1, v2, v3, txt);
+      create_polygon (thing, v1, v3, v4, txt);
     }
 }
 
-csPolygon3D* HugeRoom::create_polygon (csSector*, csPolygonSet* thing,
+csPolygon3D* HugeRoom::create_polygon (csThing* thing,
 	const csVector3& p1, const csVector3& p2, const csVector3& p3,
 	int txt)
 {
@@ -148,7 +148,7 @@ csThing* HugeRoom::create_thing (csSector* sector, const csVector3& pos)
   csVector3 p1 (rand2 (thing_max_x), rand2 (thing_max_y), rand2 (thing_max_z));
   csVector3 p2 (rand2 (thing_max_x), rand2 (thing_max_y), rand2 (thing_max_z));
   csVector3 p3 (rand2 (thing_max_x), rand2 (thing_max_y), rand2 (thing_max_z));
-  create_polygon (sector, thing, p1, p2, p3, txt);
+  create_polygon (thing, p1, p2, p3, txt);
 #endif
 #ifdef ROOM_CITYBLOCKS
   float y_low = -wall_dim;
@@ -162,11 +162,11 @@ csThing* HugeRoom::create_thing (csSector* sector, const csVector3& pos)
   csVector3 p6 (thing_cityblock_dim/2,y_high,thing_cityblock_dim/2);
   csVector3 p7 (thing_cityblock_dim/2,y_high,-thing_cityblock_dim/2);
   csVector3 p8 (-thing_cityblock_dim/2,y_high,-thing_cityblock_dim/2);
-  create_wall (sector, thing, p5, p6, p7, p8, 3, 3, txt);	// Top
-  create_wall (sector, thing, p8, p7, p3, p4, 3, 3, txt);	// Front
-  create_wall (sector, thing, p7, p6, p2, p3, 3, 3, txt);	// Right
-  create_wall (sector, thing, p5, p8, p4, p1, 3, 3, txt);	// Left
-  create_wall (sector, thing, p6, p5, p1, p2, 3, 3, txt);	// Back
+  create_wall (thing, p5, p6, p7, p8, 3, 3, txt);	// Top
+  create_wall (thing, p8, p7, p3, p4, 3, 3, txt);	// Front
+  create_wall (thing, p7, p6, p2, p3, 3, 3, txt);	// Right
+  create_wall (thing, p5, p8, p4, p1, 3, 3, txt);	// Left
+  create_wall (thing, p6, p5, p1, p2, 3, 3, txt);	// Back
 #endif
 #ifdef ROOM_RANDOM_WALLS
   thing_min_poly = 3;
@@ -180,7 +180,7 @@ csThing* HugeRoom::create_thing (csSector* sector, const csVector3& pos)
     csVector3 p2 (rand2 (thing_max_x), rand2 (thing_max_y), rand2 (thing_max_z));
     csVector3 p3 (rand2 (thing_max_x), rand2 (thing_max_y), rand2 (thing_max_z));
     csVector3 p4 = p2 + (p1-p2) + (p3-p2);
-    create_wall (sector, thing, p1, p2, p3, p4, 4, 4, txt);
+    create_wall (thing, p1, p2, p3, p4, 4, 4, txt);
   }
 #endif
 #ifdef ROOM_PURE_RANDOM
@@ -192,8 +192,8 @@ csThing* HugeRoom::create_thing (csSector* sector, const csVector3& pos)
   for (i = 0 ; i < num ; i++)
   {
     int txt = (rand () & 0x8) ? 1 : 2;
-    create_polygon (sector, thing, p1, p2, p3, txt);
-    create_polygon (sector, thing, p3, p2, p1, txt);
+    create_polygon (thing, p1, p2, p3, txt);
+    create_polygon (thing, p3, p2, p1, txt);
     p1 = p2;
     p2 = p3;
     p3 = csVector3 (rand2 (thing_max_x), rand2 (thing_max_y), rand2 (thing_max_z));
@@ -230,11 +230,11 @@ csThing* HugeRoom::create_building (csSector* sector, const csVector3& pos,
   csVector3 p8 (-xdim/2,y_high,-zdim/2);
   int hor_div = 3;//7	(10)
   int ver_div = 4;//14	(20)
-  create_wall (sector, thing, p5, p6, p7, p8, hor_div, hor_div, txt);	// Top
-  create_wall (sector, thing, p8, p7, p3, p4, hor_div, ver_div, txt);	// Front
-  create_wall (sector, thing, p7, p6, p2, p3, hor_div, ver_div, txt);	// Right
-  create_wall (sector, thing, p5, p8, p4, p1, hor_div, ver_div, txt);	// Left
-  create_wall (sector, thing, p6, p5, p1, p2, hor_div, ver_div, txt);	// Back
+  create_wall (thing, p5, p6, p7, p8, hor_div, hor_div, txt);	// Top
+  create_wall (thing, p8, p7, p3, p4, hor_div, ver_div, txt);	// Front
+  create_wall (thing, p7, p6, p2, p3, hor_div, ver_div, txt);	// Right
+  create_wall (thing, p5, p8, p4, p1, hor_div, ver_div, txt);	// Left
+  create_wall (thing, p6, p5, p1, p2, hor_div, ver_div, txt);	// Back
 
   csMovable& move = thing->GetMovable ();
   move.SetSector (sector);
@@ -398,7 +398,7 @@ csSector* HugeRoom::create_huge_world (csEngine* engine)
 #if defined(ROOM_CITY)
   csThing* floorthing = new csThing (engine);
   floorthing->SetName ("floor"); 
-  create_wall (room, floorthing,
+  create_wall (floorthing,
   	csVector3 (-wall_dim, -wall_dim+1, wall_dim),
   	csVector3 (wall_dim, -wall_dim+1, wall_dim),
   	csVector3 (wall_dim, -wall_dim+1, -wall_dim),
@@ -408,42 +408,43 @@ csSector* HugeRoom::create_huge_world (csEngine* engine)
 #elif !defined(ROOM_SMALL)
   csThing* floorthing = new csThing (engine);
   floorthing->SetName ("floor"); 
-  create_wall (room, floorthing, csVector3 (-3, -1, 3), csVector3 (3, -1, 3),
+  create_wall (floorthing, csVector3 (-3, -1, 3), csVector3 (3, -1, 3),
   	csVector3 (3, -1, -3), csVector3 (-3, -1, -3), 4, 4, 0);
-  create_wall (room, floorthing, csVector3 (-3, -1, -3), csVector3 (3, -1, -3),
+  create_wall (floorthing, csVector3 (-3, -1, -3), csVector3 (3, -1, -3),
   	csVector3 (3, -1, 3), csVector3 (-3, -1, 3), 4, 4, 0);
   floorthing->GetMovable ().SetSector (room);
   floorthing->GetMovable ().UpdateMove ();
 #endif
 
-  create_wall (room, room,
+  csThing* walls = engine->CreateSectorWalls (room, "walls");
+  create_wall (walls,
   	csVector3 (-wall_dim,wall_dim,wall_dim), csVector3 (wall_dim,wall_dim,wall_dim),
 	csVector3 (wall_dim,-wall_dim,wall_dim), csVector3 (-wall_dim,-wall_dim,wall_dim),
 	wall_num_tris, wall_num_tris, 0);
-  create_wall (room, room,
+  create_wall (walls,
   	csVector3 (wall_dim,wall_dim,-wall_dim), csVector3 (-wall_dim,wall_dim,-wall_dim),
 	csVector3 (-wall_dim,-wall_dim,-wall_dim), csVector3 (wall_dim,-wall_dim,-wall_dim),
 	wall_num_tris, wall_num_tris, 0);
-  create_wall (room, room,
+  create_wall (walls,
   	csVector3 (-wall_dim,wall_dim,-wall_dim), csVector3 (-wall_dim,wall_dim,wall_dim),
 	csVector3 (-wall_dim,-wall_dim,wall_dim), csVector3 (-wall_dim,-wall_dim,-wall_dim),
 	wall_num_tris, wall_num_tris, 0);
-  create_wall (room, room,
+  create_wall (walls,
   	csVector3 (wall_dim,wall_dim,wall_dim), csVector3 (wall_dim,wall_dim,-wall_dim),
 	csVector3 (wall_dim,-wall_dim,-wall_dim), csVector3 (wall_dim,-wall_dim,wall_dim),
 	wall_num_tris, wall_num_tris, 0);
-  create_wall (room, room,
+  create_wall (walls,
   	csVector3 (-wall_dim,-wall_dim,wall_dim), csVector3 (wall_dim,-wall_dim,wall_dim),
 	csVector3 (wall_dim,-wall_dim,-wall_dim), csVector3 (-wall_dim,-wall_dim,-wall_dim),
 	wall_num_tris, wall_num_tris, 0);
-  create_wall (room, room,
+  create_wall (walls,
   	csVector3 (-wall_dim,wall_dim,-wall_dim), csVector3 (wall_dim,wall_dim,-wall_dim),
 	csVector3 (wall_dim,wall_dim,wall_dim), csVector3 (-wall_dim,wall_dim,wall_dim),
 	wall_num_tris, wall_num_tris, 0);
 
   Sys->Printf (MSG_INITIALIZATION, "Number of polygons: %d\n", pol_nr);
   room->UseStaticTree (BSP_ALMOST_MINIMIZE_SPLITS, true);
-  room->GetStaticTree ()->Statistics ();
+  room->GetStaticThing ()->GetStaticTree ()->Statistics ();
 
   Sys->Printf (MSG_INITIALIZATION, "            vertices=%d\n",
   	room->GetStaticThing ()->GetNumVertices ());

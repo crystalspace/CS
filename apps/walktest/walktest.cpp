@@ -38,7 +38,6 @@
 #include "csengine/wirefrm.h"
 #include "csengine/polytext.h"
 #include "csengine/polytmap.h"
-#include "csengine/polyset.h"
 #include "csengine/polygon.h"
 #include "csengine/pol2d.h"
 #include "csengine/cbuffer.h"
@@ -1046,10 +1045,6 @@ void WalkTest::InitCollDet (csEngine* engine, csRegion* region)
     sn--;
     csSector* sp = (csSector*)engine->sectors[sn];
     if (region && !region->IsInRegion (sp)) continue;
-    // Initialize the sector itself.
-    mesh = QUERY_INTERFACE (sp, iPolygonMesh);
-    (void)new csCollider (*sp, collide_system, mesh);
-    mesh->DecRef ();
     // Initialize the things in this sector.
     int i;
     for (i = 0 ; i < sp->things.Length () ; i++)

@@ -253,7 +253,7 @@ class csSphereStub : public csObjectStub
 {
 public:
   /// Visit this stub while traversing the tree (octree or BSP tree).
-  virtual void* Visit (csSector* sector, csTreeVisitFunc* func, void* data);
+  virtual void* Visit (csThing* thing, csTreeVisitFunc* func, void* data);
 
   /// Initialize this stub.
   virtual void Initialize () { }

@@ -61,6 +61,14 @@ struct iSector : public iBase
   virtual void AddLight (iStatLight *light) = 0;
   /// Find a light with the given position and radius.
   virtual iStatLight *FindLight (float x, float y, float z, float dist) = 0;
+
+  /**
+   * Calculate the bounding box of all objects in this sector.
+   * This function is not very efficient as it will traverse all objects
+   * in the sector one by one and compute a bounding box from that.
+   */
+  virtual void CalculateSectorBBox (csBox3& bbox, bool do_things, bool do_meshes,
+  	bool do_terrain) = 0;
 };
 
 #endif // __ISECTOR_H__

@@ -188,7 +188,7 @@ public:
   /**
    * Create an empty tree for a parent container.
    */
-  csBspTree (csSector* sect, int mode = BSP_MINIMIZE_SPLITS);
+  csBspTree (csThing* thing, int mode = BSP_MINIMIZE_SPLITS);
 
   /**
    * Destroy the whole BSP tree (but not the actual polygons and parent
@@ -208,11 +208,6 @@ public:
   {
     Build (polygons.GetArray (), polygons.Length ());
   }
-
-  /**
-   * Create the tree for the default parent set.
-   */
-  void Build ();
 
   /// Traverse the tree from back to front starting at the root and 'pos'.
   void* Back2Front (const csVector3& pos, csTreeVisitFunc* func, void* data,

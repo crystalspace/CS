@@ -904,7 +904,7 @@ again:
     reset_vertex_colors (t);
     room->ShineLights (t);
   }
-  csPolygonSet::current_light_frame_number++;
+  csThing::current_light_frame_number++;
 }
 
 void Blocks::start_demo_shape (BlShapeType type, float x, float y, float z)
@@ -1683,7 +1683,7 @@ void Blocks::HandleGameMovement (cs_time elapsed_time)
     reset_vertex_colors (t);
     room->ShineLights (t);
   }
-  csPolygonSet::current_light_frame_number++;
+  csThing::current_light_frame_number++;
 }
 
 void Blocks::HandleMovement (cs_time elapsed_time)
@@ -1998,37 +1998,38 @@ void Blocks::InitGameRoom ()
 {
   csMaterialWrapper* tm = engine->GetMaterials ()->FindByName ("room");
   room = Sys->engine->CreateCsSector ("room");
+  csThing* walls = Sys->engine->CreateSectorWalls (room, "walls");
   Sys->set_cube_room (room);
   csPolygon3D* p;
-  p = room->NewPolygon (tm);
+  p = walls->NewPolygon (tm);
   p->AddVertex (-5, 0, 5);
   p->AddVertex (5, 0, 5);
   p->AddVertex (5, 0, -5);
   p->AddVertex (-5, 0, -5);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
-  p = room->NewPolygon (tm);
+  p = walls->NewPolygon (tm);
   p->AddVertex (-5, 20, 5);
   p->AddVertex (5, 20, 5);
   p->AddVertex (5, 0, 5);
   p->AddVertex (-5, 0, 5);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
-  p = room->NewPolygon (tm);
+  p = walls->NewPolygon (tm);
   p->AddVertex (5, 20, 5);
   p->AddVertex (5, 20, -5);
   p->AddVertex (5, 0, -5);
   p->AddVertex (5, 0, 5);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
-  p = room->NewPolygon (tm);
+  p = walls->NewPolygon (tm);
   p->AddVertex (-5, 20, -5);
   p->AddVertex (-5, 20, 5);
   p->AddVertex (-5, 0, 5);
   p->AddVertex (-5, 0, -5);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
-  p = room->NewPolygon (tm);
+  p = walls->NewPolygon (tm);
   p->AddVertex (5, 20, -5);
   p->AddVertex (-5, 20, -5);
   p->AddVertex (-5, 0, -5);
@@ -2072,9 +2073,10 @@ void Blocks::InitDemoRoom ()
 {
   csMaterialWrapper* demo_tm = engine->GetMaterials ()->FindByName ("clouds");
   demo_room = Sys->engine->CreateCsSector ("room");
+  csThing* walls = Sys->engine->CreateSectorWalls (demo_room, "walls");
 
   csPolygon3D* p;
-  p = demo_room->NewPolygon (demo_tm);
+  p = walls->NewPolygon (demo_tm);
   p->AddVertex (-50, 50, 50);
   p->AddVertex (50, 50, 50);
   p->AddVertex (50, -50, 50);
@@ -2315,7 +2317,7 @@ void Blocks::HandleLoweringPlanes (cs_time elapsed_time)
 
   // So that the engine knows to update the lights only when the frame
   // has changed (?).
-  csPolygonSet::current_light_frame_number++;
+  csThing::current_light_frame_number++;
 }
 
 void Blocks::NextFrame ()

@@ -47,6 +47,13 @@ csMovable::csMovable ()
 
 csMovable::~csMovable ()
 {
+  int i;
+  for (i = 0 ; i < listeners.Length () ; i++)
+  {
+    csMovableListener* ml = (csMovableListener*)listeners[i];
+    void* ml_data = listener_userdata[i];
+    ml (&scfiMovable, CS_MOVABLE_DESTROYED, ml_data);
+  }
   if (iparent) iparent->DecRef ();
 }
 
@@ -126,8 +133,35 @@ void csMovable::AddSector (csSector* sector)
   }
 }
 
+void csMovable::AddListener (csMovableListener* listener, void* userdata)
+{
+  RemoveListener (listener, userdata);
+  listeners.Push ((csSome)listener);
+  listener_userdata.Push (userdata);
+}
+
+void csMovable::RemoveListener (csMovableListener* listener, void* userdata)
+{
+  int idx;
+  for (idx = 0 ; idx < listeners.Length () ; idx++)
+  {
+    csMovableListener* ml = (csMovableListener*)listeners[idx];
+    if (ml == listener)
+    {
+      void* ml_data = listener_userdata[idx];
+      if (ml_data == userdata)
+      {
+	listeners.Delete (idx);
+	listener_userdata.Delete (idx);
+	return;
+      }
+    }
+  }
+}
+
 void csMovable::UpdateMove ()
 {
+//@@@@: the part below is obsolete but still needed. Listener system superceeds it.
   if (object->GetType () >= csThing::Type)
   {
     csThing* th = (csThing*)object;
@@ -142,6 +176,14 @@ void csMovable::UpdateMove ()
   {
     csCollection* col = (csCollection*)object;
     col->UpdateMove ();
+  }
+//@@@@
+  int i;
+  for (i = 0 ; i < listeners.Length () ; i++)
+  {
+    csMovableListener* ml = (csMovableListener*)listeners[i];
+    void* ml_data = listener_userdata[i];
+    ml (&scfiMovable, CS_MOVABLE_CHANGED, ml_data);
   }
 }
 

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -19,11 +19,12 @@
 #ifndef __CS_SECTOR_H__
 #define __CS_SECTOR_H__
 
+#include "csobject/pobject.h"
 #include "csobject/nobjvec.h"
-#include "csengine/polyset.h"
 #include "csengine/rview.h"
 #include "csengine/bsp.h"
 #include "csgeom/math3d.h"
+#include "csutil/cscolor.h"
 #include "isector.h"
 
 struct LightInfo;
@@ -35,17 +36,16 @@ class Polygon2D;
 class csCamera;
 class csDynLight;
 class Dumper;
-class csPolygonTree;
 class csPolygon2DQueue;
 class csProgressPulse;
 struct iGraphics3D;
 struct iStatLight;
 
 /**
- * A sector is a convex hull of polygons. It is
- * one of the base classes for the portal engine.
+ * A sector is a container for objects. It is one of
+ * the base classes for the portal engine.
  */
-class csSector : public csPolygonSet
+class csSector : public csPObject
 {
   friend class Dumper;
 
@@ -85,6 +85,12 @@ public:
   csNamedObjVector terrains;
 
 private:
+  /// Engine handle.
+  csEngine* engine;
+
+  /// Fog information.
+  csFog fog;
+
   /// Ambient light level for red in this sector.
   int level_r;
   /// Ambient light level for green in this sector.
@@ -96,37 +102,10 @@ private:
   int visited;
 
   /**
-   * If this variable is not NULL then it is a BSP or octree in this
-   * sector which includes all static (non-moving) csThings.
-   */
-  csPolygonTree* static_tree;
-
-  /**
    * If static_tree is not NULL then this is a pointer to the csThing
    * which holds all polygons of the non-moving csThings.
    */
   csThing* static_thing;
-
-  /**
-   * This function is called by the BSP tree traversal routine
-   * to draw a number of polygons.
-   */
-  static void* DrawPolygons (csSector*, csPolygonInt** polygon,
-  	int num, bool same_plane, void* data);
-
-  /**
-   * This function is called by the BSP tree traversal routine
-   * to test polygons against the C buffer and add them to a queue if needed.
-   */
-  static void* TestQueuePolygons (csSector*, csPolygonInt** polygon,
-  	int num, bool same_plane, void* data);
-
-  /**
-   * This function is called by the BSP tree traversal routine
-   * to test polygons against the quadtree and add them to a queue if needed.
-   */
-  static void* TestQueuePolygonsQuad (csSector*, csPolygonInt** polygon,
-  	int num, void* data);
 
   /**
    * This function is called by the BSP tree traversal routine
@@ -135,12 +114,15 @@ private:
   static void* CheckFrustumPolygons (csSector*, csPolygonInt** polygon,
   	int num, void* data);
 
-  /**
-   * Draw a number of polygons from a queue (used with C buffer processing).
-   */
-  void DrawPolygonsFromQueue (csPolygon2DQueue* queue, csRenderView* rview);
-
 public:
+  /**
+   * How many times are we busy drawing this sector (recursive).
+   * This is an important variable as it indicates to
+   * 'new_transformation' which set of camera vertices it should
+   * use.
+   */
+  int draw_busy;
+
   /**
    * Option variable: render portals?
    * If this variable is false portals are rendered as a solid polygon.
@@ -193,6 +175,9 @@ public:
    */
   virtual void Prepare (csSector* sector);
 
+  /// Get the engine for this sector.
+  csEngine* GetEngine () { return engine; }
+
   /**
    * Add a static or pseudo-dynamic light to this sector.
    */
@@ -225,22 +210,12 @@ public:
   csThing* GetStaticThing () { return static_thing; }
 
   /**
-   * Get the static polygon tree.
-   */
-  csPolygonTree* GetStaticTree () { return static_tree; }
-
-  /**
    * Call this function to generate a polygon tree for all csThings
-   * in this sector. This might make drawing more efficient because
-   * those things can then be drawn using Z-fill instead of Z-buffer.
-   * Also the c-buffer requires a tree of this kind.
-   * This function will only generate a tree for the csThings
-   * which cannot move. Note that you can no longer remove a csThing
-   * from the sector if it has been added to the static tree.
-   * The mode is given to the BSP building routines and can be one of the
-   * BSP_... flags.<p>
+   * in this sector which are marked as needing such a tree.
    * If 'octree' is true this function will create an octree with mini-bsp
    * trees instead of a BSP tree alone.
+   * Note that at this moment only one thing with such a tree will be
+   * properly supported.
    */
   void UseStaticTree (int mode = BSP_MINIMIZE_SPLITS, bool octree = false);
 
@@ -256,6 +231,25 @@ public:
    */
   void SetAmbientColor (int r, int g, int b)
   { level_r = r; level_g = g; level_b = b; }
+
+  /// Return true if this has fog.
+  bool HasFog () { return fog.enabled; }
+
+  /// Return fog structure.
+  csFog& GetFog () { return fog; }
+
+  /// Conveniance function to set fog to some setting.
+  void SetFog (float density, const csColor& color)
+  {
+    fog.enabled = true;
+    fog.density = density;
+    fog.red = color.red;
+    fog.green = color.green;
+    fog.blue = color.blue;
+  }
+
+  /// Disable fog.
+  void DisableFog () { fog.enabled = false; }
 
   /**
    * Follow a beam from start to end and return the first polygon that
@@ -370,6 +364,14 @@ public:
                                        const csVector3& end, csVector3& isect,
 				       float* pr = NULL);
 
+  /**
+   * Calculate the bounding box of all objects in this sector.
+   * This function is not very efficient as it will traverse all objects
+   * in the sector one by one and compute a bounding box from that.
+   */
+  void CalculateSectorBBox (csBox3& bbox, bool do_things, bool do_meshes,
+  	bool do_terrain);
+
   //------------------------------------------------
   // Everything for setting up the lighting system.
   //------------------------------------------------
@@ -389,40 +391,32 @@ public:
   void ShineLights (csThing*, csProgressPulse* = 0);
 
   CSOBJTYPE;
-  DECLARE_IBASE_EXT (csPolygonSet);
+  DECLARE_IBASE_EXT (csPObject);
 
   //------------------------- iSector interface -------------------------------
   struct eiSector : public iSector
   {
     DECLARE_EMBEDDED_IBASE (csSector);
 
-    /// Used by the engine to retrieve internal sector object (ugly)
     virtual csSector *GetPrivateObject ()
     { return scfParent; }
-    /// Create the static BSP or octree for this sector.
     virtual void CreateBSP ()
     { scfParent->UseStaticTree (); }
-
-    /// Find a sky with the given name.
     virtual iThing *GetSkyThing (const char *name);
-    /// Get the number of sky things in this sector.
     virtual int GetNumSkyThings ()
     { return scfParent->skies.Length (); }
-    /// Get a sky thing by index
     virtual iThing *GetSkyThing (int iIndex);
-
-    /// Find a thing with the given name.
     virtual iThing *GetThing (const char *name);
-    /// Get the number of things in this sector.
     virtual int GetNumThings ()
     { return scfParent->things.Length (); }
-    /// Get a thing by index
     virtual iThing *GetThing (int iIndex);
-
-    /// Add a static or pseudo-dynamic light to this sector.
     virtual void AddLight (iStatLight *light);
-    /// Find a light with the given position and radius.
     virtual iStatLight *FindLight (float x, float y, float z, float dist);
+    virtual void CalculateSectorBBox (csBox3& bbox, bool do_things, bool do_meshes,
+  	bool do_terrain)
+    {
+      scfParent->CalculateSectorBBox (bbox, do_things, do_meshes, do_terrain);
+    }
   } scfiSector;
 };
 

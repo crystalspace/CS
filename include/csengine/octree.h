@@ -384,7 +384,7 @@ public:
    * outer limits of the octree, and the number of polygons at which we
    * revert to a BSP tree.
    */
-  csOctree (csSector* sect, const csVector3& min_bbox,
+  csOctree (csThing* thing, const csVector3& min_bbox,
   	const csVector3& max_bbox, int bsp_num, int mode = BSP_MINIMIZE_SPLITS);
 
   /**
@@ -397,11 +397,6 @@ public:
    * Get the root.
    */
   csOctreeNode* GetRoot () { return (csOctreeNode*)root; }
-
-  /**
-   * Create the tree for the default parent set.
-   */
-  void Build ();
 
   /**
    * Create the tree with a given set of polygons.

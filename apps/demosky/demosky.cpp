@@ -165,8 +165,9 @@ bool Simple::Initialize (int argc, const char* const argv[],
   csMaterialWrapper* matd = sky_d->Initialize(this, engine, txtmgr, "sky_d");
 
   room = engine->CreateCsSector ("room");
+  csThing* walls = engine->CreateSectorWalls (room, "walls");
   csPolygon3D* p;
-  p = room->NewPolygon (matd);
+  p = walls->NewPolygon (matd);
   float size = 500.0; /// size of the skybox -- around 0,0,0 for now.
   float simi = size*255./256.; /// sizeminor
   p->AddVertex (-size, -simi, size);
@@ -178,7 +179,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   SetTexSpace (p, 256, p->Vobj (0), p->Vobj (1), 2.*size, p->Vobj(3), 2.*size);
   p->flags.Set(CS_POLY_LIGHTING, 0);
 
-  p = room->NewPolygon (matu);
+  p = walls->NewPolygon (matu);
   p->AddVertex (-size, simi, -size);
   p->AddVertex (size, simi, -size);
   p->AddVertex (size, simi, size);
@@ -188,7 +189,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   SetTexSpace (p, 256, p->Vobj (0), p->Vobj (1), 2.*size, p->Vobj(3), 2.*size);
   p->flags.Set(CS_POLY_LIGHTING, 0);
 
-  p = room->NewPolygon (matf);
+  p = walls->NewPolygon (matf);
   p->AddVertex (-size, size, simi);
   p->AddVertex (size, size, simi);
   p->AddVertex (size, -size, simi);
@@ -198,7 +199,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   SetTexSpace (p, 256, p->Vobj (0), p->Vobj (1), 2.*size, p->Vobj(3), 2.*size);
   p->flags.Set(CS_POLY_LIGHTING, 0);
 
-  p = room->NewPolygon (matr);
+  p = walls->NewPolygon (matr);
   p->AddVertex (simi, size, size);
   p->AddVertex (simi, size, -size);
   p->AddVertex (simi, -size, -size);
@@ -208,7 +209,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   SetTexSpace (p, 256, p->Vobj (0), p->Vobj (1), 2.*size, p->Vobj(3), 2.*size);
   p->flags.Set(CS_POLY_LIGHTING, 0);
 
-  p = room->NewPolygon (matl);
+  p = walls->NewPolygon (matl);
   p->AddVertex (-simi, size, -size);
   p->AddVertex (-simi, size, size);
   p->AddVertex (-simi, -size, size);
@@ -218,7 +219,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   SetTexSpace (p, 256, p->Vobj (0), p->Vobj (1), 2.*size, p->Vobj(3), 2.*size);
   p->flags.Set(CS_POLY_LIGHTING, 0);
 
-  p = room->NewPolygon (matb);
+  p = walls->NewPolygon (matb);
   p->AddVertex (size, size, -simi);
   p->AddVertex (-size, size, -simi);
   p->AddVertex (-size, -size, -simi);
