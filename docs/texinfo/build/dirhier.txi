@@ -382,7 +382,7 @@ Common DirectX (Win32) code
 X11 Line3D driver
 
 @item CS/plugins/video/canvas/macosx
-MacOS/X Cocoa, CoreGraphics, and OpenGL drivers
+MacOS/X OpenGL, CoreGraphics, and Cocoa 2D graphics drivers
 
 @item CS/plugins/video/canvas/memory
 Memory driver (render a scene directly to memory)
