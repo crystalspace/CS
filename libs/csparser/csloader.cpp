@@ -4800,7 +4800,11 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
 
       case CS_TOKEN_MERGE_NORMALS:
         {
-	  CsPrintf (MSG_WARNING, "MERGE_NORMALS is obsolete.\n");
+          int merge_frame = -1;
+          ScanStr (params, "%d", &merge_frame);
+          if (merge_frame > -1 && merge_frame < stemp->GetNumFrames ())
+            stemp->MergeNormals (merge_frame);
+          else stemp->MergeNormals ();
         }
         break;
 

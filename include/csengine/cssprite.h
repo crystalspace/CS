@@ -310,7 +310,7 @@ public:
   /**
    * Compute all normals in a frame.
    */
-  void ComputeNormals (csFrame* frame, csVector3* object_verts);
+  void ComputeNormals (csFrame* frame);
 
   /**
    * Do a hard transform of the sprite vertices.
@@ -320,6 +320,13 @@ public:
    * coordinates by this routine).
    */
   void HardTransform (const csReversibleTransform& t);
+
+  /**
+   * Smooth out the gouraud shading by merging the precalculated
+   * vertex normals along seams in this frame
+   */
+  void MergeNormals (int frame);
+  void MergeNormals ();
 
   CSOBJTYPE;
 };
