@@ -52,7 +52,7 @@ protected:
   /// Warp transform in world space.
   csReversibleTransform warp_wor;
   /// Callback when a sector is missing.
-  csPortalSectorCallback* sector_cb;
+  csPortalSectorCallback sector_cb;
   /// Data for sector_cb;
   void* sector_cbData;
 
@@ -207,14 +207,14 @@ public:
   virtual void SetMirror (iPolygon3D *iPoly);
 
   /// Set the missing sector callback.
-  virtual void SetPortalSectorCallback (csPortalSectorCallback *cb,
+  virtual void SetPortalSectorCallback (csPortalSectorCallback cb,
   	void* cbData)
   {
     sector_cb = cb;
     sector_cbData = cbData;
   }
   /// Get the missing sector callback.
-  virtual csPortalSectorCallback* GetPortalSectorCallback ()
+  virtual csPortalSectorCallback GetPortalSectorCallback ()
   {
     return sector_cb;
   }

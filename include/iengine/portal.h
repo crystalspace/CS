@@ -77,7 +77,7 @@ struct iFrustumView;
  * The given context will be either an instance of iRenderView, iFrustumView,
  * or else NULL.
  */
-typedef bool (csPortalSectorCallback) (iPortal* portal,
+typedef bool (*csPortalSectorCallback) (iPortal* portal,
 	iBase* context, void* callbackData);
 
 SCF_VERSION (iPortal, 0, 0, 4);
@@ -115,10 +115,10 @@ struct iPortal : public iBase
   virtual void SetMirror (iPolygon3D *iPoly) = 0;
 
   /// Set the missing sector callback.
-  virtual void SetPortalSectorCallback (csPortalSectorCallback *cb,
+  virtual void SetPortalSectorCallback (csPortalSectorCallback cb,
   	void* cbData) = 0;
   /// Get the missing sector callback.
-  virtual csPortalSectorCallback* GetPortalSectorCallback () = 0;
+  virtual csPortalSectorCallback GetPortalSectorCallback () = 0;
   /// Get the missing sector callback data.
   virtual void* GetPortalSectorCallbackData () = 0;
 
