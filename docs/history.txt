@@ -29,6 +29,9 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine eliminated unportable `test -e' from cs-config/Jamfile.
 	- res changed the Win32 plugin paths to cause less recursive directory
 	  scanning.
+	- Oktal added macros to perlpost.i to allow users to implement
+	  certain interfaces by writing classes in Perl, and made use of those
+	  macros for iEventHandler and iAwsSink; it is easy to add more.
 16-Jun-2003
 	- Oktal separated a multiple-argument %ignore directive into several
 	  single-argument ones, in perlpre.i, in order to support older

@@ -762,4 +762,126 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
   }
 %}
 
+/*****************************************************************************
+ * Define macros to create classes that are inheritable by script classes,
+ * to allow scripts to write their own implementations of interfaces.
+ *****************************************************************************/
+%define WRAP_SCRIPT_CLASS(TYPE, BODY)
+  %{
+    class csWrap_##TYPE : public TYPE
+    {
+      SV *sv;
+     public:
+      SCF_DECLARE_IBASE;
+      csWrap_##TYPE (SV *sv0) : sv (sv0)
+      {
+        SCF_CONSTRUCT_IBASE (0);
+      }
+
+      BODY
+    };
+
+    SCF_IMPLEMENT_IBASE (csWrap_##TYPE)
+      SCF_IMPLEMENTS_INTERFACE (TYPE)
+    SCF_IMPLEMENT_IBASE_END
+  %}
+
+  %typemap(in) TYPE*
+  {
+    if (sv_isa ($input, "cspace::" #TYPE))
+      $1 = (TYPE *) SvIV (SvRV ($input));
+    else if (sv_inherits ($input, "cspace::" #TYPE))
+      $1 = new csWrap_##TYPE ($input);
+    else
+      croak ("Expected object of type %s", #TYPE);
+  }
+  %typemap(freearg) TYPE*
+  {
+    $1->DecRef ();
+  }
+%enddef
+
+%define WRAP_FUNC(TYPE, FUNC, ARGS, PUSHARGS, POPRETVAL)
+  virtual TYPE FUNC ARGS
+  {
+    dSP;
+    ENTER;
+    SAVETMPS;
+    PUSHMARK (SP);
+    XPUSHs (sv);
+
+    PUSHARGS
+
+    PUTBACK;
+    call_method (#FUNC, G_SCALAR);
+    SPAGAIN;
+
+    TYPE retval = (TYPE) (POPRETVAL);
+
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+    return retval;
+  }
+%enddef
+
+%define WRAP_VOID(FUNC, ARGS, PUSHARGS)
+  virtual void FUNC ARGS
+  {
+    dSP;
+    ENTER;
+    SAVETMPS;
+    PUSHMARK (SP);
+    XPUSHs (sv);
+
+    PUSHARGS
+
+    PUTBACK;
+    call_method (#FUNC, G_DISCARD);
+    SPAGAIN;
+
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+  }
+%enddef
+
+/*****************************************************************************
+ * Use the macros we defined above for iEventHandler and iAwsSink.
+ *****************************************************************************/
+WRAP_SCRIPT_CLASS (iEventHandler,
+  WRAP_FUNC (bool, HandleEvent, (iEvent &ev),
+    SV *ev_rv = newSViv (0);
+    sv_setref_iv (ev_rv, "cspace::iEvent", & ev);
+    XPUSHs (sv_2mortal (ev_rv));,
+
+    POPi
+  )
+)
+
+WRAP_SCRIPT_CLASS (iAwsSink,
+  WRAP_FUNC (unsigned long, GetTriggerID, (const char *name),
+    XPUSHp (name);,
+
+    POPu
+  )
+  WRAP_VOID (HandleTrigger, (int id, iAwsSource *src),
+    XPUSHi (id);
+    SV *ev_rv = newSViv (0);
+    sv_setref_iv (ev_rv, "cspace::iAwsSource", src);
+    XPUSHs (sv_2mortal (ev_rv));
+  )
+  WRAP_VOID (RegisterTrigger, (const char *n, void (*t) (void*, iAwsSource*)),
+    /**/
+  )
+  WRAP_FUNC (unsigned int, GetError, (),
+    /**/,
+
+    POPu
+  )
+)
+
+// TODO: It is easy to add here more interfaces that you might want to
+//       implement in script.
+
 #endif // SWIGPERL5
