@@ -1,5 +1,7 @@
 The history order has been reversed so that new features are at the top.
 
+16-Jan-2001
+	- Eric Sunshine removed the broken and unuspported cygwin.mak file.
 15-Jan-2001
 	- Fixed a serious bug in csMeshWrapper::SetMeshObject(). This
 	  function would do a DecRef() on the given mesh (possibly

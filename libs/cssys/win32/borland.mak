@@ -1,7 +1,7 @@
 # This is the makefile for Borland compiler (bcc32 for Win32)
 
 # Friendly names for building environment
-DESCRIPTION.borland = Windows with Borland
+DESCRIPTION.borland = Windows with Borland (broken)
 DESCRIPTION.OS.borland = Win32
 
 # Choose which drivers you want to build/use
