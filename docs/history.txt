@@ -51,6 +51,10 @@ The history order has been reversed so that new features are at the top.
 	  project which were flagged by the OpenStep compiler.
 	- Eric Sunshine eliminated several compilation warnings in the
 	  Dungeon plug-in.
+	- Eric Sunshine fixed a couple bugs in the Dungeon plug-in:
+	    - Was applying delete[] to the middle rather than the beginning of
+	      a character array in yywrap().
+	    - Was leaking the 'filename' string of an included dungeon file.
 18-Jun-2000
 	- Norman Kramer fixed Squawk and csgame following the recent
 	  modifications in sprite creation.
