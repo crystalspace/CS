@@ -52,6 +52,7 @@
 #include "iengine/camera.h"
 #include "igraphic/loader.h"
 #include "imesh/object.h"
+#include "imesh/lighting.h"
 
 //------------------------------------------------- We need the 3D engine -----
 
