@@ -21,7 +21,6 @@
 
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
-#include "csobject/csobject.h"
 #include "csutil/cscolor.h"
 #include "iterrain/object.h"
 #include "iengine/terrain.h"
