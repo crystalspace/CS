@@ -250,8 +250,6 @@ static bool Convert (const char *fontfile)
 
   fprintf (out, "};\n\n");
   fclose (out);
-  font->DecRef ();
-  fs->DecRef ();
   return true;
 }
 
