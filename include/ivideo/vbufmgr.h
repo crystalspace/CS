@@ -120,6 +120,23 @@ struct iPolygonBuffer : public iBase
   virtual void Clear () = 0;
 };
 
+SCF_VERSION (iVertexBufferManagerClient, 0, 0, 1);
+
+/**
+ * Objects using services provided by the vertexbuffermanager can register
+ * with the manager to receive information about it current state, e.g. the 
+ * manager tells its clients if he is going down, closes etc.
+ */
+
+struct iVertexBufferManagerClient : public iBase
+{
+  /**
+   * This method is called whenever the the buffers managed become invalid,
+   * that is, the clients have to request a new buffer from the manager.
+   */
+  virtual void ManagerClosing () = 0;
+};
+
 SCF_VERSION (iVertexBufferManager, 0, 0, 2);
 
 /**
@@ -177,6 +194,15 @@ struct iVertexBufferManager : public iBase
    * will be one. To remove it use DecRef().
    */
   virtual iPolygonBuffer* CreatePolygonBuffer () = 0;
+
+  //---------- client handling -----------------------------------------------
+
+  /**
+   * A client using the services of the manager can register with it to receive
+   * information about the state of the manager.
+   */
+  virtual void AddClient (iVertexBufferManagerClient *client) = 0;
+  virtual void RemoveClient (iVertexBufferManagerClient *client) = 0;
 };
 
 #endif // __IVIDEO_VBUFMGR_H__
