@@ -4334,7 +4334,6 @@
                         <v x="-0.05" y="0.05" z="0" />
                     </texmap>
                 </p>
-                <moveable />
             </params>
             <move>
                 <matrix>
@@ -4483,7 +4482,6 @@
                         <v x="-0.05" y="0.05" z="0" />
                     </texmap>
                 </p>
-                <moveable />
             </params>
             <move>
                 <matrix>
@@ -4632,7 +4630,6 @@
                         <v x="-0.05" y="0.05" z="0" />
                     </texmap>
                 </p>
-                <moveable />
             </params>
             <move>
                 <matrix>
@@ -4798,7 +4795,6 @@
                         <v x="0" y="0" z="0.1" />
                     </texmap>
                 </p>
-                <moveable />
             </params>
             <move>
                 <matrix>
@@ -4929,7 +4925,6 @@
                     <v>1</v>
                     <lighting>no</lighting>
                 </p>
-                <moveable />
             </params>
             <move>
                 <matrix>
@@ -5086,7 +5081,6 @@
                         <v x="0.5" y="-0.5" z="0.5" />
                     </texmap>
                 </p>
-                <moveable />
             </params>
             <move>
                 <matrix>
@@ -6802,7 +6796,6 @@
             <params>
                 <factory>cube</factory>
 		<replacematerial old="bricks" new="asphalt" />
-                <moveable />
             </params>
             <move>
                 <matrix>
@@ -6827,7 +6820,6 @@
             <plugin>thing</plugin>
             <params>
                 <factory>cube</factory>
-                <moveable />
             </params>
             <move>
                 <matrix>
@@ -6852,7 +6844,6 @@
             <plugin>thing</plugin>
             <params>
                 <factory>cube</factory>
-                <moveable />
             </params>
             <move>
                 <matrix>
@@ -6908,7 +6899,6 @@
             <plugin>thing</plugin>
             <params>
                 <factory>circle</factory>
-                <moveable />
             </params>
             <move>
                 <v x="-16" y="1" z="30" />
@@ -6918,7 +6908,6 @@
             <plugin>thing</plugin>
             <params>
                 <factory>band</factory>
-                <moveable />
             </params>
             <move>
                 <matrix>
@@ -6931,7 +6920,6 @@
             <plugin>thing</plugin>
             <params>
                 <factory>band</factory>
-                <moveable />
             </params>
             <move>
                 <matrix>
@@ -14109,7 +14097,6 @@
                         <v x="3" y="-1" z="1" />
                     </texmap>
                 </p>
-                <moveable />
             </params>
             <move>
                 <matrix>
@@ -14554,7 +14541,6 @@
                         <v x="0" y="1" z="0.35" />
                     </texmap>
                 </p>
-                <moveable />
             </params>
             <move>
                 <matrix>
@@ -14999,7 +14985,6 @@
                         <v x="0" y="1" z="0.35" />
                     </texmap>
                 </p>
-                <moveable />
             </params>
             <move>
                 <matrix>
@@ -15444,7 +15429,6 @@
                         <v x="0" y="1" z="0.35" />
                     </texmap>
                 </p>
-                <moveable />
             </params>
             <move>
                 <matrix>
@@ -15889,7 +15873,6 @@
                         <v x="0" y="1" z="0.35" />
                     </texmap>
                 </p>
-                <moveable />
             </params>
             <move>
                 <matrix>
