@@ -38,6 +38,12 @@
 # - Eliminate the ugly mk/msvcgen/msvcgen.sh and mk/msvcgen/Jamconfig.
 #   Instead, it should be possible to run the entire process using the normal
 #   Jamconfig created by the configuration process.
+#
+# - This file should also override the Help rule to capture the help message
+#   for a target, rather than relying upon "$(<)_help = $(>)" in help.jam,
+#   since help.jam does not utilize that itself, and it is likely to be removed
+#   by an unsuspecting person.  msvcgen.jam should be responsible for its own
+#   needs.
 
 if "$(MSVCGEN_CONFIG)"
 {

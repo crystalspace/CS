@@ -9,6 +9,7 @@ jamrulesdir = $(TOP)/mk/jam ;
 
 include $(jamrulesdir)/jamcompatibility.jam ;
 include $(jamrulesdir)/subdir.jam ;
+include $(jamrulesdir)/options.jam ;
 
 include $(jamrulesdir)/variant.jam ;
 include $(jamrulesdir)/resource.jam ;
@@ -32,8 +33,6 @@ include $(jamrulesdir)/static.jam ;
 include $(jamrulesdir)/application.jam ;
 include $(jamrulesdir)/plugin.jam ;
 include $(jamrulesdir)/docs.jam ;
-
-include $(jamrulesdir)/options.jam ;
 
 # Include OS specific rules
 switch $(TARGET.OS)

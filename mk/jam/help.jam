@@ -2,16 +2,23 @@
 # Rules for displaying help messages about targets
 #============================================================================
 
-##  Help target : description
+##  Help target : description [ : options ]
 ##    Adds a description to a target which will be shown to the user when
-##    "jam help" is invoked.
+##    "jam help" is invoked.  If the `verbatim' option is specified, then
+##    `description' will be emitted verbatim; otherwise, the string "Build the"
+##    will be prepended to `description'.
+##    Options:
+##      verbatim: Do not pre-prend "Build the" to `description'.
 rule Help
 {
-  $(<)_help = $(>) ;
+  CheckOptions verbatim : $(3) : $(<) ;
+  $(<)_help = $(>) ; # Squirrel-away for use by msvcgen.jam.
   local target = $(<:G=help) ;
   Depends help : $(target) ;
-  NotFile $(>) ;
-  PrintHelp $(target) : $(>) ;
+  local desc = $(>) ;
+  if ! [ IsElem verbatim : $(3) ] { desc = "Build the $(desc)" ; }
+  NotFile $(desc) ;
+  PrintHelp $(target) : $(desc) ;
   Always $(target) ;
 }
 
@@ -22,7 +29,7 @@ Always help ;
 
 actions quietly PrintHelp
 {
-  # target width:13, description width:51
-  echo "jam ->$(<)              <- Build the =>$(>)                                                   <=" | \
-    $(SED) 's/->\(..............\).*<-/\1/;s/=>\(...................................................\).*<=/\1/'
+  # target width:15, description width:59
+  echo "jam ->$(<)               <- =>$(>)                                                           <=" | \
+    $(SED) 's/->\(...............\).*<-/\1/;s/=>\(...........................................................\).*<=/\1/'
 }

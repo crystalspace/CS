@@ -13,6 +13,10 @@ chronological order.
 	  Unix, and how not all Unix utilities deal gracefully with Windows
 	  line-terminators.  Also updated quite outdated Unix build
 	  instructions.
+	- Eric Sunshine added an 'options' argument to the Help rule in
+	  help.jam.  Presently, the only recognized option is "verbatim", which
+	  tells Help to emit the 'description' string verbatim, without
+	  prepending "Build the".
 14-Apr-2004
 	- Eric Sunshine fixed bugs in csString where GetData() and the (char
 	  const*) operator would incorrectly return a null pointer at times.
