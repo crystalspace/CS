@@ -148,11 +148,15 @@ public:
 
 struct nTerrainInfo
 {
-    /// Triangle mesh to draw for block
-    G3DTriangleMesh mesh;
+    /// Triangle meshes to draw for blocks - one mesh per texture
+    G3DTriangleMesh *mesh;
 
     /// Keep track of tris, verts, tex, indexes, and color
-    CS_DECLARE_GROWING_ARRAY (triangles, csTriangle);
+    struct triangle_queue
+    {
+      CS_DECLARE_GROWING_ARRAY (triangles, csTriangle);
+    } *triq;
+    
     CS_DECLARE_GROWING_ARRAY (vertices, csVector3);
     CS_DECLARE_GROWING_ARRAY (texels, csVector2);
     CS_DECLARE_GROWING_ARRAY (tindexes, ti_type);
@@ -276,16 +280,7 @@ private:
         se = info->vertices.Push(csVector3(bounds.x, b->ne, bounds.y)),
         sw = info->vertices.Push(csVector3(bounds.x, b->ne, bounds.y)),
         center = info->vertices.Push(csVector3(bounds.x, b->ne, bounds.y));
-
-    /**  This seems like a lot of duplication, but I don't know how to do it right
-     * otherwise. We push one texture index for each vert... even though they're
-     * the same inside a block. 
-     */
-    info->tindexes.Push(b->ti);
-    info->tindexes.Push(b->ti);
-    info->tindexes.Push(b->ti);
-    info->tindexes.Push(b->ti);
-    info->tindexes.Push(b->ti);
+   
 
     /** Build texture indices.  The northeast corner is 0,0 for the texture, and the
      * southwest corner is 1,1.  That makes the other corners respective of their places,
@@ -301,10 +296,10 @@ private:
      * No need to merge and split because each block is at full resolution,
      * we have no partial resolution blocks.
      */
-    info->triangles.Push(csTriangle(se, center, sw));
-    info->triangles.Push(csTriangle(sw, center, nw));
-    info->triangles.Push(csTriangle(ne, center, nw));
-    info->triangles.Push(csTriangle(ne, center, se));
+    info->triq[b->ti].triangles.Push(csTriangle(se, center, sw));
+    info->triq[b->ti].triangles.Push(csTriangle(sw, center, nw));
+    info->triq[b->ti].triangles.Push(csTriangle(ne, center, nw));
+    info->triq[b->ti].triangles.Push(csTriangle(ne, center, se));
   }
 
   /// Processes a node for buffering, checks for visibility and detail levels.
@@ -406,7 +401,12 @@ public:
 
 //////////////////////////////////////////////// Mesh Object ///////////////////////////////////////////////////
 
-
+/** 
+ *  This is the big terrain object.  It lets you have terrains as large as your hard drive
+ * will hold by using memory mapped i/o.  On Windows and Unix systems it should be pretty
+ * fast.  On all others, it will resort to the software emulation, so it will be somewhat
+ * slower.  
+ */
 class csBigTerrainObject : public iMeshObject
 {
 private:
@@ -431,9 +431,19 @@ private:
   /// Pointer to terrain object
   nTerrain *terrain;
 
+  /// Render information structure
+  nTerrainInfo *info;
+
+  /// Number of textures
+  unsigned short nTextures;
+
   
 protected:
+  /// Creates and sets up a vertex buffer.
   void SetupVertexBuffer (iVertexBuffer *&vbuf1);
+
+  /// Initializes a mesh structure
+  void InitMesh (nTerrainInfo *info);
 
 public:
   ////////////////////////////// iMeshObject implementation ///////////////////////////

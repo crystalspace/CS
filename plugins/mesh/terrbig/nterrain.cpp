@@ -32,14 +32,24 @@ SCF_IMPLEMENT_IBASE_END
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-csBigTerrainObject::csBigTerrainObject(iObjectRegistry* _obj_reg, iMeshObjectFactory *_pFactory):pFactory(_pFactory), object_reg(_obj_reg), terrain(NULL)
+csBigTerrainObject::csBigTerrainObject(iObjectRegistry* _obj_reg, iMeshObjectFactory *_pFactory):pFactory(_pFactory), object_reg(_obj_reg), terrain(NULL), nTextures(1)
 {
   SCF_CONSTRUCT_IBASE (NULL)
+
+  info = new nTerrainInfo();
+
+  InitMesh(info);
 }
 
 csBigTerrainObject::~csBigTerrainObject()
 {
   if (terrain) delete terrain;
+  if (info)    
+  {
+    delete [] info->mesh;
+    delete [] info->triq;
+    delete info;
+  }
 }
 
 void 
@@ -49,17 +59,38 @@ csBigTerrainObject::SetupVertexBuffer (iVertexBuffer *&vbuf1)
  {
    if (!vbufmgr)
    {
-     //iObjectRegistry* object_reg = ((csTerrFuncObjectFactory*)pFactory)->object_reg;
-     //iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+     iObjectRegistry* object_reg = ((csBigTerrainObjectFactory*)pFactory)->object_reg;
+     iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 
      // @@@ priority should be a parameter.
-     //vbufmgr = g3d->GetVertexBufferManager ();
-     //g3d->DecRef ();
+     vbufmgr = g3d->GetVertexBufferManager ();
+     g3d->DecRef ();
 
      //vbufmgr->AddClient (&scfiVertexBufferManagerClient);
    }
-   //vbuf1 = vbufmgr->CreateBuffer (1);
+   vbuf = vbufmgr->CreateBuffer (1);
  }
+}
+
+void csBigTerrainObject::InitMesh (nTerrainInfo *info)
+{
+  int i;
+ 
+  info->mesh = new G3DTriangleMesh[nTextures];
+  info->triq = new nTerrainInfo::triangle_queue[nTextures];
+
+  for(i=0; i<nTextures; ++i)
+  {
+    info->mesh[i].triangles = info->triq[i].triangles.GetArray();
+    info->mesh[i].morph_factor = 0;
+    info->mesh[i].num_vertices_pool = 1;
+    info->mesh[i].use_vertex_color = false;
+    info->mesh[i].do_morph_texels = false;
+    info->mesh[i].do_morph_colors = false;
+    info->mesh[i].do_fog = false;
+    info->mesh[i].vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
+    info->mesh[i].mixmode = CS_FX_GOURAUD;
+  }
 }
 
 
@@ -69,8 +100,6 @@ csBigTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
   if (terrain)
   {
     iCamera* cam = rview->GetCamera ();
-
-    nTerrainInfo *info = new nTerrainInfo();
 
     terrain->SetObjectToCamera(cam->GetTransform());
     terrain->SetCameraOrigin(cam->GetTransform().GetOrigin());
@@ -91,6 +120,9 @@ csBigTerrainObject::UpdateLighting (iLight** lights, int num_lights, iMovable* m
 bool 
 csBigTerrainObject::Draw (iRenderView* rview, iMovable* movable, csZBufMode zbufMode)
 {
+  int i;
+  static bufcount=0;
+
   iGraphics3D* pG3D = rview->GetGraphics3D ();
   iCamera* pCamera = rview->GetCamera ();
 
@@ -101,6 +133,23 @@ csBigTerrainObject::Draw (iRenderView* rview, iMovable* movable, csZBufMode zbuf
   pG3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zbufMode );
 
   SetupVertexBuffer(vbuf);
+
+  bufcount++;
+
+  vbufmgr->LockBuffer(vbuf, 
+	 	      info->vertices.GetArray(), 
+		      info->texels.GetArray(),
+		      info->colors.GetArray(),
+		      info->vertices.Length(),
+		      bufcount);
+
+  for(i=0; i<nTextures; ++i)
+  {
+    info->mesh[i].buffers[0]=vbuf;
+    pG3D->DrawTriangleMesh(info->mesh[i]);    
+  }
+
+  vbufmgr->UnlockBuffer(vbuf);
 
   return true;
 }
