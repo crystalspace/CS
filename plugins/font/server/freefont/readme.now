@@ -4,7 +4,7 @@ To use it, you need the freetype engine installed on your system.
 The freefont.mak expects the freetype include files in
 /usr/local/include/freetype.
 
-Get the FreeType engine for nada at www.freetype.org.
+Get the FreeType engine for nada at www.freetype.org ( you need a 1.x version ).
 
 Note that using this plugin makes only sense, if you have access to TrueType
 fonts.
