@@ -304,7 +304,6 @@ bool ImageBMPFile::LoadWindowsBitmap (UByte* iBuffer, ULong iSize)
       pwork->blue  = *inpal++;
       pwork->green = *inpal++;
       pwork->red   = *inpal++;
-      pwork->alpha = 0;
       inpal++; // Skip unused byte.
     }
 
