@@ -52,8 +52,8 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ddraw.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ddraw.lib zlib.lib png.lib libjpeg.lib dinput.lib dxguid.lib winmm.lib %libs% /nologo /version:4.0 /subsystem:windows /dll /machine:I386 /nodefaultlib:"LIBC" /nodefaultlib:"LIBCMT" /out:"csrelease\temp\%project%\%target%" /libpath:"..\..\libs\cssys\win32\lib" %lflags% /OPT:NOREF
+# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib advapi32.lib shell32.lib /nologo /subsystem:windows /dll /machine:I386
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib advapi32.lib shell32.lib winmm.lib ddraw.lib dinput.lib dxguid.lib zlib.lib png.lib libjpeg.lib %libs% /nologo /version:4.0 /subsystem:windows /dll /machine:I386 /nodefaultlib:"LIBC" /nodefaultlib:"LIBCMT" /out:"csrelease\temp\%project%\%target%" /libpath:"..\..\libs\cssys\win32\lib" %lflags% /OPT:NOREF
 # Begin Special Build Tool
 TargetPath=.\csrelease\temp\%project%\%target%
 SOURCE="$(InputPath)"
@@ -84,8 +84,8 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ddraw.lib /nologo /subsystem:windows /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ddraw.lib zlib.lib png.lib libjpeg.lib dinput.lib dxguid.lib winmm.lib %libs% /nologo /version:1.0 /subsystem:windows /dll /profile /debug /machine:I386 /nodefaultlib:"LIBC" /nodefaultlib:"LIBCMTD" /out:"csdebug\temp\%project%\%target%" /libpath:"..\..\libs\cssys\win32\lib" %lflags%
+# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib advapi32.lib shell32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /pdbtype:sept
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib advapi32.lib shell32.lib winmm.lib zlib.lib png.lib libjpeg.lib %libs% /nologo /version:1.0 /subsystem:windows /dll /profile /debug /machine:I386 /nodefaultlib:"LIBC" /nodefaultlib:"LIBCMTD" /out:"csdebug\temp\%project%\%target%" /libpath:"..\..\libs\cssys\win32\lib" %lflags%
 # Begin Special Build Tool
 TargetPath=.\csdebug\temp\%project%\%target%
 SOURCE="$(InputPath)"

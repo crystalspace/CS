@@ -56,6 +56,7 @@ TO_INSTALL.CONFIG += data/config/direct3ddx5.cfg data/config/direct3ddx6.cfg
 MSVC.DSP += DDRAW
 DSP.DDRAW.NAME = csddraw
 DSP.DDRAW.TYPE = plugin
+DSP.DDRAW.LIBS = ddraw
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
