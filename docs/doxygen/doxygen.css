@@ -2,6 +2,12 @@ body, table {
   font-family: Verdana, sans-serif;
   font-size: 10pt;
 }
+
+body {
+	margin: 0 0 0 0;
+	padding: 0 0 0 0;
+}
+
 H1 { text-align: center; }
 CAPTION { font-weight: bold }
 a:link { color: #000080; }
@@ -64,17 +70,33 @@ pre {
 p {
   line-height:1.2em;
 }
-
+ 
 td.head {
   color: white;
-  background: #BFBED0 url("b2w.jpg") top repeat-x;  
+  background: #31363e;  
   padding-left:1.2cm; 
+  text-align: left;
+}
+
+td.headshadow {
+  color: white;
+  background: white url("csshadow.png") bottom repeat-x;  
+  padding-left:1.2cm; 
+}
+
+td.head h2 {
+	margin: 0 0 0 0;
+}
+
+div.content {
+	margin-left: 0.5cm;
+	margin-right: 0.5cm;
 }
 
 @media print 
 {
 
-td.head {
+td.head, td.headshadow {
   color: black;
   background: white;
 }

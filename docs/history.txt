@@ -26,6 +26,9 @@ chronological order.
 	  unused.
 	- Eric Sunshine corrected typographical errors in build/msvc6.txi and
 	  msvc7.txi.
+	- res tweaked the doxygen files to include paths relative to the 
+	  CS/include resp. CS directory. Also updated the layout of the 
+	  generated HTML files a bit.
 9-Nov-2003
 	- Rhad added functions to handle reversing some operations with
 	  particle emitters.  These take care of some simple situations where

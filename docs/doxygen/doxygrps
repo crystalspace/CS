@@ -17,14 +17,14 @@
 */
 
 /*
- * Doxygen groups.
- * 
- * These are here rather than the includes because:
+ * Doxygen group(aka "Module") definitions.
+ * These are here, in their own file, rather than the includes because:
  *  a) Module names aren't sorted; so we can do that here
  *  b) it's easier to see what Modules are there and what
  *     identifiers they have
  *  c) it's easier to change a description
  *
+ * Not much else interesting here.
  */
  
 /**
