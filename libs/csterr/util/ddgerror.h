@@ -43,6 +43,8 @@ class WEXP ddgError
 	ddgStr _file;
 	/// Error message.
 	ddgStr _msg;
+	/// Function to call when error occurs.
+	static void (*_errorHandler)(ddgError*);
 public:
 	/// Constructor.
 	ddgError(void);
@@ -110,6 +112,8 @@ public:
 	/// Global defines
 	#define ddgSuccess	false
 	#define	ddgFailure	true
+	/// Set the errorHandler function.
+	static void errorHandler( void (*s)(ddgError *e));
 };
 
 #endif
