@@ -168,9 +168,15 @@ functions that almost hides the implementation details from end-user.
 
 The only include file you need in both your client and server modules is
 @file{scf.h}. It contains a number of macros and functions that you will need
-for easier use of @sc{scf}. For the client, you will also have to add the
-@file{scf.cpp} source code file to your project, on the server-side you don't
-need it (inline macros defined in @file{scf.h} are enough).
+for easier use of @sc{scf}. You will also have to add @file{scfimp.cpp} for
+both the server and the client, and @file{scf.cpp} for the client.
+
+Some basic functionality of @sc{scf} is provided by a central object. It can
+be accessed as @samp{iSCF::SCF} and is of type @samp{iSCF*} (which is also a
+valid interface). This object can be accessed from @emph{anywhere}, even from
+dynamic libraries. It is used by several parts of @sc{scf}. Note that this
+object is only available after calling @code{scfInitialize()}, the main
+initialization function of @sc{scf}.
 
 To simplify things, all exported classes are supposed to be derived from some
 basical interface called @samp{iBase}. Thus, any interface is supposed to
@@ -188,9 +194,13 @@ count reaches zero, the object is automatically deleted, provided that it is
 not an interface embedded within another object,
 @ref{SCF Embedded Interfaces}.
 
-@item iBase* QueryInterface(char const* iInterfaceName, int iVersion);
+@item iBase* QueryInterface(scfInterfaceID iInterfaceID, int iVersion);
 This method will return a pointer to an interface or to an embedded interface,
-@ref{SCF Embedded Interfaces}.
+@ref{SCF Embedded Interfaces}. The @emph{Interface ID} is synonymous to the
+name of the interface. In previous versions of @sc{scf} this method used to
+accept a string containing the name of the interface. This has been replaced
+by the @emph{ID} for performance reasons. You can get the ID for an interface
+by using @samp{iSCF::SCF->GetInterfaceID (name)}.
 @end table
 
 To simplify things even more, @file{scf.h} provides several macros that
@@ -352,14 +362,15 @@ use the @code{SCF_DECLARE_EMBEDDED_IBASE(@var{OuterClass})} macro instead of
 type @code{@var{OuterClass}*} rather than of type @code{iBase*}; this will
 allow the member class to talk with its parent directly, thus allowing for
 direct member variables and functions access. In fact, the
-@samp{SCF_DECLARE_IBASE} macro expands to @code{SCF_DECLARE_EMBEDDED_IBASE(iBase)}.
+@samp{SCF_DECLARE_IBASE} macro uses @code{SCF_DECLARE_EMBEDDED_IBASE(iBase)}.
+@samp{SCF_DECLARE_EMBEDDED_IBASE} itself has another special characteristic:
+It does not use a reference count, as embedded interfaces may never delete
+themselves. @code{IncRef} and @code{DecRef} simply call the corresponding
+function of their @code{scfParent}, which is the object they are embedded in.
 
-You also should use the @code{SCF_IMPLEMENT_EMBEDDED_IBASE()} macro instead of
-@code{SCF_IMPLEMENT_IBASE()} because @code{SCF_IMPLEMENT_IBASE()} will destroy the
-object when its reference count will reach zero; if you do the same for an
-embedded interface it will fail because the object is allocated and freed at
-the same time when parent object is (since it is directly embedded within the
-parent).
+When using @code{SCF_DECLARE_EMBEDDED_IBASE}, you should implement the
+methods with the @code{SCF_IMPLEMENT_EMBEDDED_IBASE()} macro instead of
+@code{SCF_IMPLEMENT_IBASE()}.
 
 @example
 SCF_IMPLEMENT_IBASE(MyGraphics3D)
@@ -663,7 +674,7 @@ int main ()
     dog->DecRef();
   @}
 
-  scfFinish();
+  iSCF::SCF->Finish();
 @}
 @end example
 
@@ -676,7 +687,7 @@ the @code{[SCF.Registry]} section of the configuration file @file{scf.cfg}.
 Alternatively, you can register classes at run time:
 
 @example
-scfRegisterClass("csDog", "dog");
+iSCF::SCF->RegisterClass("csDog", "dog");
 @end example
 
 @node SCF Advanced, , SCF Example, SCF
@@ -684,6 +695,19 @@ scfRegisterClass("csDog", "dog");
 
 The @sc{scf} library implements some things that you will need to know about
 to use some advanced techniques.  They are described in detail, below.
+
+@subsubheading @code{QueryInterface()} performance
+
+Usually you use @code{SCF_QUERY_INTERFACE (object, interface)} to query an
+interface from an object. However, this involves string comparison and should
+therefore be considered slow. To speed things up, place the following line
+somewhere in your source file (header files are also allowed, as this only
+defines an inline function):
+@example
+SCF_DECLARE_FAST_INTERFACE (iInterfaceName)
+@end example
+After that, you can use @code{SCF_QUERY_INTERFACE_FAST (object, interface)}
+to query an interface from an object.
 
 @subsubheading Dynamic Class Registration
 
@@ -695,17 +719,18 @@ registering classes within client module. To register a class that is located
 inside a shared library, use this function:
 
 @example
-extern bool scfRegisterClass(
+bool iSCF::RegisterClass(
     char const* iClassID,
     char const* iLibraryName);
 @end example
 
-The prototype should be self-describing.  If you have a class that is linked
-into the executable, you should prepare a structure of the @samp{scfClassInfo}
-type and pass it to the following function:
+The prototype should be self-describing. As any method of @code{iSCF}, you
+should call the function as @samp{iSCF::SCF->RegisterClass()}. If you have a
+class that is linked into the executable, you should prepare a structure of
+the @samp{scfClassInfo} type and pass it to the following function:
 
 @example
-extern bool scfRegisterClass(scfClassInfo*);
+bool iSCF::RegisterClass(scfClassInfo*);
 @end example
 
 You should fill the @samp{ClassID} and @samp{Factory} fields.  The
@@ -714,7 +739,7 @@ You should fill the @samp{ClassID} and @samp{Factory} fields.  The
 You can deregister an already registered class with the following function:
 
 @example
-extern bool scfUnregisterClass(char const* iClassID);
+bool iSCF::UnregisterClass(char const* iClassID);
 @end example
 
 @subsubheading Non-Registered Classes

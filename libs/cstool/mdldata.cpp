@@ -368,7 +368,7 @@ void MergeAction (iModelDataAction *Out, iModelDataAction *In1,
   }
 }
 
-typedef CS_DECLARE_OBJECT_VECTOR (csActionVector, iModelDataAction);
+CS_DECLARE_OBJECT_VECTOR (csActionVector, iModelDataAction);
 
 void csModelDataObject::MergeCopyObject (iModelDataObject *obj)
 {

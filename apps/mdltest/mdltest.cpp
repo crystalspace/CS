@@ -47,6 +47,7 @@
 #include "iutil/objreg.h"
 #include "csutil/csstring.h"
 #include "isys/plugin.h"
+#include "igraphic/imageio.h"
 #include "ivaria/reporter.h"
 
 CS_IMPLEMENT_APPLICATION
@@ -302,6 +303,13 @@ bool Simple::Initialize (int argc, const char* const argv[],
     abort ();
   }
 
+  iImageIO *imageio = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_IMGLOADER, iImageIO);
+  if (!imageio)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iModelConverter plugin!\n");
+    abort ();
+  }
+
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ())
   {
@@ -337,6 +345,11 @@ bool Simple::Initialize (int argc, const char* const argv[],
   const char *Filename = cmdline->GetName (0);
   iModelData *Model = Filename ? ImportModel (Filename) : CreateDefaultModel (tm2);
   Model->MergeObjects ();
+
+//  Model->LoadImages (vfs, imageio, g3d->GetTextureManager ()->GetTextureFormat ());
+  imageio->DecRef ();
+//  Model->RegisterTextures (engine->GetTextureList ());
+//  Model->RegisterMaterials (engine->GetMaterialList ());
 
   iMeshObjectType *ThingType = engine->GetThingType ();
   iMeshObjectFactory *ThingFactory = ThingType->NewFactory ();
