@@ -134,19 +134,6 @@ csSector* csPortalCS::FollowSegment (csReversibleTransform& t,
   return sector ? sector->FollowSegment (t, new_position, mirror) : (csSector*)NULL;
 }
 
-csPolygon3D* csPortalCS::FollowBeam (csVector3& start, csVector3& end, csPolygon3D* poly, float* sqdist)
-{
-  if (sector->beam_busy >= csSector::cfg_reflections) return NULL;
-  if (do_warp_space)
-  {
-    csVector3 start2 = warp_wor.Other2This (start);
-    csVector3 end2 = warp_wor.Other2This (end);
-    return sector->FollowBeam (start2, end2, poly, sqdist);
-  }
-  else
-    return sector->FollowBeam (start, end, poly, sqdist);
-}
-
 void csPortalCS::CalculateLighting (csLightView& lview)
 {
   if (sector->draw_busy > csSector::cfg_reflections) return;
@@ -218,14 +205,4 @@ void csPortalCS::CalculateLighting (csLightView& lview)
   }
 }
 
-void csPortalCS::DumpFrustrum (csStatLight* light, csVector3* frustrum, int num_frustrum,
-	csTransform& t)
-{
-  if (do_warp_space)
-  {
-    // @@@ Currently not supported yet.
-    return;
-  }
-  else sector->DumpFrustrum (light, frustrum, num_frustrum, t);
-}
 

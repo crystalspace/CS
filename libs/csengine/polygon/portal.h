@@ -224,25 +224,9 @@ public:
                                   csVector3& new_position, bool& mirror) = 0;
 
   /**
-   * Follow a beam of light with a given start and end point and return
-   * the first polygon that is hit. Also return the squared distance of the
-   * path that was followed to get at the polygon (this correctly takes care
-   * of space warping).
-   * NOTE@@@! It returns a csPolygon3D which might not be what you want.
-   */
-  virtual csPolygon3D* FollowBeam (csVector3& start, csVector3& end, csPolygon3D* poly, float* sqdist) = 0;
-
-  /**
    * Update lighting of all polygons reachable through this portal.
    */
   virtual void CalculateLighting (csLightView& lview) = 0;
-
-  /**
-   * Dump frustrum of all polygons reachable through this portal
-   * (for debugging).
-   */
-  virtual void DumpFrustrum (csStatLight* light, csVector3* frustrum, int num_frustrum,
-  	csTransform& t) = 0;
 };
 
 /**
@@ -292,21 +276,9 @@ public:
                                   csVector3& new_position, bool& mirror);
 
   /**
-   * Follow a beam of light through this portal.
-   */
-  virtual csPolygon3D* FollowBeam (csVector3& start, csVector3& end, csPolygon3D* poly, float* sqdist);
-
-  /**
    * Update lighting of all polygons visible through this portal.
    */
   virtual void CalculateLighting (csLightView& lview);
-
-  /**
-   * Dump frustrum of all polygons reachable through this portal
-   * (for debugging).
-   */
-  virtual void DumpFrustrum (csStatLight* light, csVector3* frustrum, int num_frustrum,
-  	csTransform& t);
 };
 
 #endif /*PORTAL_H*/
