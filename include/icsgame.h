@@ -547,19 +547,19 @@ struct iDataLoader : public iBase
   virtual const char* GetNextContext() = 0;
 
   /**
-   * Gets the name of the first element in the current context, or NULL 
-   * if there is no element at all
+   * Gets the name and value of the first element in the current context, 
+   * or NULL if there is no element at all
    */
-  virtual const char* GetFirstElement() = 0;
+  virtual bool GetFirstElement(const char*& Key, const char*& Value) = 0;
 
   /**
-   * Gets the name of the next element in the current context, or NULL 
-   * if there is no further element.
+   * Gets the name and value of the next element in the current context, 
+   * or NULL if there is no further element.
    */
-  virtual const char* GetNextElement() = 0;
+  virtual bool GetNextElement(const char*& Key, const char*& Value) = 0;
 
   /**
-   * Gets the value of the Element
+   * Gets the value of the Element with the given name
    */
   virtual const char* GetElement(const char* Key) = 0;
 };
