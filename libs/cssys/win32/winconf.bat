@@ -64,7 +64,7 @@
   rem *** configurations
   echo ### Checking if you use cmd.exe or some fancy shell...
   echo testing>conftest.1
-  make -f libs\cssys\win32\winconf.mak testecho
+  make -f libs\cssys\win32\winconf.mak DO_WIN_TEST_ECHO=yes testecho
   cmp conftest.1 conftest.2
   if not errorlevel 1 goto noremovequote
   echo $$$ O.K. Setting to use cmd.exe settings

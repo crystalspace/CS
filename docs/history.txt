@@ -3,6 +3,11 @@ The history order is reversed so that new features are at the top.
 8-Nov-2001
 	- Jorge Acereda fixed a leak in ieplex.cpp where the result of a
 	  SCF::QueryClassList() wasn't DecRef()ed.
+	- Eric Sunshine fixed a problem in which the `testecho' target from
+	  CS/libs/cssys/win32/winconf.mak would be seen by GNU `make' before
+	  any other targets, and thus become the "default" target.  Typically,
+	  the `help' target from CS/Makefile is supposed to be the default
+	  target, but `testecho' was subverting it.
 7-Nov-2001
 	- Eric Sunshine fixed simpcon.cpp so that it now uses an octal
 	  character constant for cursor assignment, rather than using an 8-bit
