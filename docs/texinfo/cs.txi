@@ -1,4 +1,4 @@
-\input texinfo
+@c -*-texinfo-*-
 @setfilename cs
 @settitle Crystal Space
 
@@ -26,16 +26,12 @@ to documentation which has not yet been written.  Please ignore this text.
 @shortcontents
 @contents
 
-@c ------------------------------------------------------------------------
-@include intro/chapter.txi
-@include build/chapter.txi
-@include options/chapter.txi
-@include apps/chapter.txi
-@include tutorial/chapter.txi
-@include concepts/chapter.txi
-@include anatomy/chapter.txi
-@include plugins/chapter.txi
-@include contrib/chapter.txi
-@c ------------------------------------------------------------------------
-
-@bye
+@imports{intro,chapter.txi}
+@imports{build,chapter.txi}
+@imports{options,chapter.txi}
+@imports{apps,chapter.txi}
+@imports{tutorial,chapter.txi}
+@imports{concepts,chapter.txi}
+@imports{anatomy,chapter.txi}
+@imports{plugins,chapter.txi}
+@imports{contrib,chapter.txi}

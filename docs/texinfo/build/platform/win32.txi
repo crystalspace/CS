@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Win32
 @subsection Windows
 @cindex Windows

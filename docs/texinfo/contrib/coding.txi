@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Coding Style
 @section Coding Style
 

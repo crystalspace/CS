@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Config_Common
 @subsection Common Configuration Options
 @cindex Common Configuration Options
@@ -20,8 +21,8 @@ Note that every option belongs in some section. Sections are denoted with
 The following sections detail options which apply to all Crystal Space
 applications.
 
-@include options/config/common/plugins.txi
-@include options/config/common/world.txi
-@include options/config/common/video.txi
-@include options/config/common/lighting.txi
-@include options/config/common/console.txi
+@importsss{options,config,common,plugins.txi}
+@importsss{options,config,common,world.txi}
+@importsss{options,config,common,video.txi}
+@importsss{options,config,common,lighting.txi}
+@importsss{options,config,common,console.txi}

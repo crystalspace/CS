@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Config_Plugins
 @subsubsection @code{[PlugIns]} section
 

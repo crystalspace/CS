@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node BeOS
 @subsection BeOS
 @cindex BeOS

@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Requirements
 @section Requirements
 @cindex Requirements

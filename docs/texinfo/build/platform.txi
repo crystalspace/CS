@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node OSSpecific
 @section Platform Specific Instructions
 
@@ -15,12 +16,12 @@ For some ports there is an additional document called
 @samp{Detailed information for @dots{}}. This document explains the inner
 structure of the port to those who want to contribute code for that port.
 
-@include build/platform/unix.txi
-@include build/platform/win32.txi
-@include build/platform/next.txi
-@include build/platform/os2.txi
-@include build/platform/mac.txi
-@include build/platform/beos.txi
-@include build/platform/msdos.txi
-@include build/platform/win32gcc.txi
-@include build/platform/amiga.txi
+@importss{build,platform,unix.txi}
+@importss{build,platform,win32.txi}
+@importss{build,platform,next.txi}
+@importss{build,platform,os2.txi}
+@importss{build,platform,mac.txi}
+@importss{build,platform,beos.txi}
+@importss{build,platform,msdos.txi}
+@importss{build,platform,win32gcc.txi}
+@importss{build,platform,amiga.txi}

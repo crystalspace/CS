@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Config_Soft3D_TextureManager
 @subsection @code{[TextureManager]} section
 

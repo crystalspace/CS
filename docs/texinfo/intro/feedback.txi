@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Feedback
 @section Feedback and Bug Reporting
 @cindex Feedback

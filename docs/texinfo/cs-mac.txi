@@ -1,0 +1,4 @@
+\input texinfo  @c -*-texinfo-*-
+@include macdef.txi
+@import{cs.txi}
+@bye

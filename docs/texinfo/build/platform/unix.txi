@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Unix
 @subsection Unix
 @cindex Unix

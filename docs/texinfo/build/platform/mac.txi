@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Macintosh
 @subsection Macintosh
 @cindex Macintosh

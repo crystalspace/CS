@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Problems
 @section Known platform specific bugs and problems
 

@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Authors
 @section Documentation Authors & Contributors
 

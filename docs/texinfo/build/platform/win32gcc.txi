@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node GCC Windows
 @subsection GCC for Windows
 

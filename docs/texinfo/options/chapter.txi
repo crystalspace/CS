@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Options
 @chapter Options
 @cindex Options
@@ -8,5 +9,5 @@ manipulated in various ways to tailor their behavior.  This chapter discusses
 the various options available to you for tailoring Crystal Space's
 configuration.
 
-@include options/cmdline.txi
-@include options/config.txi
+@imports{options,cmdline.txi}
+@imports{options,config.txi}

@@ -12,6 +12,80 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+19-Mar-2000
+	- Eric Sunshine completed Phase Two of Eric's Big Documentation
+	  Overhaul {tm}.
+	    - Created custom Texinfo macro packages which allow the Crystal
+	      Space documentation to be built on all supported platforms by
+	      taking pathname syntax into account, since none of the Texinfo
+	      conversion tools (TeX, makeinfo, texi2html) do so.  These macro
+	      packages are contained within the files unixdef.txi, macdef.txi,
+	      and dosdef.txi.  These macros must be used in place of the
+	      standard Texinfo @include and @image directives for importing
+	      other Texinfo file and images.  There are two new core macros.
+	      They are @import and @picture, and replace @include and @image,
+	      respectively.  Because of the limited macro capabilities of
+	      Texinfo, there are actually variations of these macros which
+	      must be used depending upon how deeply nested the file to be
+	      included resides.  To include a file which resides in the
+	      current directory, use @import; to include a file in an
+	      immediate subdirectory, use @imports.  Use @importss for a file
+	      two directories deep, @importsss for a file three directories
+	      deep, etc.  For example, to include the file "cow.txi" which
+	      resides within the directory "foo/bar", replace the old
+	      "@include foo/bar/cow.txi" with "@importss{foo,bar,cow.txi}.
+	      The same technique of appending 's' to the macro's name also
+	      applies to the @picture macro.
+	    - Added the cover-documents cs-unix.txi, cs-mac.txi, and
+	      cs-dos.txi.  These files should be considered the root
+	      documentation file, rather than cs.txi, for a given platform.
+	      On Unix, cs-unix.txi is used to build the documentation package;
+	      on Mac, cs-mac.txi; and on Windows/DOS, cs-dos.txi.
+	    - Replaced all instances of @include with @import{} in the
+	      existing Texinfo source files.
+	    - Performed a major overhaul of the documentation makefile,
+	      docs.mak.  The makefile has the new targets 'infodoc',
+	      'htmldoc', 'dvidoc', and 'psdoc', for generating Info, HTML,
+	      DVI, and PostScript conversions of the Texinfo documentation,
+	      respectively.  In the future, I would also like to add a
+	      'pdfdoc' target but for now all of my work is being done with
+	      NextStep, where PDF generation capability is currently
+	      unavailable.  (Perhaps I will add 'pdfdoc' during one of my rare
+	      forays into Linuxland, unless someone else beats me to it.)  The
+	      old targets 'api' and 'doc' have been renamed to 'apidoc' and
+	      'devdoc', respectively.  The makefile also goes to great lengths
+	      to deal correctly with images which are part of the
+	      documentation hierarchy.  This is a highly complex makefile.
+	      Please be certain that you understand it thoroughly before
+	      attempting any modifications.
+	    - When built via the makefile, all generated documentation is now
+	      placed within the standard 'out' directory hierarchy.  Depending
+	      upon the exact target, the generated documentation will end up
+	      in one of either out/docs/dev, out/docs/api, out/docs/info,
+	      out/docs/html, out/docs/dvi, or out/docs/ps.
+	    - Added the conversion script texi2html to the CS/bin directory
+	      along with its initialization file texi2html.init.  This is beta
+	      version 1.60 of texi2html.  This version is required for the
+	      @import and @picture macros which earlier versions of texi2html
+	      are unable to support.  The makefile automatically uses
+	      bin/texi2html as necessary.  This version of 1.60 also contains
+	      bug fixes made by the maintainer of texi2html in response to
+	      many bug reports which I filed.  (Several additional bug reports
+	      are still pending.)
+	    - Customized texi2html.init to that it does not emit the date or
+	      username in the generated output.  The reason that I do not want
+	      this information in the HTML files is that the HTML conversion
+	      will be performed and committed to the CVS repository
+	      automatically.  If this information was present in the converted
+	      files, CVS would consider the files an having been changed even
+	      if there were no actual content changes, and that would be
+	      undesirable.
+	    - Added texinfo.tex and epsf.tex to the standard distribution as a
+	      convenience and to ensure that the documentation converts
+	      easily and without hassle to DVI and PS.
+	    - Began repairing Texinfo mark-up problems.  Added Emacs "texinfo"
+	      mode selection to each file ("@c -*-texinfo-*-).
+	    - Performed a full Texinfo conversion on the license file.
 17-Mar-2000
 	- Andrew Zabolotny did the following changes:
 	   - Re-implemented bi-linear filtering (enabled by "trilinear"
@@ -52,7 +126,7 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine fixed a warning about a floating backslash within
 	  a // comment in ddgvec.cpp.
 	- Eric Sunshine completed Phase One of Eric's Big Documentation
-	  Overhaul.
+	  Overhaul {tm}.
 	    - Cleaned up and rewrote a lot of the filler material in the
 	      Crystal Space manual and updated and corrected much of the
 	      existing information.  Also composed new filler material which

@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Tutorial_Simple
 @section A @code{Simple} Tutorial
 @cindex Tutorial, @code{Simple}

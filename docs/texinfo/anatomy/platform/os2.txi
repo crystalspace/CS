@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node OS2 details
 @subsection Detailed information for OS/2
 

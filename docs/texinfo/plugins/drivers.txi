@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Drivers
 @section Drivers
 @cindex Drivers

@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 The Crystal Space project welcomes contribution from the Open Source
 community.  This is how the project grows and extends its functionality.  We
 accept bug fixes, new code, ideas, etc.

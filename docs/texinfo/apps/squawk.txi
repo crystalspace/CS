@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Squawk
 @section Squawk
 

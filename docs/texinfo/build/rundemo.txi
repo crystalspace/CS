@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Quick Start
 @section Quick Start
 @cindex Walktest

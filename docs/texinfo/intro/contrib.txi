@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Contributors
 @section Crystal Space Contributors
 @cindex Contributors

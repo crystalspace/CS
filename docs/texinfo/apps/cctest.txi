@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node CCtest
 @section CCtest
 @cindex Applications, CCtest

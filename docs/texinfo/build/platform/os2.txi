@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node OS/2
 @subsection OS/2
 @cindex OS/2

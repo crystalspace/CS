@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Config_SoundDriver
 @subsection @code{[SoundDriver]} section
 

@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node MS-DOS
 @subsection MS-DOS
 @cindex MS-DOS

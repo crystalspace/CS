@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node csClear
 @subsection csClear
 @cindex csClear

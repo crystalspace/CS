@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Porting
 @section Porting to a New Platorm
 @cindex Porting

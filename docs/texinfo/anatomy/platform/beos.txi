@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node BeOS details
 @subsection Detailed information for BeOS
 

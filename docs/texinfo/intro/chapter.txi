@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node CS Introduction
 @chapter Introduction
 @cindex Introduction
@@ -19,11 +20,11 @@ Please read the FAQ if you have a question.  If you don't find the answer
 there you can always E-Mail the mailing lists. @xref{FAQ}, or
 @ref{Mailing Lists}.
 
-@include intro/foreword.txi
-@include intro/features.txi
-@include intro/resource.txi
-@include intro/feedback.txi
-@include intro/genesis.txi
-@include intro/authors.txi
-@include intro/contrib.txi
-@include intro/license.txi
+@imports{intro,foreword.txi}
+@imports{intro,features.txi}
+@imports{intro,resource.txi}
+@imports{intro,feedback.txi}
+@imports{intro,genesis.txi}
+@imports{intro,authors.txi}
+@imports{intro,contrib.txi}
+@imports{intro,license.txi}

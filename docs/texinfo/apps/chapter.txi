@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Applications
 @chapter Applications
 @cindex Applications
@@ -7,9 +8,9 @@ Crystal Space.  The applications serve as good demonstrations of how features
 of Crystal Space can be utilized in your own programs and also serve as
 good examples of how to actually program with Crystal Space.
 
-@include apps/walktest/walktest.txi
-@include apps/blocks.txi
-@include apps/cctest.txi
+@importss{apps,walktest,walktest.txi}
+@imports{apps,blocks.txi}
+@imports{apps,cctest.txi}
 
 @node CSWStest
 @section CSWStest
@@ -105,7 +106,7 @@ study.  It is also a demo application of the csgame gameing library.
 @xref{csGame}.
 
 @c ---------------------
-@include apps/squawk.txi
+@imports{apps,squawk.txi}
 @c ---------------------
 
 @node Vsh

@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Library List
 @section Quick Overview of Modules and Libraries
 @cindex Module List

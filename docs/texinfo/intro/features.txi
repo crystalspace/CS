@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Feature List
 @section Feature List
 @cindex Features

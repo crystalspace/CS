@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node csPhyzik
 @section csPhyziks Library @code{csphyzik}
 @cindex Phyziks

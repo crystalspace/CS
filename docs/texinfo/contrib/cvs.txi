@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node CVS Guide
 @section CVS Etiquette Guidelines
 

@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Makefile Structure
 @section Structure of the Makefile
 @cindex Makefile

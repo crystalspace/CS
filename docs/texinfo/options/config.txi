@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Configuration File
 @section Configuration File
 @cindex Configuration File
@@ -7,6 +8,6 @@ configuration options particular to that application.  In other cases, a
 configuration file may be specific to a particular plug-in module or device
 driver.  Configuration files are named with the file extension @file{.cfg}.
 
-@include options/config/common.txi
-@include options/config/soft3d.txi
-@include options/config/sndsoft.txi
+@importss{options,config,common.txi}
+@importss{options,config,soft3d.txi}
+@importss{options,config,sndsoft.txi}

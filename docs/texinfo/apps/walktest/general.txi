@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Console_General
 @subsubsection General commands
 

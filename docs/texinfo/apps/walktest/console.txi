@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Console
 @subsection The Console
 @cindex Console
@@ -25,7 +26,7 @@ than grouping commands by their treatment of arguments, we should provide an
 overview of argument treatment prior to listing commands.
 @end quotation
 
-@include apps/walktest/general.txi
-@include apps/walktest/boolean.txi
-@include apps/walktest/value.txi
-@include apps/walktest/multi.txi
+@importss{apps,walktest,general.txi}
+@importss{apps,walktest,boolean.txi}
+@importss{apps,walktest,value.txi}
+@importss{apps,walktest,multi.txi}

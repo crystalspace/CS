@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node WhereToGet
 @section Where To Get Crystal Space
 

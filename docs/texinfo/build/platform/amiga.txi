@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Amiga
 @subsection Amiga
 @cindex Amiga

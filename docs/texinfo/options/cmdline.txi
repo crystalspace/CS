@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Common Command Line Options
 @section Common Command Line Options
 @cindex Common Command Line Options

@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Tutorial_Introduction
 @section Developing a Crystal Space Application
 

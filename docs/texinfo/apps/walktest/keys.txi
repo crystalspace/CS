@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Walktest_Keyboard
 @subsection Keyboard Interface
 @cindex Walktest Keys

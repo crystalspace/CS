@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Concepts
 @chapter Concepts
 @cindex Concepts

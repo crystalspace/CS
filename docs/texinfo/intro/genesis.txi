@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Genesis
 @section Genesis of Crystal Space
 @cindex Genesis

@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Config_Lighting
 @subsubsection @code{[Lighting]} section
 

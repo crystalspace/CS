@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Writing Documentation
 @section Writing Documentation
 @cindex Writing Documentation

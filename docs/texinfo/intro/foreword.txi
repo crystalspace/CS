@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node HowToRead
 @section How To Read This Manual
 

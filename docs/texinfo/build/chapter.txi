@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Building
 @chapter Configure, Build, and Install
 @cindex Configuration
@@ -11,8 +12,8 @@ and ends with detailed instructions for each supported platform.
 If you are eager to try out the package after building it successfully, then
 read the Quick Start section.  @xref{Quick Start}.
 
-@include build/sysreq.txi
-@include build/extlibs.txi
-@include build/platform.txi
-@include build/problems.txi
-@include build/rundemo.txi
+@imports{build,sysreq.txi}
+@imports{build,extlibs.txi}
+@imports{build,platform.txi}
+@imports{build,problems.txi}
+@imports{build,rundemo.txi}

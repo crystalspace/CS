@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node NeXT details
 @subsection Detailed Information for NeXT
 

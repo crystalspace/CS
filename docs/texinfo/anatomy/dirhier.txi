@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Directory Structure
 @section Directory Structure
 

@@ -1,3 +1,4 @@
+@c -*-texinfo-*-
 @node Anatomy
 @chapter Project Anatomy
 @cindex Anatomy
@@ -40,8 +41,8 @@ Geometry Library (@code{csgeom})
 Utility Library (@code{csutil})
 @end itemize
 
-@include anatomy/liblist.txi
-@include anatomy/dirhier.txi
-@include anatomy/makefile.txi
-@include anatomy/phyziks.txi
-@include anatomy/platform/details.txi
+@imports{anatomy,liblist.txi}
+@imports{anatomy,dirhier.txi}
+@imports{anatomy,makefile.txi}
+@imports{anatomy,phyziks.txi}
+@importss{anatomy,platform,details.txi}
