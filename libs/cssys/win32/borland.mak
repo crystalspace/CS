@@ -8,7 +8,9 @@ DESCRIPTION.borland = Windows with Borland
 #
 DRIVERS+=cs2d/ddraw cs3d/software \
   csnetdrv/null csnetman/null csnetman/simple \
-  cssnddrv/null cssndrdr/null cssndrdr/software
+  cssnddrv/null cssndrdr/null cssndrdr/software \
+  cs3d/opengl cs2d/openglwin \
+  cs3d/direct3d5
 
 # Uncomment the following to get an startup console window
 #CONSOLE_FLAGS = -DWIN32_USECONSOLE
@@ -68,17 +70,20 @@ LFLAGS.@ = -e$@
 CFLAGS.INCLUDE=-Iinclude/cssys/win32
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=-w-8027 -DWIN32_VOLATILE -x- $(CFLAGS.SYSTEM)
+CFLAGS.GENERAL=-w-8027 -DWIN32_VOLATILE -q -x- $(CFLAGS.SYSTEM)
 
 586=-5 -OS
 686=-6 -OS
 ULTRAOPTIMIZE=-Oi -Ov
+ifdef USE_CODEGUARD
+CODEGUARD=-vG
+endif
 
 # Flags for the compiler which are used when optimizing.
 CFLAGS.optimize=-d -ff -O2
 
 # Flags for the compiler which are used when debugging.
-#CFLAGS.debug=-Od -v -vi- -vG -y
+CFLAGS.debug=-Od -v -vi- -y $(CODEGUARD)
 
 # Flags for the compiler which are used when profiling.
 CFLAGS.profile=
@@ -87,13 +92,13 @@ CFLAGS.profile=
 CFLAGS.DLL=
 
 # General flags for the linker which are used in any case.
-LFLAGS.GENERAL=
+LFLAGS.GENERAL=-q
 
 # Flags for the linker which are used when optimizing.
 LFLAGS.optimize=
 
 # Flags for the linker which are used when debugging.
-LFLAGS.debug=
+LFLAGS.debug=-Od -v -vi- -y $(CODEGUARD)
 
 # Flags for the linker which are used when profiling.
 LFLAGS.profile=
@@ -106,7 +111,8 @@ LIB=.lib
 define AR
   @rm -f $@
 endef
-ARFLAGS=
+#For debug mode
+ARFLAGS=/P128
 ARFLAGS.@=$(subst /,\,$@)
 
 # System-dependent flags to pass to NASM
@@ -144,7 +150,7 @@ NETSOCK_LIBS=
 SYS_SED_DEPEND=-e "s/\.ob*j*\:/\$$O:/g"
 
 # Flags for linking a GUI and a console executable
-LFLAGS.EXE=-WC
+LFLAGS.EXE=-W
 LFLAGS.CONSOLE.EXE=-WC
 
 # Use makedep to build dependencies
@@ -158,10 +164,12 @@ ifeq ($(MAKESECTION),postdefines)
 L^=$+
 DO.COMPILE.C = $(CC) $(CFLAGS) $(CFLAGS.INCLUDE) $(CFLAGS.@) $(<<)
 DO.COMPILE.CPP = $(CXX) $(CFLAGS) $(CFLAGS.INCLUDE) $(CFLAGS.@) $(<<)
+DO.SHARED.LIBRARY = $(LINK) $(LFLAGS.DLL) $(LFLAGS) $(LFLAGS.@) $(^^) $(L^) $(LIBS)
+DO.SHARED.PLUGIN = $(LINK) $(LFLAGS.DLL) $(LFLAGS) $(LFLAGS.@) $(^^) $(L^) $(LIBS)
 
 define DO.STATIC.LIBRARY
 	$(AR)
-	$(foreach curobj,$(^^),tlib "$(ARFLAGS.@)" "+$(subst /,\,$(curobj))";)
+	$(foreach curobj,$(^^),tlib $(ARFLAGS) "$(ARFLAGS.@)" "+$(subst /,\,$(curobj))";)
 endef
 
 endif # ifeq ($(MAKESECTION),postdefines)

@@ -232,7 +232,7 @@ public:
   { return ParentTemplate; }
 
   CSOBJTYPE;
-  DECLARE_IBASE_EXT (csPolygonSet)
+  DECLARE_IBASE_EXT (csPolygonSet);
 
   //------------------------- iSector interface --------------------------------
   struct ThingInterface : public iThing

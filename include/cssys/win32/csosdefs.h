@@ -166,9 +166,15 @@
   #include <io.h>
 #endif
 
+#ifdef COMP_BC
+#  define GETPID() getpid()
+#else
+#  define GETPID() _getpid()
+#endif
+
 #ifdef SYSDEF_TEMP
 #  include <process.h>
-#  define TEMP_FILE "%x.cs", getpid()
+#  define TEMP_FILE "%x.cs", GETPID()
 #  define TEMP_DIR win32_tempdir()
    // This is the function called by TEMP_DIR macro
    static inline char *win32_tempdir()
@@ -201,6 +207,16 @@ static inline void *better_memcpy (void *dst, const void *src, size_t len)
   _asm		rep	movsb
   return dst;
 }
+#endif
+
+#ifdef COMP_BC
+// Azverkan
+// Major hack due to pow failures in CS for Borland, removing this
+// causes millions of strings to print out
+#define pow(arga, argb) ( (!arga && !argb)?0:pow(arga, argb) )
+
+// Azverkan: Dunno why this is in CS
+#define DEBUG_BREAK
 #endif
 
 #if defined (PROC_INTEL)

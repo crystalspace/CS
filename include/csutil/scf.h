@@ -205,7 +205,7 @@ void *Class::QueryInterface (const char *iInterfaceID, int iVersion)	\
   typedef ParentClass __scf_superclass;					\
   virtual void IncRef ();						\
   virtual void DecRef ();						\
-  virtual void *QueryInterface (const char *iInterfaceID, int iVersion);
+  virtual void *QueryInterface (const char *iInterfaceID, int iVersion)
 
 /**
  * This macro implements same functionality as IMPLEMENT_IBASE

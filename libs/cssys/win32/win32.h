@@ -68,7 +68,7 @@ public:
   virtual bool Open (const char *Title);
   virtual void Close ();
 
-  DECLARE_IBASE_EXT (csSystemDriver)
+  DECLARE_IBASE_EXT (csSystemDriver);
 
 private:
 #ifdef DO_DINPUT_KEYBOARD
