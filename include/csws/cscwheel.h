@@ -28,6 +28,8 @@
  * \addtogroup csws_comps_cwheel
  * @{ */
  
+#include "csextern.h"
+ 
 #include "csstatic.h"
 
 /// Color wheel messages
@@ -44,7 +46,7 @@ enum
 };
 
 /// Color wheel static control
-class csColorWheel : public csStatic
+class CS_CSWS_EXPORT csColorWheel : public csStatic
 {
   // Current H & S values (L is separate)
   float h,s;

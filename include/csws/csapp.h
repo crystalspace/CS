@@ -29,6 +29,8 @@
  * \addtogroup csws_comps_app
  * @{ */
 
+#include "csextern.h"
+ 
 #include <stdarg.h>
 
 #define CSWS_INTERNAL
@@ -76,7 +78,7 @@ enum csAppBackgroundStyle
  * The Crystal Space application is a regular plugin from the
  * system driver's point of view.
  */
-class csApp : public csComponent
+class CS_CSWS_EXPORT csApp : public csComponent
 {
 protected:
   friend class csMouse;

@@ -28,6 +28,8 @@
  * \addtogroup csws_stddlg
  * @{ */
  
+#include "csextern.h"
+ 
 #include "csutil/scf.h"
 #define CSWS_INTERNAL
 #include "csws.h"
@@ -102,9 +104,9 @@ struct iMessageBoxData : public iBase
  * The pressed button will be given as the 'Info' field in
  * Event.Command.Info (cscmdCancel, cscmdOk, ...).
  */
-extern void csMessageBox (csComponent *iParent, const char *iTitle,
-	const char *iMessage, iBase* userdata,
-	int iFlags = CSMBS_INFO | CSMBS_OK, ...) CS_GNUC_PRINTF (3, 6);
+extern CS_CSWS_EXPORT  void csMessageBox (csComponent *iParent, 
+  const char *iTitle, const char *iMessage, iBase* userdata, 
+  int iFlags = CSMBS_INFO | CSMBS_OK, ...) CS_GNUC_PRINTF (3, 6);
 
 /// File name entry field in file dialogs
 #define CSWID_FILENAME		0xC509
@@ -116,12 +118,13 @@ extern void csMessageBox (csComponent *iParent, const char *iTitle,
 #define CSWID_FILELIST		0xC50C
 
 /// Create and return a new file open dialog
-extern csWindow *csFileDialog (csComponent *iParent, const char *iTitle,
-  const char *iFileName = "./", const char *iOpenButtonText = "~Load",
-  bool vfspaths=false);
+extern CS_CSWS_EXPORT csWindow *csFileDialog (csComponent *iParent, 
+  const char *iTitle, const char *iFileName = "./", 
+  const char *iOpenButtonText = "~Load", bool vfspaths=false);
+  
 /// Query full name, filename and pathname from a file dialog
-extern void csQueryFileDialog (csWindow *iFileDialog, char *iFileName,
-  size_t iFileNameSize);
+extern CS_CSWS_EXPORT void csQueryFileDialog (csWindow *iFileDialog, 
+  char *iFileName, size_t iFileNameSize);
 
 /// Color wheel in color choose dialogs
 #define CSWID_COLORWHEEL	0xC50D
@@ -139,14 +142,17 @@ extern void csQueryFileDialog (csWindow *iFileDialog, char *iFileName,
 #define CSWID_COLORRGB		0xC513
 
 /// Create and return a new color choose dialog
-extern csWindow *csColorDialog (csComponent *iParent, const char *iTitle, int iColor = 0);
+extern CS_CSWS_EXPORT csWindow *csColorDialog (csComponent *iParent, 
+  const char *iTitle, int iColor = 0);
 /// Same but accepts R/G/B separately
-csWindow *csColorDialog (csComponent *iParent, const char *iTitle,
-  float iR, float iG, float iB);
+extern CS_CSWS_EXPORT  csWindow *csColorDialog (csComponent *iParent, 
+  const char *iTitle, float iR, float iG, float iB);
 /// Query color dialog contents as a single color value
-extern void csQueryColorDialog (csWindow *iColorDialog, int &oColor);
+extern CS_CSWS_EXPORT void csQueryColorDialog (csWindow *iColorDialog, 
+  int &oColor);
 /// Query color dialog contents as R,G,B floating-point numbers
-extern void csQueryColorDialog (csWindow *iColorDialog, float &oR, float &oG, float &oB);
+extern CS_CSWS_EXPORT void csQueryColorDialog (csWindow *iColorDialog, 
+  float &oR, float &oG, float &oB);
 
 /** @} */
 

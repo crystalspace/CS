@@ -29,6 +29,8 @@
  * \addtogroup csws_comps_button
  * @{ */
  
+#include "csextern.h"
+ 
 #include "cscomp.h"
 
 /**
@@ -134,7 +136,7 @@ enum csButtonFrameStyle
  * The Button class implements different types of push buttons.
  * Buttons can contain a text string and/or a bitmap.
  */
-class csButton : public csComponent
+class CS_CSWS_EXPORT csButton : public csComponent
 {
 protected:
   /// Button images in normal and pressed state

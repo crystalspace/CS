@@ -28,6 +28,8 @@
  * \addtogroup csws_comps_iline
  * @{ */
  
+#include "csextern.h"
+ 
 #include "cscomp.h"
 
 /// Possible input line frame styles
@@ -56,7 +58,7 @@ class csTimer;
  * checks the just-modified string for correctness. If method decides
  * that string is incorrect, the changes are undone.
  */
-class csInputLine : public csComponent
+class CS_CSWS_EXPORT csInputLine : public csComponent
 {
   /// Input line frame style
   csInputLineFrameStyle FrameStyle;

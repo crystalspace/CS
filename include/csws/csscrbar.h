@@ -28,6 +28,8 @@
  * \addtogroup csws_comps_scrbar
  * @{ */
  
+#include "csextern.h"
+ 
 #include "cscomp.h"
 #include "csbutton.h"
 #include "cstimer.h"
@@ -107,7 +109,7 @@ enum
  * Parent can set scroll bar's position/range using command
  * messages.
  */
-class csScrollBar : public csComponent
+class CS_CSWS_EXPORT csScrollBar : public csComponent
 {
   /// Scroll bar frame style
   csScrollBarFrameStyle FrameStyle;

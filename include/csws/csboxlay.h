@@ -24,13 +24,15 @@
  * \addtogroup csws_layout
  * @{ */
  
+#include "csextern.h"
+ 
 #include "cslayout.h"
 
 /**
  * Components are scaled to fit in one row or one column of the canvas.
  */
 
-class csBoxLayout : public csLayout
+class CS_CSWS_EXPORT csBoxLayout : public csLayout
 {
  public:
   /// Set axis to 0 to align the components along the x-axis in the middle

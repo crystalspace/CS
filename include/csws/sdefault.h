@@ -23,6 +23,8 @@
 /**
  * \addtogroup csws_skins
  * @{ */
+
+#include "csextern.h"
  
 #include "csskin.h"
 #include "csbackgr.h"
@@ -45,7 +47,7 @@ struct iTextureHandle;
 /**
  * This is the default skin for buttons.
  */
-class csDefaultButtonSkin : public csButtonSkin
+class CS_CSWS_EXPORT csDefaultButtonSkin : public csButtonSkin
 {
 public:
   /// Draw the component we are responsible for
@@ -58,7 +60,7 @@ public:
 /**
  * This is the default skin for windows.
  */
-class csDefaultWindowSkin : public csWindowSkin
+class CS_CSWS_EXPORT csDefaultWindowSkin : public csWindowSkin
 {
   // The texture for titlebar buttons
   iTextureHandle *ButtonTex;
@@ -99,7 +101,7 @@ protected:
 /**
  * This is the default skin for dialogs.
  */
-class csDefaultDialogSkin : public csDialogSkin
+class CS_CSWS_EXPORT csDefaultDialogSkin : public csDialogSkin
 {
   // The background
   csBackground Back;
@@ -121,7 +123,7 @@ public:
 /**
  * This is the default skin for window titlebars.
  */
-class csDefaultTitlebarSkin : public csTitlebarSkin
+class CS_CSWS_EXPORT csDefaultTitlebarSkin : public csTitlebarSkin
 {
   // The active window titlebar background
   csBackground ABack;
@@ -144,7 +146,7 @@ public:
 /**
  * This is the default skin for listboxes
  */
-class csDefaultListBoxSkin : public csListBoxSkin
+class CS_CSWS_EXPORT csDefaultListBoxSkin : public csListBoxSkin
 {
 public:
   /// Draw the component we are responsible for
@@ -157,7 +159,7 @@ public:
 /**
  * This is the default skin for listbox items
  */
-class csDefaultListBoxItemSkin : public csListBoxItemSkin
+class CS_CSWS_EXPORT csDefaultListBoxItemSkin : public csListBoxItemSkin
 {
 public:
   /// Draw the component we are responsible for
@@ -168,7 +170,7 @@ public:
 /**
  * This is the default skin for scroll bars
  */
- class csDefaultScrollBarSkin : public csScrollBarSkin
+ class CS_CSWS_EXPORT csDefaultScrollBarSkin : public csScrollBarSkin
  {
  public:
    /// Draw the component we are responsible for

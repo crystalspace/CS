@@ -24,6 +24,8 @@
  * \addtogroup csws
  * @{ */
  
+#include "csextern.h"
+ 
 #include "csgfx/csimage.h"
 #include "csutil/parray.h"
 
@@ -35,7 +37,7 @@ struct iTextureManager;
  * The application keeps an array of such objects, and they are registered
  * with the 3D and 2D drivers as soon as app->RegisterTextures() is called.
  */
-class csWSTexture
+class CS_CSWS_EXPORT csWSTexture
 {
   // Reference count
   int RefCount;
@@ -111,7 +113,7 @@ public:
 };
 
 /// This class is a vector of csWSTexture's
-class csWSTexVector : public csPDelArray<csWSTexture>
+class CS_CSWS_EXPORT csWSTexVector : public csPDelArray<csWSTexture>
 {
 public:
   /// Initialize the texture vector

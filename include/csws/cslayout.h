@@ -24,6 +24,8 @@
  * \addtogroup csws_layout
  * @{ */
  
+#include "csextern.h"
+ 
 #include "csws/csdialog.h"
 #include "csgeom/cspoint.h"
 #include "csutil/parray.h"
@@ -32,7 +34,7 @@
  * csLayoutConstraint is a basic constraint used for positioning a control
  * in a csLayout derived component.
  */
-class csLayoutConstraint
+class CS_CSWS_EXPORT csLayoutConstraint
 {
 public:
   /// the attached component
@@ -55,7 +57,7 @@ public:
  * The constraints (and thus the components to place) are
  * taken into account in the sequence they are added to this vector.
  */
-class csConstraintVector : public csPDelArray<csLayoutConstraint>
+class CS_CSWS_EXPORT csConstraintVector : public csPDelArray<csLayoutConstraint>
 {
 public:
   /// look up an constraint given a components
@@ -92,7 +94,7 @@ public:
  * csLayout is our baseclass for various derived classes like
  * csFlowLayout, csBoxLayout, csGridBagLayout and others.
  */
-class csLayout : public csDialog
+class CS_CSWS_EXPORT csLayout : public csDialog
 {
 protected:
   /**
@@ -169,7 +171,7 @@ public:
  * csLayout2 extends csLayout to take the maximum layout size and
  * aligning along the x and y axis into account.
  */
-class csLayout2 : public csLayout
+class CS_CSWS_EXPORT csLayout2 : public csLayout
 {
  public:
   csLayout2 (csComponent *pParent);

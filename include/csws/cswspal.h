@@ -28,6 +28,8 @@
  * \addtogroup csws_skins
  * @{ */
  
+#include "csextern.h"
+ 
 class csApp;
 
 /**
@@ -116,24 +118,24 @@ struct csColorScheme
 };
 
 /// A global array containing CSWS palette for all component types
-extern csPaletteExport *cswsPalette;
+extern CS_CSWS_EXPORT csPaletteExport *cswsPalette;
 /// Total number of palettes
-extern int cswsPaletteSize;
+extern CS_CSWS_EXPORT int cswsPaletteSize;
 
 /**
  * Register a new color palette (returns the palette index).
  * Registered palettes will be affected by color scheme changes;
  * unregistered won't be.
  */
-extern int csRegisterPalette (int *Palette, int Size);
+extern CS_CSWS_EXPORT int csRegisterPalette (int *Palette, int Size);
 /// Change the global color scheme (or restore scheme if 0 passed)
-extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
+extern CS_CSWS_EXPORT void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 
 /**
  * Cleanup the global palette array when it is not needed anymore.
  * Must be called to avoid memleaks.
  */
-extern void csResetPalette (void);
+extern CS_CSWS_EXPORT void csResetPalette (void);
 
 /**
  * \name Palette indices

@@ -28,6 +28,8 @@
  * \addtogroup csws_comps_chkbx
  * @{ */
  
+#include "csextern.h"
+ 
 #include "cscomp.h"
 #include "csbutton.h"
 
@@ -89,7 +91,7 @@ enum csCheckBoxState
  * The check boxes contains a fixed bitmap which changes depending on
  * checkbox state and no text.
  */
-class csCheckBox : public csButton
+class CS_CSWS_EXPORT csCheckBox : public csButton
 {
   /// Checkbox state
   csCheckBoxState CheckBoxState;

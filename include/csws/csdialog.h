@@ -28,6 +28,8 @@
  * \addtogroup csws_comps_dialog
  * @{ */
  
+#include "csextern.h"
+ 
 #include "cscomp.h"
 
 /**
@@ -64,7 +66,7 @@ enum csDialogFrameStyle
  * specify its frame style to csdfsAround: in this case it will
  * look like a usual window but without titlebar.
  */
-class csDialog : public csComponent
+class CS_CSWS_EXPORT csDialog : public csComponent
 {
 protected:
   /// Dialog frame style

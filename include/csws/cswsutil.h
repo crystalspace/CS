@@ -24,6 +24,8 @@
  * \addtogroup csws
  * @{ */
  
+#include "csextern.h"
+ 
 #define CSWS_INTERNAL
 #include "csws.h"
 #include "cswindow.h"
@@ -33,7 +35,7 @@
  * A window of this type is created when user clicks both mouse buttons
  * on application canvas.
  */
-class csWindowList : public csWindow
+class CS_CSWS_EXPORT csWindowList : public csWindow
 {
 protected:
   /// client dialog component
@@ -71,31 +73,34 @@ protected:
  * Compute the biggest union of a set of adjanced rectangles
  * (i.e. rectangles do not overlap and can have adjanced edges).
  */
-extern void RectUnion (cswsRectVector &rect, csRect &result);
+extern CS_CSWS_EXPORT void RectUnion (cswsRectVector &rect, csRect &result);
 
 /// Find a bitmap definition in one of CSWS.CFG bitmap arrays
-extern void ParseConfigBitmap (csApp *app, const char *prefix,
+extern CS_CSWS_EXPORT void ParseConfigBitmap (csApp *app, const char *prefix,
   const char *section, const char *id, int &x, int &y, int &w, int &h);
 
 /// Convert HLS to RGB
-extern void csHLS2RGB (float h, float l, float s, float &r, float &g, float &b);
+extern CS_CSWS_EXPORT void csHLS2RGB (float h, float l, float s, float &r, 
+  float &g, float &b);
 /// Convert RGB to HLS
-extern void csRGB2HLS (float r, float g, float b, float &h, float &l, float &s);
+extern CS_CSWS_EXPORT void csRGB2HLS (float r, float g, float b, float &h, 
+  float &l, float &s);
 /// Get a color's R,G,B components (iColor as returned by csApp::FindColor)
-extern void csGetRGB (int iColor, csApp *iApp, float &r, float &g, float &b);
+extern CS_CSWS_EXPORT void csGetRGB (int iColor, csApp *iApp, float &r, 
+  float &g, float &b);
 
 /// The short way to add a text button to a toolbar
-extern csButton *csNewToolbarButton (csComponent *iToolbar, int iCommand,
-  char *iText, csButtonFrameStyle iFrameStyle = csbfsThinRect,
+extern CS_CSWS_EXPORT csButton *csNewToolbarButton (csComponent *iToolbar, 
+  int iCommand, char *iText, csButtonFrameStyle iFrameStyle = csbfsThinRect,
   int iButtonStyle = CSBS_SHIFT | CSBS_TEXTBELOW);
 /// The short way to add a icon button to a toolbar
-extern csButton *csNewToolbarButton (csComponent *iToolbar, int iCommand,
-  csPixmap *bmpup = 0, csPixmap *bmpdn = 0,
+extern CS_CSWS_EXPORT csButton *csNewToolbarButton (csComponent *iToolbar, 
+  int iCommand, csPixmap *bmpup = 0, csPixmap *bmpdn = 0,
   csButtonFrameStyle iFrameStyle = csbfsThinRect,
   int iButtonStyle = CSBS_SHIFT, bool iDeletePixmaps = true);
 /// Create and return a new bitmap (2D sprite)
-extern csPixmap *NewBitmap (csApp *app, char *texturename, int tx, int ty,
-  int tw, int th);
+extern CS_CSWS_EXPORT csPixmap *NewBitmap (csApp *app, char *texturename, 
+  int tx, int ty, int tw, int th);
 
 /** @} */
 

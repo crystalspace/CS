@@ -20,6 +20,8 @@
 #ifndef __CS_CSBORDERLAYOUT_H__
 #define __CS_CSBORDERLAYOUT_H__
 
+#include "csextern.h"
+ 
 #include "cslayout.h"
 
 /**
@@ -31,7 +33,7 @@
  * of the attached control.
  */
 
-class csBorderConstraint : public csLayoutConstraint
+class CS_CSWS_EXPORT csBorderConstraint : public csLayoutConstraint
 {
  public:
   int mAlign;
@@ -87,7 +89,7 @@ class csBorderConstraint : public csLayoutConstraint
  * </p>
  */
  
-class csBorderLayout : public csLayout2
+class CS_CSWS_EXPORT csBorderLayout : public csLayout2
 {
  public:
   csBorderLayout (csComponent *pParent);

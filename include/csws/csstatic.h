@@ -28,6 +28,8 @@
  * \addtogroup csws_comps_static
  * @{ */
  
+#include "csextern.h"
+ 
 #include "cscomp.h"
 
 /// Possible static component styles
@@ -123,7 +125,7 @@ enum
  * the first selectable component following the static one will be
  * activated.
  */
-class csStatic : public csComponent
+class CS_CSWS_EXPORT csStatic : public csComponent
 {
 protected:
   // Character number that should be underlined (-1 == none)

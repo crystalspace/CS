@@ -28,6 +28,8 @@
  * \addtogroup csws_comps_radbut
  * @{ */
  
+#include "csextern.h"
+ 
 #include "cscomp.h"
 #include "csbutton.h"
 
@@ -68,7 +70,7 @@ enum
  * user selects one previous selection automatically deselects.
  * The first radio button in group should have the CSS_GROUP flag set.
  */
-class csRadioButton : public csButton
+class CS_CSWS_EXPORT csRadioButton : public csButton
 {
   /// Radio button state
   bool RadioButtonState;

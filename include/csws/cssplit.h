@@ -26,6 +26,8 @@
  * \addtogroup csws_comps_splitter
  * @{ */
  
+#include "csextern.h"
+ 
 #include "csws/csbutton.h"
 
 /// Splitter messages
@@ -53,7 +55,7 @@ enum
  * in its parent canvas. It is used to split some view into parts dynamically.
  * Look at csGrid to see it in action.
  */
-class csSplitter : public csComponent
+class CS_CSWS_EXPORT csSplitter : public csComponent
 {
 protected:
   /// True if it is currently sliding

@@ -27,13 +27,15 @@
  * \addtogroup csws_layout
  * @{ */
  
+#include "csextern.h"
+ 
 #include "cslayout.h"
 #include "csutil/parray.h"
 
 /**
  * Subclass of csLayoutConstraint for use with csGridBagLayout.
  */
-class csGridBagConstraint : public csLayoutConstraint
+class CS_CSWS_EXPORT csGridBagConstraint : public csLayoutConstraint
 {
 public:
   csGridBagConstraint (csComponent *comp);
@@ -278,7 +280,7 @@ public:
  * </p>
  */
  
-class csGridBagLayout : public csLayout2
+class CS_CSWS_EXPORT csGridBagLayout : public csLayout2
 {
   struct CellInfo
   {

@@ -28,6 +28,8 @@
  * \addtogroup csws
  * @{ */
  
+#include "csextern.h"
+ 
 #include "csgfx/rgbpixel.h"
 
 struct iTextureHandle;
@@ -51,7 +53,7 @@ enum csBackgroundType
  * This class is meant for displaying textured or gradiented backgrounds.
  * This is not a component; it is mainly meant for use by skins.
  */
-class csBackground
+class CS_CSWS_EXPORT csBackground
 {
   /// Background type
   csBackgroundType type;

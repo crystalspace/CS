@@ -28,6 +28,8 @@
  * \addtogroup csws_comps_grid
  * @{ */
  
+#include "csextern.h"
+ 
 #include "csws/csscrbar.h"
 #include "csutil/array.h"
 #include "csutil/parray.h"
@@ -54,7 +56,7 @@ class csGridView;
 class csGrid;
 class csSplitter;
 
-class csRegionTree2D
+class CS_CSWS_EXPORT csRegionTree2D
 {
 public:
   csRect region;
@@ -199,7 +201,7 @@ enum csGridCellBorderStyle
  * and acts as a container for the csComponent (i.e. the
  * thing that lives inside the cell)
  */
-class csGridCell : public csComponent
+class CS_CSWS_EXPORT csGridCell : public csComponent
 {
   /// The property of a specific border of the cell
   class csCellBorder
@@ -258,7 +260,7 @@ protected:
  * and can contain a horizontal and a vertical scrollbar for scrolling
  * the contents of the grid.
  */
-class csGridView : public csComponent
+class CS_CSWS_EXPORT csGridView : public csComponent
 {
 protected:
   /// The subcells this view is restricted to
@@ -376,7 +378,7 @@ enum
  * subview may be limited to certain area within the grid
  * itself.
  */
-class csGrid : public csComponent
+class CS_CSWS_EXPORT csGrid : public csComponent
 {
 protected:
   friend class csGridView;

@@ -12,12 +12,14 @@
  * \addtogroup csws_layout
  * @{ */
  
+#include "csextern.h"
+ 
 #include "cslayout.h"
 
 /**
  * Components are displayed in a grid fashion.
  */
-class csGridLayout : public csLayout
+class CS_CSWS_EXPORT csGridLayout : public csLayout
 {
 protected:
   int mRows;

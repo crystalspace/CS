@@ -28,6 +28,8 @@
  * \addtogroup csws_skins
  * @{ */
  
+#include "csextern.h"
+ 
 #include "csutil/parray.h"
 
 class csSkin;
@@ -67,7 +69,7 @@ class csBackground;
  * If you need to query some data from the application (e.g. some textures
  * and so on) you will have to overload the Initialize() virtual method.
  */
-class csSkinSlice
+class CS_CSWS_EXPORT csSkinSlice
 {
 public:
   /// Destroy this skin slice
@@ -116,6 +118,19 @@ public:
   virtual void Draw (csComponent &This) = 0;
 };
 
+/*
+  @@@ Hack:
+  VC refuses to compile csSkin if it inherits from 
+  csPDelArray<csSkinSlice>, as csSkinSlice contains abstract methods.
+  Work around this by inheriting from csSkinSliceNonAbstr instead which
+  has no abstract methods.
+ */
+class CS_CSWS_EXPORT csSkinSliceNonAbstr : public csSkinSlice
+{
+  virtual const char *GetName () const { return 0; };
+  virtual void Draw (csComponent &This) {};
+};
+
 /**
  * This class defines the interface for a container of skins.
  * Most of the functionality you will want is already here; the
@@ -142,7 +157,7 @@ public:
  * component (note that this does NOT have to do anything with class
  * hierarchy!) will receive the cscmdSkinChanged broadcast.
  */
-class csSkin : public csPDelArray<csSkinSlice>
+class CS_CSWS_EXPORT csSkin : public csPDelArray<csSkinSliceNonAbstr>
 {
   /// The application
   csApp *app;
@@ -152,7 +167,7 @@ public:
   const char *Prefix;
 
   /// Create the skin repository object
-  csSkin () : csPDelArray<csSkinSlice> (16, 16), Prefix (0) {}
+  csSkin () : csPDelArray<csSkinSliceNonAbstr> (16, 16), Prefix (0) {}
 
   virtual ~csSkin () { }
 
@@ -188,7 +203,7 @@ private:
  * Every skin slice that is meant for buttons should inherit
  * from this interface.
  */
-class csButtonSkin : public csSkinSlice
+class CS_CSWS_EXPORT csButtonSkin : public csSkinSlice
 {
 public:
   /// Get the identifier of the component this skin slice is for
@@ -204,7 +219,7 @@ public:
  * Every skin slice that is meant for windows should inherit
  * from this interface.
  */
-class csWindowSkin : public csSkinSlice
+class CS_CSWS_EXPORT csWindowSkin : public csSkinSlice
 {
 public:
   /// Get the identifier of the component this skin slice is for
@@ -229,7 +244,7 @@ public:
  * Every skin slice that is meant for dialogs should inherit
  * from this interface.
  */
-class csDialogSkin : public csSkinSlice
+class CS_CSWS_EXPORT csDialogSkin : public csSkinSlice
 {
 public:
   /// Get the identifier of the component this skin slice is for
@@ -245,7 +260,7 @@ public:
  * Every skin slice that is meant for title bars should inherit
  * from this interface.
  */
-class csTitlebarSkin : public csSkinSlice
+class CS_CSWS_EXPORT csTitlebarSkin : public csSkinSlice
 {
 public:
   /// Get the identifier of the component this skin slice is for
@@ -258,7 +273,7 @@ public:
  * Every skin slice that is meant for listboxes should inherit
  * from this interface.
  */
-class csListBoxSkin : public csSkinSlice
+class CS_CSWS_EXPORT csListBoxSkin : public csSkinSlice
 {
 public:
   /// Get the identifier of the component this skin slice is for
@@ -274,7 +289,7 @@ public:
  * Every skin slice that is meant for listboxe items should inherit
  * from this interface.
  */
-class csListBoxItemSkin : public csSkinSlice
+class CS_CSWS_EXPORT csListBoxItemSkin : public csSkinSlice
 {
 public:
   /// Get the identifier of the component this skin slice is for
@@ -288,7 +303,7 @@ public:
  * Every skin slice that is meant for scrollbars should inherit
  * from this interface.
  */
-class csScrollBarSkin : public csSkinSlice
+class CS_CSWS_EXPORT csScrollBarSkin : public csSkinSlice
 {
 public:
   /// Get the identifier of the component this skin slice is for
@@ -328,7 +343,8 @@ public:
  * name, e.g. "Button", "Window" and so on.
  */
 #define CSWS_SKIN_SLICE(comp)	\
-      InsertSorted (new cs##comp##Skin, Compare);
+      InsertSorted ((csSkinSliceNonAbstr*)new cs##comp##Skin, \
+	(csSkin::ArrayCompareFunction*)Compare);
 
 /**
  * Finish the definition of a skin.

@@ -24,6 +24,8 @@
  * \addtogroup csws_layout
  * @{ */
 
+#include "csextern.h"
+ 
 #include "cslayout.h"
 
 /**
@@ -54,7 +56,7 @@
  * </p>
  */
 
-class csFlowLayout : public csLayout
+class CS_CSWS_EXPORT csFlowLayout : public csLayout
 {
 protected:
   int mAlign;

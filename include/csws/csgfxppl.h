@@ -28,6 +28,8 @@
  * \addtogroup csws
  * @{ */
  
+#include "csextern.h"
+ 
 #include "csgeom/csrect.h"
 #include "cstool/cspixmap.h"
 #include "ivideo/graph2d.h"
@@ -68,7 +70,7 @@ struct iObjectRegistry;
  * have access to its internals, all graphics pipeline management is done
  * through main application object.
  */
-class csGraphicsPipeline
+class CS_CSWS_EXPORT csGraphicsPipeline
 {
 private:
   /// Only csApp can manipulate the graphics pipeline

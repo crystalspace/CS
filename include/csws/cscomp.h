@@ -28,6 +28,8 @@
  * \addtogroup csws_comps
  * @{ */
 
+#include "csextern.h"
+ 
 #include "csgeom/csrect.h"
 #include "csutil/parray.h"
 #include "csutil/array.h"
@@ -346,7 +348,7 @@ enum
  * anything you draw inside the Draw() method is overlayed onto parent
  * component's image.
  */
-class csComponent
+class CS_CSWS_EXPORT csComponent
 {
 protected:
   /// Object state flags (see CSS_XXX flags)
@@ -366,7 +368,9 @@ protected:
   /// What to do when parent size changes (see CS_LOCK_XXX flags)
   char ResizeMode;
   /// Used on drag operations
-  static int dragX, dragY, dragMode;
+  static int dragX;
+  static int dragY;
+  static int dragMode;
   /// The component bound before drag started
   static csRect *dragBound;
   /// Component against which this component is clipped<p>

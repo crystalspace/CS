@@ -24,13 +24,15 @@
  * \addtogroup csws_layout
  * @{ */
  
+#include "csextern.h"
+ 
 #include "cslayout.h"
 
 /**
  * This is just for completeness. Set absolute positions just like you
  * normally do with SetPos, SetSize and SetRect.
  */
-class csAbsoluteLayout : public csLayout
+class CS_CSWS_EXPORT csAbsoluteLayout : public csLayout
 {
  public:
 

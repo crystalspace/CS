@@ -31,6 +31,8 @@
  * \addtogroup csws_comps_timer
  * @{ */
  
+#include "csextern.h"
+ 
 /// csTimer class messages
 enum
 {
@@ -57,7 +59,7 @@ struct iEventOutlet;
  * bound between two periods. Timer period can be set either at run time
  * or during object creation. This component is always invisible.
  */
-class csTimer : public csComponent
+class CS_CSWS_EXPORT csTimer : public csComponent
 {
   /// Timer period in milliseconds
   unsigned timeout;

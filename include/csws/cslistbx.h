@@ -28,6 +28,8 @@
  * \addtogroup csws_comps_listbox
  * @{ */
  
+#include "csextern.h"
+ 
 #include "cscomp.h"
 #include "csscrbar.h"
 
@@ -184,7 +186,7 @@ enum csListBoxItemStyle
 };
 
 /// This class encapsulates a menu item
-class csListBoxItem : public csComponent
+class CS_CSWS_EXPORT csListBoxItem : public csComponent
 {
   /// List box item style
   csListBoxItemStyle ItemStyle;
@@ -288,7 +290,7 @@ enum csListBoxFrameStyle
  * CSLBS_MULTIPLESEL style is not specified) or have multiple selected
  * items at a time (if that style flag is set).
  */
-class csListBox : public csComponent
+class CS_CSWS_EXPORT csListBox : public csComponent
 {
   /// List box style
   int ListBoxStyle;

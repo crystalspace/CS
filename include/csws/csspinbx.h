@@ -28,6 +28,8 @@
  * \addtogroup csws_comps_spinbox
  * @{ */
  
+#include "csextern.h"
+ 
 #include "cscomp.h"
 #include "cstimer.h"
 #include "csiline.h"
@@ -104,7 +106,7 @@ enum
  * arrow button which can be used to switch input line contents back and
  * forth between a set of predefined values.
  */
-class csSpinBox : public csInputLine
+class CS_CSWS_EXPORT csSpinBox : public csInputLine
 {
   /// Current spin box value
   int Value;

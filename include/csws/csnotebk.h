@@ -28,6 +28,8 @@
  * \addtogroup csws_comps_notebook
  * @{ */
  
+#include "csextern.h"
+ 
 #include "cscomp.h"
 #include "csbutton.h"
 #include "csutil/parray.h"
@@ -131,7 +133,7 @@ class cspNotebookButton;
  * dialogs, every group can consist of several dialogs that are switched
  * with a minor arrow control in one of the corners of the notebook.
  */
-class csNotebook : public csComponent
+class CS_CSWS_EXPORT csNotebook : public csComponent
 {
   // Structure used to keep per-page private information
   struct cspPageData

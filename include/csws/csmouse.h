@@ -28,6 +28,8 @@
  * \addtogroup csws
  * @{ */
  
+#include "csextern.h"
+ 
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "csutil/parray.h"
@@ -39,7 +41,7 @@ struct iEvent;
 /**
  * This class encapsulates mouse pointer
  */
-class csMousePointer
+class CS_CSWS_EXPORT csMousePointer
 {
 private:
   friend class csMouse;
@@ -64,7 +66,7 @@ public:
  * This class handles mouse pointer and generates mouse events.<p>
  * Usually there is only one object of this class in each csApp object.
  */
-class csMouse
+class CS_CSWS_EXPORT csMouse
 {
 private:
   friend class csMousePointer;
