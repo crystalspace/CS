@@ -69,9 +69,9 @@ public:
   iIsoCell *GetCell(int x, int y) const
   {
     if(x<0) x=0;
-    else if(x >= width) x=width;
+    else if(x >= width) x=width-1;
     if(y<0) y=0;
-    else if(y >= height) y=height;
+    else if(y >= height) y=height-1;
     CS_ASSERT (x >= 0 && x < width);
     CS_ASSERT (y >= 0 && y < height);
     return grid[y*width+x];
