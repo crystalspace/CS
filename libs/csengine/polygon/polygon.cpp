@@ -1527,6 +1527,12 @@ void csPolygon2D::Draw (IGraphics2D* g2d, int col)
 
 void PreparePolygonQuick (G3DPolygonDPQ* g3dpoly, csVector2* orig_triangle, bool gouraud)
 {
+  if (g3dpoly->num == 3)
+  {
+    // Trivial case. The polygon is still a triangle.
+    return;
+  }
+
   //first we copy the first three texture coordinates to a local buffer to avoid that they
   //are overwritten when interpolating.
   G3DTexturedVertex tritexcoords[3];
