@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Jan-2004
+	- Jorrit fixed a bug in engine->GetNearbyObjects() and
+	  GetNearbyMeshes(). These functions could get confused in situations
+	  with lots of space warping portals and not return the correct
+	  result then.
+	- Jorrit added a new csEngineTools class in cstools library.
+	- Jorrit added csEngineTools::FindShortestDistance(). This function
+	  tries to find the shortest distance between two points. Possibly
+	  it will traverse portals to do so.
 14-Jan-2004
 	- Eric Sunshine added a new automated and highly dynamic unit testing
 	  framework which employs CppUnit (http://cppunit.sourceforge.net/).

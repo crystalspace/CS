@@ -2602,6 +2602,7 @@ void csEngine::GetNearbyObjectList (iSector* sector,
                     GetNearbyObjectList (portal->GetSector (), pos, radius,
 		    	list, visited_sectors);
 		  }
+		  visited_sectors.Pop ();
                 }
               }
             }
@@ -2671,6 +2672,9 @@ void csEngine::GetNearbyMeshList (iSector* sector,
           // Can we see the portal?
           if (wor_plane.Classify (pos) < -0.001)
           {
+	    // @@@ Consider having a simpler version that looks
+	    // at center of portal instead of trying to calculate distance
+	    // to portal polygon?
             csVector3 poly[100];	//@@@ HARDCODE
             int k;
 	    int* idx = portal->GetVertexIndices ();
@@ -2715,6 +2719,7 @@ void csEngine::GetNearbyMeshList (iSector* sector,
                     GetNearbyMeshList (portal->GetSector (), pos, radius,
 		    	list, visited_sectors);
 		  }
+		  visited_sectors.Pop ();
                 }
               }
             }
