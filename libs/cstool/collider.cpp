@@ -189,3 +189,106 @@ void csColliderHelper::InitializeCollisionWrappers (iCollideSystem* colsys,
   }
 }
 
+bool csColliderHelper::CollideArray (
+	iCollideSystem* colsys,
+	iCollider* collider,
+  	const csReversibleTransform* trans,
+  	int num_colliders,
+	iCollider** colliders,
+	csReversibleTransform **transforms)
+{
+  int i;
+  for (i = 0 ; i < num_colliders ; i++)
+  {
+    bool rc = colsys->Collide (collider, trans,
+    	colliders[i], transforms[i]);
+    if (rc) return rc;
+  }
+  return false;
+}
+
+int csColliderHelper::CollidePath (
+	iCollideSystem* colsys,
+	iCollider* collider,
+  	const csReversibleTransform* trans,
+	float stepsize,
+	csVector3& newpos,
+	int num_colliders,
+	iCollider** colliders,
+	csReversibleTransform** transforms)
+{
+  csReversibleTransform test = *trans;
+  csVector3 start = test.GetOrigin ();
+  csVector3 end = newpos;
+  csVector3 testpos;
+  float step = 1. / stepsize;
+  float curdist = 0;
+  bool rc = false;
+  bool firsthit = true;
+  for (;;)
+  {
+    testpos = start+curdist * (end-start);
+    test.SetOrigin (testpos);
+    colsys->ResetCollisionPairs ();
+    rc = CollideArray (colsys, collider, &test,
+    	num_colliders, colliders, transforms);
+    if (rc) break;
+    firsthit = false;
+
+    if (curdist >= 1) break;
+    curdist += step;
+    if (curdist > 1) curdist = 1;
+  }
+
+  if (rc)
+  {
+    // We had a collision.
+    if (firsthit)
+    {
+      // The collision happened on the start point. In that case
+      // we cannot move at all. Return -1.
+      return -1;
+    }
+
+    // Here we try to find more exactly where the collision occured by
+    // doing a binary search.
+    end = testpos;
+    while (csSquaredDist::PointPoint (start, end) > .05)
+    {
+      testpos = (start+end) / 2;
+      test.SetOrigin (testpos);
+      colsys->ResetCollisionPairs ();
+      rc = CollideArray (colsys, collider, &test,
+      	num_colliders, colliders, transforms);
+      if (rc)
+      {
+        // Use left segment.
+        end = testpos;
+      }
+      else
+      {
+        // Use right segment.
+	start = testpos;
+      }
+    }
+    // We know that the object can move to the 'start' position safely
+    // because of the way we handle the binary search and the starting
+    // condition that firsthit == false.
+    newpos = start;
+
+    // But first we set the collision detection array to the position
+    // which resulted in collision.
+    test.SetOrigin (end);
+    colsys->ResetCollisionPairs ();
+    CollideArray (colsys, collider, &test,
+    	num_colliders, colliders, transforms);
+
+    return 0;
+  }
+  else
+  {
+    // There was no collision.
+    return 1;
+  }
+}
+

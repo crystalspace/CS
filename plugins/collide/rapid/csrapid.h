@@ -54,13 +54,6 @@ public:
     csRapidCollider::SetFirstHit (o);
   }
 
-  virtual int CollidePath (
-  	iCollider* collider, const csReversibleTransform* trans,
-	csVector3& newpos,
-	int num_colliders,
-	iCollider** colliders,
-	csReversibleTransform** transforms);
-
   /**
    * Return true if this CD system will only return the first hit
    * that is found.

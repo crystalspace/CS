@@ -149,6 +149,77 @@ public:
    */
   static void InitializeCollisionWrappers (iCollideSystem* colsys,
   	iEngine* engine, iRegion* region = 0);
+
+  /**
+   * Test collision between one collider and an array of colliders.
+   * This function is mainly used by CollidePath() below.
+   * \param colsys is the collider system.
+   * \param collider is the collider of the object that we are going
+   * to move along the path.
+   * \param trans is the transform of that object (see Collide()).
+   * \param newpos is the new position of that object.
+   * \param num_colliders is the number of colliders that we are going
+   * to use to collide with.
+   * \param colliders is an array of colliders. Typically you can obtain
+   * such a list by doing iEngine->GetNearbyMeshes() and then getting
+   * the colliders from all meshes you get (possibly using csColliderWrapper).
+   * Note that it is safe to have 'collider' sitting in this list. This
+   * function will ignore that collider.
+   * \param transforms is an array of transforms that belong with the
+   * array of colliders.
+   */
+  static bool CollideArray (
+	iCollideSystem* colsys,
+	iCollider* collider, const csReversibleTransform* trans,
+  	int num_colliders,
+	iCollider** colliders,
+	csReversibleTransform **transforms);
+
+  /**
+   * Test if an object can move to a new position. The new position
+   * vector will be modified to reflect the maximum new position that the
+   * object could move to without colliding with something. This function
+   * will return:
+   * <ul>
+   * <li>-1 if the object could not move at all (i.e. stuck at start position).
+   * <li>0 if the object could not move fully to the desired position.
+   * <li>1 if the object can move unhindered to the end position.
+   * </ul>
+   * <p>
+   * This function will reset the collision pair array. If there was a
+   * collision along the way the array will contain the information for
+   * the first collision preventing movement.
+   * <p>
+   * The given transform should be the transform of the object corresponding
+   * with the old position. 'colliders' and 'transforms' should be arrays
+   * with 'num_colliders' elements for all the objects that we should
+   * test against.
+   * \param colsys is the collider system.
+   * \param collider is the collider of the object that we are going
+   * to move along the path.
+   * \param trans is the transform of that object (see Collide()).
+   * \param stepsize is the distance we want to recheck CD along the
+   * path. Typically this is set to a step size smaller then the size
+   * of the collider bbox.
+   * \param newpos is the new position of that object.
+   * \param num_colliders is the number of colliders that we are going
+   * to use to collide with.
+   * \param colliders is an array of colliders. Typically you can obtain
+   * such a list by doing iEngine->GetNearbyMeshes() and then getting
+   * the colliders from all meshes you get (possibly using csColliderWrapper).
+   * Note that it is safe to have 'collider' sitting in this list. This
+   * function will ignore that collider.
+   * \param transforms is an array of transforms that belong with the
+   * array of colliders.
+   */
+  static int CollidePath (
+  	iCollideSystem* colsys,
+  	iCollider* collider, const csReversibleTransform* trans,
+	float stepsize,
+	csVector3& newpos,
+	int num_colliders,
+	iCollider** colliders,
+	csReversibleTransform** transforms);
 };
 
 #endif // __CS_COLLIDER_H__

@@ -156,8 +156,6 @@ void csRapidCollider::GeometryInitialize (iPolygonMesh* mesh)
   float dx = object_bbox.MaxX () - object_bbox.MinX ();
   float dy = object_bbox.MaxY () - object_bbox.MinY ();
   float dz = object_bbox.MaxZ () - object_bbox.MinZ ();
-  smallest_box_dim = min3 (dx, dy, dz);
-  if (smallest_box_dim < 0.1f) smallest_box_dim = 0.1f;
 }
 
 csRapidCollider::~csRapidCollider ()
@@ -256,110 +254,6 @@ bool csRapidCollider::Collide (csRapidCollider &otherCollider,
     return 1;
   }
   return 0;
-}
-
-bool csRapidCollider::CollideArray (
-  	const csReversibleTransform* trans,
-  	int num_colliders,
-	iCollider** colliders,
-	csReversibleTransform **transforms)
-{
-  int i;
-  for (i = 0 ; i < num_colliders ; i++)
-  {
-    bool rc = Collide (*(csRapidCollider*)colliders[i],
-    	trans, transforms[i]);
-    if (rc) return rc;
-  }
-  return false;
-}
-
-int csRapidCollider::CollidePath (
-  	const csReversibleTransform* trans,
-	csVector3& newpos,
-	int num_colliders,
-	iCollider** colliders,
-	csReversibleTransform** transforms)
-{
-  // At initialization time (GeometryInitialize()) we calculated
-  // the smallest dimension of the object space bounding box (either
-  // x, y, or z space). We are going to use half this size to slowly
-  // move the object along its path. By using half the size we can
-  // be fairly sure that we will not miss anything.
-
-  csReversibleTransform test = *trans;
-  csVector3 start = test.GetOrigin ();
-  csVector3 end = newpos;
-  csVector3 testpos;
-  float step = 1. / (smallest_box_dim/2.);
-  float curdist = 0;
-  bool rc = false;
-  bool firsthit = true;
-  for (;;)
-  {
-    testpos = start+curdist * (end-start);
-    test.SetOrigin (testpos);
-    CollideReset ();
-    numHits = 0;
-    rc = CollideArray (&test, num_colliders, colliders, transforms);
-    if (rc) break;
-    firsthit = false;
-
-    if (curdist >= 1) break;
-    curdist += step;
-    if (curdist > 1) curdist = 1;
-  }
-
-  if (rc)
-  {
-    // We had a collision.
-    if (firsthit)
-    {
-      // The collision happened on the start point. In that case
-      // we cannot move at all. Return -1.
-      return -1;
-    }
-
-    // Here we try to find more exactly where the collision occured by
-    // doing a binary search.
-    end = testpos;
-    while (csSquaredDist::PointPoint (start, end) > .05)
-    {
-      testpos = (start+end) / 2;
-      test.SetOrigin (testpos);
-      CollideReset ();
-      numHits = 0;
-      rc = CollideArray (&test, num_colliders, colliders, transforms);
-      if (rc)
-      {
-        // Use left segment.
-        end = testpos;
-      }
-      else
-      {
-        // Use right segment.
-	start = testpos;
-      }
-    }
-    // We know that the object can move to the 'start' position safely
-    // because of the way we handle the binary search and the starting
-    // condition that firsthit == false.
-    newpos = start;
-
-    // But first we set the collision detection array to the position
-    // which resulted in collision.
-    test.SetOrigin (end);
-    CollideReset ();
-    numHits = 0;
-    CollideArray (&test, num_colliders, colliders, transforms);
-
-    return 0;
-  }
-  else
-  {
-    // There was no collision.
-    return 1;
-  }
 }
 
 csCollisionPair *csRapidCollider::GetCollisions ()

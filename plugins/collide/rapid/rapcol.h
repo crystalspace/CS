@@ -49,13 +49,6 @@ private:
   /// Get top level bounding box.
   const csCdBBox* GetBbox () const;
 
-  /**
-   * The smallest dimension in object space. This is the smallest size
-   * of one side of the object space bounding box (either x, y, or z).
-   * This is used for CollidePath().
-   */
-  float smallest_box_dim;
-
   /// Delete and free memory of this objects oriented bounding box.
   void DestroyBbox ();
 
@@ -110,20 +103,6 @@ public:
   bool Collide (csRapidCollider &pOtherCollider,
                         const csReversibleTransform *pThisTransform = 0,
                         const csReversibleTransform *pOtherTransform = 0);
-
-  /// Test collision with an array of colliders.
-  bool CollideArray (
-  	const csReversibleTransform *pThisTransform,
-  	int num_colliders,
-	iCollider** colliders,
-	csReversibleTransform **transforms);
-
-  int CollidePath (
-  	const csReversibleTransform* thisTransform,
-	csVector3& newpos,
-	int num_colliders,
-	iCollider** colliders,
-	csReversibleTransform** transforms);
 
   /// Query the array with collisions (and their count).
   static csCollisionPair *GetCollisions ();

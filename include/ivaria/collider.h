@@ -59,7 +59,7 @@ struct iCollider : public iBase
 {
 };
 
-SCF_VERSION (iCollideSystem, 0, 0, 3);
+SCF_VERSION (iCollideSystem, 0, 0, 4);
 
 /**
  * This is the Collide plug-in. This plugin is a factory for creating
@@ -161,44 +161,6 @@ struct iCollideSystem : public iBase
    * call to Collide().
    */
   virtual bool GetOneHitOnly () = 0;
-
-  /**
-   * Test if an object can move to a new position. The new position
-   * vector will be modified to reflect the maximum new position that the
-   * object could move to without colliding with something. This function
-   * will return:
-   * <ul>
-   * <li>-1 if the object could not move at all (i.e. stuck at start position).
-   * <li>0 if the object could not move fully to the desired position.
-   * <li>1 if the object can move unhindered to the end position.
-   * </ul>
-   * <p>
-   * This function will reset the collision pair array. If there was a
-   * collision along the way the array will contain the information for
-   * the first collision preventing movement.
-   * <p>
-   * The given transform should be the transform of the object corresponding
-   * with the old position. 'colliders' and 'transforms' should be arrays
-   * with 'num_colliders' elements for all the objects that we should
-   * test against.
-   * \param collider is the collider of the object that we are going
-   * to move along the path.
-   * \param trans is the transform of that object (see Collide()).
-   * \param newpos is the new position of that object.
-   * \param num_colliders is the number of colliders that we are going
-   * to use to collide with.
-   * \param colliders is an array of colliders. Typically you can obtain
-   * such a list by doing iEngine->GetNearbyMeshes() and then getting
-   * the colliders from all meshes you get (possibly using csColliderWrapper).
-   * \param transforms is an array of transforms that belong with the
-   * array of colliders.
-   */
-  virtual int CollidePath (
-  	iCollider* collider, const csReversibleTransform* trans,
-	csVector3& newpos,
-	int num_colliders,
-	iCollider** colliders,
-	csReversibleTransform** transforms) = 0;
 };
 
 #endif // __CS_IVARIA_COLLIDER_H__

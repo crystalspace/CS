@@ -81,19 +81,6 @@ public:
     const csReversibleTransform *pThisTransform = 0,
     const csReversibleTransform *pOtherTransform = 0);
 
-  /// Test collision with an array of colliders.
-  bool CollideArray (
-  	const csReversibleTransform *pThisTransform,
-  	int num_colliders,
-	  iCollider** colliders,
-	  csReversibleTransform **transforms);
-
-  int CollidePath (
-  	const csReversibleTransform* thisTransform,
-	  csVector3& newpos, int num_colliders,
-    iCollider** colliders,
-    csReversibleTransform** transforms);
-
   /// Query the array with collisions (and their count).
   static csCollisionPair *GetCollisions ();
 

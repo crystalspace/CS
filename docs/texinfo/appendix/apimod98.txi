@@ -1585,3 +1585,18 @@ priority flag is no longer required (but @code{CS_ENTITY_CAMERA} still is!).
 Gouraud is much more commonly used than flat shading and is thus the default 
 now. To achieve the opposite behaviour (ie the behaviour when 
 @code{CS_FX_GOURAUD} was not present), use the @code{CS_FX_FLAT} flag.
+
+@subheading Collision Detection Changes
+@cindex @sc{rapid}
+@cindex @sc{opcode}
+@cindex @code{iCollideSystem}
+
+The most important change is that @sc{opcode} is now prefered over
+@sc{rapid}. The @sc{opcode} plugin is free of restrictions (as opposed
+to @sc{rapid} which can't be used in commercial programs), it is faster,
+and uses a lot less memory. In future we will remove the @sc{rapid} plugin.
+
+The @code{iCollideSystem::CollidePath()} function has been moved to
+@code{csColliderHelper::CollidePath()}. In addition there are a few extra
+versions that can make life easier for calculating collisions on a path.
+

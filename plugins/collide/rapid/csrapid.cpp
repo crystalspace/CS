@@ -75,18 +75,6 @@ bool csRapidCollideSystem::Collide (
   return col1->Collide (*col2, trans1, trans2);
 }
 
-int csRapidCollideSystem::CollidePath (
-  	iCollider* collider, const csReversibleTransform* trans,
-	csVector3& newpos,
-	int num_colliders,
-	iCollider** colliders,
-	csReversibleTransform** transforms)
-{
-  csRapidCollider* thiscol = (csRapidCollider*)collider;
-  return thiscol->CollidePath (trans, newpos,
-	num_colliders, colliders, transforms);
-}
-
 csCollisionPair* csRapidCollideSystem::GetCollisionPairs ()
 {
   return csRapidCollider::GetCollisions ();

@@ -174,24 +174,6 @@ bool csOPCODECollideSystem::Collide (
   }
 }
 
-int csOPCODECollideSystem::CollidePath (
-  iCollider* collider, const csReversibleTransform* trans,
-	csVector3& newpos,
-	int num_colliders,
-	iCollider** colliders,
-	csReversibleTransform** transforms)
-{
-  (void)collider;
-  (void)trans;
-  (void)newpos;
-  (void)num_colliders;
-  (void)colliders;
-  (void)transforms;
-	return 0;
-  // csOPCODECollider* thiscol = (csOPCODECollider*) collider;
-  // return thiscol->CollidePath (trans, newpos,	num_colliders, colliders, transforms);
-}
-
 void csOPCODECollideSystem::CopyCollisionPairs (csOPCODECollider* col1,
 	csOPCODECollider* col2)
 {
