@@ -125,7 +125,7 @@ object and a mesh object factory. Instead things now work like usual
 mesh objects where @code{iMeshObjectType->NewFactory()} creates a
 factory that implements @code{iThingFactoryState} and
 @code{iMeshObjectFactory->NewInstance()} creates an instance that implements
-@code{iThingState}. The engine conveniance functions to create a thing
+@code{iThingState}. The engine convenience functions to create a thing
 mesh will automatically create both the factory and mesh so you don't
 have to worry about that. You can use @code{iThingState->GetFactory()}
 from a thing mesh object to get the @code{iThingFactoryState} so you can

@@ -30,7 +30,7 @@ class csEngine;
 SCF_VERSION (csCollection, 0, 0, 1);
 
 /**
- * A collection object is for conveniance of the script language.
+ * A collection object is for convenience of the script language.
  * It simply groups objects which are related in some way.
  */
 class csCollection : public csObject

@@ -378,7 +378,7 @@ private:
   csSharedVariableList* shared_variables;
   /// List of halos (csHaloInformation).
   csPDelArray<csLightHalo> halos;
-  /// Thing mesh object type for conveniance.
+  /// Thing mesh object type for convenience.
   csRef<iMeshObjectType> thing_type;
   /// Debugging: maximum number of polygons to process in one frame.
   static int max_process_polygons;

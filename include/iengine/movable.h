@@ -111,7 +111,7 @@ struct iMovable : public iBase
    * crosses a portal then you should in theory add every touched sector
    * to this list of sectors. If objects are small then you can get away
    * by not doing this. But it is possible that you will get render/clipping
-   * errors. There is a conveniance function (iMeshWrapper->PlaceMesh())
+   * errors. There is a convenience function (iMeshWrapper->PlaceMesh())
    * which will attempt to find all sectors a mesh is in and update the
    * movable.
    * <p>

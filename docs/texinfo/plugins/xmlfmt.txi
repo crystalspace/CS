@@ -227,7 +227,7 @@ will get at least @samp{sky}, @samp{wall}, @samp{object}, and @samp{alpha}:
 @subsubheading Plugin Section
 @cindex plugin section (Map File)
 
-The plugin section is purely for conveniance later. Normally when creating
+The plugin section is purely for convenience later. Normally when creating
 mesh objects you have to specify the @sc{scf} class name of the loader
 which will parse the @sc{xml} data for that mesh object. This is a long
 name. The plugin section allows you to define shorter names for those

@@ -36,7 +36,7 @@ struct iMeshWrapper;
 SCF_VERSION (csColliderWrapper, 0, 0, 3);
 
 /**
- * This is a conveniance object that you can use in your own
+ * This is a convenience object that you can use in your own
  * games to attach an iCollider object (from the CD plugin system)
  * to any other csObject (including CS entities). Use of this object
  * is optional (if you can assign your iCollider's to entities in

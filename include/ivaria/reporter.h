@@ -171,7 +171,7 @@ struct iReporter : public iBase
   virtual bool FindReporterListener (iReporterListener* listener) = 0;
 
   //----------------------------------------------------------------------
-  // Conveniance functions, these are not to be implemented in the plugin.
+  // Convenience functions, these are not to be implemented in the plugin.
   //----------------------------------------------------------------------
 
   /**

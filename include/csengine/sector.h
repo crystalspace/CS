@@ -564,7 +564,7 @@ public:
   /// Return fog structure.
   csFog& GetFog () { return fog; }
 
-  /// Conveniance function to set fog to some setting.
+  /// Convenience function to set fog to some setting.
   void SetFog (float density, const csColor& color)
   {
     fog.enabled = true;

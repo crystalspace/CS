@@ -123,7 +123,7 @@ public:
 
   /**
    * Initialize the list of sectors to one sector where
-   * this thing is. This is a conveniance funcion.
+   * this thing is. This is a convenience funcion.
    * This function does not do anything if the parent is not 0.
    */
   void SetSector (iSector* sector);

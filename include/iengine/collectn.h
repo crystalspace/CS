@@ -30,7 +30,7 @@ struct iObject;
 SCF_VERSION (iCollection, 0, 0, 3);
 
 /**
- * A collection object is for conveniance of the script language.
+ * A collection object is for convenience of the script language.
  * It is simply a collection of other objects.
  */
 struct iCollection : public iBase

@@ -29,7 +29,7 @@
  * @{ */
  
 /**
- * A conveniance polygon mesh implementation that you can feed
+ * A convenience polygon mesh implementation that you can feed
  * with vertices and polygons from another source.
  * This mesh optionally supports deformable.
  */
@@ -152,7 +152,7 @@ public:
 };
 
 /**
- * A conveniance polygon mesh implementation that represents a cube.
+ * A convenience polygon mesh implementation that represents a cube.
  */
 class csPolygonMeshBox : public iPolygonMesh
 {

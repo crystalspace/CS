@@ -164,7 +164,7 @@ public:
    * with it, properly register the texture and material and prepare
    * them. This function assumes that the texture manager has already
    * been set up and PrepareTextures has already been called for the
-   * other loaded textures. It is a conveniance function that offers
+   * other loaded textures. It is a convenience function that offers
    * less flexibility but is sufficient for most cases. The texture and
    * material will get the name that is given by this routine.
    */

@@ -345,7 +345,7 @@ struct iSprite3DState : public iBase
   /// Get lighting.
   virtual bool IsLighting () const = 0;
 
-  // @@@ TODO: what about conveniance functions to set colors for verts?
+  // @@@ TODO: what about convenience functions to set colors for verts?
 
   /**
    * Get the skeleton state. Will only be valid if skeletal animation

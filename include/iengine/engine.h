@@ -313,7 +313,7 @@ struct iEngine : public iBase
   virtual iSector *CreateSector (const char *name) = 0;
 
   /**
-   * Conveniance function to create the thing containing the
+   * Convenience function to create the thing containing the
    * convex outline of a sector. The thing will be empty but
    * it will have #CS_ZBUF_FILL set (so that the Z-buffer will be filled
    * by the polygons of this object) and have 'wall' as render
@@ -323,7 +323,7 @@ struct iEngine : public iBase
   virtual csPtr<iMeshWrapper> CreateSectorWallsMesh (iSector* sector,
       const char* name) = 0;
   /**
-   * Conveniance function to create a thing mesh in a sector.
+   * Convenience function to create a thing mesh in a sector.
    * This mesh will have #CS_ZBUF_USE set (use Z-buffer fully)
    * and have 'object' as render priority. This means this function
    * is useful for general objects.
@@ -585,7 +585,7 @@ struct iEngine : public iBase
   virtual iClipper2D* GetTopLevelClipper () const = 0;
 
   /**
-   * Conveniance function to create a mesh factory from a given type.
+   * Convenience function to create a mesh factory from a given type.
    * The type plugin will only be loaded if needed. 'classId' is the
    * SCF name of the plugin (like 'crystalspace.mesh.object.cube').
    * Returns 0 on failure. The factory will be registered with the engine
@@ -621,7 +621,7 @@ struct iEngine : public iBase
   	iRegion* region = 0, bool curRegOnly = true) = 0;
 
   /**
-   * Conveniance function to load a mesh factory from a given loader plugin.
+   * Convenience function to load a mesh factory from a given loader plugin.
    * Assign to a csRef or use DecRef().
    */
   virtual csPtr<iMeshFactoryWrapper> LoadMeshFactory (
@@ -629,7 +629,7 @@ struct iEngine : public iBase
 	iDataBuffer* input) = 0;
 
   /**
-   * Conveniance function to create a mesh object for a given factory.
+   * Convenience function to create a mesh object for a given factory.
    * If 'sector' is 0 then the mesh object will not be set to a position.
    * Returns 0 on failure. The object will be given the specified name.
    * 'name' can be 0 if no name is wanted. Different mesh objects can
@@ -667,7 +667,7 @@ struct iEngine : public iBase
   virtual csPtr<iMeshWrapper> CreateMeshWrapper (const char* name) = 0;
 
   /**
-   * Conveniance function to load a mesh object from a given loader plugin.
+   * Convenience function to load a mesh object from a given loader plugin.
    * If sector == 0 the object will not be placed in a sector.
    * Assign to a csRef or use DecRef().
    */
@@ -820,7 +820,7 @@ struct iEngine : public iBase
     const csFrustum& frustum) = 0;
 
   /**
-   * Conveniance function to 'remove' a CS object from the engine.
+   * Convenience function to 'remove' a CS object from the engine.
    * This will not clear the object but it will remove all references
    * to that object that the engine itself keeps. This function works
    * for: iSector, iCollection, iMeshWrapper, iMeshFactoryWrapper,

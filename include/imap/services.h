@@ -170,7 +170,7 @@ struct iSyntaxService : public iBase
 	const char* msg, ...) CS_GNUC_PRINTF(4,5) = 0;
 
   /**
-   * Report a bad token. This is a conveniance function which will
+   * Report a bad token. This is a convenience function which will
    * eventually call ReportError().
    */
   virtual void ReportBadToken (iDocumentNode* badtokennode) = 0;
