@@ -18,6 +18,8 @@
 
 #include <stdarg.h>
 
+#include <stdio.h>
+
 #include "sysdef.h"
 #ifdef OS_WIN32
 #include <windows.h>
@@ -1616,4 +1618,20 @@ bool csGraphics3DOpenGL::BatchFlushPolygonFX()
 {
   // not done yet
   return false;
+}
+
+long unsigned int *csGraphics3DOpenGL::GetZBufPoint(int x, int y)
+{
+  static long unsigned int zval;
+  zval = (unsigned long) (16777216.0 * GetZbuffValue (x,y) );
+
+  return &zval;
+}
+
+float csGraphics3DOpenGL::GetZbuffValue(int x, int y)
+{
+  GLfloat zvalue;
+  glReadPixels (x, height-y-1, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &zvalue);
+
+  return (11.0*(zvalue-1.0/11.0));
 }

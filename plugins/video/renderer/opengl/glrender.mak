@@ -39,9 +39,9 @@ ifeq ($(USE_MESA),1)
     CFLAGS.GL3D+=-I$(MESA_PATH)/include
     LIBS.LOCAL.GL3D+=-L$(MESA_PATH)/lib
   endif
-  LIBS.LOCAL.GL3D+=-lMesaGL -lMesaGLU
+  LIBS.LOCAL.GL3D+=-lMesaGLU -lMesaGL
 else
-  LIBS.LOCAL.GL3D+=-lGL
+  LIBS.LOCAL.GL3D+=-lGLU -lGL
 endif
 
 CFLAGS.GL3D+=-I$(X11_PATH)/include

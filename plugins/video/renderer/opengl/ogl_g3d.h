@@ -290,8 +290,7 @@ public:
   virtual void GetCaps (G3D_CAPS *caps);
 
   /// Get address of Z-buffer at specific point
-  virtual unsigned long *GetZBufPoint(int /*x*/, int /*y*/)
-  { return NULL; }
+  virtual unsigned long *GetZBufPoint(int x, int y);
 
   /// Dump the texture cache.
   virtual void DumpCache ();
@@ -368,8 +367,7 @@ public:
   void SysPrintf (int mode, char* str, ...);
 
   /// Get Z-buffer value at given X,Y position
-  virtual float GetZbuffValue (int /*x*/, int /*y*/)
-  { return 0; }
+  virtual float GetZbuffValue (int x, int y);
 
   /// Create a halo of the specified color and return a handle.
   virtual iHalo *CreateHalo (float /*iR*/, float /*iG*/, float /*iB*/,
