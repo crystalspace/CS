@@ -508,6 +508,8 @@ void PerfTest::NextFrame (time_t elapsed_time, time_t current_time)
 	current_tester->Setup (G3D, this);
 	last_time = current_time;
       }
+      else
+	StartShutdown ();
     }
   }
 

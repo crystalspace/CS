@@ -216,10 +216,13 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
   // point to an array of camera vertices.
   csVector3* f1 = mesh.vertices[0];
   csVector2* uv1 = mesh.texels[0][0];
-  csColor* col1 = mesh.vertex_colors[0];
   csVector3* work_verts;
   csVector2* work_uv_verts;
   csColor* work_colors;
+  csColor* col1 = NULL;// = mesh.vertex_colors[0];
+  if (mesh.use_vertex_color)
+    col1 = mesh.vertex_colors[0];
+
   if (mesh.num_vertices_pool > 1)
   {
     // Vertex morphing.
