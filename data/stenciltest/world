@@ -13,6 +13,8 @@
 	<materials>
 		<material name="1 - Default">
 			<texture>1 - Default</texture>
+			<shader type="ambient">ambient</shader>
+			<shader type="diffuse">light</shader>
 		</material>
 	</materials>
 	<plugins>
@@ -22,35 +24,11 @@
 	</plugins>
 	<addon>
 	  <plugin>renderloopLoader</plugin>
-	  <params>
-	    <name>myLoop</name>
-	    <steps>
-	      <!-- ambient pass -->
-	      <step plugin="crystalspace.renderloop.step.generic">
-		<shadertype>ambient</shadertype>
-		<zoffset>yes</zoffset>
-		<zuse />
-	      </step>
-	      <!-- diffuse pass -->
-	      <step plugin="crystalspace.renderloop.step.lightiter">
-		<steps>
-		  <step plugin="crystalspace.renderloop.step.shadow.stencil">
-		    <steps>
-		      <step plugin="crystalspace.renderloop.step.generic">
-			<shadertype>diffuse</shadertype>
-			<zoffset>no</zoffset>
-			<ztest />
-		      </step>
-		    </steps>
-		  </step>
-		</steps>
-	      </step>
-	    </steps>
-	  </params>
+	  <paramsfile>/shader/std_rloop_shadowed.xml</paramsfile>
 	</addon>
 	
 	<settings>
-		<renderloop>myLoop</renderloop>
+		<renderloop>std_rloop_shadowed</renderloop>
 		<clearzbuf>yes</clearzbuf>
 	</settings>
 	
@@ -916,14 +894,13 @@
 		<light>
 			<center x="-9.758" y="1.109" z="-0.789" />
 			<radius>30.000000</radius>
-<!--			<color red="1" green="0.9" blue="0.8" />-->
 			<color red="1" green="0" blue="0" />
 			<attenuation>realistic</attenuation>
 			<influenceradius>100000</influenceradius>
 		</light>
 		<light>
 			<center x="12.196" y="-7.804" z="20.025" />
-			<radius>20.000000</radius>
+			<radius>40.000000</radius>
 			<color red="0" green="0" blue="1" />
 			<attenuation>realistic</attenuation>
 		</light>
