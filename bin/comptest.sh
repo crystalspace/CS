@@ -2,12 +2,9 @@
 #==============================================================================
 # A compiler capability testing script.
 #
-# Arguments: 1: architecture
-#            2: machine
-#
 # This script tries to identify the compiler first, it looks if CC or CXX are
 # set, otherwise it tries to use one of the common gcc names. After that it
-# does some tests for compiler characteristics.
+# does some tests for compiler characteristics and known compiler bugs.
 #
 # The output of this script (a makefile fragment) is configuration information
 # needed for building Crystal Space.  It is piped to stdout, and errors are
@@ -15,10 +12,10 @@
 #==============================================================================
 
 #------------------------------------------------------------------------------
-# Try to find compiler
+# Try to find compiler.
 #------------------------------------------------------------------------------
 #Find a c++ compiler
-if test "x${CXX}" = "x"; then
+if [ -z "${CXX}" ]; then
   [ -z "${CXX}" ] && CXX=`which g++ 2>&1 | grep -v "[Nn]o"`
   [ -z "${CXX}" ] && CXX=`which gcc 2>&1 | grep -v "[Nn]o"`
   [ -z "${CXX}" ] && CXX=`which egcs 2>&1 | grep -v "[Nn]o"`
@@ -29,10 +26,6 @@ if test "x${CXX}" = "x"; then
     exit 1
   fi
   CXX=`basename ${CXX}`
-fi
-if ! ${CXX} --version >/dev/null ; then
-  echo "$0: Cannot find an installed C++ compiler!" >&2
-  exit 1
 fi
 
 #Find a C compiler
@@ -46,10 +39,6 @@ if [ -z "${CC}" ]; then
   fi
   CC=`basename ${CC}`
 fi
-if ! ${CC} --version >/dev/null; then
-  echo "$0: Cannot find an installed C compiler!" >&2
-  exit 1
-fi
 
 echo "CC = ${CC} -c"
 echo "CXX = ${CXX} -c"
@@ -59,7 +48,7 @@ echo "LINK = ${CXX}"
 # Check for optimisation flags
 #-----------------------------------------------------------------------------
 # Create a dummy C++ program
-echo "int main () {}" >comptest.cpp
+echo "int main() { return 0; }" > comptest.cpp
 
 # Check for machine-specific C compiler flags
 (echo "$CPU" | grep -s 686 >/dev/null && ${CXX} -c -mcpu=pentiumpro -march=i686 comptest.cpp && echo "CFLAGS.SYSTEM += -mcpu=pentiumpro -march=i686") || \
@@ -97,13 +86,11 @@ A* func4(void* p) { return reinterpret_cast<A*>(p); }
 TEST
 ${CXX} -c comptest.cpp 2>/dev/null || echo "CS_USE_OLD_STYLE_CASTS = yes"
 
-
 #------------------------------------------------------------------------------
 # Check if C++ compiler understands new C++ `explicit' keyword.
 #------------------------------------------------------------------------------
 echo "class A { public: explicit A(int); };" > comptest.cpp
 ${CXX} -c comptest.cpp 2>/dev/null || echo "CS_USE_FAKE_EXPLICIT_KEYWORD = yes"
-
 
 #------------------------------------------------------------------------------
 # If processor type was specified, check if compiler is able to understand
@@ -125,25 +112,19 @@ ${CXX} -c comptest.cpp 2>/dev/null || echo "CS_NO_QSQRT = yes"
 fi
 
 #------------------------------------------------------------------------------
-# The following test tries to detect a compiler bug discovered in gcc 2.96
-# (redhat and other unstables...) and gcc 3.0.1
-# Note: This fails for crosscompiling because you can't execute the result then
+# Attempt to detect a compiler bug discovered in gcc 2.96 (redhat and other
+# unstable versions) and gcc 3.0.1 Note: This fails for cross-compiling because
+# you can't execute the result.  (Oh well.)
 # -----------------------------------------------------------------------------
 cat << TEST > comptest.cpp
 static inline long double2int(double val)
 {
-long *l;
-val += 68719476736.0;
-l = (long*) ((char*)&val + 2);
-return *l;
+  long* l;
+  val += 68719476736.0;
+  l = (long*)((char*)&val + 2);
+  return *l;
 }
-
-int main()
-{
-if ( double2int(255.99) !=255 )
-	return 1;
-return 0;
-}
+int main() { return (double2int(255.99) != 255 ? 1 : 0); }
 TEST
 ${CXX} -O2 comptest.cpp -o comptest 
 ./comptest 2>/dev/null || echo "CS_QINT_WORKAROUND = yes"
@@ -151,4 +132,4 @@ ${CXX} -O2 comptest.cpp -o comptest
 #------------------------------------------------------------------------------
 # Clean up.
 #------------------------------------------------------------------------------
-rm -f comptest.cpp comptest.o comptest
+rm -f comptest.cpp comptest.o comptest.obj comptest.exe comptest

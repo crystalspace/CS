@@ -127,7 +127,7 @@ endif # ifeq ($(MAKESECTION),confighelp)
 #--------------------------------------------------------------- configure ---#
 ifeq ($(MAKESECTION)/$(ROOTCONFIG),rootdefines/config)
 
-SYSCONFIG += $(NEWLINE)bin/haspythn.sh >>config.tmp
+SYSCONFIG += $(NEWLINE)sh bin/haspythn.sh >>config.tmp
 SYSCONFIG += $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
 SYSCONFIG += $(NEWLINE)echo CS_BUILTIN_SIZED_TYPES = yes>>config.tmp
 
