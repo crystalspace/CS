@@ -73,6 +73,7 @@ public:
 
   virtual void Close ();
 
+  virtual void SetClipRect (int xmin, int ymin, int xmax, int ymax);
   // the remaining functions here do not need to be overridden when
   // inheriting from this class
 

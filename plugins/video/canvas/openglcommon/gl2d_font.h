@@ -34,6 +34,7 @@
 
 class csGraphics2DOpenGLFontServer
 {
+  protected:
   struct GLGlyph 
   {
     GLuint hTexture; // the texture where we find this character in
@@ -42,13 +43,12 @@ class csGraphics2DOpenGLFontServer
   
   class GLFontInfo
   {
+    friend class csGraphics2DOpenGLFontServer;
     public:
     
       GLFontInfo (){}
       ~GLFontInfo ();
 
-      void DrawCharacter (unsigned char c);
-           
       GLGlyph glyphs[256];
       float height, texheight;
       bool one_texture;
@@ -64,8 +64,8 @@ class csGraphics2DOpenGLFontServer
   GLFontInfo **mFont_Information_Array;
   iFontServer *pFontServer;
   
-  /// Try and skip this..
-  char space;
+  /// the current clipping rect
+  int ClipX1, ClipY1, ClipX2, ClipY2;
 public:
   /**
    * The maximal number of fonts that can be registered.
@@ -93,6 +93,9 @@ public:
 
   void Write (int x, int y, int bg, const char *text, int Font);
 
+  void SetClipRect (int x1, int y1, int x2, int y2)
+  { ClipX1=x1; ClipY1=y1; ClipX2=x2; ClipY2=y2; }   
+  bool ClipRect (float x, float y, float &x1, float &y1,float &x2,float &y2,float &tx1,float &ty1,float &tx2,float &ty2);
 };
 
 #endif // __CS_GL2D_FONT_H__

@@ -89,6 +89,7 @@ bool csGraphics2DGLCommon::Open (const char *Title)
     LocalFontServer = new csGraphics2DOpenGLFontServer (nFonts, FontServer);
     for (int fontindex = 0; fontindex < nFonts; fontindex++)
       LocalFontServer->AddFont (fontindex);
+    LocalFontServer->SetClipRect (0, Height, Width, 0);  
   }
 
   Clear (0);
@@ -100,6 +101,13 @@ void csGraphics2DGLCommon::Close(void)
   csGraphics2D::Close ();
   delete LocalFontServer;
   LocalFontServer = NULL;
+}
+
+void csGraphics2DGLCommon::SetClipRect (int xmin, int ymin, int xmax, int ymax)
+{
+  csGraphics2D::SetClipRect (xmin, ymin, xmax, ymax);
+  if (LocalFontServer)
+    LocalFontServer->SetClipRect (xmin, Height - ymin, xmax, Height - ymax);
 }
 
 void csGraphics2DGLCommon::Clear (int color)
@@ -152,27 +160,45 @@ void csGraphics2DGLCommon::setGLColorfromint (int color)
 void csGraphics2DGLCommon::DrawLine (
   float x1, float y1, float x2, float y2, int color)
 {
-  // prepare for 2D drawing--so we need no fancy GL effects!
-  glDisable (GL_TEXTURE_2D);
-  glDisable (GL_BLEND);
-  glDisable (GL_DEPTH_TEST);
-  glDisable (GL_ALPHA_TEST);
-  setGLColorfromint (color);
+  if (!ClipLine (x1, y1, x2, y2, ClipX1, ClipY1, ClipX2, ClipY2)){
+    y1 = QInt(Height - (y1+1));
+    y2 = QInt(Height - (y2+1));
+    // prepare for 2D drawing--so we need no fancy GL effects!
+    glDisable (GL_TEXTURE_2D);
+    glDisable (GL_BLEND);
+    glDisable (GL_DEPTH_TEST);
+    glDisable (GL_ALPHA_TEST);
+    setGLColorfromint (color);
 
-  glBegin (GL_LINES);
+    glBegin (GL_LINES);
 //    glVertex2i (GLint (x1), GLint (Height - y1 - 1));
 //    glVertex2i (GLint (x2), GLint (Height - y2 - 1));
 
 // This works with cswstest:
-  glVertex2i (GLint (QInt(x1)), GLint (QInt(Height - y1-1)));
-  glVertex2i (GLint (QInt(x2)), GLint (QInt(Height - y2-1)));
+    glVertex2i (GLint (QInt(x1)), GLint (y1));
+    glVertex2i (GLint (QInt(x2)), GLint (y2));
 
-  glEnd ();
-
+    glEnd ();
+  }
 }
 
 void csGraphics2DGLCommon::DrawBox (int x, int y, int w, int h, int color)
 {
+
+  if ((x > ClipX2) || (y > ClipY2))
+    return;
+  if (x < ClipX1)
+    w -= (ClipX1 - x), x = ClipX1;
+  if (y < ClipY1)
+    h -= (ClipY1 - y), y = ClipY1;
+  if (x + w > ClipX2)
+    w = ClipX2 - x;
+  if (y + h > ClipY2)
+    h = ClipY2 - y;
+  if ((w <= 0) || (h <= 0))
+    return;                                                                                        
+
+  y = Height - y;
   // prepare for 2D drawing--so we need no fancy GL effects!
   glDisable (GL_TEXTURE_2D);
   glDisable (GL_BLEND);
@@ -186,10 +212,10 @@ void csGraphics2DGLCommon::DrawBox (int x, int y, int w, int h, int color)
 //    glVertex2i (x, Height - (y + h - 1) - 1);
 
 // This works with cswstest:
-  glVertex2i (x, Height - (y));
-  glVertex2i (x + w, Height - (y));
-  glVertex2i (x + w, Height - (y + h));
-  glVertex2i (x, Height - (y + h));
+  glVertex2i (x, y);
+  glVertex2i (x + w, y);
+  glVertex2i (x + w, y -h);
+  glVertex2i (x, y - h);
 
   glEnd ();
 
@@ -197,15 +223,18 @@ void csGraphics2DGLCommon::DrawBox (int x, int y, int w, int h, int color)
 
 void csGraphics2DGLCommon::DrawPixel (int x, int y, int color)
 {
-  // prepare for 2D drawing--so we need no fancy GL effects!
-  glDisable (GL_TEXTURE_2D);
-  glDisable (GL_BLEND);
-  glDisable (GL_DEPTH_TEST);
-  setGLColorfromint(color);
+  if ((x >= ClipX1) && (y < ClipX2) && (y >= ClipY1) && (y < ClipY2))
+  {
+    // prepare for 2D drawing--so we need no fancy GL effects!
+    glDisable (GL_TEXTURE_2D);
+    glDisable (GL_BLEND);
+    glDisable (GL_DEPTH_TEST);
+    setGLColorfromint(color);
 
-  glBegin (GL_POINTS);
-  glVertex2i (x, Height - y - 1);
-  glEnd ();
+    glBegin (GL_POINTS);
+    glVertex2i (x, Height - y - 1);
+    glEnd ();
+  }    
 }
 
 void csGraphics2DGLCommon::Write (int x, int y, int fg, int bg, const char *text)

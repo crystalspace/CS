@@ -47,46 +47,6 @@ csGraphics2DOpenGLFontServer::GLFontInfo::~GLFontInfo ()
 }
 
 
-void csGraphics2DOpenGLFontServer::GLFontInfo::DrawCharacter (
-  unsigned char characterindex)
-{
-  // bind the texture containing this font
-  glBindTexture(GL_TEXTURE_2D, glyphs[characterindex].hTexture);
-
-  // other required settings
-  glEnable(GL_TEXTURE_2D);
-  glShadeModel(GL_FLAT);
-  glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-  // the texture coordinates must point to the correct character
-  // the texture is a strip a wide as a single character and
-  // as tall as 256 characters.  We must select a single
-  // character from it
-  float tx1 = glyphs[characterindex].x;
-  float tx2 = tx1 + glyphs[characterindex].texwidth;
-  float ty1 = glyphs[characterindex].y;
-  float ty2 = ty1 + texheight;
-  float x1 = 0.0, x2 = glyphs[characterindex].width;
-  float y1 = 0.0, y2 = height;
-
-#ifndef OS_MACOS
-  glEnable(GL_ALPHA_TEST);
-  glAlphaFunc (GL_EQUAL,1.0);
-#endif
-
-  glBegin (GL_QUADS);
-  glTexCoord2f (tx1,ty1); glVertex2f (x1,y2);
-  glTexCoord2f (tx2,ty1); glVertex2f (x2,y2);
-  glTexCoord2f (tx2,ty2); glVertex2f (x2,y1);
-  glTexCoord2f (tx1,ty2); glVertex2f (x1,y1);
-  glEnd ();
-
-  glTranslatef (x2,0.0,0.0);
-#ifndef OS_MACOS  
-  glDisable(GL_ALPHA_TEST);
-#endif
-}
-
 //--------------------------------------------------------------------------------
 //----------------------------------------------csGraphics2DOpenGLFontServer------
 //--------------------------------------------------------------------------------
@@ -100,8 +60,6 @@ csGraphics2DOpenGLFontServer::csGraphics2DOpenGLFontServer
     pFontServer(pFS)
 {
   mFont_Information_Array = new GLFontInfo * [MaxFonts];
-  char *pspace = " ";
-  space = *pspace;
 }
 
 csGraphics2DOpenGLFontServer::~csGraphics2DOpenGLFontServer ()
@@ -276,81 +234,102 @@ void csGraphics2DOpenGLFontServer::Write (int x, int y, int bg, const char *text
     Font = 0;
 #endif
 
+  if (!text || !*text) return;
+
+  GLGlyph *glyphs = mFont_Information_Array [Font]->glyphs;
+  GLuint hLastTexture, hTexture = glyphs[*text].hTexture;
+  
   glPushMatrix();
   glTranslatef (x, y, 0);
 
-  if (!mFont_Information_Array [Font]->one_texture)
-  {
-    for (; *text; ++text)
-      mFont_Information_Array [Font]->DrawCharacter (*text);
-    glPopMatrix ();
-    return;
-  }
-
-  // Ok blaze with only one texture to worry about.
-  bool skip_space = false;
-  if (bg < 0)
-    skip_space = true;
-
   glEnable(GL_TEXTURE_2D);
   glShadeModel(GL_FLAT);
+  glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+  // bind the texture containing this font
+  glBindTexture(GL_TEXTURE_2D, hTexture);
 
 #ifndef OS_MACOS
   glEnable(GL_ALPHA_TEST);
   glAlphaFunc (GL_EQUAL,1.0);
 #endif
-  GLGlyph *glyphs = mFont_Information_Array [Font]->glyphs;
 
-  GLuint hTexture = glyphs[*text].hTexture;
-
-  // bind the texture containing this font
-  glBindTexture(GL_TEXTURE_2D, hTexture);
-  glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-  float x1 = 0, x2 = 0, y1 = 0;
-  float y2 = mFont_Information_Array [Font]->height;
-  float texheight = mFont_Information_Array [Font]->texheight;
   glBegin (GL_QUADS);
-  float tx1, tx2, ty1, ty2;
-  if (!skip_space)
+
+  float tx1, tx2, ty1, ty2, x1, x2, y1, y2, x_right;
+  float height = mFont_Information_Array [Font]->height;
+  float texheight = mFont_Information_Array [Font]->texheight;
+  bool bOneTexture=mFont_Information_Array [Font]->one_texture;
+  bool skip_space = (bg < 0);
+
+  x1 = 0.0;
+
+  for (; *text; ++text)
   {
-    for (; *text; ++text)
+    x_right = x2 = x1 + glyphs[*text].width;
+    if (!skip_space || (*text != ' '))
     {
-      x2 += glyphs[*text].width;
+      if (!bOneTexture)
+      {
+	hTexture = glyphs[*text].hTexture;
+	if (hTexture != hLastTexture)
+	{
+	  hLastTexture = hTexture;
+	  glBindTexture(GL_TEXTURE_2D, hTexture);
+	}
+      }
+      // the texture coordinates must point to the correct character
+      // the texture is a strip a wide as a single character and
+      // as tall as 256 characters.  We must select a single
+      // character from it
       tx1 = glyphs[*text].x;
       tx2 = tx1 + glyphs[*text].texwidth;
       ty1 = glyphs[*text].y;
       ty2 = ty1 + texheight;
-      glTexCoord2f (tx1,ty1); glVertex2f (x1,y2);
-      glTexCoord2f (tx2,ty1); glVertex2f (x2,y2);
-      glTexCoord2f (tx2,ty2); glVertex2f (x2,y1);
-      glTexCoord2f (tx1,ty2); glVertex2f (x1,y1);
-      x1 = x2;
+      y1 = 0.0;
+      y2 = height;
+      
+      if (ClipRect (x, y, x1, y1, x2, y2, tx1, ty1, tx2, ty2))
+      {
+	glTexCoord2f (tx1,ty1); glVertex2f (x1,y2);
+	glTexCoord2f (tx2,ty1); glVertex2f (x2,y2);
+	glTexCoord2f (tx2,ty2); glVertex2f (x2,y1);
+	glTexCoord2f (tx1,ty2); glVertex2f (x1,y1);
+      }
     }
+    x1 = x_right;
   }
-  else
-  {
-    for (; *text; ++text)
-    {
-      x2 += glyphs[*text].width;
-      if (space == *text)
-	goto skip_quad;
-      tx1 = glyphs[*text].x;
-      tx2 = tx1 + glyphs[*text].texwidth;
-      ty1 = glyphs[*text].y;
-      ty2 = ty1 + texheight;
-      glTexCoord2f (tx1,ty1); glVertex2f (x1,y2);
-      glTexCoord2f (tx2,ty1); glVertex2f (x2,y2);
-      glTexCoord2f (tx2,ty2); glVertex2f (x2,y1);
-      glTexCoord2f (tx1,ty2); glVertex2f (x1,y1);
-    skip_quad:
-      x1 = x2;
-    }
-  }
+    
   glEnd ();
 
 #ifndef OS_MACOS  
   glDisable(GL_ALPHA_TEST);
 #endif
   glPopMatrix ();
+}
+
+bool csGraphics2DOpenGLFontServer::ClipRect (float x, float y, 
+                                             float &x1, float &y1, float &x2, float &y2, 
+                                             float &tx1, float &ty1, float &tx2, float &ty2)
+{
+  float nx1=x1+x, ny1=y1+y, nx2=x2+x, ny2=y2+y;
+  float ntx1=tx1, nty1=ty1, ntx2=tx2, nty2=ty2;
+
+  if ((nx1 > float(ClipX2)) || (nx2 < float(ClipX1)) 
+      || (ny1 > float(ClipY1)) || (ny2 < float(ClipY2)))
+      return false;
+  if (nx1 < ClipX1)
+    tx1 += (ntx2-ntx1)*(ClipX1 - nx1)/(nx2-nx1), x1 = ClipX1-x;
+
+  if (nx2 > ClipX2)
+    tx2 -= (ntx2-ntx1)*(nx2-ClipX2)/(nx2-nx1), x2 = ClipX2-x;
+  if (ny1 < ClipY2)
+    ty2 -= (nty2-nty1)*(ClipY2 - ny1)/(ny2-ny1), y1 = ClipY2-y;
+
+  if (ny2 > ClipY1)
+    ty1 += (nty2-nty1)*(ny2-ClipY1)/(ny2-ny1), y2 = ClipY1-y;
+  if ((tx2 <= tx1) || (ty2 <= ty1))
+   return false;                                                                                        
+
+  return true;
 }
