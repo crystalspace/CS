@@ -4,6 +4,7 @@ The history order is reversed so that new features are at the top.
 	- Removed several warnings throughout the project.
 	- Fixed a bug in GetLODPolygonCount() in spr3d.
 	- Matze: cleaned up cs-config and fixed some bugs
+	- Matze: fixed linking of csfgen
 19-Oct-2001
 	- Removed diagnostic messages from image multiplexer. Those are
 	  not really needed.
