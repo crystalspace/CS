@@ -1,9 +1,9 @@
 %define name    crystalspace
-%define version 20040509
+%define version 20040511
 %define release 1
 %define prefix	/usr
 Group: Applications/Development
-Source: cs-current-snapshot.tar.bz2
+Source: http://crystal.sourceforge.net/cvs-snapshots/bzip2/cs-current-snapshot.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 URL: http://crystal.sourceforge.net/
 #Requires: 
@@ -39,12 +39,11 @@ Documentation (manual and public API reference) for CrystalSpace free 3D SDK.
 %setup -n CS
 
 %build
-sh configure --enable-debug --prefix=%{prefix}
-# (vk) set PATH so that CS provided jam is found and used if it's not installed
-PATH=$PATH:. jam
+sh configure --enable-debug --prefix=%{prefix} 
+make all
 
 %install
-PATH=$PATH:. jam -sDESTDIR=%{buildroot} install
+DESTDIR=%{buildroot} make install
 
 CRYSTAL=%{buildroot}%{prefix} CS_DATADIR=%{buildroot}%{prefix}/share/crystal CS_MAPDIR=%{buildroot}%{prefix}/share/crystal/maps %{buildroot}%{prefix}/bin/cslight -canvas=null2d -video=null flarge
 CRYSTAL=%{buildroot}%{prefix} CS_DATADIR=%{buildroot}%{prefix}/share/crystal CS_MAPDIR=%{buildroot}%{prefix}/share/crystal/maps %{buildroot}%{prefix}/bin/cslight -canvas=null2d -video=null partsys
@@ -112,6 +111,11 @@ rm -rf "$RPM_BUILD_ROOT"
 %{prefix}/include/igraphic/*.h
 
 %changelog
+* Tue May 11 2004 Vincent Knecht <vknecht@users.sourceforge.net> 20040511-1
+- Prefixed source file name with URL.
+- Building is done by the make emulation layer, which will automatically
+  call system installed jam if present, or use CS provided jam.
+
 * Sun May 9 2004 Vincent Knecht <vknecht@users.sourceforge.net> 20040509-1
 - Building is done by jam provided with Crystal Space if not installed
 - Specified null2d canvas for levels relighting
