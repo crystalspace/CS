@@ -828,8 +828,11 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygon& poly)
   // the needed memory in the cache but don't do any calculations yet.
   int subtex_size;
   tex->GetSubtexSize (subtex_size);
-  if (subtex_size) CacheInitTexture (tex);
-  else CacheTexture (tex);
+  if (do_lighting)
+  {
+    if (subtex_size) CacheInitTexture (tex);
+    else CacheTexture (tex);
+  }
 
   Scan::init_draw (this, poly.polygon, tex, txt_mm, txt_unl);
 
@@ -1133,7 +1136,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygon& poly)
   int nDirty;
   tex->GetNumberDirtySubTex (nDirty);
 
-  if (subtex_size && nDirty)
+  if (do_lighting && subtex_size && nDirty)
   {
     // To test if the idea is feasible I'll first implement a more naive
     // algorithm here. I will search the bounding box in texture space
@@ -1703,7 +1706,7 @@ struct PQInfo
   int shf_w;
   void (*drawline) (void *dest, int len, long *zbuff, long u, long du, long v,
     long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w);
-  void (*drawline_gouroud) (void *dest, int len, long *zbuff, long u, long du, long v,
+  void (*drawline_gouraud) (void *dest, int len, long *zbuff, long u, long du, long v,
     long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w,
     long r, long g, long b, long dr, long dg, long db);
 
@@ -1711,10 +1714,11 @@ struct PQInfo
 
 PQInfo pqinfo;
 
-STDMETHODIMP csGraphics3DSoftware::StartPolygonQuick (ITextureHandle* handle, bool gouroud)
+STDMETHODIMP csGraphics3DSoftware::StartPolygonQuick (ITextureHandle* handle, bool gouraud)
 {
   csTextureMMSoftware* txt_mm = (csTextureMMSoftware*)GetcsTextureMMFromITextureHandle (handle);
   csTexture* txt_unl = txt_mm->get_texture (0);
+  if (!do_lighting) gouraud = false;
 
   int itw, ith;
 
@@ -1746,25 +1750,25 @@ STDMETHODIMP csGraphics3DSoftware::StartPolygonQuick (ITextureHandle* handle, bo
 
   // Select draw scanline routine
   pqinfo.drawline = NULL;
-  pqinfo.drawline_gouroud = NULL;
+  pqinfo.drawline_gouraud = NULL;
 
   if (pqinfo.pixelbytes == 2)
   {
     TextureTablesPalette* lt_pal = txtmgr->lt_pal;
     Scan16::pal_table = lt_pal->pal_to_true;
 
-    if (gouroud)
+    if (gouraud)
     {
       if (z_buf_mode == ZBuf_Use)
 	if (pqinfo.greenBits == 5)
-          pqinfo.drawline_gouroud = Scan16::draw_pi_scanline_gouroud_555;
+          pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_gouroud_555;
 	else
-          pqinfo.drawline_gouroud = Scan16::draw_pi_scanline_gouroud_565;
+          pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_gouroud_565;
       else
 	if (pqinfo.greenBits == 5)
-          pqinfo.drawline_gouroud = Scan16::draw_pi_scanline_gouroud_zfill_555;
+          pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_gouroud_zfill_555;
 	else
-          pqinfo.drawline_gouroud = Scan16::draw_pi_scanline_gouroud_zfill_565;
+          pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_gouroud_zfill_565;
     }
     else
     {
@@ -1783,12 +1787,12 @@ STDMETHODIMP csGraphics3DSoftware::StartPolygonQuick (ITextureHandle* handle, bo
   }
   else if (pqinfo.pixelbytes == 4)
   {
-    if (gouroud)
+    if (gouraud)
     {
       if (z_buf_mode == ZBuf_Use)
-        pqinfo.drawline_gouroud = Scan32::draw_pi_scanline_gouroud;
+        pqinfo.drawline_gouraud = Scan32::draw_pi_scanline_gouroud;
       else
-        pqinfo.drawline_gouroud = Scan32::draw_pi_scanline_gouroud_zfill;
+        pqinfo.drawline_gouraud = Scan32::draw_pi_scanline_gouroud_zfill;
     }
     else
     {
@@ -1820,10 +1824,11 @@ STDMETHODIMP csGraphics3DSoftware::FinishPolygonQuick ()
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gouroud)
+STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gouraud)
 {
   int i;
-  if (pqinfo.pixelbytes <= 1) gouroud = false;	// Currently no gouroud shading in 8-bit mode.
+  if (pqinfo.pixelbytes <= 1) gouraud = false;	// Currently no gouraud shading in 8-bit mode.
+  if (!do_lighting) gouraud = false;
 
   //-----
   // Get the values from the polygon for more conveniant local access.
@@ -1884,7 +1889,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gour
   int dz = QInt24 (((iz0 - iz2) * (poly.pi_triangle [1].y - poly.pi_triangle [2].y)
                   - (iz1 - iz2) * (poly.pi_triangle [0].y - poly.pi_triangle [2].y)) * inv_dd);
   long dr = 0, dg = 0, db = 0;
-  if (gouroud)
+  if (gouraud)
   {
     float rr0 = pqinfo.redFact*poly.pi_tritexcoords [0].r;
     float rr1 = pqinfo.redFact*poly.pi_tritexcoords [1].r;
@@ -1903,7 +1908,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gour
                 - (bb1 - bb2) * (poly.pi_triangle [0].y - poly.pi_triangle [2].y)) * inv_dd);
   }
 
-  if (!pqinfo.drawline && !pqinfo.drawline_gouroud) return S_OK;
+  if (!pqinfo.drawline && !pqinfo.drawline_gouraud) return S_OK;
 
   //-----
   // Scan from top to bottom.
@@ -1971,7 +1976,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gour
           dudyL = QInt16 ((uu[scanL2] - uu[scanL1]) * inv_dyL);
           dvdyL = QInt16 ((vv[scanL2] - vv[scanL1]) * inv_dyL);
           dzdyL = QInt24 ((iz[scanL2] - iz[scanL1]) * inv_dyL);
-	  if (gouroud)
+	  if (gouraud)
 	  {
             drdyL = QInt16 ((rr[scanL2] - rr[scanL1]) * inv_dyL);
             dgdyL = QInt16 ((gg[scanL2] - gg[scanL1]) * inv_dyL);
@@ -1993,7 +1998,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gour
           uL = QInt16 (uu [scanL1] + (uu [scanL2] - uu [scanL1]) * Factor);
           vL = QInt16 (vv [scanL1] + (vv [scanL2] - vv [scanL1]) * Factor);
           zL = QInt24 (iz [scanL1] + (iz [scanL2] - iz [scanL1]) * Factor);
-          if (gouroud)
+          if (gouraud)
 	  {
 	    rL = QInt16 (rr [scanL1] + (rr [scanL2] - rr [scanL1]) * Factor);
 	    gL = QInt16 (gg [scanL1] + (gg [scanL2] - gg [scanL1]) * Factor);
@@ -2050,8 +2055,8 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gour
         unsigned char* pixel_at;
         //m_piG2D->GetPixelAt(xl, screenY, &pixel_at);
 	pixel_at = line_table[screenY] + (xl << pixel_shift);
-	if (gouroud)
-          pqinfo.drawline_gouroud (pixel_at, xr - xl, zbuff, uu, duu,
+	if (gouraud)
+          pqinfo.drawline_gouraud (pixel_at, xr - xl, zbuff, uu, duu,
                   vv, dvv, zL, dz, pqinfo.bm, pqinfo.shf_w, rL, gL, bL, dr, dg, db);
         else
 	  pqinfo.drawline (pixel_at, xr - xl, zbuff, uu, duu,
@@ -2063,7 +2068,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gour
       uL += dudyL;
       vL += dvdyL;
       zL += dzdyL;
-      if (gouroud)
+      if (gouraud)
       {
         rL += drdyL;
         gL += dgdyL;
