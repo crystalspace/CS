@@ -20,12 +20,14 @@
 #define _ddgUtil_Class_
 
 #include "csterr/ddg.h"
+#include "types.h"
 
-#ifdef WIN32
-#define MAXFLOAT  99999999
 #ifndef M_PI
 #define M_PI      3.14159265358979323846 
 #endif
+
+#ifdef WIN32
+#define MAXFLOAT  99999999
 #else
 // Linux defines
 //#include <strstream.h> 
