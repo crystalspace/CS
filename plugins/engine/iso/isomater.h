@@ -108,7 +108,7 @@ public:
   /// Set the flat shading color
   virtual void SetFlatColor (const csRGBcolor& col) { flat_color = col; }
   /// Get flat color.
-  virtual void GetFlatColor (csRGBpixel &oColor);
+  virtual void GetFlatColor (csRGBpixel &oColor, bool useTextureMean=1);
   /// Get reflection values (diffuse, ambient, reflection).
   virtual void GetReflection (float &oDiffuse, float &oAmbient,
     float &oReflection);

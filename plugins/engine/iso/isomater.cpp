@@ -64,10 +64,10 @@ iTextureHandle *csIsoMaterial::GetTexture ()
   return texture;
 }
 
-void csIsoMaterial::GetFlatColor (csRGBpixel &oColor)
+void csIsoMaterial::GetFlatColor (csRGBpixel &oColor, bool useTextureMean)
 {
   oColor = flat_color;
-  if (texture)
+  if (texture && useTextureMean)
   {
     iTextureHandle *th = texture;
     if (th) th->GetMeanColor (oColor.red, oColor.green, oColor.blue);
