@@ -70,7 +70,6 @@ if $(USE_NEW_RENDERER) = "yes"
     hazeldr
     ieplex
     imgplex
-    mballldr
     motion
     motldr
     nullmesh
@@ -142,7 +141,6 @@ else
     hazeldr
     ieplex
     imgplex
-    mballldr
     motion
     motldr
     nullmesh
