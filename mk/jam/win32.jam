@@ -150,6 +150,7 @@ rule LinkVersionRc
 rule MakeMetadataRc
 {
   GenerateWin32MetadataRc $(>) : $($(<)_METAFILE) ;
+  Depends $(>) : $($(<)_METAFILE) ;
 }
 
 rule LinkVersionAndMetadataRc
