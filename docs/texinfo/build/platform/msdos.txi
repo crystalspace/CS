@@ -119,10 +119,10 @@ If you want to
 @itemize 
 @item
 build dynamic executables where only needed code is loaded at runtime do 
-@samp{make djgpp} and after that @samp{make all}.
+@samp{make djgpp} and after that @samp{make -k all}.
 @item 
 build static executables where all is compiled in (programs tend go get very big that way :)
-then do @samp{make djgpp USE_PLUGINS=no} and after that @samp{make all}.
+then do @samp{make djgpp USE_PLUGINS=no} and after that @samp{make -k all}.
 @end itemize
 @end itemize
 
@@ -141,3 +141,6 @@ USE_ALLEGRO = yes
 I tested compilation on a WinNT4.0 sp6 system with cmd.exe as shell and on linux in a dosemu (where i had to fiddle with the configuration step - this is only for the adventurous people).
 Note that there are issues with djgpp and Win2k/WinXP. I did not try either so you are on 
 your own here, but be told there is a FAQ on www.delorie.com/djgpp regarding this issue.
+
+@subsubheading Compilation Notes
+You will note the @sc{-k} option in the make command above. This will prevent make to stop compilation if some subproject does not compile. In particular the sockets plugin will fail since there is no standard djgpp network package (there are a few out there but i tried only one and that did not compile :). Also, i did not try a compilation of Allegro, since i didnt have it installed (poor excuse, i know).
