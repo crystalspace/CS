@@ -55,6 +55,12 @@ chronological order.
 	  iReporterIterator, and iReporterListener.
 	- Eric Sunshine fixed csperl5.mak so that it adds `swigperl5gen' and
 	  `swigperl5inst' targets to the output of "make help".
+	- Eric Sunshine fixed failure of `-shared' check in compiler.m4, which
+	  is used by external projects.  Problem was that in replacement for
+	  AC_TRY_EVAL(), "$1" was incorrectly being evaluated in the context of
+	  CS_PROG_LINK, rather than in the context of AC_TRY_EVAL().  Also
+	  upgraded `-soname' check to mirror the one from CS/configure.ac which
+	  emits a more aesthetically pleasing answer.
 10-Dec-2003
 	- Eric Sunshine fixed bug in unix.mak where it was incorrectly
 	  exporting the hard-coded "-ldl -lm" to cs-config's --libs option even

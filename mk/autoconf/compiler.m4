@@ -56,7 +56,7 @@ AC_DEFUN([CS_PROG_LINK],[
 
     AC_CACHE_CHECK([if -shared is accepted], [cs_cv_prog_link_shared],
 	[dnl Cheat: Make AC_LINK_IFELSE send errors to conftest.err
-	m4_pushdef([AC_TRY_EVAL], [_AC_EVAL_STDERR([$$1])])
+	m4_pushdef([AC_TRY_EVAL], m4_defn([_CS_TRY_EVAL]))
 	CS_BUILD_IFELSE([], [CS_CREATE_TUPLE([-shared])], [C++],
 	    [AS_IF([grep nrecognize conftest.err >/dev/null 2>&1],
 		[cs_cv_prog_link_shared=no], [cs_cv_prog_link_shared=yes])],
@@ -66,7 +66,9 @@ AC_DEFUN([CS_PROG_LINK],[
     AS_IF([test $cs_cv_prog_link_shared = yes],
 	[CS_JAMCONFIG_PROPERTY([PLUGIN.LFLAGS], [-shared], [+])])
 
-    CS_CHECK_BUILD_FLAGS([is -soname is recgonized], [cs_cv_prog_link_soname],
-	[CS_CREATE_TUPLE([-Wl,-soname,foobar])], [],
+    CS_CHECK_BUILD([if -soname is accepted], [cs_cv_prog_link_soname], [],
+	[CS_CREATE_TUPLE([-Wl,-soname,foobar])], [C++],
 	[CS_JAMCONFIG_PROPERTY([PLUGIN.LFLAGS.USE_SONAME], [yes])])
 ])
+
+AC_DEFUN([_CS_TRY_EVAL], [_AC_EVAL_STDERR([$$1])])
