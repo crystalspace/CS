@@ -19,8 +19,8 @@
 #ifndef __GL2D_FONT_H__
 #define __GL2D_FONT_H__
 
-#include "cs2d/common/graph2d.h"
 #include <GL/gl.h>
+#include "cs2d/common/graph2d.h"
 
 /**
   This class contains

@@ -99,7 +99,7 @@ public:
   virtual ~csTextureMM ();
 
   /// Get texture usage flags
-  bool get_flags () { return flags; }
+  int get_flags () { return flags; }
 
   /// Release the original image (iImage) as given by the engine.
   void free_image ();

@@ -254,7 +254,7 @@ public:
   void CacheTexture (iPolygonTexture *texture);
 
   /// Remove a texture from cache (perhaps because it's being unregistered)
-  void UncacheTexture (iTextureHandle *handle);
+  void UncacheTexture (iTextureHandle* /*handle*/) {/*@@todo*/}
 
   /**
    * Allocate a 'lighted texture' in which the base texture and lightmap

@@ -21,6 +21,7 @@
 #include <stdio.h>
 
 #include "sysdef.h"
+#include "cssys/sysdriv.h"
 #include "qint.h"
 #include "csutil/scf.h"
 #include "csgeom/math2d.h"
@@ -1074,12 +1075,7 @@ void csGraphics3DOpenGL::CacheTexture (iPolygonTexture *texture)
   lightmap_cache->cache_lightmap (texture);
 }
   
-void csGraphics3DOpenGL::UncacheTexture (iTextureHandle */*handle*/)
-{
-  //@@todo
-}
-  
-void csGraphics3DOpenGL::CacheLightedTexture (iPolygonTexture */*texture*/)
+void csGraphics3DOpenGL::CacheLightedTexture (iPolygonTexture* /*texture*/)
 {
 }
 

@@ -21,6 +21,7 @@
 #include <stdio.h>
 
 #include "sysdef.h"
+#include "cssys/sysdriv.h"
 #include "cs2d/common/graph2d.h"
 #include "csutil/util.h"
 

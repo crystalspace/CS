@@ -17,6 +17,7 @@
 */
 
 #include "sysdef.h"
+#include "cssys/sysdriv.h"
 
 #include <GL/gl.h>
 

@@ -193,7 +193,7 @@ void csTextureMM::apply_gamma ()
     return;
 
   RGBPixel *src = NULL;
-  int pixels;
+  int pixels = 0;
   switch (image->GetFormat () & CS_IMGFMT_MASK)
   {
     case CS_IMGFMT_TRUECOLOR:

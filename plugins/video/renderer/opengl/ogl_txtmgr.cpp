@@ -20,6 +20,7 @@
 #include <math.h>
 
 #include "sysdef.h"
+#include "cssys/sysdriv.h"
 #include "ogl_g3d.h"
 #include "ogl_txtmgr.h"
 #include "ogl_txtcache.h"
@@ -72,7 +73,7 @@ csTexture *csTextureMMOpenGL::new_texture (iImage *Image)
 void csTextureMMOpenGL::compute_mean_color ()
 {
   // Compute the mean color from the smallest mipmap available
-  csTextureOpenGL *tex;
+  csTextureOpenGL *tex = NULL;
   for (int i = 3; i >= 0; i--)
   {
     tex = (csTextureOpenGL *)get_texture (i);
