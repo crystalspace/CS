@@ -8,6 +8,13 @@ The history order has been reversed so that new features are at the top.
 	  array.
 	- Eric Sunshine fixed a memory leak and compiler warnings in
 	  ddgcntxt.cpp and ddgchull.cpp.
+	- Eric Sunshine reintroduced code into support/gnu/bison.sim to clear
+	  yyval before its first use.  Without this code, at least four of the
+	  compilers I use complain that yyval is used uninitialized.  I had
+	  added this code in the past, but Andrew misunderstood its
+	  implementation and removed it.  (It was specifically engineered to
+	  gracefully handle the case for which he thought it failed.)  The new
+	  implementation is even simpler and more flexible.
 29-Sep-2000
 	- Eric Sunshine made the following changes to install.mak and the
 	  installation-related makefile targets:

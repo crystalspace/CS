@@ -258,6 +258,10 @@ yyparse(YYPARSE_PARAM_ARG)
 				/*  routines				*/
   int yylen;
 
+#if defined(YYCLEAR_YYVAL)
+YYCLEAR_YYVAL;
+#endif
+
 #if YYDEBUG != 0
   if (yydebug)
     fprintf(stderr, "Starting parse\n");
