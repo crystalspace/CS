@@ -772,7 +772,7 @@ bool csGLGraphics3D::Open ()
     ext->CS_GL_ARB_point_sprite;
 
   // check for support of VBO
-  //use_hw_render_buffers = ext->CS_GL_ARB_vertex_buffer_object;
+  use_hw_render_buffers = ext->CS_GL_ARB_vertex_buffer_object;
 
   shadermgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
   if (!shadermgr)
