@@ -30,6 +30,8 @@ chronological order.
 	  is never returned.
 	- res fixed xmlread to not return a 0 attribute iterator.
 	- res slightly clarified a message in xmlshader.
+	- Jorrit fixed a bug in the new portaltraversal flag. The
+	  portals would be traversed anyway.
 29-Apr-2004
 	- Marten fixed a bug in xmlshader where it assumed the syntax-service
 	  was already loaded.  Now it loads it if needed.

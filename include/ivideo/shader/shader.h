@@ -113,7 +113,7 @@ struct iShaderManager : public iShaderVariableContext
   virtual iShaderCompiler* GetCompiler(const char* name) = 0;
 
   /// Get the shadervariablestack used to handle shadervariables on rendering
-  virtual csShaderVarStack& GetShaderVariableStack () =0;
+  virtual csShaderVarStack& GetShaderVariableStack () = 0;
 };
 
 SCF_VERSION (iShaderRenderInterface, 0,0,1);

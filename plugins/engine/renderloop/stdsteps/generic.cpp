@@ -344,9 +344,11 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
         numSSM = 0;
       }
 
-      ToggleStepSettings (g3d, false);
-      
-      mesh->portal->Draw (rview);
+      if (portalTraversal)
+      {
+        ToggleStepSettings (g3d, false);
+        mesh->portal->Draw (rview);
+      }
     }
     else 
     {
