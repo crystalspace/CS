@@ -673,7 +673,7 @@ void csODERigidBody::AttachBone (iSkeletonBone* b)
 
 void csODERigidBody::Update ()
 {
-  if (bodyID)
+  if (bodyID && !statjoint)
   {
     csOrthoTransform trans;
     if (mesh || bone)
@@ -813,11 +813,11 @@ void csODEJoint::BuildHinge2 (const csVector3 &axis1, float min1, float max1,
   dJointSetHinge2Axis1 (jointID, axis1.x, axis1.y, axis1.z);
   dJointSetHinge2Axis2 (jointID, axis2.x, axis2.y, axis2.z);
   if (max1 > min1) {
-    dJointSetHingeParam (jointID, dParamLoStop, min1);
-    dJointSetHingeParam (jointID, dParamHiStop, max1);
+    dJointSetHinge2Param (jointID, dParamLoStop, min1);
+    dJointSetHinge2Param (jointID, dParamHiStop, max1);
   } else {
-    dJointSetHingeParam (jointID, dParamLoStop, -dInfinity);
-    dJointSetHingeParam (jointID, dParamHiStop, dInfinity);
+    dJointSetHinge2Param (jointID, dParamLoStop, -dInfinity);
+    dJointSetHinge2Param (jointID, dParamHiStop, dInfinity);
   } 
   if (max2 > min2) {
     dJointSetHinge2Param (jointID, dParamLoStop2, min2);
@@ -879,7 +879,7 @@ void csODEJoint::BuildJoint ()
         jointID = dJointCreateHinge2 (dynsys->GetWorldID(), 0);
           dJointAttach (jointID, bodyID[0], bodyID[1]);
         pos = transform.GetOrigin();
-        dJointSetHingeAnchor (jointID, pos.x, pos.y, pos.z);
+        dJointSetHinge2Anchor (jointID, pos.x, pos.y, pos.z);
         rot = transform.GetO2T();
 
         if (transConstraint[0]) {
