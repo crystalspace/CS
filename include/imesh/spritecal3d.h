@@ -80,7 +80,8 @@ struct iSpriteCal3DFactoryState : public iBase
   /// Initialize internal Cal3d data structures.
   virtual bool Create(const char *name) = 0;
 
-  /** This prints the message if any cal3d function is unsuccessful.
+  /**
+   * This prints the message if any cal3d function is unsuccessful.
    * There is no way I can see to retrieve the string and use cs report 
    * with it.
    */
@@ -114,20 +115,29 @@ struct iSpriteCal3DFactoryState : public iBase
    * @param vfs The ref to the vfs plugin used when loading the anim file
    * @param filename The VFS path to the anim file.
    * @param type The type of anim this file represents.
-   * @param base_velocity On movement type anims, this represents the native traversal speed of the model implied by this animation.
-   *                      For example, a "walk" anim might specify 2m/sec.
-   * @param min_velocity  On movement type anims, this represents the minimum velocity for which this animation should be considered
-   *                      or used.  The anim will be blended with other anims to achieve the desired exact velocity.
-   * @param max_velocity  Same thing for max velocity for this anim to be blended in.
-   * @param min_interval  When the anim of type "idle" is playing, the model will randomly choose override actions to play every
-   *                      so often to enhance the realism of the idle.  (Thus a "standing" creature might shift his feet or scratch
-   *                      his nose every 30 seconds or so.)  This param is the minimum time between these overrides.
-   * @param max_interval  Max interval between these override idle actions.  The model will randomly choose a time between min and max.
-   * @idle_pct            For anims of type action, if the model is idling it will randomly choose among these based on the idle_pct
-   *                      weights specified here.  This param should total 100 across all anims for the model if used.
-   * @lock                This specifies whether the animation is to be locked on last frame or not.  If not locked, the action will return
-   *                      to the base keyframe when complete.  If locked, the action will stay in the final keyframe position until
-   *                      cleared.  (This is usually for anims like "death".)
+   * @param base_velocity On movement type anims, this represents the native
+   *   traversal speed of the model implied by this animation.
+   *   For example, a "walk" anim might specify 2m/sec.
+   * @param min_velocity  On movement type anims, this represents the minimum
+   *   velocity for which this animation should be considered
+   *   or used.  The anim will be blended with other anims to achieve the
+   *   desired exact velocity.
+   * @param max_velocity  Same thing for max velocity for this anim to be
+   *   blended in.
+   * @param min_interval  When the anim of type "idle" is playing, the model
+   *   will randomly choose override actions to play every so often to enhance
+   *   the realism of the idle.  (Thus a "standing" creature might shift his
+   *   feet or scratch his nose every 30 seconds or so.)  This param is the
+   *   minimum time between these overrides.
+   * @param max_interval  Max interval between these override idle actions.
+   *   The model will randomly choose a time between min and max.
+   * @idle_pct For anims of type action, if the model is idling it will
+   *   randomly choose among these based on the idle_pct weights specified
+   *   here. This param should total 100 across all anims for the model if used.
+   * @lock This specifies whether the animation is to be locked on last frame
+   *   or not. If not locked, the action will return to the base keyframe when
+   *   complete.  If locked, the action will stay in the final keyframe
+   *   position until cleared.  (This is usually for anims like "death".)
    */
   virtual int  LoadCoreAnimation(iVFS *vfs,const char *filename,
 				 const char *name,
@@ -148,21 +158,25 @@ struct iSpriteCal3DFactoryState : public iBase
    * attach should be true if this mesh should be part of the mesh object
    * after it is first created, or false if it will be optionally added
    * later.
-   * defmat is the material which should be used when the object is created, if any.
+   * defmat is the material which should be used when the object is created,
+   * if any.
    */
-  virtual int LoadCoreMesh(iVFS *vfs,const char *filename,const char *name,bool attach,iMaterialWrapper *defmat) = 0;
+  virtual int LoadCoreMesh(iVFS *vfs,const char *filename,
+  	const char *name,bool attach,iMaterialWrapper *defmat) = 0;
 
   /**
    * This adds a mesh as a morph target of another mesh.
    *
-   * @param mesh_index The index of the mesh we are going to add a morph target to.
+   * @param mesh_index The index of the mesh we are going to add a morph
+   *   target to.
    * @param filename The name of the file of the mesh of the morph tarrget.
    * @param name The name of the morph target.
    *
    * @return The index of the morph target.
    */
-  virtual int LoadCoreMorphTarget(iVFS *vfs,int mesh_index,const char *filename,const char *name) = 0;
-  
+  virtual int LoadCoreMorphTarget(iVFS *vfs,int mesh_index,
+  	const char *filename, const char *name) = 0;
+
   /**
    * This adds a new morph animation.
    *
@@ -182,7 +196,8 @@ struct iSpriteCal3DFactoryState : public iBase
    * @return True if successfull.
    */
   virtual bool AddMorphTarget(int morphanimation_index,
-		              const char *mesh_name, const char *morphtarget_name) = 0;
+		              const char *mesh_name,
+			      const char *morphtarget_name) = 0;
   
   /**
    * This jams a CS material into a cal3d material struct.
@@ -234,12 +249,14 @@ struct iSpriteCal3DFactoryState : public iBase
   
   
   /**
-   * Returns the xml name of the morph animation at a certain index in the array.
+   * Returns the xml name of the morph animation at a certain index in the
+   * array.
    */
   virtual const char *GetMorphAnimationName(int idx) = 0;
 
   /**
-   * Returns the index of the specified morph animation name, or -1 if not found.
+   * Returns the index of the specified morph animation name,
+   * or -1 if not found.
    */
   virtual int  FindMorphAnimationName(const char *meshName) = 0;
 
@@ -283,7 +300,10 @@ struct iSpriteCal3DState : public iBase
   /// Returns the number of animations currently loaded for the core model.
   virtual int GetAnimCount() = 0;
 
-  /// Returns the name, from the xml file, of the indexed anim, or 0 if out of bounds.
+  /**
+   * Returns the name, from the xml file, of the indexed anim, or 0
+   * if out of bounds.
+   */
   virtual const char *GetAnimName(int idx) = 0;
 
   /// Returns the type from the enum above, as specified in the XML.
@@ -292,11 +312,15 @@ struct iSpriteCal3DState : public iBase
   /// This resets all currently blended animations and stops the sprite.
   virtual void ClearAllAnims() = 0;
 
-  /// This clears the active anims for this sprite and sets it to use only the specified anim. 
+  /**
+   * This clears the active anims for this sprite and sets it to use only the
+   * specified anim. 
+   */
   virtual bool SetAnimCycle(const char *name, float weight) = 0;
 
   /**
-   * This adds the specified animation to the ones already being blended by cal3d.
+   * This adds the specified animation to the ones already being blended by
+   * cal3d.
    * The weight value is dependent on other weights used, and is only relative.
    * The delay is the period in seconds over which the blended weight will be 
    * interpolated from 0 to "weight" value.  A cal3d anim cycle, by definition,
@@ -342,19 +366,20 @@ struct iSpriteCal3DState : public iBase
    * active animations.  delayIn and delayOut allow you to fade in and fade
    * out the action for smoothness of response.
    */
-  virtual bool SetAnimAction(const char *name, float delayIn, float delayOut) = 0;
+  virtual bool SetAnimAction(const char *name, float delayIn,
+  	float delayOut) = 0;
 
   /**
    * This function searches all actions specified as type TRAVEL, and uses their
-   * preferred velocities to create a set of blended animations which will equate
-   * in velocity to the specified parm "vel".  The calling program is still
-   * responsible for actually moving the sprite.
+   * preferred velocities to create a set of blended animations which will
+   * equate in velocity to the specified parm "vel".  The calling program is
+   * still responsible for actually moving the sprite.
    */
   virtual bool SetVelocity(float vel,csRandomGen *rng=0) = 0;
 
   /**
-   * This function sets the Level of Detail used by the sprite.  This is used to 
-   * reduce the polygon count and simplify the scene for the renderer.
+   * This function sets the Level of Detail used by the sprite.  This is used
+   * to reduce the polygon count and simplify the scene for the renderer.
    */
   virtual void SetLOD(float lod) = 0;
 
@@ -396,7 +421,8 @@ struct iSpriteCal3DState : public iBase
    *
    * @return False if something went wrong.
    */
-  virtual bool BlendMorphTarget(int morph_animation_id, float weight, float delay) = 0;
+  virtual bool BlendMorphTarget(int morph_animation_id, float weight,
+  	float delay) = 0;
 
   /**
    * Clears the morph target.
