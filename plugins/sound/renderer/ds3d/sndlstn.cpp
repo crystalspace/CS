@@ -19,11 +19,12 @@
 */
 
 #include "cssysdef.h"
+#include "csplugincommon/directx/guids.h"
 #include "csutil/scf.h"
 #include "ivaria/reporter.h"
 #include "iutil/objreg.h"
 
-#include "dsound.h"
+#include <dsound.h>
 
 #include "sndrdr.h"
 #include "sndlstn.h"

@@ -123,7 +123,7 @@ csImageMemory::csImageMemory (iImage* source, int newFormat) : csImageBase()
 
 csImageMemory::csImageMemory (int iFormat) : csImageBase()
 {
-  ConstructWHDF (0, 0, 0, iFormat);
+  ConstructWHDF (0, 0, 1, iFormat);
 }
 
 void csImageMemory::AllocImage()

@@ -78,6 +78,7 @@ protected:
   iTextureWrapper* tex;
   // Dimensions of texture.
   int mat_w, mat_h;
+  csRef<iImage> proc_image;
   csRef<iGraphics3D> g3d;
   csRef<iGraphics2D> g2d;
   iObjectRegistry* object_reg;
@@ -148,7 +149,7 @@ private:
 public:
   SCF_DECLARE_IBASE_EXT (csObject);
 
-  csProcTexture (iTextureFactory* p = 0);
+  csProcTexture (iTextureFactory* p = 0, iImage* image = 0);
   virtual ~csProcTexture ();
 
   iGraphics3D* GetG3D () { return g3d; }

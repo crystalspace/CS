@@ -18,10 +18,10 @@
 */
 
 #include "cssysdef.h"
-#include "csextern.h"
 
 #define INITGUID
-#include <windows.h>
+#include "csplugincommon/directx/guids.h"
+
 #include <ddraw.h>
 #include <d3d.h>
 #include <dsound.h>

@@ -914,7 +914,8 @@ bool ImageJngFile::Load (uint8 *iBuffer, size_t iSize)
     csRGBpixel *rgbImage = 
       csPackRGBA::CopyUnpackRGBAtoRGBpixel (NewImage, Width*Height);
     ConvertFromRGBA (rgbImage);
-    CheckAlpha();
+    // Subsequent images may contain alpha, so don't check
+    if (!doWait) CheckAlpha();
   }
 
   if (mng_get_sigtype (handle) != mng_it_mng)
@@ -951,10 +952,16 @@ bool ImageJngFile::Animate (csTicks time, csRect* dirtyrect)
 
   if (updated)
   {
-    csRGBpixel *rgbImage = csPackRGBA::CopyUnpackRGBAtoRGBpixel (
-      NewImage, Width*Height);
-    ConvertFromRGBA (rgbImage);
-    CheckAlpha();
+    if (csPackRGBA::IsRGBpixelSane())
+    {
+      memcpy (Image, NewImage, Width * Height * sizeof (csRGBpixel));
+    }
+    else
+    {
+      csRGBpixel *rgbImage = csPackRGBA::CopyUnpackRGBAtoRGBpixel (
+	NewImage, Width*Height);
+      ConvertFromRGBA (rgbImage);
+    }
   }
 
   return updated;

@@ -125,7 +125,7 @@ SCF_IMPLEMENT_IBASE_EXT (csProcTexture)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iProcTexture)
 SCF_IMPLEMENT_IBASE_EXT_END
 
-csProcTexture::csProcTexture (iTextureFactory* p)
+csProcTexture::csProcTexture (iTextureFactory* p, iImage* image)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiProcTexture);
@@ -141,6 +141,7 @@ csProcTexture::csProcTexture (iTextureFactory* p)
   always_animate = false;
   visible = false;
   parent = p;
+  proc_image = image;
 }
 
 csProcTexture::~csProcTexture ()
@@ -199,8 +200,8 @@ bool csProcTexture::Initialize (iObjectRegistry* object_reg)
   csProcTexture::object_reg = object_reg;
   proceh = SetupProcEventHandler (object_reg);
 
-  csRef<iImage> proc_image;
-  proc_image.AttachNew (new csImageMemory (mat_w, mat_h));
+  if (!proc_image.IsValid())
+    proc_image.AttachNew (new csImageMemory (mat_w, mat_h));
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   g2d = CS_QUERY_REGISTRY (object_reg, iGraphics2D);

@@ -19,10 +19,11 @@
 */
 
 #include "cssysdef.h"
+#include "csplugincommon/directx/guids.h"
 #include "csutil/sysfunc.h"
 #include "csutil/scf.h"
 
-#include "dsound.h"
+#include <dsound.h>
 
 #include "sndrdr.h"
 #include "sndsrc.h"

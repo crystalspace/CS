@@ -31,7 +31,7 @@
 #include "csutil/thread.h"
 #include "csutil/win32/win32.h"
 
-#include "dsound.h"
+#include <dsound.h>
 
 class csSoundListenerDS3D;
 class csSoundSourceDS3D;

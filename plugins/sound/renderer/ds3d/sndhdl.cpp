@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "csplugincommon/directx/guids.h"
 #include "sndhdl.h"
 #include "sndrdr.h"
 #include "sndsrc.h"

@@ -19,7 +19,6 @@
 #ifndef __CS_DD3G2D_H__
 #define __CS_DD3G2D_H__
 
-#include <windows.h>
 #include <ddraw.h>
 #include "csutil/scf.h"
 #include "csplugincommon/canvas/graph2d.h"

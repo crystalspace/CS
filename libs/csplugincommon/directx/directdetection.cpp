@@ -18,6 +18,7 @@
 */
 
 #include "cssysdef.h"
+#include "csplugincommon/directx/guids.h"
 
 #include "csutil/csunicode.h"
 #include "csutil/csstring.h"

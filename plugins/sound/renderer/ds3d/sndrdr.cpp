@@ -19,6 +19,7 @@
 */
 
 #include "cssysdef.h"
+#include "csplugincommon/directx/guids.h"
 #include "csutil/sysfunc.h"
 #include <stdio.h>
 

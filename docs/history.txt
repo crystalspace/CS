@@ -18,7 +18,13 @@ chronological order.
 	  export_genmesh_skelanim.mcr (not only bones rotations).
 	- Erotoman updated "walk" script of animated mesh with some bones 
 	  movements and now it looks better.
-	
+	- res improved the performance of iTexture->Blit() by preventing the
+	  compression of the texture data.
+	- res fixed the import of DirectX GUIDs in shared lib builds.
+	- res fixed an issue in csProcAnimated where the "last update time"
+	  was only updated when the image changed.
+	- res fixed an occasional Depth value of 0 in csImageMemory.
+	- res added ability to pass an initial image to csProcTexture.
 6-Mar-2005
 	- Eric Sunshine removed invocation of SWIGEXTERN() from definition of
 	  csWrapTypedObject() in pythpost.i since the meaning of SWIGEXTERN

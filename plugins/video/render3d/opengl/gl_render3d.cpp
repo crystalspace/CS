@@ -1219,6 +1219,11 @@ void csGLGraphics3D::PrepareAsRenderTarget (csGLTextureHandle* tex_mm)
   // Make some necessary adjustments.
   if (!tex_mm->IsWasRenderTarget())
   {
+    // Pull texture data and set as RGBA again, to prevent compression (slooow)
+    // on subsequent glTexSubImage() calls.
+    uint8* pixels = new uint8[tex_mm->actual_width * tex_mm->actual_height * 4];
+    glGetTexImage (GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+
     if (!(tex_mm->GetFlags() & CS_TEXTURE_NOMIPMAPS))
     {
       if (ext->CS_GL_SGIS_generate_mipmap)
@@ -1231,6 +1236,9 @@ void csGLGraphics3D::PrepareAsRenderTarget (csGLTextureHandle* tex_mm)
 	  txtmgr->rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
       }
     }
+    glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, tex_mm->actual_width, 
+      tex_mm->actual_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+    delete[] pixels;
     tex_mm->SetWasRenderTarget (true);
   }
 }
