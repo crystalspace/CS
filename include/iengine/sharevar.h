@@ -28,7 +28,7 @@
 #include "cstypes.h"
 #include "csutil/scf.h"
 
-SCF_VERSION (iSharedVariable, 0, 0, 1);
+SCF_VERSION (iSharedVariable, 0, 1, 0);
 
 /**
  * iSharedVariable implements a refcounted float value which can
@@ -36,6 +36,7 @@ SCF_VERSION (iSharedVariable, 0, 0, 1);
  */
 struct iSharedVariable : public iBase
 {
+  virtual iObject* QueryObject () = 0;
   virtual void Set(float val) = 0;
   virtual float Get() const = 0;
   virtual void SetName (const char *iName) = 0;

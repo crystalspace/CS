@@ -45,7 +45,6 @@ static const float SCALE_FACTOR = 0.025;
 static const float FRAME_DELAY = 0.1;
 
 CS_DECLARE_TYPED_VECTOR (csStringVector, csString);
-CS_DECLARE_OBJECT_VECTOR (csVertexFrameVector, iModelDataVertices);
 
 struct csMD2Header
 {

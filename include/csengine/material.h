@@ -239,16 +239,15 @@ public:
   friend struct MaterialWrapper;
 };
 
-CS_DECLARE_OBJECT_VECTOR (csMaterialListHelper, iMaterialWrapper);
-
 /**
  * This class is used to hold a list of materials.
  */
-class csMaterialList : public csMaterialListHelper
+class csMaterialList : public csRefArrayObject<iMaterialWrapper>
 {
 public:
   /// Initialize the array
   csMaterialList ();
+  virtual ~csMaterialList () { }
 
   /// Create a new material.
   iMaterialWrapper* NewMaterial (iMaterial* material);

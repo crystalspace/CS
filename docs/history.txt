@@ -5,6 +5,17 @@ The history order is reversed so that new features are at the top.
 	- Added support for <key> in mesh factories and collections.
 	- Enhanced the new XML document a lot. Also some other smaller
 	  documentation fixes.
+	- Renamed csPtrArray to csPArray because csPtrArray may confuse
+	  people into thinking it stores csPtr instances.
+	- Added csRefArrayObject. This is a templated subclass of csRefArray
+	  which is intended for objects that implement iBase and have
+	  a QueryObject() function. It adds functionality to look for an
+	  object by name (FindByName() and GetIndexByName()). Eventually it
+	  is designed to replace CS_DECLARE_OBJECT_VECTOR.
+	- Added PushSmart() to csPArray and csRefArray.
+	- Removed all usages of CS_DECLARE_OBJECT_VECTOR in CS. Consequently
+	  removed that macro.
+	- Added QueryObject() to iSharedVariable.
 12-Jan-2002
 	- Started work on new map format document.
 	- Eric Sunshine silenced some warning messages from ActiveState Perl

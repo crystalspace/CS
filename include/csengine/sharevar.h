@@ -61,22 +61,21 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csSharedVariable);
 
-    void Set(float val)
+    virtual iObject* QueryObject () { return scfParent; }
+    virtual void Set(float val)
     {	scfParent->Set(val); }
-    float Get() const
+    virtual float Get() const
     {   return scfParent->Get(); }
-    void SetName (const char *iName)
+    virtual void SetName (const char *iName)
     {   scfParent->SetName(iName); }
-    const char *GetName () const
+    virtual const char *GetName () const
     {   return scfParent->GetName(); }
   } scfiSharedVariable;
   friend struct eiSharedVariable;
 };
 
-CS_DECLARE_OBJECT_VECTOR (csSharedVariableListHelper, iSharedVariable);
-
 /// List of 3D engine SharedVariables.
-class csSharedVariableList : public csSharedVariableListHelper
+class csSharedVariableList : public csRefArrayObject<iSharedVariable>
 {
 public:
   SCF_DECLARE_IBASE;
@@ -84,12 +83,9 @@ public:
   /// constructor
   csSharedVariableList ();
   /// destructor
-  ~csSharedVariableList ();
+  virtual ~csSharedVariableList ();
 
-  /// override FreeItem
-  virtual bool FreeItem (csSome Item);
-
-  /// iSharedVariable Factory method.  This does not add the new var to the list.
+  /// iSharedVariable Factory method. This does not add the new var to the list.
   iSharedVariable *New() const;
 
   class SharedVariableList : public iSharedVariableList

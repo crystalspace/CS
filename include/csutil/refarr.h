@@ -155,6 +155,13 @@ public:
     return (count - 1);
   }
 
+  /// Push a element on 'top' of vector if it is not already there.
+  int PushSmart (T* what)
+  {
+    int n = Find (what);
+    return (n == -1) ? Push (what) : n;
+  }
+
   /// Pop an element from vector 'top'.
   csRef<T> Pop ()
   {

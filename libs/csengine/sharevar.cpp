@@ -50,11 +50,6 @@ csSharedVariableList::~csSharedVariableList ()
   DeleteAll ();
 }
 
-bool csSharedVariableList::FreeItem (csSome Item)
-{
-  return csSharedVariableListHelper::FreeItem (Item);
-}
-
 int csSharedVariableList::SharedVariableList::GetCount () const
 {
   return scfParent->Length ();

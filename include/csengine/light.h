@@ -482,18 +482,22 @@ public:
 };
 
 
-CS_DECLARE_OBJECT_VECTOR (csLightListHelper, iLight);
-
 /**
  * List of lights for a sector. This class implements iLightList.
  */
-class csLightList : public csLightListHelper
+class csLightList : public csRefArrayObject<iLight>
 {
 public:
   SCF_DECLARE_IBASE;
 
   /// constructor
   csLightList ();
+  virtual ~csLightList () { }
+
+  /// Override PrepareItem
+  virtual void PrepareItem (iLight*) { }
+  /// Override FreeItem
+  virtual void FreeItem (iLight*) { }
 
   /// Find a light by ID
   iLight *FindByID (unsigned long id) const;

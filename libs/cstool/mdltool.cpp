@@ -146,11 +146,11 @@ CS_TYPEDEF_GROWING_ARRAY (csVector2Array, csVector2);
 CS_TYPEDEF_GROWING_ARRAY (csColorArray, csColor);
 CS_DECLARE_TYPED_VECTOR (csIntArrayVector, csIntArray);
 
-CS_DECLARE_OBJECT_VECTOR (csModelDataActionVector, iModelDataAction);
-CS_DECLARE_OBJECT_VECTOR (csModelDataMaterialVector, iModelDataMaterial);
-CS_DECLARE_OBJECT_VECTOR (csModelDataObjectVector, iModelDataObject);
-CS_DECLARE_OBJECT_VECTOR (csModelDataPolygonVector, iModelDataPolygon);
-CS_DECLARE_OBJECT_VECTOR (csModelDataVerticesVector, iModelDataVertices);
+typedef csRefArrayObject<iModelDataAction> csModelDataActionVector;
+typedef csRefArrayObject<iModelDataMaterial> csModelDataMaterialVector;
+typedef csRefArrayObject<iModelDataObject> csModelDataObjectVector;
+typedef csRefArrayObject<iModelDataPolygon> csModelDataPolygonVector;
+typedef csRefArrayObject<iModelDataVertices> csModelDataVerticesVector;
 
 // ---------------------------------------------------------------------------
 // Some helper functions
@@ -536,7 +536,7 @@ void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject
     }
     else
     {
-      ActionMap2.Replace (n, Action);
+      ActionMap2[n] = Action;
     }
     src->QueryObject ()->ObjRemove (Action->QueryObject ());
   }

@@ -108,18 +108,17 @@ public:
   virtual iSector* GetLastSector ();
 };
 
-CS_DECLARE_OBJECT_VECTOR (csCollectionListHelper, iCollection);
-
 /**
  * List of collections for the engine. This class implements iCollectionList.
  */
-class csCollectionList : public csCollectionListHelper
+class csCollectionList : public csRefArrayObject<iCollection>
 {
 public:
   SCF_DECLARE_IBASE;
 
   /// constructor
   csCollectionList ();
+  virtual ~csCollectionList () { }
   /// Create a new collection.
   virtual iCollection* NewCollection (const char* name);
 
@@ -140,19 +139,18 @@ public:
   } scfiCollectionList;
 };
 
-CS_DECLARE_OBJECT_VECTOR (csCameraPositionListHelper, iCameraPosition);
-
 /**
  * List of camera positions for the engine. This class implements
  * iCameraPositionList.
  */
-class csCameraPositionList : public csCameraPositionListHelper
+class csCameraPositionList : public csRefArrayObject<iCameraPosition>
 {
 public:
   SCF_DECLARE_IBASE;
 
   /// constructor
   csCameraPositionList ();
+  virtual ~csCameraPositionList () { }
   /// New camera position.
   virtual iCameraPosition* NewCameraPosition (const char* name);
 

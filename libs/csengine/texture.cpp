@@ -280,7 +280,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csTextureList::TextureList)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csTextureList::csTextureList () :
-  csTextureListHelper(16, 16)
+  csRefArrayObject<iTextureWrapper> (16, 16)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureList);

@@ -430,21 +430,29 @@ iLight *csLightList::LightList::Get (int n) const
 
 int csLightList::LightList::Add (iLight *obj)
 {
+  scfParent->PrepareItem (obj);
   return scfParent->Push (obj);
 }
 
 bool csLightList::LightList::Remove (iLight *obj)
 {
+  scfParent->FreeItem (obj);
   return scfParent->Delete (obj);
 }
 
 bool csLightList::LightList::Remove (int n)
 {
+  scfParent->FreeItem ((*scfParent)[n]);
   return scfParent->Delete (n);
 }
 
 void csLightList::LightList::RemoveAll ()
 {
+  int i;
+  for (i = 0 ; i < scfParent->Length () ; i++)
+  {
+    scfParent->FreeItem ((*scfParent)[i]);
+  }
   scfParent->DeleteAll ();
 }
 

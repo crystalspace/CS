@@ -425,7 +425,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csRegionList::RegionList)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csRegionList::csRegionList () :
-  csRegionListHelper(16, 16)
+  csRefArrayObject<iRegion> (16, 16)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRegionList);

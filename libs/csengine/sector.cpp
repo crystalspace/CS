@@ -58,20 +58,14 @@ csSectorLightList::~csSectorLightList ()
   DeleteAll ();
 }
 
-bool csSectorLightList::PrepareItem (csSome Item)
+void csSectorLightList::PrepareItem (iLight* item)
 {
-  iLight *light = (iLight *)Item;
-  light->IncRef ();
-  light->SetSector (&(sector->scfiSector));
-  return true;
+  item->SetSector (&(sector->scfiSector));
 }
 
-bool csSectorLightList::FreeItem (csSome Item)
+void csSectorLightList::FreeItem (iLight* item)
 {
-  iLight *light = (iLight *)Item;
-  light->SetSector (NULL);
-  light->DecRef ();
-  return true;
+  item->SetSector (NULL);
 }
 
 //---------------------------------------------------------------------------
@@ -85,22 +79,16 @@ csSectorMeshList::~csSectorMeshList ()
   DeleteAll ();
 }
 
-bool csSectorMeshList::PrepareItem (csSome item)
+void csSectorMeshList::PrepareItem (iMeshWrapper* item)
 {
   CS_ASSERT (sector != NULL);
-
-  csMeshList::PrepareItem (item);
-  sector->PrepareMesh ((iMeshWrapper *)item);
-  return true;
+  sector->PrepareMesh (item);
 }
 
-bool csSectorMeshList::FreeItem (csSome item)
+void csSectorMeshList::FreeItem (iMeshWrapper* item)
 {
   CS_ASSERT (sector != NULL);
-
-  sector->UnprepareMesh ((iMeshWrapper *)item);
-  csMeshList::FreeItem (item);
-  return true;
+  sector->UnprepareMesh (item);
 }
 
 //---------------------------------------------------------------------------
@@ -954,11 +942,10 @@ csSectorList::~csSectorList ()
   DeleteAll ();
 }
 
-bool csSectorList::FreeItem (csSome Item)
+void csSectorList::FreeItem (iSector* item)
 {
   if (CleanupReferences)
-    ((iSector *)Item)->GetPrivateObject ()->CleanupReferences ();
-  return csSectorListHelper::FreeItem (Item);
+    item->GetPrivateObject ()->CleanupReferences ();
 }
 
 int csSectorList::SectorList::GetCount () const
@@ -978,16 +965,23 @@ int csSectorList::SectorList::Add (iSector *obj)
 
 bool csSectorList::SectorList::Remove (iSector *obj)
 {
+  scfParent->FreeItem (obj);
   return scfParent->Delete (obj);
 }
 
 bool csSectorList::SectorList::Remove (int n)
 {
+  scfParent->FreeItem ((*scfParent)[n]);
   return scfParent->Delete (n);
 }
 
 void csSectorList::SectorList::RemoveAll ()
 {
+  int i;
+  for (i = 0 ; i < scfParent->Length () ; i++)
+  {
+    scfParent->FreeItem ((*scfParent)[i]);
+  }
   scfParent->DeleteAll ();
 }
 

@@ -99,18 +99,17 @@ public:
   virtual csZBufMode GetZBufMode() const {return zbufmode;}
 };
 
-CS_DECLARE_OBJECT_VECTOR (csIsoMeshFactoryListHelper, iMeshFactoryWrapper);
-
 /**
  * A list of mesh factories.
  */
-class csIsoMeshFactoryList : public csIsoMeshFactoryListHelper
+class csIsoMeshFactoryList : public csRefArrayObject<iMeshFactoryWrapper>
 {
 public:
   SCF_DECLARE_IBASE;
 
   /// constructor
   csIsoMeshFactoryList ();
+  virtual ~csIsoMeshFactoryList () { }
 
   class MeshFactoryList : public iMeshFactoryList
   {

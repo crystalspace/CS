@@ -25,10 +25,10 @@
 /**
  * An array of pointers. No ref counting is done on the elements in this
  * array. Use csRefArray if you want ref counting to happen. Note that
- * in many cases you probably want to use csRefArray instead of csPtrArray.
+ * in many cases you probably want to use csRefArray instead of csPArray.
  */
 template <class T>
-class csPtrArray
+class csPArray
 {
 private:
   int count, limit, threshold;
@@ -39,7 +39,7 @@ public:
    * Initialize object to hold initially 'ilimit' elements, and increase
    * storage by 'ithreshold' each time the upper bound is exceeded.
    */
-  csPtrArray (int ilimit = 0, int ithreshold = 0)
+  csPArray (int ilimit = 0, int ithreshold = 0)
   {
     count = 0;
     limit = (ilimit > 0 ? ilimit : 0);
@@ -66,7 +66,7 @@ public:
   /**
    * Destroy the container.
    */
-  ~csPtrArray ()
+  ~csPArray ()
   {
     DeleteAll ();
   }
@@ -148,6 +148,13 @@ public:
     SetLength (count + 1);
     root [count - 1] = what;
     return (count - 1);
+  }
+
+  /// Push a element on 'top' of vector if it is not already there.
+  int PushSmart (T* what)
+  {
+    int n = Find (what);
+    return (n == -1) ? Push (what) : n;
   }
 
   /// Pop an element from vector 'top'.

@@ -37,9 +37,9 @@ class csObjectWatcher : public iObjectWatcher
 {
 private:
   // Lights we are watching.
-  csPtrArray<iLight> lights;
+  csPArray<iLight> lights;
   // Movables we are watching.
-  csPtrArray<iMovable> movables;
+  csPArray<iMovable> movables;
   // Our light listener.
   csLightCallback* light_callback;
   // Our movable listener.

@@ -247,7 +247,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csMaterialList::MaterialList)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csMaterialList::csMaterialList () :
-  csMaterialListHelper(16, 16)
+  csRefArrayObject<iMaterialWrapper> (16, 16)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialList);

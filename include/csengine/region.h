@@ -141,16 +141,15 @@ public:
 };
 
 
-CS_DECLARE_OBJECT_VECTOR (csRegionListHelper, iRegion);
-
 /// List of 3D engine regions.
-class csRegionList : public csRegionListHelper
+class csRegionList : public csRefArrayObject<iRegion>
 {
 public:
   SCF_DECLARE_IBASE;
 
   /// constructor
   csRegionList ();
+  virtual ~csRegionList () { }
 
   class RegionList : public iRegionList
   {

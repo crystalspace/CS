@@ -59,9 +59,9 @@ public:
   void SetSector (csSector* s) { sector = s; }
 
   /// Override PrepareItem
-  virtual bool PrepareItem (csSome Item);
+  virtual void PrepareItem (iLight* light);
   /// Override FreeItem
-  virtual bool FreeItem (csSome Item);
+  virtual void FreeItem (iLight* item);
 };
 
 /// A list of meshes for a sector.
@@ -79,9 +79,9 @@ public:
   void SetSector (csSector* sec) { sector = sec; }
 
   /// Override PrepareItem
-  virtual bool PrepareItem (csSome item);
+  virtual void PrepareItem (iMeshWrapper* item);
   /// Override FreeItem
-  virtual bool FreeItem (csSome item);
+  virtual void FreeItem (iMeshWrapper* item);
 };
 
 
@@ -526,10 +526,8 @@ public:
   friend struct eiSector;
 };
 
-CS_DECLARE_OBJECT_VECTOR (csSectorListHelper, iSector);
-
 /// List of 3D engine sectors.
-class csSectorList : public csSectorListHelper
+class csSectorList : public csRefArrayObject<iSector>
 {
 public:
   SCF_DECLARE_IBASE;
@@ -538,10 +536,10 @@ public:
   /// constructor
   csSectorList (bool CleanupReferences);
   /// destructor
-  ~csSectorList ();
+  virtual ~csSectorList ();
 
-  /// override FreeItem
-  virtual bool FreeItem (csSome Item);
+  /// Override FreeItem.
+  virtual void FreeItem (iSector* item);
 
   class SectorList : public iSectorList
   {

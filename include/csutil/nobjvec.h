@@ -22,11 +22,50 @@
 
 #include "csutil/csobjvec.h"
 #include "csutil/typedvec.h"
+#include "csutil/refarr.h"
 #include "iutil/object.h"
 
 /**\file 
  * Named Object Vector class
  */
+
+/**
+ * This class implements a typed array that correctly keeps track
+ * of reference count and also is able to find by name. Assumes
+ * the types used for this implement QueryObject() to get the iObject
+ * that has GetName().
+ */
+template <class T>
+class csRefArrayObject : public csRefArray<T>
+{
+public:
+  csRefArrayObject (int ilimit = 0, int ithreshold = 0)
+  	: csRefArray<T> (ilimit, ithreshold)
+  {
+  }
+
+  int GetIndexByName (const char* name) const
+  {
+    int i;
+    for (i = 0 ; i < Length () ; i++)
+    {
+      T* o = (*this)[i];
+      if (!strcmp (o->QueryObject ()->GetName (), name))
+        return i;
+    }
+    return -1;
+  }
+
+  T* FindByName (const char* name) const
+  {
+    int i = GetIndexByName (name);
+    if (i != -1)
+      return (*this)[i];
+    else
+      return NULL;
+  }
+};
+
 
 class csObject;
 struct iObject;
@@ -159,21 +198,9 @@ public:
 #define CS_DECLARE_RESTRICTED_ACCESS_OBJECT_VECTOR(NAME,TYPE)		\
   CS_PRIVATE_DECLARE_RESTRICTED_ACCESS_OBJECT_VECTOR (NAME, TYPE)
 
-/**
- * Declare an object vector class which handles the reference count of the
- * contained object correctly and also contains overridable PrepareItem()
- * and FreeItem() functions.
- */
-#define CS_DECLARE_OBJECT_VECTOR(NAME,TYPE)				\
-  CS_PRIVATE_DECLARE_OBJECT_VECTOR (NAME, TYPE)
-
 //----------------------------------------------------------------------------
 //--- implementation of the above macros follows -----------------------------
 //----------------------------------------------------------------------------
-
-#define CS_PRIVATE_DECLARE_OBJECT_VECTOR(NAME,TYPE)			\
-  CS_PRIVATE_DECLARE_OBJECT_VECTOR_COMMON (				\
-    CS_DECLARE_TYPED_IBASE_VECTOR, NAME, TYPE)
 
 #define CS_PRIVATE_DECLARE_OBJECT_VECTOR_NOREF(NAME,TYPE)		\
   CS_PRIVATE_DECLARE_OBJECT_VECTOR_COMMON (				\

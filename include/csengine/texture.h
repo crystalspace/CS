@@ -188,17 +188,15 @@ public:
   friend struct TextureWrapper;
 };
 
-// helper for the texture list
-CS_DECLARE_OBJECT_VECTOR (csTextureListHelper, iTextureWrapper);
-
 /**
  * This class is used to hold a list of textures.
  */
-class csTextureList : public csTextureListHelper
+class csTextureList : public csRefArrayObject<iTextureWrapper>
 {
 public:
   /// Initialize the array
   csTextureList ();
+  virtual ~csTextureList () { }
 
   /// Create a new texture.
   iTextureWrapper *NewTexture (iImage *image);

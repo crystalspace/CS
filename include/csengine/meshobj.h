@@ -43,23 +43,27 @@ class csMeshWrapper;
 class csMeshFactoryWrapper;
 class csLight;
 
-CS_DECLARE_OBJECT_VECTOR (csMeshListHelper, iMeshWrapper);
-
 /**
  * General list of meshes. This class implements iMeshList.
  * Subclasses of this class can override FreeItem(), AddMesh(),
  * and RemoveMesh() for more specific functionality.
  */
-class csMeshList : public csMeshListHelper
+class csMeshList : public csRefArrayObject<iMeshWrapper>
 {
 public:
   SCF_DECLARE_IBASE;
 
   /// constructor
   csMeshList ();
+  virtual ~csMeshList () { }
 
   /// Find a mesh in <name>:<childname>:<childname> notation.
   iMeshWrapper *FindByNameWithChild (const char *Name) const;
+
+  /// Override PrepareItem
+  virtual void PrepareItem (iMeshWrapper*) { }
+  /// Override FreeItem
+  virtual void FreeItem (iMeshWrapper*) { }
 
   class MeshList : public iMeshList
   {
@@ -87,22 +91,23 @@ public:
   csMeshMeshList () : mesh (NULL) { }
   ~csMeshMeshList () { DeleteAll (); }
   void SetMesh (csMeshWrapper* m) { mesh = m; }
-  virtual bool PrepareItem (csSome Item);
-  virtual bool FreeItem (csSome Item);
+  virtual void PrepareItem (iMeshWrapper* item);
+  virtual void FreeItem (iMeshWrapper* item);
 };
-
-CS_DECLARE_OBJECT_VECTOR (csMeshFactoryListHelper, iMeshFactoryWrapper);
 
 /**
  * A list of mesh factories.
  */
-class csMeshFactoryList : public csMeshFactoryListHelper
+class csMeshFactoryList : public csRefArrayObject<iMeshFactoryWrapper>
 {
 public:
   SCF_DECLARE_IBASE;
 
   /// constructor
   csMeshFactoryList ();
+  virtual ~csMeshFactoryList () { }
+  virtual void PrepareItem (iMeshFactoryWrapper*) { }
+  virtual void FreeItem (iMeshFactoryWrapper*) { }
 
   class MeshFactoryList : public iMeshFactoryList
   {
@@ -130,8 +135,8 @@ public:
   csMeshFactoryFactoryList () : meshfact (NULL) {}
   ~csMeshFactoryFactoryList () { DeleteAll (); }
   void SetMeshFactory (csMeshFactoryWrapper* m) { meshfact = m; }
-  virtual bool PrepareItem (csSome Item);
-  virtual bool FreeItem (csSome Item);
+  virtual void PrepareItem (iMeshFactoryWrapper* item);
+  virtual void FreeItem (iMeshFactoryWrapper* item);
 };
 
 SCF_VERSION (csMeshWrapper, 0, 0, 1);

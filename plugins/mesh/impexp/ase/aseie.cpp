@@ -35,8 +35,6 @@
 typedef bool (csASEInterpreter) (class csModelConverterASE *conv, csDataStream &in,
   const char *Token);
 
-CS_DECLARE_OBJECT_VECTOR (csModelDataPolygonVector, iModelDataPolygon);
-
 class csModelConverterASE : iModelConverter
 {
 private:
@@ -54,7 +52,7 @@ public:
   // vertices of current object
   iModelDataVertices *Vertices;
   // list of polygons for current object
-  csModelDataPolygonVector Polygons;
+  csRefArrayObject<iModelDataPolygon> Polygons;
   // current polygon (for "normals" section; not referenced)
   iModelDataPolygon *CurrentPolygon;
   // current vertex (for "normals" section)
