@@ -29,6 +29,9 @@ chronological order.
 	  and unmaintained. It is better to use the NR terrain engines in any
 	  case. Before removing I tagged with TERRBIG_OBSOLETE.
 	  Note that tbconv and tbtut are also removed.
+	- Peter Amstutz removed #ifndef CS_USE_NEW_RENDERER from
+	  sprbuild.cpp which caused models loaded using the crossbuilder
+	  plugin to not work in NR!
 6-Jun-2004
 	- Jorrit modified the Jamfile so that the isotest application
 	  is only build with new renderer.

@@ -53,15 +53,15 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
   while (it1->HasNext ())
   {
     csRef<iModelDataAction> ac (SCF_QUERY_INTERFACE (it1->Next (),
-    	iModelDataAction));
+        iModelDataAction));
     if (ac)
     {
       for (i=0; i<ac->GetFrameCount (); i++)
       {
         csRef<iModelDataVertices> ver (
-		SCF_QUERY_INTERFACE (ac->GetState (i), iModelDataVertices));
+                SCF_QUERY_INTERFACE (ac->GetState (i), iModelDataVertices));
         if (ver)
-	  Frames.PushSmart (ver);
+          Frames.PushSmart (ver);
       }
     }
   }
@@ -88,7 +88,7 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
 
 #if 0
   int vertices=0;
-  // count polygons 
+  // count polygons
   it1 = Object->QueryObject ()->GetIterator ();
   while (it1->HasNext ())
   {
@@ -110,7 +110,7 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
   while (it1->HasNext ())
   {
     csRef<iModelDataPolygon> poly (
-    	SCF_QUERY_INTERFACE (it1->Next (), iModelDataPolygon));
+        SCF_QUERY_INTERFACE (it1->Next (), iModelDataPolygon));
     if (poly)
     {
       // build the vertex array
@@ -141,7 +141,7 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
    - for every vertex a table with texcoord/normal combos and its output
      vertex index is created
    - for every vertex we encounter in the polys we check this table if that
-     texcoord/normal combo appeared. if yes take the output vertex index, 
+     texcoord/normal combo appeared. if yes take the output vertex index,
      otherwise add this combo.
 */
 
@@ -158,34 +158,34 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
       csDirtyAccessArray<int> PolyVertices;
       for (i=0; i<poly->GetVertexCount(); i++)
       {
-	int vertex = poly->GetVertex (i);
-	int normal = poly->GetNormal (i);
-	int texel = poly->GetTexel (i);
+        int vertex = poly->GetVertex (i);
+        int normal = poly->GetNormal (i);
+        int texel = poly->GetTexel (i);
 
-	UsedVerticesInfo *vinfo = &usedvertices[vertex];
-	int index = -1;
+        UsedVerticesInfo *vinfo = &usedvertices[vertex];
+        int index = -1;
 
-	for (j=0; j<vinfo->Length(); j++)
-	{
-	  if ((vinfo->Get(j).normal == normal) && (vinfo->Get(j).texel == texel))
-	  {
-	    index = vinfo->Get(j).vidx;
-	    break;
-	  }
-	}
-	if (index == -1)
-	{
-	  index = SpriteVertices.Push (vertex);
-	  SpriteNormals.Push (normal);
-	  SpriteTexels.Push (texel);
-	  UsedVertexInfo vtxinfo;
-	  vtxinfo.normal = normal;
-	  vtxinfo.texel = texel;
-	  vtxinfo.vidx = index;
-	  vinfo->Push (vtxinfo);
-	}
-	PolyVertices.Push (index);
-      }	  
+        for (j=0; j<vinfo->Length(); j++)
+        {
+          if ((vinfo->Get(j).normal == normal) && (vinfo->Get(j).texel == texel))
+          {
+            index = vinfo->Get(j).vidx;
+            break;
+          }
+        }
+        if (index == -1)
+        {
+          index = SpriteVertices.Push (vertex);
+          SpriteNormals.Push (normal);
+          SpriteTexels.Push (texel);
+          UsedVertexInfo vtxinfo;
+          vtxinfo.normal = normal;
+          vtxinfo.texel = texel;
+          vtxinfo.vidx = index;
+          vinfo->Push (vtxinfo);
+        }
+        PolyVertices.Push (index);
+      }
 
       // split the polygon into triangles and copy them
       for (i=2; i<PolyVertices.Length (); i++)
@@ -245,7 +245,7 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
   while (it1->HasNext ())
   {
     csRef<iModelDataAction> ac (
-    	SCF_QUERY_INTERFACE (it1->Next (), iModelDataAction));
+        SCF_QUERY_INTERFACE (it1->Next (), iModelDataAction));
     if (ac)
     {
       const char *name = ac->QueryObject ()->GetName ();
@@ -257,23 +257,23 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
       for (i=0; i<ac->GetFrameCount (); i++)
       {
         /* It might seem strange to store the nth frame time value with the
-	 * (n-1)th frame state. This difference is due to the different
-	 * meaning of the time values in the model data structures and
-	 * in 3d sprites.
-	 */
+         * (n-1)th frame state. This difference is due to the different
+         * meaning of the time values in the model data structures and
+         * in 3d sprites.
+         */
         int FrameIndex = (i == 0) ? (ac->GetFrameCount ()-1) : (i-1);
         csRef<iModelDataVertices> ver (SCF_QUERY_INTERFACE (
-		ac->GetState (FrameIndex), iModelDataVertices));
-	if (ver)
-	{
-	  float ThisTime = ac->GetTime (i);
-	  float Delay = ThisTime - LastTime;
-  	  LastTime = ThisTime;
+                ac->GetState (FrameIndex), iModelDataVertices));
+        if (ver)
+        {
+          float ThisTime = ac->GetTime (i);
+          float Delay = ThisTime - LastTime;
+          LastTime = ThisTime;
 
-	  int FrameIndex = Frames.Find (ver);
-	  CS_ASSERT (FrameIndex != -1);
-	  StoreActionFrame (FrameIndex, int(Delay * 1000),0);
-	}
+          int FrameIndex = Frames.Find (ver);
+          CS_ASSERT (FrameIndex != -1);
+          StoreActionFrame (FrameIndex, int(Delay * 1000),0);
+        }
       }
       FinishAction ();
     }
@@ -339,7 +339,7 @@ void csSpriteBuilderFile::FinishFrame ()
 }
 
 void csSpriteBuilderFile::AddVertex (const csVector3 &pos,
-	const csVector3 & /*nrm*/, const csVector2 &tex)
+        const csVector3 & /*nrm*/, const csVector2 &tex)
 {
   Out << "      V (" << pos.x << ',' << pos.y << ',' << pos.z;
   Out << ':' << tex.x << ',' << tex.y << ")\n";
@@ -380,9 +380,7 @@ void csSpriteBuilderMesh::Finish ()
 
 void csSpriteBuilderMesh::StoreTriangle (int a, int b, int c)
 {
-#ifndef CS_USE_NEW_RENDERER
   Out->AddTriangle (a, b, c);
-#endif // CS_USE_NEW_RENDERER
 }
 
 void csSpriteBuilderMesh::StoreMaterial (iModelDataMaterial *mat)
@@ -402,9 +400,7 @@ int csSpriteBuilderMesh::StoreFrameInfo (int FrameCount, int VertexCount)
 
 void csSpriteBuilderMesh::EnableTiling ()
 {
-#ifndef CS_USE_NEW_RENDERER
   Out->SetMixMode (Out->GetMixMode () | CS_FX_TILING);
-#endif // CS_USE_NEW_RENDERER
 }
 
 void csSpriteBuilderMesh::BeginFrame (int Num)
@@ -423,7 +419,7 @@ void csSpriteBuilderMesh::FinishFrame ()
 }
 
 void csSpriteBuilderMesh::AddVertex (const csVector3 &pos,
-	const csVector3 &nrm, const csVector2 &tex)
+        const csVector3 &nrm, const csVector2 &tex)
 {
   Out->SetVertex (CurrentFrameNum, CurrentVertexNum, pos);
   Out->SetNormal (CurrentFrameNum, CurrentVertexNum, nrm);
@@ -447,7 +443,7 @@ void csSpriteBuilderMesh::StoreActionFrame (int Frame, csTicks Delay, float disp
 }
 
 bool csSpriteBuilderMesh::Build (iModelDataObject *Input,
-	iSprite3DFactoryState *Output)
+        iSprite3DFactoryState *Output)
 {
   Out = Output;
   return csSpriteBuilder::Build (Input);
