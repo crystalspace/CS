@@ -1,6 +1,8 @@
 The history order is reversed so that new features are at the top.
 
 28-Aug-2001
+	- Norman Kramer reported a fix for the freefont plugin.
+	- Added aws and ie3ds to mk/user.mak.
 	- Added iLight::GetLightID().
 	- Removed iSector::AddLight, GetLightCount, and GetLight.
 	  Instead there is now GetLights() which returns an object of type
