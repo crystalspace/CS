@@ -56,12 +56,11 @@ void OpenGLTextureCache::Dump()
 void OpenGLTextureCache::Load (HighColorCache_Data *d)
 {
     ITextureHandle* txt_handle = (ITextureHandle*)d->pSource;
-    csTextureMM* txt_mm = GetcsTextureMMFromITextureHandle (txt_handle);
-    csTexture* txt_unl = txt_mm->get_texture (0);
-    int texture_width, texture_height;
-    texture_width = txt_unl->get_width ();
-    texture_height = txt_unl->get_height ();
-    bool transparent = txt_mm->get_transparent ();
+    csTextureMM* const txt_mm = GetcsTextureMMFromITextureHandle (txt_handle);
+    csTexture* const txt_unl = txt_mm->get_texture (0);
+    int const texture_width = txt_unl->get_width ();
+    int const texture_height = txt_unl->get_height ();
+    bool const transparent = txt_mm->get_transparent ();
 
     CHK (GLuint *texturehandle = new GLuint);
     glGenTextures (1,texturehandle);
@@ -78,7 +77,7 @@ void OpenGLTextureCache::Load (HighColorCache_Data *d)
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
 
     CHK (unsigned char *tempdata = new unsigned char[texture_width*texture_height*4]);
-    ULong *source = txt_unl->get_bitmap32 ();
+    ULong const *source = txt_unl->get_bitmap32 ();
     unsigned char *dest = tempdata;
     for (int count = texture_width * texture_height;
           count > 0; count--)
