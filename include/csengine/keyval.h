@@ -25,6 +25,7 @@
 #include "iengine/keyval.h"
 
 class csSector;
+struct iSector;
 
 /**
  * A Key Value Pair.
@@ -84,7 +85,7 @@ public:
   csSector *GetSector () const { return m_pSector; }
 
   /// Get a node with the given name and a given classname. (shortcut)
-  static csMapNode *GetNode (csSector *pSector, const char *name,
+  static iMapNode *GetNode (iSector *pSector, const char *name,
     const char *classname = NULL);
 
   DECLARE_IBASE_EXT (csObject);
@@ -128,15 +129,15 @@ public:
    * responsible to take care, that the string is available while
    * the Iterator is alive.
    */
-  csNodeIterator (const csSector *pSector, const char *classname = NULL);
+  csNodeIterator (iSector *pSector, const char *classname = NULL);
 
   /// The destructor as usual
   ~csNodeIterator ();
 
   /// Reuse the iterator for an other search
-  void Reset (const csSector *pSector, const char *classname = NULL);
+  void Reset (iSector *pSector, const char *classname = NULL);
   /// Get the object we are pointing at
-  csMapNode *GetNode ();
+  iMapNode *GetNode ();
   /// Move forward
   void Next ();
   /// Check if there are other nodes
@@ -145,10 +146,12 @@ public:
 protected:
   /// Skip all nodes with wrong classname
   void SkipWrongClassname ();
+  /// Step to the next node in the sector, ignoring its classname
+  void NextNode ();
 
-  csObjIterator m_Iterator;
-  const char *m_Classname;
-  csMapNode *m_pCurrentNode;
+  iObjectIterator *Iterator;
+  const char *Classname;
+  iMapNode *CurrentNode;
 };
 
 #endif // __KEYVAL_H__

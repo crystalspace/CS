@@ -155,4 +155,17 @@ struct iObjectIterator : public iBase
   virtual bool FindName (const char* name) = 0;
 };
 
+
+SCF_VERSION (iDataObject, 0, 0, 1);
+
+/// This is an iObject that contains a type-less data buffer.
+struct iDataObject : public iBase
+{
+  /// Query the iObject pointer
+  virtual iObject *QueryObject () = 0;
+
+  /// Return the data buffer
+  virtual void* GetData () = 0;
+};
+
 #endif

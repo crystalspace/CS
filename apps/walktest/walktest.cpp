@@ -105,6 +105,7 @@ INTERFACE_ID_VAR (iSoundWrapper);
 INTERFACE_ID_VAR (iLight);
 //INTERFACE_ID_VAR (iMeshWrapper);
 //INTERFACE_ID_VAR (iKeyValuePair);
+INTERFACE_ID_VAR (iDataObject);
 
 char WalkTest::map_dir [100];
 bool WalkTest::move_3d = false;
@@ -739,7 +740,8 @@ void WalkTest::DrawFrame3D (int drawflags, cs_time /*current_time*/)
   {
     extern void HandleDynLight (iDynLight*);
     csDynLight* dn = dyn->GetNext ();
-    if (dyn->GetChild (csDataObject::Type)) HandleDynLight (&(dyn->scfiDynLight));
+    if (GET_CHILD_OBJECT_FAST (dyn, iDataObject))
+      HandleDynLight (&(dyn->scfiDynLight));
     dyn = dn;
   }
   // Apply lighting to all meshes
@@ -1352,6 +1354,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   INITIALIZE_INTERFACE_VAR (iLight);
   INITIALIZE_INTERFACE_VAR (iMeshWrapper);
   INITIALIZE_INTERFACE_VAR (iKeyValuePair);
+  INITIALIZE_INTERFACE_VAR (iDataObject);
 
   // Find the level loader plugin
   LevelLoader = QUERY_PLUGIN_ID (Sys, CS_FUNCID_LVLLOADER, iLoader);

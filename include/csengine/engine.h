@@ -82,6 +82,7 @@ extern INTERFACE_ID_VAR (iMaterialHandle);
 extern INTERFACE_ID_VAR (iTerrainWrapper);
 extern INTERFACE_ID_VAR (iTerrainFactoryWrapper);
 extern INTERFACE_ID_VAR (iKeyValuePair);
+extern INTERFACE_ID_VAR (iMapNode);
 
 extern INTERFACE_ID_VAR (csPolyTxtPlane);
 extern INTERFACE_ID_VAR (csCollection);

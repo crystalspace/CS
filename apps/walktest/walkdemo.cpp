@@ -1019,8 +1019,8 @@ void HandleDynLight (iDynLight* dyn)
 	  ms->sprite->GetMovable ().ClearSectors ();
 	  Sys->view->GetEngine ()->GetCsEngine ()->RemoveMesh (ms->sprite);
 	}
-        dyn->QueryObject ()->ObjRemove
-		(dyn->GetPrivateObject ()->GetChild (csDataObject::Type));
+        dyn->QueryObject ()->ObjRemove (GET_CHILD_OBJECT_FAST (
+	  dyn->QueryObject (), iDataObject)->QueryObject ());
         if (ms->snd)
         {
           ms->snd->Stop();

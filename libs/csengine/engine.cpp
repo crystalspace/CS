@@ -369,6 +369,7 @@ INTERFACE_ID_VAR (iMaterialHandle);
 INTERFACE_ID_VAR (iTerrainWrapper);
 INTERFACE_ID_VAR (iTerrainFactoryWrapper);
 INTERFACE_ID_VAR (iKeyValuePair);
+INTERFACE_ID_VAR (iMapNode);
 
 INTERFACE_ID_VAR (csPolyTxtPlane);
 INTERFACE_ID_VAR (csCollection);
@@ -518,6 +519,7 @@ bool csEngine::Initialize (iSystem* sys)
   INITIALIZE_INTERFACE_VAR (iTerrainWrapper);
   INITIALIZE_INTERFACE_VAR (iTerrainFactoryWrapper);
   INITIALIZE_INTERFACE_VAR (iKeyValuePair);
+  INITIALIZE_INTERFACE_VAR (iMapNode);
 
   INITIALIZE_INTERFACE_VAR (csPolyTxtPlane);
   INITIALIZE_INTERFACE_VAR (csCollection);

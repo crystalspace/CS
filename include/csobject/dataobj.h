@@ -38,7 +38,7 @@ protected:
 public:
   /// Initialize this object with data pointer initialized to 'd'
   csDataObject (void *d) : csObject (), data (d)
-  { }
+  { CONSTRUCT_IBASE (NULL); CONSTRUCT_EMBEDDED_IBASE (scfiDataObject); }
   /// Get the data associated with this object
   void* GetData () const
   { return data; }
@@ -50,6 +50,18 @@ public:
   }
   
   CSOBJTYPE;
+
+  DECLARE_IBASE_EXT (csObject);
+
+  struct DataObject : public iDataObject
+  {
+    DECLARE_EMBEDDED_IBASE (csDataObject);
+
+    virtual iObject* QueryObject ()
+    { return scfParent; }
+    virtual void* GetData ()
+    { return scfParent->GetData (); }
+  } scfiDataObject;
 };
 
 #endif /* __DATAOBJ_H_ */

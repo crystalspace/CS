@@ -75,13 +75,13 @@ csMapNode::~csMapNode ()
 {
 }
 
-csMapNode* csMapNode::GetNode (csSector *pSector, const char* name,
+iMapNode* csMapNode::GetNode (iSector *pSector, const char* name,
   const char* classname)
 {
   for (csNodeIterator Iter(pSector,classname); !Iter.IsFinished(); Iter.Next())
   {
-    csMapNode *pNode = Iter.GetNode ();
-    if (strcmp (pNode->GetName (), name) == 0)
+    iMapNode *pNode = Iter.GetNode ();
+    if (strcmp (pNode->QueryObject ()->GetName (), name) == 0)
       return pNode;
   }
 
@@ -102,61 +102,69 @@ iSector* csMapNode::MapNode::GetSector () const
 
 //---------------------------------------------------------------------------
 
-csNodeIterator::csNodeIterator (const csSector* pSector, const char* classname)
-  : m_Iterator (csMapNode::Type, *pSector), m_Classname (classname),
-    m_pCurrentNode (NULL)
+csNodeIterator::csNodeIterator (iSector* pSector, const char* classname)
+  : Classname (classname), Iterator (NULL), CurrentNode (NULL)
 {
-  SkipWrongClassname ();
-  if (!m_Iterator.IsFinished ())
-    m_pCurrentNode = (csMapNode *)m_Iterator.GetObj ();
+  Reset (pSector, Classname);
 }
   
 csNodeIterator::~csNodeIterator ()
 {
+  if (CurrentNode) CurrentNode->DecRef ();
+  if (Iterator) Iterator->DecRef ();
 }
 
-void csNodeIterator::Reset (const csSector *pSector, const char *classname)
+void csNodeIterator::Reset (iSector *pSector, const char *classname)
 {
-  m_Iterator.Reset (csMapNode::Type, *pSector);
-  m_Classname = classname;
+  if (CurrentNode) CurrentNode->DecRef ();
+  if (Iterator) Iterator->DecRef ();
+
+  Iterator = pSector->QueryObject ()->GetIterator ();
+  Classname = classname;
+  CurrentNode = QUERY_INTERFACE_FAST (Iterator->GetObject (), iMapNode);
+
   SkipWrongClassname ();
-  if (m_Iterator.IsFinished ())
-    m_pCurrentNode = NULL;
-  else
-    m_pCurrentNode = (csMapNode *)m_Iterator.GetObj ();
 }
 
-csMapNode *csNodeIterator::GetNode ()
+iMapNode *csNodeIterator::GetNode ()
 {
-  return m_pCurrentNode;
+  return CurrentNode;
 }
 
 void csNodeIterator::Next ()
 {
-  m_Iterator.Next ();
+  NextNode ();
   SkipWrongClassname ();
-  if (m_Iterator.IsFinished ())
-    m_pCurrentNode = NULL;
-  else
-    m_pCurrentNode = (csMapNode *)m_Iterator.GetObj ();
 }
 
 bool csNodeIterator::IsFinished () const
 {
-  return m_Iterator.IsFinished ();
+  return Iterator->IsFinished ();
 }
 
 void csNodeIterator::SkipWrongClassname ()
 {
-  if (m_Classname)
-    while (!m_Iterator.IsFinished ())
+  if (Classname)
+    while (!Iterator->IsFinished ())
     {
-      csMapNode *pNode = GetNode ();
-      iKeyValuePair *KeyVal =
-        GET_NAMED_CHILD_OBJECT_FAST (pNode, iKeyValuePair, "classname");
-      if (!KeyVal || strcmp (KeyVal->GetValue (), m_Classname) != 0)
-        m_Iterator.Next ();
-      else
-        return;
+      iKeyValuePair *KeyVal = GET_NAMED_CHILD_OBJECT_FAST
+        (CurrentNode->QueryObject (), iKeyValuePair, "classname");
+      if (KeyVal)
+      {
+        bool done = !strcmp (KeyVal->GetValue (), Classname);
+	KeyVal->DecRef ();
+	if (done) return;
+      }
+      NextNode ();
     }
+}
+
+void csNodeIterator::NextNode ()
+{
+  if (CurrentNode) CurrentNode->DecRef ();
+  Iterator->Next ();
+  if (Iterator->IsFinished ())
+    CurrentNode = NULL;
+  else
+    CurrentNode = QUERY_INTERFACE_FAST (Iterator->GetObject (), iMapNode);
 }

@@ -397,6 +397,15 @@ bool csObjIterator::FindName(const char* name)
 //------------------- miscelaneous simple classes derived from csObject -----//
 
 IMPLEMENT_CSOBJTYPE (csDataObject, csObject);
+
+IMPLEMENT_IBASE_EXT (csDataObject)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iDataObject)
+IMPLEMENT_IBASE_EXT_END
+
+IMPLEMENT_EMBEDDED_IBASE (csDataObject::DataObject)
+  IMPLEMENTS_INTERFACE (iDataObject)
+IMPLEMENT_EMBEDDED_IBASE_END
+
 IMPLEMENT_CSOBJTYPE (csPObject, csObject);
 
 csPObject::~csPObject ()
@@ -406,3 +415,4 @@ csPObject::~csPObject ()
     parent->ObjRelease (this);
   }
 }
+
