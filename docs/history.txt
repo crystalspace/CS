@@ -78,6 +78,9 @@ chronological order.
 	  a test to show that the system works. gmeshanim still needs to have
 	  a real scripting system. In data/flarge/world there is one box
 	  that uses this 'jitter' script.
+	- PK fixed a few bugs in csSaver::SaveMaterials.
+	- PK implemented about 70% of the particlessaver.
+	- PK fixed a bug in the xmlshader by adding a csNewStr() in SetFilename().
 12-Sep-2004
 	- Jorrit fixed genmesh so it compiles with OR again.
 	- Jorrit did some more work on gmeshanim. Still unfinished.
