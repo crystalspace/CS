@@ -27,6 +27,9 @@ chronological order.
 	- res changed glrender3d to set up the projection matrix lazily. Also
 	  updates this matrix when the perspective center or aspect changes
 	  (which can happen if multiple views are drawn subsequently).
+	- res changed csList<>::csListElement to not be dllimported any more.
+	  That caused linking problems (as the actual instantiation of 
+	  csListElement would eb required in csutil).
 29-Mar-2004
 	- Jorrit changed the NR null3d renderer so it uses the soft canvas
 	  instead of the OpenGL canvas by default.

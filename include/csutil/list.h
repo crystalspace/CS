@@ -35,7 +35,7 @@ protected:
    * Template which describs the data stored in the linked list
    * For example a list of ints uses csListElement<int>
    */
-  struct CS_CSUTIL_EXPORT csListElement
+  struct csListElement
   {
     /// Use specified data
     csListElement(const T& d, csListElement* newnext,
