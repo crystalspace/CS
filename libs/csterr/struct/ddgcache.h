@@ -350,10 +350,11 @@ public:
 		ddgAssert(ci);
 		ddgSNode	*n = get(ci);
 		short		b = n->bucket();
+		const short	blim = (short)_tail;
 		if (n->next())
 			return n->next();
 		// Find next bucket with something in it.
-		while (--b > (short)_tail && !_bucket[b] ){}
+		while (--b > blim && !_bucket[b] ){}
 		return b < 0 ? 0 : _bucket[b];
 	}
 };
