@@ -41,12 +41,12 @@ static DllRegisterData gb_regDataDefault=
 };
 
 
-void _stdcall ModuleAddRef()
+EXTERN_C void _stdcall ModuleAddRef()
 {
   gb_cRef++;
 }
 
-void _stdcall ModuleRelease()
+EXTERN_C void _stdcall ModuleRelease()
 {
   gb_cRef--;
 }
@@ -89,7 +89,7 @@ STDAPI DllUnregisterServer()
 #ifdef IS_DEFAULT  
   HRESULT hRes;
   
-  hRes = csRegisterServer(&gb_regDataDefault);
+  hRes = csUnregisterServer(&gb_regDataDefault);
   if (FAILED(hRes))
     return hRes;
 #endif
