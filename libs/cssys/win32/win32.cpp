@@ -657,7 +657,7 @@ int Win32Assistant::GetCmdShow () const
 
 //----------------------------------------// Windows input translator //------//
 
-#define MAX_SCANCODE 0x5a
+#define MAX_SCANCODE 0x100
 
 /*
     This table does not contain special key codes, since those are
@@ -666,21 +666,70 @@ int Win32Assistant::GetCmdShow () const
 
 static unsigned char ScanCodeToChar [MAX_SCANCODE] =
 {
-  0,              0,              '1',            '2',
+  0,              CSKEY_ESC,      '1',            '2',
   '3',            '4',            '5',            '6',		// 00..07
   '7',            '8',            '9',            '0',
-  '-',            '=',            0,              0,		// 08..0F
+  '-',            '=',            CSKEY_BACKSPACE,CSKEY_TAB,	// 08..0F
   'q',            'w',            'e',            'r',
   't',            'y',            'u',            'i',		// 10..17
   'o',            'p',            '[',            ']',
-  0,              0,              'a',            's',		// 18..1F
+  CSKEY_ENTER,    CSKEY_CTRL,     'a',            's',		// 18..1F
   'd',            'f',            'g',            'h',
   'j',            'k',            'l',            ';',		// 20..27
-  39,             '`',            0,              '\\',
+  39,             '`',            CSKEY_SHIFT,    '\\',
   'z',            'x',            'c',            'v',		// 28..2F
   'b',            'n',            'm',            ',',
-  '.',            '/',            0,              0,            // 30..37
-  0,              ' ',            0,              0
+  '.',            '/',            CSKEY_SHIFT,    CSKEY_PADMULT,// 30..37
+  CSKEY_ALT,      ' ',            0,              CSKEY_F1,
+  CSKEY_F2,       CSKEY_F3,       CSKEY_F4,       CSKEY_F5,	// 38..3F
+  CSKEY_F6,       CSKEY_F7,       CSKEY_F8,       CSKEY_F9,
+  CSKEY_F10,      0,              0,              CSKEY_HOME,	// 40..47
+  CSKEY_UP,       CSKEY_PGUP,     CSKEY_PADMINUS, CSKEY_LEFT,
+  CSKEY_CENTER,   CSKEY_RIGHT,    CSKEY_PADPLUS,  CSKEY_END,	// 48..4F
+  CSKEY_DOWN,     CSKEY_PGDN,     CSKEY_INS,      CSKEY_DEL,
+  0,              0,              0,              CSKEY_F11,	// 50..57
+  CSKEY_F12,      0,              0,              0,
+  0,              0,              0,              0,		// 58..5F
+  0,              0,              0,              0,
+  0,              0,              0,              0,		// 60..67
+  0,              0,              0,              0,
+  0,              0,              0,              0,		// 68..6F
+  0,              0,              0,              0,
+  0,              0,              0,              0,		// 70..77
+  0,              0,              0,              0,
+  0,              0,              0,              0,		// 78..7F
+  0,              0,              0,              0,
+  0,              0,              0,              0,		// 80..87
+  0,              0,              0,              0,
+  0,              0,              0,              0,		// 88..8F
+  0,              0,              0,              0,
+  0,              0,              0,              0,		// 90..97
+  0,              0,              0,              0,
+  CSKEY_ENTER,    CSKEY_CTRL,     0,              0,		// 98..9F
+  0,              0,              0,              0,
+  0,              0,              0,              0,		// A0..A7
+  0,              0,              0,              0,
+  0,              0,              0,              0,		// A8..AF
+  0,              0,              0,              ',',
+  0,              CSKEY_PADDIV,   0,              0,		// B0..B7
+  CSKEY_ALT,      0,              0,              0,
+  0,              0,              0,              0,		// B8..BF
+  0,              0,              0,              0,
+  0,              0,              0,              CSKEY_HOME,	// C0..C7
+  CSKEY_UP,       CSKEY_PGUP,     0,              CSKEY_LEFT,
+  0,              CSKEY_RIGHT,    0,              CSKEY_END,	// C8..CF
+  CSKEY_DOWN,     CSKEY_PGDN,     CSKEY_INS,      CSKEY_DEL,
+  0,              0,              0,              0,		// D0..D7
+  0,              0,              0,              0,
+  0,              0,              0,              0,		// D8..DF
+  0,              0,              0,              0,
+  0,              0,              0,              0,		// E0..E7
+  0,              0,              0,              0,
+  0,              0,              0,              0,		// E8..EF
+  0,              0,              0,              0,
+  0,              0,              0,              0,		// F0..F7
+  0,              0,              0,              0,
+  0,              0,              0,              0		// F8..FF
 };
 
 static unsigned char LastCharCode [MAX_SCANCODE];
