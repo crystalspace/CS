@@ -61,6 +61,7 @@ public:
   int Count() { return region_count; }
   /// Returns the rect at a specific index
   csRect& RectAt(int i) {  return region[i]; }
+  void makeEmpty () {free(region); region_count=0;}
 };
 
 #endif //__CS_CSRECTREGION_H__
