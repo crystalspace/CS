@@ -41,6 +41,11 @@ chronological order.
 	  reduction.
 	- Jorrit fixed genmesh so that it honors the SetColor() call
 	  again.
+	- Jorrit implemented LOD caching for bruteblock (for the new
+	  CD mesh LOD).
+	- Jorrit fixed csVfsCacheManager->CacheData() to call vfs->Sync().
+	  That ensures that on -recalc the vfs file is correctly updated
+	  if the cache dir happens to be in a zip file.
 	- Squee fixed the glx canvas locking up under certain alpha conditions.
 13-Oct-2004
 	- Jorrit removed the triangle connectivity information in

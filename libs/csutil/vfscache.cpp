@@ -99,7 +99,7 @@ bool csVfsCacheManager::CacheData (void* data, size_t size,
   GetVFS ()->ChDir (vfsdir);
   CacheName (buf, type ? type : current_type,
   	scope ? scope : current_scope, id);
-  csRef<iFile> cf (GetVFS ()->Open (buf, VFS_FILE_WRITE));
+  csRef<iFile> cf = GetVFS ()->Open (buf, VFS_FILE_WRITE);
   GetVFS ()->PopDir ();
 
   if (!cf)
@@ -118,6 +118,8 @@ bool csVfsCacheManager::CacheData (void* data, size_t size,
 	"Could not write file '%s' in VFS dir '%s'\n", buf, vfsdir);
     return false;
   }
+  cf = 0;	// Not sure why this is needed? Seems to crash otherwise @@@
+  GetVFS ()->Sync ();
 
   return true;
 }

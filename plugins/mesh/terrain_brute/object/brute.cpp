@@ -44,6 +44,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iutil/object.h"
 #include "iutil/cmdline.h"
 #include "iutil/cache.h"
+#include "ivaria/reporter.h"
 #include "brute.h"
 #include "csqsqrt.h"
 
@@ -809,6 +810,120 @@ public:
   }
 };
 
+#define CDLODMAGIC	    "CD01" // must be 4 chars!
+
+bool csTerrainObject::ReadCDLODFromCache ()
+{
+  int i;
+
+  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
+  	object_reg, iCommandLineParser);
+  bool verbose = cmdline->GetOption ("verbose") != 0;
+  if (cmdline->GetOption ("recalc"))
+  {
+    static bool reportit = true;
+    if (reportit)
+    {
+      reportit = false;
+      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+	  "crystalspace.mesh.bruteblock",
+	  "Forced recalculation of terrain LOD!");
+    }
+    return false;
+  }
+
+  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  if (!engine) return false;
+  iCacheManager* cache_mgr = engine->GetCacheManager ();
+
+  char* cachename = GenerateCacheName ();
+  csRef<iDataBuffer> db = cache_mgr->ReadCache ("bruteblock_lod",
+      	cachename, 0);
+  delete[] cachename;
+  if (!db) return false;
+
+  csRef<csMemFile> cf;
+  cf.AttachNew (new csMemFile ((char*)db->GetData (), db->GetSize (),
+  	    csMemFile::DISPOSITION_IGNORE));
+
+  char header[5];
+  cf->Read (header, 4);
+  header[4] = 0;
+  if (strcmp (header, CDLODMAGIC))
+  {
+    if (verbose)
+      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+	  "crystalspace.mesh.bruteblock",
+    	  "Forced recalculation of terrain LOD: magic number mismatch!");
+    return false;	// Mismatch.
+  }
+
+  int32 cache_cd_res;
+  cf->Read ((char*)&cache_cd_res, 4);
+  cache_cd_res = convert_endian (cache_cd_res);
+  if (cache_cd_res != cd_resolution)
+  {
+    if (verbose)
+      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+	  "crystalspace.mesh.bruteblock",
+    	  "Forced recalculation of terrain LOD: resolution mismatch!");
+    return false;	// Mismatch.
+  }
+
+  cf->Read ((char*)&polymesh_tri_count, 4);
+  polymesh_tri_count = convert_endian (polymesh_tri_count);
+  polymesh_triangles = new csTriangle [polymesh_tri_count];
+
+  for (i = 0 ; i < polymesh_tri_count ; i++)
+  {
+    uint32 a, b, c;
+    cf->Read ((char*)&a, 4); a = convert_endian (a);
+    cf->Read ((char*)&b, 4); b = convert_endian (b);
+    cf->Read ((char*)&c, 4); c = convert_endian (c);
+    polymesh_triangles[i].a = a;
+    polymesh_triangles[i].b = b;
+    polymesh_triangles[i].c = c;
+  }
+  return true;
+}
+
+void csTerrainObject::WriteCDLODToCache ()
+{
+  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  if (!engine) return;
+  iCacheManager* cache_mgr = engine->GetCacheManager ();
+  if (!cache_mgr) return;
+
+  char* cachename = GenerateCacheName ();
+
+  csMemFile m;
+  csRef<iFile> mf = SCF_QUERY_INTERFACE ((&m), iFile);
+
+  char header[5];
+  strcpy (header, CDLODMAGIC);
+  mf->Write ((char const*) header, 4);
+  uint32 cd_res = convert_endian (cd_resolution);
+  mf->Write ((char const*) &cd_res, 4);
+  uint32 tri_count = convert_endian (polymesh_tri_count);
+  mf->Write ((char const*) &tri_count, 4);
+
+  int i;
+  for (i = 0 ; i < polymesh_tri_count ; i++)
+  {
+    uint32 a, b, c;
+    a = convert_endian (polymesh_triangles[i].a);
+    b = convert_endian (polymesh_triangles[i].b);
+    c = convert_endian (polymesh_triangles[i].c);
+    mf->Write ((char const*) &a, 4);
+    mf->Write ((char const*) &b, 4);
+    mf->Write ((char const*) &c, 4);
+  }
+
+  cache_mgr->CacheData ((void*)(m.GetData ()), m.GetSize (),
+  	  "bruteblock_lod", cachename, 0);
+  delete[] cachename;
+}
+
 void csTerrainObject::SetupPolyMeshData ()
 {
   if (polymesh_valid) return;
@@ -833,6 +948,13 @@ void csTerrainObject::SetupPolyMeshData ()
   memcpy (polymesh_vertices, terrasampler->SampleVector3 (vertices_name),
     res * res * sizeof (csVector3));
 
+  if (cd_lod_cost > 0.00001)
+  {
+    // We use LOD. First see if we can get it from the cache.
+    if (ReadCDLODFromCache ())
+      return;
+  }
+
   // First we make the base triangle mesh with highest detail.
   polymesh_tri_count = 2 * (res-1) * (res-1);
   polymesh_triangles = new csTriangle [polymesh_tri_count];
@@ -851,7 +973,6 @@ void csTerrainObject::SetupPolyMeshData ()
   if (cd_lod_cost <= 0.00001)
   {
     // We do no lod on the CD mesh.
-    terrasampler->Cleanup ();
     return;
   }
 
@@ -864,8 +985,10 @@ void csTerrainObject::SetupPolyMeshData ()
   bool verbose = cmdline->GetOption ("verbose") != 0;
   if (verbose)
   {
-    printf ("  Optimizing CD Mesh for Terrain: tris %d ... ",
-    	polymesh_tri_count); fflush (stdout);
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+	  "crystalspace.mesh.bruteblock",
+    	  "Optimizing CD Mesh for Terrain: tris %d ...",
+    	  polymesh_tri_count);
   }
 
   // Set up the base mesh which will be used in the LOD
@@ -917,8 +1040,12 @@ void csTerrainObject::SetupPolyMeshData ()
 
   if (verbose)
   {
-    printf ("%d\n", polymesh_tri_count); fflush (stdout);
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+	  "crystalspace.mesh.bruteblock",
+    	  "Optimizing done: result %d", polymesh_tri_count);
   }
+
+  WriteCDLODToCache ();
 
   delete[] lodalgo.edgedata;
   delete[] normals;
@@ -1016,7 +1143,7 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
   polymesh_triangles = 0;
   polymesh_polygons = 0;
   cd_resolution = 256;
-  cd_lod_cost = -1;// 0.02;
+  cd_lod_cost = -1; //0.02;
 
   logparent = 0;
   initialized = false;

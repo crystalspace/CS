@@ -312,6 +312,8 @@ private:
   csTriangle* polymesh_triangles;
   int polymesh_tri_count;
   csMeshedPolygon* polymesh_polygons;
+  bool ReadCDLODFromCache ();
+  void WriteCDLODToCache ();
   void SetupPolyMeshData ();
   void CleanPolyMeshData ();
   int cd_resolution;
