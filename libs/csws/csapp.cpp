@@ -86,8 +86,12 @@ bool csApp::csAppPlugIn::HandleEvent (iEvent &Event)
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//-- csApp -//--
 
 csApp::csApp (iSystem *sys, csSkin &Skin)
-  : csComponent (NULL), Mouse (this), hints (this), scfiPlugIn (this)
+  : csComponent (NULL)
 {
+  Mouse = new csMouse(this);
+  hints = new csHintManager(this);
+  scfiPlugIn = new csAppPlugIn(this);
+  
   app = this;			// so that all inserted windows will inherit it
   MouseOwner = NULL;		// no mouse owner
   KeyboardOwner = NULL;		// no keyboard owner
@@ -112,7 +116,7 @@ csApp::csApp (iSystem *sys, csSkin &Skin)
 
 csApp::~csApp ()
 {
-  System->UnloadPlugIn (&scfiPlugIn);
+  System->UnloadPlugIn (scfiPlugIn);
 
   // Delete all children prior to shutting down the system
   DeleteAll ();
@@ -135,11 +139,15 @@ csApp::~csApp ()
   System->DecRef ();
   // Set app to NULL so that ~csComponent() won't call NotifyDelete()
   app = NULL;
+
+  delete scfiPlugIn;
+  delete hints;
+  delete Mouse;
 }
 
 bool csApp::Initialize (const char *iConfigName)
 {
-  if (!System->RegisterPlugIn ("crystalspace.windowing.system", "CSWS", &scfiPlugIn))
+  if (!System->RegisterPlugIn ("crystalspace.windowing.system", "CSWS", scfiPlugIn))
     return false;
 
   // Create the graphics pipeline
@@ -258,9 +266,9 @@ void csApp::InitializeSkin ()
     di = Config->EnumData ("MouseCursor");
   if (di)
   {
-    Mouse.ClearPointers ();
+    Mouse->ClearPointers ();
     while (di->Next ())
-      Mouse.NewPointer (di->GetKey (), (char *)di->GetData ());
+      Mouse->NewPointer (di->GetKey (), (char *)di->GetData ());
     di->DecRef ();
   }
 
@@ -405,7 +413,7 @@ void csApp::PrepareTextures ()
   // Look in palette for colors we need for windowing system
   SetupPalette ();
   // Finally, set up mouse pointer images
-  Mouse.Setup ();
+  Mouse->Setup ();
   // Invalidate entire screen
   Invalidate (true);
 }
@@ -462,7 +470,7 @@ void csApp::StartFrame ()
   cs_time elapsed_time;
   System->GetElapsedTime (elapsed_time, CurrentTime);
 
-  GfxPpl.StartFrame (&Mouse);
+  GfxPpl.StartFrame (Mouse);
 }
 
 void csApp::FinishFrame ()
@@ -496,12 +504,12 @@ void csApp::FinishFrame ()
   if (OldMouseCursorID != MouseCursorID)
   {
     do_idle = false;
-    Mouse.SetCursor (MouseCursorID);
+    Mouse->SetCursor (MouseCursorID);
     OldMouseCursorID = MouseCursorID;
   }
 
   // Flush application graphics operations
-  GfxPpl.FinishFrame (&Mouse);
+  GfxPpl.FinishFrame (Mouse);
 
   if (do_idle)
     Idle ();
@@ -557,9 +565,9 @@ bool csApp::HandleEvent (iEvent &Event)
 {
   // Mouse should always receive events
   // to reflect current mouse position
-  Mouse.HandleEvent (Event);
+  Mouse->HandleEvent (Event);
   // Same about hint manager
-  hints.HandleEvent (Event);
+  hints->HandleEvent (Event);
 
   // If canvas size changes, adjust our size accordingly
   if (Event.Type == csevBroadcast
@@ -691,7 +699,7 @@ void csApp::NotifyDelete (csComponent *comp)
   if (FocusOwner == comp)
     CaptureFocus (NULL);
 
-  hints.Remove (comp);
+  hints->Remove (comp);
 }
 
 int csApp::Execute (csComponent *comp)

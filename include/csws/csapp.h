@@ -65,11 +65,11 @@ protected:
   /// The graphics pipeline
   csGraphicsPipeline GfxPpl;
   /// The mouse pointer
-  csMouse Mouse;
+  csMouse *Mouse;
   /// The list of windowing system textures
   csWSTexVector Textures;
   /// The hints manager
-  csHintManager hints;
+  csHintManager *hints;
   /// Window list width and height
   int WindowListWidth, WindowListHeight;
   /// Current & old mouse pointer ID
@@ -104,7 +104,7 @@ protected:
 
     /// Handle a event and return true if processed; called by system driver
     virtual bool HandleEvent (iEvent &Event);
-  } scfiPlugIn;
+  } *scfiPlugIn;
   friend class csAppPlugIn;
 
 public:
@@ -201,7 +201,7 @@ public:
   }
 
   /// Return application's global mouse object
-  csMouse &GetMouse () { return Mouse; }
+  csMouse &GetMouse () { return *Mouse; }
 
   /// Set mouse cursor pointer
   void SetMouseCursor (csMouseCursorID ID) { MouseCursorID = ID; }
@@ -264,14 +264,14 @@ public:
 
   /// Associate a hint with given component
   void HintAdd (const char *iText, csComponent *iComp)
-  { hints.Add (iText, iComp); }
+  { hints->Add (iText, iComp); }
 
   /// Remove the hint associated with given component
   void HintRemove (csComponent *iComp);
 
   /// Get the hint manager object
   csHintManager &GetHintManager ()
-  { return hints; }
+  { return *hints; }
 
   /// Load a font and return its handle or NULL
   iFont *LoadFont (const char *iFontName)
