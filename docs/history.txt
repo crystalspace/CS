@@ -1,5 +1,9 @@
 The history order has been reversed so that new features are at the top.
 
+26-Jan-2001
+	- Norman Kramer did further work on the video plugins.
+	  With exception of yuv2rgb conversion AVI is working.
+	- Wouter Wijngaards did nothing on radiosity.
 25-Jan-2001
 	- Wouter Wijngaards fixed mazed compilation, by adding csutil
 	  library after the cssys for linking.
