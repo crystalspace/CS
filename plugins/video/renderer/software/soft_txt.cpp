@@ -158,6 +158,7 @@ void csTextureMMSoftware::convert_to_internal_global (csTextureManagerSoftware* 
 void csTextureMMSoftware::convert_to_internal_24bit (csTextureManagerSoftware *texman,
   iImage* imfile, unsigned char* bm)
 {
+  (void) texman;
   int s = imfile->GetSize ();
   RGBPixel* bmsrc = (RGBPixel *)imfile->GetImageData ();
   ULong *bml = (ULong*)bm;

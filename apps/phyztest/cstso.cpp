@@ -38,6 +38,7 @@ void set_no_rewind( ctEntity *ppe )
 
 void csRigidSpaceTimeObj::evolve_system( real t1, real t2, ctWorld *time_world, csWorld *space_world )
 {
+  (void) space_world;
   real ta, tb;
   ta = t1;
   tb = t2;
