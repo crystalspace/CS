@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Sep-2004
+	- Eric Sunshine fixed bugs in walktest/Jamfile where it unconditionally
+	  attempted to add several optional modules to the "walkall" compile
+	  group even if those modules had not been detected/enabled by the
+	  configure script. Among other issues, this resulted in a failure by
+	  the configure script to set up the makefile emulation layer if some
+	  of those modules were absent.
+7-Sep-2004
+        - *** RELEASED STABLE 0.98.4 ***
 24-Aug-2004
  	- Jorrit fixed a bug in Dynavis where it would try to use the
  	  hint_goodoccluder flag before setting the value of that.
