@@ -1,10 +1,28 @@
+/*
+    Copyright (C) 2002 by Mat Sutcliffe <oktal@gmx.co.uk>
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
 
 #include "cssysdef.h"
 #include "csperl5.h"
 #include "csutil/scf.h"
 #include "iutil/objreg.h"
 #include "csutil/csstring.h"
-#include "cssys/sysfunc.h"
+#include "iutil/vfs.h"
+#include "iutil/databuff.h"
 
 #include <string.h>
 
@@ -37,20 +55,42 @@ csPerl5::csPerl5 (iBase *parent)
 
 bool csPerl5::eiComponent::Initialize (iObjectRegistry *objreg)
 {
-  return true;
+  scfParent->reporter = CS_QUERY_REGISTRY (objreg, iReporter);
+
+  if (scfParent->reporter) return true;
+  else return false;
 }
 
 bool csPerl5::Initialize (iObjectRegistry *objreg)
 {
+  csRef<iVFS> vfs = CS_QUERY_REGISTRY (objreg, iVFS);
+  if (! vfs)
+  {
+    reporter->ReportError ("crystalspace.perl5.init.plugins",
+      "Can't find VFS plugin");
+    return false;
+  }
+
+  const char *vfsinc = "this/scripts/perl5";
+  csRef<iDataBuffer> incbuff = vfs->GetRealPath (vfsinc);
+  if (! incbuff)
+  {
+    reporter->ReportError ("crystalspace.perl5.init.load",
+      "VFS: Can't find %s directory; is it missing?", vfsinc);
+    return false;
+  }
+
   perl = perl_alloc ();
-  if (! perl) return false;
+  if (! perl)
+  {
+    reporter->ReportError ("crystalspace.perl5.init.alloc",
+      "perl5: Can't allocate memory for perl interpreter");
+    return false;
+  }
   perl_construct (perl);
 
-  char incdir [128];
-  csGetInstallPath (incdir, 96);
-  strcat (incdir, "scripts/perl5");
-
-  char *argv [] = { "perl5", "-I", incdir, "-e", "0" };
+  char *realinc = (char *) incbuff->GetData ();
+  char *argv [] = { "perl5", "-T", "-I", realinc, "-e", "0" };
   int argc = 5;
   perl_parse (perl, xs_init, argc, argv, NULL);
   perl_run (perl);
@@ -67,7 +107,15 @@ bool csPerl5::RunText (const char *text)
 {
   eval_pv (text, FALSE);
 
-  return true; //TODO: add error checking
+  SV* error = get_sv ("@", FALSE);
+  if (SvTRUE (error))
+  {
+    reporter->ReportError ("crystalspace.perl5.run.fatal",
+      "perl: %s", SvPV_nolen (error));
+    return false;
+  }
+  else
+    return true;
 }
 
 bool csPerl5::LoadModule (const char *name)
