@@ -1,6 +1,10 @@
 The history order is reversed so that new features are at the top.
 
 6-Mar-2002
+	- Matt Reda added support for splitting walktest into two views. 
+	  Shift-S splits to 2 views, Shift-T toggles between the two views
+	  (allowing the user to navigate the level in the two views), and
+	  Shift-U returns to a single view (the currently active one).
 	- Added iCacheManager interface (include/iutil/cache.h). This is
 	  a generic interface to describe a cache mechanism. It can be used
 	  for storing data that is hard to calculate and doesn't change
