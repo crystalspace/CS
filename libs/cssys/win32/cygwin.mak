@@ -180,6 +180,10 @@ endif # ifeq ($(MAKESECTION),defines)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
+# How to make shared libs for cs-config
+LINK.PLUGIN=dllwrap
+PLUGIN.POSTFLAGS=-mwindows -mconsole
+
 # How to make a shared AKA dynamic library
 DO.SHARED.PLUGIN.CORE = \
   dllwrap $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS) -mwindows

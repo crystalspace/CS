@@ -1,5 +1,12 @@
 #! /bin/sh
 # This generates the cs-config script
+#
+# expected arguments (in order):
+# $1: $(INSTALL_DIR)
+# $2: $(CXXFLAGS)
+# $3: $(CFLAGS)
+# $4: $(LIBS.EXE)
+# $5: scripts/cs-config (location of script source dir)
 
 verfile=include/csver.h
 vmajor=`sed -e '/#define[ 	][ 	]*CS_VERSION_MAJOR/!d' -e '/#define[ 	][ 	]*CS_VERSION_MAJOR/s/\(#define[ 	][ 	]*CS_VERSION_MAJOR[ 	][ 	]*"\)\([^\"]*\)"\(.*\)/\2/' < ${verfile}`
@@ -20,6 +27,13 @@ echo "libdir=\${prefix}/lib"	>> cs-config
 echo "syslibs=\"$4\""		>> cs-config
 echo "common_cflags=\"$2\""	>> cs-config
 echo "common_cxxflags=\"$3\""	>> cs-config
+echo				>> cs-config
+echo "makevars()"		>> cs-config
+echo "{"			>> cs-config
+echo "	cat <<EOF"		>> cs-config
+cat out/csconfig.tmp		>> cs-config
+echo "EOF"			>> cs-config
+echo "}"			>> cs-config
 echo				>> cs-config
 cat $5/cs-config.temppost	>> cs-config
 

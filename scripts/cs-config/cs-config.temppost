@@ -42,6 +42,7 @@ Options:
 	[--libs]
 	[--cflags]
 	[--cxxflags]
+	[--makevars]
 	[--help]
 Libraries:
 	csengine
@@ -116,6 +117,7 @@ the_libs=""
 show_libs=""
 show_cflags=""
 show_cxxflags=""
+show_makevars=""
 
 while test $# -gt 0; do
   case $1 in
@@ -136,6 +138,9 @@ while test $# -gt 0; do
       ;;
     --cxxflags)
 	show_cxxflags=true
+	;;
+    --makevars)
+	show_makevars=true
 	;;
     --libs)
 	show_libs=true
@@ -191,6 +196,9 @@ if test -n "$show_libs"; then
     the_libs="-L${libdir} $the_libs ${syslibs}"
 
     echo "$the_libs"
+fi
+if test -n "$show_makevars"; then
+	makevars
 fi
 
 exit 0
