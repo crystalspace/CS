@@ -11,6 +11,7 @@ chronological order.
 	  configure.ac.  If not recognized by the compiler, the
 	  CS_USE_FAKE_TYPENAME_KEYWORD macro is emitted to volatile.h, which
 	  csdef.h recognizes in order to fake up a `typename' keyword.
+	- Eric Sunshine removed a couple useless #defines from csdef.h.
 14-Sep-2003
 	- DeSigna made the following changes:
 	    - Fixed the SCF_CREATE_INSTANCE macro to return a csPtr<>, in 
