@@ -22,6 +22,10 @@ The history order is reversed so that new features are at the top.
         - parser now requests buffers w/o null termination for image 
           loading.
         - changed TinyXML plugin to use iFile::GetAllData().
+    - res changed the VFS cache manager to return data w/o null terminator.
+    - res added a new constructor to csDataBuffer, copying from an existing
+      data buffer (and adding a null terminator.)
+    - res fixed precalc info reader for the changed cache manager behaviour.
 30-Apr-2003
 	- Philip Wyett removed MSVC external references to /MT and /MTd as
 	  these params are not valid and will cause problems if used when
