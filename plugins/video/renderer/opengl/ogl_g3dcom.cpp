@@ -5554,7 +5554,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
 
   glTranslatef (asp_center_x, asp_center_y, 0);
-  for (int i = 0 ; i < 16 ; i++) matrixholder[i] = 0.0;
+  for (i = 0 ; i < 16 ; i++) matrixholder[i] = 0.0;
   matrixholder[0] = matrixholder[5] = 1.0;
   matrixholder[11] = inv_aspect;
   matrixholder[14] = -inv_aspect;
