@@ -52,6 +52,7 @@ class csArtsRenderer : public iSoundRender, public iSoundListener
   };
 
   Arts::SimpleSoundServer server;
+  Arts::Dispatcher *dispatcher;
 
   csVector3 front, top, pos, velocity;
   float distanceFactor, rolloffFactor, dopplerFactor, headSize, volume;
@@ -60,7 +61,7 @@ class csArtsRenderer : public iSoundRender, public iSoundListener
   bool bInit;
 
   iSoundSource *CreateSource (csArtsHandle *pHandle, int Mode3D);
-  //  Arts::csSoundModule *CreateArtsModule ();
+  Arts::csSoundModule *CreateArtsModule ();
 
 public:
   DECLARE_IBASE;

@@ -31,7 +31,7 @@ IMPLEMENT_IBASE_END
 
 IMPLEMENT_FACTORY (csArtsRenderer);
 
-EXPORT_CLASS_TABLE (artsrend)
+EXPORT_CLASS_TABLE (csarts)
   EXPORT_CLASS (csArtsRenderer, "crystalspace.sound.render.arts", 
 		"aRts renderer plugin for Crystal Space")
 EXPORT_CLASS_TABLE_END
@@ -39,6 +39,7 @@ EXPORT_CLASS_TABLE_END
 csArtsRenderer::csArtsRenderer (iBase *pParent)
 {
   CONSTRUCT_IBASE (pParent);
+  dispatcher = NULL;
   bInit = false;
   SetVolume (1.0f);
   SetEnvironment (ENVIRONMENT_GENERIC);
@@ -51,11 +52,13 @@ csArtsRenderer::csArtsRenderer (iBase *pParent)
 csArtsRenderer::~csArtsRenderer ()
 {
   vObject.DeleteAll ();
+  if (dispatcher) delete dispatcher;
 }
 
 bool csArtsRenderer::Initialize (iSystem *iSys)
 {
   // ok, we try to get a remote soundserver object
+  dispatcher = new Arts::Dispatcher;
   server = Arts::Reference (ARTS_SIMPLESOUNDSERVER);
   if (server.isNull ())
   {
@@ -69,7 +72,7 @@ bool csArtsRenderer::Initialize (iSystem *iSys)
   }
   return bInit;
 }
-/*
+
 Arts::csSoundModule *csArtsRenderer::CreateArtsModule ()
 {
   Arts::csSoundModule *sm = new Arts::csSoundModule;
@@ -81,7 +84,7 @@ Arts::csSoundModule *csArtsRenderer::CreateArtsModule ()
   }
   return sm;
 }
-*/
+
 void csArtsRenderer::SetVolume (float vol)
 {
   if (bInit)

@@ -1,7 +1,6 @@
 // test program
-#include <artsflow.h>
-#include <connect.h>
-#include <soundserver.h>
+//#include <artsflow.h>
+//#include <dispatcher.h>
 #include "cssysdef.h"
 #include "cssys/sysdriv.h"
 #include "csutil/scf.h"
@@ -9,10 +8,12 @@
 #include "isys/vfs.h"
 #include "isound/data.h"
 #include "isound/loader.h"
+#include "isound/renderer.h"
+#include "isound/source.h"
+#include "isound/handle.h"
 #include "csutil/databuf.h"
-#include "csarts.h"
-#include "csarts_impl.h"
 #include <termios.h>
+#include <sys/time.h>
 #include "csgeom/vector3.h"
 
 struct termios neu;
@@ -82,8 +83,11 @@ int main(int argc, const char* const args[])
   sys.RequestPlugin ("crystalspace.sound.loader.au:System.PlugIns.SoundAU");
   sys.RequestPlugin ("crystalspace.sound.loader.iff:System.PlugIns.SoundIFF");
   sys.RequestPlugin ("crystalspace.sound.loader.wav:System.PlugIns.SoundWAV");
+  sys.RequestPlugin ("crystalspace.sound.render.arts:SoundRender");
 
   sys.RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
+
+  //  Arts::Dispatcher *dispatcher = new Arts::Dispatcher;
 
   if (!sys.Initialize (argc, args, NULL))
   {
@@ -95,6 +99,8 @@ int main(int argc, const char* const args[])
   iSoundLoader *pLoader = QUERY_PLUGIN_ID (&sys, "SoundLoader", iSoundLoader);
   // we read the soundata the CS way, that is through VFS
   iVFS *pVFS = QUERY_PLUGIN (&sys, iVFS);
+  // well, since we want to try our renderer, we should request it now
+  iSoundRender *pSR = QUERY_PLUGIN (&sys, iSoundRender);
   
   // load the sound
   iDataBuffer *db = pVFS->ReadFile (args[1]);
@@ -102,36 +108,11 @@ int main(int argc, const char* const args[])
   // let the soundloader create a sounddata object from the data
   iSoundData *sd = pLoader->LoadSound (db->GetData (), db->GetSize ());
 
-  // make a soundformat we like
-  csSoundFormat format;
-  format.Freq = 44100;
-  format.Bits = 16;
-  format.Channels = 2;
+  // retrieve a soundhandle we can play from the renderer
+  iSoundHandle *sh = pSR->RegisterSound (sd);
 
-  sd->Initialize (&format);
-
-  // now create the arts soundplay control
-  Arts::Dispatcher dispatcher;
-  Arts::SimpleSoundServer server;
-
-  server = Arts::Reference ("global:Arts_SimpleSoundServer");
-  if (server.isNull ())
-  {
-    printf ("server null\n");
-    return 0;
-  }
-
-  Arts::csSoundModule sm = Arts::DynamicCast (server.createObject ("Arts::csSoundModule"));
-  assert (!sm.isNull());
-
-  std::vector<float> vData (sd->GetStaticNumSamples ()*2);
-  short *data = (short*)sd->GetStaticData ();
-  for (long i=0; i < sd->GetStaticNumSamples ()*2; i++)
-    vData[i] = (float)data[i];
-  sm.SetData (vData);
-  
-  sm.Set3DType (Arts::SOUND3D_RELATIVE);
-  sm.start ();
+  // ok, we want to take it to the max, so we need to operate on a soundsource
+  iSoundSource *ss = sh->CreateSource (SOUND3D_RELATIVE);
 
   csVector3 pos (0, 0, 1);
 
@@ -162,11 +143,14 @@ int main(int argc, const char* const args[])
 	bSet = false;
       }
       if (bSet)
-	sm.SetSoundPosition (pos.x, pos.y, pos.z);
+	ss->SetPosition (pos);
     }
   }
   tcsetattr(0,TCSANOW,&save);
-  
+
+  ss->DecRef ();
+  sh->DecRef ();
+  pSR->DecRef ();
   sd->DecRef ();
   db->DecRef ();
   pVFS->DecRef ();
