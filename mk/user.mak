@@ -44,6 +44,7 @@ PLUGINS += mesh/object/stars
 PLUGINS +=                         mesh/loader/thing
 PLUGINS += terrain/object/ddg      terrain/loader/ddg
 PLUGINS += terrain/object/terrfunc terrain/loader/terrfunc
+PLUGINS += motion/object/default   motion/loader/default
 
 PLUGINS.DYNAMIC += engine
 PLUGINS.DYNAMIC += iso
@@ -63,7 +64,7 @@ PLUGINS.DYNAMIC += dungeon
 #PLUGINS.DYNAMIC += font/server/freefont
 PLUGINS.DYNAMIC += font/server/fontplex
 PLUGINS.DYNAMIC += metaball
-PLUGINS.DYNAMIC += motion
+
 #PLUGINS.DYNAMIC += csgame/gamecore
 
 #-----------------------------------------------------------------------------

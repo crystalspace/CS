@@ -42,8 +42,6 @@ struct iStringServer;
 struct iObject;
 struct iThing;
 struct iCollection;
-struct iMotion;
-struct iMotionAnim;
 struct iSkeletonLimb;
 struct iMaterialWrapper;
 struct iMeshFactoryWrapper;
@@ -177,16 +175,6 @@ class csLoader : public iLoader
    * prefixed with the corresponding string.
    */
   bool LoadMaterials (char* buf, const char* prefix = NULL);
-
-  /**
-   * Loads a skeletal motion from a file
-   */
-  iMotion* LoadMotion (const char* fname);
-
-  /**
-   * Loads a skeletal motion from an existing stream
-   */
-  bool LoadMotion (iMotion* mot, char* buf);
 
   /**
    * Load a library into given engine.<p>

@@ -105,7 +105,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ADDON)
   CS_TOKEN_DEF (ALPHA)
   CS_TOKEN_DEF (AMBIENT)
-  CS_TOKEN_DEF (ANIM)
   CS_TOKEN_DEF (ATTENUATION)
   CS_TOKEN_DEF (BACK2FRONT)
   CS_TOKEN_DEF (CAMERA)
@@ -119,7 +118,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (DIFFUSE)
   CS_TOKEN_DEF (DITHER)
   CS_TOKEN_DEF (DYNAMIC)
-  CS_TOKEN_DEF (EULER)
   CS_TOKEN_DEF (FILE)
   CS_TOKEN_DEF (FILTER)
   CS_TOKEN_DEF (FOG)
@@ -137,7 +135,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (LAYER)
   CS_TOKEN_DEF (LIBRARY)
   CS_TOKEN_DEF (LIGHT)
-  CS_TOKEN_DEF (LINK)
   CS_TOKEN_DEF (MATERIAL)
   CS_TOKEN_DEF (MATERIALS)
   CS_TOKEN_DEF (MATRIX)
@@ -183,8 +180,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (TEXTURES)
   CS_TOKEN_DEF (TRANSPARENT)
   CS_TOKEN_DEF (MAT_SET)
-  CS_TOKEN_DEF (MOTION)
-  CS_TOKEN_DEF (Q)
   CS_TOKEN_DEF (V)
   CS_TOKEN_DEF (WORLD)
   CS_TOKEN_DEF (ZFILL)
@@ -1208,7 +1203,6 @@ bool csLoader::LoadMap (char* buf)
     CS_TOKEN_TABLE (START)
     CS_TOKEN_TABLE (SOUNDS)
     CS_TOKEN_TABLE (KEY)
-    CS_TOKEN_TABLE (MOTION)
     CS_TOKEN_TABLE (REGION)
     CS_TOKEN_TABLE (TERRAINFACTORY)
     CS_TOKEN_TABLE (RENDERPRIORITIES)
@@ -1247,24 +1241,6 @@ bool csLoader::LoadMap (char* buf)
         case CS_TOKEN_ADDON:
 	  LoadAddOn (params, (iEngine*)Engine);
       	  break;
-        case CS_TOKEN_MOTION:
-	  {
-	    if (!MotionManager)
-	    {
-	      System->Printf (MSG_FATAL_ERROR, "No motion manager loaded!\n");
-	      fatal_exit (0, false);
-	    }
-	    else
-	    {
-	      iMotion* m = MotionManager->FindByName (name);
-	      if (!m)
-	      {
-		m = MotionManager->AddMotion (name);
-		LoadMotion (m, params);
-	      }
-	    }
-	  }
-	  break;
         case CS_TOKEN_MESHFACT:
           {
             iMeshFactoryWrapper* t = Engine->FindMeshFactory (name);
@@ -2448,156 +2424,6 @@ iMeshWrapper * csLoader::LoadMeshObject (const char* fname)
   databuff->DecRef ();
   return NULL;
 }
-
-//---------------------------------------------------------------------------
-
-iMotion* csLoader::LoadMotion (const char* fname)
-{
-  iDataBuffer *databuff = VFS->ReadFile (fname);
-
-  if (!databuff || !databuff->GetSize ())
-  {
-    if (databuff) databuff->DecRef ();
-    System->Printf (MSG_FATAL_ERROR, "Could not open motion file \"%s\" on VFS!\n", fname);
-    return NULL;
-  }
-
-  CS_TOKEN_TABLE_START (tokens)
-  	CS_TOKEN_TABLE (MOTION)
-  CS_TOKEN_TABLE_END
-
-  char *name, *data;
-  char *buf = **databuff;
-	long cmd;
-
-  if ((cmd=csGetObject (&buf, tokens, &name, &data)) > 0)
-  {
-    if (!data)
-    {
-      System->Printf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
-    }
-
-    if (!MotionManager)
-      System->Printf (MSG_FATAL_ERROR, "No motion manager loaded!\n");
-    else
-    {
-      iMotion* m = MotionManager->FindByName (name);
-      if (!m)
-      {
-	m=MotionManager->AddMotion (name);
-	if (LoadMotion (m, data))
-	{
-	  databuff->DecRef ();
-	  return m;
-	}
-	else
-	{
-	  m->DecRef ();
-	  databuff->DecRef ();
-	  return NULL;
-	}
-      }
-    }
-  }
-  databuff->DecRef ();
-  return NULL;
-}
-
-bool csLoader::LoadMotion (iMotion* mot, char* buf)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (ANIM)
-    CS_TOKEN_TABLE (FRAME)
-  CS_TOKEN_TABLE_END
-
-  CS_TOKEN_TABLE_START (tok_anim)
-    CS_TOKEN_TABLE (EULER)
-    CS_TOKEN_TABLE (Q)
-    CS_TOKEN_TABLE (MATRIX)
-  CS_TOKEN_TABLE_END
-
-  CS_TOKEN_TABLE_START (tok_frame)
-    CS_TOKEN_TABLE (LINK)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-  char* params2;
-
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      System->Printf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_ANIM:
-        {
-	  cmd = csGetObject (&params, tok_anim, &name, &params2);
-	  switch (cmd) 
-	  {
-	    case CS_TOKEN_EULER:
-	      {
-	        csVector3 e;
-	        csQuaternion quat;
-	        load_vector(params2, e);
-	        quat.SetWithEuler(e);
-	        mot->AddAnim(quat);
-	      }
-	      break;
-	    case CS_TOKEN_Q:
-	      {
-	        csQuaternion quat;
-	        load_quaternion(params2, quat);
-	        mot->AddAnim(quat);
-	      }
-	      break;
-	    case CS_TOKEN_MATRIX:
-	      {
-	        csMatrix3 mat;
-	        load_matrix(params2, mat);
-	        mot->AddAnim(mat);
-	      }
-	      break;
-	    default:
-	      System->Printf (MSG_FATAL_ERROR, "Expected MATRIX or Q instead of '%s'!\n", buf);
-	      fatal_exit (0, false);
-	  }     
-        }
-        break;
-      case CS_TOKEN_FRAME:
-	{
-	  int framenumber;
-	  ScanStr(name, "%d", &framenumber);
-	  int index=mot->AddFrame(framenumber);
-	  while((cmd = csGetObject (&params, tok_frame, &name, &params2))>0)
-	  {
-	    if(cmd!=CS_TOKEN_LINK)
-	    {
-	      System->Printf (MSG_FATAL_ERROR, "Expected LINK instead of '%s'!\n", buf);
-	      fatal_exit (0, false);
-	    }
-	    int link;
-	    ScanStr(params2, "%d", &link);
-	    mot->AddFrameLink(index, name, link);
-	  }
-        }
-	break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    System->Printf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the a sprite template!\n",
-        csGetLastOffender ());
-    fatal_exit (0, false);
-  }
-  return true;
-}
-
 
 /************ iLoader implementation **************/
 
