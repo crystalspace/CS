@@ -199,7 +199,6 @@ void aws3DFrame::Draw (
 	  if(ovl)
 		  DrawTexturedBackground(todraw_txt, ovl, ovl_alpha, ovl_align);
 	  break;
-
   }
 }
 
