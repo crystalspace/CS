@@ -734,8 +734,8 @@ TYPEMAP_OUT_csWrapPtr
 
 %include "csgeom/math2d.h"
 
-%ignore csPoly2DUnbounded::operator[];
-%ignore csPoly2DUnbounded::GetVertices (); // Non-const.
+%ignore csPoly2D::operator[];
+%ignore csPoly2D::GetVertices (); // Non-const.
 %include "csgeom/poly2d.h"
 
 %include "csgeom/math3d.h"

@@ -35,7 +35,7 @@ struct iClipper2D;
 /**
  * The following class represents a general 2D polygon.
  */
-class CS_CSGEOM_EXPORT csPoly2DUnbounded
+class CS_CSGEOM_EXPORT csPoly2D
 {
 protected:
   /// The 2D vertices.
@@ -48,16 +48,16 @@ public:
   /**
    * Make a new empty polygon.
    */
-  csPoly2DUnbounded (int start_size = 10);
+  csPoly2D (int start_size = 10);
 
   /// Copy constructor.
-  csPoly2DUnbounded (const csPoly2DUnbounded& copy);
+  csPoly2D (const csPoly2D& copy);
 
   /// Destructor.
-  virtual ~csPoly2DUnbounded ();
+  ~csPoly2D ();
 
   /// Assignment operator.
-  csPoly2DUnbounded& operator= (const csPoly2DUnbounded& other);
+  csPoly2D& operator= (const csPoly2D& other);
 
   /**
    * Initialize the polygon to empty.
@@ -182,14 +182,14 @@ public:
    * polygon which already has most edges. i.e. you will not
    * get degenerate polygons.
    */
-  void Intersect (const csPlane2& plane, csPoly2DUnbounded& left,
-  	csPoly2DUnbounded& right) const;
+  void Intersect (const csPlane2& plane, csPoly2D& left,
+  	csPoly2D& right) const;
 
   /**
    * This routine is similar to Intersect but it only returns the
    * polygon on the 'right' (positive) side of the plane.
    */
-  void ClipPlane (const csPlane2& plane, csPoly2DUnbounded& right) const;
+  void ClipPlane (const csPlane2& plane, csPoly2D& right) const;
 
   /**
    * Extend this polygon with another polygon so that the resulting
@@ -199,7 +199,7 @@ public:
    * Edges are indexed with 0 being the edge from 0 to 1 and n-1 being
    * the edge from n-1 to 0.
    */
-  void ExtendConvex (const csPoly2DUnbounded& other, int this_edge);
+  void ExtendConvex (const csPoly2D& other, int this_edge);
 
   /**
    * Calculate the signed area of this polygon.
@@ -215,37 +215,6 @@ public:
 };
 
 /**
- * The following class represents a general 2D polygon with
- * a bounding box.
- */
-class CS_CSGEOM_EXPORT csPoly2D : public csPoly2DUnbounded
-{
-protected:
-  /// A 2D bounding box that is maintained automatically.
-  csBox2 bbox;
-
-public:
-  csPoly2D (int start_size = 10);
-  /// Copy constructor.
-  csPoly2D (const csPoly2D& copy);
-
-  /// Assignment operator.
-  csPoly2D& operator= (const csPoly2D& other);
-  
-  void MakeEmpty ();
-  int AddVertex (float x, float y);
-  int AddVertex (const csVector2& v) { return AddVertex (v.x, v.y); }
-  
-  /// Update the bounding box (useful after SetVertices).
-  void UpdateBoundingBox ();
-
-  /// Get the bounding box (in 2D space) for this polygon.
-  csBox2& GetBoundingBox () { return bbox; }
-
-  bool ClipAgainst (iClipper2D* view);
-};
-
-/**
  * This factory is responsible for creating csPoly2D objects or subclasses
  * of csPoly2D. To create a new factory which can create subclasses of csPoly2D
  * you should create a subclass of this factory.
@@ -257,7 +226,11 @@ public:
    CS_DECLARE_STATIC_CLASSVAR(sharedFactory,SharedFactory,csPoly2DFactory)
 
   /// Create a poly2d.
-  virtual csPoly2D* Create () { csPoly2D* p = new csPoly2D (); return p; }
+  virtual csPoly2D* Create ()
+  {
+    csPoly2D* p = new csPoly2D ();
+    return p;
+  }
 };
 
 /** @} */

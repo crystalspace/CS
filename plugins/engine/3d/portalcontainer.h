@@ -154,8 +154,8 @@ private:
   bool csPortalContainer::ClipToPlane (int portal_idx, csPlane3 *portal_plane,
 	const csVector3 &v_w2c, csVector3 * &pverts, int &num_verts);
   bool DoPerspective (csVector3 *source, int num_verts,
-	csPoly2D *dest, bool mirror, int fov, float shift_x, float shift_y,
-	const csPlane3& plane_cam);
+	csPoly2D *dest, bool mirror, int fov,
+	float shift_x, float shift_y, const csPlane3& plane_cam);
   void DrawOnePortal (csPortal* po, const csPoly2D& poly,
 	const csReversibleTransform& movtrans, iRenderView *rview,
 	const csPlane3& camera_plane);

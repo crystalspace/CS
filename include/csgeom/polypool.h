@@ -31,7 +31,7 @@
 
 /**
  * This is an object pool which holds objects of type
- * csPoly2DUnbounded. You can ask new instances from this pool.
+ * csPoly2D. You can ask new instances from this pool.
  * If needed it will allocate one for you but ideally it can
  * give you one which was allocated earlier.
  */
@@ -41,7 +41,7 @@ private:
   struct PoolObj
   {
     PoolObj* next;
-    csPoly2DUnbounded* pol2d;
+    csPoly2D* pol2d;
   };
   /// List of allocated polygons.
   PoolObj* alloced;
@@ -79,7 +79,7 @@ public:
   }
 
   /// Allocate a new object in the pool.
-  csPoly2DUnbounded* Alloc ()
+  csPoly2D* Alloc ()
   {
     PoolObj* pnew;
     if (freed)
@@ -102,7 +102,7 @@ public:
    * Note that it is only legal to free objects which were allocated
    * from the pool.
    */
-  void Free (csPoly2DUnbounded* pol)
+  void Free (csPoly2D* pol)
   {
     if (alloced)
     {

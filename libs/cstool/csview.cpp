@@ -198,7 +198,7 @@ void csView::RestrictClipperToScreen ()
     {
       PolyView->MakeRoom (OutCount);
       PolyView->SetVertices (TempPoly, OutCount);
-      PolyView->UpdateBoundingBox ();
+      //@@@PolyView->UpdateBoundingBox ();
     }
     delete [] TempPoly;
   }

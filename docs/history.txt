@@ -15,6 +15,14 @@ chronological order.
 	  instead of csPoly2D.
 	- Jorrit did some more work on pvscalc. Implemented the basic
 	  shadow area caster. Not working!
+	- Jorrit fixed csPoly2DUnbounded::ClipAgainst(). It was forgetting
+	  to set the bounding box.
+	- Jorrit removed all usages of csPoly2D in CS. The bounding box was
+	  only needed on one spot (portal clipping) and there it is easier
+	  to just create the bounding box when needed (in ClipAgainst()).
+	- Jorrit renamed csPoly2DUnbounded to csPoly2D and removed the
+	  'virtual' from destructor. So csPoly2D is now back as it was before
+	  except that it no longer supports the bounding box.
 10-Feb-2005
 	- Jorrit added csIntersect3::XPlane() and YPlane() to complement
 	  the already existing ZPlane(). Also added AxisPlane() which will

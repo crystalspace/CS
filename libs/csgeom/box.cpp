@@ -808,7 +808,7 @@ bool csBox3::ProjectOutline (const csVector3& origin,
 
 bool csBox3::ProjectOutline (const csVector3& origin,
 	int axis, float where,
-  	csPoly2DUnbounded& poly) const
+  	csPoly2D& poly) const
 {
   int idx = CalculatePointSegment (origin);
   const Outline &ol = outlines[idx];

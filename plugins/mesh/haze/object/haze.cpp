@@ -699,7 +699,7 @@ csRenderMesh** csHazeMeshObject::GetRenderMeshes (int &n, iRenderView* rview,
     incheck[i].y = layer_pts[layer_num-1 - i].y;
   }
   csVector2 checkpt( scr_orig.x, scr_orig.y );
-  if(!csPoly2D::In(incheck, layer_num, checkpt))
+  if(!csPoly2D::In (incheck, layer_num, checkpt))
   {
     // origin not inside outline.
     delete[] incheck;

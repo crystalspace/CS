@@ -420,7 +420,7 @@ bool PVSCalcSector::CastAreaShadow (const csPoly3D& polygon)
   // First we calculate the projection of the polygon on the shadow plane
   // as seen from the first point on the source box. That will be the start
   // for calculating the intersection of all those projections.
-  csPoly2DUnbounded poly_intersect;
+  csPoly2D poly_intersect;
   if (!dest.ProjectOutline (source.GetCorner (CS_BOX_CORNER_xyz),
   	plane.axis, plane.where, poly_intersect))
     return false;
@@ -436,7 +436,7 @@ bool PVSCalcSector::CastAreaShadow (const csPoly3D& polygon)
   int i;
   for (i = 1 ; i < 8 ; i++)
   {
-    csPoly2DUnbounded poly;
+    csPoly2D poly;
     if (!dest.ProjectOutline (source.GetCorner (i),
   	plane.axis, plane.where, poly))
       return false;

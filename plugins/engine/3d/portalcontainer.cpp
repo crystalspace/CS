@@ -400,8 +400,8 @@ static void Perspective (const csVector3& v, csVector2& p, int
   p.y = v.y * iz + shift_y;
 }
 
-static void AddPerspective (csPoly2D* dest, const csVector3 &v, int aspect,
-	float shift_x, float shift_y)
+static void AddPerspective (csPoly2D* dest, const csVector3 &v,
+	int aspect, float shift_x, float shift_y)
 {
   csVector2 p;
   Perspective (v, p, aspect, shift_x, shift_y);

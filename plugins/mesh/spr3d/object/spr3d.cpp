@@ -430,7 +430,7 @@ void csSprite3DMeshObjectFactory::GenerateLOD ()
   for (i = 0 ; i < (int)texels.Length () ; i++)
   {
     int j;
-    csPoly2DUnbounded* tx = texels.Get (i);
+    csPoly2D* tx = texels.Get (i);
     csPoly3D* vt = vertices.Get (i);
     csPoly3D* vn = normals.Get (i);
     for (j = 0 ; j < GetVertexCount () ; j++)

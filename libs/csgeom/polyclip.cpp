@@ -120,7 +120,7 @@ uint8 csBoxClipper::Clip (
 
 //---------------------------------------------------------------------------
 csPolygonClipper::csPolygonClipper (
-  csPoly2DUnbounded *Clipper,
+  csPoly2D *Clipper,
   bool mirror,
   bool copy) :
     csClipper()

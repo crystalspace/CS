@@ -40,7 +40,6 @@
 class csPlane3;
 class csTransform;
 class csPoly2D;
-class csPoly2DUnbounded;
 
 /**
  * The maximum value that a coordinate in the bounding box can use.
@@ -1075,7 +1074,7 @@ public:
    * then it will return false.
    */
   bool ProjectOutline (const csVector3& origin,
-	int axis, float where, csPoly2DUnbounded& poly) const;
+	int axis, float where, csPoly2D& poly) const;
 
   /**
    * Project this box to the 2D outline given the view point

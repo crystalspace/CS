@@ -39,8 +39,6 @@
 #include "csgeom/vector2.h"
 #include "csgeom/segment.h"
 
-class csPoly2D;
-
 /**
  * A plane in 2D space.
  * The plane is given by the equation AAx + BBy + CCz + DD = 0,
