@@ -36,6 +36,7 @@
 #include "igraph2d.h"
 
 #include <GL/gl.h>
+#include <GL/glu.h>
 
 // uncomment the 'USE_MULTITEXTURE 1' define to enable compile-time tests for
 // multitexture support
@@ -67,6 +68,22 @@ static int isExtensionSupported(const char * extension);
 #endif
 //---------------------------------------------------------------------------
 
+// fog variables
+// size of the fog texture
+static const unsigned int FOGTABLE_SIZE=64;
+// each texel in the fog table holds the fog alpha value at a certain
+// (distance*density).  The median distance parameter determines the
+// (distance*density) value represented by the texel at the center of
+// the fog table.  The fog calculation is:
+// alpha = 1.0 - exp( -(density*distance) / FOGTABLE_MEDIANDISTANCE)
+// 
+static const double FOGTABLE_MEDIANDISTANCE=10.0;
+static const double FOGTABLE_MAXDISTANCE = FOGTABLE_MEDIANDISTANCE * 2.0;
+// fog (distance*density) is mapped to a texture coordinate and then
+// clamped.  This determines the clamp value.  Some OpenGL drivers don't
+// like clamping textures so we must do it ourself
+static const double FOGTABLE_CLAMPVALUE = 0.95;
+
 IMPLEMENT_UNKNOWN (csGraphics3DOpenGL)
 
 BEGIN_INTERFACE_TABLE (csGraphics3DOpenGL)
@@ -82,6 +99,7 @@ csGraphics3DOpenGL::csGraphics3DOpenGL (ISystem* piSystem) : m_piG2D (NULL)
   texture_cache = NULL;
   lightmap_cache = NULL;
   txtmgr = NULL;
+  m_fogtexturehandle = 0;
 
   m_piSystem = piSystem;
 
@@ -257,9 +275,52 @@ STDMETHODIMP csGraphics3DOpenGL::Open (const char *Title)
   // need some good way of determining a good texture map size and
   // bit depth for the texture 'cache', since GL hides most of the details
   // from us.  Maybe we should just not worry about it... GJH
+
   CHK (texture_cache = new OpenGLTextureCache(1<<24,24));
   CHK (lightmap_cache = new OpenGLLightmapCache(1<<24,24));
   texture_cache->SetBilinearMapping (config->GetYesNo ("OpenGL", "ENABLE_BILINEARMAP", true));
+
+  // tells OpenGL driver we align texture data on byte boundaries, instead
+  // of perhaps word or dword boundaries
+  glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
+
+  // generate the exponential 1D texture for use in vertex fogging
+  // this texture holds a 'table' of alpha values forming an exponential
+  // curve, to use for generating exponential fog.
+  const unsigned int FOGTABLE_SIZE = 64;
+  unsigned char *transientfogdata = new unsigned char[FOGTABLE_SIZE*4];
+  for (unsigned int fogindex = 0; fogindex < FOGTABLE_SIZE; fogindex++)
+  {
+    transientfogdata[fogindex*4+0] = (unsigned char) 255;
+    transientfogdata[fogindex*4+1] = (unsigned char) 255;
+    transientfogdata[fogindex*4+2] = (unsigned char) 255;
+    double fogalpha = 
+    	(256 * ( 1.0 - exp ( - float(fogindex) *FOGTABLE_MAXDISTANCE / FOGTABLE_SIZE ) ) );
+    transientfogdata[fogindex*4+3] = (unsigned char) fogalpha;
+  }
+  // prevent weird effects when 0 distance fog wraps around to the
+  // 'max fog' texel
+  transientfogdata[(FOGTABLE_SIZE-1)*4+3] = 0;
+
+  // dump the fog table into an OpenGL texture for later user.
+  // The texture is FOGTABLE_SIZE texels wide and one texel high;
+  // we could use a 1D texture but some OpenGL drivers don't
+  // handle 1D textures very well
+  glGenTextures (1,&m_fogtexturehandle);
+  glBindTexture (GL_TEXTURE_2D, m_fogtexturehandle);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, FOGTABLE_SIZE, 1, 0,
+  		GL_RGBA, GL_UNSIGNED_BYTE, transientfogdata);
+  CHK (delete [] transientfogdata);
+
+  GLenum errtest;
+  errtest = glGetError();
+  if (errtest != GL_NO_ERROR)
+  {
+    SysPrintf (MSG_DEBUG_0,"openGL error string: %s\n",gluErrorString(errtest) );
+  }
 
   glClearColor (0.,0.,0.,0.);
   glClearDepth (-1.0);
@@ -278,7 +339,6 @@ STDMETHODIMP csGraphics3DOpenGL::Open (const char *Title)
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity();
 
-  glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
 
   FINAL_RELEASE (piGI);
   return S_OK;
@@ -303,6 +363,12 @@ csGraphics3DOpenGL::~csGraphics3DOpenGL ()
   CHK (delete texture_cache);
   CHK (delete lightmap_cache);
   CHK (delete txtmgr);
+
+  if (m_fogtexturehandle)
+  {
+    glDeleteTextures (1,&m_fogtexturehandle);
+    m_fogtexturehandle = 0;
+  }
 }
 
 STDMETHODIMP csGraphics3DOpenGL::SetDimensions (int width, int height)
@@ -824,7 +890,11 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
   // If there is vertex fog then we apply that last.
   if (poly.use_fog)
   {
-    glDisable (GL_TEXTURE_2D);
+/*    glDisable (GL_TEXTURE_2D);
+    glEnable (GL_TEXTURE_1D);*/
+    glBindTexture (GL_TEXTURE_2D, m_fogtexturehandle);
+    glTexEnvf  (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
     if (z_buf_mode == CS_ZBUF_FILL)
       glDisable(GL_DEPTH_TEST);
     else
@@ -848,12 +918,20 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
       //	P = texture color
       //	C = destination color
 
-      glColor4f (poly.fog_info [i].r, poly.fog_info [i].g, poly.fog_info [i].b,
-        poly.fog_info[i].intensity);
+      // specify fog vertex color
+      glColor3f (poly.fog_info [i].r, poly.fog_info [i].g, poly.fog_info [i].b);
 
+      // specify fog vertex alpha value using the fog table and fog distance
+      if (poly.fog_info[i].intensity > FOGTABLE_MAXDISTANCE * FOGTABLE_CLAMPVALUE)
+        glTexCoord1f (FOGTABLE_CLAMPVALUE);
+      else
+        glTexCoord1f (poly.fog_info[i].intensity/FOGTABLE_MAXDISTANCE);
+
+      // specify fog vertex location
       glVertex4f (poly.vertices [i].sx * sz, poly.vertices [i].sy * sz, -1.0, sz);
     }
     glEnd ();
+
   }
 
   FINAL_RELEASE (tex);
@@ -1000,18 +1078,16 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygonFX (G3DPolygonDPFX& poly)
   // If there is vertex fog then we apply that last.
   if (poly.use_fog)
   {
-    // Remember old values.
-/*    GLenum oldBlendDst, oldBlendSrc, oldDepthFunc;
-    glGetIntegerv (GL_BLEND_DST, (GLint *)&oldBlendDst);
-    glGetIntegerv (GL_BLEND_SRC, (GLint *)&oldBlendSrc);
-    glGetIntegerv (GL_DEPTH_FUNC, (GLint *)&oldDepthFunc);*/
-    // let OpenGL save old values for us instead, to prevent stalls in the
-    // graphics pipeline -GJH
+    // let OpenGL save old values for us
     // -GL_COLOR_BUFFER_BIT saves blend types among other things,
-    // -GL_DEPTH_BUFFER_BIT saves depth function
-    glPushAttrib (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // -GL_DEPTH_BUFFER_BIT saves depth test function
+    // -GL_TEXTURE_BIT saves current texture handle
+    glPushAttrib (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_TEXTURE_BIT);
 
-    glDisable (GL_TEXTURE_2D);
+    // we need to texture and blend, without vertex color interpolation
+    glEnable (GL_TEXTURE_2D);
+    glBindTexture (GL_TEXTURE_2D, m_fogtexturehandle);
+    glTexEnvf  (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glEnable (GL_BLEND);
     glDepthFunc (GL_EQUAL);
     glShadeModel (GL_SMOOTH);
@@ -1025,24 +1101,35 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygonFX (G3DPolygonDPFX& poly)
 
       // Formula for fog is:
       //    C = I * F + (1-I) * P
-      //	I = intensity = density * thickness
+      //	I = intensity = 1-exp(density * thickness)
       //	F = fog color
       //	P = texture color
       //	C = destination color
+      // the '1-exp' part is embodied in the fog texture; view the
+      // fog texture as a function producing the alpha value, with
+      // input (texture coordinate) being equal to I.
+
+      // specify fog vertex color
+      glColor3f (poly.fog_info[i].r, poly.fog_info[i].g, poly.fog_info[i].b);
+
+      // specify fog vertex transparency
       float I = poly.fog_info[i].intensity;
-      glColor4f (poly.fog_info[i].r, poly.fog_info[i].g, poly.fog_info[i].b, I);
+      if (I > FOGTABLE_MAXDISTANCE * FOGTABLE_CLAMPVALUE)
+        glTexCoord1f (FOGTABLE_CLAMPVALUE);
+      else
+        glTexCoord1f (I/FOGTABLE_MAXDISTANCE);
+
+      // specify fog vertex location
       glVertex3f (poly.vertices[i].sx,poly.vertices[i].sy,-poly.vertices[i].z);
     }
     glEnd ();
 
-    // Restore for next triangle
+    // Restore state (blend mode, texture handle, etc.) for next triangle
     glPopAttrib();
-    if (m_textured)
-      glEnable (GL_TEXTURE_2D);
+    if (!m_textured)
+      glDisable (GL_TEXTURE_2D);
     if (!m_gouraud)
       glShadeModel (GL_FLAT);
-/*    glBlendFunc(oldBlendSrc,oldBlendDst);
-    glDepthFunc(oldDepthFunc);*/
   }
 
   return S_OK;

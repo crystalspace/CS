@@ -98,6 +98,14 @@ protected:
    */
   bool do_extra_bright;
 
+  /// handle of a local 1D alpha-blend texture; this texture holds an
+  /// exponential alpha curve from 0 to 1.  Using this texture, you
+  /// can convert from a linear texture coordinate of 0-1 to an
+  /// exponential alpha-blend curve.  Such a mapping is useful for
+  /// drawing exponential fog polygons.  A value of 0 means the handle
+  /// is unallocated
+  GLuint m_fogtexturehandle;
+
   /// For debugging: the maximum number of polygons to draw in a frame.
   long dbg_max_polygons_to_draw;
   /// For debugging: the current polygon number.
@@ -121,6 +129,7 @@ public:
 
   /// The texture cache.
   OpenGLTextureCache* texture_cache;
+
   /// The lightmap cache.
   OpenGLLightmapCache* lightmap_cache;
 
