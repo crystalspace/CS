@@ -884,6 +884,7 @@ TYPEMAP_OUT_csWrapPtr
 
 %include "cstool/csview.h"
 %include "cstool/collider.h"
+%include "cstool/csfxscr.h"
 
 %define INTERFACE_POST(T)
 
@@ -1180,5 +1181,3 @@ uint _CS_FX_SETALPHA_INT (uint);
 #elif defined(SWIGJAVA)
 	%include "ivaria/javapost.i"
 #endif
-
-

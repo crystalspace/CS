@@ -29,6 +29,8 @@ chronological order.
 	  functions csGetResourceDir(), csGetAppDir(), and csGetAppPath().
 	- Marten fixed a crash in stencil shadow plugin. Added test to see that
 	  we don't try to create a shadow for a meshobject without polygons.
+	- Eric Sunshine added %include "cstool/csfxscr.h" to cspace.i.  Problem
+	  pointed out by James Thompson.
 9-oct-2003
 	- Jorrit added the following new functions to iThingFactoryState:
 	    - FindPolygonByName (const char*)
