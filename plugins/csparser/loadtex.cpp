@@ -95,7 +95,7 @@ csPtr<iTextureHandle> csLoader::LoadTexture (const char *fname, int Flags,
   csRef<iImage> Image = LoadImage (fname, Format);
   if (!Image)
   {
-    ReportError (
+    ReportWarning (
 	"crystalspace.maploader.parse.texture",
 	"Couldn't load image '%s', using checkerboard instead!",
 	fname);
