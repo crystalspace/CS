@@ -25,6 +25,7 @@
 #include "csutil/array.h"
 #include "csutil/parray.h"
 #include "csutil/hashmap.h"
+#include "csutil/blockallocator.h"
 #include "csutil/scf.h"
 #include "igeom/objmodel.h"
 #include "iengine/movable.h"
@@ -90,11 +91,10 @@ public:
   csRef<iMeshWrapper> mesh;
   csRef<iShadowCaster> caster;
 
-  csVisibilityObjectWrapper (csDynaVis* dynavis)
+  csVisibilityObjectWrapper ()
   {
     SCF_CONSTRUCT_IBASE (0);
     history = new csVisibilityObjectHistory ();
-    csVisibilityObjectWrapper::dynavis = dynavis;
     last_visible_vistestnr = 0;
     full_transform_identity = false;
   }
@@ -102,6 +102,10 @@ public:
   {
     history->DecRef ();
     SCF_DESTRUCT_IBASE();
+  }
+  void SetDynavis (csDynaVis* dynavis)
+  {
+    csVisibilityObjectWrapper::dynavis = dynavis;
   }
 
   void MarkInvisible (csVisReason reason)
@@ -153,11 +157,13 @@ public:
   bool vistest_objects_inuse;	// If true the vector is in use.
 
 private:
+  csBlockAllocator<csVisibilityObjectWrapper> visobj_wrappers;
+
   iObjectRegistry *object_reg;
   csRef<iBugPlug> bugplug;
   csKDTree* kdtree;
   csTiledCoverageBuffer* tcovbuf;
-  csPDelArray<csVisibilityObjectWrapper> visobj_vector;
+  csArray<csVisibilityObjectWrapper*> visobj_vector;
   csObjectModelManager* model_mgr;
   csWriteQueue* write_queue;
   int scr_width, scr_height;	// Screen dimensions.

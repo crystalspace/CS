@@ -178,7 +178,7 @@ static inline int dist_nowritequeue ()
   return 12+(csFastrand () & 0x7);
 }
 
-csDynaVis::csDynaVis (iBase *iParent)
+csDynaVis::csDynaVis (iBase *iParent) : visobj_wrappers (1000)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
@@ -224,6 +224,7 @@ csDynaVis::~csDynaVis ()
     kdtree->RemoveObject (visobj_wrap->child);
     visobj->DecRef ();
     visobj_vector.DeleteIndex (0);
+    visobj_wrappers.Free (visobj_wrap);
   }
   delete kdtree;
   delete tcovbuf;
@@ -309,8 +310,8 @@ void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
     }
   }
 #endif
-  csVisibilityObjectWrapper* visobj_wrap = new csVisibilityObjectWrapper (
-		  this);
+  csVisibilityObjectWrapper* visobj_wrap = visobj_wrappers.Alloc ();
+  visobj_wrap->SetDynavis (this);
   visobj_wrap->visobj = visobj;
   visobj->IncRef ();
   iMovable* movable = visobj->GetMovable ();
@@ -380,6 +381,7 @@ void csDynaVis::UnregisterVisObject (iVisibilityObject* visobj)
       visobj_wrap->dynavis = (csDynaVis*)0xdeadbeef;
 #endif
       visobj_vector.DeleteIndex (i);
+      visobj_wrappers.Free (visobj_wrap);
       return;
     }
   }

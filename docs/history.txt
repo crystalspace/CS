@@ -15,6 +15,8 @@ chronological order.
 	  frustum culling. Otherwise Dynavis would sometimes cull wrong because
 	  objects outside of frustum kept contributing to culling. This
 	  could happen if you have sudden changes in camera position.
+	- Jorrit changed Dynavis to also use the block allocator inside
+	  Dynavis.
 16-Nov-2003
 	- Eric Sunshine fixed bug in make and Jam `install' targets where they
 	  neglected to install the generated volatile.h if the build directory
