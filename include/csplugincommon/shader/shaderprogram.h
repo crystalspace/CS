@@ -113,6 +113,11 @@ protected:
   csRef<iDocumentNode> programNode;
   csRef<iFile> programFile;
   csString programFileName;
+  /**
+   * Whether the shader program should report additional information during
+   * runtime.
+   */
+  bool doVerbose;
 
   csShaderVariableContext svcontext;
 

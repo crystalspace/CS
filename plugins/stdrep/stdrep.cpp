@@ -405,7 +405,7 @@ bool csReporterListener::HandleEvent (iEvent& event)
                 }
                 str.Format ("  %s", msg.GetData ());
                 h++;
-                l--;
+                if (l > 0) l--;
               }
               str.Format ("  %s", msg.GetData ());
               g2d->DrawBox (4, 4+h*(fh+6), sw-8, fh+6, bg[c]);

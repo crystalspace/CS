@@ -165,7 +165,7 @@ bool csShaderGLAFP::LoadProgramStringToGL ()
   }
   else
   {
-    if ((programErrorString != 0) && (*programErrorString != 0))
+    if (doVerbose && (programErrorString != 0) && (*programErrorString != 0))
     {
       Report (CS_REPORTER_SEVERITY_WARNING, 
 	"Warning for fragment program \"%s\": '%s'", description, 

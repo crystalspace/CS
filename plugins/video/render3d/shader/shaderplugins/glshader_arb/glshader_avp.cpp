@@ -169,7 +169,7 @@ bool csShaderGLAVP::LoadProgramStringToGL ()
   }
   else
   {
-    if (/*doVerbose && */ (programErrorString != 0) 
+    if (doVerbose && (programErrorString != 0) 
       && (*programErrorString != 0))
     {
       Report (CS_REPORTER_SEVERITY_WARNING, 

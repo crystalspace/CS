@@ -85,6 +85,15 @@ csGLShader_CG::~csGLShader_CG()
 
 void csGLShader_CG::ErrorCallback ()
 {
+  bool doVerbose;
+  csRef<iVerbosityManager> verbosemgr (
+    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+  if (verbosemgr) 
+    doVerbose = verbosemgr->CheckFlag ("renderer", "shader");
+  else
+    doVerbose = false;
+  if (!doVerbose) return;
+
   CGerror error = cgGetError();
   csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
     "crystalspace.graphics3d.shader.glcg",

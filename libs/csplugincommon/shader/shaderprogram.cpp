@@ -23,6 +23,7 @@
 #include "csutil/util.h"
 #include "csutil/xmltiny.h"
 
+#include "iutil/verbositymanager.h"
 #include "ivaria/reporter.h"
 
 #include "csplugincommon/shader/shaderprogram.h"
@@ -44,6 +45,13 @@ csShaderProgram::csShaderProgram (iObjectRegistry* objectReg)
   synsrv = CS_QUERY_REGISTRY (objectReg, iSyntaxService);
   strings = CS_QUERY_REGISTRY_TAG_INTERFACE (objectReg, 
     "crystalspace.shared.stringset", iStringSet);
+  
+  csRef<iVerbosityManager> verbosemgr (
+    CS_QUERY_REGISTRY (objectReg, iVerbosityManager));
+  if (verbosemgr) 
+    doVerbose = verbosemgr->CheckFlag ("renderer", "shader");
+  else
+    doVerbose = false;
 }
 
 csShaderProgram::~csShaderProgram ()

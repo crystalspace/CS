@@ -185,14 +185,14 @@ void csConsoleOutput::PutTextV (const char *text2, va_list args)
 {
   csScopedMutexLock lock (mutex);
 
-  int i;
+  size_t i;
   csString *curline = 0;
 
-  char text[4096];
-  vsprintf (text, text2, args);
+  csString text;
+  text.FormatV (text2, args);
 
   // Scan the string for escape characters
-  for (i = 0; text && text [i] != 0; i++)
+  for (i = 0; i < text.Length(); i++)
   {
     if (clear_input)
     {

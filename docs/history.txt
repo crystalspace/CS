@@ -22,6 +22,10 @@ chronological order.
 	  csShaderVariable::operator=().
 	- res fixed some more VC7 compilation warnings.
 	- res added a few new extensions to the GL extension manager.
+	- res made the ARB and Cg shader plugins only report shader errors in
+	  -verbose mode.
+	- res fixed an underflow of a size_t in stdrep.
+	- res fixed a buffer overflow in csconout.
 27-Mar-2005
 	- Eric Sunshine added FStripCommon to jamcompatibility.jam since Jam
 	  2.4 lacks it and it is needed by StripCommon in helper.jam.
