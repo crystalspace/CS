@@ -96,6 +96,9 @@ protected:
   /// A number that is incremented if the texture is modified (proc texture).
   uint32 update_number;
 
+  /// If true then the palette of the canvas is being initialized.
+  bool is_palette_init;
+
   /**
    * If the following flag is true then this texture uses a uniform
    * 3:3:2 palette. This is used when the texture has been rendered
@@ -117,6 +120,9 @@ protected:
 
   /// the texture manager
   csTextureManagerSoftware *texman;
+
+  /// Reference to internal canvas.
+  csRef<iGraphics2D> canvas;
 
 public:
   /// Create the mipmapped texture object
@@ -169,9 +175,20 @@ public:
   void UpdateTexture () { update_number++; }
 
   /**
+   * Change a palette entry. This is called from within the callback
+   * from the canvas associated with this texture.
+   */
+  void ChangePaletteEntry (int idx, int r, int g, int b);
+
+  /**
    * Get the texture update number.
    */
   uint32 GetUpdateNumber () const { return update_number; }
+
+  /**
+   * Get canvas for texture.
+   */
+  virtual iGraphics2D* GetCanvas ();
 };
 
 /**

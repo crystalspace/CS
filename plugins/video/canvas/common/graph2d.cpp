@@ -138,6 +138,50 @@ bool csGraphics2D::Initialize (iObjectRegistry* r)
   return true;
 }
 
+bool csGraphics2D::Initialize (iObjectRegistry* r, int width, int height,
+	int depth, void* memory, iOffscreenCanvasCallback* ofscb)
+{
+  CS_ASSERT (r != NULL);
+  object_reg = r;
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  // Get the system parameters
+  Width = width;
+  Height = height;
+  Depth = depth;
+  FullScreen = false;
+  Memory = (unsigned char*)memory;
+
+  // Get the font server: A missing font server is NOT an error
+  if (!FontServer)
+  {
+    FontServer = CS_QUERY_REGISTRY (object_reg, iFontServer);
+  }
+
+  Palette = new csRGBpixel [256];
+  pfmt.PalEntries = 256;
+  pfmt.PixelBytes = 1;
+  // Initialize pointers to default drawing methods
+  _DrawPixel = DrawPixel8;
+  _WriteString = WriteString8;
+  _WriteStringBaseline = WriteStringBaseline8;
+  _GetPixelAt = GetPixelAt8;
+  // Mark all slots in palette as free
+  int i;
+  for (i = 0; i < 256; i++)
+  {
+    PaletteAlloc [i] = false;
+    Palette [i].red = 0;
+    Palette [i].green = 0;
+    Palette [i].blue = 0;
+  }
+
+  scfiEventHandler = NULL;
+
+  csGraphics2D::ofscb = ofscb;
+
+  return true;
+}
+
 void csGraphics2D::ChangeDepth (int d)
 {
   if (Depth == d) return;
@@ -215,6 +259,7 @@ void csGraphics2D::FinishDraw ()
 {
   if (FrameBufferLocked)
     FrameBufferLocked--;
+  if (ofscb) ofscb->FinishDraw (this);
 }
 
 void csGraphics2D::Clear(int color)
@@ -690,6 +735,7 @@ void csGraphics2D::SetRGB (int i, int r, int g, int b)
   Palette[i].green = g;
   Palette[i].blue = b;
   PaletteAlloc[i] = true;
+  if (ofscb) ofscb->SetRGB (this, i, r, g, b);
 }
 
 unsigned char *csGraphics2D::GetPixelAt8 (csGraphics2D *This, int x, int y)
@@ -842,6 +888,76 @@ bool csGraphics2D::SetMousePosition (int x, int y)
 bool csGraphics2D::SetMouseCursor (csMouseCursorID iShape)
 {
   return (iShape == csmcArrow);
+}
+
+
+/**
+ * A nice observation about the properties of the human eye:
+ * Let's call the largest R or G or B component of a color "main".
+ * If some other color component is much smaller than the main component,
+ * we can change it in a large range without noting any change in
+ * the color itself. Examples:
+ * (128, 128, 128) - we note a change in color if we change any component
+ * by 4 or more.
+ * (192, 128, 128) - we should change of G or B components by 8 to note any
+ * change in color.
+ * (255, 128, 128) - we should change of G or B components by 16 to note any
+ * change in color.
+ * (255, 0, 0) - we can change any of G or B components by 32 and we
+ * won't note any change.
+ * Thus, we use this observation to create a palette that contains more
+ * useful colors. We implement here a function to evaluate the "distance"
+ * between two colors. tR,tG,tB define the color we are looking for (target);
+ * sR, sG, sB define the color we're examining (source).
+ */
+static inline int rgb_dist (int tR, int tG, int tB, int sR, int sG, int sB)
+{
+  register int max = MAX (tR, tG);
+  max = MAX (max, tB);
+
+  sR -= tR; sG -= tG; sB -= tB;
+
+  return R_COEF_SQ * sR * sR * (32 - ((max - tR) >> 3)) +
+         G_COEF_SQ * sG * sG * (32 - ((max - tG) >> 3)) +
+         B_COEF_SQ * sB * sB * (32 - ((max - tB) >> 3));
+}
+
+int csGraphics2D::FindRGBPalette (int r, int g, int b)
+{
+  // @@@ Not a very fast routine!
+  int i;
+  int best_dist = 1000000;
+  int best_idx = -1;
+  for (i = 0 ; i < 256 ; i++)
+    if (PaletteAlloc[i])
+    {
+      int dist = rgb_dist (r, g, b, Palette[i].red, Palette[i].green,
+      	Palette[i].blue);
+      if (dist == 0) return i;
+      if (dist < best_dist)
+      {
+        best_dist = dist;
+	best_idx = i;
+      }
+    }
+  return best_idx;
+}
+
+csPtr<iGraphics2D> csGraphics2D::CreateOffscreenCanvas (
+  	void* memory, int width, int height, int depth,
+	iOffscreenCanvasCallback* ofscb)
+{
+  csGraphics2D* g2d = new csGraphics2D (NULL);
+  if (g2d->Initialize (object_reg, width, height, depth, memory,
+  	ofscb) && g2d->Open ())
+  {
+    return csPtr<iGraphics2D> (g2d);
+  }
+  else
+  {
+    delete g2d;
+    return NULL;
+  }
 }
 
 //---------------------------------------------------------------------------

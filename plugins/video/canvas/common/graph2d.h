@@ -44,22 +44,22 @@ struct iPluginManager;
 class csGraphics2D : public iGraphics2D
 {
 public:
-  /// The configuration file
+  /// The configuration file.
   csConfigAccess config;
 
-  /// The clipping rectangle
+  /// The clipping rectangle.
   int ClipX1, ClipX2, ClipY1, ClipY2;
 
-  /// The pixel format
+  /// The pixel format.
   csPixelFormat pfmt;
 
-  /// Most systems have a pointer to (real or pseudo) video RAM
+  /// Most systems have a pointer to (real or pseudo) video RAM.
   unsigned char *Memory;
 
   /// Open/Close state.
   bool is_open;
 
-  /// Keep a array of Y*width to avoid multiplications
+  /// Keep a array of Y*width to avoid multiplications.
   int *LineAddress;
 
   /// The object registry.
@@ -67,21 +67,27 @@ public:
   /// The plugin manager.
   csRef<iPluginManager> plugin_mgr;
 
+  /**
+   * Callback to use for informing an external agent when several
+   * canvas operations have occured.
+   */
+  csRef<iOffscreenCanvasCallback> ofscb;
+
   /// The font server
   csRef<iFontServer> FontServer;
 
   /// Pointer to a title.
   char* win_title;
 
-  /// The width, height and depth of visual
+  /// The width, height and depth of visual.
   int Width, Height, Depth;
-  /// True if visual is full-screen
+  /// True if visual is full-screen.
   bool FullScreen;
-  /// Whether to allow resizing
+  /// Whether to allow resizing.
   bool AllowResizing;
-  /// 256-color palette
+  /// 256-color palette.
   csRGBpixel *Palette;
-  /// true if some palette entry is already allocated
+  /// true if some palette entry is already allocated.
   bool PaletteAlloc[256];
   /**
    * The counter that is incremented inside BeginDraw and decremented in
@@ -92,6 +98,16 @@ public:
    * Change the depth of the canvas.
    */
   virtual void ChangeDepth (int d);
+
+private:
+  /// Find a color in palette mode.
+  int FindRGBPalette (int r, int g, int b);
+  /**
+   * Initialize the canvas for offscreen rendering.
+   * Used by CreateOffscreenCanvas().
+   */
+  bool Initialize (iObjectRegistry* r, int width, int height,
+	int depth, void* memory, iOffscreenCanvasCallback* ofscb);
 
 public:
   SCF_DECLARE_IBASE;
@@ -125,7 +141,7 @@ public:
   virtual void FinishDraw ();
 
   /// (*) Flip video pages (or dump backbuffer into framebuffer).
-  virtual void Print (csRect *area = NULL) = 0;
+  virtual void Print (csRect *area = NULL) { }
 
   /// Get active videopage number (starting from zero)
   virtual int GetPage ();
@@ -165,6 +181,8 @@ public:
     if (r < 0) r = 0; else if (r > 255) r = 255;
     if (g < 0) g = 0; else if (g > 255) g = 255;
     if (b < 0) b = 0; else if (b > 255) b = 255;
+    if (Depth == 8)
+      return FindRGBPalette (r, g, b);
     return
       ((r >> (8 - pfmt.RedBits))   << pfmt.RedShift) |
       ((g >> (8 - pfmt.GreenBits)) << pfmt.GreenShift) |
@@ -224,9 +242,13 @@ public:
   virtual bool SetGamma (float /*gamma*/) { return false; }
   virtual float GetGamma () const { return 1.0; }
 
+  virtual csPtr<iGraphics2D> CreateOffscreenCanvas (
+  	void* memory, int width, int height, int depth,
+	iOffscreenCanvasCallback* ofscb);
+
 private:
     /// helper function for ClipLine()
-  bool CLIPt(float denom, float num, float& tE, float& tL);
+  bool CLIPt (float denom, float num, float& tE, float& tL);
 public:
 
   /**
@@ -333,8 +355,8 @@ protected:
   /// Write a character in 8-bit modes
   static void WriteString8 (csGraphics2D *This, iFont *font, int x, int y,
     int fg, int bg, const char *text);
-  static void WriteStringBaseline8 (csGraphics2D *This, iFont *font, int x, int y,
-    int fg, int bg, const char *text);
+  static void WriteStringBaseline8 (csGraphics2D *This, iFont *font,
+    int x, int y, int fg, int bg, const char *text);
   /// Return address of a 8-bit pixel
   static unsigned char *GetPixelAt8 (csGraphics2D *This, int x, int y);
 
@@ -343,8 +365,8 @@ protected:
   /// Write a character in 16-bit modes
   static void WriteString16 (csGraphics2D *This, iFont *font, int x, int y,
     int fg, int bg, const char *text);
-  static void WriteStringBaseline16 (csGraphics2D *This, iFont *font, int x, int y,
-    int fg, int bg, const char *text);
+  static void WriteStringBaseline16 (csGraphics2D *This, iFont *font,
+    int x, int y, int fg, int bg, const char *text);
   /// Return address of a 16-bit pixel
   static unsigned char *GetPixelAt16 (csGraphics2D *This, int x, int y);
 
@@ -353,8 +375,8 @@ protected:
   /// Write a character in 32-bit modes
   static void WriteString32 (csGraphics2D *This, iFont *font, int x, int y,
     int fg, int bg, const char *text);
-  static void WriteStringBaseline32 (csGraphics2D *This, iFont *font, int x, int y,
-    int fg, int bg, const char *text);
+  static void WriteStringBaseline32 (csGraphics2D *This, iFont *font,
+    int x, int y, int fg, int bg, const char *text);
   /// Return address of a 32-bit pixel
   static unsigned char *GetPixelAt32 (csGraphics2D *This, int x, int y);
 

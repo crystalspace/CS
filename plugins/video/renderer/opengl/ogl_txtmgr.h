@@ -58,12 +58,15 @@ public:
  */
 class csTextureHandleOpenGL : public csTextureHandle
 {
- protected:
+protected:
   csTextureManagerOpenGL *txtmgr;
   int formatidx;
   GLenum sourceFormat, targetFormat;
   GLenum sourceType; // what size does each fragment have? e.g. GL_UNSIGNED_BYTE
   int bpp;
+  /// Reference to internal canvas.
+  csRef<iGraphics2D> canvas;
+
   bool FindFormatType ();
   bool transform (iImage *Image, csTextureOpenGL *tex);
   void ShowFormat ();
@@ -130,6 +133,13 @@ public:
   GLenum TargetFormat (){return targetFormat;}
 
   iImage *get_image (){return image;}
+
+  /**
+   * Get canvas for texture.
+   */
+  virtual iGraphics2D* GetCanvas ();
+
+  void UpdateTexture ();
 };
 
 /**

@@ -24,9 +24,10 @@
 #include "csutil/scf.h"
 #include "cstypes.h"
 
+struct iGraphics2D;
 struct iGraphics3D;
 
-SCF_VERSION (iTextureHandle, 2, 2, 1);
+SCF_VERSION (iTextureHandle, 2, 2, 2);
 
 /**
  * A texture handle as returned by iTextureManager.
@@ -97,6 +98,13 @@ struct iTextureHandle : public iBase
    * before using any texture.
    */
   virtual void Prepare () = 0;
+
+  /**
+   * Get a canvas instance which is suitable for rendering on this
+   * texture. Note that it is not allowed to change the palette of
+   * the returned canvas.
+   */
+  virtual iGraphics2D* GetCanvas () = 0;
 };
 
 #endif // __IVIDEO_TEXTURE_H__

@@ -489,7 +489,7 @@ void csTextureHandleOpenGL::InitTexture (csTextureManagerOpenGL *texman,
   // to be powers of 2.
   AdjustSizePo2 ();
 
-  // Determine the format and type of the source we gonna tranform the data to
+  // Determine the format and type of the source we gonna tranform the data to.
   FindFormatType ();
   CreateMipmaps ();
 }
@@ -603,6 +603,55 @@ bool csTextureHandleOpenGL::GetMipMapDimensions (int mipmap, int &w, int &h)
 void csTextureHandleOpenGL::Prepare ()
 {
   InitTexture (txtmgr, &txtmgr->pfmt);
+}
+
+class csOFSCbOpenGL : public iOffscreenCanvasCallback
+{
+private:
+  csTextureHandleOpenGL* txt;
+
+public:
+  csOFSCbOpenGL (csTextureHandleOpenGL* txt)
+  {
+    SCF_CONSTRUCT_IBASE (NULL);
+    csOFSCbOpenGL::txt = txt;
+  }
+  virtual ~csOFSCbOpenGL ()
+  {
+  }
+  SCF_DECLARE_IBASE;
+  virtual void FinishDraw (iGraphics2D*)
+  {
+    txt->UpdateTexture ();
+  }
+  virtual void SetRGB (iGraphics2D*, int, int, int, int)
+  {
+  }
+};
+
+
+SCF_IMPLEMENT_IBASE(csOFSCbOpenGL)
+  SCF_IMPLEMENTS_INTERFACE(iOffscreenCanvasCallback)
+SCF_IMPLEMENT_IBASE_END
+
+iGraphics2D* csTextureHandleOpenGL::GetCanvas ()
+{
+  if (!canvas)
+  {
+    csOFSCbOpenGL* ofscb = new csOFSCbOpenGL (this);
+    csTextureOpenGL *t = vTex[0];
+    canvas = txtmgr->G3D->GetDriver2D ()->CreateOffscreenCanvas (
+  	t->get_image_data (), t->get_width (), t->get_height (), 32,
+	ofscb);
+    ofscb->DecRef ();
+  }
+  return canvas;
+}
+
+void csTextureHandleOpenGL::UpdateTexture ()
+{
+  if (G3D->texture_cache)
+    G3D->texture_cache->Uncache (this);
 }
 
 //---------------------------------------------------------------------------

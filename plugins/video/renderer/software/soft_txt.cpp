@@ -35,44 +35,6 @@
 #include "csgfx/xorpat.h"
 #include "soft_g3d.h"
 
-#define RESERVED_COLOR(c) ((c == 0) || (c == 255))
-
-#define CLIP_RGB \
-  if (r < 0) r = 0; else if (r > 255) r = 255; \
-  if (g < 0) g = 0; else if (g > 255) g = 255; \
-  if (b < 0) b = 0; else if (b > 255) b = 255;
-
-/**
- * A nice observation about the properties of the human eye:
- * Let's call the largest R or G or B component of a color "main".
- * If some other color component is much smaller than the main component,
- * we can change it in a large range without noting any change in
- * the color itself. Examples:
- * (128, 128, 128) - we note a change in color if we change any component
- * by 4 or more.
- * (192, 128, 128) - we should change of G or B components by 8 to note any
- * change in color.
- * (255, 128, 128) - we should change of G or B components by 16 to note any
- * change in color.
- * (255, 0, 0) - we can change any of G or B components by 32 and we
- * won't note any change.
- * Thus, we use this observation to create a palette that contains more
- * useful colors. We implement here a function to evaluate the "distance"
- * between two colors. tR,tG,tB define the color we are looking for (target);
- * sR, sG, sB define the color we're examining (source).
- */
-static inline int rgb_dist (int tR, int tG, int tB, int sR, int sG, int sB)
-{
-  register int max = MAX (tR, tG);
-  max = MAX (max, tB);
-
-  sR -= tR; sG -= tG; sB -= tB;
-
-  return R_COEF_SQ * sR * sR * (32 - ((max - tR) >> 3)) +
-         G_COEF_SQ * sG * sG * (32 - ((max - tG) >> 3)) +
-         B_COEF_SQ * sB * sB * (32 - ((max - tB) >> 3));
-}
-
 //----------------------------------------------- csTextureHandleSoftware ---//
 
 csTextureHandleSoftware::csTextureHandleSoftware (
@@ -84,7 +46,8 @@ csTextureHandleSoftware::csTextureHandleSoftware (
     AdjustSizePo2 ();
   (this->texman = texman)->IncRef ();
   use_332_palette = false;
-  update_number = -1;
+  update_number = ~0;
+  is_palette_init = false;
 }
 
 csTextureHandleSoftware::~csTextureHandleSoftware ()
@@ -309,6 +272,91 @@ void csTextureHandleSoftware::Prepare ()
 {
   CreateMipmaps ();
   remap_texture ();
+}
+
+class csOFSCbSoftware : public iOffscreenCanvasCallback
+{
+private:
+  csTextureHandleSoftware* txt;
+
+public:
+  csOFSCbSoftware (csTextureHandleSoftware* txt)
+  {
+    SCF_CONSTRUCT_IBASE (NULL);
+    csOFSCbSoftware::txt = txt;
+  }
+  virtual ~csOFSCbSoftware ()
+  {
+  }
+  SCF_DECLARE_IBASE;
+  virtual void FinishDraw (iGraphics2D*)
+  {
+    txt->UpdateTexture ();
+  }
+  virtual void SetRGB (iGraphics2D*, int idx, int r, int g, int b)
+  {
+    txt->ChangePaletteEntry (idx, r, g, b);
+  }
+};
+
+
+SCF_IMPLEMENT_IBASE(csOFSCbSoftware)
+  SCF_IMPLEMENTS_INTERFACE(iOffscreenCanvasCallback)
+SCF_IMPLEMENT_IBASE_END
+
+iGraphics2D* csTextureHandleSoftware::GetCanvas ()
+{
+  if (!canvas)
+  {
+    csOFSCbSoftware* ofscb = new csOFSCbSoftware (this);
+    csTextureSoftware *t = (csTextureSoftware *)tex [0];
+    canvas = texman->G3D->GetDriver2D ()->CreateOffscreenCanvas (
+  	t->bitmap, t->get_width (), t->get_height (), 8,
+	ofscb);
+    ofscb->DecRef ();
+    int i;
+    is_palette_init = true;
+    for (i = 0 ; i < palette_size ; i++)
+    {
+      canvas->SetRGB (i, palette[i].red, palette[i].green,
+      	palette[i].blue);
+    }
+    is_palette_init = false;
+  }
+  return canvas;
+}
+
+void csTextureHandleSoftware::ChangePaletteEntry (int idx, int r, int g, int b)
+{
+  if (is_palette_init) return;
+  if (idx >= palette_size)
+  {
+    void* p2g;
+    if (texman->pfmt.PixelBytes == 2)
+    {
+      p2g = new uint8 [256 * sizeof (uint16)];
+      memcpy (p2g, pal2glob, sizeof (uint16)*palette_size);
+    }
+    else
+    {
+      p2g = new uint8 [256 * sizeof (uint32)];
+      memcpy (p2g, pal2glob, sizeof (uint32)*palette_size);
+    }
+    pal2glob = p2g;
+    palette_size = 256;
+  }
+
+  palette[idx].red = r;
+  palette[idx].green = g;
+  palette[idx].blue = b;
+  if (texman->pfmt.PixelBytes == 2)
+  {
+    ((uint16*)pal2glob)[idx] = texman->encode_rgb (r, g, b);
+  }
+  else
+  {
+    ((uint32*)pal2glob)[idx] = texman->encode_rgb (r, g, b);
+  }
 }
 
 //----------------------------------------------- csTextureManagerSoftware ---//

@@ -31,6 +31,7 @@ class csProcFire : public csProcTexture
 private:
   /// Palette.
   unsigned char* palette;
+  int* palette_idx;
   /// number of colours in palette
   int palsize;
 

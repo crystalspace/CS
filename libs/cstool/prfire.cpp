@@ -27,11 +27,14 @@
 
 #include "cstool/prfire.h"
 
+#define NEW 0
+
 /// the implementation of the plasma texture
 csProcFire::csProcFire () : csProcTexture()
 {
   palsize = 0;
   palette = NULL;
+  palette_idx = NULL;
   image = 0;
   mat_w = 128;
   mat_h = 128;
@@ -52,6 +55,7 @@ csProcFire::csProcFire () : csProcTexture()
 csProcFire::~csProcFire ()
 {
   delete[] palette;
+  delete[] palette_idx;
   delete[] fireline;
   delete[] image;
 }
@@ -63,8 +67,8 @@ bool csProcFire::PrepareAnim ()
   MakePalette (256);
   fireline = new uint8[mat_w];
   image = new uint8[mat_w*mat_h];
-  memset(image, 0, mat_w*mat_h);
-  memset(fireline, 0, mat_w);
+  memset (image, 0, mat_w*mat_h);
+  memset (fireline, 0, mat_w);
 
   int start = GetRandom (mat_w);
 
@@ -80,10 +84,10 @@ uint8& csProcFire::GetFireLine(int x)
   if (x < 0)
     x += mat_w;
   x %= mat_w;
-  return fireline[ x ];
+  return fireline[x];
 }
 
-void csProcFire::SetHSI(csColor& col, float H, float S, float I)
+void csProcFire::SetHSI (csColor& col, float H, float S, float I)
 {
   /// from Hue Saturation Intensity to Red Green Blue
   float Temp = H;
@@ -98,13 +102,20 @@ void csProcFire::MakePalette (int max)
 {
   int i;
   delete[] palette;
+  delete[] palette_idx;
   palsize = max;
   palette = new unsigned char [palsize*4];
+  palette_idx = new int [palsize];
   memset (palette, 0, 4*palsize);
+  memset (palette_idx, 0, palsize*sizeof (int));
   /// fill the palette
   int maxcolours = palsize/2;
   csColor col;
   int r,g,b;
+#if NEW
+  g2d = tex->GetTextureHandle ()->GetCanvas ();
+  bool palette_mode = g2d->GetPixelBytes () == 1;
+#endif
   for (i = 0; i < maxcolours; i++)
   {
     float H = 4.6f - 1.5f * float(i) / float(maxcolours);
@@ -120,6 +131,17 @@ void csProcFire::MakePalette (int max)
     palette[i*4+0] = r;
     palette[i*4+1] = g;
     palette[i*4+2] = b;
+#if NEW
+    if (palette_mode)
+    {
+      palette_idx[i] = i;
+      g2d->SetRGB (i, r, g, b);
+    }
+    else
+    {
+      palette_idx[i] = g2d->FindRGB (r, g, b);
+    }
+#endif
   }
   //// guess rest of colours
   float inc = 512.0f / float (palsize - maxcolours);
@@ -135,6 +157,17 @@ void csProcFire::MakePalette (int max)
     palette[i*4+0] = r;
     palette[i*4+1] = g;
     palette[i*4+2] = b;
+#if NEW
+    if (palette_mode)
+    {
+      palette_idx[i] = i;
+      g2d->SetRGB (i, r, g, b);
+    }
+    else
+    {
+      palette_idx[i] = g2d->FindRGB (r, g, b);
+    }
+#endif
   }
 }
 
@@ -211,6 +244,20 @@ void csProcFire::Animate (csTicks /*current_time*/)
     fireline[x] = tot / (2*sm+1);
   }
 
+#if NEW
+  g2d = tex->GetTextureHandle ()->GetCanvas ();
+  if (!g2d->BeginDraw ()) return;
+  /// draw firetexture
+  im = image;
+  for (y = 0 ; y < mat_h ; y++)
+    for (x = 0 ; x < mat_w ; x++)
+    {
+      int col = *im++;
+      col = col * palsize / 256;
+      g2d->DrawPixel (x, y, palette_idx[col]);
+    }
+  g2d->FinishDraw ();
+#else
   g3d->SetRenderTarget (tex->GetTextureHandle ());
   if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
   /// draw firetexture
@@ -231,5 +278,6 @@ void csProcFire::Animate (csTicks /*current_time*/)
   g2d->Blit (0, 0, mat_w, mat_h, data);
   delete[] data;
   g3d->FinishDraw ();
+#endif
 }
 

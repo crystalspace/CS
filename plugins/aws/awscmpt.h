@@ -203,6 +203,11 @@ public:
     virtual void Print (csRect *area = NULL);
     virtual bool SetGamma (float) { return false; }
     virtual float GetGamma () const { return 1.0; }
+    virtual csPtr<iGraphics2D> CreateOffscreenCanvas (
+    	void*, int, int, int, iOffscreenCanvasCallback*)
+    {
+      return NULL;
+    }
   };
 
   class awscG3D : public iGraphics3D

@@ -34,6 +34,7 @@ struct iImage;
 struct iFontServer;
 struct iFont;
 struct iNativeWindow;
+struct iGraphics2D;
 
 struct csPixelCoord
 {
@@ -111,7 +112,22 @@ struct csImageArea
   { x = sx; y = sy; w = sw; h = sh; data = NULL; }
 };
 
-SCF_VERSION (iGraphics2D, 2, 3, 0);
+SCF_VERSION (iOffscreenCanvasCallback, 1, 0, 0);
+
+/**
+ * When you create an offscreen canvas (CreateOffscreenCanvas()) then
+ * you can use this callback to get informed when the texture has
+ * been modified (FinishDraw() called) or a palette entry is modified.
+ */
+struct iOffscreenCanvasCallback : public iBase
+{
+  /// FinishDraw has been called.
+  virtual void FinishDraw (iGraphics2D* canvas) = 0;
+  /// Palette entry has been modified.
+  virtual void SetRGB (iGraphics2D* canvas, int idx, int r, int g, int b) = 0;
+};
+
+SCF_VERSION (iGraphics2D, 2, 3, 1);
 
 /**
  * This is the interface for 2D renderer. The 2D renderer is responsible
@@ -323,6 +339,18 @@ struct iGraphics2D : public iBase
    * Get gamma value.
    */
   virtual float GetGamma () const = 0;
+
+  /**
+   * Create an off-screen canvas so you can render on a given memory
+   * area. If depth==8 then the canvas will use palette mode. In that
+   * case you can do SetRGB() to initialize the palette.
+   * The callback interface (if given) is used to communicate from the
+   * canvas back to the caller. You can use this to detect when the
+   * texture data has changed for example.
+   */
+  virtual csPtr<iGraphics2D> CreateOffscreenCanvas (
+  	void* memory, int width, int height, int depth,
+	iOffscreenCanvasCallback* ofscb) = 0;
 };
 
 #endif // __IVIDEO_GRAPH2D_H__
