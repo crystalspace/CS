@@ -1,6 +1,6 @@
 %define name    crystalspace
 %define version 0.99
-%define release 9
+%define release 10
 %define prefix	/usr
 
 %define with_DEBUG 0
@@ -79,76 +79,39 @@ make all
 DESTDIR=%{buildroot} make install
 
 %post -n %{name}-utils
-%{prefix}/bin/cslight -canvas=null -video=null flarge
-%{prefix}/bin/cslight -canvas=null -video=null partsys
+%{_bindir}/cslight -canvas=null -video=null flarge
+%{_bindir}/cslight -canvas=null -video=null partsys
 
 %clean
 rm -rf "$RPM_BUILD_ROOT"
 
-#---------------------MAIN-------------------------
 %files -n %{name}
 %defattr(-,root,root)
 
-%{_sysconfdir}/%{name}/asciiart.cfg
-%{_sysconfdir}/%{name}/autoexec.cfg
-%{_sysconfdir}/%{name}/bugplug.cfg
-%{_sysconfdir}/%{name}/bugplug.key
-%{_sysconfdir}/%{name}/csws.cfg
-%{_sysconfdir}/%{name}/dynavis.cfg
-%{_sysconfdir}/%{name}/engine.cfg
-%{_sysconfdir}/%{name}/fancycon.cfg
-%{_sysconfdir}/%{name}/fontplex.cfg
-%{_sysconfdir}/%{name}/freetype.cfg
-%{_sysconfdir}/%{name}/gldrivers.xml
-%{_sysconfdir}/%{name}/joystick.cfg
-%{_sysconfdir}/%{name}/macosx.cfg
-%{_sysconfdir}/%{name}/mouse.cfg
-%{_sysconfdir}/%{name}/movierecorder.cfg
-%{_sysconfdir}/%{name}/null3d.cfg
-%{_sysconfdir}/%{name}/opengl.cfg
-%{_sysconfdir}/%{name}/r3dopengl.cfg
-%{_sysconfdir}/%{name}/shadermgr.cfg
-%{_sysconfdir}/%{name}/simpcon.cfg
-%{_sysconfdir}/%{name}/soft3d.cfg
-%{_sysconfdir}/%{name}/sound.cfg
-%{_sysconfdir}/%{name}/sprcal3d.cfg
-%{_sysconfdir}/%{name}/standardcon.cfg
-%{_sysconfdir}/%{name}/system.cfg
-%{_sysconfdir}/%{name}/thing.cfg
-%{_sysconfdir}/%{name}/vfs.cfg
-%{_sysconfdir}/%{name}/video.cfg
+%{_sysconfdir}/%{name}/*
+%exclude %{_sysconfdir}/%{name}/awstest.cfg
+%exclude %{_sysconfdir}/%{name}/awstut.cfg
+%exclude %{_sysconfdir}/%{name}/csbumptest.cfg
+%exclude %{_sysconfdir}/%{name}/csdemo.cfg
+%exclude %{_sysconfdir}/%{name}/cswstest.cfg
+%exclude %{_sysconfdir}/%{name}/g2dtest.cfg
+%exclude %{_sysconfdir}/%{name}/heightmapgen.cfg
+%exclude %{_sysconfdir}/%{name}/lighter.xml
+%exclude %{_sysconfdir}/%{name}/map2cs.cfg
+%exclude %{_sysconfdir}/%{name}/walktest.cfg
+%exclude %{_sysconfdir}/%{name}/waterdemo.cfg
 
 %{_libdir}/%{name}/*
 
-%{_datadir}/%{name}/data/*.zip
-%{_datadir}/%{name}/data/aws/*
-%{_datadir}/%{name}/data/cube/*
-%{_datadir}/%{name}/data/varia/*
-%{_datadir}/%{name}/data/shader/*
+%{_datadir}/%{name}/data/*
+%exclude %{_datadir}/%{name}/data/maps/*
 
-#---------------------UTILS------------------------
 %files -n %{name}-utils
 %defattr(-,root,root)
 
-%{prefix}/bin/pvscalc
-%{prefix}/bin/vsh
-%{prefix}/bin/viewmesh
-%{prefix}/bin/partedit
-%{prefix}/bin/lighter
-%{prefix}/bin/levtool
-%{prefix}/bin/heightmapgen
-%{prefix}/bin/docconv
-%{prefix}/bin/cslight
-%{prefix}/bin/csfgen
-%{prefix}/bin/csfedit
-%{prefix}/bin/csbench
-%{prefix}/bin/md22spr
-%{prefix}/bin/md32spr
-%{prefix}/bin/map2cs
-%{prefix}/bin/maya2spr
-%{prefix}/bin/3ds2lev
-%{prefix}/bin/walktest
-%{prefix}/bin/csdemo
+%{_bindir}/*
+%exclude %{_bindir}/cs-config
+%exclude %{_bindir}/*.cex
 
 %{_datadir}/%{name}/data/maps/*
 %{_datadir}/%{name}/conversion/*
@@ -165,73 +128,30 @@ rm -rf "$RPM_BUILD_ROOT"
 %{_sysconfdir}/%{name}/walktest.cfg
 %{_sysconfdir}/%{name}/waterdemo.cfg
 
-#---------------------DOC-------------------------
 %files -n %{name}-doc
 %defattr(-,root,root)
 
 %docdir docs
+%{_datadir}/doc/%{name}-%{version}/*
 
-%{_datadir}/doc/%{name}-%{version}/README.html
-%{_datadir}/doc/%{name}-%{version}/html/manual/*.html
-%{_datadir}/doc/%{name}-%{version}/html/manual/build/platform/win32/cygwin/*.jpg
-%{_datadir}/doc/%{name}-%{version}/html/manual/tutorial/howto/msvc6proj/*.jpg
-%{_datadir}/doc/%{name}-%{version}/html/manual/tutorial/howto/msvc7proj/*.jpg
-%{_datadir}/doc/%{name}-%{version}/html/manual/tutorial/howto/kdevproj/*.jpg
-%{_datadir}/doc/%{name}-%{version}/html/manual/tutorial/map2cs/*.png
-%{_datadir}/doc/%{name}-%{version}/html/manual/tutorial/map2cs/*.jpg
-%{_datadir}/doc/%{name}-%{version}/html/manual/tutorial/wincvs/*.jpg
-%{_datadir}/doc/%{name}-%{version}/html/manual/plugins/engine/*.jpg
-%{_datadir}/doc/%{name}-%{version}/html/manual/plugins/engine/*.png
-
-%{_datadir}/doc/%{name}-%{version}/history.txt
-%{_datadir}/doc/%{name}-%{version}/history.old
-
-%{_datadir}/doc/%{name}-%{version}/html/api/*
-
-#---------------------DEV-------------------------
 %files -n %{name}-devel
 %defattr(-,root,root)
 
-%{prefix}/bin/cs-config
+%{_bindir}/cs-config
 %{_libdir}/*.a
 
 # (vk) Scripting related files are here for now
-%{prefix}/bin/*.cex
+%{_bindir}/*.cex
 %{_datadir}/%{name}/bindings/*
 
 %{_datadir}/%{name}/build/*
 
-%{prefix}/include/%{name}/*.h
-%{prefix}/include/%{name}/csws/*.h
-%{prefix}/include/%{name}/iaws/*.h
-%{prefix}/include/%{name}/imap/*.h
-%{prefix}/include/%{name}/csgfx/*.h
-%{prefix}/include/%{name}/igeom/*.h
-%{prefix}/include/%{name}/imesh/*.h
-%{prefix}/include/%{name}/iutil/*.h
-%{prefix}/include/%{name}/csgeom/*.h
-%{prefix}/include/%{name}/csplugincommon/*
-%{prefix}/include/%{name}/cstool/*.h
-%{prefix}/include/%{name}/csutil/*.h
-%{prefix}/include/%{name}/csutil/*.inc
-%{prefix}/include/%{name}/csutil/win32/*.h
-%{prefix}/include/%{name}/csutil/win32/*.inc
-%{prefix}/include/%{name}/csutil/win32/*.fun
-%{prefix}/include/%{name}/csutil/macosx/*.h
-%{prefix}/include/%{name}/csutil/unix/*.h
-
-%{prefix}/include/%{name}/isound/*.h
-%{prefix}/include/%{name}/ivaria/*.h
-%{prefix}/include/%{name}/ivaria/*.i
-%{prefix}/include/%{name}/ivideo/*.h
-%{prefix}/include/%{name}/ivideo/shader/*.h
-%{prefix}/include/%{name}/itexture/*.h
-%{prefix}/include/%{name}/iengine/*.h
-%{prefix}/include/%{name}/iengine/rendersteps/*.h
-%{prefix}/include/%{name}/inetwork/*.h
-%{prefix}/include/%{name}/igraphic/*.h
+%{prefix}/include/%{name}/*
 
 %changelog
+* Sun Feb 27 2005 Vincent Knecht <vknecht@users.sourceforge.net> 0.99-10
+- Cleanup (using more wildcards, %exclude and %{_bindir}).
+
 * Fri Feb 25 2005 Vincent Knecht <vknecht@users.sourceforge.net> 0.99-9
 - Upgraded for new csplugincommon include directory.
 
