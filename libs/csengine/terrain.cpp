@@ -78,11 +78,11 @@ void transformer(csVector3 vin, csVector3 *vout)
   }
 }
 
-bool csTerrain::Initialize (char* heightmap)
+bool csTerrain::Initialize (const void* heightmap, unsigned long size)
 {
   grview = NULL;
   CHK (height = new ddgHeightMap ());
-  if (height->readTGN (heightmap))
+  if (height->readTGN (heightmap, size))
 	  height->generateHeights(257,257,5);
   CHK (mesh = new ddgTBinMesh (height));
   CHK (clipbox = new ddgBBox (csVector3(0,0,3),csVector3(640, 480, 15000)));

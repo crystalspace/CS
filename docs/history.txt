@@ -18,6 +18,11 @@ Short-term cleanups that need to be done:
 	- Added highscore GUI for Blocks.
 	- Current level is remembered in blocks.cfg.
 	- Pause removes view temporarily.
+	- Eric Sunshine improved integration of the Terrain engine with VFS.
+	  Height map files specified via the HEIGHTMAP() keyword in the world
+	  file are now loaded via VFS.  He also temporarily added height.ter
+	  to terrain.zip since automatic height map generation is currently
+	  broken (thus a pre-existing height map is required).
 13-Feb-2000
 	- Eric Sunshine performed a fairly extensive overhaul of csIniFile.
 	  Except for the lowest level I/O functionality, most methods have
@@ -62,7 +67,7 @@ Short-term cleanups that need to be done:
 	- Thomas also removed some dependencies between Crystal Shooter
 	  and csgame (csgame contained Crystal Shooter specific code).
 	- Thomas also adjusted the license of csgame to LGPL (instead of GPL).
-	- Thomas moved a testroutine for triangle intersection from walktest
+	- Thomas moved a test routine for triangle intersection from walktest
 	  to csMath3 (I think this routine is of general interest).
 	- Thomas also did a small cleanup of the VC project files.
 	- Simon Boily re-enabled multitexturing and fixed some problem with

@@ -3746,7 +3746,7 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf,
 
   long cmd;
   char* params;
-  char heightmap[256];	// @@@ Hardcoded.
+  char heightmapname[256];	// @@@ Hardcoded.
   int detail;
 
   while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
@@ -3754,7 +3754,7 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf,
     switch (cmd)
     {
       case TOKEN_HEIGHTMAP:
-        ScanStr (params, "%s", heightmap);
+        ScanStr (params, "%s", heightmapname);
         break;
       case TOKEN_DETAIL:
         ScanStr (params, "%d", &detail);
@@ -3767,17 +3767,33 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf,
     fatal_exit (0, false);
   }
 
+  if (!System->VFS->Exists(heightmapname))
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Error locating height field: %s\n", heightmapname);
+    fatal_exit (0, false);
+  }
+
+  size_t heightmapsize;
+  char* heightmap = System->VFS->ReadFile (heightmapname, heightmapsize);
+  if (heightmap == NULL)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Error loading height field: %s\n", heightmapname);
+    fatal_exit (0, false);
+  }
+
   CHK (csTerrain* terr = new csTerrain ());
   terr->SetName (name);
   terr->SetTexture (texture);
 
   // Otherwise read file, if that fails generate a random map.
-  if (!terr->Initialize (heightmap))
+  if (!terr->Initialize (heightmap, heightmapsize))
   {
-    CsPrintf (MSG_FATAL_ERROR, "Error creating height field\n");
+    delete[] heightmap;
+    CsPrintf (MSG_FATAL_ERROR, "Error creating height field from: %s\n", heightmapname);
     fatal_exit (0, false);
   }
 
+  delete[] heightmap;
   sector.terrains.Push (terr);
 }
 

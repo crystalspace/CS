@@ -93,7 +93,12 @@ public:
 	/** Load an image buffer from a memory buffer.
 	 * Return true on error.
 	 */
-	bool readMemory( unsigned short *buf );
+	bool readMemory(unsigned short *buf);
+
+	/** Read an image buffer from a Terragen file image.
+	 * Return true on error.
+	 */
+	bool readTGN(const void *buf, unsigned long size);
 
 	/** Read an image buffer from a Terragen file.
 	 * Return true on error.

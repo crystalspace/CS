@@ -84,7 +84,7 @@ public:
   ddgBBox* GetBBox () { return clipbox; }
 
   /// Load the heightmap.
-  bool Initialize (char* heightmap);
+  bool Initialize (const void* heightmap, unsigned long size);
 
   /**
    * Draw this terrain given a view and transformation.

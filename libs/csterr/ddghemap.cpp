@@ -194,22 +194,19 @@ error:
 }
 
 
-bool ddgHeightMap::readTGN(const char *file)
+bool ddgHeightMap::readTGN(const void *buf, unsigned long size)
 {
-	FILE *fptr = file && file[0] ? fopen(file,"rb") : 0;
-
-	if (!fptr)
-	{
-		return true;
-	}
 	unsigned char ch1, ch2;
-
-	char name[9],type[9], segment[5], pad[2];
+	char name[9],type[9], segment[5];
+	const char* ptr = (const char*)buf;
+	const char* const bufend = ptr + size;
 
 	// Name 8 bytes.
-	fread(name,8,1,fptr);
+	memcpy(name, ptr, 8);
+	ptr += 8;
 	name[8] = '\0';
-	fread(type,8,1,fptr);
+	memcpy(type, ptr, 8);
+	ptr += 8;
 	type[8] = '\0';
 	if (strcmp(name,"TERRAGEN") || strcmp(type,"TERRAIN "))
 	{
@@ -218,39 +215,42 @@ bool ddgHeightMap::readTGN(const char *file)
 
 	// Segment 4 bytes.
 	segment[4] = '\0';
-
-	fread(segment,4,1,fptr);
+	memcpy(segment, ptr, 4);
+	ptr += 4;
 
 	if (strcmp(segment,"SIZE")==0)
 	{
 		// SIZE 2 bytes.
-		ch1 = fgetc(fptr);
-		ch2 = fgetc(fptr);
+		ch1 = *ptr++;
+		ch2 = *ptr++;
 		_rows = _cols = ch2*256+ch1 +1;
 		// Padding 2 bytes.
-		fread(pad,2,1,fptr);
-		fread(segment,4,1,fptr);
+		ptr += 2;
+		memcpy(segment, ptr, 4);
+		ptr += 4;
 	}
 
 	if (strcmp(segment,"XPTS")==0)
 	{
 		// XPTS.
-		ch1 = fgetc(fptr);
-		ch2 = fgetc(fptr);
+		ch1 = *ptr++;
+		ch2 = *ptr++;
 		_cols = ch2*256+ch1;
 		// Padding 2 bytes.
-		fread(pad,2,1,fptr);
+		ptr += 2;
 
-		fread(segment,4,1,fptr);
+		memcpy(segment, ptr, 4);
+		ptr += 4;
 		// YPTS.
 		if (strcmp(segment,"YPTS")==0)
 		{
-			ch1 = fgetc(fptr);
-			ch2 = fgetc(fptr);
+			ch1 = *ptr++;
+			ch2 = *ptr++;
 			_rows = ch2*256+ch1;
 			// Padding 2 bytes.
-			fread(pad,2,1,fptr);
-			fread(segment,4,1,fptr);
+			ptr += 2;
+			memcpy(segment, ptr, 4);
+			ptr += 4;
 		}
 		else
 		{
@@ -263,12 +263,12 @@ bool ddgHeightMap::readTGN(const char *file)
 	// BaseHeight + elevation* Scale / 65536.
 	if (strcmp(segment,"ALTW")==0)
 	{
-		ch1 = fgetc(fptr);
-		ch2 = fgetc(fptr);
+		ch1 = *ptr++;
+		ch2 = *ptr++;
 		_scale = (ch2*256+ch1)/ 65536.0;
 
-		ch1 = fgetc(fptr);
-		ch2 = fgetc(fptr);
+		ch1 = *ptr++;
+		ch2 = *ptr++;
 		_base = ch2*256+ch1;
 	}
 	else
@@ -281,15 +281,12 @@ bool ddgHeightMap::readTGN(const char *file)
 	// is equal to BaseHeight + Elevation * HeightScale / 65536
 	allocate(_cols,_rows);
 	int r = 0;
-	int cnt;
 	while (r < _rows)
 	{
-		if ((cnt = fread(&(_pixbuffer[r*_cols]),2,_cols,fptr)) <
-		(int)_cols)
-		{
-			fclose(fptr);
-			return true;
-		}
+		if (ptr + _cols * 2 > bufend)
+			return true;	// Not enough data to fill column
+		memcpy(_pixbuffer + r * _cols, ptr, _cols * 2);
+		ptr += _cols * 2;
 		r++;
 	}
 	// Swap byte order for machines with different endian.
@@ -307,11 +304,34 @@ bool ddgHeightMap::readTGN(const char *file)
 		}
 	}
 
-	fclose(fptr);
 	return false;
 }
 
 
+
+bool ddgHeightMap::readTGN(const char *file)
+{
+	bool err = true;
+	if (file && *file)
+	{
+		FILE *fptr = fopen(file, "rb");
+		if (fptr)
+		{
+			fseek(fptr, 0, SEEK_END);
+			const long len = ftell(fptr);
+			if (len > 0)
+			{
+				void* buf = malloc(len);
+				fseek(fptr, 0, SEEK_SET);
+				if (fread(buf, len, 1, fptr) == 1)
+					err = readTGN(buf, (unsigned long)len);
+				free(buf);
+			}
+			fclose(fptr);
+		}
+	}
+	return err;
+}
 
 bool ddgHeightMap::generateHeights(unsigned int r, unsigned int c, float oct )
 {
