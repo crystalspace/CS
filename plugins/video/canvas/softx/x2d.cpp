@@ -66,9 +66,6 @@ csGraphics2DXLib::~csGraphics2DXLib(void)
 
   delete [] sim_lt8;
   delete [] sim_lt16;
-
-  if (EventOutlet)
-      EventOutlet->DecRef();
 }
 
 void csGraphics2DXLib::Report (int severity, const char* msg, ...)

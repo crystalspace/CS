@@ -99,7 +99,7 @@ struct iEventQueue : public iBase
    * queue.  It is the caller's responsibility to send a DecRef() message to
    * the returned event outlet when it is no longer needed.
    */
-  virtual iEventOutlet* CreateEventOutlet (iEventPlug*) = 0;
+  virtual csPtr<iEventOutlet> CreateEventOutlet (iEventPlug*) = 0;
 
   /**
    * Get a public event outlet for posting just an event.
@@ -111,9 +111,6 @@ struct iEventQueue : public iBase
    * iEventPlug interface.  In these cases, you can post the event by obtaining
    * the shared event outlet from GetEventOutlet(), and use it to post an event
    * instead.
-   *<p>
-   * Note that the returned object is NOT IncRef'd, thus you should NOT
-   * DecRef it after usage.
    */
   virtual iEventOutlet* GetEventOutlet () = 0;
 
@@ -136,14 +133,12 @@ struct iEventQueue : public iBase
   virtual void Post (iEvent*) = 0;
 
   /**
-   * Get next event from queue; returns NULL if no events are present.  There
-   * is rarely any need to manually retrieve events from the queue.  Instead,
-   * normal event processing via Process() takes care of this responsibility.
-   * iEventQueue gives up ownership of the returned iEvent, so it is the
-   * caller's responsibility to invoke iEvent::DecRef() when the event is no
-   * longer needed.
+   * Get next event from queue; returns a null reference if no events are
+   * present.  There is rarely any need to manually retrieve events from the
+   * queue.  Instead, normal event processing via Process() takes care of this
+   * responsibility.  iEventQueue gives up ownership of the returned iEvent.
    */
-  virtual iEvent* Get () = 0;
+  virtual csPtr<iEvent> Get () = 0;
 
   /// Clear event queue.
   virtual void Clear () = 0;

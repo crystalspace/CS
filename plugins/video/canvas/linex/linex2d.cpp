@@ -113,11 +113,8 @@ bool csGraphics2DLineXLib::Initialize (iObjectRegistry *object_reg)
     iFontServer);
 
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
-  if (q != 0)
+  if (q.IsValid())
   {
-    // Tell event queue to call us on broadcast events
-    //@@@ why is this needed???
-    //q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
     // Create the event outlet
     EventOutlet = q->CreateEventOutlet (this);
   }
@@ -127,10 +124,6 @@ bool csGraphics2DLineXLib::Initialize (iObjectRegistry *object_reg)
 csGraphics2DLineXLib::~csGraphics2DLineXLib(void)
 {
   Close();
-  if (EventOutlet)
-    EventOutlet->DecRef();
-  if (xwin)
-    xwin->DecRef();
 }
 
 bool csGraphics2DLineXLib::Open()

@@ -38,7 +38,7 @@ class csGraphics2DXLib : public csGraphics2D, public iEventPlug
   /// Used for back buffer when not using shared memory
   XImage* xim;
   /// The event outlet
-  iEventOutlet *EventOutlet;
+  csRef<iEventOutlet> EventOutlet;
   // The display context
   Display* dpy;
   int screen_num;

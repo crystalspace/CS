@@ -36,7 +36,7 @@ public:
   int shutdown;
   unsigned char *membuffer;
   SDL_mutex *th_lock;
-  iEventOutlet *EventOutlet;
+  csRef<iEventOutlet> EventOutlet;
 
 private:
   virtual int translate_key(SDL_Event *ev);

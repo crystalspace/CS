@@ -300,8 +300,6 @@ csGraphics2DSDL::~csGraphics2DSDL(void)
     // Destroy your graphic interface
     Memory = NULL;
     Close();
-    if (EventOutlet)
-      EventOutlet->DecRef ();
 }
 
 bool csGraphics2DSDL::Open()
@@ -382,13 +380,12 @@ bool csGraphics2DSDL::Open()
   pfmt.complete ();
   Clear(0);
 
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  csRef<iEventQueue> q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
   {
     q->RegisterListener (scfiEventHandler, CSMASK_Nothing);
-    if (!EventOutlet)
+    if (!EventOutlet.IsValid())
       EventOutlet = q->CreateEventOutlet (this);
-    q->DecRef ();
   }
   return true;
 }

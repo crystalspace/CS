@@ -141,12 +141,9 @@ bool csGraphics2DOS2GL::Initialize (iObjectRegistry *object_reg)
     HardwareCursor = false;
   cmdline->DecRef ();
 
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
-  if (q != 0)
-  {
+  csRef<iEventQueue> q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q.IsValid())
     EventOutlet = q->CreateEventOutlet (this);
-    q->DecRef ();
-  }
 
   KeyboardDriver = CS_QUERY_REGISTRY(object_reg, iKeyboardDriver);
 

@@ -129,8 +129,6 @@ BeAssistant::~BeAssistant() {
       be_app->Unlock();
     }
   }
-  if (event_outlet != 0)
-    event_outlet->DecRef();
 
   //iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   CS_ASSERT (event_queue != NULL);

@@ -76,7 +76,7 @@ protected:
 
   bool running;
   BMessageQueue message_queue;
-  iEventOutlet* event_outlet;
+  csRef<iEventOutlet> event_outlet;
   bool shift_down;
   bool alt_down;
   bool ctrl_down;

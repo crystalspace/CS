@@ -34,7 +34,7 @@ class NeXTDriver2D : public csGraphics2D
 
 protected:
   NeXTDelegate2D controller;
-  iNeXTAssistant* assistant;
+  csRef<iNeXTAssistant> assistant;
   NeXTFrameBuffer* frame_buffer;
 
   bool init_driver(int desired_depth);

@@ -71,8 +71,6 @@ csGraphics2DAlleg::csGraphics2DAlleg (iBase *iParent) : csGraphics2D (iParent)
 csGraphics2DAlleg::~csGraphics2DAlleg ()
 {
   Close ();
-  if (EventOutlet)
-    EventOutlet->DecRef ();
 }
 
 void csGraphics2DAlleg::Report (int severity, const char* msg, ...)
@@ -131,12 +129,11 @@ bool csGraphics2DAlleg::Initialize (iObjectRegistry *object_reg)
   Font = 0;
   Memory = NULL;
 
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
-  if (q != 0)
+  csRef<iEventQueue> q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q.IsValid())
   {
     q->RegisterListener (scfiEventHandler, CSMASK_Nothing);
     EventOutlet = q->CreateEventOutlet (this);
-    q->DecRef ();
   }
   return true;
 }

@@ -28,8 +28,13 @@ NCF_PROTO(char const*,lookup)(
 NCF_PROTO(int,exists)(NeXTConfigHandle handle, char const* section)
   { return ((iConfigFile*)handle)->SubsectionExists(section); }
 NCF_PROTO(NeXTConfigIterator,new_iterator)(NeXTConfigHandle handle,
-  char const* section) { return (NeXTConfigIterator)
-  ((iConfigFile*)handle)->Enumerate(section); }
+  char const* section)
+  { 
+  csRef<iConfigIterator> r = ((iConfigFile*)handle)->Enumerate(section);
+  iConfigIterator* p = r;
+  p->IncRef();
+  return (NeXTConfigIterator)p;
+  }
 NCF_PROTO(void,dispose_iterator)(NeXTConfigIterator handle)
   { ((iConfigIterator*)handle)->DecRef(); }
 NCF_PROTO(int,iterator_next)(NeXTConfigIterator handle)

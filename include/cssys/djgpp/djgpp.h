@@ -87,7 +87,7 @@ private:
   int mouse_sensivity_x;
   int mouse_sensivity_y;
   int mouse_sensivity_threshold;
-  iEventOutlet *EventOutlet;
+  csRef<iEventOutlet> EventOutlet;
 };
 
 #endif // DJGPP_H

@@ -68,7 +68,7 @@ class csGraphics2DOS2DIVE : public csGraphics2D, public iEventPlug
   /// Window width and height
   int WindowWidth, WindowHeight;
   /// The event outlet
-  iEventOutlet *EventOutlet;
+  csRef<iEventOutlet> EventOutlet;
   /// Generic keyboard driver.
   iKeyboardDriver* KeyboardDriver;
 

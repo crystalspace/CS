@@ -56,8 +56,6 @@ csGraphics2DAA::csGraphics2DAA (iBase *iParent) : csGraphics2D (iParent)
 csGraphics2DAA::~csGraphics2DAA (void)
 {
   Close ();
-  if (EventOutlet)
-    EventOutlet->DecRef ();
 }
 
 bool csGraphics2DAA::Initialize (iObjectRegistry *object_reg)
@@ -126,13 +124,11 @@ bool csGraphics2DAA::Initialize (iObjectRegistry *object_reg)
   pfmt.BlueMask   = 0xff;
   pfmt.complete ();
 
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  csRef<iEventQueue> q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
   {
-    //EventOutlet = System->CreateEventOutlet (this);
-    if (!EventOutlet)
+    if (!EventOutlet.IsValid())
       EventOutlet = q->CreateEventOutlet (this);
-    q->DecRef ();
   }
   return true;
 }

@@ -107,8 +107,6 @@ csXWindow::~csXWindow ()
       q->RemoveListener (scfiEventHandler);
     scfiEventHandler->DecRef ();
   }
-  if (EventOutlet)
-    EventOutlet->DecRef ();
   delete [] win_title;
 }
 

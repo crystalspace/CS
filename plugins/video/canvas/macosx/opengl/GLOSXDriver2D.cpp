@@ -70,12 +70,9 @@ bool GLOSXDriver2D::Initialize(iObjectRegistry *reg)
     };
 
     // Create the event outlet
-    iEventQueue* queue = CS_QUERY_REGISTRY(reg, iEventQueue);
+    csRef<iEventQueue> queue = CS_QUERY_REGISTRY(reg, iEventQueue);
     if (queue != 0)
-    {
         EventOutlet = queue->CreateEventOutlet (this);
-        queue->DecRef();
-    }
 
     return true;
 };

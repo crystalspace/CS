@@ -49,22 +49,15 @@ OSXDriver2D::~OSXDriver2D()
 {
     if (scfiEventHandler != NULL)
     {
-        iEventQueue *queue = CS_QUERY_REGISTRY(objectReg, iEventQueue);
-        if (queue != NULL)
-        {
+        csRef<iEventQueue> queue = CS_QUERY_REGISTRY(objectReg, iEventQueue);
+        if (queue.IsValid())
             queue->RemoveListener(scfiEventHandler);
-            queue->DecRef();
-        }
         scfiEventHandler->DecRef();
     }
 
     Close();					// Just in case it hasn't been called
 
     OSXDelegate2D_delete(delegate);
-
-    // Release assistant
-    if (assistant != NULL)
-        assistant->DecRef();
 };
 
 
@@ -82,12 +75,9 @@ bool OSXDriver2D::Initialize(iObjectRegistry *reg)
         scfiEventHandler = new EventHandler(this);
 
     // Listen for key down events
-    iEventQueue* queue = CS_QUERY_REGISTRY(reg, iEventQueue);
-    if (queue != 0)
-    {
+    csRef<iEventQueue> queue = CS_QUERY_REGISTRY(reg, iEventQueue);
+    if (queue.IsValid())
         queue->RegisterListener(scfiEventHandler, CSMASK_Broadcast | CSMASK_KeyDown);
-        queue->DecRef();
-    }
 
     // Figure out what screen we will be using
     ChooseDisplay();
@@ -396,7 +386,7 @@ void OSXDriver2D::SaveGamma(CGDirectDisplayID disp, GammaTable &table)
 // Updates the screen and display members
 void OSXDriver2D::ChooseDisplay()
 {
-    iCommandLineParser *parser = CS_QUERY_REGISTRY(objectReg, iCommandLineParser);
+    csRef<iCommandLineParser> parser = CS_QUERY_REGISTRY(objectReg, iCommandLineParser);
     const char *s = parser->GetOption("screen");
     if (s != NULL)
         screen = atoi(s);

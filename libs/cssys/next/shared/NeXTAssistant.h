@@ -41,15 +41,15 @@ class NeXTAssistant : public iNeXTAssistantLocal
 private:
   NeXTDelegateHandle controller;	// Application & window delegate.
   iObjectRegistry* registry;		// Global shared-object registry.
-  iEventQueue* event_queue;		// Global event queue.
-  iEventOutlet* event_outlet;		// Shared event outlet.
-  iVirtualClock* virtual_clock;		// Global virtual clock.
+  csRef<iEventQueue> event_queue;	// Global event queue.
+  csRef<iEventOutlet> event_outlet;	// Shared event outlet.
+  csRef<iVirtualClock> virtual_clock;	// Global virtual clock.
   bool should_shutdown;			// cscmdQuit was received.
-  iObjectRegistry* get_registry();
-  iEventQueue* get_event_queue();
-  iVirtualClock* get_virtual_clock();
-  bool runWhenNotFocused;		// Does the run loop process events
+  bool run_always;		        // Does the run loop process events
                                         // when the app is not focused?
+  csRef<iObjectRegistry> get_registry();
+  csRef<iEventQueue> get_event_queue();
+  csRef<iVirtualClock> get_virtual_clock();
   void init_menu(iConfigFile*);
   void init_runmode();
 

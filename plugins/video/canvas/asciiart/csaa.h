@@ -40,7 +40,7 @@ class csGraphics2DAA : public csGraphics2D, public iEventPlug
   /// The palette
   aa_palette palette;
   /// The event outlet
-  iEventOutlet *EventOutlet;
+  csRef<iEventOutlet> EventOutlet;
 
 public:
   SCF_DECLARE_IBASE_EXT(csGraphics2D);

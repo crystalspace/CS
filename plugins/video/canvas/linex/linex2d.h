@@ -38,7 +38,7 @@ class csGraphics2DLineXLib : public csGraphics2D, public iEventPlug
 {
   csRef<iXWindow> xwin;
   /// The event outlet
-  iEventOutlet *EventOutlet;
+  csRef<iEventOutlet> EventOutlet;
   int screen_num;
   Window window;
   Pixmap back;

@@ -27,6 +27,32 @@ The history order is reversed so that new features are at the top.
 	      use 32-bit offsets.
 	- Fixed python plugin for csPtr changes with some functions
 	  that return iImage.
+	- Eric Sunshine made csRef/csPtr corrections to the JNG plugin.
+	- Eric Sunshine added csPtr(csRef const&) constructor to csPtr.  This
+	  is a convenience for those cases where one used to do:
+	    csPtr<iFoo> func() {
+	      csRef<iFoo> foo = ...;
+	      foo->IncRef();
+	      return csPtr<iFoo>(foo);
+	    }
+	  Now one can use the more direct approach:
+	    csPtr<iFoo> func() {
+	      csRef<iFoo> foo = ...;
+	      return foo;
+	    }
+	- Eric Sunshine updated iEventQueue to return csPtr when appropriate.
+	  Modified callers of event queue methods as needed.
+	- Eric Sunshine updated a number of canvases to fix some obvious
+	  csRef/csPtr problems.  These changes should help these canvases to
+	  compile more cleanly, but whether or not they actually compile is
+	  unknown.  Someone who uses the various canvases will have to test
+	  them.
+	- Eric Sunshine upgraded the MacOS/X port to work with strict
+	  csRef/csPtr.  This port is once again buildable.
+	- Eric Sunshine did further work on cs2xml to make it buildable on
+	  MacOS/X.  Had to further break apart the
+	  mother-of-all-switch-statements in order to appease the assembler's
+	  16-bit jump offset limitation.
 16-Sep-2002
 	- Fixed a DecRef() problem with the g2d plugin (ddraw). Please
 	  people! When replacing a normal pointer with a csRef you

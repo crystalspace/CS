@@ -416,7 +416,7 @@ private:
   iObjectRegistry* registry;
   bool console_window;
   HCURSOR m_hCursor;
-  iEventOutlet* EventOutlet;
+  csRef<iEventOutlet> EventOutlet;
   void SetWinCursor (HCURSOR);
   iEventOutlet* GetEventOutlet();
   static LRESULT CALLBACK WindowProc (HWND hWnd, UINT message,
@@ -613,8 +613,6 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
 
 Win32Assistant::~Win32Assistant ()
 {
-  if (EventOutlet != 0)
-    EventOutlet->DecRef();
   if (console_window)
     FreeConsole();
 }
@@ -639,7 +637,7 @@ unsigned Win32Assistant::QueryEventPriority (unsigned /*iType*/)
 
 iEventOutlet* Win32Assistant::GetEventOutlet()
 {
-  if (EventOutlet == 0)
+  if (!EventOutlet.IsValid())
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY(registry, iEventQueue));
     if (q != 0)

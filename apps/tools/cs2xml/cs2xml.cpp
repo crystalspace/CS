@@ -1502,14 +1502,19 @@ void Cs2Xml::ParseIsoSize (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
-  csRef<iDocumentNode> child = parent->CreateNodeBefore (
+  if (!strcmp (parent_token, "grid"))	// Iso engine.
+  {
+    csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	CS_NODE_ELEMENT, NULL);
-  child->SetValue (tokname);
-  if (name && *name) child->SetAttribute ("name", name);
-  int x, z;
-  csScanStr (params, "%d,%d", &x, &z);
-  child->SetAttributeAsInt ("x", x);
-  child->SetAttributeAsInt ("z", z);
+    child->SetValue (tokname);
+    if (name && *name) child->SetAttribute ("name", name);
+    int x, z;
+    csScanStr (params, "%d,%d", &x, &z);
+    child->SetAttributeAsInt ("x", x);
+    child->SetAttributeAsInt ("z", z);
+  }
+  else
+    ParseParticleSize (parent_token, parser, parent, name, params, tokname);
 }
 
 void Cs2Xml::ParseParticleSize (char const* parent_token, csParser* parser,
@@ -1619,11 +1624,16 @@ void Cs2Xml::ParseGrid (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
-  csRef<iDocumentNode> child = parent->CreateNodeBefore (
+  if (!strcmp (parent_token, "grids"))	// Iso engine
+  {
+    csRef<iDocumentNode> child = parent->CreateNodeBefore (
       CS_NODE_ELEMENT, NULL);
-  child->SetValue (tokname);
-  if (name && *name) child->SetAttribute ("name", name);
-  ParseGeneral (tokname, parser, child, params);
+    child->SetValue (tokname);
+    if (name && *name) child->SetAttribute ("name", name);
+    ParseGeneral (tokname, parser, child, params);
+  }
+  else
+    ParseBlocks (parent_token, parser, parent, name, params, tokname);
 }
 
 void Cs2Xml::ParseBlocks (char const* parent_token, csParser* parser,
@@ -2087,7 +2097,6 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (BASECOLOR)
     CS_TOKEN_TABLE (BLOCKS)
     CS_TOKEN_TABLE (BLOCKSIZE)
-    CS_TOKEN_TABLE (BOX)
     CS_TOKEN_TABLE (BC)
     CS_TOKEN_TABLE (BH)
     CS_TOKEN_TABLE (C)
@@ -2099,19 +2108,11 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (CORRECTSEAMS)
     CS_TOKEN_TABLE (DIRECTION)
     CS_TOKEN_TABLE (DIRECTIONAL)
-    CS_TOKEN_TABLE (DIRLIGHT)
     CS_TOKEN_TABLE (DROPSIZE)
     CS_TOKEN_TABLE (DURATION)
     CS_TOKEN_TABLE (DOFLATTEN)
-    CS_TOKEN_TABLE (EMITBOX)
-    CS_TOKEN_TABLE (EMITLINE)
-    CS_TOKEN_TABLE (EMITFIXED)
-    CS_TOKEN_TABLE (EMITSPHERE)
-    CS_TOKEN_TABLE (EMITCYLINDER)
-    CS_TOKEN_TABLE (EMITCYLINDERTANGENT)
     CS_TOKEN_TABLE (EULER)
     CS_TOKEN_TABLE (END)
-    CS_TOKEN_TABLE (F)
     CS_TOKEN_TABLE (FADE)
     CS_TOKEN_TABLE (FALLSPEED)
     CS_TOKEN_TABLE (FARPLANE)
@@ -2125,23 +2126,15 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (GRID)
     CS_TOKEN_TABLE (GROUPMATERIAL)
     CS_TOKEN_TABLE (HALO)
-    CS_TOKEN_TABLE (HAZEBOX)
-    CS_TOKEN_TABLE (HAZECONE)
     CS_TOKEN_TABLE (HEIGHTMAP)
     CS_TOKEN_TABLE (KEY)
-    CS_TOKEN_TABLE (LIGHT)
-    CS_TOKEN_TABLE (LOD)
-    CS_TOKEN_TABLE (LODCOST)
-    CS_TOKEN_TABLE (LODDIST)
     CS_TOKEN_TABLE (MATRIX)
     CS_TOKEN_TABLE (MATERIAL)
     CS_TOKEN_TABLE (MAXCOLOR)
     CS_TOKEN_TABLE (MULT)
     CS_TOKEN_TABLE (MULTIPLY)
-    CS_TOKEN_TABLE (NUM)
     CS_TOKEN_TABLE (ORIG)
     CS_TOKEN_TABLE (ORIGIN)
-    CS_TOKEN_TABLE (ORIGINBOX)
     CS_TOKEN_TABLE (PATH)
     CS_TOKEN_TABLE (PARTSIZE)
     CS_TOKEN_TABLE (POLYGON)
@@ -2149,15 +2142,12 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (POS)
     CS_TOKEN_TABLE (POSITION)
     CS_TOKEN_TABLE (PUSH)
-    CS_TOKEN_TABLE (PRIORITY)
     CS_TOKEN_TABLE (Q)
     CS_TOKEN_TABLE (RADIUS)
     CS_TOKEN_TABLE (RECTPARTICLES)
     CS_TOKEN_TABLE (REGULARPARTICLES)
     CS_TOKEN_TABLE (ROT)
     CS_TOKEN_TABLE (ROTPART)
-    CS_TOKEN_TABLE (SPACE)
-    CS_TOKEN_TABLE (SCALE)
     CS_TOKEN_TABLE (SECOND)
     CS_TOKEN_TABLE (SETUPMESH)
     CS_TOKEN_TABLE (SHIFT)
@@ -2166,17 +2156,15 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (SLOPE)
     CS_TOKEN_TABLE (SOLID)
     CS_TOKEN_TABLE (SOURCE)
+    CS_TOKEN_TABLE (SPACE)
     CS_TOKEN_TABLE (SPEED)
-    CS_TOKEN_TABLE (START)
     CS_TOKEN_TABLE (SYSDIST)
     CS_TOKEN_TABLE (T)
     CS_TOKEN_TABLE (TEXTURE)
     CS_TOKEN_TABLE (TIMES)
     CS_TOKEN_TABLE (TOPLEFT)
-    CS_TOKEN_TABLE (TRANSPARENT)
     CS_TOKEN_TABLE (TRIANGLE)
     CS_TOKEN_TABLE (TRIANGLES)
-    CS_TOKEN_TABLE (TYPE)
     CS_TOKEN_TABLE (UV)
     CS_TOKEN_TABLE (UVA)
     CS_TOKEN_TABLE (UP)
@@ -2356,12 +2344,8 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	break;
       case CS_TOKEN_MULT:
       case CS_TOKEN_SIZE:
-	if (!strcmp (parent_token, "grid"))	// Iso engine.
-	{
-	  ParseIsoSize (parent_token, parser, parent, name, params, tokname);
-	  break;
-	}
-	// !!!!! FALL THROUGH TO CS_TOKEN_PARTSIZE !!!!!
+	ParseIsoSize (parent_token, parser, parent, name, params, tokname);
+	break;
       case CS_TOKEN_PARTSIZE:
       case CS_TOKEN_MULTIPLY:
 	ParseParticleSize (parent_token, parser, parent, name, params,
@@ -2385,81 +2369,118 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	ParseSysDist (parent_token, parser, parent, name, params, tokname);
 	break;
       case CS_TOKEN_GRID:
-	if (!strcmp (parent_token, "grids"))	// Iso engine
-	{
-	  ParseGrid (parent_token, parser, parent, name, params, tokname);
-	  break;
-	}
-	// !!!!! FALL THROUGH TO CS_TOKEN_BLOCKS !!!!!
+	ParseGrid (parent_token, parser, parent, name, params, tokname);
+	break;
       case CS_TOKEN_BLOCKSIZE:
       case CS_TOKEN_BLOCKS:
 	ParseBlocks (parent_token, parser, parent, name, params, tokname);
 	break;
-      case CS_TOKEN_EMITCYLINDER:
-      case CS_TOKEN_EMITCYLINDERTANGENT:
-	ParseEmitCylinder (parent_token, parser, parent, name, params,
-	  tokname);
-	break;
-      case CS_TOKEN_HAZECONE:
-	ParseHazeCone (parent_token, parser, parent, name, params, tokname);
-	break;
-      case CS_TOKEN_HAZEBOX:
-      case CS_TOKEN_BOX:
-      case CS_TOKEN_ORIGINBOX:
-      case CS_TOKEN_EMITBOX:
-      case CS_TOKEN_EMITLINE:
-	ParseBox (parent_token, parser, parent, name, params, tokname);
-	break;
-      case CS_TOKEN_EMITFIXED:
-	ParseEmitFixed (parent_token, parser, parent, name, params, tokname);
-	break;
-      case CS_TOKEN_EMITSPHERE:
-	ParseEmitSphere (parent_token, parser, parent, name, params,
-	  tokname);
-	break;
-      case CS_TOKEN_F:
-	ParseF (parent_token, parser, parent, name, params, tokname);
-	break;
-      case CS_TOKEN_NUM:
-	ParseNum (parent_token, parser, parent, name, params, tokname);
-	break;
-      case CS_TOKEN_PRIORITY:
-	ParsePriority (parent_token, parser, parent, name, params, tokname);
-	break;
-      case CS_TOKEN_START:
-	ParseStart (parent_token, parser, parent, name, params, tokname);
-	break;
-      case CS_TOKEN_LOD:
-	ParseLOD (parent_token, parser, parent, name, params, tokname);
-	break;
-      case CS_TOKEN_LODDIST:
-	ParseLODDistance (parent_token, parser, parent, name, params,
-	  tokname);
-	break;
-      case CS_TOKEN_LODCOST:
-	ParseLODCost (parent_token, parser, parent, name, params, tokname);
-	break;
-      case CS_TOKEN_DIRLIGHT:
-	ParseDirLight (parent_token, parser, parent, name, params, tokname);
-	break;
-      case CS_TOKEN_LIGHT:
-	ParseLight (parent_token, parser, parent, name, params, tokname);
-	break;
-      case CS_TOKEN_TRANSPARENT:
-	ParseTransparent (parent_token, parser, parent, name, params,
-	  tokname);
-	break;
-      case CS_TOKEN_SCALE:
-	ParseScale (parent_token, parser, parent, name, params, tokname);
-	break;
-      case CS_TOKEN_TYPE:
-	ParseType (parent_token, parser, parent, name, params, tokname);
-	break;
       default:
-	ParseOther (parent_token, parser, parent, name, params, tokname);
+	ParseGeneral1 (cmd, parent_token, parser, parent, name, params,
+	  tokname);
 	break;
     }
     delete[] tokname;
+  }
+}
+
+// This function exists solely to appease the MacOS/X assembler which can not
+// deal with the extremely large switch() statement in ParseGeneral().  The
+// assembler uses only 16-bit jump table offsets for the switch, but the switch
+// statement is so large that the offsets exceed 16-bits.  Unfortunately, there
+// doesn't seem to be any way to instruct the assembler to use 32-bit offsets.
+// This function, ParseGeneral1(), is merely a continuation of the switch()
+// statement in ParseGeneral().
+void Cs2Xml::ParseGeneral1 (long cmd, char const* parent_token,
+	csParser* parser, csRef<iDocumentNode>& parent, char*& name,
+	char* params, char const* tokname)
+{
+  CS_TOKEN_TABLE_START (tokens)
+    CS_TOKEN_TABLE (BOX)
+    CS_TOKEN_TABLE (DIRLIGHT)
+    CS_TOKEN_TABLE (EMITBOX)
+    CS_TOKEN_TABLE (EMITCYLINDER)
+    CS_TOKEN_TABLE (EMITCYLINDERTANGENT)
+    CS_TOKEN_TABLE (EMITFIXED)
+    CS_TOKEN_TABLE (EMITLINE)
+    CS_TOKEN_TABLE (EMITSPHERE)
+    CS_TOKEN_TABLE (F)
+    CS_TOKEN_TABLE (HAZEBOX)
+    CS_TOKEN_TABLE (HAZECONE)
+    CS_TOKEN_TABLE (LIGHT)
+    CS_TOKEN_TABLE (LOD)
+    CS_TOKEN_TABLE (LODCOST)
+    CS_TOKEN_TABLE (LODDIST)
+    CS_TOKEN_TABLE (NUM)
+    CS_TOKEN_TABLE (ORIGINBOX)
+    CS_TOKEN_TABLE (PRIORITY)
+    CS_TOKEN_TABLE (SCALE)
+    CS_TOKEN_TABLE (START)
+    CS_TOKEN_TABLE (TRANSPARENT)
+    CS_TOKEN_TABLE (TYPE)
+  CS_TOKEN_TABLE_END
+
+  switch (cmd)
+  {
+    case CS_TOKEN_EMITCYLINDER:
+    case CS_TOKEN_EMITCYLINDERTANGENT:
+      ParseEmitCylinder (parent_token, parser, parent, name, params, tokname);
+      break;
+    case CS_TOKEN_HAZECONE:
+      ParseHazeCone (parent_token, parser, parent, name, params, tokname);
+      break;
+    case CS_TOKEN_HAZEBOX:
+    case CS_TOKEN_BOX:
+    case CS_TOKEN_ORIGINBOX:
+    case CS_TOKEN_EMITBOX:
+    case CS_TOKEN_EMITLINE:
+      ParseBox (parent_token, parser, parent, name, params, tokname);
+      break;
+    case CS_TOKEN_EMITFIXED:
+      ParseEmitFixed (parent_token, parser, parent, name, params, tokname);
+      break;
+    case CS_TOKEN_EMITSPHERE:
+      ParseEmitSphere (parent_token, parser, parent, name, params, tokname);
+      break;
+    case CS_TOKEN_F:
+      ParseF (parent_token, parser, parent, name, params, tokname);
+      break;
+    case CS_TOKEN_NUM:
+      ParseNum (parent_token, parser, parent, name, params, tokname);
+      break;
+    case CS_TOKEN_PRIORITY:
+      ParsePriority (parent_token, parser, parent, name, params, tokname);
+      break;
+    case CS_TOKEN_START:
+      ParseStart (parent_token, parser, parent, name, params, tokname);
+      break;
+    case CS_TOKEN_LOD:
+      ParseLOD (parent_token, parser, parent, name, params, tokname);
+      break;
+    case CS_TOKEN_LODDIST:
+      ParseLODDistance (parent_token, parser, parent, name, params, tokname);
+      break;
+    case CS_TOKEN_LODCOST:
+      ParseLODCost (parent_token, parser, parent, name, params, tokname);
+      break;
+    case CS_TOKEN_DIRLIGHT:
+      ParseDirLight (parent_token, parser, parent, name, params, tokname);
+      break;
+    case CS_TOKEN_LIGHT:
+      ParseLight (parent_token, parser, parent, name, params, tokname);
+      break;
+    case CS_TOKEN_TRANSPARENT:
+      ParseTransparent (parent_token, parser, parent, name, params, tokname);
+      break;
+    case CS_TOKEN_SCALE:
+      ParseScale (parent_token, parser, parent, name, params, tokname);
+      break;
+    case CS_TOKEN_TYPE:
+      ParseType (parent_token, parser, parent, name, params, tokname);
+      break;
+    default:
+      ParseOther (parent_token, parser, parent, name, params, tokname);
+      break;
   }
 }
 

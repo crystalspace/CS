@@ -211,14 +211,13 @@ bool csGraphics2DSVGALib::Initialize (iObjectRegistry *object_reg)
   }
 
 
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
-  if (q != 0)
+  csRef<iEventQueue> q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q.IsValid())
   {
     // Tell event queue to call us on every frame
     q->RegisterListener (scfiEventHandler, CSMASK_Nothing);
     // Create the event outlet
     EventOutlet = q->CreateEventOutlet (this);
-    q->DecRef ();
   }
   return true;
 }
@@ -227,8 +226,6 @@ csGraphics2DSVGALib::~csGraphics2DSVGALib(void)
 {
   // Destroy your graphic interface
   Close();
-  if (EventOutlet)
-    EventOutlet->DecRef ();
 }
 
 bool csGraphics2DSVGALib::Open()

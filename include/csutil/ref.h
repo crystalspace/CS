@@ -47,6 +47,7 @@ private:
 
 public:
   csPtr (T* p) : obj (p) { }
+  csPtr (csRef<T> const& r) : obj(r) { r->IncRef(); }
 
 #ifdef CS_TEST_VOIDPTRUSAGE
   ~csPtr ()

@@ -43,6 +43,9 @@ public:
 
   void ParseGeneral (const char* parent_token,
   	csParser* parser, csRef<iDocumentNode>& parent, char* buf);
+  void ParseGeneral1 (long cmd, char const* parent_token, csParser* parser,
+	csRef<iDocumentNode>& parent, char*& name, char* params,
+	char const* tokname);
   void ParsePortal (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname, csRef<iDocumentNode>& portal_node);

@@ -60,10 +60,10 @@ NeXTAssistant::NeXTAssistant(iObjectRegistry* r) : registry(r),
 
   controller = NeXTDelegate_startup(this);
 
-  runWhenNotFocused = false;
+  run_always = false;
 
-  iEventQueue* q = get_event_queue();
-  if (q != 0)
+  csRef<iEventQueue> q = get_event_queue();
+  if (q.IsValid())
   {
     event_outlet = q->CreateEventOutlet(&scfiEventPlug);
     q->RegisterListener(&scfiEventHandler, CSMASK_Broadcast);
@@ -77,27 +77,18 @@ NeXTAssistant::NeXTAssistant(iObjectRegistry* r) : registry(r),
 NeXTAssistant::~NeXTAssistant()
 {
   NeXTDelegate_shutdown(controller);
-  if (virtual_clock != 0)
-    virtual_clock->DecRef();
-  if (event_outlet != 0)
-    event_outlet->DecRef();
-  if (event_queue != 0)
-  {
+  if (event_queue.IsValid())
     event_queue->RemoveListener(&scfiEventHandler);
-    event_queue->DecRef();
-  }
 }
 
 
 //-----------------------------------------------------------------------------
 // get_event_queue
 //-----------------------------------------------------------------------------
-iEventQueue* NeXTAssistant::get_event_queue()
+csRef<iEventQueue> NeXTAssistant::get_event_queue()
 {
-  if (event_queue == 0 && registry != 0)
-  {
+  if (!event_queue.IsValid() && registry != 0)
     event_queue = CS_QUERY_REGISTRY(registry, iEventQueue);
-  }
   return event_queue;
 }
 
@@ -105,9 +96,9 @@ iEventQueue* NeXTAssistant::get_event_queue()
 //-----------------------------------------------------------------------------
 // get_virtual_clock
 //-----------------------------------------------------------------------------
-iVirtualClock* NeXTAssistant::get_virtual_clock()
+csRef<iVirtualClock> NeXTAssistant::get_virtual_clock()
 {
-  if (virtual_clock == 0 && registry != 0)
+  if (!virtual_clock.IsValid() && registry != 0)
     virtual_clock = CS_QUERY_REGISTRY(registry, iVirtualClock);
   return virtual_clock;
 }
@@ -128,27 +119,24 @@ void NeXTAssistant::init_menu(iConfigFile* next_config)
 
 //-----------------------------------------------------------------------------
 // init_runmode
-//	Initialize the value of runWhenNotFocused based on config files
+//	Initialize the value of run_always based on config files
 // 	and command-line
 //-----------------------------------------------------------------------------
 void NeXTAssistant::init_runmode()
 {
-    iCommandLineParser *parser = 
-                CS_QUERY_REGISTRY(registry, iCommandLineParser);
-    const char *s = parser->GetOption("alwaysruns");
-    if (s != NULL)
-        runWhenNotFocused = 1;
-    else
-    {
-        // Query whether to pause on loss of focus
-        iConfigManager *cfg = CS_QUERY_REGISTRY(registry, iConfigManager);
-        if (cfg != NULL)
-        {
-            runWhenNotFocused = cfg->GetBool("System.RunWhenNotFocused");
-            cfg->DecRef();
-        }
-    };
-};
+  csRef<iCommandLineParser> parser = 
+    CS_QUERY_REGISTRY(registry, iCommandLineParser);
+  char const* s = parser->GetOption("alwaysruns");
+  if (s != 0)
+    run_always = 1;
+  else
+  {
+    // Query whether to pause on loss of focus.
+    csRef<iConfigManager> cfg = CS_QUERY_REGISTRY(registry, iConfigManager);
+    if (cfg.IsValid())
+      run_always = cfg->GetBool("System.RunWhenNotFocused");
+  }
+}
 
 
 //-----------------------------------------------------------------------------
@@ -180,25 +168,25 @@ void NeXTAssistant::request_shutdown()
 
 void NeXTAssistant::advance_state()
 {
-  iVirtualClock* c = get_virtual_clock();
-  if (c != 0)
+  csRef<iVirtualClock> c = get_virtual_clock();
+  if (c.IsValid())
     c->Advance();
-  iEventQueue* q = get_event_queue();
-  if (q != 0)
+  csRef <iEventQueue> q = get_event_queue();
+  if (q.IsValid())
     q->Process();
   if (!continue_running())
     NeXTDelegate_stop_event_loop(controller);
 }
 
-bool NeXTAssistant::always_runs() { return runWhenNotFocused; }
+bool NeXTAssistant::always_runs() { return run_always; }
 
 bool NeXTAssistant::continue_running() { return !should_shutdown; }
 
 void NeXTAssistant::application_activated()
 {
-  if (runWhenNotFocused == false)
+  if (!run_always)
   {
-    iVirtualClock* c = get_virtual_clock();
+    csRef<iVirtualClock> c = get_virtual_clock();
     if (c != 0)
       c->Resume();
   };
@@ -207,9 +195,9 @@ void NeXTAssistant::application_activated()
 
 void NeXTAssistant::application_deactivated()
 {
-  if (runWhenNotFocused == false)
+  if (!run_always)
   {
-    iVirtualClock* c = get_virtual_clock();
+    csRef<iVirtualClock> c = get_virtual_clock();
     if (c != 0)
       c->Suspend();
   };
@@ -310,15 +298,14 @@ bool NeXTAssistant::eiEventHandler::HandleEvent(iEvent& e)
 bool csDefaultRunLoop(iObjectRegistry* r)
 {
   bool ok = false;
-  iNeXTAssistant* a = CS_QUERY_REGISTRY(r, iNeXTAssistant);
-  if (a != 0)
+  csRef<iNeXTAssistant> a = CS_QUERY_REGISTRY(r, iNeXTAssistant);
+  if (a.IsValid())
   {
-    iNeXTAssistantLocal* al = SCF_QUERY_INTERFACE(a, iNeXTAssistantLocal);
-    a->DecRef ();
-    if (al != 0)
+    csRef<iNeXTAssistantLocal> al =
+      SCF_QUERY_INTERFACE(a, iNeXTAssistantLocal);
+    if (al.IsValid())
     {
       al->start_event_loop();
-      al->DecRef();
       ok = true;
     }
   }
@@ -334,9 +321,8 @@ bool csPlatformStartup(iObjectRegistry* r)
 {
   printf("Crystal Space for " CS_PLATFORM_NAME " " CS_VERSION "\nPorted to "
     CS_PLATFORM_NAME " by Eric Sunshine <sunshine@sunshineco.com>\n\n");
-  iNeXTAssistant* a = new NeXTAssistant(r);
+  csRef<iNeXTAssistant> a = csPtr<iNeXTAssistant>(new NeXTAssistant(r));
   r->Register(a, "iNeXTAssistant");
-  a->DecRef();
   return true;
 }
 
@@ -347,11 +333,8 @@ bool csPlatformStartup(iObjectRegistry* r)
 //-----------------------------------------------------------------------------
 bool csPlatformShutdown(iObjectRegistry* r)
 {
-  iNeXTAssistant* a = CS_QUERY_REGISTRY(r, iNeXTAssistant);
-  if (a != 0)
-  {
+  csRef<iNeXTAssistant> a = CS_QUERY_REGISTRY(r, iNeXTAssistant);
+  if (a.IsValid())
     r->Unregister(a, "NeXTAssistant"); // DecRefs() assistant as a side-effect.
-    a->DecRef ();
-  }
   return true;
 }

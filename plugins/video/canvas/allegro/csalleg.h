@@ -40,7 +40,7 @@ class csGraphics2DAlleg : public csGraphics2D, public iEventPlug
   BITMAP *bitmap;
   bool scale; /* Bitmap is not screen size, scale it */
   // The event outlet
-  iEventOutlet *EventOutlet;
+  csRef<iEventOutlet> EventOutlet;
   // Hook keyboard and mouse?
   bool hook_kbd, hook_mouse;
   // Are the keyboard/mouse hooks active?

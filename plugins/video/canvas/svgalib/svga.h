@@ -41,7 +41,7 @@ class csGraphics2DSVGALib : public csGraphics2D, public iEventPlug
   int mouse_x, mouse_y;
 
   // The event outlet
-  iEventOutlet *EventOutlet;
+  csRef<iEventOutlet> EventOutlet;
 
 public:
   SCF_DECLARE_IBASE_EXT(csGraphics2D);

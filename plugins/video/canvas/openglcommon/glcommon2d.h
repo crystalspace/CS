@@ -58,7 +58,7 @@ public:
   SCF_DECLARE_IBASE_EXT(csGraphics2D);
 
   /// The event plug object
-  iEventOutlet *EventOutlet;
+  csRef<iEventOutlet> EventOutlet;
 
   /**
    * Constructor does little, most initialization stuff happens in

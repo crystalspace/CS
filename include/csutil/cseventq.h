@@ -58,7 +58,7 @@ private:
   };
   CS_TYPEDEF_GROWING_ARRAY(ListenerVector, Listener);
 
-  /**
+  /*
    * The array of all allocated event outlets.  *NOTE* It is not the
    * responsibility of this class to free the contained event outlets, thus
    * this class does not override FreeItem().  Instead, it is the
@@ -76,7 +76,7 @@ private:
       { return (csEventOutlet*)csVector::Get(i); }
   };
 
-  /// The array of all allocated event cords.
+  // The array of all allocated event cords.
   class EventCordsVector : public csVector
   {
   public:
@@ -89,46 +89,48 @@ private:
     int Find(int Category, int SubCategory);
   };
 
-  /// Shared-object registry
+  // Shared-object registry
   iObjectRegistry* Registry;
-  /// The queue itself
+  // The queue itself
   volatile iEvent** EventQueue;
-  /// Queue head and tail pointers
+  // Queue head and tail pointers
   volatile size_t evqHead, evqTail;
-  /// The maximum queue length
+  // The maximum queue length
   volatile size_t Length;
-  /// Protection against multiple threads accessing same event queue
+  // Protection against multiple threads accessing same event queue
   volatile int SpinLock;
-  /// Protection against delete while looping through the listeners.
+  // Protection against delete while looping through the listeners.
   int busy_looping;
-  /// If a delete happened while busy_looping is true we set the
-  /// following to true.
+  /*  
+   * If a delete happened while busy_looping is true we set the
+   * following to true.
+   */
   bool delete_occured;
-  /// Registered listeners.
+  // Registered listeners.
   ListenerVector Listeners;
-  /// Array of allocated event outlets.
+  // Array of allocated event outlets.
   EventOutletsVector EventOutlets;
-  /// Array of allocated event cords.
+  // Array of allocated event cords.
   EventCordsVector EventCords;
 
-  /// Enlarge the queue size.
+  // Enlarge the queue size.
   void Resize(size_t iLength);
-  /// Lock the queue for modifications: NESTED CALLS TO LOCK/UNLOCK NOT ALLOWED!
+  // Lock the queue for modifications: NESTED CALLS TO LOCK/UNLOCK NOT ALLOWED!
   inline void Lock() { while (SpinLock) {} SpinLock++; }
-  /// Unlock the queue
+  // Unlock the queue
   inline void Unlock() { SpinLock--; }
-  /// Find a particular listener index; return -1 if listener is not registered.
+  // Find a particular listener index; return -1 if listener is not registered.
   int FindListener(iEventHandler*) const;
-  /// Notify listeners of CSMASK_Nothing.
+  // Notify listeners of CSMASK_Nothing.
   void Notify(iEvent&);
 
-  /**
+  /*
    * Start a loop. The purpose of this function is to protect
    * against modifications to the Listeners array while this array
    * is being processed.
    */
   void StartLoop ();
-  /// End a loop.
+  // End a loop.
   void EndLoop ();
 
 public:
@@ -152,7 +154,7 @@ public:
   virtual void ChangeListenerTrigger(iEventHandler*, unsigned int trigger);
 
   /// Register an event plug and return a new outlet.
-  virtual iEventOutlet* CreateEventOutlet(iEventPlug*);
+  virtual csPtr<iEventOutlet> CreateEventOutlet(iEventPlug*);
   /// Get a public event outlet for posting just an event.
   virtual iEventOutlet* GetEventOutlet();
   /// Get the event cord for a given category and subcategory.
@@ -160,8 +162,8 @@ public:
 
   /// Place an event into queue.
   virtual void Post(iEvent*);
-  /// Get next event from queue or NULL
-  virtual iEvent* Get();
+  /// Get next event from queue or a null references if no event.
+  virtual csPtr<iEvent> Get();
   /// Clear event queue
   virtual void Clear();
   /// Query if queue is empty (@@@ Not thread safe!)

@@ -118,7 +118,6 @@ bool csLinuxJoystick::Init ()
   int fd;
 
   nJoy=0;
-  SCF_DEC_REF (EventOutlet);
   bHooked = false;
   EventOutlet = NULL;
 
@@ -187,7 +186,7 @@ bool csLinuxJoystick::Init ()
             "No operable joystick found\n");
   }
 
-  return EventOutlet;
+  return EventOutlet.IsValid();
 }
 
 bool csLinuxJoystick::Close ()
@@ -200,7 +199,6 @@ bool csLinuxJoystick::Close ()
     bHooked = false;
   }
 
-  SCF_DEC_REF (EventOutlet);
   EventOutlet = NULL;
 
   for (int i=0; i<nJoy; i++)

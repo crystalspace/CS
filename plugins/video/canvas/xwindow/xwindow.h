@@ -44,7 +44,7 @@ class csXWindow : public iXWindow, public iEventPlug
   /// The Canvas
   iGraphics2D *Canvas;
   /// The event outlet
-  iEventOutlet *EventOutlet;
+  csRef<iEventOutlet> EventOutlet;
   /// The XFree86-VidModeExtension
   csRef<iXExtF86VM> xf86vm;
   /// The Window Title

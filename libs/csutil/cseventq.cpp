@@ -71,7 +71,7 @@ again:
   Unlock ();
 }
 
-iEvent *csEventQueue::Get ()
+csPtr<iEvent> csEventQueue::Get ()
 {
   iEvent* ev = 0;
   if (!IsEmpty ())
@@ -88,9 +88,8 @@ iEvent *csEventQueue::Get ()
 
 void csEventQueue::Clear ()
 {
-  iEvent* ev;
-  while ((ev = Get()) != NULL)
-    ev->DecRef();
+  csRef<iEvent> ev;
+  for (ev = Get(); ev.IsValid(); ev = Get()) /* empty */;
 }
 
 void csEventQueue::Resize (size_t iLength)
@@ -170,11 +169,11 @@ void csEventQueue::Process ()
   csEvent notification (csGetTicks(), csevBroadcast, cscmdPreProcess);
   Notify (notification);
 
-  iEvent* ev;
-  while ((ev = Get ()) != 0)
+  csRef<iEvent> ev;
+  for (ev = Get(); ev.IsValid(); ev = Get())
   {
-    Dispatch (*ev);
-    ev->DecRef ();
+    iEvent& e = *ev;
+    Dispatch (e);
   }
 
   notification.Command.Code = cscmdProcess;
@@ -254,7 +253,7 @@ void csEventQueue::ChangeListenerTrigger (iEventHandler* l,
     Listeners[n].trigger = trigger;
 }
 
-iEventOutlet* csEventQueue::CreateEventOutlet (iEventPlug* plug)
+csPtr<iEventOutlet> csEventQueue::CreateEventOutlet (iEventPlug* plug)
 {
   csEventOutlet* outlet = 0;
   if (plug != 0)

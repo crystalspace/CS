@@ -126,7 +126,7 @@ protected:
     OSXDelegate2D delegate;			// Delegate for ObjC stuff
     csGraphics2D *canvas;			// Canvas (parent class)
 
-    iNeXTAssistant *assistant;			// Assistant for dispatching events
+    csRef<iNeXTAssistant> assistant;		// Assistant for dispatching events
     iObjectRegistry *objectReg;			// Object registry
 };
 
