@@ -1,4 +1,5 @@
 SubDir TOP plugins cscript ;
 
+SubInclude TOP plugins cscript csjava ;
 SubInclude TOP plugins cscript csperl5 ;
 SubInclude TOP plugins cscript cspython ;

@@ -1,0 +1,86 @@
+SubDir TOP plugins cscript csjava ;
+
+# @@@ TODO
+# - Implement install targets.
+# - Figure out how to determine correct shared library suffix on MacOS/X and
+#   utilize that suffix.
+# - Ensure that 'clean' targets are accurate.
+# - Remove legacy Makefile.
+
+if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(CMD.SWIG) &&
+  ! [ Property build : projgen ]
+{
+  local common = [ DoSourceGrist csjava.cpp ] ;
+
+  local javadir = [ ConcatDirs $(LOCATE_TARGET) com crystalspace ] ;
+  Depends $(common) : $(javadir:G=dir) ;
+  MkDir $(javadir:G=dir) ;
+  CleanDir csjavaclean : $(javadir) ;
+
+  Swig $(common) :
+    [ DoSourceGrist cspace.i ] :
+    java :
+    -c++ -java -package com.crystalspace :
+    [ ConcatDirs $(TOP) include ] :
+    [ ConcatDirs $(TOP) include ivaria ] :
+    :
+    :
+    com crystalspace ;
+  Depends csjavaclean : javaswigclean ;
+
+  NotFile csjava ;
+  Depends plugins : csjava ;
+
+  local desc = "pure Java module" ;
+  Description csjava : $(desc) ;
+  Help csjava : "Build the $(desc)" ;
+
+  # @@@FIXME: ConstructPluginTarget will return wrong suffix on MacOS/X.
+  local javamod = [ ConstructPluginTarget csjava ] ;
+  local javamodsrc = $(common) [ Wildcard *.cpp ] ;
+  local javamodobj = [ CompileObjects $(javamodsrc) ] ;
+  javamod_TARGET = $(javamod) ;
+  javamod_SOURCES = $(javamodsrc) ;
+  javamod_OBJECTS = $(javamodobj) ;
+  LinkWith javamod : cstool csgfx csgeom csutil ;
+  ExternalLibs javamod : JAVA ;
+  CFlags javamod : $(PLUGIN.CFLAGS) $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
+  LFlags javamod : $(PLUGIN.LFLAGS) ;
+  Depends csjava : $(javamod) ;
+  MakeLocate $(javamod) : $(LOCATE_TARGET) ;
+  Depends $(javamod) : $(javamodobj) ;
+  LinkPlugin $(javamod) : $(javamodobj) ;
+
+  actions Ant
+  {
+    $(ANT) -emacs -Dbuild.compiler.emacs=true -D$(PROPERTIES) -buildfile $(>)
+  }
+
+  local jar_extra = [ Wildcard [ ConcatDirs com crystalspace ] : *.java ] ;
+  SEARCH on $(jar_extra) = $(SEARCH_SOURCE) ;
+  MakeLocate $(jar_extra:BSG=built) :
+    [ ConcatDirs $(LOCATE_TARGET) com crystalspace ] ;
+  local i ;
+  for i in $(jar_extra)
+  {
+    Depends $(i:BSG=built) : $(i) ;
+    Copy $(i:BSG=built) : $(i) ;
+  }
+
+  local jar = crystalspace.jar ;
+  local buildxml = build.xml ;
+  local classdir = [ ConcatDirs $(LOCATE_TARGET) classes ] ;
+  SEARCH on $(buildxml) = $(SEARCH_SOURCE) ;
+  Depends $(buildxml:G=build) : $(buildxml) ;
+  MakeLocate $(buildxml:G=build) : $(LOCATE_TARGET) ;
+  Copy $(buildxml:G=build) : $(buildxml) ;
+  Depends $(jar) : $(common) $(buildxml:G=build) $(jar_extra:BSG=built) ;
+  Depends csjava : $(jar) ;
+  MakeLocate $(jar) : $(LOCATE_TARGET) ;
+  Ant $(jar) : $(buildxml:G=build) ;
+
+  Always csjavaclean ;
+  NotFile csjavaclean ;
+  Clean csjavaclean : $(javamod) $(javamodobj) ;
+  Depends clean : csjavaclean ;
+}
