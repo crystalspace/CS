@@ -849,18 +849,48 @@ void csSector::Draw (iRenderView *rview)
 
 csObject **csSector::GetVisibleObjects (iFrustumView *lview, int &num_objects)
 {
-  csFrustum *lf = lview->GetFrustumContext ()->GetLightFrustum ();
-  bool infinite = lf->IsInfinite ();
-  csVector3 &c = lf->GetOrigin ();
-  bool vis;
-  int i, i1;
-  int j;
-
   num_objects = meshes.Length ();
   if (!num_objects)
   {
     return NULL;
   }
+
+  csFrustum *lf = lview->GetFrustumContext ()->GetLightFrustum ();
+  const csVector3& c = lf->GetOrigin ();
+  bool infinite = lf->IsInfinite ();
+
+  csPlane3 planes[32];
+  uint32 planes_mask;
+  if (!infinite)
+  {
+    CS_ASSERT (lf->GetVertexCount () <= 31);	// @@@ What if the frustum is bigger???
+    if (lf->GetVertexCount () > 31)
+    {
+      printf ("INTERNAL ERROR! Vertex count in GetVisibleObjects() exceeded!\n");
+      fflush (stdout);
+      return NULL;
+    }
+    planes_mask = 0;
+    int i;
+    int i1 = lf->GetVertexCount () - 1;
+    for (i = 0 ; i < lf->GetVertexCount () ; i1 = i, i++)
+    {
+      planes_mask = (planes_mask<<1)|1;
+      const csVector3 &v1 = lf->GetVertex (i);
+      const csVector3 &v2 = lf->GetVertex (i1);
+      planes[i].Set (c, v1+c, v2+c);
+    }
+    if (lf->GetBackPlane ())
+    {
+      // @@@ UNTESTED CODE! There are no backplanes yet in frustums.
+      // It is possible this plane has to be inverted.
+      planes_mask = (planes_mask<<1)|1;
+      planes[i] = *(lf->GetBackPlane ());
+    }
+  }
+
+  bool vis;
+  int j;
 
   csObject **visible_objects = new csObject *[num_objects];
 
@@ -872,7 +902,6 @@ csObject **csSector::GetVisibleObjects (iFrustumView *lview, int &num_objects)
     iMeshWrapper *sp = meshes.Get (j);
 
     // If the light frustum is infinite then every thing
-
     // in this sector is of course visible.
     if (infinite)
       vis = true;
@@ -880,79 +909,8 @@ csObject **csSector::GetVisibleObjects (iFrustumView *lview, int &num_objects)
     {
       csBox3 bbox;
       sp->GetWorldBoundingBox (bbox);
-
-      /*
-       * Here we do a quick test to see if the bounding box is visible in
-       * in the frustum. This test is not complete in the sense that it will
-       * say that some bounding boxes are visible even if they are not. But
-       * it is correct in the sense that if it says a bounding box
-       * is invisible, then it certainly is invisible.
-       *
-       * It works by taking all vertices of the bounding box. If
-       * ALL of them are on the outside of the same plane from the
-       * frustum then the object is certainly not visible.
-       */
-      vis = true;
-      i1 = lf->GetVertexCount () - 1;
-      for (i = 0; i < lf->GetVertexCount (); i1 = i, i++)
-      {
-        csVector3 &v1 = lf->GetVertex (i);
-        csVector3 &v2 = lf->GetVertex (i1);
-        if (csMath3::WhichSide3D (bbox.GetCorner (0) - c, v1, v2) < 0)
-          continue;
-        if (csMath3::WhichSide3D (bbox.GetCorner (1) - c, v1, v2) < 0)
-          continue;
-        if (csMath3::WhichSide3D (bbox.GetCorner (2) - c, v1, v2) < 0)
-          continue;
-        if (csMath3::WhichSide3D (bbox.GetCorner (3) - c, v1, v2) < 0)
-          continue;
-        if (csMath3::WhichSide3D (bbox.GetCorner (4) - c, v1, v2) < 0)
-          continue;
-        if (csMath3::WhichSide3D (bbox.GetCorner (5) - c, v1, v2) < 0)
-          continue;
-        if (csMath3::WhichSide3D (bbox.GetCorner (6) - c, v1, v2) < 0)
-          continue;
-        if (csMath3::WhichSide3D (bbox.GetCorner (7) - c, v1, v2) < 0)
-          continue;
-
-        // Here we have a case of all vertices of the bbox being on the
-        // outside of the same plane.
-        vis = false;
-        break;
-      }
-
-      if (vis && lf->GetBackPlane ())
-      {
-        /*
-	 * If still visible then we can also check the back plane.
-         * @@@ NOTE THIS IS UNTESTED CODE. LIGHT_FRUSTUMS CURRENTLY DON'T
-         * HAVE A BACK PLANE YET.
-	 */
-        if (
-          !csMath3::Visible (
-              bbox.GetCorner (0) - c,
-              *lf->GetBackPlane ()) &&
-          !csMath3::Visible (
-              bbox.GetCorner (1) - c,
-              *lf->GetBackPlane ()) &&
-          !csMath3::Visible (
-              bbox.GetCorner (2) - c,
-              *lf->GetBackPlane ()) &&
-          !csMath3::Visible (
-              bbox.GetCorner (3) - c,
-              *lf->GetBackPlane ()) &&
-          !csMath3::Visible (
-              bbox.GetCorner (4) - c,
-              *lf->GetBackPlane ()) &&
-          !csMath3::Visible (
-              bbox.GetCorner (5) - c,
-              *lf->GetBackPlane ()) &&
-          !csMath3::Visible (
-              bbox.GetCorner (6) - c,
-              *lf->GetBackPlane ()) &&
-          !csMath3::Visible (bbox.GetCorner (7) - c, *lf->GetBackPlane ()))
-          vis = false;
-      }
+      uint32 out_mask;
+      vis = csIntersect3::BoxFrustum (bbox, planes, planes_mask, out_mask);
     }
 
     if (vis) visible_objects[num_objects++] = sp->GetPrivateObject ();

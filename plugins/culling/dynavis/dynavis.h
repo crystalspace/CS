@@ -186,7 +186,7 @@ public:
     const csVector3& end, csVector3& isect, float* pr = NULL,
     iMeshWrapper** p_mesh = NULL);
   virtual bool SupportsShadowCasting () { return false; }
-  virtual void CastShadows (iFrustumView* /*fview*/) { }
+  virtual void CastShadows (iFrustumView* fview);
 
   // Debugging functions.
   iString* Debug_UnitTest ();

@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+7-Jul-2002
+	- csSector::GetVisibleObjects() now uses the efficient
+	  csIntersect3::BoxFrustum() routine. This also fixes a bug
+	  because the old code was actually not always correct.
 6-Jul-2002
 	- Removed -fno-rtti from comptest.sh. So this option will no
 	  longer be used from the moment you do 'make linux' again.

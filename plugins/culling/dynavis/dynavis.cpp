@@ -1228,6 +1228,12 @@ iPolygon3D* csDynaVis::IntersectSegment (const csVector3& start,
   return data.polygon;
 }
 
+//======== CastShadows =====================================================
+
+void csDynaVis::CastShadows (iFrustumView* fview)
+{
+}
+
 //======== Debugging =======================================================
 
 iString* csDynaVis::Debug_UnitTest ()
