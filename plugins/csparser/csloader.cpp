@@ -3143,8 +3143,8 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
 	    attenvec.x = child->GetAttributeValueAsFloat ("c");
 	    attenvec.y = child->GetAttributeValueAsFloat ("l");
 	    attenvec.z = child->GetAttributeValueAsFloat ("q");
-	  }
 #endif
+	  }
 	}
 	break;
       #ifdef CS_USE_NEW_RENDERER
