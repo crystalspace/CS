@@ -14,8 +14,11 @@ endif
 ifeq ($(DO_MMX),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_MMX$">>volatile.tmp
 endif
-ifeq ($(NEED_FAKE_BOOL),yes)
-  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define NO_BOOL_TYPE$">>volatile.tmp
+ifeq ($(DO_FAKE_BOOL),yes)
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_FAKE_BOOL$">>volatile.tmp
+endif
+ifeq ($(DO_FAKE_SOCKLEN_T),yes)
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_FAKE_SOCKLEN_T$">>volatile.tmp
 endif
 ifeq ($(DO_COREDUMP),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_COREDUMP$">>volatile.tmp

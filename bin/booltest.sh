@@ -13,7 +13,7 @@ CXX=$1
 
 echo "int main() { bool b = true; return (int)b; }" > booltest.cpp
 
-${CXX} -c booltest.cpp 2>/dev/null || echo "NEED_FAKE_BOOL = yes"
+${CXX} -c booltest.cpp 2>/dev/null || echo "DO_FAKE_BOOL = yes"
 
 rm -f booltest.cpp booltest.o
 

@@ -22,6 +22,12 @@ The history order has been reversed so that new features are at the top.
 	  programs to use hard-coded 16-bit color values in a 15-bit
 	  environment.  Thus the NeXT 2D driver now tolerate such buggy
 	  behavior.
+	- Eric Sunshine added automatic detection of socklen_t to unixconf.sh.
+	  If absent, defines DO_FAKE_SOCKLEN_T in config.mak and volatile.h,
+	  and fakes up socklen_t with int.  Hopefully this will resolve (at
+	  least one) problem with compiling network socket driver on Solaris.
+	- Eric Sunshine renamed NEED_FAKE_BOOL/NO_BOOL_TYPE to DO_FAKE_BOOL in
+	  booltest.sh, volatile.mak, and types.h for consistency's sake.
 30-Apr-2000
 	- More work on the PVS.
 	- Added csBox2 and csBox3::GetCenter().

@@ -81,6 +81,20 @@ ${CXX} -c -fno-rtti conftest.cpp 2>/dev/null && echo "CFLAGS.SYSTEM += -fno-rtti
 # Remove dummy remains
 rm -f conftest.cpp conftest.o
 
+# Check for socklen_t
+echo "#include <unistd.h>" > socktest.cpp
+echo "#include <sys/types.h>" >> socktest.cpp
+echo "#include <sys/socket.h>" >> socktest.cpp
+echo "#define BSD_COMP 1" >> socktest.cpp
+echo "#include <sys/ioctl.h>" >> socktest.cpp
+echo "#include <netinet/in.h>" >> socktest.cpp
+echo "#include <netdb.h>" >> socktest.cpp
+echo "int main() { socklen_t x = 0; return (int)x; }" >> socktest.cpp
+
+${CXX} -c socktest.cpp 2>/dev/null || echo "DO_FAKE_SOCKLEN_T = yes"
+
+rm -f socktest.cpp socktest.o
+
 # Create a dummy NASM program
 echo "%xdefine TEST" >conftest.asm
 

@@ -310,6 +310,9 @@
 #  endif
 #  include <netinet/in.h>
 #  include <netdb.h>
+#  if defined (DO_FAKE_SOCKLEN_T)
+     typedef int socklen_t;
+#  endif
 #endif
 
 #ifdef CS_DEBUG

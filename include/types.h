@@ -29,10 +29,10 @@
 //-----------------------------------------------------------------------------
 // If your compiler complains about 'true', 'false', and 'bool' it
 // may be an older C++ compiler which doesn't understand these constructs.
-// In that case, set NEED_FAKE_BOOL to 'yes' in the makefile, or define the
-// C-macro NO_BOOL_TYPE in your project file.
+// In that case, set DO_FAKE_BOOL to 'yes' in the makefile, or define the
+// C-macro DO_FAKE_BOOL in your project file.
 //-----------------------------------------------------------------------------
-#ifdef NO_BOOL_TYPE
+#ifdef DO_FAKE_BOOL
 typedef int bool;
 #undef  true
 #define true 1
