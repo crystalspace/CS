@@ -157,7 +157,6 @@
 #include "ivaria/collider.h"
 #include "ivaria/conin.h"
 #include "ivaria/conout.h"
-#include "ivaria/iso.h"
 #include "ivaria/keyval.h"
 #include "ivaria/mapnode.h"
 #include "ivaria/pmeter.h"
