@@ -112,6 +112,10 @@ private:
   void UpdateCoverageBuffer (iCamera* camera, iVisibilityObject* visobj,
   	csObjectModel* model);
 
+  // Given an occluder, update it in the coverage buffer. Using the outline.
+  void UpdateCoverageBufferOutline (iCamera* camera, iVisibilityObject* visobj,
+  	csObjectModel* model);
+
 public:
   SCF_DECLARE_IBASE;
 

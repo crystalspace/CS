@@ -102,6 +102,13 @@ private:
   	int shift = 0);
 
   /**
+   * Draw an outline on the coverage buffer.
+   * Returns false if outline is outside screen.
+   */
+  bool DrawOutline (csVector2* verts, int num_verts,
+  	int* edges, int num_edges, csBox2Int& bbox);
+
+  /**
    * Do a XOR sweep on the entire buffer.
    */
   void XORSweep ();
@@ -131,6 +138,17 @@ public:
    */
   bool InsertPolygon (csVector2* verts, int num_verts, float max_depth,
   	bool negative = false);
+
+  /**
+   * Insert an outline in the coverage buffer.
+   * It will update the screen buffer.
+   * Function returns false if outline was not visible (i.e.
+   * screen buffer was not modified).
+   * The given array of edges is an array of two integers (vertex indices)
+   * per edge.
+   */
+  bool InsertOutline (csVector2* verts, int num_verts,
+  	int* edges, int num_edges, float max_depth);
 
   /**
    * Test a polygon with the coverage buffer.

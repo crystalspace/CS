@@ -424,6 +424,88 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
   delete[] tr_verts;
 }
 
+void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
+	iVisibilityObject* visobj, csObjectModel* model)
+{
+  iMovable* movable = visobj->GetMovable ();
+  iPolygonMesh* polymesh = visobj->GetObjectModel ()->GetSmallerPolygonMesh ();
+
+  const csVector3* verts = polymesh->GetVertices ();
+  int vertex_count = polymesh->GetVertexCount ();
+  int poly_count = polymesh->GetPolygonCount ();
+
+  csReversibleTransform movtrans = movable->GetFullTransform ();
+  const csReversibleTransform& camtrans = camera->GetTransform ();
+  csReversibleTransform trans = camtrans / movtrans;
+  float fov = camera->GetFOV ();
+  float sx = camera->GetShiftX ();
+  float sy = camera->GetShiftY ();
+
+  // Calculate camera position in object space.
+  csVector3 campos_object = movtrans.Other2This (camtrans.GetOrigin ());
+  model->UpdateOutline (campos_object);
+  const csOutlineInfo& outline_info = model->GetOutlineInfo ();
+
+  int i;
+  // First transform all vertices.
+  //@@@ Avoid allocate?
+  csVector2* tr_verts = new csVector2[vertex_count];
+  float* tr_z = new float[vertex_count];
+  float max_depth = -1.0;
+  for (i = 0 ; i < vertex_count ; i++)
+  {
+    csVector3 camv = trans.Other2This (verts[i]);
+    if (camv.z <= 0.0)
+    {
+      // @@@ Later we should clamp instead of ignoring this outline.
+      return;
+    }
+    if (camv.z > max_depth) max_depth = camv.z;
+    tr_z[i] = camv.z;
+    // @@@ ONLY DO THIS WHEN NEEDED IN OUTLINE
+    Perspective (camv, tr_verts[i], fov, sx, sy);
+  }
+
+  if (do_state_dump)
+  {
+    iObject* iobj = SCF_QUERY_INTERFACE (visobj, iObject);
+    if (iobj)
+    {
+      printf ("CovOutIns of object %s (max_depth=%g)\n",
+      	iobj->GetName () ? iobj->GetName () : "<noname>",
+	max_depth);
+      iobj->DecRef ();
+    }
+  }
+
+  // Then insert the outline.
+  bool rc = covbuf->InsertOutline (tr_verts, vertex_count,
+  	outline_info.outline_edges, outline_info.num_outline_edges, max_depth);
+  if (do_state_dump)
+  {
+    printf ("  max_depth=%g rc=%d ", max_depth, rc);
+    int j;
+    for (j = 0 ; j < outline_info.num_outline_edges ; j++)
+    {
+      int vt1 = outline_info.outline_verts[outline_info.outline_edges[j*2+0]];
+      int vt2 = outline_info.outline_verts[outline_info.outline_edges[j*2+1]];
+      printf ("(%g,%g[%d],%g,%g[%d]) ",
+        tr_verts[vt1].x, tr_verts[vt1].y,
+        outline_info.outline_edges[j*2+0],
+        tr_verts[vt2].x, tr_verts[vt2].y,
+        outline_info.outline_edges[j*2+1]);
+    }
+    printf ("\n");
+
+    iString* str = covbuf->Debug_Dump ();
+    printf ("%s\n", str->GetData ());
+    str->DecRef ();
+  }
+
+  delete[] tr_z;
+  delete[] tr_verts;
+}
+
 bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   	VisTest_Front2BackData* data)
 {
@@ -468,7 +550,9 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
     if (do_cull_coverage && obj->visobj->GetObjectModel ()->
     	GetSmallerPolygonMesh ())
     {
-      UpdateCoverageBuffer (data->rview->GetCamera (), obj->visobj,
+      //UpdateCoverageBuffer (data->rview->GetCamera (), obj->visobj,
+      	//obj->model);
+      UpdateCoverageBufferOutline (data->rview->GetCamera (), obj->visobj,
       	obj->model);
     }
 

@@ -33,11 +33,47 @@ csObjectModel::csObjectModel ()
 {
   planes = NULL;
   num_planes = -1;
+  edges = NULL;
+  num_edges = -1;
 }
 
 csObjectModel::~csObjectModel ()
 {
   delete[] planes;
+  delete[] edges;
+}
+
+void csObjectModel::UpdateOutline (const csVector3& pos)
+{
+  if (!imodel->GetSmallerPolygonMesh ()) return;
+
+  int num_vertices = imodel->GetSmallerPolygonMesh ()->GetVertexCount ();
+
+  bool recalc_outline = false;
+  if (!outline_info.outline_edges)
+  {
+    // @@@ Only allocate active edges.
+    outline_info.outline_edges = new int [num_edges*2];
+    outline_info.outline_verts = new int [num_vertices];
+    recalc_outline = true;
+  }
+  else
+  {
+    float sqdist = csSquaredDist::PointPoint (pos, outline_info.outline_pos);
+    if (sqdist >= outline_info.valid_radius * outline_info.valid_radius)
+      recalc_outline = true;
+  }
+
+  if (recalc_outline)
+  {
+    csPolygonMeshTools::CalculateOutline (edges, num_edges,
+    	planes, num_vertices, pos,
+	outline_info.outline_edges, outline_info.num_outline_edges,
+	outline_info.outline_verts, outline_info.num_outline_verts,
+	outline_info.valid_radius);
+    printf ("Recalc outline %g\n", outline_info.valid_radius); fflush (stdout);
+    outline_info.outline_pos = pos;
+  }
 }
 
 //---------------------------------------------------------------------------
@@ -93,14 +129,9 @@ bool csObjectModelManager::CheckObjectModel (csObjectModel* model)
   if (model->imodel->GetShapeNumber () != model->shape_number)
   {
     model->shape_number = model->imodel->GetShapeNumber ();
+    model->outline_info.Clear ();
     iPolygonMesh* mesh = model->imodel->GetSmallerPolygonMesh ();
-    if (!mesh)
-    {
-      delete[] model->planes;
-      model->planes = NULL;
-      model->num_planes = -1;
-    }
-    else
+    if (mesh)
     {
       if (model->num_planes != mesh->GetPolygonCount ())
       {
@@ -109,6 +140,11 @@ bool csObjectModelManager::CheckObjectModel (csObjectModel* model)
         model->planes = new csPlane3 [model->num_planes];
       }
       csPolygonMeshTools::CalculatePlanes (mesh, model->planes);
+      delete[] model->edges;
+      model->edges = csPolygonMeshTools::CalculateEdges (
+      	mesh, model->num_edges);
+      csPolygonMeshTools::CheckActiveEdges (model->edges, model->num_edges,
+      	model->planes);
     }
     return true;
   }

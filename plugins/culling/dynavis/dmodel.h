@@ -23,7 +23,44 @@
 #include "csutil/hashmap.h"
 
 struct iObjectModel;
+class csObjectModel;
 class csObjectModelManager;
+struct csPolygonMeshEdge;
+
+/**
+ * Outline information.
+ */
+class csOutlineInfo
+{
+  friend class csObjectModelManager;
+  friend class csObjectModel;
+
+private:
+  csOutlineInfo ()
+  {
+    outline_edges = NULL;
+    outline_verts = NULL;
+  }
+  ~csOutlineInfo ()
+  {
+    delete[] outline_edges;
+    delete[] outline_verts;
+  }
+
+  void Clear ()
+  {
+    delete[] outline_edges; outline_edges = NULL;
+    delete[] outline_verts; outline_verts = NULL;
+  }
+
+public:
+  int num_outline_edges;
+  int num_outline_verts;
+  int* outline_edges;
+  int* outline_verts;
+  float valid_radius;
+  csVector3 outline_pos;
+};
 
 /**
  * This object represents a model in this visibility system. Several
@@ -41,6 +78,12 @@ private:
   int num_planes;
   csPlane3* planes;	// Planes for this model.
 
+  csPolygonMeshEdge* edges;
+  int num_edges;
+
+  // Outline information (may in future move to a seperate class).
+  csOutlineInfo outline_info;
+
   csObjectModel ();
   ~csObjectModel ();
 
@@ -51,6 +94,12 @@ public:
   long GetShapeNumber () const { return shape_number; }
   /// Get the planes.
   const csPlane3* GetPlanes () const { return planes; }
+
+  /// Update outline from the given position. Possibly reuse old outline.
+  void UpdateOutline (const csVector3& pos);
+
+  /// Get outline information.
+  const csOutlineInfo& GetOutlineInfo () const { return outline_info; }
 };
 
 /**

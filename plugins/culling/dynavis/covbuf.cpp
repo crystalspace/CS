@@ -521,6 +521,84 @@ bool csCoverageBuffer::DrawPolygon (csVector2* verts, int num_verts,
   return true;
 }
 
+bool csCoverageBuffer::DrawOutline (csVector2* verts, int num_verts,
+	int* edges, int num_edges,
+	csBox2Int& bbox)
+{
+  int i;
+
+  //---------
+  // First we copy the vertices to xa/ya. In the mean time
+  // we convert to integer and also search for the top vertex (lowest
+  // y coordinate) and bottom vertex.
+  //@@@ TODO: pre-shift x with 16
+  //---------
+  int xa[128], ya[128];
+  int top_vt = 0;
+  int bot_vt = 0;
+  xa[0] = QRound (verts[0].x);
+  ya[0] = QRound (verts[0].y);
+  bbox.minx = bbox.maxx = xa[0];
+  bbox.miny = bbox.maxy = ya[0];
+  for (i = 1 ; i < num_verts ; i++)
+  {
+    xa[i] = QRound (verts[i].x);
+    ya[i] = QRound (verts[i].y);
+
+    if (xa[i] < bbox.minx) bbox.minx = xa[i];
+    else if (xa[i] > bbox.maxx) bbox.maxx = xa[i];
+
+    if (ya[i] < bbox.miny)
+    {
+      bbox.miny = ya[i];
+      top_vt = i;
+    }
+    else if (ya[i] > bbox.maxy)
+    {
+      bbox.maxy = ya[i];
+      bot_vt = i;
+    }
+  }
+
+  if (bbox.maxx <= 0) return false;
+  if (bbox.maxy <= 0) return false;
+  if (bbox.minx >= width) return false;
+  if (bbox.miny >= height) return false;
+
+  InitializePolygonBuffer (bbox);
+
+  //---------
+  // Draw all edges.
+  //---------
+  for (i = 0 ; i < num_edges ; i++)
+  {
+    int vt1 = *edges++;
+    int vt2 = *edges++;
+    int ya1 = ya[vt1];
+    int ya2 = ya[vt2];
+    if (ya1 != ya2)
+    {
+      int xa1, xa2;
+      if (ya1 < ya2)
+      {
+	xa1 = xa[vt1];
+        xa2 = xa[vt2];
+      }
+      else
+      {
+        int y = ya1;
+	ya1 = ya2;
+	ya2 = y;
+	xa1 = xa[vt2];
+        xa2 = xa[vt1];
+      }
+      DrawLeftLine (xa1, ya1, xa2, ya2, 0);	// @@@ last parm 1 on last row?
+    }
+  }
+
+  return true;
+}
+
 void csCoverageBuffer::XORSweep ()
 {
   int i, x;
@@ -568,6 +646,96 @@ bool csCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
     endcol = width-1;
   }
   else
+  {
+    init = 0;
+    startrow = bbox.miny >> 5;
+    if (startrow < 0) startrow = 0;
+    endrow = bbox.maxy >> 5;
+    if (endrow >= numrows) endrow = numrows-1;
+    startcol = bbox.minx-1;
+    if (startcol < 0) startcol = 0;
+    endcol = bbox.maxx;
+    if (endcol >= width) endcol = width-1;
+  }
+
+  for (i = startrow ; i <= endrow ; i++)
+  {
+    int pc = partcols[i];
+    if (!pc) continue;
+
+    int buf_idx = (i<<w_shift) + startcol;
+    buf = &buffer[buf_idx];
+    scr_buf = &scr_buffer[buf_idx];
+
+    uint32 first = init;
+    for (x = startcol ; x <= endcol ; x++)
+    {
+      first ^= *buf++;
+      uint32 sb = *scr_buf;
+      uint32 mod_mask = (~sb) & first;	// Which bits are modified.
+      if (mod_mask)
+      {
+        mod = true;
+	sb |= first;
+	*scr_buf++ = sb;
+	if (!~sb) pc--;
+	//@@@ Optimize
+	depth_buf = &depth_buffer[(i<<(w_shift-1)) + (x>>3)];
+	if ((mod_mask & 0xff) && max_depth > *depth_buf) *depth_buf = max_depth;
+	mod_mask >>= 8;
+        depth_buf += width_po2 >> 3;
+	if ((mod_mask & 0xff) && max_depth > *depth_buf) *depth_buf = max_depth;
+	mod_mask >>= 8;
+        depth_buf += width_po2 >> 3;
+	if ((mod_mask & 0xff) && max_depth > *depth_buf) *depth_buf = max_depth;
+	mod_mask >>= 8;
+        depth_buf += width_po2 >> 3;
+	if ((mod_mask & 0xff) && max_depth > *depth_buf) *depth_buf = max_depth;
+      }
+      else
+      {
+        scr_buf++;
+      }
+    }
+    partcols[i] = pc;
+  }
+  return mod;
+}
+
+bool csCoverageBuffer::InsertOutline (csVector2* verts, int num_verts,
+	int* edges, int num_edges, float max_depth)
+{
+  csBox2Int bbox;
+  if (!DrawOutline (verts, num_verts, edges, num_edges, bbox))
+    return false;
+
+  // In this routine we render the polygon to the polygon buffer
+  // and then we simulate (but don't actually perform for optimization
+  // purposes) a XOR sweep on that polygon buffer.
+
+  int i, x;
+  uint32* buf;
+  uint32* scr_buf;
+  float* depth_buf;
+  bool mod = false;
+  uint32 init;
+
+  int startrow, endrow;
+  int startcol, endcol;
+#if 0
+  // @@@
+  if (negative)
+  {
+    init = ~0;
+    // If we are working in negative mode we need
+    // to do entire box and not only what the bounding box says.
+    startrow = 0;
+    endrow = numrows-1;
+    startcol = 0;
+    endcol = width-1;
+  }
+  else
+#endif
   {
     init = 0;
     startrow = bbox.miny >> 5;
