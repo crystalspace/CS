@@ -17,6 +17,29 @@ $T2H_PREFIX = '';
 $T2H_VERBOSE = 0;
 $T2H_WORDS_IN_PAGE = 1;
 
+$CS_WORDS_EN =
+{
+  'pre-about' => 'This document was generated using',
+  'print-page-head' => 'Created by',
+  'print-page-foot' => 'This document was generated using'
+};
+
+$CS_WORDS_FR =
+{
+  'pre-about' =>
+    'Ce document a &eacute;t&eacute; g&eacute;n&eacute;r&eacute; avec',
+  'print-page-head' => 'Cree par',
+  'print-page-foot' =>
+    'Ce document a &eacute;t&eacute; g&eacute;n&eacute;r&eacute; avec'
+};
+
+$CS_WORDS =
+{
+  'en' => $CS_WORDS_EN,
+  'fr' => $CS_WORDS_FR
+};
+
+
 ######################################################################
 # The following settings are all geared toward preventing the user's
 # name who ran the conversion, and the conversion date from being
@@ -45,11 +68,10 @@ sub T2H_InitGlobals  # For texi2html 1.65 and later.
   $T2H_EXTRA_HEAD = '';
 }
 
-$T2H_PRE_ABOUT = <<EOT;
-This document was generated using
-<A HREF="$T2H_HOMEPAGE"><I>texi2html</I></A>
-<P></P>  
-EOT
+$T2H_PRE_ABOUT = sub {
+  return $CS_WORDS->{$T2H_LANG}->{'pre-about'} .
+    " <A HREF=\"$T2H_HOMEPAGE\"><I>texi2html</I></A><P></P>";
+};
 
 sub T2H_DEFAULT_print_page_head
 {
@@ -57,7 +79,7 @@ sub T2H_DEFAULT_print_page_head
   my $longtitle = "$T2H_THISDOC{title}: $T2H_NAME{This}";
   print $fh <<EOT;
 $T2H_DOCTYPE
-<!-- Created by $THISPROG -->
+<!-- $CS_WORDS->{$T2H_LANG}->{'print-page-head'} $THISPROG -->
 <!-- 
 $T2H_AUTHORS 
 -->
@@ -79,5 +101,21 @@ EOT
 }
 
 $T2H_print_page_head = \&T2H_DEFAULT_print_page_head;        
+
+sub T2H_DEFAULT_print_page_foot
+{
+  my $fh = shift;
+  print $fh <<EOT;
+<BR>  
+<FONT SIZE="-1">
+$CS_WORDS->{$T2H_LANG}->{'print-page-foot'}
+<A HREF="$T2H_HOMEPAGE"><I>texi2html</I></A>
+$T2H_PRE_BODY_CLOSE
+</BODY>
+</HTML>
+EOT
+}
+
+$T2H_print_page_foot = \&T2H_DEFAULT_print_page_foot;
 
 1; # This must be the last non-comment line

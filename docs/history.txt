@@ -48,6 +48,9 @@ The history order is reversed so that new features are at the top.
 	  both the factory and mesh object for an iPolygonMesh that it can
 	  use (that part is not implemented yet).
 	- Walktest now uses the new function.
+	- Eric Sunshine modified CS/docs/support/texi2html.init so that it can
+	  support multiple languages.  Added French translation of contained
+	  strings from Vincent Knecht <vince@iefr.ath.cx>.
 10-Apr-2003
 	- Fixed a compile error in binary XML reader. I wonder if people
 	  compile after changing something...
