@@ -947,6 +947,7 @@ public:
   {
       dynamic_ambient = color;
       ambient_version++;
+      MarkLightmapsDirty ();
   }
   /// Gets dynamic ambient light for this thing
   const csColor& GetDynamicAmbientLight()

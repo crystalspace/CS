@@ -29,6 +29,8 @@ The history order is reversed so that new features are at the top.
 	  cope well with large integer coordinates for the given polygons.
 	  Worked around this by increasing Z=.1 to Z=.2 so that the perspective
 	  corrected coordinates don't get as big.
+	- Dynamic ambient wasn't working correctly for objects using
+	  DrawPolygonMesh (fastmesh objects).
 9-Feb-2003
 	- res augmented flarge to contain a notice that the flickering in
 	  the street is intentional.
