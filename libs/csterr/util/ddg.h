@@ -20,9 +20,11 @@
 #define _ddg_Class_
 
 #include <math.h>
+#include <stdlib.h>
 
 #ifdef DDGSTREAM
 #include <iostream.h>
+#include <strstream.h>
 #endif
 
 #ifdef WIN32
@@ -34,27 +36,12 @@
 #pragma warning (disable:4100)	// unreferenced formal parameter. 
 #pragma warning (disable:4706)	// assignment within conditional expression 
 #include "strstrea.h"
-#include "stdlib.h"			// For exit() COMP_VC/COMP_BC
 #endif
 //
 #ifdef DDG
 #define WEXP	__declspec(dllexport)
 #define WFEXP	__cdecl
 #endif
-//
-#if defined (COMP_GCC) || defined (DDG)
-#ifdef DDGSTREAM
-#include <strstream.h>
-#endif
-#include <stdlib.h>			// For exit() COMP_GCC
-#endif
-//
-#else
-// Linux defines
-#ifdef DDGSTREAM
-#include <strstream.h> 
-#endif
-#include <stdlib.h>
 #endif
 
 #ifdef __CRYSTAL_SPACE__
