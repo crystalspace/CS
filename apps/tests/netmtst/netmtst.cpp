@@ -169,7 +169,7 @@ int main (int argc, char *argv[])
 
     RecvPacket recvpkt;
     csRef<iNetworkListener> listener = driver->NewListener (PORT "/" PROTO);
-    if (listener->GetLastError () != CS_NET_ERR_NO_ERROR)
+    if (! listener)
     {
       fprintf (stderr, "Failed to set up listening socket!\n");
       return 6;
@@ -178,7 +178,7 @@ int main (int argc, char *argv[])
 
     SendPacket sendpkt;
     csRef<iNetworkConnection> sender = driver->NewConnection ("localhost:" PORT "/" PROTO);
-    if (sender->GetLastError () != CS_NET_ERR_NO_ERROR)
+    if (! sender)
     {
       fprintf (stderr, "Failed to connect socket!\n");
       return 7;

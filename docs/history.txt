@@ -36,6 +36,8 @@ The history order is reversed so that new features are at the top.
 	    other platforms.
 	  - Added #undef for MIN and MAX to csperl5.cpp to stop the macro
 	    redefinition errors when they're defined by the Perl headers.
+	- Oktal fixed a segfault when NewConnection() returns NULL in
+	  netmantest. This was a left-over from the ensocket API.
 23-May-2003
 	- Jorrit fixed a bug with 3D sprites. If the factory was
 	  HardTransformed() the shape indicator was not changed.
