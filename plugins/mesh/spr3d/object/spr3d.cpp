@@ -859,6 +859,7 @@ void csSprite3DMeshObjectFactory::HardTransform (const csReversibleTransform& t)
 
     }
   }
+  scfiObjectModel.ShapeChanged ();
 }
 
 void csSprite3DMeshObjectFactory::Sprite3DFactoryState::
@@ -2350,7 +2351,8 @@ void csSprite3DMeshObject::UpdateLightingHQ (iLight** lights, int num_lights,
       csVector3 normal = factory->GetNormal (tf_idx, j);
       if (tween_ratio)
       {
-        normal = remainder * normal + tween_ratio * factory->GetNormal (nf_idx, j);
+        normal = remainder * normal + tween_ratio *
+		factory->GetNormal (nf_idx, j);
 	float norm = normal.Norm ();
 	if (ABS (norm) > SMALL_EPSILON)
           normal /= norm;
@@ -2364,7 +2366,8 @@ void csSprite3DMeshObject::UpdateLightingHQ (iLight** lights, int num_lights,
       {
         color = light_color;
         if (obj_sq_dist >= SMALL_EPSILON) cosinus /= obj_dist;
-        if (cosinus < 1) color *= cosinus * lights[i]->GetBrightnessAtDistance (obj_dist);
+        if (cosinus < 1) color *= cosinus *
+		lights[i]->GetBrightnessAtDistance (obj_dist);
         AddVertexColor (j, color);
       }
     }

@@ -3,6 +3,9 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+23-May-2003
+	- Jorrit fixed a bug with 3D sprites. If the factory was
+	  HardTransformed() the shape indicator was not changed.
 22-May-2003
 	- res made the following changes:
 	    - when using the new renderer, the sector now stores the 
@@ -10,7 +13,6 @@ The history order is reversed so that new features are at the top.
 	      from the old system where only the mesh objects themselves
 	      knew about the rendered meshes. Not all necessary adjustments
 	      have been done yet.
-	- res made the following changes:
 	    - Made several changes to the GL extensions manager to better
 	      support WGL exts.
 	    - Added support for multisample in OpenGL. So far, works on Win32

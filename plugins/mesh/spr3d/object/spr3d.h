@@ -669,7 +669,8 @@ public:
     virtual bool IsDeformable () const { return false;  }
     virtual uint32 GetChangeNumber() const { return 0; }
 
-    PolyMesh () : polygons (NULL) {
+    PolyMesh () : polygons (NULL)
+    {
       SCF_CONSTRUCT_IBASE (NULL);
     }
     virtual ~PolyMesh () { Cleanup (); }
