@@ -16,7 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _AWSCPMP_H_
+#ifndef _AWSCOMP_H_
 #define _AWSCOMP_H_
 
 #include "iaws/awsecomp.h"
