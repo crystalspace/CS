@@ -2328,8 +2328,8 @@ void csLoader::txt_process (char *name, char* buf, const char* prefix)
     TOKEN_TABLE (DITHER)
     TOKEN_TABLE (PROCEDURAL)
     TOKEN_TABLE (PERSISTENT)
-    TOKEN_TABLE (TEX2D)
     TOKEN_TABLE (TEX2D3D)
+    TOKEN_TABLE (TEX2D)
     TOKEN_TABLE (TEX3D)
   TOKEN_TABLE_END
 
