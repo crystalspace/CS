@@ -208,28 +208,17 @@ void csGraphics2DGLCommon::DrawPixel (int x, int y, int color)
   glEnd ();
 }
 
-void csGraphics2DGLCommon::WriteChar (int x, int y, int fg, int /*bg*/, char c)
+void csGraphics2DGLCommon::Write (int x, int y, int fg, int bg, const char *text)
 {
-  // prepare for 2D drawing--so we need no fancy GL effects!
-  glDisable (GL_TEXTURE_2D);
+
   glDisable (GL_BLEND);
   glDisable (GL_DEPTH_TEST);
-  
+
   setGLColorfromint(fg);
-
-  // in fact the WriteCharacter() method properly shifts over
-  // the current modelview transform on each call, so that characters
-  // are drawn left-to-write.  But we bypass that because we know the
-  // exact x,y location of each letter.  We manipulate the transform
-  // directly, so any shift in WriteCharacter() is effectively ignored
-  // due to the Push/PopMatrix calls
-//printf("%c x=%d\n", c, x);
-  glPushMatrix();
-  glTranslatef (x, Height - y - FontServer->GetCharHeight (Font, 'T'),0.0);
-
-  LocalFontServer->WriteCharacter(c, Font);
-  glPopMatrix ();
+  LocalFontServer->Write (x,  Height - y - FontServer->GetCharHeight (Font, 'T'),
+			  bg, text, Font);
 }
+
 
 // This variable is usually NULL except when doing a screen shot:
 // in this case it is a temporarily allocated buffer for glReadPixels ()
@@ -307,25 +296,30 @@ void csGraphics2DGLCommon::RestoreArea (csImageArea *Area, bool Free)
 
 iImage *csGraphics2DGLCommon::ScreenShot ()
 {
+#ifndef GL_VERSION_1_2
   if (pfmt.PixelBytes != 1 && pfmt.PixelBytes != 4)
     return NULL;
+#endif
 
+  // Need to resolve pixel alignment issues
   int screen_width = Width * pfmt.PixelBytes;
   screen_shot = new UByte [screen_width * Height];
   if (!screen_shot) return NULL;
 
-  //glPixelStore ()?
+  // glPixelStore ()?
   switch (pfmt.PixelBytes)
   {
     case 1:
       glReadPixels (0, 0, Width, Height, GL_COLOR_INDEX,
 		    GL_UNSIGNED_BYTE, screen_shot);
       break;
+#ifdef GL_VERSION_1_2
     case 2:
       // experimental
-      //glReadPixels (0, 0, Width, Height, GL_RGB,
-	  //    GL_UNSIGNED_SHORT_5_6_5, screen_shot);
+      glReadPixels (0, 0, Width, Height, GL_RGB,
+		    GL_UNSIGNED_SHORT_5_6_5, screen_shot);
       break;
+#endif
     default:
       glReadPixels (0, 0, Width, Height, GL_RGBA,
 		    GL_UNSIGNED_BYTE, screen_shot);

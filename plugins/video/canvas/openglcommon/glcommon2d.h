@@ -85,8 +85,9 @@ public:
   virtual void DrawBox (int x, int y, int w, int h, int color);
   /// Draw a pixel
   virtual void DrawPixel (int x, int y, int color);
-  /// Write a single character
-  virtual void WriteChar (int x, int y, int fg, int bg, char c);
+
+  /// Write a text string into the back buffer
+  virtual void Write (int x, int y, int fg, int bg, const char *text);
 
   /// Figure out GL RGB color from a packed color format
   void setGLColorfromint(int color);

@@ -1,5 +1,6 @@
 /*
-   Copyright (c) 1999 Gary Haussmann
+    Copyright (c) 1999 Gary Haussmann
+    Accelerated by Samuel Humphreys
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -45,6 +46,76 @@ csGraphics2DOpenGLFontServer::GLFontInfo::~GLFontInfo ()
   }
 }
 
+
+void csGraphics2DOpenGLFontServer::GLFontInfo::DrawCharacter (
+  unsigned char characterindex)
+{
+  // bind the texture containing this font
+  glBindTexture(GL_TEXTURE_2D, glyphs[characterindex].hTexture);
+
+  // other required settings
+  glEnable(GL_TEXTURE_2D);
+  glShadeModel(GL_FLAT);
+  glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+  // the texture coordinates must point to the correct character
+  // the texture is a strip a wide as a single character and
+  // as tall as 256 characters.  We must select a single
+  // character from it
+  float tx1 = glyphs[characterindex].x;
+  float tx2 = tx1 + glyphs[characterindex].texwidth;
+  float ty1 = glyphs[characterindex].y;
+  float ty2 = ty1 + texheight;
+  float x1 = 0.0, x2 = glyphs[characterindex].width;
+  float y1 = 0.0, y2 = height;
+
+#ifndef OS_MACOS
+  glEnable(GL_ALPHA_TEST);
+  glAlphaFunc (GL_EQUAL,1.0);
+#endif
+
+  glBegin (GL_QUADS);
+  glTexCoord2f (tx1,ty1); glVertex2f (x1,y2);
+  glTexCoord2f (tx2,ty1); glVertex2f (x2,y2);
+  glTexCoord2f (tx2,ty2); glVertex2f (x2,y1);
+  glTexCoord2f (tx1,ty2); glVertex2f (x1,y1);
+  glEnd ();
+
+  glTranslatef (x2,0.0,0.0);
+#ifndef OS_MACOS  
+  glDisable(GL_ALPHA_TEST);
+#endif
+}
+
+//--------------------------------------------------------------------------------
+//----------------------------------------------csGraphics2DOpenGLFontServer------
+//--------------------------------------------------------------------------------
+
+/* The constructor initializes it member variables and constructs the
+ * first font, if one was passed into the constructor
+ */
+csGraphics2DOpenGLFontServer::csGraphics2DOpenGLFontServer 
+ (int MaxFonts, iFontServer *pFS)
+  : mFont_Count (0), mMax_Font_Count (MaxFonts), mFont_Information_Array (NULL), 
+    pFontServer(pFS)
+{
+  mFont_Information_Array = new GLFontInfo * [MaxFonts];
+  char *pspace = " ";
+  space = *pspace;
+}
+
+csGraphics2DOpenGLFontServer::~csGraphics2DOpenGLFontServer ()
+{
+  // kill all the font data we have accumulated
+  if (mFont_Information_Array)
+  {
+    // cycle through all loaded fonts
+    for (int index = 0; index < mFont_Count; index++)
+      delete mFont_Information_Array [index];
+    delete [] mFont_Information_Array;
+  }
+}
+
 void csGraphics2DOpenGLFontServer::AddFont (int fontId)
 {
   if (mFont_Count >= mMax_Font_Count)
@@ -58,14 +129,14 @@ void csGraphics2DOpenGLFontServer::AddFont (int fontId)
   int width, height;
   int rows=1;
   
-  x=y=256.0;
+  x = y = 256.0;
   height = pFontServer->GetCharHeight (fontId, 'T'); // just a dummy parameter
 
   font->height = height;
 
   const int basetexturewidth = 256;
   // figure out how many charcter rows we need
-  width=0;
+  width = 0;
   while (1)
   {
     width+= pFontServer->GetCharWidth (fontId, c);
@@ -82,8 +153,13 @@ void csGraphics2DOpenGLFontServer::AddFont (int fontId)
   font->texheight = ((float)height) / basetextureheight;
 
   int nTextures = 1 + rows/(256/height);
+  if (nTextures > 1)
+    font->one_texture = false;
+  else
+    font->one_texture = true;
+
   GLuint *nTexNames = new GLuint[ nTextures ];
-  int nCurrentTex=0;
+  int nCurrentTex = 0;
   unsigned int basepixelsize = 1;
   unsigned char *fontbitmapdata, *characterbitmapbase;
   bool GlyphBitsNotByteAligned;
@@ -107,15 +183,18 @@ void csGraphics2DOpenGLFontServer::AddFont (int fontId)
       if (y+height > 256)
       {
         y=0;
-	// if this is not the first handle we create, we hand over the data to opengl
+	// if this is not the first handle we create, we hand over the data 
+	// to opengl
 	if (c)
 	{
 #ifdef OS_MACOS
-          glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */, GL_LUMINANCE /* bytes-per-pixel */,
+          glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */, 
+			GL_LUMINANCE /* bytes-per-pixel */,
                         basetexturewidth, basetextureheight, 0 /*border*/,
                         GL_LUMINANCE, GL_UNSIGNED_BYTE, fontbitmapdata);
 #else
-          glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */, GL_ALPHA /* bytes-per-pixel */,
+          glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */, 
+			GL_ALPHA /* bytes-per-pixel */,
                         basetexturewidth, basetextureheight, 0 /*border*/,
                         GL_ALPHA, GL_UNSIGNED_BYTE, fontbitmapdata);
 #endif
@@ -172,11 +251,13 @@ void csGraphics2DOpenGLFontServer::AddFont (int fontId)
   }
 
 #ifdef OS_MACOS
-  glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */, GL_LUMINANCE /* bytes-per-pixel */,
+  glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */, 
+		GL_LUMINANCE /* bytes-per-pixel */,
                 basetexturewidth, basetextureheight, 0 /*border*/,
                 GL_LUMINANCE, GL_UNSIGNED_BYTE, fontbitmapdata);
 #else
-  glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */, GL_ALPHA /* bytes-per-pixel */,
+  glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */, 
+		GL_ALPHA /* bytes-per-pixel */,
                 basetexturewidth, basetextureheight, 0 /*border*/,
                 GL_ALPHA, GL_UNSIGNED_BYTE, fontbitmapdata);
 #endif
@@ -185,94 +266,91 @@ void csGraphics2DOpenGLFontServer::AddFont (int fontId)
   delete [] fontbitmapdata;
 }
 
-void csGraphics2DOpenGLFontServer::GLFontInfo::DrawCharacter (
-  unsigned char characterindex)
+// Rasterize string
+void csGraphics2DOpenGLFontServer::Write (int x, int y, int bg, const char *text, int Font)
 {
-  // bind the texture containing this font
-  glBindTexture(GL_TEXTURE_2D, glyphs[characterindex].hTexture);
+#ifdef CS_DEBUG
+  if (mFont_Count < 1) return;
 
-  // other required settings
+  if (Font >= mFont_Count)
+    Font = 0;
+#endif
+
+  glPushMatrix();
+  glTranslatef (x, y, 0);
+
+  if (!mFont_Information_Array [Font]->one_texture)
+  {
+    for (; *text; ++text)
+      mFont_Information_Array [Font]->DrawCharacter (*text);
+    glPopMatrix ();
+    return;
+  }
+
+  // Ok blaze with only one texture to worry about.
+  bool skip_space = false;
+  if (bg < 0)
+    skip_space = true;
+
   glEnable(GL_TEXTURE_2D);
   glShadeModel(GL_FLAT);
-  glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-  // the texture coordinates must point to the correct character
-  // the texture is a strip a wide as a single character and
-  // as tall as 256 characters.  We must select a single
-  // character from it
-  float tx1 = glyphs[characterindex].x;
-  float tx2 = tx1 + glyphs[characterindex].texwidth;
-  float ty1 = glyphs[characterindex].y;
-  float ty2 = ty1 + texheight;
-  float x1 = 0.0, x2 = glyphs[characterindex].width;
-  float y1 = 0.0, y2 = height;
 
 #ifndef OS_MACOS
   glEnable(GL_ALPHA_TEST);
   glAlphaFunc (GL_EQUAL,1.0);
 #endif
+  GLGlyph *glyphs = mFont_Information_Array [Font]->glyphs;
 
+  GLuint hTexture = glyphs[*text].hTexture;
+
+  // bind the texture containing this font
+  glBindTexture(GL_TEXTURE_2D, hTexture);
+  glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+  float x1 = 0, x2 = 0, y1 = 0;
+  float y2 = mFont_Information_Array [Font]->height;
+  float texheight = mFont_Information_Array [Font]->texheight;
   glBegin (GL_QUADS);
-  glTexCoord2f (tx1,ty1); glVertex2f (x1,y2);
-  glTexCoord2f (tx2,ty1); glVertex2f (x2,y2);
-  glTexCoord2f (tx2,ty2); glVertex2f (x2,y1);
-  glTexCoord2f (tx1,ty2); glVertex2f (x1,y1);
+  float tx1, tx2, ty1, ty2;
+  if (!skip_space)
+  {
+    for (; *text; ++text)
+    {
+      x2 += glyphs[*text].width;
+      tx1 = glyphs[*text].x;
+      tx2 = tx1 + glyphs[*text].texwidth;
+      ty1 = glyphs[*text].y;
+      ty2 = ty1 + texheight;
+      glTexCoord2f (tx1,ty1); glVertex2f (x1,y2);
+      glTexCoord2f (tx2,ty1); glVertex2f (x2,y2);
+      glTexCoord2f (tx2,ty2); glVertex2f (x2,y1);
+      glTexCoord2f (tx1,ty2); glVertex2f (x1,y1);
+      x1 = x2;
+    }
+  }
+  else
+  {
+    for (; *text; ++text)
+    {
+      x2 += glyphs[*text].width;
+      if (space == *text)
+	goto skip_quad;
+      tx1 = glyphs[*text].x;
+      tx2 = tx1 + glyphs[*text].texwidth;
+      ty1 = glyphs[*text].y;
+      ty2 = ty1 + texheight;
+      glTexCoord2f (tx1,ty1); glVertex2f (x1,y2);
+      glTexCoord2f (tx2,ty1); glVertex2f (x2,y2);
+      glTexCoord2f (tx2,ty2); glVertex2f (x2,y1);
+      glTexCoord2f (tx1,ty2); glVertex2f (x1,y1);
+    skip_quad:
+      x1 = x2;
+    }
+  }
   glEnd ();
 
-  glTranslatef (x2,0.0,0.0);
 #ifndef OS_MACOS  
   glDisable(GL_ALPHA_TEST);
 #endif
+  glPopMatrix ();
 }
-
-/* The constructor initializes it member variables and constructs the
- * first font, if one was passed into the constructor
- */
-csGraphics2DOpenGLFontServer::csGraphics2DOpenGLFontServer (int MaxFonts, iFontServer *pFS)
-  : mFont_Count (0), mMax_Font_Count (MaxFonts), mFont_Information_Array (NULL), pFontServer(pFS)
-{
-  mFont_Information_Array = new GLFontInfo * [MaxFonts];
-}
-
-csGraphics2DOpenGLFontServer::~csGraphics2DOpenGLFontServer ()
-{
-  // kill all the font data we have accumulated
-  if (mFont_Information_Array)
-  {
-    // cycle through all loaded fonts
-    for (int index = 0; index < mFont_Count; index++)
-      delete mFont_Information_Array [index];
-    delete [] mFont_Information_Array;
-  }
-}
-
-/* Print some characters (finally!)  This is basically a wrapper
- * around repeated calls to WriteCharacter
- */
-void csGraphics2DOpenGLFontServer::WriteCharacters(char *writeme, int fontnumber)
-{
-  // do some error checking
-  if (mFont_Count < 1) return;
-
-  if (fontnumber >= mFont_Count)
-    fontnumber = 0;
-
-  // write the string
-  for (char *curcharacter = writeme; *curcharacter != 0; curcharacter++)
-    WriteCharacter (*curcharacter, fontnumber);
-}
-
-/* Print a character. This is basically a wrapper
- * around calls to the GLFontInfo method WriteCharacter()
- */
-void csGraphics2DOpenGLFontServer::WriteCharacter(char writeme, int fontnumber)
-{
-  // do some error checking
-  if (mFont_Count < 1) return;
-
-  if (fontnumber >= mFont_Count)
-    fontnumber = 0;
-
-  mFont_Information_Array [fontnumber]->DrawCharacter (writeme);
-}
-

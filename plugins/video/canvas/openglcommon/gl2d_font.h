@@ -1,5 +1,6 @@
 /*
     Copyright (C) 1999 by Gary Haussmann
+    Accelerated by Samuel Humphreys
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -29,15 +30,8 @@
   in a FontDef struct (see graph2d.h), and the server will add it to
   the list of fonts.  Destruction of the server will free up all the
   bitmaps currently in use.
-
-  To write a series of characters, set the color and position using
-  glColor(r,g,b) and glRasterPos2i(x,y)  Note that the raster
-  position points to the lower left corner of the first character!
-  Then call WriteChars() with the string to print.  If you want to
-  use a different font than the default font (the first font built
-  in the server) there exists a version of WriteChars() for that
-  as well
   */
+
 class csGraphics2DOpenGLFontServer
 {
   struct GLGlyph 
@@ -57,6 +51,7 @@ class csGraphics2DOpenGLFontServer
            
       GLGlyph glyphs[256];
       float height, texheight;
+      bool one_texture;
   };
   
   /// number of fonts currently stored here
@@ -69,6 +64,8 @@ class csGraphics2DOpenGLFontServer
   GLFontInfo **mFont_Information_Array;
   iFontServer *pFontServer;
   
+  /// Try and skip this..
+  char space;
 public:
   /**
    * The maximal number of fonts that can be registered.
@@ -90,23 +87,12 @@ public:
   int CountFonts () const { return mFont_Count; }
 
   /**
-   * Draw a string using OpenGL.  It is assumed you have
-   * set up the render state using glColor and a modelview transform.
-   * To use a non-default font, pass in a second argument with
-   * the number of the font to use
+   * Draw a string using OpenGL at x,y.  It is assumed you have
+   * set up the render state using glColor.
    */
-  void WriteCharacters (char *writeme, int fontnumber = 0);
 
-  /**
-   * Draw a single character using OpenGL.  It is assumed you have
-   * set up the render state using glColor and set the modelview
-   * transform so that the character can be drawn at (0,0).  The
-   * transform will be updated so that the next character will
-   * be drawn shifted over, in the correct position.
-   * To use a non-default font, pass in a second argument with
-   * the number of the font to use
-   */
-  void WriteCharacter (char writeme, int fontnumber = 0);
+  void Write (int x, int y, int bg, const char *text, int Font);
+
 };
 
 #endif // __CS_GL2D_FONT_H__
