@@ -236,8 +236,8 @@ int csODEDynamics::CollideMeshMesh (dGeomID o1, dGeomID o2, int flags,
 }
 
 /* defined in ode */
-extern int dCollideBP (const dxGeom *o1, const dxGeom *o2, int flags, dContactGeom *outcontacts, int skip);
-extern int dCollideCP (const dxGeom *o1, const dxGeom *o2, int flags, dContactGeom *outcontacts, int skip);
+extern int dCollideBoxPlane (dxGeom *o1, dxGeom *o2, int flags, dContactGeom *outcontacts, int skip);
+extern int dCollideCCylinderPlane (dxGeom *o1, dxGeom *o2, int flags, dContactGeom *outcontacts, int skip);
 
 CS_TYPEDEF_GROWING_ARRAY(csPolyMeshList, csMeshedPolygon);
 
@@ -301,7 +301,7 @@ int csODEDynamics::CollideMeshBox (dGeomID mesh, dGeomID box, int flags,
     dGeomID odeplane = dCreatePlane(0,plane.norm.x, plane.norm.y, plane.norm.z,
       -plane.DD);
     dContactGeom tempcontacts[5];
-    int count = dCollideBP (box, odeplane, 5, tempcontacts, sizeof (dContactGeom));
+    int count = dCollideBoxPlane (box, odeplane, 5, tempcontacts, sizeof (dContactGeom));
     dGeomDestroy (odeplane);
     for (j = 0; j < count; j ++) {
       dContactGeom *c = &tempcontacts[j];
@@ -408,7 +408,7 @@ int csODEDynamics::CollideMeshCylinder (dGeomID mesh, dGeomID cyl, int flags,
     dGeomID odeplane = dCreatePlane(0,plane.norm.x, plane.norm.y, plane.norm.z,
       -plane.DD);
     dContactGeom tempcontacts[5];
-    int count = dCollideCP (cyl, odeplane, 5, tempcontacts, sizeof (dContactGeom));
+    int count = dCollideCCylinderPlane (cyl, odeplane, 5, tempcontacts, sizeof (dContactGeom));
     dGeomDestroy (odeplane);
     for (j = 0; j < count; j ++) {
       dContactGeom *c = &tempcontacts[j];
