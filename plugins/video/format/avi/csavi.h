@@ -22,6 +22,7 @@
 #include "ividecod.h"
 #include "ivfs.h"
 #include "csutil/csvector.h"
+#include "cssys/csendian.h"
 
 struct iSystem;
 class csAVIStreamVideo;
@@ -71,17 +72,20 @@ class csAVIFormat : public iStreamFormat
     char id[4];
     ULong filesize;
     char type[4];
+    void Endian (){ filesize = little_endian_long (filesize); }
   };
   struct RIFFchunk
   {
     char id[4];
     ULong chunksize;
+    void Endian (){ chunksize = little_endian_long (chunksize); }
   };
   struct RIFFlist
   {
     char id[4];
     ULong listsize;
     char type[4];
+    void Endian (){ listsize = little_endian_long (listsize); }
   };
   struct AVIHeader
   {
@@ -96,6 +100,19 @@ class csAVIFormat : public iStreamFormat
     ULong width;
     ULong height;
     ULong reserved[4];
+    void Endian ()
+    { 
+      msecperframe = little_endian_long (msecperframe); 
+      maxbytespersec = little_endian_long (maxbytespersec);
+      padsize = little_endian_long (padsize);
+      flags = little_endian_long (flags);
+      framecount = little_endian_long (framecount);
+      initialframecount = little_endian_long (initialframecount);
+      streamcount = little_endian_long (streamcount);
+      suggestedbuffersize = little_endian_long (suggestedbuffersize);
+      width = little_endian_long (width);
+      height = little_endian_long (height);
+    }
   };
   struct StreamHeader
   {
@@ -113,6 +130,24 @@ class csAVIFormat : public iStreamFormat
     ULong quality;
     ULong samplesize;
     SLong left, top, right, bottom;
+    void Endian ()
+    {
+      flags = little_endian_long (flags);
+      priority = little_endian_short (priority);
+      language = little_endian_short (language);
+      initialframecount = little_endian_long (initialframecount);
+      scale = little_endian_long (scale);
+      rate = little_endian_long (rate);
+      start = little_endian_long (start);
+      length = little_endian_long (length);
+      suggestedbuffersize = little_endian_long (suggestedbuffersize);
+      quality = little_endian_long (quality);
+      samplesize = little_endian_long (samplesize);
+      top = little_endian_long (top);
+      left = little_endian_long (left);
+      right = little_endian_long (right);
+      bottom = little_endian_long (bottom);
+    }
   };
   struct VideoStreamFormat
   {
@@ -127,6 +162,20 @@ class csAVIFormat : public iStreamFormat
     ULong ypelspermeter;
     ULong colorsused;
     ULong colorsimportant;
+    void Endian ()
+    {
+      size = little_endian_long (size);
+      width = little_endian_long (width);
+      height = little_endian_long (height);
+      planes = little_endian_short (planes);
+      bitcount = little_endian_short (bitcount);
+      compression = little_endian_long (compression);
+      sizeimage = little_endian_long (sizeimage);
+      xpelspermeter = little_endian_long (xpelspermeter);
+      ypelspermeter = little_endian_long (ypelspermeter);
+      colorsused = little_endian_long (colorsused);
+      colorsimportant = little_endian_long (colorsimportant);
+    }
   };
   struct AudioStreamFormat
   {
@@ -136,6 +185,15 @@ class csAVIFormat : public iStreamFormat
     ULong avgbytespersecond;
     UShort blockalign;
     UShort bitspersample;
+    void Endian ()
+    {
+      formattag = little_endian_short (formattag);
+      channels = little_endian_short (channels);
+      samplespersecond = little_endian_long (samplespersecond);
+      avgbytespersecond = little_endian_long (avgbytespersecond);
+      blockalign = little_endian_short (blockalign);
+      bitspersample = little_endian_short (bitspersample);
+    }
   };
  protected:
   size_t datalen;
