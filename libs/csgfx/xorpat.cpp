@@ -39,7 +39,7 @@ csPtr<iImage> csCreateXORPatternImage(int width, int height, int recdepth,
 
   for (x=0; x<width; x++)
   {
-    for (y=0; y<width; y++)
+    for (y=0; y<height; y++)
     {
       unsigned char value = ((x & coordmask) ^ (y & coordmask));
       int v = (value << shlpixel) + ((value >> valueshr) * valueadd);
