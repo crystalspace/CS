@@ -383,6 +383,11 @@ struct iMeshWrapper : public iBase
    * Draws the diffuse light mesh object
    */
   virtual void DrawLight (iRenderView* rview, iLight *light) = 0;
+
+  /**
+   * Enable/disable hardware based shadows alltogheter
+   */ 
+  virtual void CastHardwareShadow (bool castShadow) = 0;
 #endif
 };
 

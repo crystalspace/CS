@@ -241,6 +241,9 @@ enum
   XMLTOKEN_ARG,
   XMLTOKEN_ARGS,
   XMLTOKEN_VARIABLELIST
+#ifdef CS_USE_NEW_RENDERER
+  ,XMLTOKEN_CAST_HW_SHADOW
+#endif
 };
 
 class StdLoaderContext;

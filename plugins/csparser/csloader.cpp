@@ -830,6 +830,10 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("polygon", XMLTOKEN_POLYGON);
   xmltokens.Register ("arg", XMLTOKEN_ARG);
   xmltokens.Register ("args", XMLTOKEN_ARGS);
+
+#ifdef CS_USE_NEW_RENDERER
+  xmltokens.Register ("casthwshadow", XMLTOKEN_CAST_HW_SHADOW);
+#endif
   return true;
 }
 
@@ -1802,6 +1806,24 @@ bool csLoader::HandleMeshParameter (iMeshWrapper* mesh, iDocumentNode* child,
 	mesh->GetMovable ()->UpdateMove ();
       }
       break;
+#ifdef CS_USE_NEW_RENDERER
+    case XMLTOKEN_CAST_HW_SHADOW:
+      if (!mesh)
+      {
+	SyntaxService->ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	child, "First specify the parent factory with 'factory'!");
+	return false;
+      } 
+      else
+      {
+        if (strcasecmp (child->GetAttributeValue ("enable"), "true") == 0)
+          mesh->CastHardwareShadow (true);
+        else if (strcasecmp (child->GetAttributeValue ("enable"), "false") == 0)
+          mesh->CastHardwareShadow (true);
+      }
+      break;
+#endif
     default:
       handled = false;
       return true;
@@ -2849,6 +2871,7 @@ iKeyValuePair* csLoader::ParseKey (iDocumentNode* node, iObject* pParent)
   csRef<iKeyValuePair> kvp (SCF_QUERY_INTERFACE (cskvp, iKeyValuePair));
   if (pParent)
     pParent->ObjAdd (kvp->QueryObject ());
+    
   return kvp;
 }
 

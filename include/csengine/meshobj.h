@@ -171,6 +171,8 @@ protected:
   bool draw_test;
   /// Cached light test
   bool in_light;
+  /// Should we draw anything in drawshadow at all?
+  bool cast_hardware_shadow;
 #endif
 
   /**
@@ -368,6 +370,8 @@ public:
   void DrawShadow (iRenderView* rview, iLight* light);
   /// This pass draws the diffuse lit mesh
   void DrawLight (iRenderView* rview, iLight* light);
+  ///Enable/disable hardware based shadows alltogheter
+  void CastHardwareShadow (bool castShadow);
 #endif
 
   /**
@@ -671,7 +675,7 @@ public:
       scfParent->Draw (rview);
     }
 #ifdef CS_USE_NEW_RENDERER
-    virtual void DrawZ (iRenderView* rview) 
+        virtual void DrawZ (iRenderView* rview) 
 	{
 	  scfParent->DrawZ (rview);
 	}
@@ -683,6 +687,10 @@ public:
 	{
 	  scfParent->DrawLight (rview, light);
 	}
+        virtual void CastHardwareShadow (bool castShadow) 
+        {
+          scfParent->CastHardwareShadow (castShadow);
+        }
 #endif
   } scfiMeshWrapper;
   friend struct MeshWrapper;

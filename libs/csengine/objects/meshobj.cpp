@@ -86,6 +86,9 @@ csMeshWrapper::csMeshWrapper (
   children.SetMesh (this);
   imposter_active = false;
   imposter_mesh = NULL;
+#ifdef CS_USE_NEW_RENDERER
+  cast_hardware_shadow = true;
+#endif
 }
 
 csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent) :
@@ -113,6 +116,9 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent) :
   zbufMode = CS_ZBUF_USE;
   render_priority = csEngine::current_engine->GetObjectRenderPriority ();
   children.SetMesh (this);
+#ifdef CS_USE_NEW_RENDERER
+  cast_hardware_shadow = true;
+#endif
 }
 
 void csMeshWrapper::SetMeshObject (iMeshObject *meshobj)
@@ -259,13 +265,19 @@ void csMeshWrapper::DrawZ (iRenderView* rview)
 
 void csMeshWrapper::DrawShadow (iRenderView* rview, iLight* light)
 {
-  meshobj->DrawShadow (rview, &movable.scfiMovable, zbufMode, light);
+  if (cast_hardware_shadow)
+    meshobj->DrawShadow (rview, &movable.scfiMovable, zbufMode, light);
 }
 
 void csMeshWrapper::DrawLight (iRenderView* rview, iLight* light)
 {
   if (draw_test) 
     meshobj->DrawLight (rview, &movable.scfiMovable, zbufMode, light);
+}
+
+void csMeshWrapper::CastHardwareShadow (bool castShadow)
+{
+  cast_hardware_shadow = castShadow;
 }
 #endif // CS_USE_NEW_RENDERER
 
