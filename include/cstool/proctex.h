@@ -135,6 +135,10 @@ public:
   /// Get the texture corresponding with this procedural texture.
   iTextureWrapper* GetTextureWrapper () { return tex; }
 
+  /// get dimension
+  virtual void GetDimension (int &w, int &h)
+  { w = w; h = mat_h; }
+
   static int GetRandom (int max)
   {
     return (int)(float(max)*rand()/(RAND_MAX+1.0));
