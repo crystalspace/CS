@@ -22,6 +22,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "sysdef.h"
 #include "csutil/impexp/impexp.h"
 
 // converter.cpp: implementation of the converter class.
@@ -1893,15 +1894,15 @@ int converter::tds_write ( FILE *fileout ) {
   MDATA end. 
   KFDATA begin.
 */
-  short_int_val = ( short ) 0xb000;
-  num_bytes = num_bytes + tds_write_short_int ( fileout, short_int_val );
+  u_short_int_val = 0xb000;
+  num_bytes = num_bytes + tds_write_u_short_int ( fileout, u_short_int_val );
   num_bytes = num_bytes + tds_write_long_int ( fileout, lb000 );
 /*
   KFHDR begin.  
     tag, size, revision, filename, animlen.
 */
-  short_int_val = ( short ) 0xb00a;
-  num_bytes = num_bytes + tds_write_short_int ( fileout, short_int_val );
+  u_short_int_val = 0xb00a;
+  num_bytes = num_bytes + tds_write_u_short_int ( fileout, u_short_int_val );
   num_bytes = num_bytes + tds_write_long_int ( fileout, lb00a );
   short_int_val = 5;
   num_bytes = num_bytes + tds_write_short_int ( fileout, short_int_val );
@@ -1915,8 +1916,8 @@ int converter::tds_write ( FILE *fileout ) {
   KFSEG begin.  
     tag, size, start, end.
 */
-  short_int_val = ( short ) 0xb008;
-  num_bytes = num_bytes + tds_write_short_int ( fileout, short_int_val );
+  u_short_int_val = 0xb008;
+  num_bytes = num_bytes + tds_write_u_short_int ( fileout, u_short_int_val );
   num_bytes = num_bytes + tds_write_long_int ( fileout, lb008 );
   long_int_val = 0;
   num_bytes = num_bytes + tds_write_long_int ( fileout, long_int_val );
@@ -1927,8 +1928,8 @@ int converter::tds_write ( FILE *fileout ) {
   KFCURTIME begin.
     tag, size, current_frame.
 */
-  short_int_val = ( short ) 0xb009;
-  num_bytes = num_bytes + tds_write_short_int ( fileout, short_int_val );
+  u_short_int_val = 0xb009;
+  num_bytes = num_bytes + tds_write_u_short_int ( fileout, u_short_int_val );
   num_bytes = num_bytes + tds_write_long_int ( fileout, lb009 );
   long_int_val = 0;
   num_bytes = num_bytes + tds_write_long_int ( fileout, long_int_val );
@@ -1937,15 +1938,15 @@ int converter::tds_write ( FILE *fileout ) {
   OBJECT_NODE_TAG begin.
     tag, size.  
 */
-  short_int_val = ( short ) 0xb002;
-  num_bytes = num_bytes + tds_write_short_int ( fileout, short_int_val );
+  u_short_int_val = 0xb002;
+  num_bytes = num_bytes + tds_write_u_short_int ( fileout, u_short_int_val );
   num_bytes = num_bytes + tds_write_long_int ( fileout, lb002 );
 /*
   NODE_ID begin.
     tag, size, id.
 */
-  short_int_val = ( short ) 0xb030;
-  num_bytes = num_bytes + tds_write_short_int ( fileout, short_int_val );
+  u_short_int_val = 0xb030;
+  num_bytes = num_bytes + tds_write_u_short_int ( fileout, u_short_int_val );
   num_bytes = num_bytes + tds_write_long_int ( fileout, lb030 );
   short_int_val = 0;
   num_bytes = num_bytes + tds_write_short_int ( fileout, short_int_val );
@@ -1954,8 +1955,8 @@ int converter::tds_write ( FILE *fileout ) {
   NODE_HDR begin. 
     tag, size, object_name, flag1, flag2, hierarchy.
 */
-  short_int_val = ( short ) 0xb010;
-  num_bytes = num_bytes + tds_write_short_int ( fileout, short_int_val );
+  u_short_int_val = 0xb010;
+  num_bytes = num_bytes + tds_write_u_short_int ( fileout, u_short_int_val );
   num_bytes = num_bytes + tds_write_long_int ( fileout, lb010 );
   num_bytes = num_bytes + tds_write_string ( fileout, object_name );
   short_int_val = 16384;
@@ -1969,8 +1970,8 @@ int converter::tds_write ( FILE *fileout ) {
   PIVOT begin. 
     tag, size, pivot_x, pivot_y, pivot_z.
 */
-  short_int_val = ( short ) 0xb013;
-  num_bytes = num_bytes + tds_write_short_int ( fileout, short_int_val );
+  u_short_int_val = 0xb013;
+  num_bytes = num_bytes + tds_write_u_short_int ( fileout, u_short_int_val );
   num_bytes = num_bytes + tds_write_long_int ( fileout, lb013 );
   for ( i = 0; i < 3; i++ ) {
     float_val = pivot[i];
@@ -1981,8 +1982,8 @@ int converter::tds_write ( FILE *fileout ) {
   POS_TRACK_TAG begin.  
     tag, size, flag, i1, i2, i3, i4, i5, i6, frame, l1, pos_x, pos_y, pos_z.
 */
-  short_int_val = ( short ) 0xb020;
-  num_bytes = num_bytes + tds_write_short_int ( fileout, short_int_val );
+  u_short_int_val = 0xb020;
+  num_bytes = num_bytes + tds_write_u_short_int ( fileout, u_short_int_val );
   num_bytes = num_bytes + tds_write_long_int ( fileout, lb020 );
   short_int_val = 0;
   num_bytes = num_bytes + tds_write_short_int ( fileout, short_int_val );
@@ -2011,8 +2012,8 @@ int converter::tds_write ( FILE *fileout ) {
   ROT_TRACK_TAG begin. 
     tag, size, i1, i2, i3, i4, i5, i6, i7, i8, l1, rad, axis_x, axis_y, axis_z. 
 */
-  short_int_val = ( short ) 0xb021;
-  num_bytes = num_bytes + tds_write_short_int ( fileout, short_int_val );
+  u_short_int_val = 0xb021;
+  num_bytes = num_bytes + tds_write_u_short_int ( fileout, u_short_int_val );
   num_bytes = num_bytes + tds_write_long_int ( fileout, lb021 );
   short_int_val = 0;
   num_bytes = num_bytes + tds_write_short_int ( fileout, short_int_val );
@@ -2042,8 +2043,8 @@ int converter::tds_write ( FILE *fileout ) {
   SCL_TRACK_TAG begin.  
     tag, size, i1, i2, i3, i4, i5, i6, i7, i8, l1, scale_x, scale_y, scale_z.
 */
-  short_int_val = ( short ) 0xb022;
-  num_bytes = num_bytes + tds_write_short_int ( fileout, short_int_val );
+  u_short_int_val = 0xb022;
+  num_bytes = num_bytes + tds_write_u_short_int ( fileout, u_short_int_val );
   num_bytes = num_bytes + tds_write_long_int ( fileout, lb022 );
   short_int_val = 0;
   num_bytes = num_bytes + tds_write_short_int ( fileout, short_int_val );

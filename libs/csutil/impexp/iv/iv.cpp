@@ -5,8 +5,8 @@
 
 
     Based on IVCON - converts various 3D graphics file
-	Author: John Burkardt - used with permission
-	CS adaption and conversion to C++ classes  Bruce Williams
+    Author: John Burkardt - used with permission
+    CS adaption and conversion to C++ classes  Bruce Williams
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -23,6 +23,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "sysdef.h"
 #include "csutil/impexp/impexp.h"
 
 // converter.cpp: implementation of the converter class.
@@ -51,12 +52,12 @@ int converter::iv_read ( FILE *filein ) {
 */
   int   count;
   int   i;
-  int   icolor;
+  int   icolor = 0;
   int   icface;
   int   ihi;
   int   inormface;
   int   inum_face;
-  int   ivert;
+  int   ivert = 0;
   int   iword;
   int   ix;
   int   ixyz;
@@ -537,7 +538,7 @@ int converter::iv_read ( FILE *filein ) {
         }
         else if ( leqi ( word, "STRING" ) == TRUE ) {
         }
-        else if ( word == "\"" ) {
+        else if ( strcmp ( word, "\"" ) == 0) {
         }
         else {
         }
