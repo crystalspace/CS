@@ -741,6 +741,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n)
 /*  tr_o2c = camera->GetTransform ();
   if (!movable->IsFullTransformIdentity ())
     tr_o2c /= movable->GetFullTransform ();
+*/
 
   iMaterialWrapper* mater = material;
   if (!mater) mater = factory->GetMaterialWrapper ();

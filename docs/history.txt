@@ -59,6 +59,8 @@ The history order is reversed so that new features are at the top.
 	- res fixed some "csFooIterator::Next: recursive on all control paths, 
 	  function will cause runtime stack overflow" warnings on MSVC.
 	- res removed iSectorRenderMeshList::GetVisible().
+	- res fixed csGenmeshMeshObject::GetRenderMeshes() from being 
+	  completely commented out.
 3-June-2003
 	- Philipp Aumayr fixed the fancycon bug, where the borders
 	  were visibile in SW but not in GL mode. (wrong mixmode at line
