@@ -23,6 +23,9 @@
 #include "iutil/evdefs.h"
 #include "csutil/scf.h"
 
+/**\file
+ * Event system related interfaces
+ */
 /**
  * \addtogroup event_handling
  * @{ */

@@ -22,6 +22,9 @@
 #include "csutil/scf.h"
 struct iObjectRegistry;
 
+/**\file
+ * Generic component interface
+ */
 /**
  * \addtogroup scf
  * @{ */
