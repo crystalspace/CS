@@ -33,7 +33,11 @@ typedef const void *csConstSome;
  * effectively a NOP. If you want vector elements to free automatically
  * occupied memory upon vector destruction you should create a derived
  * class which should provide its own FreeItem () method (see csStrVector
- * for a example).
+ * for a example).<p>
+ * Note that FreeItem method returns a boolean value which is the success
+ * status. This is used in Delete() and DeleteAll() to decide whenever
+ * an element can be really deleted - if the element has a good reason to
+ * stay 'sticky' it can return false from FreeItem().
  */
 class csVector : public csBase
 {

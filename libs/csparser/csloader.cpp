@@ -210,6 +210,8 @@ TOKEN_DEF_START
   TOKEN_DEF (UV)
   TOKEN_DEF (UVA)
   TOKEN_DEF (UV_SHIFT)
+  TOKEN_DEF (UVEC)
+  TOKEN_DEF (VVEC)
   TOKEN_DEF (V)
   TOKEN_DEF (VERTEX)
   TOKEN_DEF (VERTICES)
@@ -329,6 +331,8 @@ csPolyTxtPlane* csLoader::load_polyplane (char* buf, char* name)
     TOKEN_TABLE (SECOND_LEN)
     TOKEN_TABLE (SECOND)
     TOKEN_TABLE (MATRIX)
+    TOKEN_TABLE (UVEC)
+    TOKEN_TABLE (VVEC)
     TOKEN_TABLE (V)
   TOKEN_TABLE_END
 
@@ -339,7 +343,7 @@ csPolyTxtPlane* csLoader::load_polyplane (char* buf, char* name)
   ppl->SetName (name);
 
   bool tx1_given = false, tx2_given = false;
-  csVector3 tx1_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
+  csVector3 tx_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
   float tx1_len = 0, tx2_len = 0;
   csMatrix3 tx_matrix;
   csVector3 tx_vector (0, 0, 0);
@@ -355,7 +359,7 @@ csPolyTxtPlane* csLoader::load_polyplane (char* buf, char* name)
     {
       case TOKEN_ORIG:
         tx1_given = true;
-        load_vector (params, tx1_orig);
+        load_vector (params, tx_orig);
         break;
       case TOKEN_FIRST:
         tx1_given = true;
@@ -379,6 +383,18 @@ csPolyTxtPlane* csLoader::load_polyplane (char* buf, char* name)
       case TOKEN_V:
         load_vector (params, tx_vector);
         break;
+      case TOKEN_UVEC:
+        tx1_given = true;
+        load_vector (params, tx1);
+        tx1_len = tx1.Norm ();
+        tx1 += tx_orig;
+        break;
+      case TOKEN_VVEC:
+        tx2_given = true;
+        load_vector (params, tx2);
+        tx2_len = tx2.Norm ();
+        tx2 += tx_orig;
+        break;
     }
   }
   if (cmd == PARSERR_TOKENNOTFOUND)
@@ -389,7 +405,7 @@ csPolyTxtPlane* csLoader::load_polyplane (char* buf, char* name)
 
   if (tx1_given)
     if (tx2_given)
-      ppl->SetTextureSpace (tx1_orig, tx1, tx1_len, tx2, tx2_len);
+      ppl->SetTextureSpace (tx_orig, tx1, tx1_len, tx2, tx2_len);
     else
     {
       CsPrintf (MSG_FATAL_ERROR, "Not supported!\n");
@@ -1388,6 +1404,8 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
     TOKEN_TABLE (FIRST)
     TOKEN_TABLE (SECOND_LEN)
     TOKEN_TABLE (SECOND)
+    TOKEN_TABLE (UVEC)
+    TOKEN_TABLE (VVEC)
     TOKEN_TABLE (LEN)
     TOKEN_TABLE (MATRIX)
     TOKEN_TABLE (PLANE)
@@ -1416,7 +1434,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
   poly3d->SetParent (parent);
 
   bool tx1_given = false, tx2_given = false;
-  csVector3 tx1_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
+  csVector3 tx_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
   float tx1_len = default_texlen, tx2_len = default_texlen;
   float tx_len = default_texlen;
   csMatrix3 tx_matrix;
@@ -1552,8 +1570,8 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
               int num;
               float flist[100];
               ScanStr (params2, "%F", flist, &num);
-              if (num == 1) tx1_orig = parent->Vobj ((int)flist[0]);
-              if (num == 3) tx1_orig = csVector3(flist[0],flist[1],flist[2]);
+              if (num == 1) tx_orig = parent->Vobj ((int)flist[0]);
+              if (num == 3) tx_orig = csVector3(flist[0],flist[1],flist[2]);
               break;
             case TOKEN_FIRST:
               tx1_given = true;
@@ -1594,6 +1612,18 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
             case TOKEN_UV_SHIFT:
               uv_shift_given = true;
               ScanStr (params2, "%f,%f", &u_shift, &v_shift);
+              break;
+            case TOKEN_UVEC:
+              tx1_given = true;
+              load_vector (params2, tx1);
+              tx1_len = tx1.Norm ();
+              tx1 += tx_orig;
+              break;
+            case TOKEN_VVEC:
+              tx2_given = true;
+              load_vector (params2, tx2);
+              tx2_len = tx2.Norm ();
+              tx2 += tx_orig;
               break;
           }
         }
@@ -1685,11 +1715,11 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
 
   if (tx1_given)
     if (tx2_given)
-      poly3d->SetTextureSpace (tx1_orig.x, tx1_orig.y, tx1_orig.z,
+      poly3d->SetTextureSpace (tx_orig.x, tx_orig.y, tx_orig.z,
                                tx1.x, tx1.y, tx1.z, tx1_len,
                                tx2.x, tx2.y, tx2.z, tx2_len);
   else
-    poly3d->SetTextureSpace (tx1_orig.x, tx1_orig.y, tx1_orig.z,
+    poly3d->SetTextureSpace (tx_orig.x, tx_orig.y, tx_orig.z,
                              tx1.x, tx1.y, tx1.z, tx1_len);
   else if (plane_name[0])
     poly3d->SetTextureSpace ((csPolyTxtPlane*)World->planes.FindByName (plane_name));
@@ -1743,6 +1773,8 @@ csCurve* csLoader::load_bezier (char* polyname, char* buf,
     TOKEN_TABLE (LEN)
     TOKEN_TABLE (MATRIX)
     TOKEN_TABLE (PLANE)
+    TOKEN_TABLE (UVEC)
+    TOKEN_TABLE (VVEC)
     TOKEN_TABLE (V)
     TOKEN_TABLE (UV_SHIFT)
   TOKEN_TABLE_END
@@ -1761,7 +1793,7 @@ csCurve* csLoader::load_bezier (char* polyname, char* buf,
 //TODO??  poly3d->SetParent (parent);
 
   bool tx1_given = false, tx2_given = false;
-  csVector3 tx1_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
+  csVector3 tx_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
   float tx1_len = default_texlen, tx2_len = default_texlen;
   float tx_len = default_texlen;
   csMatrix3 tx_matrix;
@@ -1807,8 +1839,8 @@ csCurve* csLoader::load_bezier (char* polyname, char* buf,
               int num;
               float flist[100];
               ScanStr (params2, "%F", flist, &num);
-              if (num == 1) tx1_orig = parent->Vobj ((int)flist[0]);
-              if (num == 3) tx1_orig = csVector3(flist[0],flist[1],flist[2]);
+              if (num == 1) tx_orig = parent->Vobj ((int)flist[0]);
+              if (num == 3) tx_orig = csVector3(flist[0],flist[1],flist[2]);
               break;
             case TOKEN_FIRST:
               tx1_given = true;
@@ -1849,6 +1881,18 @@ csCurve* csLoader::load_bezier (char* polyname, char* buf,
             case TOKEN_UV_SHIFT:
               uv_shift_given = true;
               ScanStr (params2, "%f,%f", &u_shift, &v_shift);
+              break;
+            case TOKEN_UVEC:
+              tx1_given = true;
+              load_vector (params2, tx1);
+              tx1_len = tx1.Norm ();
+              tx1 += tx_orig;
+              break;
+            case TOKEN_VVEC:
+              tx2_given = true;
+              load_vector (params2, tx2);
+              tx2_len = tx2.Norm ();
+              tx2 += tx_orig;
               break;
           }
         }
@@ -2020,6 +2064,8 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
     TOKEN_TABLE (SECOND)
     TOKEN_TABLE (LEN)
     TOKEN_TABLE (MATRIX)
+    TOKEN_TABLE (UVEC)
+    TOKEN_TABLE (VVEC)
     TOKEN_TABLE (V)
     TOKEN_TABLE (UV_SHIFT)
   TOKEN_TABLE_END
@@ -2036,7 +2082,7 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
   else ptemplate->SetTexture (default_texture);
 
   bool tx1_given = false, tx2_given = false;
-  csVector3 tx1_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
+  csVector3 tx_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
   float tx1_len = default_texlen, tx2_len = default_texlen;
   float tx_len = default_texlen;
   csMatrix3 tx_matrix;
@@ -2101,8 +2147,8 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
               int num;
               float flist[100];
               ScanStr (params2, "%F", flist, &num);
-              if (num == 1) tx1_orig = parent->Vtex ((int)flist[0]);
-              if (num == 3) tx1_orig = csVector3(flist[0],flist[1],flist[2]);
+              if (num == 1) tx_orig = parent->Vtex ((int)flist[0]);
+              if (num == 3) tx_orig = csVector3(flist[0],flist[1],flist[2]);
               break;
             case TOKEN_FIRST:
               tx1_given = true;
@@ -2139,6 +2185,18 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
               uv_shift_given = true;
               ScanStr (params2, "%f,%f", &u_shift, &v_shift);
               break;
+            case TOKEN_UVEC:
+              tx1_given = true;
+              load_vector (params2, tx1);
+              tx1_len = tx1.Norm ();
+              tx1 += tx_orig;
+              break;
+            case TOKEN_VVEC:
+              tx2_given = true;
+              load_vector (params2, tx2);
+              tx2_len = tx2.Norm ();
+              tx2 += tx_orig;
+              break;
           }
         }
         break;
@@ -2160,13 +2218,13 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
   if (tx1_given)
     if (tx2_given)
       TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-        tx1_orig, tx1, tx1_len, tx2, tx2_len);
+        tx_orig, tx1, tx1_len, tx2, tx2_len);
     else
     {
       float A, B, C;
       ptemplate->PlaneNormal (&A, &B, &C);
       TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-        tx1_orig, tx1, tx1_len, A, B, C);
+        tx_orig, tx1, tx1_len, A, B, C);
     }
   else if (tx_len)
   {
@@ -2212,6 +2270,8 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
     TOKEN_TABLE (SECOND)
     TOKEN_TABLE (LEN)
     TOKEN_TABLE (MATRIX)
+    TOKEN_TABLE (UVEC)
+    TOKEN_TABLE (VVEC)
     TOKEN_TABLE (V)
     TOKEN_TABLE (UV_SHIFT)
   TOKEN_TABLE_END
@@ -2231,7 +2291,7 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
   else ptemplate->SetTextureHandle (default_texture);
 
   bool tx1_given = false, tx2_given = false;
-  csVector3 tx1_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
+  csVector3 tx_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
   float tx1_len = default_texlen, tx2_len = default_texlen;
   float tx_len = default_texlen;
   csMatrix3 tx_matrix;
@@ -2276,8 +2336,8 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
               int num;
               float flist[100];
               ScanStr (params2, "%F", flist, &num);
-              if (num == 1) tx1_orig = parent->CurveVertex ((int)flist[0]);
-              if (num == 3) tx1_orig = csVector3(flist[0],flist[1],flist[2]);
+              if (num == 1) tx_orig = parent->CurveVertex ((int)flist[0]);
+              if (num == 3) tx_orig = csVector3(flist[0],flist[1],flist[2]);
               break;
             case TOKEN_FIRST:
               tx1_given = true;
@@ -2313,6 +2373,18 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
             case TOKEN_UV_SHIFT:
               uv_shift_given = true;
               ScanStr (params2, "%f,%f", &u_shift, &v_shift);
+              break;
+            case TOKEN_UVEC:
+              tx1_given = true;
+              load_vector (params2, tx1);
+              tx1_len = tx1.Norm ();
+              tx1 += tx_orig;
+              break;
+            case TOKEN_VVEC:
+              tx2_given = true;
+              load_vector (params2, tx2);
+              tx2_len = tx2.Norm ();
+              tx2 += tx_orig;
               break;
           }
         }
