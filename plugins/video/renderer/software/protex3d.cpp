@@ -58,17 +58,6 @@ bool csSoftProcTexture3D::Initialize (iSystem *iSys)
   return true;
 }
 
-void csSoftProcTexture3D::Close ()
-{
-//    System->Printf (MSG_STDOUT, "csSoftProcTexture3D::Close () called\n");
-//    if (partner_g3d || tex_mm)
-//    {
-//      // We are sharing the cache and texture manager
-//      tcache = NULL;
-//      texman = NULL;
-//    }
-}
-
 void csSoftProcTexture3D::Print (csRect *area)
 {
   csGraphics3DSoftwareCommon::Print (area);

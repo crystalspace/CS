@@ -48,8 +48,8 @@ public:
 	    void *buffer, csPixelFormat *pfmt, RGBPixel *palette, int pal_size);
 
   virtual bool Initialize (iSystem *iSys);
+
   virtual void Print (csRect *area);
-  virtual void Close ();
 
   // The entry interface for other than software drivers..
   // implementation of iSoftProcTexture

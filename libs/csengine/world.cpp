@@ -1025,7 +1025,7 @@ void csWorld::Draw (csCamera* c, csClipper* view)
 
   current_camera = c;
 
-  // This flag is set in HandleEvent on a NativeWindowResize event
+  // This flag is set in HandleEvent on a cscmdContextResize event
   if (resize) 
   {
     resize = false;
@@ -1033,8 +1033,9 @@ void csWorld::Draw (csCamera* c, csClipper* view)
   }
   // when many cameras per context, need to make sure each camera has updated
   // shift_* fields, after resizing.
-  current_camera->SetPerspectiveCenter (frame_width/2, frame_height/2);
-
+  //  current_camera->SetPerspectiveCenter (frame_width/2, frame_height/2);
+  // smgh: depreciated.. it is now the apps responsibility to monitor context
+  // resize events and update the cameras accordingly. (dtsimple implements this)
   top_clipper = view;
 
   csRenderView rview (*c, view, G3D, G2D);
@@ -1118,15 +1119,15 @@ void csWorld::DrawFunc (csCamera* c, csClipper* view,
   }
   // when many cameras per context, need to make sure each camera has updated
   // shift_* fields, after resizing.
-  current_camera->SetPerspectiveCenter (frame_width/2, frame_height/2);
+
+  //  current_camera->SetPerspectiveCenter (frame_width/2, frame_height/2);
+  // smgh: depreciated.. it is now the apps responsibility to monitor context
+  // resize events and update the cameras accordingly. (dtsimple implements this)
 
   csRenderView rview (*c, view, G3D, G2D);
   rview.clip_plane.Set (0, 0, 1, -1);   //@@@CHECK!!!
   rview.callback = callback;
   rview.callback_data = callback_data;
-
-  // Maybe not necessary if DrawFunc is never called before Draw
-  c->SetPerspectiveCenter (frame_width/2, frame_height/2);
 
   // Calculate frustum for screen dimensions (at z=1).
   float leftx = - c->GetShiftX () * c->GetInvFOV ();

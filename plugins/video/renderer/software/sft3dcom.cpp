@@ -336,6 +336,7 @@ bool csGraphics3DSoftwareCommon::SharedOpen ()
   pixel_shift = partner->pixel_shift;
   fog_buffers = partner->fog_buffers;
   alpha_mask = partner->alpha_mask;
+  z_buf_mode = partner->z_buf_mode;
 #if defined (DO_MMX)
   cpu_mmx = partner->cpu_mmx;
 #endif
