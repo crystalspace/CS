@@ -139,8 +139,7 @@ class csTextureList : public csNamedObjVector
 {
 public:
   /// Initialize the array
-  csTextureList () : csNamedObjVector (16, 16)
-  { }
+  csTextureList ();
   /// Destroy every texture in the list
   virtual ~csTextureList ();
 
@@ -160,6 +159,20 @@ public:
   /// Find a texture by name
   csTextureWrapper *FindByName (const char* iName)
   { return (csTextureWrapper *)csNamedObjVector::FindByName (iName); }
+
+  DECLARE_IBASE;
+
+  //-------------------- iTextureList implementation -------------------------
+  struct TextureList : public iTextureList
+  {
+    DECLARE_EMBEDDED_IBASE (csTextureList);
+
+    virtual iTextureWrapper *NewTexture (iImage *image);
+    virtual iTextureWrapper *NewTexture (iTextureHandle *ith);
+    virtual long GetNumTextures () const;
+    virtual iTextureWrapper *Get (int idx) const;
+    virtual iTextureWrapper *FindByName (const char* iName) const;
+  } scfiTextureList;
 };
 
 #endif // __CS_TEXTURE_H__

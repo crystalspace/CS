@@ -38,6 +38,7 @@ struct iMeshObjectType;
 struct iMaterialWrapper;
 struct iMaterialList;
 struct iTextureWrapper;
+struct iTextureList;
 struct iTerrainWrapper;
 struct iTerrainFactoryWrapper;
 struct iCameraPosition;
@@ -105,6 +106,21 @@ struct iEngine : public iPlugIn
   virtual bool DeleteLibrary (const char *iName) = 0;
   /// Delete all libraries (clear the engine)
   virtual void DeleteAll () = 0;
+
+  /// Register a new render priority.
+  virtual void RegisterRenderPriority (const char* name, long priority) = 0;
+  /// Get a render priority by name.
+  virtual long GetRenderPriority (const char* name) const = 0;
+  /// Get the render priority for sky objects (attached to 'sky' name).
+  virtual long GetSkyRenderPriority () const = 0;
+  /// Get the render priority for wall objects (attached to 'wall' name).
+  virtual long GetWallRenderPriority () const = 0;
+  /// Get the render priority for general objects (attached to 'object' name).
+  virtual long GetObjectRenderPriority () const = 0;
+  /// Get the render priority for alpha objects (attached to 'alpha' name).
+  virtual long GetAlphaRenderPriority () const = 0;
+  /// Clear all render priorities.
+  virtual void ClearRenderPriorities () = 0;
 
   /// Register a texture to be loaded during Prepare()
   virtual iTextureWrapper* CreateTexture (const char *iName,
@@ -184,13 +200,6 @@ struct iEngine : public iPlugIn
    */
   virtual iTerrainFactoryWrapper *FindTerrainFactory (const char *iName,
   	bool regionOnly = false) = 0;
-  /**
-   * Find a texture by name. If regionOnly is true then the returned
-   * texture will belong to the current region. Note that this is different
-   * from calling iRegion::FindTexture() because the latter will also
-   * return textures that belong in a region but are not connected to the
-   * engine.
-   */
   /**
    * Find a texture by name. If regionOnly is true then the returned
    * texture will belong to the current region. Note that this is different
@@ -326,6 +335,10 @@ struct iEngine : public iPlugIn
   /// @@@ Temporary function until things are moved to a plugin.
   virtual iMeshObjectType* GetThingType () = 0;
 
+  /**
+   * Get the list of all textures.
+   */
+  virtual iTextureList* GetTextureList () = 0;
   /**
    * Get the list of all materials.
    */

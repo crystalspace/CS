@@ -653,7 +653,7 @@ void csEngine::RegisterRenderPriority (const char* name, long priority)
   else if (!strcmp (name, "alpha")) render_priority_alpha = priority;
 }
 
-long csEngine::GetRenderPriority (const char* name)
+long csEngine::GetRenderPriority (const char* name) const
 {
   int i;
   for (i = 0 ; i < render_priorities.Length () ; i++)
@@ -1894,6 +1894,11 @@ iTerrainFactoryWrapper *csEngine::FindTerrainFactory (const char *iName, bool re
     return NULL;
   iTerrainFactoryWrapper* iFactory = &pFactory->scfiTerrainFactoryWrapper;
   return iFactory;
+}
+
+iTextureList* csEngine::GetTextureList ()
+{
+  return &(GetTextures ()->scfiTextureList);
 }
 
 iMaterialList* csEngine::GetMaterialList ()

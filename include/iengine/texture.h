@@ -23,6 +23,7 @@
 #include "cstypes.h"
 
 class csTextureWrapper;
+struct iImage;
 struct iTextureHandle;
 struct iTextureManager;
 struct iTextureWrapper;
@@ -68,6 +69,29 @@ struct iTextureWrapper : public iBase
    * Get the data for the use callback.
    */
   virtual void* GetUseData () const = 0;
+};
+
+
+SCF_VERSION (iTextureList, 0, 0, 1);
+
+/**
+ * This class represents a list of texture wrappers.
+ */
+struct iTextureList : public iBase
+{
+  /// Create a new texture.
+  virtual iTextureWrapper *NewTexture (iImage *image) = 0;
+  /**
+   * Create a engine wrapper for a pre-prepared iTextureHandle
+   * The handle will be IncRefed
+   */
+  virtual iTextureWrapper *NewTexture (iTextureHandle *ith) = 0;
+  /// Return the number of textures in the list
+  virtual long GetNumTextures () const = 0;
+  /// Return texture by index
+  virtual iTextureWrapper *Get (int idx) const = 0;
+  /// Find a texture by name
+  virtual iTextureWrapper *FindByName (const char* iName) const = 0;
 };
 
 #endif // __IENGINE_TEXTURE_H__

@@ -31,6 +31,7 @@ struct iSystem;
 struct iGraphics2D;
 struct iGraphics3D;
 struct iTextureManager;
+struct iTextureWrapper;
 
 class csProcTexture : public csObject
 {

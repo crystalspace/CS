@@ -723,7 +723,7 @@ void csLoader::txt_process (char *name, char* buf)
 
   iTextureWrapper *tex = LoadTexture (name, filename, flags);
   if (tex && do_transp)
-    tex->GetPrivateObject()->SetKeyColor (QInt (transp.red * 255.99),
+    tex->SetKeyColor (QInt (transp.red * 255.99),
       QInt (transp.green * 255.99), QInt (transp.blue * 255.99));
 }
 
@@ -751,9 +751,9 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
       case CS_TOKEN_TEXTURE:
       {
         ScanStr (params, "%s", str);
-        csTextureWrapper *texh = Engine->GetCsEngine()->FindCsTexture (str, onlyRegion);
+        iTextureWrapper *texh = Engine->FindTexture (str, onlyRegion);
         if (texh)
-          material->SetTextureWrapper (texh);
+          material->SetTextureWrapper (texh->GetPrivateObject());
         else
         {
           CsPrintf (MSG_FATAL_ERROR, "Cannot find texture `%s' for material `%s'\n", str, name);
@@ -979,7 +979,7 @@ bool csLoader::LoadMap (char* buf, bool iOnlyRegion)
       switch (cmd)
       {
         case CS_TOKEN_RENDERPRIORITIES:
-	  Engine->GetCsEngine()->ClearRenderPriorities ();
+	  Engine->ClearRenderPriorities ();
 	  LoadRenderPriorities (params);
 	  break;
         case CS_TOKEN_ADDON:
@@ -1894,7 +1894,7 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
   }
 
   if (!priority[0]) strcpy (priority, "object");
-  mesh->SetRenderPriority (Engine->GetCsEngine()->GetRenderPriority (priority));
+  mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
 
   return true;
 }
@@ -2167,7 +2167,7 @@ bool csLoader::LoadRenderPriorities (char* buf)
 Use BACK2FRONT, FRONT2BACK, or NONE\n", sorting);
 	  fatal_exit (0, false);
 	}
-	Engine->GetCsEngine()->RegisterRenderPriority (name, pri);
+	Engine->RegisterRenderPriority (name, pri);
         break;
       }
     }
@@ -2512,19 +2512,19 @@ iTextureWrapper *csLoader::LoadTexture (const char *name, const char *fname,
   if (!TexHandle)
     return NULL;
 
-  csTextureWrapper *TexWrapper = Engine->GetCsEngine()->
-    GetTextures()->NewTexture(TexHandle);
-  TexWrapper->SetName (name);
+  iTextureWrapper *TexWrapper =
+	Engine->GetTextureList()->NewTexture(TexHandle);
+  TexWrapper->GetPrivateObject()->SetName (name);
 
   csMaterial *Material = new csMaterial ();
-  Material->SetTextureWrapper (TexWrapper);
+  Material->SetTextureWrapper (TexWrapper->GetPrivateObject());
 
   iMaterialWrapper *MatWrapper = Engine->GetMaterialList()->
     NewMaterial (Material);
   MatWrapper->GetPrivateObject()->SetName (name);
   Material->DecRef ();
 
-  return &(TexWrapper->scfiTextureWrapper);
+  return TexWrapper;
 }
 
 //--- Sound Loading ---------------------------------------------------------

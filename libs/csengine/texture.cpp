@@ -184,6 +184,20 @@ void* csTextureWrapper::TextureWrapper::GetUseData () const
 
 //------------------------------------------------------- csTextureList -----//
 
+IMPLEMENT_IBASE (csTextureList)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iTextureList)
+IMPLEMENT_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE (csTextureList::TextureList)
+  IMPLEMENTS_INTERFACE (iTextureList)
+IMPLEMENT_EMBEDDED_IBASE_END
+
+csTextureList::csTextureList () : csNamedObjVector (16, 16)
+{
+  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiTextureList);
+}
+
 csTextureList::~csTextureList ()
 {
   DeleteAll ();
@@ -201,4 +215,29 @@ csTextureWrapper *csTextureList::NewTexture (iTextureHandle *ith)
   csTextureWrapper *tm = new csTextureWrapper (ith);
   Push (tm);
   return tm;
+}
+
+iTextureWrapper *csTextureList::TextureList::NewTexture (iImage *image)
+{
+  return &scfParent->NewTexture(image)->scfiTextureWrapper;
+}
+
+iTextureWrapper *csTextureList::TextureList::NewTexture (iTextureHandle *ith)
+{
+  return &scfParent->NewTexture(ith)->scfiTextureWrapper;
+}
+
+long csTextureList::TextureList::GetNumTextures () const
+{
+  return scfParent->Length();
+}
+
+iTextureWrapper *csTextureList::TextureList::Get (int idx) const
+{
+  return &scfParent->Get(idx)->scfiTextureWrapper;
+}
+
+iTextureWrapper *csTextureList::TextureList::FindByName (const char* iName) const
+{
+  return &scfParent->FindByName(iName)->scfiTextureWrapper;
 }
