@@ -25,7 +25,7 @@
 #include "igraph2d.h"
 #include "isystem.h"
 #include "itxtmgr.h"
-#include "csinput/csevent.h"
+#include "cssys/csevent.h"
 #include "csutil/csrect.h"
 #include "csutil/scf.h"
 #include "csutil/csstring.h"
@@ -71,7 +71,7 @@ bool csConsole::Initialize(iSystem *system)
   // Initialize flash_time for flashing cursors
   flash_time = piSystem->GetTime();
   // Initialize ourselves with the system and return true if all is well
-  return piSystem->RegisterDriver("iConsole", this);
+  return true;
 }
 
 void csConsole::Show()

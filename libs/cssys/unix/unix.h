@@ -20,7 +20,7 @@
 #define __UNIX_H__
 
 #include "csutil/scf.h"
-#include "csinput/csinput.h"
+#include "cssys/csinput.h"
 #include "cssys/system.h"
 #include "iunix.h"
 #include "igraph2d.h"
@@ -34,10 +34,6 @@ class SysSystemDriver : public csSystemDriver, public iUnixSystemDriver
   bool UseSHM;
   /// Simulated depth (ONLY FOR X2D DRIVER)
   int SimDepth;
-  /// The main loop callback
-  LoopCallback Callback;
-  /// The loop callback parameter
-  void *CallbackParam;
 
 public:
   // Constructor
@@ -57,30 +53,13 @@ public:
   // Sleep for given number of 1/1000 seconds
   virtual void Sleep (int SleepTime);
 
+  /// Toggle console text output (for consoles that share text/graphics mode)
+  virtual void EnablePrintf (bool /*iEnable*/) { }
+
   /// Implementation of iUnixSystemDriver
 
   /// Get user settings
   virtual void GetExtSettings (int &oSimDepth, bool &oUseSHM, bool &oHardwareCursor);
-  /// Set a callback that gets called from inside the main event loop
-  virtual void SetLoopCallback (LoopCallback Callback, void *Param);
-};
-
-/// Unix version.
-class SysKeyboardDriver : public csKeyboardDriver
-{
-public:
-  SysKeyboardDriver ();
-
-  void Handler (int Key, bool Down);
-};
-
-/// Unix version.
-class SysMouseDriver : public csMouseDriver
-{
-public:
-  SysMouseDriver ();
-
-  void Handler (int Button, int Down, int x, int y, int ShiftFlags);
 };
 
 #endif // __UNIX_H__

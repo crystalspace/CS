@@ -51,6 +51,7 @@ public:
   virtual void SetTransparency(bool){ csConsole::SetTransparency ( true ); }
   virtual void GetPosition(int &x, int &y, int &width, int &height) const;
   virtual void SetPosition(int x, int y, int width = -1, int height = -1);
+  virtual bool HandleEvent (csEvent &Event);
 
 protected:
   iGraphics3D *piG3D;
@@ -58,12 +59,11 @@ protected:
   ConsoleDecoration deco;
   csRect outersize, bordersize, p2size;
   bool border_computed;
-
+  bool pix_loaded;
 
   void LoadPix();
   void PrepPix( csIniFile *ini, const char *sect, ConDecoBorder &border, bool bgnd );
   void DrawBorder ( int x, int y, int width, int height, ConDecoBorder &border, int align );
-
 };
 
 #endif // ! __CS_FUNCON_H__

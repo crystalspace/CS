@@ -23,7 +23,7 @@
 #include "csws/csscrbar.h"
 #include "csws/csmouse.h"
 #include "csws/csapp.h"
-#include "csinput/csinput.h"
+#include "cssys/csinput.h"
 
 // Amount of space at left and at right of each listbox item
 #define LISTBOXITEM_XSPACE              2
@@ -458,21 +458,21 @@ bool csListBox::HandleEvent (csEvent &Event)
       switch (Event.Key.Code)
       {
         case CSKEY_UP:
-          if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == 0)
+          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
           {
             SendCommand (cscmdListBoxTrack, (void *)focused->prev);
             return true;
           } /* endif */
           return false;
         case CSKEY_DOWN:
-          if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == 0)
+          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
           {
             SendCommand (cscmdListBoxTrack, (void *)focused->next);
             return true;
           } /* endif */
           return false;
         case CSKEY_LEFT:
-          if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == CSMASK_CTRL)
+          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL)
           {
             if (deltax > LISTBOX_HORIZONTAL_PAGESTEP)
               deltax -= LISTBOX_HORIZONTAL_PAGESTEP;
@@ -481,7 +481,7 @@ bool csListBox::HandleEvent (csEvent &Event)
             PlaceItems ();
             return true;
           }
-          else if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == 0)
+          else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
           {
             if (deltax > 0)
               deltax--;
@@ -492,7 +492,7 @@ bool csListBox::HandleEvent (csEvent &Event)
           } /* endif */
           return false;
         case CSKEY_RIGHT:
-          if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == CSMASK_CTRL)
+          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL)
           {
             if (deltax + LISTBOX_HORIZONTAL_PAGESTEP <= maxdeltax)
               deltax += LISTBOX_HORIZONTAL_PAGESTEP;
@@ -501,7 +501,7 @@ bool csListBox::HandleEvent (csEvent &Event)
             PlaceItems ();
             return true;
           }
-          else if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == 0)
+          else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
           {
             if (deltax  < maxdeltax)
               deltax++;
@@ -512,52 +512,52 @@ bool csListBox::HandleEvent (csEvent &Event)
           } /* endif */
           return false;
         case CSKEY_PGUP:
-          if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == 0)
+          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
           {
             for (int i = 0; i < vertcount; i++)
               SendCommand (cscmdListBoxTrack, (void *)focused->prev);
             return true;
           }
-          else if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == CSMASK_CTRL)
+          else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL)
           {
             SendCommand (cscmdListBoxTrack, (void *)NextChild (first));
             return true;
           }
           return false;
         case CSKEY_PGDN:
-          if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == 0)
+          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
           {
             for (int i = 0; i < vertcount; i++)
               SendCommand (cscmdListBoxTrack, (void *)focused->next);
             return true;
           }
-          else if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == CSMASK_CTRL)
+          else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL)
           {
             SendCommand (cscmdListBoxTrack, (void *)PrevChild (first));
             return true;
           }
           return false;
         case CSKEY_HOME:
-          if ((Event.Key.ShiftKeys & CSMASK_CTRL) && (deltax != 0))
+          if ((Event.Key.Modifiers & CSMASK_CTRL) && (deltax != 0))
           {
             deltax = 0;
             PlaceItems ();
             return true;
           }
-          else if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == 0)
+          else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
           {
             SendCommand (cscmdListBoxTrack, (void *)NextChild (first));
             return true;
           }
           return false;
         case CSKEY_END:
-          if ((Event.Key.ShiftKeys & CSMASK_CTRL) && (deltax != maxdeltax))
+          if ((Event.Key.Modifiers & CSMASK_CTRL) && (deltax != maxdeltax))
           {
             deltax = maxdeltax;
             PlaceItems ();
             return true;
           }
-          else if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == 0)
+          else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
           {
             SendCommand (cscmdListBoxTrack, (void *)PrevChild (first));
             return true;
@@ -565,7 +565,7 @@ bool csListBox::HandleEvent (csEvent &Event)
           return false;
         case '/':
           if ((ListBoxStyle & CSLBS_MULTIPLESEL)
-           && ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == CSMASK_CTRL))
+           && ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL))
           {
             ForEachItem (do_select, NULL, false);
             return true;
@@ -573,7 +573,7 @@ bool csListBox::HandleEvent (csEvent &Event)
           return false;
         case '\\':
           if ((ListBoxStyle & CSLBS_MULTIPLESEL)
-           && ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == CSMASK_CTRL))
+           && ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL))
           {
             ForEachItem (do_deselect, NULL);
             return true;
@@ -582,7 +582,7 @@ bool csListBox::HandleEvent (csEvent &Event)
         default:
           if ((Event.Key.Code >= ' ')
            && (Event.Key.Code <= 255)
-           && !(Event.Key.ShiftKeys & (CSMASK_CTRL | CSMASK_ALT)))
+           && !(Event.Key.Modifiers & (CSMASK_CTRL | CSMASK_ALT)))
           {
             // Find first next item that starts with this letter
             csComponent *cur = focused->next;

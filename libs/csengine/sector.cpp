@@ -59,8 +59,14 @@ bool csSector::do_radiosity = false;
 
 IMPLEMENT_CSOBJTYPE (csSector,csPolygonSet);
 
+IMPLEMENT_IBASE (csSector)
+  IMPLEMENTS_INTERFACE (iSector)
+  IMPLEMENTS_INTERFACE (iPolygonSet)
+IMPLEMENT_IBASE_END
+
 csSector::csSector () : csPolygonSet ()
 {
+  CONSTRUCT_IBASE (NULL);
   first_thing = NULL;
   sector = this;
   beam_busy = 0;

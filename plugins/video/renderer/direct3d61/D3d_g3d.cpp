@@ -319,12 +319,9 @@ bool csGraphics3DDirect3DDx6::Initialize (iSystem *iSys)
   m_piSystem = iSys;
   m_piSystem->IncRef ();
 
-  if (!m_piSystem->RegisterDriver ("iGraphics3D", this))
-    return false;
-
   SysPrintf (MSG_INITIALIZATION, "\nDirect3DRender DX6.1 selected\n");
 
-  m_piG2D = LOAD_PLUGIN (m_piSystem, "crystalspace.graphics2d.direct3d.dx61", iGraphics2D);
+  m_piG2D = LOAD_PLUGIN (m_piSystem, "crystalspace.graphics2d.direct3d.dx61", NULL, iGraphics2D);
   if (!m_piG2D)
     return false;
 

@@ -24,6 +24,7 @@
 #include "csengine/rview.h"
 #include "csengine/bsp.h"
 #include "csgeom/math3d.h"
+#include "isector.h"
 
 struct LightInfo;
 class csThing;
@@ -44,7 +45,7 @@ struct iGraphics3D;
  * A sector is a convex hull of polygons. It is
  * one of the base classes for the portal engine.
  */
-class csSector : public csPolygonSet
+class csSector : public csPolygonSet, public iSector
 {
   friend class Dumper;
 
@@ -357,6 +358,9 @@ public:
   void ShineLights (csThing*, csProgressPulse* = 0);
 
   CSOBJTYPE;
+
+  //------------------------- iSector interface --------------------------------
+  DECLARE_IBASE;
 };
 
 #endif /*SECTOR_H*/

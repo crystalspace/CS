@@ -53,12 +53,60 @@
 #define MSG_DEBUG_2F		12
 
 /**
+ * Plugins have an additional characteristic called "functionality ID".
+ * This identifier is used by other plugins/engine/system driver to
+ * find some plugin that user assigned to perform some function.
+ * For example, the "VideoDriver" functionality identifier is used to
+ * separate the main 3D graphics driver from other possibly loader
+ * driver that implement the iGraphics3D interface (they could be
+ * secondary video drivers for example).
+ *<p>
+ * The functionality ID is given in the system config file as left
+ * side of assignment in "PlugIns" section. For example, in the
+ * following line:
+ * <pre>
+ * [PlugIns]
+ * VideoDriver = crystal.graphics3d.software
+ * </pre>
+ * "VideoDriver" is functionality identifier, and "crystal.graphics3d.software"
+ * is SCF class ID. No two plugins can have same functionality ID. This ID
+ * can be NULL for unnamed plugins.
+ */
+/// VFS plugin functionality identifier
+#define CS_FUNCID_VFS		"VFS"
+/// Functionality ID for the video driver
+#define CS_FUNCID_VIDEO		"VideoDriver"
+/// Sound renderer
+#define CS_FUNCID_SOUND		"SoundRender"
+/// Network driver
+#define CS_FUNCID_NETDRV	"NetDriver"
+/// Network manager
+#define CS_FUNCID_NETMAN	"NetManager"
+/// Console
+#define CS_FUNCID_CONSOLE	"Console"
+/// 3D engine
+#define CS_FUNCID_ENGINE	"Engine"
+
+/**
  * Query a pointer to some plugin through the System interface.
  * `Object' is a object that implements iSystem interface.
  * `Interface' is a interface name (iGraphics2D, iVFS and so on).
  */
 #define QUERY_PLUGIN(Object,Interface)					\
   (Interface *)Object->QueryPlugIn (#Interface, VERSION_##Interface)
+
+/**
+ * Find a plugin by his functionality ID. First the plugin with requested
+ * functionality identifier is found, and after this it is queried for the
+ * respective interface; if it does not implement the requested interface,
+ * NULL is returned. NULL is also returned if the plugin with respective
+ * functionality is simply not found. If you need the plugin with given
+ * functionality identifier no matter which interface it implements, ask
+ * for some basic interface, say iBase or iPlugIn.
+ */
+#define QUERY_PLUGIN_ID(Object,FuncID,Interface)			\
+  (Interface *)Object->QueryPlugIn (FuncID, #Interface, VERSION_##Interface)
+
 /**
  * Tell system driver to load a plugin.
  * Since SCF kernel is hidden behind the iSystem driver, this is the only
@@ -67,12 +115,12 @@
  * `ClassID' is the class ID (`crystalspace.graphics3d.software').
  * `Interface' is a interface name (iGraphics2D, iVFS and so on).
  */
-#define LOAD_PLUGIN(Object,ClassID,Interface)				\
-  (Interface *)(Object)->LoadPlugIn ((ClassID), #Interface, VERSION_##Interface)
+#define LOAD_PLUGIN(Object,ClassID,FuncID,Interface)			\
+  (Interface *)(Object)->LoadPlugIn (ClassID, FuncID, #Interface, VERSION_##Interface)
 
 struct iPlugIn;
 
-SCF_VERSION (iSystem, 0, 0, 3);
+SCF_VERSION (iSystem, 1, 0, 0);
 
 /**
  * This interface serves as a way for plug-ins to query Crystal Space about
@@ -81,28 +129,23 @@ SCF_VERSION (iSystem, 0, 0, 3);
  *<p>
  * Notes on plugin support: the list of plugins is queried from the [PlugIns]
  * section in the config file. The plugins are loaded in the order they come
- * in the .cfg file. If some plugin wants to be registered as a video/sound/etc
- * driver, it should call the RegisterDriver method (see below) with the
- * "iGraphics3D", "iNetworkDriver" and so on strings as first parameter.
- * If registration fails, this mean that another such driver has already
- * been registered with the system driver. The plugin should not complain,
- * just quietely fail the Initialize() call. Upon this system driver will
- * quietly unload the plugin as unuseful.<p>
- * If the plugin won't register as a basical driver, it won't be called by
- * the engine otherwise than for the cases where plugin registered himself.
+ * in the .cfg file.
+ *<p>
+ * The plugin can insert itself into the event processing chain and perform
+ * some actions depending on events. It also can supply an private independent
+ * API but in this case client program should know this in advance.
  */
 struct iSystem : public iBase
 {
   /// returns the configuration.
   virtual void GetSettings (int &oWidth, int &oHeight, int &oDepth, bool &oFullScreen) = 0;
-  /// Set one of basical drivers (plugins)
-  virtual bool RegisterDriver (const char *iInterface, iPlugIn *iObject) = 0;
-  /// Unload a driver
-  virtual bool DeregisterDriver (const char *iInterface, iPlugIn *iObject) = 0;
   /// Load a plugin and initialize it
-  virtual iBase *LoadPlugIn (const char *iClassID, const char *iInterface, int iVersion) = 0;
+  virtual iBase *LoadPlugIn (const char *iClassID, const char *iFuncID,
+    const char *iInterface, int iVersion) = 0;
   /// Get first of the loaded plugins that supports given interface ID
   virtual iBase *QueryPlugIn (const char *iInterface, int iVersion) = 0;
+  /// Find a plugin given his functionality ID
+  virtual iBase *QueryPlugIn (const char *iFuncID, const char *iInterface, int iVersion) = 0;
   /// Remove a plugin from system driver's plugin list
   virtual bool UnloadPlugIn (iPlugIn *iObject) = 0;
   /// print a string to the specified device.
@@ -130,9 +173,11 @@ struct iSystem : public iBase
   /// Save system configuration file
   virtual bool ConfigSave () = 0;
   /// Put a keyboard event into event queue 
-  virtual void QueueKeyEvent (int KeyCode, bool Down) = 0;
+  virtual void QueueKeyEvent (int iKeyCode, bool iDown) = 0;
   /// Put a mouse event into event queue 
-  virtual void QueueMouseEvent (int Button, int Down, int x, int y, int ShiftFlags) = 0;
+  virtual void QueueMouseEvent (int iButton, bool iDown, int x, int y) = 0;
+  /// Put a joystick event into event queue
+  virtual void QueueJoystickEvent (int iNumber, int iButton, bool iDown, int x, int y) = 0;
   /// Put a focus event into event queue 
   virtual void QueueFocusEvent (bool Enable) = 0;
   /// Register the plugin to receive specific events
@@ -154,6 +199,10 @@ struct iSystem : public iBase
   /// A shortcut for requesting to load a plugin (before Initialize())
   inline void RequestPlugin (const char *iPluginName)
   { AddOptionCL ("plugin", iPluginName); }
+  /// Called before forced suspend / after resuming suspend
+  virtual void SuspendResume (bool iSuspend) = 0;
+  /// Toggle console text output (for consoles that share text/graphics mode)
+  virtual void EnablePrintf (bool iEnable) = 0;
 };
 
 #endif // __CS_ISYSTEM_H__

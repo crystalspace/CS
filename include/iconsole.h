@@ -45,6 +45,8 @@ enum CursorConst
   csConCustomCursor
 };
 
+SCF_VERSION(iConsole, 0, 0, 4);
+
 /**
  * This is the Crystal Space Console interface.  It is an output only system.
  * It can be used in conjunction with the iConsoleInput interface in iconinp.h
@@ -56,7 +58,6 @@ enum CursorConst
  * Alpha transparency (not directly supported by 2D driver)
  * Background texture(s) (may not be available during startup)
  */
-SCF_VERSION(iConsole, 0, 0, 4);
 struct iConsole : public iPlugIn
 {
   /// Show the console   !DEPRECATED!
@@ -148,7 +149,6 @@ struct iConsole : public iPlugIn
    * assign the iCursor object to use.
    */
   virtual void SetCursorStyle(int style, bool flashing = true, iCursor *custom = NULL) = 0;
-
 };
 
 #endif // ! __CS_ICONSOLE_H__

@@ -28,21 +28,6 @@
 /// GGI version.
 class csGraphics2DGGI : public csGraphics2D
 {
-  /// Pointer to OS-specific interface
-  iUnixSystemDriver* UnixSystem;
-
-  /// This routine is called once per event loop
-  static void ProcessEvents (void *Param);
-
-//--  /// Check for a key.
-//--  void checkkey (int scancode, bool shift, bool alt, bool ctrl);
-//--  /// Handle keys.
-//--  void handle_keys (bool shift, bool alt, bool ctrl);
-//--  ///
-//--  int translate_scancode (int scancode);
-//--  bool remember_key[256];
-//--  bool button1_pressed, button2_pressed, button3_pressed;
-
   ///
   virtual bool PerformExtension (char* args);
 
@@ -67,6 +52,9 @@ public:
 
   virtual void Print (csRect *area = NULL);
   virtual void SetRGB (int i, int r, int g, int b);
+
+  /// Called on every frame by system driver
+  virtual bool HandleEvent (csEvent &Event);
 };
 
 #endif // __CS_GGI2D_H__

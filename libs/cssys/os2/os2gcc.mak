@@ -235,4 +235,16 @@ $(OS2LINK): libs/cssys/os2/support/os2link.cpp
 
 endif
 
+ifndef STARTFS
+
+# Also we need the full-screen launcher for MGL 2D driver
+STARTFS = ./startfs$(EXE)
+
+mgl2d: $(STARTFS)
+
+$(STARTFS): libs/cssys/os2/support/startfs.cpp
+	$(LD) $(LFLAGS.@) $(CFLAGS.optimize) $(LFLAGS.optimize) $^ -Zomf -Zlinker /PM:NOVIO
+
+endif
+
 endif # ifeq ($(MAKESECTION),targets)

@@ -47,7 +47,7 @@ void csSystemDriver::console_close ()
 #endif
 }
 
-// to be called instead of printf (exact same prototype/functionality of printf)
+// to be called instead of printf
 void csSystemDriver::console_out (const char *str)
 {
   if (console_ok)

@@ -18,6 +18,7 @@
 
 #include "sysdef.h"
 #include "csutil/csrect.h"
+#include "cssys/csevent.h"
 #include "isystem.h"
 
 // Some mumbo-jumbo with CHK since MGL also defines this macros :-)
@@ -45,6 +46,7 @@ csGraphics2DMGL::csGraphics2DMGL (iBase *iParent) :
 {
   CONSTRUCT_IBASE (iParent);
   dc = backdc = NULL;
+  joybutt = 0;
 }
 
 bool csGraphics2DMGL::Initialize (iSystem *pSystem)
@@ -58,7 +60,7 @@ bool csGraphics2DMGL::Initialize (iSystem *pSystem)
     return false;
   }
 
-  int video_mode = MGL_findMode (Width, Height, Depth);
+  video_mode = MGL_findMode (Width, Height, Depth);
   if (video_mode == -1)
   {
     System->Printf (MSG_FATAL_ERROR, "The mode %dx%dx%d is not available (%s)!\n",
@@ -66,15 +68,11 @@ bool csGraphics2DMGL::Initialize (iSystem *pSystem)
     return false;
   }
 
-  if (!FullScreen)
-    MGL_changeDisplayMode (grWINDOWED);
-
-  numPages = MGL_availablePages (mode);
-  // We don't need more than 2 pages
-  if (numPages > 2) numPages = 2;
-
   do_hwmouse = System->ConfigGetYesNo ("VideoDriver", "SystemMouseCursor", true);
   do_hwbackbuf = System->ConfigGetYesNo ("VideoDriver", "HardwareBackBuffer", true);
+
+  // Tell system driver to call us on every frame
+  System->CallOnEvents (this, CSMASK_Nothing);
 
   return true;
 }
@@ -83,18 +81,42 @@ csGraphics2DMGL::~csGraphics2DMGL ()
 {
 }
 
-bool csGraphics2DMGL::Open(const char *Title)
+// Ugly
+static iSystem *SysDriver;
+
+static int MGLAPI MGL_suspend_callback (MGLDC *dc, int flags)
+{
+  if (flags == MGL_DEACTIVATE)
+  {
+    SysDriver->SuspendResume (true);
+    return MGL_SUSPEND_APP;
+  }
+  else if (flags == MGL_REACTIVATE)
+    SysDriver->SuspendResume (false);
+  return MGL_NO_SUSPEND_APP;
+}
+
+bool csGraphics2DMGL::Open (const char *Title)
 {
   // Open your graphic interface
   if (!csGraphics2D::Open (Title))
     return false;
 
-  if ((dc = MGL_createDisplayDC (mode, numPages, MGL_DEFAULT_REFRESH)) == NULL)
+  SysDriver = System;
+  MGL_setSuspendAppCallback (MGL_suspend_callback);
+
+  numPages = MGL_availablePages (video_mode);
+  // We don't need more than 2 pages
+  if (numPages > 2) numPages = 2;
+
+  if ((dc = MGL_createDisplayDC (video_mode, numPages, MGL_DEFAULT_REFRESH)) == NULL)
   {
     System->Printf (MSG_FATAL_ERROR, MGL_errorMsg (MGL_result ()));
     return false;
   }
   MGL_makeCurrentDC (dc);
+
+  System->EnablePrintf (false);
 
   pixel_format_t pf;
   MGL_getPixelFormat (dc, &pf);
@@ -123,6 +145,9 @@ bool csGraphics2DMGL::Open(const char *Title)
 
   // Reset member variables
   videoPage = 0; allowDB = true;
+  joybutt = 0; paletteChanged = true;
+  memset (&joyposx, 0, sizeof (joyposx));
+  memset (&joyposy, 0, sizeof (joyposy));
 
   // We always use one palette in all our contexts
   MGL_checkIdentityPalette (false);
@@ -142,6 +167,8 @@ void csGraphics2DMGL::Close ()
     MGL_exit ();
   }
   csGraphics2D::Close ();
+
+  System->EnablePrintf (true);
 }
 
 void csGraphics2DMGL::AllocateBackBuffer ()
@@ -154,16 +181,16 @@ void csGraphics2DMGL::AllocateBackBuffer ()
     backdc = dc;
     bbtype = bbSecondVRAMPage;
     MGL_makeCurrentDC (backdc);
-    MGL_setActivePage (videoPage ^ 1);
-    MGL_setVisualPage (videoPage);
+    MGL_setActivePage (dc, videoPage ^ 1);
+    MGL_setVisualPage (dc, videoPage, false);
     return;
   }
 
   videoPage = 0;
-  MGL_setActivePage (0);
-  MGL_setVisualPage (0);
+  MGL_setActivePage (dc, 0);
+  MGL_setVisualPage (dc, 0, false);
 
-  backdc = do_hwbackbuf ? MGL_createOffscreenDC () : NULL;
+  backdc = do_hwbackbuf ? MGL_createOffscreenDC (dc, Width, Height) : NULL;
   if (backdc)
   {
     // Check if this backbuffer covers our needs
@@ -174,7 +201,9 @@ void csGraphics2DMGL::AllocateBackBuffer ()
   }
   if (!backdc)
   {
-    backdc = MGL_createMemoryDC ();
+    pixel_format_t pf;
+    MGL_getPixelFormat (dc, &pf);
+    backdc = MGL_createMemoryDC (Width, Height, Depth, &pf);
     bbtype = bbSystemMemory;
   }
 
@@ -205,8 +234,14 @@ bool csGraphics2DMGL::BeginDraw ()
   if (FrameBufferLocked != 1)
     return true;
 
+  if (paletteChanged)
+  {
+    MGL_realizePalette (dc, 256, 0, false);
+    paletteChanged = false;
+  }
+
   MGL_beginDirectAccess ();
-  Memory = backdc->surface;
+  Memory = (UByte *)backdc->surface;
 
   if (LineAddress [1] != backdc->mi.bytesPerLine)
   {
@@ -237,18 +272,20 @@ void csGraphics2DMGL::Print (csRect *area)
   if (bbtype == bbSecondVRAMPage)
   {
     videoPage ^= 1;
-    MGL_setActivePage (videoPage ^ 1);
-    MGL_setVisualPage (videoPage);
+    MGL_setActivePage (dc, videoPage ^ 1);
+    MGL_setVisualPage (dc, videoPage, true);
   }
   else
     MGL_bitBltCoord (dc, backdc,
-      area.xmin, area.ymax, area.xmax, area.ymin,
-      area.xmin, area.ymax, MGL_REPLACE_MODE);
+      area->xmin, area->ymax, area->xmax, area->ymin,
+      area->xmin, area->ymax, MGL_REPLACE_MODE);
 }
 
 void csGraphics2DMGL::SetRGB(int i, int r, int g, int b)
 {
   csGraphics2D::SetRGB (i, r, g, b);
+  MGL_setPaletteEntry (dc, i, r, g, b);
+  paletteChanged = true;
 }
 
 bool csGraphics2DMGL::SetMousePosition (int x, int y)
@@ -265,12 +302,143 @@ bool csGraphics2DMGL::SetMouseCursor (csMouseCursorID iShape)
   return false;
 }
 
-void csGraphics2DMGL::ProcessEvents (void *Param)
+int csGraphics2DMGL::TranslateKey (int mglKey)
 {
+  //@@bug: ASCII keys with code 0xE0 (in particular, small cyrillic 'r')
+  //are unusable. @@todo: bug Kendall Bennett about it.
+  if (EVT_asciiCode (mglKey) == 0xe0
+   || EVT_asciiCode (mglKey) == 0)
+  {
+    mglKey = EVT_scanCode (mglKey);
+    int key = 0;
+    switch (mglKey)
+    {
+      case KB_padMinus:   key = CSKEY_PADMINUS; break;
+      case KB_padPlus:    key = CSKEY_PADPLUS; break;
+      case KB_padTimes:   key = CSKEY_PADMULT; break;
+      case KB_padDivide:  key = CSKEY_PADDIV; break;
+      case KB_padLeft:
+      case KB_left:       key = CSKEY_LEFT; break;
+      case KB_padRight:
+      case KB_right:      key = CSKEY_RIGHT; break;
+      case KB_padUp:
+      case KB_up:         key = CSKEY_UP; break;
+      case KB_padDown:
+      case KB_down:       key = CSKEY_DOWN; break;
+      case KB_padInsert:
+      case KB_insert:     key = CSKEY_INS; break;
+      case KB_padDelete:
+      case KB_delete:     key = CSKEY_DEL; break;
+      case KB_padHome:
+      case KB_home:       key = CSKEY_HOME; break;
+      case KB_padEnd:
+      case KB_end:        key = CSKEY_END; break;
+      case KB_padPageUp:
+      case KB_pageUp:     key = CSKEY_PGUP; break;
+      case KB_padPageDown:
+      case KB_pageDown:   key = CSKEY_PGDN; break;
+      case KB_padCenter:  key = CSKEY_CENTER; break;
+      case KB_F1:         key = CSKEY_F1; break;
+      case KB_F2:         key = CSKEY_F2; break;
+      case KB_F3:         key = CSKEY_F3; break;
+      case KB_F4:         key = CSKEY_F4; break;
+      case KB_F5:         key = CSKEY_F5; break;
+      case KB_F6:         key = CSKEY_F6; break;
+      case KB_F7:         key = CSKEY_F7; break;
+      case KB_F8:         key = CSKEY_F8; break;
+      case KB_F9:         key = CSKEY_F9; break;
+      case KB_F10:        key = CSKEY_F10; break;
+      case KB_F11:        key = CSKEY_F11; break;
+      case KB_F12:        key = CSKEY_F12; break;
+      case KB_leftShift:
+      case KB_rightShift: key = CSKEY_SHIFT; break;
+      case KB_leftCtrl:
+      case KB_rightCtrl:  key = CSKEY_CTRL; break;
+      case KB_leftAlt:
+      case KB_rightAlt:   key = CSKEY_ALT; break;
+    }
+    return key;
+  }
+  else
+  {
+    if (EVT_asciiCode (mglKey) == '\r')
+      return CSKEY_ENTER;
+    return EVT_asciiCode (mglKey);
+  }
+}
+
+bool csGraphics2DMGL::HandleEvent (csEvent &Event)
+{
+  event_t evt;
+
+  // This is relatively slow (joystick reading)
+  // and should occur only if the user really requested it
+  //EVT_pollJoystick ();
+
+  while (EVT_getNext (&evt, EVT_EVERYEVT))
+  {
+    switch (evt.what)
+    {
+      case EVT_KEYDOWN:
+      case EVT_KEYREPEAT:
+      case EVT_KEYUP:
+        evt.message = TranslateKey (evt.message);
+        if (evt.message)
+          System->QueueKeyEvent (evt.message, evt.what != EVT_KEYUP);
+        break;
+      case EVT_MOUSEDOWN:
+      case EVT_MOUSEUP:
+        if (evt.message & EVT_LEFTBMASK)
+          System->QueueMouseEvent (1, !(evt.modifiers & EVT_LEFTBUT),
+            evt.where_x, evt.where_y);
+        if (evt.message & EVT_RIGHTBMASK)
+          System->QueueMouseEvent (2, !(evt.modifiers & EVT_RIGHTBUT),
+            evt.where_x, evt.where_y);
+        if (evt.message & EVT_MIDDLEBMASK)
+          System->QueueMouseEvent (3, !(evt.modifiers & EVT_MIDDLEBUT),
+            evt.where_x, evt.where_y);
+        break;
+      case EVT_MOUSEMOVE:
+        System->QueueMouseEvent (0, false, evt.where_x, evt.where_y);
+        break;
+      case EVT_JOYCLICK:
+        if (joybutt != evt.message)
+        {
+          int diff = joybutt ^ evt.message;
+          joybutt = evt.message;
+          if (diff & EVT_JOY1_BUTTONA)
+            System->QueueJoystickEvent (1, 1, !!(joybutt & EVT_JOY1_BUTTONA),
+              evt.where_x, evt.where_y);
+          if (diff & EVT_JOY1_BUTTONB)
+            System->QueueJoystickEvent (1, 2, !!(joybutt & EVT_JOY1_BUTTONB),
+              evt.where_x, evt.where_y);
+          if (diff & EVT_JOY2_BUTTONA)
+            System->QueueJoystickEvent (2, 1, !!(joybutt & EVT_JOY2_BUTTONA),
+              evt.relative_x, evt.relative_y);
+          if (diff & EVT_JOY2_BUTTONB)
+            System->QueueJoystickEvent (2, 2, !!(joybutt & EVT_JOY2_BUTTONB),
+              evt.relative_x, evt.relative_y);
+        }
+        break;
+      case EVT_JOYMOVE:
+        if (joyposx [0] != evt.where_x || joyposy [0] != evt.where_y)
+        {
+          System->QueueJoystickEvent (1, 0, false, evt.where_x, evt.where_y);
+          joyposx [0] = evt.where_x; joyposy [0] = evt.where_y;
+        }
+        if (joyposx [1] != evt.relative_x || joyposy [1] != evt.relative_y)
+        {
+          System->QueueJoystickEvent (2, 0, false, evt.relative_x, evt.relative_y);
+          joyposx [1] = evt.relative_x; joyposy [1] = evt.relative_y;
+        }
+        break;
+    }
+  }
+  return false;
 }
 
 void csGraphics2DMGL::Clear (int color)
 {
   MGL_setBackColor (color);
-  MGL_ClearDevice ();
+  MGL_clearDevice ();
 }

@@ -462,7 +462,9 @@ public:
   bool dont_draw;
 
   /**
-   * Construct a new polygon with the given name and texture.
+   * Construct a new polygon with the given texture.
+   * If the texture is NULL the polygon is untextured (or you can
+   * set the texture later using the SetTexture method).
    */
   csPolygon3D (csTextureHandle* texture);
 
@@ -714,12 +716,7 @@ public:
   /**
    * Get the texture.
    */
-  csTextureHandle* GetTexture () { return txtMM; }
-
-  /**
-   * Get the texture handle for the texture manager.
-   */
-  iTextureHandle* GetTextureHandle ();
+  csTextureHandle* GetCsTextureHandle () { return txtMM; }
 
   /**
    * Return true if this polygon or the texture it uses is transparent.
@@ -746,15 +743,6 @@ public:
    * for lighting.
    */
   void SetCosinusFactor (float f) { light_info.cosinus_factor = f; }
-
-  /**
-   * Set the alpha transparency value for this polygon (only if
-   * it is a portal).
-   * Not all renderers support all possible values. 0, 25, 50,
-   * 75, and 100 will always work but other values may give
-   * only the closest possible to one of the above.
-   */
-  void SetAlpha (int da) { if (portal) portal->SetAlpha (da); }
 
   /**
    * One of the SetTextureSpace functions should be called after
@@ -1089,21 +1077,70 @@ public:
 
   CSOBJTYPE;
 
-  //-------------------- iPolygon interface implementation --------------------
+  //-------------------- iPolygon3D interface implementation -------------------
   DECLARE_IBASE;
 
-  ///
-  virtual const char *GetObjectName () { return GetName (); }
+  /// Get polygon name
+  virtual const char *GetName ()
+  { return csObject::GetName (); }
+  /// Set polygon name
+  virtual void SetName (const char *iName)
+  { csObject::SetName (iName); }
+
   /// Get the polygonset (container) that this polygons belongs to.
-  virtual iPolygonSet *GetParentObject () { return GetParent (); }
-  ///
-  virtual csVector3 *GetCameraVector (int idx);
-  ///
-  virtual iPolygonTexture *GetObjectTexture ();
+  virtual iPolygonSet *GetContainer ()
+  { return GetParent (); }
+  /// Get the lightmap associated with this polygon
+  virtual iLightMap *GetLightMap ()
+  {
+    csLightMapped *lm = GetLightMapInfo ();
+    return lm ? lm->GetLightMap () : NULL;
+  }
+  /// Get the handle to the polygon texture object
+  virtual iPolygonTexture *GetTexture ()
+  {
+    csLightMapped *lm = GetLightMapInfo ();
+    return lm ? lm->GetPolyTex () : NULL;
+  }
+  /// Get the texture handle for the texture manager.
+  virtual iTextureHandle *GetTextureHandle ();
+
+  /// Query number of vertices in this polygon
+  virtual int GetVertexCount ()
+  { return vertices.GetNumVertices (); }
+  /// Get the given polygon vertex coordinates in object space
+  virtual csVector3 &GetVertex (int idx)
+  { return GetParent ()->GetVertex (vertices.GetVertex (idx)); }
+  /// Get the given polygon vertex coordinates in world space
+  virtual csVector3 &GetVertexW (int idx)
+  { return GetParent ()->GetVertexW (vertices.GetVertex (idx)); }
+  /// Get the given polygon vertex coordinates in camera space
+  virtual csVector3 &GetVertexC (int idx)
+  { return GetParent ()->GetVertexC (vertices.GetVertex (idx)); }
+  /// Create a polygon vertex given his index in parent polygon set
+  virtual int CreateVertex (int idx)
+  { return AddVertex (idx); }
+  /// Create a polygon vertex and add it to parent object
+  virtual int CreateVertex (const csVector3 &iVertex)
+  { return AddVertex (iVertex); }
+
   /// Get the alpha transparency value for this polygon.
-  virtual int GetAlpha ();
-  ///
-  virtual iLightMap *GetLightMap ();
+  virtual int GetAlpha ()
+  { return portal ? portal->GetAlpha () : 0; }
+  /**
+   * Set the alpha transparency value for this polygon (only if
+   * it is a portal).
+   * Not all renderers support all possible values. 0, 25, 50,
+   * 75, and 100 will always work but other values may give
+   * only the closest possible to one of the above.
+   */
+  void SetAlpha (int iAlpha)
+  { if (portal) portal->SetAlpha (iAlpha); }
+
+  /// Create a private polygon texture mapping plane
+  virtual void CreatePlane (const csVector3 &iOrigin, const csMatrix3 &iMatrix);
+  /// Set polygon texture mapping plane
+  virtual bool SetPlane (const char *iName);
 };
 
 #endif /*POLYGON_H*/

@@ -28,7 +28,7 @@
 #include "csengine/arrays.h"
 #include "csutil/cscolor.h"
 #include "igraph3d.h"
-#include "ipolygon.h"
+#include "ipolyset.h"
 
 class csPolygonInt;
 class csSector;
@@ -43,7 +43,6 @@ class Dumper;
 class csRenderView;
 class csFrustrumList;
 class csCurve;
-struct iPolygonSet;
 
 /**
  * This structure keeps the indices of the vertices which
@@ -113,7 +112,7 @@ protected:
   int num_vertices;
   /// Maximal number of vertices
   int max_vertices;
-  
+
   /// Vertices in world space.
   csVector3* wor_verts;
   /// Vertices in object space.
@@ -296,7 +295,7 @@ public:
   { return polygons.Length (); }
 
   /// Get a csPolygonInt with the index.
-  csPolygonInt* GetPolygon (int idx);
+  csPolygonInt* GetPolygonInt (int idx);
 
   /// Get the specified polygon from this set.
   csPolygon3D *GetPolygon3D (int idx)
@@ -477,10 +476,40 @@ public:
   csVector2* IntersectCameraZPlane (float z, csVector2* clipper, int num_clip, int& num_pts);
 
   CSOBJTYPE;
+
+  //-------------------- iPolygonSet interface implementation ------------------
   DECLARE_IBASE;
 
   /// Same as GetName()
-  virtual const char *GetObjectName () { return GetName (); }
+  virtual const char *GetName ()
+  { return csObject::GetName (); }
+  /// Set polygon set name
+  virtual void SetName (const char *iName)
+  { csObject::SetName (iName); }
+
+  /// Query number of polygons in set
+  virtual int GetPolygonCount ()
+  { return polygons.Length (); }
+  /// Get a polygon from set by his index
+  virtual iPolygon3D *GetPolygon (int idx);
+  /// Create a new polygon and return a pointer to it
+  virtual iPolygon3D *CreatePolygon (const char *iName);
+
+  /// Query number of vertices in set
+  virtual int GetVertexCount ()
+  { return num_vertices; }
+  /// Get the given vertex coordinates in object space
+  virtual csVector3 &GetVertex (int idx)
+  { return obj_verts [idx]; }
+  /// Get the given vertex coordinates in world space
+  virtual csVector3 &GetVertexW (int idx)
+  { return wor_verts [idx]; }
+  /// Get the given vertex coordinates in camera space
+  virtual csVector3 &GetVertexC (int idx)
+  { return cam_verts [idx]; }
+  /// Create a vertex given his object-space coords and return his index
+  virtual int CreateVertex (csVector3 &iVertex)
+  { return AddVertex (iVertex.x, iVertex.y, iVertex.z); }
 };
 
 #endif /*POLYSET_H*/

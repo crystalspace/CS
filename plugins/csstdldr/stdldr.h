@@ -27,6 +27,9 @@
 
 struct iWorld;
 struct iVFS;
+struct iSector;
+struct iPolygonSet;
+struct iPolygon3D;
 
 typedef char *csTokenList;
 
@@ -95,10 +98,13 @@ struct csPMatrix3
   }
 };
 
-enum csPPlaneMode
-{
-  pmNONE, pmFIRSTSECOND, pmMATRIX, pmVECTORS
-};
+// These bits are set during texture plane loading
+#define pmNONE		0x00000000
+#define pmORIGIN	0x00000001
+#define pmFIRSTSECOND	0x00000002
+#define pmMATRIX	0x00000004
+#define pmVECTORS	0x00000008
+#define pmPLANEREF	0x00000010
 
 class csStandardLoader : public iLoader
 {
@@ -177,7 +183,7 @@ private:
   // The standard Bison tokenizer function
   int yylex (void *lval);
   // The parser function
-  friend int yyparse (void *);
+  int yyparse ();
 
   // Temporary storage for parser
   struct yystorage
@@ -233,16 +239,50 @@ private:
         // Texture first/second lengths
         float first_len,second_len;
         // Plane definition mode
-        csPPlaneMode mode;
+        int mode;
       } plane;
+      struct
+      {
+        // The iSector object
+        iSector *sector;
+        // The iPolygonSet interface to same object
+        iPolygonSet *polyset;
+        // The currently active polygon
+        iPolygon3D *polygon;
+        // Default texture name
+        char *texname;
+        // Default texture length
+        float texlen;
+      } sector;
     };
   } storage;
+
+  // Used while processing POLYGON (...) statements
+  struct
+  {
+    // texture name
+    char *texname;
+    // default texture lengths
+    float texlen;
+    // texture plane template name
+    char *planetpl;
+    // Transformation matrix
+    csPMatrix3 matrix;
+    // Texture origin
+    csPVector3 origin;
+    // Texture first/second vectors
+    csPVector3 first,second;
+    // Texture first/second lengths
+    float first_len,second_len;
+    // Texture plane definition mode
+    int mode;
+  } polygon;
 
   // Save the state of loader and call Load() recursively
   bool RecursiveLoad (const char *iName);
 
   // Tokenize a string and return a newly-allocated array of tokens
-  csTokenList Tokenize (char *iData, size_t &oSize);
+  csTokenList Tokenize (char *iData, size_t &ioSize);
 
   // Initialize texture creation process
   void InitTexture (char *name);
@@ -257,10 +297,10 @@ private:
   // Create a global key/value pair
   bool CreateKey (const char *name, const char *value);
 
-  // Switch plane mode to one of pmXXX values
-  bool PlaneMode (csPPlaneMode mode);
-  // Create a polygon texture plane
+  // Create a polygon texture plane template
   bool CreatePlane (const char *name);
+  // Create a unique (polygon private) texture plane
+  bool CreateTexturePlane (iPolygon3D *iPolygon);
 };
 
 #endif // __STDLDR_H__

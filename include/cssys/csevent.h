@@ -33,27 +33,57 @@ enum
   csevMouseDown,		// A mouse button has been pressed
   csevMouseUp,			// A mouse button has been released
   csevMouseDoubleClick,		// A mouse button has been clicked twice
+  csevJoystickMove,		// A joystick axis has been moved
+  csevJoystickDown,		// A joystick button has been pressed
+  csevJoystickUp,		// A joystick button has been released
   csevCommand,			// Somebody(-thing) sent a command
   csevBroadcast			// Somebody(-thing) sent a broadcast command
 };
 
-// Event masks
+/**
+ * Event masks.<p>
+ * The event masks can be used by plugins to tell the system driver
+ * (via iSystem::CallOnEvents) which kinds of events they want to receive
+ * at their HandleEvent() entry. If a plugin registers to receive
+ * CSMASK_Nothing events it is always called once per frame,
+ * so that plugin can do some per-frame processing.
+ */
+/// Unused event (plugins will receive control once per frame)
 #define CSMASK_Nothing		(1 << csevNothing)
+/// Key down events
 #define CSMASK_KeyDown		(1 << csevKeyDown)
+/// Key up events
 #define CSMASK_KeyUp		(1 << csevKeyUp)
+/// Mouse move events
 #define CSMASK_MouseMove	(1 << csevMouseMove)
+/// Mouse down events
 #define CSMASK_MouseDown	(1 << csevMouseDown)
+/// Mouse up events
 #define CSMASK_MouseUp		(1 << csevMouseUp)
+/// Mouse double click events
 #define CSMASK_MouseDoubleClick	(1 << csevMouseDoubleClick)
+/// Joystick movement events
+#define CSMASK_JoystickMove	(1 << csevJoystickMove)
+/// Joystick button down events
+#define CSMASK_JoystickDown	(1 << csevJoystickDown)
+/// Joystick button up events
+#define CSMASK_JoystickUp	(1 << csevJoystickUp)
+/// Command message events
 #define CSMASK_Command		(1 << csevCommand)
+/// Broadcast message events
 #define CSMASK_Broadcast	(1 << csevBroadcast)
 
-// Some handy macros
+/// Some handy macros
+/// Check if a event is a keyboard event
 #define IS_KEYBOARD_EVENT(e)	((1 << (e).Type) & \
  (CSMASK_KeyDown | CSMASK_KeyUp))
+/// Check if a event is a mouse event
 #define IS_MOUSE_EVENT(e)	((1 << (e).Type) & \
  (CSMASK_MouseMove | CSMASK_MouseDown | \
   CSMASK_MouseUp | CSMASK_MouseDoubleClick))
+/// Check if a event is a joystick event
+#define IS_JOYSTICK_EVENT(e)	((1 << (e).Type) & \
+ (CSMASK_JoystickMove | CSMASK_JoystickDown | CSMASK_JoystickUp))
 
 /**
  * Modifier key masks
@@ -141,20 +171,20 @@ enum
 /// Numeric keypad '/'
 #define CSKEY_PADDIV		1029
 
-/// First and last control key code
+// First and last control key code
 #define CSKEY_FIRST		1000
 #define CSKEY_LAST		1029
 
 /**
- * Predefined Command Codes<p>
- * The list below does not contain all defined messages; these are only the
- * most general ones. Crystal Space Windowing System has a broad range of
+ * General Command Codes<p>
+ * The list below does not contain all defined command codes; these are only
+ * the most general ones. Crystal Space Windowing System has a broad range of
  * predefined commands; look in CSWS header files for more info.
  */
 enum
 {
   /**
-   * No command
+   * No command.
    */
   cscmdNothing = 0,
   /**
@@ -198,38 +228,42 @@ public:
     struct
     {
       int Code;			// Key code
-      int ShiftKeys;		// Control key state
+      int Modifiers;		// Control key state
     } Key;
     struct
     {
       int x,y;			// Mouse coords
       int Button;		// Button number: 1-left, 2-right, 3-middle
-      int ShiftKeys;		// Control key state
+      int Modifiers;		// Control key state
     } Mouse;
     struct
     {
-      int dx, dy;		// Joystick deltax, deltay
+      int number;		// Joystick number (1, 2, ...)
+      int x, y;			// Joystick x, y
       int Button;		// Joystick button number
-      int ShiftKeys;		// Control key state
+      int Modifiers;		// Control key state
     } Joystick;
     struct
     {
       unsigned int Code;	// Command code
       void *Info;		// Command info
-    } Command;			// to allow virtual destructors
+    } Command;
   };
 
   /// Empty initializer
   csEvent () {}
 
   /// Create a keyboard event object
-  csEvent (long iTime, int eType, int kCode, int kShiftKeys);
+  csEvent (long eTime, int eType, int kCode, int kModifiers);
 
   /// Create a mouse event object
-  csEvent (long iTime, int eType, int mx, int my, int mbutton, int mShiftKeys);
+  csEvent (long eTime, int eType, int mx, int my, int mButton, int mModifiers);
+
+  /// Create a joystick event object
+  csEvent (long eTime, int eType, int jn, int jx, int jy, int jButton, int jModifiers);
 
   /// Create a command event object
-  csEvent (long iTime, int eType, int cCode, void *cInfo = NULL);
+  csEvent (long eTime, int eType, int cCode, void *cInfo = NULL);
 
   /// Destroy an event object
   virtual ~csEvent ();

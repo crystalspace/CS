@@ -18,16 +18,10 @@
 //
 //-----------------------------------------------------------------------------
 #include "cssys/system.h"
-#include "csinput/csinput.h"
+#include "cssys/csinput.h"
 #include "NeXTSystemInterface.h"
 @class NeXTDelegate;
 class csIniFile;
-
-//-----------------------------------------------------------------------------
-// NeXT-specific keyboard and mouse drivers.
-//-----------------------------------------------------------------------------
-class SysKeyboardDriver : public csKeyboardDriver {};
-class SysMouseDriver    : public csMouseDriver    {};
 
 
 //-----------------------------------------------------------------------------

@@ -22,7 +22,7 @@
 #include "iconinp.h"
 #include "csutil/scf.h"
 #include "csutil/csstring.h"
-#include "csinput/csevent.h"
+#include "cssys/csevent.h"
 #include "coninput.h"
 #include "conbuffr.h"
 

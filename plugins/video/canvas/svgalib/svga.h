@@ -36,9 +36,6 @@ class csGraphics2DSVGALib : public csGraphics2D
   /// Pointer to DOS-specific interface
   iUnixSystemDriver* UnixSystem;
 
-  /// This routine is called once per event loop
-  static void ProcessEvents (void *Param);
-
   /// Keep track of pressed keys
   bool keydown [128];
   /// Keep track of pressed mouse buttons
@@ -62,6 +59,9 @@ public:
 
   virtual void Print (csRect *area = NULL);
   virtual void SetRGB (int i, int r, int g, int b);
+
+  /// Called on every frame by system driver
+  virtual bool HandleEvent (csEvent &Event);
 };
 
 #endif // __SVGA_H__

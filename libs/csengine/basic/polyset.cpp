@@ -134,8 +134,10 @@ int csPolygonSet::AddVertex (float x, float y, float z)
   }
   while (num_vertices >= max_vertices)
   {
-    if (max_vertices < 10000) max_vertices *= 2;
-    else max_vertices += 10000;
+    if (max_vertices < 10000)
+      max_vertices *= 2;
+    else
+      max_vertices += 10000;
     CHK (csVector3* new_wor_verts = new csVector3 [max_vertices]);
     CHK (csVector3* new_obj_verts = new csVector3 [max_vertices]);
     memcpy (new_wor_verts, wor_verts, sizeof (csVector3)*num_vertices);
@@ -279,7 +281,7 @@ void csPolygonSet::CompressVertices ()
   CHK (delete [] vt);
 }
 
-csPolygonInt* csPolygonSet::GetPolygon (int idx)
+csPolygonInt* csPolygonSet::GetPolygonInt (int idx)
 {
   return (csPolygonInt*)GetPolygon3D (idx);
 }
@@ -290,11 +292,26 @@ csPolygon3D* csPolygonSet::GetPolygon3D (char* name)
   return idx >= 0 ? polygons.Get (idx) : NULL;
 }
 
+iPolygon3D *csPolygonSet::GetPolygon (int idx)
+{
+  return GetPolygon3D (idx);
+}
+
 csPolygon3D* csPolygonSet::NewPolygon (csTextureHandle* texture)
 {
   CHK (csPolygon3D* p = new csPolygon3D (texture));
   p->SetSector (sector);
   AddPolygon (p);
+  return p;
+}
+
+iPolygon3D *csPolygonSet::CreatePolygon (const char *iName)
+{
+  csPolygon3D *p = new csPolygon3D (NULL);
+  p->SetName (iName);
+  p->SetSector (sector);
+  AddPolygon (p);
+  p->IncRef ();
   return p;
 }
 

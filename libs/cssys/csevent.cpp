@@ -19,24 +19,37 @@
 */
 
 #include "sysdef.h"
-#include "csinput/csevent.h"
+#include "cssys/csevent.h"
 
-csEvent::csEvent (long iTime, int eType, int kCode, int kShiftKeys)
+csEvent::csEvent (long iTime, int eType, int kCode, int kModifiers)
 {
   Time = iTime;
   Type = eType;
   Key.Code = kCode;
-  Key.ShiftKeys = kShiftKeys;
+  Key.Modifiers = kModifiers;
 }
 
-csEvent::csEvent (long iTime, int eType, int mx, int my, int mbutton, int mShiftKeys)
+csEvent::csEvent (long iTime, int eType, int mx, int my,
+  int mButton, int mModifiers)
 {
   Time = iTime;
   Type = eType;
   Mouse.x = mx;
   Mouse.y = my;
-  Mouse.Button = mbutton;
-  Mouse.ShiftKeys = mShiftKeys;
+  Mouse.Button = mButton;
+  Mouse.Modifiers = mModifiers;
+}
+
+csEvent::csEvent (long iTime, int eType, int jn, int jx, int jy,
+  int jButton, int jModifiers)
+{
+  Time = iTime;
+  Type = eType;
+  Joystick.number = jn;
+  Joystick.x = jx;
+  Joystick.y = jy;
+  Joystick.Button = jButton;
+  Joystick.Modifiers = jModifiers;
 }
 
 csEvent::csEvent (long iTime, int eType, int cCode, void *cInfo)

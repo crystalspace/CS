@@ -20,8 +20,8 @@
 #include "sysdef.h"
 #include "glidex23.h"
 #include "csutil/scf.h"
-#include "csinput/csevent.h"
-#include "csinput/csinput.h"
+#include "cssys/csevent.h"
+#include "cssys/csinput.h"
 #include "cssys/unix/iunix.h"
 #include "csutil/inifile.h"
 #include "csutil/csrect.h"
@@ -113,7 +113,10 @@ bool csGraphics2DGlideX::Initialize (iSystem *pSystem)
   CsPrintf (MSG_INITIALIZATION, "Video driver Glide/X version ");
   CsPrintf (MSG_INITIALIZATION, "\n");
  
-  GraphicsReady=1;  
+  // Tell system driver to call us on every frame
+  System->CallOnEvents (this, CSMASK_Nothing);
+
+  GraphicsReady = 1;  
 
   return true;
 }
@@ -135,8 +138,6 @@ bool csGraphics2DGlideX::Open(const char *Title)
   if (!csGraphics2DGlideCommon::Open (Title))
     return false;
 
-  // Set loop callback
-  UnixSystem->SetLoopCallback (ProcessEvents, this);
   // Open window
   if (m_DoGlideInWindow)
     window = XCreateSimpleWindow (dpy, DefaultRootWindow (dpy), 64, 16,
@@ -329,32 +330,28 @@ static Bool CheckKeyPress (Display *dpy, XEvent *event, XPointer arg)
   return false;
 }
 
-void csGraphics2DGlideX::ProcessEvents (void *Param)
+bool csGraphics2DGlideX::HandleEvent (csEvent &Event)
 {
   static int button_mapping[6] = {0, 1, 3, 2, 4, 5};
-  csGraphics2DGlideX *Self = (csGraphics2DGlideX *)Param;
   XEvent event;
   int state, key;
   bool down;
 
-  while (XCheckMaskEvent (Self->dpy, ~0, &event))
+  while (XCheckMaskEvent (dpy, ~0, &event))
     switch (event.type)
     {
       case ButtonPress:
         state = ((XButtonEvent*)&event)->state;
-        Self->System->QueueMouseEvent (button_mapping [event.xbutton.button],
-          true, event.xbutton.x, event.xbutton.y,
-          ((state & ShiftMask) ? CSMASK_SHIFT : 0) |
-	  ((state & Mod1Mask) ? CSMASK_ALT : 0) |
-	  ((state & ControlMask) ? CSMASK_CTRL : 0));
+        System->QueueMouseEvent (button_mapping [event.xbutton.button],
+          true, event.xbutton.x, event.xbutton.y);
           break;
       case ButtonRelease:
-        Self->System->QueueMouseEvent (button_mapping [event.xbutton.button],
-          false, event.xbutton.x, event.xbutton.y, 0);
+        System->QueueMouseEvent (button_mapping [event.xbutton.button],
+          false, event.xbutton.x, event.xbutton.y);
         break;
       case MotionNotify:
-        Self->System->QueueMouseEvent (0, false,
-	  event.xbutton.x, event.xbutton.y, 0);
+        System->QueueMouseEvent (0, false,
+	  event.xbutton.x, event.xbutton.y);
         break;
       case KeyPress:
       case KeyRelease:
@@ -424,21 +421,22 @@ void csGraphics2DGlideX::ProcessEvents (void *Param)
           case XK_F12:        key = CSKEY_F12; break;
           default:            break;
         }
-	Self->System->QueueKeyEvent (key, down);
+	System->QueueKeyEvent (key, down);
         break;
       case FocusIn:
       case FocusOut:
-        Self->System->QueueFocusEvent (event.type == FocusIn);
+        System->QueueFocusEvent (event.type == FocusIn);
         break;
       case Expose:
       {
         csRect rect (event.xexpose.x, event.xexpose.y,
 	  event.xexpose.x + event.xexpose.width, event.xexpose.y + event.xexpose.height);
-	Self->Print (&rect);
+	Print (&rect);
         break;
       }
       default:
         //if (event.type == CompletionType) shm_busy = 0;
         break;
     }
+  return false;
 }

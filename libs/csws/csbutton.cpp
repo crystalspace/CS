@@ -353,14 +353,14 @@ bool csButton::HandleKeyPress (csEvent &Event)
   // Check hot key
   if (!GetState (CSS_DISABLED))
     if (((underline_pos >= 0)
-      && ((Event.Key.ShiftKeys & CSMASK_CTRL) == 0)
-      && (Event.Key.ShiftKeys & CSMASK_FIRST)
+      && ((Event.Key.Modifiers & CSMASK_CTRL) == 0)
+      && (Event.Key.Modifiers & CSMASK_FIRST)
       && (UPPERCASE (Event.Key.Code) == UPPERCASE (text [underline_pos]))
       && (app->KeyboardOwner == NULL))
      || ((GetState (CSS_FOCUSED))
       && (Event.Key.Code == ' ')
-      && (Event.Key.ShiftKeys & CSMASK_FIRST)
-      && (!(Event.Key.ShiftKeys & (CSMASK_ALLSHIFTS - CSMASK_ALT)))))
+      && (Event.Key.Modifiers & CSMASK_FIRST)
+      && (!(Event.Key.Modifiers & (CSMASK_ALLSHIFTS - CSMASK_ALT)))))
     {
       if (!app->KeyboardOwner)
         app->CaptureKeyboard (this);

@@ -22,7 +22,7 @@
 #include "csws/csiline.h"
 #include "csws/cstimer.h"
 #include "csws/csapp.h"
-#include "csinput/csinput.h"
+#include "cssys/csinput.h"
 
 // Cursor flashing period in milliseconds
 #define CURSOR_FLASHING_INTERVAL	333
@@ -246,44 +246,44 @@ bool csInputLine::HandleEvent (csEvent &Event)
       {
         case CSKEY_LEFT:
         {
-          if (Event.Key.ShiftKeys & CSMASK_ALT)
+          if (Event.Key.Modifiers & CSMASK_ALT)
             break;
           if (cursorpos == 0)
             return true;
           int newpos = cursorpos;
-          if (Event.Key.ShiftKeys & CSMASK_CTRL)
+          if (Event.Key.Modifiers & CSMASK_CTRL)
             newpos = WordLeft (text, newpos);
           else
             newpos--;
-          SetCursorPos (newpos, (Event.Key.ShiftKeys & CSMASK_SHIFT) != 0);
+          SetCursorPos (newpos, (Event.Key.Modifiers & CSMASK_SHIFT) != 0);
           return true;
         }
         case CSKEY_RIGHT:
         {
-          if (Event.Key.ShiftKeys & CSMASK_ALT)
+          if (Event.Key.Modifiers & CSMASK_ALT)
             break;
           if (cursorpos >= (int)strlen (text))
             return true;
           int newpos = cursorpos;
-          if (Event.Key.ShiftKeys & CSMASK_CTRL)
+          if (Event.Key.Modifiers & CSMASK_CTRL)
             newpos = WordRight (text, newpos);
           else
             newpos++;
-          SetCursorPos (newpos, (Event.Key.ShiftKeys & CSMASK_SHIFT) != 0);
+          SetCursorPos (newpos, (Event.Key.Modifiers & CSMASK_SHIFT) != 0);
           return true;
         }
         case CSKEY_HOME:
-          if (Event.Key.ShiftKeys & CSMASK_ALT)
+          if (Event.Key.Modifiers & CSMASK_ALT)
             break;
-          SetCursorPos (0, (Event.Key.ShiftKeys & CSMASK_SHIFT) != 0);
+          SetCursorPos (0, (Event.Key.Modifiers & CSMASK_SHIFT) != 0);
           return true;
         case CSKEY_END:
-          if (Event.Key.ShiftKeys & CSMASK_ALT)
+          if (Event.Key.Modifiers & CSMASK_ALT)
             break;
-          SetCursorPos (strlen (text), (Event.Key.ShiftKeys & CSMASK_SHIFT) != 0);
+          SetCursorPos (strlen (text), (Event.Key.Modifiers & CSMASK_SHIFT) != 0);
           return true;
         case CSKEY_BACKSPACE:
-          if (Event.Key.ShiftKeys & CSMASK_ALLSHIFTS)
+          if (Event.Key.Modifiers & CSMASK_ALLSHIFTS)
             break;
           if (cursorpos == 0)
             return true;
@@ -291,7 +291,7 @@ bool csInputLine::HandleEvent (csEvent &Event)
           // fallback to 'Del' key
         case CSKEY_DEL:
         {
-          if (Event.Key.ShiftKeys & CSMASK_ALLSHIFTS)
+          if (Event.Key.Modifiers & CSMASK_ALLSHIFTS)
             break;
           bool nosel = selstart == selend;
           if (selstart == selend)
@@ -302,18 +302,18 @@ bool csInputLine::HandleEvent (csEvent &Event)
           return true;
         } /* endif */
         case CSKEY_INS:
-          if (Event.Key.ShiftKeys & CSMASK_ALLSHIFTS)
+          if (Event.Key.Modifiers & CSMASK_ALLSHIFTS)
             break;
           cursorvis = true;
           Invalidate ();
           return true;
         case '/':
-          if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == CSMASK_CTRL)
+          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL)
             SetSelection (0, strlen (text));
           else
             goto do_key;
         case '\\':
-          if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == CSMASK_CTRL)
+          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL)
             SetSelection (0, 0);
           else
             goto do_key;
@@ -321,7 +321,7 @@ bool csInputLine::HandleEvent (csEvent &Event)
           break;
         default:
         {
-do_key:   if ((Event.Key.ShiftKeys & (CSMASK_CTRL | CSMASK_ALT))
+do_key:   if ((Event.Key.Modifiers & (CSMASK_CTRL | CSMASK_ALT))
            || (Event.Key.Code < 32))
             return false;
           if ((Event.Key.Code > 255) || !IsValidChar (Event.Key.Code))

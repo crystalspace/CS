@@ -23,7 +23,7 @@
 #include "sysdef.h"
 #include "csutil/scf.h"
 #include "csutil/csrect.h"
-#include "csinput/csevent.h"
+#include "cssys/csevent.h"
 #include "csutil/inifile.h"
 #include "isystem.h"
 #include "qint.h"
@@ -180,10 +180,6 @@ void csGraphics2DAA::Print (csRect *area)
 
   /* Get all events from keyboard and mouse and put them into the system queue */
   int event;
-  int shiftmask =
-    (shift_state ? CSMASK_SHIFT : 0) |
-    (ctrl_state ? CSMASK_CTRL : 0) |
-    (alt_state ? CSMASK_ALT : 0);
   while ((event = aa_getevent (context, 0)) != AA_NONE)
     switch (event)
     {
@@ -196,7 +192,7 @@ void csGraphics2DAA::Print (csRect *area)
         if ((oldmousex != x)
          || (oldmousey != y))
         {
-          System->QueueMouseEvent (0, 0, x, y, shiftmask);
+          System->QueueMouseEvent (0, 0, x, y);
           oldmousex = x; oldmousey = y;
         }
         if (oldmousebut != b)
@@ -204,7 +200,7 @@ void csGraphics2DAA::Print (csRect *area)
           static int but [3] = { 1, 3, 2 };
           for (int i = 0; i <= 2; i++)
             if ((oldmousebut ^ b) & (1 << i))
-              System->QueueMouseEvent (but [i], (b & (1 << i)) != 0, x, y, shiftmask);
+              System->QueueMouseEvent (but [i], (b & (1 << i)) != 0, x, y);
           oldmousebut = b;
         }
         break;

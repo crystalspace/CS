@@ -18,7 +18,7 @@
 */
 
 #include "sysdef.h"
-#include "csinput/csevent.h"
+#include "cssys/csevent.h"
 
 #include <ctype.h>
 

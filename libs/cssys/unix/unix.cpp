@@ -80,7 +80,7 @@ void init_sig ()
 
 //------------------------------------------------------ The System driver ---//
 
-SysSystemDriver::SysSystemDriver () : csSystemDriver (), Callback (NULL)
+SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
   // Initialize signal handler for clean shutdown
   init_sig ();
@@ -133,8 +133,6 @@ void SysSystemDriver::Loop(void)
     long new_prev_time = Time ();
     NextFrame ((prev_time == -1) ? 0 : new_prev_time - prev_time, Time ());
     prev_time = new_prev_time;
-    if (Callback)
-      Callback (CallbackParam);
   }
 }
 
@@ -152,55 +150,3 @@ void SysSystemDriver::GetExtSettings (int &oSimDepth,
   oUseSHM = UseSHM;
   oHardwareCursor = HardwareCursor;
 }
-
-void SysSystemDriver::SetLoopCallback
-  (LoopCallback pCallback, void *pParam)
-{
-  Callback = pCallback;
-  CallbackParam = pParam;
-}
-
-//------------------------------------------------------ SysKeyboardDriver ---//
-
-SysKeyboardDriver::SysKeyboardDriver() : csKeyboardDriver ()
-{
-  // Nothing to do
-}
-
-void SysKeyboardDriver::Handler(int Key, bool Down)
-{
-  if (!Ready ())
-    return;
-
-  if (Key)
-  {
-    if (Down)
-      do_keypress (System->Time (), Key);
-    else
-      do_keyrelease (System->Time (), Key);
-  } /* endif */
-}
-
-//--------------------------------------------------------- SysMouseDriver ---//
-
-// Mouse fonctions
-SysMouseDriver::SysMouseDriver() : csMouseDriver ()
-{
-  // Nothing to do
-}
-
-void SysMouseDriver::Handler (int Button, int Down, int x, int y,
-  int ShiftFlags)
-{
-  if (!Ready ())
-    return;
-
-  if (Button == 0)
-    do_mousemotion (::System->Time (), x, y);
-  else if (Down)
-    do_buttonpress (::System->Time (), Button, x, y, ShiftFlags & CSMASK_SHIFT,
-      ShiftFlags & CSMASK_ALT, ShiftFlags & CSMASK_CTRL);
-  else
-    do_buttonrelease (::System->Time (), Button, x, y);
-}
-

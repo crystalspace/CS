@@ -27,6 +27,8 @@ class csWorld;
 class csVector3;
 class csColor;
 
+struct iSector;
+
 SCF_VERSION (iWorld, 0, 1, 0);
 
 /**
@@ -63,6 +65,8 @@ struct iWorld : public iPlugIn
   /// Create a texture plane
   virtual bool CreatePlane (const char *iName, const csVector3 &iOrigin,
     const csMatrix3 &iMatrix) = 0;
+  /// Create a empty sector with given name
+  virtual iSector *CreateSector (const char *iName) = 0;
 };
 
 #endif // __IWORLD_H__

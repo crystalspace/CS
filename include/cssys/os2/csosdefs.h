@@ -24,11 +24,24 @@
 #define strcasecmp stricmp
 #define strncasecmp strnicmp
 
-// The 2D graphics driver used by software renderer on this platform
-#define SOFTWARE_2D_DRIVER "crystalspace.graphics2d.dive"
-
 // The 2D graphics driver used by OpenGL renderer
 #define OPENGL_2D_DRIVER "crystalspace.graphics2d.glos2"
+
+// The 2D graphics driver used by software renderer on this platform
+#ifdef SYSDEF_SOFTWARE2D
+#  define INCL_DOS
+#  include <os2.h>
+#  define SOFTWARE_2D_DRIVER get_software_2d_driver ()
+   static inline char *get_software_2d_driver ()
+   {
+     PTIB tb; PPIB pb;
+     if (DosGetInfoBlocks (&tb, &pb) == 0
+      && pb->pib_ultype == 0)
+       return "crystalspace.graphics2d.mgl";
+     else
+       return "crystalspace.graphics2d.dive";
+   }
+#endif
 
 #if defined (SYSDEF_PATH) || defined (SYSDEF_DIR)
 #  include <sys/types.h>

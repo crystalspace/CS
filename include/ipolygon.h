@@ -20,45 +20,67 @@
 #define __IPOLYGON_H__
 
 #include "csutil/scf.h"
-#include "csgeom/math3d.h"
 
-struct iLightMap;
-struct iPolygonTexture;
-struct iTextureContainer;
-struct iTextureMap;
 struct iTextureHandle;
-class csBitSet;
-
-// forward declarations
+struct iPolygonSet;
 struct iPolygon3D;
 struct iPolygonTexture;
+struct iLightMap;
 
-SCF_VERSION (iPolygonSet, 0, 0, 1);
+class csVector3;
+class csMatrix3;
 
-/// temporary - subject to change
-struct iPolygonSet : public iBase
-{
-  ///
-  virtual const char *GetObjectName () = 0;
-};
+SCF_VERSION (iPolygon3D, 0, 1, 0);
 
-SCF_VERSION (iPolygon3D, 0, 0, 2);
-
-/// temporary - subject to change
+/**
+ * This is the interface to 3D polygons.
+ * The iPolygonSet interface defines the interface for
+ * the containers of iPolygon3D objects.
+ */
 struct iPolygon3D : public iBase
 {
-  ///
-  virtual const char *GetObjectName () = 0;
+  /// Get polygon name
+  virtual const char *GetName () = 0;
+  /// Set polygon name
+  virtual void SetName (const char *iName) = 0;
+
   /// Get the polygonset (container) that this polygons belongs to.
-  virtual iPolygonSet *GetParentObject () = 0;
-  ///
-  virtual csVector3 *GetCameraVector (int idx) = 0;
-  ///
-  virtual iPolygonTexture *GetObjectTexture () = 0;
+  virtual iPolygonSet *GetContainer () = 0;
+  /// Get the lightmap associated with this polygon
+  virtual iLightMap *GetLightMap () = 0;
+  /// Get the handle to the polygon texture object
+  virtual iPolygonTexture *GetTexture () = 0;
+  /// Get the texture handle for the texture manager.
+  virtual iTextureHandle *GetTextureHandle () = 0;
+
+  /// Query number of vertices in this polygon
+  virtual int GetVertexCount () = 0;
+  /// Get the given polygon vertex coordinates in object space
+  virtual csVector3 &GetVertex (int idx) = 0;
+  /// Get the given polygon vertex coordinates in world space
+  virtual csVector3 &GetVertexW (int idx) = 0;
+  /// Get the given polygon vertex coordinates in camera space
+  virtual csVector3 &GetVertexC (int idx) = 0;
+  /// Create a polygon vertex given his index in parent polygon set
+  virtual int CreateVertex (int idx) = 0;
+  /// Create a polygon vertex and add it to parent object
+  virtual int CreateVertex (const csVector3 &iVertex) = 0;
+
   /// Get the alpha transparency value for this polygon.
   virtual int GetAlpha () = 0;
-  ///
-  virtual iLightMap *GetLightMap () = 0;
+  /**
+   * Set the alpha transparency value for this polygon (only if
+   * it is a portal).
+   * Not all renderers support all possible values. 0, 25, 50,
+   * 75, and 100 will always work but other values may give
+   * only the closest possible to one of the above.
+   */
+  virtual void SetAlpha (int iAlpha) = 0;
+
+  /// Create a private polygon texture mapping plane
+  virtual void CreatePlane (const csVector3 &iOrigin, const csMatrix3 &iMatrix) = 0;
+  /// Set polygon texture mapping plane
+  virtual bool SetPlane (const char *iName) = 0;
 };
 
 SCF_VERSION (iPolygonTexture, 1, 0, 0);
@@ -113,4 +135,4 @@ struct iPolygonTexture : public iBase
   virtual void SetCacheData (int idx, void *d) = 0;
 };
 
-#endif
+#endif // __IPOLYGON_H__

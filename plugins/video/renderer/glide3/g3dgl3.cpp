@@ -285,12 +285,9 @@ bool csGraphics3DGlide3x::Initialize (iSystem *iSys)
 {
   (m_piSystem = iSys)->IncRef ();
 
-  if (!m_piSystem->RegisterDriver ("iGraphics3D", this))
-    return false;
-
   SysPrintf (MSG_INITIALIZATION, "\nGlideRender Glide3x selected\n");
 
-  m_piG2D = LOAD_PLUGIN (m_piSystem, GLIDE_2D_DRIVER_V3, iGraphics2D);
+  m_piG2D = LOAD_PLUGIN (m_piSystem, GLIDE_2D_DRIVER_V3, NULL, iGraphics2D);
   if (!m_piG2D)
     return false;
 

@@ -20,7 +20,7 @@
 #ifndef __CSOS2_H__
 #define __CSOS2_H__
 
-#include "csinput/csinput.h"
+#include "cssys/csinput.h"
 #include "cssys/system.h"
 #include "icsos2.h"
 
@@ -73,26 +73,6 @@ public:
     int &oWindowWidth, int &oWindowHeight, bool &oHardwareCursor);
   /// Put a keyboard event into event queue
   virtual void KeyboardEvent (int ScanCode, bool Down);
-};
-
-/**
- * This is the Keyboard class for OS/2. All of its functionality
- * is included in the 2D graphics driver.
- */
-class SysKeyboardDriver : public csKeyboardDriver
-{
-public:
-  SysKeyboardDriver ();
-};
-
-/**
- * This is the Mouse class for OS/2. All of its functionality
- * is included in the 2D graphics driver.
- */
-class SysMouseDriver : public csMouseDriver
-{
-public:
-  SysMouseDriver ();
 };
 
 #endif // __CSOS2_H__

@@ -35,12 +35,13 @@ ifdef MGL_PATH
   LIBS.MGL2D += -L$(MGL_PATH)/lib
 endif
 
-LIBS.MGL2D += -lmgl
- 
+LIBS.MGL2D += -lgm -lmgl -lpm
+#-lgm -lmglcpp -lmgl -lpm -lstdcpp
+
 ifeq ($(USE_SHARED_PLUGINS),yes)
   MGL2D = $(OUTDLL)mgl2d$(DLL)
   LIBS.LOCAL.MGL2D = $(LIBS.MGL2D)
-  DEP.MGL2D =
+  DEP.MGL2D = $(CSUTIL.LIB)
 # $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 else
   MGL2D = $(OUT)$(LIB_PREFIX)mgl2d$(LIB)

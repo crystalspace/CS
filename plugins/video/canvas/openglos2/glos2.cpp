@@ -23,7 +23,7 @@
 #include "sysdef.h"
 #include "csutil/scf.h"
 #include "csutil/csrect.h"
-#include "csinput/csevent.h"
+#include "cssys/csevent.h"
 #include "isystem.h"
 
 // shit ...
@@ -315,17 +315,14 @@ bool csGraphics2DOS2GL::SetMouseCursor (csMouseCursorID iShape)
   } /* endswitch */
 }
 
-void csGraphics2DOS2GL::MouseHandlerStub (void *Self, int Button, int Down,
+void csGraphics2DOS2GL::MouseHandlerStub (void *Self, int Button, bool Down,
   int x, int y, int ShiftFlags)
 {
   csGraphics2DOS2GL *This = (csGraphics2DOS2GL *)Self;
   if (!This)
     return;
 
-  This->System->QueueMouseEvent (Button, Down, x, This->Height - 1 - y,
-    (ShiftFlags & GLKF_SHIFT ? CSMASK_SHIFT : 0) |
-    (ShiftFlags & GLKF_CTRL ? CSMASK_CTRL : 0) |
-    (ShiftFlags & GLKF_ALT ? CSMASK_ALT : 0));
+  This->System->QueueMouseEvent (Button, Down, x, This->Height - 1 - y);
 }
 
 void csGraphics2DOS2GL::KeyboardHandlerStub (void *Self, unsigned char ScanCode,

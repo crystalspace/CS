@@ -573,7 +573,7 @@ void WalkTest::eatkeypress (int status, int key, bool shift, bool alt, bool ctrl
                 Command::perform_line (m->cmd);
             }
           }
-          else if (!status && m->is_on && m->need_status)
+          else if (!status && key == m->key && m->is_on && m->need_status)
           {
             if (key == m->key || shift != m->shift || alt != m->alt || ctrl != m->ctrl)
             {
@@ -600,15 +600,15 @@ bool WalkTest::HandleEvent (csEvent &Event)
   {
     case csevKeyDown:
       eatkeypress (1,Event.Key.Code,
-        (Event.Key.ShiftKeys & CSMASK_SHIFT) != 0,
-        (Event.Key.ShiftKeys & CSMASK_ALT) != 0,
-        (Event.Key.ShiftKeys & CSMASK_CTRL) != 0);
+        (Event.Key.Modifiers & CSMASK_SHIFT) != 0,
+        (Event.Key.Modifiers & CSMASK_ALT) != 0,
+        (Event.Key.Modifiers & CSMASK_CTRL) != 0);
       break;
     case csevKeyUp:
       eatkeypress (0,Event.Key.Code,
-        (Event.Key.ShiftKeys & CSMASK_SHIFT) != 0,
-        (Event.Key.ShiftKeys & CSMASK_ALT) != 0,
-        (Event.Key.ShiftKeys & CSMASK_CTRL) != 0);
+        (Event.Key.Modifiers & CSMASK_SHIFT) != 0,
+        (Event.Key.Modifiers & CSMASK_ALT) != 0,
+        (Event.Key.Modifiers & CSMASK_CTRL) != 0);
       break;
     case csevMouseDown:
       if (Event.Mouse.Button == 1)

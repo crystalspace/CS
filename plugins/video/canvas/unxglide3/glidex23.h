@@ -88,14 +88,15 @@ public:
   /// Set mouse cursor shape
   virtual bool SetMouseCursor (csMouseCursorID iShape, iTextureHandle *iBitmap);
 
-    Display *GetDisplay(){ return dpy;}
+  Display *GetDisplay ()
+  { return dpy; }
+
+  /// Called on every frame by system driver
+  virtual bool HandleEvent (csEvent &Event);
+
 protected:
-  /// This routine is called once per event loop
-  static void ProcessEvents (void *Param);
-  
   /// This method is used for GlideInWindow...
   void FXgetImage();
-
 };
 
 #endif // __GLIDEX2D_H__

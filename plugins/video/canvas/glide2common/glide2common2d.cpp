@@ -20,8 +20,8 @@
 #include "sysdef.h"
 #include "glide2common2d.h"
 #include "csutil/scf.h"
-#include "csinput/csevent.h"
-#include "csinput/csinput.h"
+#include "cssys/csevent.h"
+#include "cssys/csinput.h"
 #if defined(OS_BE)	// dh: is this OS-dependence necessary? 
 #include "cssys/be/beitf.h"
 #else

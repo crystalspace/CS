@@ -20,7 +20,7 @@
 #include "sysdef.h"
 #include "csutil/scf.h"
 #include "cssys/unix/iunix.h"
-#include "csinput/csevent.h"
+#include "cssys/csevent.h"
 #include "cs2d/softx/x2d.h"
 #include "csutil/csrect.h"
 #include "isystem.h"
@@ -236,6 +236,9 @@ bool csGraphics2DXLib::Initialize (iSystem *pSystem)
 
   memset (MouseCursor, 0, sizeof (MouseCursor));
 
+  // Tell system driver to call us on every frame
+  System->CallOnEvents (this, CSMASK_Nothing);
+
   return true;
 }
 
@@ -261,9 +264,6 @@ bool csGraphics2DXLib::Open(const char *Title)
   // Open your graphic interface
   if (!csGraphics2D::Open (Title))
     return false;
-
-  // Set loop callback
-  UnixSystem->SetLoopCallback (ProcessEvents, this);
 
   // Create window
   XSetWindowAttributes swa;
@@ -1028,48 +1028,44 @@ static Bool CheckKeyPress (Display *dpy, XEvent *event, XPointer arg)
 //    are needed in order to catch "WM_DELETE_WINDOW")
 static Bool AlwaysTruePredicate (Display*, XEvent*, char*) { return True; }
 
-void csGraphics2DXLib::ProcessEvents (void *Param)
+bool csGraphics2DXLib::HandleEvent (csEvent &Event)
 {
   static int button_mapping[6] = {0, 1, 3, 2, 4, 5};
-  csGraphics2DXLib *Self = (csGraphics2DXLib *)Param;
   XEvent event;
   int state, key;
   bool down;
   bool resize = false;
 
-  while (XCheckIfEvent (Self->dpy, &event, AlwaysTruePredicate, 0))
+  while (XCheckIfEvent (dpy, &event, AlwaysTruePredicate, 0))
     switch (event.type)
     {
       case ConfigureNotify:
-	if ((Self->Width  != event.xconfigure.width) ||
-	    (Self->Height != event.xconfigure.height))
+	if ((Width  != event.xconfigure.width) ||
+	    (Height != event.xconfigure.height))
 	{
-	  Self->Width = event.xconfigure.width;
-	  Self->Height = event.xconfigure.height;
+	  Width = event.xconfigure.width;
+	  Height = event.xconfigure.height;
 	  resize = true;
 	}
 	break;
       case ClientMessage:
-	if (static_cast<Atom>(event.xclient.data.l[0]) == Self->wm_delete_window)
+	if (static_cast<Atom>(event.xclient.data.l[0]) == wm_delete_window)
 	{
-	  Self->System->StartShutdown();
+	  System->StartShutdown();
 	}
 	break;
       case ButtonPress:
         state = ((XButtonEvent*)&event)->state;
-        Self->System->QueueMouseEvent (button_mapping [event.xbutton.button],
-          true, event.xbutton.x, event.xbutton.y,
-          ((state & ShiftMask) ? CSMASK_SHIFT : 0) |
-	  ((state & Mod1Mask) ? CSMASK_ALT : 0) |
-	  ((state & ControlMask) ? CSMASK_CTRL : 0));
+        System->QueueMouseEvent (button_mapping [event.xbutton.button],
+          true, event.xbutton.x, event.xbutton.y);
           break;
       case ButtonRelease:
-        Self->System->QueueMouseEvent (button_mapping [event.xbutton.button],
-          false, event.xbutton.x, event.xbutton.y, 0);
+        System->QueueMouseEvent (button_mapping [event.xbutton.button],
+          false, event.xbutton.x, event.xbutton.y);
         break;
       case MotionNotify:
-        Self->System->QueueMouseEvent (0, false,
-	  event.xbutton.x, event.xbutton.y, 0);
+        System->QueueMouseEvent (0, false,
+	  event.xbutton.x, event.xbutton.y);
         break;
       case KeyPress:
       case KeyRelease:
@@ -1139,11 +1135,11 @@ void csGraphics2DXLib::ProcessEvents (void *Param)
           case XK_F12:        key = CSKEY_F12; break;
           default:            break;
         }
-	Self->System->QueueKeyEvent (key, down);
+	System->QueueKeyEvent (key, down);
         break;
       case FocusIn:
       case FocusOut:
-        Self->System->QueueFocusEvent (event.type == FocusIn);
+        System->QueueFocusEvent (event.type == FocusIn);
         break;
       case Expose:
 	if (!resize)
@@ -1151,7 +1147,7 @@ void csGraphics2DXLib::ProcessEvents (void *Param)
 	  csRect rect (event.xexpose.x, event.xexpose.y,
 		       event.xexpose.x + event.xexpose.width, 
 		       event.xexpose.y + event.xexpose.height);
-	  Self->Print (&rect);
+	  Print (&rect);
 	}
 	break; 
       default:
@@ -1160,13 +1156,13 @@ void csGraphics2DXLib::ProcessEvents (void *Param)
     }
   if (resize)
   { 
-    if (!Self->ReallocateMemory ())
+    if (!ReallocateMemory ())
     {
-      Self->CsPrintf (MSG_FATAL_ERROR, 
-		      "Unable to allocate memory on resize!\n");
-      Self->System->StartShutdown();
+      CsPrintf (MSG_FATAL_ERROR, "Unable to allocate memory on resize!\n");
+      System->StartShutdown ();
     }
   }
+  return false;
 }
 
 bool csGraphics2DXLib::ReallocateMemory ()

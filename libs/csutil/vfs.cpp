@@ -1092,9 +1092,6 @@ csVFS::~csVFS ()
 bool csVFS::Initialize (iSystem *iSys)
 {
   (System = iSys)->IncRef ();
-  if (!System->RegisterDriver ("iVFS", this))
-    return false;
-
   csIniFile *vfsconfig =
     new csIniFile (System->ConfigGetStr ("VFS.Options", "Config", "vfs.cfg"));
   return ReadConfig (vfsconfig);

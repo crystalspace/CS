@@ -500,6 +500,7 @@ public:
 
   /**
    * Create a new sector and add it to the world.
+   * @@obsoleted by CreateSector(): should be removed in the long run
    */
   csSector* NewSector ();
 
@@ -700,6 +701,8 @@ public:
   /// Create a texture plane
   virtual bool CreatePlane (const char *iName, const csVector3 &iOrigin,
     const csMatrix3 &iMatrix);
+  /// Create a empty sector with given name
+  iSector *CreateSector (const char *iName);
 
   //--------------------- iConfig interface implementation --------------------
 

@@ -29,6 +29,9 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
+# We need our own bison.simple file
+export BISON_SIMPLE = support/gnu/bison.sim
+
 ifeq ($(USE_SHARED_PLUGINS),yes)
 #  STDLDR = $(OUTDLL)stdldr$(DLL)
   STDLDR = testldr$(EXE)

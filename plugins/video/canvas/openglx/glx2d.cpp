@@ -19,8 +19,8 @@
 #include "sysdef.h"
 #include "cs2d/openglx/glx2d.h"
 #include "csutil/scf.h"
-#include "csinput/csevent.h"
-#include "csinput/csinput.h"
+#include "cssys/csevent.h"
+#include "cssys/csinput.h"
 #include "cssys/unix/iunix.h"
 #include "csutil/csrect.h"
 #include "csutil/inifile.h"
@@ -64,7 +64,7 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
   {
     if ((strDriver = config->GetStr ("Display", "Driver", DEF_OGLDISP)))
     {
-      dispdriver = LOAD_PLUGIN (pSystem, strDriver, iOpenGLDisp);
+      dispdriver = LOAD_PLUGIN (pSystem, strDriver, NULL, iOpenGLDisp);
       if (!dispdriver)
         CsPrintf (MSG_FATAL_ERROR, "Could not create an instance of %s ! Using NULL instead.\n", strDriver);
       else
@@ -165,6 +165,9 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
     pfmt.PixelBytes = 1;
   }
 
+  // Tell system driver to call us on every frame
+  System->CallOnEvents (this, CSMASK_Nothing);
+
   return true;
 }
 
@@ -183,9 +186,6 @@ bool csGraphics2DGLX::Open(const char *Title)
   CsPrintf (MSG_INITIALIZATION, "Video driver GL/X version ");
   if (glXIsDirect(dpy,active_GLContext))
     CsPrintf (MSG_INITIALIZATION, "(direct renderer) ");
-
-  // Set loop callback
-  UnixSystem->SetLoopCallback (ProcessEvents, this);
 
   // Create window
   XSetWindowAttributes winattr;
@@ -343,38 +343,34 @@ static Bool CheckKeyPress (Display *dpy, XEvent *event, XPointer arg)
 //    are needed in order to catch "WM_DELETE_WINDOW")
 static Bool AlwaysTruePredicate (Display*, XEvent*, char*) { return True; }
 
-void csGraphics2DGLX::ProcessEvents (void *Param)
+bool csGraphics2DGLX::HandleEvent (csEvent &Event)
 {
   static int button_mapping[6] = {0, 1, 3, 2, 4, 5};
-  csGraphics2DGLX *Self = (csGraphics2DGLX *)Param;
   XEvent event;
   int state, key;
   bool down;
 
-  while (XCheckIfEvent (Self->dpy, &event, AlwaysTruePredicate, 0))
+  while (XCheckIfEvent (dpy, &event, AlwaysTruePredicate, 0))
     switch (event.type)
     {
       case ClientMessage:
-	if (static_cast<Atom>(event.xclient.data.l[0]) == Self->wm_delete_window)
+	if (static_cast<Atom>(event.xclient.data.l[0]) == wm_delete_window)
 	{
-	  Self->System->StartShutdown();
+	  System->StartShutdown();
 	}
 	break;
       case ButtonPress:
         state = ((XButtonEvent*)&event)->state;
-        Self->System->QueueMouseEvent (button_mapping [event.xbutton.button],
-          true, event.xbutton.x, event.xbutton.y,
-          ((state & ShiftMask) ? CSMASK_SHIFT : 0) |
-	  ((state & Mod1Mask) ? CSMASK_ALT : 0) |
-	  ((state & ControlMask) ? CSMASK_CTRL : 0));
+        System->QueueMouseEvent (button_mapping [event.xbutton.button],
+          true, event.xbutton.x, event.xbutton.y);
           break;
       case ButtonRelease:
-        Self->System->QueueMouseEvent (button_mapping [event.xbutton.button],
-          false, event.xbutton.x, event.xbutton.y, 0);
+        System->QueueMouseEvent (button_mapping [event.xbutton.button],
+          false, event.xbutton.x, event.xbutton.y);
         break;
       case MotionNotify:
-        Self->System->QueueMouseEvent (0, false,
-	  event.xbutton.x, event.xbutton.y, 0);
+        System->QueueMouseEvent (0, false,
+	  event.xbutton.x, event.xbutton.y);
         break;
       case KeyPress:
       case KeyRelease:
@@ -444,18 +440,19 @@ void csGraphics2DGLX::ProcessEvents (void *Param)
           case XK_F12:        key = CSKEY_F12; break;
           default:            break;
         }
-	Self->System->QueueKeyEvent (key, down);
+	System->QueueKeyEvent (key, down);
         break;
       case FocusIn:
       case FocusOut:
-        Self->System->QueueFocusEvent (event.type == FocusIn);
+        System->QueueFocusEvent (event.type == FocusIn);
         break;
       case Expose:
       {
         csRect rect (event.xexpose.x, event.xexpose.y,
 	  event.xexpose.x + event.xexpose.width, event.xexpose.y + event.xexpose.height);
-	Self->Print (&rect);
+	Print (&rect);
         break;
       }
     }
+  return false;
 }

@@ -93,10 +93,10 @@ public:
   virtual bool SetMouseCursor (csMouseCursorID iShape);
 
 private:
-  static void KeyboardHandlerStub (void *Self, unsigned char ScanCode, int Down,
-    unsigned char RepeatCount, int ShiftFlags);
-  static void MouseHandlerStub (void *Self, int Button, int Down, int x, int y,
-    int ShiftFlags);
+  static void KeyboardHandlerStub (void *Self, unsigned char ScanCode,
+    bool Down, unsigned char RepeatCount, int ShiftFlags);
+  static void MouseHandlerStub (void *Self, int Button, bool Down,
+    int x, int y, int ShiftFlags);
   static void FocusHandlerStub (void *Self, bool Enable);
   static void TerminateHandlerStub (void *Self);
 };

@@ -469,6 +469,19 @@ iTextureHandle* csPolygon3D::GetTextureHandle ()
   return txtMM ? txtMM->GetTextureHandle () : (iTextureHandle*)NULL;
 }
 
+void csPolygon3D::CreatePlane (const csVector3 &iOrigin, const csMatrix3 &iMatrix)
+{
+  SetTextureSpace (iMatrix, iOrigin);
+}
+
+bool csPolygon3D::SetPlane (const char *iName)
+{
+  csPolyTxtPlane *ppl =
+    (csPolyTxtPlane *)csWorld::current_world->planes.FindByName (iName);
+  if (!ppl) return false;
+  SetTextureSpace (ppl);
+  return true;
+}
 
 bool csPolygon3D::IsTransparent ()
 {
@@ -1675,29 +1688,4 @@ void csPolygon3D::ScaleLightMaps2X ()
   csLightMapped* lmi = GetLightMapInfo ();
   if (!lmi || lmi->tex->lm == NULL) return;
   lmi->tex->lm->Scale2X (LMW (lmi->tex), LMH (lmi->tex));
-}
-
-int csPolygon3D::GetAlpha ()
-{
-  return portal ? portal->GetAlpha () : 0;
-}
-
-csVector3 *csPolygon3D::GetCameraVector (int idx)
-{
-  return &Vcam (idx);
-}
-
-iPolygonTexture *csPolygon3D::GetObjectTexture ()
-{
-  csLightMapped* lmi = GetLightMapInfo ();
-  if (!lmi)
-    return NULL;
-
-  return lmi->GetPolyTex ();
-}
-
-iLightMap *csPolygon3D::GetLightMap ()
-{
-  csLightMapped *lmi = GetLightMapInfo ();
-  return lmi ? lmi->GetLightMap () : NULL;
 }

@@ -24,11 +24,11 @@
 #include "sysdef.h"
 #include "cssys/system.h"
 #include "cssys/sysdriv.h"
+#include "cssys/csinput.h"
 #include "csutil/csrect.h"
 #include "csutil/util.h"
 #include "csutil/inifile.h"
 #include "csutil/vfs.h"
-#include "csinput/csinput.h"
 #include "iplugin.h"
 #include "iconsole.h"
 #include "isndrdr.h"
@@ -44,11 +44,8 @@ csSystemDriver *System = NULL;
 // Make Shutdown static so that even if System has not been initialized,
 // application can tell system driver to exit immediately
 bool csSystemDriver::Shutdown = false;
-bool csSystemDriver::ExitLoop = false;
-bool csSystemDriver::ConsoleReady = false;
-
-// Global debugging level.
-int csSystemDriver::debug_level = 0;
+// This variable is used to disable console output
+bool csSystemDriver::EnableConsoleOutput = true;
 
 // This is the default fatal exit function. The user can replace
 // it by some other function that lonjumps somewhere, for example.
@@ -63,27 +60,47 @@ void default_fatal_exit (int errorcode, bool canreturn)
 
 void (*fatal_exit) (int errorcode, bool canreturn) = default_fatal_exit;
 
-//--- csPlugIn class ---//
+//------------------------------------------------------- csPlugIn class -----//
 
-csSystemDriver::csPlugIn::csPlugIn (iPlugIn *iObject, const char *iClassID)
+csSystemDriver::csPlugIn::csPlugIn (iPlugIn *iObject, const char *iClassID,
+  const char *iFuncID)
 {
   PlugIn = iObject;
   ClassID = strnew (iClassID);
+  FuncID = strnew (iFuncID);
   EventMask = 0;
 }
 
 csSystemDriver::csPlugIn::~csPlugIn ()
 {
-  CHK (delete [] ClassID);
+  delete [] ClassID;
+  delete [] FuncID;
   PlugIn->DecRef ();
 }
 
-/// A private class used to keep a list of plugins
-class csPluginList : public csStrVector
+//----------------------- A private class used to keep a list of plugins -----//
+
+struct csPluginLoadRec
+{
+  char *FuncID;
+  char *ClassID;
+
+  csPluginLoadRec (const char *iFuncID, const char *iClassID)
+  { FuncID = strnew (iFuncID); ClassID = strnew (iClassID); }
+  ~csPluginLoadRec ()
+  { delete [] ClassID; delete [] FuncID; }
+};
+
+class csPluginList : public csVector
 {
 public:
-  csPluginList () : csStrVector (8, 8) {}
+  virtual ~csPluginList ()
+  { DeleteAll (); }
   bool Sort (csSystemDriver *iSys);
+  csPluginLoadRec &Get (int idx)
+  { return *(csPluginLoadRec *)csVector::Get (idx); }
+  virtual bool FreeItem (csSome Item)
+  { delete (csPluginLoadRec *)Item; return true; }
 private:
   bool RecurseSort (csSystemDriver *iSys, int row, char *order, char *loop, bool *matrix);
 };
@@ -162,7 +179,7 @@ bool csPluginList::Sort (csSystemDriver *iSys)
   memset (matrix, 0, len * len * sizeof (bool));
   for (row = 0; row < len; row++)
   {
-    const char *dep = scfGetClassDependencies ((char *)Get (row));
+    const char *dep = scfGetClassDependencies (Get (row).ClassID);
     while (dep && *dep)
     {
       char tmp [100];
@@ -181,8 +198,8 @@ bool csPluginList::Sort (csSystemDriver *iSys)
       bool wildcard = tmp [sl - 1] == '.';
       for (col = 0; col < len; col++)
         if ((col != row)
-         && (wildcard ? strncmp (tmp, (char *)Get (col), sl) :
-             strcmp (tmp, (char *)Get (col))) == 0)
+         && (wildcard ? strncmp (tmp, Get (col).ClassID, sl) :
+             strcmp (tmp, Get (col).ClassID)) == 0)
           matrix [row * len + col] = true;
       dep = comma;
       while (*dep == ',' || *dep == ' ' || *dep == '\t')
@@ -237,7 +254,7 @@ bool csPluginList::RecurseSort (csSystemDriver *iSys, int row, char *order,
         for (int x = startx; loop [x]; x++)
           iSys->Printf (MSG_FATAL_ERROR, "   %s %s\n",
             x == startx ? "+->" : loop [x + 1] ? "| |" : "<-+",
-            (char *)Get (loop [x] - 1));
+            Get (loop [x] - 1).ClassID);
         error = true;
         break;
       }
@@ -268,8 +285,9 @@ IMPLEMENT_IBASE (csSystemDriver)
   IMPLEMENTS_EMBEDDED_INTERFACE (iSCF)
 IMPLEMENT_IBASE_END
 
-csSystemDriver::csSystemDriver () : PlugIns (8, 8), OptionList (16, 16),
-  CommandLine (16, 16), CommandLineNames (16, 16)
+csSystemDriver::csSystemDriver () : PlugIns (8, 8),
+  EventQueue (), Keyboard (this), Mouse (this), Joystick (this),
+  OptionList (16, 16), CommandLine (16, 16), CommandLineNames (16, 16)
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiSCF);
@@ -278,8 +296,6 @@ csSystemDriver::csSystemDriver () : PlugIns (8, 8), OptionList (16, 16),
   System = this;
   IsFocused = true;
   FullScreen = false;
-  Mouse = NULL;
-  Keyboard = NULL;
 
   VFS = NULL;
   G3D = NULL;
@@ -288,9 +304,11 @@ csSystemDriver::csSystemDriver () : PlugIns (8, 8), OptionList (16, 16),
   NetMan = NULL;
   Sound = NULL;
 
-  EventQueue = NULL;
   Console = NULL;
   ConfigName = NULL;
+
+  ConsoleReady = false;
+  debug_level = 0;
 }
 
 csSystemDriver::~csSystemDriver ()
@@ -309,20 +327,16 @@ csSystemDriver::~csSystemDriver ()
   System = NULL;
 
   // Deregister all known drivers
-  DeregisterDriver ("iVFS", VFS);
-  DeregisterDriver ("iGraphics3D", G3D);
-  DeregisterDriver ("iGraphics2D", G2D);
-  DeregisterDriver ("iSoundRender", Sound);
-  DeregisterDriver ("iNetworkDriver", NetDrv);
-  DeregisterDriver ("iNetworkManager", NetMan);
-  DeregisterDriver ("iConsole", Console);
+  if (VFS) VFS->DecRef ();
+  if (G3D) G3D->DecRef ();
+  if (G2D) G2D->DecRef ();
+  if (Sound) Sound->DecRef ();
+  if (NetDrv) NetDrv->DecRef ();
+  if (NetMan) NetMan->DecRef ();
+  if (Console) Console->DecRef ();
 
   // Free all plugins
   PlugIns.DeleteAll ();
-
-  CHK (delete Mouse);
-  CHK (delete Keyboard);
-  CHK (delete EventQueue);
 
   scfFinish ();
   console_close ();
@@ -336,17 +350,14 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
   else
     CHKB (Config = new csIniFile ());
 
+  Mouse.SetDoubleClickTime (
+    ConfigGetInt ("MouseDriver", "DoubleClockTime", 300),
+    ConfigGetInt ("MouseDriver", "DoubleClickDist", 2));
+
   // Initialize Shared Class Facility
-  CHK (csIniFile *scfconfig = new csIniFile ("scf.cfg"));
+  csIniFile *scfconfig = new csIniFile ("scf.cfg");
   scfInitialize (scfconfig);
-  CHK (delete scfconfig);
-
-  // Create the Event Queue
-  CHK (EventQueue = new csEventQueue ());
-
-  // Initialize keyboard and mouse
-  InitKeyboard ();
-  InitMouse ();
+  delete scfconfig;
 
   // Collect all options from command line
   CollectOptions (argc, argv);
@@ -358,8 +369,6 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
   csPluginList PluginList;
 
   // Now eat all common-for-plugins command-line switches
-  static const char g3d_str[] = "crystalspace.graphics3d.";
-  const int g3d_len = sizeof(g3d_str) / sizeof(g3d_str[0]) - 1;
   bool g3d_override = false;
 
   const char *val;
@@ -369,30 +378,38 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
     char temp [100];
     sprintf (temp, "crystalspace.graphics3d.%s", val);
     Printf (MSG_INITIALIZATION, "Using alternative 3D driver: %s\n", temp);
-    PluginList.Push (strnew (temp));
+    PluginList.Push (new csPluginLoadRec (CS_FUNCID_VIDEO, temp));
     g3d_override = true;
   }
 
   // Eat all --plugin switches specified on the command line
   int n = 0;
   while ((val = GetOptionCL ("plugin", n++)))
-    PluginList.Push (strnew (val));
+  {
+    size_t sl = strlen (val);
+    char temp [100];
+    if (sl >= sizeof (temp)) sl = sizeof (temp) - 1;
+    memcpy (temp, val, sl); temp [sl] = 0;
+    char *func = strchr (temp, ':');
+    if (func) *func++ = 0;
+    PluginList.Push (new csPluginLoadRec (func, temp));
+  }
 
   // Now load and initialize all plugins
-  n = PluginList.Length ();
-  Config->EnumData ("PlugIns", &PluginList);
-  while (n < PluginList.Length ())
+  csStrVector ConfigList;
+  Config->EnumData ("PlugIns", &ConfigList);
+  for (n = 0; n < ConfigList.Length (); n++)
   {
-    const char *classID = Config->GetStr ("PlugIns", (const char*)PluginList.Get (n));
+    const char *funcID = ConfigList.Get (n);
     // If -video was used to override 3D driver, then respect it.
-    if (g3d_override && strncmp(classID, g3d_str, g3d_len) == 0)
-      PluginList.Delete(n);
-    else
+    if (!g3d_override || strcmp (funcID, CS_FUNCID_VIDEO))
     {
-      PluginList.Replace (n, strnew (classID));
-      n++;
+      const char *classID = Config->GetStr ("PlugIns", funcID);
+      if (classID)
+        PluginList.Push (new csPluginLoadRec (funcID, classID));
     }
   }
+  ConfigList.DeleteAll ();
 
   // Sort all plugins by their dependency lists
   if (!PluginList.Sort (this))
@@ -400,7 +417,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
 
   // Load all plugins
   for (n = 0; n < PluginList.Length (); n++)
-    LoadPlugIn ((const char*)PluginList.Get (n), NULL, 0);
+    LoadPlugIn (PluginList.Get (n).ClassID, PluginList.Get (n).FuncID, NULL, 0);
 
   // See if user wants help
   if ((val = GetOptionCL ("help")))
@@ -408,6 +425,15 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
     Help ();
     exit (0);
   }
+
+  /// Now find the drivers that are known by the system driver
+  VFS = QUERY_PLUGIN_ID (this, CS_FUNCID_VFS, iVFS);
+  G3D = QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
+  if (G3D) (G2D = G3D->GetDriver2D ())->IncRef ();
+  Sound = QUERY_PLUGIN_ID (this, CS_FUNCID_SOUND, iSoundRender);
+  NetDrv = QUERY_PLUGIN_ID (this, CS_FUNCID_NETDRV, iNetworkDriver);
+  NetMan = QUERY_PLUGIN_ID (this, CS_FUNCID_NETMAN, iNetworkManager);
+  Console = QUERY_PLUGIN_ID (this, CS_FUNCID_CONSOLE, iConsole);
 
   // Check if the minimal required drivers are loaded
   if (!CheckDrivers ())
@@ -426,11 +452,6 @@ bool csSystemDriver::Open (const char *Title)
   Depth = G2D->GetPixelBytes ();
   Depth *= 8;
 
-  if (!Keyboard->Open (EventQueue))
-    return false;
-  if (!Mouse->Open (this, EventQueue))
-    return false;
-
   if (Sound)
     if (!Sound->Open ())
       return false;
@@ -444,6 +465,8 @@ bool csSystemDriver::Open (const char *Title)
   // Now pass the open event to all plugins
   csEvent e (GetTime (), csevBroadcast, cscmdSystemOpen);
   HandleEvent (e);
+
+  ExitLoop = false;
 
   return true;
 }
@@ -462,10 +485,6 @@ void csSystemDriver::Close ()
     NetDrv->Close ();
   if (G3D)
     G3D->Close ();
-  if (Keyboard)
-    Keyboard->Close ();
-  if (Mouse)
-    Mouse->Close ();
 }
 
 bool csSystemDriver::CheckDrivers ()
@@ -490,18 +509,6 @@ bool csSystemDriver::CheckDrivers ()
   return rc;
 }
 
-bool csSystemDriver::InitKeyboard ()
-{
-  CHK (Keyboard = new SysKeyboardDriver ());
-  return (Keyboard != NULL);
-}
-
-bool csSystemDriver::InitMouse ()
-{
-  CHK (Mouse = new SysMouseDriver ());
-  return (Mouse != NULL);
-}
-
 void csSystemDriver::NextFrame (time_t /*elapsed_time*/, time_t /*current_time*/)
 {
   ProcessEvents ();
@@ -511,14 +518,26 @@ void csSystemDriver::NextFrame (time_t /*elapsed_time*/, time_t /*current_time*/
 
 bool csSystemDriver::ProcessEvents ()
 {
+  // See if any plugin wants to be called every frame
+  for (int i = 0; i < PlugIns.Length (); i++)
+  {
+    csPlugIn *plugin = PlugIns.Get (i);
+    if (plugin->EventMask & CSMASK_Nothing)
+    {
+      csEvent e (Time (), csevNothing, 0);
+      plugin->PlugIn->HandleEvent (e);
+    }
+  }
+
   csEvent *ev;
   bool did_some_work = false;
-  while ((ev = EventQueue->Get ()))
+  while ((ev = EventQueue.Get ()))
   {
     did_some_work = true;
     HandleEvent (*ev);
     CHK (delete ev);
   }
+
   return did_some_work;
 }
 
@@ -528,19 +547,10 @@ bool csSystemDriver::HandleEvent (csEvent &Event)
   bool canstop = (Event.Type == csevBroadcast);
   for (int i = 0; i < PlugIns.Length (); i++)
   {
-    csPlugIn *plugin = (csPlugIn *)PlugIns.Get (i);
+    csPlugIn *plugin = PlugIns.Get (i);
     if (plugin->EventMask & evmask)
       if (plugin->PlugIn->HandleEvent (Event) && canstop)
         return true;
-  }
-
-  // If user switches away from our application, reset keyboard and mouse state
-  if ((Event.Type == csevBroadcast)
-   && (Event.Command.Code == cscmdFocusChanged)
-   && (Event.Command.Info == NULL))
-  {
-    Keyboard->Reset ();
-    Mouse->Reset ();
   }
 
   return false;
@@ -618,7 +628,7 @@ void csSystemDriver::Help ()
 {
   for (int i = 0; i < PlugIns.Length (); i++)
   {
-    csPlugIn *plugin = (csPlugIn *)PlugIns [i];
+    csPlugIn *plugin = PlugIns.Get (i);
     iConfig *Config = QUERY_INTERFACE (plugin->PlugIn, iConfig);
     if (Config)
     {
@@ -846,60 +856,15 @@ void csSystemDriver::GetSettings (int &oWidth, int &oHeight, int &oDepth,
   oFullScreen = FullScreen;
 }
 
-bool csSystemDriver::RegisterDriver (const char *iInterface, iPlugIn *iObject)
-{
-#define CHECK(Else, Object, Interface)				\
-  Else if (!Object && strcmp (iInterface, #Interface) == 0)	\
-    rc = !!(Object = QUERY_INTERFACE (iObject, Interface));
-
-  bool rc = false;
-  CHECK (;   , VFS,    iVFS)
-  CHECK (else, G3D,    iGraphics3D)
-  CHECK (else, G2D,    iGraphics2D)
-  CHECK (else, Sound,  iSoundRender)
-  CHECK (else, NetDrv, iNetworkDriver)
-  CHECK (else, NetMan, iNetworkManager)
-  CHECK (else, Console, iConsole)
-  return rc;
-
-#undef CHECK
-}
-
-bool csSystemDriver::DeregisterDriver (const char *iInterface, iPlugIn *iObject)
-{
-  if (!iObject)
-    return false;
-
-#define CHECK(Else, Object, Interface)					\
-  Else if (strcmp (iInterface, #Interface) == 0)			\
-  {									\
-    Interface *p = QUERY_INTERFACE (iObject, Interface);		\
-    if (!p) return false;						\
-    if (p != Object) { p->DecRef (); return false; }			\
-    p->DecRef (); iBase* t = Object; Object = NULL; t->DecRef ();	\
-    return true;							\
-  }
-
-  CHECK (;   , VFS,    iVFS)
-  CHECK (else, G3D,    iGraphics3D)
-  CHECK (else, G2D,    iGraphics2D)
-  CHECK (else, Sound,  iSoundRender)
-  CHECK (else, NetDrv, iNetworkDriver)
-  CHECK (else, NetMan, iNetworkManager)
-  CHECK (else, Console, iConsole)
-  return false;
-
-#undef CHECK
-}
-
-iBase *csSystemDriver::LoadPlugIn (const char *iClassID, const char *iInterface, int iVersion)
+iBase *csSystemDriver::LoadPlugIn (const char *iClassID, const char *iFuncID,
+  const char *iInterface, int iVersion)
 {
   iPlugIn *p = CREATE_INSTANCE (iClassID, iPlugIn);
   if (!p)
     Printf (MSG_WARNING, "WARNING: could not load plugin `%s'\n", iClassID);
   else
   {
-    CHK (PlugIns.Push (new csPlugIn (p, iClassID)));
+    CHK (PlugIns.Push (new csPlugIn (p, iClassID, iFuncID)));
     if (p->Initialize (this))
     {
       iBase *ret;
@@ -923,12 +888,22 @@ iBase *csSystemDriver::QueryPlugIn (const char *iInterface, int iVersion)
 {
   for (int i = 0; i < PlugIns.Length (); i++)
   {
-    iBase *ret = (iBase *)((csPlugIn *)PlugIns.Get (i))->PlugIn->
-      QueryInterface (iInterface, iVersion);
+    iBase *ret =
+      (iBase *)PlugIns.Get (i)->PlugIn->QueryInterface (iInterface, iVersion);
     if (ret)
       return ret;
   }
   return NULL;
+}
+
+iBase *csSystemDriver::QueryPlugIn (const char *iFuncID, const char *iInterface,
+  int iVersion)
+{
+  int idx = PlugIns.FindKey (iFuncID, 1);
+  if (idx < 0)
+    return false;
+
+  return (iBase *)PlugIns.Get (idx)->PlugIn->QueryInterface (iInterface, iVersion);
 }
 
 bool csSystemDriver::UnloadPlugIn (iPlugIn *iObject)
@@ -937,12 +912,21 @@ bool csSystemDriver::UnloadPlugIn (iPlugIn *iObject)
   if (idx < 0)
     return false;
 
-  DeregisterDriver ("iVFS", iObject);
-  DeregisterDriver ("iGraphics3D", iObject);
-  DeregisterDriver ("iGraphics2D", iObject);
-  DeregisterDriver ("iSoundRender", iObject);
-  DeregisterDriver ("iNetworkDriver", iObject);
-  DeregisterDriver ("iNetworkManager", iObject);
+#define CHECK(Var,Interface)						\
+  {									\
+    iBase *itf = QUERY_INTERFACE (iObject, Interface);			\
+    if (itf) { if (itf == Var) { Var = NULL; itf->DecRef (); } itf->DecRef (); }\
+  }
+
+  CHECK (VFS, iVFS)
+  CHECK (G3D, iGraphics3D)
+  CHECK (G2D, iGraphics2D)
+  CHECK (Sound, iSoundRender)
+  CHECK (NetDrv, iNetworkDriver)
+  CHECK (NetMan, iNetworkManager)
+  CHECK (Console, iConsole)
+
+#undef CHECK
 
   return PlugIns.Delete (idx);
 }
@@ -953,7 +937,7 @@ bool csSystemDriver::CallOnEvents (iPlugIn *iObject, unsigned int iEventMask)
   if (idx < 0)
     return false;
 
-  csPlugIn *plugin = (csPlugIn *)PlugIns.Get (idx);
+  csPlugIn *plugin = PlugIns.Get (idx);
   plugin->EventMask = iEventMask;
   return true;
 }
@@ -1013,63 +997,62 @@ bool csSystemDriver::ConfigSave ()
   return ConfigName ? Config->Save (ConfigName) : false;
 }
 
-void csSystemDriver::QueueKeyEvent (int KeyCode, bool Down)
+void csSystemDriver::QueueKeyEvent (int iKeyCode, bool iDown)
 {
-  if (!KeyCode)
-    return;
-
-  time_t time = Time ();
-
-  if (Down)
-    Keyboard->do_keypress (time, KeyCode);
-  else
-    Keyboard->do_keyrelease (time, KeyCode);
+  if (iKeyCode)
+    Keyboard.do_key (iKeyCode, iDown);
 }
 
-void csSystemDriver::QueueMouseEvent (int Button, int Down, int x, int y, int ShiftFlags)
+void csSystemDriver::QueueMouseEvent (int iButton, bool iDown, int x, int y)
 {
-  time_t time = Time ();
-
-  if (Button == 0)
-    Mouse->do_mousemotion (time, x, y);
-  else if (Down)
-    Mouse->do_buttonpress (time, Button, x, y, ShiftFlags & CSMASK_SHIFT,
-      ShiftFlags & CSMASK_ALT, ShiftFlags & CSMASK_CTRL);
+  if (iButton == 0)
+    Mouse.do_motion (x, y);
   else
-    Mouse->do_buttonrelease (time, Button, x, y);
+    Mouse.do_button (iButton, iDown, x, y);
+}
+
+void csSystemDriver::QueueJoystickEvent (int iNumber, int iButton, bool iDown,
+  int x, int y)
+{
+  if (iButton == 0)
+    Joystick.do_motion (iNumber, x, y);
+  else
+    Joystick.do_button (iNumber, iButton, iDown, x, y);
 }
 
 void csSystemDriver::QueueFocusEvent (bool Enable)
 {
-  if (!EventQueue)
-    return;
   if (Enable == (int)IsFocused)
     return;
   IsFocused = Enable;
 
-  CHK (EventQueue->Put (new csEvent (Time(), csevBroadcast, cscmdFocusChanged,
-    (void *)Enable)));
+  EventQueue.Put (new csEvent (Time(), csevBroadcast, cscmdFocusChanged,
+    (void *)Enable));
+
+  // If user switches away from our application, reset
+  // keyboard/mouse/joystick state
   if (!Enable)
   {
-    Keyboard->Reset ();
-    Mouse->Reset ();
+    Keyboard.Reset ();
+    Mouse.Reset ();
+    Joystick.Reset ();
   }
 }
 
 bool csSystemDriver::GetKeyState (int key)
 {
-  return Keyboard->GetKeyState (key);
+  return Keyboard.GetKeyState (key);
 }
 
 bool csSystemDriver::GetMouseButton (int button)
 {
-  return Mouse->Button [button];
+  return Mouse.GetLastButton (button);
 }
 
 void csSystemDriver::GetMousePosition (int &x, int &y)
 {
-  x = Mouse->GetLastX ();
-  y = Mouse->GetLastY ();
+  x = Mouse.GetLastX ();
+  y = Mouse.GetLastY ();
 }
 
 const char *csSystemDriver::GetOptionCL (const char *iName, int iIndex)
@@ -1105,6 +1088,21 @@ void csSystemDriver::AddOptionCL (const char *iName, const char *iValue)
 void csSystemDriver::AddNameCL (const char *iName)
 {
   CommandLineNames.Push (strnew (iName));
+}
+
+void csSystemDriver::SuspendResume (bool iSuspend)
+{
+  for (int i = 0; i < PlugIns.Length (); i++)
+    PlugIns.Get (i)->PlugIn->SuspendResume (iSuspend);
+
+  Keyboard.Reset ();
+  Mouse.Reset ();
+  Joystick.Reset ();
+}
+
+void csSystemDriver::EnablePrintf (bool iEnable)
+{
+  EnableConsoleOutput = iEnable;
 }
 
 //------------------------------------------ iSCF interface implementation ---//

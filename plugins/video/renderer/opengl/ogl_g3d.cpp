@@ -161,10 +161,7 @@ bool csGraphics3DOpenGL::Initialize (iSystem * iSys)
 {
   (System = iSys)->IncRef ();
 
-  if (!System->RegisterDriver ("iGraphics3D", this))
-    return false;
-
-  G2D = LOAD_PLUGIN (System, OPENGL_2D_DRIVER, iGraphics2D);
+  G2D = LOAD_PLUGIN (System, OPENGL_2D_DRIVER, NULL, iGraphics2D);
   if (!G2D)
     return 0;
 

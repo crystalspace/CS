@@ -21,8 +21,8 @@
 #include <ctype.h>
 #include "sysdef.h"
 #include "csengine/cspixmap.h"
-#include "csinput/csevent.h"
-#include "csinput/csinput.h"
+#include "cssys/csevent.h"
+#include "cssys/csinput.h"
 #include "qint.h"
 #include "igraph2d.h"
 #include "csws/cscomp.h"

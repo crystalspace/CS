@@ -22,7 +22,7 @@
 #include "sysdef.h"
 #include "csutil/scf.h"
 #include "csutil/csrect.h"
-#include "csinput/csevent.h"
+#include "cssys/csevent.h"
 #include "isystem.h"
 
 #include "csdive.h"
@@ -100,6 +100,14 @@ bool csGraphics2DOS2DIVE::Initialize (iSystem* pSystem)
     CsPrintf (MSG_FATAL_ERROR, "The system driver does not support the iOS2SystemDriver interface\n");
     return false;
   }
+
+  return true;
+}
+
+bool csGraphics2DOS2DIVE::Open (const char *Title)
+{
+  if (!csGraphics2D::Open (Title))
+    return false;
 
   // Query settings from system driver
   OS2System->GetExtSettings (WindowX, WindowY, WindowWidth, WindowHeight, HardwareCursor);
@@ -250,14 +258,6 @@ bool csGraphics2DOS2DIVE::Initialize (iSystem* pSystem)
       Depth, pfmt.PixelBytes << 3);
     Depth = pfmt.PixelBytes << 3;
   }
-
-  return true;
-}
-
-bool csGraphics2DOS2DIVE::Open (const char *Title)
-{
-  if (!csGraphics2D::Open (Title))
-    return false;
 
   PMrq rq;
   u_int rc;
@@ -572,8 +572,8 @@ bool csGraphics2DOS2DIVE::SetMouseCursor (csMouseCursorID iShape)
   } /* endswitch */
 }
 
-void csGraphics2DOS2DIVE::MouseHandlerStub (void *Self, int Button, int Down,
-  int x, int y, int ShiftFlags)
+void csGraphics2DOS2DIVE::MouseHandlerStub (void *Self, int Button, bool Down,
+  int x, int y, int /*ShiftFlags*/)
 {
   csGraphics2DOS2DIVE *This = (csGraphics2DOS2DIVE *)Self;
   if (!This)
@@ -585,14 +585,11 @@ void csGraphics2DOS2DIVE::MouseHandlerStub (void *Self, int Button, int Down,
   x = (x * This->Width) / ww;
   y = ((wh - 1 - y) * This->Height) / wh;
 
-  This->System->QueueMouseEvent (Button, Down, x, y,
-    (ShiftFlags & dkf_SHIFT ? CSMASK_SHIFT : 0) |
-    (ShiftFlags & dkf_CTRL ? CSMASK_CTRL : 0) |
-    (ShiftFlags & dkf_ALT ? CSMASK_ALT : 0));
+  This->System->QueueMouseEvent (Button, Down, x, y);
 }
 
 void csGraphics2DOS2DIVE::KeyboardHandlerStub (void *Self, unsigned char ScanCode,
-  int Down, unsigned char RepeatCount, int ShiftFlags)
+  bool Down, unsigned char RepeatCount, int ShiftFlags)
 {
   csGraphics2DOS2DIVE *This = (csGraphics2DOS2DIVE *)Self;
   if (!This)

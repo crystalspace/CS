@@ -140,6 +140,8 @@ class csGraphics3DSoftware : public iGraphics3D
 
   /// DrawFlags on last BeginDraw ()
   int DrawMode;
+  /// Gamma correction value (16.16 format)
+  int Gamma;
 
   /// draw_scanline_xxx routines
   csDrawScanline* ScanProc [0x13];

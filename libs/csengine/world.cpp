@@ -51,7 +51,7 @@
 #include "csengine/radiosty.h"
 #include "csgeom/fastsqrt.h"
 #include "csgeom/polypool.h"
-#include "csinput/csevent.h"
+#include "cssys/csevent.h"
 #include "csgfxldr/csimage.h"
 #include "csutil/util.h"
 #include "csutil/halogen.h"
@@ -272,8 +272,10 @@ bool csWorld::Initialize (iSystem* sys)
 
   (System = sys)->IncRef ();
 
+#if 1
   if (!(G3D = QUERY_PLUGIN (sys, iGraphics3D)))
     return false;
+#endif
 
   if (!(VFS = QUERY_PLUGIN (sys, iVFS)))
     return false;
@@ -577,65 +579,74 @@ void csWorld::ShineLights ()
       int lightmap_highqual;
     };
     PrecalcInfo current;
-    memset(&current, 0, sizeof(current)); //03/05/1999 Thomas Hieber: initialize current to something.
+    memset (&current, 0, sizeof (current));
     current.lm_version = 1;
     current.normal_light_level = NORMAL_LIGHT_LEVEL;
-    //@@@
-    //current.ambient_red = Textures::ambient_red;
-    //current.ambient_green = Textures::ambient_green;
-    //current.ambient_blue = Textures::ambient_blue;
+    current.ambient_red = csLight::ambient_red;
+    current.ambient_green = csLight::ambient_green;
+    current.ambient_blue = csLight::ambient_blue;
     current.reflect = csSector::cfg_reflections;
     current.radiosity = (int)csSector::do_radiosity;
     current.accurate_things = csPolyTexture::do_accurate_things;
     current.cosinus_factor = csPolyTexture::cfg_cosinus_factor;
     current.lightmap_size = csPolygon3D::lightcell_size;
     current.lightmap_highqual = (int)csPolygon3D::do_lightmap_highqual;
-    bool force = false;
-    char* reason = NULL;
+    char *reason = NULL;
 
     size_t size;
     char *data = VFS->ReadFile ("precalc_info", size);
-    if (data)
-    {
-      char* p1, * p2;
-      int i;
-      float f;
-      p1 = data; p2 = strchr (p1, '='); sscanf (p2+1, "%d", &i);
-      if (i != current.lm_version) { force = true; reason = "lightmap format changed"; }
-      else { p1 = p2+1; p2 = strchr (p1, '='); sscanf (p2+1, "%d", &i); if (i != current.normal_light_level) { force = true; reason = "normal light level changed"; }
-      //@@@
-      //else { p1 = p2+1; p2 = strchr (p1, '='); sscanf (p2+1, "%d", &i); if (i != current.ambient_red) { force = true; reason = "ambient red level changed"; }
-      //else { p1 = p2+1; p2 = strchr (p1, '='); sscanf (p2+1, "%d", &i); if (i != current.ambient_green) { force = true; reason = "ambient green level changed"; }
-      //else { p1 = p2+1; p2 = strchr (p1, '='); sscanf (p2+1, "%d", &i); if (i != current.ambient_blue) { force = true; reason = "ambient blue level changed"; }
-      else { p1 = p2+1; p2 = strchr (p1, '='); sscanf (p2+1, "%d", &i); if (false) { force = true; reason = "ambient white level changed"; }
-      else { p1 = p2+1; p2 = strchr (p1, '='); sscanf (p2+1, "%d", &i); if (false) { force = true; reason = "ambient red level changed"; }
-      else { p1 = p2+1; p2 = strchr (p1, '='); sscanf (p2+1, "%d", &i); if (false) { force = true; reason = "ambient green level changed"; }
-      else { p1 = p2+1; p2 = strchr (p1, '='); sscanf (p2+1, "%d", &i); if (false) { force = true; reason = "ambient blue level changed"; }
-
-      else { p1 = p2+1; p2 = strchr (p1, '='); sscanf (p2+1, "%d", &i); if (i != current.reflect) { force = true; reason = "reflection value changed"; }
-      else { p1 = p2+1; p2 = strchr (p1, '='); sscanf (p2+1, "%d", &i); if (i != current.radiosity) { force = true; reason = "radiosity value changed"; }
-      else { p1 = p2+1; p2 = strchr (p1, '='); sscanf (p2+1, "%d", &i); if (i != current.accurate_things) { force = true; reason = "'accurate things' flag changed"; }
-      else { p1 = p2+1; p2 = strchr (p1, '='); sscanf (p2+1, "%f", &f); if (ABS (f-current.cosinus_factor) > SMALL_EPSILON) { force = true; reason = "cosinus factor changed"; }
-      else { p1 = p2+1; p2 = strchr (p1, '='); sscanf (p2+1, "%d", &i); if (i != current.lightmap_size) { force = true; reason = "lightmap size changed"; }
-      else { p1 = p2+1; p2 = strchr (p1, '='); if (p2) sscanf (p2+1, "%d", &i); else i = -1; if (i != current.lightmap_highqual) { force = true; reason = "lightmap quality setting changed"; }
-      }}}}}}}}}}}
-      CHK (delete [] data);
-    }
-    else
-    {
-      force = true;
+    char *input = data;
+    if (!data)
       reason = "no 'precalc_info' found";
-    }
+    else
+      while (*input)
+      {
+        char *keyword = input + strspn (input, " \t");
+        char *endkw = strchr (input, '=');
+        if (!endkw) break;
+        *endkw++ = 0;
+        input = strchr (endkw, '\n');
+        if (input) *input++ = 0;
+        float xf;
+        sscanf (endkw, "%f", &xf);
+        int xi = QRound (xf);
 
-    if (force)
+#define CHECK(keyw,cond,reas)				\
+        else if (!strcmp (keyword, keyw))		\
+        { if (cond) { reason = reas " changed"; break; } }
+
+        if (false) {}
+        CHECK ("LMVERSION", xi != current.lm_version, "lightmap format")
+        CHECK ("NORMALLIGHTLEVEL", xi != current.normal_light_level, "normal light level")
+        CHECK ("AMBIENT_RED", xi != current.ambient_red, "ambient red level")
+        CHECK ("AMBIENT_GREEN", xi != current.ambient_green, "ambient green level")
+        CHECK ("AMBIENT_BLUE", xi != current.ambient_blue, "ambient blue level")
+        CHECK ("REFLECT", xi != current.reflect, "reflection value")
+        CHECK ("RADIOSITY", xi != current.radiosity, "radiosity value")
+        CHECK ("ACCURATE_THINGS", xi != current.accurate_things, "'accurate things' flag")
+        CHECK ("COSINUS_FACTOR", ABS (xf - current.cosinus_factor) > SMALL_EPSILON, "cosinus factor")
+        CHECK ("LIGHTMAP_SIZE", xi != current.lightmap_size, "lightmap size")
+        CHECK ("LIGHTMAP_HIGHQUAL", xi != current.lightmap_highqual, "lightmap quality setting")
+
+#undef CHECK
+      }
+    CHK (delete [] data);
+
+    if (reason)
     {
-      char data [1000];
+      char data [500];
       sprintf (data,
-        "LMVERSION=%d\n"        "NORMALLIGHTLEVEL=%d\n"
-        "AMBIENT_RED=%d\n"      "AMBIENT_GREEN=%d\n"    "AMBIENT_BLUE=%d\n"
-        "REFLECT=%d\n"          "RADIOSITY=%d\n"
-        "ACCURATE_THINGS=%d\n"  "COSINUS_FACTOR=%f\n"
-        "LIGHTMAP_SIZE=%d\n"    "LIGHTMAP_HIGHQUAL=%d\n",
+        "LMVERSION=%d\n"
+        "NORMALLIGHTLEVEL=%d\n"
+        "AMBIENT_RED=%d\n"
+        "AMBIENT_GREEN=%d\n"
+        "AMBIENT_BLUE=%d\n"
+        "REFLECT=%d\n"
+        "RADIOSITY=%d\n"
+        "ACCURATE_THINGS=%d\n"
+        "COSINUS_FACTOR=%g\n"
+        "LIGHTMAP_SIZE=%d\n"
+        "LIGHTMAP_HIGHQUAL=%d\n",
         current.lm_version, current.normal_light_level, current.ambient_red,
         current.ambient_green, current.ambient_blue, current.reflect,
         current.radiosity, current.accurate_things, current.cosinus_factor,
@@ -1548,5 +1559,16 @@ bool csWorld::CreatePlane (const char *iName, const csVector3 &iOrigin,
   csPolyTxtPlane *ppl = new csPolyTxtPlane ();
   ppl->SetName (iName);
   ppl->SetTextureSpace (iMatrix, iOrigin);
+  planes.Push (ppl);
   return true;
+}
+
+iSector *csWorld::CreateSector (const char *iName)
+{
+  csSector *sector = new csSector ();
+  sector->SetAmbientColor (csLight::ambient_red, csLight::ambient_green, csLight::ambient_blue);
+  sector->SetName (iName);
+  sectors.Push (sector);
+  sector->IncRef ();
+  return sector;
 }

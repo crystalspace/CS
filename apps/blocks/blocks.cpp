@@ -2597,8 +2597,8 @@ bool Blocks::HandleEvent (csEvent &Event)
   switch (Event.Type)
   {
     case csevKeyDown:
-      HandleKey (Event.Key.Code, Event.Key.ShiftKeys & CSMASK_SHIFT,
-          Event.Key.ShiftKeys & CSMASK_ALT, Event.Key.ShiftKeys & CSMASK_CTRL);
+      HandleKey (Event.Key.Code, Event.Key.Modifiers & CSMASK_SHIFT,
+          Event.Key.Modifiers & CSMASK_ALT, Event.Key.Modifiers & CSMASK_CTRL);
       break;
     case csevMouseDown:
       break;

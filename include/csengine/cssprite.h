@@ -506,23 +506,25 @@ public:
   virtual void Draw (csRenderView& rview) = 0;
 
   /**
-   * Move this sprite to some location.
-   */
-  virtual void SetPosition (const csVector3& location) = 0;
-
-  /**
    * Get the location of the sprite.
    */
   virtual const csVector3& GetPosition () const = 0;
+
+  CSOBJTYPE;
+
+  //------------------------- iParticle implementation -----------------------//
+  DECLARE_IBASE;
 
   /**
    * Relative move of this sprite.
    * Note that this does not check if the sector is left.
    */
-  virtual void MovePosition (const csVector3& delta) = 0;
+//virtual void MovePosition (const csVector3& delta) = 0;
 
-  DECLARE_IBASE;
-  CSOBJTYPE;
+  /**
+   * Move this sprite to some location.
+   */
+//virtual void SetPosition (const csVector3& location) = 0;
 };
 
 
@@ -636,7 +638,7 @@ public:
   void SetTexture (const char* name, csTextureList* textures);
 
   /// Scale the sprite by scaling the diagonal of the transform
-  virtual void ScaleBy(float factor);
+  virtual void ScaleBy (float factor);
 
   /// Rotate the sprite in some way, angle in radians.
   /// currently first z-rotates angle then x-rotates angle.

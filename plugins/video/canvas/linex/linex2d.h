@@ -71,9 +71,6 @@ class csGraphics2DLineXLib : public csGraphics2D
   /// Pointer to DOS-specific interface
   iUnixSystemDriver* UnixSystem;
 
-  /// This routine is called once per event loop
-  static void ProcessEvents (void *Param);
-
 public:
   DECLARE_IBASE;
 
@@ -98,6 +95,9 @@ public:
 
   /// Set mouse cursor shape
   virtual bool SetMouseCursor (csMouseCursorID iShape);
+
+  /// Called on every frame by system driver
+  virtual bool HandleEvent (csEvent &Event);
 };
 
 #endif // __LINEX2D_H__

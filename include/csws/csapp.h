@@ -25,7 +25,7 @@
 #include "cscomp.h"
 #include "cswstex.h"
 #include "csgfxppl.h"
-#include "csinput/cseventq.h"
+#include "cssys/cseventq.h"
 #include "csutil/csstrvec.h"
 
 class cswsSystemDriver;
@@ -57,8 +57,6 @@ protected:
   csGraphicsPipeline *GfxPpl;
   /// The mouse pointer
   csMouse *Mouse;
-  /// The event queue
-  csEventQueue *EventQueue;
   /// The list of windowing system textures
   csWSTexVector Textures;
   /// Application background style
@@ -160,7 +158,7 @@ public:
   csMouseCursorID GetMouseCursor () { return MouseCursorID; }
 
   /// Add a event to event queue
-  void PutEvent (csEvent *Event) { EventQueue->Put (Event); }
+  void PutEvent (csEvent *Event);
 
   /// Handle a event and return true if processed
   virtual bool HandleEvent (csEvent &Event);

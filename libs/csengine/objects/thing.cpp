@@ -640,7 +640,7 @@ void csThing::MergeTemplate (csThingTemplate* tpl, csTextureList* txtList,
   for (i = 0; i < GetNumPolygons (); i++)
   {
     csPolygon3D *p = GetPolygon3D (i);
-    txtname = p->GetTexture ()->GetName ();
+    txtname = p->GetCsTextureHandle ()->GetName ();
     newname = new char [strlen (prefix) + strlen (txtname) + 2];
     sprintf (newname, "%s_%s", prefix, txtname);
     csTextureHandle *th = txtList->FindByName (newname);

@@ -86,8 +86,8 @@ public:
   virtual bool SetMouseCursor (csMouseCursorID iShape);
 */
 protected:
-  /// This routine is called once per event loop
-  static void ProcessEvents (void *Param);
+  /// Called on every frame by system driver
+  virtual bool HandleEvent (csEvent &Event);
   
   /// This method is used for GlideInWindow...
   void FXgetImage();

@@ -266,7 +266,7 @@ void SysSystemDriver::Loop(void)
 
 			theMouse = anEvent.where;
 			if (( piG2D ) && ( piG2D->PointInWindow( &theMouse ) )) {
-				Mouse->do_mousemotion( current_time, theMouse.h, theMouse.v );
+				Mouse->do_motion( theMouse.h, theMouse.v );
 			}
 		}
 		current_time = Time();
@@ -352,7 +352,7 @@ void SysSystemDriver::HandleMouseEvent( time_t current_time, EventRecord *theEve
 	// find out what part of the screen the mouse was clicked on
 	
 	partCode = FindWindow( theEvent->where, &targetWindow );
-	
+
 	switch (partCode)
 	{	
 		case inDesk:
@@ -385,11 +385,9 @@ void SysSystemDriver::HandleMouseEvent( time_t current_time, EventRecord *theEve
 					theMouse = theEvent->where;
 					::GlobalToLocal( &theMouse );
 					if ( theEvent->what == mouseDown )
-    					Mouse->do_buttonpress( current_time, 1, theMouse.h, theMouse.v,
-    							theEvent->modifiers & shiftKey, theEvent->modifiers & optionKey,
-    							theEvent->modifiers & controlKey );
+    					Mouse->do_press( 1, theMouse.h, theMouse.v);
     				else
-    					Mouse->do_buttonrelease( current_time, 1, theMouse.h, theMouse.v );
+    					Mouse->do_release( 1, theMouse.h, theMouse.v );
 				} else {
 					// If the window wasn't active, make it active.
 					
@@ -789,9 +787,9 @@ void SysSystemDriver::ScanKeyboard( time_t current_time )
 					theChar = KeyToChar[ ( i * 32 ) + j ];
 					if ( theChar != '\0' ) {
 						if ( keys & 1 )
-        					Keyboard->do_keypress( current_time, theChar );
+        					Keyboard.do_press( current_time, theChar );
         				else
-        					Keyboard->do_keyrelease( current_time, theChar );
+        					Keyboard.do_release( current_time, theChar );
         			}
 				}
 			}
@@ -823,48 +821,48 @@ void SysSystemDriver::HandleKey( time_t current_time, const char key, const char
 
 	switch ( key ) {
 		case kHomeCharCode:
-        	Keyboard->do_keypress( current_time, CSKEY_HOME );
+        	Keyboard.do_press( CSKEY_HOME );
 			break;
 
 		case kEndCharCode:
-        	Keyboard->do_keypress( current_time, CSKEY_END );
+        	Keyboard.do_press( CSKEY_END );
 			break;
 
 		case kEscapeCharCode:
-			Keyboard->do_keypress( current_time, CSKEY_ESC );
+			Keyboard.do_press( CSKEY_ESC );
 			break;
 
 		case kReturnCharCode: 
-			Keyboard->do_keypress( current_time, CSKEY_ENTER );
+			Keyboard.do_press( CSKEY_ENTER );
 			break;
 
 		case kUpArrowCharCode:
-			Keyboard->do_keypress( current_time, CSKEY_UP );
+			Keyboard.do_press( CSKEY_UP );
 			break;
 
 		case kDownArrowCharCode:
-			Keyboard->do_keypress( current_time, CSKEY_DOWN );
+			Keyboard.do_press( CSKEY_DOWN );
 			break;
 
 		case kLeftArrowCharCode:
-			Keyboard->do_keypress( current_time, CSKEY_LEFT );
+			Keyboard.do_press( CSKEY_LEFT );
 			break;
 
 		case kRightArrowCharCode:
-			Keyboard->do_keypress( current_time, CSKEY_RIGHT );
+			Keyboard.do_press( CSKEY_RIGHT );
 			break;
 
 		case kPageUpCharCode:
-			Keyboard->do_keypress( current_time, CSKEY_PGUP );
+			Keyboard.do_press( CSKEY_PGUP );
 			break;
 
 		case kPageDownCharCode:
-			Keyboard->do_keypress( current_time, CSKEY_PGDN );
+			Keyboard.do_press( CSKEY_PGDN );
 			break;
 
 		default:
-			Keyboard->do_keypress( current_time, key );
-			Keyboard->do_keyrelease( current_time, key );
+			Keyboard.do_press( key );
+			Keyboard.do_release( key );
 			break;
 	}
 #endif
@@ -881,7 +879,7 @@ void SysSystemDriver::HandleOSEvent( time_t current_time, EventRecord *theEvent,
 
 		theMouse = theEvent->where;
 		if (( piG2D ) && ( piG2D->PointInWindow( &theMouse ) )) {
-			Mouse->do_mousemotion( current_time, theMouse.h, theMouse.v );
+			Mouse->do_motion( theMouse.h, theMouse.v );
 		}
 	} else if (osEvtFlag == suspendResumeMessage) {
 		if (theEvent->message & resumeFlag) {

@@ -125,7 +125,7 @@ void csOctree::Build ()
   int i;
   int num = sector->GetNumPolygons ();
   CHK (csPolygonInt** polygons = new csPolygonInt* [num]);
-  for (i = 0 ; i < num ; i++) polygons[i] = sector->GetPolygon (i);
+  for (i = 0 ; i < num ; i++) polygons[i] = sector->GetPolygonInt (i);
 
   CHK (root = new csOctreeNode);
 

@@ -19,6 +19,43 @@
 #ifndef __MGL2D_H__
 #define __MGL2D_H__
 
+/* Convert our system definition flags to MGL compatible */
+#if defined (OS_DOS)
+#  define __MSDOS32__
+#elif defined (OS_OS2)
+#  define __OS2_32__
+#elif defined (OS_WIN32)
+#  define __WINDOWS32__
+#elif defined (OS_BEOS)
+#  define __BEOS__
+#elif defined (OS_LINUX)
+#  define __LINUX__
+#elif defined (OS_FREEBSD)
+#  define __FREEBSD__
+#elif defined (OS_MAC)
+#  define __MACOS__
+#endif
+
+#if defined (OS_UNIX)
+#  define __UNIX__
+#endif
+
+#if defined (PROC_INTEL)
+#  define __INTEL__
+#elif defined (PROC_ALPHA)
+#  define __ALPHA__
+#elif defined (PROC_MIPS)
+#  define __MIPS__
+#elif defined (PROC_PPC)
+#  define __PPC__
+#elif defined (PROC_M68K)
+#  define __MC68K__
+#endif
+
+#if defined (CS_BIG_ENDIAN)
+#  define __BIG_ENDIAN__
+#endif
+
 #include <mgraph.h>
 
 #include "csutil/scf.h"
@@ -28,15 +65,10 @@ class csGraphics2DMGL : public csGraphics2D
 {
   /// MGL context
   MGLDC *dc;
-
   /// Hardware mouse cursor or software emulation?
   bool do_hwmouse;
-
   /// Use back buffer in system memory or in video memory
   bool do_hwbackbuf;
-
-  /// This routine is called once per event loop
-  static void ProcessEvents (void *Param);
 
 public:
   DECLARE_IBASE;
@@ -89,6 +121,9 @@ public:
    */
   virtual bool SetMouseCursor (csMouseCursorID iShape);
 
+  /// Called on every frame by system driver
+  virtual bool HandleEvent (csEvent &Event);
+
 private:
   /// The video mode ID
   int video_mode;
@@ -102,10 +137,18 @@ private:
   int videoPage;
   /// Do we allow page flipping + double buffering?
   bool allowDB;
+  /// Last known joystick button mask
+  size_t joybutt;
+  /// Last known joystick positions
+  int joyposx [2], joyposy [2];
+  /// true if palette was changed
+  bool paletteChanged;
   /// Allocate the back buffer: either in hardware or software
   void AllocateBackBuffer ();
   /// Deallocate the back buffer
   void DeallocateBackBuffer ();
+  /// Translate an MGL key to Crystal Space
+  int TranslateKey (int mglKey);
 };
 
 #endif // __MGL2D_H__

@@ -25,7 +25,7 @@
 #include "igraph2d.h"
 #include "isystem.h"
 #include "itxtmgr.h"
-#include "csinput/csevent.h"
+#include "cssys/csevent.h"
 #include "csutil/csrect.h"
 #include "csutil/scf.h"
 #include "csutil/csstring.h"
@@ -36,43 +36,61 @@
 
 #define G3D piG3D
 
-funConsole::funConsole(iBase *base) : csConsole (NULL)
+funConsole::funConsole (iBase *base) : csConsole (NULL)
 {
   CONSTRUCT_IBASE (base);
   border_computed = false;
+  pix_loaded = false;
 }
 
-funConsole::~funConsole()
+funConsole::~funConsole ()
 {
-  if(piG3D)
-    piG3D->DecRef();
-  if(piVFS)
-    piVFS->DecRef();
+  if (piG3D)
+    piG3D->DecRef ();
+  if (piVFS)
+    piVFS->DecRef ();
 }
 
-bool funConsole::Initialize(iSystem *system) 
+bool funConsole::Initialize (iSystem *system) 
 {
   bool succ = csConsole::Initialize ( system );
-  piG3D = QUERY_PLUGIN(piSystem, iGraphics3D);
+  piG3D = QUERY_PLUGIN_ID (piSystem, CS_FUNCID_VIDEO, iGraphics3D);
 
   outersize.Set ( size );
-  if(!piG3D)
+  if (!piG3D)
     return false;
-  piVFS = QUERY_PLUGIN(piSystem, iVFS);
+  piVFS = QUERY_PLUGIN_ID (piSystem, CS_FUNCID_VFS, iVFS);
   if (!piVFS)
     return false;
-  
-  LoadPix();
+
+  // Tell system driver that we want to handle broadcast events
+  if (!piSystem->CallOnEvents (this, CSMASK_Broadcast))
+    return false;
+
   return succ;
 }
 
-void funConsole::Draw3D(csRect*)
+bool funConsole::HandleEvent (csEvent &Event)
+{
+  if (Event.Type == csevBroadcast
+   && Event.Command.Code == cscmdSystemOpen
+   && !pix_loaded)
+  {
+    LoadPix ();
+    pix_loaded = true;
+  }
+  return false;
+}
+
+
+void funConsole::Draw3D (csRect *)
 {
   bool btext, bgour;
   int i;
   long int zBuf;
   G3DPolygonDPFX poly;
-  if ( !border_computed ){
+  if ( !border_computed )
+  {
     // determine what space left to draw the actual console
     memset( &bordersize, 0, sizeof(bordersize) );
     if ( deco.border[0].txt )
@@ -110,7 +128,8 @@ void funConsole::Draw3D(csRect*)
 
   float u_stretch=1.0, v_stretch=1.0;
 
-  if ( !with_color && !deco.bgnd.do_stretch ){
+  if ( !with_color && !deco.bgnd.do_stretch )
+  {
     int w, h;
     deco.bgnd.txt->GetMipMapDimensions( 0, w, h );
     u_stretch = ((float)(size.xmax - size.xmin)) / ((float)w);
@@ -126,7 +145,8 @@ void funConsole::Draw3D(csRect*)
   poly.vertices[3].u = 0;
   poly.vertices[3].v = v_stretch;
     
-  for (i=0; i<poly.num; i++){
+  for (i=0; i<poly.num; i++)
+  {
     poly.vertices[i].r=((float)deco.bgnd.kr)/255.0;
     poly.vertices[i].g=((float)deco.bgnd.kg)/255.0;
     poly.vertices[i].b=((float)deco.bgnd.kb)/255.0;
@@ -136,35 +156,36 @@ void funConsole::Draw3D(csRect*)
 
   poly.txt_handle = deco.bgnd.txt;
 
-  if ( with_color )
-    G3D->SetRenderState (G3DRENDERSTATE_TEXTUREMAPPINGENABLE, false );
+  if (with_color)
+    G3D->SetRenderState (G3DRENDERSTATE_TEXTUREMAPPINGENABLE, false);
   
   float alpha = deco.bgnd.do_alpha ? deco.bgnd.alpha : 0.0;
 
-  G3D->StartPolygonFX ( poly.txt_handle, CS_FX_SETALPHA( alpha ) | CS_FX_COPY | (with_color && deco.bgnd.do_keycolor  ? CS_FX_GOURAUD : 0) );
+  G3D->StartPolygonFX (poly.txt_handle, CS_FX_SETALPHA (alpha) |
+    CS_FX_COPY | (with_color && deco.bgnd.do_keycolor ? CS_FX_GOURAUD : 0));
 
   G3D->DrawPolygonFX (poly);
   G3D->FinishPolygonFX ();
 
-  if ( with_color )
-    G3D->SetRenderState (G3DRENDERSTATE_TEXTUREMAPPINGENABLE, true );
+  if (with_color)
+    G3D->SetRenderState (G3DRENDERSTATE_TEXTUREMAPPINGENABLE, true);
   
   // draw the top left decoration
-  DrawBorder( outersize.xmin, height-outersize.ymin, bordersize.xmin, bordersize.ymin, deco.border[0], 0 );
+  DrawBorder (outersize.xmin, height-outersize.ymin, bordersize.xmin, bordersize.ymin, deco.border[0], 0);
   // draw the top decoration
-  DrawBorder( p2size.xmin-deco.p2lx, height-outersize.ymin, p2size.Width()+deco.p2lx+deco.p2rx, bordersize.ymin,  deco.border[1], 1 );
+  DrawBorder (p2size.xmin-deco.p2lx, height-outersize.ymin, p2size.Width()+deco.p2lx+deco.p2rx, bordersize.ymin,  deco.border[1], 1);
   // draw the top right decoration
-  DrawBorder( p2size.xmax, height-outersize.ymin, bordersize.xmax, bordersize.ymin, deco.border[2], 0 );
+  DrawBorder (p2size.xmax, height-outersize.ymin, bordersize.xmax, bordersize.ymin, deco.border[2], 0);
   // draw the right decoration
-  DrawBorder( p2size.xmax, height-p2size.ymin+deco.p2ty, bordersize.xmax, p2size.Height()+deco.p2by+deco.p2ty, deco.border[3], 2 );
+  DrawBorder (p2size.xmax, height-p2size.ymin+deco.p2ty, bordersize.xmax, p2size.Height()+deco.p2by+deco.p2ty, deco.border[3], 2);
   // draw the bottom right decoration
-  DrawBorder( p2size.xmax, height-p2size.ymax, bordersize.xmax, bordersize.ymax, deco.border[4], 0 );
+  DrawBorder (p2size.xmax, height-p2size.ymax, bordersize.xmax, bordersize.ymax, deco.border[4], 0);
   // draw the bottom decoration
-  DrawBorder( p2size.xmin-deco.p2lx, height-p2size.ymax, p2size.Width()+deco.p2lx+deco.p2rx, bordersize.ymax, deco.border[5], 3 );
+  DrawBorder (p2size.xmin-deco.p2lx, height-p2size.ymax, p2size.Width()+deco.p2lx+deco.p2rx, bordersize.ymax, deco.border[5], 3);
   // draw the bottom left decoration
-  DrawBorder( outersize.xmin, height-p2size.ymax, bordersize.xmin, bordersize.ymax, deco.border[6], 0 );
+  DrawBorder (outersize.xmin, height-p2size.ymax, bordersize.xmin, bordersize.ymax, deco.border[6], 0);
   // draw the left decoration
-  DrawBorder( outersize.xmin, height-p2size.ymin+deco.p2ty, bordersize.xmin, p2size.Height()+deco.p2by+deco.p2ty, deco.border[7], 4 );
+  DrawBorder (outersize.xmin, height-p2size.ymin+deco.p2ty, bordersize.xmin, p2size.Height()+deco.p2by+deco.p2ty, deco.border[7], 4);
   
   G3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zBuf );
   G3D->SetRenderState (G3DRENDERSTATE_TEXTUREMAPPINGENABLE, btext);
@@ -281,7 +302,8 @@ void funConsole::LoadPix()
   csIniFile *ini = new csIniFile( "funcon.cfg" );
   const char* dir = ini->GetStr( "funcon", "zip" );
   const char* mountdir = ini->GetStr( "funcon", "mount" );
-  if ( piVFS->Mount( mountdir, dir ) ){
+  if ( piVFS->Mount( mountdir, dir ) )
+  {
     piVFS->PushDir();
     piVFS->ChDir( mountdir );
 
@@ -308,9 +330,9 @@ void funConsole::LoadPix()
 
     piVFS->PopDir();
     piVFS->Unmount( mountdir, dir );
-
-  }else
-    printf("Couldn´t mount %s on %s\n", dir, mountdir );
+  }
+  else
+    printf("Couldn't mount %s on %s\n", dir, mountdir );
 
   delete ini;
 }

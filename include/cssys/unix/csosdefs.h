@@ -22,12 +22,23 @@
 
 #include <math.h>
 
-#define SOFTWARE_2D_DRIVER get_software_2d_driver ()
-
-// The 2D graphics drivers used by software renderer on this platform
-#define SOFTWARE_2D_DRIVER_SVGA	"crystalspace.graphics2d.svgalib"
-#define SOFTWARE_2D_DRIVER_GGI	"crystalspace.graphics2d.ggi"
-#define SOFTWARE_2D_DRIVER_XLIB	"crystalspace.graphics2d.xlib"
+#ifdef SYSDEF_SOFTWARE2D
+#  define SOFTWARE_2D_DRIVER get_software_2d_driver ()
+   static inline char* get_software_2d_driver ()
+   {
+     if (getenv ("GGI_DISPLAY"))
+       return "crystalspace.graphics2d.ggi";
+     else
+#  if defined (OS_LINUX)
+     if (getenv ("DISPLAY"))
+#  endif
+       return "crystalspace.graphics2d.xlib";
+#  if defined (OS_LINUX)
+     else
+       return "crystalspace.graphics2d.svgalib";
+#  endif
+   }
+#endif
 
 // The 2D graphics driver used by OpenGL renderer
 #define OPENGL_2D_DRIVER "crystalspace.graphics2d.glx"
@@ -36,7 +47,7 @@
 #define GLIDE_2D_DRIVER	"crystalspace.graphics2d.glidex"
 
 // The 2D graphics driver used by Glide renderer Version 3
-#define GLIDE_2D_DRIVER_V3	"crystalspace.graphics2d.glidex.3"
+#define GLIDE_2D_DRIVER_V3 "crystalspace.graphics2d.glidex.3"
 // The sound driver
 #define SOUND_DRIVER "crystalspace.sound.driver.oss"
 

@@ -227,7 +227,7 @@ bool csSocketDriver::Close()
 bool csSocketDriver::Initialize(iSystem* p)
 {
   Sys = p;
-  return Sys->RegisterDriver("iNetworkDriver", this);
+  return true;
 }
 
 csNetworkSocket csSocketDriver::CreateSocket(bool reliable)

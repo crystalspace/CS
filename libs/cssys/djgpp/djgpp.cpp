@@ -1,6 +1,5 @@
 /*
     DOS support for Crystal Space 3D library
-    Copyright (C) 1998 by Jorrit Tyberghein
     Written by David N. Arnold <derek_arnold@fuse.net>
     Written by Andrew Zabolotny <bit@eltech.ru>
 
@@ -18,15 +17,6 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
-/*
- * Written by David N. Arnold. <derek_arnold@fuse.net>
- * 13-07-98:  Andrew Zabolotny <bit@eltech.ru>
- *   - Rewritten video driver; no changes to Allegro support though
- *   - Rewritten keyboard handler
- *   - Rewritten mouse handler
- *   - Did I forgot to rewrite something? :-)
- */
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -81,6 +71,12 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
     Printf (MSG_FATAL_ERROR, "sizeof (event_queue [0]) == %d instead of 12!\n", sizeof (event_queue [0]));
     exit (-1);
   }
+
+  __dpmi_regs regs;
+  regs.x.ax = 0x0000;
+  __dpmi_int (0x33, &regs);
+  MouseExists = !!(regs.x.ax);
+  MouseOpened = false;
 }
 
 void *SysSystemDriver::QueryInterface (const char *iInterfaceID, int iVersion)
@@ -102,7 +98,6 @@ void SysSystemDriver::Loop ()
     // Fill in events ...
     while (event_queue_tail != event_queue_head)
     {
-      unsigned long time = Time ();
       switch (event_queue [event_queue_tail].Type)
       {
         case 1:
@@ -118,10 +113,7 @@ void SysSystemDriver::Loop ()
 
           ScanCode = ScanCodeToChar [ScanCode & 0x7F];
           if (ScanCode)
-            if (Down)
-              Keyboard->do_keypress (time, ScanCode);
-            else
-              Keyboard->do_keyrelease (time, ScanCode);
+            QueueKeyEvent (ScanCode, Down);
           break;
         }
         case 2:
@@ -131,15 +123,14 @@ void SysSystemDriver::Loop ()
           int x = event_queue [event_queue_tail].Mouse.x;
           int y = event_queue [event_queue_tail].Mouse.y;
 
+          QueueMouseEvent (Button, x, y);
+
           if (Button == 0)
-            Mouse->do_mousemotion (time, x, y);
+            Mouse->do_motion (x, y);
           else if (Down)
-            Mouse->do_buttonpress (time, Button, x, y,
-              Keyboard->GetKeyState (CSKEY_SHIFT),
-              Keyboard->GetKeyState (CSKEY_ALT),
-              Keyboard->GetKeyState (CSKEY_CTRL));
+            Mouse->do_press (Button, x, y);
           else
-            Mouse->do_buttonrelease (time, Button, x, y);
+            Mouse->do_release (Button, x, y);
           break;
         }
       } /* endswitch */
@@ -154,75 +145,27 @@ void SysSystemDriver::EnablePrintf (bool Enable)
   console_Enable (Enable);
 }
 
-bool SysSystemDriver::SetMousePosition (int x, int y)
+bool SysSystemDriver::Open (const char *Title)
 {
-  return ((SysMouseDriver *)Mouse)->SetMousePosition (x, y);
-}
-
-//================================================================ Keyboard ====
-
-SysKeyboardDriver::SysKeyboardDriver() : csKeyboardDriver ()
-{
-  KeyboardOpened = false;
-}
-
-SysKeyboardDriver::~SysKeyboardDriver(void)
-{
-  Close();
-}
-
-bool SysKeyboardDriver::Open(csEventQueue* EvQueue)
-{
-  csKeyboardDriver::Open (EvQueue);
+  if (!csSystemDriver::Open (Title))
+    return false;
 
   // Initialize keyboard handler
   if (KH.install ())
     return false;
   // Give us exclusive access of the keyboard.
   KH.chain (0);
-
   KeyboardOpened = true;
-  return true;
-}
 
-void SysKeyboardDriver::Close(void)
-{
-  if (KeyboardOpened)
-  {
-    KH.uninstall ();
-    KeyboardOpened = false;
-  }
-}
+  SensivityFactor = Config->GetFloat ("MouseDriver", "MouseSensivity", 1.0);
 
-//=================================================================== Mouse ====
-
-SysMouseDriver::SysMouseDriver () : csMouseDriver ()
-{
-  __dpmi_regs regs;
-  regs.x.ax = 0x0000;
-  __dpmi_int (0x33, &regs);
-  MouseExists = !!(regs.x.ax);
-  MouseOpened = false;
-
-  SensivityFactor = System->Config->GetFloat ("MouseDriver", "MouseSensivity", 1.0);
-}
-
-SysMouseDriver::~SysMouseDriver ()
-{
-  Close ();
-}
-
-bool SysMouseDriver::Open (iSystem* System, csEventQueue *EvQueue)
-{
-  if (!csMouseDriver::Open (System, EvQueue))
-    return false;
   if (MH.install ())
     return false;
 
-  // Query screen size from System object
+  // Query screen size
   int FrameWidth, FrameHeight, Depth;
   bool FullScreen;
-  System->GetSettings (FrameWidth, FrameHeight, Depth, FullScreen);
+  GetSettings (FrameWidth, FrameHeight, Depth, FullScreen);
 
   // Query mouse sensivity
   __dpmi_regs regs;
@@ -260,32 +203,39 @@ bool SysMouseDriver::Open (iSystem* System, csEventQueue *EvQueue)
   __dpmi_int (0x33, &regs);
 
   MouseOpened = true;
+
   return true;
 }
 
-void SysMouseDriver::Close ()
+void SysSystemDriver::Close ()
 {
-  if (!MouseOpened)
-    return;
+  if (KeyboardOpened)
+  {
+    KH.uninstall ();
+    KeyboardOpened = false;
+  }
 
-  MH.uninstall ();
+  if (MouseOpened)
+  {
+    MH.uninstall ();
 
-  // Restore mouse sensivity
-  __dpmi_regs regs;
-  regs.x.cx = 8;
-  regs.x.dx = 16;
-  regs.x.ax = 0x0F;
-  __dpmi_int (0x33, &regs);
-  regs.x.ax = 0x1A;
-  regs.x.bx = mouse_sensivity_x;
-  regs.x.cx = mouse_sensivity_y;
-  regs.x.dx = mouse_sensivity_threshold;
-  __dpmi_int (0x33, &regs);
+    // Restore mouse sensivity
+    __dpmi_regs regs;
+    regs.x.cx = 8;
+    regs.x.dx = 16;
+    regs.x.ax = 0x0F;
+    __dpmi_int (0x33, &regs);
+    regs.x.ax = 0x1A;
+    regs.x.bx = mouse_sensivity_x;
+    regs.x.cx = mouse_sensivity_y;
+    regs.x.dx = mouse_sensivity_threshold;
+    __dpmi_int (0x33, &regs);
 
-  MouseOpened = false;
+    MouseOpened = false;
+  }
 }
 
-bool SysMouseDriver::SetMousePosition (int x, int y)
+bool SysSystemDriver::SetMousePosition (int x, int y)
 {
   if (!MouseOpened)
     return false;

@@ -82,9 +82,8 @@ public:
   /// Set mouse cursor shape
   virtual bool SetMouseCursor (csMouseCursorID iShape);
 
-protected:
-  /// This routine is called once per event loop
-  static void ProcessEvents (void *Param);
+  /// Called on every frame by system driver
+  virtual bool HandleEvent (csEvent &Event);
 };
 
 #endif // __XLIB2D_H__

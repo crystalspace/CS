@@ -22,7 +22,7 @@
 #include "cs2d/svgalib/svga.h"
 #include "cssys/unix/iunix.h"
 #include "csutil/csrect.h"
-#include "csinput/csinput.h"
+#include "cssys/csinput.h"
 #include "isystem.h"
 
 static unsigned short ScanCodeToChar[128] =
@@ -138,6 +138,9 @@ bool csGraphics2DSVGALib::Initialize (iSystem *pSystem)
   memset (mouse_button , 0, sizeof (mouse_button));
   memset (keydown, 0, sizeof (keydown));
 
+  // Tell system driver to call us on every frame
+  System->CallOnEvents (this, CSMASK_Nothing);
+
   return true;
 }
 
@@ -154,9 +157,6 @@ bool csGraphics2DSVGALib::Open(const char *Title)
   // Open your graphic interface
   if (!csGraphics2D::Open (Title))
     return false;
-
-  // Set loop callback
-  UnixSystem->SetLoopCallback (ProcessEvents, this);
 
   vga_init ();
 
@@ -219,13 +219,11 @@ void csGraphics2DSVGALib::Close(void)
   csGraphics2D::Close ();
 }
 
-void csGraphics2DSVGALib::ProcessEvents (void* Param)
+bool csGraphics2DSVGALib::HandleEvent (csEvent &Event)
 {
   static int mouse_button_mask [3] =
-  {MOUSE_LEFTBUTTON, MOUSE_RIGHTBUTTON, MOUSE_MIDDLEBUTTON};
+  { MOUSE_LEFTBUTTON, MOUSE_RIGHTBUTTON, MOUSE_MIDDLEBUTTON };
   
-  csGraphics2DSVGALib *Self = (csGraphics2DSVGALib *)Param;
-
   keyboard_update ();
   bool shift = keyboard_keypressed (SCANCODE_LEFTSHIFT)
             || keyboard_keypressed (SCANCODE_RIGHTSHIFT);
@@ -238,10 +236,10 @@ void csGraphics2DSVGALib::ProcessEvents (void* Param)
   {
     int key = ScanCodeToChar [scancode];
     bool down = key ? keyboard_keypressed (scancode) : false;
-    if (down != Self->keydown [scancode])
+    if (down != keydown [scancode])
     {
-      Self->keydown [scancode] = down;
-      Self->System->QueueKeyEvent (key, down);
+      keydown [scancode] = down;
+      System->QueueKeyEvent (key, down);
     }
   }
 
@@ -249,23 +247,24 @@ void csGraphics2DSVGALib::ProcessEvents (void* Param)
   {
     int x = mouse_getx ();
     int y = mouse_gety ();
-    if ((x != Self->mouse_x) || (y != Self->mouse_y))
+    if ((x != mouse_x) || (y != mouse_y))
     {
-      Self->mouse_x = x; Self->mouse_y = y;
-      Self->System->QueueMouseEvent (0, false, x, y, 0);
+      mouse_x = x; mouse_y = y;
+      System->QueueMouseEvent (0, false, x, y);
     }
     
     int buttons = mouse_getbutton ();
     for (int button = 0; button < 3; button++)
     {
       bool down = (buttons & mouse_button_mask [button]) != 0;
-      if (down != Self->mouse_button [button])
+      if (down != mouse_button [button])
       {
-        Self->mouse_button [button] = down;
-        Self->System->QueueMouseEvent (button + 1, down, x, y, state);
+        mouse_button [button] = down;
+        System->QueueMouseEvent (button + 1, down, x, y);
       }
     }
   }
+  return false;
 }
   
 void csGraphics2DSVGALib::Print (csRect *area)

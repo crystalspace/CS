@@ -56,9 +56,6 @@ csSoundRenderEAX::csSoundRenderEAX(iBase *piBase)
 
 bool csSoundRenderEAX::Initialize(iSystem *iSys)
 {
-	if (!iSys->RegisterDriver ("iSoundRender", this))
-		return false;
-	
 	m_piSystem = iSys;
 	m_pListener = new csSoundListenerEAX( NULL );
 	return true;

@@ -24,7 +24,7 @@
 #include "csutil/inifile.h"
 #include "csutil/csstrvec.h"
 #include "csutil/scanstr.h"
-#include "csinput/cseventq.h"
+#include "cssys/cseventq.h"
 #include "csws/cswssys.h"
 #include "csws/cslistbx.h"
 #include "csws/csmouse.h"
@@ -136,8 +136,6 @@ bool csApp::InitialSetup (int argc, const char* const argv[],
 
   // Change to the directory on VFS where we keep our data
   System->VFS->ChDir (iDataDir);
-
-  EventQueue = System->EventQueue;
 
   int Width = System->G2D->GetWidth ();
   int Height = System->G2D->GetHeight ();
@@ -408,7 +406,7 @@ bool csApp::ProcessEvents ()
     HandleEvent (ev);
   }
 
-  while ((ev = EventQueue->Get ()))
+  while ((ev = System->EventQueue.Get ()))
   {
     did_some_work = true;
     if (!System->HandleEvent (*ev)
@@ -446,6 +444,11 @@ bool csApp::ProcessEvents ()
 void csApp::Idle ()
 {
   System->Sleep (1);
+}
+
+void csApp::PutEvent (csEvent *Event)
+{
+  System->EventQueue.Put (Event);
 }
 
 bool csApp::PreHandleEvent (csEvent &Event)
@@ -535,7 +538,7 @@ bool csApp::HandleEvent (csEvent &Event)
 
   // Handle 'window list' event
   if ((Event.Type == csevMouseDown)
-   && (((System->Mouse->Button[1] && System->Mouse->Button[2]))
+   && (((System->GetMouseButton (1) && System->GetMouseButton (2)))
     || (Event.Mouse.Button == 3)))
   {
     WindowList ();

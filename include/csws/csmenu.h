@@ -21,7 +21,7 @@
 #define __CSMENU_H__
 
 #include "csutil/csbase.h"
-#include "csinput/csevent.h"
+#include "cssys/csevent.h"
 #include "cscomp.h"
 
 /**

@@ -56,9 +56,6 @@ csSoundRenderDS3D::csSoundRenderDS3D(iBase *piBase)
 
 bool csSoundRenderDS3D::Initialize(iSystem *iSys)
 {
-  if (!iSys->RegisterDriver ("iSoundRender", this))
-    return false;
-
   m_p3DAudioRenderer = NULL;
   m_piSystem = iSys;
   m_pListener = new csSoundListenerDS3D(NULL);

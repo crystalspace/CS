@@ -178,31 +178,31 @@ void SysSystemDriver::Loop(void)
 					msg.Code &= ~IECODE_UP_PREFIX;
 					switch(msg.Code) {
 					case 0x4c:
-						Keyboard->do_keyrelease(System->Time(), CSKEY_UP);
+						Keyboard.do_release(System->Time(), CSKEY_UP);
 						break;
 					case 0x4d:
-						Keyboard->do_keyrelease(System->Time(), CSKEY_DOWN);
+						Keyboard.do_release(System->Time(), CSKEY_DOWN);
 						break;
 					case 0x4f:
-						Keyboard->do_keyrelease(System->Time(), CSKEY_LEFT);
+						Keyboard.do_release(System->Time(), CSKEY_LEFT);
 						break;
 					case 0x4e:
-						Keyboard->do_keyrelease(System->Time(), CSKEY_RIGHT);
+						Keyboard.do_release(System->Time(), CSKEY_RIGHT);
 						break;
 					case 0x3f:
-						Keyboard->do_keyrelease(System->Time(), CSKEY_PGUP);
+						Keyboard.do_release(System->Time(), CSKEY_PGUP);
 						break;
 					case 0x1f:
-						Keyboard->do_keyrelease(System->Time(), CSKEY_PGDN);
+						Keyboard.do_release(System->Time(), CSKEY_PGDN);
 						break;
 					case 0x1d:
-						Keyboard->do_keyrelease(System->Time(), CSKEY_END);
+						Keyboard.do_release(System->Time(), CSKEY_END);
 						break;
 					case 0x45:
-						Keyboard->do_keyrelease(System->Time(), CSKEY_ESC);
+						Keyboard.do_release(System->Time(), CSKEY_ESC);
 						break;
 					case 0x44:
-						Keyboard->do_keyrelease(System->Time(), '\n');
+						Keyboard.do_release(System->Time(), '\n');
 						break;
 					case 96:
 					case 97:
@@ -222,37 +222,37 @@ void SysSystemDriver::Loop(void)
 						ie.ie_Qualifier     = msg.Qualifier;
 						ie.ie_EventAddress  = (APTR *) *((ULONG *)msg.IAddress);
 						MapRawKey(&ie, &Key1, 1, NULL);
-						Keyboard->do_keyrelease(System->Time(), int(Key1));
+						Keyboard.do_release(System->Time(), int(Key1));
 						break;
 					}
 				} else {
 					switch(msg.Code) {
 					case 0x4c:
-						Keyboard->do_keypress(System->Time(), CSKEY_UP);
+						Keyboard.do_press(System->Time(), CSKEY_UP);
 						break;
 					case 0x4d:
-						Keyboard->do_keypress(System->Time(), CSKEY_DOWN);
+						Keyboard.do_press(System->Time(), CSKEY_DOWN);
 						break;
 					case 0x4f:
-						Keyboard->do_keypress(System->Time(), CSKEY_LEFT);
+						Keyboard.do_press(System->Time(), CSKEY_LEFT);
 						break;
 					case 0x4e:
-						Keyboard->do_keypress(System->Time(), CSKEY_RIGHT);
+						Keyboard.do_press(System->Time(), CSKEY_RIGHT);
 						break;
 					case 0x3f:
-						Keyboard->do_keypress(System->Time(), CSKEY_PGUP);
+						Keyboard.do_press(System->Time(), CSKEY_PGUP);
 						break;
 					case 0x1f:
-						Keyboard->do_keypress(System->Time(), CSKEY_PGDN);
+						Keyboard.do_press(System->Time(), CSKEY_PGDN);
 						break;
 					case 0x1d:
-						Keyboard->do_keypress(System->Time(), CSKEY_END);
+						Keyboard.do_press(System->Time(), CSKEY_END);
 						break;
 					case 0x45:
-						Keyboard->do_keypress(System->Time(), CSKEY_ESC);
+						Keyboard.do_press(System->Time(), CSKEY_ESC);
 						break;
 					case 0x44:
-						Keyboard->do_keypress(System->Time(), '\n');
+						Keyboard.do_press(System->Time(), '\n');
 						break;
 					case 96:
 					case 97:
@@ -272,28 +272,28 @@ void SysSystemDriver::Loop(void)
 						ie.ie_Qualifier     = msg.Qualifier;
 						ie.ie_EventAddress  = (APTR *) *((ULONG *)msg.IAddress);
 						MapRawKey(&ie, &Key1, 1, NULL);
-						Keyboard->do_keypress(System->Time(), int(Key1));
+						Keyboard.do_press(System->Time(), int(Key1));
 						break;
 					}
 				}
 				break;
 			case IDCMP_MOUSEBUTTONS:
 				if        (msg.Code == SELECTDOWN) {
-					Mouse->do_buttonpress(System->Time(), 1, int(msg.MouseX), int(msg.MouseY), shift, alt, ctrl);
+					Mouse->do_press(1, int(msg.MouseX), int(msg.MouseY));
 				} else if (msg.Code == MIDDLEDOWN) {
-					Mouse->do_buttonpress(System->Time(), 2, int(msg.MouseX), int(msg.MouseY), shift, alt, ctrl);
+					Mouse->do_press(2, int(msg.MouseX), int(msg.MouseY));
 				} else if (msg.Code == MENUDOWN) {
-					Mouse->do_buttonpress(System->Time(), 3, int(msg.MouseX), int(msg.MouseY), shift, alt, ctrl);
+					Mouse->do_press(3, int(msg.MouseX), int(msg.MouseY));
 				} else if (msg.Code == SELECTUP) {
-					Mouse->do_buttonrelease(System->Time(), 1, int(msg.MouseX), int(msg.MouseY));
+					Mouse->do_release(1, int(msg.MouseX), int(msg.MouseY));
 				} else if (msg.Code == MIDDLEUP) {
-					Mouse->do_buttonrelease(System->Time(), 2, int(msg.MouseX), int(msg.MouseY));
+					Mouse->do_release(2, int(msg.MouseX), int(msg.MouseY));
 				} else if (msg.Code == MENUUP) {
-					Mouse->do_buttonrelease(System->Time(), 3, int(msg.MouseX), int(msg.MouseY));
+					Mouse->do_release(3, int(msg.MouseX), int(msg.MouseY));
 				}
 				break;
 			case IDCMP_MOUSEMOVE:
-				Mouse->do_mousemotion(System->Time(), int(msg.MouseX), int(msg.MouseY));
+				Mouse->do_motion(int(msg.MouseX), int(msg.MouseY));
 				break;
 			}
 

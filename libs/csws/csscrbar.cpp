@@ -301,7 +301,7 @@ pulse:      if (active_button == SCROLL_UL)
         case CSKEY_LEFT:
         case CSKEY_DOWN:
         case CSKEY_RIGHT:
-          if (Event.Key.ShiftKeys & (CSMASK_ALT | CSMASK_SHIFT))
+          if (Event.Key.Modifiers & (CSMASK_ALT | CSMASK_SHIFT))
             break;
           if (IsHorizontal != ((Event.Key.Code == CSKEY_LEFT) || (Event.Key.Code == CSKEY_RIGHT)))
             break;
@@ -311,7 +311,7 @@ pulse:      if (active_button == SCROLL_UL)
               app->CaptureKeyboard (this);
 
             int delta = (Event.Key.Code == CSKEY_UP) || (Event.Key.Code == CSKEY_LEFT) ? -1 : +1;
-            delta *= (Event.Key.ShiftKeys & CSMASK_CTRL) ? status.pagestep : status.step;
+            delta *= (Event.Key.Modifiers & CSMASK_CTRL) ? status.pagestep : status.step;
 
             SetValue (status.value + delta);
           } /* endif */

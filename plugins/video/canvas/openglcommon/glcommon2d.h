@@ -51,7 +51,7 @@ public:
   virtual ~csGraphics2DGLCommon ();
 
   /* You must supply all the functions not supplied here, such
-   * as SetMouseCursor, ProcessEvents, etc. 
+   * as SetMouseCursor etc.
    * Note also that even though Initialize, Open, and Close are supplied here, 
    * you must still override these functions for your own
    * subclass to make system-specific calls for creating and showing

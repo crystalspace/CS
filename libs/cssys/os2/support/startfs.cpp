@@ -1,8 +1,5 @@
 /*
-    DOS support for Crystal Space 3D library
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by David N. Arnold <derek_arnold@fuse.net>
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1999 by Andrew Zabolotny
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -19,28 +16,29 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-// In DOS we do not want printf() to work in graphics mode
-// since it shows garbage on screen
+/*
+    This program uses a feature of OS/2 that allows to launch PM programs
+    as fullscreen sessions. If a full-screen VIO program executes a child
+    process using exec() instead of DosStartSession() it will be executed
+    in same process. This is used to launch Crystal Space in full screen
+    so that MGL 2D driver can work.
+*/
 
-#include <stdarg.h>
+#include <process.h>
 #include <stdio.h>
+#include <errno.h>
+#include <string.h>
 
-#include "sysdef.h"
-#include "cssys/system.h"
-
-// to be called before all printf() calls
-void csSystemDriver::console_open ()
+int main (int argc, char *argv[])
 {
-}
+  if (argc < 2)
+  {
+    fprintf (stderr, "Usage: startfs <executable>\n");
+    return -1;
+  }
 
-// to be called before shutdown
-void csSystemDriver::console_close ()
-{
-}
+  execv (argv [1], &argv [1]);
 
-// to be called instead of printf (exact same prototype/functionality of printf)
-void csSystemDriver::console_out (const char *str)
-{
-  if (EnableConsoleOutput)
-    fputs (str, stdout);
+  fprintf (stderr, "%s: %s\n", argv [1], strerror (errno));
+  return -1;
 }

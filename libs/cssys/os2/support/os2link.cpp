@@ -42,6 +42,7 @@ static struct
   char *linker;
   char *description;
   bool console;
+  bool fullscreen;
   bool verbose;
   bool dll;
   char *modname;
@@ -50,6 +51,7 @@ static struct
 {
   "gcc",
   NULL,
+  false,
   false,
   false,
   false,
@@ -74,6 +76,7 @@ static void display_help ()
   printf ("  --description=# Set output file description\n");
   printf ("  --out=#         Set .def file output directory\n");
   printf ("  --console       Create a .DEF file for console application\n");
+  printf ("  --fullscreen    Create a .DEF file for a full-screen console application\n");
   printf ("  --verbose       Display the linker command line\n");
   printf ("  --help          Display usage help\n");
   printf ("  --version       Show program version\n");
@@ -141,6 +144,8 @@ int main (int argc, char *argv[])
         opt.outdir = optarg (arg, sl);
       else if (ISOPT ("console"))
         opt.console = true;
+      else if (ISOPT ("fullscreen"))
+        opt.fullscreen = true;
       else if (ISOPT ("verbose"))
         opt.verbose = true;
       else if (ISOPT ("help"))
@@ -197,7 +202,8 @@ int main (int argc, char *argv[])
   }
   else
   {
-    fprintf (f, "NAME %s %s\n", opt.modname, opt.console ? "WINDOWCOMPAT" : "WINDOWAPI");
+    fprintf (f, "NAME %s %s\n", opt.modname, opt.fullscreen ? "NOTWINDOWCOMPAT" :
+      opt.console ? "WINDOWCOMPAT" : "WINDOWAPI");
     if (opt.description)
       fprintf (f, "DESCRIPTION \"%s\"\n", opt.description);
     fprintf (f, "STACKSIZE 1048576\n");

@@ -21,7 +21,7 @@
 
 #include <stddef.h>
 #include "sysdef.h"
-#include "csinput/cseventq.h"
+#include "cssys/cseventq.h"
 
 csEventQueue::csEventQueue (size_t iLength)
   : EventQueue (NULL), Length (0), SpinLock (0)

@@ -60,8 +60,7 @@ bool csGraphics2D::Initialize (iSystem* pSystem)
     Palette [i].blue = 0;
   }
 
-  // Now try to register ourselves with system driver as being the 2D driver
-  return System->RegisterDriver ("iGraphics2D", this);
+  return true;
 }
 
 csGraphics2D::~csGraphics2D ()

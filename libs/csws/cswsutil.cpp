@@ -32,7 +32,7 @@
 #include "csutil/csstrvec.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
-#include "csinput/csinput.h"
+#include "cssys/csinput.h"
 #include "itxtmgr.h"
 
 #define MSGBOX_TEXTURE "csws::MessageBoxIcons"

@@ -90,7 +90,7 @@ bool csKeyboardAccelerator::PostHandleEvent (csEvent &Event)
     {
       csAccElement *ae = (csAccElement *)Accelerators [i];
       if ((ae->Key == Event.Key.Code)
-       && (ae->Shifts == (Event.Key.ShiftKeys & CSMASK_ALLSHIFTS)))
+       && (ae->Shifts == (Event.Key.Modifiers & CSMASK_ALLSHIFTS)))
       {
         CHK (csEvent *ev = new csEvent (ae->Event));
         app->PutEvent (ev);

@@ -25,7 +25,7 @@
 #include "cssys/system.h"
 #include "cssys/sysdriv.h"
 #include "cstools/simpcons.h"
-#include "csinput/csinput.h"
+#include "cssys/csinput.h"
 #include "csutil/csrect.h"
 #include "csutil/inifile.h"
 #include "igraph2d.h"

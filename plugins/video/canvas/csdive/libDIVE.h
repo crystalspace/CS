@@ -113,8 +113,10 @@ extern FGVideoMode *vmList;             // Pointer to an array of tVideoMode`s
 extern u_int vmCount;                   // Number of videomodes in vmList
 extern long DesktopW, DesktopH;         // Desktop width and height
 
-typedef void (*tKeyboardHandler) (void *param, unsigned char ScanCode, int Down, unsigned char RepeatCount, int ShiftFlags);
-typedef void (*tMouseHandler) (void *param, int Button, int Down, int x, int y, int ShiftFlags);
+typedef void (*tKeyboardHandler) (void *param, unsigned char ScanCode,
+  bool Down, unsigned char RepeatCount, int ShiftFlags);
+typedef void (*tMouseHandler) (void *param, int Button, bool Down,
+  int x, int y, int ShiftFlags);
 typedef void (*tTerminateHandler) (void *param);
 typedef void (*tFocusHandler) (void *param, bool Enable);
 

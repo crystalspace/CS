@@ -23,7 +23,7 @@
 #define __CSEVENTQ_H__
 
 #include "csutil/csbase.h"
-#include "csinput/csevent.h"
+#include "cssys/csevent.h"
 
 // Default event queue size
 #define DEF_EVENT_QUEUE_LENGTH  256

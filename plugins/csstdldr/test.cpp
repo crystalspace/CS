@@ -64,7 +64,7 @@ int main (int argc, char* argv[])
   printf ("Success: %d\n", ldr->Load ("/this/plugins/csstdldr/test/world.test"));
 
   delete ldr;
-  delete System;
+//  delete System;
 
   return 0;
 }

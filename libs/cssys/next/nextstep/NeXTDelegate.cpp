@@ -23,7 +23,7 @@
 #include "sysdef.h"
 #include "NeXTDelegate.h"
 #include "NeXTSystemDriver.h"
-#include "csinput/csevent.h"
+#include "cssys/csevent.h"
 extern "Objective-C" {
 #import <appkit/Application.h>
 #import <appkit/View.h>
@@ -525,7 +525,7 @@ static void timer_handler( DPSTimedEntry, double, void* data )
 	{
 	int x, y;
 	if ([self localize:p toView:v x:&x y:&y])
-	    driver->QueueMouseEvent( 0, false, x, y, 0 );
+	    driver->QueueMouseEvent( 0, false, x, y );
 	}
     }
 
@@ -535,7 +535,7 @@ static void timer_handler( DPSTimedEntry, double, void* data )
 	{
 	int x, y;
 	[self localize:p toView:v x:&x y:&y];
-	driver->QueueMouseEvent( button, false, x, y, 0 );
+	driver->QueueMouseEvent( button, false, x, y );
 	}
     }
 
@@ -545,7 +545,7 @@ static void timer_handler( DPSTimedEntry, double, void* data )
 	{
 	int x, y;
 	[self localize:p toView:v x:&x y:&y];
-	driver->QueueMouseEvent( button, true, x, y, modifiers );
+	driver->QueueMouseEvent( button, true, x, y );
 	}
     }
 

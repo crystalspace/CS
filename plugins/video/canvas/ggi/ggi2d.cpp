@@ -23,7 +23,7 @@
 #include "cs2d/ggi/ggi2d.h"
 #include "cssys/unix/iunix.h"
 #include "csutil/csrect.h"
-#include "csinput/csinput.h"
+#include "cssys/csinput.h"
 #include "isystem.h"
 
 #include <ggi/ggi.h>
@@ -50,14 +50,6 @@ bool csGraphics2DGGI::Initialize (iSystem *pSystem)
 {
   if (!csGraphics2D::Initialize (pSystem))
     return false;
-
-  UnixSystem = QUERY_INTERFACE (System, iUnixSystemDriver);
-  if (!UnixSystem)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "FATAL: The system driver does not support "
-                               "the iUnixSystemDriver interface\n");
-    return false;
-  }
 
   Font = 0;
   Memory = NULL;
@@ -156,6 +148,10 @@ bool csGraphics2DGGI::Initialize (iSystem *pSystem)
   }
 
   pfmt.complete ();
+
+  // Tell system driver to call us on every frame
+  System->CallOnEvents (this, CSMASK_Nothing);
+
   return true;
 }
 
@@ -181,9 +177,6 @@ bool csGraphics2DGGI::Open(const char *Title)
 {
   // Open your graphic interface
   if (!csGraphics2D::Open (Title)) return false;
-
-  // Set loop callback
-  UnixSystem->SetLoopCallback (ProcessEvents, this);
 
   Memory = CHK( new unsigned char [Width*Height*pfmt.PixelBytes] );
 
@@ -261,19 +254,17 @@ int csGraphics2DGGI::translate_key (ggi_event *ev)
   return -1;
 }
 
-void csGraphics2DGGI::ProcessEvents (void* Param)
+bool csGraphics2DGGI::HandleEvent (csEvent &Event)
 {
-  csGraphics2DGGI *Self = (csGraphics2DGGI *)Param;
-
   ggi_event ev;
   struct timeval tv;
 
   tv.tv_sec  = 0;
   tv.tv_usec = 0;
 
-  while (ggiEventPoll(Self->vis, GGI_EVENTS, &tv) != 0)
+  while (ggiEventPoll(vis, GGI_EVENTS, &tv) != 0)
   { 
-    ggiEventRead(Self->vis, &ev, GGI_EVENTS);
+    ggiEventRead(vis, &ev, GGI_EVENTS);
 
     switch (ev.any.type)
     {
@@ -281,17 +272,18 @@ void csGraphics2DGGI::ProcessEvents (void* Param)
       case evKeyRepeat:
       case evKeyRelease:
       {
-        int key  = Self->translate_key(&ev);
+        int key  = translate_key(&ev);
         int down = (ev.any.type != evKeyRelease);
 
         if (key >= 0)
-          Self->System->QueueKeyEvent (key, down);
+          System->QueueKeyEvent (key, down);
         break;
       }
 
       // NOTE: mouse not yet implemented...
     }
   }
+  return false;
 }
 
 void csGraphics2DGGI::Print (csRect *area)

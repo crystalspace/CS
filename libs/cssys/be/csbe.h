@@ -23,13 +23,10 @@
 
 #include "csutil/scf.h"
 #include "def.h"
-#include "csinput/csinput.h"
+#include "cssys/csinput.h"
 #include "cssys/system.h"
 #include "cssys/be/icsbe.h"
 class CrystApp;
-
-class SysKeyboardDriver : public csKeyboardDriver {};
-class SysMouseDriver : public csMouseDriver {};
 
 class SysSystemDriver : public csSystemDriver, public iBeLibSystemDriver
 {

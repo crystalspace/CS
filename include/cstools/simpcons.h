@@ -125,7 +125,7 @@ public:
   void SetMaxLines (int ml = -1);
 
   /// iConsole compatibility methods
-  virtual bool Initialize(iSystem *system) { return (system->RegisterDriver("iConsole", this)); }
+  virtual bool Initialize(iSystem *system) { return true; }
   virtual void PutText(const char *text);
   virtual const csString *GetText(int = -1) const { return NULL; } /* Not supported */
   virtual void DeleteText(int = 0, int = -1) { } /* Not supported */

@@ -320,7 +320,7 @@ const char *scfFactory::QueryDependencies ()
 //------------------------------------------------- Client SCF functions ----//
 
 // This is the registry for all class factories
-static scfClassRegistry *ClassRegistry;
+static scfClassRegistry *ClassRegistry = NULL;
 // If this bool is true, we should sort the registery
 static bool SortClassRegistry = false;
 

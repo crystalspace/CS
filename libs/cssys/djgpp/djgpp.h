@@ -23,7 +23,7 @@
 #define DJGPP_H
 
 #include "idjgpp.h"
-#include "csinput/csinput.h"
+#include "cssys/csinput.h"
 #include "cssys/system.h"
 
 /// DJGPP version.
@@ -39,45 +39,24 @@ public:
   /// Override QueryInterface to allow additional interfaces
   virtual void *QueryInterface (const char *iInterfaceID, int iVersion);
 
+  virtual bool Open (const char *Title);
+  virtual void Close ();
+
   /// Implementation of iDosSystemDriver
 
   /// Enable or disable text-mode CsPrintf
   virtual void EnablePrintf (bool Enable);
   /// Set mouse position since mouse driver is part of system driver
   virtual bool SetMousePosition (int x, int y);
-};
 
-/// DJGPP version.
-class SysKeyboardDriver : public csKeyboardDriver
-{
 private:
   bool KeyboardOpened;
-public:
-  SysKeyboardDriver ();
-  virtual ~SysKeyboardDriver ();
-
-  virtual bool Open (csEventQueue*);
-  virtual void Close ();
-};
-
-/// DJGPP version.
-class SysMouseDriver : public csMouseDriver
-{
-private:
   bool MouseOpened;
   bool MouseExists;
   float SensivityFactor;
   int mouse_sensivity_x;
   int mouse_sensivity_y;
   int mouse_sensivity_threshold;
-
-public:
-  SysMouseDriver();
-  virtual ~SysMouseDriver ();
-
-  virtual bool Open (iSystem *System, csEventQueue*);
-  virtual void Close ();
-  bool SetMousePosition (int x, int y);
 };
 
 #endif // DJGPP_H

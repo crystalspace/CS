@@ -444,12 +444,9 @@ bool csGraphics3DGlide2x::Initialize (iSystem *iSys)
 {
   (m_piSystem = iSys)->IncRef ();
 
-  if (!m_piSystem->RegisterDriver ("iGraphics3D", this))
-    return false;
-
   SysPrintf (MSG_INITIALIZATION, "\nGlideRender Glide2x selected\n");
 
-  m_piG2D = LOAD_PLUGIN (m_piSystem, GLIDE_2D_DRIVER, iGraphics2D);
+  m_piG2D = LOAD_PLUGIN (m_piSystem, GLIDE_2D_DRIVER, NULL, iGraphics2D);
   if (!m_piG2D)
     return false;
 

@@ -20,8 +20,8 @@
 #include "sysdef.h"
 #include "cs2d/beglide2/glidebe2d.h"
 #include "csutil/scf.h"
-#include "csinput/csevent.h"
-#include "csinput/csinput.h"
+#include "cssys/csevent.h"
+#include "cssys/csinput.h"
 #include "cssys/be/beitf.h"
 #include "csutil/csrect.h"
 #include "cs3d/glide2/gllib2.h"
@@ -96,9 +96,6 @@ bool csGraphics2DBeGlide::Open(const char *Title)
   BeSystem->GetMouseHandler (MouseHandler, MouseHandlerParm);
   BeSystem->GetFocusHandler (FocusHandler, FocusHandlerParm);
 	
-  // Set loop callback
-  BeSystem->SetLoopCallback (ProcessEvents, this);
-
   // Open window
   dpy = CHK (new CrystGlideView(BRect(0,0,Width-1,Height-1)));
   window = CHK (new CrystGlideWindow(BRect(32,32,Width+32,Height+32), Title, dpy, this));
@@ -158,32 +155,31 @@ void csGraphics2DBeGlide::FXgetImage()
 
 }
 
-void csGraphics2DBeGlide::ProcessEvents (void *Param)
+bool csGraphics2DBeGlide::HandleEvent (csEvent &Event)
 {
 //  static int button_mapping[6] = {0, 1, 3, 2, 4, 5};
-  csGraphics2DBeGlide *Self = (csGraphics2DBeGlide *)Param;
 #if 0
   XEvent event;
   int state, key;
   bool down;
 
-  while (XCheckMaskEvent (Self->dpy, ~0, &event))
+  while (XCheckMaskEvent (dpy, ~0, &event))
     switch (event.type)
     {
       case ButtonPress:
         state = ((XButtonEvent*)&event)->state;
-        Self->UnixSystem->MouseEvent (button_mapping[event.xbutton.button],
+        UnixSystem->MouseEvent (button_mapping[event.xbutton.button],
           true, event.xbutton.x, event.xbutton.y,
           (state & ShiftMask ? CSMASK_SHIFT : 0) |
 	  (state & Mod1Mask ? CSMASK_ALT : 0) |
 	  (state & ControlMask ? CSMASK_CTRL : 0));
           break;
       case ButtonRelease:
-        Self->UnixSystem->MouseEvent (button_mapping [event.xbutton.button],
+        UnixSystem->MouseEvent (button_mapping [event.xbutton.button],
           false, event.xbutton.x, event.xbutton.y, 0);
         break;
       case MotionNotify:
-        Self->UnixSystem->MouseEvent (0, false, event.xbutton.x, event.xbutton.y, 0);
+        UnixSystem->MouseEvent (0, false, event.xbutton.x, event.xbutton.y, 0);
         break;
       case KeyPress:
       case KeyRelease:
@@ -228,17 +224,17 @@ void csGraphics2DBeGlide::ProcessEvents (void *Param)
           case XK_F12:        key = CSKEY_F12; break;
           default:            break;
         }
-	Self->UnixSystem->KeyboardEvent (key, down);
+	UnixSystem->KeyboardEvent (key, down);
         break;
       case FocusIn:
       case FocusOut:
-        Self->UnixSystem->FocusEvent (event.type == FocusIn);
+        UnixSystem->FocusEvent (event.type == FocusIn);
         break;
       case Expose:
       {
         csRect rect (event.xexpose.x, event.xexpose.y,
 	  event.xexpose.x + event.xexpose.width, event.xexpose.y + event.xexpose.height);
-	Self->Print (&rect);
+	Print (&rect);
 	break;
       }
       default:
@@ -246,6 +242,7 @@ void csGraphics2DBeGlide::ProcessEvents (void *Param)
         break;
     }
 #endif
+  return false;
 }
 
 void csGraphics2DBeGlide::ApplyDepthInfo(color_space this_color_space)

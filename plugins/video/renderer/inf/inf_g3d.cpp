@@ -102,10 +102,7 @@ bool csGraphics3DInfinite::Initialize (iSystem *iSys)
 
   width = height = -1;
 
-  if (!System->RegisterDriver ("iGraphics3D", this))
-    return false;
-
-  G2D = LOAD_PLUGIN (System, "crystalspace.graphics2d.infinite", iGraphics2D);
+  G2D = LOAD_PLUGIN (System, "crystalspace.graphics2d.infinite", NULL, iGraphics2D);
   if (!G2D)
     return false;
 

@@ -55,4 +55,3 @@ bool csOpenGLSVGADisp::close()
   
   return true;
 }
-

@@ -18,6 +18,7 @@
 
 #include <stdarg.h>
 
+#define SYSDEF_SOFTWARE2D
 #include "sysdef.h"
 #include "qint.h"
 #include "csgeom/math2d.h"
@@ -120,27 +121,6 @@ IMPLEMENT_IBASE (csGraphics3DSoftware)
   IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
 IMPLEMENT_IBASE_END
 
-#if defined (OS_LINUX)
-static char* get_software_2d_driver ()
-{
-  if (getenv ("GGI_DISPLAY"))
-    return SOFTWARE_2D_DRIVER_GGI;
-  else if (getenv ("DISPLAY"))
-    return SOFTWARE_2D_DRIVER_XLIB;
-  else
-    return SOFTWARE_2D_DRIVER_SVGA;
-}
-#elif defined (OS_UNIX) && !defined (OS_BE)
-// by the way, other unices has SVGALib support too... through GGI ;-)
-static char* get_software_2d_driver ()
-{
-  if (getenv ("GGI_DISPLAY"))
-    return SOFTWARE_2D_DRIVER_GGI;
-  else
-    return SOFTWARE_2D_DRIVER_XLIB;
-}
-#endif
-
 csGraphics3DSoftware::csGraphics3DSoftware (iBase *iParent) : G2D (NULL)
 {
   CONSTRUCT_IBASE (iParent);
@@ -168,6 +148,7 @@ csGraphics3DSoftware::csGraphics3DSoftware (iBase *iParent) : G2D (NULL)
   smaller_buffer = NULL;
   rstate_mipmap = 0;
   do_gouraud = true;
+  Gamma = QInt16 (1.0);
 
   dbg_max_polygons_to_draw = 2000000000;        // After 2 billion polygons we give up :-)
 
@@ -189,12 +170,7 @@ csGraphics3DSoftware::csGraphics3DSoftware (iBase *iParent) : G2D (NULL)
 csGraphics3DSoftware::~csGraphics3DSoftware ()
 {
   Close ();
-  csScan_Finalize ();
-  CHK (delete texman);
-  CHK (delete [] z_buffer);
-  CHK (delete [] smaller_buffer);
-  CHK (delete [] line_table);
-  CHK (delete config;)
+  CHK (delete config);
   if (G2D) G2D->DecRef ();
   if (System) System->DecRef ();
 }
@@ -205,29 +181,23 @@ bool csGraphics3DSoftware::Initialize (iSystem *iSys)
 
   width = height = -1;
 
-  if (!System->RegisterDriver ("iGraphics3D", this))
-    return false;
-
   const char *driver = config->GetStr ("Hardware", "Driver2D", SOFTWARE_2D_DRIVER);
-  G2D = LOAD_PLUGIN (System, driver, iGraphics2D);
+  G2D = LOAD_PLUGIN (System, driver, NULL, iGraphics2D);
   if (!G2D)
     return false;
-
-  CHK (texman = new csTextureManagerSoftware (System, G2D, config));
 
 #ifdef DO_MMX
   do_mmx = config->GetYesNo ("Hardware", "MMX", true);
 #endif
   do_smaller_rendering = config->GetYesNo ("Hardware", "SMALLER", false);
   mipmap_coef = config->GetFloat ("TextureManager", "MIPMAP_COEF", 1.3);
-  SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE,
-    config->GetYesNo ("Hardware", "INTERLACING", false));
+  do_interlaced = config->GetYesNo ("Hardware", "INTERLACING", false) ? 0 : -1;
 
   const char *gamma = System->GetOptionCL ("gamma");
   if (!gamma) gamma = config->GetStr ("Hardware", "GAMMA", "1");
   float fGamma;
   sscanf (gamma, "%f", &fGamma);
-  SetRenderState (G3DRENDERSTATE_GAMMACORRECTION, QInt16 (fGamma));
+  Gamma = QInt16 (fGamma);
 
   return true;
 }
@@ -511,6 +481,9 @@ bool csGraphics3DSoftware::Open (const char *Title)
       return false;
   }
 
+  // Create the texture manager
+  CHK (texman = new csTextureManagerSoftware (System, G2D, config));
+
   int nWidth = G2D->GetWidth ();
   int nHeight = G2D->GetHeight ();
   bool bFullScreen = G2D->GetFullScreen ();
@@ -607,6 +580,10 @@ bool csGraphics3DSoftware::Open (const char *Title)
     fog_tables [i].table = NULL;
 
   ScanSetup ();
+
+  SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE, do_interlaced == 0);
+  SetRenderState (G3DRENDERSTATE_GAMMACORRECTION, Gamma);
+
   return true;
 }
 
@@ -628,6 +605,12 @@ void csGraphics3DSoftware::Close()
 
   CHK (delete tcache); tcache = NULL;
   CHK (delete clipper); clipper = NULL;
+
+  csScan_Finalize ();
+  CHK (delete texman); texman = NULL;
+  CHK (delete [] z_buffer); z_buffer = NULL;
+  CHK (delete [] smaller_buffer); smaller_buffer = NULL;
+  CHK (delete [] line_table); line_table = NULL;
 
   G2D->Close ();
   width = height = -1;
@@ -2520,6 +2503,7 @@ bool csGraphics3DSoftware::SetRenderState (G3D_RENDERSTATEOPTION op,
       do_gouraud = value;
       break;
     case G3DRENDERSTATE_GAMMACORRECTION:
+      Gamma = value;
       texman->SetGamma (value / 65536.);
       if (tcache) tcache->Clear ();
       break;
@@ -2565,7 +2549,7 @@ long csGraphics3DSoftware::GetRenderState(G3D_RENDERSTATEOPTION op)
     case G3DRENDERSTATE_GOURAUDENABLE:
       return do_gouraud;
     case G3DRENDERSTATE_GAMMACORRECTION:
-      return QInt16 (texman->Gamma);
+      return QInt16 (Gamma);
     default:
       return 0;
   }

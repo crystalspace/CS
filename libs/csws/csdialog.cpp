@@ -18,8 +18,8 @@
 */
 
 #include "sysdef.h"
-#include "csinput/csevent.h"
-#include "csinput/csinput.h"
+#include "cssys/csevent.h"
+#include "cssys/csinput.h"
 #include "csws/cswindow.h"
 #include "csws/csdialog.h"
 
@@ -102,13 +102,13 @@ bool csDialog::HandleEvent (csEvent &Event)
       switch (Event.Key.Code)
       {
         case CSKEY_TAB:
-          if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == CSMASK_SHIFT)
+          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_SHIFT)
           {
             SetFocused (PrevGroup ());
             AdjustFocused (false);
             return true;
           }
-          else if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == 0)
+          else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
           {
             SetFocused (NextGroup ());
             AdjustFocused (true);
@@ -117,7 +117,7 @@ bool csDialog::HandleEvent (csEvent &Event)
           break;
         case CSKEY_LEFT:
         case CSKEY_UP:
-          if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == 0)
+          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
           {
             SetFocused (PrevControl ());
             AdjustFocused (false);
@@ -126,7 +126,7 @@ bool csDialog::HandleEvent (csEvent &Event)
           break;
         case CSKEY_RIGHT:
         case CSKEY_DOWN:
-          if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == 0)
+          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
           {
             SetFocused (NextControl ());
             AdjustFocused (true);
@@ -134,7 +134,7 @@ bool csDialog::HandleEvent (csEvent &Event)
           }
           break;
         case CSKEY_ENTER:
-          if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == 0)
+          if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
           {
             csComponent *def = GetDefault ();
             if (def->SendCommand (cscmdActivate, NULL) != def)

@@ -20,7 +20,7 @@
 #include "sysdef.h"
 #include "csutil/csstrvec.h"
 #include "csutil/scanstr.h"
-#include "csinput/csevent.h"
+#include "cssys/csevent.h"
 #include "csws/csmouse.h"
 #include "csws/csapp.h"
 

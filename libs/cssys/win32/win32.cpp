@@ -25,15 +25,12 @@
 #include "igraph3d.h"
 
 // Sets up graphics drivers -- Assumes DirectX 5 or later & DirectDraw 3D
-// 3/30/2000 -- PEG
 #include "cssys/win32/DirectDetection.h"
 #include "cs2d/ddraw/ig2d.h"
 
 #include <windows.h>
 #include <windowsx.h>
 
-// More DirectX 5 or later related stuff
-// 3/30/2000 -- PEG
 #include <ddraw.h>
 
 // Use new DirectInput keyboard handling by Xavier Trochu (xtrochu@yahoo.com)?
@@ -104,17 +101,6 @@ void SysSystemDriver::Close(void)
   ChangeDisplaySettings(NULL,0);
 }
 
-////The Keyboard Driver////////////////
-
-SysKeyboardDriver::SysKeyboardDriver() : csKeyboardDriver ()
-{
-}
-
-SysKeyboardDriver::~SysKeyboardDriver(void)
-{
-  Close();
-}
-
 #ifdef DO_DINPUT_KEYBOARD
 
 /*
@@ -145,39 +131,44 @@ static int s_KeyTable[257]=
   CSKEY_HOME,CSKEY_UP,CSKEY_PGUP,0,CSKEY_LEFT,0,CSKEY_RIGHT,0,CSKEY_END,CSKEY_DOWN,CSKEY_PGDN,CSKEY_INS,CSKEY_DEL
 };
 
-// This macro is for COM calls. If it fails, it shows a MessageBox then Kills the whole process. It's brutal, but as I use another thread, it's safer this way
-#define CHK_FAILED(x)  { if(FAILED(x)) { ::MessageBox(::GetFocus(), #x " Failed!", NULL,MB_OK|MB_ICONERROR); ::ExitProcess(1); } }
+// This macro is for COM calls. If it fails, it shows a MessageBox then
+// kills the whole process. It's brutal, but as I use another thread,
+// it's safer this way
+#define CHK_FAILED(x) \
+  { if(FAILED(x)) { MessageBox(NULL, #x " Failed!", NULL,MB_OK|MB_ICONERROR); ::ExitProcess(1); } }
 // This macro is for COM Release calls
-#define CHK_RELEASE(x)  { if((x) != NULL) { (x)->Release(); (x)=NULL; } }
+#define CHK_RELEASE(x) \
+  { if((x) != NULL) { (x)->Release(); (x)=NULL; } }
 
 /*
- * The thread entry point. Called by CsKeyboardDriver::Open()
- *
-*/
+ * The thread entry point. Called by ::Open()
+ */
 
 #define AUTOREPEAT_WAITTIME 1000 // 1 seconde
 #define AUTOREPEAT_TIME      100 // 10 keystroke/seconds
 
-DWORD WINAPI s_threadroutine(LPVOID param)
+DWORD WINAPI s_threadroutine (LPVOID param)
 {
-  SysKeyboardDriver * kbd=(SysKeyboardDriver*)param;
+  iSystem *System = (iSystem *)param;
   HRESULT hr;
-  DWORD dwWait=INFINITE;
-  char * buffer;
-  int lastkey=-1;
+  DWORD dwWait = INFINITE;
+  char *buffer;
+  int i,lastkey = -1;
 #ifndef DI_USEGETDEVICEDATA
-  char *oldbuffer=NULL;
+  char *oldbuffer = NULL;
 #else
 #endif
-  LPDIRECTINPUT lpdi=NULL;
-  LPDIRECTINPUTDEVICE lpKbd=NULL; 
-  HANDLE hEvent[2];
-  int i;
+  LPDIRECTINPUT lpdi = NULL;
+  LPDIRECTINPUTDEVICE lpKbd = NULL; 
+  HANDLE hEvent [2];
 
-  CHK_FAILED(::DirectInputCreate(ModuleHandle, 0X300, &lpdi, NULL));  // 0X300 instead of DIRECTINPUT_VERSION allow the binaries to stay compatible with NT4
-  CHK_FAILED(lpdi->CreateDevice(GUID_SysKeyboard, &lpKbd, NULL));
-  CHK_FAILED(lpKbd->SetDataFormat(&c_dfDIKeyboard)); 
-  CHK_FAILED(lpKbd->SetCooperativeLevel(::FindWindow(WINDOWCLASSNAME,NULL), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE)); 
+  // Use 0x0300 instead of DIRECTINPUT_VERSION
+  // to allow the binaries run under NT4 (which has just DX3)
+  CHK_FAILED (DirectInputCreate (ModuleHandle, 0x0300, &lpdi, NULL));
+  CHK_FAILED (lpdi->CreateDevice (GUID_SysKeyboard, &lpKbd, NULL));
+  CHK_FAILED (lpKbd->SetDataFormat (&c_dfDIKeyboard)); 
+  CHK_FAILED (lpKbd->SetCooperativeLevel (FindWindow (WINDOWCLASSNAME, NULL),
+    DISCL_FOREGROUND | DISCL_NONEXCLUSIVE)); 
 #ifdef DI_USEGETDEVICEDATA
   {
     DIPROPDWORD dpd;
@@ -187,240 +178,204 @@ DWORD WINAPI s_threadroutine(LPVOID param)
     dpd.diph.dwHow=DIPH_DEVICE;
     dpd.dwData=10; // The size of the buffer (should be more than sufficient)
 #if DIRECTINPUT_VERSION < 0x0700
-  CHK_FAILED(lpKbd->SetProperty(DIPROP_BUFFERSIZE,&dpd));
+    CHK_FAILED (lpKbd->SetProperty (DIPROP_BUFFERSIZE, &dpd));
 #else 
-  //For incomprehensible reason, SetProperty() parameters type has
-  //changed between DX6.1 and DX7 SDK
-  CHK_FAILED(lpKbd->SetProperty(DIPROP_BUFFERSIZE,&dpd.diph));
+    //For incomprehensible reason, SetProperty() parameters type has
+    //changed between DX6.1 and DX7 SDK
+    CHK_FAILED (lpKbd->SetProperty (DIPROP_BUFFERSIZE, &dpd.diph));
 #endif
-
   }
 #endif
-  hEvent[0]=::CreateEvent(NULL,FALSE,FALSE,NULL);
-  if(hEvent[0]==NULL)
+  hEvent [0] = CreateEvent (NULL, FALSE, FALSE, NULL);
+  if (hEvent [0] == NULL)
   {
-    ::MessageBox(::GetFocus(), "CreateEvent() Failed!", NULL,MB_OK|MB_ICONERROR);
-    ::ExitProcess(1);
+    MessageBox (NULL, "CreateEvent() Failed!", NULL, MB_OK|MB_ICONERROR);
+    ExitProcess (1);
   }
-  if(!::DuplicateHandle(::GetCurrentProcess(),kbd->m_hEvent,
-             ::GetCurrentProcess(),&hEvent[1],
-             0,FALSE,DUPLICATE_SAME_ACCESS))
+  if (!DuplicateHandle (GetCurrentProcess(), kbd->m_hEvent, GetCurrentProcess (),
+        &hEvent [1], 0, FALSE, DUPLICATE_SAME_ACCESS))
   {
-    ::MessageBox(::GetFocus(), "DuplicateEvent() Failed!", NULL,MB_OK|MB_ICONERROR);
-    ::ExitProcess(1);
-  }
-  hr=lpKbd->SetEventNotification(hEvent[0]);
-  switch(hr) {
-  case DI_OK:
-    break;
-  default:
-    ::MessageBox(::GetFocus(), "lpKbd->SetEventNotification(hEvent) Failed!", NULL,MB_OK|MB_ICONERROR);
-    ::ExitProcess(1);
-    break;
+    MessageBox (NULL, "DuplicateEvent() Failed!", NULL, MB_OK|MB_ICONERROR);
+    ExitProcess (1);
   }
 
-  while(1)
+  hr = lpKbd->SetEventNotification (hEvent [0]);
+  switch (hr)
   {
-    hr=lpKbd->Acquire();
-    if(SUCCEEDED(hr))
+    case DI_OK:
       break;
-    if(WaitForSingleObject(hEvent[1],0)==WAIT_OBJECT_0+1)
+    default:
+      MessageBox (NULL, "lpKbd->SetEventNotification(hEvent) Failed!", NULL,
+        MB_OK|MB_ICONERROR);
+      ExitProcess (1);
+      break;
+  }
+
+  while (1)
+  {
+    hr = lpKbd->Acquire ();
+    if (SUCCEEDED (hr))
+      break;
+    if (WaitForSingleObject (hEvent [1], 0) == WAIT_OBJECT_0 + 1)
     {
-      CloseHandle(hEvent[0]);
-      CloseHandle(hEvent[1]);
-      CHK_RELEASE(lpKbd);
-      CHK_RELEASE(lpdi);
+      CloseHandle (hEvent [0]);
+      CloseHandle (hEvent [1]);
+      CHK_RELEASE (lpKbd);
+      CHK_RELEASE (lpdi);
 #ifndef DI_USEGETDEVICEDATA
-      if(oldbuffer) delete[] oldbuffer;
+      if (oldbuffer) delete[] oldbuffer;
 #endif
       return 0;
     }
   }
 
 #ifndef DI_USEGETDEVICEDATA
-  oldbuffer=new char[256];
-  hr=lpKbd->GetDeviceState(256,oldbuffer);
+  oldbuffer = new char [256];
+  hr = lpKbd->GetDeviceState (256, oldbuffer);
 #endif
-  while(1) {
-    switch(::WaitForMultipleObjects(2,hEvent,FALSE,dwWait))
+  while (1)
+  {
+    switch (WaitForMultipleObjects (2, hEvent, FALSE, dwWait))
     {
-    case WAIT_OBJECT_0:
+      case WAIT_OBJECT_0:
 #ifndef DI_USEGETDEVICEDATA
-      buffer=new char[256];
-      do {
-        hr=lpKbd->GetDeviceState(256,buffer);
-        switch(hr)
+        buffer = new char [256];
+        do
         {
-        case DIERR_NOTACQUIRED:
-        case DIERR_INPUTLOST:
-          lpKbd->Acquire();
-          break;
-        case DI_OK:
-          break;
-        default:
-          ::MessageBox(::GetFocus(), "lpKbd->GetDeviceState(hEvent) Failed!", NULL,MB_OK|MB_ICONERROR);
-          ::ExitProcess(1);
-          break;
-        }
-      } while(hr!=DI_OK);
-      for(i=0;i<256;i++)
-        if(oldbuffer[i]!=buffer[i])
-        {
-          if(buffer[i]&0X80) {
-            lastkey=i;
-            dwWait=AUTOREPEAT_WAITTIME;
-            kbd->do_keypress(SysGetTime(),s_KeyTable[i]);
-          } else {
-            dwWait=INFINITE;
-            lastkey=-1;
-            kbd->do_keyrelease(SysGetTime(),s_KeyTable[i]);
+          hr = lpKbd->GetDeviceState (256, buffer);
+          switch (hr)
+          {
+            case DIERR_NOTACQUIRED:
+            case DIERR_INPUTLOST:
+              lpKbd->Acquire ();
+              break;
+            case DI_OK:
+              break;
+            default:
+              MessageBox (NULL, "lpKbd->GetDeviceState(hEvent) Failed!",
+                NULL, MB_OK|MB_ICONERROR);
+              ExitProcess (1);
+              break;
           }
-          break;
-        }
-      delete[] oldbuffer;
-      oldbuffer=buffer;
+        } while (hr != DI_OK);
+        for (i = 0; i < 256; i++)
+          if (oldbuffer [i] != buffer [i])
+          {
+            if (buffer [i] & 0X80)
+            {
+              lastkey = i;
+              dwWait = AUTOREPEAT_WAITTIME;
+              System->QueueKeyEvent (s_KeyTable [i], true);
+            }
+            else
+            {
+              lastkey = -1;
+              dwWait = INFINITE;
+              System->QueueKeyEvent (s_KeyTable[i], false);
+            }
+            break;
+          }
+        delete [] oldbuffer;
+        oldbuffer = buffer;
 #else
-      DIDEVICEOBJECTDATA  * lpdidod;
-      DWORD dwNb;
-      do {
-        dwNb=INFINITE;
-        hr=lpKbd->GetDeviceData(sizeof(DIDEVICEOBJECTDATA),NULL,&dwNb,DIGDD_PEEK);
-        switch(hr)
+        DIDEVICEOBJECTDATA *lpdidod;
+        DWORD dwNb;
+        do
         {
-        case DIERR_NOTACQUIRED:
-        case DIERR_INPUTLOST:
-          lpKbd->Acquire();
-          break;
-        case DI_OK:
-          break;
-        case DI_BUFFEROVERFLOW:
-          hr=DI_OK;
-          break;
-        default:
-          ::MessageBox(::GetFocus(), "lpKbd->GetDeviceState(hEvent) Failed!", NULL,MB_OK|MB_ICONERROR);
-          ::ExitProcess(1);
-          break;
-        }
-      } while(hr!=DI_OK);
-      if(!dwNb)
-        continue;
-      lpdidod=new DIDEVICEOBJECTDATA[dwNb];
-      CHK_FAILED(lpKbd->GetDeviceData(sizeof(DIDEVICEOBJECTDATA),lpdidod,&dwNb,0));
-      for(i=0;i<dwNb;i++)
-      {
-        if(lpdidod[i].dwData&0X80)
+          dwNb = INFINITE;
+          hr = lpKbd->GetDeviceData (sizeof (DIDEVICEOBJECTDATA), NULL, &dwNb,DIGDD_PEEK);
+          switch(hr)
+          {
+            case DIERR_NOTACQUIRED:
+            case DIERR_INPUTLOST:
+              lpKbd->Acquire ();
+              break;
+            case DI_OK:
+              break;
+            case DI_BUFFEROVERFLOW:
+              hr = DI_OK;
+              break;
+            default:
+              MessageBox(NULL, "lpKbd->GetDeviceState(hEvent) Failed!",
+                NULL, MB_OK|MB_ICONERROR);
+              ExitProcess (1);
+              break;
+          }
+        } while (hr != DI_OK);
+        if (!dwNb)
+          continue;
+        lpdidod = new DIDEVICEOBJECTDATA [dwNb];
+        CHK_FAILED (lpKbd->GetDeviceData (sizeof (DIDEVICEOBJECTDATA),
+          lpdidod, &dwNb, 0));
+        for (i = 0; i < dwNb; i++)
         {
-          lastkey=lpdidod[i].dwOfs;
-          dwWait=AUTOREPEAT_WAITTIME:
-          kbd->do_keypress(SysGetTime(),s_KeyTable[lpdidod[i].dwOfs]);
-        } else {
-          dwWait=INFINITE;
-          lastkey=-1;
-          kbd->do_keyrelease(SysGetTime(),s_KeyTable[lpdidod[i].dwOfs]);
+          if (lpdidod [i].dwData & 0X80)
+          {
+            lastkey = lpdidod [i].dwOfs;
+            dwWait = AUTOREPEAT_WAITTIME:
+            System->QueueKeyEvent (s_KeyTable [lpdidod [i].dwOfs], true);
+          }
+          else
+          {
+            lastkey = -1;
+            dwWait = INFINITE;
+            System->QueueKeyEvent (s_KeyTable [lpdidod [i].dwOfs], false);
+          }
         }
-      }
-      delete[] lpdidod;
+        delete[] lpdidod;
 #endif
-      break;
-    case WAIT_TIMEOUT:  // HANDLE key autorepeat
-      buffer=new char[256];
-      do {
-        hr=lpKbd->GetDeviceState(256,buffer);
-        switch(hr)
+        break;
+      case WAIT_TIMEOUT:  // HANDLE key autorepeat
+        buffer = new char [256];
+        do
         {
-        case DIERR_NOTACQUIRED:
-        case DIERR_INPUTLOST:
-          lpKbd->Acquire();
-          break;
-        case DI_OK:
-          break;
-        default:
-          ::MessageBox(::GetFocus(), "lpKbd->GetDeviceState(hEvent) Failed!", NULL,MB_OK|MB_ICONERROR);
-          ::ExitProcess(1);
-          break;
+          hr = lpKbd->GetDeviceState (256, buffer);
+          switch (hr)
+          {
+            case DIERR_NOTACQUIRED:
+            case DIERR_INPUTLOST:
+              lpKbd->Acquire ();
+              break;
+            case DI_OK:
+              break;
+            default:
+              MessageBox (NULL, "lpKbd->GetDeviceState(hEvent) Failed!",
+                NULL, MB_OK|MB_ICONERROR);
+              ExitProcess (1);
+              break;
+          }
+        } while (hr != DI_OK);
+        // The lastkey is still pressed
+        if ((lastkey >= 0) && (buffer [lastkey] & 0X80))
+        {
+          dwWait = AUTOREPEAT_TIME;
+          System->QueueKeyEvent (s_KeyTable [lastkey], true);
         }
-      } while(hr!=DI_OK);
-      if((lastkey>=0)&&(buffer[lastkey]&0X80)) // The lastkey is still pressed
-      {
-        dwWait=AUTOREPEAT_TIME;
-        kbd->do_keypress(SysGetTime(),s_KeyTable[lastkey]);
-      } else { // Strange.. we didn't get the message that the key was released !
-        dwWait=INFINITE;
-        lastkey=-1;
-      }
-      delete[] buffer;
-      break;
-    case WAIT_OBJECT_0+1:
-      lpKbd->Unacquire();
-      CloseHandle(hEvent[0]);
-      CloseHandle(hEvent[1]);
-      CHK_RELEASE(lpKbd);
-      CHK_RELEASE(lpdi);
+        else
+        { // Strange.. we didn't get the message that the key was released !
+          lastkey = -1;
+          dwWait = INFINITE;
+        }
+        delete [] buffer;
+        break;
+      case WAIT_OBJECT_0 + 1:
+        lpKbd->Unacquire ();
+        CloseHandle (hEvent [0]);
+        CloseHandle (hEvent [1]);
+        CHK_RELEASE (lpKbd);
+        CHK_RELEASE (lpdi);
 #ifndef DI_USEGETDEVICEDATA
-      if(oldbuffer) delete[] oldbuffer;
+        if (oldbuffer)
+          delete [] oldbuffer;
 #endif
-      return 0;
+        return 0;
     }
   }
 }
 
 #undef CHK_RELEASE
 #undef CHK_FAILED
-#endif  // DO_DINPUT_KEYBOARD
-
-bool SysKeyboardDriver::Open(csEventQueue *EvQueue)
-{
-  csKeyboardDriver::Open (EvQueue);
-#ifdef DO_DINPUT_KEYBOARD
-  DWORD dwThreadId;
-  m_hEvent=::CreateEvent(NULL,FALSE,FALSE,NULL);
-  m_hThread=::CreateThread(NULL,0,s_threadroutine,this,0,&dwThreadId);
-  if(m_hEvent==NULL||m_hThread==NULL)
-  {
-  ::MessageBox(::GetFocus(), "CreateEvent() Failed!", NULL,MB_OK|MB_ICONERROR);
-  ::ExitProcess(1);
-  }
-#endif
-  return true;
-}
-
-void SysKeyboardDriver::Close (void)
-{
-#ifdef DO_DINPUT_KEYBOARD
- if(m_hEvent)
- {
-  ::SetEvent(m_hEvent);
-  ::CloseHandle(m_hEvent);
-  m_hEvent = NULL;
-  ::WaitForSingleObject(m_hThread,1000);
-  ::CloseHandle(m_hThread);
-  m_hThread = NULL;
- }
-#endif
-}
-
-//------------------------------------------------// The Mouse Driver //------//
-
-SysMouseDriver::SysMouseDriver() : csMouseDriver ()
-{
-}
-
-SysMouseDriver::~SysMouseDriver(void)
-{
-  Close();
-}
-
-bool SysMouseDriver::Open(csEventQueue *EvQueue)
-{
-  csMouseDriver::Open (System, EvQueue);
-  return true;
-}
-
-void SysMouseDriver::Close()
-{
-}
-
-// The System driver ////////////////
+#endif // DO_DINPUT_KEYBOARD
 
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
@@ -442,6 +397,40 @@ void *SysSystemDriver::QueryInterface (const char *iInterfaceID, int iVersion)
 {
   IMPLEMENTS_INTERFACE_COMMON (iWin32SystemDriver, (iWin32SystemDriver *)this)
   return csSystemDriver::QueryInterface (iInterfaceID, iVersion);
+}
+
+bool SysSystemDriver::Open (const char *Title)
+{
+  if (!csSystemDriver::Open (Title))
+    return false;
+
+  csKeyboardDriver::Open (EvQueue);
+#ifdef DO_DINPUT_KEYBOARD
+  DWORD dwThreadId;
+  m_hEvent = CreateEvent (NULL, FALSE, FALSE, NULL);
+  m_hThread = CreateThread (NULL, 0, s_threadroutine, this, 0, &dwThreadId);
+  if (!m_hEvent || !m_hThread)
+  {
+    MessageBox (NULL, "CreateEvent() Failed!", NULL, MB_OK|MB_ICONERROR);
+    ExitProcess (1);
+  }
+#endif
+  return true;
+}
+
+void SysSystemDriver::Close ()
+{
+#ifdef DO_DINPUT_KEYBOARD
+  if (m_hEvent)
+  {
+    SetEvent (m_hEvent);
+    CloseHandle (m_hEvent);
+    m_hEvent = NULL;
+    WaitForSingleObject (m_hThread, 1000);
+    CloseHandle (m_hThread);
+    m_hThread = NULL;
+  }
+#endif
 }
 
 void SysSystemDriver::Loop ()
@@ -480,19 +469,19 @@ void SysSystemDriver::Loop ()
   }
 }
 
-//----------------------------------------------// COM Implementation //------//
+//----------------------------------------------// SCF Implementation //------//
 
-HINSTANCE SysSystemDriver::GetInstance() const
+HINSTANCE SysSystemDriver::GetInstance () const
 {
   return ModuleHandle;
 }
 
-bool SysSystemDriver::GetIsActive() const
+bool SysSystemDriver::GetIsActive () const
 {
   return ApplicationActive;
 }
 
-int SysSystemDriver::GetCmdShow() const
+int SysSystemDriver::GetCmdShow () const
 {
   return ApplicationShow;
 }
@@ -500,160 +489,103 @@ int SysSystemDriver::GetCmdShow() const
 //----------------------------------------// Windows input translator //------//
 
 #ifndef DO_DINPUT_KEYBOARD
-void WinKeyTrans(csSystemDriver* pSystemDriver, WPARAM wParam, 
-  bool /*shift*/, bool /*alt*/, bool /*ctrl*/, bool down)
+void WinKeyTrans (csSystemDriver* pSystemDriver, WPARAM wParam, bool down)
 {
-  if(pSystemDriver)
+  if (!pSystemDriver)
+    return;
+
+  int key = 0;
+  switch (wParam)
   {
-    switch(wParam)
-    {
-    case VK_END:
-      if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_END) ;
-      else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_END) ;
-      break;
-    case VK_UP:
-      if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_UP) ;
-      else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_UP) ;
-      break;
-    case VK_DOWN:
-      if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_DOWN) ;
-      else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_DOWN) ;
-      break;
-    case VK_LEFT:
-      if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_LEFT) ;
-      else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_LEFT) ;
-      break;
-    case VK_RIGHT:
-      if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_RIGHT) ;
-      else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_RIGHT) ;
-      break;
-    case VK_PRIOR:
-      if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_PGUP) ;
-      else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_PGUP) ;
-      break;
-    case VK_NEXT:
-      if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_PGDN) ;
-      else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_PGDN) ;
-      break;
-    case VK_MENU:
-      if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_ALT) ;
-      else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_ALT) ;
-      break;
-    case VK_CONTROL:
-      if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_CTRL) ;
-      else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_CTRL) ;
-      break;
-    case VK_SHIFT:
-      if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_SHIFT) ;
-      else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_SHIFT);
-      break;
-    }
+    case VK_END:     key = CSKEY_END;
+    case VK_UP:      key = CSKEY_UP;
+    case VK_DOWN:    key = CSKEY_DOWN;
+    case VK_LEFT:    key = CSKEY_LEFT;
+    case VK_RIGHT:   key = CSKEY_RIGHT;
+    case VK_PRIOR:   key = CSKEY_PGUP;
+    case VK_NEXT:    key = CSKEY_PGDN;
+    case VK_MENU:    key = CSKEY_ALT;
+    case VK_CONTROL: key = CSKEY_CTRL;
+    case VK_SHIFT:   key = CSKEY_SHIFT;
   }
+  if (key && System)
+    System->QueueKeyEvent (key, down);
 }
 #endif
 
 long FAR PASCAL WindowProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
-#ifndef DO_DINPUT_KEYBOARD
-  bool shift=false, ctrl=false;
-  
-  if(GetAsyncKeyState(VK_CONTROL)) ctrl=true;
-  if(GetAsyncKeyState(VK_SHIFT)) shift=true;
-#endif
-  
-  switch( message )
+  switch (message)
   {
-  case WM_ACTIVATEAPP:
-    ApplicationActive = wParam;
-    break;
-
-  case WM_ACTIVATE:
-    if (System) System->Keyboard->Reset ();
-    break;
-
-  case WM_SETCURSOR:
-    if(LOWORD(lParam) == HTCLIENT)
-    {
-      SetCursor((HCURSOR)GetWindowLong(hWnd,0));
-      return TRUE;
-    } 
-    break;
-
-  case WM_CREATE:
-    SetWindowLong(hWnd,0,(LONG)LoadCursor(NULL,IDC_CROSS));
-    break;
-   
-  case WM_DESTROY:
-    PostQuitMessage( 0 );
-    break;
-
+    case WM_ACTIVATEAPP:
+      ApplicationActive = wParam;
+      break;
+    case WM_ACTIVATE:
+      if (System) System->Keyboard->Reset ();
+      break;
+    case WM_SETCURSOR:
+      if (LOWORD(lParam) == HTCLIENT)
+      {
+        SetCursor((HCURSOR)GetWindowLong(hWnd,0));
+        return TRUE;
+      } 
+      break;
+    case WM_CREATE:
+      SetWindowLong (hWnd, 0, (LONG)LoadCursor (NULL, IDC_CROSS));
+      break;
+    case WM_DESTROY:
+      PostQuitMessage (0);
+      break;
 #ifndef DO_DINPUT_KEYBOARD
-  case WM_CHAR:
-    if(System)
-    {
-      if (wParam == '\r') wParam = CSKEY_ENTER;
-        System->Keyboard->do_keypress (SysGetTime (), wParam) ;
-        System->Keyboard->do_keyrelease (SysGetTime (), wParam) ;
-    }
-    break;
-    
-  case WM_KEYDOWN:
-    WinKeyTrans(System, wParam, shift, false, ctrl, true);
-    if(wParam==VK_MENU) return 0;
-    break;
-    
-  case WM_SYSKEYDOWN:
-    WinKeyTrans(System, wParam, shift, true, ctrl, true);
-    if(wParam==VK_MENU) return 0;
-    break;
-    
-  case WM_KEYUP:
-    WinKeyTrans(System, wParam, shift, false, ctrl, false);
-    if(wParam==VK_MENU) return 0;
-    break;
-    
-  case WM_SYSKEYUP:
-    WinKeyTrans(System, wParam, shift, true, ctrl, false);
-    if(wParam==VK_MENU) return 0;
-    break;
+    case WM_CHAR:
+      if(System)
+      {
+        if (wParam == '\r') wParam = CSKEY_ENTER;
+        System->QueueKeyEvent (wParam, true);
+        System->QueueKeyEvent (wParam, false);
+      }
+      break;
+    case WM_KEYDOWN:
+    case WM_SYSKEYDOWN:
+      WinKeyTrans (System, wParam, true);
+      if (wParam == VK_MENU) return 0;
+      break;
+    case WM_KEYUP:
+    case WM_SYSKEYUP:
+      WinKeyTrans (System, wParam, false);
+      if (wParam == VK_MENU) return 0;
+      break;
 #endif
-    
-  case WM_LBUTTONDOWN:
-    if (System)
-      System->Mouse->do_buttonpress(SysGetTime (), 1, LOWORD(lParam), HIWORD(lParam), wParam & MK_SHIFT , GetAsyncKeyState(VK_MENU), wParam & MK_CONTROL);
-    break;
-    
-  case WM_LBUTTONUP:
-    if (System)
-      System->Mouse->do_buttonrelease(SysGetTime (), 1, LOWORD(lParam), HIWORD(lParam));
-    break;
-    
-  case WM_MBUTTONDOWN:
-    if (System)
-      System->Mouse->do_buttonpress(SysGetTime (), 3, LOWORD(lParam), HIWORD(lParam), wParam & MK_SHIFT , GetAsyncKeyState(VK_MENU), wParam & MK_CONTROL);
-    break;
-    
-  case WM_MBUTTONUP:
-    if (System)
-      System->Mouse->do_buttonrelease(SysGetTime (), 3, LOWORD(lParam), HIWORD(lParam));
-    break;
-    
-  case WM_RBUTTONDOWN:
-    if (System)
-      System->Mouse->do_buttonpress(SysGetTime (), 2, LOWORD(lParam), HIWORD(lParam), wParam & MK_SHIFT , GetAsyncKeyState(VK_MENU), wParam & MK_CONTROL);
-    break;
-    
-  case WM_RBUTTONUP:
-    if (System)
-      System->Mouse->do_buttonrelease(SysGetTime (), 2, LOWORD(lParam), HIWORD(lParam));
-    break;
-    
-  case WM_MOUSEMOVE:
-    if (System)
-      System->Mouse->do_mousemotion(SysGetTime (), LOWORD(lParam), HIWORD(lParam));
-    break;
+    case WM_LBUTTONDOWN:
+      if (System)
+        System->QueueMouseEvent (1, true, LOWORD(lParam), HIWORD(lParam));
+      break;
+    case WM_LBUTTONUP:
+      if (System)
+        System->QueueMouseEvent (1, false, LOWORD(lParam), HIWORD(lParam));
+      break;
+    case WM_MBUTTONDOWN:
+      if (System)
+        System->QueueMouseEvent (3, true, LOWORD(lParam), HIWORD(lParam));
+      break;
+    case WM_MBUTTONUP:
+      if (System)
+        System->QueueMouseEvent (3, false, LOWORD(lParam), HIWORD(lParam));
+      break;
+    case WM_RBUTTONDOWN:
+      if (System)
+        System->QueueMouseEvent (2, true, LOWORD(lParam), HIWORD(lParam));
+      break;
+    case WM_RBUTTONUP:
+      if (System)
+        System->QueueMouseEvent (2, false, LOWORD(lParam), HIWORD(lParam));
+      break;
+    case WM_MOUSEMOVE:
+      if (System)
+        System->QueueMouseEvent (0, false, LOWORD(lParam), HIWORD(lParam));
+      break;
   }
-  return DefWindowProc(hWnd, message, wParam, lParam);
+  return DefWindowProc (hWnd, message, wParam, lParam);
 }
 
 #undef main

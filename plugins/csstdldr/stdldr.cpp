@@ -25,6 +25,7 @@
 #include "sysdef.h"
 #include "stdldr.h"
 #include "stdparse.h"
+#include "qint.h"
 #include "cssys/csendian.h"
 #include "csutil/csvector.h"
 #include "csutil/util.h"
@@ -33,6 +34,7 @@
 #include "isystem.h"
 #include "iworld.h"
 #include "ivfs.h"
+#include "ipolygon.h"
 
 // This character, if encountered, is considered to start either a keyword
 // or a non-quoted string. Having too much symbols here can hurt since these
@@ -217,7 +219,7 @@ bool csStandardLoader::Load (const char *iName)
     system->Printf (MSG_FATAL_ERROR, "Failed to load file '%s'!\n", iName);
     return false;
   }
-  bool rc = (yyparse (this) == 0);
+  bool rc = (yyparse () == 0);
   yydone ();
 
   // Free the token data
@@ -235,7 +237,7 @@ bool csStandardLoader::Load (const char *iName)
 
 bool csStandardLoader::Parse (char *iData)
 {
-  size_t size;
+  size_t size = strlen (iData);
   csTokenList tl = Tokenize (iData, size);
   if (!tl) return false;
 
@@ -244,26 +246,37 @@ bool csStandardLoader::Parse (char *iData)
     free (tl);
     return false;
   }
-  bool rc = (yyparse (this) == 0);
+  bool rc = (yyparse () == 0);
   yydone ();
 
   free (tl);
   return rc;
 }
 
-csTokenList csStandardLoader::Tokenize (char *iData, size_t &oSize)
+csTokenList csStandardLoader::Tokenize (char *iData, size_t &ioSize)
 {
-  csTokenList output = (csTokenList)malloc (oSize = 256);
+  // Statistic says us that output is usually a bit less than
+  // 1/2 of the original ASCII text size
+  size_t inputSize = ioSize; ioSize /= 4;
+  char *inputData = iData;
+  csTokenList output = (csTokenList)malloc (ioSize);
   int cur = sizeof (long) * 2, prev = -1, prevprev = -1;
 
   if (!lineoffs) lineoffs = new csVector ();
   if (!strings) strings = new csStringList ();
 
-#define ENSURE(size)					\
-  if (cur + size > oSize)				\
-  {							\
-    while (cur + size > oSize) oSize += 256;		\
-    output = (csTokenList)realloc (output, oSize);	\
+#define ENSURE(size)							\
+  if (cur + (size) > ioSize)						\
+  {									\
+    /* Try to predict how much we'll need */				\
+    size_t predict_size = QRound ((iData <= inputData) ? 0 :		\
+      (double (cur) * double (inputSize)) / double (iData - inputData));\
+    size_t min_size = ioSize + (size);					\
+    if (min_size < ioSize + 256)					\
+      min_size = ioSize + 256;						\
+    if (predict_size < min_size)					\
+      predict_size = min_size;						\
+    output = (csTokenList)realloc (output, ioSize = predict_size);	\
   }
 
   line = 1;
@@ -452,16 +465,16 @@ csTokenList csStandardLoader::Tokenize (char *iData, size_t &oSize)
     }
 
     // Compress all sequential equal tokens into one
-    if (prev
+    bool equal = (prev
      && ((output [prev] & TOKEN_MASK) == outtoken)
-     && (TOKEN_COUNT_GET (output [prev]) < TOKEN_COUNT_MAX))
-    {
-      ENSURE (datasize);
+     && (TOKEN_COUNT_GET (output [prev]) < TOKEN_COUNT_MAX));
+
+    ENSURE (datasize + (equal & 1) ^ 1);
+
+    if (equal)
       TOKEN_COUNT_INC (output [prev]);
-    }
     else
     {
-      ENSURE (1 + datasize);
       prevprev = prev;
       prev = cur;
       output [cur++] = outtoken;
@@ -481,10 +494,16 @@ csTokenList csStandardLoader::Tokenize (char *iData, size_t &oSize)
   // Put the string table at the end of token table
   set_le_long (output, PARSER_VERSION);
   set_le_long (output + sizeof (long), cur);
-  for (int i = 0; i < strings->Length (); i++)
+
+  int i; size_t total_len = 0;
+  for (i = 0; i < strings->Length (); i++)
+    total_len += strlen (strings->Get (i)) + 1;
+
+  ENSURE (total_len);
+
+  for (i = 0; i < strings->Length (); i++)
   {
     size_t len = strlen (strings->Get (i)) + 1;
-    ENSURE (len);
     memcpy (output + cur, strings->Get (i), len);
     cur += len;
   }
@@ -492,7 +511,7 @@ csTokenList csStandardLoader::Tokenize (char *iData, size_t &oSize)
   strings = NULL;
 
   line = -1;
-  oSize = cur;
+  ioSize = cur;
 
   return output;
 }
@@ -742,20 +761,16 @@ bool csStandardLoader::CreateKey (const char *name, const char *value)
   return world->CreateKey (name, value);
 }
 
-bool csStandardLoader::PlaneMode (csPPlaneMode mode)
+static bool CheckFlags (int mode)
 {
-  if ((storage.plane.mode != pmNONE)
-   && (storage.plane.mode != mode)
-   && !(storage.plane.mode == pmFIRSTSECOND && mode == pmVECTORS))
-  {
-    yyerror ("invalid plane definition");
+  // Check for incompatible combinations
+  int x1 = mode & (pmORIGIN | pmMATRIX);
+  int x2 = mode & (pmFIRSTSECOND | pmMATRIX | pmVECTORS | pmPLANEREF);
+
+  if ((x1 && !IsPowerOf2 (x1))
+   || (x2 && !IsPowerOf2 (x2)))
     return false;
-  }
-  if (storage.plane.mode != mode)
-  {
-    storage.plane.first_len = storage.plane.second_len = 0.0;
-    storage.plane.mode = mode;
-  }
+
   return true;
 }
 
@@ -763,7 +778,14 @@ bool csStandardLoader::CreatePlane (const char *name)
 {
   if (!name)
   {
-    yyerror ("unnamed planes not allowed in global context");
+    yyerror ("unnamed texture planes not allowed in global context");
+    return false;
+  }
+
+  // Check for incompatible combinations
+  if (!CheckFlags (storage.plane.mode))
+  {
+    yyerror ("invalid texture plane definition");
     return false;
   }
 
@@ -772,41 +794,107 @@ bool csStandardLoader::CreatePlane (const char *name)
   csVector3 &s = (csVector3 &)storage.plane.second;
   csMatrix3 &m = (csMatrix3 &)storage.plane.matrix;
 
-  switch (storage.plane.mode)
+  if (storage.plane.mode == pmNONE)
   {
-    case pmNONE:
-      yyerror ("empty plane definition");
+    yyerror ("empty plane definition");
+    return false;
+  }
+
+  if (storage.plane.mode & (pmFIRSTSECOND | pmVECTORS))
+  {
+    if (!(storage.plane.mode & pmORIGIN))
+    {
+      yyerror ("no texture plane origin defined");
       return false;
-    case pmFIRSTSECOND:
-    case pmVECTORS:
-      if (storage.plane.first_len == 0.0)
+    }
+    if (storage.plane.first_len == 0.0)
+    {
+      yyerror ("no FIRST vector defined");
+      return false;
+    }
+    if (storage.plane.second_len == 0.0)
+    {
+      yyerror ("no SECOND vector defined");
+      return false;
+    }
+    if (storage.plane.mode & pmFIRSTSECOND)
+    {
+      f -= o; s -= o;
+      float fact = storage.plane.first_len / f.Norm ();
+      f *= fact;
+      fact = storage.plane.second_len / s.Norm ();
+      s *= fact;
+    }
+
+    csVector3 z = f % s;
+    m.Set (f.x, s.x, z.x,
+           f.y, s.y, z.y,
+           f.z, s.z, z.z);
+  }
+
+  return world->CreatePlane (name, o, m);
+}
+
+bool csStandardLoader::CreateTexturePlane (iPolygon3D *iPolygon)
+{
+  // Check for incompatible combinations
+  if (!CheckFlags (polygon.mode))
+  {
+    yyerror ("invalid texture plane definition");
+    return false;
+  }
+
+  if (polygon.mode == pmNONE)
+  {
+    yyerror ("empty plane definition");
+    return false;
+  }
+
+  if (polygon.mode & (pmFIRSTSECOND | pmMATRIX | pmVECTORS))
+  {
+    csVector3 &o = (csVector3 &)polygon.origin;
+    csVector3 &f = (csVector3 &)polygon.first;
+    csVector3 &s = (csVector3 &)polygon.second;
+    csMatrix3 &m = (csMatrix3 &)polygon.matrix;
+
+    if (polygon.mode & (pmFIRSTSECOND | pmVECTORS))
+    {
+      if (!(storage.plane.mode & pmORIGIN))
+      {
+        yyerror ("no texture plane origin defined");
+        return false;
+      }
+      if (polygon.first_len == 0.0)
       {
         yyerror ("no FIRST vector defined");
         return false;
       }
-      if (storage.plane.second_len == 0.0)
+      if (polygon.second_len == 0.0)
       {
         yyerror ("no SECOND vector defined");
         return false;
       }
-      if (storage.plane.mode == pmFIRSTSECOND)
+      if (polygon.mode & pmFIRSTSECOND)
       {
         f -= o; s -= o;
-        float fact = storage.plane.first_len / f.Norm ();
+        float fact = polygon.first_len / f.Norm ();
         f *= fact;
-        fact = storage.plane.second_len / s.Norm ();
+        fact = polygon.second_len / s.Norm ();
         s *= fact;
       }
-      {
-        csVector3 z = f % s;
-        m.Set (f.x, s.x, z.x,
-               f.y, s.y, z.y,
-               f.z, s.z, z.z);
-      }
-      break;
-    case pmMATRIX:
-      break;
-  }
 
-  return world->CreatePlane (name, o, m);
+      csVector3 z = f % s;
+      m.Set (f.x, s.x, z.x,
+             f.y, s.y, z.y,
+             f.z, s.z, z.z);
+    }
+    iPolygon->CreatePlane (o, m);
+  }
+  else if (polygon.mode & pmPLANEREF)
+    if (!iPolygon->SetPlane (polygon.planetpl))
+    {
+      yyerror ("unknown texture plane name");
+      return false;
+    }
+  return true;
 }

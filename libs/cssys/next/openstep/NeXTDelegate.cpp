@@ -23,7 +23,7 @@
 #include "sysdef.h"
 #include "NeXTDelegate.h"
 #include "NeXTSystemDriver.h"
-#include "csinput/csevent.h"
+#include "cssys/csevent.h"
 extern "Objective-C" {
 #import <AppKit/NSApplication.h>
 #import <AppKit/NSCursor.h>
@@ -465,7 +465,7 @@ enum
 	{
 	int x, y;
 	if ([self localize:p toView:v x:&x y:&y])
-	    driver->QueueMouseEvent( 0, false, x, y, 0 );
+	    driver->QueueMouseEvent( 0, false, x, y );
 	}
     }
 
@@ -475,7 +475,7 @@ enum
 	{
 	int x, y;
 	[self localize:p toView:v x:&x y:&y];
-	driver->QueueMouseEvent( button, false, x, y, 0 );
+	driver->QueueMouseEvent( button, false, x, y );
 	}
     }
 
@@ -485,7 +485,7 @@ enum
 	{
 	int x, y;
 	[self localize:p toView:v x:&x y:&y];
-	driver->QueueMouseEvent( button, true, x, y, modifiers );
+	driver->QueueMouseEvent( button, true, x, y );
 	}
     }
 

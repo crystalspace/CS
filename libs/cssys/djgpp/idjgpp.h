@@ -28,8 +28,6 @@ SCF_VERSION (iDosSystemDriver, 0, 0, 1);
 
 struct iDosSystemDriver : public iBase
 {
-  /// Enable or disable text-mode CsPrintf
-  virtual void EnablePrintf (bool Enable) = 0;
   /// Set mouse position since mouse driver is part of system driver
   virtual bool SetMousePosition (int x, int y) = 0;
 };

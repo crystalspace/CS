@@ -232,9 +232,9 @@ void SysKeyboardDriver::GenerateEvents()
   {
     unsigned char c = keyboard_queue [keyboard_queue_tail];
     if (c < 0x80)
-      do_keypress (ScancodeToChar[c]);
+      do_press (ScancodeToChar[c]);
     else
-      do_keyrelease (ScancodeToChar[c & 0x7f]);
+      do_release (ScancodeToChar[c & 0x7f]);
     keyboard_queue_tail = (keyboard_queue_tail + 1) & KEYBOARD_QUEUE_MASK;
   }
 }
@@ -280,17 +280,14 @@ void SysMouseDriver::GenerateEvents ()
   while (mouse_queue_head != mouse_queue_tail)
   {
     if (mouse_queue [mouse_queue_tail].button == 0)
-      do_mousemotion (mouse_queue [mouse_queue_tail].x,
+      do_motion (mouse_queue [mouse_queue_tail].x,
         mouse_queue [mouse_queue_tail].y);
     else if (mouse_queue [mouse_queue_tail].down)
-      do_buttonpress (mouse_queue [mouse_queue_tail].button,
+      do_press (mouse_queue [mouse_queue_tail].button,
         mouse_queue [mouse_queue_tail].x,
-        mouse_queue [mouse_queue_tail].y,
-        System->Keyboard->Key.shift,
-        System->Keyboard->Key.alt,
-        System->Keyboard->Key.ctrl);
+        mouse_queue [mouse_queue_tail].y);
     else
-      do_buttonrelease (mouse_queue [mouse_queue_tail].button,
+      do_release (mouse_queue [mouse_queue_tail].button,
         mouse_queue [mouse_queue_tail].x,
         mouse_queue [mouse_queue_tail].y);
   }

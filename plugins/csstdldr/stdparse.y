@@ -27,14 +27,20 @@
 
 #include "iworld.h"
 #include "itxtmgr.h"
-
-#define YYPARSE_PARAM ldr
-#define THIS	((csStandardLoader *)ldr)
-#define yyerror THIS->yyerror
-#define yylex   THIS->yylex
+#include "isector.h"
+#include "ipolyset.h"
+#include "ipolygon.h"
 
 /* Define this to debug parser */
 //#define YYDEBUG	1
+
+/* yyparse is a member function */
+#define yyparse csStandardLoader::yyparse
+
+/* Provide detailed info about parse errors */
+#define YYERROR_VERBOSE	1
+/* Avoid some "signed vs unsigned comparison" warnings */
+#define sizeof	(int)sizeof
 
 // Macros for accessing yylval as different data types
 #define CSCOLOR(x)	(*(csColor *)&x)
@@ -42,13 +48,25 @@
 #define CSVECTOR3(x)	(*(csVector3 *)&x)
 
 // More shortcuts
-#define STORAGE		THIS->storage
-#define TEX		THIS->storage.tex
-#define CAMERA		THIS->storage.camera
-#define PLANE		THIS->storage.plane
+#define TEX		storage.tex
+#define CAMERA		storage.camera
+#define PLANE		storage.plane
+#define SECTOR		storage.sector
 
-#define ABORTMSG \
-  { yyerror ("syntax error, loading aborted"); YYABORT; }
+#define ABORTMSG							\
+  { yyerror ("loading error, aborting"); YYABORT; }
+
+#define YYERROR_EXTENDED(msg)						\
+  if (yychar == STRING)							\
+  {									\
+    msg = (char *) realloc(msg, size += 14 + strlen (yylval.string));	\
+    sprintf (strchr (msg, 0), " (value = `%s')", yylval.string);	\
+  }									\
+  else if (yychar == NUMBER)						\
+  {									\
+    msg = (char *) realloc(msg, size += 14 + 20);			\
+    sprintf (strchr (msg, 0), " (value = `%g')", yylval.fval);		\
+  }
 
 %} /* Definition for all tokens */
 
@@ -101,12 +119,9 @@
 */
 %token KW_ACTION
 %token KW_ACTIVATE
-%token KW_ACTIVE
 %token KW_ADD
 %token KW_ALPHA
 %token KW_ATTENUATION
-%token KW_BECOMING_ACTIVE
-%token KW_BECOMING_INACTIVE
 %token KW_BEZIER
 %token KW_CAMERA
 %token KW_CENTER
@@ -144,7 +159,6 @@
 %token KW_LIBRARY
 %token KW_LIGHT
 %token KW_LIGHTING
-%token KW_LIGHTX
 %token KW_LIMB
 %token KW_MATRIX
 %token KW_MERGE_NORMALS
@@ -163,8 +177,6 @@
 %token KW_POLYGON
 %token KW_PORTAL
 %token KW_POSITION
-%token KW_PRIMARY_ACTIVE
-%token KW_PRIMARY_INACTIVE
 %token KW_RADIUS
 %token KW_ROT
 %token KW_ROT_X
@@ -176,8 +188,6 @@
 %token KW_SCALE_Z
 %token KW_SCRIPT
 %token KW_SECOND
-%token KW_SECONDARY_ACTIVE
-%token KW_SECONDARY_INACTIVE
 %token KW_SECOND_LEN
 %token KW_SECTOR
 %token KW_SKELETON
@@ -188,7 +198,6 @@
 %token KW_SPRITE2D
 %token KW_START
 %token KW_STATBSP
-%token KW_STATELESS
 %token KW_STATIC
 %token KW_TEMPLATE
 %token KW_TERRAIN
@@ -255,10 +264,10 @@
 
 input:
   KW_WORLD name '('
-  { THIS->world->SelectLibrary (STORAGE.cur_library = $2); }
+  { world->SelectLibrary (storage.cur_library = $2); }
   world_ops ')'
 | KW_LIBRARY name '('
-  { THIS->world->SelectLibrary (STORAGE.cur_library = $2); }
+  { world->SelectLibrary (storage.cur_library = $2); }
   world_ops ')'
 ;
 
@@ -272,37 +281,54 @@ world_ops:
 world_op:
   KW_TEXTURES '(' textures ')'
 | KW_TEX_SET name '('
-  { STORAGE.tex_prefix = $2; }
+  { storage.tex_prefix = $2; }
   textures ')'
-  { STORAGE.tex_prefix = NULL; }
+  { storage.tex_prefix = NULL; }
 | KW_LIBRARY '(' STRING ')'
-  { if (!THIS->RecursiveLoad ($3)) YYABORT; }
+  { if (!RecursiveLoad ($3)) YYABORT; }
 | KW_SOUNDS '(' sounds ')'
   { printf ("SOUNDS\n"); }
 | KW_START '(' STRING ',' vector ')'
   {
-    if (!THIS->world->CreateCamera ("Start", $3,
+    if (!world->CreateCamera ("Start", $3,
       (csVector3 &)$5, csVector3 (0, 0, 1), csVector3 (0, 1, 0)))
       YYABORT;
   }
 | KW_CAMERA name '('
-  { THIS->InitCamera ($2); }
+  { InitCamera ($2); }
   camera_ops ')'
-  { if (!THIS->CreateCamera ()) YYABORT; }
+  { if (!CreateCamera ()) YYABORT; }
 | KW_PLANE name '('
-  { PLANE.mode = pmNONE; }
+  {
+    PLANE.mode = pmNONE;
+    polygon.first_len = polygon.second_len = 0.0;
+  }
   plane_ops ')'
-  { if (!THIS->CreatePlane ($2)) YYABORT; }
-| KW_SECTOR name '(' sector_ops ')'
-  { printf ("SECTOR [%s]\n", $2); }
+  { if (!CreatePlane ($2)) YYABORT; }
+| KW_SECTOR name '('
+  {
+    SECTOR.sector = world->CreateSector ($2);
+    SECTOR.polyset = QUERY_INTERFACE (SECTOR.sector, iPolygonSet);
+    if (!SECTOR.polyset)
+    {
+      SECTOR.sector->DecRef ();
+      yyerror ("engine created an invalid iSector object!");
+      YYABORT;
+    }
+    SECTOR.texname = NULL;
+    SECTOR.texlen = 1.0;
+  }
+  sector_ops ')'
+  {
+    SECTOR.polyset->DecRef ();
+    SECTOR.sector->DecRef ();
+  }
 | KW_KEY name '(' STRING ')'
-  { if (!THIS->CreateKey ($2, $4)) YYABORT; }
+  { if (!CreateKey ($2, $4)) YYABORT; }
 | KW_COLLECTION name '(' collection_ops ')'
   { printf ("COLLECTION [%s]\n", $2); }
 | KW_SCRIPT name '(' STRING ':' STRING ')'
   { printf ("SCRIPT '%s' (%s: %s)\n", $2, $4, $6); }
-| KW_LIGHTX name '(' lightx_ops ')'
-  { printf ("LIGHTX [%s]\n", $2); }
 | KW_THING name '(' thing_tpl_ops ')'
   { printf ("THING_tpl [%s]\n", $2); }
 | KW_SPRITE name '(' sprite_tpl_ops ')'
@@ -318,9 +344,9 @@ textures:
 
 texture:
   KW_TEXTURE name '('
-  { THIS->InitTexture ($2); }
+  { InitTexture ($2); }
   texture_ops ')'
-  { if (!THIS->CreateTexture ()) ABORTMSG; }
+  { if (!CreateTexture ()) ABORTMSG; }
 ;
 
 texture_ops:
@@ -392,15 +418,21 @@ sector_ops:
 
 sector_op:
   KW_VERTEX '(' vector ')'
-  { printf ("VERTEX (%g,%g,%g)\n", $3.x, $3.y, $3.z); }
-| KW_POLYGON '(' polygon_ops ')'
-  { printf ("POLYGON (...)\n"); }
+  { SECTOR.polyset->CreateVertex (CSVECTOR3 ($3)); }
+| KW_POLYGON name '('
+  {
+    SECTOR.polygon = SECTOR.polyset->CreatePolygon ($2);
+    polygon.texlen = SECTOR.texlen;
+  }
+  polygon_ops ')'
+  {
+    if (!CreateTexturePlane (SECTOR.polygon)) YYABORT;
+    SECTOR.polygon->DecRef ();
+  }
 | KW_TEXNR '(' STRING ')'
-  { printf ("TEXNR ('%s')\n", $3); }
+  { SECTOR.texname = $3; }
 | KW_TEXLEN '(' NUMBER ')'
-  { printf ("TEXLEN (%g)\n", $3); }
-| KW_LIGHTX '(' STRING ')'
-  { printf ("LIGHTX ('%s')\n", $3); }
+  { SECTOR.texlen = $3; }
 | KW_ACTIVATE '(' STRING ')'
   { printf ("ACTIVATE (%s)\n", $3); }
 | KW_TRIGGER '(' STRING ',' STRING ')'
@@ -462,51 +494,82 @@ plane_ops:
 plane_op:
   KW_ORIG '(' vect_idx ')'
   {
-    if (!THIS->PlaneMode (pmFIRSTSECOND)) YYABORT;
+    PLANE.mode |= pmORIGIN;
     PLANE.origin.Set ($3);
   }
 | KW_FIRST '(' vect_idx ')'
   {
-    if (!THIS->PlaneMode (pmFIRSTSECOND)) YYABORT;
+    PLANE.mode |= pmFIRSTSECOND;
     PLANE.first.Set ($3);
   }
 | KW_SECOND '(' vect_idx ')'
   {
-    if (!THIS->PlaneMode (pmFIRSTSECOND)) YYABORT;
+    PLANE.mode |= pmFIRSTSECOND;
     PLANE.second.Set ($3);
   }
 | KW_FIRST_LEN '(' NUMBER ')'
   {
-    if (!THIS->PlaneMode (pmFIRSTSECOND)) YYABORT;
+    PLANE.mode |= pmFIRSTSECOND;
     PLANE.first_len = $3;
   }
 | KW_SECOND_LEN '(' NUMBER ')'
   {
-    if (!THIS->PlaneMode (pmFIRSTSECOND)) YYABORT;
+    PLANE.mode |= pmFIRSTSECOND;
     PLANE.second_len = $3;
   }
 | KW_UVEC '(' vector ')'
   {
-    if (!THIS->PlaneMode (pmVECTORS)) YYABORT;
+    PLANE.mode |= pmVECTORS;
     PLANE.first = $3;
     PLANE.first_len = 1.0;
   }
 | KW_VVEC '(' vector ')'
   {
-    if (!THIS->PlaneMode (pmVECTORS)) YYABORT;
+    PLANE.mode |= pmVECTORS;
     PLANE.second = $3;
     PLANE.second_len = 1.0;
   }
 | KW_MATRIX '(' matrix ')'
   {
-    if (!THIS->PlaneMode (pmMATRIX)) YYABORT;
+    PLANE.mode |= pmMATRIX;
     PLANE.matrix.Set (*$3);
   }
 | KW_V '(' vector ')'
   {
-    if (!THIS->PlaneMode (pmMATRIX)) YYABORT;
+    PLANE.mode |= pmMATRIX;
     PLANE.origin.Set ($3);
   }
+;
+
+/*--------*/
+
+light_ops:
+  light_op
+| light_ops light_op
+;
+
+light_op:
+  vector ':' NUMBER color NUMBER
+  /* <pos> <radius> <color> <dynamic-flag> */
+  { printf ("<pos> <radius> <color> <dynamic-flag>\n"); }
+| KW_CENTER '(' vector ')'
+  { printf ("CENTER (...)\n"); }
+| KW_RADIUS '(' NUMBER ')'
+  { printf ("RADIUS (%g)\n", $3); }
+| KW_DYNAMIC noargs
+  { printf ("DYNAMIC ()\n"); }
+| KW_COLOR '(' color ')'
+  { printf ("COLOR ( ... )\n"); }
+| KW_HALO '(' NUMBER NUMBER ')'
+  { printf ("HALO (%g,%g)\n", $3, $4); }
+| KW_ATTENUATION '(' attenuation_op ')'
+;
+
+attenuation_op:
+  KW_none
+| KW_linear
+| KW_inverse
+| KW_realistic
 ;
 
 /*--------*/
@@ -531,30 +594,6 @@ collection_op:
 
 /*--------*/
 
-lightx_ops:
-  /* empty */
-| lightx_ops lightx_op
-;
-
-lightx_op:
-  KW_ACTIVE '(' NUMBER ')'		{ printf ("ACTIVE (%g)\n", $3); }
-| KW_STATELESS '(' NUMBER ')'		{ printf ("STATELESS (%g)\n", $3); }
-| KW_PRIMARY_ACTIVE '(' NUMBER NUMBER NUMBER NUMBER NUMBER ')'
-  { printf ("PRIMARY_ACTIVE (%g,%g,%g,%g,%g)\n", $3, $4, $5, $6, $7); }
-| KW_SECONDARY_ACTIVE '(' NUMBER NUMBER NUMBER NUMBER NUMBER ')'
-  { printf ("SECONDARY_ACTIVE (%g,%g,%g,%g,%g)\n", $3, $4, $5, $6, $7); }
-| KW_BECOMING_ACTIVE '(' NUMBER NUMBER NUMBER NUMBER NUMBER ')'
-  { printf ("BECOMING_ACTIVE (%g,%g,%g,%g,%g)\n", $3, $4, $5, $6, $7); }
-| KW_PRIMARY_INACTIVE '(' NUMBER NUMBER NUMBER NUMBER NUMBER ')'
-  { printf ("PRIMARY_INACTIVE (%g,%g,%g,%g,%g)\n", $3, $4, $5, $6, $7); }
-| KW_SECONDARY_INACTIVE '(' NUMBER NUMBER NUMBER NUMBER NUMBER ')'
-  { printf ("SECONDARY_INACTIVE (%g,%g,%g,%g,%g)\n", $3, $4, $5, $6, $7); }
-| KW_BECOMING_INACTIVE '(' NUMBER NUMBER NUMBER NUMBER NUMBER ')'
-  { printf ("BECOMING_INACTIVE (%g,%g,%g,%g,%g)\n", $3, $4, $5, $6, $7); }
-;
-
-/*--------*/
-
 thing_tpl_ops:
   thing_tpl_op
 | thing_tpl_ops thing_tpl_op
@@ -569,8 +608,6 @@ thing_tpl_op:
   { printf ("TEXNR (%s)\n", $3); }
 | KW_TEXLEN '(' NUMBER ')'
   { printf ("TEXLEN (%g)\n", $3); }
-| KW_LIGHTX '(' STRING ')'
-  { printf ("LIGHTX ('%s')\n", $3); }
 | KW_MOVE '(' move ')'
   { printf ("MOVE ()\n"); }
 | KW_FOG '(' color NUMBER ')'
@@ -612,6 +649,8 @@ thing_op:
 | KW_FILE '(' STRING ')'
   { printf ("FILE ('%s')\n", $3); }
 ;
+
+/*--------*/
 
 bezier_ops:
   bezier_op
@@ -756,13 +795,16 @@ name:
 
 /* Yes or no - the result is a boolean */
 yesno:
-  KW_yes				{ $$ = true; }
-| KW_no					{ $$ = false; }
+  KW_yes
+  { $$ = true; }
+| KW_no
+  { $$ = false; }
 ;
 
 /* The definition of a color - red, green, blue from 0 to 1 */
 color:
-  NUMBER NUMBER NUMBER			{ CSCOLOR ($$).Set ($1, $2, $3); }
+  NUMBER NUMBER NUMBER
+  { CSCOLOR ($$).Set ($1, $2, $3); }
 ;
 
 /* Simply a vector */
@@ -791,17 +833,17 @@ matrix:
   NUMBER NUMBER NUMBER
   NUMBER NUMBER NUMBER			/* Matrix defined by nine numbers */
   {
-    $$ = &STORAGE.matrix2;
+    $$ = &storage.matrix2;
     $$->Set ($1, $2, $3, $4, $5, $6, $7, $8, $9);
   }
 | NUMBER				/* Uniform matrix scaler */
   {
-    $$ = &STORAGE.matrix2;
+    $$ = &storage.matrix2;
     $$->Set ($1, 0, 0, 0, $1, 0, 0, 0, $1);
   }
 | /* Initialize matrix to identity before starting any complex defs */
   {
-    $$ = &STORAGE.matrix2;
+    $$ = &storage.matrix2;
     $$->Identity ();
   }
   matrix_ops
@@ -814,23 +856,23 @@ matrix_ops:
 
 matrix_op:
   KW_IDENTITY noargs			/* Load identity matrix */
-  { STORAGE.matrix2.Identity (); }
+  { storage.matrix2.Identity (); }
 | KW_ROT_X '(' NUMBER ')'		/* Rotate around OX */
-  { STORAGE.matrix2 *= csXRotMatrix3 ($3); }
+  { storage.matrix2 *= csXRotMatrix3 ($3); }
 | KW_ROT_Y '(' NUMBER ')'		/* Rotate around OY */
-  { STORAGE.matrix2 *= csYRotMatrix3 ($3); }
+  { storage.matrix2 *= csYRotMatrix3 ($3); }
 | KW_ROT_Z '(' NUMBER ')'		/* Rotate around OZ */
-  { STORAGE.matrix2 *= csZRotMatrix3 ($3); }
+  { storage.matrix2 *= csZRotMatrix3 ($3); }
 | KW_SCALE '(' NUMBER ')'		/* Uniform matrix scaler */
-  { STORAGE.matrix2 *= $3; }
+  { storage.matrix2 *= $3; }
 | KW_SCALE '(' NUMBER NUMBER NUMBER ')'	/* Scalers for X/Y/Z individually */
-  { STORAGE.matrix2 *= csMatrix3 ($3, 0, 0, 0, $4, 0, 0, 0, $5); }
+  { storage.matrix2 *= csMatrix3 ($3, 0, 0, 0, $4, 0, 0, 0, $5); }
 | KW_SCALE_X '(' NUMBER ')'		/* Scale related to YOZ */
-  { STORAGE.matrix2 *= csXScaleMatrix3 ($3); }
+  { storage.matrix2 *= csXScaleMatrix3 ($3); }
 | KW_SCALE_Y '(' NUMBER ')'		/* Scale related to XOZ */
-  { STORAGE.matrix2 *= csYScaleMatrix3 ($3); }
+  { storage.matrix2 *= csYScaleMatrix3 ($3); }
 | KW_SCALE_Z '(' NUMBER ')'		/* Scale related to XOY */
-  { STORAGE.matrix2 *= csYScaleMatrix3 ($3); }
+  { storage.matrix2 *= csYScaleMatrix3 ($3); }
 ;
 
 noargs:
@@ -841,7 +883,7 @@ noargs:
 /* MOVE ( ... ) operator (used in things/sprites/etc) */
 move:
   {
-    $$ = &STORAGE;
+    $$ = &storage;
     $$->matrix.Identity ();
     $$->matrix_valid = false;
     $$->vector_valid = false;
@@ -857,13 +899,13 @@ move_ops:
 move_op:
   KW_MATRIX '(' matrix ')'
   {
-    STORAGE.matrix = *$3;
-    STORAGE.matrix_valid = true;
+    storage.matrix = *$3;
+    storage.matrix_valid = true;
   }
 | KW_V '(' vector ')'
   {
-    STORAGE.vector = CSVECTOR3 ($3);
-    STORAGE.vector_valid = true;
+    storage.vector = CSVECTOR3 ($3);
+    storage.vector_valid = true;
   }
 ;
 
@@ -875,11 +917,16 @@ polygon_ops:
 
 polygon_op:
   KW_TEXNR '(' STRING ')'
-  { printf ("TEXNR ('%s')\n", $3); }
+  { polygon.texname = $3; }
 | KW_LIGHTING '(' yesno ')'
   { printf ("LIGHTING (%d)\n", $3); }
-| KW_TEXTURE '(' polygon_texture_ops ')'
-  { printf ("TEXTURE (...)\n"); }
+| KW_TEXTURE '('
+  {
+    polygon.mode = pmNONE;
+    polygon.first_len = polygon.second_len = polygon.texlen;
+  }
+  polygon_texture_ops ')'
+  {  }
 | KW_VERTICES '(' vertex_indices ')'
   { printf ("VERTICES (...)\n"); }
 | KW_GOURAUD noargs
@@ -902,8 +949,6 @@ polygon_op:
   { printf ("PORTAL (%s)\n", $3); }
 | KW_WARP '(' warp_ops ')'
   { printf ("WARP (...)\n"); }
-| KW_LIGHTX '(' STRING ')'
-  { printf ("LIGHTX ('%s')\n", $3); }
 ;
 
 colors:
@@ -955,54 +1000,60 @@ polygon_texture_ops:
 ;
 
 polygon_texture_op:
-  KW_ORIG '(' vect_idx ')'		{ printf ("ORIG (%g, %g, %g)\n", $3.x, $3.y, $3.z); }
-| KW_FIRST '(' vect_idx ')'		{ printf ("FIRST (%g, %g, %g)\n", $3.x, $3.y, $3.z); }
-| KW_SECOND '(' vect_idx ')'		{ printf ("SECOND (%g, %g, %g)\n", $3.x, $3.y, $3.z); }
-| KW_FIRST_LEN '(' NUMBER ')'		{ printf ("FIRST_LEN (%g)\n", $3); }
-| KW_SECOND_LEN '(' NUMBER ')'		{ printf ("SECOND_LEN (%g)\n", $3); }
-| KW_UVEC '(' vector ')'		{ printf ("UVEC (%g, %g, %g)\n", $3.x, $3.y, $3.z); }
-| KW_VVEC '(' vector ')'		{ printf ("VVEC (%g, %g, %g)\n", $3.x, $3.y, $3.z); }
+  KW_ORIG '(' vect_idx ')'
+  {
+    polygon.mode |= pmORIGIN;
+    polygon.origin.Set ($3);
+  }
+| KW_FIRST '(' vect_idx ')'
+  {
+    polygon.mode |= pmFIRSTSECOND;
+    polygon.first.Set ($3);
+  }
+| KW_SECOND '(' vect_idx ')'
+  {
+    polygon.mode |= pmFIRSTSECOND;
+    polygon.second.Set ($3);
+  }
+| KW_FIRST_LEN '(' NUMBER ')'
+  {
+    polygon.mode |= pmFIRSTSECOND;
+    polygon.first_len = $3;
+  }
+| KW_SECOND_LEN '(' NUMBER ')'
+  {
+    polygon.mode |= pmFIRSTSECOND;
+    polygon.second_len = $3;
+  }
+| KW_UVEC '(' vector ')'
+  {
+    polygon.mode |= pmVECTORS;
+    polygon.first = $3;
+    polygon.first_len = 1.0;
+  }
+| KW_VVEC '(' vector ')'
+  {
+    polygon.mode |= pmVECTORS;
+    polygon.second = $3;
+    polygon.second_len = 1.0;
+  }
 | KW_MATRIX '(' matrix ')'
   {
-    printf ("MATRIX (\n  %g, %g, %g\n  %g, %g, %g\n  %g, %g, %g\n)\n",
-    $3->m11, $3->m12, $3->m13, $3->m21, $3->m22, $3->m21, $3->m31, $3->m32, $3->m33);
+    polygon.mode |= pmMATRIX;
+    polygon.matrix.Set (*$3);
   }
-| KW_V '(' vector ')'			{ printf ("V (%g, %g, %g)\n", $3.x, $3.y, $3.z); }
-| KW_TEXLEN '(' NUMBER ')'
-  { printf ("TEXLEN (%g)\n", $3); }
+| KW_V '(' vector ')'
+  {
+    polygon.mode |= pmMATRIX;
+    polygon.origin.Set ($3);
+  }
 | KW_PLANE '(' STRING ')'
-  { printf ("PLANE ('%s')\n", $3); }
+  {
+    polygon.mode |= pmPLANEREF;
+    polygon.planetpl = $3;
+  }
 | KW_UV_SHIFT '(' vector2 ')'
   { printf ("UV_SHIFT (%g, %g)\n", $3.x, $3.y); }
-;
-
-light_ops:
-  light_op
-| light_ops light_op
-;
-
-light_op:
-  vector ':' NUMBER color NUMBER
-  /* <pos> <radius> <color> <dynamic-flag> */
-  { printf ("<pos> <radius> <color> <dynamic-flag>\n"); }
-| KW_CENTER '(' vector ')'
-  { printf ("CENTER (...)\n"); }
-| KW_RADIUS '(' NUMBER ')'
-  { printf ("RADIUS (%g)\n", $3); }
-| KW_DYNAMIC noargs
-  { printf ("DYNAMIC ()\n"); }
-| KW_COLOR '(' color ')'
-  { printf ("COLOR ( ... )\n"); }
-| KW_HALO '(' NUMBER NUMBER ')'
-  { printf ("HALO (%g,%g)\n", $3, $4); }
-| KW_ATTENUATION '(' attenuation_op ')'
-;
-
-attenuation_op:
-  KW_none
-| KW_linear
-| KW_inverse
-| KW_realistic
 ;
 
 %% /* End of grammar */

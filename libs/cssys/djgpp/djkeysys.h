@@ -29,7 +29,7 @@
 #ifndef __DJKEYSYS_H__
 #define __DJKEYSYS_H__
 
-/// Simple keyboard handling helper class for SysKeyboardDriver
+/// Simple keyboard handling helper class
 class KeyboardHandler
 {
 public:

@@ -91,10 +91,7 @@ bool csSoundRenderSoftware::Initialize (iSystem *iSys)
 
 	m_piSystem = iSys;
 
-	if (!iSys->RegisterDriver ("iSoundRender", this))
-		return false;
-
-	m_piSoundDriver = LOAD_PLUGIN (iSys, szSoundDriver, iSoundDriver);
+	m_piSoundDriver = LOAD_PLUGIN (iSys, szSoundDriver, NULL, iSoundDriver);
   
 	if ( NULL == m_piSoundDriver )
 	{	

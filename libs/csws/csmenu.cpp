@@ -24,7 +24,7 @@
 #include "csws/cscomp.h"
 #include "csws/csmenu.h"
 #include "csws/csapp.h"
-#include "csinput/csinput.h"
+#include "cssys/csinput.h"
 
 // Menu texture name
 #define MENU_TEXTURE_NAME       "csws::Menu"
@@ -219,7 +219,7 @@ bool csMenuItem::HandleEvent (csEvent &Event)
     case csevKeyDown:
       // Check hot key
       if ((underline_pos >= 0)
-       && ((Event.Key.ShiftKeys & CSMASK_CTRL) == 0)
+       && ((Event.Key.Modifiers & CSMASK_CTRL) == 0)
        && (UPPERCASE (Event.Key.Code) == UPPERCASE (text [underline_pos])))
       {
         Press ();
@@ -790,8 +790,8 @@ bool csMenu::PreHandleEvent (csEvent &Event)
   {
     // if we aren't active, and ALT is not pressed,
     // or Ctrl is pressed, skip this event
-    if (((Event.Key.ShiftKeys & CSMASK_ALT) == 0)
-     || (Event.Key.ShiftKeys & CSMASK_CTRL))
+    if (((Event.Key.Modifiers & CSMASK_ALT) == 0)
+     || (Event.Key.Modifiers & CSMASK_CTRL))
       return false;
     // Cycle through all menu items, checking for hotkey
     if (ForEach (do_forall, &Event))

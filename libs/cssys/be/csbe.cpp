@@ -149,19 +149,14 @@ void CrystApp::MessageReceived(BMessage* m)
 void CrystApp::queueMouseEvent(int button, bool down, BPoint where)
 {
   if (where.x >= 0 && where.y >= 0)
-  {
-    driver->QueueMouseEvent(button, down, where.x, where.y,
-      (shift_down ? CSMASK_SHIFT : 0) |
-      (alt_down   ? CSMASK_ALT   : 0) |
-      (ctrl_down  ? CSMASK_CTRL  : 0));
-  }
+    driver->QueueMouseEvent (button, down, where.x, where.y);
 }
 
 void CrystApp::checkMouseMoved()
 {
   if (mouse_moved)
   {
-    queueMouseEvent(0, false, mouse_point);
+    queueMouseEvent (0, false, mouse_point);
     mouse_moved = false;
   }
 }
@@ -175,7 +170,7 @@ void CrystApp::checkButton(int button, int32 buttons, int32 mask, BPoint where)
     {
       button_state[button] = state;
       checkMouseMoved();
-      queueMouseEvent(button + 1, state, where);
+      queueMouseEvent (button + 1, state, where);
     }
   }
 }

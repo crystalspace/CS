@@ -40,12 +40,12 @@
 
 #include "def.h"
 #if defined(COMP_VC) || defined(COMP_WCC)
-#include "csinput/csinput.h"
+#include "cssys/csinput.h"
 #include "igraph2D.h"
 #endif
 
 #include "cssys/system.h"
-#include "csinput/csinput.h"
+#include "cssys/csinput.h"
 
 /// Windows system driver
 class SysSystemDriver : public csSystemDriver, public iWin32SystemDriver
@@ -67,45 +67,20 @@ public:
   /// Gets the nCmdShow of the WinMain().
   int GetCmdShow() const;
 
+  virtual bool Open (const char *Title);
+  virtual void Close ();
+
   virtual void IncRef () { csSystemDriver::IncRef (); }
   virtual void DecRef () { csSystemDriver::DecRef (); }
   /// Override QueryInterface to allow additional interfaces
   virtual void *QueryInterface (const char *iInterfaceID, int iVersion);
-};
 
-/// Windows version.
-class SysKeyboardDriver : public csKeyboardDriver
-{
-#ifdef DO_DINPUT_KEYBOARD
 private:
+#ifdef DO_DINPUT_KEYBOARD
   HANDLE m_hEvent;
   HANDLE m_hThread;
   friend DWORD WINAPI s_threadroutine(LPVOID param);
 #endif
-public:
-  SysKeyboardDriver();
-  ~SysKeyboardDriver(void);
-  
-  virtual bool Open (csEventQueue *EvQueue);
-  virtual void Close ();
-  
-};
-
-/// Windows version.
-class SysMouseDriver : public csMouseDriver
-{
-private:
-  int MouseOpened;
-  
-public:
-  SysMouseDriver();
-  ~SysMouseDriver(void);
-  
-  virtual bool Open (csEventQueue *EvQueue);
-  virtual void Close ();
-  
-  void Move(int *x, int *y, int *button);
 };
 
 #endif // __CS_WIN32_H__
-

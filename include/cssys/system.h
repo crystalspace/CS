@@ -25,6 +25,7 @@
 #include "csutil/util.h"
 #include "csutil/csstrvec.h"
 #include "csutil/csobjvec.h"
+#include "cssys/csinput.h"
 #include "iconfig.h"
 #include "isystem.h"
 #include "ivfs.h"
@@ -65,13 +66,13 @@ class csSystemDriver : public iSystem
   public:
     // The plugin itself
     iPlugIn *PlugIn;
-    // The class ID of the plugin
-    char *ClassID;
+    // The class ID of the plugin, and their functionality ID
+    char *ClassID, *FuncID;
     // The mask of events this plugin wants to see
     unsigned int EventMask;
 
     // Construct the object that represents a plugin
-    csPlugIn (iPlugIn *iObject, const char *iClassID);
+    csPlugIn (iPlugIn *iObject, const char *iClassID, const char *iFuncID);
     // Free storage
     virtual ~csPlugIn ();
   };
@@ -82,9 +83,18 @@ class csSystemDriver : public iSystem
   public:
     // Create the vector
     csPlugInsVector (int iLimit, int iDelta) : csObjVector (iLimit, iDelta) {}
-    // Compare a vector element against a iPlugIn pointer
-    virtual int CompareKey (csSome Item, csConstSome Key, int) const
-    { return ((csPlugIn *)Item)->PlugIn == Key ? 0 : -1; }
+    // Find a plugin either by its address or by his function ID
+    virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const
+    {
+      if (Mode == 0)
+        return ((csPlugIn *)Item)->PlugIn == Key ? 0 : 1;
+      else
+        return ((csPlugIn *)Item)->FuncID ? strcmp (((csPlugIn *)Item)->FuncID, (char *)Key)
+             : ((csPlugIn *)Item)->FuncID == Key ? 0 : 1;
+    }
+    // Overrided Get() to avoid typecasts
+    csPlugIn *Get (int idx)
+    { return (csPlugIn *)csObjVector::Get (idx); }
   };
 
   /// Class to collect all options for all plug-in modules in the system.
@@ -152,6 +162,8 @@ public:
   iNetworkDriver* NetDrv;
   /// Network manager
   iNetworkManager* NetMan;
+  /// System console
+  iConsole *Console;
 
   /// the width of this frame
   int FrameWidth;
@@ -162,23 +174,25 @@ public:
   /// the bits-per-pixel of the display.
   int Depth;
   /// The event queue
-  csEventQueue *EventQueue;
+  csEventQueue EventQueue;
   /// Keyboard driver
-  csKeyboardDriver *Keyboard;
+  csKeyboardDriver Keyboard;
   /// Mouse driver
-  csMouseDriver *Mouse;
+  csMouseDriver Mouse;
+  /// Joystick driver
+  csJoystickDriver Joystick;
   /// The Configuration File object
   csIniFile *Config;
   /// Set to non-zero to exit csSystemDriver::Loop()
   static bool Shutdown;
   /// Same as Shutdown but set manually by windowing system
-  static bool ExitLoop;
-  /// System console
-  iConsole *Console;
+  bool ExitLoop;
+  /// Enable console output (used on systems where graphics screen is shared with text console)
+  static bool EnableConsoleOutput;
   /// Debugging level (0 = no debug, 1 = normal debug, 2 = verbose debug)
-  static int debug_level;
+  int debug_level;
   /// true if demo console is ready
-  static bool ConsoleReady;
+  bool ConsoleReady;
   /// true if CrystalSpace visual is active (focused)
   bool IsFocused;
   /// List of all options for all plug-in modules.
@@ -214,11 +228,6 @@ public:
   virtual bool Open (const char *Title);
   /// Close the system
   virtual void Close ();
-
-  /// Initialize Keyboard object
-  virtual bool InitKeyboard ();
-  /// Initialize Mouse object
-  virtual bool InitMouse ();
 
   /**
    * System loop. This should be called last since it returns
@@ -331,14 +340,13 @@ public:
 
   /// returns the configuration.
   virtual void GetSettings (int &oWidth, int &oHeight, int &oDepth, bool &oFullScreen);
-  /// Set one of basical drivers (plugins)
-  virtual bool RegisterDriver (const char *iInterface, iPlugIn *iObject);
-  /// Unload a driver
-  virtual bool DeregisterDriver (const char *iInterface, iPlugIn *iObject);
   /// Load a plugin and initialize it
-  virtual iBase *LoadPlugIn (const char *iClassID, const char *iInterface, int iVersion);
+  virtual iBase *LoadPlugIn (const char *iClassID, const char *iFuncID,
+    const char *iInterface, int iVersion);
   /// Get first of the loaded plugins that supports given interface ID
   virtual iBase *QueryPlugIn (const char *iInterface, int iVersion);
+  /// Find a plugin given his functionality ID
+  virtual iBase *QueryPlugIn (const char *iFuncID, const char *iInterface, int iVersion);
   /// Remove a plugin from system driver's plugin list
   virtual bool UnloadPlugIn (iPlugIn *iObject);
   /// print a string to the specified device.
@@ -366,9 +374,11 @@ public:
   /// Save system configuration file
   virtual bool ConfigSave ();
   /// Put a keyboard event into event queue 
-  virtual void QueueKeyEvent (int KeyCode, bool Down);
+  virtual void QueueKeyEvent (int iKeyCode, bool iDown);
   /// Put a mouse event into event queue 
-  virtual void QueueMouseEvent (int Button, int Down, int x, int y, int ShiftFlags);
+  virtual void QueueMouseEvent (int iButton, bool iDown, int x, int y);
+  /// Put a joystick event into event queue
+  virtual void QueueJoystickEvent (int iNumber, int iButton, bool iDown, int x, int y);
   /// Put a focus event into event queue 
   virtual void QueueFocusEvent (bool Enable);
   /// Register the plugin to receive specific events
@@ -387,6 +397,10 @@ public:
   virtual void AddOptionCL (const char *iName, const char *iValue);
   /// Add a command-line name to the command-line names array
   virtual void AddNameCL (const char *iName);
+  /// Called before forced suspend / after resuming suspend
+  virtual void SuspendResume (bool iSuspend);
+  /// Toggle console text output (for consoles that share text/graphics mode)
+  virtual void EnablePrintf (bool iEnable);
 
   /****************************** iSCF interface ******************************/
 
