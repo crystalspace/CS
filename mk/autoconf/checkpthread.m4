@@ -72,9 +72,7 @@ AC_DEFUN([CS_CHECK_PTHREAD],
 	    ;;
     esac
     _CS_CHECK_MUTEX_FEATURE([PTHREAD_MUTEX_RECURSIVE],
-	[cs_cv_sys_pthread_mutex_recursive], [for pthread recursive mutexes])
-    _CS_CHECK_MUTEX_FEATURE([PTHREAD_MUTEX_TIMED],
-	[cs_cv_sys_pthread_mutex_timed], [for pthread timed mutexes])])
+	[cs_cv_sys_pthread_mutex_recursive], [for pthread recursive mutexes])])
 
 # _CS_CHECK_MUTEX_FEATURE(FEATURE, CACHE-VAR, MESSAGE)
 AC_DEFUN([_CS_CHECK_MUTEX_FEATURE],

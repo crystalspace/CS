@@ -1,4 +1,4 @@
-#                                               -*- Autoconf -*-
+# configure.ac                                                 -*- Autoconf -*-
 #==============================================================================
 # Copyright (C)2003-2005 by Eric Sunshine <sunshine@sunshineco.com>
 #
@@ -22,7 +22,7 @@ m4_define([cs_version_number], [0.99])
 AC_INIT([crystalspace], [cs_version_number],
         [crystal-main@lists.sourceforge.net])
 CS_PACKAGEINFO([Crystal Space],
-    [Copyright (C)1998-2004 Jorrit Tyberghein and others],
+    [Copyright (C)1998-2005 Jorrit Tyberghein and others],
     [http://www.crystalspace3d.org/])
 AC_CONFIG_SRCDIR([libs/csutil/Jamfile])
 AC_CONFIG_AUX_DIR([mk/autoconf])
@@ -281,6 +281,7 @@ AC_DEFUN([CS_CHECK_RTLD],
 CS_CHECK_RTLD
 
 
+
 #------------------------------------------------------------------------------
 # Determine host platform.  Recognized families: Unix, Windows, MacOS/X.
 #
@@ -465,7 +466,6 @@ AS_IF([test -n "$PERL" && test "$with_perl" != no],
 	    [CS_EMIT_BUILD_RESULT([cs_cv_perl], [PERL5])
 	    CS_EMIT_BUILD_PROPERTY([PERL5.MODULE_EXT],[.$cs_cv_perl_ext])])])])
 	
-
 
 
 #------------------------------------------------------------------------------
@@ -742,6 +742,20 @@ CS_COMPILER_PIC([C++], [cs_cv_prog_cxx_pic],
 
 
 #------------------------------------------------------------------------------
+# Check if C++ function inlining can be enabled and disabled. Apparently, with
+# some versions of GNU build tools on Windows, the Crystal Space Python plugin
+# fails to link and emits the error message "Error: 0-bit reloc in dll". In
+# particular, this occurs with optimizations (such as -O3) enabled. We can
+# avoid the error by disabling function inlining.
+#------------------------------------------------------------------------------
+CS_EMIT_BUILD_FLAGS([how to disable function inlining],
+    [cs_cv_prog_cxx_disable_inlining],
+    [CS_CREATE_TUPLE([-fno-inline-functions])],
+    [C++], [COMPILER.C++FLAGS.INLINING.DISABLE])
+
+
+
+#------------------------------------------------------------------------------
 # Check for compiler- and CPU-specific code generation flags.  These flags are
 # mutually exclusive.  Exclusivity is enforced by the CS_CHECK_CODE_GEN_FLAG()
 # macro.  Note that use of these flags typically means that the resulting
@@ -903,7 +917,7 @@ AS_IF([test -d /usr/local/lib],
 
 
 #------------------------------------------------------------------------------
-# Check if va_copy or __va_copy is available. 
+# Check if va_copy() or __va_copy() is available. 
 #------------------------------------------------------------------------------
 # CS_CHECK_VA_COPY(FUNCTION)
 AC_DEFUN([CS_CHECK_VA_COPY],
@@ -984,15 +998,11 @@ AS_IF([test "$no_x" != yes],
 
     CS_CHECK_LIB_WITH([Xaw],
 	[AC_LANG_PROGRAM(
-		[[#include <X11/Shell.h>
-		#include <X11/Xaw/Form.h>]],
-		[XtVaGetValues(0, 0, 0, 0)])], 
-		[], [],
-	[CS_EMIT_BUILD_RESULT([cs_cv_libXaw], [XAW])],
-	[],
-	[$X_CFLAGS], [], [$X_PRE_LIBS $X_LIBS -lX11 $X_EXTRA_LIBS])
-    ])
-
+	    [[#include <X11/Shell.h>
+	    #include <X11/Xaw/Form.h>]],
+	    [XtVaGetValues(0,0,0,0)])],
+	[], [],	[CS_EMIT_BUILD_RESULT([cs_cv_libXaw], [XAW])], [],
+	[$X_CFLAGS], [], [$X_PRE_LIBS $X_LIBS -lX11 $X_EXTRA_LIBS])])
 
 
 
@@ -2380,6 +2390,7 @@ AC_ARG_ENABLE([leak-guard],
 AC_MSG_RESULT([$enable_leak_guard])
 AS_IF([test $enable_leak_guard = yes],
     [CS_HEADER_PROPERTY([CS_USE_LEAK_GUARD])])
+
 
 
 #------------------------------------------------------------------------------

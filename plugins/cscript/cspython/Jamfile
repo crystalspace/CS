@@ -2,6 +2,22 @@ SubDir TOP plugins cscript cspython ;
 
 if $(PYTHON.AVAILABLE) = "yes"
 {
+  # Compiler flags for Swig-generated code. The synthesized code is not 100%
+  # clean, so we disable some compilation warnings in order to avoid abuse
+  # about code over which we have no control.  Additionally, it is reported
+  # that, with some versions of GNU build tools on Windows, the Crystal Space
+  # Python plugin fails to link and emits the error message "Error: 0-bit reloc
+  # in dll". In particular, this occurs with optimizations (such as -O3)
+  # enabled. We can avoid the error by disabling function inlining.
+  CSPYTHON.CFLAGS =
+    [ FDefines SWIG_GLOBAL ]
+    $(COMPILER.C++FLAGS.WARNING.NO_UNUSED) 
+    $(COMPILER.C++FLAGS.WARNING.NO_UNINITIALIZED) ;
+  if $(TARGET.OS) = WIN32
+  {
+    CSPYTHON.CFLAGS += $(COMPILER.C++FLAGS.INLINING.DISABLE) ;
+  }
+
   #--------
   # Swig-generated files.
   #--------
@@ -48,10 +64,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   Library cspycommon : $(common) : shared independent ;
   LibDepends cspycommon : cstool csgfx csgeom csutil ;
   ExternalLibs cspycommon : PYTHON ;
-  CFlags cspycommon :
-    [ FDefines SWIG_GLOBAL ]
-    $(COMPILER.C++FLAGS.WARNING.NO_UNUSED) 
-    $(COMPILER.C++FLAGS.WARNING.NO_UNINITIALIZED) ;
+  CFlags cspycommon : $(CSPYTHON.CFLAGS) ;
 
   #--------
   # cspython -- Crystal Space plugin
@@ -60,10 +73,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   Plugin cspython : cspython.h cspython.cpp pytocs.h pytocs.cpp ;
   LinkWith cspython : cspycommon cstool csgfx csgeom csutil ;
   ExternalLibs cspython : PYTHON ;
-  CFlags cspython :
-    [ FDefines SWIG_GLOBAL ]
-    $(COMPILER.C++FLAGS.WARNING.NO_UNUSED) 
-    $(COMPILER.C++FLAGS.WARNING.NO_UNINITIALIZED) ;
+  CFlags cspython : $(CSPYTHON.CFLAGS) ;
   Depends cspython : $(cspacepy) ;
 
 
@@ -74,15 +84,8 @@ if $(PYTHON.AVAILABLE) = "yes"
   Description pythmod : $(desc) ;
   Help pythmod : "Build the $(desc)" ;
 
-  # Plugin rule above already invokes CompileObject for $(common). We do not
-  # invoking it again because we want to avoid compiling the same (large) file
-  # twice. Intead, we just get a reference to the object file.
-  local commonobj = [ DoObjectGrist $(common:S=$(SUFOBJ)) ] ;
-
   local pythmodsrc = [ DoSourceGrist pythmod.cpp ] ;
-  #local pythmodobj = $(commonobj) [ CompileObjects $(pythmodsrc) ] ;
   local pythmodobj = [ CompileObjects $(pythmodsrc) ] ;
-
   local pythmod = _cspace ;
   if $(PYTHON.MODULE_EXT)
   {

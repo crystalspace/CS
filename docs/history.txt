@@ -13,6 +13,16 @@ chronological order.
 	    - AMotor joint functionality added
 	- Eric Sunshine fixed bug in simpleformer where a void function was
 	  attempting to return a value.
+	- Eric Sunshine added a check to configure.ac to determine how to
+	  disable function inlining.  The result of this check is used when
+	  building cspython since it is reported that, with some versions of
+	  GNU build tools on Windows, cspython fails to link and emits the
+	  error message "Error: 0-bit reloc in dll". In particular, this occurs
+	  with optimizations (such as -O3) enabled. It is said that the problem
+	  can be avoided by disabling function inlining.  Reported by Jorg
+	  Fischer <turboj@web.de>.
+	- Eric Sunshine removed the unused PTHREAD_MUTEX_TIMED test from
+	  CS_CHECK_PTHREAD() in checkpthread.m4.
 15-Mar-2005
 	- Eric Sunshine renamed csQint8(), csQint16(), and csQint24() to
 	  csQfixed8(), csQfixed16(), and csQfixed24(), respectively, in order
