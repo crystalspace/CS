@@ -114,6 +114,22 @@ void Cleanup ()
   csInitializer::DestroyApplication (object_reg);
 }
 
+
+/// call during 2d phase
+static void DebugZBufShow(iGraphics3D *g3d, iGraphics2D *g2d, 
+  iTextureManager *txtmgr)
+{
+  int w = g3d->GetWidth();
+  int h = g3d->GetHeight();
+  for(int y=0; y<h; y++)
+    for(int x=0; x<w; x++)
+    {
+      float zbuf = g3d->GetZBuffValue(x,y);
+      uint32 zint = (uint32)zbuf;
+      g2d->DrawPixel(x, y, zint);
+    }
+}
+
 struct PlayerGridChange : public iGridChangeCallback
 {
   IsoTest* app;
@@ -746,6 +762,9 @@ void IsoTest::SetupFrame ()
   
   // Start drawing 2D graphics.
   if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
+  
+  if(0) /// debug zbuffer
+    DebugZBufShow(myG3D, myG2D, txtmgr);
   
   char buf[255];
   sprintf(buf, "FPS: %g    loc(%g,%g,%g)", fps, player->GetPosition().x,
