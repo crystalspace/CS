@@ -82,6 +82,17 @@ CS_IMPLEMENT_PLUGIN
 #define ENUM_CURRENT_SETTINGS       ((DWORD)-1)
 #endif
 
+/*
+  hack: when debugging it is really annoying to have 
+  a black window in front of your face instead of the
+  IDE... though this hack causes taskbar flickering under 
+  some circumstances
+ */
+#ifdef CS_DEBUG
+# undef  HWND_TOPMOST
+# define HWND_TOPMOST HWND_TOP
+#endif
+
 static void SystemFatalError (char *str, HRESULT hRes = S_OK)
 {
   LPVOID lpMsgBuf;
@@ -279,7 +290,8 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
   if (cmdline->GetOption ("nosysmouse")) m_bHardwareCursor = false;
   cmdline->DecRef ();
 
-  DepthBits = config->GetInt ("Video.OpenGL.DepthBits", 32);
+  m_nDepthBits = config->GetInt ("Video.OpenGL.DepthBits", 32);
+  m_nDisplayFrequency = config->GetInt ("Video.DisplayFrequency", 0);
 
   return true;
 }
@@ -299,7 +311,7 @@ void csGraphics2DOpenGL::CalcPixelFormat ()
       0,                              /* alpha bits (ignored) */
       0,                              /* no accumulation buffer */
       0, 0, 0, 0,                     /* accum bits (ignored) */
-      DepthBits,                      /* depth buffer */
+      m_nDepthBits,                   /* depth buffer */
       1,                              /* no stencil buffer */
       0,                              /* no auxiliary buffers */
       PFD_MAIN_PLANE,                 /* main layer */
@@ -318,7 +330,7 @@ void csGraphics2DOpenGL::CalcPixelFormat ()
     SystemFatalError ("DescribePixelFormat failed.");
 
   //Depth = pfd.cColorBits; // @@@ ColorBits are ignored. Will cause corruption
-  DepthBits = pfd.cDepthBits;
+  m_nDepthBits = pfd.cDepthBits;
 }
 
 bool csGraphics2DOpenGL::Open ()
@@ -367,7 +379,7 @@ bool csGraphics2DOpenGL::Open ()
 
   Report (CS_REPORTER_SEVERITY_NOTIFY,
     "Using %d bits per pixel (%d color mode), %d bits depth buffer.", 
-      Depth, 1 << (Depth == 32 ? 24 : Depth), DepthBits);
+      Depth, 1 << (Depth == 32 ? 24 : Depth), m_nDepthBits);
 
   hGLRC = wglCreateContext (hDC);
   wglMakeCurrent (hDC, hGLRC);
@@ -604,14 +616,22 @@ void csGraphics2DOpenGL::SwitchDisplayMode ()
   DEVMODE dmode;
   LONG ti;
 
-  EnumDisplaySettings (NULL, 0, &dmode);
+  EnumDisplaySettings (NULL, ENUM_CURRENT_SETTINGS, &dmode);
 
   dmode.dmBitsPerPel = Depth;
   dmode.dmPelsWidth = Width;
   dmode.dmPelsHeight = Height;
-  dmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
-
+  if (m_nDisplayFrequency) dmode.dmDisplayFrequency = m_nDisplayFrequency;
+  dmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT | DM_DISPLAYFREQUENCY;
+  
   if ((ti = ChangeDisplaySettings(&dmode, CDS_FULLSCREEN)) != DISP_CHANGE_SUCCESSFUL)
+  {
+    // maybe just the monitor frequency is not supported.
+    // so try without setting it
+    dmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+    ti = ChangeDisplaySettings(&dmode, CDS_FULLSCREEN);
+  }
+  if (ti != DISP_CHANGE_SUCCESSFUL)
   {
     //The cases below need error handling, as they are errors.
     switch (ti)

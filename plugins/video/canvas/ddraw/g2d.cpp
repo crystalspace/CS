@@ -117,6 +117,8 @@ bool csGraphics2DDDraw3::Initialize (iObjectRegistry *object_reg)
   if (cmdline->GetOption ("nosysmouse")) m_bHardwareCursor = false;
   cmdline->DecRef ();
 
+  m_nDisplayFrequency = config->GetInt ("Video.DisplayFrequency", 0);
+
   return true;
 }
 
@@ -560,7 +562,18 @@ HRESULT csGraphics2DDDraw3::InitSurfaces ()
   if (FullScreen)
   {
     // Set FS video mode
-    hRet = m_lpDD->SetDisplayMode (Width, Height, Depth);
+    LPDIRECTDRAW7 lpDD7;
+    if (m_lpDD->QueryInterface (IID_IDirectDraw7, (LPVOID*)&lpDD7) == S_OK)
+    {
+      hRet = lpDD7->SetDisplayMode (Width, Height, Depth, m_nDisplayFrequency, 0);
+      lpDD7->Release ();
+    }
+    if ((!lpDD7) || (hRet != DD_OK))
+    {
+      // maybe just the monitor frequency is not supported.
+      // so try without setting it
+      hRet = m_lpDD->SetDisplayMode (Width, Height, Depth);
+    }
     if (hRet != DD_OK)
       return InitFail (hRet, "SetDisplayMode FAILED (Code: %08lx)\n");
   }

@@ -97,7 +97,8 @@ protected:
 
   bool m_bHardwareCursor;
 
-  int DepthBits;
+  int m_nDepthBits;
+  int m_nDisplayFrequency;
 
   // Old window procedure (the one in win32.cpp)
   WNDPROC m_OldWndProc;
