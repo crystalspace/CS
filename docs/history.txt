@@ -31,6 +31,8 @@ The history order is reversed so that new features are at the top.
 	  threathing warnings in case some dll's cannot be loaded. In debug
 	  mode the warnings are still as descriptive as before.
 	- Fixed glrender3d and shadermgr so they compile on gcc.
+	- Fixed r3dtest so it compiles with old renderer too. Easier
+	  to compare performance that way.
 16-Jan-2003
 	- 'reverse_action' in 3D sprites was not initialized to false.
 	- Fixed odedynam plugin so it compiles again.

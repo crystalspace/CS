@@ -50,12 +50,17 @@
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 #include "csutil/cmdhelp.h"
-#include "ivideo/render3d.h"
-#include "ivideo/rndbuf.h"
+#ifdef CS_USE_NEW_RENDERER
+#  include "ivideo/render3d.h"
+#  include "ivideo/shader/shader.h"
+#  include "ivideo/rndbuf.h"
+#else
+#  include "ivideo/graph3d.h"
+#endif
+
 #include "imesh/terrfunc.h"
 #include "imesh/genmesh.h"
-#include "ivideo/shader/shader.h"
-#include "ilight/testlt.h"
+//#include "ilight/testlt.h"
 
 /*#include "csengine/material.h"
 #include "csengine/texture.h"*/
@@ -64,6 +69,7 @@
 
 CS_IMPLEMENT_APPLICATION
 
+#ifdef CS_USE_NEW_RENDERER
 class csTestMesh : public iStreamSource
 {
 private:
@@ -151,6 +157,7 @@ public:
 SCF_IMPLEMENT_IBASE (csTestMesh)
   SCF_IMPLEMENTS_INTERFACE (iStreamSource)
 SCF_IMPLEMENT_IBASE_END
+#endif
 
 //-----------------------------------------------------------------------------
 
@@ -284,7 +291,11 @@ bool R3DTest::Initialize ()
 {
   if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,
+#if CS_USE_NEW_RENDERER
         CS_REQUEST_PLUGIN ("crystalspace.render3d.opengl", iRender3D),
+#else
+        CS_REQUEST_PLUGIN ("crystalspace.graphics3d.opengl", iGraphics3D),
+#endif
         CS_REQUEST_ENGINE,
 	CS_REQUEST_IMAGELOADER,
 	CS_REQUEST_LEVELLOADER,
@@ -332,7 +343,8 @@ bool R3DTest::Initialize ()
     return false;
   }
 
-  r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
+  //r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
+  r3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (r3d == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -389,8 +401,9 @@ bool R3DTest::Initialize ()
   }
 
   // Change this path to something /Anders Stenberg
-  vfs->ChDir ("/this/data/mayatest");
-  loader->LoadMapFile ("mayatest.xml", true);
+  vfs->Mount ("/lev/testrender", "testrender.zip");
+  vfs->ChDir ("/lev/testrender");
+  loader->LoadMapFile ("world", true);
 
   csRef<iSector> room = engine->FindSector ("room");
 
