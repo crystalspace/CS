@@ -161,14 +161,16 @@ bool csPolyTexture::RecalculateDynamicLights ()
   if (!lm->UpdateRealLightMap (amb.red,
                                amb.green,
                                amb.blue,
-                               polygon->GetParent()->GetDynamicAmbientVersion()>ambient_version )) return false;
+                               polygon->GetParent()
+			       	->GetDynamicAmbientVersion()>ambient_version ))
+	return false;
 
   ambient_version = polygon->GetParent()->GetDynamicAmbientVersion();
 
   //---
   // Now add all dynamic lights.
   //---
-  csLightPatch *lp = polygon->GetBasePolygon ()->GetLightpatches ();
+  csLightPatch *lp = polygon->GetLightpatches ();
   while (lp)
   {
     ShineDynLightMap (lp);
@@ -342,7 +344,7 @@ void csPolyTexture::FillLightMap (
     // on the polygon plane but I'm not sure yet how to do that efficiently.
     // poly will be the polygon to which we clip all frustums.
     csVector3 poly[4];
-    csPolygon3D *base_poly = polygon->GetBasePolygon ();
+    csPolygon3D *base_poly = polygon;
     int num_vertices = 4;
     csMatrix3 m_t2w = txt_pl->m_world2tex.GetInverse ();
     csVector3 &v_t2w = txt_pl->v_world2tex;
@@ -445,7 +447,7 @@ void csPolyTexture::FillLightMap (
       csPolygon3D *shad_poly = (csPolygon3D *) (shadow_it->GetUserData ());
       // It is possible that shad_poly is NULL. This can happen if we
       // are casting shadows from something that is not a thing.
-      if (shad_poly && shad_poly->GetBasePolygon () == base_poly) continue;
+      if (shad_poly == base_poly) continue;
 
       // Check if planes of two polygons are equal
       // (@@@ should be precalculated).
@@ -473,8 +475,7 @@ void csPolyTexture::FillLightMap (
         // Test if two polygons can cast shadows on each other.
 	// Note: we use the base polygons here because that is a stronger
 	// test which is more likely to give a better result.
-        if (shad_poly && !CanCastShadow (shad_poly->GetBasePolygon (),
-			base_poly, lightpos))
+        if (shad_poly && !CanCastShadow (shad_poly, base_poly, lightpos))
         {
           new_shadow->DecRef ();
           continue;

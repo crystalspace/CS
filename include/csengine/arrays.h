@@ -24,7 +24,6 @@
 
 class csCurve;
 class csLightHalo;
-class csPolygonInt;
 class csPolygon3D;
 
 CS_DECLARE_TYPED_VECTOR_NODELETE (csCurvesArrayHelper, csCurve);
@@ -72,8 +71,8 @@ public:
   csPolygon3D *Get (int iIndex) const;
 
   /// Get the entire array of polygons as an array of pointers
-  csPolygonInt **GetArray ()
-  { return (csPolygonInt **)root; }
+  csPolygon3D **GetArray ()
+  { return (csPolygon3D **)root; }
 };
 
 #endif // __CS_ARRAYS_H__

@@ -45,7 +45,7 @@ csPolygonArray::~csPolygonArray ()
 
 bool csPolygonArray::FreeItem (csSome Item)
 {
-  delete(csPolygon3D *) (csPolygonInt *)Item;
+  delete (csPolygon3D *)Item;
   return true;
 }
 
@@ -53,13 +53,13 @@ int csPolygonArray::CompareKey (csSome Item, csConstSome Key, int Mode) const
 {
   (void)Mode;
 
-  const char *name = ((csPolygon3D *) (csPolygonInt *)Item)->GetName ();
+  const char *name = ((csPolygon3D *) Item)->GetName ();
   return name ? strcmp (name, (char *)Key) : -1;
 }
 
 csPolygon3D *csPolygonArray::Get (int iIndex) const
 {
-  return (csPolygon3D *) (csPolygonInt *)csVector::Get (iIndex);
+  return (csPolygon3D *)csVector::Get (iIndex);
 }
 
 //---------------------------------------------------------+ csHaloArray +----//

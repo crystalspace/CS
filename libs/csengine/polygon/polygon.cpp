@@ -288,7 +288,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csPolygon3D::csPolygon3D (
   csMaterialWrapper *material) :
-    csPolygonInt(),
     csObject(),
     vertices(4)
 {
@@ -304,14 +303,9 @@ csPolygon3D::csPolygon3D (
     csPolygon3D::material = NULL;
 
   txt_info = NULL;
-  txt_share_list = NULL;
 
   plane = NULL;
-
   portal = NULL;
-
-  //sector = NULL;
-  orig_poly = NULL;
 
   flags.SetAll (CS_POLY_LIGHTING | CS_POLY_COLLDET | CS_POLY_VISCULL);
 
@@ -329,7 +323,6 @@ csPolygon3D::csPolygon3D (
 }
 
 csPolygon3D::csPolygon3D (csPolygon3D &poly) :
-  csPolygonInt(),
   csObject(),
   vertices(4)
 {
@@ -358,7 +351,6 @@ csPolygon3D::csPolygon3D (csPolygon3D &poly) :
   material = poly.material;
 
   poly.flags.Set (CS_POLY_SPLIT);
-  orig_poly = poly.orig_poly ? poly.orig_poly : &poly;
 
   // Share txt_info with original polygon.
   txt_info = poly.txt_info;
@@ -367,9 +359,6 @@ csPolygon3D::csPolygon3D (csPolygon3D &poly) :
     txt_info->IncRef ();
     DG_LINK ((csObject *)this, txt_info);
   }
-
-  txt_share_list = orig_poly->txt_share_list;
-  orig_poly->txt_share_list = this;
 
   flags = poly.flags;
   flags.Reset (CS_POLY_SPLIT | CS_POLY_DELETE_PORTAL);
@@ -546,14 +535,14 @@ void csPolygon3D::SetPortal (csPortal *prt)
 }
 
 void csPolygon3D::SplitWithPlane (
-  csPolygonInt **poly1,
-  csPolygonInt **poly2,
+  csPolygon3D **poly1,
+  csPolygon3D **poly2,
   const csPlane3 &plane)
 {
   csPolygon3D *np1 = new csPolygon3D (*this);
   csPolygon3D *np2 = new csPolygon3D (*this);
-  *poly1 = (csPolygonInt *)np1;                 // Front
-  *poly2 = (csPolygonInt *)np2;                 // Back
+  *poly1 = np1;                 // Front
+  *poly2 = np2;                 // Back
   np1->Reset ();
   np2->Reset ();
   GetParent ()->AddPolygon (np1);
@@ -624,10 +613,9 @@ void csPolygon3D::SplitWithPlane (
   //np2->Finish ();
 }
 
-bool csPolygon3D::Overlaps (csPolygonInt *overlapped)
+bool csPolygon3D::Overlaps (csPolygon3D *overlapped)
 {
-  if (overlapped->GetType () != 1) return true; // @@@ NOT IMPLEMENTED YET!
-  csPolygon3D *totest = (csPolygon3D *)overlapped;
+  csPolygon3D *totest = overlapped;
 
   // Algorithm: if any of the vertices of the 'totest' polygon
   // is facing away from the front of this polygon (i.e. the vertex
@@ -833,7 +821,6 @@ void csPolygon3D::Finish ()
 {
 #ifndef CS_USE_NEW_RENDERER
 
-  if (orig_poly) return ;
 #ifdef DO_HW_UVZ
   if (uvz)
   {
@@ -1138,12 +1125,7 @@ void csPolygon3D::SetTextureSpace (
 void csPolygon3D::MakeDirtyDynamicLights ()
 {
   thing->MarkLightmapsDirty ();
-  csPolygon3D *p;
-  if (orig_poly)
-    p = orig_poly;
-  else
-    p = this;
-  p->light_info.dyn_dirty = true;
+  light_info.dyn_dirty = true;
 
   csPolyTexLightMap *lmi = GetLightMapInfo ();
   if (lmi && lmi->tex) lmi->tex->MakeDirtyDynamicLights ();
@@ -1912,8 +1894,6 @@ bool csPolygon3D::IntersectRayPlane (
 
 void csPolygon3D::InitializeDefault ()
 {
-  if (orig_poly) return ;
-
   csPolyTexLightMap *lmi = GetLightMapInfo ();
   if (lmi)
   {
@@ -1933,8 +1913,6 @@ void csPolygon3D::InitializeDefault ()
 
 bool csPolygon3D::ReadFromCache (iFile* file)
 {
-  if (orig_poly) return true;
-
   csPolyTexLightMap *lmi = GetLightMapInfo ();
   if (lmi)
   {
@@ -1990,8 +1968,6 @@ bool csPolygon3D::ReadFromCache (iFile* file)
 
 bool csPolygon3D::WriteToCache (iFile* file)
 {
-  if (orig_poly) return true;
-
   csPolyTexLightMap *lmi = GetLightMapInfo ();
   if (lmi)
   {
@@ -2037,8 +2013,6 @@ bool csPolygon3D::WriteToCache (iFile* file)
 
 void csPolygon3D::PrepareLighting ()
 {
-  if (orig_poly) return ;
-
   csPolyTexLightMap *lmi = GetLightMapInfo ();
   if (!lmi || !lmi->tex->lm) return ;
   lmi->tex->lm->ConvertToMixingMode ();
@@ -2104,11 +2078,10 @@ void csPolygon3D::FillLightMapDynamic (csFrustumView &lview)
 {
   csFrustumContext *ctxt = lview.GetFrustumContext ();
 
-  //@@@if (orig_poly) return; BE CAREFUL
   // We are working for a dynamic light. In this case we create
   // a light patch for this polygon.
   csLightPatch *lp = csEngine::current_engine->lightpatch_pool->Alloc ();
-  GetBasePolygon ()->AddLightpatch (lp);
+  AddLightpatch (lp);
 
   csLightingPolyTexQueue *lptq = (csLightingPolyTexQueue *)
     (lview.GetUserdata ());

@@ -281,17 +281,6 @@ public:
   //----------------------------------------------------------------------
 
   /**
-   * Get the mesh which implements the visibility culler.
-   */
-  iMeshWrapper* GetCullerMesh () const { return culler_mesh; }
-
-  /**
-   * Look for the mesh object and see if it implements iVisibilityCuller.
-   * If so then use it for visibility culling in this sector.
-   */
-  bool UseCuller (const char* meshname);
-
-  /**
    * Use the given plugin as a visibility culler (should implement
    * iVisibilityCuller). Returns false if the culler could not be
    * loaded for some reason.
@@ -483,8 +472,6 @@ public:
       { return scfParent; }
     virtual int GetRecLevel () const
       { return scfParent->draw_busy; }
-    virtual bool SetVisibilityCuller (const char *Name)
-      { return scfParent->UseCuller (Name); }
     virtual bool SetVisibilityCullerPlugin (const char *Name)
       { return scfParent->UseCullerPlugin (Name); }
     virtual iVisibilityCuller* GetVisibilityCuller ()

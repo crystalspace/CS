@@ -432,10 +432,8 @@ void csPolygon2D::DrawFilled (
   if (poly->GetTextureType () != POLYTXT_LIGHTMAP)
   {
     // We are going to use DrawPolygonFX
-
     // Add all dynamic lights if polygon is dirty.
-    csPolygon3D *unsplit;
-    unsplit = poly->GetBasePolygon ();
+    csPolygon3D *unsplit = poly;
 
     const bool do_light = poly->flags.Check (CS_POLY_LIGHTING);
     if (do_light)

@@ -25,10 +25,8 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/polyidx.h"
-#include "csengine/polyint.h"
 #include "csengine/polyplan.h"
 #include "csengine/portal.h"
-#include "csengine/octree.h"
 #include "csengine/material.h"
 #include "iengine/sector.h"
 #include "imesh/thing/ptextype.h"
@@ -48,6 +46,7 @@ class csLightMap;
 class csLightPatch;
 class csPolyTexture;
 class csThing;
+struct iFile;
 struct iLight;
 struct iGraphics2D;
 struct iGraphics3D;
@@ -460,10 +459,7 @@ public:
  * the texture is filtered in which case it is drawn on top of the other
  * sector.
  */
-class csPolygon3D : public csPolygonInt, public csObject
-// NOTE: DO NOT MOVE csPolygonInt FROM FIRST PLACE! THERE ARE LOTS OF PLACES
-// WHERE CODE BLATANTLY SWITCHES BETWEEN csPolygon3D AND csPolygonInt TYPES
-// WITHOUT GIVING TO THE C++ COMPILER EVEN A CHANCE TO ADJUST THE POINTER!!!
+class csPolygon3D : public csObject
 {
   friend class csPolyTexture;
 
@@ -518,23 +514,6 @@ private:
    * csPolyTexLightMap or csPolyTexGouraud.
    */
   csPolyTexType *txt_info;
-
-  /**
-   * The original polygon. This is useful when a BSP tree
-   * has split a polygon. In that case, orig_poly will indicate the
-   * original polygon that this polygon was split from.
-   * If not split then this will be NULL.
-   */
-  csPolygon3D *orig_poly;
-
-  /**
-   * The texture share list. All polygons that share a single texture
-   * are linked using this field. For example, if some polygon was split
-   * multiple times by the BSP algorithm, all polygons that results
-   * from that split are linked through this field. The start of list is
-   * in "orig_poly" polygon.
-   */
-  csPolygon3D *txt_share_list;
 
   /**
    * Visibility number. If equal to csOctreeNode::pvs_cur_vis_nr then
@@ -771,14 +750,14 @@ public:
   csPolyIndexed& GetVertices () { return vertices; }
 
   /**
-   * Get number of vertices (required for csPolygonInt).
+   * Get number of vertices.
    */
-  virtual int GetVertexCount () { return vertices.GetVertexCount (); }
+  int GetVertexCount () { return vertices.GetVertexCount (); }
 
   /**
-   * Get vertex index table (required for csPolygonInt).
+   * Get vertex index table.
    */
-  virtual int* GetVertexIndices () { return vertices.GetVertexIndices (); }
+  int* GetVertexIndices () { return vertices.GetVertexIndices (); }
 
   /**
    * Set the warping transformation for the portal.
@@ -960,16 +939,6 @@ public:
    * directly.
    */
   void SetTextureSpace (csMatrix3 const&, csVector3 const&);
-
-  /// Return the pointer to the original polygon (before any BSP splits).
-  csPolygonInt* GetUnsplitPolygon () { return orig_poly; }
-
-  /**
-   * Return the pointer to the original polygon (before any BSP splits).
-   * If polygon was not split this will return current poly.
-   */
-  csPolygon3D* GetBasePolygon ()
-  { return orig_poly ? (csPolygon3D*)orig_poly : this; }
 
   /**
    * A dynamic light has changed (this can be either an
@@ -1171,16 +1140,16 @@ public:
    * poly is completely back of the given plane it returnes CS_POL_BACK.
    * Otherwise it returns CS_POL_SPLIT_NEEDED.
    */
-  virtual int Classify (const csPlane3& pl);
+  int Classify (const csPlane3& pl);
 
   /// Same as Classify() but for X plane only.
-  virtual int ClassifyX (float x);
+  int ClassifyX (float x);
 
   /// Same as Classify() but for Y plane only.
-  virtual int ClassifyY (float y);
+  int ClassifyY (float y);
 
   /// Same as Classify() but for Z plane only.
-  virtual int ClassifyZ (float z);
+  int ClassifyZ (float z);
 
   /**
    * Split this polygon with the given plane (A,B,C,D) and return the
@@ -1189,20 +1158,14 @@ public:
    * This function is mainly used by the BSP splitter. Note that splitting
    * happens in object space.
    */
-  virtual void SplitWithPlane (csPolygonInt** front, csPolygonInt** back,
+  void SplitWithPlane (csPolygon3D** front, csPolygon3D** back,
   	const csPlane3& plane);
 
   /**
    * Check if this polygon (partially) overlaps the other polygon
    * from some viewpoint in space. This function works in object space.
    */
-  virtual bool Overlaps (csPolygonInt* overlapped);
-
-  /**
-   * Return 1 to indicate to the BSP tree routines that
-   * this is a csPolygon3D.
-   */
-  virtual int GetType () { return 1; }
+  bool Overlaps (csPolygon3D* overlapped);
 
   /**
    * Intersect object-space segment with this polygon. Return
@@ -1267,13 +1230,6 @@ public:
     csPolyTexLightMap *lm = GetLightMapInfo ();
     return lm ? lm->GetPolyTex () : (iPolygonTexture*)NULL;
   }
-
-  /// Get next polygon in texture share list
-  csPolygon3D *GetNextShare ()
-  { return txt_share_list; }
-  /// Set next polygon in texture share list
-  void SetNextShare (csPolygon3D *next)
-  { txt_share_list = next; }
 
   SCF_DECLARE_IBASE_EXT (csObject);
 

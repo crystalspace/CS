@@ -65,7 +65,7 @@ struct iSectorCallback : public iBase
 };
 
 
-SCF_VERSION (iSector, 0, 4, 5);
+SCF_VERSION (iSector, 0, 5, 0);
 
 /**
  * The iSector interface is used to work with "sectors". A "sector"
@@ -118,11 +118,6 @@ struct iSector : public iBase
   virtual void CalculateSectorBBox (csBox3& bbox,
     bool do_meshes) const = 0;
 
-  /**
-   * Use the specified mesh object as the visibility culler for
-   * this sector.
-   */
-  virtual bool SetVisibilityCuller (const char *Name) = 0;
   /**
    * Use the specified plugin as the visibility culler for
    * this sector. Returns false if the culler could not be

@@ -1032,9 +1032,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 #   define CONPRI(m) Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, m);
     CONPRI("-*- Additional commands -*-");
     CONPRI("Visibility:");
-    CONPRI("  emode pvs freezepvs pvsonly");
-    CONPRI("  db_octree, db_osolid, db_dumpstubs, db_cbuffer, db_frustum");
-    CONPRI("  db_curleaf, farplane");
+    CONPRI("  db_frustum farplane");
     CONPRI("Lights:");
     CONPRI("  addlight dellight dellights");
     CONPRI("  clrlights setlight");
@@ -1055,7 +1053,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("Debugging:");
     CONPRI("  hi zbuf debug0 debug1 debug2 palette bugplug");
     CONPRI("  db_boxshow db_boxcam1 db_boxcam2 db_boxsize1 db_boxsize2");
-    CONPRI("  db_boxnode1 db_boxnode2 db_boxvis db_radstep db_radhi db_radtodo");
+    CONPRI("  db_radstep db_radhi db_radtodo");
     CONPRI("Meshes:");
     CONPRI("  loadmesh addmesh delmesh listmeshes");
     CONPRI("  listactions setaction setmotion");
@@ -1353,138 +1351,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     csCommandProcessor::change_float (arg, &size, "box2 size", 0.01, 1000);
     Sys->debug_box2.SetSize (csVector3 (size, size, size));
   }
-  else if (!strcasecmp (cmd, "db_boxnode1"))
-  {
-#if 0
-//@@@
-    iSector* room = Sys->view->GetCamera ()->GetSector ();
-    csThing* stat = room->GetStaticThing ();
-    if (stat)
-    {
-      csPolygonTree* tree = stat->GetStaticTree ();
-      csOctree* otree = (csOctree*)tree;
-      csOctreeNode* l = otree->GetLeaf (Sys->view->GetCamera ()->GetOrigin ());
-      Sys->debug_box1 = l->GetBox ();
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Box 1: (%f,%f,%f)-(%f,%f,%f)",
-	  	Sys->debug_box1.MinX (), Sys->debug_box1.MinY (),
-	  	Sys->debug_box1.MinZ (), Sys->debug_box1.MaxX (),
-	  	Sys->debug_box1.MaxY (), Sys->debug_box1.MaxZ ());
-    }
-    else
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"There is no octree in this sector!");
-#endif
-  }
-  else if (!strcasecmp (cmd, "db_boxnode2"))
-  {
-#if 0
-//@@@
-    iSector* room = Sys->view->GetCamera ()->GetSector ();
-    csThing* stat = room->GetStaticThing ();
-    if (stat)
-    {
-      csPolygonTree* tree = stat->GetStaticTree ();
-      csOctree* otree = (csOctree*)tree;
-      csOctreeNode* l = otree->GetLeaf (Sys->view->GetCamera ()->GetOrigin ());
-      Sys->debug_box2 = l->GetBox ();
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Box 2: (%f,%f,%f)-(%f,%f,%f)",
-	  	Sys->debug_box2.MinX (), Sys->debug_box2.MinY (),
-	  	Sys->debug_box2.MinZ (), Sys->debug_box2.MaxX (),
-	  	Sys->debug_box2.MaxY (), Sys->debug_box2.MaxZ ());
-    }
-    else
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"There is no octree in this sector!");
-#endif
-  }
-  else if (!strcasecmp (cmd, "db_boxvis"))
-  {
-#if 0
-//@@@
-    iSector* room = Sys->view->GetCamera ()->GetSector ();
-    csThing* stat = room->GetStaticThing ();
-    if (stat)
-    {
-      //csPolygonTree* tree = stat->GetStaticTree ();
-      //csOctree* otree = (csOctree*)tree;
-      //bool vis1 = otree->BoxCanSeeBox (Sys->debug_box1, Sys->debug_box2);
-      //bool vis2 = otree->BoxCanSeeBox (Sys->debug_box2, Sys->debug_box1);
-      //Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Box1->box2:%d box2->box1:%d", vis1, vis2);
-    }
-    else
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"No octree in this sector!");
-#endif
-  }
   else if (!strcasecmp (cmd, "db_frustum"))
     csCommandProcessor::change_int (arg, &Sys->cfg_debug_check_frustum, "debug check frustum", 0, 2000000000);
-  else if (!strcasecmp (cmd, "db_octree"))
-    csCommandProcessor::change_int (arg, &Sys->cfg_draw_octree, "debug octree", -1, 10);
-  else if (!strcasecmp (cmd, "db_curleaf"))
-  {
-#if 0
-//@@@
-    iSector* room = Sys->view->GetCamera ()->GetSector ();
-    csThing* stat = room->GetStaticThing ();
-    if (stat)
-    {
-      csPolygonTree* tree = stat->GetStaticTree ();
-      csOctree* otree = (csOctree*)tree;
-      csOctreeNode* l = otree->GetLeaf (Sys->view->GetCamera ()->GetOrigin ());
-      const csBox3& b = l->GetBox ();
-      printf ("Leaf (%d): %f,%f,%f %f,%f,%f\n", l->IsLeaf (),
-      	b.MinX (), b.MinY (), b.MinZ (), b.MaxX (), b.MaxY (), b.MaxZ ());
-      printf ("Solid Mask x: %04x\n", l->GetSolidMask (CS_BOX_SIDE_x));
-      printf ("Solid Mask X: %04x\n", l->GetSolidMask (CS_BOX_SIDE_X));
-      printf ("Solid Mask y: %04x\n", l->GetSolidMask (CS_BOX_SIDE_y));
-      printf ("Solid Mask Y: %04x\n", l->GetSolidMask (CS_BOX_SIDE_Y));
-      printf ("Solid Mask z: %04x\n", l->GetSolidMask (CS_BOX_SIDE_z));
-      printf ("Solid Mask Z: %04x\n", l->GetSolidMask (CS_BOX_SIDE_Z));
-    }
-    else
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"There is no octree in this sector!");
-#endif
-  }
-  else if (!strcasecmp (cmd, "db_dumpstubs"))
-  {
-#if 0
-//@@@
-    iSector* room = Sys->view->GetCamera ()->GetSector ();
-    csThing* stat = room->GetStaticThing ();
-    if (stat)
-    {
-      csPolygonTree* tree = stat->GetStaticTree ();
-      csOctree* otree = (csOctree*)tree;
-      printf ("1\n");
-      //Dumper::dump_stubs (otree);
-    }
-    csMeshWrapper* spr = (csMeshWrapper*)Sys->engine->meshes[0];
-    if (spr)
-    {
-      //@@@@@Dumper::dump_stubs (spr->GetPolyTreeObject ());
-    }
-    Sys->Report (CS_REPORTER_SEVERITY_DEBUG, "======");
-#endif
-  }
-  else if (!strcasecmp (cmd, "db_osolid"))
-  {
-#if 0
-//@@@
-    extern void CreateSolidThings (csEngine*, iSector*, csOctreeNode*, int);
-    iSector* room = Sys->view->GetCamera ()->GetSector ();
-    csThing* stat = room->GetStaticThing ();
-    if (stat)
-    {
-      csPolygonTree* tree = stat->GetStaticTree ();
-      csOctree* otree = (csOctree*)tree;
-      CreateSolidThings (Sys->Engine, room, otree->GetRoot (), 0);
-    }
-#endif
-  }
   else if (!strcasecmp (cmd, "db_radstep"))
   {
     csRadiosity* rad;
@@ -1526,45 +1394,6 @@ bool CommandHandler (const char *cmd, const char *arg)
     csCommandProcessor::change_boolean (arg, &Sys->do_show_palette, "palette");
   else if (!strcasecmp (cmd, "move3d"))
     csCommandProcessor::change_boolean (arg, &Sys->move_3d, "move3d");
-  else if (!strcasecmp (cmd, "pvs"))
-  {
-    csEngine* engine = (csEngine*)(iEngine*)(Sys->Engine);
-    bool en = engine->IsPVS ();
-    csCommandProcessor::change_boolean (arg, &en, "pvs");
-    if (en)
-      engine->EnablePVS ();
-    else
-      engine->DisablePVS ();
-  }
-  else if (!strcasecmp (cmd, "pvsonly"))
-  {
-    csEngine* engine = (csEngine*)(iEngine*)(Sys->Engine);
-    bool en = engine->IsPVSOnly ();
-    csCommandProcessor::change_boolean (arg, &en, "pvs only");
-    if (en)
-      engine->EnablePVSOnly ();
-    else
-      engine->DisablePVSOnly ();
-  }
-  else if (!strcasecmp (cmd, "freezepvs"))
-  {
-    csEngine* engine = (csEngine*)(iEngine*)(Sys->Engine);
-    bool en = engine->IsPVSFrozen ();
-    csCommandProcessor::change_boolean (arg, &en, "freeze pvs");
-    if (en)
-      engine->FreezePVS (Sys->view->GetCamera ()->GetTransform ().GetOrigin ());
-    else
-      engine->UnfreezePVS ();
-  }
-  else if (!strcasecmp (cmd, "emode"))
-  {
-    const char* const choices[5] = { "auto", "back2front", "front2back",
-    	"zbuffer", NULL };
-    int emode = Sys->Engine->GetEngineMode ();
-    csCommandProcessor::change_choice (arg, &emode, "engine mode", choices, 4);
-    csEngine* engine = (csEngine*)(iEngine*)(Sys->Engine);
-    engine->SetEngineMode (emode);
-  }
   else if (!strcasecmp (cmd, "freelook"))
   {
     csCommandProcessor::change_boolean (arg, &Sys->do_freelook, "freelook");
@@ -1760,45 +1589,12 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "debug0"))
   {
-#if 0
-//@@@
-    csCamera* c = Sys->view->GetCamera ();
-    if (c->GetSector ()->GetStaticThing ())
-    {
-      csOctree* octree = (csOctree*)(c->GetSector ()->GetStaticThing ()->GetStaticTree ());
-      //Dumper::dump_stubs (octree);
-#if 0
-      csNamedObjVector& meshes = Sys->view->GetEngine ()->meshes;
-      int i;
-      for (i = 0 ; i < meshes.Length () ; i++)
-      {
-        csMeshWrapper* spr = (csMeshWrapper*)meshes[i];
-	@@@@Dumper::dump_stubs (spr->GetPolyTreeObject ());
-      }
-#endif
-    }
-    //Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-    	//"No debug0 implementation in this version.");
-#endif
   }
   else if (!strcasecmp (cmd, "debug1"))
   {
-    extern int covtree_level;
-    covtree_level++;
-    if (covtree_level > 25) covtree_level = 1;
-    printf ("covtree_level=%d\n", covtree_level);
-    //Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-    	//"No debug1 implementation in this version.");
   }
   else if (!strcasecmp (cmd, "debug2"))
   {
-#   if 0
-    extern bool do_covtree_dump;
-    do_covtree_dump = !do_covtree_dump;
-#   else
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-    	"No debug2 implementation in this version.");
-#   endif
   }
   else if (!strcasecmp (cmd, "strafe_left"))
   {

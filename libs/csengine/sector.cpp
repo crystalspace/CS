@@ -34,7 +34,6 @@
 #include "iengine/rview.h"
 #include "imesh/lighting.h"
 #include "csengine/polygon.h"
-#include "csengine/cbufcube.h"
 
 
 
@@ -218,36 +217,6 @@ void csSector::RelinkMesh (iMeshWrapper *mesh)
 }
 
 //----------------------------------------------------------------------
-bool csSector::UseCuller (const char *meshname)
-{
-  culler = NULL;
-
-  // Find the culler with the given name.
-  culler_mesh = meshes.FindByName (meshname);
-  if (!culler_mesh) return false;
-
-  // Query the culler interface from it.
-  culler = SCF_QUERY_INTERFACE (
-      culler_mesh->GetMeshObject (),
-      iVisibilityCuller);
-  if (!culler) { culler_mesh = NULL; return false; }
-
-  // load cache data
-  char cachename[256];
-  sprintf (cachename, "%s_%s", GetName (), meshname);
-  culler->Setup (cachename);
-
-  // Loop through all meshes and update their bounding box in the
-  // polygon trees.
-  int i;
-  for (i = 0; i < meshes.Length (); i++)
-  {
-    iMeshWrapper* m = meshes.Get (i);
-    m->GetMovable ()->UpdateMove ();
-    RegisterMeshToCuller (m);
-  }
-  return true;
-}
 
 bool csSector::UseCullerPlugin (const char *plugname)
 {
@@ -855,6 +824,7 @@ void csSector::Draw (iRenderView *rview)
 
 void csSector::CheckFrustum (iFrustumView *lview)
 {
+// @@@ REMOVE ME!
   int i = sector_cb_vector.Length ()-1;
   while (i >= 0)
   {
@@ -863,8 +833,6 @@ void csSector::CheckFrustum (iFrustumView *lview)
     i--;
   }
 
-  csCBufferCube *cb = engine->GetCBufCube ();
-  cb->MakeEmpty ();
   RealCheckFrustum (lview);
 }
 

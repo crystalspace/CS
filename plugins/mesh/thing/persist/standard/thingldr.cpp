@@ -232,7 +232,14 @@ bool csThingLoader::LoadThingPart (iDocumentNode* node,
 	    child, "'vistree' flag only for top-level thing!");
 	  return false;
 	}
-        else thing_state->GetFlags ().Set (CS_THING_VISTREE);
+        else
+	{
+	  synldr->ReportError (
+	    "crystalspace.thingloader.parse.vistree",
+	    child, "'vistree' no longer supported! Convert your level to Dynavis using 'levtool'!\n");
+	  printf ("'vistree' no longer supported! Convert your level to Dynavis using 'levtool'!\n");
+	  return false;
+	}
         break;
       case XMLTOKEN_FASTMESH:
         if (!isParent)

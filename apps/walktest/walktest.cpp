@@ -78,7 +78,6 @@
 #include "iutil/plugin.h"
 
 #include "csengine/wirefrm.h"
-#include "csengine/cbuffer.h"
 #include "csengine/stats.h"
 #include "csengine/light.h"
 
@@ -141,7 +140,6 @@ WalkTest::WalkTest () :
   selected_light = NULL;
   selected_polygon = NULL;
   move_forward = false;
-  cfg_draw_octree = 0;
   cfg_recording = -1;
   recorded_perf_stats_name = NULL;
   recorded_perf_stats = NULL;
@@ -543,11 +541,6 @@ void WalkTest::DrawFrameDebug ()
   //if (selected_polygon || selected_light)
     //view->GetEngine ()->DrawFunc (view->GetCamera (),
       //view->GetClipper (), draw_edges, (void*)1);
-  if (cfg_draw_octree)
-  {
-    extern void DrawOctreeBoxes (int);
-    DrawOctreeBoxes (cfg_draw_octree == -1 ? -1 : cfg_draw_octree-1);
-  }
   if (cfg_debug_check_frustum)
   {
     // @@@

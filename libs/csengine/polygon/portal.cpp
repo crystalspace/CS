@@ -22,7 +22,6 @@
 #include "csengine/sector.h"
 #include "csengine/engine.h"
 #include "csengine/stats.h"
-#include "csengine/cbuffer.h"
 #include "csengine/lview.h"
 #include "csengine/light.h"
 #include "csutil/debug.h"

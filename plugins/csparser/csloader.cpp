@@ -2841,7 +2841,6 @@ iSector* csLoader::ParseSector (iDocumentNode* node)
   const char* secname = node->GetAttributeValue ("name");
 
   bool do_culler = false;
-  const char* bspname = NULL;
   const char* culplugname = NULL;
 
   iSector* sector = GetLoaderContext ()->FindSector (secname);
@@ -2867,20 +2866,11 @@ iSector* csLoader::ParseSector (iDocumentNode* node)
 	}
       	break;
       case XMLTOKEN_CULLER:
-	bspname = child->GetContentsValue ();
-	if (!bspname)
-	{
-	  SyntaxService->ReportError (
-		"crystalspace.maploader.parse.sector",
-	  	child, "CULLER expects the name of a mesh object!");
-	  return NULL;
-	}
-	else
-	{
-          do_culler = true;
-	  culplugname = NULL;
-	}
-        break;
+	SyntaxService->ReportError (
+	  "crystalspace.maploader.parse.sector",
+	  child, "<culler> no longer supported! Convert your level to Dynavis using 'levtool'!");
+	printf ("<culler> no longer supported! Convert your level to Dynavis using 'levtool'!");
+	return NULL;
       case XMLTOKEN_CULLERP:
 	culplugname = child->GetContentsValue ();
 	if (!culplugname)
@@ -2894,7 +2884,6 @@ iSector* csLoader::ParseSector (iDocumentNode* node)
 	else
 	{
           do_culler = true;
-	  bspname = NULL;
 	}
         break;
       case XMLTOKEN_MESHREF:
@@ -3035,11 +3024,7 @@ iSector* csLoader::ParseSector (iDocumentNode* node)
   if (!(flags & CS_LOADER_NOBSP))
     if (do_culler)
     {
-      bool rc;
-      if (bspname)
-        rc = sector->SetVisibilityCuller (bspname);
-      else
-        rc = sector->SetVisibilityCullerPlugin (culplugname);
+      bool rc = sector->SetVisibilityCullerPlugin (culplugname);
       if (!rc)
       {
 	SyntaxService->ReportError (

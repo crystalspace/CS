@@ -17,7 +17,6 @@
 */
 #include "cssysdef.h"
 #include "csgeom/frustum.h"
-#include "csengine/cbufcube.h"
 #include "csengine/light.h"
 #include "csengine/sector.h"
 #include "csengine/thing.h"
@@ -256,6 +255,8 @@ csStatLight::~csStatLight ()
 {
 }
 
+#if 0
+// @@@ REMOVE ME
 static void node_light_func (
   csOctreeNode *node,
   csFrustumView *lview,
@@ -288,6 +289,7 @@ static void node_light_func (
     }
   }
 }
+#endif
 
 static void poly_light_func (csObject *obj, csFrustumView *lview, bool vis)
 {
@@ -321,7 +323,6 @@ void csStatLight::CalculateLighting ()
 {
   csFrustumView lview;
   csFrustumContext *ctxt = lview.GetFrustumContext ();
-  lview.SetNodeFunction (node_light_func);
   lview.SetPolygonFunction (poly_light_func);
   lview.SetCurveFunction (curve_light_func);
   lview.SetRadius (GetRadius ());
@@ -348,7 +349,6 @@ void csStatLight::CalculateLighting (iMeshWrapper *th)
 {
   csFrustumView lview;
   csFrustumContext *ctxt = lview.GetFrustumContext ();
-  lview.SetNodeFunction (node_light_func);
   lview.SetPolygonFunction (poly_light_func);
   lview.SetCurveFunction (curve_light_func);
   lview.SetRadius (GetRadius ());
@@ -485,7 +485,6 @@ void csDynLight::Setup ()
 
   csFrustumView lview;
   csFrustumContext *ctxt = lview.GetFrustumContext ();
-  lview.SetNodeFunction (node_light_func);
   lview.SetPolygonFunction (poly_light_func);
   lview.SetCurveFunction (curve_light_func);
   lview.SetRadius (GetRadius ());

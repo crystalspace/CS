@@ -20,9 +20,9 @@
 #define __CS_THING_H__
 
 #include "csgeom/transfrm.h"
+#include "csengine/arrays.h"
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
-#include "csengine/bsp.h"
 #include "csutil/util.h"
 #include "csutil/flags.h"
 #include "csutil/cscolor.h"
@@ -31,7 +31,6 @@
 #include "csutil/refarr.h"
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
-#include "iengine/viscull.h"
 #include "iengine/mesh.h"
 #include "iengine/rview.h"
 #include "iengine/shadcast.h"
@@ -49,7 +48,6 @@ class csMaterialWrapper;
 class csMaterialList;
 class csThing;
 class csPolygon3D;
-class csPolygonInt;
 class csPolygonTree;
 class csPolygon2D;
 class csPolygon2DQueue;
@@ -167,10 +165,7 @@ private:
  * oriented such that they are visible from the outside.<p>
  *
  * Things can also be used for volumetric fog. In that case
- * the Thing must be convex.<p>
- *
- * If you add a static tree (octree/BSP trees) to a thing it can
- * be used as a visibility culler (i.e. it implements iVisibilityCuller).
+ * the Thing must be convex.
  */
 class csThing : public csObject
 {
@@ -311,24 +306,6 @@ private:
    */
   uint32 ambient_version;
 
-  /**
-   * Vector with visibility objects. Only useful if this thing has a
-   * static tree and thus can do visibility testing.
-   */
-  csVector visobjects;
-
-  /**
-   * List of objects to iterate over (after VisTest()).
-   */
-  csVector vistest_objects;
-  bool vistest_objects_inuse;	// If true the vector is in use.
-
-  /**
-   * If this variable is not NULL then it is a BSP or octree for this
-   * thing.
-   */
-  csPolygonTree* static_tree;
-
   /// If convex, this holds the index to the center vertex.
   int center_idx;
 
@@ -408,23 +385,14 @@ private:
    * for more efficient rendering. WARNING! This version only works for
    * lightmapped polygons right now and is far from complete.
    */
-  void DrawPolygonArrayDPM (csPolygonInt** polygon, int num,
+  void DrawPolygonArrayDPM (csPolygon3D** polygon, int num,
 	iRenderView* rview, iMovable* movable, csZBufMode zMode);
 
   /**
    * Draw the given array of polygons in the current csPolygonSet.
    */
-  static void DrawPolygonArray (csPolygonInt** polygon, int num,
+  static void DrawPolygonArray (csPolygon3D** polygon, int num,
 	iRenderView* rview, csZBufMode zMode);
-
-  /**
-   * Test a number of polygons against the c-buffer and insert them to the
-   * c-buffer if visible and also add them to a queue.
-   * If 'pvs' is true then the PVS is used (polygon->IsVisible()).
-   */
-  static void* TestQueuePolygonArray (csPolygonInt** polygon, int num,
-	iRenderView* d, csPolygon2DQueue* poly_queue, bool pvs,
-	uint32 current_visnr);
 
   /**
    * Draw one 3D/2D polygon combination. The 2D polygon is the transformed
@@ -432,32 +400,6 @@ private:
    */
   static void DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
 	iRenderView* d, csZBufMode zMode);
-
-  /**
-   * This function is called by the BSP tree traversal routine
-   * to test polygons against the C buffer and add them to a queue if needed.
-   */
-  static void* TestQueuePolygons (csThing*, csPolygonInt** polygon,
-  	int num, bool same_plane, void* data);
-
-  /**
-   * Draw a number of polygons from a queue (used with C buffer processing).
-   * Polygons are drawn using ZFILL mode.
-   */
-  void DrawPolygonsFromQueue (csPolygon2DQueue* queue, iRenderView* rview);
-
-  /**
-   * This function is called by the BSP tree traversal routine
-   * to draw a number of polygons.
-   */
-  static void* DrawPolygons (csThing*, csPolygonInt** polygon,
-  	int num, bool same_plane, void* data);
-
-  /**
-   * Check if some object needs updating in the visibility information
-   * (static tree) and do the update in that case.
-   */
-  void CheckVisUpdate (csVisObjInfo* vinf);
 
   /**
    * Utility function to be called whenever movable changes so the
@@ -576,7 +518,7 @@ public:
   //----------------------------------------------------------------------
 
   /// Add a polygon to this thing.
-  void AddPolygon (csPolygonInt* spoly);
+  void AddPolygon (csPolygon3D* spoly);
 
   /// Create a new polygon in this thing and add it.
   csPolygon3D* NewPolygon (csMaterialWrapper* material);
@@ -584,9 +526,6 @@ public:
   /// Get the number of polygons in this thing.
   int GetPolygonCount ()
   { return polygons.Length (); }
-
-  /// Get a csPolygonInt with the index.
-  csPolygonInt* GetPolygonInt (int idx);
 
   /// Get the specified polygon from this set.
   csPolygon3D *GetPolygon3D (int idx)
@@ -811,44 +750,6 @@ public:
   iPolygonMesh* GetWriteObject ();
 
   //----------------------------------------------------------------------
-  // Visibility culler
-  //----------------------------------------------------------------------
-
-  /**
-   * Get the static polygon tree.
-   */
-  csPolygonTree* GetStaticTree () { return static_tree; }
-
-  /**
-   * Call this function to generate a polygon tree for this csThing.
-   * This might make drawing more efficient because
-   * this thing can then be drawn using Z-fill instead of Z-buffer.
-   * Also the c-buffer requires a tree of this kind.
-   */
-  void BuildStaticTree (const char* name, int mode = BSP_MINIMIZE_SPLITS);
-
-  /// Register a visibility object with this culler.
-  void RegisterVisObject (iVisibilityObject* visobj);
-  /// Unregister a visibility object with this culler.
-  void UnregisterVisObject (iVisibilityObject* visobj);
-
-  /// General VisTest.
-  bool VisTest (iRenderView* irview);
-  /// Box VisTest.
-  csPtr<iVisibilityObjectIterator> VisTest (const csBox3& box);
-  /// Sphere VisTest.
-  csPtr<iVisibilityObjectIterator> VisTest (const csSphere& sphere);
-
-  //----------------------------------------------------------------------
-  // Shadow System
-  //----------------------------------------------------------------------
-
-  /**
-   * Start casting shadows from a given point in space.
-   */
-  void CastShadows (iFrustumView* fview);
-
-  //----------------------------------------------------------------------
   // Drawing
   //----------------------------------------------------------------------
 
@@ -948,11 +849,6 @@ public:
   csPolygon3D* IntersectSegmentFull (const csVector3& start,
 	const csVector3& end, csVector3& isect,
 	float* pr = NULL, csMeshWrapper** p_mesh = NULL);
-
-  /**
-   * Check frustum visibility on this thing.
-   */
-  void RealCheckFrustum (iFrustumView* lview, iMovable* movable);
 
   /**
    * Check frustum visibility on this thing.
@@ -1257,48 +1153,6 @@ public:
     SCF_DECLARE_IBASE;
   } scfiPolygonMeshLOD;
 
-  //-------------------- iVisibilityCuller interface implementation ----------
-  struct VisCull : public iVisibilityCuller
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csThing);
-    virtual void Setup (const char* name)
-    {
-      scfParent->BuildStaticTree (name, BSP_MINIMIZE_SPLITS);
-    }
-    virtual void RegisterVisObject (iVisibilityObject* visobj)
-    {
-      scfParent->RegisterVisObject (visobj);
-    }
-    virtual void UnregisterVisObject (iVisibilityObject* visobj)
-    {
-      scfParent->UnregisterVisObject (visobj);
-    }
-    virtual bool VisTest (iRenderView* irview)
-    {
-      return scfParent->VisTest (irview);
-    }
-    virtual csPtr<iVisibilityObjectIterator> VisTest (const csBox3& box)
-    {
-      return scfParent->VisTest (box);
-    }
-    virtual csPtr<iVisibilityObjectIterator> VisTest (const csSphere& sphere)
-    {
-      return scfParent->VisTest (sphere);
-    }
-    virtual bool IntersectSegment (const csVector3& start,
-      const csVector3& end, csVector3& isect, float* pr = NULL,
-      iMeshWrapper** p_mesh = NULL, iPolygon3D** poly = NULL);
-    virtual void CastShadows (iFrustumView* fview)
-    {
-      scfParent->CastShadows (fview);
-    }
-    virtual uint32 GetCurrentVisibilityNumber () const
-    {
-      return scfParent->current_visnr;
-    }
-  } scfiVisibilityCuller;
-  friend struct VisCull;
-
   //-------------------- iShadowCaster interface implementation ----------
   struct ShadowCaster : public iShadowCaster
   {
@@ -1316,7 +1170,7 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE (csThing);
     virtual void CastShadows (iMovable* movable, iFrustumView* fview)
     {
-      scfParent->RealCheckFrustum (fview, movable);
+      scfParent->CheckFrustum (fview, movable);
     }
   } scfiShadowReceiver;
   friend struct ShadowReceiver;

@@ -41,13 +41,6 @@ struct iCurveTemplate;
 struct csFog;
 
 /**
- * If CS_THING_VISTREE is set then an octree will be calculated for the
- * polygons in this thing. In this case the thing will implement a
- * fully working iVisibilityCuller which the sector can use.
- */
-#define CS_THING_VISTREE 1
-
-/**
  * If CS_THING_FASTMESH is set then this thing will be drawn using
  * the faster DrawPolygonMesh.
  */

@@ -21,7 +21,6 @@
 
 #include "csutil/hashmap.h"
 
-class csPolygonInt;
 class csPolygon3D;
 class csPolygonEdges;
 
@@ -122,10 +121,9 @@ private:
 public:
   /**
    * Construct this structure based on the given array
-   * of csPolygonInt*. The csPolygonInt* are assumed to
-   * be of type csPolygon3D.
+   * of csPolygon3D*.
    */
-  csPolygonEdges (csPolygonInt** polygons, int num_polygons);
+  csPolygonEdges (csPolygon3D** polygons, int num_polygons);
 
   /**
    * Destroy this set of edges

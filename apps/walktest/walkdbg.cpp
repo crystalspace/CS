@@ -30,7 +30,6 @@
 #include "iengine/light.h"
 
 #include "csengine/wirefrm.h"
-#include "csengine/octree.h"
 
 #define Gfx3D Sys->myG3D
 #define Gfx2D Sys->myG2D
@@ -384,62 +383,6 @@ void DrawLineDepth (const csVector3& v1, const csVector3& v2,
   int color = Gfx2D->FindRGB (col, col, col);
 
   Gfx2D->DrawLine (px1, py1, px2, py2, color);
-}
-
-void DrawOctreeBoxes (csOctreeNode* node,
-	int level, int draw_level)
-{
-  if (!node) return;
-  if (draw_level != -1 && level > draw_level) return;
-  if (level == draw_level || (draw_level == -1 && node->IsLeaf ()))
-  {
-    iCamera* cam = Sys->view->GetCamera ();
-    csOrthoTransform& ct = cam->GetTransform ();
-    const csBox3& box = node->GetBox ();
-    DrawLineDepth (ct.Other2This (box.GetCorner (0)),
-  		   ct.Other2This (box.GetCorner (1)), cam->GetFOV ());
-    DrawLineDepth (ct.Other2This (box.GetCorner (0)),
-  		   ct.Other2This (box.GetCorner (2)), cam->GetFOV ());
-    DrawLineDepth (ct.Other2This (box.GetCorner (0)),
-  		   ct.Other2This (box.GetCorner (4)), cam->GetFOV ());
-    DrawLineDepth (ct.Other2This (box.GetCorner (7)),
-  		   ct.Other2This (box.GetCorner (3)), cam->GetFOV ());
-    DrawLineDepth (ct.Other2This (box.GetCorner (7)),
-  		   ct.Other2This (box.GetCorner (6)), cam->GetFOV ());
-    DrawLineDepth (ct.Other2This (box.GetCorner (6)),
-  		   ct.Other2This (box.GetCorner (2)), cam->GetFOV ());
-    DrawLineDepth (ct.Other2This (box.GetCorner (6)),
-  		   ct.Other2This (box.GetCorner (4)), cam->GetFOV ());
-    DrawLineDepth (ct.Other2This (box.GetCorner (3)),
-  		   ct.Other2This (box.GetCorner (2)), cam->GetFOV ());
-    DrawLineDepth (ct.Other2This (box.GetCorner (3)),
-  		   ct.Other2This (box.GetCorner (1)), cam->GetFOV ());
-    DrawLineDepth (ct.Other2This (box.GetCorner (5)),
-  		   ct.Other2This (box.GetCorner (1)), cam->GetFOV ());
-    DrawLineDepth (ct.Other2This (box.GetCorner (5)),
-  		   ct.Other2This (box.GetCorner (4)), cam->GetFOV ());
-    DrawLineDepth (ct.Other2This (box.GetCorner (5)),
-  		   ct.Other2This (box.GetCorner (7)), cam->GetFOV ());
-  }
-  int i;
-  for (i = 0 ; i < 8 ; i++)
-    DrawOctreeBoxes (node->GetChild (i), level+1, draw_level);
-}
-
-
-void DrawOctreeBoxes (int draw_level)
-{
-  (void)draw_level;
-#if 0
-//@@@
-  csCamera* cam = Sys->view->GetCamera ();
-  csSector* sector = cam->GetSector ();
-  csThing* stat = sector->GetStaticThing ();
-  if (!stat) return;
-  csOctree* tree = (csOctree*)stat->GetStaticTree ();
-  csOctreeNode* node = tree->GetRoot ();
-  DrawOctreeBoxes (node, 0, draw_level);
-#endif
 }
 
 #define PLANE_X 0

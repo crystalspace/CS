@@ -32,7 +32,6 @@
 #include "csengine/material.h"
 #include "csengine/lghtmap.h"
 #include "csengine/stats.h"
-#include "csengine/cbuffer.h"
 #include "csengine/lppool.h"
 #include "csengine/region.h"
 #include "csgeom/fastsqrt.h"
@@ -64,7 +63,6 @@
 #include "iutil/plugin.h"
 #include "iutil/virtclk.h"
 #include "csgeom/polypool.h"
-#include "csengine/cbufcube.h"
 #include "csengine/polygon.h"
 #include "csengine/pol2d.h"
 #include "csengine/radiosty.h"
@@ -515,38 +513,6 @@ iSector *csSectorIt::Fetch ()
     return sector ? &(sector->scfiSector) : NULL;
   }
 
-#if 0
-  //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-  // @@@ This function should try to use the octree if available to
-
-  // quickly discard lots of polygons that cannot be close enough.
-  while (cur_poly < sector->GetPolygonCount ())
-  {
-    csPolygon3D *p = sector->GetPolygon3D (cur_poly);
-    cur_poly++;
-
-    csPortal *po = p->GetPortal ();
-    if (po)
-    {
-      const csPlane3 &wpl = p->GetPlane ()->GetWorldPlane ();
-      float d = wpl.Distance (pos);
-      if (d < radius && csMath3::Visible (pos, wpl))
-      {
-        if (!po->GetSector ()) po->CompleteSector ();
-
-        csVector3 new_pos;
-        if (po->flags.Check (CS_PORTAL_WARP))
-          new_pos = po->Warp (pos);
-        else
-          new_pos = pos;
-        recursive_it = new csSectorIt (po->GetSector (), new_pos, radius);
-        return Fetch ();
-      }
-    }
-  }
-#endif
-
   // End search.
   has_ended = true;
   return NULL;
@@ -655,27 +621,20 @@ csEngine::csEngine (iBase *iParent) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
   DG_TYPE (&scfiObject, "csEngine");
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
-  cbufcube = NULL;
-  cbufcube = new csCBufferCube (1024);
   render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory ());
   thing_type = new csThingObjectType (NULL);
   rad_debug = NULL;
-  engine_mode = CS_ENGINE_AUTODETECT;
   first_dyn_lights = NULL;
   object_reg = NULL;
   textures = NULL;
   materials = NULL;
   render_context = NULL;
   shared_variables = NULL;
-  c_buffer = NULL;
   region = NULL;
   current_camera = NULL;
   current_engine = this;
   current_iengine = (iEngine*)this;
   scfiEventHandler = NULL;
-  use_pvs = false;
-  use_pvs_only = false;
-  freeze_pvs = false;
   clear_zbuf = false;
   clear_screen = false;
   nextframe_pending = 0;
@@ -684,8 +643,6 @@ csEngine::csEngine (iBase *iParent) :
   default_lightmap_cell_size = 16;
   default_clear_zbuf = false;
   default_clear_screen = false;
-
-  InitCuller ();
 
   textures = new csTextureList ();
   materials = new csMaterialList ();
@@ -727,12 +684,10 @@ csEngine::~csEngine ()
   render_priorities.DeleteAll ();
 
   delete render_pol2d_pool;
-  delete cbufcube;
   delete rad_debug;
   delete materials;
   delete textures;
   delete lightpatch_pool;
-  delete c_buffer;
   delete shared_variables;
 }
 
@@ -905,12 +860,10 @@ void csEngine::DeleteAll ()
 
   render_context = NULL;
 
-  InitCuller ();
   delete render_pol2d_pool;
   render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory ());
   delete lightpatch_pool;
   lightpatch_pool = new csLightPatchPool ();
-  use_pvs = false;
 
   // Clear all regions.
   region = NULL;
@@ -1006,55 +959,6 @@ void csEngine::ClearRenderPriorities ()
   RegisterRenderPriority ("alpha", 8, CS_RENDPRI_BACK2FRONT);
 }
 
-void csEngine::ResolveEngineMode ()
-{
-  if (engine_mode == CS_ENGINE_AUTODETECT)
-  {
-    // Here we do some heuristic. We scan all sectors and see if there
-    // are some that have big octrees. If so we select CS_ENGINE_FRONT2BACK.
-    // If not we select CS_ENGINE_BACK2FRONT.
-    // @@@ It might be an interesting option to try to find a good engine
-    // mode for every sector and switch dynamically based on the current
-    // sector (only switch based on the position of the camera, not switch
-    // based on the sector we are currently rendering).
-    int switch_f2b = 0;
-    int i;
-    for (i = 0; i < sectors.Length (); i++)
-    {
-      csSector *s = sectors[i]->GetPrivateObject ();
-      iMeshWrapper *ss = s->GetCullerMesh ();
-      if (ss)
-      {
-#if 0
-        // @@@ Disabled because we can't get at the tree now.
-        csPolygonTree *ptree = ss->GetPrivateObject ()->GetStaticTree ();
-        csOctree *otree = (csOctree *)ptree;
-        int num_nodes = otree->GetRoot ()->CountChildren ();
-        if (num_nodes > 30)
-          switch_f2b += 10;
-        else if (num_nodes > 15)
-          switch_f2b += 5;
-#else
-        switch_f2b += 10;
-#endif
-      }
-
-      if (switch_f2b >= 10) break;
-    }
-
-    if (switch_f2b >= 10)
-    {
-      engine_mode = CS_ENGINE_FRONT2BACK;
-      Report ("Engine is using front2back mode.");
-    }
-    else
-    {
-      engine_mode = CS_ENGINE_BACK2FRONT;
-      Report ("Engine is using back2front mode.");
-    }
-  }
-}
-
 int csEngine::GetLightmapCellSize () const
 {
   return csLightMap::lightcell_size;
@@ -1075,12 +979,6 @@ void csEngine::ResetWorldSpecificSettings()
   	default_ambient_red / 255.0f,
 	default_ambient_green / 255.0f, 
         default_ambient_blue / 255.0f));
-}
-
-void csEngine::InitCuller ()
-{
-  delete c_buffer;
-  c_buffer = new csCBuffer (0, frame_width - 1, frame_height);
 }
 
 void csEngine::PrepareTextures ()
@@ -1488,9 +1386,6 @@ void csEngine::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
   Stats::polygons_rejected = 0;
   Stats::polygons_accepted = 0;
 
-  // Make sure we select an engine mode.
-  ResolveEngineMode ();
-
   current_camera = c;
   rview.SetEngine (this);
   rview.SetOriginalCamera (c);
@@ -1518,16 +1413,6 @@ void csEngine::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
   float topy = -c->GetShiftY () * c->GetInvFOV ();
   float boty = (frame_height - c->GetShiftY ()) * c->GetInvFOV ();
   rview.SetFrustum (leftx, rightx, topy, boty);
-
-  // Initialize the 2D/3D culler.
-  if (engine_mode == CS_ENGINE_FRONT2BACK)
-  {
-    c_buffer->Initialize ();
-    c_buffer->InsertPolygon (
-          view->GetClipPoly (),
-          view->GetVertexCount (),
-          true);
-  }
 
   cur_process_polygons = 0;
 }
@@ -2975,9 +2860,6 @@ void csEngine::Resize ()
 {
   frame_width = G3D->GetWidth ();
   frame_height = G3D->GetHeight ();
-
-  // Reset the culler.
-  InitCuller ();
 }
 
 void csEngine::SetContext (iTextureHandle *txthandle)
@@ -2994,7 +2876,6 @@ void csEngine::SetContext (iTextureHandle *txthandle)
       frame_width = G3D->GetWidth ();
       frame_height = G3D->GetHeight ();
     }
-    InitCuller ();
   }
 }
 

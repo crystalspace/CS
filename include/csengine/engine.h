@@ -40,7 +40,6 @@
 #include "ivideo/graph3d.h"
 
 
-class csCBufferCube;
 class csPoly2DPool;
 class csRadiosity;
 class csRegion;
@@ -54,8 +53,6 @@ class csStatLight;
 class csDynLight;
 class csEngine;
 class csLight;
-class csCBuffer;
-class csXORBuffer;
 class csLightPatchPool;
 class csLightHalo;
 class csRenderView;
@@ -366,42 +363,11 @@ private:
   /// Current number of processed polygons.
   static int cur_process_polygons;
 
-  /// Current engine mode (one of CS_ENGINE_... flags).
-  int engine_mode;
-
   /// Current render context (proc texture) or NULL if global.
   iTextureHandle* render_context;
 
   /// Pointer to radiosity system if we are in step-by-step radiosity mode.
   csRadiosity* rad_debug;
-
-  /// Optional c-buffer used for rendering.
-  csCBuffer* c_buffer;
-  /// Optional XOR-buffer used for rendering.
-  csXORBuffer* xor_buffer;
-  bool use_xorbuf;
-
-  /// C-buffer cube used for lighting.
-  csCBufferCube* cbufcube;
-
-  /// Use PVS.
-  bool use_pvs;
-
-  /**
-   * Use PVS only. If this flag is true (and use_pvs == true)
-   * then no other culling mechanisms will be used.
-   */
-  bool use_pvs_only;
-
-  /**
-   * Freeze the PVS.
-   * If this flag is true then the PVS will be 'frozen'.
-   * The freeze_pvs_pos will be used as the fixed position
-   * to calculate the PVS from.
-   */
-  bool freeze_pvs;
-  /// Frozen PVS position.
-  csVector3 freeze_pvs_pos;
 
   /// Clear the Z-buffer every frame.
   bool clear_zbuf;
@@ -438,11 +404,6 @@ private:
   csRef<iVirtualClock> virtual_clock;
 
 private:
-  /**
-   * Resolve the engine mode if it is CS_ENGINE_AUTODETECT.
-   */
-  void ResolveEngineMode ();
-
   /**
    * Setup for starting a Draw or DrawFunc.
    */
@@ -619,25 +580,6 @@ public:
   void InvalidateLightmaps ();
 
   /**
-   * Set the desired engine mode.
-   * One of the CS_ENGINE_... flags. Default is CS_ENGINE_AUTODETECT.
-   * If you select CS_ENGINE_AUTODETECT then the mode will be
-   * auto-detected (depending on level and/or hardware capabilities)
-   * the first time csEngine::Draw() is called.
-   */
-  virtual void SetEngineMode (int mode)
-  {
-    engine_mode = mode;
-  }
-
-  /**
-   * Get the current engine mode.
-   * If called between SetEngineMode() and the first Draw() it is
-   * possible that this mode will still be CS_ENGINE_AUTODETECT.
-   */
-  virtual int GetEngineMode () const { return engine_mode; }
-
-  /**
    * Get the required flags for 3D->BeginDraw() which should be called
    * from the application. These flags must be or-ed with optional other
    * flags that the application might be interested in.
@@ -646,7 +588,7 @@ public:
   {
     int flag = 0;
     if (clear_screen) flag |= CSDRAW_CLEARSCREEN;
-    if (clear_zbuf || engine_mode == CS_ENGINE_ZBUFFER)
+    if (clear_zbuf)
       return flag | CSDRAW_CLEARZBUFFER;
     else
       return flag;
@@ -656,77 +598,6 @@ public:
    * Get the last animation time.
    */
   csTicks GetLastAnimationTime () const { return nextframe_pending; }
-
-  /**
-   * Initialize the culler.
-   */
-  void InitCuller ();
-
-  /**
-   * Return c-buffer (or NULL if not used).
-   */
-  csCBuffer* GetCBuffer () const { return c_buffer; }
-
-  /**
-   * Return xor-buffer (or NULL if not used).
-   */
-  csXORBuffer* GetXORBuffer () const { return xor_buffer; }
-
-  /**
-   * Return cbuffer cube.
-   */
-  csCBufferCube* GetCBufCube () const { return cbufcube; }
-
-  /**
-   * Enable PVS.
-   */
-  void EnablePVS () { use_pvs = true; use_pvs_only = false; }
-
-  /**
-   * Disable PVS.
-   */
-  void DisablePVS () { use_pvs = false; }
-
-  /**
-   * Is PVS enabled?
-   */
-  virtual bool IsPVS () const { return use_pvs; }
-
-  /**
-   * Use only PVS for culling. This flag only makes sense when
-   * PVS is enabled.
-   */
-  void EnablePVSOnly () { use_pvs_only = true; }
-
-  /**
-   * Don't use only PVS for culling.
-   */
-  void DisablePVSOnly () { use_pvs_only = false; }
-
-  /**
-   * Is PVS only enabled?
-   */
-  bool IsPVSOnly () { return use_pvs_only; }
-
-  /**
-   * Freeze the PVS for some position.
-   */
-  void FreezePVS (const csVector3& pos) { freeze_pvs = true; freeze_pvs_pos = pos; }
-
-  /**
-   * Unfreeze the PVS.
-   */
-  void UnfreezePVS () { freeze_pvs = false; }
-
-  /**
-   * Is the PVS frozen?
-   */
-  bool IsPVSFrozen () { return freeze_pvs; }
-
-  /**
-   * Return the frozen position for the PVS.
-   */
-  const csVector3& GetFrozenPosition () const { return freeze_pvs_pos; }
 
   /**
    * Set the mode for the lighting cache (combination of CS_ENGINE_CACHE_???).

@@ -1286,7 +1286,7 @@ static void frustum_polygon_report_func (
   csPlane3 poly_plane;
 
   // radiosity works with the base, unsplit polygon.
-  csPolygon3D *destpoly3d = ((csPolygon3D *)obj)->GetBasePolygon ();
+  csPolygon3D *destpoly3d = (csPolygon3D *)obj;
 
   // obtain radpoly
   csRadElement *dest = csRadElement::GetRadElement (*destpoly3d);

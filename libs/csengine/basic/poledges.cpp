@@ -16,7 +16,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "csengine/polyint.h"
 #include "csengine/poledges.h"
 #include "csengine/polygon.h"
 
@@ -94,13 +93,13 @@ csPolygon3D *csEdgeIterator::Next (int &e1, int &e2)
 }
 
 //---------------------------------------------------------------------------
-csPolygonEdges::csPolygonEdges (csPolygonInt **polygons, int num_polygons) :
+csPolygonEdges::csPolygonEdges (csPolygon3D **polygons, int num_polygons) :
   edges(25247)  // Some prime number
 {
   int i, j, j1;
   for (i = 0; i < num_polygons; i++)
   {
-    csPolygon3D *p = (csPolygon3D *)polygons[i];
+    csPolygon3D *p = polygons[i];
     const csPolyIndexed &pi = p->GetVertices ();
     j1 = pi.GetVertexCount () - 1;
     for (j = 0; j < pi.GetVertexCount (); j++)

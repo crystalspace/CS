@@ -101,30 +101,6 @@ struct iSharedVariableList;
 #define CS_NLIGHT_NEARBYSECTORS 8
 /** @} */
 
-/** \name SetEngineMode() settings
- * @{ */
-/**
- * Autodetect the best mode according to the level.
- */
-#define CS_ENGINE_AUTODETECT 0
-
-/**
- * Use back-to-front rendering (using optional BSP/octree) and Z-fill.
- * Don't init Z-buffer at start of render frame.
- */
-#define CS_ENGINE_BACK2FRONT 1
-
-/**
- * Use a 2D/3D culler (c-buffer) and front-to-back sorting.
- */
-#define CS_ENGINE_FRONT2BACK 2
-
-/**
- * Use the Z-buffer for culling.
- */
-#define CS_ENGINE_ZBUFFER 3
-/** @} */
-
 /** \name SetLightingCacheMode() settings
  * @{ */
 /**
@@ -196,7 +172,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 8, 0);
+SCF_VERSION (iEngine, 0, 9, 0);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -248,11 +224,6 @@ struct iEngine : public iBase
    * manager)
    */
   virtual int GetTextureFormat () const = 0;
-
-  /**
-   * Return true if engine want to use PVS.
-   */
-  virtual bool IsPVS () const = 0;
 
   /**
    * Create or select a new region (name can be NULL for the default main
@@ -571,29 +542,6 @@ struct iEngine : public iBase
    * to let this function return that the Z-buffer must be cleared.
    */
   virtual int GetBeginDrawFlags () const = 0;
-
-  /**
-   * Set the desired engine mode.
-   * One of the CS_ENGINE_... flags. Default is CS_ENGINE_AUTODETECT.
-   * <ul>
-   * <li>#CS_ENGINE_AUTODETECT: try to auto-detect the best mode to use
-   *     for rendering this level (also depends on hardware capabilities).
-   *     This is calculated the first time iEngine->Draw() is called.
-   * <li>#CS_ENGINE_BACK2FRONT: Render polygons back to front (optionally
-   *     using octree/bsp for this).
-   * <li>#CS_ENGINE_FRONT2BACK: Use the c-buffer for culling polygons and
-   *     render front to back (only if octree/bsp tree is available).
-   * <li>#CS_ENGINE_ZBUFFER: Use the Z-buffer for rendering.
-   * </ul>
-   */
-  virtual void SetEngineMode (int mode) = 0;
-
-  /**
-   * Get the current engine mode.
-   * If called between SetEngineMode() and the first Draw() it is
-   * possible that this mode will still be CS_ENGINE_AUTODETECT.
-   */
-  virtual int GetEngineMode () const = 0;
 
   /**
    * Get the top-level clipper.

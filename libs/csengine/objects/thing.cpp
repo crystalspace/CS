@@ -27,8 +27,6 @@
 #include "csengine/engine.h"
 #include "csengine/stats.h"
 #include "csengine/sector.h"
-#include "csengine/cbufcube.h"
-#include "csengine/bspbbox.h"
 #include "csengine/curve.h"
 #include "csengine/texture.h"
 #include "csengine/material.h"
@@ -65,7 +63,6 @@ SCF_IMPLEMENT_IBASE_EXT(csThing)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iLightingInfo)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iObjectModel)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPolygonMesh)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iVisibilityCuller)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iShadowCaster)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iShadowReceiver)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshObject)
@@ -86,10 +83,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::PolyMesh)
   SCF_IMPLEMENTS_INTERFACE(iPolygonMesh)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::VisCull)
-  SCF_IMPLEMENTS_INTERFACE(iVisibilityCuller)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::ShadowCaster)
@@ -119,7 +112,6 @@ csThing::csThing (iBase *parent) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityCuller);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowCaster);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowReceiver);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshObject);
@@ -168,7 +160,6 @@ csThing::csThing (iBase *parent) :
 
   cfg_moving = CS_THING_MOVE_NEVER;
 
-  static_tree = NULL;
   prepared = false;
 
   current_lod = 1;
@@ -185,8 +176,6 @@ csThing::csThing (iBase *parent) :
   obj_normals = NULL;
   smoothed = false;
   current_visnr = 1;
-
-  vistest_objects_inuse = false;
 }
 
 csThing::~csThing ()
@@ -208,16 +197,6 @@ csThing::~csThing ()
   delete[] curve_vertices;
   delete[] curve_texels;
   delete bbox;
-  delete static_tree;
-
-  int i;
-  for (i = 0; i < visobjects.Length (); i++)
-  {
-    csVisObjInfo *vinf = (csVisObjInfo *)visobjects[i];
-    delete vinf->bbox;
-    vinf->visobj->DecRef ();
-    delete vinf;
-  }
 
   polygons.DeleteAll ();          // delete prior to portal_poly array !
   if (portal_polygons.Length ()) portal_polygons.DeleteAll ();
@@ -959,80 +938,6 @@ void csThing::RemoveUnusedVertices ()
   if (bbox) CreateBoundingBox ();
 }
 
-void csThing::BuildStaticTree (const char *name, int mode)
-{
-  //mode = BSP_BALANCE_AND_SPLITS;
-  delete static_tree;
-  static_tree = NULL;
-
-  CreateBoundingBox ();
-
-  csBox3 bbox;
-  GetBoundingBox (bbox);
-  static_tree = new csOctree (
-      this,
-      bbox.Min (),
-      bbox.Max (),
-      150 /*15*/,
-      mode);
-
-  csEngine *w = csEngine::current_engine;
-  iCacheManager* cache_mgr = w->GetCacheManager ();
-
-  char* cachename = GenerateCacheName ();
-  char buf[100];
-  sprintf (buf, "%s_%s", cachename, name);
-  cache_mgr->SetCurrentScope (buf);
-  delete[] cachename;
-
-  bool recalc_octree = true;
-  if (!csEngine::do_force_revis)
-  {
-    recalc_octree = false;
-    csEngine::current_engine->Report ("Loading bsp/octree...");
-    recalc_octree = !((csOctree *)static_tree)->ReadFromCache (
-        cache_mgr,
-        GetPolygonArray ().GetArray (),
-        GetPolygonArray ().Length ());
-    if (recalc_octree)
-    {
-      delete static_tree;
-      static_tree = new csOctree (
-          this,
-          bbox.Min (),
-          bbox.Max (),
-          150 /*15*/,
-          mode);
-    }
-
-    cache_mgr->SetCurrentScope (NULL);
-  }
-
-  if (recalc_octree)
-  {
-    csEngine::current_engine->Report ("Calculate bsp/octree...");
-    static_tree->Build (GetPolygonArray ());
-
-    csEngine::current_engine->Report ("Caching bsp/octree...");
-    ((csOctree *)static_tree)->Cache (cache_mgr);
-
-    cache_mgr->SetCurrentScope (NULL);
-  }
-
-  csEngine::current_engine->Report ("Compress vertices...");
-  CompressVertices ();
-  RemoveUnusedVertices ();
-  csEngine::current_engine->Report ("Build vertex tables...");
-  ((csOctree *)static_tree)->BuildVertexTables ();
-
-  static_tree->Statistics ();
-}
-
-csPolygonInt *csThing::GetPolygonInt (int idx)
-{
-  return (csPolygonInt *)GetPolygon3D (idx);
-}
-
 csPolygon3D *csThing::GetPolygon3D (const char *name)
 {
   int idx = polygons.FindKey (name);
@@ -1103,14 +1008,13 @@ void csThing::RemovePolygons ()
   if (portal_polygons.Length ()) portal_polygons.DeleteAll ();
 }
 
-void csThing::AddPolygon (csPolygonInt *poly)
+void csThing::AddPolygon (csPolygon3D *poly)
 {
   InvalidateThing ();
 
-  csPolygon3D *poly3d = (csPolygon3D *)poly;
-  poly3d->SetParent (this);
-  polygons.Push (poly3d);
-  if (poly3d->GetPortal ()) AddPortalPolygon (poly3d);
+  poly->SetParent (this);
+  polygons.Push (poly);
+  if (poly->GetPortal ()) AddPortalPolygon (poly);
 }
 
 csCurve *csThing::GetCurve (char *name) const
@@ -1271,113 +1175,6 @@ void csThing::HardTransform (const csReversibleTransform &t)
   }
 }
 
-struct ISectData
-{
-  csSegment3 seg;
-  csVector3 isect;
-  float r;
-  bool only_local;      // If true we only consider polygons in the culler mesh
-  csMeshWrapper *mesh;  // Hit mesh
-};
-
-/*
- * @@@
- * This function does not yet do anything but it should
- * use the PVS as soon as we have that to make IntersectSegment
- * even faster.
- */
-static bool IntersectSegmentCull (
-  csPolygonTree *
-
-  /*tree*/,
-  csPolygonTreeNode *node,
-  const csVector3 &
-
-  /*pos*/,
-  void *data)
-{
-  if (!node) return false;
-  if (node->Type () != NODE_OCTREE) return true;
-
-  ISectData *idata = (ISectData *)data;
-  csOctreeNode *onode = (csOctreeNode *)node;
-  csVector3 isect;
-  if (csIntersect3::BoxSegment (onode->GetBox (), idata->seg, isect) > -1)
-    return true;
-
-  // Segment does not intersect with node so we return false here.
-  return false;
-}
-
-static void *IntersectSegmentTestPol (
-  csThing *thing,
-  csPolygonInt **polygon,
-  int num,
-  bool
-
-  /*same_plane*/,
-  void *data)
-{
-  ISectData *idata = (ISectData *)data;
-  int i;
-  for (i = 0; i < num; i++)
-  {
-    if (polygon[i]->GetType () == 1)
-    {
-      csPolygon3D *p = (csPolygon3D *)polygon[i];
-      if (
-        p->IntersectSegment (
-            idata->seg.Start (),
-            idata->seg.End (),
-            idata->isect,
-            &(idata->r)))
-      {
-        idata->mesh = NULL;
-        return (void *)p;
-      }
-    }
-    else if ((!idata->only_local) && polygon[i]->GetType () == 3)
-    {
-      csBspPolygon *bsppol = (csBspPolygon *)polygon[i];
-      csVisObjInfo *obj = bsppol->GetOriginator ();
-      iMeshWrapper* mesh = obj->visobj->GetMeshWrapper ();
-      if (mesh)
-      {
-        if (mesh->GetMeshObject () == &(thing->scfiMeshObject)) continue;
-        if (
-          bsppol->IntersectSegment (
-              idata->seg.Start (),
-              idata->seg.End (),
-              idata->isect,
-              NULL))
-        {
-          csRef<iThingState> thing (SCF_QUERY_INTERFACE (
-              mesh->GetMeshObject (),
-              iThingState));
-          if (thing)
-          {
-            //@@@@@@ UGLY!
-            csThing *th = (csThing *) (thing->GetPrivateObject ());
-
-            csPolygon3D *p = th->IntersectSegment (
-                idata->seg.Start (),
-                idata->seg.End (),
-                idata->isect,
-                &(idata->r));
-            if (p)
-            {
-              idata->mesh = mesh->GetPrivateObject ();
-              return p;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  return NULL;
-}
-
 csPolygon3D *csThing::IntersectSegmentFull (
   const csVector3 &start,
   const csVector3 &end,
@@ -1386,59 +1183,31 @@ csPolygon3D *csThing::IntersectSegmentFull (
   csMeshWrapper **p_mesh)
 {
   if (p_mesh) *p_mesh = NULL;
-  if (static_tree)
+
+  int i;
+  float r, best_r = 2000000000.;
+  csVector3 cur_isect;
+  csPolygon3D *best_p = NULL;
+
+  // @@@ This routine is not very optimal. Especially for things
+  // with large number of polygons.
+  for (i = 0; i < polygons.Length (); i++)
   {
-    // Version with culler.
-    ISectData idata;
-    idata.mesh = NULL;
-    idata.only_local = false;
-    idata.seg.Set (start, end);
-
-    void *rc = static_tree->Front2Back (
-        start,
-        IntersectSegmentTestPol,
-        (void *) &idata,
-        IntersectSegmentCull,
-        (void *) &idata);
-    if (rc)
+    csPolygon3D *p = polygons.Get (i);
+    if (p->IntersectSegment (start, end, cur_isect, &r))
     {
-      if (pr) *pr = idata.r;
-      isect = idata.isect;
-      if (p_mesh) *p_mesh = idata.mesh;
-      return (csPolygon3D *)rc;
-    }
-
-    return NULL;
-  }
-  else
-  {
-    // Version without culler.
-    int i;
-    float r, best_r = 2000000000.;
-    csVector3 cur_isect;
-    csPolygon3D *best_p = NULL;
-
-    // @@@ This routine is not very optimal. Especially for things
-
-    // with large number of polygons.
-    for (i = 0; i < polygons.Length (); i++)
-    {
-      csPolygon3D *p = polygons.Get (i);
-      if (p->IntersectSegment (start, end, cur_isect, &r))
+      if (r < best_r)
       {
-        if (r < best_r)
-        {
-          best_r = r;
-          best_p = p;
-          isect = cur_isect;
-        }
+        best_r = r;
+        best_p = p;
+        isect = cur_isect;
       }
     }
-
-    if (pr) *pr = best_r;
-    if (p_mesh) *p_mesh = NULL;
-    return best_p;
   }
+
+  if (pr) *pr = best_r;
+  if (p_mesh) *p_mesh = NULL;
+  return best_p;
 }
 
 csPolygon3D *csThing::IntersectSegment (
@@ -1472,103 +1241,50 @@ csPolygon3D *csThing::IntersectSegment (
     return best_p;
   }
 
-  if (static_tree)
+  int i;
+  float r, best_r = 2000000000.;
+  csVector3 cur_isect;
+  csPolygon3D *best_p = NULL;
+
+  // @@@ This routine is not very optimal. Especially for things
+  // with large number of polygons.
+  for (i = 0; i < polygons.Length (); i++)
   {
-    // Version with culler.
-    ISectData idata;
-    idata.only_local = true;
-    idata.seg.Set (start, end);
-
-    void *rc = static_tree->Front2Back (
-        start,
-        IntersectSegmentTestPol,
-        (void *) &idata,
-        IntersectSegmentCull,
-        (void *) &idata);
-    if (rc)
+    csPolygon3D *p = polygons.Get (i);
+    if (p->IntersectSegment (start, end, cur_isect, &r))
     {
-      if (pr) *pr = idata.r;
-      isect = idata.isect;
-      return (csPolygon3D *)rc;
-    }
-
-    return NULL;
-  }
-  else
-  {
-    // Version without culler.
-    int i;
-    float r, best_r = 2000000000.;
-    csVector3 cur_isect;
-    csPolygon3D *best_p = NULL;
-
-    // @@@ This routine is not very optimal. Especially for things
-
-    // with large number of polygons.
-    for (i = 0; i < polygons.Length (); i++)
-    {
-      csPolygon3D *p = polygons.Get (i);
-      if (p->IntersectSegment (start, end, cur_isect, &r))
+      if (r < best_r)
       {
-        if (r < best_r)
-        {
-          best_r = r;
-          best_p = p;
-          isect = cur_isect;
-        }
+        best_r = r;
+        best_p = p;
+        isect = cur_isect;
       }
     }
-
-    if (pr) *pr = best_r;
-    return best_p;
   }
+
+  if (pr) *pr = best_r;
+  return best_p;
 }
 
 bool csThing::HitBeamOutline (const csVector3& start,
   const csVector3& end, csVector3& isect, float* pr)
 {
-  if (static_tree)
+  int i;
+  float r;
+
+  // @@@ This routine is not very optimal. Especially for things
+  // with large number of polygons.
+  for (i = 0; i < polygons.Length (); i++)
   {
-    // Version with culler.
-    ISectData idata;
-    idata.only_local = true;
-    idata.seg.Set (start, end);
-
-    void *rc = static_tree->Front2Back (
-        start,
-        IntersectSegmentTestPol,
-        (void *) &idata,
-        IntersectSegmentCull,
-        (void *) &idata);
-    if (rc)
+    csPolygon3D *p = polygons.Get (i);
+    if (p->IntersectSegment (start, end, isect, &r))
     {
-      if (pr) *pr = idata.r;
-      isect = idata.isect;
-      return rc != NULL;
+      if (pr) *pr = r;
+      return true;
     }
-
-    return false;
   }
-  else
-  {
-    // Version without culler.
-    int i;
-    float r;
 
-    // @@@ This routine is not very optimal. Especially for things
-    // with large number of polygons.
-    for (i = 0; i < polygons.Length (); i++)
-    {
-      csPolygon3D *p = polygons.Get (i);
-      if (p->IntersectSegment (start, end, isect, &r))
-      {
-        if (pr) *pr = r;
-        return true;
-      }
-    }
-
-    return false;
-  }
+  return false;
 }
 
 bool csThing::HitBeamObject (const csVector3& start,
@@ -1619,24 +1335,6 @@ void csThing::DrawOnePolygon (
     {
       keep_plane = new csPolyPlane (*(p->GetPlane ()));
     }
-    // Before we draw through the portal we see if we are rendering
-    // for an object that uses a static tree (i.e. c-buffer). If that is
-    // the case we clear the c-buffer for the portal shape. We can safely
-    // do this because the c-buffer algo for this sector has finished
-    // anyway.
-    if (
-      csEngine::current_engine->GetEngineMode () == CS_ENGINE_FRONT2BACK)
-    {
-      csCBuffer *c_buffer = csEngine::current_engine->GetCBuffer ();
-      if (c_buffer)
-      {
-        c_buffer->Initialize ();
-        c_buffer->InsertPolygon (
-            poly->GetVertices (),
-            poly->GetVertexCount (),
-            true);
-      }
-    }
 
     // Draw through the portal. If this fails we draw the original polygon
     // instead. Drawing through a portal can fail because we have reached
@@ -1672,7 +1370,7 @@ void csThing::DrawOnePolygon (
 }
 
 void csThing::DrawPolygonArray (
-  csPolygonInt **polygon,
+  csPolygon3D **polygon,
   int num,
   iRenderView *d,
   csZBufMode zMode)
@@ -1698,8 +1396,7 @@ void csThing::DrawPolygonArray (
 
   for (i = 0; i < num; i++)
   {
-    if (polygon[i]->GetType () != 1) continue;
-    p = (csPolygon3D *)polygon[i];
+    p = polygon[i];
     if (p->flags.Check (CS_POLY_NO_DRAW)) continue;
     p->UpdateTransformation (camtrans, icam->GetCameraNumber ());
     if (p->ClipToPlane (pclip_plane, camtrans.GetOrigin (), verts, num_verts))  //@@@Pool for verts?
@@ -1937,7 +1634,7 @@ float csThing::GetScreenBoundingBox (
 
 #ifndef CS_USE_NEW_RENDERER
 void csThing::DrawPolygonArrayDPM (
-  csPolygonInt ** /*polygon*/,
+  csPolygon3D ** /*polygon*/,
   int /*num*/,
   iRenderView *rview,
   iMovable *movable,
@@ -2003,252 +1700,6 @@ int viscnt_invis_obj;
 float viscnt_vis_node_vol;
 float viscnt_invis_node_vol;
 #endif
-
-void *csThing::TestQueuePolygonArray (
-  csPolygonInt **polygon,
-  int num,
-  iRenderView *d,
-  csPolygon2DQueue *poly_queue,
-  bool pvs,
-  uint32 current_visnr)
-{
-  csPolygon3D *p;
-  csVector3 *verts;
-  int num_verts;
-  int i;
-  csCBuffer *c_buffer = csEngine::current_engine->GetCBuffer ();
-  bool visible;
-  csPoly2DPool *render_pool = csEngine::current_engine->render_pol2d_pool;
-  csPolygon2D *clip;
-  iCamera *icam = d->GetCamera ();
-  const csReversibleTransform &camtrans = icam->GetTransform ();
-
-  // Normally visibility of objects in the bsp tree is handled by inserting
-  // the bounding box polygons of the object in the tree. However, this
-  // insertion will not modify the tree meaning that if we reach a bsp leaf
-  // we will just insert all remaining bounding box polygons in that leaf
-  // without further subdividing the leaf as would be needed for real
-  // bsp building.
-  //
-  // When doing visibility testing we traverse the tree from front to back
-  // and insert all polygons in the c-buffer. Bounding box polygons
-  // are not inserted but only tested to see if the object is visible or not.
-  //
-  // So this means that the bsp code should always traverse the bounding
-  // box polygons first before giving the real polygons.
-  for (i = 0; i < num; i++)
-  {
-    if (!csEngine::ProcessPolygon ()) return (void *)1;
-
-    // For every polygon we perform some type of culling (2D or 3D culling).
-    // If 2D culling (c-buffer) then transform it to screen space
-    // and perform clipping to Z plane. Then test against the c-buffer
-    // to see if it is visible.
-    // If 3D culling (quadtree3D) then we just test it.
-    if (polygon[i]->GetType () == 3)
-    {
-      // We're dealing with a csBspPolygon.
-      csBspPolygon *bsppol = (csBspPolygon *)polygon[i];
-      csVisObjInfo *obj = bsppol->GetOriginator ();
-      bool obj_vis = obj->visobj->GetVisibilityNumber () == current_visnr;
-      csPolyTreeBBox *tbb = obj->bbox;
-
-      // If the object is already marked visible then we don't have
-      // to do any of the other processing for this polygon.
-      if (!obj_vis)
-      {
-        // Since we have a csBspPolygon we know that the poly tree object
-        // is a csPolyTreeBBox instance.
-        if (!tbb->IsTransformed (icam->GetCameraNumber ()))
-        {
-          // The bbox of this object has not yet been transformed
-          // to camera space.
-          tbb->World2Camera (camtrans, icam->GetCameraNumber ());
-        }
-
-        // Culling.
-        bool mark_vis = false;
-        csPlane3 clip_plane, *pclip_plane;
-        bool do_clip_plane = d->GetClipPlane (clip_plane);
-        if (do_clip_plane)
-          pclip_plane = &clip_plane;
-        else
-          pclip_plane = NULL;
-        clip = (csPolygon2D *) (render_pool->Alloc ());
-        if (
-          bsppol->ClipToPlane (
-              pclip_plane,
-              camtrans.GetOrigin (),
-              verts,
-              num_verts,
-              !icam->IsMirrored ()))
-        {
-          csPlane3 *plclip = icam->GetFarPlane ();
-
-          // The far plane is defined negative. So if the polygon is entirely
-          // in front of the far plane it is not visible. Otherwise we will
-          // render it.
-          if (
-            !plclip ||
-            csPoly3D::Classify (*plclip, verts, num_verts) != CS_POL_FRONT)
-          {
-            if (
-              bsppol->DoPerspective (
-                  camtrans,
-                  verts,
-                  num_verts,
-                  clip,
-                  icam->IsMirrored ()) &&
-              clip->ClipAgainst (d->GetClipper ()))
-            {
-              if (c_buffer->TestPolygon (
-                    clip->GetVertices (),
-                    clip->GetVertexCount ()))
-              {
-                mark_vis = true;
-#		ifdef CS_DEBUG
-		viscnt_vis_obj++;
-#		endif
-              }
-#	      ifdef CS_DEBUG
-	      else viscnt_invis_obj++;
-#	      endif
-	    }
-          }
-        }
-
-        if (mark_vis) obj->visobj->SetVisibilityNumber (current_visnr);
-        if (clip) render_pool->Free (clip);
-      }
-    }
-    else
-    {
-      // We're dealing with a csPolygon3D.
-      // @@@ We should only alloc the 2D polygon when we need to do it.
-      // So this means further down the 'if'.
-      p = (csPolygon3D *)polygon[i];
-      if (pvs)
-      {
-        //if (!p->IsVisible ())
-        //{
-        // Polygon is not visible because of PVS.
-        //@@@ CURRENTLY DISABLED continue;
-        //}
-      }
-
-      visible = false;
-      clip = NULL;
-
-      // Culling.
-      if (p->flags.Check (CS_POLY_NO_DRAW))
-      {
-        // Don't draw this polygon.
-      }
-      else
-      {
-        csPlane3 clip_plane, *pclip_plane;
-        bool do_clip_plane = d->GetClipPlane (clip_plane);
-        if (do_clip_plane)
-          pclip_plane = &clip_plane;
-        else
-          pclip_plane = NULL;
-
-        csPlane3 *plclip = icam->GetFarPlane ();
-
-        clip = (csPolygon2D *) (render_pool->Alloc ());
-        if (
-          p->ClipToPlane (
-              pclip_plane,
-              camtrans.GetOrigin (),
-              verts,
-              num_verts) &&
-          (
-            !plclip ||
-            csPoly3D::Classify (*plclip, verts, num_verts) != CS_POL_FRONT
-          ) &&
-          p->DoPerspective (
-              camtrans,
-              verts,
-              num_verts,
-              clip,
-              NULL,
-              icam->IsMirrored ()) &&
-          clip->ClipAgainst (d->GetClipper ()))
-        {
-          if (csEngine::current_engine->IsPVSOnly ())
-            visible = true;
-          else
-          {
-            // A portal is considered an non-transparent surface
-            // here (i.e. a normal polygon). So we simply do
-            // InsertPolygon() as opposed to TestPolygon() for portals.
-            visible = c_buffer->InsertPolygon (
-                  clip->GetVertices (),
-                  clip->GetVertexCount ());
-#	    ifdef CS_DEBUG
-	    if (visible) viscnt_vis_poly++;
-	    else viscnt_invis_poly++;
-#	    endif
-          }
-        }
-      }
-
-      if (visible && !clip)
-      {
-        // If visible and we don't already have a clip (i.e. we did 3D culling)
-        // then we need to make it here. It is still possible that the
-        // polygon will be culled at this stage.
-        csPlane3 clip_plane, *pclip_plane;
-        bool do_clip_plane = d->GetClipPlane (clip_plane);
-        if (do_clip_plane)
-          pclip_plane = &clip_plane;
-        else
-          pclip_plane = NULL;
-
-        csPlane3 *plclip = icam->GetFarPlane ();
-        clip = (csPolygon2D *) (render_pool->Alloc ());
-        if (
-          !(
-            p->ClipToPlane (
-                pclip_plane,
-                camtrans.GetOrigin (),
-                verts,
-                num_verts) &&
-              (
-                !plclip ||
-                csPoly3D::Classify (
-                    *plclip,
-                    verts,
-                    num_verts) != CS_POL_FRONT
-              ) && p->DoPerspective (
-                  camtrans,
-                  verts,
-                  num_verts,
-                  clip,
-                  NULL,
-                  icam->IsMirrored ()) && clip->ClipAgainst (d->GetClipper ())
-          ))
-        {
-          visible = false;
-        }
-      }
-
-      if (visible)
-      {
-        poly_queue->Push (p, clip);
-        Stats::polygons_accepted++;
-        if (c_buffer && c_buffer->IsFull ()) return (void *)1;  // Stop
-      }
-      else
-      {
-        if (clip) render_pool->Free (clip);
-        Stats::polygons_rejected++;
-      }
-    }
-  }
-
-  return NULL;
-}
 
 // @@@ We need a more clever algorithm here. We should try
 // to recognize convex sub-parts of a polygonset and return
@@ -2558,8 +2009,7 @@ void PolyMeshHelper::Setup ()
   for (i = 0; i < thing->GetPolygonCount (); i++)
   {
     csPolygon3D *p = pol.Get (i);
-    if (!p->GetUnsplitPolygon () && p->flags.Check (poly_flag))
-      num_poly++;
+    if (p->flags.Check (poly_flag)) num_poly++;
   }
 
   // Check curves.
@@ -2605,7 +2055,7 @@ void PolyMeshHelper::Setup ()
     for (i = 0; i < thing->GetPolygonCount (); i++)
     {
       csPolygon3D *p = pol.Get (i);
-      if (!p->GetUnsplitPolygon () && p->flags.Check (poly_flag))
+      if (p->flags.Check (poly_flag))
       {
         polygons[num_poly].num_vertices = p->GetVertexCount ();
         polygons[num_poly].vertices = p->GetVertexIndices ();
@@ -3001,285 +2451,6 @@ bool csThing::DrawTest (iRenderView *rview, iMovable *movable)
 #endif
 }
 
-CS_IMPLEMENT_STATIC_VAR (GetCullOctreeNodePerspPoly,csPolygon2D,())
-
-// @@@ This routine need to be cleaned up!!! It probably needs to
-
-// be part of the class.
-bool CullOctreeNode (
-  csPolygonTree *tree,
-  csPolygonTreeNode *node,
-  const csVector3 &pos,
-  void *data)
-{
-  if (!node) return false;
-  if (node->Type () != NODE_OCTREE) return true;
-
-  bool vis = true;
-
-  int i;
-  csOctree *otree = (csOctree *)tree;
-  csOctreeNode *onode = (csOctreeNode *)node;
-
-  csCBuffer *c_buffer;
-  iRenderView *rview = (iRenderView *)data;
-  static csPolygon2D &persp = *GetCullOctreeNodePerspPoly ();
-  csVector3 array[7];
-  csEngine *w = csEngine::current_engine;
-  iCamera *icam = rview->GetCamera ();
-  const csReversibleTransform &camtrans = icam->GetTransform ();
-
-  //if (w->IsPVS ())
-  //{
-  // Test for PVS.
-  //if (!onode->IsVisible ()) { vis = false; goto the_end; }
-  //else if (w->IsPVSOnly ()) goto is_vis;
-  //}
-  c_buffer = w->GetCBuffer ();
-
-  int num_array;
-  csPlane3 *far_plane = icam->GetFarPlane ();
-  otree->GetConvexOutline (onode, pos, array, num_array, far_plane != NULL);
-
-  if (num_array)
-  {
-    // If we use a farplane we could have up to 7 corners,
-    // but the 7th we'll need not here.
-    int nVert = MIN (6, num_array);
-
-    csVector3 cam[7];
-
-    // If all vertices are behind z plane then the node is
-    // not visible. If some vertices are behind z plane then we
-    // need to clip the polygon.
-    // We also test the node against the view frustum here.
-    int num_z_0 = 0;
-    bool left = true, right = true, top = true, bot = true;
-    float lx, rx, ty, by;
-    rview->GetFrustum (lx, rx, ty, by);
-    for (i = 0; i < nVert; i++)
-    {
-      cam[i] = camtrans.Other2This (array[i]);
-      if (cam[i].z < SMALL_EPSILON) num_z_0++;
-      if (left && cam[i].x >= cam[i].z * lx) left = false;
-      if (right && cam[i].x <= cam[i].z * rx) right = false;
-      if (top && cam[i].y >= cam[i].z * ty) top = false;
-      if (bot && cam[i].y <= cam[i].z * by) bot = false;
-    }
-
-    if (left || right || top || bot)
-    {
-      vis = false;
-      goto the_end;
-    }
-
-    if (num_z_0 == nVert)
-    {
-      // Node behind camera.
-      vis = false;
-      goto the_end;
-    }
-
-    if (far_plane)
-    {
-      if (num_array == 7)                 // we havent transformed the 7th yet
-        cam[6] = camtrans.Other2This (array[6]);
-      for (i = 0; i < num_array; i++)
-        if (far_plane->Classify (cam[i]) > SMALL_EPSILON) break;
-      if (i == num_array)
-      {
-	vis = false;
-        goto the_end;
-      }
-    }
-
-    persp.MakeEmpty ();
-    if (num_z_0 == 0)
-    {
-      // No vertices are behind. Just perspective correct.
-      for (i = 0; i < nVert; i++) persp.AddPerspective (cam[i]);
-    }
-    else
-    {
-      // Some vertices are behind. We need to clip.
-      csVector3 isect;
-      int i1 = nVert - 1;
-      for (i = 0; i < nVert; i++)
-      {
-        if (cam[i].z < SMALL_EPSILON)
-        {
-          if (cam[i1].z < SMALL_EPSILON)
-          {
-            // Just skip vertex.
-          }
-          else
-          {
-            // We need to intersect and add intersection point.
-            csIntersect3::ZPlane (SMALL_EPSILON, cam[i], cam[i1], isect);
-            persp.AddPerspective (isect);
-          }
-        }
-        else
-        {
-          if (cam[i1].z < SMALL_EPSILON)
-          {
-            // We need to intersect and add both intersection point and
-	    // this point.
-            csIntersect3::ZPlane (SMALL_EPSILON, cam[i], cam[i1], isect);
-            persp.AddPerspective (isect);
-          }
-
-          // Just perspective correct and add to the 2D polygon.
-          persp.AddPerspective (cam[i]);
-        }
-
-        i1 = i;
-      }
-    }
-
-    if (!persp.ClipAgainst (rview->GetClipper ()))
-    {
-      vis = false;
-      goto the_end;
-    }
-
-    // c-buffer test.
-    vis = c_buffer->TestPolygon (
-          persp.GetVertices (),
-          persp.GetVertexCount ());
-    if (!vis) goto the_end;
-  }
-
-  // If a node is visible we check wether or not it has a minibsp.
-  // If it has a minibsp then we need to transform all vertices used
-  // by that minibsp to camera space.
-  csVector3 *cam;
-  int *indices;
-  int num_indices;
-  if (onode->GetMiniBspVerts ())
-  {
-    // Here we get the polygon set as the static thing from the sector itself.
-    csThing *pset = otree->GetThing ();
-    cam = pset->GetCameraVertices (camtrans, icam->GetCameraNumber ());
-    indices = onode->GetMiniBspVerts ();
-    num_indices = onode->GetMiniBspVertexCount ();
-    for (i = 0; i < num_indices; i++)
-      cam[indices[i]] = camtrans.Other2This (pset->Vwor (indices[i]));
-  }
-
-the_end:
-# ifdef CS_DEBUG
-  if (viscnt_enabled)
-  {
-    if (vis) viscnt_vis_node++;
-    else
-    {
-      viscnt_invis_node++;
-      const csBox3& b = onode->GetBox ();
-      float volume = (b.MaxX ()-b.MinX ()) * (b.MaxY ()-b.MinY ()) *
-		(b.MaxZ ()-b.MinZ ());
-      viscnt_invis_node_vol += volume;
-    }
-  }
-# endif
-
-  return vis;
-}
-
-/**
- * This is data that is created by the visibility culler
- * and registered to the current recursion level (as render
- * context data). The data contains the queue of all visible
- * polygons. Since visibility testing and drawing is now seperate
- * we need to remember everything in a queue. Since it is also
- * possible that between visibility testing and drawing other
- * objects (or even this thing again!) can be called we have to
- * attach this queue to the current recursion level.
- */
-struct csPolygonVisInfo :
-  public iBase
-{
-  uint32 current_visnr;
-  csPolygon2DQueue *poly_queue;
-  csPolygonVisInfo (int num);
-  virtual~csPolygonVisInfo()
-  {
-    delete poly_queue;
-  }
-  SCF_DECLARE_IBASE;
-};
-
-SCF_IMPLEMENT_IBASE(csPolygonVisInfo)
-  SCF_IMPLEMENTS_INTERFACE(iBase)
-SCF_IMPLEMENT_IBASE_END
-
-csPolygonVisInfo::csPolygonVisInfo (int num)
-{
-  SCF_CONSTRUCT_IBASE (NULL);
-  poly_queue = new csPolygon2DQueue (num);
-}
-
-void *csThing::TestQueuePolygons (
-  csThing *thing,
-  csPolygonInt **polygon,
-  int num,
-  bool /*same_plane*/,
-  void *data)
-{
-  iRenderView *d = (iRenderView *)data;
-  csPolygonVisInfo *pvi = (csPolygonVisInfo *)
-    (d->FindRenderContextData ((void *)thing));
-  if (!pvi)
-  {
-    csEngine::current_engine->ReportBug ("INTERNAL ERROR! polygon queue is missing!!!");
-    fflush (stdout);
-    DEBUG_BREAK;
-  }
-
-  return csThing::TestQueuePolygonArray (
-      polygon,
-      num,
-      d,
-      pvi->poly_queue,
-      d->GetEngine ()->IsPVS (),
-      pvi->current_visnr);
-}
-
-void csThing::DrawPolygonsFromQueue (
-  csPolygon2DQueue *queue,
-  iRenderView *rview)
-{
-#ifndef CS_USE_NEW_RENDERER
-  csPolygon3D *poly3d;
-  csPolygon2D *poly2d;
-  csPoly2DPool *render_pool = csEngine::current_engine->render_pol2d_pool;
-  const csReversibleTransform &camtrans = rview->GetCamera ()->GetTransform ();
-  while (queue->Pop (&poly3d, &poly2d))
-  {
-    poly3d->UpdateTransformation (
-        camtrans,
-        rview->GetCamera ()->GetCameraNumber ());
-    poly3d->GetPlane ()->WorldToCamera (camtrans, poly3d->Vcam (0));
-    DrawOnePolygon (poly3d, poly2d, rview, CS_ZBUF_FILL);
-    render_pool->Free (poly2d);
-  }
-#endif // CS_USE_NEW_RENDERER
-}
-
-void *csThing::DrawPolygons (
-  csThing * /*thing*/,
-  csPolygonInt **polygon,
-  int num,
-  bool /*same_plane*/,
-  void *data)
-{
-#ifndef CS_USE_NEW_RENDERER
-  iRenderView *d = (iRenderView *)data;
-  csThing::DrawPolygonArray (polygon, num, d, CS_ZBUF_FILL);
-#endif // CS_USE_NEW_RENDERER
-  return NULL;
-}
-
 bool csThing::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
 {
 #ifndef CS_USE_NEW_RENDERER
@@ -3288,87 +2459,24 @@ bool csThing::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
 
   draw_busy++;
 
-  // If this thing has a static tree we follow a totally different procedure
-  // to draw it.
-  if (static_tree)
-  {
-#   ifdef CS_DEBUG
-    if (viscnt_enabled)
-    {
-      csOctree* otree = (csOctree*)static_tree;
-      const csBox3& b = otree->GetRoot ()->GetBox ();
-      viscnt_vis_node_vol = (b.MaxX ()-b.MinX ()) * (b.MaxY ()-b.MinY ()) *
-		(b.MaxZ ()-b.MinZ ());
-    }
-#   endif
+  Stats::polygons_considered += polygons.Length ();
+  DrawCurves (rview, movable, zMode);
 
-    int engine_mode = csEngine::current_engine->GetEngineMode ();
-
-    // If this thing has a static polygon tree (octree) there
-    // are three possibilities.
-    if (engine_mode == CS_ENGINE_FRONT2BACK)
-    {
-      csPolygonVisInfo *pvi = (csPolygonVisInfo *)
-        (rview->FindRenderContextData ((void *)this));
-      if (!pvi)
-      {
-        csEngine::current_engine->ReportBug (
-		"INTERNAL ERROR! polygon queue is missing!!!");
-        fflush (stdout);
-        DEBUG_BREAK;
-      }
-
-      // Render all polygons that are visible back to front.
-      DrawPolygonsFromQueue (pvi->poly_queue, rview);
-      rview->DeleteRenderContextData ((void *)this);
-    }
-    else if (engine_mode == CS_ENGINE_BACK2FRONT)
-    {
-      //-----
-      // Here we don't use the c-buffer or 2D culler but just render back
-      // to front.
-      //-----
-      static_tree->Back2Front (
-          camtrans.GetOrigin (),
-          &DrawPolygons,
-          (void *)rview);
-    }
-    else
-    {
-      //-----
-      // Here we render using the Z-buffer.
-      //-----
-      csOctree *otree = (csOctree *)static_tree;
-      csPolygonIntArray &unsplit = otree->GetRoot ()->GetUnsplitPolygons ();
-      DrawPolygonArray (
-        unsplit.GetPolygons (),
-        unsplit.GetPolygonCount (),
-        rview,
-        CS_ZBUF_USE);
-    }
-  }
+  if (flags.Check (CS_THING_FASTMESH))
+    DrawPolygonArrayDPM (
+      polygons.GetArray (),
+      polygons.Length (),
+      rview,
+      movable,
+      zMode);
   else
   {
-    // This thing has no static tree
-    Stats::polygons_considered += polygons.Length ();
-    DrawCurves (rview, movable, zMode);
-
-    if (flags.Check (CS_THING_FASTMESH))
-      DrawPolygonArrayDPM (
-        polygons.GetArray (),
-        polygons.Length (),
-        rview,
-        movable,
-        zMode);
-    else
-    {
-      UpdateTransformation (camtrans, icam->GetCameraNumber ());
-      DrawPolygonArray (
-        polygons.GetArray (),
-        polygons.Length (),
-        rview,
-        zMode);
-    }
+    UpdateTransformation (camtrans, icam->GetCameraNumber ());
+    DrawPolygonArray (
+      polygons.GetArray (),
+      polygons.Length (),
+      rview,
+      zMode);
   }
 
   draw_busy--;
@@ -3504,653 +2612,9 @@ bool csThing::DrawFoggy (iRenderView *d, iMovable *)
 }
 #endif // CS_USE_NEW_RENDERER
 
-void csThing::RegisterVisObject (iVisibilityObject *visobj)
-{
-  csVisObjInfo *vinf = new csVisObjInfo ();
-  vinf->visobj = visobj;
-
-  csRef<iShadowCaster> shadcast (SCF_QUERY_INTERFACE (visobj, iShadowCaster));
-  vinf->shadcast = shadcast;
-  vinf->bbox = new csPolyTreeBBox ();
-
-  // Initialize the movable and shape numbers with a number different
-  // from the one that the objects currently have so that we know
-  // we will add the object to the tree when we first need it.
-  vinf->last_movablenr = visobj->GetMovable ()->GetUpdateNumber () - 1;
-  vinf->last_shapenr = visobj->GetObjectModel ()->GetShapeNumber () - 1;
-  visobjects.Push (vinf);
-  visobj->IncRef ();
-}
-
-void csThing::UnregisterVisObject (iVisibilityObject *visobj)
-{
-  int idx;
-  csVisObjInfo *vinf = NULL;
-  for (idx = 0; idx < visobjects.Length (); idx++)
-  {
-    vinf = (csVisObjInfo *)visobjects[idx];
-    if (vinf->visobj == visobj) break;
-    vinf = NULL;
-  }
-
-  if (vinf == NULL) return ;
-  visobjects.Delete (idx);
-  delete vinf->bbox;
-  delete vinf;
-  visobj->DecRef ();
-}
-
-void csThing::CheckVisUpdate (csVisObjInfo *vinf)
-{
-  iVisibilityObject *visobj = vinf->visobj;
-  iMovable *movable = visobj->GetMovable ();
-  long movablenr = movable->GetUpdateNumber ();
-  long shapenr = visobj->GetObjectModel ()->GetShapeNumber ();
-  if (movablenr != vinf->last_movablenr || shapenr != vinf->last_shapenr)
-  {
-    vinf->last_movablenr = movablenr;
-    vinf->last_shapenr = shapenr;
-
-    csPolyTreeBBox *bbox = vinf->bbox;
-
-    // If object has not been placed in a sector we do nothing here.
-    if (!movable->InSector ()) return ;
-
-    csBox3 b;
-    visobj->GetObjectModel ()->GetObjectBoundingBox (b, CS_BBOX_MAX);
-
-    csReversibleTransform trans = movable->GetFullTransform ().GetInverse ();
-    bbox->Update (b, trans, vinf);
-
-    // Temporarily increase reference to prevent free.
-    bbox->GetBaseStub ()->IncRef ();
-    static_tree->AddObject (bbox);
-    bbox->GetBaseStub ()->DecRef ();
-  }
-}
-
-bool csThing::VisTest (iRenderView *irview)
-{
-  if (!static_tree) return false;
-  current_visnr++;
-
-  iEngine *iengine = irview->GetEngine ();
-  iCamera *icam = irview->GetCamera ();
-  int engine_mode = iengine->GetEngineMode ();
-
-  // If this thing has a static polygon tree (octree) there
-  // are three possibilities.
-  if (engine_mode == CS_ENGINE_FRONT2BACK)
-  {
-    //-----
-    // In this part of the rendering we use the c-buffer or another
-    // 2D/3D visibility culler.
-    //-----
-    csOrthoTransform &camtrans = icam->GetTransform ();
-    const csVector3 &origin = camtrans.GetOrigin ();
-
-    int i;
-    for (i = 0; i < visobjects.Length (); i++)
-    {
-      csVisObjInfo *vinf = (csVisObjInfo *)visobjects[i];
-
-      // First update visibility information if object has moved or
-      // changed shape fundamentally.
-      CheckVisUpdate (vinf);
-
-      iVisibilityObject *vo = vinf->visobj;
-      iMeshWrapper* mw = vo->GetMeshWrapper ();
-      if (mw->GetMeshObject () == &scfiMeshObject)
-      {
-        // If the object represents the object of the culler then
-        // the object is automatically visible.
-        vo->SetVisibilityNumber (current_visnr);
-      }
-      else
-      {
-        // If the current viewpoint is inside the bounding box of the
-        // object then we consider the object visible.
-        csBox3 bbox;
-        vo->GetObjectModel ()->GetObjectBoundingBox (bbox, CS_BBOX_MAX);
-        if (bbox.In (origin))
-          vo->SetVisibilityNumber (current_visnr);
-      }
-
-      vinf->bbox->ClearTransform ();
-    }
-
-    // Using the PVS, mark all sectors and polygons that are visible
-    // from the current node.
-    //if (engine->IsPVS ())
-    //{
-    //csOctree* otree = (csOctree*)static_tree;
-    //@@@if (engine->IsPVSFrozen ())
-    //@@@otree->MarkVisibleFromPVS (engine->GetFrozenPosition ());
-    //@@@else
-    //otree->MarkVisibleFromPVS (origin);
-    //}
-    // Initialize a queue on which all visible polygons will be pushed.
-    // The octree is traversed front to back but we want to render
-    // back to front. That's one of the reasons for this queue.
-    csPolygonVisInfo *pvi = new csPolygonVisInfo (GetPolygonCount ());
-    pvi->current_visnr = current_visnr;
-    irview->AttachRenderContextData ((void *)this, (iBase *)pvi);
-
-    // Update the transformation for the static tree. This will
-    // not actually transform all vertices from world to camera but
-    // it will make sure that when a node (octree node) is visited,
-    // the transformation will happen at that time.
-    UpdateTransformation (camtrans, icam->GetCameraNumber ());
-
-    // Traverse the tree front to back and push all visible polygons
-    // on the queue. This traversal will also mark all visible
-    // meshes and things. They will be put on a queue later.
-    static_tree->Front2Back (
-        origin,
-        &TestQueuePolygons,
-        irview,
-        CullOctreeNode,
-        irview);
-    return true;
-  }
-  else if (engine_mode == CS_ENGINE_BACK2FRONT)
-  {
-    //-----
-    // Here we don't use the c-buffer or 2D culler but just render back
-    // to front.
-    //-----
-    UpdateTransformation (icam->GetTransform (), icam->GetCameraNumber ());
-    return false;
-  }
-  else
-  {
-    //-----
-    // Here we render using the Z-buffer.
-    //-----
-    UpdateTransformation (icam->GetTransform (), icam->GetCameraNumber ());
-    return false;
-  }
-}
-
 //----------------------------------------------------------------------
-
-class csThingVisObjIt : public iVisibilityObjectIterator
-{
-private:
-  csVector* vector;
-  int position;
-  bool* vistest_objects_inuse;
-
-public:
-  SCF_DECLARE_IBASE;
-
-  csThingVisObjIt (csVector* vector, bool* vistest_objects_inuse)
-  {
-    SCF_CONSTRUCT_IBASE (NULL);
-    csThingVisObjIt::vector = vector;
-    csThingVisObjIt::vistest_objects_inuse = vistest_objects_inuse;
-    if (vistest_objects_inuse) *vistest_objects_inuse = true;
-    Reset ();
-  }
-  virtual ~csThingVisObjIt ()
-  {
-    // If the vistest_objects_inuse pointer is not NULL we set the
-    // bool to false to indicate we're no longer using the base
-    // vector. Otherwise we delete the vector.
-    if (vistest_objects_inuse) *vistest_objects_inuse = false;
-    else delete vector;
-  }
-
-  virtual bool Next()
-  {
-    if (position < 0) return false;
-    position++;
-    if (position == vector->Length ())
-    {
-      position = -1;
-      return false;
-    }
-    return true;
-  }
-
-  virtual void Reset()
-  {
-    if (vector == NULL || vector->Length () < 1)
-      position = -1;
-    else
-      position = 0;
-  }
-
-  virtual iVisibilityObject* GetObject () const
-  {
-    return (iVisibilityObject*)(vector->Get (position));
-  }
-  virtual bool IsFinished () const
-  {
-    return (position < 0);
-  }
-};
-
-SCF_IMPLEMENT_IBASE (csThingVisObjIt)
-  SCF_IMPLEMENTS_INTERFACE (iVisibilityObjectIterator)
-SCF_IMPLEMENT_IBASE_END
-
-//----------------------------------------------------------------------
-
-csPtr<iVisibilityObjectIterator> csThing::VisTest (const csBox3& box)
-{
-  if (!static_tree) return NULL;
-  current_visnr++;
-
-  csVector* v;
-  if (vistest_objects_inuse)
-  {
-    // Vector is already in use by another iterator. Allocate a new vector
-    // here.
-    v = new csVector ();
-  }
-  else
-  {
-    v = &vistest_objects;
-    vistest_objects.DeleteAll ();
-  }
-
-  // @@@ Very ugly implementation. Should at least try
-  // to use the octree!!!
-  int i;
-  for (i = 0; i < visobjects.Length (); i++)
-  {
-    csVisObjInfo *vinf = (csVisObjInfo *)visobjects[i];
-    iVisibilityObject *vo = vinf->visobj;
-    CheckVisUpdate (vinf);
-    csPolyTreeBBox *pt_bbox = vinf->bbox;
-    const csBox3& bbox = pt_bbox->GetWorldBoundingBox ();
-    if (bbox.TestIntersect (box))
-    {
-      vo->SetVisibilityNumber (current_visnr);
-      v->Push (vo);
-    }
-  }
-
-  csThingVisObjIt* vobjit = new csThingVisObjIt (v,
-  	vistest_objects_inuse ? NULL : &vistest_objects_inuse);
-  return csPtr<iVisibilityObjectIterator> (vobjit);
-}
-
-csPtr<iVisibilityObjectIterator> csThing::VisTest (const csSphere& sphere)
-{
-  if (!static_tree) return NULL;
-  current_visnr++;
-
-  csVector* v;
-  if (vistest_objects_inuse)
-  {
-    // Vector is already in use by another iterator. Allocate a new vector
-    // here.
-    v = new csVector ();
-  }
-  else
-  {
-    v = &vistest_objects;
-    vistest_objects.DeleteAll ();
-  }
-
-  // @@@ Very ugly implementation. Should at least try
-  // to use the octree!!!
-  csVector3 pos = sphere.GetCenter ();
-  float sqradius = sphere.GetRadius () * sphere.GetRadius ();
-  int i;
-  for (i = 0; i < visobjects.Length (); i++)
-  {
-    csVisObjInfo *vinf = (csVisObjInfo *)visobjects[i];
-    iVisibilityObject *vo = vinf->visobj;
-    CheckVisUpdate (vinf);
-    csPolyTreeBBox *pt_bbox = vinf->bbox;
-    const csBox3& bbox = pt_bbox->GetWorldBoundingBox ();
-    if (csIntersect3::BoxSphere (bbox, pos, sqradius))
-    {
-      vo->SetVisibilityNumber (current_visnr);
-      v->Push (vo);
-    }
-  }
-
-  csThingVisObjIt* vobjit = new csThingVisObjIt (v,
-  	vistest_objects_inuse ? NULL : &vistest_objects_inuse);
-  return csPtr<iVisibilityObjectIterator> (vobjit);
-}
-
-struct CheckFrustData
-{
-  iFrustumView *fview;
-  csHashSet visible_things;	// Contains objects of type iMeshWrapper.
-};
-
-static int frust_cnt = 50;
-
-//@@@ Needs to be part of sector?
-//@@@ TODO Optimization!: sort shadow frustums with relative size
-//as seen from light position. i.e. bigger shadow frustums come first.
-//After that do the compression step. This should reduce a lot more
-//of the shadow frustums.
-static void CompressShadowFrustums (iShadowBlockList *list)
-{
-  iShadowIterator *shadow_it = list->GetShadowIterator (true);
-  csFrustum *sf;
-  if (!shadow_it->HasNext ())
-  {
-    shadow_it->DecRef ();
-    return ;
-  }
-
-  csCBufferCube *cb = csEngine::current_engine->GetCBufCube ();
-  cb->MakeEmpty ();
-
-  while (shadow_it->HasNext ())
-  {
-    iShadowBlock *shadlist = shadow_it->GetNextShadowBlock ();
-    sf = shadow_it->Next ();
-    if (!list->FromCurrentRegion (shadlist))
-      break;
-
-    bool vis = cb->InsertPolygon (sf->GetVertices (), sf->GetVertexCount ());
-    if (!vis) shadow_it->DeleteCurrent ();
-  }
-
-  shadow_it->DecRef ();
-}
-
-//@@@ Needs to be part of sector?
-static void *CheckFrustumPolygonsFB (
-  csThing *thing,
-  csPolygonInt **polygon,
-  int num,
-  bool
-
-  /*same_plane*/,
-  void *data)
-{
-  iShadowCaster *ishadcast = &(thing->scfiShadowCaster);
-
-  csPolygon3D *p;
-  CheckFrustData *fdata = (CheckFrustData *)data;
-  iFrustumView *fview = fdata->fview;
-  csFrustumContext *ctxt = fview->GetFrustumContext ();
-  iShadowBlockList *shadows = ctxt->GetShadows ();
-  csVector3 &center = ctxt->GetLightFrustum ()->GetOrigin ();
-  csCBufferCube *cb = csEngine::current_engine->GetCBufCube ();
-  bool cw = true;                               // @@@ Mirror flag?
-  int i, j;
-  for (i = 0; i < num; i++)
-  {
-    csVector3 poly[128];                        // @@@ HARDCODED! BAD!
-    if (polygon[i]->GetType () == 3)
-    {
-      // A BSP polygon. Used for testing visibility of things.
-      csBspPolygon *bsppol = (csBspPolygon *)polygon[i];
-      csVisObjInfo *obj = bsppol->GetOriginator ();
-
-      // @@@ The code below is all not very nice. We should not assume
-      // that only meshes can be used in vis info.
-      iMeshWrapper* mesh = obj->visobj->GetMeshWrapper ();
-      if (mesh)
-      {
-        if (!fdata->visible_things.In (mesh))
-        {
-          csRef<iShadowCaster> shadcast (SCF_QUERY_INTERFACE (
-              mesh->GetMeshObject (), iShadowCaster));
-          if (shadcast)
-          {
-            csPolyIndexed &pi = bsppol->GetPolygon ();
-            csPolyTreeBBox *pi_par = bsppol->GetParent ();
-            csVector3Array &verts = pi_par->GetVertices ();
-            for (j = 0; j < pi.GetVertexCount (); j++)
-              poly[j] = verts[pi[j]] - center;
-
-            bool vis = cb->TestPolygon (poly, pi.GetVertexCount ());
-            if (vis)
-            {
-              if (fview->ThingShadowsEnabled ())
-              {
-                // The thing is visible and we want things to cast
-                // shadows. So we add all shadows generated by this
-                // thing to the shadow list.
-                if (shadcast != ishadcast)
-                {
-                  if ((!mesh->GetFlags ().Check (CS_ENTITY_CAMERA)) &&
-                      fview->CheckShadowMask (mesh->GetFlags ().Get ()))
-                    shadcast->AppendShadows (mesh->GetMovable (), shadows, center);
-                }
-              }
-
-              fdata->visible_things.AddNoTest (mesh);
-            }
-          }
-        }
-      }
-
-      continue;
-    }
-
-    if (polygon[i]->GetType () != 1) continue;
-    p = (csPolygon3D *)polygon[i];
-
-    // Polygons that are merged with the octree have world==obj space.
-    for (j = 0; j < p->GetVertexCount (); j++)
-      poly[j] = p->Vobj (j) - center;
-
-    bool vis = false;
-
-    float clas = p->GetPlane ()->GetWorldPlane ().Classify (center);
-    if (ABS (clas) < EPSILON) continue;
-    if ((clas <= 0) != cw) continue;
-
-    if (p->GetPortal ())
-    {
-      vis = cb->TestPolygon (poly, p->GetVertexCount ());
-    }
-    else
-    {
-      vis = cb->InsertPolygon (poly, p->GetVertexCount ());
-    }
-
-    fview->CallPolygonFunction ((csObject *)p, vis);
-    if (vis)
-    {
-      if (!shadows->GetLastShadowBlock ())
-      {
-        shadows->NewShadowBlock ();
-      }
-
-      csPlane3 pl = p->GetPlane ()->GetWorldPlane ();
-      pl.DD += center * pl.norm;
-      pl.Invert ();
-
-      csFrustum *frust = shadows->GetLastShadowBlock ()->AddShadow (
-          center,
-          (void *)p,
-          p->GetVertices ().GetVertexCount (),
-          pl);
-
-      // Polygons that are merged with the octree have world==obj space.
-      for (j = 0; j < p->GetVertices ().GetVertexCount (); j++)
-        frust->GetVertex (j).Set (poly[j]);
-      frust_cnt--;
-      if (frust_cnt < 0)
-      {
-        frust_cnt = 200;
-        CompressShadowFrustums (shadows);
-      }
-    }
-  }
-
-  return NULL;
-}
-
-// @@@ This routine need to be cleaned up!!! It needs to
-// be part of the class.
-// @@@ This function needs to use the PVS. However, this function itself
-// is used for the PVS so we need to take care!
-static bool CullOctreeNodeLighting (
-  csPolygonTree *tree,
-  csPolygonTreeNode *node,
-  const csVector3 &
-
-  /*pos*/,
-  void *data)
-{
-  if (!node) return false;
-  if (node->Type () != NODE_OCTREE) return true;
-
-  csOctree *otree = (csOctree *)tree;
-  csOctreeNode *onode = (csOctreeNode *)node;
-  iFrustumView *fview = (iFrustumView *)data;
-
-  csFrustumContext *ctxt = fview->GetFrustumContext ();
-  const csVector3 &center = ctxt->GetLightFrustum ()->GetOrigin ();
-  csVector3 bmin = onode->GetMinCorner () - center;
-  csVector3 bmax = onode->GetMaxCorner () - center;
-
-  // Calculate the distance between (0,0,0) and the box.
-  csVector3 result (0, 0, 0);
-  if (bmin.x > 0)
-    result.x = bmin.x;
-  else if (bmax.x < 0)
-    result.x = -bmax.x;
-  if (bmin.y > 0)
-    result.y = bmin.y;
-  else if (bmax.y < 0)
-    result.y = -bmax.y;
-  if (bmin.z > 0)
-    result.z = bmin.z;
-  else if (bmax.z < 0)
-    result.z = -bmax.z;
-
-  float dist = result.Norm ();
-  float radius = fview->GetRadius ();
-  if (radius < dist)
-  {
-    return false;
-  }
-
-  if (ABS (dist) < EPSILON)
-  {
-    // We are in the node.
-    fview->CallNodeFunction (onode, true);
-    return true;
-  }
-
-  // Test node against quad-tree.
-  csVector3 outline[6];
-  int num_outline;
-  otree->GetConvexOutline (onode, center, outline, num_outline);
-
-  bool vis = true;
-  if (num_outline > 0)
-  {
-    int i;
-    for (i = 0; i < num_outline; i++) outline[i] -= center;
-
-    csCBufferCube *cb = csEngine::current_engine->GetCBufCube ();
-    if (cb && !cb->TestPolygon (outline, num_outline)) vis = false;
-  }
-
-  fview->CallNodeFunction (onode, vis);
-  return vis;
-}
-
-void csThing::CastShadows (iFrustumView *fview)
-{
-  CS_ASSERT (static_tree != NULL);
-  current_visnr++;
-
-  iShadowBlockList *shadows = fview->GetFrustumContext ()->GetShadows ();
-  // Mark a new region so that we can restore the shadows later.
-  uint32 prev_region = shadows->MarkNewRegion ();
-
-  // If there is a static tree (BSP and/or octree) then we
-  // go front to back and add shadows to the list while we are doing
-  // that. In future I would like to add some extra culling stage
-  // here using a quad-tree or something similar (for example six
-  // quad-trees arranged in a cube around the light).
-  // First make sure the visibility objects are correctly put in the trees.
-  int i;
-  for (i = 0; i < visobjects.Length (); i++)
-  {
-    csVisObjInfo *vinf = (csVisObjInfo *)visobjects[i];
-
-    // First update visibility information if object has moved or
-    // changed shape fundamentally.
-    CheckVisUpdate (vinf);
-  }
-
-  CheckFrustData fdata;
-  fdata.fview = fview;
-
-  // Translate this sector so that it is oriented around
-  // the position of the light (position of the light becomes
-  // the new origin).
-  csVector3 &center = fview->GetFrustumContext ()->GetLightFrustum ()
-    ->GetOrigin ();
-
-  // All visible things will cause shadows to be added to 'lview'.
-  // Later on we'll restore these shadows.
-  frust_cnt = 50;
-  static_tree->Front2Back (
-      center,
-      CheckFrustumPolygonsFB,
-      (void *) &fdata,
-      CullOctreeNodeLighting,
-      (void *)fview);
-  frust_cnt = 50;
-
-  // Calculate lighting for all things in this sector.
-  // The 'visible_things' hashset that is in fdata will contain
-  // all things that are found visible while traversing the octree.
-  // This queue is filled while traversing the octree
-  // (CheckFrustumPolygonsFB).
-  csHashIterator it (fdata.visible_things.GetHashMap ());
-  iMeshWrapper *mesh;
-
-  while (it.HasNext ())
-  {
-    mesh = (iMeshWrapper *) (it.Next ());
-    // Only if the thing has right flags do we consider it for shadows.
-    if (fview->CheckProcessMask (mesh->GetFlags ().Get ()))
-    {
-      csRef<iShadowReceiver> shadrcv (SCF_QUERY_INTERFACE (
-        mesh->GetMeshObject (),
-        iShadowReceiver));
-      if (shadrcv)
-      {
-        // Skip doing lighting for the thing containing the culler itself.
-        if (shadrcv != &(scfiShadowReceiver))
-          shadrcv->CastShadows (mesh->GetMovable (), fview);
-      }
-    }
-  }
-
-  // Restore the shadow list in 'lview' and then delete
-  // all the shadow frustums that were added in this recursion
-  // level.
-  while (shadows->GetLastShadowBlock ())
-  {
-    iShadowBlock *sh = shadows->GetLastShadowBlock ();
-    if (!shadows->FromCurrentRegion (sh))
-      break;
-    shadows->RemoveLastShadowBlock ();
-    sh->DecRef ();
-  }
-  shadows->RestoreRegion (prev_region);
-}
 
 void csThing::CheckFrustum (iFrustumView *lview, iMovable *movable)
-{
-  csCBufferCube *cb = csEngine::current_engine->GetCBufCube ();
-  cb->MakeEmpty ();
-  RealCheckFrustum (lview, movable);
-}
-
-void csThing::RealCheckFrustum (iFrustumView *lview, iMovable *movable)
 {
   //@@@ Ok?
   cached_movable = movable;
@@ -4457,38 +2921,6 @@ iMeshObjectFactory *csThing::MeshObject::GetFactory () const
 {
   if (!scfParent->ParentTemplate) return NULL;
   return &scfParent->ParentTemplate->scfiMeshObjectFactory;
-}
-
-//---------------------------------------------------------------------------
-bool csThing::VisCull::IntersectSegment (
-  const csVector3 &start,
-  const csVector3 &end,
-  csVector3 &isect,
-  float *pr,
-  iMeshWrapper **p_mesh,
-  iPolygon3D** poly)
-{
-  scfParent->current_visnr++;
-  csMeshWrapper *m;
-  csPolygon3D *p = scfParent->IntersectSegmentFull (
-      start,
-      end,
-      isect,
-      pr,
-      &m);
-  if (p_mesh)
-  {
-    if (m)
-      *p_mesh = &(m->scfiMeshWrapper);
-    else
-      *p_mesh = NULL;
-  }
-
-  if (poly) *poly = &(p->scfiPolygon3D);
-  if (p)
-    return true;
-  else
-    return false;
 }
 
 //---------------------------------------------------------------------------

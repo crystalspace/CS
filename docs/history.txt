@@ -1,5 +1,19 @@
 The history order is reversed so that new features are at the top.
 
+16-Dec-2002
+	- Completely removed the old octree culler. This has a great impact
+	  on the internal engine structure. It greatly simplifies both
+	  csThing and csPolygon3D and it also makes sure they are a bit
+	  more efficient (use less memory and a bit faster since some
+	  virtual function calls are no longer virtual).
+	- Moved crysball culler from csengine to csgeom as it doesn't
+	  need nor depend on the engine.
+	- Removed everything related to PVS from the engine. That wasn't
+	  used anyway.
+	- Removed several API calls in iEngine and iSector related to the
+	  old culler and PVS.
+	- The parser will now give an error if 'culler' or 'vistree' is
+	  used in a map file.
 13-Dec-2002
         - Andreas Busch cleaned up some old/unused prototypes and outdated
           comments in walktest/handle_keys.
