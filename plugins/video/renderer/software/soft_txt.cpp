@@ -435,11 +435,14 @@ static uint8 *GenLightmapTable (int bits)
   int rshf = (13 - bits);
   int i, j;
   for (i = 0; i < 64; i++)
-    for (j = 0; j < 256; j++)
+  {
+    *dst++ = 0;
+    for (j = 1; j < 256; j++)
     {
       int x = (i * j) >> rshf;
-      *dst++ = (x > maxv) ? maxv : x;
+      *dst++ = (x > maxv) ? maxv : (x?x:1) ;
     }
+  }
   return table;
 }
 
