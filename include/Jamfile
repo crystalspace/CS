@@ -1,27 +1,3 @@
 SubDir TOP include ;
 
-rule ScanHeaders
-{
-  local top = $(<) ;
-  local dir = [ ConcatDirs $(top) include $(>) ] ;
-  local i, files = [ GLOB $(dir) : * ] ;
-  
-  for i in $(files)
-  {
-    if $(i:S) = ".h" || $(i:S) = ".i"
-    {
-      SEARCH on $(i:G=header) = $(top) ;
-      Depends install_include :
-        [ DoInstall $(i:G=header) : $(includedir) $(>) ] ;
-    }
-    else
-    {
-      if $(i:BS) != $(DOT) && $(i:BS) != $(DOTDOT)
-      {
-	ScanHeaders $(top) : $(>) $(i:BS) ;
-      }
-    }
-  }
-}
-
-ScanHeaders $(TOP) ;
+Recurse InstallHeader : .h .i ;

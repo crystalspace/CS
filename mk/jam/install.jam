@@ -15,7 +15,7 @@ appconfdir ?= [ ConcatDirs $(sysconfdir) $(PACKAGE_NAME) ] ;
 plugindir ?= [ ConcatDirs $(libdir) $(PACKAGE_NAME) ] ;
 
 ##  InstallHeader headername [ : subdir ]
-##    DoInstall a headerfile into the includedir directory. A subdirectory
+##    DoInstall a header file into the includedir directory. A subdirectory
 ##    relative to the includedir can be specified.
 rule InstallHeader
 {

@@ -73,6 +73,41 @@ rule Wildcard
   return $(files:BSR=$(sdir)) ;
 }
 
+##  Recurse rule : types : [ prefix ]
+##    Recursively scan current directory, $(SUBDIR), for files matching 'types'
+##    and invoke 'rule' for each file which matches one of the 'types'.
+##    'types' is a list of file extensions (with the leading dot).  'rule' will
+##    be invoked with two arguments: (1) the basename of the file, (2) a list
+##    of the path components from the current directory to the file's
+##    directory.  When 'rule' is invoked, it will see a $(SUBDIR) value of the
+##    directory containing the file (as if the rule had been invoked from
+##    within the file's directory).  'prefix' is an optional list of path
+##    components which will be prefixed to rule's second argument.
+rule Recurse
+{
+  local rule = $(1) ;
+  local types = $(2) ;
+  local prefix = $(3) ;
+  local files = [ GLOB $(SUBDIR) : * ] ;
+  
+  local i ;
+  for i in $(files)
+  {
+    if [ IsElem $(i:S) : $(types) ]
+    {
+      $(rule) $(i:BS) : $(prefix) ;
+    }
+    else
+    {
+      if ! [ IsElem $(i:BS) : $(DOT) $(DOTDOT) ]
+      {
+        local SUBDIR = $(i) ; # Called rules see this new temporary value.
+	Recurse $(rule) : $(types) : $(prefix) $(i:BS) ;
+      }
+    }
+  }
+}
+
 ##  Prefix list : prefix
 ##    Adds a prefix to a all elements in list.
 rule Prefix

@@ -18,6 +18,13 @@ chronological order.
 	  InstallHTMLDocs to better reflect its function.
 	- Jorrit re-enabled the clipping optimization in NR GL renderer
 	  after fixing partsys so it has a 'portals' render priority.
+	- Eric Sunshine added a general-purpose Recurse rule to helper.jam
+	  which recursively scans a directory tree for files matching types
+	  specified by the client, and invokes a client-specified Jam rule for
+	  each discovered file.
+	- Eric Sunshine removed the InstallHTMLDocs and ScanHeaders rules
+	  (docs/html/Jamfile & include/Jamfile), and replaced them with simple
+	  invocations of the new Recurse rule.
 17-Apr-2004
 	- Aren Blondahl updated map2cs to have newly optimized render priority
 	  on entities ('priority' tag in the .map) and fixed map2cs to support
