@@ -20,16 +20,12 @@
   TODO:
     Make nice startup screen with moving blocks as demo.
     Better textures.
-    'pause' should temporarily remove visible blocks (or fog area).
     Mark game-over height so that you can see it.
     Improve 'Game Over' screen!
     Cleanup of several 'Screens' in Blocks (code cleanup).
     Psuedo-AI module to play automatically.
     Add confirmation before quitting game.
     Fix bugs with marker on floor (wrong size...).
-    Extra light to the back of the play area.
-    Rotation of blocks should be relative to the camera position just
-       like movement.
  */
 
 #define SYSDEF_ACCESS
@@ -40,7 +36,6 @@
 #include "csutil/inifile.h"
 #include "csutil/vfs.h"
 #include "csgfxldr/csimage.h"
-#include "csgfxldr/gifimage.h"
 #include "csengine/dumper.h"
 #include "csengine/texture.h"
 #include "csengine/sector.h"
@@ -1087,12 +1082,48 @@ void Blocks::HandleGameKey (int key, bool shift, bool alt, bool ctrl)
     cam_move_dest = cam_move_src - .3 * (view_origin - cam_move_src);
     cam_move_up = csVector3 (0, -1, 0);
   }
-  else if (key_rotpx.Match (key, shift, alt, ctrl)) start_rotation (ROT_PX);
-  else if (key_rotmx.Match (key, shift, alt, ctrl)) start_rotation (ROT_MX);
+  else if (key_rotpx.Match (key, shift, alt, ctrl))
+  {
+    switch (cur_hor_dest)
+    {
+      case 0: start_rotation (ROT_PX); break;
+      case 1: start_rotation (ROT_PZ); break;
+      case 2: start_rotation (ROT_MX); break;
+      case 3: start_rotation (ROT_MZ); break;
+    }
+  }
+  else if (key_rotmx.Match (key, shift, alt, ctrl))
+  {
+    switch (cur_hor_dest)
+    {
+      case 0: start_rotation (ROT_MX); break;
+      case 1: start_rotation (ROT_MZ); break;
+      case 2: start_rotation (ROT_PX); break;
+      case 3: start_rotation (ROT_PZ); break;
+    }
+  }
   else if (key_rotpy.Match (key, shift, alt, ctrl)) start_rotation (ROT_PY);
   else if (key_rotmy.Match (key, shift, alt, ctrl)) start_rotation (ROT_MY);
-  else if (key_rotpz.Match (key, shift, alt, ctrl)) start_rotation (ROT_PZ);
-  else if (key_rotmz.Match (key, shift, alt, ctrl)) start_rotation (ROT_MZ);
+  else if (key_rotpz.Match (key, shift, alt, ctrl))
+  {
+    switch (cur_hor_dest)
+    {
+      case 0: start_rotation (ROT_PZ); break;
+      case 1: start_rotation (ROT_MX); break;
+      case 2: start_rotation (ROT_MZ); break;
+      case 3: start_rotation (ROT_PX); break;
+    }
+  }
+  else if (key_rotmz.Match (key, shift, alt, ctrl))
+  {
+    switch (cur_hor_dest)
+    {
+      case 0: start_rotation (ROT_MZ); break;
+      case 1: start_rotation (ROT_PX); break;
+      case 2: start_rotation (ROT_PZ); break;
+      case 3: start_rotation (ROT_MX); break;
+    }
+  }
   else if (key_up.Match (key, shift, alt, ctrl)) start_horizontal_move (-move_down_dx, -move_down_dy);
   else if (key_down.Match (key, shift, alt, ctrl)) start_horizontal_move (move_down_dx, move_down_dy);
   else if (key_left.Match (key, shift, alt, ctrl)) start_horizontal_move (-move_right_dx, -move_right_dy);
@@ -1652,35 +1683,35 @@ void Blocks::InitTextures ()
   if (world) world->Clear ();
 
   Sys->set_pillar_texture (
-    csLoader::LoadTexture (Sys->world, "pillar", "stone4.gif"));
+    csLoader::LoadTexture (Sys->world, "pillar", "stone4.png"));
   Sys->set_cube_texture (
-    csLoader::LoadTexture (Sys->world, "cube", "cube.gif"));
+    csLoader::LoadTexture (Sys->world, "cube", "cube.png"));
   Sys->set_raster_texture (
     csLoader::LoadTexture (Sys->world, "raster", "clouds_thick1.jpg"));
-  csLoader::LoadTexture (Sys->world, "room", "mystone2.gif");
-  csLoader::LoadTexture (Sys->world, "clouds", "clouds.gif");
+  csLoader::LoadTexture (Sys->world, "room", "mystone2.png");
+  csLoader::LoadTexture (Sys->world, "clouds", "clouds.jpg");
 
   Sys->set_cube_f1_texture (
-    csLoader::LoadTexture (Sys->world, "cubef1", "cubef1.gif"));
+    csLoader::LoadTexture (Sys->world, "cubef1", "cubef1.png"));
   Sys->set_cube_f2_texture (
-    csLoader::LoadTexture (Sys->world, "cubef2", "cubef2.gif"));
+    csLoader::LoadTexture (Sys->world, "cubef2", "cubef2.png"));
   Sys->set_cube_f3_texture (
-    csLoader::LoadTexture (Sys->world, "cubef3", "cubef3.gif"));
+    csLoader::LoadTexture (Sys->world, "cubef3", "cubef3.png"));
   Sys->set_cube_f4_texture (
-    csLoader::LoadTexture (Sys->world, "cubef4", "cubef4.gif"));
+    csLoader::LoadTexture (Sys->world, "cubef4", "cubef4.png"));
 
-  csLoader::LoadTexture (Sys->world, "menu_novice", "novice.gif");
-  csLoader::LoadTexture (Sys->world, "menu_back", "back.gif");
-  csLoader::LoadTexture (Sys->world, "menu_average", "average.gif");
-  csLoader::LoadTexture (Sys->world, "menu_expert", "expert.gif");
-  csLoader::LoadTexture (Sys->world, "menu_high", "high.gif");
-  csLoader::LoadTexture (Sys->world, "menu_quit", "quit.gif");
-  csLoader::LoadTexture (Sys->world, "menu_3x3", "p3x3.gif");
-  csLoader::LoadTexture (Sys->world, "menu_4x4", "p4x4.gif");
-  csLoader::LoadTexture (Sys->world, "menu_5x5", "p5x5.gif");
-  csLoader::LoadTexture (Sys->world, "menu_6x6", "p6x6.gif");
-  csLoader::LoadTexture (Sys->world, "menu_keyconfig", "keys.gif");
-  csLoader::LoadTexture (Sys->world, "menu_start", "start.gif");
+  csLoader::LoadTexture (Sys->world, "menu_novice", "novice.png");
+  csLoader::LoadTexture (Sys->world, "menu_back", "back.png");
+  csLoader::LoadTexture (Sys->world, "menu_average", "average.png");
+  csLoader::LoadTexture (Sys->world, "menu_expert", "expert.png");
+  csLoader::LoadTexture (Sys->world, "menu_high", "high.png");
+  csLoader::LoadTexture (Sys->world, "menu_quit", "quit.png");
+  csLoader::LoadTexture (Sys->world, "menu_3x3", "p3x3.png");
+  csLoader::LoadTexture (Sys->world, "menu_4x4", "p4x4.png");
+  csLoader::LoadTexture (Sys->world, "menu_5x5", "p5x5.png");
+  csLoader::LoadTexture (Sys->world, "menu_6x6", "p6x6.png");
+  csLoader::LoadTexture (Sys->world, "menu_keyconfig", "keys.png");
+  csLoader::LoadTexture (Sys->world, "menu_start", "start.png");
 }
 
 void Blocks::DrawMenu (int menu)
@@ -1965,6 +1996,7 @@ void Blocks::InitGameRoom ()
   room->AddLight (new csStatLight (-3, 5, 0, 10, .8, .4, .4, false));
   room->AddLight (new csStatLight (3, 5, 0, 10, .4, .4, .8, false));
   room->AddLight (new csStatLight (0, 5, -3, 10, .4, .8, .4, false));
+  room->AddLight (new csStatLight (0, 5, 3, 10, .8, .4, .8, false));
   room->AddLight (new csStatLight (0, (ZONE_HEIGHT-3-3)*CUBE_DIM+1, 0,
   	CUBE_DIM*10, .5, .5, .5, false));
   room->AddLight (new csStatLight (0, (ZONE_HEIGHT-3+3)*CUBE_DIM+1, 0,
@@ -2656,7 +2688,7 @@ int main (int argc, char* argv[])
   Gfx3D->SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE, (long)false);
 
   // Some commercials...
-  Sys->Printf (MSG_INITIALIZATION, "3D Blocks version 0.2.\n");
+  Sys->Printf (MSG_INITIALIZATION, "3D Blocks version 1.0.\n");
   Sys->Printf (MSG_INITIALIZATION, "Created by Jorrit Tyberghein and others...\n\n");
   Sys->txtmgr = Gfx3D->GetTextureManager ();
   Sys->txtmgr->SetVerbose (true);

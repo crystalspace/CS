@@ -12,6 +12,11 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+22-Feb-2000
+	- Gary Haussmann fixed another mipmap bug in the OpenGL
+	  rasterizer. The problem was that the maximum mipmap level
+	  required is actually MAX(log2(width),log2(height)), whereas
+	  I thought it was MIN( ... , ... ) instead.
 21-Feb-2000
 	- Martin Geisse submitted more Texinfo conversions of the LaTeX files
 	  from newdoc.  These files still need a lot of work, but it is a
@@ -45,6 +50,12 @@ Short-term cleanups that need to be done:
 	- Fixed bug with adding of dynamic objects to octree. Now sprites
 	  should work well in levels containing STATBSP statement. They
 	  were broken for some time.
+	- Added extra light to Blocks game screen to avoid the dark
+	  side :-)
+	- Added 'Start Game' menu entry (suggestion from Eric Sunshine).
+	- Fixed rotation of shapes in Blocks so that rotation is relative
+	  to camera position. i.e. the Blocks will always rotate the same
+	  way no matter where the camera is.
 	- Eric Sunshine fixed csGraphics3DSoftware so that it once again
 	  compiles under NextStep.
 	- Eric Sunshine hacked around a NextStep compiler bug which generated
