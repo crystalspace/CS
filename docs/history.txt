@@ -22,6 +22,9 @@ chronological order.
 	- res changed csRenderMesh to have the db_mesh_name member not only in
 	  debug mode (mostly for binary compatibility between debug/release
 	  binaries).
+	- res fixed a bug in csRenderMeshHolderSingle where it reported the
+	  first returned mesh as 'not created', tho the opposite would've been
+	  correct.
 23-Mar-2004
 	- Anders Stenberg brought stencil shadows back to life in NR.
 	  They should get along well with stencil clipping.

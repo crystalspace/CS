@@ -25,7 +25,7 @@
 
 csRenderMeshHolderSingle::csRenderMeshHolderSingle ()
 {
-  lastMesh = meshes.Push (new csRenderMesh);
+  lastMesh = 0;
 }
 
 csRenderMeshHolderSingle::~csRenderMeshHolderSingle ()
@@ -41,7 +41,7 @@ csRenderMeshHolderSingle::~csRenderMeshHolderSingle ()
 csRenderMesh*& csRenderMeshHolderSingle::GetUnusedMesh (bool& created)
 {
   created = false;
-  if (meshes[lastMesh]->inUse == true)
+  if ((meshes.Length() == 0) || (meshes[lastMesh]->inUse == true))
   {
     lastMesh = -1;
     //check the list
