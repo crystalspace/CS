@@ -81,6 +81,8 @@ public:
   virtual void SetMaterial (int idx, iMaterialHandle* mat_handle);
   virtual void SetVertexArray (csVector3* verts, int num_verts);
   virtual void Clear ();
+  //Does nothing as default
+  virtual void MarkLightmapsDirty();
 };
 
 /**

@@ -202,6 +202,7 @@ csTrianglesPerSuperLightmap::csTrianglesPerSuperLightmap()
   numLightmaps = 0;
   cacheData = NULL;
   isUnlit = false;
+  initialized = false;
 }
 
 csTrianglesPerSuperLightmap::csTrianglesPerSuperLightmap(int numVertex)
@@ -215,6 +216,7 @@ csTrianglesPerSuperLightmap::csTrianglesPerSuperLightmap(int numVertex)
   numVertices = 0;
   numLightmaps = 0;
   cacheData = NULL;
+  initialized = false;
 
   vertexIndices.SetLength(numVertex);
 
@@ -239,7 +241,9 @@ csTrianglesPerSuperLightmap::~csTrianglesPerSuperLightmap()
   }  
   if(cacheData) cacheData->Clear();
   delete region;
+
 }
+
 
 TrianglesSuperLightmapNode::TrianglesSuperLightmapNode()
 {
@@ -257,6 +261,8 @@ TrianglesSuperLightmapList::TrianglesSuperLightmapList()
   first = NULL;
   last = NULL;
   numElems = 0;
+  dirty = true;
+  firstTime = true;
 }
 
 TrianglesSuperLightmapList::~TrianglesSuperLightmapList()
@@ -948,6 +954,10 @@ void csTriangleArrayPolygonBuffer::AddTriangles(csTrianglesPerMaterial* pol,
   poly_texture->IncRef();
 }
 
+void csTriangleArrayPolygonBuffer::MarkLightmapsDirty()
+{
+  superLM.MarkLightmapsDirty();
+}
 
 void csTriangleArrayPolygonBuffer::AddPolygon (int* verts, int num_verts,
 	const csPlane3& poly_normal,

@@ -413,7 +413,8 @@ public:
   void Cache (iPolygonTexture *polytex);
 
   /// Cache a whole precalculated superlightmap
-  void Cache(csTrianglesPerSuperLightmap* s);
+  void Cache(csTrianglesPerSuperLightmap* s, bool dirty,
+             bool* modified);
 
   /// Finds an empty superlightmap (returns -1 if none is found)
   int FindFreeSuperLightmap();

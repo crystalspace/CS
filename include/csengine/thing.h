@@ -849,6 +849,9 @@ public:
   /// Get the cache name.
   const char* GetCacheName ();
 
+  /// Marks the whole object as it is affected by any light
+  void MarkLightmapsDirty();
+
   //----------------------------------------------------------------------
   // Utility functions
   //----------------------------------------------------------------------

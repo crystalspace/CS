@@ -126,6 +126,13 @@ struct iPolygonBuffer : public iBase
 
   /// Clear all polygons, materials, and vertex array.
   virtual void Clear () = 0;
+
+   /** Sets the polygon buffer as dirty
+  * This means that the mesh is affected by some light 
+  */
+  virtual void MarkLightmapsDirty() = 0;
+
+
 };
 
 SCF_VERSION (iVertexBufferManagerClient, 0, 0, 1);

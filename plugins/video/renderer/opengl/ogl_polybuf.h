@@ -185,6 +185,9 @@ class csTrianglesPerSuperLightmap
     csSLMCacheData* cacheData;
     bool isUnlit;
 
+    // Checks if the superlightmap is initialized or not
+    bool initialized;
+
 };
 
 /** Simple single list node*/
@@ -218,6 +221,21 @@ class TrianglesSuperLightmapList
     ~TrianglesSuperLightmapList();
     void Add(TrianglesSuperLightmapNode* t);
     TrianglesSuperLightmapNode* GetLast();
+
+    //Dirty due dynamic lights, needs recalculating
+    bool dirty;
+
+    //firstTime says if it's the first time that the superlightmap
+    // is cached
+    bool firstTime;
+
+    //Marks as dirty
+    void MarkLightmapsDirty() {dirty = true;};
+
+    //Clear the dirty state
+    void ClearLightmapsDirty() {dirty = false;};
+    //Gets the dirty state
+    bool GetLightmapsDirtyState(){ return dirty;}
 };
 
 
@@ -227,13 +245,17 @@ class TrianglesSuperLightmapList
  */
 class csTriangleArrayPolygonBuffer : public csPolygonBuffer
 {
+
+public:
+  //SuperLightMap list
+  TrianglesSuperLightmapList superLM; 
 protected:
 
   //Mesh triangles grouped by material list
   TrianglesList polygons;
   
-  //SuperLightMap list
-  TrianglesSuperLightmapList superLM; 
+  
+  
   typedef iMaterialHandle* iMaterialHandleP;
 
   CS_DECLARE_GROWING_ARRAY (materials, iMaterialHandleP);
@@ -370,6 +392,9 @@ public:
     int* verts, int num_vertices, const csMatrix3& m_obj2tex, 
     const csVector3& v_obj2tex,iPolygonTexture* poly_texture, int mat_index,
     const csPlane3& poly_normal);
+
+  /// Marks the polygon buffer as affected by any light
+  virtual void MarkLightmapsDirty();
 };
 
 /**

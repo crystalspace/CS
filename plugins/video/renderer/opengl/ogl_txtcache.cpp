@@ -622,7 +622,8 @@ int OpenGLLightmapCache::FindFreeSuperLightmap()
  * lightmap
  */
 
-void OpenGLLightmapCache::Cache(csTrianglesPerSuperLightmap* s)
+void OpenGLLightmapCache::Cache(csTrianglesPerSuperLightmap* s, bool dirty,
+                                bool* modified)
 {
   //First: Try to find a free superlightmap
 
@@ -640,25 +641,30 @@ void OpenGLLightmapCache::Cache(csTrianglesPerSuperLightmap* s)
     // if we need to recalculate the lightmaps
     // due the effect of dynamic lights
    
-    SLMHandle = s->cacheData->Handle;
-    for(i = 0; i < numLightmaps; i++)
+    if(dirty || !s->initialized)
     {
-      if(lmArray[i]->RecalculateDynamicLights())
+      SLMHandle = s->cacheData->Handle;
+      for(i = 0; i < numLightmaps; i++)
       {
-        iLightMap* lm = lmArray[i]->GetLightMap();
-        int lmwidth = lm->GetWidth();
-        int lmheight = lm->GetHeight();
-        csRGBpixel* lm_data = lm->GetMapData();
-        csRect r = rectangleArray[i];
-        glBindTexture (GL_TEXTURE_2D, SLMHandle);
-        glTexSubImage2D(GL_TEXTURE_2D, 0,r.xmin,r.ymin,
-          lmwidth, lmheight,GL_RGBA,GL_UNSIGNED_BYTE,lm_data);
+        if(lmArray[i]->RecalculateDynamicLights())
+        {
+          iLightMap* lm = lmArray[i]->GetLightMap();
+          int lmwidth = lm->GetWidth();
+          int lmheight = lm->GetHeight();
+         csRGBpixel* lm_data = lm->GetMapData();
+          csRect r = rectangleArray[i];
+          glBindTexture (GL_TEXTURE_2D, SLMHandle);
+          glTexSubImage2D(GL_TEXTURE_2D, 0,r.xmin,r.ymin,
+            lmwidth, lmheight,GL_RGBA,GL_UNSIGNED_BYTE,lm_data);
+        }
       }
-    }        
+      s->initialized = true;
+    }
+
     return; 
   }
   
-  //The superlightmap isn't in the cache, so we have to find
+  //The superlightmap isn't in the cache, so we have to cache it
   
   int index = FindFreeSuperLightmap();
   if(index < 0)
@@ -670,7 +676,7 @@ void OpenGLLightmapCache::Cache(csTrianglesPerSuperLightmap* s)
     suplm[cur_lm].Clear();
     index = cur_lm;
   }
-  
+  s->initialized = false;
   //Fill the superLightmap
   SourceData sd ;
   sd.superLMDataSource = s;
@@ -693,6 +699,7 @@ void OpenGLLightmapCache::Cache(csTrianglesPerSuperLightmap* s)
     glTexSubImage2D(GL_TEXTURE_2D, 0,r.xmin,r.ymin,
       lmwidth, lmheigth,GL_RGBA,GL_UNSIGNED_BYTE,lm_data);
   }
+
 }
 
 

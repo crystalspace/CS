@@ -4758,6 +4758,8 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
     //printf("superLMCount = %d\n",numSuperLM);
     TrianglesSuperLightmapNode* tSL = polbuf->GetFirstTrianglesSLM ();
     G3DFogInfo* fog_info = mesh.vertex_fog;
+    bool dirty = polbuf->superLM.GetLightmapsDirtyState();
+    bool modified = false;
     for(i = 0; i < numSuperLM; i++)
     {      
 
@@ -4795,7 +4797,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
           continue; //Nothing to do;
         }
         csTrianglesPerSuperLightmap* trisSLM = tSL->info;
-        lightmap_cache->Cache(trisSLM);
+        lightmap_cache->Cache(trisSLM,dirty,&modified);
         csLightMapQueue* lm_queue = lightmap_cache->GetQueue(trisSLM);
 
         if(lm_queue)
@@ -4826,7 +4828,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
       {
 
         csTrianglesPerSuperLightmap* trisSLM = tSL->info;
-        lightmap_cache->Cache(trisSLM);
+        lightmap_cache->Cache(trisSLM, dirty,&modified);
         csLightMapQueue* lm_queue = lightmap_cache->GetQueue(trisSLM);
         
                 
@@ -4861,7 +4863,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
     if(polbuf->HaveUnlitPolys() && mesh.do_fog)
     {
       csTrianglesPerSuperLightmap* unlitPolys = polbuf->GetUnlitPolys();
-      lightmap_cache->Cache(unlitPolys);
+      lightmap_cache->Cache(unlitPolys,dirty,&modified);
       csLightMapQueue* fog_queue = lightmap_cache->GetQueue(unlitPolys);
       int num_triangles = unlitPolys->numTriangles;
       csTriangle* triangles = unlitPolys->triangles.GetArray();
@@ -4893,7 +4895,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
         triangles = clipped_lightmap_triangles->GetArray ();
         if (num_triangles <= 0)
           return; //Nothing to do;       
-        lightmap_cache->Cache(unlitPolys);
+        lightmap_cache->Cache(unlitPolys,dirty,&modified);
         csLightMapQueue* fog_queue = lightmap_cache->GetQueue(unlitPolys);
 
         if(fog_queue)
@@ -4916,7 +4918,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
       else
       {
         csTrianglesPerSuperLightmap* unlitPolys = polbuf->GetUnlitPolys();
-        lightmap_cache->Cache(unlitPolys);
+        lightmap_cache->Cache(unlitPolys,dirty,&modified);
         csLightMapQueue* fog_queue = lightmap_cache->GetQueue(unlitPolys);
 
         if(fog_queue)
@@ -4936,10 +4938,10 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
         }
       }
     }
-  }  
-  
-
-
+    
+  }
+  polbuf->superLM.ClearLightmapsDirty();
+     
   //@@@
   lightmap_cache->Flush ();
   //lightmap_cache->FlushIfNeeded ();

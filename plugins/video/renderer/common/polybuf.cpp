@@ -91,6 +91,9 @@ void csPolArrayPolygonBuffer::Clear ()
   num_vertices = 0;
 }
 
+void csPolArrayPolygonBuffer::MarkLightmapsDirty()
+{};
+
 csPolArrayVertexBufferManager::csPolArrayVertexBufferManager
 	(iObjectRegistry* object_reg) : csVertexBufferManager (object_reg)
 {
@@ -99,6 +102,7 @@ csPolArrayVertexBufferManager::csPolArrayVertexBufferManager
 csPolArrayVertexBufferManager::~csPolArrayVertexBufferManager()
 {
 }
+
 
 iPolygonBuffer* csPolArrayVertexBufferManager::CreatePolygonBuffer ()
 {
