@@ -23,6 +23,8 @@ chronological order.
 	  is used in the font cache. It would not correctly copy the source
 	  element in the 'Construct()'. This fix does not fix the problem with
 	  the huge slowdown in CS though.
+	- res changed the csArray<> comparison functor to not store the key as
+	  a ref. This seems to fix the slowdown.
 31-Mar-2004
 	- Jorrit fixed a bug with iSector->HitBeamPortals(). It would not
 	  be able to register hits on meshes that don't return a polygon

@@ -84,7 +84,7 @@ public:
   /// Return the key with which this functor was constructed.
   operator K const&() const { return key; }
 private:
-  K const& key;
+  K const/*&*/ key;
   CF cmp;
 };
 
@@ -114,7 +114,7 @@ public:
   virtual operator CF() const { return cmp; }
   operator K const&() const { return key; }
 private:
-  K const& key;
+  K const/*&*/ key;
   CF cmp;
 };
 
