@@ -115,7 +115,7 @@ bool csLinuxJoystick::Init ()
 
   csRef<iConfigIterator> it (config->Enumerate (CS_LINUX_JOYSTICK_KEY));
 
-  csVector h;
+  csArray<void*> h;
   int fd;
 
   nJoy=0;
