@@ -19,6 +19,12 @@
 *****************************************************************************/
 #include "ivaria/aws.h"
 #include "isys/plugin.h"
+#include "csgeom/csrect.h"
+#include "csfx/proctex.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/graph3d.h"
+#include "awscomp.h"
+#include "awswin.h"
 
 /****
   
@@ -27,22 +33,42 @@ windowing system.  It supports simple skinning via the .skn defintions, and crea
 
  ****/
 
-class awsComponent
-{
-public:
-    awsComponent();
-    virtual ~awsComponent();
-
-    /// This is the function that components use to set themselves up.  All components MUST implement this function.
-    virtual bool Setup(iAws *wmgr)=0;
-
-
-};
-
 class awsManager : public iAws
 {
    /// Handle to the preference manager.
    iAwsPrefs *prefmgr;
+
+   /// The rect which maintains what needs to be invalidated, and thus redrawn.
+   csRect     dirty;
+
+   /// The current top window
+   awsWindow   *top;
+  
+   /// Handle to our procedural texture, which is what we draw on.
+   class awsCanvas : public csProcTexture
+   {
+    awsManager *wmgr;
+
+    public:
+  
+        /// Create a new texture.
+        awsCanvas (awsManager *_wmgr);
+  
+        /// Destroy this texture
+        virtual ~awsCanvas ();
+        
+        /// This is actually not used ever.  The window manager doesn't "animate", and only refreshes the canvas when needed.
+        virtual void Animate (cs_time current_time);
+
+        /// Get the iGraphics2D interface so that components can use it.
+        iGraphics2D *G2D() 
+        { return ptG2D; }
+
+        /// Get the iGraphics3D interface so that components can use it.
+        iGraphics3D *G3D() 
+        { return ptG3D; }
+
+   } canvas;
 
 public:
     DECLARE_IBASE;
@@ -57,6 +83,17 @@ public:
 
     /// Set the preference manager used by the window system
     virtual void       SetPrefMgr(iAwsPrefs *pmgr);
+
+    /// Get the top window
+    virtual awsWindow *GetTopWindow();
+
+    /// Set the top window
+    virtual void       SetTopWindow(awsWindow *_top);
+
+
+    /// Redraw whatever portions of the screen need it.
+
+  //////////////////////////////////////
 
   // Implement iPlugIn interface.
   struct eiPlugIn : public iPlugIn

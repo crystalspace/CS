@@ -247,6 +247,15 @@ public:
     /// Lookup the value of a rect key by id (from the skin def)
     virtual bool LookupRectKey(unsigned long id, csRect &rect); 
 
+    /// Get the value of an integer from a given component node
+    virtual bool GetInt(awsComponentNode *node, char *name, int &val);
+
+    /// Get the a rect from a given component node
+    virtual bool GetRect(awsComponentNode *node, char *name, csRect &rect);
+
+    /// Get the value of an integer from a given component node
+    virtual bool GetString(awsComponentNode *node, char *name, iString *&val);
+
 public:
     /// Called by internal code to add a parsed out tree of window components.
     void AddWindowDef(awsComponentNode *win)

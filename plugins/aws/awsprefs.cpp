@@ -155,6 +155,63 @@ awsPrefManager::LookupRectKey(unsigned long id, csRect &val)
     return false;
 }
 
+bool
+awsPrefManager::GetInt(awsComponentNode *node, char *name, int &val)
+{
+    if (!node) return false;
+
+    awsKey *k = ((awsKeyContainer *)node)->Find(NameToId(name));
+
+    if (k)
+    {
+      if (k->Type() == KEY_INT) 
+      {
+        val = ((awsIntKey *)k)->Value();
+        return true;
+      }
+    }
+
+    return false;
+}
+
+bool 
+awsPrefManager::GetRect(awsComponentNode *node, char *name, csRect &val)
+{
+   if (!node) return false;
+   awsKey *k = ((awsKeyContainer *)node)->Find(NameToId(name));
+
+    if (k)
+    {
+       if (k->Type() == KEY_RECT) 
+       {
+          val = ((awsRectKey *)k)->Value();
+          return true;
+       }
+    }
+
+  return false;
+
+}
+
+bool 
+awsPrefManager::GetString(awsComponentNode *node, char *name, iString *&val)
+{
+    if (!node) return false;
+
+    awsKey *k = ((awsKeyContainer *)node)->Find(NameToId(name));
+
+    if (k)
+    {
+       if (k->Type() == KEY_STR) 
+       {
+          val = ((awsStringKey *)k)->Value();
+          return true;
+       }
+    }
+
+  return false;
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* adler32.c -- compute the Adler-32 checksum of a data stream
