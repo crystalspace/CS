@@ -16,25 +16,22 @@ int NeXTGetInstallPath(char *oInstallPath, size_t iBufferSize, char pathSep)
     int result = 0;
         
     oInstallPath[0] = '\0';
-    if (iBufferSize != 0)
+    if (s == 0 || [s isEqualToString:@""] ||
+        (![s hasPrefix:@"Y"] && ![s hasPrefix:@"y"] &&	// Yes
+        ![s hasPrefix:@"T"] && ![s hasPrefix:@"t"] &&	// True
+        ![s hasPrefix:@"O"] && ![s hasPrefix:@"o"] &&	// On
+        ![s hasPrefix:@"1"]))				// 1
     {
-        result = 1;
-        if (s == 0 || [s isEqualToString:@""] ||
-            (![s hasPrefix:@"Y"] && ![s hasPrefix:@"y"] &&	// Yes
-            ![s hasPrefix:@"T"] && ![s hasPrefix:@"t"] &&	// True
-            ![s hasPrefix:@"O"] && ![s hasPrefix:@"o"] &&	// On
-            ![s hasPrefix:@"1"]))				// 1
+        s = [defs stringForKey:@"CrystalSpaceRoot"];
+        if (s != 0 && ![s isEqualToString:@""])
         {
-            s = [defs stringForKey:@"CrystalSpaceRoot"];
-            if (s != 0 && ![s isEqualToString:@""])
-            {
-                NSMutableString *path = [s mutableCopy];
-                if ([path characterAtIndex:[path length]] != pathSep)
-                    [path appendFormat:@"%c", pathSep];
-                   
-                [path getFileSystemRepresentation:oInstallPath maxLength:iBufferSize];
-                [path release];
-            }
+            result = 1;
+            NSMutableString *path = [s mutableCopy];
+            if ([path characterAtIndex:[path length]] != pathSep)
+                [path appendFormat:@"%c", pathSep];
+                
+            [path getFileSystemRepresentation:oInstallPath maxLength:iBufferSize];
+            [path release];
         }
     }
 
