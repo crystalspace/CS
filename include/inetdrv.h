@@ -32,7 +32,11 @@
 
 #define CS_NET_LISTEN_QUEUE_SIZE 5
 
-#if !defined(OS_WIN32)
+#if defined(OS_MACOS)
+	typedef unsigned int csNetworkSocket;
+	#define CS_NET_SOCKET_INVALID ((csNetworkSocket)~0)
+	typedef unsigned long fd_set;
+#elif !defined(OS_WIN32)
 	#include <sys/select.h>
 	typedef unsigned int csNetworkSocket;
 	#define CS_NET_SOCKET_INVALID ((csNetworkSocket)~0)
