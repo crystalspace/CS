@@ -23,6 +23,11 @@ Short-term cleanups that need to be done:
 	  This means that curved surfaces will now appear correctly
 	  even if you use STATBSP() but they will still not use the
 	  visibility algorithm (i.e. they will be slow).
+	- Thomas Hieber removed setting for manual sectoring in map2cs.
+	  It is now always on. Textures are also exported with different
+	  name and filename.
+	- Thomas also fixed the release mode name for the Windows OpenGL
+	  2D driver.
 3-Jan-2000
 	- Some changes to python scripts from Eric Sunshine.
 	- Thomas Hieber fixed a few things to make CS compilable again with
