@@ -284,6 +284,8 @@ void Phyztest::NextFrame (time_t elapsed_time, time_t current_time)
   // add a chain
   if (GetKeyState (CSKEY_DEL) && !chain_added ){
     
+
+ //   CsPrintf (MSG_DEBUG_0, "adding chain\n");
     // use box template
     csSpriteTemplate* bxtmpl = view->GetWorld ()->GetSpriteTemplate ("box");
     if (!bxtmpl){     
@@ -401,7 +403,10 @@ void Phyztest::NextFrame (time_t elapsed_time, time_t current_time)
       if( chain[i] != NULL ){
         //  get the position of this link
         new_p = chain[i]->rb->get_pos();
+  //      CsPrintf (MSG_DEBUG_0, "chain pos %d = %f, %f, %f\n",
+    //      i, new_p.x, new_p.y, new_p.z);
         chain[i]->sprt->SetMove ( new_p );
+        
         M = chain[i]->rb->get_R();   // get orientation for this link
         // ctMatrix3 and csMatrix3 not directly compatable yet
         m.Set( M[0][0], M[0][1], M[0][2],
@@ -466,6 +471,10 @@ int main (int argc, char* argv[])
   // add air resistance
   ctAirResistanceF *af = new ctAirResistanceF();
   phyz_world.add_enviro_force( af );
+
+  // register collision detection catastrophe manager
+  ctLameCollisionCatastrophe *cdm = new ctLameCollisionCatastrophe();
+  phyz_world.register_catastrophe_manager( cdm );
 
   // Create our main class.
   Sys = new Phyztest ();
