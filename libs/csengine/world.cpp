@@ -616,7 +616,10 @@ csWorld::~csWorld ()
   delete cbufcube;
   delete covtree_lut;
   delete rad_debug;
-
+  delete c_buffer;
+  delete covtree;
+  delete quad3d;
+  
   // @@@ temp hack
   delete camera_hack;
   camera_hack = NULL;

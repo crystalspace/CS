@@ -1567,6 +1567,9 @@ void csSector::RealCheckFrustum (csFrustumView& lview)
     // Calculate lighting for all things in the current sector.
     for (i = 0 ; i < num_visible_things ; i++)
       visible_things[i]->RealCheckFrustum (lview);
+      
+    if (visible_things) 
+      delete [] visible_things;
   }
 
   // Restore the shadow list in 'lview' and then delete
