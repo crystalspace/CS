@@ -16,6 +16,13 @@ The history order is reversed so that new features are at the top.
 	  only once).
 	- Fixed a bug in Dynavis debugging module. The code was changed
 	  to use csRef but the DecRef() wasn't removed.
+	- Extended state dumping in Dynavis a bit.
+	- Fixed a bug in Dynavis which could cause wrong culling. The
+	  problem is that making tiles empty works by setting a flag.
+	  The actual initialization of the tile only happens when somebody
+	  wants to update the tile. However, a few of the testing functions
+	  didn't properly test for this flag.
+	- Removed the state dump code in Dynavis in optimize mode.
 9-Feb-2003
 	- res augmented flarge to contain a notice that the flickering in
 	  the street is intentional.

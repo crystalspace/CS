@@ -409,6 +409,9 @@ bool csCoverageTile::TestFullRect (float testdepth)
 
 bool csCoverageTile::TestRect (int start, int end, float testdepth)
 {
+  // Tile is still empty.
+  if (queue_tile_empty) return true;
+
   // If the depth of this rectangle is smaller than the minimum depth
   // of this tile then this rectangle is automatically visible.
   if (testdepth <= tile_min_depth) return true;
@@ -476,6 +479,9 @@ bool csCoverageTile::TestRect (int start, int end, float testdepth)
 bool csCoverageTile::TestRect (const csBits64& vermask, int start, int end,
   	float testdepth)
 {
+  // Tile is still empty.
+  if (queue_tile_empty) return true;
+
   // If the depth of this rectangle is smaller than the minimum depth
   // of this tile then this rectangle is automatically visible.
   if (testdepth <= tile_min_depth) return true;
@@ -544,6 +550,9 @@ bool csCoverageTile::TestPoint (int x, int y, float testdepth)
 {
   CS_ASSERT (x >= 0 && x < 32);
   CS_ASSERT (y >= 0 && y < 64);
+
+  // If tile is still empty we are visible.
+  if (queue_tile_empty) return true;
 
   // First check for depth.
   int xd = x >> 3;	// Depth x coordinate.
