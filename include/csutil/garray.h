@@ -36,7 +36,7 @@
  * Usage examples:
  * <pre>
  * DECLARE_GROWING_ARRAY (static, LightArray, csLight*)
- * DECLARE_GROWING_ARRAY (, IntArray, int)
+ * DECLARE_GROWING_ARRAY (;, IntArray, int)
  * </pre>
  */
 #define DECLARE_GROWING_ARRAY(Static, Name, Type)			\
