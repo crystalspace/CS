@@ -33,6 +33,8 @@
 #include "ivideo/sproctxt.h"
 #include "ivideo/txtmgr.h"
 
+#include "video/renderer/common/pixfmt.h"
+
 #if defined(CS_OPENGL_PATH)
 #include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
 #else
@@ -230,11 +232,11 @@ bool csOpenGLProcSoftware::Prepare(
   csTextureHandleOpenGL *tex,
   csPixelFormat *ipfmt,
   void *buffer,bool alone_hint)
-{
-  // We generate a 32 bit pfmt taking into account endianness and whether
-  // frame buffer is RGB or BGR...there must be a better way...
-
-#if defined (CS_BIG_ENDIAN)
+{ 
+  // We generate a 32 bit pfmt based on whether the platform uses
+  // an RGB or BGR frame buffer
+    
+#if (CS_24BIT_PIXEL_LAYOUT == CS_24BIT_PIXEL_ABGR)
   if (ipfmt->RedMask > ipfmt->BlueMask)
   {
     pfmt.RedMask   = 0xff000000;

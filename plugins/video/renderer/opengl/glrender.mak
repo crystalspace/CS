@@ -70,7 +70,8 @@ INC.GL3D = $(wildcard plugins/video/renderer/opengl/*.h) \
   plugins/video/renderer/common/dtmesh.h \
   plugins/video/renderer/common/dpmesh.h \
   plugins/video/renderer/common/vbufmgr.h \
-  plugins/video/renderer/common/polybuf.h
+  plugins/video/renderer/common/polybuf.h \
+  plugins/video/renderer/common/pixfmt.h
 SRC.GL3D = $(wildcard plugins/video/renderer/opengl/*.cpp) \
   plugins/video/renderer/common/txtmgr.cpp \
   plugins/video/renderer/common/dtmesh.cpp \
@@ -102,7 +103,7 @@ clean: gl3dclean
 gl3d: $(OUTDIRS) $(GL3D)
 
 $(OUT)%$O: plugins/video/renderer/opengl/%.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.GL3D)
+	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT) $(CFLAGS.GL3D)
 
 $(GL3D): $(OBJ.GL3D) $(LIB.GL3D)
 	$(DO.PLUGIN.PREAMBLE) \
@@ -115,7 +116,7 @@ gl3dclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)gl3d.dep
 $(OUTOS)gl3d.dep: $(SRC.GL3D)
-	$(DO.DEP1) $(CFLAGS.GL3D) $(DO.DEP2)
+	$(DO.DEP1) $(CFLAGS.PIXEL_LAYOUT) $(CFLAGS.GL3D) $(DO.DEP2)
 else
 -include $(OUTOS)gl3d.dep
 endif
