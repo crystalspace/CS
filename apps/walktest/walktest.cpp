@@ -405,7 +405,7 @@ void WalkTest::MoveSystems (cs_time elapsed_time, cs_time current_time)
   // Animate the psuedo-dynamic light if any.
   if (anim_dynlight)
   {
-    float t = fmod (float (current_time), 2000.) / 2000.;
+    float t = fmod (float (current_time), float(2000.)) / 2000.;
     anim_dynlight->SetColor (csColor (t, 0, 1-t));
   }
 
