@@ -1,5 +1,14 @@
 The history order has been reversed so that new features are at the top.
 
+19-Sep-2000
+	- Andrew fixed a small bug in csws/cscomp.cpp.
+	- Andrew updated csComponent comment to reflect the fact that
+	  components can be partially transparent.
+	- Andrew fixed a bug in csArchive which would trigger when
+	  the archive contains directories that have no files.
+18-Sep-2000
+	- Jerry A. Segler Jr fixed linux compilation problem in cs_pyth.cpp
+	  on new GCC's.
 17-Sep-2000
 	- Seth Galbraith did the following to docs:
 	    - Removed section on seperate vertex, texel, and normal arrays
