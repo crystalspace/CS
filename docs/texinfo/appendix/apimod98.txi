@@ -264,7 +264,8 @@ base mesh), and that those meshes can be overridden by user-defined meshes
 the visible mesh.) 
 
 In @code{iPolygonMesh} the @code{IsDeformable()} method has been replaced
-with the more general @code{GetFlags()}.
+with the more general @code{GetFlags()}. In addition to that @code{Cleanup()}
+is removed and instead @code{Lock()} and @code{Unlock()} are added.
 
 @code{iPolygonMesh} now has @code{GetTriangles()} and @code{GetTriangleCount()}.
 Check out the @sc{api} docs for implementation details.
