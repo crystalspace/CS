@@ -20,6 +20,17 @@
 #ifndef __CS_CSSHLIB_H__
 #define __CS_CSSHLIB_H__
 
+/**\file
+ * Crystal Space cross-platform shared library management
+ */
+
+/** 
+ * \addtogroup util
+ * @{ */
+
+/**\name Low-level shared library support
+ * @{ */
+
 #include "syspath.h"
 #include "csutil/ref.h"
 #include "csutil/refarr.h"
@@ -87,7 +98,6 @@ bool csGetLoadLibraryVerbose();
  */
 csRef<iStrVector> csScanPluginDir (const char* dir, 
 				   csRef<iStrVector>& plugins,
-				   csRefArray<iDocument>& metadata,
 				   bool recursive = true);
 
 /**
@@ -96,13 +106,17 @@ csRef<iStrVector> csScanPluginDir (const char* dir,
  * \p dirs.
  */				
 csRef<iStrVector> csScanPluginDirs (csPluginPaths* dirs, 
-				    csRef<iStrVector>& plugins,
-				    csRefArray<iDocument>& metadata);
+				    csRef<iStrVector>& plugins);
 
 /**
  * Query plugin metadata.
+ * \remark 
  */
 csRef<iString> csGetPluginMetadata (const char* fullPath, 
 				    csRef<iDocument>& metadata);
+
+/** @} */
+
+/** @} */
 
 #endif // __CS_CSSHLIB_H__

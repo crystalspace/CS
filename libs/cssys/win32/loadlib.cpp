@@ -16,10 +16,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */	
 
+#define CS_SYSDEF_PROVIDE_HARDWARE_MMIO
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
 #include "cssys/sysfunc.h"
 #include "cssys/syspath.h"
+#include "cssys/csmmap.h"
 #ifdef __CYGWIN__
 #include <sys/cygwin.h>
 #endif
@@ -196,11 +198,10 @@ static void AppendWin32Error (const char* text,
 }
 
 static csRef<iString> InternalGetPluginMetadata (const char* fullPath, 
-						 csRef<iDocument>& metadata,
-						 iDocumentSystem* docsys)
+						 csRef<iDocument>& metadata)
 {
   iString* result = 0;
-  metadata = 0;
+  csRef<iDocument> newMetadata = 0;
 
   HMODULE hLibrary = LoadLibraryEx (fullPath, 0, 
     LOADLIBEX_FLAGS | LOAD_LIBRARY_AS_DATAFILE);
@@ -216,14 +217,23 @@ static csRef<iString> InternalGetPluginMetadata (const char* fullPath,
 	LPVOID resData = LockResource (resDataHandle);
 	if (resData != 0)
 	{
-	  csRef<iDocument> doc = docsys->CreateDocument();
-	  char const* errmsg = doc->Parse ((char*)resData);
-	  if (errmsg == 0)
+	  if (!(newMetadata = metadata))
 	  {
-	    metadata = doc;
+	    /*
+	      TinyXML documents hold references to the document system.
+	      So we have to create a new csTinyDocumentSystem (). Using just
+	      'csTinyDocumentSystem docsys' would result in a crash when the
+	      documents try to DecRef() to already destructed document system.
+	    */
+	    csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
+	      (new csTinyDocumentSystem ());
+	    newMetadata = docsys->CreateDocument();
 	  }
-	  else
+	  char const* errmsg = newMetadata->Parse ((char*)resData);
+	  if (errmsg != 0)
 	  {
+	    newMetadata = 0;
+
 	    csString errstr;
 	    errstr.Format ("Error parsing metadata from '%s': %s",
 	      fullPath, errmsg);
@@ -243,14 +253,23 @@ static csRef<iString> InternalGetPluginMetadata (const char* fullPath,
     or not.
     */
 
+  metadata = newMetadata;
   return csPtr<iString> (result);
 }
 
 csRef<iString> csGetPluginMetadata (const char* fullPath, 
 				    csRef<iDocument>& metadata)
 {
-  csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
-    (new csTinyDocumentSystem ());
+  /*
+    @@@ There's a small inefficiency here.
+    This function, when given a filename of <blah>.dll or 
+    <blah>.csplugin, first checks <blah>.dll for embedded
+    metadata and then for the existence of a <blah>.csplugin
+    file. However, the csScanPluginDir() function already
+    emits a <blah>.csplugin file name when such a file was
+    found, <blah>.dll otherwise. This information can
+    probably be reused.
+   */
 
   CS_ALLOC_STACK_ARRAY (char, dllPath, strlen (fullPath) + 5);
   strcpy (dllPath, fullPath);
@@ -268,7 +287,7 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
   }
 
   csRef<iString> result = 
-    InternalGetPluginMetadata (dllPath, metadata, docsys);
+    InternalGetPluginMetadata (dllPath, metadata);
 
   /* Check whether a .csplugin file exists as well */
 
@@ -285,21 +304,20 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
       csString errstr;
       errstr.Format ("'%s' contains embedded metadata, "
 	"but external '%s' exists as well. Ignoring the latter.",
-	fullPath, cspluginPath);
+	dllPath, cspluginPath);
 
       result.AttachNew (new scfString (errstr));
     }
     else
     {
-      csRef<iDocument> doc = docsys->CreateDocument();
-      char const* errmsg = doc->Parse (&file);
+      csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
+	(new csTinyDocumentSystem ());
+      metadata = docsys->CreateDocument();
+      char const* errmsg = metadata->Parse (&file);
 
-      if (errmsg == 0)
+      if (errmsg != 0)
       {
-	metadata = doc;
-      }
-      else
-      {
+	metadata = 0;
 	csString errstr;
 	errstr.Format ("Error parsing metadata from '%s': %s",
 	  cspluginPath, errmsg);
@@ -324,10 +342,8 @@ inline static void AddLower (csStringHash& hash, const char* str)
 }
 
 void InternalScanPluginDir (iStrVector*& messages,
-			    iDocumentSystem* docsys,
 			    const char* dir, 
 			    csRef<iStrVector>& plugins,
-			    csRefArray<iDocument>& metadata,
 			    bool recursive)
 {
   csStringHash files;
@@ -400,8 +416,6 @@ void InternalScanPluginDir (iStrVector*& messages,
     csString fullPath;
 
     csRef<iString> msg;
-    csRef<iDocument> doc;
-    csRef<iDocument> pluginMetadata;
 
     while (fileIt.HasNext())
     {
@@ -420,63 +434,29 @@ void InternalScanPluginDir (iStrVector*& messages,
 	else
 	  fullPath << dir << PATH_SEPARATOR << fileName;
 
-	msg = InternalGetPluginMetadata (fullPath, pluginMetadata, docsys);
-	if (msg != 0)
-	{
-	  AppendStrVecString (messages, msg->GetData());
-	}
-
 	/*
 	  Check whether the DLL has a companion .csplugin.
 	 */
-	char cspluginPath [MAX_PATH + 10];
 	char cspluginFile [MAX_PATH + 10];
 
-	strcpy (cspluginPath, fullPath);
 	strcpy (cspluginFile, fileName);
-	char* dot = strrchr (cspluginPath, '.');
-	strcpy (dot, ".csplugin");
-	dot = strrchr (cspluginFile, '.');
+	char* dot = strrchr (cspluginFile, '.');
 	strcpy (dot, ".csplugin");
 
 	csStringID cspID = files.Request (cspluginFile);
 	if (cspID != csInvalidStringID)
 	{
-	  if (pluginMetadata != 0)
-	  {
-	    csString errstr;
-	    errstr.Format ("'%s' contains embedded metadata, "
-	      "but external '%s' exists as well. Ignoring the latter.",
-	      fullPath.GetData(), cspluginPath);
+	  char cspluginPath [MAX_PATH + 10];
 
-	    AppendStrVecString (messages, errstr);
-	  }
-	  else
-	  {
-	    // parse .csplugin
-	    csPhysicalFile file (cspluginPath, "rb");
+	  strcpy (cspluginPath, fullPath);
+	  char* dot = strrchr (cspluginPath, '.');
+	  strcpy (dot, ".csplugin");
 
-	    doc = docsys->CreateDocument();
-	    char const* errmsg = doc->Parse (&file);
-
-	    if (errmsg == 0)
-	    {
-	      pluginMetadata = doc;
-	    }
-	    else
-	    {
-	      csString errstr;
-	      errstr.Format ("Error parsing metadata from '%s': %s",
-		cspluginPath, errmsg);
-
-	      AppendStrVecString (messages, errstr);
-	    }
-	  }
+          plugins->Push (csStrNew (cspluginPath));
 	}
-	if (pluginMetadata != 0)
+	else
 	{
-	  plugins->Push (csStrNew (fullPath));
-	  metadata.Push (pluginMetadata);
+          plugins->Push (csStrNew (fullPath));
 	}
       }
     }
@@ -496,8 +476,8 @@ void InternalScanPluginDir (iStrVector*& messages,
       fullPath << dir << PATH_SEPARATOR << dirs.Request (id);
 
       iStrVector* subdirMessages = 0;
-      InternalScanPluginDir (subdirMessages, docsys, fullPath, plugins,
-	metadata, recursive);
+      InternalScanPluginDir (subdirMessages, fullPath, plugins,
+	recursive);
       
       if (subdirMessages != 0)
       {
@@ -514,7 +494,6 @@ void InternalScanPluginDir (iStrVector*& messages,
 
 csRef<iStrVector> csScanPluginDir (const char* dir, 
 				   csRef<iStrVector>& plugins,
-				   csRefArray<iDocument>& metadata,
 				   bool recursive)
 {
   iStrVector* messages = 0;
@@ -522,38 +501,25 @@ csRef<iStrVector> csScanPluginDir (const char* dir,
   if (!plugins)
     plugins.AttachNew (new scfStrVector ());
 
-  csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
-    (new csTinyDocumentSystem ());
-
-  InternalScanPluginDir (messages, docsys, dir, plugins, metadata, 
+  InternalScanPluginDir (messages, dir, plugins,  
     recursive);
 	 
   return csPtr<iStrVector> (messages);
 }
 
 csRef<iStrVector> csScanPluginDirs (csPluginPaths* dirs, 
-				    csRef<iStrVector>& plugins,
-				    csRefArray<iDocument>& metadata)
+				    csRef<iStrVector>& plugins)
 {
   iStrVector* messages = 0;
 
   if (!plugins)
     plugins.AttachNew (new scfStrVector ());
 
-  /*
-    TinyXML documents hold references to the document system.
-    So we have to create a new csTinyDocumentSystem (). Using just
-    'csTinyDocumentSystem docsys' would result in a crash when the
-    documents try to DecRef() to already destructed document system.
-   */
-  csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
-    (new csTinyDocumentSystem ());
-
   for (int i = 0; i < dirs->GetCount (); i++)
   {
     iStrVector* dirMessages = 0;
-    InternalScanPluginDir (dirMessages, docsys, (*dirs)[i].path, 
-      plugins, metadata, (*dirs)[i].scanRecursive);
+    InternalScanPluginDir (dirMessages, (*dirs)[i].path, 
+      plugins, (*dirs)[i].scanRecursive);
     
     if (dirMessages != 0)
     {

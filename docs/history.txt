@@ -27,6 +27,11 @@ The history order is reversed so that new features are at the top.
 	      reported by TeX.
 	- Eric Sunshine removed the unused, obsolete, and deprecated top-level
 	  <name> node from the .csplugin files.
+	- res changed the plugin scanning process, now the scanning for plugin
+	  files and the retrieval of metadata is split up.
+	- res added a "special case" for static plugins when checking whether
+	  a class is already registered; in particular, when the class already
+	  registered is inside a static plugin, no message is emitted.
 21-Jun-2003
         - Philip Wyett updated win32.mak to reflect changes/additions in
           the general cssys library affecting MSVC port(s).

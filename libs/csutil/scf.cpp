@@ -50,6 +50,7 @@ private:
   csRef<csMutex> mutex;
 
   csStringSet contexts;
+  csStringID staticContextID;
 
   void RegisterClassesInt (char const* pluginPath, iDocumentNode* scfnode, 
     const char* context = 0);
@@ -64,8 +65,8 @@ public:
   /// destructor
   virtual ~csSCF ();
 
-  virtual void RegisterClasses (iDocument*);
-  virtual void RegisterClasses (char const*);
+  virtual void RegisterClasses (iDocument*, const char* context = 0);
+  virtual void RegisterClasses (char const*, const char* context = 0);
   virtual void RegisterClasses (char const* pluginPath, 
     iDocument* scfnode, const char* context = 0);
   virtual bool RegisterClass (const char *iClassID,
@@ -427,24 +428,20 @@ SCF_IMPLEMENT_IBASE_END;
 
 static void scfScanPlugins (csPluginPaths* pluginPaths, const char* context)
 {
-  if (!PrivateSCF)
-    PrivateSCF = new csSCF ();
-
 #ifndef CS_STATIC_LINKED
+
   if (pluginPaths)
   {
     // Search plugins in pluginpaths
     csRef<iStrVector> plugins;
-    csRefArray<iDocument> metadata;
 
     int i, j;
     for (i = 0; i < pluginPaths->GetCount(); i++)
     {
       if (plugins) plugins->DeleteAll();
-      metadata.DeleteAll();
 
       csRef<iStrVector> messages = 
-	csScanPluginDir ((*pluginPaths)[i].path, plugins, metadata,
+	csScanPluginDir ((*pluginPaths)[i].path, plugins, 
 	  (*pluginPaths)[i].scanRecursive);
 
       if ((messages != 0) && (messages->Length() > 0))
@@ -459,14 +456,35 @@ static void scfScanPlugins (csPluginPaths* pluginPaths, const char* context)
 	    " %s\n", messages->Get (j));
 	}
       }
-      for (j = 0; j < metadata.Length(); j++)
+
+      csRef<iDocument> metadata;
+      csRef<iString> msg;
+      for (j = 0; j < plugins->Length(); j++)
       {
-	PrivateSCF->RegisterClasses (plugins->Get (j), metadata[j], 
-	  context ? context : (*pluginPaths)[i].type);
+	msg = csGetPluginMetadata (plugins->Get (j), metadata);
+	if (msg != 0)
+	{
+	  fprintf (stderr,
+	    "Error retrieving metadata for %s: %s\n",
+	    plugins->Get (j), msg->GetData ());
+	}
+	/* 
+	  Metadata may be 0 although no error has been returned,
+	  but metadata may be valid although an error has been returned :)
+	  This is the case where the plugin scanner recognized
+	  possible plugins which turned out not be such. 
+	  (This happens e.g. on Win32 where 3rd party DLLs are
+	    returned as well.)
+	  */
+	if (metadata)
+	{
+	  PrivateSCF->RegisterClasses (plugins->Get (j), metadata, 
+	    context ? context : (*pluginPaths)[i].type);
+	}
       }
     }
-  #endif
   }
+#endif
 }
 
 void scfInitialize (csPluginPaths* pluginPaths)
@@ -504,6 +522,8 @@ csSCF::csSCF ()
 
   // We need a recursive mutex.
   mutex = csMutex::Create (true);
+
+  staticContextID = contexts.Request (SCF_STATIC_CLASS_CONTEXT);
 }
 
 csSCF::~csSCF ()
@@ -519,18 +539,18 @@ csSCF::~csSCF ()
   SCF = PrivateSCF = 0;
 }
 
-void csSCF::RegisterClasses (char const* xml)
+void csSCF::RegisterClasses (char const* xml, const char* context)
 {
   csMemFile file(xml, strlen(xml));
   csTinyDocumentSystem docsys;
   csRef<iDocument> doc = docsys.CreateDocument();
   if (doc->Parse(&file) == 0)
-    RegisterClasses(doc);
+    RegisterClasses(doc, context);
 }
 
-void csSCF::RegisterClasses (iDocument* doc)
+void csSCF::RegisterClasses (iDocument* doc, const char* context)
 {
-  RegisterClasses (0, doc);
+  RegisterClasses (0, doc, context);
 }
 
 void csSCF::RegisterClasses (char const* pluginPath, 
@@ -654,10 +674,12 @@ void csSCF::UnloadUnusedModules ()
 #endif
 }
 
-inline static bool SameContext (csStringID contextA, csStringID contextB)
+inline static bool ContextClash (csStringID contextA, csStringID contextB)
 {
-  return ((contextA != csInvalidStringID) && 
-    (contextB != csInvalidStringID) && (contextA == contextB));
+  return (
+    (contextA != csInvalidStringID) && 
+    (contextB != csInvalidStringID) && 
+    (contextA == contextB));
 }
 
 bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
@@ -671,7 +693,7 @@ bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
   if ((idx = ClassRegistry->FindKey (iClassID)) >= 0)
   {
     scfFactory *cf = (scfFactory *)ClassRegistry->Get (idx);
-    if (SameContext (cf->classContext, contextID))
+    if (ContextClash (cf->classContext, contextID))
     {
       fprintf (stderr,
 	"SCF_WARNING: class %s has already been registered in the same context ('%s')\n", 
@@ -686,12 +708,16 @@ bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
 	purposes we emit something.
        */
     #ifdef CS_DEBUG
-      // @@@ some way to have this warning in non-debug builds would be nice.
-      fprintf (stderr,
-	"SCF_NOTIFY: class %s has already been registered in a different context ('%s' vs '%s') "
-	"(this message appears only in debug builds)\n", 
-	iClassID, context, 
-	(cf->classContext != csInvalidStringID) ? contexts.Request (cf->classContext) : 0);
+      // Don't report when the already registered class is static.
+      if (cf->classContext != staticContextID)
+      {
+	// @@@ some way to have this warning in non-debug builds would be nice.
+	fprintf (stderr,
+	  "SCF_NOTIFY: class %s has already been registered in a different context ('%s' vs '%s') "
+	  "(this message appears only in debug builds)\n", 
+	  iClassID, context, 
+	  (cf->classContext != csInvalidStringID) ? contexts.Request (cf->classContext) : 0);
+      }
     #endif
     }
     return false;
@@ -713,7 +739,7 @@ bool csSCF::RegisterClass (scfFactoryFunc Func, const char *iClassID,
   if ((idx = ClassRegistry->FindKey (iClassID)) >= 0)
   {
     scfFactory *cf = (scfFactory *)ClassRegistry->Get (idx);
-    if (SameContext (cf->classContext, contextID))
+    if (ContextClash (cf->classContext, contextID))
     {
       fprintf (stderr,
 	"SCF_WARNING: class %s has already been registered in the same context (%s)\n", 
@@ -728,11 +754,15 @@ bool csSCF::RegisterClass (scfFactoryFunc Func, const char *iClassID,
 	purposes we emit something.
        */
     #ifdef CS_DEBUG
-      // @@@ some way to have this warning in non-debug builds would be nice.
-      fprintf (stderr,
-	"SCF_NOTIFY: class %s has already been registered in a different context (%s vs %s) "
-	"(this message appears only in debug builds)\n", 
-	iClassID, context, contexts.Request (cf->classContext));
+      // Don't report when the already registered class is static.
+      if (cf->classContext != staticContextID)
+      {
+	// @@@ some way to have this warning in non-debug builds would be nice.
+	fprintf (stderr,
+	  "SCF_NOTIFY: class %s has already been registered in a different context (%s vs %s) "
+	  "(this message appears only in debug builds)\n", 
+	  iClassID, context, contexts.Request (cf->classContext));
+      }
     #endif
     }
     return false;

@@ -40,21 +40,28 @@ static void AppendStrVecString (iStrVector*& strings, const char* str)
   strings->Push (csStrNew (str));
 }
 
-static csRef<iString> InternalGetPluginMetadata (const char* fullPath, 
-						 csRef<iDocument>& metadata,
-						 iDocumentSystem* docsys)
+csRef<iString> csGetPluginMetadata (const char* fullPath, 
+				    csRef<iDocument>& metadata)
 {
   iString* result = 0;
 
+  if (!metadata)
+  {
+    /*
+      TinyXML documents hold references to the document system.
+      So we have to create a new csTinyDocumentSystem (). Using just
+      'csTinyDocumentSystem docsys' would result in a crash when the
+      documents try to DecRef() to already destructed document system.
+     */
+    csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
+      (new csTinyDocumentSystem ());
+    metadata = docsys->CreateDocument ();
+  }
+  
   csPhysicalFile file (fullPath, "rb");
 
-  csRef<iDocument> doc = docsys->CreateDocument();
-  char const* errmsg = doc->Parse (&file/*Buffer*/);
-  if (errmsg == 0)
-  {
-    metadata = doc;
-  }
-  else
+  char const* errmsg = metadata->Parse (&file);
+  if (errmsg != 0)
   {
     metadata = 0;
 
@@ -65,25 +72,13 @@ static csRef<iString> InternalGetPluginMetadata (const char* fullPath,
     result = new scfString (errstr);
   }
 
-  //delete[] Buffer;
-	  
   return csPtr<iString> (result);
 }
   
-csRef<iString> csGetPluginMetadata (const char* fullPath, 
-				    csRef<iDocument>& metadata)
-{
-  csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
-    (new csTinyDocumentSystem ());
-  return InternalGetPluginMetadata (fullPath, metadata, docsys);
-}
-
 // Scan a directory for .csplugin files
 void InternalScanPluginDir (iStrVector*& messages,
-			    iDocumentSystem* docsys,
 			    const char* dir, 
 			    csRef<iStrVector>& plugins,
-			    csRefArray<iDocument>& metadata,
 			    bool recursive)
 {
   struct dirent* de;
@@ -100,19 +95,7 @@ void InternalScanPluginDir (iStrVector*& messages,
 	  csString scffilepath;
 	  scffilepath << dir << PATH_SEPARATOR << de->d_name;
 	  
-	  csRef<iDocument> doc;
-	  csRef<iString> error = InternalGetPluginMetadata (
-	    scffilepath, doc, docsys);
-	    
-	  if (error == 0)
-	  {
-	    metadata.Push (doc);
-	    plugins->Push (csStrNew (scffilepath));
-	  }  
-	  else
-	  {
-	    AppendStrVecString (messages, error->GetData ());
-	  }
+	  plugins->Push (csStrNew (scffilepath));
         }
 	else
 	{
@@ -124,8 +107,8 @@ void InternalScanPluginDir (iStrVector*& messages,
 	    csString scffilepath;
 	    scffilepath << dir << PATH_SEPARATOR << de->d_name;
 	  
-	    InternalScanPluginDir (subdirMessages, docsys, scffilepath,
-	      plugins, metadata, recursive);
+	    InternalScanPluginDir (subdirMessages, scffilepath,
+	      plugins, recursive);
   
 	    if (subdirMessages != 0)
 	    {
@@ -145,7 +128,6 @@ void InternalScanPluginDir (iStrVector*& messages,
 
 csRef<iStrVector> csScanPluginDir (const char* dir, 
 				   csRef<iStrVector>& plugins,
-				   csRefArray<iDocument>& metadata,
 				   bool recursive)
 {
   iStrVector* messages = 0;
@@ -153,38 +135,25 @@ csRef<iStrVector> csScanPluginDir (const char* dir,
   if (!plugins)
     plugins.AttachNew (new scfStrVector ());
 
-  csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
-    (new csTinyDocumentSystem ());
-
-  InternalScanPluginDir (messages, docsys, dir, plugins, metadata, 
+  InternalScanPluginDir (messages, dir, plugins, 
     recursive);
 	 
   return csPtr<iStrVector> (messages);
 }
 
 csRef<iStrVector> csScanPluginDirs (csPluginPaths* dirs, 
-				    csRef<iStrVector>& plugins,
-				    csRefArray<iDocument>& metadata)
+				    csRef<iStrVector>& plugins)
 {
   iStrVector* messages = 0;
 
   if (!plugins)
     plugins.AttachNew (new scfStrVector ());
 
-  /*
-    TinyXML documents hold references to the document system.
-    So we have to create a new csTinyDocumentSystem (). Using just
-    'csTinyDocumentSystem docsys' would result in a crash when the
-    documents try to DecRef() to already destructed document system.
-   */
-  csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
-    (new csTinyDocumentSystem ());
-
   for (int i = 0; i < dirs->GetCount (); i++)
   {
     iStrVector* dirMessages = 0;
-    InternalScanPluginDir (dirMessages, docsys, (*dirs)[i].path, plugins, 
-      metadata, (*dirs)[i].scanRecursive);
+    InternalScanPluginDir (dirMessages, (*dirs)[i].path, plugins, 
+      (*dirs)[i].scanRecursive);
     
     if (dirMessages != 0)
     {
