@@ -5,6 +5,9 @@
 DESCRIPTION.linux = Linux
 DESCRIPTION.OS.linux = Linux
 
+# a joystick device plugin
+#PLUGINS+=device/joystick/linux
+
 # Choose which 2D/3D driver combinations you want to build/use
 PLUGINS+=video/canvas/softx
 PLUGINS+=video/canvas/openglx video/renderer/opengl
