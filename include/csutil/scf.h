@@ -725,6 +725,10 @@ public:									\
       ID = iSCF::SCF->GetInterfaceID(#Name);				\
     return ID;								\
   }									\
+  static char const* GetName()						\
+  {									\
+    return #Name;							\
+  }									\
 };
 
 /**
@@ -750,6 +754,11 @@ public:
    * integer.
    */
   static scfInterfaceID GetID() { return (scfInterfaceID)(-1); }
+
+  /**
+   * Retrieve the interface's name as a string.
+   */
+  static char const* GetName() { return 0; }
 };
 
 /**

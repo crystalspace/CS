@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Nov-2003
+	- Eric Sunshine added new static method scfInterface<>::GetName() which
+	  returns an interface's name as a string.  This allows templates to
+	  retrieve an interface's name as a string even if the template knows
+	  the interface only by the opaque name `T'. For example:
+	  char const* n = scfInterface<T>::GetName();
 18-Nov-2003
 	- Keith committed a new version of the Max level export scripts.
 	  This version supports ThingFactories and instances now.  Also
