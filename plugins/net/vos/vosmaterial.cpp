@@ -55,7 +55,7 @@ public:
   virtual void doTask();
 };
 
-ConstructMaterialTask::ConstructMaterialTask(iObjectRegistry *objreg, 
+ConstructMaterialTask::ConstructMaterialTask(iObjectRegistry *objreg,
                                              csMetaMaterial* mm)
   : coords(0), metamaterial(mm, true), object_reg(objreg)
 {
@@ -80,7 +80,7 @@ void ConstructMaterialTask::doTask()
     if(layers.size() > 0)
     {
       iTextureWrapper** layertws = (iTextureWrapper**)malloc(
-      	layers.size() * sizeof(iTextureWrapper*));
+        layers.size() * sizeof(iTextureWrapper*));
       for(unsigned int i = 0; i < layers.size(); i++)
       {
         layertws[i] = layers[i]->GetTextureWrapper();
@@ -88,7 +88,7 @@ void ConstructMaterialTask::doTask()
       }
 
       imat = engine->CreateBaseMaterial(basetw, layers.size(),
-      	layertws, coords);
+        layertws, coords);
       free(layertws);
       free(coords);
     }
@@ -132,9 +132,9 @@ void ConstructMaterialTask::doTask()
 
 
       iTextureWrapper* txtwrap;
-      txtwrap = engine->CreateBlackTexture("", 2, 2, 0, CS_TEXTURE_3D);
+      txtwrap = engine->CreateBlackTexture(metamaterial->getURLstr().c_str(), 64, 64, 0, CS_TEXTURE_3D);
 
-      csImageMemory* img = new csImageMemory(1, 1);
+      csImageMemory* img = new csImageMemory(64, 64);
       csRGBpixel px((int)(R*255.0), (int)(G*255.0), (int)(B*255.0));
       img->Clear(px);
       txtwrap->SetImageFile(img);
@@ -149,7 +149,7 @@ void ConstructMaterialTask::doTask()
   if(imat.IsValid())
   {
     csRef<iMaterialWrapper> material = engine->GetMaterialList()->NewMaterial(
-    	imat);
+      imat);
     if(!material) return;
     material->Register(txtmgr);
     material->GetMaterialHandle()->Prepare();
@@ -197,7 +197,7 @@ void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
 {
   LOG("csMetaMaterial", 3, "setting up material");
   ConstructMaterialTask* cmt = new ConstructMaterialTask(
-  	vosa3dl->GetObjectRegistry(), this);
+    vosa3dl->GetObjectRegistry(), this);
 
   A3DL::TextureIterator txt = getTextureLayers();
   if(txt.hasMore())
@@ -213,13 +213,13 @@ void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
     if(txt.hasMore())
     {
       cmt->coords = (csTextureLayer*)malloc(txt.remaining()
-      	* sizeof(csTextureLayer));
+        * sizeof(csTextureLayer));
       float uscale = 1, vscale = 1, ushift = 0, vshift = 0;
       for(int i = 0; txt.hasMore(); txt++, i++)
       {
         vRef<csMetaTexture> mt = meta_cast<csMetaTexture>(*txt);
         if(mt.isValid())
-	{
+  {
           mt->Setup(vosa3dl);
           mt->acquire();
           cmt->layers.push_back(&mt);
@@ -236,7 +236,7 @@ void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
           cmt->coords[i].ushift = ushift;
           cmt->coords[i].vshift = vshift;
           switch(mt->getBlendMode())
-	  {
+    {
             case A3DL::Material::BLEND_NORMAL:
               try
               {
@@ -348,7 +348,7 @@ void csMetaMaterial::notifyChildRemoved(VobjectEvent& event)
 }
 
 MetaObject* csMetaMaterial::new_csMetaMaterial(VobjectBase* superobject,
-	const std::string& type)
+  const std::string& type)
 {
   return new csMetaMaterial(superobject);
 }

@@ -84,9 +84,9 @@ void ConstructPolygonMeshTask::doTask()
     LOG("ConstructPolygonMeshTask", 3, "is static mesh");
 
     csRef<iMeshFactoryWrapper> factory = engine->CreateMeshFactory (
-    	"crystalspace.mesh.object.thing", "polygonmesh_factory");
+      "crystalspace.mesh.object.thing", "polygonmesh_factory");
     csRef<iThingFactoryState> thingfac = SCF_QUERY_INTERFACE(
-    	factory->GetMeshObjectFactory(), iThingFactoryState);
+      factory->GetMeshObjectFactory(), iThingFactoryState);
 
     for(size_t i = 0; i < verts.size(); i++)
     {
@@ -103,10 +103,10 @@ void ConstructPolygonMeshTask::doTask()
       for(size_t n = 0; n < polys[i].size(); n++)
       {
         thingfac->AddPolygonVertex(CS_POLYRANGE_SINGLE(polymap[i]),
-	  	polys[i][n]);
+      polys[i][n]);
 
         // Does this code reject (say) a quad with one colinear vertex?
-	// Is this desireable?
+  // Is this desireable?
         if(n > 2)
         {
           float a = csMath3::Area3(thingfac->GetPolygonVertex(polymap[i],n-2),
@@ -121,7 +121,7 @@ void ConstructPolygonMeshTask::doTask()
         thingfac->RemovePolygon(polymap[i]);
         polymap[i] = -1;
         LOG("ConstructPolygonMeshTask", 2, "Discarded polygon "
-	  	<< i << " with three colinear or coincident vertices");
+      << i << " with three colinear or coincident vertices");
       }
     }
 
@@ -131,7 +131,7 @@ void ConstructPolygonMeshTask::doTask()
       {
         if(polymap[i] == -1) continue;
         // Convenience: prevents us from having to say CS_POLYRANGE_SINGLE
-	// in every thingfac->SetPolygonFoo method
+  // in every thingfac->SetPolygonFoo method
         csPolygonRange p = CS_POLYRANGE_SINGLE(polymap[i]);
 
         int * polyindices = thingfac->GetPolygonVertexIndices(polymap[i]);
@@ -161,10 +161,10 @@ void ConstructPolygonMeshTask::doTask()
         else
         {
           thingfac->SetPolygonTextureMapping(p,vert1, uv1, vert2,
-	  	uv2, vert3, uv3);
+      uv2, vert3, uv3);
         }
         thingfac->SetPolygonMaterial(p,
-		(meta_cast<csMetaMaterial>(*materials))->GetMaterialWrapper());
+    (meta_cast<csMetaMaterial>(*materials))->GetMaterialWrapper());
       }
     }
     else
@@ -173,7 +173,7 @@ void ConstructPolygonMeshTask::doTask()
       {
         if(polymap[i] == -1) continue;
         //Convenience: prevents us from having to say CS_POLYRANGE_SINGLE
-	//in every thingfac->SetPolygonFoo method
+  //in every thingfac->SetPolygonFoo method
         csPolygonRange p = CS_POLYRANGE_SINGLE(polymap[i]);
 
         // iPolygon3DStatic* p = thingfac->GetPolygon(polymap[i]);
@@ -214,23 +214,23 @@ void ConstructPolygonMeshTask::doTask()
           case A3DL::PolygonMesh::NoTexture:
             break;
           case A3DL::PolygonMesh::UVcoord:
-	    {
+      {
               csVector2 uv1(texsp[i].Rep.UVcoord.u1, texsp[i].Rep.UVcoord.v1);
               csVector2 uv2(texsp[i].Rep.UVcoord.u2, texsp[i].Rep.UVcoord.v2);
               csVector2 uv3(texsp[i].Rep.UVcoord.u3, texsp[i].Rep.UVcoord.v3);
 
               csMatrix2 m (
-	      	uv2.x - uv1.x,
-		uv3.x - uv1.x,
-		uv2.y - uv1.y,
-	      	uv3.y - uv1.y);
+          uv2.x - uv1.x,
+    uv3.x - uv1.x,
+    uv2.y - uv1.y,
+          uv3.y - uv1.y);
               float det = m.Determinant ();
 
               if (ABS (det) < 0.0001f)
               {
                 // Set the u-v axis to the two sides which join at the
-		// greatest angle (another idea: set it to the greatest side
-		// and a purpendicular?)
+    // greatest angle (another idea: set it to the greatest side
+    // and a purpendicular?)
 
                 csVector3 vt1 = thingfac->GetVertex(texsp[i].Rep.UVcoord.vert1);
                 csVector3 vt2 = thingfac->GetVertex(texsp[i].Rep.UVcoord.vert2);
@@ -250,9 +250,9 @@ void ConstructPolygonMeshTask::doTask()
               else
               {
                 thingfac->SetPolygonTextureMapping(
-			p, thingfac->GetVertex(texsp[i].Rep.UVcoord.vert1), uv1,
-			thingfac->GetVertex(texsp[i].Rep.UVcoord.vert2), uv2,
-			thingfac->GetVertex(texsp[i].Rep.UVcoord.vert3), uv3);
+      p, thingfac->GetVertex(texsp[i].Rep.UVcoord.vert1), uv1,
+      thingfac->GetVertex(texsp[i].Rep.UVcoord.vert2), uv2,
+      thingfac->GetVertex(texsp[i].Rep.UVcoord.vert3), uv3);
               }
             }
             break;
@@ -265,7 +265,7 @@ void ConstructPolygonMeshTask::doTask()
                             texsp[i].Rep.PolygonPlane.y,
                             texsp[i].Rep.PolygonPlane.z);
               thingfac->SetPolygonTextureMapping(
-	      	p,org, vec, texsp[i].Rep.PolygonPlane.len);
+          p,org, vec, texsp[i].Rep.PolygonPlane.len);
             }
             break;
           case A3DL::PolygonMesh::ArbitraryPlane:
@@ -280,19 +280,19 @@ void ConstructPolygonMeshTask::doTask()
                              texsp[i].Rep.ArbitraryPlane.y2,
                              texsp[i].Rep.ArbitraryPlane.z2);
               thingfac->SetPolygonTextureMapping(
-	      	p,org, vec1, texsp[i].Rep.ArbitraryPlane.len1,
-		vec2, texsp[i].Rep.ArbitraryPlane.len2);
+          p,org, vec1, texsp[i].Rep.ArbitraryPlane.len1,
+    vec2, texsp[i].Rep.ArbitraryPlane.len2);
             }
             break;
           case A3DL::PolygonMesh::TexMatrix:
             {
               csMatrix3 mx(texsp[i].Rep.Matrix.m11, texsp[i].Rep.Matrix.m12,
-	      		   texsp[i].Rep.Matrix.m13, texsp[i].Rep.Matrix.m21,
-			   texsp[i].Rep.Matrix.m22, texsp[i].Rep.Matrix.m23,
-			   texsp[i].Rep.Matrix.m31, texsp[i].Rep.Matrix.m32,
-			   texsp[i].Rep.Matrix.m33);
-	      csVector3 vec(texsp[i].Rep.Matrix.x, texsp[i].Rep.Matrix.y,
-	      	texsp[i].Rep.Matrix.z);
+               texsp[i].Rep.Matrix.m13, texsp[i].Rep.Matrix.m21,
+         texsp[i].Rep.Matrix.m22, texsp[i].Rep.Matrix.m23,
+         texsp[i].Rep.Matrix.m31, texsp[i].Rep.Matrix.m32,
+         texsp[i].Rep.Matrix.m33);
+        csVector3 vec(texsp[i].Rep.Matrix.x, texsp[i].Rep.Matrix.y,
+          texsp[i].Rep.Matrix.z);
               thingfac->SetPolygonTextureMapping(p,mx, vec);
             }
             break;
@@ -332,21 +332,21 @@ void ConstructPolygonMeshTask::doTask()
               thingfac->SetPolygonMaterial(p, mat->GetMaterialWrapper());
             }
             else
-	      thingfac->SetPolygonMaterial(
-	      	p, csMetaMaterial::GetCheckerboard());
+        thingfac->SetPolygonMaterial(
+          p, csMetaMaterial::GetCheckerboard());
           }
-	  else
-	    thingfac->SetPolygonMaterial(p, csMetaMaterial::GetCheckerboard());
+    else
+      thingfac->SetPolygonMaterial(p, csMetaMaterial::GetCheckerboard());
       }
     }
 
     thingfac->SetSmoothingFlag(true);
 
     LOG("ConstructPolygonMeshTask", 3, "creating mesh wrapper for "
-      	<< name << " in sector " << sector);
+        << name << " in sector " << sector);
 
     csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper(
-    	factory, name.c_str(), sector, csVector3(0, 0, 0));
+      factory, name.c_str(), sector, csVector3(0, 0, 0));
 
     if(materials.size())
     {
@@ -356,11 +356,11 @@ void ConstructPolygonMeshTask::doTask()
     else
     {
       meshwrapper->GetMeshObject()->SetMaterialWrapper(
-	csMetaMaterial::GetCheckerboard());
+  csMetaMaterial::GetCheckerboard());
     }
 
     csRef<iThingState> thingstate = SCF_QUERY_INTERFACE(
-    	meshwrapper->GetMeshObject(), iThingState);
+      meshwrapper->GetMeshObject(), iThingState);
 
     //thingstate->SetMovingOption(CS_THING_MOVE_OCCASIONAL);
     thingstate->SetMovingOption(CS_THING_MOVE_NEVER);
@@ -380,18 +380,18 @@ void ConstructPolygonMeshTask::doTask()
   else
   {
     csRef<iMeshFactoryWrapper> factory = engine->CreateMeshFactory (
-    	"crystalspace.mesh.object.genmesh", "polygonmesh_factory");
+      "crystalspace.mesh.object.genmesh", "polygonmesh_factory");
     csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper(
-    	factory, name.c_str(), sector);
+      factory, name.c_str(), sector);
 
     if(materials.hasMore())
       meshwrapper->GetMeshObject()->SetMaterialWrapper(
-		(meta_cast<csMetaMaterial>(*materials))->GetMaterialWrapper());
+    (meta_cast<csMetaMaterial>(*materials))->GetMaterialWrapper());
     else
       meshwrapper->GetMeshObject()->SetMaterialWrapper(
-		csMetaMaterial::GetCheckerboard());
+    csMetaMaterial::GetCheckerboard());
     csRef<iGeneralFactoryState> genmesh = SCF_QUERY_INTERFACE(
-    	factory->GetMeshObjectFactory(), iGeneralFactoryState);
+      factory->GetMeshObjectFactory(), iGeneralFactoryState);
 
     // Load vertices
     genmesh->SetVertexCount(verts.size());
@@ -426,7 +426,7 @@ void ConstructPolygonMeshTask::doTask()
         triangles[num].c = polys[i][c];
         num++;
         if(dbl)
-	{
+  {
           triangles[num].a = polys[i][0];
           triangles[num].b = polys[i][c];
           triangles[num].c = polys[i][c-1];
@@ -451,7 +451,7 @@ void ConstructPolygonMeshTask::doTask()
     genmesh->CalculateNormals();
 
     csRef<iGeneralMeshState> gm = SCF_QUERY_INTERFACE(
-    	meshwrapper->GetMeshObject(), iGeneralMeshState);
+      meshwrapper->GetMeshObject(), iGeneralMeshState);
     gm->SetLighting(true);
 
     /* XXX TODO: Make these be optional properties, on by default */
@@ -473,7 +473,7 @@ csMetaPolygonMesh::csMetaPolygonMesh(VobjectBase* superobject)
 }
 
 MetaObject* csMetaPolygonMesh::new_csMetaPolygonMesh(VobjectBase* superobject,
-	const std::string& type)
+  const std::string& type)
 {
     return new csMetaPolygonMesh(superobject);
 }
@@ -481,7 +481,7 @@ MetaObject* csMetaPolygonMesh::new_csMetaPolygonMesh(VobjectBase* superobject,
 void csMetaPolygonMesh::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
 {
   ConstructPolygonMeshTask* cpmt = new ConstructPolygonMeshTask(
-  	vosa3dl->GetObjectRegistry(), this, getURLstr(), sect->GetSector());
+    vosa3dl->GetObjectRegistry(), this, getURLstr(), sect->GetSector());
 
   LOG("csMetaPolygonMesh", 2, "getting vertices");
 
