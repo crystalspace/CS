@@ -5,8 +5,8 @@
 @cindex MacOS/X
 
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.  Copyright
-@copyright{} 1999, 2000, 2001, 2002 by Eric Sunshine.  Last updated
-21 December 2002.}
+@copyright{} 1999, 2000, 2001, 2002, 2003 by Eric Sunshine.  Last updated
+6 January 2003.}
 
 Crystal Space was ported to MacOS/X by Eric Sunshine.  If you have questions or
 comments about this port, please contact Eric Sunshine at
@@ -44,7 +44,7 @@ In addition to obtaining the project source code (@pxref{Where to Get}), you
 may also need to download and compile several support libraries used for image
 manipulation (@pxref{External Libraries}).  The libraries @samp{libpng} and
 @samp{libjpeg}, which are present on many Unix installations, are absent from
-MacOS/X.
+MacOS/X.  The optional @samp{libmng} is less common.
 
 One way to procure these libraries is to install them with Fink, which is a
 tool for installing pre-built Unix and Unix-like tools and resources on
@@ -61,8 +61,8 @@ in Crystal Space ``support'' download directory at the following location:
 @noindent
 @uref{ftp://sunsite.dk/projects/crystal/support/general/}
 
-If you have permission to do so, it is best to install the @sc{jpeg} and
-@sc{png} libraries in standard locations by following the installation
+If you have permission to do so, it is best to install the @sc{jpeg}, @sc{png},
+and @sc{mng} libraries in standard locations by following the installation
 instructions for each package (for example @samp{make install}).  In some
 cases, these libraries may already be present on your computer if you installed
 them separately (via Fink, for instance) or if they were installed by default.
@@ -77,6 +77,7 @@ directory.  For example:
 cd CS/libs
 gnutar xfz libpng*.tar.gz
 gnutar xfz jpegsrc*.tar.gz
+gnutar xfz libmng*.tar.gz
 @end example
 
 @noindent
@@ -89,6 +90,10 @@ make -f scripts/makefile.macosx libpng.a
 cd ../*jpeg*
 sh ./configure
 make libjpeg.a
+
+cd ../libmng*
+sh ./configure
+make libmng.a
 @end example
 
 @node MacOS/X Resources, MacOS/X Building, MacOS/X Libraries, MacOS/X
@@ -138,11 +143,11 @@ The Crystal Space project consists of a number of components and example
 programs.  The following commands are all issued from within the top level
 Crystal Space source code directory named @file{CS}.
 
-To begin building Crystal Space, first configure the makefiles for MacOS/X by
-typing the following command:
+To begin building Crystal Space, first configure the project for MacOS/X by
+typing the following command from within the root @file{CS} directory:
 
 @example
-make macosx
+./configure
 @end example
 
 At configuration time, you can also specify where Crystal Space should be
@@ -151,13 +156,19 @@ can specify another location if desired.  This setting is remembered and
 automatically applied later when you install the project.  For example:
 
 @example
-make macosx INSTALL_DIR=/Lirary/CrystalSpace
+./configure --prefix=/Library/CrystalSpace
 @end example
 
-Once the makefiles have been configured, you can begin building the Crystal
-Space demonstration programs.  Alternately, if you are interested in building
-only certain components of the system, such as drivers or libraries, then can
-do that instead.
+For a full list of configuration options, type:
+
+@example
+./configure --help
+@end example
+
+Once the project has been configured, you can begin building the Crystal Space
+demonstration programs.  Alternately, if you are interested in building only
+certain components of the system, such as drivers or libraries, then can do
+that instead.
 
 To see a list of all targets which can be built, type:
 

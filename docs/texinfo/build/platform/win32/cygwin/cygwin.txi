@@ -5,198 +5,197 @@
 @noindent
 @emph{Philip Wyett @email{philipwyett@@dsl.pipex.com}.}
 @noindent
-@emph{Last updated May 30, 2002}
+@emph{Last updated 6 January 2003.}
 
 These instructions are for building Crystal Space with Cygwin a @sc{gnu}
-compiler for Windows created by Red Hat Inc. and other third party contributors.
+compiler for Windows created by Red Hat Inc. and other third party
+contributors.
 
 @subsubheading A Warning About Cygwin
 
-A full or extensive install of Cygwin can take up alot of hard disk space. Please
-be careful if installing on low free space disks. A typical install can be around
-400Mb and large above 700Mb. You have been warned.
+A full or extensive Cygwin installation can take up alot of hard disk space.
+Please be careful if installing on low free space disks.  A typical install can
+be around 400@sc{mb} and large above 700@sc{mb}.
 
-@subsubheading Getting Cygwin
+@subsubheading Obtaining Cygwin
 
 Cygwin uses a custom setup application for installation of Cygwin which can be
 obtained from their official website.
 
+@noindent
 @uref{http://sources.redhat.com/cygwin/}
 
-The installation program @emph{setup.exe} must be downloaded to your system. You
-can download it using the following link.
+The installation program @file{setup.exe} must be downloaded to your system.
+You can download it using the following link:
 
+@noindent
 @uref{http://sources.redhat.com/cygwin/setup.exe}
 
 @subsubheading Installing Cygwin
 
-Firstly goto the location where you downloaded the Cygwin @emph{setup.exe}. I would
-suggest it be in a directory of it's own as during download it will drop the
-distributions files in the same location.
+First, go to the location where you downloaded the Cygwin @file{setup.exe}.  It
+is suggested that you download it into a directory of its own since it will
+place additional files in that directory later on when it downloads the actual
+Cygwin packages.
 
 @ifnotinfo
 @picturessss{build,platform,win32,cygwin,cygshot1}
+
 @end ifnotinfo
+Click/double click on @file{setup.exe} icon to begin the installation process.
 
-Click/Double Click on @emph{setup.exe} icon as shown in the screenshot above to begin
-the installation process.
-
-You will first be prompted with a Cygwin welcome dialog, which can be seen in the
-screenshot below. It tells you basic information e.g. what it is and what version of
-@emph{setup.exe} it is.
+You will first be prompted with a Cygwin welcome dialog.  It provides basic
+information about the setup program, such as its version number.
 
 @ifnotinfo
 @picturessss{build,platform,win32,cygwin,cygshot2}
-@end ifnotinfo
 
+@end ifnotinfo
 Click on the @emph{Next} button to continue.
 
-The next dialog you will see is the @emph{Choose a Download Source} dialog - See screenshot
-below. Here you need to choose if you wish to download and install direct from the internet
-or download to your system so you can can install it later. Cygwin like Linux can uninstall
-and update using this program. So really the decision is do you want to download and keep
-it to avoid a large download at a later date or if you have broadband say, download and
-install and not worry about keeping the package files. This is a matter of personal preference
-which we leave to you.
+The next dialog you will see is the @emph{Choose a Download Source} dialog.
+Here you need to choose if you wish to download and install directly from the
+internet or download to your system so you can install it later.  Cygwin, like
+Linux, can install, uninstall, and update using this program.  So, the decision
+is whether or not you want to download and keep the downloaded files around in
+order to avoid a large download at a later date if you re-install.  If you have
+a fast Internet connection, then you can download and install directly without
+saving the packages to your disk drive.  This is a matter of personal
+preference which we leave to you.
 
 @ifnotinfo
 @picturessss{build,platform,win32,cygwin,cygshot3}
+
 @end ifnotinfo
+After deciding, click on the @emph{Next} button to continue.
 
-After deciding click on the @emph{Next} button to continue.
+Note: For the purposes of this discussion, it is assumed that you are
+installing directly from the Internet.
 
-Note: For the purposes of this tutorial, we will be assuming you are installing directly
-from the internet.
+The next dialog you will see is the @emph{Select Root Install Directory}
+dialog.  The first thing to choose is the location of where Cygwin should be
+installed.  It is suggested that you install in a directory named @file{cygwin}
+at the location of your choice.  Point the installer at that directory.
 
-The next dialog you will see is the @emph{Select Root Install Directory} dialog - See
-screenshot below. The first thing to choose is the location of where you wish Cygwin to
-be installed on your system. We would suggest creating a directory called @emph{cygwin}
-at the location of your choice and pointing the installer to that directory.
-
-The next thing to decide if you are a system administrator, is do you want any others with
-system access to have access to Cygwin. Also you are asked if you wish to use normal DOS text
-file formatting or Unix. The difference is the CR/LF (Carriage Return/Line Feed) used in text
-files. This is all a matter of preference for the user. If you are a pure Windows users I
-would use the @emph{DOS} option. However, if you maybe moving the files you use to a Linux
-machine for instance it can be favorable to use the @emph{Unix} option. We leave it you.
+The next thing to decide, if you are a system administrator, is if you want any
+other users of that computer to have access to Cygwin.  Also you are asked if
+you wish to use @sc{dos} text file line-ending format (@sc{cr/lf}) or Unix
+format (@sc{lf}).  This is all a matter of preference for the user.  If you are
+a pure Windows users it is suggested that you choose the @sc{dos} option.
+However, if you might move files to a Unix machine, for instance, it might be
+favorable to use the Unix option.
 
 @ifnotinfo
 @picturessss{build,platform,win32,cygwin,cygshot4}
+
 @end ifnotinfo
+After deciding on a root install location and other options, click on the
+@emph{Next} button to continue.
 
-After deciding on a root install location and other options, click on the @emph{Next}
-button to continue.
-
-The next dialog you will see is the @emph{Select Local Package Directory} dialog - See
-screenshot below. This directory is corresponds to the location where you placed
-the Cygwin @emph{setup.exe}.
+The next dialog you will see is the @emph{Select Local Package Directory}
+dialog.  This directory is corresponds to the location where you placed the
+Cygwin @file{setup.exe} program.
 
 @ifnotinfo
 @picturessss{build,platform,win32,cygwin,cygshot5}
-@end ifnotinfo
 
+@end ifnotinfo
 If they correspond click on the @emph{Next} button to continue.
 
-The next dialog you will see is the @emph{Select Your Internet Connection} dialog - See
-screenshot below. This is just so you can specify the type of connection you have. Most
-of the time it will be a @emph{Direct Connection} you have. However, if you access the
-internet via proxy server, please select that option and enter the necessary information.
+The next dialog you will see is the @emph{Select Your Internet Connection}
+dialog.  This lets you specify the type of connection you have.  Most of the
+time it will be a @emph{Direct Connection} you have.  However, if you access
+the Internet via proxy server, then select that option and enter the necessary
+information.
 
 @ifnotinfo
 @picturessss{build,platform,win32,cygwin,cygshot6}
+
 @end ifnotinfo
+After choosing your internet connection type, click on the @emph{Next} button
+to continue.
 
-After choosing your internet connection type, click on the @emph{Next} button to continue.
-
-The next dialog you will see is the @emph{Choose A Download Site} dialog - See screenshot
-below. Ok, you all I hope know to choose a download location in or as close to your own
-country as possible. As I am in th United Kingdom, I choose one in my own country to
-download from.
+The next dialog you will see is the @emph{Choose A Download Site} dialog.
+Choose a download location in or as close to your own country as possible.
 
 @ifnotinfo
 @picturessss{build,platform,win32,cygwin,cygshot7}
-@end ifnotinfo
 
-After choosing your closest download location, click on the @emph{Next} button
+@end ifnotinfo
+After choosing the closest download location, click on the @emph{Next} button
 to continue.
 
-The next dialog you will see is the @emph{Select Packages To Install} dialog - See
-screenshot below. As you see the installer is a tree with selectable packages in the
-branches. While we would suggest installing the vast majority of the tools if you have
-enough hard disk space. However key packages you need are all those in the @emph{Devel}
-branch and at a minimum @emph{libjpeg}, @emph{libpng}, @emph{opengl}, @emph{python},
-@emph{win32api} and @emph{zlib} from the @emph{Libs} branch.
+The next dialog you will see is the @emph{Select Packages To Install} dialog.
+This shows a tree with selectable packages in the branches.  If you have
+sufficient disk space and a high-speed Internet connection, you may wish to
+install the majority of the tools.  On the other hand, if you want to install
+only a minimum set of tools, choose the packages in the @emph{Devel} branch
+and, at a minimum, @emph{libjpeg}, @emph{libpng}, @emph{opengl}, @emph{python},
+@emph{win32api}, and @emph{zlib} from the @emph{Libs} branch.
 
 @ifnotinfo
 @picturessss{build,platform,win32,cygwin,cygshot8}
+
 @end ifnotinfo
+Note: You do not need to install the @emph{Apache server}, @emph{XFree} or
+@emph{Games} packages.  Also if you miss anything first time round you can
+simply repeat the install process and install the package(s) you missed.
 
-Note: You do not need to install the @emph{apache server}, @emph{Xfree} or @emph{Games}.
-Also if you miss anything first time round you can merely repeat the install process and
-pick-up and install the package(s) you miss.
+Important: The above @emph{Select Packages To Install} section is subject to
+change.
 
-Important: The above @emph{Select Packages To Install} section is subject to change. It
-is a preliminary version only.
+After choosing the packages for installing, click on the @emph{Next} button to
+continue.
 
-After choosing the packages for installing, click on the @emph{Next} button to continue.
+At this point the installer will download and install the selected packages and
+perform post build steps, such as the generation of documentation, etc.
 
-At this point the installer will download and install the selected packages and perform
-post build steps i.e. generating documentation etc. If you see command windows appear.
-Do not worry.
-
-The next dialog you will see is the @emph{Create Icons} dialog - See screenshot below.
-If you are doing a fresh install and want these icons please check the boxes. If you are
-updating you need not check the boxes if you already have the icons.
+The next dialog you will see is the @emph{Create Icons} dialog.  If you are
+performing a fresh install and want these icons, then check the boxes.  If you
+are updating you need not check the boxes if you already have the icons.
 
 @ifnotinfo
 @picturessss{build,platform,win32,cygwin,cygshot9}
-@end ifnotinfo
 
+@end ifnotinfo
 After making your selection, click on the @emph{Finish} button to continue.
 
-After all this you will be prompted with a dialog to tell you that the installation is
-complete. Click on the @emph{Ok} button to finish the install process.
+After all this you will be prompted with a dialog to tell you that the
+installation is complete.  Click on the @emph{Ok} button to finish the
+installation process.
 
-@subsubheading Installing DirectX 8 SDK for Cygwin
+@subsubheading Installing DirectX 8 @sc{sdk} for Cygwin
 
-The Microsoft DirectX 8 SDK which the Cygwin port uses is one created especially for it. You can
-download it via the following link.
+The Microsoft DirectX 8 @sc{sdk} which the Cygwin port uses is one created
+especially for it.  You can download it via the following link.
 
+@noindent
 @uref{ftp://sunsite.dk/projects/crystal/support/cygwin/DXforCygwin.zip}
 
-To install. Extract the archive to a location of your choice. Open a Cygwin bash prompt and
-navigate to where you extracted the files. To be more exact the directory which contains the
-@file{Makefile}. Now at the prompt do: @file{make install} and hit @sc{return}. Wait for the
-prompt to re-appear and it's installed - That's it. :)
+To install, extract the archive to a location of your choice.  Open a Cygwin
+Bash prompt and navigate to where you extracted the files (that is, the
+directory which contains the @file{Makefile}).  Next, at the command prompt
+type @samp{make install}.
 
-@subsubheading Building
+@subsubheading Building Crystal Space
 
-Open a Cygwin bash prompt by wither using the desktop shortcut or the icon in the programs
-menu. Navigate to the @file{CS\} directory and issue the following commands.
+Open a Cygwin Bash prompt via the desktop shortcut or the via item in the
+Programs menu.  Navigate to the @file{CS\} directory and issue the following
+commands:
 
 @example
-make cygwin MODE=debug
+./configure
 make depend
 make -k all
 @end example
 
-Some Windows ME users have reported a system crash when running the 
-@samp{make cygwin} command. If you have that problem, try adding
-@samp{FORCEBUCK=SS} to the command line, like this:
+Note that making the @samp{depend} target is optional and can be omitted if you
+do not plan to make any changes to the Crystal Space source or header files.
 
-@example
-make cygwin MODE=debug FORCEBUCK=SS
-make depend
-make -k all
-@end example
-
-Note that making the @samp{depend} target is not absolutely required. If
-doing so presents problems, then you can safely omit it:
-
-@example
-make cygwin MODE=debug
-make -k all
-@end example
+The @samp{-k} option used in the @samp{make -k all} command instructs the
+project builder to ignore errors and continue compiling regardless.  This can
+be useful in cases when localized errors appear in the project since often they
+affect only a single module.
 
 @subsubheading Additional Command Line Compile Options
 
@@ -209,7 +208,4 @@ make -k clean all
 
 @noindent
 This will first remove all object files, libraries, etc.  from the
-@file{CS\out\WIN32\X86\debug} directory and will then build the entire project.
-
-The @samp{-k} option used in the @samp{make -k all} command instructs the
-compiler to ignore errors and continue compiling regardless.
+@file{CS\out\WIN32\X86\debug} directory and then build the entire project.

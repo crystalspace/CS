@@ -56,28 +56,24 @@ You can download @code{zlib} from:
 @uref{http://www.gzip.org/zlib/}
 
 After downloading you can either install the package normally (i.e. @samp{make
-install}) or unpack it into the directory @file{CS/libs/zlib}.  In general, if
+install}) or unpack it into the directory @file{CS/libs/zlib*}.  In general, if
 you have permission to do so, it is best to install the library.
-
-Read the compilation instructions included with @code{zlib} and compile it.
 
 @subheading libpng
 @cindex libpng
 @cindex Libraries, libpng
 @cindex PNG library
 
-Crystal Space relies upon the @code{libpng} library for reading PNG graphic
-files.  You can download @code{libpng} from:
+Crystal Space relies upon the @code{libpng} library for reading @sc{png}
+graphic files.  You can download @code{libpng} from:
 
 @noindent
 @uref{http://www.libpng.org/pub/png/libpng.html}
 
 After downloading you can either install the package normally (i.e. @samp{make
 -f scripts/makefile.std install}) or unpack it into the directory
-@file{CS/libs/libpng}.  In general, if you have permission to do so, it is best
-to install the library.
-
-Read the compilation instructions included with @code{zlib} and compile it.
+@file{CS/libs/libpng*}.  In general, if you have permission to do so, it is
+best to install the library.
 
 @subheading libjpeg
 @cindex libjpeg
@@ -91,7 +87,20 @@ graphic files.  You can download @code{libjpeg} from:
 @uref{http://www.ijg.org/files/}
 
 After downloading you can either install the package normally (i.e. @samp{make
-install}) or unpack it into the directory @file{CS/libs/libpng}.  In general,
+install}) or unpack it into the directory @file{CS/libs/jpeg*}.  In general,
 if you have permission to do so, it is best to install the library.
 
-Read the compilation instructions included with @code{zlib} and compile it.
+@subheading libmng
+@cindex libmng
+@cindex Libraries, libmng
+@cindex MNG/JNG library
+
+Crystal Space can optionally utilize the @code{libmng} library for reading
+MNG/JNG graphic files.  You can download @code{libmng} from:
+
+@noindent
+@uref{http://www.libmng.com/downloadpublic.html}
+
+After downloading you can either install the package normally (i.e. @samp{make
+install}) or unpack it into the directory @file{CS/libs/libmng*}.  In general,
+if you have permission to do so, it is best to install the library.

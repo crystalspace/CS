@@ -4,8 +4,8 @@
 
 @noindent
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.  Originally
-written by Philip Wyett, @email{philipwyett@@dsl.pipex.com}.  Last updated 29
-October 2002.}
+written by Philip Wyett, @email{philipwyett@@dsl.pipex.com}.  Last updated 6
+January 2003.}
 
 These instructions are for building Crystal Space with MinGW, the
 @emph{Minimalist @sc{gnu} compiler for Windows}.
@@ -57,7 +57,7 @@ Be sure to install them in the order shown.
 @itemize @bullet
 @item
 Install the MinGW compiler.  The is a self-extracting executable.  The
-following instructions assume you have installed the MinGW package at
+following instructions assume you will install the MinGW package at
 @file{C:\mingw32}, though you are free to install it wherever you like.
 
 @item
@@ -65,7 +65,7 @@ Install @sc{msys}.  This is a self-extracting executable.  During the
 installation, you will be asked for the location of the MinGW installation.
 This allows @sc{msys} to correctly locate the MinGW tools later on when
 building Crystal Space.  Be sure to enter the correct path (@file{C:\mingw32},
-in our example).
+in our example) when prompted.
 
 @item
 Install the @file{csmingwlibs} package.  This is a self-extracting executable.
@@ -75,25 +75,27 @@ building Crystal Space.  If you are interested, see the @file{README} file in
 the @file{csmingwlibs} directory after installation for all the gory details.
 @end itemize
 
-@subsubheading Building
+@subsubheading Building Crystal Space
 
-The most robust way to configure and build Crystal Space is from within the
-@sc{msys} shell environment.  To start this environment, click on the
-@sc{msys} icon which the installation procedure placed upon your desktop, or
-choose the @sc{msys} item from the Start menu.  This will launch a Unix-like
-shell window into which you type commands.
+You must configure and build Crystal Space from within the @sc{msys} shell
+environment.  To launch this environment, click on the @sc{msys} icon which the
+installation procedure placed upon your desktop, or choose the @sc{msys} item
+from the @emph{Programs} menu.  This will launch a Unix-like shell window into
+which you type commands.
 
-From
-this shell, go to your @file{CS} directory with the @samp{cd} command.  For
-example, if Crystal Space resides at @file{C:\work\CS}, invoke the command
-@samp{cd /c/work/CS}.  Next, build the project with the following sequence
-of commands:
+From this shell, go to your @file{CS} directory with the @samp{cd} command.
+For example, if Crystal Space resides at @file{C:\work\CS}, invoke the command
+@samp{cd /c/work/CS}.  Next, build the project with the following sequence of
+commands:
 
 @example
-make win32gcc
+./configure
 make depend
 make -k all
 @end example
+
+Note that the @samp{depend} target is optional and can be omitted if you do not
+plan to make any changes to the Crystal Space source or header files.
 
 The @samp{-k} option used in @samp{make -k all} instructs the @file{make}
 utility to ignore errors and continue building the project.  This may be
@@ -103,24 +105,13 @@ also be necessary if you are using the bleeding-edge version of Crystal Space
 from the @sc{cvs} repository, and some module fails to build correctly.
 
 If you prefer to build a @dfn{debug} version of Crystal Space, substitute
-the following command for the one above:
+the following commands for those shown above:
 
 @example
-make win32gcc MODE=debug
-@end example
-
-Some Windows @sc{me} users have reported a system crash when running the
-@samp{make win32gcc} command.  If you experience this problem, try adding
-@samp{FORCEBUCK=SS} to the command line, like this:
-
-@example
-make win32gcc FORCEBUCK=SS
+./configure --enable-debug
 make depend
 make -k all
 @end example
-
-Note that the @samp{depend} target is not absolutely required.  If you
-experience problems with dependency generation, you can safely omit that step.
 
 @subsubheading Additional Build Options
 
@@ -138,7 +129,7 @@ Crystal Space from the @sc{cvs} repository after some radical change.
 
 @example
 make distclean
-make win32gcc
+./configure
 make depend
 make -k all
 @end example

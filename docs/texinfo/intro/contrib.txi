@@ -733,6 +733,10 @@ robust, generalized, and usable than the old.
 Eric, a long time opponent of the monolithic @emph{system driver} concept,
 designed the modular and flexible replacement infrastructure which he and
 others then proceeded to implement.
+
+@item
+He bravely coerced Crystal Space to use GNU Autoconf for configuration (or,
+looked at another way, he bravely coerced Autoconf to work with Crystal Space).
 @end itemize
 
 @item

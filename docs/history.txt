@@ -23,6 +23,10 @@ The history order is reversed so that new features are at the top.
 	      directory.  This caused problems because the path was not
 	      properly recorded and would fail if the user did not have "." in
 	      PATH.
+	- Eric Sunshine updated the "build" instructions in the user manual to
+	  mention "configure" rather than "make platform".
+	- Eric Sunshine added libmng to "external libraries" section of user
+	  manual.
 5-Jan-2002
 	- Applied a patch from Rene Jager (renej.frog@yucom.be) which does
 	  the following:
