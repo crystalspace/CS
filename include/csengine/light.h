@@ -71,6 +71,11 @@ protected:
   /// Attenuation type
   int attenuation;
 
+  /**
+   * List of light callbacks.
+   */
+  csVector light_cb_vector;
+
 public:
   /// Set of flags
   csFlags flags;
@@ -162,7 +167,7 @@ public:
    * lightmaps are not automatically updated when calling this function
    * as that is a time consuming process.
    */
-  virtual void SetColor (const csColor& col) { color = col; }
+  virtual void SetColor (const csColor& col);
 
   /**
    * Return the associated halo
@@ -188,6 +193,35 @@ public:
    * Get the brightness of a light at a given distance.
    */
   float GetBrightnessAtDistance (float d);
+
+  //----------------------------------------------------------------------
+  // Callbacks
+  //----------------------------------------------------------------------
+  void SetLightCallback (iLightCallback* cb)
+  {
+    light_cb_vector.Push (cb);
+    cb->IncRef ();
+  }
+
+  void RemoveLightCallback (iLightCallback* cb)
+  {
+    int idx = light_cb_vector.Find (cb);
+    if (idx != -1)
+    {
+      light_cb_vector.Delete (idx);
+      cb->DecRef ();
+    }
+  }
+
+  int GetLightCallbackCount () const
+  {
+    return light_cb_vector.Length ();
+  }
+  
+  iLightCallback* GetLightCallback (int idx) const
+  {
+    return (iLightCallback*)light_cb_vector.Get (idx);
+  }
 
   //------------------------ iLight interface -----------------------------
   SCF_DECLARE_IBASE_EXT (csObject);
@@ -218,6 +252,22 @@ public:
   	float roundness);
     virtual iFlareHalo* CreateFlareHalo ();
     virtual csFlags& GetFlags () { return scfParent->flags; }
+    virtual void SetLightCallback (iLightCallback* cb)
+    {
+      scfParent->SetLightCallback (cb);
+    }
+    virtual void RemoveLightCallback (iLightCallback* cb)
+    {
+      scfParent->RemoveLightCallback (cb);
+    }
+    virtual int GetLightCallbackCount () const
+    {
+      return scfParent->GetLightCallbackCount ();
+    }
+    virtual iLightCallback* GetLightCallback (int idx) const
+    {
+      return scfParent->GetLightCallback (idx);
+    }
   } scfiLight;
 };
 

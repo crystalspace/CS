@@ -80,6 +80,23 @@ struct iFlareHalo;
 #define CS_ATTN_REALISTIC 3
 /** @} */
 
+SCF_VERSION (iLightCallback, 0, 0, 1);
+
+/**
+ * Set a callback which is called when this light color is changed.
+ * The given context will be either an instance of iRenderView, iFrustumView,
+ * or else NULL.
+ */
+struct iLightCallback : public iBase
+{
+  /**
+   * Light color will be changed. It is safe to delete this callback
+   * in this function.
+   */
+  virtual void OnColorChange (const csColor& newcolor) = 0;
+};
+
+
 SCF_VERSION (iLight, 0, 0, 7);
 
 /**
@@ -178,6 +195,24 @@ struct iLight : public iBase
    * </ul>
    */
   virtual csFlags& GetFlags () = 0;
+
+  /**
+   * Set the light callback. This will call IncRef() on the callback
+   * So make sure you call DecRef() to release your own reference.
+   */
+  virtual void SetLightCallback (iLightCallback* cb) = 0;
+
+  /**
+   * Remove a light callback.
+   */
+  virtual void RemoveLightCallback (iLightCallback* cb) = 0;
+
+  /// Get the number of light callbacks.
+  virtual int GetLightCallbackCount () const = 0;
+  
+  /// Get the specified light callback.
+  virtual iLightCallback* GetLightCallback (int idx) const = 0;
+
 };
 
 SCF_VERSION (iLightList, 0, 0, 1);
