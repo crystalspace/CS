@@ -379,6 +379,16 @@ void csDynLight::Setup ()
   sector->CheckFrustum (lview);
 }
 
+void csDynLight::SetColor (const csColor& col)
+{
+  csLightPatch* lp = lightpatches;
+  while (lp)
+  {
+    lp->GetPolygon ()->MakeDirtyDynamicLights ();
+    lp = lp->GetNextLight ();
+  }
+}
+
 void csDynLight::Move (csSector* sector, float x, float y, float z)
 {
   if (sector == csDynLight::sector && center.x == x && center.y == y && center.z == z)

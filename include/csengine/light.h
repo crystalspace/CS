@@ -544,6 +544,12 @@ public:
   void Setup ();
 
   /**
+   * Call this when the color of the light changes. This is more
+   * efficient than calling Setup().
+   */
+  virtual void SetColor (const csColor& col);
+
+  /**
    * Move the light. This will NOT automatically recalculate the
    * view frustum. You still need to call Setup() after this.
    */
