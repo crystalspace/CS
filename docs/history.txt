@@ -8,7 +8,7 @@ chronological order.
 
 2-Apr-2004
 	- res made the following changes:
-	    - Replaced the CS_SHADERVAR_STACK #define witha csShaderVarStack
+	    - Replaced the CS_SHADERVAR_STACK #define with a csShaderVarStack
 	      typedef.
 	    - Added a new base class for shader plugins, containing some
 	      common stuff.
