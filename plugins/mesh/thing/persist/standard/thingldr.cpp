@@ -434,7 +434,8 @@ bool csThingLoader::ParsePoly3d (
 	iEngine* engine,
 	float default_texlen,
 	iThingFactoryState* thing_fact_state, int vt_offset,
-	bool& poly_delete, iMeshWrapper* mesh)
+	bool& poly_delete, iMeshWrapper* mesh,
+	bool& baduv)
 {
   poly_delete = false;
   iMaterialWrapper* mat = 0;
@@ -667,11 +668,17 @@ bool csThingLoader::ParsePoly3d (
 	  "Bad texture specification: vertex index 3 doesn't exist!");
       return false;
     }
-    thing_fact_state->SetPolygonTextureMapping (
+    if (!thing_fact_state->SetPolygonTextureMapping (
     	CS_POLYRANGE_LAST,
-        thing_fact_state->GetPolygonVertex (CS_POLYINDEX_LAST, tx_uv_i1), tx_uv1,
-        thing_fact_state->GetPolygonVertex (CS_POLYINDEX_LAST, tx_uv_i2), tx_uv2,
-        thing_fact_state->GetPolygonVertex (CS_POLYINDEX_LAST, tx_uv_i3), tx_uv3);
+        thing_fact_state->GetPolygonVertex (CS_POLYINDEX_LAST, tx_uv_i1),
+		tx_uv1,
+        thing_fact_state->GetPolygonVertex (CS_POLYINDEX_LAST, tx_uv_i2),
+		tx_uv2,
+        thing_fact_state->GetPolygonVertex (CS_POLYINDEX_LAST, tx_uv_i3),
+		tx_uv3))
+    {
+      baduv = true;
+    }
   }
   else if (texspec & CSTEX_V1)
   {
@@ -689,8 +696,11 @@ bool csThingLoader::ParsePoly3d (
           "Bad texture specification!");
 	return false;
       }
-      else thing_fact_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST,
-        tx_orig, tx1, tx_len.y, tx2, tx_len.z);
+      else if (!thing_fact_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST,
+            tx_orig, tx1, tx_len.y, tx2, tx_len.z))
+      {
+	baduv = true;
+      }
     }
     else
     {
@@ -700,8 +710,11 @@ bool csThingLoader::ParsePoly3d (
           "Bad texture specification!");
 	return false;
       }
-      else thing_fact_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST,
-      	tx_orig, tx1, tx_len.x);
+      else if (!thing_fact_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST,
+      	tx_orig, tx1, tx_len.x))
+      {
+        baduv = true;
+      }
     }
   }
   else if (tx_len.x)
@@ -711,55 +724,83 @@ bool csThingLoader::ParsePoly3d (
     // a standard offset. Otherwise we will just create a plane specific
     // for this case given the first two vertices.
     bool same_x = true, same_y = true, same_z = true;
-    const csVector3& v = thing_fact_state->GetPolygonVertex (CS_POLYINDEX_LAST, 0);
-    for (int i = 1 ; i < thing_fact_state->GetPolygonVertexCount (CS_POLYINDEX_LAST) ; i++)
+    const csVector3& v = thing_fact_state->GetPolygonVertex (
+    	CS_POLYINDEX_LAST, 0);
+    for (int i = 1 ; i < thing_fact_state->GetPolygonVertexCount (
+    	CS_POLYINDEX_LAST) ; i++)
     {
-      const csVector3& v2 = thing_fact_state->GetPolygonVertex (CS_POLYINDEX_LAST, i);
+      const csVector3& v2 = thing_fact_state->GetPolygonVertex (
+      	CS_POLYINDEX_LAST, i);
       if (same_x && ABS (v.x-v2.x) >= SMALL_EPSILON) same_x = false;
       if (same_y && ABS (v.y-v2.y) >= SMALL_EPSILON) same_y = false;
       if (same_z && ABS (v.z-v2.z) >= SMALL_EPSILON) same_z = false;
     }
     if (same_x)
     {
-      thing_fact_state->SetPolygonTextureMapping (
+      if (!thing_fact_state->SetPolygonTextureMapping (
         CS_POLYRANGE_LAST,
       	csVector3 (v.x, 0, 0), csVector3 (v.x, 0, 1),
-	tx_len.x, csVector3 (v.x, 1, 0), tx_len.x);
+	tx_len.x, csVector3 (v.x, 1, 0), tx_len.x))
+      {
+        baduv = true;
+      }
     }
     else if (same_y)
     {
-      thing_fact_state->SetPolygonTextureMapping (
+      if (!thing_fact_state->SetPolygonTextureMapping (
         CS_POLYRANGE_LAST,
       	csVector3 (0, v.y, 0), csVector3 (1, v.y, 0),
-	tx_len.x, csVector3 (0, v.y, 1), tx_len.x);
+	tx_len.x, csVector3 (0, v.y, 1), tx_len.x))
+      {
+        baduv = true;
+      }
     }
     else if (same_z)
     {
-      thing_fact_state->SetPolygonTextureMapping (
+      if (!thing_fact_state->SetPolygonTextureMapping (
       	CS_POLYRANGE_LAST,
 	csVector3 (0, 0, v.z), csVector3 (1, 0, v.z),
-	tx_len.x, csVector3 (0, 1, v.z), tx_len.x);
+	tx_len.x, csVector3 (0, 1, v.z), tx_len.x))
+      {
+        baduv = true;
+      }
     }
     else
-      thing_fact_state->SetPolygonTextureMapping (
+    {
+      if (!thing_fact_state->SetPolygonTextureMapping (
       	CS_POLYRANGE_LAST,
-	tx_len.x);
+	tx_len.x))
+      {
+        baduv = true;
+      }
+    }
   }
   else
-    thing_fact_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, tx_matrix, tx_vector);
+  {
+    if (!thing_fact_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST,
+    	tx_matrix, tx_vector))
+    {
+      baduv = true;
+    }
+  }
 
   if (texspec & CSTEX_UV_SHIFT)
   {
     if (thing_fact_state->IsPolygonTextureMappingEnabled (CS_POLYINDEX_LAST))
     {
-      thing_fact_state->GetPolygonTextureMapping (CS_POLYINDEX_LAST, tx_matrix, tx_vector);
+      thing_fact_state->GetPolygonTextureMapping (CS_POLYINDEX_LAST,
+      	tx_matrix, tx_vector);
       // T = Mot * (O - Vot)
       // T = Mot * (O - Vot) + Vuv      ; Add shift Vuv to final texture map
       // T = Mot * (O - Vot) + Mot * Mot-1 * Vuv
       // T = Mot * (O - Vot + Mot-1 * Vuv)
       csVector3 shift (uv_shift.x, uv_shift.y, 0);
       tx_vector -= tx_matrix.GetInverse () * shift;
-      thing_fact_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, tx_matrix, tx_vector);
+      if (!thing_fact_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST,
+      	tx_matrix, tx_vector))
+      {
+        baduv = true;
+      }
     }
   }
 
@@ -896,7 +937,7 @@ bool csThingLoader::LoadThingPart (iThingEnvironment* te, iDocumentNode* node,
 	iObjectRegistry* object_reg, iReporter* reporter,
 	iSyntaxService *synldr, ThingLoadInfo& info,
 	iEngine* engine, int vt_offset, bool isParent,
-	iMeshWrapper* mesh)
+	iMeshWrapper* mesh, bool& baduv)
 {
 #define CHECK_TOPLEVEL(m) \
 if (!isParent) { \
@@ -1058,7 +1099,7 @@ if (!info.thing_fact_state) \
 	if (!LoadThingPart (te, child, ldr_context, object_reg, reporter,
 		synldr, info, engine, info.thing_fact_state
 			? info.thing_fact_state->GetVertexCount () : 0,
-		false, mesh))
+		false, mesh, baduv))
 	  return false;
         break;
       case XMLTOKEN_V:
@@ -1090,8 +1131,9 @@ Nag to Jorrit about this feature if you want it.");
 	    	info.default_material);
 	  bool poly_delete = false;
 	  bool success = ParsePoly3d (child, ldr_context,
-	  			    engine, info.default_texlen, info.thing_fact_state,
-				    vt_offset, poly_delete, mesh);
+	  			    engine, info.default_texlen,
+				    info.thing_fact_state,
+				    vt_offset, poly_delete, mesh, baduv);
 	  if (!success)
 	  {
 	    info.thing_fact_state->RemovePolygon (idx);
@@ -1205,8 +1247,9 @@ csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
   // It is possible that the mesh wrapper is null.
   csRef<iMeshWrapper> mesh = SCF_QUERY_INTERFACE_SAFE (context, iMeshWrapper);
 
+  bool baduv = false;
   if (!LoadThingPart (te, node, ldr_context, object_reg, reporter, synldr, info,
-  	engine, 0, true, mesh))
+  	engine, 0, true, mesh, baduv))
   {
     info.obj = 0;
   }
@@ -1243,6 +1286,13 @@ csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
     }
   }
 
+  if (baduv)
+  {
+    synldr->Report ("crystalspace.thingloader.parse",
+		CS_REPORTER_SEVERITY_WARNING,
+		node, "Bad UV coordinates for polygons in this thing!");
+  }
+
   return csPtr<iBase> (info.obj);
 }
 
@@ -1277,11 +1327,20 @@ csPtr<iBase> csThingFactoryLoader::Parse (iDocumentNode* node,
   fact = info.type->NewFactory ();
   info.thing_fact_state = SCF_QUERY_INTERFACE (fact, iThingFactoryState);
 
+  bool baduv = false;
   if (!LoadThingPart (te, node, ldr_context, object_reg, reporter, synldr, info,
-  	engine, 0, true, 0))
+  	engine, 0, true, 0, baduv))
   {
     fact = 0;
   }
+
+  if (baduv)
+  {
+    synldr->Report ("crystalspace.thingloader.parse",
+    		CS_REPORTER_SEVERITY_WARNING,
+		node, "Bad UV coordinates for polygons in this thing!");
+  }
+
   return csPtr<iBase> (fact);
 }
 

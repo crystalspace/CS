@@ -1386,45 +1386,52 @@ int* csThingStatic::GetPolygonVertexIndices (int polygon_idx)
   return static_polygons[GetRealIndex (polygon_idx)]->GetVertexIndices ();
 }
 
-void csThingStatic::SetPolygonTextureMapping (const csPolygonRange& range,
+bool csThingStatic::SetPolygonTextureMapping (const csPolygonRange& range,
   	const csMatrix3& m, const csVector3& v)
 {
   int i, start, end;
   GetRealRange (range, start, end);
   for (i = start ; i <= end ; i++)
     static_polygons[i]->SetTextureSpace (m, v);
+  return true;
 }
 
-void csThingStatic::SetPolygonTextureMapping (const csPolygonRange& range,
+bool csThingStatic::SetPolygonTextureMapping (const csPolygonRange& range,
   	const csVector2& uv1, const csVector2& uv2, const csVector2& uv3)
 {
   int i, start, end;
   GetRealRange (range, start, end);
+  bool error = false;
   for (i = start ; i <= end ; i++)
   {
     csPolygon3DStatic* sp = static_polygons[i];
-    sp->SetTextureSpace (
+    if (!sp->SetTextureSpace (
     	sp->Vobj (0), uv1,
     	sp->Vobj (1), uv2,
-    	sp->Vobj (2), uv3);
+    	sp->Vobj (2), uv3))
+      error = true;
   }
+  return !error;
 }
 
-void csThingStatic::SetPolygonTextureMapping (const csPolygonRange& range,
+bool csThingStatic::SetPolygonTextureMapping (const csPolygonRange& range,
   	const csVector3& p1, const csVector2& uv1,
   	const csVector3& p2, const csVector2& uv2,
   	const csVector3& p3, const csVector2& uv3)
 {
   int i, start, end;
   GetRealRange (range, start, end);
+  bool error = false;
   for (i = start ; i <= end ; i++)
   {
     csPolygon3DStatic* sp = static_polygons[i];
-    sp->SetTextureSpace (p1, uv1, p2, uv2, p3, uv3);
+    if (!sp->SetTextureSpace (p1, uv1, p2, uv2, p3, uv3))
+      error = true;
   }
+  return !error;
 }
 
-void csThingStatic::SetPolygonTextureMapping (const csPolygonRange& range,
+bool csThingStatic::SetPolygonTextureMapping (const csPolygonRange& range,
   	const csVector3& v_orig, const csVector3& v1, float len1)
 {
   int i, start, end;
@@ -1434,9 +1441,11 @@ void csThingStatic::SetPolygonTextureMapping (const csPolygonRange& range,
     csPolygon3DStatic* sp = static_polygons[i];
     sp->SetTextureSpace (v_orig, v1, len1);
   }
+  return true;
 }
 
-void csThingStatic::SetPolygonTextureMapping (const csPolygonRange& range, float len1)
+bool csThingStatic::SetPolygonTextureMapping (const csPolygonRange& range,
+	float len1)
 {
   int i, start, end;
   GetRealRange (range, start, end);
@@ -1445,9 +1454,10 @@ void csThingStatic::SetPolygonTextureMapping (const csPolygonRange& range, float
     csPolygon3DStatic* sp = static_polygons[i];
     sp->SetTextureSpace (sp->Vobj (0), sp->Vobj (1), len1);
   }
+  return true;
 }
 
-void csThingStatic::SetPolygonTextureMapping (const csPolygonRange& range,
+bool csThingStatic::SetPolygonTextureMapping (const csPolygonRange& range,
   	const csVector3& v_orig,
 	const csVector3& v1, float len1,
 	const csVector3& v2, float len2)
@@ -1459,6 +1469,7 @@ void csThingStatic::SetPolygonTextureMapping (const csPolygonRange& range,
     csPolygon3DStatic* sp = static_polygons[i];
     sp->SetTextureSpace (v_orig, v1, len1, v2, len2);
   }
+  return true;
 }
 
 void csThingStatic::GetPolygonTextureMapping (int polygon_idx,
@@ -1467,8 +1478,8 @@ void csThingStatic::GetPolygonTextureMapping (int polygon_idx,
   static_polygons[GetRealIndex (polygon_idx)]->GetTextureSpace (m, v);
 }
 
-void csThingStatic::SetPolygonTextureMappingEnabled (const csPolygonRange& range,
-  	bool enabled)
+void csThingStatic::SetPolygonTextureMappingEnabled (
+	const csPolygonRange& range, bool enabled)
 {
   int i, start, end;
   GetRealRange (range, start, end);

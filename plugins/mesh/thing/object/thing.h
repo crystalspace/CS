@@ -475,21 +475,21 @@ public:
   virtual int GetPolygonVertexCount (int polygon_idx);
   virtual const csVector3& GetPolygonVertex (int polygon_idx, int vertex_idx);
   virtual int* GetPolygonVertexIndices (int polygon_idx);
-  virtual void SetPolygonTextureMapping (const csPolygonRange& range,
+  virtual bool SetPolygonTextureMapping (const csPolygonRange& range,
   	const csMatrix3& m, const csVector3& v);
-  virtual void SetPolygonTextureMapping (const csPolygonRange& range,
+  virtual bool SetPolygonTextureMapping (const csPolygonRange& range,
   	const csVector2& uv1, const csVector2& uv2, const csVector2& uv3);
-  virtual void SetPolygonTextureMapping (const csPolygonRange& range,
+  virtual bool SetPolygonTextureMapping (const csPolygonRange& range,
   	const csVector3& p1, const csVector2& uv1,
   	const csVector3& p2, const csVector2& uv2,
   	const csVector3& p3, const csVector2& uv3);
-  virtual void SetPolygonTextureMapping (const csPolygonRange& range,
+  virtual bool SetPolygonTextureMapping (const csPolygonRange& range,
   	const csVector3& v_orig, const csVector3& v1, float len1);
-  virtual void SetPolygonTextureMapping (const csPolygonRange& range,
+  virtual bool SetPolygonTextureMapping (const csPolygonRange& range,
   	const csVector3& v_orig,
 	const csVector3& v1, float len1,
 	const csVector3& v2, float len2);
-  virtual void SetPolygonTextureMapping (const csPolygonRange& range,
+  virtual bool SetPolygonTextureMapping (const csPolygonRange& range,
   	float len1);
   virtual void GetPolygonTextureMapping (int polygon_idx,
   	csMatrix3& m, csVector3& v);

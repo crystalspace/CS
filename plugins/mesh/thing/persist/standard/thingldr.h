@@ -120,14 +120,14 @@ public:
 	float default_texlen,
 	iThingFactoryState* thing_fact_state,
 	int vt_offset, bool& poly_delete,
-	iMeshWrapper* mesh);
+	iMeshWrapper* mesh, bool& baduv);
 
   bool LoadThingPart (iThingEnvironment* te,
   	iDocumentNode* node, iLoaderContext* ldr_context,
 	iObjectRegistry* object_reg, iReporter* reporter,
 	iSyntaxService *synldr, ThingLoadInfo& info,
 	iEngine* engine, int vt_offset, bool isParent,
-	iMeshWrapper* mesh);
+	iMeshWrapper* mesh, bool& baduv);
 
 public:
   SCF_DECLARE_IBASE;

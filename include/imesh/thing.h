@@ -410,8 +410,10 @@ struct iThingFactoryState : public iBase
    * \param m the matrix which defines the mapping.
    * \param v the vector which defines the mapping.
    * range.
+   * \return false in case the texture mapping was invalid. In that case
+   * a default texture mapping will be set on the polygon.
    */
-  virtual void SetPolygonTextureMapping (const csPolygonRange& range,
+  virtual bool SetPolygonTextureMapping (const csPolygonRange& range,
   	const csMatrix3& m, const csVector3& v) = 0;
 
   /**
@@ -422,8 +424,10 @@ struct iThingFactoryState : public iBase
    * \param uv1 uv coordinates for vertex 1.
    * \param uv2 uv coordinates for vertex 2.
    * \param uv3 uv coordinates for vertex 3.
+   * \return false in case the texture mapping was invalid. In that case
+   * a default texture mapping will be set on the polygon.
    */
-  virtual void SetPolygonTextureMapping (const csPolygonRange& range,
+  virtual bool SetPolygonTextureMapping (const csPolygonRange& range,
   	const csVector2& uv1, const csVector2& uv2, const csVector2& uv3) = 0;
 
   /**
@@ -439,8 +443,10 @@ struct iThingFactoryState : public iBase
    * \param uv2 uv coordinates for vertex 2.
    * \param p3 vertex 3.
    * \param uv3 uv coordinates for vertex 3.
+   * \return false in case the texture mapping was invalid. In that case
+   * a default texture mapping will be set on the polygon.
    */
-  virtual void SetPolygonTextureMapping (const csPolygonRange& range,
+  virtual bool SetPolygonTextureMapping (const csPolygonRange& range,
   	const csVector3& p1, const csVector2& uv1,
   	const csVector3& p2, const csVector2& uv2,
   	const csVector3& p3, const csVector2& uv3) = 0;
@@ -460,8 +466,10 @@ struct iThingFactoryState : public iBase
    * \param v_orig origin.
    * \param v u-axis in texture space coordinate system.
    * \param len length of u-axis.
+   * \return false in case the texture mapping was invalid. In that case
+   * a default texture mapping will be set on the polygon.
    */
-  virtual void SetPolygonTextureMapping (const csPolygonRange& range,
+  virtual bool SetPolygonTextureMapping (const csPolygonRange& range,
   	const csVector3& v_orig, const csVector3& v, float len) = 0;
 
   /**
@@ -481,8 +489,10 @@ struct iThingFactoryState : public iBase
    * \param len1 length of u-axis.
    * \param v2 v-axis in texture space coordinate system.
    * \param len2 length of v-axis.
+   * \return false in case the texture mapping was invalid. In that case
+   * a default texture mapping will be set on the polygon.
    */
-  virtual void SetPolygonTextureMapping (const csPolygonRange& range,
+  virtual bool SetPolygonTextureMapping (const csPolygonRange& range,
   	const csVector3& v_orig,
 	const csVector3& v1, float len1,
 	const csVector3& v2, float len2) = 0;
@@ -501,8 +511,10 @@ struct iThingFactoryState : public iBase
    * range.
    * \param len length of the u-axis and the v-axis is given as the 'len1'
    * parameter.
+   * \return false in case the texture mapping was invalid. In that case
+   * a default texture mapping will be set on the polygon.
    */
-  virtual void SetPolygonTextureMapping (const csPolygonRange& range,
+  virtual bool SetPolygonTextureMapping (const csPolygonRange& range,
   	float len) = 0;
 
   /**

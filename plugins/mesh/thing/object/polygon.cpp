@@ -652,8 +652,7 @@ void csPolygon3DStatic::GetTextureSpace (
   }
 }
 
-static int bad_poly_counter = 0;
-void csPolygon3DStatic::SetTextureSpace (
+bool csPolygon3DStatic::SetTextureSpace (
   const csVector3 &p1,
   const csVector2 &uv1,
   const csVector3 &p2,
@@ -688,13 +687,13 @@ void csPolygon3DStatic::SetTextureSpace (
 
   if (ABS (det) < CS_POLY_MIN_UV_DET)
   {
-    bad_poly_counter++;
-    if (csThingObjectType::do_verbose || bad_poly_counter < 10)
+    if (csThingObjectType::do_verbose)
+    {
       thing_static->thing_type->Warn (
-        "Warning: bad UV coordinates for poly '%s'!",
-        GetName ());
+        "Warning: bad UV coordinates for poly '%s'!", GetName ());
+    }
     SetTextureSpace (p1, p2, 1);
-    return ;
+    return false;
   }
   else
     m.Invert ();
@@ -715,6 +714,7 @@ void csPolygon3DStatic::SetTextureSpace (
   pv = p1 + pl.x * (p2 - p1) + pl.y * (p3 - p1);
 
   SetTextureSpace (po, pu, (pu - po).Norm (), pv, (pv - po).Norm ());
+  return true;
 }
 
 void csPolygon3DStatic::SetTextureSpace (
