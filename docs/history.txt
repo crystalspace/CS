@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+27-Mar-2005
+	- Eric Sunshine added FStripCommon to jamcompatibility.jam since Jam
+	  2.4 lacks it and it is needed by StripCommon in helper.jam.
 26-Mar-2005
 	- res added a check for setenv() and some (Win32 only) code to fake it
 	  up if not present.

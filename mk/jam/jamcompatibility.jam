@@ -53,8 +53,8 @@ if [ Match (csh) : $(SHELL) ]
 
 # Jam 2.4's SubDir rule had some problems and misses the useful SUBDIRRULES
 # extension. So we override it here with a better version (from jam 2.5rc3).
-# Likewise, 2.4 is missing FReverse, which is needed by SubDir and other
-# custom rules we define.
+# Likewise, 2.4 is missing FReverse and FStrip, which are needed by SubDir and
+# other custom rules we define.
 if $(JAMVERSION) = 2.4
 {
 
@@ -64,6 +64,21 @@ rule FReverse
 	# return ... a3 a2 a1 ;
 
 	if $(1) { return [ FReverse $(1[2-]) ] $(1[1]) ; }
+}
+
+rule FStripCommon
+{
+	# FStripCommon v1 : v2 ;
+
+	# Strip common initial elements of variables v1 and v2.
+	# Modifies the variable values themselves.
+
+	if $($(<)[1]) && $($(<)[1]) = $($(>)[1])
+	{
+	    $(<) = $($(<)[2-]) ;
+	    $(>) = $($(>)[2-]) ;
+	    FStripCommon $(<) : $(>) ;
+	}
 }
 
 rule SubDir
