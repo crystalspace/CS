@@ -23,7 +23,7 @@
 
 // This is the name of the DLL. Make sure to change this if you change the DLL name!
 // DAN: this might have to be changed for each OS, cuz each OS has a different extension for DLLs.
-#define DLL_NAME "libbe2d.so"
+#define DLL_NAME "be2d.so"
 
 static unsigned int gRefCount = 0;
 static DllRegisterData gRegData =

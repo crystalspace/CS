@@ -60,6 +60,7 @@ public:
   virtual ~csGraphics2DBeLib(void);
 
   virtual bool Open (char *Title);
+  virtual bool Initialize ();
   virtual void Close ();
 
   virtual bool BeginDraw () { return (Memory != NULL); }
