@@ -5617,8 +5617,10 @@ class iSpriteCal3DSocket(iBase):
     def GetSecondaryCount(*args): return _cspace.iSpriteCal3DSocket_GetSecondaryCount(*args)
     def GetSecondaryMesh(*args): return _cspace.iSpriteCal3DSocket_GetSecondaryMesh(*args)
     def GetSecondaryTransform(*args): return _cspace.iSpriteCal3DSocket_GetSecondaryTransform(*args)
+    def SetSecondaryTransform(*args): return _cspace.iSpriteCal3DSocket_SetSecondaryTransform(*args)
     def AttachSecondary(*args): return _cspace.iSpriteCal3DSocket_AttachSecondary(*args)
     def DetachSecondary(*args): return _cspace.iSpriteCal3DSocket_DetachSecondary(*args)
+    def FindSecondary(*args): return _cspace.iSpriteCal3DSocket_FindSecondary(*args)
     def __del__(self, destroy=_cspace.delete_iSpriteCal3DSocket):
         try:
             if self.thisown: destroy(self)
