@@ -10,6 +10,12 @@ chronological order.
 	- Jorrit added new versions of csPoly3D::ComputeNormal() and
 	  ComputePlane() that accept a csArray<csVector3>.
 	- Jorrit did further work on the lighter app. Added 'litPolygon' class.
+	- Jorrit did a runtime speedup of thing by moving more of the
+	  initialization stuff to the -prepare stage (iThingState->Prepare() or
+	  PrepareForUse()). This speeds up moving in a big world when things
+	  come into view the first time. I put the speed testing code in
+	  #ifdef's because there are still some slowdowns that I want to
+	  examine further.
 	- Eric Sunshine made the following changes:
 	    - Updated apimod100.txi to mention that installation location of
 	      the Crystal Space header tree has changed.

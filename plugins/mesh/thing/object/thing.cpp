@@ -2837,6 +2837,14 @@ void csThing::PrepareRenderMeshes (
       materials_to_visit.Push (renderMeshes[i]->material);
   }
   materials_to_visit.ShrinkBestFit ();
+
+  for (i = 0; i < renderMeshes.Length(); i++)
+  {
+    csRenderMesh* rm = renderMeshes[i];
+    rm->variablecontext->GetVariable (static_data->texLightmapName)->
+      SetValue (i < litPolys.Length() ? litPolys[i]->SLM->GetTexture() : 0);
+  }
+
 }
 
 #endif
@@ -2855,12 +2863,33 @@ void csThing::PrepareForUse ()
 
   UpdateDirtyLMs ();
 #endif // __USE_MATERIALS_REPLACEMENT__
+#ifdef CS_USE_NEW_RENDERER
+  csDirtyAccessArray<csRenderMesh*>& renderMeshes =
+    rmHolder.GetUnusedMeshes (0);
+  if (renderMeshes.Length() == 0)
+  {
+    PrepareRenderMeshes (renderMeshes);
+  }
+#endif
 }
+
+#define DO_TIMING 0
+
+#if DO_TIMING
+#include <sys/time.h>
+#endif
 
 csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview, 
                                          iMovable* movable, uint32 frustum_mask)
 {
 #ifdef CS_USE_NEW_RENDERER
+
+#if DO_TIMING
+struct timeval tv1, tv2, tv3, tv4, tv5, tv6;
+struct timezone tz1, tz2, tz3, tz4, tz5, tz6;
+gettimeofday (&tv1, &tz1);
+#endif
+
   Prepare ();
 
   iCamera *icam = rview->GetCamera ();
@@ -2884,7 +2913,10 @@ csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview,
   sphere.SetCenter (b.GetCenter ());
   sphere.SetRadius (static_data->max_obj_radius);
 
-  //@@@
+#if DO_TIMING
+gettimeofday (&tv2, &tz2);
+#endif
+
   size_t i;
   csReversibleTransform tr_o2c = camtrans;
   if (!movable->IsFullTransformIdentity ())
@@ -2894,9 +2926,17 @@ csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview,
   	clip_z_plane);
   csVector3 camera_origin = tr_o2c.GetT2OTranslation ();
 
+#if DO_TIMING
+gettimeofday (&tv3, &tz3);
+#endif
+
   const uint currentFrame = rview->GetCurrentFrameNumber ();
   csDirtyAccessArray<csRenderMesh*>& renderMeshes =
     rmHolder.GetUnusedMeshes (currentFrame);
+
+#if DO_TIMING
+gettimeofday (&tv4, &tz4);
+#endif
   
   if (renderMeshes.Length() == 0)
   {
@@ -2915,9 +2955,14 @@ csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview,
     rm->do_mirror = icam->IsMirrored ();
     rm->lastFrame = currentFrame;
 
-    rm->variablecontext->GetVariable (static_data->texLightmapName)->
-      SetValue (i < litPolys.Length() ? litPolys[i]->SLM->GetTexture() : 0);
+    // Jorrit: Moved the code below to PrepareRenderMeshes().
+    //rm->variablecontext->GetVariable (static_data->texLightmapName)->
+      //SetValue (i < litPolys.Length() ? litPolys[i]->SLM->GetTexture() : 0);
   }
+
+#if DO_TIMING
+gettimeofday (&tv5, &tz5);
+#endif
 
   UpdateDirtyLMs (); // @@@ Here?
 
@@ -2926,6 +2971,18 @@ csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview,
   {
     materials_to_visit[i]->Visit ();
   }
+
+#if DO_TIMING
+gettimeofday (&tv6, &tz6);
+if (tv6.tv_usec - tv1.tv_usec > 200)
+{
+csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (logparent, iMeshWrapper));
+printf ("%s %p d1=%d d2=%d d3=%d d4=%d d5=%d diff=%d\n", mw->QueryObject ()->GetName (),
+this,
+tv2.tv_usec-tv1.tv_usec, tv3.tv_usec-tv2.tv_usec, tv4.tv_usec-tv3.tv_usec,
+tv5.tv_usec-tv4.tv_usec, tv6.tv_usec-tv5.tv_usec, tv6.tv_usec - tv1.tv_usec);
+}
+#endif
 
   return renderMeshes.GetArray ();
 #else
