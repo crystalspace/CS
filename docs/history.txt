@@ -16,6 +16,9 @@ chronological order.
 	  better error message.
 	  Also changed the "environment" syntax of FixedVP a bit to 
 	  allow for future texgen modes. Look at water shader for reference.
+	- Anders Stenberg fixed a bug in windows threading, where a
+	  semaphore "LockWait" would return instantly due to wrong
+	  usage of the timeout value.
 22-Mar-2004
 	- Anders Stenberg fixed several places where mesh objects would
 	  return "false" from GetRenderMeshes (which is supposed to return

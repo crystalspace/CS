@@ -186,7 +186,7 @@ bool csWinCondition::Wait (csMutex* mutex, csTicks timeout)
 {
   // SignalObjectAndWait() is only available in WinNT 4.0 and above
   // so we use the potentially dangerous version below
-  if (mutex->Release () && LockWait ((DWORD)timeout))
+  if (mutex->Release () && LockWait (timeout==0?INFINITE:(DWORD)timeout))
     return mutex->LockWait ();
   return false;
 }
