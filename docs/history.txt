@@ -477,6 +477,7 @@ chronological order.
 	- Eric Sunshine fixed shell quoting problems from 10-Jul-2004 change to
 	  GenerateWin32ManifestRc rule in win32.jam which caused 'sed'
 	  expressions to crash and burn on some platforms.
+	- *** RELEASED STABLE 0.98.3 ***
 14-Jul-2004
 	- Jorrit fixed a big bug in csSafeCopyArray.  The problem was that
 	  csArray was using 'memmove' but that function is illegal in the
@@ -638,6 +639,7 @@ chronological order.
 	- Keith modified the sprcal3d loader to automatically call this
 	  function when models are loaded from a .cal3d file.  Loading sprcal3d
 	  models is about 4x faster now due to this refactoring.
+	- *** RELEASED STABLE 0.98.2 ***
 6-Jul-2004
 	- Reed changed VOSA3DL to load required plugins on demand rather than 
 	  assume they were already loaded.
@@ -715,6 +717,7 @@ chronological order.
 	- Eric Sunshine added a bunch of missing entries to
 	  plugins/filesys/vfs/vfs.cfg.template, which is the vfs.cfg that
 	  actually gets installed by "jam install".
+	- *** RELEASED STABLE 0.98.1 ***
 1-Jul-2004
 	- Eric Sunshine augmented "jam install" so that CS/data/cube and
 	  CS/data/flarge/mosaic-detail.dds are also installed.
