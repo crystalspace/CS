@@ -24,6 +24,13 @@ chronological order.
 	  to use to do a HUGE optimization of the ODE mesh->ball and other
 	  mesh related tests.
 	- Jorrit added csPolygonTree::IntersectBox() and IntersectSphere().
+	- Jorrit did a huge optimization to the mesh->sphere collision
+	  detection code in odedynamics plugin by using the new csPolygonTree.
+	  There is still a huge memory leak (the trees are not cleaned up yet)
+	  and also there is a strange error:
+		ODE Message 3: LCP internal error, s <= 0 (s=0.0000e+000)
+	  But otherwise things look very normal. I got a speed increase from
+	  1 fps to 150 fps :-)
 17-Aug-2003
 	- Jorrit fixed a bug in csIntersect3::IntersectTriangle(). In
 	  some cases it would fail to register a hit.

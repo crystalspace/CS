@@ -21,6 +21,7 @@
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
 #include "ivaria/collider.h"
+#include "csgeom/polytree.h"
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
 #include "iengine/engine.h"
@@ -87,7 +88,7 @@ csODEDynamics::csODEDynamics (iBase* parent)
   dGeomDestroy (id);
 
   dGeomClass c;
-  c.bytes = sizeof (iMeshWrapper *);
+  c.bytes = sizeof (MeshInfo);
   c.collider = &CollideSelector;
   c.aabb = &GetAABB;
   c.aabb_test = 0;
@@ -294,7 +295,8 @@ int csODEDynamics::CollideMeshBox (dGeomID mesh, dGeomID box, int flags,
   boxbox.AddBoundingVertex (-aabb);
   csReversibleTransform boxt = GetGeomTransform (box);
 
-  iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (mesh);
+  MeshInfo *mi = (MeshInfo*)dGeomGetClassData (mesh);
+  iMeshWrapper *m = mi->mesh;
   CS_ASSERT (m);
   iPolygonMesh* p = m->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet();
   csVector3 *vertex_table = p->GetVertices ();
@@ -415,7 +417,8 @@ int csODEDynamics::CollideMeshCylinder (dGeomID mesh, dGeomID cyl, int flags,
   cylbox.AddBoundingVertex (-aabb);
   csReversibleTransform cylt = GetGeomTransform (cyl);
 
-  iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (mesh);
+  MeshInfo *mi = (MeshInfo*)dGeomGetClassData (mesh);
+  iMeshWrapper *m = mi->mesh;
   CS_ASSERT (m);
   iPolygonMesh* p = m->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet();
   csVector3 *vertex_table = p->GetVertices ();
@@ -526,7 +529,8 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
   const dReal *pos = dGeomGetPosition (sphere);
   csVector3 center(pos[0], pos[1], pos[2]);
   dReal rad = dGeomSphereGetRadius (sphere);
-  iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (mesh);
+  MeshInfo *mi = (MeshInfo *)dGeomGetClassData (mesh);
+  iMeshWrapper *m = mi->mesh;
   CS_ASSERT (m);
   iPolygonMesh* p = m->GetMeshObject()->GetObjectModel()
   	->GetPolygonMeshColldet();
@@ -537,11 +541,21 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
 
   int outcount = 0;
 
+#if 1
+  csPolygonTree* tree = mi->tree;
+  csArray<int> polyidx;
+  tree->IntersectSphere (polyidx, center, rad*rad);
+  for (int i = 0; i < polyidx.Length () && outcount < N; i ++)
+  {
+    csMeshedPolygon& poly = polygon_list[polyidx[i]];
+#else
   for (int i = 0; i < p->GetPolygonCount() && outcount < N; i ++)
   {
-    csPlane3 plane(vertex_table[polygon_list[i].vertices[0]] / mesht,
-      vertex_table[polygon_list[i].vertices[1]] / mesht,
-      vertex_table[polygon_list[i].vertices[2]] / mesht);
+    csMeshedPolygon& poly = polygon_list[i];
+#endif
+    csPlane3 plane(vertex_table[poly.vertices[0]] / mesht,
+      vertex_table[poly.vertices[1]] / mesht,
+      vertex_table[poly.vertices[2]] / mesht);
     plane.Normalize();
     if (plane.Classify (center) < 0)
     {
@@ -552,11 +566,11 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
     {
       continue;
     }
-    int vcount = polygon_list[i].num_vertices;
+    int vcount = poly.num_vertices;
     for (int j = 0; j < vcount-1; j ++)
     {
-      int ind1 = polygon_list[i].vertices[j];
-      int ind2 = polygon_list[i].vertices[j+1];
+      int ind1 = poly.vertices[j];
+      int ind2 = poly.vertices[j+1];
       csVector3 v1 = vertex_table[ind1] / mesht;
       csVector3 v2 = vertex_table[ind2] / mesht;
       csPlane3 edgeplane(v1, v2, v2 - plane.Normal());
@@ -589,8 +603,8 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
       }
     }
     /* get the one last edge from END to 0 */
-    int ind1 = polygon_list[i].vertices[vcount-1];
-    int ind2 = polygon_list[i].vertices[0];
+    int ind1 = poly.vertices[vcount-1];
+    int ind2 = poly.vertices[0];
     csVector3 v1 = vertex_table[ind1] / mesht;
     csVector3 v2 = vertex_table[ind2] / mesht;
     csPlane3 edgeplane (v1, v2, v2 - plane.Normal());
@@ -653,7 +667,8 @@ void csODEDynamics::GetAABB (dGeomID g, dReal aabb[6])
 {
   csBox3 box;
   csReversibleTransform mesht = GetGeomTransform (g);
-  iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (g);
+  MeshInfo *mi = (MeshInfo *)dGeomGetClassData (g);
+  iMeshWrapper *m = mi->mesh;
   iPolygonMesh* p = m->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet();
   csVector3 *vertex_table = p->GetVertices ();
   box.StartBoundingBox ();
@@ -765,8 +780,13 @@ bool csODEDynamicSystem::AttachColliderMesh (iMeshWrapper* mesh,
   	const csOrthoTransform& trans, float friction, float elasticity, float softness)
 {
   dGeomID id = dCreateGeom (csODEDynamics::GetGeomClassNum());
-  iMeshWrapper **gdata = (iMeshWrapper **)dGeomGetClassData (id);
-  *gdata = mesh;
+  MeshInfo *gdata = (MeshInfo*)dGeomGetClassData (id);
+  gdata->mesh = mesh;
+  // @@@ Jorrit: BIG MEMORY LEAK
+  gdata->tree = new csPolygonTree ();
+  iPolygonMesh* p = mesh->GetMeshObject()->GetObjectModel()
+  	->GetPolygonMeshColldet();
+  gdata->tree->Build (p);
   dSpaceAdd (spaceID, id);
 
   dMatrix3 mat;
@@ -962,12 +982,16 @@ bool csODERigidBody::AttachColliderMesh (iMeshWrapper *mesh,
   dGeomTransformSetCleanup (id, 1);
 
   dGeomID gid = dCreateGeom (csODEDynamics::GetGeomClassNum());
-  iMeshWrapper **gdata = (iMeshWrapper **)dGeomGetClassData (gid);
-  *gdata = mesh;
+  MeshInfo *gdata = (MeshInfo*)dGeomGetClassData (gid);
+  gdata->mesh = mesh;
+  // @@@ Jorrit: BIG MEMORY LEAK
+  gdata->tree = new csPolygonTree ();
+  iPolygonMesh* p = mesh->GetMeshObject()->GetObjectModel()
+  	->GetPolygonMeshColldet();
+  gdata->tree->Build (p);
   dGeomTransformSetGeom (id, gid);
 
   csOBB b;
-  iPolygonMesh* p = mesh->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet();
   b.FindOBB (p->GetVertices(), p->GetVertexCount());
   dMassSetBox (&m, density, b.MaxX()-b.MinX(), b.MaxY()-b.MinY(), b.MaxZ()-b.MinZ());
 

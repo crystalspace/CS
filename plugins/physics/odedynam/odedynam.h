@@ -46,6 +46,7 @@
 struct iObjectRegistry;
 struct iMeshWrapper;
 struct iSkeletonBone;
+class csPolygonTree;
 
 ////////////////////////////////////////////
 // NOTE
@@ -79,10 +80,17 @@ public:
 
 typedef csDirtyAccessArray<dGeomID> csGeomList;
 
-struct ContactEntry {
+struct ContactEntry
+{
   dGeomID o1, o2;
   csVector3 point;
   csVector3 dir;
+};
+
+struct MeshInfo
+{
+  iMeshWrapper* mesh;
+  csPolygonTree* tree;
 };
 
 typedef csDirtyAccessArray<ContactEntry> csContactList;

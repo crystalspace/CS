@@ -25,6 +25,8 @@
 csPolygonTree::csPolygonTree ()
 {
   split_axis = CS_POLYTREE_AXISINVALID;
+  child1 = 0;
+  child2 = 0;
 }
 
 csPolygonTree::~csPolygonTree ()
