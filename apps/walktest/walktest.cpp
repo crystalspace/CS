@@ -43,7 +43,7 @@
 #include "csengine/2d/csspr2d.h"
 #include "csutil/sparse3d.h"
 #include "csutil/inifile.h"
-//#include "csutil/impexp/impexp.h"
+#include "csutil/impexp/impexp.h"
 #include "csobject/nameobj.h"
 #include "csobject/dataobj.h"
 #include "csgfxldr/csimage.h"
@@ -61,7 +61,7 @@
 #endif
 
 WalkTest *Sys;
-//converter *ImportExport;
+converter *ImportExport;
 
 #define Gfx3D System->piG3D
 #define Gfx2D System->piG2D
@@ -199,9 +199,10 @@ void WalkTest::DrawFrame (long elapsed_time, long current_time)
 
     if (cslogo)
     {
-      int w  = cslogo->Width()  * FRAME_WIDTH  / 640;
-      int h  = cslogo->Height() * FRAME_HEIGHT / 480;
-      cslogo->Draw(Gfx2D, 2,2,w,h);
+      int w = cslogo->Width()  * FRAME_WIDTH  / 640;
+      int h = cslogo->Height() * FRAME_HEIGHT / 480;
+      int x = FRAME_WIDTH - 2 - w*152/256;
+      cslogo->Draw(Gfx2D, x,2,w,h);
     }
   } /* endif */
 
@@ -482,15 +483,15 @@ int main (int argc, char* argv[])
 
   // create the converter class for testing
 
-  //CHK(ImportExport = new converter());
+  CHK(ImportExport = new converter());
 
   // process import/export files from config and print log for testing
 
-  //ImportExport->ProcessConfig (config);
+  ImportExport->ProcessConfig (config);
 
   // free memory - delete this if you want to use the data in the buffer
 
-  //delete ImportExport;
+  delete ImportExport;
 
   // end converter test
 
