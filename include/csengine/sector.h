@@ -27,7 +27,6 @@
 #include "csutil/cscolor.h"
 #include "isector.h"
 
-struct LightInfo;
 class csThing;
 class csEngine;
 class csStatLight;
@@ -100,9 +99,6 @@ private:
   /// Ambient light level for blue in this sector.
   int level_b;
 
-  ///
-  int visited;
-
   /**
    * If static_tree is not NULL then this is a pointer to the csThing
    * which holds all polygons of the non-moving csThings.
@@ -115,22 +111,7 @@ private:
    */
   iVisibilityCuller* culler;
 
-  /**
-   * This function is called by the BSP tree traversal routine
-   * to update the lighting for a number of polygons.
-   */
-  static void* CheckFrustumPolygons (csSector*, csPolygonInt** polygon,
-  	int num, void* data);
-
 public:
-  /**
-   * How many times are we busy drawing this sector (recursive).
-   * This is an important variable as it indicates to
-   * 'new_transformation' which set of camera vertices it should
-   * use.
-   */
-  int draw_busy;
-
   /**
    * Option variable: render portals?
    * If this variable is false portals are rendered as a solid polygon.
@@ -160,9 +141,23 @@ public:
    */
   static bool do_radiosity;
 
-  /// How many times are we shining a specific light through this sector.
-  int beam_busy;
+  /**
+   * How many times are we busy drawing this sector (recursive).
+   * This is an important variable as it indicates to
+   * 'new_transformation' which set of camera vertices it should
+   * use.
+   */
+  int draw_busy;
 
+private:
+  /**
+   * This function is called by the BSP tree traversal routine
+   * to update the lighting for a number of polygons.
+   */
+  static void* CheckFrustumPolygons (csSector*, csPolygonInt** polygon,
+  	int num, void* data);
+
+public:
   /**
    * Construct a sector. This sector will be completely empty.
    */
@@ -175,18 +170,22 @@ public:
    */
   virtual ~csSector ();
 
+  //----------------------------------------------------------------------
+  // Setup
+  //----------------------------------------------------------------------
+
   /**
    * Prepare all polygons for use. This function MUST be called
    * AFTER the texture manager has been prepared. This function
    * is normally called by csEngine::Prepare() so you only need
    * to worry about this function when you add sectors later.
    */
-  virtual void Prepare (csSector* sector);
-
-  /// Get the engine for this sector.
-  csEngine* GetEngine () { return engine; }
+  virtual void Prepare ();
 
   //----------------------------------------------------------------------
+  // Mesh manipulation functions
+  //----------------------------------------------------------------------
+
   /**
    * Add a mesh to this sector and register it to the culler.
    */
@@ -217,7 +216,11 @@ public:
    * Find the given mesh by name.
    */
   csMeshWrapper* GetMesh (const char* name);
+
   //----------------------------------------------------------------------
+  // Thing manipulation functions
+  //----------------------------------------------------------------------
+
   /**
    * Add a thing to this sector and register it to the culler.
    */
@@ -248,7 +251,11 @@ public:
    * Find a thing with the given name.
    */
   csThing* GetThing (const char* name);
+
   //----------------------------------------------------------------------
+  // Sky manipulation functions
+  //----------------------------------------------------------------------
+
   /**
    * Add a sky thing to this sector and register it to the culler.
    */
@@ -279,7 +286,11 @@ public:
    * Find a sky thing with the given name.
    */
   csThing* GetSky (const char* name);
+
   //----------------------------------------------------------------------
+  // Collection manipulation functions
+  //----------------------------------------------------------------------
+
   /**
    * Add a collection to this sector.
    */
@@ -310,7 +321,11 @@ public:
    * Find a collection with the given name.
    */
   csCollection* GetCollection (const char* name);
+
   //----------------------------------------------------------------------
+  // Light manipulation functions
+  //----------------------------------------------------------------------
+
   /**
    * Add a static or pseudo-dynamic light to this sector.
    */
@@ -354,7 +369,11 @@ public:
    * Find the light with the given object id.
    */
   csStatLight* FindLight (CS_ID id);
+
   //----------------------------------------------------------------------
+  // Terrain manipulation functions
+  //----------------------------------------------------------------------
+
   /**
    * Add a terrain to this sector.
    */
@@ -388,6 +407,9 @@ public:
   {
     return (csTerrain*)terrains.FindByName (name);
   }
+
+  //----------------------------------------------------------------------
+  // Visibility Stuff
   //----------------------------------------------------------------------
 
   /**
@@ -395,12 +417,6 @@ public:
    * things which are moved into this thing will return IsMerged()==true).
    */
   csThing* GetStaticThing () { return static_thing; }
-
-  /**
-   * Get the visibility culler that is used for this sector.
-   * NULL if none.
-   */
-  iVisibilityCuller* GetVisibilityCuller () { return culler; }
 
   /**
    * Call this function to generate a polygon tree for all csThings
@@ -413,36 +429,23 @@ public:
   void UseStaticTree (int mode = BSP_MINIMIZE_SPLITS, bool octree = false);
 
   /**
-   * Get ambient color valid in this sector.
+   * Get the visibility culler that is used for this sector.
+   * NULL if none.
    */
-  void GetAmbientColor (int& r, int& g, int& b)
-  { r = level_r; g = level_g; b = level_b; }
+  iVisibilityCuller* GetVisibilityCuller () { return culler; }
 
+  //----------------------------------------------------------------------
+  // Drawing
+  //----------------------------------------------------------------------
+  
   /**
-   * Set the ambient color for this sector. This is only useful
-   * before lighting is calculated.
+   * Draw the sector in the given view and with the given transformation.
    */
-  void SetAmbientColor (int r, int g, int b)
-  { level_r = r; level_g = g; level_b = b; }
+  void Draw (csRenderView& rview);
 
-  /// Return true if this has fog.
-  bool HasFog () { return fog.enabled; }
-
-  /// Return fog structure.
-  csFog& GetFog () { return fog; }
-
-  /// Conveniance function to set fog to some setting.
-  void SetFog (float density, const csColor& color)
-  {
-    fog.enabled = true;
-    fog.density = density;
-    fog.red = color.red;
-    fog.green = color.green;
-    fog.blue = color.blue;
-  }
-
-  /// Disable fog.
-  void DisableFog () { fog.enabled = false; }
+  //----------------------------------------------------------------------
+  // Utility Functions
+  //----------------------------------------------------------------------
 
   /**
    * Follow a beam from start to end and return the first polygon that
@@ -465,26 +468,6 @@ public:
   	csPolygon3D** polygonPtr);
 
   /**
-   * Prepare the lightmaps so that they are suitable for the
-   * 3D rasterizer.
-   */
-  void CreateLightMaps (iGraphics3D* g3d);
-
-  /**
-   * Draw the sector in the given view and with the given transformation.
-   */
-  void Draw (csRenderView& rview);
-
-  /**
-   * Init the lightmaps for all polygons in this sector. If this
-   * routine can find them in the cache it will load them, otherwise
-   * it will prepare the lightmap for the lighting routines.
-   * If do_cache == false this function will not try to read from
-   * the cache.
-   */
-  void InitLightMaps (bool do_cache = true);
-
-  /**
    * Check visibility in a frustum way for all things and polygons in
    * this sector and possibly traverse through portals to other sectors.
    * This version doesn't init the 2D culler cube so it can be used
@@ -504,13 +487,6 @@ public:
    * You must delete this array after you are ready using it.
    */
   csThing** GetVisibleThings (csFrustumView& lview, int& num_things);
-
-  /**
-   * Cache the lightmaps for all polygons in this sector.
-   * The lightmaps will be cached to the current level file
-   * (if it is an archive) or else to 'precalc.zip'.
-   */
-  void CacheLightMaps ();
 
   /**
    * Intersects world-space sphere with polygons of this set. Return
@@ -570,6 +546,28 @@ public:
   //------------------------------------------------
 
   /**
+   * Init the lightmaps for all polygons in this sector. If this
+   * routine can find them in the cache it will load them, otherwise
+   * it will prepare the lightmap for the lighting routines.
+   * If do_cache == false this function will not try to read from
+   * the cache.
+   */
+  void InitLightMaps (bool do_cache = true);
+
+  /**
+   * Prepare the lightmaps so that they are suitable for the
+   * 3D rasterizer.
+   */
+  void CreateLightMaps (iGraphics3D* g3d);
+
+  /**
+   * Cache the lightmaps for all polygons in this sector.
+   * The lightmaps will be cached to the current level file
+   * (if it is an archive) or else to 'precalc.zip'.
+   */
+  void CacheLightMaps ();
+
+  /**
    * The whole setup starts with csEngine::shine_lights calling
    * csSector::shine_lights for every sector in the engine.
    * This function will call csStatLight::shine_lightmaps for every
@@ -582,6 +580,45 @@ public:
 
   /// Version of shine_lights() which only affects one thing.
   void ShineLights (csThing*, csProgressPulse* = 0);
+
+  //----------------------------------------------------------------------
+  // Various
+  //----------------------------------------------------------------------
+
+  /// Get the engine for this sector.
+  csEngine* GetEngine () { return engine; }
+
+  /**
+   * Get ambient color valid in this sector.
+   */
+  void GetAmbientColor (int& r, int& g, int& b)
+  { r = level_r; g = level_g; b = level_b; }
+
+  /**
+   * Set the ambient color for this sector. This is only useful
+   * before lighting is calculated.
+   */
+  void SetAmbientColor (int r, int g, int b)
+  { level_r = r; level_g = g; level_b = b; }
+
+  /// Return true if this has fog.
+  bool HasFog () { return fog.enabled; }
+
+  /// Return fog structure.
+  csFog& GetFog () { return fog; }
+
+  /// Conveniance function to set fog to some setting.
+  void SetFog (float density, const csColor& color)
+  {
+    fog.enabled = true;
+    fog.density = density;
+    fog.red = color.red;
+    fog.green = color.green;
+    fog.blue = color.blue;
+  }
+
+  /// Disable fog.
+  void DisableFog () { fog.enabled = false; }
 
   CSOBJTYPE;
   DECLARE_IBASE_EXT (csPObject);

@@ -241,7 +241,7 @@ void InfPortalCS::CompleteSector ()
   infinite_maze->connect_infinite (x1, y1, z1, x2, y2, z2, false);
   SetSector (s);
   infinite_maze->random_loose_portals (x2, y2, z2);
-  s->Prepare (s);
+  s->Prepare ();
   s->InitLightMaps (false);
   s->ShineLights ();
   s->CreateLightMaps (System->G3D);

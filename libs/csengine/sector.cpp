@@ -76,7 +76,6 @@ csSector::csSector (csEngine* engine) : csPObject ()
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiSector);
   csSector::engine = engine;
-  beam_busy = 0;
   level_r = level_g = level_b = 0;
   static_thing = NULL;
   engine->AddToCurrentRegion (this);
@@ -98,7 +97,7 @@ csSector::~csSector ()
   terrains.DeleteAll ();
 }
 
-void csSector::Prepare (csSector*)  //@@@@@ UNNEEDED PARM
+void csSector::Prepare ()
 {
   int i;
   for (i = 0 ; i < things.Length () ; i++)

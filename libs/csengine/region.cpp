@@ -293,7 +293,7 @@ bool csRegion::Region::PrepareSectors ()
     !iter.IsFinished () ; ++iter)
   {
     csSector* s = (csSector*)iter.GetObj ();
-    s->Prepare (s);
+    s->Prepare ();
   }
   return true;
 }

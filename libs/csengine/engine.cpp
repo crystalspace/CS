@@ -941,7 +941,7 @@ void csEngine::PrepareSectors()
   for (int i = 0 ; i < sectors.Length () ; i++)
   {
     csSector* s = (csSector*)sectors[i];
-    s->Prepare (s);
+    s->Prepare ();
   }
 }
 
