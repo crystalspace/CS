@@ -155,6 +155,10 @@ The history order is reversed so that new features are at the top.
 	- Marten Svanfeldt optimized shader variable system.
 	- Marten also added fixes to the way the new texture manager handles
 	  cubemaps.
+	- Paul Garceau noted a known bug with Win98/ME platforms having to do with
+	  the use of dllwrap.exe under Msys/Mingw (win32gcc.mak).  This bug has been
+	  relegated to the area of a systems platform specific bug.  It does not affect
+	  any other build platforms, including Cygwin.
 13-Feb-2003
 	- Added another trivial case to csRect::ClipLine() making it a little
 	  bit safer again.
