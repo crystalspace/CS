@@ -38,6 +38,11 @@ The history order is reversed so that new features are at the top.
 	  API.
 	- Matze enabled python in cygwin port. (I didn't touch anything, but as
 	  I tried it again today, it suddenly worked :)
+	- Thanks to Matze we finally got debugging to work properly with
+	  cygwin and mingw ports. In the past there was no useful debug
+	  info when debugging inside a dll. Now this is solved at the cost
+	  of vastly bigger dll's (i.e. from 92K to 726K in one case).
+	  The dll's are only bigger in debug mode though.
 9-Dec-2001
 	- Optimized the matrix multiply routine considerably (the
 	  *= operator) by avoiding the copy of 'this'. Instead

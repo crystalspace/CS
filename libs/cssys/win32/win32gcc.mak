@@ -124,8 +124,14 @@ LFLAGS.debug=-g
 # Flags for the linker which are used when profiling.
 LFLAGS.profile=-pg
 
+# Flags for dllwrap in optimize mode
+DFLAGS.optimize = -s
+
+# Flags for dllwrap in debug mode
+DFLAGS.debug = -g3
+
 # Flags for the linker which are used when building a shared library.
-LFLAGS.DLL=-q -s --no-export-all-symbols --dllname $*
+LFLAGS.DLL=$(DFLAGS.$(MODE)) -q --no-export-all-symbols --dllname $*
 
 # Typical extension for objects and static libraries
 LIB=.a
