@@ -331,6 +331,9 @@ public:
   virtual int GetMaximumAspectRatio ()
   { return 32768; }
 
+  virtual void AdjustToOptimalTextureSize(int& w, int& h) 
+  {(void)w;(void)h;}
+
   /// Get the fog mode.
   virtual G3D_FOGMETHOD GetFogMode ()
   { return G3DFOGMETHOD_VERTEX; }

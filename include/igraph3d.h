@@ -590,6 +590,12 @@ struct iGraphics3D : public iPlugIn
    */
   virtual void SetClipper (csVector2* vertices, int num_vertices) = 0;
 
+  /** Adjust the given texture size to an optimal size. This will take into
+   *  consideration maximum sizes, limitations to power of two, max aspect
+   *  ratio and so on.
+   */
+  virtual void AdjustToOptimalTextureSize(int& w, int& h) = 0;
+  
   /// Returns true if the driver needs PO2 lightmaps and texture maps
   virtual bool NeedsPO2Maps () = 0;
 

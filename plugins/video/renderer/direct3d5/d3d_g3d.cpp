@@ -26,9 +26,9 @@
 
 #include <windows.h>
 #include <stdlib.h>
-#include "ddraw.h"
-#include "d3d.h"
-#include "d3dcaps.h"
+#include <ddraw.h>
+#include <d3d.h>
+#include <d3dcaps.h>
 
 #include "sysdef.h"
 #include "csutil/scf.h"

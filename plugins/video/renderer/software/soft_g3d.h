@@ -389,6 +389,8 @@ public:
   /// Returns the maximum aspect ratio of maps.
   virtual int GetMaximumAspectRatio ()
   { return 32768; }
+  virtual void AdjustToOptimalTextureSize(int& w, int& h) 
+  {(void)w;(void)h;}
 
   /// Get Z-buffer value at given X,Y position
   virtual float GetZbuffValue (int x, int y);
