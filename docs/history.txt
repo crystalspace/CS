@@ -6,6 +6,10 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug in Blocks with the menu entries having a weird
 	  color when fog was enabled (used for fading in/out). Fixed this
 	  by not using fog but csfxFadeOut() instead.
+	- Fixed a very dangerous bug introduced yesterday in
+	  csEngine::SelectRegion(). Do not blindly convert a csBla class
+	  to iBla by taking the address of (...->scfiBla). If the csBla
+	  pointer happens to be NULL this causes bad problems.
 21-Oct-2001
 	- Martin Geisse did some clean-up in the region code.
 	- Justin Miller added a few basic build speed/size Q/As to msvc FAQs.

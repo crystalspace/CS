@@ -1705,13 +1705,17 @@ void csEngine::SelectRegion (const char *iName)
     return;
   }
 
-  region = &((csRegion*)regions.FindByName (iName))->scfiRegion;
-  if (!region)
+  csRegion* r = (csRegion*)(regions.FindByName (iName));
+  if (!r)
   {
-    csRegion *r = new csRegion (this);
+    r = new csRegion (this);
     region = &r->scfiRegion;
     r->SetName (iName);
     regions.Push (r);
+  }
+  else
+  {
+    region = &(r->scfiRegion);
   }
 }
 
