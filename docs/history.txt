@@ -17,6 +17,12 @@ The history order is reversed so that new features are at the top.
 	  visibility testing (enabled by default).
 	- Also added VISTEST keyword to the terrain loader plugin.
 	- Added new command in BugPlug to enable/disable terrain visibility.
+	- Martin Geisse added a 'const' version of 'operator []' to
+	  DECLARE_GROWING_ARRAY.
+	- Martin removed an include of ddg.h.
+	- Philip Wyett removed unused libs from MSVC project files.
+	  Moved ddraw and other libs to makefiles where it is required.
+	  A work in progress...
 12-Jun-2001
 	- Fixed a compile error and warning in SCF.
 	- Removed dumper.cpp and dumper.h. They are obsolete and BugPlug
