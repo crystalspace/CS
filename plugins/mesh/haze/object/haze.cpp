@@ -563,14 +563,14 @@ bool csHazeMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
         movable->GetUpdateNumber (), fov, shiftx, shifty,
         tr_o2c, sbox, cbox) < 0)
   {
-    printf("No draw\n");
+    //printf("No draw\n");
     return false;
   }
   int clip_portal, clip_plane, clip_z_plane;
   if (rview->ClipBBox (sbox, cbox, clip_portal, clip_plane,
         clip_z_plane) == false)
   {
-    printf("No draw(2)\n");
+    //printf("No draw(2)\n");
     return false;
   }
 
@@ -747,17 +747,17 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
   //campos.Set(10,10,10);
   //printf("campos %g,%g,%g\n", campos.x, campos.y, campos.z);
   csHazeHull::ComputeOutline(hull, campos, layer_num, layer_poly);
-  printf("has outline of size %d: ", layer_num);
+  //printf("has outline of size %d: ", layer_num);
   if(layer_num <= 0) return false;
   csVector3* layer_pts = new csVector3[layer_num];
   for(i=0; i<layer_num; i++)
   {
-    printf(" %d", layer_poly[i]);
+    //printf(" %d", layer_poly[i]);
     csVector3 objpos;
     hull->GetVertex(objpos, layer_poly[i] );
     ProjectO2S(tr_o2c, fov, shx, shy, objpos, layer_pts[i]);
   }
-  printf("\n");
+  //printf("\n");
   // get hull 0 uv values
   float layer_scale = layers.GetLayer(0)->scale;
   csVector2* layer_uvs = new csVector2[layer_num];
