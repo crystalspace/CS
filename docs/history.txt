@@ -1,6 +1,49 @@
 The history order has been reversed so that new features are at the top.
 
+12-Oct-2000
+	- Andrew Zabolotny did the following changes:
+	    - Renamed csPixmap::DrawTiledShifted into DrawTiled. There is
+	      no need to use long clumsy names like
+	      DrawARoundBoxWithALittleRedDotInLeftUpperCorner ().
+	    - I have extended iGraphics3D::DrawPixmap() method with one
+	      argument - uint8 alpha, and also enhanced the function a lot
+	      in software renderer.  Now if the tx,ty,tw,th rectangle
+	      exceeds texture size, texture is tiled across the screen
+	      rectangle. The alpha is from 0 to 255 and defines the
+	      transparency of the pixmap, 0 being opaque and 255 full
+	      transparency.
+	    - Semi-transparent windows in CSWS! (cswstest -> Theme button).
+	      This is a bit buggy though because sometimes the window gets
+	      repainted twice, with alpha-blended textures this results in
+	      visual artifacts :-( Will take a look at this later.
+	      Both windows and dialogs are allowed to be transparent now.
+	      Also simple non-transparent textured backgrounds (which are
+	      faster of course) are allowed for both windows and dialogs.
+	      Note that if you insert a dialog into a window, and set both
+	      to semi-transparent, their textures will overlap, and thus
+	      you will see the desktop (and the windows behind) through
+	      *two* transparent textures. In general it is recommended that
+	      if you insert a semi-transparent dialog into a window, you
+	      set that window's alpha to 255 (e.g. fully transparent).
+	    - Removed the NULL_SOFTWARE_2D_DRIVER macros from null3d renderer.
+	      The NULL3D renderer is not a NULL renderer, it is a *NULL 3D*
+	      renderer, that is, it does not have any 3D primitives
+	      implemented (e.g. polygons) - everything other is like in
+	      the "normal" renderer, thus it uses same default canvas like
+	      the normal renderer. NULL3D renderer is mainly an alternative
+	      renderer for those CSWS applications that do not need any
+	      3D drawing. Now it supports semi-transparent and tiled textures
+	      as well.
+	     - Fixed other renderers in order to be able to compile. I
+	       believe tiling will work with at least the OpenGL driver
+	       without any change; alpha is not implemented yet but its
+	       easy to implement.
 11-Oct-2000
+	- Thomas Hieber did the first preliminary integrated of the XML
+	  parser for the gamecore library.
+	- Norman Kramer fixed the glx2d canvas so that the xwindow is
+	  now destroyed after gl context is destroyed (other way around
+	  resulted in crash).
 	- Some small changes from Michael Robellard <miker@vetechno.com>:
 	    - New SetValue in csKeyValuePair.
 	    - Added 'const' to csMovable::Transform.
