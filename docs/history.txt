@@ -43,6 +43,9 @@ chronological order.
 	  solution but for now it will do.
 	- Jorrit fixed a bug in portal loading and collision detection. This
 	  bug caused the camera to jump up and down in the reflecting room.
+	- res fixed another problem with mode switching back on app exit.
+	- res did some small cleanups in graph2d.cpp (removed some commented
+	  out statements, removed a printf.)
 29-Sep-2003
 	- Jorrit moved ParseTextureMapping() and ParsePoly3d() from syntax
 	  services to thing loader. It doesn't make much sense to make those

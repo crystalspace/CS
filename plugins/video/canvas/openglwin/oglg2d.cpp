@@ -601,7 +601,7 @@ bool csGraphics2DOpenGL::RestoreDisplayMode ()
 {
   if (is_open)
   {
-    if (FullScreen) SwitchDisplayMode (false);
+    if (FullScreen) SwitchDisplayMode (true);
     return true;
   }
   return false;
@@ -868,8 +868,12 @@ void csGraphics2DOpenGL::SwitchDisplayMode (bool userMode)
     // set the default display mode
     if (modeSwitched)
     {
+      ZeroMemory (&dmode, sizeof(dmode));
+      curdmode.dmSize = sizeof (dmode);
+      curdmode.dmDriverExtra = 0;
+      EnumDisplaySettings (0, ENUM_REGISTRY_SETTINGS, &dmode);
       // just do something when the mode was actually switched.
-      ChangeDisplaySettings (0, 0);
+      ChangeDisplaySettings (&dmode, CDS_RESET);
       modeSwitched = false;
     }
   }
@@ -878,10 +882,10 @@ void csGraphics2DOpenGL::SwitchDisplayMode (bool userMode)
     modeSwitched = false;
     // set the user-requested display mode
     ZeroMemory (&curdmode, sizeof(curdmode));
-    curdmode.dmSize = sizeof (DEVMODE);
+    curdmode.dmSize = sizeof (curdmode);
     curdmode.dmDriverExtra = 0;
     EnumDisplaySettings (0, ENUM_CURRENT_SETTINGS, &curdmode);
-    memcpy (&dmode, &curdmode, sizeof (DEVMODE));
+    memcpy (&dmode, &curdmode, sizeof (curdmode));
 
     // check if we already are in the desired display mode
     if (((int)curdmode.dmBitsPerPel == Depth) &&
@@ -955,7 +959,7 @@ void csGraphics2DOpenGL::SwitchDisplayMode (bool userMode)
 
   // retrieve actual refresh rate
   ZeroMemory (&curdmode, sizeof(curdmode));
-  curdmode.dmSize = sizeof (DEVMODE);
+  curdmode.dmSize = sizeof (curdmode);
   curdmode.dmDriverExtra = 0;
   EnumDisplaySettings (0, ENUM_CURRENT_SETTINGS, &curdmode);
   refreshRate = curdmode.dmDisplayFrequency;

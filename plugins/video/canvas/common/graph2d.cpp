@@ -33,6 +33,7 @@
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "ivaria/reporter.h"
 
 #include "softfontcache.h"
 
@@ -112,11 +113,11 @@ bool csGraphics2D::Initialize (iObjectRegistry* r)
 #ifdef CS_DEBUG
   if (!FontServer)
   {
-    printf (
-      "WARNING: Canvas driver couldn't find a font server plugin!\n"
+    csReport (r, CS_REPORTER_SEVERITY_WARNING,
+      "crystalspace.graphics2d.common",
+      "Canvas driver couldn't find a font server plugin!  "
       "This is normal if you don't want one (warning displays only in "
-      "debug mode)\n");
-    fflush (stdout);
+      "debug mode)");
   }
 #endif
 
@@ -125,8 +126,6 @@ bool csGraphics2D::Initialize (iObjectRegistry* r)
   pfmt.PixelBytes = 1;
   // Initialize pointers to default drawing methods
   _DrawPixel = DrawPixel8;
-//  _WriteString = WriteString8;
-//  _WriteStringBaseline = WriteStringBaseline8;
   _GetPixelAt = GetPixelAt8;
   // Mark all slots in palette as free
   int i;
