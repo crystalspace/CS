@@ -156,10 +156,12 @@ install_data: $(INSTALL_DIR)/data
 	  $(notdir $(TO_INSTALL.DATA))) >> $(INSTALL_LOG)
 
 # Install dynamic libraries (plug-in modules).
+ifeq ($(USE_PLUGINS),yes)
 install_dynamiclibs: $(INSTALL_DLL.DIR)
 	$(CP) $(TO_INSTALL.DYNAMIC_LIBS) $(INSTALL_DLL.DIR)
 	@echo $(addprefix $(INSTALL_DLL.DIR)/, \
 	  $(notdir $(TO_INSTALL.DYNAMIC_LIBS))) >> $(INSTALL_LOG)
+endif
 
 # Install static libraries.
 install_staticlibs: $(INSTALL_LIB.DIR)
