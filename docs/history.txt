@@ -6,7 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-10-oct-2003
+12-Oct-2003
+	- Eric Sunshine clarified documentation for csGetResourceDir(),
+	  iCommandLineParser::GetResourceDir(), and
+	  csCommandLineParser::GetResourceDir() so that the Cocoa application
+	  wrapper's "Resources" directory is mentioned explicitly.  Also
+	  clarified documentation for csGetAppDir() so that Cocoa application
+	  wrapper is mentioned explicitly.
+10-Oct-2003
 	- Jorrit added iPolygonHandle. This is an SCF interface that can
 	  be used to represent a thing polygon in situations where an SCF
 	  interface is required. It is created by
@@ -19,8 +26,8 @@ chronological order.
 	- Jorrit changed the engine sequence manager so that it now sets the
 	  material on the instance polygon instead of the factory polygon.
 	- Jorrit moved an error if a thing has no polygons after converting
-	  everything to portals. This error complained if a part had no polygons
-	  but it should only complain if the entire thing has none.
+	  everything to portals.  This error complained if a part had no
+	  polygons but it should only complain if the entire thing has none.
 	- Jorrit removed the unused csSector::IntersectSphere().
 	- Jorrit removed a few additional declarations of iPolygon3D.
 	- Eric Sunshine added new methods GetResourceDir() and GetAppPath() to
@@ -47,7 +54,7 @@ chronological order.
 	  as proposed by Gregory Block wherein the monolithic and obnoxious
 	  vfs.cfg is retired in favor of a more dynamic and automatic
 	  configuration mechanism.
-9-oct-2003
+9-Oct-2003
 	- Jorrit added the following new functions to iThingFactoryState:
 	    - FindPolygonByName (const char*)
 	    - AddEmptyPolygon ()

@@ -83,7 +83,9 @@ char* csExpandPath (const char* path);
 char* csGetAppPath (const char* argv0);
 
 /**
- * Return the directory in which the application resides.
+ * Return the directory in which the application executable resides.  For
+ * MacOS/X, returns the directory in which the Cocoa application wrapper
+ * resides.
  * \remark May return 0 if some problem prevents determination of the
  *   application's directory.
  * \remark Caller is responsible for freeing the returned string with delete[] 
@@ -103,7 +105,9 @@ char* csGetAppDir (const char* argv0);
  * many platforms, resources (such as plugin modules) reside in the same
  * directory as the application itself.  The default implementation
  * returns the same value as csGetAppPath(), however platforms may want to
- * override the default implementation if this behavior is unsuitable.
+ * override the default implementation if this behavior is unsuitable.  For
+ * example, on MacOS/X, for GUI applications, resources reside in the
+ * "Resources" directory within the Cocoa application wrapper.
  * \remark May return 0 if some problem prevents determination of the
  *   resource path.
  * \remark Caller is responsible for freeing the returend string with delete[] 

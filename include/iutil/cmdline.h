@@ -70,7 +70,7 @@ struct iCommandLineParser : public iBase
   /**
    * Returns the directory in which the application's resources resides.  On
    * many platforms, this may be the same as the directory returned by
-   * GetAppDir(); however, on MacOS/X, it is the "Contents" directory within
+   * GetAppDir(); however, on MacOS/X, it is the "Resources" directory within
    * the Cocoa application wrapper.
    */
   virtual const char* GetResourceDir () = 0;
