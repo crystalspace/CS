@@ -24,6 +24,7 @@
 #include "video/canvas/openglcommon/iogl.h"
 #include "ivideo/xwindow.h"
 
+#define GLX_GLXEXT_PROTOTYPES
 #include <GL/glx.h>
 
 #include "iogldisp.h"
