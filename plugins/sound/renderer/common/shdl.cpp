@@ -51,12 +51,13 @@ bool csSoundHandle::IsStatic() {
   return Data->IsStatic();
 }
 
-void csSoundHandle::Play(bool Loop) {
+iSoundSource *csSoundHandle::Play(bool Loop) {
   iSoundSource *src = CreateSource(SOUND3D_DISABLE);
   if (src) {
     src->Play(Loop ? SOUND_LOOP : 0);
     src->DecRef();
   }
+  return (Loop ? src : (iSoundSource *)NULL);
 }
 
 void csSoundHandle::StartStream(bool Loop)
