@@ -31,6 +31,7 @@
 #include "cstool/mdltool.h"
 #include "csgfx/csimage.h"
 
+struct iRegion;
 #include "iutil/databuff.h"
 #include "imap/reader.h"
 #include "imap/services.h"

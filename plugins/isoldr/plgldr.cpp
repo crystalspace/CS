@@ -23,6 +23,7 @@
 // if there is then let me know - Ta - richard@starport.net
 
 #include "cssysdef.h"
+struct iRegion;
 #include "isoload.h"
 #include "imap/reader.h"
 
