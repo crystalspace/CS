@@ -140,8 +140,8 @@ void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
   float t;
   for (i = 0; i < num_vertices; i++)
   {
-    g3dpoly->vertices [i].sx = clipped_verts [i].x;
-    g3dpoly->vertices [i].sy = clipped_verts [i].y;
+    g3dpoly->vertices [i].x = clipped_verts [i].x;
+    g3dpoly->vertices [i].y = clipped_verts [i].y;
     switch (clipped_vtstats[i].Type)
     {
       case CS_VERTEX_ORIGINAL:
@@ -179,8 +179,8 @@ void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
 	j1 = orig_num_vertices - 1;
 	for (j = 0; j < orig_num_vertices; j++)
 	{
-          if ((y >= inpoly [j].sy && y <= inpoly [j1].sy) ||
-	      (y <= inpoly [j].sy && y >= inpoly [j1].sy))
+          if ((y >= inpoly [j].y && y <= inpoly [j1].y) ||
+	      (y <= inpoly [j].y && y >= inpoly [j1].y))
 	  {
 	    edge_from [edge] = j;
 	    edge_to [edge] = j1;
@@ -199,10 +199,10 @@ void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
 	G3DTexturedVertex& B = inpoly [edge_to [0]];
 	G3DTexturedVertex& C = inpoly [edge_from [1]];
 	G3DTexturedVertex& D = inpoly [edge_to [1]];
-	float t1 = (y - A.sy) / (B.sy - A.sy);
-	float t2 = (y - C.sy) / (D.sy - C.sy);
-	float x1 = A.sx + t1 * (B.sx - A.sx);
-	float x2 = C.sx + t2 * (D.sx - C.sx);
+	float t1 = (y - A.y) / (B.y - A.y);
+	float t2 = (y - C.y) / (D.y - C.y);
+	float x1 = A.x + t1 * (B.x - A.x);
+	float x2 = C.x + t2 * (D.x - C.x);
 	t = (x - x1) / (x2 - x1);
 	INTERPOLATE (z);
 	INTERPOLATE (u);
@@ -232,8 +232,8 @@ void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
   int j;
   for (j = 0; j < num_vertices; j++)
   {
-    g3dpoly->vertices [j].sx = clipped_verts [j].x;
-    g3dpoly->vertices [j].sy = clipped_verts [j].y;
+    g3dpoly->vertices [j].x = clipped_verts [j].x;
+    g3dpoly->vertices [j].y = clipped_verts [j].y;
     if (!was_clipped && clipped_verts[j] != orig_triangle[j])
     	was_clipped = true;
   }
@@ -286,8 +286,8 @@ void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
 
   for (j = 0 ; j < g3dpoly->num ; j++)
   {
-    float x = g3dpoly->vertices [j].sx;
-    float y = g3dpoly->vertices [j].sy;
+    float x = g3dpoly->vertices [j].x;
+    float y = g3dpoly->vertices [j].y;
 
     // Find the original triangle top/left/bottom/right vertices
     // between which the currently examined point is located.
@@ -518,14 +518,14 @@ void csPolygon2D::DrawFilled (iRenderView* rview, csPolygon3D* poly,
     if (mirror)
       for (i = 0 ; i < num_vertices ; i++)
       {
-        g3dpoly.vertices[num_vertices-i-1].sx = vertices[i].x;
-        g3dpoly.vertices[num_vertices-i-1].sy = vertices[i].y;
+        g3dpoly.vertices[num_vertices-i-1].x = vertices[i].x;
+        g3dpoly.vertices[num_vertices-i-1].y = vertices[i].y;
       }
     else
       for (i = 0 ; i < num_vertices ; i++)
       {
-        g3dpoly.vertices[i].sx = vertices[i].x;
-        g3dpoly.vertices[i].sy = vertices[i].y;
+        g3dpoly.vertices[i].x = vertices[i].x;
+        g3dpoly.vertices[i].y = vertices[i].y;
       }
 
     g3dpoly.z_value = poly->Vcam(0).z;
@@ -593,14 +593,14 @@ void csPolygon2D::FillZBuf (iRenderView* rview, csPolygon3D* poly,
   if (icam->IsMirrored ())
     for (i = 0 ; i < num_vertices ; i++)
     {
-      g3dpoly.vertices[num_vertices-i-1].sx = vertices[i].x;
-      g3dpoly.vertices[num_vertices-i-1].sy = vertices[i].y;
+      g3dpoly.vertices[num_vertices-i-1].x = vertices[i].x;
+      g3dpoly.vertices[num_vertices-i-1].y = vertices[i].y;
     }
   else
     for (i = 0 ; i < num_vertices ; i++)
     {
-      g3dpoly.vertices[i].sx = vertices[i].x;
-      g3dpoly.vertices[i].sy = vertices[i].y;
+      g3dpoly.vertices[i].x = vertices[i].x;
+      g3dpoly.vertices[i].y = vertices[i].y;
     }
 
   g3dpoly.z_value = poly->Vcam(0).z;
@@ -629,8 +629,8 @@ void csPolygon2D::AddFogPolygon (iGraphics3D* g3d, csPolygon3D* /*poly*/,
   if (mirror)
     for (i = 0 ; i < num_vertices ; i++)
     {
-      g3dpoly.vertices[num_vertices-i-1].sx = vertices[i].x;
-      g3dpoly.vertices[num_vertices-i-1].sy = vertices[i].y;
+      g3dpoly.vertices[num_vertices-i-1].x = vertices[i].x;
+      g3dpoly.vertices[num_vertices-i-1].y = vertices[i].y;
     }
   else
     memcpy (g3dpoly.vertices, vertices, num_vertices * sizeof (csVector2));

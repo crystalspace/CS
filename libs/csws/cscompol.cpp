@@ -54,10 +54,10 @@ void csComponent::Polygon3D (G3DPolygonDPFX &poly, UInt mode)
   * all resulting rectangles.
   */
   cswsRectVector rect (8, 4);
-  int i, x = QInt (poly.vertices[0].sx), y = QInt (poly.vertices[0].sy);
+  int i, x = QInt (poly.vertices[0].x), y = QInt (poly.vertices[0].y);
   csRect *lb = new csRect (x, y, x, y);
   for (i = 1; i < poly.num; i++)
-    lb->Extend (QInt (poly.vertices[i].sx), QInt (poly.vertices[i].sy));
+    lb->Extend (QInt (poly.vertices[i].x), QInt (poly.vertices[i].y));
 
   lb->xmax++;
   lb->ymax++;
@@ -75,8 +75,8 @@ void csComponent::Polygon3D (G3DPolygonDPFX &poly, UInt mode)
   ALLOC_STACK_ARRAY (orig_poly, G3DTexturedVertex, orig_num_vert);
   for (i = 0; i < orig_num_vert; i++)
   {
-    orig_vert [i].x = dx + poly.vertices [i].sx;
-    orig_vert [i].y = dy + poly.vertices [i].sy;
+    orig_vert [i].x = dx + poly.vertices [i].x;
+    orig_vert [i].y = dy + poly.vertices [i].y;
     orig_poly [i] = poly.vertices [i];
   }
 
@@ -104,9 +104,9 @@ void csComponent::Polygon3D (G3DPolygonDPFX &poly, UInt mode)
     float t;
     for (j = 0; j < clipped_num_vert; j++)
     {
-      poly.vertices [j].sx = clipped_vert [j].x;
+      poly.vertices [j].x = clipped_vert [j].x;
       // The Y coordinate is oriented upside
-      poly.vertices [j].sy = app->ScreenHeight - clipped_vert [j].y;
+      poly.vertices [j].y = app->ScreenHeight - clipped_vert [j].y;
       if (rc != CS_CLIP_INSIDE)
         switch (vstats [j].Type)
         {

@@ -51,21 +51,19 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ADD)
   CS_TOKEN_DEF (ALPHA)
   CS_TOKEN_DEF (BEZIER)
-  CS_TOKEN_DEF (CAMERA)
   CS_TOKEN_DEF (CIRCLE)
   CS_TOKEN_DEF (CLIP)
   CS_TOKEN_DEF (CLONE)
   CS_TOKEN_DEF (COLORS)
   CS_TOKEN_DEF (COLLDET)
-  CS_TOKEN_DEF (CONVEX)
   CS_TOKEN_DEF (COSFACT)
   CS_TOKEN_DEF (COPY)
   CS_TOKEN_DEF (CURVE)
   CS_TOKEN_DEF (CURVECENTER)
   CS_TOKEN_DEF (CURVECONTROL)
   CS_TOKEN_DEF (CURVESCALE)
-  CS_TOKEN_DEF (DETAIL)
   CS_TOKEN_DEF (FACTORY)
+  CS_TOKEN_DEF (FASTMESH)
   CS_TOKEN_DEF (FIRST)
   CS_TOKEN_DEF (FIRST_LEN)
   CS_TOKEN_DEF (FLAT)
@@ -913,13 +911,11 @@ static bool load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
     CS_TOKEN_TABLE (MATERIAL)
     CS_TOKEN_TABLE (TEXLEN)
     CS_TOKEN_TABLE (FOG)
-    CS_TOKEN_TABLE (DETAIL)
-    CS_TOKEN_TABLE (CONVEX)
     CS_TOKEN_TABLE (MOVEABLE)
     CS_TOKEN_TABLE (TEMPLATE)
     CS_TOKEN_TABLE (CLONE)
-    CS_TOKEN_TABLE (CAMERA)
     CS_TOKEN_TABLE (VISTREE)
+    CS_TOKEN_TABLE (FASTMESH)
     CS_TOKEN_TABLE (PART)
     CS_TOKEN_TABLE (FACTORY)
   CS_TOKEN_TABLE_END
@@ -946,6 +942,14 @@ static bool load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
 	  return false;
 	}
         else thing_state->GetFlags ().Set (CS_THING_VISTREE);
+        break;
+      case CS_TOKEN_FASTMESH:
+        if (!isParent)
+	{
+	  printf ("FASTMESH flag only for top-level thing!\n");
+	  return false;
+	}
+        else thing_state->GetFlags ().Set (CS_THING_FASTMESH);
         break;
       case CS_TOKEN_MOVEABLE:
         if (!isParent)

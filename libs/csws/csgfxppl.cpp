@@ -238,8 +238,8 @@ void csGraphicsPipeline::Polygon3D (G3DPolygonDPFX &poly, UInt mode)
   int i;
   for (i = 0; i < poly.num; i++)
   {
-    int x = QInt (poly.vertices [i].sx);
-    int y = FrameHeight - 1 - QInt (poly.vertices [i].sy);
+    int x = QInt (poly.vertices [i].x);
+    int y = FrameHeight - 1 - QInt (poly.vertices [i].y);
     INCLUDE_MIN_POINT (x, y);
     INCLUDE_MAX_POINT (x + 1, y + 1);
   }
@@ -260,14 +260,14 @@ void csGraphicsPipeline::ClearZbuffer (int x1, int y1, int x2, int y2)
   poly.num = 4;
   y1 = FrameHeight - y1;
   y2 = FrameHeight - y2;
-  poly.vertices [0].sx = x1;
-  poly.vertices [0].sy = y1;
-  poly.vertices [1].sx = x1;
-  poly.vertices [1].sy = y2;
-  poly.vertices [2].sx = x2;
-  poly.vertices [2].sy = y2;
-  poly.vertices [3].sx = x2;
-  poly.vertices [3].sy = y1;
+  poly.vertices [0].x = x1;
+  poly.vertices [0].y = y1;
+  poly.vertices [1].x = x1;
+  poly.vertices [1].y = y2;
+  poly.vertices [2].x = x2;
+  poly.vertices [2].y = y2;
+  poly.vertices [3].x = x2;
+  poly.vertices [3].y = y1;
   // Set plane normal to be perpendicular to OZ and very far away
   poly.normal.Set (0, 0, -1, 1e35);
   G3D->DrawPolygon (poly);

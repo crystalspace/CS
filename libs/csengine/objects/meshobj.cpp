@@ -252,6 +252,7 @@ void csMeshWrapper::DrawInt (iRenderView* rview)
     rview->CallCallback (CALLBACK_MESH, (void*)&scfiMeshWrapper);
   }
   if (draw_cb) if (!draw_cb->BeforeDrawing (meshwrap, rview)) return;
+
   if (mesh->DrawTest (rview, &movable.scfiMovable))
   {
     if (rview->GetCallback ())

@@ -1522,31 +1522,32 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
   // Compute the min_y and max_y for this polygon in screen space coordinates.
   // We are going to use these to scan the polygon from top to bottom.
   min_i = max_i = 0;
-  min_y = max_y = poly.vertices[0].sy;
+  min_y = max_y = poly.vertices[0].y;
   // count 'real' number of vertices
   int num_vertices = 1;
   for (i = 1 ; i < poly.num ; i++)
   {
     // Sometimes double precision in the clipper is not enough. Do an epsilon fuzz
     // so not to reject cases when bounds exceeded by less than epsilon. smgh
-    if (((poly.vertices[i].sx + EPSILON) < 0) ||
-	((poly.vertices[i].sx - EPSILON) > width))
+    if (((poly.vertices[i].x + EPSILON) < 0) ||
+	((poly.vertices[i].x - EPSILON) > width))
       return;
 
-    if (poly.vertices[i].sy > max_y)
+    if (poly.vertices[i].y > max_y)
     {
-      max_y = poly.vertices[i].sy;
+      max_y = poly.vertices[i].y;
       max_i = i;
     }
-    else if (poly.vertices[i].sy < min_y)
+    else if (poly.vertices[i].y < min_y)
     {
-      min_y = poly.vertices[i].sy;
+      min_y = poly.vertices[i].y;
       min_i = i;
     }
     // theoretically we should do sqrt(dx^2+dy^2) here, but
     // we can approximate it by just abs(dx)+abs(dy)
-    if ((ABS (poly.vertices [i].sx - poly.vertices [i - 1].sx)
-       + ABS (poly.vertices [i].sy - poly.vertices [i - 1].sy)) > VERTEX_NEAR_THRESHOLD)
+    if ((ABS (poly.vertices [i].x - poly.vertices [i - 1].x)
+       + ABS (poly.vertices [i].y - poly.vertices [i - 1].y))
+       	> VERTEX_NEAR_THRESHOLD)
       num_vertices++;
     // the above does not catch cases like this:
     // p1   p2   p3
@@ -1640,7 +1641,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
 
   sxL = sxR = dxL = dxR = 0;            // avoid GCC warnings about "uninitialized variables"
   scanL2 = scanR2 = max_i;
-  sy = fyL = fyR = QRound (poly.vertices [scanL2].sy);
+  sy = fyL = fyR = QRound (poly.vertices [scanL2].y);
 
   for ( ; ; )
   {
@@ -1661,17 +1662,17 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
 	  scanR2 = 0;
 
         leave = false;
-        fyR = QRound (poly.vertices [scanR2].sy);
+        fyR = QRound (poly.vertices [scanR2].y);
         if (sy <= fyR)
           continue;
 
-        float dyR = (poly.vertices [scanR1].sy - poly.vertices [scanR2].sy);
+        float dyR = (poly.vertices [scanR1].y - poly.vertices [scanR2].y);
         if (dyR)
         {
-          sxR = poly.vertices [scanR1].sx;
-          dxR = (poly.vertices [scanR2].sx - sxR) / dyR;
+          sxR = poly.vertices [scanR1].x;
+          dxR = (poly.vertices [scanR2].x - sxR) / dyR;
           // horizontal pixel correction
-          sxR += dxR * (poly.vertices [scanR1].sy - (float (sy) - 0.5));
+          sxR += dxR * (poly.vertices [scanR1].y - (float (sy) - 0.5));
         } /* endif */
       } /* endif */
       if (sy <= fyL)
@@ -1681,17 +1682,17 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
 	  scanL2 = poly.num - 1;
 
         leave = false;
-        fyL = QRound (poly.vertices [scanL2].sy);
+        fyL = QRound (poly.vertices [scanL2].y);
         if (sy <= fyL)
           continue;
 
-        float dyL = (poly.vertices [scanL1].sy - poly.vertices [scanL2].sy);
+        float dyL = (poly.vertices [scanL1].y - poly.vertices [scanL2].y);
         if (dyL)
         {
-          sxL = poly.vertices [scanL1].sx;
-          dxL = (poly.vertices [scanL2].sx - sxL) / dyL;
+          sxL = poly.vertices [scanL1].x;
+          dxL = (poly.vertices [scanL2].x - sxL) / dyL;
           // horizontal pixel correction
-          sxL += dxL * (poly.vertices [scanL1].sy - (float (sy) - 0.5));
+          sxL += dxL * (poly.vertices [scanL1].y - (float (sy) - 0.5));
         } /* endif */
       } /* endif */
     } while (!leave); /* enddo */
@@ -1807,37 +1808,37 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
 
   // Sometimes double precision in the clipper is not enough. Do an epsilon fuzz
   // so not to reject cases when bounds exceeded by less than epsilon. smgh
-  if (((poly.vertices[0].sx + EPSILON) < 0) ||
-      ((poly.vertices[0].sx - EPSILON) > width))
+  if (((poly.vertices[0].x + EPSILON) < 0) ||
+      ((poly.vertices[0].x - EPSILON) > width))
     return;
 
   min_i = max_i = min_z_i = 0;
-  min_y = max_y = poly.vertices[0].sy;
+  min_y = max_y = poly.vertices[0].y;
 
   float t = (M == 0.f ? N : N/M);
   bool M_neg = (M<0.f);
   bool M_zero = (M == 0.f);
-  min_z = (M_zero ? 0 : poly.vertices[0].sx) + t*poly.vertices[0].sy;
+  min_z = (M_zero ? 0 : poly.vertices[0].x) + t*poly.vertices[0].y;
 
   // count 'real' number of vertices
   int num_vertices = 1;
   for (i = 1 ; i < poly.num ; i++)
   {
-    if (((poly.vertices[i].sx + EPSILON) < 0) ||
-	((poly.vertices[i].sx - EPSILON) > width))
+    if (((poly.vertices[i].x + EPSILON) < 0) ||
+	((poly.vertices[i].x - EPSILON) > width))
       return;
 
-    if (poly.vertices[i].sy > max_y)
+    if (poly.vertices[i].y > max_y)
     {
-      max_y = poly.vertices[i].sy;
+      max_y = poly.vertices[i].y;
       max_i = i;
     }
-    else if (poly.vertices[i].sy < min_y)
+    else if (poly.vertices[i].y < min_y)
     {
-      min_y = poly.vertices[i].sy;
+      min_y = poly.vertices[i].y;
       min_i = i;
     }
-    float inv_z = (M_zero ? 0 : poly.vertices[i].sx) + t*poly.vertices[i].sy;
+    float inv_z = (M_zero ? 0 : poly.vertices[i].x) + t*poly.vertices[i].y;
 
     if ((inv_z > min_z) ^ M_neg)
     {
@@ -1846,8 +1847,8 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
     }
     // theoretically we should do sqrt(dx^2+dy^2) here, but
     // we can approximate it by just abs(dx)+abs(dy)
-    if ((ABS (poly.vertices [i].sx - poly.vertices [i - 1].sx)
-       + ABS (poly.vertices [i].sy - poly.vertices [i - 1].sy))
+    if ((ABS (poly.vertices [i].x - poly.vertices [i - 1].x)
+       + ABS (poly.vertices [i].y - poly.vertices [i - 1].y))
        	> VERTEX_NEAR_THRESHOLD)
       num_vertices++;
   }
@@ -1856,8 +1857,8 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
       ((max_y - EPSILON) > height))
     return;
 
-  min_z = M * (poly.vertices[min_z_i].sx - width2)
-        + N * (poly.vertices[min_z_i].sy - height2) + O;
+  min_z = M * (poly.vertices[min_z_i].x - width2)
+        + N * (poly.vertices[min_z_i].y - height2) + O;
 
   // if this is a 'degenerate' polygon, skip it.
   if (num_vertices < 3)
@@ -1975,8 +1976,8 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
       float K2 = _Q2 * inv_aspect + _Q4 * N;
       float K3 = _Q3              + _Q4 * O;
 
-      float x = poly.vertices [min_z_i].sx - width2;
-      float y = poly.vertices [min_z_i].sy - height2;
+      float x = poly.vertices [min_z_i].x - width2;
+      float y = poly.vertices [min_z_i].y - height2;
 
       float du = (min_z * (J1 + J2) - (M + N) * (J1 * x + J2 * y + J3)) /
                  (min_z * (min_z + M + N));
@@ -2087,7 +2088,7 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
   {
     sxL = sxR = dxL = dxR = 0;
     scanL2 = scanR2 = max_i;
-    sy = fyL = fyR = QRound (poly.vertices [scanL2].sy);
+    sy = fyL = fyR = QRound (poly.vertices [scanL2].y);
 
     // Find the largest texture rectangle that is going to be displayed
     float u_min = +99999999;
@@ -2112,17 +2113,17 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
             scanR2 = 0;
 
           leave = false;
-          fyR = QRound (poly.vertices [scanR2].sy);
+          fyR = QRound (poly.vertices [scanR2].y);
           if (sy <= fyR)
             continue;
 
-          float dyR = (poly.vertices [scanR1].sy - poly.vertices [scanR2].sy);
+          float dyR = (poly.vertices [scanR1].y - poly.vertices [scanR2].y);
           if (dyR)
           {
-            sxR = poly.vertices [scanR1].sx;
-            dxR = (poly.vertices [scanR2].sx - sxR) / dyR;
+            sxR = poly.vertices [scanR1].x;
+            dxR = (poly.vertices [scanR2].x - sxR) / dyR;
             // horizontal pixel correction
-            sxR += dxR * (poly.vertices [scanR1].sy - (float (sy) - 0.5));
+            sxR += dxR * (poly.vertices [scanR1].y - (float (sy) - 0.5));
           }
         }
         if (sy <= fyL)
@@ -2132,17 +2133,17 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
             scanL2 = poly.num - 1;
 
           leave = false;
-          fyL = QRound (poly.vertices [scanL2].sy);
+          fyL = QRound (poly.vertices [scanL2].y);
           if (sy <= fyL)
             continue;
 
-          float dyL = (poly.vertices [scanL1].sy - poly.vertices [scanL2].sy);
+          float dyL = (poly.vertices [scanL1].y - poly.vertices [scanL2].y);
           if (dyL)
           {
-            sxL = poly.vertices [scanL1].sx;
-            dxL = (poly.vertices [scanL2].sx - sxL) / dyL;
+            sxL = poly.vertices [scanL1].x;
+            dxL = (poly.vertices [scanL2].x - sxL) / dyL;
             // horizontal pixel correction
-            sxL += dxL * (poly.vertices [scanL1].sy - (float (sy) - 0.5));
+            sxL += dxL * (poly.vertices [scanL1].y - (float (sy) - 0.5));
           }
         }
       } while (!leave);
@@ -2268,7 +2269,7 @@ texr_done:
 
   sxL = sxR = dxL = dxR = 0; // Avoid warnings about "uninitialized variables"
   scanL2 = scanR2 = max_i;
-  sy = fyL = fyR = QRound (poly.vertices [scanL2].sy);
+  sy = fyL = fyR = QRound (poly.vertices [scanL2].y);
 
   for ( ; ; )
   {
@@ -2289,17 +2290,17 @@ texr_done:
 	  scanR2 = 0;
 
         leave = false;
-        fyR = QRound (poly.vertices [scanR2].sy);
+        fyR = QRound (poly.vertices [scanR2].y);
         if (sy <= fyR)
           continue;
 
-        float dyR = (poly.vertices [scanR1].sy - poly.vertices [scanR2].sy);
+        float dyR = (poly.vertices [scanR1].y - poly.vertices [scanR2].y);
         if (dyR)
         {
-          sxR = poly.vertices [scanR1].sx;
-          dxR = (poly.vertices [scanR2].sx - sxR) / dyR;
+          sxR = poly.vertices [scanR1].x;
+          dxR = (poly.vertices [scanR2].x - sxR) / dyR;
           // horizontal pixel correction
-          sxR += dxR * (poly.vertices [scanR1].sy - (float (sy) - 0.5));
+          sxR += dxR * (poly.vertices [scanR1].y - (float (sy) - 0.5));
         }
       }
       if (sy <= fyL)
@@ -2309,17 +2310,17 @@ texr_done:
 	  scanL2 = poly.num - 1;
 
         leave = false;
-        fyL = QRound (poly.vertices [scanL2].sy);
+        fyL = QRound (poly.vertices [scanL2].y);
         if (sy <= fyL)
           continue;
 
-        float dyL = (poly.vertices [scanL1].sy - poly.vertices [scanL2].sy);
+        float dyL = (poly.vertices [scanL1].y - poly.vertices [scanL2].y);
         if (dyL)
         {
-          sxL = poly.vertices [scanL1].sx;
-          dxL = (poly.vertices [scanL2].sx - sxL) / dyL;
+          sxL = poly.vertices [scanL1].x;
+          dxL = (poly.vertices [scanL2].x - sxL) / dyL;
           // horizontal pixel correction
-          sxL += dxL * (poly.vertices [scanL1].sy - (float (sy) - 0.5));
+          sxL += dxL * (poly.vertices [scanL1].y - (float (sy) - 0.5));
         }
       }
     } while (!leave);
@@ -2479,25 +2480,25 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id,
   // Compute the min_y and max_y for this polygon in screen space coordinates.
   // We are going to use these to scan the polygon from top to bottom.
   min_i = max_i = 0;
-  min_y = max_y = poly.vertices[0].sy;
+  min_y = max_y = poly.vertices[0].y;
   // count 'real' number of vertices
   int num_vertices = 1;
   for (i = 1 ; i < poly.num ; i++)
   {
-    if (poly.vertices[i].sy > max_y)
+    if (poly.vertices[i].y > max_y)
     {
-      max_y = poly.vertices[i].sy;
+      max_y = poly.vertices[i].y;
       max_i = i;
     }
-    else if (poly.vertices[i].sy < min_y)
+    else if (poly.vertices[i].y < min_y)
     {
-      min_y = poly.vertices[i].sy;
+      min_y = poly.vertices[i].y;
       min_i = i;
     }
     // theoretically we should do here sqrt(dx^2+dy^2), but
     // we can approximate it just by abs(dx)+abs(dy)
-    if ((ABS (poly.vertices [i].sx - poly.vertices [i - 1].sx)
-       + ABS (poly.vertices [i].sy - poly.vertices [i - 1].sy))
+    if ((ABS (poly.vertices [i].x - poly.vertices [i - 1].x)
+       + ABS (poly.vertices [i].y - poly.vertices [i - 1].y))
        	> VERTEX_NEAR_THRESHOLD)
       num_vertices++;
   }
@@ -2592,7 +2593,7 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id,
 
   sxL = sxR = dxL = dxR = 0; // Avoid warnings about "uninitialized variables"
   scanL2 = scanR2 = max_i;
-  sy = fyL = fyR = QRound (poly.vertices [scanL2].sy);
+  sy = fyL = fyR = QRound (poly.vertices [scanL2].y);
 
   for ( ; ; )
   {
@@ -2613,17 +2614,17 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id,
 	  scanR2 = 0;
 
         leave = false;
-        fyR = QRound (poly.vertices [scanR2].sy);
+        fyR = QRound (poly.vertices [scanR2].y);
         if (sy <= fyR)
           continue;
 
-        float dyR = (poly.vertices [scanR1].sy - poly.vertices [scanR2].sy);
+        float dyR = (poly.vertices [scanR1].y - poly.vertices [scanR2].y);
         if (dyR)
         {
-          sxR = poly.vertices [scanR1].sx;
-          dxR = (poly.vertices [scanR2].sx - sxR) / dyR;
+          sxR = poly.vertices [scanR1].x;
+          dxR = (poly.vertices [scanR2].x - sxR) / dyR;
           // horizontal pixel correction
-          sxR += dxR * (poly.vertices [scanR1].sy - (float (sy) - 0.5));
+          sxR += dxR * (poly.vertices [scanR1].y - (float (sy) - 0.5));
         } /* endif */
       } /* endif */
       if (sy <= fyL)
@@ -2633,17 +2634,17 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id,
 	  scanL2 = poly.num - 1;
 
         leave = false;
-        fyL = QRound (poly.vertices [scanL2].sy);
+        fyL = QRound (poly.vertices [scanL2].y);
         if (sy <= fyL)
           continue;
 
-        float dyL = (poly.vertices [scanL1].sy - poly.vertices [scanL2].sy);
+        float dyL = (poly.vertices [scanL1].y - poly.vertices [scanL2].y);
         if (dyL)
         {
-          sxL = poly.vertices [scanL1].sx;
-          dxL = (poly.vertices [scanL2].sx - sxL) / dyL;
+          sxL = poly.vertices [scanL1].x;
+          dxL = (poly.vertices [scanL2].x - sxL) / dyL;
           // horizontal pixel correction
-          sxL += dxL * (poly.vertices [scanL1].sy - (float (sy) - 0.5));
+          sxL += dxL * (poly.vertices [scanL1].y - (float (sy) - 0.5));
         } /* endif */
       } /* endif */
     } while (!leave); /* enddo */
@@ -2897,10 +2898,10 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
     if (poly.vertices [i].b > 2.0) poly.vertices [i].b = 2.0;
     if (poly.vertices [i].b < 0.0) poly.vertices [i].b = 0.0;
     bb[i] = poly.vertices [i].b * pqinfo.blueFact  * Scan.FlatRGB.blue;
-    if (poly.vertices [i].sy > top_y)
-      top_y = poly.vertices [top = i].sy;
-    if (poly.vertices [i].sy < bot_y)
-      bot_y = poly.vertices [bot = i].sy;
+    if (poly.vertices [i].y > top_y)
+      top_y = poly.vertices [top = i].y;
+    if (poly.vertices [i].y < bot_y)
+      bot_y = poly.vertices [bot = i].y;
   }
 
   // If the polygon exceeds the screen, it is an engine failure
@@ -2929,7 +2930,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
 // Start of code to stop MSVC bitching about uninitialized variables
   L.sv = R.sv = top;
   L.fv = R.fv = top;
-  int sy = L.fy = R.fy = QRound (poly.vertices [top].sy);
+  int sy = L.fy = R.fy = QRound (poly.vertices [top].y);
 
   L.x = R.x = 0;
   L.dxdy = R.dxdy = 0;
@@ -2975,17 +2976,17 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
 	  R.fv = 0;
 
         leave = false;
-	R.fy = QRound (poly.vertices [R.fv].sy);
+	R.fy = QRound (poly.vertices [R.fv].y);
 	if (sy <= R.fy)
 	  continue;
 
-        float dyR = poly.vertices [R.sv].sy - poly.vertices [R.fv].sy;
+        float dyR = poly.vertices [R.sv].y - poly.vertices [R.fv].y;
         if (dyR)
         {
           float inv_dyR = 1 / dyR;
-          R.x = QInt16 (poly.vertices [R.sv].sx);
+          R.x = QInt16 (poly.vertices [R.sv].x);
           R.dxdy = QInt16 (
-            (poly.vertices [R.fv].sx - poly.vertices [R.sv].sx) * inv_dyR);
+            (poly.vertices [R.fv].x - poly.vertices [R.sv].x) * inv_dyR);
           R.dzdy = QInt24 ((iz [R.fv] - iz [R.sv]) * inv_dyR);
           if (pqinfo.textured)
           {
@@ -3001,13 +3002,13 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
 
           // horizontal pixel correction
           float deltaX = (R.dxdy * 1/65536.) *
-            (poly.vertices [R.sv].sy - (float (sy) - 0.5));
+            (poly.vertices [R.sv].y - (float (sy) - 0.5));
           R.x += QInt16 (deltaX);
 
           // apply sub-pixel accuracy factor
           float Factor;
-          if (poly.vertices [R.fv].sx != poly.vertices [R.sv].sx)
-            Factor = deltaX / (poly.vertices [R.fv].sx - poly.vertices [R.sv].sx);
+          if (poly.vertices [R.fv].x != poly.vertices [R.sv].x)
+            Factor = deltaX / (poly.vertices [R.fv].x - poly.vertices [R.sv].x);
           else
             Factor = 0;
           if (pqinfo.textured)
@@ -3033,17 +3034,17 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
 	  L.fv = poly.num - 1;
 
         leave = false;
-	L.fy = QRound (poly.vertices [L.fv].sy);
+	L.fy = QRound (poly.vertices [L.fv].y);
 	if (sy <= L.fy)
 	  continue;
 
-        float dyL = poly.vertices [L.sv].sy - poly.vertices [L.fv].sy;
+        float dyL = poly.vertices [L.sv].y - poly.vertices [L.fv].y;
         if (dyL)
         {
           float inv_dyL = 1 / dyL;
-          L.x = QInt16 (poly.vertices [L.sv].sx);
+          L.x = QInt16 (poly.vertices [L.sv].x);
           L.dxdy = QInt16 (
-            (poly.vertices [L.fv].sx - poly.vertices [L.sv].sx) * inv_dyL);
+            (poly.vertices [L.fv].x - poly.vertices [L.sv].x) * inv_dyL);
           L.dzdy = QInt24 ((iz [L.fv] - iz [L.sv]) * inv_dyL);
           if (pqinfo.textured)
           {
@@ -3059,13 +3060,13 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
 
           // horizontal pixel correction
           float deltaX = (L.dxdy * 1/65536.) *
-            (poly.vertices [L.sv].sy - (float (sy) - 0.5));
+            (poly.vertices [L.sv].y - (float (sy) - 0.5));
           L.x += QInt16 (deltaX);
 
           // apply sub-pixel accuracy factor
           float Factor;
-          if (poly.vertices [L.fv].sx != poly.vertices [L.sv].sx)
-            Factor = deltaX / (poly.vertices [L.fv].sx - poly.vertices [L.sv].sx);
+          if (poly.vertices [L.fv].x != poly.vertices [L.sv].x)
+            Factor = deltaX / (poly.vertices [L.fv].x - poly.vertices [L.sv].x);
           else
             Factor = 0;
           if (pqinfo.textured)
@@ -3197,8 +3198,24 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
 
 void csGraphics3DSoftwareCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 {
-  DefaultDrawTriangleMesh (mesh, this, o2c, clipper,
-	cliptype, aspect, width2, height2);
+  iClipper2D* cl;
+  if (mesh.clip_portal >= CS_CLIPPER_NONE)
+    cl = clipper;
+  else
+    cl = NULL;
+  DefaultDrawTriangleMesh (mesh, this, o2c, cl,
+	false /*lazyclip*/, aspect, width2, height2);
+}
+
+void csGraphics3DSoftwareCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
+{
+  iClipper2D* cl;
+  if (mesh.clip_portal >= CS_CLIPPER_NONE)
+    cl = clipper;
+  else
+    cl = NULL;
+  DefaultDrawPolygonMesh (mesh, this, o2c, cl,
+	false /*lazyclip*/, aspect, width2, height2);
 }
 
 unsigned char *csGraphics3DSoftwareCommon::BuildIndexedFogTable ()

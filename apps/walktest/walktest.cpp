@@ -806,8 +806,8 @@ void WalkTest::DrawFrameMap ()
     	    g3dpoly.inv_aspect = view->GetCamera ()->GetInvFOV ();
 	    for (i = 0 ; i <g3dpoly.num ; i++)
 	    {
-	      g3dpoly.vertices[i].sx = clip->GetVertex (i)->x;
-	      g3dpoly.vertices[i].sy = clip->GetVertex (i)->y;
+	      g3dpoly.vertices[i].x = clip->GetVertex (i)->x;
+	      g3dpoly.vertices[i].y = clip->GetVertex (i)->y;
 	    }
 	    g3dpoly.alpha = 0;
 	    g3dpoly.z_value = p->Vwor (0).y;

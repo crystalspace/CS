@@ -165,9 +165,9 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDP& poly)
   {
     // Calculate the original 3D coordinate again (camera space).
     csVector3 v;
-    v.z = 1. / (M * (poly.vertices[i].sx - shift_x) + N * (poly.vertices[i].sy - shift_y) + O);
-    v.x = (poly.vertices[i].sx - shift_x) * v.z * inv_aspect;
-    v.y = (poly.vertices[i].sy - shift_y) * v.z * inv_aspect;
+    v.z = 1. / (M * (poly.vertices[i].x - shift_x) + N * (poly.vertices[i].y - shift_y) + O);
+    v.x = (poly.vertices[i].x - shift_x) * v.z * inv_aspect;
+    v.y = (poly.vertices[i].y - shift_y) * v.z * inv_aspect;
 
     // Initialize fog vertex.
     poly.fog_info[i].r = 0;
@@ -270,8 +270,8 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDPFX& poly)
     // Calculate the original 3D coordinate again (camera space).
     csVector3 v;
     v.z = 1. / poly.vertices[i].z;
-    v.x = (poly.vertices[i].sx - shift_x) * v.z * inv_aspect;
-    v.y = (poly.vertices[i].sy - shift_y) * v.z * inv_aspect;
+    v.x = (poly.vertices[i].x - shift_x) * v.z * inv_aspect;
+    v.y = (poly.vertices[i].y - shift_y) * v.z * inv_aspect;
 
     // Initialize fog vertex.
     poly.fog_info[i].r = 0;

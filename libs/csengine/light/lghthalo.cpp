@@ -352,8 +352,8 @@ static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
   float t;
   for (i = 0; i < num_vertices; i++)
   {
-    g3dpoly->vertices [i].sx = clipped_verts [i].x;
-    g3dpoly->vertices [i].sy = clipped_verts [i].y;
+    g3dpoly->vertices [i].x = clipped_verts [i].x;
+    g3dpoly->vertices [i].y = clipped_verts [i].y;
     switch (clipped_vtstats[i].Type)
     {
       case CS_VERTEX_ORIGINAL:
@@ -391,8 +391,8 @@ static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
         j1 = orig_num_vertices - 1;
         for (j = 0; j < orig_num_vertices; j++)
         {
-          if ((y >= inpoly [j].sy && y <= inpoly [j1].sy) ||
-              (y <= inpoly [j].sy && y >= inpoly [j1].sy))
+          if ((y >= inpoly [j].y && y <= inpoly [j1].y) ||
+              (y <= inpoly [j].y && y >= inpoly [j1].y))
           {
             edge_from [edge] = j;
             edge_to [edge] = j1;
@@ -411,10 +411,10 @@ static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
         G3DTexturedVertex& B = inpoly [edge_to [0]];
         G3DTexturedVertex& C = inpoly [edge_from [1]];
         G3DTexturedVertex& D = inpoly [edge_to [1]];
-        float t1 = (y - A.sy) / (B.sy - A.sy);
-        float t2 = (y - C.sy) / (D.sy - C.sy);
-        float x1 = A.sx + t1 * (B.sx - A.sx);
-        float x2 = C.sx + t2 * (D.sx - C.sx);
+        float t1 = (y - A.y) / (B.y - A.y);
+        float t2 = (y - C.y) / (D.y - C.y);
+        float x1 = A.x + t1 * (B.x - A.x);
+        float x2 = C.x + t2 * (D.x - C.x);
         t = (x - x1) / (x2 - x1);
         INTERPOLATE (z);
         INTERPOLATE (u);
@@ -499,8 +499,8 @@ void csLightFlareHalo::ProcessFlareComponent(csEngine const& engine,
   for(i=0; i<4; i++)
   {
     dpfx.vertices[i].z = SMALL_Z;
-    dpfx.vertices[i].sx = HaloPoly[i].x;
-    dpfx.vertices[i].sy = HaloPoly[i].y;
+    dpfx.vertices[i].x = HaloPoly[i].x;
+    dpfx.vertices[i].y = HaloPoly[i].y;
     dpfx.vertices[i].u = HaloUV[i].x;
     dpfx.vertices[i].v = HaloUV[i].y;
     dpfx.vertices[i].r = 1.0;

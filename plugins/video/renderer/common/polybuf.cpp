@@ -22,41 +22,60 @@
 #include "cssysdef.h"
 #include "polybuf.h"
 #include "csutil/util.h"
+#include "imesh/thing/polygon.h"
 #include "qint.h"
 
 csPolArrayPolygonBuffer::csPolArrayPolygonBuffer (iVertexBufferManager* mgr)
 	: csPolygonBuffer (mgr)
 {
+  vertices = NULL;
 }
 
 csPolArrayPolygonBuffer::~csPolArrayPolygonBuffer ()
 {
+  Clear ();
+}
+
+void csPolArrayPolygonBuffer::AddPolygon (int* verts, int num_verts,
+	const csPlane3& poly_normal,
+  	iMaterialHandle* mat_handle,
+	const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
+	iPolygonTexture* poly_texture)
+{
+  csPolArrayPolygon pol;
+  pol.num_vertices = num_verts;
+  pol.vertices = new int [num_verts];
+  memcpy (pol.vertices, verts, num_verts * sizeof (int));
+  pol.normal = poly_normal;
+  pol.m_obj2tex = m_obj2tex;
+  pol.v_obj2tex = v_obj2tex;
+  pol.mat_handle = mat_handle;
+  pol.poly_texture = poly_texture;
+  poly_texture->IncRef ();
+  polygons.Push (pol);
+}
+
+void csPolArrayPolygonBuffer::SetVertexArray (csVector3* verts, int num_verts)
+{
+  delete[] vertices;
+  num_vertices = num_verts;
+  vertices = new csVector3 [num_verts];
+  memcpy (vertices, verts, num_verts * sizeof (csVector3));
+}
+
+void csPolArrayPolygonBuffer::Clear ()
+{
   int i;
   for (i = 0 ; i < polygons.Length () ; i++)
   {
-    int* pol = polygons[i];
-    delete[] pol;
-  }
-}
-
-void csPolArrayPolygonBuffer::AddPolygon (int* verts, int num_verts)
-{
-  int* newpol = new int [num_verts];
-  memcpy (newpol, verts, num_verts * sizeof (int));
-  polygons.Push (newpol);
-  num_vertices.Push (num_verts);
-}
-
-void csPolArrayPolygonBuffer::ClearPolygons ()
-{
-  int i;
-  for (i = 0 ; i < polygons.Length () ; i++)
-  {
-    int* pol = polygons[i];
-    delete[] pol;
+    csPolArrayPolygon& pol = polygons[i];
+    delete[] pol.vertices;
+    pol.poly_texture->DecRef ();
   }
   polygons.SetLength (0);
-  num_vertices.SetLength (0);
+
+  delete[] vertices; vertices = NULL;
+  num_vertices = 0;
 }
 
 csPolArrayVertexBufferManager::csPolArrayVertexBufferManager

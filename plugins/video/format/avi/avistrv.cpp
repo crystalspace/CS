@@ -164,14 +164,14 @@ bool csAVIStreamVideo::SetRect (int x, int y, int w, int h)
   int height = pG3D->GetHeight ()-1;
 
   rc.Set (x, y, x+w, y+h);
-  polyfx.vertices[0].sx = x;
-  polyfx.vertices[0].sy = height - y;
-  polyfx.vertices[1].sx = x+w;
-  polyfx.vertices[1].sy = height - y;
-  polyfx.vertices[2].sx = x+w;
-  polyfx.vertices[2].sy = height - (y+h);
-  polyfx.vertices[3].sx = x;
-  polyfx.vertices[3].sy = height - (y+h);
+  polyfx.vertices[0].x = x;
+  polyfx.vertices[0].y = height - y;
+  polyfx.vertices[1].x = x+w;
+  polyfx.vertices[1].y = height - y;
+  polyfx.vertices[2].x = x+w;
+  polyfx.vertices[2].y = height - (y+h);
+  polyfx.vertices[3].x = x;
+  polyfx.vertices[3].y = height - (y+h);
 
   memimage.Rescale (w, h);
   return true;

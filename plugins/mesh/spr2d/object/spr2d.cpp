@@ -186,8 +186,8 @@ static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
   float t;
   for (i = 0; i < num_vertices; i++)
   {
-    g3dpoly->vertices [i].sx = clipped_verts [i].x;
-    g3dpoly->vertices [i].sy = clipped_verts [i].y;
+    g3dpoly->vertices [i].x = clipped_verts [i].x;
+    g3dpoly->vertices [i].y = clipped_verts [i].y;
     switch (clipped_vtstats[i].Type)
     {
       case CS_VERTEX_ORIGINAL:
@@ -225,8 +225,8 @@ static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
 	j1 = orig_num_vertices - 1;
 	for (j = 0; j < orig_num_vertices; j++)
 	{
-          if ((y >= inpoly [j].sy && y <= inpoly [j1].sy) ||
-	      (y <= inpoly [j].sy && y >= inpoly [j1].sy))
+          if ((y >= inpoly [j].y && y <= inpoly [j1].y) ||
+	      (y <= inpoly [j].y && y >= inpoly [j1].y))
 	  {
 	    edge_from [edge] = j;
 	    edge_to [edge] = j1;
@@ -245,10 +245,10 @@ static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
 	G3DTexturedVertex& B = inpoly [edge_to [0]];
 	G3DTexturedVertex& C = inpoly [edge_from [1]];
 	G3DTexturedVertex& D = inpoly [edge_to [1]];
-	float t1 = (y - A.sy) / (B.sy - A.sy);
-	float t2 = (y - C.sy) / (D.sy - C.sy);
-	float x1 = A.sx + t1 * (B.sx - A.sx);
-	float x2 = C.sx + t2 * (D.sx - C.sx);
+	float t1 = (y - A.y) / (B.y - A.y);
+	float t2 = (y - C.y) / (D.y - C.y);
+	float x1 = A.x + t1 * (B.x - A.x);
+	float x2 = C.x + t2 * (D.x - C.x);
 	t = (x - x1) / (x2 - x1);
 	INTERPOLATE (z);
 	INTERPOLATE (u);
@@ -311,9 +311,9 @@ bool csSprite2DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   for (i = 0; i < vertices.Length (); i++)
   {
     g3dpolyfx.vertices [i].z = iz;
-    g3dpolyfx.vertices [i].sx =
+    g3dpolyfx.vertices [i].x =
     poly2d [i].x = (cam.x + vertices [i].pos.x) * iza + camera->GetShiftX ();
-    g3dpolyfx.vertices [i].sy =
+    g3dpolyfx.vertices [i].y =
     poly2d [i].y = (cam.y + vertices [i].pos.y) * iza + camera->GetShiftY ();
     g3dpolyfx.vertices [i].r = vertices [i].color.red;
     g3dpolyfx.vertices [i].g = vertices [i].color.green;

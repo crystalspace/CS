@@ -1655,8 +1655,8 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
   int num_vertices = 1;
   for (i = 1; i < poly.num; i++)
   {
-    if ((ABS (poly.vertices[i].sx - poly.vertices[i - 1].sx)
-	 + ABS (poly.vertices[i].sy - poly.vertices[i - 1].sy))
+    if ((ABS (poly.vertices[i].x - poly.vertices[i - 1].x)
+	 + ABS (poly.vertices[i].y - poly.vertices[i - 1].y))
 	 	> VERTEX_NEAR_THRESHOLD)
       num_vertices++;
   }
@@ -1769,8 +1769,8 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
   GLfloat* gltxt = queue.GetGLTxt (idx);
   for (i = 0; i < poly.num; i++)
   {
-    sx = poly.vertices[i].sx - asp_center_x;
-    sy = poly.vertices[i].sy - asp_center_y;
+    sx = poly.vertices[i].x - asp_center_x;
+    sy = poly.vertices[i].y - asp_center_y;
     one_over_sz = M * sx + N * sy + O;
     sz = 1.0 / one_over_sz;
     u_over_sz = (J1 * sx + J2 * sy + J3);
@@ -1780,8 +1780,8 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
     // of homogenous texture space coordinates.
     *gltxt++ = u_over_sz * sz;
     *gltxt++ = v_over_sz * sz;
-    *glverts++ = poly.vertices[i].sx * sz;
-    *glverts++ = poly.vertices[i].sy * sz;
+    *glverts++ = poly.vertices[i].x * sz;
+    *glverts++ = poly.vertices[i].y * sz;
     *glverts++ = -1.0;
     *glverts++ = sz;
   }
@@ -1869,8 +1869,8 @@ void csGraphics3DOGLCommon::DrawPolygonZFill (G3DPolygonDP & poly)
   int num_vertices = 1;
   for (i = 1; i < poly.num; i++)
   {
-    if ((ABS (poly.vertices[i].sx - poly.vertices[i - 1].sx)
-	 + ABS (poly.vertices[i].sy - poly.vertices[i - 1].sy))
+    if ((ABS (poly.vertices[i].x - poly.vertices[i - 1].x)
+	 + ABS (poly.vertices[i].y - poly.vertices[i - 1].y))
 	 	> VERTEX_NEAR_THRESHOLD)
       num_vertices++;
   }
@@ -1926,12 +1926,12 @@ void csGraphics3DOGLCommon::DrawPolygonZFill (G3DPolygonDP & poly)
   float sx, sy, sz, one_over_sz;
   for (i = 0; i < poly.num; i++)
   {
-    sx = poly.vertices[i].sx - asp_center_x;
-    sy = poly.vertices[i].sy - asp_center_y;
+    sx = poly.vertices[i].x - asp_center_x;
+    sy = poly.vertices[i].y - asp_center_y;
     one_over_sz = M * sx + N * sy + O;
     sz = 1.0 / one_over_sz;
-    glverts[vtidx++] = poly.vertices[i].sx * sz;
-    glverts[vtidx++] = poly.vertices[i].sy * sz;
+    glverts[vtidx++] = poly.vertices[i].x * sz;
+    glverts[vtidx++] = poly.vertices[i].y * sz;
     glverts[vtidx++] = -1.0;
     glverts[vtidx++] = sz;
   }
@@ -2022,8 +2022,8 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
     if (ABS (sz) < SMALL_EPSILON) sz = 1. / SMALL_EPSILON;
     else sz = 1./sz;
 
-    *glverts++ = poly.vertices[i].sx * sz;
-    *glverts++ = poly.vertices[i].sy * sz;
+    *glverts++ = poly.vertices[i].x * sz;
+    *glverts++ = poly.vertices[i].y * sz;
     *glverts++ = -1;
     *glverts++ = sz;
 
@@ -2451,6 +2451,18 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
       }
     }
   }
+}
+
+void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
+{
+  FlushDrawPolygon ();
+  iClipper2D* cl;
+  if (mesh.clip_portal >= CS_CLIPPER_NONE)
+    cl = clipper;
+  else
+    cl = NULL;
+  DefaultDrawPolygonMesh (mesh, this, o2c, cl, false /*lazyclip*/, aspect,
+  	asp_center_x, asp_center_y);
 }
 
 void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
@@ -3304,8 +3316,8 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   {
     // theoretically we should do here sqrt(dx^2+dy^2), but
     // we can approximate it just by abs(dx)+abs(dy)
-    if ((ABS (poly.vertices[i].sx - poly.vertices[i - 1].sx)
-	 + ABS (poly.vertices[i].sy - poly.vertices[i - 1].sy))
+    if ((ABS (poly.vertices[i].x - poly.vertices[i - 1].x)
+	 + ABS (poly.vertices[i].y - poly.vertices[i - 1].y))
 	 	> VERTEX_NEAR_THRESHOLD)
       num_vertices++;
   }
@@ -3446,8 +3458,8 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   glBegin (GL_TRIANGLE_FAN);
   for (i = 0; i < poly.num; i++)
   {
-    sx = poly.vertices[i].sx - asp_center_x;
-    sy = poly.vertices[i].sy - asp_center_y;
+    sx = poly.vertices[i].x - asp_center_x;
+    sy = poly.vertices[i].y - asp_center_y;
     one_over_sz = M * sx + N * sy + O;
     sz = 1.0 / one_over_sz;
     u_over_sz = (J1 * sx + J2 * sy + J3);
@@ -3459,7 +3471,7 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
     // of homogenous texture space coordinates
     glMultiTexCoord2fARB (GL_TEXTURE0_ARB, u_over_sz * sz, v_over_sz * sz);
     glMultiTexCoord2fARB (GL_TEXTURE1_ARB, light_u, light_v);
-    glVertex4f (poly.vertices[i].sx * sz, poly.vertices[i].sy * sz, -1.0, sz);
+    glVertex4f (poly.vertices[i].x * sz, poly.vertices[i].y * sz, -1.0, sz);
   }
   glEnd ();
 

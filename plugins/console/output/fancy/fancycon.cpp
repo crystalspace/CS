@@ -224,14 +224,14 @@ void csFancyConsole::Draw3D (csRect *oArea)
   size.ymax += -bordersize.ymax + deco.p2by + deco.by;
 
   poly.num = 4;
-  poly.vertices [0].sx = size.xmin;
-  poly.vertices [0].sy = height - size.ymin;
-  poly.vertices [1].sx = size.xmax;
-  poly.vertices [1].sy = height - size.ymin;
-  poly.vertices [2].sx = size.xmax;
-  poly.vertices [2].sy = height - size.ymax;
-  poly.vertices [3].sx = size.xmin;
-  poly.vertices [3].sy = height - size.ymax;
+  poly.vertices [0].x = size.xmin;
+  poly.vertices [0].y = height - size.ymin;
+  poly.vertices [1].x = size.xmax;
+  poly.vertices [1].y = height - size.ymin;
+  poly.vertices [2].x = size.xmax;
+  poly.vertices [2].y = height - size.ymax;
+  poly.vertices [3].x = size.xmin;
+  poly.vertices [3].y = height - size.ymax;
   poly.use_fog = false;
 
   float u_stretch = 1.0, v_stretch = 1.0;
@@ -358,19 +358,19 @@ void csFancyConsole::DrawBorder (int x, int y, int width, int height,
     poly.vertices [3].u = 0;
     poly.vertices [3].v = v_stretch;
 
-    poly.vertices [0].sx = x;
-    poly.vertices [0].sy = y;
-    poly.vertices [1].sx = x + width ;
-    poly.vertices [1].sy = y;
-    poly.vertices [2].sx = x + width;
-    poly.vertices [2].sy = y - height;
-    poly.vertices [3].sx = x;
-    poly.vertices [3].sy = y - height;
+    poly.vertices [0].x = x;
+    poly.vertices [0].y = y;
+    poly.vertices [1].x = x + width ;
+    poly.vertices [1].y = y;
+    poly.vertices [2].x = x + width;
+    poly.vertices [2].y = y - height;
+    poly.vertices [3].x = x;
+    poly.vertices [3].y = y - height;
 
     for (i = 0; i < 4; i++)
     {
-      poly.vertices [i].sx -= border.offx;
-      poly.vertices [i].sy += border.offy;
+      poly.vertices [i].x -= border.offx;
+      poly.vertices [i].y += border.offy;
       poly.vertices [i].z = 1;
       poly.vertices [i].r = 1;
       poly.vertices [i].g = 1;

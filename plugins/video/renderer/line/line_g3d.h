@@ -242,13 +242,13 @@ public:
   virtual void DrawTriangleMesh (G3DTriangleMesh& mesh)
   {
     DefaultDrawTriangleMesh (mesh, this, o2c, clipper,
-	cliptype, aspect, width2, height2);
+	false, aspect, width2, height2);
   }
 
   /// Draw a polygon mesh.
   virtual void DrawPolygonMesh (G3DPolygonMesh& mesh)
   {
-    DefaultDrawPolygonMesh (mesh, this, o2c, clipper, aspect, inv_aspect,
+    DefaultDrawPolygonMesh (mesh, this, o2c, clipper, false, aspect,
       width2, height2);
   }
 

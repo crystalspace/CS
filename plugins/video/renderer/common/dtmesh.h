@@ -26,7 +26,7 @@ void DefaultDrawTriangleMesh (
   G3DTriangleMesh& mesh,
   iGraphics3D* g3d,
   csReversibleTransform& o2c,
-  iClipper2D* clipper, int cliptype,
+  iClipper2D* clipper, bool lazyclip,
   float aspect,
   int width2,
   int height2);

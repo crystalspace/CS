@@ -45,6 +45,12 @@ struct csFog;
 #define CS_THING_VISTREE 1
 
 /**
+ * If CS_THING_FASTMESH is set then this thing will be drawn using
+ * the faster DrawPolygonMesh.
+ */
+#define CS_THING_FASTMESH 2
+
+/**
  * The following flags affect movement options for a thing. See
  * SetMovingOption() for more info.
  */

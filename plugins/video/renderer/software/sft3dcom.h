@@ -447,11 +447,7 @@ public:
   virtual void DrawTriangleMesh (G3DTriangleMesh& mesh);
 
   /// Draw a polygon mesh.
-  virtual void DrawPolygonMesh (G3DPolygonMesh& mesh)
-  {
-    DefaultDrawPolygonMesh (mesh, this, o2c, clipper, aspect, inv_aspect,
-      width2, height2);
-  }
+  virtual void DrawPolygonMesh (G3DPolygonMesh& mesh);
 
   /// Get the iGraphics2D driver.
   virtual iGraphics2D *GetDriver2D ()

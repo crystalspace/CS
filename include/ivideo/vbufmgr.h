@@ -22,9 +22,13 @@
 
 #include "csutil/scf.h"
 
+class csMatrix3;
+class csPlane3;
 class csVector3;
 class csVector2;
 class csColor;
+struct iPolygonTexture;
+struct iMaterialHandle;
 
 SCF_VERSION (iVertexBuffer, 0, 1, 0);
 
@@ -59,7 +63,7 @@ struct iVertexBuffer : public iBase
   virtual int GetVertexCount () const = 0;
 };
 
-SCF_VERSION (iPolygonBuffer, 0, 0, 1);
+SCF_VERSION (iPolygonBuffer, 0, 0, 2);
 
 /**
  * This interface represents a black-box polygon buffer.
@@ -78,9 +82,20 @@ struct iPolygonBuffer : public iBase
    * Add a polygon to this buffer. The data pointed to by 'verts'
    * is copied so it can be discarded after calling AddPolygon.
    */
-  virtual void AddPolygon (int* verts, int num_verts) = 0;
-  /// Clear all polygons.
-  virtual void ClearPolygons () = 0;
+  virtual void AddPolygon (int* verts, int num_verts,
+	const csPlane3& poly_normal,
+  	iMaterialHandle* mat_handle,
+	const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
+	iPolygonTexture* poly_texture) = 0;
+
+  /**
+   * Set vertices to use for the polygons.
+   * The given array is copied.
+   */
+  virtual void SetVertexArray (csVector3* verts, int num_verts) = 0;
+
+  /// Clear all polygons and vertex array.
+  virtual void Clear () = 0;
 };
 
 SCF_VERSION (iVertexBufferManager, 0, 0, 2);

@@ -54,6 +54,7 @@ struct iRenderView;
 struct iMovable;
 struct iFrustumView;
 struct iMaterialWrapper;
+struct iPolygonBuffer;
 
 #define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING)
 
@@ -165,6 +166,12 @@ private:
    */
   csVector portal_polygons;
 
+  /**
+   * If we are a detail object then this will contain a reference to a
+   * polygon buffer for the 3D renderer. This can be used by DrawPolygonMesh.
+   */
+  iPolygonBuffer* polybuf;
+
   /// A vector with all edges in this thing.
   CS_DECLARE_GROWING_ARRAY (thing_edges, csThingEdge);
   /// If false then thing_edges is not valid and needs to be recalculated.
@@ -197,6 +204,8 @@ private:
 
   /// Radius of object in object space.
   csVector3 obj_radius;
+  /// Full radius of object in object space.
+  float max_obj_radius;
 
   /**
    * Light frame number. Using this number one can see if gouraud shaded
@@ -274,13 +283,20 @@ public:
 
 private:
   /**
+   * Prepare the polygon buffer for use by DrawPolygonMesh.
+   * If the polygon buffer is already made then this function will do
+   * nothing.
+   */
+  void PreparePolygonBuffer ();
+
+  /**
    * Draw the given array of polygons in the current thing.
    * This version uses iGraphics3D->DrawPolygonMesh()
    * for more efficient rendering. WARNING! This version only works for
    * lightmapped polygons right now and is far from complete.
    */
   void DrawPolygonArrayDPM (csPolygonInt** polygon, int num,
-	iRenderView* rview, csZBufMode zMode);
+	iRenderView* rview, iMovable* movable, csZBufMode zMode);
 
   /**
    * Draw the given array of polygons in the current csPolygonSet.
@@ -341,9 +357,6 @@ private:
    * is used.
    */
   void UpdateCurveTransform ();
-
-  /// Internal draw function.
-  bool DrawInt (iRenderView* rview, iMovable* movable, csZBufMode zMode);
 
   /// Cleanup the thing edge table.
   void CleanupThingEdgeTable ();
@@ -577,6 +590,19 @@ public:
   }
 
   /**
+   * Get bounding box given some transformation.
+   */
+  void GetTransformedBoundingBox (
+	const csReversibleTransform& trans, csBox3& cbox);
+
+  /**
+   * Get bounding box in screen space.
+   */
+  float GetScreenBoundingBox (
+	float fov, float sx, float sy,
+	const csReversibleTransform& trans, csBox2& sbox, csBox3& cbox);
+
+  /**
    * Get the bounding box in object space for this polygon set.
    * This is calculated based on the oriented bounding box.
    */
@@ -651,6 +677,11 @@ public:
   // Drawing
   //----------------------------------------------------------------------
   
+  /**
+   * Test if this thing is visible or not.
+   */
+  bool DrawTest (iRenderView* rview, iMovable* movable);
+
   /**
    * Draw this thing given a view and transformation.
    */
@@ -1000,10 +1031,9 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csThing);
     virtual iMeshObjectFactory* GetFactory () const;
-    virtual bool DrawTest (iRenderView* /*rview*/, iMovable* /*movable*/)
+    virtual bool DrawTest (iRenderView* rview, iMovable* movable)
     {
-      //@@@ For now!
-      return true;
+      return scfParent->DrawTest (rview, movable);
     }
     virtual void UpdateLighting (iLight** /*lights*/, int /*num_lights*/,
       	iMovable* /*movable*/) { }

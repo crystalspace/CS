@@ -4,7 +4,7 @@ The history order is reversed so that new features are at the top.
 	- Fixed a linking error in povie.mak.
 26-Aug-2001
 	- Removed G3DVertex class since this is equivalent to using
-	  csVector instead.
+	  csVector2 instead.
 	- DefaultDrawTriangleMesh now also understands lazy clipping but
 	  this is not yet used by the software renderer.
 	- Added clip_portal, clip_plane, and clip_z_plane to G3DPolygonMesh

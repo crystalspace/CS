@@ -22,6 +22,7 @@
 
 #include "csutil/scf.h"
 #include "csgeom/plane3.h"
+#include "csgeom/vector2.h"
 
 class csMatrix3;
 class csVector3;
@@ -33,6 +34,7 @@ class csColor;
 
 struct iGraphics2D;
 struct iPolygonTexture;
+struct iPolygonBuffer;
 struct iVertexBuffer;
 struct iVertexBufferManager;
 struct iTextureManager;
@@ -90,18 +92,8 @@ struct csPixelFormat;
 #define CS_FX_SETALPHA_INT(alpha) \
   (CS_FX_ALPHA | uint (alpha & CS_FX_MASK_ALPHA))
 
-/// Vertex Structure for use with G3DPolygonDP and G3DPolygonDFP
-class G3DVertex
-{
-public:
-  /// Screen x space.
-  float sx;
-  /// Screen y space.
-  float sy;
-};
-
 /// Vertex Structure for use with G3DPolygonDPQ
-class G3DTexturedVertex : public G3DVertex
+class G3DTexturedVertex : public csVector2
 {
 public:
   /// inverse z value (1/real_z)
@@ -169,7 +161,7 @@ struct G3DPolygonDFP
   /// Current number of vertices.
   int num;
   /// Vertices that form the polygon.
-  G3DVertex vertices[100];
+  csVector2 vertices[100];
 
   /// The plane equation in camera space of this polygon.
   csPlane3 normal;
@@ -416,17 +408,6 @@ struct G3DTriangleMesh
 };
 
 /**
- * A polygon. Note that this structure is only valid if used
- * in combination with a vertex or edge table.  The vertex array then
- * contains indices in that table (either vertices or edges).
- */
-struct csPolygonDPM
-{
-  int vertices;
-  int *vertex;
-};
-
-/**
  * Structure containing all info needed by DrawPolygonMesh.
  * In theory this function is capable of:<br>
  * <ul>
@@ -438,44 +419,18 @@ struct csPolygonDPM
  */
 struct G3DPolygonMesh
 {
-  /// Number of vertices.
-  int num_vertices;
-
-  /// Number of polygons.
-  int num_polygons;
-
-  /// Pointer to array of polygons
-  csPolygonDPM* polygons;
-
-  /**
-   * Material for all polygons.  If this is NULL, each polygon has it's
-   * own material handle in the mat_handle array.
-   */
-  iMaterialHandle *master_mat_handle;
-
-  /**
-   * Pointer to an array of material handles (one for for each polygon)
-   * Only valid if master_mat_handle is NULL
-   */
-  iMaterialHandle **mat_handle;
-
-  /// Transformation matrices for the texture
-  G3DTexturePlane *plane;
-  // @@@ WARNING! The m_cam2tex and v_cam2tex fields in the above
-  // structure are to be interpreted as m_world2tex and v_world2tex
-  // instead!!! Transformation happens in 3D renderer too.
-
-  /// The plane equations in world space of this polygon.
-  csPlane3* normal;
-
-  /// Handle to lighted textures (texture + lightmap)
-  iPolygonTexture **poly_texture;
+  /// Polygon buffer.
+  iPolygonBuffer* polybuf;
 
   // Apply fogging?
   bool do_fog;
 
-  /// Do clipping tests?
-  bool do_clip;
+  /// Clip to portal? One of CS_CLIP_???.
+  int clip_portal;
+  /// Clip to near plane? One of CS_CLIP_???.
+  int clip_plane;
+  /// Clip to z plane? One of CS_CLIP_???.
+  int clip_z_plane;
 
   /// Consider polygon vertices in anti-clockwise order if true.
   bool do_mirror;
@@ -488,9 +443,6 @@ struct G3DPolygonMesh
     /// Must apply perspective.
     VM_VIEWSPACE
   } vertex_mode;
-
-  /// The mesh vertex array
-  csVector3 *vertices;
 
   /// Information for fogging the vertices.
   G3DFogInfo* vertex_fog;

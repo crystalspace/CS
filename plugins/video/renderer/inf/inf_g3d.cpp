@@ -24,11 +24,10 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/polyclip.h"
+#include "video/renderer/inf/inf_g3d.h"
+#include "video/renderer/inf/inf_txt.h"
+#include "video/renderer/common/polybuf.h"
 #include "cssys/system.h"
-#include "imesh/thing/lightmap.h"	//@@@
-#include "imesh/thing/polygon.h"	//@@@
-#include "isys/plugin.h"
-#include "isys/system.h"
 #include "iutil/cfgfile.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
@@ -328,12 +327,13 @@ void csGraphics3DInfinite::DrawPolygonMesh (G3DPolygonMesh& mesh)
   num_drawpolygon_mesh++;
   if (do_fastmesh)
   {
-    num_drawpolygon_mesh += mesh.num_polygons;
+    csPolArrayPolygonBuffer* polbuf = (csPolArrayPolygonBuffer*)mesh.polybuf;
+    num_drawpolygon_mesh += polbuf->GetPolygonCount ();
   }
   else
   {
     in_mesh = true;
-    DefaultDrawPolygonMesh (mesh, this, o2c, clipper, aspect, inv_aspect,
+    DefaultDrawPolygonMesh (mesh, this, o2c, clipper, false, aspect,
       width2, height2);
     in_mesh = false;
   }
@@ -349,13 +349,13 @@ void csGraphics3DInfinite::DrawPolygon (G3DPolygonDP& poly)
   if (do_overdraw)
   {
     int i;
-    csVector2 p1 (poly.vertices[0].sx, poly.vertices[0].sy);
-    csVector2 p2 (poly.vertices[1].sx, poly.vertices[1].sy);
+    csVector2 p1 (poly.vertices[0].x, poly.vertices[0].y);
+    csVector2 p2 (poly.vertices[1].x, poly.vertices[1].y);
     csVector2 p3;
     for (i = 2 ; i < poly.num ; i++)
     {
-      p3.x = poly.vertices[i].sx;
-      p3.y = poly.vertices[i].sy;
+      p3.x = poly.vertices[i].x;
+      p3.y = poly.vertices[i].y;
       pixels_drawn += ABS (csMath2::Area2 (p1, p2, p3) / 2);
     }
   }
@@ -371,13 +371,13 @@ void csGraphics3DInfinite::DrawPolygonFX (G3DPolygonDPFX& poly)
   if (do_overdraw)
   {
     int i;
-    csVector2 p1 (poly.vertices[0].sx, poly.vertices[0].sy);
-    csVector2 p2 (poly.vertices[1].sx, poly.vertices[1].sy);
+    csVector2 p1 (poly.vertices[0].x, poly.vertices[0].y);
+    csVector2 p2 (poly.vertices[1].x, poly.vertices[1].y);
     csVector2 p3;
     for (i = 2 ; i < poly.num ; i++)
     {
-      p3.x = poly.vertices[i].sx;
-      p3.y = poly.vertices[i].sy;
+      p3.x = poly.vertices[i].x;
+      p3.y = poly.vertices[i].y;
       pixels_drawn_fx += ABS (csMath2::Area2 (p1, p2, p3) / 2);
     }
   }

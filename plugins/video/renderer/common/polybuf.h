@@ -19,8 +19,23 @@
 #ifndef __POLYBUF_H__
 #define __POLYBUF_H__
 
+#include "csgeom/vector3.h"
+#include "csgeom/plane3.h"
+#include "csgeom/matrix3.h"
 #include "csutil/garray.h"
 #include "plugins/video/renderer/common/vbufmgr.h"
+
+class csPolArrayPolygon
+{
+public:
+  int num_vertices;
+  int* vertices;
+  csPlane3 normal;
+  csMatrix3 m_obj2tex;
+  csVector3 v_obj2tex;
+  iMaterialHandle* mat_handle;
+  iPolygonTexture* poly_texture;
+};
 
 /**
  * This implementation of csPolygonBuffer just keeps the polygons
@@ -30,9 +45,10 @@
 class csPolArrayPolygonBuffer : public csPolygonBuffer
 {
 protected:
-  CS_DECLARE_GROWING_ARRAY (num_vertices, int);
-  typedef int* intp;
-  CS_DECLARE_GROWING_ARRAY (polygons, intp);
+  CS_DECLARE_GROWING_ARRAY (polygons, csPolArrayPolygon);
+
+  csVector3* vertices;
+  int num_vertices;
 
 public:
   ///
@@ -40,8 +56,22 @@ public:
   ///
   virtual ~csPolArrayPolygonBuffer ();
 
-  virtual void AddPolygon (int* verts, int num_verts);
-  virtual void ClearPolygons ();
+  /// Get the number of polygons.
+  int GetPolygonCount () const { return polygons.Length (); }
+  /// Get the polygon info.
+  const csPolArrayPolygon& GetPolygon (int i) const { return polygons[i]; }
+  /// Get the number of vertices.
+  int GetVertexCount () const { return num_vertices; }
+  /// Get the vertices array.
+  csVector3* GetVertices () const { return vertices; }
+
+  virtual void AddPolygon (int* verts, int num_verts,
+	const csPlane3& poly_normal,
+  	iMaterialHandle* mat_handle,
+	const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
+	iPolygonTexture* poly_texture);
+  virtual void SetVertexArray (csVector3* verts, int num_verts);
+  virtual void Clear ();
 };
 
 /**

@@ -45,6 +45,7 @@
 #include "iengine/rview.h"
 #include "iengine/fview.h"
 #include "qint.h"
+#include "qsqrt.h"
 
 long csThing::current_light_frame_number = 0;
 
@@ -135,10 +136,14 @@ csThing::csThing (iBase* parent) : csObject (parent),
   thing_edges_valid = false;
   
   curves_transf_ok = false;
+
+  polybuf = NULL;
 }
 
 csThing::~csThing ()
 {
+  if (polybuf) polybuf->DecRef ();
+
   if (wor_verts == obj_verts) delete [] obj_verts;
   else { delete [] wor_verts; delete [] obj_verts; }
   delete [] cam_verts;
@@ -175,7 +180,7 @@ void csThing::ComputeThingEdgeTable ()
   if (thing_edges_valid) return;
   CleanupThingEdgeTable ();
 
-
+  //@@@
 
   thing_edges_valid = true;
 }
@@ -508,7 +513,8 @@ void csThing::BuildStaticTree (const char* name, int mode)
     if (recalc_octree)
     {
       delete static_tree;
-      static_tree = new csOctree (this, bbox.Min (), bbox.Max (), 150/*15*/, mode);
+      static_tree = new csOctree (this, bbox.Min (), bbox.Max (),
+      	150/*15*/, mode);
     }
   }
   if (recalc_octree)
@@ -546,9 +552,11 @@ csPolygon3D* csThing::NewPolygon (csMaterialWrapper* material)
 
 void csThing::AddPolygon (csPolygonInt* poly)
 {
+  if (polybuf) { polybuf->DecRef (); polybuf = NULL; }
   ((csPolygon3D *)poly)->SetParent (this);
   polygons.Push ((csPolygon3D *)poly);
   thing_edges_valid = false;
+  prepared = false;
 }
 
 csCurve* csThing::GetCurve (char* name)
@@ -905,83 +913,137 @@ void csThing::DrawPolygonArray (csPolygonInt** polygon, int num,
   }
 }
 
-void csThing::DrawPolygonArrayDPM (csPolygonInt** /*polygon*/, int /*num*/,
-	iRenderView* d, csZBufMode zMode)
+void csThing::PreparePolygonBuffer ()
 {
-  // @@@ We should include object 2 world transform here too like it
-  // happens with sprites.
+  if (polybuf) return;
+  iVertexBufferManager* vbufmgr = csEngine::current_engine->G3D
+  	->GetVertexBufferManager ();
+  polybuf = vbufmgr->CreatePolygonBuffer ();
+  polybuf->SetVertexArray (obj_verts, num_vertices);
   int i;
-  iCamera* icam = d->GetCamera ();
+  for (i = 0 ; i < polygons.Length () ; i++)
+  {
+    csPolygon3D* poly = GetPolygon3D (i);
+    csPolyTexLightMap *lmi = poly->GetLightMapInfo ();
+    // @@@ what if lmi == NULL?
+    CS_ASSERT (lmi != NULL);
+    csPolyTxtPlane* txt_plane = lmi->GetTxtPlane ();
+    csMatrix3* m_obj2tex;
+    csVector3* v_obj2tex;
+    txt_plane->GetObjectToTexture (m_obj2tex, v_obj2tex);
+    polybuf->AddPolygon (poly->GetVertexIndices (),
+      poly->GetVertexCount (), poly->GetPlane ()->GetObjectPlane (),
+      poly->GetMaterialHandle (), *m_obj2tex, *v_obj2tex,
+      lmi->GetPolyTex ());
+  }
+}
 
-  csReversibleTransform tr_o2c = icam->GetTransform ();
-  d->GetGraphics3D ()->SetObjectToCamera (&tr_o2c);
-  d->GetGraphics3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zMode);
+void csThing::GetTransformedBoundingBox (
+	const csReversibleTransform& trans, csBox3& cbox)
+{
+//@@@@@@@@@@@@@@
+// @@@ Shouldn't we try to cache this depending on camera/movable number?
+// Similar to what happens in csSprite3D.
+
+  csBox3 box;
+  GetBoundingBox (box);
+  cbox.StartBoundingBox (trans * box.GetCorner (0));
+  cbox.AddBoundingVertexSmart (trans * box.GetCorner (1));
+  cbox.AddBoundingVertexSmart (trans * box.GetCorner (2));
+  cbox.AddBoundingVertexSmart (trans * box.GetCorner (3));
+  cbox.AddBoundingVertexSmart (trans * box.GetCorner (4));
+  cbox.AddBoundingVertexSmart (trans * box.GetCorner (5));
+  cbox.AddBoundingVertexSmart (trans * box.GetCorner (6));
+  cbox.AddBoundingVertexSmart (trans * box.GetCorner (7));
+}
+
+static void Perspective (const csVector3& v, csVector2& p, float fov,
+    	float sx, float sy)
+{
+  float iz = fov / v.z;
+  p.x = v.x * iz + sx;
+  p.y = v.y * iz + sy;
+}
+
+float csThing::GetScreenBoundingBox (
+	float fov, float sx, float sy,
+	const csReversibleTransform& trans, csBox2& sbox, csBox3& cbox)
+{
+  csVector2 oneCorner;
+
+  GetTransformedBoundingBox (trans, cbox);
+
+  // if the entire bounding box is behind the camera, we're done
+  if ((cbox.MinZ () < 0) && (cbox.MaxZ () < 0))
+  {
+    return -1;
+  }
+
+  // Transform from camera to screen space.
+  if (cbox.MinZ () <= 0)
+  {
+    // Sprite is very close to camera.
+    // Just return a maximum bounding box.
+    sbox.Set (-10000, -10000, 10000, 10000);
+  }
+  else
+  {
+    Perspective (cbox.Max (), oneCorner, fov, sx, sy);
+    sbox.StartBoundingBox (oneCorner);
+    csVector3 v (cbox.MinX (), cbox.MinY (), cbox.MaxZ ());
+    Perspective (v, oneCorner, fov, sx, sy);
+    sbox.AddBoundingVertexSmart (oneCorner);
+    Perspective (cbox.Min (), oneCorner, fov, sx, sy);
+    sbox.AddBoundingVertexSmart (oneCorner);
+    v.Set (cbox.MaxX (), cbox.MaxY (), cbox.MinZ ());
+    Perspective (v, oneCorner, fov, sx, sy);
+    sbox.AddBoundingVertexSmart (oneCorner);
+  }
+
+  return cbox.MaxZ ();
+}
+
+void csThing::DrawPolygonArrayDPM (csPolygonInt** /*polygon*/, int /*num*/,
+	iRenderView* rview, iMovable* movable, csZBufMode zMode)
+{
+  PreparePolygonBuffer ();
+
+  iCamera* icam = rview->GetCamera ();
+  csReversibleTransform tr_o2c = icam->GetTransform () *
+  	movable->GetFullTransform ().GetInverse ();
 
   G3DPolygonMesh mesh;
-  mesh.num_vertices = GetVertexCount ();
-  mesh.num_polygons = GetPolygonCount ();
-  mesh.master_mat_handle = NULL;
-  // @@@ It would be nice if we could avoid this allocate.
-  // Even nicer would be if we didn't have to copy the data
-  // to this structure every time. Maybe hold this array native
-  // in every detail object?
-  // IMPORTANT OPT!!! CACHE THIS ARRAY IN EACH ENTITY!
-  mesh.polygons = new csPolygonDPM [GetPolygonCount ()];
-  mesh.mat_handle = new iMaterialHandle* [GetPolygonCount ()];
-  mesh.normal = new csPlane3 [GetPolygonCount ()];
-  mesh.plane = new G3DTexturePlane [GetPolygonCount ()];
-  mesh.poly_texture = new iPolygonTexture* [GetPolygonCount ()];
+  csBox2 bbox;
+  csBox3 bbox3;
+  if (GetScreenBoundingBox (
+	icam->GetFOV (), icam->GetShiftX (), icam->GetShiftY (),
+	tr_o2c, bbox, bbox3) < 0)
+    return;	// Not visible.
+
+  if (!rview->ClipBBox (bbox, bbox3, mesh.clip_portal,
+  	mesh.clip_plane, mesh.clip_z_plane))
+    return;	// Not visible.
+
+  int i;
+
+  rview->GetGraphics3D ()->SetObjectToCamera (&tr_o2c);
+  rview->GetGraphics3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zMode);
+
+  mesh.polybuf = polybuf;
   for (i = 0 ; i < GetPolygonCount () ; i++)
   {
     csPolygon3D* p = GetPolygon3D (i);
-
-    // Vertices.
-    int num_v = p->GetVertexCount ();
-    mesh.polygons[i].vertices = num_v;
-    mesh.polygons[i].vertex = p->GetVertexIndices ();
-
-    // Other info.
-    // @@@ ONLY lightmapped polygons right now.
-    // This function needs support for DrawTriangleMesh if gouraud
-    // shaded polygons are used.
-    csPolyTexLightMap *lmi = p->GetLightMapInfo ();
-    if (!lmi)
-    {
-      printf ("INTERNAL ERROR! Don't use gouraud shaded polygons on DETAIL objects right now!\n");
-      goto cleanup;
-    }
     p->GetMaterialWrapper ()->Visit ();
-    mesh.mat_handle[i] = p->GetMaterialHandle ();
-
-    csPolyTxtPlane* txt_plane = lmi->GetTxtPlane ();
-    csMatrix3* m_wor2tex;
-    csVector3* v_wor2tex;
-    txt_plane->GetWorldToTexture (m_wor2tex, v_wor2tex);
-    mesh.plane[i].m_cam2tex = m_wor2tex;	// @@@ WRONG NAME
-    mesh.plane[i].v_cam2tex = v_wor2tex;
-    mesh.normal[i] = p->GetPlane ()->GetWorldPlane ();
-    mesh.poly_texture[i] = lmi->GetPolyTex ();
   }
 
   mesh.do_fog = false;
-  mesh.do_clip = false;
   mesh.do_mirror = icam->IsMirrored ();
   mesh.vertex_mode = G3DPolygonMesh::VM_WORLDSPACE;
-  mesh.vertices = wor_verts;
   mesh.vertex_fog = NULL;
 
-  // @@@ FAR plane not yet supported here!
   // @@@ fog not supported yet.
-  // @@@ clipping not supported yet.
 
-  d->GetGraphics3D ()->DrawPolygonMesh (mesh);
-
-cleanup:
-  delete [] mesh.polygons;
-  delete [] mesh.mat_handle;
-  delete [] mesh.plane;
-  delete [] mesh.normal;
-  delete [] mesh.poly_texture;
+  rview->GetGraphics3D ()->DrawPolygonMesh (mesh);
 }
 
 void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
@@ -1247,10 +1309,7 @@ void csThing::CreateBoundingBox ()
 void csThing::GetRadius (csVector3& rad, csVector3& cent)
 {
   csBox3 b;
-  if (!obj_bbox_valid)
-  {
-    GetBoundingBox (b);
-  }
+  GetBoundingBox (b);
   rad = obj_radius;
   cent = b.GetCenter();
 }
@@ -1315,6 +1374,8 @@ void csThing::GetBoundingBox (csBox3& box)
   obj_bbox.Set (min_bbox, max_bbox);
   box = obj_bbox;
   obj_radius = (max_bbox - min_bbox) * 0.5f;
+  max_obj_radius = qsqrt (csSquaredDist::PointPoint (max_bbox, min_bbox))
+  	* 0.5f;
 }
 
 void csThing::GetBoundingBox (iMovable* movable, csBox3& box)
@@ -1571,19 +1632,56 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
   return true;//@@@ RETURN correct vis info
 }
 
-bool csThing::Draw (iRenderView* rview, iMovable* movable, csZBufMode zMode)
+bool csThing::DrawTest (iRenderView* rview, iMovable* movable)
 {
-  if (flags.Check (CS_ENTITY_INVISIBLE)) return false;
-  if (flags.Check (CS_ENTITY_CAMERA))
+  Prepare ();
+
+  iCamera* icam = rview->GetCamera ();
+  const csReversibleTransform& camtrans = icam->GetTransform ();
+  // Only get the transformation if this thing can move.
+  bool can_move = false;
+  if (movable && cfg_moving != CS_THING_MOVE_NEVER)
   {
-    csOrthoTransform& trans = rview->GetCamera ()->GetTransform ();
-    csVector3 old = trans.GetO2TTranslation ();
-    trans.SetO2TTranslation (csVector3 (0));
-    bool rc = DrawInt (rview, movable, zMode);
-    trans.SetO2TTranslation (old);
-    return rc;
+    can_move = true;
   }
-  else return DrawInt (rview, movable, zMode);
+
+  //@@@ Ok?
+  cached_movable = movable;
+  WorUpdate ();
+
+  csBox3 b;
+  GetBoundingBox (b);
+  csVector3 center = b.GetCenter();
+  float maxradius = max_obj_radius;
+  if (can_move)
+    center = movable->GetFullTransform ().This2Other (center);
+  center = camtrans.Other2This (center);
+  if (center.z+maxradius < 0) return false;
+
+  //-----
+  // If the camera location (origin in camera space) is inside the
+  // bounding sphere then the object is certainly visible.
+  //-----
+  if (ABS (center.x) <= maxradius &&
+      ABS (center.y) <= maxradius &&
+      ABS (center.z) <= maxradius)
+    return true;
+
+  //-----
+  // Also do frustum checking.
+  //-----
+  float lx, rx, ty, by;
+  rview->GetFrustum (lx, rx, ty, by);
+  lx *= center.z;
+  if (center.x+maxradius < lx) return false;
+  rx *= center.z;
+  if (center.x-maxradius > rx) return false;
+  ty *= center.z;
+  if (center.y+maxradius < ty) return false;
+  by *= center.z;
+  if (center.y-maxradius > by) return false;
+
+  return true;
 }
 
 static int count_cull_node_notvis_behind;
@@ -1813,24 +1911,10 @@ void* csThing::DrawPolygons (csThing* /*thing*/,
   return NULL;
 }
 
-bool csThing::DrawInt (iRenderView* rview, iMovable* movable, csZBufMode zMode)
+bool csThing::Draw (iRenderView* rview, iMovable* movable, csZBufMode zMode)
 {
-  Prepare ();
-
   iCamera* icam = rview->GetCamera ();
   const csReversibleTransform& camtrans = icam->GetTransform ();
-  csReversibleTransform movtrans;
-  // Only get the transformation if this thing can move.
-  bool can_move = false;
-  if (movable && cfg_moving != CS_THING_MOVE_NEVER)
-  {
-    movtrans = movable->GetFullTransform ();
-    can_move = true;
-  }
-
-  //@@@ Ok?
-  cached_movable = movable;
-  WorUpdate ();
 
   draw_busy++;
 
@@ -1884,29 +1968,9 @@ bool csThing::DrawInt (iRenderView* rview, iMovable* movable, csZBufMode zMode)
 
     DrawCurves (rview, movable, zMode);
 
-    int res=1;
-
-    // Calculate tesselation resolution
-    // TODO should depend on a point in space, and a scale param in place of 40
-    if (num_vertices>0)
-    {
-      csVector3 wv = wor_verts[0];
-      csVector3 world_coord;
-      if (can_move) world_coord = movtrans.This2Other (wv);
-      else world_coord = wv;
-      csVector3 camera_coord = camtrans.Other2This (world_coord);
-  
-      if (camera_coord.z > 0.0001)
-      {
-        res=(int)(40.0/camera_coord.z);
-        if (res<1) res=1;
-        else if (res>9) res=9;
-      }
-    }
-
-    if (flags.Check (CS_ENTITY_DETAIL))
+    if (flags.Check (CS_THING_FASTMESH))
       DrawPolygonArrayDPM (polygons.GetArray (), polygons.Length (), rview,
-      	zMode);
+      	movable, zMode);
     else
       DrawPolygonArray (polygons.GetArray (), polygons.Length (), rview,
       	zMode);

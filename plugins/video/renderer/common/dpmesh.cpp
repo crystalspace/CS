@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -24,6 +24,7 @@
 #include "csgeom/math3d.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/polyclip.h"
+#include "plugins/video/renderer/common/polybuf.h"
 
 //------------------------------------------------------------------------
 // Everything for mesh drawing.
@@ -40,38 +41,37 @@ static CS_DECLARE_GROWING_ARRAY (persp, csVector2);
 static CS_DECLARE_GROWING_ARRAY (visible, bool);
 
 /*
- * [01:00:34] <Jorrit> 1. Transform the vertices from world to camera space.
- * [01:00:40] <Jorrit> 2. Perspective project them.
- * [01:00:48] <Jorrit> 3. Call DrawPolygon for every polygon.
- *
- * [01:31:23] <Jorrit> As to the transform. Every graphics3D implementation holds a o2c transform.
- * [01:31:27] <Jorrit> (object to camera).
- * [01:31:47] <Jorrit> See how the soft_g3d.h DrawTriangleMesh gives o2c to DefaultDrawTriangleMesh.
- * [01:31:57] <Jorrit> You also need to give the clipper and so on.
- * [01:32:00] <link> ah I see
- * [01:32:08] <Jorrit> (initially you can ignore the clipper but you'll have to support it in the end).
+ * Default implementation of DrawPolygonMesh which works with polygon
+ * buffers that are equal to csPolArrayPolygonBuffer.
+ * If 'clipper' == NULL then no clipping will happen.
+ * If 'lazyclip' == true then only a lazy clip will happen (currently
+ * not supported).
  */
 void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
-	csReversibleTransform &o2c,
-	iClipper2D * /*clipper*/, float aspect, float /*inv_aspect*/,
+	const csReversibleTransform& o2c,
+	iClipper2D* clipper, bool lazyclip, float aspect,
 	int width2, int height2)
 {
+  csPolArrayPolygonBuffer* polbuf = (csPolArrayPolygonBuffer*)mesh.polybuf;
+  int num_vertices = polbuf->GetVertexCount ();
+  int num_polygons = polbuf->GetPolygonCount ();
+
   // Update work arrays
-  if (mesh.num_vertices > tr_verts.Limit ())
+  if (num_vertices > tr_verts.Limit ())
   {
-    tr_verts.SetLimit (mesh.num_vertices);
-    persp.SetLimit (mesh.num_vertices);
-    visible.SetLimit (mesh.num_vertices);
+    tr_verts.SetLimit (num_vertices);
+    persp.SetLimit (num_vertices);
+    visible.SetLimit (num_vertices);
   }
 
-  csVector3 *f1 = mesh.vertices;
+  csVector3 *f1 = polbuf->GetVertices ();
   csVector3 *work_verts;
   int i;
 
   // Perform vertex transforms if necessary
   if (mesh.vertex_mode == G3DPolygonMesh::VM_WORLDSPACE)
   {
-    for (i = 0 ; i < mesh.num_vertices ; i++)
+    for (i = 0 ; i < num_vertices ; i++)
       tr_verts[i] = o2c * f1[i];
     work_verts = tr_verts.GetArray();
   }
@@ -79,7 +79,7 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
     work_verts = f1;
 
   // Perspective project the vertices
-  for (i = 0 ; i < mesh.num_vertices ; i++)
+  for (i = 0 ; i < num_vertices ; i++)
   {
     if (work_verts[i].z >= SMALL_Z)
     {
@@ -99,42 +99,54 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
   poly.use_fog = mesh.do_fog;
   poly.plane.m_cam2tex = &m_cam2tex;
   poly.plane.v_cam2tex = &v_cam2tex;
-  if (mesh.master_mat_handle)
-    poly.mat_handle = mesh.master_mat_handle;
-# ifdef DO_HW_UVZ
-  //csVector3* uvz; @@@ Where do I get this?
-  poly.mirror = mesh.do_mirror;
-# endif
 
   // @@@ We need to restructure a bit here to avoid
   // unneeded copy of data.
-  for (i = 0 ; i < mesh.num_polygons ; i++)
+  for (i = 0 ; i < num_polygons ; i++)
   {
-    poly.num = mesh.polygons[i].vertices;
-    if (!mesh.master_mat_handle)
-      poly.mat_handle = mesh.mat_handle[i];
+    const csPolArrayPolygon& pol = polbuf->GetPolygon (i);
+    poly.num = pol.num_vertices;
+    poly.mat_handle = pol.mat_handle;
     
-    // Transform world to texture transform to
+    // Transform object to texture transform to
     // camera to texture transformation here.
-    m_cam2tex = *mesh.plane[i].m_cam2tex;	// (contents in mesh is really world space plane)
-    m_cam2tex *= o2c.GetT2O ();
-    v_cam2tex = o2c.Other2This (*mesh.plane[i].v_cam2tex);
+    m_cam2tex = pol.m_obj2tex * o2c.GetT2O ();
+    v_cam2tex = o2c.Other2This (pol.v_obj2tex);
 
-    poly.poly_texture = mesh.poly_texture[i];
+    poly.poly_texture = pol.poly_texture;
     int j;
     // @@@ Support mirror here.
     // @@@ Check for visibility of three vertices.
     for (j = 0 ; j < poly.num ; j++)
     {
-      int vidx = mesh.polygons[i].vertex[j];
-      poly.vertices[j].sx = persp[vidx].x;
-      poly.vertices[j].sy = persp[vidx].y;
+      int vidx = pol.vertices[j];
+      poly.vertices[j].x = persp[vidx].x;
+      poly.vertices[j].y = persp[vidx].y;
       if (mesh.vertex_fog)
         poly.fog_info[j] = mesh.vertex_fog[vidx];
     }
-    csVector3& vertex0 = work_verts[mesh.polygons[i].vertex[0]];
+
+    // Clip polygon. Note that the clipper doesn't care about the
+    // orientation of the polygon vertices. It works just as well in
+    // mirrored mode.
+    if (clipper)
+    {
+      csVector2 clipped_poly[100];
+      int clipped_num;
+      UByte clip_result = clipper->Clip (poly.vertices, poly.num,
+      	clipped_poly, clipped_num);
+      if (clip_result == CS_CLIP_OUTSIDE) continue;
+      if (clip_result != CS_CLIP_INSIDE)
+      {
+        // We need to copy the clipped polygon.
+	memcpy (poly.vertices, clipped_poly, sizeof (csVector2)*2*clipped_num);
+        poly.num = clipped_num;
+      }
+    }
+
+    csVector3& vertex0 = work_verts[pol.vertices[0]];
     poly.z_value = vertex0.z;
-    o2c.Other2This (mesh.normal[i], vertex0, poly.normal);
+    o2c.Other2This (pol.normal, vertex0, poly.normal);
 
     // Draw the polygon
     piG3D->DrawPolygon (poly);

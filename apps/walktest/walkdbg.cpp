@@ -218,8 +218,8 @@ void DrawDebugBoxSide (csCamera* cam, bool do3d,
     if (persp.y <= 0) persp.y = 1;
     if (persp.y > FRAME_HEIGHT) persp.y = FRAME_HEIGHT-1;
   }
-  poly.vertices[0].sx = persp.x;
-  poly.vertices[0].sy = persp.y;
+  poly.vertices[0].x = persp.x;
+  poly.vertices[0].y = persp.y;
   poly.vertices[0].z = 1./v.z;
   poly.vertices[0].u = 0;
   poly.vertices[0].v = 0;
@@ -236,8 +236,8 @@ void DrawDebugBoxSide (csCamera* cam, bool do3d,
     if (persp.y <= 0) persp.y = 1;
     if (persp.y > FRAME_HEIGHT) persp.y = FRAME_HEIGHT-1;
   }
-  poly.vertices[1].sx = persp.x;
-  poly.vertices[1].sy = persp.y;
+  poly.vertices[1].x = persp.x;
+  poly.vertices[1].y = persp.y;
   poly.vertices[1].z = 1./v.z;
   poly.vertices[1].u = 1;
   poly.vertices[1].v = 0;
@@ -254,8 +254,8 @@ void DrawDebugBoxSide (csCamera* cam, bool do3d,
     if (persp.y <= 0) persp.y = 1;
     if (persp.y > FRAME_HEIGHT) persp.y = FRAME_HEIGHT-1;
   }
-  poly.vertices[2].sx = persp.x;
-  poly.vertices[2].sy = persp.y;
+  poly.vertices[2].x = persp.x;
+  poly.vertices[2].y = persp.y;
   poly.vertices[2].z = 1./v.z;
   poly.vertices[2].u = 1;
   poly.vertices[2].v = 1;
@@ -272,8 +272,8 @@ void DrawDebugBoxSide (csCamera* cam, bool do3d,
     if (persp.y <= 0) persp.y = 1;
     if (persp.y > FRAME_HEIGHT) persp.y = FRAME_HEIGHT-1;
   }
-  poly.vertices[3].sx = persp.x;
-  poly.vertices[3].sy = persp.y;
+  poly.vertices[3].x = persp.x;
+  poly.vertices[3].y = persp.y;
   poly.vertices[3].z = 1./v.z;
   poly.vertices[3].u = 0;
   poly.vertices[3].v = 1;
@@ -291,10 +291,10 @@ void DrawDebugBoxSide (csCamera* cam, bool do3d,
   {
     iTextureManager* txtmgr = Gfx3D->GetTextureManager ();
     int color = txtmgr->FindRGB (QInt (255.*c1.red*2), 0, QInt (255.*c1.blue*2));
-    Gfx2D->DrawLine (poly.vertices[0].sx, FRAME_HEIGHT-poly.vertices[0].sy, poly.vertices[1].sx, FRAME_HEIGHT-poly.vertices[1].sy, color);
-    Gfx2D->DrawLine (poly.vertices[1].sx, FRAME_HEIGHT-poly.vertices[1].sy, poly.vertices[2].sx, FRAME_HEIGHT-poly.vertices[2].sy, color);
-    Gfx2D->DrawLine (poly.vertices[2].sx, FRAME_HEIGHT-poly.vertices[2].sy, poly.vertices[3].sx, FRAME_HEIGHT-poly.vertices[3].sy, color);
-    Gfx2D->DrawLine (poly.vertices[3].sx, FRAME_HEIGHT-poly.vertices[3].sy, poly.vertices[0].sx, FRAME_HEIGHT-poly.vertices[0].sy, color);
+    Gfx2D->DrawLine (poly.vertices[0].x, FRAME_HEIGHT-poly.vertices[0].y, poly.vertices[1].x, FRAME_HEIGHT-poly.vertices[1].y, color);
+    Gfx2D->DrawLine (poly.vertices[1].x, FRAME_HEIGHT-poly.vertices[1].y, poly.vertices[2].x, FRAME_HEIGHT-poly.vertices[2].y, color);
+    Gfx2D->DrawLine (poly.vertices[2].x, FRAME_HEIGHT-poly.vertices[2].y, poly.vertices[3].x, FRAME_HEIGHT-poly.vertices[3].y, color);
+    Gfx2D->DrawLine (poly.vertices[3].x, FRAME_HEIGHT-poly.vertices[3].y, poly.vertices[0].x, FRAME_HEIGHT-poly.vertices[0].y, color);
   }
 }
 

@@ -300,10 +300,10 @@ void csGraphics3DLine::DrawPolygon (G3DPolygonDP& poly)
   for (i = 0 ; i < poly.num ; i++)
   {
     G2D->DrawLine (
-      poly.vertices[i].sx,
-      height-poly.vertices[i].sy,
-      poly.vertices[(i+1)%poly.num].sx,
-      height-poly.vertices[(i+1)%poly.num].sy,
+      poly.vertices[i].x,
+      height-poly.vertices[i].y,
+      poly.vertices[(i+1)%poly.num].x,
+      height-poly.vertices[(i+1)%poly.num].y,
       color);
   }
 }
@@ -332,10 +332,10 @@ void csGraphics3DLine::DrawPolygonFX (G3DPolygonDPFX& poly)
   for (i = 0 ; i < poly.num ; i++)
   {
     G2D->DrawLine (
-      poly.vertices[i].sx,
-      height-poly.vertices[i].sy,
-      poly.vertices[(i+1)%poly.num].sx,
-      height-poly.vertices[(i+1)%poly.num].sy,
+      poly.vertices[i].x,
+      height-poly.vertices[i].y,
+      poly.vertices[(i+1)%poly.num].x,
+      height-poly.vertices[(i+1)%poly.num].y,
       color);
   }
 }

@@ -25,10 +25,9 @@ struct iClipper2D;
 void DefaultDrawPolygonMesh (
   G3DPolygonMesh& mesh,
   iGraphics3D* g3d,
-  csReversibleTransform& o2c,
-  iClipper2D* clipper,
+  const csReversibleTransform& o2c,
+  iClipper2D* clipper, bool lazyclip,
   float aspect,
-  float inv_aspect,
   int width2,
   int height2);
 

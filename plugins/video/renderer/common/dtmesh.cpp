@@ -86,8 +86,8 @@ static void G3DPreparePolygonFX (G3DPolygonDPFX* g3dpoly,
   float t;
   for (i = 0 ; i < num_vertices ; i++)
   {
-    g3dpoly->vertices[i].sx = clipped_verts[i].x;
-    g3dpoly->vertices[i].sy = clipped_verts[i].y;
+    g3dpoly->vertices[i].x = clipped_verts[i].x;
+    g3dpoly->vertices[i].y = clipped_verts[i].y;
     switch (clipped_vtstats[i].Type)
     {
       case CS_VERTEX_ORIGINAL:
@@ -204,8 +204,7 @@ static void DrawTriangle (
 	float* z_verts,
 	csVector2* uv_verts,
 	csColor* colors,
-	G3DFogInfo* fog,
-	bool do_clip)
+	G3DFogInfo* fog)
 {
   // The triangle in question
   csVector2 triangle[3];
@@ -239,7 +238,7 @@ static void DrawTriangle (
   // orientation of the triangle vertices. It works just as well in
   // mirrored mode.
   int rescount = 0;
-  if (do_clip)
+  if (clipper)
   {
     clip_result = clipper->Clip (triangle, 3, clipped_triangle, rescount,
 		  clipped_vtstats);
@@ -272,18 +271,18 @@ static void DrawTriangle (
 		(csVector2 *)triangle, poly.use_fog, colors != NULL);
   else
   {
-    poly.vertices [0].sx = triangle [0].x;
-    poly.vertices [0].sy = triangle [0].y;
-    poly.vertices [1].sx = triangle [1].x;
-    poly.vertices [1].sy = triangle [1].y;
-    poly.vertices [2].sx = triangle [2].x;
-    poly.vertices [2].sy = triangle [2].y;
+    poly.vertices [0].x = triangle [0].x;
+    poly.vertices [0].y = triangle [0].y;
+    poly.vertices [1].x = triangle [1].x;
+    poly.vertices [1].y = triangle [1].y;
+    poly.vertices [2].x = triangle [2].x;
+    poly.vertices [2].y = triangle [2].y;
   }
   g3d->DrawPolygonFX (poly);
 }
 
 void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
-  csReversibleTransform& o2c, iClipper2D* clipper, int cliptype, float aspect,
+  csReversibleTransform& o2c, iClipper2D* clipper, bool lazyclip, float aspect,
   int width2, int height2)
 {
   int i;
@@ -414,8 +413,6 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
       poly.flat_color_g, poly.flat_color_b);
 
   poly.use_fog = mesh.do_fog;
-  bool do_clip = false;
-  if (clipper && mesh.clip_portal >= CS_CLIP_NEEDED) do_clip = true;
 
   // Draw all triangles.
   csTriangle* triangles = mesh.triangles;
@@ -434,15 +431,16 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
       //=====
       continue;
     }
-    else if (cnt_vis == 3)
+    else if (cnt_vis == 3 || lazyclip)
     {
       //=====
-      // Another easy case: all vertices are visible.
+      // Another easy case: all vertices are visible or we are using
+      // lazy clipping in which case we draw the triangle completely.
       //=====
       int trivert [3] = { a, b, c };
       DrawTriangle (g3d, clipper, mesh, poly,
       	persp[a], persp[b], persp[c], trivert,
-	z_verts.GetArray (), work_uv_verts, work_col, mesh.vertex_fog, do_clip);
+	z_verts.GetArray (), work_uv_verts, work_col, mesh.vertex_fog);
     }
     else if (cnt_vis == 1)
     {
@@ -542,7 +540,7 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
       int trivert [3] = { 0, 1, 2 };
       DrawTriangle (g3d, clipper, mesh, poly,
       	pa, pb, pc, trivert,
-	zv, uv, work_col ? col : NULL, fog, do_clip);
+	zv, uv, work_col ? col : NULL, fog);
     }
     else
     {
@@ -622,11 +620,11 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
       int trivert1[3] = { 0, 1, 2 };
       DrawTriangle (g3d, clipper, mesh, poly,
       	pa, pb, pc, trivert1,
-	zv, uv, work_col ? col : NULL, fog, do_clip);
+	zv, uv, work_col ? col : NULL, fog);
       int trivert2[3] = { 0, 2, 3 };
       DrawTriangle (g3d, clipper, mesh, poly,
       	pa, pc, pd, trivert2,
-	zv, uv, work_col ? col : NULL, fog, do_clip);
+	zv, uv, work_col ? col : NULL, fog);
     }
   }
 }
