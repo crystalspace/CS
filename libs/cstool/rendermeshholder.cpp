@@ -23,56 +23,26 @@
 #include "cstool/rendermeshholder.h"
 #include "ivideo/rendermesh.h"
 
-csRenderMeshHolderSingle::csRenderMeshHolderSingle ()
+csRenderMeshHolderSingle::csRenderMeshPtr::csRenderMeshPtr()
 {
-  lastMesh = 0;
-  nextShrink = 0;
+  ptr = new csRenderMesh;
 }
 
-csRenderMeshHolderSingle::~csRenderMeshHolderSingle ()
+csRenderMeshHolderSingle::csRenderMeshPtr::csRenderMeshPtr (
+  csRenderMeshPtr const& other)
 {
-  while (meshes.Length () > 0)
-  {
-    csRenderMesh *mesh = meshes.Pop ();
-    delete mesh;
-  }
+  ptr = new csRenderMesh (*other.ptr);
+}
+
+csRenderMeshHolderSingle::csRenderMeshPtr::~csRenderMeshPtr()
+{
+  delete ptr;
 }
 
 csRenderMesh*& csRenderMeshHolderSingle::GetUnusedMesh (bool& created,
 							uint frameNumber)
 {
-  created = false;
-  if ((meshes.Length() == 0) || 
-    (meshes[lastMesh]->lastFrame == frameNumber))
-  {
-    lastMesh = (size_t)-1;
-    //check the list
-    size_t i;
-    for(i = 0; i<meshes.Length (); i++)
-    {
-      if (meshes[i]->lastFrame != frameNumber)
-      {
-        lastMesh = i;
-        break;
-      }
-    }
-    if (lastMesh == (size_t)-1)
-    {
-      lastMesh = meshes.Push (new csRenderMesh);
-      created = true;
-      nextShrink = frameNumber + 1;
-    }
-  }
-
-  // Conserve some memory
-  if (!created && (frameNumber <= nextShrink))
-  {
-    meshes.ShrinkBestFit ();
-  }
-
-  csRenderMesh*& mesh = meshes[lastMesh];
-  mesh->lastFrame = frameNumber;
-  return mesh;
+  return meshes.GetUnusedData (created, frameNumber).ptr;
 }
 
 //---------------------------------------------------------------------------

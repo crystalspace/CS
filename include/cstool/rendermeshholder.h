@@ -30,24 +30,29 @@
 #include "csutil/blockallocator.h"
 #include "csutil/garray.h"
 
+#include "framedataholder.h"
+
 struct csRenderMesh;
 
 /**
  * Helper class to retrieve an unused csRenderMesh.
- * Manages a list of csRenderMesh structures and returns one which has its
- * \a inUse member set to false.
+ * \remark Uses csFrameDataHolder internally. See it's documentation for some
+ *  additional information.
  */
 class CS_CSTOOL_EXPORT csRenderMeshHolderSingle
 {
-  csArray<csRenderMesh*> meshes;
-  size_t lastMesh;
-  uint nextShrink;
-public:
-  csRenderMeshHolderSingle ();
-  ~csRenderMeshHolderSingle ();
+  struct csRenderMeshPtr
+  {
+    csRenderMesh* ptr;
 
+    csRenderMeshPtr ();
+    csRenderMeshPtr (csRenderMeshPtr const& other);
+    ~csRenderMeshPtr ();
+  };
+  csFrameDataHolder<csRenderMeshPtr> meshes;
+public:
   /**
-   * Retrieve a csRenderMesh whose \a inUse member is set to false.
+   * Retrieve a csRenderMesh which was not yet used this frame.
    * \param created \a True if a new csRenderMesh was allocated, \a False
    *  if one was reused. Can be used to determine whether all or only a
    *  subset of the csRenderMesh values have to be initialized.

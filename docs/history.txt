@@ -12,6 +12,19 @@ chronological order.
 	- Jorrit fixed a crash bug in walktest/flarge when you tried to jump
 	  on the car.
 	- Jorrit added some leak guards.
+	- res made the following changes:
+	    - Added some documentation for csFrameDataHolder<>.
+	    - Added a Construct() variant to csArrayElementHandler to 
+	      initialize elements with the default constructor. So when
+	      InitRegion() is called, instead of calling the default ctor one
+	      time and the copy ctor for every element in the region, only the
+	      default ctor is called for every element.
+	    - Changed csRenderMeshHolderSingle to utilize csFrameDataHolder<>.
+	    - Fixed the Haze mesh to work with NR.
+	    - Added an assertion to 
+	      csSectorVisibleMeshCallback::ObjectVisible() to catch cases 
+	      where a mesh reports a render mesh count != 0 but returns a 0
+	      pointer to the meshes.
 23-Aug-2004
 	- Jorrit added lots more leak guards.
 	- Jorrit fixed a leak in xmlshader where a failing technique was

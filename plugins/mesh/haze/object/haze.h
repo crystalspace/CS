@@ -25,6 +25,7 @@
 #include "csutil/cscolor.h"
 #include "csutil/parray.h"
 #include "csutil/refarr.h"
+#include "cstool/rendermeshholder.h"
 #include "imesh/object.h"
 #include "imesh/haze.h"
 #include "imesh/particle.h"
@@ -36,6 +37,7 @@
 struct iMaterialWrapper;
 struct iCamera;
 class csHazeMeshObjectFactory;
+class csHazeMeshObjectType;
 
 /**
  * haze layer
@@ -221,6 +223,19 @@ private:
   /// vector of csHazeLayer
   csPDelArray<csHazeLayer> layers;
 
+  csRenderMeshHolderSingle rmHolder;
+
+  struct HazeRenderBuffer
+  {
+    size_t count;
+    csRef<iRenderBuffer> buffer;
+
+    HazeRenderBuffer() : count(0) { }
+  };
+  csFrameDataHolder<HazeRenderBuffer> renderBuffers;
+  csFrameDataHolder<HazeRenderBuffer> indexBuffers;
+  static csStringID vertex_name, texel_name, index_name;
+
   /**
    * Setup this object. This function will check if setup is needed.
    */
@@ -265,10 +280,11 @@ public:
   void ComputeHullOutline(iHazeHull *hull, float layer_scale,
     const csVector3& campos, csReversibleTransform& tr_o2c, float fov,
     float shx, float shy, int &layer_num, int *& layer_poly,
-    csVector3 *& layer_pts, csVector2 *&layer_uvs);
+    csVector3 *& layer_pts, csVector3** cam_pts, csVector2 *&layer_uvs);
   /** project a vertice in object space to screenspace */
   void ProjectO2S(csReversibleTransform& tr_o2c, float fov, float shiftx,
-    float shifty, const csVector3& objpos, csVector3& scrpos);
+    float shifty, const csVector3& objpos, csVector3& scrpos, 
+    csVector3* campos);
   /** recursively draw a polygon - type 0=center 1,2 is rim, with
     alternative interpolation.
     quality is the minimal cos of the angle.
@@ -294,8 +310,11 @@ public:
   virtual csPtr<iMeshObject> Clone () { return 0; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable,
   	uint32 frustum_mask);
+  void GenGeometryAdapt (iRenderView *rview, iGraphics3D *g3d, 
+    int num_sides, csVector3* scrpts, csVector3* campts, csVector2* uvs,
+    float layer_scale, float quality, int depth, int maxdepth);
   virtual csRenderMesh **GetRenderMeshes (int &n, iRenderView*, 
-    iMovable*, uint32) { n = 0; return 0; }
+    iMovable*, uint32);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
@@ -398,10 +417,11 @@ private:
   iBase* logparent;
   iMeshObjectType* haze_type;
   csFlags flags;
-
 public:
+  iObjectRegistry* object_reg;
+
   /// Constructor.
-  csHazeMeshObjectFactory (iMeshObjectType *pParent);
+  csHazeMeshObjectFactory (csHazeMeshObjectType* pParent);
 
   /// Destructor.
   virtual ~csHazeMeshObjectFactory ();
@@ -489,6 +509,7 @@ public:
 class csHazeMeshObjectType : public iMeshObjectType
 {
 public:
+  iObjectRegistry* object_reg;
   SCF_DECLARE_IBASE;
 
   /// Constructor.
@@ -501,7 +522,8 @@ public:
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csHazeMeshObjectType);
-    virtual bool Initialize (iObjectRegistry*) { return true; }
+    virtual bool Initialize (iObjectRegistry* object_reg) 
+    { scfParent->object_reg = object_reg; return true; }
   } scfiComponent;
 };
 

@@ -20,6 +20,19 @@
 #ifndef __CS_CSTOOL_FRAMEDATAHOLDER_H__
 #define __CS_CSTOOL_FRAMEDATAHOLDER_H__
 
+/**\file
+ * Helper template to retrieve an instance of some type that has not yet been
+ * used in a frame.
+ */
+
+#include "csutil/array.h"
+
+/**
+ * Helper template to retrieve an instance of some type that has not yet been
+ * used in a frame. Retrieval in subsequent frames will reuse already created 
+ * instances, if appropriate (that is, the associated frame number differs from
+ * the provide current frame number).
+ */
 template <class T>
 class csFrameDataHolder
 {
@@ -41,6 +54,13 @@ public:
   {
   }
 
+  /**
+   * Retrieve an instance of the type \a T whose associated frame number
+   * differs from \a frameNumber. In \a created, it is returned whether a
+   * new instance was created (value is \a true) or an existing one was
+   * reused (value is \a false). Can be used to e.g. determine whether some 
+   * initialization work can be saved.
+   */
   T& GetUnusedData (bool& created, uint frameNumber)
   {
     created = false;
@@ -59,7 +79,7 @@ public:
       }
       if (lastData == (size_t)-1)
       {
-	data.GetExtend (lastData = data.Length ());
+	data.SetLength ((lastData = data.Length ()) + 1);
 	created = true;
 	nextShrink = frameNumber + 1;
       }
@@ -76,6 +96,11 @@ public:
     return frameData.data;
   }
   
+  /**
+   * Remove all allocated instances.
+   * \remark Warning! Do not use when some instances are still in use
+   *  somewhere!
+   */
   void Clear ()
   {
     data.DeleteAll();

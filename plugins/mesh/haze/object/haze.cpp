@@ -19,6 +19,8 @@
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
 #include "csgeom/poly2d.h"
+#include "cstool/rbuflock.h"
+#include "iutil/objreg.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
 #include "ivideo/graph3d.h"
@@ -426,6 +428,10 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csHazeMeshObject::HazeState)
   SCF_IMPLEMENTS_INTERFACE (iHazeState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+csStringID csHazeMeshObject::vertex_name = csInvalidStringID;
+csStringID csHazeMeshObject::texel_name = csInvalidStringID;
+csStringID csHazeMeshObject::index_name = csInvalidStringID;
+
 csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory)
 {
   SCF_CONSTRUCT_IBASE (0);
@@ -454,6 +460,19 @@ csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory)
     csHazeLayer *p = new csHazeLayer (factlayers->Get(i)->hull,
       factlayers->Get(i)->scale);
     layers.Push(p);
+  }
+
+  csRef<iStringSet> strings;
+  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (factory->object_reg,
+    "crystalspace.shared.stringset", iStringSet);
+
+  if ((vertex_name == csInvalidStringID) ||
+    (texel_name == csInvalidStringID) ||
+    (index_name == csInvalidStringID))
+  {
+    vertex_name = strings->Request ("vertices");
+    texel_name = strings->Request ("texture coordinates");
+    index_name = strings->Request ("indices");
   }
 }
 
@@ -574,6 +593,250 @@ bool csHazeMeshObject::DrawTest (iRenderView* rview, iMovable* movable,
 
   return true;
 }
+
+CS_IMPLEMENT_STATIC_VAR(GetTempVertices, csDirtyAccessArray<csVector3>, ());
+CS_IMPLEMENT_STATIC_VAR(GetTempTexels, csDirtyAccessArray<csVector2>, ());
+CS_IMPLEMENT_STATIC_VAR(GetTempIndices, csDirtyAccessArray<uint>, ());
+
+void csHazeMeshObject::GenGeometryAdapt (iRenderView *rview, iGraphics3D *g3d, 
+					 int num_sides, csVector3* scrpts, 
+					 csVector3* campts, csVector2* uvs,
+					 float layer_scale, float quality, 
+					 int depth, int maxdepth)
+{
+  /// only triangles
+  (void)num_sides;
+  CS_ASSERT(num_sides == 3);
+  // check if the angle is OK
+  csVector2 dir1;
+  dir1.x = scrpts[1].x - scrpts[0].x;
+  dir1.y = scrpts[1].y - scrpts[0].y;
+  csVector2 dir2;
+  dir2.x = scrpts[2].x - scrpts[0].x;
+  dir2.y = scrpts[2].y - scrpts[0].y;
+  csVector2 normdir1 = dir1 / dir1.Norm();
+  csVector2 normdir2 = dir2 / dir2.Norm();
+  float cosangle = normdir1 * normdir2;
+  //printf("cosangle %g, quality %g\n", cosangle, quality);
+  if(cosangle > quality || depth >= maxdepth)
+  {
+    // emit geometry
+    for (int i = 0; i < 3; i++)
+    {
+      GetTempIndices()->Push (GetTempVertices()->Length());
+      GetTempVertices()->Push (campts[i]);
+      GetTempTexels()->Push (uvs[i]);
+    }
+    return;
+  }
+  // split up
+  csVector3 oldpos = scrpts[2];
+  csVector3 oldcam = campts[2];
+  csVector2 olduv = uvs[2];
+  scrpts[2] = (scrpts[1] + scrpts[2])*0.5;
+  campts[2] = (campts[1] + campts[2])*0.5;
+  csVector2 newdir;
+  newdir.x = scrpts[2].x - scrpts[0].x;
+  newdir.y = scrpts[2].y - scrpts[0].y;
+  newdir /= newdir.Norm();
+  uvs[2].Set(0.5, 0.5);
+  uvs[2] += newdir * layer_scale;
+  GenGeometryAdapt (rview, g3d, 3, scrpts, campts, uvs, layer_scale, quality, 
+    depth+1, maxdepth);
+  // other half
+  csVector3 oldpos1 = scrpts[1];
+  csVector3 oldcam1 = campts[1];
+  csVector2 olduv1 = uvs[1];
+  scrpts[1] = scrpts[2];
+  campts[1] = campts[2];
+  uvs[1] = uvs[2];
+  scrpts[2] = oldpos;
+  campts[2] = oldcam;
+  uvs[2] = olduv;
+  GenGeometryAdapt (rview, g3d, 3, scrpts, campts, uvs, layer_scale, quality, 
+    depth+1, maxdepth);
+  scrpts[1] = oldpos1;
+  campts[1] = oldcam1;
+  uvs[1] = olduv1;
+}
+
+csRenderMesh** csHazeMeshObject::GetRenderMeshes (int &n, iRenderView* rview,
+						  iMovable* movable, 
+						  uint32 frustum_mask)
+{ 
+  SetupObject ();
+
+  if(layers.Length() <= 0)
+  {
+    n = 0; 
+    return 0; 
+  }
+
+  /// prepare to transform the points
+  iGraphics3D* g3d = rview->GetGraphics3D ();
+  iCamera* camera = rview->GetCamera ();
+  csVector3 campos = camera->GetTransform().GetOrigin();
+  if (!movable->IsFullTransformIdentity ())
+    campos = movable->GetFullTransform() * campos;
+  float fov = camera->GetFOV ();
+  float shx = camera->GetShiftX ();
+  float shy = camera->GetShiftY ();
+  /// obj to camera space
+  csReversibleTransform tr_o2c = camera->GetTransform ();
+  if (!movable->IsFullTransformIdentity ())
+    tr_o2c /= movable->GetFullTransform ();
+
+
+  // project origin to screenspace
+  csVector2 center(0.5, 0.5);
+  csVector3 scr_orig;
+  csVector3 cam_orig;
+  ProjectO2S(tr_o2c, fov, shx, shy, origin, scr_orig, &cam_orig);
+
+  // get hull 0 outline in screenspace
+  iHazeHull *hull = layers[0]->hull;
+  float layer_scale = layers[0]->scale;
+  int layer_num = 0;
+  int *layer_poly = 0;
+  csVector3* layer_pts = 0;
+  csVector2* layer_uvs = 0;
+  csVector3* cam_pts = 0;
+  ComputeHullOutline(hull, layer_scale, campos, tr_o2c, fov, shx, shy,
+    layer_num, layer_poly, layer_pts, &cam_pts, layer_uvs);
+  if(layer_num <= 0)
+  {
+    n = 0; 
+    return 0; 
+  }
+
+  int i;
+  // additional test if origin inside the outline
+  csVector2* incheck = new csVector2[layer_num];
+  for(i=0; i<layer_num; i++)
+  {
+    incheck[i].x = layer_pts[layer_num-1 - i].x;
+    incheck[i].y = layer_pts[layer_num-1 - i].y;
+  }
+  csVector2 checkpt( scr_orig.x, scr_orig.y );
+  if(!csPoly2D::In(incheck, layer_num, checkpt))
+  {
+    // origin not inside outline.
+    delete[] incheck;
+    delete[] layer_poly;
+    delete[] layer_pts;
+    delete[] layer_uvs;
+    delete[] cam_pts;
+    n = 0; 
+    return 0; 
+  }
+  delete[] incheck;
+
+  GetTempVertices()->Empty();
+  GetTempTexels()->Empty();
+  GetTempIndices()->Empty();
+
+  {
+    // draw triangles from orig to layer 0
+    csVector3 tri_pts[3];
+    csVector3 tri_campts[3];
+    csVector2 tri_uvs[3];
+    tri_pts[0] = scr_orig;
+    tri_campts[0] = cam_orig;
+    tri_uvs[0] = center;
+    for(i=0; i<layer_num; i++)
+    {
+      int nexti = (i+1)%layer_num;
+      tri_pts[2] = layer_pts[i];
+      tri_pts[1] = layer_pts[nexti];
+      tri_campts[2] = cam_pts[i];
+      tri_campts[1] = cam_pts[nexti];
+      tri_uvs[2] = layer_uvs[i];
+      tri_uvs[1] = layer_uvs[nexti];
+
+
+      //printf("drawing a polygon\n");
+      //DrawPoly(rview, g3d, mat, 3, tri_pts, tri_uvs);
+
+      float quality = 0.90f;
+      int maxdepth = 10;
+      GenGeometryAdapt (rview, g3d, 3, tri_pts, tri_campts, tri_uvs, 
+	layer_scale, quality, 0, maxdepth);
+    }
+  }
+
+  bool bufferCreated;
+  const size_t vertCount = GetTempVertices()->Length();
+  HazeRenderBuffer& vertices = renderBuffers.GetUnusedData (bufferCreated,
+    rview->GetCurrentFrameNumber());
+  if (bufferCreated || (vertices.count < vertCount))
+  {
+    vertices.buffer = g3d->CreateRenderBuffer (vertCount * sizeof (float) * 3,
+      CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
+  }
+  vertices.buffer->CopyToBuffer (GetTempVertices()->GetArray(), 
+    vertCount * sizeof (float) * 3);
+  HazeRenderBuffer& texels = renderBuffers.GetUnusedData (bufferCreated,
+    rview->GetCurrentFrameNumber());
+  if (bufferCreated || (texels.count < vertCount))
+  {
+    texels.buffer = g3d->CreateRenderBuffer (vertCount * sizeof (float) * 2,
+      CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 2);
+  }
+  texels.buffer->CopyToBuffer (GetTempTexels()->GetArray(), 
+    vertCount * sizeof (float) * 2);
+  HazeRenderBuffer& indices = indexBuffers.GetUnusedData (bufferCreated,
+    rview->GetCurrentFrameNumber());
+  if (bufferCreated || (indices.count < GetTempIndices()->Length()))
+  {
+    indices.buffer = g3d->CreateIndexRenderBuffer (
+      GetTempIndices()->Length() * sizeof (uint), CS_BUF_STREAM, 
+      CS_BUFCOMP_UNSIGNED_INT, 0, vertCount);
+  }
+  indices.buffer->CopyToBuffer (GetTempIndices()->GetArray(), 
+    GetTempIndices()->Length() * sizeof (uint));
+
+  bool rmCreated;
+  csRenderMesh*& rm = rmHolder.GetUnusedMesh (rmCreated, 
+    rview->GetCurrentFrameNumber());
+  if (rmCreated)
+  {
+    rm->variablecontext.AttachNew (new csShaderVariableContext);
+    rm->meshtype = CS_MESHTYPE_TRIANGLES;
+    rm->material = material;
+    rm->mixmode = MixMode;
+  }
+
+  int clip_portal, clip_plane, clip_z_plane;
+  rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
+      clip_z_plane);
+  csVector3 camera_origin = tr_o2c.GetT2OTranslation ();
+
+  rm->camera_origin = camera_origin;
+  rm->camera_transform = &camera->GetTransform();
+  rm->clip_portal = clip_portal;
+  rm->clip_plane = clip_plane;
+  rm->clip_z_plane = clip_z_plane;
+  rm->do_mirror = camera->IsMirrored ();
+
+  //rm->object2camera = tr_o2c;
+
+  rm->indexend = GetTempIndices()->Length();
+  csShaderVariable* sv = rm->variablecontext->GetVariableAdd (vertex_name);
+  sv->SetValue (vertices.buffer);
+  sv = rm->variablecontext->GetVariableAdd (texel_name);
+  sv->SetValue (texels.buffer);
+  sv = rm->variablecontext->GetVariableAdd (index_name);
+  sv->SetValue (indices.buffer);
+
+  delete[] layer_poly;
+  delete[] layer_pts;
+  delete[] layer_uvs;
+  delete[] cam_pts;
+
+  n = 1; 
+  return &rm; 
+}
+
 
 #define INTERPOLATE1_S(var) \
   g3dpoly->var [i] = inpoly_##var [vt]+ \
@@ -700,7 +963,7 @@ static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
 void csHazeMeshObject::ComputeHullOutline(iHazeHull *hull, float layer_scale,
   const csVector3& campos, csReversibleTransform& tr_o2c, float fov, float shx,
   float shy, int &layer_num, int *& layer_poly, csVector3 *& layer_pts,
-  csVector2 *&layer_uvs)
+  csVector3** cam_pts, csVector2 *&layer_uvs)
 {
   int i;
   // get hull outline in screenspace
@@ -711,12 +974,20 @@ void csHazeMeshObject::ComputeHullOutline(iHazeHull *hull, float layer_scale,
   //printf("has outline of size %d: ", layer_num);
   if(layer_num <= 0) return;
   layer_pts = new csVector3[layer_num];
+#if defined(CS_USE_NEW_RENDERER)
+  *cam_pts = new csVector3[layer_num];
+#endif
   for(i=0; i<layer_num; i++)
   {
     //printf(" %d", layer_poly[i]);
     csVector3 objpos;
     hull->GetVertex(objpos, layer_poly[i] );
-    ProjectO2S(tr_o2c, fov, shx, shy, objpos, layer_pts[i]);
+#if defined(CS_USE_NEW_RENDERER)
+    ProjectO2S(tr_o2c, fov, shx, shy, objpos, layer_pts[i],
+      &((*cam_pts)[i]));
+#else
+    ProjectO2S(tr_o2c, fov, shx, shy, objpos, layer_pts[i], 0);
+#endif
   }
   //printf("\n");
   // get hull 0 uv values
@@ -724,7 +995,8 @@ void csHazeMeshObject::ComputeHullOutline(iHazeHull *hull, float layer_scale,
   csVector2 center(0.5, 0.5);
   // project to screenspace
   csVector3 scr_orig;
-  ProjectO2S(tr_o2c, fov, shx, shy, origin, scr_orig);
+  csVector3 cam_orig;
+  ProjectO2S (tr_o2c, fov, shx, shy, origin, scr_orig, &cam_orig);
   csVector2 dir;
   for(i=0; i<layer_num; i++)
   {
@@ -777,7 +1049,7 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
   // project origin to screenspace
   csVector2 center(0.5, 0.5);
   csVector3 scr_orig;
-  ProjectO2S(tr_o2c, fov, shx, shy, origin, scr_orig);
+  ProjectO2S(tr_o2c, fov, shx, shy, origin, scr_orig, 0);
 
   // get hull 0 outline in screenspace
   iHazeHull *hull = layers[0]->hull;
@@ -787,7 +1059,7 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
   csVector3* layer_pts = 0;
   csVector2* layer_uvs = 0;
   ComputeHullOutline(hull, layer_scale, campos, tr_o2c, fov, shx, shy,
-    layer_num, layer_poly, layer_pts, layer_uvs);
+    layer_num, layer_poly, layer_pts, 0, layer_uvs);
   if(layer_num <= 0) return false;
 
   // additional test if origin inside the outline
@@ -983,8 +1255,12 @@ void csHazeMeshObject::DrawPolyAdapt(iRenderView *rview, iGraphics3D *g3d,
 }
 
 void csHazeMeshObject::ProjectO2S(csReversibleTransform& tr_o2c, float fov,
-  float shiftx, float shifty, const csVector3& objpos, csVector3& scrpos)
+  float shiftx, float shifty, const csVector3& objpos, csVector3& scrpos, 
+  csVector3* campos)
 {
+#if defined(CS_USE_NEW_RENDERER)
+  *campos =
+#endif
   scrpos = tr_o2c * objpos;  // to camera space
   scrpos.z = 1. / scrpos.z; // = iz
   float inv_z = fov * scrpos.z; // = iz
@@ -1067,7 +1343,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csHazeMeshObjectFactory::HazeHullCreation)
   SCF_IMPLEMENTS_INTERFACE (iHazeHullCreation)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csHazeMeshObjectFactory::csHazeMeshObjectFactory (iMeshObjectType *pParent)
+csHazeMeshObjectFactory::csHazeMeshObjectFactory (csHazeMeshObjectType* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiHazeFactoryState);
@@ -1078,6 +1354,7 @@ csHazeMeshObjectFactory::csHazeMeshObjectFactory (iMeshObjectType *pParent)
   directional.Set(0,0,0);
   logparent = 0;
   haze_type = pParent;
+  object_reg = pParent->object_reg;
 }
 
 csHazeMeshObjectFactory::~csHazeMeshObjectFactory ()

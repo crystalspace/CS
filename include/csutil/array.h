@@ -174,6 +174,11 @@ template <class T>
 class csArrayElementHandler
 {
 public:
+  static void Construct (T* address)
+  {
+    new (CS_STATIC_CAST(void*,address)) T();
+  }
+
   static void Construct (T* address, T const& src)
   {
     new (CS_STATIC_CAST(void*,address)) T(src);
@@ -187,7 +192,7 @@ public:
   static void InitRegion (T* address, size_t count)
   {
     for (size_t i = 0 ; i < count ; i++)
-      Construct (address + i, T ());
+      Construct (address + i);
   }
 };
 
