@@ -42,7 +42,7 @@ SRC.ISO = $(wildcard $(DIR.ISO)/*.cpp)
 OBJ.ISO = $(addprefix $(OUT.ISO)/,$(notdir $(SRC.ISO:.cpp=$O)))
 DEP.ISO = CSUTIL CSSYS CSGEOM CSGFX CSUTIL CSSYS
 
-OUTDIRS += $(OUT.ISO)
+$(OUTDIRS) += $(OUT.ISO)
 
 MSVC.DSP += ISO
 DSP.ISO.NAME = iso

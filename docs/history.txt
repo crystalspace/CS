@@ -13,6 +13,8 @@ The history order is reversed so that new features are at the top.
 	  it caused all object files to be rebuilt each time "make bugplug" or
 	  "make iso" was invoked.  New solution augments $(OUTDIRS) to achieve
 	  proper behavior.
+	- Philip Wyett eliminated the makefile systems warnings introduced in
+	  changes earlier today.
 26-Mar-2003
 	- Fixed a bug with the new OpenPortal() implementation in OpenGL
 	  renderer.  It was not setting/restoring the stencil in all cases.
@@ -43,7 +45,7 @@ The history order is reversed so that new features are at the top.
 	  especially when it is opening (move close to the door).
 	- Matze added support for 64 bit integers to Crystal Space. You can
 	  use the int64 and uint64 type now.
-	- Mårten Svanfeldt fixed:
+	- MÃ¥rten Svanfeldt fixed:
 	    - Rendering in new renderer after Jorrits changes to thing
 	    - Made some performance-increases by caching and reducing state-
 	      changes in new opengl renderer.
