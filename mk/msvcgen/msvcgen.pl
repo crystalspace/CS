@@ -727,8 +727,10 @@ sub process_project_options {
 
     my @files = massage_paths(@ARGV);
     ($main::opt_meta_file) = massage_paths($main::opt_meta_file);
-    push(@files, $main::opt_meta_file)
-	if ($main::opt_meta_file && !grep(/$main::opt_meta_file/, @files));
+    if ($main::opt_meta_file) {
+	my $metafile_rx = quotemeta($main::opt_meta_file);
+	push(@files, $main::opt_meta_file) if (!grep(/$metafile_rx/, @files));
+    }
 
     my $default_type = '';
     my $type;
