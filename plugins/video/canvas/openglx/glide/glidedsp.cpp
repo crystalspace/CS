@@ -41,6 +41,16 @@ csOpenGLGlideDisp::csOpenGLGlideDisp (iBase *iParent)
   CONSTRUCT_IBASE (iParent);
 }
 
+bool csOpenGLGlideDisp::Initialize(iSystem *pSystem)
+{
+   // This environment setting prevents fxmesa from setting atexit handlers
+   // which when used in conjunction with scf (dlopen) causes at least with
+   // the voodoo2 crashes on exit which trash the Xserver! This environment
+   // setting is new with Mesa3.2.
+   setenv ("MESA_FX_NO_SIGNALS", "1", 0);
+   return true;
+}
+
 bool csOpenGLGlideDisp::open()
 {
   // no special fx required ( e.g. in mesa this is done by setting MESA_GLX_FX=fullscreen in the enviroment )
