@@ -73,7 +73,7 @@ void csRenderLoop::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
     Resize ();
   }*/
 
-  rview.GetClipPlane ().Set (0, 0, 1, -1);      //@@@CHECK!!!
+  rview.GetClipPlane ().Set (0, 0, -1, 0);
 
   // Calculate frustum for screen dimensions (at z=1).
   float leftx = -c->GetShiftX () * c->GetInvFOV ();

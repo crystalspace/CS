@@ -1452,11 +1452,11 @@ bool csDynaVis::VisTest (iRenderView* rview,
   data.frustum[1].Set (trans.GetT2O () * frust[1], - frust[1] * o2tmult);
   data.frustum[2].Set (trans.GetT2O () * frust[2], - frust[2] * o2tmult);
   data.frustum[3].Set (trans.GetT2O () * frust[3], - frust[3] * o2tmult);
-  // @@@ DO z=0 plane too!
-  //csPlane3 pz0 (0, 0, 1, 0);
-  //data.frustum[4] = trans.This2Other (pz0);
-  //uint32 frustum_mask = 0x1f;
-  uint32 frustum_mask = 0xf;
+
+  csPlane3 pz0 = ctxt->clip_plane;
+  pz0.Invert ();
+  data.frustum[4] = trans.This2Other (pz0);
+  uint32 frustum_mask = 0x1f;
 
 # ifdef CS_DEBUG
   if (do_state_dump)

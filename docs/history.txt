@@ -22,6 +22,11 @@ chronological order.
 	- Jorrit fixed a bug with the ball mesh where colors generated
 	  by the special 'PaintSky()' and related routines were no longer
 	  being honored.
+	- Jorrit fixed the default clip plane that is set by csEngine::Draw().
+	  It was currently not used by anything but it will now be used.
+	- Jorrit enhanced Dynavis and Frustvis to use the clip planes as
+	  defined by the last portal that was traversed. This can benefit
+	  performance a bit.
 24-Feb-2004
         - Fritz Elfert fixed conversion of bezier mesh factories in map2cs
           and re-enabled them (With wrong cvs log-message: "Before big

@@ -446,7 +446,11 @@ bool csFrustumVis::VisTest (iRenderView* rview,
   data.frustum[1].Set (trans.GetT2O () * frust[1], - frust[1] * o2tmult);
   data.frustum[2].Set (trans.GetT2O () * frust[2], - frust[2] * o2tmult);
   data.frustum[3].Set (trans.GetT2O () * frust[3], - frust[3] * o2tmult);
-  // @@@ DO z=0 plane too!
+
+  csPlane3 pz0 = ctxt->clip_plane;
+  pz0.Invert ();
+  data.frustum[4] = trans.This2Other (pz0);
+  uint32 frustum_mask = 0x1f;
 
   // The big routine: traverse from front to back and mark all objects
   // visible that are visible.
@@ -455,7 +459,7 @@ bool csFrustumVis::VisTest (iRenderView* rview,
   data.frustvis = this;
   data.viscallback = viscallback;
   kdtree->Front2Back (data.pos, FrustTest_Front2Back, (void*)&data,
-  	0xf);	// 0xf == frustum_mask for four planes.
+  	frustum_mask);
 
   return true;
 }
