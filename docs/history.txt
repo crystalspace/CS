@@ -12,6 +12,9 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+27-Mar-2000
+	- Updated docs/incoming/worldfmt.tex to conform to the latest
+	  changes related to TEXTURES, 2D sprites, and UVEC/VVEC.
 25-Mar-2000
 	- Optimized sprites a bit more.
 	- Changed curve drawing using new clipper routine to get
