@@ -22,6 +22,8 @@ The history order is reversed so that new features are at the top.
 	  Currently there are two simple tutorials so there are also
 	  two simple directories in 'tutor'. The targets are 'tutsimp'
 	  and 'tutsimp2'.
+	- Wouter Wijngaards writes: the clipping of mesh objects should now
+	  be correctly handled in the iso engine.
 14-Jun-2001
 	- Made the terrain visibility checker more efficient and more robust.
 	  The calculation of the extent works completely different now and
