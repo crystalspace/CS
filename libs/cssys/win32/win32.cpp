@@ -476,7 +476,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
 {
   SCF_CONSTRUCT_IBASE(0);
 
-#ifdef CS_DEBUG
+#if defined(CS_DEBUG) && !defined(__CYGWIN__) && !defined(__MINGW__) 
   console_window = true;
 #else
   console_window = false;
