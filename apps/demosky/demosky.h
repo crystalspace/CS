@@ -32,6 +32,7 @@ class csMaterialWrapper;
 class csProcSky;
 class csProcSkyTexture;
 class csPolygon3D;
+struct iFont;
 
 class Simple : public SysSystemDriver
 {
@@ -41,6 +42,7 @@ private:
   csView* view;
   csEngine* engine;
   csMaterialWrapper* matPlasma;
+  iFont *font;
 
   /// the sky 
   csProcSky *sky;

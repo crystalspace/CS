@@ -35,6 +35,7 @@
 #include "igraph3d.h"
 #include "itxtmgr.h"
 #include "iconsole.h"
+#include "ifontsrv.h"
 
 //------------------------------------------------- We need the 3D engine -----
 
@@ -58,6 +59,7 @@ Simple::Simple ()
 Simple::~Simple ()
 {
   delete view;
+  if(font) font->DecRef();
 
   delete sky;
   delete sky_f;
@@ -138,6 +140,8 @@ bool Simple::Initialize (int argc, const char* const argv[],
       for (b = 0; b < 4; b++)
 	txtmgr->ReserveColor (r * 32, g * 32, b * 64);
   txtmgr->SetPalette ();
+
+  font = G2D->GetFontServer()->LoadFont(CSFONT_LARGE);
 
   // Some commercials...
   Printf (MSG_INITIALIZATION, "Crystal Space Procedural Sky Demo.\n");
@@ -273,7 +277,15 @@ void Simple::NextFrame ()
   view->Draw ();
 
   // Start drawing 2D graphics.
-  //if (!G3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
+  if (!G3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
+  const char *text = "Press 't' to toggle animation. Escape quits."
+    " Arrow keys/pgup/pgdown to move.";
+  int txtx = 10;
+  int txty = G2D->GetHeight() - 20;
+  G2D->Write(font, txtx+1, txty+1, G3D->GetTextureManager()->FindRGB(80,80,80), 
+    -1, text);
+  G2D->Write(font, txtx, txty, G3D->GetTextureManager()->FindRGB(255,255,255),
+    -1, text);
 
   // Drawing code ends here.
   G3D->FinishDraw ();
@@ -285,6 +297,13 @@ bool Simple::HandleEvent (iEvent &Event)
 {
   if (superclass::HandleEvent (Event))
     return true;
+
+  if ((Event.Type == csevKeyDown) && (Event.Key.Code == 't'))
+  {
+    /// toggle animation
+    sky->SetAnimated( !sky->GetAnimated());
+    return true;
+  }
 
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {

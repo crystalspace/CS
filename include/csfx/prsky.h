@@ -103,8 +103,11 @@ class csProcSky {
   int nr_octaves;
   /// size of an octave
   int octsize;
-  /// the octaves
+  /// the octaves, for the current state
   uint8 *octaves;
+  /// the enlarged octaves
+  uint8** enlarged;
+
 
   /// is it animation (if not - no recalculation is performed)
   bool animated;
@@ -113,6 +116,8 @@ class csProcSky {
   void Initialize();
   /// init an octave with new random/smoothed content
   void InitOctave(int nr);
+  /// enlarge an octave, size is scaled by 2**factor, values >> rshift;
+  void Enlarge(uint8 *dest, uint8 *src, int factor, int rshift);
   /// octave value get/set
   uint8& GetOctave(int oct, int x, int y) 
   { return octaves [ oct*octsize*octsize + y*octsize + x ]; }

@@ -77,6 +77,7 @@ void csProcSkyTexture::Animate (cs_time current_time)
 
 csProcSky::csProcSky()
 {
+  int i;
   radius = 20000000.; /// 20 000 km
   center.Set(0., -radius + 100000.0, 0.); // sky is 100 km high
   cam.Set(0.,0.,0.);
@@ -95,6 +96,13 @@ csProcSky::csProcSky()
   nr_octaves = 5;
   octsize = 32; // octave is octsize x octsize
   octaves = new uint8 [octsize*octsize*nr_octaves];
+  enlarged = new uint8* [nr_octaves];
+  for(i=0 ; i<nr_octaves; i++)
+  {
+    /// scale size of this octave
+    int sz = 1 << (nr_octaves - i - 1);
+    enlarged[i] = new uint8 [sz * sz * octsize * octsize ];
+  }
 
   animated= true;
 
@@ -104,6 +112,9 @@ csProcSky::csProcSky()
 csProcSky::~csProcSky()
 {
   delete[] octaves;
+  for(int i=0 ; i<nr_octaves; i++)
+    delete[] enlarged[i];
+  delete[] enlarged;
 }
 
 
@@ -113,6 +124,11 @@ void csProcSky::Initialize()
   int i;
   for(i=0 ; i< nr_octaves; i++)
     InitOctave(i);
+  /// fill enlarged octaves
+  for(i=0 ; i< nr_octaves; i++)
+  {
+    Enlarge( enlarged[i], octaves + octsize*octsize*i, nr_octaves - i - 1, i);
+  }
 }
 
 void csProcSky::InitOctave(int nr)
@@ -122,6 +138,7 @@ void csProcSky::InitOctave(int nr)
   int i;
   for(i=0; i<sz; i++)
     myoct[i] = (uint8)( rand()&0xFF );
+
   int sm = 2;
   for(int y=0; y<octsize; y++)
     for(int x=0; x<octsize; x++)
@@ -135,6 +152,52 @@ void csProcSky::InitOctave(int nr)
       SetOctave(nr,x,y,tot);
     }
   delete myoct;
+}
+
+
+void csProcSky::Enlarge(uint8* dest, uint8* src, int factor, int rshift)
+{
+  int srcsize = octsize;
+  int zoom = 1<<factor;
+  int destsize = srcsize*zoom;
+  //// smooth in squares of zoom x zoom
+  for(int sy = 0; sy <srcsize; sy++)
+    for(int sx = 0; sx <srcsize; sx++)
+    {
+      /// the topleft/topright/botleft/botright values of the square
+      int topleft = src[sy*srcsize + sx] << 6;
+      int botleft = src[ ( (sy+1)%srcsize )*srcsize + sx] << 6;
+      int topright = src[sy*srcsize + (sx+1)%srcsize] << 6;
+      int botright = src[ ( (sy+1)%srcsize )*srcsize + (sx+1)%srcsize] << 6;
+      /*
+      int topleft = GetOctave(0, sx, sy) << 6;
+      int topright = GetOctave(0, (sx+1)%srcsize, sy) << 6;
+      int botleft = GetOctave(0, sx, (sy+1)%srcsize) << 6;
+      int botright = GetOctave(0, (sx+1)%srcsize, (sy+1)%srcsize) << 6;
+      */
+      
+      int leftinc = (botleft - topleft) >> factor;
+      int rightinc = (botright - topright) >> factor;
+      int leftval = topleft;  /// these will walk with y
+      int rightval = topright;
+      /// the start of the horizontal line in dest;
+      uint8* dypos= dest + sy*zoom*destsize;
+      /// smooth 1 square onto dest
+      for(int dy = 0; dy<zoom; dy++)
+      {
+        int horinc = (rightval - leftval) >> factor;
+	int horval = leftval;
+	uint8* dxpos = dypos + sx*zoom;
+        for(int dx = 0; dx<zoom; dx++)
+	{
+	  *dxpos++ = horval >> (6+rshift);
+	  horval += horinc;
+	}
+	leftval += leftinc;
+	rightval += rightinc;
+	dypos += destsize;
+      }
+    }
 }
 
 bool csProcSky::SphereIntersect(const csVector3& point, csVector3& isect)
@@ -244,14 +307,21 @@ uint8 csProcSky::GetCloudVal(int x, int y)
   int div = 1;
   int i;
   int revdiv = div << (nr_octaves-1);
+  int thesize = revdiv*octsize;
   for(i=0; i<nr_octaves; i++)
   {
     /// add octave value div (2**octavenr).
-    /// later octaves count for less.
+    /// later octaves count for less.  (lessened is precalced)
     /// the x,y is divided by revdiv - later octaves divided less.
     /// later octaves give more precision.
     /// and tiled into the octsize.
+
+    int add = int( enlarged[i][ thesize*(y%thesize)+ x%thesize ]);
+    thesize>>=1;
+
+    /*
     int add = 0 ;
+
     ///olddirect:int(GetOctave(i, (x/revdiv)%octsize, (y/revdiv)%octsize ))>>i;
     /// get interpolated adding value.
     int add1 = (revdiv-x%revdiv)*
@@ -264,9 +334,10 @@ uint8 csProcSky::GetCloudVal(int x, int y)
       (int(GetOctave(i, (x/revdiv + 1)%octsize, (y/revdiv+1)%octsize ))>>i);
     add = add1*(revdiv-y%revdiv) + add2*(y%revdiv);
     add /= revdiv*revdiv;
+    */
     res += add ;
-    div <<= 1;
-    revdiv >>=1;
+    //div <<= 1;
+    //revdiv >>=1;
   }
   //res>>=1;  /// do not do this
   //res = int(GetOctave(0, (x/8)%octsize, (y/8)%octsize )) ;
