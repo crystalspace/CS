@@ -42,7 +42,13 @@
 #include "iutil/comp.h"
 #include "iutil/virtclk.h"
 #include "ivideo/graph3d.h"
+#ifndef CS_USE_NEW_RENDERER
 #include "ivideo/vbufmgr.h"
+#else
+#include "ivideo/rendermesh.h"
+#include "ivideo/rndbuf.h"
+#include "csutil/anonrndbuf.h"
+#endif // CS_USE_NEW_RENDERER
 #include "ivideo/material.h"
 #include "qint.h"
 
@@ -365,6 +371,7 @@ private:
   /// The normals
   csPDelArray<csPoly3D> normals;
 
+
   /**
    * Connectivity information for this sprite template.
    * Also contains temporary vertex position information
@@ -384,6 +391,12 @@ private:
 public:
   iObjectRegistry* object_reg;
   iVirtualClock* vc;
+
+  csRef<iGraphics3D> g3d;
+
+#ifdef CS_USE_NEW_RENDERER
+  csAnonRenderBufferManager *anon_buffers;
+#endif
 
   /**
    * Reference to the engine (optional because sprites can also be
@@ -613,6 +626,14 @@ public:
   { MixMode = mode; }
   uint GetMixMode () const
   { return MixMode; }
+
+#ifdef CS_USE_NEW_RENDERER
+  bool AddRenderBuffer (const char *name, csRenderBufferComponentType component_type, int component_size);
+  bool SetRenderBufferComponent (const char *name, int index, int component, float value);
+  bool SetRenderBufferComponent (const char *name, int index, int component, int value);
+  bool SetRenderBuffer (const char *name, float *value);
+  bool SetRenderBuffer (const char *name, int *value);
+#endif
 
   /// For LOD.
   int GetLODPolygonCount (float lod) const;
@@ -922,6 +943,28 @@ public:
     { scfParent->SetMixMode (mode); }
     virtual uint GetMixMode () const
     { return scfParent->GetMixMode (); }
+#ifdef CS_USE_NEW_RENDERER
+    virtual bool AddRenderBuffer (const char *name, csRenderBufferComponentType component_type, int component_size)
+    {
+      return scfParent->AddRenderBuffer (name, component_type, component_size);
+    }
+    virtual bool SetRenderBufferComponent (const char *name, int index, int component, float value)
+    {
+      return scfParent->SetRenderBufferComponent(name, index, component, value);
+    }
+    virtual bool SetRenderBufferComponent (const char *name, int index, int component, int value)
+    {
+      return scfParent->SetRenderBufferComponent(name, index, component, value);
+    }
+    virtual bool SetRenderBuffer (const char *name, float *value)
+    {
+      return scfParent->SetRenderBuffer(name, value);
+    }
+    virtual bool SetRenderBuffer (const char *name, int *value)
+    {
+      return scfParent->SetRenderBuffer(name, value);
+    }
+#endif
   } scfiSprite3DFactoryState;
 
   //--------------------- iLODControl implementation -------------//
@@ -1270,7 +1313,12 @@ private:
   long cur_movablenr;
 
   // Remembered info between DrawTest and Draw.
+#ifndef CS_USE_NEW_RENDERER
   G3DTriangleMesh g3dmesh;
+#else
+  csRenderMesh rendermesh;
+  csRenderMesh *meshptr;
+#endif // CS_USE_NEW_RENDERER
 
   bool initialized;
 
@@ -1282,6 +1330,7 @@ private:
    * of frames. Do we create a vertex buffer for every frame?
    * @@@
    */
+#ifndef CS_USE_NEW_RENDERER
   iVertexBufferManager* vbufmgr;
   csRef<iVertexBuffer> vbuf;
   /// Vertex buffer for tweening.
@@ -1291,10 +1340,36 @@ private:
   csVector2* vbuf_texels, * vbuf_tween_texels;
   csColor* vbuf_colors, * vbuf_tween_colors;
   int vbuf_num_vertices;
+#else
+  csVector3* final_verts;
+  csVector2* final_texcoords;
+  csColor* final_colors;
+  csTriangle* final_triangles;
+  csTriangle* shadow_triangles;
+  bool shadow_caps;
+  bool use_shadow_ind;
+  
+  int final_num_vertices;
+  int final_num_triangles;
+
+  csRef<iRenderBuffer> vertices;
+  csRef<iRenderBuffer> shadow_verts;
+  csRef<iRenderBuffer> normals;
+  csRef<iRenderBuffer> shadow_norms;
+  csRef<iRenderBuffer> texcoords;
+  csRef<iRenderBuffer> colors;
+  csRef<iRenderBuffer> indices;
+  csStringID vertices_name, normals_name,
+    texcoords_name, colors_name, indices_name, 
+    shadow_verts_name, shadow_norms_name;
+
+#endif // CS_USE_NEW_RENDERER
+  csReversibleTransform tr_o2c;
 
   /// Setup this object.
   void SetupObject ();
 
+#ifndef CS_USE_NEW_RENDERER
   /// interface to receive state of vertexbuffermanager
   struct eiVertexBufferManagerClient : public iVertexBufferManagerClient
   {
@@ -1302,6 +1377,17 @@ private:
     virtual void ManagerClosing ();
   }scfiVertexBufferManagerClient;
   friend struct eiVertexBufferManagerClient;
+#else
+  iRenderBuffer *GetRenderBuffer (csStringID name);
+  //------------------------- iStreamSource implementation ----------------
+  class RenderBufferSource : public iRenderBufferSource
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObject);
+    iRenderBuffer *GetRenderBuffer (csStringID name)
+	{ return scfParent->GetRenderBuffer (name); }
+  } scfiRenderBufferSource;
+  friend class RenderBufferSource;
+#endif // CS_USE_NEW_RENDERER
 
 private:
   /**
@@ -1395,6 +1481,14 @@ public:
   {
     col = base_color;
   }
+
+#ifdef CS_USE_NEW_RENDERER
+  bool AddStream (const char *name, int component_size);
+  bool SetStreamComponent (const char *name, int index, int component, float value);
+  bool SetStreamComponent (const char *name, int index, int component, int value);
+  bool SetStream (const char *name, float *value);
+  bool SetStream (const char *name, int *value);
+#endif
 
   /**
    * Add a color for a vertex.
@@ -1594,6 +1688,9 @@ public:
   virtual void UpdateLighting (iLight** lights, int num_lights,
       	iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
+#ifdef CS_USE_NEW_RENDERER
+  virtual csRenderMesh **GetRenderMeshes (int &n);
+#endif // CS_USE_NEW_RENDERER
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
     if (cb) cb->IncRef ();
