@@ -20,6 +20,7 @@ awsKey::awsKey(iString *n)
 {
   if (n) {
     name = aws_adler32(aws_adler32(0, NULL, 0), (unsigned char *)n->GetData(), n->Length());
+    printf("aws-debug: new key %s mapped to %lu\n", n->GetData(), name);
     n->DecRef();
   }
 }
@@ -40,7 +41,11 @@ unsigned long
 awsPrefManager::NameToId(char *n)
 {
  if (n) {
-    return aws_adler32(aws_adler32(0, NULL, 0), (unsigned char *)n, strlen(n));
+    unsigned long id = aws_adler32(aws_adler32(0, NULL, 0), (unsigned char *)n, strlen(n));
+    
+    printf("aws-debug: mapped %s to %lu\n", n, id);
+    
+    return id;
  }
  else 
     return 0;
@@ -259,8 +264,13 @@ bool
 awsPrefManager::GetRect(awsComponentNode *node, char *name, csRect &val)
 {
    if (!node) return false;
+   
+   printf("aws-debug: Getting \"%s\" from %x\n", name, node);
+   
    awsKey *k = ((awsKeyContainer *)node)->Find(NameToId(name));
 
+   printf("aws-debug: Node retrieved.\n", name, node);
+   
     if (k)
     {
        if (k->Type() == KEY_RECT) 

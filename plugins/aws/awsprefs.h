@@ -185,19 +185,7 @@ public:
   { children.Delete(children.Find(key)); }
 
   /// Consumes an entire list by moving all of it's member's to this one, and removing them from it.
-  void Consume(awsKeyContainer *c)
-  {
-     
-     for(int i=0; i<c->children.Length(); ++i) 
-     {
-        void *p = c->children[i];
-	
-        children.Push(p);
-        c->children.Delete(i);
-     }
-     
-     delete c;
-  }
+  void Consume(awsKeyContainer *c);
 };
 
 class awsSkinNode : public awsKey, awsKeyContainer

@@ -5,7 +5,8 @@
 #include "iengine/engine.h"
 #include <stdio.h>
 
-awsManager::awsManager(iBase *p):prefmgr(NULL),System(NULL)
+awsManager::awsManager(iBase *p):prefmgr(NULL),System(NULL), 
+               UsingDefaultContext(false), DefaultContextInitialized(false)
 {
   SCF_CONSTRUCT_IBASE (p);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
@@ -91,7 +92,7 @@ awsManager::FindComponentFactory(char *name)
   void *p = component_factories.GetFirstItem();
   unsigned long id = prefmgr->NameToId(name);
   
-  while(p)
+  do 
   {
     awsComponentFactoryMap *cfm = (awsComponentFactoryMap *)p;
     
@@ -99,7 +100,7 @@ awsManager::FindComponentFactory(char *name)
       return cfm->factory;
       
     p = component_factories.GetNextItem();
-  }
+  } while(p!=component_factories.PeekFirstItem());
   
   return NULL;
 }
@@ -121,26 +122,33 @@ awsManager::SetContext(iGraphics2D *g2d, iGraphics3D *g3d)
        ptG3D = g3d;
        
        frame.Set(0,0,ptG2D->GetWidth(), ptG2D->GetHeight());
+       
+       UsingDefaultContext=false;
    }
 }
 
 void 
 awsManager::SetDefaultContext(iEngine* engine, iTextureManager* txtmgr)
 {
-  canvas.SetSize(512, 512);
-  canvas.SetKeyColor(255,0,255);
-  if (!canvas.Initialize(System, engine, txtmgr, "awsCanvas"))
-    printf("aws-debug: SetDefaultContext failed to initialize the memory canvas.\n");
-  else
-    printf("aws-debug: Memory canvas initialized!\n");
+  if (!DefaultContextInitialized)
+  {
+    canvas.SetSize(512, 512);
+    canvas.SetKeyColor(255,0,255);
+    if (!canvas.Initialize(System, engine, txtmgr, "awsCanvas"))
+      printf("aws-debug: SetDefaultContext failed to initialize the memory canvas.\n");
+    else
+      printf("aws-debug: Memory canvas initialized!\n");
     
-  if (!canvas.PrepareAnim())
-    printf("aws-debug: Prepare anim failed!\n");
-  else
-    printf("aws-debug: Prepare anim succeeded.\n");
+    if (!canvas.PrepareAnim())
+      printf("aws-debug: Prepare anim failed!\n");
+    else
+      printf("aws-debug: Prepare anim succeeded.\n");
    
-  iTextureWrapper *tw = engine->GetTextureList()->NewTexture(canvas.GetTextureWrapper()->GetTextureHandle());
-  iMaterialWrapper *canvasMat = engine->CreateMaterial("awsCanvasMat", tw);
+    iTextureWrapper *tw = engine->GetTextureList()->NewTexture(canvas.GetTextureWrapper()->GetTextureHandle());
+    iMaterialWrapper *canvasMat = engine->CreateMaterial("awsCanvasMat", tw);
+    
+    DefaultContextInitialized=true;
+  }
           
   ptG2D = canvas.G2D();
   ptG3D = canvas.G3D();
@@ -157,6 +165,8 @@ awsManager::SetDefaultContext(iEngine* engine, iTextureManager* txtmgr)
     ptG2D->Clear(txtmgr->FindRGB(255,0,255));
     ptG3D->FinishDraw();
     ptG3D->Print(NULL);
+    
+    UsingDefaultContext=true;
   }
 }
 
@@ -227,6 +237,7 @@ awsManager::Redraw()
    static csRect bounds(0,0,512,512);
 
    redraw_tag++;
+   
    ptG3D->BeginDraw(CSDRAW_2DGRAPHICS);
    
    ptG2D->SetClipRect(0,0,640,480);
@@ -235,9 +246,13 @@ awsManager::Redraw()
    ptG2D->DrawLine(0,  200,0,  220, GetPrefMgr()->GetColor(AC_HIGHLIGHT));
    ptG2D->DrawLine(0,  220,512,220, GetPrefMgr()->GetColor(AC_SHADOW));
    ptG2D->DrawLine(512,200,512,200, GetPrefMgr()->GetColor(AC_SHADOW));
-      
-   ptG3D->FinishDraw ();
-   ptG3D->Print (&bounds);
+   
+   // This only needs to happen when drawing to the default context.
+   if (UsingDefaultContext)
+   {
+     ptG3D->FinishDraw ();
+     ptG3D->Print (&bounds);
+   }
      
    // check to see if there is anything to redraw.
    if (dirty[0].IsEmpty()) {
@@ -334,8 +349,12 @@ awsManager::RecursiveDrawChildren(awsComponent *cmp, csRect &dirtyarea)
 awsWindow *
 awsManager::CreateWindowFrom(char *defname)
 {
+   printf("aws-debug: Searching for window def \"%s\"\n", defname);
+   
    // Find the window definition
    awsComponentNode *winnode = GetPrefMgr()->FindWindowDef(defname);
+   
+   printf("aws-debug: Window definition was %s\n", (winnode ? "found." : "not found."));
    
    // If we couldn't find it, abort
    if (winnode==NULL) return NULL;

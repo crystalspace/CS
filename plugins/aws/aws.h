@@ -125,6 +125,18 @@ class awsManager : public iAws
    /// Contains a reference to the image loader
    iImageIO *ImageLoader;
    
+   /// Is true if the window manager is using the internal canvas, else false.
+   bool UsingDefaultContext;
+   
+   /** Is true if the default context has already been initialized.  This is
+     neccessary because csProcTex has some unusual assumptions about the
+     state of the system, so I cannot initialize it until a number of conditions
+     are true.  Therefore, it is initialized in SetDefaultContext.  If a user
+     switches to a different context, and then switches back, we wouldn't want
+     them to possibly die by re-initing the thing again.
+   */
+   bool DefaultContextInitialized;
+   
 public:
     SCF_DECLARE_IBASE;
 
@@ -175,7 +187,7 @@ protected:
     
 public:
     /// Instantiates a window based on a window definition.
-    awsWindow *CreateWindowFrom(char *defname);
+    virtual awsWindow *CreateWindowFrom(char *defname);
 
 public:
     /// Set the contexts however you want

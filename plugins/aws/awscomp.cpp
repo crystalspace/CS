@@ -3,6 +3,8 @@
 #include "awscomp.h"
 #include "awsslot.h"
 
+#include <stdio.h>
+
 
 awsComponent::awsComponent():children(NULL)
 {
@@ -40,6 +42,8 @@ awsComponent::Setup(iAws *_wmgr, awsComponentNode *settings)
 
   wmgr = _wmgr;
   
+  printf("aws-debug: setting up awsComponent.\n");
+  
   if (settings) 
   {
   
@@ -47,9 +51,12 @@ awsComponent::Setup(iAws *_wmgr, awsComponentNode *settings)
    iString *id_str=NULL;
   
    pm->GetRect(settings, "Frame", frame);
-   pm->GetString(settings, "Id", id_str);
+   //pm->GetString(settings, "Id", id_str);
 
    if (id_str!=NULL) id = pm->NameToId(id_str->GetData());
+   
+   printf("aws-debug: Frame is: (%d,%d)-(%d,%d)\n", frame.xmin, frame.ymin, frame.xmax, frame.ymax);
+   
 
    // Children are automatically filled in by the windowmanager.
    
