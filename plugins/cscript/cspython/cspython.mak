@@ -131,7 +131,7 @@ ifeq (,$(CMD.SWIG))
 TO_INSTALL.SCRIPTS += $(wildcard $(SRCDIR)/scripts/python/*.py)
 else
 TO_INSTALL.SCRIPTS += $(filter-out $(SWIG.CSPYTHON.PY.CVS), \
-  $(wildcard $(SRCDIR)/scripts/python/*.py))
+  $(wildcard $(SRCDIR)/scripts/python/*.py)) $(SWIG.CSPYTHON.PY)
 endif
 
 MSVC.DSP += CSPYTHON

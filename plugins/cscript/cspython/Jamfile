@@ -2,18 +2,21 @@ SubDir TOP plugins cscript cspython ;
 
 if $(PYTHON.AVAILABLE) = "yes"
 {
-  local target = cs_pyth.cpp ;
-  local cspacepy = [ FGristFiles cspace.py ] ;
-  local cspacepydir = [ ConcatDirs $(TOP) scripts python ] ;
+  #--------
+  # Swig-generated files.
+  #--------
+  local common = cs_pyth.cpp ;
+  local cspacepy = [ DoSourceGrist cspace.py ] ;
+  local cspacepydir ;
 
   if ! [ Property build : projgen ]
   {
-    target = [ FGristFiles $(target) ] ;
+    common = [ DoSourceGrist $(common) ] ;
 
     if $(CMD.SWIG)
     {
-      Swig $(target) $(cspacepy) :
-        [ FGristFiles cspace.i ] :
+      Swig $(common) $(cspacepy) :
+        [ DoSourceGrist cspace.i ] :
         python :
 	-c++ -shadow :
 	[ ConcatDirs $(TOP) include ] :
@@ -24,18 +27,10 @@ if $(PYTHON.AVAILABLE) = "yes"
     }
     else
     {
-      SEARCH on $(target) = $(SEARCH_SOURCE) ;
+      SEARCH on $(common) = $(SEARCH_SOURCE) ;
+      cspacepydir = [ ConcatDirs $(TOP) scripts python ] ;
     }
   }
-
-  Help cspython : "Crystal Script Python plug-in" ;
-  Plugin cspython : $(target) cspython.h cspython.cpp pytocs.h pytocs.cpp ;
-  LinkWith cspython : cstool csgfx csgeom csutil ;
-  ExternalLibs cspython : PYTHON ;
-  CFlags cspython :
-    [ FDefines SWIG_GLOBAL ]
-    $(COMPILER.C++FLAGS.WARNING.NO_UNUSED) 
-    $(COMPILER.C++FLAGS.WARNING.NO_UNINITIALIZED) ;
 
   rule InstallCSPythonPY
   {
@@ -45,6 +40,63 @@ if $(PYTHON.AVAILABLE) = "yes"
   InstallCSPythonPY $(cspacepy) : $(cspacepydir) : python ;
 
 
+  #--------
+  # cspython -- Crystal Space plugin
+  #--------
+  Help cspython : "Crystal Script Python plug-in" ;
+  Plugin cspython : $(common) cspython.h cspython.cpp pytocs.h pytocs.cpp ;
+  LinkWith cspython : cstool csgfx csgeom csutil ;
+  ExternalLibs cspython : PYTHON ;
+  CFlags cspython :
+    [ FDefines SWIG_GLOBAL ]
+    $(COMPILER.C++FLAGS.WARNING.NO_UNUSED) 
+    $(COMPILER.C++FLAGS.WARNING.NO_UNINITIALIZED) ;
+
+
+  #--------
+  # pythmod -- Pure Python module
+  #--------
+  Help pythmod : "Crystal Space pure Python module" ;
+
+  # Plugin rule above already invokes CompileObject for $(common). We do not
+  # invoking it again because we want to avoid compiling the same (large) file
+  # twice. Intead, we just get a reference to the object file.
+  local commonobj = [ DoObjectGrist $(common:S=$(SUFOBJ)) ] ;
+
+  local pythmodsrc = [ DoSourceGrist pythmod.cpp ] ;
+  local pythmodobj = $(commonobj) [ CompileObjects $(pythmodsrc) ] ;
+
+  local pythmod = _cspace ;
+  if $(PYTHON.MODULE_EXT)
+  {
+    pythmod = $(pythmod:S=$(PYTHON.MODULE_EXT)) ;
+  }
+  else
+  {
+    pythmod = [ ConstructPluginTarget $(pythmod) ] ;
+  }
+
+  pythmod_TARGET = $(pythmod) ;
+  LinkWith pythmod : cstool csgfx csgeom csutil ;
+  ExternalLibs pythmod : PYTHON ;
+  CFlags pythmod : $(PLUGIN.CFLAGS) ;
+  LFlags pythmod : $(PLUGIN.LFLAGS) ;
+  NotFile pythmod ;
+  Depends pythmod : $(pythmod) ;
+  MakeLocate $(pythmod) : $(LOCATE_TARGET) ;
+  Depends $(pythmod) : $(pythmodobj) ;
+  LinkPlugin $(pythmod) : $(pythmodobj) ;
+  SystemInstallPlugin $(pythmod) ;
+
+  Always pythmodclean ;
+  NotFile pythmodclean ;
+  Clean pythmodclean : $(pythmod) $(pythmodobj) ;
+  Depends clean : pythmodclean ;
+
+
+  #--------
+  # python.cex -- cs-config extension
+  #--------
   # Note that '__EOF__' is purposely quoted to prevent shell from intrepreting
   # dollar signs in quoted block.
   actions PythonCex
@@ -73,11 +125,13 @@ __EOF__
   }
 
   local cexfile = python.cex ;
+  local extralibs ;
   switch $(TARGET.OS)
   {
-    case WIN32 : CSPYTHON.PLATFORM_LIBS on $(cexfile) = "gdi32 shell32" ;
-    case * : CSPYTHON.PLATFORM_LIBS = "" ;
+    case WIN32 : extralibs = "gdi32 shell32" ;
+    case * : extralibs = "" ;
   }
+  CSPYTHON.PLATFORM_LIBS on $(cexfile) = $(extralibs) ;
   ShellScript $(cexfile) : PythonCex ;
   Depends cspython : $(cexfile) ;
   Depends cspythonclean : $(cexfile)clean ;

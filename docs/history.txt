@@ -39,6 +39,12 @@ chronological order.
 	  with current_drawflags.
 	- res fixed an occasional crash in genmesh (happens when multiple maps
 	  are loaded at once for some reason).
+	- Eric Sunshine added a "pythmod" Jam target to cspython/Jamfile, which
+	  builds the pure Python "cspace" module. Builds and loads correctly on
+	  Linux. Other platforms not yet tested.
+	- Eric Sunshine fixed bugs in cspython.mak and csperl5.mak where the
+	  generated cspace.py and cspace.pm files did not get installed if Swig
+	  was present.
 26-Apr-2004
 	- Eric Sunshine fixed bugs in cross-product functions of csVector4 and
 	  csDVector4 where it was accessing 'x' component of wrong vector.

@@ -73,7 +73,7 @@ ext_module = Extension(
 setup_kwargs = {
     'name'         : 'cspace',
     'description'  : 'Python Crystal Space Module',
-    'url'          : 'http://www.crystalspace.org',
+    'url'          : 'http://www.crystalspace.org/',
     'license'      : 'LGPL',
     'package_dir'  : {'' : derived_dir},
     'py_modules'   : ['cspace'],

@@ -99,7 +99,7 @@ ifeq (,$(CMD.SWIG))
 TO_INSTALL.SCRIPTS += $(wildcard $(addprefix $(SWIG.PERL5.DIR)/*.,pm pl))
 else
 TO_INSTALL.SCRIPTS += $(filter-out $(SWIG.PERL5.PM),\
-  $(wildcard $(addprefix $(SWIG.PERL5.DIR)/*.,pm pl)))
+  $(wildcard $(addprefix $(SWIG.PERL5.DIR)/*.,pm pl))) $(SWIG.PERL5.PM.IN)
 endif
 
 #MSVC.DSP += MSCSPERL5

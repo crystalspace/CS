@@ -1,6 +1,6 @@
+// Implementation specific to the pure Python "cspace" module (pythmod). Not
+// used by the cspython Crystal Space plugin.
+
 #include "cssysdef.h"
 
-//#define CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION my_cs_static_var_cleanup
-
 CS_IMPLEMENT_APPLICATION
-
