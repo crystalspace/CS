@@ -27,6 +27,9 @@ chronological order.
 	  character back instead of $(i). This will break static linking but
 	  at least normal linking works. With $(i) many modules wont link
 	  correctly.
+	- Jorrit fixed a bad bug in the OpenGL renderer. DrawPolygonMesh()
+	  didn't call FlushDrawPolygon() which could cause particle systems
+	  not to be rendered.
 14-Oct-2003
 	- Eric Sunshine fixed typographical error in constant expression in
 	  cssys/general/platformconfig.cpp: S_IWGRPS_IXGRP --> S_IWGRP|S_IXGRP.

@@ -1882,6 +1882,7 @@ void csGraphics3DOGLCommon::SetupStencil ()
 void csGraphics3DOGLCommon::FlushDrawPolygon ()
 {
   if (queue.num_triangles <= 0) return;
+  SetupClipPortals ();
 
   csMaterialHandle* mat_handle = (csMaterialHandle*)queue.mat_handle;
   iTextureHandle* txt_handle = 0;
@@ -3769,6 +3770,7 @@ static DTM_Info ci;
 
 void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
 {
+  FlushDrawPolygon ();
   csRef<iVertexBufferManager> vbman = GetVertexBufferManager();
   csRef<iVertexBuffer> vb = vbman->CreateBuffer (0);
 
