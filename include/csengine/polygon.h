@@ -108,11 +108,15 @@ class csPolygonTextureType
   friend class csPolygon3D;
 
 public:
+	csPolygonTextureType();
+
   /// Destructor
   virtual ~csPolygonTextureType () { }
 
   /// Return a type for the kind of texturing used.
   virtual int GetTextureType () = 0;
+
+  DECLARE_IBASE;
 };
 
 /**
@@ -395,12 +399,6 @@ private:
 
   /// Set of flags
   ULong flags;
-
-  /**
-   * If 'delete_tex_info' is true this polygon is responsible for
-   * cleaning the csPolyTextures.
-   */
-  bool delete_tex_info;
 
   /**
    * The original polygon. This is useful when a BSP tree

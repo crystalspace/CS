@@ -58,6 +58,17 @@ DECLARE_GROWING_ARRAY (static, VectorArray, csVector3)
 
 //---------------------------------------------------------------------------
 
+csPolygonTextureType::csPolygonTextureType() 
+{
+	CONSTRUCT_IBASE(NULL)
+	IncRef();
+}
+
+IMPLEMENT_IBASE(csPolygonTextureType);
+IMPLEMENT_IBASE_END
+
+//---------------------------------------------------------------------------
+
 csLightMapped::csLightMapped ()
 {
   lightmap = lightmap1 = lightmap2 = lightmap3 = NULL;
@@ -244,7 +255,6 @@ csPolygon3D::csPolygon3D (csTextureHandle* texture)
   if (texture) SetTexture (texture);
 
   txt_info = NULL;
-  delete_tex_info = true;
 
   plane = NULL;
   delete_plane = false;
@@ -289,7 +299,7 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt (),
 
   // Share txt_info with original polygon.
   txt_info = poly.txt_info;
-  delete_tex_info = false;
+  txt_info->IncRef();
 
   poly.dont_draw = true;
   dont_draw = false;
@@ -307,7 +317,10 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt (),
 
 csPolygon3D::~csPolygon3D ()
 {
-  CHK (delete txt_info); txt_info = NULL;
+  if(txt_info) {
+    txt_info->DecRef(); 
+    txt_info = NULL;
+  }
   if (delete_plane) CHKB (delete plane);
   if (delete_portal) CHKB (delete portal);
   while (light_info.lightpatches)
@@ -317,8 +330,11 @@ csPolygon3D::~csPolygon3D ()
 
 void csPolygon3D::SetTextureType (int type)
 {
-  if (txt_info && txt_info->GetTextureType () == type) return;	// Already that type
-  CHK (delete txt_info);
+  if(txt_info)
+  	if(txt_info->GetTextureType () == type) 
+  		return;	// Already that type
+  else
+  	txt_info->DecRef();
   switch (type)
   {
     case POLYTXT_LIGHTMAP:
