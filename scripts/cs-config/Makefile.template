@@ -56,10 +56,10 @@ CSCONFIG.MAK=csconfig.mak
 ifeq ($(LINK.PLUGIN),)
   LINK.PLUGIN=$(LINK)
 endif
-CFLAGS = $(shell ./cs-config --cflags)
-CXXFLAGS = $(shell ./cs-config --cxxflags)
-LINKFLAGS = $(shell ./cs-config --libs cstool csutil cssys csgfx csgeom)
-PLUGIN.LINKFLAGS = $(shell ./cs-config --libs cstool csutil cssys csgfx csgeom)
+CFLAGS := $(shell ./cs-config --cflags)
+CXXFLAGS := $(shell ./cs-config --cxxflags)
+LINKFLAGS := $(shell ./cs-config --libs cstool csutil cssys csgfx csgeom)
+PLUGIN.LINKFLAGS := $(shell ./cs-config --libs cstool csutil cssys csgfx csgeom)
 
 #------
 # Rules
