@@ -13,6 +13,9 @@ chronological order.
 	  functions to use seperate materials, rotation, scale, ... for
 	  particles. By doing that Jorrit managed to significantly optimize
 	  csNewParticleSystem again.
+	- Jorrit did a small optimization to csNewParticleSystem. If lighting
+	  is not enabled it will not call GetRelevantLights() from the
+	  light manager.
 10-Feb-2004
 	- Eric Sunshine fixed CS/data/Jamfile so that it no longer tries to
 	  install the non-existent unifont.csf file.  (Bug reported by Frank

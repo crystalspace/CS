@@ -365,7 +365,7 @@ bool csNewParticleSystem::DrawTest (iRenderView* rview, iMovable* movable)
   SetupParticles (trans, vertices, box);
 #endif
 
-  if (light_mgr)
+  if (Lighting && light_mgr)
   {
     const csArray<iLight*>& relevant_lights = light_mgr
     	->GetRelevantLights (LogParent, -1, false);
