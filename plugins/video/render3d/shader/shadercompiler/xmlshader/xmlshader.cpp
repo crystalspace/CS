@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
+#include "imap/services.h"
 #include "ivideo/rendermesh.h"
 #include "csutil/util.h"
 #include "csutil/scfstr.h"
@@ -81,6 +82,8 @@ void csXMLShaderCompiler::BuildTokens ()
   xmltokens.Register("fp", XMLTOKEN_FRAGMENTPROGRAM);
   xmltokens.Register("buffer", XMLTOKEN_BUFFERMAPPING);
   xmltokens.Register("texture", XMLTOKEN_TEXTUREMAPPING);
+  xmltokens.Register("mixmode", XMLTOKEN_MIXMODE);
+  xmltokens.Register("alphamode", XMLTOKEN_ALPHAMODE);
 }
 
 int csXMLShaderCompiler::CompareTechniqueKeeper(void const* item1, void const* item2)
@@ -127,8 +130,8 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader(iDocumentNode *templ)
     if (shader!=0) break;
   }
 
-
-  shader->name = csStrNew((const char*)templ->GetAttributeValue("name"));
+  if (shader != 0)
+    shader->name = csStrNew((const char*)templ->GetAttributeValue("name"));
 
   return shader;
 }
@@ -163,7 +166,17 @@ csXMLShader* csXMLShaderCompiler::CompileTechnique (iDocumentNode *node,
     LoadSVBlock (varNode, &newShader->staticVariables, &newShader->dynamicVariables);
 
   //alloc passes
-  newShader->passes = new csXMLShader::shaderPass[newShader->passesCount];
+  newShader->passes = 
+    new csXMLShader::shaderPass[newShader->passesCount];
+  uint i;
+  for (i = 0; i < newShader->passesCount; i++)
+  {
+    csXMLShader::shaderPass& pass = newShader->passes[i];
+    pass.alphaMode.autoAlphaMode = true;
+    pass.alphaMode.autoModeTexture = 
+      strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
+  }
+
 
   //first thing we load is the programs for each pass.. if one of them fail,
   //fail the whole technique
@@ -221,6 +234,48 @@ bool csXMLShaderCompiler::LoadPass(iDocumentNode *node, csXMLShader::shaderPass 
     {
       //report error!!
       return false;
+    }
+  }
+
+  {
+    csRef<iSyntaxService> synldr = 
+      CS_QUERY_REGISTRY (objectreg, iSyntaxService);
+
+    csRef<iDocumentNode> nodeMixMode = node->GetNode ("mixmode");
+    if (nodeMixMode != 0)
+    {
+      uint mm;
+      if (synldr->ParseMixmode (nodeMixMode, mm))
+	pass->mixMode = mm;
+    }
+
+    csRef<iDocumentNode> nodeAlphaMode = node->GetNode ("alphamode");
+    if (nodeAlphaMode != 0)
+    {
+      csAlphaMode am;
+      if (synldr->ParseAlphaMode (nodeAlphaMode, strings, am))
+      {
+	pass->alphaMode = am;
+      }
+    }
+  }
+  if (pass->alphaMode.autoAlphaMode)
+  {
+    if (pass->alphaMode.autoModeTexture != csInvalidStringID)
+    {
+      csShaderVariable *var;
+      var = pass->GetVariableRecursive(pass->alphaMode.autoModeTexture);
+
+      if(!var)
+	var = pass->owner->GetVariableRecursive(
+	  pass->alphaMode.autoModeTexture);
+      if (var)
+	pass->autoAlphaTexRef = var;
+      else
+      {
+	pass->dynamicVariables.InsertSorted (csShaderVariableProxy (
+	  pass->alphaMode.autoModeTexture, 0, &pass->autoAlphaTexRef));
+      }
     }
   }
 
@@ -318,6 +373,8 @@ bool csXMLShaderCompiler::LoadPass(iDocumentNode *node, csXMLShader::shaderPass 
 	pass->dynamicVariables.InsertSorted (csShaderVariableProxy (varID, 
 	  0, &pass->bufferRef[pass->bufferCount]));
       }
+      else
+	pass->bufferRef[a] = varRef;
       pass->vertexattributes[pass->bufferCount] = attrib;
       pass->bufferCount++;
       //pass->bufferCount = MAX (pass->bufferCount, a + 1);
@@ -364,6 +421,8 @@ bool csXMLShaderCompiler::LoadPass(iDocumentNode *node, csXMLShader::shaderPass 
 	pass->dynamicVariables.InsertSorted (csShaderVariableProxy (varID, 
 	  0, &pass->textureRef[texUnit]));
       }
+      else
+	pass->textureRef[texUnit] = varRef;
 
       pass->textureCount = MAX(pass->textureCount, texUnit + 1);
       //pass->textureCount++;
@@ -387,25 +446,25 @@ bool csXMLShaderCompiler::LoadSVBlock (iDocumentNode *node,
     svVar.AttachNew (
       new csShaderVariable(strings->Request(var->GetAttributeValue ("name"))));
 
-    csStringID idtype = xmltokens.Request( var->GetAttributeValue("type") );
+    csStringID idtype = xmltokens.Request (var->GetAttributeValue("type"));
     idtype -= 100;
     svVar->SetType( (csShaderVariable::VariableType) idtype);
     switch(idtype)
     {
     case csShaderVariable::INT:
-      svVar->SetValue( var->GetAttributeValueAsInt("default") );
+      svVar->SetValue (var->GetAttributeValueAsInt("default"));
       break;
     case csShaderVariable::FLOAT:
-      svVar->SetValue( var->GetAttributeValueAsFloat("default") );
+      svVar->SetValue (var->GetAttributeValueAsFloat("default"));
       break;
     case csShaderVariable::STRING:
-      svVar->SetValue(new scfString( var->GetAttributeValue("default")) );
+      svVar->SetValue (new scfString( var->GetAttributeValue("default")) );
       break;
     case csShaderVariable::VECTOR3:
       const char* def = var->GetAttributeValue("default");
       csVector3 v;
       sscanf(def, "%f,%f,%f", &v.x, &v.y, &v.z);
-      svVar->SetValue( v );
+      svVar->SetValue (v);
       break;
     }
     staticVariables->AddVariable(svVar);
@@ -608,9 +667,20 @@ bool csXMLShader::SetupPass (csRenderMesh *mesh,
     thispass->wmAlpha);
 
   // @@@ Is it okay to modify the render mesh here?
-  // @@@ FIXME: Get those from shader file
-  mesh->mixmode = CS_FX_COPY; 
-  mesh->alphaType = csAlphaMode::alphaSmooth;
+  mesh->mixmode = thispass->mixMode;
+  if (thispass->alphaMode.autoAlphaMode)
+  {
+    iTextureHandle* tex = 0;
+    if (thispass->autoAlphaTexRef != 0)
+      thispass->autoAlphaTexRef->GetValue (tex);
+    if (tex != 0)
+      mesh->alphaType = tex->GetAlphaType ();
+    else
+      mesh->alphaType = csAlphaMode::alphaNone;
+  }
+  else
+    mesh->alphaType = thispass->alphaMode.alphaType;
+
 
   if(thispass->vp) thispass->vp->SetupState (mesh, dynamicDomains);
   if(thispass->fp) thispass->fp->SetupState (mesh, dynamicDomains);

@@ -650,8 +650,10 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
           }
           //create a new variable
           const char* varname = child->GetAttributeValue ("name");
-          csRef<csShaderVariable> var = 
-            shaderMgr->CreateVariable (strings->Request (varname));
+          /*csRef<csShaderVariable> var = 
+            shaderMgr->CreateVariable (strings->Request (varname));*/
+	  csRef<csShaderVariable> var;
+	  var.AttachNew (new csShaderVariable (strings->Request (varname)));
 
           if (!SyntaxService->ParseShaderParam (child, var))
           {

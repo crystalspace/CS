@@ -70,6 +70,7 @@
 #include "ivideo/rendermesh.h"
 #include "igraphic/imageio.h"
 #include "csgfx/memimage.h"
+#include "csgfx/shadervarcontext.h"
 #include "csgeom/subrec.h"
 #include "csgeom/subrec2.h"
 
@@ -169,47 +170,12 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 int csThing:: last_thing_id = 0;
 
-class csShaderVariableContext : public iShaderVariableContext
-{
-  csShaderVariableContextHelper svContextHelper;
-public:
-  SCF_DECLARE_IBASE;
-
-  csShaderVariableContext ()
-  {
-    SCF_CONSTRUCT_IBASE(0);
-  }
-  virtual ~csShaderVariableContext ()
-  {
-    SCF_DESTRUCT_IBASE ();
-  }
-
-  virtual void AddVariable (csShaderVariable *variable)
-    { svContextHelper.AddVariable (variable); }
-
-  virtual csShaderVariable* GetVariable (csStringID name) const
-    { return svContextHelper.GetVariable (name); }
-
-  virtual csShaderVariable* GetVariableRecursive (csStringID name) const
-    { return GetVariable (name); }
-  
-    virtual void FillVariableList (csShaderVariableList *list) const
-    { svContextHelper.FillVariableList (list); }
-};
-
-SCF_IMPLEMENT_IBASE(csShaderVariableContext)
-  SCF_IMPLEMENTS_INTERFACE(iShaderVariableContext)
-SCF_IMPLEMENT_IBASE_END
-
 //----------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE(csThingStatic)
   SCF_IMPLEMENTS_INTERFACE(iThingFactoryState)
   SCF_IMPLEMENTS_INTERFACE(iMeshObjectFactory)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iObjectModel)
-#ifdef CS_USE_NEW_RENDERER
-  SCF_IMPLEMENTS_INTERFACE(iRenderBufferSource)
-#endif
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csThingStatic::ObjectModel)
@@ -217,13 +183,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csThingStatic::ObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 #ifdef CS_USE_NEW_RENDERER
-/*csStringID csThingStatic::vertex_name = csInvalidStringID;
-csStringID csThingStatic::texel_name = csInvalidStringID;
-csStringID csThingStatic::normal_name = csInvalidStringID;
-csStringID csThingStatic::color_name = csInvalidStringID;
-csStringID csThingStatic::index_name = csInvalidStringID;
-csStringID csThingStatic::tangent_name = csInvalidStringID;
-csStringID csThingStatic::binormal_name = csInvalidStringID;*/
 csStringID csThingStatic::texLightmapName = csInvalidStringID;
 #endif
 
@@ -262,26 +221,6 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
 #ifdef CS_USE_NEW_RENDERER
   r3d = CS_QUERY_REGISTRY (thing_type->object_reg, iGraphics3D);
 
-/*  if ((vertex_name == csInvalidStringID) ||
-    (texel_name == csInvalidStringID) ||
-    (normal_name == csInvalidStringID) ||
-    (color_name == csInvalidStringID) ||
-    (index_name == csInvalidStringID) ||
-    (tangent_name == csInvalidStringID) ||
-    (binormal_name == csInvalidStringID))
-  {
-    csRef<iStringSet> strings = 
-      CS_QUERY_REGISTRY_TAG_INTERFACE (thing_type->object_reg,
-        "crystalspace.renderer.stringset", iStringSet);
-
-    vertex_name = strings->Request ("vertices");
-    texel_name = strings->Request ("texture coordinates");
-    normal_name = strings->Request ("normals");
-    color_name = strings->Request ("colors");
-    index_name = strings->Request ("indices");
-    tangent_name = strings->Request ("tangents");
-    binormal_name = strings->Request ("binormals");
-  }*/
   if ((texLightmapName == csInvalidStringID))
   {
     csRef<iStringSet> strings = 
@@ -1093,210 +1032,58 @@ void csThingStatic::GetRadius (csVector3 &rad, csVector3 &cent)
 }
 
 #ifdef CS_USE_NEW_RENDERER
-iRenderBuffer* csThingStatic::GetRenderBuffer (csStringID name)
-{
-/*  if (name == vertex_name)
-  {
-    return vertex_buffer;
-  } 
-  else if (name == texel_name)
-  {
-    return texel_buffer;
-  }
-  else if (name == normal_name)
-  {
-    return normal_buffer;
-  }
-  else if (name == color_name)
-  {
-    return color_buffer;
-  }
-  else if (name == index_name)
-  {
-    return index_buffer;
-  }
-  else if (name == tangent_name)
-  {
-    return tangent_buffer;
-  }
-  else if (name == binormal_name)
-  {
-    return binormal_buffer;
-  }
-  else*/
-  {
-    return 0;
-  }
-}
-
 void csThingStatic::FillRenderMeshes (
 	csDirtyAccessArray<csRenderMesh*>& rmeshes,
 	const csArray<RepMaterial>& repMaterials,
 	uint mixmode)
 {
-  polyRenderers.DeleteAll ();
-
-/*  int num_verts = 0, num_indices = 0, max_vc = 0;
-  int i;
-
-  for (i = 0; i < static_polygons.Length(); i++)
-  {
-    csPolygon3DStatic* poly = static_polygons.Get (i);
-
-    int pvc = poly->GetVertexCount ();
-
-    num_verts += pvc;
-    num_indices += (pvc - 2) * 3;
-    max_vc = MAX (max_vc, pvc);
-  }
-
-  if (!vertex_buffer)
-    vertex_buffer = r3d->CreateRenderBuffer (num_verts * sizeof (csVector3), 
-      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
-  csVector3* vertices = (csVector3*)vertex_buffer->Lock (CS_BUF_LOCK_NORMAL);
-
-  if (!normal_buffer)
-    normal_buffer = r3d->CreateRenderBuffer (num_verts * sizeof (csVector3), 
-      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
-  csVector3* normals = (csVector3*)normal_buffer->Lock (CS_BUF_LOCK_NORMAL);
-
-  if (!texel_buffer)
-    texel_buffer = r3d->CreateRenderBuffer (num_verts * sizeof (csVector2), 
-      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2, false);
-  csVector2* texels = (csVector2*)texel_buffer->Lock (CS_BUF_LOCK_NORMAL);
-
-  if (!index_buffer)
-    index_buffer = r3d->CreateRenderBuffer (num_indices  * sizeof (int), 
-      CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 1, true);
-  int* indices = (int*)index_buffer->Lock (CS_BUF_LOCK_NORMAL);
-
-  if (!tangent_buffer)
-    tangent_buffer = r3d->CreateRenderBuffer (num_verts * sizeof (csVector3), 
-      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
-  csVector3* tangents = (csVector3*)tangent_buffer->Lock (CS_BUF_LOCK_NORMAL);
-
-  if (!binormal_buffer)
-    binormal_buffer = r3d->CreateRenderBuffer (num_verts * sizeof (csVector3), 
-      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
-  csVector3* binormals = (csVector3*)binormal_buffer->Lock (CS_BUF_LOCK_NORMAL);
-
-  CS_ALLOC_STACK_ARRAY (int, pvIndices, max_vc);
-
-  int vindex = 0, iindex = 0;*/
+  //polyRenderers.DeleteAll ();
 
   for (int i = 0; i < litPolys.Length (); i++)
   {
     const csStaticPolyGroup& pg = *(litPolys[i]);
     csRenderMesh* rm = new csRenderMesh;
 
-    csRef<iPolygonRenderer> polyRenderer = r3d->CreatePolygonRenderer ();
-    polyRenderers.Push (polyRenderer);
+    csRef<iPolygonRenderer> polyRenderer;
+    if (polyRenderers.Length () <= i)
+    {
+      polyRenderer = r3d->CreatePolygonRenderer ();
+      polyRenderers.Push (polyRenderer);
 
-    rm->buffersource = this;
+      int j;
+      for (j = 0; j< pg.polys.Length(); j++)
+      {
+	polyRenderer->AddPolygon (&static_polygons[pg.polys[j]]->polygon_data);
+      }
+    }
+    else
+      polyRenderer = polyRenderers[i];
+
     rm->z_buf_mode = CS_ZBUF_USE;
     rm->mixmode = mixmode; 
     rm->material = pg.material;
-    //rm->meshtype = CS_MESHTYPE_TRIANGLES;
     rm->meshtype = CS_MESHTYPE_POLYGON;
-    rm->dynDomain = new csShaderVariableContext ();
+    rm->dynDomain.AttachNew (new csShaderVariableContext ());
     rm->dynDomain->AddVariable (new csShaderVariable (texLightmapName));
 
-    //rm->indexstart = iindex;
+    /*csShaderVariable* sv;
+    sv = dynDomain->GetVariableAdd (index_name);
+    sv->SetValue (factory->GetRenderBuffer (factory->index_name));
+    sv = dynDomain->GetVariableAdd (vertex_name);
+    sv->SetValue (factory->GetRenderBuffer (factory->vertex_name));
+    sv = dynDomain->GetVariableAdd (texel_name);
+    sv->SetValue (factory->GetRenderBuffer (factory->texel_name));
+    sv = dynDomain->GetVariableAdd (normal_name);
+    sv->SetValue (factory->GetRenderBuffer (factory->normal_name));
+    sv = dynDomain->GetVariableAdd (color_name);
+    sv->SetValue (factory->GetRenderBuffer (factory->color_name));*/
 
-    int j;
-    for (j = 0; j< pg.polys.Length(); j++)
-    {
-      polyRenderer->AddPolygon (&static_polygons[pg.polys[j]]->polygon_data);
-
-#if 0
-      csPolygon3DStatic* static_data = static_polygons[pg.polys[j]];
-      int* poly_indices = static_data->GetVertexIndices ();
-
-      csVector3 polynormal;
-      if (!smoothed)
-      {
-	// hmm... It seems that both polynormal and obj_normals[] need to be inverted.
-	//  Don't know why, just found it out empirical.
-	polynormal = -static_data->GetObjectPlane().Normal();
-      }
-
-      /*
-	To get the texture coordinates of a vertex, the coordinates
-	in object space have to be transformed to the texture space.
-	The Z part is simply dropped then.
-      */
-      csMatrix3 t_m;
-      csVector3 t_v;
-      static_data->MappingGetTextureSpace (t_m, t_v);
-      csTransform object2texture (t_m, t_v);
-
-      /*
-        Calculate the 'tangent' vector of this poly, needed for dot3.
-        It is "a tangent to the surface which represents the direction 
-        of increase of the t texture coordinate." (Quotation from
-         http://www.ati.com/developer/sdk/rage128sdk/Rage128BumpTutorial.html)
-         Conveniently, all polys have a object->texture space transformatin
-         associated with them.
-
-         @@@ Ignores the fact things can be smooth.
-         But it's simpler for now :)
-       */
-      csTransform tangentTF (t_m.GetInverse (), csVector3 (0));
-      csVector3 tangent = tangentTF.Other2This (csVector3 (1, 0, 0));
-      tangent.Normalize ();
-
-      /*
-      Calculate the 'binormal' vector of this poly, needed for dot3.
-      */
-      csVector3 binormal = tangentTF.Other2This (csVector3 (0, -1, 0));
-      binormal.Normalize ();
-
-      // First, fill the normal/texel/vertex buffers.
-      int j, vc = static_data->GetVertexCount();
-      for (j = 0; j < vc; j++)
-      {
-	int vidx = *poly_indices++;
-	*vertices++ = obj_verts[vidx];
-	if (smoothed)
-	{
-	  CS_ASSERT (obj_normals != 0);
-	  *normals++ = -obj_normals[vidx];
-	}
-	else
-	  *normals++ = polynormal;
-	csVector3 t = object2texture.Other2This (obj_verts[vidx]);
-	*texels++ = csVector2 (t.x, t.y);
-        *tangents++ = tangent;
-        *binormals++ = binormal;
-
-	pvIndices[j] = vindex++;
-      }
-
-      // Triangulate poly.
-      for (j = 2; j < vc; j++)
-      {
-	*indices++ = pvIndices[0];
-	iindex++;
-	*indices++ = pvIndices[j - 1];
-	iindex++;
-	*indices++ = pvIndices[j];
-	iindex++;
-      }
-#endif
-    }
-    //rm->indexend = iindex;
-    rm->buffersource = polyRenderer->GetBufferSource (rm->indexstart,
-      rm->indexend);
+    /*rm->buffersource = polyRenderer->GetBufferSource (rm->indexstart,
+      rm->indexend);*/
+    polyRenderer->PrepareRenderMesh (*rm);
 
     rmeshes.Push (rm);
   }
-
-/*  index_buffer->Release ();
-  texel_buffer->Release ();
-  normal_buffer->Release ();
-  vertex_buffer->Release ();
-  tangent_buffer->Release ();
-  binormal_buffer->Release ();*/
 }
 #endif // CS_USE_NEW_RENDERER
 

@@ -13,6 +13,8 @@ chronological order.
 	    <texture name="tex diffuse" destination="unit 0" />
 	- res made the 'type' attribute for <fp> and <vp> optional. Defaults
 	  to 'fp' resp 'vp' now.
+	- res updated the Thing plugin.
+	- res made shader pass mixmode and alpha mode working again.
 28-Nov-2003
 	- res added some NR VC7 projects to csall.
 	- res made lots of changes. Waterdemo now works again.

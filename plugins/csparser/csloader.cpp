@@ -1077,14 +1077,43 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
 	  {
 	    csRef<iShaderManager> shaderMgr =
 	      CS_QUERY_REGISTRY (object_reg, iShaderManager);
-	    csRef<iShader> shader_ambient = shaderMgr->CreateShader ();
+
+	    csRef<iVFS> vfs (CS_QUERY_REGISTRY(object_reg, iVFS));
+	    csRef<iFile> shaderFile = vfs->Open ("/shader/ambient.xml", 
+	      VFS_FILE_READ);
+
+	    csRef<iDocumentSystem> docsys (
+	      CS_QUERY_REGISTRY(object_reg, iDocumentSystem));
+	    if (docsys == 0)
+	      docsys.AttachNew (new csTinyDocumentSystem ());
+	    csRef<iDocument> shaderDoc = docsys->CreateDocument ();
+	    shaderDoc->Parse (shaderFile);
+
+	    /*csRef<iShaderCompiler> shcom (CS_LOAD_PLUGIN (plugin_mgr,
+	      "crystalspace.graphics3d.shadercompiler.xmlshader",
+	      iShaderCompiler));*/
+	    csRef<iShaderManager> shmgr (CS_QUERY_REGISTRY(object_reg, 
+	      iShaderManager));
+	    //shmgr->RegisterCompiler (shcom);
+	    csRef<iShaderCompiler> shcom (shmgr->GetCompiler ("XMLShader"));
+	    csRef<iShader> shader_ambient = 
+	      shcom->CompileShader (shaderDoc->GetRoot ()->GetNode ("shader"));
+	    shaderMgr->RegisterShader (shader_ambient);
+	    
+	    shaderFile = vfs->Open ("/shader/light.xml", VFS_FILE_READ);
+	    shaderDoc->Parse (shaderFile);
+	    csRef<iShader> shader_light = 
+	      shcom->CompileShader (shaderDoc->GetRoot ()->GetNode ("shader"));
+	    shaderMgr->RegisterShader (shader_light);
+
+	    /*csRef<iShader> shader_ambient = shaderMgr->CreateShader ();
 	    csRef<iDataBuffer> db_ambient = VFS->ReadFile (
 	    	"/shader/ambient.xml");
 	    shader_ambient->Load (db_ambient);
 
 	    csRef<iShader> shader_light = shaderMgr->CreateShader ();
 	    csRef<iDataBuffer> db_light = VFS->ReadFile ("/shader/light.xml");
-	    shader_light->Load (db_light);
+	    shader_light->Load (db_light);*/
 	  }
 #endif
 
@@ -4471,7 +4500,7 @@ bool csLoader::ParseShaderList (iDocumentNode* node)
     {
     case XMLTOKEN_SHADER:
       {
-        csRef<iShader> shader (shaderMgr->CreateShader ());
+        /*csRef<iShader> shader (shaderMgr->CreateShader ());
         //test if we have a childnode named file, if so load from file, else
         //use inline loading
         csRef<iDocumentNode> fileChild = child->GetNode ("file");
@@ -4483,7 +4512,39 @@ bool csLoader::ParseShaderList (iDocumentNode* node)
         else
         {
           shader->Load (child);
-        }
+        }*/
+
+	csRef<iShaderManager> shaderMgr =
+	  CS_QUERY_REGISTRY (object_reg, iShaderManager);
+
+	csRef<iDocumentNode> shaderNode;
+        csRef<iDocumentNode> fileChild = child->GetNode ("file");
+        if (fileChild)
+        {
+	  csRef<iVFS> vfs (CS_QUERY_REGISTRY(object_reg, iVFS));
+	  csRef<iFile> shaderFile = vfs->Open (
+	    fileChild->GetContentsValue (), VFS_FILE_READ);
+
+	  csRef<iDocumentSystem> docsys (
+	    CS_QUERY_REGISTRY(object_reg, iDocumentSystem));
+	  if (docsys == 0)
+	    docsys.AttachNew (new csTinyDocumentSystem ());
+	  csRef<iDocument> shaderDoc = docsys->CreateDocument ();
+	  shaderDoc->Parse (shaderFile);
+	  shaderNode = shaderDoc->GetRoot ()->GetNode ("shader");
+	}
+	else
+	{
+	  shaderNode = child;
+	}
+
+	csRef<iShaderManager> shmgr (CS_QUERY_REGISTRY(object_reg, 
+	  iShaderManager));
+	csRef<iShaderCompiler> shcom (shmgr->GetCompiler ("XMLShader"));
+	csRef<iShader> shader = 
+	  shcom->CompileShader (shaderNode);
+
+	shaderMgr->RegisterShader (shader);
       }
       break;
     }

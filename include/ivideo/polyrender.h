@@ -58,13 +58,14 @@ struct csPolygonRenderData
 
 
 
-SCF_VERSION (iPolygonRenderer, 0, 0, 1);
+SCF_VERSION (iPolygonRenderer, 0, 1, 0);
 
 // @@@ Document me.
 struct iPolygonRenderer : public iBase
 {
-  virtual iRenderBufferSource* GetBufferSource (uint& indexStart, 
-    uint& indexEnd) = 0;
+  /*virtual iRenderBufferSource* GetBufferSource (uint& indexStart, 
+    uint& indexEnd) = 0;*/
+  virtual void PrepareRenderMesh (csRenderMesh& mesh) = 0;
   
   virtual void Clear () = 0;
   virtual void AddPolygon (csPolygonRenderData* poly) = 0;

@@ -19,6 +19,7 @@
 #ifndef __XMLSHADER_H__
 #define __XMLSHADER_H__
 
+#include "ivideo/material.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
 #include "iutil/document.h"
@@ -95,11 +96,16 @@ private:
 
   struct shaderPass : public iShaderVariableContext
   {
+    //mix and alpha mode
+    uint mixMode;
+    csAlphaMode alphaMode;
+
     SCF_DECLARE_IBASE;
 
     shaderPass () 
     { 
       SCF_CONSTRUCT_IBASE (0);
+      mixMode = CS_FX_COPY;
     }
 
     virtual ~shaderPass () 
@@ -152,10 +158,6 @@ private:
     //writemasks
     bool wmRed, wmGreen, wmBlue, wmAlpha;
 
-    //mix and alpha mode
-    uint mixMode;
-    csAlphaMode alphaMode;
-
     //helpers for static and dynamic variables
     csShaderVariableContextHelper staticVariables;
     csShaderVariableProxyList dynamicVariables;
@@ -178,7 +180,7 @@ private:
   bool orig_wmRed, orig_wmGreen, orig_wmBlue, orig_wmAlpha;
 
   //Array of passes
-  shaderPass *passes;
+  shaderPass* passes;
   unsigned int passesCount;
 
   unsigned int currentPass;
@@ -250,7 +252,9 @@ private:
     XMLTOKEN_VERTEXPROGRAM,
     XMLTOKEN_FRAGMENTPROGRAM,
     XMLTOKEN_BUFFERMAPPING,
-    XMLTOKEN_TEXTUREMAPPING
+    XMLTOKEN_TEXTUREMAPPING,
+    XMLTOKEN_MIXMODE,
+    XMLTOKEN_ALPHAMODE
   };
 
   //Standard vars

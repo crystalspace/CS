@@ -21,6 +21,7 @@
 #include "iutil/strset.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
+#include "ivideo/rendermesh.h"
 
 #include "imesh/thing/polygon.h"
 
@@ -29,7 +30,7 @@
 
 SCF_IMPLEMENT_IBASE(csGLPolygonRenderer)
   SCF_IMPLEMENTS_INTERFACE(iPolygonRenderer)
-  SCF_IMPLEMENTS_INTERFACE(iRenderBufferSource)
+//  SCF_IMPLEMENTS_INTERFACE(iRenderBufferSource)
 SCF_IMPLEMENT_IBASE_END
 
 csStringID csGLPolygonRenderer::vertex_name   = csInvalidStringID;
@@ -272,11 +273,35 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
   lmcoords_buffer->Release ();
 }
 
-iRenderBufferSource* csGLPolygonRenderer::GetBufferSource (uint& indexStart, 
+/*iRenderBufferSource* csGLPolygonRenderer::GetBufferSource (uint& indexStart, 
                                                            uint& indexEnd)
 {
   PrepareBuffers (indexStart, indexEnd);
   return ((iRenderBufferSource*)this);
+}*/
+
+void csGLPolygonRenderer::PrepareRenderMesh (csRenderMesh& mesh)
+{
+  PrepareBuffers (mesh.indexstart, mesh.indexend);
+
+  csShaderVariable* sv;
+  sv = mesh.dynDomain->GetVariableAdd (index_name);
+  sv->SetValue (index_buffer);
+  sv = mesh.dynDomain->GetVariableAdd (vertex_name);
+  sv->SetValue (vertex_buffer);
+  sv = mesh.dynDomain->GetVariableAdd (texel_name);
+  sv->SetValue (texel_buffer);
+  sv = mesh.dynDomain->GetVariableAdd (normal_name);
+  sv->SetValue (normal_buffer);
+  sv = mesh.dynDomain->GetVariableAdd (binormal_name);
+  sv->SetValue (binormal_buffer);
+  sv = mesh.dynDomain->GetVariableAdd (tangent_name);
+  sv->SetValue (tangent_buffer);
+  sv = mesh.dynDomain->GetVariableAdd (lmcoords_name);
+  sv->SetValue (lmcoords_buffer);
+  sv = mesh.dynDomain->GetVariableAdd (color_name);
+  sv->SetValue (color_buffer);
+
 }
 
 void csGLPolygonRenderer::Clear ()
@@ -291,7 +316,7 @@ void csGLPolygonRenderer::AddPolygon (csPolygonRenderData* poly)
   polysNum++;
 }
 
-iRenderBuffer* csGLPolygonRenderer::GetRenderBuffer (csStringID name)
+/*iRenderBuffer* csGLPolygonRenderer::GetRenderBuffer (csStringID name)
 {
   if (renderBufferNum != polysNum) return 0;
 
@@ -331,4 +356,4 @@ iRenderBuffer* csGLPolygonRenderer::GetRenderBuffer (csStringID name)
   {
     return 0;
   }
-}
+}*/
