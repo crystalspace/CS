@@ -1701,6 +1701,13 @@ static bool VisTest_Front2Back (csKDTree* treenode, void* userdata,
   return true;
 }
 
+static bool Dummy_Front2Back (csKDTree* treenode, void*,
+	uint32, uint32&)
+{
+  treenode->Distribute ();
+  return true;
+}
+
 bool csDynaVis::VisTest (iRenderView* rview, 
 			 iVisibilityCullerListener* viscallback)
 {
@@ -1712,7 +1719,11 @@ bool csDynaVis::VisTest (iRenderView* rview,
 
   // just make sure we have a callback
   if (viscallback == 0)
+  {
+    // No callback. Assume we are precaching and pre-fetch the kdtree.
+    kdtree->Front2Back (csVector3 (0), Dummy_Front2Back, 0, 0);
     return false;
+  }
 
   cnt_visible = 0;
   cnt_node_visible = 0;

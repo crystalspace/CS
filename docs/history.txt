@@ -17,6 +17,8 @@ chronological order.
 	  a 'profclear' command to bugplug (assigned to 'ctrl-shift-p').
 	- Jorrit added the ability to the profiler to remember minimum and
 	  maximum elapsed time.
+	- Jorrit enhanced PrecacheCulling() in Dynavis so that it also traverses
+	  the kdtree now. That improves efficiency a bit more.
 1-Feb-2005
 	- Jorrit reverted a bug fix in engine->GetNearbyObjects() and
 	  GetNearbyMeshes() that was done on 15-Jan. The problem is that this
