@@ -42,6 +42,29 @@ struct csDGEL
   csDGEL** children;
   bool marker;
 
+  csDGEL ()
+  {
+    object = NULL;
+    used = false;
+    description = NULL;
+    file = NULL;
+    num_parents = 0;
+    parents = NULL;
+    num_children = 0;
+    children = NULL;
+  }
+  void Clear ()
+  {
+    delete[] description; description = NULL;
+    delete[] file; file = NULL;
+    delete[] parents; parents = NULL; num_parents = 0;
+    delete[] children; children = NULL; num_children = 0;
+  }
+  ~csDGEL ()
+  {
+    Clear ();
+  }
+
   void AddChild (csDGEL* child)
   {
     if (!children)
@@ -68,18 +91,13 @@ struct csDGEL
       }
       return;
     }
-    // Allocate the array one too big for the new elements because
-    // it is possible that we don't find the element to remove.
-    csDGEL** new_children = new csDGEL*[num_children];
     int i, j = 0;
     for (i = 0 ; i < num_children ; i++)
     {
       if (child != children[i])
-	new_children[j++] = children[i];
+	children[j++] = children[i];
     }
     num_children = j;
-    delete[] children;
-    children = new_children;
   }
   void AddParent (csDGEL* parent)
   {
@@ -107,18 +125,13 @@ struct csDGEL
       }
       return;
     }
-    // Allocate the array one too big for the new elements because
-    // it is possible that we don't find the element to remove.
-    csDGEL** new_parents = new csDGEL*[num_parents];
     int i, j = 0;
     for (i = 0 ; i < num_parents ; i++)
     {
       if (parent != parents[i])
-	new_parents[j++] = parents[i];
+	parents[j++] = parents[i];
     }
     num_parents = j;
-    delete[] parents;
-    parents = new_parents;
   }
 };
 
@@ -127,7 +140,7 @@ class csDebugGraph : public iBase
 public:
   int num_els;
   int max_els;
-  csDGEL* els;
+  csDGEL** els;
   bool exact;
 
   csDebugGraph ()
@@ -135,7 +148,7 @@ public:
     SCF_CONSTRUCT_IBASE (NULL);
     num_els = 0;
     max_els = 100;
-    els = new csDGEL [max_els];
+    els = new csDGEL* [max_els];
     exact = true;
   }
   virtual ~csDebugGraph ()
@@ -147,15 +160,12 @@ public:
     int i;
     for (i = 0 ; i < num_els ; i++)
     {
-      delete[] els[i].description;
-      delete[] els[i].file;
-      delete[] els[i].parents;
-      delete[] els[i].children;
+      delete els[i];
     }
     delete[] els;
     num_els = 0;
     max_els = 100;
-    els = new csDGEL [max_els];
+    els = new csDGEL* [max_els];
   }
 
   csDGEL* AddEl ()
@@ -170,30 +180,25 @@ public:
         int i;
         for (i = 0 ; i < num_els ; i++)
         {
-          if (!els[i].used)
+          if (!els[i]->used)
 	  {
-	    els[i].used = true;
-	    return &els[i];
+	    els[i]->Clear ();
+	    els[i]->used = true;
+	    els[i]->object = NULL;
+	    return els[i];
 	  }
         }
       }
       max_els += 100;
-      csDGEL* new_els = new csDGEL [max_els];
-      memcpy (new_els, els, sizeof (csDGEL) * num_els);
+      csDGEL** new_els = new csDGEL* [max_els];
+      memcpy (new_els, els, sizeof (csDGEL*) * num_els);
       delete[] els;
       els = new_els;
     }
 
-    csDGEL* el = &els[num_els];
-    el->object = NULL;
+    csDGEL* el = new csDGEL ();
+    els[num_els++] = el;
     el->used = true;
-    el->description = NULL;
-    el->file = NULL;
-    el->num_parents = 0;
-    el->parents = NULL;
-    el->num_children = 0;
-    el->children = NULL;
-    num_els++;
     return el;
   }
 
@@ -202,7 +207,7 @@ public:
     int i;
     for (i = 0 ; i < num_els ; i++)
     {
-      if (els[i].used && els[i].object == object) return &els[i];
+      if (els[i]->used && els[i]->object == object) return els[i];
     }
     return NULL;
   }
@@ -399,19 +404,19 @@ void csDebuggingGraph::Dump (iObjectRegistry* object_reg)
   CS_ASSERT (object_reg != NULL);
   csDebugGraph* dg = SetupDebugGraph (object_reg);
 
-  csDGEL* els = dg->els;
+  csDGEL** els = dg->els;
   // First mark all elements as unused and count the number
   // of elements we have.
   int i, cnt = 0;
   for (i = 0 ; i < dg->num_els ; i++)
   {
-    if (els[i].object)
+    if (els[i]->used)
     {
       cnt++;
-      els[i].marker = false;
+      els[i]->marker = false;
     }
     else
-      els[i].marker = true;
+      els[i]->marker = true;
   }
 
   printf ("====================================================\n");
@@ -421,9 +426,9 @@ void csDebuggingGraph::Dump (iObjectRegistry* object_reg)
   i = 0;
   while (i < dg->num_els)
   {
-    if (!els[i].marker)
+    if (!els[i]->marker)
     {
-      Dump (object_reg, els[i].object, true, false);
+      Dump (object_reg, els[i]->object, true, false);
       i = 0;	// Restart scan.
       printf ("----------------------------------------------------\n");
     }
@@ -497,15 +502,16 @@ void csDebuggingGraph::Dump (iObjectRegistry* object_reg, void* object,
   if (reset_mark)
   {
     // First mark all elements as unused.
-    csDGEL* els = dg->els;
+    csDGEL** els = dg->els;
     for (i = 0 ; i < dg->num_els ; i++)
     {
-      if (els[i].used) els[i].marker = false;
-      else els[i].marker = true;
+      if (els[i]->used) els[i]->marker = false;
+      else els[i]->marker = true;
     }
   }
 
   csDGEL* el = dg->FindEl (object);
+  CS_ASSERT (el != NULL);
 
   // First copy all elements that belong to this sub-graph
   // to a local array.
@@ -515,18 +521,23 @@ void csDebuggingGraph::Dump (iObjectRegistry* object_reg, void* object,
   while (done < num)
   {
     csDGEL* lel = local_els[done++];
-    for (i = 0 ; i < lel->num_parents ; i++)
-      if (!lel->parents[i]->marker)
+    if (lel->used)
+    {
+      for (i = 0 ; i < lel->num_parents ; i++)
       {
-        local_els[num++] = lel->parents[i];
-	lel->parents[i]->marker = true;
-      }
-    for (i = 0 ; i < lel->num_children ; i++)
-      if (!lel->children[i]->marker)
-      {
-        local_els[num++] = lel->children[i];
-	lel->children[i]->marker = true;
-      }
+        if (!lel->parents[i]->marker)
+        {
+          local_els[num++] = lel->parents[i];
+	  lel->parents[i]->marker = true;
+        }
+      }	
+      for (i = 0 ; i < lel->num_children ; i++)
+        if (!lel->children[i]->marker)
+        {
+          local_els[num++] = lel->children[i];
+	  lel->children[i]->marker = true;
+        }
+    }
   }
 
   // Now mark all elements as unused again.

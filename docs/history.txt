@@ -53,6 +53,8 @@ The history order is reversed so that new features are at the top.
 	  or release mode they will produce no code.
 	- Added the ability to attach a new description to an object
 	  in the debug graph.
+	- Fixed a few bad bugs in csDebuggingGraph which actually prevented
+	  it from working properly with high number of objects (> 100).
 13-Nov-2001
 	- Small comment fix in vfs.h.
 	- Fixed a bad bug in csObject destructor. It appears that it could
