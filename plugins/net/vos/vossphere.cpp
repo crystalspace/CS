@@ -42,7 +42,6 @@ public:
   std::string name;
   csRef<iSector> sector;
   csRef<iDynamicSystem> dynsys;
-  csVector3 size;
   int rim_vertices;
 
   ConstructSphereTask(iObjectRegistry *objreg, vRef<csMetaMaterial> mat, 
@@ -76,16 +75,16 @@ void ConstructSphereTask::doTask()
   //}
   
   csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper
-	  (ball_factory, name.c_str(), sector, csVector3(0, 0, 0));
+      (ball_factory, name.c_str(), sector, csVector3(0, 0, 0));
   
   csRef<iBallState> ballLook = SCF_QUERY_INTERFACE (
-		  				meshwrapper->GetMeshObject(), iBallState);
+                          meshwrapper->GetMeshObject(), iBallState);
 
   if(ballLook)
   {
     ballLook->SetMaterialWrapper(metamat->GetMaterialWrapper());
     ballLook->SetRadius (.5, .5, .5);
-	ballLook->SetRimVertices (rim_vertices);
+    ballLook->SetRimVertices (rim_vertices);
 
     if (dynsys)
     {
@@ -100,7 +99,7 @@ void ConstructSphereTask::doTask()
 
       collider->AttachColliderBox (size, t, 0, 1, 0);
       //if(isRemote()) collider->MakeStatic();
-	  cube->GetCSinterface()->SetCollider (collider);
+      cube->GetCSinterface()->SetCollider (collider);
   */  }
 
     sphere->GetCSinterface()->SetMeshWrapper(meshwrapper);
@@ -131,21 +130,12 @@ void csMetaSphere::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
 
   int rim_vertices = getRimVertices();
 
-  LOG("csMetaSphere", 3, "setting up cube");
+  LOG("csMetaSphere", 3, "setting up sphere");
   ConstructSphereTask *t = new ConstructSphereTask(vosa3dl->GetObjectRegistry(), 
                                     mat, this, getURLstr(), sect->GetSector(),
-									rim_vertices);
+                                    rim_vertices);
 
   t->dynsys = vosa3dl->GetDynSys();
-  double x = 1, y = 1, z = 1;
-  try
-  {
-    getScaling (x, y, z);
-  }
-  catch (NoSuchObjectError) 
-  {
-  }
-  t->size = csVector3 (x,y,z);
 
   vosa3dl->mainThreadTasks.push(t);
   LOG("csMetaSphere", 3, "calling csMetaObject3D::setup");
