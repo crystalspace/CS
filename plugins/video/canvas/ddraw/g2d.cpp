@@ -65,7 +65,7 @@ void sys_fatalerror(char *str, HRESULT hRes = S_OK)
 
 IMPLEMENT_FACTORY (csGraphics2DDDraw3)
 
-EXPORT_CLASS_TABLE (ddraw)
+EXPORT_CLASS_TABLE (ddraw3)
   EXPORT_CLASS (csGraphics2DDDraw3, SOFTWARE_2D_DRIVER,
     "DirectDraw DX3 2D graphics driver for Crystal Space")
   EXPORT_CLASS (csGraphics2DDDraw3, "crystalspace.graphics2d.direct3d.dx5",
