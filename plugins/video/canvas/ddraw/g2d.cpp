@@ -778,3 +778,51 @@ void csGraphics2DDDraw3::SetFor3D(bool For3D)
 {
   m_bUses3D = For3D;
 }
+
+void csGraphics2DDDraw3::DrawSprite8 (csGraphics2D *This, iTextureHandle *hTex, 
+                                      int sx, int sy, int sw, int sh,
+                                      int tx, int ty, int tw, int th)
+{
+  (void) This;
+  (void) hTex;
+  (void) sx;
+  (void) sy;
+  (void) sw;
+  (void) sh;
+  (void) tx;
+  (void) ty;
+  (void) tw;
+  (void) th;
+}
+
+void csGraphics2DDDraw3::DrawSprite16 (csGraphics2D *This, iTextureHandle *hTex, 
+                                       int sx, int sy, int sw, int sh,
+                                       int tx, int ty, int tw, int th)
+{
+  (void) This;
+  (void) hTex;
+  (void) sx;
+  (void) sy;
+  (void) sw;
+  (void) sh;
+  (void) tx;
+  (void) ty;
+  (void) tw;
+  (void) th;
+}
+
+void csGraphics2DDDraw3::DrawSprite32 (csGraphics2D *This, iTextureHandle *hTex, 
+                                       int sx, int sy, int sw, int sh,
+                                       int tx, int ty, int tw, int th)
+{
+  (void) This;
+  (void) hTex;
+  (void) sx;
+  (void) sy;
+  (void) sw;
+  (void) sh;
+  (void) tx;
+  (void) ty;
+  (void) tw;
+  (void) th;
+}
