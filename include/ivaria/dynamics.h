@@ -197,7 +197,7 @@ struct iRigidBody : public iBase
   /// Get the angular velocity (rotation)
   virtual const csVector3 GetAngularVelocity () const = 0;
 
-  /// Set the bodies physic properties
+  /// Set the physic properties
   virtual void SetProperties (float mass, const csVector3& center,
   	const csMatrix3& inertia) = 0;
   /// Get the physic properties. NULL parameters are ignored
@@ -313,15 +313,19 @@ struct iJoint : public iBase
    * if set.
    */
   virtual void SetTransConstraints (bool X, bool Y, bool Z) = 0;
-  /// The following functions return the current axis trans constraints
+  /// True if this axis' translation is constrained
   virtual bool IsXTransConstrained () = 0;
+  /// True if this axis' translation is constrained
   virtual bool IsYTransConstrained () = 0;
+  /// True if this axis' translation is constrained
   virtual bool IsZTransConstrained () = 0;
-  /// Sets/Gets the minimum constrained distance between bodies
+  /// Sets the minimum constrained distance between bodies
   virtual void SetMinimumDistance (const csVector3 &min) = 0;
+  /// Gets the minimum constrained distance between bodies
   virtual csVector3 GetMinimumDistance () = 0;
-  /// Sets/Gets the maximum constrained distance between bodies
+  /// Sets the maximum constrained distance between bodies
   virtual void SetMaximumDistance (const csVector3 &max) = 0;
+  /// Gets the maximum constrained distance between bodies
   virtual csVector3 GetMaximumDistance () = 0;
   /**
    * Sets the rotational constraints on the 3 axes.  Works like
@@ -329,15 +333,19 @@ struct iJoint : public iBase
    * the respective axes.
    */
   virtual void SetRotConstraints (bool X, bool Y, bool Z) = 0;
-  /// The following functions return the current axis rot constraints
+  /// True if this axis' rotation is constrained
   virtual bool IsXRotConstrained () = 0;
+  /// True if this axis' rotation is constrained
   virtual bool IsYRotConstrained () = 0;
+  /// True if this axis' rotation is constrained
   virtual bool IsZRotConstrained () = 0;
-  /// Sets/Gets the minimum constrained angle between bodies
+  /// Sets the minimum constrained angle between bodies
   virtual void SetMinimumAngle (const csVector3 &min) = 0;
+  /// Gets the minimum constrained angle between bodies
   virtual csVector3 GetMinimumAngle () = 0;
-  /// Sets/Gets the maxium constrained angle between bodies
+  /// Sets the maximum constrained angle between bodies
   virtual void SetMaximumAngle (const csVector3 &max) = 0;
+  /// Gets the maximum constrained angle between bodies
   virtual csVector3 GetMaximumAngle () = 0;
 };
 
