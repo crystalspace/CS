@@ -41,6 +41,9 @@ include mk/nasm.mak
 
 ifeq ($(USE_SHARED_PLUGINS),no)
   override MAKE_DLL=no
+  O_SHARED=stat
+else
+  O_SHARED=dyn
 endif
 
 ifeq ($(USE_SHARED_LIBS),yes)
@@ -61,7 +64,8 @@ vpath %.cpp support/debug
 OUTBASE=out/
 OUTOS=$(OUTBASE)$(OS)/
 OUTPROC=$(OUTOS)$(PROC)/
-OUT=$(OUTPROC)$(MODE)$(OUTSUFX.$(MAKE_DLL))/
+OUTSHR=$(OUTPROC)$(O_SHARED)/
+OUT=$(OUTSHR)$(MODE)$(OUTSUFX.$(MAKE_DLL))/
 ############################################
 
 CFLAGS.INCLUDE+=$(CFLAGS.I). $(CFLAGS.I)./include $(CFLAGS.I)./libs \
@@ -151,7 +155,7 @@ ifndef DO.DEP
 endif
 
 # Directories for output files
-OUTDIRS = $(OUTBASE) $(OUTOS) $(OUTPROC) $(OUT) $(OUTDLL)
+OUTDIRS = $(OUTBASE) $(OUTOS) $(OUTPROC) $(OUTSHR) $(OUT) $(OUTDLL)
 
 # The following include should make additional defines using above variables
 MAKESECTION = postdefines

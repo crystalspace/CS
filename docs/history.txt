@@ -1,5 +1,15 @@
 The history order has been reversed so that new features are at the top.
 
+10-May-2000
+	- Michael Dale Long did a major update for CrystalClear. A lot of
+	  work has been done on iActor. The main thing was adding multiple
+	  velocity support. A lot of other bugfixes and other things I
+	  can't remember right now, too.
+	- Frank O'Connor updated VC project files for new dynamic texture
+	  system.
+	- Modified makefile system to add an extra 'dyn' or 'stat' in
+	  the 'out' directory to differentiate between dynamic or static
+	  linking.
 9-May-2000
 	- -revis commandline option will now work to force recalculation
 	  of the octree. -norevis will not work for this as CS cannot
@@ -15,6 +25,7 @@ The history order has been reversed so that new features are at the top.
 	- Norman also added FUNC_ID for fontrenderer to isystem.h.
 	- Norman disabled freetype engine plugin to prevent default
 	  compilation, user should enable it itself.
+	- Norman added missing methods for dynamic textures (still dummies).
 	- Thomas Riemer did a minor fix for initialization of name for
 	  command for NetSpace.
 	- Frank O'Connor did some fixes with regards to the new font
@@ -24,11 +35,19 @@ The history order has been reversed so that new features are at the top.
 	- Norman fixed gfxtest to change %ld to %d. Eric then fixed this
 	  fix to be more portable with regards to how size_t is defined.
 	- Norman removed various unused variables.
+	- Norman Kramer fixed mixup of glxclean and glx2dclean rules
+	  in makefile.
 	- Received a patch from Samuel Humphreys which allows you to render
 	  on texture dynamically. Currently this only works for the software
 	  renderer. Support for the other renderers will have to be added.
 	  There is also a new 'dtsimple' demo app to show of the new
 	  feature.
+	- Paul Garceau modified win32/volatile.h to enable user to decide
+	  whether or not Trocchus' DO_DINPUT_KEYBOARD should be enabled.
+	- Paul also did some Mingw specific modifications. He added an option
+	  to decide which processor you want to use (default is i386).
+	  If you wish to use another Intel processor you will need to modify
+	  CFLAGS.GENERAL.
 8-May-2000
 	- Eric Sunshine re-enabled -kb flag and re-added CRLF line terminators
 	  for all .dsp files so that they will work even from CVS snapshot
