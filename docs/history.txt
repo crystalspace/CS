@@ -72,6 +72,10 @@ chronological order.
 	- Marten Svanfeldt changed GL_CLAMP into GL_CLAMP_TO_EDGE in glrender3ds
 	  texturecache. They should be identical, but ATI does not work as
 	  expected when using GL_CLAMP.
+        - res hardcoded the texture format for cubemaps to RGB8 to fix visual
+          glitches on ATI cards.
+        - res added a simple calculation of binormals and tangents to thing.
+        - res reformatted light.xml a bit.
 7-Sep-2003
 	- Jorrit performed a lot of changes to unify the new and old
 	  renderer branches:

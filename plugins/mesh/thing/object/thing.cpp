@@ -160,6 +160,14 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csThingStatic::ObjectModel)
   SCF_IMPLEMENTS_INTERFACE(iObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+csStringID csThingStatic::vertex_name = csInvalidStringID;
+csStringID csThingStatic::texel_name = csInvalidStringID;
+csStringID csThingStatic::normal_name = csInvalidStringID;
+csStringID csThingStatic::color_name = csInvalidStringID;
+csStringID csThingStatic::index_name = csInvalidStringID;
+csStringID csThingStatic::tangent_name = csInvalidStringID;
+csStringID csThingStatic::binormal_name = csInvalidStringID;
+
 csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type)
 	: static_polygons (32, 64)
 {
@@ -189,15 +197,27 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type)
 
 #ifdef CS_USE_NEW_RENDERER
   r3d = CS_QUERY_REGISTRY (thing_type->object_reg, iGraphics3D);
-  csRef<iStringSet> strings = 
-    CS_QUERY_REGISTRY_TAG_INTERFACE (thing_type->object_reg,
-      "crystalspace.renderer.stringset", iStringSet);
 
-  vertex_name = strings->Request ("vertices");
-  texel_name = strings->Request ("texture coordinates");
-  normal_name = strings->Request ("normals");
-  color_name = strings->Request ("colors");
-  index_name = strings->Request ("indices");
+  if ((vertex_name == csInvalidStringID) ||
+    (texel_name == csInvalidStringID) ||
+    (normal_name == csInvalidStringID) ||
+    (color_name == csInvalidStringID) ||
+    (index_name == csInvalidStringID) ||
+    (tangent_name == csInvalidStringID) ||
+    (binormal_name == csInvalidStringID))
+  {
+    csRef<iStringSet> strings = 
+      CS_QUERY_REGISTRY_TAG_INTERFACE (thing_type->object_reg,
+        "crystalspace.renderer.stringset", iStringSet);
+
+    vertex_name = strings->Request ("vertices");
+    texel_name = strings->Request ("texture coordinates");
+    normal_name = strings->Request ("normals");
+    color_name = strings->Request ("colors");
+    index_name = strings->Request ("indices");
+    tangent_name = strings->Request ("tangents");
+    binormal_name = strings->Request ("binormals");
+  }
 #endif
 }
 
@@ -1181,9 +1201,6 @@ void csThingStatic::FillRenderMeshes (
 	csDirtyAccessArray<csRenderMesh*>& rmeshes,
 	const csArray<RepMaterial>& repMaterials)
 {
-  csHash<csPolygon3DStatic*, iMaterialWrapper*> material_polys;
-  csHash<iMaterialWrapper*, iMaterialWrapper*> materials;
-
   int num_verts = 0, num_indices = 0, max_vc = 0;
   int i;
 
@@ -1191,67 +1208,79 @@ void csThingStatic::FillRenderMeshes (
   {
     csPolygon3DStatic* poly = static_polygons.Get (i);
 
-    iMaterialWrapper* mat = poly->GetMaterialWrapper ();
-    if (materials.Get (mat) == 0)
-      materials.Put (mat, mat);
-    material_polys.Put (mat, poly);
-
     int pvc = poly->GetVertexCount ();
 
     num_verts += pvc;
+#ifdef POLY_RENDERMESH
+    num_indices += pvc;
+#else
     num_indices += (pvc - 2) * 3;
+#endif
     max_vc = MAX (max_vc, pvc);
   }
 
   if (!vertex_buffer)
     vertex_buffer = r3d->CreateRenderBuffer (num_verts * sizeof (csVector3), 
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
-
   csVector3* vertices = (csVector3*)vertex_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
   if (!normal_buffer)
     normal_buffer = r3d->CreateRenderBuffer (num_verts * sizeof (csVector3), 
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
-
   csVector3* normals = (csVector3*)normal_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
   if (!texel_buffer)
     texel_buffer = r3d->CreateRenderBuffer (num_verts * sizeof (csVector2), 
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2, false);
-
   csVector2* texels = (csVector2*)texel_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
   if (!index_buffer)
     index_buffer = r3d->CreateRenderBuffer (num_indices  * sizeof (int), 
       CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 1, true);
-
   int* indices = (int*)index_buffer->Lock (CS_BUF_LOCK_NORMAL);
+
+  if (!tangent_buffer)
+    tangent_buffer = r3d->CreateRenderBuffer (num_verts * sizeof (csVector3), 
+      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
+  csVector3* tangents = (csVector3*)tangent_buffer->Lock (CS_BUF_LOCK_NORMAL);
+
+  if (!binormal_buffer)
+    binormal_buffer = r3d->CreateRenderBuffer (num_verts * sizeof (csVector3), 
+      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
+  csVector3* binormals = (csVector3*)binormal_buffer->Lock (CS_BUF_LOCK_NORMAL);
+
+#ifdef POLY_RENDERMESH
+  polyVertNum.SetLength (static_polygons.Length());
+  int polyCounter = 0;
+#endif
 
   CS_ALLOC_STACK_ARRAY (int, pvIndices, max_vc);
 
   int vindex = 0, iindex = 0;
 
-  csHash<iMaterialWrapper*, iMaterialWrapper*>::GlobalIterator matIt =
-    materials.GetIterator ();
-  while (matIt.HasNext ())
+  for (i = 0; i < litPolys.Length (); i++)
   {
-    iMaterialWrapper* mat = matIt.Next ();
-
+    const csStaticPolyGroup& pg = *(litPolys[i]);
     csRenderMesh* rm = new csRenderMesh;
 
     rm->buffersource = this;
     rm->z_buf_mode = CS_ZBUF_USE;
     rm->mixmode = CS_FX_COPY; 
-    rm->material = mat;
+    rm->material = pg.material;
+#ifdef POLY_RENDERMESH
+    rm->meshtype = CS_MESHTYPE_POLYGON;
+    rm->polyNumVerts = polyVertNum.GetArray () + polyCounter;
+    rm->polyTexMaps = polyTexMaps.GetArray () + polyCounter;
+#else
     rm->meshtype = CS_MESHTYPE_TRIANGLES;
+#endif
 
     rm->indexstart = iindex;
 
-    csHash<csPolygon3DStatic*, iMaterialWrapper*>::Iterator polyIt =
-      material_polys.GetIterator (mat);
-    while (polyIt.HasNext ())
+    int j;
+    for (j = 0; j< pg.polys.Length(); j++)
     {
-      csPolygon3DStatic* static_data = polyIt.Next ();
+      csPolygon3DStatic* static_data = static_polygons[pg.polys[j]];
 
       int* poly_indices = static_data->GetVertexIndices ();
 
@@ -1271,7 +1300,31 @@ void csThingStatic::FillRenderMeshes (
       csMatrix3 t_m;
       csVector3 t_v;
       static_data->MappingGetTextureSpace (t_m, t_v);
-      csTransform transform (t_m, t_v);
+      csReversibleTransform transform (t_m, t_v);
+
+      /*
+        Calculate the 'tangent' vector of this poly, needed for dot3.
+        It is "a tangent to the surface which represents the direction 
+        of increase of the t texture coordinate." (Quotation from
+         http://www.ati.com/developer/sdk/rage128sdk/Rage128BumpTutorial.html)
+         Conveniently, all polys have a object->texture space transformatin
+         associated with them.
+
+         @@@ Ignores the fact things can be smooth.
+         But it's simpler for now :)
+       */
+      csVector3 tex_t0 = transform.This2Other (csVector3 (0, 0, 0));
+      csVector3 tex_t1 = transform.This2Other (csVector3 (0, 1, 0));
+      csVector3 tangent (tex_t1 - tex_t0);
+      tangent.Normalize ();
+
+      /*
+        Calculate the 'binormal' vector of this poly, needed for dot3.
+        It's simply the cross product of the tangent and the normal.
+      */
+      
+      csVector3 binormal (tangent % polynormal);
+      binormal.Normalize ();
 
       // First, fill the normal/texel/vertex buffers.
       int j, vc = static_data->GetVertexCount();
@@ -1288,10 +1341,22 @@ void csThingStatic::FillRenderMeshes (
 	  *normals++ = polynormal;
 	csVector3 t = transform.Other2This (obj_verts[vidx]);
 	*texels++ = csVector2 (t.x, t.y);
+        *tangents++ = tangent;
+        *binormals++ = binormal;
 
 	pvIndices[j] = vindex++;
       }
 
+#ifdef POLY_RENDERMESH
+      for (j = 0; j < vc; j++)
+      {
+	*indices++ = pvIndices[j];
+	iindex++;
+      }
+      polyVertNum[polyCounter] = vc;
+      polyTexMaps[polyCounter] = static_data->GetTextureMapping ();
+      polyCounter++;
+#else
       // Triangulate poly.
       for (j = 2; j < vc; j++)
       {
@@ -1302,6 +1367,7 @@ void csThingStatic::FillRenderMeshes (
 	*indices++ = pvIndices[j];
 	iindex++;
       }
+#endif
     }
     rm->indexend = iindex;
 
@@ -1312,6 +1378,8 @@ void csThingStatic::FillRenderMeshes (
   texel_buffer->Release ();
   normal_buffer->Release ();
   vertex_buffer->Release ();
+  tangent_buffer->Release ();
+  binormal_buffer->Release ();
 }
 #endif // CS_USE_NEW_RENDERER
 
@@ -2420,7 +2488,7 @@ bool csThing::DrawTest (iRenderView *rview, iMovable *movable)
   for (i = 0; i < renderMeshes.Length(); i++)
   {
     csRenderMesh* rm = renderMeshes[i];
-    rm->transform = &tr_o2c;
+    rm->object2camera = tr_o2c;
     rm->clip_portal = clip_portal;
     rm->clip_plane = clip_plane;
     rm->clip_z_plane = clip_z_plane;
