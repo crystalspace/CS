@@ -4,6 +4,8 @@ The history order is reversed so that new features are at the top.
 	- Removed the windows pen support added by 'res'. I don't have
 	  the needed include files on mingw.
 	- Matze added VFS support to csFileDialog
+	- Jorge Acereda fixed infinite renderer. It failed to overload
+	  iGraphics2D::Write() because it had a different argument list.
 30-Oct-2001
 	- Matze changed code structure of viewmesh a bit. I'll add csws
 	  interfaces tomorrow.
