@@ -1757,11 +1757,14 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
 
   iSector *s = c->GetSector ();
 #if defined(CS_USE_NEW_RENDERER)
-  csReversibleTransform camTransR = c->GetTransform();
-  G3D->SetWorldToCamera (&camTransR);
-  iRenderLoop* rl = s->GetRenderLoop ();
-  if (!rl) rl = defaultRenderLoop;
-  rl->Draw (&rview, s);
+  if (s) 
+  {
+    csReversibleTransform camTransR = c->GetTransform();
+    G3D->SetWorldToCamera (&camTransR);
+    iRenderLoop* rl = s->GetRenderLoop ();
+    if (!rl) rl = defaultRenderLoop;
+    rl->Draw (&rview, s);
+  }
 #else
   if (s) s->Draw (&rview);
 #endif	// CS_USE_NEW_RENDERER
