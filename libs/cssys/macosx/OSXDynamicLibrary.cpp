@@ -1,6 +1,6 @@
 //=============================================================================
 //
-//	Copyright (C)1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999-2003 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -71,20 +71,6 @@ static OSXPluginArray& get_loaded_plugins()
 //-----------------------------------------------------------------------------
 csLibraryHandle csFindLoadLibrary(char const* name)
 {
-  static bool initialized = false;
-  if (!initialized)
-  {
-    initialized = true;
-#if 0 // the same is done in csInitializer::InitalizeSCF 
-    char temp [CS_MAXPATHLEN];
-    char *path = csGetConfigPath ();
-    strcpy (temp, path);
-    delete[] path;
-    strcat(temp, OS_MACOSX_PLUGIN_DIR);
-    csAddLibraryPath(OS_MACOSX_PLUGIN_DIR);
-    csAddLibraryPath(temp);
-#endif
-  }
   return csFindLoadLibrary(0, name, OS_MACOSX_PLUGIN_EXT);
 }
 

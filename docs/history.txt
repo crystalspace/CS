@@ -31,6 +31,10 @@ The history order is reversed so that new features are at the top.
 	  and WinME where "dllwrap --driver-name=g++" results in the error
 	  "dllwrap.exe: installation problem, cannot exec g++".
 	- Eric Sunshine removed the unused libs/cssys/general/instpath.cpp.
+	- Eric Sunshine made the following changes to the configuration-path &
+	  plugin-paths function in the MacOS/X port:
+	    - Fixed bug: csGetPluginsPath() was leaking char[1024] buffer.
+	    - Cleaned up implementation files.
 25-Feb-2003
 	- Marten Svanfeldt made these changes:
 	    - Fixed a bug in the light/shadow culling.

@@ -20,7 +20,7 @@
 //-----------------------------------------------------------------------------
 // OSXInstallPath.cpp
 //
-//	Platform-specific function to determine installation path.
+//	Platform-specific function to determine configuration and plugin paths.
 //
 //-----------------------------------------------------------------------------
 #include "cssysdef.h"
@@ -31,42 +31,39 @@
 #include "csutil/util.h"
 
 //-----------------------------------------------------------------------------
-// csGetInstallPath
+// csGetConfigPath
 //-----------------------------------------------------------------------------
-char* csGetConfigPath ()
+char* csGetConfigPath()
 {
   char* buff = new char[1024];
-
-  if (OSXGetInstallPath(buff, 1024, PATH_SEPARATOR))
+  if (!OSXGetInstallPath(buff, sizeof(buff), PATH_SEPARATOR))
   {
-    return buff;
+    char const* path = getenv("CRYSTAL");
+    if (!path || *path == 0)
+      strncpy (buff, ".", sizeof(buff));
+    else
+      strncpy (buff, path, sizeof(buff));
   }
-  
-  char const* path = getenv("CRYSTAL");
-  if (!path || *path == 0)
-  {
-    strncpy (buff, ".", 1024);
-    return buff;
-  }
-  
-  strncpy (buff, path, 1024);  
   return buff;
 }
 
-char** csGetPluginPaths ()
-{
-  char** paths = new char* [4];
-  char* buff = new char[1024];
 
-  strncpy(buff, csGetConfigPath(), 1024);
-  strncat(buff, OS_MACOSX_PLUGIN_DIR, 1024);
-  
-  paths[0] = csGetConfigPath ();
-  paths[1] = csStrNew (buff);
-  paths[2] = csStrNew (".");
+//-----------------------------------------------------------------------------
+// csGetPluginPaths
+//-----------------------------------------------------------------------------
+char** csGetPluginPaths()
+{
+  char** paths = new char* [4];     // Caller frees.
+  char*  buff  = new char[1024];    // Caller frees.
+  char*  cpath = csGetConfigPath(); // Caller frees.
+
+  strncpy(buff, cpath, sizeof(buff));
+  strncat(buff, OS_MACOSX_PLUGIN_DIR, sizeof(buff));
+
+  paths[0] = csStrNew(buff);
+  paths[1] = cpath;
+  paths[2] = csStrNew(".");
   paths[3] = 0;
 
-  delete[] buff;
-  
-  return paths; 
-}    
+  return paths;
+}
