@@ -214,6 +214,14 @@ bool csFreeTypeFont::GetGlyphSize (uint8 c, int &oW, int &oH)
   return true;
 }
 
+bool csFreeTypeFont::GetGlyphSize (uint8 c, int &oW, int &oH, int &, int &, int &)
+{
+  if (!current) return false;
+  oW = current->glyphs [c].w;
+  oH = current->glyphs [c].h;
+  return true;
+}
+
 uint8 *csFreeTypeFont::GetGlyphBitmap (uint8 c, int &oW, int &oH)
 {
   if (!current) return NULL;
@@ -222,7 +230,31 @@ uint8 *csFreeTypeFont::GetGlyphBitmap (uint8 c, int &oW, int &oH)
   return current->glyphs [c].bitmap;
 }
 
+uint8 *csFreeTypeFont::GetGlyphBitmap (uint8 c, int &oW, int &oH, int &, int &, int &)
+{
+  if (!current) return NULL;
+  oW = current->glyphs [c].w;
+  oH = current->glyphs [c].h;
+  return current->glyphs [c].bitmap;
+}
+
 void csFreeTypeFont::GetDimensions (const char *text, int &oW, int &oH)
+{
+  if (!text || !current)
+  {
+    oW = oH = 0;
+    return;
+  }
+
+  oW = 0; oH = current->maxH;
+  while (*text)
+  {
+    oW += current->glyphs [*(const uint8 *)text].w;
+    text++;
+  }
+}
+
+void csFreeTypeFont::GetDimensions (const char *text, int &oW, int &oH, int &, int &, int &)
 {
   if (!text || !current)
   {

@@ -131,6 +131,7 @@ public:
    * Returns false if values could not be determined.
    */
   virtual bool GetGlyphSize (uint8 c, int &oW, int &oH);
+  virtual bool GetGlyphSize (uint8 c, int &oW, int &oH, int &adv, int &left, int &top);
 
   /**
    * Return a pointer to a bitmap containing a rendered character.
@@ -138,11 +139,13 @@ public:
    * filled with bitmap width and height.
    */
   virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH);
+  virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH, int &adv, int &left, int &top);
 
   /**
    * Return the width and height of text written with this font.
    */
   virtual void GetDimensions (const char *text, int &oW, int &oH);
+  virtual void GetDimensions (const char *text, int &oW, int &oH, int &desc);
 
   /**
    * Determine how much characters from this string can be written
