@@ -12,6 +12,11 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+19-Feb-2000
+	- Eric Sunshine enhanced csStrVector so that it can perform both
+	  case-sensitive and case-insensitive sorting and comparison.
+	- Eric Sunshine fixed cspFileDialog so that it sorts the directory
+	  and file lists.
 18-Feb-2000
 	- Fixed Z-buffering for sprites. Was broken after the
 	  DrawTriangleMesh changes.
