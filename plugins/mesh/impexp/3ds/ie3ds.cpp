@@ -165,7 +165,7 @@ bool csModelConverter3ds::SupportsFormat( const char *formatExt )
 iModelData *csModelConverter3ds::Load( UByte* buffer, ULong size )
 {
 Lib3dsFile *p3dsFile;
-iModelData *pModalData;
+csModelData *pModelData;
 
   /***  send the buffer in to be translated  ***/
   p3dsFile = LoadFileData( buffer, size );
@@ -173,8 +173,8 @@ iModelData *pModalData;
     return NULL; // kick out if there is a problem
 
   // make a new instance of iModelData
-   pModelData = new csModelData( );
-   pModelData->QueryObject ()->SetName ("model");
+  pModelData = new csModelData( );
+  pModelData->QueryObject ()->SetName ("model");
 
 //   JUST LOAD UP MESHES FOR NOW
 
@@ -278,7 +278,7 @@ Lib3dsMesh *pCurMesh;
 
   lib3ds_file_free( p3dsFile );
 
-  return pModelData;
+  return SCF_QUERY_INTERFACE( pModelData, iModelData );
 }
 
 iDataBuffer *csModelConverter3ds::Save( iModelData *pMdl, const char *formatName )
@@ -290,16 +290,12 @@ iDataBuffer *csModelConverter3ds::Save( iModelData *pMdl, const char *formatName
 
 bool csModelConverter3ds::LoadMeshObjectData( iModelDataObject *pDataObject, Lib3dsMesh *p3dsMesh )
 {
-bool doTexels;
 
   /***  Load up vertices and texels  ***/
-int numVertices, numTexels, i;
+int numVertices, i;
 
-  return false;
-/*
   // get the number of vertices in the current mesh
   numVertices = p3dsMesh->points;
-  numTexels = p3dsMesh->texels;
 
   //  load up the vertices
 Lib3dsPoint *pCurPoint;
@@ -313,28 +309,14 @@ csVector3 vertex;
     // index to the position on the list using index (do I have to loop? should I build a list)
     xyz = pCurPoint->pos;
     vertex = csVector3( xyz[0], xyz[1], xyz[2] );
-    pSpriteLook->GetVertex( vertexIndex, i ) = vertex;
+      /// Add a vertex
+    pDataObject->AddVertex( vertex );
     pCurPoint++;
   }
 
-  // now load up the texels
-Lib3dsTexel *pCurTexel;
-float u, v;
-
-  pCurTexel = p3dsMesh->texelL;
-
-  for ( i = 0 ; i < numTexels ; i++ )
-  {
-    u = *pCurTexel[0];  // just a little dereferencing
-    v = *pCurTexel[1];
-    pSpriteLook->GetTexel( texelIndex, i ) = csVector2( u, v );
-    pCurTexel++;
-  }
-*/
   /***  Load up the triangles  ***/
 
 int numTriangles, index, j;
-float x, y, z;
 Lib3dsFace *pCurFace;
 iModelDataPolygon *pCurPoly;
 csVector3 position;
@@ -345,6 +327,11 @@ csVector2 textureUV;
     //  get the trianlge count and go to the first triangle
     numTriangles = p3dsMesh->faces;
     pCurFace = p3dsMesh->faceL;
+
+    // set a dummy values
+    normal.Set( 0, 0, 0 );
+    color.Set( .5, .5, .5 );
+    textureUV.Set( 0, 0 );
 
     // now copy each triangle over
     for ( i = 0 ; i < numTriangles ; i++ )
@@ -357,21 +344,22 @@ csVector2 textureUV;
 
 
       /***  process the information for each polygon vertex  ***/
-/*
+
       //  get the indices for each vector of the triangle
       for( j = 0 ; j <3 ; j++ )
       {
         index = pCurFace->points[j];
-        position.Set( index.float sx, float sy, float sz ) 
 
-      // now add the vertex
-      pCurPoly->AddVertex( &position, &normal, &color, &textureUV );
+        // now add the vertex
+        pCurPoly->AddVertex( index, normal, color, textureUV );
+
+      }
 
       // set the material
       // pCurPoly->SetMaterial (iModelDataMaterial *m) = 0;
 
       pCurFace++;
-    */
+    
     }
 
   return true;
