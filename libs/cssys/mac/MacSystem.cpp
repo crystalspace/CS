@@ -294,7 +294,8 @@ bool SysSystemDriver::Initialize (int argc, const char* const argv[], const char
     MenuHandle      theMenu;
     Str255          theText;
 
-    argc = GetCommandLine( &argv );
+// WHM CW6 fix, remove the (char ***) for CW4
+    argc = GetCommandLine( (char***) &argv );
     if ( ! csSystemDriver::Initialize ( argc, argv, iConfigName ))
         return false;
 
