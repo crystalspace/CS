@@ -24,7 +24,8 @@ set -e
 
 case "$1" in
     configure)
-
+    # dh_link don't do this correctly
+    [ -d /usr/lib/crystalspace/data/config ] && rmdir /usr/lib/crystalspace/data/config && ln -s /etc/crystalspace/config /usr/lib/crystalspace/data/config
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
