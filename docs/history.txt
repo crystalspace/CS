@@ -30,6 +30,7 @@ chronological order.
 	      than $HOME/.crystal.
 	    - Unix: Plugin meta-information is now stored in BFD section
 	      ".crystalspace" rather than ".crystal".
+	- Remi Bonnet fixed a typo in csHash::DeleteElement.     
 7-Jul-2004
 	- Jorrit fixed several compile errors for gcc 2.95 as reported by
 	  Darius Dawidowski. Darius also reported a warning in spr2d

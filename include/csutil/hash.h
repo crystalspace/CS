@@ -520,7 +520,7 @@ public:
 
   /// Delete the element pointed by the iterator. This is safe for this
   /// iterator, not for the others.
-  void DeleteElement (GlobalIterator iterator)
+  void DeleteElement (GlobalIterator& iterator)
   {
     Elements[iterator.bucket].DeleteIndex(iterator.element);
     Size--;
