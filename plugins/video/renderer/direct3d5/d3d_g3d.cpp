@@ -258,16 +258,18 @@ bool csGraphics3DDirect3DDx5::Open(const char* Title)
   DDSCAPS ddsCaps;
   DWORD dwTotal, dwFree;
   D3DRECT rect;
-  
+
+  // Get the direct detection device.
+  iGraphics2DDDraw3* pSysGInfo = QUERY_INTERFACE(m_piG2D, iGraphics2DDDraw3);
+  ASSERT(pSysGInfo);
+
+  pSysGInfo->SetFor3D(true);
+
   // Open the 2D driver.
   
   if (!m_piG2D->Open(Title))
     return false;
   
-  // Get the direct detection device.
-  iGraphics2DDDraw3* pSysGInfo = QUERY_INTERFACE(m_piG2D, iGraphics2DDDraw3);
-  ASSERT(pSysGInfo);
-
   pSysGInfo->GetDirectDetection(&m_pDirectDevice);
   ASSERT( m_pDirectDevice );
   

@@ -20,6 +20,8 @@ struct iGraphics2DDDraw6 : public iBase
   virtual void GetDirectDetection (IDirectDetectionInternal** lplpDDetection) = 0;
   ///
   virtual void SetColorPalette (void) = 0;
+  ///
+  virtual void SetFor3D(bool For3D) = 0;
 };
 
 #endif

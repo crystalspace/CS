@@ -279,14 +279,14 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   DWORD dwTotal, dwFree;
   D3DRECT rect;
   
-  // Open the 2D driver.
-  
-  if (!m_piG2D->Open(Title))
-    return false;
-  
   // Get the direct detection device.
   iGraphics2DDDraw6* pSysGInfo = QUERY_INTERFACE(m_piG2D, iGraphics2DDDraw6);
   ASSERT(pSysGInfo);
+  pSysGInfo->SetFor3D(true);
+  
+  // Open the 2D driver.
+  if (!m_piG2D->Open(Title))
+    return false;
   
   pSysGInfo->GetDirectDetection(&m_pDirectDevice);
   ASSERT( m_pDirectDevice );

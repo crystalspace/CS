@@ -182,7 +182,7 @@ csGraphics2DDDraw3::csGraphics2DDDraw3(iBase *iParent) :
   m_nGraphicsReady(true),
   m_bLocked(false),
   m_piWin32System(NULL),
-  m_bUses3D(true)
+  m_bUses3D(false)
 {
   CONSTRUCT_IBASE (iParent);
 }
@@ -196,10 +196,6 @@ csGraphics2DDDraw3::~csGraphics2DDDraw3(void)
 
 bool csGraphics2DDDraw3::Initialize (iSystem *pSystem)
 {
-  DDSURFACEDESC ddsd;
-  HRESULT ddrval;
-  DDPIXELFORMAT ddpf;
-
   if (!csGraphics2D::Initialize(pSystem))
     return false;
 
@@ -213,7 +209,16 @@ bool csGraphics2DDDraw3::Initialize (iSystem *pSystem)
   m_nCmdShow  = m_piWin32System->GetCmdShow();
 
   System->GetSettings(Width, Height, Depth, FullScreen);
-  
+
+  return true;
+}
+
+void csGraphics2DDDraw3::SecondaryInit()
+{
+  DDSURFACEDESC ddsd;
+  HRESULT ddrval;
+  DDPIXELFORMAT ddpf;
+
   // Create the DirectDraw device //
   LPGUID pGuid = NULL;
   if (!m_bUses3D)
@@ -340,22 +345,12 @@ bool csGraphics2DDDraw3::Initialize (iSystem *pSystem)
     
     complete_pixel_format();
   }
-
-#if 0
- printf ("Bytes per pixel: %d\n"
-         "Red/Green/Blue bits: %d,%d,%d\n"
-         "Red/Green/Blue mask: %08lX,%08lX,%08lX\n"
-         "Red/Green/Blue shift: %d,%d,%d\n"
- ,
-         pfmt.PixelBytes, pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits,
-         pfmt.RedMask, pfmt.GreenMask, pfmt.BlueMask,
-         pfmt.RedShift, pfmt.GreenShift, pfmt.BlueShift);
-#endif
-  return true;
 }
 
 bool csGraphics2DDDraw3::Open(const char *Title)
 {
+  SecondaryInit();
+
   if (!csGraphics2D::Open (Title))
     return false;
 
@@ -777,4 +772,9 @@ extern DirectDetectionDevice* DirectDevice;
 void csGraphics2DDDraw3::GetDirectDetection (IDirectDetectionInternal** lplpDDetection)
 {
   *lplpDDetection = static_cast<IDirectDetectionInternal*>(DirectDevice);
+}
+
+void csGraphics2DDDraw3::SetFor3D(bool For3D)
+{
+  m_bUses3D = For3D;
 }

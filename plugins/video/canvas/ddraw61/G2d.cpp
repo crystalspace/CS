@@ -177,20 +177,13 @@ csGraphics2DDDraw6::csGraphics2DDDraw6(iBase *iParent) :
   m_nDepth(-1),
   m_nGraphicsReady(true),
   m_bLocked(false),
-  m_bUses3D(true)
+  m_bUses3D(false)
 {
   CONSTRUCT_IBASE (iParent);
 }
 
 bool csGraphics2DDDraw6::Initialize(iSystem *pSystem)
 {
-  DDSURFACEDESC2 ddsd;
-  HRESULT ddrval;
-  DDPIXELFORMAT ddpf;
-  //DDCAPS ddcaps;
-  LPGUID pGuid = NULL;
-  //iWin32SystemDriver* piWin32System;
-
   // Call original Initialize() function
   if (!csGraphics2D::Initialize(pSystem))
     return false;
@@ -209,6 +202,16 @@ bool csGraphics2DDDraw6::Initialize(iSystem *pSystem)
   }
 
   System->GetSettings(Width, Height, m_nDepth, FullScreen);
+
+  return true;
+}
+
+void csGraphics2DDDraw6::SecondaryInit()
+{
+  DDSURFACEDESC2 ddsd;
+  HRESULT ddrval;
+  DDPIXELFORMAT ddpf;
+  LPGUID pGuid = NULL;
 
   // Create the DirectDraw device //
   if (!m_bUses3D)
@@ -352,8 +355,6 @@ bool csGraphics2DDDraw6::Initialize(iSystem *pSystem)
 
   m_nActivePage = 0;
   m_bDisableDoubleBuffer = false;
-
-  return true;
 }
 
 csGraphics2DDDraw6::~csGraphics2DDDraw6(void)
@@ -364,6 +365,8 @@ csGraphics2DDDraw6::~csGraphics2DDDraw6(void)
 
 bool csGraphics2DDDraw6::Open(char *Title)
 {
+  SecondaryInit();
+
   if (!csGraphics2D::Open (Title))
     return false;
   
@@ -765,4 +768,9 @@ extern DirectDetectionDevice* DirectDevice;
 void csGraphics2DDDraw6::GetDirectDetection (IDirectDetectionInternal** lplpDDetection)
 {
   *lplpDDetection = static_cast<IDirectDetectionInternal*>(DirectDevice);
+}
+
+void csGraphics2DDDraw6::SetFor3D(bool For3D)
+{
+  m_bUses3D = For3D;
 }

@@ -66,8 +66,12 @@ public:
   virtual void GetDirectDetection (IDirectDetectionInternal** lplpDDetection);
   ///
   virtual void SetColorPalette ();
+  ///
+  virtual void SetFor3D(bool For3D);
   
 protected:
+  void SecondaryInit();
+
   LPDIRECTDRAW m_lpDD;
   LPDIRECTDRAW4 m_lpDD4;
   LPDIRECTDRAWSURFACE4 m_lpddsPrimary;
