@@ -1188,6 +1188,9 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
 csDrawScanline* csGraphics3DSoftwareCommon::ScanProc_8_Alpha
   (csGraphics3DSoftwareCommon *This, int alpha, bool keycolor, bool alphamap)
 {
+  keycolor = false; // done to eliminate compiler warning and use it at least once.
+  alphamap = false; // done to eliminate compiler warning and use it at least once.
+  
   csAlphaTables *alpha_tables = This->texman->alpha_tables;
 
   if (alpha < 32)
