@@ -33,7 +33,6 @@ ifeq ($(MAKESECTION),postdefines)
 JOYTEST.EXE = joytest$(EXE)
 DIR.JOYTEST = apps/tests/joytest
 OUT.JOYTEST = $(OUT)/$(DIR.JOYTEST)
-INF.JOYTEST = $(SRCDIR)/$(DIR.JOYTEST)/joytest.csplugin
 INC.JOYTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.JOYTEST)/*.h))
 SRC.JOYTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.JOYTEST)/*.cpp))
 OBJ.JOYTEST = $(addprefix $(OUT.JOYTEST)/,$(notdir $(SRC.JOYTEST:.cpp=$O)))
