@@ -36,8 +36,8 @@ GetRegistryInstallPath (const HKEY parentKey, char *oInstallPath, size_t iBuffer
   HKEY m_pKey;
   LONG result;
 
-  result =
-    RegCreateKey(parentKey, "Software\\CrystalSpace", &m_pKey);
+  result = RegOpenKeyEx (parentKey, "Software\\CrystalSpace",
+    0, KEY_READ, &m_pKey);
   if (result == ERROR_SUCCESS)
   {
     result = RegQueryValueEx(
@@ -145,7 +145,7 @@ static inline char* FindConfigPath ()
   }
 
   // retrieve the path of the Program Files folder and append 
-  // a "\Crystal\".
+  // a "\Crystal".
   if (MinShellDllVersion(5, 0))
   {
     LPMALLOC MAlloc;
@@ -171,7 +171,7 @@ static inline char* FindConfigPath ()
   }
 
   // nothing helps, use default
-  // which is "C:\Program Files\Crystal\"
+  // which is "C:\Program Files\Crystal"
   strncpy(path, "C:\\Program Files\\Crystal", 1024);
 
   return csStrNew (path);

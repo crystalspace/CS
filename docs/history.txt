@@ -55,6 +55,15 @@ The history order is reversed so that new features are at the top.
 	      was gorked, which caused most commands invoked by jobber.pl to
 	      fail when executed from cron (though not when run from an
 	      interactive shell session).
+	- res added a prototype for csGetPlatformConfig() to cssys/sysfunc.h.
+	  This can be used to retrieve a platform-specific configuration storage
+	  facility, intended for user-set settings/setting changed at runtime.
+	- res implemented csGetPlatformConfig() for Win32. The implementation 
+	  uses the registry.
+	- res also changed RegCreateKey() to RegOpenKeyEx() in instpath.cpp.
+	  RegCreateKey() is not only deprecated, but it also creates a registry
+	  key if needed, which is unnecessary as we just want to read something
+	  there.
 3-May-2003
 	- Matze changed -Wno-unused-function and -Wno-unused-label flags to
 	  -Wno-unused in aws Jamfile. Seems gcc2.9x doesn't like the first 2

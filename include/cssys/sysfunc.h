@@ -24,7 +24,9 @@
 #include "csutil/ref.h"
 #include "csutil/csstring.h"
 #include "iutil/strvec.h"
+
 struct iObjectRegistry;
+struct iConfigFile;
 
 /**
  * Implements a default run-loop for stand-alone applications.<p>
@@ -120,5 +122,14 @@ csRef<iStrVector> csFindSystemRoots();
  * If the username can not be determined, then an empty string is returned.
  */
 csString csGetUsername();
+
+/**
+ * Get a platform-specific config object.
+ * The data is stored in a platform-specific manner - e.g. the Registry on
+ * Windows.
+ * \param key Used to distinguish different stored configurations.
+ * \return A config 'file'. Might return NULL on some platforms.
+ */
+csPtr<iConfigFile> csGetPlatformConfig (const char* key);
 
 #endif // __CS_SYSFUNC_H__
