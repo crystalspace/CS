@@ -128,7 +128,7 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
 
     if (!IsPowerOf2 (Width) || !IsPowerOf2 (Height))
       CsPrintf (MSG_WARNING,
-        "Inefficient texture image '%s' dimenstions!\n"
+        "Inefficient texture image '%s' dimensions!\n"
         "The width (%d) and height (%d) should be a power of two.\n",
         GetName (), Width, Height);
   }
