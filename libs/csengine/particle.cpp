@@ -74,10 +74,10 @@ void csParticleSystem :: AppendRectSprite(float width, float height,
   csColoredVertices& vs = part->GetVertices();
   vs.SetLimit(4);
   vs.SetLength(4);
-  vs[0].pos.Set(-width,-height); vs[0].u=0.; vs[0].v=0.;
-  vs[1].pos.Set(-width,+height); vs[1].u=0.; vs[1].v=1.;
-  vs[2].pos.Set(+width,+height); vs[2].u=1.; vs[2].v=1.;
-  vs[3].pos.Set(+width,-height); vs[3].u=1.; vs[3].v=0.;
+  vs[0].pos.Set(-width,-height); vs[0].u=0.; vs[0].v=1.;
+  vs[1].pos.Set(-width,+height); vs[1].u=0.; vs[1].v=0.;
+  vs[2].pos.Set(+width,+height); vs[2].u=1.; vs[2].v=0.;
+  vs[3].pos.Set(+width,-height); vs[3].u=1.; vs[3].v=1.;
   part->SetLighting( lighted );
   part->SetColor( csColor(1.0, 1.0, 1.0) );
   part->SetTexture(txt);
