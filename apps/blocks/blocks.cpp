@@ -27,6 +27,9 @@
     Psuedo-AI module to play automatically.
     Add confirmation before quitting game.
     Fix bugs with marker on floor (wrong size...).
+    Extra light to the back of the play area.
+    Rotation of blocks should be relative to the camera position just
+       like movement.
  */
 
 #define SYSDEF_ACCESS
@@ -1736,8 +1739,8 @@ void Blocks::StartKeyConfig ()
 
   keyconf_menu->Add ("shape left", KeyName (key_left), (void*)&key_left);
   keyconf_menu->Add ("shape right", KeyName (key_right), (void*)&key_right);
-  keyconf_menu->Add ("pitch up", KeyName (key_rotpx), (void*)&key_rotpx);
-  keyconf_menu->Add ("pitch down", KeyName (key_rotmx), (void*)&key_rotmx);
+  keyconf_menu->Add ("pitch down", KeyName (key_rotpx), (void*)&key_rotpx);
+  keyconf_menu->Add ("pitch up", KeyName (key_rotmx), (void*)&key_rotmx);
   keyconf_menu->Add ("yaw left", KeyName (key_rotpy), (void*)&key_rotpy);
   keyconf_menu->Add ("yaw right", KeyName (key_rotmy), (void*)&key_rotmy);
   keyconf_menu->Add ("roll left", KeyName (key_rotpz), (void*)&key_rotpz);
