@@ -265,38 +265,38 @@ public:
       if (mw) return &(mw->scfiMaterialWrapper);
       else return NULL;
     }
-    virtual int AddMaterial (iMaterialWrapper *imw)
+    virtual int Add (iMaterialWrapper *imw)
     {
       csIsoMaterialWrapper* mw = scfParent->NewMaterial (imw->GetMaterialHandle ());
       if (mw) return Find (&(mw->scfiMaterialWrapper));
       return -1;
     }
-    virtual bool RemoveMaterial (int idx)
+    virtual bool Remove (int idx)
     {
       scfParent->RemoveIndex (idx);
       return true;
     }
 
-    virtual bool RemoveMaterial (iMaterialWrapper *imw)
+    virtual bool Remove (iMaterialWrapper *imw)
     {
       int idx = Find (imw);
       if (idx != -1)
-	RemoveMaterial (idx);
+	Remove (idx);
       return idx != -1;
     }
 
     virtual void RemoveAll ()
     {
-      for (int i=GetMaterialCount ()-1; i>=0; i--)
+      for (int i=GetCount ()-1; i>=0; i--)
 	scfParent->RemoveIndex (i);
     }
-    virtual int GetMaterialCount () const
+    virtual int GetCount () const
     {
       return scfParent->Length ();
     }
     virtual iMaterialWrapper* Get (int idx) const
     {
-      CS_ASSERT (idx >= 0 && idx < GetMaterialCount ());
+      CS_ASSERT (idx >= 0 && idx < GetCount ());
       return &(scfParent->Get (idx)->scfiMaterialWrapper);
     }
     virtual iMaterialWrapper* FindByName (const char* iName) const
