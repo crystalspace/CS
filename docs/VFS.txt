@@ -1,0 +1,171 @@
+The Virtual File System (VFS)
+
+Since many even basic concepts in file systems on different OSes often
+differ, you often should care to use the right path separators on the right
+platform, search on different "drives", "mounts" and so on for required files.
+This library achieves the goal to make the file system look "the same", and
+adds many bonus features such as archive support and overlayed directories.
+
+Each "directory" on the VFS "virtual volume" is mapped to some "real-world"
+directory or ZIP archive. Additionally, you can make one "virtual directory"
+to map to several "real-world" directories (and/or ZIP files) at once, thus
+covering such usages as having files either on CD or HD (depending on user's
+choice), distributing data file updates (thus overriding some files on
+write-only media) and so on.
+
+The Virtual File System is driven by a configuration file, the format of that
+file is described further.
+
+The main "VFS" section describes the layout of the "virtual" file system.
+Imagine a clean disk drive onto which you start to "create" directories
+by making links to existing "real" directories and archive (.zip) files.
+An archive is treated exactly like a subdirectory; You even can link one
+"virtual directory" to several "real" paths and archives; however if you
+write files they will be written to the first directory or archive in list.
+
+The path lists should be separated by commas (,), so commas cannot be used
+in directory names; I don't see a problem with this but if you do, change
+VFS_PATH_DIVIDER macro in vfs.cpp.
+
+The VFS section usually makes heavy usage of variable data since most OSes
+have very different file systems; the "common denominator" that emulates
+VFS is a Unix-like filesystem. To include the value of a variable in a VFS
+path use $(variable-name) construct; in the case variable-name consists of
+a single letter, you can use the $variable-name construct (i.e. $A).
+
+Variables that are defined in environment overrides those defined in
+this file. For example, HOME environment variable is set in all Unices
+(at least I know of), but is undefined in other OSes - they can define
+their own values for these variables in system-dependent sections, but if
+user will define the HOME environment variable it will always override
+the one from this file. You also can refer the variables in the following
+way: $(VAR:expr) that means "use the contents of VAR if VAR is set (usually
+in environment), and use expr if not". This can be used for more complex
+expressions, example:
+
+	$(HOME:$(HOMEDIR:$(HOMEPATH:/home)))
+
+This expression means "take the value of HOME variable, if it is not set, use
+the contents of HOMEDIR variable, if it is also not set, use HOMEPATH variable,
+and if none are set, use "/home" as the resulting value).
+
+The VFS class defines a variable called "/" (i.e. to reference it you write
+"$/") that contains the path delimiter on current OS (i.e. '/' for Unix, '\'
+for DOS and ':' for Mac). If you reference a "real-world" path, you better
+use $/ and not '\', ':' or '/'.
+
+-----------------------------------------------------------------------------
+There are several differences between different filesystems that you should
+always keep in mind because VFS doesn't hide these details from you. To
+avoid inconsistencies between different file systems you should avoid
+breaking the following rules:
+
+-*- Choose file names that are well suited for all operating systems you are
+    targeting; as of today DOS has most restricted rules for naming files
+    (8.3 file names with only ASCII7 characters except "?*+ " and with only
+    one dot per filename). The VFS does not make any tries to mimic long file
+    names on systems that does not support them; some C compiler runtimes
+    (for example, DJGPP) have limited support for working with LFNs: filenames
+    are automatically truncated to 8.3 space on creation and truncated before
+    comparisons, in most cases this is enough. The part of VFS that is located
+    in archives support virtually any file names, so if you're sure that you
+    will never have to place some file on "real" filesystem, you can give him
+    any name you want.
+
+-*- One more fact you should remember is that different systems use different
+    filename comparison criteria. On Unix filename is case-sensitive, while
+    on DOS, OS/2, Windows it is case-insensitive. To avoid problems with this
+    always open files with their exact names. For example, if you have a file
+    on VFS called "VFS.cfg" you should it as "VFS.cfg" and not as "vfs.cfg"
+    or "VFS.CFG". Even if on DOS the file will be called "VFS.CFG" (DOS
+    always uppercases file names).
+
+-*- Keep in mind that Unix CAN delete currently opened files while DOS, OS/2,
+    Windows and possibly others (Mac and Amiga?) cannot. So you should avoid
+    deleting open files (actually this should work on files which are located
+    in archives but is not advised to do so (and has not been tested)).
+
+-----------------------------------------------------------------------------
+To make difference between archives and raw disk directories VFS uses a
+simple convention: directories ends with a path separator character ($/)
+while archives doesn't. For example "$/data" refers to an archive, while
+"$/data$/" refers to the "data" directory. This is often the major cause
+of most errors; so if you're getting unexpected results check in the first
+place if directories have trailing path separators.
+
+--------------------------------------------------------------- cut here ----
+
+[VFS]
+
+; Assume the following close-to-reality example. Assume we wrote a game
+; with three levels; game is located on CD-ROM and we want to be able to
+; release patches in the future which will replace only several files
+; from level archives (each level is presumed to be placed in a separate
+; archive on either CD-ROM or cached on HD). Additionally, we will add
+; a link to user's home directory (something somewhat vaguely defined
+; on non-Unices) so that game can store user's settings into something
+; like /~/game.profile.
+;
+; The following variables should be defined either in environment
+; or in system-dependen sections:
+; .	- The current directory (or the directory game has been installed into)
+; /	- The native path separator character; this value is supplied by the
+;         VFS manager, so you do not need to define it here; you can do it
+;         however if you want.
+; CD	- The path to CD-ROM
+; HOME	- user's home directory
+;
+; A common error (at least for me) is to leave the last $/. This is an error
+; since VFS will threat any path not ending in $/ as a *file* (i.e. archive)
+; name and not as a "real-world" path name.
+
+~=$(HOME)$/
+level1=$.$/patches$/l1$/, $.$/cache$/level1.zip, $(CD)$/data$/level1.zip
+level2=$.$/patches$/l2$/, $.$/cache$/level2.zip, $(CD)$/data$/level2.zip
+level3=$.$/patches$/l3$/, $.$/cache$/level3.zip, $(CD)$/data$/level3.zip
+
+;
+; OS aliases: aliases are always read FIRST, VFS entries specific to
+; operating system brand override those defined in OS alias section.
+; For example, if your current OS is Solaris, VFS will look for
+; value of a variable first in environment, then in section
+; VFS.Solaris, and finally in VFS.Unix (as given in section below).
+;
+[VFS.Alias]
+; Map all Unix brands to the common VFS.Unix section
+Solaris		= VFS.Unix
+Linux		= VFS.Unix
+BSD		= VFS.Unix
+Irix		= VFS.Unix
+NextStep	= VFS.Unix
+OpenStep	= VFS.Unix
+Rhapsody-DR2	= VFS.Unix
+BeOS		= VFS.Unix
+
+; All OSes with CP/M-like filesystems
+DOS		= VFS.CP/M
+OS/2		= VFS.CP/M
+Win32		= VFS.CP/M
+
+[VFS.Unix]
+.=.
+..=..
+CD=/mnt/cdrom
+
+[VFS.CP/M]
+.=.
+..=..
+HOME=$(HOMEDIR:$(HOMEPATH:.))
+CD=x:
+
+; Not sure about the following
+[VFS.Macintosh]
+.=:
+..=
+HOME=
+
+; Even more not sure about Amiga
+[VFS.Amiga]
+.=
+..=
+HOME=
