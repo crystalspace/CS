@@ -240,6 +240,8 @@ class csSystemDriver : public iSystem
 
   // Elapsed time between last two frames and absolute time in milliseconds
   cs_time ElapsedTime, CurrentTime;
+  
+protected:
   /// The configuration manager
   iConfigManager *Config;
   /// The Virtual File System object
