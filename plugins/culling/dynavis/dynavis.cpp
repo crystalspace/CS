@@ -1136,6 +1136,7 @@ end:
 
 bool csDynaVis::VisTest (iRenderView* rview)
 {
+  UpdateObjects ();
   current_visnr++;
   history_frame_cnt++;	// Only for history culling.
 
@@ -1307,6 +1308,7 @@ static bool VisTestBox_Front2Back (csKDTree* treenode, void* userdata,
 
 csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (const csBox3& box)
 {
+  UpdateObjects ();
   current_visnr++;
 
   csVector* v;
@@ -1388,6 +1390,7 @@ static bool VisTestSphere_Front2Back (csKDTree* treenode, void* userdata,
 
 csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (const csSphere& sphere)
 {
+  UpdateObjects ();
   current_visnr++;
 
   csVector* v;
@@ -1557,6 +1560,7 @@ bool csDynaVis::IntersectSegment (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr,
     iMeshWrapper** p_mesh, iPolygon3D** poly)
 {
+  UpdateObjects ();
   current_visnr++;
 
   IntersectSegment_Front2BackData data;
@@ -1670,6 +1674,7 @@ static bool CastShadows_Front2Back (csKDTree* treenode, void* userdata,
 // @@@ USE RADIUS!!!
 void csDynaVis::CastShadows (iFrustumView* fview)
 {
+  UpdateObjects ();
   current_visnr++;
   CastShadows_Front2BackData data;
   data.current_visnr = current_visnr;

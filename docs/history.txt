@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+6-Jan-2002
+	- Fixed a stupid bug in Dynavis. Dynavis wasn't correctly updating
+	  the kdtree when objects moved. The reason was that UpdateObjects()
+	  wasn't called when needed. Frustvis didn't suffer from this
+	  problem.
 5-Jan-2002
 	- Applied a patch from Rene Jager (renej.frog@yucom.be) which does
 	  the following:
