@@ -57,19 +57,19 @@ void scfString::Insert (size_t iPos, iString *iStr)
 void scfString::Overwrite (size_t iPos, iString *iStr)
 { s->Overwrite (iPos, iStr->GetData ()); }
 
-iString *scfString::Append (const char *iStr, size_t iCount = (size_t)-1)
+iString *scfString::Append (const char *iStr, size_t iCount)
 {
   s->Append (iStr, iCount);
   return this;
 }
 
-iString *scfString::Append (const iString *iStr, size_t iCount = (size_t)-1)
+iString *scfString::Append (const iString *iStr, size_t iCount)
 {
   s->Append (iStr->GetData (), iCount);
   return this;
 }
 
-void scfString::Replace (const iString *iStr, size_t iCount = (size_t)-1)
+void scfString::Replace (const iString *iStr, size_t iCount)
 { s->Replace (iStr->GetData (), iCount); }
 
 bool scfString::Compare (const iString *iStr) const
