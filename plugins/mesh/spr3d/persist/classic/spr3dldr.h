@@ -25,6 +25,7 @@
 #include "imap/services.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "csutil/strhash.h"
 
 struct iEngine;
 struct iSkeletonLimb;
@@ -43,10 +44,14 @@ private:
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
   iSyntaxService* synldr;
+  csStringHash xmltokens;
 
   // Load a skeleton.
   bool LoadSkeleton (csParser* parser, iReporter* reporter, 
     iSkeletonLimb* limb, char* buf);
+  // Load a skeleton.
+  bool LoadSkeleton (iDocumentNode* node, iReporter* reporter, 
+    iSkeletonLimb* limb);
 
 public:
   SCF_DECLARE_IBASE;
@@ -66,10 +71,7 @@ public:
 
   /// Parse a given node and return a new object for it.
   virtual iBase* Parse (iDocumentNode* node,
-    iLoaderContext* ldr_context, iBase* context)
-  {
-    return NULL;
-  }
+    iLoaderContext* ldr_context, iBase* context);
 
   struct eiComponent : public iComponent
   {
@@ -126,6 +128,7 @@ private:
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
   iSyntaxService* synldr;
+  csStringHash xmltokens;
 
 public:
   SCF_DECLARE_IBASE;
@@ -145,10 +148,7 @@ public:
 
   /// Parse a given node and return a new object for it.
   virtual iBase* Parse (iDocumentNode* node,
-    iLoaderContext* ldr_context, iBase* context)
-  {
-    return NULL;
-  }
+    iLoaderContext* ldr_context, iBase* context);
 
   struct eiComponent : public iComponent
   {

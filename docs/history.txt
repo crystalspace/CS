@@ -2,6 +2,8 @@ The history order is reversed so that new features are at the top.
 
 19-Aug-2002
 	- Implemented XML version of the ball mesh object loader.
+	- Fixed a memory leak in SKELETON statement of spr3d loader.
+	- Converted the 3D sprite loader to XML.
 17-Aug-2002
 	- Better error message is a texture could not be loaded in
 	  the loader.

@@ -42,42 +42,25 @@
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/document.h"
 #include "imap/ldrctxt.h"
 #include "spr3dldr.h"
 
 CS_IMPLEMENT_PLUGIN
 
 CS_TOKEN_DEF_START
-  CS_TOKEN_DEF (ADD)
-  CS_TOKEN_DEF (ALPHA)
-  CS_TOKEN_DEF (COPY)
-  CS_TOKEN_DEF (KEYCOLOR)
-  CS_TOKEN_DEF (TILING)
-  CS_TOKEN_DEF (MULTIPLY2)
-  CS_TOKEN_DEF (MULTIPLY)
-  CS_TOKEN_DEF (TRANSPARENT)
-
   CS_TOKEN_DEF (ACTION)
   CS_TOKEN_DEF (APPLY_MOTION)
   CS_TOKEN_DEF (BASECOLOR)
   CS_TOKEN_DEF (F)
   CS_TOKEN_DEF (FACTORY)
   CS_TOKEN_DEF (FRAME)
-  CS_TOKEN_DEF (IDENTITY)
   CS_TOKEN_DEF (LIMB)
   CS_TOKEN_DEF (LIGHTING)
   CS_TOKEN_DEF (MATERIAL)
   CS_TOKEN_DEF (MATRIX)
   CS_TOKEN_DEF (MIXMODE)
   CS_TOKEN_DEF (Q)
-  CS_TOKEN_DEF (ROT)
-  CS_TOKEN_DEF (ROT_X)
-  CS_TOKEN_DEF (ROT_Y)
-  CS_TOKEN_DEF (ROT_Z)
-  CS_TOKEN_DEF (SCALE)
-  CS_TOKEN_DEF (SCALE_X)
-  CS_TOKEN_DEF (SCALE_Y)
-  CS_TOKEN_DEF (SCALE_Z)
   CS_TOKEN_DEF (SKELETON)
   CS_TOKEN_DEF (SMOOTH)
   CS_TOKEN_DEF (TRANSFORM)
@@ -87,6 +70,29 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (V)
   CS_TOKEN_DEF (VERTICES)
 CS_TOKEN_DEF_END
+
+enum
+{
+  XMLTOKEN_ACTION,
+  XMLTOKEN_APPLYMOTION,
+  XMLTOKEN_BASECOLOR,
+  XMLTOKEN_F,
+  XMLTOKEN_FACTORY,
+  XMLTOKEN_FRAME,
+  XMLTOKEN_LIMB,
+  XMLTOKEN_LIGHTING,
+  XMLTOKEN_MATERIAL,
+  XMLTOKEN_MATRIX,
+  XMLTOKEN_MIXMODE,
+  XMLTOKEN_Q,
+  XMLTOKEN_SKELETON,
+  XMLTOKEN_SMOOTH,
+  XMLTOKEN_TRANSFORM,
+  XMLTOKEN_T,
+  XMLTOKEN_SOCKET,
+  XMLTOKEN_TWEEN,
+  XMLTOKEN_V
+};
 
 static void ReportError (iReporter* reporter, const char* id,
 	const char* description, ...)
@@ -183,6 +189,22 @@ bool csSprite3DFactoryLoader::Initialize (iObjectRegistry* object_reg)
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+
+  xmltokens.Register ("action", XMLTOKEN_ACTION);
+  xmltokens.Register ("f", XMLTOKEN_F);
+  xmltokens.Register ("frame", XMLTOKEN_FRAME);
+  xmltokens.Register ("limb", XMLTOKEN_LIMB);
+  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
+  xmltokens.Register ("matrix", XMLTOKEN_MATRIX);
+  xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
+  xmltokens.Register ("q", XMLTOKEN_Q);
+  xmltokens.Register ("skeleton", XMLTOKEN_SKELETON);
+  xmltokens.Register ("smooth", XMLTOKEN_SMOOTH);
+  xmltokens.Register ("transform", XMLTOKEN_TRANSFORM);
+  xmltokens.Register ("t", XMLTOKEN_T);
+  xmltokens.Register ("socket", XMLTOKEN_SOCKET);
+  xmltokens.Register ("tween", XMLTOKEN_TWEEN);
+  xmltokens.Register ("v", XMLTOKEN_V);
   return true;
 }
 
@@ -321,6 +343,96 @@ bool csSprite3DFactoryLoader::LoadSkeleton (csParser* parser,
   return true;
 }
 
+bool csSprite3DFactoryLoader::LoadSkeleton (iDocumentNode* node,
+					    iReporter* reporter,
+					    iSkeletonLimb* limb)
+{
+  csRef<iSkeletonConnection> con;
+  con.Take (SCF_QUERY_INTERFACE (limb, iSkeletonConnection));
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_LIMB:
+        {
+          iSkeletonConnection* newcon = limb->CreateConnection ();
+	  iSkeletonLimb* newlimb = SCF_QUERY_INTERFACE (newcon, iSkeletonLimb);
+	  const char* limbname = child->GetContentsValue ();
+	  if (limbname) newlimb->SetName (limbname);
+	  if (!LoadSkeleton (child, reporter, newlimb))
+	    return false;
+	}
+        break;
+      case XMLTOKEN_TRANSFORM:
+        if (con)
+        {
+	  csMatrix3 m;
+	  csVector3 v (0, 0, 0);
+	  csRef<iDocumentNodeIterator> child_it = child->GetNodes ();
+	  while (child_it->HasNext ())
+	  {
+	    csRef<iDocumentNode> childchild = child_it->Next ();
+	    if (childchild->GetType () != CS_NODE_ELEMENT) continue;
+	    const char* child_value = childchild->GetValue ();
+	    csStringID id = xmltokens.Request (child_value);
+	    switch (id)
+	    {
+              case XMLTOKEN_MATRIX:
+		if (!synldr->ParseMatrix (childchild, m))
+		  return false;
+		break;
+   	      case XMLTOKEN_Q:
+	        {
+		  csQuaternion q;
+		  q.x = childchild->GetAttributeValueAsFloat ("x");
+		  q.y = childchild->GetAttributeValueAsFloat ("y");
+		  q.z = childchild->GetAttributeValueAsFloat ("z");
+		  q.r = childchild->GetAttributeValueAsFloat ("r");
+		  m.Set (q);
+	        }
+	        break;
+              case XMLTOKEN_V:
+	        if (!synldr->ParseVector (childchild, v))
+		  return false;
+		break;
+	      default:
+		ReportError (reporter,
+		  "crystalspace.sprite3dfactoryloader.parse.skeleton",
+		  "Unexpected token '%s' in 'transform'!", child_value);
+	        return false;
+            }
+          }
+	  csTransform tr (m, -m.GetInverse () * v);
+	  con->SetTransformation (tr);
+        }
+	else
+	{
+	  ReportError (reporter,
+	    "crystalspace.sprite3dfactoryloader.parse.skeleton.badtransform",
+	    "'transform' not valid for this type of skeleton limb!");
+	  return false;
+	}
+	break;
+      case XMLTOKEN_V:
+	limb->AddVertex (child->GetContentsValueAsInt ());
+        break;
+      default:
+	ReportError (reporter,
+		  "crystalspace.sprite3dfactoryloader.parse.skeleton",
+		  "Unexpected token '%s' in 'skeleton'!", value);
+	return false;
+    }
+  }
+
+  return true;
+}
+
 iBase* csSprite3DFactoryLoader::Parse (const char* string,
 				       iLoaderContext* ldr_context, 
 				       iBase* context)
@@ -400,34 +512,35 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
     switch (cmd)
     {
       case CS_TOKEN_MATERIAL:
-	    {
+      {
         csScanStr (params, "%s", str);
         iMaterialWrapper* mat = ldr_context->FindMaterial (str);
-	      if (!mat)
-	      {
-	        ReportError (reporter,
+	if (!mat)
+	{
+	  ReportError (reporter,
 		        "crystalspace.sprite3dfactoryloader.parse.unknownmaterial",
 		        "Couldn't find material named '%s'", str);
-	        spr3dLook->DecRef ();
+	  spr3dLook->DecRef ();
           fact->DecRef ();
           return NULL;
-	      }
-	      spr3dLook->SetMaterialWrapper (mat);
-	    }
-	    break;
+	}
+	spr3dLook->SetMaterialWrapper (mat);
+      }
+      break;
 
       case CS_TOKEN_SKELETON:
-	    {
+      {
         spr3dLook->EnableSkeletalAnimation ();
         iSkeleton* skeleton = spr3dLook->GetSkeleton ();
-        iSkeletonLimb* skellimb = SCF_QUERY_INTERFACE (skeleton,
-	        iSkeletonLimb);
+        csRef<iSkeletonLimb> skellimb;
+	skellimb.Take (SCF_QUERY_INTERFACE (skeleton,
+	        iSkeletonLimb));
         if (name) skellimb->SetName (name);
         if (!LoadSkeleton (parser, reporter, skellimb, params))
         {
-	        spr3dLook->DecRef ();
-	        fact->DecRef ();
-	        return NULL;
+	  spr3dLook->DecRef ();
+	  fact->DecRef ();
+	  return NULL;
         }
       }
       break;
@@ -443,12 +556,12 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
         {
           if (!params2)
           {
-	          ReportError (reporter,
+	    ReportError (reporter,
 		          "crystalspace.sprite3dfactoryloader.parse.action.badformat",
 		          "Bad format while parsing ACTION!");
-	          spr3dLook->DecRef ();
-	          fact->DecRef ();
-	          return NULL;
+	    spr3dLook->DecRef ();
+	    fact->DecRef ();
+	    return NULL;
           }
           switch (cmd)
           {
@@ -457,14 +570,14 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
               iSpriteFrame* ff = spr3dLook->FindFrame (fn);
               if (!ff)
               {
-	              ReportError (reporter,
-		              "crystalspace.sprite3dfactoryloader."
+	        ReportError (reporter,
+		  "crystalspace.sprite3dfactoryloader."
                   "parse.action.badframe",
-		              "Trying to add unknown frame '%s' to action '%s'!",
-		            fn, act->GetName ());
-		            spr3dLook->DecRef ();
-		            fact->DecRef ();
-                  return NULL;
+		  "Trying to add unknown frame '%s' to action '%s'!",
+		  fn, act->GetName ());
+		  spr3dLook->DecRef ();
+		  fact->DecRef ();
+                return NULL;
               }
               act->AddFrame (ff, d);
             break;
@@ -485,8 +598,8 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
         {
           if (!params2)
           {
-	          ReportError (reporter,
-		          "crystalspace.sprite3dfactoryloader.parse.frame.badformat",
+	    ReportError (reporter,
+	      "crystalspace.sprite3dfactoryloader.parse.frame.badformat",
               "Bad format while parsing FRAME!");
 	          spr3dLook->DecRef ();
 	          fact->DecRef ();
@@ -585,15 +698,255 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
       break;
 
       case CS_TOKEN_TWEEN:
-	    {
-	      bool do_tween;
+      {
+        bool do_tween;
         csScanStr (params, "%b", &do_tween);
         spr3dLook->EnableTweening (do_tween);
-	    }
-	    break;
+      }
+      break;
     }
   }
   spr3dLook->DecRef ();
+  return fact;
+}
+
+iBase* csSprite3DFactoryLoader::Parse (iDocumentNode* node,
+				       iLoaderContext* ldr_context, 
+				       iBase* context)
+{
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.sprite.3d", iMeshObjectType);
+  if (!type)
+  {
+    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.sprite.3d",
+    	iMeshObjectType);
+  }
+  if (!type)
+  {
+    ReportError (reporter,
+		"crystalspace.sprite3dfactoryloader.setup.objecttype",
+		"Could not load the sprite.3d mesh object plugin!");
+    return NULL;
+  }
+
+  // @@@ Temporary fix to allow to set actions for objects loaded
+  // with impexp. Once those loaders move to another plugin this code
+  // below should be removed.
+  csRef<iMeshObjectFactory> fact;
+  if (context)
+    fact.Take (SCF_QUERY_INTERFACE (context, iMeshObjectFactory));
+  // DecRef of fact will be handled later.
+  // If there was no factory we create a new one.
+  if (!fact)
+    fact.Take (type->NewFactory ());
+
+  type->DecRef ();
+  csRef<iSprite3DFactoryState> spr3dLook;
+  spr3dLook.Take (SCF_QUERY_INTERFACE (fact, iSprite3DFactoryState));
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_MATERIAL:
+        {
+          const char* matname = child->GetContentsValue ();
+          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+	  if (!mat)
+	  {
+	    ReportError (reporter,
+		  "crystalspace.sprite3dfactoryloader.parse.unknownmaterial",
+		  "Couldn't find material named '%s'", matname);
+            return NULL;
+	  }
+	  spr3dLook->SetMaterialWrapper (mat);
+        }
+        break;
+
+      case XMLTOKEN_SKELETON:
+        {
+          spr3dLook->EnableSkeletalAnimation ();
+          iSkeleton* skeleton = spr3dLook->GetSkeleton ();
+          csRef<iSkeletonLimb> skellimb;
+	  skellimb.Take (SCF_QUERY_INTERFACE (skeleton, iSkeletonLimb));
+	  const char* skelname = child->GetAttributeValue ("name");
+          if (skelname) skellimb->SetName (skelname);
+          if (!LoadSkeleton (child, reporter, skellimb))
+	    return NULL;
+        }
+        break;
+
+      case XMLTOKEN_ACTION:
+        {
+          iSpriteAction* act = spr3dLook->AddAction ();
+          act->SetName (child->GetAttributeValue ("name"));
+
+	  csRef<iDocumentNodeIterator> child_it = child->GetNodes ();
+	  while (child_it->HasNext ())
+	  {
+	    csRef<iDocumentNode> childchild = child_it->Next ();
+	    if (childchild->GetType () != CS_NODE_ELEMENT) continue;
+	    const char* child_value = childchild->GetValue ();
+	    csStringID id = xmltokens.Request (child_value);
+	    switch (id)
+	    {
+              case XMLTOKEN_F:
+	        {
+		  const char* fn = childchild->GetAttributeValue ("name");
+		  int d = childchild->GetAttributeValueAsInt ("delay");
+                  iSpriteFrame* ff = spr3dLook->FindFrame (fn);
+                  if (!ff)
+                  {
+	            ReportError (reporter,
+		      "crystalspace.sprite3dfactoryloader.parse.action",
+		      "Trying to add unknown frame '%s' to action '%s'!",
+		      fn, act->GetName ());
+                    return NULL;
+	          }
+                  act->AddFrame (ff, d);
+                }
+                break;
+	      default:
+	        ReportError (reporter,
+		      "crystalspace.sprite3dfactoryloader.parse.action",
+		      "Unknown token '%s' in 'action'!", child_value);
+	        return NULL;
+            }
+          }
+        }
+        break;
+
+      case XMLTOKEN_FRAME:
+        {
+          iSpriteFrame* fr = spr3dLook->AddFrame ();
+          fr->SetName (child->GetAttributeValue ("name"));
+          int anm_idx = fr->GetAnmIndex ();
+          int tex_idx = fr->GetTexIndex ();
+          int i = 0;
+          float x, y, z, u, v, nx, ny, nz;
+	  csRef<iDocumentNodeIterator> child_it = child->GetNodes ();
+	  while (child_it->HasNext ())
+	  {
+	    csRef<iDocumentNode> childchild = child_it->Next ();
+	    if (childchild->GetType () != CS_NODE_ELEMENT) continue;
+	    const char* child_value = childchild->GetValue ();
+	    csStringID id = xmltokens.Request (child_value);
+	    switch (id)
+	    {
+              case XMLTOKEN_V:
+	        {
+		  x = childchild->GetAttributeValueAsFloat ("x");
+		  y = childchild->GetAttributeValueAsFloat ("y");
+		  z = childchild->GetAttributeValueAsFloat ("z");
+		  u = childchild->GetAttributeValueAsFloat ("u");
+		  v = childchild->GetAttributeValueAsFloat ("v");
+		  nx = childchild->GetAttributeValueAsFloat ("nx");
+		  ny = childchild->GetAttributeValueAsFloat ("ny");
+		  nz = childchild->GetAttributeValueAsFloat ("nz");
+                  // check if it's the first frame
+                  if (spr3dLook->GetFrameCount () == 1)
+                  {
+                    spr3dLook->AddVertices (1);
+                  }
+                  else if (i >= spr3dLook->GetVertexCount ())
+                  {
+	            ReportError (reporter,
+		            "crystalspace.sprite3dfactoryloader.parse.frame",
+		            "Trying to add too many vertices to frame '%s'!",
+		            fr->GetName ());
+		    return NULL;
+                  }
+                  spr3dLook->SetVertex (anm_idx, i, csVector3 (x, y, z));
+                  spr3dLook->SetTexel  (tex_idx, i, csVector2 (u, v));
+	          spr3dLook->SetNormal (anm_idx, i, csVector3 (nx, ny, nz));
+                  i++;
+                }
+                break;
+	      default:
+	        ReportError (reporter,
+		      "crystalspace.sprite3dfactoryloader.parse.frame",
+		      "Unknown token '%s' in 'frame'!", child_value);
+	        return NULL;
+            }
+	  }
+          if (i < spr3dLook->GetVertexCount ())
+          {
+	    ReportError (reporter,
+		 "crystalspace.sprite3dfactoryloader.parse.frame.vertices",
+		 "Too few vertices in frame '%s'!", fr->GetName ());
+	    return NULL;
+          }
+        }
+        break;
+
+      case XMLTOKEN_T:
+        {
+          int a, b, c;
+	  a = child->GetAttributeValueAsInt ("v1");
+	  b = child->GetAttributeValueAsInt ("v2");
+	  c = child->GetAttributeValueAsInt ("v3");
+          spr3dLook->AddTriangle (a, b, c);
+        }
+        break;
+
+      case XMLTOKEN_SOCKET:
+        {
+          int a = child->GetAttributeValueAsInt ("tri");
+          iSpriteSocket* sprite_socket = spr3dLook->AddSocket ();
+          sprite_socket->SetName (child->GetAttributeValue ("name"));
+          sprite_socket->SetTriangleIndex (a);
+        }
+        break;
+
+      case XMLTOKEN_SMOOTH:
+        {
+	  csRef<iDocumentAttribute> attr;
+	  int base = -1;
+	  int frame = -1;
+	  attr = child->GetAttribute ("base");
+	  if (attr) base = attr->GetValueAsInt ();
+	  attr = child->GetAttribute ("frame");
+	  if (attr) frame = attr->GetValueAsInt ();
+	  if (base == -1 && frame != -1)
+	  {
+	    ReportError (reporter,
+		  "crystalspace.sprite3dfactoryloader.parse.badsmooth",
+		  "Please specify 'base' when specifying 'frame' in 'smooth'!");
+	    return NULL;
+	  }
+	  if (base == -1)
+	    spr3dLook->MergeNormals ();
+	  else if (frame == -1)
+	    spr3dLook->MergeNormals (base);
+	  else
+	    spr3dLook->MergeNormals (base, frame);
+        }
+        break;
+
+      case XMLTOKEN_TWEEN:
+        {
+          bool do_tween;
+          if (!synldr->ParseBool (child, do_tween, true))
+	    return NULL;
+          spr3dLook->EnableTweening (do_tween);
+        }
+        break;
+
+      default:
+	ReportError (reporter,
+		  "crystalspace.sprite3dfactoryloader.parse.badtoken",
+		  "Unexpected token '%s' in sprite factory '%s'!",
+		  value, node->GetAttributeValue ("name"));
+        return NULL;
+    }
+  }
+  // IncRef() to make sure it doesn't get deleted.
+  if (fact) fact->IncRef ();
   return fact;
 }
 
@@ -766,6 +1119,15 @@ bool csSprite3DLoader::Initialize (iObjectRegistry* object_reg)
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+
+  xmltokens.Register ("action", XMLTOKEN_ACTION);
+  xmltokens.Register ("applymotion", XMLTOKEN_APPLYMOTION);
+  xmltokens.Register ("basecolor", XMLTOKEN_BASECOLOR);
+  xmltokens.Register ("factory", XMLTOKEN_FACTORY);
+  xmltokens.Register ("lighting", XMLTOKEN_LIGHTING);
+  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
+  xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
+  xmltokens.Register ("tween", XMLTOKEN_TWEEN);
   return true;
 }
 
@@ -934,6 +1296,152 @@ iBase* csSprite3DLoader::Parse (const char* string,
   }
 
   if (spr3dLook) spr3dLook->DecRef ();
+  return mesh;
+}
+
+iBase* csSprite3DLoader::Parse (iDocumentNode* node,
+	iLoaderContext* ldr_context, iBase*)
+{
+  csRef<iMeshObject> mesh;
+  csRef<iSprite3DState> spr3dLook;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_FACTORY:
+	{
+	  const char* factname = child->GetContentsValue ();
+	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
+	  if (!fact)
+	  {
+      	    ReportError (reporter,
+		"crystalspace.sprite3dloader.parse.unknownfactory",
+		"Couldn't find factory '%s'!", factname);
+	    return NULL;
+	  }
+	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
+          spr3dLook.Take (SCF_QUERY_INTERFACE (mesh, iSprite3DState));
+	}
+	break;
+      case XMLTOKEN_ACTION:
+	spr3dLook->SetAction (child->GetContentsValue ());
+        break;
+      case XMLTOKEN_BASECOLOR:
+	{
+	  csColor col;
+	  if (!synldr->ParseColor (child, col))
+	    return NULL;
+	  spr3dLook->SetBaseColor (col);
+	}
+        break;
+      case XMLTOKEN_LIGHTING:
+	{
+	  bool do_lighting;
+	  if (!synldr->ParseBool (child, do_lighting, true))
+	    return NULL;
+	  spr3dLook->SetLighting (do_lighting);
+	}
+        break;
+      case XMLTOKEN_MATERIAL:
+	{
+	  const char* matname = child->GetContentsValue ();
+          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+	  if (!mat)
+	  {
+      	    ReportError (reporter,
+		"crystalspace.sprite3dloader.parse.unknownmaterial",
+		"Couldn't find material '%s'!", matname);
+            return NULL;
+	  }
+	  spr3dLook->SetMaterialWrapper (mat);
+	}
+	break;
+      case XMLTOKEN_MIXMODE:
+        {
+	  uint mm;
+	  if (!synldr->ParseMixmode (child, mm))
+	    return NULL;
+          spr3dLook->SetMixMode (mm);
+	}
+	break;
+      case XMLTOKEN_APPLYMOTION:
+	{
+	  const char* motname = child->GetContentsValue ();
+	  iMotionManager *motman = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+		"crystalspace.motion.manager.default",
+		iMotionManager);
+	  if (!motman)
+	  {
+      	    ReportError (reporter,
+		"crystalspace.sprite3dloader.setup.motion.motionmanager",
+		"Could not find motion manager!");
+	    return NULL;
+	  }
+	  motman->DecRef();
+	  if (!spr3dLook)
+	  {
+      	    ReportError (reporter,
+		"crystalspace.sprite3dloader.parse.motion.missingfactory",
+		"No Factory! Please define 'factory' before 'applymotion'!");
+	    return NULL;
+	  }
+	  iSkeletonState *skel_state = spr3dLook->GetSkeletonState();
+	  iSkeletonLimbState *limb = SCF_QUERY_INTERFACE (skel_state,
+	  	iSkeletonLimbState );
+	  limb->DecRef();
+	  if (!(limb = limb->GetChildren()))
+	  {
+      	    ReportError (reporter,
+		"crystalspace.sprite3dloader.parse.motion.nochildren",
+		"Skeleton has no libs. Cannot apply motion!");
+	    return NULL;
+	  }
+	  iSkeletonConnectionState *con = SCF_QUERY_INTERFACE (limb,
+	  	iSkeletonConnectionState );
+	  iSkeletonBone *bone = SCF_QUERY_INTERFACE (con, iSkeletonBone);
+	  if (!bone)
+	  {
+      	    ReportError (reporter,
+		"crystalspace.sprite3dloader.parse.motion.nobones",
+		"The skeleton has no bones!");
+	    return NULL;
+	  }
+          iMotionTemplate* motion = motman->FindMotionByName (motname);
+	  if (!motion)
+	  {
+      	    ReportError (reporter,
+		"crystalspace.sprite3dloader.parse.motion.nomotion",
+		"The motion '%s' does not exist!", motname);
+	    return NULL;
+	  }
+          iMotionController* mc = motman->AddController (bone);
+          mc->SetMotion (motion);
+	}
+	break;
+      case XMLTOKEN_TWEEN:
+	{
+	  bool do_tween;
+	  if (!synldr->ParseBool (child, do_tween, true))
+	    return NULL;
+          spr3dLook->EnableTweening (do_tween);
+	}
+	break;
+      default:
+      	ReportError (reporter,
+		"crystalspace.sprite3dloader.parse",
+		"Unexpected token '%s' in 3D sprite!", value);
+	return NULL;
+    }
+  }
+
+  // Prevent deletion by smart pointer.
+  mesh->IncRef ();
   return mesh;
 }
 
