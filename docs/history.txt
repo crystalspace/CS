@@ -20,6 +20,9 @@ chronological order.
 	  and should now also work at runtime.
 	- Eric Sunshine eliminated about 350 errors and warnings reported by
 	  modern versions of Doxygen for the public API reference.
+	- res fixed a recent leak fix in csImage to not subsequently crash
+	  when a paletted image is converted to another paletted format
+	  (notably, stripping or adding alpha).
 14-Oct-2004
 	- Eric Sunshine added an AAlib (ASCII Art library) check to
 	  configure.ac. If the package is present, then the CS `asciiart'

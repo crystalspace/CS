@@ -482,7 +482,7 @@ void csImageFile::convert_rgba (csRGBpixel *iImage)
       {
         if (!Alpha)
           Alpha = new uint8 [pixels];
-		int i;
+	int i;
         for (i = 0; i < pixels; i++)
           Alpha [i] = iImage [i].alpha;
       }
@@ -594,8 +594,9 @@ void csImageFile::SetFormat (int iFormat)
       Alpha = new uint8 [pixels];
       memset ((void*)Alpha, 0xff, pixels);
     }
-    convert_pal8 ((uint8 *)oldimage, Palette);
+    csRGBpixel* oldPalette = Palette;
     Palette = 0;
+    convert_pal8 ((uint8 *)oldimage, oldPalette);
   }
   else if ((oldformat & CS_IMGFMT_MASK) == CS_IMGFMT_NONE)
   {

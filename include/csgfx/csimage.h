@@ -82,7 +82,7 @@ protected:
    * the buffer itself if it is appropiate (or wont if the buffer
    * size/contents are appropiate for target format).
    */
-  void convert_rgba (csRGBpixel *iImage);
+  void convert_rgba (csRGBpixel* iImage);
 
   /**
    * Used to convert an 8-bit indexed image into requested format.
@@ -92,14 +92,14 @@ protected:
    * the buffer itself if it is appropiate (or wont if the buffer
    * size/contents are appropiate for target format). Same about palette.
    */
-  void convert_pal8 (uint8 *iImage, csRGBpixel *iPalette, int nPalColors = 256);
+  void convert_pal8 (uint8* iImage, csRGBpixel* iPalette, int nPalColors = 256);
 
   /**
    * Same as above but accepts an array of csRGBcolor's as palette.
    * The csRGBcolor array is never freed, so its your responsability
    * if you did it.
    */
-  void convert_pal8 (uint8 *iImage, const csRGBcolor *iPalette,
+  void convert_pal8 (uint8* iImage, const csRGBcolor* iPalette,
   	int nPalColors = 256);
 
   /**
