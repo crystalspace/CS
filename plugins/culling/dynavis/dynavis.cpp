@@ -1182,7 +1182,6 @@ bool csDynaVis::VisTest (iRenderView* rview, iVisibilityCullerListner *viscallba
     for (i = 0 ; i < visobj_vector.Length () ; i++)
     {
       csVisibilityObjectWrapper* visobj_wrap = visobj_vector[i];
-      iVisibilityObject* visobj = visobj_wrap->visobj;
       if (visobj_wrap->history->history_frame_cnt == history_frame_cnt-1)
       {
 	visobj_wrap->history->history_frame_cnt = history_frame_cnt;
