@@ -96,8 +96,6 @@
         texel = (rs | gs | bs) >> 15;
     #endif
   #endif
-#elif defined (PI_FLAT)
-        UInt texel = Scan.FlatColor;
 #endif
 
         *_dest = texel;

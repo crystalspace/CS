@@ -171,8 +171,11 @@ void PI_SCANFUNC (void *dest, int len, unsigned long *zbuff,
   PI_PIXTYPE *_destend = _dest + len;
 
 #ifdef PI_FLAT
-  // if flat shading is desired, we will just use white as our texel color
+  // if flat shading is desired, we will just use one color
   (void)u; (void)v; (void)du; (void)dv; (void)bitmap; (void)bitmap_log2w;
+#  ifndef PI_GOURAUD
+  register UInt texel = Scan.FlatColor;
+#  endif
 #endif
 
 #if defined (PI_GOURAUD) && !defined (PI_BLEND)
