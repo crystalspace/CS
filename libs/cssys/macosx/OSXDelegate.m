@@ -530,7 +530,7 @@ ND_PROTO(void,dispatch_event)
 
 
 //-----------------------------------------------------------------------------
-// Activation / Deactivation / Hide / Unhide
+// Activation / Deactivation / Hiding / Revealing
 //-----------------------------------------------------------------------------
 - (void)pause
 {
@@ -574,12 +574,12 @@ ND_PROTO(void,dispatch_event)
 
 - (void)applicationDidHide: (NSNotification*)n
 {
-    OSXAssistant_application_hidden(assistant);
+  OSXAssistant_application_hidden(assistant);
 }
 
 - (void)applicationDidUnhide: (NSNotification*)n
 {
-    OSXAssistant_application_unhidden(assistant);
+  OSXAssistant_application_unhidden(assistant);
 }
 
 
@@ -674,11 +674,13 @@ ND_PROTO(void,stop_event_loop)(OSXDelegateHandle handle)
   pool = [[NSAutoreleasePool alloc] init];
   NSApp = [OSXApplication sharedApplication];
   controller = [[OSXDelegate alloc] initWithDriver:handle];
+
   [[NSNotificationCenter defaultCenter]
     addObserver:controller
     selector:@selector(applicationDidBecomeActive:)
     name:NSApplicationDidBecomeActiveNotification
     object:NSApp];
+
   [[NSNotificationCenter defaultCenter]
     addObserver:controller
     selector:@selector(applicationDidResignActive:)

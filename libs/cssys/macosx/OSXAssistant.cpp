@@ -206,12 +206,12 @@ void OSXAssistant::application_deactivated()
 
 void OSXAssistant::application_hidden()
 {
-    event_outlet->ImmediateBroadcast(cscmdCanvasHidden, (void*)false);
+  event_outlet->ImmediateBroadcast(cscmdCanvasHidden, (void*)false);
 }
 
 void OSXAssistant::application_unhidden()
 {
-    event_outlet->ImmediateBroadcast(cscmdCanvasExposed, (void*)false);
+  event_outlet->ImmediateBroadcast(cscmdCanvasExposed, (void*)false);
 }
 
 void OSXAssistant::flush_graphics_context()

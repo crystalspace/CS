@@ -19,11 +19,6 @@
 //	This object owns the OSXDelegate, thus OSXDelegate only gets
 //	destroyed when the last reference to this object is removed.
 //
-// Changes:
-// --------
-// 9/30/03:  Reed Hedges added application_hidden/unhidden and incremented
-//           SCF version of iOSXAssistantLocal to 0.0.2
-//
 //-----------------------------------------------------------------------------
 #if defined(__cplusplus)
 
@@ -69,6 +64,8 @@ public:
   virtual bool continue_running();
   virtual void application_activated();
   virtual void application_deactivated();
+  virtual void application_hidden();
+  virtual void application_unhidden();
   virtual void flush_graphics_context();
   virtual void hide_mouse_pointer();
   virtual void show_mouse_pointer();
@@ -78,8 +75,6 @@ public:
   virtual void mouse_down(int button, int x, int y);
   virtual void mouse_up(int button, int x, int y);
   virtual void mouse_moved(int x, int y);
-  virtual void application_hidden();
-  virtual void application_unhidden();
 
   struct eiEventPlug : public iEventPlug
   {
@@ -112,6 +107,8 @@ NSD_PROTO(int, always_runs)(OSXAssistant);
 NSD_PROTO(int, continue_running)(OSXAssistant);
 NSD_PROTO(void,application_activated)(OSXAssistant);
 NSD_PROTO(void,application_deactivated)(OSXAssistant);
+NSD_PROTO(void,application_hidden)(OSXAssistant);
+NSD_PROTO(void,application_unhidden)(OSXAssistant);
 NSD_PROTO(void,flush_graphics_context)(OSXAssistant);
 NSD_PROTO(void,hide_mouse_pointer)(OSXAssistant);
 NSD_PROTO(void,show_mouse_pointer)(OSXAssistant);
@@ -121,8 +118,6 @@ NSD_PROTO(void,key_up)(OSXAssistant, int raw, int cooked);
 NSD_PROTO(void,mouse_down)(OSXAssistant, int button, int x, int y);
 NSD_PROTO(void,mouse_up)(OSXAssistant, int button, int x, int y);
 NSD_PROTO(void,mouse_moved)(OSXAssistant, int x, int y);
-NSD_PROTO(void,application_hidden)(OSXAssistant);
-NSD_PROTO(void,application_unhidden)(OSXAssistant);
 
 #undef NSD_PROTO
 
