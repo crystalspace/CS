@@ -172,72 +172,108 @@ void csPolyTexture::InitLightMaps ()
 {
 }
 
-// @@@ This is realy an ugly function which should be precalculated!
-static bool TestAdjacency (
-  csVector3 *poly1,
-  int num_vertices1,
-  csPolygon3D *p,
-  int num_vertices2,
+//====================================================
+// This routine will try to find a plane that goes
+// through the light position and two points in space,
+// and that cleanly seperates the two given polygons
+// (i.e. one polygon on the left and the other on the
+// right of that plane). If such a plane exists then
+// we know the polygons cannot shadow each other as
+// seen from the light position.
+// Currently this routine is limited in that it will
+// only test planes made from the light position and
+// an edge of the second polygon. This doesn't catch
+// all possible cases.
+//
+// TODO@@@: Add tests for more planes!
+//====================================================
+static bool FindSeperatingPlane (
+  csPolygon3D* poly1, int num_vertices1,
+  csPolygon3D* p, int num_vertices2,
   const csVector3 &lightpos)
 {
-  int i, j, j1;
-  for (i = 0; i < num_vertices1; i++)
+  int pointClassify, previousSign;
+  int i, j;
+  float auxD = 0.0;
+
+  int i1 = num_vertices2-1;
+  csVector3 ed1 = p->Vwor(i1) - lightpos;
+  csVector3 ed2;
+  for (i = 0 ; i < num_vertices2 ; ed1 = ed2, i1 = i, i++)
   {
-    csVector3 v = poly1[i] + lightpos;
-    j1 = num_vertices2 - 1;
-    for (j = 0; j < num_vertices2; j++)
+    //-----
+    // We are now handling edge ed1-ed2.
+    //-----
+    ed2 = p->Vwor (i) - lightpos;
+    csPlane3 plane (ed1, ed2);
+
+    //-----
+    // First try to find another vertex on 'p' which is not
+    // on the edge ed1-ed2.
+    //-----
+    auxD = 0;
+    for(j = 0 ; j < num_vertices2 ; j++)
     {
-      if (ABS (csMath3::Area3 (v, p->Vwor (j), p->Vwor (j1))) < SMALL_EPSILON)
-      {
-        // Check location of all other vertices relative to edge for polygon 1.
-        int sgn = 0;
-        int k;
-        for (k = 0; k < num_vertices1; k++)
-        {
-          if (k != i)
-          {
-            csVector3 vtest = poly1[k] + lightpos;
-            float area1 = csMath3::Area3 (vtest, p->Vwor (j), p->Vwor (j1));
-            if (ABS (area1) >= SMALL_EPSILON)
-            {
-              int newsgn = SIGN (area1);
-              if (sgn == 0)
-                sgn = newsgn;
-              else if (sgn != newsgn)
-                goto bad;
-            }
-          }
-        }
-
-        // Check location of all other vertices relative to edge for polygon 2.
-        sgn = -sgn;
-        for (k = 0; k < num_vertices2; k++)
-        {
-          if (k != j && k != j1)
-          {
-            float area2 = csMath3::Area3 (
-                p->Vwor (k),
-                p->Vwor (j),
-                p->Vwor (j1));
-            if (ABS (area2) >= SMALL_EPSILON)
-            {
-              int newsgn = SIGN (area2);
-              if (sgn != newsgn) goto bad;
-            }
-          }
-        }
-
-        return true;
-      }
-
-      // @@@ Yes, I know this is bad: this is a temporary routine :-)
-bad:
-      j1 = j;
+      if (j == i || j == i1) continue;
+      auxD = plane.Classify (p->Vwor (j)-lightpos);
+      if (ABS(auxD) > EPSILON) break;
     }
-  }
+    if (ABS (auxD) < EPSILON)
+      return true;	// Very thin polygon.
 
+    //-----
+    // Now check all vertices of poly1 and see if they are
+    // on other side of the plane (other side relative to the
+    // vertex we found in previous loop).
+    //-----
+    previousSign = SIGN (auxD);
+    bool overlap = false;
+    for (j = 0 ; j < num_vertices1 ; j++)
+    {
+      auxD = plane.Classify (poly1->Vwor (j) - lightpos);
+      if (ABS (auxD) < EPSILON) continue;
+      pointClassify = SIGN (auxD);
+      if (previousSign == pointClassify) 
+      {
+        overlap = true;
+        break;
+      }
+    }
+    if (!overlap)
+      return true;
+  }
   return false;
 }
+
+
+static bool CanCastShadow (
+  csPolygon3D *shadow_poly,
+  csPolygon3D *poly,
+  const csVector3 &lightpos)
+{
+  /*
+   * To polygons cannot shadow each other if there is a plane between
+   * the light position and two points in space that cleanly seperates
+   * the two polygons. These are the criteria we now use in this test.
+   */
+  if (FindSeperatingPlane (
+  	shadow_poly, shadow_poly->GetVertexCount (), 
+	poly, poly->GetVertexCount (),
+	lightpos))
+    return false;
+
+  // If we couldn't find a seperating plane between poly1 and p then
+  // we also try the reverse because that way we might give a good
+  // result.
+  if (FindSeperatingPlane (
+	poly, poly->GetVertexCount (),
+	shadow_poly, shadow_poly->GetVertexCount (),
+	lightpos))
+    return false;
+
+  return true;
+}
+
 
 void csPolyTexture::FillLightMap (
   csFrustumView *lview,
@@ -413,14 +449,10 @@ void csPolyTexture::FillLightMap (
       csFrustum *new_shadow = shadow_frust->Intersect (poly, num_vertices);
       if (new_shadow)
       {
-        // Test if two polygons are adjacent (@@@ should be precalculated).
-        if (
-          TestAdjacency (
-              new_shadow->GetVertices (),
-              new_shadow->GetVertexCount (),
-              polygon,
-              polygon->GetVertexCount (),
-              lightpos))
+        // Test if two polygons can cast shadows on each other.
+	// Note: we use the base polygons here because that is a stronger
+	// test which is more likely to give a better result.
+        if (!CanCastShadow (shad_poly->GetBasePolygon (), base_poly, lightpos))
         {
           new_shadow->DecRef ();
           continue;
@@ -968,7 +1000,7 @@ void csShadowBitmap::_LightDrawBox (int x, int y, int w, int h)
 
 void csShadowBitmap::_ShadowPutPixel (int x, int y, float area)
 {
-  if (x >= sb_w || y >= sb_h || x < 0 || y < 0) return ;
+  if (x >= sb_w || y >= sb_h || x < 0 || y < 0) return;
   if (area < .2) return ;
   CS_ASSERT (cnt_unshadowed >= 0);
 
@@ -1296,14 +1328,14 @@ void csShadowBitmap::UpdateShadowMap (
   v_rv *= rv_step;
   v_ru *= ru_step;
 
-  for (i = 0; i < lm_h; i++)
+  for (i = 0 ; i < lm_h ; i++)
   {
     int uv = base_uv;
     base_uv += lm_w;
 
     v = v_base;
     v_base += v_rv;
-    for (j = 0; j < lm_w; j++, uv++)
+    for (j = 0 ; j < lm_w ; j++, uv++)
     {
       v += v_ru;
 

@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+5-Jun-2002
+	- Thanks to the extensive research and coding efforts of Toni
+	  I managed to fix up static lighting so that it gives more correct
+	  shadows in most cases.
 31-May-2002
 	- Implemented a new CLEARSCREEN option in the SETTINGS block. Using
 	  this you can force clearing of the screen every frame (this is

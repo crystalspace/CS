@@ -48,35 +48,35 @@ static csAAPFCBPixel PutPixel;
 static csAAPFCBBox DrawBox;
 static void *Arg;
 
-void __poly_fill (csVector2 *iVertices, int iVertexCount)
+void __poly_fill (csVector2 *iverts, int ivertscount)
 {
-  // Calculate the complete are of visible rectangle
-  static csRect *Grid = GetAAGrid();
+  // Calculate the complete are of visible rectangle.
+  static csRect *Grid = GetAAGrid ();
   int height = Grid->Height ();
   int width = Grid->Width ();
   int visarea = width * height;
 
-  // Sanity check (prevents infinite looping)
+  // Sanity check (prevents infinite looping).
   if (visarea <= 0) return ;
 
-  // Calculate the complete area of the polygon
-  float a = __calc_area (iVertexCount, iVertices);
+  // Calculate the complete area of the polygon.
+  float a = __calc_area (ivertscount, iverts);
 
-  // Check if polygon is hollow
+  // Check if polygon is hollow.
   if (a < EPSILON)  // this area is hollow
     return ;
 
-  // Check if current rectangle equals a single grid cell
+  // Check if current rectangle equals a single grid cell.
   if (height == 1 && width == 1)
   {
     PutPixel (Grid->xmin, Grid->ymin, a, Arg);
     return ;
   }
 
-  // Check if polygon surface equals the visible rectangle surface
+  // Check if polygon surface equals the visible rectangle surface.
   if (ABS (a - visarea) < EPSILON)
   {
-    // this area is completely covered
+    // This area is completely covered.
     if (DrawBox)
       DrawBox (Grid->xmin, Grid->ymin, width, height, Arg);
     else
@@ -92,47 +92,43 @@ void __poly_fill (csVector2 *iVertices, int iVertexCount)
     return ;
   }
 
-  // Allocate space for both polygons that result after split
+  // Allocate space for both polygons that result after split.
   int n2[2] = { 0, 0 };
   csVector2 *p2[2];
 
-  p2[0] = (csVector2 *)alloca (sizeof (csVector2) * (iVertexCount + 1));
-  p2[1] = (csVector2 *)alloca (sizeof (csVector2) * (iVertexCount + 1));
+  p2[0] = (csVector2 *)alloca (sizeof (csVector2) * (ivertscount + 1));
+  p2[1] = (csVector2 *)alloca (sizeof (csVector2) * (ivertscount + 1));
 
   if (width > height)
   {
     // Split the polygon vertically by the line "x = sub_x"
-
-    // (p2 [0] -- left poly, p2 [1] -- right poly)
+    // (p2 [0] -- left poly, p2 [1] -- right poly).
     int sub_x = Grid->xmin + width / 2;
-    int where_are_we = iVertices[0].x > sub_x;
-    p2[where_are_we][n2[where_are_we]++] = iVertices[0];
+    int where_are_we = iverts[0].x > sub_x;
+    p2[where_are_we][n2[where_are_we]++] = iverts[0];
 
     int v, prev;
-    for (v = 1, prev = 0; v <= iVertexCount; v++)
+    for (v = 1, prev = 0; v <= ivertscount; v++)
     {
       // Check whenever current vertex is on left or right side of divider
-      int cur = (v == iVertexCount) ? 0 : v;
-      int now_we_are = iVertices[cur].x > sub_x;
+      int cur = (v == ivertscount) ? 0 : v;
+      int now_we_are = iverts[cur].x > sub_x;
 
       if (now_we_are == where_are_we)
       {
-        // Do not add the first point since it will be added at the end
-        if (cur) p2[where_are_we][n2[where_are_we]++] = iVertices[cur];
+        // Do not add the first point since it will be added at the end.
+        if (cur) p2[where_are_we][n2[where_are_we]++] = iverts[cur];
       }
       else
       {
-        // The most complex case: find the Y at intersection point
-        float y = iVertices[prev].y + (iVertices[cur].y - iVertices[prev].y) *
-          (
-            sub_x -
-            iVertices[prev].x
-          ) / (iVertices[cur].x - iVertices[prev].x);
+        // The most complex case: find the Y at intersection point.
+        float y = iverts[prev].y + (iverts[cur].y - iverts[prev].y) *
+          (sub_x - iverts[prev].x) / (iverts[cur].x - iverts[prev].x);
 
-        // Add the intersection point to both polygons
+        // Add the intersection point to both polygons.
         p2[0][n2[0]++] = p2[1][n2[1]++] = csVector2 (sub_x, y);
 
-        if (cur) p2[now_we_are][n2[now_we_are]++] = iVertices[cur];
+        if (cur) p2[now_we_are][n2[now_we_are]++] = iverts[cur];
       }
 
       where_are_we = now_we_are;
@@ -151,37 +147,34 @@ void __poly_fill (csVector2 *iVertices, int iVertexCount)
   }
   else
   {
-    // Split the polygon horizontally by the line "y = sub_y"
-    // (p[0] -- top poly, p[1] -- bottom poly)
+    // Split the polygon horizontally by the line "y = sub_y".
+    // (p[0] -- top poly, p[1] -- bottom poly).
     int sub_y = Grid->ymin + height / 2;
-    int where_are_we = iVertices[0].y > sub_y;
-    p2[where_are_we][n2[where_are_we]++] = iVertices[0];
+    int where_are_we = iverts[0].y > sub_y;
+    p2[where_are_we][n2[where_are_we]++] = iverts[0];
 
     int v, prev;
-    for (v = 1, prev = 0; v <= iVertexCount; v++)
+    for (v = 1, prev = 0; v <= ivertscount; v++)
     {
-      // Check whenever current vertex is on top or down side of divider
-      int cur = (v == iVertexCount) ? 0 : v;
-      int now_we_are = iVertices[cur].y > sub_y;
+      // Check whenever current vertex is on top or down side of divider.
+      int cur = (v == ivertscount) ? 0 : v;
+      int now_we_are = iverts[cur].y > sub_y;
 
       if (now_we_are == where_are_we)
       {
-        // Do not add the first point since it will be added at the end
-        if (cur) p2[where_are_we][n2[where_are_we]++] = iVertices[cur];
+        // Do not add the first point since it will be added at the end.
+        if (cur) p2[where_are_we][n2[where_are_we]++] = iverts[cur];
       }
       else
       {
-        // The most complex case: find the X at intersection point
-        float x = iVertices[prev].x + (iVertices[cur].x - iVertices[prev].x) *
-          (
-            sub_y -
-            iVertices[prev].y
-          ) / (iVertices[cur].y - iVertices[prev].y);
+        // The most complex case: find the X at intersection point.
+        float x = iverts[prev].x + (iverts[cur].x - iverts[prev].x) *
+          (sub_y - iverts[prev].y) / (iverts[cur].y - iverts[prev].y);
 
-        // Add the intersection point to both polygons
+        // Add the intersection point to both polygons.
         p2[0][n2[0]++] = p2[1][n2[1]++] = csVector2 (x, sub_y);
 
-        if (cur) p2[now_we_are][n2[now_we_are]++] = iVertices[cur];
+        if (cur) p2[now_we_are][n2[now_we_are]++] = iverts[cur];
       }
 
       where_are_we = now_we_are;
@@ -201,35 +194,36 @@ void __poly_fill (csVector2 *iVertices, int iVertexCount)
 }
 
 void csAntialiasedPolyFill (
-  csVector2 *iVertices,
-  int iVertexCount,
+  csVector2 *iverts,
+  int ivertscount,
   void *iArg,
   csAAPFCBPixel iPutPixel,
   csAAPFCBBox iDrawBox)
 {
   static csRect *Grid = GetAAGrid();
-  // if nothing to do, exit
-  if (iVertexCount <= 0) return ;
+  // If nothing to do, exit.
+  if (ivertscount <= 0) return ;
 
   PutPixel = iPutPixel;
   DrawBox = iDrawBox;
   Arg = iArg;
 
-  // Find the bounding box first
+  // Find the bounding box first.
   Grid->Set (999999, 999999, -999999, -999999);
 
   int i;
-  for (i = 0; i < iVertexCount; i++)
+  for (i = 0; i < ivertscount; i++)
   {
-    int x = QInt (iVertices[i].x);
-    int y = QInt (iVertices[i].y);
+    int x = QInt (iverts[i].x);
+    int y = QInt (iverts[i].y);
     if (Grid->xmin > x) Grid->xmin = x;
     if (Grid->ymin > y) Grid->ymin = y;
-    x = QRound (ceil (iVertices[i].x));
-    y = QRound (ceil (iVertices[i].y));
+    x = QRound (ceil (iverts[i].x));
+    y = QRound (ceil (iverts[i].y));
     if (Grid->xmax < x) Grid->xmax = x;
     if (Grid->ymax < y) Grid->ymax = y;
   }
 
-  __poly_fill (iVertices, iVertexCount);
+  __poly_fill (iverts, ivertscount);
 }
+
