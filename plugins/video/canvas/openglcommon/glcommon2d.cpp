@@ -259,7 +259,7 @@ void csGraphics2DGLCommon::DrawBox (int x, int y, int w, int h, int color)
 
 void csGraphics2DGLCommon::DrawPixel (int x, int y, int color)
 {
-  if ((x >= ClipX1) && (y < ClipX2) && (y >= ClipY1) && (y < ClipY2))
+  if ((x >= ClipX1) && (x < ClipX2) && (y >= ClipY1) && (y < ClipY2))
   {
     // prepare for 2D drawing--so we need no fancy GL effects!
     bool gl_texture2d = glIsEnabled(GL_TEXTURE_2D);
