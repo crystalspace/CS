@@ -2266,12 +2266,12 @@ void csThing::CastShadows (iFrustumView* fview)
   // all things that are found visible while traversing the octree.
   // This queue is filled while traversing the octree
   // (CheckFrustumPolygonsFB).
-  csHashIterator* it = fdata.visible_things.GetIterator ();
+  csHashIterator it (fdata.visible_things.GetHashMap ());
   csObject* o;
   // @@@ THIS SHOULD USE THE SHADOW RECEIVERS!!!
-  while (it->HasNext ())
+  while (it.HasNext ())
   {
-    o = (csObject*)(it->Next ());
+    o = (csObject*)(it.Next ());
     csMeshWrapper* mesh = (csMeshWrapper*)o;
     // @@@ should not be known in engine.
     // @@@ UGLY

@@ -78,25 +78,21 @@ public:
   DECLARE_IBASE;
 
   void ClearIterated() {
-    csHashIterator *it = Iterated.GetIterator();
-    while (it->HasNext()) {
-      char *n = (char*)it->Next();
+    csHashIterator it (&Iterated);
+    while (it.HasNext()) {
+      char *n = (char*)it.Next();
       delete[] n;
     }
-    delete it;
     Iterated.DeleteAll();
   }
   bool FindIterated(const char *Key) {
     csHashKey HashKey = csHashCompute(CurrentIterator->GetKey());
-    csHashIterator *it = Iterated.GetIterator(HashKey);
-    while (it->HasNext()) {
-      char *n = (char*)it->Next();
-      if (strcasecmp(n, Key)==0) {
-        delete it;
+    csHashIterator it (&Iterated, HashKey);
+    while (it.HasNext()) {
+      char *n = (char*)it.Next();
+      if (strcasecmp(n, Key)==0)
         return true;
-      }
     }
-    delete it;
     return false;
   }
   void AddIterated(const char *Key) {

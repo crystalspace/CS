@@ -49,7 +49,7 @@ DECLARE_TYPED_VECTOR (csHashBucketVector, csHashBucket);
 /**
  * An iterator to iterate over elements in the hashmap.
  * When you have an open iterator you should not alter the
- * hashmap that this iterator emerged from. The only safe
+ * hashmap that this object iterates over. The only safe
  * operation that you can do is to call 'Delete' on this
  * iterator to delete one element from the map. The iterator
  * will correctly point to the next element then.
@@ -78,13 +78,21 @@ private:
   /// Go to next element.
   void GotoNextElement ();
 
-  /**
-   * Constructor is private. This object is only made
-   * by the friend csHashMap.
-   */
-  csHashIterator (csHashMap* hash) { this->hash = hash; }
-
 public:
+
+  /**
+   * Constructor for an iterator to iterate over all elements in a hashmap.
+   * Note that you should not do changes on the hashmap when you have
+   * open iterators.
+   */
+  csHashIterator (csHashMap* hash);
+  /**
+   * Constructor for an iterator to iterate over all elements with the
+   * given key. Note that you should not do changes on the hashmap when
+   * you have open iterators.
+   */
+  csHashIterator (csHashMap* hash, csHashKey Key);
+
   /// Is there a next element in this iterator?
   bool HasNext ();
   /// Get the next element.
@@ -140,27 +148,10 @@ public:
    * Get an object from this map. Returns NULL if object
    * is not there. If there are multiple elements with
    * the same key then a random one will be returned.
-   * Use GetIterator() to iterate over all elements with
+   * Use an iterator to iterate over all elements with
    * the same key.
    */
   csHashObject Get (csHashKey key) const;
-
-  /**
-   * Get an iterator to iterate over all elements with the
-   * given key. 'delete' this iterator when you don't want to
-   * use it anymore. Note that you should not do changes on the
-   * hashmap when you have open iterators. This function will
-   * always return an iterator even if there are no elements with
-   * this key.
-   */
-  csHashIterator* GetIterator (csHashKey key);
-
-  /**
-   * Get an iterator to iterate over all elements in this hashmap.
-   * Note that you should not do changes on the hashmap when you have
-   * open iterators.
-   */
-  csHashIterator* GetIterator ();
 
   /**
    * Delete all objects from this map with a given key.
@@ -210,12 +201,6 @@ public:
   bool In (csHashObject object);
 
   /**
-   * Get an iterator to iterate over all objects
-   * in this set.
-   */
-  csHashIterator* GetIterator ();
-
-  /**
    * Delete all elements in the set.
    */
   void DeleteAll ();
@@ -226,6 +211,9 @@ public:
    * @@@ Not implemented yet!
    */
   void Delete (csHashObject object);
+
+  /// Return the hash map for this hash set
+  inline csHashMap *GetHashMap () {return &map;}
 };
 
 #endif //__CS_HASHMAP_H__

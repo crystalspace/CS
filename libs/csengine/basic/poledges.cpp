@@ -28,7 +28,7 @@ csPolEdgeIterator::csPolEdgeIterator (csHashMap& edges, int i1, int i2)
   if (i1 > i2) { int swap = i1; i1 = i2; i2 = swap; }
   csPolEdgeIterator::i1 = i1;
   csPolEdgeIterator::i2 = i2;
-  iterator = edges.GetIterator ((i1+1)*(i2+1));
+  iterator = new csHashIterator (&edges, (i1+1)*(i2+1));
   if (iterator->HasNext ())
   {
     current = (csPolEdge*)(iterator->Next ());
@@ -65,7 +65,7 @@ csPolygon3D* csPolEdgeIterator::Next ()
 
 csEdgeIterator::csEdgeIterator (csHashMap& edges)
 {
-  iterator = edges.GetIterator ();
+  iterator = new csHashIterator (&edges);
   if (iterator->HasNext ())
     current = (csPolEdge*)(iterator->Next ());
   else
@@ -118,13 +118,12 @@ csPolygonEdges::csPolygonEdges (csPolygonInt** polygons, int num_polygons)
 
 csPolygonEdges::~csPolygonEdges ()
 {
-  csHashIterator* iterator = edges.GetIterator ();
-  while (iterator->HasNext ())
+  csHashIterator iterator (&edges);
+  while (iterator.HasNext ())
   {
-    csPolEdge* pol_edge = (csPolEdge*)(iterator->Next ());
+    csPolEdge* pol_edge = (csPolEdge*)(iterator.Next ());
     delete pol_edge;
   }
-  delete iterator;
 }
 
 //---------------------------------------------------------------------------

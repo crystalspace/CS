@@ -24,16 +24,9 @@
 
 //-----------------------------------------------------------------------------
 
-static csHashKey rotate_bits_right(csHashKey h, unsigned int nbits)
+inline static csHashKey rotate_bits_right_3(csHashKey h)
 {
-  while (nbits-- > 0)
-  {
-    bool carry = (h & 1) != 0;
-    h >>= 1;
-    if (carry)
-      h |= 0x80000000UL;
-  }
-  return h;
+  return (h >> 3) | (h << 29);
 }
 
 csHashKey csHashCompute(char const* s, int n)
@@ -41,16 +34,42 @@ csHashKey csHashCompute(char const* s, int n)
   csHashKey h = 0;
   char const* slim = s + n;
   while (s < slim)
-    h = rotate_bits_right(h, 3) + *s++;
+    h = rotate_bits_right_3(h) + *s++;
   return h;
 }
 
 csHashKey csHashCompute(char const* s)
 {
-  return csHashCompute(s, strlen(s));
+  csHashKey h = 0;
+  while (*s != 0)
+    h = rotate_bits_right_3(h) + *s++;
+  return h;
 }
 
 //-----------------------------------------------------------------------------
+
+csHashIterator::csHashIterator (csHashMap *hm)
+{
+  hash = hm;
+  bucket = NULL;
+  element_index = 0;
+  bucket_index = (uint32)-1;
+  do_iterate_key = false;
+  GotoNextElement ();
+}
+
+csHashIterator::csHashIterator (csHashMap *hm, csHashKey hkey)
+{
+  uint32 idx = key % hm->NumBuckets;
+
+  hash = hm;
+  bucket = hm->Buckets[idx]; // NULL if bucket is empty.
+  element_index = -1;
+  bucket_index = idx;
+  key = hkey;
+  do_iterate_key = true;
+  GotoNextSameKey ();
+}
 
 bool csHashIterator::HasNext ()
 {
@@ -142,33 +161,6 @@ csHashObject csHashMap::Get (csHashKey key) const
   return NULL;
 }
 
-csHashIterator* csHashMap::GetIterator (csHashKey key)
-{
-  uint32 idx = key % NumBuckets;
-
-  csHashIterator* iterator = new csHashIterator (this);
-  iterator->bucket = Buckets[idx]; // Is NULL for bucket empty.
-  iterator->element_index = -1;
-  iterator->bucket_index = idx;
-  iterator->key = key;
-  iterator->do_iterate_key = true;
-  iterator->GotoNextSameKey ();
-
-  return iterator;
-}
-
-csHashIterator* csHashMap::GetIterator ()
-{
-  csHashIterator* iterator = new csHashIterator (this);
-  iterator->bucket = NULL;
-  iterator->element_index = 0;
-  iterator->bucket_index = (uint32)-1;
-  iterator->do_iterate_key = false;
-  iterator->GotoNextElement ();
-
-  return iterator;
-}
-
 void csHashMap::DeleteAll (csHashKey key)
 {
   uint32 idx = key % NumBuckets;
@@ -212,23 +204,14 @@ void csHashSet::AddNoTest (csHashObject object)
 bool csHashSet::In (csHashObject object)
 {
   csHashKey key = (csHashKey)object;
-  csHashIterator* it = map.GetIterator (key);
-  while (it->HasNext ())
+  csHashIterator it (&map, key);
+  while (it.HasNext ())
   {
-    csHashObject obj = it->Next ();
+    csHashObject obj = it.Next ();
     if (obj == object)
-    {
-      delete it;
       return true;
-    }
   }
-  delete it;
   return false;
-}
-
-csHashIterator* csHashSet::GetIterator ()
-{
-  return map.GetIterator ();
 }
 
 void csHashSet::DeleteAll ()
