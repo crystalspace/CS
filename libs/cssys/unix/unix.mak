@@ -44,9 +44,9 @@ ifeq ($(MAKESECTION),defines)
 include $(SRCDIR)/mk/unix.mak
 
 # Extra libraries needed on this system.
-ifndef LIBS.EXE
-  LIBS.EXE += $(LFLAGS.l)dl $(LFLAGS.l)m
-endif
+# <cs-config>
+LIBS.EXE.PLATFORM += $(LFLAGS.l)dl $(LFLAGS.l)m
+# </cs-config>
 
 # Indicate where special include files can be found.
 ifndef CFLAGS.INCLUDE

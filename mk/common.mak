@@ -5,6 +5,7 @@
 
 # Several symbols with special meaning
 
+# <cs-config>
 # The following macro should contain TWO empty lines
 define NEWLINE
 
@@ -16,7 +17,6 @@ SPACE=$(EMPTY) $(EMPTY)
 SEPARATOR=\
 $"*-------------------------------------------------------------------------*$"
 
-# <cs-config>
 # Transliterate $@ to uppercase.
 UPCASE = \
     $(subst a,A,\
@@ -45,7 +45,6 @@ UPCASE = \
     $(subst x,X,\
     $(subst y,Y,\
     $(subst z,Z,$@))))))))))))))))))))))))))
-# </cs-config>
 
 # Transliterate $r to uppercase.  Typically, $r would be the iterator variable
 # in a $(foreach) invocation.
@@ -101,6 +100,8 @@ ifeq ($(strip $(BUCK)),)
     BUCK = \$$
   endif
 endif
+
+# </cs-config>
 
 # The suffixes for $(OUT) directory when making PIC and non-PIC code
 # Can be changed from system-dependent makefile

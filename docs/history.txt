@@ -27,7 +27,17 @@ chronological order.
 	- Eric Sunshine removed the last remnant (DO_DINPUT_KEYBOARD) of
 	  DirecInput support; the bulk of which was removed some time ago.
         - Philip Wyett corrected #include's for Cg and eliminated make
-          depend warnings.        
+          depend warnings.
+	- Eric Sunshine fixed a number of problems where the output of
+	  "cs-config --makevars" was lacking on some platforms (missing
+	  definitions, etc.) for both make and jam generations of cs-config.
+	  (bug #759768)
+	- Eric Sunshine fixed csconf.mak so that it also extracts <cs-config>
+	  blocks from CS/mk/*.mak, rather than only from the platform-specific
+	  makefile.
+	- Eric Sunshine changed cs-config so that it also now recognizes
+	  --long-version in addition to --longversion.
+	- Eric Sunshine added --makevars to cs-config --help output.
 11-Sep-2003
 	- Jorrit cleaned up some sources in the stencil renderloop.
 	- Jorrit did the following optimizations with regards to

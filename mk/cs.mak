@@ -21,6 +21,7 @@ include $(SRCDIR)/mk/common.mak
 # Remove all standard suffixes to speed up make lookups
 .SUFFIXES:
 
+# <cs-config>
 #-------------- Several definitions to make this file compiler-independent ---#
 # Flags for C compiler to direct output to the rule target
 CFLAGS.@ = -o $@
@@ -38,6 +39,7 @@ CFLAGS.I = -I
 ARFLAGS.@=$@
 # Object file extension
 O=.o
+# </cs-config>
 
 ifeq ($(USE_PLUGINS),no)
   override MAKE_DLL=no

@@ -49,12 +49,13 @@ Options:
 	[--prefix]
 	[--exec-prefix]
 	[--version]
-	[--longversion]
+	[--long-version]
 	[--libdir]
 	[--includedir]
 	[--libs]
 	[--cflags]
 	[--cxxflags]
+	[--makevars]
 	[--help]
 Libraries:
 	csengine
@@ -199,7 +200,7 @@ while test $# -gt 0; do
         echo $version
         exit 0
         ;;
-    --longversion)
+    --long-version|--longversion)
 	echo $longversion
 	exit 0
 	;;

@@ -59,11 +59,15 @@ EXE = .app
 # Extension for dynamic libraries on this system.
 DLL = .csbundle
 
+# <cs-config>
 # Extra libraries needed on this system.
 LIBS.EXE =
+# </cs-config>
 
+# <cs-config>
 # Extra libraries needed only for executables (not plug-ins)
 LIBS.EXE.PLATFORM =
+# </cs-config>
 
 # Indicate where special include files can be found.
 CFLAGS.INCLUDE = $(addprefix $(CFLAGS.I),$(MACOSX.SOURCE_PATHS))

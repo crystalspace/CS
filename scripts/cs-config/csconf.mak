@@ -52,7 +52,9 @@ CSCONFIG.VMINOR  := $(shell sed -e '/\#define[ 	][ 	]*CS_VERSION_MINOR/!d' -e 's
 CSCONFIG.RDATE   := $(shell sed -e '/\#define[ 	][ 	]*CS_RELEASE_DATE/!d'  -e 's/\#define[ 	][ 	]*CS_RELEASE_DATE[ 	][ 	]*CS_VER_QUOTE(\(..*\)).*/\1/' < $(CSCONFIG.VERFILE))
 
 # Extract needed makefile fragments directly from target makefile.
-CSCONFIG.MAKEFRAG = sed '/<cs-config>/,/<\/cs-config>/!d;/^\#/d' < $(SRCDIR)/$(TARGET_MAKEFILE)
+CSCONFIG.MAKEFRAG = \
+  cat $(wildcard $(SRCDIR)/mk/*.mak) $(SRCDIR)/$(TARGET_MAKEFILE) | \
+  sed '/<cs-config>/,/<\/cs-config>/!d;/<cs-config>/d;/<\/cs-config>/d'
 
 endif # ifeq ($(DO_CREATE_CSCONFIG),yes)
 
@@ -104,7 +106,9 @@ $(CSCONFIG.EXE): $(CSCONFIG.DEP)
 	@echo $"# Automatically generated. $" 		>> cs-config
 	@echo $"EXE=$(EXE)$" 				>> cs-config
 	@echo $"DLL=$(DLL)$" 				>> cs-config
-	@echo $"LIBS.EXE.PLATFORM=$(LIBS.EXE.PLATFORM)$">> cs-config
+	@echo $"CSTHREAD.CFLAGS=$(CSTHREAD.CFLAGS)$"	>> cs-config
+	@echo $"CSTHREAD.LFLAGS=$(CSTHREAD.LFLAGS)$"	>> cs-config
+	@echo $"CSTHREAD.LIBS=$(CSTHREAD.LIBS)$"	>> cs-config
 	@$(CSCONFIG.MAKEFRAG) >> cs-config
 	@echo $"EOF$"					>> cs-config
 	@echo $"}$"					>> cs-config
@@ -112,7 +116,7 @@ $(CSCONFIG.EXE): $(CSCONFIG.DEP)
 	@cat $(SRCDIR)/scripts/cs-config/cs-config.temppost >> cs-config
 
 	@chmod +x cs-config
-	
+
 endif # ifeq ($(DO_CREATE_CSCONFIG),yes)
 
 cs-configclean:

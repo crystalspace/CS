@@ -28,14 +28,16 @@ O=.o
 # Typical prefix for library filenames
 LIB_PREFIX=lib
 
+# <cs-config>
 # Extra libraries needed on this system (beside drivers)
 # LIBS.SYSTEM comes from the local config.mak and is set up by the Autoconf
 # configure script.
-LIBS.EXE += \
+LIBS.EXE.PLATFORM += \
   $(LFLAGS.L)/usr/lib/w32api \
   $(LFLAGS.l)gdi32 \
   $(LIBS.SYSTEM) \
   $(LFLAGS.l)shell32 
+# </cs-config>
 
 # Extra libraries needed for Python cspace module.
 PYTHMOD.LIBS.PLATFORM = gdi32 shell32
@@ -46,12 +48,16 @@ LIBS.SOUND.SYSTEM = $(LFLAGS.l)dsound $(LFLAGS.l)winmm
 # Freetype library
 LIBS.FREETYPE.SYSTEM = $(LFLAGS.l)ttf
 
+# <cs-config>
 # General flags for the compiler which are used in any case.
 CFLAGS.GENERAL = $(CFLAGS.SYSTEM) $(CSTHREAD.CFLAGS) -pipe
+# </cs-config>
 
+# <cs-config>
 # Indicate where special include files can be found.
 # for instance where your dx includes are
 CFLAGS.INCLUDE= $(CFLAGS.I)/usr/include/directx
+# </cs-config>
 
 # Flags for the compiler which are used when profiling.
 CFLAGS.profile = -pg -O -g
@@ -140,7 +146,7 @@ MAKEVERSIONINFO = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mkverres.sh
 MERGERES = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mergeres.sh
 MAKEMETADATA = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mkmetadatares.sh
 
-ifdef WIN32_USED_ONLY_BE_CSCONFIG
+ifdef WIN32_USED_ONLY_BY_CSCONFIG
 # <cs-config>
 DO.SHARED.PLUGIN.PREAMBLE += \
   echo "EXPORTS" > $(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM) \

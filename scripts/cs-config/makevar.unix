@@ -1,3 +1,7 @@
+LFLAGS.L = -L
+LFLAGS.l = -l
+CFLAGS.D = -D
+CFLAGS.I = -I
 EXE=
 DLL=.so
 LIBS.EXE.PLATFORM=-ldl -lm -lnsl
