@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XML Spy v4.4 U (http://www.xmlspy.com) by Jorrit Tyberghein (private) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="world">
+		<xs:annotation>
+			<xs:documentation>The top-level of the world</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence maxOccurs="unbounded">
+				<xs:element name="textures" minOccurs="0"/>
+				<xs:element name="materials" minOccurs="0"/>
+				<xs:element name="sector" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="meshobj">
+								<xs:complexType/>
+							</xs:element>
+							<xs:element name="light"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="plugins" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="v">
+		<xs:complexType>
+			<xs:attribute name="x" type="xs:float" use="optional" default="0"/>
+			<xs:attribute name="y" type="xs:float" use="optional" default="0"/>
+			<xs:attribute name="z" type="xs:float" use="optional" default="0"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="matrix">
+		<xs:complexType>
+			<xs:sequence maxOccurs="unbounded">
+				<xs:element name="scale" minOccurs="0">
+					<xs:complexType>
+						<xs:attribute name="x" type="xs:float" use="optional" default="1"/>
+						<xs:attribute name="y" type="xs:float" use="optional" default="1"/>
+						<xs:attribute name="z" type="xs:float" use="optional" default="1"/>
+						<xs:attribute name="all" type="xs:float" use="optional" default="1"/>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="rotx" minOccurs="0"/>
+				<xs:element name="roty" minOccurs="0"/>
+				<xs:element name="rotz" minOccurs="0"/>
+				<xs:element name="m11" minOccurs="0"/>
+				<xs:element name="m12" minOccurs="0"/>
+				<xs:element name="m13" minOccurs="0"/>
+				<xs:element name="m21" minOccurs="0"/>
+				<xs:element name="m22" minOccurs="0"/>
+				<xs:element name="m23" minOccurs="0"/>
+				<xs:element name="m31" minOccurs="0"/>
+				<xs:element name="m32" minOccurs="0"/>
+				<xs:element name="m33" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="mixmode">
+		<xs:complexType>
+			<xs:sequence maxOccurs="unbounded">
+				<xs:element name="add" minOccurs="0"/>
+				<xs:element name="copy" minOccurs="0"/>
+				<xs:element name="transparent" minOccurs="0"/>
+				<xs:element name="alpha" minOccurs="0">
+					<xs:complexType/>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

@@ -28,6 +28,9 @@ The history order is reversed so that new features are at the top.
 	  services.
 	- Removed scalex, scaley, and scalez. There is now only 'scale' which
 	  has four optional arguments (x, y, z, and all).
+	- Added a VERY short and incomplete Schema for the CS map file format.
+	  This is very much work in progress as I'm still learning Schema.
+	  Look in scripts/xml.
 8-Aug-2002
 	- Removed support/doom2cs again. This doom2cs utility can now be
 	  found at ftp://sunsite.dk/projects/crystal/contrib/doom2cs.zip
