@@ -1,6 +1,6 @@
 SubDir TOP plugins cscript csperl5 ;
 
-if $(PERL5.AVAILABLE) = "yes" && ! $(MSVCGEN_CONFIG) # Ugly!
+if $(PERL5.AVAILABLE) = "yes" && $(DO_MSVCGEN) != "yes" # Ugly!
 {
   # @@@ FIXME: This scheme of creating a file which includes
   # csperlxs_fallback.inc fails when it comes to project file creation, since
@@ -28,8 +28,7 @@ if $(PERL5.AVAILABLE) = "yes" && ! $(MSVCGEN_CONFIG) # Ugly!
     {
       actions PerlEmbedGlueFile
       {
-        $(CMD.PERL5) -MExtUtils::Embed -e xsinit -- \
-        -o $(<) -std cspace
+        $(CMD.PERL5) -MExtUtils::Embed -e xsinit -- -o $(<) -std cspace
       }
     }
   }

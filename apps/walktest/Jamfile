@@ -54,7 +54,7 @@ else
 
 CompileGroups walktest : nrall ;
 
-if $(MSVCGEN_CONFIG) != "yes"
+if $(DO_MSVCGEN) != "yes"
 {
 Help walktest_static : "Crystal Space WalkTest demo (static build)" ;
 

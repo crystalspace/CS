@@ -2,7 +2,7 @@ SubDir TOP plugins aws ;
 
 FILES = [ Wildcard *.cpp *.h ] ;
 
-if ! $(MSVCGEN_CONFIG) # Ugly, but we must take msvcgen.jam into account.
+if $(DO_MSVCGEN) != "yes" # Ugly, but we must take msvcgen.jam into account.
 {
   if $(CMD.BISON) && $(CMD.FLEX)
   {
