@@ -26,6 +26,8 @@
 
 //---------------------------------------------------------------------------
 
+// some docs: http://www.cica.indiana.edu/graphics/image_specs/rgb.format.txt
+
 static struct SGIHeader
 {
   UShort Magic;		// Magic id
@@ -66,7 +68,9 @@ csImageFile* csSGIImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iForm
 bool ImageSGIFile::Load (UByte* iBuffer, ULong iSize)
 {
   (void)iSize;
-  if (!readHeader (iBuffer, 3))
+
+  UInt planes = readHeader (iBuffer);
+  if (planes !=3 && planes != 4)
     return false;
 
   set_dimensions (header.Width, header.Height);
@@ -202,7 +206,7 @@ int ImageSGIFile::decode_rle (UByte *src, ULong length, UByte *dst)
   return size;
 }
 
-bool ImageSGIFile::readHeader (UByte *iBuffer, UInt numplanes)
+UInt ImageSGIFile::readHeader (UByte *iBuffer)
 {
   UByte *tmpPtr = iBuffer;
 
@@ -215,5 +219,5 @@ bool ImageSGIFile::readHeader (UByte *iBuffer, UInt numplanes)
   header.Width = getShort (tmpPtr); tmpPtr += 2;
   header.Height = getShort (tmpPtr); tmpPtr += 2;
   header.Channels = getShort (tmpPtr); tmpPtr += 2;
-  return (header.Channels==numplanes); //Check that it's a RGB pic
+  return (header.Channels);
 }

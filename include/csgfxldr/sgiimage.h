@@ -16,8 +16,8 @@ protected:
 class ImageSGIFile : public csImageFile
 {
   friend class csSGIImageLoader;
-  // Read and validate SGI header
-  bool readHeader(UByte *buf,UInt numplanes);
+  // Read SGI header and get the number of planes (only 3 or 4 is supported)
+  UInt readHeader(UByte *buf);
   // Read table with offsets
   void loadSGITables(UByte *in,ULong *out,int size);
   // Decode an RLE encoded line
