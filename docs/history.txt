@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+6-Sep-2001
+	- Fixed a bug in iLoader::LoadTexture(). This function would still
+	  return a texture wrapper even if no texture handle could be loaded.
+	  Now it will return NULL.
+	- Fixed a bug in perftest with initialization of G3DTriangleMesh
+	  structure.
 5-Sep-2001
 	- Eric Sunshine eliminated several compilation warnings from aseie.cpp.
 	- Eric Sunshine removed the obsolete igame/csgame.h.
@@ -19,9 +25,6 @@ The history order is reversed so that new features are at the top.
 	      It is not assured that the configmanager is still available
 	      at this time.
 	    - Added decref() of xf86vm in xwindow.cpp.
-	- Fixed a bug in iLoader::LoadTexture(). This function would still
-	  return a texture wrapper even if no texture handle could be loaded.
-	  Now it will return NULL.
 4-Sep-2001
 	- Fixed the ASE importer plugin for missing 'isspace'.
 	- Fixed the cslua plugin by regenerating the swig file with luaswig.
