@@ -108,9 +108,11 @@ ddgTBinMesh::ddgTBinMesh( ddgHeightMap * h )
 	// Queues to hold the visible, clipped and sorted visible triangles.
 	_qs = new ddgQueue( this );
 	_qm = new ddgQueue( this );
+	_qz = new ddgQueue( this );
 	// By default the iterators support 1000 levels of nesting.
 	_qsi = new ddgSplayIterator(_qs);
 	_qmi = new ddgSplayIterator(_qm);
+	_qzi = new ddgSplayIterator(_qz);
 
 	unsigned int i;
 	for (i = 0; i < _bintreeMax; i++ )
@@ -155,6 +157,8 @@ ddgTBinMesh::~ddgTBinMesh(void)
 	delete stri;
 	delete _qs;
 	delete _qm;
+	delete _qz;
+
 	delete _bintree;
 	delete normal; // tmp
 }
