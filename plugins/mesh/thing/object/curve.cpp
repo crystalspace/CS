@@ -458,7 +458,9 @@ void csCurve::CalculateLightingStatic (iFrustumView *lview, bool vis)
     smap = LightMap->FindShadowMap (l);
     if (!smap)
     {
-      smap = LightMap->NewShadowMap (l, CURVE_LM_SIZE, CURVE_LM_SIZE);
+      smap = LightMap->NewShadowMap (l,
+		      CURVE_LM_SIZE * csLightMap::lightcell_size,
+		      CURVE_LM_SIZE * csLightMap::lightcell_size);
     }
 
     ShadowMap = smap->GetArray ();

@@ -1,6 +1,6 @@
 The history order is reversed so that new features are at the top.
 
-2-Feb-2002
+3-Feb-2003
 	- Eric Sunshine replaced fabsf() with fabs() in terrbig plugin for
 	  improved portability since not all platforms have fabsf().  (An
 	  alternate solution would be to check for fabsf via configure.  We
@@ -10,6 +10,26 @@ The history order is reversed so that new features are at the top.
 	    - Was incorrectly using "==" rather than "=" in a `test'
 	      conditional.
 	    - Was passing incorrect flags to CS_CHECK_BUILD().
+	- OpenGL: Removed the unlit superlightmap. This is not needed anymore.
+	- OpenGL: Added code to detect the optimal size for the super lightmap.
+	- Removed the ExtraBright option in opengl.cfg. Wasn't working anyway.
+	- OpenGL renderer now listens to the -verbose commandline option too.
+	  If that option is given it will print out information (at close
+	  time) about super lightmap cache usage.
+	- Split the super lightmap cache in four queues. Queue 0 is for
+	  the largest super lightmap size (by default 256x256), queue 1
+	  is for the next smaller size (128x128) and so on. When building
+	  super lightmaps for DrawPolygonMesh the best queue is selected
+	  then. This greatly improves super lightmap cache usage with the
+	  same amount of texture memory on the card.
+	- Changed Video.OpenGL.SuperLightMapNum to SuperLightMapNum0,
+	  SuperLightMapNum1, SuperLightMapNum2, and SuperLightMapNum3.
+	  With these you can set the sizes of the four queues.
+	- Software renderer implementation of DrawPolygonMesh now does
+	  backface culling. This makes it a LOT faster and now performance
+	  compares to old style single-polygon drawing.
+	- Because of this optimization I reduced the FastMeshThresshold to
+	  10 by default now.
 	- Eric Sunshine made the following changes to configure's OpenGL tests:
 	    - Now checks for opengl32 and cousins before libGL and libMesaGL.
 	      Hopefully this will work around problems experienced by Cygwin
@@ -24,13 +44,70 @@ The history order is reversed so that new features are at the top.
 	      the OpenGL library since some users have reported that Mesa's
 	      OpenGL library references pthread functions.
 2-Feb-2003
+	- Optimization with polygon buffers (DrawPolygonMesh) in OpenGL
+	  renderer. They use less memory now and they are also more efficient.
+	- Cleaned up some unused code in ogl_g3dcom.cpp.
+	- Fixed a crash bug with fog when clipping is needed.
+	- With Z-plane clipping (OpenGL) we now only switch to exact clipping
+	  if the NeedScreenClipping flag is set in opengl.cfg.
+	- Fixed bug in OpenGL fog handling. Was broken after a recent
+	  optimization.
+	- Removed redundant number of triangles in the polygon buffer.
+	- Cleaned up OpenGL polybuf code a bit more.
+	- Removed an unneeded IncRef() on iPolyTexture in the polygon buffer
+	  implementation.
+	- Added iPolygonBuffer->Prepare() function to make it easier to
+	  manage optimal super lightmap calculation.
+	- Fixed a bug in csGrowingArray<T>->SetLimit(). It would not
+	  adjust the length of the array if the new limit was smaller than
+	  the length.
+	- Now lightmaps are sorted on biggest dimension before we start
+	  choosing a super lightmap. By doing this we can significantly
+	  reduce the number of needed super lightmaps for some of the larger
+	  objects.
 	- Eric Sunshine modified tutorial/intro.txi so that it gives the full
 	  name of SCF and features a hyperlink to the SCF section.
 	- res fixed a crash in JNG saving
+1-Feb-2003
+	- Lightmaps with DrawPolygonMesh were not correctly aligned. This
+	  is a very old bug that was fixed for normal lightmap rendering
+	  but not for DrawPolygonMesh.
+	- Fixed a bad bug with curved surfaces and pseudo-dynamic lighting.
+	  This caused crashes.
+	- Work around to a division by zero bug that sometimes happens in emit.
+	  Don't know what causes this and I don't understand the emit code
+	  so I cannot give a real fix.
+	- Fixed a very bad bug in the thing mesh plugin. When a lightcell
+	  size was selected different from the default 16, all shadow
+	  calculations would go wrong because the shift value (4) wasn't
+	  updated. This bug was introduced when I moved thing to a seperate
+	  plugin.
 31-Jan-2003
+	- Another small optimization in the super lightmap cache. This time
+	  avoid virtual function calls.
+	- Another small optimization. If nothing was drawn during the
+	  unlit texture mapping then no lightmaps are drawn either (for
+	  DrawPolygonMesh).
+	- Cleaned up super lightmap code a little more.
+	- Started work on new optimization in the super lightmap cache. Not
+	  operational yet.
+	- Made the super lightmap cache in the OpenGL renderer a lot faster.
+	  There is now a cost associated with every super lightmap (based
+	  on number of lightmaps that are in it) and also a timestamp which
+	  says when that super lightmap was last needed. When selecting a
+	  new super lightmap this information is used to make sure that
+	  useful super lightmaps stay in memory.
+	- Fixed a bad bug in the exact clipper used by DrawPolygonMesh. This
+	  bug was introduced yesterday and caused lightmaps to be wrong
+	  if exact clipping was needed.
 	- res fixed MSVC assertion in csString::Collapse() if the string
 	  contains characters >= 0x80
 30-Jan-2003
+	- Greatly modified the DrawPolygonMesh and polygon buffer
+	  code in the OpenGL renderer. This is still very experimental
+	  so I'm going to continue working on this. There are also no
+	  substantial performance improvements yet.
+	- Additional small optimization in the super lightmap cache handling.
 	- Matthias Braun made plugin makefiles using the CFLAGS from external
 	  libraries (3ds, mikmod, ogg/vorbis, openal, ode plugins)
 	- Eric Sunshine fixed problem in the various OpenGL renderer and canvas
