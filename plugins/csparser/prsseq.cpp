@@ -879,6 +879,18 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 	        if (!SyntaxService->ParseVector (child2, offset))
 		  return 0;
 		break;
+	      case XMLTOKEN_AUTOOFFSET:
+		{
+		  csRef<iMeshWrapper> mw = SCF_QUERY_INTERFACE (mesh->GetValue(),
+		    iMeshWrapper);
+		  if (mw)
+		  {
+		    csBox3 box;
+		    mw->GetWorldBoundingBox (box);
+		    offset = (box.Min() + box.Max()) / 2.0f;
+		  }
+		}
+		break;
 	      default:
 		SyntaxService->ReportBadToken (child2);
 		return 0;

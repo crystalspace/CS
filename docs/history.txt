@@ -34,6 +34,11 @@ chronological order.
 	      generated and written to the .zip (so they are supplied by the 
 	      user).
 	    - Added possibility to specify the renderloop to use.
+	- res augmented the rotation sequence action loaded to automatically
+	  determine a rotation center (the middle of the object's bounding
+	  box) when <autoffset /> is specified.
+	- res slightly improved the error handling when reading shader files
+	  from world files.
 27-Mar-2004
 	- Anders Stenberg did the following NR changes:
 	    - Added the possibility to route Cg programs through

@@ -1106,6 +1106,8 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("shader", XMLTOKEN_SHADER);
   xmltokens.Register ("shadervar", XMLTOKEN_SHADERVAR);
   xmltokens.Register ("renderloop", XMLTOKEN_RENDERLOOP);
+  
+  xmltokens.Register ("autooffset", XMLTOKEN_AUTOOFFSET);
 
   return true;
 }
@@ -4761,20 +4763,27 @@ bool csLoader::ParseShaderList (iDocumentNode* node)
 	  csRef<iFile> shaderFile = vfs->Open (
 	    fileChild->GetContentsValue (), VFS_FILE_READ);
 
-    if(!shaderFile)
-    {
-      ReportWarning ("csLoader::ParseShaderList", 
-        "Unable to open shader file '%s'!",
-        fileChild->GetContentsValue ());
-      break;
-    }
+	  if(!shaderFile)
+	  {
+	    ReportWarning ("csLoader::ParseShaderList", 
+	      "Unable to open shader file '%s'!",
+	      fileChild->GetContentsValue ());
+	    break;
+	  }
 
 	  csRef<iDocumentSystem> docsys (
 	    CS_QUERY_REGISTRY(object_reg, iDocumentSystem));
 	  if (docsys == 0)
 	    docsys.AttachNew (new csTinyDocumentSystem ());
 	  csRef<iDocument> shaderDoc = docsys->CreateDocument ();
-	  shaderDoc->Parse (shaderFile);
+	  const char* err = shaderDoc->Parse (shaderFile);
+	  if (err != 0)
+	  {
+	    ReportWarning ("csLoader::ParseShaderList", 
+	      "Could not parse shader file '%s': %s",
+	      fileChild->GetContentsValue (), err);
+	    break;
+	  }
 	  shaderNode = shaderDoc->GetRoot ()->GetNode ("shader");
 	}
 	else
