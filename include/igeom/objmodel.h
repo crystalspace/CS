@@ -33,6 +33,10 @@ struct iPolygonMesh;
 class csBox3;
 
 /**
+ * \name Bounding box types
+ * @{ */
+ 
+/**
  * For iObjectModel::GetObjectBoundingBox() get a normal bounding box which
  * may or may not be recalculated depending on the changing geometry of
  * the object.
@@ -51,6 +55,8 @@ class csBox3;
  * a realistic maximum bounding box.
  */
 #define CS_BBOX_MAX 2
+
+/** @} */
 
 SCF_VERSION (iObjectModel, 0, 0, 1);
 
@@ -101,13 +107,13 @@ struct iObjectModel : public iBase
    * Get the bounding box in object space for this mesh object.
    * Type has three possibilities:
    * <ul>
-   * <li> CS_BBOX_NORMAL: get a normal bounding box which
+   * <li> #CS_BBOX_NORMAL: get a normal bounding box which
    *      may or may not be recalculated depending on the changing
    *      geometry of the object.
-   * <li> CS_BBOX_ACCURATE: get a totally accurate bounding
+   * <li> #CS_BBOX_ACCURATE: get a totally accurate bounding
    *      box. Not all plugins support this. Some will just return a normal
    *      bounding box.
-   * <li> CS_BBOX_MAX: get the maximum bounding box
+   * <li> #CS_BBOX_MAX: get the maximum bounding box
    *      that this object will ever use. For objects that don't have a
    *      preset maximum bounding box this just has to be a reasonable
    *      estimate of a realistic maximum bounding box.
