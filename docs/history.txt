@@ -65,6 +65,12 @@ The history order is reversed so that new features are at the top.
 	  now were the easy ones.
 	- Eric Sunshine eliminated the unmaintained and broken cslua module.
 	- Oktal added a Jamfile to the PicoGUI test app.
+	- Oktal made the following changes to the PicoGUI server plugin:
+	    - Commented out the font engine constructor; the PicoGUI API does
+	      not provide a functionality to define an external font engine,
+	      so the constructor code is incorrect. I will have to patch Pico.
+	    - Rearranged the pgserver initialization code; it was doing things
+	      in the wrong order which was causing a segfault within Pico.
 27-May-2003
 	- Boyan made the following changes:
 	    - Fixed kyboard focusing component bug in AWS 

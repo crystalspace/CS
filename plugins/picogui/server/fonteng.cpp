@@ -32,6 +32,7 @@ csRef<iFontServer> csPGFontEngine::Serv;
 
 bool csPGFontEngine::Construct (iFontServer *s)
 {
+#if 0
   Serv = s;
   static fontlib lib;
   lib.engine_init	= Init;
@@ -46,6 +47,8 @@ bool csPGFontEngine::Construct (iFontServer *s)
   lib.getmetrics	= GetMetrics;
   g_error err = bdf_regfunc (& lib);
   return err == 0;
+#endif
+  return true;
 }
 
 g_error csPGFontEngine::Init ()

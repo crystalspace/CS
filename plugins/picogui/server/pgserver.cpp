@@ -78,6 +78,12 @@ inline bool csPicoGUIServer::Initialize (iObjectRegistry *objreg)
   csRef<iFontServer> fsv = CS_QUERY_REGISTRY (objreg, iFontServer);
   if (! fsv) return false;
 
+  if (! csPGVideoDriver::Construct (g2d)) return false;
+
+  if (! csPGFontEngine::Construct (fsv)) return false;
+
+  if (! csPGInputDriver::Construct (evq)) return false;
+
   e = pgserver_init (PGINIT_NO_COMMANDLINE | PGINIT_NO_CONFIGFILE, 0, NULL);
   if (iserror(e)) {
     os_show_error(e);
@@ -85,12 +91,6 @@ inline bool csPicoGUIServer::Initialize (iObjectRegistry *objreg)
   }
 
   evq->RegisterListener (& scfiEventHandler, CSMASK_Nothing);
-
-  if (! csPGVideoDriver::Construct (g2d)) return false;
-
-  if (! csPGFontEngine::Construct (fsv)) return false;
-
-  if (! csPGInputDriver::Construct (evq)) return false;
 
   pgserver_mainloop_start ();
   return true;
