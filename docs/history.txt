@@ -19,6 +19,8 @@ chronological order.
 	- Eric Sunshine fixed several makefile and Jamfile problems with the
 	  new null renderer for the NR, including a sizable number of
 	  copy/paste errors.
+	- Eric Sunshine adjusted msvcgen/workspaces.mak to take into account
+	  new nullrender3d module.
 20-Feb-2004
 	- Jorrit added a csArray::GetIndex() function which will return the
 	  index of an element in the array (as input you give a pointer to

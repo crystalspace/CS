@@ -77,6 +77,7 @@ MSVC.WORKSPACE.TYPICAL.REJECT = \
   glshader_cg \
   glshader_fixed \
   grp.+_(?!typical\.) \
+  nullrender3d \
   shadermgr \
   softrender3d \
   softshader \
@@ -90,6 +91,7 @@ MSVC.WORKSPACE.NEWRENDERER.NAME = newrenderer
 MSVC.WORKSPACE.NEWRENDERER.REJECT = \
   gl3d \
   grp.+_(?!newrenderer\.) \
+  null3d \
   soft3d
 
 # Walktest plus all plugins commonly required by Walktest.
