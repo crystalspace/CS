@@ -97,6 +97,9 @@
         <texture name="seagull">
             <file>/lib/std/seagull.gif</file>
         </texture>
+        <texture name="flickernote">
+            <file>flicker-note1.png</file>
+        </texture>
     </textures>
     <settings>
         <fastmesh>10</fastmesh>
@@ -202,6 +205,27 @@
         </material>
         <material name="seagull">
             <texture>seagull</texture>
+        </material>
+        <material name="flickernote">
+            <texture>flickernote</texture>
+        </material>
+        <material name="flare_center">
+            <texture>flare_center</texture>
+        </material>
+        <material name="flare_spark1">
+            <texture>flare_spark1</texture>
+        </material>
+        <material name="flare_spark2">
+            <texture>flare_spark2</texture>
+        </material>
+        <material name="flare_spark3">
+            <texture>flare_spark3</texture>
+        </material>
+        <material name="flare_spark4">
+            <texture>flare_spark4</texture>
+        </material>
+        <material name="flare_spark5">
+            <texture>flare_spark5</texture>
         </material>
     </materials>
     <renderpriorities>
@@ -12359,24 +12383,16 @@
                         <v x="-12" y="4" z="5" />
                     </texmap>
                 </p>
+                <material>flickernote</material>
                 <p name="down">
                     <v>1</v>
                     <v>5</v>
                     <v>4</v>
                     <v>0</v>
                     <texmap>
-                        <matrix>
-                            <m11>0.2</m11>
-                            <m12>0</m12>
-                            <m13>0</m13>
-                            <m21>0</m21>
-                            <m22>0</m22>
-                            <m23>-0.2</m23>
-                            <m31>0</m31>
-                            <m32>-0.2</m32>
-                            <m33>0</m33>
-                        </matrix>
-                        <v x="-12" y="-1" z="6" />
+                    	<uv idx="0" u="1" v="1" />
+                    	<uv idx="1" u="0" v="1" />
+                    	<uv idx="2" u="0" v="0" />
                     </texmap>
                 </p>
             </params>
