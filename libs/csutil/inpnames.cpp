@@ -140,7 +140,6 @@ bool csParseInputDef (const char* name, csEvent& ev, bool use_modifiers = true)
 bool csGetInputDesc (iEvent *ev, char *buf, bool use_modifiers = true)
 {
   (void) use_modifiers;
-  char *ret = buf;
   int mod = 0;
   switch (ev->Type)
   {
