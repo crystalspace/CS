@@ -1,6 +1,41 @@
 The history order has been reversed so that new features are at the top.
 
+25-Jul-2000
+	- Engine plugin is now working!
+	- Extended iWorld with a few functions from csWorld.
+	- Extended simplep app with more functionality. Still doesn't show
+	  any 3D yet.
+	- Scott Bowden continued work on the Unreal convertor (t3d2cs).
+	  The following changes have been made:
+	    - Added the friend function 'dMsg(char *message)'
+	      to all classes in t3d2cs. It is used to print a
+	      debug message, and can be disabled.
+	    - Rearranged the internal data representation used
+	      in most of the classes in t3d2cs. Mainly this was
+	      a mass rename of a lot of variables to d_[var] to
+	      specify that it is internal data. This allows me,
+	      for example, to have a public function in tLocation
+	      called .x() to get the x value without causing confusion.
+	    - Added the tRotation class [tRtation.h]. Should work
+	      fine.
+	    - Add the tPolygon and tPolyList classes [tPolygon.h /
+	      tPolyLst.h ]. They do not fully work yet. I am aware
+	      of this fact :)
+	    - Added in the tLcation [tLocation (8.3, grr!)] class to
+	      handle brush locations. I have also moved setFloatVal
+	      to setDoubleVal and changed the handling of precision
+	      variables accordingly to doubles instead of floats.
 24-Jul-2000
+	- Started work on new engine plugin. This plugin will link statically
+	  with csengine but will itself be a plugin that can be used
+	  by apps instead of linking to csengine directly. This method
+	  serves as the future prefered base for working with CS and it
+	  also allows to dynamically load the (large) engine plugin into
+	  memory. This engine plugin also makes it easier to conform to
+	  the LGPL. Not working yet.
+	- Added new 'simplep' application which will eventually be similar
+	  to 'simple' except that it will use the engine plugin instead
+	  of statically linking to 'csengine'.
 	- Added csWorld parameter to csPolygonSet (and thus to csThing
 	  and csSector as well) to help the removal of the current_world
 	  static variable.
@@ -19,6 +54,31 @@ The history order has been reversed so that new features are at the top.
 	  it is actually ment: i.e. to indicate a polygon that should not
 	  be drawn. This fixes the new CS_ENGINE_ZBUFFER engine mode.
 	- Got an updated doc to csPhyziks from Michael Ewert.
+	- Andrew Zabolotny did the following changes:
+	    - Added dynamic loader support for DJGPP. Added required
+	      detection routines to bin/dosconf.bat. If you have libdl
+	      installed (available from Crystal Space ftp site, and in
+	      near future from ftp.simtel.net) it will set
+	      USE_SHARED_PLUGINS to yes, otherwise to no.
+	      Also you may want to use shared versions of libpng, zlib,
+	      libjpeg. The dosconf.bat script looks for these libraries,
+	      and if available turns on the usage of shared version of
+	      respective libraries. You may have as well just one library
+	      in shared version, and other twos - in static version,
+	      each one is detected individually.
+	    - Removed someone's #ifndef YY_NO_NULLIFY_YYVAL from
+	      support/gnu/bison.sim. This is a very incorrect change since
+	      YYVAL is not always an int, in my case (csstdldr) it is a
+	      structure, and as such cannot be assigned NULL.
+	      A better approach would be to do:
+		#ifdef YYVAL_ZERO
+		  yyval = YYVAL_ZERO;
+		#endif
+	      but in any case I don't see the need for it - I don't get
+	      any warnings about uninitialized variables, at least with
+	      pgcc 2.95.2 in optimize mode.
+	    - Further work on the new loader.
+	    - Fixed a warning in csFrustum::Classify().
 23-Jul-2000
 	- Cleaned up some coverage mask tree statictics.
 	- Added csWorld::SetEngineMode() with which you can control how

@@ -84,6 +84,11 @@ struct iWorld : public iPlugIn
   virtual iThing *FindThing (const char *iName) = 0;
   /// Find a sprite by name
   virtual iSprite *FindSprite (const char *iName) = 0;
+
+  /// Enable/disable the lighting cache.
+  virtual void EnableLightingCache (bool do_cache) = 0;
+  /// Return true if lighting cache is enabled.
+  virtual bool IsLightingCacheEnabled () = 0;
 };
 
 #endif // __IWORLD_H__

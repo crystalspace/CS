@@ -15,15 +15,16 @@
 ifndef PLUGINS
   PLUGINS  = video/renderer video/canvas
   PLUGINS += video/renderer/line video/renderer/null video/renderer/inf
-  PLUGINS += cscon 
-  PLUGINS += csclear 
-  PLUGINS += dungeon 
-  PLUGINS += net/driver/socket net/netman 
-  PLUGINS += font/server/csfont 
+  PLUGINS += cscon
+  PLUGINS += csclear
+  PLUGINS += dungeon
+  PLUGINS += engine
+  PLUGINS += net/driver/socket net/netman
+  PLUGINS += font/server/csfont
 # PLUGINS += font/server/freefont
 # PLUGINS += csstdldr
-  PLUGINS += netspace/nstp netspace/nsmgr 
-  PLUGINS += csauth/simple 
+  PLUGINS += netspace/nstp netspace/nsmgr
+  PLUGINS += csauth/simple
   PLUGINS += colldet/rapid
   PLUGINS += metaball
   PLUGINS += $(DETECTED_PLUGINS)
