@@ -142,7 +142,8 @@ void csMaterialWrapper::Visit ()
 {
   // @@@ This is not very clean! We shouldn't cast from iMaterial to csMaterial.
   csMaterial* mat = (csMaterial*)material;
-  mat->GetTextureWrapper ()->Visit ();
+  if (mat && mat->GetTextureWrapper ())
+    mat->GetTextureWrapper ()->Visit ();
 }
 
 //------------------------------------------------------ csMaterialList -----//

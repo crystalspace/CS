@@ -4,6 +4,17 @@ The history order has been reversed so that new features are at the top.
 	- Updated various parts of the documentation. The most important
 	  change is that the simple tutorial has been updated to the mesh
 	  object plugin system.
+	- Fixed an old bug in the OpenGL canvas. The ScreenShot() function
+	  did not work correctly on big-endian systems in 32-bit display
+	  mode. The colors were wrong.
+	- Fixed a bug in csMaterialHandle::FreeMaterial(). It would
+	  accidently clean up the texture as well.
+	- Fixed another bug in csMaterialHandle::Prepare(). This function
+	  will now look if the material is still there and copy the
+	  data again. This is useful to change material settings later.
+	- Fixed a bug in csMaterialWrapper::Visit(). It would call
+	  visit on the texture even if there is no texture for the material.
+	  This naturally caused a crash.
 14-Feb-2001
 	- Continued making use of QUERY_INTERFACE in the engine more sensible.
 	  This involves:
