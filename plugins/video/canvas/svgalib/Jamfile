@@ -2,14 +2,14 @@ SubDir TOP plugins video canvas svgalib ;
 
 if $(SVGA.AVAILABLE) = "yes" 
 {
-Plugin svgalib2d
+Plugin svga2d
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith svgalib2d : canvascommon cssys csutil ;
-ExternalLibs svgalib2d :  VGA ;
+LinkWith svga2d : canvascommon cssys csutil ;
+ExternalLibs svga2d :  VGA ;
 
-Help svgalib2d : "Crystal Space SVGAlib 2D driver" ;
-CompileGroups svgalib2d :  drivers2d ;
+Help svga2d : "Crystal Space SVGAlib 2D driver" ;
+CompileGroups svga2d :  drivers2d ;
 
 }
 
