@@ -1,5 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
+25-Mar-2001
+	- Eric Sunshine reverted a change to csconin.cpp by Philip Wyett since
+	  Philip's change was incorrect.  Eric applied the correct fix instead.
 24-Mar-2001
 	- Eric Sunshine made the following changes to the project:
 	    - Repaired an ultra nasty bug in csSystemDriver::LoadPlugIn().

@@ -63,6 +63,7 @@ csConsoleInput::~csConsoleInput ()
 
   if (Console)
   {
+    Console->RegisterPlugin (NULL);
     Console->DecRef ();
   }
 }
