@@ -31,7 +31,6 @@ ifeq ($(MAKESECTION),postdefines)
 
 CFLAGS.GLIDE3D+=-I/usr/local/glide/include -DDO_GLIDE -DGLIDE24_ONLY
 LIBS._GLIDE3D+=-lglide2x
-CFLAGS.MAKEDEP += CFLAGS.GLIDE3D
 
 # The Glide driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
@@ -74,7 +73,7 @@ glide3dclean:
 ifdef DO_DEPEND
 depend: $(OUTOS)glide3d.dep
 $(OUTOS)glide3d.dep: $(SRC.GLIDE3D)
-	$(DO.DEP)
+	$(DO.DEP) $(CFLAGS.GLIDE3D)
 else
 -include $(OUTOS)glide3d.dep
 endif

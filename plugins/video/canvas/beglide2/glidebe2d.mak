@@ -74,7 +74,7 @@ glidebeclean:
 ifdef DO_DEPEND
 depend: $(OUTOS)glidebe2d.dep
 $(OUTOS)glidebe2d.dep: $(SRC.GLIDEBE2D)
-	$(DO.DEP)
+	$(DO.DEP) $(CFLAGS.GLIDEBE2D)
 else
 -include $(OUTOS)glidebe2d.dep
 endif

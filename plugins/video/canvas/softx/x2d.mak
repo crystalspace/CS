@@ -72,7 +72,7 @@ x2dclean:
 ifdef DO_DEPEND
 depend: $(OUTOS)x2d.dep
 $(OUTOS)x2d.dep: $(SRC.XLIB2D)
-	$(DO.DEP)
+	$(DO.DEP) $(CFLAGS.X2D)
 else
 -include $(OUTOS)x2d.dep
 endif

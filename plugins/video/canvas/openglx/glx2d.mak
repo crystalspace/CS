@@ -87,7 +87,7 @@ glx2dclean:
 ifdef DO_DEPEND
 depend: $(OUTOS)glx2d.dep
 $(OUTOS)glx2d.dep: $(SRC.GLX2D)
-	$(DO.DEP)
+	$(DO.DEP) $(CFLAGS.GLX2D)
 else
 -include $(OUTOS)glx2d.dep
 endif

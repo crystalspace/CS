@@ -36,18 +36,17 @@ ifeq ($(MAKESECTION),postdefines)
 # The driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
   oglsvga=$(OUTDLL)oglsvga$(DLL)
-  LIBS.oglsvga=$(LIBS._oglsvga)
-#  LIBS.oglsvga=$(LIBS._oglsvga) $(CSUTIL.LIB) $(CSSYS.LIB)
-  DEP.oglsvga=$(CSUTIL.LIB) $(CSSYS.LIB)
+  LIBS.OGLSVGA=$(LIBS._oglsvga)
+  DEP.OGLSVGA=$(CSUTIL.LIB) $(CSSYS.LIB)
 else
   oglsvga=$(OUT)$(LIB_PREFIX)oglsvga$(LIB)
   DEP.EXE+=$(oglsvga)
   LIBS.EXE+=$(LIBS._oglsvga) $(CSUTIL.LIB) $(CSSYS.LIB)
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_oglsvga
 endif
-DESCRIPTION.$(oglsvga) = $(DESCRIPTION.oglsvga)
-SRC.oglsvga = $(wildcard libs/cs2d/openglx/svga/*.cpp)
-OBJ.oglsvga = $(addprefix $(OUT),$(notdir $(SRC.oglsvga:.cpp=$O)))
+DESCRIPTION.$(oglsvga) = $(DESCRIPTION.OGLSVGA)
+SRC.OGLSVGA = $(wildcard libs/cs2d/openglx/svga/*.cpp)
+OBJ.OGLSVGA = $(addprefix $(OUT),$(notdir $(SRC.OGLSVGA:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -55,24 +54,22 @@ endif # ifeq ($(MAKESECTION),postdefines)
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: oglsvga oglsvgaclean
+vpath %.cpp libs/cs2d/openglx/svga
 
 # Chain rules
 clean: oglsvgaclean
 
 oglsvga: $(OUTDIRS) $(oglsvga)
 
-$(OUT)%$O: libs/cs2d/openglx/svga/%.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.oglsvga)
- 
-$(oglsvga): $(OBJ.oglsvga) $(DEP.oglsvga)
-	$(DO.PLUGIN) $(LIBS.oglsvga)
+$(oglsvga): $(OBJ.OGLSVGA) $(DEP.OGLSVGA)
+	$(DO.PLUGIN) $(LIBS.OGLSVGA)
 
 oglsvgaclean:
-	$(RM) $(oglsvga) $(OBJ.oglsvga)
+	$(RM) $(oglsvga) $(OBJ.OGLSVGA)
  
 ifdef DO_DEPEND
 depend: $(OUTOS)oglsvga.dep
-$(OUTOS)oglsvga.dep: $(SRC.oglsvga)
+$(OUTOS)oglsvga.dep: $(SRC.OGLSVGA)
 	$(DO.DEP)
 else
 -include $(OUTOS)oglsvga.dep

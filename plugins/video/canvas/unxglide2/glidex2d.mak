@@ -80,7 +80,7 @@ glidexclean:
 ifdef DO_DEPEND
 depend: $(OUTOS)glidex2d.dep
 $(OUTOS)glidex2d.dep: $(SRC.GLIDEX2D)
-	$(DO.DEP)
+	$(DO.DEP) $(CFLAGS.GLIDEX2D)
 else
 -include $(OUTOS)glidex2d.dep
 endif
