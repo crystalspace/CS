@@ -353,21 +353,21 @@ void csCurve::ShineDynLight (csLightPatch *lp)
       {
         lval = map[uv].red + QRound (color.red * brightness);
         if (lval > 255) lval = 255;
-        map[uv].red = lval;
+        map[uv].red = (unsigned char) lval;
       }
 
       if (color.green > 0)
       {
         lval = map[uv].green + QRound (color.green * brightness);
         if (lval > 255) lval = 255;
-        map[uv].green = lval;
+        map[uv].green = (unsigned char) lval;
       }
 
       if (color.blue > 0)
       {
         lval = map[uv].blue + QRound (color.blue * brightness);
         if (lval > 255) lval = 255;
-        map[uv].blue = lval;
+        map[uv].blue = (unsigned char) lval;
       }
     }
   }
@@ -518,7 +518,7 @@ void csCurve::CalculateLightingStatic (iFrustumView *lview, bool vis)
       {
         lval = ShadowMap[uv] + QRound (CS_NORMAL_LIGHT_LEVEL * brightness);
         if (lval > 255) lval = 255;
-        ShadowMap[uv] = lval;
+        ShadowMap[uv] = (unsigned char) lval;
       }
       else
       {
@@ -526,21 +526,21 @@ void csCurve::CalculateLightingStatic (iFrustumView *lview, bool vis)
         {
           lval = Lightmap[uv].red + QRound (color.red * brightness);
           if (lval > 255) lval = 255;
-          Lightmap[uv].red = lval;
+          Lightmap[uv].red = (unsigned char) lval;
         }
 
         if (col.green > 0)
         {
           lval = Lightmap[uv].green + QRound (color.green * brightness);
           if (lval > 255) lval = 255;
-          Lightmap[uv].green = lval;
+          Lightmap[uv].green = (unsigned char) lval;
         }
 
         if (col.blue > 0)
         {
           lval = Lightmap[uv].blue + QRound (color.blue * brightness);
           if (lval > 255) lval = 255;
-          Lightmap[uv].blue = lval;
+          Lightmap[uv].blue = (unsigned char) lval;
         }
       }
     }
@@ -791,7 +791,7 @@ float csCurve::GetScreenBoundingBox (
 {
   csVector2 oneCorner;
 
-  float aspect = camera->GetFOV ();
+  float aspect = (float) camera->GetFOV ();
   float shift_x = camera->GetShiftX ();
   float shift_y = camera->GetShiftY ();
 
