@@ -241,18 +241,18 @@ COMPILE_RES = windres --include-dir include $(RCFLAGS)
 MAKEVERSIONINFO = $(RUN_SCRIPT) libs/cssys/win32/mkverres.sh
 MERGERES = $(RUN_SCRIPT) libs/cssys/win32/mergeres.sh
 
-#DO.SHARED.PLUGIN.CORE = \
-#  $(MAKEVERSIONINFO) $(OUT)/$(@:$(DLL)=-version.rc) \
-#    "$(DESCRIPTION.$*)" $(COMMAND_DELIM) \
-#  $(MERGERES) $(OUT)/$(@:$(DLL)=-rsrc.rc) "./" \
-#    $(OUT)/$(@:$(DLL)=-version.rc) $($@.WINRSRC) $(COMMAND_DELIM) \
-#  $(COMPILE_RES) -i $(OUT)/$(@:$(DLL)=-rsrc.rc) \
-#    -o $(OUT)/$(@:$(DLL)=-rsrc.o) $(COMMAND_DELIM) \
-#  $(DLLWRAPWRAP) $* $(LFLAGS.DLL) $(LFLAGS.@) $(^^) \
-#    $(OUT)/$(@:$(DLL)=-rsrc.o) $(L^) $(LIBS) $(LFLAGS) -mwindows
 DO.SHARED.PLUGIN.CORE = \
+  $(MAKEVERSIONINFO) $(OUT)/$(@:$(DLL)=-version.rc) \
+    "$(DESCRIPTION.$*)" $(COMMAND_DELIM) \
+  $(MERGERES) $(OUT)/$(@:$(DLL)=-rsrc.rc) "./" \
+    $(OUT)/$(@:$(DLL)=-version.rc) $($@.WINRSRC) $(COMMAND_DELIM) \
+  $(COMPILE_RES) -i $(OUT)/$(@:$(DLL)=-rsrc.rc) \
+    -o $(OUT)/$(@:$(DLL)=-rsrc.o) $(COMMAND_DELIM) \
   $(DLLWRAPWRAP) $* $(LFLAGS.DLL) $(LFLAGS.@) $(^^) \
-    $(L^) $(LIBS) $(LFLAGS) -mwindows
+    $(OUT)/$(@:$(DLL)=-rsrc.o) $(L^) $(LIBS) $(LFLAGS) -mwindows
+#DO.SHARED.PLUGIN.CORE = \
+#  $(DLLWRAPWRAP) $* $(LFLAGS.DLL) $(LFLAGS.@) $(^^) \
+#    $(L^) $(LIBS) $(LFLAGS) -mwindows
 
 # Commenting out the following line will make the -noconsole option work
 # but the only way to redirect output will be WITH -noconsole (wacky :-)
