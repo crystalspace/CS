@@ -122,6 +122,11 @@ csRenderView::csRenderView (const csRenderView& c)
   if (iengine) iengine->IncRef ();
 }
 
+csRenderView::~csRenderView ()
+{
+  if (iengine) iengine->DecRef ();
+}
+
 void csRenderView::SetView (csClipper* view)
 {
   iClipper2D* ic = QUERY_INTERFACE (view, iClipper2D);
