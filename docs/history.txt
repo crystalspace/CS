@@ -1,5 +1,13 @@
 The history order is reversed so that new features are at the top.
 
+28-Nov-2002
+	- Eric Sunshine disabled the "experimental" render3d project by default
+	  for MSVC users since its many compilation problems were causing
+	  significant consternation for the masses.
+	- Eric Sunshine fixed the makefiles so that the optional "local.mak" is
+	  included at the appropriate place and time.  Also fixed several
+	  targets which depend upon user.mak so that they also now depend upon
+	  local.mak.
 27-Nov-2002
 	- Keith Fulton added movement commands to viewmesh to allow testing
 	  of displacement-based anims.

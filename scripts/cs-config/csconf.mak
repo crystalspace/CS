@@ -26,7 +26,7 @@ endif
 ifeq ($(MAKESECTION),postdefines)
 
 CSCONFIG.EXE = cs-config
-CSCONFIG.DEP = config.mak mk/user.mak $(TARGET_MAKEFILE)
+CSCONFIG.DEP = config.mak mk/user.mak $(wildcard mk/local.mak) $(TARGET_MAKEFILE)
 CSCONFIG.TMP = $(OUT)/csconfig.tmp
 
 TO_INSTALL.EXE	+= $(CSCONFIG.EXE)

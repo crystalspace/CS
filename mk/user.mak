@@ -209,3 +209,7 @@ USE_MESA=0
 ifndef DEPEND_TOOL
   DEPEND_TOOL=cc
 endif
+
+# Include a local makefile where you can add additional targets or whatever.
+# This comes in handy, if you don't want to alter the original CS makefiles.
+-include mk/local.mak

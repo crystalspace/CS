@@ -31,8 +31,3 @@ ifeq ($(strip $(SUBMAKEFILES)),)
     libs/*/*.mak))
   include $(SUBMAKEFILES)
 endif
-
-# Include a local makefile where you can add additional targets or whatever.
-# This comes in handy, if you don't want to alter the original CS makefiles.
-
--include mk/local.mak
