@@ -43,9 +43,9 @@ csMeshWrapper::csMeshWrapper (csObject* theParent)
 
 void csMeshWrapper::SetMeshObject (iMeshObject* mesh)
 {
-  if (mesh) mesh->DecRef ();
-  csMeshWrapper::mesh = mesh;
   if (mesh) mesh->IncRef ();
+  if (csMeshWrapper::mesh) mesh->DecRef ();
+  csMeshWrapper::mesh = mesh;
 }
 
 csMeshWrapper::~csMeshWrapper ()

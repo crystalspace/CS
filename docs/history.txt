@@ -1,5 +1,9 @@
 The history order has been reversed so that new features are at the top.
 
+15-Jan-2001
+	- Fixed a serious bug in csMeshWrapper::SetMeshObject(). This
+	  function would do a DecRef() on the given mesh (possibly
+	  deleting it).
 14-Jan-2001
 	- Eric Sunshine fixed vfs.cfg so that it works with MacOS/X Server
 	  again following Andrew's change to the meaning of CS_PLATFORM_NAME.
