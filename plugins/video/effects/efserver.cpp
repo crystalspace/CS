@@ -60,7 +60,11 @@ iEffectDefinition* csEffectServer::CreateEffect()
 
 bool csEffectServer::Validate( iEffectDefinition* effect )
 {
+#ifndef CS_USE_NEW_RENDERER
   csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY( objectreg, iGraphics3D ));
+#else
+  csRef<iRender3D> g3d (CS_QUERY_REGISTRY( objectreg, iRender3D ));
+#endif
   if( g3d )
   {
     csRef<iEffectClient> client (SCF_QUERY_INTERFACE( g3d, iEffectClient ));
