@@ -103,10 +103,6 @@ class csLoader
   static csPolygon3D* load_poly3d (char* polyname, char* buf,
     csMaterialWrapper* default_material, float default_texlen,
     CLights* default_lightx, csPolygonSet* parent);
-  /// Parse a Bezier surface definition and return a new object
-  static csCurve* load_bezier (char* polyname, char* buf,
-    csMaterialWrapper* default_material, float default_texlen,
-    CLights* default_lightx, csSector* sec, csPolygonSet* parent);
 
   /// Load a image and return an iImage object
   static iImage* load_image(const char* name);
@@ -123,7 +119,7 @@ class csLoader
   /// Parse a Bezier surface definition and return a new object
   static csCurveTemplate* load_beziertemplate (char* ptname, char* buf,
     csMaterialWrapper* default_material, float default_texlen,
-    csThingTemplate* parent);
+    csVector3* curve_vertices);
 
   /// Create a thing template from a sixface (obsolete)
   static csThingTemplate* load_sixtpl(char* tname,char* buf);

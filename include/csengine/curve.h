@@ -96,7 +96,6 @@ public:
 };
 
 class csPolygonSet;
-class csThingTemplate;
 class csCurveTemplate;
 class csLightPatch;
 class csSector;
@@ -277,16 +276,11 @@ public:
 class csCurveTemplate : public csObject
 {
 protected:
-  csThingTemplate *parent;
-
   csMaterialWrapper* cstxt;
 
 public:
   ///
   csCurveTemplate() : csObject() {}
-
-  ///
-  virtual void SetParent (csThingTemplate *p) { parent=p; }
 
   ///
   virtual csCurve* MakeCurve () = 0;

@@ -817,7 +817,6 @@ void csBezierCurve::Normal (csVector3& vec, double u, double v)
 csBezierTemplate::csBezierTemplate ()
   : csCurveTemplate () 
 {
-  parent = NULL;
   int i;
   for (i=0 ; i<9 ; i++)
     ver_id[i] = 0;

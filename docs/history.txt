@@ -1,5 +1,28 @@
 The history order has been reversed so that new features are at the top.
 
+16-Sep-2000
+	- Started the first work towards removing csThingTemplate. This
+	  involves changing the way that curves are loaded. Now it is possible
+	  to define a curve in a thing. Previously it was only possible to
+	  define curves in thing templates. This also allows curves
+	  to be defined in a sector but this will currently be ignored by
+	  the engine. Note that internally csBezierTemplate and csCurveTemplate
+	  are still used even if a curve is defined in a thing (without
+	  thing template). Basicly a curve template is the definition
+	  of the geometry.
+	- Start work on csThing::MergeTemplate which works with csThing
+	  instead of csThingTemplate. This is also with the removal
+	  of csThingTemplate in mind. This function is not finished yet.
+15-Sep-2000
+	- Wouter Wijngaards removed several less useful files from install.
+14-Sep-2000
+	- Wouter Wijngaards made the following change to the install
+	  procedure:
+	    Now also copies the great pubapi docs (.htm .gif and .css files).
+	    And copies docs/README.htm as well. docs/html is now copied to
+	    a install/docs/html dir too.
+	    Only the history.txt, history.old and incoming/ links do not
+	    work in README.htm now. But these I feel not to be essential.
 13-Sep-2000
 	- Wyatt Miler added perfstat plugin to the shared lib project file.
 	  Updated cspython, however, it still doesn't link.

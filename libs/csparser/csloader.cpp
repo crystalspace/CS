@@ -1379,11 +1379,40 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, csSector* sector,
       break;
 
     case TOKEN_BEZIER:
-      //CsPrintf(MSG_WARNING,"Encountered curve!\n");
-      ps.AddCurve (load_bezier (name, params,
-        info.default_material, info.default_texlen,
-        info.default_lightx, sector, &ps) );
-      csLoaderStat::curves_loaded++;
+      {
+        csCurveTemplate* ct = load_beziertemplate (name, params,
+	    info.default_material, info.default_texlen,
+	    ps.GetCurveVertices ());
+	csCurve* p = ct->MakeCurve ();
+	p->SetName (ct->GetName ());
+	p->SetParent (&ps);
+	p->SetSector (sector);
+        if (!ct->GetMaterialWrapper ()) p->SetMaterialWrapper (info.default_material);
+	int j;
+        for (j = 0 ; j < ct->NumVertices () ; j++)
+          p->SetControlPoint (j, ct->GetVertex (j));
+	ps.AddCurve (p);
+      }
+      break;
+
+    case TOKEN_CURVECENTER:
+      {
+        csVector3 c;
+        ScanStr (params, "%f,%f,%f", &c.x, &c.y, &c.z);
+        ps.curves_center = c;
+      }
+      break;
+    case TOKEN_CURVESCALE:
+      ScanStr (params, "%f", &ps.curves_scale);
+      break;
+
+    case TOKEN_CURVECONTROL:
+      {
+        csVector3 v;
+        csVector2 t;
+        ScanStr (params, "%f,%f,%f:%f,%f", &v.x, &v.y, &v.z,&t.x,&t.y);
+        ps.AddCurveVertex (v, t);
+      }
       break;
 
     case TOKEN_TEXNR:
@@ -1718,6 +1747,9 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec, bool is_sky
     TOKEN_TABLE (CIRCLE)
     TOKEN_TABLE (POLYGON)
     TOKEN_TABLE (BEZIER)
+    TOKEN_TABLE (CURVECENTER)
+    TOKEN_TABLE (CURVESCALE)
+    TOKEN_TABLE (CURVECONTROL)
     TOKEN_TABLE (MAT_SET_SELECT)
     TOKEN_TABLE (TEXNR)
     TOKEN_TABLE (MATERIAL)
@@ -2313,180 +2345,6 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
 }
 
 
-csCurve* csLoader::load_bezier (char* polyname, char* buf,
-  csMaterialWrapper* default_material, float default_texlen,
-  CLights* default_lightx, csSector* sec, csPolygonSet* parent)
-{
-  TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (TEXNR)
-    TOKEN_TABLE (MATERIAL)
-    TOKEN_TABLE (TEXTURE)
-    TOKEN_TABLE (VERTICES)
-  TOKEN_TABLE_END
-
-  TOKEN_TABLE_START (tex_commands)
-    TOKEN_TABLE (ORIG)
-    TOKEN_TABLE (FIRST_LEN)
-    TOKEN_TABLE (FIRST)
-    TOKEN_TABLE (SECOND_LEN)
-    TOKEN_TABLE (SECOND)
-    TOKEN_TABLE (LEN)
-    TOKEN_TABLE (MATRIX)
-    TOKEN_TABLE (PLANE)
-    TOKEN_TABLE (UVEC)
-    TOKEN_TABLE (VVEC)
-    TOKEN_TABLE (V)
-    TOKEN_TABLE (UV_SHIFT)
-  TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params, * params2;
-
-  (void)default_lightx; (void)sec; (void)parent;
-
-  csBezierCurve *curve = new csBezierCurve (NULL);
-  curve->SetName (polyname);
-  curve->SetMaterialWrapper (default_material);
-  curve->SetSector(sec);
-  csMaterialWrapper* mat = NULL;
-//TODO??  poly3d->SetSector(sec);
-//TODO??  poly3d->SetParent (parent);
-
-  bool tx1_given = false, tx2_given = false;
-  csVector3 tx_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
-  float tx1_len = default_texlen, tx2_len = default_texlen;
-  float tx_len = default_texlen;
-  csMatrix3 tx_matrix;
-  csVector3 tx_vector (0, 0, 0);
-  char plane_name[30];
-  plane_name[0] = 0;
-  bool uv_shift_given = false;
-  float u_shift = 0, v_shift = 0;
-
-  char str[255];
-
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
-    }
-    switch (cmd)
-    {
-      case TOKEN_TEXNR:
-        //@@OBSOLETE, retained for backward compatibility
-      case TOKEN_MATERIAL:
-        ScanStr (params, "%s", str);
-        mat = FindMaterial (str);
-        if (mat == NULL)
-        {
-          CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
-          fatal_exit (0, true);
-        }
-        curve->SetMaterialWrapper (mat);
-        break;
-      case TOKEN_TEXTURE:
-        while ((cmd = csGetObject (&params, tex_commands, &name, &params2)) > 0)
-        {
-          if (!params2)
-          {
-            CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
-            fatal_exit (0, false);
-          }
-          switch (cmd)
-          {
-            case TOKEN_ORIG:
-              tx1_given = true;
-              int num;
-              float flist[100];
-              ScanStr (params2, "%F", flist, &num);
-              if (num == 1) tx_orig = parent->Vobj ((int)flist[0]);
-              if (num == 3) tx_orig = csVector3(flist[0],flist[1],flist[2]);
-              break;
-            case TOKEN_FIRST:
-              tx1_given = true;
-              ScanStr (params2, "%F", flist, &num);
-              if (num == 1) tx1 = parent->Vobj ((int)flist[0]);
-              if (num == 3) tx1 = csVector3(flist[0],flist[1],flist[2]);
-              break;
-            case TOKEN_FIRST_LEN:
-              ScanStr (params2, "%f", &tx1_len);
-              tx1_given = true;
-              break;
-            case TOKEN_SECOND:
-              tx2_given = true;
-              ScanStr (params2, "%F", flist, &num);
-              if (num == 1) tx2 = parent->Vobj ((int)flist[0]);
-              if (num == 3) tx2 = csVector3(flist[0],flist[1],flist[2]);
-              break;
-            case TOKEN_SECOND_LEN:
-              ScanStr (params2, "%f", &tx2_len);
-              tx2_given = true;
-              break;
-            case TOKEN_LEN:
-              ScanStr (params2, "%f", &tx_len);
-              break;
-            case TOKEN_MATRIX:
-              load_matrix (params2, tx_matrix);
-              tx_len = 0;
-              break;
-            case TOKEN_V:
-              load_vector (params2, tx_vector);
-              tx_len = 0;
-              break;
-            case TOKEN_PLANE:
-              ScanStr (params2, "%s", str);
-              strcpy (plane_name, str);
-              tx_len = 0;
-              break;
-            case TOKEN_UV_SHIFT:
-              uv_shift_given = true;
-              ScanStr (params2, "%f,%f", &u_shift, &v_shift);
-              break;
-            case TOKEN_UVEC:
-              tx1_given = true;
-              load_vector (params2, tx1);
-              tx1_len = tx1.Norm ();
-              tx1 += tx_orig;
-              break;
-            case TOKEN_VVEC:
-              tx2_given = true;
-              load_vector (params2, tx2);
-              tx2_len = tx2.Norm ();
-              tx2 += tx_orig;
-              break;
-          }
-        }
-        break;
-      case TOKEN_VERTICES:
-        {
-          int list[100], num;
-          ScanStr (params, "%D", list, &num);
-
-          if (num != 9)
-            {
-              CsPrintf (MSG_FATAL_ERROR, "Wrong number of vertices to bezier!\n");
-              fatal_exit (0, false);
-            }
-
-          //TODO          for (i = 0 ; i < num ; i++) poly3d->set_vertex (i, list[i]);
-        }
-        break;
-    }
-  }
-  if (cmd == PARSERR_TOKENNOTFOUND)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a bezier!\n", csGetLastOffender ());
-    fatal_exit (0, false);
-  }
-
-  return curve;
-}
-
-
-
 //---------------------------------------------------------------------------
 
 iImage* csLoader::load_image (const char* name)
@@ -2959,7 +2817,7 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
 
 csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
   csMaterialWrapper* default_material, float default_texlen,
-  csThingTemplate* parent)
+  csVector3* curve_vertices)
 {
   TOKEN_TABLE_START (commands)
     TOKEN_TABLE (TEXNR)
@@ -2989,8 +2847,6 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
 
   csBezierTemplate *ptemplate = new csBezierTemplate();
   ptemplate->SetName (ptname);
-
-  ptemplate->SetParent (parent);
 
   csMaterialWrapper* mat;
   if (default_material == NULL) mat = NULL;
@@ -3044,13 +2900,13 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
               int num;
               float flist[100];
               ScanStr (params2, "%F", flist, &num);
-              if (num == 1) tx_orig = parent->CurveVertex ((int)flist[0]);
+              if (num == 1) tx_orig = curve_vertices[(int)flist[0]];
               if (num == 3) tx_orig = csVector3(flist[0],flist[1],flist[2]);
               break;
             case TOKEN_FIRST:
               tx1_given = true;
               ScanStr (params2, "%F", flist, &num);
-              if (num == 1) tx1 = parent->CurveVertex ((int)flist[0]);
+              if (num == 1) tx1 = curve_vertices[(int)flist[0]];
               if (num == 3) tx1 = csVector3(flist[0],flist[1],flist[2]);
               break;
             case TOKEN_FIRST_LEN:
@@ -3060,7 +2916,7 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
             case TOKEN_SECOND:
               tx2_given = true;
               ScanStr (params2, "%F", flist, &num);
-              if (num == 1) tx2 = parent->CurveVertex ((int)flist[0]);
+              if (num == 1) tx2 = curve_vertices[(int)flist[0]];
               if (num == 3) tx2 = csVector3(flist[0],flist[1],flist[2]);
               break;
             case TOKEN_SECOND_LEN:
@@ -3214,7 +3070,7 @@ csThingTemplate* csLoader::load_thingtpl (char* tname, char* buf)
       case TOKEN_BEZIER:
         //CsPrintf(MSG_WARNING,"Encountered template curve!\n");
         tmpl->AddCurve (load_beziertemplate(name, params, default_material,
-          default_texlen, tmpl));
+          default_texlen, tmpl->GetCurveVertices ()));
         break;
 
       case TOKEN_CURVECENTER:
@@ -4291,6 +4147,10 @@ csSector* csLoader::load_sector (char* secname, char* buf)
     TOKEN_TABLE (SNOW)
     TOKEN_TABLE (FIRE)
     TOKEN_TABLE (HARDMOVE)
+    TOKEN_TABLE (BEZIER)
+    TOKEN_TABLE (CURVECENTER)
+    TOKEN_TABLE (CURVESCALE)
+    TOKEN_TABLE (CURVECONTROL)
   TOKEN_TABLE_END
 
   char* name;

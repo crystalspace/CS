@@ -692,6 +692,113 @@ void csThing::MergeTemplate (csThingTemplate* tpl, csMaterialList* matList,
   }
 }
 
+#if 0
+void csThing::MergeTemplate (csThing* tpl,
+  csMaterialWrapper* default_material, float default_texlen,
+  CLights* default_lightx,
+  csVector3* shift, csMatrix3* transform)
+{
+  (void)default_texlen;
+  int i, j;
+  int* merge_vertices;
+
+  //TODO should merge? take averages or something?
+  curves_center = tpl->curves_center;
+  curves_scale = tpl->curves_scale;
+  //@@@### Set parent template as thing...!!! ParentTemplate = tpl;
+
+  merge_vertices = new int [tpl->GetNumVertices ()+1];
+  for (i = 0 ; i < tpl->GetNumVertices () ; i++)
+  {
+    csVector3 v = tpl->Vwor (i);//@@@### wor of obj?
+    if (transform) v = *transform * v;
+    if (shift) v += *shift;
+    merge_vertices[i] = AddVertex (v);
+  }
+
+  for (i = 0 ; i < tpl->polygons.Length () ; i++)
+  {
+    csPolygon3D* pt = tpl->GetPolygon3D (i);
+    csPolygon3D* p;
+    p = NewPolygon (pt->GetMaterialWrapper ());
+    p->SetName (pt->GetName());
+    if (!pt->GetMaterialWrapper ()) p->SetMaterialWrapper (default_material);
+    int* idx = pt->GetVertices ().GetVertexIndices ();
+    for (j = 0 ; j < pt->GetVertices ().GetNumVertices () ; j++)
+      p->AddVertex (merge_vertices[idx[j]]);
+
+    p->flags = pt->flags;
+    // Set polygon texture type
+    switch (pt->flags.Get () & CS_POLYTPL_TEXMODE)
+    {
+      case CS_POLYTPL_TEXMODE_NONE:
+        p->SetTextureType (POLYTXT_NONE);
+        break;
+      case CS_POLYTPL_TEXMODE_FLAT:
+        p->SetTextureType (POLYTXT_FLAT);
+        break;
+      case CS_POLYTPL_TEXMODE_GOURAUD:
+        p->SetTextureType (POLYTXT_GOURAUD);
+        break;
+      case CS_POLYTPL_TEXMODE_LIGHTMAP:
+      {
+        p->SetTextureType (POLYTXT_LIGHTMAP);
+        csPolyTexLightMap* pol_lm = p->GetLightMapInfo ();
+        if (pol_lm) pol_lm->SetUniformDynLight (default_lightx);
+        break;
+      }
+    }
+@@@###
+    csVector2 *uv_coords = pt->GetUVCoords ();
+    if (uv_coords)
+    {
+      csPolyTexFlat *fs = p->GetFlatInfo ();
+      if (fs)
+      {
+        fs->Setup (p);
+        for (j = 0; j < pt->GetNumVertices (); j++)
+          fs->SetUV (j, uv_coords [j].x, uv_coords [j].y);
+      }
+    }
+
+    csColor *colors = pt->GetColors ();
+    if (colors)
+    {
+      csPolyTexGouraud *gs = p->GetGouraudInfo ();
+      if (gs)
+      {
+        gs->Setup (p);
+        for (j = 0; j < pt->GetNumVertices (); j++)
+          gs->SetColor (j, colors [j]);
+      }
+    }
+
+    // This is unused for anything else than POLYTXT_LIGHTMAP;
+    // however it won't hurt even if it is not of this type.
+    p->SetTextureSpace (pt->GetTextureMatrix (), pt->GetTextureVector ());
+  }
+
+  for (i = 0; i < tpl->GetNumCurveVertices (); i++)
+    AddCurveVertex (tpl->CurveVertex (i), tpl->CurveTexel (i));
+
+  for (i = 0; i < tpl->GetNumCurves (); i++)
+  {
+    csCurveTemplate *pt = tpl->GetCurve (i);
+    csCurve *p = pt->MakeCurve ();
+    p->SetName (pt->GetName ());
+    p->SetParent (this);
+    p->SetSector (movable.GetSector (0));
+
+    if (!pt->GetMaterialWrapper ()) p->SetMaterialWrapper (default_material);
+    for (j = 0 ; j < pt->NumVertices () ; j++)
+      p->SetControlPoint (j, pt->GetVertex (j));
+    AddCurve (p);
+  }
+
+  delete [] merge_vertices;
+}
+#endif
+
 void csThing::UpdateInPolygonTrees ()
 {
   // If thing has not been placed in a sector we do nothing here.

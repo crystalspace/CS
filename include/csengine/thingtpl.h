@@ -100,6 +100,9 @@ public:
   csVector3& CurveVertex (int i)
   { return curve_vertices[i]; }
   ///
+  csVector3* GetCurveVertices ()
+  { return curve_vertices; }
+  ///
   csVector2& CurveTexel (int i)
   { return curve_texels[i]; }
   ///

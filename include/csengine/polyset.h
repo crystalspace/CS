@@ -319,6 +319,9 @@ public:
   /// Get the specified curve vertex.
   csVector3& CurveVertex (int i) { return curve_vertices[i]; }
 
+  /// Get the curve vertices.
+  csVector3* GetCurveVertices () { return curve_vertices; }
+
   /// Get the specified curve texture coordinate (texel).
   csVector2& CurveTexel (int i) { return curve_texels[i]; }
 

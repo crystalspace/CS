@@ -262,9 +262,27 @@ public:
   	float default_texlen = 1, CLights* default_lightx = NULL,
 	csVector3* shift = NULL, csMatrix3* transform = NULL);
 
+#if 0
   /**
    * Add polygons and vertices from the specified template. Replace the materials if they 
    * match one in the matList.
+   */
+  void MergeTemplate (csThing* tpl, csMaterialList* matList, const char* prefix, 
+	csMaterialWrapper* default_material = NULL,
+  	float default_texlen = 1, CLights* default_lightx = NULL,
+	csVector3* shift = NULL, csMatrix3* transform = NULL);
+
+  /**
+   * Add polygons and vertices from the specified thing (seen as template).
+   */
+  void MergeTemplate (csThing* tpl, csMaterialWrapper* default_material = NULL,
+  	float default_texlen = 1, CLights* default_lightx = NULL,
+	csVector3* shift = NULL, csMatrix3* transform = NULL);
+#endif
+
+  /**
+   * Add polygons and vertices from the specified thing (seen as template).
+   * Replace the materials if they match one in the matList.
    */
   void MergeTemplate (csThingTemplate* tpl, csMaterialList* matList, const char* prefix, 
 	csMaterialWrapper* default_material = NULL,
