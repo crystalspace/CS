@@ -13,6 +13,8 @@ W - Wishlist (the build also works without this feature)
     plugin works).
 
 [M] Add a Jamfile for cscript/csjava.
+[M] Figure out how to create MSVC project files for the pure Python and pure
+    Perl extension modules.
 [M] Introduce a new rule named Description and change all invocations of the
     Help rule (except the ones using the "verbatim" option) to invocations of
     the Description rule throughout the project.  Next, remove the "verbatim"
