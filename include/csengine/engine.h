@@ -461,6 +461,13 @@ private:
     const csVector3& pos, float radius, csPArray<iObject>& list,
     csPArray<iSector>& visited_sectors, bool crossPortals = true);
 
+  /**
+   * Get a list of all meshes in the given sphere.
+   */
+  void GetNearbyMeshList (iSector* sector,
+    const csVector3& pos, float radius, csPArray<iMeshWrapper>& list,
+    csPArray<iSector>& visited_sectors, bool crossPortals = true);
+
 public:
   /**
    * The current camera for drawing the world.
@@ -792,17 +799,21 @@ public:
   virtual int GetNearbyLights (iSector* sector, const csBox3& box,
   	uint32 flags, iLight** lights, int max_num_lights);
 
-  /**
-   * This routine returns an iterator to iterate over
-   * all nearby sectors.
-   */
   virtual csPtr<iSectorIterator> GetNearbySectors (iSector* sector,
   	const csVector3& pos, float radius);
+
   virtual csPtr<iObjectIterator> GetNearbyObjects (iSector* sector,
     const csVector3& pos, float radius, bool crossPortals = true);
   virtual csPtr<iObjectIterator> GetVisibleObjects (iSector* sector,
     const csVector3& pos);
   virtual csPtr<iObjectIterator> GetVisibleObjects (iSector* sector,
+    const csFrustum& frustum);
+
+  virtual csPtr<iMeshWrapperIterator> GetNearbyMeshes (iSector* sector,
+    const csVector3& pos, float radius, bool crossPortals = true);
+  virtual csPtr<iMeshWrapperIterator> GetVisibleMeshes (iSector* sector,
+    const csVector3& pos);
+  virtual csPtr<iMeshWrapperIterator> GetVisibleMeshes (iSector* sector,
     const csFrustum& frustum);
 
   virtual bool RemoveObject (iBase* object);

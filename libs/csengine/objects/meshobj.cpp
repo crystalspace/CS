@@ -457,27 +457,20 @@ void csMeshWrapper::PlaceMesh ()
   if (!movable.IsFullTransformIdentity ())
     sphere = movable.GetFullTransform ().This2Other (sphere);
   max_radius = sphere.GetRadius ();
-
   float max_sq_radius = max_radius * max_radius;
 
-  // @@@ This function only goes one level deep in portals. Should be fixed!
-  // @@@ It would be nice if we could find a more optimal portal representation
-  // for large sectors.
+  csRef<iMeshWrapperIterator> it = csEngine::current_engine
+  	->GetNearbyMeshes (sector, sphere.GetCenter (), max_radius, true);
 
-  // @@@ THIS FUNCTION SHOULD USE GetNearbyObjects()!!!
-
-  int i, j;
-  iMeshList *ml = sector->GetMeshes ();
-  for (i = 0; i < ml->GetCount (); i++)
+  int j;
+  while (it->HasNext ())
   {
-    iMeshWrapper *mesh = ml->Get (i);
-
+    iMeshWrapper* mesh = it->Next ();
     if (mesh->GetMeshObject ()->GetPortalCount () == 0)
       continue;		// No portals to consider.
 
-    csRef<iThingState> thing (SCF_QUERY_INTERFACE (
-        mesh->GetMeshObject (),
-        iThingState));
+    csRef<iThingState> thing = SCF_QUERY_INTERFACE (
+        mesh->GetMeshObject (), iThingState);
     if (thing)
     {
       // @@@ This function will currently only consider portals on things
@@ -495,8 +488,7 @@ void csMeshWrapper::PlaceMesh ()
             const csPlane3 &pl = portal_poly->GetWorldPlane ();
 
             float sqdist = csSquaredDist::PointPlane (
-                sphere.GetCenter (),
-                pl);
+                sphere.GetCenter (), pl);
             if (sqdist <= max_sq_radius)
             {
               // Plane of portal is close enough.

@@ -907,16 +907,10 @@ bool csPolygon3DStatic::IntersectRay (const csVector3 &start,
   // the starting point of the beam.
   csPlane3 &pl = plane_obj;
   float dot1 = pl.D () +
-    pl.A () *
-    start.x +
-    pl.B () *
-    start.y +
-    pl.C () *
-    start.z;
+    pl.A () * start.x + pl.B () * start.y + pl.C () * start.z;
   if (dot1 > 0) return false;
 
   // If this vector is perpendicular to the plane of the polygon we
-
   // need to catch this case here.
   float dot2 = pl.D () + pl.A () * end.x + pl.B () * end.y + pl.C () * end.z;
   if (ABS (dot1 - dot2) < SMALL_EPSILON) return false;

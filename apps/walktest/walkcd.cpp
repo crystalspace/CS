@@ -219,26 +219,22 @@ int CollisionDetect (iEngine* Engine, csColliderWrapper *c, iSector* sp,
   // Check collision with this sector.
   csCollisionPair* CD_contact;
 
-  csRef<iObjectIterator> objit (Engine->GetNearbyObjects (sp,
-	cdt->GetOrigin (), 3));		// 3 should be enough for moving around.
+  csRef<iMeshWrapperIterator> objit = Engine->GetNearbyMeshes (sp,
+	cdt->GetOrigin (), 3);		// 3 should be enough for moving around.
   while (objit->HasNext ())
   {
-    iObject* mw_obj = objit->Next ();
-    csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (mw_obj, iMeshWrapper));
-    if (mw)
-    {
-      Sys->collide_system->ResetCollisionPairs ();
-      if (c->Collide (mw_obj, cdt,
-    	  &mw->GetMovable ()->GetTransform ())) hit++;
+    iMeshWrapper* mw = objit->Next ();
+    Sys->collide_system->ResetCollisionPairs ();
+    if (c->Collide (mw->QueryObject (), cdt, &mw->GetMovable ()->GetTransform ()))
+      hit++;
 
-      CD_contact = Sys->collide_system->GetCollisionPairs ();
-      for (j=0 ; j<Sys->collide_system->GetCollisionPairCount () ; j++)
-        our_cd_contact[num_our_cd++] = CD_contact[j];
+    CD_contact = Sys->collide_system->GetCollisionPairs ();
+    for (j=0 ; j<Sys->collide_system->GetCollisionPairCount () ; j++)
+      our_cd_contact[num_our_cd++] = CD_contact[j];
 
-      if (Sys->collide_system->GetOneHitOnly () && hit)
-        return 1;
-      // TODO, should test which one is the closest.
-    }
+    if (Sys->collide_system->GetOneHitOnly () && hit)
+      return 1;
+    // TODO, should test which one is the closest.
   }
 
   return hit;

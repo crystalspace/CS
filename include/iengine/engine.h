@@ -48,6 +48,7 @@ struct iLightIterator;
 struct iStatLight;
 struct iDynLight;
 struct iSprite;
+struct iMeshWrapperIterator;
 struct iMeshObject;
 struct iMeshObjectFactory;
 struct iMeshWrapper;
@@ -142,7 +143,7 @@ struct iRenderLoop;
 #define CS_RENDPRI_FRONT2BACK 2
 /** @} */
 
-SCF_VERSION (iEngine, 0, 20, 0);
+SCF_VERSION (iEngine, 0, 21, 0);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -754,16 +755,27 @@ struct iEngine : public iBase
 
   /**
    * This routine returns an iterator to iterate over
-   * all objects that are within a radius
-   * of a given position. You can use #SCF_QUERY_INTERFACE to get
-   * any interface from the returned objects. If crossPortals
-   * is true it will search through portals. Otherwise it will limit
-   * the search to the sector passed in.<p>
-   * Assign to a csRef or use DecRef().
+   * all objects that are within a radius of a given position.
+   * The current implementation only does meshes but in future
+   * lights will also be supported.
+   * You can use #SCF_QUERY_INTERFACE to get any interface from the
+   * returned objects. If crossPortals is true it will search through
+   * portals. Otherwise it will limit the search to the sector passed in.
+   * If you only want to have meshes then it is more efficient to
+   * call GetNearbyMeshes() as you can then avoid the call to
+   * #SCF_QUERY_INTERFACE.
    */
   virtual csPtr<iObjectIterator> GetNearbyObjects (iSector* sector,
     const csVector3& pos, float radius, bool crossPortals = true ) = 0;
 
+  /**
+   * This routine returns an iterator to iterate over
+   * all meshes that are within a radius of a given position.
+   * If crossPortals is true it will search through
+   * portals. Otherwise it will limit the search to the sector passed in.
+   */
+  virtual csPtr<iMeshWrapperIterator> GetNearbyMeshes (iSector* sector,
+    const csVector3& pos, float radius, bool crossPortals = true ) = 0;
 
   /**
    * This routine returns an iterator to iterate over
@@ -771,9 +783,19 @@ struct iEngine : public iBase
    * This routine assumes full 360 degree visibility.
    * You can use #SCF_QUERY_INTERFACE to get any interface from the
    * returned objects.<p>
-   * Assign to a csRef or use DecRef().
+   * If you only want meshes then use GetVisibleMeshes().
+   * CURRENTLY NOT IMPLEMENTED!
    */
   virtual csPtr<iObjectIterator> GetVisibleObjects (iSector* sector,
+    const csVector3& pos) = 0;
+
+  /**
+   * This routine returns an iterator to iterate over
+   * all meshes that are potentially visible as seen from a given position.
+   * This routine assumes full 360 degree visibility.
+   * CURRENTLY NOT IMPLEMENTED!
+   */
+  virtual csPtr<iMeshWrapperIterator> GetVisibleMeshes (iSector* sector,
     const csVector3& pos) = 0;
 
   /**
@@ -782,9 +804,19 @@ struct iEngine : public iBase
    * This routine has a frustum restricting the view.
    * You can use #SCF_QUERY_INTERFACE to get any interface from the
    * returned objects.<p>
-   * Assign to a csRef or use DecRef().
+   * If you only want meshes then use GetVisibleMeshes().
+   * CURRENTLY NOT IMPLEMENTED!
    */
   virtual csPtr<iObjectIterator> GetVisibleObjects (iSector* sector,
+    const csFrustum& frustum) = 0;
+
+  /**
+   * This routine returns an iterator to iterate over
+   * all meshes that are potentially visible as seen from a given position.
+   * This routine has a frustum restricting the view.
+   * CURRENTLY NOT IMPLEMENTED!
+   */
+  virtual csPtr<iMeshWrapperIterator> GetVisibleMeshes (iSector* sector,
     const csFrustum& frustum) = 0;
 
   /**

@@ -3,6 +3,26 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+9-Jul-2003
+	- Jorrit fixed PlaceMesh() so that it now uses
+	  engine->GetNearbyObjects(). That makes it a lot more efficient
+	  then the old implementation which simply traversed all objects
+	  in the current sector.
+	- Jorrit added iMeshWrapperIterator to iterate over meshes.
+	- Jorrit added three new functions to iEngine: GetNearbyMeshes()
+	  and two versions of GetVisibleMeshes(). These functions complement
+	  the already existing GetNearbyObjects() and GetVisibleObjects().
+	  Instead of returning an iObjectIterator they return an
+	  iMeshWrapperIterator. This avoids the need to do SCF_QUERY_INTERFACE
+	  to get the iMeshWrapper in the code using the iterator so this
+	  can be a significant optimization.
+	  The Get...Objects() functions will not be removed because in the
+	  future they will also return lights.
+	  Side note: GetVisibleObjects() and GetVisibleMeshes() are not
+	  implemented yet.
+	- Jorrit changed PlaceMesh() so it uses GetNearbyMeshes() now.
+	- Jorrit changed Walktest collision detection code so it uses
+	  GetNearbyMeshes().
 8-Jul-2003
 	- Jorrit reverted the change to glrender.mak that was made yesterday.
 	  This change breaks compilation of the OpenGL plugin.  With revision

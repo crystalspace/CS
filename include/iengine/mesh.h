@@ -565,6 +565,24 @@ struct iMeshFactoryList : public iBase
   virtual iMeshFactoryWrapper *FindByName (const char *Name) const = 0;
 };
 
+SCF_VERSION (iMeshWrapperIterator, 0, 1, 0);
+
+/**
+ * This is an iterator mesh wrappers.
+ */
+struct iMeshWrapperIterator : public iBase
+{
+  /// Move forward.
+  virtual iMeshWrapper* Next () = 0;
+
+  /// Reset the iterator to the beginning.
+  virtual void Reset () = 0;
+
+  /// Check if we have any more meshes.
+  virtual bool HasNext () const = 0;
+};
+
+
 /** @} */
 
 #endif // __CS_IENGINE_MESH_H__

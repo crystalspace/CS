@@ -744,7 +744,6 @@ iPolygon3D *csSector::IntersectSegment (
     if (mesh->GetMeshObject ()->GetPortalCount () == 0) continue;
 
     bool has_not_moved = mesh->GetMovable ()->IsFullTransformIdentity ();
-
     csRef<iThingState> ith (SCF_QUERY_INTERFACE (
         mesh->GetMeshObject (),
         iThingState));

@@ -362,6 +362,34 @@ public:
 };
 
 /**
+ * Iterator to iterate over meshes in the given list.
+ */
+class csMeshListIt : public iMeshWrapperIterator
+{
+  friend class csEngine;
+private:
+  csPArray<iMeshWrapper>* list;
+  int num_objects;
+
+  // Current index.
+  int cur_idx;
+
+private:
+  /// Construct an iterator and initialize to start.
+  csMeshListIt (csPArray<iMeshWrapper>* list);
+
+public:
+  /// Destructor.
+  virtual ~csMeshListIt ();
+
+  SCF_DECLARE_IBASE;
+
+  virtual void Reset ();
+  virtual iMeshWrapper* Next ();
+  virtual bool HasNext () const;
+};
+
+/**
  * Iterator to iterate over objects in the given list.
  */
 class csObjectListIt : public iObjectIterator
@@ -593,6 +621,42 @@ iObject* csObjectListIt::Next ()
 }
 
 bool csObjectListIt::HasNext () const
+{
+  return cur_idx < num_objects;
+}
+
+//---------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE(csMeshListIt)
+  SCF_IMPLEMENTS_INTERFACE(iMeshWrapperIterator)
+SCF_IMPLEMENT_IBASE_END
+
+csMeshListIt::csMeshListIt (csPArray<iMeshWrapper>* list)
+{
+  SCF_CONSTRUCT_IBASE (0);
+  csMeshListIt::list = list;
+  num_objects = list->Length ();
+  Reset ();
+}
+
+csMeshListIt::~csMeshListIt ()
+{
+  delete list;
+}
+
+void csMeshListIt::Reset ()
+{
+  cur_idx = 0;
+}
+
+iMeshWrapper* csMeshListIt::Next ()
+{
+  if (cur_idx >= num_objects) return 0;
+  cur_idx++;
+  return (*list)[cur_idx-1];
+}
+
+bool csMeshListIt::HasNext () const
 {
   return cur_idx < num_objects;
 }
@@ -2446,6 +2510,113 @@ csPtr<iObjectIterator> csEngine::GetVisibleObjects (
 }
 
 csPtr<iObjectIterator> csEngine::GetVisibleObjects (
+  iSector* /*sector*/,
+  const csFrustum& /*frustum*/)
+{
+  // @@@ Not implemented yet.
+  return 0;
+}
+
+void csEngine::GetNearbyMeshList (iSector* sector,
+    const csVector3& pos, float radius, csPArray<iMeshWrapper>& list,
+    csPArray<iSector>& visited_sectors, bool crossPortals)
+{
+  iVisibilityCuller* culler = sector->GetVisibilityCuller ();
+  csRef<iVisibilityObjectIterator> visit = culler->VisTest (
+  	csSphere (pos, radius));
+
+  //@@@@@@@@ TODO ALSO SUPPORT LIGHTS!
+  while (visit->HasNext ())
+  {
+    iVisibilityObject* vo = visit->Next ();
+    iMeshWrapper* imw = vo->GetMeshWrapper ();
+    if (imw)
+    {
+      list.Push (imw); 
+      if (crossPortals && imw->GetMeshObject ()->GetPortalCount () > 0)
+      {
+        csRef<iThingState> st = SCF_QUERY_INTERFACE (imw->GetMeshObject (), iThingState);
+        if (st)
+        {
+          // Check if there are portals and if they are near the position.
+          int pc = st->GetFactory ()->GetPortalCount ();
+          int j;
+          for (j = 0 ; j < pc ; j++)
+          {
+            iPolygon3D* pp = st->GetPortalPolygon (j);
+	    iPolygon3DStatic* pps = pp->GetStaticData ();
+            const csPlane3& wor_plane = pp->GetWorldPlane ();
+            // Can we see the portal?
+            if (wor_plane.Classify (pos) < -0.001)
+            {
+              csVector3 poly[100];	//@@@ HARDCODE
+              int k;
+              for (k = 0 ; k < pps->GetVertexCount () ; k++)
+              {
+                poly[k] = pp->GetVertexW (k);
+              }
+              float sqdist_portal = csSquaredDist::PointPoly (
+                    pos, poly, pps->GetVertexCount (),
+                    wor_plane);
+              if (sqdist_portal <= radius * radius)
+              {
+                // Also handle objects in the destination sector unless
+                // it is a warping sector.
+                iPortal* portal = pps->GetPortal ();
+                portal->CompleteSector (0);
+                CS_ASSERT (portal != 0);
+                if (sector != portal->GetSector () && portal->GetSector ()
+                                && !portal->GetFlags ().Check (CS_PORTAL_WARP))
+                {
+                  int l;
+                  bool already_visited = false;
+                  for (l = 0 ; l < visited_sectors.Length () ; l++)
+                  {
+                    if (visited_sectors[l] == portal->GetSector ())
+                    {
+                      already_visited = true;
+                      break;
+                    }
+                  }
+                  if (!already_visited)
+                  {
+                    visited_sectors.Push (portal->GetSector ());
+                    GetNearbyMeshList (portal->GetSector (), pos, radius, list,
+                                         visited_sectors);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+csPtr<iMeshWrapperIterator> csEngine::GetNearbyMeshes (
+  iSector *sector,
+  const csVector3 &pos,
+  float radius,
+  bool crossPortals)
+{
+  csPArray<iMeshWrapper>* list = new csPArray<iMeshWrapper>;
+  csPArray<iSector> visited_sectors;
+  visited_sectors.Push (sector);
+  GetNearbyMeshList (sector, pos, radius, *list, visited_sectors, crossPortals);
+  csMeshListIt *it = new csMeshListIt (list);
+  return csPtr<iMeshWrapperIterator> (it);
+}
+
+csPtr<iMeshWrapperIterator> csEngine::GetVisibleMeshes (
+  iSector* /*sector*/,
+  const csVector3& /*pos*/)
+{
+  // @@@ Not implemented yet.
+  return 0;
+}
+
+csPtr<iMeshWrapperIterator> csEngine::GetVisibleMeshes (
   iSector* /*sector*/,
   const csFrustum& /*frustum*/)
 {
