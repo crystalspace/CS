@@ -75,6 +75,8 @@ The history order is reversed so that new features are at the top.
 	  generating vfs.cfg.
 	- DeSigna added a comment to the contribs section, changed
 	  some minor formatting for the printed manual.
+	- Duhprey added a line to the hashmap constructor forcing bucket 
+	  capacity to a prime number
 12-Jun-2003
 	- Jorrit clarified a comment with csColliderWrapper telling people that
 	  you must DecRef() the new collider wrapper after creating it.
