@@ -94,6 +94,9 @@ endif
 ifeq ($(NATIVE_COM),no)
   CFLAGS+=$(CFLAGS.D)NO_COM_SUPPORT
 endif
+ifeq ($(DO_SOUND),yes)
+  CFLAGS+=$(CFLAGS.D)DO_SOUND
+endif
 
 # Use $(^^) instead of $^ when you need all dependencies except libraries
 ^^=$(filter-out %$(LIB),$^)
