@@ -1576,7 +1576,7 @@ public:
     return false;
   }
 
-  void SetReverseAction(bool reverse)
+  void SetReverseAction (bool reverse)
   { 
     frame_increment = (reverse) ? -1:1;
     if (cur_action)

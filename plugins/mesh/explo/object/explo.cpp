@@ -92,6 +92,7 @@ csExploMeshObject::csExploMeshObject (iObjectRegistry* object_reg,
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiExplosionState);
   /// defaults
   scale_particles = false;
+  lighted_particles = false;
   push.Set (0, 0, 0);
   center.Set (0, 0, 0);
   number = 50;

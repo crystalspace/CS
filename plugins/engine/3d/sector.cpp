@@ -128,14 +128,13 @@ csSector::csSector (csEngine *engine) : csObject()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityCullerListener);
   DG_TYPE (this, "csSector");
   csSector::engine = engine;
-#ifndef CS_USE_NEW_RENDERER
   fog.enabled = false;
-#endif // CS_USE_NEW_RENDERER
   draw_busy = 0;
   dynamic_ambient_color.Set(0,0,0);
   meshes.SetSector (this);
   //portal_containers.SetSector (this);
   lights.SetSector (this);
+  current_visnr = 0;
 }
 
 csSector::~csSector ()

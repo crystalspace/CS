@@ -1047,6 +1047,8 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   loopaction = true;
   fullstop = false;
   last_action = 0;
+  single_step = false;
+  frame_increment = 1;
 
 #ifndef CS_USE_NEW_RENDERER
   vbufmgr = 0;
