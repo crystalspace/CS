@@ -43,6 +43,9 @@ The history order is reversed so that new features are at the top.
 	  CVS Attic.
 	- Eric Sunshine corrected the makefile DESCRIPTION variables for the
 	  MetaBalls plugins.
+	- Eric Sunshine made the following changes:
+	    - Moved the contents of plugins/engine to plugins/engine/3d.
+	    - Moved plugins/iso to plugins/engine/iso.
 10-Jun-2001
 	- Norman Kramer did the following:
 	    - Blocks now decrefs its queried soundwrapper, releases/stops the

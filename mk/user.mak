@@ -53,11 +53,13 @@ PLUGINS += mesh/object/metaball    mesh/loader/metaball
 PLUGINS += terrain/object/terrfunc terrain/loader/terrfunc
 PLUGINS += motion/object/default   motion/loader/default
 
-PLUGINS.DYNAMIC += engine
-PLUGINS.DYNAMIC += iso
+PLUGINS.DYNAMIC += engine/3d
+PLUGINS.DYNAMIC += engine/iso
 PLUGINS.DYNAMIC += cslexan
 PLUGINS.DYNAMIC += sequence
-PLUGINS.DYNAMIC += video/renderer/line video/renderer/null video/renderer/inf
+PLUGINS.DYNAMIC += video/renderer/line
+PLUGINS.DYNAMIC += video/renderer/null
+PLUGINS.DYNAMIC += video/renderer/inf
 PLUGINS.DYNAMIC += video/loader/bmp
 PLUGINS.DYNAMIC += video/loader/tga
 PLUGINS.DYNAMIC += video/loader/sgi
@@ -67,9 +69,8 @@ PLUGINS.DYNAMIC += sound/loader
 PLUGINS.DYNAMIC += console/output/standard
 PLUGINS.DYNAMIC += console/output/fancy
 PLUGINS.DYNAMIC += dungeon
-#PLUGINS.DYNAMIC += font/server/freefont
 PLUGINS.DYNAMIC += font/server/fontplex
-
+#PLUGINS.DYNAMIC += font/server/freefont
 #PLUGINS.DYNAMIC += csgame/gamecore
 
 #-----------------------------------------------------------------------------
