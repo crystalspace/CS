@@ -22,6 +22,7 @@
 
 #include "csutil/scf.h"
 #include "csgeom/vector3.h"
+#include "csgeom/transfrm.h"
 #include "iplugin.h"
 
 struct iEntity;
@@ -35,6 +36,7 @@ struct iAttributeIterator;
 struct iCollider;
 struct iDataLoader;
 struct iDataSaver; 
+struct iSector;
 
 //---------------------------------------------------------------------------
 
@@ -78,7 +80,7 @@ struct iPosition : public iBase
   virtual void SetPosition (iPosition* pPos) = 0;
 
   /// Gets the current sector.
-  virtual csSector* GetSector () = 0;
+  virtual iSector* GetSector () = 0;
 
   /// Gets the current position in the world.
   virtual csVector3 GetVector () = 0;
@@ -268,7 +270,7 @@ struct iEntityEventhandler : public iBase
 {
   /**
    * Let the entity component handle a given event. If there are no return
-   * return parameters, OutPar can be NULL. If there are no Input parameters,
+   * parameters, OutPar can be NULL. If there are no Input parameters,
    * InPar can also be NULL.
    * The method needs to return true, if the event has been handled, 
    * otherwise it must return false. In that case the entity will keep on
@@ -454,7 +456,8 @@ struct iEntity : public iBase
 SCF_VERSION (iEntityClass, 0, 1, 0);
 
 /**
- * An Entity class.
+ * An Entity class. Defines the behaviour and default data for a class of
+ * entites
  */
 struct iEntityClass : public iBase
 {
@@ -464,16 +467,12 @@ struct iEntityClass : public iBase
   /// Create an Entity of this class.
   virtual iEntity* CreateEntity () = 0;
 
-  /// Add a Baseclass to this class
-  virtual void AddBaseclass(const char* EntityClassname) = 0;
-
   /**
-   * Add a component to this class. 
-   * Note, that this call, like AddBaseclass, only adds the information
-   * about components, and doesn't try to create an instance of that
-   * class. Instantiation will happen only in CreateEntity.
+   * Read the definition for this class from the given structured data
+   * file. Normally all information needed to define this class should 
+   * be contained there. For all missing data we will use defaults.
    */
-  virtual void AddComponent(const char* ScfClassname) = 0;
+  virtual void ReadDefinition(iDataLoader* pDefinition) = 0;
 };
 
 //---------------------------------------------------------------------------
@@ -789,10 +788,15 @@ struct iGameClientConnection : public iBase
 SCF_VERSION (iGameCore, 0, 1, 0);
 
 /**
- * The csgame core
+ * The csgame core plugin itself
  */
-struct iGameCore : public iBase
+struct iGameCore : public iPlugIn
 {
+
+//Temporary hack, to avoid the need to implement any of these interfaces.
+//on the long term they are all needed, so the #if should go away
+#if 0
+
   /// Get a pointer to the class repository.
   virtual iEntityClassRepository* GetClassRepository () = 0;
 
@@ -919,6 +923,8 @@ struct iGameCore : public iBase
    * pLoader->OpenContext()
    */
   virtual iEntity* LoadEntity(iDataLoader* pLoader) = 0;
+
+#endif 
 };
 
 #endif // __ICSGAME_H__
