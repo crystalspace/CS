@@ -28,6 +28,10 @@ W - Wishlist (the build also works without this feature)
     very easy in theory but not possible at the moment, because kdevelop is only
     able to handle make as build tool. I already filled a featurerequest
     in the kdevelop bugtracker.
+    Seems we have a similar situation in anjuta. Creating projectfiles would
+    be easy but they also rely on make. At least they say that they already
+    have patches/stuff in cvs which should let users customize the build
+    application they use, so anjuta could be a nice option soon.
 [W] It would be nice to have the configure files regenerated and execute if the
     configure.ac file has changed. Unfortunately it is not possible to force jam
     to reread it's config files, so this isn't 100% possible...
