@@ -173,8 +173,8 @@ InfRoomData* InfiniteMaze::create_six_room (iEngine* engine, int x, int y, int z
 void InfiniteMaze::connect_infinite (int x1, int y1, int z1, int x2, int y2,
 	int z2, bool create_portal1)
 {
-  InfRoomData* s1 = (InfRoomData*)(infinite_world->Get (x1, y1, z1));
-  InfRoomData* s2 = (InfRoomData*)(infinite_world->Get (x2, y2, z2));
+  //InfRoomData* s1 = (InfRoomData*)(infinite_world->Get (x1, y1, z1));
+  //InfRoomData* s2 = (InfRoomData*)(infinite_world->Get (x2, y2, z2));
   char* p1, * p2;
   if (x1 == x2)
     if (y1 == y2)
@@ -301,8 +301,8 @@ void InfiniteMaze::create_loose_portal (int x1, int y1, int z1,
   else
     if (x1 < x2) p1 = "e";
     else p1 = "w";
-  InfRoomData* s = (InfRoomData*)(infinite_world->Get (x1, y1, z1));
   //@@@@@@@@@@@@
+  //InfRoomData* s = (InfRoomData*)(infinite_world->Get (x1, y1, z1));
   //iPolygon3DStatic* po = s->walls_fact_state->GetPolygon (p1);
   //iPortal* portal = po->CreateNullPortal ();
   InfPortalCS* prt = new InfPortalCS ();

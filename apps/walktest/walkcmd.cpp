@@ -907,18 +907,17 @@ void WalkTest::ParseKeyCmds (iObject* src)
 	    csScanStr (kp->GetValue (), "%s,%d,%f,%f",
 	  	  polyname, &xyz, &max_angle, &speed);
 
-	    int i;
-	    iPortal* portal;
-	    for (i = 0 ; i < pc->GetPortalCount () ; i++)
+	    iPortal* portal = 0;
+	    for (int i = 0 ; i < pc->GetPortalCount () ; i++)
 	    {
-	      portal = pc->GetPortal (i);
-	      if (!strcmp (polyname, portal->GetName ()))
+	      iPortal* test = pc->GetPortal (i);
+	      if (!strcmp (polyname, test->GetName ()))
 	      {
+		portal = test;
 	        break;
 	      }
-	      portal = 0;
 	    }
-	    if (!portal)
+	    if (portal == 0)
 	    {
 	      Sys->Report (CS_REPORTER_SEVERITY_WARNING,
 	    	  "Cannot find a portal named '%s'!", polyname);
