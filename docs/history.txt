@@ -6,6 +6,11 @@ The history order is reversed so that new features are at the top.
 	- Received a new shuttle from Thomas Hieber. It is now used
 	  as the main shuttle in the demo.
 	- Made softer transitions in the demo between camera switches.
+	- Martin Geisse added string server plugin and new pseudo-RTTI
+	  system. Both still unused.
+	- Philip Wyett eliminated some compiler warnings in MSVC
+	  and MingW ports.
+	- Philiop also added Martins strserv plugin to global build process.
 4-May-2001
 	- Philip Wyett fixed the signed/unsigned warnings in the
 	  sequence manager.
