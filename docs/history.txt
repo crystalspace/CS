@@ -5,7 +5,22 @@ The history order has been reversed so that new features are at the top.
 	  ProjectXPlane() but for a general axis aligned plane.
 	- Added assignment operator for csPoly2D.
 	- Some further work on PVS.
+	- Frank O'Connor defaulted DO_DINPUT_KEYBOARD in Win32 built.
+	- Frank also fixed hardware cursor problem for DDraw.
+	- Frank also did several VC project file changes.
+	- Paul Garceau modified ddraw makefile to accomodate generic
+	  ddraw make. Added ifdefs to accomodate Borland, COMP_GCC,
+	  and COMP_VC.
+	- Gary Haussmann corrected bad transform in DrawTriangleMesh.
+	- Gary added detection of other extensions
+	  (GL_EXT_compiled_vertex_array and GLX_ARB_get_proc_address).
+	- Gary disabled code to detect opengl extensions, as this
+	  will break compiles on some platforms.
+	- Martin Geisse fixed a bug in dungeon plugin.
 1-May-2000
+	- Norman Kramer added CSSTA_CHARWRAP and CSSTA_WORDWRAP to show
+	  text in a static text control that is longer than the control
+	  (csws).
 	- Added csBox2 and csBox3 Min() and Max() functions that accept
 	  a component index (x=0, y=1, z=2).
 	- Added csIntersect3::PlaneXPlane(), PlaneYPlane(), PlaneZPlane()
