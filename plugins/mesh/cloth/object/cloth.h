@@ -26,6 +26,7 @@
 
 struct csTriangle;
 struct iClothFactoryState;	
+struct csBitArray;
 	
 class Constraint
 {
@@ -63,6 +64,7 @@ uint             nverts;
 csTriangle*      triangles;
 uint             ntris;
 
+csBitArray*      ConstrainedVertices;
 csBasicVector*   Edges;
 uint             nedges;
 
