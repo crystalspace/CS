@@ -11,9 +11,10 @@
 ##    are known:
 ##      for Applictaion targets: console
 ##	    The console flag should be specified for applications which are
-##          typically started by commandline and don't rely and provide user
-##	    interaction. (this flag is usefull on macosx where graphical
-##	    applications can't easily be used remotely or in scripts).
+##          typically started by commandline and don't rely and provide GUI
+##	    user interaction. (this flag is useful on MacOS/X where console
+##	    applications are simple executables, but GUI applications are
+##	    "wrapped" executable bundles.
 ##	for Libraries: static, shared
 ##	    Some platforms support building libraries as shared libraries,
 ##	    which should reduce memory usage and loadtimes when the library is
@@ -46,4 +47,3 @@ rule _Options
     }
   }
 }
-
