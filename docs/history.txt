@@ -54,6 +54,10 @@ chronological order.
 	  assumed 32-bit architecture.
 	- Eric Sunshine fixed some invalid URLs in sysreq.txi pointed out by
 	  Roland Schulz <mail@r2s2.de>.
+	- Eric Sunshine re-created all of the EPS images in
+	  CS/docs/texinfo/tutorial/howto/msvc7proj because the existing ones
+	  had corrupt bounding boxes.  Also converted the JPEGS from
+	  progressive to normal mode.
 23-Sep-2003
 	- Jorrit changed the default display depth in video.cfg from 16
 	  to 32. On 3D cards, CS performs awfully bad with 16-bit displays
